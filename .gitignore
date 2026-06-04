@@ -44,7 +44,9 @@ next-env.d.ts
 .playwright-mcp/
 
 # Claude Code 내부 설정 (커밋 불필요)
-.claude/
+.claude/*
+!.claude/skills/
+!.claude/skills/**
 
 # 스크린샷 (개발용)
 *.png
