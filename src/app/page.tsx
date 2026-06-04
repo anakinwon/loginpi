@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { PiUserCard } from '@/components/pi-user-card'
-import { PiPaymentDemo } from '@/components/pi-payment-demo'
+import { PiProductCard } from '@/components/pi-product-card'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -72,24 +72,28 @@ export default function HomePage() {
         <PiUserCard />
       </section>
 
-      {/* Pi Coin 결제 데모 */}
+      {/* Pi Coin 결제 테스트 */}
       <section className='mb-12'>
-        <h2 className='mb-4 text-2xl font-semibold'>Pi Coin 결제 데모</h2>
+        <h2 className='mb-4 text-2xl font-semibold'>Pi Coin 결제 테스트</h2>
         <div className='grid gap-4 sm:grid-cols-2'>
-          <PiPaymentDemo />
-          <div className='bg-muted rounded-xl p-5 text-sm space-y-2'>
-            <p className='font-medium'>사용 방법</p>
-            <ol className='text-muted-foreground space-y-1.5 list-decimal list-inside'>
-              <li>Pi Browser로 이 페이지에 접속</li>
-              <li>Pi 계정으로 로그인</li>
-              <li>결제 금액 입력 (Pi 단위)</li>
-              <li>결제하기 버튼 클릭</li>
-              <li>Pi 지갑 확인 화면에서 승인</li>
+          <PiProductCard />
+          <div className='bg-muted rounded-xl p-5 text-sm space-y-3'>
+            <p className='font-medium'>테스트 방법</p>
+            <ol className='text-muted-foreground space-y-2 list-decimal list-inside'>
+              <li>Pi Browser로 이 페이지 접속 후 로그인</li>
+              <li>상품명 확인 (기본값: <strong className='text-foreground'>상품1</strong>)</li>
+              <li>수량 입력 (기본값: <strong className='text-foreground'>1개</strong>)</li>
+              <li>결제 금액 확인 (<strong className='text-foreground'>1 Pi</strong>)</li>
+              <li><strong className='text-foreground'>결제하기</strong> 버튼 클릭</li>
+              <li>Pi 지갑 화면에서 결제 승인</li>
             </ol>
-            <p className='text-muted-foreground text-xs pt-1'>
-              결제 완료 후 Payment ID와 TxID가 표시됩니다.
-              일반 브라우저에서는 Pi Browser 전용 안내가 표시됩니다.
-            </p>
+            <div className='border-t pt-3'>
+              <p className='font-medium mb-1'>결제 완료 시 표시</p>
+              <ul className='text-muted-foreground space-y-1 text-xs'>
+                <li>✓ Payment ID (결제 고유번호)</li>
+                <li>✓ Transaction ID (블록체인 TxID)</li>
+              </ul>
+            </div>
           </div>
         </div>
       </section>
