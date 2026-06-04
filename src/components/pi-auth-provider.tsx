@@ -17,6 +17,7 @@ interface PiAuthContextValue {
   isInPiBrowser: boolean
   signIn: () => Promise<void>
   signOut: () => Promise<void>
+  devLogin: () => Promise<void>
   error: string | null
 }
 
@@ -92,6 +93,25 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null)
   }, [])
 
+  // 개발 환경 전용: Pi.authenticate 없이 mock admin 세션 생성
+  const devLogin = useCallback(async () => {
+    setIsLoading(true)
+    setError(null)
+    try {
+      const res = await fetch('/api/auth/dev', { method: 'POST' })
+      if (!res.ok) {
+        const data = (await res.json()) as { error?: string }
+        throw new Error(data.error ?? '개발 로그인 실패')
+      }
+      const data = (await res.json()) as { user: PiSessionUser }
+      setUser(data.user)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '개발 로그인 실패')
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
+
   useEffect(() => {
     const inPi = detectPiBrowser()
     setIsInPiBrowser(inPi)
@@ -113,7 +133,7 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <PiAuthContext.Provider
-      value={{ user, isLoading, isInPiBrowser, signIn, signOut, error }}
+      value={{ user, isLoading, isInPiBrowser, signIn, signOut, devLogin, error }}
     >
       {children}
     </PiAuthContext.Provider>

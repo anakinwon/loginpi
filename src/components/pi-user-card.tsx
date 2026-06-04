@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { usePiAuth } from './pi-auth-provider'
 
-// Stellar 지갑 주소 (56자) 앞 10자 + … + 끝 6자로 축약
+// Stellar 지갑 주소 56자 → 앞 10자 + … + 끝 6자
 function truncateAddress(addr: string): string {
   if (addr.length <= 20) return addr
   return `${addr.slice(0, 10)}…${addr.slice(-6)}`
@@ -20,35 +20,69 @@ function formatDate(iso: string): string {
   })
 }
 
+// 개발 환경 + 일반 브라우저 → devLogin 사용 (Pi.authenticate는 Pi Browser 외 resolve 안 됨)
+const isDev = process.env.NODE_ENV !== 'production'
+
 export function PiUserCard() {
-  const { user, isLoading, signIn, signOut, error } = usePiAuth()
+  const { user, isLoading, isInPiBrowser, signIn, signOut, devLogin, error } = usePiAuth()
+  const useDevLogin = isDev && !isInPiBrowser
 
   if (!user) {
     return (
-      <div className='bg-muted flex flex-wrap items-center gap-6 rounded-xl p-6'>
-        <div className='flex flex-col gap-2'>
-          <Button onClick={signIn} disabled={isLoading} className='gap-2'>
-            <span className='font-serif text-base italic leading-none' aria-hidden='true'>
-              π
-            </span>
-            {isLoading ? 'Pi 인증 중…' : 'Pi Network로 로그인'}
-          </Button>
-          {error && <p className='text-destructive text-xs'>{error}</p>}
+      <div className='flex flex-col gap-3'>
+        <div className='bg-muted flex flex-wrap items-center gap-6 rounded-xl p-6'>
+          <div className='flex flex-col gap-2'>
+            <Button
+              onClick={useDevLogin ? devLogin : signIn}
+              disabled={isLoading}
+              className='gap-2'
+            >
+              <span
+                className='font-serif text-base italic leading-none'
+                aria-hidden='true'
+              >
+                π
+              </span>
+              {isLoading
+                ? 'Pi 인증 중…'
+                : useDevLogin
+                  ? 'Pi Network로 로그인 (개발 임시)'
+                  : 'Pi Network로 로그인'}
+            </Button>
+            {error && <p className='text-destructive text-xs'>{error}</p>}
+          </div>
+          <p className='text-muted-foreground text-sm'>
+            Pi Browser에서 접속하면 자동으로 인증됩니다.
+            <br />
+            다른 환경에서는 버튼을 눌러 수동으로 로그인하세요.
+          </p>
         </div>
-        <p className='text-muted-foreground text-sm'>
-          Pi Browser에서 접속하면 자동으로 인증됩니다.
-          <br />
-          다른 환경에서는 버튼을 눌러 수동으로 로그인하세요.
-        </p>
+
+        {/* 개발 환경 전용 안내 — 프로덕션 빌드에서는 렌더링 자체가 제거됨 */}
+        {isDev && !isInPiBrowser && (
+          <p className='text-muted-foreground border-dashed text-xs'>
+            개발 환경: 위 버튼은 Pi Browser 없이도 mock admin 세션으로 즉시 로그인됩니다.
+            프로덕션 빌드에서는 자동으로 실제 Pi 인증으로 전환됩니다.
+          </p>
+        )}
       </div>
     )
   }
+
+  const isDevSession = user.uid.startsWith('dev_')
 
   return (
     <Card>
       <CardHeader className='pb-3'>
         <div className='flex items-center justify-between'>
-          <CardTitle className='text-sm'>Pi Network 사용자 정보</CardTitle>
+          <div className='flex items-center gap-2'>
+            <CardTitle className='text-sm'>Pi Network 사용자 정보</CardTitle>
+            {isDevSession && (
+              <span className='rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'>
+                개발 임시 세션
+              </span>
+            )}
+          </div>
           <Button variant='outline' size='sm' onClick={signOut}>
             로그아웃
           </Button>
