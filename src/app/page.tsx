@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { PiUserCard } from '@/components/pi-user-card'
 import { PiProductCard } from '@/components/pi-product-card'
+import { PiPayButton } from '@/components/pi-pay-button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -72,29 +73,17 @@ export default function HomePage() {
         <PiUserCard />
       </section>
 
-      {/* Pi Coin 결제 테스트 */}
+      {/* Pi 결제 버튼 */}
       <section className='mb-12'>
-        <h2 className='mb-4 text-2xl font-semibold'>Pi Coin 결제 테스트</h2>
-        <div className='grid gap-4 sm:grid-cols-2'>
-          <PiProductCard />
-          <div className='bg-muted rounded-xl p-5 text-sm space-y-3'>
-            <p className='font-medium'>테스트 방법</p>
-            <ol className='text-muted-foreground space-y-2 list-decimal list-inside'>
-              <li>Pi Browser로 이 페이지 접속 후 로그인</li>
-              <li>상품명 확인 (기본값: <strong className='text-foreground'>상품1</strong>)</li>
-              <li>수량 입력 (기본값: <strong className='text-foreground'>1개</strong>)</li>
-              <li>결제 금액 확인 (<strong className='text-foreground'>1 Pi</strong>)</li>
-              <li><strong className='text-foreground'>결제하기</strong> 버튼 클릭</li>
-              <li>Pi 지갑 화면에서 결제 승인</li>
-            </ol>
-            <div className='border-t pt-3'>
-              <p className='font-medium mb-1'>결제 완료 시 표시</p>
-              <ul className='text-muted-foreground space-y-1 text-xs'>
-                <li>✓ Payment ID (결제 고유번호)</li>
-                <li>✓ Transaction ID (블록체인 TxID)</li>
-              </ul>
-            </div>
+        <h2 className='mb-4 text-2xl font-semibold'>Pi 코인 결제</h2>
+        <div className='grid gap-6 sm:grid-cols-2'>
+          {/* 단순 결제 버튼 */}
+          <div className='rounded-xl border p-6'>
+            <PiPayButton />
           </div>
+
+          {/* 상품 결제 */}
+          <PiProductCard />
         </div>
       </section>
 
