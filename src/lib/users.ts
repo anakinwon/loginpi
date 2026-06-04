@@ -1,5 +1,5 @@
 import 'server-only'
-import { supabaseAdmin } from './supabase-admin'
+import { getSupabaseAdmin } from './supabase-admin'
 
 export interface UserRow {
   id: string
@@ -22,7 +22,7 @@ export async function upsertPiUser(piUser: {
   username: string | null
   walletAddress: string | null
 }): Promise<UserRow> {
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await getSupabaseAdmin()
     .from('users')
     .upsert(
       {
@@ -47,7 +47,7 @@ export async function upsertGoogleUser(googleUser: {
   name: string | null
   image: string | null
 }): Promise<UserRow> {
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await getSupabaseAdmin()
     .from('users')
     .upsert(
       {
@@ -74,7 +74,7 @@ export async function linkGoogleToPiUser(
   if (piUserId === googleUserId) return // 이미 연동됨
 
   // Google row 데이터 조회
-  const { data: googleUser, error: fetchErr } = await supabaseAdmin
+  const { data: googleUser, error: fetchErr } = await getSupabaseAdmin()
     .from('users')
     .select('google_id, google_email, google_name, google_image')
     .eq('id', googleUserId)
@@ -85,7 +85,7 @@ export async function linkGoogleToPiUser(
   }
 
   // Pi row에 Google 필드 추가
-  const { error: updateErr } = await supabaseAdmin
+  const { error: updateErr } = await getSupabaseAdmin()
     .from('users')
     .update({
       google_id: googleUser.google_id,
@@ -98,11 +98,11 @@ export async function linkGoogleToPiUser(
   if (updateErr) throw updateErr
 
   // 독립 Google row 삭제
-  await supabaseAdmin.from('users').delete().eq('id', googleUserId)
+  await getSupabaseAdmin().from('users').delete().eq('id', googleUserId)
 }
 
 export async function getUserById(id: string): Promise<UserRow | null> {
-  const { data } = await supabaseAdmin
+  const { data } = await getSupabaseAdmin()
     .from('users')
     .select()
     .eq('id', id)
