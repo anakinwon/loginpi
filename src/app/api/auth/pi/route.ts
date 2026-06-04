@@ -84,7 +84,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: '잘못된 요청 본문입니다' }, { status: 400 })
   }
 
-  const { accessToken } = body as { accessToken?: string }
+  const { accessToken, walletAddress } = body as {
+    accessToken?: string
+    walletAddress?: string | null
+  }
   if (!accessToken || typeof accessToken !== 'string') {
     return NextResponse.json({ error: 'accessToken이 필요합니다' }, { status: 400 })
   }
@@ -115,11 +118,13 @@ export async function POST(request: NextRequest) {
   const secondsUntilExpiry = Math.floor((tokenExpiresAt - Date.now()) / 1000)
   const maxAge = Math.min(Math.max(secondsUntilExpiry, 0), MAX_COOKIE_AGE_SEC)
 
-  // uid는 scope 없이 항상 제공, username은 'username' scope 허용 시 제공
+  // uid는 scope 없이 항상 제공
+  // username: 'username' scope / wallet_address: 클라이언트 Pi.authenticate 결과에서 수신 (/v2/me 미제공)
   const sessionData: PiSessionUser = {
     uid: piUser.uid,
     displayName: piUser.username ?? `pi_${piUser.uid.slice(0, 8)}`,
     username: piUser.username ?? null,
+    walletAddress: typeof walletAddress === 'string' ? walletAddress : null,
     scopesGranted: piUser.credentials.scopes,
     tokenValidUntil: piUser.credentials.valid_until.iso8601,
   }

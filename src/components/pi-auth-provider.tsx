@@ -55,14 +55,20 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
         window.Pi.init({ version: '2.0', sandbox: detectSandbox() })
       )
 
-      const auth = await window.Pi.authenticate(['username'], (payment) => {
-        console.warn('미완료 Pi 결제 발견:', payment.identifier)
-      })
+      const auth = await window.Pi.authenticate(
+        ['username', 'wallet_address'],
+        (payment) => {
+          console.warn('미완료 Pi 결제 발견:', payment.identifier)
+        }
+      )
 
       const res = await fetch('/api/auth/pi', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ accessToken: auth.accessToken }),
+        body: JSON.stringify({
+          accessToken: auth.accessToken,
+          walletAddress: auth.user.wallet_address ?? null,
+        }),
       })
 
       if (!res.ok) {

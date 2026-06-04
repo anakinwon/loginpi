@@ -19,6 +19,7 @@ declare global {
   interface PiUser {
     uid: string
     username: string
+    wallet_address?: string
   }
 
   interface PiAuthResult {
