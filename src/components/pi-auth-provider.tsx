@@ -27,6 +27,16 @@ function detectPiBrowser(): boolean {
   return /PiBrowser/i.test(navigator.userAgent)
 }
 
+// localhost는 항상 sandbox — 개발 환경에서 Pi.init({ sandbox: false })를 넘기면
+// Pi App Studio "Verify My App"이 Pi.authenticate 호출을 감지하지 못함
+function detectSandbox(): boolean {
+  if (typeof window !== 'undefined') {
+    const { hostname } = window.location
+    if (hostname === 'localhost' || hostname === '127.0.0.1') return true
+  }
+  return process.env.NEXT_PUBLIC_PI_SANDBOX === 'true'
+}
+
 export function PiAuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<PiSessionUser | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -42,10 +52,7 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
     setError(null)
     try {
       await Promise.resolve(
-        window.Pi.init({
-          version: '2.0',
-          sandbox: process.env.NEXT_PUBLIC_PI_SANDBOX === 'true',
-        })
+        window.Pi.init({ version: '2.0', sandbox: detectSandbox() })
       )
 
       const auth = await window.Pi.authenticate(['username'], (payment) => {
@@ -79,23 +86,23 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null)
   }, [])
 
-  // 마운트 시 기존 서명된 세션 복원. 세션 없고 Pi Browser이면 자동 인증
   useEffect(() => {
     const inPi = detectPiBrowser()
     setIsInPiBrowser(inPi)
 
-    fetch('/api/auth/pi')
-      .then((res) => res.json())
-      .then((data: { user: PiSessionUser | null }) => {
-        if (data.user) {
-          setUser(data.user)
-        } else if (inPi) {
-          signIn()
-        }
-      })
-      .catch(() => {
-        if (inPi) signIn()
-      })
+    if (inPi) {
+      // Pi Browser: 즉시 Pi.authenticate 실행
+      // GET 세션 복원을 기다리면 "Verify My App"이 Pi.authenticate 호출을 감지하지 못함
+      signIn()
+    } else {
+      // 일반 브라우저: 서명된 세션 쿠키로 상태 복원만 시도
+      fetch('/api/auth/pi')
+        .then((res) => res.json())
+        .then((data: { user: PiSessionUser | null }) => {
+          if (data.user) setUser(data.user)
+        })
+        .catch(() => {})
+    }
   }, [signIn])
 
   return (
