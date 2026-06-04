@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
+import Script from 'next/script'
 import './globals.css'
 import { ThemeProvider } from '@/components/theme-provider'
+import { PiAuthProvider } from '@/components/pi-auth-provider'
 import { Header } from '@/components/layout/header'
 import { Footer } from '@/components/layout/footer'
 import { Toaster } from '@/components/ui/sonner'
@@ -31,16 +33,22 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col antialiased`}
       >
+        <Script
+          src='https://sdk.minepi.com/pi-sdk.js'
+          strategy='beforeInteractive'
+        />
         <ThemeProvider
           attribute='class'
           defaultTheme='system'
           enableSystem
           disableTransitionOnChange
         >
-          <Header />
-          <main className='flex-1'>{children}</main>
-          <Footer />
-          <Toaster richColors />
+          <PiAuthProvider>
+            <Header />
+            <main className='flex-1'>{children}</main>
+            <Footer />
+            <Toaster richColors />
+          </PiAuthProvider>
         </ThemeProvider>
       </body>
     </html>

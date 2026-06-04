@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { PiLoginButton } from '@/components/pi-login-button'
 import { ThemeToggle } from '@/components/theme-toggle'
 
 export function Header() {
@@ -8,7 +9,8 @@ export function Header() {
         <Link href='/' className='text-foreground font-semibold tracking-tight'>
           Next.js Starter Kit
         </Link>
-        <nav className='flex items-center gap-2'>
+        <nav className='flex items-center gap-3'>
+          <PiLoginButton />
           <ThemeToggle />
         </nav>
       </div>

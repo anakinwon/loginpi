@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button, buttonVariants } from '@/components/ui/button'
+import { PiLoginButton } from '@/components/pi-login-button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -62,6 +63,19 @@ export default function HomePage() {
           빠르게 시작하는 Next.js 15 + Tailwind CSS v4 + shadcn/ui
           보일러플레이트
         </p>
+      </section>
+
+      {/* Pi Network 인증 */}
+      <section className='mb-12'>
+        <h2 className='mb-4 text-2xl font-semibold'>Pi Network 인증</h2>
+        <div className='bg-muted flex flex-wrap items-center gap-6 rounded-xl p-6'>
+          <PiLoginButton />
+          <p className='text-muted-foreground text-sm'>
+            Pi Browser에서 접속하면 자동으로 인증됩니다.
+            <br />
+            다른 환경에서는 버튼을 눌러 수동으로 로그인할 수 있습니다.
+          </p>
+        </div>
       </section>
 
       {/* 기술 스택 카드 */}
