@@ -15,6 +15,7 @@ export async function POST() {
   }
 
   const mockUser: PiSessionUser = {
+    userId: 'dev_admin_supabase_id_000000000000000',
     uid: 'dev_admin_uid_000000000000000000000000000000',
     displayName: 'admin',
     username: 'admin',

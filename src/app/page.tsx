@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { PiUserCard } from '@/components/pi-user-card'
 import { GoogleUserCard } from '@/components/google-user-card'
+import { AccountLinkCard } from '@/components/account-link-card'
 import { PiProductCard } from '@/components/pi-product-card'
 import { PiPayButton } from '@/components/pi-pay-button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -71,7 +72,7 @@ export default function HomePage() {
       {/* 로그인 */}
       <section className='mb-12'>
         <h2 className='mb-4 text-2xl font-semibold'>로그인</h2>
-        <div className='grid gap-4 sm:grid-cols-2'>
+        <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
           <div>
             <p className='text-muted-foreground mb-3 text-xs font-medium uppercase tracking-wider'>
               Pi Network
@@ -83,6 +84,12 @@ export default function HomePage() {
               Google
             </p>
             <GoogleUserCard />
+          </div>
+          <div>
+            <p className='text-muted-foreground mb-3 text-xs font-medium uppercase tracking-wider'>
+              계정 연동
+            </p>
+            <AccountLinkCard />
           </div>
         </div>
       </section>

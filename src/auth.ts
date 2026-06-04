@@ -1,5 +1,6 @@
 import NextAuth from 'next-auth'
 import Google from 'next-auth/providers/google'
+import { upsertGoogleUser } from '@/lib/users'
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
@@ -10,10 +11,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ],
   session: { strategy: 'jwt' },
   callbacks: {
-    jwt({ token, profile }) {
-      // Google 프로필에서 Google ID를 토큰에 저장
-      if (profile?.sub) {
-        token.googleId = profile.sub as string
+    async jwt({ token, profile, account }) {
+      // Google OAuth 최초 로그인 시 Supabase upsert → userId 저장
+      if (account?.provider === 'google' && profile?.sub) {
+        try {
+          const dbUser = await upsertGoogleUser({
+            id: profile.sub as string,
+            email: (profile.email ?? '') as string,
+            name: (profile.name ?? null) as string | null,
+            image: ((profile as Record<string, unknown>).picture ?? null) as string | null,
+          })
+          token.userId = dbUser.id  // Supabase users.id
+        } catch {
+          // DB 오류 시 Google sub을 fallback으로 사용
+          token.userId = token.sub
+        }
       }
       return token
     },
@@ -22,12 +34,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         ...session,
         user: {
           ...session.user,
-          id: token.sub ?? '',
+          // Supabase users.id를 id로 노출 (Pi row와 연동 후 동일 값)
+          id: (token.userId as string) ?? token.sub ?? '',
         },
       }
     },
   },
   pages: {
-    signIn: '/',   // 별도 로그인 페이지 없이 홈에서 처리
+    signIn: '/',
   },
 })
