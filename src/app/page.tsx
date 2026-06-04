@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { PiUserCard } from '@/components/pi-user-card'
+import { PiPaymentDemo } from '@/components/pi-payment-demo'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -69,6 +70,28 @@ export default function HomePage() {
       <section className='mb-12'>
         <h2 className='mb-4 text-2xl font-semibold'>Pi Network 인증</h2>
         <PiUserCard />
+      </section>
+
+      {/* Pi Coin 결제 데모 */}
+      <section className='mb-12'>
+        <h2 className='mb-4 text-2xl font-semibold'>Pi Coin 결제 데모</h2>
+        <div className='grid gap-4 sm:grid-cols-2'>
+          <PiPaymentDemo />
+          <div className='bg-muted rounded-xl p-5 text-sm space-y-2'>
+            <p className='font-medium'>사용 방법</p>
+            <ol className='text-muted-foreground space-y-1.5 list-decimal list-inside'>
+              <li>Pi Browser로 이 페이지에 접속</li>
+              <li>Pi 계정으로 로그인</li>
+              <li>결제 금액 입력 (Pi 단위)</li>
+              <li>결제하기 버튼 클릭</li>
+              <li>Pi 지갑 확인 화면에서 승인</li>
+            </ol>
+            <p className='text-muted-foreground text-xs pt-1'>
+              결제 완료 후 Payment ID와 TxID가 표시됩니다.
+              일반 브라우저에서는 Pi Browser 전용 안내가 표시됩니다.
+            </p>
+          </div>
+        </div>
       </section>
 
       {/* 기술 스택 카드 */}

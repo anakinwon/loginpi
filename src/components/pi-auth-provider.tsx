@@ -57,9 +57,26 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
       )
 
       const auth = await window.Pi.authenticate(
-        ['username', 'wallet_address'],
-        (payment) => {
-          console.warn('미완료 Pi 결제 발견:', payment.identifier)
+        ['username', 'wallet_address', 'payments'],
+        async (payment: PaymentDTO) => {
+          // 미완료 결제 자동 복구 — 미구현 시 사용자가 새 결제 불가
+          try {
+            if (!payment.status.developer_approved) {
+              await fetch('/api/payments/approve', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ paymentId: payment.identifier }),
+              })
+            } else if (!payment.status.developer_completed && payment.transaction?.txid) {
+              await fetch('/api/payments/complete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ paymentId: payment.identifier, txid: payment.transaction.txid }),
+              })
+            }
+          } catch {
+            console.error('미완료 결제 복구 실패:', payment.identifier)
+          }
         }
       )
 
