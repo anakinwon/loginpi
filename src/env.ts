@@ -4,6 +4,10 @@ import { z } from 'zod'
 export const env = createEnv({
   server: {
     PI_SESSION_SECRET: z.string().min(32, 'PI_SESSION_SECRET는 최소 32자 이상이어야 합니다'),
+    AUTH_SECRET: z.string().min(32, 'AUTH_SECRET은 최소 32자 이상이어야 합니다'),
+    GOOGLE_CLIENT_ID: z.string().optional(),
+    GOOGLE_CLIENT_SECRET: z.string().optional(),
+    PI_API_KEY: z.string().optional(),
   },
   client: {
     NEXT_PUBLIC_APP_URL: z.string().url(),
@@ -11,6 +15,10 @@ export const env = createEnv({
   },
   runtimeEnv: {
     PI_SESSION_SECRET: process.env.PI_SESSION_SECRET,
+    AUTH_SECRET: process.env.AUTH_SECRET,
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+    PI_API_KEY: process.env.PI_API_KEY,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_PI_SANDBOX: process.env.NEXT_PUBLIC_PI_SANDBOX,
   },

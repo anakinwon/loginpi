@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { PiUserCard } from '@/components/pi-user-card'
+import { GoogleUserCard } from '@/components/google-user-card'
 import { PiProductCard } from '@/components/pi-product-card'
 import { PiPayButton } from '@/components/pi-pay-button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -67,10 +68,23 @@ export default function HomePage() {
         </p>
       </section>
 
-      {/* Pi Network 인증 */}
+      {/* 로그인 */}
       <section className='mb-12'>
-        <h2 className='mb-4 text-2xl font-semibold'>Pi Network 인증</h2>
-        <PiUserCard />
+        <h2 className='mb-4 text-2xl font-semibold'>로그인</h2>
+        <div className='grid gap-4 sm:grid-cols-2'>
+          <div>
+            <p className='text-muted-foreground mb-3 text-xs font-medium uppercase tracking-wider'>
+              Pi Network
+            </p>
+            <PiUserCard />
+          </div>
+          <div>
+            <p className='text-muted-foreground mb-3 text-xs font-medium uppercase tracking-wider'>
+              Google
+            </p>
+            <GoogleUserCard />
+          </div>
+        </div>
       </section>
 
       {/* Pi 결제 버튼 */}

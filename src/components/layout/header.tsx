@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { GoogleLoginButton } from '@/components/google-login-button'
 import { PiLoginButton } from '@/components/pi-login-button'
 import { ThemeToggle } from '@/components/theme-toggle'
 
@@ -10,6 +11,7 @@ export function Header() {
           Next.js Starter Kit
         </Link>
         <nav className='flex items-center gap-3'>
+          <GoogleLoginButton />
           <PiLoginButton />
           <ThemeToggle />
         </nav>
