@@ -30,7 +30,7 @@ export async function GET(
     .order('reg_dtm', { ascending: false })
     .range(from, from + limit - 1)
 
-  const safeQ = q.replace(/[,()*]/g, '').slice(0, 100)
+  const safeQ = q.replace(/[,()*]/g, '').replace(/[%_\\]/g, '\\$&').slice(0, 100)
   if (safeQ) {
     query = query.or(`post_ttl.ilike.%${safeQ}%,post_cont.ilike.%${safeQ}%`)
   }

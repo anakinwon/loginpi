@@ -33,8 +33,12 @@ export default async function BoardListPage({ params, searchParams }: Props) {
     .order('reg_dtm', { ascending: false })
     .range(from, from + limit - 1)
 
-  // PostgREST 필터 메타문자 제거 후 검색 (인젝션 방지)
-  const safeQ = q?.trim().replace(/[,()*]/g, '').slice(0, 100) ?? ''
+  // PostgREST 인젝션 방지: ,()*는 제거, LIKE 와일드카드 %_\는 이스케이프
+  const safeQ = q
+    ?.trim()
+    .replace(/[,()*]/g, '')
+    .replace(/[%_\\]/g, '\\$&')
+    .slice(0, 100) ?? ''
   if (safeQ) {
     query = query.or(`post_ttl.ilike.%${safeQ}%,post_cont.ilike.%${safeQ}%`)
   }
