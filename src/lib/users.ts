@@ -16,7 +16,7 @@ export interface UserRow {
   updated_at: string
 }
 
-// Pi 로그인 시 upsert — pi_uid 기준
+// Pi 로그인 시 upsert — pi_uid 기준 (항상 1건만 유지)
 export async function upsertPiUser(piUser: {
   uid: string
   username: string | null
@@ -40,78 +40,28 @@ export async function upsertPiUser(piUser: {
   return data as UserRow
 }
 
-// Google 로그인 시 upsert — google_id 기준
-export async function upsertGoogleUser(googleUser: {
-  id: string
-  email: string
-  name: string | null
-  image: string | null
-}): Promise<UserRow> {
-  const { data, error } = await getSupabaseAdmin()
-    .from('users')
-    .upsert(
-      {
-        google_id: googleUser.id,
-        google_email: googleUser.email,
-        google_name: googleUser.name,
-        google_image: googleUser.image,
-        display_name: googleUser.name ?? googleUser.email,
-      },
-      { onConflict: 'google_id' }
-    )
-    .select()
-    .single()
-
-  if (error) throw new Error(error.message ?? 'Google 사용자 저장 실패')
-  return data as UserRow
-}
-
-// 계정 연동: Pi users row에 Google 필드 병합, 독립 Google row 삭제
-export async function linkGoogleToPiUser(
+// 연동 코드 입력 완료 시: Pi row에 Google 필드 UPDATE
+// Google 전용 row를 별도 생성하지 않고 기존 Pi row에 직접 업데이트
+export async function updatePiUserWithGoogle(
   piUserId: string,
-  googleUserId: string
-): Promise<void> {
-  if (piUserId === googleUserId) return // 이미 연동됨
-
-  const supabase = getSupabaseAdmin()
-
-  // Google row 데이터 조회
-  const { data: googleUser, error: fetchErr } = await supabase
-    .from('users')
-    .select('google_id, google_email, google_name, google_image')
-    .eq('id', googleUserId)
-    .single()
-
-  if (fetchErr || !googleUser?.google_id) {
-    throw new Error('Google 사용자를 찾을 수 없습니다')
+  googleUser: {
+    id: string    // Google OAuth sub
+    email: string
+    name: string | null
+    image: string | null
   }
-
-  // google_id UNIQUE 충돌 방지: Google row의 google_id를 먼저 null로 비움
-  // Pi row 업데이트 전에 같은 google_id가 두 row에 존재하면 409 발생
-  await supabase.from('users').update({ google_id: null }).eq('id', googleUserId)
-
-  // Pi row에 Google 필드 추가
-  const { error: updateErr } = await supabase
+): Promise<void> {
+  const { error } = await getSupabaseAdmin()
     .from('users')
     .update({
-      google_id: googleUser.google_id,
-      google_email: googleUser.google_email,
-      google_name: googleUser.google_name,
-      google_image: googleUser.google_image,
+      google_id: googleUser.id,
+      google_email: googleUser.email,
+      google_name: googleUser.name,
+      google_image: googleUser.image,
     })
     .eq('id', piUserId)
 
-  if (updateErr) {
-    // 실패 시 Google row 복원 (best-effort)
-    await supabase
-      .from('users')
-      .update({ google_id: googleUser.google_id })
-      .eq('id', googleUserId)
-    throw new Error(updateErr.message ?? '계정 연동 중 오류가 발생했습니다')
-  }
-
-  // 독립 Google row 삭제
-  await supabase.from('users').delete().eq('id', googleUserId)
+  if (error) throw new Error(error.message ?? '계정 연동 실패')
 }
 
 export async function getUserById(id: string): Promise<UserRow | null> {

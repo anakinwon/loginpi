@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
-import { upsertGoogleUser, linkGoogleToPiUser } from '@/lib/users'
+import { updatePiUserWithGoogle } from '@/lib/users'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 
 // POST /api/auth/link-complete
-// Body: { code: string }  — Pi Browser가 생성한 6자리 코드
-// 일반 브라우저에서 Google 세션을 가진 채로 호출
+// Body: { code: string }
+// 일반 브라우저에서 Google 세션을 가진 채로 호출 → Pi row에 Google 필드 UPDATE
 export async function POST(request: NextRequest) {
   let body: unknown
   try { body = await request.json() } catch {
@@ -34,15 +34,11 @@ export async function POST(request: NextRequest) {
   if (new Date(linkCode.expires_at) < new Date()) {
     return NextResponse.json({ error: '코드가 만료됐습니다 (10분 초과)' }, { status: 400 })
   }
-
-  // 5회 이상이면 차단
-  const MAX_ATTEMPTS = 5
-  if (linkCode.attempt_count >= MAX_ATTEMPTS) {
+  if (linkCode.attempt_count >= 5) {
     return NextResponse.json({ error: '시도 횟수 초과로 코드가 무효화됐습니다. Pi Browser에서 새 코드를 생성하세요.' }, { status: 400 })
   }
 
-  // Google 세션 여부와 무관하게 시도 즉시 카운트 증가
-  // — Google 로그인 상태에서 브루트포스 시 카운터를 우회하는 경로 차단
+  // 시도 횟수 즉시 증가 (브루트포스 방지)
   await supabase
     .from('link_codes')
     .update({ attempt_count: linkCode.attempt_count + 1 })
@@ -53,23 +49,24 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Google 로그인이 필요합니다' }, { status: 401 })
   }
 
-  const googleSub = googleSession.user.sub ?? googleSession.user.id
-  const googleEmail = googleSession.user.email
-  if (!googleEmail) {
+  // Google OAuth sub를 google_id로 사용 (JWT token.sub = Google raw sub)
+  const googleSub = googleSession.user.sub
+  if (!googleSub) {
+    return NextResponse.json({ error: 'Google 인증 정보가 없습니다' }, { status: 400 })
+  }
+  if (!googleSession.user.email) {
     return NextResponse.json({ error: 'Google 이메일 정보가 없습니다' }, { status: 400 })
   }
 
   try {
-    const googleDbUser = await upsertGoogleUser({
+    // Pi row에 Google 필드 직접 UPDATE — 별도 row 생성 없음
+    await updatePiUserWithGoogle(linkCode.pi_user_id, {
       id: googleSub,
-      email: googleEmail,
+      email: googleSession.user.email,
       name: googleSession.user.name ?? null,
       image: googleSession.user.image ?? null,
     })
 
-    await linkGoogleToPiUser(linkCode.pi_user_id, googleDbUser.id)
-
-    // 1회 사용 처리
     await supabase
       .from('link_codes')
       .update({ used_at: new Date().toISOString() })
