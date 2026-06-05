@@ -15,6 +15,12 @@ export async function Header() {
           Next.js Starter Kit
         </Link>
         <nav className='flex items-center gap-3'>
+          <Link
+            href='/board'
+            className='text-muted-foreground hover:text-foreground text-sm transition-colors'
+          >
+            게시판
+          </Link>
           {showAdmin && (
             <Link
               href='/admin'
