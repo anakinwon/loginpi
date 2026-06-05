@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { signIn, useSession } from 'next-auth/react'
+import { signIn as googleSignIn, useSession } from 'next-auth/react'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { usePiAuth } from './pi-auth-provider'
@@ -11,19 +11,26 @@ import Link from 'next/link'
 type GenStatus = 'idle' | 'loading' | 'done' | 'error'
 
 export function AccountLinkCard() {
-  const { user: piUser, isInPiBrowser } = usePiAuth()
+  const { user: piUser, isInPiBrowser, isLoading: piLoading, signIn: piSignIn } = usePiAuth()
   const { data: googleSession } = useSession()
   const [genStatus, setGenStatus] = useState<GenStatus>('idle')
   const [code, setCode] = useState('')
   const [errMsg, setErrMsg] = useState('')
 
-  async function generateCode() {
+  async function generateCode(isRetry = false) {
     setGenStatus('loading')
     setCode('')
     setErrMsg('')
     try {
       const res = await fetch('/api/auth/link-start', { method: 'POST' })
       const data = (await res.json()) as { code?: string; error?: string }
+
+      // Pi 세션 만료 시 1회 재인증 후 재시도
+      if (res.status === 401 && !isRetry) {
+        await piSignIn()
+        return generateCode(true)
+      }
+
       if (!res.ok || !data.code) throw new Error(data.error ?? '코드 생성 실패')
       setCode(data.code)
       setGenStatus('done')
@@ -60,33 +67,63 @@ export function AccountLinkCard() {
           ) : isInPiBrowser ? (
             /* ── Pi Browser: 연동 코드 생성 ── */
             <>
-              <p className='text-xs text-muted-foreground'>
-                아래 버튼을 눌러 연동 코드를 생성하고,<br />
-                일반 브라우저에서{' '}
-                <span className='font-mono text-foreground'>/link</span> 페이지를 열어 입력하세요.
-              </p>
+              {piLoading ? (
+                /* Pi SDK 인증 대기 중 */
+                <p className='text-xs text-muted-foreground'>Pi 로그인 확인 중…</p>
 
-              <Button
-                size='sm'
-                className='w-full'
-                disabled={genStatus === 'loading'}
-                onClick={generateCode}
-              >
-                {genStatus === 'loading' ? '코드 생성 중…' : '연동 코드 생성'}
-              </Button>
-
-              {genStatus === 'done' && displayCode && (
-                <div className='rounded-lg border-2 border-primary/30 bg-primary/5 p-4 text-center space-y-2'>
-                  <p className='text-xs text-muted-foreground'>연동 코드</p>
-                  <p className='text-4xl font-bold tracking-widest font-mono text-primary'>
-                    {displayCode}
+              ) : !piUser ? (
+                /* Pi 로그인 필요 */
+                <div className='space-y-2'>
+                  <p className='text-xs text-muted-foreground'>
+                    연동 코드를 생성하려면 먼저 Pi 로그인이 필요합니다.
                   </p>
-                  <p className='text-xs text-muted-foreground'>10분 내 사용</p>
+                  <Button size='sm' className='w-full' onClick={() => piSignIn()}>
+                    Pi 로그인
+                  </Button>
                 </div>
-              )}
 
-              {genStatus === 'error' && (
-                <p className='text-destructive text-xs'>{errMsg}</p>
+              ) : (
+                /* Pi 로그인 완료 → 코드 생성 UI */
+                <>
+                  <div className='bg-muted rounded-lg p-3 text-xs text-muted-foreground space-y-1'>
+                    <p className='font-semibold text-foreground'>Pi Browser 역할: 코드 생성</p>
+                    <p>① 아래 버튼으로 6자리 코드 생성</p>
+                    <p>② 일반 브라우저(Chrome 등)에서</p>
+                    <p className='font-mono text-foreground pl-3'>
+                      {typeof window !== 'undefined' ? window.location.origin : ''}/link
+                    </p>
+                    <p>③ 페이지를 열고 코드 입력</p>
+                  </div>
+
+                  <Button
+                    size='sm'
+                    className='w-full'
+                    disabled={genStatus === 'loading'}
+                    onClick={() => generateCode()}
+                  >
+                    {genStatus === 'loading' ? '코드 생성 중…' : '연동 코드 생성'}
+                  </Button>
+
+                  {genStatus === 'done' && displayCode && (
+                    <div className='rounded-lg border-2 border-primary/30 bg-primary/5 p-4 text-center space-y-2'>
+                      <p className='text-xs text-muted-foreground'>연동 코드 — 일반 브라우저에서 입력</p>
+                      <p className='text-4xl font-bold tracking-widest font-mono text-primary'>
+                        {displayCode}
+                      </p>
+                      <p className='text-xs text-muted-foreground'>10분 내 사용</p>
+                    </div>
+                  )}
+
+                  {genStatus === 'error' && (
+                    <div className='space-y-2'>
+                      <p className='text-destructive text-xs'>{errMsg}</p>
+                      <Button size='sm' variant='outline' className='w-full'
+                        onClick={() => generateCode()}>
+                        다시 시도
+                      </Button>
+                    </div>
+                  )}
+                </>
               )}
             </>
 
@@ -94,10 +131,11 @@ export function AccountLinkCard() {
             /* ── 일반 브라우저: 코드 입력 안내 ── */
             <>
               <div className='bg-muted rounded-lg p-3 text-xs text-muted-foreground space-y-1'>
-                <p className='font-semibold text-foreground'>연동 순서</p>
-                <p>① Pi Browser에서 이 페이지를 열고 연동 코드 생성</p>
-                <p>② 이 브라우저에서 아래 버튼 클릭 후 코드 입력</p>
-                <p>③ Google로 로그인하면 자동 연동</p>
+                <p className='font-semibold text-foreground'>일반 브라우저 역할: 코드 입력</p>
+                <p>① Pi Browser에서 이 페이지 접속</p>
+                <p>② Pi 로그인 후 연동 코드 생성</p>
+                <p>③ 아래 버튼 클릭 후 코드 입력</p>
+                <p>④ Google 로그인하면 연동 완료</p>
               </div>
 
               {!googleSession?.user && (
@@ -105,7 +143,7 @@ export function AccountLinkCard() {
                   variant='outline'
                   size='sm'
                   className='w-full gap-1.5'
-                  onClick={() => signIn('google')}
+                  onClick={() => googleSignIn('google')}
                 >
                   Google로 먼저 로그인
                 </Button>
