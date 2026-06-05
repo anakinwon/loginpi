@@ -14,7 +14,7 @@ import Link from 'next/link'
 //   piUser (Pi 세션 있음) → 코드 생성 UI  (UA 감지 불필요)
 //   !piUser          → 코드 입력 안내 + Pi Browser 전용 링크 안내
 export function AccountLinkCard() {
-  const { user: piUser, isLoading: piLoading, signIn: piSignIn } = usePiAuth()
+  const { user: piUser, piAccessToken, isLoading: piLoading, signIn: piSignIn } = usePiAuth()
   const { data: googleSession } = useSession()
   const [genStatus, setGenStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
   const [code, setCode] = useState('')
@@ -37,7 +37,14 @@ export function AccountLinkCard() {
     setCode('')
     setErrMsg('')
     try {
-      const res = await fetch('/api/auth/link-start', { method: 'POST', credentials: 'include' })
+      const res = await fetch('/api/auth/link-start', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          // 쿠키가 WebView에 저장 안 됐을 때 Pi Network API 직접 검증 폴백
+          ...(piAccessToken ? { 'X-Pi-Token': piAccessToken } : {}),
+        },
+      })
       const data = (await res.json()) as { code?: string; error?: string }
       if (res.status === 401 && !isRetry) {
         await piSignIn()

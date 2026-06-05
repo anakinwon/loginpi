@@ -13,6 +13,8 @@ export type { PiSessionUser }
 
 interface PiAuthContextValue {
   user: PiSessionUser | null
+  // Pi.authenticate()로 받은 accessToken — 쿠키 저장 실패 시 폴백 인증에 사용
+  piAccessToken: string | null
   isLoading: boolean
   isInPiBrowser: boolean
   signIn: () => Promise<void>
@@ -26,7 +28,6 @@ const PiAuthContext = createContext<PiAuthContextValue | null>(null)
 function detectPiBrowser(): boolean {
   if (typeof navigator === 'undefined') return false
   const ua = navigator.userAgent
-  // Pi Browser UA 패턴 — 여러 버전/형태 커버
   return (
     /PiBrowser/i.test(ua) ||
     /Pi Network/i.test(ua) ||
@@ -45,7 +46,7 @@ function detectSandbox(): boolean {
 
 export function PiAuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<PiSessionUser | null>(null)
-  // 초기 true: 클라이언트 초기화 전까지는 "로딩 중"으로 처리 → flash 방지
+  const [piAccessToken, setPiAccessToken] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isInPiBrowser, setIsInPiBrowser] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -86,6 +87,9 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
         }
       )
 
+      // accessToken을 state에 저장 — WebView 쿠키 저장 실패 시 폴백 인증에 사용
+      setPiAccessToken(auth.accessToken)
+
       const res = await fetch('/api/auth/pi', {
         method: 'POST',
         credentials: 'include',
@@ -115,6 +119,7 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = useCallback(async () => {
     await fetch('/api/auth/pi', { method: 'DELETE', credentials: 'include' })
     setUser(null)
+    setPiAccessToken(null)
   }, [])
 
   const devLogin = useCallback(async () => {
@@ -140,10 +145,8 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
     setIsInPiBrowser(inPi)
 
     if (inPi) {
-      // Pi Browser: Pi.authenticate 즉시 실행 (signIn 내부에서 isLoading 관리)
       signIn()
     } else {
-      // 일반 브라우저: 쿠키 복원 후 isLoading false
       fetch('/api/auth/pi', { credentials: 'include' })
         .then((res) => res.json())
         .then((data: { user: PiSessionUser | null }) => {
@@ -156,7 +159,7 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <PiAuthContext.Provider
-      value={{ user, isLoading, isInPiBrowser, signIn, signOut, devLogin, error }}
+      value={{ user, piAccessToken, isLoading, isInPiBrowser, signIn, signOut, devLogin, error }}
     >
       {children}
     </PiAuthContext.Provider>

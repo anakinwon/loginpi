@@ -14,7 +14,7 @@ import { usePiAuth } from '@/components/pi-auth-provider'
 //   piUser 없음 → 코드 입력 UI  (일반 브라우저)
 //   ?generate=1  → 항상 생성 UI  (UA 감지 실패 시 강제 진입용)
 function LinkPageInner() {
-  const { user: piUser, isLoading: piLoading, signIn: piSignIn } = usePiAuth()
+  const { user: piUser, piAccessToken, isLoading: piLoading, signIn: piSignIn } = usePiAuth()
   const { data: googleSession, status: googleStatus } = useSession()
   const params = useSearchParams()
   const router = useRouter()
@@ -42,7 +42,13 @@ function LinkPageInner() {
     setGenCode('')
     setGenErr('')
     try {
-      const res = await fetch('/api/auth/link-start', { method: 'POST', credentials: 'include' })
+      const res = await fetch('/api/auth/link-start', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          ...(piAccessToken ? { 'X-Pi-Token': piAccessToken } : {}),
+        },
+      })
       const data = (await res.json()) as { code?: string; error?: string }
       if (res.status === 401 && !isRetry) {
         await piSignIn()
