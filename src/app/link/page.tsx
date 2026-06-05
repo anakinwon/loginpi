@@ -22,13 +22,16 @@ function LinkPageInner() {
   const forceGenerate = params.get('generate') === '1'
   const showGenerate = forceGenerate || !!piUser
 
+  // URL ?code= 파라미터로 코드 자동 채우기
+  const codeFromUrl = (params.get('code') ?? '').replace(/\D/g, '').slice(0, 6)
+
   // ── 생성 상태 ──
   const [genStatus, setGenStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
   const [genCode, setGenCode] = useState('')
   const [genErr, setGenErr] = useState('')
 
   // ── 입력 상태 ──
-  const [inputCode, setInputCode] = useState('')
+  const [inputCode, setInputCode] = useState(codeFromUrl)
   const [linkStatus, setLinkStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
   const [linkErr, setLinkErr] = useState('')
 
@@ -217,7 +220,7 @@ function LinkPageInner() {
                   {linkStatus === 'loading'
                     ? '연동 중…'
                     : googleSession?.user
-                      ? '연동하기'
+                      ? 'Google 연동'
                       : 'Google 로그인 후 연동'}
                 </Button>
               </form>

@@ -171,12 +171,20 @@ export function AccountLinkCard() {
               </Button>
 
               {genStatus === 'done' && displayCode && (
-                <div className='rounded-lg border-2 border-primary/40 bg-primary/5 p-4 text-center space-y-1'>
+                <div className='rounded-lg border-2 border-primary/40 bg-primary/5 p-4 text-center space-y-2'>
                   <p className='text-xs text-muted-foreground'>연동 코드 (일반 브라우저에서 입력)</p>
                   <p className='text-4xl font-bold tracking-widest font-mono text-primary'>
                     {displayCode}
                   </p>
                   <p className='text-xs text-muted-foreground'>10분 내 사용</p>
+                  <a
+                    href={`${typeof window !== 'undefined' ? window.location.origin : 'https://loginpi.vercel.app'}/link?code=${code}`}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'w-full mt-1')}
+                  >
+                    연동하러가기 →
+                  </a>
                 </div>
               )}
 
