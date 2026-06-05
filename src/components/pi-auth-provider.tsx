@@ -25,11 +25,16 @@ const PiAuthContext = createContext<PiAuthContextValue | null>(null)
 
 function detectPiBrowser(): boolean {
   if (typeof navigator === 'undefined') return false
-  return /PiBrowser/i.test(navigator.userAgent)
+  const ua = navigator.userAgent
+  // Pi Browser UA 패턴 — 여러 버전/형태 커버
+  return (
+    /PiBrowser/i.test(ua) ||
+    /Pi Network/i.test(ua) ||
+    /PiApp/i.test(ua) ||
+    /MinePI/i.test(ua)
+  )
 }
 
-// localhost는 항상 sandbox — 개발 환경에서 Pi.init({ sandbox: false })를 넘기면
-// Pi App Studio "Verify My App"이 Pi.authenticate 호출을 감지하지 못함
 function detectSandbox(): boolean {
   if (typeof window !== 'undefined') {
     const { hostname } = window.location
@@ -40,13 +45,15 @@ function detectSandbox(): boolean {
 
 export function PiAuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<PiSessionUser | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
+  // 초기 true: 클라이언트 초기화 전까지는 "로딩 중"으로 처리 → flash 방지
+  const [isLoading, setIsLoading] = useState(true)
   const [isInPiBrowser, setIsInPiBrowser] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const signIn = useCallback(async () => {
     if (!window.Pi) {
       setError('Pi SDK가 로드되지 않았습니다')
+      setIsLoading(false)
       return
     }
     setIsLoading(true)
@@ -59,7 +66,6 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
       const auth = await window.Pi.authenticate(
         ['username', 'wallet_address', 'payments'],
         async (payment: PaymentDTO) => {
-          // 미완료 결제 자동 복구 — 미구현 시 사용자가 새 결제 불가
           try {
             if (!payment.status.developer_approved) {
               await fetch('/api/payments/approve', {
@@ -110,7 +116,6 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null)
   }, [])
 
-  // 개발 환경 전용: Pi.authenticate 없이 mock admin 세션 생성
   const devLogin = useCallback(async () => {
     setIsLoading(true)
     setError(null)
@@ -134,17 +139,17 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
     setIsInPiBrowser(inPi)
 
     if (inPi) {
-      // Pi Browser: 즉시 Pi.authenticate 실행
-      // GET 세션 복원을 기다리면 "Verify My App"이 Pi.authenticate 호출을 감지하지 못함
+      // Pi Browser: Pi.authenticate 즉시 실행 (signIn 내부에서 isLoading 관리)
       signIn()
     } else {
-      // 일반 브라우저: 서명된 세션 쿠키로 상태 복원만 시도
+      // 일반 브라우저: 쿠키 복원 후 isLoading false
       fetch('/api/auth/pi')
         .then((res) => res.json())
         .then((data: { user: PiSessionUser | null }) => {
           if (data.user) setUser(data.user)
         })
         .catch(() => {})
+        .finally(() => setIsLoading(false))
     }
   }, [signIn])
 

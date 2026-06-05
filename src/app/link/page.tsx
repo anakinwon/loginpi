@@ -1,27 +1,33 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { signIn as googleSignIn, useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { usePiAuth } from '@/components/pi-auth-provider'
 
-// Pi Browser → 코드 생성 / 일반 브라우저 → 코드 입력
-// 한 URL로 접속해 환경에 맞는 UI 자동 표시
-export default function LinkPage() {
-  const { user: piUser, isInPiBrowser, isLoading: piLoading, signIn: piSignIn } = usePiAuth()
+// 분기 기준:
+//   piUser 있음 → 코드 생성 UI  (Pi 세션 보유 = Pi Browser 또는 Pi 쿠키 있는 환경)
+//   piUser 없음 → 코드 입력 UI  (일반 브라우저)
+//   ?generate=1  → 항상 생성 UI  (UA 감지 실패 시 강제 진입용)
+function LinkPageInner() {
+  const { user: piUser, isLoading: piLoading, signIn: piSignIn } = usePiAuth()
   const { data: googleSession, status: googleStatus } = useSession()
+  const params = useSearchParams()
   const router = useRouter()
 
-  // ── Pi Browser 상태 ──
+  const forceGenerate = params.get('generate') === '1'
+  const showGenerate = forceGenerate || !!piUser
+
+  // ── 생성 상태 ──
   const [genStatus, setGenStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
   const [genCode, setGenCode] = useState('')
   const [genErr, setGenErr] = useState('')
 
-  // ── 일반 브라우저 상태 ──
+  // ── 입력 상태 ──
   const [inputCode, setInputCode] = useState('')
   const [linkStatus, setLinkStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
   const [linkErr, setLinkErr] = useState('')
@@ -31,7 +37,6 @@ export default function LinkPage() {
   const isValidCode = digits.length === 6
   const displayGenCode = genCode ? `${genCode.slice(0, 3)}-${genCode.slice(3)}` : ''
 
-  // Pi Browser: 코드 생성
   async function generateCode(isRetry = false) {
     setGenStatus('loading')
     setGenCode('')
@@ -52,7 +57,6 @@ export default function LinkPage() {
     }
   }
 
-  // 일반 브라우저: 코드 입력 후 연동
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!isValidCode) return
@@ -79,8 +83,22 @@ export default function LinkPage() {
     }
   }
 
-  // ── Pi Browser UI ──────────────────────────────────────
-  if (isInPiBrowser) {
+  // ── 초기 로딩 (Pi SDK 인증 중) ──────────────────────────
+  if (piLoading) {
+    return (
+      <div className='min-h-[60vh] flex items-center justify-center px-4'>
+        <Card className='w-full max-w-sm'>
+          <CardContent className='py-10 text-center space-y-3'>
+            <div className='mx-auto h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent' />
+            <p className='text-sm text-muted-foreground'>Pi 로그인 확인 중…</p>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  // ── 코드 생성 UI (piUser 있거나 ?generate=1) ───────────
+  if (showGenerate) {
     return (
       <div className='min-h-[60vh] flex items-center justify-center px-4'>
         <Card className='w-full max-w-sm'>
@@ -88,10 +106,8 @@ export default function LinkPage() {
             <CardTitle>연동 코드 생성</CardTitle>
           </CardHeader>
           <CardContent className='space-y-4'>
-            {piLoading ? (
-              <p className='text-sm text-muted-foreground'>Pi 로그인 확인 중…</p>
-
-            ) : !piUser ? (
+            {!piUser ? (
+              /* ?generate=1 강제 진입했지만 Pi 로그인 안 된 상태 */
               <div className='space-y-3'>
                 <p className='text-sm text-muted-foreground'>
                   연동 코드를 생성하려면 Pi 로그인이 필요합니다.
@@ -102,6 +118,7 @@ export default function LinkPage() {
               </div>
 
             ) : genStatus === 'done' && displayGenCode ? (
+              /* 코드 생성 완료 */
               <div className='space-y-4'>
                 <p className='text-sm text-muted-foreground'>
                   일반 브라우저에서 이 사이트의{' '}
@@ -115,17 +132,24 @@ export default function LinkPage() {
                   </p>
                   <p className='text-xs text-muted-foreground'>10분 내 사용</p>
                 </div>
-                <Button variant='outline' size='sm' className='w-full'
-                  onClick={() => { setGenStatus('idle'); setGenCode('') }}>
+                <Button
+                  variant='outline'
+                  size='sm'
+                  className='w-full'
+                  onClick={() => { setGenStatus('idle'); setGenCode('') }}
+                >
                   새 코드 생성
                 </Button>
               </div>
 
             ) : (
+              /* 코드 생성 버튼 */
               <div className='space-y-3'>
                 <p className='text-sm text-muted-foreground'>
-                  버튼을 누르면 6자리 연동 코드가 표시됩니다.<br />
-                  일반 브라우저의 <span className='font-mono text-foreground'>/link</span> 페이지에서 입력하세요.
+                  아래 버튼을 눌러 6자리 코드를 생성하세요.<br />
+                  일반 브라우저에서{' '}
+                  <span className='font-mono text-foreground'>/link</span>{' '}
+                  페이지에 접속해 코드를 입력하면 계정이 연동됩니다.
                 </p>
                 <Button
                   className='w-full'
@@ -145,7 +169,7 @@ export default function LinkPage() {
     )
   }
 
-  // ── 일반 브라우저 UI ───────────────────────────────────
+  // ── 코드 입력 UI (일반 브라우저) ───────────────────────
   return (
     <div className='min-h-[60vh] flex items-center justify-center px-4'>
       <Card className='w-full max-w-sm'>
@@ -171,7 +195,9 @@ export default function LinkPage() {
                     inputMode='numeric'
                     placeholder='000-000'
                     value={displayValue}
-                    onChange={(e) => setInputCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    onChange={(e) =>
+                      setInputCode(e.target.value.replace(/\D/g, '').slice(0, 6))
+                    }
                     className='text-center text-2xl font-mono tracking-widest h-12'
                     maxLength={7}
                     autoComplete='one-time-code'
@@ -202,5 +228,19 @@ export default function LinkPage() {
         </CardContent>
       </Card>
     </div>
+  )
+}
+
+export default function LinkPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className='min-h-[60vh] flex items-center justify-center'>
+          <div className='h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent' />
+        </div>
+      }
+    >
+      <LinkPageInner />
+    </Suspense>
   )
 }
