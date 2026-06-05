@@ -14,7 +14,7 @@ import Link from 'next/link'
 //   piUser (Pi 세션 있음) → 코드 생성 UI  (UA 감지 불필요)
 //   !piUser          → 코드 입력 안내 + Pi Browser 전용 링크 안내
 export function AccountLinkCard() {
-  const { user: piUser, piAccessToken, isLoading: piLoading, signIn: piSignIn } = usePiAuth()
+  const { user: piUser, piAccessToken, isLoading: piLoading, signIn: piSignIn, isInPiBrowser } = usePiAuth()
   const { data: googleSession } = useSession()
   const [genStatus, setGenStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
   const [code, setCode] = useState('')
@@ -153,24 +153,26 @@ export function AccountLinkCard() {
                 </Button>
               )}
 
-              {/* Pi Browser 진입 안내 */}
-              <div className='rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-3 space-y-2'>
-                <p className='text-xs font-semibold text-amber-700 dark:text-amber-400'>
-                  Pi Browser에서 할 일
-                </p>
-                <p className='text-xs text-muted-foreground'>
-                  아래 링크를 복사해서 Pi Browser 주소창에 입력하세요.
-                </p>
-                <div className='flex gap-1.5'>
-                  <code className='flex-1 rounded bg-background border px-2 py-1 text-xs font-mono truncate'>
-                    {generateUrl}
-                  </code>
-                  <Button size='sm' variant='outline' className='shrink-0 text-xs'
-                    onClick={copyGenerateUrl}>
-                    {copied ? '복사됨!' : '복사'}
-                  </Button>
+              {/* Pi Browser 진입 안내 — Pi Browser에서만 표시 (일반 브라우저에서는 불필요) */}
+              {isInPiBrowser && (
+                <div className='rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-3 space-y-2'>
+                  <p className='text-xs font-semibold text-amber-700 dark:text-amber-400'>
+                    Pi Browser에서 할 일
+                  </p>
+                  <p className='text-xs text-muted-foreground'>
+                    아래 링크를 복사해서 Pi Browser 주소창에 입력하세요.
+                  </p>
+                  <div className='flex gap-1.5'>
+                    <code className='flex-1 rounded bg-background border px-2 py-1 text-xs font-mono truncate'>
+                      {generateUrl}
+                    </code>
+                    <Button size='sm' variant='outline' className='shrink-0 text-xs'
+                      onClick={copyGenerateUrl}>
+                      {copied ? '복사됨!' : '복사'}
+                    </Button>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* 일반 브라우저 코드 입력 */}
               <Link

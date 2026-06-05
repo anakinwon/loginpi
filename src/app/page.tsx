@@ -20,6 +20,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
+import { usePiAuth } from '@/components/pi-auth-provider'
 
 const STACK_ITEMS = [
   {
@@ -56,6 +57,9 @@ const STACK_ITEMS = [
 
 export default function HomePage() {
   const [inputValue, setInputValue] = useState('')
+  const { user: piUser, isLoading: piLoading, isInPiBrowser } = usePiAuth()
+  // Pi Browser이거나 Pi 로그인 상태이거나 아직 로딩 중일 때만 Pi Network 섹션 표시
+  const showPiSection = piLoading || isInPiBrowser || !!piUser
 
   return (
     <div className='mx-auto max-w-5xl px-4 py-12'>
@@ -73,12 +77,14 @@ export default function HomePage() {
       <section className='mb-12'>
         <h2 className='mb-4 text-2xl font-semibold'>로그인</h2>
         <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
-          <div>
-            <p className='text-muted-foreground mb-3 text-xs font-medium uppercase tracking-wider'>
-              Pi Network
-            </p>
-            <PiUserCard />
-          </div>
+          {showPiSection && (
+            <div>
+              <p className='text-muted-foreground mb-3 text-xs font-medium uppercase tracking-wider'>
+                Pi Network
+              </p>
+              <PiUserCard />
+            </div>
+          )}
           <div>
             <p className='text-muted-foreground mb-3 text-xs font-medium uppercase tracking-wider'>
               Google

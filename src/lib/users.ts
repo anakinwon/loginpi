@@ -36,7 +36,7 @@ export async function upsertPiUser(piUser: {
     .select()
     .single()
 
-  if (error) throw error
+  if (error) throw new Error(error.message ?? 'Pi 사용자 저장 실패')
   return data as UserRow
 }
 
@@ -62,7 +62,7 @@ export async function upsertGoogleUser(googleUser: {
     .select()
     .single()
 
-  if (error) throw error
+  if (error) throw new Error(error.message ?? 'Google 사용자 저장 실패')
   return data as UserRow
 }
 
@@ -73,8 +73,10 @@ export async function linkGoogleToPiUser(
 ): Promise<void> {
   if (piUserId === googleUserId) return // 이미 연동됨
 
+  const supabase = getSupabaseAdmin()
+
   // Google row 데이터 조회
-  const { data: googleUser, error: fetchErr } = await getSupabaseAdmin()
+  const { data: googleUser, error: fetchErr } = await supabase
     .from('users')
     .select('google_id, google_email, google_name, google_image')
     .eq('id', googleUserId)
@@ -84,8 +86,12 @@ export async function linkGoogleToPiUser(
     throw new Error('Google 사용자를 찾을 수 없습니다')
   }
 
+  // google_id UNIQUE 충돌 방지: Google row의 google_id를 먼저 null로 비움
+  // Pi row 업데이트 전에 같은 google_id가 두 row에 존재하면 409 발생
+  await supabase.from('users').update({ google_id: null }).eq('id', googleUserId)
+
   // Pi row에 Google 필드 추가
-  const { error: updateErr } = await getSupabaseAdmin()
+  const { error: updateErr } = await supabase
     .from('users')
     .update({
       google_id: googleUser.google_id,
@@ -95,10 +101,17 @@ export async function linkGoogleToPiUser(
     })
     .eq('id', piUserId)
 
-  if (updateErr) throw updateErr
+  if (updateErr) {
+    // 실패 시 Google row 복원 (best-effort)
+    await supabase
+      .from('users')
+      .update({ google_id: googleUser.google_id })
+      .eq('id', googleUserId)
+    throw new Error(updateErr.message ?? '계정 연동 중 오류가 발생했습니다')
+  }
 
   // 독립 Google row 삭제
-  await getSupabaseAdmin().from('users').delete().eq('id', googleUserId)
+  await supabase.from('users').delete().eq('id', googleUserId)
 }
 
 export async function getUserById(id: string): Promise<UserRow | null> {
