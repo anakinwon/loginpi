@@ -16,23 +16,40 @@ export async function GET(request: NextRequest) {
   const supabase = getSupabaseAdmin()
 
   // 경로 1: Google 세션 기반 조회
+  // google_id 형식 불일치(UUID vs OAuth sub)를 대비해 google_email로도 fallback
   const googleSession = await auth()
   if (googleSession?.user) {
     const googleSub = googleSession.user.sub ?? googleSession.user.id
+    const googleEmail = googleSession.user.email
+
+    let row: { pi_uid: string | null; pi_username: string | null; google_id: string | null; google_email: string | null } | null = null
+
+    // 1-A: google_id로 조회
     if (googleSub) {
       const { data } = await supabase
         .from('users')
         .select('pi_uid, pi_username, google_id, google_email')
         .eq('google_id', googleSub)
         .maybeSingle()
+      row = data
+    }
 
-      if (data) {
-        return NextResponse.json<LinkStatusResponse>({
-          linked: !!data.pi_uid,
-          piUsername: data.pi_username ?? null,
-          googleEmail: data.google_email ?? null,
-        })
-      }
+    // 1-B: google_id 조회 실패 시 google_email로 fallback
+    if (!row && googleEmail) {
+      const { data } = await supabase
+        .from('users')
+        .select('pi_uid, pi_username, google_id, google_email')
+        .eq('google_email', googleEmail)
+        .maybeSingle()
+      row = data
+    }
+
+    if (row) {
+      return NextResponse.json<LinkStatusResponse>({
+        linked: !!row.pi_uid,
+        piUsername: row.pi_username ?? null,
+        googleEmail: row.google_email ?? null,
+      })
     }
   }
 
