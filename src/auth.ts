@@ -25,26 +25,33 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
           if (byId) {
             token.userId = byId.id
-          } else if (profile.email) {
-            // 2차: google_email fallback (google_id가 sub과 불일치하는 경우 대응)
-            const { data: byEmail } = await db
-              .from('users')
-              .select('id')
-              .eq('google_email', profile.email as string)
-              .maybeSingle()
-
-            if (byEmail) {
-              token.userId = byEmail.id
-              // google_id를 실제 OAuth sub으로 자동 보정
-              await db
+          } else {
+            // 2차: google_email fallback
+            // 조건: email_verified=true + google_id가 아직 NULL인 행에만 허용
+            // google_id가 이미 다른 값으로 세팅된 행은 건드리지 않음 (계정 탈취 방지)
+            const emailVerified = (profile as { email_verified?: boolean }).email_verified
+            if (profile.email && emailVerified === true) {
+              const { data: byEmail } = await db
                 .from('users')
-                .update({ google_id: profile.sub as string })
-                .eq('id', byEmail.id)
+                .select('id, google_id')
+                .eq('google_email', profile.email as string)
+                .is('google_id', null)  // google_id가 NULL인 행만 매칭
+                .maybeSingle()
+
+              if (byEmail) {
+                token.userId = byEmail.id
+                // google_id가 NULL이었던 행에 실제 sub 세팅 (1회성 데이터 복구)
+                await db
+                  .from('users')
+                  .update({ google_id: profile.sub as string })
+                  .eq('id', byEmail.id)
+                  .is('google_id', null)  // 경쟁 조건 방지: NULL 확인 후 업데이트
+              } else {
+                token.userId = null
+              }
             } else {
               token.userId = null
             }
-          } else {
-            token.userId = null
           }
         } catch {
           token.userId = null
