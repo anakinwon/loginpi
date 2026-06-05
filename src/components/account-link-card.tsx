@@ -17,6 +17,7 @@ export function AccountLinkCard() {
   const [code, setCode] = useState('')
   const [errMsg, setErrMsg] = useState('')
   const [copied, setCopied] = useState(false)
+  const [linkUrlCopied, setLinkUrlCopied] = useState(false)
 
   // DB 기반 연동 상태
   const [linkStatus, setLinkStatus] = useState<LinkStatusResponse | null>(null)
@@ -77,6 +78,19 @@ export function AccountLinkCard() {
       await navigator.clipboard.writeText(generateUrl)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
+    } catch {
+      // 복사 실패 시 무시
+    }
+  }
+
+  // 코드 포함된 연동 URL 복사 — Pi Browser에서 일반 브라우저로 전달하기 위한 유일한 방법
+  async function copyLinkUrl() {
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://loginpi.vercel.app'
+    const url = `${origin}/link?code=${code}`
+    try {
+      await navigator.clipboard.writeText(url)
+      setLinkUrlCopied(true)
+      setTimeout(() => setLinkUrlCopied(false), 4000)
     } catch {
       // 복사 실패 시 무시
     }
@@ -177,14 +191,19 @@ export function AccountLinkCard() {
                     {displayCode}
                   </p>
                   <p className='text-xs text-muted-foreground'>10분 내 사용</p>
-                  <a
-                    href={`${typeof window !== 'undefined' ? window.location.origin : 'https://loginpi.vercel.app'}/link?code=${code}`}
-                    target='_blank'
-                    rel='noopener noreferrer'
-                    className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'w-full mt-1')}
+                  <Button
+                    variant='outline'
+                    size='sm'
+                    className='w-full mt-1'
+                    onClick={copyLinkUrl}
                   >
-                    연동하러가기 →
-                  </a>
+                    {linkUrlCopied ? '✓ 복사됨! 일반 브라우저에서 붙여넣기 하세요' : '연동하러가기 → (URL 복사)'}
+                  </Button>
+                  {linkUrlCopied && (
+                    <p className='text-xs text-muted-foreground text-center'>
+                      Chrome, Safari 등 일반 브라우저 주소창에 붙여넣어 접속하세요
+                    </p>
+                  )}
                 </div>
               )}
 
