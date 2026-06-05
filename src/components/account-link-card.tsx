@@ -30,15 +30,21 @@ export function AccountLinkCard() {
       : 'https://loginpi.vercel.app/link?generate=1'
 
   // 세션이 준비되면 DB에서 실제 연동 상태 조회
+  // Pi Browser WebView는 쿠키 미전송 → X-Pi-Token 헤더 폴백
   useEffect(() => {
     if (piLoading) return
     setLinkStatusLoading(true)
-    fetch('/api/auth/link-status', { credentials: 'include' })
+    fetch('/api/auth/link-status', {
+      credentials: 'include',
+      headers: {
+        ...(piAccessToken ? { 'X-Pi-Token': piAccessToken } : {}),
+      },
+    })
       .then((r) => r.json())
       .then((data: LinkStatusResponse) => setLinkStatus(data))
       .catch(() => setLinkStatus({ linked: false, piUsername: null, googleEmail: null }))
       .finally(() => setLinkStatusLoading(false))
-  }, [piLoading, piUser, googleSession?.user])
+  }, [piLoading, piUser, piAccessToken, googleSession?.user])
 
   async function generateCode(isRetry = false) {
     setGenStatus('loading')
