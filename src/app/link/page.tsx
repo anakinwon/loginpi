@@ -117,33 +117,8 @@ function LinkPageInner() {
                 </Button>
               </div>
 
-            ) : genStatus === 'done' && displayGenCode ? (
-              /* 코드 생성 완료 */
-              <div className='space-y-4'>
-                <p className='text-sm text-muted-foreground'>
-                  일반 브라우저에서 이 사이트의{' '}
-                  <span className='font-mono text-foreground'>/link</span> 페이지를 열고
-                  아래 코드를 입력하세요.
-                </p>
-                <div className='rounded-lg border-2 border-primary/30 bg-primary/5 p-5 text-center space-y-2'>
-                  <p className='text-xs text-muted-foreground'>연동 코드</p>
-                  <p className='text-5xl font-bold tracking-widest font-mono text-primary'>
-                    {displayGenCode}
-                  </p>
-                  <p className='text-xs text-muted-foreground'>10분 내 사용</p>
-                </div>
-                <Button
-                  variant='outline'
-                  size='sm'
-                  className='w-full'
-                  onClick={() => { setGenStatus('idle'); setGenCode('') }}
-                >
-                  새 코드 생성
-                </Button>
-              </div>
-
             ) : (
-              /* 코드 생성 버튼 */
+              /* 코드 생성 버튼 + 결과를 바로 아래에 표시 */
               <div className='space-y-3'>
                 <p className='text-sm text-muted-foreground'>
                   아래 버튼을 눌러 6자리 코드를 생성하세요.<br />
@@ -156,8 +131,24 @@ function LinkPageInner() {
                   disabled={genStatus === 'loading'}
                   onClick={() => generateCode()}
                 >
-                  {genStatus === 'loading' ? '코드 생성 중…' : '연동 코드 생성'}
+                  {genStatus === 'loading'
+                    ? '코드 생성 중…'
+                    : genStatus === 'done'
+                      ? '새 코드 생성'
+                      : '연동 코드 생성'}
                 </Button>
+
+                {/* 버튼 바로 아래에 코드 표시 */}
+                {genStatus === 'done' && displayGenCode && (
+                  <div className='rounded-lg border-2 border-primary/40 bg-primary/5 p-5 text-center space-y-2'>
+                    <p className='text-xs text-muted-foreground'>연동 코드 (일반 브라우저에서 입력)</p>
+                    <p className='text-5xl font-bold tracking-widest font-mono text-primary'>
+                      {displayGenCode}
+                    </p>
+                    <p className='text-xs text-muted-foreground'>10분 내 사용</p>
+                  </div>
+                )}
+
                 {genStatus === 'error' && (
                   <p className='text-destructive text-xs text-center'>{genErr}</p>
                 )}
