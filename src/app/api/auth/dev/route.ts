@@ -15,10 +15,10 @@ export async function POST() {
   }
 
   const mockUser: PiSessionUser = {
-    userId: 'dev_admin_supabase_id_000000000000000',
+    userId: '01b6a587-5786-4528-95e4-a36b045d583d',
     uid: 'dev_admin_uid_000000000000000000000000000000',
-    displayName: 'admin',
-    username: 'admin',
+    displayName: 'anakin2',
+    username: 'anakin2',
     // 명백히 가짜임을 알 수 있는 Stellar 형식 주소 (G + 55자)
     walletAddress: 'GDEVADMIN2222222222222222222222222222222222222222222222222',
     scopesGranted: ['username', 'wallet_address'],
