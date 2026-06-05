@@ -88,6 +88,7 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
 
       const res = await fetch('/api/auth/pi', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           accessToken: auth.accessToken,
@@ -112,7 +113,7 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const signOut = useCallback(async () => {
-    await fetch('/api/auth/pi', { method: 'DELETE' })
+    await fetch('/api/auth/pi', { method: 'DELETE', credentials: 'include' })
     setUser(null)
   }, [])
 
@@ -143,7 +144,7 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
       signIn()
     } else {
       // 일반 브라우저: 쿠키 복원 후 isLoading false
-      fetch('/api/auth/pi')
+      fetch('/api/auth/pi', { credentials: 'include' })
         .then((res) => res.json())
         .then((data: { user: PiSessionUser | null }) => {
           if (data.user) setUser(data.user)

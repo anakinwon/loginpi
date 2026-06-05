@@ -103,7 +103,8 @@ export async function POST(request: NextRequest) {
   response.cookies.set('pi_session', signed, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    // Pi Browser WebView에서 strict 쿠키가 저장 안 되는 문제 방지
+    sameSite: 'lax',
     maxAge,
     path: '/',
   })

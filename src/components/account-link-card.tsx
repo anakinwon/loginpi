@@ -37,7 +37,7 @@ export function AccountLinkCard() {
     setCode('')
     setErrMsg('')
     try {
-      const res = await fetch('/api/auth/link-start', { method: 'POST' })
+      const res = await fetch('/api/auth/link-start', { method: 'POST', credentials: 'include' })
       const data = (await res.json()) as { code?: string; error?: string }
       if (res.status === 401 && !isRetry) {
         await piSignIn()

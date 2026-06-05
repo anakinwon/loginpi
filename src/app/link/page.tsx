@@ -42,7 +42,7 @@ function LinkPageInner() {
     setGenCode('')
     setGenErr('')
     try {
-      const res = await fetch('/api/auth/link-start', { method: 'POST' })
+      const res = await fetch('/api/auth/link-start', { method: 'POST', credentials: 'include' })
       const data = (await res.json()) as { code?: string; error?: string }
       if (res.status === 401 && !isRetry) {
         await piSignIn()
@@ -70,6 +70,7 @@ function LinkPageInner() {
     try {
       const res = await fetch('/api/auth/link-complete', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code: digits }),
       })

@@ -26,14 +26,17 @@ export async function POST(request: NextRequest) {
   const piCookie = request.cookies.get('pi_session')?.value
   if (!piCookie) {
     return NextResponse.json(
-      { error: 'Pi Browser에서 Pi 계정으로 로그인해주세요' },
+      { error: 'Pi 세션이 만료됐습니다. Pi 로그인을 다시 시도해주세요.' },
       { status: 401 }
     )
   }
 
   const piUser = verifyPayload<PiSessionUser>(piCookie, secret)
   if (!piUser?.uid) {
-    return NextResponse.json({ error: 'Pi 세션이 유효하지 않습니다' }, { status: 401 })
+    return NextResponse.json(
+      { error: 'Pi 세션이 유효하지 않습니다. Pi 로그인을 다시 시도해주세요.' },
+      { status: 401 }
+    )
   }
 
   let userId = piUser.userId
