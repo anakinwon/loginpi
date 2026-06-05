@@ -45,6 +45,16 @@ Behavior requirements:
 
 ## 1. 아키텍처 개요
 
+### Pi Browser 감지 원칙
+
+**UA 패턴(`/PiBrowser/i`)은 사용하지 않는다.** UA 문자열은 신뢰도가 낮고 Pi Browser 환경에서 매칭되지 않는 경우가 있다.
+
+**`Pi.authenticate()` 성공 여부**가 Pi Browser를 판단하는 유일한 기준:
+- Pi Browser: `authenticate()` 성공 → `isInPiBrowser = true`
+- 일반 브라우저: `authenticate()` 5초 타임아웃 / 에러 → `isInPiBrowser = false`
+
+`isInPiBrowser` 단일 flag로 모든 UI를 제어한다.
+
 ### 인증 흐름
 
 ```
@@ -52,30 +62,20 @@ Pi Browser / 일반 브라우저
         │
         ▼
 [app/layout.tsx]
-  Pi SDK Script (beforeInteractive)
+  Pi SDK Script (beforeInteractive, 항상 전역 로드)
   PiAuthProvider (React Context)
         │
         ▼ useEffect 마운트 시
         │
-   Pi Browser?
-   ├── YES → signIn() 즉시 호출 ──────────────────────────┐
-   └── NO  → GET /api/auth/pi (쿠키 세션 복원)           │
-                  │                                       │
-              세션 있음 → setUser()                       │
-              세션 없음 → 로그인 버튼 대기                │
-                                                          ▼
-                                            window.Pi.init({ version:'2.0', sandbox })
-                                                          │
-                                            window.Pi.authenticate(['username','wallet_address'], ...)
-                                                          │
-                                            POST /api/auth/pi
-                                            body: { accessToken, walletAddress }
-                                                          │
-                                            GET https://api.minepi.com/v2/me
-                                            Authorization: Bearer <accessToken>
-                                                          │
-                                            HMAC-SHA256 서명 쿠키 발급
-                                            pi_session = base64url(payload).sig
+   window.Pi 존재?
+   ├── YES → signIn() 즉시 호출
+   │           │
+   │           ▼ Promise.race([authenticate(), 5초 timeout])
+   │           │
+   │       성공 → isInPiBrowser=true → POST /api/auth/pi → HMAC 쿠키 발급
+   │       실패/타임아웃 → isInPiBrowser=false → GET /api/auth/pi (세션 복원)
+   │
+   └── NO  → isInPiBrowser=false → GET /api/auth/pi (세션 복원)
 ```
 
 ### 파일 맵
@@ -454,6 +454,9 @@ export async function DELETE() {
 
 ### `src/components/pi-auth-provider.tsx`
 
+> **⚠️ 중요**: `detectPiBrowser()` UA 패턴 감지 함수는 사용하지 않는다.
+> `isInPiBrowser`는 반드시 `Pi.authenticate()` 성공 여부로만 결정한다.
+
 ```typescript
 'use client'
 
@@ -464,19 +467,16 @@ export type { PiSessionUser }
 
 interface PiAuthContextValue {
   user: PiSessionUser | null
+  piAccessToken: string | null   // Pi Browser WebView 쿠키 미전송 시 X-Pi-Token 헤더 fallback용
   isLoading: boolean
   isInPiBrowser: boolean
   signIn: () => Promise<void>
   signOut: () => Promise<void>
+  devLogin: () => Promise<void>  // 개발 환경 전용 mock 로그인
   error: string | null
 }
 
 const PiAuthContext = createContext<PiAuthContextValue | null>(null)
-
-function detectPiBrowser(): boolean {
-  if (typeof navigator === 'undefined') return false
-  return /PiBrowser/i.test(navigator.userAgent)
-}
 
 // ⚠️ localhost는 항상 sandbox:true — Pi App Studio "Verify My App"이
 // Pi.init({ sandbox: false }) 상태에서 Pi.authenticate 호출을 감지하지 못함
@@ -488,33 +488,63 @@ function detectSandbox(): boolean {
   return process.env.NEXT_PUBLIC_PI_SANDBOX === 'true'
 }
 
+// 미완료 결제 자동 복구 핸들러 — Pi.authenticate 두 번째 인자로 반드시 전달
+async function onIncompletePayment(payment: PaymentDTO) {
+  try {
+    if (!payment.status.developer_approved) {
+      await fetch('/api/payments/approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentId: payment.identifier }),
+      })
+    } else if (!payment.status.developer_completed && payment.transaction?.txid) {
+      await fetch('/api/payments/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentId: payment.identifier, txid: payment.transaction.txid }),
+      })
+    }
+  } catch {
+    console.error('미완료 결제 복구 실패:', payment.identifier)
+  }
+}
+
 export function PiAuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<PiSessionUser | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
+  const [piAccessToken, setPiAccessToken] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(true)   // 초기값 true: 감지 중 표시
   const [isInPiBrowser, setIsInPiBrowser] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const signIn = useCallback(async () => {
     if (!window.Pi) {
-      setError('Pi SDK가 로드되지 않았습니다')
+      // Pi SDK 없음 → 확실히 일반 브라우저
+      setIsInPiBrowser(false)
+      setIsLoading(false)
       return
     }
     setIsLoading(true)
     setError(null)
     try {
-      // ⚠️ Pi.init()은 void | Promise<void> — Promise.resolve()로 감싸야 안전하게 await 가능
       await Promise.resolve(
         window.Pi.init({ version: '2.0', sandbox: detectSandbox() })
       )
 
-      // ⚠️ wallet_address는 /v2/me 미제공 → 여기서만 얻을 수 있음
-      const auth = await window.Pi.authenticate(
-        ['username', 'wallet_address'],
-        (payment) => { console.warn('미완료 Pi 결제 발견:', payment.identifier) }
-      )
+      // ⚠️ 일반 브라우저에서 Pi.authenticate()가 pending 상태로 멈출 수 있으므로 5초 타임아웃
+      const auth = await Promise.race([
+        window.Pi.authenticate(['username', 'wallet_address', 'payments'], onIncompletePayment),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('timeout')), 5000)
+        ),
+      ])
+
+      // 인증 성공 → Pi Browser 확정
+      setIsInPiBrowser(true)
+      setPiAccessToken(auth.accessToken)
 
       const res = await fetch('/api/auth/pi', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           accessToken: auth.accessToken,
@@ -530,38 +560,62 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
       const data = (await res.json()) as { user: PiSessionUser }
       setUser(data.user)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Pi 인증 중 오류가 발생했습니다')
+      const msg = err instanceof Error ? err.message : 'Pi 인증 중 오류가 발생했습니다'
+      // 타임아웃은 일반 브라우저 판단 — 에러 메시지 표시 안 함
+      if (msg !== 'timeout') setError(msg)
+      // 인증 실패/타임아웃 → 일반 브라우저로 확정
+      setIsInPiBrowser(false)
     } finally {
       setIsLoading(false)
     }
   }, [])
 
   const signOut = useCallback(async () => {
-    await fetch('/api/auth/pi', { method: 'DELETE' })
+    await fetch('/api/auth/pi', { method: 'DELETE', credentials: 'include' })
     setUser(null)
+    setPiAccessToken(null)
+  }, [])
+
+  const devLogin = useCallback(async () => {
+    setIsLoading(true)
+    setError(null)
+    try {
+      const res = await fetch('/api/auth/dev', { method: 'POST' })
+      if (!res.ok) {
+        const data = (await res.json()) as { error?: string }
+        throw new Error(data.error ?? '개발 로그인 실패')
+      }
+      const data = (await res.json()) as { user: PiSessionUser }
+      setUser(data.user)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '개발 로그인 실패')
+    } finally {
+      setIsLoading(false)
+    }
   }, [])
 
   useEffect(() => {
-    const inPi = detectPiBrowser()
-    setIsInPiBrowser(inPi)
-
-    if (inPi) {
-      // ⚠️ Pi Browser에서는 GET 세션 복원 없이 즉시 signIn() 호출
-      // GET 요청을 먼저 기다리면 "Verify My App"이 Pi.authenticate 호출을 감지하지 못함
+    if (typeof window !== 'undefined' && window.Pi) {
+      // Pi SDK 존재 → authenticate() 시도
+      // 성공: isInPiBrowser=true / 실패·타임아웃: isInPiBrowser=false
       signIn()
     } else {
-      // 일반 브라우저: 서명된 세션 쿠키로 상태 복원
-      fetch('/api/auth/pi')
+      // Pi SDK 없음 → 일반 브라우저, 기존 세션만 복원
+      setIsInPiBrowser(false)
+      fetch('/api/auth/pi', { credentials: 'include' })
         .then((res) => res.json())
         .then((data: { user: PiSessionUser | null }) => {
           if (data.user) setUser(data.user)
         })
         .catch(() => {})
+        .finally(() => setIsLoading(false))
     }
   }, [signIn])
 
   return (
-    <PiAuthContext.Provider value={{ user, isLoading, isInPiBrowser, signIn, signOut, error }}>
+    <PiAuthContext.Provider
+      value={{ user, piAccessToken, isLoading, isInPiBrowser, signIn, signOut, devLogin, error }}
+    >
       {children}
     </PiAuthContext.Provider>
   )
@@ -829,6 +883,35 @@ GET /v2/me 결과     → wallet_address 없음         ❌
 ```typescript
 // void도 안전하게 처리: Promise.resolve()로 감쌈
 await Promise.resolve(window.Pi.init({ version: '2.0', sandbox: detectSandbox() }))
+```
+
+---
+
+### ❌ 함정 7 — UA 패턴으로 Pi Browser 감지 시도 (절대 사용 금지)
+
+**증상**: Pi Browser에서 `isInPiBrowser = false`로 판단되어 Pi 로그인 버튼 미표시
+
+**원인**: Pi Browser의 실제 UA 문자열이 `/PiBrowser/i` 패턴에 매칭되지 않는 경우 발생.
+Pi SDK를 전역 로드하면 일반 브라우저에서도 `window.Pi`가 존재하여 추가 혼동 유발.
+
+**잘못된 코드**:
+```typescript
+// ❌ UA 패턴 기반 — 신뢰도 낮음
+function detectPiBrowser(): boolean {
+  return /PiBrowser/i.test(navigator.userAgent)
+}
+```
+
+**올바른 코드**: `Pi.authenticate()` 성공 여부로 판단
+```typescript
+// ✅ SDK 동작 기반 — 유일하게 신뢰 가능한 방법
+const auth = await Promise.race([
+  window.Pi.authenticate(['username', 'wallet_address', 'payments'], onIncompletePayment),
+  new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000)),
+])
+setIsInPiBrowser(true)  // 성공 → Pi Browser
+// catch:
+setIsInPiBrowser(false) // 실패/타임아웃 → 일반 브라우저
 ```
 
 ---
