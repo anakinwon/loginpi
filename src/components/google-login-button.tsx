@@ -2,11 +2,16 @@
 
 import { signIn, signOut, useSession } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
+import { usePiAuth } from '@/components/pi-auth-provider'
 
 // 헤더 전용 간결 Google 로그인/로그아웃 버튼
+// Pi Browser에서는 표시하지 않음
 export function GoogleLoginButton() {
   const { data: session, status } = useSession()
+  const { isInPiBrowser, isLoading: piLoading } = usePiAuth()
 
+  // Pi Browser이거나 아직 Pi 환경 확인 중이면 숨김
+  if (piLoading || isInPiBrowser) return null
   if (status === 'loading') return null
 
   if (session?.user) {

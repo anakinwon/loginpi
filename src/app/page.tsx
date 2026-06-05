@@ -85,8 +85,8 @@ export default function HomePage() {
               <PiUserCard />
             </div>
           )}
-          {/* Pi Browser에서는 Google 로그인 카드 불필요 — AccountLinkCard에서 연동 상태 통합 표시 */}
-          {!isInPiBrowser && (
+          {/* Pi Browser 확정 후에만 표시 — 로딩 중에는 isInPiBrowser=false 기본값이므로 piLoading도 체크 */}
+          {!piLoading && !isInPiBrowser && (
             <div>
               <p className='text-muted-foreground mb-3 text-xs font-medium uppercase tracking-wider'>
                 Google
