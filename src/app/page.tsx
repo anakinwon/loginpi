@@ -85,8 +85,8 @@ export default function HomePage() {
               <PiUserCard />
             </div>
           )}
-          {/* piUser 있으면 Pi 환경으로 간주 — UA 감지 실패 시에도 안전하게 숨김 */}
-          {!piLoading && !isInPiBrowser && !piUser && (
+          {/* Pi Browser가 아닌 일반 브라우저에서 Google 카드 표시 */}
+          {!isInPiBrowser && (
             <div>
               <p className='text-muted-foreground mb-3 text-xs font-medium uppercase tracking-wider'>
                 Google
@@ -103,19 +103,18 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Pi 결제 버튼 */}
-      <section className='mb-12'>
-        <h2 className='mb-4 text-2xl font-semibold'>Pi 코인 결제</h2>
-        <div className='grid gap-6 sm:grid-cols-2'>
-          {/* 단순 결제 버튼 */}
-          <div className='rounded-xl border p-6'>
-            <PiPayButton />
+      {/* Pi 결제 버튼 — Pi Browser 또는 Pi 로그인 상태에서만 표시 */}
+      {showPiSection && (
+        <section className='mb-12'>
+          <h2 className='mb-4 text-2xl font-semibold'>Pi 코인 결제</h2>
+          <div className='grid gap-6 sm:grid-cols-2'>
+            <div className='rounded-xl border p-6'>
+              <PiPayButton />
+            </div>
+            <PiProductCard />
           </div>
-
-          {/* 상품 결제 */}
-          <PiProductCard />
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* 기술 스택 카드 */}
       <section className='mb-12'>

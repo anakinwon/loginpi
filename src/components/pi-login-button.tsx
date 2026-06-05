@@ -10,6 +10,9 @@ export function PiLoginButton() {
   const { user, isLoading, isInPiBrowser, signIn, signOut, devLogin, error } = usePiAuth()
   const useDevLogin = isDev && !isInPiBrowser
 
+  // 일반 브라우저에서는 Pi 관련 버튼 완전히 숨기기
+  if (!isInPiBrowser && !useDevLogin) return null
+
   if (user) {
     const isDevSession = user.uid.startsWith('dev_')
     return (

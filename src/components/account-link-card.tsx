@@ -139,13 +139,13 @@ export function AccountLinkCard() {
 
         <StatusRow
           label='Pi Network'
-          connected={!!piUser}
-          value={piUser?.username ? `@${piUser.username}` : undefined}
+          connected={!!linkStatus?.piUsername}
+          value={linkStatus?.piUsername ? `@${linkStatus.piUsername}` : undefined}
         />
         <StatusRow
           label='Google'
-          connected={!!googleSession?.user}
-          value={googleSession?.user?.email ?? undefined}
+          connected={!!linkStatus?.googleEmail || !!googleSession?.user}
+          value={linkStatus?.googleEmail ?? googleSession?.user?.email ?? undefined}
         />
 
         <div className='border-t pt-3 space-y-3'>
@@ -220,12 +220,15 @@ export function AccountLinkCard() {
                 </div>
               )}
 
-              <Link
-                href='/link'
-                className={cn(buttonVariants({ size: 'sm' }), 'w-full text-center')}
-              >
-                연동 코드 입력하러 가기 →
-              </Link>
+              {/* Pi 미연결 상태에서만 코드 입력 버튼 표시 */}
+              {!linkStatus?.piUsername && (
+                <Link
+                  href='/link'
+                  className={cn(buttonVariants({ size: 'sm' }), 'w-full text-center')}
+                >
+                  연동 코드 입력하러 가기 →
+                </Link>
+              )}
             </>
           )}
         </div>
