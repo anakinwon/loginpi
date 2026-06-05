@@ -1,81 +1,77 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
-import { verifyPayload } from '@/lib/pi-session-crypto'
 import { upsertGoogleUser, linkGoogleToPiUser } from '@/lib/users'
-import type { PiSessionUser } from '@/types/pi-session'
-import type { LinkTokenPayload } from '../link-start/route'
-
-function getSecret() {
-  const s = process.env.PI_SESSION_SECRET
-  if (!s) throw new Error('PI_SESSION_SECRET 미설정')
-  return s
-}
+import { getSupabaseAdmin } from '@/lib/supabase-admin'
 
 // POST /api/auth/link-complete
-// Body: { token: string }
-// — provider=pi 토큰 (Pi→Google 방향): Google 세션으로 Google upsert 후 병합
-// — provider=google 토큰 (Google→Pi 방향): Pi 세션 쿠키로 Pi userId 확인 후 병합
+// Body: { code: string }  — Pi Browser가 생성한 6자리 코드
+// 일반 브라우저에서 Google 세션을 가진 채로 호출
 export async function POST(request: NextRequest) {
-  let secret: string
-  try { secret = getSecret() } catch {
-    return NextResponse.json({ error: 'PI_SESSION_SECRET 미설정' }, { status: 500 })
-  }
-
   let body: unknown
   try { body = await request.json() } catch {
     return NextResponse.json({ error: '잘못된 요청' }, { status: 400 })
   }
-  const { token } = body as { token?: string }
-  if (!token) {
-    return NextResponse.json({ error: 'token이 필요합니다' }, { status: 400 })
+
+  const { code } = body as { code?: string }
+  if (!code || !/^\d{6}$/.test(code)) {
+    return NextResponse.json({ error: '유효한 6자리 코드를 입력해주세요' }, { status: 400 })
   }
 
-  // 링크 토큰 검증
-  const payload = verifyPayload<LinkTokenPayload>(token, secret)
-  if (!payload) {
-    return NextResponse.json({ error: '유효하지 않은 연동 링크입니다' }, { status: 400 })
+  const supabase = getSupabaseAdmin()
+
+  const { data: linkCode, error: fetchErr } = await supabase
+    .from('link_codes')
+    .select('pi_user_id, expires_at, used_at, attempt_count')
+    .eq('code', code)
+    .single()
+
+  if (fetchErr || !linkCode) {
+    return NextResponse.json({ error: '유효하지 않은 코드입니다' }, { status: 400 })
   }
-  if (Date.now() / 1000 > payload.exp) {
-    return NextResponse.json({ error: '연동 링크가 만료됐습니다 (10분 초과)' }, { status: 400 })
+  if (linkCode.used_at) {
+    return NextResponse.json({ error: '이미 사용된 코드입니다' }, { status: 400 })
+  }
+  if (new Date(linkCode.expires_at) < new Date()) {
+    return NextResponse.json({ error: '코드가 만료됐습니다 (10분 초과)' }, { status: 400 })
+  }
+
+  // 5회 이상 실패한 코드는 brute-force 방지를 위해 즉시 무효화
+  const MAX_ATTEMPTS = 5
+  if (linkCode.attempt_count >= MAX_ATTEMPTS) {
+    return NextResponse.json({ error: '시도 횟수 초과로 코드가 무효화됐습니다. Pi Browser에서 새 코드를 생성하세요.' }, { status: 400 })
+  }
+
+  const googleSession = await auth()
+  if (!googleSession?.user) {
+    // 인증 실패도 시도 횟수에 포함 — 코드 탐색을 통한 Google 세션 확인 방지
+    await supabase
+      .from('link_codes')
+      .update({ attempt_count: linkCode.attempt_count + 1 })
+      .eq('code', code)
+    return NextResponse.json({ error: 'Google 로그인이 필요합니다' }, { status: 401 })
+  }
+
+  const googleSub = googleSession.user.sub ?? googleSession.user.id
+  const googleEmail = googleSession.user.email
+  if (!googleEmail) {
+    return NextResponse.json({ error: 'Google 이메일 정보가 없습니다' }, { status: 400 })
   }
 
   try {
-    if (payload.provider === 'pi') {
-      // ── Pi가 생성한 토큰: 지금 이 요청은 일반 브라우저(Google 세션 필요) ──
-      const googleSession = await auth()
-      if (!googleSession?.user) {
-        return NextResponse.json({ error: 'Google 로그인이 필요합니다' }, { status: 401 })
-      }
+    const googleDbUser = await upsertGoogleUser({
+      id: googleSub,
+      email: googleEmail,
+      name: googleSession.user.name ?? null,
+      image: googleSession.user.image ?? null,
+    })
 
-      // Google OAuth sub을 우선 사용 (session.user.id가 잘못된 경우 방어)
-      // sub: Google OAuth raw sub, id: Supabase UUID or sub (upsert 실패 시)
-      const googleSub = googleSession.user.sub ?? googleSession.user.id
-      const googleEmail = googleSession.user.email
+    await linkGoogleToPiUser(linkCode.pi_user_id, googleDbUser.id)
 
-      if (!googleEmail) {
-        return NextResponse.json({ error: 'Google 이메일 정보가 없습니다' }, { status: 400 })
-      }
-
-      // 항상 fresh upsert로 Supabase row 보장
-      // (첫 로그인이거나 이전 upsert가 실패한 경우도 커버)
-      const googleDbUser = await upsertGoogleUser({
-        id: googleSub,
-        email: googleEmail,
-        name: googleSession.user.name ?? null,
-        image: googleSession.user.image ?? null,
-      })
-
-      await linkGoogleToPiUser(payload.userId, googleDbUser.id)
-
-    } else {
-      // ── Google이 생성한 토큰: 지금 이 요청은 Pi Browser(Pi 세션 필요) ──
-      const piCookie = request.cookies.get('pi_session')?.value
-      const piUser = piCookie ? verifyPayload<PiSessionUser>(piCookie, secret) : null
-      if (!piUser?.userId) {
-        return NextResponse.json({ error: 'Pi 로그인이 필요합니다' }, { status: 401 })
-      }
-      await linkGoogleToPiUser(piUser.userId, payload.userId)
-    }
+    // 1회 사용 처리
+    await supabase
+      .from('link_codes')
+      .update({ used_at: new Date().toISOString() })
+      .eq('code', code)
 
     return NextResponse.json({ success: true })
   } catch (err) {

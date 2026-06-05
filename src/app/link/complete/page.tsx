@@ -5,29 +5,28 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
-// Google OAuth 완료 후 여기로 리다이렉트 (provider=pi 방향)
-// callbackUrl: /link/complete?t={token}&p=pi
+// Google 로그인 완료 후 callbackUrl로 /link/complete?code={code} 리다이렉트
 function LinkCompleteInner() {
   const params = useSearchParams()
   const router = useRouter()
-  const token = params.get('t')
+  const code = params.get('code')
   const { status } = useSession()
   const [result, setResult] = useState<'pending' | 'done' | 'error'>('pending')
   const [message, setMessage] = useState('')
 
   useEffect(() => {
-    if (status !== 'authenticated' || !token || result !== 'pending') return
+    if (status !== 'authenticated' || !code || result !== 'pending') return
 
     fetch('/api/auth/link-complete', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token }),
+      body: JSON.stringify({ code }),
     })
       .then((r) => r.json())
       .then((d: { success?: boolean; error?: string }) => {
         if (d.success) {
           setResult('done')
-          setMessage('계정 연동이 완료됐습니다!')
+          setMessage('Pi와 Google 계정이 연동됐습니다!')
           setTimeout(() => router.push('/'), 2000)
         } else {
           setResult('error')
@@ -38,7 +37,17 @@ function LinkCompleteInner() {
         setResult('error')
         setMessage('서버 오류가 발생했습니다')
       })
-  }, [status, token, result, router])
+  }, [status, code, result, router])
+
+  if (!code) {
+    return (
+      <Card className='max-w-md mx-auto mt-20'>
+        <CardContent className='py-8 text-center'>
+          <p className='text-destructive text-sm'>유효하지 않은 연동 링크입니다.</p>
+        </CardContent>
+      </Card>
+    )
+  }
 
   return (
     <Card className='max-w-md mx-auto mt-20'>
