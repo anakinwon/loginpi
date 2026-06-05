@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { verifyPayload } from '@/lib/pi-session-crypto'
-import { linkGoogleToPiUser } from '@/lib/users'
+import { upsertGoogleUser, linkGoogleToPiUser } from '@/lib/users'
 import type { PiSessionUser } from '@/types/pi-session'
 import type { LinkTokenPayload } from '../link-start/route'
 
@@ -13,8 +13,8 @@ function getSecret() {
 
 // POST /api/auth/link-complete
 // Body: { token: string }
-// — provider=pi 토큰: Google 세션 필요 → linkGoogleToPiUser(pi_userId, google_userId)
-// — provider=google 토큰: Pi 세션 필요 → linkGoogleToPiUser(pi_userId, google_userId)
+// — provider=pi 토큰 (Pi→Google 방향): Google 세션으로 Google upsert 후 병합
+// — provider=google 토큰 (Google→Pi 방향): Pi 세션 쿠키로 Pi userId 확인 후 병합
 export async function POST(request: NextRequest) {
   let secret: string
   try { secret = getSecret() } catch {
@@ -41,14 +41,34 @@ export async function POST(request: NextRequest) {
 
   try {
     if (payload.provider === 'pi') {
-      // Pi 사용자가 생성한 토큰 → 지금은 Google 브라우저에서 실행 중
+      // ── Pi가 생성한 토큰: 지금 이 요청은 일반 브라우저(Google 세션 필요) ──
       const googleSession = await auth()
-      if (!googleSession?.user?.id) {
+      if (!googleSession?.user) {
         return NextResponse.json({ error: 'Google 로그인이 필요합니다' }, { status: 401 })
       }
-      await linkGoogleToPiUser(payload.userId, googleSession.user.id)
+
+      // Google OAuth sub을 우선 사용 (session.user.id가 잘못된 경우 방어)
+      // sub: Google OAuth raw sub, id: Supabase UUID or sub (upsert 실패 시)
+      const googleSub = googleSession.user.sub ?? googleSession.user.id
+      const googleEmail = googleSession.user.email
+
+      if (!googleEmail) {
+        return NextResponse.json({ error: 'Google 이메일 정보가 없습니다' }, { status: 400 })
+      }
+
+      // 항상 fresh upsert로 Supabase row 보장
+      // (첫 로그인이거나 이전 upsert가 실패한 경우도 커버)
+      const googleDbUser = await upsertGoogleUser({
+        id: googleSub,
+        email: googleEmail,
+        name: googleSession.user.name ?? null,
+        image: googleSession.user.image ?? null,
+      })
+
+      await linkGoogleToPiUser(payload.userId, googleDbUser.id)
+
     } else {
-      // Google 사용자가 생성한 토큰 → 지금은 Pi Browser에서 실행 중
+      // ── Google이 생성한 토큰: 지금 이 요청은 Pi Browser(Pi 세션 필요) ──
       const piCookie = request.cookies.get('pi_session')?.value
       const piUser = piCookie ? verifyPayload<PiSessionUser>(piCookie, secret) : null
       if (!piUser?.userId) {
@@ -60,6 +80,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true })
   } catch (err) {
     const message = err instanceof Error ? err.message : '계정 연동 실패'
+    console.error('[link-complete]', message, err)
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }

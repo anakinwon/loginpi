@@ -34,8 +34,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         ...session,
         user: {
           ...session.user,
-          // Supabase users.id를 id로 노출 (Pi row와 연동 후 동일 값)
           id: (token.userId as string) ?? token.sub ?? '',
+          sub: token.sub,   // Google OAuth raw sub — link-complete에서 upsert 재시도에 사용
         },
       }
     },
