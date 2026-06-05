@@ -136,11 +136,11 @@ export function AccountLinkCard() {
                   <span className='text-amber-600 dark:text-amber-400 font-medium'>
                     Pi Browser
                   </span>
-                  에서 이 사이트 접속 후<br />
-                  계정 연동 카드의 <strong className='text-foreground'>[연동 코드 생성]</strong> 버튼을 누르면<br />
-                  6자리 코드가 표시됩니다.
+                  에서{' '}
+                  <span className='font-mono text-foreground'>/link</span> 페이지에 접속하면<br />
+                  <strong className='text-foreground'>[연동 코드 생성]</strong> 버튼이 표시됩니다.
                 </p>
-                <p className='pt-1'>그 코드를 아래 버튼을 눌러 이 브라우저에서 입력하세요.</p>
+                <p className='pt-1'>생성된 6자리 코드를 아래 버튼을 눌러 입력하세요.</p>
               </div>
 
               {!googleSession?.user && (
