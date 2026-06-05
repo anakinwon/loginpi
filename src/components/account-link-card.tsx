@@ -86,13 +86,13 @@ export function AccountLinkCard() {
                 /* Pi 로그인 완료 → 코드 생성 UI */
                 <>
                   <div className='bg-muted rounded-lg p-3 text-xs text-muted-foreground space-y-1'>
-                    <p className='font-semibold text-foreground'>Pi Browser 역할: 코드 생성</p>
-                    <p>① 아래 버튼으로 6자리 코드 생성</p>
+                    <p className='font-semibold text-foreground'>연동 순서</p>
+                    <p>① 아래 버튼으로 6자리 코드 생성 — <strong className='text-foreground'>이 화면에 코드가 표시됩니다</strong></p>
                     <p>② 일반 브라우저(Chrome 등)에서</p>
-                    <p className='font-mono text-foreground pl-3'>
-                      {typeof window !== 'undefined' ? window.location.origin : ''}/link
+                    <p className='font-mono bg-background rounded px-1.5 py-0.5 text-foreground'>
+                      {typeof window !== 'undefined' ? window.location.origin : 'https://loginpi.vercel.app'}/link
                     </p>
-                    <p>③ 페이지를 열고 코드 입력</p>
+                    <p>③ 접속 후 코드 입력 → Google 로그인 → 연동 완료</p>
                   </div>
 
                   <Button
@@ -131,11 +131,16 @@ export function AccountLinkCard() {
             /* ── 일반 브라우저: 코드 입력 안내 ── */
             <>
               <div className='bg-muted rounded-lg p-3 text-xs text-muted-foreground space-y-1'>
-                <p className='font-semibold text-foreground'>일반 브라우저 역할: 코드 입력</p>
-                <p>① Pi Browser에서 이 페이지 접속</p>
-                <p>② Pi 로그인 후 연동 코드 생성</p>
-                <p>③ 아래 버튼 클릭 후 코드 입력</p>
-                <p>④ Google 로그인하면 연동 완료</p>
+                <p className='font-semibold text-foreground'>연동 방법</p>
+                <p>
+                  <span className='text-amber-600 dark:text-amber-400 font-medium'>
+                    Pi Browser
+                  </span>
+                  에서 이 사이트 접속 후<br />
+                  계정 연동 카드의 <strong className='text-foreground'>"연동 코드 생성"</strong> 버튼을 누르면<br />
+                  6자리 코드가 표시됩니다.
+                </p>
+                <p className='pt-1'>그 코드를 아래 버튼을 눌러 이 브라우저에서 입력하세요.</p>
               </div>
 
               {!googleSession?.user && (
