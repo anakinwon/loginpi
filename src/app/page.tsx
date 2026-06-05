@@ -85,12 +85,15 @@ export default function HomePage() {
               <PiUserCard />
             </div>
           )}
-          <div>
-            <p className='text-muted-foreground mb-3 text-xs font-medium uppercase tracking-wider'>
-              Google
-            </p>
-            <GoogleUserCard />
-          </div>
+          {/* Pi Browser에서는 Google 로그인 카드 불필요 — AccountLinkCard에서 연동 상태 통합 표시 */}
+          {!isInPiBrowser && (
+            <div>
+              <p className='text-muted-foreground mb-3 text-xs font-medium uppercase tracking-wider'>
+                Google
+              </p>
+              <GoogleUserCard />
+            </div>
+          )}
           <div>
             <p className='text-muted-foreground mb-3 text-xs font-medium uppercase tracking-wider'>
               계정 연동

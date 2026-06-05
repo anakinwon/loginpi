@@ -1,36 +1,44 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { signIn as googleSignIn, useSession } from 'next-auth/react'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { usePiAuth } from './pi-auth-provider'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
+import type { LinkStatusResponse } from '@/app/api/auth/link-status/route'
 
-// 분기 기준:
-//   piLoading        → 로딩 스피너
-//   piUser && alreadyLinked → 연동 완료
-//   piUser (Pi 세션 있음) → 코드 생성 UI  (UA 감지 불필요)
-//   !piUser          → 코드 입력 안내 + Pi Browser 전용 링크 안내
 export function AccountLinkCard() {
   const { user: piUser, piAccessToken, isLoading: piLoading, signIn: piSignIn, isInPiBrowser } = usePiAuth()
   const { data: googleSession } = useSession()
+
   const [genStatus, setGenStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
   const [code, setCode] = useState('')
   const [errMsg, setErrMsg] = useState('')
   const [copied, setCopied] = useState(false)
 
-  const alreadyLinked =
-    !!piUser && !!googleSession?.user && piUser.userId === googleSession.user.id
+  // DB 기반 연동 상태
+  const [linkStatus, setLinkStatus] = useState<LinkStatusResponse | null>(null)
+  const [linkStatusLoading, setLinkStatusLoading] = useState(true)
 
   const displayCode = code ? `${code.slice(0, 3)}-${code.slice(3)}` : ''
 
-  // Pi Browser 연동용 링크 (/link?generate=1)
   const generateUrl =
     typeof window !== 'undefined'
       ? `${window.location.origin}/link?generate=1`
       : 'https://loginpi.vercel.app/link?generate=1'
+
+  // 세션이 준비되면 DB에서 실제 연동 상태 조회
+  useEffect(() => {
+    if (piLoading) return
+    setLinkStatusLoading(true)
+    fetch('/api/auth/link-status', { credentials: 'include' })
+      .then((r) => r.json())
+      .then((data: LinkStatusResponse) => setLinkStatus(data))
+      .catch(() => setLinkStatus({ linked: false, piUsername: null, googleEmail: null }))
+      .finally(() => setLinkStatusLoading(false))
+  }, [piLoading, piUser, googleSession?.user])
 
   async function generateCode(isRetry = false) {
     setGenStatus('loading')
@@ -41,7 +49,6 @@ export function AccountLinkCard() {
         method: 'POST',
         credentials: 'include',
         headers: {
-          // 쿠키가 WebView에 저장 안 됐을 때 Pi Network API 직접 검증 폴백
           ...(piAccessToken ? { 'X-Pi-Token': piAccessToken } : {}),
         },
       })
@@ -69,6 +76,54 @@ export function AccountLinkCard() {
     }
   }
 
+  // ── 로딩 중 ──────────────────────────────────────────
+  if (piLoading || linkStatusLoading) {
+    return (
+      <Card>
+        <CardHeader className='pb-3'>
+          <CardTitle className='text-sm'>계정 연동</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className='flex items-center gap-2 text-xs text-muted-foreground'>
+            <div className='h-3 w-3 animate-spin rounded-full border border-muted-foreground border-t-transparent' />
+            연동 상태 확인 중…
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  // ── 연동 완료 ────────────────────────────────────────
+  if (linkStatus?.linked) {
+    return (
+      <Card>
+        <CardHeader className='pb-3'>
+          <CardTitle className='text-sm'>계정 연동</CardTitle>
+        </CardHeader>
+        <CardContent className='space-y-3 text-sm'>
+          <div className='rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 p-4 space-y-3'>
+            <p className='text-xs font-semibold text-green-700 dark:text-green-400'>
+              ✓ Pi + Google 계정 연동 완료
+            </p>
+            {linkStatus.piUsername && (
+              <div className='flex items-center justify-between text-xs'>
+                <span className='text-muted-foreground'>Pi Network</span>
+                <span className='font-medium'>@{linkStatus.piUsername}</span>
+              </div>
+            )}
+            {linkStatus.googleEmail && (
+              <div className='flex items-center justify-between text-xs'>
+                <span className='text-muted-foreground'>Google</span>
+                <span className='font-medium truncate max-w-[160px]'>{linkStatus.googleEmail}</span>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  // ── 연동 미완료 ──────────────────────────────────────
   return (
     <Card>
       <CardHeader className='pb-3'>
@@ -89,20 +144,7 @@ export function AccountLinkCard() {
 
         <div className='border-t pt-3 space-y-3'>
 
-          {/* Pi 세션 확인 중 */}
-          {piLoading ? (
-            <div className='flex items-center gap-2 text-xs text-muted-foreground'>
-              <div className='h-3 w-3 animate-spin rounded-full border border-muted-foreground border-t-transparent' />
-              Pi 로그인 확인 중…
-            </div>
-
-          ) : alreadyLinked ? (
-            /* 연동 완료 */
-            <p className='text-green-600 dark:text-green-400 text-xs font-medium'>
-              ✓ 두 계정이 연동되어 있습니다
-            </p>
-
-          ) : piUser ? (
+          {piUser ? (
             /* Pi 세션 있음 → 코드 생성 UI */
             <div className='space-y-2'>
               <p className='text-xs text-muted-foreground'>
@@ -122,7 +164,6 @@ export function AccountLinkCard() {
                     : '연동 코드 생성'}
               </Button>
 
-              {/* 버튼 바로 아래에 코드 표시 */}
               {genStatus === 'done' && displayCode && (
                 <div className='rounded-lg border-2 border-primary/40 bg-primary/5 p-4 text-center space-y-1'>
                   <p className='text-xs text-muted-foreground'>연동 코드 (일반 브라우저에서 입력)</p>
@@ -139,9 +180,8 @@ export function AccountLinkCard() {
             </div>
 
           ) : (
-            /* Pi 세션 없음 → 두 경로 안내 */
+            /* Pi 세션 없음 (일반 브라우저) */
             <>
-              {/* Google 로그인이 없으면 먼저 안내 */}
               {!googleSession?.user && (
                 <Button
                   variant='outline'
@@ -153,7 +193,7 @@ export function AccountLinkCard() {
                 </Button>
               )}
 
-              {/* Pi Browser 진입 안내 — Pi Browser에서만 표시 (일반 브라우저에서는 불필요) */}
+              {/* Pi Browser 진입 안내 — Pi Browser에서만 표시 */}
               {isInPiBrowser && (
                 <div className='rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-3 space-y-2'>
                   <p className='text-xs font-semibold text-amber-700 dark:text-amber-400'>
@@ -174,7 +214,6 @@ export function AccountLinkCard() {
                 </div>
               )}
 
-              {/* 일반 브라우저 코드 입력 */}
               <Link
                 href='/link'
                 className={cn(buttonVariants({ size: 'sm' }), 'w-full text-center')}
