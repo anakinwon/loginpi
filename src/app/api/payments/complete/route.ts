@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getSupabaseAdmin } from '@/lib/supabase-admin'
 
 const PI_PAYMENTS_URL = 'https://api.minepi.com/v2/payments'
 
@@ -41,8 +42,11 @@ export async function POST(request: NextRequest) {
     }
     const payment = (await res.json()) as PaymentDTO
 
-    // TODO: 실서비스에서는 여기서 DB에 결제 완료 기록
-    // await db.payments.markComplete({ paymentId, txid, completedAt: new Date() })
+    // approve에서 생성된 row를 completed 상태로 업데이트
+    await getSupabaseAdmin()
+      .from('payments')
+      .update({ txid, status: 'completed', updated_at: new Date().toISOString() })
+      .eq('payment_id', paymentId)
 
     return NextResponse.json({ success: true, payment })
   } catch {

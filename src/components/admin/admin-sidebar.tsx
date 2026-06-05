@@ -7,6 +7,8 @@ import { cn } from '@/lib/utils'
 const NAV = [
   { href: '/admin', label: '대시보드' },
   { href: '/admin/users', label: '사용자 관리' },
+  { href: '/admin/payments', label: '결제 내역' },
+  { href: '/admin/links', label: '계정 연동 현황' },
 ]
 
 export function AdminSidebar() {

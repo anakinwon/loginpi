@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getSupabaseAdmin } from '@/lib/supabase-admin'
 
 const PI_PAYMENTS_URL = 'https://api.minepi.com/v2/payments'
 
@@ -23,17 +24,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'paymentId가 필요합니다' }, { status: 400 })
   }
 
-  // TODO: 실서비스에서는 여기서 DB 주문과 금액/사용자 대조 검증 필수
-  // const payment = await fetchPaymentFromPi(paymentId, apiKey)
-  // const order = await db.orders.findByPaymentId(paymentId)
-  // if (!order || order.amount !== payment.amount) return 400
-
   try {
     const res = await fetch(`${PI_PAYMENTS_URL}/${paymentId}/approve`, {
       method: 'POST',
-      headers: {
-        Authorization: `Key ${apiKey}`,   // ⚠️ Bearer 아닌 Key
-      },
+      headers: { Authorization: `Key ${apiKey}` },
     })
     if (!res.ok) {
       const text = await res.text()
@@ -43,6 +37,27 @@ export async function POST(request: NextRequest) {
       )
     }
     const payment = (await res.json()) as PaymentDTO
+
+    // Pi UID로 users 테이블에서 user.id 조회 후 결제 기록
+    const db = getSupabaseAdmin()
+    const { data: user } = await db
+      .from('users')
+      .select('id')
+      .eq('pi_uid', payment.user_uid)
+      .single()
+
+    if (user) {
+      await db.from('payments').upsert({
+        payment_id: payment.identifier,
+        user_id: user.id,
+        amount: payment.amount,
+        memo: payment.memo,
+        metadata: payment.metadata,
+        status: 'approved',
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'payment_id' })
+    }
+
     return NextResponse.json({ success: true, payment })
   } catch {
     return NextResponse.json({ error: 'Pi Network API 연결 실패' }, { status: 502 })
