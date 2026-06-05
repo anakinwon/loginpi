@@ -26,7 +26,9 @@ interface PiAuthContextValue {
 const PiAuthContext = createContext<PiAuthContextValue | null>(null)
 
 function detectPiBrowser(): boolean {
-  if (typeof navigator === 'undefined') return false
+  if (typeof window === 'undefined') return false
+  // Pi SDK 전역 객체가 있으면 Pi Browser 확실 (UA 패턴보다 신뢰도 높음)
+  if ('Pi' in window && window.Pi) return true
   const ua = navigator.userAgent
   return (
     /PiBrowser/i.test(ua) ||
