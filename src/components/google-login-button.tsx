@@ -8,10 +8,10 @@ import { usePiAuth } from '@/components/pi-auth-provider'
 // Pi Browser에서는 표시하지 않음
 export function GoogleLoginButton() {
   const { data: session, status } = useSession()
-  const { isInPiBrowser, isLoading: piLoading } = usePiAuth()
+  const { isInPiBrowser, isLoading: piLoading, user: piUser } = usePiAuth()
 
-  // Pi Browser이거나 아직 Pi 환경 확인 중이면 숨김
-  if (piLoading || isInPiBrowser) return null
+  // Pi 환경 (UA 감지 성공 or piUser 존재)이거나 아직 로딩 중이면 숨김
+  if (piLoading || isInPiBrowser || !!piUser) return null
   if (status === 'loading') return null
 
   if (session?.user) {

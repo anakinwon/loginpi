@@ -85,8 +85,8 @@ export default function HomePage() {
               <PiUserCard />
             </div>
           )}
-          {/* Pi Browser 확정 후에만 표시 — 로딩 중에는 isInPiBrowser=false 기본값이므로 piLoading도 체크 */}
-          {!piLoading && !isInPiBrowser && (
+          {/* piUser 있으면 Pi 환경으로 간주 — UA 감지 실패 시에도 안전하게 숨김 */}
+          {!piLoading && !isInPiBrowser && !piUser && (
             <div>
               <p className='text-muted-foreground mb-3 text-xs font-medium uppercase tracking-wider'>
                 Google
