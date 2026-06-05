@@ -16,6 +16,7 @@ export default function LinkPage() {
   const [errMsg, setErrMsg] = useState('')
 
   const digits = code.replace(/\D/g, '').slice(0, 6)
+  const displayValue = digits.length > 3 ? `${digits.slice(0, 3)}-${digits.slice(3)}` : digits
   const isValid = digits.length === 6
 
   async function handleSubmit(e: React.FormEvent) {
@@ -70,11 +71,11 @@ export default function LinkPage() {
                   <Input
                     id='link-code'
                     inputMode='numeric'
-                    placeholder='6자리 숫자 입력 (예: 394821)'
-                    value={digits}
+                    placeholder='000-000'
+                    value={displayValue}
                     onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                    className='text-center text-xl font-mono tracking-widest h-12'
-                    maxLength={6}
+                    className='text-center text-2xl font-mono tracking-widest h-12'
+                    maxLength={7}
                     autoComplete='one-time-code'
                   />
                 </div>
