@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { verifyPayload, signPayload } from '@/lib/pi-session-crypto'
+import { upsertPiUser } from '@/lib/users'
 import type { PiSessionUser } from '@/types/pi-session'
 
-// 링크 토큰 페이로드 (10분 TTL, stateless)
 export interface LinkTokenPayload {
-  userId: string       // Supabase users.id
-  provider: 'pi' | 'google'  // 토큰 발급자
-  exp: number          // Unix timestamp (초)
+  userId: string
+  provider: 'pi' | 'google'
+  exp: number
 }
 
 function getSecret() {
@@ -16,9 +16,6 @@ function getSecret() {
   return s
 }
 
-// POST /api/auth/link-start
-// — Pi Browser에서: Pi 세션 → provider=pi 토큰 생성
-// — 일반 브라우저에서: Google 세션 → provider=google 토큰 생성
 export async function POST(request: NextRequest) {
   let secret: string
   try { secret = getSecret() } catch {
@@ -27,13 +24,35 @@ export async function POST(request: NextRequest) {
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? ''
 
-  // Pi 세션 확인
+  // ── Pi 세션 우선 처리 ──────────────────────────────────────────────
   const piCookie = request.cookies.get('pi_session')?.value
   if (piCookie) {
     const piUser = verifyPayload<PiSessionUser>(piCookie, secret)
-    if (piUser?.userId) {
+
+    // uid 기준으로 확인 (userId는 Supabase upsert 실패 시 '' 일 수 있음)
+    if (piUser?.uid) {
+      let userId = piUser.userId
+
+      // userId가 비어있으면(Supabase upsert 이전 실패) 재시도
+      if (!userId) {
+        try {
+          const dbUser = await upsertPiUser({
+            uid: piUser.uid,
+            username: piUser.username,
+            walletAddress: piUser.walletAddress,
+          })
+          userId = dbUser.id
+        } catch (e) {
+          console.error('[link-start] Pi upsert 재시도 실패:', e)
+          return NextResponse.json(
+            { error: 'Pi 계정 DB 등록에 실패했습니다. Pi로 다시 로그인해주세요.' },
+            { status: 500 }
+          )
+        }
+      }
+
       const payload: LinkTokenPayload = {
-        userId: piUser.userId,
+        userId,
         provider: 'pi',
         exp: Math.floor(Date.now() / 1000) + 600,
       }
@@ -43,7 +62,7 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  // Google 세션 확인
+  // ── Google 세션 처리 ───────────────────────────────────────────────
   const googleSession = await auth()
   if (googleSession?.user?.id) {
     const payload: LinkTokenPayload = {
@@ -56,5 +75,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ token, url, provider: 'google' })
   }
 
-  return NextResponse.json({ error: 'Pi 또는 Google 로그인이 필요합니다' }, { status: 401 })
+  return NextResponse.json(
+    { error: 'Pi 또는 Google 로그인이 필요합니다' },
+    { status: 401 }
+  )
 }
