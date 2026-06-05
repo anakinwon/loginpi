@@ -9,6 +9,7 @@ const NAV = [
   { href: '/admin/users', label: '사용자 관리' },
   { href: '/admin/payments', label: '결제 내역' },
   { href: '/admin/links', label: '계정 연동 현황' },
+  { href: '/admin/board', label: '게시판 관리' },
 ]
 
 export function AdminSidebar() {

@@ -33,8 +33,10 @@ export default async function BoardListPage({ params, searchParams }: Props) {
     .order('reg_dtm', { ascending: false })
     .range(from, from + limit - 1)
 
-  if (q?.trim()) {
-    query = query.or(`post_ttl.ilike.%${q}%,post_cont.ilike.%${q}%`)
+  // PostgREST 필터 메타문자 제거 후 검색 (인젝션 방지)
+  const safeQ = q?.trim().replace(/[,()*]/g, '').slice(0, 100) ?? ''
+  if (safeQ) {
+    query = query.or(`post_ttl.ilike.%${safeQ}%,post_cont.ilike.%${safeQ}%`)
   }
 
   const { data: posts, count } = await query
