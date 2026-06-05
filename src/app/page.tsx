@@ -58,8 +58,8 @@ const STACK_ITEMS = [
 export default function HomePage() {
   const [inputValue, setInputValue] = useState('')
   const { user: piUser, isLoading: piLoading, isInPiBrowser } = usePiAuth()
-  // Pi Browser이거나 Pi 로그인 상태이거나 아직 로딩 중일 때만 Pi Network 섹션 표시
-  const showPiSection = piLoading || isInPiBrowser || !!piUser
+  // 로딩 완료 후 Pi Browser 또는 Pi 로그인 상태일 때만 Pi 섹션 표시
+  const showPiSection = isInPiBrowser || !!piUser
 
   return (
     <div className='mx-auto max-w-5xl px-4 py-12'>
@@ -76,31 +76,41 @@ export default function HomePage() {
       {/* 로그인 */}
       <section className='mb-12'>
         <h2 className='mb-4 text-2xl font-semibold'>로그인</h2>
-        <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
-          {showPiSection && (
-            <div>
-              <p className='text-muted-foreground mb-3 text-xs font-medium uppercase tracking-wider'>
-                Pi Network
-              </p>
-              <PiUserCard />
-            </div>
-          )}
-          {/* Pi Browser가 아닌 일반 브라우저에서 Google 카드 표시 */}
-          {!isInPiBrowser && (
-            <div>
-              <p className='text-muted-foreground mb-3 text-xs font-medium uppercase tracking-wider'>
-                Google
-              </p>
-              <GoogleUserCard />
-            </div>
-          )}
-          <div>
-            <p className='text-muted-foreground mb-3 text-xs font-medium uppercase tracking-wider'>
-              계정 연동
-            </p>
-            <AccountLinkCard />
+
+        {/* Pi Browser 여부 판단 중 (authenticate() 시도 중) */}
+        {piLoading ? (
+          <div className='flex items-center gap-2 text-sm text-muted-foreground py-6'>
+            <div className='h-4 w-4 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent' />
+            환경 감지 중…
           </div>
-        </div>
+        ) : (
+          <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
+            {/* Pi Browser: Pi Network 카드 */}
+            {showPiSection && (
+              <div>
+                <p className='text-muted-foreground mb-3 text-xs font-medium uppercase tracking-wider'>
+                  Pi Network
+                </p>
+                <PiUserCard />
+              </div>
+            )}
+            {/* 일반 브라우저: Google 카드 */}
+            {!isInPiBrowser && (
+              <div>
+                <p className='text-muted-foreground mb-3 text-xs font-medium uppercase tracking-wider'>
+                  Google
+                </p>
+                <GoogleUserCard />
+              </div>
+            )}
+            <div>
+              <p className='text-muted-foreground mb-3 text-xs font-medium uppercase tracking-wider'>
+                계정 연동
+              </p>
+              <AccountLinkCard />
+            </div>
+          </div>
+        )}
       </section>
 
       {/* Pi 결제 버튼 — Pi Browser 또는 Pi 로그인 상태에서만 표시 */}

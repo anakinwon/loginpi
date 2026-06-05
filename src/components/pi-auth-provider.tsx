@@ -13,7 +13,6 @@ export type { PiSessionUser }
 
 interface PiAuthContextValue {
   user: PiSessionUser | null
-  // Pi.authenticate()로 받은 accessToken — 쿠키 저장 실패 시 폴백 인증에 사용
   piAccessToken: string | null
   isLoading: boolean
   isInPiBrowser: boolean
@@ -25,23 +24,32 @@ interface PiAuthContextValue {
 
 const PiAuthContext = createContext<PiAuthContextValue | null>(null)
 
-function detectPiBrowser(): boolean {
-  if (typeof navigator === 'undefined') return false
-  const ua = navigator.userAgent
-  return (
-    /PiBrowser/i.test(ua) ||
-    /Pi Network/i.test(ua) ||
-    /PiApp/i.test(ua) ||
-    /MinePI/i.test(ua)
-  )
-}
-
 function detectSandbox(): boolean {
   if (typeof window !== 'undefined') {
     const { hostname } = window.location
     if (hostname === 'localhost' || hostname === '127.0.0.1') return true
   }
   return process.env.NEXT_PUBLIC_PI_SANDBOX === 'true'
+}
+
+async function onIncompletePayment(payment: PaymentDTO) {
+  try {
+    if (!payment.status.developer_approved) {
+      await fetch('/api/payments/approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentId: payment.identifier }),
+      })
+    } else if (!payment.status.developer_completed && payment.transaction?.txid) {
+      await fetch('/api/payments/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentId: payment.identifier, txid: payment.transaction.txid }),
+      })
+    }
+  } catch {
+    console.error('미완료 결제 복구 실패:', payment.identifier)
+  }
 }
 
 export function PiAuthProvider({ children }: { children: React.ReactNode }) {
@@ -53,7 +61,8 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = useCallback(async () => {
     if (!window.Pi) {
-      setError('Pi SDK가 로드되지 않았습니다')
+      // Pi SDK 없음 → 확실히 일반 브라우저
+      setIsInPiBrowser(false)
       setIsLoading(false)
       return
     }
@@ -64,30 +73,16 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
         window.Pi.init({ version: '2.0', sandbox: detectSandbox() })
       )
 
-      const auth = await window.Pi.authenticate(
-        ['username', 'wallet_address', 'payments'],
-        async (payment: PaymentDTO) => {
-          try {
-            if (!payment.status.developer_approved) {
-              await fetch('/api/payments/approve', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ paymentId: payment.identifier }),
-              })
-            } else if (!payment.status.developer_completed && payment.transaction?.txid) {
-              await fetch('/api/payments/complete', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ paymentId: payment.identifier, txid: payment.transaction.txid }),
-              })
-            }
-          } catch {
-            console.error('미완료 결제 복구 실패:', payment.identifier)
-          }
-        }
-      )
+      // Pi.authenticate()가 일반 브라우저에서 pending 상태로 멈출 수 있으므로 5초 타임아웃
+      const auth = await Promise.race([
+        window.Pi.authenticate(['username', 'wallet_address', 'payments'], onIncompletePayment),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('timeout')), 5000)
+        ),
+      ])
 
-      // accessToken을 state에 저장 — WebView 쿠키 저장 실패 시 폴백 인증에 사용
+      // 인증 성공 → Pi Browser 확정
+      setIsInPiBrowser(true)
       setPiAccessToken(auth.accessToken)
 
       const res = await fetch('/api/auth/pi', {
@@ -108,9 +103,11 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
       const data = (await res.json()) as { user: PiSessionUser }
       setUser(data.user)
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : 'Pi 인증 중 오류가 발생했습니다'
-      )
+      const msg = err instanceof Error ? err.message : 'Pi 인증 중 오류가 발생했습니다'
+      // 타임아웃은 일반 브라우저 판단 — 에러 메시지 표시 안 함
+      if (msg !== 'timeout') setError(msg)
+      // 인증 실패 → 일반 브라우저로 확정
+      setIsInPiBrowser(false)
     } finally {
       setIsLoading(false)
     }
@@ -141,27 +138,13 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   useEffect(() => {
-    const inPi = detectPiBrowser()
-    setIsInPiBrowser(inPi)
-
-    if (inPi) {
-      // Pi Browser: Pi SDK가 아직 로드되지 않았으면 동적으로 로드
-      const loadSdkAndSignIn = () => {
-        if (typeof window !== 'undefined' && window.Pi) {
-          signIn()
-          return
-        }
-        const script = document.createElement('script')
-        script.src = 'https://sdk.minepi.com/pi-sdk.js'
-        script.onload = () => signIn()
-        script.onerror = () => {
-          setError('Pi SDK 로드 실패')
-          setIsLoading(false)
-        }
-        document.head.appendChild(script)
-      }
-      loadSdkAndSignIn()
+    if (typeof window !== 'undefined' && window.Pi) {
+      // Pi SDK가 있음 → signIn() 시도
+      // 성공: isInPiBrowser=true / 실패·타임아웃: isInPiBrowser=false
+      signIn()
     } else {
+      // Pi SDK 없음 → 일반 브라우저 확정, 기존 세션만 복원
+      setIsInPiBrowser(false)
       fetch('/api/auth/pi', { credentials: 'include' })
         .then((res) => res.json())
         .then((data: { user: PiSessionUser | null }) => {

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
+import Script from 'next/script'
 import { SessionProvider } from 'next-auth/react'
 import './globals.css'
 import { auth } from '@/auth'
@@ -37,6 +38,10 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col antialiased`}
       >
+        <Script
+          src='https://sdk.minepi.com/pi-sdk.js'
+          strategy='beforeInteractive'
+        />
         <SessionProvider session={session}>
           <ThemeProvider
             attribute='class'
