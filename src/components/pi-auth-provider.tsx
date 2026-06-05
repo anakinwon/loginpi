@@ -26,9 +26,7 @@ interface PiAuthContextValue {
 const PiAuthContext = createContext<PiAuthContextValue | null>(null)
 
 function detectPiBrowser(): boolean {
-  if (typeof window === 'undefined') return false
-  // Pi SDK 전역 객체가 있으면 Pi Browser 확실 (UA 패턴보다 신뢰도 높음)
-  if ('Pi' in window && window.Pi) return true
+  if (typeof navigator === 'undefined') return false
   const ua = navigator.userAgent
   return (
     /PiBrowser/i.test(ua) ||
@@ -147,7 +145,22 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
     setIsInPiBrowser(inPi)
 
     if (inPi) {
-      signIn()
+      // Pi Browser: Pi SDK가 아직 로드되지 않았으면 동적으로 로드
+      const loadSdkAndSignIn = () => {
+        if (typeof window !== 'undefined' && window.Pi) {
+          signIn()
+          return
+        }
+        const script = document.createElement('script')
+        script.src = 'https://sdk.minepi.com/pi-sdk.js'
+        script.onload = () => signIn()
+        script.onerror = () => {
+          setError('Pi SDK 로드 실패')
+          setIsLoading(false)
+        }
+        document.head.appendChild(script)
+      }
+      loadSdkAndSignIn()
     } else {
       fetch('/api/auth/pi', { credentials: 'include' })
         .then((res) => res.json())
