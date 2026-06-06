@@ -11,9 +11,9 @@ interface PaymentRow {
   amount: number
   memo: string | null
   status: PaymentStatus
-  created_at: string
-  updated_at: string
-  users: {
+  reg_dtm: string
+  mod_dtm: string
+  sys_user: {
     display_name: string
     pi_username: string | null
     google_email: string | null
@@ -105,9 +105,9 @@ export default function PaymentsPage() {
               {filtered.map((p) => (
                 <tr key={p.id} className='hover:bg-muted/30 transition-colors'>
                   <td className='px-4 py-3'>
-                    <p className='font-medium'>{p.users?.display_name ?? '—'}</p>
+                    <p className='font-medium'>{p.sys_user?.display_name ?? '—'}</p>
                     <p className='text-muted-foreground text-xs'>
-                      {p.users?.pi_username ? `@${p.users.pi_username}` : p.users?.google_email ?? ''}
+                      {p.sys_user?.pi_username ? `@${p.sys_user.pi_username}` : p.sys_user?.google_email ?? ''}
                     </p>
                   </td>
                   <td className='px-4 py-3 font-semibold tabular-nums'>
@@ -125,7 +125,7 @@ export default function PaymentsPage() {
                     {p.payment_id}
                   </td>
                   <td className='px-4 py-3 text-muted-foreground text-xs whitespace-nowrap'>
-                    {new Date(p.created_at).toLocaleString('ko-KR')}
+                    {new Date(p.reg_dtm).toLocaleString('ko-KR')}
                   </td>
                 </tr>
               ))}
