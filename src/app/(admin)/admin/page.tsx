@@ -6,12 +6,12 @@ async function getStats() {
   const db = getSupabaseAdmin()
   const [{ count: total }, { count: piOnly }, { count: googleOnly }, { count: linked }] =
     await Promise.all([
-      db.from('users').select('*', { count: 'exact', head: true }),
-      db.from('users').select('*', { count: 'exact', head: true })
+      db.from('sys_user').select('*', { count: 'exact', head: true }),
+      db.from('sys_user').select('*', { count: 'exact', head: true })
         .not('pi_uid', 'is', null).is('google_id', null),
-      db.from('users').select('*', { count: 'exact', head: true })
+      db.from('sys_user').select('*', { count: 'exact', head: true })
         .is('pi_uid', null).not('google_id', 'is', null),
-      db.from('users').select('*', { count: 'exact', head: true })
+      db.from('sys_user').select('*', { count: 'exact', head: true })
         .not('pi_uid', 'is', null).not('google_id', 'is', null),
     ])
   return { total: total ?? 0, piOnly: piOnly ?? 0, googleOnly: googleOnly ?? 0, linked: linked ?? 0 }

@@ -12,8 +12,9 @@ export async function GET(req: NextRequest) {
   const search = searchParams.get('search')?.trim() ?? ''
 
   let query = getSupabaseAdmin()
-    .from('std_dic_sync')
-    .select('dic_id, dic_log_nm, dic_phy_nm, dic_phy_fll_nm, dic_desc, data_type, data_len, apv_status, synced_at')
+    .from('std_dic')
+    .select('dic_id, dic_log_nm, dic_phy_nm, dic_phy_fll_nm, dic_desc, data_type, data_len, apv_status, synced_at, reg_dtm, mod_dtm, regr_id')
+    .eq('del_yn', 'N')
     .order('dic_log_nm', { ascending: true })
 
   if (search) {
@@ -47,7 +48,7 @@ export async function POST(req: NextRequest) {
   }
 
   const { data, error } = await getSupabaseAdmin()
-    .from('std_dic_sync')
+    .from('std_dic')
     .insert({
       dic_id: crypto.randomUUID(),
       dic_log_nm: body.dic_log_nm.trim(),
@@ -58,6 +59,7 @@ export async function POST(req: NextRequest) {
       data_type: body.data_type ?? null,
       data_len: body.data_len ?? null,
       apv_status: 'APPROVED',
+      regr_id: requester?.id ?? null,
     })
     .select()
     .single()

@@ -9,7 +9,7 @@ export async function GET() {
   }
 
   const { data, error } = await getSupabaseAdmin()
-    .from('payments')
+    .from('pi_pymnt')
     .select(`
       id,
       payment_id,
@@ -18,11 +18,11 @@ export async function GET() {
       memo,
       status,
       metadata,
-      created_at,
-      updated_at,
-      users ( display_name, pi_username, google_email )
+      reg_dtm,
+      mod_dtm,
+      sys_user ( display_name, pi_username, google_email )
     `)
-    .order('created_at', { ascending: false })
+    .order('reg_dtm', { ascending: false })
 
   if (error) {
     return NextResponse.json({ error: '결제 내역 조회 실패' }, { status: 500 })

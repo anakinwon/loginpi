@@ -27,9 +27,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (body.dic_gbn_cd !== undefined) patch.dic_gbn_cd = body.dic_gbn_cd
   if (body.data_type !== undefined) patch.data_type = body.data_type || null
   if (body.data_len !== undefined) patch.data_len = body.data_len
+  patch.modr_id = requester?.id ?? null
 
   const { data, error } = await getSupabaseAdmin()
-    .from('std_dic_sync')
+    .from('std_dic')
     .update(patch)
     .eq('dic_id', id)
     .select()
@@ -49,8 +50,8 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
   const { id } = await params
 
   const { error } = await getSupabaseAdmin()
-    .from('std_dic_sync')
-    .delete()
+    .from('std_dic')
+    .update({ del_yn: 'Y', mod_dtm: new Date().toISOString(), modr_id: requester?.id ?? null })
     .eq('dic_id', id)
 
   if (error) return NextResponse.json({ error: '삭제 실패' }, { status: 500 })

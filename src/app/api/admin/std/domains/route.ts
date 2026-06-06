@@ -13,8 +13,9 @@ export async function GET(req: NextRequest) {
   const typeFilter = searchParams.get('type') ?? ''
 
   let query = getSupabaseAdmin()
-    .from('std_dom_sync')
-    .select('dom_id, dom_nm, key_dom_nm, key_dom_phy_nm, dom_type_cd, data_type_cd, data_len, data_scale, dom_desc, synced_at')
+    .from('std_dom')
+    .select('dom_id, dom_nm, key_dom_nm, key_dom_phy_nm, dom_type_cd, data_type_cd, data_len, data_scale, dom_desc, synced_at, reg_dtm, mod_dtm, regr_id')
+    .eq('del_yn', 'N')
     .order('dom_nm', { ascending: true })
 
   if (typeFilter) query = query.eq('dom_type_cd', typeFilter)
@@ -52,7 +53,7 @@ export async function POST(req: NextRequest) {
   }
 
   const { data, error } = await getSupabaseAdmin()
-    .from('std_dom_sync')
+    .from('std_dom')
     .insert({
       dom_id: crypto.randomUUID(),
       dom_nm: body.dom_nm.trim(),
@@ -63,6 +64,7 @@ export async function POST(req: NextRequest) {
       data_len: body.data_len ?? null,
       data_scale: body.data_scale ?? null,
       dom_desc: body.dom_desc?.trim() ?? null,
+      regr_id: requester?.id ?? null,
     })
     .select()
     .single()

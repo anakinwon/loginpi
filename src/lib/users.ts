@@ -12,8 +12,8 @@ export interface UserRow {
   google_image: string | null
   display_name: string
   role: string
-  created_at: string
-  updated_at: string
+  reg_dtm: string
+  mod_dtm: string
 }
 
 // Pi 로그인 시 upsert — pi_uid 기준 (항상 1건만 유지)
@@ -23,7 +23,7 @@ export async function upsertPiUser(piUser: {
   walletAddress: string | null
 }): Promise<UserRow> {
   const { data, error } = await getSupabaseAdmin()
-    .from('users')
+    .from('sys_user')
     .upsert(
       {
         pi_uid: piUser.uid,
@@ -52,7 +52,7 @@ export async function updatePiUserWithGoogle(
   }
 ): Promise<void> {
   const { error } = await getSupabaseAdmin()
-    .from('users')
+    .from('sys_user')
     .update({
       google_id: googleUser.id,
       google_email: googleUser.email,
@@ -66,7 +66,7 @@ export async function updatePiUserWithGoogle(
 
 export async function getUserById(id: string): Promise<UserRow | null> {
   const { data } = await getSupabaseAdmin()
-    .from('users')
+    .from('sys_user')
     .select()
     .eq('id', id)
     .single()

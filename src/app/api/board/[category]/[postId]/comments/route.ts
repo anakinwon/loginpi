@@ -44,8 +44,8 @@ export async function POST(request: NextRequest, { params }: Params) {
       cmnt_cont: cmnt_cont.trim(),
       rgst_usr_id: user.id,
       rgst_usr_nm: user.display_name,
-      reg_usr_id: user.display_name.slice(0, 20),
-      mod_usr_id: user.display_name.slice(0, 20),
+      regr_id: user.display_name.slice(0, 20),
+      modr_id: user.display_name.slice(0, 20),
     })
     .select('cmnt_id')
     .single()

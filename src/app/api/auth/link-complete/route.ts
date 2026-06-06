@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
   const supabase = getSupabaseAdmin()
 
   const { data: linkCode, error: fetchErr } = await supabase
-    .from('link_codes')
+    .from('auth_link_cd')
     .select('pi_user_id, expires_at, used_at, attempt_count')
     .eq('code', code)
     .single()
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
 
   // 시도 횟수 즉시 증가 (브루트포스 방지)
   await supabase
-    .from('link_codes')
+    .from('auth_link_cd')
     .update({ attempt_count: linkCode.attempt_count + 1 })
     .eq('code', code)
 
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
     })
 
     await supabase
-      .from('link_codes')
+      .from('auth_link_cd')
       .update({ used_at: new Date().toISOString() })
       .eq('code', code)
 

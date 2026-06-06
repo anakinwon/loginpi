@@ -19,6 +19,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (body.term_phy_nm !== undefined) patch.term_phy_nm = body.term_phy_nm.trim().toLowerCase()
   if (body.term_phy_fll_nm !== undefined) patch.term_phy_fll_nm = body.term_phy_fll_nm.trim().toUpperCase()
   if (body.term_desc !== undefined) patch.term_desc = body.term_desc?.trim() || null
+  patch.modr_id = requester?.id ?? null
 
   const { data, error } = await getSupabaseAdmin()
     .from('std_term')
@@ -40,7 +41,7 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
 
   const { error } = await getSupabaseAdmin()
     .from('std_term')
-    .delete()
+    .update({ del_yn: 'Y', mod_dtm: new Date().toISOString(), modr_id: requester?.id ?? null })
     .eq('term_id', id)
 
   if (error) return NextResponse.json({ error: '삭제 실패' }, { status: 500 })

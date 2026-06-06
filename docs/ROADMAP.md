@@ -241,7 +241,7 @@ brd_attch 8행  — fl_nm/fl_pth/fl_url/fl_sz/fl_tp, del_yn 논리삭제
 
 **설계 핵심 사항**
 - `rgst_usr_id` (uuid): `public.users.id` 참조 (FK 없음 — app 레벨 관리)
-- `reg_usr_id` / `mod_usr_id`: `varchar(20)` — `user.display_name.slice(0,20)` 사용 (UUID 불가)
+- `regr_id` / `modr_id`: `varchar(20)` — `user.display_name.slice(0,20)` 사용 (UUID 불가)
 - `ctgr_cd` → `brd_ctgr.ctgr_cd` FK 존재
 - `cmnt_yn='Y'`: FREE, QNA만 댓글 허용 / `attch_yn='Y'`: 전 카테고리 첨부 허용
 - `wr_min_role_cd`: 카테고리별 최소 작성 역할 (MASTER/MANAGER/USER)

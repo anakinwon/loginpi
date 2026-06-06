@@ -18,7 +18,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
           // 1차: google_id(OAuth sub)로 조회
           const { data: byId } = await db
-            .from('users')
+            .from('sys_user')
             .select('id')
             .eq('google_id', profile.sub as string)
             .maybeSingle()
@@ -32,7 +32,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             const emailVerified = (profile as { email_verified?: boolean }).email_verified
             if (profile.email && emailVerified === true) {
               const { data: byEmail } = await db
-                .from('users')
+                .from('sys_user')
                 .select('id, google_id')
                 .eq('google_email', profile.email as string)
                 .is('google_id', null)  // google_id가 NULL인 행만 매칭
@@ -42,7 +42,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 token.userId = byEmail.id
                 // google_id가 NULL이었던 행에 실제 sub 세팅 (1회성 데이터 복구)
                 await db
-                  .from('users')
+                  .from('sys_user')
                   .update({ google_id: profile.sub as string })
                   .eq('id', byEmail.id)
                   .is('google_id', null)  // 경쟁 조건 방지: NULL 확인 후 업데이트

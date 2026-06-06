@@ -11,7 +11,8 @@ export async function GET(req: NextRequest) {
 
   let query = getSupabaseAdmin()
     .from('std_term')
-    .select('term_id, term_log_nm, term_phy_nm, term_phy_fll_nm, term_desc, apv_status, synced_at')
+    .select('term_id, term_log_nm, term_phy_nm, term_phy_fll_nm, term_desc, apv_status, synced_at, reg_dtm, mod_dtm, regr_id')
+    .eq('del_yn', 'N')
     .order('term_log_nm', { ascending: true })
 
   if (search) {
@@ -48,6 +49,7 @@ export async function POST(req: NextRequest) {
       term_phy_fll_nm: body.term_phy_fll_nm?.trim().toUpperCase() ?? null,
       term_desc: body.term_desc?.trim() ?? null,
       apv_status: 'APPROVED',
+      regr_id: requester?.id ?? null,
     })
     .select()
     .single()

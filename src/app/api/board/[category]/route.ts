@@ -85,8 +85,8 @@ export async function POST(
       post_cont: post_cont?.trim() ?? null,
       rgst_usr_id: user.id,
       rgst_usr_nm: user.display_name,
-      reg_usr_id: user.display_name.slice(0, 20),
-      mod_usr_id: user.display_name.slice(0, 20),
+      regr_id: user.display_name.slice(0, 20),
+      modr_id: user.display_name.slice(0, 20),
     })
     .select('post_id')
     .single()

@@ -98,8 +98,8 @@ export async function POST(request: NextRequest, { params }: Params) {
         fl_url: publicUrl,
         fl_sz: file.size,
         fl_tp: file.type || null,
-        reg_usr_id: user.display_name.slice(0, 20),
-        mod_usr_id: user.display_name.slice(0, 20),
+        regr_id: user.display_name.slice(0, 20),
+        modr_id: user.display_name.slice(0, 20),
       })
       .select('attch_id')
       .single()

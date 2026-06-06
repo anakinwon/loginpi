@@ -38,23 +38,23 @@ export async function POST(request: NextRequest) {
     }
     const payment = (await res.json()) as PaymentDTO
 
-    // Pi UID로 users 테이블에서 user.id 조회 후 결제 기록
+    // Pi UID로 sys_user 테이블에서 user.id 조회 후 결제 기록
     const db = getSupabaseAdmin()
     const { data: user } = await db
-      .from('users')
+      .from('sys_user')
       .select('id')
       .eq('pi_uid', payment.user_uid)
       .single()
 
     if (user) {
-      await db.from('payments').upsert({
+      await db.from('pi_pymnt').upsert({
         payment_id: payment.identifier,
         user_id: user.id,
         amount: payment.amount,
         memo: payment.memo,
         metadata: payment.metadata,
         status: 'approved',
-        updated_at: new Date().toISOString(),
+        mod_dtm: new Date().toISOString(),
       }, { onConflict: 'payment_id' })
     }
 

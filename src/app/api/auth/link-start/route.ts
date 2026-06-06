@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
   let code = ''
   for (let attempt = 0; attempt < 3; attempt++) {
     code = randomSixDigit()
-    const { error } = await supabase.from('link_codes').insert({
+    const { error } = await supabase.from('auth_link_cd').insert({
       code,
       pi_user_id: userId,
       expires_at: new Date(Date.now() + 10 * 60 * 1000).toISOString(),

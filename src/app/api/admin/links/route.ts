@@ -9,9 +9,9 @@ export async function GET() {
   }
 
   const { data, error } = await getSupabaseAdmin()
-    .from('users')
-    .select('id, pi_uid, pi_username, google_id, google_email, google_name, display_name, role, created_at')
-    .order('created_at', { ascending: false })
+    .from('sys_user')
+    .select('id, pi_uid, pi_username, google_id, google_email, google_name, display_name, role, reg_dtm')
+    .order('reg_dtm', { ascending: false })
 
   if (error) {
     return NextResponse.json({ error: '연동 현황 조회 실패' }, { status: 500 })

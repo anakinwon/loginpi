@@ -31,7 +31,7 @@ export async function PATCH(
   }
 
   const { error } = await getSupabaseAdmin()
-    .from('users')
+    .from('sys_user')
     .update({ role })
     .eq('id', id)
 

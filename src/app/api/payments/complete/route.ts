@@ -44,8 +44,8 @@ export async function POST(request: NextRequest) {
 
     // approve에서 생성된 row를 completed 상태로 업데이트
     await getSupabaseAdmin()
-      .from('payments')
-      .update({ txid, status: 'completed', updated_at: new Date().toISOString() })
+      .from('pi_pymnt')
+      .update({ txid, status: 'completed', mod_dtm: new Date().toISOString() })
       .eq('payment_id', paymentId)
 
     return NextResponse.json({ success: true, payment })

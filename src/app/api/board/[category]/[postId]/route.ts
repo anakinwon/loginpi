@@ -94,7 +94,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     .update({
       post_ttl: post_ttl.trim(),
       post_cont: post_cont?.trim() ?? null,
-      mod_usr_id: user.display_name.slice(0, 20),
+      modr_id: user.display_name.slice(0, 20),
       mod_dtm: new Date().toISOString(),
     })
     .eq('post_id', postId)
@@ -131,7 +131,7 @@ export async function DELETE(_request: NextRequest, { params }: Params) {
     .update({
       del_yn: 'Y',
       del_dtm: new Date().toISOString(),
-      mod_usr_id: user.display_name.slice(0, 20),
+      modr_id: user.display_name.slice(0, 20),
     })
     .eq('post_id', postId)
 
