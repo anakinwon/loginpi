@@ -1,10 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { usePiAuth } from '@/components/pi-auth-provider'
 
-function detectBrowser(ua: string): string {
-  // window.Pi 주입 여부가 Pi Browser의 가장 확실한 식별자
-  if (typeof window !== 'undefined' && window.Pi) return 'Pi Browser'
+function detectByUA(ua: string): string {
   if (/PiBrowser/.test(ua)) return 'Pi Browser'
   if (/Edg\//.test(ua)) return 'Edge'
   if (/OPR\//.test(ua)) return 'Opera'
@@ -15,11 +14,14 @@ function detectBrowser(ua: string): string {
 }
 
 export function BrowserName() {
-  const [name, setName] = useState('...')
+  const { isInPiBrowser, isLoading } = usePiAuth()
+  const [uaName, setUaName] = useState('...')
 
   useEffect(() => {
-    setName(detectBrowser(navigator.userAgent))
+    setUaName(detectByUA(navigator.userAgent))
   }, [])
 
-  return <span>{name}</span>
+  // Pi 인증 완료 후 실제 Pi Browser로 확정된 경우에만 교체
+  if (!isLoading && isInPiBrowser) return <span>Pi Browser</span>
+  return <span>{uaName}</span>
 }
