@@ -12,6 +12,10 @@ const NAV = [
   { href: '/admin/board', label: '게시판 관리' },
 ]
 
+const STD_NAV = [
+  { href: '/admin/std/words', label: '표준단어' },
+]
+
 export function AdminSidebar() {
   const pathname = usePathname()
 
@@ -22,6 +26,23 @@ export function AdminSidebar() {
       </div>
       <nav className='flex flex-col gap-1 p-2 flex-1'>
         {NAV.map(({ href, label }) => (
+          <Link
+            key={href}
+            href={href}
+            className={cn(
+              'rounded-md px-3 py-2 text-sm transition-colors',
+              pathname === href
+                ? 'bg-primary text-primary-foreground'
+                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+            )}
+          >
+            {label}
+          </Link>
+        ))}
+        <p className='text-muted-foreground px-3 pt-3 pb-1 text-xs font-semibold tracking-wide uppercase'>
+          데이터 표준
+        </p>
+        {STD_NAV.map(({ href, label }) => (
           <Link
             key={href}
             href={href}
