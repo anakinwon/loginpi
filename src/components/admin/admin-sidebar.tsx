@@ -14,6 +14,7 @@ const NAV = [
 
 const STD_NAV = [
   { href: '/admin/std/words', label: '표준단어' },
+  { href: '/admin/std/domains', label: '표준도메인' },
 ]
 
 export function AdminSidebar() {
