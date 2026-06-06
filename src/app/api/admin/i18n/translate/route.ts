@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@supabase/supabase-js'
+import { readFile } from 'fs/promises'
+import { join } from 'path'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 
 const supabase = createClient(
@@ -12,10 +14,10 @@ const LOCALE_NAMES: Record<string, string> = {
   en: 'English', zh: 'Chinese (Simplified)', ja: 'Japanese', hi: 'Hindi',
   vi: 'Vietnamese', af: 'Afrikaans', fil: 'Filipino', th: 'Thai',
   id: 'Indonesian', ms: 'Malay', es: 'Spanish', fr: 'French',
-  de: 'German', it: 'Italian',
+  de: 'German', it: 'Italian', ru: 'Russian',
+  pt: 'Portuguese', ar: 'Egyptian Arabic',
 }
 
-// ko.json에서 flat key-value 추출 (중첩 객체 → 'board.title' 형식)
 function flattenJson(obj: Record<string, unknown>, prefix = ''): Record<string, string> {
   const result: Record<string, string> = {}
   for (const [k, v] of Object.entries(obj)) {
@@ -51,14 +53,22 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'ANTHROPIC_API_KEY가 설정되지 않았습니다' }, { status: 500 })
   }
 
-  // ko 기준 전체 키 조회
-  const { data: koMsgs } = await supabase
-    .from('i18n_message')
-    .select('msg_key, msg_val')
-    .eq('locale_cd', 'ko')
-    .not('msg_val', 'is', null)
+  // ko.json 파일을 직접 읽어서 source of truth로 사용
+  const koJsonPath = join(process.cwd(), 'messages', 'ko.json')
+  let koFlat: Record<string, string>
+  try {
+    const raw = await readFile(koJsonPath, 'utf-8')
+    const koJson = JSON.parse(raw) as Record<string, unknown>
+    koFlat = flattenJson(koJson)
+  } catch {
+    return NextResponse.json({ error: 'ko.json 파일을 읽을 수 없습니다' }, { status: 500 })
+  }
 
-  // 대상 언어 기존 번역 조회
+  if (Object.keys(koFlat).length === 0) {
+    return NextResponse.json({ error: 'ko.json이 비어있습니다' }, { status: 400 })
+  }
+
+  // 대상 언어 기존 번역 조회 (미번역 키만 추출)
   const { data: existingMsgs } = await supabase
     .from('i18n_message')
     .select('msg_key, msg_val')
@@ -66,11 +76,10 @@ export async function POST(req: NextRequest) {
 
   const existingKeys = new Set((existingMsgs ?? []).filter((m) => m.msg_val).map((m) => m.msg_key))
 
-  // 미번역 키만 추출
   const toTranslate: Record<string, string> = {}
-  for (const msg of koMsgs ?? []) {
-    if (!existingKeys.has(msg.msg_key)) {
-      toTranslate[msg.msg_key] = msg.msg_val
+  for (const [key, val] of Object.entries(koFlat)) {
+    if (!existingKeys.has(key)) {
+      toTranslate[key] = val
     }
   }
 
@@ -80,7 +89,6 @@ export async function POST(req: NextRequest) {
 
   const client = new Anthropic({ apiKey })
 
-  // 50개씩 배치 처리
   const entries = Object.entries(toTranslate)
   const BATCH = 50
   const upsertRows: { locale_cd: string; msg_key: string; msg_val: string; is_auto: string }[] = []
@@ -102,7 +110,6 @@ ${JSON.stringify(batch, null, 2)}`
     const raw = (message.content[0] as { type: string; text: string }).text.trim()
     let translated: Record<string, string> = {}
     try {
-      // JSON 블록 감지 후 파싱
       const jsonMatch = raw.match(/\{[\s\S]*\}/)
       if (jsonMatch) translated = JSON.parse(jsonMatch[0])
     } catch {

@@ -4,6 +4,19 @@ import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 
+// locale 코드 → ISO 3166-1 alpha-2 (flag-icons 클래스용)
+const LOCALE_COUNTRY: Record<string, string> = {
+  ko: 'kr', en: 'us', zh: 'cn', ja: 'jp', hi: 'in',
+  vi: 'vn', af: 'za', fil: 'ph', th: 'th', id: 'id',
+  ms: 'my', es: 'es', fr: 'fr', de: 'de', it: 'it', ru: 'ru',
+  pt: 'pt', ar: 'eg',
+}
+
+function Flag({ locale }: { locale: string }) {
+  const country = LOCALE_COUNTRY[locale] ?? 'un'
+  return <span className={`fi fi-${country} rounded-sm`} style={{ fontSize: '1.25rem' }} />
+}
+
 interface LocaleStat {
   locale_cd: string
   locale_nm: string
@@ -76,12 +89,18 @@ export default function I18nPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({}),
       })
-      const d = (await res.json()) as { synced: string[]; errors: string[] }
+      const d = (await res.json()) as { synced: string[]; skipped: string[]; errors: string[] }
+
       if (d.errors.length > 0) {
-        toast.error(`일부 실패: ${d.errors.join(', ')}`)
-      } else {
-        toast.success(`전체 ${d.synced.length}개 언어 동기화 완료`)
+        toast.error(`오류 발생: ${d.errors.join(', ')}`)
       }
+
+      if (d.synced.length > 0) {
+        toast.success(`${d.synced.length}개 언어 동기화 완료`)
+      } else if (d.errors.length === 0) {
+        toast.info('DB에 동기화할 데이터가 없습니다. 먼저 "번역 + 동기화"를 실행해 주세요.')
+      }
+
       load()
     } catch {
       toast.error('동기화 실패')
@@ -145,7 +164,7 @@ export default function I18nPage() {
                 <tr key={loc.locale_cd} className='hover:bg-muted/20'>
                   <td className='px-4 py-3'>
                     <div className='flex items-center gap-2'>
-                      <span className='text-xl'>{loc.flag_emoji}</span>
+                      <Flag locale={loc.locale_cd} />
                       <div>
                         <p className='font-medium'>{loc.locale_nm}</p>
                         <p className='text-muted-foreground text-xs uppercase'>{loc.locale_cd}</p>

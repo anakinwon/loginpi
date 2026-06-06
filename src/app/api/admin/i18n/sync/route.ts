@@ -28,6 +28,9 @@ function unflattenJson(flat: Record<string, string>): Record<string, unknown> {
 // 허용 locale 집합 (routing.ts 정의 기준)
 const ALLOWED_LOCALES = new Set<string>(routing.locales)
 
+// ko는 messages/ko.json이 source of truth — DB→JSON 동기화 대상 제외
+const SYNC_SKIP = new Set(['ko'])
+
 export async function POST(req: NextRequest) {
   const user = await getSessionUser()
   if (!isAdmin(user)) {
@@ -36,6 +39,11 @@ export async function POST(req: NextRequest) {
 
   const body = (await req.json().catch(() => ({}))) as { locale?: string }
   const targetLocale = body.locale
+
+  // ko는 source of truth — 명시적 요청도 거부
+  if (targetLocale !== undefined && SYNC_SKIP.has(targetLocale)) {
+    return NextResponse.json({ error: 'ko는 DB→JSON 동기화 대상이 아닙니다' }, { status: 400 })
+  }
 
   // 요청 locale이 있으면 허용 목록에서 검증
   if (targetLocale !== undefined && !ALLOWED_LOCALES.has(targetLocale)) {
@@ -56,9 +64,13 @@ export async function POST(req: NextRequest) {
 
   const messagesDir = resolve(process.cwd(), 'messages')
   const synced: string[] = []
+  const skipped: string[] = []
   const errors: string[] = []
 
   for (const lc of localeCodes) {
+    // ko는 파일이 source of truth — DB에서 덮어쓰지 않음
+    if (SYNC_SKIP.has(lc)) continue
+
     // 허용 목록 + DB 존재 여부 이중 검증
     if (!ALLOWED_LOCALES.has(lc) || !dbLocales.has(lc)) {
       errors.push(`${lc}: 허용되지 않은 locale`)
@@ -88,10 +100,16 @@ export async function POST(req: NextRequest) {
       flat[msg_key] = msg_val
     }
 
+    // DB에 데이터가 없으면 기존 파일을 덮어쓰지 않음 (skip — 오류 아님)
+    if (Object.keys(flat).length === 0) {
+      skipped.push(lc)
+      continue
+    }
+
     const nested = unflattenJson(flat)
     await writeFile(filePath, JSON.stringify(nested, null, 2), 'utf-8')
     synced.push(lc)
   }
 
-  return NextResponse.json({ synced, errors })
+  return NextResponse.json({ synced, skipped, errors })
 }

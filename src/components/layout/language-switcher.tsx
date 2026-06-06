@@ -25,6 +25,9 @@ const LOCALE_META: Record<string, LocaleMeta> = {
   fr:  { name: 'Français',         country: 'fr' },
   de:  { name: 'Deutsch',          country: 'de' },
   it:  { name: 'Italiano',         country: 'it' },
+  ru:  { name: 'Русский',          country: 'ru' },
+  pt:  { name: 'Português',        country: 'pt' },
+  ar:  { name: 'العربية',          country: 'eg' },
 }
 
 function Flag({ country, size = 'sm' }: { country: string; size?: 'sm' | 'lg' }) {

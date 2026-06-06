@@ -7,6 +7,7 @@ import {
   useEffect,
   useState,
 } from 'react'
+import { useRouter } from 'next/navigation'
 import type { PiSessionUser } from '@/types/pi-session'
 
 export type { PiSessionUser }
@@ -58,6 +59,7 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
   const [isInPiBrowser, setIsInPiBrowser] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const router = useRouter()
 
   const signIn = useCallback(async () => {
     if (!window.Pi) {
@@ -102,6 +104,8 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
 
       const data = (await res.json()) as { user: PiSessionUser }
       setUser(data.user)
+      // 쿠키 발급 후 서버 컴포넌트(Header) 재실행 → showAdmin 즉시 반영
+      router.refresh()
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Pi 인증 중 오류가 발생했습니다'
       // 타임아웃은 일반 브라우저 판단 — 에러 메시지 표시 안 함
@@ -111,13 +115,15 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [router])
 
   const signOut = useCallback(async () => {
     await fetch('/api/auth/pi', { method: 'DELETE', credentials: 'include' })
     setUser(null)
     setPiAccessToken(null)
-  }, [])
+    // 쿠키 삭제 후 서버 컴포넌트 재실행 → showAdmin 즉시 제거
+    router.refresh()
+  }, [router])
 
   const devLogin = useCallback(async () => {
     setIsLoading(true)
@@ -130,12 +136,13 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
       }
       const data = (await res.json()) as { user: PiSessionUser }
       setUser(data.user)
+      router.refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : '개발 로그인 실패')
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [router])
 
   useEffect(() => {
     if (typeof window !== 'undefined' && window.Pi) {

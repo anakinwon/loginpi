@@ -15,7 +15,7 @@ interface UserRow {
   google_name: string | null
   display_name: string
   role: Role
-  created_at: string
+  reg_dtm: string
 }
 
 const ROLE_COLOR: Record<Role, string> = {
@@ -100,7 +100,10 @@ export default function UsersPage() {
                     </span>
                   </td>
                   <td className='px-4 py-3 text-muted-foreground text-xs'>
-                    {new Date(user.created_at).toLocaleDateString('ko-KR')}
+                    {new Date(user.reg_dtm).toLocaleString('ko-KR', {
+                      year: 'numeric', month: '2-digit', day: '2-digit',
+                      hour: '2-digit', minute: '2-digit',
+                    })}
                   </td>
                   <td className='px-4 py-3'>
                     <div className='flex gap-1 flex-wrap'>
