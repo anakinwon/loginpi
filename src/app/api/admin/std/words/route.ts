@@ -10,14 +10,11 @@ export async function GET(req: NextRequest) {
 
   const { searchParams } = new URL(req.url)
   const search = searchParams.get('search')?.trim() ?? ''
-  const gbn = searchParams.get('gbn') ?? ''
 
   let query = getSupabaseAdmin()
     .from('std_dic_sync')
-    .select('dic_id, dic_log_nm, dic_phy_nm, dic_phy_fll_nm, dic_desc, dic_gbn_cd, data_type, data_len, data_scale, apv_status, synced_at')
+    .select('dic_id, dic_log_nm, dic_phy_nm, dic_phy_fll_nm, dic_desc, data_type, data_len, apv_status, synced_at')
     .order('dic_log_nm', { ascending: true })
-
-  if (gbn) query = query.eq('dic_gbn_cd', gbn)
 
   if (search) {
     const s = search.replace(/[%_\\]/g, '\\$&')
@@ -41,7 +38,6 @@ export async function POST(req: NextRequest) {
     dic_phy_nm: string
     dic_phy_fll_nm?: string
     dic_desc?: string
-    dic_gbn_cd: string
     data_type?: string
     data_len?: number
   }
@@ -56,9 +52,9 @@ export async function POST(req: NextRequest) {
       dic_id: crypto.randomUUID(),
       dic_log_nm: body.dic_log_nm.trim(),
       dic_phy_nm: body.dic_phy_nm.trim().toUpperCase(),
-      dic_phy_fll_nm: body.dic_phy_fll_nm?.trim().toUpperCase() ?? null,
+      dic_phy_fll_nm: body.dic_phy_fll_nm?.trim() ?? null,
       dic_desc: body.dic_desc?.trim() ?? null,
-      dic_gbn_cd: body.dic_gbn_cd ?? '0001',
+      dic_gbn_cd: '0001',
       data_type: body.data_type ?? null,
       data_len: body.data_len ?? null,
       apv_status: 'APPROVED',

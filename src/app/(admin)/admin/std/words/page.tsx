@@ -11,18 +11,11 @@ interface WordRow {
   dic_phy_nm: string
   dic_phy_fll_nm: string | null
   dic_desc: string | null
-  dic_gbn_cd: string
   data_type: string | null
   data_len: number | null
   apv_status: string
-  synced_at: string
 }
 
-const GBN: Record<string, string> = { '0001': '단어', '0002': '복합어' }
-const GBN_COLOR: Record<string, string> = {
-  '0001': 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-  '0002': 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
-}
 const STATUS_COLOR: Record<string, string> = {
   APPROVED: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
   PENDING: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
@@ -34,7 +27,6 @@ const EMPTY_FORM = {
   dic_phy_nm: '',
   dic_phy_fll_nm: '',
   dic_desc: '',
-  dic_gbn_cd: '0001',
   data_type: '',
   data_len: '',
 }
@@ -43,9 +35,7 @@ export default function StdWordsPage() {
   const [words, setWords] = useState<WordRow[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
-  const [gbnFilter, setGbnFilter] = useState('')
 
-  // 등록/수정 폼
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState<WordRow | null>(null)
   const [form, setForm] = useState(EMPTY_FORM)
@@ -56,12 +46,11 @@ export default function StdWordsPage() {
     setLoading(true)
     const params = new URLSearchParams()
     if (search) params.set('search', search)
-    if (gbnFilter) params.set('gbn', gbnFilter)
     fetch(`/api/admin/std/words?${params}`)
       .then((r) => r.json())
       .then((d: { words: WordRow[] }) => setWords(d.words ?? []))
       .finally(() => setLoading(false))
-  }, [search, gbnFilter])
+  }, [search])
 
   useEffect(() => {
     const t = setTimeout(load, 300)
@@ -81,7 +70,6 @@ export default function StdWordsPage() {
       dic_phy_nm: w.dic_phy_nm,
       dic_phy_fll_nm: w.dic_phy_fll_nm ?? '',
       dic_desc: w.dic_desc ?? '',
-      dic_gbn_cd: w.dic_gbn_cd,
       data_type: w.data_type ?? '',
       data_len: w.data_len?.toString() ?? '',
     })
@@ -100,7 +88,6 @@ export default function StdWordsPage() {
         dic_phy_nm: form.dic_phy_nm,
         dic_phy_fll_nm: form.dic_phy_fll_nm || null,
         dic_desc: form.dic_desc || null,
-        dic_gbn_cd: form.dic_gbn_cd,
         data_type: form.data_type || null,
         data_len: form.data_len ? parseInt(form.data_len) : null,
       }
@@ -148,44 +135,21 @@ export default function StdWordsPage() {
       <div className='flex items-center justify-between'>
         <div>
           <h1 className='text-2xl font-bold'>표준단어 관리</h1>
-          <p className='text-muted-foreground mt-1 text-sm'>
-            전체 {words.length}건
-          </p>
+          <p className='text-muted-foreground mt-1 text-sm'>전체 {words.length}건</p>
         </div>
         <Button onClick={openNew} size='sm'>+ 신규 등록</Button>
       </div>
 
-      {/* 검색 + 필터 */}
-      <div className='flex gap-2'>
-        <Input
-          placeholder='논리명 / 물리명 검색…'
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className='max-w-64'
-        />
-        <div className='flex gap-1'>
-          {[['', '전체'], ['0001', '단어'], ['0002', '복합어']].map(([val, label]) => (
-            <button
-              key={val}
-              onClick={() => setGbnFilter(val)}
-              className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-                gbnFilter === val
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-      </div>
+      <Input
+        placeholder='논리명 / 물리명 검색…'
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className='max-w-64'
+      />
 
-      {/* 등록/수정 폼 */}
       {showForm && (
         <div className='rounded-lg border bg-muted/30 p-4 space-y-3'>
-          <h2 className='font-semibold text-sm'>
-            {editing ? '단어 수정' : '신규 단어 등록'}
-          </h2>
+          <h2 className='font-semibold text-sm'>{editing ? '단어 수정' : '신규 단어 등록'}</h2>
           <div className='grid grid-cols-2 gap-3 sm:grid-cols-3'>
             <label className='space-y-1'>
               <span className='text-xs text-muted-foreground'>논리명 *</span>
@@ -208,19 +172,8 @@ export default function StdWordsPage() {
               <Input
                 value={form.dic_phy_fll_nm}
                 onChange={(e) => setForm((f) => ({ ...f, dic_phy_fll_nm: e.target.value }))}
-                placeholder='예: USER'
+                placeholder='예: User'
               />
-            </label>
-            <label className='space-y-1'>
-              <span className='text-xs text-muted-foreground'>구분</span>
-              <select
-                value={form.dic_gbn_cd}
-                onChange={(e) => setForm((f) => ({ ...f, dic_gbn_cd: e.target.value }))}
-                className='border-input bg-background h-9 w-full rounded-md border px-3 text-sm'
-              >
-                <option value='0001'>단어</option>
-                <option value='0002'>복합어</option>
-              </select>
             </label>
             <label className='space-y-1'>
               <span className='text-xs text-muted-foreground'>데이터 타입</span>
@@ -259,7 +212,6 @@ export default function StdWordsPage() {
         </div>
       )}
 
-      {/* 목록 테이블 */}
       {loading ? (
         <p className='text-muted-foreground text-sm'>로딩 중…</p>
       ) : words.length === 0 ? (
@@ -272,7 +224,6 @@ export default function StdWordsPage() {
                 <th className='text-left px-4 py-2 font-medium'>논리명</th>
                 <th className='text-left px-4 py-2 font-medium'>물리명(약어)</th>
                 <th className='text-left px-4 py-2 font-medium'>물리명(전체)</th>
-                <th className='text-left px-4 py-2 font-medium'>구분</th>
                 <th className='text-left px-4 py-2 font-medium'>타입/길이</th>
                 <th className='text-left px-4 py-2 font-medium'>상태</th>
                 <th className='text-left px-4 py-2 font-medium'>설명</th>
@@ -287,15 +238,8 @@ export default function StdWordsPage() {
                   <td className='px-4 py-3 font-mono text-xs text-muted-foreground'>
                     {w.dic_phy_fll_nm ?? '—'}
                   </td>
-                  <td className='px-4 py-3'>
-                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${GBN_COLOR[w.dic_gbn_cd] ?? ''}`}>
-                      {GBN[w.dic_gbn_cd] ?? w.dic_gbn_cd}
-                    </span>
-                  </td>
                   <td className='px-4 py-3 text-muted-foreground text-xs'>
-                    {w.data_type
-                      ? `${w.data_type}${w.data_len ? `(${w.data_len})` : ''}`
-                      : '—'}
+                    {w.data_type ? `${w.data_type}${w.data_len ? `(${w.data_len})` : ''}` : '—'}
                   </td>
                   <td className='px-4 py-3'>
                     <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_COLOR[w.apv_status] ?? ''}`}>
@@ -307,18 +251,11 @@ export default function StdWordsPage() {
                   </td>
                   <td className='px-4 py-3'>
                     <div className='flex gap-1'>
-                      <Button
-                        variant='outline'
-                        size='sm'
-                        className='h-6 px-2 text-xs'
-                        onClick={() => openEdit(w)}
-                      >
+                      <Button variant='outline' size='sm' className='h-6 px-2 text-xs' onClick={() => openEdit(w)}>
                         수정
                       </Button>
                       <Button
-                        variant='outline'
-                        size='sm'
-                        className='h-6 px-2 text-xs text-destructive hover:text-destructive'
+                        variant='outline' size='sm' className='h-6 px-2 text-xs text-destructive hover:text-destructive'
                         disabled={deleting === w.dic_id}
                         onClick={() => remove(w.dic_id, w.dic_log_nm)}
                       >
