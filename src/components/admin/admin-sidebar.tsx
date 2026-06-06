@@ -21,6 +21,26 @@ const STD_NAV = [
   { href: '/admin/std/approvals', label: '승인 워크플로우' },
 ]
 
+const I18N_NAV = [
+  { href: '/admin/i18n', label: '다국어 관리' },
+]
+
+function NavItem({ href, label, pathname }: { href: string; label: string; pathname: string }) {
+  return (
+    <Link
+      href={href}
+      className={cn(
+        'rounded-md px-3 py-2 text-sm transition-colors',
+        pathname === href
+          ? 'bg-primary text-primary-foreground'
+          : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+      )}
+    >
+      {label}
+    </Link>
+  )
+}
+
 export function AdminSidebar() {
   const pathname = usePathname()
 
@@ -31,35 +51,21 @@ export function AdminSidebar() {
       </div>
       <nav className='flex flex-col gap-1 p-2 flex-1'>
         {NAV.map(({ href, label }) => (
-          <Link
-            key={href}
-            href={href}
-            className={cn(
-              'rounded-md px-3 py-2 text-sm transition-colors',
-              pathname === href
-                ? 'bg-primary text-primary-foreground'
-                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-            )}
-          >
-            {label}
-          </Link>
+          <NavItem key={href} href={href} label={label} pathname={pathname} />
         ))}
+
         <p className='text-muted-foreground px-3 pt-3 pb-1 text-xs font-semibold tracking-wide uppercase'>
           데이터 표준
         </p>
         {STD_NAV.map(({ href, label }) => (
-          <Link
-            key={href}
-            href={href}
-            className={cn(
-              'rounded-md px-3 py-2 text-sm transition-colors',
-              pathname === href
-                ? 'bg-primary text-primary-foreground'
-                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-            )}
-          >
-            {label}
-          </Link>
+          <NavItem key={href} href={href} label={label} pathname={pathname} />
+        ))}
+
+        <p className='text-muted-foreground px-3 pt-3 pb-1 text-xs font-semibold tracking-wide uppercase'>
+          다국어
+        </p>
+        {I18N_NAV.map(({ href, label }) => (
+          <NavItem key={href} href={href} label={label} pathname={pathname} />
         ))}
       </nav>
       <div className='border-t p-3'>
