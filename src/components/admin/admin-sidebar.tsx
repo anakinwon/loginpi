@@ -16,6 +16,7 @@ const STD_NAV = [
   { href: '/admin/std/words', label: '표준단어' },
   { href: '/admin/std/domains', label: '표준도메인' },
   { href: '/admin/std/terms', label: '표준용어' },
+  { href: '/admin/std/ddl', label: 'DDL Export' },
 ]
 
 export function AdminSidebar() {
