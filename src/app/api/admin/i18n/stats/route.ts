@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { getSessionUser, isAdmin } from '@/lib/auth-check'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -7,20 +8,22 @@ const supabase = createClient(
 )
 
 export async function GET() {
-  // 지원 언어 목록
+  const user = await getSessionUser()
+  if (!isAdmin(user)) {
+    return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+  }
+
   const { data: locales } = await supabase
     .from('i18n_locale')
     .select('*')
     .eq('is_active', 'Y')
     .order('sort_ord')
 
-  // ko 기준 전체 키 수
   const { count: totalKeys } = await supabase
     .from('i18n_message')
     .select('*', { count: 'exact', head: true })
     .eq('locale_cd', 'ko')
 
-  // 언어별 번역 완료 키 수
   const { data: perLocale } = await supabase
     .from('i18n_message')
     .select('locale_cd')

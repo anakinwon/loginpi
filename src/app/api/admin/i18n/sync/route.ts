@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { writeFile } from 'fs/promises'
-import { join } from 'path'
+import { join, resolve, sep } from 'path'
+import { getSessionUser, isAdmin } from '@/lib/auth-check'
+import { routing } from '@/i18n/routing'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -23,25 +25,53 @@ function unflattenJson(flat: Record<string, string>): Record<string, unknown> {
   return result
 }
 
-export async function POST(req: NextRequest) {
-  const body = (await req.json().catch(() => ({}))) as { locale?: string }
-  const targetLocale = body.locale // 특정 locale만 동기화, 없으면 전체
+// 허용 locale 집합 (routing.ts 정의 기준)
+const ALLOWED_LOCALES = new Set<string>(routing.locales)
 
-  // 대상 locale 결정
+export async function POST(req: NextRequest) {
+  const user = await getSessionUser()
+  if (!isAdmin(user)) {
+    return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+  }
+
+  const body = (await req.json().catch(() => ({}))) as { locale?: string }
+  const targetLocale = body.locale
+
+  // 요청 locale이 있으면 허용 목록에서 검증
+  if (targetLocale !== undefined && !ALLOWED_LOCALES.has(targetLocale)) {
+    return NextResponse.json({ error: '유효하지 않은 locale입니다' }, { status: 400 })
+  }
+
   const { data: locales } = await supabase
     .from('i18n_locale')
     .select('locale_cd')
     .eq('is_active', 'Y')
 
+  // DB에서 실제 존재하는 locale만 사용 (DB 주입 방어 이중화)
+  const dbLocales = new Set((locales ?? []).map((l: { locale_cd: string }) => l.locale_cd))
+
   const localeCodes = targetLocale
     ? [targetLocale]
-    : (locales ?? []).map((l: { locale_cd: string }) => l.locale_cd)
+    : [...dbLocales]
 
-  const messagesDir = join(process.cwd(), 'messages')
+  const messagesDir = resolve(process.cwd(), 'messages')
   const synced: string[] = []
   const errors: string[] = []
 
   for (const lc of localeCodes) {
+    // 허용 목록 + DB 존재 여부 이중 검증
+    if (!ALLOWED_LOCALES.has(lc) || !dbLocales.has(lc)) {
+      errors.push(`${lc}: 허용되지 않은 locale`)
+      continue
+    }
+
+    // 경로 탈출 방어: 최종 경로가 messages 디렉토리 하위인지 확인
+    const filePath = resolve(messagesDir, `${lc}.json`)
+    if (!filePath.startsWith(messagesDir + sep)) {
+      errors.push(`${lc}: 경로 검증 실패`)
+      continue
+    }
+
     const { data: msgs, error } = await supabase
       .from('i18n_message')
       .select('msg_key, msg_val')
@@ -59,11 +89,7 @@ export async function POST(req: NextRequest) {
     }
 
     const nested = unflattenJson(flat)
-    await writeFile(
-      join(messagesDir, `${lc}.json`),
-      JSON.stringify(nested, null, 2),
-      'utf-8'
-    )
+    await writeFile(filePath, JSON.stringify(nested, null, 2), 'utf-8')
     synced.push(lc)
   }
 

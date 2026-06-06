@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@supabase/supabase-js'
+import { getSessionUser, isAdmin } from '@/lib/auth-check'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -29,6 +30,11 @@ function flattenJson(obj: Record<string, unknown>, prefix = ''): Record<string, 
 }
 
 export async function POST(req: NextRequest) {
+  const user = await getSessionUser()
+  if (!isAdmin(user)) {
+    return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+  }
+
   const { locale } = (await req.json()) as { locale: string }
 
   if (!locale || locale === 'ko') {
