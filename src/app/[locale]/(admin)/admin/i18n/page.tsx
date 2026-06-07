@@ -4,6 +4,10 @@ import { useCallback, useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
+import { routing } from '@/i18n/routing'
+
+// routing.ts에 등록된 locale 집합 — 미등록 locale은 영어로 폴백 서비스됨
+const ROUTING_LOCALES = new Set<string>(routing.locales)
 
 // locale_cd → alpha-2 국가코드 (fi fi-* CSS 플래그용)
 const LOCALE_COUNTRY: Record<string, string> = {
@@ -191,7 +195,10 @@ export default function I18nPage() {
       if (!res.ok) throw new Error(d.error ?? '상태 변경 실패')
 
       if (is_active === 'Y') {
-        toast.success(`${locale_cd} 활성화됨 — routing.ts 추가 후 재배포 필요`)
+        toast.success(`${locale_cd} 활성화됨`, {
+          description: 'i18n/routing.ts의 locales 배열에 추가 후 재배포 필요. 그 전까지 영어(EN)로 폴백 서비스됩니다.',
+          duration: 6000,
+        })
         // 비활성 목록에서 즉시 제거 (낙관적 업데이트)
         if (options?.country_cd) {
           setActivatedCountryCds((prev) => new Set([...prev, options.country_cd!.toUpperCase()]))
@@ -331,6 +338,14 @@ export default function I18nPage() {
                         <div>
                           <p className='font-medium'>{loc.locale_nm}</p>
                           <p className='text-muted-foreground text-xs uppercase'>{loc.locale_cd}</p>
+                          {!ROUTING_LOCALES.has(loc.locale_cd) && (
+                            <span
+                              title='i18n/routing.ts의 locales 배열에 추가 후 재배포 필요. 현재는 영어(EN)로 폴백 서비스됩니다.'
+                              className='inline-flex items-center gap-0.5 text-[10px] font-medium text-amber-600 dark:text-amber-400'
+                            >
+                              ⚠ 라우팅 미등록
+                            </span>
+                          )}
                         </div>
                       </div>
                     </td>
