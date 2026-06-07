@@ -105,32 +105,32 @@ pnpm outdated   # 분기별 1회 실행하여 현황 파악
 
 ---
 
-### TypeScript 6.x (현재 6.0.3 available)
+### ~~TypeScript 6.x~~ — ✅ 완료 (2026-06-07, feature/upgrade-nextjs-16)
 
-```bash
-pnpm add -D typescript@^6
-```
-
-**확인 사항**:
-- `strict` 모드 동작 변화 (v6는 기존 `strict` 옵션 일부 강화 가능)
-- `tsconfig.json` deprecated 옵션 제거 여부
-- `isolatedModules` 기본값 변경 여부
-
-**검증**: `pnpm tsc --noEmit` 에러 없음 → `pnpm build` 성공.
+`pnpm tsc --noEmit` 에러 없음. strict 모드 강화 없음. tsconfig 변경 불필요.
 
 ---
 
-### ESLint 10.x (현재 10.4.1 available)
+### ESLint 10.x (현재 10.4.1 available) — ⛔ 대기
 
-package.json에 `"eslint": "^9"` 로 범위 지정되어 있어 자동 업데이트 안 됨.
+**블로커**: `eslint-config-next@16`이 내부적으로 사용하는 세 플러그인이 ESLint 10을 미지원 (2026-06-07 기준)
+
+| 플러그인 | 설치 버전 | 지원 ESLint 범위 |
+|---|---|---|
+| `eslint-plugin-react` | `7.37.5` | `^3 ~ ^9` |
+| `eslint-plugin-import` | `2.32.0` | `^2 ~ ^9` |
+| `eslint-plugin-jsx-a11y` | `6.10.2` | `^3 ~ ^9` |
+
+**전환 조건**: `eslint-config-next`가 위 플러그인의 ESLint 10 호환 버전을 채택한 뒤 진행.
 
 ```bash
-pnpm add -D eslint@^10
+# 전환 가능 여부 확인 명령
+npm view eslint-plugin-react peerDependencies
+npm view eslint-plugin-import peerDependencies
 ```
 
-**확인 사항**:
+**확인 사항** (전환 시):
 - `eslint.config.mjs` — FlatCompat 이미 제거됨 (Next.js 16 업그레이드 시 처리)
-- `next/core-web-vitals` + `next/typescript` 규칙 호환성 (eslint-config-next@16과 맞춤 확인)
 - `eslint-config-prettier` v10 호환성
 
 **검증**: `pnpm lint` 에러 없음.
