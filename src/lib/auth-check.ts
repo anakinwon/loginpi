@@ -2,7 +2,7 @@ import 'server-only'
 import { cookies } from 'next/headers'
 import { auth } from '@/auth'
 import { verifyPayload } from './pi-session-crypto'
-import { getUserById } from './users'
+import { getUserById, getUserByPiUid } from './users'
 import type { PiSessionUser } from '@/types/pi-session'
 import type { UserRow } from './users'
 
@@ -19,6 +19,10 @@ export async function getSessionUser(): Promise<UserRow | null> {
       const piSession = verifyPayload<PiSessionUser>(piCookie, secret)
       if (piSession?.userId) {
         const user = await getUserById(piSession.userId)
+        if (user) return user
+      } else if (piSession?.uid) {
+        // 구버전 쿠키(userId='') 또는 DB 오류 시 pi_uid로 폴백 조회
+        const user = await getUserByPiUid(piSession.uid)
         if (user) return user
       }
     }

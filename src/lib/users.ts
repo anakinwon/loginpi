@@ -72,3 +72,13 @@ export async function getUserById(id: string): Promise<UserRow | null> {
     .single()
   return (data as UserRow) ?? null
 }
+
+// pi_uid로 조회 — 구버전 쿠키(userId='')나 DB 오류 시 폴백용
+export async function getUserByPiUid(uid: string): Promise<UserRow | null> {
+  const { data } = await getSupabaseAdmin()
+    .from('sys_user')
+    .select()
+    .eq('pi_uid', uid)
+    .single()
+  return (data as UserRow) ?? null
+}
