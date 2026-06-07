@@ -358,7 +358,7 @@ brd_attch 8행  — fl_nm/fl_pth/fl_url/fl_sz/fl_tp, del_yn 논리삭제
 
 ---
 
-## Phase 6: 다국어 처리 ✅ (완료 — 6/7)
+## Phase 6: 다국어 처리 ✅ (완료 — 7/7)
 
 > **목표**: next-intl v4 기반 다국어 지원 (ko / en / zh / ja / hi / vi / af / fil / th / id / ms / es / fr / de / it / ru / pt / ar)
 
@@ -366,6 +366,24 @@ brd_attch 8행  — fl_nm/fl_pth/fl_url/fl_sz/fl_tp, del_yn 논리삭제
 - ✅ **TASK-041**: 번역 파일 + UI 적용 — ko.json 409키 정의, `useTranslations()` / `getTranslations()` 전 페이지·컴포넌트 적용, 3단계 fallback (locale → en → ko), `readFile()` 로 모듈캐시 우회
 - ✅ **TASK-042**: 국가/언어 DB — `i18n_locale` / `i18n_message` Supabase 테이블, DB→JSON 동기화 API (`/api/admin/i18n/sync`), 관리자 번역 현황 대시보드 (`/admin/i18n`)
 - ✅ **TASK-043**: AI 자동 번역 — Gemini 2.5 Flash 무료 API, 배치 50건 + 4.5초 rate-limit 대기, 배치별 즉시 upsert (부분실패 보존), 영어 차용어 역번역 프롬프트 규칙, 18개 언어 지원
+- ✅ **TASK-044**: 다국어 안정성 강화 + 보안 패치 (2026-06-07)
+
+**TASK-044 상세** (재발 방지 + 보안 개선):
+- ✅ `src/lib/locale-currency.ts` — LOCALE_CURRENCY 단일 소스 (3개 파일 중복 제거)
+- ✅ `src/lib/locale-country.ts` — LOCALE_COUNTRY + `getAlpha2()` + `ACTIVE_COUNTRY_CODES` 단일 소스
+- ✅ `src/i18n/routing.ts` — 203개 국가 코드 선점 등록 (기존 20개 → 203개, 재배포 없이 신규 locale 활성화 가능)
+- ✅ `src/app/api/admin/i18n/locale/route.ts` — `addLocaleToRouting()` 추가 (로컬 개발 시 routing.ts 자동 수정, Vercel 프로덕션은 read-only라 무시)
+- ✅ `src/app/api/admin/i18n/locale/route.ts` — `LOCALE_CD_RE = /^[a-z]{2,3}(-[A-Z]{2,3})?$/` 검증 추가 (코드 인젝션 방지 HIGH 취약점 해소)
+- ✅ `src/app/api/admin/i18n/translate/route.ts` — `Intl.DisplayNames` 도입으로 정적 언어명 맵 제거 (새 locale 추가 시 수정 불필요)
+- ✅ `messages/il.json` — 히브리어(이스라엘) 번역 파일 생성
+
+**버그 수정 이력** (근본 원인 → 해결책):
+| 버그 | 원인 | 해결 |
+|---|---|---|
+| USD/AUD Pi 시세 동일 | `pi-price-chip.tsx`의 로컬 LOCALE_CURRENCY에 `au` 누락 | locale-currency.ts 단일 소스 |
+| 이스라엘 ⚠ 라우팅 미등록 | routing.ts에 `il` 미등록, 3개 파일에 중복된 맵 | 203개 선점 등록 + 단일 소스 |
+| 이스라엘 번역 "지원하지 않는 언어입니다" | translate API의 정적 LOCALE_NAMES에 `il` 누락 | Intl.DisplayNames 도입 |
+| 에티오피아 ⚠ 라우팅 미등록 | 동일한 근본 원인 | 203개 선점 등록으로 구조적 해결 |
 
 **핵심 설계 결정**:
 - next-intl v4의 `getTranslations()` (서버) / `useTranslations()` (클라이언트) 분리
@@ -373,6 +391,7 @@ brd_attch 8행  — fl_nm/fl_pth/fl_url/fl_sz/fl_tp, del_yn 논리삭제
 - `readFile()` 사용 (동적 `import()` 는 Node 모듈캐시로 동기화 결과 미반영)
 - 3단계 fallback: 미번역 콘텐츠는 영어 → 한국어 순으로 표시 (키명 노출 방지)
 - Gemini 무료 15 RPM 제한 대응: 배치 50개 + 4.5초 sleep 패턴
+- `routing.ts`는 컴파일 타임 정적 — Vercel 소스 파일은 런타임 수정 불가 (read-only)
 
 ---
 
@@ -393,6 +412,7 @@ brd_attch 8행  — fl_nm/fl_pth/fl_url/fl_sz/fl_tp, del_yn 논리삭제
 | M9: 데이터 표준 CRUD | Phase 5 | 2026-06-06 | 표준단어·도메인·용어·DDL Export | ✅ 완료 |
 | M10: Audit Trail + 승인 워크플로우 | Phase 5 | 2026-06-06 | 변경 이력 추적, 승인 프로세스 | ✅ 완료 |
 | M11: 다국어 | Phase 6 | 2026-06-07 | next-intl v4, 18개 언어, Gemini 자동번역, 3단계 fallback | ✅ 완료 |
+| M12: 다국어 안정성 | Phase 6 | 2026-06-07 | 단일 소스 분리, 203개 locale 선점, 코드 인젝션 보안 패치 | ✅ 완료 |
 
 ---
 
@@ -407,6 +427,9 @@ brd_attch 8행  — fl_nm/fl_pth/fl_url/fl_sz/fl_tp, del_yn 논리삭제
 | Supabase admin 초기화 | lazy init 패턴 | 빌드 시점 SERVICE_ROLE_KEY 미설정으로 빌드 실패 방지 |
 | DB 테이블 리네이밍 | `users→sys_user`, `payments→pi_pymnt`, `link_codes→auth_link_cd` 완료 | 한국 DA 도메인 접두사 표준 — Migration 003~008 (2026-06-06) |
 | 시스템 컬럼 규칙 | `regr_id/reg_dtm/modr_id/mod_dtm` 4개 `NOT NULL DEFAULT` 전 테이블 강제화 | DA 표준: 복합어 REGR(등록자)/MODR(변경자), `CURRENT_TIMESTAMP` 표준 표기 |
+| routing.ts locale 등록 | 203개 국가 코드 선점 등록 | next-intl `defineRouting()`은 빌드 타임 정적 — Vercel 런타임 수정 불가 |
+| locale 단일 소스 | `src/lib/locale-currency.ts`, `src/lib/locale-country.ts` | 3+ 파일에 중복된 맵이 sync 버그 반복 유발 |
+| locale_cd 보안 검증 | `LOCALE_CD_RE = /^[a-z]{2,3}(-[A-Z]{2,3})?$/` | routing.ts 파일 쓰기 전 화이트리스트 필터 (코드 인젝션 HIGH 취약점) |
 
 ---
 
@@ -420,3 +443,4 @@ brd_attch 8행  — fl_nm/fl_pth/fl_url/fl_sz/fl_tp, del_yn 논리삭제
 | v1.3 | 2026-06-06 | DA 품질점검 표준화 완료 — Migration 003~008 (19개 위반 해소), 전 테이블 시스템 컬럼 강제화, `users→sys_user` 등 리네이밍 이력 반영 | anakin |
 | v1.4 | 2026-06-06 | Phase 5 완료 — TASK-034 Audit Trail (Migration 009 + std_audit_log 트리거), TASK-035 승인 워크플로우 (Migration 010 + approval_queue 활용) | anakin |
 | v1.5 | 2026-06-07 | Phase 6 완료 — next-intl v4 다국어, Gemini 2.5 Flash 자동번역, 18개 언어 지원, 3단계 fallback, Supabase 1000행 제한 해소, 모듈캐시 우회(readFile) | anakin |
+| v1.6 | 2026-06-07 | TASK-044: 다국어 안정성 강화 — locale 단일 소스(locale-currency/country.ts), routing.ts 203개 선점 등록, Intl.DisplayNames 도입, 코드 인젝션 보안 패치(LOCALE_CD_RE) | anakin |
