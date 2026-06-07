@@ -7,7 +7,6 @@ import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { BrowserName } from '@/components/layout/browser-name'
 import { LanguageSwitcher } from '@/components/layout/language-switcher'
 import { PiPriceChip } from '@/components/layout/pi-price-chip'
-import { PiAdminLink } from '@/components/layout/pi-admin-link'
 
 export async function Header() {
   const user = await getSessionUser()
@@ -36,8 +35,6 @@ export async function Header() {
               {t('admin')}
             </Link>
           )}
-          {/* Pi Browser: 서버 컴포넌트 갱신 타이밍과 무관하게 클라이언트에서 즉시 표시 */}
-          <PiAdminLink />
           <GoogleLoginButton />
           <PiLoginButton />
           <ThemeToggle />
