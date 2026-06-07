@@ -130,6 +130,8 @@ src/lib/locale-currency.ts  — LOCALE_CURRENCY (locale → 통화 코드)
 src/lib/locale-country.ts   — LOCALE_COUNTRY, getAlpha2(), ACTIVE_COUNTRY_CODES
 ```
 
+**완전성 자동 검증**: `scripts/validate-locales.mjs`가 `pnpm build` 시 messages/*.json ↔ 통화 ↔ 국가 ↔ routing.ts 교차 검증 — 매핑 누락 시 빌드 실패 (et/mx 통화 USD 오표시 재발 방지, 2026-06-08). 수동 실행: `pnpm validate:locales`
+
 ### locale_cd 형식 규칙
 
 Admin에서 신규 locale을 처리할 때 `locale_cd` 형식을 반드시 검증한다:
@@ -153,12 +155,13 @@ const raw = await readFile(join(process.cwd(), 'messages', `${locale}.json`), 'u
 
 ## DB 테이블 명명 규칙 (DA 표준)
 
-모든 테이블·컬럼은 한국 DA 표준을 따른다:
+모든 테이블·컬럼은 한국 DA 표준을 따른다. **정본: `docs/da/데이터표준규칙.md`** (프레임워크 전체 맵: `docs/da/README.md`):
 
-- **시스템 컬럼 4개** — 전 테이블 필수: `regr_id VARCHAR(20) NOT NULL DEFAULT 'system'`, `reg_dtm TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP`, `modr_id`, `mod_dtm`
-- **논리삭제**: `del_yn CHAR(1) DEFAULT 'N'`
+- **시스템 컬럼 4개** — 전 테이블 필수: `regr_id TEXT NOT NULL DEFAULT 'ADMIN'`, `reg_dtm TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP`, `modr_id TEXT NOT NULL DEFAULT 'ADMIN'`, `mod_dtm TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP`
+- **논리삭제**: `del_yn CHAR(1) DEFAULT 'N'` + `del_dtm TIMESTAMPTZ` (신규 테이블부터 del_dtm 필수) — 물리 DELETE 절대 금지
 - **복합어**: REGR(등록자), MODR(변경자), PYMNT(결제), CTGR(카테고리)
 - **도메인 약어**: `_id`(식별자), `_nm`(이름), `_cd`(코드), `_yn`(여부), `_dtm`(일시), `_dt`(날짜)
+- **자동 강제**: `sql/*.sql` 작성·Supabase 마이그레이션 시 `da-ddl-guard` Hook이 자동 검사 — 위반 시 차단되며 DA 승인(`-- DA-APPROVED:` 주석) 필요
 
 현재 테이블 목록: `sys_user`, `pi_pymnt`, `auth_link_cd`, `brd_*`, `std_*`, `approval_queue`, `i18n_locale`, `i18n_message`, `i18n_cntry_mst`
 

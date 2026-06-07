@@ -360,8 +360,8 @@ Step 4: Pi 결제 (Free: 0.1 Pi / Premium: 월 3개 무료)
 ### 11.9 DB 스키마 (13개 테이블, `msg_` 접두사)
 
 > 전 테이블 DA 표준 시스템 컬럼 4개 필수:
-> `regr_id VARCHAR(20) NOT NULL DEFAULT 'system'`, `reg_dtm TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP`,
-> `modr_id VARCHAR(20)`, `mod_dtm TIMESTAMPTZ`
+> `regr_id TEXT NOT NULL DEFAULT 'ADMIN'`, `reg_dtm TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP`,
+> `modr_id TEXT NOT NULL DEFAULT 'ADMIN'`, `mod_dtm TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP`
 
 | 테이블 | 설명 | 주요 컬럼 |
 |---|---|---|

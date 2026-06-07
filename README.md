@@ -1,6 +1,6 @@
-# Next.js 15 Starter Kit
+# Next.js 16 Starter Kit
 
-웹 개발을 빠르게 시작할 수 있는 Next.js 15 + Tailwind CSS v4 + shadcn/ui 보일러플레이트입니다.
+웹 개발을 빠르게 시작할 수 있는 Next.js 16 + Tailwind CSS v4 + shadcn/ui 보일러플레이트입니다.
 
 ## 포함된 기술 스택
 

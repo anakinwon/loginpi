@@ -649,7 +649,7 @@ For full authentication and session management, use dedicated auth libraries or 
 
 ## Migration from Middleware
 
-If migrating from Next.js 15 or earlier:
+If migrating from Next.js 16 or earlier:
 
 1. **Rename function** (optional but recommended):
    ```typescript

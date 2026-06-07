@@ -800,9 +800,9 @@ FEATURE_ADDON     → feature_cd별 분기 처리
 ## 8. DB 스키마 (DA 표준, msg_ 접두사)
 
 > 전 테이블 시스템 컬럼 4개 필수:
-> `regr_id VARCHAR(20) NOT NULL DEFAULT 'system'`,
+> `regr_id TEXT NOT NULL DEFAULT 'ADMIN'`,
 > `reg_dtm TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP`,
-> `modr_id VARCHAR(20)`, `mod_dtm TIMESTAMPTZ`
+> `modr_id TEXT NOT NULL DEFAULT 'ADMIN'`, `mod_dtm TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP`
 
 ### 테이블 목록 (13개)
 
@@ -834,10 +834,10 @@ CREATE TABLE msg_theme (
   theme_tp_cd  VARCHAR(10)  NOT NULL CHECK (theme_tp_cd IN ('BASIC','PREMIUM')),
   sort_ord     INTEGER      DEFAULT 0,
   use_yn       CHAR(1)      DEFAULT 'Y',
-  regr_id      VARCHAR(20)  NOT NULL DEFAULT 'system',
+  regr_id      TEXT  NOT NULL DEFAULT 'ADMIN',
   reg_dtm      TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  modr_id      VARCHAR(20),
-  mod_dtm      TIMESTAMPTZ
+  modr_id      TEXT         NOT NULL DEFAULT 'ADMIN',
+  mod_dtm      TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- 채팅방
@@ -855,10 +855,10 @@ CREATE TABLE msg_room (
   gate_min_pi      DECIMAL(10,4) DEFAULT 0,   -- Pi Gate 최소 잔액 조건
   pymnt_id         TEXT         REFERENCES pi_pymnt(payment_id),
   del_yn           CHAR(1)      DEFAULT 'N',
-  regr_id          VARCHAR(20)  NOT NULL DEFAULT 'system',
+  regr_id          TEXT  NOT NULL DEFAULT 'ADMIN',
   reg_dtm          TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  modr_id          VARCHAR(20),
-  mod_dtm          TIMESTAMPTZ
+  modr_id          TEXT         NOT NULL DEFAULT 'ADMIN',
+  mod_dtm          TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- 채팅방 멤버
@@ -871,10 +871,10 @@ CREATE TABLE msg_room_mbr (
   expire_dtm      TIMESTAMPTZ,             -- GUEST 임시 입장 만료
   del_yn          CHAR(1)     DEFAULT 'N',
   UNIQUE (room_id, usr_id),
-  regr_id         VARCHAR(20) NOT NULL DEFAULT 'system',
+  regr_id         TEXT NOT NULL DEFAULT 'ADMIN',
   reg_dtm         TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  modr_id         VARCHAR(20),
-  mod_dtm         TIMESTAMPTZ
+  modr_id         TEXT         NOT NULL DEFAULT 'ADMIN',
+  mod_dtm         TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- 메시지
@@ -890,10 +890,10 @@ CREATE TABLE msg_msg (
   stkr_id     UUID,                     -- 스티커 전송 시 msg_stkr.stkr_id
   ref_msg_id  UUID,                     -- 답장·스레드 참조
   del_yn      CHAR(1)      DEFAULT 'N',
-  regr_id     VARCHAR(20)  NOT NULL DEFAULT 'system',
+  regr_id     TEXT  NOT NULL DEFAULT 'ADMIN',
   reg_dtm     TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  modr_id     VARCHAR(20),
-  mod_dtm     TIMESTAMPTZ
+  modr_id     TEXT         NOT NULL DEFAULT 'ADMIN',
+  mod_dtm     TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- 구독
@@ -906,10 +906,10 @@ CREATE TABLE msg_subscr (
   expire_dtm    TIMESTAMPTZ NOT NULL,
   auto_renew_yn CHAR(1)     DEFAULT 'Y',
   del_yn        CHAR(1)     DEFAULT 'N',
-  regr_id       VARCHAR(20) NOT NULL DEFAULT 'system',
+  regr_id       TEXT NOT NULL DEFAULT 'ADMIN',
   reg_dtm       TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  modr_id       VARCHAR(20),
-  mod_dtm       TIMESTAMPTZ
+  modr_id       TEXT         NOT NULL DEFAULT 'ADMIN',
+  mod_dtm       TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Pi Tip 내역
@@ -922,10 +922,10 @@ CREATE TABLE msg_tip (
   tip_amt_pi  DECIMAL(10,4) NOT NULL,
   tip_msg     TEXT,                     -- 팁과 함께 전송한 메시지
   pymnt_id    TEXT         NOT NULL REFERENCES pi_pymnt(payment_id),
-  regr_id     VARCHAR(20)  NOT NULL DEFAULT 'system',
+  regr_id     TEXT  NOT NULL DEFAULT 'ADMIN',
   reg_dtm     TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  modr_id     VARCHAR(20),
-  mod_dtm     TIMESTAMPTZ
+  modr_id     TEXT         NOT NULL DEFAULT 'ADMIN',
+  mod_dtm     TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 ```
 

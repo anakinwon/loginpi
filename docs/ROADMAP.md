@@ -93,7 +93,7 @@ Pi 인증·결제 구현을 완료했고, Google 계정 연동까지 마쳤다.
 
 > **목표**: 최신 Next.js 16 생태계 기반의 재사용 가능한 스타터킷 구축
 
-- **TASK-001: Next.js 15 + Tailwind v4 + shadcn/ui base-nova 환경 셋업** ✅
+- **TASK-001: Next.js 16 + Tailwind v4 + shadcn/ui base-nova 환경 셋업** ✅
   - ✅ Next.js 16 App Router + React 19 + TypeScript 6 strict mode
   - ✅ Tailwind CSS v4 (CSS-first, `tailwind.config` 없음, `@theme inline {}`)
   - ✅ shadcn/ui base-nova (`@base-ui/react` 기반, `asChild` 없음)
@@ -303,9 +303,9 @@ brd_attch 8행  — fl_nm/fl_pth/fl_url/fl_sz/fl_tp, del_yn 논리삭제
 - ✅ Migration 006: `std_*` 테이블 `regr_id`, `modr_id`, `del_yn` 추가
 - ✅ Migration 007: `reg_usr_id`→`regr_id`, `mod_usr_id`→`modr_id` 복합어 표준(REGR/MODR) 적용
 - ✅ Migration 008: 전 테이블 시스템 컬럼 4개 `NOT NULL DEFAULT` 강제화 (33개 테이블)
-- ✅ `docs/품질검토수행완료보고서.md` 신규 작성
-- ✅ `.claude/skills/.../데이터표준규칙.md` 표준 규칙 문서화
-- ✅ `da-qa-naming-auditor.md` — 명명규칙 점검 에이전트 가이드 완성
+- ✅ `docs/da/reports/2026-06-06_품질검토수행완료보고서.md` 신규 작성 (2026-06-08 ReORG에서 이동)
+- ✅ `docs/da/데이터표준규칙.md` 표준 규칙 문서화 (2026-06-08 정본 승격 — 구 .claude/skills 경로에서 이동)
+- ✅ 명명규칙 점검 가이드 — `docs/da/품질점검기준서.md`로 통합 (구 da-qa-naming-auditor.md 병합)
 
 ### TASK-030: 표준단어 관리 ✅ 완료
 
@@ -554,7 +554,7 @@ Step 4: Pi 결제 (Free: 0.1 Pi / Premium: 월 3개 무료)
 
 | 마일스톤 | Phase | 완료일 | 주요 산출물 | 상태 |
 |---------|-------|-------|-----------|------|
-| M0: 스타터킷 | Phase 0 | 2026-06-05 | Next.js 15 + Tailwind v4 + shadcn/ui | ✅ 완료 |
+| M0: 스타터킷 | Phase 0 | 2026-06-05 | Next.js 16 + Tailwind v4 + shadcn/ui | ✅ 완료 |
 | M1: Pi 인증 | Phase 1 | 2026-06-05 | Pi SDK 인증, HMAC 세션 | ✅ 완료 |
 | M2: Pi 결제 | Phase 1 | 2026-06-05 | U2A 결제 3단계 흐름 | ✅ 완료 |
 | M3: Google 로그인 | Phase 2 | 2026-06-05 | NextAuth.js + Supabase | ✅ 완료 |
@@ -618,5 +618,5 @@ Step 4: Pi 결제 (Free: 0.1 Pi / Premium: 월 3개 무료)
 | v1.4 | 2026-06-06 | Phase 5 완료 — TASK-034 Audit Trail (Migration 009 + std_audit_log 트리거), TASK-035 승인 워크플로우 (Migration 010 + approval_queue 활용) | anakin |
 | v1.5 | 2026-06-07 | Phase 6 완료 — next-intl v4 다국어, Gemini 2.5 Flash 자동번역, 18개 언어 지원, 3단계 fallback, Supabase 1000행 제한 해소, 모듈캐시 우회(readFile) | anakin |
 | v1.6 | 2026-06-07 | TASK-044: 다국어 안정성 강화 — locale 단일 소스(locale-currency/country.ts), routing.ts 203개 선점 등록, Intl.DisplayNames 도입, 코드 인젝션 보안 패치(LOCALE_CD_RE) | anakin |
-| v1.7 | 2026-06-07 | 기술 업그레이드: Next.js 15→16.2.7, TypeScript 5→6.0.3, eslint-config-next@16, FlatCompat 제거. 기술 업그레이드 모니터링 섹션 추가. | anakin |
+| v1.7 | 2026-06-07 | 기술 업그레이드: Next.js 16→16.2.7, TypeScript 5→6.0.3, eslint-config-next@16, FlatCompat 제거. 기술 업그레이드 모니터링 섹션 추가. | anakin |
 | v1.8 | 2026-06-07 | Phase 7~9 PiChat 로드맵 추가: TASK-050~074 (채팅 MVP·수익화·생태계). 마일스톤 M14~M18 추가. PRD.md v4.0 통합 반영. | anakin |
