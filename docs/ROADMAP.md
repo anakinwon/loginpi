@@ -1,11 +1,11 @@
 # Pi Network 기반 풀스택 앱 플랫폼 — 개발 로드맵
 
-Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 15 기반 Pi Network 앱 플랫폼
+Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Network 앱 플랫폼
 
 > **기준일**: 2026-06-07
 > **현재 버전**: Phase 6 완료
 > **배포 URL**: https://loginpi.vercel.app
-> **기술 스택**: Next.js 15 App Router · React 19 · TypeScript · Tailwind CSS v4 · NextAuth.js · Supabase PostgreSQL
+> **기술 스택**: Next.js 16 App Router · React 19 · TypeScript 6 · Tailwind CSS v4 · NextAuth.js · Supabase PostgreSQL
 
 ---
 
@@ -91,10 +91,10 @@ Pi 인증·결제 구현을 완료했고, Google 계정 연동까지 마쳤다.
 
 ## Phase 0: 스타터킷 현행화 ✅ (완료)
 
-> **목표**: 최신 Next.js 15 생태계 기반의 재사용 가능한 스타터킷 구축
+> **목표**: 최신 Next.js 16 생태계 기반의 재사용 가능한 스타터킷 구축
 
 - **TASK-001: Next.js 15 + Tailwind v4 + shadcn/ui base-nova 환경 셋업** ✅
-  - ✅ Next.js 15 App Router + React 19 + TypeScript strict mode
+  - ✅ Next.js 16 App Router + React 19 + TypeScript 6 strict mode
   - ✅ Tailwind CSS v4 (CSS-first, `tailwind.config` 없음, `@theme inline {}`)
   - ✅ shadcn/ui base-nova (`@base-ui/react` 기반, `asChild` 없음)
   - ✅ next-themes 다크모드 (`@custom-variant dark (&:where(.dark, .dark *))`)
@@ -413,6 +413,20 @@ brd_attch 8행  — fl_nm/fl_pth/fl_url/fl_sz/fl_tp, del_yn 논리삭제
 | M10: Audit Trail + 승인 워크플로우 | Phase 5 | 2026-06-06 | 변경 이력 추적, 승인 프로세스 | ✅ 완료 |
 | M11: 다국어 | Phase 6 | 2026-06-07 | next-intl v4, 18개 언어, Gemini 자동번역, 3단계 fallback | ✅ 완료 |
 | M12: 다국어 안정성 | Phase 6 | 2026-06-07 | 단일 소스 분리, 203개 locale 선점, 코드 인젝션 보안 패치 | ✅ 완료 |
+| M13: Next.js 16 + TypeScript 6 | 기술 업그레이드 | 2026-06-07 | Next.js 16.2.7, TypeScript 6.0.3, eslint-config-next@16, FlatCompat 제거 | ✅ 완료 |
+
+---
+
+## 기술 업그레이드 모니터링
+
+> `docs/UPGRADE_STRATEGY.md` 참조. 아래 항목은 외부 조건 해소 시 즉시 진행.
+
+| 항목 | 현재 | 대기 조건 |
+|---|---|---|
+| **next-auth v5 stable** | beta.31 유지 | npm `latest` 태그가 5.x가 되면 `pnpm add next-auth@^5` |
+| **ESLint 10** | 9.39.4 유지 | `eslint-plugin-react/import/jsx-a11y`가 ESLint 10 peerDep 추가 시 |
+| **middleware.ts → proxy.ts** | middleware.ts 유지 | next-intl이 Next.js 16 proxy (nodejs runtime) 지원 시 |
+| **react-hooks/set-state-in-effect** | warn 20개 | 별도 리팩토링 이슈 — useEffect 내 setLoading 패턴 정리 |
 
 ---
 
@@ -444,3 +458,4 @@ brd_attch 8행  — fl_nm/fl_pth/fl_url/fl_sz/fl_tp, del_yn 논리삭제
 | v1.4 | 2026-06-06 | Phase 5 완료 — TASK-034 Audit Trail (Migration 009 + std_audit_log 트리거), TASK-035 승인 워크플로우 (Migration 010 + approval_queue 활용) | anakin |
 | v1.5 | 2026-06-07 | Phase 6 완료 — next-intl v4 다국어, Gemini 2.5 Flash 자동번역, 18개 언어 지원, 3단계 fallback, Supabase 1000행 제한 해소, 모듈캐시 우회(readFile) | anakin |
 | v1.6 | 2026-06-07 | TASK-044: 다국어 안정성 강화 — locale 단일 소스(locale-currency/country.ts), routing.ts 203개 선점 등록, Intl.DisplayNames 도입, 코드 인젝션 보안 패치(LOCALE_CD_RE) | anakin |
+| v1.7 | 2026-06-07 | 기술 업그레이드: Next.js 15→16.2.7, TypeScript 5→6.0.3, eslint-config-next@16, FlatCompat 제거. 기술 업그레이드 모니터링 섹션 추가. | anakin |
