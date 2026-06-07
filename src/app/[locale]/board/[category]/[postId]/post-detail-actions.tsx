@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -11,18 +12,20 @@ type Props = { category: string; postId: string }
 
 export function PostDetailActions({ category, postId }: Props) {
   const router = useRouter()
+  const t = useTranslations('board')
+  const tc = useTranslations('common')
   const [deleting, setDeleting] = useState(false)
 
   const handleDelete = async () => {
-    if (!confirm('게시글을 삭제할까요?')) return
+    if (!confirm(t('deletePost'))) return
     setDeleting(true)
     const res = await fetch(`/api/board/${category}/${postId}`, { method: 'DELETE' })
     if (res.ok) {
-      toast.success('게시글이 삭제됐습니다')
+      toast.success(t('deleteSuccess'))
       router.push(`/board/${category}`)
     } else {
       const { error } = await res.json()
-      toast.error(error ?? '삭제 실패')
+      toast.error(error ?? t('deleteFail'))
       setDeleting(false)
     }
   }
@@ -33,10 +36,10 @@ export function PostDetailActions({ category, postId }: Props) {
         href={`/board/${category}/${postId}/edit`}
         className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}
       >
-        수정
+        {tc('edit')}
       </Link>
       <Button variant='destructive' size='sm' onClick={handleDelete} disabled={deleting}>
-        {deleting ? '삭제 중…' : '삭제'}
+        {deleting ? tc('deleting') : tc('delete')}
       </Button>
     </div>
   )

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -17,6 +18,8 @@ interface PostRow {
 }
 
 export default function AdminBoardPage() {
+  const t = useTranslations('admin.board')
+  const tc = useTranslations('common')
   const [posts, setPosts] = useState<PostRow[]>([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -51,23 +54,23 @@ export default function AdminBoardPage() {
     if (res.ok) {
       const { pin_yn } = await res.json()
       setPosts((prev) => prev.map((p) => (p.post_id === postId ? { ...p, pin_yn } : p)))
-      toast.success(pin_yn === 'Y' ? '공지로 설정됐습니다' : '공지가 해제됐습니다')
+      toast.success(pin_yn === 'Y' ? t('pinnedSuccess') : t('unpinnedSuccess'))
     } else {
       const { error } = await res.json()
-      toast.error(error ?? '처리 실패')
+      toast.error(error ?? t('processFail'))
     }
   }
 
   const handleDelete = async (postId: string, title: string) => {
-    if (!confirm(`"${title}" 게시글을 삭제할까요?`)) return
+    if (!confirm(t('deleteConfirm', { title }))) return
     const res = await fetch(`/api/admin/board/${postId}`, { method: 'DELETE' })
     if (res.ok) {
       setPosts((prev) => prev.filter((p) => p.post_id !== postId))
-      setTotal((t) => t - 1)
-      toast.success('게시글이 삭제됐습니다')
+      setTotal((total) => total - 1)
+      toast.success(t('deleteSuccess'))
     } else {
       const { error } = await res.json()
-      toast.error(error ?? '삭제 실패')
+      toast.error(error ?? t('deleteFail'))
     }
   }
 
@@ -77,14 +80,13 @@ export default function AdminBoardPage() {
     <div className='space-y-4'>
       <div className='flex items-center justify-between'>
         <div>
-          <h1 className='text-2xl font-bold'>게시판 관리</h1>
+          <h1 className='text-2xl font-bold'>{t('title')}</h1>
           <p className='text-muted-foreground mt-1 text-sm'>
-            총 {total}개 게시글 · 공지 설정 및 강제 삭제
+            {t('desc', { count: total })}
           </p>
         </div>
       </div>
 
-      {/* 카테고리 필터 */}
       <div className='flex flex-wrap gap-2'>
         {['ALL', ...categories].map((c) => (
           <button
@@ -96,31 +98,30 @@ export default function AdminBoardPage() {
                 : 'bg-muted text-muted-foreground hover:bg-muted/80'
             }`}
           >
-            {c === 'ALL' ? '전체' : c}
+            {c === 'ALL' ? tc('all') : c}
           </button>
         ))}
       </div>
 
-      {/* 게시글 테이블 */}
       <div className='overflow-hidden rounded-lg border'>
         {loading ? (
           <div className='flex items-center justify-center gap-2 py-12 text-sm text-muted-foreground'>
             <div className='h-4 w-4 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent' />
-            불러오는 중…
+            {t('loading')}
           </div>
         ) : posts.length === 0 ? (
           <div className='py-12 text-center text-sm text-muted-foreground'>
-            게시글이 없습니다.
+            {t('noData')}
           </div>
         ) : (
           <>
             <div className='hidden border-b bg-muted/50 px-4 py-2 text-xs font-medium text-muted-foreground sm:grid sm:grid-cols-[60px_1fr_80px_60px_100px_120px]'>
-              <span>카테고리</span>
-              <span>제목</span>
-              <span className='text-center'>작성자</span>
-              <span className='text-center'>조회</span>
-              <span className='text-center'>날짜</span>
-              <span className='text-center'>관리</span>
+              <span>{t('col.category')}</span>
+              <span>{t('col.title')}</span>
+              <span className='text-center'>{t('col.author')}</span>
+              <span className='text-center'>{t('col.views')}</span>
+              <span className='text-center'>{t('col.date')}</span>
+              <span className='text-center'>{t('col.manage')}</span>
             </div>
             {posts.map((post) => (
               <div
@@ -131,7 +132,7 @@ export default function AdminBoardPage() {
                 <div className='flex items-center gap-1.5 min-w-0'>
                   {post.pin_yn === 'Y' && (
                     <span className='shrink-0 rounded bg-primary/10 px-1.5 py-0.5 text-xs font-medium text-primary'>
-                      공지
+                      {t('notice')}
                     </span>
                   )}
                   <Link
@@ -157,7 +158,7 @@ export default function AdminBoardPage() {
                     className='h-7 px-2 text-xs'
                     onClick={() => handlePinToggle(post.post_id, post.pin_yn)}
                   >
-                    {post.pin_yn === 'Y' ? '공지 해제' : '공지 설정'}
+                    {post.pin_yn === 'Y' ? t('unsetPinned') : t('setPinned')}
                   </Button>
                   <Button
                     variant='destructive'
@@ -165,7 +166,7 @@ export default function AdminBoardPage() {
                     className='h-7 px-2 text-xs'
                     onClick={() => handleDelete(post.post_id, post.post_ttl)}
                   >
-                    삭제
+                    {tc('delete')}
                   </Button>
                 </div>
               </div>
@@ -174,12 +175,11 @@ export default function AdminBoardPage() {
         )}
       </div>
 
-      {/* 페이지네이션 */}
       {totalPages > 1 && (
         <div className='flex justify-center gap-1'>
           {page > 1 && (
             <Button variant='outline' size='sm' onClick={() => setPage((p) => p - 1)}>
-              이전
+              {tc('prev')}
             </Button>
           )}
           {Array.from({ length: Math.min(totalPages, 10) }, (_, i) => i + 1).map((p) => (
@@ -194,7 +194,7 @@ export default function AdminBoardPage() {
           ))}
           {page < totalPages && (
             <Button variant='outline' size='sm' onClick={() => setPage((p) => p + 1)}>
-              다음
+              {tc('next')}
             </Button>
           )}
         </div>

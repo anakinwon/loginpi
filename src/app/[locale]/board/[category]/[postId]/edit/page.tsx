@@ -1,4 +1,5 @@
 import { notFound, redirect } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 import { getCategory } from '@/lib/board'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth-check'
@@ -8,7 +9,11 @@ type Props = { params: Promise<{ category: string; postId: string }> }
 
 export default async function EditPage({ params }: Props) {
   const { category, postId } = await params
-  const [ctgr, user] = await Promise.all([getCategory(category), getSessionUser()])
+  const [ctgr, user, t] = await Promise.all([
+    getCategory(category),
+    getSessionUser(),
+    getTranslations('board'),
+  ])
 
   if (!ctgr) redirect(`/board/${category}`)
   if (!user) redirect(`/board/${category}/${postId}`)
@@ -28,7 +33,7 @@ export default async function EditPage({ params }: Props) {
 
   return (
     <div className='mx-auto max-w-4xl px-4 py-8'>
-      <h1 className='mb-6 text-2xl font-bold'>{ctgr.ctgr_nm} — 수정</h1>
+      <h1 className='mb-6 text-2xl font-bold'>{t('editTitle', { name: ctgr.ctgr_nm })}</h1>
       <PostForm
         category={category}
         postId={postId}

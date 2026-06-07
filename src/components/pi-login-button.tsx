@@ -1,16 +1,16 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { usePiAuth } from './pi-auth-provider'
 
-// 개발 환경 + 일반 브라우저 → devLogin 사용 (Pi.authenticate는 Pi Browser 외 resolve 안 됨)
 const isDev = process.env.NODE_ENV !== 'production'
 
 export function PiLoginButton() {
+  const t = useTranslations('header')
   const { user, isLoading, isInPiBrowser, signIn, signOut, devLogin, error } = usePiAuth()
   const useDevLogin = isDev && !isInPiBrowser
 
-  // 일반 브라우저에서는 Pi 관련 버튼 완전히 숨기기
   if (!isInPiBrowser && !useDevLogin) return null
 
   if (user) {
@@ -24,7 +24,7 @@ export function PiLoginButton() {
           )}
         </span>
         <Button variant='outline' size='sm' onClick={signOut}>
-          로그아웃
+          {t('logout')}
         </Button>
         {error && <span className='text-destructive text-xs'>{error}</span>}
       </div>
@@ -42,7 +42,7 @@ export function PiLoginButton() {
         <span className='font-serif text-sm italic leading-none' aria-hidden='true'>
           π
         </span>
-        {isLoading ? '인증 중…' : useDevLogin ? 'Pi 로그인 (dev)' : 'Pi 로그인'}
+        {isLoading ? t('piAuthenticating') : useDevLogin ? t('piLoginDev') : t('piLogin')}
       </Button>
       {error && <span className='text-destructive text-xs'>{error}</span>}
     </div>

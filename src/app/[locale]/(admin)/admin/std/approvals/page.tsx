@@ -1,6 +1,7 @@
 'use client'
 
 import { Fragment, useEffect, useState, useCallback } from 'react'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -20,25 +21,28 @@ interface ApprovalRow {
   reg_dtm:       string
 }
 
-const STATUS_LABELS: Record<string, string> = {
-  PENDING:  '대기',
-  APPROVED: '승인',
-  REJECTED: '반려',
-}
-
 const STATUS_STYLE: Record<string, string> = {
   PENDING:  'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
   APPROVED: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
   REJECTED: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
 }
 
-const ENTITY_LABELS: Record<string, string> = {
-  STD_DIC:  '표준단어',
-  STD_DOM:  '표준도메인',
-  STD_TERM: '표준용어',
-}
-
 export default function StdApprovalsPage() {
+  const t = useTranslations('admin.std.approvals')
+  const tc = useTranslations('common')
+
+  const STATUS_LABELS: Record<string, string> = {
+    PENDING:  t('status.pending'),
+    APPROVED: t('status.approved'),
+    REJECTED: t('status.rejected'),
+  }
+
+  const ENTITY_LABELS: Record<string, string> = {
+    STD_DIC:  t('entity.stdDic'),
+    STD_DOM:  t('entity.stdDom'),
+    STD_TERM: t('entity.stdTerm'),
+  }
+
   const [approvals, setApprovals] = useState<ApprovalRow[]>([])
   const [total, setTotal]         = useState(0)
   const [loading, setLoading]     = useState(true)
@@ -75,14 +79,14 @@ export default function StdApprovalsPage() {
       })
       if (!res.ok) {
         const d = (await res.json()) as { error?: string }
-        throw new Error(d.error ?? '처리 실패')
+        throw new Error(d.error ?? t('processFail'))
       }
-      toast.success(action === 'approve' ? '승인됐습니다' : '반려됐습니다')
+      toast.success(action === 'approve' ? t('approveSuccess') : t('rejectSuccess'))
       setRejectId(null)
       setRejectReason('')
       load()
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : '오류 발생')
+      toast.error(err instanceof Error ? err.message : tc('error'))
     } finally {
       setProcessing(null)
     }
@@ -93,11 +97,10 @@ export default function StdApprovalsPage() {
   return (
     <div className='space-y-4'>
       <div>
-        <h1 className='text-2xl font-bold'>승인 워크플로우</h1>
-        <p className='text-muted-foreground mt-1 text-sm'>전체 {total.toLocaleString()}건</p>
+        <h1 className='text-2xl font-bold'>{t('title')}</h1>
+        <p className='text-muted-foreground mt-1 text-sm'>{t('totalCount', { count: total.toLocaleString() })}</p>
       </div>
 
-      {/* 상태 필터 칩 */}
       <div className='flex flex-wrap gap-2'>
         {(['PENDING', 'APPROVED', 'REJECTED', 'all'] as const).map((s) => (
           <button
@@ -109,7 +112,7 @@ export default function StdApprovalsPage() {
                 : 'bg-muted text-muted-foreground hover:bg-muted/70'
             }`}
           >
-            {s === 'all' ? '전체' : STATUS_LABELS[s]}
+            {s === 'all' ? t('status.all') : STATUS_LABELS[s]}
           </button>
         ))}
         <select
@@ -117,7 +120,7 @@ export default function StdApprovalsPage() {
           onChange={(e) => { setEntityFilter(e.target.value); setPage(1) }}
           className='border-input bg-background h-7 rounded-full border px-3 text-xs'
         >
-          <option value=''>모든 유형</option>
+          <option value=''>{t('allTypes')}</option>
           {Object.entries(ENTITY_LABELS).map(([v, l]) => (
             <option key={v} value={v}>{l}</option>
           ))}
@@ -125,30 +128,28 @@ export default function StdApprovalsPage() {
       </div>
 
       {loading ? (
-        <p className='text-muted-foreground text-sm'>로딩 중…</p>
+        <p className='text-muted-foreground text-sm'>{tc('loading')}</p>
       ) : approvals.length === 0 ? (
         <p className='text-muted-foreground text-sm'>
-          {statusFilter === 'PENDING' ? '대기 중인 승인 요청이 없습니다.' : '데이터가 없습니다.'}
+          {statusFilter === 'PENDING' ? t('noPending') : t('noData')}
         </p>
       ) : (
         <div className='rounded-lg border overflow-x-auto'>
           <table className='w-full text-sm'>
             <thead className='bg-muted/50 border-b'>
               <tr>
-                <th className='text-left px-4 py-2 font-medium'>요청일시</th>
-                <th className='text-left px-4 py-2 font-medium'>유형</th>
-                <th className='text-left px-4 py-2 font-medium'>대상</th>
-                <th className='text-left px-4 py-2 font-medium'>요청자</th>
-                <th className='text-left px-4 py-2 font-medium'>상태</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.requestedAt')}</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.type')}</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.target')}</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.requestedBy')}</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.status')}</th>
                 <th className='px-4 py-2'></th>
               </tr>
             </thead>
             <tbody className='divide-y'>
               {approvals.map((apv) => (
                 <Fragment key={apv.apv_id}>
-                  <tr
-                    className='hover:bg-muted/30 transition-colors'
-                  >
+                  <tr className='hover:bg-muted/30 transition-colors'>
                     <td className='px-4 py-3 font-mono text-xs text-muted-foreground whitespace-nowrap'>
                       {new Date(apv.reg_dtm).toLocaleString('ko-KR')}
                     </td>
@@ -176,7 +177,7 @@ export default function StdApprovalsPage() {
                               disabled={processing === apv.apv_id}
                               onClick={() => decide(apv.apv_id, 'approve')}
                             >
-                              승인
+                              {t('approve')}
                             </Button>
                             <Button
                               size='sm' variant='outline'
@@ -184,7 +185,7 @@ export default function StdApprovalsPage() {
                               disabled={processing === apv.apv_id}
                               onClick={() => { setRejectId(apv.apv_id); setRejectReason('') }}
                             >
-                              반려
+                              {t('reject')}
                             </Button>
                           </>
                         )}
@@ -198,13 +199,12 @@ export default function StdApprovalsPage() {
                     </td>
                   </tr>
 
-                  {/* 반려 사유 입력 인라인 폼 */}
                   {rejectId === apv.apv_id && (
                     <tr className='bg-red-50/30 dark:bg-red-900/10'>
                       <td colSpan={6} className='px-4 py-3'>
                         <div className='flex items-center gap-2'>
                           <Input
-                            placeholder='반려 사유를 입력해 주세요 *'
+                            placeholder={t('rejectReasonPlaceholder')}
                             value={rejectReason}
                             onChange={(e) => setRejectReason(e.target.value)}
                             className='max-w-sm h-8 text-sm'
@@ -215,32 +215,33 @@ export default function StdApprovalsPage() {
                             disabled={!rejectReason.trim() || processing === apv.apv_id}
                             onClick={() => decide(apv.apv_id, 'reject', rejectReason)}
                           >
-                            반려 확정
+                            {t('rejectConfirm')}
                           </Button>
                           <Button size='sm' variant='outline' className='h-8' onClick={() => setRejectId(null)}>
-                            취소
+                            {tc('cancel')}
                           </Button>
                         </div>
                       </td>
                     </tr>
                   )}
 
-                  {/* 상세 정보 펼침 */}
                   {expanded === apv.apv_id && (
                     <tr className='bg-muted/20'>
                       <td colSpan={6} className='px-4 py-3 text-xs space-y-2'>
                         {apv.reject_reason && (
-                          <p className='text-destructive'>반려 사유: {apv.reject_reason}</p>
+                          <p className='text-destructive'>{t('rejectReason', { reason: apv.reject_reason })}</p>
                         )}
                         {apv.decided_by && (
                           <p className='text-muted-foreground'>
-                            처리자: {apv.decided_by}
-                            {apv.decided_at && ` / ${new Date(apv.decided_at).toLocaleString('ko-KR')}`}
+                            {t('decidedBy', {
+                              name: apv.decided_by,
+                              date: apv.decided_at ? new Date(apv.decided_at).toLocaleString('ko-KR') : '',
+                            })}
                           </p>
                         )}
                         {apv.req_data && (
                           <div>
-                            <p className='font-semibold text-muted-foreground mb-1'>요청 데이터</p>
+                            <p className='font-semibold text-muted-foreground mb-1'>{t('requestData')}</p>
                             <pre className='rounded bg-muted p-2 overflow-x-auto font-mono max-h-48'>
                               {JSON.stringify(apv.req_data, null, 2)}
                             </pre>
@@ -256,15 +257,14 @@ export default function StdApprovalsPage() {
         </div>
       )}
 
-      {/* 페이지네이션 */}
       {totalPages > 1 && (
         <div className='flex items-center gap-2'>
           <Button size='sm' variant='outline' disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
-            이전
+            {tc('prev')}
           </Button>
-          <span className='text-sm text-muted-foreground'>{page} / {totalPages}</span>
+          <span className='text-sm text-muted-foreground'>{tc('pageOf', { current: page, total: totalPages })}</span>
           <Button size='sm' variant='outline' disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>
-            다음
+            {tc('next')}
           </Button>
         </div>
       )}

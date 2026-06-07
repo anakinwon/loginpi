@@ -1,11 +1,11 @@
 'use client'
 
 import { useEffect, useState, useMemo } from 'react'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
-// 물리명 마지막 약어 → SQL 타입 매핑
 const DOM_TYPE_MAP: Record<string, { pg: string; mysql: string }> = {
   NM:    { pg: 'VARCHAR(100)',   mysql: 'VARCHAR(100)' },
   CD:    { pg: 'VARCHAR(20)',    mysql: 'VARCHAR(20)' },
@@ -42,7 +42,6 @@ interface ColumnDef {
 
 function inferType(phy_nm: string): { pg: string; mysql: string } {
   const parts = phy_nm.split('_')
-  // 마지막 → 없으면 끝에서 두 번째까지 합쳐서 재시도
   const last = parts[parts.length - 1].toUpperCase()
   if (DOM_TYPE_MAP[last]) return DOM_TYPE_MAP[last]
   const last2 = parts.slice(-2).join('').toUpperCase()
@@ -92,6 +91,7 @@ function buildDDL(
 }
 
 export default function DdlExportPage() {
+  const t = useTranslations('admin.std.ddl')
   const [tableName, setTableName] = useState('')
   const [tableLogNm, setTableLogNm] = useState('')
   const [columns, setColumns] = useState<ColumnDef[]>([])
@@ -108,7 +108,7 @@ export default function DdlExportPage() {
   const filteredTerms = useMemo(() => {
     const q = termSearch.toLowerCase()
     return allTerms
-      .filter((t) => t.term_log_nm.includes(q) || t.term_phy_nm.includes(q))
+      .filter((term) => term.term_log_nm.includes(q) || term.term_phy_nm.includes(q))
       .slice(0, 10)
   }, [allTerms, termSearch])
 
@@ -156,7 +156,7 @@ export default function DdlExportPage() {
 
   function copyDdl() {
     navigator.clipboard.writeText(ddl)
-    toast.success('DDL이 클립보드에 복사됐습니다')
+    toast.success(t('copySuccess'))
   }
 
   function downloadDdl() {
@@ -172,58 +172,53 @@ export default function DdlExportPage() {
   return (
     <div className='space-y-6'>
       <div>
-        <h1 className='text-2xl font-bold'>DDL Export</h1>
-        <p className='text-muted-foreground mt-1 text-sm'>
-          표준용어를 컬럼으로 선택하면 CREATE TABLE SQL이 자동 생성됩니다
-        </p>
+        <h1 className='text-2xl font-bold'>{t('title')}</h1>
+        <p className='text-muted-foreground mt-1 text-sm'>{t('desc')}</p>
       </div>
 
       <div className='grid gap-6 lg:grid-cols-2'>
-        {/* ── 왼쪽: 빌더 ── */}
         <div className='space-y-4'>
 
-          {/* 테이블 정보 */}
           <div className='rounded-lg border p-4 space-y-3'>
-            <h2 className='font-semibold text-sm'>테이블 정보</h2>
+            <h2 className='font-semibold text-sm'>{t('sectionTable')}</h2>
             <div className='grid grid-cols-2 gap-3'>
               <label className='space-y-1'>
-                <span className='text-xs text-muted-foreground'>테이블명(영문) *</span>
+                <span className='text-xs text-muted-foreground'>{t('field.tableNmEn')}</span>
                 <Input
                   value={tableName}
                   onChange={(e) => setTableName(e.target.value)}
-                  placeholder='예: usr_info'
+                  placeholder={t('placeholder.tableNmEn')}
                 />
               </label>
               <label className='space-y-1'>
-                <span className='text-xs text-muted-foreground'>테이블명(한글)</span>
+                <span className='text-xs text-muted-foreground'>{t('field.tableNmKo')}</span>
                 <Input
                   value={tableLogNm}
                   onChange={(e) => setTableLogNm(e.target.value)}
-                  placeholder='예: 사용자정보'
+                  placeholder={t('placeholder.tableNmKo')}
                 />
               </label>
             </div>
           </div>
 
-          {/* 표준용어 검색 */}
           <div className='rounded-lg border p-4 space-y-2'>
-            <h2 className='font-semibold text-sm'>컬럼 추가 — 표준용어에서 선택</h2>
+            <h2 className='font-semibold text-sm'>{t('sectionColumn')}</h2>
             <div className='relative'>
               <Input
                 value={termSearch}
                 onChange={(e) => setTermSearch(e.target.value)}
-                placeholder='용어 검색 후 클릭으로 추가…'
+                placeholder={t('placeholder.termSearch')}
               />
               {termSearch && filteredTerms.length > 0 && (
                 <div className='absolute z-10 mt-1 w-full rounded-md border bg-background shadow-lg max-h-52 overflow-y-auto'>
-                  {filteredTerms.map((t) => (
+                  {filteredTerms.map((term) => (
                     <button
-                      key={t.term_id}
-                      onClick={() => addFromTerm(t)}
+                      key={term.term_id}
+                      onClick={() => addFromTerm(term)}
                       className='flex w-full items-center justify-between px-3 py-2 text-sm hover:bg-muted text-left'
                     >
-                      <span>{t.term_log_nm}</span>
-                      <span className='font-mono text-xs text-muted-foreground'>{t.term_phy_nm}</span>
+                      <span>{term.term_log_nm}</span>
+                      <span className='font-mono text-xs text-muted-foreground'>{term.term_phy_nm}</span>
                     </button>
                   ))}
                 </div>
@@ -231,16 +226,15 @@ export default function DdlExportPage() {
             </div>
           </div>
 
-          {/* 컬럼 목록 */}
           {columns.length > 0 && (
             <div className='rounded-lg border overflow-x-auto'>
               <table className='w-full text-xs'>
                 <thead className='bg-muted/50 border-b'>
                   <tr>
-                    <th className='text-left px-3 py-2 font-medium'>컬럼 (논리명)</th>
-                    <th className='text-left px-3 py-2 font-medium'>타입</th>
-                    <th className='px-2 py-2 text-center font-medium'>PK</th>
-                    <th className='px-2 py-2 text-center font-medium'>NN</th>
+                    <th className='text-left px-3 py-2 font-medium'>{t('col.colLogNm')}</th>
+                    <th className='text-left px-3 py-2 font-medium'>{t('col.type')}</th>
+                    <th className='px-2 py-2 text-center font-medium'>{t('col.pk')}</th>
+                    <th className='px-2 py-2 text-center font-medium'>{t('col.nn')}</th>
                     <th className='px-2 py-2'></th>
                   </tr>
                 </thead>
@@ -311,34 +305,32 @@ export default function DdlExportPage() {
           )}
         </div>
 
-        {/* ── 오른쪽: DDL 미리보기 ── */}
         <div className='space-y-3'>
           <div className='flex items-center justify-between'>
-            <h2 className='font-semibold text-sm'>DDL 미리보기</h2>
+            <h2 className='font-semibold text-sm'>{t('sectionPreview')}</h2>
             <div className='flex items-center gap-2'>
-              {/* DB 타입 탭 */}
               <div className='flex rounded-md border overflow-hidden text-xs'>
-                {(['pg', 'mysql'] as const).map((t) => (
+                {(['pg', 'mysql'] as const).map((dbT) => (
                   <button
-                    key={t}
-                    onClick={() => setDbType(t)}
+                    key={dbT}
+                    onClick={() => setDbType(dbT)}
                     className={`px-3 py-1.5 font-medium transition-colors ${
-                      dbType === t
+                      dbType === dbT
                         ? 'bg-primary text-primary-foreground'
                         : 'bg-background text-muted-foreground hover:bg-muted'
                     }`}
                   >
-                    {t === 'pg' ? 'PostgreSQL' : 'MySQL'}
+                    {dbT === 'pg' ? 'PostgreSQL' : 'MySQL'}
                   </button>
                 ))}
               </div>
               {ddl && (
                 <div className='flex gap-1'>
                   <Button size='sm' variant='outline' className='h-7 text-xs' onClick={copyDdl}>
-                    복사
+                    {t('copy')}
                   </Button>
                   <Button size='sm' variant='outline' className='h-7 text-xs' onClick={downloadDdl}>
-                    ↓ .sql
+                    {t('download')}
                   </Button>
                 </div>
               )}
@@ -348,7 +340,7 @@ export default function DdlExportPage() {
           <pre className='rounded-lg border bg-muted/30 p-4 text-xs font-mono min-h-72 overflow-x-auto whitespace-pre leading-relaxed'>
             {ddl || (
               <span className='text-muted-foreground'>
-                테이블명과 컬럼을 추가하면 DDL이 여기에 생성됩니다.
+                {t('emptyPreview')}
               </span>
             )}
           </pre>

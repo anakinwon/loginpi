@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -55,6 +56,8 @@ const EMPTY_FORM = {
 }
 
 export default function StdDomainsPage() {
+  const t = useTranslations('admin.std.domains')
+  const tc = useTranslations('common')
   const [domains, setDomains] = useState<DomainRow[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -78,8 +81,8 @@ export default function StdDomainsPage() {
   }, [search, typeFilter])
 
   useEffect(() => {
-    const t = setTimeout(load, 300)
-    return () => clearTimeout(t)
+    const timer = setTimeout(load, 300)
+    return () => clearTimeout(timer)
   }, [load])
 
   function openNew() {
@@ -105,7 +108,7 @@ export default function StdDomainsPage() {
 
   async function save() {
     if (!form.dom_nm.trim() || !form.key_dom_nm.trim() || !form.key_dom_phy_nm.trim()) {
-      toast.error('도메인명, 키도메인명, 키도메인물리명은 필수입니다')
+      toast.error(t('validationRequired'))
       return
     }
     setSaving(true)
@@ -129,31 +132,31 @@ export default function StdDomainsPage() {
       })
       if (!res.ok) {
         const d = (await res.json()) as { error?: string }
-        throw new Error(d.error ?? '저장 실패')
+        throw new Error(d.error ?? t('saveFail'))
       }
-      toast.success(editing ? '수정됐습니다' : '등록됐습니다')
+      toast.success(editing ? t('editSuccess') : t('saveSuccess'))
       setShowForm(false)
       load()
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : '오류 발생')
+      toast.error(err instanceof Error ? err.message : tc('error'))
     } finally {
       setSaving(false)
     }
   }
 
   async function remove(id: string, nm: string) {
-    if (!confirm(`"${nm}"을(를) 삭제하시겠습니까?`)) return
+    if (!confirm(t('deleteConfirm', { name: nm }))) return
     setDeleting(id)
     try {
       const res = await fetch(`/api/admin/std/domains/${id}`, { method: 'DELETE' })
       if (!res.ok) {
         const d = (await res.json()) as { error?: string }
-        throw new Error(d.error ?? '삭제 실패')
+        throw new Error(d.error ?? t('deleteFail'))
       }
-      toast.success('삭제됐습니다')
+      toast.success(t('deleteSuccess'))
       setDomains((prev) => prev.filter((d) => d.dom_id !== id))
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : '오류 발생')
+      toast.error(err instanceof Error ? err.message : tc('error'))
     } finally {
       setDeleting(null)
     }
@@ -163,22 +166,21 @@ export default function StdDomainsPage() {
     <div className='space-y-4'>
       <div className='flex items-center justify-between'>
         <div>
-          <h1 className='text-2xl font-bold'>표준도메인 관리</h1>
-          <p className='text-muted-foreground mt-1 text-sm'>전체 {domains.length}건</p>
+          <h1 className='text-2xl font-bold'>{t('title')}</h1>
+          <p className='text-muted-foreground mt-1 text-sm'>{t('totalCount', { count: domains.length })}</p>
         </div>
-        <Button onClick={openNew} size='sm'>+ 신규 등록</Button>
+        <Button onClick={openNew} size='sm'>{tc('newRegister')}</Button>
       </div>
 
-      {/* 검색 + 필터 */}
       <div className='flex gap-2'>
         <Input
-          placeholder='도메인명 / 키도메인명 검색…'
+          placeholder={t('searchPlaceholder')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className='max-w-64'
         />
         <div className='flex gap-1'>
-          {([['', '전체'], ['0001', '코드'], ['0002', '식별자'], ['0003', '일반']] as [string, string][]).map(([val, label]) => (
+          {([['', t('typeFilter.all')], ['0001', t('typeFilter.code')], ['0002', t('typeFilter.id')], ['0003', t('typeFilter.general')]] as [string, string][]).map(([val, label]) => (
             <button
               key={val}
               onClick={() => setTypeFilter(val)}
@@ -194,87 +196,85 @@ export default function StdDomainsPage() {
         </div>
       </div>
 
-      {/* 등록/수정 폼 */}
       {showForm && (
         <div className='rounded-lg border bg-muted/30 p-4 space-y-3'>
           <h2 className='font-semibold text-sm'>
-            {editing ? '도메인 수정' : '신규 도메인 등록'}
+            {editing ? t('formTitleEdit') : t('formTitleNew')}
           </h2>
           <div className='grid grid-cols-2 gap-3 sm:grid-cols-3'>
             <label className='space-y-1'>
-              <span className='text-xs text-muted-foreground'>도메인명 *</span>
-              <Input value={form.dom_nm} onChange={(e) => setForm((f) => ({ ...f, dom_nm: e.target.value }))} placeholder='예: 가격도메인' />
+              <span className='text-xs text-muted-foreground'>{t('field.domNm')}</span>
+              <Input value={form.dom_nm} onChange={(e) => setForm((f) => ({ ...f, dom_nm: e.target.value }))} placeholder={t('placeholder.domNm')} />
             </label>
             <label className='space-y-1'>
-              <span className='text-xs text-muted-foreground'>키도메인명 *</span>
-              <Input value={form.key_dom_nm} onChange={(e) => setForm((f) => ({ ...f, key_dom_nm: e.target.value }))} placeholder='예: 가격' />
+              <span className='text-xs text-muted-foreground'>{t('field.keyDomNm')}</span>
+              <Input value={form.key_dom_nm} onChange={(e) => setForm((f) => ({ ...f, key_dom_nm: e.target.value }))} placeholder={t('placeholder.keyDomNm')} />
             </label>
             <label className='space-y-1'>
-              <span className='text-xs text-muted-foreground'>키도메인물리명 *</span>
-              <Input value={form.key_dom_phy_nm} onChange={(e) => setForm((f) => ({ ...f, key_dom_phy_nm: e.target.value }))} placeholder='예: PRICE' />
+              <span className='text-xs text-muted-foreground'>{t('field.keyDomPhyNm')}</span>
+              <Input value={form.key_dom_phy_nm} onChange={(e) => setForm((f) => ({ ...f, key_dom_phy_nm: e.target.value }))} placeholder={t('placeholder.keyDomPhyNm')} />
             </label>
             <label className='space-y-1'>
-              <span className='text-xs text-muted-foreground'>도메인 구분</span>
+              <span className='text-xs text-muted-foreground'>{t('field.domType')}</span>
               <select
                 value={form.dom_type_cd}
                 onChange={(e) => setForm((f) => ({ ...f, dom_type_cd: e.target.value }))}
                 className='border-input bg-background h-9 w-full rounded-md border px-3 text-sm'
               >
-                <option value='0001'>코드</option>
-                <option value='0002'>식별자</option>
-                <option value='0003'>일반</option>
+                <option value='0001'>{t('selectDomType.code')}</option>
+                <option value='0002'>{t('selectDomType.id')}</option>
+                <option value='0003'>{t('selectDomType.general')}</option>
               </select>
             </label>
             <label className='space-y-1'>
-              <span className='text-xs text-muted-foreground'>데이터 타입</span>
+              <span className='text-xs text-muted-foreground'>{t('field.dataType')}</span>
               <select
                 value={form.data_type_cd}
                 onChange={(e) => setForm((f) => ({ ...f, data_type_cd: e.target.value }))}
                 className='border-input bg-background h-9 w-full rounded-md border px-3 text-sm'
               >
-                <option value='0003'>VARCHAR / TEXT</option>
-                <option value='0013'>INTEGER</option>
-                <option value='0015'>NUMERIC</option>
-                <option value='0018'>DATE</option>
-                <option value='0020'>TIMESTAMP</option>
+                <option value='0003'>{t('selectDataType.varchar')}</option>
+                <option value='0013'>{t('selectDataType.integer')}</option>
+                <option value='0015'>{t('selectDataType.numeric')}</option>
+                <option value='0018'>{t('selectDataType.date')}</option>
+                <option value='0020'>{t('selectDataType.timestamp')}</option>
               </select>
             </label>
             <label className='space-y-1'>
-              <span className='text-xs text-muted-foreground'>길이</span>
-              <Input type='number' value={form.data_len} onChange={(e) => setForm((f) => ({ ...f, data_len: e.target.value }))} placeholder='예: 100' />
+              <span className='text-xs text-muted-foreground'>{t('field.dataLen')}</span>
+              <Input type='number' value={form.data_len} onChange={(e) => setForm((f) => ({ ...f, data_len: e.target.value }))} placeholder={t('placeholder.dataLen')} />
             </label>
             <label className='space-y-1'>
-              <span className='text-xs text-muted-foreground'>소수점 자리</span>
-              <Input type='number' value={form.data_scale} onChange={(e) => setForm((f) => ({ ...f, data_scale: e.target.value }))} placeholder='예: 2' />
+              <span className='text-xs text-muted-foreground'>{t('field.dataScale')}</span>
+              <Input type='number' value={form.data_scale} onChange={(e) => setForm((f) => ({ ...f, data_scale: e.target.value }))} placeholder={t('placeholder.dataScale')} />
             </label>
             <label className='col-span-2 space-y-1'>
-              <span className='text-xs text-muted-foreground'>설명</span>
-              <Input value={form.dom_desc} onChange={(e) => setForm((f) => ({ ...f, dom_desc: e.target.value }))} placeholder='도메인 설명 (선택)' />
+              <span className='text-xs text-muted-foreground'>{t('field.desc')}</span>
+              <Input value={form.dom_desc} onChange={(e) => setForm((f) => ({ ...f, dom_desc: e.target.value }))} placeholder={t('placeholder.desc')} />
             </label>
           </div>
           <div className='flex gap-2'>
-            <Button size='sm' onClick={save} disabled={saving}>{saving ? '저장 중…' : '저장'}</Button>
-            <Button size='sm' variant='outline' onClick={() => setShowForm(false)}>취소</Button>
+            <Button size='sm' onClick={save} disabled={saving}>{saving ? tc('saving') : tc('save')}</Button>
+            <Button size='sm' variant='outline' onClick={() => setShowForm(false)}>{tc('cancel')}</Button>
           </div>
         </div>
       )}
 
-      {/* 목록 */}
       {loading ? (
-        <p className='text-muted-foreground text-sm'>로딩 중…</p>
+        <p className='text-muted-foreground text-sm'>{tc('loading')}</p>
       ) : domains.length === 0 ? (
-        <p className='text-muted-foreground text-sm'>도메인이 없습니다.</p>
+        <p className='text-muted-foreground text-sm'>{t('noData')}</p>
       ) : (
         <div className='rounded-lg border overflow-x-auto'>
           <table className='w-full text-sm'>
             <thead className='bg-muted/50 border-b'>
               <tr>
-                <th className='text-left px-4 py-2 font-medium'>도메인명</th>
-                <th className='text-left px-4 py-2 font-medium'>키도메인명</th>
-                <th className='text-left px-4 py-2 font-medium'>물리명</th>
-                <th className='text-left px-4 py-2 font-medium'>구분</th>
-                <th className='text-left px-4 py-2 font-medium'>데이터 타입</th>
-                <th className='text-left px-4 py-2 font-medium'>설명</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.domNm')}</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.keyDomNm')}</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.phyNm')}</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.type')}</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.dataType')}</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.desc')}</th>
                 <th className='px-4 py-2'></th>
               </tr>
             </thead>
@@ -297,13 +297,13 @@ export default function StdDomainsPage() {
                   </td>
                   <td className='px-4 py-3'>
                     <div className='flex gap-1'>
-                      <Button variant='outline' size='sm' className='h-6 px-2 text-xs' onClick={() => openEdit(d)}>수정</Button>
+                      <Button variant='outline' size='sm' className='h-6 px-2 text-xs' onClick={() => openEdit(d)}>{tc('edit')}</Button>
                       <Button
                         variant='outline' size='sm' className='h-6 px-2 text-xs text-destructive hover:text-destructive'
                         disabled={deleting === d.dom_id}
                         onClick={() => remove(d.dom_id, d.dom_nm)}
                       >
-                        삭제
+                        {tc('delete')}
                       </Button>
                     </div>
                   </td>

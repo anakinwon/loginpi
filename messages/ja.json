@@ -1,1 +1,540 @@
-{}
+{
+  "admin": {
+    "board": {
+      "col": {
+        "author": "作成者",
+        "category": "Category",
+        "date": "日付",
+        "manage": "管理",
+        "title": "タイトル",
+        "views": "閲覧数"
+      },
+      "deleteConfirm": "\"{title}\" の投稿を削除しますか？",
+      "deleteFail": "削除失敗",
+      "deleteSuccess": "投稿が削除されました",
+      "desc": "合計 {count}件の投稿 · お知らせ設定および強制削除",
+      "loading": "読み込み中…",
+      "noData": "投稿がありません。",
+      "notice": "お知らせ",
+      "pinnedSuccess": "お知らせに設定されました",
+      "processFail": "処理失敗",
+      "setPinned": "お知らせ設定",
+      "title": "Board 管理",
+      "unpinnedSuccess": "お知らせが解除されました",
+      "unsetPinned": "お知らせ解除"
+    },
+    "dashboard": {
+      "googleOnly": "Google専用",
+      "googleOnlyDesc": "Googleアカウントのみのユーザー",
+      "greeting": "こんにちは、{name}さん ({role})",
+      "linked": "アカウント連携",
+      "linkedDesc": "Pi + Google連携完了",
+      "piOnly": "Pi専用",
+      "piOnlyDesc": "Piアカウントのみのユーザー",
+      "title": "Dashboard",
+      "totalUsers": "全ユーザー",
+      "totalUsersDesc": "登録されている全アカウント数"
+    },
+    "i18n": {
+      "col": {
+        "language": "言語",
+        "progress": "進捗率",
+        "translatedKeys": "翻訳キー"
+      },
+      "desc": "翻訳状況 Dashboard",
+      "footnote1": "* 「翻訳 + 同期」: Claude AIで未翻訳キーを自動翻訳後、messages/*.jsonを更新",
+      "footnote2": "* 「DB→JSON 同期」: DBに保存された翻訳DataをJSONファイルに反映のみ行います",
+      "stats": {
+        "completed": "100% 完了",
+        "completedOf": "{count}言語中",
+        "supportedLocales": "対応言語",
+        "totalKeys": "全翻訳キー"
+      },
+      "syncAll": "DB→JSON 同期",
+      "syncFail": "同期失敗",
+      "syncing": "同期中…",
+      "syncingLocale": "同期中…",
+      "syncNoData": "DBに同期するDataがありません。まず「翻訳 + 同期」を実行してください。",
+      "syncSuccess": "{count}言語同期完了",
+      "title": "多言語管理",
+      "translate": "翻訳 + 同期",
+      "translateFail": "翻訳失敗",
+      "translateSuccess": "{count}件翻訳完了",
+      "translating": "翻訳中…"
+    },
+    "links": {
+      "col": {
+        "googleAccount": "Google アカウント",
+        "joinDate": "登録日",
+        "linkStatus": "連携ステータス",
+        "piAccount": "Pi アカウント",
+        "role": "ロール",
+        "user": "ユーザー"
+      },
+      "desc": {
+        "googleOnly": "Pi 未連携",
+        "linked": "Pi + Google 接続済み",
+        "piOnly": "Google 未連携"
+      },
+      "noUsers": "該当するユーザーがいません。",
+      "status": {
+        "googleOnly": "Google 専用",
+        "linked": "連携済み",
+        "piOnly": "Pi 専用"
+      },
+      "title": "アカウント連携状況",
+      "totalCount": "合計 {count}名"
+    },
+    "nav": {
+      "backHome": "← ホームへ",
+      "board": "Board管理",
+      "dashboard": "Dashboard",
+      "i18n": "多言語管理",
+      "i18nSection": "多言語",
+      "links": "アカウント連携状況",
+      "payments": "支払い履歴",
+      "stdApprovals": "承認Workflow",
+      "stdAudit": "変更履歴",
+      "stdDdl": "DDL Export",
+      "stdDomains": "標準Domain",
+      "stdSection": "Data標準",
+      "stdTerms": "標準用語",
+      "stdWords": "標準単語",
+      "title": "Admin",
+      "users": "ユーザー管理"
+    },
+    "payments": {
+      "col": {
+        "amount": "金額",
+        "date": "日時",
+        "memo": "メモ",
+        "paymentId": "決済 ID",
+        "status": "ステータス",
+        "user": "ユーザー"
+      },
+      "noPayments": "支払い履歴がありません。",
+      "status": {
+        "approved": "承認",
+        "cancelled": "キャンセル",
+        "completed": "完了",
+        "error": "エラー",
+        "pending": "待機"
+      },
+      "title": "支払い履歴",
+      "totalCount": "全 {count}件 · 完了合計 {total} π"
+    },
+    "std": {
+      "approvals": {
+        "allTypes": "すべてのType",
+        "approve": "承認",
+        "approveSuccess": "承認されました",
+        "col": {
+          "requestedAt": "リクエスト日時",
+          "requestedBy": "リクエスト者",
+          "status": "Status",
+          "target": "対象",
+          "type": "Type"
+        },
+        "decidedBy": "処理者: {name} / {date}",
+        "entity": {
+          "stdDic": "標準単語",
+          "stdDom": "標準Domain",
+          "stdTerm": "標準用語"
+        },
+        "noData": "Dataがありません。",
+        "noPending": "保留中の承認リクエストはありません。",
+        "processFail": "処理失敗",
+        "reject": "却下",
+        "rejectConfirm": "却下確定",
+        "rejectReason": "却下理由: {reason}",
+        "rejectReasonPlaceholder": "却下理由を入力してください *",
+        "rejectSuccess": "却下されました",
+        "requestData": "リクエスト Data",
+        "status": {
+          "all": "すべて",
+          "approved": "承認済み",
+          "pending": "保留",
+          "rejected": "却下"
+        },
+        "title": "承認 Workflow",
+        "totalCount": "合計 {count}件"
+      },
+      "audit": {
+        "after": "変更後",
+        "before": "変更前",
+        "col": {
+          "action": "アクション",
+          "changedAt": "変更日時",
+          "changedBy": "変更者",
+          "table": "Table",
+          "target": "対象"
+        },
+        "filter": {
+          "allTables": "すべて",
+          "from": "開始日",
+          "table": "Table",
+          "to": "終了日"
+        },
+        "noData": "履歴がありません。",
+        "tableLabel": {
+          "stdDic": "標準単語",
+          "stdDom": "標準Domain",
+          "stdTerm": "標準用語"
+        },
+        "title": "変更履歴 (Audit Trail)",
+        "totalCount": "合計 {count}件"
+      },
+      "ddl": {
+        "col": {
+          "colLogNm": "Column (論理名)",
+          "nn": "NN",
+          "pk": "PK",
+          "type": "Type"
+        },
+        "copy": "コピー",
+        "copySuccess": "DDLがクリップボードにコピーされました",
+        "desc": "標準用語をColumnとして選択するとCREATE TABLE SQLが自動生成されます",
+        "download": "↓ .sql",
+        "emptyPreview": "Table名とColumnを追加するとDDLがここに生成されます。",
+        "field": {
+          "tableNmEn": "Table名(英語) *",
+          "tableNmKo": "Table名(韓国語)"
+        },
+        "placeholder": {
+          "tableNmEn": "例: usr_info",
+          "tableNmKo": "例: ユーザー情報",
+          "termSearch": "用語検索後クリックで追加…"
+        },
+        "sectionColumn": "Column 追加 — 標準用語から選択",
+        "sectionPreview": "DDL プレビュー",
+        "sectionTable": "Table情報",
+        "title": "DDL Export"
+      },
+      "domains": {
+        "col": {
+          "dataType": "Data Type",
+          "desc": "説明",
+          "domNm": "Domain名",
+          "keyDomNm": "Key Domain名",
+          "phyNm": "物理名",
+          "type": "区分"
+        },
+        "deleteConfirm": "\"{name}\"を削除しますか？",
+        "deleteFail": "削除失敗",
+        "deleteSuccess": "削除しました",
+        "editSuccess": "修正しました",
+        "field": {
+          "dataLen": "長さ",
+          "dataScale": "小数点桁数",
+          "dataType": "Data Type",
+          "desc": "説明",
+          "domNm": "Domain名 *",
+          "domType": "Domain 区分",
+          "keyDomNm": "Key Domain名 *",
+          "keyDomPhyNm": "Key Domain物理名 *"
+        },
+        "formTitleEdit": "Domain 修正",
+        "formTitleNew": "新規 Domain 登録",
+        "noData": "Domainがありません。",
+        "placeholder": {
+          "dataLen": "例: 100",
+          "dataScale": "例: 2",
+          "desc": "Domain説明 (任意)",
+          "domNm": "例: 価格Domain",
+          "keyDomNm": "例: 価格",
+          "keyDomPhyNm": "例: PRICE"
+        },
+        "saveFail": "保存失敗",
+        "saveSuccess": "登録しました",
+        "searchPlaceholder": "Domain名 / Key Domain名 検索…",
+        "selectDataType": {
+          "date": "DATE",
+          "integer": "INTEGER",
+          "numeric": "NUMERIC",
+          "timestamp": "TIMESTAMP",
+          "varchar": "VARCHAR / TEXT"
+        },
+        "selectDomType": {
+          "code": "Code",
+          "general": "一般",
+          "id": "識別子"
+        },
+        "title": "標準Domain 管理",
+        "totalCount": "全体 {count}件",
+        "typeFilter": {
+          "all": "全体",
+          "code": "Code",
+          "general": "一般",
+          "id": "識別子"
+        },
+        "validationRequired": "Domain名、キーDomain名、キーDomain物理名は必須です"
+      },
+      "terms": {
+        "col": {
+          "desc": "説明",
+          "logNm": "論理名",
+          "phyNmLower": "物理名(小文字)",
+          "phyNmUpper": "物理名(大文字)"
+        },
+        "deleteConfirm": "\"{name}\"を削除しますか？",
+        "deleteFail": "削除失敗",
+        "deleteSuccess": "削除しました",
+        "editSuccess": "修正しました",
+        "field": {
+          "autoPhyNm": "自動生成物理名",
+          "desc": "説明 (任意)",
+          "domainSelect": "標準Domain * (物理名最後の要素)",
+          "logNm": "論理名 *",
+          "wordSelect": "構成単語選択 *",
+          "wordSelectHint": "(追加順序 = 物理名順序)"
+        },
+        "formTitleEdit": "用語修正",
+        "formTitleNew": "新規標準用語登録",
+        "noData": "用語がありません。",
+        "placeholder": {
+          "desc": "用語説明",
+          "domainSelect": "Domain選択…",
+          "logNm": "例: 社員名",
+          "wordSearch": "単語検索後クリックで追加…"
+        },
+        "saveFail": "保存失敗",
+        "saveSuccess": "登録しました",
+        "searchPlaceholder": "論理名 / 物理名 検索…",
+        "title": "標準用語管理",
+        "totalCount": "合計 {count}件",
+        "validationLogNm": "論理名は必須です",
+        "validationPhyNm": "物理名を生成できません",
+        "validationWordDomain": "構成単語とDomainを選択する必要があります"
+      },
+      "words": {
+        "col": {
+          "desc": "説明",
+          "logNm": "論理名",
+          "phyNmAbbr": "物理名(略語)",
+          "phyNmFull": "物理名(全体)",
+          "status": "状態",
+          "typeLen": "Type/長さ"
+        },
+        "deleteConfirm": "\"{name}\" 単語を削除しますか？",
+        "deleteFail": "削除失敗",
+        "deleteSuccess": "削除しました",
+        "editSuccess": "修正しました",
+        "field": {
+          "dataLen": "Data 長さ",
+          "dataType": "Data Type",
+          "desc": "説明",
+          "logNm": "論理名 *",
+          "phyNmAbbr": "物理名(略語) *",
+          "phyNmFull": "物理名(全体)"
+        },
+        "formTitleEdit": "単語修正",
+        "formTitleNew": "新規単語登録",
+        "noData": "単語がありません。",
+        "placeholder": {
+          "dataLen": "例: 100",
+          "dataType": "例: VARCHAR",
+          "desc": "単語説明 (任意)",
+          "logNm": "例: ユーザー",
+          "phyNmAbbr": "例: USR",
+          "phyNmFull": "例: User"
+        },
+        "saveFail": "保存失敗",
+        "saveSuccess": "登録しました",
+        "searchPlaceholder": "論理名 / 物理名検索…",
+        "title": "標準単語管理",
+        "totalCount": "合計 {count}件",
+        "validationRequired": "論理名と物理名は必須です"
+      }
+    },
+    "users": {
+      "changeFail": "変更失敗",
+      "col": {
+        "changeRole": "役割変更",
+        "googleAccount": "Googleアカウント",
+        "joinDate": "登録日",
+        "piAccount": "Piアカウント",
+        "role": "役割",
+        "user": "ユーザー"
+      },
+      "noUsers": "ユーザーがいません。",
+      "roleChanged": "役割が変更されました",
+      "title": "ユーザー管理",
+      "totalCount": "全 {count}名"
+    }
+  },
+  "attachment": {
+    "delete": "削除",
+    "deleteConfirm": "Attachmentを削除しますか？",
+    "deleteFail": "削除に失敗しました",
+    "deleteSuccess": "削除されました",
+    "sizeLimit": "最大5個 · ファイルあたり20MB",
+    "title": "Attachment",
+    "titleCount": "Attachment ({count})",
+    "upload": "ファイルを追加",
+    "uploadFail": "アップロードに失敗しました",
+    "uploading": "アップロード中…",
+    "uploadSuccess": "{count}個のファイルがアップロードされました"
+  },
+  "board": {
+    "adopted": "採用",
+    "adoptedComplete": "採用完了",
+    "columns": {
+      "author": "作成者",
+      "date": "日付",
+      "title": "Title",
+      "views": "Views"
+    },
+    "contentPlaceholder": "Contentを入力してください",
+    "createFail": "作成失敗",
+    "createSuccess": "投稿が作成されました",
+    "creating": "登録中…",
+    "deleteFail": "削除失敗",
+    "deletePost": "投稿を削除しますか？",
+    "deleteSuccess": "削除されました",
+    "editFail": "修正失敗",
+    "editPost": "修正",
+    "editSuccess": "修正されました",
+    "editTitle": "{name} — 修正",
+    "featureAttachment": "Attachment",
+    "featureComment": "Comment",
+    "modified": "(修正済み)",
+    "noBoards": "登録されたBoardはありません。",
+    "noData": "まだ投稿がありません。",
+    "noResults": "\"{q}\" の検索結果はありません。",
+    "notice": "Notice",
+    "postContent": "Content",
+    "postTitle": "Title",
+    "saving": "修正中…",
+    "searchPlaceholder": "TitleまたはContentを検索",
+    "submitPost": "登録",
+    "title": "Board",
+    "titlePlaceholder": "Titleを入力してください",
+    "viewCount": "Views {count}",
+    "write": "投稿する",
+    "writeTitle": "{name} — 投稿する"
+  },
+  "comment": {
+    "adopt": "採用",
+    "adoptCancelSuccess": "採用が取り消されました",
+    "adoptedAnswer": "採用された回答",
+    "adoptSuccess": "回答が採用されました",
+    "cancelAdopt": "採用取り消し",
+    "count": "{count}件",
+    "createFail": "コメントの投稿に失敗しました",
+    "createSuccess": "コメントが投稿されました",
+    "deleteConfirm": "コメントを削除しますか？",
+    "deleteFail": "処理に失敗しました",
+    "deleteSuccess": "コメントが削除されました",
+    "loginRequired": "コメントを投稿するにはログインしてください。",
+    "noComments": "まだコメントがありません。",
+    "placeholder": "コメントを入力してください (Ctrl+Enterで投稿)",
+    "submit": "コメントを投稿",
+    "title": "コメント"
+  },
+  "common": {
+    "all": "すべて",
+    "back": "戻る",
+    "cancel": "キャンセル",
+    "close": "閉じる",
+    "confirm": "確認",
+    "count": "{count}件",
+    "countPerson": "{count}名",
+    "create": "登録",
+    "creating": "登録中…",
+    "delete": "削除",
+    "deleting": "削除中…",
+    "edit": "編集",
+    "error": "エラー発生",
+    "loading": "Loading…",
+    "newRegister": "+ 新規登録",
+    "next": "次へ",
+    "no": "いいえ",
+    "noData": "Dataがありません。",
+    "pageOf": "{current} / {total}",
+    "prev": "前へ",
+    "reset": "リセット",
+    "save": "保存",
+    "saving": "保存中…",
+    "search": "検索",
+    "yes": "はい"
+  },
+  "header": {
+    "admin": "Admin",
+    "board": "掲示板",
+    "googleLogin": "Google Login",
+    "logout": "Logout",
+    "piAuthenticating": "認証中…",
+    "piLogin": "Pi Login",
+    "piLoginDev": "Pi Login (dev)"
+  },
+  "home": {
+    "accountLink": "アカウント連携",
+    "button": "Button",
+    "buttonDefault": "基本",
+    "components": "shadcn/ui Component 例",
+    "detectingEnv": "環境検出中…",
+    "dialogDesc": "shadcn/uiのDialog Componentです。@base-ui/reactに基づいてアクセシビリティを完全にサポートします。",
+    "dialogTitle": "Starter Kitへようこそ！",
+    "dialogToast": "Dialog & Toast (Sonner)",
+    "dialogToastMsg": "DialogでToast！",
+    "email": "Email",
+    "errorToast": "Error Toast",
+    "errorToastMsg": "Error Toast の例",
+    "gettingStarted": "始める",
+    "google": "Google",
+    "inputLabel": "Input + Label",
+    "loginSection": "Login",
+    "openDialog": "Dialogを開く",
+    "piNetwork": "Pi Network",
+    "piPayment": "Pi Coin決済",
+    "showToast": "Toastを表示",
+    "stack": {
+      "envDesc": "Build時環境変数Type検証",
+      "nextjsDesc": "App Router, React 19, Turbopack",
+      "shadcnDesc": "base-nova Style, @base-ui/react ベース",
+      "tailwindDesc": "CSS-first 設定, @theme Directive",
+      "themesDesc": "Dark Mode / システムTheme自動連携",
+      "tsDesc": "strict Mode, Type安全性"
+    },
+    "step1": "環境変数ファイルを作成",
+    "step2": "必要なComponentを追加",
+    "step3": "で環境変数Schemaを定義後、開発を開始！",
+    "subtitle": "素早く始めるNext.js 15 + Tailwind CSS v4 + shadcn/ui Boilerplate",
+    "successToast": "Success Toast",
+    "successToastDesc": "richColors Optionが有効化されています。",
+    "successToastMsg": "Sonner Toast!",
+    "techStack": "含まれる技術 Stack",
+    "title": "Next.js Starter Kit"
+  },
+  "link": {
+    "checkingPi": "Piログインを確認中…",
+    "checkingSession": "Google セッション確認中…",
+    "codeExpiry": "10分以内に使用",
+    "codeInputLabel": "連携コード",
+    "codeLabel": "連携コード (通常のブラウザで入力)",
+    "complete": "連携が完了しました。",
+    "completeTitle": "アカウント連携処理中",
+    "desc": "PiアカウントとGoogleアカウントを連携します。",
+    "generate": "連携コードを生成",
+    "generateDesc": "下のボタンを押して6桁のコードを生成してください。通常のブラウザで/linkページにアクセスし、コードを入力するとアカウントが連携されます。",
+    "generateFail": "コード生成に失敗しました",
+    "generateTitle": "連携コード生成",
+    "generating": "コード生成中…",
+    "googleLink": "Google連携",
+    "googleLoginAndLink": "Googleログイン後に連携",
+    "googleLoginRequired": "コード入力後、Googleログイン画面に移動します。",
+    "inputDesc": "Pi Browserのこのページで生成した6桁のコードを入力してください。",
+    "inputTitle": "連携コード入力",
+    "invalidLink": "無効な連携リンクです。",
+    "linkDone": "アカウント連携完了！ホームに移動します…",
+    "linkedSuccess": "PiとGoogleアカウントが連携されました！ホームへ移動します…",
+    "linkFail": "連携失敗",
+    "linking": "連携中…",
+    "needPiLogin": "連携コードを生成するにはPiログインが必要です。",
+    "piLogin": "Piログイン",
+    "processing": "連携処理中…",
+    "regenerate": "新しいコードを生成",
+    "serverError": "サーバーエラーが発生しました",
+    "title": "Piアカウント連携"
+  }
+}

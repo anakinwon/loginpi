@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 type LinkStatus = 'linked' | 'pi_only' | 'google_only'
@@ -29,13 +30,9 @@ const STATUS_STYLE: Record<LinkStatus, string> = {
   google_only: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
 }
 
-const STATUS_LABEL: Record<LinkStatus, string> = {
-  linked:      '연동 완료',
-  pi_only:     'Pi 전용',
-  google_only: 'Google 전용',
-}
-
 export default function LinksPage() {
+  const t = useTranslations('admin.links')
+  const tc = useTranslations('common')
   const [users, setUsers] = useState<UserRow[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<LinkStatus | 'all'>('all')
@@ -47,6 +44,12 @@ export default function LinksPage() {
       .finally(() => setLoading(false))
   }, [])
 
+  const STATUS_LABEL: Record<LinkStatus, string> = {
+    linked:      t('status.linked'),
+    pi_only:     t('status.piOnly'),
+    google_only: t('status.googleOnly'),
+  }
+
   const counts = {
     linked:      users.filter((u) => getLinkStatus(u) === 'linked').length,
     pi_only:     users.filter((u) => getLinkStatus(u) === 'pi_only').length,
@@ -56,19 +59,18 @@ export default function LinksPage() {
   const filtered = filter === 'all' ? users : users.filter((u) => getLinkStatus(u) === filter)
 
   const STAT_CARDS = [
-    { label: '연동 완료', value: counts.linked, desc: 'Pi + Google 연결됨', key: 'linked' as LinkStatus },
-    { label: 'Pi 전용', value: counts.pi_only, desc: 'Google 미연동', key: 'pi_only' as LinkStatus },
-    { label: 'Google 전용', value: counts.google_only, desc: 'Pi 미연동', key: 'google_only' as LinkStatus },
+    { label: t('status.linked'), value: counts.linked, desc: t('desc.linked'), key: 'linked' as LinkStatus },
+    { label: t('status.piOnly'), value: counts.pi_only, desc: t('desc.piOnly'), key: 'pi_only' as LinkStatus },
+    { label: t('status.googleOnly'), value: counts.google_only, desc: t('desc.googleOnly'), key: 'google_only' as LinkStatus },
   ]
 
   return (
     <div className='space-y-4'>
       <div>
-        <h1 className='text-2xl font-bold'>계정 연동 현황</h1>
-        <p className='text-muted-foreground text-sm mt-1'>전체 {users.length}명</p>
+        <h1 className='text-2xl font-bold'>{t('title')}</h1>
+        <p className='text-muted-foreground text-sm mt-1'>{t('totalCount', { count: users.length })}</p>
       </div>
 
-      {/* 통계 카드 — 클릭 시 해당 필터로 이동 */}
       <div className='grid gap-4 sm:grid-cols-3'>
         {STAT_CARDS.map(({ label, value, desc, key }) => (
           <button key={key} onClick={() => setFilter(filter === key ? 'all' : key)} className='text-left'>
@@ -85,7 +87,6 @@ export default function LinksPage() {
         ))}
       </div>
 
-      {/* 상태 필터 탭 */}
       <div className='flex gap-2 flex-wrap'>
         {(['all', 'linked', 'pi_only', 'google_only'] as const).map((s) => (
           <button
@@ -97,27 +98,26 @@ export default function LinksPage() {
                 : 'border-border text-muted-foreground hover:bg-muted'
             }`}
           >
-            {s === 'all' ? `전체 (${users.length})` : `${STATUS_LABEL[s]} (${counts[s]})`}
+            {s === 'all' ? `${tc('all')} (${users.length})` : `${STATUS_LABEL[s]} (${counts[s]})`}
           </button>
         ))}
       </div>
 
-      {/* 사용자 테이블 */}
       {loading ? (
-        <p className='text-muted-foreground text-sm'>로딩 중…</p>
+        <p className='text-muted-foreground text-sm'>{tc('loading')}</p>
       ) : filtered.length === 0 ? (
-        <p className='text-muted-foreground text-sm'>해당 사용자가 없습니다.</p>
+        <p className='text-muted-foreground text-sm'>{t('noUsers')}</p>
       ) : (
         <div className='rounded-lg border overflow-x-auto'>
           <table className='w-full text-sm'>
             <thead className='bg-muted/50 border-b'>
               <tr>
-                <th className='text-left px-4 py-2 font-medium'>사용자</th>
-                <th className='text-left px-4 py-2 font-medium'>Pi 계정</th>
-                <th className='text-left px-4 py-2 font-medium'>Google 계정</th>
-                <th className='text-left px-4 py-2 font-medium'>연동 상태</th>
-                <th className='text-left px-4 py-2 font-medium'>역할</th>
-                <th className='text-left px-4 py-2 font-medium'>가입일</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.user')}</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.piAccount')}</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.googleAccount')}</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.linkStatus')}</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.role')}</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.joinDate')}</th>
               </tr>
             </thead>
             <tbody className='divide-y'>

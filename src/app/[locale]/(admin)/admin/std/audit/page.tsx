@@ -1,6 +1,7 @@
 'use client'
 
 import { Fragment, useEffect, useState, useCallback } from 'react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
@@ -15,12 +16,6 @@ interface AuditLog {
   chg_dtm:   string
 }
 
-const TBL_LABELS: Record<string, string> = {
-  std_dic:  '표준단어',
-  std_dom:  '표준도메인',
-  std_term: '표준용어',
-}
-
 const ACTION_STYLE: Record<string, string> = {
   INSERT: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
   UPDATE: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
@@ -28,6 +23,15 @@ const ACTION_STYLE: Record<string, string> = {
 }
 
 export default function StdAuditPage() {
+  const t = useTranslations('admin.std.audit')
+  const tc = useTranslations('common')
+
+  const TBL_LABELS: Record<string, string> = {
+    std_dic:  t('tableLabel.stdDic'),
+    std_dom:  t('tableLabel.stdDom'),
+    std_term: t('tableLabel.stdTerm'),
+  }
+
   const [logs, setLogs]       = useState<AuditLog[]>([])
   const [total, setTotal]     = useState(0)
   const [loading, setLoading] = useState(true)
@@ -73,52 +77,51 @@ export default function StdAuditPage() {
   return (
     <div className='space-y-4'>
       <div>
-        <h1 className='text-2xl font-bold'>변경 이력 (Audit Trail)</h1>
-        <p className='text-muted-foreground mt-1 text-sm'>전체 {total.toLocaleString()}건</p>
+        <h1 className='text-2xl font-bold'>{t('title')}</h1>
+        <p className='text-muted-foreground mt-1 text-sm'>{t('totalCount', { count: total.toLocaleString() })}</p>
       </div>
 
-      {/* 필터 */}
       <div className='flex flex-wrap items-end gap-3'>
         <label className='space-y-1'>
-          <span className='text-xs text-muted-foreground'>테이블</span>
+          <span className='text-xs text-muted-foreground'>{t('filter.table')}</span>
           <select
             value={tbl}
             onChange={(e) => { setTbl(e.target.value); setPage(1) }}
             className='border-input bg-background h-9 rounded-md border px-3 text-sm'
           >
-            <option value=''>전체</option>
+            <option value=''>{t('filter.allTables')}</option>
             {Object.entries(TBL_LABELS).map(([v, l]) => (
               <option key={v} value={v}>{l}</option>
             ))}
           </select>
         </label>
         <label className='space-y-1'>
-          <span className='text-xs text-muted-foreground'>시작일</span>
+          <span className='text-xs text-muted-foreground'>{t('filter.from')}</span>
           <Input type='date' value={from} onChange={(e) => { setFrom(e.target.value); setPage(1) }} className='h-9 w-36' />
         </label>
         <label className='space-y-1'>
-          <span className='text-xs text-muted-foreground'>종료일</span>
+          <span className='text-xs text-muted-foreground'>{t('filter.to')}</span>
           <Input type='date' value={to} onChange={(e) => { setTo(e.target.value); setPage(1) }} className='h-9 w-36' />
         </label>
         <Button size='sm' variant='outline' onClick={() => { setTbl(''); setFrom(''); setTo(''); setPage(1) }}>
-          초기화
+          {tc('reset')}
         </Button>
       </div>
 
       {loading ? (
-        <p className='text-muted-foreground text-sm'>로딩 중…</p>
+        <p className='text-muted-foreground text-sm'>{tc('loading')}</p>
       ) : logs.length === 0 ? (
-        <p className='text-muted-foreground text-sm'>이력이 없습니다.</p>
+        <p className='text-muted-foreground text-sm'>{t('noData')}</p>
       ) : (
         <div className='rounded-lg border overflow-x-auto'>
           <table className='w-full text-sm'>
             <thead className='bg-muted/50 border-b'>
               <tr>
-                <th className='text-left px-4 py-2 font-medium'>변경일시</th>
-                <th className='text-left px-4 py-2 font-medium'>테이블</th>
-                <th className='text-left px-4 py-2 font-medium'>대상</th>
-                <th className='text-left px-4 py-2 font-medium'>동작</th>
-                <th className='text-left px-4 py-2 font-medium'>변경자</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.changedAt')}</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.table')}</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.target')}</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.action')}</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.changedBy')}</th>
                 <th className='px-4 py-2'></th>
               </tr>
             </thead>
@@ -158,7 +161,7 @@ export default function StdAuditPage() {
                         <div className='grid grid-cols-2 gap-4 text-xs'>
                           {log.old_val && (
                             <div>
-                              <p className='font-semibold text-muted-foreground mb-1'>변경 전</p>
+                              <p className='font-semibold text-muted-foreground mb-1'>{t('before')}</p>
                               <pre className='rounded bg-muted p-2 overflow-x-auto font-mono text-xs max-h-48'>
                                 {JSON.stringify(log.old_val, null, 2)}
                               </pre>
@@ -166,7 +169,7 @@ export default function StdAuditPage() {
                           )}
                           {log.new_val && (
                             <div>
-                              <p className='font-semibold text-muted-foreground mb-1'>변경 후</p>
+                              <p className='font-semibold text-muted-foreground mb-1'>{t('after')}</p>
                               <pre className='rounded bg-muted p-2 overflow-x-auto font-mono text-xs max-h-48'>
                                 {JSON.stringify(log.new_val, null, 2)}
                               </pre>
@@ -183,15 +186,14 @@ export default function StdAuditPage() {
         </div>
       )}
 
-      {/* 페이지네이션 */}
       {totalPages > 1 && (
         <div className='flex items-center gap-2'>
           <Button size='sm' variant='outline' disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
-            이전
+            {tc('prev')}
           </Button>
-          <span className='text-sm text-muted-foreground'>{page} / {totalPages}</span>
+          <span className='text-sm text-muted-foreground'>{tc('pageOf', { current: page, total: totalPages })}</span>
           <Button size='sm' variant='outline' disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)}>
-            다음
+            {tc('next')}
           </Button>
         </div>
       )}

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 
@@ -26,6 +27,7 @@ function formatSize(bytes: number): string {
 }
 
 export function AttachmentSection({ category, postId, initialAttachments, canUpload }: Props) {
+  const t = useTranslations('attachment')
   const [attachments, setAttachments] = useState<Attachment[]>(initialAttachments)
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -50,10 +52,10 @@ export function AttachmentSection({ category, postId, initialAttachments, canUpl
           reg_dtm: new Date().toISOString(),
         })),
       ])
-      toast.success(`${uploaded.length}개 파일이 업로드됐습니다`)
+      toast.success(t('uploadSuccess', { count: uploaded.length }))
     } else {
       const { error } = await res.json()
-      toast.error(error ?? '업로드 실패')
+      toast.error(error ?? t('uploadFail'))
     }
 
     setUploading(false)
@@ -61,16 +63,16 @@ export function AttachmentSection({ category, postId, initialAttachments, canUpl
   }
 
   const handleDelete = async (attchId: string) => {
-    if (!confirm('첨부파일을 삭제할까요?')) return
+    if (!confirm(t('deleteConfirm'))) return
     const res = await fetch(`/api/board/${category}/${postId}/attachments/${attchId}`, {
       method: 'DELETE',
     })
     if (res.ok) {
       setAttachments((prev) => prev.filter((a) => a.attch_id !== attchId))
-      toast.success('삭제됐습니다')
+      toast.success(t('deleteSuccess'))
     } else {
       const { error } = await res.json()
-      toast.error(error ?? '삭제 실패')
+      toast.error(error ?? t('deleteFail'))
     }
   }
 
@@ -79,7 +81,7 @@ export function AttachmentSection({ category, postId, initialAttachments, canUpl
   return (
     <div className='mb-8 rounded-lg border p-4'>
       <h3 className='mb-3 text-sm font-medium'>
-        첨부파일{attachments.length > 0 ? ` (${attachments.length})` : ''}
+        {attachments.length > 0 ? t('titleCount', { count: attachments.length }) : t('title')}
       </h3>
 
       {attachments.length > 0 && (
@@ -102,7 +104,7 @@ export function AttachmentSection({ category, postId, initialAttachments, canUpl
                   onClick={() => handleDelete(att.attch_id)}
                   className='shrink-0 text-xs text-destructive hover:underline'
                 >
-                  삭제
+                  {t('delete')}
                 </button>
               )}
             </li>
@@ -125,9 +127,9 @@ export function AttachmentSection({ category, postId, initialAttachments, canUpl
             disabled={uploading}
             onClick={() => fileInputRef.current?.click()}
           >
-            {uploading ? '업로드 중…' : '파일 추가'}
+            {uploading ? t('uploading') : t('upload')}
           </Button>
-          <p className='mt-1.5 text-xs text-muted-foreground'>최대 5개 · 파일당 20MB</p>
+          <p className='mt-1.5 text-xs text-muted-foreground'>{t('sizeLimit')}</p>
         </>
       )}
     </div>

@@ -1,15 +1,24 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 
-// locale 코드 → ISO 3166-1 alpha-2 (flag-icons 클래스용)
 const LOCALE_COUNTRY: Record<string, string> = {
   ko: 'kr', en: 'us', zh: 'cn', ja: 'jp', hi: 'in',
   vi: 'vn', af: 'za', fil: 'ph', th: 'th', id: 'id',
   ms: 'my', es: 'es', fr: 'fr', de: 'de', it: 'it', ru: 'ru',
   pt: 'pt', ar: 'eg',
+}
+
+// 언어 고유 명칭 (현지 스크립트)
+const NATIVE_NAMES: Record<string, string> = {
+  ko: '한국어', en: 'English', zh: '中文', ja: '日本語', hi: 'हिन्दी',
+  vi: 'Tiếng Việt', af: 'Afrikaans', fil: 'Filipino', th: 'ภาษาไทย',
+  id: 'Bahasa Indonesia', ms: 'Bahasa Melayu', es: 'Español',
+  fr: 'Français', de: 'Deutsch', it: 'Italiano', ru: 'Русский',
+  pt: 'Português', ar: 'العربية',
 }
 
 function Flag({ locale }: { locale: string }) {
@@ -33,6 +42,8 @@ interface StatsData {
 }
 
 export default function I18nPage() {
+  const t = useTranslations('admin.i18n')
+  const tc = useTranslations('common')
   const [stats, setStats] = useState<StatsData | null>(null)
   const [loading, setLoading] = useState(true)
   const [translating, setTranslating] = useState<string | null>(null)
@@ -49,7 +60,14 @@ export default function I18nPage() {
   useEffect(() => { load() }, [load])
 
   async function translateAndSync(locale: string) {
+    const locStat = stats?.locales.find((l) => l.locale_cd === locale)
+    const pendingKeys = locStat ? locStat.total - locStat.translated : (stats?.totalKeys ?? 0)
+
     setTranslating(locale)
+    const toastId = toast.loading(
+      `${locale.toUpperCase()} ${t('translating')} (${pendingKeys}개 키, 최대 2분 소요)`
+    )
+
     try {
       const res = await fetch('/api/admin/i18n/translate', {
         method: 'POST',
@@ -57,24 +75,26 @@ export default function I18nPage() {
         body: JSON.stringify({ locale }),
       })
       const d = (await res.json()) as { translated?: number; error?: string; message?: string }
-      if (!res.ok) throw new Error(d.error ?? '번역 실패')
+      if (!res.ok) throw new Error(d.error ?? t('translateFail'))
+
       if (d.message) {
-        toast.info(d.message)
+        toast.info(d.message, { id: toastId })
       } else {
-        toast.success(`${d.translated ?? 0}개 번역 완료`)
+        toast.success(t('translateSuccess', { count: d.translated ?? 0 }), { id: toastId })
       }
 
-      // 번역 후 자동 동기화
       setSyncing(locale)
-      await fetch('/api/admin/i18n/sync', {
+      const syncRes = await fetch('/api/admin/i18n/sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ locale }),
       })
-      toast.success(`${locale} JSON 동기화 완료`)
+      if (syncRes.ok) {
+        toast.success(`${locale.toUpperCase()} JSON ${t('syncSuccess', { count: 1 })}`)
+      }
       load()
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : '오류 발생')
+      toast.error(err instanceof Error ? err.message : tc('error'), { id: toastId })
     } finally {
       setTranslating(null)
       setSyncing(null)
@@ -92,18 +112,18 @@ export default function I18nPage() {
       const d = (await res.json()) as { synced: string[]; skipped: string[]; errors: string[] }
 
       if (d.errors.length > 0) {
-        toast.error(`오류 발생: ${d.errors.join(', ')}`)
+        toast.error(`${tc('error')}: ${d.errors.join(', ')}`)
       }
 
       if (d.synced.length > 0) {
-        toast.success(`${d.synced.length}개 언어 동기화 완료`)
+        toast.success(t('syncSuccess', { count: d.synced.length }))
       } else if (d.errors.length === 0) {
-        toast.info('DB에 동기화할 데이터가 없습니다. 먼저 "번역 + 동기화"를 실행해 주세요.')
+        toast.info(t('syncNoData'))
       }
 
       load()
     } catch {
-      toast.error('동기화 실패')
+      toast.error(t('syncFail'))
     } finally {
       setSyncing(null)
     }
@@ -113,8 +133,8 @@ export default function I18nPage() {
     <div className='space-y-6'>
       <div className='flex items-center justify-between'>
         <div>
-          <h1 className='text-2xl font-bold'>다국어 관리</h1>
-          <p className='text-muted-foreground mt-1 text-sm'>번역 현황 대시보드</p>
+          <h1 className='text-2xl font-bold'>{t('title')}</h1>
+          <p className='text-muted-foreground mt-1 text-sm'>{t('desc')}</p>
         </div>
         <Button
           variant='outline'
@@ -122,40 +142,38 @@ export default function I18nPage() {
           disabled={syncing === 'all'}
           onClick={syncAll}
         >
-          {syncing === 'all' ? '동기화 중…' : 'DB→JSON 동기화'}
+          {syncing === 'all' ? t('syncing') : t('syncAll')}
         </Button>
       </div>
 
-      {/* 통계 카드 */}
       {stats && (
         <div className='grid grid-cols-3 gap-4'>
           <div className='rounded-lg border p-4'>
-            <p className='text-muted-foreground text-xs font-medium'>지원 언어</p>
+            <p className='text-muted-foreground text-xs font-medium'>{t('stats.supportedLocales')}</p>
             <p className='mt-1 text-3xl font-bold'>{stats.locales.length}</p>
           </div>
           <div className='rounded-lg border p-4'>
-            <p className='text-muted-foreground text-xs font-medium'>전체 번역 키</p>
+            <p className='text-muted-foreground text-xs font-medium'>{t('stats.totalKeys')}</p>
             <p className='mt-1 text-3xl font-bold'>{stats.totalKeys}</p>
           </div>
           <div className='rounded-lg border p-4'>
-            <p className='text-muted-foreground text-xs font-medium'>100% 완료</p>
+            <p className='text-muted-foreground text-xs font-medium'>{t('stats.completed')}</p>
             <p className='mt-1 text-3xl font-bold'>{stats.completed}</p>
-            <p className='text-muted-foreground text-xs'>{stats.locales.length}개 언어 중</p>
+            <p className='text-muted-foreground text-xs'>{t('stats.completedOf', { count: stats.locales.length })}</p>
           </div>
         </div>
       )}
 
-      {/* 언어별 번역 현황 */}
       {loading ? (
-        <p className='text-muted-foreground text-sm'>로딩 중…</p>
+        <p className='text-muted-foreground text-sm'>{tc('loading')}</p>
       ) : (
         <div className='rounded-lg border overflow-hidden'>
           <table className='w-full text-sm'>
             <thead className='bg-muted/50 border-b'>
               <tr>
-                <th className='text-left px-4 py-2 font-medium'>언어</th>
-                <th className='text-left px-4 py-2 font-medium'>진행률</th>
-                <th className='text-right px-4 py-2 font-medium'>번역 키</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.language')}</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.progress')}</th>
+                <th className='text-right px-4 py-2 font-medium'>{t('col.translatedKeys')}</th>
                 <th className='px-4 py-2'></th>
               </tr>
             </thead>
@@ -166,7 +184,7 @@ export default function I18nPage() {
                     <div className='flex items-center gap-2'>
                       <Flag locale={loc.locale_cd} />
                       <div>
-                        <p className='font-medium'>{loc.locale_nm}</p>
+                        <p className='font-medium'>{NATIVE_NAMES[loc.locale_cd] ?? loc.locale_nm}</p>
                         <p className='text-muted-foreground text-xs uppercase'>{loc.locale_cd}</p>
                       </div>
                     </div>
@@ -196,10 +214,10 @@ export default function I18nPage() {
                           onClick={() => translateAndSync(loc.locale_cd)}
                         >
                           {translating === loc.locale_cd
-                            ? '번역 중…'
+                            ? t('translating')
                             : syncing === loc.locale_cd
-                              ? '동기화 중…'
-                              : '번역 + 동기화'}
+                              ? t('syncingLocale')
+                              : t('translate')}
                         </Button>
                       </div>
                     )}
@@ -212,9 +230,9 @@ export default function I18nPage() {
       )}
 
       <p className='text-muted-foreground text-xs'>
-        * &quot;번역 + 동기화&quot;: Claude AI로 미번역 키를 자동 번역 후 messages/*.json 갱신
+        {t('footnote1')}
         <br />
-        * &quot;DB→JSON 동기화&quot;: DB에 저장된 번역 데이터를 JSON 파일에 반영만 합니다
+        {t('footnote2')}
       </p>
     </div>
   )

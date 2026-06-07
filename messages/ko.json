@@ -2,10 +2,13 @@
   "common": {
     "loading": "로딩 중…",
     "save": "저장",
+    "saving": "저장 중…",
     "cancel": "취소",
     "delete": "삭제",
+    "deleting": "삭제 중…",
     "edit": "수정",
     "create": "등록",
+    "creating": "등록 중…",
     "search": "검색",
     "reset": "초기화",
     "prev": "이전",
@@ -16,11 +19,21 @@
     "back": "뒤로",
     "close": "닫기",
     "yes": "예",
-    "no": "아니오"
+    "no": "아니오",
+    "error": "오류 발생",
+    "newRegister": "+ 신규 등록",
+    "count": "{count}건",
+    "countPerson": "{count}명",
+    "pageOf": "{current} / {total}"
   },
   "header": {
     "board": "게시판",
-    "admin": "Admin"
+    "admin": "Admin",
+    "logout": "로그아웃",
+    "piLogin": "Pi 로그인",
+    "piLoginDev": "Pi 로그인 (dev)",
+    "piAuthenticating": "인증 중…",
+    "googleLogin": "Google 로그인"
   },
   "home": {
     "title": "Next.js Starter Kit",
@@ -48,7 +61,18 @@
     "step1": "환경변수 파일 생성",
     "step2": "필요한 컴포넌트 추가",
     "step3": "에서 환경변수 스키마 정의 후 개발 시작!",
-    "email": "이메일"
+    "email": "이메일",
+    "buttonDefault": "기본",
+    "successToastMsg": "Sonner 토스트!",
+    "successToastDesc": "richColors 옵션이 활성화되어 있습니다.",
+    "stack": {
+      "nextjsDesc": "App Router, React 19, Turbopack",
+      "tailwindDesc": "CSS-first 설정, @theme 디렉티브",
+      "shadcnDesc": "base-nova 스타일, @base-ui/react 기반",
+      "tsDesc": "strict 모드, 타입 안전성",
+      "themesDesc": "다크모드 / 시스템 테마 자동 연동",
+      "envDesc": "빌드 시점 환경변수 타입 검증"
+    }
   },
   "board": {
     "title": "게시판",
@@ -63,7 +87,7 @@
     "notice": "공지",
     "adopted": "채택",
     "noData": "아직 게시글이 없습니다.",
-    "noResults": "검색 결과가 없습니다.",
+    "noResults": "\"{q}\" 검색 결과가 없습니다.",
     "searchPlaceholder": "제목 또는 내용 검색",
     "postTitle": "제목",
     "postContent": "내용",
@@ -78,9 +102,18 @@
     "submitPost": "등록",
     "deletePost": "게시글을 삭제할까요?",
     "deleteSuccess": "삭제됐습니다",
-    "deleteFail": "삭제 실패"
+    "deleteFail": "삭제 실패",
+    "viewCount": "조회 {count}",
+    "modified": "(수정됨)",
+    "adoptedComplete": "채택완료",
+    "writeTitle": "{name} — 글쓰기",
+    "editTitle": "{name} — 수정",
+    "contentPlaceholder": "내용을 입력하세요",
+    "featureComment": "댓글",
+    "featureAttachment": "첨부파일"
   },
   "comment": {
+    "title": "댓글",
     "count": "{count}개",
     "noComments": "아직 댓글이 없습니다.",
     "adoptedAnswer": "채택된 답변",
@@ -93,11 +126,415 @@
     "deleteConfirm": "댓글을 삭제할까요?",
     "deleteSuccess": "댓글이 삭제됐습니다",
     "deleteFail": "처리 실패",
+    "adoptSuccess": "답변이 채택됐습니다",
+    "adoptCancelSuccess": "채택이 취소됐습니다",
     "loginRequired": "댓글을 작성하려면 로그인하세요."
+  },
+  "attachment": {
+    "title": "첨부파일",
+    "titleCount": "첨부파일 ({count})",
+    "delete": "삭제",
+    "upload": "파일 추가",
+    "uploading": "업로드 중…",
+    "uploadSuccess": "{count}개 파일이 업로드됐습니다",
+    "uploadFail": "업로드 실패",
+    "deleteConfirm": "첨부파일을 삭제할까요?",
+    "deleteSuccess": "삭제됐습니다",
+    "deleteFail": "삭제 실패",
+    "sizeLimit": "최대 5개 · 파일당 20MB"
   },
   "link": {
     "title": "Pi 계정 연동",
     "desc": "Pi 계정과 Google 계정을 연동합니다.",
-    "complete": "연동이 완료됐습니다."
+    "complete": "연동이 완료됐습니다.",
+    "checkingPi": "Pi 로그인 확인 중…",
+    "generateTitle": "연동 코드 생성",
+    "inputTitle": "연동 코드 입력",
+    "needPiLogin": "연동 코드를 생성하려면 Pi 로그인이 필요합니다.",
+    "piLogin": "Pi 로그인",
+    "generateDesc": "아래 버튼을 눌러 6자리 코드를 생성하세요. 일반 브라우저에서 /link 페이지에 접속해 코드를 입력하면 계정이 연동됩니다.",
+    "generating": "코드 생성 중…",
+    "regenerate": "새 코드 생성",
+    "generate": "연동 코드 생성",
+    "codeLabel": "연동 코드 (일반 브라우저에서 입력)",
+    "codeExpiry": "10분 내 사용",
+    "generateFail": "코드 생성 실패",
+    "inputDesc": "Pi Browser의 이 페이지에서 생성한 6자리 코드를 입력하세요.",
+    "codeInputLabel": "연동 코드",
+    "googleLoginRequired": "코드 입력 후 Google 로그인 화면으로 이동합니다.",
+    "linking": "연동 중…",
+    "googleLink": "Google 연동",
+    "googleLoginAndLink": "Google 로그인 후 연동",
+    "linkDone": "계정 연동 완료! 홈으로 이동합니다…",
+    "linkFail": "연동 실패",
+    "completeTitle": "계정 연동 처리 중",
+    "checkingSession": "Google 세션 확인 중…",
+    "processing": "연동 처리 중…",
+    "linkedSuccess": "Pi와 Google 계정이 연동됐습니다! 홈으로 이동합니다…",
+    "serverError": "서버 오류가 발생했습니다",
+    "invalidLink": "유효하지 않은 연동 링크입니다."
+  },
+  "admin": {
+    "nav": {
+      "title": "Admin",
+      "dashboard": "대시보드",
+      "users": "사용자 관리",
+      "payments": "결제 내역",
+      "links": "계정 연동 현황",
+      "board": "게시판 관리",
+      "stdSection": "데이터 표준",
+      "stdWords": "표준단어",
+      "stdDomains": "표준도메인",
+      "stdTerms": "표준용어",
+      "stdDdl": "DDL Export",
+      "stdAudit": "변경 이력",
+      "stdApprovals": "승인 워크플로우",
+      "i18nSection": "다국어",
+      "i18n": "다국어 관리",
+      "backHome": "← 홈으로"
+    },
+    "dashboard": {
+      "title": "대시보드",
+      "greeting": "안녕하세요, {name}님 ({role})",
+      "totalUsers": "전체 사용자",
+      "totalUsersDesc": "가입된 전체 계정 수",
+      "piOnly": "Pi 전용",
+      "piOnlyDesc": "Pi 계정만 있는 사용자",
+      "googleOnly": "Google 전용",
+      "googleOnlyDesc": "Google 계정만 있는 사용자",
+      "linked": "계정 연동",
+      "linkedDesc": "Pi + Google 연동 완료"
+    },
+    "users": {
+      "title": "사용자 관리",
+      "totalCount": "전체 {count}명",
+      "noUsers": "사용자가 없습니다.",
+      "col": {
+        "user": "사용자",
+        "piAccount": "Pi 계정",
+        "googleAccount": "Google 계정",
+        "role": "역할",
+        "joinDate": "가입일",
+        "changeRole": "역할 변경"
+      },
+      "roleChanged": "역할이 변경됐습니다",
+      "changeFail": "변경 실패"
+    },
+    "payments": {
+      "title": "결제 내역",
+      "totalCount": "전체 {count}건 · 완료 합계 {total} π",
+      "noPayments": "결제 내역이 없습니다.",
+      "status": {
+        "completed": "완료",
+        "approved": "승인",
+        "pending": "대기",
+        "cancelled": "취소",
+        "error": "오류"
+      },
+      "col": {
+        "user": "사용자",
+        "amount": "금액",
+        "memo": "메모",
+        "status": "상태",
+        "paymentId": "결제 ID",
+        "date": "일시"
+      }
+    },
+    "links": {
+      "title": "계정 연동 현황",
+      "totalCount": "전체 {count}명",
+      "noUsers": "해당 사용자가 없습니다.",
+      "status": {
+        "linked": "연동 완료",
+        "piOnly": "Pi 전용",
+        "googleOnly": "Google 전용"
+      },
+      "desc": {
+        "linked": "Pi + Google 연결됨",
+        "piOnly": "Google 미연동",
+        "googleOnly": "Pi 미연동"
+      },
+      "col": {
+        "user": "사용자",
+        "piAccount": "Pi 계정",
+        "googleAccount": "Google 계정",
+        "linkStatus": "연동 상태",
+        "role": "역할",
+        "joinDate": "가입일"
+      }
+    },
+    "board": {
+      "title": "게시판 관리",
+      "desc": "총 {count}개 게시글 · 공지 설정 및 강제 삭제",
+      "noData": "게시글이 없습니다.",
+      "loading": "불러오는 중…",
+      "col": {
+        "category": "카테고리",
+        "title": "제목",
+        "author": "작성자",
+        "views": "조회",
+        "date": "날짜",
+        "manage": "관리"
+      },
+      "notice": "공지",
+      "setPinned": "공지 설정",
+      "unsetPinned": "공지 해제",
+      "pinnedSuccess": "공지로 설정됐습니다",
+      "unpinnedSuccess": "공지가 해제됐습니다",
+      "processFail": "처리 실패",
+      "deleteConfirm": "\"{title}\" 게시글을 삭제할까요?",
+      "deleteSuccess": "게시글이 삭제됐습니다",
+      "deleteFail": "삭제 실패"
+    },
+    "std": {
+      "words": {
+        "title": "표준단어 관리",
+        "totalCount": "전체 {count}건",
+        "noData": "단어가 없습니다.",
+        "searchPlaceholder": "논리명 / 물리명 검색…",
+        "formTitleNew": "신규 단어 등록",
+        "formTitleEdit": "단어 수정",
+        "col": {
+          "logNm": "논리명",
+          "phyNmAbbr": "물리명(약어)",
+          "phyNmFull": "물리명(전체)",
+          "typeLen": "타입/길이",
+          "status": "상태",
+          "desc": "설명"
+        },
+        "field": {
+          "logNm": "논리명 *",
+          "phyNmAbbr": "물리명(약어) *",
+          "phyNmFull": "물리명(전체)",
+          "dataType": "데이터 타입",
+          "dataLen": "데이터 길이",
+          "desc": "설명"
+        },
+        "placeholder": {
+          "logNm": "예: 사용자",
+          "phyNmAbbr": "예: USR",
+          "phyNmFull": "예: User",
+          "dataType": "예: VARCHAR",
+          "dataLen": "예: 100",
+          "desc": "단어 설명 (선택)"
+        },
+        "validationRequired": "논리명과 물리명은 필수입니다",
+        "deleteConfirm": "\"{name}\" 단어를 삭제하시겠습니까?",
+        "saveSuccess": "등록됐습니다",
+        "editSuccess": "수정됐습니다",
+        "deleteSuccess": "삭제됐습니다",
+        "saveFail": "저장 실패",
+        "deleteFail": "삭제 실패"
+      },
+      "domains": {
+        "title": "표준도메인 관리",
+        "totalCount": "전체 {count}건",
+        "noData": "도메인이 없습니다.",
+        "searchPlaceholder": "도메인명 / 키도메인명 검색…",
+        "formTitleNew": "신규 도메인 등록",
+        "formTitleEdit": "도메인 수정",
+        "typeFilter": {
+          "all": "전체",
+          "code": "코드",
+          "id": "식별자",
+          "general": "일반"
+        },
+        "col": {
+          "domNm": "도메인명",
+          "keyDomNm": "키도메인명",
+          "phyNm": "물리명",
+          "type": "구분",
+          "dataType": "데이터 타입",
+          "desc": "설명"
+        },
+        "field": {
+          "domNm": "도메인명 *",
+          "keyDomNm": "키도메인명 *",
+          "keyDomPhyNm": "키도메인물리명 *",
+          "domType": "도메인 구분",
+          "dataType": "데이터 타입",
+          "dataLen": "길이",
+          "dataScale": "소수점 자리",
+          "desc": "설명"
+        },
+        "placeholder": {
+          "domNm": "예: 가격도메인",
+          "keyDomNm": "예: 가격",
+          "keyDomPhyNm": "예: PRICE",
+          "dataLen": "예: 100",
+          "dataScale": "예: 2",
+          "desc": "도메인 설명 (선택)"
+        },
+        "selectDomType": {
+          "code": "코드",
+          "id": "식별자",
+          "general": "일반"
+        },
+        "selectDataType": {
+          "varchar": "VARCHAR / TEXT",
+          "integer": "INTEGER",
+          "numeric": "NUMERIC",
+          "date": "DATE",
+          "timestamp": "TIMESTAMP"
+        },
+        "validationRequired": "도메인명, 키도메인명, 키도메인물리명은 필수입니다",
+        "deleteConfirm": "\"{name}\"을(를) 삭제하시겠습니까?",
+        "saveSuccess": "등록됐습니다",
+        "editSuccess": "수정됐습니다",
+        "deleteSuccess": "삭제됐습니다",
+        "saveFail": "저장 실패",
+        "deleteFail": "삭제 실패"
+      },
+      "terms": {
+        "title": "표준용어 관리",
+        "totalCount": "전체 {count}건",
+        "noData": "용어가 없습니다.",
+        "searchPlaceholder": "논리명 / 물리명 검색…",
+        "formTitleNew": "신규 표준용어 등록",
+        "formTitleEdit": "용어 수정",
+        "col": {
+          "logNm": "논리명",
+          "phyNmLower": "물리명(소문자)",
+          "phyNmUpper": "물리명(대문자)",
+          "desc": "설명"
+        },
+        "field": {
+          "logNm": "논리명 *",
+          "wordSelect": "구성 단어 선택 *",
+          "wordSelectHint": "(추가 순서 = 물리명 순서)",
+          "domainSelect": "표준도메인 * (물리명 마지막 요소)",
+          "autoPhyNm": "자동 생성 물리명",
+          "desc": "설명 (선택)"
+        },
+        "placeholder": {
+          "logNm": "예: 사원명",
+          "wordSearch": "단어 검색 후 클릭으로 추가…",
+          "domainSelect": "도메인 선택…",
+          "desc": "용어 설명"
+        },
+        "validationLogNm": "논리명은 필수입니다",
+        "validationWordDomain": "구성 단어와 도메인을 선택해야 합니다",
+        "validationPhyNm": "물리명을 생성할 수 없습니다",
+        "deleteConfirm": "\"{name}\"을(를) 삭제하시겠습니까?",
+        "saveSuccess": "등록됐습니다",
+        "editSuccess": "수정됐습니다",
+        "deleteSuccess": "삭제됐습니다",
+        "saveFail": "저장 실패",
+        "deleteFail": "삭제 실패"
+      },
+      "ddl": {
+        "title": "DDL Export",
+        "desc": "표준용어를 컬럼으로 선택하면 CREATE TABLE SQL이 자동 생성됩니다",
+        "sectionTable": "테이블 정보",
+        "sectionColumn": "컬럼 추가 — 표준용어에서 선택",
+        "sectionPreview": "DDL 미리보기",
+        "field": {
+          "tableNmEn": "테이블명(영문) *",
+          "tableNmKo": "테이블명(한글)"
+        },
+        "placeholder": {
+          "tableNmEn": "예: usr_info",
+          "tableNmKo": "예: 사용자정보",
+          "termSearch": "용어 검색 후 클릭으로 추가…"
+        },
+        "col": {
+          "colLogNm": "컬럼 (논리명)",
+          "type": "타입",
+          "pk": "PK",
+          "nn": "NN"
+        },
+        "copy": "복사",
+        "download": "↓ .sql",
+        "emptyPreview": "테이블명과 컬럼을 추가하면 DDL이 여기에 생성됩니다.",
+        "copySuccess": "DDL이 클립보드에 복사됐습니다"
+      },
+      "audit": {
+        "title": "변경 이력 (Audit Trail)",
+        "totalCount": "전체 {count}건",
+        "noData": "이력이 없습니다.",
+        "tableLabel": {
+          "stdDic": "표준단어",
+          "stdDom": "표준도메인",
+          "stdTerm": "표준용어"
+        },
+        "filter": {
+          "table": "테이블",
+          "from": "시작일",
+          "to": "종료일",
+          "allTables": "전체"
+        },
+        "col": {
+          "changedAt": "변경일시",
+          "table": "테이블",
+          "target": "대상",
+          "action": "동작",
+          "changedBy": "변경자"
+        },
+        "before": "변경 전",
+        "after": "변경 후"
+      },
+      "approvals": {
+        "title": "승인 워크플로우",
+        "totalCount": "전체 {count}건",
+        "noPending": "대기 중인 승인 요청이 없습니다.",
+        "noData": "데이터가 없습니다.",
+        "allTypes": "모든 유형",
+        "status": {
+          "pending": "대기",
+          "approved": "승인",
+          "rejected": "반려",
+          "all": "전체"
+        },
+        "entity": {
+          "stdDic": "표준단어",
+          "stdDom": "표준도메인",
+          "stdTerm": "표준용어"
+        },
+        "col": {
+          "requestedAt": "요청일시",
+          "type": "유형",
+          "target": "대상",
+          "requestedBy": "요청자",
+          "status": "상태"
+        },
+        "approve": "승인",
+        "reject": "반려",
+        "rejectReasonPlaceholder": "반려 사유를 입력해 주세요 *",
+        "rejectConfirm": "반려 확정",
+        "rejectReason": "반려 사유: {reason}",
+        "decidedBy": "처리자: {name} / {date}",
+        "requestData": "요청 데이터",
+        "approveSuccess": "승인됐습니다",
+        "rejectSuccess": "반려됐습니다",
+        "processFail": "처리 실패"
+      }
+    },
+    "i18n": {
+      "title": "다국어 관리",
+      "desc": "번역 현황 대시보드",
+      "syncAll": "DB→JSON 동기화",
+      "syncing": "동기화 중…",
+      "stats": {
+        "supportedLocales": "지원 언어",
+        "totalKeys": "전체 번역 키",
+        "completed": "100% 완료",
+        "completedOf": "{count}개 언어 중"
+      },
+      "col": {
+        "language": "언어",
+        "progress": "진행률",
+        "translatedKeys": "번역 키"
+      },
+      "translate": "번역 + 동기화",
+      "translating": "번역 중…",
+      "syncingLocale": "동기화 중…",
+      "translateSuccess": "{count}개 번역 완료",
+      "translateFail": "번역 실패",
+      "syncSuccess": "{count}개 언어 동기화 완료",
+      "syncNoData": "DB에 동기화할 데이터가 없습니다. 먼저 \"번역 + 동기화\"를 실행해 주세요.",
+      "syncFail": "동기화 실패",
+      "footnote1": "* \"번역 + 동기화\": Claude AI로 미번역 키를 자동 번역 후 messages/*.json 갱신",
+      "footnote2": "* \"DB→JSON 동기화\": DB에 저장된 번역 데이터를 JSON 파일에 반영만 합니다"
+    }
   }
 }

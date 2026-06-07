@@ -1,20 +1,24 @@
 import Link from 'next/link'
+import { getTranslations } from 'next-intl/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import type { CategoryRow } from '@/lib/board'
 
 export default async function BoardIndexPage() {
-  const { data: categories } = await getSupabaseAdmin()
-    .from('brd_ctgr')
-    .select('*')
-    .eq('use_yn', 'Y')
-    .order('sort_ord', { ascending: true })
+  const [{ data: categories }, t] = await Promise.all([
+    getSupabaseAdmin()
+      .from('brd_ctgr')
+      .select('*')
+      .eq('use_yn', 'Y')
+      .order('sort_ord', { ascending: true }),
+    getTranslations('board'),
+  ])
 
   return (
     <div className='mx-auto max-w-4xl px-4 py-12'>
-      <h1 className='mb-8 text-2xl font-bold'>게시판</h1>
+      <h1 className='mb-8 text-2xl font-bold'>{t('title')}</h1>
 
       {(!categories || categories.length === 0) ? (
-        <p className='text-muted-foreground'>등록된 게시판이 없습니다.</p>
+        <p className='text-muted-foreground'>{t('noBoards')}</p>
       ) : (
         <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
           {(categories as CategoryRow[]).map((ctgr) => (
@@ -27,12 +31,12 @@ export default async function BoardIndexPage() {
               <div className='mt-3 flex flex-wrap gap-1.5'>
                 {ctgr.cmnt_yn === 'Y' && (
                   <span className='rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground'>
-                    댓글
+                    {t('featureComment')}
                   </span>
                 )}
                 {ctgr.attch_yn === 'Y' && (
                   <span className='rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground'>
-                    첨부파일
+                    {t('featureAttachment')}
                   </span>
                 )}
               </div>

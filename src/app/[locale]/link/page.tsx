@@ -1,6 +1,7 @@
 'use client'
 
 import { Suspense, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { signIn as googleSignIn, useSession } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -14,6 +15,8 @@ import { usePiAuth } from '@/components/pi-auth-provider'
 //   piUser 없음 → 코드 입력 UI  (일반 브라우저)
 //   ?generate=1  → 항상 생성 UI  (UA 감지 실패 시 강제 진입용)
 function LinkPageInner() {
+  const t = useTranslations('link')
+  const tc = useTranslations('common')
   const { user: piUser, piAccessToken, isLoading: piLoading, signIn: piSignIn } = usePiAuth()
   const { data: googleSession, status: googleStatus } = useSession()
   const params = useSearchParams()
@@ -22,15 +25,12 @@ function LinkPageInner() {
   const forceGenerate = params.get('generate') === '1'
   const showGenerate = forceGenerate || !!piUser
 
-  // URL ?code= 파라미터로 코드 자동 채우기
   const codeFromUrl = (params.get('code') ?? '').replace(/\D/g, '').slice(0, 6)
 
-  // ── 생성 상태 ──
   const [genStatus, setGenStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
   const [genCode, setGenCode] = useState('')
   const [genErr, setGenErr] = useState('')
 
-  // ── 입력 상태 ──
   const [inputCode, setInputCode] = useState(codeFromUrl)
   const [linkStatus, setLinkStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
   const [linkErr, setLinkErr] = useState('')
@@ -57,12 +57,12 @@ function LinkPageInner() {
         await piSignIn()
         return generateCode(true)
       }
-      if (!res.ok || !data.code) throw new Error(data.error ?? '코드 생성 실패')
+      if (!res.ok || !data.code) throw new Error(data.error ?? t('generateFail'))
       setGenCode(data.code)
       setGenStatus('done')
     } catch (err) {
       setGenStatus('error')
-      setGenErr(err instanceof Error ? err.message : '오류 발생')
+      setGenErr(err instanceof Error ? err.message : tc('error'))
     }
   }
 
@@ -84,57 +84,47 @@ function LinkPageInner() {
         body: JSON.stringify({ code: digits }),
       })
       const data = (await res.json()) as { success?: boolean; error?: string }
-      if (!res.ok || !data.success) throw new Error(data.error ?? '연동 실패')
+      if (!res.ok || !data.success) throw new Error(data.error ?? t('linkFail'))
       setLinkStatus('done')
       setTimeout(() => router.push('/'), 1500)
     } catch (err) {
       setLinkStatus('error')
-      setLinkErr(err instanceof Error ? err.message : '오류 발생')
+      setLinkErr(err instanceof Error ? err.message : tc('error'))
     }
   }
 
-  // ── 초기 로딩 (Pi SDK 인증 중) ──────────────────────────
   if (piLoading) {
     return (
       <div className='min-h-[60vh] flex items-center justify-center px-4'>
         <Card className='w-full max-w-sm'>
           <CardContent className='py-10 text-center space-y-3'>
             <div className='mx-auto h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent' />
-            <p className='text-sm text-muted-foreground'>Pi 로그인 확인 중…</p>
+            <p className='text-sm text-muted-foreground'>{t('checkingPi')}</p>
           </CardContent>
         </Card>
       </div>
     )
   }
 
-  // ── 코드 생성 UI (piUser 있거나 ?generate=1) ───────────
   if (showGenerate) {
     return (
       <div className='min-h-[60vh] flex items-center justify-center px-4'>
         <Card className='w-full max-w-sm'>
           <CardHeader>
-            <CardTitle>연동 코드 생성</CardTitle>
+            <CardTitle>{t('generateTitle')}</CardTitle>
           </CardHeader>
           <CardContent className='space-y-4'>
             {!piUser ? (
-              /* ?generate=1 강제 진입했지만 Pi 로그인 안 된 상태 */
               <div className='space-y-3'>
-                <p className='text-sm text-muted-foreground'>
-                  연동 코드를 생성하려면 Pi 로그인이 필요합니다.
-                </p>
+                <p className='text-sm text-muted-foreground'>{t('needPiLogin')}</p>
                 <Button className='w-full' onClick={() => piSignIn()}>
-                  Pi 로그인
+                  {t('piLogin')}
                 </Button>
               </div>
-
             ) : (
-              /* 코드 생성 버튼 + 결과를 바로 아래에 표시 */
               <div className='space-y-3'>
                 <p className='text-sm text-muted-foreground'>
-                  아래 버튼을 눌러 6자리 코드를 생성하세요.<br />
-                  일반 브라우저에서{' '}
-                  <span className='font-mono text-foreground'>/link</span>{' '}
-                  페이지에 접속해 코드를 입력하면 계정이 연동됩니다.
+                  {t('generateDesc')}
                 </p>
                 <Button
                   className='w-full'
@@ -142,20 +132,19 @@ function LinkPageInner() {
                   onClick={() => generateCode()}
                 >
                   {genStatus === 'loading'
-                    ? '코드 생성 중…'
+                    ? t('generating')
                     : genStatus === 'done'
-                      ? '새 코드 생성'
-                      : '연동 코드 생성'}
+                      ? t('regenerate')
+                      : t('generate')}
                 </Button>
 
-                {/* 버튼 바로 아래에 코드 표시 */}
                 {genStatus === 'done' && displayGenCode && (
                   <div className='rounded-lg border-2 border-primary/40 bg-primary/5 p-5 text-center space-y-2'>
-                    <p className='text-xs text-muted-foreground'>연동 코드 (일반 브라우저에서 입력)</p>
+                    <p className='text-xs text-muted-foreground'>{t('codeLabel')}</p>
                     <p className='text-5xl font-bold tracking-widest font-mono text-primary'>
                       {displayGenCode}
                     </p>
-                    <p className='text-xs text-muted-foreground'>10분 내 사용</p>
+                    <p className='text-xs text-muted-foreground'>{t('codeExpiry')}</p>
                   </div>
                 )}
 
@@ -170,27 +159,23 @@ function LinkPageInner() {
     )
   }
 
-  // ── 코드 입력 UI (일반 브라우저) ───────────────────────
   return (
     <div className='min-h-[60vh] flex items-center justify-center px-4'>
       <Card className='w-full max-w-sm'>
         <CardHeader>
-          <CardTitle>연동 코드 입력</CardTitle>
+          <CardTitle>{t('inputTitle')}</CardTitle>
         </CardHeader>
         <CardContent className='space-y-5'>
           {linkStatus === 'done' ? (
             <p className='text-green-600 dark:text-green-400 text-sm font-medium text-center py-4'>
-              ✓ 계정 연동 완료! 홈으로 이동합니다…
+              ✓ {t('linkDone')}
             </p>
           ) : (
             <>
-              <p className='text-sm text-muted-foreground'>
-                <span className='text-amber-600 dark:text-amber-400 font-medium'>Pi Browser</span>의{' '}
-                이 페이지에서 생성한 6자리 코드를 입력하세요.
-              </p>
+              <p className='text-sm text-muted-foreground'>{t('inputDesc')}</p>
               <form onSubmit={handleSubmit} className='space-y-4'>
                 <div className='space-y-1.5'>
-                  <Label htmlFor='link-code'>연동 코드</Label>
+                  <Label htmlFor='link-code'>{t('codeInputLabel')}</Label>
                   <Input
                     id='link-code'
                     inputMode='numeric'
@@ -206,7 +191,7 @@ function LinkPageInner() {
                 </div>
                 {!googleSession?.user && (
                   <p className='text-xs text-muted-foreground bg-muted rounded-md p-2'>
-                    코드 입력 후 Google 로그인 화면으로 이동합니다.
+                    {t('googleLoginRequired')}
                   </p>
                 )}
                 {linkStatus === 'error' && (
@@ -218,10 +203,10 @@ function LinkPageInner() {
                   disabled={!isValidCode || linkStatus === 'loading'}
                 >
                   {linkStatus === 'loading'
-                    ? '연동 중…'
+                    ? t('linking')
                     : googleSession?.user
-                      ? 'Google 연동'
-                      : 'Google 로그인 후 연동'}
+                      ? t('googleLink')
+                      : t('googleLoginAndLink')}
                 </Button>
               </form>
             </>

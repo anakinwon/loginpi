@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -39,6 +40,8 @@ export function CommentSection({
   currentUserRole,
   canComment,
 }: Props) {
+  const t = useTranslations('comment')
+  const tc = useTranslations('common')
   const [comments, setComments] = useState<Comment[]>(initialComments)
   const [acptId, setAcptId] = useState(acptCmntId)
   const [content, setContent] = useState('')
@@ -69,26 +72,26 @@ export function CommentSection({
         },
       ])
       setContent('')
-      toast.success('댓글이 등록됐습니다')
+      toast.success(t('createSuccess'))
     } else {
       const { error } = await res.json()
-      toast.error(error ?? '댓글 등록 실패')
+      toast.error(error ?? t('createFail'))
     }
     setSubmitting(false)
   }
 
   const handleDelete = async (cmntId: string) => {
-    if (!confirm('댓글을 삭제할까요?')) return
+    if (!confirm(t('deleteConfirm'))) return
     const res = await fetch(`/api/board/${category}/${postId}/comments/${cmntId}`, {
       method: 'DELETE',
     })
     if (res.ok) {
       setComments((prev) => prev.filter((c) => c.cmnt_id !== cmntId))
       if (acptId === cmntId) setAcptId(null)
-      toast.success('댓글이 삭제됐습니다')
+      toast.success(t('deleteSuccess'))
     } else {
       const { error } = await res.json()
-      toast.error(error ?? '삭제 실패')
+      toast.error(error ?? t('deleteFail'))
     }
   }
 
@@ -103,20 +106,22 @@ export function CommentSection({
       setComments((prev) =>
         prev.map((c) => ({ ...c, acpt_yn: c.cmnt_id === cmntId ? 'Y' : 'N' }))
       )
-      toast.success(cmntId ? '답변이 채택됐습니다' : '채택이 취소됐습니다')
+      toast.success(cmntId ? t('adoptSuccess') : t('adoptCancelSuccess'))
     } else {
       const { error } = await res.json()
-      toast.error(error ?? '처리 실패')
+      toast.error(error ?? t('deleteFail'))
     }
   }
 
   return (
     <div className='mt-8 border-t pt-6'>
-      <h2 className='mb-4 text-lg font-semibold'>댓글 {comments.length > 0 ? `${comments.length}개` : ''}</h2>
+      <h2 className='mb-4 text-lg font-semibold'>
+        {t('title')}{comments.length > 0 ? ` ${t('count', { count: comments.length })}` : ''}
+      </h2>
 
       <div className='space-y-3'>
         {comments.length === 0 && (
-          <p className='py-6 text-center text-sm text-muted-foreground'>아직 댓글이 없습니다.</p>
+          <p className='py-6 text-center text-sm text-muted-foreground'>{t('noComments')}</p>
         )}
         {comments.map((comment) => {
           const isMyComment = currentUserId === comment.rgst_usr_id
@@ -136,7 +141,7 @@ export function CommentSection({
                   <span className='text-sm font-medium'>{comment.rgst_usr_nm}</span>
                   {isAccepted && (
                     <span className='rounded bg-green-100 px-1.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400'>
-                      채택된 답변
+                      {t('adoptedAnswer')}
                     </span>
                   )}
                 </div>
@@ -151,7 +156,7 @@ export function CommentSection({
                       className='h-6 px-2 text-xs'
                       onClick={() => handleAccept(isAccepted ? null : comment.cmnt_id)}
                     >
-                      {isAccepted ? '채택 취소' : '채택'}
+                      {isAccepted ? t('cancelAdopt') : t('adopt')}
                     </Button>
                   )}
                   {(isMyComment || isModerator) && (
@@ -161,7 +166,7 @@ export function CommentSection({
                       className='h-6 px-2 text-xs text-destructive hover:text-destructive'
                       onClick={() => handleDelete(comment.cmnt_id)}
                     >
-                      삭제
+                      {tc('delete')}
                     </Button>
                   )}
                 </div>
@@ -180,19 +185,19 @@ export function CommentSection({
             onKeyDown={(e) => {
               if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) handleSubmit()
             }}
-            placeholder='댓글을 입력하세요 (Ctrl+Enter로 등록)'
+            placeholder={t('placeholder')}
             rows={3}
             className='mb-2 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
           />
           <Button onClick={handleSubmit} disabled={submitting || !content.trim()} size='sm'>
-            {submitting ? '등록 중…' : '댓글 등록'}
+            {submitting ? tc('creating') : t('submit')}
           </Button>
         </div>
       )}
 
       {!canComment && (
         <p className='mt-6 text-center text-sm text-muted-foreground'>
-          댓글을 작성하려면 로그인하세요.
+          {t('loginRequired')}
         </p>
       )}
     </div>

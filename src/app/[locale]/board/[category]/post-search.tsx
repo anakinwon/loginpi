@@ -2,11 +2,14 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 
 export function PostSearch({ category, q }: { category: string; q?: string }) {
   const router = useRouter()
+  const t = useTranslations('board')
+  const tc = useTranslations('common')
   const [value, setValue] = useState(q ?? '')
 
   const search = () => {
@@ -20,11 +23,11 @@ export function PostSearch({ category, q }: { category: string; q?: string }) {
         value={value}
         onChange={(e) => setValue(e.target.value)}
         onKeyDown={(e) => e.key === 'Enter' && search()}
-        placeholder='제목 또는 내용 검색'
+        placeholder={t('searchPlaceholder')}
         className='max-w-xs'
       />
       <Button variant='outline' size='sm' onClick={search}>
-        검색
+        {tc('search')}
       </Button>
       {q && (
         <Button
@@ -35,7 +38,7 @@ export function PostSearch({ category, q }: { category: string; q?: string }) {
             router.push(`/board/${category}`)
           }}
         >
-          초기화
+          {tc('reset')}
         </Button>
       )}
     </div>

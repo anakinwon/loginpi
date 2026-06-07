@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 
@@ -26,6 +27,8 @@ const ROLE_COLOR: Record<Role, string> = {
 }
 
 export default function UsersPage() {
+  const t = useTranslations('admin.users')
+  const tc = useTranslations('common')
   const [users, setUsers] = useState<UserRow[]>([])
   const [loading, setLoading] = useState(true)
   const [changing, setChanging] = useState<string | null>(null)
@@ -47,12 +50,12 @@ export default function UsersPage() {
       })
       if (!res.ok) {
         const d = (await res.json()) as { error?: string }
-        throw new Error(d.error ?? '변경 실패')
+        throw new Error(d.error ?? t('changeFail'))
       }
       setUsers((prev) => prev.map((u) => (u.id === id ? { ...u, role } : u)))
-      toast.success('역할이 변경됐습니다')
+      toast.success(t('roleChanged'))
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : '오류 발생')
+      toast.error(err instanceof Error ? err.message : tc('error'))
     } finally {
       setChanging(null)
     }
@@ -61,27 +64,27 @@ export default function UsersPage() {
   return (
     <div className='space-y-4'>
       <div>
-        <h1 className='text-2xl font-bold'>사용자 관리</h1>
+        <h1 className='text-2xl font-bold'>{t('title')}</h1>
         <p className='text-muted-foreground text-sm mt-1'>
-          전체 {users.length}명
+          {t('totalCount', { count: users.length })}
         </p>
       </div>
 
       {loading ? (
-        <p className='text-muted-foreground text-sm'>로딩 중…</p>
+        <p className='text-muted-foreground text-sm'>{tc('loading')}</p>
       ) : users.length === 0 ? (
-        <p className='text-muted-foreground text-sm'>사용자가 없습니다.</p>
+        <p className='text-muted-foreground text-sm'>{t('noUsers')}</p>
       ) : (
         <div className='rounded-lg border overflow-hidden'>
           <table className='w-full text-sm'>
             <thead className='bg-muted/50 border-b'>
               <tr>
-                <th className='text-left px-4 py-2 font-medium'>사용자</th>
-                <th className='text-left px-4 py-2 font-medium'>Pi 계정</th>
-                <th className='text-left px-4 py-2 font-medium'>Google 계정</th>
-                <th className='text-left px-4 py-2 font-medium'>역할</th>
-                <th className='text-left px-4 py-2 font-medium'>가입일</th>
-                <th className='text-left px-4 py-2 font-medium'>역할 변경</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.user')}</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.piAccount')}</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.googleAccount')}</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.role')}</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.joinDate')}</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.changeRole')}</th>
               </tr>
             </thead>
             <tbody className='divide-y'>

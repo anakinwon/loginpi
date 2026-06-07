@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@supabase/supabase-js'
 import { readFile } from 'fs/promises'
 import { join } from 'path'
@@ -31,6 +30,34 @@ function flattenJson(obj: Record<string, unknown>, prefix = ''): Record<string, 
   return result
 }
 
+function sleep(ms: number) {
+  return new Promise<void>((resolve) => setTimeout(resolve, ms))
+}
+
+// Gemini REST API 호출 (SDK 불필요)
+async function callGemini(prompt: string, apiKey: string): Promise<string> {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: {
+        temperature: 0,
+        responseMimeType: 'application/json',
+      },
+    }),
+  })
+  if (!res.ok) {
+    const body = await res.text()
+    throw new Error(`${res.status}: ${body.slice(0, 300)}`)
+  }
+  const data = (await res.json()) as {
+    candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>
+  }
+  return data.candidates?.[0]?.content?.parts?.[0]?.text ?? ''
+}
+
 export async function POST(req: NextRequest) {
   const user = await getSessionUser()
   if (!isAdmin(user)) {
@@ -48,12 +75,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: '지원하지 않는 언어입니다' }, { status: 400 })
   }
 
-  const apiKey = process.env.ANTHROPIC_API_KEY
+  const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) {
-    return NextResponse.json({ error: 'ANTHROPIC_API_KEY가 설정되지 않았습니다' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'GEMINI_API_KEY가 설정되지 않았습니다. aistudio.google.com/apikey에서 무료 발급 후 .env.local에 추가하세요.' },
+      { status: 500 }
+    )
   }
 
-  // ko.json 파일을 직접 읽어서 source of truth로 사용
   const koJsonPath = join(process.cwd(), 'messages', 'ko.json')
   let koFlat: Record<string, string>
   try {
@@ -68,7 +97,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'ko.json이 비어있습니다' }, { status: 400 })
   }
 
-  // 대상 언어 기존 번역 조회 (미번역 키만 추출)
   const { data: existingMsgs } = await supabase
     .from('i18n_message')
     .select('msg_key, msg_val')
@@ -87,47 +115,60 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ translated: 0, message: '번역할 키가 없습니다' })
   }
 
-  const client = new Anthropic({ apiKey })
-
   const entries = Object.entries(toTranslate)
   const BATCH = 50
-  const upsertRows: { locale_cd: string; msg_key: string; msg_val: string; is_auto: string }[] = []
+  // Gemini 무료 15 RPM 제한: 첫 배치 이후 4.5초 대기
+  const RATE_LIMIT_DELAY = 4500
+  let totalUpserted = 0
 
   for (let i = 0; i < entries.length; i += BATCH) {
+    if (i > 0) await sleep(RATE_LIMIT_DELAY)
+
     const batch = Object.fromEntries(entries.slice(i, i + BATCH))
     const prompt = `Translate the following Korean UI strings to ${localeName}.
-Keep the same JSON key names. Return ONLY a valid JSON object with the translated values.
-Do not add explanations or markdown code blocks.
+Rules:
+- Korean loanwords originally from English (대시보드, 보드, 데이터, 콘텐츠, 카테고리 etc.) must be translated back to the original English word (Dashboard, Board, Data, Content, Category etc.)
+- Technical abbreviations (DDL, API, JSON, DB, SQL, HTML, ICU) must remain unchanged
+- Keep the same JSON key names
+- Return ONLY a valid JSON object with no markdown or explanation
 
 ${JSON.stringify(batch, null, 2)}`
 
-    const message = await client.messages.create({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 4096,
-      messages: [{ role: 'user', content: prompt }],
-    })
+    let text: string
+    try {
+      text = await callGemini(prompt, apiKey)
+    } catch (apiErr) {
+      const msg = apiErr instanceof Error ? apiErr.message : 'Gemini API 오류'
+      // 이미 번역된 데이터가 있으면 부분 성공 반환, 없으면 오류
+      if (totalUpserted > 0) {
+        return NextResponse.json({ translated: totalUpserted, message: `${totalUpserted}개 번역 후 중단: ${msg}` })
+      }
+      return NextResponse.json({ error: `번역 실패: ${msg}` }, { status: 502 })
+    }
 
-    const raw = (message.content[0] as { type: string; text: string }).text.trim()
     let translated: Record<string, string> = {}
     try {
-      const jsonMatch = raw.match(/\{[\s\S]*\}/)
+      const jsonMatch = text.match(/\{[\s\S]*\}/)
       if (jsonMatch) translated = JSON.parse(jsonMatch[0])
     } catch {
       continue
     }
 
+    const batchRows: { locale_cd: string; msg_key: string; msg_val: string; is_auto: string }[] = []
     for (const [key, val] of Object.entries(translated)) {
       if (typeof val === 'string') {
-        upsertRows.push({ locale_cd: locale, msg_key: key, msg_val: val, is_auto: 'Y' })
+        batchRows.push({ locale_cd: locale, msg_key: key, msg_val: val, is_auto: 'Y' })
       }
+    }
+
+    // 배치별 즉시 upsert — Gemini 실패 시에도 이전 배치 데이터 보존
+    if (batchRows.length > 0) {
+      await supabase
+        .from('i18n_message')
+        .upsert(batchRows, { onConflict: 'locale_cd,msg_key' })
+      totalUpserted += batchRows.length
     }
   }
 
-  if (upsertRows.length > 0) {
-    await supabase
-      .from('i18n_message')
-      .upsert(upsertRows, { onConflict: 'locale_cd,msg_key' })
-  }
-
-  return NextResponse.json({ translated: upsertRows.length })
+  return NextResponse.json({ translated: totalUpserted })
 }

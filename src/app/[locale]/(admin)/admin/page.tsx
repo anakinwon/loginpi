@@ -1,3 +1,4 @@
+import { getTranslations } from 'next-intl/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth-check'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -18,21 +19,21 @@ async function getStats() {
 }
 
 export default async function AdminDashboard() {
-  const [user, stats] = await Promise.all([getSessionUser(), getStats()])
+  const [user, stats, t] = await Promise.all([getSessionUser(), getStats(), getTranslations('admin.dashboard')])
 
   const STAT_CARDS = [
-    { label: '전체 사용자', value: stats.total, desc: '가입된 전체 계정 수' },
-    { label: 'Pi 전용', value: stats.piOnly, desc: 'Pi 계정만 있는 사용자' },
-    { label: 'Google 전용', value: stats.googleOnly, desc: 'Google 계정만 있는 사용자' },
-    { label: '계정 연동', value: stats.linked, desc: 'Pi + Google 연동 완료' },
+    { label: t('totalUsers'), value: stats.total, desc: t('totalUsersDesc') },
+    { label: t('piOnly'), value: stats.piOnly, desc: t('piOnlyDesc') },
+    { label: t('googleOnly'), value: stats.googleOnly, desc: t('googleOnlyDesc') },
+    { label: t('linked'), value: stats.linked, desc: t('linkedDesc') },
   ]
 
   return (
     <div className='space-y-6'>
       <div>
-        <h1 className='text-2xl font-bold'>대시보드</h1>
+        <h1 className='text-2xl font-bold'>{t('title')}</h1>
         <p className='text-muted-foreground text-sm mt-1'>
-          안녕하세요, {user?.display_name}님 ({user?.role})
+          {t('greeting', { name: user?.display_name ?? '', role: user?.role ?? '' })}
         </p>
       </div>
 

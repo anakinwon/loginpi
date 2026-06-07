@@ -2,28 +2,29 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 
 const NAV = [
-  { href: '/admin', label: '대시보드' },
-  { href: '/admin/users', label: '사용자 관리' },
-  { href: '/admin/payments', label: '결제 내역' },
-  { href: '/admin/links', label: '계정 연동 현황' },
-  { href: '/admin/board', label: '게시판 관리' },
-]
+  { href: '/admin',          labelKey: 'dashboard' },
+  { href: '/admin/users',    labelKey: 'users' },
+  { href: '/admin/payments', labelKey: 'payments' },
+  { href: '/admin/links',    labelKey: 'links' },
+  { href: '/admin/board',    labelKey: 'board' },
+] as const
 
 const STD_NAV = [
-  { href: '/admin/std/words', label: '표준단어' },
-  { href: '/admin/std/domains', label: '표준도메인' },
-  { href: '/admin/std/terms', label: '표준용어' },
-  { href: '/admin/std/ddl', label: 'DDL Export' },
-  { href: '/admin/std/audit', label: '변경 이력' },
-  { href: '/admin/std/approvals', label: '승인 워크플로우' },
-]
+  { href: '/admin/std/words',     labelKey: 'stdWords' },
+  { href: '/admin/std/domains',   labelKey: 'stdDomains' },
+  { href: '/admin/std/terms',     labelKey: 'stdTerms' },
+  { href: '/admin/std/ddl',       labelKey: 'stdDdl' },
+  { href: '/admin/std/audit',     labelKey: 'stdAudit' },
+  { href: '/admin/std/approvals', labelKey: 'stdApprovals' },
+] as const
 
 const I18N_NAV = [
-  { href: '/admin/i18n', label: '다국어 관리' },
-]
+  { href: '/admin/i18n', labelKey: 'i18n' },
+] as const
 
 function NavItem({ href, label, pathname }: { href: string; label: string; pathname: string }) {
   return (
@@ -42,35 +43,36 @@ function NavItem({ href, label, pathname }: { href: string; label: string; pathn
 }
 
 export function AdminSidebar() {
+  const t = useTranslations('admin.nav')
   const pathname = usePathname()
 
   return (
     <aside className='bg-muted/40 border-r w-48 shrink-0 flex flex-col'>
       <div className='border-b px-4 py-3'>
-        <p className='font-semibold text-sm'>Admin</p>
+        <p className='font-semibold text-sm'>{t('title')}</p>
       </div>
       <nav className='flex flex-col gap-1 p-2 flex-1'>
-        {NAV.map(({ href, label }) => (
-          <NavItem key={href} href={href} label={label} pathname={pathname} />
+        {NAV.map(({ href, labelKey }) => (
+          <NavItem key={href} href={href} label={t(labelKey)} pathname={pathname} />
         ))}
 
         <p className='text-muted-foreground px-3 pt-3 pb-1 text-xs font-semibold tracking-wide uppercase'>
-          데이터 표준
+          {t('stdSection')}
         </p>
-        {STD_NAV.map(({ href, label }) => (
-          <NavItem key={href} href={href} label={label} pathname={pathname} />
+        {STD_NAV.map(({ href, labelKey }) => (
+          <NavItem key={href} href={href} label={t(labelKey)} pathname={pathname} />
         ))}
 
         <p className='text-muted-foreground px-3 pt-3 pb-1 text-xs font-semibold tracking-wide uppercase'>
-          다국어
+          {t('i18nSection')}
         </p>
-        {I18N_NAV.map(({ href, label }) => (
-          <NavItem key={href} href={href} label={label} pathname={pathname} />
+        {I18N_NAV.map(({ href, labelKey }) => (
+          <NavItem key={href} href={href} label={t(labelKey)} pathname={pathname} />
         ))}
       </nav>
       <div className='border-t p-3'>
         <Link href='/' className='text-muted-foreground text-xs hover:underline'>
-          ← 홈으로
+          {t('backHome')}
         </Link>
       </div>
     </aside>

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -16,6 +17,8 @@ type Props = {
 
 export function PostForm({ category, postId, initialTitle = '', initialContent = '' }: Props) {
   const router = useRouter()
+  const t = useTranslations('board')
+  const tc = useTranslations('common')
   const [title, setTitle] = useState(initialTitle)
   const [content, setContent] = useState(initialContent)
   const [submitting, setSubmitting] = useState(false)
@@ -25,7 +28,7 @@ export function PostForm({ category, postId, initialTitle = '', initialContent =
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!title.trim()) {
-      toast.error('제목을 입력해주세요')
+      toast.error(t('titlePlaceholder'))
       return
     }
     setSubmitting(true)
@@ -41,13 +44,13 @@ export function PostForm({ category, postId, initialTitle = '', initialContent =
 
     if (res.ok) {
       const data = await res.json()
-      toast.success(isEdit ? '수정됐습니다' : '게시글이 작성됐습니다')
+      toast.success(isEdit ? t('editSuccess') : t('createSuccess'))
       const targetId = isEdit ? postId : data.post_id
       router.push(`/board/${category}/${targetId}`)
       router.refresh()
     } else {
       const { error } = await res.json()
-      toast.error(error ?? (isEdit ? '수정 실패' : '작성 실패'))
+      toast.error(error ?? (isEdit ? t('editFail') : t('createFail')))
       setSubmitting(false)
     }
   }
@@ -55,24 +58,24 @@ export function PostForm({ category, postId, initialTitle = '', initialContent =
   return (
     <form onSubmit={handleSubmit} className='space-y-4'>
       <div className='space-y-1.5'>
-        <Label htmlFor='post-title'>제목</Label>
+        <Label htmlFor='post-title'>{t('postTitle')}</Label>
         <Input
           id='post-title'
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder='제목을 입력하세요'
+          placeholder={t('titlePlaceholder')}
           required
           disabled={submitting}
         />
       </div>
 
       <div className='space-y-1.5'>
-        <Label htmlFor='post-content'>내용</Label>
+        <Label htmlFor='post-content'>{t('postContent')}</Label>
         <textarea
           id='post-content'
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          placeholder='내용을 입력하세요'
+          placeholder={t('contentPlaceholder')}
           rows={18}
           disabled={submitting}
           className='w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50'
@@ -81,7 +84,9 @@ export function PostForm({ category, postId, initialTitle = '', initialContent =
 
       <div className='flex gap-2'>
         <Button type='submit' disabled={submitting}>
-          {submitting ? (isEdit ? '수정 중…' : '등록 중…') : isEdit ? '수정' : '등록'}
+          {submitting
+            ? isEdit ? t('saving') : tc('creating')
+            : isEdit ? t('editPost') : tc('create')}
         </Button>
         <Button
           type='button'
@@ -89,7 +94,7 @@ export function PostForm({ category, postId, initialTitle = '', initialContent =
           onClick={() => router.back()}
           disabled={submitting}
         >
-          취소
+          {tc('cancel')}
         </Button>
       </div>
     </form>

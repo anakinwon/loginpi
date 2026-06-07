@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import { getTranslations } from 'next-intl/server'
 import { getCategory } from '@/lib/board'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth-check'
@@ -11,7 +12,11 @@ type Props = { params: Promise<{ category: string; postId: string }> }
 
 export default async function PostDetailPage({ params }: Props) {
   const { category, postId } = await params
-  const [ctgr, user] = await Promise.all([getCategory(category), getSessionUser()])
+  const [ctgr, user, t] = await Promise.all([
+    getCategory(category),
+    getSessionUser(),
+    getTranslations('board'),
+  ])
 
   if (!ctgr) notFound()
 
@@ -62,12 +67,12 @@ export default async function PostDetailPage({ params }: Props) {
           <h1 className='text-2xl font-bold leading-tight'>
             {post.pin_yn === 'Y' && (
               <span className='mr-2 rounded bg-primary/10 px-1.5 py-0.5 text-sm font-medium text-primary'>
-                공지
+                {t('notice')}
               </span>
             )}
             {ctgr.ctgr_cd === 'QNA' && post.answ_yn === 'Y' && (
               <span className='mr-2 rounded bg-green-100 px-1.5 py-0.5 text-sm font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400'>
-                채택완료
+                {t('adoptedComplete')}
               </span>
             )}
             {post.post_ttl}
@@ -78,7 +83,7 @@ export default async function PostDetailPage({ params }: Props) {
         </div>
         <div className='mt-3 flex flex-wrap gap-4 text-sm text-muted-foreground'>
           <span>{post.rgst_usr_nm}</span>
-          <span>조회 {post.vw_cnt + 1}</span>
+          <span>{t('viewCount', { count: post.vw_cnt + 1 })}</span>
           <time dateTime={post.reg_dtm}>
             {new Date(post.reg_dtm).toLocaleString('ko-KR', {
               year: 'numeric',
@@ -88,7 +93,7 @@ export default async function PostDetailPage({ params }: Props) {
               minute: '2-digit',
             })}
           </time>
-          {post.reg_dtm !== post.mod_dtm && <span className='text-xs'>(수정됨)</span>}
+          {post.reg_dtm !== post.mod_dtm && <span className='text-xs'>{t('modified')}</span>}
         </div>
       </div>
 

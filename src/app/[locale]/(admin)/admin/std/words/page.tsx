@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -32,6 +33,8 @@ const EMPTY_FORM = {
 }
 
 export default function StdWordsPage() {
+  const t = useTranslations('admin.std.words')
+  const tc = useTranslations('common')
   const [words, setWords] = useState<WordRow[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -53,8 +56,8 @@ export default function StdWordsPage() {
   }, [search])
 
   useEffect(() => {
-    const t = setTimeout(load, 300)
-    return () => clearTimeout(t)
+    const timer = setTimeout(load, 300)
+    return () => clearTimeout(timer)
   }, [load])
 
   function openNew() {
@@ -78,7 +81,7 @@ export default function StdWordsPage() {
 
   async function save() {
     if (!form.dic_log_nm.trim() || !form.dic_phy_nm.trim()) {
-      toast.error('논리명과 물리명은 필수입니다')
+      toast.error(t('validationRequired'))
       return
     }
     setSaving(true)
@@ -100,31 +103,31 @@ export default function StdWordsPage() {
       })
       if (!res.ok) {
         const d = (await res.json()) as { error?: string }
-        throw new Error(d.error ?? '저장 실패')
+        throw new Error(d.error ?? t('saveFail'))
       }
-      toast.success(editing ? '수정됐습니다' : '등록됐습니다')
+      toast.success(editing ? t('editSuccess') : t('saveSuccess'))
       setShowForm(false)
       load()
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : '오류 발생')
+      toast.error(err instanceof Error ? err.message : tc('error'))
     } finally {
       setSaving(false)
     }
   }
 
   async function remove(id: string, nm: string) {
-    if (!confirm(`"${nm}" 단어를 삭제하시겠습니까?`)) return
+    if (!confirm(t('deleteConfirm', { name: nm }))) return
     setDeleting(id)
     try {
       const res = await fetch(`/api/admin/std/words/${id}`, { method: 'DELETE' })
       if (!res.ok) {
         const d = (await res.json()) as { error?: string }
-        throw new Error(d.error ?? '삭제 실패')
+        throw new Error(d.error ?? t('deleteFail'))
       }
-      toast.success('삭제됐습니다')
+      toast.success(t('deleteSuccess'))
       setWords((prev) => prev.filter((w) => w.dic_id !== id))
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : '오류 발생')
+      toast.error(err instanceof Error ? err.message : tc('error'))
     } finally {
       setDeleting(null)
     }
@@ -134,14 +137,14 @@ export default function StdWordsPage() {
     <div className='space-y-4'>
       <div className='flex items-center justify-between'>
         <div>
-          <h1 className='text-2xl font-bold'>표준단어 관리</h1>
-          <p className='text-muted-foreground mt-1 text-sm'>전체 {words.length}건</p>
+          <h1 className='text-2xl font-bold'>{t('title')}</h1>
+          <p className='text-muted-foreground mt-1 text-sm'>{t('totalCount', { count: words.length })}</p>
         </div>
-        <Button onClick={openNew} size='sm'>+ 신규 등록</Button>
+        <Button onClick={openNew} size='sm'>{tc('newRegister')}</Button>
       </div>
 
       <Input
-        placeholder='논리명 / 물리명 검색…'
+        placeholder={t('searchPlaceholder')}
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         className='max-w-64'
@@ -149,84 +152,84 @@ export default function StdWordsPage() {
 
       {showForm && (
         <div className='rounded-lg border bg-muted/30 p-4 space-y-3'>
-          <h2 className='font-semibold text-sm'>{editing ? '단어 수정' : '신규 단어 등록'}</h2>
+          <h2 className='font-semibold text-sm'>{editing ? t('formTitleEdit') : t('formTitleNew')}</h2>
           <div className='grid grid-cols-2 gap-3 sm:grid-cols-3'>
             <label className='space-y-1'>
-              <span className='text-xs text-muted-foreground'>논리명 *</span>
+              <span className='text-xs text-muted-foreground'>{t('field.logNm')}</span>
               <Input
                 value={form.dic_log_nm}
                 onChange={(e) => setForm((f) => ({ ...f, dic_log_nm: e.target.value }))}
-                placeholder='예: 사용자'
+                placeholder={t('placeholder.logNm')}
               />
             </label>
             <label className='space-y-1'>
-              <span className='text-xs text-muted-foreground'>물리명(약어) *</span>
+              <span className='text-xs text-muted-foreground'>{t('field.phyNmAbbr')}</span>
               <Input
                 value={form.dic_phy_nm}
                 onChange={(e) => setForm((f) => ({ ...f, dic_phy_nm: e.target.value }))}
-                placeholder='예: USR'
+                placeholder={t('placeholder.phyNmAbbr')}
               />
             </label>
             <label className='space-y-1'>
-              <span className='text-xs text-muted-foreground'>물리명(전체)</span>
+              <span className='text-xs text-muted-foreground'>{t('field.phyNmFull')}</span>
               <Input
                 value={form.dic_phy_fll_nm}
                 onChange={(e) => setForm((f) => ({ ...f, dic_phy_fll_nm: e.target.value }))}
-                placeholder='예: User'
+                placeholder={t('placeholder.phyNmFull')}
               />
             </label>
             <label className='space-y-1'>
-              <span className='text-xs text-muted-foreground'>데이터 타입</span>
+              <span className='text-xs text-muted-foreground'>{t('field.dataType')}</span>
               <Input
                 value={form.data_type}
                 onChange={(e) => setForm((f) => ({ ...f, data_type: e.target.value }))}
-                placeholder='예: VARCHAR'
+                placeholder={t('placeholder.dataType')}
               />
             </label>
             <label className='space-y-1'>
-              <span className='text-xs text-muted-foreground'>데이터 길이</span>
+              <span className='text-xs text-muted-foreground'>{t('field.dataLen')}</span>
               <Input
                 type='number'
                 value={form.data_len}
                 onChange={(e) => setForm((f) => ({ ...f, data_len: e.target.value }))}
-                placeholder='예: 100'
+                placeholder={t('placeholder.dataLen')}
               />
             </label>
             <label className='col-span-2 space-y-1 sm:col-span-3'>
-              <span className='text-xs text-muted-foreground'>설명</span>
+              <span className='text-xs text-muted-foreground'>{t('field.desc')}</span>
               <Input
                 value={form.dic_desc}
                 onChange={(e) => setForm((f) => ({ ...f, dic_desc: e.target.value }))}
-                placeholder='단어 설명 (선택)'
+                placeholder={t('placeholder.desc')}
               />
             </label>
           </div>
           <div className='flex gap-2'>
             <Button size='sm' onClick={save} disabled={saving}>
-              {saving ? '저장 중…' : '저장'}
+              {saving ? tc('saving') : tc('save')}
             </Button>
             <Button size='sm' variant='outline' onClick={() => setShowForm(false)}>
-              취소
+              {tc('cancel')}
             </Button>
           </div>
         </div>
       )}
 
       {loading ? (
-        <p className='text-muted-foreground text-sm'>로딩 중…</p>
+        <p className='text-muted-foreground text-sm'>{tc('loading')}</p>
       ) : words.length === 0 ? (
-        <p className='text-muted-foreground text-sm'>단어가 없습니다.</p>
+        <p className='text-muted-foreground text-sm'>{t('noData')}</p>
       ) : (
         <div className='rounded-lg border overflow-x-auto'>
           <table className='w-full text-sm'>
             <thead className='bg-muted/50 border-b'>
               <tr>
-                <th className='text-left px-4 py-2 font-medium'>논리명</th>
-                <th className='text-left px-4 py-2 font-medium'>물리명(약어)</th>
-                <th className='text-left px-4 py-2 font-medium'>물리명(전체)</th>
-                <th className='text-left px-4 py-2 font-medium'>타입/길이</th>
-                <th className='text-left px-4 py-2 font-medium'>상태</th>
-                <th className='text-left px-4 py-2 font-medium'>설명</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.logNm')}</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.phyNmAbbr')}</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.phyNmFull')}</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.typeLen')}</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.status')}</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.desc')}</th>
                 <th className='px-4 py-2'></th>
               </tr>
             </thead>
@@ -252,14 +255,14 @@ export default function StdWordsPage() {
                   <td className='px-4 py-3'>
                     <div className='flex gap-1'>
                       <Button variant='outline' size='sm' className='h-6 px-2 text-xs' onClick={() => openEdit(w)}>
-                        수정
+                        {tc('edit')}
                       </Button>
                       <Button
                         variant='outline' size='sm' className='h-6 px-2 text-xs text-destructive hover:text-destructive'
                         disabled={deleting === w.dic_id}
                         onClick={() => remove(w.dic_id, w.dic_log_nm)}
                       >
-                        삭제
+                        {tc('delete')}
                       </Button>
                     </div>
                   </td>

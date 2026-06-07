@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 
 type PaymentStatus = 'pending' | 'approved' | 'completed' | 'cancelled' | 'error'
 
@@ -28,15 +29,9 @@ const STATUS_STYLE: Record<PaymentStatus, string> = {
   error:     'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
 }
 
-const STATUS_LABEL: Record<PaymentStatus, string> = {
-  completed: '완료',
-  approved:  '승인',
-  pending:   '대기',
-  cancelled: '취소',
-  error:     '오류',
-}
-
 export default function PaymentsPage() {
+  const t = useTranslations('admin.payments')
+  const tc = useTranslations('common')
   const [payments, setPayments] = useState<PaymentRow[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<PaymentStatus | 'all'>('all')
@@ -54,17 +49,23 @@ export default function PaymentsPage() {
     .filter((p) => p.status === 'completed')
     .reduce((sum, p) => sum + p.amount, 0)
 
+  const STATUS_LABEL: Record<PaymentStatus, string> = {
+    completed: t('status.completed'),
+    approved:  t('status.approved'),
+    pending:   t('status.pending'),
+    cancelled: t('status.cancelled'),
+    error:     t('status.error'),
+  }
+
   return (
     <div className='space-y-4'>
       <div>
-        <h1 className='text-2xl font-bold'>결제 내역</h1>
+        <h1 className='text-2xl font-bold'>{t('title')}</h1>
         <p className='text-muted-foreground text-sm mt-1'>
-          전체 {payments.length}건 · 완료 합계{' '}
-          <span className='font-semibold text-foreground'>{totalPi.toFixed(4)} π</span>
+          {t('totalCount', { count: payments.length, total: totalPi.toFixed(4) })}
         </p>
       </div>
 
-      {/* 상태 필터 */}
       <div className='flex gap-2 flex-wrap'>
         {(['all', 'completed', 'approved', 'pending', 'cancelled', 'error'] as const).map((s) => (
           <button
@@ -76,7 +77,7 @@ export default function PaymentsPage() {
                 : 'border-border text-muted-foreground hover:bg-muted'
             }`}
           >
-            {s === 'all' ? '전체' : STATUS_LABEL[s]}
+            {s === 'all' ? tc('all') : STATUS_LABEL[s]}
             {s !== 'all' && (
               <span className='ml-1'>({payments.filter((p) => p.status === s).length})</span>
             )}
@@ -85,20 +86,20 @@ export default function PaymentsPage() {
       </div>
 
       {loading ? (
-        <p className='text-muted-foreground text-sm'>로딩 중…</p>
+        <p className='text-muted-foreground text-sm'>{tc('loading')}</p>
       ) : filtered.length === 0 ? (
-        <p className='text-muted-foreground text-sm'>결제 내역이 없습니다.</p>
+        <p className='text-muted-foreground text-sm'>{t('noPayments')}</p>
       ) : (
         <div className='rounded-lg border overflow-x-auto'>
           <table className='w-full text-sm'>
             <thead className='bg-muted/50 border-b'>
               <tr>
-                <th className='text-left px-4 py-2 font-medium'>사용자</th>
-                <th className='text-left px-4 py-2 font-medium'>금액</th>
-                <th className='text-left px-4 py-2 font-medium'>메모</th>
-                <th className='text-left px-4 py-2 font-medium'>상태</th>
-                <th className='text-left px-4 py-2 font-medium'>결제 ID</th>
-                <th className='text-left px-4 py-2 font-medium'>일시</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.user')}</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.amount')}</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.memo')}</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.status')}</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.paymentId')}</th>
+                <th className='text-left px-4 py-2 font-medium'>{t('col.date')}</th>
               </tr>
             </thead>
             <tbody className='divide-y'>

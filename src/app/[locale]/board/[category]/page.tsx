@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import { getTranslations } from 'next-intl/server'
 import { getCategory, hasMinRole } from '@/lib/board'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth-check'
@@ -16,7 +17,12 @@ export default async function BoardListPage({ params, searchParams }: Props) {
   const { category } = await params
   const { page: pageStr, q } = await searchParams
 
-  const [ctgr, user] = await Promise.all([getCategory(category), getSessionUser()])
+  const [ctgr, user, t, tc] = await Promise.all([
+    getCategory(category),
+    getSessionUser(),
+    getTranslations('board'),
+    getTranslations('common'),
+  ])
   if (!ctgr) notFound()
 
   const page = Math.max(1, Number(pageStr ?? 1))
@@ -48,7 +54,6 @@ export default async function BoardListPage({ params, searchParams }: Props) {
   const totalPages = Math.ceil(total / limit)
   const canWrite = !!user && hasMinRole(user.role, ctgr.wr_min_role_cd)
 
-  // 현재 페이지 기준 ±4 범위 페이지 번호
   const startPage = Math.max(1, page - 4)
   const endPage = Math.min(totalPages, startPage + 9)
   const pageNumbers = Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i)
@@ -59,7 +64,7 @@ export default async function BoardListPage({ params, searchParams }: Props) {
         <h1 className='text-2xl font-bold'>{ctgr.ctgr_nm}</h1>
         {canWrite && (
           <Link href={`/board/${category}/write`} className={cn(buttonVariants({ size: 'sm' }))}>
-            글쓰기
+            {t('write')}
           </Link>
         )}
       </div>
@@ -69,15 +74,15 @@ export default async function BoardListPage({ params, searchParams }: Props) {
       <div className='overflow-hidden rounded-lg border'>
         {(!posts || posts.length === 0) ? (
           <div className='py-16 text-center text-sm text-muted-foreground'>
-            {q ? `"${q}" 검색 결과가 없습니다.` : '아직 게시글이 없습니다.'}
+            {q ? t('noResults', { q }) : t('noData')}
           </div>
         ) : (
           <>
             <div className='hidden border-b bg-muted/50 px-4 py-2 text-xs font-medium text-muted-foreground sm:grid sm:grid-cols-[1fr_80px_60px_90px]'>
-              <span>제목</span>
-              <span className='text-center'>작성자</span>
-              <span className='text-center'>조회</span>
-              <span className='text-center'>날짜</span>
+              <span>{t('columns.title')}</span>
+              <span className='text-center'>{t('columns.author')}</span>
+              <span className='text-center'>{t('columns.views')}</span>
+              <span className='text-center'>{t('columns.date')}</span>
             </div>
             {posts.map((post) => (
               <Link
@@ -88,12 +93,12 @@ export default async function BoardListPage({ params, searchParams }: Props) {
                 <span className='flex items-center gap-1.5 text-sm'>
                   {post.pin_yn === 'Y' && (
                     <span className='shrink-0 rounded bg-primary/10 px-1.5 py-0.5 text-xs font-medium text-primary'>
-                      공지
+                      {t('notice')}
                     </span>
                   )}
                   {ctgr.ctgr_cd === 'QNA' && post.answ_yn === 'Y' && (
                     <span className='shrink-0 rounded bg-green-100 px-1.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400'>
-                      채택
+                      {t('adopted')}
                     </span>
                   )}
                   <span className='truncate'>{post.post_ttl}</span>
@@ -116,7 +121,7 @@ export default async function BoardListPage({ params, searchParams }: Props) {
               href={`/board/${category}?page=${page - 1}${q ? `&q=${encodeURIComponent(q)}` : ''}`}
               className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}
             >
-              이전
+              {tc('prev')}
             </Link>
           )}
           {pageNumbers.map((p) => (
@@ -133,7 +138,7 @@ export default async function BoardListPage({ params, searchParams }: Props) {
               href={`/board/${category}?page=${page + 1}${q ? `&q=${encodeURIComponent(q)}` : ''}`}
               className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}
             >
-              다음
+              {tc('next')}
             </Link>
           )}
         </div>
