@@ -8,6 +8,8 @@ export const LOCALE_COUNTRY: Record<string, string> = {
   ru: 'ru', pt: 'pt', ar: 'eg',
   au: 'au',  // 호주: 영어권이지만 AUD 통화 분리를 위해 별도 locale
   il: 'il',  // 이스라엘: 히브리어(Hebrew) locale
+  et: 'et',  // 에티오피아: 암하라어 locale, ETB 통화
+  mx: 'mx',  // 멕시코: 스페인어 공유, MXN 통화 분리를 위해 별도 locale
 }
 
 // locale_cd → alpha-2 (정적 맵 우선, 없으면 BCP 47 마지막 세그먼트)

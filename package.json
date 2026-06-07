@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
+    "build": "node scripts/validate-locales.mjs && next build --turbopack",
+    "validate:locales": "node scripts/validate-locales.mjs",
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write .",

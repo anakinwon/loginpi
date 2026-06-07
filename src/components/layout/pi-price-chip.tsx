@@ -33,6 +33,12 @@ export function PiPriceChip({ locale }: { locale: string }) {
   if (piUsd === null) return null
 
   // locale이 바뀌면 prop 변경으로 리렌더 → currency·price 자동 갱신
+  // 매핑 누락 시 USD fallback — 침묵 누락이 et/mx 환율 버그의 은폐 원인이었으므로 dev에서 경고 (2026-06-08)
+  if (process.env.NODE_ENV === 'development' && !LOCALE_CURRENCY[locale]) {
+    console.warn(
+      `[pi-price-chip] locale '${locale}' 통화 매핑 누락 → USD fallback 중. src/lib/locale-currency.ts에 추가하세요 (pnpm validate:locales로 검증)`
+    )
+  }
   const currency = LOCALE_CURRENCY[locale] ?? 'USD'
   const rate = rates[currency] ?? 1
   const price = piUsd * rate
