@@ -52,3 +52,10 @@ next-env.d.ts
 *.png
 *.jpg
 *.jpeg
+
+# public 폴더 정적 이미지는 배포에 필요하므로 예외 처리
+!public/*.png
+!public/*.jpg
+!public/*.jpeg
+!public/*.svg
+!public/*.ico

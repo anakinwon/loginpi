@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import { usePiAuth } from '@/components/pi-auth-provider'
 
 function detectByUA(ua: string): string {
@@ -21,7 +22,18 @@ export function BrowserName() {
     setUaName(detectByUA(navigator.userAgent))
   }, [])
 
-  // Pi 인증 완료 후 실제 Pi Browser로 확정된 경우에만 교체
-  if (!isLoading && isInPiBrowser) return <span>Pi Browser</span>
+  // Pi 인증 완료 후 실제 Pi Browser로 확정된 경우에만 로고 이미지 표시
+  if (!isLoading && isInPiBrowser) {
+    return (
+      <Image
+        src='/pi-logo.png'
+        alt='Pi Network Login Test'
+        width={40}
+        height={40}
+        className='rounded-full'
+        priority
+      />
+    )
+  }
   return <span>{uaName}</span>
 }
