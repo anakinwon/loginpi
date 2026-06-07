@@ -4,6 +4,11 @@ import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
+import { useDynamicLimit } from '@/hooks/use-dynamic-limit'
+import { AdminPagination } from '@/components/admin/admin-pagination'
+
+// p-6(48) + 제목+설명(56) + gap(16) + 테이블헤더(33) + gap(16) + 페이지네이션(36)
+const CHROME_PX = 205
 
 const ROLES = ['ADMIN', 'MASTER', 'MANAGER', 'USER'] as const
 type Role = (typeof ROLES)[number]
@@ -20,10 +25,10 @@ interface UserRow {
 }
 
 const ROLE_COLOR: Record<Role, string> = {
-  ADMIN: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-  MASTER: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+  ADMIN:   'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+  MASTER:  'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
   MANAGER: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-  USER: 'bg-muted text-muted-foreground',
+  USER:    'bg-muted text-muted-foreground',
 }
 
 export default function UsersPage() {
@@ -32,6 +37,11 @@ export default function UsersPage() {
   const [users, setUsers] = useState<UserRow[]>([])
   const [loading, setLoading] = useState(true)
   const [changing, setChanging] = useState<string | null>(null)
+  const [page, setPage] = useState(1)
+  const limit = useDynamicLimit(CHROME_PX)
+
+  // limit 변경 시 첫 페이지로 리셋
+  useEffect(() => { setPage(1) }, [limit])
 
   useEffect(() => {
     fetch('/api/admin/users')
@@ -61,11 +71,14 @@ export default function UsersPage() {
     }
   }
 
+  const totalPages = Math.ceil(users.length / limit)
+  const displayedUsers = users.slice((page - 1) * limit, page * limit)
+
   return (
     <div className='space-y-4'>
       <div>
         <h1 className='text-2xl font-bold'>{t('title')}</h1>
-        <p className='text-muted-foreground text-sm mt-1'>
+        <p className='text-muted-foreground mt-1 text-sm'>
           {t('totalCount', { count: users.length })}
         </p>
       </div>
@@ -75,21 +88,21 @@ export default function UsersPage() {
       ) : users.length === 0 ? (
         <p className='text-muted-foreground text-sm'>{t('noUsers')}</p>
       ) : (
-        <div className='rounded-lg border overflow-hidden'>
+        <div className='overflow-hidden rounded-lg border'>
           <table className='w-full text-sm'>
-            <thead className='bg-muted/50 border-b'>
+            <thead className='border-b bg-muted/50'>
               <tr>
-                <th className='text-left px-4 py-2 font-medium'>{t('col.user')}</th>
-                <th className='text-left px-4 py-2 font-medium'>{t('col.piAccount')}</th>
-                <th className='text-left px-4 py-2 font-medium'>{t('col.googleAccount')}</th>
-                <th className='text-left px-4 py-2 font-medium'>{t('col.role')}</th>
-                <th className='text-left px-4 py-2 font-medium'>{t('col.joinDate')}</th>
-                <th className='text-left px-4 py-2 font-medium'>{t('col.changeRole')}</th>
+                <th className='px-4 py-2 text-left font-medium'>{t('col.user')}</th>
+                <th className='px-4 py-2 text-left font-medium'>{t('col.piAccount')}</th>
+                <th className='px-4 py-2 text-left font-medium'>{t('col.googleAccount')}</th>
+                <th className='px-4 py-2 text-left font-medium'>{t('col.role')}</th>
+                <th className='px-4 py-2 text-left font-medium'>{t('col.joinDate')}</th>
+                <th className='px-4 py-2 text-left font-medium'>{t('col.changeRole')}</th>
               </tr>
             </thead>
             <tbody className='divide-y'>
-              {users.map((user) => (
-                <tr key={user.id} className='hover:bg-muted/30 transition-colors'>
+              {displayedUsers.map((user) => (
+                <tr key={user.id} className='transition-colors hover:bg-muted/30'>
                   <td className='px-4 py-3 font-medium'>{user.display_name}</td>
                   <td className='px-4 py-3 text-muted-foreground'>
                     {user.pi_username ? `@${user.pi_username}` : '—'}
@@ -102,14 +115,14 @@ export default function UsersPage() {
                       {user.role}
                     </span>
                   </td>
-                  <td className='px-4 py-3 text-muted-foreground text-xs'>
+                  <td className='px-4 py-3 text-xs text-muted-foreground'>
                     {new Date(user.reg_dtm).toLocaleString('ko-KR', {
                       year: 'numeric', month: '2-digit', day: '2-digit',
                       hour: '2-digit', minute: '2-digit',
                     })}
                   </td>
                   <td className='px-4 py-3'>
-                    <div className='flex gap-1 flex-wrap'>
+                    <div className='flex flex-wrap gap-1'>
                       {ROLES.filter((r) => r !== user.role).map((r) => (
                         <Button
                           key={r}
@@ -130,6 +143,8 @@ export default function UsersPage() {
           </table>
         </div>
       )}
+
+      <AdminPagination page={page} totalPages={totalPages} onPage={setPage} />
     </div>
   )
 }

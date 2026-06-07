@@ -1,1 +1,540 @@
-{}
+{
+  "common": {
+    "loading": "लोड हो रहा है...",
+    "save": "सहेजें",
+    "saving": "सहेजा जा रहा है...",
+    "cancel": "रद्द करें",
+    "delete": "हटाएँ",
+    "deleting": "हटाया जा रहा है...",
+    "edit": "संपादित करें",
+    "create": "बनाएँ",
+    "creating": "बनाया जा रहा है...",
+    "search": "खोजें",
+    "reset": "रीसेट करें",
+    "prev": "पिछला",
+    "next": "अगला",
+    "all": "सभी",
+    "noData": "कोई Data नहीं है।",
+    "confirm": "पुष्टि करें",
+    "back": "वापस",
+    "close": "बंद करें",
+    "yes": "हाँ",
+    "no": "नहीं",
+    "error": "त्रुटि हुई",
+    "newRegister": "+ नया पंजीकरण",
+    "count": "{count} आइटम",
+    "countPerson": "{count} लोग",
+    "pageOf": "{current} / {total}"
+  },
+  "header": {
+    "board": "Board",
+    "admin": "Admin",
+    "logout": "Logout",
+    "piLogin": "Pi Login",
+    "piLoginDev": "Pi Login (dev)",
+    "piAuthenticating": "प्रमाणीकरण हो रहा है...",
+    "googleLogin": "Google Login"
+  },
+  "home": {
+    "title": "Next.js Starter Kit",
+    "subtitle": "Next.js 15 + Tailwind CSS v4 + shadcn/ui Boilerplate के साथ तेज़ी से शुरू करें",
+    "loginSection": "Login",
+    "detectingEnv": "वातावरण का पता लगाया जा रहा है...",
+    "piNetwork": "Pi Network",
+    "google": "Google",
+    "accountLink": "खाता लिंक करें",
+    "piPayment": "Pi Coin भुगतान",
+    "techStack": "शामिल Tech Stack",
+    "components": "shadcn/ui Component उदाहरण",
+    "button": "Button",
+    "inputLabel": "Input + Label",
+    "dialogToast": "Dialog & Toast (Sonner)",
+    "openDialog": "Dialog खोलें",
+    "dialogTitle": "Starter Kit में आपका स्वागत है!",
+    "dialogDesc": "यह shadcn/ui का Dialog Component है। यह @base-ui/react पर आधारित पहुँच-योग्यता का पूरी तरह से समर्थन करता है।",
+    "showToast": "Toast दिखाएँ",
+    "dialogToastMsg": "Dialog से Toast!",
+    "successToast": "Success Toast",
+    "errorToast": "Error Toast",
+    "errorToastMsg": "Error Toast उदाहरण",
+    "gettingStarted": "शुरू करें",
+    "step1": "पर्यावरण Variable फ़ाइल बनाएँ",
+    "step2": "आवश्यक Component जोड़ें",
+    "step3": "में पर्यावरण Variable Schema परिभाषित करें और विकास शुरू करें!",
+    "email": "Email",
+    "buttonDefault": "डिफ़ॉल्ट",
+    "successToastMsg": "Sonner Toast!",
+    "successToastDesc": "richColors Option सक्रिय है।",
+    "stack": {
+      "nextjsDesc": "App Router, React 19, Turbopack",
+      "tailwindDesc": "CSS-first सेटिंग, @theme Directive",
+      "shadcnDesc": "base-nova Style, @base-ui/react पर आधारित",
+      "tsDesc": "strict Mode, Type सुरक्षा",
+      "themesDesc": "Dark Mode / System Theme स्वचालित एकीकरण",
+      "envDesc": "Build समय पर पर्यावरण Variable Type सत्यापन"
+    }
+  },
+  "board": {
+    "title": "Board",
+    "noBoards": "कोई Board पंजीकृत नहीं है।",
+    "write": "लिखें",
+    "columns": {
+      "title": "शीर्षक",
+      "author": "लेखक",
+      "views": "दृश्य",
+      "date": "दिनांक"
+    },
+    "notice": "सूचना",
+    "adopted": "अपनाया गया",
+    "noData": "अभी तक कोई Post नहीं है।",
+    "noResults": "\"{q}\" के लिए कोई परिणाम नहीं मिला।",
+    "searchPlaceholder": "शीर्षक या Content खोजें",
+    "postTitle": "Post शीर्षक",
+    "postContent": "Post Content",
+    "titlePlaceholder": "शीर्षक दर्ज करें",
+    "editSuccess": "संपादित किया गया",
+    "createSuccess": "Post बनाया गया",
+    "editFail": "संपादन विफल",
+    "createFail": "बनाना विफल",
+    "saving": "सहेजा जा रहा है…",
+    "creating": "बनाया जा रहा है…",
+    "editPost": "Post संपादित करें",
+    "submitPost": "Post सबमिट करें",
+    "deletePost": "क्या आप Post हटाना चाहते हैं?",
+    "deleteSuccess": "हटाया गया",
+    "deleteFail": "हटाना विफल",
+    "viewCount": "दृश्य {count}",
+    "modified": "(संपादित)",
+    "adoptedComplete": "अपनाया गया पूर्ण",
+    "writeTitle": "{name} — लिखें",
+    "editTitle": "{name} — संपादित करें",
+    "contentPlaceholder": "Content दर्ज करें",
+    "featureComment": "Comment",
+    "featureAttachment": "संलग्नक"
+  },
+  "comment": {
+    "title": "टिप्पणी",
+    "count": "{count} टिप्पणी",
+    "noComments": "अभी कोई टिप्पणी नहीं है।",
+    "adoptedAnswer": "स्वीकृत उत्तर",
+    "adopt": "स्वीकार करें",
+    "cancelAdopt": "स्वीकृति रद्द करें",
+    "placeholder": "टिप्पणी दर्ज करें (Ctrl+Enter से सबमिट करें)",
+    "submit": "टिप्पणी सबमिट करें",
+    "createSuccess": "टिप्पणी सबमिट हो गई है",
+    "createFail": "टिप्पणी सबमिट करने में विफल",
+    "deleteConfirm": "क्या आप टिप्पणी हटाना चाहते हैं?",
+    "deleteSuccess": "टिप्पणी हटा दी गई है",
+    "deleteFail": "प्रक्रिया विफल",
+    "adoptSuccess": "उत्तर स्वीकार कर लिया गया है",
+    "adoptCancelSuccess": "स्वीकृति रद्द कर दी गई है",
+    "loginRequired": "टिप्पणी करने के लिए Login करें।"
+  },
+  "attachment": {
+    "title": "संलग्नक",
+    "titleCount": "संलग्नक ({count})",
+    "delete": "हटाएँ",
+    "upload": "File जोड़ें",
+    "uploading": "अपलोड हो रहा है…",
+    "uploadSuccess": "{count} File अपलोड हो गए हैं",
+    "uploadFail": "अपलोड विफल",
+    "deleteConfirm": "क्या आप संलग्नक हटाना चाहते हैं?",
+    "deleteSuccess": "हटा दिया गया है",
+    "deleteFail": "हटाने में विफल",
+    "sizeLimit": "अधिकतम 5 · प्रति File 20MB"
+  },
+  "link": {
+    "title": "Pi खाता लिंक करें",
+    "desc": "Pi खाते को Google खाते से लिंक करें।",
+    "complete": "लिंकिंग पूरी हो गई है।",
+    "checkingPi": "Pi Login की जाँच हो रही है…",
+    "generateTitle": "लिंकिंग कोड जनरेट करें",
+    "inputTitle": "लिंकिंग कोड दर्ज करें",
+    "needPiLogin": "लिंकिंग कोड जनरेट करने के लिए Pi Login आवश्यक है।",
+    "piLogin": "Pi Login",
+    "generateDesc": "नीचे दिए गए बटन को दबाकर 6 अंकों का कोड जनरेट करें। सामान्य Browser में /link Page पर जाकर कोड दर्ज करने पर खाता लिंक हो जाएगा।",
+    "generating": "कोड जनरेट हो रहा है…",
+    "regenerate": "नया कोड जनरेट करें",
+    "generate": "लिंकिंग कोड जनरेट करें",
+    "codeLabel": "लिंकिंग कोड (सामान्य Browser में दर्ज करें)",
+    "codeExpiry": "10 मिनट के भीतर उपयोग करें",
+    "generateFail": "कोड जनरेट करने में विफल",
+    "inputDesc": "Pi Browser के इस Page पर जनरेट किया गया 6 अंकों का कोड दर्ज करें।",
+    "codeInputLabel": "लिंकिंग कोड",
+    "googleLoginRequired": "कोड दर्ज करने के बाद Google Login स्क्रीन पर रीडायरेक्ट किया जाएगा।",
+    "linking": "लिंक हो रहा है…",
+    "googleLink": "Google लिंक करें",
+    "googleLoginAndLink": "Google Login करें और लिंक करें",
+    "linkDone": "खाता लिंकिंग पूरी हुई! Home पर रीडायरेक्ट किया जा रहा है…",
+    "linkFail": "लिंक विफल",
+    "completeTitle": "खाता लिंकिंग प्रोसेस हो रहा है",
+    "checkingSession": "Google Session की जाँच हो रही है…",
+    "processing": "लिंकिंग प्रोसेस हो रहा है…",
+    "linkedSuccess": "Pi और Google खाते लिंक हो गए हैं! होम पर रीडायरेक्ट किया जा रहा है…",
+    "serverError": "Server त्रुटि हुई है",
+    "invalidLink": "अमान्य लिंकिंग Link है।"
+  },
+  "admin": {
+    "nav": {
+      "title": "Admin",
+      "dashboard": "Dashboard",
+      "users": "उपयोगकर्ता प्रबंधन",
+      "payments": "भुगतान इतिहास",
+      "links": "खाता लिंकिंग स्थिति",
+      "board": "Board प्रबंधन",
+      "stdSection": "Data मानक",
+      "stdWords": "मानक शब्द",
+      "stdDomains": "मानक Domain",
+      "stdTerms": "मानक शब्दावली",
+      "stdDdl": "DDL Export",
+      "stdAudit": "परिवर्तन इतिहास",
+      "stdApprovals": "अनुमोदन Workflow",
+      "i18nSection": "बहुभाषी",
+      "i18n": "बहुभाषी प्रबंधन",
+      "backHome": "← होम पर वापस"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "greeting": "नमस्ते, {name} ({role})",
+      "totalUsers": "कुल उपयोगकर्ता",
+      "totalUsersDesc": "पंजीकृत खातों की कुल संख्या",
+      "piOnly": "केवल Pi",
+      "piOnlyDesc": "केवल Pi खाता वाले उपयोगकर्ता",
+      "googleOnly": "केवल Google",
+      "googleOnlyDesc": "केवल Google खाता वाले उपयोगकर्ता",
+      "linked": "खाता लिंकिंग",
+      "linkedDesc": "Pi + Google लिंकिंग पूर्ण"
+    },
+    "users": {
+      "title": "उपयोगकर्ता प्रबंधन",
+      "totalCount": "कुल {count} लोग",
+      "noUsers": "कोई उपयोगकर्ता नहीं हैं।",
+      "col": {
+        "user": "उपयोगकर्ता",
+        "piAccount": "Pi खाता",
+        "googleAccount": "Google खाता",
+        "role": "भूमिका",
+        "joinDate": "शामिल होने की तिथि",
+        "changeRole": "भूमिका बदलें"
+      },
+      "roleChanged": "भूमिका बदल दी गई है",
+      "changeFail": "बदलने में विफल"
+    },
+    "payments": {
+      "title": "भुगतान इतिहास",
+      "totalCount": "कुल {count} आइटम · पूर्ण योग {total} π",
+      "noPayments": "कोई भुगतान इतिहास नहीं है।",
+      "status": {
+        "completed": "पूर्ण",
+        "approved": "अनुमोदित",
+        "pending": "लंबित",
+        "cancelled": "रद्द",
+        "error": "त्रुटि"
+      },
+      "col": {
+        "user": "उपयोगकर्ता",
+        "amount": "राशि",
+        "memo": "मेमो",
+        "status": "स्थिति",
+        "paymentId": "भुगतान ID",
+        "date": "दिनांक"
+      }
+    },
+    "links": {
+      "title": "खाता लिंकिंग स्थिति",
+      "totalCount": "कुल {count} उपयोगकर्ता",
+      "noUsers": "कोई उपयोगकर्ता उपलब्ध नहीं है।",
+      "status": {
+        "linked": "लिंक किया गया",
+        "piOnly": "केवल Pi",
+        "googleOnly": "केवल Google"
+      },
+      "desc": {
+        "linked": "Pi + Google लिंक किया गया",
+        "piOnly": "Google लिंक नहीं किया गया",
+        "googleOnly": "Pi लिंक नहीं किया गया"
+      },
+      "col": {
+        "user": "उपयोगकर्ता",
+        "piAccount": "Pi खाता",
+        "googleAccount": "Google खाता",
+        "linkStatus": "लिंक स्थिति",
+        "role": "भूमिका",
+        "joinDate": "शामिल होने की तिथि"
+      }
+    },
+    "board": {
+      "title": "Board प्रबंधन",
+      "desc": "कुल {count} पोस्ट · सूचना सेट करें और जबरन हटाएँ",
+      "noData": "कोई पोस्ट नहीं है।",
+      "loading": "लोड हो रहा है…",
+      "col": {
+        "category": "Category",
+        "title": "शीर्षक",
+        "author": "लेखक",
+        "views": "दृश्य",
+        "date": "दिनांक",
+        "manage": "प्रबंधित करें"
+      },
+      "notice": "सूचना",
+      "setPinned": "सूचना सेट करें",
+      "unsetPinned": "सूचना हटाएँ",
+      "pinnedSuccess": "सूचना के रूप में सेट किया गया",
+      "unpinnedSuccess": "सूचना हटा दी गई",
+      "processFail": "प्रक्रिया विफल",
+      "deleteConfirm": "क्या आप \"{title}\" पोस्ट हटाना चाहते हैं?",
+      "deleteSuccess": "पोस्ट हटा दी गई है",
+      "deleteFail": "हटाने में विफल"
+    },
+    "std": {
+      "words": {
+        "title": "मानक शब्द प्रबंधन",
+        "totalCount": "कुल {count} शब्द",
+        "noData": "कोई शब्द नहीं है।",
+        "searchPlaceholder": "तार्किक नाम / भौतिक नाम खोजें…",
+        "formTitleNew": "नया शब्द पंजीकृत करें",
+        "formTitleEdit": "शब्द संपादित करें",
+        "col": {
+          "logNm": "तार्किक नाम",
+          "phyNmAbbr": "भौतिक नाम (संक्षिप्त)",
+          "phyNmFull": "भौतिक नाम (पूर्ण)",
+          "typeLen": "Type/लंबाई",
+          "status": "स्थिति",
+          "desc": "विवरण"
+        },
+        "field": {
+          "logNm": "तार्किक नाम *",
+          "phyNmAbbr": "भौतिक नाम (संक्षिप्त) *",
+          "phyNmFull": "भौतिक नाम (पूर्ण)",
+          "dataType": "Data Type",
+          "dataLen": "Data लंबाई",
+          "desc": "विवरण"
+        },
+        "placeholder": {
+          "logNm": "उदाहरण: उपयोगकर्ता",
+          "phyNmAbbr": "उदाहरण: USR",
+          "phyNmFull": "उदाहरण: User",
+          "dataType": "उदाहरण: VARCHAR",
+          "dataLen": "उदाहरण: 100",
+          "desc": "शब्द विवरण (वैकल्पिक)"
+        },
+        "validationRequired": "तार्किक नाम और भौतिक नाम आवश्यक हैं",
+        "deleteConfirm": "क्या आप \"{name}\" शब्द को हटाना चाहते हैं?",
+        "saveSuccess": "सफलतापूर्वक सहेजा गया",
+        "editSuccess": "सफलतापूर्वक संपादित किया गया",
+        "deleteSuccess": "सफलतापूर्वक हटाया गया",
+        "saveFail": "सहेजने में विफल",
+        "deleteFail": "हटाने में विफल"
+      },
+      "domains": {
+        "title": "Standard Domain प्रबंधन",
+        "totalCount": "कुल {count} आइटम",
+        "noData": "कोई Domain नहीं है।",
+        "searchPlaceholder": "Domain नाम / Key Domain नाम खोजें…",
+        "formTitleNew": "नया Domain पंजीकरण",
+        "formTitleEdit": "Domain संपादित करें",
+        "typeFilter": {
+          "all": "सभी",
+          "code": "Code",
+          "id": "पहचानकर्ता",
+          "general": "सामान्य"
+        },
+        "col": {
+          "domNm": "Domain नाम",
+          "keyDomNm": "Key Domain नाम",
+          "phyNm": "भौतिक नाम",
+          "type": "प्रकार",
+          "dataType": "Data Type",
+          "desc": "विवरण"
+        },
+        "field": {
+          "domNm": "Domain नाम *",
+          "keyDomNm": "Key Domain नाम *",
+          "keyDomPhyNm": "Key Domain भौतिक नाम *",
+          "domType": "Domain प्रकार",
+          "dataType": "Data Type",
+          "dataLen": "लंबाई",
+          "dataScale": "दशमलव स्थान",
+          "desc": "विवरण"
+        },
+        "placeholder": {
+          "domNm": "उदाहरण: मूल्य Domain",
+          "keyDomNm": "उदाहरण: मूल्य",
+          "keyDomPhyNm": "उदाहरण: PRICE",
+          "dataLen": "उदाहरण: 100",
+          "dataScale": "उदाहरण: 2",
+          "desc": "Domain विवरण (वैकल्पिक)"
+        },
+        "selectDomType": {
+          "code": "Code",
+          "id": "पहचानकर्ता",
+          "general": "सामान्य"
+        },
+        "selectDataType": {
+          "varchar": "VARCHAR / TEXT",
+          "integer": "INTEGER",
+          "numeric": "NUMERIC",
+          "date": "DATE",
+          "timestamp": "TIMESTAMP"
+        },
+        "validationRequired": "Domain नाम, Key Domain नाम, Key Domain भौतिक नाम अनिवार्य हैं",
+        "deleteConfirm": "\"{name}\" को हटाना चाहते हैं?",
+        "saveSuccess": "सफलतापूर्वक सहेजा गया",
+        "editSuccess": "सफलतापूर्वक संपादित किया गया",
+        "deleteSuccess": "सफलतापूर्वक हटाया गया",
+        "saveFail": "सहेजने में विफल",
+        "deleteFail": "हटाने में विफल"
+      },
+      "terms": {
+        "title": "मानक शब्दावली प्रबंधन",
+        "totalCount": "कुल {count} मामले",
+        "noData": "कोई शब्दावली नहीं है।",
+        "searchPlaceholder": "तार्किक नाम / भौतिक नाम खोजें…",
+        "formTitleNew": "नई मानक शब्दावली पंजीकरण",
+        "formTitleEdit": "शब्दावली संपादित करें",
+        "col": {
+          "logNm": "तार्किक नाम",
+          "phyNmLower": "भौतिक नाम (छोटे अक्षर)",
+          "phyNmUpper": "भौतिक नाम (बड़े अक्षर)",
+          "desc": "विवरण"
+        },
+        "field": {
+          "logNm": "तार्किक नाम *",
+          "wordSelect": "घटक शब्द चुनें *",
+          "wordSelectHint": "(जोड़ने का क्रम = भौतिक नाम का क्रम)",
+          "domainSelect": "मानक Domain * (भौतिक नाम का अंतिम तत्व)",
+          "autoPhyNm": "स्वचालित रूप से उत्पन्न भौतिक नाम",
+          "desc": "विवरण (वैकल्पिक)"
+        },
+        "placeholder": {
+          "logNm": "उदाहरण: कर्मचारी नाम",
+          "wordSearch": "शब्द खोजने के बाद क्लिक करके जोड़ें…",
+          "domainSelect": "Domain चुनें…",
+          "desc": "शब्दावली विवरण"
+        },
+        "validationLogNm": "तार्किक नाम अनिवार्य है",
+        "validationWordDomain": "घटक शब्द और Domain को चुनना होगा",
+        "validationPhyNm": "भौतिक नाम को उत्पन्न नहीं किया जा सकता",
+        "deleteConfirm": "\"{name}\" को हटाना चाहते हैं?",
+        "saveSuccess": "सफलतापूर्वक सहेजा गया",
+        "editSuccess": "सफलतापूर्वक संपादित किया गया",
+        "deleteSuccess": "सफलतापूर्वक हटाया गया",
+        "saveFail": "सहेजने में विफल",
+        "deleteFail": "हटाने में विफल"
+      },
+      "ddl": {
+        "title": "DDL Export",
+        "desc": "मानक शब्दावली को Column के रूप में चुनने पर CREATE TABLE SQL स्वचालित रूप से उत्पन्न होता है",
+        "sectionTable": "Table जानकारी",
+        "sectionColumn": "Column जोड़ें — Standard Term से चुनें",
+        "sectionPreview": "DDL पूर्वावलोकन",
+        "field": {
+          "tableNmEn": "Table Name (अंग्रेजी) *",
+          "tableNmKo": "Table Name (कोरियाई)"
+        },
+        "placeholder": {
+          "tableNmEn": "उदा: usr_info",
+          "tableNmKo": "उदा: उपयोगकर्ता जानकारी",
+          "termSearch": "Term खोजने के बाद क्लिक करके जोड़ें…"
+        },
+        "col": {
+          "colLogNm": "Column (तार्किक नाम)",
+          "type": "Type",
+          "pk": "PK",
+          "nn": "NN"
+        },
+        "copy": "कॉपी करें",
+        "download": "↓ .sql",
+        "emptyPreview": "Table Name और Column जोड़ने पर DDL यहां बनाया जाएगा।",
+        "copySuccess": "DDL क्लिपबोर्ड पर कॉपी हो गया है"
+      },
+      "audit": {
+        "title": "परिवर्तन इतिहास (Audit Trail)",
+        "totalCount": "कुल {count} आइटम",
+        "noData": "कोई इतिहास नहीं है।",
+        "tableLabel": {
+          "stdDic": "Standard Word",
+          "stdDom": "Standard Domain",
+          "stdTerm": "Standard Term"
+        },
+        "filter": {
+          "table": "Table",
+          "from": "प्रारंभ तिथि",
+          "to": "समाप्ति तिथि",
+          "allTables": "सभी"
+        },
+        "col": {
+          "changedAt": "परिवर्तन तिथि/समय",
+          "table": "Table",
+          "target": "लक्ष्य",
+          "action": "कार्य",
+          "changedBy": "द्वारा बदला गया"
+        },
+        "before": "परिवर्तन से पहले",
+        "after": "परिवर्तन के बाद"
+      },
+      "approvals": {
+        "title": "अनुमोदन Workflow",
+        "totalCount": "कुल {count} आइटम",
+        "noPending": "कोई लंबित अनुमोदन अनुरोध नहीं है।",
+        "noData": "कोई Data नहीं है।",
+        "allTypes": "सभी प्रकार",
+        "status": {
+          "pending": "लंबित",
+          "approved": "अनुमोदित",
+          "rejected": "अस्वीकृत",
+          "all": "सभी"
+        },
+        "entity": {
+          "stdDic": "Standard Word",
+          "stdDom": "Standard Domain",
+          "stdTerm": "Standard Term"
+        },
+        "col": {
+          "requestedAt": "अनुरोध तिथि/समय",
+          "type": "प्रकार",
+          "target": "लक्ष्य",
+          "requestedBy": "द्वारा अनुरोधित",
+          "status": "स्थिति"
+        },
+        "approve": "अनुमोदित करें",
+        "reject": "अस्वीकार करें",
+        "rejectReasonPlaceholder": "अस्वीकृति का कारण दर्ज करें *",
+        "rejectConfirm": "अस्वीकृति की पुष्टि करें",
+        "rejectReason": "अस्वीकृति का कारण: {reason}",
+        "decidedBy": "निर्णयकर्ता: {name} / {date}",
+        "requestData": "Request Data",
+        "approveSuccess": "स्वीकृत हो गया",
+        "rejectSuccess": "अस्वीकृत हो गया",
+        "processFail": "प्रक्रिया विफल"
+      }
+    },
+    "i18n": {
+      "title": "बहुभाषी प्रबंधन",
+      "desc": "अनुवाद स्थिति Dashboard",
+      "syncAll": "DB→JSON सिंक करें",
+      "syncing": "सिंक्रनाइज़ हो रहा है…",
+      "stats": {
+        "supportedLocales": "समर्थित भाषाएँ",
+        "totalKeys": "कुल अनुवाद Keys",
+        "completed": "100% पूर्ण",
+        "completedOf": "{count} भाषाओं में से"
+      },
+      "col": {
+        "language": "भाषा",
+        "progress": "प्रगति",
+        "translatedKeys": "अनुवादित Keys"
+      },
+      "translate": "अनुवाद करें + सिंक करें",
+      "translating": "अनुवाद हो रहा है…",
+      "syncingLocale": "सिंक्रनाइज़ हो रहा है…",
+      "translateSuccess": "{count} अनुवाद पूर्ण हुए",
+      "translateFail": "अनुवाद विफल",
+      "syncSuccess": "{count} भाषाओं का सिंक्रनाइज़ेशन पूर्ण हुआ",
+      "syncNoData": "DB में सिंक्रनाइज़ करने के लिए कोई Data नहीं है। कृपया पहले \"अनुवाद करें + सिंक करें\" चलाएँ।",
+      "syncFail": "सिंक्रनाइज़ेशन विफल",
+      "footnote1": "* \"अनुवाद करें + सिंक करें\": Claude AI द्वारा बिना अनुवादित Keys का स्वचालित अनुवाद करने के बाद messages/*.json को अपडेट करें",
+      "footnote2": "* \"DB→JSON सिंक करें\": DB में संग्रहीत अनुवाद Data को केवल JSON फ़ाइल में दर्शाता है"
+    }
+  }
+}

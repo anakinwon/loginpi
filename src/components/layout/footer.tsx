@@ -45,7 +45,7 @@ export async function Footer() {
   return (
     <footer className='border-t'>
       {adminUser && (
-        <div className='border-b py-8'>
+        <div className='border-b py-8 md:hidden'>
           <div className='mx-auto max-w-5xl px-4'>
             <div className='grid grid-cols-2 gap-8 md:grid-cols-4'>
               {FOOTER_GROUPS.map((group) => (

@@ -3,6 +3,11 @@
 import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useDynamicLimit } from '@/hooks/use-dynamic-limit'
+import { AdminPagination } from '@/components/admin/admin-pagination'
+
+// p-6(48) + 제목+설명(56) + gap(16) + 통계카드(100) + gap(16) + 필터칩(36) + gap(16) + 테이블헤더(33) + gap(16) + 페이지네이션(36)
+const CHROME_PX = 373
 
 type LinkStatus = 'linked' | 'pi_only' | 'google_only'
 
@@ -36,6 +41,11 @@ export default function LinksPage() {
   const [users, setUsers] = useState<UserRow[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<LinkStatus | 'all'>('all')
+  const [page, setPage] = useState(1)
+  const limit = useDynamicLimit(CHROME_PX)
+
+  // limit 또는 필터 변경 시 첫 페이지로 리셋
+  useEffect(() => { setPage(1) }, [limit, filter])
 
   useEffect(() => {
     fetch('/api/admin/links')
@@ -57,44 +67,46 @@ export default function LinksPage() {
   }
 
   const filtered = filter === 'all' ? users : users.filter((u) => getLinkStatus(u) === filter)
+  const totalPages = Math.ceil(filtered.length / limit)
+  const displayedLinks = filtered.slice((page - 1) * limit, page * limit)
 
   const STAT_CARDS = [
-    { label: t('status.linked'), value: counts.linked, desc: t('desc.linked'), key: 'linked' as LinkStatus },
-    { label: t('status.piOnly'), value: counts.pi_only, desc: t('desc.piOnly'), key: 'pi_only' as LinkStatus },
-    { label: t('status.googleOnly'), value: counts.google_only, desc: t('desc.googleOnly'), key: 'google_only' as LinkStatus },
+    { label: t('status.linked'),     value: counts.linked,      desc: t('desc.linked'),      key: 'linked' as LinkStatus },
+    { label: t('status.piOnly'),     value: counts.pi_only,     desc: t('desc.piOnly'),      key: 'pi_only' as LinkStatus },
+    { label: t('status.googleOnly'), value: counts.google_only, desc: t('desc.googleOnly'),  key: 'google_only' as LinkStatus },
   ]
 
   return (
     <div className='space-y-4'>
       <div>
         <h1 className='text-2xl font-bold'>{t('title')}</h1>
-        <p className='text-muted-foreground text-sm mt-1'>{t('totalCount', { count: users.length })}</p>
+        <p className='text-muted-foreground mt-1 text-sm'>{t('totalCount', { count: users.length })}</p>
       </div>
 
       <div className='grid gap-4 sm:grid-cols-3'>
         {STAT_CARDS.map(({ label, value, desc, key }) => (
           <button key={key} onClick={() => setFilter(filter === key ? 'all' : key)} className='text-left'>
-            <Card className={`transition-colors cursor-pointer ${filter === key ? 'ring-2 ring-primary' : 'hover:bg-muted/40'}`}>
+            <Card className={`cursor-pointer transition-colors ${filter === key ? 'ring-2 ring-primary' : 'hover:bg-muted/40'}`}>
               <CardHeader className='pb-2'>
-                <CardTitle className='text-sm text-muted-foreground font-medium'>{label}</CardTitle>
+                <CardTitle className='text-sm font-medium text-muted-foreground'>{label}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className='text-3xl font-bold'>{loading ? '…' : value}</p>
-                <p className='text-muted-foreground text-xs mt-1'>{desc}</p>
+                <p className='mt-1 text-xs text-muted-foreground'>{desc}</p>
               </CardContent>
             </Card>
           </button>
         ))}
       </div>
 
-      <div className='flex gap-2 flex-wrap'>
+      <div className='flex flex-wrap gap-2'>
         {(['all', 'linked', 'pi_only', 'google_only'] as const).map((s) => (
           <button
             key={s}
             onClick={() => setFilter(s)}
-            className={`rounded-full px-3 py-1 text-xs font-medium border transition-colors ${
+            className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
               filter === s
-                ? 'bg-primary text-primary-foreground border-primary'
+                ? 'border-primary bg-primary text-primary-foreground'
                 : 'border-border text-muted-foreground hover:bg-muted'
             }`}
           >
@@ -108,23 +120,23 @@ export default function LinksPage() {
       ) : filtered.length === 0 ? (
         <p className='text-muted-foreground text-sm'>{t('noUsers')}</p>
       ) : (
-        <div className='rounded-lg border overflow-x-auto'>
+        <div className='overflow-x-auto overflow-hidden rounded-lg border'>
           <table className='w-full text-sm'>
-            <thead className='bg-muted/50 border-b'>
+            <thead className='border-b bg-muted/50'>
               <tr>
-                <th className='text-left px-4 py-2 font-medium'>{t('col.user')}</th>
-                <th className='text-left px-4 py-2 font-medium'>{t('col.piAccount')}</th>
-                <th className='text-left px-4 py-2 font-medium'>{t('col.googleAccount')}</th>
-                <th className='text-left px-4 py-2 font-medium'>{t('col.linkStatus')}</th>
-                <th className='text-left px-4 py-2 font-medium'>{t('col.role')}</th>
-                <th className='text-left px-4 py-2 font-medium'>{t('col.joinDate')}</th>
+                <th className='px-4 py-2 text-left font-medium'>{t('col.user')}</th>
+                <th className='px-4 py-2 text-left font-medium'>{t('col.piAccount')}</th>
+                <th className='px-4 py-2 text-left font-medium'>{t('col.googleAccount')}</th>
+                <th className='px-4 py-2 text-left font-medium'>{t('col.linkStatus')}</th>
+                <th className='px-4 py-2 text-left font-medium'>{t('col.role')}</th>
+                <th className='px-4 py-2 text-left font-medium'>{t('col.joinDate')}</th>
               </tr>
             </thead>
             <tbody className='divide-y'>
-              {filtered.map((u) => {
+              {displayedLinks.map((u) => {
                 const status = getLinkStatus(u)
                 return (
-                  <tr key={u.id} className='hover:bg-muted/30 transition-colors'>
+                  <tr key={u.id} className='transition-colors hover:bg-muted/30'>
                     <td className='px-4 py-3 font-medium'>{u.display_name}</td>
                     <td className='px-4 py-3 text-muted-foreground'>
                       {u.pi_username ? `@${u.pi_username}` : '—'}
@@ -137,8 +149,8 @@ export default function LinksPage() {
                         {STATUS_LABEL[status]}
                       </span>
                     </td>
-                    <td className='px-4 py-3 text-muted-foreground text-xs'>{u.role}</td>
-                    <td className='px-4 py-3 text-muted-foreground text-xs whitespace-nowrap'>
+                    <td className='px-4 py-3 text-xs text-muted-foreground'>{u.role}</td>
+                    <td className='whitespace-nowrap px-4 py-3 text-xs text-muted-foreground'>
                       {new Date(u.created_at).toLocaleDateString('ko-KR')}
                     </td>
                   </tr>
@@ -148,6 +160,8 @@ export default function LinksPage() {
           </table>
         </div>
       )}
+
+      <AdminPagination page={page} totalPages={totalPages} onPage={setPage} />
     </div>
   )
 }

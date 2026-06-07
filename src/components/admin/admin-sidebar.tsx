@@ -47,7 +47,7 @@ export function AdminSidebar() {
   const pathname = usePathname()
 
   return (
-    <aside className='bg-muted/40 border-r w-48 shrink-0 flex flex-col'>
+    <aside className='bg-muted/40 border-r w-48 shrink-0 hidden md:flex flex-col'>
       <div className='border-b px-4 py-3'>
         <p className='font-semibold text-sm'>{t('title')}</p>
       </div>

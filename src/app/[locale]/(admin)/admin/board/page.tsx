@@ -5,6 +5,11 @@ import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
+import { useDynamicLimit } from '@/hooks/use-dynamic-limit'
+import { AdminPagination } from '@/components/admin/admin-pagination'
+
+// p-6(48) + 제목+설명(56) + gap(16) + 카테고리필터(36) + gap(16) + 테이블헤더(33) + gap(16) + 페이지네이션(36)
+const CHROME_PX = 257
 
 interface PostRow {
   post_id: string
@@ -25,13 +30,16 @@ export default function AdminBoardPage() {
   const [loading, setLoading] = useState(true)
   const [ctgrFilter, setCtgrFilter] = useState('ALL')
   const [page, setPage] = useState(1)
-  const limit = 30
+  const limit = useDynamicLimit(CHROME_PX)
 
   const categories = useMemo(() => {
     const unique = new Map<string, string>()
     posts.forEach((p) => unique.set(p.ctgr_cd, p.ctgr_cd))
     return Array.from(unique.keys())
   }, [posts])
+
+  // limit 변경 시 첫 페이지로 리셋
+  useEffect(() => { setPage(1) }, [limit])
 
   useEffect(() => {
     setLoading(true)
@@ -47,7 +55,7 @@ export default function AdminBoardPage() {
         setTotal(d.total ?? 0)
       })
       .finally(() => setLoading(false))
-  }, [page, ctgrFilter])
+  }, [page, ctgrFilter, limit])
 
   const handlePinToggle = async (postId: string, currentPin: string) => {
     const res = await fetch(`/api/admin/board/${postId}`, { method: 'PATCH' })
@@ -129,7 +137,7 @@ export default function AdminBoardPage() {
                 className='flex flex-col gap-1 border-b px-4 py-3 last:border-b-0 sm:grid sm:grid-cols-[60px_1fr_80px_60px_100px_120px] sm:items-center sm:gap-0'
               >
                 <span className='text-xs font-medium text-muted-foreground'>{post.ctgr_cd}</span>
-                <div className='flex items-center gap-1.5 min-w-0'>
+                <div className='flex min-w-0 items-center gap-1.5'>
                   {post.pin_yn === 'Y' && (
                     <span className='shrink-0 rounded bg-primary/10 px-1.5 py-0.5 text-xs font-medium text-primary'>
                       {t('notice')}
@@ -146,10 +154,7 @@ export default function AdminBoardPage() {
                 <span className='text-center text-xs text-muted-foreground'>{post.rgst_usr_nm}</span>
                 <span className='text-center text-xs text-muted-foreground'>{post.vw_cnt}</span>
                 <span className='text-center text-xs text-muted-foreground'>
-                  {new Date(post.reg_dtm).toLocaleDateString('ko-KR', {
-                    month: '2-digit',
-                    day: '2-digit',
-                  })}
+                  {new Date(post.reg_dtm).toLocaleDateString('ko-KR', { month: '2-digit', day: '2-digit' })}
                 </span>
                 <div className='flex items-center justify-center gap-1.5'>
                   <Button
@@ -175,30 +180,7 @@ export default function AdminBoardPage() {
         )}
       </div>
 
-      {totalPages > 1 && (
-        <div className='flex justify-center gap-1'>
-          {page > 1 && (
-            <Button variant='outline' size='sm' onClick={() => setPage((p) => p - 1)}>
-              {tc('prev')}
-            </Button>
-          )}
-          {Array.from({ length: Math.min(totalPages, 10) }, (_, i) => i + 1).map((p) => (
-            <Button
-              key={p}
-              variant={p === page ? 'default' : 'outline'}
-              size='sm'
-              onClick={() => setPage(p)}
-            >
-              {p}
-            </Button>
-          ))}
-          {page < totalPages && (
-            <Button variant='outline' size='sm' onClick={() => setPage((p) => p + 1)}>
-              {tc('next')}
-            </Button>
-          )}
-        </div>
-      )}
+      <AdminPagination page={page} totalPages={totalPages} onPage={setPage} />
     </div>
   )
 }

@@ -5,6 +5,11 @@ import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { useDynamicLimit } from '@/hooks/use-dynamic-limit'
+import { AdminPagination } from '@/components/admin/admin-pagination'
+
+// p-6(48) + 제목+설명(56) + gap(16) + 검색입력(36) + gap(16) + 테이블헤더(33) + gap(16) + 페이지네이션(36)
+const CHROME_PX = 257
 
 interface WordRow {
   dic_id: string
@@ -39,11 +44,17 @@ export default function StdWordsPage() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
 
+  const [page, setPage] = useState(1)
+  const limit = useDynamicLimit(CHROME_PX)
+
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState<WordRow | null>(null)
   const [form, setForm] = useState(EMPTY_FORM)
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState<string | null>(null)
+
+  // limit 또는 검색어 변경 시 첫 페이지로 리셋
+  useEffect(() => { setPage(1) }, [limit, search])
 
   const load = useCallback(() => {
     setLoading(true)
@@ -132,6 +143,9 @@ export default function StdWordsPage() {
       setDeleting(null)
     }
   }
+
+  const totalPages = Math.ceil(words.length / limit)
+  const displayedWords = words.slice((page - 1) * limit, page * limit)
 
   return (
     <div className='space-y-4'>
@@ -234,7 +248,7 @@ export default function StdWordsPage() {
               </tr>
             </thead>
             <tbody className='divide-y'>
-              {words.map((w) => (
+              {displayedWords.map((w) => (
                 <tr key={w.dic_id} className='hover:bg-muted/30 transition-colors'>
                   <td className='px-4 py-3 font-medium'>{w.dic_log_nm}</td>
                   <td className='px-4 py-3 font-mono text-xs'>{w.dic_phy_nm}</td>
@@ -272,6 +286,8 @@ export default function StdWordsPage() {
           </table>
         </div>
       )}
+
+      <AdminPagination page={page} totalPages={totalPages} onPage={setPage} />
     </div>
   )
 }

@@ -1,1 +1,540 @@
-{}
+{
+  "common": {
+    "create": "Tạo",
+    "creating": "Đang tạo...",
+    "loading": "Đang tải...",
+    "save": "Lưu",
+    "saving": "Đang lưu...",
+    "cancel": "Hủy",
+    "delete": "Xóa",
+    "deleting": "Đang xóa...",
+    "edit": "Sửa",
+    "search": "Tìm kiếm",
+    "reset": "Đặt lại",
+    "prev": "Trước",
+    "next": "Tiếp",
+    "all": "Tất cả",
+    "noData": "Không có Data.",
+    "confirm": "Xác nhận",
+    "back": "Quay lại",
+    "close": "Đóng",
+    "yes": "Có",
+    "no": "Không",
+    "error": "Đã xảy ra lỗi",
+    "newRegister": "+ Đăng ký mới",
+    "count": "{count} mục",
+    "countPerson": "{count} người",
+    "pageOf": "{current} / {total}"
+  },
+  "header": {
+    "board": "Board",
+    "admin": "Admin",
+    "logout": "Đăng xuất",
+    "piLogin": "Đăng nhập Pi",
+    "piLoginDev": "Đăng nhập Pi (dev)",
+    "piAuthenticating": "Đang xác thực...",
+    "googleLogin": "Đăng nhập Google"
+  },
+  "home": {
+    "title": "Next.js Starter Kit",
+    "subtitle": "Boilerplate Next.js 15 + Tailwind CSS v4 + shadcn/ui để bắt đầu nhanh chóng",
+    "loginSection": "Đăng nhập",
+    "detectingEnv": "Đang phát hiện môi trường...",
+    "piNetwork": "Pi Network",
+    "google": "Google",
+    "accountLink": "Liên kết tài khoản",
+    "piPayment": "Thanh toán Pi Coin",
+    "techStack": "Tech Stack đi kèm",
+    "components": "Ví dụ Component shadcn/ui",
+    "button": "Button",
+    "inputLabel": "Input + Label",
+    "dialogToast": "Dialog & Toast (Sonner)",
+    "openDialog": "Mở Dialog",
+    "dialogTitle": "Chào mừng bạn đến với Starter Kit!",
+    "dialogDesc": "Đây là Component Dialog của shadcn/ui. Hỗ trợ hoàn hảo khả năng truy cập dựa trên @base-ui/react.",
+    "showToast": "Hiển thị Toast",
+    "dialogToastMsg": "Toast từ Dialog!",
+    "successToast": "Success Toast",
+    "errorToast": "Error Toast",
+    "errorToastMsg": "Ví dụ Error Toast",
+    "gettingStarted": "Bắt đầu",
+    "step1": "Tạo tệp biến môi trường",
+    "step2": "Thêm các Component cần thiết",
+    "step3": "Xác định Schema biến môi trường và bắt đầu phát triển!",
+    "email": "Email",
+    "buttonDefault": "Mặc định",
+    "successToastMsg": "Sonner Toast!",
+    "successToastDesc": "Tùy chọn richColors đã được kích hoạt.",
+    "stack": {
+      "nextjsDesc": "App Router, React 19, Turbopack",
+      "tailwindDesc": "Cấu hình CSS-first, chỉ thị @theme",
+      "shadcnDesc": "Kiểu base-nova, dựa trên @base-ui/react",
+      "tsDesc": "Chế độ strict, an toàn kiểu",
+      "themesDesc": "Chế độ tối / Tự động liên kết Theme hệ thống",
+      "envDesc": "Xác thực kiểu biến môi trường tại thời điểm Build"
+    }
+  },
+  "board": {
+    "title": "Board",
+    "noBoards": "Không có Board nào được đăng ký.",
+    "write": "Viết bài",
+    "columns": {
+      "title": "Tiêu đề",
+      "author": "Tác giả",
+      "views": "Lượt xem",
+      "date": "Ngày"
+    },
+    "notice": "Thông báo",
+    "adopted": "Đã chọn",
+    "noData": "Chưa có bài viết nào.",
+    "noResults": "Không có kết quả tìm kiếm cho \"{q}\".",
+    "searchPlaceholder": "Tìm kiếm tiêu đề hoặc nội dung",
+    "postTitle": "Tiêu đề",
+    "postContent": "Nội dung",
+    "titlePlaceholder": "Vui lòng nhập tiêu đề",
+    "editSuccess": "Đã sửa thành công",
+    "createSuccess": "Bài viết đã được tạo",
+    "editFail": "Sửa thất bại",
+    "createFail": "Tạo thất bại",
+    "saving": "Đang sửa...",
+    "creating": "Đang tạo...",
+    "editPost": "Sửa",
+    "submitPost": "Đăng",
+    "deletePost": "Bạn có muốn xóa bài viết này không?",
+    "deleteSuccess": "Đã xóa thành công",
+    "deleteFail": "Xóa thất bại",
+    "viewCount": "{count} lượt xem",
+    "modified": "(Đã sửa)",
+    "adoptedComplete": "Đã chọn hoàn tất",
+    "writeTitle": "{name} — Viết bài",
+    "editTitle": "{name} — Sửa",
+    "contentPlaceholder": "Nhập nội dung",
+    "featureComment": "Bình luận",
+    "featureAttachment": "Tệp đính kèm"
+  },
+  "comment": {
+    "title": "Bình luận",
+    "count": "{count} bình luận",
+    "noComments": "Chưa có bình luận nào.",
+    "adoptedAnswer": "Trả lời được chọn",
+    "adopt": "Chọn",
+    "cancelAdopt": "Hủy chọn",
+    "placeholder": "Nhập bình luận (Ctrl+Enter để đăng)",
+    "submit": "Đăng bình luận",
+    "createSuccess": "Bình luận đã được đăng",
+    "createFail": "Đăng bình luận thất bại",
+    "deleteConfirm": "Bạn có muốn xóa bình luận này không?",
+    "deleteSuccess": "Bình luận đã được xóa",
+    "deleteFail": "Xử lý thất bại",
+    "adoptSuccess": "Trả lời đã được chọn",
+    "adoptCancelSuccess": "Lựa chọn đã bị hủy",
+    "loginRequired": "Vui lòng đăng nhập để viết bình luận."
+  },
+  "attachment": {
+    "title": "Tệp đính kèm",
+    "titleCount": "Tệp đính kèm ({count})",
+    "delete": "Xóa",
+    "upload": "Thêm tệp",
+    "uploading": "Đang tải lên…",
+    "uploadSuccess": "{count} tệp đã được tải lên",
+    "uploadFail": "Tải lên thất bại",
+    "deleteConfirm": "Bạn có muốn xóa tệp đính kèm này không?",
+    "deleteSuccess": "Đã xóa",
+    "deleteFail": "Xóa thất bại",
+    "sizeLimit": "Tối đa 5 tệp · 20MB mỗi tệp"
+  },
+  "link": {
+    "title": "Liên kết tài khoản Pi",
+    "desc": "Liên kết tài khoản Pi và tài khoản Google.",
+    "complete": "Liên kết đã hoàn tất.",
+    "checkingPi": "Đang kiểm tra đăng nhập Pi…",
+    "generateTitle": "Tạo mã liên kết",
+    "inputTitle": "Nhập mã liên kết",
+    "needPiLogin": "Cần đăng nhập Pi để tạo mã liên kết.",
+    "piLogin": "Đăng nhập Pi",
+    "generateDesc": "Nhấn nút bên dưới để tạo mã 6 chữ số. Truy cập trang /link trong trình duyệt thông thường và nhập mã để liên kết tài khoản của bạn.",
+    "generating": "Đang tạo mã…",
+    "regenerate": "Tạo mã mới",
+    "generate": "Tạo mã liên kết",
+    "codeLabel": "Mã liên kết (nhập trong trình duyệt thông thường)",
+    "codeExpiry": "Sử dụng trong 10 phút",
+    "generateFail": "Tạo mã thất bại",
+    "inputDesc": "Nhập mã 6 chữ số được tạo trên trang này trong Pi Browser.",
+    "codeInputLabel": "Mã liên kết",
+    "googleLoginRequired": "Sau khi nhập mã, bạn sẽ được chuyển đến màn hình đăng nhập Google.",
+    "linking": "Đang liên kết…",
+    "googleLink": "Liên kết Google",
+    "googleLoginAndLink": "Đăng nhập Google và liên kết",
+    "linkDone": "Liên kết tài khoản hoàn tất! Đang chuyển đến trang chủ…",
+    "linkFail": "Liên kết thất bại",
+    "completeTitle": "Đang xử lý liên kết tài khoản",
+    "checkingSession": "Đang kiểm tra phiên Google…",
+    "processing": "Đang xử lý liên kết…",
+    "linkedSuccess": "Tài khoản Pi và Google đã được liên kết! Đang chuyển đến trang chủ…",
+    "serverError": "Đã xảy ra lỗi Server",
+    "invalidLink": "Liên kết không hợp lệ."
+  },
+  "admin": {
+    "nav": {
+      "title": "Admin",
+      "dashboard": "Dashboard",
+      "users": "Quản lý người dùng",
+      "payments": "Lịch sử thanh toán",
+      "links": "Trạng thái liên kết tài khoản",
+      "board": "Quản lý Board",
+      "stdSection": "Tiêu chuẩn Data",
+      "stdWords": "Từ tiêu chuẩn",
+      "stdDomains": "Domain tiêu chuẩn",
+      "stdTerms": "Thuật ngữ tiêu chuẩn",
+      "stdDdl": "DDL Export",
+      "stdAudit": "Lịch sử thay đổi",
+      "stdApprovals": "Workflow phê duyệt",
+      "i18nSection": "Đa ngôn ngữ",
+      "i18n": "Quản lý đa ngôn ngữ",
+      "backHome": "← Về trang chủ"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "greeting": "Xin chào, {name} ({role})",
+      "totalUsers": "Tổng số người dùng",
+      "totalUsersDesc": "Tổng số tài khoản đã đăng ký",
+      "piOnly": "Chỉ Pi",
+      "piOnlyDesc": "Người dùng chỉ có tài khoản Pi",
+      "googleOnly": "Chỉ Google",
+      "googleOnlyDesc": "Người dùng chỉ có tài khoản Google",
+      "linked": "Liên kết tài khoản",
+      "linkedDesc": "Liên kết Pi + Google hoàn tất"
+    },
+    "users": {
+      "title": "Quản lý người dùng",
+      "totalCount": "Tổng cộng {count} người",
+      "noUsers": "Không có người dùng nào.",
+      "col": {
+        "user": "Người dùng",
+        "piAccount": "Tài khoản Pi",
+        "googleAccount": "Tài khoản Google",
+        "role": "Vai trò",
+        "joinDate": "Ngày tham gia",
+        "changeRole": "Thay đổi vai trò"
+      },
+      "roleChanged": "Vai trò đã được thay đổi",
+      "changeFail": "Thay đổi thất bại"
+    },
+    "payments": {
+      "title": "Lịch sử thanh toán",
+      "totalCount": "Tổng cộng {count} giao dịch · Tổng số đã hoàn thành {total} π",
+      "noPayments": "Không có lịch sử thanh toán.",
+      "status": {
+        "completed": "Hoàn thành",
+        "approved": "Đã phê duyệt",
+        "pending": "Đang chờ",
+        "cancelled": "Hủy",
+        "error": "Lỗi"
+      },
+      "col": {
+        "user": "Người dùng",
+        "amount": "Số tiền",
+        "memo": "Ghi chú",
+        "status": "Trạng thái",
+        "paymentId": "ID thanh toán",
+        "date": "Ngày"
+      }
+    },
+    "links": {
+      "title": "Trạng thái liên kết tài khoản",
+      "totalCount": "Tổng cộng {count} người",
+      "noUsers": "Không có người dùng nào.",
+      "status": {
+        "linked": "Đã liên kết",
+        "piOnly": "Chỉ Pi",
+        "googleOnly": "Chỉ Google"
+      },
+      "desc": {
+        "linked": "Pi + Google đã kết nối",
+        "piOnly": "Google chưa liên kết",
+        "googleOnly": "Pi chưa liên kết"
+      },
+      "col": {
+        "user": "Người dùng",
+        "piAccount": "Tài khoản Pi",
+        "googleAccount": "Tài khoản Google",
+        "linkStatus": "Trạng thái liên kết",
+        "role": "Vai trò",
+        "joinDate": "Ngày tham gia"
+      }
+    },
+    "board": {
+      "title": "Quản lý Board",
+      "desc": "Tổng cộng {count} bài viết · Cài đặt thông báo và xóa bắt buộc",
+      "noData": "Không có bài viết nào.",
+      "loading": "Đang tải…",
+      "col": {
+        "category": "Category",
+        "title": "Tiêu đề",
+        "author": "Tác giả",
+        "views": "Lượt xem",
+        "date": "Ngày",
+        "manage": "Quản lý"
+      },
+      "notice": "Thông báo",
+      "setPinned": "Đặt làm thông báo",
+      "unsetPinned": "Bỏ đặt làm thông báo",
+      "pinnedSuccess": "Đã đặt làm thông báo",
+      "unpinnedSuccess": "Đã bỏ đặt làm thông báo",
+      "processFail": "Xử lý thất bại",
+      "deleteConfirm": "Bạn có muốn xóa bài viết \"{title}\" không?",
+      "deleteSuccess": "Bài viết đã được xóa",
+      "deleteFail": "Xóa thất bại"
+    },
+    "std": {
+      "words": {
+        "title": "Quản lý từ chuẩn",
+        "totalCount": "Tổng cộng {count} mục",
+        "noData": "Không có từ nào.",
+        "searchPlaceholder": "Tìm kiếm tên logic / tên vật lý…",
+        "formTitleNew": "Đăng ký từ mới",
+        "formTitleEdit": "Sửa từ",
+        "col": {
+          "logNm": "Tên logic",
+          "phyNmAbbr": "Tên vật lý (viết tắt)",
+          "phyNmFull": "Tên vật lý (Đầy đủ)",
+          "typeLen": "Type/Độ dài",
+          "status": "Trạng thái",
+          "desc": "Mô tả"
+        },
+        "field": {
+          "logNm": "Tên logic *",
+          "phyNmAbbr": "Tên vật lý (Viết tắt) *",
+          "phyNmFull": "Tên vật lý (Đầy đủ)",
+          "dataType": "Data Type",
+          "dataLen": "Data Độ dài",
+          "desc": "Mô tả"
+        },
+        "placeholder": {
+          "logNm": "Ví dụ: Người dùng",
+          "phyNmAbbr": "Ví dụ: USR",
+          "phyNmFull": "Ví dụ: User",
+          "dataType": "Ví dụ: VARCHAR",
+          "dataLen": "Ví dụ: 100",
+          "desc": "Mô tả từ (tùy chọn)"
+        },
+        "validationRequired": "Tên logic và tên vật lý là bắt buộc",
+        "deleteConfirm": "Bạn có muốn xóa từ \"{name}\" không?",
+        "saveSuccess": "Đã lưu thành công",
+        "editSuccess": "Đã sửa đổi thành công",
+        "deleteSuccess": "Đã xóa thành công",
+        "saveFail": "Lưu thất bại",
+        "deleteFail": "Xóa thất bại"
+      },
+      "domains": {
+        "title": "Quản lý Domain tiêu chuẩn",
+        "totalCount": "Tổng cộng {count} mục",
+        "noData": "Không có Domain.",
+        "searchPlaceholder": "Tìm kiếm Tên Domain / Tên Key Domain…",
+        "formTitleNew": "Đăng ký Domain mới",
+        "formTitleEdit": "Sửa đổi Domain",
+        "typeFilter": {
+          "all": "Tất cả",
+          "code": "Code",
+          "id": "Định danh",
+          "general": "Chung"
+        },
+        "col": {
+          "domNm": "Tên Domain",
+          "keyDomNm": "Tên Key Domain",
+          "phyNm": "Tên vật lý",
+          "type": "Loại",
+          "dataType": "Data Type",
+          "desc": "Mô tả"
+        },
+        "field": {
+          "domNm": "Tên Domain *",
+          "keyDomNm": "Tên Key Domain *",
+          "keyDomPhyNm": "Tên vật lý Key Domain *",
+          "domType": "Loại Domain",
+          "dataType": "Data Type",
+          "dataLen": "Độ dài",
+          "dataScale": "Số thập phân",
+          "desc": "Mô tả"
+        },
+        "placeholder": {
+          "domNm": "Ví dụ: Domain giá",
+          "keyDomNm": "Ví dụ: Giá",
+          "keyDomPhyNm": "Ví dụ: PRICE",
+          "dataLen": "Ví dụ: 100",
+          "dataScale": "Ví dụ: 2",
+          "desc": "Mô tả Domain (tùy chọn)"
+        },
+        "selectDomType": {
+          "code": "Code",
+          "id": "ID",
+          "general": "Chung"
+        },
+        "selectDataType": {
+          "varchar": "VARCHAR / TEXT",
+          "integer": "INTEGER",
+          "numeric": "NUMERIC",
+          "date": "DATE",
+          "timestamp": "TIMESTAMP"
+        },
+        "validationRequired": "Tên Domain, Tên Key Domain, Tên vật lý Key Domain là bắt buộc",
+        "deleteConfirm": "Bạn có muốn xóa \"{name}\" không?",
+        "saveSuccess": "Đã lưu thành công",
+        "editSuccess": "Đã sửa thành công",
+        "deleteSuccess": "Đã xóa thành công",
+        "saveFail": "Lưu thất bại",
+        "deleteFail": "Xóa thất bại"
+      },
+      "terms": {
+        "title": "Quản lý thuật ngữ tiêu chuẩn",
+        "totalCount": "Tổng cộng {count} mục",
+        "noData": "Không có thuật ngữ nào.",
+        "searchPlaceholder": "Tìm kiếm Tên logic / Tên vật lý…",
+        "formTitleNew": "Đăng ký thuật ngữ tiêu chuẩn mới",
+        "formTitleEdit": "Sửa thuật ngữ",
+        "col": {
+          "logNm": "Tên logic",
+          "phyNmLower": "Tên vật lý (chữ thường)",
+          "phyNmUpper": "Tên vật lý (chữ hoa)",
+          "desc": "Mô tả"
+        },
+        "field": {
+          "logNm": "Tên logic *",
+          "wordSelect": "Chọn từ cấu thành *",
+          "wordSelectHint": "(Thứ tự thêm = Thứ tự tên vật lý)",
+          "domainSelect": "Standard Domain * (Phần tử cuối cùng của tên vật lý)",
+          "autoPhyNm": "Tên vật lý tạo tự động",
+          "desc": "Mô tả (tùy chọn)"
+        },
+        "placeholder": {
+          "logNm": "Ví dụ: Tên nhân viên",
+          "wordSearch": "Tìm kiếm từ rồi nhấp để thêm…",
+          "domainSelect": "Chọn Domain…",
+          "desc": "Mô tả thuật ngữ"
+        },
+        "validationLogNm": "Tên logic là bắt buộc",
+        "validationWordDomain": "Từ cấu thành và Domain phải được chọn",
+        "validationPhyNm": "Không thể tạo tên vật lý",
+        "deleteConfirm": "Bạn có muốn xóa \"{name}\" không?",
+        "saveSuccess": "Đã lưu thành công",
+        "editSuccess": "Đã sửa thành công",
+        "deleteSuccess": "Đã xóa thành công",
+        "saveFail": "Lưu thất bại",
+        "deleteFail": "Xóa thất bại"
+      },
+      "ddl": {
+        "title": "DDL Export",
+        "desc": "Nếu chọn thuật ngữ tiêu chuẩn làm Column, CREATE TABLE SQL sẽ được tạo tự động",
+        "sectionTable": "Thông tin Table",
+        "sectionColumn": "Thêm Column — chọn từ Standard Term",
+        "sectionPreview": "Xem trước DDL",
+        "field": {
+          "tableNmEn": "Table Name (tiếng Anh) *",
+          "tableNmKo": "Table Name (tiếng Hàn)"
+        },
+        "placeholder": {
+          "tableNmEn": "Ví dụ: usr_info",
+          "tableNmKo": "Ví dụ: Thông tin người dùng",
+          "termSearch": "Tìm kiếm Term sau đó nhấp để thêm…"
+        },
+        "col": {
+          "colLogNm": "Column (tên logic)",
+          "type": "Type",
+          "pk": "PK",
+          "nn": "NN"
+        },
+        "copy": "Sao chép",
+        "download": "↓ .sql",
+        "emptyPreview": "Nếu bạn thêm Table Name và Column, DDL sẽ được tạo ở đây.",
+        "copySuccess": "DDL đã được sao chép vào Clipboard"
+      },
+      "audit": {
+        "title": "Lịch sử thay đổi (Audit Trail)",
+        "totalCount": "Tổng cộng {count} mục",
+        "noData": "Không có lịch sử.",
+        "tableLabel": {
+          "stdDic": "Standard Word",
+          "stdDom": "Standard Domain",
+          "stdTerm": "Standard Term"
+        },
+        "filter": {
+          "table": "Table",
+          "from": "Ngày bắt đầu",
+          "to": "Ngày kết thúc",
+          "allTables": "Tất cả"
+        },
+        "col": {
+          "changedAt": "Ngày/giờ thay đổi",
+          "table": "Table",
+          "target": "Đối tượng",
+          "action": "Hành động",
+          "changedBy": "Người thay đổi"
+        },
+        "before": "Trước khi thay đổi",
+        "after": "Sau khi thay đổi"
+      },
+      "approvals": {
+        "title": "Phê duyệt Workflow",
+        "totalCount": "Tổng cộng {count} mục",
+        "noPending": "Không có yêu cầu phê duyệt đang chờ.",
+        "noData": "Không có Data.",
+        "allTypes": "Tất cả Type",
+        "status": {
+          "pending": "Đang chờ",
+          "approved": "Đã phê duyệt",
+          "rejected": "Đã từ chối",
+          "all": "Tất cả"
+        },
+        "entity": {
+          "stdDic": "Standard Word",
+          "stdDom": "Standard Domain",
+          "stdTerm": "Standard Term"
+        },
+        "col": {
+          "requestedAt": "Ngày/giờ yêu cầu",
+          "type": "Type",
+          "target": "Đối tượng",
+          "requestedBy": "Người yêu cầu",
+          "status": "Trạng thái"
+        },
+        "approve": "Phê duyệt",
+        "reject": "Từ chối",
+        "rejectReasonPlaceholder": "Vui lòng nhập lý do từ chối *",
+        "rejectConfirm": "Xác nhận từ chối",
+        "rejectReason": "Lý do từ chối: {reason}",
+        "decidedBy": "Người xử lý: {name} / {date}",
+        "requestData": "Request Data",
+        "approveSuccess": "Đã phê duyệt thành công",
+        "rejectSuccess": "Đã từ chối thành công",
+        "processFail": "Xử lý thất bại"
+      }
+    },
+    "i18n": {
+      "title": "Quản lý đa ngôn ngữ",
+      "desc": "Dashboard trạng thái dịch",
+      "syncAll": "Đồng bộ DB→JSON",
+      "syncing": "Đang đồng bộ…",
+      "stats": {
+        "supportedLocales": "Ngôn ngữ được hỗ trợ",
+        "totalKeys": "Tổng số khóa dịch",
+        "completed": "Hoàn thành 100%",
+        "completedOf": "Trong số {count} ngôn ngữ"
+      },
+      "col": {
+        "language": "Ngôn ngữ",
+        "progress": "Tiến độ",
+        "translatedKeys": "Khóa đã dịch"
+      },
+      "translate": "Dịch + Đồng bộ",
+      "translating": "Đang dịch…",
+      "syncingLocale": "Đang đồng bộ…",
+      "translateSuccess": "Đã dịch {count} mục thành công",
+      "translateFail": "Dịch thất bại",
+      "syncSuccess": "Đã đồng bộ {count} ngôn ngữ thành công",
+      "syncNoData": "Không có Data để đồng bộ trong DB. Vui lòng chạy \"Dịch + Đồng bộ\" trước.",
+      "syncFail": "Đồng bộ thất bại",
+      "footnote1": "* \"Dịch + Đồng bộ\": Tự động dịch các khóa chưa dịch bằng Claude AI và sau đó cập nhật messages/*.json",
+      "footnote2": "* \"Đồng bộ DB→JSON\": Chỉ phản ánh Data dịch được lưu trữ trong DB vào tệp JSON"
+    }
+  }
+}

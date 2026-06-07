@@ -5,6 +5,11 @@ import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { useDynamicLimit } from '@/hooks/use-dynamic-limit'
+import { AdminPagination } from '@/components/admin/admin-pagination'
+
+// p-6(48) + 제목+설명(56) + gap(16) + 검색+타입필터(36) + gap(16) + 테이블헤더(33) + gap(16) + 페이지네이션(36)
+const CHROME_PX = 257
 
 interface DomainRow {
   dom_id: string
@@ -63,11 +68,17 @@ export default function StdDomainsPage() {
   const [search, setSearch] = useState('')
   const [typeFilter, setTypeFilter] = useState('')
 
+  const [page, setPage] = useState(1)
+  const limit = useDynamicLimit(CHROME_PX)
+
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState<DomainRow | null>(null)
   const [form, setForm] = useState(EMPTY_FORM)
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState<string | null>(null)
+
+  // limit·검색어·타입필터 변경 시 첫 페이지로 리셋
+  useEffect(() => { setPage(1) }, [limit, search, typeFilter])
 
   const load = useCallback(() => {
     setLoading(true)
@@ -161,6 +172,9 @@ export default function StdDomainsPage() {
       setDeleting(null)
     }
   }
+
+  const totalPages = Math.ceil(domains.length / limit)
+  const displayedDomains = domains.slice((page - 1) * limit, page * limit)
 
   return (
     <div className='space-y-4'>
@@ -279,7 +293,7 @@ export default function StdDomainsPage() {
               </tr>
             </thead>
             <tbody className='divide-y'>
-              {domains.map((d) => (
+              {displayedDomains.map((d) => (
                 <tr key={d.dom_id} className='hover:bg-muted/30 transition-colors'>
                   <td className='px-4 py-3 font-medium'>{d.dom_nm}</td>
                   <td className='px-4 py-3'>{d.key_dom_nm}</td>
@@ -313,6 +327,8 @@ export default function StdDomainsPage() {
           </table>
         </div>
       )}
+
+      <AdminPagination page={page} totalPages={totalPages} onPage={setPage} />
     </div>
   )
 }
