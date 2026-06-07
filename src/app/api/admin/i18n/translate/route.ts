@@ -9,12 +9,28 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-const LOCALE_NAMES: Record<string, string> = {
-  en: 'English', zh: 'Chinese (Simplified)', ja: 'Japanese', hi: 'Hindi',
-  vi: 'Vietnamese', af: 'Afrikaans', fil: 'Filipino', th: 'Thai',
-  id: 'Indonesian', ms: 'Malay', es: 'Spanish', fr: 'French',
-  de: 'German', it: 'Italian', ru: 'Russian',
-  pt: 'Portuguese', ar: 'Egyptian Arabic',
+// Gemini 프롬프트 품질을 위한 언어명 override
+// - Intl.DisplayNames가 모호하거나 locale_cd가 언어코드가 아닌 경우만 등록
+// - 새 locale 추가 시 이 맵을 건드릴 필요 없음 (Intl.DisplayNames가 자동 처리)
+const LOCALE_NAME_OVERRIDES: Record<string, string> = {
+  zh:  'Chinese (Simplified)',  // Intl은 'Chinese'로만 반환
+  ar:  'Egyptian Arabic',       // 아랍어 방언 명확화
+  au:  'Australian English',    // country code 기반 locale
+  fil: 'Filipino',              // Intl 미인식
+  af:  'Afrikaans',             // Intl 미인식 가능
+  il:  'Hebrew',                // country code 기반 locale → 히브리어
+}
+
+// locale_cd → Gemini용 언어명
+// Intl.DisplayNames 자동 파생 → override 적용 → 최후 폴백: locale_cd 그대로
+function getLocaleName(locale_cd: string): string {
+  if (LOCALE_NAME_OVERRIDES[locale_cd]) return LOCALE_NAME_OVERRIDES[locale_cd]
+  try {
+    const names = new Intl.DisplayNames(['en'], { type: 'language' })
+    const name = names.of(locale_cd)
+    if (name && name !== locale_cd) return name
+  } catch {}
+  return locale_cd
 }
 
 function flattenJson(obj: Record<string, unknown>, prefix = ''): Record<string, string> {
@@ -70,10 +86,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: '번역 대상 언어가 잘못됐습니다' }, { status: 400 })
   }
 
-  const localeName = LOCALE_NAMES[locale]
-  if (!localeName) {
-    return NextResponse.json({ error: '지원하지 않는 언어입니다' }, { status: 400 })
-  }
+  const localeName = getLocaleName(locale)
 
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) {

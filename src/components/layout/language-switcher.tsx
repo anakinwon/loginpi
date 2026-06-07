@@ -2,29 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { usePathname, useRouter } from '@/i18n/navigation'
-
-// locale_cd → alpha-2 국가코드 (fi fi-* CSS 플래그 아이콘용)
-const LOCALE_COUNTRY: Record<string, string> = {
-  ko: 'kr', en: 'us', zh: 'cn', ja: 'jp', hi: 'in',
-  vi: 'vn', af: 'za', fil: 'ph', th: 'th', id: 'id',
-  ms: 'my', es: 'es', fr: 'fr', de: 'de', it: 'it',
-  ru: 'ru', pt: 'pt', ar: 'eg',
-  au: 'au',  // 호주: 영어권이지만 AUD 통화 분리를 위해 별도 locale
-}
-
-// locale_cd → 대표 통화코드 (i18n_cntry_mst join 대신 정적 선언)
-const LOCALE_CURRENCY: Record<string, string> = {
-  ko: 'KRW', en: 'USD', zh: 'CNY', ja: 'JPY', hi: 'INR',
-  vi: 'VND', af: 'ZAR', fil: 'PHP', th: 'THB', id: 'IDR',
-  ms: 'MYR', es: 'EUR', fr: 'EUR', de: 'EUR', it: 'EUR',
-  ru: 'RUB', pt: 'EUR', ar: 'EGP',
-  au: 'AUD',
-}
-
-// 활성 locale에 대응하는 country_cd 집합 (대문자)
-const ACTIVE_COUNTRY_CODES = new Set(
-  Object.values(LOCALE_COUNTRY).map((c) => c.toUpperCase())
-)
+import { LOCALE_CURRENCY } from '@/lib/locale-currency'
+import { LOCALE_COUNTRY, ACTIVE_COUNTRY_CODES, getAlpha2 } from '@/lib/locale-country'
 
 interface ActiveLocale {
   locale_cd: string
@@ -52,13 +31,6 @@ function fmtRate(rate: number | undefined): string {
 // flag-icons CSS 아이콘 (fi fi-{alpha2})
 function FlagIcon({ code, className = '' }: { code: string; className?: string }) {
   return <span className={`fi fi-${code.toLowerCase()} ${className}`} />
-}
-
-// locale_cd → alpha-2 국가 코드 (정적 맵 우선, 없으면 BCP 47 마지막 세그먼트)
-function getAlpha2(locale_cd: string): string {
-  if (LOCALE_COUNTRY[locale_cd]) return LOCALE_COUNTRY[locale_cd]
-  const parts = locale_cd.split('-')
-  return parts[parts.length - 1].toLowerCase()
 }
 
 export function LanguageSwitcher({ locale }: { locale: string }) {

@@ -1,0 +1,540 @@
+{
+  "admin": {
+    "payments": {
+      "col": {
+        "date": "תאריך",
+        "status": "סטטוס",
+        "paymentId": "מזהה תשלום",
+        "user": "משתמש",
+        "amount": "סכום",
+        "memo": "Memo"
+      },
+      "title": "היסטוריית תשלומים",
+      "totalCount": "סה\"כ {count} פריטים · סכום שהושלם {total} π",
+      "noPayments": "אין היסטוריית תשלומים.",
+      "status": {
+        "completed": "הושלם",
+        "approved": "אושר",
+        "pending": "ממתין",
+        "cancelled": "מבוטל",
+        "error": "שגיאה"
+      }
+    },
+    "nav": {
+      "title": "מנהל",
+      "dashboard": "Dashboard",
+      "users": "ניהול משתמשים",
+      "payments": "היסטוריית תשלומים",
+      "links": "סטטוס קישור חשבונות",
+      "board": "ניהול Board",
+      "stdSection": "תקן Data",
+      "stdWords": "מילים סטנדרטיות",
+      "stdDomains": "Domains סטנדרטיים",
+      "stdTerms": "מונחים סטנדרטיים",
+      "stdDdl": "DDL Export",
+      "stdAudit": "היסטוריית שינויים",
+      "stdApprovals": "תהליך אישור",
+      "i18nSection": "רב לשוני",
+      "i18n": "ניהול רב לשוני",
+      "backHome": "← חזרה לדף הבית"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "greeting": "שלום, {name} ({role})",
+      "totalUsers": "סה\"כ משתמשים",
+      "totalUsersDesc": "מספר החשבונות הרשומים הכולל",
+      "piOnly": "Pi בלבד",
+      "piOnlyDesc": "משתמשים עם חשבונות Pi בלבד",
+      "googleOnly": "Google בלבד",
+      "googleOnlyDesc": "משתמשים עם חשבונות Google בלבד",
+      "linked": "קישור חשבונות",
+      "linkedDesc": "קישור Pi + Google הושלם"
+    },
+    "users": {
+      "title": "ניהול משתמשים",
+      "totalCount": "סה\"כ {count} משתמשים",
+      "noUsers": "אין משתמשים.",
+      "col": {
+        "user": "משתמש",
+        "piAccount": "חשבון Pi",
+        "googleAccount": "חשבון Google",
+        "role": "תפקיד",
+        "joinDate": "תאריך הצטרפות",
+        "changeRole": "שנה תפקיד"
+      },
+      "roleChanged": "התפקיד שונה",
+      "changeFail": "שינוי נכשל"
+    },
+    "links": {
+      "title": "סטטוס קישור חשבונות",
+      "totalCount": "סה\"כ {count} משתמשים",
+      "noUsers": "אין משתמשים כאלה.",
+      "status": {
+        "linked": "מקושר",
+        "piOnly": "Pi בלבד",
+        "googleOnly": "Google בלבד"
+      },
+      "desc": {
+        "linked": "Pi + Google מחובר",
+        "piOnly": "Google לא מקושר",
+        "googleOnly": "Pi לא מקושר"
+      },
+      "col": {
+        "user": "משתמש",
+        "piAccount": "חשבון Pi",
+        "googleAccount": "חשבון Google",
+        "linkStatus": "סטטוס קישור",
+        "role": "תפקיד",
+        "joinDate": "תאריך הצטרפות"
+      }
+    },
+    "board": {
+      "title": "ניהול Board",
+      "desc": "{count} פוסטים בסך הכל · הגדרת הודעה ומחיקה כפויה",
+      "noData": "אין פוסטים.",
+      "loading": "טוען...",
+      "col": {
+        "category": "Category",
+        "title": "כותרת",
+        "author": "מחבר",
+        "views": "צפיות",
+        "date": "תאריך",
+        "manage": "ניהול"
+      },
+      "notice": "הודעה",
+      "setPinned": "הגדר כהודעה",
+      "unsetPinned": "בטל הודעה",
+      "pinnedSuccess": "הוגדר כהודעה בהצלחה",
+      "unpinnedSuccess": "ההודעה בוטלה בהצלחה",
+      "processFail": "הפעולה נכשלה",
+      "deleteConfirm": "למחוק את הפוסט \"{title}\"?",
+      "deleteSuccess": "הפוסט נמחק בהצלחה.",
+      "deleteFail": "מחיקה נכשלה"
+    },
+    "std": {
+      "words": {
+        "title": "ניהול מילים סטנדרטיות",
+        "totalCount": "סה\"כ {count} מילים",
+        "noData": "אין מילים.",
+        "searchPlaceholder": "חיפוש שם לוגי / שם פיזי...",
+        "formTitleNew": "רישום מילה חדשה",
+        "formTitleEdit": "עריכת מילה",
+        "col": {
+          "logNm": "שם לוגי",
+          "phyNmAbbr": "שם פיזי (קיצור)",
+          "phyNmFull": "שם פיזי (מלא)",
+          "typeLen": "Type/אורך",
+          "status": "סטטוס",
+          "desc": "תיאור"
+        },
+        "field": {
+          "logNm": "שם לוגי *",
+          "phyNmAbbr": "שם פיזי (קיצור) *",
+          "phyNmFull": "שם פיזי (מלא)",
+          "dataType": "Data Type",
+          "dataLen": "Data אורך",
+          "desc": "תיאור"
+        },
+        "placeholder": {
+          "logNm": "דוגמה: משתמש",
+          "phyNmAbbr": "דוגמה: USR",
+          "phyNmFull": "דוגמה: User",
+          "dataType": "דוגמה: VARCHAR",
+          "dataLen": "דוגמה: 100",
+          "desc": "תיאור מילה (אופציונלי)"
+        },
+        "validationRequired": "שם לוגי ושם פיזי נדרשים",
+        "deleteConfirm": "האם אתה בטוח שברצונך למחוק את המילה \"{name}\"?",
+        "saveSuccess": "נשמר בהצלחה",
+        "editSuccess": "נערך בהצלחה",
+        "deleteSuccess": "נמחק בהצלחה",
+        "saveFail": "שמירה נכשלה",
+        "deleteFail": "מחיקה נכשלה"
+      },
+      "domains": {
+        "title": "ניהול Standard Domain",
+        "totalCount": "סה\"כ {count} פריטים",
+        "noData": "אין Domain",
+        "searchPlaceholder": "חפש Domain Name / Key Domain Name…",
+        "formTitleNew": "רישום Domain חדש",
+        "formTitleEdit": "עריכת Domain",
+        "typeFilter": {
+          "all": "הכל",
+          "code": "Code",
+          "id": "מזהה",
+          "general": "כללי"
+        },
+        "col": {
+          "domNm": "Domain Name",
+          "keyDomNm": "Key Domain Name",
+          "phyNm": "שם פיזי",
+          "type": "סוג",
+          "dataType": "Data Type",
+          "desc": "תיאור"
+        },
+        "field": {
+          "domNm": "Domain Name *",
+          "keyDomNm": "Key Domain Name *",
+          "keyDomPhyNm": "Key Domain Physical Name *",
+          "domType": "Domain סוג",
+          "dataType": "Data Type",
+          "dataLen": "אורך",
+          "dataScale": "מקומות עשרוניים",
+          "desc": "תיאור"
+        },
+        "placeholder": {
+          "domNm": "דוגמה: Price Domain",
+          "keyDomNm": "דוגמה: Price",
+          "keyDomPhyNm": "דוגמה: PRICE",
+          "dataLen": "לדוגמה: 100",
+          "dataScale": "לדוגמה: 2",
+          "desc": "תיאור Domain (אופציונלי)"
+        },
+        "selectDomType": {
+          "code": "Code",
+          "id": "מזהה",
+          "general": "כללי"
+        },
+        "selectDataType": {
+          "varchar": "VARCHAR / TEXT",
+          "integer": "INTEGER",
+          "numeric": "NUMERIC",
+          "date": "DATE",
+          "timestamp": "TIMESTAMP"
+        },
+        "validationRequired": "שם Domain, שם Key Domain, שם פיזי של Key Domain הם שדות חובה",
+        "deleteConfirm": "האם למחוק את \"{name}\"?",
+        "saveSuccess": "נשמר בהצלחה",
+        "editSuccess": "עודכן בהצלחה",
+        "deleteSuccess": "נמחק בהצלחה",
+        "saveFail": "שמירה נכשלה",
+        "deleteFail": "מחיקה נכשלה"
+      },
+      "terms": {
+        "deleteConfirm": "האם למחוק את \"{name}\"?",
+        "title": "ניהול מונחים סטנדרטיים",
+        "totalCount": "סה\"כ {count} פריטים",
+        "noData": "אין מונחים.",
+        "searchPlaceholder": "חיפוש שם לוגי / שם פיזי…",
+        "formTitleNew": "רישום מונח סטנדרטי חדש",
+        "formTitleEdit": "עריכת מונח",
+        "col": {
+          "logNm": "שם לוגי",
+          "phyNmLower": "שם פיזי (אותיות קטנות)",
+          "phyNmUpper": "שם פיזי (אותיות גדולות)",
+          "desc": "תיאור"
+        },
+        "field": {
+          "logNm": "שם לוגי *",
+          "wordSelect": "בחר מילים מרכיבות *",
+          "wordSelectHint": "(סדר הוספה = סדר שם פיזי)",
+          "domainSelect": "Standard Domain * (רכיב אחרון של שם פיזי)",
+          "autoPhyNm": "שם פיזי שנוצר אוטומטית",
+          "desc": "תיאור (אופציונלי)"
+        },
+        "placeholder": {
+          "logNm": "לדוגמה: שם עובד",
+          "wordSearch": "לאחר חיפוש מילה, הוסף בלחיצה…",
+          "domainSelect": "בחר Domain…",
+          "desc": "תיאור מונח"
+        },
+        "validationLogNm": "שם לוגי הוא שדה חובה",
+        "validationWordDomain": "מילים מרכיבות ו-Domain חייבים להיבחר",
+        "validationPhyNm": "לא ניתן ליצור שם פיזי",
+        "saveSuccess": "נשמר בהצלחה",
+        "editSuccess": "עודכן בהצלחה",
+        "deleteSuccess": "נמחק בהצלחה",
+        "saveFail": "שמירה נכשלה",
+        "deleteFail": "מחיקה נכשלה"
+      },
+      "ddl": {
+        "title": "DDL Export",
+        "desc": "אם תבחר מונחים סטנדרטיים כ-Column, ייווצר CREATE TABLE SQL אוטומטית",
+        "sectionTable": "מידע Table",
+        "sectionColumn": "הוסף Column — בחר מתוך מונחים סטנדרטיים",
+        "sectionPreview": "תצוגה מקדימה של DDL",
+        "field": {
+          "tableNmEn": "שם Table (אנגלית) *",
+          "tableNmKo": "שם Table (קוריאנית)"
+        },
+        "placeholder": {
+          "tableNmEn": "לדוגמה: usr_info",
+          "tableNmKo": "לדוגמה: פרטי משתמש",
+          "termSearch": "חפש מונח והוסף בלחיצה…"
+        },
+        "col": {
+          "colLogNm": "Column (שם לוגי)",
+          "type": "Type",
+          "pk": "PK",
+          "nn": "NN"
+        },
+        "copy": "העתק",
+        "download": "↓ .sql",
+        "emptyPreview": "לאחר הוספת שם Table ו-Column, ה-DDL ייווצר כאן.",
+        "copySuccess": "DDL הועתק ללוח הגזירים"
+      },
+      "audit": {
+        "title": "היסטוריית שינויים (Audit Trail)",
+        "totalCount": "סה\"כ {count} פריטים",
+        "noData": "אין היסטוריה.",
+        "tableLabel": {
+          "stdDic": "מילה סטנדרטית",
+          "stdDom": "Domain סטנדרטי",
+          "stdTerm": "מונח סטנדרטי"
+        },
+        "filter": {
+          "table": "Table",
+          "from": "תאריך התחלה",
+          "to": "תאריך סיום",
+          "allTables": "הכל"
+        },
+        "col": {
+          "changedAt": "תאריך/שעת שינוי",
+          "table": "Table",
+          "target": "יעד",
+          "action": "פעולה",
+          "changedBy": "שונה על ידי"
+        },
+        "before": "לפני שינוי",
+        "after": "לאחר שינוי"
+      },
+      "approvals": {
+        "title": "Workflow אישור",
+        "totalCount": "סה\"כ {count} פריטים",
+        "noPending": "אין בקשות אישור ממתינות.",
+        "noData": "אין Data.",
+        "allTypes": "כל ה-Types",
+        "status": {
+          "pending": "ממתין",
+          "approved": "אושר",
+          "rejected": "נדחה",
+          "all": "הכל"
+        },
+        "entity": {
+          "stdDic": "מילה סטנדרטית",
+          "stdDom": "Domain סטנדרטי",
+          "stdTerm": "מונח סטנדרטי"
+        },
+        "col": {
+          "requestedAt": "תאריך/שעת בקשה",
+          "type": "Type",
+          "target": "יעד",
+          "requestedBy": "מבוקש על ידי",
+          "status": "Status"
+        },
+        "approve": "אשר",
+        "reject": "דחה",
+        "rejectReasonPlaceholder": "הזן את סיבת הדחייה *",
+        "rejectConfirm": "אשר דחייה",
+        "rejectReason": "סיבת דחייה: {reason}",
+        "decidedBy": "טופל על ידי: {name} / {date}",
+        "requestData": "נתוני בקשה",
+        "approveSuccess": "אושר",
+        "rejectSuccess": "נדחה",
+        "processFail": "הפעולה נכשלה"
+      }
+    },
+    "i18n": {
+      "title": "ניהול רב לשוני",
+      "desc": "Dashboard מצב תרגום",
+      "syncAll": "סנכרון DB→JSON",
+      "syncing": "מסנכרן...",
+      "stats": {
+        "supportedLocales": "שפות נתמכות",
+        "totalKeys": "סה\"כ מפתחות תרגום",
+        "completed": "100% הושלם",
+        "completedOf": "מתוך {count} שפות"
+      },
+      "col": {
+        "language": "שפה",
+        "progress": "התקדמות",
+        "translatedKeys": "מפתחות מתורגמים"
+      },
+      "translate": "תרגם + סנכרן",
+      "translating": "מתרגם...",
+      "syncingLocale": "מסנכרן...",
+      "translateSuccess": "{count} תרגומים הושלמו",
+      "translateFail": "התרגום נכשל",
+      "syncSuccess": "סנכרון {count} שפות הושלם",
+      "syncNoData": "אין נתונים לסנכרן ב-DB. אנא הפעל תחילה את \"תרגם + סנכרן\".",
+      "syncFail": "הסנכרון נכשל",
+      "footnote1": "* \"תרגם + סנכרן\": תרגום אוטומטי של מפתחות לא מתורגמים באמצעות Claude AI ולאחר מכן עדכון messages/*.json",
+      "footnote2": "* \"סנכרון DB→JSON\": משקף רק נתוני תרגום השמורים ב-DB לקובצי JSON"
+    }
+  },
+  "common": {
+    "loading": "טוען...",
+    "save": "שמור",
+    "saving": "שומר...",
+    "cancel": "בטל",
+    "delete": "מחק",
+    "deleting": "מוחק...",
+    "edit": "ערוך",
+    "create": "צור",
+    "creating": "יוצר...",
+    "search": "חפש",
+    "reset": "אפס",
+    "prev": "קודם",
+    "next": "הבא",
+    "all": "הכל",
+    "noData": "אין Data.",
+    "confirm": "אשר",
+    "back": "חזור",
+    "close": "סגור",
+    "yes": "כן",
+    "no": "לא",
+    "error": "אירעה שגיאה",
+    "newRegister": "+ רישום חדש",
+    "count": "{count} פריטים",
+    "countPerson": "{count} אנשים",
+    "pageOf": "{current} / {total}"
+  },
+  "header": {
+    "board": "Board",
+    "admin": "Admin",
+    "logout": "התנתק",
+    "piLogin": "Pi Login",
+    "piLoginDev": "Pi Login (dev)",
+    "piAuthenticating": "מאמת...",
+    "googleLogin": "Google Login"
+  },
+  "home": {
+    "title": "Next.js Starter Kit",
+    "subtitle": "Boilerplate של Next.js 15 + Tailwind CSS v4 + shadcn/ui להתחלה מהירה",
+    "loginSection": "Login",
+    "detectingEnv": "מזהה סביבה...",
+    "piNetwork": "Pi Network",
+    "google": "Google",
+    "accountLink": "קישור חשבון",
+    "piPayment": "תשלום Pi Coin",
+    "techStack": "Tech Stack כלול",
+    "components": "דוגמאות ל-shadcn/ui Components",
+    "button": "Button",
+    "inputLabel": "Input + Label",
+    "dialogToast": "Dialog & Toast (Sonner)",
+    "openDialog": "פתח Dialog",
+    "dialogTitle": "ברוכים הבאים ל-Starter Kit!",
+    "dialogDesc": "זהו Dialog Component של shadcn/ui. הוא תומך באופן מלא בנגישות, מבוסס על @base-ui/react.",
+    "showToast": "הצג Toast",
+    "dialogToastMsg": "Toast מתוך Dialog!",
+    "successToast": "Toast הצלחה",
+    "errorToast": "Toast שגיאה",
+    "errorToastMsg": "דוגמת Toast שגיאה",
+    "gettingStarted": "תחילת עבודה",
+    "step1": "צור קובץ משתני סביבה",
+    "step2": "הוסף רכיבים נחוצים",
+    "step3": "הגדר סכימת משתני סביבה והתחל פיתוח!",
+    "email": "Email",
+    "buttonDefault": "ברירת מחדל",
+    "successToastMsg": "Sonner Toast!",
+    "successToastDesc": "אפשרות richColors מופעלת.",
+    "stack": {
+      "nextjsDesc": "App Router, React 19, Turbopack",
+      "tailwindDesc": "הגדרת CSS-first, הנחיית @theme",
+      "shadcnDesc": "סגנון base-nova, מבוסס על @base-ui/react",
+      "tsDesc": "מצב strict, בטיחות טיפוסים",
+      "themesDesc": "מצב כהה / שילוב אוטומטי של ערכת נושא מערכת",
+      "envDesc": "אימות טיפוס משתני סביבה בזמן בנייה"
+    }
+  },
+  "board": {
+    "title": "Board",
+    "noBoards": "לא נרשמו Boards.",
+    "write": "כתוב",
+    "columns": {
+      "title": "כותרת",
+      "author": "מחבר",
+      "views": "צפיות",
+      "date": "תאריך"
+    },
+    "notice": "הודעה",
+    "adopted": "אומץ",
+    "noData": "אין פוסטים עדיין.",
+    "noResults": "אין תוצאות עבור \"{q}\".",
+    "searchPlaceholder": "חפש כותרת או תוכן",
+    "postTitle": "כותרת",
+    "postContent": "תוכן",
+    "titlePlaceholder": "אנא הזן כותרת",
+    "editSuccess": "נערך בהצלחה",
+    "createSuccess": "הפוסט נוצר בהצלחה",
+    "editFail": "עריכה נכשלה",
+    "createFail": "יצירה נכשלה",
+    "saving": "שומר...",
+    "creating": "יוצר...",
+    "editPost": "ערוך",
+    "submitPost": "שלח",
+    "deletePost": "למחוק פוסט?",
+    "deleteSuccess": "נמחק בהצלחה",
+    "deleteFail": "מחיקה נכשלה",
+    "viewCount": "צפיות {count}",
+    "modified": "(שונה)",
+    "adoptedComplete": "אימוץ הושלם",
+    "writeTitle": "{name} — כתוב",
+    "editTitle": "{name} — ערוך",
+    "contentPlaceholder": "הזן תוכן",
+    "featureComment": "תגובה",
+    "featureAttachment": "Attachment"
+  },
+  "comment": {
+    "title": "תגובות",
+    "count": "{count} תגובות",
+    "noComments": "אין עדיין תגובות.",
+    "adoptedAnswer": "תשובה מאומצת",
+    "adopt": "אמץ",
+    "cancelAdopt": "בטל אימוץ",
+    "placeholder": "הקלד תגובה (Ctrl+Enter לשליחה)",
+    "submit": "שלח תגובה",
+    "createSuccess": "התגובה נשלחה בהצלחה",
+    "createFail": "שליחת תגובה נכשלה",
+    "deleteConfirm": "האם למחוק את התגובה?",
+    "deleteSuccess": "התגובה נמחקה בהצלחה",
+    "deleteFail": "הפעולה נכשלה",
+    "adoptSuccess": "התשובה אומצה בהצלחה",
+    "adoptCancelSuccess": "האימוץ בוטל בהצלחה",
+    "loginRequired": "יש להתחבר כדי לכתוב תגובה."
+  },
+  "attachment": {
+    "title": "Attachment",
+    "titleCount": "Attachment ({count})",
+    "delete": "מחק",
+    "upload": "הוסף File",
+    "uploading": "Uploading…",
+    "uploadSuccess": "{count} Files הועלו בהצלחה",
+    "uploadFail": "Upload נכשל",
+    "deleteConfirm": "האם למחוק את ה-Attachment?",
+    "deleteSuccess": "נמחק בהצלחה",
+    "deleteFail": "מחיקה נכשלה",
+    "sizeLimit": "מקסימום 5 · 20MB ל-File"
+  },
+  "link": {
+    "title": "קישור חשבון Pi",
+    "desc": "קשר את חשבון Pi שלך לחשבון Google.",
+    "complete": "הקישור הושלם.",
+    "checkingPi": "בודק Pi Login…",
+    "generateTitle": "יצירת Code קישור",
+    "inputTitle": "הזן Code קישור",
+    "needPiLogin": "נדרש Login ל-Pi כדי ליצור Code קישור.",
+    "piLogin": "Pi Login",
+    "generateDesc": "לחץ על ה-Button למטה כדי ליצור Code בן 6 ספרות. היכנס ל-Page /link ב-Browser רגיל והזן את ה-Code כדי לקשר את החשבונות.",
+    "generating": "יוצר Code…",
+    "regenerate": "צור Code חדש",
+    "generate": "צור Code קישור",
+    "codeLabel": "Code קישור (הזן ב-Browser רגיל)",
+    "codeExpiry": "יש להשתמש תוך 10 דקות",
+    "generateFail": "יצירת Code נכשלה",
+    "inputDesc": "הזן את ה-Code בן 6 הספרות שנוצר ב-Page זה ב-Pi Browser.",
+    "codeInputLabel": "Code קישור",
+    "googleLoginRequired": "לאחר הזנת ה-Code, תועבר למסך ה-Login של Google.",
+    "linking": "מקשר…",
+    "googleLink": "קישור Google",
+    "googleLoginAndLink": "Login ל-Google וקשר",
+    "linkDone": "קישור חשבון הושלם! עובר ל-Home…",
+    "linkFail": "קישור נכשל",
+    "completeTitle": "קישור חשבון בתהליך",
+    "checkingSession": "בודק סשן Google…",
+    "processing": "בתהליך קישור…",
+    "linkedSuccess": "חשבונות Pi ו-Google קושרו! מועבר לדף הבית…",
+    "serverError": "אירעה שגיאת שרת",
+    "invalidLink": "קישור לא חוקי."
+  }
+}

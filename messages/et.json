@@ -1,0 +1,540 @@
+{
+  "common": {
+    "loading": "Laadimine…",
+    "save": "Salvesta",
+    "saving": "Salvestamine…",
+    "cancel": "Tühista",
+    "delete": "Kustuta",
+    "deleting": "Kustutamine…",
+    "edit": "Muuda",
+    "create": "Loo",
+    "creating": "Loomine…",
+    "search": "Otsi",
+    "reset": "Lähtesta",
+    "prev": "Eelmine",
+    "next": "Järgmine",
+    "all": "Kõik",
+    "noData": "Data puudub.",
+    "confirm": "Kinnita",
+    "back": "Tagasi",
+    "close": "Sulge",
+    "yes": "Jah",
+    "no": "Ei",
+    "error": "Viga ilmnes",
+    "newRegister": "+ Uus registreerimine",
+    "count": "{count} tk",
+    "countPerson": "{count} inimest",
+    "pageOf": "{current} / {total}"
+  },
+  "header": {
+    "board": "Board",
+    "admin": "Admin",
+    "logout": "Logi välja",
+    "piLogin": "Pi Login",
+    "piLoginDev": "Pi Login (dev)",
+    "piAuthenticating": "Autentimine…",
+    "googleLogin": "Google Login"
+  },
+  "home": {
+    "title": "Next.js Starter Kit",
+    "subtitle": "Kiire algus Next.js 15 + Tailwind CSS v4 + shadcn/ui Boilerplate'iga",
+    "loginSection": "Login",
+    "detectingEnv": "Keskkonna tuvastamine…",
+    "piNetwork": "Pi Network",
+    "google": "Google",
+    "accountLink": "Konto linkimine",
+    "piPayment": "Pi Coin makse",
+    "techStack": "Kaasatud Tech Stack",
+    "components": "shadcn/ui Component näited",
+    "button": "Button",
+    "inputLabel": "Input + Label",
+    "dialogToast": "Dialog & Toast (Sonner)",
+    "openDialog": "Ava Dialog",
+    "dialogTitle": "Tere tulemast Starter Kit'i!",
+    "dialogDesc": "See on shadcn/ui Dialog Component. See toetab täielikult ligipääsetavust, tuginedes @base-ui/react'ile.",
+    "showToast": "Näita Toast'i",
+    "dialogToastMsg": "Toast Dialog'ist!",
+    "successToast": "Success Toast",
+    "errorToast": "Error Toast",
+    "errorToastMsg": "Error Toast näide",
+    "gettingStarted": "Alustamine",
+    "step1": "Looge keskkonnamuutujate fail",
+    "step2": "Lisage vajalikud komponendid",
+    "step3": "Määratlege keskkonnamuutujate skeem ja alustage arendust!",
+    "email": "E-post",
+    "buttonDefault": "Vaikimisi",
+    "successToastMsg": "Sonner Toast!",
+    "successToastDesc": "richColors valik on aktiveeritud.",
+    "stack": {
+      "nextjsDesc": "App Router, React 19, Turbopack",
+      "tailwindDesc": "CSS-first seadistus, @theme direktiiv",
+      "shadcnDesc": "base-nova stiil, põhineb @base-ui/react-il",
+      "tsDesc": "strict režiim, tüübiohutus",
+      "themesDesc": "Tume režiim / süsteemi teema automaatne sünkroonimine",
+      "envDesc": "Keskkonnamuutujate tüübi valideerimine kompileerimise ajal"
+    }
+  },
+  "board": {
+    "title": "Board",
+    "noBoards": "Boarde pole registreeritud.",
+    "write": "Kirjuta",
+    "columns": {
+      "title": "Pealkiri",
+      "author": "Autor",
+      "views": "Vaatamisi",
+      "date": "Kuupäev"
+    },
+    "notice": "Teade",
+    "adopted": "Vastu võetud",
+    "noData": "Postitusi pole veel.",
+    "noResults": "Otsingutulemusi \"{q}\" ei leitud.",
+    "searchPlaceholder": "Otsi pealkirja või sisu",
+    "postTitle": "Pealkiri",
+    "postContent": "Sisu",
+    "titlePlaceholder": "Sisestage pealkiri",
+    "editSuccess": "Muudetud",
+    "createSuccess": "Postitus on loodud",
+    "editFail": "Muutmine ebaõnnestus",
+    "createFail": "Loomine ebaõnnestus",
+    "saving": "Salvestamine...",
+    "creating": "Loomine...",
+    "editPost": "Muuda",
+    "submitPost": "Esita",
+    "deletePost": "Kas kustutada postitus?",
+    "deleteSuccess": "Kustutatud",
+    "deleteFail": "Kustutamine ebaõnnestus",
+    "viewCount": "Vaatamisi {count}",
+    "modified": "(Muudetud)",
+    "adoptedComplete": "Vastu võetud",
+    "writeTitle": "{name} — Kirjuta",
+    "editTitle": "{name} — Muuda",
+    "contentPlaceholder": "Sisestage sisu",
+    "featureComment": "Kommentaar",
+    "featureAttachment": "Manused"
+  },
+  "comment": {
+    "title": "Kommentaarid",
+    "count": "{count} kommentaari",
+    "noComments": "Kommentaare veel pole.",
+    "adoptedAnswer": "Valitud vastus",
+    "adopt": "Vali",
+    "cancelAdopt": "Tühista valik",
+    "placeholder": "Sisesta kommentaar (registreerimiseks Ctrl+Enter)",
+    "submit": "Esita kommentaar",
+    "createSuccess": "Kommentaar on esitatud",
+    "createFail": "Kommentaari esitamine ebaõnnestus",
+    "deleteConfirm": "Kas kustutada kommentaar?",
+    "deleteSuccess": "Kommentaar on kustutatud",
+    "deleteFail": "Töötlemine ebaõnnestus",
+    "adoptSuccess": "Vastus on valitud",
+    "adoptCancelSuccess": "Valik on tühistatud",
+    "loginRequired": "Kommentaari kirjutamiseks logi sisse."
+  },
+  "attachment": {
+    "title": "Manused",
+    "titleCount": "Manused ({count})",
+    "delete": "Kustuta",
+    "upload": "Lisa fail",
+    "uploading": "Üleslaadimine...",
+    "uploadSuccess": "{count} faili on üles laaditud",
+    "uploadFail": "Üleslaadimine ebaõnnestus",
+    "deleteConfirm": "Kas kustutada manus?",
+    "deleteSuccess": "Kustutatud",
+    "deleteFail": "Kustutamine ebaõnnestus",
+    "sizeLimit": "Maksimaalselt 5 faili · 20MB faili kohta"
+  },
+  "link": {
+    "title": "Pi konto linkimine",
+    "desc": "Lingib Pi konto ja Google'i konto.",
+    "complete": "Linkimine on lõpetatud.",
+    "checkingPi": "Pi sisselogimise kontrollimine...",
+    "generateTitle": "Linkimiskoodi genereerimine",
+    "inputTitle": "Sisesta linkimiskood",
+    "needPiLogin": "Linkimiskoodi genereerimiseks on vaja Pi sisselogimist.",
+    "piLogin": "Pi sisselogimine",
+    "generateDesc": "Vajuta allolevat nuppu, et genereerida 6-kohaline kood. Ava tavalises brauseris leht /link ja sisesta kood, et konto linkida.",
+    "generating": "Koodi genereerimine...",
+    "regenerate": "Genereeri uus kood",
+    "generate": "Genereeri linkimiskood",
+    "codeLabel": "Linkimiskood (sisesta tavalises brauseris)",
+    "codeExpiry": "Kasuta 10 minuti jooksul",
+    "generateFail": "Koodi genereerimine ebaõnnestus",
+    "inputDesc": "Sisesta 6-kohaline kood, mis genereeriti Pi Browseri sellel lehel.",
+    "codeInputLabel": "Linkimiskood",
+    "googleLoginRequired": "Pärast koodi sisestamist suunatakse teid Google'i sisselogimise ekraanile.",
+    "linking": "Linkimine...",
+    "googleLink": "Google'i linkimine",
+    "googleLoginAndLink": "Lingi pärast Google'i sisselogimist",
+    "linkDone": "Konto linkimine lõpetatud! Liigutakse avalehele...",
+    "linkFail": "Linkimine ebaõnnestus",
+    "completeTitle": "Konto linkimine töötlemisel",
+    "checkingSession": "Google'i seansi kontrollimine…",
+    "processing": "Linkimine töötlemisel…",
+    "linkedSuccess": "Pi ja Google'i kontod on lingitud! Liigutakse avalehele…",
+    "serverError": "Serveri viga ilmnes",
+    "invalidLink": "Kehtetu linkimise link."
+  },
+  "admin": {
+    "nav": {
+      "title": "Admin",
+      "dashboard": "Dashboard",
+      "users": "Kasutajate haldus",
+      "payments": "Maksete ajalugu",
+      "links": "Konto linkimise staatus",
+      "board": "Board haldus",
+      "stdSection": "Data standardid",
+      "stdWords": "Standard Words",
+      "stdDomains": "Standard Domains",
+      "stdTerms": "Standard Terms",
+      "stdDdl": "DDL Export",
+      "stdAudit": "Muudatuste ajalugu",
+      "stdApprovals": "Kinnituse töövoog",
+      "i18nSection": "Mitmekeelsus",
+      "i18n": "Mitmekeelsuse haldus",
+      "backHome": "← Avalehele"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "greeting": "Tere, {name} ({role})",
+      "totalUsers": "Kasutajaid kokku",
+      "totalUsersDesc": "Registreeritud kontode koguarv",
+      "piOnly": "Ainult Pi",
+      "piOnlyDesc": "Kasutajad ainult Pi kontoga",
+      "googleOnly": "Ainult Google",
+      "googleOnlyDesc": "Kasutajad ainult Google'i kontoga",
+      "linked": "Konto linkimine",
+      "linkedDesc": "Pi + Google linkimine lõpetatud"
+    },
+    "users": {
+      "title": "Kasutajate haldus",
+      "totalCount": "Kokku {count} inimest",
+      "noUsers": "Kasutajaid pole.",
+      "col": {
+        "user": "Kasutaja",
+        "piAccount": "Pi konto",
+        "googleAccount": "Google'i konto",
+        "role": "Roll",
+        "joinDate": "Liitumiskuupäev",
+        "changeRole": "Muuda rolli"
+      },
+      "roleChanged": "Roll on muudetud",
+      "changeFail": "Muutmine ebaõnnestus"
+    },
+    "payments": {
+      "title": "Maksete ajalugu",
+      "totalCount": "Kokku {count} kirjet · Lõpetatud kokku {total} π",
+      "noPayments": "Maksete ajalugu pole.",
+      "status": {
+        "completed": "Lõpetatud",
+        "approved": "Kinnitatud",
+        "pending": "Ootel",
+        "cancelled": "Tühistatud",
+        "error": "Viga"
+      },
+      "col": {
+        "user": "Kasutaja",
+        "amount": "Summa",
+        "memo": "Memo",
+        "status": "Olek",
+        "paymentId": "Makse ID",
+        "date": "Kuupäev"
+      }
+    },
+    "links": {
+      "title": "Konto linkimise olek",
+      "totalCount": "Kokku {count} kasutajat",
+      "noUsers": "Kasutajaid ei leitud.",
+      "status": {
+        "linked": "Lingitud",
+        "piOnly": "Ainult Pi",
+        "googleOnly": "Ainult Google"
+      },
+      "desc": {
+        "linked": "Pi + Google ühendatud",
+        "piOnly": "Google'iga linkimata",
+        "googleOnly": "Pi-ga linkimata"
+      },
+      "col": {
+        "user": "Kasutaja",
+        "piAccount": "Pi konto",
+        "googleAccount": "Google'i konto",
+        "linkStatus": "Linkimise olek",
+        "role": "Roll",
+        "joinDate": "Liitumiskuupäev"
+      }
+    },
+    "board": {
+      "title": "Board haldus",
+      "desc": "Kokku {count} postitust · teavituste seadistamine ja sundkustutamine",
+      "noData": "Postitusi ei ole.",
+      "loading": "Laadimine…",
+      "col": {
+        "category": "Category",
+        "title": "Pealkiri",
+        "author": "Autor",
+        "views": "Vaatamisi",
+        "date": "Kuupäev",
+        "manage": "Halda"
+      },
+      "notice": "Teavitus",
+      "setPinned": "Määra teavituseks",
+      "unsetPinned": "Eemalda teavitus",
+      "pinnedSuccess": "Määratud teavituseks",
+      "unpinnedSuccess": "Teavitus eemaldatud",
+      "processFail": "Töötlemine ebaõnnestus",
+      "deleteConfirm": "Kas kustutada postitus \"{title}\"?",
+      "deleteSuccess": "Postitus kustutatud",
+      "deleteFail": "Kustutamine ebaõnnestus"
+    },
+    "std": {
+      "words": {
+        "title": "Standard Words haldus",
+        "totalCount": "Kokku {count} kirjet",
+        "noData": "Sõnu ei ole.",
+        "searchPlaceholder": "Otsi loogilise nime / füüsilise nime järgi…",
+        "formTitleNew": "Uue sõna lisamine",
+        "formTitleEdit": "Sõna muutmine",
+        "col": {
+          "logNm": "Loogiline nimi",
+          "phyNmAbbr": "Füüsiline nimi (lühend)",
+          "phyNmFull": "Füüsiline nimi (täielik)",
+          "typeLen": "Type/pikkus",
+          "status": "Olek",
+          "desc": "Kirjeldus"
+        },
+        "field": {
+          "logNm": "Loogiline nimi *",
+          "phyNmAbbr": "Füüsiline nimi (lühend) *",
+          "phyNmFull": "Füüsiline nimi (täielik)",
+          "dataType": "Data Type",
+          "dataLen": "Data pikkus",
+          "desc": "Kirjeldus"
+        },
+        "placeholder": {
+          "logNm": "Nt: Kasutaja",
+          "phyNmAbbr": "Nt: USR",
+          "phyNmFull": "Nt: User",
+          "dataType": "Nt: VARCHAR",
+          "dataLen": "Nt: 100",
+          "desc": "Sõna kirjeldus (valikuline)"
+        },
+        "validationRequired": "Loogiline nimi ja füüsiline nimi on kohustuslikud",
+        "deleteConfirm": "Kas soovite kustutada sõna \"{name}\"?",
+        "saveSuccess": "Salvestatud",
+        "editSuccess": "Muudetud",
+        "deleteSuccess": "Kustutatud",
+        "saveFail": "Salvestamine ebaõnnestus",
+        "deleteFail": "Kustutamine ebaõnnestus"
+      },
+      "domains": {
+        "title": "Standard Domain haldus",
+        "totalCount": "Kokku {count} kirjet",
+        "noData": "Domain puudub.",
+        "searchPlaceholder": "Domain nimi / Key Domain nimi otsi…",
+        "formTitleNew": "Uus Domain registreerimine",
+        "formTitleEdit": "Domain muutmine",
+        "typeFilter": {
+          "all": "Kõik",
+          "code": "Code",
+          "id": "Identifikaator",
+          "general": "Üldine"
+        },
+        "col": {
+          "domNm": "Domain nimi",
+          "keyDomNm": "Key Domain nimi",
+          "phyNm": "Füüsiline nimi",
+          "type": "Type",
+          "dataType": "Data Type",
+          "desc": "Kirjeldus"
+        },
+        "field": {
+          "domNm": "Domain nimi *",
+          "keyDomNm": "Key Domain nimi *",
+          "keyDomPhyNm": "Key Domain füüsiline nimi *",
+          "domType": "Domain Type",
+          "dataType": "Data Type",
+          "dataLen": "Pikkus",
+          "dataScale": "Kümnendkohtade arv",
+          "desc": "Kirjeldus"
+        },
+        "placeholder": {
+          "domNm": "Nt: Hind Domain",
+          "keyDomNm": "Nt: Hind",
+          "keyDomPhyNm": "Nt: PRICE",
+          "dataLen": "Nt: 100",
+          "dataScale": "Nt: 2",
+          "desc": "Domaini kirjeldus (valikuline)"
+        },
+        "selectDomType": {
+          "code": "Code",
+          "id": "Identifikaator",
+          "general": "Üldine"
+        },
+        "selectDataType": {
+          "varchar": "VARCHAR / TEXT",
+          "integer": "INTEGER",
+          "numeric": "NUMERIC",
+          "date": "DATE",
+          "timestamp": "TIMESTAMP"
+        },
+        "validationRequired": "Domaini nimi, võtme Domaini nimi, võtme Domaini füüsiline nimi on kohustuslikud",
+        "deleteConfirm": "Kas soovite kustutada \"{name}\"?",
+        "saveSuccess": "Salvestatud",
+        "editSuccess": "Muudetud",
+        "deleteSuccess": "Kustutatud",
+        "saveFail": "Salvestamine ebaõnnestus",
+        "deleteFail": "Kustutamine ebaõnnestus"
+      },
+      "terms": {
+        "title": "Standardterminite haldus",
+        "totalCount": "Kokku {count} kirjet",
+        "noData": "Termineid pole.",
+        "searchPlaceholder": "Otsi loogilise nime / füüsilise nime järgi…",
+        "formTitleNew": "Uue standardtermini lisamine",
+        "formTitleEdit": "Termini muutmine",
+        "col": {
+          "logNm": "Loogiline nimi",
+          "phyNmLower": "Füüsiline nimi (väiketähed)",
+          "phyNmUpper": "Füüsiline nimi (suurtähed)",
+          "desc": "Kirjeldus"
+        },
+        "field": {
+          "logNm": "Loogiline nimi *",
+          "wordSelect": "Koostisosa sõna valik *",
+          "wordSelectHint": "(Lisamise järjekord = füüsilise nime järjekord)",
+          "domainSelect": "Standard Domain * (füüsilise nime viimane element)",
+          "autoPhyNm": "Automaatselt genereeritud füüsiline nimi",
+          "desc": "Kirjeldus (valikuline)"
+        },
+        "placeholder": {
+          "logNm": "Nt: Töötaja nimi",
+          "wordSearch": "Pärast sõna otsimist lisage klõpsates…",
+          "domainSelect": "Vali Domain…",
+          "desc": "Termini kirjeldus"
+        },
+        "validationLogNm": "Loogiline nimi on kohustuslik",
+        "validationWordDomain": "Koostisosa sõna ja Domain tuleb valida",
+        "validationPhyNm": "Füüsilist nime ei saa luua",
+        "deleteConfirm": "Kas soovite kustutada \"{name}\"?",
+        "saveSuccess": "Salvestatud",
+        "editSuccess": "Muudetud",
+        "deleteSuccess": "Kustutatud",
+        "saveFail": "Salvestamine ebaõnnestus",
+        "deleteFail": "Kustutamine ebaõnnestus"
+      },
+      "ddl": {
+        "title": "DDL Export",
+        "desc": "Kui standardterminid valitakse Columniteks, genereeritakse CREATE TABLE SQL automaatselt",
+        "sectionTable": "Table info",
+        "sectionColumn": "Lisa Column — vali standardterminitest",
+        "sectionPreview": "DDL eelvaade",
+        "field": {
+          "tableNmEn": "Tabeli nimi (inglise keeles) *",
+          "tableNmKo": "Tabeli nimi (korea keeles)"
+        },
+        "placeholder": {
+          "tableNmEn": "nt: usr_info",
+          "tableNmKo": "nt: kasutajateave",
+          "termSearch": "Otsi Terminit ja lisa klõpsates…"
+        },
+        "col": {
+          "colLogNm": "Column (loogiline nimi)",
+          "type": "Type",
+          "pk": "PK",
+          "nn": "NN"
+        },
+        "copy": "Kopeeri",
+        "download": "↓ .sql",
+        "emptyPreview": "Tabeli nime ja Column'i lisamisel genereeritakse DDL siia.",
+        "copySuccess": "DDL kopeeriti lõikelauale"
+      },
+      "audit": {
+        "title": "Muudatuste ajalugu (Audit Trail)",
+        "totalCount": "Kokku {count} kirjet",
+        "noData": "Ajalugu puudub.",
+        "tableLabel": {
+          "stdDic": "Standard Word",
+          "stdDom": "Standard Domain",
+          "stdTerm": "Standard Termin"
+        },
+        "filter": {
+          "table": "Table",
+          "from": "Alguskuupäev",
+          "to": "Lõppkuupäev",
+          "allTables": "Kõik"
+        },
+        "col": {
+          "changedAt": "Muutmise aeg",
+          "table": "Table",
+          "target": "Sihtmärk",
+          "action": "Tegevus",
+          "changedBy": "Muutja"
+        },
+        "before": "Enne muutmist",
+        "after": "Pärast muutmist"
+      },
+      "approvals": {
+        "title": "Kinnituse Workflow",
+        "totalCount": "Kokku {count} kirjet",
+        "noPending": "Ootel kinnitustaotlusi pole.",
+        "noData": "Data puudub.",
+        "allTypes": "Kõik tüübid",
+        "status": {
+          "pending": "Ootel",
+          "approved": "Kinnitatud",
+          "rejected": "Tagasi lükatud",
+          "all": "Kõik"
+        },
+        "entity": {
+          "stdDic": "Standard Word",
+          "stdDom": "Standard Domain",
+          "stdTerm": "Standard Termin"
+        },
+        "col": {
+          "requestedAt": "Taotluse aeg",
+          "type": "Tüüp",
+          "target": "Sihtmärk",
+          "requestedBy": "Taotleja",
+          "status": "Olek"
+        },
+        "approve": "Kinnita",
+        "reject": "Lükka tagasi",
+        "rejectReasonPlaceholder": "Sisesta tagasilükkamise põhjus *",
+        "rejectConfirm": "Kinnita tagasilükkamine",
+        "rejectReason": "Tagasilükkamise põhjus: {reason}",
+        "decidedBy": "Töötles: {name} / {date}",
+        "requestData": "Request Data",
+        "approveSuccess": "Heaks kiidetud",
+        "rejectSuccess": "Tagasi lükatud",
+        "processFail": "Töötlemine ebaõnnestus"
+      }
+    },
+    "i18n": {
+      "title": "Mitmekeelne haldus",
+      "desc": "Tõlke oleku Dashboard",
+      "syncAll": "DB→JSON sünkroonimine",
+      "syncing": "Sünkroonimine…",
+      "stats": {
+        "supportedLocales": "Toetatud keeled",
+        "totalKeys": "Tõlke võtmeid kokku",
+        "completed": "100% valmis",
+        "completedOf": "{count} keelest"
+      },
+      "col": {
+        "language": "Keel",
+        "progress": "Edenemine",
+        "translatedKeys": "Tõlgitud võtmed"
+      },
+      "translate": "Tõlgi + sünkrooni",
+      "translating": "Tõlkimine…",
+      "syncingLocale": "Sünkroonimine…",
+      "translateSuccess": "{count} tõlget valmis",
+      "translateFail": "Tõlkimine ebaõnnestus",
+      "syncSuccess": "{count} keele sünkroonimine valmis",
+      "syncNoData": "DB-s pole sünkroonimiseks Data-t. Palun käivitage esmalt \"Tõlgi + sünkrooni\".",
+      "syncFail": "Sünkroonimine ebaõnnestus",
+      "footnote1": "* \"Tõlgi + sünkrooni\": Tõlgib automaatselt tõlkimata võtmed Claude AI-ga ja uuendab messages/*.json",
+      "footnote2": "* \"DB→JSON sünkroonimine\": Peegeldab ainult DB-s salvestatud tõlke Data-t JSON faili"
+    }
+  }
+}

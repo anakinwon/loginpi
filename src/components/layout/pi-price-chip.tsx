@@ -1,14 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-
-// locale_cd → 대표 통화코드 (language-switcher와 동일 맵)
-const LOCALE_CURRENCY: Record<string, string> = {
-  ko: 'KRW', en: 'USD', zh: 'CNY', ja: 'JPY', hi: 'INR',
-  vi: 'VND', af: 'ZAR', fil: 'PHP', th: 'THB', id: 'IDR',
-  ms: 'MYR', es: 'EUR', fr: 'EUR', de: 'EUR', it: 'EUR',
-  ru: 'RUB', pt: 'EUR', ar: 'EGP',
-}
+import { LOCALE_CURRENCY } from '@/lib/locale-currency'
 
 // 통화별 가격 포매팅
 function fmtPrice(price: number): string {

@@ -1,1 +1,540 @@
-{}
+{
+  "home": {
+    "successToast": "Success Toast",
+    "title": "Next.js Starter Kit",
+    "subtitle": "Begin vinnig met Next.js 15 + Tailwind CSS v4 + shadcn/ui Boilerplate",
+    "loginSection": "Login",
+    "detectingEnv": "Bespeur omgewing tans...",
+    "piNetwork": "Pi Network",
+    "google": "Google",
+    "accountLink": "Koppel Rekening",
+    "piPayment": "Pi Coin Betaling",
+    "techStack": "Ingesluit Tegnologie Stack",
+    "components": "shadcn/ui Component Voorbeeld",
+    "button": "Button",
+    "inputLabel": "Input + Label",
+    "dialogToast": "Dialog & Toast (Sonner)",
+    "openDialog": "Maak Dialog oop",
+    "dialogTitle": "Welkom by die Starter Kit!",
+    "dialogDesc": "Dit is die Dialog Component van shadcn/ui. Dit ondersteun toeganklikheid ten volle, gebaseer op @base-ui/react.",
+    "showToast": "Wys Toast",
+    "dialogToastMsg": "Toast in Dialog!",
+    "errorToast": "Error Toast",
+    "errorToastMsg": "Error Toast voorbeeld",
+    "gettingStarted": "Begin",
+    "step1": "Skep omgewingsveranderlike lêer",
+    "step2": "Voeg nodige Component by",
+    "step3": "Definieer omgewingsveranderlike Skema in en begin ontwikkeling!",
+    "email": "E-pos",
+    "buttonDefault": "Standaard",
+    "successToastMsg": "Sonner Toast!",
+    "successToastDesc": "Die richColors opsie is geaktiveer.",
+    "stack": {
+      "nextjsDesc": "App Router, React 19, Turbopack",
+      "tailwindDesc": "CSS-first instelling, @theme direktief",
+      "shadcnDesc": "base-nova styl, gebaseer op @base-ui/react",
+      "tsDesc": "strict modus, tipe veiligheid",
+      "themesDesc": "Donker modus / outomatiese stelsel Tema integrasie",
+      "envDesc": "Omgewingsveranderlike tipe validering tydens bou"
+    }
+  },
+  "common": {
+    "loading": "Laai tans...",
+    "save": "Stoor",
+    "saving": "Stoor tans...",
+    "cancel": "Kanselleer",
+    "delete": "Vee uit",
+    "deleting": "Vee tans uit...",
+    "edit": "Wysig",
+    "create": "Skep",
+    "creating": "Skep tans...",
+    "search": "Soek",
+    "reset": "Herstel",
+    "prev": "Vorige",
+    "next": "Volgende",
+    "all": "Alles",
+    "noData": "Geen Data.",
+    "confirm": "Bevestig",
+    "back": "Terug",
+    "close": "Sluit",
+    "yes": "Ja",
+    "no": "Nee",
+    "error": "Fout het voorgekom",
+    "newRegister": "+ Nuwe Registrasie",
+    "count": "{count} items",
+    "countPerson": "{count} persone",
+    "pageOf": "{current} / {total}"
+  },
+  "header": {
+    "board": "Board",
+    "admin": "Admin",
+    "logout": "Meld uit",
+    "piLogin": "Pi Login",
+    "piLoginDev": "Pi Login (dev)",
+    "piAuthenticating": "Verifieer tans...",
+    "googleLogin": "Google Login"
+  },
+  "admin": {
+    "std": {
+      "ddl": {
+        "sectionColumn": "Voeg Column by — kies uit Standaardterm",
+        "sectionPreview": "DDL Voorskou",
+        "field": {
+          "tableNmEn": "Table naam (Engels) *",
+          "tableNmKo": "Table naam (Koreaans)"
+        },
+        "placeholder": {
+          "tableNmEn": "Bv.: usr_info",
+          "tableNmKo": "Bv.: Gebruikerinligting",
+          "termSearch": "Soek Term en voeg by deur te klik…"
+        },
+        "col": {
+          "colLogNm": "Column (Logiese naam)",
+          "type": "Type",
+          "pk": "PK",
+          "nn": "NN"
+        },
+        "copy": "Kopieer",
+        "download": "↓ .sql",
+        "emptyPreview": "As u 'n Table naam en Column byvoeg, sal DDL hier gegenereer word.",
+        "copySuccess": "DDL is na die knipbord gekopieer",
+        "title": "DDL Export",
+        "desc": "As standaardterme as kolomme gekies word, sal CREATE TABLE SQL outomaties gegenereer word",
+        "sectionTable": "Tabel inligting"
+      },
+      "audit": {
+        "title": "Veranderingsgeskiedenis (Audit Trail)",
+        "totalCount": "Totaal {count} rekords",
+        "noData": "Geen geskiedenis nie.",
+        "tableLabel": {
+          "stdDic": "Standaardwoord",
+          "stdDom": "Standaard Domain",
+          "stdTerm": "Standaard Term"
+        },
+        "filter": {
+          "table": "Table",
+          "from": "Begindatum",
+          "to": "Einddatum",
+          "allTables": "Alles"
+        },
+        "col": {
+          "changedAt": "Veranderingsdatum/tyd",
+          "table": "Table",
+          "target": "Teiken",
+          "action": "Aksie",
+          "changedBy": "Verander deur"
+        },
+        "before": "Voor verandering",
+        "after": "Na verandering"
+      },
+      "words": {
+        "title": "Standaard Woorde Bestuur",
+        "totalCount": "Totaal {count} items",
+        "noData": "Geen woorde nie.",
+        "searchPlaceholder": "Soek logiese naam / fisiese naam…",
+        "formTitleNew": "Registreer nuwe woord",
+        "formTitleEdit": "Wysig woord",
+        "col": {
+          "logNm": "Logiese Naam",
+          "phyNmAbbr": "Fisiese Naam (Afkorting)",
+          "phyNmFull": "Fisiese naam (Volledig)",
+          "typeLen": "Type/Lengte",
+          "status": "Status",
+          "desc": "Beskrywing"
+        },
+        "field": {
+          "logNm": "Logiese naam *",
+          "phyNmAbbr": "Fisiese naam (Afkorting) *",
+          "phyNmFull": "Fisiese naam (Volledig)",
+          "dataType": "Data Type",
+          "dataLen": "Data Lengte",
+          "desc": "Beskrywing"
+        },
+        "placeholder": {
+          "logNm": "Bv: Gebruiker",
+          "phyNmAbbr": "Bv: USR",
+          "phyNmFull": "Bv: User",
+          "dataType": "Bv: VARCHAR",
+          "dataLen": "Bv: 100",
+          "desc": "Woord beskrywing (Opsioneel)"
+        },
+        "validationRequired": "Logiese naam en fisiese naam is verpligtend",
+        "deleteConfirm": "Wil jy die woord \"{name}\" verwyder?",
+        "saveSuccess": "Gestoor",
+        "editSuccess": "Gewysig",
+        "deleteSuccess": "Verwyder",
+        "saveFail": "Stoor misluk",
+        "deleteFail": "Verwyder misluk"
+      },
+      "domains": {
+        "title": "Standaard Domain Bestuur",
+        "totalCount": "Totaal {count} rekords",
+        "noData": "Geen Domains beskikbaar nie.",
+        "searchPlaceholder": "Domain naam / Sleutel Domain naam soek…",
+        "formTitleNew": "Nuwe Domain registrasie",
+        "formTitleEdit": "Domain wysig",
+        "typeFilter": {
+          "all": "Alles",
+          "code": "Code",
+          "id": "Identifiseerder",
+          "general": "Algemeen"
+        },
+        "col": {
+          "domNm": "Domain naam",
+          "keyDomNm": "Sleutel Domain naam",
+          "phyNm": "Fisiese naam",
+          "type": "Type",
+          "dataType": "Data Type",
+          "desc": "Beskrywing"
+        },
+        "field": {
+          "domNm": "Domain naam *",
+          "keyDomNm": "Sleutel Domain naam *",
+          "keyDomPhyNm": "Sleutel Domain fisiese naam *",
+          "domType": "Domain Type",
+          "dataType": "Data Type",
+          "dataLen": "Lengte",
+          "dataScale": "Desimale plekke",
+          "desc": "Beskrywing"
+        },
+        "placeholder": {
+          "domNm": "Bv: Prys Domain",
+          "keyDomNm": "Bv: Prys",
+          "keyDomPhyNm": "Bv: PRICE",
+          "dataLen": "Bv.: 100",
+          "dataScale": "Bv.: 2",
+          "desc": "Domain beskrywing (opsioneel)"
+        },
+        "selectDomType": {
+          "code": "Kode",
+          "id": "Identifiseerder",
+          "general": "Algemeen"
+        },
+        "selectDataType": {
+          "varchar": "VARCHAR / TEXT",
+          "integer": "INTEGER",
+          "numeric": "NUMERIC",
+          "date": "DATE",
+          "timestamp": "TIMESTAMP"
+        },
+        "validationRequired": "Domainnaam, sleuteldomainnaam, sleuteldomain fisiese naam is verpligtend",
+        "deleteConfirm": "Wil jy \"{name}\" uitvee?",
+        "saveSuccess": "Geregistreer",
+        "editSuccess": "Gewysig",
+        "deleteSuccess": "Uitgevee",
+        "saveFail": "Stoor misluk",
+        "deleteFail": "Uitvee misluk"
+      },
+      "terms": {
+        "title": "Bestuur van standaardterme",
+        "totalCount": "Totaal {count} items",
+        "noData": "Geen terme beskikbaar nie.",
+        "searchPlaceholder": "Soek logiese naam / fisiese naam…",
+        "formTitleNew": "Registreer nuwe standaardterm",
+        "formTitleEdit": "Wysig term",
+        "col": {
+          "logNm": "Logiese naam",
+          "phyNmLower": "Fisiese naam (kleinletters)",
+          "phyNmUpper": "Fisiese naam (hoofletters)",
+          "desc": "Beskrywing"
+        },
+        "field": {
+          "logNm": "Logiese naam *",
+          "wordSelect": "Kies samestellende woord *",
+          "wordSelectHint": "(Byvoegingsvolgorde = fisiese naam volgorde)",
+          "domainSelect": "Standaard Domain * (laaste element van fisiese naam)",
+          "autoPhyNm": "Outomaties gegenereerde fisiese naam",
+          "desc": "Beskrywing (opsioneel)"
+        },
+        "placeholder": {
+          "logNm": "Bv.: Werknemer naam",
+          "wordSearch": "Soek woord en voeg by deur te klik…",
+          "domainSelect": "Kies Domain…",
+          "desc": "Term beskrywing"
+        },
+        "validationLogNm": "Logiese naam is verpligtend",
+        "validationWordDomain": "Samestellende woord en Domain moet gekies word",
+        "validationPhyNm": "Kan nie fisiese naam genereer nie",
+        "deleteConfirm": "Wil jy \"{name}\" uitvee?",
+        "saveSuccess": "Geregistreer",
+        "editSuccess": "Gewysig",
+        "deleteSuccess": "Uitgevee",
+        "saveFail": "Stoor misluk",
+        "deleteFail": "Uitvee misluk"
+      },
+      "approvals": {
+        "title": "Goedkeuring Workflow",
+        "totalCount": "Totaal {count} rekords",
+        "noPending": "Geen hangende goedkeuringsversoeke nie.",
+        "noData": "Geen Data nie.",
+        "allTypes": "Alle Tipes",
+        "status": {
+          "pending": "Hangende",
+          "approved": "Goedgekeur",
+          "rejected": "Verwerp",
+          "all": "Alles"
+        },
+        "entity": {
+          "stdDic": "Standaardwoord",
+          "stdDom": "Standaard Domain",
+          "stdTerm": "Standaard Term"
+        },
+        "col": {
+          "requestedAt": "Versoekdatum/tyd",
+          "type": "Tipe",
+          "target": "Teiken",
+          "requestedBy": "Versoek deur",
+          "status": "Status"
+        },
+        "approve": "Keur goed",
+        "reject": "Verwerp",
+        "rejectReasonPlaceholder": "Voer die rede vir verwerping in *",
+        "rejectConfirm": "Bevestig verwerping",
+        "rejectReason": "Rede vir verwerping: {reason}",
+        "decidedBy": "Verwerk deur: {name} / {date}",
+        "requestData": "Versoek Data",
+        "approveSuccess": "Goedgekeur",
+        "rejectSuccess": "Verwerp",
+        "processFail": "Verwerking het misluk"
+      }
+    },
+    "nav": {
+      "title": "Admin",
+      "dashboard": "Dashboard",
+      "users": "Gebruikersbestuur",
+      "payments": "Betalingsgeskiedenis",
+      "links": "Rekeningkoppelingsstatus",
+      "board": "Board Bestuur",
+      "stdSection": "Data Standaard",
+      "stdWords": "Standaardwoorde",
+      "stdDomains": "Standaard Domains",
+      "stdTerms": "Standaardterme",
+      "stdDdl": "DDL Export",
+      "stdAudit": "Veranderingsgeskiedenis",
+      "stdApprovals": "Goedkeurings Workflow",
+      "i18nSection": "Meertalig",
+      "i18n": "Meertalige Bestuur",
+      "backHome": "← Na Tuis"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "greeting": "Hallo, {name} ({role})",
+      "totalUsers": "Totale Gebruikers",
+      "totalUsersDesc": "Totale aantal geregistreerde rekeninge",
+      "piOnly": "Slegs Pi",
+      "piOnlyDesc": "Gebruikers met slegs Pi-rekeninge",
+      "googleOnly": "Slegs Google",
+      "googleOnlyDesc": "Gebruikers met slegs Google-rekeninge",
+      "linked": "Rekening Gekoppel",
+      "linkedDesc": "Pi + Google-koppeling voltooi"
+    },
+    "users": {
+      "title": "Gebruikersbestuur",
+      "totalCount": "Totaal {count} persone",
+      "noUsers": "Geen gebruikers nie.",
+      "col": {
+        "user": "Gebruiker",
+        "piAccount": "Pi-rekening",
+        "googleAccount": "Google-rekening",
+        "role": "Rol",
+        "joinDate": "Registrasiedatum",
+        "changeRole": "Verander Rol"
+      },
+      "roleChanged": "Rol is verander",
+      "changeFail": "Verandering misluk"
+    },
+    "payments": {
+      "title": "Betalingsgeskiedenis",
+      "totalCount": "Totaal {count} items · Voltooide totaal {total} π",
+      "noPayments": "Geen betalingsgeskiedenis nie.",
+      "status": {
+        "completed": "Voltooi",
+        "approved": "Goedgekeur",
+        "pending": "Hangende",
+        "cancelled": "Gekanselleer",
+        "error": "Fout"
+      },
+      "col": {
+        "user": "Gebruiker",
+        "amount": "Bedrag",
+        "memo": "Memo",
+        "status": "Status",
+        "paymentId": "Betaling ID",
+        "date": "Datum"
+      }
+    },
+    "links": {
+      "title": "Rekeningkoppeling Status",
+      "totalCount": "Totaal {count} persone",
+      "noUsers": "Geen gebruikers gevind nie.",
+      "status": {
+        "linked": "Gekoppel",
+        "piOnly": "Slegs Pi",
+        "googleOnly": "Slegs Google"
+      },
+      "desc": {
+        "linked": "Pi + Google gekoppel",
+        "piOnly": "Google nie gekoppel nie",
+        "googleOnly": "Pi nie gekoppel nie"
+      },
+      "col": {
+        "user": "Gebruiker",
+        "piAccount": "Pi Rekening",
+        "googleAccount": "Google Rekening",
+        "linkStatus": "Koppeling Status",
+        "role": "Rol",
+        "joinDate": "Aansluitingsdatum"
+      }
+    },
+    "board": {
+      "title": "Board Bestuur",
+      "desc": "Totaal {count} plasings · Stel kennisgewing en dwing verwydering af",
+      "noData": "Geen plasings nie.",
+      "loading": "Laai tans…",
+      "col": {
+        "category": "Category",
+        "title": "Titel",
+        "author": "Skrywer",
+        "views": "Besigtigings",
+        "date": "Datum",
+        "manage": "Bestuur"
+      },
+      "notice": "Kennisgewing",
+      "setPinned": "Stel as Kennisgewing",
+      "unsetPinned": "Verwyder Kennisgewing",
+      "pinnedSuccess": "As kennisgewing gestel",
+      "unpinnedSuccess": "Kennisgewing verwyder",
+      "processFail": "Verwerking misluk",
+      "deleteConfirm": "Wil jy die plasing \"{title}\" verwyder?",
+      "deleteSuccess": "Plasing is verwyder",
+      "deleteFail": "Verwydering misluk"
+    },
+    "i18n": {
+      "title": "Meertalige Bestuur",
+      "desc": "Vertalingstatus Dashboard",
+      "syncAll": "DB→JSON Sinkroniseer",
+      "syncing": "Besig om te sinkroniseer…",
+      "stats": {
+        "supportedLocales": "Ondersteunde Tale",
+        "totalKeys": "Totale Vertalingsleutels",
+        "completed": "100% Voltooi",
+        "completedOf": "Van {count} tale"
+      },
+      "col": {
+        "language": "Taal",
+        "progress": "Vordering",
+        "translatedKeys": "Vertaalde Sleutels"
+      },
+      "translate": "Vertaal + Sinkroniseer",
+      "translating": "Besig om te vertaal…",
+      "syncingLocale": "Besig om te sinkroniseer…",
+      "translateSuccess": "{count} vertalings voltooi",
+      "translateFail": "Vertaling het misluk",
+      "syncSuccess": "{count} tale gesinkroniseer",
+      "syncNoData": "Geen Data om in DB te sinkroniseer nie. Voer asseblief eers \"Vertaal + Sinkroniseer\" uit.",
+      "syncFail": "Sinkronisering het misluk",
+      "footnote1": "* \"Vertaal + Sinkroniseer\": Vertaal outomaties onvertaalde sleutels met Claude AI en werk dan messages/*.json op",
+      "footnote2": "* \"DB→JSON Sinkroniseer\": Weerspieël slegs vertaalde Data wat in DB gestoor is in die JSON-lêer"
+    }
+  },
+  "board": {
+    "title": "Board",
+    "noBoards": "Geen Boards geregistreer nie.",
+    "write": "Skryf",
+    "columns": {
+      "title": "Titel",
+      "author": "Skrywer",
+      "views": "Besigtigings",
+      "date": "Datum"
+    },
+    "notice": "Kennisgewing",
+    "adopted": "Aanvaar",
+    "noData": "Daar is nog geen plasings nie.",
+    "noResults": "Geen resultate vir \"{q}\".",
+    "searchPlaceholder": "Soek Titel of inhoud",
+    "postTitle": "Titel",
+    "postContent": "Inhoud",
+    "titlePlaceholder": "Voer Titel in",
+    "editSuccess": "Gewysig",
+    "createSuccess": "Plasing geskep",
+    "editFail": "Wysiging misluk",
+    "createFail": "Skepping misluk",
+    "saving": "Besig om te stoor…",
+    "creating": "Besig om te skep…",
+    "editPost": "Wysig",
+    "submitPost": "Dien in",
+    "deletePost": "Wil jy die plasing uitvee?",
+    "deleteSuccess": "Uitgevee",
+    "deleteFail": "Vee misluk",
+    "viewCount": "Besigtigings {count}",
+    "modified": "(Gewysig)",
+    "adoptedComplete": "Aanneming voltooi",
+    "writeTitle": "{name} — Skryf",
+    "editTitle": "{name} — Wysig",
+    "contentPlaceholder": "Voer inhoud in",
+    "featureComment": "Kommentaar",
+    "featureAttachment": "Attachment"
+  },
+  "comment": {
+    "title": "Comment",
+    "count": "{count} items",
+    "noComments": "Daar is nog geen Comments nie.",
+    "adoptedAnswer": "Aangeneemde Antwoord",
+    "adopt": "Aanvaar",
+    "cancelAdopt": "Kanselleer Aanvaarding",
+    "placeholder": "Voer 'n Comment in (Registreer met Ctrl+Enter)",
+    "submit": "Dien Comment in",
+    "createSuccess": "Die Comment is geregistreer.",
+    "createFail": "Comment registrasie het misluk.",
+    "deleteConfirm": "Wil jy die Comment uitvee?",
+    "deleteSuccess": "Die Comment is uitgevee.",
+    "deleteFail": "Verwerking het misluk.",
+    "adoptSuccess": "Die antwoord is aanvaar.",
+    "adoptCancelSuccess": "Die aanvaarding is gekanselleer.",
+    "loginRequired": "Meld aan om 'n Comment te skryf."
+  },
+  "attachment": {
+    "title": "Attachment",
+    "titleCount": "Attachment ({count})",
+    "delete": "Vee uit",
+    "upload": "Voeg lêer by",
+    "uploading": "Uploading...",
+    "uploadSuccess": "{count} lêers is opgelaai.",
+    "uploadFail": "Upload het misluk.",
+    "deleteConfirm": "Wil jy die Attachment uitvee?",
+    "deleteSuccess": "Uitgevee.",
+    "deleteFail": "Uitvee het misluk.",
+    "sizeLimit": "Maksimum 5 items · 20MB per lêer"
+  },
+  "link": {
+    "title": "Pi Account Skakeling",
+    "desc": "Skakel Pi Account en Google Account.",
+    "complete": "Skakeling is voltooi.",
+    "checkingPi": "Kontroleer Pi Login...",
+    "generateTitle": "Genereer Skakel Code",
+    "inputTitle": "Voer Skakel Code in",
+    "needPiLogin": "Pi Login is nodig om 'n skakel Code te genereer.",
+    "piLogin": "Pi Login",
+    "generateDesc": "Druk die knoppie hieronder om 'n 6-syfer Code te genereer. Gaan na die /link bladsy in 'n gewone blaaier en voer die Code in om jou Account te skakel.",
+    "generating": "Genereer Code...",
+    "regenerate": "Genereer nuwe Code",
+    "generate": "Genereer Skakel Code",
+    "codeLabel": "Skakel Code (Voer in 'n gewone blaaier in)",
+    "codeExpiry": "Gebruik binne 10 minute",
+    "generateFail": "Code generasie het misluk.",
+    "inputDesc": "Voer die 6-syfer Code in wat op hierdie bladsy van Pi Browser gegenereer is.",
+    "codeInputLabel": "Skakel Code",
+    "googleLoginRequired": "Nadat die Code ingevoer is, sal jy na die Google Login skerm herlei word.",
+    "linking": "Skakel tans...",
+    "googleLink": "Google Skakeling",
+    "googleLoginAndLink": "Skakel na Google Login",
+    "linkDone": "Account skakeling voltooi! Herlei na Home...",
+    "linkFail": "Koppeling misluk",
+    "completeTitle": "Besig om rekening te koppel",
+    "checkingSession": "Besig om Google-sessie na te gaan…",
+    "processing": "Besig om te koppel…",
+    "linkedSuccess": "Pi en Google-rekening is gekoppel! Gaan na Tuis…",
+    "serverError": "’n Bedienerfout het voorgekom",
+    "invalidLink": "Ongeldige koppelingskakel."
+  }
+}

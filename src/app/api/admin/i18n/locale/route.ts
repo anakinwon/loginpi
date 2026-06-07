@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { readFile, writeFile } from 'fs/promises'
+import { join } from 'path'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 
 const supabase = createClient(
@@ -12,6 +14,44 @@ function toFlagEmoji(cc: string): string {
   return [...cc.toUpperCase()]
     .map((c) => String.fromCodePoint(0x1f1e0 + c.charCodeAt(0) - 65))
     .join('')
+}
+
+// 허용 locale_cd 형식: "ko", "fil", "af-AF" 등 (2~3 소문자 + 선택적 하이픈+2대문자)
+const LOCALE_CD_RE = /^[a-z]{2,3}(-[A-Z]{2,3})?$/
+
+// routing.ts의 locales 배열에 새 locale_cd를 추가한다.
+// Vercel 서버리스에서는 소스 파일이 읽기 전용이므로 실패할 수 있음 → 무시.
+// 로컬 개발 환경에서는 파일이 즉시 수정되어 재시작 없이 적용됨.
+async function addLocaleToRouting(locale_cd: string): Promise<boolean> {
+  // 화이트리스트 검증: 파일 쓰기 전 반드시 형식 확인
+  if (!LOCALE_CD_RE.test(locale_cd)) return false
+
+  try {
+    const routingPath = join(process.cwd(), 'src', 'i18n', 'routing.ts')
+    const content = await readFile(routingPath, 'utf-8')
+
+    // includes()로 정확히 일치 확인 (RegExp 특수문자 오염 방지)
+    if (content.includes(`'${locale_cd}'`)) return true
+
+    // 충돌 변형 섹션 앞에 삽입 (없으면 배열 끝에 추가)
+    const marker = '// ── 충돌 변형'
+    let updated: string
+    if (content.includes(marker)) {
+      updated = content.replace(marker, `'${locale_cd}',\n\n    ${marker}`)
+    } else {
+      updated = content.replace(
+        /(\s+)(\],\s*\n\s*defaultLocale)/,
+        `$1'${locale_cd}',\n$1$2`
+      )
+    }
+
+    if (updated === content) return false
+    await writeFile(routingPath, updated, 'utf-8')
+    return true
+  } catch {
+    // Vercel 프로덕션에서는 실패 (소스 파일 쓰기 불가) — 무시
+    return false
+  }
 }
 
 // PATCH: locale 활성/비활성 토글
@@ -66,7 +106,6 @@ export async function PATCH(req: NextRequest) {
   }
 
   // locale_cd가 null이었던 국가를 활성화할 때 i18n_cntry_mst.locale_cd 연결
-  // (locale_cd가 null인 경우만 덮어쓰기 → 기존 연결 보호)
   if (country_cd && is_active === 'Y') {
     await supabase
       .from('i18n_cntry_mst')
@@ -75,5 +114,11 @@ export async function PATCH(req: NextRequest) {
       .is('locale_cd', null)
   }
 
-  return NextResponse.json({ ok: true, locale_cd, is_active })
+  // 신규 활성화 시 routing.ts 자동 수정 시도 (로컬 개발 환경에서만 적용됨)
+  let routingUpdated = false
+  if (is_active === 'Y') {
+    routingUpdated = await addLocaleToRouting(locale_cd)
+  }
+
+  return NextResponse.json({ ok: true, locale_cd, is_active, routingUpdated })
 }

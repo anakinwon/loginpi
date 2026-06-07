@@ -5,32 +5,11 @@ import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { routing } from '@/i18n/routing'
+import { LOCALE_CURRENCY } from '@/lib/locale-currency'
+import { LOCALE_COUNTRY, ACTIVE_COUNTRY_CODES, getAlpha2 } from '@/lib/locale-country'
 
 // routing.ts에 등록된 locale 집합 — 미등록 locale은 영어로 폴백 서비스됨
 const ROUTING_LOCALES = new Set<string>(routing.locales)
-
-// locale_cd → alpha-2 국가코드 (fi fi-* CSS 플래그용)
-const LOCALE_COUNTRY: Record<string, string> = {
-  ko: 'kr', en: 'us', zh: 'cn', ja: 'jp', hi: 'in',
-  vi: 'vn', af: 'za', fil: 'ph', th: 'th', id: 'id',
-  ms: 'my', es: 'es', fr: 'fr', de: 'de', it: 'it',
-  ru: 'ru', pt: 'pt', ar: 'eg',
-  au: 'au',  // 호주: 영어권이지만 AUD 통화 분리를 위해 별도 locale
-}
-
-// locale_cd → 대표 통화코드
-const LOCALE_CURRENCY: Record<string, string> = {
-  ko: 'KRW', en: 'USD', zh: 'CNY', ja: 'JPY', hi: 'INR',
-  vi: 'VND', af: 'ZAR', fil: 'PHP', th: 'THB', id: 'IDR',
-  ms: 'MYR', es: 'EUR', fr: 'EUR', de: 'EUR', it: 'EUR',
-  ru: 'RUB', pt: 'EUR', ar: 'EGP',
-  au: 'AUD',
-}
-
-// 활성 locale에 대응하는 대문자 country_cd 집합
-const ACTIVE_COUNTRY_CODES = new Set(
-  Object.values(LOCALE_COUNTRY).map((c) => c.toUpperCase())
-)
 
 function fmtRate(rate: number | undefined): string {
   if (!rate) return '—'
@@ -43,13 +22,6 @@ function FlagIcon({ code, className = '' }: { code: string; className?: string }
   return <span className={`fi fi-${code.toLowerCase()} ${className}`} />
 }
 
-// locale_cd → alpha-2 국가 코드 변환 (fi fi-* CSS 클래스용)
-// 정적 맵 우선, 없으면 BCP 47 마지막 세그먼트 추출 ("af-AF" → "af")
-function getAlpha2(locale_cd: string): string {
-  if (LOCALE_COUNTRY[locale_cd]) return LOCALE_COUNTRY[locale_cd]
-  const parts = locale_cd.split('-')
-  return parts[parts.length - 1].toLowerCase()
-}
 
 interface LocaleStat {
   locale_cd: string
@@ -193,14 +165,23 @@ export default function I18nPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ locale_cd, is_active, ...options }),
       })
-      const d = (await res.json()) as { ok?: boolean; error?: string }
+      const d = (await res.json()) as { ok?: boolean; error?: string; routingUpdated?: boolean }
       if (!res.ok) throw new Error(d.error ?? '상태 변경 실패')
 
       if (is_active === 'Y') {
-        toast.success(`${locale_cd} 활성화됨`, {
-          description: 'i18n/routing.ts의 locales 배열에 추가 후 재배포 필요. 그 전까지 영어(EN)로 폴백 서비스됩니다.',
-          duration: 6000,
-        })
+        if (d.routingUpdated) {
+          // 로컬 개발 환경: routing.ts 자동 수정 성공 → 재배포만 하면 즉시 반영
+          toast.success(`${locale_cd} 활성화 완료`, {
+            description: 'routing.ts가 자동 수정됐습니다. 재배포 후 즉시 반영됩니다.',
+            duration: 5000,
+          })
+        } else {
+          // Vercel 프로덕션 또는 routing.ts에 이미 등록된 경우
+          toast.success(`${locale_cd} 활성화됨`, {
+            description: 'routing.ts에 이미 등록된 locale입니다. 즉시 서비스됩니다.',
+            duration: 4000,
+          })
+        }
         // 비활성 목록에서 즉시 제거 (낙관적 업데이트)
         if (options?.country_cd) {
           setActivatedCountryCds((prev) => new Set([...prev, options.country_cd!.toUpperCase()]))
@@ -342,8 +323,16 @@ export default function I18nPage() {
                           <p className='text-muted-foreground text-xs uppercase'>{loc.locale_cd}</p>
                           {!ROUTING_LOCALES.has(loc.locale_cd) && (
                             <span
-                              title='i18n/routing.ts의 locales 배열에 추가 후 재배포 필요. 현재는 영어(EN)로 폴백 서비스됩니다.'
-                              className='inline-flex items-center gap-0.5 text-[10px] font-medium text-amber-600 dark:text-amber-400'
+                              title={[
+                                `'${loc.locale_cd}'이 src/i18n/routing.ts에 없습니다.`,
+                                '',
+                                '해결 방법:',
+                                `  src/i18n/routing.ts의 locales 배열에 '${loc.locale_cd}' 추가 후 재배포`,
+                                '',
+                                '※ 주요 국가 코드는 routing.ts에 선점 등록되어 있으므로',
+                                '  이 메시지는 매우 희귀한 경우에만 표시됩니다.',
+                              ].join('\n')}
+                              className='inline-flex cursor-help items-center gap-0.5 text-[10px] font-medium text-amber-600 dark:text-amber-400'
                             >
                               ⚠ 라우팅 미등록
                             </span>

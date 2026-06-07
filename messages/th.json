@@ -1,1 +1,540 @@
-{}
+{
+  "common": {
+    "loading": "กำลังโหลด...",
+    "save": "บันทึก",
+    "saving": "กำลังบันทึก...",
+    "cancel": "ยกเลิก",
+    "delete": "ลบ",
+    "deleting": "กำลังลบ...",
+    "edit": "แก้ไข",
+    "create": "สร้าง",
+    "creating": "กำลังสร้าง...",
+    "search": "ค้นหา",
+    "reset": "รีเซ็ต",
+    "prev": "ก่อนหน้า",
+    "next": "ถัดไป",
+    "all": "ทั้งหมด",
+    "noData": "ไม่มี Data",
+    "confirm": "ยืนยัน",
+    "back": "ย้อนกลับ",
+    "close": "ปิด",
+    "yes": "ใช่",
+    "no": "ไม่ใช่",
+    "error": "เกิดข้อผิดพลาด",
+    "newRegister": "+ สร้างใหม่",
+    "count": "{count} รายการ",
+    "countPerson": "{count} คน",
+    "pageOf": "{current} / {total}"
+  },
+  "header": {
+    "board": "Board",
+    "admin": "Admin",
+    "logout": "ออกจากระบบ",
+    "piLogin": "Pi Login",
+    "piLoginDev": "Pi Login (dev)",
+    "piAuthenticating": "กำลังยืนยันตัวตน...",
+    "googleLogin": "Google Login"
+  },
+  "home": {
+    "title": "Next.js Starter Kit",
+    "subtitle": "Boilerplate Next.js 15 + Tailwind CSS v4 + shadcn/ui เพื่อเริ่มต้นอย่างรวดเร็ว",
+    "loginSection": "Login",
+    "detectingEnv": "กำลังตรวจจับสภาพแวดล้อม...",
+    "piNetwork": "Pi Network",
+    "google": "Google",
+    "accountLink": "เชื่อมโยงบัญชี",
+    "piPayment": "ชำระเงินด้วย Pi Coin",
+    "techStack": "Tech Stack ที่รวมอยู่",
+    "components": "ตัวอย่าง shadcn/ui Component",
+    "button": "Button",
+    "inputLabel": "Input + Label",
+    "dialogToast": "Dialog & Toast (Sonner)",
+    "openDialog": "เปิด Dialog",
+    "dialogTitle": "ยินดีต้อนรับสู่ Starter Kit!",
+    "dialogDesc": "นี่คือ Dialog Component ของ shadcn/ui รองรับการเข้าถึงได้อย่างสมบูรณ์แบบด้วย @base-ui/react",
+    "showToast": "แสดง Toast",
+    "dialogToastMsg": "Toast จาก Dialog!",
+    "successToast": "Success Toast",
+    "errorToast": "Error Toast",
+    "errorToastMsg": "Error Toast ตัวอย่าง",
+    "gettingStarted": "เริ่มต้นใช้งาน",
+    "step1": "สร้างไฟล์ตัวแปรสภาพแวดล้อม",
+    "step2": "เพิ่ม Component ที่จำเป็น",
+    "step3": "กำหนด Schema ตัวแปรสภาพแวดล้อม แล้วเริ่มพัฒนา!",
+    "email": "Email",
+    "buttonDefault": "ค่าเริ่มต้น",
+    "successToastMsg": "Sonner Toast!",
+    "successToastDesc": "ตัวเลือก richColors เปิดใช้งานอยู่",
+    "stack": {
+      "nextjsDesc": "App Router, React 19, Turbopack",
+      "tailwindDesc": "การตั้งค่า CSS-first, @theme directive",
+      "shadcnDesc": "สไตล์ base-nova, อิงตาม @base-ui/react",
+      "tsDesc": "โหมด strict, ความปลอดภัยของ Type",
+      "themesDesc": "โหมด Dark / การเชื่อมโยง Theme ระบบอัตโนมัติ",
+      "envDesc": "การตรวจสอบ Type ของตัวแปรสภาพแวดล้อม ณ เวลา Build"
+    }
+  },
+  "link": {
+    "title": "เชื่อมโยงบัญชี Pi",
+    "desc": "เชื่อมโยงบัญชี Pi และบัญชี Google",
+    "complete": "การเชื่อมโยงเสร็จสมบูรณ์แล้ว",
+    "checkingPi": "กำลังตรวจสอบการเข้าสู่ระบบ Pi...",
+    "generateTitle": "สร้างรหัสเชื่อมโยง",
+    "inputTitle": "ป้อนรหัสเชื่อมโยง",
+    "needPiLogin": "ต้องเข้าสู่ระบบ Pi เพื่อสร้างรหัสเชื่อมโยง",
+    "piLogin": "เข้าสู่ระบบ Pi",
+    "generateDesc": "กดปุ่มด้านล่างเพื่อสร้างรหัส 6 หลัก เข้าสู่หน้า /link ในเบราว์เซอร์ทั่วไปและป้อนรหัสเพื่อเชื่อมโยงบัญชีของคุณ",
+    "generating": "กำลังสร้างรหัส...",
+    "regenerate": "สร้างรหัสใหม่",
+    "generate": "สร้างรหัสเชื่อมโยง",
+    "codeLabel": "รหัสเชื่อมโยง (ป้อนในเบราว์เซอร์ทั่วไป)",
+    "codeExpiry": "ใช้ภายใน 10 นาที",
+    "generateFail": "สร้างรหัสไม่สำเร็จ",
+    "inputDesc": "ป้อนรหัส 6 หลักที่สร้างจากหน้านี้ใน Pi Browser",
+    "codeInputLabel": "รหัสเชื่อมโยง",
+    "googleLoginRequired": "หลังจากป้อนรหัส คุณจะถูกนำไปยังหน้าเข้าสู่ระบบ Google",
+    "linking": "กำลังเชื่อมโยง...",
+    "googleLink": "เชื่อมโยง Google",
+    "googleLoginAndLink": "เข้าสู่ระบบ Google แล้วเชื่อมโยง",
+    "linkDone": "เชื่อมโยงบัญชีเรียบร้อยแล้ว! กำลังนำไปยังหน้าหลัก...",
+    "linkFail": "การเชื่อมโยงล้มเหลว",
+    "completeTitle": "กำลังดำเนินการเชื่อมโยงบัญชี",
+    "checkingSession": "กำลังตรวจสอบเซสชัน Google…",
+    "processing": "กำลังดำเนินการเชื่อมโยง…",
+    "linkedSuccess": "บัญชี Pi และ Google เชื่อมโยงกันแล้ว! กำลังย้ายไปหน้าแรก…",
+    "serverError": "เกิดข้อผิดพลาดของเซิร์ฟเวอร์",
+    "invalidLink": "ลิงก์เชื่อมโยงไม่ถูกต้อง"
+  },
+  "board": {
+    "title": "Board",
+    "noBoards": "ไม่มี Board ที่ลงทะเบียน",
+    "write": "เขียน",
+    "columns": {
+      "title": "หัวข้อ",
+      "author": "ผู้เขียน",
+      "views": "การดู",
+      "date": "วันที่"
+    },
+    "notice": "ประกาศ",
+    "adopted": "เลือก",
+    "noData": "ยังไม่มีโพสต์",
+    "noResults": "ไม่พบผลลัพธ์การค้นหาสำหรับ \"{q}\"",
+    "searchPlaceholder": "ค้นหาหัวข้อหรือเนื้อหา",
+    "postTitle": "หัวข้อ",
+    "postContent": "เนื้อหา",
+    "titlePlaceholder": "กรุณาป้อนหัวข้อ",
+    "editSuccess": "แก้ไขแล้ว",
+    "createSuccess": "โพสต์ถูกสร้างแล้ว",
+    "editFail": "แก้ไขล้มเหลว",
+    "createFail": "สร้างล้มเหลว",
+    "saving": "กำลังบันทึก…",
+    "creating": "กำลังสร้าง…",
+    "editPost": "แก้ไข",
+    "submitPost": "ส่ง",
+    "deletePost": "คุณต้องการลบโพสต์นี้หรือไม่?",
+    "deleteSuccess": "ลบแล้ว",
+    "deleteFail": "ลบล้มเหลว",
+    "viewCount": "การดู {count}",
+    "modified": "(แก้ไขแล้ว)",
+    "adoptedComplete": "เลือกแล้ว",
+    "writeTitle": "{name} — เขียน",
+    "editTitle": "{name} — แก้ไข",
+    "contentPlaceholder": "ป้อนเนื้อหา",
+    "featureComment": "Comment",
+    "featureAttachment": "ไฟล์แนบ"
+  },
+  "comment": {
+    "title": "ความคิดเห็น",
+    "count": "{count} ความคิดเห็น",
+    "noComments": "ยังไม่มีความคิดเห็น",
+    "adoptedAnswer": "คำตอบที่ถูกเลือก",
+    "adopt": "เลือก",
+    "cancelAdopt": "ยกเลิกการเลือก",
+    "placeholder": "พิมพ์ความคิดเห็น (กด Ctrl+Enter เพื่อส่ง)",
+    "submit": "ส่งความคิดเห็น",
+    "createSuccess": "ส่งความคิดเห็นเรียบร้อยแล้ว",
+    "createFail": "ส่งความคิดเห็นไม่สำเร็จ",
+    "deleteConfirm": "ต้องการลบความคิดเห็นหรือไม่?",
+    "deleteSuccess": "ลบความคิดเห็นเรียบร้อยแล้ว",
+    "deleteFail": "ดำเนินการไม่สำเร็จ",
+    "adoptSuccess": "เลือกคำตอบเรียบร้อยแล้ว",
+    "adoptCancelSuccess": "ยกเลิกการเลือกเรียบร้อยแล้ว",
+    "loginRequired": "กรุณาเข้าสู่ระบบเพื่อแสดงความคิดเห็น"
+  },
+  "attachment": {
+    "title": "ไฟล์แนบ",
+    "titleCount": "ไฟล์แนบ ({count})",
+    "delete": "ลบ",
+    "upload": "เพิ่มไฟล์",
+    "uploading": "กำลังอัปโหลด...",
+    "uploadSuccess": "อัปโหลด {count} ไฟล์เรียบร้อยแล้ว",
+    "uploadFail": "อัปโหลดไม่สำเร็จ",
+    "deleteConfirm": "ต้องการลบไฟล์แนบหรือไม่?",
+    "deleteSuccess": "ลบเรียบร้อยแล้ว",
+    "deleteFail": "ลบไม่สำเร็จ",
+    "sizeLimit": "สูงสุด 5 ไฟล์ · 20MB ต่อไฟล์"
+  },
+  "admin": {
+    "nav": {
+      "title": "Admin",
+      "dashboard": "Dashboard",
+      "users": "การจัดการผู้ใช้",
+      "payments": "ประวัติการชำระเงิน",
+      "links": "สถานะการเชื่อมโยงบัญชี",
+      "board": "การจัดการ Board",
+      "stdSection": "มาตรฐาน Data",
+      "stdWords": "คำมาตรฐาน",
+      "stdDomains": "Domain มาตรฐาน",
+      "stdTerms": "คำศัพท์มาตรฐาน",
+      "stdDdl": "DDL Export",
+      "stdAudit": "ประวัติการเปลี่ยนแปลง",
+      "stdApprovals": "เวิร์กโฟลว์การอนุมัติ",
+      "i18nSection": "หลายภาษา",
+      "i18n": "การจัดการหลายภาษา",
+      "backHome": "← กลับหน้าแรก"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "greeting": "สวัสดีครับ/ค่ะ, คุณ {name} ({role})",
+      "totalUsers": "ผู้ใช้ทั้งหมด",
+      "totalUsersDesc": "จำนวนบัญชีที่ลงทะเบียนทั้งหมด",
+      "piOnly": "เฉพาะ Pi",
+      "piOnlyDesc": "ผู้ใช้ที่มีเฉพาะบัญชี Pi",
+      "googleOnly": "เฉพาะ Google",
+      "googleOnlyDesc": "ผู้ใช้ที่มีเฉพาะบัญชี Google",
+      "linked": "เชื่อมโยงบัญชี",
+      "linkedDesc": "เชื่อมโยง Pi + Google เสร็จสมบูรณ์"
+    },
+    "std": {
+      "domains": {
+        "selectDomType": {
+          "code": "Code",
+          "id": "Identifier",
+          "general": "ทั่วไป"
+        },
+        "title": "การจัดการ Standard Domain",
+        "totalCount": "ทั้งหมด {count} รายการ",
+        "noData": "ไม่มี Domain",
+        "searchPlaceholder": "ค้นหา Domain name / Key Domain name…",
+        "formTitleNew": "ลงทะเบียน New Domain",
+        "formTitleEdit": "แก้ไข Domain",
+        "typeFilter": {
+          "all": "ทั้งหมด",
+          "code": "Code",
+          "id": "ตัวระบุ",
+          "general": "ทั่วไป"
+        },
+        "col": {
+          "domNm": "Domain name",
+          "keyDomNm": "Key Domain name",
+          "phyNm": "ชื่อทางกายภาพ",
+          "type": "ประเภท",
+          "dataType": "Data Type",
+          "desc": "คำอธิบาย"
+        },
+        "field": {
+          "domNm": "Domain name *",
+          "keyDomNm": "Key Domain name *",
+          "keyDomPhyNm": "Key Domain Physical name *",
+          "domType": "ประเภท Domain",
+          "dataType": "Data Type",
+          "dataLen": "ความยาว",
+          "dataScale": "ตำแหน่งทศนิยม",
+          "desc": "คำอธิบาย"
+        },
+        "placeholder": {
+          "domNm": "ตัวอย่าง: Price Domain",
+          "keyDomNm": "ตัวอย่าง: Price",
+          "keyDomPhyNm": "ตัวอย่าง: PRICE",
+          "dataLen": "ตัวอย่าง: 100",
+          "dataScale": "ตัวอย่าง: 2",
+          "desc": "คำอธิบาย Domain (ไม่บังคับ)"
+        },
+        "selectDataType": {
+          "varchar": "VARCHAR / TEXT",
+          "integer": "INTEGER",
+          "numeric": "NUMERIC",
+          "date": "DATE",
+          "timestamp": "TIMESTAMP"
+        },
+        "validationRequired": "ชื่อ Domain, ชื่อ Key Domain, ชื่อ Physical Key Domain เป็นสิ่งจำเป็น",
+        "deleteConfirm": "คุณต้องการลบ \"{name}\" หรือไม่?",
+        "saveSuccess": "บันทึกสำเร็จ",
+        "editSuccess": "แก้ไขสำเร็จ",
+        "deleteSuccess": "ลบสำเร็จ",
+        "saveFail": "บันทึกไม่สำเร็จ",
+        "deleteFail": "ลบไม่สำเร็จ"
+      },
+      "words": {
+        "title": "การจัดการคำมาตรฐาน",
+        "totalCount": "ทั้งหมด {count} รายการ",
+        "noData": "ไม่มีคำ",
+        "searchPlaceholder": "ค้นหาชื่อเชิงตรรกะ / ชื่อเชิงกายภาพ...",
+        "formTitleNew": "ลงทะเบียนคำใหม่",
+        "formTitleEdit": "แก้ไขคำ",
+        "col": {
+          "logNm": "ชื่อเชิงตรรกะ",
+          "phyNmAbbr": "ชื่อเชิงกายภาพ (คำย่อ)",
+          "phyNmFull": "ชื่อทางกายภาพ (เต็ม)",
+          "typeLen": "Type/ความยาว",
+          "status": "สถานะ",
+          "desc": "คำอธิบาย"
+        },
+        "field": {
+          "logNm": "ชื่อเชิงตรรกะ *",
+          "phyNmAbbr": "ชื่อทางกายภาพ (ย่อ) *",
+          "phyNmFull": "ชื่อทางกายภาพ (เต็ม)",
+          "dataType": "Data Type",
+          "dataLen": "Data ความยาว",
+          "desc": "คำอธิบาย"
+        },
+        "placeholder": {
+          "logNm": "ตัวอย่าง: ผู้ใช้",
+          "phyNmAbbr": "ตัวอย่าง: USR",
+          "phyNmFull": "ตัวอย่าง: User",
+          "dataType": "ตัวอย่าง: VARCHAR",
+          "dataLen": "ตัวอย่าง: 100",
+          "desc": "คำอธิบายคำ (ไม่บังคับ)"
+        },
+        "validationRequired": "ชื่อเชิงตรรกะและชื่อทางกายภาพเป็นสิ่งจำเป็น",
+        "deleteConfirm": "คุณต้องการลบคำว่า \"{name}\" หรือไม่?",
+        "saveSuccess": "บันทึกสำเร็จแล้ว",
+        "editSuccess": "แก้ไขสำเร็จแล้ว",
+        "deleteSuccess": "ลบสำเร็จแล้ว",
+        "saveFail": "บันทึกล้มเหลว",
+        "deleteFail": "ลบล้มเหลว"
+      },
+      "terms": {
+        "title": "การจัดการคำศัพท์มาตรฐาน",
+        "totalCount": "ทั้งหมด {count} รายการ",
+        "noData": "ไม่มีคำศัพท์",
+        "searchPlaceholder": "ค้นหาชื่อเชิงตรรกะ / ชื่อเชิงกายภาพ…",
+        "formTitleNew": "ลงทะเบียนคำศัพท์มาตรฐานใหม่",
+        "formTitleEdit": "แก้ไขคำศัพท์",
+        "col": {
+          "logNm": "ชื่อเชิงตรรกะ",
+          "phyNmLower": "ชื่อเชิงกายภาพ (ตัวพิมพ์เล็ก)",
+          "phyNmUpper": "ชื่อเชิงกายภาพ (ตัวพิมพ์ใหญ่)",
+          "desc": "คำอธิบาย"
+        },
+        "field": {
+          "logNm": "ชื่อเชิงตรรกะ *",
+          "wordSelect": "เลือกคำประกอบ *",
+          "wordSelectHint": "(ลำดับการเพิ่ม = ลำดับชื่อเชิงกายภาพ)",
+          "domainSelect": "Standard Domain * (องค์ประกอบสุดท้ายของชื่อเชิงกายภาพ)",
+          "autoPhyNm": "ชื่อเชิงกายภาพที่สร้างอัตโนมัติ",
+          "desc": "คำอธิบาย (ไม่บังคับ)"
+        },
+        "placeholder": {
+          "logNm": "ตัวอย่าง: ชื่อพนักงาน",
+          "wordSearch": "หลังจากค้นหาคำแล้วคลิกเพื่อเพิ่ม…",
+          "domainSelect": "เลือก Domain…",
+          "desc": "คำอธิบายคำศัพท์"
+        },
+        "validationLogNm": "ชื่อเชิงตรรกะเป็นสิ่งจำเป็น",
+        "validationWordDomain": "ต้องเลือกคำประกอบและ Domain",
+        "validationPhyNm": "ไม่สามารถสร้างชื่อเชิงกายภาพได้",
+        "deleteConfirm": "คุณต้องการลบ \"{name}\" หรือไม่?",
+        "saveSuccess": "บันทึกสำเร็จ",
+        "editSuccess": "แก้ไขสำเร็จ",
+        "deleteSuccess": "ลบสำเร็จ",
+        "saveFail": "บันทึกไม่สำเร็จ",
+        "deleteFail": "ลบไม่สำเร็จ"
+      },
+      "ddl": {
+        "title": "DDL Export",
+        "desc": "เมื่อเลือกคำศัพท์มาตรฐานเป็น Column, CREATE TABLE SQL จะถูกสร้างขึ้นโดยอัตโนมัติ",
+        "sectionTable": "ข้อมูล Table",
+        "sectionColumn": "เพิ่ม Column — เลือกจาก Standard Term",
+        "sectionPreview": "ตัวอย่าง DDL",
+        "field": {
+          "tableNmEn": "Table name (ภาษาอังกฤษ) *",
+          "tableNmKo": "Table name (ภาษาเกาหลี)"
+        },
+        "placeholder": {
+          "tableNmEn": "ตัวอย่าง: usr_info",
+          "tableNmKo": "ตัวอย่าง: ข้อมูลผู้ใช้",
+          "termSearch": "ค้นหา Term แล้วเพิ่มโดยคลิก..."
+        },
+        "col": {
+          "colLogNm": "Column (ชื่อเชิงตรรกะ)",
+          "type": "Type",
+          "pk": "PK",
+          "nn": "NN"
+        },
+        "copy": "คัดลอก",
+        "download": "↓ .sql",
+        "emptyPreview": "หากเพิ่ม Table name และ Column, DDL จะถูกสร้างขึ้นที่นี่",
+        "copySuccess": "DDL ถูกคัดลอกไปยังคลิปบอร์ดแล้ว"
+      },
+      "audit": {
+        "title": "ประวัติการเปลี่ยนแปลง (Audit Trail)",
+        "totalCount": "ทั้งหมด {count} รายการ",
+        "noData": "ไม่มีประวัติ",
+        "tableLabel": {
+          "stdDic": "Standard Word",
+          "stdDom": "Standard Domain",
+          "stdTerm": "Standard Term"
+        },
+        "filter": {
+          "table": "Table",
+          "from": "วันที่เริ่มต้น",
+          "to": "วันที่สิ้นสุด",
+          "allTables": "ทั้งหมด"
+        },
+        "col": {
+          "changedAt": "วันที่และเวลาที่เปลี่ยนแปลง",
+          "table": "Table",
+          "target": "เป้าหมาย",
+          "action": "การกระทำ",
+          "changedBy": "ผู้เปลี่ยนแปลง"
+        },
+        "before": "ก่อนเปลี่ยนแปลง",
+        "after": "หลังเปลี่ยนแปลง"
+      },
+      "approvals": {
+        "title": "Workflow การอนุมัติ",
+        "totalCount": "ทั้งหมด {count} รายการ",
+        "noPending": "ไม่มีคำขออนุมัติที่รอดำเนินการ",
+        "noData": "ไม่มี Data",
+        "allTypes": "ทุกประเภท",
+        "status": {
+          "pending": "รอดำเนินการ",
+          "approved": "อนุมัติแล้ว",
+          "rejected": "ถูกปฏิเสธ",
+          "all": "ทั้งหมด"
+        },
+        "entity": {
+          "stdDic": "Standard Word",
+          "stdDom": "Standard Domain",
+          "stdTerm": "Standard Term"
+        },
+        "col": {
+          "requestedAt": "วันที่และเวลาที่ร้องขอ",
+          "type": "ประเภท",
+          "target": "เป้าหมาย",
+          "requestedBy": "ผู้ร้องขอ",
+          "status": "สถานะ"
+        },
+        "approve": "อนุมัติ",
+        "reject": "ปฏิเสธ",
+        "rejectReasonPlaceholder": "โปรดระบุเหตุผลในการปฏิเสธ *",
+        "rejectConfirm": "ยืนยันการปฏิเสธ",
+        "rejectReason": "เหตุผลในการปฏิเสธ: {reason}",
+        "decidedBy": "ผู้ดำเนินการ: {name} / {date}",
+        "requestData": "Request Data",
+        "approveSuccess": "อนุมัติแล้ว",
+        "rejectSuccess": "ปฏิเสธแล้ว",
+        "processFail": "ดำเนินการไม่สำเร็จ"
+      }
+    },
+    "users": {
+      "title": "การจัดการผู้ใช้",
+      "totalCount": "ทั้งหมด {count} คน",
+      "noUsers": "ไม่มีผู้ใช้",
+      "col": {
+        "user": "ผู้ใช้",
+        "piAccount": "บัญชี Pi",
+        "googleAccount": "บัญชี Google",
+        "role": "บทบาท",
+        "joinDate": "วันที่เข้าร่วม",
+        "changeRole": "เปลี่ยนบทบาท"
+      },
+      "roleChanged": "บทบาทถูกเปลี่ยนแล้ว",
+      "changeFail": "เปลี่ยนไม่สำเร็จ"
+    },
+    "payments": {
+      "title": "ประวัติการชำระเงิน",
+      "totalCount": "ทั้งหมด {count} รายการ · ยอดรวมที่เสร็จสมบูรณ์ {total} π",
+      "noPayments": "ไม่มีประวัติการชำระเงิน",
+      "status": {
+        "completed": "เสร็จสมบูรณ์",
+        "approved": "อนุมัติ",
+        "pending": "รอดำเนินการ",
+        "cancelled": "ยกเลิก",
+        "error": "ข้อผิดพลาด"
+      },
+      "col": {
+        "user": "ผู้ใช้",
+        "amount": "จำนวนเงิน",
+        "memo": "บันทึก",
+        "status": "สถานะ",
+        "paymentId": "Payment ID",
+        "date": "วันที่และเวลา"
+      }
+    },
+    "links": {
+      "title": "สถานะการเชื่อมโยงบัญชี",
+      "totalCount": "ทั้งหมด {count} คน",
+      "noUsers": "ไม่มีผู้ใช้ดังกล่าว",
+      "status": {
+        "linked": "เชื่อมโยงแล้ว",
+        "piOnly": "Pi เท่านั้น",
+        "googleOnly": "Google เท่านั้น"
+      },
+      "desc": {
+        "linked": "Pi + Google เชื่อมต่อแล้ว",
+        "piOnly": "ไม่ได้เชื่อมโยงกับ Google",
+        "googleOnly": "ไม่ได้เชื่อมโยงกับ Pi"
+      },
+      "col": {
+        "user": "ผู้ใช้",
+        "piAccount": "บัญชี Pi",
+        "googleAccount": "บัญชี Google",
+        "linkStatus": "สถานะการเชื่อมโยง",
+        "role": "บทบาท",
+        "joinDate": "วันที่เข้าร่วม"
+      }
+    },
+    "board": {
+      "title": "การจัดการ Board",
+      "desc": "โพสต์ทั้งหมด {count} รายการ · ตั้งค่าประกาศและลบแบบบังคับ",
+      "noData": "ไม่มีโพสต์",
+      "loading": "กำลังโหลด...",
+      "col": {
+        "category": "Category",
+        "title": "หัวข้อ",
+        "author": "ผู้เขียน",
+        "views": "ยอดดู",
+        "date": "วันที่",
+        "manage": "จัดการ"
+      },
+      "notice": "ประกาศ",
+      "setPinned": "ตั้งค่าประกาศ",
+      "unsetPinned": "ยกเลิกประกาศ",
+      "pinnedSuccess": "ตั้งค่าเป็นประกาศแล้ว",
+      "unpinnedSuccess": "ยกเลิกประกาศแล้ว",
+      "processFail": "ดำเนินการล้มเหลว",
+      "deleteConfirm": "คุณต้องการลบโพสต์ \"{title}\" หรือไม่?",
+      "deleteSuccess": "ลบโพสต์แล้ว",
+      "deleteFail": "ลบไม่สำเร็จ"
+    },
+    "i18n": {
+      "title": "การจัดการหลายภาษา",
+      "desc": "Dashboard สถานะการแปล",
+      "syncAll": "ซิงค์ DB→JSON",
+      "syncing": "กำลังซิงค์…",
+      "stats": {
+        "supportedLocales": "ภาษาที่รองรับ",
+        "totalKeys": "คีย์การแปลทั้งหมด",
+        "completed": "เสร็จสมบูรณ์ 100%",
+        "completedOf": "จาก {count} ภาษา"
+      },
+      "col": {
+        "language": "ภาษา",
+        "progress": "ความคืบหน้า",
+        "translatedKeys": "คีย์ที่แปลแล้ว"
+      },
+      "translate": "แปล + ซิงค์",
+      "translating": "กำลังแปล…",
+      "syncingLocale": "กำลังซิงค์…",
+      "translateSuccess": "แปลเสร็จสมบูรณ์ {count} รายการ",
+      "translateFail": "การแปลล้มเหลว",
+      "syncSuccess": "ซิงค์ {count} ภาษาเสร็จสมบูรณ์",
+      "syncNoData": "ไม่มี Data ให้ซิงค์ใน DB โปรดรัน \"แปล + ซิงค์\" ก่อน",
+      "syncFail": "การซิงค์ล้มเหลว",
+      "footnote1": "* \"แปล + ซิงค์\": แปลคีย์ที่ยังไม่ได้แปลโดยอัตโนมัติด้วย Claude AI จากนั้นอัปเดต messages/*.json",
+      "footnote2": "* \"ซิงค์ DB→JSON\": สะท้อน Data การแปลที่จัดเก็บใน DB ไปยังไฟล์ JSON เท่านั้น"
+    }
+  }
+}
