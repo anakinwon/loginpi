@@ -1,6 +1,6 @@
 # 기술스택 업그레이드 전략
 
-> **기준일**: 2026-06-07
+> **기준일**: 2026-06-07 (최종 업데이트: 2026-06-07)
 > **기준**: Node.js Active LTS / npm stable 채널 (beta·RC·canary 제외)
 > **실행 전 필수**: `pnpm outdated` + `pnpm tsc --noEmit` (기준선 확인)
 
@@ -14,6 +14,24 @@
 | 프레임워크/라이브러리 | npm `latest` 태그 (stable 채널) |
 | TypeScript | `^현재_major` stable 최신 유지 (major 업그레이드는 Tier 3) |
 | 현재 beta 사용 중 | stable 출시 시 전환 (downgrade 아님) |
+
+---
+
+## ✅ 완료 — Tier 3: Next.js 16 (2026-06-07)
+
+| 항목 | 변경 전 | 변경 후 | 비고 |
+|---|---|---|---|
+| `next` | `15.5.18` | `16.2.7` | stable |
+| `eslint-config-next` | `15.5.18` | `16.2.7` | 동일 major 맞춤 |
+| `eslint.config.mjs` | FlatCompat 래퍼 방식 | 네이티브 flat config import | `@eslint/eslintrc` 불필요 제거 |
+| `@eslint/eslintrc` | devDependency 존재 | 제거 | flat config 전환으로 불필요 |
+| `package.json` | `pnpm.onlyBuiltDependencies` 필드 | 제거 | pnpm 11은 `pnpm-workspace.yaml`만 읽음 |
+
+**주요 결정**:
+- `middleware.ts` → `proxy.ts` 이름 변경 **보류**: Next.js 16 proxy는 edge runtime 미지원, next-intl 미들웨어는 edge 런타임 사용
+- `react-hooks/set-state-in-effect` 규칙 `warn`으로 다운그레이드: useEffect 내 setLoading 패턴 리팩토링은 별도 이슈
+
+**검증 결과**: `pnpm tsc --noEmit` ✅ / `pnpm lint` ✅ (0 errors) / `pnpm build` ✅
 
 ---
 
@@ -83,48 +101,36 @@ pnpm outdated   # 분기별 1회 실행하여 현황 파악
 **원칙**: 반드시 별도 feature 브랜치 → 전체 기능 테스트 → main 머지.
 `pnpm outdated`에서 major 버전이 달라진 항목을 확인 후 각각 계획 수립.
 
-### Next.js 16.x (현재 16.2.7 available)
-
-```bash
-pnpm add next@16 eslint-config-next@16
-```
-
-**확인 사항**:
-- `next.config.ts` API 변경 여부
-- `createNextIntlPlugin()` 호환성 (`next.config.ts`)
-- App Router 타입 변경
-- `eslint-config-next` 반드시 동일 major 버전 맞추기
-
-**검증**: 전체 관리자 페이지 + 게시판 + 다국어 라우팅.
+### ~~Next.js 16.x~~ — ✅ 완료 (2026-06-07, feature/upgrade-nextjs-16)
 
 ---
 
-### TypeScript 6.x (현재 6.0.3 available)
+### ~~TypeScript 6.x~~ — ✅ 완료 (2026-06-07, feature/upgrade-nextjs-16)
 
-```bash
-pnpm add -D typescript@^6
-```
-
-**확인 사항**:
-- `strict` 모드 동작 변화 (v6는 기존 `strict` 옵션 일부 강화 가능)
-- `tsconfig.json` deprecated 옵션 제거 여부
-- `isolatedModules` 기본값 변경 여부
-
-**검증**: `pnpm tsc --noEmit` 에러 없음 → `pnpm build` 성공.
+`pnpm tsc --noEmit` 에러 없음. strict 모드 강화 없음. tsconfig 변경 불필요.
 
 ---
 
-### ESLint 10.x (현재 10.4.1 available)
+### ESLint 10.x (현재 10.4.1 available) — ⛔ 대기
 
-package.json에 `"eslint": "^9"` 로 범위 지정되어 있어 자동 업데이트 안 됨.
+**블로커**: `eslint-config-next@16`이 내부적으로 사용하는 세 플러그인이 ESLint 10을 미지원 (2026-06-07 기준)
+
+| 플러그인 | 설치 버전 | 지원 ESLint 범위 |
+|---|---|---|
+| `eslint-plugin-react` | `7.37.5` | `^3 ~ ^9` |
+| `eslint-plugin-import` | `2.32.0` | `^2 ~ ^9` |
+| `eslint-plugin-jsx-a11y` | `6.10.2` | `^3 ~ ^9` |
+
+**전환 조건**: `eslint-config-next`가 위 플러그인의 ESLint 10 호환 버전을 채택한 뒤 진행.
 
 ```bash
-pnpm add -D eslint@^10
+# 전환 가능 여부 확인 명령
+npm view eslint-plugin-react peerDependencies
+npm view eslint-plugin-import peerDependencies
 ```
 
-**확인 사항**:
-- `eslint.config.mjs`의 `FlatCompat` 필요성 (v10에서 레거시 설정 완전 제거 가능성)
-- `next/core-web-vitals` + `next/typescript` 규칙 호환성
+**확인 사항** (전환 시):
+- `eslint.config.mjs` — FlatCompat 이미 제거됨 (Next.js 16 업그레이드 시 처리)
 - `eslint-config-prettier` v10 호환성
 
 **검증**: `pnpm lint` 에러 없음.

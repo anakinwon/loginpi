@@ -1,6 +1,6 @@
 # Pi Network 사용자 인증 구현 스킬
 
-Next.js 15 App Router 코드베이스에 Pi Network 인증을 완전하게 구현하는 가이드.
+Next.js 16 App Router 코드베이스에 Pi Network 인증을 완전하게 구현하는 가이드.
 이 문서만 참고하면 처음부터 실수 없이 구현할 수 있다.
 
 ---

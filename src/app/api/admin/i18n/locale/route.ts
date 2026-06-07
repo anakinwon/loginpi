@@ -3,6 +3,8 @@ import { createClient } from '@supabase/supabase-js'
 import { readFile, writeFile } from 'fs/promises'
 import { join } from 'path'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
+import { LOCALE_CURRENCY } from '@/lib/locale-currency'
+import { LOCALE_COUNTRY } from '@/lib/locale-country'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -120,5 +122,24 @@ export async function PATCH(req: NextRequest) {
     routingUpdated = await addLocaleToRouting(locale_cd)
   }
 
-  return NextResponse.json({ ok: true, locale_cd, is_active, routingUpdated })
+  // 매핑 완전성 사전 경고 — et/mx 통화 USD 오표시 재발 방지 (2026-06-08)
+  // 빌드된 번들 기준 체크: 누락 시 locale-currency/country.ts 수정 + 재배포 전까지 USD/fallback 표시됨
+  const mappingWarnings: string[] = []
+  if (is_active === 'Y') {
+    if (!LOCALE_CURRENCY[locale_cd]) {
+      mappingWarnings.push(
+        `통화 매핑 누락: src/lib/locale-currency.ts에 '${locale_cd}' 추가 후 재배포 필요 (현재 π 시세가 USD로 표시됨)`
+      )
+    }
+    if (!LOCALE_COUNTRY[locale_cd]) {
+      mappingWarnings.push(
+        `국가 매핑 누락: src/lib/locale-country.ts에 '${locale_cd}' 추가 후 재배포 필요 (국기·중복필터 fallback 동작)`
+      )
+    }
+    if (mappingWarnings.length > 0) {
+      console.warn(`[i18n/locale] '${locale_cd}' 활성화 — 매핑 경고:\n  ${mappingWarnings.join('\n  ')}`)
+    }
+  }
+
+  return NextResponse.json({ ok: true, locale_cd, is_active, routingUpdated, mappingWarnings })
 }

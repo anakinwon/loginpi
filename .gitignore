@@ -59,3 +59,4 @@ next-env.d.ts
 !public/*.jpeg
 !public/*.svg
 !public/*.ico
+package-lock.json

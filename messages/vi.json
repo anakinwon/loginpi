@@ -37,7 +37,7 @@
   },
   "home": {
     "title": "Next.js Starter Kit",
-    "subtitle": "Boilerplate Next.js 15 + Tailwind CSS v4 + shadcn/ui để bắt đầu nhanh chóng",
+    "subtitle": "Boilerplate Next.js 16 + Tailwind CSS v4 + shadcn/ui để bắt đầu nhanh chóng",
     "loginSection": "Đăng nhập",
     "detectingEnv": "Đang phát hiện môi trường...",
     "piNetwork": "Pi Network",

@@ -1,1 +1,540 @@
-{}
+{
+  "link": {
+    "codeInputLabel": "Code Pautan",
+    "title": "Pautan Akaun Pi",
+    "desc": "Pautkan Akaun Pi dan Akaun Google.",
+    "complete": "Pautan telah selesai.",
+    "checkingPi": "Sedang menyemak Login Pi…",
+    "generateTitle": "Jana Code Pautan",
+    "inputTitle": "Masukkan Code Pautan",
+    "needPiLogin": "Login Pi diperlukan untuk menjana Code pautan.",
+    "piLogin": "Login Pi",
+    "generateDesc": "Tekan butang di bawah untuk menjana Code 6 digit. Akses halaman /link dalam pelayar biasa dan masukkan Code untuk memautkan Akaun anda.",
+    "generating": "Sedang menjana Code…",
+    "regenerate": "Jana Code baharu",
+    "generate": "Jana Code Pautan",
+    "codeLabel": "Code Pautan (Masukkan dalam pelayar biasa)",
+    "codeExpiry": "Guna dalam 10 minit",
+    "generateFail": "Gagal menjana Code",
+    "inputDesc": "Masukkan Code 6 digit yang dijana pada halaman ini di Pi Browser.",
+    "googleLoginRequired": "Selepas memasukkan Code, anda akan dialihkan ke skrin Login Google.",
+    "linking": "Sedang memautkan…",
+    "googleLink": "Pautan Google",
+    "googleLoginAndLink": "Pautkan selepas Login Google",
+    "linkDone": "Pautan Akaun selesai! Mengalihkan ke Home…",
+    "linkFail": "Pautan Gagal",
+    "completeTitle": "Memproses Pautan Akaun",
+    "checkingSession": "Menyemak Session Google…",
+    "processing": "Memproses Pautan…",
+    "linkedSuccess": "Akaun Pi dan Google telah berjaya dipautkan! Bergerak ke Laman Utama…",
+    "serverError": "Ralat Server telah berlaku",
+    "invalidLink": "Pautan tidak sah."
+  },
+  "common": {
+    "loading": "Memuat...",
+    "save": "Simpan",
+    "saving": "Menyimpan...",
+    "cancel": "Batal",
+    "delete": "Padam",
+    "deleting": "Memadam...",
+    "edit": "Edit",
+    "create": "Cipta",
+    "creating": "Mencipta...",
+    "search": "Cari",
+    "reset": "Set Semula",
+    "prev": "Sebelum",
+    "next": "Seterusnya",
+    "all": "Semua",
+    "noData": "Tiada Data.",
+    "confirm": "Sahkan",
+    "back": "Kembali",
+    "close": "Tutup",
+    "yes": "Ya",
+    "no": "Tidak",
+    "error": "Ralat Berlaku",
+    "newRegister": "+ Daftar Baharu",
+    "count": "{count} item",
+    "countPerson": "{count} orang",
+    "pageOf": "{current} / {total}"
+  },
+  "header": {
+    "board": "Board",
+    "admin": "Admin",
+    "logout": "Log Keluar",
+    "piLogin": "Log Masuk Pi",
+    "piLoginDev": "Log Masuk Pi (dev)",
+    "piAuthenticating": "Mengesahkan...",
+    "googleLogin": "Log Masuk Google"
+  },
+  "home": {
+    "title": "Next.js Starter Kit",
+    "subtitle": "Boilerplate Next.js 16 + Tailwind CSS v4 + shadcn/ui untuk permulaan pantas",
+    "loginSection": "Log Masuk",
+    "detectingEnv": "Mengesan Persekitaran...",
+    "piNetwork": "Pi Network",
+    "google": "Google",
+    "accountLink": "Pautan Akaun",
+    "piPayment": "Pembayaran Pi Coin",
+    "techStack": "Tech Stack Termasuk",
+    "components": "Contoh Komponen shadcn/ui",
+    "button": "Button",
+    "inputLabel": "Input + Label",
+    "dialogToast": "Dialog & Toast (Sonner)",
+    "openDialog": "Buka Dialog",
+    "dialogTitle": "Selamat Datang ke Starter Kit!",
+    "dialogDesc": "Ini adalah komponen Dialog shadcn/ui. Ia menyokong kebolehcapaian sepenuhnya berdasarkan @base-ui/react.",
+    "showToast": "Papar Toast",
+    "dialogToastMsg": "Toast dari Dialog!",
+    "successToast": "Success Toast",
+    "errorToast": "Error Toast",
+    "errorToastMsg": "Contoh Error Toast",
+    "gettingStarted": "Bermula",
+    "step1": "Cipta fail pemboleh ubah persekitaran",
+    "step2": "Tambah Component yang diperlukan",
+    "step3": "Takrifkan Skema pemboleh ubah persekitaran dan mula membangun!",
+    "email": "Email",
+    "buttonDefault": "Lalai",
+    "successToastMsg": "Sonner Toast!",
+    "successToastDesc": "Option richColors diaktifkan.",
+    "stack": {
+      "nextjsDesc": "App Router, React 19, Turbopack",
+      "tailwindDesc": "Tetapan CSS-first, Direktif @theme",
+      "shadcnDesc": "Style base-nova, berdasarkan @base-ui/react",
+      "tsDesc": "Mod strict, keselamatan Type",
+      "themesDesc": "Mod gelap / penyepaduan tema sistem automatik",
+      "envDesc": "Pengesahan Type pemboleh ubah persekitaran masa Build"
+    }
+  },
+  "board": {
+    "title": "Board",
+    "noBoards": "Tiada Board yang didaftarkan.",
+    "write": "Tulis",
+    "columns": {
+      "title": "Tajuk",
+      "author": "Penulis",
+      "views": "Paparan",
+      "date": "Tarikh"
+    },
+    "notice": "Notis",
+    "adopted": "Diterima",
+    "noData": "Tiada Post lagi.",
+    "noResults": "Tiada hasil carian untuk \"{q}\".",
+    "searchPlaceholder": "Cari tajuk atau kandungan",
+    "postTitle": "Tajuk Post",
+    "postContent": "Kandungan Post",
+    "titlePlaceholder": "Sila masukkan tajuk",
+    "editSuccess": "Berjaya diedit",
+    "createSuccess": "Post berjaya dicipta",
+    "editFail": "Gagal mengedit",
+    "createFail": "Gagal mencipta",
+    "saving": "Sedang mengedit…",
+    "creating": "Sedang mencipta…",
+    "editPost": "Edit",
+    "submitPost": "Hantar",
+    "deletePost": "Padamkan Post?",
+    "deleteSuccess": "Berjaya dipadamkan",
+    "deleteFail": "Gagal memadamkan",
+    "viewCount": "Paparan {count}",
+    "modified": "(Diedit)",
+    "adoptedComplete": "Penerimaan Selesai",
+    "writeTitle": "{name} — Tulis Post",
+    "editTitle": "{name} — Edit Post",
+    "contentPlaceholder": "Masukkan kandungan",
+    "featureComment": "Komen",
+    "featureAttachment": "Attachment"
+  },
+  "comment": {
+    "title": "Comment",
+    "count": "{count}",
+    "noComments": "Belum ada Comment lagi.",
+    "adoptedAnswer": "Jawapan yang Diterima",
+    "adopt": "Terima",
+    "cancelAdopt": "Batal Terima",
+    "placeholder": "Masukkan Comment (Daftar dengan Ctrl+Enter)",
+    "submit": "Hantar Comment",
+    "createSuccess": "Comment telah dihantar",
+    "createFail": "Gagal menghantar Comment",
+    "deleteConfirm": "Padamkan Comment?",
+    "deleteSuccess": "Comment telah dipadamkan",
+    "deleteFail": "Gagal memproses",
+    "adoptSuccess": "Jawapan telah diterima",
+    "adoptCancelSuccess": "Penerimaan telah dibatalkan",
+    "loginRequired": "Sila log masuk untuk menulis Comment."
+  },
+  "attachment": {
+    "title": "Attachment",
+    "titleCount": "Attachment ({count})",
+    "delete": "Padam",
+    "upload": "Tambah File",
+    "uploading": "Sedang Upload…",
+    "uploadSuccess": "{count} File telah di-Upload",
+    "uploadFail": "Gagal Upload",
+    "deleteConfirm": "Padamkan Attachment?",
+    "deleteSuccess": "Telah dipadamkan",
+    "deleteFail": "Gagal memadamkan",
+    "sizeLimit": "Maksimum 5 · 20MB setiap File"
+  },
+  "admin": {
+    "nav": {
+      "title": "Admin",
+      "dashboard": "Dashboard",
+      "users": "Pengurusan Pengguna",
+      "payments": "Sejarah Pembayaran",
+      "links": "Status Pautan Akaun",
+      "board": "Pengurusan Board",
+      "stdSection": "Standard Data",
+      "stdWords": "Perkataan Standard",
+      "stdDomains": "Domain Standard",
+      "stdTerms": "Terma Standard",
+      "stdDdl": "DDL Export",
+      "stdAudit": "Sejarah Perubahan",
+      "stdApprovals": "Workflow Kelulusan",
+      "i18nSection": "Pelbagai Bahasa",
+      "i18n": "Pengurusan Pelbagai Bahasa",
+      "backHome": "← Ke Laman Utama"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "greeting": "Helo, {name} ({role})",
+      "totalUsers": "Jumlah Pengguna",
+      "totalUsersDesc": "Jumlah akaun berdaftar",
+      "piOnly": "Pi Sahaja",
+      "piOnlyDesc": "Pengguna dengan akaun Pi sahaja",
+      "googleOnly": "Google Sahaja",
+      "googleOnlyDesc": "Pengguna dengan akaun Google sahaja",
+      "linked": "Pautan Akaun",
+      "linkedDesc": "Pautan Pi + Google Selesai"
+    },
+    "users": {
+      "title": "Pengurusan Pengguna",
+      "totalCount": "Jumlah {count} orang",
+      "noUsers": "Tiada pengguna.",
+      "col": {
+        "user": "Pengguna",
+        "piAccount": "Akaun Pi",
+        "googleAccount": "Akaun Google",
+        "role": "Peranan",
+        "joinDate": "Tarikh Sertai",
+        "changeRole": "Tukar Peranan"
+      },
+      "roleChanged": "Peranan telah ditukar",
+      "changeFail": "Gagal Tukar"
+    },
+    "payments": {
+      "title": "Sejarah Pembayaran",
+      "totalCount": "Jumlah {count} transaksi · Jumlah selesai {total} π",
+      "noPayments": "Tiada sejarah pembayaran.",
+      "status": {
+        "completed": "Selesai",
+        "approved": "Diluluskan",
+        "pending": "Menunggu",
+        "cancelled": "Batal",
+        "error": "Ralat"
+      },
+      "col": {
+        "user": "Pengguna",
+        "amount": "Jumlah",
+        "memo": "Memo",
+        "status": "Status",
+        "paymentId": "ID Pembayaran",
+        "date": "Tarikh"
+      }
+    },
+    "links": {
+      "title": "Status Pautan Akaun",
+      "totalCount": "Jumlah {count} pengguna",
+      "noUsers": "Tiada pengguna yang sepadan.",
+      "status": {
+        "linked": "Berpaut",
+        "piOnly": "Pi Sahaja",
+        "googleOnly": "Google Sahaja"
+      },
+      "desc": {
+        "linked": "Pi + Google disambungkan",
+        "piOnly": "Google tidak berpaut",
+        "googleOnly": "Pi tidak berpaut"
+      },
+      "col": {
+        "user": "Pengguna",
+        "piAccount": "Akaun Pi",
+        "googleAccount": "Akaun Google",
+        "linkStatus": "Status Pautan",
+        "role": "Peranan",
+        "joinDate": "Tarikh Sertai"
+      }
+    },
+    "board": {
+      "title": "Pengurusan Board",
+      "desc": "Jumlah {count} siaran · Tetapan notis dan padam paksa",
+      "noData": "Tiada siaran.",
+      "loading": "Memuatkan…",
+      "col": {
+        "category": "Category",
+        "title": "Tajuk",
+        "author": "Penulis",
+        "views": "Paparan",
+        "date": "Tarikh",
+        "manage": "Urus"
+      },
+      "notice": "Notis",
+      "setPinned": "Tetapkan Notis",
+      "unsetPinned": "Nyahset Notis",
+      "pinnedSuccess": "Berjaya ditetapkan sebagai notis",
+      "unpinnedSuccess": "Notis telah dinyahset",
+      "processFail": "Gagal memproses",
+      "deleteConfirm": "Padam siaran \"{title}\"?",
+      "deleteSuccess": "Siaran telah dipadam",
+      "deleteFail": "Gagal memadam"
+    },
+    "std": {
+      "words": {
+        "title": "Pengurusan Standard Words",
+        "totalCount": "Jumlah {count} item",
+        "noData": "Tiada perkataan.",
+        "searchPlaceholder": "Cari nama logik / nama fizikal…",
+        "formTitleNew": "Daftar Perkataan Baharu",
+        "formTitleEdit": "Edit Perkataan",
+        "col": {
+          "logNm": "Nama Logik",
+          "phyNmAbbr": "Nama Fizikal (Singkatan)",
+          "phyNmFull": "Nama Fizikal (Penuh)",
+          "typeLen": "Type/Length",
+          "status": "Status",
+          "desc": "Description"
+        },
+        "field": {
+          "logNm": "Nama Logik *",
+          "phyNmAbbr": "Nama Fizikal (Singkatan) *",
+          "phyNmFull": "Nama Fizikal (Penuh)",
+          "dataType": "Data Type",
+          "dataLen": "Data Length",
+          "desc": "Description"
+        },
+        "placeholder": {
+          "logNm": "Contoh: User",
+          "phyNmAbbr": "Contoh: USR",
+          "phyNmFull": "Contoh: User",
+          "dataType": "Contoh: VARCHAR",
+          "dataLen": "Contoh: 100",
+          "desc": "Description perkataan (Pilihan)"
+        },
+        "validationRequired": "Nama Logik dan Nama Fizikal adalah wajib",
+        "deleteConfirm": "Adakah anda pasti ingin memadam perkataan \"{name}\"?",
+        "saveSuccess": "Berjaya disimpan",
+        "editSuccess": "Berjaya diubah",
+        "deleteSuccess": "Berjaya dipadam",
+        "saveFail": "Gagal menyimpan",
+        "deleteFail": "Gagal memadam"
+      },
+      "domains": {
+        "title": "Pengurusan Domain Standard",
+        "totalCount": "Jumlah {count} item",
+        "noData": "Tiada Domain.",
+        "searchPlaceholder": "Cari Nama Domain / Nama Domain Kunci…",
+        "formTitleNew": "Pendaftaran Domain Baharu",
+        "formTitleEdit": "Ubah Domain",
+        "typeFilter": {
+          "all": "Semua",
+          "code": "Code",
+          "id": "Identifier",
+          "general": "Umum"
+        },
+        "col": {
+          "domNm": "Nama Domain",
+          "keyDomNm": "Nama Domain Kunci",
+          "phyNm": "Nama Fizikal",
+          "type": "Jenis",
+          "dataType": "Data Type",
+          "desc": "Description"
+        },
+        "field": {
+          "domNm": "Nama Domain *",
+          "keyDomNm": "Nama Domain Kunci *",
+          "keyDomPhyNm": "Nama Fizikal Domain Kunci *",
+          "domType": "Jenis Domain",
+          "dataType": "Data Type",
+          "dataLen": "Length",
+          "dataScale": "Tempat Perpuluhan",
+          "desc": "Description"
+        },
+        "placeholder": {
+          "domNm": "Contoh: Domain Harga",
+          "keyDomNm": "Contoh: Harga",
+          "keyDomPhyNm": "Contoh: PRICE",
+          "dataLen": "Contoh: 100",
+          "dataScale": "Contoh: 2",
+          "desc": "Penerangan Domain (Pilihan)"
+        },
+        "selectDomType": {
+          "code": "Code",
+          "id": "Identifier",
+          "general": "Umum"
+        },
+        "selectDataType": {
+          "varchar": "VARCHAR / TEXT",
+          "integer": "INTEGER",
+          "numeric": "NUMERIC",
+          "date": "DATE",
+          "timestamp": "TIMESTAMP"
+        },
+        "validationRequired": "Nama Domain, Nama Domain Kunci, Nama Fizikal Domain Kunci adalah wajib",
+        "deleteConfirm": "Adakah anda pasti ingin memadamkan \"{name}\"?",
+        "saveSuccess": "Berjaya disimpan",
+        "editSuccess": "Berjaya dikemas kini",
+        "deleteSuccess": "Berjaya dipadamkan",
+        "saveFail": "Gagal menyimpan",
+        "deleteFail": "Gagal memadamkan"
+      },
+      "terms": {
+        "title": "Pengurusan Istilah Standard",
+        "totalCount": "Jumlah {count} item",
+        "noData": "Tiada istilah.",
+        "searchPlaceholder": "Cari Nama Logik / Nama Fizikal…",
+        "formTitleNew": "Pendaftaran Istilah Standard Baharu",
+        "formTitleEdit": "Edit Istilah",
+        "col": {
+          "logNm": "Nama Logik",
+          "phyNmLower": "Nama Fizikal (huruf kecil)",
+          "phyNmUpper": "Nama Fizikal (huruf besar)",
+          "desc": "Penerangan"
+        },
+        "field": {
+          "logNm": "Nama Logik *",
+          "wordSelect": "Pilih Perkataan Komponen *",
+          "wordSelectHint": "(Susunan penambahan = Susunan Nama Fizikal)",
+          "domainSelect": "Domain Standard * (Elemen terakhir Nama Fizikal)",
+          "autoPhyNm": "Nama Fizikal Dijana Secara Automatik",
+          "desc": "Penerangan (Pilihan)"
+        },
+        "placeholder": {
+          "logNm": "Contoh: Nama Pekerja",
+          "wordSearch": "Cari perkataan kemudian tambah dengan klik…",
+          "domainSelect": "Pilih Domain…",
+          "desc": "Penerangan Istilah"
+        },
+        "validationLogNm": "Nama Logik adalah wajib",
+        "validationWordDomain": "Perkataan komponen dan Domain mesti dipilih",
+        "validationPhyNm": "Nama Fizikal tidak dapat dijana",
+        "deleteConfirm": "Adakah anda pasti ingin memadamkan \"{name}\"?",
+        "saveSuccess": "Berjaya disimpan",
+        "editSuccess": "Berjaya dikemas kini",
+        "deleteSuccess": "Berjaya dipadamkan",
+        "saveFail": "Gagal menyimpan",
+        "deleteFail": "Gagal memadamkan"
+      },
+      "ddl": {
+        "title": "DDL Export",
+        "desc": "Apabila Istilah Standard dipilih sebagai Column, CREATE TABLE SQL akan dijana secara automatik",
+        "sectionTable": "Maklumat Table",
+        "sectionColumn": "Tambah Column — Pilih daripada Istilah Standard",
+        "sectionPreview": "Pratonton DDL",
+        "field": {
+          "tableNmEn": "Nama Table (Inggeris) *",
+          "tableNmKo": "Nama Table (Korea)"
+        },
+        "placeholder": {
+          "tableNmEn": "Cth: usr_info",
+          "tableNmKo": "Cth: Maklumat Pengguna",
+          "termSearch": "Cari Istilah dan klik untuk tambah…"
+        },
+        "col": {
+          "colLogNm": "Column (Nama Logik)",
+          "type": "Type",
+          "pk": "PK",
+          "nn": "NN"
+        },
+        "copy": "Salin",
+        "download": "↓ .sql",
+        "emptyPreview": "Apabila Nama Table dan Column ditambah, DDL akan dihasilkan di sini.",
+        "copySuccess": "DDL telah disalin ke Clipboard."
+      },
+      "audit": {
+        "title": "Sejarah Perubahan (Audit Trail)",
+        "totalCount": "Jumlah {count} item",
+        "noData": "Tiada sejarah.",
+        "tableLabel": {
+          "stdDic": "Perkataan Standard",
+          "stdDom": "Domain Standard",
+          "stdTerm": "Istilah Standard"
+        },
+        "filter": {
+          "table": "Table",
+          "from": "Tarikh Mula",
+          "to": "Tarikh Tamat",
+          "allTables": "Semua"
+        },
+        "col": {
+          "changedAt": "Tarikh/Masa Perubahan",
+          "table": "Table",
+          "target": "Sasaran",
+          "action": "Tindakan",
+          "changedBy": "Diubah Oleh"
+        },
+        "before": "Sebelum Perubahan",
+        "after": "Selepas Perubahan"
+      },
+      "approvals": {
+        "title": "Workflow Kelulusan",
+        "totalCount": "Jumlah {count} item",
+        "noPending": "Tiada permintaan kelulusan yang belum selesai.",
+        "noData": "Tiada Data.",
+        "allTypes": "Semua Jenis",
+        "status": {
+          "pending": "Belum Selesai",
+          "approved": "Diluluskan",
+          "rejected": "Ditolak",
+          "all": "Semua"
+        },
+        "entity": {
+          "stdDic": "Perkataan Standard",
+          "stdDom": "Domain Standard",
+          "stdTerm": "Istilah Standard"
+        },
+        "col": {
+          "requestedAt": "Tarikh/Masa Diminta",
+          "type": "Jenis",
+          "target": "Sasaran",
+          "requestedBy": "Diminta Oleh",
+          "status": "Status"
+        },
+        "approve": "Luluskan",
+        "reject": "Tolak",
+        "rejectReasonPlaceholder": "Sila masukkan sebab penolakan *",
+        "rejectConfirm": "Sahkan Penolakan",
+        "rejectReason": "Sebab Penolakan: {reason}",
+        "decidedBy": "Diputuskan oleh: {name} / {date}",
+        "requestData": "Data Permintaan",
+        "approveSuccess": "Diluluskan",
+        "rejectSuccess": "Ditolak",
+        "processFail": "Pemprosesan Gagal"
+      }
+    },
+    "i18n": {
+      "title": "Pengurusan Berbilang Bahasa",
+      "desc": "Dashboard Status Terjemahan",
+      "syncAll": "Penyegerakan DB→JSON",
+      "syncing": "Menyegerakkan…",
+      "stats": {
+        "supportedLocales": "Bahasa yang Disokong",
+        "totalKeys": "Jumlah Kunci Terjemahan",
+        "completed": "100% Selesai",
+        "completedOf": "Daripada {count} bahasa"
+      },
+      "col": {
+        "language": "Bahasa",
+        "progress": "Kemajuan",
+        "translatedKeys": "Kunci Diterjemahkan"
+      },
+      "translate": "Terjemah + Segerak",
+      "translating": "Menterjemah…",
+      "syncingLocale": "Menyegerakkan…",
+      "translateSuccess": "{count} terjemahan selesai",
+      "translateFail": "Terjemahan Gagal",
+      "syncSuccess": "{count} bahasa selesai disegerakkan",
+      "syncNoData": "Tiada Data untuk disegerakkan dalam DB. Sila jalankan \"Terjemah + Segerak\" terlebih dahulu.",
+      "syncFail": "Penyegerakan Gagal",
+      "footnote1": "* \"Terjemah + Segerak\": Terjemah kunci yang belum diterjemahkan secara automatik dengan Claude AI, kemudian kemas kini messages/*.json",
+      "footnote2": "* \"Penyegerakan DB→JSON\": Hanya mencerminkan Data terjemahan yang disimpan dalam DB ke dalam fail JSON"
+    }
+  }
+}

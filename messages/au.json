@@ -1,1 +1,540 @@
-{}
+{
+  "common": {
+    "loading": "Loading…",
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "deleting": "Deleting…",
+    "edit": "Edit",
+    "create": "Create",
+    "creating": "Creating…",
+    "search": "Search",
+    "reset": "Reset",
+    "prev": "Previous",
+    "next": "Next",
+    "all": "All",
+    "noData": "No data available.",
+    "confirm": "Confirm",
+    "back": "Back",
+    "close": "Close",
+    "yes": "Yes",
+    "no": "No",
+    "error": "An error occurred",
+    "newRegister": "+ New Registration",
+    "count": "{count} items",
+    "countPerson": "{count} people",
+    "pageOf": "{current} / {total}"
+  },
+  "header": {
+    "board": "Board",
+    "admin": "Admin",
+    "logout": "Log out",
+    "piLogin": "Pi Login",
+    "piLoginDev": "Pi Login (dev)",
+    "piAuthenticating": "Authenticating…",
+    "googleLogin": "Google Login"
+  },
+  "home": {
+    "title": "Next.js Starter Kit",
+    "subtitle": "A boilerplate to quickly get started with Next.js 16 + Tailwind CSS v4 + shadcn/ui.",
+    "loginSection": "Login",
+    "detectingEnv": "Detecting environment…",
+    "piNetwork": "Pi Network",
+    "google": "Google",
+    "accountLink": "Account Link",
+    "piPayment": "Pi Coin Payment",
+    "techStack": "Included Tech Stack",
+    "components": "shadcn/ui Component Examples",
+    "button": "Button",
+    "inputLabel": "Input + Label",
+    "dialogToast": "Dialog & Toast (Sonner)",
+    "openDialog": "Open Dialog",
+    "dialogTitle": "Welcome to the Starter Kit!",
+    "dialogDesc": "This is shadcn/ui's Dialog component. It fully supports accessibility based on @base-ui/react.",
+    "showToast": "Show Toast",
+    "dialogToastMsg": "Toast from Dialog!",
+    "successToast": "Success Toast",
+    "errorToast": "Error Toast",
+    "errorToastMsg": "Error Toast Example",
+    "gettingStarted": "Getting Started",
+    "step1": "Create Environment Variable File",
+    "step2": "Add Required Components",
+    "step3": "Define environment variable schema and start development!",
+    "email": "Email",
+    "buttonDefault": "Default",
+    "successToastMsg": "Sonner Toast!",
+    "successToastDesc": "The richColors option is enabled.",
+    "stack": {
+      "nextjsDesc": "App Router, React 19, Turbopack",
+      "tailwindDesc": "CSS-first setup, @theme directive",
+      "shadcnDesc": "Base-nova style, based on @base-ui/react",
+      "tsDesc": "Strict mode, type safety",
+      "themesDesc": "Dark mode / System theme auto-sync",
+      "envDesc": "Build-time environment variable type validation"
+    }
+  },
+  "board": {
+    "title": "Board",
+    "noBoards": "No boards registered.",
+    "write": "Write Post",
+    "columns": {
+      "title": "Title",
+      "author": "Author",
+      "views": "Views",
+      "date": "Date"
+    },
+    "notice": "Notice",
+    "adopted": "Adopted",
+    "noData": "No posts yet.",
+    "noResults": "No results found for \"{q}\".",
+    "searchPlaceholder": "Search title or content",
+    "postTitle": "Title",
+    "postContent": "Content",
+    "titlePlaceholder": "Please enter a title",
+    "editSuccess": "Updated successfully",
+    "createSuccess": "Post created successfully",
+    "editFail": "Update failed",
+    "createFail": "Creation failed",
+    "saving": "Updating…",
+    "creating": "Creating…",
+    "editPost": "Edit",
+    "submitPost": "Submit",
+    "deletePost": "Delete post?",
+    "deleteSuccess": "Deleted successfully",
+    "deleteFail": "Deletion failed",
+    "viewCount": "{count} Views",
+    "modified": "(Modified)",
+    "adoptedComplete": "Adopted",
+    "writeTitle": "{name} — Write Post",
+    "editTitle": "{name} — Edit Post",
+    "contentPlaceholder": "Enter content",
+    "featureComment": "Comments",
+    "featureAttachment": "Attachment"
+  },
+  "comment": {
+    "title": "Comments",
+    "count": "{count}",
+    "noComments": "No comments yet.",
+    "adoptedAnswer": "Adopted Answer",
+    "adopt": "Adopt",
+    "cancelAdopt": "Cancel Adoption",
+    "placeholder": "Enter your comment (Ctrl+Enter to submit)",
+    "submit": "Submit Comment",
+    "createSuccess": "Comment submitted successfully.",
+    "createFail": "Failed to submit comment.",
+    "deleteConfirm": "Delete comment?",
+    "deleteSuccess": "Comment deleted successfully.",
+    "deleteFail": "Processing failed.",
+    "adoptSuccess": "Answer adopted successfully.",
+    "adoptCancelSuccess": "Adoption cancelled successfully.",
+    "loginRequired": "Log in to write a comment."
+  },
+  "attachment": {
+    "title": "Attachments",
+    "titleCount": "Attachments ({count})",
+    "delete": "Delete",
+    "upload": "Add File",
+    "uploading": "Uploading…",
+    "uploadSuccess": "{count} files uploaded successfully.",
+    "uploadFail": "Upload failed.",
+    "deleteConfirm": "Delete attachment?",
+    "deleteSuccess": "Deleted successfully.",
+    "deleteFail": "Deletion failed.",
+    "sizeLimit": "Max 5 files · 20MB per file"
+  },
+  "link": {
+    "title": "Link Pi Account",
+    "desc": "Link your Pi account with your Google account.",
+    "complete": "Linking complete.",
+    "checkingPi": "Checking Pi login…",
+    "generateTitle": "Generate Linking Code",
+    "inputTitle": "Enter Linking Code",
+    "needPiLogin": "Pi login is required to generate a linking code.",
+    "piLogin": "Pi Login",
+    "generateDesc": "Press the button below to generate a 6-digit code. Access the /link page in a regular browser and enter the code to link your account.",
+    "generating": "Generating code…",
+    "regenerate": "Generate New Code",
+    "generate": "Generate Linking Code",
+    "codeLabel": "Linking Code (Enter in a regular browser)",
+    "codeExpiry": "Use within 10 minutes",
+    "generateFail": "Failed to generate code.",
+    "inputDesc": "Enter the 6-digit code generated on this page in the Pi Browser.",
+    "codeInputLabel": "Linking Code",
+    "googleLoginRequired": "After entering the code, you will be redirected to the Google login screen.",
+    "linking": "Linking…",
+    "googleLink": "Link Google",
+    "googleLoginAndLink": "Log in with Google and Link",
+    "linkDone": "Account linking complete! Redirecting to home…",
+    "linkFail": "Link Failed",
+    "completeTitle": "Processing Account Link",
+    "checkingSession": "Checking Google Session…",
+    "processing": "Processing Link…",
+    "linkedSuccess": "Your Pi and Google accounts have been linked! Redirecting to Home…",
+    "serverError": "A server error occurred.",
+    "invalidLink": "Invalid link."
+  },
+  "admin": {
+    "nav": {
+      "title": "Admin",
+      "dashboard": "Dashboard",
+      "users": "User Management",
+      "payments": "Payments",
+      "links": "Linked Accounts",
+      "board": "Board Management",
+      "stdSection": "Data Standards",
+      "stdWords": "Standard Words",
+      "stdDomains": "Standard Domains",
+      "stdTerms": "Standard Terms",
+      "stdDdl": "DDL Export",
+      "stdAudit": "Change History",
+      "stdApprovals": "Approval Workflow",
+      "i18nSection": "Internationalisation",
+      "i18n": "Internationalisation Management",
+      "backHome": "← Back to Home"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "greeting": "Hello, {name} ({role})",
+      "totalUsers": "Total Users",
+      "totalUsersDesc": "Total number of registered accounts",
+      "piOnly": "Pi Only",
+      "piOnlyDesc": "Users with only a Pi account",
+      "googleOnly": "Google Only",
+      "googleOnlyDesc": "Users with only a Google account",
+      "linked": "Linked Accounts",
+      "linkedDesc": "Pi + Google linking complete"
+    },
+    "users": {
+      "title": "User Management",
+      "totalCount": "Total {count} users",
+      "noUsers": "No users found.",
+      "col": {
+        "user": "User",
+        "piAccount": "Pi Account",
+        "googleAccount": "Google Account",
+        "role": "Role",
+        "joinDate": "Join Date",
+        "changeRole": "Change Role"
+      },
+      "roleChanged": "Role changed successfully.",
+      "changeFail": "Change failed."
+    },
+    "payments": {
+      "title": "Payment History",
+      "totalCount": "Total {count} transactions · Completed total {total} π",
+      "noPayments": "No payment history found.",
+      "status": {
+        "completed": "Completed",
+        "approved": "Approved",
+        "pending": "Pending",
+        "cancelled": "Cancelled",
+        "error": "Error"
+      },
+      "col": {
+        "status": "Status",
+        "paymentId": "Payment ID",
+        "date": "Date",
+        "user": "User",
+        "amount": "Amount",
+        "memo": "Memo"
+      }
+    },
+    "links": {
+      "title": "Account Link Status",
+      "totalCount": "Total {count} Users",
+      "noUsers": "No users found.",
+      "status": {
+        "linked": "Linked",
+        "piOnly": "Pi Only",
+        "googleOnly": "Google Only"
+      },
+      "desc": {
+        "linked": "Pi + Google Connected",
+        "piOnly": "Google Not Linked",
+        "googleOnly": "Pi Not Linked"
+      },
+      "col": {
+        "user": "User",
+        "piAccount": "Pi Account",
+        "googleAccount": "Google Account",
+        "linkStatus": "Link Status",
+        "role": "Role",
+        "joinDate": "Join Date"
+      }
+    },
+    "board": {
+      "title": "Board Management",
+      "desc": "Total {count} posts · Manage notices and force deletion.",
+      "noData": "No posts available.",
+      "loading": "Loading...",
+      "col": {
+        "category": "Category",
+        "title": "Title",
+        "author": "Author",
+        "views": "Views",
+        "date": "Date",
+        "manage": "Manage"
+      },
+      "notice": "Notice",
+      "setPinned": "Set as Notice",
+      "unsetPinned": "Unset Notice",
+      "pinnedSuccess": "Successfully set as notice.",
+      "unpinnedSuccess": "Notice unset successfully.",
+      "processFail": "Processing failed.",
+      "deleteConfirm": "Delete \"{title}\" post?",
+      "deleteSuccess": "Post deleted successfully.",
+      "deleteFail": "Deletion failed."
+    },
+    "std": {
+      "words": {
+        "title": "Standard Word Management",
+        "totalCount": "Total {count} Words",
+        "noData": "No words available.",
+        "searchPlaceholder": "Search Logical Name / Physical Name...",
+        "formTitleNew": "Add New Word",
+        "formTitleEdit": "Edit Word",
+        "col": {
+          "logNm": "Logical Name",
+          "phyNmAbbr": "Physical Name (Abbr.)",
+          "phyNmFull": "Physical Name (Full)",
+          "typeLen": "Type/Length",
+          "status": "Status",
+          "desc": "Description"
+        },
+        "field": {
+          "logNm": "Logical Name *",
+          "phyNmAbbr": "Physical Name (Abbreviation) *",
+          "phyNmFull": "Physical Name (Full)",
+          "dataType": "Data Type",
+          "dataLen": "Data Length",
+          "desc": "Description"
+        },
+        "placeholder": {
+          "logNm": "e.g.: User",
+          "phyNmAbbr": "e.g.: USR",
+          "phyNmFull": "e.g.: User",
+          "dataType": "e.g.: VARCHAR",
+          "dataLen": "e.g.: 100",
+          "desc": "Word Description (Optional)"
+        },
+        "validationRequired": "Logical Name and Physical Name are required.",
+        "deleteConfirm": "Are you sure you want to delete the word \"{name}\"?",
+        "saveSuccess": "Saved successfully.",
+        "editSuccess": "Edited successfully.",
+        "deleteSuccess": "Deleted successfully.",
+        "saveFail": "Save failed.",
+        "deleteFail": "Delete failed."
+      },
+      "domains": {
+        "title": "Standard Domain Management",
+        "totalCount": "Total {count}",
+        "noData": "No domains found.",
+        "searchPlaceholder": "Search Domain Name / Key Domain Name...",
+        "formTitleNew": "New Domain Registration",
+        "formTitleEdit": "Edit Domain",
+        "typeFilter": {
+          "all": "All",
+          "code": "Code",
+          "id": "ID",
+          "general": "General"
+        },
+        "col": {
+          "domNm": "Domain Name",
+          "keyDomNm": "Key Domain Name",
+          "phyNm": "Physical Name",
+          "type": "Type",
+          "dataType": "Data Type",
+          "desc": "Description"
+        },
+        "field": {
+          "domNm": "Domain Name *",
+          "keyDomNm": "Key Domain Name *",
+          "keyDomPhyNm": "Key Domain Physical Name *",
+          "domType": "Domain Type",
+          "dataType": "Data Type",
+          "dataLen": "Length",
+          "dataScale": "Scale",
+          "desc": "Description"
+        },
+        "placeholder": {
+          "domNm": "e.g.: Price Domain",
+          "keyDomNm": "e.g.: Price",
+          "keyDomPhyNm": "e.g.: PRICE",
+          "dataLen": "e.g., 100",
+          "dataScale": "e.g., 2",
+          "desc": "Domain Description (Optional)"
+        },
+        "selectDomType": {
+          "code": "Code",
+          "id": "Identifier",
+          "general": "General"
+        },
+        "selectDataType": {
+          "varchar": "VARCHAR / TEXT",
+          "integer": "INTEGER",
+          "numeric": "NUMERIC",
+          "date": "DATE",
+          "timestamp": "TIMESTAMP"
+        },
+        "validationRequired": "Domain Name, Key Domain Name, Key Domain Physical Name are required",
+        "deleteConfirm": "Are you sure you want to delete \"{name}\"?",
+        "saveSuccess": "Saved successfully",
+        "editSuccess": "Edited successfully",
+        "deleteSuccess": "Deleted successfully",
+        "saveFail": "Save failed",
+        "deleteFail": "Delete failed"
+      },
+      "terms": {
+        "searchPlaceholder": "Search Logical Name / Physical Name...",
+        "formTitleNew": "New Standard Term Registration",
+        "formTitleEdit": "Edit Term",
+        "col": {
+          "logNm": "Logical Name",
+          "phyNmLower": "Physical Name (Lowercase)",
+          "phyNmUpper": "Physical Name (Uppercase)",
+          "desc": "Description"
+        },
+        "field": {
+          "logNm": "Logical Name *",
+          "wordSelect": "Select Component Word *",
+          "wordSelectHint": "(Addition Order = Physical Name Order)",
+          "domainSelect": "Standard Domain * (Last element of Physical Name)",
+          "autoPhyNm": "Auto-generated Physical Name",
+          "desc": "Description (Optional)"
+        },
+        "title": "Standard Term Management",
+        "totalCount": "Total {count} items",
+        "noData": "No terms available.",
+        "placeholder": {
+          "domainSelect": "Select Domain...",
+          "desc": "Term Description",
+          "logNm": "e.g., Employee Name",
+          "wordSearch": "Search for words and click to add..."
+        },
+        "validationLogNm": "Logical Name is required",
+        "validationWordDomain": "Component words and domain must be selected",
+        "validationPhyNm": "Cannot generate physical name",
+        "deleteConfirm": "Are you sure you want to delete \"{name}\"?",
+        "saveSuccess": "Saved successfully",
+        "editSuccess": "Edited successfully",
+        "deleteSuccess": "Deleted successfully",
+        "saveFail": "Save failed",
+        "deleteFail": "Delete failed"
+      },
+      "ddl": {
+        "title": "DDL Export",
+        "desc": "If you select standard terms as columns, CREATE TABLE SQL will be automatically generated",
+        "sectionTable": "Table Information",
+        "sectionColumn": "Add Column — Select from Standard Terms",
+        "sectionPreview": "DDL Preview",
+        "field": {
+          "tableNmEn": "Table Name (English) *",
+          "tableNmKo": "Table Name (Korean)"
+        },
+        "placeholder": {
+          "tableNmEn": "e.g.: usr_info",
+          "tableNmKo": "e.g.: User Information",
+          "termSearch": "Search for terms and click to add…"
+        },
+        "col": {
+          "colLogNm": "Column (Logical Name)",
+          "type": "Type",
+          "pk": "PK",
+          "nn": "NN"
+        },
+        "copy": "Copy",
+        "download": "Download .sql",
+        "emptyPreview": "Once you add a table name and columns, the DDL will be generated here.",
+        "copySuccess": "DDL has been copied to the clipboard."
+      },
+      "approvals": {
+        "noPending": "No pending approval requests.",
+        "title": "Approval Workflow",
+        "totalCount": "Total {count} items",
+        "noData": "No data available.",
+        "allTypes": "All Types",
+        "status": {
+          "pending": "Pending",
+          "approved": "Approved",
+          "rejected": "Rejected",
+          "all": "All"
+        },
+        "entity": {
+          "stdDic": "Standard Word",
+          "stdDom": "Standard Domain",
+          "stdTerm": "Standard Term"
+        },
+        "col": {
+          "requestedAt": "Requested At",
+          "type": "Type",
+          "target": "Target",
+          "requestedBy": "Requested By",
+          "status": "Status"
+        },
+        "approve": "Approve",
+        "reject": "Reject",
+        "rejectReasonPlaceholder": "Please enter the rejection reason *",
+        "rejectConfirm": "Confirm Rejection",
+        "rejectReason": "Rejection Reason: {reason}",
+        "decidedBy": "Processed by: {name} / {date}",
+        "requestData": "Request Data",
+        "approveSuccess": "Approved successfully",
+        "rejectSuccess": "Rejected successfully",
+        "processFail": "Processing failed"
+      },
+      "audit": {
+        "title": "Change History (Audit Trail)",
+        "totalCount": "Total {count} items",
+        "noData": "No history available.",
+        "tableLabel": {
+          "stdDic": "Standard Word",
+          "stdDom": "Standard Domain",
+          "stdTerm": "Standard Term"
+        },
+        "filter": {
+          "table": "Table",
+          "from": "Start Date",
+          "to": "End Date",
+          "allTables": "All Tables"
+        },
+        "col": {
+          "changedAt": "Changed At",
+          "table": "Table",
+          "target": "Target",
+          "action": "Action",
+          "changedBy": "Changed By"
+        },
+        "before": "Before Change",
+        "after": "After Change"
+      }
+    },
+    "i18n": {
+      "title": "Internationalisation Management",
+      "desc": "Translation Status Dashboard",
+      "syncAll": "DB→JSON Synchronisation",
+      "syncing": "Synchronising…",
+      "stats": {
+        "supportedLocales": "Supported Languages",
+        "totalKeys": "Total Translation Keys",
+        "completed": "100% Completed",
+        "completedOf": "Of {count} languages"
+      },
+      "col": {
+        "language": "Language",
+        "progress": "Progress",
+        "translatedKeys": "Translated Keys"
+      },
+      "translate": "Translate + Synchronise",
+      "translating": "Translating…",
+      "syncingLocale": "Synchronising…",
+      "syncFail": "Synchronisation failed",
+      "translateSuccess": "{count} translations completed",
+      "translateFail": "Translation failed",
+      "syncSuccess": "{count} languages synchronised successfully",
+      "syncNoData": "No data to synchronise in the DB. Please run \"Translate + Synchronise\" first.",
+      "footnote1": "* \"Translate + Synchronise\": Automatically translates untranslated keys using Claude AI, then updates messages/*.json",
+      "footnote2": "* \"DB→JSON Synchronisation\": Only reflects translation data stored in the DB to the JSON file"
+    }
+  }
+}

@@ -1,6 +1,6 @@
 # Pi + Google 계정 연동 구현 스킬
 
-Next.js 15 App Router 코드베이스에서 Pi Network 계정과 Google 계정을 연동하는 완전한 구현 가이드.
+Next.js 16 App Router 코드베이스에서 Pi Network 계정과 Google 계정을 연동하는 완전한 구현 가이드.
 Pi Browser와 일반 브라우저의 기술적 제약을 극복하는 "6자리 OTP 코드" 방식의 전체 구현.
 
 > **전제**: Pi 인증이 완료되어 있어야 한다. → `.claude/skills/pi_auth/SKILL.md` 참고
@@ -26,7 +26,7 @@ Pi Browser와 일반 브라우저의 기술적 제약을 극복하는 "6자리 O
 
 ```
 You are an expert Pi Network + Google OAuth full-stack developer.
-Implement Pi + Google account linking in this Next.js 15 App Router codebase.
+Implement Pi + Google account linking in this Next.js 16 App Router codebase.
 
 Requirements:
 - Pi Browser generates a 6-digit one-time code (expires in 10 min)

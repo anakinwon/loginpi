@@ -1,1 +1,540 @@
-{}
+{
+  "board": {
+    "title": "Board",
+    "noBoards": "Aucun Board enregistré.",
+    "write": "Écrire",
+    "columns": {
+      "title": "Titre",
+      "author": "Auteur",
+      "views": "Vues",
+      "date": "Date"
+    },
+    "notice": "Avis",
+    "adopted": "Adopté",
+    "noData": "Il n'y a pas encore de publication.",
+    "noResults": "Aucun résultat pour \"{q}\".",
+    "searchPlaceholder": "Rechercher par titre ou contenu",
+    "postTitle": "Titre",
+    "postContent": "Contenu",
+    "titlePlaceholder": "Veuillez saisir le titre",
+    "editSuccess": "Modifié avec succès",
+    "createSuccess": "La publication a été créée avec succès",
+    "editFail": "Échec de la modification",
+    "createFail": "Échec de la création",
+    "saving": "Modification en cours…",
+    "creating": "Création en cours…",
+    "editPost": "Modifier",
+    "submitPost": "Soumettre",
+    "deletePost": "Voulez-vous supprimer la publication ?",
+    "deleteSuccess": "Supprimé avec succès",
+    "deleteFail": "Échec de la suppression",
+    "viewCount": "Vues {count}",
+    "modified": "(Modifié)",
+    "adoptedComplete": "Adoption terminée",
+    "writeTitle": "{name} — Écrire",
+    "editTitle": "{name} — Modifier",
+    "contentPlaceholder": "Saisissez le contenu",
+    "featureComment": "Commentaire",
+    "featureAttachment": "Pièce jointe"
+  },
+  "common": {
+    "loading": "Chargement…",
+    "save": "Enregistrer",
+    "saving": "Enregistrement…",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "deleting": "Suppression…",
+    "edit": "Modifier",
+    "create": "Créer",
+    "creating": "Création…",
+    "search": "Rechercher",
+    "reset": "Réinitialiser",
+    "prev": "Précédent",
+    "next": "Suivant",
+    "all": "Tout",
+    "noData": "Aucune Data.",
+    "confirm": "Confirmer",
+    "back": "Retour",
+    "close": "Fermer",
+    "yes": "Oui",
+    "no": "Non",
+    "error": "Erreur",
+    "newRegister": "+ Nouvelle inscription",
+    "count": "{count} éléments",
+    "countPerson": "{count} personnes",
+    "pageOf": "{current} / {total}"
+  },
+  "header": {
+    "board": "Board",
+    "admin": "Admin",
+    "logout": "Déconnexion",
+    "piLogin": "Connexion Pi",
+    "piLoginDev": "Connexion Pi (dev)",
+    "piAuthenticating": "Authentification…",
+    "googleLogin": "Connexion Google"
+  },
+  "home": {
+    "title": "Next.js Starter Kit",
+    "subtitle": "Boilerplate Next.js 16 + Tailwind CSS v4 + shadcn/ui pour un démarrage rapide",
+    "loginSection": "Connexion",
+    "detectingEnv": "Détection de l'environnement…",
+    "piNetwork": "Pi Network",
+    "google": "Google",
+    "accountLink": "Lien de compte",
+    "piPayment": "Paiement Pi Coin",
+    "techStack": "Tech Stack inclus",
+    "components": "Exemples de Composants shadcn/ui",
+    "button": "Button",
+    "inputLabel": "Input + Label",
+    "dialogToast": "Dialog & Toast (Sonner)",
+    "openDialog": "Ouvrir le Dialog",
+    "dialogTitle": "Bienvenue dans le Starter Kit !",
+    "dialogDesc": "C'est le Composant Dialog de shadcn/ui. Il prend entièrement en charge l'accessibilité basée sur @base-ui/react.",
+    "showToast": "Afficher le Toast",
+    "dialogToastMsg": "Toast depuis le Dialog !",
+    "successToast": "Success Toast",
+    "errorToast": "Error Toast",
+    "errorToastMsg": "Exemple de Error Toast",
+    "gettingStarted": "Démarrer",
+    "step1": "Créer le fichier de variables d'environnement",
+    "step2": "Ajouter les composants nécessaires",
+    "step3": "Définir le schéma des variables d'environnement dans et commencer le développement !",
+    "email": "Email",
+    "buttonDefault": "Par défaut",
+    "successToastMsg": "Sonner Toast !",
+    "successToastDesc": "L'option richColors est activée.",
+    "stack": {
+      "nextjsDesc": "App Router, React 19, Turbopack",
+      "tailwindDesc": "Configuration CSS-first, directive @theme",
+      "shadcnDesc": "Style base-nova, basé sur @base-ui/react",
+      "tsDesc": "Mode strict, sécurité des types",
+      "themesDesc": "Mode sombre / Synchronisation automatique du thème système",
+      "envDesc": "Validation des types de variables d'environnement au moment de la compilation"
+    }
+  },
+  "comment": {
+    "title": "Commentaires",
+    "count": "{count} commentaires",
+    "noComments": "Aucun commentaire pour l'instant.",
+    "adoptedAnswer": "Réponse adoptée",
+    "adopt": "Adopter",
+    "cancelAdopt": "Annuler l'adoption",
+    "placeholder": "Saisissez un commentaire (Ctrl+Entrée pour soumettre)",
+    "submit": "Soumettre le commentaire",
+    "createSuccess": "Commentaire soumis avec succès",
+    "createFail": "Échec de la soumission du commentaire",
+    "deleteConfirm": "Voulez-vous supprimer le commentaire ?",
+    "deleteSuccess": "Commentaire supprimé avec succès",
+    "deleteFail": "Échec du traitement",
+    "adoptSuccess": "Réponse adoptée avec succès",
+    "adoptCancelSuccess": "Adoption annulée avec succès",
+    "loginRequired": "Connectez-vous pour écrire un commentaire."
+  },
+  "attachment": {
+    "title": "Pièces jointes",
+    "titleCount": "Pièces jointes ({count})",
+    "delete": "Supprimer",
+    "upload": "Ajouter un fichier",
+    "uploading": "Téléchargement en cours…",
+    "uploadSuccess": "{count} fichiers téléchargés avec succès",
+    "uploadFail": "Échec du téléchargement",
+    "deleteConfirm": "Voulez-vous supprimer la pièce jointe ?",
+    "deleteSuccess": "Supprimé avec succès",
+    "deleteFail": "Échec de la suppression",
+    "sizeLimit": "Max. 5 fichiers · 20 Mo par fichier"
+  },
+  "link": {
+    "title": "Lier le compte Pi",
+    "desc": "Lie votre compte Pi à votre compte Google.",
+    "complete": "Liaison terminée.",
+    "checkingPi": "Vérification de la connexion Pi…",
+    "generateTitle": "Générer le code de liaison",
+    "inputTitle": "Saisir le code de liaison",
+    "needPiLogin": "Une connexion Pi est requise pour générer un code de liaison.",
+    "piLogin": "Connexion Pi",
+    "generateDesc": "Appuyez sur le bouton ci-dessous pour générer un code à 6 chiffres. Accédez à la page /link dans un navigateur standard et saisissez le code pour lier votre compte.",
+    "generating": "Génération du code…",
+    "regenerate": "Générer un nouveau code",
+    "generate": "Générer le code de liaison",
+    "codeLabel": "Code de liaison (à saisir dans un navigateur standard)",
+    "codeExpiry": "À utiliser dans les 10 minutes",
+    "generateFail": "Échec de la génération du code",
+    "inputDesc": "Saisissez le code à 6 chiffres généré sur cette page du navigateur Pi.",
+    "codeInputLabel": "Code de liaison",
+    "googleLoginRequired": "Après avoir saisi le code, vous serez redirigé vers l'écran de connexion Google.",
+    "linking": "Liaison en cours…",
+    "googleLink": "Lier Google",
+    "googleLoginAndLink": "Se connecter à Google et lier",
+    "linkDone": "Liaison du compte terminée ! Redirection vers l'accueil…",
+    "linkFail": "Échec de la liaison",
+    "completeTitle": "Traitement de la liaison de compte",
+    "checkingSession": "Vérification de la session Google…",
+    "processing": "Traitement de la liaison…",
+    "linkedSuccess": "Les comptes Pi et Google sont liés ! Redirection vers l'accueil…",
+    "serverError": "Une erreur de serveur est survenue",
+    "invalidLink": "Lien de liaison invalide."
+  },
+  "admin": {
+    "nav": {
+      "title": "Admin",
+      "dashboard": "Dashboard",
+      "users": "Gestion des utilisateurs",
+      "payments": "Historique des paiements",
+      "links": "Statut de la liaison de compte",
+      "board": "Gestion du Board",
+      "stdSection": "Standard de Data",
+      "stdWords": "Mots standards",
+      "stdDomains": "Domaines standards",
+      "stdTerms": "Termes standards",
+      "stdDdl": "DDL Export",
+      "stdAudit": "Historique des modifications",
+      "stdApprovals": "Workflow d'approbation",
+      "i18nSection": "Internationalisation",
+      "i18n": "Gestion de l'internationalisation",
+      "backHome": "← Retour à l'accueil"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "greeting": "Bonjour, {name} ({role})",
+      "totalUsers": "Utilisateurs totaux",
+      "totalUsersDesc": "Nombre total de comptes enregistrés",
+      "piOnly": "Pi uniquement",
+      "piOnlyDesc": "Utilisateurs avec un compte Pi uniquement",
+      "googleOnly": "Google uniquement",
+      "googleOnlyDesc": "Utilisateurs avec un compte Google uniquement",
+      "linked": "Comptes liés",
+      "linkedDesc": "Liaison Pi + Google terminée"
+    },
+    "users": {
+      "title": "Gestion des utilisateurs",
+      "totalCount": "Total {count} utilisateurs",
+      "noUsers": "Aucun utilisateur.",
+      "col": {
+        "user": "Utilisateur",
+        "piAccount": "Compte Pi",
+        "googleAccount": "Compte Google",
+        "role": "Rôle",
+        "joinDate": "Date d'inscription",
+        "changeRole": "Changer le rôle"
+      },
+      "roleChanged": "Le rôle a été modifié",
+      "changeFail": "Échec de la modification"
+    },
+    "payments": {
+      "title": "Historique des paiements",
+      "totalCount": "Total {count} transactions · Total terminé {total} π",
+      "noPayments": "Aucun historique de paiement.",
+      "status": {
+        "completed": "Terminé",
+        "approved": "Approuvé",
+        "pending": "En attente",
+        "cancelled": "Annulé",
+        "error": "Erreur"
+      },
+      "col": {
+        "user": "Utilisateur",
+        "amount": "Montant",
+        "memo": "Mémo",
+        "status": "Statut",
+        "paymentId": "ID de paiement",
+        "date": "Date"
+      }
+    },
+    "links": {
+      "title": "Statut de liaison des comptes",
+      "totalCount": "{count} utilisateurs au total",
+      "noUsers": "Aucun utilisateur correspondant.",
+      "status": {
+        "linked": "Lié",
+        "piOnly": "Pi uniquement",
+        "googleOnly": "Google uniquement"
+      },
+      "desc": {
+        "linked": "Pi + Google liés",
+        "piOnly": "Google non lié",
+        "googleOnly": "Pi non lié"
+      },
+      "col": {
+        "user": "Utilisateur",
+        "piAccount": "Compte Pi",
+        "googleAccount": "Compte Google",
+        "linkStatus": "Statut de liaison",
+        "role": "Rôle",
+        "joinDate": "Date d'inscription"
+      }
+    },
+    "board": {
+      "title": "Gestion du Board",
+      "desc": "{count} posts au total · Définir les annonces et supprimer de force",
+      "noData": "Aucun post.",
+      "loading": "Chargement…",
+      "col": {
+        "category": "Category",
+        "title": "Titre",
+        "author": "Auteur",
+        "views": "Vues",
+        "date": "Date",
+        "manage": "Gérer"
+      },
+      "notice": "Annonce",
+      "setPinned": "Définir comme annonce",
+      "unsetPinned": "Annuler l'annonce",
+      "pinnedSuccess": "Défini comme annonce",
+      "unpinnedSuccess": "Annonce annulée",
+      "processFail": "Échec du traitement",
+      "deleteConfirm": "Voulez-vous supprimer le post \"{title}\" ?",
+      "deleteSuccess": "Post supprimé",
+      "deleteFail": "Échec de la suppression"
+    },
+    "std": {
+      "words": {
+        "title": "Gestion des mots standards",
+        "totalCount": "{count} éléments au total",
+        "noData": "Aucun mot.",
+        "searchPlaceholder": "Rechercher un nom logique / physique…",
+        "formTitleNew": "Enregistrer un nouveau mot",
+        "formTitleEdit": "Modifier le mot",
+        "col": {
+          "logNm": "Nom logique",
+          "phyNmAbbr": "Nom physique (abréviation)",
+          "phyNmFull": "Nom physique (complet)",
+          "typeLen": "Type/Longueur",
+          "status": "Statut",
+          "desc": "Description"
+        },
+        "field": {
+          "logNm": "Nom logique *",
+          "phyNmAbbr": "Nom physique (abrégé) *",
+          "phyNmFull": "Nom physique (complet)",
+          "dataType": "Data Type",
+          "dataLen": "Data Longueur",
+          "desc": "Description"
+        },
+        "placeholder": {
+          "logNm": "Ex: Utilisateur",
+          "phyNmAbbr": "Ex: USR",
+          "phyNmFull": "Ex: User",
+          "dataType": "Ex: VARCHAR",
+          "dataLen": "Ex: 100",
+          "desc": "Description du mot (facultatif)"
+        },
+        "validationRequired": "Le nom logique et le nom physique sont obligatoires",
+        "deleteConfirm": "Voulez-vous supprimer le mot \"{name}\" ?",
+        "saveSuccess": "Enregistré avec succès",
+        "editSuccess": "Modifié avec succès",
+        "deleteSuccess": "Supprimé avec succès",
+        "saveFail": "Échec de l'enregistrement",
+        "deleteFail": "Échec de la suppression"
+      },
+      "domains": {
+        "title": "Gestion des domaines standards",
+        "totalCount": "Total : {count} éléments",
+        "noData": "Aucun domaine.",
+        "searchPlaceholder": "Rechercher par nom de domaine / nom de domaine clé…",
+        "formTitleNew": "Enregistrement d'un nouveau domaine",
+        "formTitleEdit": "Modification du domaine",
+        "typeFilter": {
+          "all": "Tout",
+          "code": "Code",
+          "id": "Identifiant",
+          "general": "Général"
+        },
+        "col": {
+          "domNm": "Nom du domaine",
+          "keyDomNm": "Nom du domaine clé",
+          "phyNm": "Nom physique",
+          "type": "Type",
+          "dataType": "Data Type",
+          "desc": "Description"
+        },
+        "field": {
+          "domNm": "Nom du domaine *",
+          "keyDomNm": "Nom du domaine clé *",
+          "keyDomPhyNm": "Nom physique du domaine clé *",
+          "domType": "Type de domaine",
+          "dataType": "Data Type",
+          "dataLen": "Longueur",
+          "dataScale": "Échelle décimale",
+          "desc": "Description"
+        },
+        "placeholder": {
+          "domNm": "Ex: Domaine de prix",
+          "keyDomNm": "Ex: Prix",
+          "keyDomPhyNm": "Ex: PRICE",
+          "dataLen": "Ex: 100",
+          "dataScale": "Ex: 2",
+          "desc": "Description du Domain (facultatif)"
+        },
+        "selectDomType": {
+          "code": "Code",
+          "id": "Identifiant",
+          "general": "Général"
+        },
+        "selectDataType": {
+          "varchar": "VARCHAR / TEXT",
+          "integer": "INTEGER",
+          "numeric": "NUMERIC",
+          "date": "DATE",
+          "timestamp": "TIMESTAMP"
+        },
+        "validationRequired": "Le nom du Domain, le nom du Key Domain et le nom physique du Key Domain sont obligatoires.",
+        "deleteConfirm": "Voulez-vous supprimer \"{name}\" ?",
+        "saveSuccess": "Enregistré avec succès.",
+        "editSuccess": "Modifié avec succès.",
+        "deleteSuccess": "Supprimé avec succès.",
+        "saveFail": "Échec de l'enregistrement.",
+        "deleteFail": "Échec de la suppression."
+      },
+      "terms": {
+        "title": "Gestion des termes standard",
+        "totalCount": "{count} éléments au total",
+        "noData": "Aucun terme.",
+        "searchPlaceholder": "Rechercher par nom logique / nom physique…",
+        "formTitleNew": "Enregistrer un nouveau terme standard",
+        "formTitleEdit": "Modifier le terme",
+        "col": {
+          "logNm": "Nom logique",
+          "phyNmLower": "Nom physique (minuscules)",
+          "phyNmUpper": "Nom physique (majuscules)",
+          "desc": "Description"
+        },
+        "field": {
+          "logNm": "Nom logique *",
+          "wordSelect": "Sélectionner les mots composants *",
+          "wordSelectHint": "(Ordre d'ajout = ordre du nom physique)",
+          "domainSelect": "Standard Domain * (dernier élément du nom physique)",
+          "autoPhyNm": "Nom physique généré automatiquement",
+          "desc": "Description (facultatif)"
+        },
+        "placeholder": {
+          "logNm": "Ex: Nom de l'employé",
+          "wordSearch": "Rechercher des mots puis cliquer pour ajouter…",
+          "domainSelect": "Sélectionner un Domain…",
+          "desc": "Description du terme"
+        },
+        "validationLogNm": "Le nom logique est obligatoire.",
+        "validationWordDomain": "Les mots composants et le Domain doivent être sélectionnés.",
+        "validationPhyNm": "Impossible de générer le nom physique.",
+        "deleteConfirm": "Voulez-vous supprimer \"{name}\" ?",
+        "saveSuccess": "Enregistré avec succès.",
+        "editSuccess": "Modifié avec succès.",
+        "deleteSuccess": "Supprimé avec succès.",
+        "saveFail": "Échec de l'enregistrement.",
+        "deleteFail": "Échec de la suppression."
+      },
+      "ddl": {
+        "title": "DDL Export",
+        "desc": "Si vous sélectionnez un terme standard comme colonne, le SQL CREATE TABLE sera généré automatiquement.",
+        "sectionTable": "Informations sur la table",
+        "sectionColumn": "Ajouter Column — Sélectionner depuis Terme standard",
+        "sectionPreview": "Aperçu DDL",
+        "field": {
+          "tableNmEn": "Nom de la Table (Anglais) *",
+          "tableNmKo": "Nom de la Table (Coréen)"
+        },
+        "placeholder": {
+          "tableNmEn": "Ex: usr_info",
+          "tableNmKo": "Ex: informations utilisateur",
+          "termSearch": "Rechercher Terme et ajouter en cliquant..."
+        },
+        "col": {
+          "colLogNm": "Column (Nom logique)",
+          "type": "Type",
+          "pk": "PK",
+          "nn": "NN"
+        },
+        "copy": "Copier",
+        "download": "↓ .sql",
+        "emptyPreview": "Si vous ajoutez un Nom de la Table et des Column, le DDL sera généré ici.",
+        "copySuccess": "Le DDL a été copié dans le presse-papiers"
+      },
+      "audit": {
+        "title": "Historique des modifications (Audit Trail)",
+        "totalCount": "Total {count} éléments",
+        "noData": "Aucun historique.",
+        "tableLabel": {
+          "stdDic": "Mot standard",
+          "stdDom": "Domaine standard",
+          "stdTerm": "Terme standard"
+        },
+        "filter": {
+          "table": "Table",
+          "from": "Date de début",
+          "to": "Date de fin",
+          "allTables": "Tout"
+        },
+        "col": {
+          "changedAt": "Date et heure de modification",
+          "table": "Table",
+          "target": "Cible",
+          "action": "Action",
+          "changedBy": "Modifié par"
+        },
+        "before": "Avant modification",
+        "after": "Après modification"
+      },
+      "approvals": {
+        "title": "Workflow d'Approbation",
+        "totalCount": "Total {count} éléments",
+        "noPending": "Aucune demande d'approbation en attente.",
+        "noData": "Aucune Data.",
+        "allTypes": "Tous les types",
+        "status": {
+          "pending": "En attente",
+          "approved": "Approuvé",
+          "rejected": "Rejeté",
+          "all": "Tout"
+        },
+        "entity": {
+          "stdDic": "Mot standard",
+          "stdDom": "Domaine standard",
+          "stdTerm": "Terme standard"
+        },
+        "col": {
+          "requestedAt": "Date et heure de la demande",
+          "type": "Type",
+          "target": "Cible",
+          "requestedBy": "Demandé par",
+          "status": "Statut"
+        },
+        "approve": "Approuver",
+        "reject": "Rejeter",
+        "rejectReasonPlaceholder": "Veuillez saisir le motif du rejet *",
+        "rejectConfirm": "Confirmer le rejet",
+        "rejectReason": "Motif du rejet : {reason}",
+        "decidedBy": "Traité par : {name} / {date}",
+        "requestData": "Request Data",
+        "approveSuccess": "Approuvé",
+        "rejectSuccess": "Rejeté",
+        "processFail": "Échec du traitement"
+      }
+    },
+    "i18n": {
+      "title": "Gestion de l'internationalisation",
+      "desc": "Dashboard de l'état des traductions",
+      "syncAll": "Synchronisation DB→JSON",
+      "syncing": "Synchronisation en cours…",
+      "stats": {
+        "supportedLocales": "Langues prises en charge",
+        "totalKeys": "Total des clés de traduction",
+        "completed": "100% terminé",
+        "completedOf": "Sur {count} langues"
+      },
+      "col": {
+        "language": "Langue",
+        "progress": "Progression",
+        "translatedKeys": "Clés traduites"
+      },
+      "translate": "Traduire + Synchroniser",
+      "translating": "Traduction en cours…",
+      "syncingLocale": "Synchronisation en cours…",
+      "translateSuccess": "{count} traductions terminées",
+      "translateFail": "Échec de la traduction",
+      "syncSuccess": "{count} langues synchronisées",
+      "syncNoData": "Aucune Data à synchroniser dans la DB. Veuillez d'abord exécuter \"Traduire + Synchroniser\".",
+      "syncFail": "Échec de la synchronisation",
+      "footnote1": "* \"Traduire + Synchroniser\" : Traduit automatiquement les clés non traduites avec Claude AI, puis met à jour messages/*.json",
+      "footnote2": "* \"Synchronisation DB→JSON\" : Reflète uniquement les Data de traduction stockées dans la DB dans le fichier JSON"
+    }
+  }
+}

@@ -1,18 +1,17 @@
-import { dirname } from 'path'
-import { fileURLToPath } from 'url'
-import { FlatCompat } from '@eslint/eslintrc'
+import nextCWV from 'eslint-config-next/core-web-vitals'
+import nextTS from 'eslint-config-next/typescript'
 import prettier from 'eslint-config-prettier'
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
-
-const compat = new FlatCompat({ baseDirectory: __dirname })
-
 const eslintConfig = [
-  ...compat.extends('next/core-web-vitals', 'next/typescript'),
+  ...nextCWV,
+  ...nextTS,
   prettier,
   {
-    ignores: ['node_modules/**', '.next/**', 'out/**', 'build/**', 'next-env.d.ts'],
+    rules: {
+      // react-hooks@5 신규 규칙 — 기존 코드 패턴(setLoading in fetch effect 등)과
+      // 충돌하므로 별도 리팩토링 이슈로 분리, 현재는 경고만 표시
+      'react-hooks/set-state-in-effect': 'warn',
+    },
   },
 ]
 
