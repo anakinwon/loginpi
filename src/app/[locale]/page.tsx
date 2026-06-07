@@ -24,7 +24,7 @@ import { cn } from '@/lib/utils'
 import { usePiAuth } from '@/components/pi-auth-provider'
 
 const STACK_ITEMS = [
-  { title: 'Next.js 15',     badge: 'v15',      descKey: 'stack.nextjsDesc'  },
+  { title: 'Next.js 16',     badge: 'v15',      descKey: 'stack.nextjsDesc'  },
   { title: 'Tailwind CSS v4', badge: 'v4',      descKey: 'stack.tailwindDesc' },
   { title: 'shadcn/ui',      badge: 'latest',   descKey: 'stack.shadcnDesc'  },
   { title: 'TypeScript',     badge: 'v5',       descKey: 'stack.tsDesc'      },

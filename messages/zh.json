@@ -37,7 +37,7 @@
   },
   "home": {
     "title": "Next.js 启动套件",
-    "subtitle": "快速启动 Next.js 15 + Tailwind CSS v4 + shadcn/ui 样板",
+    "subtitle": "快速启动 Next.js 16 + Tailwind CSS v4 + shadcn/ui 样板",
     "loginSection": "登录",
     "detectingEnv": "环境检测中…",
     "piNetwork": "Pi Network",
