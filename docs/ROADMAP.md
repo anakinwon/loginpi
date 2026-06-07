@@ -2,8 +2,8 @@
 
 Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 15 기반 Pi Network 앱 플랫폼
 
-> **기준일**: 2026-06-06
-> **현재 버전**: Phase 5 완료 → Phase 6 대기
+> **기준일**: 2026-06-07
+> **현재 버전**: Phase 6 완료
 > **배포 URL**: https://loginpi.vercel.app
 > **기술 스택**: Next.js 15 App Router · React 19 · TypeScript · Tailwind CSS v4 · NextAuth.js · Supabase PostgreSQL
 
@@ -358,14 +358,21 @@ brd_attch 8행  — fl_nm/fl_pth/fl_url/fl_sz/fl_tp, del_yn 논리삭제
 
 ---
 
-## Phase 6: 다국어 처리 ⏳ (미시작)
+## Phase 6: 다국어 처리 ✅ (완료 — 6/7)
 
-> **목표**: next-intl v4 기반 다국어 지원 (ko / en / zh / ja)
+> **목표**: next-intl v4 기반 다국어 지원 (ko / en / zh / ja / hi / vi / af / fil / th / id / ms / es / fr / de / it / ru / pt / ar)
 
-- [ ] **TASK-040**: next-intl 설치 + 라우팅 재구성 (`[locale]` 디렉토리)
-- [ ] **TASK-041**: 번역 파일 + UI 적용
-- [ ] **TASK-042**: 국가/언어 DB (Supabase `i18n_*` 테이블)
-- [ ] **TASK-043**: AI 자동 번역
+- ✅ **TASK-040**: next-intl v4 설치 + `[locale]` App Router 라우팅 재구성, `middleware.ts` 인터셉터, `i18n/routing.ts` 설정
+- ✅ **TASK-041**: 번역 파일 + UI 적용 — ko.json 409키 정의, `useTranslations()` / `getTranslations()` 전 페이지·컴포넌트 적용, 3단계 fallback (locale → en → ko), `readFile()` 로 모듈캐시 우회
+- ✅ **TASK-042**: 국가/언어 DB — `i18n_locale` / `i18n_message` Supabase 테이블, DB→JSON 동기화 API (`/api/admin/i18n/sync`), 관리자 번역 현황 대시보드 (`/admin/i18n`)
+- ✅ **TASK-043**: AI 자동 번역 — Gemini 2.5 Flash 무료 API, 배치 50건 + 4.5초 rate-limit 대기, 배치별 즉시 upsert (부분실패 보존), 영어 차용어 역번역 프롬프트 규칙, 18개 언어 지원
+
+**핵심 설계 결정**:
+- next-intl v4의 `getTranslations()` (서버) / `useTranslations()` (클라이언트) 분리
+- `ko.json`이 source of truth — DB 통계도 ko.json 파일 기준 키 수 계산
+- `readFile()` 사용 (동적 `import()` 는 Node 모듈캐시로 동기화 결과 미반영)
+- 3단계 fallback: 미번역 콘텐츠는 영어 → 한국어 순으로 표시 (키명 노출 방지)
+- Gemini 무료 15 RPM 제한 대응: 배치 50개 + 4.5초 sleep 패턴
 
 ---
 
@@ -385,7 +392,7 @@ brd_attch 8행  — fl_nm/fl_pth/fl_url/fl_sz/fl_tp, del_yn 논리삭제
 | M8.5: DA 품질 표준화 | Phase 5 | 2026-06-06 | Migration 003~008, 19개 위반 해소 | ✅ 완료 |
 | M9: 데이터 표준 CRUD | Phase 5 | 2026-06-06 | 표준단어·도메인·용어·DDL Export | ✅ 완료 |
 | M10: Audit Trail + 승인 워크플로우 | Phase 5 | 2026-06-06 | 변경 이력 추적, 승인 프로세스 | ✅ 완료 |
-| M11: 다국어 | Phase 6 | — | next-intl, ko/en/zh/ja | ⏳ |
+| M11: 다국어 | Phase 6 | 2026-06-07 | next-intl v4, 18개 언어, Gemini 자동번역, 3단계 fallback | ✅ 완료 |
 
 ---
 
@@ -412,3 +419,4 @@ brd_attch 8행  — fl_nm/fl_pth/fl_url/fl_sz/fl_tp, del_yn 논리삭제
 | v1.2 | 2026-06-06 | Phase 5 TASK-030~033 완료 반영 (표준단어·도메인·용어·DDL Export), M9 달성 | anakin |
 | v1.3 | 2026-06-06 | DA 품질점검 표준화 완료 — Migration 003~008 (19개 위반 해소), 전 테이블 시스템 컬럼 강제화, `users→sys_user` 등 리네이밍 이력 반영 | anakin |
 | v1.4 | 2026-06-06 | Phase 5 완료 — TASK-034 Audit Trail (Migration 009 + std_audit_log 트리거), TASK-035 승인 워크플로우 (Migration 010 + approval_queue 활용) | anakin |
+| v1.5 | 2026-06-07 | Phase 6 완료 — next-intl v4 다국어, Gemini 2.5 Flash 자동번역, 18개 언어 지원, 3단계 fallback, Supabase 1000행 제한 해소, 모듈캐시 우회(readFile) | anakin |

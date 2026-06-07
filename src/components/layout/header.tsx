@@ -6,6 +6,7 @@ import { ThemeToggle } from '@/components/theme-toggle'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { BrowserName } from '@/components/layout/browser-name'
 import { LanguageSwitcher } from '@/components/layout/language-switcher'
+import { PiPriceChip } from '@/components/layout/pi-price-chip'
 
 export async function Header() {
   const user = await getSessionUser()
@@ -38,6 +39,7 @@ export async function Header() {
           <PiLoginButton />
           <ThemeToggle />
           <LanguageSwitcher locale={locale} />
+          <PiPriceChip locale={locale} />
         </nav>
       </div>
     </header>
