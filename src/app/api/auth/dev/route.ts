@@ -23,6 +23,7 @@ export async function POST() {
     walletAddress: 'GDEVADMIN2222222222222222222222222222222222222222222222222',
     scopesGranted: ['username', 'wallet_address'],
     tokenValidUntil: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    role: 'MASTER',
   }
 
   // 실제 인증과 동일한 HMAC-SHA256 서명 적용 (verifyPayload 호환)

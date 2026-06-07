@@ -6,4 +6,5 @@ export interface PiSessionUser {
   walletAddress: string | null
   scopesGranted: string[]
   tokenValidUntil: string
+  role: string            // DB의 sys_user.role (ADMIN·MASTER·USER 등)
 }

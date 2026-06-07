@@ -70,8 +70,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Pi Network API 연결 실패' }, { status: 502 })
   }
 
-  // Supabase users 테이블에 upsert → userId 획득
+  // Supabase users 테이블에 upsert → userId·role 획득
   let userId = ''
+  let userRole = 'USER'
   try {
     const dbUser = await upsertPiUser({
       uid: piUser.uid,
@@ -79,6 +80,7 @@ export async function POST(request: NextRequest) {
       walletAddress: typeof walletAddress === 'string' ? walletAddress : null,
     })
     userId = dbUser.id
+    userRole = dbUser.role
   } catch {
     // DB 오류 시 userId 없이 계속 진행 (graceful degradation)
   }
@@ -96,6 +98,7 @@ export async function POST(request: NextRequest) {
     walletAddress: typeof walletAddress === 'string' ? walletAddress : null,
     scopesGranted: piUser.credentials.scopes,
     tokenValidUntil: piUser.credentials.valid_until.iso8601,
+    role: userRole,
   }
 
   const signed = signPayload(sessionData, secret)
