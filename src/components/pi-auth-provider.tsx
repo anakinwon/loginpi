@@ -69,12 +69,15 @@ async function onIncompletePayment(payment: PaymentDTO) {
 // 해결: useSearchParams()로 searchParams 변화를 React 반응형으로 감지해 signIn 재호출.
 function SearchParamsWatcher({ signIn }: { signIn: () => Promise<void> }) {
   const searchParams = useSearchParams()
+  // searchParams 객체가 아닌 next 문자열 값을 의존성으로 사용.
+  // router.refresh() 후 Next.js가 같은 내용이어도 새 객체를 반환하면
+  // [searchParams, signIn] 의존성은 effect를 반복 실행해 signIn 무한 루프 발생.
+  const next = searchParams.get('next')
 
   useEffect(() => {
-    const next = searchParams.get('next')
     if (!isSafeNext(next) || typeof window === 'undefined' || !window.Pi) return
     signIn()
-  }, [searchParams, signIn])
+  }, [next, signIn])
 
   return null
 }
