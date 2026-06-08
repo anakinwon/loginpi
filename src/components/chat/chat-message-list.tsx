@@ -81,10 +81,40 @@ export function ChatMessageList({
       {!hasMore && messages.length > 0 && (
         <div className='py-2 text-center text-xs text-muted-foreground'>대화의 시작입니다</div>
       )}
-      {messages.map(msg => (
-        <MessageBubble key={msg.msg_id} msg={msg} isMe={msg.snd_usr_id === currentUserId} />
+      {messages.map((msg, idx) => (
+        <div key={msg.msg_id}>
+          {(idx === 0 || !isSameDay(messages[idx - 1].reg_dtm, msg.reg_dtm)) && (
+            <DateDivider dtm={msg.reg_dtm} />
+          )}
+          <MessageBubble msg={msg} isMe={msg.snd_usr_id === currentUserId} />
+        </div>
       ))}
       <div ref={bottomRef} />
+    </div>
+  )
+}
+
+const DAY_NAMES = ['일', '월', '화', '수', '목', '금', '토']
+
+function isSameDay(a: string, b: string): boolean {
+  const da = new Date(a)
+  const db = new Date(b)
+  return da.getFullYear() === db.getFullYear() &&
+    da.getMonth() === db.getMonth() &&
+    da.getDate() === db.getDate()
+}
+
+function formatKoreanDate(dtm: string): string {
+  const d = new Date(dtm)
+  return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 ${DAY_NAMES[d.getDay()]}요일`
+}
+
+function DateDivider({ dtm }: { dtm: string }) {
+  return (
+    <div className='my-3 flex items-center gap-3'>
+      <div className='h-px flex-1 bg-border' />
+      <span className='text-xs text-muted-foreground'>{formatKoreanDate(dtm)}</span>
+      <div className='h-px flex-1 bg-border' />
     </div>
   )
 }
