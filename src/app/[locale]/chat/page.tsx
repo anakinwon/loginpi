@@ -1,43 +1,19 @@
-import { redirect } from 'next/navigation'
-import { Link } from '@/i18n/navigation'
 import { getSessionUser } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
-import { GroupRoomCreator } from '@/components/chat/group-room-creator'
+import { ChatListView, type RoomWithTheme } from '@/components/chat/chat-list-view'
+import { ClientChatList } from '@/components/chat/client-chat-list'
 
-type RoomWithTheme = {
-  room_id: string
-  room_nm: string
-  theme_cd: string
-  room_tp_cd: string
-  is_public_yn: string
-  // Supabase PostgREST JOIN은 1:1 FK라도 배열로 반환
-  msg_theme: { theme_nm: string; theme_emoji: string }[] | null
-}
+const ROOM_SELECT = 'room_id, room_nm, theme_cd, room_tp_cd, is_public_yn, msg_theme(theme_nm, theme_emoji)'
 
-function RoomCard({ room, href }: { room: RoomWithTheme; href: string }) {
-  return (
-    <Link
-      href={href}
-      className='flex items-center gap-3 rounded-xl border p-3 transition-colors hover:bg-muted/50'
-    >
-      <span className='text-2xl'>{room.msg_theme?.[0]?.theme_emoji ?? '💬'}</span>
-      <div className='min-w-0'>
-        <p className='truncate font-medium text-sm'>{room.room_nm}</p>
-        <p className='text-xs text-muted-foreground'>
-          {room.msg_theme?.[0]?.theme_nm ?? room.theme_cd}
-          {room.room_tp_cd === 'G' && room.is_public_yn === 'Y' && ' · 공개'}
-          {room.room_tp_cd === 'G' && room.is_public_yn === 'N' && ' · 비공개'}
-          {room.room_tp_cd === 'D' && ' · 1:1'}
-        </p>
-      </div>
-    </Link>
-  )
-}
-
-export default async function ChatPage({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params
+export default async function ChatPage() {
   const user = await getSessionUser()
-  if (!user) redirect(`/${locale}?error=login_required&next=${encodeURIComponent(`/${locale}/chat`)}`)
+
+  // 쿠키로 신원을 못 찾으면(Pi Browser는 Set-Cookie 미저장) redirect 대신 클라이언트 게이트로 위임.
+  // 클라이언트가 localStorage 토큰을 X-Pi-Token 헤더로 실어 목록을 로드한다.
+  // 일반 브라우저는 쿠키가 있어 이 분기를 타지 않고 아래 SSR 경로로 진행한다.
+  if (!user) {
+    return <ClientChatList />
+  }
 
   const db = getSupabaseAdmin()
 
@@ -53,7 +29,7 @@ export default async function ChatPage({ params }: { params: Promise<{ locale: s
     const roomIds = mbrs.map((m: { room_id: string }) => m.room_id)
     const { data } = await db
       .from('msg_room')
-      .select('room_id, room_nm, theme_cd, room_tp_cd, is_public_yn, msg_theme(theme_nm, theme_emoji)')
+      .select(ROOM_SELECT)
       .in('room_id', roomIds)
       .eq('del_yn', 'N')
       .order('mod_dtm', { ascending: false })
@@ -63,7 +39,7 @@ export default async function ChatPage({ params }: { params: Promise<{ locale: s
   // 공개 그룹 채팅방 (최근 10개)
   const { data: publicRooms } = await db
     .from('msg_room')
-    .select('room_id, room_nm, theme_cd, room_tp_cd, is_public_yn, msg_theme(theme_nm, theme_emoji)')
+    .select(ROOM_SELECT)
     .eq('is_public_yn', 'Y')
     .eq('room_tp_cd', 'G')
     .eq('del_yn', 'N')
@@ -73,49 +49,5 @@ export default async function ChatPage({ params }: { params: Promise<{ locale: s
   const myRoomIds = new Set(myRooms.map(r => r.room_id))
   const discoverRooms = ((publicRooms ?? []) as RoomWithTheme[]).filter(r => !myRoomIds.has(r.room_id))
 
-  return (
-    <div className='mx-auto max-w-2xl px-4 py-8'>
-      {/* 헤더 */}
-      <div className='mb-8 flex items-center justify-between'>
-        <div>
-          <h1 className='text-2xl font-bold'>PiChat</h1>
-          <p className='text-sm text-muted-foreground'>Pi 커뮤니티 테마 채팅</p>
-        </div>
-        <GroupRoomCreator />
-      </div>
-
-      {/* 내 채팅방 */}
-      <section className='mb-8'>
-        <h2 className='mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground'>
-          내 채팅방
-        </h2>
-        {myRooms.length === 0 ? (
-          <div className='rounded-xl border border-dashed py-8 text-center'>
-            <p className='text-sm text-muted-foreground'>아직 참여 중인 채팅방이 없습니다</p>
-            <p className='mt-1 text-xs text-muted-foreground'>+ 채팅방 만들기로 첫 방을 개설해 보세요</p>
-          </div>
-        ) : (
-          <div className='space-y-2'>
-            {myRooms.map(room => (
-              <RoomCard key={room.room_id} room={room} href={`/chat/${room.room_id}`} />
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* 공개 채팅방 탐색 */}
-      {discoverRooms.length > 0 && (
-        <section>
-          <h2 className='mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground'>
-            공개 채팅방 탐색
-          </h2>
-          <div className='space-y-2'>
-            {discoverRooms.map(room => (
-              <RoomCard key={room.room_id} room={room} href={`/chat/${room.room_id}`} />
-            ))}
-          </div>
-        </section>
-      )}
-    </div>
-  )
+  return <ChatListView myRooms={myRooms} discoverRooms={discoverRooms} />
 }

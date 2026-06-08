@@ -19,6 +19,14 @@ export async function GET(_request: Request, { params }: Params) {
   if (!room) return NextResponse.json({ error: '채팅방을 찾을 수 없습니다' }, { status: 404 })
   if (!mbr) return NextResponse.json({ error: '채팅방 멤버가 아닙니다' }, { status: 403 })
 
+  // 테마 이모지 — 클라이언트 게이트(ClientChatRoom) 헤더 렌더용
+  const { data: theme } = await getSupabaseAdmin()
+    .from('msg_theme')
+    .select('theme_emoji')
+    .eq('theme_cd', room.theme_cd)
+    .single()
+  const themeEmoji = (theme as { theme_emoji?: string } | null)?.theme_emoji ?? '💬'
+
   const { data: members } = await getSupabaseAdmin()
     .from('msg_room_mbr')
     .select('room_mbr_id, usr_id, mbr_role_cd, lst_read_msg_id, expire_dtm, reg_dtm')
@@ -26,5 +34,5 @@ export async function GET(_request: Request, { params }: Params) {
     .eq('del_yn', 'N')
     .order('reg_dtm', { ascending: true })
 
-  return NextResponse.json({ room, members: members ?? [], myRole: mbr.mbr_role_cd })
+  return NextResponse.json({ room, themeEmoji, members: members ?? [], myRole: mbr.mbr_role_cd })
 }

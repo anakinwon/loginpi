@@ -10,6 +10,7 @@ import {
   useState,
 } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { setPiToken, clearPiToken } from '@/lib/pi-fetch'
 import type { PiSessionUser } from '@/types/pi-session'
 
 export type { PiSessionUser }
@@ -147,39 +148,9 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
         return
       }
 
-      // 세션 없음 → next 파라미터 유무로 분기
-      if (next) {
-        // 보호 페이지(chat/admin) 경유 로그인: pi-code → pi-callback로 쿠키 설정 시도.
-        // Pi Browser WebView는 Set-Cookie 저장이 불안정해 쿠키 미저장 시 무한 루프가 발생함.
-        // → 동일 목적지에 5초 내 재진입을 차단(시간 기반 가드)해 무한 루프를 1회 실패로 전환.
-        //   (근본 해결은 X-Pi-Token 헤더 인증 — TASK-055 Phase 2)
-        const guardKey = `pi_nav_attempt:${next}`
-        const lastAttempt = Number(sessionStorage.getItem(guardKey) ?? '0')
-        if (Date.now() - lastAttempt < 5000) {
-          sessionStorage.removeItem(guardKey)
-          setError('cookie_blocked')
-          setIsLoading(false)
-          return
-        }
-        sessionStorage.setItem(guardKey, String(Date.now()))
-
-        const codeRes = await fetch('/api/auth/pi-code', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ accessToken: auth.accessToken, to: next }),
-        })
-        if (!codeRes.ok) {
-          const d = (await codeRes.json()) as { error?: string }
-          throw new Error(d.error ?? '인증 코드 발급 실패')
-        }
-        const { redirectUrl } = (await codeRes.json()) as { redirectUrl: string }
-        window.location.href = redirectUrl
-        return
-      }
-
-      // 홈 직접 접근(next 없음): fetch POST → React 상태만 갱신.
-      // window.location을 건드리지 않으므로 전체 페이지 리로드/무한 루프가 발생하지 않음.
-      // 쿠키가 저장되지 않는 Pi Browser에서도 setUser로 클라이언트 로그인 상태는 유지됨.
+      // 세션 없음 → 서버 인증 + 세션 토큰 발급.
+      // Pi Browser는 쿠키가 저장되지 않으므로 응답의 token을 localStorage에 보관하고,
+      // 이후 모든 인증 요청에 X-Pi-Token 헤더로 전달한다(piFetch).
       const res = await fetch('/api/auth/pi', {
         method: 'POST',
         credentials: 'include',
@@ -193,9 +164,18 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
         const data = (await res.json()) as { error?: string }
         throw new Error(data.error ?? '서버 인증 실패')
       }
-      const data = (await res.json()) as { user: PiSessionUser }
+      const data = (await res.json()) as { user: PiSessionUser; token?: string }
+      if (data.token) setPiToken(data.token)
       setUser(data.user)
-      routerRef.current.refresh()
+
+      if (next) {
+        // 목적지로 클라이언트 라우팅(풀 리로드 없음 → 무한 루프 불가).
+        // 보호 페이지가 쿠키로 신원을 못 찾으면(Pi Browser) 클라이언트 게이트가
+        // X-Pi-Token 헤더로 데이터를 로드한다.
+        routerRef.current.push(next)
+      } else {
+        routerRef.current.refresh()
+      }
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Pi 인증 중 오류가 발생했습니다'
       if (msg !== 'timeout') setError(msg)
@@ -208,6 +188,7 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = useCallback(async () => {
     await fetch('/api/auth/pi', { method: 'DELETE', credentials: 'include' })
+    clearPiToken()
     setUser(null)
     setPiAccessToken(null)
     routerRef.current.refresh()

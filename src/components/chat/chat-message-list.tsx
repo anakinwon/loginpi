@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useRef, useCallback, useState } from 'react'
+import { piFetch } from '@/lib/pi-fetch'
 import type { ChatMessage } from '@/hooks/use-chat-room'
 
 interface ChatMessageListProps {
@@ -47,7 +48,7 @@ export function ChatMessageList({
     const container = containerRef.current
     const prevScrollHeight = container?.scrollHeight ?? 0
 
-    const res = await fetch(`/api/chat/rooms/${roomId}/messages?limit=50&before=${oldestMsgId}`)
+    const res = await piFetch(`/api/chat/rooms/${roomId}/messages?limit=50&before=${oldestMsgId}`)
     if (res.ok) {
       const { messages: older, hasMore: more, oldestMsgId: nextCursor } = await res.json()
       prependMessages(older)

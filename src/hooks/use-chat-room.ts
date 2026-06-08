@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useRef, useCallback, useState } from 'react'
 import { getSupabaseClient } from '@/lib/supabase-client'
+import { piFetch } from '@/lib/pi-fetch'
 
 export interface ChatMessage {
   msg_id: string
@@ -123,7 +124,8 @@ export function useChatRoom(
     addMessage(tempMsg)
 
     try {
-      const res = await fetch(`/api/chat/rooms/${roomId}/messages`, {
+      // piFetch: Pi Browser는 X-Pi-Token 헤더, 일반 브라우저는 쿠키로 인증
+      const res = await piFetch(`/api/chat/rooms/${roomId}/messages`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ msg_cont: trimmed, msg_tp_cd: 'TEXT' }),

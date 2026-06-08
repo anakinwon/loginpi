@@ -1,40 +1,23 @@
 'use client'
 
-import { useCallback } from 'react'
 import { useTranslations } from 'next-intl'
-import { useParams } from 'next/navigation'
+import { useRouter } from '@/i18n/navigation'
 import { usePiAuth } from '@/components/pi-auth-provider'
 
-// Pi Browser 전용 관리자 링크
-// form POST는 Pi Browser WebView에서 ERR_CONNECTION_ABORTED로 차단됨.
-// pi-code → pi-callback(HTML) 흐름으로 쿠키를 안정적으로 설정한 뒤 이동.
+// Pi Browser 전용 관리자 링크.
+// 클라이언트 라우팅(router.push)으로 admin 진입 → admin layout이 쿠키로 신원을 못 찾으면
+// ClientAdminGate가 렌더된다(무한 루프 없음).
 export function PiAdminLink() {
-  const { user, isInPiBrowser, piAccessToken } = usePiAuth()
+  const { user, isInPiBrowser } = usePiAuth()
   const t = useTranslations('header')
-  const params = useParams()
-  const locale = (params.locale as string) ?? 'ko'
-
-  const handleClick = useCallback(async () => {
-    if (!piAccessToken) return
-    const to = `/${locale}/admin`
-    try {
-      const res = await fetch('/api/auth/pi-code', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ accessToken: piAccessToken, to }),
-      })
-      if (!res.ok) return
-      const { redirectUrl } = (await res.json()) as { redirectUrl: string }
-      window.location.href = redirectUrl
-    } catch {}
-  }, [locale, piAccessToken])
+  const router = useRouter()
 
   if (!isInPiBrowser) return null
-  if (!user || !piAccessToken || (user.role !== 'ADMIN' && user.role !== 'MASTER')) return null
+  if (!user || (user.role !== 'ADMIN' && user.role !== 'MASTER')) return null
 
   return (
     <button
-      onClick={handleClick}
+      onClick={() => router.push('/admin')}
       className='text-muted-foreground hover:text-foreground text-sm transition-colors'
     >
       {t('admin')}

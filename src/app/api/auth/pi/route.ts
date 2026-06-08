@@ -102,7 +102,9 @@ export async function POST(request: NextRequest) {
   }
 
   const signed = signPayload(sessionData, secret)
-  const response = NextResponse.json({ success: true, user: sessionData })
+  // 쿠키(일반 브라우저) + token(Pi Browser localStorage→X-Pi-Token 헤더) 이중 제공.
+  // Pi Browser WebView는 Set-Cookie를 저장하지 않으므로 클라이언트가 token을 보관해야 한다.
+  const response = NextResponse.json({ success: true, user: sessionData, token: signed })
   response.cookies.set('pi_session', signed, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',

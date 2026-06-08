@@ -3,34 +3,51 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth-check'
 import { getOrCreateDirectRoom } from '@/lib/chat'
 
-// GET /api/chat/rooms — 내가 참여 중인 채팅방 목록
-export async function GET() {
+// GET /api/chat/rooms — 내가 참여 중인 채팅방 목록 (+?include=public 시 공개 그룹방)
+// Pi Browser 클라이언트 게이트(ClientChatList)가 X-Pi-Token 헤더로 호출한다.
+export async function GET(request: NextRequest) {
   const user = await getSessionUser()
   if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
+  const includePublic = new URL(request.url).searchParams.get('include') === 'public'
+
+  // 내 채팅방
   const { data: mbrs } = await getSupabaseAdmin()
     .from('msg_room_mbr')
     .select('room_id')
     .eq('usr_id', user.id)
     .eq('del_yn', 'N')
 
-  if (!mbrs || mbrs.length === 0) return NextResponse.json({ rooms: [] })
+  let rooms: unknown[] = []
+  if (mbrs && mbrs.length > 0) {
+    const roomIds = mbrs.map((m: { room_id: string }) => m.room_id)
+    const { data, error } = await getSupabaseAdmin()
+      .from('msg_room')
+      .select(`
+        room_id, room_nm, room_desc, theme_cd, room_tp_cd,
+        max_mbr_cnt, is_public_yn, del_yn, reg_dtm,
+        msg_theme(theme_nm, theme_emoji)
+      `)
+      .in('room_id', roomIds)
+      .eq('del_yn', 'N')
+      .order('mod_dtm', { ascending: false })
+    if (error) return NextResponse.json({ error: '채팅방 목록 조회 실패' }, { status: 500 })
+    rooms = data ?? []
+  }
 
-  const roomIds = mbrs.map((m: { room_id: string }) => m.room_id)
+  if (!includePublic) return NextResponse.json({ rooms })
 
-  const { data: rooms, error } = await getSupabaseAdmin()
+  // 공개 그룹 채팅방 (최근 10개)
+  const { data: publicRooms } = await getSupabaseAdmin()
     .from('msg_room')
-    .select(`
-      room_id, room_nm, room_desc, theme_cd, room_tp_cd,
-      max_mbr_cnt, is_public_yn, del_yn, reg_dtm,
-      msg_theme(theme_nm, theme_emoji)
-    `)
-    .in('room_id', roomIds)
+    .select('room_id, room_nm, theme_cd, room_tp_cd, is_public_yn, msg_theme(theme_nm, theme_emoji)')
+    .eq('is_public_yn', 'Y')
+    .eq('room_tp_cd', 'G')
     .eq('del_yn', 'N')
-    .order('mod_dtm', { ascending: false })
+    .order('reg_dtm', { ascending: false })
+    .limit(10)
 
-  if (error) return NextResponse.json({ error: '채팅방 목록 조회 실패' }, { status: 500 })
-  return NextResponse.json({ rooms })
+  return NextResponse.json({ rooms, publicRooms: publicRooms ?? [] })
 }
 
 // POST /api/chat/rooms — 1:1 Direct Room 생성 (TASK-053에서 Group·Event 추가)

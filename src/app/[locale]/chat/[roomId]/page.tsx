@@ -4,6 +4,7 @@ import { getSessionUser } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getRoom, getRoomMember } from '@/lib/chat'
 import { ChatRoomPanel } from '@/components/chat/chat-room-panel'
+import { ClientChatRoom } from '@/components/chat/client-chat-room'
 import type { ChatMessage } from '@/hooks/use-chat-room'
 
 type Params = { params: Promise<{ locale: string; roomId: string }> }
@@ -11,7 +12,12 @@ type Params = { params: Promise<{ locale: string; roomId: string }> }
 export default async function ChatRoomPage({ params }: Params) {
   const { locale, roomId } = await params
   const user = await getSessionUser()
-  if (!user) redirect(`/${locale}?error=login_required&next=${encodeURIComponent(`/${locale}/chat/${roomId}`)}`)
+
+  // 쿠키로 신원을 못 찾으면(Pi Browser는 Set-Cookie 미저장) redirect 대신 클라이언트 게이트로 위임.
+  // 클라이언트가 localStorage 토큰을 X-Pi-Token 헤더로 실어 방 정보·메시지를 로드한다.
+  if (!user) {
+    return <ClientChatRoom roomId={roomId} />
+  }
 
   const [room, mbr] = await Promise.all([
     getRoom(roomId),
