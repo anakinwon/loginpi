@@ -11,7 +11,7 @@ type Params = { params: Promise<{ locale: string; roomId: string }> }
 export default async function ChatRoomPage({ params }: Params) {
   const { locale, roomId } = await params
   const user = await getSessionUser()
-  if (!user) redirect(`/${locale}?error=login_required`)
+  if (!user) redirect(`/${locale}?error=login_required&next=${encodeURIComponent(`/${locale}/chat/${roomId}`)}`)
 
   const [room, mbr] = await Promise.all([
     getRoom(roomId),

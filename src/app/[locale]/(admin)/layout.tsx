@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import { getLocale } from 'next-intl/server'
 import { AdminSidebar } from '@/components/admin/admin-sidebar'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 
@@ -9,10 +10,10 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode
 }) {
-  const user = await getSessionUser()
+  const [user, locale] = await Promise.all([getSessionUser(), getLocale()])
 
   if (!isAdmin(user)) {
-    redirect('/?error=unauthorized')
+    redirect(`/${locale}?error=unauthorized&next=${encodeURIComponent(`/${locale}/admin`)}`)
   }
 
   return (

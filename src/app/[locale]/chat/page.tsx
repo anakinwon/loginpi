@@ -37,7 +37,7 @@ function RoomCard({ room, href }: { room: RoomWithTheme; href: string }) {
 export default async function ChatPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
   const user = await getSessionUser()
-  if (!user) redirect(`/${locale}?error=login_required`)
+  if (!user) redirect(`/${locale}?error=login_required&next=${encodeURIComponent(`/${locale}/chat`)}`)
 
   const db = getSupabaseAdmin()
 

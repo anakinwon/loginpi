@@ -63,7 +63,6 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = useCallback(async () => {
     if (!window.Pi) {
-      // Pi SDK 없음 → 확실히 일반 브라우저
       setIsInPiBrowser(false)
       setIsLoading(false)
       return
@@ -83,34 +82,43 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
         ),
       ])
 
-      // 인증 성공 → Pi Browser 확정
       setIsInPiBrowser(true)
       setPiAccessToken(auth.accessToken)
 
-      const res = await fetch('/api/auth/pi', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          accessToken: auth.accessToken,
-          walletAddress: auth.user.wallet_address ?? null,
-        }),
-      })
-
-      if (!res.ok) {
-        const data = (await res.json()) as { error?: string }
-        throw new Error(data.error ?? '서버 인증 실패')
+      // 기존 세션 쿠키 확인 (이미 로그인된 경우 form POST 불필요)
+      const checkRes = await fetch('/api/auth/pi', { credentials: 'include' })
+      const { user: existing } = (await checkRes.json()) as { user: PiSessionUser | null }
+      if (existing) {
+        setUser(existing)
+        router.refresh()
+        return
       }
 
-      const data = (await res.json()) as { user: PiSessionUser }
-      setUser(data.user)
-      // 쿠키 발급 후 서버 컴포넌트(Header) 재실행 → showAdmin 즉시 반영
-      router.refresh()
+      // Pi Browser WebView에서 fetch() Set-Cookie가 저장 안 되는 문제
+      // → form POST(pi-redirect)로 쿠키 저장 보장 (top-level navigation은 Set-Cookie 신뢰성 있음)
+      const next = new URLSearchParams(window.location.search).get('next')
+        ?? window.location.pathname
+      const form = document.createElement('form')
+      form.method = 'POST'
+      form.action = '/api/auth/pi-redirect'
+      form.style.display = 'none'
+      ;([
+        ['accessToken', auth.accessToken],
+        ['walletAddress', auth.user.wallet_address ?? ''],
+        ['to', next],
+      ] as [string, string][]).forEach(([name, value]) => {
+        const input = document.createElement('input')
+        input.type = 'hidden'
+        input.name = name
+        input.value = value
+        form.appendChild(input)
+      })
+      document.body.appendChild(form)
+      form.submit()
+      // form.submit() → 페이지 이동 발생, 이후 코드 실행 안 됨
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Pi 인증 중 오류가 발생했습니다'
-      // 타임아웃은 일반 브라우저 판단 — 에러 메시지 표시 안 함
       if (msg !== 'timeout') setError(msg)
-      // 인증 실패 → 일반 브라우저로 확정
       setIsInPiBrowser(false)
     } finally {
       setIsLoading(false)
