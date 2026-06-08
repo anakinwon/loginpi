@@ -8,7 +8,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog'
 import { ThemeSelector, type ThemeRow } from './theme-selector'
 
@@ -153,10 +152,16 @@ export function GroupRoomCreator() {
   }, [])
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className='inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90'>
+    <>
+      <button
+        type='button'
+        onClick={() => setOpen(true)}
+        className='inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90'
+      >
         + 채팅방 만들기
-      </DialogTrigger>
+      </button>
+
+      <Dialog open={open} onOpenChange={setOpen}>
 
       <DialogContent className='sm:max-w-lg' showCloseButton={!isBusy}>
         <DialogHeader>
@@ -357,6 +362,7 @@ export function GroupRoomCreator() {
           )}
         </div>
       </DialogContent>
-    </Dialog>
+      </Dialog>
+    </>
   )
 }
