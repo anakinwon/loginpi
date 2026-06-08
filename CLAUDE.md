@@ -194,6 +194,77 @@ if (!isAdmin(user)) return NextResponse.json({ error: 'unauthorized' }, { status
 
 ---
 
+## PiRC2 스마트 컨트랙트 (Soroban — Pi Testnet)
+
+Pi Network 최초 Soroban 스마트 컨트랙트. **반복 결제(구독) 시스템** 구현에 사용한다.
+공식 문서: `https://github.com/PiNetwork/PiRC` (PiRC2 디렉토리, 9개 섹션)
+
+### 컨트랙트 정보
+
+| 항목 | 값 |
+|---|---|
+| Contract ID (Testnet) | `CCUF75B6W3HRJTJD6O7OXNI72HGJ7DERZ5MUNOMFMSK23ME5GUIKPFYV` |
+| Network passphrase | `"Pi Testnet"` |
+| RPC URL | `https://rpc.testnet.minepi.com` |
+| 토큰 단위 | **1 Pi = 10,000,000 units (i128)** |
+
+### stellar-cli 설정
+
+```bash
+export CONTRACT_ID=CCUF75B6W3HRJTJD6O7OXNI72HGJ7DERZ5MUNOMFMSK23ME5GUIKPFYV
+export NETWORK=pi-testnet
+```
+
+`~/.stellar/network/pi-testnet.toml`:
+```toml
+rpc_url = "https://rpc.testnet.minepi.com"
+rpc_headers = []
+network_passphrase = "Pi Testnet"
+```
+
+### 핵심 메서드
+
+| 메서드 | 설명 | 호출 주체 |
+|---|---|---|
+| `register_service(merchant, name, price, period_secs, trial_period_secs, approve_periods)` | 서비스 등록 (1회성) | **판매자 서버** |
+| `subscribe(subscriber, service_id, auto_renew)` | 구독 시작 | **구독자** (Pi Wallet 서명 필요) |
+| `cancel(subscriber, sub_id)` | 구독 취소 | 구독자 |
+| `process(merchant, service_id, offset, limit)` | 배치 청구 실행 (페이지네이션) | **판매자 서버** (cron job) |
+| `extend_subscription(subscriber, sub_id)` | 구독 연장 | 구독자 |
+| `toggle_auto_renew(subscriber, sub_id)` | 자동갱신 토글 | 구독자 |
+| `is_subscription_active(subscriber, service_id)` | 구독 활성 여부 | 누구나 (read-only) |
+| `get_subscription(subscriber, sub_id)` | 구독 상세 조회 | 누구나 |
+| `get_merchant_services(merchant)` | 판매자 서비스 목록 | 누구나 |
+
+### 구독 행동 매트릭스
+
+| 조건 | auto_renew=true | auto_renew=false |
+|---|---|---|
+| **무료 체험 있음** | 즉시 결제 없음, approve_periods 기간 토큰 승인 | 체험 기간만, 만료 시 종료 |
+| **무료 체험 없음** | 즉시 첫 기간 결제 + approve_periods 기간 승인 | 즉시 첫 기간 결제 + 1기간 승인 |
+
+### 에러 코드
+
+`1`InvalidPrice · `2`InvalidPeriod · `3`AlreadySubscribed · `4`SubscriptionNotFound
+`5`ServiceNotFound · `6`Unauthorized · `7`AlreadyCancelled · `11`SubscriptionExpired · `12`ServiceNotActive
+
+### TASK-054 구현 전략
+
+`subscribe()`는 구독자(Pi Browser 사용자)의 **Soroban 트랜잭션 서명**이 필요하다.
+Pi SDK가 `window.Pi.invokeContract()` 또는 유사 메서드를 공식 제공하기 전까지:
+
+- **단기 (TASK-054 현재)**: 기존 U2A 결제 흐름(`metadata.type='CHAT_SUBSCR'`) → 서버에서 `msg_subscr` DB 관리 (앱 레벨 구독). 컨트랙트 없이 동일한 사용자 경험 제공.
+- **중기 (Pi SDK Soroban 지원 시)**: PiRC2 `subscribe()` 직접 통합, 서버 cron에서 `process()` 실행.
+- `process()` 배치 청구는 판매자 서버 키로 실행 가능 — Pi Wallet 서명 불필요. cron job 설계에 즉시 활용 가능.
+
+```typescript
+// 금액 변환 유틸리티 (1 Pi = 10_000_000 units)
+const toUnits = (pi: number): bigint => BigInt(Math.round(pi * 10_000_000))
+const toPi = (units: bigint): number => Number(units) / 10_000_000
+```
+
+---
+
 ## 디렉토리 구조
 
 ```

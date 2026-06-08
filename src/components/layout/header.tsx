@@ -28,6 +28,12 @@ export async function Header() {
           >
             {t('board')}
           </Link>
+          <Link
+            href='/chat'
+            className='text-muted-foreground hover:text-foreground text-sm transition-colors'
+          >
+            채팅
+          </Link>
           {showAdmin && (
             <Link
               href='/admin'

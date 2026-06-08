@@ -400,63 +400,112 @@ brd_attch 8행  — fl_nm/fl_pth/fl_url/fl_sz/fl_tp, del_yn 논리삭제
 > **목표**: 테마 기반 1:1·그룹 채팅 + Supabase Realtime + Pi 결제 연동 + 구독 시스템
 > **상세 스펙**: `docs/PRD_CHAT.md` (v1.2)
 
-### TASK-050: DB 마이그레이션 (`msg_*` 13개 테이블) 🔜
+### TASK-050: DB 마이그레이션 (`msg_*` 13개 테이블) ✅ 완료
 
-- 🔜 `sql/011_msg_tables.sql` 작성 — DA 표준 시스템 컬럼 4개 전 테이블 필수
-- 🔜 `msg_theme` — 테마 마스터 (`theme_tp_cd`: BASIC/PREMIUM)
-- 🔜 `msg_room` — 채팅방 (`room_tp_cd`: D/G/E, `entry_fee_pi`, `is_public_yn`)
-- 🔜 `msg_room_mbr` — 채팅방 멤버 (`mbr_role_cd`: OWNER/ADMIN/MEMBER/GUEST)
-- 🔜 `msg_msg` — 메시지 (`msg_tp_cd`: TEXT/IMAGE/FILE/VOICE/STICKER/TIP_NOTI/SYSTEM)
-- 🔜 `msg_msg_reac` — 메시지 이모지 반응
-- 🔜 `msg_attch` — 채팅 첨부파일
-- 🔜 `msg_subscr_plan` — 구독 플랜 정의
-- 🔜 `msg_subscr` — 사용자 구독 현황
-- 🔜 `msg_stkr_pack` / `msg_stkr` / `msg_usr_stkr` — 스티커 시스템
-- 🔜 `msg_tip` — Pi Tip 내역
-- 🔜 Realtime RLS 정책: `msg_msg` 채팅방 멤버만 구독 가능
+- ✅ `sql/012_msg_tables.sql` 작성 — DA 표준 시스템 컬럼 4개 전 테이블 필수
+- ✅ `msg_theme` — 테마 마스터 (`theme_tp_cd`: BASIC/PREMIUM)
+- ✅ `msg_subscr_plan` — 구독 플랜 정의 (`mth_cnt` DA 표준 컬럼명)
+- ✅ `msg_stkr_pack` / `msg_stkr` — 스티커 팩·개별 항목
+- ✅ `msg_theme_stkr` — 테마 기본 스티커팩 매핑
+- ✅ `msg_room` — 채팅방 (`room_tp_cd`: D/G/E, `entry_fee_pi`, `is_public_yn`)
+- ✅ `msg_room_mbr` — 채팅방 멤버 (`mbr_role_cd`: OWNER/ADMIN/MEMBER/GUEST)
+- ✅ `msg_msg` — 메시지 (`msg_tp_cd`: TEXT/IMAGE/FILE/VOICE/STICKER/TIP_NOTI/SYSTEM)
+- ✅ `msg_msg_reac` — 메시지 이모지 반응
+- ✅ `msg_attch` — 채팅 첨부파일
+- ✅ `msg_subscr` — 사용자 구독 현황
+- ✅ `msg_usr_stkr` — 사용자 보유 스티커팩
+- ✅ `msg_tip` — Pi Tip 내역 (`tip_cont` DA 표준 컬럼명)
+- ✅ Realtime RLS 정책: `msg_msg` 채팅방 멤버만 구독 가능 (service_role bypass 유지)
 
-### TASK-051: 테마 마스터 데이터 세팅 🔜
+### TASK-051: 테마 마스터 데이터 세팅 ✅ 완료
 
-- 🔜 초기 20개 테마 INSERT (BASIC 6개 + PREMIUM 14개+)
-- 🔜 테마별 기본 스티커팩 3개 매핑 (`msg_theme_stkr`)
-- 🔜 `msg_subscr_plan` 3개 플랜 INSERT (FREE/PREMIUM/BUSINESS)
-- 🔜 `/api/admin/chat/themes` — 관리자 테마 CRUD API
+- ✅ `sql/013_msg_seed.sql` — 20개 테마 INSERT (BASIC 6개 + PREMIUM 14개)
+- ✅ 테마별 기본 스티커팩 3종(이모지팩·일러스트팩·인사/응원팩) × 20개 = 60개 `msg_stkr_pack` INSERT
+- ✅ `msg_theme_stkr` 60개 매핑 (DO 블록 + RETURNING으로 원자적 처리)
+- ✅ `msg_subscr_plan` 5개 INSERT: FREE / PREMIUM_MONTHLY·ANNUAL / BUSINESS_MONTHLY·ANNUAL
+- 🔜 `/api/admin/chat/themes` — 관리자 테마 CRUD API (TASK-052 이후 별도 구현)
 
-### TASK-052: 1:1 채팅 API + Supabase Realtime + E2E 암호화 🔜
+### TASK-052: 1:1 채팅 API + Supabase Realtime ✅ 완료
 
-- 🔜 `src/hooks/use-chat-room.ts` — `postgres_changes` + `presence` 구독 훅
-- 🔜 `GET /api/chat/rooms/[roomId]/messages` — cursor 페이지네이션 (scroll-up 무한로드)
-- 🔜 `POST /api/chat/rooms/[roomId]/messages` — 메시지 전송 + rate limiting (1초 5건)
-- 🔜 1:1 Direct Room (`room_tp_cd='D'`) 자동 생성 로직
-- 🔜 E2E 암호화 — 1:1·비밀방 메시지: Pi 지갑 키 기반 암호화 (서버 복호화 불가)
-- 🔜 `src/components/chat/chat-message-list.tsx` — 실시간 메시지 렌더링
-- 🔜 `src/components/chat/chat-input.tsx` — 텍스트·스티커·파일 입력
+- ✅ `src/lib/chat.ts` — MsgRoom·MsgMsg·MsgRoomMbr 타입 + CRUD 헬퍼
+- ✅ `src/lib/supabase-client.ts` — 클라이언트 Realtime용 Supabase 인스턴스 (publishable key)
+- ✅ `GET /api/chat/rooms` — 내 채팅방 목록, `POST` — 1:1 Direct Room 생성
+- ✅ `GET /api/chat/rooms/[roomId]` — 상세 + 멤버 목록 + 내 역할
+- ✅ `GET /api/chat/rooms/[roomId]/messages` — cursor 페이지네이션 (scroll-up 무한로드)
+- ✅ `POST /api/chat/rooms/[roomId]/messages` — 메시지 전송 + rate limiting (1초 5건)
+- ✅ `POST /api/chat/rooms/[roomId]/join` — 공개 그룹방 입장 (정원 확인)
+- ✅ `src/hooks/use-chat-room.ts` — `postgres_changes` + `presence` 구독 훅, 중복 방지 + scroll-up prepend
+- ✅ `src/components/chat/chat-message-list.tsx` — 실시간 렌더링, scroll-up 무한로드, 시스템 메시지 분기
+- ✅ `src/components/chat/chat-input.tsx` — Enter 전송, Shift+Enter 줄바꿈, 높이 자동조절, rate limit 복원
+- 🔜 E2E 암호화 — Pi 지갑 키 기반 (Phase 8 이후 적용)
 
-### TASK-053: 그룹 채팅방 생성 (테마 선택 UX + Pi 결제) 🔜
+### TASK-053: 그룹 채팅방 생성 (테마 선택 UX + Pi 결제) ✅ 완료
 
 ```
 채팅방 생성 UX:
 Step 1: 테마 선택 (BASIC 자유 / PREMIUM 🔒 → 단건 0.2 Pi 또는 구독)
-Step 2: 채팅방 이름·설명 (테마 이모지·태그 자동 제안)
-Step 3: 공개/비공개 + 정원 설정
-Step 4: Pi 결제 (Free: 0.1 Pi / Premium: 월 3개 무료)
+Step 2: 채팅방 이름·설명 (테마 이모지 자동 제안)
+Step 3: 공개/비공개 + 정원 설정 (10/30/50/100명)
+Step 4: Pi 결제 (BASIC 0.1 π / PREMIUM 0.3 π)
 ```
 
-- 🔜 `src/components/chat/theme-selector.tsx` — 테마 선택 화면 (Step 1)
-- 🔜 `POST /api/chat/rooms` — 채팅방 생성 (metadata.type=`CHAT_ROOM_CREATE`)
-- 🔜 `/api/payments/complete` — `CHAT_ROOM_CREATE` 분기 추가
-- 🔜 `src/app/[locale]/chat/page.tsx` — 채팅 홈 (테마 마켓플레이스 + 공개방 목록)
-- 🔜 `src/app/[locale]/chat/[roomId]/page.tsx` — 채팅방
-- 🔜 `POST /api/chat/rooms/[roomId]/join` — 입장 (공개방 / 초대코드 / 결제 분기)
-- 🔜 `src/components/chat/inline-purchase-prompt.tsx` — 인라인 구매 트리거 공통 컴포넌트
+- ✅ `src/app/api/chat/themes/route.ts` — GET 테마 목록 (msg_theme 조회)
+- ✅ `src/components/chat/inline-purchase-prompt.tsx` — 인라인 구매 트리거 공통 컴포넌트
+- ✅ `src/components/chat/theme-selector.tsx` — 테마 선택 그리드 (BASIC 자유 / PREMIUM 🔒 InlinePurchasePrompt)
+- ✅ `src/components/chat/group-room-creator.tsx` — 4단계 마법사 Dialog (테마→이름→설정→Pi결제)
+- ✅ `src/components/chat/chat-room-panel.tsx` — ChatMessageList + ChatInput 래퍼 (Realtime 단일 구독)
+- ✅ `/api/payments/complete` — `CHAT_ROOM_CREATE` 분기 추가 (결제완료 시 msg_room + msg_room_mbr 원자 생성)
+- ✅ `src/app/[locale]/chat/page.tsx` — 채팅 홈 (내 채팅방 + 공개방 탐색 + GroupRoomCreator)
+- ✅ `src/app/[locale]/chat/[roomId]/page.tsx` — 채팅방 (초기 50건 서버 프리페치 + Realtime)
+- ✅ Header에 '채팅' 링크 추가
 
-### TASK-054: 구독 시스템 (플랜 + Pi 결제) 🔜
+### TASK-054: 구독 시스템 (플랜 + Pi 결제 + PiRC2 Soroban) 🔜
+
+> **PiRC2 컨트랙트** (Pi Testnet): `CCUF75B6W3HRJTJD6O7OXNI72HGJ7DERZ5MUNOMFMSK23ME5GUIKPFYV`
+> 공식 문서: https://github.com/PiNetwork/PiRC (PiRC2 디렉토리, 9개 섹션)
+> CLAUDE.md의 "PiRC2 스마트 컨트랙트" 섹션 참고
+
+#### 구현 파일
 
 - 🔜 `src/lib/chat-auth.ts` — `getChatPlan()`, `canCreateRoom()`, `canSendTip()`, `getAiQuota()` (server-only)
 - 🔜 `GET /api/subscriptions/plans` — 플랜 목록 + 현재 사용자 등급
-- 🔜 `POST /api/subscriptions` — 구독 시작 (metadata.type=`CHAT_SUBSCR`)
+- 🔜 `POST /api/subscriptions` — 구독 시작 (Pi 결제 완료 후 `msg_subscr` UPSERT, metadata.type=`CHAT_SUBSCR`)
+- 🔜 `DELETE /api/subscriptions` — 구독 취소 (논리삭제 + PiRC2 `cancel()` 호출 예정)
 - 🔜 `GET /api/subscriptions/check` — 기능별 권한 체크 `{ canTip, canCreateRoom, aiQuota... }`
 - 🔜 `src/components/chat/subscription-gate.tsx` — 유료 기능 접근 제어 컴포넌트
+
+#### PiRC2 통합 전략
+
+**단기 (TASK-054)**: 기존 U2A 결제 흐름 유지 — Pi SDK `createPayment()` → `/payments/complete`에서 `msg_subscr` UPSERT. PiRC2 컨트랙트 없이 앱 레벨 구독 관리.
+
+**중기 (Pi SDK Soroban 지원 시)**: `subscribe()` 직접 통합 (구독자 Pi Wallet 서명). `process()` cron job은 판매자 서버 키로 즉시 실행 가능.
+
+```
+플랜 ID          가격      기간    PiRC2 price (units)
+PREMIUM_MONTHLY  1 Pi/월  30일    10_000_000
+PREMIUM_ANNUAL   10 Pi/년 365일   100_000_000
+BUSINESS_MONTHLY 5 Pi/월  30일    50_000_000
+BUSINESS_ANNUAL  50 Pi/년 365일   500_000_000
+```
+
+#### `msg_subscr` 테이블 분기 처리 (`payments/complete/route.ts`)
+
+```typescript
+if (meta?.type === 'CHAT_SUBSCR') {
+  const planDays = meta.plan_cd === 'PREMIUM_ANNUAL' ? 365
+    : meta.plan_cd === 'BUSINESS_ANNUAL' ? 365 : 30
+  const expireDtm = new Date(Date.now() + planDays * 86400_000)
+  await db.from('msg_subscr').upsert({
+    usr_id: owner.id,
+    plan_cd: String(meta.plan_cd),
+    pymnt_id: paymentId,
+    start_dtm: new Date().toISOString(),
+    expire_dtm: expireDtm.toISOString(),
+    auto_renew_yn: 'Y',
+    regr_id: slug, modr_id: slug,
+  }, { onConflict: 'usr_id' })
+}
+```
 
 ---
 
@@ -569,8 +618,8 @@ Step 4: Pi 결제 (Free: 0.1 Pi / Premium: 월 3개 무료)
 | M11: 다국어 | Phase 6 | 2026-06-07 | next-intl v4, 18개 언어, Gemini 자동번역, 3단계 fallback | ✅ 완료 |
 | M12: 다국어 안정성 | Phase 6 | 2026-06-07 | 단일 소스 분리, 203개 locale 선점, 코드 인젝션 보안 패치 | ✅ 완료 |
 | M13: Next.js 16 + TypeScript 6 | 기술 업그레이드 | 2026-06-07 | Next.js 16.2.7, TypeScript 6.0.3, eslint-config-next@16, FlatCompat 제거 | ✅ 완료 |
-| M14: PiChat DB + 테마 마스터 | Phase 7 | — | msg_* 13개 테이블, 20개 테마 데이터, RLS 정책 | 🔜 준비중 |
-| M15: PiChat MVP | Phase 7 | — | 1:1·그룹 채팅 Realtime, E2E 암호화, 구독 시스템, 테마 선택 UX | 🔜 준비중 |
+| M14: PiChat DB + 테마 마스터 | Phase 7 | 2026-06-08 | msg_* 13개 테이블, 테마 20개, 플랜 5개, 스티커팩 60개 | ✅ 완료 |
+| M15: PiChat MVP | Phase 7 | 2026-06-08 | 그룹 채팅방 생성 4단계 마법사 (테마 선택 + Pi 결제), 채팅 홈, 채팅방 페이지 | ✅ 완료 |
 | M16: Pi 수익화 | Phase 8 | — | Pi Tip, 스티커 마켓, 인라인 트리거 8종, AI 봇, 이벤트방 | 🔜 준비중 |
 | M17: 미디어 메시지 | Phase 8 | — | 파일·이미지·음성 메시지 (Supabase Storage) | 🔜 준비중 |
 | M18: PiChat 생태계 | Phase 9 | — | 마켓플레이스, Pi Bet, Webhook, 분석 대시보드, 커스텀 스티커 | 🔜 준비중 |
@@ -620,3 +669,7 @@ Step 4: Pi 결제 (Free: 0.1 Pi / Premium: 월 3개 무료)
 | v1.6 | 2026-06-07 | TASK-044: 다국어 안정성 강화 — locale 단일 소스(locale-currency/country.ts), routing.ts 203개 선점 등록, Intl.DisplayNames 도입, 코드 인젝션 보안 패치(LOCALE_CD_RE) | anakin |
 | v1.7 | 2026-06-07 | 기술 업그레이드: Next.js 16→16.2.7, TypeScript 5→6.0.3, eslint-config-next@16, FlatCompat 제거. 기술 업그레이드 모니터링 섹션 추가. | anakin |
 | v1.8 | 2026-06-07 | Phase 7~9 PiChat 로드맵 추가: TASK-050~074 (채팅 MVP·수익화·생태계). 마일스톤 M14~M18 추가. PRD.md v4.0 통합 반영. | anakin |
+| v1.9 | 2026-06-08 | TASK-050·051 완료 — sql/012_msg_tables.sql (msg_* 13개 테이블, Realtime RLS), sql/013_msg_seed.sql (테마 20개, 구독플랜 5개, 스티커팩 60개). M14 달성. | anakin |
+| v2.0 | 2026-06-08 | TASK-052 완료 — 1:1 채팅 API (rooms·messages·join), supabase-client.ts, use-chat-room 훅(Realtime+presence), ChatMessageList(scroll-up 무한로드), ChatInput(rate limit 복원). tsc 통과. | anakin |
+| v2.1 | 2026-06-08 | TASK-053 완료 — 그룹 채팅방 생성 4단계 마법사 (ThemeSelector·InlinePurchasePrompt·GroupRoomCreator), payments/complete CHAT_ROOM_CREATE 분기, /chat 홈·/chat/[roomId] 페이지, Header 채팅 링크. M15 달성. | anakin |
+| v2.2 | 2026-06-08 | PiRC2 Soroban 스마트 컨트랙트 통합 문서화 — CLAUDE.md PiRC2 섹션 추가 (Contract ID·메서드·구독 매트릭스), TASK-054 PiRC2 기반 상세 업데이트, PRD_CHAT.md 구독 API 현행화, pi_pay SKILL.md PiRC2 구독 결제 섹션 추가. | anakin |
