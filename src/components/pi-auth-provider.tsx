@@ -27,6 +27,12 @@ interface PiAuthContextValue {
 
 const PiAuthContext = createContext<PiAuthContextValue | null>(null)
 
+// 오픈 리다이렉트 방지: 같은 origin의 상대 경로만 허용
+// '//' 로 시작하면 프로토콜 상대 URL (//evil.com), '/\' 로 시작하면 스킴 우회 시도
+function isSafeNext(next: string | null): next is string {
+  return !!next && /^\/(?!\/)/.test(next) && !next.startsWith('/\\')
+}
+
 function detectSandbox(): boolean {
   if (typeof window !== 'undefined') {
     const { hostname } = window.location
@@ -66,7 +72,7 @@ function SearchParamsWatcher({ signIn }: { signIn: () => Promise<void> }) {
 
   useEffect(() => {
     const next = searchParams.get('next')
-    if (!next || typeof window === 'undefined' || !window.Pi) return
+    if (!isSafeNext(next) || typeof window === 'undefined' || !window.Pi) return
     signIn()
   }, [searchParams, signIn])
 
@@ -118,7 +124,8 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
       // 기존 세션 쿠키 확인 (이미 로그인된 경우 추가 POST 불필요)
       const checkRes = await fetch('/api/auth/pi', { credentials: 'include' })
       const { user: existing } = (await checkRes.json()) as { user: PiSessionUser | null }
-      const next = new URLSearchParams(window.location.search).get('next')
+      const rawNext = new URLSearchParams(window.location.search).get('next')
+      const next = isSafeNext(rawNext) ? rawNext : null
       if (existing) {
         setUser(existing)
         if (next) {
