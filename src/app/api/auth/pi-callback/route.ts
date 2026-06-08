@@ -14,8 +14,9 @@ interface NavTokenPayload extends PiSessionUser {
   exp: number
 }
 
+// 허용 문자만 통과: 알파벳·숫자·URL 안전 특수문자만 허용해 HTML/JS 인젝션 원천 차단
 function safeRedirectPath(to: string | null): string {
-  if (!to || !to.startsWith('/') || to.startsWith('//') || to.startsWith('/\\')) return '/'
+  if (!to || !/^\/[A-Za-z0-9\-_./?=&%#]*$/.test(to)) return '/'
   return to
 }
 
@@ -60,9 +61,9 @@ export async function GET(request: NextRequest) {
   const signed = signPayload(sessionData, secret)
 
   // 302 대신 200 HTML 응답: Set-Cookie가 200 응답에 첨부되어 WebView 쿠키 저장이 더 안정적
-  // JS redirect로 목적지 이동
-  const escapedTo = to.replace(/'/g, "\\'")
-  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><script>window.location.replace('${escapedTo}')</script></head><body></body></html>`
+  // JSON.stringify로 to를 안전하게 직렬화: 모든 특수문자 이스케이프 + </script> 인젝션 방지
+  const safeJson = JSON.stringify(to).replace(/</g, '\\u003c')
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><script>window.location.replace(${safeJson})</script></head><body></body></html>`
 
   const response = new NextResponse(html, {
     status: 200,
