@@ -15,9 +15,10 @@ export interface ThemeRow {
 interface ThemeSelectorProps {
   selectedThemeCode: string | null
   onSelect: (theme: ThemeRow) => void
+  hasPremiumAccess?: boolean
 }
 
-export function ThemeSelector({ selectedThemeCode, onSelect }: ThemeSelectorProps) {
+export function ThemeSelector({ selectedThemeCode, onSelect, hasPremiumAccess = false }: ThemeSelectorProps) {
   const [themes, setThemes] = useState<ThemeRow[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [promptTheme, setPromptTheme] = useState<ThemeRow | null>(null)
@@ -55,14 +56,14 @@ export function ThemeSelector({ selectedThemeCode, onSelect }: ThemeSelectorProp
           return (
             <button
               key={theme.theme_cd}
-              onClick={() => isPremium ? setPromptTheme(theme) : onSelect(theme)}
+              onClick={() => isPremium && !hasPremiumAccess ? setPromptTheme(theme) : onSelect(theme)}
               className={`relative flex flex-col items-center gap-1.5 rounded-xl border p-3 text-center transition-colors ${
                 isSelected
                   ? 'border-primary bg-primary/10'
                   : 'hover:border-muted-foreground/40 hover:bg-muted/40'
               }`}
             >
-              {isPremium && (
+              {isPremium && !hasPremiumAccess && (
                 <span className='absolute right-1.5 top-1.5 text-[10px]'>🔒</span>
               )}
               <span className='text-2xl leading-none'>{theme.theme_emoji}</span>

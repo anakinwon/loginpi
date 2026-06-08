@@ -3,6 +3,7 @@ import { useState, useCallback, useEffect } from 'react'
 import { useRouter } from '@/i18n/navigation'
 import { toast } from 'sonner'
 import { usePiAuth } from '@/components/pi-auth-provider'
+import { piFetch } from '@/lib/pi-fetch'
 import {
   Dialog,
   DialogContent,
@@ -46,6 +47,17 @@ export function GroupRoomCreator() {
   const [maxMbr, setMaxMbr] = useState<Capacity>(50)
   const [payStatus, setPayStatus] = useState<PayStatus>('idle')
   const [payError, setPayError] = useState<string | null>(null)
+  const [canUsePremiumTheme, setCanUsePremiumTheme] = useState(false)
+
+  // 구독 여부 확인 — PREMIUM 테마 추가 요금 면제 여부 결정
+  useEffect(() => {
+    piFetch('/api/subscriptions/check')
+      .then(r => r.ok ? r.json() : null)
+      .then((d: { canUsePremiumTheme?: boolean } | null) => {
+        setCanUsePremiumTheme(d?.canUsePremiumTheme ?? false)
+      })
+      .catch(() => { /* 조용히 실패 — 비구독자로 취급 */ })
+  }, [])
 
   // 다이얼로그 열릴 때 마다 초기화
   useEffect(() => {
@@ -64,8 +76,8 @@ export function GroupRoomCreator() {
   const isPremium = selectedTheme?.theme_tp_cd === 'PREMIUM'
   // FITNESS(PT/피트니스)는 무료 — 결제 없이 바로 생성
   const isFree = selectedTheme?.theme_cd === 'FITNESS'
-  // BASIC: 0.1 π, PREMIUM: 0.3 π (방생성 0.1 + 테마 0.2)
-  const payAmount = isPremium ? 0.3 : 0.1
+  // 구독자는 PREMIUM 테마 추가 요금 면제 → 방 생성(0.1π)만 청구
+  const payAmount = isPremium && !canUsePremiumTheme ? 0.3 : 0.1
   const isBusy = payStatus === 'approving' || payStatus === 'waiting' || payStatus === 'completing'
 
   const handleThemeSelect = useCallback((theme: ThemeRow) => {
@@ -211,7 +223,7 @@ export function GroupRoomCreator() {
             <div>
               <p className='mb-3 text-sm text-muted-foreground'>채팅방의 테마를 선택하세요</p>
               <div className='max-h-72 overflow-y-auto pr-1'>
-                <ThemeSelector selectedThemeCode={selectedTheme?.theme_cd ?? null} onSelect={handleThemeSelect} />
+                <ThemeSelector selectedThemeCode={selectedTheme?.theme_cd ?? null} onSelect={handleThemeSelect} hasPremiumAccess={canUsePremiumTheme} />
               </div>
             </div>
           )}
@@ -350,10 +362,16 @@ export function GroupRoomCreator() {
                   <span>{maxMbr}명</span>
                 </div>
                 <div className='border-t pt-2'>
-                  {isPremium && (
+                  {isPremium && !canUsePremiumTheme && (
                     <div className='flex justify-between text-amber-600 dark:text-amber-400'>
                       <span>PREMIUM 테마 단건</span>
                       <span>0.2 π</span>
+                    </div>
+                  )}
+                  {isPremium && canUsePremiumTheme && (
+                    <div className='flex justify-between text-emerald-600 dark:text-emerald-400'>
+                      <span>PREMIUM 테마</span>
+                      <span>구독 혜택 (무료)</span>
                     </div>
                   )}
                   <div className='flex justify-between'>
