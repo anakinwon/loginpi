@@ -1,31 +1,43 @@
 'use client'
 
+import { useCallback } from 'react'
 import { useTranslations } from 'next-intl'
 import { useParams } from 'next/navigation'
 import { usePiAuth } from '@/components/pi-auth-provider'
 
 // Pi Browser 전용 관리자 링크
-// fetch() 응답 Set-Cookie가 WebView에 저장 안 되는 문제를 form POST로 우회
-// form submit → 서버가 Set-Cookie + 302 리다이렉트 → 브라우저 네이티브 처리로 쿠키 안정적 저장
+// form POST는 Pi Browser WebView에서 ERR_CONNECTION_ABORTED로 차단됨.
+// pi-code → pi-callback(HTML) 흐름으로 쿠키를 안정적으로 설정한 뒤 이동.
 export function PiAdminLink() {
   const { user, isInPiBrowser, piAccessToken } = usePiAuth()
   const t = useTranslations('header')
   const params = useParams()
   const locale = (params.locale as string) ?? 'ko'
 
+  const handleClick = useCallback(async () => {
+    if (!piAccessToken) return
+    const to = `/${locale}/admin`
+    try {
+      const res = await fetch('/api/auth/pi-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accessToken: piAccessToken, to }),
+      })
+      if (!res.ok) return
+      const { redirectUrl } = (await res.json()) as { redirectUrl: string }
+      window.location.href = redirectUrl
+    } catch {}
+  }, [locale, piAccessToken])
+
   if (!isInPiBrowser) return null
   if (!user || !piAccessToken || (user.role !== 'ADMIN' && user.role !== 'MASTER')) return null
 
   return (
-    <form method='post' action='/api/auth/pi-redirect' style={{ display: 'inline' }}>
-      <input type='hidden' name='accessToken' value={piAccessToken} />
-      <input type='hidden' name='to' value={`/${locale}/admin`} />
-      <button
-        type='submit'
-        className='text-muted-foreground hover:text-foreground text-sm transition-colors'
-      >
-        {t('admin')}
-      </button>
-    </form>
+    <button
+      onClick={handleClick}
+      className='text-muted-foreground hover:text-foreground text-sm transition-colors'
+    >
+      {t('admin')}
+    </button>
   )
 }

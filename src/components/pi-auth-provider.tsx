@@ -147,42 +147,22 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
         return
       }
 
-      // 세션 없음 → next 파라미터 유무로 분기
-      if (next) {
-        // Pi Browser form POST 차단(ERR_CONNECTION_ABORTED) 우회:
-        // ① fetch()로 토큰 검증 + 단기 네비게이션 토큰 발급 (쿠키 설정 불필요)
-        // ② window.location.href(GET 네비게이션)로 이동 → 서버가 302 + Set-Cookie 응답
-        const codeRes = await fetch('/api/auth/pi-code', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ accessToken: auth.accessToken, to: next }),
-        })
-        if (!codeRes.ok) {
-          const d = (await codeRes.json()) as { error?: string }
-          throw new Error(d.error ?? '인증 코드 발급 실패')
-        }
-        const { redirectUrl } = (await codeRes.json()) as { redirectUrl: string }
-        window.location.href = redirectUrl
-        return
-      }
-
-      // 홈 등 직접 접근: 기존 fetch 방식 (React 상태 갱신)
-      const res = await fetch('/api/auth/pi', {
+      // 세션 없음 → pi-code → pi-callback(HTML) 흐름으로 쿠키 설정
+      // Pi Browser WebView는 redirect 응답의 Set-Cookie를 follow 요청에 포함하지 않는 이슈가 있어,
+      // pi-callback에서 HTML 응답으로 쿠키를 저장한 후 JS로 이동하는 방식을 항상 사용.
+      // next 없으면 현재 페이지로 돌아옴 → 재실행된 signIn()에서 기존 세션 감지 후 상태 갱신.
+      const to = next ?? window.location.pathname
+      const codeRes = await fetch('/api/auth/pi-code', {
         method: 'POST',
-        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          accessToken: auth.accessToken,
-          walletAddress: auth.user.wallet_address ?? null,
-        }),
+        body: JSON.stringify({ accessToken: auth.accessToken, to }),
       })
-      if (!res.ok) {
-        const data = (await res.json()) as { error?: string }
-        throw new Error(data.error ?? '서버 인증 실패')
+      if (!codeRes.ok) {
+        const d = (await codeRes.json()) as { error?: string }
+        throw new Error(d.error ?? '인증 코드 발급 실패')
       }
-      const data = (await res.json()) as { user: PiSessionUser }
-      setUser(data.user)
-      routerRef.current.refresh()
+      const { redirectUrl } = (await codeRes.json()) as { redirectUrl: string }
+      window.location.href = redirectUrl
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Pi 인증 중 오류가 발생했습니다'
       if (msg !== 'timeout') setError(msg)
