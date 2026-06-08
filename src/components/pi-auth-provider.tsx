@@ -62,22 +62,23 @@ async function onIncompletePayment(payment: PaymentDTO) {
 }
 
 // useSearchParams는 Suspense 경계 안에서만 안전하게 사용 가능.
-// 이 컴포넌트는 UI 없이 next 파라미터 변경만 감지해 signIn을 재트리거.
-//
-// 문제: Next.js Link 탐색 시 SPA 방식으로 URL만 바뀌고 PiAuthProvider는 언마운트되지 않음.
-// 따라서 useEffect([signIn])은 재실행되지 않아 signIn()이 호출되지 않음.
-// 해결: useSearchParams()로 searchParams 변화를 React 반응형으로 감지해 signIn 재호출.
-function SearchParamsWatcher({ signIn }: { signIn: () => Promise<void> }) {
+// piSdkReady: SDK 로드 완료 전에는 signIn 호출 안 함 (비동기 afterInteractive 로드 대응)
+function SearchParamsWatcher({
+  signIn,
+  piSdkReady,
+}: {
+  signIn: () => Promise<void>
+  piSdkReady: boolean
+}) {
   const searchParams = useSearchParams()
   // searchParams 객체가 아닌 next 문자열 값을 의존성으로 사용.
-  // router.refresh() 후 Next.js가 같은 내용이어도 새 객체를 반환하면
-  // [searchParams, signIn] 의존성은 effect를 반복 실행해 signIn 무한 루프 발생.
+  // router.refresh() 후 Next.js가 새 객체를 반환하면 무한 루프 발생하므로 문자열 추출 필수.
   const next = searchParams.get('next')
 
   useEffect(() => {
-    if (!isSafeNext(next) || typeof window === 'undefined' || !window.Pi) return
+    if (!isSafeNext(next) || !piSdkReady) return
     signIn()
-  }, [next, signIn])
+  }, [next, signIn, piSdkReady])
 
   return null
 }
@@ -88,6 +89,12 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
   const [isInPiBrowser, setIsInPiBrowser] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Pi SDK 로드 완료 여부.
+  // afterInteractive Script의 onLoad → 'pi-sdk-loaded' 이벤트를 수신해 true로 전환.
+  // 하이드레이션 시점에 window.Pi가 이미 존재하면 즉시 true (캐시된 SDK).
+  const [piSdkReady, setPiSdkReady] = useState(() => typeof window !== 'undefined' && !!window.Pi)
+
   const router = useRouter()
 
   // router를 ref로 관리: router.refresh() 후 router 참조가 바뀌어도 signIn 콜백 참조는 안정 유지
@@ -144,8 +151,7 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
       if (next) {
         // Pi Browser form POST 차단(ERR_CONNECTION_ABORTED) 우회:
         // ① fetch()로 토큰 검증 + 단기 네비게이션 토큰 발급 (쿠키 설정 불필요)
-        // ② window.location.href(GET 네비게이션)로 이동 → 서버가 200 HTML + Set-Cookie 응답
-        //    GET 응답의 Set-Cookie는 WebView에 안정적으로 저장됨
+        // ② window.location.href(GET 네비게이션)로 이동 → 서버가 302 + Set-Cookie 응답
         const codeRes = await fetch('/api/auth/pi-code', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -161,7 +167,6 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       // 홈 등 직접 접근: 기존 fetch 방식 (React 상태 갱신)
-      // 쿠키 미저장 시 보호 페이지 이동 시점에 form POST로 재처리됨
       const res = await fetch('/api/auth/pi', {
         method: 'POST',
         credentials: 'include',
@@ -214,32 +219,52 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  // 초기 마운트 시 Pi SDK 인증 (next 파라미터 없는 경우만 — next 있으면 SearchParamsWatcher가 처리)
+  // Pi SDK 비동기 로드 감지.
+  // locale layout의 afterInteractive Script onLoad → 'pi-sdk-loaded' 이벤트를 여기서 수신.
+  // Pi Browser에서 SDK는 캐시되어 있어 거의 즉시 로드됨.
+  // 3초 타임아웃: 일반 브라우저나 CDN 접근 불가 환경에서 무한 대기 방지.
   useEffect(() => {
-    const hasNext = new URLSearchParams(window.location.search).has('next')
-    if (typeof window !== 'undefined' && window.Pi && !hasNext) {
-      signIn()
-    } else if (!window.Pi) {
-      // Pi SDK 없음 → 일반 브라우저 확정, 기존 세션만 복원
-      setIsInPiBrowser(false)
-      fetch('/api/auth/pi', { credentials: 'include' })
-        .then((res) => res.json())
-        .then((data: { user: PiSessionUser | null }) => {
-          if (data.user) setUser(data.user)
-        })
-        .catch(() => {})
-        .finally(() => setIsLoading(false))
+    if (piSdkReady) return
+
+    const onLoad = () => setPiSdkReady(true)
+    window.addEventListener('pi-sdk-loaded', onLoad, { once: true })
+
+    const fallback = setTimeout(() => {
+      window.removeEventListener('pi-sdk-loaded', onLoad)
+      if (!window.Pi) {
+        // Pi SDK 미로드 → 일반 브라우저: 기존 세션만 복원
+        setIsInPiBrowser(false)
+        fetch('/api/auth/pi', { credentials: 'include' })
+          .then(r => r.json())
+          .then((data: { user: PiSessionUser | null }) => { if (data.user) setUser(data.user) })
+          .catch(() => {})
+          .finally(() => setIsLoading(false))
+      }
+      // window.Pi 있음: sdk-loaded 이벤트가 이미 setPiSdkReady(true) 실행했을 것이므로 여기까지 안 옴
+    }, 3000)
+
+    return () => {
+      window.removeEventListener('pi-sdk-loaded', onLoad)
+      clearTimeout(fallback)
     }
-    // hasNext && window.Pi 인 경우: SearchParamsWatcher의 effect가 처리
-  }, [signIn])
+  }, [piSdkReady])
+
+  // Pi SDK 준비 완료 시 인증 초기화 (next 파라미터 없는 경우만).
+  // piSdkReady가 dep에 포함되어야 afterInteractive 로드 후 이 effect가 재실행됨.
+  useEffect(() => {
+    if (!piSdkReady) return
+    const hasNext = new URLSearchParams(window.location.search).has('next')
+    if (!hasNext) signIn()
+    // hasNext인 경우: SearchParamsWatcher가 piSdkReady dep으로 재실행되어 처리
+  }, [signIn, piSdkReady])
 
   return (
     <PiAuthContext.Provider
       value={{ user, piAccessToken, isLoading, isInPiBrowser, signIn, signOut, devLogin, error }}
     >
-      {/* SearchParamsWatcher: next 파라미터 변경 감지용 (UI 없음, Suspense 필수) */}
+      {/* SearchParamsWatcher: SPA 탐색 시 next 파라미터 변경을 감지해 signIn 재호출 (UI 없음) */}
       <Suspense fallback={null}>
-        <SearchParamsWatcher signIn={signIn} />
+        <SearchParamsWatcher signIn={signIn} piSdkReady={piSdkReady} />
       </Suspense>
       {children}
     </PiAuthContext.Provider>

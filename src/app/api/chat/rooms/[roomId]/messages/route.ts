@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth-check'
 import { getRoomMember, getRecentMsgCount } from '@/lib/chat'
+import { broadcastToRoom } from '@/lib/realtime-broadcast'
 
 type Params = { params: Promise<{ roomId: string }> }
 
@@ -70,12 +71,17 @@ export async function POST(request: NextRequest, { params }: Params) {
     return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
   }
 
-  const { msg_cont, msg_tp_cd = 'TEXT', ref_msg_id, stkr_id } = body as {
+  const { msg_id: clientMsgId, msg_cont, msg_tp_cd = 'TEXT', ref_msg_id, stkr_id } = body as {
+    msg_id?: string
     msg_cont?: string
     msg_tp_cd?: string
     ref_msg_id?: string
     stkr_id?: string
   }
+
+  // 클라이언트가 broadcast와 동일한 UUID를 전달하면 DB primary key로 사용 (broadcast-DB msg_id 일치)
+  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+  const validMsgId = clientMsgId && UUID_RE.test(clientMsgId) ? clientMsgId : undefined
 
   if (msg_tp_cd === 'TEXT' && !msg_cont?.trim()) {
     return NextResponse.json({ error: '메시지 내용을 입력해주세요' }, { status: 400 })
@@ -89,6 +95,7 @@ export async function POST(request: NextRequest, { params }: Params) {
   const { data, error } = await getSupabaseAdmin()
     .from('msg_msg')
     .insert({
+      ...(validMsgId ? { msg_id: validMsgId } : {}),
       room_id: roomId,
       snd_usr_id: user.id,
       snd_usr_nm: user.display_name,
@@ -104,11 +111,16 @@ export async function POST(request: NextRequest, { params }: Params) {
 
   if (error) return NextResponse.json({ error: '메시지 전송 실패' }, { status: 500 })
 
-  // 채팅방 mod_dtm 갱신 (최근 메시지 기준 정렬용)
-  await getSupabaseAdmin()
-    .from('msg_room')
-    .update({ modr_id: user.display_name.slice(0, 20) })
-    .eq('room_id', roomId)
+  // 채팅방 mod_dtm 갱신 + 서버 브로드캐스트를 병렬 실행
+  // 브로드캐스트는 서비스 롤 키 + REST API로 전송 → 클라이언트 직접 broadcast 불필요
+  // (클라이언트 broadcast는 snd_usr_id 스푸핑 가능 — 서버에서만 발송해야 신원 보장됨)
+  await Promise.all([
+    getSupabaseAdmin()
+      .from('msg_room')
+      .update({ modr_id: user.display_name.slice(0, 20) })
+      .eq('room_id', roomId),
+    broadcastToRoom(roomId, 'new_msg', data),
+  ])
 
   return NextResponse.json({ message: data }, { status: 201 })
 }

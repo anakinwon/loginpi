@@ -76,6 +76,7 @@ export default async function ChatRoomPage({ params }: Params) {
         roomId={roomId}
         initialMessages={initialMessages}
         currentUserId={user.id}
+        currentUserDisplayName={user.display_name}
       />
     </div>
   )

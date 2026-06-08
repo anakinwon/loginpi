@@ -1,18 +1,23 @@
 'use client'
 import { useEffect, useRef, useCallback, useState } from 'react'
-import { useChatRoom, type ChatMessage } from '@/hooks/use-chat-room'
+import type { ChatMessage } from '@/hooks/use-chat-room'
 
 interface ChatMessageListProps {
   roomId: string
-  initialMessages: ChatMessage[]
+  messages: ChatMessage[]
   currentUserId: string
+  prependMessages: (msgs: ChatMessage[]) => void
 }
 
-export function ChatMessageList({ roomId, initialMessages, currentUserId }: ChatMessageListProps) {
-  const { messages, prependMessages } = useChatRoom(roomId, initialMessages)
-  const [hasMore, setHasMore] = useState(initialMessages.length >= 50)
+export function ChatMessageList({
+  roomId,
+  messages,
+  currentUserId,
+  prependMessages,
+}: ChatMessageListProps) {
+  const [hasMore, setHasMore] = useState(messages.length >= 50)
   const [isLoading, setIsLoading] = useState(false)
-  const [oldestMsgId, setOldestMsgId] = useState<string | null>(initialMessages[0]?.msg_id ?? null)
+  const [oldestMsgId, setOldestMsgId] = useState<string | null>(messages[0]?.msg_id ?? null)
   const bottomRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const isInitial = useRef(true)
@@ -49,7 +54,6 @@ export function ChatMessageList({ roomId, initialMessages, currentUserId }: Chat
       setHasMore(more)
       setOldestMsgId(nextCursor)
 
-      // 이전 스크롤 위치 복원
       requestAnimationFrame(() => {
         if (container) {
           container.scrollTop = container.scrollHeight - prevScrollHeight
@@ -63,10 +67,7 @@ export function ChatMessageList({ roomId, initialMessages, currentUserId }: Chat
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
-
-    const onScroll = () => {
-      if (container.scrollTop < 80) loadMore()
-    }
+    const onScroll = () => { if (container.scrollTop < 80) loadMore() }
     container.addEventListener('scroll', onScroll)
     return () => container.removeEventListener('scroll', onScroll)
   }, [loadMore])
@@ -79,13 +80,23 @@ export function ChatMessageList({ roomId, initialMessages, currentUserId }: Chat
       {!hasMore && messages.length > 0 && (
         <div className='py-2 text-center text-xs text-muted-foreground'>대화의 시작입니다</div>
       )}
-
       {messages.map(msg => (
         <MessageBubble key={msg.msg_id} msg={msg} isMe={msg.snd_usr_id === currentUserId} />
       ))}
       <div ref={bottomRef} />
     </div>
   )
+}
+
+// Node.js는 ICU 없이 빌드되면 toLocaleTimeString('ko-KR')이 'PM HH:MM'을 반환해 hydration 불일치 발생.
+// 직접 구현으로 서버·클라이언트 동일 출력 보장.
+function formatKoreanTime(dtm: string): string {
+  const d = new Date(dtm)
+  const h = d.getHours()
+  const m = d.getMinutes().toString().padStart(2, '0')
+  const period = h < 12 ? '오전' : '오후'
+  const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h
+  return `${period} ${h12.toString().padStart(2, '0')}:${m}`
 }
 
 function MessageBubble({ msg, isMe }: { msg: ChatMessage; isMe: boolean }) {
@@ -112,7 +123,7 @@ function MessageBubble({ msg, isMe }: { msg: ChatMessage; isMe: boolean }) {
         {msg.msg_cont}
       </div>
       <span className='text-[10px] text-muted-foreground'>
-        {new Date(msg.reg_dtm).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
+        {formatKoreanTime(msg.reg_dtm)}
       </span>
     </div>
   )

@@ -1,13 +1,11 @@
 'use client'
 import { useState, useRef, useCallback } from 'react'
-import type { ChatMessage } from '@/hooks/use-chat-room'
 
 interface ChatInputProps {
-  roomId: string
-  onSend: (msg: ChatMessage) => void
+  onSend: (text: string) => Promise<void>
 }
 
-export function ChatInput({ roomId, onSend }: ChatInputProps) {
+export function ChatInput({ onSend }: ChatInputProps) {
   const [text, setText] = useState('')
   const [isSending, setIsSending] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -20,34 +18,18 @@ export function ChatInput({ roomId, onSend }: ChatInputProps) {
     setText('')
 
     try {
-      const res = await fetch(`/api/chat/rooms/${roomId}/messages`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ msg_cont: trimmed, msg_tp_cd: 'TEXT' }),
-      })
-
-      if (res.status === 429) {
-        // rate limit — 텍스트 복원
-        setText(trimmed)
-        return
-      }
-
-      if (res.ok) {
-        const { message } = await res.json()
-        onSend(message)
-      } else {
-        // 전송 실패 시 텍스트 복원
-        setText(trimmed)
-      }
+      await onSend(trimmed)
+    } catch (err) {
+      // rate limit이거나 전송 실패 시 입력 내용 복원
+      setText(trimmed)
     } finally {
       setIsSending(false)
       textareaRef.current?.focus()
     }
-  }, [text, isSending, roomId, onSend])
+  }, [text, isSending, onSend])
 
   const onKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      // Enter 전송 / Shift+Enter 줄바꿈
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault()
         send()
@@ -56,7 +38,6 @@ export function ChatInput({ roomId, onSend }: ChatInputProps) {
     [send],
   )
 
-  // textarea 높이 자동 조절
   const onInput = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setText(e.target.value)
     const ta = e.target
