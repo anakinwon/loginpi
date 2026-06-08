@@ -459,6 +459,29 @@ Step 4: Pi 결제 (BASIC 0.1 π / PREMIUM 0.3 π)
 - ✅ `src/app/[locale]/chat/[roomId]/page.tsx` — 채팅방 (초기 50건 서버 프리페치 + Realtime)
 - ✅ Header에 '채팅' 링크 추가
 
+### TASK-055: Pi Browser 쿠키 비의존 인증 (X-Pi-Token) ✅ 완료 (2026-06-08)
+
+> **핵심 가치 직결** — Pi Browser WebView는 모든 방식(form POST·fetch·redirect·HTML)의
+> `Set-Cookie`를 저장하지 않아, 쿠키 기반 페이지 보호로는 채팅·관리자 접속 시
+> 무한 리다이렉트 루프가 발생했다(로그인 자체 불가). CLAUDE.md "인증 + 세션 구조"의
+> 쿠키↔X-Pi-Token 이중 경로 + 클라이언트 게이트 패턴으로 근본 해결.
+
+#### 구현 파일
+
+- ✅ `src/lib/pi-fetch.ts` — `piFetch`(X-Pi-Token 헤더 자동 첨부) + 토큰 localStorage 저장/조회
+- ✅ `src/lib/auth-check.ts` — `getSessionUser()` 쿠키 OR X-Pi-Token 헤더 + `tokenValidUntil` 만료 검증
+- ✅ `src/app/api/auth/pi/route.ts` — POST 응답에 세션 `token` 이중 반환
+- ✅ `src/components/pi-auth-provider.tsx` — 로그인 흐름 fetch POST + setPiToken 통일, 보호 페이지 router.push
+- ✅ `chat-list-view` · `client-chat-list` · `client-chat-room` — 클라이언트 게이트
+- ✅ `chat/page.tsx` · `chat/[roomId]/page.tsx` — 쿠키 미인식 시 클라이언트 게이트 폴백
+- ✅ `use-chat-room.ts` · `chat-message-list.tsx` — 메시지 송신/로드 `piFetch` 전환
+- ✅ `client-admin-gate.tsx` + admin layout — 무한 루프 차단 안내
+
+#### 후속 과제
+
+- 🔜 admin 12개 페이지 클라이언트 데이터 로드 전환 (현재는 PC 브라우저 권장 안내)
+- 🔜 dead route 정리: `pi-code` · `pi-callback` · `pi-redirect` (쿠키 흐름 제거로 미사용)
+
 ### TASK-054: 구독 시스템 (플랜 + Pi 결제 + PiRC2 Soroban) 🔜
 
 > **PiRC2 컨트랙트** (Pi Testnet): `CCUF75B6W3HRJTJD6O7OXNI72HGJ7DERZ5MUNOMFMSK23ME5GUIKPFYV`

@@ -2,6 +2,25 @@
 
 이 파일은 Claude Code(claude.ai/code)가 이 저장소에서 작업할 때 참고하는 안내 문서입니다.
 
+---
+
+## ⭐ 프로젝트 핵심 가치 (최우선 — 절대 훼손 금지)
+
+존재 이유는 단 두 가지다. 어떤 변경도 이 둘을 깨뜨리면 안 된다.
+
+1. **Pi Browser에서 Pi 계정으로 로그인할 수 있어야 한다.**
+2. **Pi Browser에서 Pi 계정으로 결제할 수 있어야 한다.**
+
+> Pi Browser 로그인이 막히면 Pi username으로 아무것도 할 수 없어 프로젝트 전체가 무가치해진다.
+> 인증·페이지·기능 변경은 **Pi Browser 실기기에서 로그인·결제·채팅 접속을 검증**한 뒤에만 완료로 간주한다.
+
+**치명적 제약 — Pi Browser WebView는 모든 방식(form POST·fetch·302/307 redirect·200 HTML)의 `Set-Cookie`를 저장하지 않는다.**
+쿠키에만 의존하는 서버 컴포넌트 페이지 보호는 Pi Browser에서 **구조적으로 동작 불가**다.
+→ 인증이 필요한 페이지는 반드시 **쿠키 OR `X-Pi-Token` 헤더** 두 경로를 지원해야 한다(→ "인증 + 세션 구조" 참고).
+→ `getSessionUser()`가 null일 때 **`redirect`로 막으면 Pi Browser에서 무한 리다이렉트 루프가 발생한다(절대 금지)** — 클라이언트 게이트로 위임할 것.
+
+---
+
 ## 빌드 및 개발 명령어
 
 ```bash
@@ -169,9 +188,21 @@ const raw = await readFile(join(process.cwd(), 'messages', `${locale}.json`), 'u
 
 ## 인증 + 세션 구조
 
-### Pi 세션 (Pi Browser)
-- `pi_session` 쿠키 — HMAC-SHA256 서명 (`httpOnly`, `sameSite: strict`)
-- Pi Browser WebView 쿠키 미전송 시 `X-Pi-Token` 헤더 fallback
+> Pi Browser는 쿠키를 저장하지 않는다(핵심 가치 제약 참고). 그래서 Pi 세션은
+> **쿠키(일반 브라우저) + `X-Pi-Token` 헤더(Pi Browser localStorage) 이중 경로**로 동작한다.
+
+### Pi 세션 (쿠키 비의존 이중 경로)
+- **발급** (`/api/auth/pi` POST): `signPayload` HMAC-SHA256 서명 토큰을 `pi_session` 쿠키(`httpOnly`, `sameSite: lax`)와 JSON `token` 필드로 **둘 다 반환**
+- **클라이언트 저장**: `pi-auth-provider`가 `token`을 `localStorage`(`pi_token`)에 저장 (`setPiToken`)
+- **요청**: 인증이 필요한 클라이언트→API 호출은 `fetch` 대신 **`piFetch`**(`src/lib/pi-fetch.ts`) 사용 → `X-Pi-Token` 헤더 자동 첨부 + `credentials: 'include'`
+- **서버 검증**: `getSessionUser()`가 **쿠키 우선 → 없으면 `X-Pi-Token` 헤더**로 신원 확인 + `tokenValidUntil` 만료 검증
+
+### 쿠키 비의존 페이지 패턴 (Pi Browser 필수 — 위반 시 무한 루프)
+인증이 필요한 서버 컴포넌트 페이지는 `getSessionUser()`가 null이어도 **`redirect` 금지**.
+대신 **클라이언트 게이트**를 렌더해 `piFetch`로 데이터를 로드한다.
+- 일반 브라우저(쿠키 O): 서버 SSR 그대로 — 회귀 위험 없음
+- Pi Browser(쿠키 X): 클라이언트 게이트 — 예) `ClientChatList`, `ClientChatRoom`, `ClientAdminGate`
+- 데이터 API(예: `/api/chat/rooms`)는 `getSessionUser()`만 쓰면 쿠키·헤더 양쪽 자동 지원
 
 ### Google 세션 (NextAuth.js v5 beta — v5 stable 미출시)
 - `session.user.sub` = Google OAuth raw sub (google_id 저장)
@@ -180,7 +211,7 @@ const raw = await readFile(join(process.cwd(), 'messages', `${locale}.json`), 'u
 ### 통합 체크
 ```ts
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
-const user = await getSessionUser()  // Pi 또는 Google 세션 통합
+const user = await getSessionUser()  // Pi(쿠키/헤더) 또는 Google 세션 통합
 if (!isAdmin(user)) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
 ```
 
