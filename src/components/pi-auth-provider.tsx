@@ -142,27 +142,22 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
 
       // 세션 없음 → next 파라미터 유무로 분기
       if (next) {
-        // 보호 페이지에서 리다이렉트된 경우:
-        // fetch() Set-Cookie가 WebView에 저장 안 되는 문제를 form POST로 우회
-        // top-level navigation의 Set-Cookie는 항상 저장됨
-        const form = document.createElement('form')
-        form.method = 'POST'
-        form.action = '/api/auth/pi-redirect'
-        form.style.display = 'none'
-        ;([
-          ['accessToken', auth.accessToken],
-          ['to', next],
-        ] as [string, string][]).forEach(([name, value]) => {
-          const input = document.createElement('input')
-          input.type = 'hidden'
-          input.name = name
-          input.value = value
-          form.appendChild(input)
+        // Pi Browser form POST 차단(ERR_CONNECTION_ABORTED) 우회:
+        // ① fetch()로 토큰 검증 + 단기 네비게이션 토큰 발급 (쿠키 설정 불필요)
+        // ② window.location.href(GET 네비게이션)로 이동 → 서버가 200 HTML + Set-Cookie 응답
+        //    GET 응답의 Set-Cookie는 WebView에 안정적으로 저장됨
+        const codeRes = await fetch('/api/auth/pi-code', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ accessToken: auth.accessToken, to: next }),
         })
-        document.body.appendChild(form)
-        form.submit()
+        if (!codeRes.ok) {
+          const d = (await codeRes.json()) as { error?: string }
+          throw new Error(d.error ?? '인증 코드 발급 실패')
+        }
+        const { redirectUrl } = (await codeRes.json()) as { redirectUrl: string }
+        window.location.href = redirectUrl
         return
-        // form.submit() → 페이지 이동, 이후 코드 실행 안 됨
       }
 
       // 홈 등 직접 접근: 기존 fetch 방식 (React 상태 갱신)

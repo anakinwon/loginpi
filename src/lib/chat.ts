@@ -130,6 +130,49 @@ export async function getOrCreateDirectRoom(
   return room as MsgRoom
 }
 
+// 그룹 채팅방 생성 (결제 완료 후 또는 무료 테마)
+export async function createGroupRoom(params: {
+  userId: string
+  displayName: string
+  theme_cd: string
+  room_nm: string
+  room_desc: string | null
+  is_public_yn: 'Y' | 'N'
+  max_mbr_cnt: number
+  pymnt_id?: string | null
+}): Promise<MsgRoom> {
+  const supabase = getSupabaseAdmin()
+  const slug = params.displayName.slice(0, 20)
+
+  const { data: room, error } = await supabase
+    .from('msg_room')
+    .insert({
+      room_nm: params.room_nm,
+      room_desc: params.room_desc,
+      theme_cd: params.theme_cd,
+      room_tp_cd: 'G',
+      max_mbr_cnt: params.max_mbr_cnt,
+      is_public_yn: params.is_public_yn,
+      pymnt_id: params.pymnt_id ?? null,
+      regr_id: slug,
+      modr_id: slug,
+    })
+    .select()
+    .single()
+
+  if (error || !room) throw new Error('채팅방 생성 실패')
+
+  await supabase.from('msg_room_mbr').insert({
+    room_id: (room as MsgRoom).room_id,
+    usr_id: params.userId,
+    mbr_role_cd: 'OWNER',
+    regr_id: slug,
+    modr_id: slug,
+  })
+
+  return room as MsgRoom
+}
+
 // rate limiting: 최근 1초 내 해당 사용자의 메시지 수
 export async function getRecentMsgCount(roomId: string, userId: string): Promise<number> {
   const since = new Date(Date.now() - 1000).toISOString()

@@ -62,6 +62,8 @@ export function GroupRoomCreator() {
   }, [open])
 
   const isPremium = selectedTheme?.theme_tp_cd === 'PREMIUM'
+  // FITNESS(PT/피트니스)는 무료 — 결제 없이 바로 생성
+  const isFree = selectedTheme?.theme_cd === 'FITNESS'
   // BASIC: 0.1 π, PREMIUM: 0.3 π (방생성 0.1 + 테마 0.2)
   const payAmount = isPremium ? 0.3 : 0.1
   const isBusy = payStatus === 'approving' || payStatus === 'waiting' || payStatus === 'completing'
@@ -145,6 +147,39 @@ export function GroupRoomCreator() {
       },
     )
   }, [selectedTheme, payAmount, roomNm, roomDesc, isPublic, maxMbr, router])
+
+  const createFreeRoom = useCallback(async () => {
+    if (!selectedTheme) return
+    setPayStatus('completing')
+    setPayError(null)
+    try {
+      const res = await fetch('/api/chat/rooms/group', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          theme_cd: selectedTheme.theme_cd,
+          room_nm: roomNm,
+          room_desc: roomDesc || null,
+          is_public_yn: isPublic,
+          max_mbr_cnt: maxMbr,
+        }),
+      })
+      if (!res.ok) {
+        const d = (await res.json()) as { error?: string }
+        throw new Error(d.error ?? '방 생성 실패')
+      }
+      const data = (await res.json()) as { room?: { room_id: string } }
+      setPayStatus('done')
+      setOpen(false)
+      toast.success('채팅방이 생성되었습니다!')
+      if (data.room?.room_id) {
+        router.push(`/chat/${data.room.room_id}`)
+      }
+    } catch (e) {
+      setPayStatus('error')
+      setPayError(e instanceof Error ? e.message : '방 생성 오류')
+    }
+  }, [selectedTheme, roomNm, roomDesc, isPublic, maxMbr, router])
 
   const retryPayment = useCallback(() => {
     setPayStatus('idle')
@@ -274,12 +309,22 @@ export function GroupRoomCreator() {
                 <button onClick={() => setStep(2)} className='flex-1 rounded-xl border px-4 py-2 text-sm hover:bg-muted'>
                   이전
                 </button>
-                <button
-                  onClick={() => setStep(4)}
-                  className='flex-1 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground'
-                >
-                  다음
-                </button>
+                {isFree ? (
+                  <button
+                    onClick={createFreeRoom}
+                    disabled={isBusy}
+                    className='flex-1 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-40'
+                  >
+                    {isBusy ? '생성 중…' : '무료 방 만들기'}
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setStep(4)}
+                    className='flex-1 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground'
+                  >
+                    다음
+                  </button>
+                )}
               </div>
             </div>
           )}
