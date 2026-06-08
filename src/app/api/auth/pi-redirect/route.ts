@@ -44,7 +44,6 @@ export async function POST(request: NextRequest) {
 
   const formData = await request.formData()
   const accessToken = formData.get('accessToken') as string | null
-  const walletAddress = (formData.get('walletAddress') as string | null) || null
   const to = safeRedirectPath(formData.get('to') as string | null)
 
   if (!accessToken) {
@@ -72,7 +71,7 @@ export async function POST(request: NextRequest) {
     const dbUser = await upsertPiUser({
       uid: piUser.uid,
       username: piUser.username ?? null,
-      walletAddress,
+      walletAddress: null,
     })
     userId = dbUser.id
     userRole = dbUser.role

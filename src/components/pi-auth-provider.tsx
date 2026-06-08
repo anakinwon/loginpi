@@ -85,7 +85,7 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
       setIsInPiBrowser(true)
       setPiAccessToken(auth.accessToken)
 
-      // 기존 세션 쿠키 확인 (이미 로그인된 경우 form POST 불필요)
+      // 기존 세션 쿠키 확인 (이미 로그인된 경우 추가 요청 불필요)
       const checkRes = await fetch('/api/auth/pi', { credentials: 'include' })
       const { user: existing } = (await checkRes.json()) as { user: PiSessionUser | null }
       if (existing) {
@@ -94,28 +94,50 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
         return
       }
 
-      // Pi Browser WebView에서 fetch() Set-Cookie가 저장 안 되는 문제
-      // → form POST(pi-redirect)로 쿠키 저장 보장 (top-level navigation은 Set-Cookie 신뢰성 있음)
+      // 세션 없음 → next 파라미터 유무로 분기
       const next = new URLSearchParams(window.location.search).get('next')
-        ?? window.location.pathname
-      const form = document.createElement('form')
-      form.method = 'POST'
-      form.action = '/api/auth/pi-redirect'
-      form.style.display = 'none'
-      ;([
-        ['accessToken', auth.accessToken],
-        ['walletAddress', auth.user.wallet_address ?? ''],
-        ['to', next],
-      ] as [string, string][]).forEach(([name, value]) => {
-        const input = document.createElement('input')
-        input.type = 'hidden'
-        input.name = name
-        input.value = value
-        form.appendChild(input)
+      if (next) {
+        // 보호 페이지에서 리다이렉트된 경우:
+        // fetch() Set-Cookie가 WebView에 저장 안 되는 문제를 form POST로 우회
+        // top-level navigation의 Set-Cookie는 항상 저장됨
+        const form = document.createElement('form')
+        form.method = 'POST'
+        form.action = '/api/auth/pi-redirect'
+        form.style.display = 'none'
+        ;([
+          ['accessToken', auth.accessToken],
+          ['to', next],
+        ] as [string, string][]).forEach(([name, value]) => {
+          const input = document.createElement('input')
+          input.type = 'hidden'
+          input.name = name
+          input.value = value
+          form.appendChild(input)
+        })
+        document.body.appendChild(form)
+        form.submit()
+        return
+        // form.submit() → 페이지 이동, 이후 코드 실행 안 됨
+      }
+
+      // 홈 등 직접 접근: 기존 fetch 방식 (React 상태 갱신)
+      // 쿠키 미저장 시 보호 페이지 이동 시점에 form POST로 재처리됨
+      const res = await fetch('/api/auth/pi', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          accessToken: auth.accessToken,
+          walletAddress: auth.user.wallet_address ?? null,
+        }),
       })
-      document.body.appendChild(form)
-      form.submit()
-      // form.submit() → 페이지 이동 발생, 이후 코드 실행 안 됨
+      if (!res.ok) {
+        const data = (await res.json()) as { error?: string }
+        throw new Error(data.error ?? '서버 인증 실패')
+      }
+      const data = (await res.json()) as { user: PiSessionUser }
+      setUser(data.user)
+      router.refresh()
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Pi 인증 중 오류가 발생했습니다'
       if (msg !== 'timeout') setError(msg)
