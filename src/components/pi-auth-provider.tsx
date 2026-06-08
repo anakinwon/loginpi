@@ -5,6 +5,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from 'react'
 import { useRouter } from 'next/navigation'
@@ -60,6 +61,10 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
   const [isInPiBrowser, setIsInPiBrowser] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
+  // router를 ref로 관리: router.refresh()가 router 참조를 교체해도 signIn 콜백 참조는 안정 유지
+  // (router가 deps에 있으면 refresh() → 새 router → signIn 재생성 → useEffect 재실행 → 무한루프)
+  const routerRef = useRef(router)
+  useEffect(() => { routerRef.current = router }, [router])
 
   const signIn = useCallback(async () => {
     if (!window.Pi) {
@@ -90,7 +95,7 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
       const { user: existing } = (await checkRes.json()) as { user: PiSessionUser | null }
       if (existing) {
         setUser(existing)
-        router.refresh()
+        routerRef.current.refresh()
         return
       }
 
@@ -137,7 +142,7 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
       }
       const data = (await res.json()) as { user: PiSessionUser }
       setUser(data.user)
-      router.refresh()
+      routerRef.current.refresh()
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Pi 인증 중 오류가 발생했습니다'
       if (msg !== 'timeout') setError(msg)
@@ -145,15 +150,14 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setIsLoading(false)
     }
-  }, [router])
+  }, [])
 
   const signOut = useCallback(async () => {
     await fetch('/api/auth/pi', { method: 'DELETE', credentials: 'include' })
     setUser(null)
     setPiAccessToken(null)
-    // 쿠키 삭제 후 서버 컴포넌트 재실행 → showAdmin 즉시 제거
-    router.refresh()
-  }, [router])
+    routerRef.current.refresh()
+  }, [])
 
   const devLogin = useCallback(async () => {
     setIsLoading(true)
@@ -166,13 +170,13 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
       }
       const data = (await res.json()) as { user: PiSessionUser }
       setUser(data.user)
-      router.refresh()
+      routerRef.current.refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : '개발 로그인 실패')
     } finally {
       setIsLoading(false)
     }
-  }, [router])
+  }, [])
 
   useEffect(() => {
     if (typeof window !== 'undefined' && window.Pi) {
