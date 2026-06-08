@@ -1,6 +1,7 @@
 'use client'
 
 import {
+  Suspense,
   createContext,
   useCallback,
   useContext,
@@ -8,7 +9,7 @@ import {
   useRef,
   useState,
 } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import type { PiSessionUser } from '@/types/pi-session'
 
 export type { PiSessionUser }
@@ -54,6 +55,24 @@ async function onIncompletePayment(payment: PaymentDTO) {
   }
 }
 
+// useSearchParams는 Suspense 경계 안에서만 안전하게 사용 가능.
+// 이 컴포넌트는 UI 없이 next 파라미터 변경만 감지해 signIn을 재트리거.
+//
+// 문제: Next.js Link 탐색 시 SPA 방식으로 URL만 바뀌고 PiAuthProvider는 언마운트되지 않음.
+// 따라서 useEffect([signIn])은 재실행되지 않아 signIn()이 호출되지 않음.
+// 해결: useSearchParams()로 searchParams 변화를 React 반응형으로 감지해 signIn 재호출.
+function SearchParamsWatcher({ signIn }: { signIn: () => Promise<void> }) {
+  const searchParams = useSearchParams()
+
+  useEffect(() => {
+    const next = searchParams.get('next')
+    if (!next || typeof window === 'undefined' || !window.Pi) return
+    signIn()
+  }, [searchParams, signIn])
+
+  return null
+}
+
 export function PiAuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<PiSessionUser | null>(null)
   const [piAccessToken, setPiAccessToken] = useState<string | null>(null)
@@ -61,10 +80,14 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
   const [isInPiBrowser, setIsInPiBrowser] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
-  // router를 ref로 관리: router.refresh()가 router 참조를 교체해도 signIn 콜백 참조는 안정 유지
-  // (router가 deps에 있으면 refresh() → 새 router → signIn 재생성 → useEffect 재실행 → 무한루프)
+
+  // router를 ref로 관리: router.refresh() 후 router 참조가 바뀌어도 signIn 콜백 참조는 안정 유지
+  // router가 useCallback 의존성에 있으면 refresh() → 새 router → signIn 재생성 → useEffect 재실행 → 무한루프
   const routerRef = useRef(router)
   useEffect(() => { routerRef.current = router }, [router])
+
+  // 동시 호출 방지: signIn이 실행 중이면 중복 호출 무시
+  const isSigningInRef = useRef(false)
 
   const signIn = useCallback(async () => {
     if (!window.Pi) {
@@ -72,6 +95,8 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(false)
       return
     }
+    if (isSigningInRef.current) return
+    isSigningInRef.current = true
     setIsLoading(true)
     setError(null)
     try {
@@ -90,17 +115,22 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
       setIsInPiBrowser(true)
       setPiAccessToken(auth.accessToken)
 
-      // 기존 세션 쿠키 확인 (이미 로그인된 경우 추가 요청 불필요)
+      // 기존 세션 쿠키 확인 (이미 로그인된 경우 추가 POST 불필요)
       const checkRes = await fetch('/api/auth/pi', { credentials: 'include' })
       const { user: existing } = (await checkRes.json()) as { user: PiSessionUser | null }
+      const next = new URLSearchParams(window.location.search).get('next')
       if (existing) {
         setUser(existing)
+        if (next) {
+          // 쿠키 있음 + next 파라미터 → 목적지로 바로 이동 (전체 페이지 이동으로 쿠키 전달 보장)
+          window.location.assign(next)
+          return
+        }
         routerRef.current.refresh()
         return
       }
 
       // 세션 없음 → next 파라미터 유무로 분기
-      const next = new URLSearchParams(window.location.search).get('next')
       if (next) {
         // 보호 페이지에서 리다이렉트된 경우:
         // fetch() Set-Cookie가 WebView에 저장 안 되는 문제를 form POST로 우회
@@ -149,6 +179,7 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
       setIsInPiBrowser(false)
     } finally {
       setIsLoading(false)
+      isSigningInRef.current = false
     }
   }, [])
 
@@ -178,12 +209,12 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
+  // 초기 마운트 시 Pi SDK 인증 (next 파라미터 없는 경우만 — next 있으면 SearchParamsWatcher가 처리)
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.Pi) {
-      // Pi SDK가 있음 → signIn() 시도
-      // 성공: isInPiBrowser=true / 실패·타임아웃: isInPiBrowser=false
+    const hasNext = new URLSearchParams(window.location.search).has('next')
+    if (typeof window !== 'undefined' && window.Pi && !hasNext) {
       signIn()
-    } else {
+    } else if (!window.Pi) {
       // Pi SDK 없음 → 일반 브라우저 확정, 기존 세션만 복원
       setIsInPiBrowser(false)
       fetch('/api/auth/pi', { credentials: 'include' })
@@ -194,12 +225,17 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
         .catch(() => {})
         .finally(() => setIsLoading(false))
     }
+    // hasNext && window.Pi 인 경우: SearchParamsWatcher의 effect가 처리
   }, [signIn])
 
   return (
     <PiAuthContext.Provider
       value={{ user, piAccessToken, isLoading, isInPiBrowser, signIn, signOut, devLogin, error }}
     >
+      {/* SearchParamsWatcher: next 파라미터 변경 감지용 (UI 없음, Suspense 필수) */}
+      <Suspense fallback={null}>
+        <SearchParamsWatcher signIn={signIn} />
+      </Suspense>
       {children}
     </PiAuthContext.Provider>
   )
