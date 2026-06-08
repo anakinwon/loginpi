@@ -7,6 +7,7 @@ interface InlinePurchasePromptProps {
   piAmount: number
   onSinglePurchase: () => void
   onSubscribe?: () => void
+  subscribing?: boolean
   onClose: () => void
 }
 
@@ -17,6 +18,7 @@ export function InlinePurchasePrompt({
   piAmount,
   onSinglePurchase,
   onSubscribe,
+  subscribing = false,
   onClose,
 }: InlinePurchasePromptProps) {
   if (!isOpen) return null
@@ -47,9 +49,17 @@ export function InlinePurchasePrompt({
           {onSubscribe && (
             <button
               onClick={onSubscribe}
-              className='w-full rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors hover:bg-muted'
+              disabled={subscribing}
+              className='w-full rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50'
             >
-              구독으로 이용하기
+              {subscribing ? (
+                <span className='flex items-center justify-center gap-2'>
+                  <span className='h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent' />
+                  구독 결제 중…
+                </span>
+              ) : (
+                '구독으로 이용하기'
+              )}
             </button>
           )}
 

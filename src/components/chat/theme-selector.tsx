@@ -1,5 +1,6 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import { useSubscribePlan } from '@/hooks/use-subscribe-plan'
 import { InlinePurchasePrompt } from './inline-purchase-prompt'
 
 export interface ThemeRow {
@@ -20,6 +21,13 @@ export function ThemeSelector({ selectedThemeCode, onSelect }: ThemeSelectorProp
   const [themes, setThemes] = useState<ThemeRow[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [promptTheme, setPromptTheme] = useState<ThemeRow | null>(null)
+
+  const { subscribe, paying } = useSubscribePlan({
+    onSuccess: useCallback(() => {
+      if (promptTheme) onSelect(promptTheme)
+      setPromptTheme(null)
+    }, [promptTheme, onSelect]),
+  })
 
   useEffect(() => {
     fetch('/api/chat/themes')
@@ -78,11 +86,9 @@ export function ThemeSelector({ selectedThemeCode, onSelect }: ThemeSelectorProp
           if (promptTheme) onSelect(promptTheme)
           setPromptTheme(null)
         }}
-        onSubscribe={() => {
-          // TASK-054 구독 시스템 구현 후 연결
-          setPromptTheme(null)
-        }}
-        onClose={() => setPromptTheme(null)}
+        onSubscribe={subscribe}
+        subscribing={paying}
+        onClose={() => { if (!paying) setPromptTheme(null) }}
       />
     </>
   )

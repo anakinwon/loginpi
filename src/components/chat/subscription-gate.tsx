@@ -1,9 +1,9 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { toast } from 'sonner'
 import { usePiAuth } from '@/components/pi-auth-provider'
 import { piFetch } from '@/lib/pi-fetch'
+import { useSubscribePlan } from '@/hooks/use-subscribe-plan'
 import { InlinePurchasePrompt } from './inline-purchase-prompt'
 
 // 유료 기능 접근 게이트.
@@ -62,7 +62,6 @@ export function SubscriptionGate({
   const [check, setCheck] = useState<CheckResult | null>(null)
   const [loading, setLoading] = useState(true)
   const [promptOpen, setPromptOpen] = useState(false)
-  const [paying, setPaying] = useState(false)
 
   const [reloadKey, setReloadKey] = useState(0)
   const reloadCheck = useCallback(() => setReloadKey((k) => k + 1), [])
@@ -90,64 +89,13 @@ export function SubscriptionGate({
     }
   }, [reloadKey])
 
-  const subscribe = useCallback(async () => {
-    if (!window.Pi) {
-      toast.error('Pi Browser에서만 구독 결제가 가능합니다')
-      return
-    }
-    setPaying(true)
-    try {
-      // 1. 서버에서 권위 있는 결제 파라미터 수신 (amount = price_pi)
-      const prep = await piFetch('/api/subscriptions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan_cd: planCd }),
-      })
-      if (!prep.ok) {
-        const d = (await prep.json()) as { error?: string }
-        throw new Error(d.error ?? '구독 준비 실패')
-      }
-      const params = (await prep.json()) as {
-        amount: number
-        memo: string
-        metadata: Record<string, unknown>
-      }
-
-      // 2. Pi 결제 — 완료 시 /payments/complete의 CHAT_SUBSCR 분기가 msg_subscr UPSERT
-      window.Pi.createPayment(params, {
-        onReadyForServerApproval: async (paymentId) => {
-          await fetch('/api/payments/approve', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ paymentId }),
-          })
-        },
-        onReadyForServerCompletion: async (paymentId, txid) => {
-          const res = await fetch('/api/payments/complete', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ paymentId, txid }),
-          })
-          setPaying(false)
-          if (res.ok) {
-            toast.success('구독이 시작되었습니다!')
-            setPromptOpen(false)
-            reloadCheck() // 권한 재확인 → children 렌더
-          } else {
-            toast.error('구독 완료 처리에 실패했습니다')
-          }
-        },
-        onCancel: () => setPaying(false),
-        onError: (e) => {
-          setPaying(false)
-          toast.error(e.message)
-        },
-      })
-    } catch (e) {
-      setPaying(false)
-      toast.error(e instanceof Error ? e.message : '구독 오류')
-    }
-  }, [planCd, reloadCheck])
+  const { subscribe, paying } = useSubscribePlan({
+    planCd,
+    onSuccess: useCallback(() => {
+      setPromptOpen(false)
+      reloadCheck()
+    }, [reloadCheck]),
+  })
 
   if (loading) {
     return (
