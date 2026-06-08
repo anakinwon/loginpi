@@ -482,7 +482,7 @@ Step 4: Pi 결제 (BASIC 0.1 π / PREMIUM 0.3 π)
 - 🔜 admin 12개 페이지 클라이언트 데이터 로드 전환 (현재는 PC 브라우저 권장 안내)
 - 🔜 dead route 정리: `pi-code` · `pi-callback` · `pi-redirect` (쿠키 흐름 제거로 미사용)
 
-### TASK-054: 구독 시스템 (플랜 + Pi 결제 + PiRC2 Soroban) 🔜
+### TASK-054: 구독 시스템 (플랜 + Pi 결제 + PiRC2 Soroban) ✅ 완료 (2026-06-09)
 
 > **PiRC2 컨트랙트** (Pi Testnet): `CCUF75B6W3HRJTJD6O7OXNI72HGJ7DERZ5MUNOMFMSK23ME5GUIKPFYV`
 > 공식 문서: https://github.com/PiNetwork/PiRC (PiRC2 디렉토리, 9개 섹션)
@@ -490,12 +490,13 @@ Step 4: Pi 결제 (BASIC 0.1 π / PREMIUM 0.3 π)
 
 #### 구현 파일
 
-- 🔜 `src/lib/chat-auth.ts` — `getChatPlan()`, `canCreateRoom()`, `canSendTip()`, `getAiQuota()` (server-only)
-- 🔜 `GET /api/subscriptions/plans` — 플랜 목록 + 현재 사용자 등급
-- 🔜 `POST /api/subscriptions` — 구독 시작 (Pi 결제 완료 후 `msg_subscr` UPSERT, metadata.type=`CHAT_SUBSCR`)
-- 🔜 `DELETE /api/subscriptions` — 구독 취소 (논리삭제 + PiRC2 `cancel()` 호출 예정)
-- 🔜 `GET /api/subscriptions/check` — 기능별 권한 체크 `{ canTip, canCreateRoom, aiQuota... }`
-- 🔜 `src/components/chat/subscription-gate.tsx` — 유료 기능 접근 제어 컴포넌트
+- ✅ `src/lib/chat-auth.ts` — `getChatPlan()`·`canCreateRoom()`·`canSendTip()`·`getAiQuota()` (server-only). 등급별 한도를 `PLAN_CAPS` 단일 매트릭스로 관리(무제한 = `-1` 센티넬)
+- ✅ `GET /api/subscriptions/plans` — 플랜 목록 + 현재 사용자 등급
+- ✅ `POST /api/subscriptions` — 구독 결제 준비. 서버가 `price_pi`로 amount를 권위 있게 확정해 `createPayment` 파라미터 반환(metadata.type=`CHAT_SUBSCR`)
+- ✅ `DELETE /api/subscriptions` — 구독 취소. `auto_renew_yn='N'`만 해제하고 `expire_dtm`까지 이용 유지(만료 시 `getChatPlan`이 자동 FREE 강등). 즉시 논리삭제는 환불정책+PiRC2 `cancel()` 연동 시로 보류
+- ✅ `GET /api/subscriptions/check` — 기능별 권한 매트릭스 `{ tier, canTip, canUsePremiumTheme, canCreateEventRoom, canCreateRoomFree, aiQuota... }`
+- ✅ `/api/payments/complete` — `CHAT_SUBSCR` 분기 추가. 결제 amount ≥ `price_pi` 서버 재검증 후 `mth_cnt` 기반 만료일 계산 + `msg_subscr` UPSERT(`usr_id` UNIQUE)
+- ✅ `src/components/chat/subscription-gate.tsx` — 유료 기능 접근 게이트(piFetch 권한확인 → 잠금 시 InlinePurchasePrompt 구독 결제)
 
 #### PiRC2 통합 전략
 
@@ -696,3 +697,4 @@ if (meta?.type === 'CHAT_SUBSCR') {
 | v2.0 | 2026-06-08 | TASK-052 완료 — 1:1 채팅 API (rooms·messages·join), supabase-client.ts, use-chat-room 훅(Realtime+presence), ChatMessageList(scroll-up 무한로드), ChatInput(rate limit 복원). tsc 통과. | anakin |
 | v2.1 | 2026-06-08 | TASK-053 완료 — 그룹 채팅방 생성 4단계 마법사 (ThemeSelector·InlinePurchasePrompt·GroupRoomCreator), payments/complete CHAT_ROOM_CREATE 분기, /chat 홈·/chat/[roomId] 페이지, Header 채팅 링크. M15 달성. | anakin |
 | v2.2 | 2026-06-08 | PiRC2 Soroban 스마트 컨트랙트 통합 문서화 — CLAUDE.md PiRC2 섹션 추가 (Contract ID·메서드·구독 매트릭스), TASK-054 PiRC2 기반 상세 업데이트, PRD_CHAT.md 구독 API 현행화, pi_pay SKILL.md PiRC2 구독 결제 섹션 추가. | anakin |
+| v2.3 | 2026-06-09 | TASK-054 완료 — 구독 시스템(앱 레벨 U2A). chat-auth.ts(PLAN_CAPS 권한 단일 소스), /api/subscriptions(plans·POST결제준비·DELETE취소·check), payments/complete CHAT_SUBSCR 분기(amount 서버 재검증 + msg_subscr UPSERT), subscription-gate.tsx. tsc·lint(0 errors) 통과. M16 구독 기반 완성. | anakin |

@@ -26,12 +26,28 @@ export default async function ChatRoomPage({ params }: Params) {
 
   if (!room) redirect(`/${locale}/chat`)
 
-  // 비멤버: 공개방이면 join 안내, 비공개방이면 홈으로
+  // 비멤버: 공개 그룹방이면 자동 입장, 비공개·이벤트방은 목록으로
   if (!mbr) {
-    if (room.is_public_yn === 'Y') {
-      redirect(`/${locale}/chat?join=${roomId}`)
+    if (room.room_tp_cd === 'G' && room.is_public_yn === 'Y') {
+      const { count } = await getSupabaseAdmin()
+        .from('msg_room_mbr')
+        .select('room_mbr_id', { count: 'exact', head: true })
+        .eq('room_id', roomId)
+        .eq('del_yn', 'N')
+      if ((count ?? 0) >= room.max_mbr_cnt) redirect(`/${locale}/chat`)
+      await getSupabaseAdmin()
+        .from('msg_room_mbr')
+        .insert({
+          room_id: roomId,
+          usr_id: user.id,
+          mbr_role_cd: 'MEMBER',
+          regr_id: user.display_name.slice(0, 20),
+          modr_id: user.display_name.slice(0, 20),
+        })
+      // insert 후 이하 코드에서 그대로 렌더
+    } else {
+      redirect(`/${locale}/chat`)
     }
-    redirect(`/${locale}/chat`)
   }
 
   // 초기 메시지 50건 (최신 → 오래된 순 조회 후 역순 정렬)

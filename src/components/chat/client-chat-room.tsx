@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Link } from '@/i18n/navigation'
 import { usePiAuth } from '@/components/pi-auth-provider'
 import { piFetch } from '@/lib/pi-fetch'
@@ -8,6 +8,7 @@ import { ChatRoomPanel } from './chat-room-panel'
 import type { ChatMessage } from '@/hooks/use-chat-room'
 
 type RoomInfo = { room_nm: string; room_desc: string | null; theme_cd: string }
+type PublicPreview = { room_nm: string; theme_cd: string }
 
 // Pi Browser 전용 채팅방 게이트.
 // 서버가 쿠키로 신원을 못 찾을 때 렌더되며, localStorage 토큰을 X-Pi-Token 헤더로 실어
@@ -28,17 +29,30 @@ export function ClientChatRoom({ roomId }: { roomId: string }) {
   const [room, setRoom] = useState<RoomInfo | null>(null)
   const [themeEmoji, setThemeEmoji] = useState('💬')
   const [initialMessages, setInitialMessages] = useState<ChatMessage[]>([])
-  const [state, setState] = useState<'loading' | 'ready' | 'forbidden' | 'error'>('loading')
+  const [state, setState] = useState<'loading' | 'ready' | 'joinable' | 'joining' | 'forbidden' | 'error'>('loading')
+  const [joinPreview, setJoinPreview] = useState<PublicPreview | null>(null)
+  const [loadKey, setLoadKey] = useState(0)
 
   useEffect(() => {
     if (!user) return
     let cancelled = false
 
     ;(async () => {
+      setState('loading')
       const roomRes = await piFetch(`/api/chat/rooms/${roomId}`)
       if (cancelled) return
       if (roomRes.status === 403) {
-        setState('forbidden')
+        try {
+          const errData = (await roomRes.json()) as { isPublic?: boolean; room?: PublicPreview }
+          if (errData.isPublic && errData.room) {
+            setJoinPreview(errData.room)
+            setState('joinable')
+          } else {
+            setState('forbidden')
+          }
+        } catch {
+          setState('forbidden')
+        }
         return
       }
       if (!roomRes.ok) {
@@ -64,7 +78,25 @@ export function ClientChatRoom({ roomId }: { roomId: string }) {
     return () => {
       cancelled = true
     }
-  }, [user, roomId])
+  }, [user, roomId, loadKey])
+
+  const handleJoin = useCallback(async () => {
+    setState('joining')
+    try {
+      const res = await piFetch(`/api/chat/rooms/${roomId}/join`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      })
+      if (res.ok) {
+        setLoadKey((k) => k + 1)
+      } else {
+        setState('forbidden')
+      }
+    } catch {
+      setState('forbidden')
+    }
+  }, [roomId])
 
   if (authLoading) return <Centered>Pi 계정 인증 중…</Centered>
   if (!user) {
@@ -76,6 +108,27 @@ export function ClientChatRoom({ roomId }: { roomId: string }) {
     )
   }
   if (state === 'loading') return <Centered>채팅방을 불러오는 중…</Centered>
+
+  if (state === 'joinable' || state === 'joining') {
+    return (
+      <Centered>
+        {joinPreview && <p className='font-semibold'>{joinPreview.room_nm}</p>}
+        <p>공개 채팅방입니다. 입장하시겠습니까?</p>
+        <button
+          type='button'
+          disabled={state === 'joining'}
+          onClick={handleJoin}
+          className='rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50'
+        >
+          {state === 'joining' ? '입장 중…' : '입장하기'}
+        </button>
+        <Link href='/chat' className='text-xs text-muted-foreground underline'>
+          목록으로
+        </Link>
+      </Centered>
+    )
+  }
+
   if (state === 'forbidden') {
     return (
       <Centered>

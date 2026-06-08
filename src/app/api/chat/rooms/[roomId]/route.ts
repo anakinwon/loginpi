@@ -17,7 +17,16 @@ export async function GET(_request: Request, { params }: Params) {
   ])
 
   if (!room) return NextResponse.json({ error: '채팅방을 찾을 수 없습니다' }, { status: 404 })
-  if (!mbr) return NextResponse.json({ error: '채팅방 멤버가 아닙니다' }, { status: 403 })
+  if (!mbr) {
+    // 공개 그룹방이면 클라이언트가 입장 CTA를 보여줄 수 있도록 방 미리보기 포함
+    if (room.room_tp_cd === 'G' && room.is_public_yn === 'Y') {
+      return NextResponse.json(
+        { error: '채팅방 멤버가 아닙니다', isPublic: true, room: { room_nm: room.room_nm, theme_cd: room.theme_cd } },
+        { status: 403 }
+      )
+    }
+    return NextResponse.json({ error: '채팅방 멤버가 아닙니다' }, { status: 403 })
+  }
 
   // 테마 이모지 — 클라이언트 게이트(ClientChatRoom) 헤더 렌더용
   const { data: theme } = await getSupabaseAdmin()

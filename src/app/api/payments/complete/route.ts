@@ -53,6 +53,7 @@ export async function POST(request: NextRequest) {
 
     // CHAT_ROOM_CREATE: 결제 완료 시 그룹 채팅방 생성
     let createdRoom: Record<string, unknown> | null = null
+    let grantedSubscr: Record<string, unknown> | null = null
     const meta = payment.metadata as Record<string, unknown> | null
     if (meta?.type === 'CHAT_ROOM_CREATE' && payment.user_uid) {
       const { data: owner } = await db
@@ -90,6 +91,56 @@ export async function POST(request: NextRequest) {
           createdRoom = room as Record<string, unknown>
         }
       }
+    } else if (meta?.type === 'CHAT_SUBSCR' && payment.user_uid) {
+      // CHAT_SUBSCR: 결제 완료 시 구독 시작/갱신 (msg_subscr UPSERT — usr_id UNIQUE)
+      const planCd = String(meta.plan_cd ?? '')
+      const [{ data: owner }, { data: plan }] = await Promise.all([
+        db.from('sys_user').select('id, display_name').eq('pi_uid', payment.user_uid).maybeSingle(),
+        db
+          .from('msg_subscr_plan')
+          .select('plan_cd, price_pi, mth_cnt')
+          .eq('plan_cd', planCd)
+          .eq('use_yn', 'Y')
+          .eq('del_yn', 'N')
+          .maybeSingle(),
+      ])
+
+      if (owner && plan) {
+        const ownerRow = owner as { id: string; display_name: string | null }
+        const planRow = plan as { plan_cd: string; price_pi: number; mth_cnt: number }
+        const slug = String(ownerRow.display_name ?? 'user').slice(0, 20)
+
+        // 결제 금액이 플랜 가격 이상인지 서버 재검증 (클라이언트 amount 조작 방지, 부동소수 오차 허용)
+        if (Number(payment.amount) + 1e-6 >= planRow.price_pi) {
+          const months = planRow.mth_cnt > 0 ? planRow.mth_cnt : 1
+          const now = new Date()
+          const expire = new Date(now)
+          expire.setMonth(expire.getMonth() + months)
+
+          const { data: subscr } = await db
+            .from('msg_subscr')
+            .upsert(
+              {
+                usr_id: ownerRow.id,
+                plan_cd: planRow.plan_cd,
+                pymnt_id: paymentId,
+                start_dtm: now.toISOString(),
+                expire_dtm: expire.toISOString(),
+                auto_renew_yn: 'Y',
+                del_yn: 'N',
+                del_dtm: null,
+                regr_id: slug,
+                modr_id: slug,
+                mod_dtm: now.toISOString(),
+              },
+              { onConflict: 'usr_id' }
+            )
+            .select()
+            .single()
+
+          grantedSubscr = (subscr as Record<string, unknown>) ?? null
+        }
+      }
     }
 
     // 구글 계정 연동 사용자에게 결제 영수증 이메일 발송 (비동기 — 실패해도 결제 응답에 영향 없음)
@@ -117,7 +168,7 @@ export async function POST(request: NextRequest) {
       })()
     }
 
-    return NextResponse.json({ success: true, payment, room: createdRoom })
+    return NextResponse.json({ success: true, payment, room: createdRoom, subscription: grantedSubscr })
   } catch {
     return NextResponse.json({ error: 'Pi Network API 연결 실패' }, { status: 502 })
   }
