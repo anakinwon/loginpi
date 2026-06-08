@@ -5,8 +5,8 @@ import type { PiSessionUser } from '@/types/pi-session'
 // Pi Browser 대체 2단계: 네비게이션 토큰 → pi_session 쿠키 교환
 //
 // 클라이언트가 window.location.href(GET)로 이 URL에 접근.
-// GET 네비게이션 응답의 Set-Cookie는 WebView에 안정적으로 저장됨.
-// 200 HTML 응답 + JS redirect로 쿠키를 200 응답에 첨부 — 302보다 안전한 WebView 쿠키 저장.
+// GET 네비게이션 302 응답의 Set-Cookie는 WebView에 안정적으로 저장됨.
+// (form POST와 달리 GET 탑레벨 네비게이션은 Pi Browser WebView가 차단하지 않음)
 
 const MAX_COOKIE_AGE_SEC = 7 * 24 * 60 * 60
 
@@ -14,7 +14,7 @@ interface NavTokenPayload extends PiSessionUser {
   exp: number
 }
 
-// 허용 문자만 통과: 알파벳·숫자·URL 안전 특수문자만 허용해 HTML/JS 인젝션 원천 차단
+// 알파벳·숫자·URL 안전 특수문자만 허용 — HTML/JS 인젝션 가능한 <>"'` 등 원천 차단
 function safeRedirectPath(to: string | null): string {
   if (!to || !/^\/[A-Za-z0-9\-_./?=&%#]*$/.test(to)) return '/'
   return to
@@ -60,15 +60,8 @@ export async function GET(request: NextRequest) {
 
   const signed = signPayload(sessionData, secret)
 
-  // 302 대신 200 HTML 응답: Set-Cookie가 200 응답에 첨부되어 WebView 쿠키 저장이 더 안정적
-  // JSON.stringify로 to를 안전하게 직렬화: 모든 특수문자 이스케이프 + </script> 인젝션 방지
-  const safeJson = JSON.stringify(to).replace(/</g, '\\u003c')
-  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><script>window.location.replace(${safeJson})</script></head><body></body></html>`
-
-  const response = new NextResponse(html, {
-    status: 200,
-    headers: { 'Content-Type': 'text/html; charset=utf-8' },
-  })
+  // HTML 빌딩 없이 302 redirect — XSS 위험 없는 가장 단순한 방식
+  const response = NextResponse.redirect(new URL(to, request.url))
   response.cookies.set('pi_session', signed, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
