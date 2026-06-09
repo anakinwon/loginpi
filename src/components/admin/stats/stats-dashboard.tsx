@@ -13,6 +13,15 @@ const RevenueDonutChart = dynamic(() => import('@/components/charts/revenue-donu
 
 const MEDALS = ['🥇', '🥈', '🥉']
 
+// msg_theme에 등록되지 않은 시스템 코드 한국어 레이블
+const THEME_LABEL: Record<string, string> = {
+  SUBSCRIPTION: '구독',
+  UNKNOWN: '기타',
+}
+function themeLabel(cd: string): string {
+  return THEME_LABEL[cd] ?? cd
+}
+
 function TopUsersList({ users, loading }: { users: TopUser[]; loading: boolean }) {
   if (loading) {
     return (
@@ -63,7 +72,7 @@ function TopThemesList({ themes, loading }: { themes: TopTheme[]; loading: boole
           <span className='text-base'>{MEDALS[i] ?? `${i + 1}.`}</span>
           <span className='shrink-0'>{t.theme_emoji ?? ''}</span>
           <span className='min-w-0 flex-1 truncate font-medium'>
-            {t.theme_nm ?? t.theme_cd}
+            {t.theme_nm ?? themeLabel(t.theme_cd)}
           </span>
           <span className='text-muted-foreground shrink-0'>{t.total_pi.toFixed(2)} π</span>
         </li>

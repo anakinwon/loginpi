@@ -2,11 +2,13 @@
 import { useEffect, useRef, useCallback, useState } from 'react'
 import { piFetch } from '@/lib/pi-fetch'
 import type { ChatMessage } from '@/hooks/use-chat-room'
+import { PiTipButton } from './pi-tip-button'
 
 interface ChatMessageListProps {
   roomId: string
   messages: ChatMessage[]
   currentUserId: string
+  canTip: boolean
   prependMessages: (msgs: ChatMessage[]) => void
 }
 
@@ -14,6 +16,7 @@ export function ChatMessageList({
   roomId,
   messages,
   currentUserId,
+  canTip,
   prependMessages,
 }: ChatMessageListProps) {
   const [hasMore, setHasMore] = useState(messages.length >= 50)
@@ -86,7 +89,7 @@ export function ChatMessageList({
           {(idx === 0 || !isSameDay(messages[idx - 1].reg_dtm, msg.reg_dtm)) && (
             <DateDivider dtm={msg.reg_dtm} />
           )}
-          <MessageBubble msg={msg} isMe={msg.snd_usr_id === currentUserId} />
+          <MessageBubble msg={msg} isMe={msg.snd_usr_id === currentUserId} canTip={canTip} roomId={roomId} />
         </div>
       ))}
       <div ref={bottomRef} />
@@ -130,7 +133,9 @@ function formatKoreanTime(dtm: string): string {
   return `${period} ${h12.toString().padStart(2, '0')}:${m}`
 }
 
-function MessageBubble({ msg, isMe }: { msg: ChatMessage; isMe: boolean }) {
+function MessageBubble({ msg, isMe, canTip, roomId }: {
+  msg: ChatMessage; isMe: boolean; canTip: boolean; roomId: string
+}) {
   if (msg.msg_tp_cd === 'SYSTEM' || msg.msg_tp_cd === 'TIP_NOTI') {
     return (
       <div className='py-1 text-center text-xs text-muted-foreground'>
@@ -140,7 +145,7 @@ function MessageBubble({ msg, isMe }: { msg: ChatMessage; isMe: boolean }) {
   }
 
   return (
-    <div className={`flex flex-col gap-0.5 ${isMe ? 'items-end' : 'items-start'}`}>
+    <div className={`group flex flex-col gap-0.5 ${isMe ? 'items-end' : 'items-start'}`}>
       {!isMe && (
         <span className='text-xs text-muted-foreground'>{msg.snd_usr_nm}</span>
       )}
@@ -153,9 +158,14 @@ function MessageBubble({ msg, isMe }: { msg: ChatMessage; isMe: boolean }) {
       >
         {msg.msg_cont}
       </div>
-      <span className='text-[10px] text-muted-foreground'>
-        {formatKoreanTime(msg.reg_dtm)}
-      </span>
+      <div className='flex items-center gap-1'>
+        <span className='text-[10px] text-muted-foreground'>
+          {formatKoreanTime(msg.reg_dtm)}
+        </span>
+        {!isMe && canTip && (
+          <PiTipButton roomId={roomId} recipientId={msg.snd_usr_id} recipientName={msg.snd_usr_nm} />
+        )}
+      </div>
     </div>
   )
 }
