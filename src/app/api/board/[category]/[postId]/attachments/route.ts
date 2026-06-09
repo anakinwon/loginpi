@@ -10,6 +10,22 @@ const MAX_SIZE = 20 * 1024 * 1024 // 20MB
 
 type Params = { params: Promise<{ category: string; postId: string }> }
 
+// GET /api/board/[category]/[postId]/attachments — 첨부파일 목록 조회
+export async function GET(_request: NextRequest, { params }: Params) {
+  const { postId } = await params
+  const db = getSupabaseAdmin()
+
+  const { data, error } = await db
+    .from('brd_attch')
+    .select('attch_id, fl_nm, fl_url, fl_sz, fl_tp, reg_dtm')
+    .eq('post_id', postId)
+    .eq('del_yn', 'N')
+    .order('reg_dtm', { ascending: true })
+
+  if (error) return NextResponse.json({ error: '첨부파일 조회 실패' }, { status: 500 })
+  return NextResponse.json({ attachments: data ?? [] })
+}
+
 // POST /api/board/[category]/[postId]/attachments — 파일 업로드
 export async function POST(request: NextRequest, { params }: Params) {
   const { category, postId } = await params
