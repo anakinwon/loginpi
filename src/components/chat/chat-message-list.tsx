@@ -87,14 +87,28 @@ export function ChatMessageList({
       {!hasMore && messages.length > 0 && (
         <div className='py-2 text-center text-xs text-muted-foreground'>대화의 시작입니다</div>
       )}
-      {messages.map((msg, idx) => (
-        <div key={msg.msg_id}>
-          {(idx === 0 || !isSameDay(messages[idx - 1].reg_dtm, msg.reg_dtm)) && (
-            <DateDivider dtm={msg.reg_dtm} />
-          )}
-          <MessageBubble msg={msg} isMe={msg.snd_usr_id === currentUserId} canTip={canTip} roomId={roomId} />
-        </div>
-      ))}
+      {messages.map((msg, idx) => {
+        const next = messages[idx + 1]
+        // 다음 메시지가 동일 발신자 + 동일 분이면 현재 메시지의 시간 숨김
+        const hideTime = !!next &&
+          next.snd_usr_id === msg.snd_usr_id &&
+          formatKoreanTime(next.reg_dtm) === formatKoreanTime(msg.reg_dtm) &&
+          isSameDay(next.reg_dtm, msg.reg_dtm)
+        return (
+          <div key={msg.msg_id}>
+            {(idx === 0 || !isSameDay(messages[idx - 1].reg_dtm, msg.reg_dtm)) && (
+              <DateDivider dtm={msg.reg_dtm} />
+            )}
+            <MessageBubble
+              msg={msg}
+              isMe={msg.snd_usr_id === currentUserId}
+              canTip={canTip}
+              roomId={roomId}
+              hideTime={hideTime}
+            />
+          </div>
+        )
+      })}
       <div ref={bottomRef} />
     </div>
   )
@@ -136,8 +150,8 @@ function formatKoreanTime(dtm: string): string {
   return `${period} ${h12.toString().padStart(2, '0')}:${m}`
 }
 
-function MessageBubble({ msg, isMe, canTip, roomId }: {
-  msg: ChatMessage; isMe: boolean; canTip: boolean; roomId: string
+function MessageBubble({ msg, isMe, canTip, roomId, hideTime }: {
+  msg: ChatMessage; isMe: boolean; canTip: boolean; roomId: string; hideTime: boolean
 }) {
   if (msg.msg_tp_cd === 'SYSTEM' || msg.msg_tp_cd === 'TIP_NOTI') {
     return (
@@ -161,14 +175,16 @@ function MessageBubble({ msg, isMe, canTip, roomId }: {
       >
         {msg.msg_cont}
       </div>
-      <div className='flex items-center gap-1'>
-        <span className='text-[10px] text-muted-foreground'>
-          {formatKoreanTime(msg.reg_dtm)}
-        </span>
-        {!isMe && canTip && (
-          <PiTipButton roomId={roomId} recipientId={msg.snd_usr_id} recipientName={msg.snd_usr_nm} />
-        )}
-      </div>
+      {!hideTime && (
+        <div className='flex items-center gap-1'>
+          <span className='text-[10px] text-muted-foreground'>
+            {formatKoreanTime(msg.reg_dtm)}
+          </span>
+          {!isMe && canTip && (
+            <PiTipButton roomId={roomId} recipientId={msg.snd_usr_id} recipientName={msg.snd_usr_nm} />
+          )}
+        </div>
+      )}
     </div>
   )
 }
