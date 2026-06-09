@@ -51,14 +51,22 @@ export function useChatRoom(
     setMessages(prev => prev.filter(m => m.msg_id !== msgId))
   }, [])
 
-  // 서버 응답(real msg_id)과 서버 브로드캐스트 간 경쟁 조건 처리:
-  // - 브로드캐스트가 먼저 도착한 경우: real msg_id가 이미 존재 → temp만 제거
-  // - API 응답이 먼저 도착한 경우: temp → real로 교체 → 이후 브로드캐스트는 dedup으로 무시
+  // 서버 응답으로 낙관적 temp 메시지를 교체
+  // 서버가 클라이언트 UUID를 그대로 사용하므로 tempId === realMsg.msg_id 가 일반적
+  // → 이 경우 제자리 업데이트(서버 타임스탬프 반영), 삭제 후 재추가 안 함
+  // → 이후 도착하는 브로드캐스트는 addMessage dedup으로 무시됨
   const replaceMessage = useCallback((tempId: string, realMsg: ChatMessage) => {
     setMessages(prev => {
+      if (tempId === realMsg.msg_id) {
+        // 서버가 클라이언트 UUID 그대로 사용 — 제자리 교체
+        return prev.map(m => m.msg_id === tempId ? realMsg : m)
+      }
+      // 서버가 새 UUID를 생성한 경우 (레거시 경로)
       if (prev.some(m => m.msg_id === realMsg.msg_id)) {
+        // 브로드캐스트가 먼저 도착 → temp만 제거
         return prev.filter(m => m.msg_id !== tempId)
       }
+      // API 응답이 먼저 도착 → temp → real 교체
       return prev.map(m => m.msg_id === tempId ? realMsg : m)
     })
   }, [])

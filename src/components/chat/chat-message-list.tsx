@@ -25,6 +25,7 @@ export function ChatMessageList({
   const bottomRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const isInitial = useRef(true)
+  const lastMsgIdRef = useRef<string | null>(null)
 
   // 최초 렌더 시 맨 아래로 스크롤
   useEffect(() => {
@@ -34,10 +35,12 @@ export function ChatMessageList({
     }
   }, [])
 
-  // 새 메시지 도착 시 맨 아래로 스크롤 (자신이 보낸 메시지 or 화면 하단에 있을 때)
+  // 새 메시지가 추가될 때만 스크롤 (제자리 업데이트는 무시)
+  // replaceMessage 인플레이스 교체 시 msg_id가 바뀌지 않으므로 이중 스크롤 방지
   useEffect(() => {
     const last = messages[messages.length - 1]
-    if (!last) return
+    if (!last || last.msg_id === lastMsgIdRef.current) return
+    lastMsgIdRef.current = last.msg_id
     if (last.snd_usr_id === currentUserId) {
       bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
     }
