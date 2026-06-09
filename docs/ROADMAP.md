@@ -692,17 +692,17 @@ if (meta?.type === 'CHAT_SUBSCR') {
 > **상세 스펙**: `docs/PRD_6_CHART.md` | **담당 에이전트**: `.claude/agents/chart/dashboard-stats-builder.md`
 > **핵심 결정**: ① 차트 = **react-plotly.js**(순수 JS, `ssr:false` dynamic) ② 활동집계 = **신규 활동 로그**(하루 1행 UPSERT) ③ 집계방식 = **중간집계(Rollup) 테이블 사전 집계 → 대시보드 직접 조회**
 
-### TASK-080: 활동 로그 마이그레이션 (`sql/015`) 🔜
+### TASK-080: 활동 로그 마이그레이션 (`sql/015`) ✅
 
-- 🔜 `sql/015_user_activity_log.sql` — `sys_user_actvty_log` (`UNIQUE(usr_id, actvty_dt)` 하루 1행)
-- 🔜 `fn_record_activity(usr_id, type)` — `ON CONFLICT DO UPDATE` UPSERT RPC
-- 🔜 DA 표준: 시스템 컬럼 4개 + `del_yn`, `-- DA-APPROVED:` 주석
+- ✅ `sql/015_user_activity_log.sql` — `sys_user_actvty_log` (`UNIQUE(usr_id, actvty_dt)` 하루 1행)
+- ✅ `fn_record_activity(usr_id, type)` — `ON CONFLICT DO UPDATE` UPSERT RPC
+- ✅ DA 표준: 시스템 컬럼 4개 + `del_yn`, `-- DA-APPROVED:` 주석
 
-### TASK-081: 활동 계측 (원천 적재 시작) 🔜
+### TASK-081: 활동 계측 (원천 적재 시작) ✅
 
-- 🔜 `src/lib/activity-log.ts` — `recordActivity()` fire-and-forget 헬퍼
-- 🔜 인증 진입점(`getSessionUser()` 성공 / 로그인 API)에서 계측 (미들웨어 전체 계측 지양)
-- ⚠️ **소급 불가** — 본 태스크를 가장 먼저 배포해 데이터 축적 시작
+- ✅ `src/lib/activity-log.ts` — `recordActivity()` fire-and-forget 헬퍼
+- ✅ `/api/auth/pi` GET(세션 복원) · POST(로그인) 양쪽 계측 삽입
+- ⚠️ **소급 불가** — 배포 즉시 데이터 축적 시작
 
 ### TASK-082: 중간집계 테이블 + 집계 RPC (`sql/016`) 🔜
 

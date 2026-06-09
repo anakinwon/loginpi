@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { signPayload, verifyPayload } from '@/lib/pi-session-crypto'
 import { upsertPiUser } from '@/lib/users'
+import { recordActivity } from '@/lib/activity-log'
 import type { PiSessionUser } from '@/types/pi-session'
 
 const PI_API_URL = 'https://api.minepi.com/v2/me'
@@ -33,6 +34,8 @@ export async function GET(request: NextRequest) {
     res.cookies.delete('pi_session')
     return res
   }
+  // 세션 복원 성공 → 활동 기록 (fire-and-forget)
+  if (user.userId) recordActivity(user.userId, 'LOGIN')
   return NextResponse.json({ user })
 }
 
@@ -86,6 +89,9 @@ export async function POST(request: NextRequest) {
   } catch {
     // DB 오류 시 userId 없이 계속 진행 (graceful degradation)
   }
+
+  // 로그인 성공 → 활동 기록 (fire-and-forget)
+  if (userId) recordActivity(userId, 'LOGIN')
 
   // Pi 토큰 만료 → 쿠키 maxAge
   const tokenExpiresAt = new Date(piUser.credentials.valid_until.iso8601).getTime()
