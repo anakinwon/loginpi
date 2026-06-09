@@ -5,7 +5,7 @@
 | 항목 | 내용 |
 |------|------|
 | 문서명 | 보안 취약점 점검 결과 보고서 |
-| 점검 기준 문서 | `docs/PRD_SECURITY.md` |
+| 점검 기준 문서 | `docs/PRD_2_SECURITY.md` |
 | 점검 완료일 | 2026-06-03 |
 | 점검 수행자 | anakin.won@gmail.com |
 | 프로젝트명 | claude-nextjs-starters (표준데이터 관리 시스템) |
@@ -157,7 +157,7 @@ const auth = await requireAuth(req, ['USER', 'SUBMANAGER', 'MANAGER', 'MASTER', 
 if (!auth.ok) return auth.response
 ```
 
-**검증 근거:** PRD_SECURITY.md 체크리스트 SEC-003 완료 확인 (2026-06-03)
+**검증 근거:** PRD_2_SECURITY.md 체크리스트 SEC-003 완료 확인 (2026-06-03)
 
 ---
 
@@ -179,7 +179,7 @@ if (!auth.ok) return auth.response
 - 해당 3개 파일에서 `supabaseAdmin` → `createSupabaseServer()` (anon key + 세션 쿠키) 로 교체
 - RLS 기반 접근 제어 복원
 
-**검증 근거:** PRD_SECURITY.md 체크리스트 SEC-004 완료 확인 (2026-06-03)
+**검증 근거:** PRD_2_SECURITY.md 체크리스트 SEC-004 완료 확인 (2026-06-03)
 
 ---
 
@@ -286,7 +286,7 @@ export function noCacheHeaders(): HeadersInit {
 - 게시글 본문: 최대 10,000자 검증 추가
 - 댓글: 최대 1,000자 검증 추가
 
-**검증 근거:** PRD_SECURITY.md 체크리스트 SEC-008 완료 확인 (2026-06-03)
+**검증 근거:** PRD_2_SECURITY.md 체크리스트 SEC-008 완료 확인 (2026-06-03)
 
 ---
 
@@ -309,7 +309,7 @@ export function noCacheHeaders(): HeadersInit {
 const q = sp.get('q')?.trim()?.slice(0, 100)
 ```
 
-**검증 근거:** PRD_SECURITY.md 체크리스트 SEC-009 완료 확인 (2026-06-03)
+**검증 근거:** PRD_2_SECURITY.md 체크리스트 SEC-009 완료 확인 (2026-06-03)
 
 ---
 
@@ -331,7 +331,7 @@ const q = sp.get('q')?.trim()?.slice(0, 100)
 - `file-type` 패키지 도입 — 파일 헤더(Magic Byte) 기반 실제 MIME 타입 검증
 - 클라이언트 제공값 무시, 서버 자체 판별값 기준으로 화이트리스트 검사
 
-**검증 근거:** PRD_SECURITY.md 체크리스트 SEC-010 완료 확인 (2026-06-03)
+**검증 근거:** PRD_2_SECURITY.md 체크리스트 SEC-010 완료 확인 (2026-06-03)
 
 ---
 
@@ -355,7 +355,7 @@ const ext = file.name.split('.').pop()?.toLowerCase() ?? 'bin'
 const fl_pth = `${id}/${randomUUID()}.${ext}`
 ```
 
-**검증 근거:** PRD_SECURITY.md 체크리스트 SEC-011 완료 확인 (2026-06-03)
+**검증 근거:** PRD_2_SECURITY.md 체크리스트 SEC-011 완료 확인 (2026-06-03)
 
 ---
 
@@ -403,7 +403,7 @@ import { createClient } from '@supabase/supabase-js'
 - `.env` 파일의 Slack Webhook URL → 예시 플레이스홀더(`REPLACE_ME`)로 교체
 - 실제 URL은 `.env.local`에만 보관 (`.gitignore` 적용됨)
 
-**검증 근거:** PRD_SECURITY.md 체크리스트 SEC-013 완료 확인 (2026-06-03)
+**검증 근거:** PRD_2_SECURITY.md 체크리스트 SEC-013 완료 확인 (2026-06-03)
 
 ---
 
@@ -453,7 +453,7 @@ function sanitizeNext(next: string | null): string {
 }
 ```
 
-**검증 근거:** PRD_SECURITY.md 체크리스트 SEC-015 완료 확인 (2026-06-03)
+**검증 근거:** PRD_2_SECURITY.md 체크리스트 SEC-015 완료 확인 (2026-06-03)
 
 ---
 
@@ -512,7 +512,7 @@ try {
 }
 ```
 
-**검증 근거:** PRD_SECURITY.md 체크리스트 SEC-017 완료 확인 (2026-06-03)
+**검증 근거:** PRD_2_SECURITY.md 체크리스트 SEC-017 완료 확인 (2026-06-03)
 
 ---
 
@@ -569,7 +569,7 @@ export function handleDbError(error: unknown, context?: string): NextResponse {
 - 관리자 로그인 성공 (`ADMIN_LOGIN`) 기록
 - 인증 없는 접근 시도 (`UNAUTHORIZED_ACCESS`) 기록
 
-**검증 근거:** PRD_SECURITY.md 체크리스트 SEC-019 완료 확인 (2026-06-03)
+**검증 근거:** PRD_2_SECURITY.md 체크리스트 SEC-019 완료 확인 (2026-06-03)
 
 ---
 
@@ -693,7 +693,7 @@ try {
 }
 ```
 
-**검증 근거:** PRD_SECURITY.md 체크리스트 SEC-023 완료 확인 (2026-06-03)
+**검증 근거:** PRD_2_SECURITY.md 체크리스트 SEC-023 완료 확인 (2026-06-03)
 
 ---
 
@@ -853,4 +853,4 @@ if (!auth.ok) return auth.response
 
 ---
 
-*본 보고서는 `docs/PRD_SECURITY.md` 요구사항 명세를 기준으로 실제 코드베이스를 점검한 결과를 기록한 공식 제출용 문서입니다.*
+*본 보고서는 `docs/PRD_2_SECURITY.md` 요구사항 명세를 기준으로 실제 코드베이스를 점검한 결과를 기록한 공식 제출용 문서입니다.*

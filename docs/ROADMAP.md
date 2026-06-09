@@ -2,8 +2,8 @@
 
 Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Network 앱 플랫폼
 
-> **기준일**: 2026-06-07
-> **현재 버전**: Phase 6 완료 · Phase 7~9 설계 완료 (구현 대기)
+> **기준일**: 2026-06-09
+> **현재 버전**: Phase 7 완료 (PiChat MVP) · Phase 10 사용자 프로필 완료 · Phase 11 통계 대시보드 계획 · Phase 8~9 대기
 > **배포 URL**: https://loginpi.vercel.app
 > **기술 스택**: Next.js 16 App Router · React 19 · TypeScript 6 · Tailwind CSS v4 · NextAuth.js · Supabase PostgreSQL
 
@@ -395,10 +395,10 @@ brd_attch 8행  — fl_nm/fl_pth/fl_url/fl_sz/fl_tp, del_yn 논리삭제
 
 ---
 
-## Phase 7: PiChat MVP 🔜 (준비중)
+## Phase 7: PiChat MVP ✅ (완료)
 
 > **목표**: 테마 기반 1:1·그룹 채팅 + Supabase Realtime + Pi 결제 연동 + 구독 시스템
-> **상세 스펙**: `docs/PRD_CHAT.md` (v1.2)
+> **상세 스펙**: `docs/PRD_4_CHAT.md` (v1.2)
 
 ### TASK-050: DB 마이그레이션 (`msg_*` 13개 테이블) ✅ 완료
 
@@ -623,6 +623,126 @@ if (meta?.type === 'CHAT_SUBSCR') {
 
 ---
 
+## Phase 10: 사용자 프로필 관리 (마이페이지) ✅ 완료 (2026-06-09)
+
+> **목표**: 개인정보 수정 · 결제 내역 · 구독 현황 — Pi Browser 실기기 동작 보장 최우선
+> **상세 스펙**: `docs/PRD_5_USERS.md` | **담당 에이전트**: `.claude/agents/user-profile-manager.md`
+> **빌드 검증**: `pnpm tsc --noEmit` 통과 · `pnpm lint` 0 errors · `pnpm build` 성공
+
+### TASK-056: DB 마이그레이션 — sys_user 프로필 컬럼 추가 ✅
+
+- ✅ `sql/014_user_profile_columns.sql` 작성
+- ✅ `real_nm TEXT`, `nick_nm TEXT`, `phone_no TEXT`, `addr TEXT`, `addr_dtl TEXT` 컬럼 추가
+- ✅ DA 표준 준수 (시스템 컬럼 4개 기존 보유, 논리삭제 del_yn='Y' 정책 유지)
+- ✅ Supabase 적용 완료 확인
+
+### TASK-057: API — GET /api/profile ✅
+
+- ✅ `src/app/api/profile/route.ts` (GET) 구현
+- ✅ `getSessionUser()` — 쿠키/X-Pi-Token 이중 인증 자동 지원
+- ✅ sys_user 조회 → UserRow(프로필 확장 포함) 반환
+- ✅ `src/lib/users.ts` — `UserRow` 타입 확장 (5개 컬럼 추가)
+
+### TASK-058: API — PATCH /api/profile ✅
+
+- ✅ `src/app/api/profile/route.ts` (PATCH) 구현
+- ✅ Zod v4 스키마 검증 (real_nm, nick_nm, phone_no, addr, addr_dtl, display_name)
+- ✅ `src/lib/users.ts` — `updateUserProfile()` 함수 추가
+- ✅ `modr_id`, `mod_dtm` 자동 갱신 (DA 표준)
+
+### TASK-059: API — GET /api/profile/payments ✅
+
+- ✅ `src/app/api/profile/payments/route.ts` (GET) 구현
+- ✅ pi_pymnt 테이블 — user_id 기준 최신순 20건 조회
+- ✅ status·amount·memo·reg_dtm 포함 응답
+
+### TASK-060: 컴포넌트 — ProfileTabs + ClientProfileGate ✅
+
+- ✅ `src/app/[locale]/profile/page.tsx` — Server Component
+  - `getSessionUser()` null 시 `<ClientProfileGate />` 반환 (**redirect 절대 금지**)
+- ✅ `src/app/[locale]/profile/_components/client-profile-gate.tsx` — Pi Browser 게이트
+  - localStorage `pi_token` → `piFetch('/api/profile')` → 프로필 로드
+  - 실패(401) → "로그인이 필요합니다" 표시
+- ✅ `src/app/[locale]/profile/_components/profile-tabs.tsx` — 탭 전환 UI
+
+### TASK-061: 컴포넌트 — ProfileForm · PaymentHistory · SubscriptionStatus ✅
+
+- ✅ `src/app/[locale]/profile/_components/profile-form.tsx`
+  - `piFetch()` PATCH 호출 — X-Pi-Token 헤더 자동 첨부
+  - FormData 기반 6개 필드 + 저장 피드백 메시지
+- ✅ `src/app/[locale]/profile/_components/payment-history.tsx`
+  - `piFetch('/api/profile/payments')` + 빈 상태 UI
+- ✅ `src/app/[locale]/profile/_components/subscription-status.tsx`
+  - 기존 `/api/subscriptions/check` + `/api/subscriptions` DELETE 재사용
+  - PLAN_CAPS 기반 플랜 배지(FREE/PREMIUM/BUSINESS) 표시
+
+### TASK-062: 번역 + 3단계 검증 ✅
+
+- ✅ `messages/ko.json` — `profile` 네임스페이스 추가
+- ✅ 빌드 검증: `pnpm tsc --noEmit` 통과 · `pnpm lint` 0 errors · `pnpm build` 성공
+  - `ƒ /[locale]/profile`, `ƒ /api/profile`, `ƒ /api/profile/payments` 라우트 확인
+- ⏳ 2단계: Playwright — X-Pi-Token 헤더 시뮬레이션 인증 경로 검증 (Pi Browser 배포 후 권장)
+- ⏳ 3단계: Pi Browser 실기기 — ClientProfileGate 동작 + 편집 저장 + 결제/구독 탭 전환
+
+---
+
+## Phase 11: 어드민 통계 대시보드 🔜 (계획)
+
+> **목표**: DAU/WAU/MAU 사용자 활동 추이 + 테마(카테고리)별 매출 시각화
+> **상세 스펙**: `docs/PRD_6_CHART.md` | **담당 에이전트**: `.claude/agents/chart/dashboard-stats-builder.md`
+> **핵심 결정**: ① 차트 = **react-plotly.js**(순수 JS, `ssr:false` dynamic) ② 활동집계 = **신규 활동 로그**(하루 1행 UPSERT) ③ 집계방식 = **중간집계(Rollup) 테이블 사전 집계 → 대시보드 직접 조회**
+
+### TASK-080: 활동 로그 마이그레이션 (`sql/015`) 🔜
+
+- 🔜 `sql/015_user_activity_log.sql` — `sys_user_actvty_log` (`UNIQUE(usr_id, actvty_dt)` 하루 1행)
+- 🔜 `fn_record_activity(usr_id, type)` — `ON CONFLICT DO UPDATE` UPSERT RPC
+- 🔜 DA 표준: 시스템 컬럼 4개 + `del_yn`, `-- DA-APPROVED:` 주석
+
+### TASK-081: 활동 계측 (원천 적재 시작) 🔜
+
+- 🔜 `src/lib/activity-log.ts` — `recordActivity()` fire-and-forget 헬퍼
+- 🔜 인증 진입점(`getSessionUser()` 성공 / 로그인 API)에서 계측 (미들웨어 전체 계측 지양)
+- ⚠️ **소급 불가** — 본 태스크를 가장 먼저 배포해 데이터 축적 시작
+
+### TASK-082: 중간집계 테이블 + 집계 RPC (`sql/016`) 🔜
+
+- 🔜 `stat_actvty_dly` — 일별 DAU/WAU/MAU 사전 집계
+- 🔜 `stat_revenue_dly` — 일별 × 테마별 매출 (PK `stat_dt, theme_cd`)
+- 🔜 `fn_build_daily_stats(p_dt date)` — **멱등** 집계(백필·보정 안전). 매출 4경로 UNION(방·팁·스티커·구독 `SUBSCR`)
+
+### TASK-083: 집계 배치 + 백필 🔜
+
+- 🔜 `POST /api/admin/stats/aggregate` — `CRON_SECRET` 보호, `fn_build_daily_stats` 호출
+- 🔜 Cron 등록 — pg_cron(`10 0 * * *`) 또는 Vercel Cron, 매일 전일분 집계
+- 🔜 과거 백필 1회 (적재 시작일 ~ 어제 루프)
+
+### TASK-084: 통계 API 🔜
+
+- 🔜 `src/types/stats.ts` — `ActivityStatsResponse` / `RevenueStatsResponse`
+- 🔜 `GET /api/admin/stats/activity?period=` — rollup SELECT + **당일 실시간 보정**(하이브리드)
+- 🔜 `GET /api/admin/stats/revenue?period=` — rollup SELECT (테마 라벨·이모지 `msg_theme` 조인)
+- 🔜 `getSessionUser()` + `isAdmin()` 인증
+
+### TASK-085: 차트 라이브러리 + 컴포넌트 3종 🔜
+
+- 🔜 `pnpm add react-plotly.js plotly.js-basic-dist-min` (+ 타입)
+- 🔜 `src/lib/plotly-theme.ts` — 다크모드 layout 프리셋
+- 🔜 `DauWauMauChart`(멀티 라인, `dynamic ssr:false`) · `RevenueDonutChart`(비중) · `RevenueTimelineChart`(누적 바)
+
+### TASK-086: 대시보드 페이지 + 메뉴 🔜
+
+- 🔜 `StatsCard`(증감 ↑↓ + 스켈레톤) · `StatsDateFilter`(7/30/90/365) · `StatsDashboard`(piFetch 페치)
+- 🔜 `src/app/[locale]/(admin)/admin/stats/page.tsx` — isAdmin 게이트
+- 🔜 어드민 사이드바에 "통계" 메뉴 추가
+
+### TASK-087: 검증 🔜
+
+- 🔜 `fn_build_daily_stats` 멱등성(2회 실행 동일) · 백필 ↔ on-the-fly 샘플 대조
+- 🔜 당일 보정 노출 · 다크모드 layout · Plotly `ssr:false` 빌드 통과
+- 🔜 `pnpm tsc --noEmit` · `pnpm lint` · Pi Browser 어드민 piFetch 인증
+
+---
+
 ## 마일스톤 요약
 
 | 마일스톤 | Phase | 완료일 | 주요 산출물 | 상태 |
@@ -647,6 +767,8 @@ if (meta?.type === 'CHAT_SUBSCR') {
 | M16: Pi 수익화 | Phase 8 | — | Pi Tip, 스티커 마켓, 인라인 트리거 8종, AI 봇, 이벤트방 | 🔜 준비중 |
 | M17: 미디어 메시지 | Phase 8 | — | 파일·이미지·음성 메시지 (Supabase Storage) | 🔜 준비중 |
 | M18: PiChat 생태계 | Phase 9 | — | 마켓플레이스, Pi Bet, Webhook, 분석 대시보드, 커스텀 스티커 | 🔜 준비중 |
+| M19: 사용자 프로필 | Phase 10 | 2026-06-09 | 마이페이지 (개인정보·결제내역·구독현황), Pi Browser ClientGate | ✅ 완료 |
+| M20: 어드민 통계 대시보드 | Phase 11 | — | DAU/WAU/MAU·테마별 매출 (react-plotly.js + 중간집계 rollup) | 🔜 계획 |
 
 ---
 
@@ -698,3 +820,6 @@ if (meta?.type === 'CHAT_SUBSCR') {
 | v2.1 | 2026-06-08 | TASK-053 완료 — 그룹 채팅방 생성 4단계 마법사 (ThemeSelector·InlinePurchasePrompt·GroupRoomCreator), payments/complete CHAT_ROOM_CREATE 분기, /chat 홈·/chat/[roomId] 페이지, Header 채팅 링크. M15 달성. | anakin |
 | v2.2 | 2026-06-08 | PiRC2 Soroban 스마트 컨트랙트 통합 문서화 — CLAUDE.md PiRC2 섹션 추가 (Contract ID·메서드·구독 매트릭스), TASK-054 PiRC2 기반 상세 업데이트, PRD_CHAT.md 구독 API 현행화, pi_pay SKILL.md PiRC2 구독 결제 섹션 추가. | anakin |
 | v2.3 | 2026-06-09 | TASK-054 완료 — 구독 시스템(앱 레벨 U2A). chat-auth.ts(PLAN_CAPS 권한 단일 소스), /api/subscriptions(plans·POST결제준비·DELETE취소·check), payments/complete CHAT_SUBSCR 분기(amount 서버 재검증 + msg_subscr UPSERT), subscription-gate.tsx. tsc·lint(0 errors) 통과. M16 구독 기반 완성. | anakin |
+| v2.4 | 2026-06-09 | Phase 7 완료 현행화. Phase 10 사용자 프로필 관리(마이페이지) 신규 추가 — TASK-056~062 (sys_user 프로필 컬럼 마이그레이션·GET/PATCH /api/profile·결제내역 API·ProfileTabs·ClientProfileGate·번역+검증). M19 마일스톤 추가. PRD.md v5.0 통합(섹션 12 신설). | anakin |
+| v2.5 | 2026-06-09 | Phase 10 완료 — TASK-056~062 전체 구현 완료. DB 마이그레이션(Supabase 적용)·users.ts 타입 확장+updateUserProfile()·GET/PATCH /api/profile·GET /api/profile/payments·page.tsx+5개 컴포넌트·ko.json 번역. pnpm build 성공, /[locale]/profile ∙ /api/profile ∙ /api/profile/payments 라우트 확인. M19 달성. | anakin |
+| v2.6 | 2026-06-09 | Phase 11 어드민 통계 대시보드 계획 추가 — TASK-080~087 (`PRD_CHART.md` 수용). react-plotly.js 채택, 활동 로그 `sys_user_actvty_log`(하루 1행 UPSERT) + 계측, 중간집계 rollup `stat_actvty_dly`/`stat_revenue_dly` + `fn_build_daily_stats` 멱등 집계, 일배치/백필/당일보정 하이브리드, 테마별 매출 4경로 UNION. M20 마일스톤 추가. PRD.md v6.0 통합(섹션 13 신설). | anakin |

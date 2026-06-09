@@ -620,3 +620,115 @@ developer_completed: true   →  최종 완료 ✓
     ▼
 cancelled / user_cancelled: true  →  결제 취소
 ```
+
+
+# Pi Network PiRC2 구독 취소 및 환불·수수료 정책
+## 구독 시작 시와 구독 취소 시에 아래의 안내사항을 반드시 공지해야 함.
+
+
+> **출처:** Pi Network 공식 GitHub ([PiNetwork/PiRC](https://github.com/PiNetwork/PiRC)), [minepi.com 블로그](https://minepi.com/blog/subscriptions-smart-contract/)  
+> **조사 일자:** 2026년 6월
+
+---
+
+
+## ⚠️ 먼저 알아야 할 맥락
+
+PiRC2는 Pi Network 최초의 스마트컨트랙트 기능으로, 현재 **Testnet 단계**에서 개발자 리뷰 및 커뮤니티 피드백을 수집 중입니다. 외부 감사 서비스의 보안 검토도 진행 중이며, 아직 Mainnet 배포는 결정되지 않은 상태입니다.
+
+---
+
+## 1. 취소(Cancel) 메커니즘
+
+공식 GitHub 문서(`9-subscription-setup-guide.md`)에 따르면:
+
+- **`cancel` 함수**는 자동 갱신(`auto_renew`)을 비활성화합니다.
+- **이미 결제된 잔여 이용 시간은 그대로 보존됩니다.**
+- 즉각적인 서비스 종료가 아닌 **"현재 구독 기간이 끝날 때까지 유지 후 미갱신"** 방식입니다.
+- 만약 `auto_renew`가 이미 `false`인 상태라면 `AlreadyCancelled` 오류를 반환합니다.
+
+```
+# 취소 호출 예시
+stellar contract invoke \
+  --id $CONTRACT_ID \
+  --network $NETWORK \
+  -s <PRIVATE_KEY> \
+  -- cancel \
+  --subscriber <SUBSCRIBER_PUBLIC_KEY> \
+  --sub_id 0
+```
+
+> **결론: Pi Network PiRC2의 취소는 "즉시 환불"이 아닌 "기간 만료 후 자동 갱신 중단" 방식**
+
+---
+
+## 2. 환불 정책
+
+공식 PiRC2 문서에는 **부분 환불이나 잔여 기간 환불에 대한 정책이 명시되어 있지 않습니다.**  
+`cancel` 호출 시 잔여 이용 시간이 보존된다는 것만 기술되어 있으며, 이는 환불이 아닌 서비스 이용 지속을 의미합니다.
+
+| 구분 | 내용 |
+|------|------|
+| 취소 즉시 환불 | ❌ 언급 없음 |
+| 잔여 기간 서비스 이용 | ✅ 보장 |
+| 부분 환불 | ❌ 언급 없음 |
+| 환불 수수료 | ❌ 언급 없음 |
+
+---
+
+## 3. 결제 실패 시 자동 처리
+
+결제가 실패하면 해당 구독의 `auto_renew`가 **자동으로 `false`로 전환**됩니다.  
+Merchant가 `process()` 함수를 호출할 때 결제에 실패하면 별도 조작 없이 자동으로 구독이 갱신 불가 상태가 됩니다.
+
+| 이벤트 | 설명 |
+|--------|------|
+| `chg_fail` | 결제 실패 이벤트 발생 |
+| `auto_renew` | 자동으로 `false` 전환 |
+
+---
+
+## 4. 스마트컨트랙트의 핵심 설계 원칙 (자금 보호)
+
+구독자가 사전에 예산을 승인하더라도, **실제 청구가 이루어지기 전까지 승인된 자금은 구독자의 지갑에 그대로 유지됩니다.**  
+전체 예산을 컨트랙트에 미리 예치(pre-funding)할 필요가 없습니다.
+
+각 청구 이벤트마다 새 서명이 필요하지 않으면서도, 실제 청구 시점까지 자금은 사용자 지갑에 보관됩니다.  
+충전 시점에 지갑 잔액이 충분하다면 구독이 유지됩니다.
+
+### 기술 구현 방식
+
+> Soroban의 토큰 allowance 메커니즘을 활용:  
+> 구독자가 컨트랙트를 spender로 `approve` → 이후 컨트랙트가 `transfer_from`으로 시간에 따라 차감  
+> 전체 예산을 사전 이전하지 않고도 반복 결제 구현 가능
+
+---
+
+## 5. 수수료(Fee) 정책
+
+공식 PiRC2 문서에는 **플랫폼 수준의 수수료 정책이 명시되어 있지 않습니다.**  
+서비스 가격(`price`)은 Merchant가 자유롭게 설정할 수 있으며, 가격 단위는 Pi의 소수점 7자리 기준 최소 단위를 사용합니다.
+
+```
+price 예시: 10000000 = 1 Pi  (소수점 7자리)
+```
+
+---
+
+## 6. 구독 생명주기 흐름
+
+```
+1. Merchant → register_service 호출
+         ↓
+2. Subscriber → subscribe 호출 (토큰 승인 자동 설정)
+         ↓
+3. 청구 기간 종료 시, Merchant → process 호출
+         ↓
+4. 컨트랙트 → transfer_from으로 구독자에게 청구
+         ↓
+5. allowance 부족 시, 구독자 → extend_subscription 호출
+         ↓
+6. 구독자 → 언제든지 cancel 또는 toggle_auto_renew 호출 가능
+```
+
+---
