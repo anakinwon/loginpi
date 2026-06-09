@@ -40,8 +40,29 @@ export async function GET(
     return NextResponse.json({ error: '목록 조회 실패' }, { status: 500 })
   }
 
+  // 갤러리 게시판이면 각 게시글의 첫 번째 이미지를 thumb_url로 병합
+  type PostRow = NonNullable<typeof data>[number]
+  let posts: (PostRow & { thumb_url?: string | null })[] = data ?? []
+
+  if (ctgr.gallery_yn === 'Y' && data && data.length > 0) {
+    const postIds = data.map((p) => p.post_id)
+    const { data: thumbRows } = await db
+      .from('brd_attch')
+      .select('post_id, fl_url')
+      .in('post_id', postIds)
+      .like('fl_tp', 'image/%')
+      .eq('del_yn', 'N')
+      .order('reg_dtm', { ascending: true })
+
+    const thumbMap = new Map<string, string>()
+    for (const row of thumbRows ?? []) {
+      if (!thumbMap.has(row.post_id)) thumbMap.set(row.post_id, row.fl_url)
+    }
+    posts = data.map((p) => ({ ...p, thumb_url: thumbMap.get(p.post_id) ?? null }))
+  }
+
   return NextResponse.json({
-    posts: data,
+    posts,
     total: count ?? 0,
     page,
     limit,

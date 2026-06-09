@@ -23,6 +23,7 @@ export default async function BoardListPage({ params }: Props) {
         ctgrNm={ctgr.ctgr_nm}
         isQna={ctgr.ctgr_cd === 'QNA'}
         canWrite={canWrite}
+        isGallery={ctgr.gallery_yn === 'Y'}
       />
     </Suspense>
   )

@@ -32,6 +32,7 @@ interface Post {
   pin_yn: string
   answ_yn: string
   reg_dtm: string
+  thumb_url?: string | null
 }
 
 interface Props {
@@ -39,9 +40,10 @@ interface Props {
   ctgrNm: string
   isQna: boolean
   canWrite: boolean
+  isGallery?: boolean
 }
 
-export function BoardListView({ category, ctgrNm, isQna, canWrite }: Props) {
+export function BoardListView({ category, ctgrNm, isQna, canWrite, isGallery }: Props) {
   const t = useTranslations('board')
   const tc = useTranslations('common')
   const searchParams = useSearchParams()
@@ -49,18 +51,19 @@ export function BoardListView({ category, ctgrNm, isQna, canWrite }: Props) {
   const page = Math.max(1, Number(searchParams.get('page') ?? 1))
   const q = searchParams.get('q') ?? ''
 
-  const [limit, setLimit] = useState(15)
+  const [limit, setLimit] = useState(isGallery ? 12 : 15)
   const [posts, setPosts] = useState<Post[]>([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
 
-  // 마운트 후 실제 화면 크기로 limit 측정 + 리사이즈 대응
+  // 갤러리가 아닐 때만 화면 크기 기반 limit 계산
   useEffect(() => {
+    if (isGallery) return
     const update = () => setLimit(calcLimit())
     update()
     window.addEventListener('resize', update)
     return () => window.removeEventListener('resize', update)
-  }, [])
+  }, [isGallery])
 
   // limit·page·q 변경 시 게시글 조회
   useEffect(() => {
@@ -102,50 +105,107 @@ export function BoardListView({ category, ctgrNm, isQna, canWrite }: Props) {
       <PostSearch category={category} q={q || undefined} />
 
       {/* 게시글 목록 */}
-      <div className='overflow-hidden rounded-lg border'>
-        {loading ? (
-          <div className='py-16 text-center text-sm text-muted-foreground'>{tc('loading')}</div>
-        ) : posts.length === 0 ? (
-          <div className='py-16 text-center text-sm text-muted-foreground'>
-            {q ? t('noResults', { q }) : t('noData')}
+      {loading ? (
+        <div className={cn(
+          'py-16 text-center text-sm text-muted-foreground',
+          !isGallery && 'rounded-lg border'
+        )}>
+          {tc('loading')}
+        </div>
+      ) : posts.length === 0 ? (
+        <div className={cn(
+          'py-16 text-center text-sm text-muted-foreground',
+          !isGallery && 'rounded-lg border'
+        )}>
+          {q ? t('noResults', { q }) : t('noData')}
+        </div>
+      ) : isGallery ? (
+        /* 갤러리 썸네일 그리드 */
+        <div className='grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4'>
+          {posts.map((post) => (
+            <Link
+              key={post.post_id}
+              href={`/board/${category}/${post.post_id}`}
+              className='group overflow-hidden rounded-lg border transition-colors hover:border-primary/50'
+            >
+              <div className='relative aspect-square overflow-hidden bg-muted'>
+                {post.thumb_url ? (
+                  <img
+                    src={post.thumb_url}
+                    alt={post.post_ttl}
+                    className='h-full w-full object-cover transition-transform duration-200 group-hover:scale-105'
+                  />
+                ) : (
+                  <div className='flex h-full items-center justify-center'>
+                    <svg
+                      xmlns='http://www.w3.org/2000/svg'
+                      className='h-8 w-8 text-muted-foreground/40'
+                      fill='none'
+                      viewBox='0 0 24 24'
+                      stroke='currentColor'
+                    >
+                      <path
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
+                        strokeWidth={1.5}
+                        d='M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z'
+                      />
+                    </svg>
+                  </div>
+                )}
+              </div>
+              <div className='p-2'>
+                <p className='truncate text-sm font-medium leading-snug group-hover:text-primary'>
+                  {post.post_ttl}
+                </p>
+                <p className='mt-0.5 text-xs text-muted-foreground'>
+                  {post.rgst_usr_nm} ·{' '}
+                  {new Date(post.reg_dtm).toLocaleDateString('ko-KR', {
+                    month: '2-digit',
+                    day: '2-digit',
+                  })}
+                </p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      ) : (
+        /* 일반 테이블 목록 */
+        <div className='overflow-hidden rounded-lg border'>
+          <div className='hidden border-b bg-muted/50 px-4 py-2 text-xs font-medium text-muted-foreground sm:grid sm:grid-cols-[1fr_80px_60px_90px]'>
+            <span>{t('columns.title')}</span>
+            <span className='text-center'>{t('columns.author')}</span>
+            <span className='text-center'>{t('columns.views')}</span>
+            <span className='text-center'>{t('columns.date')}</span>
           </div>
-        ) : (
-          <>
-            <div className='hidden border-b bg-muted/50 px-4 py-2 text-xs font-medium text-muted-foreground sm:grid sm:grid-cols-[1fr_80px_60px_90px]'>
-              <span>{t('columns.title')}</span>
-              <span className='text-center'>{t('columns.author')}</span>
-              <span className='text-center'>{t('columns.views')}</span>
-              <span className='text-center'>{t('columns.date')}</span>
-            </div>
-            {posts.map((post) => (
-              <Link
-                key={post.post_id}
-                href={`/board/${category}/${post.post_id}`}
-                className='flex flex-col gap-1 border-b px-4 py-3 last:border-b-0 transition-colors hover:bg-muted/30 sm:grid sm:grid-cols-[1fr_80px_60px_90px] sm:items-center sm:gap-0'
-              >
-                <span className='flex items-center gap-1.5 text-sm'>
-                  {post.pin_yn === 'Y' && (
-                    <span className='shrink-0 rounded bg-primary/10 px-1.5 py-0.5 text-xs font-medium text-primary'>
-                      {t('notice')}
-                    </span>
-                  )}
-                  {isQna && post.answ_yn === 'Y' && (
-                    <span className='shrink-0 rounded bg-green-100 px-1.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400'>
-                      {t('adopted')}
-                    </span>
-                  )}
-                  <span className='truncate'>{post.post_ttl}</span>
-                </span>
-                <span className='text-center text-xs text-muted-foreground'>{post.rgst_usr_nm}</span>
-                <span className='text-center text-xs text-muted-foreground'>{post.vw_cnt}</span>
-                <span className='text-center text-xs text-muted-foreground'>
-                  {new Date(post.reg_dtm).toLocaleDateString('ko-KR', { month: '2-digit', day: '2-digit' })}
-                </span>
-              </Link>
-            ))}
-          </>
-        )}
-      </div>
+          {posts.map((post) => (
+            <Link
+              key={post.post_id}
+              href={`/board/${category}/${post.post_id}`}
+              className='flex flex-col gap-1 border-b px-4 py-3 last:border-b-0 transition-colors hover:bg-muted/30 sm:grid sm:grid-cols-[1fr_80px_60px_90px] sm:items-center sm:gap-0'
+            >
+              <span className='flex items-center gap-1.5 text-sm'>
+                {post.pin_yn === 'Y' && (
+                  <span className='shrink-0 rounded bg-primary/10 px-1.5 py-0.5 text-xs font-medium text-primary'>
+                    {t('notice')}
+                  </span>
+                )}
+                {isQna && post.answ_yn === 'Y' && (
+                  <span className='shrink-0 rounded bg-green-100 px-1.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400'>
+                    {t('adopted')}
+                  </span>
+                )}
+                <span className='truncate'>{post.post_ttl}</span>
+              </span>
+              <span className='text-center text-xs text-muted-foreground'>{post.rgst_usr_nm}</span>
+              <span className='text-center text-xs text-muted-foreground'>{post.vw_cnt}</span>
+              <span className='text-center text-xs text-muted-foreground'>
+                {new Date(post.reg_dtm).toLocaleDateString('ko-KR', { month: '2-digit', day: '2-digit' })}
+              </span>
+            </Link>
+          ))}
+        </div>
+      )}
 
       {/* 페이지네이션 */}
       {totalPages > 1 && (

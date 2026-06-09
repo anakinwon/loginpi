@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
@@ -13,15 +13,19 @@ type Props = {
   postId?: string
   initialTitle?: string
   initialContent?: string
+  canAttach?: boolean
 }
 
-export function PostForm({ category, postId, initialTitle = '', initialContent = '' }: Props) {
+export function PostForm({ category, postId, initialTitle = '', initialContent = '', canAttach }: Props) {
   const router = useRouter()
   const t = useTranslations('board')
   const tc = useTranslations('common')
+  const ta = useTranslations('attachment')
   const [title, setTitle] = useState(initialTitle)
   const [content, setContent] = useState(initialContent)
   const [submitting, setSubmitting] = useState(false)
+  const [files, setFiles] = useState<File[]>([])
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const isEdit = !!postId
 
@@ -44,8 +48,22 @@ export function PostForm({ category, postId, initialTitle = '', initialContent =
 
     if (res.ok) {
       const data = await res.json()
-      toast.success(isEdit ? t('editSuccess') : t('createSuccess'))
       const targetId = isEdit ? postId : data.post_id
+
+      // 글 등록 후 선택된 파일을 업로드 (신규 글 + 첨부파일 있을 때만)
+      if (!isEdit && canAttach && files.length > 0) {
+        const formData = new FormData()
+        files.forEach((f) => formData.append('files', f))
+        const uploadRes = await fetch(`/api/board/${category}/${targetId}/attachments`, {
+          method: 'POST',
+          body: formData,
+        })
+        if (!uploadRes.ok) {
+          toast.error(ta('uploadFail'))
+        }
+      }
+
+      toast.success(isEdit ? t('editSuccess') : t('createSuccess'))
       router.push(`/board/${category}/${targetId}`)
       router.refresh()
     } else {
@@ -81,6 +99,41 @@ export function PostForm({ category, postId, initialTitle = '', initialContent =
           className='w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50'
         />
       </div>
+
+      {canAttach && !isEdit && (
+        <div className='space-y-1.5'>
+          <Label>{ta('title')}</Label>
+          <div className='flex flex-wrap items-center gap-2'>
+            <input
+              ref={fileInputRef}
+              type='file'
+              multiple
+              className='hidden'
+              onChange={(e) => setFiles(Array.from(e.target.files ?? []))}
+              disabled={submitting}
+            />
+            <Button
+              type='button'
+              variant='outline'
+              size='sm'
+              onClick={() => fileInputRef.current?.click()}
+              disabled={submitting}
+            >
+              {ta('upload')}
+            </Button>
+            {files.length > 0 && (
+              <ul className='flex flex-wrap gap-1.5'>
+                {files.map((f, i) => (
+                  <li key={i} className='rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground'>
+                    {f.name}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          <p className='text-xs text-muted-foreground'>{ta('sizeLimit')}</p>
+        </div>
+      )}
 
       <div className='flex gap-2'>
         <Button type='submit' disabled={submitting}>

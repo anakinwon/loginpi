@@ -21,7 +21,7 @@ export default async function WritePage({ params }: Props) {
   return (
     <div className='mx-auto max-w-4xl px-4 py-8'>
       <h1 className='mb-6 text-2xl font-bold'>{t('writeTitle', { name: ctgr.ctgr_nm })}</h1>
-      <PostForm category={category} />
+      <PostForm category={category} canAttach={ctgr.attch_yn === 'Y'} />
     </div>
   )
 }
