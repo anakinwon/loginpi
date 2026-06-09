@@ -3,7 +3,14 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { ChatListView, type RoomWithTheme } from '@/components/chat/chat-list-view'
 import { ClientChatList } from '@/components/chat/client-chat-list'
 
-const ROOM_SELECT = 'room_id, room_nm, theme_cd, room_tp_cd, is_public_yn, msg_theme(theme_nm, theme_emoji, theme_tp_cd)'
+const ROOM_SELECT = `room_id, room_nm, theme_cd, room_tp_cd, is_public_yn,
+  max_mbr_cnt, expr_dtm, msg_theme(theme_nm, theme_emoji, theme_tp_cd)`
+
+function buildCntMap(mbrRows: { room_id: string }[]): Map<string, number> {
+  const map = new Map<string, number>()
+  for (const m of mbrRows) map.set(m.room_id, (map.get(m.room_id) ?? 0) + 1)
+  return map
+}
 
 export default async function ChatPage() {
   const user = await getSessionUser()
@@ -27,13 +34,16 @@ export default async function ChatPage() {
   let myRooms: RoomWithTheme[] = []
   if (mbrs && mbrs.length > 0) {
     const roomIds = mbrs.map((m: { room_id: string }) => m.room_id)
-    const { data } = await db
-      .from('msg_room')
-      .select(ROOM_SELECT)
-      .in('room_id', roomIds)
-      .eq('del_yn', 'N')
-      .order('mod_dtm', { ascending: false })
-    myRooms = (data ?? []) as unknown as RoomWithTheme[]
+    const [{ data }, { data: mbrRows }] = await Promise.all([
+      db.from('msg_room').select(ROOM_SELECT)
+        .in('room_id', roomIds).eq('del_yn', 'N').order('mod_dtm', { ascending: false }),
+      db.from('msg_room_mbr').select('room_id').in('room_id', roomIds).eq('del_yn', 'N'),
+    ])
+    const cntMap = buildCntMap(mbrRows ?? [])
+    myRooms = (data ?? []).map((r: Record<string, unknown>) => ({
+      ...(r as unknown as RoomWithTheme),
+      cur_mbr_cnt: cntMap.get(r.room_id as string) ?? 0,
+    }))
   }
 
   // 공개 그룹 채팅방 (최근 10개)
@@ -46,8 +56,19 @@ export default async function ChatPage() {
     .order('reg_dtm', { ascending: false })
     .limit(10)
 
-  const myRoomIds = new Set(myRooms.map(r => r.room_id))
-  const discoverRooms = ((publicRooms ?? []) as unknown as RoomWithTheme[]).filter(r => !myRoomIds.has(r.room_id))
+  let discoverRooms: RoomWithTheme[] = []
+  if (publicRooms && publicRooms.length > 0) {
+    const myRoomIds = new Set(myRooms.map(r => r.room_id))
+    const filtered = publicRooms.filter(r => !myRoomIds.has(r.room_id))
+    const pubIds = filtered.map(r => r.room_id)
+    const { data: pubMbrRows } = await db
+      .from('msg_room_mbr').select('room_id').in('room_id', pubIds).eq('del_yn', 'N')
+    const pubCntMap = buildCntMap(pubMbrRows ?? [])
+    discoverRooms = filtered.map((r: Record<string, unknown>) => ({
+      ...(r as unknown as RoomWithTheme),
+      cur_mbr_cnt: pubCntMap.get(r.room_id as string) ?? 0,
+    }))
+  }
 
   return <ChatListView myRooms={myRooms} discoverRooms={discoverRooms} />
 }

@@ -11,8 +11,19 @@ export type RoomWithTheme = {
   theme_cd: string
   room_tp_cd: string
   is_public_yn: string
+  max_mbr_cnt?: number
+  cur_mbr_cnt?: number
+  expr_dtm?: string
   // msg_room.theme_cd → msg_theme FK (forward reference) → PostgREST가 단일 객체로 반환
   msg_theme: { theme_nm: string; theme_emoji: string; theme_tp_cd: string } | null
+}
+
+function exprLabel(exprDtm?: string): { text: string; warn: boolean } | null {
+  if (!exprDtm || exprDtm.startsWith('9999')) return null
+  const daysLeft = Math.ceil((new Date(exprDtm).getTime() - Date.now()) / 86_400_000)
+  if (daysLeft < 0) return { text: '만료됨', warn: true }
+  if (daysLeft === 0) return { text: '오늘 만료', warn: true }
+  return { text: `D-${daysLeft}`, warn: daysLeft <= 3 }
 }
 
 function ThemeEmoji({ room }: { room: RoomWithTheme }) {
@@ -44,11 +55,19 @@ function RoomCard({ room, href }: { room: RoomWithTheme; href: string }) {
               PREMIUM
             </span>
           )}
-          {room.room_tp_cd === 'G' && room.is_public_yn === 'Y' && (
-            <span className='ml-1 text-muted-foreground/70'>· 공개</span>
-          )}
-          {room.room_tp_cd === 'G' && room.is_public_yn === 'N' && (
-            <span className='ml-1 text-muted-foreground/70'>· 비공개</span>
+          {room.room_tp_cd === 'G' && (() => {
+            const el = exprLabel(room.expr_dtm)
+            if (!el) return null
+            return (
+              <span className={`ml-1 ${el.warn ? 'text-orange-500 dark:text-orange-400' : 'text-muted-foreground/70'}`}>
+                · {el.text}
+              </span>
+            )
+          })()}
+          {room.room_tp_cd === 'G' && room.max_mbr_cnt != null && (
+            <span className='ml-1 text-muted-foreground/70'>
+              ({room.cur_mbr_cnt ?? 0}/{room.max_mbr_cnt}명)
+            </span>
           )}
           {room.room_tp_cd === 'D' && (
             <span className='ml-1 text-muted-foreground/70'>· 1:1</span>

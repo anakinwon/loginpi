@@ -128,7 +128,7 @@ export function useChatRoom(
       const res = await piFetch(`/api/chat/rooms/${roomId}/messages`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ msg_cont: trimmed, msg_tp_cd: 'TEXT' }),
+        body: JSON.stringify({ msg_id: tempId, msg_cont: trimmed, msg_tp_cd: 'TEXT' }),
       })
 
       if (res.status === 429) {

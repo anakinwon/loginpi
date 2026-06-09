@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
     }
 
     const results: { date: string; ok: boolean }[] = []
-    let cur = new Date(from + 'T00:00:00Z')
+    const cur = new Date(from + 'T00:00:00Z')
     const end = new Date(to + 'T00:00:00Z')
 
     while (cur <= end) {

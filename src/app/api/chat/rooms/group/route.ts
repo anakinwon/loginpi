@@ -20,12 +20,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
   }
 
-  const { theme_cd, room_nm, room_desc, is_public_yn, max_mbr_cnt } = body as {
+  const { theme_cd, room_nm, room_desc, is_public_yn, max_mbr_cnt, expr_dtm } = body as {
     theme_cd?: string
     room_nm?: string
     room_desc?: string
     is_public_yn?: 'Y' | 'N'
     max_mbr_cnt?: number
+    expr_dtm?: string | null
   }
 
   if (!theme_cd) {
@@ -51,6 +52,7 @@ export async function POST(request: NextRequest) {
       room_desc: room_desc?.trim() || null,
       is_public_yn: is_public_yn ?? 'Y',
       max_mbr_cnt: typeof max_mbr_cnt === 'number' ? max_mbr_cnt : 50,
+      expr_dtm: expr_dtm ?? null,
     })
     return NextResponse.json({ room }, { status: 201 })
   } catch {

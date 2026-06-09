@@ -33,7 +33,8 @@
     "piLogin": "Pi 로그인",
     "piLoginDev": "Pi 로그인 (dev)",
     "piAuthenticating": "인증 중…",
-    "googleLogin": "Google 로그인"
+    "googleLogin": "Google 로그인",
+    "myProfile": "내 프로필"
   },
   "home": {
     "title": "Next.js Starter Kit",

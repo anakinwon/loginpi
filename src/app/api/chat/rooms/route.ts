@@ -25,18 +25,32 @@ export async function GET(request: NextRequest) {
   let rooms: unknown[] = []
   if (mbrs && mbrs.length > 0) {
     const roomIds = mbrs.map((m: { room_id: string }) => m.room_id)
-    const { data, error } = await getSupabaseAdmin()
-      .from('msg_room')
-      .select(`
-        room_id, room_nm, room_desc, theme_cd, room_tp_cd,
-        max_mbr_cnt, is_public_yn, del_yn, reg_dtm,
-        msg_theme(theme_nm, theme_emoji, theme_tp_cd)
-      `)
-      .in('room_id', roomIds)
-      .eq('del_yn', 'N')
-      .order('mod_dtm', { ascending: false })
+    const [{ data, error }, { data: mbrRows }] = await Promise.all([
+      getSupabaseAdmin()
+        .from('msg_room')
+        .select(`
+          room_id, room_nm, room_desc, theme_cd, room_tp_cd,
+          max_mbr_cnt, is_public_yn, del_yn, reg_dtm, expr_dtm,
+          msg_theme(theme_nm, theme_emoji, theme_tp_cd)
+        `)
+        .in('room_id', roomIds)
+        .eq('del_yn', 'N')
+        .order('mod_dtm', { ascending: false }),
+      getSupabaseAdmin()
+        .from('msg_room_mbr')
+        .select('room_id')
+        .in('room_id', roomIds)
+        .eq('del_yn', 'N'),
+    ])
     if (error) return NextResponse.json({ error: '채팅방 목록 조회 실패' }, { status: 500 })
-    rooms = data ?? []
+    const cntMap = new Map<string, number>()
+    for (const m of mbrRows ?? []) {
+      cntMap.set(m.room_id, (cntMap.get(m.room_id) ?? 0) + 1)
+    }
+    rooms = (data ?? []).map((r: Record<string, unknown>) => ({
+      ...r,
+      cur_mbr_cnt: cntMap.get(r.room_id as string) ?? 0,
+    }))
   }
 
   if (!includePublic) return NextResponse.json({ rooms })
@@ -44,14 +58,32 @@ export async function GET(request: NextRequest) {
   // 공개 그룹 채팅방 (최근 10개)
   const { data: publicRooms } = await getSupabaseAdmin()
     .from('msg_room')
-    .select('room_id, room_nm, theme_cd, room_tp_cd, is_public_yn, msg_theme(theme_nm, theme_emoji, theme_tp_cd)')
+    .select('room_id, room_nm, theme_cd, room_tp_cd, is_public_yn, max_mbr_cnt, expr_dtm, msg_theme(theme_nm, theme_emoji, theme_tp_cd)')
     .eq('is_public_yn', 'Y')
     .eq('room_tp_cd', 'G')
     .eq('del_yn', 'N')
     .order('reg_dtm', { ascending: false })
     .limit(10)
 
-  return NextResponse.json({ rooms, publicRooms: publicRooms ?? [] })
+  const pubRoomIds = (publicRooms ?? []).map(r => r.room_id)
+  let publicRoomsWithCnt: unknown[] = publicRooms ?? []
+  if (pubRoomIds.length > 0) {
+    const { data: pubMbrRows } = await getSupabaseAdmin()
+      .from('msg_room_mbr')
+      .select('room_id')
+      .in('room_id', pubRoomIds)
+      .eq('del_yn', 'N')
+    const pubCntMap = new Map<string, number>()
+    for (const m of pubMbrRows ?? []) {
+      pubCntMap.set(m.room_id, (pubCntMap.get(m.room_id) ?? 0) + 1)
+    }
+    publicRoomsWithCnt = (publicRooms ?? []).map(r => ({
+      ...r,
+      cur_mbr_cnt: pubCntMap.get(r.room_id) ?? 0,
+    }))
+  }
+
+  return NextResponse.json({ rooms, publicRooms: publicRoomsWithCnt })
 }
 
 // POST /api/chat/rooms — 1:1 Direct Room 생성 (TASK-053에서 Group·Event 추가)

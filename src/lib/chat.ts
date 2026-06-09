@@ -140,6 +140,7 @@ export async function createGroupRoom(params: {
   is_public_yn: 'Y' | 'N'
   max_mbr_cnt: number
   pymnt_id?: string | null
+  expr_dtm?: string | null
 }): Promise<MsgRoom> {
   const supabase = getSupabaseAdmin()
   const slug = params.displayName.slice(0, 20)
@@ -156,6 +157,7 @@ export async function createGroupRoom(params: {
       pymnt_id: params.pymnt_id ?? null,
       regr_id: slug,
       modr_id: slug,
+      ...(params.expr_dtm ? { expr_dtm: params.expr_dtm } : {}),
     })
     .select()
     .single()

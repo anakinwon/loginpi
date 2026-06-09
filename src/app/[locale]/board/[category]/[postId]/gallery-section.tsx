@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 
 type ImageItem = {
@@ -18,6 +18,12 @@ export function GallerySection({ images }: Props) {
   const [selected, setSelected] = useState<ImageItem | null>(null)
   const [selectedIdx, setSelectedIdx] = useState(0)
 
+  const navigate = useCallback((dir: number) => {
+    const next = (selectedIdx + dir + images.length) % images.length
+    setSelectedIdx(next)
+    setSelected(images[next])
+  }, [selectedIdx, images])
+
   useEffect(() => {
     if (!selected) return
     const handler = (e: KeyboardEvent) => {
@@ -27,19 +33,13 @@ export function GallerySection({ images }: Props) {
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [selected, selectedIdx])
+  }, [selected, navigate])
 
   if (images.length === 0) return null
 
   const open = (idx: number) => {
     setSelectedIdx(idx)
     setSelected(images[idx])
-  }
-
-  const navigate = (dir: number) => {
-    const next = (selectedIdx + dir + images.length) % images.length
-    setSelectedIdx(next)
-    setSelected(images[next])
   }
 
   return (

@@ -15,6 +15,7 @@ import { ThemeSelector, type ThemeRow } from './theme-selector'
 type Step = 1 | 2 | 3 | 4
 type PayStatus = 'idle' | 'approving' | 'waiting' | 'completing' | 'done' | 'error' | 'cancelled'
 type Capacity = 10 | 30 | 50 | 100
+type ExprDays = 0 | 1 | 3 | 7 | 30
 
 const PAY_STATUS_MSG: Partial<Record<PayStatus, string>> = {
   approving: '승인 중…',
@@ -45,6 +46,7 @@ export function GroupRoomCreator() {
   const [roomDesc, setRoomDesc] = useState('')
   const [isPublic, setIsPublic] = useState<'Y' | 'N'>('Y')
   const [maxMbr, setMaxMbr] = useState<Capacity>(50)
+  const [exprDays, setExprDays] = useState<ExprDays>(0)
   const [payStatus, setPayStatus] = useState<PayStatus>('idle')
   const [payError, setPayError] = useState<string | null>(null)
   const [canUsePremiumTheme, setCanUsePremiumTheme] = useState(false)
@@ -70,6 +72,7 @@ export function GroupRoomCreator() {
       setRoomDesc('')
       setIsPublic('Y')
       setMaxMbr(50)
+      setExprDays(0)
       setPayStatus('idle')
       setPayError(null)
     }
@@ -110,6 +113,7 @@ export function GroupRoomCreator() {
           room_desc: roomDesc || null,
           is_public_yn: isPublic,
           max_mbr_cnt: maxMbr,
+          expr_dtm: exprDays === 0 ? null : new Date(Date.now() + exprDays * 86400000).toISOString(),
         },
       },
       {
@@ -160,7 +164,7 @@ export function GroupRoomCreator() {
         onError: (e) => { setPayStatus('error'); setPayError(e.message) },
       },
     )
-  }, [selectedTheme, payAmount, roomNm, roomDesc, isPublic, maxMbr, router])
+  }, [selectedTheme, payAmount, roomNm, roomDesc, isPublic, maxMbr, exprDays, router])
 
   const createFreeRoom = useCallback(async () => {
     if (!selectedTheme) return
@@ -176,6 +180,7 @@ export function GroupRoomCreator() {
           room_desc: roomDesc || null,
           is_public_yn: isPublic,
           max_mbr_cnt: maxMbr,
+          expr_dtm: exprDays === 0 ? null : new Date(Date.now() + exprDays * 86400000).toISOString(),
         }),
       })
       if (!res.ok) {
@@ -193,7 +198,7 @@ export function GroupRoomCreator() {
       setPayStatus('error')
       setPayError(e instanceof Error ? e.message : '방 생성 오류')
     }
-  }, [selectedTheme, roomNm, roomDesc, isPublic, maxMbr, router])
+  }, [selectedTheme, roomNm, roomDesc, isPublic, maxMbr, exprDays, router])
 
   const retryPayment = useCallback(() => {
     setPayStatus('idle')
@@ -282,7 +287,7 @@ export function GroupRoomCreator() {
             </div>
           )}
 
-          {/* Step 3: 공개 설정 + 정원 */}
+          {/* Step 3: 공개 설정 + 정원 + 유효기간 */}
           {step === 3 && (
             <div className='space-y-4'>
               <div>
@@ -314,6 +319,29 @@ export function GroupRoomCreator() {
                       }`}
                     >
                       {n}명
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <p className='mb-2 text-sm font-medium'>유효기간</p>
+                <div className='grid grid-cols-5 gap-2'>
+                  {([
+                    { days: 0 as ExprDays, label: '무기한' },
+                    { days: 1 as ExprDays, label: '1일' },
+                    { days: 3 as ExprDays, label: '3일' },
+                    { days: 7 as ExprDays, label: '7일' },
+                    { days: 30 as ExprDays, label: '30일' },
+                  ]).map(({ days, label }) => (
+                    <button
+                      key={days}
+                      onClick={() => setExprDays(days)}
+                      className={`rounded-xl border py-2 text-xs font-medium transition-colors ${
+                        exprDays === days ? 'border-primary bg-primary/10 text-primary' : 'hover:bg-muted'
+                      }`}
+                    >
+                      {label}
                     </button>
                   ))}
                 </div>
@@ -362,6 +390,10 @@ export function GroupRoomCreator() {
                 <div className='flex justify-between'>
                   <span className='text-muted-foreground'>최대 정원</span>
                   <span>{maxMbr}명</span>
+                </div>
+                <div className='flex justify-between'>
+                  <span className='text-muted-foreground'>유효기간</span>
+                  <span>{exprDays === 0 ? '무기한' : `${exprDays}일`}</span>
                 </div>
                 <div className='border-t pt-2'>
                   {isPremium && !canUsePremiumTheme && (

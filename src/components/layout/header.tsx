@@ -8,6 +8,7 @@ import { BrowserName } from '@/components/layout/browser-name'
 import { LanguageSwitcher } from '@/components/layout/language-switcher'
 import { PiPriceChip } from '@/components/layout/pi-price-chip'
 import { PiAdminLink } from '@/components/layout/pi-admin-link'
+import { PiProfileLink } from '@/components/layout/pi-profile-link'
 
 export async function Header() {
   const user = await getSessionUser()
@@ -34,6 +35,16 @@ export async function Header() {
           >
             채팅
           </Link>
+          {user && (
+            <Link
+              href='/profile'
+              className='text-muted-foreground hover:text-foreground text-sm transition-colors'
+            >
+              {t('myProfile')}
+            </Link>
+          )}
+          {/* Pi Browser 전용: 쿠키 없음 → 클라이언트 상태로 보완 */}
+          <PiProfileLink />
           {showAdmin && (
             <Link
               href='/admin'
@@ -46,7 +57,9 @@ export async function Header() {
           <PiAdminLink />
           <GoogleLoginButton />
           <PiLoginButton />
-          <ThemeToggle />
+          <span className='hidden md:inline-flex'>
+            <ThemeToggle />
+          </span>
           <LanguageSwitcher locale={locale} />
           <PiPriceChip locale={locale} />
         </nav>
