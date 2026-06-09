@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
       .select(`
         room_id, room_nm, room_desc, theme_cd, room_tp_cd,
         max_mbr_cnt, is_public_yn, del_yn, reg_dtm,
-        msg_theme(theme_nm, theme_emoji)
+        msg_theme(theme_nm, theme_emoji, theme_tp_cd)
       `)
       .in('room_id', roomIds)
       .eq('del_yn', 'N')
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
   // 공개 그룹 채팅방 (최근 10개)
   const { data: publicRooms } = await getSupabaseAdmin()
     .from('msg_room')
-    .select('room_id, room_nm, theme_cd, room_tp_cd, is_public_yn, msg_theme(theme_nm, theme_emoji)')
+    .select('room_id, room_nm, theme_cd, room_tp_cd, is_public_yn, msg_theme(theme_nm, theme_emoji, theme_tp_cd)')
     .eq('is_public_yn', 'Y')
     .eq('room_tp_cd', 'G')
     .eq('del_yn', 'N')

@@ -12,26 +12,66 @@ export type RoomWithTheme = {
   room_tp_cd: string
   is_public_yn: string
   // Supabase PostgREST JOIN은 1:1 FK라도 배열로 반환
-  msg_theme: { theme_nm: string; theme_emoji: string }[] | null
+  msg_theme: { theme_nm: string; theme_emoji: string; theme_tp_cd?: string }[] | null
+}
+
+function ThemeEmoji({ room }: { room: RoomWithTheme }) {
+  const emoji = room.msg_theme?.[0]?.theme_emoji ?? '💬'
+  const isPremium = room.msg_theme?.[0]?.theme_tp_cd === 'PREMIUM'
+  const isDirect = room.room_tp_cd === 'D'
+
+  const bg = isDirect
+    ? 'bg-blue-100 dark:bg-blue-900/40'
+    : isPremium
+      ? 'bg-amber-100 dark:bg-amber-900/40'
+      : 'bg-muted'
+
+  return (
+    <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-2xl ${bg}`}>
+      {emoji}
+    </span>
+  )
 }
 
 function RoomCard({ room, href }: { room: RoomWithTheme; href: string }) {
+  const themeName = room.msg_theme?.[0]?.theme_nm ?? room.theme_cd
+  const isPremium = room.msg_theme?.[0]?.theme_tp_cd === 'PREMIUM'
+
   return (
     <Link
       href={href}
       className='flex items-center gap-3 rounded-xl border p-3 transition-colors hover:bg-muted/50'
     >
-      <span className='text-2xl'>{room.msg_theme?.[0]?.theme_emoji ?? '💬'}</span>
-      <div className='min-w-0'>
+      <ThemeEmoji room={room} />
+      <div className='min-w-0 flex-1'>
         <p className='truncate font-medium text-sm'>{room.room_nm}</p>
         <p className='text-xs text-muted-foreground'>
-          {room.msg_theme?.[0]?.theme_nm ?? room.theme_cd}
-          {room.room_tp_cd === 'G' && room.is_public_yn === 'Y' && ' · 공개'}
-          {room.room_tp_cd === 'G' && room.is_public_yn === 'N' && ' · 비공개'}
-          {room.room_tp_cd === 'D' && ' · 1:1'}
+          {themeName}
+          {isPremium && (
+            <span className='ml-1.5 rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'>
+              PREMIUM
+            </span>
+          )}
+          {room.room_tp_cd === 'G' && room.is_public_yn === 'Y' && (
+            <span className='ml-1 text-muted-foreground/70'>· 공개</span>
+          )}
+          {room.room_tp_cd === 'G' && room.is_public_yn === 'N' && (
+            <span className='ml-1 text-muted-foreground/70'>· 비공개</span>
+          )}
+          {room.room_tp_cd === 'D' && (
+            <span className='ml-1 text-muted-foreground/70'>· 1:1</span>
+          )}
         </p>
       </div>
     </Link>
+  )
+}
+
+function SectionHeader({ label }: { label: string }) {
+  return (
+    <h2 className='mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground'>
+      {label}
+    </h2>
   )
 }
 
@@ -42,6 +82,16 @@ export function ChatListView({
   myRooms: RoomWithTheme[]
   discoverRooms: RoomWithTheme[]
 }) {
+  const subscriptionRooms = myRooms.filter(r => r.msg_theme?.[0]?.theme_tp_cd === 'PREMIUM')
+  const regularRooms = myRooms.filter(r => r.msg_theme?.[0]?.theme_tp_cd !== 'PREMIUM')
+
+  // 탐색 목록: PREMIUM 테마 먼저 정렬
+  const sortedDiscover = [...discoverRooms].sort((a, b) => {
+    const aP = a.msg_theme?.[0]?.theme_tp_cd === 'PREMIUM' ? 0 : 1
+    const bP = b.msg_theme?.[0]?.theme_tp_cd === 'PREMIUM' ? 0 : 1
+    return aP - bP
+  })
+
   return (
     <div className='mx-auto max-w-2xl px-4 py-8'>
       {/* 헤더 */}
@@ -53,33 +103,50 @@ export function ChatListView({
         <GroupRoomCreator />
       </div>
 
-      {/* 내 채팅방 */}
+      {/* 구독 채팅 */}
+      {subscriptionRooms.length > 0 && (
+        <section className='mb-8'>
+          <div className='mb-3 flex items-center gap-2'>
+            <SectionHeader label='구독 채팅' />
+            <span className='mb-3 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'>
+              PREMIUM
+            </span>
+          </div>
+          <div className='space-y-2'>
+            {subscriptionRooms.map(room => (
+              <RoomCard key={room.room_id} room={room} href={`/chat/${room.room_id}`} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* 일반 채팅 */}
       <section className='mb-8'>
-        <h2 className='mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground'>
-          내 채팅방
-        </h2>
-        {myRooms.length === 0 ? (
+        <SectionHeader label='내 채팅방' />
+        {regularRooms.length === 0 && subscriptionRooms.length === 0 ? (
           <div className='rounded-xl border border-dashed py-8 text-center'>
             <p className='text-sm text-muted-foreground'>아직 참여 중인 채팅방이 없습니다</p>
             <p className='mt-1 text-xs text-muted-foreground'>+ 채팅방 만들기로 첫 방을 개설해 보세요</p>
           </div>
+        ) : regularRooms.length === 0 ? (
+          <div className='rounded-xl border border-dashed py-6 text-center'>
+            <p className='text-sm text-muted-foreground'>일반 채팅방이 없습니다</p>
+          </div>
         ) : (
           <div className='space-y-2'>
-            {myRooms.map(room => (
+            {regularRooms.map(room => (
               <RoomCard key={room.room_id} room={room} href={`/chat/${room.room_id}`} />
             ))}
           </div>
         )}
       </section>
 
-      {/* 공개 채팅방 탐색 */}
-      {discoverRooms.length > 0 && (
+      {/* 공개 채팅방 탐색 (PREMIUM 먼저) */}
+      {sortedDiscover.length > 0 && (
         <section>
-          <h2 className='mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground'>
-            공개 채팅방 탐색
-          </h2>
+          <SectionHeader label='공개 채팅방 탐색' />
           <div className='space-y-2'>
-            {discoverRooms.map(room => (
+            {sortedDiscover.map(room => (
               <RoomCard key={room.room_id} room={room} href={`/chat/${room.room_id}`} />
             ))}
           </div>

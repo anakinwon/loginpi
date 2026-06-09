@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
+import { canCreateRoom } from '@/lib/chat-auth'
 import { createGroupRoom } from '@/lib/chat'
 
-// 무료 테마는 결제 없이 그룹방 생성 가능
-// 서버에서 화이트리스트 검증 — 클라이언트 우회 방지
+// 무료 테마(FITNESS) 또는 구독자의 월 무료 쿼터 내에서는 결제 없이 그룹방 생성 가능
+// 서버에서 화이트리스트·구독 권한 검증 — 클라이언트 우회 방지
 const FREE_THEME_CODES = new Set(['FITNESS'])
 
 export async function POST(request: NextRequest) {
@@ -27,8 +28,15 @@ export async function POST(request: NextRequest) {
     max_mbr_cnt?: number
   }
 
-  if (!theme_cd || !FREE_THEME_CODES.has(theme_cd)) {
-    return NextResponse.json({ error: '이 테마는 결제가 필요합니다' }, { status: 403 })
+  if (!theme_cd) {
+    return NextResponse.json({ error: '테마를 선택해 주세요' }, { status: 400 })
+  }
+
+  if (!FREE_THEME_CODES.has(theme_cd)) {
+    const allowance = await canCreateRoom(user.id)
+    if (!allowance.allowed) {
+      return NextResponse.json({ error: '이 테마는 결제가 필요합니다' }, { status: 403 })
+    }
   }
   if (!room_nm?.trim()) {
     return NextResponse.json({ error: '채팅방 이름을 입력해 주세요' }, { status: 400 })

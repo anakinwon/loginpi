@@ -3,7 +3,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { ChatListView, type RoomWithTheme } from '@/components/chat/chat-list-view'
 import { ClientChatList } from '@/components/chat/client-chat-list'
 
-const ROOM_SELECT = 'room_id, room_nm, theme_cd, room_tp_cd, is_public_yn, msg_theme(theme_nm, theme_emoji)'
+const ROOM_SELECT = 'room_id, room_nm, theme_cd, room_tp_cd, is_public_yn, msg_theme(theme_nm, theme_emoji, theme_tp_cd)'
 
 export default async function ChatPage() {
   const user = await getSessionUser()

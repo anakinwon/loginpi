@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  next-themes@0.4.6: 91ca281e4a624d29f34509c1bb900e53c1c36bc69d50191f0262bd69f21bc24e
+
 importers:
 
   .:
@@ -46,7 +49,7 @@ importers:
         version: 4.13.0(next@16.2.7(@babel/core@7.29.7)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)(typescript@6.0.3)
       next-themes:
         specifier: ^0.4.6
-        version: 0.4.6(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        version: 0.4.6(patch_hash=91ca281e4a624d29f34509c1bb900e53c1c36bc69d50191f0262bd69f21bc24e)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       react:
         specifier: 19.2.7
         version: 19.2.7
@@ -6047,7 +6050,7 @@ snapshots:
     transitivePeerDependencies:
       - '@swc/helpers'
 
-  next-themes@0.4.6(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
+  next-themes@0.4.6(patch_hash=91ca281e4a624d29f34509c1bb900e53c1c36bc69d50191f0262bd69f21bc24e)(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
     dependencies:
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)

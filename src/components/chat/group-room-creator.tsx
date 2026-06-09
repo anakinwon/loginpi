@@ -48,13 +48,15 @@ export function GroupRoomCreator() {
   const [payStatus, setPayStatus] = useState<PayStatus>('idle')
   const [payError, setPayError] = useState<string | null>(null)
   const [canUsePremiumTheme, setCanUsePremiumTheme] = useState(false)
+  const [canCreateRoomFree, setCanCreateRoomFree] = useState(false)
 
-  // 구독 여부 확인 — PREMIUM 테마 추가 요금 면제 여부 결정
+  // 구독 여부 확인 — PREMIUM 테마 추가 요금 면제 + 월 무료 방 생성 쿼터 여부 결정
   useEffect(() => {
     piFetch('/api/subscriptions/check')
       .then(r => r.ok ? r.json() : null)
-      .then((d: { canUsePremiumTheme?: boolean } | null) => {
+      .then((d: { canUsePremiumTheme?: boolean; canCreateRoomFree?: boolean } | null) => {
         setCanUsePremiumTheme(d?.canUsePremiumTheme ?? false)
+        setCanCreateRoomFree(d?.canCreateRoomFree ?? false)
       })
       .catch(() => { /* 조용히 실패 — 비구독자로 취급 */ })
   }, [])
@@ -74,9 +76,9 @@ export function GroupRoomCreator() {
   }, [open])
 
   const isPremium = selectedTheme?.theme_tp_cd === 'PREMIUM'
-  // FITNESS(PT/피트니스)는 무료 — 결제 없이 바로 생성
-  const isFree = selectedTheme?.theme_cd === 'FITNESS'
-  // 구독자는 PREMIUM 테마 추가 요금 면제 → 방 생성(0.1π)만 청구
+  // FITNESS(PT/피트니스)는 무료, 또는 구독자의 월 무료 쿼터 내에서는 결제 없이 생성
+  const isFree = selectedTheme?.theme_cd === 'FITNESS' || canCreateRoomFree
+  // 비구독자만 결제: PREMIUM 테마는 0.3π(방0.1+테마0.2), BASIC은 0.1π
   const payAmount = isPremium && !canUsePremiumTheme ? 0.3 : 0.1
   const isBusy = payStatus === 'approving' || payStatus === 'waiting' || payStatus === 'completing'
 
@@ -165,7 +167,7 @@ export function GroupRoomCreator() {
     setPayStatus('completing')
     setPayError(null)
     try {
-      const res = await fetch('/api/chat/rooms/group', {
+      const res = await piFetch('/api/chat/rooms/group', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -327,7 +329,7 @@ export function GroupRoomCreator() {
                     disabled={isBusy}
                     className='flex-1 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-40'
                   >
-                    {isBusy ? '생성 중…' : '무료 방 만들기'}
+                    {isBusy ? '생성 중…' : canCreateRoomFree && selectedTheme?.theme_cd !== 'FITNESS' ? '구독 혜택으로 방 만들기' : '무료 방 만들기'}
                   </button>
                 ) : (
                   <button
