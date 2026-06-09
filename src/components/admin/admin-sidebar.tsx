@@ -12,6 +12,7 @@ const NAV = [
   { href: '/admin/payments', labelKey: 'payments' },
   { href: '/admin/links',    labelKey: 'links' },
   { href: '/admin/board',    labelKey: 'board' },
+  { href: '/admin/batch',    labelKey: 'batch' },
 ] as const
 
 const STD_NAV = [

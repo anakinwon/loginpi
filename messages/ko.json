@@ -195,7 +195,26 @@
       "stdApprovals": "승인 워크플로우",
       "i18nSection": "다국어",
       "i18n": "다국어 관리",
+      "batch": "온디멘드 배치",
       "backHome": "← 홈으로"
+    },
+    "batch": {
+      "title": "온디멘드 배치",
+      "desc": "통계 집계를 수동으로 즉시 실행합니다",
+      "runToday": "오늘 집계 실행",
+      "runYesterday": "어제 집계 실행",
+      "runDate": "특정 날짜 집계",
+      "runBtn": "실행",
+      "running": "실행 중…",
+      "success": "{date} 집계 완료",
+      "error": "집계 실패: {msg}",
+      "backfillTitle": "기간 백필",
+      "backfillDesc": "from ~ to 범위를 일괄 집계합니다",
+      "backfillRun": "백필 실행",
+      "backfillRunning": "백필 실행 중…",
+      "backfillSuccess": "{total}일 집계 완료 (실패 {failed}건)",
+      "from": "시작일",
+      "to": "종료일"
     },
     "dashboard": {
       "title": "대시보드",

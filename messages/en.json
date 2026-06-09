@@ -538,7 +538,26 @@
       "users": "User Management",
       "board": "Board Management",
       "stdSection": "Data Standard",
-      "stdDdl": "DDL Export"
+      "stdDdl": "DDL Export",
+      "batch": "On-demand Batch"
+    },
+    "batch": {
+      "title": "On-demand Batch",
+      "desc": "Manually trigger statistics aggregation",
+      "runToday": "Run Today's Aggregation",
+      "runYesterday": "Run Yesterday's Aggregation",
+      "runDate": "Run for Specific Date",
+      "runBtn": "Run",
+      "running": "Running…",
+      "success": "Aggregation complete for {date}",
+      "error": "Aggregation failed: {msg}",
+      "backfillTitle": "Range Backfill",
+      "backfillDesc": "Aggregate all dates in from ~ to range",
+      "backfillRun": "Run Backfill",
+      "backfillRunning": "Running backfill…",
+      "backfillSuccess": "{total} days aggregated ({failed} failed)",
+      "from": "From",
+      "to": "To"
     }
   }
 }
