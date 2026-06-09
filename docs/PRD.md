@@ -656,7 +656,7 @@ export default async function ProfilePage() {
 
 ---
 
-## 13. Phase 11 — 어드민 통계 대시보드 (DAU/WAU/MAU · 테마별 매출) 🔜
+## 13. Phase 11 — 어드민 통계 대시보드 (DAU/WAU/MAU · 테마별 매출) ✅
 
 > 상세 명세: `docs/PRD_6_CHART.md` | 담당 에이전트: `.claude/agents/chart/dashboard-stats-builder.md`
 
@@ -729,20 +729,131 @@ src/types/stats.ts           # ActivityStatsResponse / RevenueStatsResponse
 
 | Task | 내용 | 상태 |
 |---|---|---|
-| TASK-080 | `sql/015` 활동 로그 마이그레이션 + `fn_record_activity` | 🔜 |
-| TASK-081 | `lib/activity-log.ts` + 인증 진입점 계측 (원천 적재 시작) | 🔜 |
-| TASK-082 | `sql/016` rollup 2종 + `fn_build_daily_stats(date)` 집계 RPC | 🔜 |
-| TASK-083 | `/api/admin/stats/aggregate` + Cron(pg_cron/Vercel) + 과거 백필 | 🔜 |
-| TASK-084 | `types/stats.ts` + `activity`·`revenue` API (rollup 조회 + 당일 보정) | 🔜 |
-| TASK-085 | react-plotly.js 설치 + `plotly-theme.ts` + 차트 컴포넌트 3종 | 🔜 |
-| TASK-086 | `StatsCard`·`StatsDashboard` + `stats/page.tsx` + 어드민 메뉴 | 🔜 |
-| TASK-087 | 검증 — 멱등성·백필 대조·당일 보정·다크모드·Pi Browser | 🔜 |
+| TASK-080 | `sql/015` 활동 로그 마이그레이션 + `fn_record_activity` | ✅ |
+| TASK-081 | `lib/activity-log.ts` + 인증 진입점 계측 (원천 적재 시작) | ✅ |
+| TASK-082 | `sql/016` rollup 2종 + `fn_build_daily_stats(date)` 집계 RPC | ✅ |
+| TASK-083 | `/api/admin/stats/aggregate` + Cron(pg_cron/Vercel) + 과거 백필 | ✅ |
+| TASK-084 | `types/stats.ts` + `activity`·`revenue` API (rollup 조회 + 당일 보정) | ✅ |
+| TASK-085 | react-plotly.js 설치 + `plotly-theme.ts` + 차트 컴포넌트 3종 | ✅ |
+| TASK-086 | `StatsCard`·`StatsDashboard` + `stats/page.tsx` + 어드민 메뉴 | ✅ |
+| TASK-087 | 검증 — 멱등성·백필 대조·당일 보정·다크모드·Pi Browser | ✅ |
 
 > ⚠️ DAU/WAU/MAU는 소급 불가 — TASK-080·081(원천 계측)을 **가장 먼저** 배포해 데이터를 축적한 뒤 집계·차트를 붙인다.
 
 ---
 
-## 14. 환경변수 전체 목록
+## 14. Phase 12 — PiTranslate™ 글로벌 동시통역 🔜
+
+> 상세 명세: `docs/PRD_4_CHAT.md` (v1.6, Section 1-4) | 담당 에이전트: Phase 12 전용 에이전트 없음 — `chat-translate.ts` 직접 구현
+
+### 14.1 범위
+
+| 섹션 | 기능 |
+|---|---|
+| 자동 번역 | 메시지 수신 시 사용자 선택 locale로 자동 번역 (원본 언어 ≠ 사용자 locale 시) |
+| 번역 엔진 | **Gemini 2.0 Flash** 주력 (번역·언어감지) + **Claude Haiku** fallback |
+| 동시성 처리 | in-memory pending map — 동일 (msgId, locale) 동시 요청 시 API 1회만 호출 |
+| 캐시 | `msg_trans` 테이블 (msg_id, locale_cd) UNIQUE — 동일 조합 1회만 번역 |
+| 실시간 전달 | Supabase Realtime broadcast `msg_trans` 이벤트 — 같은 locale 사용자 동시 수신 |
+| 투명성 | 메시지 버블 `[원문 보기]` 토글 UI |
+
+### 14.2 핵심 결정
+
+| 항목 | 결정 |
+|---|---|
+| 번역 엔진 | **하이브리드**: Gemini 2.0 Flash (주력, ~76% 비용 절감) + Claude Haiku (fallback) |
+| 번역 제공 범위 | **전 사용자 무료** — 월 ~$30 인프라로 글로벌 킬러 피처 제공 |
+| 동시성 | in-memory pending map (`chat-translate-dedup.ts`) — 서버 재시작 시 소멸, 경합 없음 |
+| 언어 감지 | Gemini Flash API 단일 호출 (번역 + 감지 동시) → `msg_msg.src_lang_cd` 저장 |
+| 클라이언트 구독 | `use-chat-room.ts`에 `msg_trans` broadcast 이벤트 추가 |
+
+### 14.3 DB 마이그레이션
+
+**`sql/018_msg_trans.sql`** — 번역 캐시 테이블 신설 + `msg_msg.src_lang_cd` 컬럼 추가
+
+```sql
+-- msg_msg에 원본 언어 코드 추가
+ALTER TABLE msg_msg ADD COLUMN IF NOT EXISTS src_lang_cd VARCHAR(20);
+
+-- 번역 캐시 테이블 (On-demand, UNIQUE(msg_id, locale_cd))
+CREATE TABLE IF NOT EXISTS msg_trans (
+  trans_id   UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  msg_id     UUID NOT NULL REFERENCES msg_msg(msg_id) ON DELETE CASCADE,
+  locale_cd  VARCHAR(20) NOT NULL,
+  trans_cont TEXT NOT NULL,
+  regr_id    TEXT NOT NULL DEFAULT 'SYSTEM',
+  reg_dtm    TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  modr_id    TEXT NOT NULL DEFAULT 'SYSTEM',
+  mod_dtm    TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE (msg_id, locale_cd)
+);
+```
+
+### 14.4 API 설계
+
+| 엔드포인트 | 메서드 | 설명 |
+|---|---|---|
+| `/api/chat/rooms/[roomId]/messages/[msgId]/translate` | POST | 번역 API — 캐시 → dedup → Gemini Flash → broadcast |
+
+**번역 흐름**:
+```
+POST /translate
+  1. msg_trans 캐시 조회 → 캐시 히트 시 즉시 반환 + broadcast
+  2. pending map 확인 (중복 API 호출 방지)
+  3. Gemini 2.0 Flash API (번역 + 언어감지)
+     → 실패 시 Claude Haiku fallback
+  4. msg_trans UPSERT
+  5. Supabase Realtime broadcast('msg_trans', { msg_id, locale_cd, trans_cont })
+```
+
+### 14.5 컴포넌트 구조
+
+```
+src/lib/
+├── chat-translate.ts           # Gemini Flash + Claude Haiku fallback 번역
+└── chat-translate-dedup.ts     # in-memory pending map 동시성 처리
+src/app/api/chat/rooms/[roomId]/messages/[msgId]/translate/
+└── route.ts                    # POST — 번역 API
+src/hooks/
+└── use-chat-room.ts            # msg_trans broadcast 이벤트 추가 (Phase 12 확장)
+src/components/chat/
+├── chat-message-list.tsx       # 번역 텍스트 표시 + [원문 보기] 토글
+└── translated-message.tsx      # 번역 버블 컴포넌트 (신규)
+```
+
+### 14.6 클라이언트 broadcast 확장
+
+```tsx
+// use-chat-room.ts — Phase 12 확장
+channel
+  .on('broadcast', { event: 'new_msg' }, ({ payload }) => addMessage(payload as ChatMessage))
+  .on('broadcast', { event: 'msg_trans' }, ({ payload }) => {
+    if (payload.locale_cd === userLocale) replaceTranslation(payload.msg_id, payload.trans_cont)
+  })
+  .on('presence', { event: 'sync' }, () => setOnlineUserIds(Object.keys(channel.presenceState())))
+  .subscribe()
+```
+
+### 14.7 개발 태스크
+
+| Task | 내용 | 상태 |
+|---|---|---|
+| TASK-090 | `sql/018_msg_trans.sql` 마이그레이션 + `msg_msg.src_lang_cd` + `env.ts` `GEMINI_API_KEY` | 🔜 |
+| TASK-091 | `src/lib/chat-translate.ts` — Gemini 2.0 Flash 번역·언어감지 + Claude Haiku fallback | 🔜 |
+| TASK-092 | `src/lib/chat-translate-dedup.ts` — in-memory pending map 동시성 처리 | 🔜 |
+| TASK-093 | `POST /api/chat/rooms/[roomId]/messages/[msgId]/translate` 번역 API | 🔜 |
+| TASK-094 | 메시지 전송 시 방 참가자 locale 자동 번역 큐 (비동기, non-blocking) | 🔜 |
+| TASK-095 | `use-chat-room.ts` 확장 — `msg_trans` broadcast 이벤트 구독 + 메시지 번역 교체 | 🔜 |
+| TASK-096 | 사용자 프로필 — 표시 언어 설정 UI (203개 locale, 1회 설정) | 🔜 |
+| TASK-097 | 메시지 버블 `[원문 보기]` 토글 UI (번역 투명성 보장) | 🔜 |
+| TASK-098 | 어드민 번역 통계 (일별 번역 건수·캐시 히트율·비용 추정) | 🔜 |
+| TASK-099 | 번역 품질 피드백 UI (메시지별 👍/👎 — 향후 fine-tune 데이터) | 🔜 |
+
+> **구현 순서**: TASK-090 → 091 → 092 → 093 → 094 → 095 (P0 완료 = MVP) → 096 → 097 → 098 → 099
+
+---
+
+## 15. 환경변수 전체 목록
 
 | 변수명 | Phase | 용도 |
 |---|---|---|
@@ -756,14 +867,14 @@ src/types/stats.ts           # ActivityStatsResponse / RevenueStatsResponse
 | `NEXT_PUBLIC_SUPABASE_URL` | 2 | Supabase 프로젝트 URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | 2 | Supabase Anon Key |
 | `SUPABASE_SERVICE_ROLE_KEY` | 2 | Supabase Service Role (서버 전용) |
-| `GEMINI_API_KEY` | 6 | Gemini AI 번역 |
+| `GEMINI_API_KEY` | 6, 12 | Gemini AI 번역 (Phase 6 다국어 + Phase 12 PiTranslate™ 주력 엔진) |
 | `RESEND_API_KEY` | 6 | 결제 영수증 이메일 발송 |
-| `ANTHROPIC_API_KEY` | 7 | Claude AI 채팅 비서 (Phase 7 신규) |
+| `ANTHROPIC_API_KEY` | 7 | Claude AI 채팅 비서 (Phase 7 신규) · PiTranslate™ fallback (Phase 12) |
 | `CRON_SECRET` | 11 | 통계 집계 배치 인증 (Vercel Cron 경로 채택 시, Phase 11 신규) |
 
 ---
 
-## 15. 디렉토리 구조
+## 16. 디렉토리 구조
 
 ```
 src/
@@ -812,7 +923,7 @@ src/
 │       ├── subscription-gate.tsx
 │       └── inline-purchase-prompt.tsx
 ├── hooks/
-│   └── use-chat-room.ts            # Supabase Realtime 구독 훅 (Phase 7~9)
+│   └── use-chat-room.ts            # Supabase Realtime 구독 훅 (Phase 7~9, 12 확장)
 ├── i18n/
 │   ├── routing.ts
 │   └── request.ts
@@ -822,6 +933,8 @@ src/
 │   ├── chat-auth.ts                # 구독 등급 체크 헬퍼 (Phase 7~9)
 │   ├── chat.ts                     # 채팅 CRUD 헬퍼 (Phase 7~9)
 │   ├── chat-ai-prompts.ts          # 테마별 AI 시스템 프롬프트 (Phase 7~9)
+│   ├── chat-translate.ts           # Gemini Flash + Claude Haiku fallback 번역 (Phase 12)
+│   ├── chat-translate-dedup.ts     # in-memory pending map 동시성 처리 (Phase 12)
 │   ├── activity-log.ts             # 사용자 활동 계측 UPSERT (Phase 11)
 │   ├── plotly-theme.ts             # Plotly 다크모드 layout 프리셋 (Phase 11)
 │   ├── locale-currency.ts
@@ -839,7 +952,7 @@ src/
 
 ---
 
-## 16. DB 테이블 현황
+## 17. DB 테이블 현황
 
 ### 기존 테이블 (Phase 0~6)
 
@@ -882,9 +995,17 @@ src/
 | public | stat_actvty_dly | 일별 활동 중간집계 (DAU/WAU/MAU 사전 계산) — `sql/016` |
 | public | stat_revenue_dly | 일별 × 테마별 매출 중간집계 (PK `stat_dt, theme_cd`) — `sql/016` |
 
+### 신규 테이블 (Phase 12 — PiTranslate™)
+
+| 스키마 | 테이블 | 설명 |
+|---|---|---|
+| public | msg_trans | 번역 캐시 (`UNIQUE(msg_id, locale_cd)`) — On-demand 번역 결과 저장, 같은 조합 1회만 번역 — `sql/018` |
+
+> **Phase 12 컬럼 추가**: `msg_msg.src_lang_cd VARCHAR(20)` — 원본 언어 코드 (Gemini Flash 감지) — `sql/018`
+
 ---
 
-## 17. 변경 이력
+## 18. 변경 이력
 
 | 버전 | 날짜 | 내용 |
 |---|---|---|
@@ -894,3 +1015,4 @@ src/
 | v4.0 | 2026-06-07 | Phase 7~9 PiChat 통합. 섹션 11 신규 추가 (테마 시스템·구독 티어·인라인 트리거·DB 13개·API·Realtime·탈중앙화). Next.js 16·TypeScript 6 업그레이드 반영. `docs/PRD_CHAT.md`에서 핵심 내용 통합 |
 | v5.0 | 2026-06-09 | Phase 7 PiChat MVP 완료 상태 현행화. Phase 10 사용자 프로필 관리(마이페이지) 신규 추가 — 섹션 12 신설(DB 마이그레이션 014·API 명세·컴포넌트 구조·Pi Browser 클라이언트 게이트 패턴). `PRD_USERS.md` 핵심 내용 통합. 섹션 번호 12→13, 13→14, 14→15, 15→16 재정렬. |
 | v6.0 | 2026-06-09 | Phase 10 완료 반영. Phase 11 어드민 통계 대시보드(DAU/WAU/MAU·테마별 매출) 신규 추가 — 섹션 13 신설(`PRD_CHART.md` 수용: react-plotly.js 채택·활동로그 `sys_user_actvty_log`·중간집계 rollup `stat_actvty_dly`/`stat_revenue_dly`·`fn_build_daily_stats` 멱등 집계·4경로 매출 귀속·TASK-080~087). 섹션 13→14, 14→15, 15→16, 16→17 재정렬. CRON_SECRET 환경변수·신규 통계 테이블 3종 추가. |
+| v7.0 | 2026-06-10 | Phase 11 완료 반영. Phase 12 PiTranslate™ 글로벌 동시통역 신규 추가 — 섹션 14 신설(`PRD_4_CHAT.md` v1.6 수용: Gemini 2.0 Flash 주력 + Claude Haiku fallback 하이브리드·비용 ~76% 절감·`msg_trans` 번역 캐시 테이블·in-memory dedup·broadcast 기반 실시간 전달·TASK-090~099). 기존 섹션 14→15, 15→16, 16→17, 17→18 재번호화. `GEMINI_API_KEY` Phase `6, 12`로 업데이트. Phase 12 파일 디렉토리 구조 추가. `msg_trans` DB 테이블 현황 추가. |

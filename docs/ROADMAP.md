@@ -2,8 +2,8 @@
 
 Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Network 앱 플랫폼
 
-> **기준일**: 2026-06-09
-> **현재 버전**: Phase 7·10·11 완료 (PiChat MVP · 사용자 프로필 · 통계 대시보드) · Phase 8~9 대기
+> **기준일**: 2026-06-10
+> **현재 버전**: Phase 7·10·11 완료 (PiChat MVP · 사용자 프로필 · 통계 대시보드) · Phase 8~9 대기 · **Phase 12 PiTranslate™ 설계 완료 (구현 대기)**
 > **배포 URL**: https://loginpi.vercel.app
 > **기술 스택**: Next.js 16 App Router · React 19 · TypeScript 6 · Tailwind CSS v4 · NextAuth.js · Supabase PostgreSQL
 
@@ -398,7 +398,7 @@ brd_attch 8행  — fl_nm/fl_pth/fl_url/fl_sz/fl_tp, del_yn 논리삭제
 ## Phase 7: PiChat MVP ✅ (완료)
 
 > **목표**: 테마 기반 1:1·그룹 채팅 + Supabase Realtime + Pi 결제 연동 + 구독 시스템
-> **상세 스펙**: `docs/PRD_4_CHAT.md` (v1.2)
+> **상세 스펙**: `docs/PRD_4_CHAT.md` (v1.6)
 
 ### TASK-050: DB 마이그레이션 (`msg_*` 13개 테이블) ✅ 완료
 
@@ -750,6 +750,85 @@ if (meta?.type === 'CHAT_SUBSCR') {
 
 ---
 
+## Phase 12: PiTranslate™ 글로벌 동시통역 🔜 (준비중)
+
+> **목표**: 채팅방에서 어떤 언어로 보내도, 각 사용자의 선택 언어로 실시간 자동 번역 — 언어 장벽 제로
+> **상세 스펙**: `docs/PRD_4_CHAT.md` (v1.6, Section 1-4) | **담당 에이전트**: 전용 에이전트 없음
+> **핵심 결정**: ① 번역 엔진 = **Gemini 2.0 Flash**(주력) + **Claude Haiku**(fallback) 하이브리드 (비용 ~76% 절감) ② 캐시 = `msg_trans` 테이블 `UNIQUE(msg_id, locale_cd)` ③ 동시성 = in-memory pending map ④ 실시간 = Supabase Realtime broadcast `msg_trans` 이벤트
+
+### TASK-090: DB 마이그레이션 + 환경변수 🔜
+
+- 🔜 `sql/018_msg_trans.sql` — `msg_trans` 번역 캐시 테이블 신설
+  - PK `trans_id UUID`, UNIQUE `(msg_id, locale_cd)`, `trans_cont TEXT NOT NULL`
+  - 시스템 컬럼 4개 + `del_yn` DA 표준 준수 (`-- DA-APPROVED:` 주석 필수)
+- 🔜 `msg_msg.src_lang_cd VARCHAR(20)` 컬럼 추가 (원본 언어 코드 — Gemini Flash 감지)
+- 🔜 `src/env.ts` + `.env.example` — `GEMINI_API_KEY` 이미 등록 확인 (Phase 6에서 추가됨)
+
+### TASK-091: Gemini Flash 번역 라이브러리 🔜
+
+- 🔜 `src/lib/chat-translate.ts` — 번역 단일 함수 `translateMessage(text, srcLang, targetLocale)`
+  - Gemini 2.0 Flash API: 번역 + 언어감지 단일 호출
+  - 실패·타임아웃 시 Claude Haiku fallback 자동 전환 (`ANTHROPIC_API_KEY` 재사용)
+  - 반환: `{ translated: string, srcLangCd: string }`
+
+### TASK-092: 동시성 dedup 처리 🔜
+
+- 🔜 `src/lib/chat-translate-dedup.ts` — in-memory pending map
+  - key: `${msgId}:${localeCd}`, value: `Promise<string>`
+  - 동일 (msgId, locale) 동시 요청 시 API 1회만 호출, 나머지는 첫 Promise await
+  - 서버 재시작 시 맵 소멸 (DB 캐시로 보완)
+
+### TASK-093: 번역 API 라우트 🔜
+
+- 🔜 `POST /api/chat/rooms/[roomId]/messages/[msgId]/translate`
+  - Body: `{ locale_cd: string }`
+  - 인증: `getSessionUser()` + 방 참가 여부 확인 (`piFetch` 지원)
+  - 흐름: `msg_trans` DB 캐시 조회 → 캐시 히트 즉시 반환 → pending map → Gemini Flash → DB UPSERT → Realtime broadcast
+
+### TASK-094: 메시지 전송 시 번역 큐 연동 🔜
+
+- 🔜 `POST /api/chat/rooms/[roomId]/messages` 확장
+  - 저장 + broadcast 후 비동기(non-blocking `void`) 번역 큐 시작
+  - `getDistinctRoomLocales(roomId)` — 방 참가자 locale 목록 조회
+  - `src_lang_cd` 감지 후 `msg_msg` 업데이트 (첫 번역 시)
+  - 각 locale별 `/translate` 내부 호출 (본인 locale 제외)
+
+### TASK-095: 클라이언트 broadcast 구독 확장 🔜
+
+- 🔜 `src/hooks/use-chat-room.ts` — `msg_trans` broadcast 이벤트 추가
+  ```typescript
+  .on('broadcast', { event: 'msg_trans' }, ({ payload }) => {
+    if (payload.locale_cd === userLocale) replaceTranslation(payload.msg_id, payload.trans_cont)
+  })
+  ```
+- 🔜 `replaceTranslation(msgId, transText)` — 메시지 번역 텍스트 교체 함수
+- 🔜 ChatMessage 타입에 `trans_cont?: string` 추가
+
+> **P0 완료 = MVP**: TASK-090 → 091 → 092 → 093 → 094 → 095 완료 시 PiTranslate™ 기본 동작
+
+### TASK-096: 사용자 표시 언어 설정 UI 🔜
+
+- 🔜 프로필 페이지 (`/profile`) — "표시 언어" 설정 항목 추가 (203개 locale 드롭다운, 1회 설정)
+- 🔜 `sys_user.display_locale_cd` 컬럼 추가 (없으면 `navigator.language` fallback)
+- 🔜 `src/hooks/use-user-locale.ts` — 클라이언트 locale 훅 (localStorage 캐시)
+
+### TASK-097: 원문 보기 토글 UI 🔜
+
+- 🔜 메시지 버블에 `[원문 보기]` 토글 버튼 추가 (번역 투명성 보장)
+- 🔜 `src/components/chat/translated-message.tsx` — 번역/원문 전환 컴포넌트
+
+### TASK-098: 어드민 번역 통계 🔜
+
+- 🔜 어드민 대시보드에 번역 통계 탭 추가
+- 🔜 일별 번역 건수 · 캐시 히트율 · 예상 비용 (Gemini API 토큰 기준)
+
+### TASK-099: 번역 품질 피드백 🔜
+
+- 🔜 메시지별 번역 👍/👎 피드백 UI
+- 🔜 `msg_trans.feedback_yn CHAR(1)` 컬럼 추가 (향후 fine-tune 데이터)
+
+---
+
 ## 마일스톤 요약
 
 | 마일스톤 | Phase | 완료일 | 주요 산출물 | 상태 |
@@ -776,6 +855,7 @@ if (meta?.type === 'CHAT_SUBSCR') {
 | M18: PiChat 생태계 | Phase 9 | — | 마켓플레이스, Pi Bet, Webhook, 분석 대시보드, 커스텀 스티커 | 🔜 준비중 |
 | M19: 사용자 프로필 | Phase 10 | 2026-06-09 | 마이페이지 (개인정보·결제내역·구독현황), Pi Browser ClientGate | ✅ 완료 |
 | M20: 어드민 통계 대시보드 | Phase 11 | 2026-06-09 | DAU/WAU/MAU·테마별 매출 (react-plotly.js + 중간집계 rollup) | ✅ 완료 |
+| M21: PiTranslate™ MVP | Phase 12 | — | sql/018 + chat-translate.ts + dedup + translate API + broadcast 확장 (TASK-090~095) | 🔜 준비중 |
 
 ---
 
@@ -831,3 +911,4 @@ if (meta?.type === 'CHAT_SUBSCR') {
 | v2.5 | 2026-06-09 | Phase 10 완료 — TASK-056~062 전체 구현 완료. DB 마이그레이션(Supabase 적용)·users.ts 타입 확장+updateUserProfile()·GET/PATCH /api/profile·GET /api/profile/payments·page.tsx+5개 컴포넌트·ko.json 번역. pnpm build 성공, /[locale]/profile ∙ /api/profile ∙ /api/profile/payments 라우트 확인. M19 달성. | anakin |
 | v2.6 | 2026-06-09 | Phase 11 어드민 통계 대시보드 계획 추가 — TASK-080~087 (`PRD_CHART.md` 수용). react-plotly.js 채택, 활동 로그 `sys_user_actvty_log`(하루 1행 UPSERT) + 계측, 중간집계 rollup `stat_actvty_dly`/`stat_revenue_dly` + `fn_build_daily_stats` 멱등 집계, 일배치/백필/당일보정 하이브리드, 테마별 매출 4경로 UNION. M20 마일스톤 추가. PRD.md v6.0 통합(섹션 13 신설). | anakin |
 | v2.7 | 2026-06-09 | Phase 11 완료 현행화 — TASK-083/084/085/087 구현 완료 확인 후 🔜→✅ 업데이트. TASK-083: `POST /api/admin/stats/aggregate` CRON_SECRET+어드민 이중인증·백필 모드(`backfill:true`)·`vercel.json` Cron(`0 0 * * *`) 등록. TASK-084: `fn_top_active_users`/`fn_top_revenue_themes`/`fn_top_spenders` RPC 3종 Supabase 배포. TASK-085: `plotly-plot.tsx`(ssr:false)·`dau-wau-mau-chart`·`revenue-donut-chart`·`revenue-timeline-chart` 4종 구현. 실데이터 적재 확인: `stat_actvty_dly` 5일치(2026-06-05~09)·`stat_revenue_dly` 4일치(2026-06-06~09). M20 완료일 2026-06-09 반영. | anakin |
+| v2.8 | 2026-06-10 | Phase 12 PiTranslate™ 글로벌 동시통역 로드맵 추가 — TASK-090~099 (`PRD_4_CHAT.md` v1.6 수용). Gemini 2.0 Flash 주력 + Claude Haiku fallback 하이브리드, `msg_trans` 번역 캐시, in-memory dedup(`chat-translate-dedup.ts`), broadcast 기반 실시간 전달. M21 마일스톤 추가. `PRD_4_CHAT.md` 버전 참조 v1.2→v1.6 업데이트. 기준일 2026-06-10 갱신. `PRD.md` v7.0 통합(섹션 14 신설·섹션 15~18 재번호화). | anakin |
