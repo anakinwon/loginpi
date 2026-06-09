@@ -20,7 +20,7 @@ interface UserRow {
   google_name: string | null
   display_name: string
   role: string
-  created_at: string
+  reg_dtm: string
 }
 
 function getLinkStatus(u: UserRow): LinkStatus {
@@ -151,7 +151,17 @@ export default function LinksPage() {
                     </td>
                     <td className='px-4 py-3 text-xs text-muted-foreground'>{u.role}</td>
                     <td className='whitespace-nowrap px-4 py-3 text-xs text-muted-foreground'>
-                      {new Date(u.created_at).toLocaleDateString('ko-KR')}
+                      {u.reg_dtm
+                        ? new Date(u.reg_dtm).toLocaleString('ko-KR', {
+                            timeZone: 'Asia/Seoul',
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit',
+                          })
+                        : '—'}
                     </td>
                   </tr>
                 )
