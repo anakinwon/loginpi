@@ -1,0 +1,39 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import { piFetch } from '@/lib/pi-fetch'
+import { ProfileTabs } from './profile-tabs'
+import type { UserRow } from '@/lib/users'
+
+export function ClientProfileGate() {
+  const [user, setUser] = useState<UserRow | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
+
+  useEffect(() => {
+    piFetch('/api/profile')
+      .then(res => (res.ok ? res.json() : Promise.reject(res.status)))
+      .then((data: { user: UserRow }) => setUser(data.user))
+      .catch(() => setError(true))
+      .finally(() => setLoading(false))
+  }, [])
+
+  if (loading) {
+    return <div className='p-8 text-center text-sm text-muted-foreground'>로딩 중…</div>
+  }
+
+  if (error || !user) {
+    return (
+      <div className='flex flex-col items-center gap-4 py-16'>
+        <p className='text-sm text-muted-foreground'>로그인이 필요합니다</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className='mx-auto max-w-2xl px-4 py-8'>
+      <h1 className='mb-6 text-2xl font-bold'>내 프로필</h1>
+      <ProfileTabs initialUser={user} />
+    </div>
+  )
+}

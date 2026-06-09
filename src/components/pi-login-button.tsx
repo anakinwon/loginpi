@@ -1,6 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
+import { Link } from '@/i18n/navigation'
 import { Button } from '@/components/ui/button'
 import { usePiAuth } from './pi-auth-provider'
 
@@ -15,14 +16,19 @@ export function PiLoginButton() {
 
   if (user) {
     const isDevSession = user.uid.startsWith('dev_')
+    const displayLabel = user.nick_nm
+      ?? (user.username ? `@${user.username}` : user.displayName)
     return (
       <div className='flex items-center gap-2'>
-        <span className='text-sm font-medium'>
-          {user.username ? `@${user.username}` : user.displayName}
+        <Link
+          href='/profile'
+          className='text-sm font-medium hover:underline'
+        >
+          {displayLabel}
           {isDevSession && (
             <span className='text-muted-foreground ml-1 text-xs'>(dev)</span>
           )}
-        </span>
+        </Link>
         <Button variant='outline' size='sm' onClick={signOut}>
           {t('logout')}
         </Button>

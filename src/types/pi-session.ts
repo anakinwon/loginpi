@@ -7,4 +7,5 @@ export interface PiSessionUser {
   scopesGranted: string[]
   tokenValidUntil: string
   role: string            // DB의 sys_user.role (ADMIN·MASTER·USER 등)
+  nick_nm?: string | null // 사용자 설정 닉네임 (프로필에서 수정 가능)
 }

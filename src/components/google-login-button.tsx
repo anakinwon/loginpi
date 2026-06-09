@@ -2,6 +2,7 @@
 
 import { signIn, signOut, useSession } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
+import { Link } from '@/i18n/navigation'
 import { Button } from '@/components/ui/button'
 import { usePiAuth } from '@/components/pi-auth-provider'
 
@@ -16,9 +17,9 @@ export function GoogleLoginButton() {
   if (session?.user) {
     return (
       <div className='flex items-center gap-2'>
-        <span className='text-sm font-medium'>
+        <Link href='/profile' className='text-sm font-medium hover:underline'>
           {session.user.name ?? session.user.email}
-        </span>
+        </Link>
         <Button variant='outline' size='sm' onClick={() => signOut()}>
           {t('logout')}
         </Button>

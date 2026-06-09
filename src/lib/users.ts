@@ -12,6 +12,12 @@ export interface UserRow {
   google_image: string | null
   display_name: string
   role: string
+  // Phase 10 — 마이그레이션 014 추가 컬럼
+  real_nm: string | null
+  nick_nm: string | null
+  phone_no: string | null
+  addr: string | null
+  addr_dtl: string | null
   reg_dtm: string
   mod_dtm: string
 }
@@ -71,6 +77,19 @@ export async function getUserById(id: string): Promise<UserRow | null> {
     .eq('id', id)
     .single()
   return (data as UserRow) ?? null
+}
+
+export async function updateUserProfile(
+  userId: string,
+  data: Partial<Pick<UserRow, 'display_name' | 'real_nm' | 'nick_nm' | 'phone_no' | 'addr' | 'addr_dtl'>>
+): Promise<UserRow | null> {
+  const { data: row } = await getSupabaseAdmin()
+    .from('sys_user')
+    .update({ ...data, modr_id: userId, mod_dtm: new Date().toISOString() })
+    .eq('id', userId)
+    .select()
+    .maybeSingle()
+  return (row as UserRow) ?? null
 }
 
 // pi_uid로 조회 — 구버전 쿠키(userId='')나 DB 오류 시 폴백용
