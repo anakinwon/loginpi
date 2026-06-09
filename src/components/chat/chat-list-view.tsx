@@ -12,7 +12,7 @@ export type RoomWithTheme = {
   room_tp_cd: string
   is_public_yn: string
   // Supabase PostgREST JOIN은 1:1 FK라도 배열로 반환
-  msg_theme: { theme_nm: string; theme_emoji: string; theme_tp_cd?: string }[] | null
+  msg_theme: { theme_nm: string; theme_emoji: string; theme_tp_cd: string }[] | null
 }
 
 function ThemeEmoji({ room }: { room: RoomWithTheme }) {
