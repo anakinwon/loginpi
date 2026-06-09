@@ -3,6 +3,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth-check'
 import { getRoomMember, getRecentMsgCount } from '@/lib/chat'
 import { broadcastToRoom } from '@/lib/realtime-broadcast'
+import { recordActivity } from '@/lib/activity-log'
 
 type Params = { params: Promise<{ roomId: string }> }
 
@@ -59,6 +60,9 @@ export async function POST(request: NextRequest, { params }: Params) {
 
   const mbr = await getRoomMember(roomId, user.id)
   if (!mbr) return NextResponse.json({ error: '채팅방 멤버가 아닙니다' }, { status: 403 })
+
+  // 메시지 전송 = 가장 명확한 활성 사용자 신호
+  recordActivity(user.id, 'MSG')
 
   // rate limiting: 1초 5건 초과 방지
   const recentCount = await getRecentMsgCount(roomId, user.id)

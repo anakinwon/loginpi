@@ -2,12 +2,16 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth-check'
 import { getOrCreateDirectRoom } from '@/lib/chat'
+import { recordActivity } from '@/lib/activity-log'
 
 // GET /api/chat/rooms — 내가 참여 중인 채팅방 목록 (+?include=public 시 공개 그룹방)
 // Pi Browser 클라이언트 게이트(ClientChatList)가 X-Pi-Token 헤더로 호출한다.
 export async function GET(request: NextRequest) {
   const user = await getSessionUser()
   if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+
+  // 채팅 화면 진입 = 활성 사용자 신호 (하루 첫 호출만 INSERT, 이후 UPSERT no-op)
+  recordActivity(user.id, 'CHAT')
 
   const includePublic = new URL(request.url).searchParams.get('include') === 'public'
 
