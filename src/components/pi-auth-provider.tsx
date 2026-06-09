@@ -23,6 +23,7 @@ interface PiAuthContextValue {
   signIn: () => Promise<void>
   signOut: () => Promise<void>
   devLogin: () => Promise<void>
+  updateUser: (patch: Partial<PiSessionUser>) => void
   error: string | null
 }
 
@@ -186,6 +187,10 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
+  const updateUser = useCallback((patch: Partial<PiSessionUser>) => {
+    setUser(prev => (prev ? { ...prev, ...patch } : prev))
+  }, [])
+
   const signOut = useCallback(async () => {
     await fetch('/api/auth/pi', { method: 'DELETE', credentials: 'include' })
     clearPiToken()
@@ -254,7 +259,7 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <PiAuthContext.Provider
-      value={{ user, piAccessToken, isLoading, isInPiBrowser, signIn, signOut, devLogin, error }}
+      value={{ user, piAccessToken, isLoading, isInPiBrowser, signIn, signOut, devLogin, updateUser, error }}
     >
       {/* SearchParamsWatcher: SPA 탐색 시 next 파라미터 변경을 감지해 signIn 재호출 (UI 없음) */}
       <Suspense fallback={null}>

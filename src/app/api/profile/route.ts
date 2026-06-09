@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server'
+import { cookies, headers } from 'next/headers'
 import { z } from 'zod'
 import { getSessionUser } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { signPayload, verifyPayload } from '@/lib/pi-session-crypto'
+import type { PiSessionUser } from '@/types/pi-session'
 
 const ProfileUpdateSchema = z.object({
   display_name: z.string().min(1).max(50).optional(),
@@ -53,5 +56,34 @@ export async function PATCH(req: Request) {
     .maybeSingle()
 
   if (error) return NextResponse.json({ error: '프로필 저장 실패' }, { status: 500 })
-  return NextResponse.json({ user: data })
+
+  // Pi 세션인 경우 nick_nm을 반영한 새 토큰 재발급 — 새로고침 후에도 헤더에 즉시 반영됨
+  const secret = process.env.PI_SESSION_SECRET
+  let newToken: string | undefined
+  if (secret) {
+    const cookieStore = await cookies()
+    const headerStore = await headers()
+    const rawToken =
+      cookieStore.get('pi_session')?.value ?? headerStore.get('x-pi-token') ?? null
+    if (rawToken) {
+      const piSession = verifyPayload<PiSessionUser>(rawToken, secret)
+      if (piSession) {
+        newToken = signPayload({ ...piSession, nick_nm: data?.nick_nm ?? null }, secret)
+      }
+    }
+  }
+
+  const response = NextResponse.json({
+    user: data,
+    ...(newToken ? { token: newToken } : {}),
+  })
+  if (newToken) {
+    response.cookies.set('pi_session', newToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+    })
+  }
+  return response
 }

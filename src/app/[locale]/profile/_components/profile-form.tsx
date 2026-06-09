@@ -1,7 +1,8 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { piFetch } from '@/lib/pi-fetch'
+import { piFetch, setPiToken } from '@/lib/pi-fetch'
+import { usePiAuth } from '@/components/pi-auth-provider'
 import type { UserRow } from '@/lib/users'
 
 interface Props {
@@ -22,6 +23,7 @@ export function ProfileForm({ initialUser, onSaved }: Props) {
   const formRef = useRef<HTMLFormElement>(null)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState<{ type: 'ok' | 'err'; text: string } | null>(null)
+  const { updateUser } = usePiAuth()
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -48,7 +50,11 @@ export function ProfileForm({ initialUser, onSaved }: Props) {
       return
     }
 
-    const { user } = (await res.json()) as { user: UserRow }
+    const { user, token } = (await res.json()) as { user: UserRow; token?: string }
+    // nick_nm 변경 시 Pi 세션 in-memory state 즉시 갱신 → 헤더 바로 반영
+    updateUser({ nick_nm: user.nick_nm ?? null })
+    // localStorage Pi 토큰도 갱신 → 새로고침 후에도 헤더 유지
+    if (token) setPiToken(token)
     onSaved(user)
     setMessage({ type: 'ok', text: '저장되었습니다.' })
   }
