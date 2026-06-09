@@ -20,17 +20,16 @@ function ThemeEmoji({ room }: { room: RoomWithTheme }) {
   const isPremium = room.msg_theme?.[0]?.theme_tp_cd === 'PREMIUM'
   const isDirect = room.room_tp_cd === 'D'
 
-  const bg = isDirect
-    ? 'bg-blue-100 dark:bg-blue-900/40'
-    : isPremium
-      ? 'bg-amber-100 dark:bg-amber-900/40'
-      : 'bg-muted'
+  let cls = 'flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-2xl select-none '
+  if (isDirect) {
+    cls += 'bg-blue-100 dark:bg-blue-900/40'
+  } else if (isPremium) {
+    cls += 'bg-amber-100 ring-2 ring-amber-300/70 dark:bg-amber-900/40 dark:ring-amber-600/50'
+  } else {
+    cls += 'bg-muted'
+  }
 
-  return (
-    <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-2xl ${bg}`}>
-      {emoji}
-    </span>
-  )
+  return <span className={cls}>{emoji}</span>
 }
 
 function RoomCard({ room, href }: { room: RoomWithTheme; href: string }) {
@@ -75,6 +74,14 @@ function SectionHeader({ label }: { label: string }) {
   )
 }
 
+function sortByPremiumFirst(rooms: RoomWithTheme[]): RoomWithTheme[] {
+  return [...rooms].sort((a, b) => {
+    const aP = a.msg_theme?.[0]?.theme_tp_cd === 'PREMIUM' ? 0 : 1
+    const bP = b.msg_theme?.[0]?.theme_tp_cd === 'PREMIUM' ? 0 : 1
+    return aP - bP
+  })
+}
+
 export function ChatListView({
   myRooms,
   discoverRooms,
@@ -82,15 +89,14 @@ export function ChatListView({
   myRooms: RoomWithTheme[]
   discoverRooms: RoomWithTheme[]
 }) {
+  // 구독 채팅방: 내가 참여 중인 방 중 PREMIUM 테마
   const subscriptionRooms = myRooms.filter(r => r.msg_theme?.[0]?.theme_tp_cd === 'PREMIUM')
-  const regularRooms = myRooms.filter(r => r.msg_theme?.[0]?.theme_tp_cd !== 'PREMIUM')
 
-  // 탐색 목록: PREMIUM 테마 먼저 정렬
-  const sortedDiscover = [...discoverRooms].sort((a, b) => {
-    const aP = a.msg_theme?.[0]?.theme_tp_cd === 'PREMIUM' ? 0 : 1
-    const bP = b.msg_theme?.[0]?.theme_tp_cd === 'PREMIUM' ? 0 : 1
-    return aP - bP
-  })
+  // 일반 채팅방: 내 비구독 방 + 탐색 가능한 공개 방, PREMIUM 테마 먼저
+  const regularMyRooms = myRooms.filter(r => r.msg_theme?.[0]?.theme_tp_cd !== 'PREMIUM')
+  const regularRooms = sortByPremiumFirst([...regularMyRooms, ...discoverRooms])
+
+  const isEmpty = myRooms.length === 0 && discoverRooms.length === 0
 
   return (
     <div className='mx-auto max-w-2xl px-4 py-8'>
@@ -103,11 +109,11 @@ export function ChatListView({
         <GroupRoomCreator />
       </div>
 
-      {/* 구독 채팅 */}
+      {/* 구독 채팅방 */}
       {subscriptionRooms.length > 0 && (
         <section className='mb-8'>
           <div className='mb-3 flex items-center gap-2'>
-            <SectionHeader label='구독 채팅' />
+            <SectionHeader label='구독 채팅방' />
             <span className='mb-3 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'>
               PREMIUM
             </span>
@@ -120,10 +126,10 @@ export function ChatListView({
         </section>
       )}
 
-      {/* 일반 채팅 */}
-      <section className='mb-8'>
-        <SectionHeader label='내 채팅방' />
-        {regularRooms.length === 0 && subscriptionRooms.length === 0 ? (
+      {/* 일반 채팅방 (내 비구독 방 + 탐색 공개 방, PREMIUM 테마 먼저) */}
+      <section>
+        <SectionHeader label='일반 채팅방' />
+        {isEmpty ? (
           <div className='rounded-xl border border-dashed py-8 text-center'>
             <p className='text-sm text-muted-foreground'>아직 참여 중인 채팅방이 없습니다</p>
             <p className='mt-1 text-xs text-muted-foreground'>+ 채팅방 만들기로 첫 방을 개설해 보세요</p>
@@ -140,18 +146,6 @@ export function ChatListView({
           </div>
         )}
       </section>
-
-      {/* 공개 채팅방 탐색 (PREMIUM 먼저) */}
-      {sortedDiscover.length > 0 && (
-        <section>
-          <SectionHeader label='공개 채팅방 탐색' />
-          <div className='space-y-2'>
-            {sortedDiscover.map(room => (
-              <RoomCard key={room.room_id} room={room} href={`/chat/${room.room_id}`} />
-            ))}
-          </div>
-        </section>
-      )}
     </div>
   )
 }
