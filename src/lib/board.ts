@@ -7,6 +7,7 @@ export interface CategoryRow {
   ctgr_nm: string
   attch_yn: string
   cmnt_yn: string
+  gallery_yn: string
   wr_min_role_cd: string
   sort_ord: number
   use_yn: string

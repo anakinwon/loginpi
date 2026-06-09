@@ -39,6 +39,11 @@ export default async function BoardIndexPage() {
                     {t('featureAttachment')}
                   </span>
                 )}
+                {ctgr.gallery_yn === 'Y' && (
+                  <span className='rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground'>
+                    {t('featureGallery')}
+                  </span>
+                )}
               </div>
             </Link>
           ))}

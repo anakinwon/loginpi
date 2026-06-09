@@ -110,7 +110,10 @@
     "editTitle": "{name} — Edit",
     "contentPlaceholder": "Enter content",
     "featureComment": "Comments",
-    "featureAttachment": "Attachments"
+    "featureAttachment": "Attachments",
+    "featureGallery": "Gallery",
+    "galleryTitle": "Image Gallery ({count})",
+    "galleryClose": "Close"
   },
   "comment": {
     "title": "Comments",

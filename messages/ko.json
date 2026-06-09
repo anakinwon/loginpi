@@ -110,7 +110,10 @@
     "editTitle": "{name} — 수정",
     "contentPlaceholder": "내용을 입력하세요",
     "featureComment": "댓글",
-    "featureAttachment": "첨부파일"
+    "featureAttachment": "첨부파일",
+    "featureGallery": "갤러리",
+    "galleryTitle": "이미지 갤러리 ({count}장)",
+    "galleryClose": "닫기"
   },
   "comment": {
     "title": "댓글",

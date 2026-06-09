@@ -7,6 +7,7 @@ import { getSessionUser } from '@/lib/auth-check'
 import { PostDetailActions } from './post-detail-actions'
 import { CommentSection } from './comment-section'
 import { AttachmentSection } from './attachment-section'
+import { GallerySection } from './gallery-section'
 
 type Props = { params: Promise<{ category: string; postId: string }> }
 
@@ -44,13 +45,25 @@ export default async function PostDetailPage({ params }: Props) {
       .order('reg_dtm', { ascending: true }),
     db
       .from('brd_attch')
-      .select('attch_id, fl_nm, fl_url, fl_sz, reg_dtm')
+      .select('attch_id, fl_nm, fl_url, fl_sz, fl_tp, reg_dtm')
       .eq('post_id', postId)
       .eq('del_yn', 'N'),
   ])
 
   const isOwner = !!user && post.rgst_usr_id === user.id
   const isModerator = user?.role === 'ADMIN' || user?.role === 'MASTER'
+
+  // gallery_yn='Y'인 게시판의 이미지 첨부파일 목록 (fl_tp에서 image/* 필터)
+  const galleryImages = ctgr.gallery_yn === 'Y'
+    ? (attachments ?? [])
+      .filter((a: { fl_tp?: string }) => a.fl_tp?.startsWith('image/'))
+      .map(({ attch_id, fl_nm, fl_url }: { attch_id: string; fl_nm: string; fl_url: string }) => ({ attch_id, fl_nm, fl_url }))
+    : []
+
+  // AttachmentSection에 넘기는 목록 — fl_tp 제외 (AttachmentSection 타입과 호환)
+  const attachmentList = (attachments ?? []).map(
+    ({ fl_tp: _ft, ...a }: { attch_id: string; fl_nm: string; fl_url: string; fl_sz: number; fl_tp?: string; reg_dtm: string }) => a
+  )
 
   return (
     <div className='mx-auto max-w-4xl px-4 py-8'>
@@ -101,11 +114,15 @@ export default async function PostDetailPage({ params }: Props) {
         {post.post_cont ?? ''}
       </div>
 
+      {ctgr.gallery_yn === 'Y' && galleryImages.length > 0 && (
+        <GallerySection images={galleryImages} />
+      )}
+
       {ctgr.attch_yn === 'Y' && (
         <AttachmentSection
           category={category}
           postId={postId}
-          initialAttachments={attachments ?? []}
+          initialAttachments={attachmentList}
           canUpload={isOwner || isModerator}
         />
       )}
