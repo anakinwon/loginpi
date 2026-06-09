@@ -17,9 +17,10 @@ export async function GET(_request: NextRequest, { params }: Params) {
 
   const { data, error } = await db
     .from('brd_attch')
-    .select('attch_id, fl_nm, fl_url, fl_sz, fl_tp, reg_dtm')
+    .select('attch_id, fl_nm, fl_url, fl_sz, fl_tp, sort_ord, reg_dtm')
     .eq('post_id', postId)
     .eq('del_yn', 'N')
+    .order('sort_ord', { ascending: true })
     .order('reg_dtm', { ascending: true })
 
   if (error) return NextResponse.json({ error: '첨부파일 조회 실패' }, { status: 500 })
@@ -79,9 +80,14 @@ export async function POST(request: NextRequest, { params }: Params) {
     )
   }
 
-  const uploaded: { attch_id: string; fl_nm: string; fl_url: string; fl_sz: number }[] = []
+  // sort_ord가 FormData에 있으면 사용 (갤러리 업로드 시 명시적 순서 지정)
+  const sortOrdRaw = formData.get('sort_ord')
+  const baseSortOrd = sortOrdRaw !== null ? Number(sortOrdRaw) : (existing ?? 0)
 
-  for (const file of files) {
+  const uploaded: { attch_id: string; fl_nm: string; fl_url: string; fl_sz: number; sort_ord: number }[] = []
+
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i]
     if (file.size > MAX_SIZE) {
       return NextResponse.json(
         { error: `파일 크기는 20MB를 초과할 수 없습니다 (${file.name})` },
@@ -104,6 +110,7 @@ export async function POST(request: NextRequest, { params }: Params) {
     }
 
     const { data: { publicUrl } } = db.storage.from(BUCKET).getPublicUrl(storagePath)
+    const sortOrd = baseSortOrd + i
 
     const { data: row, error: dbErr } = await db
       .from('brd_attch')
@@ -114,10 +121,11 @@ export async function POST(request: NextRequest, { params }: Params) {
         fl_url: publicUrl,
         fl_sz: file.size,
         fl_tp: file.type || null,
+        sort_ord: sortOrd,
         regr_id: user.display_name.slice(0, 20),
         modr_id: user.display_name.slice(0, 20),
       })
-      .select('attch_id')
+      .select('attch_id, sort_ord')
       .single()
 
     if (dbErr) {
@@ -126,7 +134,7 @@ export async function POST(request: NextRequest, { params }: Params) {
       return NextResponse.json({ error: `DB 저장 실패: ${file.name}` }, { status: 500 })
     }
 
-    uploaded.push({ attch_id: row.attch_id, fl_nm: file.name, fl_url: publicUrl, fl_sz: file.size })
+    uploaded.push({ attch_id: row.attch_id, fl_nm: file.name, fl_url: publicUrl, fl_sz: file.size, sort_ord: row.sort_ord })
   }
 
   return NextResponse.json({ uploaded }, { status: 201 })

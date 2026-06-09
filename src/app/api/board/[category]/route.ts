@@ -52,6 +52,7 @@ export async function GET(
       .in('post_id', postIds)
       .like('fl_tp', 'image/%')
       .eq('del_yn', 'N')
+      .order('sort_ord', { ascending: true })
       .order('reg_dtm', { ascending: true })
 
     const thumbMap = new Map<string, string>()

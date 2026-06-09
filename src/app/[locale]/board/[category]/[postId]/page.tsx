@@ -7,7 +7,7 @@ import { getSessionUser } from '@/lib/auth-check'
 import { PostDetailActions } from './post-detail-actions'
 import { CommentSection } from './comment-section'
 import { AttachmentSection } from './attachment-section'
-import { GallerySection } from './gallery-section'
+import { GalleryBodyRenderer } from '@/components/board/gallery-body-renderer'
 
 type Props = { params: Promise<{ category: string; postId: string }> }
 
@@ -45,24 +45,19 @@ export default async function PostDetailPage({ params }: Props) {
       .order('reg_dtm', { ascending: true }),
     db
       .from('brd_attch')
-      .select('attch_id, fl_nm, fl_url, fl_sz, fl_tp, reg_dtm')
+      .select('attch_id, fl_nm, fl_url, fl_sz, fl_tp, sort_ord, reg_dtm')
       .eq('post_id', postId)
-      .eq('del_yn', 'N'),
+      .eq('del_yn', 'N')
+      .order('sort_ord', { ascending: true })
+      .order('reg_dtm', { ascending: true }),
   ])
 
   const isOwner = !!user && post.rgst_usr_id === user.id
   const isModerator = user?.role === 'ADMIN' || user?.role === 'MASTER'
 
-  // gallery_yn='Y'인 게시판의 이미지 첨부파일 목록 (fl_tp에서 image/* 필터)
-  const galleryImages = ctgr.gallery_yn === 'Y'
-    ? (attachments ?? [])
-      .filter((a: { fl_tp?: string }) => a.fl_tp?.startsWith('image/'))
-      .map(({ attch_id, fl_nm, fl_url }: { attch_id: string; fl_nm: string; fl_url: string }) => ({ attch_id, fl_nm, fl_url }))
-    : []
-
-  // AttachmentSection에 넘기는 목록 — fl_tp 제외 (AttachmentSection 타입과 호환)
+  // AttachmentSection에 넘기는 목록 — fl_tp, sort_ord 제외 (AttachmentSection 타입과 호환)
   const attachmentList = (attachments ?? []).map(
-    ({ fl_tp: _ft, ...a }: { attch_id: string; fl_nm: string; fl_url: string; fl_sz: number; fl_tp?: string; reg_dtm: string }) => a
+    ({ fl_tp: _ft, sort_ord: _so, ...a }: { attch_id: string; fl_nm: string; fl_url: string; fl_sz: number; fl_tp?: string; sort_ord?: number; reg_dtm: string }) => a
   )
 
   return (
@@ -110,12 +105,12 @@ export default async function PostDetailPage({ params }: Props) {
         </div>
       </div>
 
-      <div className='mb-8 min-h-32 whitespace-pre-wrap text-sm leading-relaxed'>
-        {post.post_cont ?? ''}
-      </div>
-
-      {ctgr.gallery_yn === 'Y' && galleryImages.length > 0 && (
-        <GallerySection images={galleryImages} />
+      {ctgr.gallery_yn === 'Y' ? (
+        <GalleryBodyRenderer postCont={post.post_cont} />
+      ) : (
+        <div className='mb-8 min-h-32 whitespace-pre-wrap text-sm leading-relaxed'>
+          {post.post_cont ?? ''}
+        </div>
       )}
 
       {ctgr.attch_yn === 'Y' && (
