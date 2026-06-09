@@ -33,7 +33,7 @@ export default async function ChatPage() {
       .in('room_id', roomIds)
       .eq('del_yn', 'N')
       .order('mod_dtm', { ascending: false })
-    myRooms = (data ?? []) as RoomWithTheme[]
+    myRooms = (data ?? []) as unknown as RoomWithTheme[]
   }
 
   // 공개 그룹 채팅방 (최근 10개)
@@ -47,7 +47,7 @@ export default async function ChatPage() {
     .limit(10)
 
   const myRoomIds = new Set(myRooms.map(r => r.room_id))
-  const discoverRooms = ((publicRooms ?? []) as RoomWithTheme[]).filter(r => !myRoomIds.has(r.room_id))
+  const discoverRooms = ((publicRooms ?? []) as unknown as RoomWithTheme[]).filter(r => !myRoomIds.has(r.room_id))
 
   return <ChatListView myRooms={myRooms} discoverRooms={discoverRooms} />
 }

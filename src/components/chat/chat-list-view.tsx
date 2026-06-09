@@ -11,13 +11,12 @@ export type RoomWithTheme = {
   theme_cd: string
   room_tp_cd: string
   is_public_yn: string
-  // Supabase PostgREST JOIN은 1:1 FK라도 배열로 반환
-  msg_theme: { theme_nm: string; theme_emoji: string; theme_tp_cd: string }[] | null
+  // msg_room.theme_cd → msg_theme FK (forward reference) → PostgREST가 단일 객체로 반환
+  msg_theme: { theme_nm: string; theme_emoji: string; theme_tp_cd: string } | null
 }
 
 function ThemeEmoji({ room }: { room: RoomWithTheme }) {
-  // 말풍선(💬) 배경 컨테이너 제거 — 테마 이모지 자체를 컬러 아이콘으로 직접 표시
-  const emoji = room.msg_theme?.[0]?.theme_emoji
+  const emoji = room.msg_theme?.theme_emoji
     ?? (room.room_tp_cd === 'D' ? '👤' : '🏠')
   return (
     <span className='flex h-10 w-10 shrink-0 items-center justify-center text-3xl select-none'>
@@ -27,8 +26,8 @@ function ThemeEmoji({ room }: { room: RoomWithTheme }) {
 }
 
 function RoomCard({ room, href }: { room: RoomWithTheme; href: string }) {
-  const themeName = room.msg_theme?.[0]?.theme_nm ?? room.theme_cd
-  const isPremium = room.msg_theme?.[0]?.theme_tp_cd === 'PREMIUM'
+  const themeName = room.msg_theme?.theme_nm ?? room.theme_cd
+  const isPremium = room.msg_theme?.theme_tp_cd === 'PREMIUM'
 
   return (
     <Link
@@ -70,8 +69,8 @@ function SectionHeader({ label }: { label: string }) {
 
 function sortByPremiumFirst(rooms: RoomWithTheme[]): RoomWithTheme[] {
   return [...rooms].sort((a, b) => {
-    const aP = a.msg_theme?.[0]?.theme_tp_cd === 'PREMIUM' ? 0 : 1
-    const bP = b.msg_theme?.[0]?.theme_tp_cd === 'PREMIUM' ? 0 : 1
+    const aP = a.msg_theme?.theme_tp_cd === 'PREMIUM' ? 0 : 1
+    const bP = b.msg_theme?.theme_tp_cd === 'PREMIUM' ? 0 : 1
     return aP - bP
   })
 }
@@ -84,9 +83,9 @@ export function ChatListView({
   discoverRooms: RoomWithTheme[]
 }) {
   // 내 채팅방을 구독/일반 두 섹션으로 분리 (discover와 완전히 별도)
-  const subscriptionRooms = myRooms.filter(r => r.msg_theme?.[0]?.theme_tp_cd === 'PREMIUM')
+  const subscriptionRooms = myRooms.filter(r => r.msg_theme?.theme_tp_cd === 'PREMIUM')
   const regularRooms = sortByPremiumFirst(
-    myRooms.filter(r => r.msg_theme?.[0]?.theme_tp_cd !== 'PREMIUM')
+    myRooms.filter(r => r.msg_theme?.theme_tp_cd !== 'PREMIUM')
   )
   const sortedDiscover = sortByPremiumFirst(discoverRooms)
 
