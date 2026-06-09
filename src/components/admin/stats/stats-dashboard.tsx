@@ -144,6 +144,8 @@ export function StatsDashboard() {
   const lastActivity = activityData?.series.at(-1)
   const totalRevPi = revenueData?.series.reduce((s, r) => s + r.rev_pi, 0) ?? 0
   const totalTxn = revenueData?.series.reduce((s, r) => s + r.txn_cnt, 0) ?? 0
+  const subscRevPi = revenueData?.series.filter(r => r.theme_cd === 'SUBSCRIPTION').reduce((s, r) => s + r.rev_pi, 0) ?? 0
+  const genRevPi = revenueData?.series.filter(r => r.theme_cd !== 'SUBSCRIPTION').reduce((s, r) => s + r.rev_pi, 0) ?? 0
 
   if (error) {
     return (
@@ -197,7 +199,7 @@ export function StatsDashboard() {
       <section className='space-y-4'>
         <h2 className='text-lg font-semibold'>매출</h2>
 
-        {/* 기간 총 매출 / 총 거래 카드 */}
+        {/* 매출 KPI 카드 — 총합 / 거래건수 / 구독 / 일반 */}
         <div className='grid grid-cols-2 gap-3'>
           <StatsCard
             label={`기간 총 매출 (${period}일)`}
@@ -206,9 +208,21 @@ export function StatsDashboard() {
             loading={loading}
           />
           <StatsCard
-            label={`기간 총 거래`}
+            label='기간 총 거래'
             value={totalTxn}
             unit='건'
+            loading={loading}
+          />
+          <StatsCard
+            label='구독 요금제 매출'
+            value={subscRevPi.toFixed(4)}
+            unit='π'
+            loading={loading}
+          />
+          <StatsCard
+            label='일반 요금제 매출'
+            value={genRevPi.toFixed(4)}
+            unit='π'
             loading={loading}
           />
         </div>
@@ -233,13 +247,13 @@ export function StatsDashboard() {
           </div>
         </div>
 
-        {/* Top-3 테마 + Top-3 지출자 */}
+        {/* Top-3 지출자 + Top-3 테마 */}
         <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+          <RankingCard title={`Top 3 구매왕 (최근 ${period}일)`}>
+            <TopSpendersList spenders={revenueData?.topSpenders ?? []} loading={loading} />
+          </RankingCard>
           <RankingCard title={`Top 3 테마 매출 (최근 ${period}일)`}>
             <TopThemesList themes={revenueData?.topThemes ?? []} loading={loading} />
-          </RankingCard>
-          <RankingCard title={`Top 3 최고 지출자 (최근 ${period}일)`}>
-            <TopSpendersList spenders={revenueData?.topSpenders ?? []} loading={loading} />
           </RankingCard>
         </div>
       </section>

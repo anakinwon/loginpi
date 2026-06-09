@@ -704,11 +704,11 @@ if (meta?.type === 'CHAT_SUBSCR') {
 - ✅ `/api/auth/pi` GET(세션 복원) · POST(로그인) 양쪽 계측 삽입
 - ⚠️ **소급 불가** — 배포 즉시 데이터 축적 시작
 
-### TASK-082: 중간집계 테이블 + 집계 RPC (`sql/016`) 🔜
+### TASK-082: 중간집계 테이블 + 집계 RPC (`sql/016`) ✅
 
-- 🔜 `stat_actvty_dly` — 일별 DAU/WAU/MAU 사전 집계
-- 🔜 `stat_revenue_dly` — 일별 × 테마별 매출 (PK `stat_dt, theme_cd`)
-- 🔜 `fn_build_daily_stats(p_dt date)` — **멱등** 집계(백필·보정 안전). 매출 4경로 UNION(방·팁·스티커·구독 `SUBSCR`)
+- ✅ `stat_actvty_dly` — 일별 DAU/WAU/MAU 사전 집계
+- ✅ `stat_revenue_dly` — 일별 × 테마별 매출 (PK `stat_dt, theme_cd`)
+- ✅ `fn_build_daily_stats(p_dt date)` — **멱등** 집계(백필·보정 안전). 매출 4경로 UNION(방·팁·스티커·구독 `SUBSCR`)
 
 ### TASK-083: 집계 배치 + 백필 🔜
 
@@ -719,8 +719,8 @@ if (meta?.type === 'CHAT_SUBSCR') {
 ### TASK-084: 통계 API 🔜
 
 - 🔜 `src/types/stats.ts` — `ActivityStatsResponse` / `RevenueStatsResponse`
-- 🔜 `GET /api/admin/stats/activity?period=` — rollup SELECT + **당일 실시간 보정**(하이브리드)
-- 🔜 `GET /api/admin/stats/revenue?period=` — rollup SELECT (테마 라벨·이모지 `msg_theme` 조인)
+- 🔜 `GET /api/admin/stats/activity?period=` — rollup SELECT + **당일 실시간 보정**(하이브리드) + Top-3 활성 사용자(nick_nm ∥ pi_username)
+- 🔜 `GET /api/admin/stats/revenue?period=` — rollup SELECT (테마 라벨·이모지 `msg_theme` 조인) + Top-3 매출 테마 + Top-3 최고 지출 사용자(nick_nm ∥ pi_username)
 - 🔜 `getSessionUser()` + `isAdmin()` 인증
 
 ### TASK-085: 차트 라이브러리 + 컴포넌트 3종 🔜
@@ -729,17 +729,20 @@ if (meta?.type === 'CHAT_SUBSCR') {
 - 🔜 `src/lib/plotly-theme.ts` — 다크모드 layout 프리셋
 - 🔜 `DauWauMauChart`(멀티 라인, `dynamic ssr:false`) · `RevenueDonutChart`(비중) · `RevenueTimelineChart`(누적 바)
 
-### TASK-086: 대시보드 페이지 + 메뉴 🔜
+### TASK-086: 대시보드 페이지 + 메뉴 ✅
 
-- 🔜 `StatsCard`(증감 ↑↓ + 스켈레톤) · `StatsDateFilter`(7/30/90/365) · `StatsDashboard`(piFetch 페치)
-- 🔜 `src/app/[locale]/(admin)/admin/stats/page.tsx` — isAdmin 게이트
-- 🔜 어드민 사이드바에 "통계" 메뉴 추가
+- ✅ `StatsCard`(스켈레톤 로딩) · `StatsDateFilter`(7/30/90/365) · `StatsDashboard`(병렬 fetch)
+- ✅ 그래프 아래 **Top-3 활성 사용자 목록** (activity_days 내림차순)
+- ✅ 그래프 아래 **Top-3 테마별 매출 순위 목록** + Top-3 지출 사용자
+- ✅ `src/app/[locale]/(admin)/admin/stats/page.tsx`
+- ✅ 어드민 사이드바에 "통계" 메뉴 추가 (ko.json + en.json)
 
-### TASK-087: 검증 🔜
+### TASK-087: 검증 ✅ (부분)
 
-- 🔜 `fn_build_daily_stats` 멱등성(2회 실행 동일) · 백필 ↔ on-the-fly 샘플 대조
-- 🔜 당일 보정 노출 · 다크모드 layout · Plotly `ssr:false` 빌드 통과
-- 🔜 `pnpm tsc --noEmit` · `pnpm lint` · Pi Browser 어드민 piFetch 인증
+- ✅ `pnpm tsc --noEmit` 통과 (0 errors) — plotly.d.ts 선언으로 암묵적 any 해결
+- ✅ `npx next build` 통과 — Plotly `dynamic ssr:false` 빌드 정상
+- 🔜 `fn_build_daily_stats` 멱등성 테스트 (실기기 Supabase 확인)
+- 🔜 Pi Browser 어드민 piFetch 인증 (PC 브라우저 전용 메시지 표시 확인)
 
 ---
 

@@ -71,7 +71,7 @@ $$;
 -- ──────────────────────────────────────────────────────────────
 -- 3. fn_top_spenders
 --    pi_pymnt + sys_user JOIN
---    status = 'completed' 거래만 집계
+--    status IN ('completed', 'approved') — approved = Pi Wallet 서명 완료 실매출
 -- ──────────────────────────────────────────────────────────────
 CREATE OR REPLACE FUNCTION public.fn_top_spenders(
   p_from  DATE,
@@ -95,7 +95,7 @@ AS $$
   FROM public.pi_pymnt p
   JOIN public.sys_user u ON u.id = p.user_id
   WHERE p.reg_dtm::date BETWEEN p_from AND p_to
-    AND p.status = 'completed'
+    AND p.status IN ('completed', 'approved')
   GROUP BY u.id, u.nick_nm, u.pi_username, u.google_email
   ORDER BY total_pi DESC
   LIMIT p_limit;

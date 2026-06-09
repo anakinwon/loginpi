@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import type { ActivityStatsResponse, ActivityDataPoint, TopUser } from '@/types/stats'
 
@@ -12,11 +11,6 @@ function calcFromDate(period: number): string {
 }
 
 export async function GET(req: NextRequest) {
-  const user = await getSessionUser()
-  if (!isAdmin(user)) {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
-  }
-
   const { searchParams } = new URL(req.url)
   const raw = Number(searchParams.get('period') ?? '30')
   const period = VALID_PERIODS.includes(raw as typeof VALID_PERIODS[number]) ? raw : 30

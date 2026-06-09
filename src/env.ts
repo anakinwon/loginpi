@@ -13,6 +13,7 @@ export const env = createEnv({
     GEMINI_API_KEY: z.string().optional(),
     RESEND_API_KEY: z.string().optional(),
     RESEND_FROM_EMAIL: z.string().optional(),
+    CRON_SECRET: z.string().optional(),
   },
   client: {
     NEXT_PUBLIC_APP_URL: z.string().url(),
@@ -31,6 +32,7 @@ export const env = createEnv({
     GEMINI_API_KEY: process.env.GEMINI_API_KEY,
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     RESEND_FROM_EMAIL: process.env.RESEND_FROM_EMAIL,
+    CRON_SECRET: process.env.CRON_SECRET,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_PI_SANDBOX: process.env.NEXT_PUBLIC_PI_SANDBOX,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,

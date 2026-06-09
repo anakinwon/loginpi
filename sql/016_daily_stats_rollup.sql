@@ -50,7 +50,7 @@ CREATE INDEX IF NOT EXISTS idx_actvty_log_dt
   ON public.sys_user_actvty_log (actvty_dt) WHERE del_yn = 'N';
 
 CREATE INDEX IF NOT EXISTS idx_pi_pymnt_reg_dtm_status
-  ON public.pi_pymnt (reg_dtm) WHERE status = 'completed';
+  ON public.pi_pymnt (reg_dtm) WHERE status IN ('completed', 'approved');
 
 CREATE INDEX IF NOT EXISTS idx_msg_tip_reg_dtm
   ON public.msg_tip (reg_dtm) WHERE del_yn = 'N';
@@ -127,7 +127,7 @@ BEGIN
       p.amount
     FROM public.pi_pymnt p
     WHERE p.reg_dtm::date = p_dt
-      AND p.status = 'completed'
+      AND p.status IN ('completed', 'approved')
       AND p.metadata->>'type' = 'CHAT_ROOM_CREATE'
 
     UNION ALL
@@ -152,7 +152,7 @@ BEGIN
     JOIN public.pi_pymnt p       ON p.payment_id = us.pymnt_id
     WHERE us.reg_dtm::date = p_dt
       AND us.del_yn = 'N'
-      AND p.status = 'completed'
+      AND p.status IN ('completed', 'approved')
 
     UNION ALL
 
@@ -162,7 +162,7 @@ BEGIN
       p.amount
     FROM public.pi_pymnt p
     WHERE p.reg_dtm::date = p_dt
-      AND p.status = 'completed'
+      AND p.status IN ('completed', 'approved')
       AND p.metadata->>'type' = 'CHAT_SUBSCR'
 
     UNION ALL
@@ -173,7 +173,7 @@ BEGIN
       p.amount
     FROM public.pi_pymnt p
     WHERE p.reg_dtm::date = p_dt
-      AND p.status = 'completed'
+      AND p.status IN ('completed', 'approved')
       AND p.metadata->>'type' IS NULL
       AND NOT EXISTS (
         SELECT 1

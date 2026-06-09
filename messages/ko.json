@@ -178,6 +178,7 @@
     "nav": {
       "title": "Admin",
       "dashboard": "대시보드",
+      "stats": "통계",
       "users": "사용자 관리",
       "payments": "결제 내역",
       "links": "계정 연동 현황",
