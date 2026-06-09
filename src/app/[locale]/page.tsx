@@ -1,10 +1,12 @@
 import { StatsDashboard } from '@/components/admin/stats/stats-dashboard'
+import { AccountIntegrationSection } from '@/components/account-integration-section'
 
 export const metadata = { title: '통계 대시보드' }
 
 export default function HomePage() {
   return (
-    <div className='mx-auto max-w-5xl px-4 py-8 space-y-4'>
+    <div className='mx-auto max-w-5xl px-4 py-8 space-y-8'>
+      <AccountIntegrationSection />
       <div>
         <h1 className='text-2xl font-bold'>통계 대시보드</h1>
         <p className='text-muted-foreground mt-1 text-sm'>
