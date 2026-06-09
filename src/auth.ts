@@ -1,6 +1,7 @@
 import NextAuth from 'next-auth'
 import Google from 'next-auth/providers/google'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { recordActivity } from '@/lib/activity-log'
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
@@ -25,6 +26,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
           if (byId) {
             token.userId = byId.id
+            recordActivity(byId.id, 'LOGIN')
           } else {
             // 2차: google_email fallback
             // 조건: email_verified=true + google_id가 아직 NULL인 행에만 허용
@@ -40,6 +42,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
               if (byEmail) {
                 token.userId = byEmail.id
+                recordActivity(byEmail.id, 'LOGIN')
                 // google_id가 NULL이었던 행에 실제 sub 세팅 (1회성 데이터 복구)
                 await db
                   .from('sys_user')
