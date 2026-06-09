@@ -89,14 +89,12 @@ export function ChatListView({
   myRooms: RoomWithTheme[]
   discoverRooms: RoomWithTheme[]
 }) {
-  // 구독 채팅방: 내가 참여 중인 방 중 PREMIUM 테마
+  // 내 채팅방을 구독/일반 두 섹션으로 분리 (discover와 완전히 별도)
   const subscriptionRooms = myRooms.filter(r => r.msg_theme?.[0]?.theme_tp_cd === 'PREMIUM')
-
-  // 일반 채팅방: 내 비구독 방 + 탐색 가능한 공개 방, PREMIUM 테마 먼저
-  const regularMyRooms = myRooms.filter(r => r.msg_theme?.[0]?.theme_tp_cd !== 'PREMIUM')
-  const regularRooms = sortByPremiumFirst([...regularMyRooms, ...discoverRooms])
-
-  const isEmpty = myRooms.length === 0 && discoverRooms.length === 0
+  const regularRooms = sortByPremiumFirst(
+    myRooms.filter(r => r.msg_theme?.[0]?.theme_tp_cd !== 'PREMIUM')
+  )
+  const sortedDiscover = sortByPremiumFirst(discoverRooms)
 
   return (
     <div className='mx-auto max-w-2xl px-4 py-8'>
@@ -109,7 +107,7 @@ export function ChatListView({
         <GroupRoomCreator />
       </div>
 
-      {/* 구독 채팅방 */}
+      {/* 구독 채팅방 — PREMIUM 테마 방만 */}
       {subscriptionRooms.length > 0 && (
         <section className='mb-8'>
           <div className='mb-3 flex items-center gap-2'>
@@ -126,26 +124,36 @@ export function ChatListView({
         </section>
       )}
 
-      {/* 일반 채팅방 (내 비구독 방 + 탐색 공개 방, PREMIUM 테마 먼저) */}
-      <section>
-        <SectionHeader label='일반 채팅방' />
-        {isEmpty ? (
-          <div className='rounded-xl border border-dashed py-8 text-center'>
-            <p className='text-sm text-muted-foreground'>아직 참여 중인 채팅방이 없습니다</p>
-            <p className='mt-1 text-xs text-muted-foreground'>+ 채팅방 만들기로 첫 방을 개설해 보세요</p>
-          </div>
-        ) : regularRooms.length === 0 ? (
-          <div className='rounded-xl border border-dashed py-6 text-center'>
-            <p className='text-sm text-muted-foreground'>일반 채팅방이 없습니다</p>
-          </div>
-        ) : (
+      {/* 일반 채팅방 — 비PREMIUM 내 방, PREMIUM 테마 먼저 정렬 */}
+      {(regularRooms.length > 0 || myRooms.length === 0) && (
+        <section className='mb-8'>
+          <SectionHeader label='일반 채팅방' />
+          {myRooms.length === 0 ? (
+            <div className='rounded-xl border border-dashed py-8 text-center'>
+              <p className='text-sm text-muted-foreground'>아직 참여 중인 채팅방이 없습니다</p>
+              <p className='mt-1 text-xs text-muted-foreground'>+ 채팅방 만들기로 첫 방을 개설해 보세요</p>
+            </div>
+          ) : (
+            <div className='space-y-2'>
+              {regularRooms.map(room => (
+                <RoomCard key={room.room_id} room={room} href={`/chat/${room.room_id}`} />
+              ))}
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* 공개 채팅방 탐색 — PREMIUM 테마 먼저 */}
+      {sortedDiscover.length > 0 && (
+        <section>
+          <SectionHeader label='채팅방 탐색' />
           <div className='space-y-2'>
-            {regularRooms.map(room => (
+            {sortedDiscover.map(room => (
               <RoomCard key={room.room_id} room={room} href={`/chat/${room.room_id}`} />
             ))}
           </div>
-        )}
-      </section>
+        </section>
+      )}
     </div>
   )
 }
