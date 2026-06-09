@@ -52,8 +52,20 @@ export function GroupRoomCreator() {
   const [canUsePremiumTheme, setCanUsePremiumTheme] = useState(false)
   const [canCreateRoomFree, setCanCreateRoomFree] = useState(false)
 
-  // 구독 여부 확인 — PREMIUM 테마 추가 요금 면제 + 월 무료 방 생성 쿼터 여부 결정
+  // 다이얼로그 열릴 때마다 폼 초기화 + 구독 상태 재확인
+  // 구독 직후 동일 세션에서 방 생성 시에도 최신 권한 반영
   useEffect(() => {
+    if (!open) return
+    setStep(1)
+    setSelectedTheme(null)
+    setRoomNm('')
+    setRoomDesc('')
+    setIsPublic('Y')
+    setMaxMbr(50)
+    setExprDays(0)
+    setPayStatus('idle')
+    setPayError(null)
+
     piFetch('/api/subscriptions/check')
       .then(r => r.ok ? r.json() : null)
       .then((d: { canUsePremiumTheme?: boolean; canCreateRoomFree?: boolean } | null) => {
@@ -61,21 +73,6 @@ export function GroupRoomCreator() {
         setCanCreateRoomFree(d?.canCreateRoomFree ?? false)
       })
       .catch(() => { /* 조용히 실패 — 비구독자로 취급 */ })
-  }, [])
-
-  // 다이얼로그 열릴 때 마다 초기화
-  useEffect(() => {
-    if (open) {
-      setStep(1)
-      setSelectedTheme(null)
-      setRoomNm('')
-      setRoomDesc('')
-      setIsPublic('Y')
-      setMaxMbr(50)
-      setExprDays(0)
-      setPayStatus('idle')
-      setPayError(null)
-    }
   }, [open])
 
   const isPremium = selectedTheme?.theme_tp_cd === 'PREMIUM'
