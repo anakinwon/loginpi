@@ -16,20 +16,14 @@ export type RoomWithTheme = {
 }
 
 function ThemeEmoji({ room }: { room: RoomWithTheme }) {
-  const emoji = room.msg_theme?.[0]?.theme_emoji ?? '💬'
-  const isPremium = room.msg_theme?.[0]?.theme_tp_cd === 'PREMIUM'
-  const isDirect = room.room_tp_cd === 'D'
-
-  let cls = 'flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-2xl select-none '
-  if (isDirect) {
-    cls += 'bg-blue-100 dark:bg-blue-900/40'
-  } else if (isPremium) {
-    cls += 'bg-amber-100 ring-2 ring-amber-300/70 dark:bg-amber-900/40 dark:ring-amber-600/50'
-  } else {
-    cls += 'bg-muted'
-  }
-
-  return <span className={cls}>{emoji}</span>
+  // 말풍선(💬) 배경 컨테이너 제거 — 테마 이모지 자체를 컬러 아이콘으로 직접 표시
+  const emoji = room.msg_theme?.[0]?.theme_emoji
+    ?? (room.room_tp_cd === 'D' ? '👤' : '🏠')
+  return (
+    <span className='flex h-10 w-10 shrink-0 items-center justify-center text-3xl select-none'>
+      {emoji}
+    </span>
+  )
 }
 
 function RoomCard({ room, href }: { room: RoomWithTheme; href: string }) {
