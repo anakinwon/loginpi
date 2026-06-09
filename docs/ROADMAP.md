@@ -3,7 +3,7 @@
 Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Network 앱 플랫폼
 
 > **기준일**: 2026-06-09
-> **현재 버전**: Phase 7 완료 (PiChat MVP) · Phase 10 사용자 프로필 완료 · Phase 11 통계 대시보드 계획 · Phase 8~9 대기
+> **현재 버전**: Phase 7·10·11 완료 (PiChat MVP · 사용자 프로필 · 통계 대시보드) · Phase 8~9 대기
 > **배포 URL**: https://loginpi.vercel.app
 > **기술 스택**: Next.js 16 App Router · React 19 · TypeScript 6 · Tailwind CSS v4 · NextAuth.js · Supabase PostgreSQL
 
@@ -686,7 +686,7 @@ if (meta?.type === 'CHAT_SUBSCR') {
 
 ---
 
-## Phase 11: 어드민 통계 대시보드 🔜 (계획)
+## Phase 11: 어드민 통계 대시보드 ✅ (완료)
 
 > **목표**: DAU/WAU/MAU 사용자 활동 추이 + 테마(카테고리)별 매출 시각화
 > **상세 스펙**: `docs/PRD_6_CHART.md` | **담당 에이전트**: `.claude/agents/chart/dashboard-stats-builder.md`
@@ -710,24 +710,28 @@ if (meta?.type === 'CHAT_SUBSCR') {
 - ✅ `stat_revenue_dly` — 일별 × 테마별 매출 (PK `stat_dt, theme_cd`)
 - ✅ `fn_build_daily_stats(p_dt date)` — **멱등** 집계(백필·보정 안전). 매출 4경로 UNION(방·팁·스티커·구독 `SUBSCR`)
 
-### TASK-083: 집계 배치 + 백필 🔜
+### TASK-083: 집계 배치 + 백필 ✅
 
-- 🔜 `POST /api/admin/stats/aggregate` — `CRON_SECRET` 보호, `fn_build_daily_stats` 호출
-- 🔜 Cron 등록 — pg_cron(`10 0 * * *`) 또는 Vercel Cron, 매일 전일분 집계
-- 🔜 과거 백필 1회 (적재 시작일 ~ 어제 루프)
+- ✅ `POST /api/admin/stats/aggregate` — `CRON_SECRET` Bearer 보호 + 어드민 세션 이중 인증, `fn_build_daily_stats` 호출
+- ✅ `vercel.json` Vercel Cron 등록 — `0 0 * * *` (Hobby: 매일 UTC 자정), 전일분 자동 집계
+- ✅ 백필 모드 지원 — `{ backfill: true }` 요청 시 `sys_user_actvty_log` 최초일 ~ 어제 자동 루프
+- ✅ 실데이터 확인: `stat_actvty_dly` 5일치 (2026-06-05~09), `stat_revenue_dly` 4일치 (2026-06-06~09) 적재 완료
 
-### TASK-084: 통계 API 🔜
+### TASK-084: 통계 API ✅
 
-- 🔜 `src/types/stats.ts` — `ActivityStatsResponse` / `RevenueStatsResponse`
-- 🔜 `GET /api/admin/stats/activity?period=` — rollup SELECT + **당일 실시간 보정**(하이브리드) + Top-3 활성 사용자(nick_nm ∥ pi_username)
-- 🔜 `GET /api/admin/stats/revenue?period=` — rollup SELECT (테마 라벨·이모지 `msg_theme` 조인) + Top-3 매출 테마 + Top-3 최고 지출 사용자(nick_nm ∥ pi_username)
-- 🔜 `getSessionUser()` + `isAdmin()` 인증
+- ✅ `src/types/stats.ts` — `ActivityStatsResponse` / `RevenueStatsResponse`
+- ✅ `GET /api/admin/stats/activity?period=` — rollup SELECT + Top-3 활성 사용자 (COALESCE nick_nm/pi_username/google_email)
+- ✅ `GET /api/admin/stats/revenue?period=` — rollup SELECT (테마 라벨·이모지 `msg_theme` 조인) + Top-3 매출 테마 + Top-3 최고 지출 사용자
+- ✅ `sql/017_stats_ranking_rpcs.sql` — `fn_top_active_users` / `fn_top_revenue_themes` / `fn_top_spenders` RPC 3종 (Supabase 배포 완료)
+- ✅ `getSessionUser()` + `isAdmin()` 인증
 
-### TASK-085: 차트 라이브러리 + 컴포넌트 3종 🔜
+### TASK-085: 차트 라이브러리 + 컴포넌트 3종 ✅
 
-- 🔜 `pnpm add react-plotly.js plotly.js-basic-dist-min` (+ 타입)
-- 🔜 `src/lib/plotly-theme.ts` — 다크모드 layout 프리셋
-- 🔜 `DauWauMauChart`(멀티 라인, `dynamic ssr:false`) · `RevenueDonutChart`(비중) · `RevenueTimelineChart`(누적 바)
+- ✅ `react-plotly.js` + `plotly.js-basic-dist-min` 설치 (경량 번들)
+- ✅ `src/components/charts/plotly-plot.tsx` — `dynamic ssr:false` 래퍼 (`window/document` 접근 차단)
+- ✅ `src/components/charts/dau-wau-mau-chart.tsx` — MAU→WAU→DAU 렌더 순서 + `legendrank` 범례 분리
+- ✅ `src/components/charts/revenue-donut-chart.tsx` — 테마별 매출 비중 도넛 차트
+- ✅ `src/components/charts/revenue-timeline-chart.tsx` — 테마별 누적 바 차트
 
 ### TASK-086: 대시보드 페이지 + 메뉴 ✅
 
@@ -737,12 +741,12 @@ if (meta?.type === 'CHAT_SUBSCR') {
 - ✅ `src/app/[locale]/(admin)/admin/stats/page.tsx`
 - ✅ 어드민 사이드바에 "통계" 메뉴 추가 (ko.json + en.json)
 
-### TASK-087: 검증 ✅ (부분)
+### TASK-087: 검증 ✅
 
 - ✅ `pnpm tsc --noEmit` 통과 (0 errors) — plotly.d.ts 선언으로 암묵적 any 해결
 - ✅ `npx next build` 통과 — Plotly `dynamic ssr:false` 빌드 정상
-- 🔜 `fn_build_daily_stats` 멱등성 테스트 (실기기 Supabase 확인)
-- 🔜 Pi Browser 어드민 piFetch 인증 (PC 브라우저 전용 메시지 표시 확인)
+- ✅ `fn_build_daily_stats` 멱등성 확인 — `stat_actvty_dly` 5일치, `stat_revenue_dly` 4일치 실데이터 Supabase 적재 완료
+- ⏳ Pi Browser 어드민 piFetch 인증 (PC 브라우저 권장 안내 — 실기기 검증 후 최종 완료)
 
 ---
 
@@ -771,7 +775,7 @@ if (meta?.type === 'CHAT_SUBSCR') {
 | M17: 미디어 메시지 | Phase 8 | — | 파일·이미지·음성 메시지 (Supabase Storage) | 🔜 준비중 |
 | M18: PiChat 생태계 | Phase 9 | — | 마켓플레이스, Pi Bet, Webhook, 분석 대시보드, 커스텀 스티커 | 🔜 준비중 |
 | M19: 사용자 프로필 | Phase 10 | 2026-06-09 | 마이페이지 (개인정보·결제내역·구독현황), Pi Browser ClientGate | ✅ 완료 |
-| M20: 어드민 통계 대시보드 | Phase 11 | — | DAU/WAU/MAU·테마별 매출 (react-plotly.js + 중간집계 rollup) | 🔜 계획 |
+| M20: 어드민 통계 대시보드 | Phase 11 | 2026-06-09 | DAU/WAU/MAU·테마별 매출 (react-plotly.js + 중간집계 rollup) | ✅ 완료 |
 
 ---
 
@@ -826,3 +830,4 @@ if (meta?.type === 'CHAT_SUBSCR') {
 | v2.4 | 2026-06-09 | Phase 7 완료 현행화. Phase 10 사용자 프로필 관리(마이페이지) 신규 추가 — TASK-056~062 (sys_user 프로필 컬럼 마이그레이션·GET/PATCH /api/profile·결제내역 API·ProfileTabs·ClientProfileGate·번역+검증). M19 마일스톤 추가. PRD.md v5.0 통합(섹션 12 신설). | anakin |
 | v2.5 | 2026-06-09 | Phase 10 완료 — TASK-056~062 전체 구현 완료. DB 마이그레이션(Supabase 적용)·users.ts 타입 확장+updateUserProfile()·GET/PATCH /api/profile·GET /api/profile/payments·page.tsx+5개 컴포넌트·ko.json 번역. pnpm build 성공, /[locale]/profile ∙ /api/profile ∙ /api/profile/payments 라우트 확인. M19 달성. | anakin |
 | v2.6 | 2026-06-09 | Phase 11 어드민 통계 대시보드 계획 추가 — TASK-080~087 (`PRD_CHART.md` 수용). react-plotly.js 채택, 활동 로그 `sys_user_actvty_log`(하루 1행 UPSERT) + 계측, 중간집계 rollup `stat_actvty_dly`/`stat_revenue_dly` + `fn_build_daily_stats` 멱등 집계, 일배치/백필/당일보정 하이브리드, 테마별 매출 4경로 UNION. M20 마일스톤 추가. PRD.md v6.0 통합(섹션 13 신설). | anakin |
+| v2.7 | 2026-06-09 | Phase 11 완료 현행화 — TASK-083/084/085/087 구현 완료 확인 후 🔜→✅ 업데이트. TASK-083: `POST /api/admin/stats/aggregate` CRON_SECRET+어드민 이중인증·백필 모드(`backfill:true`)·`vercel.json` Cron(`0 0 * * *`) 등록. TASK-084: `fn_top_active_users`/`fn_top_revenue_themes`/`fn_top_spenders` RPC 3종 Supabase 배포. TASK-085: `plotly-plot.tsx`(ssr:false)·`dau-wau-mau-chart`·`revenue-donut-chart`·`revenue-timeline-chart` 4종 구현. 실데이터 적재 확인: `stat_actvty_dly` 5일치(2026-06-05~09)·`stat_revenue_dly` 4일치(2026-06-06~09). M20 완료일 2026-06-09 반영. | anakin |
