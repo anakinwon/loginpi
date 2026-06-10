@@ -5,14 +5,16 @@ import { StickerPicker } from './sticker-picker'
 interface ChatInputProps {
   onSend: (text: string) => Promise<void>
   onSendSticker: (stkrId: string, stkrUrl: string) => Promise<void>
+  onSendFile?: (file: File) => Promise<void>
 }
 
-export function ChatInput({ onSend, onSendSticker }: ChatInputProps) {
+export function ChatInput({ onSend, onSendSticker, onSendFile }: ChatInputProps) {
   const [text, setText] = useState('')
   const [isSending, setIsSending] = useState(false)
   const [showPicker, setShowPicker] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // 외부 클릭 시 스티커 피커 닫기
   useEffect(() => {
@@ -64,6 +66,18 @@ export function ChatInput({ onSend, onSendSticker }: ChatInputProps) {
     await onSendSticker(stkrId, stkrUrl)
   }, [onSendSticker])
 
+  const handleFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !onSendFile) return
+    e.target.value = '' // 동일 파일 재선택 허용
+    setIsSending(true)
+    try {
+      await onSendFile(file)
+    } finally {
+      setIsSending(false)
+    }
+  }, [onSendFile])
+
   return (
     <div
       ref={containerRef}
@@ -80,6 +94,26 @@ export function ChatInput({ onSend, onSendSticker }: ChatInputProps) {
       >
         😊
       </button>
+      {onSendFile && (
+        <>
+          <input
+            ref={fileInputRef}
+            type='file'
+            className='hidden'
+            accept='image/*,audio/*,.pdf,.doc,.docx,.txt,.zip'
+            onChange={handleFileChange}
+          />
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isSending}
+            className='shrink-0 rounded-xl p-2 text-lg text-muted-foreground transition-colors hover:bg-muted disabled:opacity-40'
+            title='파일 첨부'
+            aria-label='파일 첨부'
+          >
+            📎
+          </button>
+        </>
+      )}
       <textarea
         ref={textareaRef}
         value={text}

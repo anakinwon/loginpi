@@ -18,10 +18,25 @@ export async function GET(_request: Request, { params }: Params) {
 
   if (!room) return NextResponse.json({ error: '채팅방을 찾을 수 없습니다' }, { status: 404 })
   if (!mbr) {
-    // 공개 그룹방이면 클라이언트가 입장 CTA를 보여줄 수 있도록 방 미리보기 포함
-    if (room.room_tp_cd === 'G' && room.is_public_yn === 'Y') {
+    // 공개 그룹방·이벤트방이면 클라이언트가 입장 CTA를 보여줄 수 있도록 방 미리보기 포함
+    // 이벤트방(E)은 entry_fee_pi를 함께 내려 결제 후 입장(Trigger 8) UI를 띄울 수 있게 한다
+    if ((room.room_tp_cd === 'G' || room.room_tp_cd === 'E') && room.is_public_yn === 'Y') {
+      // 종료된 이벤트방은 입장 불가
+      if (room.room_tp_cd === 'E' && room.entry_expire_dtm && new Date(room.entry_expire_dtm) <= new Date()) {
+        return NextResponse.json({ error: '종료된 이벤트방입니다' }, { status: 403 })
+      }
       return NextResponse.json(
-        { error: '채팅방 멤버가 아닙니다', isPublic: true, room: { room_nm: room.room_nm, theme_cd: room.theme_cd } },
+        {
+          error: '채팅방 멤버가 아닙니다',
+          isPublic: true,
+          room: {
+            room_nm: room.room_nm,
+            theme_cd: room.theme_cd,
+            room_tp_cd: room.room_tp_cd,
+            entry_fee_pi: room.entry_fee_pi,
+            entry_expire_dtm: room.entry_expire_dtm,
+          },
+        },
         { status: 403 }
       )
     }

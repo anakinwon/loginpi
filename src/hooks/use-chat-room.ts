@@ -35,6 +35,8 @@ interface UseChatRoomOptions {
   // 방 헤더 언어 콤보 선택 시 true — 로드된 모든 메시지(본인 과거 메시지 포함)를
   // userLocale로 일괄 번역하고, 이후 추가되는 메시지도 전부 번역한다
   forceTranslate?: boolean
+  // @ai 멘션 전송 시 월 한도 초과 → panel에서 업그레이드 모달 표시
+  onAiLimitExceeded?: () => void
 }
 
 interface UseChatRoomReturn {
@@ -42,6 +44,7 @@ interface UseChatRoomReturn {
   onlineUserIds: string[]
   sendMessage: (text: string) => Promise<void>
   sendSticker: (stkrId: string, stkrUrl: string) => Promise<void>
+  sendFile: (file: File) => Promise<void>
   prependMessages: (msgs: ChatMessage[]) => void
 }
 
@@ -51,7 +54,7 @@ const TRANS_EVENT = 'msg_trans'
 export function useChatRoom(
   roomId: string,
   initialMessages: ChatMessage[],
-  { currentUserId, currentUserDisplayName, userLocale, forceTranslate = false }: UseChatRoomOptions,
+  { currentUserId, currentUserDisplayName, userLocale, forceTranslate = false, onAiLimitExceeded }: UseChatRoomOptions,
 ): UseChatRoomReturn {
   // 초기 메시지에 trans_locale 세팅 — 서버가 trans_cont를 미리 채운 경우 현재 locale로 표시
   const [messages, setMessages] = useState<ChatMessage[]>(() =>
@@ -270,6 +273,12 @@ export function useChatRoom(
         removeMessage(tempId)
         throw new Error('rate_limit')
       }
+      if (res.status === 402) {
+        // @ai 멘션 → 월 한도 초과 → 업그레이드 유도
+        removeMessage(tempId)
+        onAiLimitExceeded?.()
+        return
+      }
       if (!res.ok) {
         removeMessage(tempId)
         throw new Error('send_failed')
@@ -280,7 +289,7 @@ export function useChatRoom(
     } catch (err) {
       throw err
     }
-  }, [roomId, currentUserId, currentUserDisplayName, addMessage, removeMessage, replaceMessage])
+  }, [roomId, currentUserId, currentUserDisplayName, addMessage, removeMessage, replaceMessage, onAiLimitExceeded])
 
   const sendSticker = useCallback(async (stkrId: string, stkrUrl: string) => {
     const tempId = crypto.randomUUID()
@@ -320,5 +329,48 @@ export function useChatRoom(
     }
   }, [roomId, currentUserId, currentUserDisplayName, addMessage, removeMessage, replaceMessage])
 
-  return { messages, onlineUserIds, sendMessage, sendSticker, prependMessages }
+  const sendFile = useCallback(async (file: File) => {
+    const form = new FormData()
+    form.append('file', file)
+
+    const uploadRes = await piFetch(`/api/chat/rooms/${roomId}/upload`, { method: 'POST', body: form })
+    if (!uploadRes.ok) throw new Error('upload_failed')
+
+    const { url, msg_tp_cd, file_name } = await uploadRes.json() as {
+      url: string; msg_tp_cd: 'IMAGE' | 'VOICE' | 'FILE'; file_name: string
+    }
+
+    const tempId = crypto.randomUUID()
+    requestedTransRef.current.add(tempId)
+    const tempMsg: ChatMessage = {
+      msg_id: tempId,
+      room_id: roomId,
+      snd_usr_id: currentUserId,
+      snd_usr_nm: currentUserDisplayName,
+      msg_cont: msg_tp_cd === 'FILE' ? file_name : null,
+      msg_tp_cd,
+      attch_url: url,
+      stkr_id: null,
+      ref_msg_id: null,
+      del_yn: 'N',
+      reg_dtm: new Date().toISOString(),
+    }
+    addMessage(tempMsg)
+
+    const res = await piFetch(`/api/chat/rooms/${roomId}/messages`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ msg_id: tempId, msg_tp_cd, attch_url: url, msg_cont: msg_tp_cd === 'FILE' ? file_name : null }),
+    })
+
+    if (!res.ok) {
+      removeMessage(tempId)
+      throw new Error('send_failed')
+    }
+
+    const { message } = await res.json() as { message: ChatMessage }
+    replaceMessage(tempId, message)
+  }, [roomId, currentUserId, currentUserDisplayName, addMessage, removeMessage, replaceMessage])
+
+  return { messages, onlineUserIds, sendMessage, sendSticker, sendFile, prependMessages }
 }

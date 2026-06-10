@@ -164,11 +164,23 @@ export interface AiQuota {
 }
 
 // AI 봇 호출 잔여 한도.
-// 실제 사용량 집계는 TASK-060(AI 봇)에서 msg_msg 기반으로 연결 — 현재 used=0 플레이스홀더.
+// 이번 달 @ai 멘션 TEXT 메시지 수를 msg_msg에서 직접 집계.
 export async function getAiQuota(userId: string, plan?: ChatPlan): Promise<AiQuota> {
   const p = plan ?? (await getChatPlan(userId))
   const limit = p.caps.aiMonthlyQuota
   if (limit === -1) return { limit: -1, used: 0, remaining: -1 }
-  const used = 0 // TODO(TASK-060): msg_msg AI 응답 건수 집계로 대체
+
+  const now = new Date()
+  const monthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString()
+  const { count } = await getSupabaseAdmin()
+    .from('msg_msg')
+    .select('msg_id', { count: 'exact', head: true })
+    .eq('snd_usr_id', userId)
+    .eq('msg_tp_cd', 'TEXT')
+    .ilike('msg_cont', '%@ai %')
+    .gte('reg_dtm', monthStart)
+    .eq('del_yn', 'N')
+
+  const used = count ?? 0
   return { limit, used, remaining: Math.max(0, limit - used) }
 }

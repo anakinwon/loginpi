@@ -42,6 +42,7 @@ export function ChatRoomPanel({
   const [isSubscribed, setIsSubscribed] = useState(false)
   const [tipPromptOpen, setTipPromptOpen] = useState(false)
   const [expirePromptOpen, setExpirePromptOpen] = useState(false)
+  const [aiLimitPromptOpen, setAiLimitPromptOpen] = useState(false)
   const [expireBannerDismissed, setExpireBannerDismissed] = useState(false)
 
   // 방 입장 시 이 방에 저장된 번역 언어 복원 (외부 저장소 구독 — 방별 독립)
@@ -72,17 +73,19 @@ export function ChatRoomPanel({
   const handleSubscribeSuccess = useCallback(() => {
     setTipPromptOpen(false)
     setExpirePromptOpen(false)
+    setAiLimitPromptOpen(false)
     checkSubscription()
   }, [checkSubscription])
 
   const { subscribe, paying } = useSubscribePlan({ onSuccess: handleSubscribeSuccess })
 
   const onUpgradeForTip = useCallback(() => setTipPromptOpen(true), [])
+  const onAiLimitExceeded = useCallback(() => setAiLimitPromptOpen(true), [])
 
   // 콤보 선택 언어가 URL locale보다 우선 — 이 방의 모든 메시지가 해당 언어로 보임
   const effectiveLocale = viewLocale || urlLocale
 
-  const { messages, sendMessage, sendSticker, prependMessages } = useChatRoom(
+  const { messages, sendMessage, sendSticker, sendFile, prependMessages } = useChatRoom(
     roomId,
     initialMessages,
     {
@@ -91,6 +94,8 @@ export function ChatRoomPanel({
       userLocale: effectiveLocale,
       // isSubscribed 이중 게이트 — localStorage에 남은 이전 viewLocale이 비구독자에게 활성화되는 것 방지
       forceTranslate: isSubscribed && !!viewLocale,
+      // TASK-064 Trigger 3: @ai 멘션 한도 초과 → 업그레이드 모달
+      onAiLimitExceeded,
     },
   )
 
@@ -163,7 +168,7 @@ export function ChatRoomPanel({
       />
 
       {/* 채팅 입력 섹션 — 고정 */}
-      <ChatInput onSend={sendMessage} onSendSticker={sendSticker} />
+      <ChatInput onSend={sendMessage} onSendSticker={sendSticker} onSendFile={sendFile} />
 
       {/* Trigger 2: Tip 업그레이드 모달 */}
       <InlinePurchasePrompt
@@ -187,6 +192,18 @@ export function ChatRoomPanel({
         onSubscribe={subscribe}
         subscribing={paying}
         onClose={() => setExpirePromptOpen(false)}
+      />
+
+      {/* Trigger 3: AI 봇 한도 초과 업그레이드 모달 */}
+      <InlinePurchasePrompt
+        isOpen={aiLimitPromptOpen}
+        featureName='AI 채팅 비서 한도 초과'
+        description='이번 달 @ai 멘션 한도를 초과했습니다. 프리미엄 구독으로 무제한 AI 질문을 이용하세요.'
+        piAmount={3}
+        onSinglePurchase={() => setAiLimitPromptOpen(false)}
+        onSubscribe={subscribe}
+        subscribing={paying}
+        onClose={() => setAiLimitPromptOpen(false)}
       />
     </div>
   )

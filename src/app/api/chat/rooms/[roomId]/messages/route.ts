@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse, after } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth-check'
-import { getRoomMember, getRecentMsgCount } from '@/lib/chat'
+import { getRoomMember, getRoom, getRecentMsgCount } from '@/lib/chat'
+import { getAiQuota } from '@/lib/chat-auth'
+import { getThemeSystemPrompt, extractAiQuestion, generateAiReply } from '@/lib/chat-ai-prompts'
 import { broadcastToRoom } from '@/lib/realtime-broadcast'
 import { recordActivity } from '@/lib/activity-log'
 import { LOCALE_CD_RE } from '@/lib/chat-translate'
@@ -123,6 +125,27 @@ export async function POST(request: NextRequest, { params }: Params) {
     return NextResponse.json({ error: '유효하지 않은 메시지 타입' }, { status: 400 })
   }
 
+  // TASK-065 보안: IMAGE/FILE/VOICE의 attch_url은 이 방의 Storage 공개 URL만 허용
+  // 외부 URL(피싱·XSS)과 타 채팅방 파일 cross-attach를 차단한다
+  if (msg_tp_cd === 'IMAGE' || msg_tp_cd === 'FILE' || msg_tp_cd === 'VOICE') {
+    const expectedPrefix = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/chat-attachments/${roomId}/`
+    if (!attch_url || !attch_url.startsWith(expectedPrefix)) {
+      return NextResponse.json({ error: '유효하지 않은 첨부 파일 URL입니다' }, { status: 400 })
+    }
+  }
+
+  // TASK-064: @ai 멘션 시 한도 사전 체크 — 초과면 메시지 삽입 없이 402 반환
+  const isAiMention = msg_tp_cd === 'TEXT' && /^@ai\s/i.test(msg_cont?.trim() ?? '')
+  if (isAiMention && process.env.ANTHROPIC_API_KEY) {
+    const quota = await getAiQuota(user.id)
+    if (quota.remaining === 0) {
+      return NextResponse.json(
+        { error: 'AI 월 호출 한도를 초과했습니다', aiLimitExceeded: true },
+        { status: 402 },
+      )
+    }
+  }
+
   // STICKER: 소유권 검증 + 서버 stkr_url 사용 (클라이언트 attch_url 무시)
   let resolvedAttchUrl: string | null = attch_url ?? null
   if (msg_tp_cd === 'STICKER' && stkr_id) {
@@ -212,6 +235,38 @@ export async function POST(request: NextRequest, { params }: Params) {
         msgCont: data.msg_cont,
       }).catch(err => console.error('[chat-translate] 번역 큐 오류', err)),
     )
+  }
+
+  // TASK-064: @ai 멘션 감지 → AI_REPLY 생성 (백그라운드)
+  // 한도 체크는 위에서 완료 — after()에서는 생성만 담당
+  if (isAiMention && process.env.ANTHROPIC_API_KEY) {
+    after(async () => {
+      try {
+        const room = await getRoom(roomId)
+        const systemPrompt = getThemeSystemPrompt(room?.theme_cd ?? '')
+        const question = extractAiQuestion(msg_cont ?? '')
+        const aiText = await generateAiReply(systemPrompt, question)
+
+        const { data: aiMsg } = await getSupabaseAdmin()
+          .from('msg_msg')
+          .insert({
+            room_id: roomId,
+            snd_usr_id: user.id, // FK 안전 — 요청자 ID 재사용
+            snd_usr_nm: 'PiChat AI',
+            msg_cont: aiText,
+            msg_tp_cd: 'AI_REPLY',
+            ref_msg_id: data.msg_id,
+            regr_id: 'SYSTEM',
+            modr_id: 'SYSTEM',
+          })
+          .select()
+          .single()
+
+        if (aiMsg) await broadcastToRoom(roomId, 'new_msg', aiMsg)
+      } catch (err) {
+        console.error('[chat-ai] AI 응답 생성 실패', err)
+      }
+    })
   }
 
   return NextResponse.json({ message: data }, { status: 201 })

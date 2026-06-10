@@ -27,6 +27,17 @@ export async function POST(request: NextRequest, { params }: Params) {
     }
   }
 
+  // TASK-063: 유료 이벤트방 — 결제 완료 후 payments/complete에서 GUEST 삽입됨
+  // 결제 없이 직접 join 시도 시 402 반환 (클라이언트가 Pi SDK 결제 흐름으로 안내)
+  if (room.room_tp_cd === 'E' && room.entry_fee_pi > 0) {
+    const existing = await getRoomMember(roomId, user.id)
+    if (existing) return NextResponse.json({ message: '이미 채팅방 멤버입니다' })
+    return NextResponse.json(
+      { error: '유료 이벤트방입니다. 결제 후 입장하세요.', requiresPayment: true, entryFeePi: room.entry_fee_pi },
+      { status: 402 },
+    )
+  }
+
   // 비공개방은 초대코드 없이 입장 불가 (TASK-053에서 확장)
   if (room.is_public_yn === 'N') {
     return NextResponse.json({ error: '비공개 채팅방입니다' }, { status: 403 })

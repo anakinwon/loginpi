@@ -181,6 +181,59 @@ export async function POST(request: NextRequest) {
           if (tipMsg) await broadcastToRoom(roomId, 'new_msg', tipMsg)
         }
       }
+    } else if (meta?.type === 'EVENT_ROOM_JOIN' && payment.user_uid) {
+      // EVENT_ROOM_JOIN: 결제 완료 시 GUEST로 이벤트방 입장 처리
+      const roomIdStr = String(meta.room_id ?? '')
+      const [{ data: owner }, { data: room }] = await Promise.all([
+        db.from('sys_user').select('id, display_name').eq('pi_uid', payment.user_uid).maybeSingle(),
+        db.from('msg_room').select('room_id, room_nm, entry_fee_pi, entry_expire_dtm').eq('room_id', roomIdStr).eq('del_yn', 'N').maybeSingle(),
+      ])
+
+      if (owner && room) {
+        const ownerRow = owner as { id: string; display_name: string | null }
+        const roomRow = room as { room_id: string; room_nm: string; entry_fee_pi: number; entry_expire_dtm: string | null }
+        const slug = String(ownerRow.display_name ?? 'user').slice(0, 20)
+
+        // 결제 금액이 입장료 이상인지 서버 재검증
+        if (Number(payment.amount) + 1e-6 >= Number(roomRow.entry_fee_pi)) {
+          // 이미 입장한 경우 중복 삽입 방지
+          const { data: existingMbr } = await db
+            .from('msg_room_mbr')
+            .select('room_mbr_id')
+            .eq('room_id', roomRow.room_id)
+            .eq('usr_id', ownerRow.id)
+            .eq('del_yn', 'N')
+            .maybeSingle()
+
+          if (!existingMbr) {
+            await db.from('msg_room_mbr').insert({
+              room_id: roomRow.room_id,
+              usr_id: ownerRow.id,
+              mbr_role_cd: 'GUEST',
+              expire_dtm: roomRow.entry_expire_dtm,
+              regr_id: slug,
+              modr_id: slug,
+            })
+
+            // 입장 SYSTEM 메시지 브로드캐스트
+            const { data: sysMsg } = await db
+              .from('msg_msg')
+              .insert({
+                room_id: roomRow.room_id,
+                snd_usr_id: ownerRow.id,
+                snd_usr_nm: String(ownerRow.display_name ?? 'user'),
+                msg_cont: `🎟️ ${ownerRow.display_name} 님이 이벤트방에 입장했습니다`,
+                msg_tp_cd: 'SYSTEM',
+                regr_id: slug,
+                modr_id: slug,
+              })
+              .select()
+              .single()
+
+            if (sysMsg) await broadcastToRoom(roomRow.room_id, 'new_msg', sysMsg)
+          }
+        }
+      }
     } else if (meta?.type === 'STICKER_PACK' && payment.user_uid) {
       // STICKER_PACK: 결제 완료 시 msg_usr_stkr UPSERT (UNIQUE usr_id,pack_id — 중복 구매 안전)
       const packId = String(meta.pack_id ?? '')

@@ -194,6 +194,83 @@ function MessageBubble({ msg, isMe, canTip, roomId, hideTime, onUpgradeForTip }:
     )
   }
 
+  // TASK-065: 이미지 첨부 — 클릭 시 원본 크기로 열림
+  if (msg.msg_tp_cd === 'IMAGE') {
+    return (
+      <div className={`group flex flex-col gap-0.5 ${isMe ? 'items-end' : 'items-start'}`}>
+        {!isMe && <span className='text-xs text-muted-foreground'>{msg.snd_usr_nm}</span>}
+        {msg.attch_url ? (
+          <a href={msg.attch_url} target='_blank' rel='noopener noreferrer'>
+            <img
+              src={msg.attch_url}
+              alt='이미지'
+              className='max-h-60 max-w-[280px] rounded-xl object-cover'
+            />
+          </a>
+        ) : (
+          <div className='flex h-20 w-40 items-center justify-center rounded-xl bg-muted text-muted-foreground text-sm'>이미지 없음</div>
+        )}
+        {!hideTime && (
+          <span className='text-[10px] text-muted-foreground'>{formatKoreanTime(msg.reg_dtm)}</span>
+        )}
+      </div>
+    )
+  }
+
+  // TASK-065: 음성 파일 — 인라인 오디오 플레이어
+  if (msg.msg_tp_cd === 'VOICE') {
+    return (
+      <div className={`group flex flex-col gap-0.5 ${isMe ? 'items-end' : 'items-start'}`}>
+        {!isMe && <span className='text-xs text-muted-foreground'>{msg.snd_usr_nm}</span>}
+        {msg.attch_url && (
+          <audio controls src={msg.attch_url} className='max-w-[280px] rounded-xl' />
+        )}
+        {!hideTime && (
+          <span className='text-[10px] text-muted-foreground'>{formatKoreanTime(msg.reg_dtm)}</span>
+        )}
+      </div>
+    )
+  }
+
+  // TASK-065: 일반 파일 — 다운로드 링크
+  if (msg.msg_tp_cd === 'FILE') {
+    return (
+      <div className={`group flex flex-col gap-0.5 ${isMe ? 'items-end' : 'items-start'}`}>
+        {!isMe && <span className='text-xs text-muted-foreground'>{msg.snd_usr_nm}</span>}
+        <a
+          href={msg.attch_url ?? '#'}
+          target='_blank'
+          rel='noopener noreferrer'
+          className={`flex items-center gap-2 rounded-2xl px-3 py-2 text-sm ${isMe ? 'rounded-br-sm bg-primary text-primary-foreground' : 'rounded-bl-sm bg-muted'}`}
+        >
+          <span>📄</span>
+          <span className='max-w-[200px] truncate'>{msg.msg_cont ?? '파일'}</span>
+        </a>
+        {!hideTime && (
+          <span className='text-[10px] text-muted-foreground'>{formatKoreanTime(msg.reg_dtm)}</span>
+        )}
+      </div>
+    )
+  }
+
+  // TASK-064: AI 봇 응답 — 보라색 말풍선 + 🤖 뱃지로 일반 사용자 메시지와 구분
+  if (msg.msg_tp_cd === 'AI_REPLY') {
+    return (
+      <div className='group flex flex-col items-start gap-0.5'>
+        <span className='flex items-center gap-1 text-xs text-muted-foreground'>
+          <span>🤖</span>
+          <span>PiChat AI</span>
+        </span>
+        <div className='max-w-[70%] rounded-2xl rounded-bl-sm bg-violet-100 px-3 py-2 text-sm dark:bg-violet-900/40'>
+          {msg.msg_cont}
+        </div>
+        {!hideTime && (
+          <span className='text-[10px] text-muted-foreground'>{formatKoreanTime(msg.reg_dtm)}</span>
+        )}
+      </div>
+    )
+  }
+
   return (
     <div className={`group flex flex-col gap-0.5 ${isMe ? 'items-end' : 'items-start'}`}>
       {!isMe && (

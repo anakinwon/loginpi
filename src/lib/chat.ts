@@ -23,7 +23,7 @@ export interface MsgMsg {
   snd_usr_id: string
   snd_usr_nm: string
   msg_cont: string | null
-  msg_tp_cd: 'TEXT' | 'IMAGE' | 'FILE' | 'VOICE' | 'STICKER' | 'TIP_NOTI' | 'SYSTEM'
+  msg_tp_cd: 'TEXT' | 'IMAGE' | 'FILE' | 'VOICE' | 'STICKER' | 'TIP_NOTI' | 'SYSTEM' | 'AI_REPLY'
   attch_url: string | null
   stkr_id: string | null
   ref_msg_id: string | null
@@ -163,6 +163,51 @@ export async function createGroupRoom(params: {
     .single()
 
   if (error || !room) throw new Error('채팅방 생성 실패')
+
+  await supabase.from('msg_room_mbr').insert({
+    room_id: (room as MsgRoom).room_id,
+    usr_id: params.userId,
+    mbr_role_cd: 'OWNER',
+    regr_id: slug,
+    modr_id: slug,
+  })
+
+  return room as MsgRoom
+}
+
+// 이벤트 채팅방 생성 (BUSINESS 플랜 전용 — 유료 입장 + 종료 시각 설정)
+export async function createEventRoom(params: {
+  userId: string
+  displayName: string
+  theme_cd: string
+  room_nm: string
+  room_desc: string | null
+  is_public_yn: 'Y' | 'N'
+  max_mbr_cnt: number
+  entry_fee_pi: number
+  entry_expire_dtm: string
+}): Promise<MsgRoom> {
+  const supabase = getSupabaseAdmin()
+  const slug = params.displayName.slice(0, 20)
+
+  const { data: room, error } = await supabase
+    .from('msg_room')
+    .insert({
+      room_nm: params.room_nm,
+      room_desc: params.room_desc,
+      theme_cd: params.theme_cd,
+      room_tp_cd: 'E',
+      max_mbr_cnt: params.max_mbr_cnt,
+      is_public_yn: params.is_public_yn,
+      entry_fee_pi: params.entry_fee_pi,
+      entry_expire_dtm: params.entry_expire_dtm,
+      regr_id: slug,
+      modr_id: slug,
+    })
+    .select()
+    .single()
+
+  if (error || !room) throw new Error('이벤트방 생성 실패')
 
   await supabase.from('msg_room_mbr').insert({
     room_id: (room as MsgRoom).room_id,
