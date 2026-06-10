@@ -18,6 +18,8 @@ export interface UserRow {
   phone_no: string | null
   addr: string | null
   addr_dtl: string | null
+  // Phase 12 — 마이그레이션 020 추가 컬럼 (PiTranslate™ 표시 언어)
+  display_locale_cd: string | null
   reg_dtm: string
   mod_dtm: string
 }
@@ -81,7 +83,7 @@ export async function getUserById(id: string): Promise<UserRow | null> {
 
 export async function updateUserProfile(
   userId: string,
-  data: Partial<Pick<UserRow, 'display_name' | 'real_nm' | 'nick_nm' | 'phone_no' | 'addr' | 'addr_dtl'>>
+  data: Partial<Pick<UserRow, 'display_name' | 'real_nm' | 'nick_nm' | 'phone_no' | 'addr' | 'addr_dtl' | 'display_locale_cd'>>
 ): Promise<UserRow | null> {
   const { data: row } = await getSupabaseAdmin()
     .from('sys_user')

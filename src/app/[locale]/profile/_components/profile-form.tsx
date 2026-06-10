@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react'
 import { piFetch, setPiToken } from '@/lib/pi-fetch'
 import { usePiAuth } from '@/components/pi-auth-provider'
+import { getLocaleOptions } from '@/lib/locale-options'
 import type { UserRow } from '@/lib/users'
 
 interface Props {
@@ -18,6 +19,9 @@ const FIELDS: { name: keyof UserRow; label: string; placeholder: string }[] = [
   { name: 'addr',         label: '주소',       placeholder: '기본 주소' },
   { name: 'addr_dtl',     label: '상세 주소',  placeholder: '동·호수 등' },
 ]
+
+// PiTranslate™ 표시 언어 드롭다운 옵션 — locale-options.ts 단일 소스
+const LOCALE_OPTIONS = getLocaleOptions('ko')
 
 export function ProfileForm({ initialUser, onSaved }: Props) {
   const formRef = useRef<HTMLFormElement>(null)
@@ -75,6 +79,24 @@ export function ProfileForm({ initialUser, onSaved }: Props) {
           />
         </div>
       ))}
+
+      {/* PiTranslate™ 표시 언어 — 채팅 메시지가 이 언어로 자동 번역됨 */}
+      <div className='flex flex-col gap-1'>
+        <label className='text-sm font-medium' htmlFor='display_locale_cd'>
+          표시 언어 (채팅 자동 번역)
+        </label>
+        <select
+          id='display_locale_cd'
+          name='display_locale_cd'
+          defaultValue={initialUser.display_locale_cd ?? ''}
+          className='rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/50'
+        >
+          <option value=''>미설정 (브라우저 언어 사용)</option>
+          {LOCALE_OPTIONS.map(({ value, label }) => (
+            <option key={value} value={value}>{label}</option>
+          ))}
+        </select>
+      </div>
 
       {message && (
         <p className={`text-sm ${message.type === 'ok' ? 'text-green-600' : 'text-destructive'}`}>

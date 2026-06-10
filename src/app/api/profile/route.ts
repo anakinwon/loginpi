@@ -13,6 +13,8 @@ const ProfileUpdateSchema = z.object({
   phone_no:     z.string().max(20).optional(),
   addr:         z.string().max(200).optional(),
   addr_dtl:     z.string().max(100).optional(),
+  // PiTranslate™ 표시 언어 — locale 코드 화이트리스트 검증 (코드 인젝션 방지)
+  display_locale_cd: z.string().regex(/^[a-z]{2,3}(-[A-Z]{2,3})?$/).optional(),
 })
 
 export async function GET() {
@@ -21,7 +23,7 @@ export async function GET() {
 
   const { data } = await getSupabaseAdmin()
     .from('sys_user')
-    .select('id, display_name, real_nm, nick_nm, phone_no, addr, addr_dtl, pi_username, google_email, role, reg_dtm')
+    .select('id, display_name, real_nm, nick_nm, phone_no, addr, addr_dtl, display_locale_cd, pi_username, google_email, role, reg_dtm')
     .eq('id', user.id)
     .maybeSingle()
 
@@ -52,7 +54,7 @@ export async function PATCH(req: Request) {
       mod_dtm: new Date().toISOString(),
     })
     .eq('id', user.id)
-    .select('id, display_name, real_nm, nick_nm, phone_no, addr, addr_dtl, pi_username, google_email, role, reg_dtm')
+    .select('id, display_name, real_nm, nick_nm, phone_no, addr, addr_dtl, display_locale_cd, pi_username, google_email, role, reg_dtm')
     .maybeSingle()
 
   if (error) return NextResponse.json({ error: '프로필 저장 실패' }, { status: 500 })

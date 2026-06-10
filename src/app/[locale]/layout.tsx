@@ -41,11 +41,12 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      {/* onLoad는 이벤트 핸들러이므로 Client Component(PiSdkScript)로 분리 */}
-      <PiSdkScript />
       <body
         className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col antialiased`}
       >
+        {/* onLoad는 이벤트 핸들러이므로 Client Component(PiSdkScript)로 분리.
+            ※ <html> 직접 자식으로 두면 invalid DOM → hydration 불일치 → script 경고 발생 — 반드시 body 안에 배치 */}
+        <PiSdkScript />
         <NextIntlClientProvider messages={messages}>
           <SessionProvider session={session}>
             <ThemeProvider
