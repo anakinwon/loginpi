@@ -234,6 +234,32 @@ export async function POST(request: NextRequest) {
           }
         }
       }
+    } else if (meta?.type === 'FEATURE_ADDON' && meta?.feature_cd === 'BADGE_UPGRADE' && payment.user_uid) {
+      // BADGE_UPGRADE: 결제 완료 시 배지 강화 (특별 디자인 + 채팅방 이름 옆 상시 표시)
+      const themeCd = String(meta.theme_cd ?? '')
+      const { data: owner } = await db
+        .from('sys_user')
+        .select('id, display_name')
+        .eq('pi_uid', payment.user_uid)
+        .maybeSingle()
+
+      // 강화 가격 0.1 Pi 서버 재검증 (부동소수 오차 허용)
+      if (owner && themeCd && Number(payment.amount) + 1e-6 >= 0.1) {
+        const ownerRow = owner as { id: string; display_name: string | null }
+        const slug = String(ownerRow.display_name ?? 'user').slice(0, 20)
+        await db
+          .from('msg_usr_badge')
+          .update({
+            upgr_yn: 'Y',
+            upgr_dtm: new Date().toISOString(),
+            pymnt_id: paymentId,
+            modr_id: slug,
+            mod_dtm: new Date().toISOString(),
+          })
+          .eq('usr_id', ownerRow.id)
+          .eq('theme_cd', themeCd)
+          .eq('del_yn', 'N')
+      }
     } else if (meta?.type === 'STICKER_PACK' && payment.user_uid) {
       // STICKER_PACK: 결제 완료 시 msg_usr_stkr UPSERT (UNIQUE usr_id,pack_id — 중복 구매 안전)
       const packId = String(meta.pack_id ?? '')

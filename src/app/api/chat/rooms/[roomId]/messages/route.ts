@@ -4,6 +4,7 @@ import { getSessionUser } from '@/lib/auth-check'
 import { getRoomMember, getRoom, getRecentMsgCount } from '@/lib/chat'
 import { getAiQuota } from '@/lib/chat-auth'
 import { getThemeSystemPrompt, extractAiQuestion, generateAiReply } from '@/lib/chat-ai-prompts'
+import { tryAwardBadge } from '@/lib/chat-badge'
 import { broadcastToRoom } from '@/lib/realtime-broadcast'
 import { recordActivity } from '@/lib/activity-log'
 import { LOCALE_CD_RE } from '@/lib/chat-translate'
@@ -234,6 +235,15 @@ export async function POST(request: NextRequest, { params }: Params) {
         msgId: data.msg_id,
         msgCont: data.msg_cont,
       }).catch(err => console.error('[chat-translate] 번역 큐 오류', err)),
+    )
+  }
+
+  // TASK-062 Trigger 7: 테마 활동 배지 수여 체크 (백그라운드)
+  // 배지 보유 시 RPC가 인덱스 1회 조회로 즉시 반환 — 매 메시지 비용 최소
+  if (msg_tp_cd === 'TEXT' || msg_tp_cd === 'IMAGE' || msg_tp_cd === 'FILE' || msg_tp_cd === 'VOICE') {
+    after(() =>
+      tryAwardBadge({ userId: user.id, roomId, displayName: user.display_name })
+        .catch(err => console.error('[chat-badge] 배지 수여 체크 실패', err)),
     )
   }
 

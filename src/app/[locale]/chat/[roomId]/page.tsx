@@ -111,6 +111,7 @@ export default async function ChatRoomPage({ params }: Params) {
         roomNm={room.room_nm}
         roomDesc={room.room_desc}
         themeEmoji={themeEmoji}
+        themeCd={room.theme_cd}
         capacityAlert={capacityAlert}
       />
     </div>

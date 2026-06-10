@@ -9,6 +9,7 @@ import { ChatMessageList } from './chat-message-list'
 import { ChatInput } from './chat-input'
 import { ChatLocaleSelect } from './chat-locale-select'
 import { InlinePurchasePrompt } from './inline-purchase-prompt'
+import { BadgeAwardPopup, type BadgeAwardInfo } from './badge-award-popup'
 
 interface ChatRoomPanelProps {
   roomId: string
@@ -18,7 +19,13 @@ interface ChatRoomPanelProps {
   roomNm: string
   roomDesc?: string | null
   themeEmoji?: string
+  themeCd?: string
   capacityAlert?: boolean
+}
+
+interface MyBadge extends BadgeAwardInfo {
+  upgr_yn: 'Y' | 'N'
+  noti_yn: 'Y' | 'N'
 }
 
 // 방별 번역 언어 localStorage 키 — 채팅룸은 독립 공간이므로 방마다 따로 저장
@@ -32,6 +39,7 @@ export function ChatRoomPanel({
   roomNm,
   roomDesc,
   themeEmoji = '💬',
+  themeCd,
   capacityAlert = false,
 }: ChatRoomPanelProps) {
   const urlLocale = useLocale()
@@ -44,6 +52,9 @@ export function ChatRoomPanel({
   const [expirePromptOpen, setExpirePromptOpen] = useState(false)
   const [aiLimitPromptOpen, setAiLimitPromptOpen] = useState(false)
   const [expireBannerDismissed, setExpireBannerDismissed] = useState(false)
+  // TASK-062 Trigger 7: 배지 수여 축하 팝업 + 강화 배지 헤더 상시 표시
+  const [badgeAward, setBadgeAward] = useState<BadgeAwardInfo | null>(null)
+  const [upgradedBadge, setUpgradedBadge] = useState<BadgeAwardInfo | null>(null)
 
   // 방 입장 시 이 방에 저장된 번역 언어 복원 (외부 저장소 구독 — 방별 독립)
   useEffect(() => {
@@ -82,6 +93,44 @@ export function ChatRoomPanel({
   const onUpgradeForTip = useCallback(() => setTipPromptOpen(true), [])
   const onAiLimitExceeded = useCallback(() => setAiLimitPromptOpen(true), [])
 
+  // 팝업을 봤다는 표시 — 다음 방문 시 중복 표시 방지
+  const markBadgeNotified = useCallback((badgeId: string) => {
+    piFetch(`/api/badges/${badgeId}`, { method: 'PATCH' }).catch(() => {})
+  }, [])
+
+  // 실시간 수여 broadcast 수신 → 축하 팝업 (Trigger 7)
+  const onBadgeAward = useCallback((badge: BadgeAwardInfo) => {
+    setBadgeAward(badge)
+    markBadgeNotified(badge.badge_id)
+  }, [markBadgeNotified])
+
+  // 방 입장 시: 미통지 배지 팝업(오프라인 중 수여 폴백) + 이 테마의 강화 배지 헤더 표시
+  useEffect(() => {
+    piFetch('/api/badges')
+      .then(r => r.ok ? r.json() : null)
+      .then((d: { badges?: MyBadge[] } | null) => {
+        if (!d?.badges) return
+        const unnotified = d.badges.find(b => b.noti_yn === 'N')
+        if (unnotified) {
+          setBadgeAward(unnotified)
+          markBadgeNotified(unnotified.badge_id)
+        }
+        if (themeCd) {
+          const upgraded = d.badges.find(b => b.theme_cd === themeCd && b.upgr_yn === 'Y')
+          if (upgraded) setUpgradedBadge(upgraded)
+        }
+      })
+      .catch(() => {})
+  }, [themeCd, markBadgeNotified])
+
+  // 강화 결제 완료 → 팝업 닫고 헤더에 즉시 반영
+  const onBadgeUpgraded = useCallback(() => {
+    setBadgeAward(prev => {
+      if (prev && prev.theme_cd === themeCd) setUpgradedBadge(prev)
+      return null
+    })
+  }, [themeCd])
+
   // 콤보 선택 언어가 URL locale보다 우선 — 이 방의 모든 메시지가 해당 언어로 보임
   const effectiveLocale = viewLocale || urlLocale
 
@@ -96,6 +145,8 @@ export function ChatRoomPanel({
       forceTranslate: isSubscribed && !!viewLocale,
       // TASK-064 Trigger 3: @ai 멘션 한도 초과 → 업그레이드 모달
       onAiLimitExceeded,
+      // TASK-062 Trigger 7: 배지 수여 broadcast → 축하 팝업
+      onBadgeAward,
     },
   )
 
@@ -112,7 +163,18 @@ export function ChatRoomPanel({
         </Link>
         <span className='shrink-0 text-xl'>{themeEmoji}</span>
         <div className='min-w-0 flex-1'>
-          <p className='truncate text-sm font-semibold'>{roomNm}</p>
+          <p className='flex items-center gap-1.5 truncate text-sm font-semibold'>
+            <span className='truncate'>{roomNm}</span>
+            {/* Trigger 7: 강화 배지 — 채팅방 이름 옆 상시 표시 (특별 디자인) */}
+            {upgradedBadge && (
+              <span
+                className='inline-flex shrink-0 items-center gap-0.5 rounded-full bg-gradient-to-r from-amber-200 to-yellow-300 px-1.5 py-0.5 text-[10px] font-bold text-amber-900 shadow-sm ring-1 ring-amber-400/60 dark:from-amber-700 dark:to-yellow-600 dark:text-amber-100'
+                title={`${upgradedBadge.theme_nm} 강화 배지`}
+              >
+                {upgradedBadge.theme_emoji}🏅
+              </span>
+            )}
+          </p>
           {roomDesc && (
             <p className='truncate text-xs text-muted-foreground'>{roomDesc}</p>
           )}
@@ -192,6 +254,13 @@ export function ChatRoomPanel({
         onSubscribe={subscribe}
         subscribing={paying}
         onClose={() => setExpirePromptOpen(false)}
+      />
+
+      {/* Trigger 7: 배지 수여 축하 + 강화 0.1 Pi 팝업 */}
+      <BadgeAwardPopup
+        badge={badgeAward}
+        onUpgraded={onBadgeUpgraded}
+        onClose={() => setBadgeAward(null)}
       />
 
       {/* Trigger 3: AI 봇 한도 초과 업그레이드 모달 */}

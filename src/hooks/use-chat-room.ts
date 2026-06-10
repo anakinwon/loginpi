@@ -28,6 +28,15 @@ interface MsgTransPayload {
   trans_cont: string
 }
 
+// 배지 수여 broadcast 페이로드 (TASK-062 Trigger 7 — 서버 tryAwardBadge)
+export interface BadgeAwardPayload {
+  usr_id: string
+  badge_id: string
+  theme_cd: string
+  theme_nm: string
+  theme_emoji: string
+}
+
 interface UseChatRoomOptions {
   currentUserId: string
   currentUserDisplayName: string
@@ -37,6 +46,8 @@ interface UseChatRoomOptions {
   forceTranslate?: boolean
   // @ai 멘션 전송 시 월 한도 초과 → panel에서 업그레이드 모달 표시
   onAiLimitExceeded?: () => void
+  // 내 배지 수여 broadcast 수신 → panel에서 축하 팝업(Trigger 7) 표시
+  onBadgeAward?: (badge: BadgeAwardPayload) => void
 }
 
 interface UseChatRoomReturn {
@@ -50,11 +61,12 @@ interface UseChatRoomReturn {
 
 const BROADCAST_EVENT = 'new_msg'
 const TRANS_EVENT = 'msg_trans'
+const BADGE_EVENT = 'badge_award'
 
 export function useChatRoom(
   roomId: string,
   initialMessages: ChatMessage[],
-  { currentUserId, currentUserDisplayName, userLocale, forceTranslate = false, onAiLimitExceeded }: UseChatRoomOptions,
+  { currentUserId, currentUserDisplayName, userLocale, forceTranslate = false, onAiLimitExceeded, onBadgeAward }: UseChatRoomOptions,
 ): UseChatRoomReturn {
   // 초기 메시지에 trans_locale 세팅 — 서버가 trans_cont를 미리 채운 경우 현재 locale로 표시
   const [messages, setMessages] = useState<ChatMessage[]>(() =>
@@ -66,6 +78,9 @@ export function useChatRoom(
   const channelRef = useRef<ReturnType<ReturnType<typeof getSupabaseClient>['channel']> | null>(null)
   // 이미 번역 요청한 msg_id — broadcast 수신마다 중복 POST 방지
   const requestedTransRef = useRef<Set<string>>(new Set())
+  // 배지 수여 콜백 최신 참조 — 콜백 변경 시 채널 재구독 방지
+  const onBadgeAwardRef = useRef(onBadgeAward)
+  useEffect(() => { onBadgeAwardRef.current = onBadgeAward }, [onBadgeAward])
 
   const addMessage = useCallback((msg: ChatMessage) => {
     setMessages(prev => {
@@ -221,6 +236,11 @@ export function useChatRoom(
         if (userLocale && locale_cd === userLocale) {
           applyTranslation(msg_id, trans_cont, locale_cd)
         }
+      })
+      .on('broadcast', { event: BADGE_EVENT }, ({ payload }) => {
+        const badge = payload as BadgeAwardPayload
+        // 내 배지 수여만 축하 팝업 — 다른 참가자는 SYSTEM 메시지로 확인
+        if (badge.usr_id === currentUserId) onBadgeAwardRef.current?.(badge)
       })
       .on('presence', { event: 'sync' }, () => {
         const state = channel.presenceState<{ userId: string }>()
