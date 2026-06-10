@@ -3,10 +3,12 @@ import { useState, useEffect, useCallback } from 'react'
 import { useLocale } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { useChatRoom, type ChatMessage } from '@/hooks/use-chat-room'
+import { useSubscribePlan } from '@/hooks/use-subscribe-plan'
 import { piFetch } from '@/lib/pi-fetch'
 import { ChatMessageList } from './chat-message-list'
 import { ChatInput } from './chat-input'
 import { ChatLocaleSelect } from './chat-locale-select'
+import { InlinePurchasePrompt } from './inline-purchase-prompt'
 
 interface ChatRoomPanelProps {
   roomId: string
@@ -16,6 +18,7 @@ interface ChatRoomPanelProps {
   roomNm: string
   roomDesc?: string | null
   themeEmoji?: string
+  capacityAlert?: boolean
 }
 
 // 방별 번역 언어 localStorage 키 — 채팅룸은 독립 공간이므로 방마다 따로 저장
@@ -29,6 +32,7 @@ export function ChatRoomPanel({
   roomNm,
   roomDesc,
   themeEmoji = '💬',
+  capacityAlert = false,
 }: ChatRoomPanelProps) {
   const urlLocale = useLocale()
   // '' = 자동 (URL locale 기준 수신 번역만) / locale 코드 = 이 방 전체 강제 번역
@@ -36,6 +40,9 @@ export function ChatRoomPanel({
   const [canTip, setCanTip] = useState(false)
   // 구독 확인 전까지 false(fail-closed) — 비구독자가 짧은 틈에 강제 번역 사용하는 것 방지
   const [isSubscribed, setIsSubscribed] = useState(false)
+  const [tipPromptOpen, setTipPromptOpen] = useState(false)
+  const [expirePromptOpen, setExpirePromptOpen] = useState(false)
+  const [expireBannerDismissed, setExpireBannerDismissed] = useState(false)
 
   // 방 입장 시 이 방에 저장된 번역 언어 복원 (외부 저장소 구독 — 방별 독립)
   useEffect(() => {
@@ -50,10 +57,32 @@ export function ChatRoomPanel({
     } catch {}
   }, [roomId])
 
+  const checkSubscription = useCallback(() => {
+    piFetch('/api/subscriptions/check')
+      .then(r => r.ok ? r.json() : null)
+      .then((d: { canTip?: boolean; tier?: string } | null) => {
+        if (d?.canTip) setCanTip(true)
+        if (d?.tier && d.tier !== 'FREE') setIsSubscribed(true)
+      })
+      .catch(() => {})
+  }, [])
+
+  useEffect(() => { checkSubscription() }, [checkSubscription])
+
+  const handleSubscribeSuccess = useCallback(() => {
+    setTipPromptOpen(false)
+    setExpirePromptOpen(false)
+    checkSubscription()
+  }, [checkSubscription])
+
+  const { subscribe, paying } = useSubscribePlan({ onSuccess: handleSubscribeSuccess })
+
+  const onUpgradeForTip = useCallback(() => setTipPromptOpen(true), [])
+
   // 콤보 선택 언어가 URL locale보다 우선 — 이 방의 모든 메시지가 해당 언어로 보임
   const effectiveLocale = viewLocale || urlLocale
 
-  const { messages, sendMessage, prependMessages } = useChatRoom(
+  const { messages, sendMessage, sendSticker, prependMessages } = useChatRoom(
     roomId,
     initialMessages,
     {
@@ -64,16 +93,6 @@ export function ChatRoomPanel({
       forceTranslate: isSubscribed && !!viewLocale,
     },
   )
-
-  useEffect(() => {
-    piFetch('/api/subscriptions/check')
-      .then(r => r.ok ? r.json() : null)
-      .then((d: { canTip?: boolean; tier?: string } | null) => {
-        if (d?.canTip) setCanTip(true)
-        if (d?.tier && d.tier !== 'FREE') setIsSubscribed(true)
-      })
-      .catch(() => {})
-  }, [])
 
   return (
     <div className='flex min-h-0 flex-1 flex-col overflow-hidden'>
@@ -97,6 +116,41 @@ export function ChatRoomPanel({
         <ChatLocaleSelect value={viewLocale} onChange={handleLocaleChange} isSubscribed={isSubscribed} />
       </header>
 
+      {/* Trigger 5: 정원 초과 방장 알림 배너 */}
+      {capacityAlert && (
+        <div className='flex shrink-0 items-center justify-between gap-2 bg-amber-500/10 px-4 py-2 text-xs text-amber-700 dark:text-amber-400'>
+          <span>⚠️ 채팅방 정원이 꽉 찼습니다. 구독 업그레이드로 정원을 늘리세요.</span>
+          <button
+            onClick={() => setExpirePromptOpen(true)}
+            className='shrink-0 rounded-md bg-amber-500 px-2 py-0.5 text-white transition-colors hover:bg-amber-600'
+          >
+            업그레이드
+          </button>
+        </div>
+      )}
+
+      {/* Trigger 4: 메시지 만료 경고 배너 (FREE 플랜 — 7일 보관) */}
+      {!isSubscribed && !expireBannerDismissed && (
+        <div className='flex shrink-0 items-center justify-between gap-2 bg-blue-500/10 px-4 py-2 text-xs text-blue-700 dark:text-blue-400'>
+          <span>📦 무료 플랜은 메시지가 7일 후 만료됩니다.</span>
+          <div className='flex shrink-0 items-center gap-2'>
+            <button
+              onClick={() => setExpirePromptOpen(true)}
+              className='rounded-md bg-blue-500 px-2 py-0.5 text-white transition-colors hover:bg-blue-600'
+            >
+              업그레이드
+            </button>
+            <button
+              onClick={() => setExpireBannerDismissed(true)}
+              className='text-muted-foreground hover:text-foreground'
+              aria-label='닫기'
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* 채팅 본문 — 이 영역만 스크롤 (ChatMessageList 내부 overflow-y-auto) */}
       <ChatMessageList
         roomId={roomId}
@@ -105,10 +159,35 @@ export function ChatRoomPanel({
         canTip={canTip}
         userLocale={effectiveLocale}
         prependMessages={prependMessages}
+        onUpgradeForTip={onUpgradeForTip}
       />
 
       {/* 채팅 입력 섹션 — 고정 */}
-      <ChatInput onSend={sendMessage} />
+      <ChatInput onSend={sendMessage} onSendSticker={sendSticker} />
+
+      {/* Trigger 2: Tip 업그레이드 모달 */}
+      <InlinePurchasePrompt
+        isOpen={tipPromptOpen}
+        featureName='Tip 보내기'
+        description='프리미엄 구독자는 다른 참가자에게 Pi Tip을 보낼 수 있습니다.'
+        piAmount={3}
+        onSinglePurchase={() => setTipPromptOpen(false)}
+        onSubscribe={subscribe}
+        subscribing={paying}
+        onClose={() => setTipPromptOpen(false)}
+      />
+
+      {/* Trigger 4·5: 메시지 보관 / 정원 확장 업그레이드 모달 */}
+      <InlinePurchasePrompt
+        isOpen={expirePromptOpen}
+        featureName='채팅 보관 · 정원 확장'
+        description='프리미엄 구독으로 메시지를 무제한 보관하고 채팅방 정원을 늘리세요.'
+        piAmount={3}
+        onSinglePurchase={() => setExpirePromptOpen(false)}
+        onSubscribe={subscribe}
+        subscribing={paying}
+        onClose={() => setExpirePromptOpen(false)}
+      />
     </div>
   )
 }

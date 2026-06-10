@@ -97,12 +97,13 @@ export async function POST(request: NextRequest, { params }: Params) {
     return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
   }
 
-  const { msg_id: clientMsgId, msg_cont, msg_tp_cd = 'TEXT', ref_msg_id, stkr_id } = body as {
+  const { msg_id: clientMsgId, msg_cont, msg_tp_cd = 'TEXT', ref_msg_id, stkr_id, attch_url } = body as {
     msg_id?: string
     msg_cont?: string
     msg_tp_cd?: string
     ref_msg_id?: string
     stkr_id?: string
+    attch_url?: string
   }
 
   // 클라이언트가 broadcast와 동일한 UUID를 전달하면 DB primary key로 사용 (broadcast-DB msg_id 일치)
@@ -113,9 +114,60 @@ export async function POST(request: NextRequest, { params }: Params) {
     return NextResponse.json({ error: '메시지 내용을 입력해주세요' }, { status: 400 })
   }
 
+  if (msg_tp_cd === 'STICKER' && !stkr_id) {
+    return NextResponse.json({ error: '스티커 ID가 필요합니다' }, { status: 400 })
+  }
+
   const validTypes = ['TEXT', 'IMAGE', 'FILE', 'VOICE', 'STICKER', 'SYSTEM']
   if (!validTypes.includes(msg_tp_cd)) {
     return NextResponse.json({ error: '유효하지 않은 메시지 타입' }, { status: 400 })
+  }
+
+  // STICKER: 소유권 검증 + 서버 stkr_url 사용 (클라이언트 attch_url 무시)
+  let resolvedAttchUrl: string | null = attch_url ?? null
+  if (msg_tp_cd === 'STICKER' && stkr_id) {
+    const db = getSupabaseAdmin()
+    const { data: stkrRow } = await db
+      .from('msg_stkr')
+      .select('stkr_id, pack_id, stkr_url')
+      .eq('stkr_id', stkr_id)
+      .eq('del_yn', 'N')
+      .maybeSingle()
+
+    if (!stkrRow) {
+      return NextResponse.json({ error: '존재하지 않는 스티커입니다' }, { status: 404 })
+    }
+
+    const { data: packRow } = await db
+      .from('msg_stkr_pack')
+      .select('pack_id, price_pi, is_dflt_yn')
+      .eq('pack_id', (stkrRow as { pack_id: string }).pack_id)
+      .eq('del_yn', 'N')
+      .maybeSingle()
+
+    if (!packRow) {
+      return NextResponse.json({ error: '스티커 팩을 찾을 수 없습니다' }, { status: 404 })
+    }
+
+    const pack = packRow as { pack_id: string; price_pi: number; is_dflt_yn: string }
+    const isFree = pack.is_dflt_yn === 'Y' || Number(pack.price_pi) === 0
+
+    if (!isFree) {
+      const { data: ownership } = await db
+        .from('msg_usr_stkr')
+        .select('pack_id')
+        .eq('usr_id', user.id)
+        .eq('pack_id', pack.pack_id)
+        .eq('del_yn', 'N')
+        .maybeSingle()
+
+      if (!ownership) {
+        return NextResponse.json({ error: '이 스티커 팩을 구매하지 않았습니다' }, { status: 403 })
+      }
+    }
+
+    // 클라이언트 URL을 신뢰하지 않고 DB에서 검증된 URL 사용
+    resolvedAttchUrl = (stkrRow as { stkr_url: string }).stkr_url
   }
 
   const { data, error } = await getSupabaseAdmin()
@@ -127,6 +179,7 @@ export async function POST(request: NextRequest, { params }: Params) {
       snd_usr_nm: user.display_name,
       msg_cont: msg_cont?.trim() ?? null,
       msg_tp_cd,
+      attch_url: resolvedAttchUrl,
       ref_msg_id: ref_msg_id ?? null,
       stkr_id: stkr_id ?? null,
       regr_id: user.display_name.slice(0, 20),

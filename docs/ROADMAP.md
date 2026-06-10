@@ -3,7 +3,7 @@
 Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Network 앱 플랫폼
 
 > **기준일**: 2026-06-10
-> **현재 버전**: Phase 7·10·11 완료 (PiChat MVP · 사용자 프로필 · 통계 대시보드) · Phase 8~9 대기 · **Phase 12 PiTranslate™ MVP 구현 완료 (TASK-090~097 ✅ · 098~099 대기)**
+> **현재 버전**: Phase 7·10·11 완료 (PiChat MVP · 사용자 프로필 · 통계 대시보드) · Phase 12 PiTranslate™ MVP 완료 (TASK-090~097 ✅ · 098~099 대기) · Phase 8~9 대기 · **Phase 13 MyPiShop(MPS) 준비중 (TASK-100~113)**
 > **배포 URL**: https://loginpi.vercel.app
 > **기술 스택**: Next.js 16 App Router · React 19 · TypeScript 6 · Tailwind CSS v4 · NextAuth.js · Supabase PostgreSQL
 
@@ -847,6 +847,124 @@ if (meta?.type === 'CHAT_SUBSCR') {
 
 ---
 
+## Phase 13: MyPiShop(MPS) 🔜 (준비중)
+
+> **목표**: Pi Coin 전용 P2P 직거래 마켓플레이스 — 에스크로 기반 안전 거래, 재고 관리, 매장 등록
+> **상세 스펙**: `docs/PRD_8_MPS.md` (v1.1) | **담당 에이전트**: `.claude/agents/commerce/mps-prd-architect.md`
+> **핵심 결정**: ① 에스크로 = **PiRC2 U2A 가상 에스크로** (운영자 Pi 계정 중간 보관, `metadata.type='MPS_ESCROW'`) ② 재고 = `stock_qty = reg_qty - ordered_qty` CHECK 제약 + 원자적 차감 ③ DB = `mps_` 접두사 6개 테이블 ④ 3단계 마일스톤 (Phase 1 MVP → Phase 2 확장 → Phase 3 PiRC3 마이그레이션)
+
+### TASK-100: DB 마이그레이션 `sql/021_mps.sql` 🔜
+
+> `mps_` 접두사 신규 주제영역 — DA 표준 시스템 컬럼 4개 + `del_yn` 논리삭제 전 테이블 적용 (`-- DA-APPROVED:` 주석 필수)
+
+- 🔜 `mps_ctgr` — 카테고리 (계층형, `parent_ctgr_id`, `depth_no`)
+- 🔜 `mps_shop` — 매장 (`shop_type_cd`: ONLINE/OFFLINE/BOTH, `lat`/`lng NUMERIC(9,6)`, `place_id TEXT NULL` ← Google Maps Phase 3 확장 포인트)
+- 🔜 `mps_item` — 상품 (`reg_qty`, `ordered_qty`, `stock_qty` + `CHECK(stock_qty = reg_qty - ordered_qty)` DB 불변 조건)
+  - `item_cnd_cd`: NEW/USED/HANDMADE | `item_st_cd`: DRAFT/OPEN/CLOSED/SOLD
+  - `reg_qty = 9999` 센티널: 무제한 재고 → 자동 SOLD 전환 억제 (음료·피자 등)
+- 🔜 `mps_item_img` — 상품 이미지 (`sort_ord`, `thumbnail_yn`)
+- 🔜 `mps_order` — 주문 (`order_st_cd`: PENDING/ESCROW/TRADING/SELLER_DONE/DONE/CANCELLED, `escrow_txid`, `release_txid`, `fee_pi`, `fee_payer_id`)
+- 🔜 `mps_txn_hist` — 거래내역 (`txn_type_cd`: ESCROW_IN/RELEASE_OUT/REFUND/FEE)
+
+### TASK-101: lib 헬퍼 3종 🔜
+
+- 🔜 `src/lib/mps-item.ts` — 상품 CRUD, 재고 원자적 차감 (`UPDATE ... WHERE stock_qty > 0 RETURNING`)
+- 🔜 `src/lib/mps-order.ts` — 주문 생성·상태 전이·에스크로 흐름
+- 🔜 `src/lib/mps-shop.ts` — 매장 CRUD
+
+### TASK-102: 상품 API (FR-01·FR-02·FR-04) 🔜
+
+- 🔜 `GET /api/store/items` — 목록 조회 (카테고리·상태·키워드 필터, 커서 페이지네이션)
+- 🔜 `POST /api/store/items` — 상품 등록 (판매자 인증, Zod 검증)
+- 🔜 `GET /api/store/items/[itemId]` — 상세 조회 (이미지 포함)
+- 🔜 `PATCH /api/store/items/[itemId]` — 수정 (소유자 확인)
+- 🔜 `DELETE /api/store/items/[itemId]` — 논리삭제 (`del_yn='Y'`, 물리 DELETE 금지)
+- 🔜 `POST /api/store/items/[itemId]/images` — 이미지 업로드 (Supabase Storage)
+
+### TASK-103: 재고 관리 (FR-07) 🔜
+
+> **핵심 불변 조건**: `stock_qty = reg_qty - ordered_qty` — CHECK 제약 + 원자적 UPDATE
+
+- 🔜 원자적 재고 차감: `UPDATE mps_item SET ordered_qty = ordered_qty + 1, stock_qty = stock_qty - 1 WHERE item_id = $1 AND stock_qty > 0 RETURNING item_id`
+  - 반환 없으면 → 재고 부족 409 응답 (race condition 안전)
+- 🔜 `reg_qty = 9999` 센티널 처리 — `stock_qty < 10` 임박 경고만, SOLD 자동전환 생략
+- 🔜 주문 취소 시 재고 복원: `ordered_qty - 1, stock_qty + 1`
+
+### TASK-104: 주문 + 에스크로 API (FR-08·FR-09·FR-11·FR-13) 🔜
+
+> **에스크로 흐름**: 구매자 Pi 송금 → 운영자 계정 보관 → 거래 완료 후 판매자 송금
+
+- 🔜 `POST /api/store/orders` — 주문 생성 (재고 원자적 차감 + PENDING 상태)
+- 🔜 `POST /api/store/orders/[orderId]/escrow` — Pi U2A 에스크로 완료 처리 (`metadata.type='MPS_ESCROW'`, PENDING → ESCROW)
+- 🔜 `POST /api/store/orders/[orderId]/confirm` — 판매자 거래 완료 선언 (ESCROW → SELLER_DONE)
+- 🔜 `POST /api/store/orders/[orderId]/release` — 구매자 최종 확인 (SELLER_DONE → DONE) + 판매자 Pi 송금 (`metadata.type='MPS_RELEASE'`)
+- 🔜 `GET /api/store/orders` — 내 주문 목록 (판매자/구매자 분리 조회)
+- 🔜 `GET /api/store/orders/[orderId]` — 주문 상세
+
+### TASK-105: 상품 목록·상세 UI (SCR-01·SCR-02) 🔜
+
+- 🔜 `src/app/[locale]/store/page.tsx` — 상품 목록 (카테고리 필터, 검색바, 무한 스크롤)
+- 🔜 `src/app/[locale]/store/[itemId]/page.tsx` — 상품 상세 (이미지 갤러리, 구매 버튼, 재고 표시)
+- 🔜 `ClientStoreGate` — `getSessionUser()` null 시 클라이언트 게이트 (`redirect` 금지 — Pi Browser 무한 루프 방지)
+- 🔜 `piFetch` 의무 — 모든 API 호출에 `X-Pi-Token` 헤더 자동 첨부
+
+### TASK-106: 내 상품 관리 UI (SCR-03·SCR-04) 🔜
+
+- 🔜 `src/app/[locale]/store/my/items/page.tsx` — 내 상품 목록 (상태별 탭: DRAFT/OPEN/CLOSED/SOLD)
+- 🔜 `src/app/[locale]/store/my/items/new/page.tsx` — 상품 등록/수정 폼 (이미지 업로드 포함)
+
+### TASK-107: 주문 관리 UI (SCR-05·SCR-06) 🔜
+
+- 🔜 `src/app/[locale]/store/my/sales/page.tsx` — 판매 주문 관리 (거래 완료 선언 버튼)
+- 🔜 `src/app/[locale]/store/my/orders/page.tsx` — 구매 주문 관리 (최종 확인 버튼)
+
+> **P0 완료 = Phase 1 MVP**: TASK-100 → 101 → 102 → 103 → 104 → 105 → 106 → 107
+
+---
+
+### Phase 2 — 확장
+
+### TASK-108: 카테고리 시스템 (FR-03) 🔜
+
+- 🔜 `GET /api/store/categories` — 계층형 카테고리 트리 조회
+- 🔜 어드민 카테고리 CRUD (`/admin/store/categories`)
+
+### TASK-109: 매장 관리 (FR-06·SCR-08) 🔜
+
+- 🔜 `GET /api/store/shops` — 내 매장 목록
+- 🔜 `POST /api/store/shops` — 매장 등록 (`place_id`·`lat`·`lng` 저장 준비)
+- 🔜 `PATCH /api/store/shops/[shopId]` — 매장 수정
+- 🔜 `DELETE /api/store/shops/[shopId]` — 논리삭제
+- 🔜 `src/app/[locale]/store/my/shops/page.tsx` — 매장 관리 UI (SCR-08)
+
+### TASK-110: 양방향 주문 취소 (FR-10) 🔜
+
+- 🔜 `POST /api/store/orders/[orderId]/cancel` — 취소 요청 (취소 요청자 수수료 부담)
+- 🔜 에스크로 환불 흐름 (`metadata.type='MPS_CANCEL_REFUND'`)
+- 🔜 ESCROW 상태에서만 취소 허용 (SELLER_DONE 이후는 불가)
+
+### TASK-111: 거래 내역 (FR-12·SCR-07) 🔜
+
+- 🔜 `GET /api/store/txns` — 내 거래내역 조회 (`mps_txn_hist`)
+- 🔜 `src/app/[locale]/store/my/history/page.tsx` — 거래 내역 UI (SCR-07)
+
+---
+
+### Phase 3 — 고도화
+
+### TASK-112: PiRC3 실 에스크로 마이그레이션 🔜
+
+- 🔜 PiRC2 U2A 가상 에스크로 → PiRC3 스마트 컨트랙트 실 에스크로로 전환
+- 🔜 `mps_order.escrow_txid` → PiRC3 Contract transaction hash로 교체
+- 🔜 `subscribe()` 방식의 Pi Wallet 서명 기반 에스크로 잠금
+
+### TASK-113: Google Maps 연동 🔜
+
+- 🔜 `mps_shop.place_id` + `lat`/`lng` → Google Maps Place API 자동완성
+- 🔜 매장 주소 입력 시 지도 핀 표시 + 좌표 자동 저장
+
+---
+
 ## 마일스톤 요약
 
 | 마일스톤 | Phase | 완료일 | 주요 산출물 | 상태 |
@@ -874,6 +992,7 @@ if (meta?.type === 'CHAT_SUBSCR') {
 | M19: 사용자 프로필 | Phase 10 | 2026-06-09 | 마이페이지 (개인정보·결제내역·구독현황), Pi Browser ClientGate | ✅ 완료 |
 | M20: 어드민 통계 대시보드 | Phase 11 | 2026-06-09 | DAU/WAU/MAU·테마별 매출 (react-plotly.js + 중간집계 rollup) | ✅ 완료 |
 | M21: PiTranslate™ MVP | Phase 12 | 2026-06-10 | sql/020 + chat-translate.ts + dedup + translate API + broadcast 확장 + 표시언어 설정 + 원문 토글 (TASK-090~097) | ✅ 완료 |
+| M22: MyPiShop(MPS) Phase 1 MVP | Phase 13 | — | sql/021_mps.sql (mps_ 6개 테이블) + lib 헬퍼 3종 + 상품·주문·에스크로 API 12종 + 화면 6종 (TASK-100~107) | 🔜 준비중 |
 
 ---
 
@@ -932,3 +1051,4 @@ if (meta?.type === 'CHAT_SUBSCR') {
 | v2.8 | 2026-06-10 | Phase 12 PiTranslate™ 글로벌 동시통역 로드맵 추가 — TASK-090~099 (`PRD_4_CHAT.md` v1.6 수용). Gemini 2.0 Flash 주력 + Claude Haiku fallback 하이브리드, `msg_trans` 번역 캐시, in-memory dedup(`chat-translate-dedup.ts`), broadcast 기반 실시간 전달. M21 마일스톤 추가. `PRD_4_CHAT.md` 버전 참조 v1.2→v1.6 업데이트. 기준일 2026-06-10 갱신. `PRD.md` v7.0 통합(섹션 14 신설·섹션 15~18 재번호화). | anakin |
 | v3.0 | 2026-06-10 | Phase 12 추가 고도화 — 방별 번역 언어 콤보(`chat-locale-select.tsx`, 방 헤더 제목 옆, localStorage 방별 독립 저장) + `translate-batch` API(캐시 우선 일괄 번역) + `forceTranslate` 모드(전체 메시지 강제 번역·언어 변경 시 재번역) + 채팅 레이아웃 고정(헤더·입력창 `shrink-0`, 본문만 `min-h-0` 스크롤) + 헤더 ChatRoomPanel 통합 + `locale-options.ts` 단일 소스. tsc·build 통과. | anakin |
 | v2.9 | 2026-06-10 | Phase 12 PiTranslate™ MVP 구현 완료 — TASK-090~097. `sql/020_msg_trans.sql`(018·019 선점으로 번호 조정, Supabase 적용 완료), `chat-translate.ts`(Gemini 2.0 Flash REST + Claude Haiku fallback), `chat-translate-dedup.ts`(pending map + 번역 큐 + broadcast 내장), translate API 라우트, 메시지 POST `after()` 번역 큐 + GET locale pre-populate, `use-chat-room.ts` msg_trans 구독 + 수신 자동 번역 요청, 프로필 표시 언어 드롭다운(203 locale), `translated-message.tsx` 원문 토글. tsc·lint(0 errors)·build 통과. M21 달성. TASK-098(어드민 번역 통계)·099(품질 피드백)는 후속. | anakin |
+| v4.0 | 2026-06-10 | Phase 13 MyPiShop(MPS) 로드맵 추가 — TASK-100~113 (`PRD_8_MPS.md` v1.1 수용). PiRC2 U2A 가상 에스크로·`stock_qty` 원자적 차감 불변 조건·`mps_` 6개 테이블(sql/021_mps.sql)·lib 헬퍼 3종·API 12종·화면 6종(SCR-01~06) Phase 1 MVP / TASK-108~111 Phase 2 확장 / TASK-112~113 Phase 3 PiRC3 마이그레이션. M22 마일스톤 추가. 현재 버전 헤더 갱신. | anakin |

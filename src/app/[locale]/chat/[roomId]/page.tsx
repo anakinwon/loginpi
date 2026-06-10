@@ -49,14 +49,24 @@ export default async function ChatRoomPage({ params }: Params) {
     }
   }
 
-  // 초기 메시지 50건 (최신 → 오래된 순 조회 후 역순 정렬)
-  const { data: rawMsgs } = await getSupabaseAdmin()
-    .from('msg_msg')
-    .select('msg_id, room_id, snd_usr_id, snd_usr_nm, msg_cont, msg_tp_cd, attch_url, stkr_id, ref_msg_id, src_lang_cd, del_yn, reg_dtm')
-    .eq('room_id', roomId)
-    .eq('del_yn', 'N')
-    .order('reg_dtm', { ascending: false })
-    .limit(50)
+  // 초기 메시지 50건 + 현재 멤버 수를 병렬 조회
+  const [{ data: rawMsgs }, { count: mbrCount }] = await Promise.all([
+    getSupabaseAdmin()
+      .from('msg_msg')
+      .select('msg_id, room_id, snd_usr_id, snd_usr_nm, msg_cont, msg_tp_cd, attch_url, stkr_id, ref_msg_id, src_lang_cd, del_yn, reg_dtm')
+      .eq('room_id', roomId)
+      .eq('del_yn', 'N')
+      .order('reg_dtm', { ascending: false })
+      .limit(50),
+    getSupabaseAdmin()
+      .from('msg_room_mbr')
+      .select('room_mbr_id', { count: 'exact', head: true })
+      .eq('room_id', roomId)
+      .eq('del_yn', 'N'),
+  ])
+
+  const isOwner = mbr?.mbr_role_cd === 'OWNER'
+  const capacityAlert = isOwner && (mbrCount ?? 0) >= room.max_mbr_cnt
 
   const initialMessages = ((rawMsgs ?? []) as ChatMessage[]).reverse()
 
@@ -101,6 +111,7 @@ export default async function ChatRoomPage({ params }: Params) {
         roomNm={room.room_nm}
         roomDesc={room.room_desc}
         themeEmoji={themeEmoji}
+        capacityAlert={capacityAlert}
       />
     </div>
   )

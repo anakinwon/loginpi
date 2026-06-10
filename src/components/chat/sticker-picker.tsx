@@ -1,0 +1,255 @@
+'use client'
+import { useEffect, useState, useCallback } from 'react'
+import { toast } from 'sonner'
+import { piFetch } from '@/lib/pi-fetch'
+import { useSubscribePlan } from '@/hooks/use-subscribe-plan'
+import { InlinePurchasePrompt } from './inline-purchase-prompt'
+
+interface Sticker {
+  stkr_id: string
+  stkr_nm: string
+  stkr_url: string
+}
+
+interface OwnedPack {
+  pack_id: string
+  pack_nm: string
+  price_pi: number
+  stickers: Sticker[]
+}
+
+interface StorePack {
+  pack_id: string
+  pack_nm: string
+  price_pi: number
+  preview_stickers: Sticker[]
+}
+
+interface StickerPickerProps {
+  onSelect: (stkrId: string, stkrUrl: string) => void
+  onClose: () => void
+}
+
+export function StickerPicker({ onSelect, onClose }: StickerPickerProps) {
+  const [ownedPacks, setOwnedPacks] = useState<OwnedPack[]>([])
+  const [storePacks, setStorePacks] = useState<StorePack[]>([])
+  const [activePackId, setActivePackId] = useState<string | null>(null)
+  const [showStore, setShowStore] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [buying, setBuying] = useState<string | null>(null)
+  const [showSubscribePrompt, setShowSubscribePrompt] = useState(false)
+
+  const handleSubscribeSuccess = useCallback(() => {
+    setShowSubscribePrompt(false)
+  }, [])
+
+  const { subscribe, paying } = useSubscribePlan({ onSuccess: handleSubscribeSuccess })
+
+  const loadPacks = useCallback(async () => {
+    const res = await piFetch('/api/stickers/packs')
+    if (!res.ok) throw new Error('load_failed')
+    return res.json() as Promise<{ ownedPacks: OwnedPack[]; storePacks: StorePack[] }>
+  }, [])
+
+  useEffect(() => {
+    loadPacks()
+      .then(d => {
+        setOwnedPacks(d.ownedPacks)
+        setStorePacks(d.storePacks)
+        if (d.ownedPacks.length > 0) setActivePackId(d.ownedPacks[0].pack_id)
+        else setShowStore(true)
+      })
+      .catch(() => toast.error('스티커를 불러오지 못했습니다'))
+      .finally(() => setLoading(false))
+  }, [loadPacks])
+
+  const buyPack = useCallback(async (packId: string, packNm: string) => {
+    if (!window.Pi) {
+      toast.error('Pi Browser에서만 구매할 수 있습니다')
+      return
+    }
+    setBuying(packId)
+    try {
+      const prep = await piFetch(`/api/stickers/packs/${packId}/buy`, { method: 'POST' })
+      if (!prep.ok) {
+        const d = await prep.json() as { error?: string }
+        throw new Error(d.error ?? '결제 준비 실패')
+      }
+      const params = await prep.json() as { amount: number; memo: string; metadata: Record<string, unknown> }
+
+      window.Pi.createPayment(params, {
+        onReadyForServerApproval: async (paymentId) => {
+          await fetch('/api/payments/approve', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ paymentId }),
+          })
+        },
+        onReadyForServerCompletion: async (paymentId, txid) => {
+          const res = await fetch('/api/payments/complete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ paymentId, txid }),
+          })
+          setBuying(null)
+          if (res.ok) {
+            toast.success(`${packNm} 구매 완료! 🎉`)
+            const updated = await loadPacks().catch(() => null)
+            if (updated) {
+              setOwnedPacks(updated.ownedPacks)
+              setStorePacks(updated.storePacks)
+              setActivePackId(packId)
+              setShowStore(false)
+            }
+          } else {
+            toast.error('구매 완료 처리 실패')
+          }
+        },
+        onCancel: () => setBuying(null),
+        onError: (e) => { setBuying(null); toast.error(e.message) },
+      })
+    } catch (e) {
+      setBuying(null)
+      toast.error(e instanceof Error ? e.message : '구매 오류')
+    }
+  }, [loadPacks])
+
+  const activePack = ownedPacks.find(p => p.pack_id === activePackId)
+
+  return (
+    <div className='absolute bottom-full left-0 z-50 mb-2 w-72 overflow-hidden rounded-2xl border bg-popover shadow-xl'>
+      {/* 팩 탭 */}
+      <div className='flex items-center gap-1 overflow-x-auto border-b px-2 pt-2'>
+        {ownedPacks.map(pack => (
+          <button
+            key={pack.pack_id}
+            onClick={() => { setActivePackId(pack.pack_id); setShowStore(false) }}
+            className={`shrink-0 rounded-t-lg px-2 py-1.5 text-xs font-medium transition-colors ${
+              !showStore && activePackId === pack.pack_id
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            {pack.pack_nm}
+          </button>
+        ))}
+        {storePacks.length > 0 && (
+          <button
+            onClick={() => setShowStore(true)}
+            className={`ml-auto shrink-0 rounded-t-lg px-2 py-1.5 text-xs font-medium transition-colors ${
+              showStore ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            🛒 스토어
+          </button>
+        )}
+        <button
+          onClick={onClose}
+          className='shrink-0 px-1 py-1 text-xs text-muted-foreground hover:text-foreground'
+          aria-label='닫기'
+        >
+          ✕
+        </button>
+      </div>
+
+      {/* 컨텐츠 */}
+      <div className='h-52 overflow-y-auto p-2'>
+        {loading ? (
+          <div className='flex h-full items-center justify-center text-sm text-muted-foreground'>
+            불러오는 중…
+          </div>
+        ) : showStore ? (
+          <StoreView storePacks={storePacks} buying={buying} onBuy={buyPack} onSubscribeBanner={() => setShowSubscribePrompt(true)} />
+        ) : activePack ? (
+          <div className='grid grid-cols-4 gap-1'>
+            {activePack.stickers.map(s => (
+              <button
+                key={s.stkr_id}
+                onClick={() => onSelect(s.stkr_id, s.stkr_url)}
+                className='aspect-square rounded-lg p-0.5 transition-colors hover:bg-muted'
+                title={s.stkr_nm}
+              >
+                <img src={s.stkr_url} alt={s.stkr_nm} className='h-full w-full object-contain' />
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className='flex h-full flex-col items-center justify-center gap-2 text-sm text-muted-foreground'>
+            <span>보유한 스티커가 없습니다</span>
+            {storePacks.length > 0 && (
+              <button onClick={() => setShowStore(true)} className='text-xs text-primary underline'>
+                스토어 둘러보기
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+      <InlinePurchasePrompt
+        isOpen={showSubscribePrompt}
+        featureName='스티커 팩 구독'
+        description='프리미엄 구독 시 매월 새 스티커 팩을 포함해 다양한 특혜를 누리세요.'
+        piAmount={3}
+        onSinglePurchase={() => setShowSubscribePrompt(false)}
+        onSubscribe={subscribe}
+        subscribing={paying}
+        onClose={() => setShowSubscribePrompt(false)}
+      />
+    </div>
+  )
+}
+
+function StoreView({
+  storePacks,
+  buying,
+  onBuy,
+  onSubscribeBanner,
+}: {
+  storePacks: StorePack[]
+  buying: string | null
+  onBuy: (packId: string, packNm: string) => void
+  onSubscribeBanner?: () => void
+}) {
+  if (storePacks.length === 0) {
+    return (
+      <p className='py-6 text-center text-sm text-muted-foreground'>구매 가능한 스티커팩이 없습니다</p>
+    )
+  }
+  return (
+    <div className='flex flex-col gap-3'>
+      {storePacks.map(pack => (
+        <div key={pack.pack_id} className='rounded-xl border p-2'>
+          <div className='flex items-center justify-between'>
+            <span className='text-sm font-medium'>{pack.pack_nm}</span>
+            <button
+              onClick={() => onBuy(pack.pack_id, pack.pack_nm)}
+              disabled={buying === pack.pack_id}
+              className='rounded-lg bg-primary px-2 py-1 text-xs font-medium text-primary-foreground disabled:opacity-50'
+            >
+              {buying === pack.pack_id ? '결제 중…' : `π${pack.price_pi}`}
+            </button>
+          </div>
+          {pack.preview_stickers.length > 0 && (
+            <div className='mt-1.5 flex gap-1'>
+              {pack.preview_stickers.map(s => (
+                <img
+                  key={s.stkr_id}
+                  src={s.stkr_url}
+                  alt={s.stkr_nm}
+                  className='h-10 w-10 rounded-md object-contain'
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
+      {onSubscribeBanner && (
+        <button
+          onClick={onSubscribeBanner}
+          className='mt-1 w-full rounded-xl border border-primary/30 bg-primary/5 px-3 py-2 text-left text-xs text-primary transition-colors hover:bg-primary/10'
+        >
+          ✨ 구독하면 스티커 팩이 매월 포함됩니다 →
+        </button>
+      )}
+    </div>
+  )
+}

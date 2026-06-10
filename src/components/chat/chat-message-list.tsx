@@ -12,6 +12,7 @@ interface ChatMessageListProps {
   canTip: boolean
   userLocale?: string // PiTranslate™ — scroll-up 로드 시 캐시된 번역 pre-populate
   prependMessages: (msgs: ChatMessage[]) => void
+  onUpgradeForTip?: () => void
 }
 
 export function ChatMessageList({
@@ -21,6 +22,7 @@ export function ChatMessageList({
   canTip,
   userLocale,
   prependMessages,
+  onUpgradeForTip,
 }: ChatMessageListProps) {
   const [hasMore, setHasMore] = useState(messages.length >= 50)
   const [isLoading, setIsLoading] = useState(false)
@@ -110,6 +112,7 @@ export function ChatMessageList({
               canTip={canTip}
               roomId={roomId}
               hideTime={hideTime}
+              onUpgradeForTip={onUpgradeForTip}
             />
           </div>
         )
@@ -155,13 +158,38 @@ function formatKoreanTime(dtm: string): string {
   return `${period} ${h12.toString().padStart(2, '0')}:${m}`
 }
 
-function MessageBubble({ msg, isMe, canTip, roomId, hideTime }: {
+function MessageBubble({ msg, isMe, canTip, roomId, hideTime, onUpgradeForTip }: {
   msg: ChatMessage; isMe: boolean; canTip: boolean; roomId: string; hideTime: boolean
+  onUpgradeForTip?: () => void
 }) {
   if (msg.msg_tp_cd === 'SYSTEM' || msg.msg_tp_cd === 'TIP_NOTI') {
     return (
       <div className='py-1 text-center text-xs text-muted-foreground'>
         {msg.msg_cont}
+        {msg.msg_tp_cd === 'TIP_NOTI' && !canTip && onUpgradeForTip && (
+          <button
+            onClick={onUpgradeForTip}
+            className='ml-1.5 text-primary underline'
+          >
+            나도 Tip 보내기
+          </button>
+        )}
+      </div>
+    )
+  }
+
+  if (msg.msg_tp_cd === 'STICKER') {
+    return (
+      <div className={`group flex flex-col gap-0.5 ${isMe ? 'items-end' : 'items-start'}`}>
+        {!isMe && <span className='text-xs text-muted-foreground'>{msg.snd_usr_nm}</span>}
+        {msg.attch_url ? (
+          <img src={msg.attch_url} alt='스티커' className='h-24 w-24 rounded-xl object-contain' />
+        ) : (
+          <div className='flex h-24 w-24 items-center justify-center rounded-xl bg-muted text-4xl'>🎭</div>
+        )}
+        {!hideTime && (
+          <span className='text-[10px] text-muted-foreground'>{formatKoreanTime(msg.reg_dtm)}</span>
+        )}
       </div>
     )
   }

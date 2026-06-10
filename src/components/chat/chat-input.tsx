@@ -1,14 +1,28 @@
 'use client'
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
+import { StickerPicker } from './sticker-picker'
 
 interface ChatInputProps {
   onSend: (text: string) => Promise<void>
+  onSendSticker: (stkrId: string, stkrUrl: string) => Promise<void>
 }
 
-export function ChatInput({ onSend }: ChatInputProps) {
+export function ChatInput({ onSend, onSendSticker }: ChatInputProps) {
   const [text, setText] = useState('')
   const [isSending, setIsSending] = useState(false)
+  const [showPicker, setShowPicker] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  // 외부 클릭 시 스티커 피커 닫기
+  useEffect(() => {
+    if (!showPicker) return
+    function handleMouseDown(e: MouseEvent) {
+      if (!containerRef.current?.contains(e.target as Node)) setShowPicker(false)
+    }
+    document.addEventListener('mousedown', handleMouseDown)
+    return () => document.removeEventListener('mousedown', handleMouseDown)
+  }, [showPicker])
 
   const send = useCallback(async () => {
     const trimmed = text.trim()
@@ -19,7 +33,7 @@ export function ChatInput({ onSend }: ChatInputProps) {
 
     try {
       await onSend(trimmed)
-    } catch (err) {
+    } catch {
       // rate limit이거나 전송 실패 시 입력 내용 복원
       setText(trimmed)
     } finally {
@@ -45,8 +59,27 @@ export function ChatInput({ onSend }: ChatInputProps) {
     ta.style.height = `${Math.min(ta.scrollHeight, 120)}px`
   }, [])
 
+  const handleStickerSelect = useCallback(async (stkrId: string, stkrUrl: string) => {
+    setShowPicker(false)
+    await onSendSticker(stkrId, stkrUrl)
+  }, [onSendSticker])
+
   return (
-    <div className='flex shrink-0 items-end gap-2 border-t border-border/50 bg-zinc-200 p-3 shadow-[0_-4px_12px_rgb(0_0_0_/_0.06)] dark:bg-zinc-700'>
+    <div
+      ref={containerRef}
+      className='relative flex shrink-0 items-end gap-2 border-t border-border/50 bg-zinc-200 p-3 shadow-[0_-4px_12px_rgb(0_0_0_/_0.06)] dark:bg-zinc-700'
+    >
+      {showPicker && (
+        <StickerPicker onSelect={handleStickerSelect} onClose={() => setShowPicker(false)} />
+      )}
+      <button
+        onClick={() => setShowPicker(o => !o)}
+        className='shrink-0 rounded-xl p-2 text-lg text-muted-foreground transition-colors hover:bg-muted'
+        title='스티커'
+        aria-label='스티커 선택'
+      >
+        😊
+      </button>
       <textarea
         ref={textareaRef}
         value={text}

@@ -41,6 +41,7 @@ interface UseChatRoomReturn {
   messages: ChatMessage[]
   onlineUserIds: string[]
   sendMessage: (text: string) => Promise<void>
+  sendSticker: (stkrId: string, stkrUrl: string) => Promise<void>
   prependMessages: (msgs: ChatMessage[]) => void
 }
 
@@ -241,12 +242,7 @@ export function useChatRoom(
     const trimmed = text.trim()
     if (!trimmed) return
 
-    // 발신자 낙관적 업데이트: 서버 응답을 기다리지 않고 즉시 표시
-    // tempId는 클라이언트에서만 유효한 임시 식별자
-    // 다른 클라이언트는 서버 브로드캐스트(API POST 후)로 메시지를 수신함 — 신원 검증됨
     const tempId = crypto.randomUUID()
-    // 방금 보낸 내 메시지는 번역 요청 대상에서 제외 — DB 저장 전이라 번역 API가 404로 실패함
-    // (내가 쓴 글은 원문 그대로 보는 것이 자연스러움. 언어 변경 시 ref가 비워져 재번역됨)
     requestedTransRef.current.add(tempId)
     const tempMsg: ChatMessage = {
       msg_id: tempId,
@@ -264,7 +260,6 @@ export function useChatRoom(
     addMessage(tempMsg)
 
     try {
-      // piFetch: Pi Browser는 X-Pi-Token 헤더, 일반 브라우저는 쿠키로 인증
       const res = await piFetch(`/api/chat/rooms/${roomId}/messages`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -281,12 +276,49 @@ export function useChatRoom(
       }
 
       const { message } = await res.json() as { message: ChatMessage }
-      // API 응답의 실제 메시지로 교체 (서버 타임스탬프 + 검증된 신원)
       replaceMessage(tempId, message)
     } catch (err) {
       throw err
     }
   }, [roomId, currentUserId, currentUserDisplayName, addMessage, removeMessage, replaceMessage])
 
-  return { messages, onlineUserIds, sendMessage, prependMessages }
+  const sendSticker = useCallback(async (stkrId: string, stkrUrl: string) => {
+    const tempId = crypto.randomUUID()
+    // 스티커는 번역 대상 아님 — dedup Set에 미리 추가해 forceTranslate 모드에서도 번역 API 호출 방지
+    requestedTransRef.current.add(tempId)
+    const tempMsg: ChatMessage = {
+      msg_id: tempId,
+      room_id: roomId,
+      snd_usr_id: currentUserId,
+      snd_usr_nm: currentUserDisplayName,
+      msg_cont: null,
+      msg_tp_cd: 'STICKER',
+      attch_url: stkrUrl,
+      stkr_id: stkrId,
+      ref_msg_id: null,
+      del_yn: 'N',
+      reg_dtm: new Date().toISOString(),
+    }
+    addMessage(tempMsg)
+
+    try {
+      const res = await piFetch(`/api/chat/rooms/${roomId}/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ msg_id: tempId, msg_tp_cd: 'STICKER', stkr_id: stkrId, attch_url: stkrUrl }),
+      })
+
+      if (!res.ok) {
+        removeMessage(tempId)
+        throw new Error('send_failed')
+      }
+
+      const { message } = await res.json() as { message: ChatMessage }
+      replaceMessage(tempId, message)
+    } catch (err) {
+      throw err
+    }
+  }, [roomId, currentUserId, currentUserDisplayName, addMessage, removeMessage, replaceMessage])
+
+  return { messages, onlineUserIds, sendMessage, sendSticker, prependMessages }
 }
