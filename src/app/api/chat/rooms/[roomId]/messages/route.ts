@@ -1,14 +1,17 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse, after } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth-check'
 import { getRoomMember, getRecentMsgCount } from '@/lib/chat'
 import { broadcastToRoom } from '@/lib/realtime-broadcast'
 import { recordActivity } from '@/lib/activity-log'
+import { LOCALE_CD_RE } from '@/lib/chat-translate'
+import { queueRoomTranslations } from '@/lib/chat-translate-dedup'
 
 type Params = { params: Promise<{ roomId: string }> }
 
-// GET /api/chat/rooms/[roomId]/messages?limit=50&before=<msg_id>
+// GET /api/chat/rooms/[roomId]/messages?limit=50&before=<msg_id>&locale=<locale>
 // cursor 기반 페이지네이션 — scroll-up 무한로드
+// locale 전달 시 msg_trans 캐시된 번역을 trans_cont 필드로 pre-populate (PiTranslate™)
 export async function GET(request: NextRequest, { params }: Params) {
   const { roomId } = await params
   const user = await getSessionUser()
@@ -20,10 +23,11 @@ export async function GET(request: NextRequest, { params }: Params) {
   const { searchParams } = new URL(request.url)
   const limit = Math.min(Number(searchParams.get('limit') ?? '50'), 100)
   const before = searchParams.get('before') // msg_id cursor
+  const locale = searchParams.get('locale')
 
   let query = getSupabaseAdmin()
     .from('msg_msg')
-    .select('msg_id, room_id, snd_usr_id, snd_usr_nm, msg_cont, msg_tp_cd, attch_url, stkr_id, ref_msg_id, del_yn, reg_dtm')
+    .select('msg_id, room_id, snd_usr_id, snd_usr_nm, msg_cont, msg_tp_cd, attch_url, stkr_id, ref_msg_id, src_lang_cd, del_yn, reg_dtm')
     .eq('room_id', roomId)
     .eq('del_yn', 'N')
     .order('reg_dtm', { ascending: false })
@@ -48,6 +52,24 @@ export async function GET(request: NextRequest, { params }: Params) {
   const reversed = (messages ?? []).reverse()
   const hasMore = (messages ?? []).length === limit
   const oldestMsgId = reversed[0]?.msg_id ?? null
+
+  // 캐시된 번역 pre-populate — 신규 번역은 발생하지 않음 (조회만)
+  if (locale && LOCALE_CD_RE.test(locale) && reversed.length > 0) {
+    const { data: transRows } = await getSupabaseAdmin()
+      .from('msg_trans')
+      .select('msg_id, trans_cont')
+      .in('msg_id', reversed.map(m => m.msg_id))
+      .eq('locale_cd', locale)
+      .eq('del_yn', 'N')
+
+    if (transRows && transRows.length > 0) {
+      const transMap = new Map(transRows.map((t: { msg_id: string; trans_cont: string }) => [t.msg_id, t.trans_cont]))
+      for (const msg of reversed as Array<{ msg_id: string; trans_cont?: string }>) {
+        const trans = transMap.get(msg.msg_id)
+        if (trans) msg.trans_cont = trans
+      }
+    }
+  }
 
   return NextResponse.json({ messages: reversed, hasMore, oldestMsgId })
 }
@@ -125,6 +147,19 @@ export async function POST(request: NextRequest, { params }: Params) {
       .eq('room_id', roomId),
     broadcastToRoom(roomId, 'new_msg', data),
   ])
+
+  // PiTranslate™ 번역 큐 (TASK-094) — 응답을 막지 않는 백그라운드 실행
+  // after(): 응답 전송 후에도 서버리스 인스턴스가 종료되지 않고 작업을 완료함
+  // 방 참가자들의 display_locale_cd 목록으로 자동 번역 → msg_trans 캐시 + broadcast
+  if (data.msg_tp_cd === 'TEXT' && data.msg_cont) {
+    after(() =>
+      queueRoomTranslations({
+        roomId,
+        msgId: data.msg_id,
+        msgCont: data.msg_cont,
+      }).catch(err => console.error('[chat-translate] 번역 큐 오류', err)),
+    )
+  }
 
   return NextResponse.json({ message: data }, { status: 201 })
 }

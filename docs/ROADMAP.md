@@ -3,7 +3,7 @@
 Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Network 앱 플랫폼
 
 > **기준일**: 2026-06-10
-> **현재 버전**: Phase 7·10·11 완료 (PiChat MVP · 사용자 프로필 · 통계 대시보드) · Phase 8~9 대기 · **Phase 12 PiTranslate™ 설계 완료 (구현 대기)**
+> **현재 버전**: Phase 7·10·11 완료 (PiChat MVP · 사용자 프로필 · 통계 대시보드) · Phase 8~9 대기 · **Phase 12 PiTranslate™ MVP 구현 완료 (TASK-090~097 ✅ · 098~099 대기)**
 > **배포 URL**: https://loginpi.vercel.app
 > **기술 스택**: Next.js 16 App Router · React 19 · TypeScript 6 · Tailwind CSS v4 · NextAuth.js · Supabase PostgreSQL
 
@@ -750,79 +750,97 @@ if (meta?.type === 'CHAT_SUBSCR') {
 
 ---
 
-## Phase 12: PiTranslate™ 글로벌 동시통역 🔜 (준비중)
+## Phase 12: PiTranslate™ 글로벌 동시통역 ✅ MVP 완료 (2026-06-10 — TASK-090~097 · 098~099 대기)
 
 > **목표**: 채팅방에서 어떤 언어로 보내도, 각 사용자의 선택 언어로 실시간 자동 번역 — 언어 장벽 제로
 > **상세 스펙**: `docs/PRD_4_CHAT.md` (v1.6, Section 1-4) | **담당 에이전트**: 전용 에이전트 없음
 > **핵심 결정**: ① 번역 엔진 = **Gemini 2.0 Flash**(주력) + **Claude Haiku**(fallback) 하이브리드 (비용 ~76% 절감) ② 캐시 = `msg_trans` 테이블 `UNIQUE(msg_id, locale_cd)` ③ 동시성 = in-memory pending map ④ 실시간 = Supabase Realtime broadcast `msg_trans` 이벤트
+> **빌드 검증**: `pnpm tsc --noEmit` 통과 · `pnpm lint` 0 errors · `pnpm build` 성공 (`/api/.../translate` 라우트 확인)
 
-### TASK-090: DB 마이그레이션 + 환경변수 🔜
+### TASK-090: DB 마이그레이션 + 환경변수 ✅ 완료
 
-- 🔜 `sql/018_msg_trans.sql` — `msg_trans` 번역 캐시 테이블 신설
-  - PK `trans_id UUID`, UNIQUE `(msg_id, locale_cd)`, `trans_cont TEXT NOT NULL`
-  - 시스템 컬럼 4개 + `del_yn` DA 표준 준수 (`-- DA-APPROVED:` 주석 필수)
-- 🔜 `msg_msg.src_lang_cd VARCHAR(20)` 컬럼 추가 (원본 언어 코드 — Gemini Flash 감지)
-- 🔜 `src/env.ts` + `.env.example` — `GEMINI_API_KEY` 이미 등록 확인 (Phase 6에서 추가됨)
+- ✅ `sql/020_msg_trans.sql` — `msg_trans` 번역 캐시 테이블 신설 (**018·019 선점으로 020으로 번호 조정**)
+  - PK `trans_id UUID`, UNIQUE `(msg_id, locale_cd)`, `trans_cont TEXT NOT NULL`, `model_ver`(모델 추적)
+  - 시스템 컬럼 4개 + `del_yn`/`del_dtm` DA 표준 준수 (`-- DA-APPROVED:` 주석)
+- ✅ `msg_msg.src_lang_cd VARCHAR(20)` 컬럼 추가 (원본 언어 코드 — Gemini Flash 감지)
+- ✅ `sys_user.display_locale_cd VARCHAR(20)` 컬럼 추가 (서버 번역 큐 대상 — TASK-096 선반영)
+- ✅ Supabase 적용 완료 (`apply_migration` — 테이블·컬럼 3종 검증 확인)
+- ✅ `GEMINI_API_KEY` — `src/env.ts` Phase 6에서 기등록 확인
 
-### TASK-091: Gemini Flash 번역 라이브러리 🔜
+### TASK-091: Gemini Flash 번역 라이브러리 ✅ 완료
 
-- 🔜 `src/lib/chat-translate.ts` — 번역 단일 함수 `translateMessage(text, srcLang, targetLocale)`
-  - Gemini 2.0 Flash API: 번역 + 언어감지 단일 호출
-  - 실패·타임아웃 시 Claude Haiku fallback 자동 전환 (`ANTHROPIC_API_KEY` 재사용)
-  - 반환: `{ translated: string, srcLangCd: string }`
+- ✅ `src/lib/chat-translate.ts` — `translateMessage(text, targetLocale)`
+  - **Gemini 2.5 Flash** REST API (SDK 불필요 — admin i18n translate 라우트와 동일 패턴): 번역 + 언어감지 단일 호출, `responseMimeType: application/json` + temperature 0
+  - ⚠️ PRD의 `gemini-2.0-flash`는 2026-06-10 기준 **단종**(generateContent 404) — `gemini-2.5-flash`로 전환 (실호출 검증 완료)
+  - 10초 타임아웃(`AbortSignal.timeout`) · 실패 시 Claude Haiku fallback 자동 전환 (`ANTHROPIC_API_KEY` 재사용)
+  - 반환: `{ translated, srcLangCd, modelVer }` · `LOCALE_CD_RE` 화이트리스트 + `baseLang()` 헬퍼 export
 
-### TASK-092: 동시성 dedup 처리 🔜
+### TASK-092: 동시성 dedup 처리 ✅ 완료
 
-- 🔜 `src/lib/chat-translate-dedup.ts` — in-memory pending map
-  - key: `${msgId}:${localeCd}`, value: `Promise<string>`
+- ✅ `src/lib/chat-translate-dedup.ts` — in-memory pending map
+  - key: `${msgId}:${localeCd}`, value: `Promise<TranslationOutcome>`
   - 동일 (msgId, locale) 동시 요청 시 API 1회만 호출, 나머지는 첫 Promise await
-  - 서버 재시작 시 맵 소멸 (DB 캐시로 보완)
+  - 서버 재시작·멀티 인스턴스는 DB 캐시 + UPSERT(`onConflict: msg_id,locale_cd`)로 보완
+  - broadcast를 dedup job 내부에 배치 — fresh 번역 1회에만 발송 (대기자 N명이어도 중복 발송 없음)
 
-### TASK-093: 번역 API 라우트 🔜
+### TASK-093: 번역 API 라우트 ✅ 완료
 
-- 🔜 `POST /api/chat/rooms/[roomId]/messages/[msgId]/translate`
-  - Body: `{ locale_cd: string }`
-  - 인증: `getSessionUser()` + 방 참가 여부 확인 (`piFetch` 지원)
+- ✅ `POST /api/chat/rooms/[roomId]/messages/[msgId]/translate`
+  - Body: `{ locale_cd: string }` (`LOCALE_CD_RE` 검증)
+  - 인증: `getSessionUser()` + `getRoomMember()` 방 참가 확인 (`piFetch` 쿠키/헤더 이중 지원)
   - 흐름: `msg_trans` DB 캐시 조회 → 캐시 히트 즉시 반환 → pending map → Gemini Flash → DB UPSERT → Realtime broadcast
+  - `src_lang_cd`가 대상 locale과 같으면 번역 생략 (`same_lang: true` 반환)
 
-### TASK-094: 메시지 전송 시 번역 큐 연동 🔜
+### TASK-094: 메시지 전송 시 번역 큐 연동 ✅ 완료
 
-- 🔜 `POST /api/chat/rooms/[roomId]/messages` 확장
-  - 저장 + broadcast 후 비동기(non-blocking `void`) 번역 큐 시작
-  - `getDistinctRoomLocales(roomId)` — 방 참가자 locale 목록 조회
-  - `src_lang_cd` 감지 후 `msg_msg` 업데이트 (첫 번역 시)
-  - 각 locale별 `/translate` 내부 호출 (본인 locale 제외)
+- ✅ `POST /api/chat/rooms/[roomId]/messages` 확장
+  - 저장 + broadcast 후 **Next.js 16 `after()`** 로 백그라운드 번역 큐 실행 (서버리스 freeze에도 완료 보장 — `void`보다 안전)
+  - `getDistinctRoomLocales(roomId)` — `msg_room_mbr` ⨝ `sys_user.display_locale_cd` 방 참가자 locale 목록
+  - `src_lang_cd` 첫 감지 시 `msg_msg` 조건부 UPDATE(`.is('src_lang_cd', null)` — race 안전)
+  - 감지된 원본 언어와 같은 locale은 건너뜀
+- ✅ `GET .../messages?locale=` — `msg_trans` 캐시된 번역 `trans_cont` pre-populate (scroll-up·초기 로드)
 
-### TASK-095: 클라이언트 broadcast 구독 확장 🔜
+### TASK-095: 클라이언트 broadcast 구독 확장 ✅ 완료
 
-- 🔜 `src/hooks/use-chat-room.ts` — `msg_trans` broadcast 이벤트 추가
-  ```typescript
-  .on('broadcast', { event: 'msg_trans' }, ({ payload }) => {
-    if (payload.locale_cd === userLocale) replaceTranslation(payload.msg_id, payload.trans_cont)
-  })
-  ```
-- 🔜 `replaceTranslation(msgId, transText)` — 메시지 번역 텍스트 교체 함수
-- 🔜 ChatMessage 타입에 `trans_cont?: string` 추가
+- ✅ `src/hooks/use-chat-room.ts` — `msg_trans` broadcast 이벤트 구독 (`locale_cd === userLocale`일 때만 적용)
+- ✅ `applyTranslation(msgId, transCont)` — 메시지 번역 텍스트 교체 함수
+- ✅ `ChatMessage` 타입에 `trans_cont?` · `src_lang_cd?` 추가
+- ✅ 수신 메시지 자동 번역 요청(`requestTranslation`) — `display_locale_cd` 미설정 사용자도 URL locale 기준 번역 수신 (서버 dedup으로 중복 호출 차단, `requestedTransRef`로 클라이언트 중복 POST 방지)
+- ✅ `chat-room-panel.tsx` — `useLocale()`(next-intl)로 표시 언어 전달
+- ✅ `client-chat-room.tsx` · `chat/[roomId]/page.tsx` — 초기 50건에 캐시 번역 병합
 
-> **P0 완료 = MVP**: TASK-090 → 091 → 092 → 093 → 094 → 095 완료 시 PiTranslate™ 기본 동작
+> **P0 완료 = MVP**: TASK-090 → 091 → 092 → 093 → 094 → 095 ✅ — PiTranslate™ 기본 동작
 
-### TASK-096: 사용자 표시 언어 설정 UI 🔜
+### TASK-096: 사용자 표시 언어 설정 UI ✅ 완료
 
-- 🔜 프로필 페이지 (`/profile`) — "표시 언어" 설정 항목 추가 (203개 locale 드롭다운, 1회 설정)
-- 🔜 `sys_user.display_locale_cd` 컬럼 추가 (없으면 `navigator.language` fallback)
-- 🔜 `src/hooks/use-user-locale.ts` — 클라이언트 locale 훅 (localStorage 캐시)
+- ✅ 프로필 페이지 (`/profile`) — "표시 언어 (채팅 자동 번역)" 드롭다운 추가 (`routing.locales` 203개 단일 소스, `Intl.DisplayNames` 한국어 라벨 자동 파생)
+- ✅ `sys_user.display_locale_cd` 컬럼 (sql/020) + `UserRow`/`updateUserProfile` 타입 확장
+- ✅ `PATCH /api/profile` — Zod `display_locale_cd` regex 검증 (locale 코드 인젝션 방지)
+- ℹ️ `use-user-locale.ts` 별도 훅은 생략 — 채팅 표시 언어는 next-intl URL locale을 직접 사용 (이 앱은 203개 locale 라우팅을 이미 보유, localStorage 캐시 불필요)
 
-### TASK-097: 원문 보기 토글 UI 🔜
+### TASK-097: 원문 보기 토글 UI ✅ 완료
 
-- 🔜 메시지 버블에 `[원문 보기]` 토글 버튼 추가 (번역 투명성 보장)
-- 🔜 `src/components/chat/translated-message.tsx` — 번역/원문 전환 컴포넌트
+- ✅ `src/components/chat/translated-message.tsx` — 번역/원문 전환 컴포넌트 (`[원문 보기]` ↔ `[번역 보기]`)
+- ✅ `chat-message-list.tsx` MessageBubble — `trans_cont`가 원문과 다를 때만 번역 표시 + 토글 (동일하면 원문 그대로)
 
-### TASK-098: 어드민 번역 통계 🔜
+### 추가 고도화: 방별 번역 언어 콤보 + 채팅 레이아웃 고정 ✅ 완료 (2026-06-10)
+
+> 채팅방 헤더 제목 옆 언어 콤보에서 선택한 언어로 **그 방의 모든 메시지를 강제 번역** — 방마다 독립 적용
+
+- ✅ `src/components/chat/chat-locale-select.tsx` — 제목 옆 콤보 (🌐 자동 + 203개 locale)
+- ✅ `src/lib/locale-options.ts` — locale 드롭다운 옵션 단일 소스 (profile-form 중복 제거)
+- ✅ 방별 독립 저장 — `localStorage['chat_view_locale:{roomId}']` (다른 방에 영향 없음, 재입장 시 복원)
+- ✅ `POST /api/chat/rooms/[roomId]/translate-batch` — 일괄 번역 (캐시 일괄 조회 → 미스만 최신순 순차 번역, 50건 제한, 개별 실패 스킵)
+- ✅ `use-chat-room.ts` `forceTranslate` 모드 — 로드된 전체 메시지(본인 과거 메시지 포함)·scroll-up·신규 수신을 단일 effect로 일괄 번역, 언어 변경 시 기존 번역 wipe 후 재번역. fresh 번역은 broadcast로 점진 도착(진행형 UX)
+- ✅ 헤더를 `ChatRoomPanel`로 통합 (page.tsx·client-chat-room 중복 제거) — **제목 섹션·입력 섹션 고정(`shrink-0`), 본문만 스크롤(`min-h-0 overflow-y-auto`)**
+- ✅ 방금 보낸 내 메시지는 번역 제외(`requestedTransRef` 선등록 — DB 저장 전 404 race 방지)
+
+### TASK-098: 어드민 번역 통계 🔜 (후속)
 
 - 🔜 어드민 대시보드에 번역 통계 탭 추가
 - 🔜 일별 번역 건수 · 캐시 히트율 · 예상 비용 (Gemini API 토큰 기준)
 
-### TASK-099: 번역 품질 피드백 🔜
+### TASK-099: 번역 품질 피드백 🔜 (후속)
 
 - 🔜 메시지별 번역 👍/👎 피드백 UI
 - 🔜 `msg_trans.feedback_yn CHAR(1)` 컬럼 추가 (향후 fine-tune 데이터)
@@ -855,7 +873,7 @@ if (meta?.type === 'CHAT_SUBSCR') {
 | M18: PiChat 생태계 | Phase 9 | — | 마켓플레이스, Pi Bet, Webhook, 분석 대시보드, 커스텀 스티커 | 🔜 준비중 |
 | M19: 사용자 프로필 | Phase 10 | 2026-06-09 | 마이페이지 (개인정보·결제내역·구독현황), Pi Browser ClientGate | ✅ 완료 |
 | M20: 어드민 통계 대시보드 | Phase 11 | 2026-06-09 | DAU/WAU/MAU·테마별 매출 (react-plotly.js + 중간집계 rollup) | ✅ 완료 |
-| M21: PiTranslate™ MVP | Phase 12 | — | sql/018 + chat-translate.ts + dedup + translate API + broadcast 확장 (TASK-090~095) | 🔜 준비중 |
+| M21: PiTranslate™ MVP | Phase 12 | 2026-06-10 | sql/020 + chat-translate.ts + dedup + translate API + broadcast 확장 + 표시언어 설정 + 원문 토글 (TASK-090~097) | ✅ 완료 |
 
 ---
 
@@ -912,3 +930,5 @@ if (meta?.type === 'CHAT_SUBSCR') {
 | v2.6 | 2026-06-09 | Phase 11 어드민 통계 대시보드 계획 추가 — TASK-080~087 (`PRD_CHART.md` 수용). react-plotly.js 채택, 활동 로그 `sys_user_actvty_log`(하루 1행 UPSERT) + 계측, 중간집계 rollup `stat_actvty_dly`/`stat_revenue_dly` + `fn_build_daily_stats` 멱등 집계, 일배치/백필/당일보정 하이브리드, 테마별 매출 4경로 UNION. M20 마일스톤 추가. PRD.md v6.0 통합(섹션 13 신설). | anakin |
 | v2.7 | 2026-06-09 | Phase 11 완료 현행화 — TASK-083/084/085/087 구현 완료 확인 후 🔜→✅ 업데이트. TASK-083: `POST /api/admin/stats/aggregate` CRON_SECRET+어드민 이중인증·백필 모드(`backfill:true`)·`vercel.json` Cron(`0 0 * * *`) 등록. TASK-084: `fn_top_active_users`/`fn_top_revenue_themes`/`fn_top_spenders` RPC 3종 Supabase 배포. TASK-085: `plotly-plot.tsx`(ssr:false)·`dau-wau-mau-chart`·`revenue-donut-chart`·`revenue-timeline-chart` 4종 구현. 실데이터 적재 확인: `stat_actvty_dly` 5일치(2026-06-05~09)·`stat_revenue_dly` 4일치(2026-06-06~09). M20 완료일 2026-06-09 반영. | anakin |
 | v2.8 | 2026-06-10 | Phase 12 PiTranslate™ 글로벌 동시통역 로드맵 추가 — TASK-090~099 (`PRD_4_CHAT.md` v1.6 수용). Gemini 2.0 Flash 주력 + Claude Haiku fallback 하이브리드, `msg_trans` 번역 캐시, in-memory dedup(`chat-translate-dedup.ts`), broadcast 기반 실시간 전달. M21 마일스톤 추가. `PRD_4_CHAT.md` 버전 참조 v1.2→v1.6 업데이트. 기준일 2026-06-10 갱신. `PRD.md` v7.0 통합(섹션 14 신설·섹션 15~18 재번호화). | anakin |
+| v3.0 | 2026-06-10 | Phase 12 추가 고도화 — 방별 번역 언어 콤보(`chat-locale-select.tsx`, 방 헤더 제목 옆, localStorage 방별 독립 저장) + `translate-batch` API(캐시 우선 일괄 번역) + `forceTranslate` 모드(전체 메시지 강제 번역·언어 변경 시 재번역) + 채팅 레이아웃 고정(헤더·입력창 `shrink-0`, 본문만 `min-h-0` 스크롤) + 헤더 ChatRoomPanel 통합 + `locale-options.ts` 단일 소스. tsc·build 통과. | anakin |
+| v2.9 | 2026-06-10 | Phase 12 PiTranslate™ MVP 구현 완료 — TASK-090~097. `sql/020_msg_trans.sql`(018·019 선점으로 번호 조정, Supabase 적용 완료), `chat-translate.ts`(Gemini 2.0 Flash REST + Claude Haiku fallback), `chat-translate-dedup.ts`(pending map + 번역 큐 + broadcast 내장), translate API 라우트, 메시지 POST `after()` 번역 큐 + GET locale pre-populate, `use-chat-room.ts` msg_trans 구독 + 수신 자동 번역 요청, 프로필 표시 언어 드롭다운(203 locale), `translated-message.tsx` 원문 토글. tsc·lint(0 errors)·build 통과. M21 달성. TASK-098(어드민 번역 통계)·099(품질 피드백)는 후속. | anakin |

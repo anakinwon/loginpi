@@ -3,12 +3,14 @@ import { useEffect, useRef, useCallback, useState } from 'react'
 import { piFetch } from '@/lib/pi-fetch'
 import type { ChatMessage } from '@/hooks/use-chat-room'
 import { PiTipButton } from './pi-tip-button'
+import { TranslatedMessage } from './translated-message'
 
 interface ChatMessageListProps {
   roomId: string
   messages: ChatMessage[]
   currentUserId: string
   canTip: boolean
+  userLocale?: string // PiTranslate™ — scroll-up 로드 시 캐시된 번역 pre-populate
   prependMessages: (msgs: ChatMessage[]) => void
 }
 
@@ -17,6 +19,7 @@ export function ChatMessageList({
   messages,
   currentUserId,
   canTip,
+  userLocale,
   prependMessages,
 }: ChatMessageListProps) {
   const [hasMore, setHasMore] = useState(messages.length >= 50)
@@ -54,7 +57,8 @@ export function ChatMessageList({
     const container = containerRef.current
     const prevScrollHeight = container?.scrollHeight ?? 0
 
-    const res = await piFetch(`/api/chat/rooms/${roomId}/messages?limit=50&before=${oldestMsgId}`)
+    const localeQuery = userLocale ? `&locale=${encodeURIComponent(userLocale)}` : ''
+    const res = await piFetch(`/api/chat/rooms/${roomId}/messages?limit=50&before=${oldestMsgId}${localeQuery}`)
     if (res.ok) {
       const { messages: older, hasMore: more, oldestMsgId: nextCursor } = await res.json()
       prependMessages(older)
@@ -68,7 +72,7 @@ export function ChatMessageList({
       })
     }
     setIsLoading(false)
-  }, [hasMore, isLoading, oldestMsgId, roomId, prependMessages])
+  }, [hasMore, isLoading, oldestMsgId, roomId, userLocale, prependMessages])
 
   // 스크롤 최상단 감지 → loadMore 호출
   useEffect(() => {
@@ -79,8 +83,9 @@ export function ChatMessageList({
     return () => container.removeEventListener('scroll', onScroll)
   }, [loadMore])
 
+  // 채팅 본문 — 유일한 스크롤 영역. overscroll-contain: 끝까지 스크롤해도 페이지 전체로 전파 안 됨
   return (
-    <div ref={containerRef} className='flex flex-1 flex-col gap-1 overflow-y-auto p-4'>
+    <div ref={containerRef} className='flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto overscroll-contain p-4'>
       {isLoading && (
         <div className='py-2 text-center text-sm text-muted-foreground'>불러오는 중...</div>
       )}
@@ -173,7 +178,12 @@ function MessageBubble({ msg, isMe, canTip, roomId, hideTime }: {
             : 'rounded-bl-sm bg-muted'
         }`}
       >
-        {msg.msg_cont}
+        {/* PiTranslate™ — 번역본이 있고 원문과 다르면 번역 표시 + 원문 토글 */}
+        {msg.trans_cont && msg.trans_cont !== msg.msg_cont ? (
+          <TranslatedMessage original={msg.msg_cont ?? ''} translated={msg.trans_cont} />
+        ) : (
+          msg.msg_cont
+        )}
       </div>
       {!hideTime && (
         <div className='flex items-center gap-1'>

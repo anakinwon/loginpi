@@ -1,5 +1,4 @@
 import { redirect } from 'next/navigation'
-import { Link } from '@/i18n/navigation'
 import { getSessionUser } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getRoom, getRoomMember } from '@/lib/chat'
@@ -53,13 +52,31 @@ export default async function ChatRoomPage({ params }: Params) {
   // 초기 메시지 50건 (최신 → 오래된 순 조회 후 역순 정렬)
   const { data: rawMsgs } = await getSupabaseAdmin()
     .from('msg_msg')
-    .select('msg_id, room_id, snd_usr_id, snd_usr_nm, msg_cont, msg_tp_cd, attch_url, stkr_id, ref_msg_id, del_yn, reg_dtm')
+    .select('msg_id, room_id, snd_usr_id, snd_usr_nm, msg_cont, msg_tp_cd, attch_url, stkr_id, ref_msg_id, src_lang_cd, del_yn, reg_dtm')
     .eq('room_id', roomId)
     .eq('del_yn', 'N')
     .order('reg_dtm', { ascending: false })
     .limit(50)
 
   const initialMessages = ((rawMsgs ?? []) as ChatMessage[]).reverse()
+
+  // PiTranslate™ — 현재 locale의 캐시된 번역을 trans_cont로 pre-populate (조회만, 신규 번역 없음)
+  if (initialMessages.length > 0) {
+    const { data: transRows } = await getSupabaseAdmin()
+      .from('msg_trans')
+      .select('msg_id, trans_cont')
+      .in('msg_id', initialMessages.map(m => m.msg_id))
+      .eq('locale_cd', locale)
+      .eq('del_yn', 'N')
+
+    if (transRows && transRows.length > 0) {
+      const transMap = new Map(transRows.map((t: { msg_id: string; trans_cont: string }) => [t.msg_id, t.trans_cont]))
+      for (const msg of initialMessages) {
+        const trans = transMap.get(msg.msg_id)
+        if (trans) msg.trans_cont = trans
+      }
+    }
+  }
 
   // msg_theme JOIN으로 테마 이모지 가져오기
   const { data: themeData } = await getSupabaseAdmin()
@@ -71,34 +88,19 @@ export default async function ChatRoomPage({ params }: Params) {
   const themeEmoji = (themeData as { theme_emoji?: string } | null)?.theme_emoji ?? '💬'
 
   return (
-    <div
-      className='mx-auto flex w-full max-w-2xl flex-col overflow-hidden'
-      style={{ height: 'calc(100vh - 3.5rem)' }}
-    >
-      {/* 채팅방 헤더 */}
-      <header className='flex shrink-0 items-center gap-3 border-b bg-background px-4 py-3'>
-        <Link
-          href='/chat'
-          className='shrink-0 text-muted-foreground transition-colors hover:text-foreground'
-          aria-label='채팅 목록으로'
-        >
-          ←
-        </Link>
-        <span className='text-xl'>{themeEmoji}</span>
-        <div className='min-w-0'>
-          <p className='truncate font-semibold text-sm'>{room.room_nm}</p>
-          {room.room_desc && (
-            <p className='truncate text-xs text-muted-foreground'>{room.room_desc}</p>
-          )}
-        </div>
-      </header>
-
-      {/* 메시지 목록 + 입력창 */}
+    // 화면 직접 고정 프레임: top-14(사이트 헤더 아래) ~ bottom-0(화면 바닥).
+    // fixed는 뷰포트 기준이라 URL바·키보드 변화를 자동 추적하고,
+    // 레이아웃의 Footer가 아래에 있어도 페이지 전체 스크롤이 생기지 않는다 (본문만 스크롤).
+    <div className='fixed inset-x-0 top-14 bottom-0 z-40 mx-auto flex w-full max-w-2xl flex-col overflow-hidden bg-background'>
+      {/* 헤더(제목+언어콤보 고정)·메시지(스크롤)·입력창(고정)은 ChatRoomPanel이 렌더 */}
       <ChatRoomPanel
         roomId={roomId}
         initialMessages={initialMessages}
         currentUserId={user.id}
         currentUserDisplayName={user.display_name}
+        roomNm={room.room_nm}
+        roomDesc={room.room_desc}
+        themeEmoji={themeEmoji}
       />
     </div>
   )

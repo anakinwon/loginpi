@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import { useLocale } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { usePiAuth } from '@/components/pi-auth-provider'
 import { piFetch } from '@/lib/pi-fetch'
@@ -15,10 +16,7 @@ type PublicPreview = { room_nm: string; theme_cd: string }
 // 방 정보·초기 메시지를 클라이언트에서 로드한 뒤 ChatRoomPanel(실시간 패널)에 전달한다.
 function Centered({ children }: { children: React.ReactNode }) {
   return (
-    <div
-      className='mx-auto flex w-full max-w-2xl flex-col items-center justify-center gap-2 text-center text-sm text-muted-foreground'
-      style={{ height: 'calc(100vh - 3.5rem)' }}
-    >
+    <div className='fixed inset-x-0 top-14 bottom-0 z-40 mx-auto flex w-full max-w-2xl flex-col items-center justify-center gap-2 bg-background text-center text-sm text-muted-foreground'>
       {children}
     </div>
   )
@@ -26,6 +24,7 @@ function Centered({ children }: { children: React.ReactNode }) {
 
 export function ClientChatRoom({ roomId }: { roomId: string }) {
   const { user, isLoading: authLoading } = usePiAuth()
+  const userLocale = useLocale()
   const [room, setRoom] = useState<RoomInfo | null>(null)
   const [themeEmoji, setThemeEmoji] = useState('💬')
   const [initialMessages, setInitialMessages] = useState<ChatMessage[]>([])
@@ -61,7 +60,8 @@ export function ClientChatRoom({ roomId }: { roomId: string }) {
       }
       const roomData = (await roomRes.json()) as { room: RoomInfo; themeEmoji?: string }
 
-      const msgRes = await piFetch(`/api/chat/rooms/${roomId}/messages?limit=50`)
+      // locale 전달 → 캐시된 번역(trans_cont) pre-populate (PiTranslate™)
+      const msgRes = await piFetch(`/api/chat/rooms/${roomId}/messages?limit=50&locale=${encodeURIComponent(userLocale)}`)
       if (cancelled) return
       if (!msgRes.ok) {
         setState('error')
@@ -78,7 +78,7 @@ export function ClientChatRoom({ roomId }: { roomId: string }) {
     return () => {
       cancelled = true
     }
-  }, [user, roomId, loadKey])
+  }, [user, roomId, loadKey, userLocale])
 
   const handleJoin = useCallback(async () => {
     setState('joining')
@@ -147,32 +147,17 @@ export function ClientChatRoom({ roomId }: { roomId: string }) {
   }
 
   return (
-    <div
-      className='mx-auto flex w-full max-w-2xl flex-col overflow-hidden'
-      style={{ height: 'calc(100vh - 3.5rem)' }}
-    >
-      <header className='flex shrink-0 items-center gap-3 border-b bg-background px-4 py-3'>
-        <Link
-          href='/chat'
-          className='shrink-0 text-muted-foreground transition-colors hover:text-foreground'
-          aria-label='채팅 목록으로'
-        >
-          ←
-        </Link>
-        <span className='text-xl'>{themeEmoji}</span>
-        <div className='min-w-0'>
-          <p className='truncate font-semibold text-sm'>{room?.room_nm}</p>
-          {room?.room_desc && (
-            <p className='truncate text-xs text-muted-foreground'>{room.room_desc}</p>
-          )}
-        </div>
-      </header>
-
+    // 화면 직접 고정 프레임 (top-14 ~ bottom-0) — Footer 영향 없이 본문만 스크롤
+    <div className='fixed inset-x-0 top-14 bottom-0 z-40 mx-auto flex w-full max-w-2xl flex-col overflow-hidden bg-background'>
+      {/* 헤더(제목+언어콤보 고정)·메시지(스크롤)·입력창(고정)은 ChatRoomPanel이 렌더 */}
       <ChatRoomPanel
         roomId={roomId}
         initialMessages={initialMessages}
         currentUserId={user.userId}
         currentUserDisplayName={user.displayName}
+        roomNm={room?.room_nm ?? ''}
+        roomDesc={room?.room_desc}
+        themeEmoji={themeEmoji}
       />
     </div>
   )
