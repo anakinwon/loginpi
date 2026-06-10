@@ -19,7 +19,9 @@ async function getStats() {
 }
 
 export default async function AdminDashboard() {
-  const [user, stats, t] = await Promise.all([getSessionUser(), getStats(), getTranslations('admin.dashboard')])
+  // user = null이면 통계 조회 생략 — RSC payload에 미인증 데이터 포함 방지
+  const [user, t] = await Promise.all([getSessionUser(), getTranslations('admin.dashboard')])
+  const stats = user ? await getStats() : { total: 0, piOnly: 0, googleOnly: 0, linked: 0 }
 
   const STAT_CARDS = [
     { label: t('totalUsers'), value: stats.total, desc: t('totalUsersDesc') },
