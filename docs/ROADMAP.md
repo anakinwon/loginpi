@@ -3,7 +3,7 @@
 Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Network 앱 플랫폼
 
 > **기준일**: 2026-06-11
-> **현재 버전**: Phase 7·8·9·10·11 완료 (PiChat MVP · Pi 수익화 · 생태계 확장 · 사용자 프로필 · 통계 대시보드) · Phase 12 PiTranslate™ MVP 완료 (TASK-090~097 ✅ · 098~099 대기) · **Phase 13 MyPiShop(MPS) 준비중 (TASK-100~113)**
+> **현재 버전**: Phase 7·8·9·10·11 완료 (PiChat MVP · Pi 수익화 · 생태계 확장 · 사용자 프로필 · 통계 대시보드) · Phase 12 PiTranslate™ MVP 완료 (TASK-090~097 ✅ · 098~099 대기) · **Phase 13 MyPiShop(MPS) 준비중 (TASK-100~113)** · **Phase 14 PiVoice™ 음성통화 설계 완료 (TASK-120~123, `docs/PRD_9_VOICE_CHAT.md`)**
 > **배포 URL**: https://loginpi.vercel.app
 > **기술 스택**: Next.js 16 App Router · React 19 · TypeScript 6 · Tailwind CSS v4 · NextAuth.js · Supabase PostgreSQL
 
@@ -1004,6 +1004,47 @@ if (meta?.type === 'CHAT_SUBSCR') {
 
 ---
 
+## Phase 14: PiVoice™ — WebRTC 실시간 음성 통화 🔜 (설계 완료, 구현 대기)
+
+> **목표**: 채팅방 멤버 간 브라우저 기반 1:1 음성 통화 — 추가 인프라 0(시그널링 재사용), 서버 미디어 비용 0(P2P 직결)
+> **상세 스펙**: `docs/PRD_9_VOICE_CHAT.md` (v1.0) | **담당 에이전트**: `.claude/agents/chat/voice-chat-architect.md`
+> **확정 결정 (2026-06-11)**: ① MVP = **1:1 음성만** ② TURN = **관리형 서비스로 시작**(Metered 등, 검증 후 자체 coturn 전환) ③ 수익화 = **베타 완전 무료**(결제 설계만) ④ 토폴로지 = P2P 메시(최대 4인, 초과 시 LiveKit 오디오 SFU)
+> **핵심 재사용**: `broadcastToRoom`(시그널링) · `getSupabaseClient`+presence(수신) · `piFetch`/`getSessionUser`(인증) · `ClientChatRoom` 게이트 패턴 · `getRoomMember`(권한) · DA DDL 표준
+
+### TASK-120: 데이터 모델 `sql/024_voice_call.sql` 🔜
+
+- 🔜 `msg_call_log` — 통화 이력 (`caller_usr_id`/`callee_usr_id`, `call_st_cd` RINGING/CONNECTED/ENDED/DECLINED/MISSED, `relay_yn`, `duration_sec`, `end_rsn_cd`)
+- 🔜 `msg_call_quality_stat` — 품질 메트릭 (`rtt_ms`, `packet_loss_pct`, `jitter_ms`, UNIQUE(call_id, usr_id))
+- 🔜 DA 표준 (시스템 컬럼 4개 + del_yn/del_dtm + TIMESTAMPTZ + `-- DA-APPROVED:` 주석), `da-ddl-guard` 통과
+
+### TASK-121: TURN 자격증명 발급 API 🔜
+
+- 🔜 `POST /api/voice/turn-credentials` — Pi 토큰 검증 → 관리형 TURN 임시 자격증명(TTL 1h) 반환, 클라이언트 하드코딩 금지
+- 🔜 `src/env.ts` + `.env.example` — `TURN_HOST`/`TURN_SECRET`/`TURN_CREDENTIAL_TTL` server 변수 추가
+- 🔜 TURN over TLS 443 경로 포함(제한망 대비)
+
+### TASK-122: 시그널링 + 통화 API 🔜
+
+- 🔜 `POST /api/chat/rooms/[roomId]/call` — 통화 시작 (`getRoomMember` 권한 + `msg_call_log` INSERT(RINGING) + `call_invite` broadcast)
+- 🔜 `POST .../call/[callId]/signal` — offer/answer/candidate/hangup 중계 (서버 발신으로 신원 보증)
+- 🔜 `POST .../call/[callId]/end` — 종료 + `duration_sec`·`end_rsn_cd` 기록 + 품질 stat 적재
+- 🔜 신규 broadcast 이벤트: `call_invite`/`webrtc_offer`/`webrtc_answer`/`webrtc_candidate`/`call_hangup` (채널 `room:${roomId}` 재사용)
+
+### TASK-123: WebRTC 훅 + UI 🔜
+
+- 🔜 `src/hooks/use-webrtc-call.ts` — RTCPeerConnection 관리, 상태 머신(ringing 30초 타임아웃 → connected → ended), ICE restart(Wi-Fi↔LTE), `getUserMedia` 제약(echoCancellation/noiseSuppression/autoGainControl), `pc.getStats()` 품질 수집
+- 🔜 `src/app/[locale]/chat/[roomId]/call/page.tsx` — redirect 금지 → `ClientVoiceCall` 위임
+- 🔜 `client-voice-call.tsx`(Pi Browser 게이트) + `voice-call-panel.tsx`(발신/수신 벨·통화 화면) + 채팅방 헤더 📞 버튼
+
+### 단계별 Go/No-Go
+
+- 🔜 **S0 스파이크**: Pi Browser 실기기 마이크 권한 + `getUserMedia` 동작 확인 (iOS WKWebView 지원 여부 = 전체 go/no-go 핵심)
+- 🔜 **S1 1:1 MVP**: TASK-120~123 (동일/상이 네트워크 통화 연결·종료·품질 로깅)
+- 🔜 **S2 품질 검증**: TURN 경유율·packet loss 데이터로 자체 coturn 전환 판단
+- 🔜 **S3 확장**: (데이터 기반) 4인 메시 또는 LiveKit SFU / 결제 게이팅(`VOICE_CALL_CREDIT` + `voiceDailyFreeMinutes`) 활성화
+
+---
+
 ## 마일스톤 요약
 
 | 마일스톤 | Phase | 완료일 | 주요 산출물 | 상태 |
@@ -1032,6 +1073,7 @@ if (meta?.type === 'CHAT_SUBSCR') {
 | M20: 어드민 통계 대시보드 | Phase 11 | 2026-06-09 | DAU/WAU/MAU·테마별 매출 (react-plotly.js + 중간집계 rollup) | ✅ 완료 |
 | M21: PiTranslate™ MVP | Phase 12 | 2026-06-10 | sql/020 + chat-translate.ts + dedup + translate API + broadcast 확장 + 표시언어 설정 + 원문 토글 (TASK-090~097) | ✅ 완료 |
 | M22: MyPiShop(MPS) Phase 1 MVP | Phase 13 | — | sql/021_mps.sql (mps_ 6개 테이블) + lib 헬퍼 3종 + 상품·주문·에스크로 API 12종 + 화면 6종 (TASK-100~107) | 🔜 준비중 |
+| M23: PiVoice™ 1:1 음성 통화 | Phase 14 | — | sql/024 (msg_call_log·quality_stat) + TURN 발급 + 시그널링/통화 API + use-webrtc-call 훅 + 통화 UI (TASK-120~123) | 🔜 설계 완료 |
 
 ---
 
@@ -1091,5 +1133,6 @@ if (meta?.type === 'CHAT_SUBSCR') {
 | v3.0 | 2026-06-10 | Phase 12 추가 고도화 — 방별 번역 언어 콤보(`chat-locale-select.tsx`, 방 헤더 제목 옆, localStorage 방별 독립 저장) + `translate-batch` API(캐시 우선 일괄 번역) + `forceTranslate` 모드(전체 메시지 강제 번역·언어 변경 시 재번역) + 채팅 레이아웃 고정(헤더·입력창 `shrink-0`, 본문만 `min-h-0` 스크롤) + 헤더 ChatRoomPanel 통합 + `locale-options.ts` 단일 소스. tsc·build 통과. | anakin |
 | v2.9 | 2026-06-10 | Phase 12 PiTranslate™ MVP 구현 완료 — TASK-090~097. `sql/020_msg_trans.sql`(018·019 선점으로 번호 조정, Supabase 적용 완료), `chat-translate.ts`(Gemini 2.0 Flash REST + Claude Haiku fallback), `chat-translate-dedup.ts`(pending map + 번역 큐 + broadcast 내장), translate API 라우트, 메시지 POST `after()` 번역 큐 + GET locale pre-populate, `use-chat-room.ts` msg_trans 구독 + 수신 자동 번역 요청, 프로필 표시 언어 드롭다운(203 locale), `translated-message.tsx` 원문 토글. tsc·lint(0 errors)·build 통과. M21 달성. TASK-098(어드민 번역 통계)·099(품질 피드백)는 후속. | anakin |
 | v4.0 | 2026-06-10 | Phase 13 MyPiShop(MPS) 로드맵 추가 — TASK-100~113 (`PRD_8_MPS.md` v1.1 수용). PiRC2 U2A 가상 에스크로·`stock_qty` 원자적 차감 불변 조건·`mps_` 6개 테이블(sql/021_mps.sql)·lib 헬퍼 3종·API 12종·화면 6종(SCR-01~06) Phase 1 MVP / TASK-108~111 Phase 2 확장 / TASK-112~113 Phase 3 PiRC3 마이그레이션. M22 마일스톤 추가. 현재 버전 헤더 갱신. | anakin |
+| v5.2 | 2026-06-11 | Phase 14 PiVoice™ 음성통화 설계 추가 — `docs/PRD_9_VOICE_CHAT.md` v1.0 수용. WebRTC P2P 1:1 MVP, Supabase Realtime 시그널링 재사용(추가 인프라 0), 관리형 TURN으로 시작, 베타 무료. TASK-120~123(데이터모델·TURN발급·시그널링/통화API·WebRTC훅+UI) + S0~S3 Go/No-Go 로드맵. M23 마일스톤 추가. `voice-chat-architect` 에이전트 기준선 반영. | anakin |
 | v5.1 | 2026-06-11 | Phase 9 PiChat 생태계 완료 — TASK-070~074 전체 구현. `sql/022_chat_ecosystem.sql`(msg_theme_follow·msg_bet·msg_bet_optn·msg_bet_entry·msg_webhook + fn_chat_marketplace·fn_room_analytics·fn_room_mau RPC). 마켓플레이스(테마 필터+가중 랭킹+팔로우), Pi Bet(생성·U2A 참가·균등 분배 정산·BET_NOTI), Webhook·봇(API Key 인증·메시지 push·어드민 현황), 분석 대시보드(일별 통계+MAU+plotly), 커스텀 스티커(ownr_usr_id·mkt_yn·노출 규칙). **msg_msg CHECK AI_REPLY 누락 버그 수정**. M18 달성. tsc·lint(0 errors)·build 통과. | anakin |
 | v5.0 | 2026-06-11 | Phase 8 수익화 전체 완료 현행화 — TASK-060~065 전체 🔜→✅. Pi Tip(`/api/tips` + `pi-tip-button.tsx`), 스티커 마켓(`sticker-picker.tsx` + `/api/stickers/packs`), 인라인 트리거 8종(Trigger 1~8 전체 구현 — 배지 시스템·이벤트방 알림 포함), 이벤트 채팅방(이벤트방 탭 다이얼로그 + `room_tp_cd='E'` API), AI 어시스턴트(`@ai` 멘션→Anthropic API→`AI_REPLY`), 파일·이미지·음성 메시지(Supabase Storage + IMAGE/VOICE/FILE 타입). Phase 11 후속 고도화 섹션 추가 — DAU/WAU/MAU 통계 버그 4건(activity-log lazy thenable·Vercel Cron GET·슬라이딩 윈도우·오늘 온디맨드), Top3 가중치 점수제(활동일수×0.2 + 콘텐츠×0.3 + 결제×0.5). M16·M17 ✅ 완료 처리. 기준일·버전 헤더 갱신. | anakin |
