@@ -25,11 +25,13 @@ export async function GET() {
 
   const db = getSupabaseAdmin()
 
+  // TASK-074: 노출 범위 — 플랫폼 기본팩(ownr 없음) + 마켓 판매 커스텀팩 + 내가 만든 팩
   const { data: allPacks } = await db
     .from('msg_stkr_pack')
     .select('pack_id, pack_nm, pack_desc, price_pi, is_dflt_yn')
     .eq('use_yn', 'Y')
     .eq('del_yn', 'N')
+    .or(`ownr_usr_id.is.null,mkt_yn.eq.Y,ownr_usr_id.eq.${user.id}`)
     .order('price_pi')
 
   if (!allPacks?.length) {

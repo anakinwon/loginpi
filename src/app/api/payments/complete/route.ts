@@ -290,6 +290,67 @@ export async function POST(request: NextRequest) {
           )
         }
       }
+    } else if (meta?.type === 'PI_BET' && payment.user_uid) {
+      // PI_BET: 결제 완료 시 베팅 참가 INSERT + BET_NOTI 발송 (TASK-071)
+      const betId = String(meta.bet_id ?? '')
+      const optnNo = Number(meta.optn_no)
+      const [{ data: owner }, { data: bet }] = await Promise.all([
+        db.from('sys_user').select('id, display_name').eq('pi_uid', payment.user_uid).maybeSingle(),
+        db
+          .from('msg_bet')
+          .select('bet_id, room_id, bet_titl, bet_amt_pi, bet_st_cd, close_dtm')
+          .eq('bet_id', betId)
+          .eq('del_yn', 'N')
+          .maybeSingle(),
+      ])
+
+      if (owner && bet && Number.isInteger(optnNo) && optnNo >= 1) {
+        const ownerRow = owner as { id: string; display_name: string | null }
+        const betRow = bet as {
+          bet_id: string
+          room_id: string
+          bet_titl: string
+          bet_amt_pi: number
+          bet_st_cd: string
+          close_dtm: string | null
+        }
+        const slug = String(ownerRow.display_name ?? 'user').slice(0, 20)
+        const stillOpen =
+          betRow.bet_st_cd === 'OPEN' &&
+          (!betRow.close_dtm || new Date(betRow.close_dtm) > new Date())
+
+        // 결제 금액이 베팅 참가비 이상인지 서버 재검증
+        if (stillOpen && Number(payment.amount) + 1e-6 >= Number(betRow.bet_amt_pi)) {
+          // UNIQUE(bet_id, usr_id) — 중복 참가는 insert 에러로 자연 차단
+          const { error: entryError } = await db.from('msg_bet_entry').insert({
+            bet_id: betRow.bet_id,
+            usr_id: ownerRow.id,
+            optn_no: optnNo,
+            bet_amt_pi: betRow.bet_amt_pi,
+            pymnt_id: paymentId,
+            regr_id: slug,
+            modr_id: slug,
+          })
+
+          if (!entryError) {
+            const { data: betMsg } = await db
+              .from('msg_msg')
+              .insert({
+                room_id: betRow.room_id,
+                snd_usr_id: ownerRow.id,
+                snd_usr_nm: String(ownerRow.display_name ?? 'user'),
+                msg_cont: `🎲 ${ownerRow.display_name} 님이 "${betRow.bet_titl}" 베팅에 π${betRow.bet_amt_pi} 참가했습니다`,
+                msg_tp_cd: 'BET_NOTI',
+                regr_id: slug,
+                modr_id: slug,
+              })
+              .select()
+              .single()
+
+            if (betMsg) await broadcastToRoom(betRow.room_id, 'new_msg', betMsg)
+          }
+        }
+      }
     }
 
     // 구글 계정 연동 사용자에게 결제 영수증 이메일 발송 (비동기 — 실패해도 결제 응답에 영향 없음)

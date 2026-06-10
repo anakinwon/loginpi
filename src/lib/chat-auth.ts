@@ -64,20 +64,38 @@ const FREE_PLAN: ChatPlan = {
   caps: PLAN_CAPS.FREE,
 }
 
+// 운영자(ADMIN/MASTER) 가상 플랜 — 구독 없이도 BUSINESS 전 기능 사용·검증 가능
+const OPERATOR_PLAN: ChatPlan = {
+  plan_cd: 'OPERATOR',
+  plan_nm: 'Pi Host (운영자)',
+  tier: 'BUSINESS',
+  expire_dtm: null,
+  auto_renew_yn: null,
+  caps: PLAN_CAPS.BUSINESS,
+}
+
 // 사용자의 현재 활성 구독 플랜.
 // 만료(expire_dtm <= now)·논리삭제(del_yn='Y')는 자동 제외 → 없으면 FREE로 강등.
+// 운영자(ADMIN/MASTER)는 구독·tier와 무관하게 BUSINESS 캡 보장 (Business 전용 기능 운영·검증)
 export async function getChatPlan(userId: string): Promise<ChatPlan> {
-  const { data } = await getSupabaseAdmin()
-    .from('msg_subscr')
-    .select('plan_cd, expire_dtm, auto_renew_yn, msg_subscr_plan(plan_nm, plan_tp_cd)')
-    .eq('usr_id', userId)
-    .eq('del_yn', 'N')
-    .gt('expire_dtm', new Date().toISOString())
-    .order('expire_dtm', { ascending: false })
-    .limit(1)
-    .maybeSingle()
+  const [{ data }, { data: userRow }] = await Promise.all([
+    getSupabaseAdmin()
+      .from('msg_subscr')
+      .select('plan_cd, expire_dtm, auto_renew_yn, msg_subscr_plan(plan_nm, plan_tp_cd)')
+      .eq('usr_id', userId)
+      .eq('del_yn', 'N')
+      .gt('expire_dtm', new Date().toISOString())
+      .order('expire_dtm', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    getSupabaseAdmin().from('sys_user').select('role').eq('id', userId).maybeSingle(),
+  ])
 
-  if (!data) return FREE_PLAN
+  const isOperator =
+    (userRow as { role?: string } | null)?.role === 'ADMIN' ||
+    (userRow as { role?: string } | null)?.role === 'MASTER'
+
+  if (!data) return isOperator ? OPERATOR_PLAN : FREE_PLAN
 
   const row = data as {
     plan_cd: string
@@ -91,7 +109,9 @@ export async function getChatPlan(userId: string): Promise<ChatPlan> {
   }
 
   const planRow = Array.isArray(row.msg_subscr_plan) ? row.msg_subscr_plan[0] : row.msg_subscr_plan
-  const tier = (planRow?.plan_tp_cd ?? 'FREE') as PlanTier
+  const subscrTier = (planRow?.plan_tp_cd ?? 'FREE') as PlanTier
+  // 운영자는 구독 tier가 낮아도 BUSINESS 캡으로 승격 (구독 정보는 그대로 표시)
+  const tier = isOperator ? 'BUSINESS' : subscrTier
 
   return {
     plan_cd: row.plan_cd,

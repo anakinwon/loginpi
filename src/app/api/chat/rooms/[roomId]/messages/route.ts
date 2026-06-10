@@ -9,6 +9,7 @@ import { broadcastToRoom } from '@/lib/realtime-broadcast'
 import { recordActivity } from '@/lib/activity-log'
 import { LOCALE_CD_RE } from '@/lib/chat-translate'
 import { queueRoomTranslations } from '@/lib/chat-translate-dedup'
+import { pushRoomWebhooks } from '@/lib/chat-webhook'
 
 type Params = { params: Promise<{ roomId: string }> }
 
@@ -237,6 +238,13 @@ export async function POST(request: NextRequest, { params }: Params) {
       }).catch(err => console.error('[chat-translate] 번역 큐 오류', err)),
     )
   }
+
+  // TASK-072: 등록된 Webhook으로 신규 메시지 push (백그라운드 — Business 봇 연동)
+  after(() =>
+    pushRoomWebhooks(roomId, data).catch(err =>
+      console.error('[chat-webhook] push 오류', err),
+    ),
+  )
 
   // TASK-062 Trigger 7: 테마 활동 배지 수여 체크 (백그라운드)
   // 배지 보유 시 RPC가 인덱스 1회 조회로 즉시 반환 — 매 메시지 비용 최소

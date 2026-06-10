@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
 import { useSubscribePlan } from '@/hooks/use-subscribe-plan'
 import { InlinePurchasePrompt } from './inline-purchase-prompt'
+import { CustomStickerCreator } from './custom-sticker-creator'
 
 interface Sticker {
   stkr_id: string
@@ -38,6 +39,8 @@ export function StickerPicker({ onSelect, onClose }: StickerPickerProps) {
   const [loading, setLoading] = useState(true)
   const [buying, setBuying] = useState<string | null>(null)
   const [showSubscribePrompt, setShowSubscribePrompt] = useState(false)
+  // TASK-074: 커스텀 스티커 제작 다이얼로그 (Business — 권한은 API 검증)
+  const [showCreator, setShowCreator] = useState(false)
 
   const handleSubscribeSuccess = useCallback(() => {
     setShowSubscribePrompt(false)
@@ -144,6 +147,14 @@ export function StickerPicker({ onSelect, onClose }: StickerPickerProps) {
           </button>
         )}
         <button
+          onClick={() => setShowCreator(true)}
+          className='shrink-0 px-1 py-1.5 text-xs text-muted-foreground hover:text-foreground'
+          aria-label='커스텀 스티커 만들기'
+          title='커스텀 스티커팩 만들기 (Business)'
+        >
+          🎨
+        </button>
+        <button
           onClick={onClose}
           className='shrink-0 px-1 py-1 text-xs text-muted-foreground hover:text-foreground'
           aria-label='닫기'
@@ -184,6 +195,18 @@ export function StickerPicker({ onSelect, onClose }: StickerPickerProps) {
           </div>
         )}
       </div>
+      {/* TASK-074: 커스텀 스티커팩 제작 */}
+      {showCreator && (
+        <CustomStickerCreator
+          onCreated={() => {
+            setShowCreator(false)
+            loadPacks()
+              .then(d => { setOwnedPacks(d.ownedPacks); setStorePacks(d.storePacks) })
+              .catch(() => {})
+          }}
+          onClose={() => setShowCreator(false)}
+        />
+      )}
       <InlinePurchasePrompt
         isOpen={showSubscribePrompt}
         featureName='스티커 팩 구독'

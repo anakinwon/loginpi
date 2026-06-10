@@ -2,8 +2,8 @@
 
 Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Network 앱 플랫폼
 
-> **기준일**: 2026-06-10
-> **현재 버전**: Phase 7·10·11 완료 (PiChat MVP · 사용자 프로필 · 통계 대시보드) · Phase 12 PiTranslate™ MVP 완료 (TASK-090~097 ✅ · 098~099 대기) · Phase 8~9 대기 · **Phase 13 MyPiShop(MPS) 준비중 (TASK-100~113)**
+> **기준일**: 2026-06-11
+> **현재 버전**: Phase 7·8·9·10·11 완료 (PiChat MVP · Pi 수익화 · 생태계 확장 · 사용자 프로필 · 통계 대시보드) · Phase 12 PiTranslate™ MVP 완료 (TASK-090~097 ✅ · 098~099 대기) · **Phase 13 MyPiShop(MPS) 준비중 (TASK-100~113)**
 > **배포 URL**: https://loginpi.vercel.app
 > **기술 스택**: Next.js 16 App Router · React 19 · TypeScript 6 · Tailwind CSS v4 · NextAuth.js · Supabase PostgreSQL
 
@@ -533,93 +533,116 @@ if (meta?.type === 'CHAT_SUBSCR') {
 
 ---
 
-## Phase 8: PiChat 수익화 기능 🔜 (준비중)
+## Phase 8: PiChat 수익화 기능 ✅ (완료, 2026-06-11)
 
 > **목표**: Pi Tip·스티커 마켓·AI 봇·이벤트방·인라인 구매 트리거 8종 구현
+> **빌드 검증**: `pnpm tsc --noEmit` 통과 · `pnpm lint` 0 errors · `pnpm build` 성공
 
-### TASK-060: Pi Tip (인라인 결제 + TIP_NOTI 메시지) 🔜
+### TASK-060: Pi Tip (인라인 결제 + TIP_NOTI 메시지) ✅ 완료
 
-- 🔜 `src/components/chat/pi-tip-button.tsx` — 채팅창 내 Tip 버튼
-- 🔜 `POST /api/tips` — Tip 기록 (metadata.type=`PI_TIP`, 금액 서버 재검증)
-- 🔜 Pi Tip 수신 시 `TIP_NOTI` 타입 메시지 자동 발송
-- 🔜 트리거 2 구현: TIP_NOTI → "나도 팁 보내기" → Free 사용자 단건/구독 선택
+- ✅ `src/components/chat/pi-tip-button.tsx` — 채팅창 내 Tip 버튼 (Pi SDK U2A 결제 연동)
+- ✅ `POST /api/tips/route.ts` — Tip 기록 (metadata.type=`PI_TIP`, 금액 서버 재검증)
+- ✅ Pi Tip 수신 시 `TIP_NOTI` 타입 메시지 자동 발송 → 수신자 실시간 알림
+- ✅ 트리거 2 구현: TIP_NOTI "나도 팁 보내기" → Free 사용자 단건/구독 업셀 선택
+- ✅ 차트 테마 레이블 한국어화 + Tip 결제 완료 처리 (Pi payments/complete 분기)
 
-### TASK-061: 스티커 마켓 (테마별 팩 + 인라인 업셀) 🔜
+### TASK-061: 스티커 마켓 (테마별 팩 + 인라인 업셀) ✅ 완료
 
-- 🔜 `src/components/chat/sticker-picker.tsx` — 스티커 선택 UI (기본 3개 + 하단 업셀)
-- 🔜 `GET /api/stickers/packs` — 테마별 스티커 팩 마켓
-- 🔜 `POST /api/stickers/packs` — 스티커 팩 구매 (metadata.type=`STICKER_PACK`)
-- 🔜 트리거 1 구현: 스티커 메뉴 하단 업셀 배너
+- ✅ `src/components/chat/sticker-picker.tsx` — 스티커 선택 UI (기본 3개 팩 + 하단 업셀 배너)
+- ✅ `GET /api/stickers/packs` — 테마별 스티커 팩 마켓 (msg_sticker_pack 조회)
+- ✅ `POST /api/stickers/packs` — 스티커 팩 구매 (metadata.type=`STICKER_PACK`, Pi U2A)
+- ✅ `chat-input.tsx` 스티커 전송 통합 (STICKER 타입 메시지)
+- ✅ 트리거 1 구현: 스티커 메뉴 하단 업셀 배너 (미구매 팩 자동 하이라이트)
 
-### TASK-062: 인라인 구매 트리거 8종 구현 🔜
+### TASK-062: 인라인 구매 트리거 8종 구현 ✅ 완료
 
-| 트리거 | 발동 조건 | 구현 내용 |
+| 트리거 | 발동 조건 | 구현 상태 |
 |---|---|---|
-| 1 스티커 업셀 | 스티커 메뉴 열 때 | `sticker-picker.tsx` 하단 배너 |
-| 2 Tip 수신→보내기 | TIP_NOTI "보내기" 클릭 | `inline-purchase-prompt.tsx` |
-| 3 AI 한도 초과 | AI 사용 한도 도달 | `chat-input.tsx` AI 응답 실패 시 |
-| 4 메시지 만료 경고 | 7일 내 만료 메시지 존재 | 채팅방 입장 시 상단 배너 |
-| 5 정원 초과 | 멤버 수 = max_mbr_cnt | 방장 대상 알림 팝업 |
-| 6 프리미엄 테마 잠금 | PREMIUM 테마 클릭 | `theme-selector.tsx` 잠금 팝업 |
-| 7 배지 강화 | 테마 배지 수여 시 | 프로필 화면 팝업 |
-| 8 이벤트방 알림 | 팔로우 테마 이벤트 개설 | 푸시 알림 + 채팅 홈 배너 |
+| 1 스티커 업셀 | 스티커 메뉴 열 때 | ✅ `sticker-picker.tsx` 하단 배너 |
+| 2 Tip 수신→보내기 | TIP_NOTI "보내기" 클릭 | ✅ `inline-purchase-prompt.tsx` |
+| 3 AI 한도 초과 | AI 사용 한도 도달 | ✅ `chat-input.tsx` AI 응답 실패 시 |
+| 4 메시지 만료 경고 | 7일 내 만료 메시지 존재 | ✅ 채팅방 입장 시 상단 배너 |
+| 5 정원 초과 | 멤버 수 = max_mbr_cnt | ✅ 방장 대상 알림 팝업 |
+| 6 프리미엄 테마 잠금 | PREMIUM 테마 클릭 | ✅ `theme-selector.tsx` 잠금 팝업 |
+| 7 배지 강화 | 테마 배지 수여 시 | ✅ Trigger 7 테마 활동 배지 시스템 (`50d12d2`) |
+| 8 이벤트방 알림 | 팔로우 테마 이벤트 개설 | ✅ 채팅 홈 배너 (`8448284`) |
 
-### TASK-063: 이벤트 채팅방 (유료 입장 + 방장 수익 분배) 🔜
+### TASK-063: 이벤트 채팅방 (유료 입장 + 방장 수익 분배) ✅ 완료
 
-- 🔜 `room_tp_cd='E'` 이벤트방 생성 — `entry_fee_pi`, `entry_expire_dtm` 설정
-- 🔜 입장 시 Pi 결제 (metadata.type=`EVENT_ROOM_JOIN`)
-- 🔜 `msg_room_mbr(GUEST, expire_dtm=이벤트종료)` — 임시 멤버십
-- 🔜 방장 Pi 수익 분배 로직 (플랫폼 수수료 0% 초기 3년 정책)
-- 🔜 트리거 8 구현: 테마 팔로우 사용자 이벤트 알림
+- ✅ `room_tp_cd='E'` 이벤트방 생성 — `entry_fee_pi`, `entry_expire_dtm` 설정
+- ✅ 입장 시 Pi 결제 (metadata.type=`EVENT_ROOM_JOIN`)
+- ✅ `msg_room_mbr(GUEST, expire_dtm=이벤트종료)` — 임시 멤버십
+- ✅ 방장 Pi 수익 분배 로직 (플랫폼 수수료 0% 초기 3년 정책)
+- ✅ 채팅방 만들기 다이얼로그에 "이벤트방" 탭 추가 (`c532607`)
+- ✅ 트리거 8 구현: 테마 팔로우 사용자 이벤트 알림
 
-### TASK-064: AI 채팅 비서 (`@ai` 멘션 + 테마별 프롬프트) 🔜
+### TASK-064: AI 채팅 비서 (`@ai` 멘션 + 테마별 프롬프트) ✅ 완료
 
-- 🔜 `src/lib/chat-ai-prompts.ts` — 테마별 Claude 시스템 프롬프트 매핑
+- ✅ `src/lib/chat-ai-prompts.ts` — 테마별 Claude 시스템 프롬프트 매핑
   - 골프방: 골프 코치 · 먹방방: 칼로리·영양 전문가 · 여행방: 여행 플래너·번역
-- 🔜 메시지 내 `@ai` 멘션 파싱 → Anthropic API 호출 → `SYSTEM` 타입 메시지 발송
-- 🔜 AI 사용 한도 체크 (Free: 불가/0.05 Pi · Premium: 10회/월 · Business: 무제한)
-- 🔜 트리거 3 구현: AI 한도 초과 인라인 구매
+- ✅ 메시지 내 `@ai` 멘션 파싱 → Anthropic API 호출 → `AI_REPLY` 타입 메시지 발송
+- ✅ AI 사용 한도 체크 (Free: 불가/0.05 Pi · Premium: 10회/월 · Business: 무제한)
+- ✅ 트리거 3 구현: AI 한도 초과 인라인 구매 프롬프트
 
-### TASK-065: 파일·이미지·음성 메시지 (Supabase Storage) 🔜
+### TASK-065: 파일·이미지·음성 메시지 (Supabase Storage) ✅ 완료
 
-- 🔜 `msg_attch` 테이블 활용 — `IMAGE`/`FILE`/`VOICE` 타입 메시지
-- 🔜 파일 업로드: MIME 화이트리스트, 크기 강제 (Premium: 100MB/월, Business: 1GB/월)
-- 🔜 음성 메시지 녹음: Free 30초 / Premium 1분 / Business 5분
-- 🔜 Supabase Storage `chat-attachments` 버킷
+- ✅ `msg_attch` 테이블 활용 — `IMAGE`/`FILE`/`VOICE` 타입 메시지
+- ✅ 파일 업로드: MIME 화이트리스트, 크기 강제 (Premium: 100MB/월, Business: 1GB/월)
+- ✅ 음성 메시지 녹음: Free 30초 / Premium 1분 / Business 5분
+- ✅ Supabase Storage `chat-attachments` 버킷 연동
 
 ---
 
-## Phase 9: PiChat 생태계 확장 🔜 (준비중)
+## Phase 9: PiChat 생태계 확장 ✅ (완료, 2026-06-11)
 
 > **목표**: 마켓플레이스·Webhook·분석 대시보드·커스텀 스티커로 Pi 커뮤니티 생태계 구축
+> **DB**: `sql/022_chat_ecosystem.sql` — 신규 5개 테이블 + RPC 3종 + msg_msg CHECK 확장 (Supabase 적용 완료)
+> **빌드 검증**: `pnpm tsc --noEmit` 통과 · `pnpm lint` 0 errors · `pnpm build` 성공 (신규 라우트 12종 확인)
+> ⚠️ **버그 수정 포함**: `msg_msg` CHECK 제약에 `AI_REPLY` 누락 — TASK-064 AI 응답 INSERT가 조용히 실패하던 잠재 버그를 022 마이그레이션에서 해소
 
-### TASK-070: 채팅 마켓플레이스 (테마별 공개방 디렉토리) 🔜
+### TASK-070: 채팅 마켓플레이스 (테마별 공개방 디렉토리) ✅ 완료
 
-- 🔜 `src/app/[locale]/chat/page.tsx` — 테마별 공개방 탐색 (테마 필터 칩)
-- 🔜 인기 채팅방 랭킹 (멤버 수, 최근 메시지, Pi Tip 수령량 기준)
-- 🔜 테마 팔로우 — 신규 이벤트방 알림 구독
+- ✅ `GET /api/chat/marketplace?theme=` — 공개 그룹·이벤트방 디렉토리 (테마 필터)
+- ✅ `fn_chat_marketplace` RPC — 인기 랭킹 (점수 = 멤버수×2 + 주간 메시지×0.5 + 주간 Tip×10)
+- ✅ `msg_theme_follow` 테이블 + `POST/DELETE /api/chat/themes/[themeCd]/follow` (UPSERT 재팔로우 안전)
+- ✅ `chat-marketplace.tsx` — 테마 필터 칩 + 🥇🥈🥉 랭킹 + 팔로우 토글 (낙관적 업데이트), 채팅 홈 통합
 
-### TASK-071: Pi Bet 투표 🔜
+### TASK-071: Pi Bet 투표 ✅ 완료
 
-- 🔜 채팅방 내 베팅 이벤트 생성 (방장 권한)
-- 🔜 참가자 Pi 베팅 → 결과 확정 시 승리자 Pi 분배
-- 🔜 베팅 메시지 타입 추가 (`msg_tp_cd='BET_NOTI'`)
+- ✅ `msg_bet` / `msg_bet_optn` / `msg_bet_entry` 테이블 (UNIQUE(bet_id, usr_id) — 1인 1회)
+- ✅ `GET/POST /api/chat/rooms/[roomId]/bets` — 목록(옵션·참가 현황·내 참가) + 생성(방장 전용, 옵션 2~10개)
+- ✅ `POST .../bets/[betId]/entries` — 참가 준비 (서버가 금액 결정, /api/tips 패턴)
+- ✅ `payments/complete` PI_BET 분기 — 금액 서버 재검증 + OPEN 상태 확인 + entry INSERT + BET_NOTI
+- ✅ `POST .../bets/[betId]/settle` — 생성자 정산: 풀 균등 분배(소수 4자리 절사), 조건부 UPDATE로 동시 정산 race 방지
+- ✅ `msg_tp_cd='BET_NOTI'` 추가 (CHECK 확장 + 중앙 정렬 알림 렌더)
+- ✅ `pi-bet-panel.tsx` — 채팅방 헤더 🎲 버튼 → 생성·참가(Pi U2A)·정산 패널
+- ℹ️ 승자 Pi 분배는 `payout_pi` 장부 기록 — 실송금(A2U)은 Pi SDK 지원 시 후속 (PiRC2 구독과 동일 전략)
 
-### TASK-072: 채팅 봇·Webhook 연동 (Business 전용) 🔜
+### TASK-072: 채팅 봇·Webhook 연동 (Business 전용) ✅ 완료
 
-- 🔜 Webhook URL 등록 → 채팅방 신규 메시지 Push 알림
-- 🔜 봇 메시지 전송 API (API Key 기반)
-- 🔜 `src/app/api/admin/chat/webhooks/route.ts`
+- ✅ `msg_webhook` 테이블 (api_key UNIQUE, bot_nm, webhook_url nullable)
+- ✅ `GET/POST/DELETE /api/chat/rooms/[roomId]/webhooks` — 방장+BUSINESS 게이트, 방당 5개 제한, api_key 등록 시 1회만 전체 노출
+- ✅ SSRF 이중 방어 — `validateWebhookUrl()`: https 강제 + DNS 해석 후 loopback·사설(10/8, 172.16/12, 192.168/16)·link-local(169.254 메타데이터)·IPv6 내부 대역 차단, 등록·발송 양 시점 재검증(DNS rebinding 대비) + `redirect: 'manual'`(302 우회 차단)
+- ✅ 신규 메시지 Webhook push — `chat-webhook.ts`, messages POST `after()` 백그라운드 (5초 타임아웃, 개별 실패 격리)
+- ✅ `POST /api/chat/bot/messages` — `Authorization: Bot <api_key>` 인증 봇 전송 (분당 30건 rate limit)
+- ✅ `GET /api/admin/chat/webhooks` — 어드민 전체 현황 (api_key 마스킹)
 
-### TASK-073: 분석 대시보드 (Business 전용) 🔜
+### TASK-073: 분석 대시보드 (Business 전용) ✅ 완료
 
-- 🔜 채팅방별 MAU, 메시지 수, Pi 수익, 멤버 증감 통계
-- 🔜 `src/app/[locale]/chat/[roomId]/analytics/page.tsx`
+- ✅ `fn_room_analytics` RPC — 일별 메시지·활성 사용자·Tip 수익·신규 멤버 (generate_series 빈 날짜 0 채움)
+- ✅ `fn_room_mau` RPC — 기간 고유 발신자 (일별 합산 아닌 중복 제거)
+- ✅ `GET /api/chat/rooms/[roomId]/analytics?days=7|30|90` — 방장+BUSINESS 게이트
+- ✅ `src/app/[locale]/chat/[roomId]/analytics/page.tsx` + `room-analytics.tsx` — 요약 카드 4종 + plotly 차트 2종 (기존 plotly-plot ssr:false 래퍼 재사용), 채팅방 헤더 📊 진입
+- ✅ redirect 없는 클라이언트 위임 (Pi Browser 무한 루프 방지 패턴 준수)
 
-### TASK-074: 커스텀 스티커 제작 (Business 전용) 🔜
+### TASK-074: 커스텀 스티커 제작 (Business 전용) ✅ 완료
 
-- 🔜 이미지 업로드 → 스티커팩 생성 (팩당 10개, 0.5 Pi)
-- 🔜 내 채팅방 전용 스티커 + 마켓플레이스 판매 옵션
+- ✅ `POST /api/stickers/custom` — multipart 이미지 1~10장 (png/jpg/gif/webp 2MB, SVG 제외 — XSS), BUSINESS 게이트, 사용자당 팩 10개 제한
+- ✅ `msg_stkr_pack.ownr_usr_id`(제작자) + `mkt_yn`(마켓 판매 여부) 컬럼 추가
+- ✅ 노출 규칙: 플랫폼 기본팩 + 마켓 판매팩(mkt_yn='Y') + 내 팩만 — `/api/stickers/packs` 필터 확장
+- ✅ 제작자 자동 보유(msg_usr_stkr) — 마켓 판매 시 구매자는 기존 STICKER_PACK 결제 흐름 재사용
+- ✅ `custom-sticker-creator.tsx` — 스티커 피커 🎨 버튼 → 제작 다이얼로그 (미리보기·판매 옵션)
+- ℹ️ PRD의 제작비 0.5 Pi는 **Business 플랜 포함**으로 처리 (BUSINESS 전용 기능 — 별도 결제 흐름 생략)
 
 ---
 
@@ -747,6 +770,22 @@ if (meta?.type === 'CHAT_SUBSCR') {
 - ✅ `npx next build` 통과 — Plotly `dynamic ssr:false` 빌드 정상
 - ✅ `fn_build_daily_stats` 멱등성 확인 — `stat_actvty_dly` 5일치, `stat_revenue_dly` 4일치 실데이터 Supabase 적재 완료
 - ⏳ Pi Browser 어드민 piFetch 인증 (PC 브라우저 권장 안내 — 실기기 검증 후 최종 완료)
+
+### Phase 11 후속 고도화 ✅ 완료 (2026-06-11)
+
+#### 버그픽스 4건 (`6170b4d`) ✅
+
+- ✅ `activity-log.ts` lazy thenable 버그 수정 — `recordActivity()` Promise 미await으로 집계 누락 방지
+- ✅ Vercel Cron GET 핸들러 추가 — `vercel.json` Cron은 GET 요청 발송, 기존 POST 전용 핸들러 누락 수정
+- ✅ WAU/MAU 슬라이딩 윈도우 쿼리 수정 — `stat_actvty_dly` 기준 7일/30일 범위 off-by-one 해소
+- ✅ 오늘 온디맨드 집계 — 당일 데이터는 rollup 테이블 없어 직접 집계 fallback 추가
+
+#### 활성 사용자 Top 3 가중치 점수제 개편 (`bf29103`) ✅
+
+- ✅ 단순 활동일수 → 종합 가중치 점수제로 전환
+  - 점수 = 활동일수 × 0.2 + 콘텐츠활동수 × 0.3 + 결제건수 × 0.5
+  - 결제 활성 사용자를 상위로 부상시켜 수익화 기여도 반영
+- ✅ `fn_top_active_users` RPC 수정 — Supabase 재배포 완료
 
 ---
 
@@ -986,9 +1025,9 @@ if (meta?.type === 'CHAT_SUBSCR') {
 | M13: Next.js 16 + TypeScript 6 | 기술 업그레이드 | 2026-06-07 | Next.js 16.2.7, TypeScript 6.0.3, eslint-config-next@16, FlatCompat 제거 | ✅ 완료 |
 | M14: PiChat DB + 테마 마스터 | Phase 7 | 2026-06-08 | msg_* 13개 테이블, 테마 20개, 플랜 5개, 스티커팩 60개 | ✅ 완료 |
 | M15: PiChat MVP | Phase 7 | 2026-06-08 | 그룹 채팅방 생성 4단계 마법사 (테마 선택 + Pi 결제), 채팅 홈, 채팅방 페이지 | ✅ 완료 |
-| M16: Pi 수익화 | Phase 8 | — | Pi Tip, 스티커 마켓, 인라인 트리거 8종, AI 봇, 이벤트방 | 🔜 준비중 |
-| M17: 미디어 메시지 | Phase 8 | — | 파일·이미지·음성 메시지 (Supabase Storage) | 🔜 준비중 |
-| M18: PiChat 생태계 | Phase 9 | — | 마켓플레이스, Pi Bet, Webhook, 분석 대시보드, 커스텀 스티커 | 🔜 준비중 |
+| M16: Pi 수익화 | Phase 8 | 2026-06-11 | Pi Tip, 스티커 마켓, 인라인 트리거 8종, AI 봇, 이벤트방 | ✅ 완료 |
+| M17: 미디어 메시지 | Phase 8 | 2026-06-11 | 파일·이미지·음성 메시지 (Supabase Storage) | ✅ 완료 |
+| M18: PiChat 생태계 | Phase 9 | 2026-06-11 | 마켓플레이스, Pi Bet, Webhook, 분석 대시보드, 커스텀 스티커 (sql/022 + API 12종 + UI 4종) | ✅ 완료 |
 | M19: 사용자 프로필 | Phase 10 | 2026-06-09 | 마이페이지 (개인정보·결제내역·구독현황), Pi Browser ClientGate | ✅ 완료 |
 | M20: 어드민 통계 대시보드 | Phase 11 | 2026-06-09 | DAU/WAU/MAU·테마별 매출 (react-plotly.js + 중간집계 rollup) | ✅ 완료 |
 | M21: PiTranslate™ MVP | Phase 12 | 2026-06-10 | sql/020 + chat-translate.ts + dedup + translate API + broadcast 확장 + 표시언어 설정 + 원문 토글 (TASK-090~097) | ✅ 완료 |
@@ -1052,3 +1091,5 @@ if (meta?.type === 'CHAT_SUBSCR') {
 | v3.0 | 2026-06-10 | Phase 12 추가 고도화 — 방별 번역 언어 콤보(`chat-locale-select.tsx`, 방 헤더 제목 옆, localStorage 방별 독립 저장) + `translate-batch` API(캐시 우선 일괄 번역) + `forceTranslate` 모드(전체 메시지 강제 번역·언어 변경 시 재번역) + 채팅 레이아웃 고정(헤더·입력창 `shrink-0`, 본문만 `min-h-0` 스크롤) + 헤더 ChatRoomPanel 통합 + `locale-options.ts` 단일 소스. tsc·build 통과. | anakin |
 | v2.9 | 2026-06-10 | Phase 12 PiTranslate™ MVP 구현 완료 — TASK-090~097. `sql/020_msg_trans.sql`(018·019 선점으로 번호 조정, Supabase 적용 완료), `chat-translate.ts`(Gemini 2.0 Flash REST + Claude Haiku fallback), `chat-translate-dedup.ts`(pending map + 번역 큐 + broadcast 내장), translate API 라우트, 메시지 POST `after()` 번역 큐 + GET locale pre-populate, `use-chat-room.ts` msg_trans 구독 + 수신 자동 번역 요청, 프로필 표시 언어 드롭다운(203 locale), `translated-message.tsx` 원문 토글. tsc·lint(0 errors)·build 통과. M21 달성. TASK-098(어드민 번역 통계)·099(품질 피드백)는 후속. | anakin |
 | v4.0 | 2026-06-10 | Phase 13 MyPiShop(MPS) 로드맵 추가 — TASK-100~113 (`PRD_8_MPS.md` v1.1 수용). PiRC2 U2A 가상 에스크로·`stock_qty` 원자적 차감 불변 조건·`mps_` 6개 테이블(sql/021_mps.sql)·lib 헬퍼 3종·API 12종·화면 6종(SCR-01~06) Phase 1 MVP / TASK-108~111 Phase 2 확장 / TASK-112~113 Phase 3 PiRC3 마이그레이션. M22 마일스톤 추가. 현재 버전 헤더 갱신. | anakin |
+| v5.1 | 2026-06-11 | Phase 9 PiChat 생태계 완료 — TASK-070~074 전체 구현. `sql/022_chat_ecosystem.sql`(msg_theme_follow·msg_bet·msg_bet_optn·msg_bet_entry·msg_webhook + fn_chat_marketplace·fn_room_analytics·fn_room_mau RPC). 마켓플레이스(테마 필터+가중 랭킹+팔로우), Pi Bet(생성·U2A 참가·균등 분배 정산·BET_NOTI), Webhook·봇(API Key 인증·메시지 push·어드민 현황), 분석 대시보드(일별 통계+MAU+plotly), 커스텀 스티커(ownr_usr_id·mkt_yn·노출 규칙). **msg_msg CHECK AI_REPLY 누락 버그 수정**. M18 달성. tsc·lint(0 errors)·build 통과. | anakin |
+| v5.0 | 2026-06-11 | Phase 8 수익화 전체 완료 현행화 — TASK-060~065 전체 🔜→✅. Pi Tip(`/api/tips` + `pi-tip-button.tsx`), 스티커 마켓(`sticker-picker.tsx` + `/api/stickers/packs`), 인라인 트리거 8종(Trigger 1~8 전체 구현 — 배지 시스템·이벤트방 알림 포함), 이벤트 채팅방(이벤트방 탭 다이얼로그 + `room_tp_cd='E'` API), AI 어시스턴트(`@ai` 멘션→Anthropic API→`AI_REPLY`), 파일·이미지·음성 메시지(Supabase Storage + IMAGE/VOICE/FILE 타입). Phase 11 후속 고도화 섹션 추가 — DAU/WAU/MAU 통계 버그 4건(activity-log lazy thenable·Vercel Cron GET·슬라이딩 윈도우·오늘 온디맨드), Top3 가중치 점수제(활동일수×0.2 + 콘텐츠×0.3 + 결제×0.5). M16·M17 ✅ 완료 처리. 기준일·버전 헤더 갱신. | anakin |

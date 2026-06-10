@@ -24,6 +24,10 @@ const STD_NAV = [
   { href: '/admin/std/approvals', labelKey: 'stdApprovals' },
 ] as const
 
+const CHAT_NAV = [
+  { href: '/admin/subscriptions', labelKey: 'subscriptions' },
+] as const
+
 const I18N_NAV = [
   { href: '/admin/i18n', labelKey: 'i18n' },
 ] as const
@@ -62,6 +66,13 @@ export function AdminSidebar() {
           {t('stdSection')}
         </p>
         {STD_NAV.map(({ href, labelKey }) => (
+          <NavItem key={href} href={href} label={t(labelKey)} pathname={pathname} />
+        ))}
+
+        <p className='text-muted-foreground px-3 pt-3 pb-1 text-xs font-semibold tracking-wide uppercase'>
+          {t('chatSection')}
+        </p>
+        {CHAT_NAV.map(({ href, labelKey }) => (
           <NavItem key={href} href={href} label={t(labelKey)} pathname={pathname} />
         ))}
 

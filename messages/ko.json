@@ -197,6 +197,8 @@
       "i18nSection": "다국어",
       "i18n": "다국어 관리",
       "batch": "온디멘드 배치",
+      "chatSection": "채팅 관리",
+      "subscriptions": "구독 관리",
       "backHome": "← 홈으로"
     },
     "batch": {
@@ -597,5 +599,45 @@
       "cancelError":     "취소에 실패했습니다. 다시 시도해 주세요."
     },
     "loginRequired": "로그인이 필요합니다"
+  },
+  "adminSubscriptions": {
+    "title": "구독 관리",
+    "desc": "전체 {count}건 · Business {business}건 · Premium {premium}건",
+    "noData": "활성 구독이 없습니다.",
+    "filter": {
+      "all": "전체",
+      "business": "Business",
+      "premium": "Premium"
+    },
+    "col": {
+      "user": "사용자",
+      "plan": "플랜",
+      "tier": "등급",
+      "expireAt": "만료일",
+      "autoRenew": "자동갱신",
+      "startAt": "시작일",
+      "manage": "관리"
+    },
+    "expired": "만료됨",
+    "dday": "D-{n}",
+    "autoRenewYes": "O",
+    "autoRenewNo": "-",
+    "extend": "연장",
+    "revoke": "취소",
+    "revokeConfirm": "\"{name}\"님의 구독을 취소할까요?",
+    "revokeSuccess": "구독이 취소됐습니다",
+    "revokeFail": "취소 실패",
+    "extendSuccess": "만료일이 연장됐습니다",
+    "extendFail": "연장 실패",
+    "grantTitle": "구독 수동 부여",
+    "grantUsrId": "사용자 ID (UUID)",
+    "grantPlan": "플랜",
+    "grantMonths": "기간(개월)",
+    "grantBtn": "부여",
+    "granting": "처리 중…",
+    "grantSuccess": "구독이 부여됐습니다",
+    "grantFail": "부여 실패",
+    "grantValidation": "사용자 ID와 플랜을 선택해 주세요",
+    "extendMonths": "연장 개월 수"
   }
 }

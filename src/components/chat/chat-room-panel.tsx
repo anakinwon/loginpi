@@ -10,6 +10,7 @@ import { ChatInput } from './chat-input'
 import { ChatLocaleSelect } from './chat-locale-select'
 import { InlinePurchasePrompt } from './inline-purchase-prompt'
 import { BadgeAwardPopup, type BadgeAwardInfo } from './badge-award-popup'
+import { PiBetPanel } from './pi-bet-panel'
 
 interface ChatRoomPanelProps {
   roomId: string
@@ -55,6 +56,8 @@ export function ChatRoomPanel({
   // TASK-062 Trigger 7: 배지 수여 축하 팝업 + 강화 배지 헤더 상시 표시
   const [badgeAward, setBadgeAward] = useState<BadgeAwardInfo | null>(null)
   const [upgradedBadge, setUpgradedBadge] = useState<BadgeAwardInfo | null>(null)
+  // TASK-071: Pi Bet 패널
+  const [betPanelOpen, setBetPanelOpen] = useState(false)
 
   // 방 입장 시 이 방에 저장된 번역 언어 복원 (외부 저장소 구독 — 방별 독립)
   useEffect(() => {
@@ -179,6 +182,24 @@ export function ChatRoomPanel({
             <p className='truncate text-xs text-muted-foreground'>{roomDesc}</p>
           )}
         </div>
+        {/* TASK-073: 분석 대시보드 (Business — 권한은 API가 검증) */}
+        <Link
+          href={`/chat/${roomId}/analytics`}
+          className='shrink-0 text-lg transition-transform hover:scale-110'
+          aria-label='채팅방 분석'
+          title='채팅방 분석 (Business)'
+        >
+          📊
+        </Link>
+        {/* TASK-071: Pi Bet 패널 열기 */}
+        <button
+          onClick={() => setBetPanelOpen(true)}
+          className='shrink-0 text-lg transition-transform hover:scale-110'
+          aria-label='Pi Bet'
+          title='Pi Bet 투표'
+        >
+          🎲
+        </button>
         {/* PiTranslate™ 방별 번역 언어 콤보 — 구독자 전용 특혜 */}
         <ChatLocaleSelect value={viewLocale} onChange={handleLocaleChange} isSubscribed={isSubscribed} />
       </header>
@@ -262,6 +283,9 @@ export function ChatRoomPanel({
         onUpgraded={onBadgeUpgraded}
         onClose={() => setBadgeAward(null)}
       />
+
+      {/* TASK-071: Pi Bet 패널 */}
+      {betPanelOpen && <PiBetPanel roomId={roomId} onClose={() => setBetPanelOpen(false)} />}
 
       {/* Trigger 3: AI 봇 한도 초과 업그레이드 모달 */}
       <InlinePurchasePrompt

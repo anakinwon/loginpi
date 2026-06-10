@@ -1,4 +1,5 @@
 import 'server-only'
+import { randomBytes, scryptSync, timingSafeEqual } from 'node:crypto'
 import { getSupabaseAdmin } from './supabase-admin'
 
 export interface MsgRoom {
@@ -12,9 +13,33 @@ export interface MsgRoom {
   entry_fee_pi: number
   entry_expire_dtm: string | null
   pymnt_id: string | null
+  join_pwd_hash: string | null
   del_yn: 'Y' | 'N'
   reg_dtm: string
   mod_dtm: string
+}
+
+// 비밀방 입장 비밀번호 해시 — scrypt(salt 내장). 형식: scrypt$<saltHex>$<hashHex>
+export function hashRoomPassword(plain: string): string {
+  const salt = randomBytes(16)
+  const hash = scryptSync(plain, salt, 64)
+  return `scrypt$${salt.toString('hex')}$${hash.toString('hex')}`
+}
+
+export function verifyRoomPassword(plain: string, stored: string | null): boolean {
+  if (!stored) return false
+  const parts = stored.split('$')
+  if (parts.length !== 3 || parts[0] !== 'scrypt') return false
+  const salt = Buffer.from(parts[1], 'hex')
+  const expected = Buffer.from(parts[2], 'hex')
+  const actual = scryptSync(plain, salt, expected.length)
+  return expected.length === actual.length && timingSafeEqual(expected, actual)
+}
+
+// 비밀번호 해시를 제거한 안전한 방 객체 — API 응답 직렬화용 (해시 유출 방지)
+export function toPublicRoom(room: MsgRoom): Omit<MsgRoom, 'join_pwd_hash'> & { has_join_pwd: boolean } {
+  const { join_pwd_hash, ...rest } = room
+  return { ...rest, has_join_pwd: !!join_pwd_hash }
 }
 
 export interface MsgMsg {
@@ -23,7 +48,7 @@ export interface MsgMsg {
   snd_usr_id: string
   snd_usr_nm: string
   msg_cont: string | null
-  msg_tp_cd: 'TEXT' | 'IMAGE' | 'FILE' | 'VOICE' | 'STICKER' | 'TIP_NOTI' | 'SYSTEM' | 'AI_REPLY'
+  msg_tp_cd: 'TEXT' | 'IMAGE' | 'FILE' | 'VOICE' | 'STICKER' | 'TIP_NOTI' | 'SYSTEM' | 'AI_REPLY' | 'BET_NOTI'
   attch_url: string | null
   stkr_id: string | null
   ref_msg_id: string | null
@@ -218,6 +243,44 @@ export async function createEventRoom(params: {
   })
 
   return room as MsgRoom
+}
+
+// 채팅방 수정 (방장 전용) — 공개/비밀 전환·비밀번호·이름·설명·정원
+// 권한 검증은 호출부(API)에서 OWNER 확인 후 진입한다.
+export interface RoomUpdateInput {
+  room_nm?: string
+  room_desc?: string | null
+  is_public_yn?: 'Y' | 'N'
+  max_mbr_cnt?: number
+  // 비밀번호 처리: undefined=변경 안 함, null=제거, string=신규 설정(해시는 호출부에서)
+  join_pwd_hash?: string | null
+}
+
+export async function updateRoom(
+  roomId: string,
+  displayName: string,
+  input: RoomUpdateInput,
+): Promise<MsgRoom | null> {
+  const patch: Record<string, unknown> = {
+    modr_id: displayName.slice(0, 20),
+    mod_dtm: new Date().toISOString(),
+  }
+  if (input.room_nm !== undefined) patch.room_nm = input.room_nm
+  if (input.room_desc !== undefined) patch.room_desc = input.room_desc
+  if (input.is_public_yn !== undefined) patch.is_public_yn = input.is_public_yn
+  if (input.max_mbr_cnt !== undefined) patch.max_mbr_cnt = input.max_mbr_cnt
+  if (input.join_pwd_hash !== undefined) patch.join_pwd_hash = input.join_pwd_hash
+
+  const { data, error } = await getSupabaseAdmin()
+    .from('msg_room')
+    .update(patch)
+    .eq('room_id', roomId)
+    .eq('del_yn', 'N')
+    .select()
+    .single()
+
+  if (error || !data) return null
+  return data as MsgRoom
 }
 
 // rate limiting: 최근 1초 내 해당 사용자의 메시지 수

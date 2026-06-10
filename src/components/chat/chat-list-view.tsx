@@ -2,6 +2,7 @@
 
 import { Link } from '@/i18n/navigation'
 import { GroupRoomCreator } from '@/components/chat/group-room-creator'
+import { ChatMarketplace } from '@/components/chat/chat-marketplace'
 
 // 서버(SSR)·클라이언트(Pi Browser 게이트) 양쪽에서 공유하는 채팅 목록 표현 컴포넌트.
 // 데이터 로딩은 각 호출부가 담당하고, 이 컴포넌트는 렌더링만 책임진다.
@@ -157,7 +158,7 @@ export function ChatListView({
 
       {/* 공개 채팅방 탐색 — PREMIUM 테마 먼저 */}
       {sortedDiscover.length > 0 && (
-        <section>
+        <section className='mb-8'>
           <SectionHeader label='채팅방 탐색' />
           <div className='space-y-2'>
             {sortedDiscover.map(room => (
@@ -166,6 +167,9 @@ export function ChatListView({
           </div>
         </section>
       )}
+
+      {/* TASK-070: 마켓플레이스 — 테마 필터 + 인기 랭킹 + 테마 팔로우 */}
+      <ChatMarketplace />
     </div>
   )
 }

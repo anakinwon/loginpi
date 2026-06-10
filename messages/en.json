@@ -533,6 +533,8 @@
       "stdApprovals": "Approval Workflow",
       "i18nSection": "Multilingual",
       "i18n": "Multilingual Management",
+      "chatSection": "Chat Management",
+      "subscriptions": "Subscriptions",
       "backHome": "← Back to Home",
       "dashboard": "Dashboard",
       "stats": "Statistics",
@@ -560,5 +562,46 @@
       "from": "From",
       "to": "To"
     }
+  },
+  "adminSubscriptions": {
+    "title": "Subscription Management",
+    "desc": "Total {count} · Business {business} · Premium {premium}",
+    "noData": "No active subscriptions.",
+    "filter": {
+      "all": "All",
+      "business": "Business",
+      "premium": "Premium"
+    },
+    "col": {
+      "user": "User",
+      "plan": "Plan",
+      "tier": "Tier",
+      "expireAt": "Expires",
+      "autoRenew": "Auto-renew",
+      "startAt": "Started",
+      "manage": "Manage"
+    },
+    "expired": "Expired",
+    "dday": "D-{n}",
+    "autoRenewYes": "O",
+    "autoRenewNo": "-",
+    "extend": "Extend",
+    "revoke": "Revoke",
+    "revokeConfirm": "Revoke subscription for \"{name}\"?",
+    "revokeSuccess": "Subscription revoked",
+    "revokeFail": "Revoke failed",
+    "extendSuccess": "Expiry date extended",
+    "extendFail": "Extend failed",
+    "grantTitle": "Grant Subscription",
+    "grantUsrId": "User ID (UUID)",
+    "grantPlan": "Plan",
+    "grantMonths": "Duration (months)",
+    "grantBtn": "Grant",
+    "granting": "Processing…",
+    "grantSuccess": "Subscription granted",
+    "grantFail": "Grant failed",
+    "grantValidation": "Please enter user ID and select a plan",
+    "extendMonths": "Months to extend"
   }
+}
 }

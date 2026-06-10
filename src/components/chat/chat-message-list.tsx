@@ -162,7 +162,8 @@ function MessageBubble({ msg, isMe, canTip, roomId, hideTime, onUpgradeForTip }:
   msg: ChatMessage; isMe: boolean; canTip: boolean; roomId: string; hideTime: boolean
   onUpgradeForTip?: () => void
 }) {
-  if (msg.msg_tp_cd === 'SYSTEM' || msg.msg_tp_cd === 'TIP_NOTI') {
+  // BET_NOTI(TASK-071)는 SYSTEM과 동일한 중앙 정렬 알림 스타일
+  if (msg.msg_tp_cd === 'SYSTEM' || msg.msg_tp_cd === 'TIP_NOTI' || msg.msg_tp_cd === 'BET_NOTI') {
     return (
       <div className='py-1 text-center text-xs text-muted-foreground'>
         {msg.msg_cont}
