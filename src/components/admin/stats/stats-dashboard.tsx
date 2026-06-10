@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import dynamic from 'next/dynamic'
+import { piFetch } from '@/lib/pi-fetch'
 import { StatsCard } from './stats-card'
 import { StatsDateFilter } from './stats-date-filter'
 import type { ActivityStatsResponse, RevenueStatsResponse, TopUser, TopTheme, TopSpender } from '@/types/stats'
@@ -129,9 +130,15 @@ export function StatsDashboard() {
     setLoading(true)
     setError(null)
     try {
+      // 온디맨드 집계 — 오늘(UTC) 행을 최신화한 뒤 조회 (실패해도 기존 롤업으로 표시)
+      await piFetch('/api/admin/stats/aggregate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: '{}',
+      }).catch(() => {})
       const [actRes, revRes] = await Promise.all([
-        fetch(`/api/admin/stats/activity?period=${p}`),
-        fetch(`/api/admin/stats/revenue?period=${p}`),
+        piFetch(`/api/admin/stats/activity?period=${p}`),
+        piFetch(`/api/admin/stats/revenue?period=${p}`),
       ])
       if (!actRes.ok || !revRes.ok) throw new Error('데이터 조회 실패')
       const [act, rev] = await Promise.all([
