@@ -2,8 +2,12 @@
 
 import { useEffect, useState } from 'react'
 import { piFetch } from '@/lib/pi-fetch'
+import { getLocaleOptions } from '@/lib/locale-options'
 import { ProfileTabs } from './profile-tabs'
 import type { UserRow } from '@/lib/users'
+
+// useEffect 이후에만 렌더되므로 SSR 없음 → hydration 불일치 없음
+const localeOptions = getLocaleOptions()
 
 export function ClientProfileGate() {
   const [user, setUser] = useState<UserRow | null>(null)
@@ -33,7 +37,7 @@ export function ClientProfileGate() {
   return (
     <div className='mx-auto max-w-2xl px-4 py-8'>
       <h1 className='mb-6 text-2xl font-bold'>내 프로필</h1>
-      <ProfileTabs initialUser={user} />
+      <ProfileTabs initialUser={user} localeOptions={localeOptions} />
     </div>
   )
 }

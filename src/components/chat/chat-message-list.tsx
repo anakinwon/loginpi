@@ -85,7 +85,7 @@ export function ChatMessageList({
 
   // 채팅 본문 — 유일한 스크롤 영역. overscroll-contain: 끝까지 스크롤해도 페이지 전체로 전파 안 됨
   return (
-    <div ref={containerRef} className='flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto overscroll-contain p-4'>
+    <div ref={containerRef} className='flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto overscroll-contain bg-muted/30 p-4 shadow-inner'>
       {isLoading && (
         <div className='py-2 text-center text-sm text-muted-foreground'>불러오는 중...</div>
       )}

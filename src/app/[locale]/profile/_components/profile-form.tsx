@@ -3,11 +3,12 @@
 import { useRef, useState } from 'react'
 import { piFetch, setPiToken } from '@/lib/pi-fetch'
 import { usePiAuth } from '@/components/pi-auth-provider'
-import { getLocaleOptions } from '@/lib/locale-options'
+import type { LocaleOption } from '@/lib/locale-options'
 import type { UserRow } from '@/lib/users'
 
 interface Props {
   initialUser: UserRow
+  localeOptions: LocaleOption[]
   onSaved: (user: UserRow) => void
 }
 
@@ -20,10 +21,7 @@ const FIELDS: { name: keyof UserRow; label: string; placeholder: string }[] = [
   { name: 'addr_dtl',     label: '상세 주소',  placeholder: '동·호수 등' },
 ]
 
-// PiTranslate™ 표시 언어 드롭다운 옵션 — locale-options.ts 단일 소스
-const LOCALE_OPTIONS = getLocaleOptions('ko')
-
-export function ProfileForm({ initialUser, onSaved }: Props) {
+export function ProfileForm({ initialUser, localeOptions, onSaved }: Props) {
   const formRef = useRef<HTMLFormElement>(null)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState<{ type: 'ok' | 'err'; text: string } | null>(null)
@@ -92,7 +90,7 @@ export function ProfileForm({ initialUser, onSaved }: Props) {
           className='rounded-md border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/50'
         >
           <option value=''>미설정 (브라우저 언어 사용)</option>
-          {LOCALE_OPTIONS.map(({ value, label }) => (
+          {localeOptions.map(({ value, label }) => (
             <option key={value} value={value}>{label}</option>
           ))}
         </select>

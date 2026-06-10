@@ -54,6 +54,7 @@ export default async function LocaleLayout({
               defaultTheme='system'
               enableSystem
               disableTransitionOnChange
+              enableColorScheme={false}
             >
               <PiAuthProvider>
                 <Header />

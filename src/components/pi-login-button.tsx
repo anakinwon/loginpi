@@ -12,7 +12,7 @@ export function PiLoginButton() {
   const { user, isLoading, isInPiBrowser, signIn, signOut, devLogin, error } = usePiAuth()
   const useDevLogin = isDev && !isInPiBrowser
 
-  if (!isInPiBrowser && !useDevLogin) return null
+  if (!isInPiBrowser) return null
 
   if (user) {
     const isDevSession = user.uid.startsWith('dev_')

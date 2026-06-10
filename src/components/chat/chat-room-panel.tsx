@@ -78,13 +78,13 @@ export function ChatRoomPanel({
   return (
     <div className='flex min-h-0 flex-1 flex-col overflow-hidden'>
       {/* 제목 섹션 — 고정 (스크롤 안 됨) */}
-      <header className='flex shrink-0 items-center gap-3 border-b bg-background px-4 py-3'>
+      <header className='flex shrink-0 items-center gap-3 border-b border-border/50 bg-zinc-200 px-4 py-3 shadow-md dark:bg-zinc-700'>
         <Link
           href='/chat'
           className='shrink-0 text-muted-foreground transition-colors hover:text-foreground'
           aria-label='채팅 목록으로'
         >
-          ←
+          ⬅️
         </Link>
         <span className='shrink-0 text-xl'>{themeEmoji}</span>
         <div className='min-w-0 flex-1'>

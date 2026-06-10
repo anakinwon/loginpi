@@ -35,22 +35,15 @@ export async function Header() {
           >
             채팅
           </Link>
-          {user && (
-            <Link
-              href='/profile'
-              className='text-muted-foreground hover:text-foreground text-sm transition-colors'
-            >
-              {t('myProfile')}
-            </Link>
-          )}
           {/* Pi Browser 전용: 쿠키 없음 → 클라이언트 상태로 보완 */}
           <PiProfileLink />
           {showAdmin && (
             <Link
               href='/admin'
               className='text-muted-foreground hover:text-foreground text-sm transition-colors'
+              title={t('admin')}
             >
-              {t('admin')}
+              🛡️
             </Link>
           )}
           {/* Pi Browser 관리자용: 클라이언트 상태 기반 즉시 표시 */}

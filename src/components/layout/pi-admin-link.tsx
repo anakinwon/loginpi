@@ -19,8 +19,9 @@ export function PiAdminLink() {
     <button
       onClick={() => router.push('/admin')}
       className='text-muted-foreground hover:text-foreground text-sm transition-colors'
+      title={t('admin')}
     >
-      {t('admin')}
+      🛡️
     </button>
   )
 }

@@ -5,6 +5,7 @@ import { ProfileForm } from './profile-form'
 import { PaymentHistory } from './payment-history'
 import { SubscriptionStatus } from './subscription-status'
 import type { UserRow } from '@/lib/users'
+import type { LocaleOption } from '@/lib/locale-options'
 
 const TABS = [
   { id: 'info',    label: '개인정보' },
@@ -16,9 +17,10 @@ type TabId = (typeof TABS)[number]['id']
 
 interface Props {
   initialUser: UserRow
+  localeOptions: LocaleOption[]
 }
 
-export function ProfileTabs({ initialUser }: Props) {
+export function ProfileTabs({ initialUser, localeOptions }: Props) {
   const [activeTab, setActiveTab] = useState<TabId>('info')
   const [user, setUser] = useState(initialUser)
 
@@ -41,7 +43,7 @@ export function ProfileTabs({ initialUser }: Props) {
         ))}
       </div>
 
-      {activeTab === 'info'    && <ProfileForm initialUser={user} onSaved={setUser} />}
+      {activeTab === 'info'    && <ProfileForm initialUser={user} localeOptions={localeOptions} onSaved={setUser} />}
       {activeTab === 'payment' && <PaymentHistory />}
       {activeTab === 'subscr'  && <SubscriptionStatus />}
     </div>
