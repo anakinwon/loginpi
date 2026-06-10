@@ -11,6 +11,7 @@ import { ChatLocaleSelect } from './chat-locale-select'
 import { InlinePurchasePrompt } from './inline-purchase-prompt'
 import { BadgeAwardPopup, type BadgeAwardInfo } from './badge-award-popup'
 import { PiBetPanel } from './pi-bet-panel'
+import { RoomSettingsDialog, type RoomSettings } from './room-settings-dialog'
 
 interface ChatRoomPanelProps {
   roomId: string
@@ -58,6 +59,13 @@ export function ChatRoomPanel({
   const [upgradedBadge, setUpgradedBadge] = useState<BadgeAwardInfo | null>(null)
   // TASK-071: Pi Bet 패널
   const [betPanelOpen, setBetPanelOpen] = useState(false)
+  // 방장 전용 채팅방 수정 — 방 메타 조회 후 OWNER일 때만 버튼 노출
+  const [isOwner, setIsOwner] = useState(false)
+  const [roomSettings, setRoomSettings] = useState<RoomSettings | null>(null)
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  // 헤더 제목은 수정 결과를 즉시 반영 (서버 재조회 없이)
+  const [displayRoomNm, setDisplayRoomNm] = useState(roomNm)
+  const [displayRoomDesc, setDisplayRoomDesc] = useState<string | null>(roomDesc ?? null)
 
   // 방 입장 시 이 방에 저장된 번역 언어 복원 (외부 저장소 구독 — 방별 독립)
   useEffect(() => {
@@ -83,6 +91,29 @@ export function ChatRoomPanel({
   }, [])
 
   useEffect(() => { checkSubscription() }, [checkSubscription])
+
+  // 방 메타 조회 — 방장(OWNER)이고 그룹/이벤트방이면 수정 버튼 노출
+  useEffect(() => {
+    piFetch(`/api/chat/rooms/${roomId}`)
+      .then(r => r.ok ? r.json() : null)
+      .then((d: {
+        myRole?: string
+        room?: { room_nm: string; room_desc: string | null; is_public_yn: 'Y' | 'N'; max_mbr_cnt: number; has_join_pwd: boolean; room_tp_cd: string }
+      } | null) => {
+        if (!d?.room) return
+        if (d.myRole === 'OWNER' && d.room.room_tp_cd !== 'D') {
+          setIsOwner(true)
+          setRoomSettings({
+            room_nm: d.room.room_nm,
+            room_desc: d.room.room_desc,
+            is_public_yn: d.room.is_public_yn,
+            max_mbr_cnt: d.room.max_mbr_cnt,
+            has_join_pwd: d.room.has_join_pwd,
+          })
+        }
+      })
+      .catch(() => {})
+  }, [roomId])
 
   const handleSubscribeSuccess = useCallback(() => {
     setTipPromptOpen(false)
@@ -167,7 +198,12 @@ export function ChatRoomPanel({
         <span className='shrink-0 text-xl'>{themeEmoji}</span>
         <div className='min-w-0 flex-1'>
           <p className='flex items-center gap-1.5 truncate text-sm font-semibold'>
-            <span className='truncate'>{roomNm}</span>
+            <span className='truncate'>{displayRoomNm}</span>
+            {roomSettings && (
+              <span className='shrink-0 text-xs' title={roomSettings.is_public_yn === 'Y' ? '공개방' : '비밀방'}>
+                {roomSettings.is_public_yn === 'Y' ? '🌐' : '🔒'}
+              </span>
+            )}
             {/* Trigger 7: 강화 배지 — 채팅방 이름 옆 상시 표시 (특별 디자인) */}
             {upgradedBadge && (
               <span
@@ -178,10 +214,21 @@ export function ChatRoomPanel({
               </span>
             )}
           </p>
-          {roomDesc && (
-            <p className='truncate text-xs text-muted-foreground'>{roomDesc}</p>
+          {displayRoomDesc && (
+            <p className='truncate text-xs text-muted-foreground'>{displayRoomDesc}</p>
           )}
         </div>
+        {/* 방장 전용 채팅방 수정 버튼 */}
+        {isOwner && roomSettings && (
+          <button
+            onClick={() => setSettingsOpen(true)}
+            className='shrink-0 text-lg transition-transform hover:scale-110'
+            aria-label='채팅방 수정'
+            title='채팅방 수정 (방장)'
+          >
+            ⚙️
+          </button>
+        )}
         {/* TASK-073: 분석 대시보드 (Business — 권한은 API가 검증) */}
         <Link
           href={`/chat/${roomId}/analytics`}
@@ -286,6 +333,21 @@ export function ChatRoomPanel({
 
       {/* TASK-071: Pi Bet 패널 */}
       {betPanelOpen && <PiBetPanel roomId={roomId} onClose={() => setBetPanelOpen(false)} />}
+
+      {/* 방장 전용 채팅방 수정 다이얼로그 */}
+      {settingsOpen && roomSettings && (
+        <RoomSettingsDialog
+          roomId={roomId}
+          initial={roomSettings}
+          onSaved={next => {
+            setRoomSettings(next)
+            setDisplayRoomNm(next.room_nm)
+            setDisplayRoomDesc(next.room_desc)
+            setSettingsOpen(false)
+          }}
+          onClose={() => setSettingsOpen(false)}
+        />
+      )}
 
       {/* Trigger 3: AI 봇 한도 초과 업그레이드 모달 */}
       <InlinePurchasePrompt
