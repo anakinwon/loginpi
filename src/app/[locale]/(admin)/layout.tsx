@@ -16,7 +16,7 @@ export default async function AdminLayout({
   // 쿠키로 신원을 못 찾으면(Pi Browser는 Set-Cookie 미저장) redirect 대신 클라이언트 게이트로 위임.
   // → admin 경유 무한 리다이렉트 루프 차단. (admin 페이지 데이터는 쿠키 기반이라 PC 브라우저 권장)
   if (!user) {
-    return <ClientAdminGate />
+    return <ClientAdminGate>{children}</ClientAdminGate>
   }
 
   // 로그인했으나 관리자 권한 없음 → 홈으로

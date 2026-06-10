@@ -2,13 +2,9 @@
 
 import { Link } from '@/i18n/navigation'
 import { useTranslations } from 'next-intl'
-import { usePiAuth } from '@/components/pi-auth-provider'
 
 export function BoardChatLinks() {
   const t = useTranslations('header')
-  const { isInPiBrowser } = usePiAuth()
-
-  if (isInPiBrowser) return null
 
   return (
     <>
