@@ -1,14 +1,15 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Link } from '@/i18n/navigation'
 import { usePiAuth } from '@/components/pi-auth-provider'
-import { getPiToken } from '@/lib/pi-fetch'
+import { piFetch } from '@/lib/pi-fetch'
 
 // 서버가 쿠키로 신원을 못 찾을 때(Pi Browser는 Set-Cookie 미저장) admin layout이 렌더하는 게이트.
-// Pi ADMIN/MASTER 사용자는 _pit 파라미터로 재내비게이션 → 미들웨어가 X-Pi-Token 헤더로 변환
-// → 서버가 Pi 세션을 인식해 admin layout이 이 컴포넌트 대신 정상 admin UI를 렌더한다.
+// Pi ADMIN/MASTER 사용자는 piFetch로 60초짜리 ticket을 발급받아 _pit 파라미터로 재내비게이션한다.
+// ticket은 실제 세션 토큰 대신 HMAC 서명된 단기 자격증명 — URL·서버로그에 세션 토큰이 직접 노출되지 않는다.
+// 미들웨어가 _pit → x-pit-ticket 헤더로 변환 → auth-check가 ticket 검증 후 정상 admin UI 렌더.
 function GateBox({ children }: { children: React.ReactNode }) {
   return (
     <div className='flex flex-1 items-center justify-center p-10'>
@@ -20,17 +21,22 @@ function GateBox({ children }: { children: React.ReactNode }) {
 export function ClientAdminGate() {
   const { user, isLoading } = usePiAuth()
   const router = useRouter()
+  const navigating = useRef(false)
 
   useEffect(() => {
     if (!user || (user.role !== 'ADMIN' && user.role !== 'MASTER')) return
-    const token = getPiToken()
-    if (!token) return
+    if (navigating.current) return
     const url = new URL(window.location.href)
-    // 이미 _pit가 있으면 재시도 방지 (토큰 무효화 시 무한루프 차단)
     if (url.searchParams.has('_pit')) return
-    // _pit 파라미터로 재내비게이션 → middleware.ts에서 X-Pi-Token 헤더로 변환
-    url.searchParams.set('_pit', token)
-    router.replace(url.pathname + url.search)
+    navigating.current = true
+    piFetch('/api/admin/pit-ticket', { method: 'POST' })
+      .then((res) => res.json())
+      .then(({ ticket }: { ticket?: string }) => {
+        if (!ticket) { navigating.current = false; return }
+        url.searchParams.set('_pit', ticket)
+        router.replace(url.pathname + url.search)
+      })
+      .catch(() => { navigating.current = false })
   }, [user, router])
 
   if (isLoading) return <GateBox>Pi 계정 인증 중…</GateBox>

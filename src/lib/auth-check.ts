@@ -2,6 +2,7 @@ import 'server-only'
 import { cookies, headers } from 'next/headers'
 import { auth } from '@/auth'
 import { verifyPayload } from './pi-session-crypto'
+import { verifyPitTicket } from './pit-ticket'
 import { getUserById, getUserByPiUid } from './users'
 import type { PiSessionUser } from '@/types/pi-session'
 import type { UserRow } from './users'
@@ -10,6 +11,7 @@ import type { UserRow } from './users'
 // 두 인증 방식의 단일 진입점
 export async function getSessionUser(): Promise<UserRow | null> {
   const secret = process.env.PI_SESSION_SECRET
+  const headerStore = await headers()
 
   // 1. Pi 세션 토큰 확인 — 쿠키(일반 브라우저) 우선, 없으면 X-Pi-Token 헤더(Pi Browser).
   //    Pi Browser WebView는 Set-Cookie를 저장하지 않으므로, 클라이언트가 localStorage에
@@ -18,7 +20,6 @@ export async function getSessionUser(): Promise<UserRow | null> {
     const cookieStore = await cookies()
     let piToken = cookieStore.get('pi_session')?.value
     if (!piToken) {
-      const headerStore = await headers()
       piToken = headerStore.get('x-pi-token') ?? undefined
     }
     if (piToken) {
@@ -35,6 +36,18 @@ export async function getSessionUser(): Promise<UserRow | null> {
         const user = await getUserByPiUid(piSession.uid)
         if (user) return user
       }
+    }
+  }
+
+  // 1b. x-pit-ticket 헤더 확인 — Pi Browser admin 페이지 내비게이션용 단기 ticket.
+  //     미들웨어가 _pit URL 파라미터를 이 헤더로 변환한다. ticket은 60초 만료 HMAC 서명값으로
+  //     실제 세션 토큰이 URL에 노출되지 않도록 간접 자격증명 역할을 한다.
+  const pitTicket = headerStore.get('x-pit-ticket')
+  if (pitTicket) {
+    const userId = verifyPitTicket(pitTicket)
+    if (userId) {
+      const user = await getUserById(userId)
+      if (user) return user
     }
   }
 

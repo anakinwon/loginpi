@@ -19,9 +19,11 @@ export default function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL('/en' + (rest || '/'), req.url))
   }
 
-  // _pit 쿼리 파라미터 → X-Pi-Token 요청 헤더로 변환.
+  // _pit 쿼리 파라미터 → x-pit-ticket 요청 헤더로 변환.
   // Pi Browser는 페이지 내비게이션(router.replace) 시 커스텀 헤더를 직접 첨부할 수 없으므로
-  // ClientAdminGate가 토큰을 URL 파라미터로 전달하면 미들웨어가 서버 인증용 헤더로 전환한다.
+  // ClientAdminGate가 /api/admin/pit-ticket에서 발급받은 60초짜리 HMAC ticket을
+  // URL 파라미터로 전달하면 미들웨어가 서버 인증용 헤더로 전환한다.
+  // (실제 세션 토큰이 아닌 단기 ticket이므로 URL 노출 위험이 제한된다.)
   const pit = req.nextUrl.searchParams.get('_pit')
   if (pit) {
     const cleanUrl = req.nextUrl.clone()
@@ -30,13 +32,13 @@ export default function middleware(req: NextRequest) {
     const intlRes = intlMiddleware(new NextRequest(cleanUrl, { headers: req.headers, method: req.method }))
     // intl이 리다이렉트 결정(예: locale 미등록 → /en) 시 그대로 따름
     if (intlRes.headers.has('location')) return intlRes
-    // intl이 설정한 요청 헤더(locale 정보 등) 추출 후 X-Pi-Token 병합
+    // intl이 설정한 요청 헤더(locale 정보 등) 추출 후 x-pit-ticket 병합
     const fwd = new Headers()
     for (const [k, v] of intlRes.headers.entries()) {
       // x-middleware-request-{name} → 서버 요청에서 {name} 헤더로 변환되는 Next.js 내부 규약
       if (k.startsWith('x-middleware-request-')) fwd.set(k.slice(21), v)
     }
-    fwd.set('x-pi-token', pit)
+    fwd.set('x-pit-ticket', pit)
     return NextResponse.next({ request: { headers: fwd } })
   }
 
