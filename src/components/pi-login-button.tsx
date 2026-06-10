@@ -22,7 +22,7 @@ export function PiLoginButton() {
       <div className='flex items-center gap-2'>
         <Link
           href='/profile'
-          className='text-sm font-medium hover:underline'
+          className='text-sm font-medium text-[navy] hover:underline dark:text-blue-300'
         >
           {displayLabel}
           {isDevSession && (

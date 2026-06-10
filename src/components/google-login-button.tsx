@@ -17,7 +17,7 @@ export function GoogleLoginButton() {
   if (session?.user) {
     return (
       <div className='flex items-center gap-2'>
-        <Link href='/profile' className='text-sm font-medium hover:underline'>
+        <Link href='/profile' className='text-sm font-medium text-[navy] hover:underline dark:text-blue-300'>
           {session.user.name ?? session.user.email}
         </Link>
         <Button variant='outline' size='sm' onClick={() => signOut()}>

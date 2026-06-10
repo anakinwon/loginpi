@@ -8,7 +8,7 @@ import { BrowserName } from '@/components/layout/browser-name'
 import { LanguageSwitcher } from '@/components/layout/language-switcher'
 import { PiPriceChip } from '@/components/layout/pi-price-chip'
 import { PiAdminLink } from '@/components/layout/pi-admin-link'
-import { PiProfileLink } from '@/components/layout/pi-profile-link'
+import { BoardChatLinks } from '@/components/layout/board-chat-links'
 
 export async function Header() {
   const user = await getSessionUser()
@@ -23,20 +23,10 @@ export async function Header() {
           <BrowserName />
         </Link>
         <nav className='flex items-center gap-3'>
-          <Link
-            href='/board'
-            className='text-muted-foreground hover:text-foreground text-sm transition-colors'
-          >
-            {t('board')}
-          </Link>
-          <Link
-            href='/chat'
-            className='text-muted-foreground hover:text-foreground text-sm transition-colors'
-          >
-            채팅
-          </Link>
-          {/* Pi Browser 전용: 쿠키 없음 → 클라이언트 상태로 보완 */}
-          <PiProfileLink />
+          {/* Pi Browser에서는 숨김 — 클라이언트 컴포넌트에서 isInPiBrowser 감지 */}
+          <BoardChatLinks />
+          <GoogleLoginButton />
+          <PiLoginButton />
           {showAdmin && (
             <Link
               href='/admin'
@@ -46,10 +36,8 @@ export async function Header() {
               🛡️
             </Link>
           )}
-          {/* Pi Browser 관리자용: 클라이언트 상태 기반 즉시 표시 */}
+          {/* Pi Browser 관리자용: 로그아웃 버튼 오른쪽에 배치 */}
           <PiAdminLink />
-          <GoogleLoginButton />
-          <PiLoginButton />
           <span className='hidden md:inline-flex'>
             <ThemeToggle />
           </span>
