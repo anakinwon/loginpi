@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth-check'
-import { getRoom, getRoomMember } from '@/lib/chat'
+import { getRoom, getRoomMember, verifyRoomPassword } from '@/lib/chat'
 
 type Params = { params: Promise<{ roomId: string }> }
 
@@ -38,14 +38,27 @@ export async function POST(request: NextRequest, { params }: Params) {
     )
   }
 
-  // 비공개방은 초대코드 없이 입장 불가 (TASK-053에서 확장)
-  if (room.is_public_yn === 'N') {
-    return NextResponse.json({ error: '비공개 채팅방입니다' }, { status: 403 })
-  }
-
-  // 이미 멤버인지 확인
+  // 이미 멤버면 비밀번호 없이 통과 (재입장)
   const existing = await getRoomMember(roomId, user.id)
   if (existing) return NextResponse.json({ message: '이미 채팅방 멤버입니다' })
+
+  let body: unknown
+  try { body = await request.json() } catch { body = {} }
+  const { join_pwd } = body as { join_pwd?: string }
+
+  // 비밀방(is_public_yn='N')은 비밀번호로만 입장 가능
+  // 비밀번호 미설정(join_pwd_hash=null) 비밀방은 초대/생성자 전용 → 입장 불가
+  if (room.is_public_yn === 'N') {
+    if (!room.join_pwd_hash) {
+      return NextResponse.json({ error: '비공개 채팅방입니다' }, { status: 403 })
+    }
+    if (!join_pwd || !verifyRoomPassword(String(join_pwd), room.join_pwd_hash)) {
+      return NextResponse.json(
+        { error: '비밀번호가 일치하지 않습니다', requiresPassword: true },
+        { status: 401 },
+      )
+    }
+  }
 
   // 정원 확인
   const { count } = await getSupabaseAdmin()
@@ -57,11 +70,6 @@ export async function POST(request: NextRequest, { params }: Params) {
   if ((count ?? 0) >= room.max_mbr_cnt) {
     return NextResponse.json({ error: '채팅방 정원이 가득 찼습니다' }, { status: 409 })
   }
-
-  let body: unknown
-  try { body = await request.json() } catch { body = {} }
-  const { invite_code } = body as { invite_code?: string }
-  void invite_code // 추후 초대코드 검증 확장 예정
 
   const { error } = await getSupabaseAdmin()
     .from('msg_room_mbr')
