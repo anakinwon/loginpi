@@ -298,7 +298,7 @@ export async function POST(request: NextRequest) {
         db.from('sys_user').select('id, display_name').eq('pi_uid', payment.user_uid).maybeSingle(),
         db
           .from('msg_bet')
-          .select('bet_id, room_id, bet_titl, bet_amt_pi, bet_st_cd, close_dtm')
+          .select('bet_id, room_id, bet_titl, bet_amt_pi, bet_st_cd, close_dtm, crtr_usr_id')
           .eq('bet_id', betId)
           .eq('del_yn', 'N')
           .maybeSingle(),
@@ -313,41 +313,57 @@ export async function POST(request: NextRequest) {
           bet_amt_pi: number
           bet_st_cd: string
           close_dtm: string | null
+          crtr_usr_id: string
         }
-        const slug = String(ownerRow.display_name ?? 'user').slice(0, 20)
-        const stillOpen =
-          betRow.bet_st_cd === 'OPEN' &&
-          (!betRow.close_dtm || new Date(betRow.close_dtm) > new Date())
 
-        // 결제 금액이 베팅 참가비 이상인지 서버 재검증
-        if (stillOpen && Number(payment.amount) + 1e-6 >= Number(betRow.bet_amt_pi)) {
-          // UNIQUE(bet_id, usr_id) — 중복 참가는 insert 에러로 자연 차단
-          const { error: entryError } = await db.from('msg_bet_entry').insert({
-            bet_id: betRow.bet_id,
-            usr_id: ownerRow.id,
-            optn_no: optnNo,
-            bet_amt_pi: betRow.bet_amt_pi,
-            pymnt_id: paymentId,
-            regr_id: slug,
-            modr_id: slug,
-          })
+        // 베팅 생성자는 자신의 베팅에 참가 불가 — 결과 조작 인센티브 차단
+        // 선택 옵션 실존 여부 DB 재검증 — Pi SDK 메타데이터는 공격자 제어 입력
+        if (ownerRow.id !== betRow.crtr_usr_id) {
+          const { data: optnRow } = await db
+            .from('msg_bet_optn')
+            .select('optn_no')
+            .eq('bet_id', betRow.bet_id)
+            .eq('optn_no', optnNo)
+            .eq('del_yn', 'N')
+            .maybeSingle()
 
-          if (!entryError) {
-            const { data: betMsg } = await db
-              .from('msg_msg')
-              .insert({
-                room_id: betRow.room_id,
-                snd_usr_id: ownerRow.id,
-                snd_usr_nm: String(ownerRow.display_name ?? 'user'),
-                msg_cont: `🎲 ${ownerRow.display_name} 님이 "${betRow.bet_titl}" 베팅에 π${betRow.bet_amt_pi} 참가했습니다`,
-                msg_tp_cd: 'BET_NOTI',
+          if (optnRow) {
+            const slug = String(ownerRow.display_name ?? 'user').slice(0, 20)
+            const stillOpen =
+              betRow.bet_st_cd === 'OPEN' &&
+              (!betRow.close_dtm || new Date(betRow.close_dtm) > new Date())
+
+            // 결제 금액이 베팅 참가비 이상인지 서버 재검증
+            if (stillOpen && Number(payment.amount) + 1e-6 >= Number(betRow.bet_amt_pi)) {
+              // UNIQUE(bet_id, usr_id) — 중복 참가는 insert 에러로 자연 차단
+              const { error: entryError } = await db.from('msg_bet_entry').insert({
+                bet_id: betRow.bet_id,
+                usr_id: ownerRow.id,
+                optn_no: optnNo,
+                bet_amt_pi: betRow.bet_amt_pi,
+                pymnt_id: paymentId,
                 regr_id: slug,
                 modr_id: slug,
               })
-              .select()
-              .single()
 
-            if (betMsg) await broadcastToRoom(betRow.room_id, 'new_msg', betMsg)
+              if (!entryError) {
+                const { data: betMsg } = await db
+                  .from('msg_msg')
+                  .insert({
+                    room_id: betRow.room_id,
+                    snd_usr_id: ownerRow.id,
+                    snd_usr_nm: String(ownerRow.display_name ?? 'user'),
+                    msg_cont: `🎲 ${ownerRow.display_name} 님이 "${betRow.bet_titl}" 베팅에 π${betRow.bet_amt_pi} 참가했습니다`,
+                    msg_tp_cd: 'BET_NOTI',
+                    regr_id: slug,
+                    modr_id: slug,
+                  })
+                  .select()
+                  .single()
+
+                if (betMsg) await broadcastToRoom(betRow.room_id, 'new_msg', betMsg)
+              }
+            }
           }
         }
       }
