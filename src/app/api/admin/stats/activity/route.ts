@@ -44,6 +44,9 @@ export async function GET(req: NextRequest) {
     usr_id: row.usr_id,
     display_nm: row.display_nm ?? '(이름 없음)',
     activity_days: Number(row.activity_days),
+    content_cnt: Number(row.content_cnt),
+    action_cnt: Number(row.action_cnt),
+    score: Number(row.score),
   }))
 
   const body: ActivityStatsResponse = { period, from_dt: fromDt, series, topUsers }

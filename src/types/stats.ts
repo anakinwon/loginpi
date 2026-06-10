@@ -7,10 +7,14 @@ export interface ActivityDataPoint {
   mau_cnt: number
 }
 
+// 가중치 종합 점수제: score = 활동일수×0.2 + 콘텐츠활동×0.3 + 결제건수×0.5
 export interface TopUser {
   usr_id: string
   display_nm: string
   activity_days: number
+  content_cnt: number
+  action_cnt: number
+  score: number
 }
 
 export interface ActivityStatsResponse {

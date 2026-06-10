@@ -39,15 +39,25 @@ function TopUsersList({ users, loading }: { users: TopUser[]; loading: boolean }
   }
   if (users.length === 0) return <p className='text-muted-foreground text-sm'>데이터 없음</p>
   return (
-    <ol className='space-y-2'>
-      {users.map((u, i) => (
-        <li key={u.usr_id} className='flex items-center gap-2 text-sm'>
-          <span className='text-base'>{MEDALS[i] ?? `${i + 1}.`}</span>
-          <span className='min-w-0 flex-1 truncate font-medium'>{u.display_nm}</span>
-          <span className='text-muted-foreground shrink-0'>{u.activity_days}일</span>
-        </li>
-      ))}
-    </ol>
+    <div className='space-y-3'>
+      <ol className='space-y-2'>
+        {users.map((u, i) => (
+          <li key={u.usr_id} className='flex items-center gap-2 text-sm'>
+            <span className='text-base'>{MEDALS[i] ?? `${i + 1}.`}</span>
+            <div className='min-w-0 flex-1'>
+              <p className='truncate font-medium'>{u.display_nm}</p>
+              <p className='text-muted-foreground text-xs'>
+                활동 {u.activity_days}일 · 콘텐츠 {u.content_cnt} · 결제 {u.action_cnt}
+              </p>
+            </div>
+            <span className='shrink-0 font-semibold'>{u.score.toFixed(1)}점</span>
+          </li>
+        ))}
+      </ol>
+      <p className='text-muted-foreground text-xs'>
+        점수 = 활동일수×0.2 + 콘텐츠(채팅·게시글·댓글)×0.3 + 결제건수×0.5
+      </p>
+    </div>
   )
 }
 
