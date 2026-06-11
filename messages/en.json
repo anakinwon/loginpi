@@ -690,7 +690,26 @@
     },
     "waitingBuyerConfirm": "Waiting for the buyer to confirm receipt",
     "waitingSellerComplete": "Waiting for the seller to close the deal",
-    "escrowReleased": "Deal closed — escrow settlement in progress"
+    "escrowReleased": "Deal closed — escrow settlement in progress",
+    "bond": {
+      "title": "Seller Bond",
+      "desc": "Deposit 1π to cover 9 cancellation fees — receive 0.1π compensation when a buyer cancels",
+      "active": "Active",
+      "inactive": "Not Deposited",
+      "deposit": "Deposit 1π",
+      "redeposit": "Deposit 1π More",
+      "depositSuccess": "1π bond deposited (9 cancellation fees + 0.1π reserve)",
+      "balance": "Balance",
+      "avail": "Available",
+      "remainCancels": "Cancels Covered",
+      "cancelCnt": "Cancels Used",
+      "exhausted": "Bond exhausted — switched to no-bond mode until you deposit 1π more (no fee compensation)",
+      "notice": "0.1π of the 1π deposit is a reserve not used for fees. Refund will be available after legal review.",
+      "badgeBonded": "Bonded Deal",
+      "badgeFree": "Free Cancellation",
+      "buyerNoticeBonded": "🛡️ Bonded deal: after escrow payment, the cancelling party pays a 0.1π fee to the other party (you receive 0.1π if the seller cancels)",
+      "buyerNoticeFree": "Free-cancellation deal: no cancellation fee (seller has no bond — no compensation either)"
+    }
   },
   "adminSubscriptions": {
     "col": {

@@ -692,7 +692,26 @@
     },
     "waitingBuyerConfirm": "구매자의 수령 확인을 기다리는 중입니다",
     "waitingSellerComplete": "판매자의 거래 완료 처리를 기다리는 중입니다",
-    "escrowReleased": "거래 종결 — 에스크로 정산 처리"
+    "escrowReleased": "거래 종결 — 에스크로 정산 처리",
+    "bond": {
+      "title": "판매자 보증금",
+      "desc": "1π 예치 시 취소수수료 9회분 충당 — 구매자 취소 시 0.1π 보상을 받을 수 있습니다",
+      "active": "활성",
+      "inactive": "미예치",
+      "deposit": "1π 예치하기",
+      "redeposit": "추가 1π 예치",
+      "depositSuccess": "보증금 1π가 예치됐습니다 (취소수수료 9회분 + 지급준비금 0.1π)",
+      "balance": "잔액",
+      "avail": "가용 잔액",
+      "remainCancels": "잔여 감당 횟수",
+      "cancelCnt": "누적 취소",
+      "exhausted": "보증금이 소진됐습니다 — 추가 1π 예치 전까지 무보증금 모드로 전환됩니다 (수수료 수령 불가)",
+      "notice": "예치액 1π 중 0.1π는 지급준비금으로 수수료 충당에 사용되지 않습니다. 반환 기능은 법적 검토 후 제공 예정입니다.",
+      "badgeBonded": "보증금 거래",
+      "badgeFree": "자유 취소",
+      "buyerNoticeBonded": "🛡️ 보증금 거래: 에스크로 결제 후 취소 시 취소 요청자가 0.1π 수수료를 상대방에게 지불합니다 (판매자 취소 시 0.1π를 보상받습니다)",
+      "buyerNoticeFree": "자유 취소 거래: 취소수수료가 없습니다 (판매자 미예치 — 취소 보상도 없음)"
+    }
   },
   "profile": {
     "title": "내 프로필",

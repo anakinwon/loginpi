@@ -4,6 +4,7 @@ import { sendPaymentReceipt } from '@/lib/email'
 import { broadcastToRoom } from '@/lib/realtime-broadcast'
 import { canSendTip } from '@/lib/chat-auth'
 import { markEscrow } from '@/lib/mps-order'
+import { depositBond, BOND_DEPOSIT_PI } from '@/lib/mps-bond'
 
 const PI_PAYMENTS_URL = 'https://api.minepi.com/v2/payments'
 
@@ -318,6 +319,20 @@ export async function POST(request: NextRequest) {
         ) {
           await markEscrow(orderId, buyerRow.id, txid, Number(payment.amount))
         }
+      }
+    } else if (meta?.type === 'MPS_BOND' && payment.user_uid) {
+      // MPS_BOND: 판매자 보증금 1π 예치 — fn_mps_bond_deposit 원자적 적립 (PRD v1.6~1.8)
+      const { data: seller } = await db
+        .from('sys_user')
+        .select('id, display_name')
+        .eq('pi_uid', payment.user_uid)
+        .maybeSingle()
+
+      // 결제 금액이 예치액(1π) 이상인지 서버 재검증 (부동소수 오차 허용)
+      if (seller && Number(payment.amount) + 1e-6 >= BOND_DEPOSIT_PI) {
+        const sellerRow = seller as { id: string; display_name: string | null }
+        const slug = String(sellerRow.display_name ?? 'user').slice(0, 20)
+        await depositBond(sellerRow.id, paymentId, slug)
       }
     } else if (meta?.type === 'PI_BET' && payment.user_uid) {
       // PI_BET: 결제 완료 시 베팅 참가 INSERT + BET_NOTI 발송 (TASK-071)

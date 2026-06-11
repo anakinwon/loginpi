@@ -1,8 +1,12 @@
 'use client'
 
+import { useMemo, useState } from 'react'
 import { Link } from '@/i18n/navigation'
 import { GroupRoomCreator } from '@/components/chat/group-room-creator'
 import { ChatMarketplace } from '@/components/chat/chat-marketplace'
+import { AdminPagination } from '@/components/admin/admin-pagination'
+
+const PAGE_SIZE = 5
 
 // 서버(SSR)·클라이언트(Pi Browser 게이트) 양쪽에서 공유하는 카페 목록 표현 컴포넌트.
 // 데이터 로딩은 각 호출부가 담당하고, 이 컴포넌트는 렌더링만 책임진다.
@@ -93,6 +97,34 @@ function SectionHeader({ label }: { label: string }) {
   )
 }
 
+// 5개씩 클라이언트 페이지네이션 — 섹션마다 독립적인 page 상태를 가진다.
+// 데이터는 호출부가 전부 로드해 두므로 추가 fetch 없이 슬라이스만 한다.
+function PagedRoomList({ rooms }: { rooms: RoomWithTheme[] }) {
+  const [page, setPage] = useState(1)
+  const totalPages = Math.ceil(rooms.length / PAGE_SIZE)
+  // 목록이 줄어 현재 page가 범위를 벗어나면 마지막 페이지로 보정
+  const safePage = Math.min(page, Math.max(1, totalPages))
+  const visible = useMemo(
+    () => rooms.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE),
+    [rooms, safePage],
+  )
+
+  return (
+    <>
+      <div className='space-y-2'>
+        {visible.map(room => (
+          <RoomCard key={room.room_id} room={room} href={`/chat/${room.room_id}`} />
+        ))}
+      </div>
+      {totalPages > 1 && (
+        <div className='mt-3'>
+          <AdminPagination page={safePage} totalPages={totalPages} onPage={setPage} />
+        </div>
+      )}
+    </>
+  )
+}
+
 function sortByPremiumFirst(rooms: RoomWithTheme[]): RoomWithTheme[] {
   return [...rooms].sort((a, b) => {
     const aP = a.msg_theme?.theme_tp_cd === 'PREMIUM' ? 0 : 1
@@ -135,11 +167,7 @@ export function ChatListView({
               PREMIUM
             </span>
           </div>
-          <div className='space-y-2'>
-            {subscriptionRooms.map(room => (
-              <RoomCard key={room.room_id} room={room} href={`/chat/${room.room_id}`} />
-            ))}
-          </div>
+          <PagedRoomList rooms={subscriptionRooms} />
         </section>
       )}
 
@@ -153,11 +181,7 @@ export function ChatListView({
               <p className='mt-1 text-xs text-muted-foreground'>+ 카페 만들기로 첫 방을 개설해 보세요</p>
             </div>
           ) : (
-            <div className='space-y-2'>
-              {regularRooms.map(room => (
-                <RoomCard key={room.room_id} room={room} href={`/chat/${room.room_id}`} />
-              ))}
-            </div>
+            <PagedRoomList rooms={regularRooms} />
           )}
         </section>
       )}
@@ -166,11 +190,7 @@ export function ChatListView({
       {sortedDiscover.length > 0 && (
         <section className='mb-8'>
           <SectionHeader label='카페 탐색' />
-          <div className='space-y-2'>
-            {sortedDiscover.map(room => (
-              <RoomCard key={room.room_id} room={room} href={`/chat/${room.room_id}`} />
-            ))}
-          </div>
+          <PagedRoomList rooms={sortedDiscover} />
         </section>
       )}
 

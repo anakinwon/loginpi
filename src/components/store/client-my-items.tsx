@@ -7,6 +7,7 @@ import { Link } from '@/i18n/navigation'
 import { usePiAuth } from '@/components/pi-auth-provider'
 import { piFetch } from '@/lib/pi-fetch'
 import { Button } from '@/components/ui/button'
+import { SellerBondCard } from './seller-bond-card'
 import type { StoreItem } from './store-item-list'
 
 const ST_TABS = ['ALL', 'DRAFT', 'OPEN', 'CLOSED', 'SOLD'] as const
@@ -76,6 +77,8 @@ export function ClientMyItems({ serverAuthed = false }: { serverAuthed?: boolean
 
   return (
     <div className='space-y-4'>
+      <SellerBondCard />
+
       <div className='flex flex-wrap items-center gap-2'>
         {ST_TABS.map(s => (
           <button

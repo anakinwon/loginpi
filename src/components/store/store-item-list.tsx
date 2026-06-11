@@ -33,7 +33,7 @@ export function StoreItemList() {
   const [sort, setSort] = useState<(typeof SORT_LIST)[number]>('latest')
   const [loading, setLoading] = useState(true)
 
-  const limit = 20
+  const limit = 5 // 페이지당 상품 수
 
   const load = useCallback(async () => {
     setLoading(true)

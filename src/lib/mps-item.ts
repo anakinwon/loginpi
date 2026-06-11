@@ -1,5 +1,6 @@
 import 'server-only'
 import { getSupabaseAdmin } from './supabase-admin'
+import { isSellerBonded } from './mps-bond'
 
 // MPS 상품 CRUD — 재고 불변 조건 stock_qty = reg_qty - ordered_qty (DB CHECK 이중 보장)
 
@@ -121,7 +122,10 @@ export async function getItemDetail(itemId: string, viewerId?: string) {
     shop = data
   }
 
-  return { ...row, images: imgs ?? [], shop }
+  // 보증금 거래 여부 — 구매자가 취소수수료 발생 여부를 거래 전에 인지 (FR-10 단서 공시)
+  const sellerBonded = await isSellerBonded(row.seller_id)
+
+  return { ...row, images: imgs ?? [], shop, seller_bonded: sellerBonded }
 }
 
 // 조회수 증가 — 정밀 카운팅 불필요, 실패는 무시

@@ -27,6 +27,7 @@ interface ItemDetail {
   thumbnail_url: string | null
   images: ItemImage[]
   shop: { shop_nm: string; shop_type_cd: string; addr: string | null } | null
+  seller_bonded: boolean // 판매자 보증금 활성 — 취소수수료 0.1π 발생 거래 (FR-10 단서 공시)
 }
 
 interface OrderPrep {
@@ -186,7 +187,19 @@ export function StoreItemDetail({ itemId }: { itemId: string }) {
             <span className='bg-muted rounded-full px-2.5 py-0.5'>{t('stockLeft', { count: item.stock_qty })}</span>
           )}
           <span className='bg-muted rounded-full px-2.5 py-0.5'>{t('viewCount', { count: item.view_cnt })}</span>
+          {item.seller_bonded ? (
+            <span className='rounded-full bg-green-100 px-2.5 py-0.5 text-green-700 dark:bg-green-900/30 dark:text-green-400'>
+              🛡️ {t('bond.badgeBonded')}
+            </span>
+          ) : (
+            <span className='bg-muted rounded-full px-2.5 py-0.5'>{t('bond.badgeFree')}</span>
+          )}
         </div>
+
+        {/* 보증금 거래 공시 — 구매자가 취소수수료 발생 여부를 거래 전에 인지 (FR-10) */}
+        <p className='text-muted-foreground text-xs'>
+          {item.seller_bonded ? t('bond.buyerNoticeBonded') : t('bond.buyerNoticeFree')}
+        </p>
 
         {item.item_desc && (
           <p className='text-sm whitespace-pre-wrap'>{item.item_desc}</p>
