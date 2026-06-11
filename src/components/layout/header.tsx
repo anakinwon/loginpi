@@ -1,20 +1,16 @@
-import { getLocale, getTranslations } from 'next-intl/server'
+import { getLocale } from 'next-intl/server'
 import { Link } from '@/i18n/navigation'
 import { GoogleLoginButton } from '@/components/google-login-button'
 import { PiLoginButton } from '@/components/pi-login-button'
 import { ThemeToggle } from '@/components/theme-toggle'
-import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { BrowserName } from '@/components/layout/browser-name'
 import { LanguageSwitcher } from '@/components/layout/language-switcher'
 import { PiPriceChip } from '@/components/layout/pi-price-chip'
-import { PiAdminLink } from '@/components/layout/pi-admin-link'
-import { BoardChatLinks } from '@/components/layout/board-chat-links'
 
+// 상단 고정 헤더: 로고 · 계정명(로그인 버튼 내장) · 로그인/아웃 · 다국어 · Pi 시세.
+// 메뉴 이동(Home·Cafe·Shop·나의정보/관리자)은 BottomNav가 담당한다.
 export async function Header() {
-  const user = await getSessionUser()
-  const showAdmin = isAdmin(user)
   const locale = await getLocale()
-  const t = await getTranslations('header')
 
   return (
     <header className='bg-background/80 sticky top-0 z-50 border-b backdrop-blur-sm'>
@@ -23,21 +19,9 @@ export async function Header() {
           <BrowserName />
         </Link>
         <nav className='flex items-center gap-3'>
-          {/* Pi Browser에서는 숨김 — 클라이언트 컴포넌트에서 isInPiBrowser 감지 */}
-          <BoardChatLinks />
+          {/* 계정명·로그아웃 버튼은 각 로그인 버튼 컴포넌트가 세션 상태에 따라 렌더 */}
           <GoogleLoginButton />
           <PiLoginButton />
-          {showAdmin && (
-            <Link
-              href='/admin'
-              className='text-muted-foreground hover:text-foreground text-sm transition-colors'
-              title={t('admin')}
-            >
-              🛡️
-            </Link>
-          )}
-          {/* Pi Browser 관리자용: 로그아웃 버튼 오른쪽에 배치 */}
-          <PiAdminLink />
           <span className='hidden md:inline-flex'>
             <ThemeToggle />
           </span>

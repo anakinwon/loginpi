@@ -10,7 +10,7 @@ import { ThemeProvider } from '@/components/theme-provider'
 import { PiAuthProvider } from '@/components/pi-auth-provider'
 import { PiSdkScript } from '@/components/pi-sdk-script'
 import { Header } from '@/components/layout/header'
-import { Footer } from '@/components/layout/footer'
+import { BottomNav } from '@/components/layout/bottom-nav'
 import { Toaster } from '@/components/ui/sonner'
 
 const geistSans = Geist({
@@ -50,16 +50,17 @@ export default async function LocaleLayout({
         <NextIntlClientProvider messages={messages}>
           <SessionProvider session={session}>
             <ThemeProvider
-              attribute='class'
-              defaultTheme='system'
+              attribute="class"
+              defaultTheme="system"
               enableSystem
               disableTransitionOnChange
               enableColorScheme={false}
             >
               <PiAuthProvider>
                 <Header />
-                <main className='flex-1'>{children}</main>
-                <Footer />
+                {/* pb-16: 하단 고정 BottomNav(h-16)에 콘텐츠가 가려지지 않도록 여백 확보 */}
+                <main className="flex-1 pb-16">{children}</main>
+                <BottomNav />
                 <Toaster richColors />
               </PiAuthProvider>
             </ThemeProvider>
