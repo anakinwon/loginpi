@@ -1,8 +1,11 @@
 'use client'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from '@/i18n/navigation'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
+import { AdminPagination } from '@/components/admin/admin-pagination'
+
+const PAGE_SIZE = 10
 
 // TASK-070: 카페 마켓플레이스 — 테마 필터 칩 + 인기 랭킹 + 테마 팔로우
 // 데이터는 클라이언트에서 piFetch로 로드 (Pi Browser X-Pi-Token 이중 경로 자동 지원)
@@ -40,9 +43,11 @@ export function ChatMarketplace() {
   const [followed, setFollowed] = useState<Set<string>>(new Set())
   const [activeTheme, setActiveTheme] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [page, setPage] = useState(1)
 
   const load = useCallback(async (theme: string | null) => {
     setLoading(true)
+    setPage(1) // 테마 전환·재로드 시 첫 페이지로 리셋
     try {
       const qs = theme ? `?theme=${encodeURIComponent(theme)}` : ''
       const res = await piFetch(`/api/chat/marketplace${qs}`)
@@ -63,6 +68,17 @@ export function ChatMarketplace() {
   useEffect(() => {
     void load(null)
   }, [load])
+
+  const totalPages = Math.ceil(rooms.length / PAGE_SIZE)
+  const safePage = Math.min(page, Math.max(1, totalPages))
+  // 현재 페이지 슬라이스 + 전역 순위(rank) 부여 — 🥇🥈🥉는 전역 TOP 3에만 표시
+  const visibleRooms = useMemo(
+    () =>
+      rooms
+        .slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE)
+        .map((room, i) => ({ room, rank: (safePage - 1) * PAGE_SIZE + i })),
+    [rooms, safePage],
+  )
 
   function selectTheme(theme: string | null) {
     setActiveTheme(theme)
@@ -150,34 +166,45 @@ export function ChatMarketplace() {
           <p className='text-sm text-muted-foreground'>해당 테마의 공개 카페가 아직 없습니다</p>
         </div>
       ) : (
-        <div className='space-y-2'>
-          {rooms.map((room, idx) => (
-            <Link
-              key={room.room_id}
-              href={`/chat/${room.room_id}`}
-              className='flex items-center gap-3 rounded-xl border p-3 transition-colors hover:bg-muted/50'
-            >
-              <span className='flex h-10 w-10 shrink-0 items-center justify-center text-3xl select-none'>
-                {room.theme_emoji}
-              </span>
-              <div className='min-w-0 flex-1'>
-                <p className='truncate text-sm font-medium'>
-                  {idx < 3 && <span className='mr-1'>{RANK_BADGES[idx]}</span>}
-                  {room.room_nm}
-                  {room.room_tp_cd === 'E' && (
-                    <span className='ml-1.5 rounded-full bg-violet-100 px-1.5 py-0.5 text-[10px] font-medium text-violet-700 dark:bg-violet-900/30 dark:text-violet-400'>
-                      이벤트 π{room.entry_fee_pi}
-                    </span>
-                  )}
-                </p>
-                <p className='text-xs text-muted-foreground'>
-                  {room.theme_nm} · 멤버 {room.mbr_cnt}명 · 주간 메시지 {room.msg_cnt_7d}건
-                  {Number(room.tip_amt_7d) > 0 && <span> · 주간 Tip π{room.tip_amt_7d}</span>}
-                </p>
-              </div>
-            </Link>
-          ))}
-        </div>
+        <>
+          <div className='space-y-2'>
+            {visibleRooms.map(({ room, rank }) => (
+              <Link
+                key={room.room_id}
+                href={`/chat/${room.room_id}`}
+                className='flex items-center gap-3 rounded-xl border p-3 transition-colors hover:bg-muted/50'
+              >
+                <span className='flex h-10 w-10 shrink-0 items-center justify-center text-3xl select-none'>
+                  {room.theme_emoji}
+                </span>
+                <div className='min-w-0 flex-1'>
+                  <p className='truncate text-sm font-medium'>
+                    {rank < 3 ? (
+                      <span className='mr-1'>{RANK_BADGES[rank]}</span>
+                    ) : (
+                      <span className='mr-1 text-muted-foreground'>{rank + 1}.</span>
+                    )}
+                    {room.room_nm}
+                    {room.room_tp_cd === 'E' && (
+                      <span className='ml-1.5 rounded-full bg-violet-100 px-1.5 py-0.5 text-[10px] font-medium text-violet-700 dark:bg-violet-900/30 dark:text-violet-400'>
+                        이벤트 π{room.entry_fee_pi}
+                      </span>
+                    )}
+                  </p>
+                  <p className='text-xs text-muted-foreground'>
+                    {room.theme_nm} · 멤버 {room.mbr_cnt}명 · 주간 메시지 {room.msg_cnt_7d}건
+                    {Number(room.tip_amt_7d) > 0 && <span> · 주간 Tip π{room.tip_amt_7d}</span>}
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </div>
+          {totalPages > 1 && (
+            <div className='mt-3'>
+              <AdminPagination page={safePage} totalPages={totalPages} onPage={setPage} />
+            </div>
+          )}
+        </>
       )}
     </section>
   )
