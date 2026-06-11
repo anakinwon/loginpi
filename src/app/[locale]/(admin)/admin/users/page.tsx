@@ -22,6 +22,7 @@ interface UserRow {
   display_name: string
   role: Role
   reg_dtm: string
+  last_login_dtm: string | null
 }
 
 const ROLE_COLOR: Record<Role, string> = {
@@ -97,6 +98,7 @@ export default function UsersPage() {
                 <th className='px-4 py-2 text-left font-medium'>{t('col.googleAccount')}</th>
                 <th className='px-4 py-2 text-left font-medium'>{t('col.role')}</th>
                 <th className='px-4 py-2 text-left font-medium'>{t('col.joinDate')}</th>
+                <th className='px-4 py-2 text-left font-medium'>{t('col.lastLogin')}</th>
                 <th className='px-4 py-2 text-left font-medium'>{t('col.changeRole')}</th>
               </tr>
             </thead>
@@ -120,6 +122,14 @@ export default function UsersPage() {
                       year: 'numeric', month: '2-digit', day: '2-digit',
                       hour: '2-digit', minute: '2-digit',
                     })}
+                  </td>
+                  <td className='px-4 py-3 text-xs text-muted-foreground'>
+                    {user.last_login_dtm
+                      ? new Date(user.last_login_dtm).toLocaleString('ko-KR', {
+                          year: 'numeric', month: '2-digit', day: '2-digit',
+                          hour: '2-digit', minute: '2-digit',
+                        })
+                      : '—'}
                   </td>
                   <td className='px-4 py-3'>
                     <div className='flex flex-wrap gap-1'>

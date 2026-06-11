@@ -27,6 +27,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           if (byId) {
             token.userId = byId.id
             recordActivity(byId.id, 'LOGIN')
+            await db
+              .from('sys_user')
+              .update({ last_login_dtm: new Date().toISOString() })
+              .eq('id', byId.id)
           } else {
             // 2차: google_email fallback
             // 조건: email_verified=true + google_id가 아직 NULL인 행에만 허용
@@ -46,7 +50,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 // google_id가 NULL이었던 행에 실제 sub 세팅 (1회성 데이터 복구)
                 await db
                   .from('sys_user')
-                  .update({ google_id: profile.sub as string })
+                  .update({ google_id: profile.sub as string, last_login_dtm: new Date().toISOString() })
                   .eq('id', byEmail.id)
                   .is('google_id', null)  // 경쟁 조건 방지: NULL 확인 후 업데이트
               } else {

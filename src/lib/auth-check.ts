@@ -3,7 +3,7 @@ import { cookies, headers } from 'next/headers'
 import { auth } from '@/auth'
 import { verifyPayload } from './pi-session-crypto'
 import { verifyPitTicket } from './pit-ticket'
-import { getUserById, getUserByPiUid } from './users'
+import { getUserById, getUserByPiUid, touchLastLogin } from './users'
 import type { PiSessionUser } from '@/types/pi-session'
 import type { UserRow } from './users'
 
@@ -30,11 +30,17 @@ export async function getSessionUser(): Promise<UserRow | null> {
         (!piSession.tokenValidUntil || new Date(piSession.tokenValidUntil) > new Date())
       if (piSession?.userId && notExpired) {
         const user = await getUserById(piSession.userId)
-        if (user) return user
+        if (user) {
+          touchLastLogin(user.id)  // Pi Browser 토큰 재사용 접속도 기록 (5분 스로틀)
+          return user
+        }
       } else if (piSession?.uid && notExpired) {
         // 구버전 쿠키(userId='') 또는 DB 오류 시 pi_uid로 폴백 조회
         const user = await getUserByPiUid(piSession.uid)
-        if (user) return user
+        if (user) {
+          touchLastLogin(user.id)
+          return user
+        }
       }
     }
   }
@@ -47,7 +53,10 @@ export async function getSessionUser(): Promise<UserRow | null> {
     const userId = verifyPitTicket(pitTicket)
     if (userId) {
       const user = await getUserById(userId)
-      if (user) return user
+      if (user) {
+        touchLastLogin(user.id)
+        return user
+      }
     }
   }
 
@@ -55,7 +64,10 @@ export async function getSessionUser(): Promise<UserRow | null> {
   const googleSession = await auth()
   if (googleSession?.user?.id) {
     const user = await getUserById(googleSession.user.id)
-    if (user) return user
+    if (user) {
+      touchLastLogin(user.id)  // 일반 브라우저 세션 유지 접속도 기록 (5분 스로틀)
+      return user
+    }
   }
 
   return null
