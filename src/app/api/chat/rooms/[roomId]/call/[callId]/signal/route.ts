@@ -57,10 +57,13 @@ export async function POST(req: Request, { params }: Params) {
       .eq('call_st_cd', 'RINGING')
   }
 
+  // 신원 키(call_id, from_usr_id)는 클라이언트 payload에서 제거하고 서버 검증값으로 덮어쓴다.
+  // 스프레드를 먼저 펼친 뒤 서버 주입 필드를 마지막에 둬야 위장(spoofing)을 막을 수 있다.
+  const { call_id: _ignoredCallId, from_usr_id: _ignoredFrom, ...safePayload } = payload
   await broadcastToCall(roomId, event, {
+    ...safePayload,
     call_id: callId,
     from_usr_id: user.id,
-    ...payload,
   })
 
   return NextResponse.json({ ok: true })
