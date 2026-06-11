@@ -199,6 +199,7 @@
       "batch": "온디멘드 배치",
       "chatSection": "카페 관리",
       "subscriptions": "구독 관리",
+      "stickers": "스티커 관리",
       "backHome": "← 홈으로"
     },
     "batch": {
@@ -280,10 +281,15 @@
       "col": {
         "user": "사용자",
         "amount": "금액",
+        "theme": "테마",
         "memo": "메모",
         "status": "상태",
         "paymentId": "결제 ID",
         "date": "일시"
+      },
+      "theme": {
+        "subscription": "구독",
+        "unknown": "기타"
       }
     },
     "links": {
@@ -598,7 +604,9 @@
       "addr": "주소",
       "addrDtl": "상세 주소",
       "saved": "저장되었습니다.",
-      "saveError": "저장에 실패했습니다. 다시 시도해 주세요."
+      "saveError": "저장에 실패했습니다. 다시 시도해 주세요.",
+      "kakaoId": "카카오톡 ID",
+      "selfIntro": "자기소개"
     },
     "payment": {
       "empty": "결제 내역이 없습니다.",
@@ -619,6 +627,62 @@
       "cancelError": "취소에 실패했습니다. 다시 시도해 주세요."
     },
     "loginRequired": "로그인이 필요합니다"
+  },
+  "adminStickers": {
+    "title": "스티커 관리",
+    "desc": "전체 {count}팩 · 공식 {official} · 커스텀 {custom} · 판매중 {active}",
+    "createTitle": "새 스티커팩 만들기",
+    "packNm": "팩 이름",
+    "packDesc": "설명",
+    "theme": "테마",
+    "price": "가격 (π)",
+    "isDflt": "테마 기본팩",
+    "createBtn": "팩 생성",
+    "creating": "생성 중…",
+    "createSuccess": "스티커팩이 생성되었습니다",
+    "createFail": "팩 생성에 실패했습니다",
+    "createValidation": "팩 이름을 입력해주세요",
+    "filter": {
+      "all": "전체",
+      "official": "공식",
+      "custom": "커스텀",
+      "stopped": "판매중지"
+    },
+    "col": {
+      "pack": "팩",
+      "theme": "테마",
+      "type": "구분",
+      "price": "가격",
+      "stkrCnt": "스티커",
+      "ownrCnt": "보유자",
+      "status": "상태",
+      "regDtm": "등록일",
+      "manage": "관리"
+    },
+    "typeOfficial": "공식",
+    "typeCustom": "커스텀",
+    "statusOn": "판매중",
+    "statusOff": "중지",
+    "dfltBadge": "기본",
+    "free": "무료",
+    "detail": "상세",
+    "close": "닫기",
+    "edit": "수정",
+    "delete": "삭제",
+    "deleteConfirm": "'{name}' 팩을 삭제할까요? 스토어에서 더 이상 표시되지 않습니다.",
+    "deleteSuccess": "팩이 삭제되었습니다",
+    "deleteFail": "팩 삭제에 실패했습니다",
+    "updateSuccess": "팩 정보가 수정되었습니다",
+    "updateFail": "팩 수정에 실패했습니다",
+    "noData": "스티커팩이 없습니다",
+    "stickers": "스티커 목록",
+    "noStickers": "등록된 스티커가 없습니다 — 이미지를 업로드해 추가하세요",
+    "addStickers": "+ 스티커 추가 (png/jpg/gif/webp, 2MB)",
+    "uploading": "업로드 중…",
+    "uploadSuccess": "{count}개 스티커가 추가되었습니다",
+    "uploadFail": "스티커 업로드에 실패했습니다",
+    "stkrDeleteConfirm": "이 스티커를 삭제할까요?",
+    "stkrDeleteFail": "스티커 삭제에 실패했습니다"
   },
   "adminSubscriptions": {
     "title": "구독 관리",

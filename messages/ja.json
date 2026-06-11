@@ -578,7 +578,9 @@
       "addr": "住所",
       "addrDtl": "詳細住所",
       "saved": "保存されました。",
-      "saveError": "保存に失敗しました。再度お試しください。"
+      "saveError": "保存に失敗しました。再度お試しください。",
+      "kakaoId": "カカオトーク ID",
+      "selfIntro": "自己紹介"
     },
     "payment": {
       "empty": "決済履歴がありません。",

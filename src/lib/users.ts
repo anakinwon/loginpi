@@ -21,6 +21,9 @@ export interface UserRow {
   addr_dtl: string | null
   // Phase 12 — 마이그레이션 020 추가 컬럼 (PiTranslate™ 표시 언어)
   display_locale_cd: string | null
+  // 마이그레이션 027 — 카카오톡 연동 ID + 자기소개
+  kakao_id: string | null
+  self_intro: string | null
   // 마이그레이션 025 — 최근 로그인 일시 (도입 이전 사용자는 null)
   last_login_dtm: string | null
   reg_dtm: string
@@ -87,7 +90,7 @@ export async function getUserById(id: string): Promise<UserRow | null> {
 
 export async function updateUserProfile(
   userId: string,
-  data: Partial<Pick<UserRow, 'display_name' | 'real_nm' | 'nick_nm' | 'phone_no' | 'addr' | 'addr_dtl' | 'display_locale_cd'>>
+  data: Partial<Pick<UserRow, 'display_name' | 'real_nm' | 'nick_nm' | 'phone_no' | 'addr' | 'addr_dtl' | 'display_locale_cd' | 'kakao_id' | 'self_intro'>>
 ): Promise<UserRow | null> {
   const { data: row } = await getSupabaseAdmin()
     .from('sys_user')

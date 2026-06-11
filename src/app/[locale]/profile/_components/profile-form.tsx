@@ -19,6 +19,7 @@ const FIELDS: { name: keyof UserRow; label: string; placeholder: string }[] = [
   { name: 'phone_no',     label: '연락처',     placeholder: '010-0000-0000' },
   { name: 'addr',         label: '주소',       placeholder: '기본 주소' },
   { name: 'addr_dtl',     label: '상세 주소',  placeholder: '동·호수 등' },
+  { name: 'kakao_id',     label: '카카오톡 ID', placeholder: '카카오톡 아이디 입력' },
 ]
 
 export function ProfileForm({ initialUser, localeOptions, onSaved }: Props) {
@@ -94,6 +95,22 @@ export function ProfileForm({ initialUser, localeOptions, onSaved }: Props) {
             <option key={value} value={value}>{label}</option>
           ))}
         </select>
+      </div>
+
+      {/* 자기소개 — textarea (FIELDS 루프 밖에서 별도 렌더) */}
+      <div className='flex flex-col gap-1'>
+        <label className='text-sm font-medium' htmlFor='self_intro'>
+          자기소개
+        </label>
+        <textarea
+          id='self_intro'
+          name='self_intro'
+          defaultValue={(initialUser.self_intro as string | null) ?? ''}
+          placeholder='간단한 자기소개를 입력해 주세요 (최대 500자)'
+          maxLength={500}
+          rows={4}
+          className='rounded-md border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/50 resize-none'
+        />
       </div>
 
       {message && (
