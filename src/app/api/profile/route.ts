@@ -23,11 +23,18 @@ export async function GET() {
   const user = await getSessionUser()
   if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
-  const { data } = await getSupabaseAdmin()
+  const { data, error } = await getSupabaseAdmin()
     .from('sys_user')
     .select('id, display_name, real_nm, nick_nm, phone_no, addr, addr_dtl, display_locale_cd, kakao_id, self_intro, pi_username, google_email, role, reg_dtm')
     .eq('id', user.id)
     .maybeSingle()
+
+  // error 무시 시 { user: null } 200 응답 → 클라이언트 게이트가 "로그인이 필요합니다"로 오인
+  // (실제 사례: 027 마이그레이션 미적용으로 kakao_id 컬럼 부재 → 인증 정상인데 로그인 오류로 표시)
+  if (error || !data) {
+    console.error('[profile] 조회 실패:', error?.message ?? 'row 없음')
+    return NextResponse.json({ error: '프로필 조회 실패' }, { status: 500 })
+  }
 
   return NextResponse.json({ user: data })
 }
