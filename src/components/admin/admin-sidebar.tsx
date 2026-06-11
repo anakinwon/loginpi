@@ -26,6 +26,7 @@ const STD_NAV = [
 
 const CHAT_NAV = [
   { href: '/admin/subscriptions', labelKey: 'subscriptions' },
+  { href: '/admin/stickers',      labelKey: 'stickers' },
 ] as const
 
 const I18N_NAV = [
