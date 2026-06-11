@@ -637,6 +637,13 @@
       "CLOSED": "게시중단",
       "SOLD": "판매완료"
     },
+    "tradeSt": {
+      "OPEN": "판매중",
+      "TRADING": "거래중",
+      "SOLD": "판매완료"
+    },
+    "tradingCount": "거래중 {count}건",
+    "notOnSale": "판매중이 아닌 상품입니다",
     "orderSt": {
       "PENDING": "결제 대기",
       "ESCROW": "에스크로 완료",

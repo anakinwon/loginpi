@@ -14,21 +14,37 @@ interface OrderRow {
   buyer_id: string
   seller_id: string
   order_price_pi: number
-  order_st_cd: 'PENDING' | 'ESCROW' | 'TRADING' | 'SELLER_DONE' | 'BUYER_DONE' | 'DONE' | 'CANCELLED'
+  order_st_cd:
+    | 'PENDING'
+    | 'ESCROW'
+    | 'TRADING'
+    | 'SELLER_DONE'
+    | 'BUYER_DONE'
+    | 'DONE'
+    | 'CANCELLED'
   cancel_reason: string | null
   reg_dtm: string
   mps_item: { item_nm: string; thumbnail_url: string | null } | null
 }
 
+// ESCROW·SELLER_DONE은 구버전 주문 레거시 상태 — 화면에는 거래중과 동일 계열로 표시
 const ST_STYLE: Record<OrderRow['order_st_cd'], string> = {
-  PENDING:     'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
-  ESCROW:      'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-  TRADING:     'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
-  SELLER_DONE: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
-  BUYER_DONE:  'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400',
-  DONE:        'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-  CANCELLED:   'bg-muted text-muted-foreground',
+  PENDING:
+    'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
+  ESCROW:
+    'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
+  TRADING:
+    'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
+  SELLER_DONE:
+    'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
+  BUYER_DONE:
+    'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400',
+  DONE: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+  CANCELLED: 'bg-muted text-muted-foreground',
 }
+
+// 결제 완료 후 거래 진행 중인 상태 (레거시 포함) — 구매자 수령 확인 가능 구간
+const IN_TRADE: OrderRow['order_st_cd'][] = ['TRADING', 'ESCROW', 'SELLER_DONE']
 
 // 주문 관리 (SCR-05 판매 / SCR-06 구매) — 양방향 확인 액션 포함
 // serverAuthed: 서버 getSessionUser() 확인 결과 (Google 쿠키 로그인 포함)
@@ -64,13 +80,24 @@ export function ClientMyOrders({
   }, [authed, load])
 
   if (!authed && isLoading) {
-    return <p className='text-muted-foreground py-16 text-center text-sm'>{t('loading')}</p>
+    return (
+      <p className="text-muted-foreground py-16 text-center text-sm">
+        {t('loading')}
+      </p>
+    )
   }
   if (!authed) {
-    return <p className='text-muted-foreground py-16 text-center text-sm'>{t('loginRequired')}</p>
+    return (
+      <p className="text-muted-foreground py-16 text-center text-sm">
+        {t('loginRequired')}
+      </p>
+    )
   }
 
-  async function act(orderId: string, action: 'confirm' | 'release' | 'complete' | 'cancel') {
+  async function act(
+    orderId: string,
+    action: 'release' | 'complete' | 'cancel',
+  ) {
     let body: string | undefined
     if (action === 'cancel') {
       const reason = prompt(t('cancelReasonPrompt'))
@@ -97,66 +124,92 @@ export function ClientMyOrders({
   }
 
   return (
-    <div className='space-y-3'>
+    <div className="space-y-3">
       {loading ? (
-        <p className='text-muted-foreground py-16 text-center text-sm'>{t('loading')}</p>
+        <p className="text-muted-foreground py-16 text-center text-sm">
+          {t('loading')}
+        </p>
       ) : orders.length === 0 ? (
-        <p className='text-muted-foreground py-16 text-center text-sm'>{t('noOrders')}</p>
+        <p className="text-muted-foreground py-16 text-center text-sm">
+          {t('noOrders')}
+        </p>
       ) : (
-        orders.map(o => {
+        orders.map((o) => {
           const busy = acting === o.order_id
           return (
-            <div key={o.order_id} className='space-y-2 rounded-lg border p-4'>
-              <div className='flex items-center justify-between gap-2'>
-                <Link href={`/store/${o.item_id}`} className='truncate text-sm font-medium hover:underline'>
+            <div key={o.order_id} className="space-y-2 rounded-lg border p-4">
+              <div className="flex items-center justify-between gap-2">
+                <Link
+                  href={`/store/${o.item_id}`}
+                  className="truncate text-sm font-medium hover:underline"
+                >
                   {o.mps_item?.item_nm ?? t('itemNotFound')}
                 </Link>
-                <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${ST_STYLE[o.order_st_cd]}`}>
-                  {t(`orderSt.${o.order_st_cd}`)}
+                <span
+                  className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${ST_STYLE[o.order_st_cd]}`}
+                >
+                  {/* 레거시 ESCROW·SELLER_DONE도 "거래중"으로 표시 */}
+                  {t(
+                    `orderSt.${IN_TRADE.includes(o.order_st_cd) ? 'TRADING' : o.order_st_cd}`,
+                  )}
                 </span>
               </div>
-              <p className='text-muted-foreground text-xs'>
-                {Number(o.order_price_pi)} π · {new Date(o.reg_dtm).toLocaleString()}
-                {o.order_st_cd === 'CANCELLED' && o.cancel_reason && ` · ${o.cancel_reason}`}
+              <p className="text-muted-foreground text-xs">
+                {Number(o.order_price_pi)} π ·{' '}
+                {new Date(o.reg_dtm).toLocaleString()}
+                {o.order_st_cd === 'CANCELLED' &&
+                  o.cancel_reason &&
+                  ` · ${o.cancel_reason}`}
               </p>
 
-              {/* 상태별 액션 — 3단계 확인: ①전달(판매자) ②수령(구매자) ③거래완료(판매자) */}
-              <div className='flex flex-wrap gap-1.5'>
-                {role === 'seller' && (o.order_st_cd === 'ESCROW' || o.order_st_cd === 'TRADING') && (
-                  <Button size='sm' disabled={busy} onClick={() => act(o.order_id, 'confirm')}>
-                    {t('actionSellerDone')}
-                  </Button>
-                )}
-                {role === 'buyer' && o.order_st_cd === 'SELLER_DONE' && (
-                  <Button size='sm' disabled={busy} onClick={() => act(o.order_id, 'release')}>
+              {/* 상태별 액션 — 2단계 확인: ①수령(구매자) ②거래완료(판매자) */}
+              <div className="flex flex-wrap gap-1.5">
+                {role === 'buyer' && IN_TRADE.includes(o.order_st_cd) && (
+                  <Button
+                    size="sm"
+                    disabled={busy}
+                    onClick={() => act(o.order_id, 'release')}
+                  >
                     {t('actionBuyerDone')}
                   </Button>
                 )}
                 {role === 'seller' && o.order_st_cd === 'BUYER_DONE' && (
-                  <Button size='sm' disabled={busy} onClick={() => act(o.order_id, 'complete')}>
+                  <Button
+                    size="sm"
+                    disabled={busy}
+                    onClick={() => act(o.order_id, 'complete')}
+                  >
                     {t('actionComplete')}
                   </Button>
                 )}
-                {role === 'buyer' && o.order_st_cd === 'SELLER_DONE' && (
-                  <Button size='sm' variant='outline' disabled={busy} onClick={() => act(o.order_id, 'cancel')}>
-                    {t('actionCancel')}
-                  </Button>
-                )}
-                {['PENDING', 'ESCROW', 'TRADING'].includes(o.order_st_cd) && (
-                  <Button size='sm' variant='outline' disabled={busy} onClick={() => act(o.order_id, 'cancel')}>
+                {(o.order_st_cd === 'PENDING' ||
+                  (IN_TRADE.includes(o.order_st_cd) &&
+                    (role === 'buyer' || o.order_st_cd !== 'SELLER_DONE'))) && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={busy}
+                    onClick={() => act(o.order_id, 'cancel')}
+                  >
                     {t('actionCancel')}
                   </Button>
                 )}
               </div>
 
-              {role === 'seller' && o.order_st_cd === 'SELLER_DONE' && (
-                <p className='text-muted-foreground text-xs'>{t('waitingBuyerConfirm')}</p>
+              {role === 'seller' && IN_TRADE.includes(o.order_st_cd) && (
+                <p className="text-muted-foreground text-xs">
+                  {t('waitingBuyerConfirm')}
+                </p>
               )}
               {role === 'buyer' && o.order_st_cd === 'BUYER_DONE' && (
-                <p className='text-muted-foreground text-xs'>{t('waitingSellerComplete')}</p>
+                <p className="text-muted-foreground text-xs">
+                  {t('waitingSellerComplete')}
+                </p>
               )}
               {o.order_st_cd === 'DONE' && (
-                <p className='text-muted-foreground text-xs'>{t('escrowReleased')}</p>
+                <p className="text-muted-foreground text-xs">
+                  {t('escrowReleased')}
+                </p>
               )}
             </div>
           )

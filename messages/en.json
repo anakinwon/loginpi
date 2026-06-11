@@ -635,6 +635,13 @@
       "CLOSED": "Paused",
       "SOLD": "Sold Out"
     },
+    "tradeSt": {
+      "OPEN": "On Sale",
+      "TRADING": "In Trade",
+      "SOLD": "Sold Out"
+    },
+    "tradingCount": "{count} in trade",
+    "notOnSale": "This item is not on sale",
     "orderSt": {
       "PENDING": "Awaiting Payment",
       "ESCROW": "In Escrow",

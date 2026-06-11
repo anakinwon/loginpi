@@ -1,8 +1,9 @@
 import 'server-only'
 import { getSupabaseAdmin } from './supabase-admin'
 
-// MPS 주문 — 상태 머신 (3단계 확인 에스크로):
-//   PENDING → ESCROW → SELLER_DONE(판매자 전달) → BUYER_DONE(구매자 수령) → DONE(판매자 거래완료 → 정산)
+// MPS 주문 — 상태 머신 (에스크로 결제 즉시 거래중):
+//   PENDING → TRADING(결제 완료 = 거래중) → BUYER_DONE(구매자 수령) → DONE(판매자 거래완료 → 정산)
+// ESCROW·SELLER_DONE은 구버전 주문 호환용 레거시 상태 — 신규 전환 없음
 // 생성·취소는 재고 원자성 때문에 DB RPC(fn_mps_order_create / fn_mps_order_cancel) 위임
 
 export interface MpsOrder {
@@ -11,7 +12,14 @@ export interface MpsOrder {
   buyer_id: string
   seller_id: string
   order_price_pi: number
-  order_st_cd: 'PENDING' | 'ESCROW' | 'TRADING' | 'SELLER_DONE' | 'BUYER_DONE' | 'DONE' | 'CANCELLED'
+  order_st_cd:
+    | 'PENDING'
+    | 'ESCROW'
+    | 'TRADING'
+    | 'SELLER_DONE'
+    | 'BUYER_DONE'
+    | 'DONE'
+    | 'CANCELLED'
   escrow_txid: string | null
   release_txid: string | null
   cancel_req_id: string | null
@@ -29,7 +37,12 @@ export type OrderError =
   | 'UNKNOWN'
 
 function mapRpcError(message: string): OrderError {
-  for (const code of ['OUT_OF_STOCK', 'SELF_PURCHASE', 'ORDER_NOT_FOUND', 'NOT_ALLOWED'] as const) {
+  for (const code of [
+    'OUT_OF_STOCK',
+    'SELF_PURCHASE',
+    'ORDER_NOT_FOUND',
+    'NOT_ALLOWED',
+  ] as const) {
     if (message.includes(code)) return code
   }
   return 'UNKNOWN'
@@ -69,13 +82,18 @@ export async function cancelOrder(
   return { order: data as MpsOrder }
 }
 
-// 에스크로 완료 — Pi 결제 complete 콜백에서 호출 (PENDING → ESCROW, 구매자·금액 검증은 호출자 책임)
-export async function markEscrow(orderId: string, buyerId: string, txid: string, amountPi: number) {
+// 에스크로 입금 완료 — Pi 결제 complete 콜백에서 호출 (PENDING → TRADING, 구매자·금액 검증은 호출자 책임)
+export async function markEscrow(
+  orderId: string,
+  buyerId: string,
+  txid: string,
+  amountPi: number,
+) {
   const db = getSupabaseAdmin()
   const { data, error } = await db
     .from('mps_order')
     .update({
-      order_st_cd: 'ESCROW',
+      order_st_cd: 'TRADING',
       escrow_txid: txid,
       modr_id: buyerId,
       mod_dtm: new Date().toISOString(),
@@ -102,26 +120,8 @@ export async function markEscrow(orderId: string, buyerId: string, txid: string,
   return data as MpsOrder
 }
 
-// ① 판매자 "물건 전달 완료" — ESCROW·TRADING → SELLER_DONE
-export async function markSellerDone(orderId: string, sellerId: string) {
-  const { data } = await getSupabaseAdmin()
-    .from('mps_order')
-    .update({
-      order_st_cd: 'SELLER_DONE',
-      modr_id: sellerId,
-      mod_dtm: new Date().toISOString(),
-    })
-    .eq('order_id', orderId)
-    .eq('seller_id', sellerId)
-    .in('order_st_cd', ['ESCROW', 'TRADING'])
-    .eq('del_yn', 'N')
-    .select()
-    .maybeSingle()
-
-  return (data as MpsOrder | null) ?? null
-}
-
-// ② 구매자 "물건 수령 완료" — SELLER_DONE → BUYER_DONE (판매자 최종 확인 대기)
+// ① 구매자 "물건 수령 완료" — TRADING → BUYER_DONE (판매자 거래완료 대기)
+//    ESCROW·SELLER_DONE은 구버전 주문 호환 허용
 export async function markBuyerDone(orderId: string, buyerId: string) {
   const { data } = await getSupabaseAdmin()
     .from('mps_order')
@@ -132,7 +132,7 @@ export async function markBuyerDone(orderId: string, buyerId: string) {
     })
     .eq('order_id', orderId)
     .eq('buyer_id', buyerId)
-    .eq('order_st_cd', 'SELLER_DONE') // 단계 순서 강제 — 판매자 전달 확인 전 수령 확인 불가
+    .in('order_st_cd', ['TRADING', 'ESCROW', 'SELLER_DONE'])
     .eq('del_yn', 'N')
     .select()
     .maybeSingle()
@@ -140,7 +140,7 @@ export async function markBuyerDone(orderId: string, buyerId: string) {
   return (data as MpsOrder | null) ?? null
 }
 
-// ③ 판매자 "거래 완료" — BUYER_DONE → DONE + RELEASE_OUT 이력 (실 Pi 정산은 운영자 처리)
+// ② 판매자 "거래 완료" — BUYER_DONE → DONE + RELEASE_OUT 이력 (에스크로 → 판매자, 실 Pi 정산은 운영자 처리)
 export async function markComplete(orderId: string, sellerId: string) {
   const db = getSupabaseAdmin()
   const { data } = await db
@@ -173,7 +173,11 @@ export async function markComplete(orderId: string, sellerId: string) {
 }
 
 // 주문 상세 — 당사자(구매자·판매자)·관리자만
-export async function getOrderForUser(orderId: string, userId: string, isAdminUser: boolean) {
+export async function getOrderForUser(
+  orderId: string,
+  userId: string,
+  isAdminUser: boolean,
+) {
   const { data } = await getSupabaseAdmin()
     .from('mps_order')
     .select('*, mps_item ( item_nm, thumbnail_url, price_pi )')
@@ -190,7 +194,10 @@ export async function getOrderForUser(orderId: string, userId: string, isAdminUs
 }
 
 // 내 주문 목록 — role: buyer(구매) | seller(판매)
-export async function listOrdersByRole(userId: string, role: 'buyer' | 'seller') {
+export async function listOrdersByRole(
+  userId: string,
+  role: 'buyer' | 'seller',
+) {
   const column = role === 'buyer' ? 'buyer_id' : 'seller_id'
   const { data, error } = await getSupabaseAdmin()
     .from('mps_order')

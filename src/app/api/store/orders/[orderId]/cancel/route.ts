@@ -8,13 +8,15 @@ const cancelSchema = z.object({
 })
 
 // POST /api/store/orders/[orderId]/cancel — 주문 취소 + 재고 복원
-// PENDING·ESCROW·TRADING: 당사자·관리자 | SELLER_DONE: 구매자·관리자만 | DONE: 불가
+// PENDING·TRADING(레거시 ESCROW 포함): 당사자·관리자 | 레거시 SELLER_DONE: 구매자·관리자만 | DONE: 불가
+// 거래중 취소 시 보증금 활성 판매자 거래에 한해 취소수수료 0.1π (fn_mps_order_cancel)
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ orderId: string }> },
 ) {
   const user = await getSessionUser()
-  if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user)
+    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
   const { orderId } = await params
   let body: unknown
@@ -26,15 +28,29 @@ export async function POST(
 
   const parsed = cancelSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json({ error: '취소 사유를 입력해주세요' }, { status: 400 })
+    return NextResponse.json(
+      { error: '취소 사유를 입력해주세요' },
+      { status: 400 },
+    )
   }
 
-  const result = await cancelOrder(orderId, user.id, parsed.data.reason, isAdmin(user))
+  const result = await cancelOrder(
+    orderId,
+    user.id,
+    parsed.data.reason,
+    isAdmin(user),
+  )
   if ('error' in result) {
     if (result.error === 'ORDER_NOT_FOUND') {
-      return NextResponse.json({ error: '주문을 찾을 수 없습니다' }, { status: 404 })
+      return NextResponse.json(
+        { error: '주문을 찾을 수 없습니다' },
+        { status: 404 },
+      )
     }
-    return NextResponse.json({ error: '취소할 수 없는 주문입니다' }, { status: 403 })
+    return NextResponse.json(
+      { error: '취소할 수 없는 주문입니다' },
+      { status: 403 },
+    )
   }
   return NextResponse.json({ order: result.order })
 }

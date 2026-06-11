@@ -53,7 +53,35 @@ const SORT_MAP = {
   views: { column: 'view_cnt', ascending: false },
 } as const
 
-// 공개 목록 — OPEN 상태만 노출 (DRAFT·CLOSED·SOLD 제외)
+// 진행 중 주문 상태 — 재고를 선점하고 아직 종결되지 않은 주문 (거래중 표시 기준)
+const ACTIVE_ORDER_STS = [
+  'PENDING',
+  'ESCROW',
+  'TRADING',
+  'SELLER_DONE',
+  'BUYER_DONE',
+]
+
+// 상품별 진행 중 주문 수 집계 — 거래중/판매완료 구분에 사용
+async function getTradingCounts(
+  itemIds: string[],
+): Promise<Map<string, number>> {
+  if (itemIds.length === 0) return new Map()
+  const { data } = await getSupabaseAdmin()
+    .from('mps_order')
+    .select('item_id')
+    .in('item_id', itemIds)
+    .in('order_st_cd', ACTIVE_ORDER_STS)
+    .eq('del_yn', 'N')
+
+  const map = new Map<string, number>()
+  for (const row of (data ?? []) as { item_id: string }[]) {
+    map.set(row.item_id, (map.get(row.item_id) ?? 0) + 1)
+  }
+  return map
+}
+
+// 공개 목록 — OPEN·SOLD 노출 (DRAFT·CLOSED 제외). SOLD는 거래중/판매완료 배지 표시용
 export async function listOpenItems(filter: ItemListFilter) {
   const db = getSupabaseAdmin()
   const limit = Math.min(filter.limit ?? 20, 50)
@@ -64,7 +92,7 @@ export async function listOpenItems(filter: ItemListFilter) {
     .from('mps_item')
     .select('*', { count: 'exact' })
     .eq('del_yn', 'N')
-    .eq('item_st_cd', 'OPEN')
+    .in('item_st_cd', ['OPEN', 'SOLD'])
 
   if (filter.ctgrId) q = q.eq('ctgr_id', filter.ctgrId)
   if (filter.cndCd) q = q.eq('item_cnd_cd', filter.cndCd)
@@ -78,10 +106,17 @@ export async function listOpenItems(filter: ItemListFilter) {
     .range((page - 1) * limit, page * limit - 1)
 
   if (error) throw new Error(error.message)
-  return { items: (data ?? []) as MpsItem[], total: count ?? 0, page, limit }
+
+  const rows = (data ?? []) as MpsItem[]
+  const tradingCounts = await getTradingCounts(rows.map((r) => r.item_id))
+  const items = rows.map((r) => ({
+    ...r,
+    trading_cnt: tradingCounts.get(r.item_id) ?? 0,
+  }))
+  return { items, total: count ?? 0, page, limit }
 }
 
-// 판매자 본인 상품 목록 — 전체 상태 포함
+// 판매자 본인 상품 목록 — 전체 상태 포함 + 진행 중 주문 수 (거래중/판매완료 배지)
 export async function listMyItems(sellerId: string) {
   const { data, error } = await getSupabaseAdmin()
     .from('mps_item')
@@ -91,14 +126,25 @@ export async function listMyItems(sellerId: string) {
     .order('reg_dtm', { ascending: false })
 
   if (error) throw new Error(error.message)
-  return (data ?? []) as MpsItem[]
+
+  const rows = (data ?? []) as MpsItem[]
+  const tradingCounts = await getTradingCounts(rows.map((r) => r.item_id))
+  return rows.map((r) => ({
+    ...r,
+    trading_cnt: tradingCounts.get(r.item_id) ?? 0,
+  }))
 }
 
 // 상세 조회 — 이미지·매장 포함. DRAFT는 판매자 본인에게만 노출
 export async function getItemDetail(itemId: string, viewerId?: string) {
   const db = getSupabaseAdmin()
   const [{ data: item }, { data: imgs }] = await Promise.all([
-    db.from('mps_item').select('*').eq('item_id', itemId).eq('del_yn', 'N').maybeSingle(),
+    db
+      .from('mps_item')
+      .select('*')
+      .eq('item_id', itemId)
+      .eq('del_yn', 'N')
+      .maybeSingle(),
     db
       .from('mps_item_img')
       .select('img_id, img_url, sort_ord, thumbnail_yn')
@@ -123,9 +169,19 @@ export async function getItemDetail(itemId: string, viewerId?: string) {
   }
 
   // 보증금 거래 여부 — 구매자가 취소수수료 발생 여부를 거래 전에 인지 (FR-10 단서 공시)
-  const sellerBonded = await isSellerBonded(row.seller_id)
+  // 진행 중 주문 수 — 거래중/판매완료 배지 구분
+  const [sellerBonded, tradingCounts] = await Promise.all([
+    isSellerBonded(row.seller_id),
+    getTradingCounts([row.item_id]),
+  ])
 
-  return { ...row, images: imgs ?? [], shop, seller_bonded: sellerBonded }
+  return {
+    ...row,
+    images: imgs ?? [],
+    shop,
+    seller_bonded: sellerBonded,
+    trading_cnt: tradingCounts.get(row.item_id) ?? 0,
+  }
 }
 
 // 조회수 증가 — 정밀 카운팅 불필요, 실패는 무시
@@ -136,7 +192,11 @@ export async function incrementViewCnt(itemId: string, current: number) {
     .eq('item_id', itemId)
 }
 
-export async function createItem(sellerId: string, regrId: string, input: CreateItemInput) {
+export async function createItem(
+  sellerId: string,
+  regrId: string,
+  input: CreateItemInput,
+) {
   const regQty = input.reg_qty ?? 1
   const { data, error } = await getSupabaseAdmin()
     .from('mps_item')
@@ -175,7 +235,11 @@ export interface UpdateItemPatch {
   reg_qty?: number
 }
 
-export type UpdateItemError = 'NOT_FOUND' | 'FORBIDDEN' | 'INVALID_STATUS' | 'QTY_BELOW_ORDERED'
+export type UpdateItemError =
+  | 'NOT_FOUND'
+  | 'FORBIDDEN'
+  | 'INVALID_STATUS'
+  | 'QTY_BELOW_ORDERED'
 
 // 수정 — 본인 확인 + reg_qty 변경 시 재고 재계산 (new_reg_qty >= ordered_qty 검증)
 export async function updateItem(
@@ -195,22 +259,42 @@ export async function updateItem(
   const item = cur as MpsItem
   if (item.seller_id !== sellerId) return { error: 'FORBIDDEN' as const }
 
-  const update: Record<string, unknown> = { modr_id: sellerId, mod_dtm: new Date().toISOString() }
-  for (const key of ['item_nm', 'item_desc', 'price_pi', 'item_cnd_cd', 'ctgr_id', 'shop_id', 'thumbnail_url', 'item_st_cd'] as const) {
+  const update: Record<string, unknown> = {
+    modr_id: sellerId,
+    mod_dtm: new Date().toISOString(),
+  }
+  for (const key of [
+    'item_nm',
+    'item_desc',
+    'price_pi',
+    'item_cnd_cd',
+    'ctgr_id',
+    'shop_id',
+    'thumbnail_url',
+    'item_st_cd',
+  ] as const) {
     if (patch[key] !== undefined) update[key] = patch[key]
   }
 
   // SOLD는 자동 전환 전용 — 수동 지정 불가 (DB CHECK과 별개로 명시 차단)
-  if (patch.item_st_cd && !['DRAFT', 'OPEN', 'CLOSED'].includes(patch.item_st_cd)) {
+  if (
+    patch.item_st_cd &&
+    !['DRAFT', 'OPEN', 'CLOSED'].includes(patch.item_st_cd)
+  ) {
     return { error: 'INVALID_STATUS' as const }
   }
 
   if (patch.reg_qty !== undefined) {
-    if (patch.reg_qty < item.ordered_qty) return { error: 'QTY_BELOW_ORDERED' as const }
+    if (patch.reg_qty < item.ordered_qty)
+      return { error: 'QTY_BELOW_ORDERED' as const }
     update.reg_qty = patch.reg_qty
     update.stock_qty = patch.reg_qty - item.ordered_qty
     // SOLD 상품의 수량 증가 → OPEN 재전환 (FR-02)
-    if (item.item_st_cd === 'SOLD' && patch.reg_qty - item.ordered_qty > 0 && !patch.item_st_cd) {
+    if (
+      item.item_st_cd === 'SOLD' &&
+      patch.reg_qty - item.ordered_qty > 0 &&
+      !patch.item_st_cd
+    ) {
       update.item_st_cd = 'OPEN'
     }
   }
@@ -227,7 +311,11 @@ export async function updateItem(
 }
 
 // 논리삭제 — 물리 DELETE 금지
-export async function softDeleteItem(itemId: string, sellerId: string, isAdminUser = false) {
+export async function softDeleteItem(
+  itemId: string,
+  sellerId: string,
+  isAdminUser = false,
+) {
   const db = getSupabaseAdmin()
   let q = db
     .from('mps_item')
