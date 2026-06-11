@@ -32,6 +32,8 @@ export function ChatInput({ onSend, onSendSticker, onSendFile }: ChatInputProps)
 
     setIsSending(true)
     setText('')
+    // 줄바꿈으로 늘어난 높이 초기화 (setText는 onInput을 거치지 않음)
+    if (textareaRef.current) textareaRef.current.style.height = 'auto'
 
     try {
       await onSend(trimmed)
@@ -126,6 +128,8 @@ export function ChatInput({ onSend, onSendSticker, onSendFile }: ChatInputProps)
       />
       <button
         onClick={send}
+        // 터치/클릭 시 textarea의 포커스를 뺏지 않음 → 모바일 키보드 유지
+        onPointerDown={e => e.preventDefault()}
         disabled={!text.trim() || isSending}
         className='shrink-0 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-40'
       >
