@@ -12,8 +12,8 @@ import { InlinePurchasePrompt } from './inline-purchase-prompt'
 import { BadgeAwardPopup, type BadgeAwardInfo } from './badge-award-popup'
 import { PiBetPanel } from './pi-bet-panel'
 import { RoomSettingsDialog, type RoomSettings } from './room-settings-dialog'
-import { VoiceCallPanel } from './voice-call-panel'
-import { useWebrtcCall } from '@/hooks/use-webrtc-call'
+import { VoiceChannelPanel, RemoteAudio } from './voice-channel-panel'
+import { useVoiceChannel } from '@/hooks/use-voice-channel'
 
 interface ChatRoomPanelProps {
   roomId: string
@@ -58,7 +58,9 @@ export function ChatRoomPanel({
   const [expireBannerDismissed, setExpireBannerDismissed] = useState(false)
   // TASK-062 Trigger 7: 배지 수여 축하 팝업 + 강화 배지 헤더 상시 표시
   const [badgeAward, setBadgeAward] = useState<BadgeAwardInfo | null>(null)
-  const [upgradedBadge, setUpgradedBadge] = useState<BadgeAwardInfo | null>(null)
+  const [upgradedBadge, setUpgradedBadge] = useState<BadgeAwardInfo | null>(
+    null,
+  )
   // TASK-071: Pi Bet 패널
   const [betPanelOpen, setBetPanelOpen] = useState(false)
   // 방장 전용 카페 수정 — 방 메타 조회 후 OWNER일 때만 버튼 노출
@@ -67,28 +69,34 @@ export function ChatRoomPanel({
   const [settingsOpen, setSettingsOpen] = useState(false)
   // 헤더 제목은 수정 결과를 즉시 반영 (서버 재조회 없이)
   const [displayRoomNm, setDisplayRoomNm] = useState(roomNm)
-  // PiVoice™ — 통화 멤버 피커
-  const [callPickerOpen, setCallPickerOpen] = useState(false)
-  const [callMembers, setCallMembers] = useState<{ usr_id: string; display_nm: string }[]>([])
-  const [callCalleeName, setCallCalleeName] = useState<string | undefined>(undefined)
-  const [displayRoomDesc, setDisplayRoomDesc] = useState<string | null>(roomDesc ?? null)
+  // PiVoice™ v2.0 — 음성채널 패널 표시 + 방장 마이크 제어 권한
+  const [voicePanelOpen, setVoicePanelOpen] = useState(false)
+  const [canControlMic, setCanControlMic] = useState(false)
+  const [displayRoomDesc, setDisplayRoomDesc] = useState<string | null>(
+    roomDesc ?? null,
+  )
 
   // 방 입장 시 이 방에 저장된 번역 언어 복원 (외부 저장소 구독 — 방별 독립)
   useEffect(() => {
-    try { setViewLocale(localStorage.getItem(viewLocaleKey(roomId)) ?? '') } catch {}
-  }, [roomId])
-
-  const handleLocaleChange = useCallback((cd: string) => {
-    setViewLocale(cd)
     try {
-      if (cd) localStorage.setItem(viewLocaleKey(roomId), cd)
-      else localStorage.removeItem(viewLocaleKey(roomId))
+      setViewLocale(localStorage.getItem(viewLocaleKey(roomId)) ?? '')
     } catch {}
   }, [roomId])
 
+  const handleLocaleChange = useCallback(
+    (cd: string) => {
+      setViewLocale(cd)
+      try {
+        if (cd) localStorage.setItem(viewLocaleKey(roomId), cd)
+        else localStorage.removeItem(viewLocaleKey(roomId))
+      } catch {}
+    },
+    [roomId],
+  )
+
   const checkSubscription = useCallback(() => {
     piFetch('/api/subscriptions/check')
-      .then(r => r.ok ? r.json() : null)
+      .then((r) => (r.ok ? r.json() : null))
       .then((d: { canTip?: boolean; tier?: string } | null) => {
         if (d?.canTip) setCanTip(true)
         if (d?.tier && d.tier !== 'FREE') setIsSubscribed(true)
@@ -96,56 +104,57 @@ export function ChatRoomPanel({
       .catch(() => {})
   }, [])
 
-  useEffect(() => { checkSubscription() }, [checkSubscription])
+  useEffect(() => {
+    checkSubscription()
+  }, [checkSubscription])
 
-  // PiVoice™ — WebRTC 통화 훅
+  // PiVoice™ v2.0 — N:N 음성채널 훅 (1명도 입장 가능, 최대 마이크 4명)
   const {
-    callState,
-    incomingCall,
-    remoteStream,
+    voiceState,
+    participants: voiceParticipants,
+    remoteStreams,
     isMuted,
-    startCall,
-    answerCall,
-    rejectCall,
-    endCall,
+    micAllowed,
+    join: joinVoice,
+    leave: leaveVoice,
     toggleMute,
-  } = useWebrtcCall({ roomId, currentUserId })
-
-  // 통화 버튼 클릭 시 멤버 목록 fetch → 피커 표시
-  const handleOpenCallPicker = useCallback(async () => {
-    const res = await piFetch(`/api/chat/rooms/${roomId}/members`)
-    if (!res.ok) return
-    const { members } = (await res.json()) as { members: { usr_id: string; display_nm: string }[] }
-    setCallMembers(members.filter(m => m.usr_id !== currentUserId))
-    setCallPickerOpen(true)
-  }, [roomId, currentUserId])
-
-  const handlePickCallee = useCallback((usr_id: string, nm: string) => {
-    setCallCalleeName(nm)
-    setCallPickerOpen(false)
-    startCall(usr_id)
-  }, [startCall])
+    controlMic,
+  } = useVoiceChannel({ roomId, currentUserId })
 
   // 방 메타 조회 — 방장(OWNER)이고 그룹/이벤트방이면 수정 버튼 노출
   useEffect(() => {
     piFetch(`/api/chat/rooms/${roomId}`)
-      .then(r => r.ok ? r.json() : null)
-      .then((d: {
-        myRole?: string
-        room?: { room_nm: string; room_desc: string | null; is_public_yn: 'Y' | 'N'; max_mbr_cnt: number; has_join_pwd: boolean; room_tp_cd: string }
-      } | null) => {
-        if (!d?.room) return
-        if (d.myRole === 'OWNER' && d.room.room_tp_cd !== 'D') {
-          setIsOwner(true)
-          setRoomSettings({
-            room_nm: d.room.room_nm,
-            room_desc: d.room.room_desc,
-            is_public_yn: d.room.is_public_yn,
-            max_mbr_cnt: d.room.max_mbr_cnt,
-            has_join_pwd: d.room.has_join_pwd,
-          })
-        }
-      })
+      .then((r) => (r.ok ? r.json() : null))
+      .then(
+        (
+          d: {
+            myRole?: string
+            room?: {
+              room_nm: string
+              room_desc: string | null
+              is_public_yn: 'Y' | 'N'
+              max_mbr_cnt: number
+              has_join_pwd: boolean
+              room_tp_cd: string
+            }
+          } | null,
+        ) => {
+          if (!d?.room) return
+          // 방장(OWNER/ADMIN)은 음성채널 마이크 원격 제어 가능 — 서버가 재검증
+          if (d.myRole === 'OWNER' || d.myRole === 'ADMIN')
+            setCanControlMic(true)
+          if (d.myRole === 'OWNER' && d.room.room_tp_cd !== 'D') {
+            setIsOwner(true)
+            setRoomSettings({
+              room_nm: d.room.room_nm,
+              room_desc: d.room.room_desc,
+              is_public_yn: d.room.is_public_yn,
+              max_mbr_cnt: d.room.max_mbr_cnt,
+              has_join_pwd: d.room.has_join_pwd,
+            })
+          }
+        },
+      )
       .catch(() => {})
   }, [roomId])
 
@@ -156,7 +165,9 @@ export function ChatRoomPanel({
     checkSubscription()
   }, [checkSubscription])
 
-  const { subscribe, paying } = useSubscribePlan({ onSuccess: handleSubscribeSuccess })
+  const { subscribe, paying } = useSubscribePlan({
+    onSuccess: handleSubscribeSuccess,
+  })
 
   const onUpgradeForTip = useCallback(() => setTipPromptOpen(true), [])
   const onAiLimitExceeded = useCallback(() => setAiLimitPromptOpen(true), [])
@@ -167,24 +178,29 @@ export function ChatRoomPanel({
   }, [])
 
   // 실시간 수여 broadcast 수신 → 축하 팝업 (Trigger 7)
-  const onBadgeAward = useCallback((badge: BadgeAwardInfo) => {
-    setBadgeAward(badge)
-    markBadgeNotified(badge.badge_id)
-  }, [markBadgeNotified])
+  const onBadgeAward = useCallback(
+    (badge: BadgeAwardInfo) => {
+      setBadgeAward(badge)
+      markBadgeNotified(badge.badge_id)
+    },
+    [markBadgeNotified],
+  )
 
   // 방 입장 시: 미통지 배지 팝업(오프라인 중 수여 폴백) + 이 테마의 강화 배지 헤더 표시
   useEffect(() => {
     piFetch('/api/badges')
-      .then(r => r.ok ? r.json() : null)
+      .then((r) => (r.ok ? r.json() : null))
       .then((d: { badges?: MyBadge[] } | null) => {
         if (!d?.badges) return
-        const unnotified = d.badges.find(b => b.noti_yn === 'N')
+        const unnotified = d.badges.find((b) => b.noti_yn === 'N')
         if (unnotified) {
           setBadgeAward(unnotified)
           markBadgeNotified(unnotified.badge_id)
         }
         if (themeCd) {
-          const upgraded = d.badges.find(b => b.theme_cd === themeCd && b.upgr_yn === 'Y')
+          const upgraded = d.badges.find(
+            (b) => b.theme_cd === themeCd && b.upgr_yn === 'Y',
+          )
           if (upgraded) setUpgradedBadge(upgraded)
         }
       })
@@ -193,7 +209,7 @@ export function ChatRoomPanel({
 
   // 강화 결제 완료 → 팝업 닫고 헤더에 즉시 반영
   const onBadgeUpgraded = useCallback(() => {
-    setBadgeAward(prev => {
+    setBadgeAward((prev) => {
       if (prev && prev.theme_cd === themeCd) setUpgradedBadge(prev)
       return null
     })
@@ -202,10 +218,8 @@ export function ChatRoomPanel({
   // 콤보 선택 언어가 URL locale보다 우선 — 이 방의 모든 메시지가 해당 언어로 보임
   const effectiveLocale = viewLocale || urlLocale
 
-  const { messages, sendMessage, sendSticker, sendFile, prependMessages } = useChatRoom(
-    roomId,
-    initialMessages,
-    {
+  const { messages, sendMessage, sendSticker, sendFile, prependMessages } =
+    useChatRoom(roomId, initialMessages, {
       currentUserId,
       currentUserDisplayName,
       userLocale: effectiveLocale,
@@ -215,33 +229,35 @@ export function ChatRoomPanel({
       onAiLimitExceeded,
       // TASK-062 Trigger 7: 배지 수여 broadcast → 축하 팝업
       onBadgeAward,
-    },
-  )
+    })
 
   return (
-    <div className='flex min-h-0 flex-1 flex-col overflow-hidden'>
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
       {/* 제목 섹션 — 고정 (스크롤 안 됨) */}
-      <header className='flex shrink-0 items-center gap-3 border-b border-border/50 bg-zinc-200 px-4 py-3 shadow-md dark:bg-zinc-700'>
+      <header className="border-border/50 flex shrink-0 items-center gap-3 border-b bg-zinc-200 px-4 py-3 shadow-md dark:bg-zinc-700">
         <Link
-          href='/chat'
-          className='shrink-0 text-muted-foreground transition-colors hover:text-foreground'
-          aria-label='카페 목록으로'
+          href="/chat"
+          className="text-muted-foreground hover:text-foreground shrink-0 transition-colors"
+          aria-label="카페 목록으로"
         >
           ⬅️
         </Link>
-        <span className='shrink-0 text-xl'>{themeEmoji}</span>
-        <div className='min-w-0 flex-1'>
-          <p className='flex items-center gap-1.5 truncate text-sm font-semibold'>
-            <span className='truncate'>{displayRoomNm}</span>
+        <span className="shrink-0 text-xl">{themeEmoji}</span>
+        <div className="min-w-0 flex-1">
+          <p className="flex items-center gap-1.5 truncate text-sm font-semibold">
+            <span className="truncate">{displayRoomNm}</span>
             {roomSettings && (
-              <span className='shrink-0 text-xs' title={roomSettings.is_public_yn === 'Y' ? '공개방' : '비밀방'}>
+              <span
+                className="shrink-0 text-xs"
+                title={roomSettings.is_public_yn === 'Y' ? '공개방' : '비밀방'}
+              >
                 {roomSettings.is_public_yn === 'Y' ? '🌐' : '🔒'}
               </span>
             )}
             {/* Trigger 7: 강화 배지 — 카페 이름 옆 상시 표시 (특별 디자인) */}
             {upgradedBadge && (
               <span
-                className='inline-flex shrink-0 items-center gap-0.5 rounded-full bg-gradient-to-r from-amber-200 to-yellow-300 px-1.5 py-0.5 text-[10px] font-bold text-amber-900 shadow-sm ring-1 ring-amber-400/60 dark:from-amber-700 dark:to-yellow-600 dark:text-amber-100'
+                className="inline-flex shrink-0 items-center gap-0.5 rounded-full bg-gradient-to-r from-amber-200 to-yellow-300 px-1.5 py-0.5 text-[10px] font-bold text-amber-900 shadow-sm ring-1 ring-amber-400/60 dark:from-amber-700 dark:to-yellow-600 dark:text-amber-100"
                 title={`${upgradedBadge.theme_nm} 강화 배지`}
               >
                 {upgradedBadge.theme_emoji}🏅
@@ -249,16 +265,18 @@ export function ChatRoomPanel({
             )}
           </p>
           {displayRoomDesc && (
-            <p className='truncate text-xs text-muted-foreground'>{displayRoomDesc}</p>
+            <p className="text-muted-foreground truncate text-xs">
+              {displayRoomDesc}
+            </p>
           )}
         </div>
         {/* 방장 전용 카페 수정 버튼 */}
         {isOwner && roomSettings && (
           <button
             onClick={() => setSettingsOpen(true)}
-            className='shrink-0 text-lg transition-transform hover:scale-110'
-            aria-label='카페 수정'
-            title='카페 수정 (방장)'
+            className="shrink-0 text-lg transition-transform hover:scale-110"
+            aria-label="카페 수정"
+            title="카페 수정 (방장)"
           >
             ⚙️
           </button>
@@ -266,42 +284,52 @@ export function ChatRoomPanel({
         {/* TASK-073: 분석 대시보드 (Business — 권한은 API가 검증) */}
         <Link
           href={`/chat/${roomId}/analytics`}
-          className='shrink-0 text-lg transition-transform hover:scale-110'
-          aria-label='카페 분석'
-          title='카페 분석 (Business)'
+          className="shrink-0 text-lg transition-transform hover:scale-110"
+          aria-label="카페 분석"
+          title="카페 분석 (Business)"
         >
           📊
         </Link>
         {/* TASK-071: Pi Bet 패널 열기 */}
         <button
           onClick={() => setBetPanelOpen(true)}
-          className='shrink-0 text-lg transition-transform hover:scale-110'
-          aria-label='Pi Bet'
-          title='Pi Bet 투표'
+          className="shrink-0 text-lg transition-transform hover:scale-110"
+          aria-label="Pi Bet"
+          title="Pi Bet 투표"
         >
           🎲
         </button>
-        {/* PiVoice™ 통화 버튼 */}
+        {/* PiVoice™ v2.0 음성채널 버튼 — 참여 인원 배지 표시 */}
         <button
-          onClick={handleOpenCallPicker}
-          disabled={callState !== 'idle'}
-          className='shrink-0 text-lg transition-transform hover:scale-110 disabled:opacity-40'
-          aria-label='음성 통화'
-          title='음성 통화'
+          onClick={() => setVoicePanelOpen((o) => !o)}
+          className="relative shrink-0 text-lg transition-transform hover:scale-110"
+          aria-label="음성채널"
+          title="음성채널"
         >
-          📞
+          🎙️
+          {voiceParticipants.length > 0 && (
+            <span className="absolute -top-1 -right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-green-500 px-0.5 text-[10px] font-bold text-white">
+              {voiceParticipants.length}
+            </span>
+          )}
         </button>
         {/* PiTranslate™ 방별 번역 언어 콤보 — 구독자 전용 특혜 */}
-        <ChatLocaleSelect value={viewLocale} onChange={handleLocaleChange} isSubscribed={isSubscribed} />
+        <ChatLocaleSelect
+          value={viewLocale}
+          onChange={handleLocaleChange}
+          isSubscribed={isSubscribed}
+        />
       </header>
 
       {/* Trigger 5: 정원 초과 방장 알림 배너 */}
       {capacityAlert && (
-        <div className='flex shrink-0 items-center justify-between gap-2 bg-amber-500/10 px-4 py-2 text-xs text-amber-700 dark:text-amber-400'>
-          <span>⚠️ 카페 정원이 꽉 찼습니다. 구독 업그레이드로 정원을 늘리세요.</span>
+        <div className="flex shrink-0 items-center justify-between gap-2 bg-amber-500/10 px-4 py-2 text-xs text-amber-700 dark:text-amber-400">
+          <span>
+            ⚠️ 카페 정원이 꽉 찼습니다. 구독 업그레이드로 정원을 늘리세요.
+          </span>
           <button
             onClick={() => setExpirePromptOpen(true)}
-            className='shrink-0 rounded-md bg-amber-500 px-2 py-0.5 text-white transition-colors hover:bg-amber-600'
+            className="shrink-0 rounded-md bg-amber-500 px-2 py-0.5 text-white transition-colors hover:bg-amber-600"
           >
             업그레이드
           </button>
@@ -310,19 +338,19 @@ export function ChatRoomPanel({
 
       {/* Trigger 4: 메시지 만료 경고 배너 (FREE 플랜 — 7일 보관) */}
       {!isSubscribed && !expireBannerDismissed && (
-        <div className='flex shrink-0 items-center justify-between gap-2 bg-blue-500/10 px-4 py-2 text-xs text-blue-700 dark:text-blue-400'>
+        <div className="flex shrink-0 items-center justify-between gap-2 bg-blue-500/10 px-4 py-2 text-xs text-blue-700 dark:text-blue-400">
           <span>📦 무료 플랜은 메시지가 7일 후 만료됩니다.</span>
-          <div className='flex shrink-0 items-center gap-2'>
+          <div className="flex shrink-0 items-center gap-2">
             <button
               onClick={() => setExpirePromptOpen(true)}
-              className='rounded-md bg-blue-500 px-2 py-0.5 text-white transition-colors hover:bg-blue-600'
+              className="rounded-md bg-blue-500 px-2 py-0.5 text-white transition-colors hover:bg-blue-600"
             >
               업그레이드
             </button>
             <button
               onClick={() => setExpireBannerDismissed(true)}
-              className='text-muted-foreground hover:text-foreground'
-              aria-label='닫기'
+              className="text-muted-foreground hover:text-foreground"
+              aria-label="닫기"
             >
               ✕
             </button>
@@ -342,13 +370,17 @@ export function ChatRoomPanel({
       />
 
       {/* 카페 입력 섹션 — 고정 */}
-      <ChatInput onSend={sendMessage} onSendSticker={sendSticker} onSendFile={sendFile} />
+      <ChatInput
+        onSend={sendMessage}
+        onSendSticker={sendSticker}
+        onSendFile={sendFile}
+      />
 
       {/* Trigger 2: Tip 업그레이드 모달 */}
       <InlinePurchasePrompt
         isOpen={tipPromptOpen}
-        featureName='Tip 보내기'
-        description='프리미엄 구독자는 다른 참가자에게 Pi Tip을 보낼 수 있습니다.'
+        featureName="Tip 보내기"
+        description="프리미엄 구독자는 다른 참가자에게 Pi Tip을 보낼 수 있습니다."
         piAmount={3}
         onSinglePurchase={() => setTipPromptOpen(false)}
         onSubscribe={subscribe}
@@ -359,8 +391,8 @@ export function ChatRoomPanel({
       {/* Trigger 4·5: 메시지 보관 / 정원 확장 업그레이드 모달 */}
       <InlinePurchasePrompt
         isOpen={expirePromptOpen}
-        featureName='카페 보관 · 정원 확장'
-        description='프리미엄 구독으로 메시지를 무제한 보관하고 카페 정원을 늘리세요.'
+        featureName="카페 보관 · 정원 확장"
+        description="프리미엄 구독으로 메시지를 무제한 보관하고 카페 정원을 늘리세요."
         piAmount={3}
         onSinglePurchase={() => setExpirePromptOpen(false)}
         onSubscribe={subscribe}
@@ -376,14 +408,16 @@ export function ChatRoomPanel({
       />
 
       {/* TASK-071: Pi Bet 패널 */}
-      {betPanelOpen && <PiBetPanel roomId={roomId} onClose={() => setBetPanelOpen(false)} />}
+      {betPanelOpen && (
+        <PiBetPanel roomId={roomId} onClose={() => setBetPanelOpen(false)} />
+      )}
 
       {/* 방장 전용 카페 수정 다이얼로그 */}
       {settingsOpen && roomSettings && (
         <RoomSettingsDialog
           roomId={roomId}
           initial={roomSettings}
-          onSaved={next => {
+          onSaved={(next) => {
             setRoomSettings(next)
             setDisplayRoomNm(next.room_nm)
             setDisplayRoomDesc(next.room_desc)
@@ -396,8 +430,8 @@ export function ChatRoomPanel({
       {/* Trigger 3: AI 봇 한도 초과 업그레이드 모달 */}
       <InlinePurchasePrompt
         isOpen={aiLimitPromptOpen}
-        featureName='AI 카페 비서 한도 초과'
-        description='이번 달 @ai 멘션 한도를 초과했습니다. 프리미엄 구독으로 무제한 AI 질문을 이용하세요.'
+        featureName="AI 카페 비서 한도 초과"
+        description="이번 달 @ai 멘션 한도를 초과했습니다. 프리미엄 구독으로 무제한 AI 질문을 이용하세요."
         piAmount={3}
         onSinglePurchase={() => setAiLimitPromptOpen(false)}
         onSubscribe={subscribe}
@@ -405,49 +439,27 @@ export function ChatRoomPanel({
         onClose={() => setAiLimitPromptOpen(false)}
       />
 
-      {/* PiVoice™ 통화 멤버 피커 */}
-      {callPickerOpen && (
-        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
-          <div className='w-72 rounded-2xl border bg-background p-5 shadow-xl'>
-            <p className='mb-3 text-sm font-semibold'>통화할 멤버 선택</p>
-            {callMembers.length === 0 ? (
-              <p className='text-xs text-muted-foreground'>다른 멤버가 없습니다.</p>
-            ) : (
-              <ul className='space-y-1'>
-                {callMembers.map(m => (
-                  <li key={m.usr_id}>
-                    <button
-                      onClick={() => handlePickCallee(m.usr_id, m.display_nm)}
-                      className='w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-muted'
-                    >
-                      📞 {m.display_nm}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-            <button
-              onClick={() => setCallPickerOpen(false)}
-              className='mt-3 w-full rounded-lg bg-muted px-3 py-1.5 text-xs'
-            >
-              취소
-            </button>
-          </div>
-        </div>
+      {/* PiVoice™ v2.0 음성채널 패널 — N:N(1~4명 마이크), 방장 원격 제어 */}
+      {voicePanelOpen && (
+        <VoiceChannelPanel
+          voiceState={voiceState}
+          participants={voiceParticipants}
+          isMuted={isMuted}
+          micAllowed={micAllowed}
+          currentUserId={currentUserId}
+          canControlMic={canControlMic}
+          onJoin={joinVoice}
+          onLeave={leaveVoice}
+          onToggleMute={toggleMute}
+          onControlMic={controlMic}
+          onClose={() => setVoicePanelOpen(false)}
+        />
       )}
 
-      {/* PiVoice™ 통화 오버레이 */}
-      <VoiceCallPanel
-        callState={callState}
-        incomingCall={incomingCall}
-        remoteStream={remoteStream}
-        isMuted={isMuted}
-        calleeName={callCalleeName ?? incomingCall?.caller_nm}
-        onAnswer={answerCall}
-        onReject={rejectCall}
-        onHangup={() => endCall()}
-        onToggleMute={toggleMute}
-      />
+      {/* 음성채널 원격 오디오 — 패널을 닫아도 통화 오디오 유지 */}
+      {[...remoteStreams.entries()].map(([usrId, stream]) => (
+        <RemoteAudio key={usrId} stream={stream} />
+      ))}
     </div>
   )
 }
