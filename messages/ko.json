@@ -217,7 +217,26 @@
       "backfillRunning": "백필 실행 중…",
       "backfillSuccess": "{total}일 집계 완료 (실패 {failed}건)",
       "from": "시작일",
-      "to": "종료일"
+      "to": "종료일",
+      "logTitle": "작업 실행 이력",
+      "logDesc": "CRON 자동 실행과 수동 실행 결과를 확인합니다 (최근 50건)",
+      "logRefresh": "새로고침",
+      "logLoading": "불러오는 중…",
+      "logEmpty": "실행 이력이 없습니다",
+      "logColStart": "시작 일시",
+      "logColTrigger": "실행 주체",
+      "logColPeriod": "대상 기간",
+      "logColResult": "결과",
+      "logColDays": "처리 일수",
+      "logColDuration": "소요",
+      "logColRunner": "실행자",
+      "logColMsg": "메시지",
+      "logSuccess": "성공",
+      "logFail": "실패",
+      "logFailedCnt": "실패 {failed}",
+      "triggerCron": "CRON",
+      "triggerManual": "수동",
+      "triggerBackfill": "백필"
     },
     "dashboard": {
       "title": "대시보드",
@@ -241,7 +260,8 @@
         "googleAccount": "Google 계정",
         "role": "역할",
         "joinDate": "가입일",
-        "changeRole": "역할 변경"
+        "changeRole": "역할 변경",
+        "lastLogin": "최근 로그인"
       },
       "roleChanged": "역할이 변경됐습니다",
       "changeFail": "변경 실패"
@@ -566,37 +586,37 @@
   "profile": {
     "title": "내 프로필",
     "tabs": {
-      "info":    "개인정보",
+      "info": "개인정보",
       "payment": "결제 내역",
-      "subscr":  "구독 현황"
+      "subscr": "구독 현황"
     },
     "info": {
       "displayName": "표시 이름",
-      "realNm":      "실명",
-      "nickNm":      "닉네임",
-      "phoneNo":     "연락처",
-      "addr":        "주소",
-      "addrDtl":     "상세 주소",
-      "saved":       "저장되었습니다.",
-      "saveError":   "저장에 실패했습니다. 다시 시도해 주세요."
+      "realNm": "실명",
+      "nickNm": "닉네임",
+      "phoneNo": "연락처",
+      "addr": "주소",
+      "addrDtl": "상세 주소",
+      "saved": "저장되었습니다.",
+      "saveError": "저장에 실패했습니다. 다시 시도해 주세요."
     },
     "payment": {
-      "empty":  "결제 내역이 없습니다.",
+      "empty": "결제 내역이 없습니다.",
       "status": {
-        "pending":   "대기",
-        "approved":  "승인",
+        "pending": "대기",
+        "approved": "승인",
         "completed": "완료"
       }
     },
     "subscr": {
-      "currentPlan":     "현재 플랜",
-      "expireDate":      "만료일: {date}",
-      "autoRenewOn":     "자동 갱신 활성화됨",
-      "autoRenewOff":    "자동 갱신이 취소되어 있습니다.",
+      "currentPlan": "현재 플랜",
+      "expireDate": "만료일: {date}",
+      "autoRenewOn": "자동 갱신 활성화됨",
+      "autoRenewOff": "자동 갱신이 취소되어 있습니다.",
       "cancelAutoRenew": "자동 갱신 취소",
-      "cancelConfirm":   "구독을 취소하면 만료일까지 이용 후 자동 갱신이 중단됩니다. 계속하시겠습니까?",
-      "cancelOk":        "구독이 취소되었습니다. 만료일까지 이용할 수 있습니다.",
-      "cancelError":     "취소에 실패했습니다. 다시 시도해 주세요."
+      "cancelConfirm": "구독을 취소하면 만료일까지 이용 후 자동 갱신이 중단됩니다. 계속하시겠습니까?",
+      "cancelOk": "구독이 취소되었습니다. 만료일까지 이용할 수 있습니다.",
+      "cancelError": "취소에 실패했습니다. 다시 시도해 주세요."
     },
     "loginRequired": "로그인이 필요합니다"
   },

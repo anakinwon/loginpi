@@ -65,23 +65,64 @@ function summarize(results: DayResult[]) {
   return { total: results.length, failed: failed.length, failedDates: failed.map(r => r.date) }
 }
 
+type TriggerCd = 'CRON' | 'MANUAL' | 'BACKFILL'
+
+interface BatchSummary {
+  total: number
+  failed: number
+  failedDates: string[]
+}
+
+// 실행 결과를 sys_batch_log에 기록 — 어드민 배치 화면에서 CRON 포함 전체 이력 조회
+// 기록 실패가 본 작업 결과를 가리면 안 되므로 오류는 콘솔에만 남긴다
+async function logBatchRun(
+  triggerCd: TriggerCd,
+  fromDt: string,
+  toDt: string,
+  startDtm: Date,
+  summary: BatchSummary,
+  regrId: string,
+) {
+  const { error } = await getSupabaseAdmin().from('sys_batch_log').insert({
+    job_nm: 'stats_aggregate',
+    trigger_cd: triggerCd,
+    from_dt: fromDt,
+    to_dt: toDt,
+    start_dtm: startDtm.toISOString(),
+    end_dtm: new Date().toISOString(),
+    success_yn: summary.failed === 0 ? 'Y' : 'N',
+    total_cnt: summary.total,
+    failed_cnt: summary.failed,
+    result_msg: summary.failedDates.length > 0 ? `실패: ${summary.failedDates.join(', ')}` : null,
+    regr_id: regrId,
+    modr_id: regrId,
+  })
+  if (error) console.error('sys_batch_log 기록 실패:', error.message)
+}
+
 // Vercel Cron은 GET으로 호출한다 — 매일 00:00 UTC: 어제 확정 + 오늘 행 갱신
 export async function GET(req: NextRequest) {
   if (!isCronAuthorized(req)) {
     return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
   }
-  const results = await rebuildWithRipple(yesterdayUtc(), yesterdayUtc())
-  return NextResponse.json({ cron: true, ...summarize(results) })
+  const startDtm = new Date()
+  const target = yesterdayUtc()
+  const results = await rebuildWithRipple(target, target)
+  const s = summarize(results)
+  await logBatchRun('CRON', target, target, startDtm, s, 'SYSTEM')
+  return NextResponse.json({ cron: true, ...s })
 }
 
 export async function POST(req: NextRequest) {
   // 인증: CRON_SECRET 또는 어드민 세션
   const cronAuth = isCronAuthorized(req)
+  let regrId = 'SYSTEM'
   if (!cronAuth) {
     const user = await getSessionUser()
     if (!isAdmin(user)) {
       return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
     }
+    regrId = user?.pi_username ?? user?.google_email ?? user?.id ?? 'ADMIN'
   }
 
   let body: Record<string, unknown> = {}
@@ -114,8 +155,11 @@ export async function POST(req: NextRequest) {
     }
     if (from > to) from = to
 
+    const startDtm = new Date()
     const results = await rebuildWithRipple(from, to)
-    return NextResponse.json({ backfill: true, ...summarize(results) })
+    const s = summarize(results)
+    await logBatchRun('BACKFILL', from, to, startDtm, s, regrId)
+    return NextResponse.json({ backfill: true, ...s })
   }
 
   // 단일 날짜 처리 (기본: 오늘 UTC — 온디맨드 최신화)
@@ -123,8 +167,10 @@ export async function POST(req: NextRequest) {
   let date = typeof body.date === 'string' && isValidDate(body.date) ? body.date : today
   if (date > today) date = today
 
+  const startDtm = new Date()
   const results = await rebuildWithRipple(date, date)
   const s = summarize(results)
+  await logBatchRun(cronAuth ? 'CRON' : 'MANUAL', date, date, startDtm, s, regrId)
 
   if (s.failed > 0) {
     return NextResponse.json(

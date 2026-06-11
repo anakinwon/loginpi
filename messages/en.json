@@ -560,7 +560,26 @@
       "backfillRunning": "Backfill Running...",
       "backfillSuccess": "{total} days aggregation completed ({failed} failed)",
       "from": "Start Date",
-      "to": "End Date"
+      "to": "End Date",
+      "logTitle": "Job Execution History",
+      "logDesc": "View CRON and manual run results (latest 50)",
+      "logRefresh": "Refresh",
+      "logLoading": "Loading...",
+      "logEmpty": "No execution history",
+      "logColStart": "Started At",
+      "logColTrigger": "Trigger",
+      "logColPeriod": "Target Period",
+      "logColResult": "Result",
+      "logColDays": "Days Processed",
+      "logColDuration": "Duration",
+      "logColRunner": "Runner",
+      "logColMsg": "Message",
+      "logSuccess": "Success",
+      "logFail": "Failed",
+      "logFailedCnt": "{failed} failed",
+      "triggerCron": "CRON",
+      "triggerManual": "Manual",
+      "triggerBackfill": "Backfill"
     }
   },
   "adminSubscriptions": {

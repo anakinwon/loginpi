@@ -1,5 +1,6 @@
 import { getTranslations } from 'next-intl/server'
 import { BatchRunner } from '@/components/admin/batch-runner'
+import { BatchLogTable } from '@/components/admin/batch-log-table'
 
 export async function generateMetadata() {
   const t = await getTranslations('admin.batch')
@@ -16,6 +17,7 @@ export default async function BatchPage() {
         <p className='text-muted-foreground mt-1 text-sm'>{t('desc')}</p>
       </div>
       <BatchRunner />
+      <BatchLogTable />
     </div>
   )
 }

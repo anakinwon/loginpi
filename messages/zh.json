@@ -33,11 +33,12 @@
     "piLogin": "Pi Login",
     "piLoginDev": "Pi Login (dev)",
     "piAuthenticating": "认证中...",
-    "googleLogin": "Google Login"
+    "googleLogin": "Google Login",
+    "myProfile": "我的个人资料"
   },
   "home": {
     "title": "Next.js 启动套件",
-    "subtitle": "快速启动 Next.js 16 + Tailwind CSS v4 + shadcn/ui 样板",
+    "subtitle": "快速启动 Next.js 15 + Tailwind CSS v4 + shadcn/ui 样板",
     "loginSection": "登录",
     "detectingEnv": "环境检测中…",
     "piNetwork": "Pi Network",
@@ -110,7 +111,10 @@
     "editTitle": "{name} — 修改",
     "contentPlaceholder": "请输入内容",
     "featureComment": "评论",
-    "featureAttachment": "附件"
+    "featureAttachment": "附件",
+    "featureGallery": "Gallery",
+    "galleryTitle": "图片 Gallery ({count}张)",
+    "galleryClose": "关闭"
   },
   "comment": {
     "title": "评论",
@@ -534,7 +538,106 @@
       "stdApprovals": "审批工作流",
       "i18nSection": "多语言",
       "i18n": "多语言管理",
-      "backHome": "← 返回首页"
+      "backHome": "← 返回首页",
+      "stats": "统计",
+      "batch": "按需 Batch",
+      "chatSection": "咖啡厅管理",
+      "subscriptions": "订阅管理"
+    },
+    "batch": {
+      "title": "按需 Batch",
+      "desc": "手动立即运行统计聚合",
+      "runToday": "运行今日聚合",
+      "runYesterday": "运行昨日聚合",
+      "runDate": "特定日期聚合",
+      "runBtn": "运行",
+      "running": "运行中…",
+      "success": "{date} 聚合完成",
+      "error": "聚合失败: {msg}",
+      "backfillTitle": "期间 Backfill",
+      "backfillDesc": "批量聚合 from ~ to 范围",
+      "backfillRun": "运行 Backfill",
+      "backfillRunning": "Backfill 运行中…",
+      "backfillSuccess": "{total}天聚合完成 (失败 {failed}项)",
+      "from": "开始日期",
+      "to": "结束日期"
     }
+  },
+  "profile": {
+    "title": "我的个人资料",
+    "tabs": {
+      "info": "个人信息",
+      "payment": "支付记录",
+      "subscr": "订阅状态"
+    },
+    "info": {
+      "displayName": "显示名称",
+      "realNm": "真实姓名",
+      "nickNm": "昵称",
+      "phoneNo": "联系方式",
+      "addr": "地址",
+      "addrDtl": "详细地址",
+      "saved": "已保存。",
+      "saveError": "保存失败。请重试。"
+    },
+    "payment": {
+      "empty": "没有支付记录。",
+      "status": {
+        "pending": "待处理",
+        "approved": "已批准",
+        "completed": "已完成"
+      }
+    },
+    "subscr": {
+      "currentPlan": "当前 Plan",
+      "expireDate": "到期日期: {date}",
+      "autoRenewOn": "自动续订已启用",
+      "autoRenewOff": "自动续订已取消。",
+      "cancelAutoRenew": "取消自动续订",
+      "cancelConfirm": "取消订阅后，您可以使用到期日，之后将停止自动续订。是否继续？",
+      "cancelOk": "订阅已取消。您可以使用到期日。",
+      "cancelError": "取消失败。请重试。"
+    },
+    "loginRequired": "需要登录"
+  },
+  "adminSubscriptions": {
+    "title": "订阅管理",
+    "desc": "全部 {count}个 · Business {business}个 · Premium {premium}个",
+    "noData": "没有活跃的订阅。",
+    "filter": {
+      "all": "全部",
+      "business": "Business",
+      "premium": "Premium"
+    },
+    "col": {
+      "user": "用户",
+      "plan": "Plan",
+      "tier": "等级",
+      "expireAt": "到期日",
+      "autoRenew": "自动续订",
+      "startAt": "开始日期",
+      "manage": "管理"
+    },
+    "expired": "已到期",
+    "dday": "D-{n}",
+    "autoRenewYes": "是",
+    "autoRenewNo": "否",
+    "extend": "延长",
+    "revoke": "取消",
+    "revokeConfirm": "取消 \"{name}\" 的订阅吗？",
+    "revokeSuccess": "订阅已取消",
+    "revokeFail": "取消失败",
+    "extendSuccess": "到期日已延长",
+    "extendFail": "延长失败",
+    "grantTitle": "手动授予订阅",
+    "grantUsrId": "用户 ID (UUID)",
+    "grantPlan": "Plan",
+    "grantMonths": "期限(月)",
+    "grantBtn": "授予",
+    "granting": "处理中…",
+    "grantSuccess": "订阅已授予",
+    "grantFail": "授予失败",
+    "grantValidation": "请选择用户 ID 和 Plan",
+    "extendMonths": "延长月数"
   }
 }
