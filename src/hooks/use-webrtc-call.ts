@@ -83,6 +83,18 @@ export function useWebrtcCall({ roomId, currentUserId, onCallEnded }: UseWebrtcC
     }
   }, [])
 
+  // ─── 통화 종료 ─────────────────────────────────────────────────────────────
+  // createPc의 onconnectionstatechange가 참조하므로 createPc보다 먼저 선언해야 한다
+  const endCall = useCallback(async (callId: string, reason: 'USER_ENDED' | 'TIMEOUT' | 'REJECTED' | 'FAILED' = 'USER_ENDED') => {
+    const stats = await collectStats()
+    await piFetch(`/api/chat/rooms/${roomId}/call/${callId}/end`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ end_rsn_cd: reason, ...stats }),
+    })
+    cleanup()
+  }, [roomId, collectStats, cleanup])
+
   // ─── RTCPeerConnection 생성 ────────────────────────────────────────────────
   const createPc = useCallback(async (callId: string) => {
     const credsRes = await piFetch('/api/voice/turn-credentials', { method: 'POST' })
@@ -113,7 +125,7 @@ export function useWebrtcCall({ roomId, currentUserId, onCallEnded }: UseWebrtcC
     }
 
     return pc
-  }, [roomId]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [roomId, endCall])
 
   // ─── 로컬 마이크 ───────────────────────────────────────────────────────────
   const getLocalStream = useCallback(async () => {
@@ -124,17 +136,6 @@ export function useWebrtcCall({ roomId, currentUserId, onCallEnded }: UseWebrtcC
     localStreamRef.current = stream
     return stream
   }, [])
-
-  // ─── 통화 종료 ─────────────────────────────────────────────────────────────
-  const endCall = useCallback(async (callId: string, reason: 'USER_ENDED' | 'TIMEOUT' | 'REJECTED' | 'FAILED' = 'USER_ENDED') => {
-    const stats = await collectStats()
-    await piFetch(`/api/chat/rooms/${roomId}/call/${callId}/end`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ end_rsn_cd: reason, ...stats }),
-    })
-    cleanup()
-  }, [roomId, collectStats, cleanup])
 
   // ─── 발신 ──────────────────────────────────────────────────────────────────
   const startCall = useCallback(async (calleeUsrId: string) => {

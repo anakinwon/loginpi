@@ -125,7 +125,7 @@ export async function POST() {
 
 **재사용**: `broadcastToRoom`, `getSupabaseClient`+presence, `piFetch`/`getSessionUser`, `ClientChatRoom`/page 게이트, `getRoomMember`, `payments/complete` 분기(향후), `env.ts`, DA DDL 패턴.
 
-**신규**: `sql/024_voice_call.sql` · `POST /api/voice/turn-credentials` · `POST /api/chat/rooms/[roomId]/call`(시작) · `.../call/[callId]/signal`(중계) · `.../call/[callId]/end`(종료) · `src/hooks/use-webrtc-call.ts` · `src/components/chat/client-voice-call.tsx` · `voice-call-panel.tsx` · `src/app/[locale]/chat/[roomId]/call/page.tsx`.
+**신규**: `sql/028_voice_call.sql` · `POST /api/voice/turn-credentials` · `POST /api/chat/rooms/[roomId]/call`(시작) · `.../call/[callId]/signal`(중계) · `.../call/[callId]/end`(종료) · `src/hooks/use-webrtc-call.ts` · `src/components/chat/client-voice-call.tsx` · `voice-call-panel.tsx` · `src/app/[locale]/chat/[roomId]/call/page.tsx`.
 
 ---
 
@@ -134,7 +134,7 @@ export async function POST() {
 `msg_` 접두사, 시스템 컬럼 4개, `del_yn`+`del_dtm`, `TIMESTAMPTZ`, `WHERE del_yn='N'` 부분 인덱스. `da-ddl-guard` Hook 통과 위해 `-- DA-APPROVED:` 주석 필수.
 
 ```sql
--- sql/024_voice_call.sql (구현 단계에서 생성)
+-- sql/028_voice_call.sql (구현 단계에서 생성 — 024는 sys_batch_log, 027은 카카오 연동 점유)
 -- DA-APPROVED: 음성통화 Phase 14 신규 — call/quality 외래어 약어 DA 승인. (2026-06-11)
 
 CREATE TABLE IF NOT EXISTS public.msg_call_log (
