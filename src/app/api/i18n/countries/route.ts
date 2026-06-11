@@ -16,7 +16,7 @@ export async function GET() {
     supabase
       .from('i18n_cntry_mst')
       .select(
-        'country_cd, dis_ord_seq, country_eng_nm, country_mot_nm, currency_cd',
+        'country_cd, dis_ord_seq, country_eng_nm, country_mot_nm, currency_cd, locale_cd, use_yn',
       )
       .order('dis_ord_seq', { ascending: true }),
   ])
