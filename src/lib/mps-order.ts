@@ -1,7 +1,8 @@
 import 'server-only'
 import { getSupabaseAdmin } from './supabase-admin'
 
-// MPS 주문 — 상태 머신: PENDING → ESCROW → (TRADING) → SELLER_DONE → DONE / CANCELLED
+// MPS 주문 — 상태 머신 (3단계 확인 에스크로):
+//   PENDING → ESCROW → SELLER_DONE(판매자 전달) → BUYER_DONE(구매자 수령) → DONE(판매자 거래완료 → 정산)
 // 생성·취소는 재고 원자성 때문에 DB RPC(fn_mps_order_create / fn_mps_order_cancel) 위임
 
 export interface MpsOrder {
@@ -10,7 +11,7 @@ export interface MpsOrder {
   buyer_id: string
   seller_id: string
   order_price_pi: number
-  order_st_cd: 'PENDING' | 'ESCROW' | 'TRADING' | 'SELLER_DONE' | 'DONE' | 'CANCELLED'
+  order_st_cd: 'PENDING' | 'ESCROW' | 'TRADING' | 'SELLER_DONE' | 'BUYER_DONE' | 'DONE' | 'CANCELLED'
   escrow_txid: string | null
   release_txid: string | null
   cancel_req_id: string | null
@@ -120,19 +121,38 @@ export async function markSellerDone(orderId: string, sellerId: string) {
   return (data as MpsOrder | null) ?? null
 }
 
-// ② 구매자 "물건 수령 완료" — SELLER_DONE → DONE + RELEASE_OUT 이력 (실 Pi 정산은 운영자 처리)
+// ② 구매자 "물건 수령 완료" — SELLER_DONE → BUYER_DONE (판매자 최종 확인 대기)
 export async function markBuyerDone(orderId: string, buyerId: string) {
-  const db = getSupabaseAdmin()
-  const { data } = await db
+  const { data } = await getSupabaseAdmin()
     .from('mps_order')
     .update({
-      order_st_cd: 'DONE',
+      order_st_cd: 'BUYER_DONE',
       modr_id: buyerId,
       mod_dtm: new Date().toISOString(),
     })
     .eq('order_id', orderId)
     .eq('buyer_id', buyerId)
-    .eq('order_st_cd', 'SELLER_DONE') // 단계 순서 강제 — 판매자 확인 전 수령 확인 불가
+    .eq('order_st_cd', 'SELLER_DONE') // 단계 순서 강제 — 판매자 전달 확인 전 수령 확인 불가
+    .eq('del_yn', 'N')
+    .select()
+    .maybeSingle()
+
+  return (data as MpsOrder | null) ?? null
+}
+
+// ③ 판매자 "거래 완료" — BUYER_DONE → DONE + RELEASE_OUT 이력 (실 Pi 정산은 운영자 처리)
+export async function markComplete(orderId: string, sellerId: string) {
+  const db = getSupabaseAdmin()
+  const { data } = await db
+    .from('mps_order')
+    .update({
+      order_st_cd: 'DONE',
+      modr_id: sellerId,
+      mod_dtm: new Date().toISOString(),
+    })
+    .eq('order_id', orderId)
+    .eq('seller_id', sellerId)
+    .eq('order_st_cd', 'BUYER_DONE') // 단계 순서 강제 — 구매자 수령 확인 전 거래 종결 불가
     .eq('del_yn', 'N')
     .select()
     .maybeSingle()
@@ -146,8 +166,8 @@ export async function markBuyerDone(orderId: string, buyerId: string) {
     txn_type_cd: 'RELEASE_OUT',
     pi_amt: -order.order_price_pi,
     memo: '판매자 정산 대기 — 운영자 에스크로 계정에서 송금 처리 필요',
-    regr_id: buyerId,
-    modr_id: buyerId,
+    regr_id: sellerId,
+    modr_id: sellerId,
   })
   return order
 }

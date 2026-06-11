@@ -642,6 +642,7 @@
       "ESCROW": "에스크로 완료",
       "TRADING": "거래중",
       "SELLER_DONE": "전달 완료 (수령 확인 대기)",
+      "BUYER_DONE": "수령 완료 (거래 종결 대기)",
       "DONE": "거래 완료",
       "CANCELLED": "취소됨"
     },
@@ -681,14 +682,17 @@
     "cancelReasonPrompt": "취소 사유를 입력해주세요",
     "actionSellerDone": "물건 전달 완료",
     "actionBuyerDone": "물건 수령 완료",
+    "actionComplete": "거래 완료",
     "actionCancel": "주문 취소",
     "actionDone": {
       "confirm": "전달 완료로 처리됐습니다. 구매자 수령 확인을 기다립니다",
-      "release": "수령 확인 완료! 판매자에게 Pi가 정산됩니다",
+      "release": "수령 확인 완료! 판매자의 거래 완료 처리를 기다립니다",
+      "complete": "거래가 완료됐습니다! 에스크로 Pi가 정산됩니다",
       "cancel": "주문이 취소됐습니다"
     },
     "waitingBuyerConfirm": "구매자의 수령 확인을 기다리는 중입니다",
-    "escrowReleased": "양방향 확인 완료 — 에스크로 정산 처리"
+    "waitingSellerComplete": "판매자의 거래 완료 처리를 기다리는 중입니다",
+    "escrowReleased": "거래 종결 — 에스크로 정산 처리"
   },
   "profile": {
     "title": "내 프로필",

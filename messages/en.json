@@ -640,6 +640,7 @@
       "ESCROW": "In Escrow",
       "TRADING": "Trading",
       "SELLER_DONE": "Delivered (Awaiting Receipt)",
+      "BUYER_DONE": "Received (Awaiting Closure)",
       "DONE": "Completed",
       "CANCELLED": "Cancelled"
     },
@@ -679,14 +680,17 @@
     "cancelReasonPrompt": "Please enter the cancellation reason",
     "actionSellerDone": "Mark as Delivered",
     "actionBuyerDone": "Confirm Receipt",
+    "actionComplete": "Complete Deal",
     "actionCancel": "Cancel Order",
     "actionDone": {
       "confirm": "Marked as delivered. Waiting for buyer confirmation",
-      "release": "Receipt confirmed! Pi will be released to the seller",
+      "release": "Receipt confirmed! Waiting for the seller to close the deal",
+      "complete": "Deal completed! Escrowed Pi will be released",
       "cancel": "Order cancelled"
     },
     "waitingBuyerConfirm": "Waiting for the buyer to confirm receipt",
-    "escrowReleased": "Both parties confirmed — escrow settlement in progress"
+    "waitingSellerComplete": "Waiting for the seller to close the deal",
+    "escrowReleased": "Deal closed — escrow settlement in progress"
   },
   "adminSubscriptions": {
     "col": {

@@ -14,7 +14,7 @@ interface OrderRow {
   buyer_id: string
   seller_id: string
   order_price_pi: number
-  order_st_cd: 'PENDING' | 'ESCROW' | 'TRADING' | 'SELLER_DONE' | 'DONE' | 'CANCELLED'
+  order_st_cd: 'PENDING' | 'ESCROW' | 'TRADING' | 'SELLER_DONE' | 'BUYER_DONE' | 'DONE' | 'CANCELLED'
   cancel_reason: string | null
   reg_dtm: string
   mps_item: { item_nm: string; thumbnail_url: string | null } | null
@@ -25,6 +25,7 @@ const ST_STYLE: Record<OrderRow['order_st_cd'], string> = {
   ESCROW:      'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
   TRADING:     'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
   SELLER_DONE: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+  BUYER_DONE:  'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400',
   DONE:        'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
   CANCELLED:   'bg-muted text-muted-foreground',
 }
@@ -69,7 +70,7 @@ export function ClientMyOrders({
     return <p className='text-muted-foreground py-16 text-center text-sm'>{t('loginRequired')}</p>
   }
 
-  async function act(orderId: string, action: 'confirm' | 'release' | 'cancel') {
+  async function act(orderId: string, action: 'confirm' | 'release' | 'complete' | 'cancel') {
     let body: string | undefined
     if (action === 'cancel') {
       const reason = prompt(t('cancelReasonPrompt'))
@@ -119,7 +120,7 @@ export function ClientMyOrders({
                 {o.order_st_cd === 'CANCELLED' && o.cancel_reason && ` · ${o.cancel_reason}`}
               </p>
 
-              {/* 상태별 액션 — 양방향 확인 (FR-11) */}
+              {/* 상태별 액션 — 3단계 확인: ①전달(판매자) ②수령(구매자) ③거래완료(판매자) */}
               <div className='flex flex-wrap gap-1.5'>
                 {role === 'seller' && (o.order_st_cd === 'ESCROW' || o.order_st_cd === 'TRADING') && (
                   <Button size='sm' disabled={busy} onClick={() => act(o.order_id, 'confirm')}>
@@ -129,6 +130,11 @@ export function ClientMyOrders({
                 {role === 'buyer' && o.order_st_cd === 'SELLER_DONE' && (
                   <Button size='sm' disabled={busy} onClick={() => act(o.order_id, 'release')}>
                     {t('actionBuyerDone')}
+                  </Button>
+                )}
+                {role === 'seller' && o.order_st_cd === 'BUYER_DONE' && (
+                  <Button size='sm' disabled={busy} onClick={() => act(o.order_id, 'complete')}>
+                    {t('actionComplete')}
                   </Button>
                 )}
                 {role === 'buyer' && o.order_st_cd === 'SELLER_DONE' && (
@@ -145,6 +151,9 @@ export function ClientMyOrders({
 
               {role === 'seller' && o.order_st_cd === 'SELLER_DONE' && (
                 <p className='text-muted-foreground text-xs'>{t('waitingBuyerConfirm')}</p>
+              )}
+              {role === 'buyer' && o.order_st_cd === 'BUYER_DONE' && (
+                <p className='text-muted-foreground text-xs'>{t('waitingSellerComplete')}</p>
               )}
               {o.order_st_cd === 'DONE' && (
                 <p className='text-muted-foreground text-xs'>{t('escrowReleased')}</p>
