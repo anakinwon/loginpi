@@ -12,6 +12,8 @@ import { InlinePurchasePrompt } from './inline-purchase-prompt'
 import { BadgeAwardPopup, type BadgeAwardInfo } from './badge-award-popup'
 import { PiBetPanel } from './pi-bet-panel'
 import { RoomSettingsDialog, type RoomSettings } from './room-settings-dialog'
+import { VoiceCallPanel } from './voice-call-panel'
+import { useWebrtcCall } from '@/hooks/use-webrtc-call'
 
 interface ChatRoomPanelProps {
   roomId: string
@@ -65,6 +67,10 @@ export function ChatRoomPanel({
   const [settingsOpen, setSettingsOpen] = useState(false)
   // 헤더 제목은 수정 결과를 즉시 반영 (서버 재조회 없이)
   const [displayRoomNm, setDisplayRoomNm] = useState(roomNm)
+  // PiVoice™ — 통화 멤버 피커
+  const [callPickerOpen, setCallPickerOpen] = useState(false)
+  const [callMembers, setCallMembers] = useState<{ usr_id: string; display_nm: string }[]>([])
+  const [callCalleeName, setCallCalleeName] = useState<string | undefined>(undefined)
   const [displayRoomDesc, setDisplayRoomDesc] = useState<string | null>(roomDesc ?? null)
 
   // 방 입장 시 이 방에 저장된 번역 언어 복원 (외부 저장소 구독 — 방별 독립)
@@ -91,6 +97,34 @@ export function ChatRoomPanel({
   }, [])
 
   useEffect(() => { checkSubscription() }, [checkSubscription])
+
+  // PiVoice™ — WebRTC 통화 훅
+  const {
+    callState,
+    incomingCall,
+    remoteStream,
+    isMuted,
+    startCall,
+    answerCall,
+    rejectCall,
+    endCall,
+    toggleMute,
+  } = useWebrtcCall({ roomId, currentUserId })
+
+  // 통화 버튼 클릭 시 멤버 목록 fetch → 피커 표시
+  const handleOpenCallPicker = useCallback(async () => {
+    const res = await piFetch(`/api/chat/rooms/${roomId}/members`)
+    if (!res.ok) return
+    const { members } = (await res.json()) as { members: { usr_id: string; display_nm: string }[] }
+    setCallMembers(members.filter(m => m.usr_id !== currentUserId))
+    setCallPickerOpen(true)
+  }, [roomId, currentUserId])
+
+  const handlePickCallee = useCallback((usr_id: string, nm: string) => {
+    setCallCalleeName(nm)
+    setCallPickerOpen(false)
+    startCall(usr_id)
+  }, [startCall])
 
   // 방 메타 조회 — 방장(OWNER)이고 그룹/이벤트방이면 수정 버튼 노출
   useEffect(() => {
@@ -247,6 +281,16 @@ export function ChatRoomPanel({
         >
           🎲
         </button>
+        {/* PiVoice™ 통화 버튼 */}
+        <button
+          onClick={handleOpenCallPicker}
+          disabled={callState !== 'idle'}
+          className='shrink-0 text-lg transition-transform hover:scale-110 disabled:opacity-40'
+          aria-label='음성 통화'
+          title='음성 통화'
+        >
+          📞
+        </button>
         {/* PiTranslate™ 방별 번역 언어 콤보 — 구독자 전용 특혜 */}
         <ChatLocaleSelect value={viewLocale} onChange={handleLocaleChange} isSubscribed={isSubscribed} />
       </header>
@@ -359,6 +403,50 @@ export function ChatRoomPanel({
         onSubscribe={subscribe}
         subscribing={paying}
         onClose={() => setAiLimitPromptOpen(false)}
+      />
+
+      {/* PiVoice™ 통화 멤버 피커 */}
+      {callPickerOpen && (
+        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
+          <div className='w-72 rounded-2xl border bg-background p-5 shadow-xl'>
+            <p className='mb-3 text-sm font-semibold'>통화할 멤버 선택</p>
+            {callMembers.length === 0 ? (
+              <p className='text-xs text-muted-foreground'>다른 멤버가 없습니다.</p>
+            ) : (
+              <ul className='space-y-1'>
+                {callMembers.map(m => (
+                  <li key={m.usr_id}>
+                    <button
+                      onClick={() => handlePickCallee(m.usr_id, m.display_nm)}
+                      className='w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-muted'
+                    >
+                      📞 {m.display_nm}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <button
+              onClick={() => setCallPickerOpen(false)}
+              className='mt-3 w-full rounded-lg bg-muted px-3 py-1.5 text-xs'
+            >
+              취소
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* PiVoice™ 통화 오버레이 */}
+      <VoiceCallPanel
+        callState={callState}
+        incomingCall={incomingCall}
+        remoteStream={remoteStream}
+        isMuted={isMuted}
+        calleeName={callCalleeName ?? incomingCall?.caller_nm}
+        onAnswer={answerCall}
+        onReject={rejectCall}
+        onHangup={() => endCall()}
+        onToggleMute={toggleMute}
       />
     </div>
   )
