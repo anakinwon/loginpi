@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
       .update({ txid, status: 'completed', mod_dtm: new Date().toISOString() })
       .eq('payment_id', paymentId)
 
-    // CHAT_ROOM_CREATE: 결제 완료 시 그룹 채팅방 생성
+    // CHAT_ROOM_CREATE: 결제 완료 시 그룹 카페 생성
     let createdRoom: Record<string, unknown> | null = null
     let grantedSubscr: Record<string, unknown> | null = null
     const meta = payment.metadata as Record<string, unknown> | null
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
         const { data: room } = await db
           .from('msg_room')
           .insert({
-            room_nm: String(meta.room_nm ?? '채팅방'),
+            room_nm: String(meta.room_nm ?? '카페'),
             room_desc: meta.room_desc ? String(meta.room_desc) : null,
             theme_cd: String(meta.theme_cd ?? 'CODING'),
             room_tp_cd: 'G',
@@ -235,7 +235,7 @@ export async function POST(request: NextRequest) {
         }
       }
     } else if (meta?.type === 'FEATURE_ADDON' && meta?.feature_cd === 'BADGE_UPGRADE' && payment.user_uid) {
-      // BADGE_UPGRADE: 결제 완료 시 배지 강화 (특별 디자인 + 채팅방 이름 옆 상시 표시)
+      // BADGE_UPGRADE: 결제 완료 시 배지 강화 (특별 디자인 + 카페 이름 옆 상시 표시)
       const themeCd = String(meta.theme_cd ?? '')
       const { data: owner } = await db
         .from('sys_user')

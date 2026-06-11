@@ -18,7 +18,7 @@ export function BoardChatLinks() {
         href='/chat'
         className='text-muted-foreground hover:text-foreground text-sm transition-colors'
       >
-        채팅
+        카페
       </Link>
     </>
   )

@@ -24,7 +24,7 @@ export default async function ChatPage() {
 
   const db = getSupabaseAdmin()
 
-  // 내 채팅방 목록
+  // 내 카페 목록
   const { data: mbrs } = await db
     .from('msg_room_mbr')
     .select('room_id')
@@ -46,7 +46,7 @@ export default async function ChatPage() {
     }))
   }
 
-  // 공개 그룹 채팅방 (최근 10개)
+  // 공개 그룹 카페 (최근 10개)
   const { data: publicRooms } = await db
     .from('msg_room')
     .select(ROOM_SELECT)

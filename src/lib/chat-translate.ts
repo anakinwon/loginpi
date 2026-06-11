@@ -90,7 +90,7 @@ async function callClaudeHaiku(prompt: string, apiKey: string): Promise<string> 
   return block.text
 }
 
-// 채팅 메시지 1건 번역 — Gemini 실패 시 Claude Haiku 자동 fallback
+// 카페 메시지 1건 번역 — Gemini 실패 시 Claude Haiku 자동 fallback
 export async function translateMessage(
   text: string,
   targetLocale: string,

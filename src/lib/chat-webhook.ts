@@ -3,7 +3,7 @@ import { lookup } from 'node:dns/promises'
 import net from 'node:net'
 import { getSupabaseAdmin } from './supabase-admin'
 
-// TASK-072: 채팅 Webhook push — 신규 메시지를 등록된 외부 URL로 POST 전송
+// TASK-072: 카페 Webhook push — 신규 메시지를 등록된 외부 URL로 POST 전송
 // messages POST의 after()에서 호출 — 응답을 막지 않는 백그라운드 실행
 
 // SSRF 방어 — loopback·사설·link-local·메타데이터(169.254) 대역 차단

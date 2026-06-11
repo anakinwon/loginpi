@@ -545,7 +545,7 @@ toggle_auto_renew(subscriber, sub_id)
 window.Pi.createPayment(
   {
     amount: 1,  // 1 Pi/월
-    memo: 'PiChat Premium 구독',
+    memo: 'PiCafé Premium 구독',
     metadata: {
       type: 'CHAT_SUBSCR',
       plan_cd: 'PREMIUM_MONTHLY',

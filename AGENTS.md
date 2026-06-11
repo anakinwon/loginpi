@@ -1,4 +1,4 @@
-# AGENTS.md — cafe-pi-claude
+# AGENTS.md — chat-pi-claude
 
 > AI 코딩 에이전트(Claude Code·Codex·Cursor 등)를 위한 진입 안내.
 > **정본 지침은 [CLAUDE.md](./CLAUDE.md), 빠른 금지/패턴 참조는 [RULES.md](./RULES.md).**

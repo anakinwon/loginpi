@@ -4,7 +4,7 @@ import { Link } from '@/i18n/navigation'
 import { GroupRoomCreator } from '@/components/chat/group-room-creator'
 import { ChatMarketplace } from '@/components/chat/chat-marketplace'
 
-// 서버(SSR)·클라이언트(Pi Browser 게이트) 양쪽에서 공유하는 채팅 목록 표현 컴포넌트.
+// 서버(SSR)·클라이언트(Pi Browser 게이트) 양쪽에서 공유하는 카페 목록 표현 컴포넌트.
 // 데이터 로딩은 각 호출부가 담당하고, 이 컴포넌트는 렌더링만 책임진다.
 export type RoomWithTheme = {
   room_id: string
@@ -102,7 +102,7 @@ export function ChatListView({
   myRooms: RoomWithTheme[]
   discoverRooms: RoomWithTheme[]
 }) {
-  // 내 채팅방을 구독/일반 두 섹션으로 분리 (discover와 완전히 별도)
+  // 내 카페를 구독/일반 두 섹션으로 분리 (discover와 완전히 별도)
   const subscriptionRooms = myRooms.filter(r => r.msg_theme?.theme_tp_cd === 'PREMIUM')
   const regularRooms = sortByPremiumFirst(
     myRooms.filter(r => r.msg_theme?.theme_tp_cd !== 'PREMIUM')
@@ -114,17 +114,17 @@ export function ChatListView({
       {/* 헤더 */}
       <div className='mb-8 flex items-center justify-between'>
         <div>
-          <h1 className='text-2xl font-bold'>PiChat</h1>
-          <p className='text-sm text-muted-foreground'>Pi 커뮤니티 테마 채팅</p>
+          <h1 className='text-2xl font-bold'>PiCafé</h1>
+          <p className='text-sm text-muted-foreground'>Pi 커뮤니티 테마 카페</p>
         </div>
         <GroupRoomCreator />
       </div>
 
-      {/* 구독 채팅방 — PREMIUM 테마 방만 */}
+      {/* 구독 카페 — PREMIUM 테마 방만 */}
       {subscriptionRooms.length > 0 && (
         <section className='mb-8'>
           <div className='mb-3 flex items-center gap-2'>
-            <SectionHeader label='구독 채팅방' />
+            <SectionHeader label='구독 카페' />
             <span className='mb-3 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'>
               PREMIUM
             </span>
@@ -137,14 +137,14 @@ export function ChatListView({
         </section>
       )}
 
-      {/* 일반 채팅방 — 비PREMIUM 내 방, PREMIUM 테마 먼저 정렬 */}
+      {/* 일반 카페 — 비PREMIUM 내 방, PREMIUM 테마 먼저 정렬 */}
       {(regularRooms.length > 0 || myRooms.length === 0) && (
         <section className='mb-8'>
-          <SectionHeader label='일반 채팅방' />
+          <SectionHeader label='일반 카페' />
           {myRooms.length === 0 ? (
             <div className='rounded-xl border border-dashed py-8 text-center'>
-              <p className='text-sm text-muted-foreground'>아직 참여 중인 채팅방이 없습니다</p>
-              <p className='mt-1 text-xs text-muted-foreground'>+ 채팅방 만들기로 첫 방을 개설해 보세요</p>
+              <p className='text-sm text-muted-foreground'>아직 참여 중인 카페가 없습니다</p>
+              <p className='mt-1 text-xs text-muted-foreground'>+ 카페 만들기로 첫 방을 개설해 보세요</p>
             </div>
           ) : (
             <div className='space-y-2'>
@@ -156,10 +156,10 @@ export function ChatListView({
         </section>
       )}
 
-      {/* 공개 채팅방 탐색 — PREMIUM 테마 먼저 */}
+      {/* 공개 카페 탐색 — PREMIUM 테마 먼저 */}
       {sortedDiscover.length > 0 && (
         <section className='mb-8'>
-          <SectionHeader label='채팅방 탐색' />
+          <SectionHeader label='카페 탐색' />
           <div className='space-y-2'>
             {sortedDiscover.map(room => (
               <RoomCard key={room.room_id} room={room} href={`/chat/${room.room_id}`} />

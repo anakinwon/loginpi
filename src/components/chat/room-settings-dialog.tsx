@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
 
-// 채팅방 수정 다이얼로그 (방장 OWNER 전용)
+// 카페 수정 다이얼로그 (방장 OWNER 전용)
 // 공개/비밀 전환 · 비밀방 비밀번호 설정/변경/제거 · 이름 · 설명 · 정원
 
 export interface RoomSettings {
@@ -73,7 +73,7 @@ export function RoomSettingsDialog({
         toast.error(data.error ?? '수정 실패')
         return
       }
-      toast.success('채팅방 정보를 수정했습니다')
+      toast.success('카페 정보를 수정했습니다')
       onSaved({
         room_nm: nm,
         room_desc: roomDesc.trim() || null,
@@ -95,7 +95,7 @@ export function RoomSettingsDialog({
         onClick={e => e.stopPropagation()}
       >
         <div className='mb-3 flex items-center justify-between'>
-          <h3 className='text-base font-semibold'>⚙️ 채팅방 수정</h3>
+          <h3 className='text-base font-semibold'>⚙️ 카페 수정</h3>
           <button onClick={onClose} className='text-muted-foreground hover:text-foreground' aria-label='닫기'>✕</button>
         </div>
 

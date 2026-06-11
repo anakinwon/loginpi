@@ -6,9 +6,9 @@ import { usePiAuth } from '@/components/pi-auth-provider'
 import { piFetch } from '@/lib/pi-fetch'
 import { ChatListView, type RoomWithTheme } from './chat-list-view'
 
-// Pi Browser 전용 채팅 목록 게이트.
+// Pi Browser 전용 카페 목록 게이트.
 // 서버가 쿠키로 신원을 못 찾을 때(=쿠키 미저장 Pi Browser, 또는 비로그인) 렌더된다.
-// localStorage 토큰을 X-Pi-Token 헤더로 실어(piFetch) 채팅방 목록을 클라이언트에서 로드한다.
+// localStorage 토큰을 X-Pi-Token 헤더로 실어(piFetch) 카페 목록을 클라이언트에서 로드한다.
 export function ClientChatList() {
   const { user, isLoading: authLoading } = usePiAuth()
   const [myRooms, setMyRooms] = useState<RoomWithTheme[]>([])
@@ -51,7 +51,7 @@ export function ClientChatList() {
   if (!user) {
     return (
       <div className='py-20 text-center'>
-        <p className='text-sm text-muted-foreground'>채팅은 로그인 후 이용할 수 있습니다</p>
+        <p className='text-sm text-muted-foreground'>카페는 로그인 후 이용할 수 있습니다</p>
         <Link href='/' className='mt-2 inline-block text-sm text-primary underline'>
           홈으로 이동
         </Link>
@@ -59,12 +59,12 @@ export function ClientChatList() {
     )
   }
   if (state === 'loading') {
-    return <div className='py-20 text-center text-sm text-muted-foreground'>채팅방을 불러오는 중…</div>
+    return <div className='py-20 text-center text-sm text-muted-foreground'>카페를 불러오는 중…</div>
   }
   if (state === 'error') {
     return (
       <div className='py-20 text-center text-sm text-muted-foreground'>
-        채팅방을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.
+        카페를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.
       </div>
     )
   }

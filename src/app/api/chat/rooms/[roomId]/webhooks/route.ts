@@ -8,7 +8,7 @@ import { validateWebhookUrl } from '@/lib/chat-webhook'
 
 type Params = { params: Promise<{ roomId: string }> }
 
-// TASK-072: 채팅 봇·Webhook 연동 (Business 전용)
+// TASK-072: 카페 봇·Webhook 연동 (Business 전용)
 // 방장(OWNER) + BUSINESS 플랜만 등록 가능 — api_key는 봇 메시지 전송 인증에 사용
 
 async function requireOwnerBusiness(roomId: string) {

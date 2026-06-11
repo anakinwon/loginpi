@@ -119,7 +119,7 @@ export function GroupRoomCreator() {
     window.Pi.createPayment(
       {
         amount: payAmount,
-        memo: `채팅방 생성: ${roomNm}`,
+        memo: `카페 생성: ${roomNm}`,
         metadata: {
           type: 'CHAT_ROOM_CREATE',
           theme_cd: selectedTheme.theme_cd,
@@ -165,7 +165,7 @@ export function GroupRoomCreator() {
             const data = (await res.json()) as { room?: { room_id: string } }
             setPayStatus('done')
             setOpen(false)
-            toast.success('채팅방이 생성되었습니다!')
+            toast.success('카페가 생성되었습니다!')
             if (data.room?.room_id) {
               router.push(`/chat/${data.room.room_id}`)
             }
@@ -205,7 +205,7 @@ export function GroupRoomCreator() {
       const data = (await res.json()) as { room?: { room_id: string } }
       setPayStatus('done')
       setOpen(false)
-      toast.success('채팅방이 생성되었습니다!')
+      toast.success('카페가 생성되었습니다!')
       if (data.room?.room_id) {
         router.push(`/chat/${data.room.room_id}`)
       }
@@ -263,14 +263,14 @@ export function GroupRoomCreator() {
         onClick={() => setOpen(true)}
         className='inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90'
       >
-        + 채팅방 만들기
+        + 카페 만들기
       </button>
 
       <Dialog open={open} onOpenChange={setOpen}>
 
       <DialogContent className='sm:max-w-lg' showCloseButton={!isBusy}>
         <DialogHeader>
-          <DialogTitle>{roomType === 'E' ? '이벤트 채팅방 만들기' : '그룹 채팅방 만들기'}</DialogTitle>
+          <DialogTitle>{roomType === 'E' ? '이벤트 카페 만들기' : '그룹 카페 만들기'}</DialogTitle>
         </DialogHeader>
 
         <div className='flex flex-col gap-5'>
@@ -292,7 +292,7 @@ export function GroupRoomCreator() {
                 <button
                   onClick={() => {
                     if (canCreateEventRoom) setRoomType('E')
-                    else toast.info('이벤트 채팅방은 Business 플랜 전용입니다')
+                    else toast.info('이벤트 카페는 Business 플랜 전용입니다')
                   }}
                   className={`rounded-xl border px-3 py-2 text-sm font-medium transition-colors ${
                     roomType === 'E'
@@ -308,14 +308,14 @@ export function GroupRoomCreator() {
                   참가자가 입장료(π)를 결제하고 입장하는 기간 한정 방입니다. 생성 비용은 없습니다.
                 </p>
               )}
-              <p className='mb-3 text-sm text-muted-foreground'>채팅방의 테마를 선택하세요</p>
+              <p className='mb-3 text-sm text-muted-foreground'>카페의 테마를 선택하세요</p>
               <div className='max-h-72 overflow-y-auto pr-1'>
                 <ThemeSelector selectedThemeCode={selectedTheme?.theme_cd ?? null} onSelect={handleThemeSelect} hasPremiumAccess={canUsePremiumTheme} />
               </div>
             </div>
           )}
 
-          {/* Step 2: 채팅방 정보 */}
+          {/* Step 2: 카페 정보 */}
           {step === 2 && selectedTheme && (
             <div className='space-y-4'>
               <div className='flex items-center gap-2 text-sm'>
@@ -329,7 +329,7 @@ export function GroupRoomCreator() {
               </div>
 
               <div>
-                <label className='mb-1 block text-sm font-medium'>채팅방 이름 *</label>
+                <label className='mb-1 block text-sm font-medium'>카페 이름 *</label>
                 <input
                   type='text'
                   value={roomNm}
@@ -341,11 +341,11 @@ export function GroupRoomCreator() {
               </div>
 
               <div>
-                <label className='mb-1 block text-sm font-medium'>채팅방 소개 (선택)</label>
+                <label className='mb-1 block text-sm font-medium'>카페 소개 (선택)</label>
                 <textarea
                   value={roomDesc}
                   onChange={e => setRoomDesc(e.target.value)}
-                  placeholder='채팅방에 대해 소개해 주세요'
+                  placeholder='카페에 대해 소개해 주세요'
                   rows={3}
                   maxLength={200}
                   className='w-full resize-none rounded-xl border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring'
@@ -507,7 +507,7 @@ export function GroupRoomCreator() {
                   <span>{selectedTheme.theme_emoji} {selectedTheme.theme_nm}</span>
                 </div>
                 <div className='flex justify-between'>
-                  <span className='text-muted-foreground'>채팅방 이름</span>
+                  <span className='text-muted-foreground'>카페 이름</span>
                   <span className='max-w-[60%] truncate text-right font-medium'>{roomNm}</span>
                 </div>
                 <div className='flex justify-between'>

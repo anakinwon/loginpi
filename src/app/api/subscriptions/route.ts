@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
   // Pi createPayment에 그대로 넣을 파라미터 — amount는 서버 권위값
   return NextResponse.json({
     amount: planRow.price_pi,
-    memo: `PiChat 구독: ${planRow.plan_nm}`,
+    memo: `PiCafé 구독: ${planRow.plan_nm}`,
     metadata: { type: 'CHAT_SUBSCR', plan_cd: planRow.plan_cd },
   })
 }

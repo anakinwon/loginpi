@@ -4,7 +4,7 @@
 > **버전**: v1.0
 > **상태**: 초안 (설계 합의용 — 코드 구현 전)
 > **작성자**: voice-chat-architect 에이전트 (검토: anakin)
-> **관련 문서**: `docs/PRD_4_CHAT.md`(채팅 본체) · `.claude/plans/warm-stirring-star.md`(구축 계획)
+> **관련 문서**: `docs/PRD_4_CHAT.md`(카페 본체) · `.claude/plans/warm-stirring-star.md`(구축 계획)
 
 ---
 
@@ -44,14 +44,14 @@
 
 ## 1. 개요·목표·핵심가치
 
-PiChat 채팅방 참여자 간 **브라우저 기반 실시간 1:1 음성 통화**를 추가한다. 별도 앱 설치 없이 Pi Browser·일반 브라우저에서 즉시 통화한다.
+PiCafé 카페 참여자 간 **브라우저 기반 실시간 1:1 음성 통화**를 추가한다. 별도 앱 설치 없이 Pi Browser·일반 브라우저에서 즉시 통화한다.
 
 **핵심가치**
 - **추가 인프라 0**: 시그널링을 기존 Supabase Realtime Broadcast로 처리 — 신규 WebSocket 서버 불필요
 - **서버 미디어 비용 0**: 1:1은 P2P 직결 — 음성 트래픽이 서버를 거치지 않음(릴레이 시에만 TURN 경유)
 - **Pi Browser 모바일 1급**: 모바일 비중이 높으므로 Wi-Fi↔LTE 전환·UDP 차단망을 1급 시나리오로 설계
 
-**MVP 목표**: 채팅방 멤버 간 1:1 음성 통화 발신·수신·종료, 통화 품질(packet loss/jitter/RTT) 로깅, Pi Browser 실기기 동작.
+**MVP 목표**: 카페 멤버 간 1:1 음성 통화 발신·수신·종료, 통화 품질(packet loss/jitter/RTT) 로깅, Pi Browser 실기기 동작.
 
 **비목표(MVP 제외)**: 그룹(2인 초과) 통화, 영상 통화, 통화 녹음, 결제 게이팅 — 모두 데이터 검증 후 후속 단계.
 
@@ -119,7 +119,7 @@ export async function POST() {
 `getSessionUser()` null 시 **redirect 금지** → `ClientVoiceCall` 위임(`ClientChatRoom` 패턴 그대로). 모든 통화 API 호출은 `piFetch`(X-Pi-Token 자동 첨부).
 
 ### 4.5 권한
-`getRoomMember(roomId, userId)` + `mbr_role_cd`로 발신/수신 자격 확인. 1:1 MVP는 채팅방 멤버 간만 허용(GUEST 만료 자동 차단).
+`getRoomMember(roomId, userId)` + `mbr_role_cd`로 발신/수신 자격 확인. 1:1 MVP는 카페 멤버 간만 허용(GUEST 만료 자동 차단).
 
 ### 신규/재사용 매핑
 
@@ -232,7 +232,7 @@ CREATE INDEX IF NOT EXISTS idx_msg_call_qual_call  ON public.msg_call_quality_st
 
 - **iOS Pi Browser WebRTC 제약** *(최우선)*: WKWebView `getUserMedia` 지원 여부가 S0 스파이크의 go/no-go 핵심 — 미지원 시 전체 재검토
 - **관리형 TURN 무료 티어 한도**: 베타 트래픽 초과 시 자체 coturn 조기 전환
-- **시그널링 채널 분리**: MVP는 `room:${roomId}` 재사용. 통화 트래픽이 채팅 broadcast와 섞이는 부하는 S2에서 측정 후 `call:${callId}` 분리 검토
+- **시그널링 채널 분리**: MVP는 `room:${roomId}` 재사용. 통화 트래픽이 카페 broadcast와 섞이는 부하는 S2에서 측정 후 `call:${callId}` 분리 검토
 - **동시 통화 정책**: 1:1 MVP는 사용자당 1개 활성 통화로 제한(이미 통화 중이면 새 발신/수신 거부)
 - **결정 필요(추후)**: 관리형 TURN 업체 선정(Metered/Twilio/Cloudflare), 무료 통화 시간·추가권 가격(S3)
 

@@ -54,10 +54,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: '수신자를 찾을 수 없습니다' }, { status: 404 })
   }
   if (!senderMbr) {
-    return NextResponse.json({ error: '해당 채팅방에 참여 중이 아닙니다' }, { status: 403 })
+    return NextResponse.json({ error: '해당 카페에 참여 중이 아닙니다' }, { status: 403 })
   }
   if (!recipientMbr) {
-    return NextResponse.json({ error: '수신자가 해당 채팅방에 없습니다' }, { status: 400 })
+    return NextResponse.json({ error: '수신자가 해당 카페에 없습니다' }, { status: 400 })
   }
 
   const recipientRow = recipient as { id: string; display_name: string | null }

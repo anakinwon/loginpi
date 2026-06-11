@@ -16,6 +16,7 @@ interface PackRow {
   pack_desc: string | null
   price_pi: number
   is_dflt_yn: string
+  ownr_usr_id: string | null
 }
 
 // GET /api/stickers/packs — 보유팩(전체 스티커) + 미보유 스토어팩(미리보기 3개)
@@ -28,7 +29,7 @@ export async function GET() {
   // TASK-074: 노출 범위 — 플랫폼 기본팩(ownr 없음) + 마켓 판매 커스텀팩 + 내가 만든 팩
   const { data: allPacks } = await db
     .from('msg_stkr_pack')
-    .select('pack_id, pack_nm, pack_desc, price_pi, is_dflt_yn')
+    .select('pack_id, pack_nm, pack_desc, price_pi, is_dflt_yn, ownr_usr_id')
     .eq('use_yn', 'Y')
     .eq('del_yn', 'N')
     .or(`ownr_usr_id.is.null,mkt_yn.eq.Y,ownr_usr_id.eq.${user.id}`)
@@ -73,12 +74,18 @@ export async function GET() {
 
   for (const pack of packs) {
     const stickers = stickersByPack.get(pack.pack_id) ?? []
+    // 내가 만든 커스텀 팩 여부 — ownr_usr_id는 응답에 노출하지 않고 is_custom 플래그만 전달
+    const { ownr_usr_id, ...rest } = pack
+    const is_custom = ownr_usr_id === user.id
     if (ownedPackIds.has(pack.pack_id)) {
-      ownedPacks.push({ ...pack, stickers })
+      ownedPacks.push({ ...rest, is_custom, stickers })
     } else {
-      storePacks.push({ ...pack, preview_stickers: stickers.slice(0, 3) })
+      storePacks.push({ ...rest, is_custom, preview_stickers: stickers.slice(0, 3) })
     }
   }
+
+  // 커스텀(내가 만든) 팩을 항상 맨 앞으로 — stable sort로 그 외 팩의 가격순은 유지
+  ownedPacks.sort((a, b) => Number(b.is_custom) - Number(a.is_custom))
 
   return NextResponse.json({ ownedPacks, storePacks })
 }

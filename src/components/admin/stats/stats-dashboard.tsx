@@ -55,7 +55,7 @@ function TopUsersList({ users, loading }: { users: TopUser[]; loading: boolean }
         ))}
       </ol>
       <p className='text-muted-foreground text-xs'>
-        점수 = 활동일수×0.2 + 콘텐츠(채팅·게시글·댓글)×0.3 + 결제건수×0.5
+        점수 = 활동일수×0.2 + 콘텐츠(카페·게시글·댓글)×0.3 + 결제건수×0.5
       </p>
     </div>
   )

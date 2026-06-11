@@ -145,7 +145,7 @@ export async function getOrCreateDirectRoom(
     .select()
     .single()
 
-  if (error || !room) throw new Error('채팅방 생성 실패')
+  if (error || !room) throw new Error('카페 생성 실패')
 
   await supabase.from('msg_room_mbr').insert([
     { room_id: room.room_id, usr_id: userId1, mbr_role_cd: 'OWNER',  regr_id: slug, modr_id: slug },
@@ -155,7 +155,7 @@ export async function getOrCreateDirectRoom(
   return room as MsgRoom
 }
 
-// 그룹 채팅방 생성 (결제 완료 후 또는 무료 테마)
+// 그룹 카페 생성 (결제 완료 후 또는 무료 테마)
 export async function createGroupRoom(params: {
   userId: string
   displayName: string
@@ -187,7 +187,7 @@ export async function createGroupRoom(params: {
     .select()
     .single()
 
-  if (error || !room) throw new Error('채팅방 생성 실패')
+  if (error || !room) throw new Error('카페 생성 실패')
 
   await supabase.from('msg_room_mbr').insert({
     room_id: (room as MsgRoom).room_id,
@@ -200,7 +200,7 @@ export async function createGroupRoom(params: {
   return room as MsgRoom
 }
 
-// 이벤트 채팅방 생성 (BUSINESS 플랜 전용 — 유료 입장 + 종료 시각 설정)
+// 이벤트 카페 생성 (BUSINESS 플랜 전용 — 유료 입장 + 종료 시각 설정)
 export async function createEventRoom(params: {
   userId: string
   displayName: string
@@ -245,7 +245,7 @@ export async function createEventRoom(params: {
   return room as MsgRoom
 }
 
-// 채팅방 수정 (방장 전용) — 공개/비밀 전환·비밀번호·이름·설명·정원
+// 카페 수정 (방장 전용) — 공개/비밀 전환·비밀번호·이름·설명·정원
 // 권한 검증은 호출부(API)에서 OWNER 확인 후 진입한다.
 export interface RoomUpdateInput {
   room_nm?: string

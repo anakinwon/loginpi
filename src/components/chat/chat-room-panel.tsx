@@ -30,7 +30,7 @@ interface MyBadge extends BadgeAwardInfo {
   noti_yn: 'Y' | 'N'
 }
 
-// 방별 번역 언어 localStorage 키 — 채팅룸은 독립 공간이므로 방마다 따로 저장
+// 방별 번역 언어 localStorage 키 — 카페룸은 독립 공간이므로 방마다 따로 저장
 const viewLocaleKey = (roomId: string) => `chat_view_locale:${roomId}`
 
 export function ChatRoomPanel({
@@ -59,7 +59,7 @@ export function ChatRoomPanel({
   const [upgradedBadge, setUpgradedBadge] = useState<BadgeAwardInfo | null>(null)
   // TASK-071: Pi Bet 패널
   const [betPanelOpen, setBetPanelOpen] = useState(false)
-  // 방장 전용 채팅방 수정 — 방 메타 조회 후 OWNER일 때만 버튼 노출
+  // 방장 전용 카페 수정 — 방 메타 조회 후 OWNER일 때만 버튼 노출
   const [isOwner, setIsOwner] = useState(false)
   const [roomSettings, setRoomSettings] = useState<RoomSettings | null>(null)
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -191,7 +191,7 @@ export function ChatRoomPanel({
         <Link
           href='/chat'
           className='shrink-0 text-muted-foreground transition-colors hover:text-foreground'
-          aria-label='채팅 목록으로'
+          aria-label='카페 목록으로'
         >
           ⬅️
         </Link>
@@ -204,7 +204,7 @@ export function ChatRoomPanel({
                 {roomSettings.is_public_yn === 'Y' ? '🌐' : '🔒'}
               </span>
             )}
-            {/* Trigger 7: 강화 배지 — 채팅방 이름 옆 상시 표시 (특별 디자인) */}
+            {/* Trigger 7: 강화 배지 — 카페 이름 옆 상시 표시 (특별 디자인) */}
             {upgradedBadge && (
               <span
                 className='inline-flex shrink-0 items-center gap-0.5 rounded-full bg-gradient-to-r from-amber-200 to-yellow-300 px-1.5 py-0.5 text-[10px] font-bold text-amber-900 shadow-sm ring-1 ring-amber-400/60 dark:from-amber-700 dark:to-yellow-600 dark:text-amber-100'
@@ -218,13 +218,13 @@ export function ChatRoomPanel({
             <p className='truncate text-xs text-muted-foreground'>{displayRoomDesc}</p>
           )}
         </div>
-        {/* 방장 전용 채팅방 수정 버튼 */}
+        {/* 방장 전용 카페 수정 버튼 */}
         {isOwner && roomSettings && (
           <button
             onClick={() => setSettingsOpen(true)}
             className='shrink-0 text-lg transition-transform hover:scale-110'
-            aria-label='채팅방 수정'
-            title='채팅방 수정 (방장)'
+            aria-label='카페 수정'
+            title='카페 수정 (방장)'
           >
             ⚙️
           </button>
@@ -233,8 +233,8 @@ export function ChatRoomPanel({
         <Link
           href={`/chat/${roomId}/analytics`}
           className='shrink-0 text-lg transition-transform hover:scale-110'
-          aria-label='채팅방 분석'
-          title='채팅방 분석 (Business)'
+          aria-label='카페 분석'
+          title='카페 분석 (Business)'
         >
           📊
         </Link>
@@ -254,7 +254,7 @@ export function ChatRoomPanel({
       {/* Trigger 5: 정원 초과 방장 알림 배너 */}
       {capacityAlert && (
         <div className='flex shrink-0 items-center justify-between gap-2 bg-amber-500/10 px-4 py-2 text-xs text-amber-700 dark:text-amber-400'>
-          <span>⚠️ 채팅방 정원이 꽉 찼습니다. 구독 업그레이드로 정원을 늘리세요.</span>
+          <span>⚠️ 카페 정원이 꽉 찼습니다. 구독 업그레이드로 정원을 늘리세요.</span>
           <button
             onClick={() => setExpirePromptOpen(true)}
             className='shrink-0 rounded-md bg-amber-500 px-2 py-0.5 text-white transition-colors hover:bg-amber-600'
@@ -286,7 +286,7 @@ export function ChatRoomPanel({
         </div>
       )}
 
-      {/* 채팅 본문 — 이 영역만 스크롤 (ChatMessageList 내부 overflow-y-auto) */}
+      {/* 카페 본문 — 이 영역만 스크롤 (ChatMessageList 내부 overflow-y-auto) */}
       <ChatMessageList
         roomId={roomId}
         messages={messages}
@@ -297,7 +297,7 @@ export function ChatRoomPanel({
         onUpgradeForTip={onUpgradeForTip}
       />
 
-      {/* 채팅 입력 섹션 — 고정 */}
+      {/* 카페 입력 섹션 — 고정 */}
       <ChatInput onSend={sendMessage} onSendSticker={sendSticker} onSendFile={sendFile} />
 
       {/* Trigger 2: Tip 업그레이드 모달 */}
@@ -315,8 +315,8 @@ export function ChatRoomPanel({
       {/* Trigger 4·5: 메시지 보관 / 정원 확장 업그레이드 모달 */}
       <InlinePurchasePrompt
         isOpen={expirePromptOpen}
-        featureName='채팅 보관 · 정원 확장'
-        description='프리미엄 구독으로 메시지를 무제한 보관하고 채팅방 정원을 늘리세요.'
+        featureName='카페 보관 · 정원 확장'
+        description='프리미엄 구독으로 메시지를 무제한 보관하고 카페 정원을 늘리세요.'
         piAmount={3}
         onSinglePurchase={() => setExpirePromptOpen(false)}
         onSubscribe={subscribe}
@@ -334,7 +334,7 @@ export function ChatRoomPanel({
       {/* TASK-071: Pi Bet 패널 */}
       {betPanelOpen && <PiBetPanel roomId={roomId} onClose={() => setBetPanelOpen(false)} />}
 
-      {/* 방장 전용 채팅방 수정 다이얼로그 */}
+      {/* 방장 전용 카페 수정 다이얼로그 */}
       {settingsOpen && roomSettings && (
         <RoomSettingsDialog
           roomId={roomId}
@@ -352,7 +352,7 @@ export function ChatRoomPanel({
       {/* Trigger 3: AI 봇 한도 초과 업그레이드 모달 */}
       <InlinePurchasePrompt
         isOpen={aiLimitPromptOpen}
-        featureName='AI 채팅 비서 한도 초과'
+        featureName='AI 카페 비서 한도 초과'
         description='이번 달 @ai 멘션 한도를 초과했습니다. 프리미엄 구독으로 무제한 AI 질문을 이용하세요.'
         piAmount={3}
         onSinglePurchase={() => setAiLimitPromptOpen(false)}

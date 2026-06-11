@@ -13,11 +13,11 @@ export async function POST(request: NextRequest, { params }: Params) {
   if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
   const room = await getRoom(roomId)
-  if (!room) return NextResponse.json({ error: '채팅방을 찾을 수 없습니다' }, { status: 404 })
+  if (!room) return NextResponse.json({ error: '카페를 찾을 수 없습니다' }, { status: 404 })
 
   // Direct Room은 join API로 입장 불가 — getOrCreateDirectRoom으로만 생성
   if (room.room_tp_cd === 'D') {
-    return NextResponse.json({ error: '1:1 채팅방에는 직접 입장할 수 없습니다' }, { status: 403 })
+    return NextResponse.json({ error: '1:1 카페에는 직접 입장할 수 없습니다' }, { status: 403 })
   }
 
   // 이벤트방 만료 확인
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest, { params }: Params) {
   // 결제 없이 직접 join 시도 시 402 반환 (클라이언트가 Pi SDK 결제 흐름으로 안내)
   if (room.room_tp_cd === 'E' && room.entry_fee_pi > 0) {
     const existing = await getRoomMember(roomId, user.id)
-    if (existing) return NextResponse.json({ message: '이미 채팅방 멤버입니다' })
+    if (existing) return NextResponse.json({ message: '이미 카페 멤버입니다' })
     return NextResponse.json(
       { error: '유료 이벤트방입니다. 결제 후 입장하세요.', requiresPayment: true, entryFeePi: room.entry_fee_pi },
       { status: 402 },
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest, { params }: Params) {
 
   // 이미 멤버면 비밀번호 없이 통과 (재입장)
   const existing = await getRoomMember(roomId, user.id)
-  if (existing) return NextResponse.json({ message: '이미 채팅방 멤버입니다' })
+  if (existing) return NextResponse.json({ message: '이미 카페 멤버입니다' })
 
   let body: unknown
   try { body = await request.json() } catch { body = {} }
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest, { params }: Params) {
   // 비밀번호 미설정(join_pwd_hash=null) 비밀방은 초대/생성자 전용 → 입장 불가
   if (room.is_public_yn === 'N') {
     if (!room.join_pwd_hash) {
-      return NextResponse.json({ error: '비공개 채팅방입니다' }, { status: 403 })
+      return NextResponse.json({ error: '비공개 카페입니다' }, { status: 403 })
     }
     if (!join_pwd || !verifyRoomPassword(String(join_pwd), room.join_pwd_hash)) {
       return NextResponse.json(
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest, { params }: Params) {
     .eq('del_yn', 'N')
 
   if ((count ?? 0) >= room.max_mbr_cnt) {
-    return NextResponse.json({ error: '채팅방 정원이 가득 찼습니다' }, { status: 409 })
+    return NextResponse.json({ error: '카페 정원이 가득 찼습니다' }, { status: 409 })
   }
 
   const { error } = await getSupabaseAdmin()

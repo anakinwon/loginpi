@@ -24,7 +24,7 @@ interface CheckResult {
 const FEATURE_LABEL: Record<Feature, string> = {
   tip: 'Pi Tip 보내기',
   premiumTheme: 'PREMIUM 테마',
-  eventRoom: '이벤트 채팅방',
+  eventRoom: '이벤트 카페',
   ai: 'AI 봇',
 }
 

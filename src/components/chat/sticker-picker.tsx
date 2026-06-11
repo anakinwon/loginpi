@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, Fragment } from 'react'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
 import { useSubscribePlan } from '@/hooks/use-subscribe-plan'
@@ -17,6 +17,7 @@ interface OwnedPack {
   pack_nm: string
   price_pi: number
   stickers: Sticker[]
+  is_custom?: boolean
 }
 
 interface StorePack {
@@ -123,19 +124,31 @@ export function StickerPicker({ onSelect, onClose }: StickerPickerProps) {
     <div className='absolute bottom-full left-0 z-50 mb-2 w-72 overflow-hidden rounded-2xl border bg-popover shadow-xl'>
       {/* 팩 탭 */}
       <div className='flex items-center gap-1 overflow-x-auto border-b px-2 pt-2'>
-        {ownedPacks.map(pack => (
-          <button
-            key={pack.pack_id}
-            onClick={() => { setActivePackId(pack.pack_id); setShowStore(false) }}
-            className={`shrink-0 rounded-t-lg px-2 py-1.5 text-xs font-medium transition-colors ${
-              !showStore && activePackId === pack.pack_id
-                ? 'bg-background text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            {pack.pack_nm}
-          </button>
-        ))}
+        {ownedPacks.map((pack, idx) => {
+          const active = !showStore && activePackId === pack.pack_id
+          // 커스텀(맨 앞 그룹)과 일반 팩 경계에 세로 구분선 — 가독성
+          const showDivider = !pack.is_custom && idx > 0 && ownedPacks[idx - 1].is_custom
+          return (
+            <Fragment key={pack.pack_id}>
+              {showDivider && (
+                <span className='mx-0.5 h-4 w-px shrink-0 self-center bg-border' aria-hidden />
+              )}
+              <button
+                onClick={() => { setActivePackId(pack.pack_id); setShowStore(false) }}
+                title={pack.is_custom ? '내 커스텀 스티커팩' : undefined}
+                className={`shrink-0 rounded-t-lg px-2 py-1.5 text-xs font-medium transition-colors ${
+                  active
+                    ? 'bg-background text-foreground shadow-sm'
+                    : pack.is_custom
+                      ? 'text-amber-600 hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300'
+                      : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {pack.is_custom ? `🎨 ${pack.pack_nm}` : pack.pack_nm}
+              </button>
+            </Fragment>
+          )
+        })}
         {storePacks.length > 0 && (
           <button
             onClick={() => setShowStore(true)}

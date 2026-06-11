@@ -153,7 +153,7 @@ export function useChatRoom(
         .then((data: { trans_cont?: string; same_lang?: boolean } | null) => {
           if (data?.trans_cont && !data.same_lang) applyTranslation(msg.msg_id, data.trans_cont, userLocale)
         })
-        .catch(() => {}) // 번역 실패는 원문 표시로 자연 폴백 — 채팅 흐름을 막지 않음
+        .catch(() => {}) // 번역 실패는 원문 표시로 자연 폴백 — 카페 흐름을 막지 않음
     }
   }, [roomId, userLocale, forceTranslate, applyTranslation, batchTranslate])
 

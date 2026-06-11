@@ -1,7 +1,7 @@
 import 'server-only'
 import { getSupabaseAdmin } from './supabase-admin'
 
-// PiChat 구독 권한 단일 소스.
+// PiCafé 구독 권한 단일 소스.
 // 플랜 등급별 기능 한도를 PLAN_CAPS 한 곳에서 정의하고, 모든 게이트·API가 이를 따른다.
 // (정책 변경 시 이 파일만 수정 — locale-currency 단일 소스와 동일한 원칙)
 

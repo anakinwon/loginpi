@@ -3,7 +3,7 @@ import { getSessionUser } from '@/lib/auth-check'
 import { getChatPlan } from '@/lib/chat-auth'
 import { createEventRoom } from '@/lib/chat'
 
-// POST /api/chat/rooms/event — 이벤트 채팅방 생성 (Business 플랜 전용)
+// POST /api/chat/rooms/event — 이벤트 카페 생성 (Business 플랜 전용)
 // 참가자는 entry_fee_pi 결제 후 payments/complete에서 GUEST 입장 처리
 export async function POST(request: NextRequest) {
   const user = await getSessionUser()
@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
 
   const plan = await getChatPlan(user.id)
   if (!plan.caps.canCreateEventRoom) {
-    return NextResponse.json({ error: '이벤트 채팅방은 Business 플랜 전용입니다' }, { status: 403 })
+    return NextResponse.json({ error: '이벤트 카페는 Business 플랜 전용입니다' }, { status: 403 })
   }
 
   let body: unknown

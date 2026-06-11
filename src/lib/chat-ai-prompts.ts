@@ -1,7 +1,7 @@
 import 'server-only'
 import Anthropic from '@anthropic-ai/sdk'
 
-// 채팅방 테마별 AI 봇 시스템 프롬프트
+// 카페 테마별 AI 봇 시스템 프롬프트
 // @ai 멘션 → 방 테마에 맞는 전문 역할로 응답
 const THEME_PROMPTS: Record<string, string> = {
   GOLF: '당신은 골프 코치 AI입니다. 스윙, 코스 전략, 클럽 선택, 핸디캡 등 골프 관련 질문에 한국어로 3~5문장 이내로 답변하세요.',
@@ -16,7 +16,7 @@ const THEME_PROMPTS: Record<string, string> = {
   LANGUAGE: '당신은 언어 학습 튜터 AI입니다. 문법, 표현, 번역, 언어 학습 팁을 한국어로 3~5문장 이내로 답변하세요.',
 }
 
-const DEFAULT_PROMPT = '당신은 PiChat AI 비서입니다. 모든 질문에 친절하게 한국어로 3~5문장 이내로 답변하세요.'
+const DEFAULT_PROMPT = '당신은 PiCafé AI 비서입니다. 모든 질문에 친절하게 한국어로 3~5문장 이내로 답변하세요.'
 
 export function getThemeSystemPrompt(themeCd: string): string {
   return THEME_PROMPTS[themeCd] ?? DEFAULT_PROMPT

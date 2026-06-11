@@ -78,10 +78,10 @@ export function ProfileForm({ initialUser, localeOptions, onSaved }: Props) {
         </div>
       ))}
 
-      {/* PiTranslate™ 표시 언어 — 채팅 메시지가 이 언어로 자동 번역됨 */}
+      {/* PiTranslate™ 표시 언어 — 카페 메시지가 이 언어로 자동 번역됨 */}
       <div className='flex flex-col gap-1'>
         <label className='text-sm font-medium' htmlFor='display_locale_cd'>
-          표시 언어 (채팅 자동 번역)
+          표시 언어 (카페 자동 번역)
         </label>
         <select
           id='display_locale_cd'

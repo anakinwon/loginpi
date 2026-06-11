@@ -88,7 +88,7 @@ export function BadgeAwardPopup({ badge, onUpgraded, onClose }: BadgeAwardPopupP
         <div className='mt-4 rounded-xl bg-gradient-to-r from-amber-100 to-yellow-100 p-3 text-xs text-amber-800 dark:from-amber-900/40 dark:to-yellow-900/40 dark:text-amber-200'>
           ✨ 배지를 강화하면 특별 디자인이 적용되고
           <br />
-          채팅방 이름 옆에 상시 표시됩니다
+          카페 이름 옆에 상시 표시됩니다
         </div>
 
         <div className='mt-4 space-y-2.5'>

@@ -1,4 +1,4 @@
--- TASK-050: PiChat msg_* 테이블 13개 — DA 표준 시스템 컬럼 4개 전 테이블 필수
+-- TASK-050: PiCafé msg_* 테이블 13개 — DA 표준 시스템 컬럼 4개 전 테이블 필수
 -- FK 의존성 순서: msg_theme → msg_stkr_pack → msg_stkr → msg_theme_stkr
 --                → msg_room → msg_room_mbr → msg_msg → msg_msg_reac / msg_attch
 --                → msg_subscr_plan → msg_subscr → msg_usr_stkr → msg_tip
@@ -95,7 +95,7 @@ CREATE TABLE IF NOT EXISTS public.msg_theme_stkr (
 );
 
 -- ──────────────────────────────────────────
--- 6. msg_room — 채팅방
+-- 6. msg_room — 카페
 -- ──────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS public.msg_room (
   room_id          UUID          PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -118,7 +118,7 @@ CREATE TABLE IF NOT EXISTS public.msg_room (
 );
 
 -- ──────────────────────────────────────────
--- 7. msg_room_mbr — 채팅방 멤버
+-- 7. msg_room_mbr — 카페 멤버
 -- ──────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS public.msg_room_mbr (
   room_mbr_id     UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -176,7 +176,7 @@ CREATE TABLE IF NOT EXISTS public.msg_msg_reac (
 );
 
 -- ──────────────────────────────────────────
--- 10. msg_attch — 채팅 첨부파일 (Supabase Storage)
+-- 10. msg_attch — 카페 첨부파일 (Supabase Storage)
 -- ──────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS public.msg_attch (
   attch_id UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -268,7 +268,7 @@ CREATE INDEX IF NOT EXISTS idx_msg_tip_rcvr       ON public.msg_tip      (rcvr_u
 CREATE INDEX IF NOT EXISTS idx_msg_stkr_pack      ON public.msg_stkr     (pack_id);
 
 -- ──────────────────────────────────────────
--- Realtime RLS — msg_msg 채팅방 멤버만 구독 가능
+-- Realtime RLS — msg_msg 카페 멤버만 구독 가능
 -- service_role key는 RLS를 bypass하므로 서버 API는 영향 없음
 -- anon key 기반 Realtime 구독 시에만 이 정책이 적용됨
 -- ──────────────────────────────────────────

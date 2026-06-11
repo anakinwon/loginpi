@@ -14,7 +14,7 @@ export async function GET(_request: NextRequest, { params }: Params) {
   if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
   const mbr = await getRoomMember(roomId, user.id)
-  if (!mbr) return NextResponse.json({ error: '채팅방 멤버가 아닙니다' }, { status: 403 })
+  if (!mbr) return NextResponse.json({ error: '카페 멤버가 아닙니다' }, { status: 403 })
 
   const db = getSupabaseAdmin()
   const { data: bets, error } = await db
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest, { params }: Params) {
   if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
   const mbr = await getRoomMember(roomId, user.id)
-  if (!mbr) return NextResponse.json({ error: '채팅방 멤버가 아닙니다' }, { status: 403 })
+  if (!mbr) return NextResponse.json({ error: '카페 멤버가 아닙니다' }, { status: 403 })
   if (mbr.mbr_role_cd !== 'OWNER') {
     return NextResponse.json({ error: '방장만 베팅을 생성할 수 있습니다' }, { status: 403 })
   }

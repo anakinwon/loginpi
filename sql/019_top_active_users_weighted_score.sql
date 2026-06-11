@@ -3,11 +3,11 @@
 --   score = 활동일수 × p_w_visit + 콘텐츠활동 × p_w_content + 핵심액션 × p_w_action
 --
 --   A 방문 빈도   (기본 0.2): sys_user_actvty_log 기간 내 고유 활동일수
---   B 콘텐츠 활동 (기본 0.3): 채팅 메시지(TEXT) + 게시글 + 댓글
+--   B 콘텐츠 활동 (기본 0.3): 카페 메시지(TEXT) + 게시글 + 댓글
 --   C 핵심 액션   (기본 0.5): Pi 결제 건수 (방 생성·팁·스티커·구독 — completed/approved)
 --
 -- 어뷰징 필터링:
---   · 채팅 메시지는 사용자당 하루 50건까지만 점수 반영 (도배 방지)
+--   · 카페 메시지는 사용자당 하루 50건까지만 점수 반영 (도배 방지)
 --   · TIP_NOTI 등 시스템 메시지 제외 (msg_tp_cd = 'TEXT'만 인정)
 --   · del_yn = 'Y' 삭제 데이터 제외
 --   · 팁은 pi_pymnt 경유 결제이므로 msg_tip을 별도 합산하지 않음 (이중 계산 방지)
@@ -42,7 +42,7 @@ AS $$
     GROUP BY l.usr_id
   ),
   chat AS (
-    -- B-1. 채팅 메시지 — 도배 방지: 하루 50건 상한
+    -- B-1. 카페 메시지 — 도배 방지: 하루 50건 상한
     SELECT d.usr_id, SUM(LEAST(d.cnt, 50)) AS cnt
     FROM (
       SELECT m.snd_usr_id AS usr_id, m.reg_dtm::date AS dt, COUNT(*) AS cnt

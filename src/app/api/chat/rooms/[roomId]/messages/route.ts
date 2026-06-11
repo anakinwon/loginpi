@@ -22,7 +22,7 @@ export async function GET(request: NextRequest, { params }: Params) {
   if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
   const mbr = await getRoomMember(roomId, user.id)
-  if (!mbr) return NextResponse.json({ error: '채팅방 멤버가 아닙니다' }, { status: 403 })
+  if (!mbr) return NextResponse.json({ error: '카페 멤버가 아닙니다' }, { status: 403 })
 
   const { searchParams } = new URL(request.url)
   const limit = Math.min(Number(searchParams.get('limit') ?? '50'), 100)
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest, { params }: Params) {
   if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
   const mbr = await getRoomMember(roomId, user.id)
-  if (!mbr) return NextResponse.json({ error: '채팅방 멤버가 아닙니다' }, { status: 403 })
+  if (!mbr) return NextResponse.json({ error: '카페 멤버가 아닙니다' }, { status: 403 })
 
   // 메시지 전송 = 가장 명확한 활성 사용자 신호
   recordActivity(user.id, 'MSG')
@@ -128,7 +128,7 @@ export async function POST(request: NextRequest, { params }: Params) {
   }
 
   // TASK-065 보안: IMAGE/FILE/VOICE의 attch_url은 이 방의 Storage 공개 URL만 허용
-  // 외부 URL(피싱·XSS)과 타 채팅방 파일 cross-attach를 차단한다
+  // 외부 URL(피싱·XSS)과 타 카페 파일 cross-attach를 차단한다
   if (msg_tp_cd === 'IMAGE' || msg_tp_cd === 'FILE' || msg_tp_cd === 'VOICE') {
     const expectedPrefix = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/chat-attachments/${roomId}/`
     if (!attch_url || !attch_url.startsWith(expectedPrefix)) {
@@ -215,7 +215,7 @@ export async function POST(request: NextRequest, { params }: Params) {
 
   if (error) return NextResponse.json({ error: '메시지 전송 실패' }, { status: 500 })
 
-  // 채팅방 mod_dtm 갱신 + 서버 브로드캐스트를 병렬 실행
+  // 카페 mod_dtm 갱신 + 서버 브로드캐스트를 병렬 실행
   // 브로드캐스트는 서비스 롤 키 + REST API로 전송 → 클라이언트 직접 broadcast 불필요
   // (클라이언트 broadcast는 snd_usr_id 스푸핑 가능 — 서버에서만 발송해야 신원 보장됨)
   await Promise.all([
@@ -270,7 +270,7 @@ export async function POST(request: NextRequest, { params }: Params) {
           .insert({
             room_id: roomId,
             snd_usr_id: user.id, // FK 안전 — 요청자 ID 재사용
-            snd_usr_nm: 'PiChat AI',
+            snd_usr_nm: 'PiCafé AI',
             msg_cont: aiText,
             msg_tp_cd: 'AI_REPLY',
             ref_msg_id: data.msg_id,

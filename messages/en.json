@@ -38,7 +38,7 @@
   },
   "home": {
     "title": "Next.js Starter Kit",
-    "subtitle": "Next.js 16 + Tailwind CSS v4 + shadcn/ui boilerplate for quick start.",
+    "subtitle": "Next.js 15 + Tailwind CSS v4 + shadcn/ui boilerplate for quick start.",
     "loginSection": "Login",
     "detectingEnv": "Detecting environment...",
     "piNetwork": "Pi Network",
@@ -246,7 +246,7 @@
         "googleAccount": "Google Account",
         "linkStatus": "Linking Status",
         "role": "Role",
-        "joinDate": "Joined At"
+        "joinDate": "Join Date"
       }
     },
     "board": {
@@ -533,37 +533,47 @@
       "stdApprovals": "Approval Workflow",
       "i18nSection": "Multilingual",
       "i18n": "Multilingual Management",
-      "chatSection": "Chat Management",
-      "subscriptions": "Subscriptions",
       "backHome": "← Back to Home",
       "dashboard": "Dashboard",
-      "stats": "Statistics",
       "users": "User Management",
       "board": "Board Management",
       "stdSection": "Data Standard",
       "stdDdl": "DDL Export",
-      "batch": "On-demand Batch"
+      "stats": "Statistics",
+      "batch": "On-demand Batch",
+      "chatSection": "Cafe Management",
+      "subscriptions": "Subscription Management"
     },
     "batch": {
       "title": "On-demand Batch",
-      "desc": "Manually trigger statistics aggregation",
+      "desc": "Manually run statistics aggregation immediately",
       "runToday": "Run Today's Aggregation",
       "runYesterday": "Run Yesterday's Aggregation",
-      "runDate": "Run for Specific Date",
+      "runDate": "Aggregate Specific Date",
       "runBtn": "Run",
-      "running": "Running…",
-      "success": "Aggregation complete for {date}",
-      "error": "Aggregation failed: {msg}",
-      "backfillTitle": "Range Backfill",
-      "backfillDesc": "Aggregate all dates in from ~ to range",
+      "running": "Running...",
+      "success": "{date} Aggregation Completed",
+      "error": "Aggregation Failed: {msg}",
+      "backfillTitle": "Period Backfill",
+      "backfillDesc": "Batch aggregate the range from ~ to",
       "backfillRun": "Run Backfill",
-      "backfillRunning": "Running backfill…",
-      "backfillSuccess": "{total} days aggregated ({failed} failed)",
-      "from": "From",
-      "to": "To"
+      "backfillRunning": "Backfill Running...",
+      "backfillSuccess": "{total} days aggregation completed ({failed} failed)",
+      "from": "Start Date",
+      "to": "End Date"
     }
   },
   "adminSubscriptions": {
+    "col": {
+      "plan": "Plan",
+      "tier": "Tier",
+      "expireAt": "Expiration Date",
+      "autoRenew": "Auto-renew",
+      "startAt": "Start Date",
+      "manage": "Manage",
+      "user": "User"
+    },
+    "expired": "Expired",
     "title": "Subscription Management",
     "desc": "Total {count} · Business {business} · Premium {premium}",
     "noData": "No active subscriptions.",
@@ -572,36 +582,62 @@
       "business": "Business",
       "premium": "Premium"
     },
-    "col": {
-      "user": "User",
-      "plan": "Plan",
-      "tier": "Tier",
-      "expireAt": "Expires",
-      "autoRenew": "Auto-renew",
-      "startAt": "Started",
-      "manage": "Manage"
-    },
-    "expired": "Expired",
     "dday": "D-{n}",
-    "autoRenewYes": "O",
-    "autoRenewNo": "-",
+    "autoRenewYes": "Yes",
+    "autoRenewNo": "No",
     "extend": "Extend",
     "revoke": "Revoke",
-    "revokeConfirm": "Revoke subscription for \"{name}\"?",
+    "revokeConfirm": "Revoke \"{name}\"'s subscription?",
     "revokeSuccess": "Subscription revoked",
-    "revokeFail": "Revoke failed",
-    "extendSuccess": "Expiry date extended",
-    "extendFail": "Extend failed",
-    "grantTitle": "Grant Subscription",
+    "revokeFail": "Revocation failed",
+    "extendSuccess": "Expiration date extended",
+    "extendFail": "Extension failed",
+    "grantTitle": "Grant Subscription Manually",
     "grantUsrId": "User ID (UUID)",
     "grantPlan": "Plan",
-    "grantMonths": "Duration (months)",
+    "grantMonths": "Duration (Months)",
     "grantBtn": "Grant",
-    "granting": "Processing…",
+    "granting": "Processing...",
     "grantSuccess": "Subscription granted",
     "grantFail": "Grant failed",
-    "grantValidation": "Please enter user ID and select a plan",
-    "extendMonths": "Months to extend"
+    "grantValidation": "Please select User ID and Plan",
+    "extendMonths": "Extension Months"
+  },
+  "profile": {
+    "title": "My Profile",
+    "tabs": {
+      "info": "Personal Information",
+      "payment": "Payment History",
+      "subscr": "Subscription Status"
+    },
+    "info": {
+      "displayName": "Display Name",
+      "realNm": "Real Name",
+      "nickNm": "Nickname",
+      "phoneNo": "Contact Number",
+      "addr": "Address",
+      "addrDtl": "Detailed Address",
+      "saved": "Saved.",
+      "saveError": "Failed to save. Please try again."
+    },
+    "payment": {
+      "empty": "No payment history.",
+      "status": {
+        "pending": "Pending",
+        "approved": "Approved",
+        "completed": "Completed"
+      }
+    },
+    "subscr": {
+      "currentPlan": "Current Plan",
+      "expireDate": "Expiration Date: {date}",
+      "autoRenewOn": "Auto-renewal enabled",
+      "autoRenewOff": "Auto-renewal is canceled.",
+      "cancelAutoRenew": "Cancel Auto-renewal",
+      "cancelConfirm": "If you cancel your subscription, auto-renewal will stop after you use it until the expiration date. Do you want to continue?",
+      "cancelOk": "Subscription has been canceled. You can use it until the expiration date.",
+      "cancelError": "Failed to cancel. Please try again."
+    },
+    "loginRequired": "Login Required"
   }
-}
 }

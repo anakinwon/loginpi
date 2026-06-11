@@ -3,7 +3,7 @@
 Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Network 앱 플랫폼
 
 > **기준일**: 2026-06-11
-> **현재 버전**: Phase 7·8·9·10·11 완료 (PiChat MVP · Pi 수익화 · 생태계 확장 · 사용자 프로필 · 통계 대시보드) · Phase 12 PiTranslate™ MVP 완료 (TASK-090~097 ✅ · 098~099 대기) · **Phase 13 MyPiShop(MPS) 준비중 (TASK-100~113)** · **Phase 14 PiVoice™ 음성통화 설계 완료 (TASK-120~123, `docs/PRD_9_VOICE_CHAT.md`)**
+> **현재 버전**: Phase 7·8·9·10·11 완료 (PiCafé MVP · Pi 수익화 · 생태계 확장 · 사용자 프로필 · 통계 대시보드) · Phase 12 PiTranslate™ MVP 완료 (TASK-090~097 ✅ · 098~099 대기) · **Phase 13 MyPiShop(MPS) 준비중 (TASK-100~113)** · **Phase 14 PiVoice™ 음성통화 설계 완료 (TASK-120~123, `docs/PRD_9_VOICE_CHAT.md`)**
 > **배포 URL**: https://loginpi.vercel.app
 > **기술 스택**: Next.js 16 App Router · React 19 · TypeScript 6 · Tailwind CSS v4 · NextAuth.js · Supabase PostgreSQL
 
@@ -395,9 +395,9 @@ brd_attch 8행  — fl_nm/fl_pth/fl_url/fl_sz/fl_tp, del_yn 논리삭제
 
 ---
 
-## Phase 7: PiChat MVP ✅ (완료)
+## Phase 7: PiCafé MVP ✅ (완료)
 
-> **목표**: 테마 기반 1:1·그룹 채팅 + Supabase Realtime + Pi 결제 연동 + 구독 시스템
+> **목표**: 테마 기반 1:1·그룹 카페 + Supabase Realtime + Pi 결제 연동 + 구독 시스템
 > **상세 스펙**: `docs/PRD_4_CHAT.md` (v1.6)
 
 ### TASK-050: DB 마이그레이션 (`msg_*` 13개 테이블) ✅ 완료
@@ -407,15 +407,15 @@ brd_attch 8행  — fl_nm/fl_pth/fl_url/fl_sz/fl_tp, del_yn 논리삭제
 - ✅ `msg_subscr_plan` — 구독 플랜 정의 (`mth_cnt` DA 표준 컬럼명)
 - ✅ `msg_stkr_pack` / `msg_stkr` — 스티커 팩·개별 항목
 - ✅ `msg_theme_stkr` — 테마 기본 스티커팩 매핑
-- ✅ `msg_room` — 채팅방 (`room_tp_cd`: D/G/E, `entry_fee_pi`, `is_public_yn`)
-- ✅ `msg_room_mbr` — 채팅방 멤버 (`mbr_role_cd`: OWNER/ADMIN/MEMBER/GUEST)
+- ✅ `msg_room` — 카페 (`room_tp_cd`: D/G/E, `entry_fee_pi`, `is_public_yn`)
+- ✅ `msg_room_mbr` — 카페 멤버 (`mbr_role_cd`: OWNER/ADMIN/MEMBER/GUEST)
 - ✅ `msg_msg` — 메시지 (`msg_tp_cd`: TEXT/IMAGE/FILE/VOICE/STICKER/TIP_NOTI/SYSTEM)
 - ✅ `msg_msg_reac` — 메시지 이모지 반응
-- ✅ `msg_attch` — 채팅 첨부파일
+- ✅ `msg_attch` — 카페 첨부파일
 - ✅ `msg_subscr` — 사용자 구독 현황
 - ✅ `msg_usr_stkr` — 사용자 보유 스티커팩
 - ✅ `msg_tip` — Pi Tip 내역 (`tip_cont` DA 표준 컬럼명)
-- ✅ Realtime RLS 정책: `msg_msg` 채팅방 멤버만 구독 가능 (service_role bypass 유지)
+- ✅ Realtime RLS 정책: `msg_msg` 카페 멤버만 구독 가능 (service_role bypass 유지)
 
 ### TASK-051: 테마 마스터 데이터 세팅 ✅ 완료
 
@@ -425,11 +425,11 @@ brd_attch 8행  — fl_nm/fl_pth/fl_url/fl_sz/fl_tp, del_yn 논리삭제
 - ✅ `msg_subscr_plan` 5개 INSERT: FREE / PREMIUM_MONTHLY·ANNUAL / BUSINESS_MONTHLY·ANNUAL
 - 🔜 `/api/admin/chat/themes` — 관리자 테마 CRUD API (TASK-052 이후 별도 구현)
 
-### TASK-052: 1:1 채팅 API + Supabase Realtime ✅ 완료
+### TASK-052: 1:1 카페 API + Supabase Realtime ✅ 완료
 
 - ✅ `src/lib/chat.ts` — MsgRoom·MsgMsg·MsgRoomMbr 타입 + CRUD 헬퍼
 - ✅ `src/lib/supabase-client.ts` — 클라이언트 Realtime용 Supabase 인스턴스 (publishable key)
-- ✅ `GET /api/chat/rooms` — 내 채팅방 목록, `POST` — 1:1 Direct Room 생성
+- ✅ `GET /api/chat/rooms` — 내 카페 목록, `POST` — 1:1 Direct Room 생성
 - ✅ `GET /api/chat/rooms/[roomId]` — 상세 + 멤버 목록 + 내 역할
 - ✅ `GET /api/chat/rooms/[roomId]/messages` — cursor 페이지네이션 (scroll-up 무한로드)
 - ✅ `POST /api/chat/rooms/[roomId]/messages` — 메시지 전송 + rate limiting (1초 5건)
@@ -439,12 +439,12 @@ brd_attch 8행  — fl_nm/fl_pth/fl_url/fl_sz/fl_tp, del_yn 논리삭제
 - ✅ `src/components/chat/chat-input.tsx` — Enter 전송, Shift+Enter 줄바꿈, 높이 자동조절, rate limit 복원
 - 🔜 E2E 암호화 — Pi 지갑 키 기반 (Phase 8 이후 적용)
 
-### TASK-053: 그룹 채팅방 생성 (테마 선택 UX + Pi 결제) ✅ 완료
+### TASK-053: 그룹 카페 생성 (테마 선택 UX + Pi 결제) ✅ 완료
 
 ```
-채팅방 생성 UX:
+카페 생성 UX:
 Step 1: 테마 선택 (BASIC 자유 / PREMIUM 🔒 → 단건 0.2 Pi 또는 구독)
-Step 2: 채팅방 이름·설명 (테마 이모지 자동 제안)
+Step 2: 카페 이름·설명 (테마 이모지 자동 제안)
 Step 3: 공개/비공개 + 정원 설정 (10/30/50/100명)
 Step 4: Pi 결제 (BASIC 0.1 π / PREMIUM 0.3 π)
 ```
@@ -455,14 +455,14 @@ Step 4: Pi 결제 (BASIC 0.1 π / PREMIUM 0.3 π)
 - ✅ `src/components/chat/group-room-creator.tsx` — 4단계 마법사 Dialog (테마→이름→설정→Pi결제)
 - ✅ `src/components/chat/chat-room-panel.tsx` — ChatMessageList + ChatInput 래퍼 (Realtime 단일 구독)
 - ✅ `/api/payments/complete` — `CHAT_ROOM_CREATE` 분기 추가 (결제완료 시 msg_room + msg_room_mbr 원자 생성)
-- ✅ `src/app/[locale]/chat/page.tsx` — 채팅 홈 (내 채팅방 + 공개방 탐색 + GroupRoomCreator)
-- ✅ `src/app/[locale]/chat/[roomId]/page.tsx` — 채팅방 (초기 50건 서버 프리페치 + Realtime)
-- ✅ Header에 '채팅' 링크 추가
+- ✅ `src/app/[locale]/chat/page.tsx` — 카페 홈 (내 카페 + 공개방 탐색 + GroupRoomCreator)
+- ✅ `src/app/[locale]/chat/[roomId]/page.tsx` — 카페 (초기 50건 서버 프리페치 + Realtime)
+- ✅ Header에 '카페' 링크 추가
 
 ### TASK-055: Pi Browser 쿠키 비의존 인증 (X-Pi-Token) ✅ 완료 (2026-06-08)
 
 > **핵심 가치 직결** — Pi Browser WebView는 모든 방식(form POST·fetch·redirect·HTML)의
-> `Set-Cookie`를 저장하지 않아, 쿠키 기반 페이지 보호로는 채팅·관리자 접속 시
+> `Set-Cookie`를 저장하지 않아, 쿠키 기반 페이지 보호로는 카페·관리자 접속 시
 > 무한 리다이렉트 루프가 발생했다(로그인 자체 불가). CLAUDE.md "인증 + 세션 구조"의
 > 쿠키↔X-Pi-Token 이중 경로 + 클라이언트 게이트 패턴으로 근본 해결.
 
@@ -533,14 +533,14 @@ if (meta?.type === 'CHAT_SUBSCR') {
 
 ---
 
-## Phase 8: PiChat 수익화 기능 ✅ (완료, 2026-06-11)
+## Phase 8: PiCafé 수익화 기능 ✅ (완료, 2026-06-11)
 
 > **목표**: Pi Tip·스티커 마켓·AI 봇·이벤트방·인라인 구매 트리거 8종 구현
 > **빌드 검증**: `pnpm tsc --noEmit` 통과 · `pnpm lint` 0 errors · `pnpm build` 성공
 
 ### TASK-060: Pi Tip (인라인 결제 + TIP_NOTI 메시지) ✅ 완료
 
-- ✅ `src/components/chat/pi-tip-button.tsx` — 채팅창 내 Tip 버튼 (Pi SDK U2A 결제 연동)
+- ✅ `src/components/chat/pi-tip-button.tsx` — 카페창 내 Tip 버튼 (Pi SDK U2A 결제 연동)
 - ✅ `POST /api/tips/route.ts` — Tip 기록 (metadata.type=`PI_TIP`, 금액 서버 재검증)
 - ✅ Pi Tip 수신 시 `TIP_NOTI` 타입 메시지 자동 발송 → 수신자 실시간 알림
 - ✅ 트리거 2 구현: TIP_NOTI "나도 팁 보내기" → Free 사용자 단건/구독 업셀 선택
@@ -561,22 +561,22 @@ if (meta?.type === 'CHAT_SUBSCR') {
 | 1 스티커 업셀 | 스티커 메뉴 열 때 | ✅ `sticker-picker.tsx` 하단 배너 |
 | 2 Tip 수신→보내기 | TIP_NOTI "보내기" 클릭 | ✅ `inline-purchase-prompt.tsx` |
 | 3 AI 한도 초과 | AI 사용 한도 도달 | ✅ `chat-input.tsx` AI 응답 실패 시 |
-| 4 메시지 만료 경고 | 7일 내 만료 메시지 존재 | ✅ 채팅방 입장 시 상단 배너 |
+| 4 메시지 만료 경고 | 7일 내 만료 메시지 존재 | ✅ 카페 입장 시 상단 배너 |
 | 5 정원 초과 | 멤버 수 = max_mbr_cnt | ✅ 방장 대상 알림 팝업 |
 | 6 프리미엄 테마 잠금 | PREMIUM 테마 클릭 | ✅ `theme-selector.tsx` 잠금 팝업 |
 | 7 배지 강화 | 테마 배지 수여 시 | ✅ Trigger 7 테마 활동 배지 시스템 (`50d12d2`) |
-| 8 이벤트방 알림 | 팔로우 테마 이벤트 개설 | ✅ 채팅 홈 배너 (`8448284`) |
+| 8 이벤트방 알림 | 팔로우 테마 이벤트 개설 | ✅ 카페 홈 배너 (`8448284`) |
 
-### TASK-063: 이벤트 채팅방 (유료 입장 + 방장 수익 분배) ✅ 완료
+### TASK-063: 이벤트 카페 (유료 입장 + 방장 수익 분배) ✅ 완료
 
 - ✅ `room_tp_cd='E'` 이벤트방 생성 — `entry_fee_pi`, `entry_expire_dtm` 설정
 - ✅ 입장 시 Pi 결제 (metadata.type=`EVENT_ROOM_JOIN`)
 - ✅ `msg_room_mbr(GUEST, expire_dtm=이벤트종료)` — 임시 멤버십
 - ✅ 방장 Pi 수익 분배 로직 (플랫폼 수수료 0% 초기 3년 정책)
-- ✅ 채팅방 만들기 다이얼로그에 "이벤트방" 탭 추가 (`c532607`)
+- ✅ 카페 만들기 다이얼로그에 "이벤트방" 탭 추가 (`c532607`)
 - ✅ 트리거 8 구현: 테마 팔로우 사용자 이벤트 알림
 
-### TASK-064: AI 채팅 비서 (`@ai` 멘션 + 테마별 프롬프트) ✅ 완료
+### TASK-064: AI 카페 비서 (`@ai` 멘션 + 테마별 프롬프트) ✅ 완료
 
 - ✅ `src/lib/chat-ai-prompts.ts` — 테마별 Claude 시스템 프롬프트 매핑
   - 골프방: 골프 코치 · 먹방방: 칼로리·영양 전문가 · 여행방: 여행 플래너·번역
@@ -593,19 +593,19 @@ if (meta?.type === 'CHAT_SUBSCR') {
 
 ---
 
-## Phase 9: PiChat 생태계 확장 ✅ (완료, 2026-06-11)
+## Phase 9: PiCafé 생태계 확장 ✅ (완료, 2026-06-11)
 
 > **목표**: 마켓플레이스·Webhook·분석 대시보드·커스텀 스티커로 Pi 커뮤니티 생태계 구축
 > **DB**: `sql/022_chat_ecosystem.sql` — 신규 5개 테이블 + RPC 3종 + msg_msg CHECK 확장 (Supabase 적용 완료)
 > **빌드 검증**: `pnpm tsc --noEmit` 통과 · `pnpm lint` 0 errors · `pnpm build` 성공 (신규 라우트 12종 확인)
 > ⚠️ **버그 수정 포함**: `msg_msg` CHECK 제약에 `AI_REPLY` 누락 — TASK-064 AI 응답 INSERT가 조용히 실패하던 잠재 버그를 022 마이그레이션에서 해소
 
-### TASK-070: 채팅 마켓플레이스 (테마별 공개방 디렉토리) ✅ 완료
+### TASK-070: 카페 마켓플레이스 (테마별 공개방 디렉토리) ✅ 완료
 
 - ✅ `GET /api/chat/marketplace?theme=` — 공개 그룹·이벤트방 디렉토리 (테마 필터)
 - ✅ `fn_chat_marketplace` RPC — 인기 랭킹 (점수 = 멤버수×2 + 주간 메시지×0.5 + 주간 Tip×10)
 - ✅ `msg_theme_follow` 테이블 + `POST/DELETE /api/chat/themes/[themeCd]/follow` (UPSERT 재팔로우 안전)
-- ✅ `chat-marketplace.tsx` — 테마 필터 칩 + 🥇🥈🥉 랭킹 + 팔로우 토글 (낙관적 업데이트), 채팅 홈 통합
+- ✅ `chat-marketplace.tsx` — 테마 필터 칩 + 🥇🥈🥉 랭킹 + 팔로우 토글 (낙관적 업데이트), 카페 홈 통합
 
 ### TASK-071: Pi Bet 투표 ✅ 완료
 
@@ -615,10 +615,10 @@ if (meta?.type === 'CHAT_SUBSCR') {
 - ✅ `payments/complete` PI_BET 분기 — 금액 서버 재검증 + OPEN 상태 확인 + entry INSERT + BET_NOTI
 - ✅ `POST .../bets/[betId]/settle` — 생성자 정산: 풀 균등 분배(소수 4자리 절사), 조건부 UPDATE로 동시 정산 race 방지
 - ✅ `msg_tp_cd='BET_NOTI'` 추가 (CHECK 확장 + 중앙 정렬 알림 렌더)
-- ✅ `pi-bet-panel.tsx` — 채팅방 헤더 🎲 버튼 → 생성·참가(Pi U2A)·정산 패널
+- ✅ `pi-bet-panel.tsx` — 카페 헤더 🎲 버튼 → 생성·참가(Pi U2A)·정산 패널
 - ℹ️ 승자 Pi 분배는 `payout_pi` 장부 기록 — 실송금(A2U)은 Pi SDK 지원 시 후속 (PiRC2 구독과 동일 전략)
 
-### TASK-072: 채팅 봇·Webhook 연동 (Business 전용) ✅ 완료
+### TASK-072: 카페 봇·Webhook 연동 (Business 전용) ✅ 완료
 
 - ✅ `msg_webhook` 테이블 (api_key UNIQUE, bot_nm, webhook_url nullable)
 - ✅ `GET/POST/DELETE /api/chat/rooms/[roomId]/webhooks` — 방장+BUSINESS 게이트, 방당 5개 제한, api_key 등록 시 1회만 전체 노출
@@ -632,7 +632,7 @@ if (meta?.type === 'CHAT_SUBSCR') {
 - ✅ `fn_room_analytics` RPC — 일별 메시지·활성 사용자·Tip 수익·신규 멤버 (generate_series 빈 날짜 0 채움)
 - ✅ `fn_room_mau` RPC — 기간 고유 발신자 (일별 합산 아닌 중복 제거)
 - ✅ `GET /api/chat/rooms/[roomId]/analytics?days=7|30|90` — 방장+BUSINESS 게이트
-- ✅ `src/app/[locale]/chat/[roomId]/analytics/page.tsx` + `room-analytics.tsx` — 요약 카드 4종 + plotly 차트 2종 (기존 plotly-plot ssr:false 래퍼 재사용), 채팅방 헤더 📊 진입
+- ✅ `src/app/[locale]/chat/[roomId]/analytics/page.tsx` + `room-analytics.tsx` — 요약 카드 4종 + plotly 차트 2종 (기존 plotly-plot ssr:false 래퍼 재사용), 카페 헤더 📊 진입
 - ✅ redirect 없는 클라이언트 위임 (Pi Browser 무한 루프 방지 패턴 준수)
 
 ### TASK-074: 커스텀 스티커 제작 (Business 전용) ✅ 완료
@@ -791,7 +791,7 @@ if (meta?.type === 'CHAT_SUBSCR') {
 
 ## Phase 12: PiTranslate™ 글로벌 동시통역 ✅ MVP 완료 (2026-06-10 — TASK-090~097 · 098~099 대기)
 
-> **목표**: 채팅방에서 어떤 언어로 보내도, 각 사용자의 선택 언어로 실시간 자동 번역 — 언어 장벽 제로
+> **목표**: 카페에서 어떤 언어로 보내도, 각 사용자의 선택 언어로 실시간 자동 번역 — 언어 장벽 제로
 > **상세 스펙**: `docs/PRD_4_CHAT.md` (v1.6, Section 1-4) | **담당 에이전트**: 전용 에이전트 없음
 > **핵심 결정**: ① 번역 엔진 = **Gemini 2.0 Flash**(주력) + **Claude Haiku**(fallback) 하이브리드 (비용 ~76% 절감) ② 캐시 = `msg_trans` 테이블 `UNIQUE(msg_id, locale_cd)` ③ 동시성 = in-memory pending map ④ 실시간 = Supabase Realtime broadcast `msg_trans` 이벤트
 > **빌드 검증**: `pnpm tsc --noEmit` 통과 · `pnpm lint` 0 errors · `pnpm build` 성공 (`/api/.../translate` 라우트 확인)
@@ -852,19 +852,19 @@ if (meta?.type === 'CHAT_SUBSCR') {
 
 ### TASK-096: 사용자 표시 언어 설정 UI ✅ 완료
 
-- ✅ 프로필 페이지 (`/profile`) — "표시 언어 (채팅 자동 번역)" 드롭다운 추가 (`routing.locales` 203개 단일 소스, `Intl.DisplayNames` 한국어 라벨 자동 파생)
+- ✅ 프로필 페이지 (`/profile`) — "표시 언어 (카페 자동 번역)" 드롭다운 추가 (`routing.locales` 203개 단일 소스, `Intl.DisplayNames` 한국어 라벨 자동 파생)
 - ✅ `sys_user.display_locale_cd` 컬럼 (sql/020) + `UserRow`/`updateUserProfile` 타입 확장
 - ✅ `PATCH /api/profile` — Zod `display_locale_cd` regex 검증 (locale 코드 인젝션 방지)
-- ℹ️ `use-user-locale.ts` 별도 훅은 생략 — 채팅 표시 언어는 next-intl URL locale을 직접 사용 (이 앱은 203개 locale 라우팅을 이미 보유, localStorage 캐시 불필요)
+- ℹ️ `use-user-locale.ts` 별도 훅은 생략 — 카페 표시 언어는 next-intl URL locale을 직접 사용 (이 앱은 203개 locale 라우팅을 이미 보유, localStorage 캐시 불필요)
 
 ### TASK-097: 원문 보기 토글 UI ✅ 완료
 
 - ✅ `src/components/chat/translated-message.tsx` — 번역/원문 전환 컴포넌트 (`[원문 보기]` ↔ `[번역 보기]`)
 - ✅ `chat-message-list.tsx` MessageBubble — `trans_cont`가 원문과 다를 때만 번역 표시 + 토글 (동일하면 원문 그대로)
 
-### 추가 고도화: 방별 번역 언어 콤보 + 채팅 레이아웃 고정 ✅ 완료 (2026-06-10)
+### 추가 고도화: 방별 번역 언어 콤보 + 카페 레이아웃 고정 ✅ 완료 (2026-06-10)
 
-> 채팅방 헤더 제목 옆 언어 콤보에서 선택한 언어로 **그 방의 모든 메시지를 강제 번역** — 방마다 독립 적용
+> 카페 헤더 제목 옆 언어 콤보에서 선택한 언어로 **그 방의 모든 메시지를 강제 번역** — 방마다 독립 적용
 
 - ✅ `src/components/chat/chat-locale-select.tsx` — 제목 옆 콤보 (🌐 자동 + 203개 locale)
 - ✅ `src/lib/locale-options.ts` — locale 드롭다운 옵션 단일 소스 (profile-form 중복 제거)
@@ -1006,7 +1006,7 @@ if (meta?.type === 'CHAT_SUBSCR') {
 
 ## Phase 14: PiVoice™ — WebRTC 실시간 음성 통화 🔜 (설계 완료, 구현 대기)
 
-> **목표**: 채팅방 멤버 간 브라우저 기반 1:1 음성 통화 — 추가 인프라 0(시그널링 재사용), 서버 미디어 비용 0(P2P 직결)
+> **목표**: 카페 멤버 간 브라우저 기반 1:1 음성 통화 — 추가 인프라 0(시그널링 재사용), 서버 미디어 비용 0(P2P 직결)
 > **상세 스펙**: `docs/PRD_9_VOICE_CHAT.md` (v1.0) | **담당 에이전트**: `.claude/agents/chat/voice-chat-architect.md`
 > **확정 결정 (2026-06-11)**: ① MVP = **1:1 음성만** ② TURN = **관리형 서비스로 시작**(Metered 등, 검증 후 자체 coturn 전환) ③ 수익화 = **베타 완전 무료**(결제 설계만) ④ 토폴로지 = P2P 메시(최대 4인, 초과 시 LiveKit 오디오 SFU)
 > **핵심 재사용**: `broadcastToRoom`(시그널링) · `getSupabaseClient`+presence(수신) · `piFetch`/`getSessionUser`(인증) · `ClientChatRoom` 게이트 패턴 · `getRoomMember`(권한) · DA DDL 표준
@@ -1034,7 +1034,7 @@ if (meta?.type === 'CHAT_SUBSCR') {
 
 - 🔜 `src/hooks/use-webrtc-call.ts` — RTCPeerConnection 관리, 상태 머신(ringing 30초 타임아웃 → connected → ended), ICE restart(Wi-Fi↔LTE), `getUserMedia` 제약(echoCancellation/noiseSuppression/autoGainControl), `pc.getStats()` 품질 수집
 - 🔜 `src/app/[locale]/chat/[roomId]/call/page.tsx` — redirect 금지 → `ClientVoiceCall` 위임
-- 🔜 `client-voice-call.tsx`(Pi Browser 게이트) + `voice-call-panel.tsx`(발신/수신 벨·통화 화면) + 채팅방 헤더 📞 버튼
+- 🔜 `client-voice-call.tsx`(Pi Browser 게이트) + `voice-call-panel.tsx`(발신/수신 벨·통화 화면) + 카페 헤더 📞 버튼
 
 ### 단계별 Go/No-Go
 
@@ -1064,11 +1064,11 @@ if (meta?.type === 'CHAT_SUBSCR') {
 | M11: 다국어 | Phase 6 | 2026-06-07 | next-intl v4, 18개 언어, Gemini 자동번역, 3단계 fallback | ✅ 완료 |
 | M12: 다국어 안정성 | Phase 6 | 2026-06-07 | 단일 소스 분리, 203개 locale 선점, 코드 인젝션 보안 패치 | ✅ 완료 |
 | M13: Next.js 16 + TypeScript 6 | 기술 업그레이드 | 2026-06-07 | Next.js 16.2.7, TypeScript 6.0.3, eslint-config-next@16, FlatCompat 제거 | ✅ 완료 |
-| M14: PiChat DB + 테마 마스터 | Phase 7 | 2026-06-08 | msg_* 13개 테이블, 테마 20개, 플랜 5개, 스티커팩 60개 | ✅ 완료 |
-| M15: PiChat MVP | Phase 7 | 2026-06-08 | 그룹 채팅방 생성 4단계 마법사 (테마 선택 + Pi 결제), 채팅 홈, 채팅방 페이지 | ✅ 완료 |
+| M14: PiCafé DB + 테마 마스터 | Phase 7 | 2026-06-08 | msg_* 13개 테이블, 테마 20개, 플랜 5개, 스티커팩 60개 | ✅ 완료 |
+| M15: PiCafé MVP | Phase 7 | 2026-06-08 | 그룹 카페 생성 4단계 마법사 (테마 선택 + Pi 결제), 카페 홈, 카페 페이지 | ✅ 완료 |
 | M16: Pi 수익화 | Phase 8 | 2026-06-11 | Pi Tip, 스티커 마켓, 인라인 트리거 8종, AI 봇, 이벤트방 | ✅ 완료 |
 | M17: 미디어 메시지 | Phase 8 | 2026-06-11 | 파일·이미지·음성 메시지 (Supabase Storage) | ✅ 완료 |
-| M18: PiChat 생태계 | Phase 9 | 2026-06-11 | 마켓플레이스, Pi Bet, Webhook, 분석 대시보드, 커스텀 스티커 (sql/022 + API 12종 + UI 4종) | ✅ 완료 |
+| M18: PiCafé 생태계 | Phase 9 | 2026-06-11 | 마켓플레이스, Pi Bet, Webhook, 분석 대시보드, 커스텀 스티커 (sql/022 + API 12종 + UI 4종) | ✅ 완료 |
 | M19: 사용자 프로필 | Phase 10 | 2026-06-09 | 마이페이지 (개인정보·결제내역·구독현황), Pi Browser ClientGate | ✅ 완료 |
 | M20: 어드민 통계 대시보드 | Phase 11 | 2026-06-09 | DAU/WAU/MAU·테마별 매출 (react-plotly.js + 중간집계 rollup) | ✅ 완료 |
 | M21: PiTranslate™ MVP | Phase 12 | 2026-06-10 | sql/020 + chat-translate.ts + dedup + translate API + broadcast 확장 + 표시언어 설정 + 원문 토글 (TASK-090~097) | ✅ 완료 |
@@ -1119,10 +1119,10 @@ if (meta?.type === 'CHAT_SUBSCR') {
 | v1.5 | 2026-06-07 | Phase 6 완료 — next-intl v4 다국어, Gemini 2.5 Flash 자동번역, 18개 언어 지원, 3단계 fallback, Supabase 1000행 제한 해소, 모듈캐시 우회(readFile) | anakin |
 | v1.6 | 2026-06-07 | TASK-044: 다국어 안정성 강화 — locale 단일 소스(locale-currency/country.ts), routing.ts 203개 선점 등록, Intl.DisplayNames 도입, 코드 인젝션 보안 패치(LOCALE_CD_RE) | anakin |
 | v1.7 | 2026-06-07 | 기술 업그레이드: Next.js 16→16.2.7, TypeScript 5→6.0.3, eslint-config-next@16, FlatCompat 제거. 기술 업그레이드 모니터링 섹션 추가. | anakin |
-| v1.8 | 2026-06-07 | Phase 7~9 PiChat 로드맵 추가: TASK-050~074 (채팅 MVP·수익화·생태계). 마일스톤 M14~M18 추가. PRD.md v4.0 통합 반영. | anakin |
+| v1.8 | 2026-06-07 | Phase 7~9 PiCafé 로드맵 추가: TASK-050~074 (카페 MVP·수익화·생태계). 마일스톤 M14~M18 추가. PRD.md v4.0 통합 반영. | anakin |
 | v1.9 | 2026-06-08 | TASK-050·051 완료 — sql/012_msg_tables.sql (msg_* 13개 테이블, Realtime RLS), sql/013_msg_seed.sql (테마 20개, 구독플랜 5개, 스티커팩 60개). M14 달성. | anakin |
-| v2.0 | 2026-06-08 | TASK-052 완료 — 1:1 채팅 API (rooms·messages·join), supabase-client.ts, use-chat-room 훅(Realtime+presence), ChatMessageList(scroll-up 무한로드), ChatInput(rate limit 복원). tsc 통과. | anakin |
-| v2.1 | 2026-06-08 | TASK-053 완료 — 그룹 채팅방 생성 4단계 마법사 (ThemeSelector·InlinePurchasePrompt·GroupRoomCreator), payments/complete CHAT_ROOM_CREATE 분기, /chat 홈·/chat/[roomId] 페이지, Header 채팅 링크. M15 달성. | anakin |
+| v2.0 | 2026-06-08 | TASK-052 완료 — 1:1 카페 API (rooms·messages·join), supabase-client.ts, use-chat-room 훅(Realtime+presence), ChatMessageList(scroll-up 무한로드), ChatInput(rate limit 복원). tsc 통과. | anakin |
+| v2.1 | 2026-06-08 | TASK-053 완료 — 그룹 카페 생성 4단계 마법사 (ThemeSelector·InlinePurchasePrompt·GroupRoomCreator), payments/complete CHAT_ROOM_CREATE 분기, /chat 홈·/chat/[roomId] 페이지, Header 카페 링크. M15 달성. | anakin |
 | v2.2 | 2026-06-08 | PiRC2 Soroban 스마트 컨트랙트 통합 문서화 — CLAUDE.md PiRC2 섹션 추가 (Contract ID·메서드·구독 매트릭스), TASK-054 PiRC2 기반 상세 업데이트, PRD_CHAT.md 구독 API 현행화, pi_pay SKILL.md PiRC2 구독 결제 섹션 추가. | anakin |
 | v2.3 | 2026-06-09 | TASK-054 완료 — 구독 시스템(앱 레벨 U2A). chat-auth.ts(PLAN_CAPS 권한 단일 소스), /api/subscriptions(plans·POST결제준비·DELETE취소·check), payments/complete CHAT_SUBSCR 분기(amount 서버 재검증 + msg_subscr UPSERT), subscription-gate.tsx. tsc·lint(0 errors) 통과. M16 구독 기반 완성. | anakin |
 | v2.4 | 2026-06-09 | Phase 7 완료 현행화. Phase 10 사용자 프로필 관리(마이페이지) 신규 추가 — TASK-056~062 (sys_user 프로필 컬럼 마이그레이션·GET/PATCH /api/profile·결제내역 API·ProfileTabs·ClientProfileGate·번역+검증). M19 마일스톤 추가. PRD.md v5.0 통합(섹션 12 신설). | anakin |
@@ -1130,9 +1130,9 @@ if (meta?.type === 'CHAT_SUBSCR') {
 | v2.6 | 2026-06-09 | Phase 11 어드민 통계 대시보드 계획 추가 — TASK-080~087 (`PRD_CHART.md` 수용). react-plotly.js 채택, 활동 로그 `sys_user_actvty_log`(하루 1행 UPSERT) + 계측, 중간집계 rollup `stat_actvty_dly`/`stat_revenue_dly` + `fn_build_daily_stats` 멱등 집계, 일배치/백필/당일보정 하이브리드, 테마별 매출 4경로 UNION. M20 마일스톤 추가. PRD.md v6.0 통합(섹션 13 신설). | anakin |
 | v2.7 | 2026-06-09 | Phase 11 완료 현행화 — TASK-083/084/085/087 구현 완료 확인 후 🔜→✅ 업데이트. TASK-083: `POST /api/admin/stats/aggregate` CRON_SECRET+어드민 이중인증·백필 모드(`backfill:true`)·`vercel.json` Cron(`0 0 * * *`) 등록. TASK-084: `fn_top_active_users`/`fn_top_revenue_themes`/`fn_top_spenders` RPC 3종 Supabase 배포. TASK-085: `plotly-plot.tsx`(ssr:false)·`dau-wau-mau-chart`·`revenue-donut-chart`·`revenue-timeline-chart` 4종 구현. 실데이터 적재 확인: `stat_actvty_dly` 5일치(2026-06-05~09)·`stat_revenue_dly` 4일치(2026-06-06~09). M20 완료일 2026-06-09 반영. | anakin |
 | v2.8 | 2026-06-10 | Phase 12 PiTranslate™ 글로벌 동시통역 로드맵 추가 — TASK-090~099 (`PRD_4_CHAT.md` v1.6 수용). Gemini 2.0 Flash 주력 + Claude Haiku fallback 하이브리드, `msg_trans` 번역 캐시, in-memory dedup(`chat-translate-dedup.ts`), broadcast 기반 실시간 전달. M21 마일스톤 추가. `PRD_4_CHAT.md` 버전 참조 v1.2→v1.6 업데이트. 기준일 2026-06-10 갱신. `PRD.md` v7.0 통합(섹션 14 신설·섹션 15~18 재번호화). | anakin |
-| v3.0 | 2026-06-10 | Phase 12 추가 고도화 — 방별 번역 언어 콤보(`chat-locale-select.tsx`, 방 헤더 제목 옆, localStorage 방별 독립 저장) + `translate-batch` API(캐시 우선 일괄 번역) + `forceTranslate` 모드(전체 메시지 강제 번역·언어 변경 시 재번역) + 채팅 레이아웃 고정(헤더·입력창 `shrink-0`, 본문만 `min-h-0` 스크롤) + 헤더 ChatRoomPanel 통합 + `locale-options.ts` 단일 소스. tsc·build 통과. | anakin |
+| v3.0 | 2026-06-10 | Phase 12 추가 고도화 — 방별 번역 언어 콤보(`chat-locale-select.tsx`, 방 헤더 제목 옆, localStorage 방별 독립 저장) + `translate-batch` API(캐시 우선 일괄 번역) + `forceTranslate` 모드(전체 메시지 강제 번역·언어 변경 시 재번역) + 카페 레이아웃 고정(헤더·입력창 `shrink-0`, 본문만 `min-h-0` 스크롤) + 헤더 ChatRoomPanel 통합 + `locale-options.ts` 단일 소스. tsc·build 통과. | anakin |
 | v2.9 | 2026-06-10 | Phase 12 PiTranslate™ MVP 구현 완료 — TASK-090~097. `sql/020_msg_trans.sql`(018·019 선점으로 번호 조정, Supabase 적용 완료), `chat-translate.ts`(Gemini 2.0 Flash REST + Claude Haiku fallback), `chat-translate-dedup.ts`(pending map + 번역 큐 + broadcast 내장), translate API 라우트, 메시지 POST `after()` 번역 큐 + GET locale pre-populate, `use-chat-room.ts` msg_trans 구독 + 수신 자동 번역 요청, 프로필 표시 언어 드롭다운(203 locale), `translated-message.tsx` 원문 토글. tsc·lint(0 errors)·build 통과. M21 달성. TASK-098(어드민 번역 통계)·099(품질 피드백)는 후속. | anakin |
 | v4.0 | 2026-06-10 | Phase 13 MyPiShop(MPS) 로드맵 추가 — TASK-100~113 (`PRD_8_MPS.md` v1.1 수용). PiRC2 U2A 가상 에스크로·`stock_qty` 원자적 차감 불변 조건·`mps_` 6개 테이블(sql/021_mps.sql)·lib 헬퍼 3종·API 12종·화면 6종(SCR-01~06) Phase 1 MVP / TASK-108~111 Phase 2 확장 / TASK-112~113 Phase 3 PiRC3 마이그레이션. M22 마일스톤 추가. 현재 버전 헤더 갱신. | anakin |
 | v5.2 | 2026-06-11 | Phase 14 PiVoice™ 음성통화 설계 추가 — `docs/PRD_9_VOICE_CHAT.md` v1.0 수용. WebRTC P2P 1:1 MVP, Supabase Realtime 시그널링 재사용(추가 인프라 0), 관리형 TURN으로 시작, 베타 무료. TASK-120~123(데이터모델·TURN발급·시그널링/통화API·WebRTC훅+UI) + S0~S3 Go/No-Go 로드맵. M23 마일스톤 추가. `voice-chat-architect` 에이전트 기준선 반영. | anakin |
-| v5.1 | 2026-06-11 | Phase 9 PiChat 생태계 완료 — TASK-070~074 전체 구현. `sql/022_chat_ecosystem.sql`(msg_theme_follow·msg_bet·msg_bet_optn·msg_bet_entry·msg_webhook + fn_chat_marketplace·fn_room_analytics·fn_room_mau RPC). 마켓플레이스(테마 필터+가중 랭킹+팔로우), Pi Bet(생성·U2A 참가·균등 분배 정산·BET_NOTI), Webhook·봇(API Key 인증·메시지 push·어드민 현황), 분석 대시보드(일별 통계+MAU+plotly), 커스텀 스티커(ownr_usr_id·mkt_yn·노출 규칙). **msg_msg CHECK AI_REPLY 누락 버그 수정**. M18 달성. tsc·lint(0 errors)·build 통과. | anakin |
-| v5.0 | 2026-06-11 | Phase 8 수익화 전체 완료 현행화 — TASK-060~065 전체 🔜→✅. Pi Tip(`/api/tips` + `pi-tip-button.tsx`), 스티커 마켓(`sticker-picker.tsx` + `/api/stickers/packs`), 인라인 트리거 8종(Trigger 1~8 전체 구현 — 배지 시스템·이벤트방 알림 포함), 이벤트 채팅방(이벤트방 탭 다이얼로그 + `room_tp_cd='E'` API), AI 어시스턴트(`@ai` 멘션→Anthropic API→`AI_REPLY`), 파일·이미지·음성 메시지(Supabase Storage + IMAGE/VOICE/FILE 타입). Phase 11 후속 고도화 섹션 추가 — DAU/WAU/MAU 통계 버그 4건(activity-log lazy thenable·Vercel Cron GET·슬라이딩 윈도우·오늘 온디맨드), Top3 가중치 점수제(활동일수×0.2 + 콘텐츠×0.3 + 결제×0.5). M16·M17 ✅ 완료 처리. 기준일·버전 헤더 갱신. | anakin |
+| v5.1 | 2026-06-11 | Phase 9 PiCafé 생태계 완료 — TASK-070~074 전체 구현. `sql/022_chat_ecosystem.sql`(msg_theme_follow·msg_bet·msg_bet_optn·msg_bet_entry·msg_webhook + fn_chat_marketplace·fn_room_analytics·fn_room_mau RPC). 마켓플레이스(테마 필터+가중 랭킹+팔로우), Pi Bet(생성·U2A 참가·균등 분배 정산·BET_NOTI), Webhook·봇(API Key 인증·메시지 push·어드민 현황), 분석 대시보드(일별 통계+MAU+plotly), 커스텀 스티커(ownr_usr_id·mkt_yn·노출 규칙). **msg_msg CHECK AI_REPLY 누락 버그 수정**. M18 달성. tsc·lint(0 errors)·build 통과. | anakin |
+| v5.0 | 2026-06-11 | Phase 8 수익화 전체 완료 현행화 — TASK-060~065 전체 🔜→✅. Pi Tip(`/api/tips` + `pi-tip-button.tsx`), 스티커 마켓(`sticker-picker.tsx` + `/api/stickers/packs`), 인라인 트리거 8종(Trigger 1~8 전체 구현 — 배지 시스템·이벤트방 알림 포함), 이벤트 카페(이벤트방 탭 다이얼로그 + `room_tp_cd='E'` API), AI 어시스턴트(`@ai` 멘션→Anthropic API→`AI_REPLY`), 파일·이미지·음성 메시지(Supabase Storage + IMAGE/VOICE/FILE 타입). Phase 11 후속 고도화 섹션 추가 — DAU/WAU/MAU 통계 버그 4건(activity-log lazy thenable·Vercel Cron GET·슬라이딩 윈도우·오늘 온디맨드), Top3 가중치 점수제(활동일수×0.2 + 콘텐츠×0.3 + 결제×0.5). M16·M17 ✅ 완료 처리. 기준일·버전 헤더 갱신. | anakin |

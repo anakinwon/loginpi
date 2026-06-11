@@ -4,7 +4,7 @@ import { Link } from '@/i18n/navigation'
 import PlotlyPlot from '@/components/charts/plotly-plot'
 import { piFetch } from '@/lib/pi-fetch'
 
-// TASK-073: 채팅방 분석 대시보드 (Business 전용)
+// TASK-073: 카페 분석 대시보드 (Business 전용)
 // 인증·권한은 API가 강제 — Pi Browser X-Pi-Token 이중 경로는 piFetch가 자동 처리
 
 interface DailyRow {
@@ -81,11 +81,11 @@ export function RoomAnalytics({ roomId }: { roomId: string }) {
         <p className='mt-3 text-sm text-muted-foreground'>{error}</p>
         {businessRequired && (
           <p className='mt-2 text-xs text-muted-foreground'>
-            Business 플랜(Pi Host)으로 업그레이드하면 채팅방 분석을 볼 수 있습니다.
+            Business 플랜(Pi Host)으로 업그레이드하면 카페 분석을 볼 수 있습니다.
           </p>
         )}
         <Link href={`/chat/${roomId}`} className='mt-4 inline-block text-sm text-primary underline'>
-          채팅방으로 돌아가기
+          카페로 돌아가기
         </Link>
       </div>
     )
@@ -99,7 +99,7 @@ export function RoomAnalytics({ roomId }: { roomId: string }) {
     <div className='mx-auto max-w-3xl px-4 py-8'>
       <div className='mb-6 flex items-center justify-between'>
         <div>
-          <h1 className='text-xl font-bold'>📊 채팅방 분석</h1>
+          <h1 className='text-xl font-bold'>📊 카페 분석</h1>
           <p className='text-xs text-muted-foreground'>Business 전용 — 최근 {data.days}일</p>
         </div>
         <div className='flex items-center gap-2'>

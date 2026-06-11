@@ -9,7 +9,7 @@
 1. **Pi Browser에서 Pi 계정으로 로그인할 수 있어야 한다.**
 2. **Pi Browser에서 Pi 계정으로 결제할 수 있어야 한다.**
 
-인증·페이지·기능 변경은 **Pi Browser 실기기에서 로그인·결제·채팅 접속을 검증**한 뒤에만 완료로 간주한다.
+인증·페이지·기능 변경은 **Pi Browser 실기기에서 로그인·결제·카페 접속을 검증**한 뒤에만 완료로 간주한다.
 
 **치명적 제약 — Pi Browser WebView는 모든 방식(form POST·fetch·302/307 redirect·200 HTML)의 `Set-Cookie`를 저장하지 않는다.**
 → 인증이 필요한 페이지는 반드시 **쿠키 OR `X-Pi-Token` 헤더** 두 경로를 지원해야 한다.
@@ -190,7 +190,7 @@ src/
 │   ├── [locale]/
 │   │   ├── (admin)/admin/      # 대시보드·users·payments·links·board·std·i18n
 │   │   ├── board/              # 통합 게시판 (4종)
-│   │   ├── chat/               # 채팅 목록·방
+│   │   ├── chat/               # 카페 목록·방
 │   │   ├── link/               # Pi·Google 계정 연동
 │   │   └── page.tsx
 │   ├── api/

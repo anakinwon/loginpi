@@ -17,7 +17,7 @@ type PublicPreview = {
   entry_expire_dtm?: string | null
 }
 
-// Pi Browser 전용 채팅방 게이트.
+// Pi Browser 전용 카페 게이트.
 // 서버가 쿠키로 신원을 못 찾을 때 렌더되며, localStorage 토큰을 X-Pi-Token 헤더로 실어
 // 방 정보·초기 메시지를 클라이언트에서 로드한 뒤 ChatRoomPanel(실시간 패널)에 전달한다.
 function Centered({ children }: { children: React.ReactNode }) {
@@ -151,12 +151,12 @@ export function ClientChatRoom({ roomId }: { roomId: string }) {
   if (!user) {
     return (
       <Centered>
-        채팅은 로그인 후 이용할 수 있습니다
+        카페는 로그인 후 이용할 수 있습니다
         <Link href='/' className='text-primary underline'>홈으로 이동</Link>
       </Centered>
     )
   }
-  if (state === 'loading') return <Centered>채팅방을 불러오는 중…</Centered>
+  if (state === 'loading') return <Centered>카페를 불러오는 중…</Centered>
 
   if (state === 'joinable' || state === 'joining') {
     const isPaidEvent = joinPreview?.room_tp_cd === 'E' && (joinPreview.entry_fee_pi ?? 0) > 0
@@ -183,7 +183,7 @@ export function ClientChatRoom({ roomId }: { roomId: string }) {
           </>
         ) : (
           <>
-            <p>공개 채팅방입니다. 입장하시겠습니까?</p>
+            <p>공개 카페입니다. 입장하시겠습니까?</p>
             <button
               type='button'
               disabled={state === 'joining'}
@@ -204,16 +204,16 @@ export function ClientChatRoom({ roomId }: { roomId: string }) {
   if (state === 'forbidden') {
     return (
       <Centered>
-        채팅방 멤버가 아닙니다
-        <Link href='/chat' className='text-primary underline'>채팅 목록으로</Link>
+        카페 멤버가 아닙니다
+        <Link href='/chat' className='text-primary underline'>카페 목록으로</Link>
       </Centered>
     )
   }
   if (state === 'error') {
     return (
       <Centered>
-        채팅방을 불러오지 못했습니다
-        <Link href='/chat' className='text-primary underline'>채팅 목록으로</Link>
+        카페를 불러오지 못했습니다
+        <Link href='/chat' className='text-primary underline'>카페 목록으로</Link>
       </Centered>
     )
   }

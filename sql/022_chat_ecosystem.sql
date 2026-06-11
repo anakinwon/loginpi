@@ -1,4 +1,4 @@
--- DA-APPROVED: Phase 9 PiChat 생태계 — 테마 팔로우·Pi Bet·Webhook 신규 주제영역. BET/OPTN/WEBHOOK 약어는 표준사전 미등재 외래어로 DA 승인 처리. msg_msg CHECK 확장은 기존 코드(AI_REPLY INSERT)와 DB 제약 불일치 버그 수정 포함.
+-- DA-APPROVED: Phase 9 PiCafé 생태계 — 테마 팔로우·Pi Bet·Webhook 신규 주제영역. BET/OPTN/WEBHOOK 약어는 표준사전 미등재 외래어로 DA 승인 처리. msg_msg CHECK 확장은 기존 코드(AI_REPLY INSERT)와 DB 제약 불일치 버그 수정 포함.
 -- TASK-070~072: msg_theme_follow / msg_bet / msg_bet_optn / msg_bet_entry / msg_webhook
 -- + msg_msg.msg_tp_cd CHECK 확장 (AI_REPLY 버그 수정 + BET_NOTI 신규)
 -- + msg_stkr_pack 커스텀 제작자 컬럼 (TASK-074)
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS public.msg_theme_follow (
 
 -- ──────────────────────────────────────────
 -- 2. msg_bet — Pi Bet 베팅 이벤트 (TASK-071)
---    방장이 채팅방 내 베팅 이벤트 생성 — 참가비 고정, 승리 옵션 적중자가 풀 분배
+--    방장이 카페 내 베팅 이벤트 생성 — 참가비 고정, 승리 옵션 적중자가 풀 분배
 -- ──────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS public.msg_bet (
   bet_id       UUID          PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS public.msg_bet_entry (
 );
 
 -- ──────────────────────────────────────────
--- 5. msg_webhook — 채팅 봇·Webhook (TASK-072, Business 전용)
+-- 5. msg_webhook — 카페 봇·Webhook (TASK-072, Business 전용)
 --    webhook_url: 신규 메시지 push 대상 / api_key: 봇 메시지 전송 인증
 -- ──────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS public.msg_webhook (
@@ -173,7 +173,7 @@ RETURNS TABLE (
 $$;
 
 -- ──────────────────────────────────────────
--- 9. fn_room_analytics — 채팅방 일별 분석 RPC (TASK-073, Business 전용)
+-- 9. fn_room_analytics — 카페 일별 분석 RPC (TASK-073, Business 전용)
 -- ──────────────────────────────────────────
 CREATE OR REPLACE FUNCTION public.fn_room_analytics(p_room_id UUID, p_days INT DEFAULT 30)
 RETURNS TABLE (
@@ -212,7 +212,7 @@ RETURNS TABLE (
   ORDER BY d.stat_dt;
 $$;
 
--- 채팅방 MAU — 최근 p_days일 고유 발신자 수 (일별 합산과 달리 중복 제거)
+-- 카페 MAU — 최근 p_days일 고유 발신자 수 (일별 합산과 달리 중복 제거)
 CREATE OR REPLACE FUNCTION public.fn_room_mau(p_room_id UUID, p_days INT DEFAULT 30)
 RETURNS BIGINT LANGUAGE sql STABLE AS $$
   SELECT COUNT(DISTINCT snd_usr_id)

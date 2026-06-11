@@ -4,7 +4,7 @@ import { Link } from '@/i18n/navigation'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
 
-// TASK-070: 채팅 마켓플레이스 — 테마 필터 칩 + 인기 랭킹 + 테마 팔로우
+// TASK-070: 카페 마켓플레이스 — 테마 필터 칩 + 인기 랭킹 + 테마 팔로우
 // 데이터는 클라이언트에서 piFetch로 로드 (Pi Browser X-Pi-Token 이중 경로 자동 지원)
 
 interface MarketRoom {
@@ -98,7 +98,7 @@ export function ChatMarketplace() {
     <section>
       <div className='mb-3 flex items-center justify-between'>
         <h2 className='text-sm font-semibold uppercase tracking-wider text-muted-foreground'>
-          마켓플레이스 — 인기 채팅방
+          마켓플레이스 — 인기 카페
         </h2>
       </div>
 
@@ -147,7 +147,7 @@ export function ChatMarketplace() {
         </div>
       ) : rooms.length === 0 ? (
         <div className='rounded-xl border border-dashed py-8 text-center'>
-          <p className='text-sm text-muted-foreground'>해당 테마의 공개 채팅방이 아직 없습니다</p>
+          <p className='text-sm text-muted-foreground'>해당 테마의 공개 카페가 아직 없습니다</p>
         </div>
       ) : (
         <div className='space-y-2'>

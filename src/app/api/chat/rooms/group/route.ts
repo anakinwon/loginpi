@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     }
   }
   if (!room_nm?.trim()) {
-    return NextResponse.json({ error: '채팅방 이름을 입력해 주세요' }, { status: 400 })
+    return NextResponse.json({ error: '카페 이름을 입력해 주세요' }, { status: 400 })
   }
 
   try {
@@ -56,6 +56,6 @@ export async function POST(request: NextRequest) {
     })
     return NextResponse.json({ room }, { status: 201 })
   } catch {
-    return NextResponse.json({ error: '채팅방 생성 실패' }, { status: 500 })
+    return NextResponse.json({ error: '카페 생성 실패' }, { status: 500 })
   }
 }

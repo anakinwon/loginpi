@@ -122,7 +122,7 @@ DO UPDATE SET
 
 | 매출 유형 | 결제 경로 | 테마 귀속 경로 | `metadata.type` |
 |---|---|---|---|
-| 채팅방 생성/입장 | `msg_room.pymnt_id` → `pi_pymnt` | `msg_room.theme_cd` | `CHAT_ROOM_CREATE` |
+| 카페 생성/입장 | `msg_room.pymnt_id` → `pi_pymnt` | `msg_room.theme_cd` | `CHAT_ROOM_CREATE` |
 | 팁(Tip) | `msg_tip.pymnt_id` → `pi_pymnt` | `msg_tip.room_id` → `msg_room.theme_cd` | (TIP 계열) |
 | 스티커팩 | `msg_usr_stkr.pymnt_id` → `pi_pymnt` | `msg_usr_stkr.pack_id` → `msg_stkr_pack.theme_cd` | (STICKER 계열) |
 | 구독 | `msg_subscr.pymnt_id` → `pi_pymnt` | **테마 없음** → `구독` 별도 분류 | `CHAT_SUBSCR` |
@@ -618,7 +618,7 @@ rollup은 D-1 기준이라 **"오늘" 행이 없다.** 대시보드 최신성을
 ```sql
 -- status='completed' 결제를 테마별로 귀속 (4경로 UNION)
 WITH rev AS (
-  -- ① 채팅방
+  -- ① 카페
   SELECT p.payment_id, p.amount, p.reg_dtm, r.theme_cd
   FROM pi_pymnt p JOIN msg_room r ON r.pymnt_id = p.payment_id
   WHERE p.status='completed' AND r.del_yn='N'

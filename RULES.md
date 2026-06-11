@@ -1,4 +1,4 @@
-# RULES.md — cafe-pi-claude 절대 규칙 (빠른 참조)
+# RULES.md — chat-pi-claude 절대 규칙 (빠른 참조)
 
 > CLAUDE.md 핵심 제약의 요약본. **상세 맥락·근거는 항상 [CLAUDE.md](./CLAUDE.md)가 정본.**
 > 충돌 시 CLAUDE.md를 따른다.
@@ -10,7 +10,7 @@
 1. **Pi Browser에서 Pi 계정으로 로그인할 수 있어야 한다.**
 2. **Pi Browser에서 Pi 계정으로 결제할 수 있어야 한다.**
 
-인증·페이지·기능 변경은 **Pi Browser 실기기에서 로그인·결제·채팅 접속을 검증**한 뒤에만 완료로 간주한다.
+인증·페이지·기능 변경은 **Pi Browser 실기기에서 로그인·결제·카페 접속을 검증**한 뒤에만 완료로 간주한다.
 
 ---
 

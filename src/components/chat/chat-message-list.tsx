@@ -85,7 +85,7 @@ export function ChatMessageList({
     return () => container.removeEventListener('scroll', onScroll)
   }, [loadMore])
 
-  // 채팅 본문 — 유일한 스크롤 영역. overscroll-contain: 끝까지 스크롤해도 페이지 전체로 전파 안 됨
+  // 카페 본문 — 유일한 스크롤 영역. overscroll-contain: 끝까지 스크롤해도 페이지 전체로 전파 안 됨
   return (
     <div ref={containerRef} className='flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto overscroll-contain bg-muted/30 p-4 shadow-inner'>
       {isLoading && (
@@ -260,7 +260,7 @@ function MessageBubble({ msg, isMe, canTip, roomId, hideTime, onUpgradeForTip }:
       <div className='group flex flex-col items-start gap-0.5'>
         <span className='flex items-center gap-1 text-xs text-muted-foreground'>
           <span>🤖</span>
-          <span>PiChat AI</span>
+          <span>PiCafé AI</span>
         </span>
         <div className='max-w-[70%] rounded-2xl rounded-bl-sm bg-violet-100 px-3 py-2 text-sm dark:bg-violet-900/40'>
           {msg.msg_cont}

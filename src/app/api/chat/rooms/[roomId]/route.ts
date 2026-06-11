@@ -5,7 +5,7 @@ import { getRoom, getRoomMember, updateRoom, hashRoomPassword, toPublicRoom } fr
 
 type Params = { params: Promise<{ roomId: string }> }
 
-// GET /api/chat/rooms/[roomId] — 채팅방 상세 + 멤버 목록
+// GET /api/chat/rooms/[roomId] — 카페 상세 + 멤버 목록
 export async function GET(_request: Request, { params }: Params) {
   const { roomId } = await params
   const user = await getSessionUser()
@@ -16,7 +16,7 @@ export async function GET(_request: Request, { params }: Params) {
     getRoomMember(roomId, user.id),
   ])
 
-  if (!room) return NextResponse.json({ error: '채팅방을 찾을 수 없습니다' }, { status: 404 })
+  if (!room) return NextResponse.json({ error: '카페를 찾을 수 없습니다' }, { status: 404 })
   if (!mbr) {
     // 공개 그룹방·이벤트방이면 클라이언트가 입장 CTA를 보여줄 수 있도록 방 미리보기 포함
     // 이벤트방(E)은 entry_fee_pi를 함께 내려 결제 후 입장(Trigger 8) UI를 띄울 수 있게 한다
@@ -27,7 +27,7 @@ export async function GET(_request: Request, { params }: Params) {
       }
       return NextResponse.json(
         {
-          error: '채팅방 멤버가 아닙니다',
+          error: '카페 멤버가 아닙니다',
           isPublic: true,
           room: {
             room_nm: room.room_nm,
@@ -40,7 +40,7 @@ export async function GET(_request: Request, { params }: Params) {
         { status: 403 }
       )
     }
-    return NextResponse.json({ error: '채팅방 멤버가 아닙니다' }, { status: 403 })
+    return NextResponse.json({ error: '카페 멤버가 아닙니다' }, { status: 403 })
   }
 
   // 테마 이모지 — 클라이언트 게이트(ClientChatRoom) 헤더 렌더용
@@ -67,7 +67,7 @@ export async function GET(_request: Request, { params }: Params) {
   })
 }
 
-// PATCH /api/chat/rooms/[roomId] — 채팅방 수정 (방장 OWNER 전용)
+// PATCH /api/chat/rooms/[roomId] — 카페 수정 (방장 OWNER 전용)
 // 공개/비밀 전환·비밀방 비밀번호·이름·설명·정원 변경
 export async function PATCH(request: NextRequest, { params }: Params) {
   const { roomId } = await params
@@ -75,12 +75,12 @@ export async function PATCH(request: NextRequest, { params }: Params) {
   if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
   const [room, mbr] = await Promise.all([getRoom(roomId), getRoomMember(roomId, user.id)])
-  if (!room) return NextResponse.json({ error: '채팅방을 찾을 수 없습니다' }, { status: 404 })
+  if (!room) return NextResponse.json({ error: '카페를 찾을 수 없습니다' }, { status: 404 })
   if (!mbr || mbr.mbr_role_cd !== 'OWNER') {
-    return NextResponse.json({ error: '방장만 채팅방을 수정할 수 있습니다' }, { status: 403 })
+    return NextResponse.json({ error: '방장만 카페를 수정할 수 있습니다' }, { status: 403 })
   }
   if (room.room_tp_cd === 'D') {
-    return NextResponse.json({ error: '1:1 채팅방은 수정할 수 없습니다' }, { status: 400 })
+    return NextResponse.json({ error: '1:1 카페는 수정할 수 없습니다' }, { status: 400 })
   }
 
   let body: unknown
@@ -150,7 +150,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
   }
 
   const updated = await updateRoom(roomId, user.display_name, patch)
-  if (!updated) return NextResponse.json({ error: '채팅방 수정 실패' }, { status: 500 })
+  if (!updated) return NextResponse.json({ error: '카페 수정 실패' }, { status: 500 })
 
   return NextResponse.json({ room: toPublicRoom(updated) })
 }

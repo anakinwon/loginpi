@@ -1,4 +1,4 @@
--- TASK-051: PiChat 마스터 데이터 세팅
+-- TASK-051: PiCafé 마스터 데이터 세팅
 -- msg_theme 20개 · msg_subscr_plan 5개 · msg_stkr_pack 60개 · msg_theme_stkr 60개
 
 -- ──────────────────────────────────────────
@@ -38,7 +38,7 @@ ON CONFLICT (theme_cd) DO NOTHING;
 INSERT INTO public.msg_subscr_plan
   (plan_cd, plan_nm, plan_desc, plan_tp_cd, price_pi, mth_cnt)
 VALUES
-  ('FREE',              'Pi Explorer',    '기본 무료 플랜 — BASIC 테마 5개, 1:1 채팅 무제한',           'FREE',     0,    0),
+  ('FREE',              'Pi Explorer',    '기본 무료 플랜 — BASIC 테마 5개, 1:1 카페 무제한',           'FREE',     0,    0),
   ('PREMIUM_MONTHLY',   'Pi Creator 월간', 'PREMIUM 전체 테마 · 월 3개 그룹방 · Pi Tip · AI 10회/월',  'PREMIUM',  1,    1),
   ('PREMIUM_ANNUAL',    'Pi Creator 연간', 'PREMIUM 월간 × 12개월 — 2개월 무료',                       'PREMIUM', 10,   12),
   ('BUSINESS_MONTHLY',  'Pi Host 월간',   '무제한 그룹방 · 이벤트방 · 분석 대시보드 · Webhook',        'BUSINESS', 5,    1),

@@ -6,7 +6,7 @@ import { getChatPlan } from '@/lib/chat-auth'
 
 type Params = { params: Promise<{ roomId: string }> }
 
-// TASK-073: 채팅방 분석 대시보드 (Business 전용, 방장만)
+// TASK-073: 카페 분석 대시보드 (Business 전용, 방장만)
 // GET /api/chat/rooms/[roomId]/analytics?days=30
 export async function GET(request: NextRequest, { params }: Params) {
   const { roomId } = await params
