@@ -12,9 +12,12 @@ import type { StoreItem } from './store-item-list'
 const ST_TABS = ['ALL', 'DRAFT', 'OPEN', 'CLOSED', 'SOLD'] as const
 
 // 내 상품 관리 (SCR-03) — 상태별 탭 + 게시/중단/삭제
-export function ClientMyItems() {
+// serverAuthed: 서버에서 getSessionUser()로 확인한 세션 (Google 쿠키 로그인 포함)
+// usePiAuth는 Pi 로그인만 반영하므로 둘 중 하나만 있어도 인증으로 간주한다
+export function ClientMyItems({ serverAuthed = false }: { serverAuthed?: boolean }) {
   const t = useTranslations('store')
   const { user, isLoading } = usePiAuth()
+  const authed = serverAuthed || !!user
   const [items, setItems] = useState<StoreItem[]>([])
   const [tab, setTab] = useState<(typeof ST_TABS)[number]>('ALL')
   const [loading, setLoading] = useState(true)
@@ -33,13 +36,13 @@ export function ClientMyItems() {
   }, [])
 
   useEffect(() => {
-    if (user) void load()
-  }, [user, load])
+    if (authed) void load()
+  }, [authed, load])
 
-  if (isLoading) {
+  if (!authed && isLoading) {
     return <p className='text-muted-foreground py-16 text-center text-sm'>{t('loading')}</p>
   }
-  if (!user) {
+  if (!authed) {
     return <p className='text-muted-foreground py-16 text-center text-sm'>{t('loginRequired')}</p>
   }
 
@@ -117,6 +120,9 @@ export function ClientMyItems() {
                 </p>
               </div>
               <div className='flex shrink-0 gap-1.5'>
+                <Link href={`/store/my/items/${item.item_id}/edit`}>
+                  <Button size='sm' variant='outline'>{t('actionEdit')}</Button>
+                </Link>
                 {(item.item_st_cd === 'DRAFT' || item.item_st_cd === 'CLOSED') && (
                   <Button size='sm' variant='outline' onClick={() => changeStatus(item.item_id, 'OPEN')}>
                     {t('actionOpen')}

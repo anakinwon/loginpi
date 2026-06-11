@@ -647,6 +647,9 @@
     },
     "myItemsTitle": "내 상품 관리",
     "newItemTitle": "상품 등록",
+    "editItemTitle": "상품 수정",
+    "editSuccess": "상품이 수정됐습니다",
+    "actionEdit": "수정",
     "salesTitle": "판매 주문 관리",
     "ordersTitle": "구매 주문 관리",
     "newItem": "+ 상품 등록",
@@ -668,7 +671,8 @@
       "unlimitedHint": "음료·피자 등 재고 추적이 무의미한 상품은 무제한으로 등록하세요",
       "thumbUrl": "대표 이미지 URL",
       "publish": "바로 게시",
-      "saveDraft": "임시저장"
+      "saveDraft": "임시저장",
+      "saveEdit": "수정 저장"
     },
     "formInvalid": "상품명과 가격을 확인해주세요",
     "qtyInvalid": "수량은 1~9998 사이로 입력해주세요",

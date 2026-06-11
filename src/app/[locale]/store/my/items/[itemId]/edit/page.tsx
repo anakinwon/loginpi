@@ -5,11 +5,16 @@ import { StoreItemForm } from '@/components/store/store-item-form'
 
 export async function generateMetadata() {
   const t = await getTranslations('store')
-  return { title: t('newItemTitle') }
+  return { title: t('editItemTitle') }
 }
 
-// SCR-04 상품 등록 — redirect 금지, 서버 세션(Google 포함) + Pi 로그인 OR 게이트
-export default async function NewItemPage() {
+// SCR-04 상품 수정 — redirect 금지, 서버 세션(Google 포함) + Pi 로그인 OR 게이트
+export default async function EditItemPage({
+  params,
+}: {
+  params: Promise<{ itemId: string }>
+}) {
+  const { itemId } = await params
   const t = await getTranslations('store')
   const user = await getSessionUser()
 
@@ -18,8 +23,8 @@ export default async function NewItemPage() {
       <Link href='/store/my/items' className='text-muted-foreground text-sm hover:underline'>
         ← {t('myItemsTitle')}
       </Link>
-      <h1 className='text-xl font-bold'>{t('newItemTitle')}</h1>
-      <StoreItemForm serverAuthed={!!user} />
+      <h1 className='text-xl font-bold'>{t('editItemTitle')}</h1>
+      <StoreItemForm serverAuthed={!!user} itemId={itemId} />
     </div>
   )
 }

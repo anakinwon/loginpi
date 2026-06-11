@@ -30,9 +30,17 @@ const ST_STYLE: Record<OrderRow['order_st_cd'], string> = {
 }
 
 // 주문 관리 (SCR-05 판매 / SCR-06 구매) — 양방향 확인 액션 포함
-export function ClientMyOrders({ role }: { role: 'buyer' | 'seller' }) {
+// serverAuthed: 서버 getSessionUser() 확인 결과 (Google 쿠키 로그인 포함)
+export function ClientMyOrders({
+  role,
+  serverAuthed = false,
+}: {
+  role: 'buyer' | 'seller'
+  serverAuthed?: boolean
+}) {
   const t = useTranslations('store')
   const { user, isLoading } = usePiAuth()
+  const authed = serverAuthed || !!user
   const [orders, setOrders] = useState<OrderRow[]>([])
   const [loading, setLoading] = useState(true)
   const [acting, setActing] = useState<string | null>(null)
@@ -51,13 +59,13 @@ export function ClientMyOrders({ role }: { role: 'buyer' | 'seller' }) {
   }, [role])
 
   useEffect(() => {
-    if (user) void load()
-  }, [user, load])
+    if (authed) void load()
+  }, [authed, load])
 
-  if (isLoading) {
+  if (!authed && isLoading) {
     return <p className='text-muted-foreground py-16 text-center text-sm'>{t('loading')}</p>
   }
-  if (!user) {
+  if (!authed) {
     return <p className='text-muted-foreground py-16 text-center text-sm'>{t('loginRequired')}</p>
   }
 

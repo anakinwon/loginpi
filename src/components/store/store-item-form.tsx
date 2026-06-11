@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { useRouter } from '@/i18n/navigation'
@@ -10,11 +10,18 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
-// 상품 등록 폼 (SCR-04) — 이미지는 URL 입력 (Storage 업로드는 후속 TASK)
-export function StoreItemForm() {
+interface ItemFormProps {
+  serverAuthed?: boolean // 서버 getSessionUser() 확인 결과 (Google 쿠키 로그인 포함)
+  itemId?: string // 지정 시 수정 모드 — 기존 값 로드 후 PATCH
+}
+
+// 상품 등록·수정 폼 (SCR-04) — 이미지는 URL 입력 (Storage 업로드는 후속 TASK)
+export function StoreItemForm({ serverAuthed = false, itemId }: ItemFormProps) {
   const t = useTranslations('store')
   const router = useRouter()
   const { user, isLoading } = usePiAuth()
+  const authed = serverAuthed || !!user
+  const editMode = !!itemId
 
   const [itemNm, setItemNm] = useState('')
   const [itemDesc, setItemDesc] = useState('')
@@ -24,15 +31,49 @@ export function StoreItemForm() {
   const [unlimited, setUnlimited] = useState(false)
   const [thumbnailUrl, setThumbnailUrl] = useState('')
   const [saving, setSaving] = useState(false)
+  const [loadingItem, setLoadingItem] = useState(editMode)
 
-  if (isLoading) {
+  // 수정 모드 — 기존 상품 값 로드
+  useEffect(() => {
+    if (!editMode || !authed) return
+    void (async () => {
+      const res = await piFetch(`/api/store/items/${itemId}`)
+      if (res.ok) {
+        const { item } = (await res.json()) as {
+          item: {
+            item_nm: string
+            item_desc: string | null
+            price_pi: number
+            item_cnd_cd: 'NEW' | 'USED' | 'HANDMADE'
+            reg_qty: number
+            thumbnail_url: string | null
+          }
+        }
+        setItemNm(item.item_nm)
+        setItemDesc(item.item_desc ?? '')
+        setPricePi(String(item.price_pi))
+        setCndCd(item.item_cnd_cd)
+        setUnlimited(item.reg_qty === 9999)
+        setRegQty(item.reg_qty === 9999 ? '1' : String(item.reg_qty))
+        setThumbnailUrl(item.thumbnail_url ?? '')
+      } else {
+        toast.error(t('itemNotFound'))
+      }
+      setLoadingItem(false)
+    })()
+  }, [editMode, authed, itemId, t])
+
+  if (!authed && isLoading) {
     return <p className='text-muted-foreground py-16 text-center text-sm'>{t('loading')}</p>
   }
-  if (!user) {
+  if (!authed) {
     return <p className='text-muted-foreground py-16 text-center text-sm'>{t('loginRequired')}</p>
   }
+  if (loadingItem) {
+    return <p className='text-muted-foreground py-16 text-center text-sm'>{t('loading')}</p>
+  }
 
-  async function submit(status: 'DRAFT' | 'OPEN') {
+  async function submit(status?: 'DRAFT' | 'OPEN') {
     const price = Number(pricePi)
     const qty = unlimited ? 9999 : Number(regQty)
     if (!itemNm.trim() || !price || price <= 0) {
@@ -44,23 +85,27 @@ export function StoreItemForm() {
       return
     }
 
+    const payload = {
+      item_nm: itemNm.trim(),
+      item_desc: itemDesc.trim() || undefined,
+      price_pi: price,
+      item_cnd_cd: cndCd,
+      reg_qty: qty,
+      thumbnail_url: thumbnailUrl.trim() || undefined,
+      ...(status ? { item_st_cd: status } : {}),
+    }
+
     setSaving(true)
     try {
-      const res = await piFetch('/api/store/items', {
-        method: 'POST',
+      const res = await piFetch(editMode ? `/api/store/items/${itemId}` : '/api/store/items', {
+        method: editMode ? 'PATCH' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          item_nm: itemNm.trim(),
-          item_desc: itemDesc.trim() || undefined,
-          price_pi: price,
-          item_cnd_cd: cndCd,
-          reg_qty: qty,
-          thumbnail_url: thumbnailUrl.trim() || undefined,
-          item_st_cd: status,
-        }),
+        body: JSON.stringify(payload),
       })
       if (res.ok) {
-        toast.success(status === 'OPEN' ? t('publishSuccess') : t('draftSuccess'))
+        toast.success(
+          editMode ? t('editSuccess') : status === 'OPEN' ? t('publishSuccess') : t('draftSuccess'),
+        )
         router.push('/store/my/items')
       } else {
         const { error } = (await res.json()) as { error?: string }
@@ -154,12 +199,20 @@ export function StoreItemForm() {
       </div>
 
       <div className='flex gap-2 pt-2'>
-        <Button onClick={() => submit('OPEN')} disabled={saving} className='flex-1'>
-          {saving ? t('saving') : t('form.publish')}
-        </Button>
-        <Button onClick={() => submit('DRAFT')} disabled={saving} variant='outline'>
-          {t('form.saveDraft')}
-        </Button>
+        {editMode ? (
+          <Button onClick={() => submit()} disabled={saving} className='flex-1'>
+            {saving ? t('saving') : t('form.saveEdit')}
+          </Button>
+        ) : (
+          <>
+            <Button onClick={() => submit('OPEN')} disabled={saving} className='flex-1'>
+              {saving ? t('saving') : t('form.publish')}
+            </Button>
+            <Button onClick={() => submit('DRAFT')} disabled={saving} variant='outline'>
+              {t('form.saveDraft')}
+            </Button>
+          </>
+        )}
       </div>
     </div>
   )

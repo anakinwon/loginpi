@@ -645,6 +645,9 @@
     },
     "myItemsTitle": "My Items",
     "newItemTitle": "Register Item",
+    "editItemTitle": "Edit Item",
+    "editSuccess": "Item updated",
+    "actionEdit": "Edit",
     "salesTitle": "Sales Orders",
     "ordersTitle": "Purchase Orders",
     "newItem": "+ New Item",
@@ -666,7 +669,8 @@
       "unlimitedHint": "Use unlimited for items like drinks or pizza where stock tracking is meaningless",
       "thumbUrl": "Thumbnail Image URL",
       "publish": "Publish Now",
-      "saveDraft": "Save Draft"
+      "saveDraft": "Save Draft",
+      "saveEdit": "Save Changes"
     },
     "formInvalid": "Please check the item name and price",
     "qtyInvalid": "Quantity must be between 1 and 9998",
