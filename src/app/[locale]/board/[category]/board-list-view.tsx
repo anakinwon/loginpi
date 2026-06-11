@@ -35,6 +35,21 @@ interface Post {
   thumb_url?: string | null
 }
 
+// 썸네일 없는 글의 플레이스홀더 그라데이션 — post_id 해시로 글마다 고정 선택
+const PLACEHOLDER_GRADIENTS = [
+  'from-violet-500 via-purple-500 to-fuchsia-500',
+  'from-sky-500 via-blue-500 to-indigo-500',
+  'from-emerald-500 via-teal-500 to-cyan-500',
+  'from-amber-500 via-orange-500 to-rose-500',
+  'from-pink-500 via-rose-500 to-red-500',
+  'from-lime-500 via-green-500 to-emerald-500',
+]
+function gradientFor(id: string): string {
+  let h = 0
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0
+  return PLACEHOLDER_GRADIENTS[h % PLACEHOLDER_GRADIENTS.length]
+}
+
 interface Props {
   category: string
   ctgrNm: string
@@ -106,12 +121,18 @@ export function BoardListView({ category, ctgrNm, isQna, canWrite, isGallery }: 
 
       {/* 게시글 목록 */}
       {loading ? (
-        <div className={cn(
-          'py-16 text-center text-sm text-muted-foreground',
-          !isGallery && 'rounded-lg border'
-        )}>
-          {tc('loading')}
-        </div>
+        isGallery ? (
+          /* 갤러리 스켈레톤 — 카드 자리에 펄스 애니메이션 */
+          <div className='grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3'>
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className='aspect-[4/3] animate-pulse rounded-2xl bg-muted' />
+            ))}
+          </div>
+        ) : (
+          <div className='rounded-lg border py-16 text-center text-sm text-muted-foreground'>
+            {tc('loading')}
+          </div>
+        )
       ) : posts.length === 0 ? (
         <div className={cn(
           'py-16 text-center text-sm text-muted-foreground',
@@ -120,26 +141,33 @@ export function BoardListView({ category, ctgrNm, isQna, canWrite, isGallery }: 
           {q ? t('noResults', { q }) : t('noData')}
         </div>
       ) : isGallery ? (
-        /* 갤러리 썸네일 그리드 */
-        <div className='grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4'>
+        /* 갤러리 카드 그리드 — 그라데이션 오버레이 + 호버 리프트 */
+        <div className='grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3'>
           {posts.map((post) => (
             <Link
               key={post.post_id}
               href={`/board/${category}/${post.post_id}`}
-              className='group overflow-hidden rounded-lg border transition-colors hover:border-primary/50'
+              className='group relative block overflow-hidden rounded-2xl border bg-card shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/10'
             >
-              <div className='relative aspect-square overflow-hidden bg-muted'>
+              {/* 썸네일 영역 (4:3) */}
+              <div className='relative aspect-[4/3] overflow-hidden'>
                 {post.thumb_url ? (
                   <img
                     src={post.thumb_url}
                     alt={post.post_ttl}
-                    className='h-full w-full object-cover transition-transform duration-200 group-hover:scale-105'
+                    className='h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-110'
                   />
                 ) : (
-                  <div className='flex h-full items-center justify-center'>
+                  /* 썸네일 없는 글 — post_id 고정 비비드 그라데이션 */
+                  <div
+                    className={cn(
+                      'flex h-full w-full items-center justify-center bg-gradient-to-br transition-transform duration-500 ease-out group-hover:scale-110',
+                      gradientFor(post.post_id)
+                    )}
+                  >
                     <svg
                       xmlns='http://www.w3.org/2000/svg'
-                      className='h-8 w-8 text-muted-foreground/40'
+                      className='h-12 w-12 text-white/40 drop-shadow'
                       fill='none'
                       viewBox='0 0 24 24'
                       stroke='currentColor'
@@ -153,18 +181,43 @@ export function BoardListView({ category, ctgrNm, isQna, canWrite, isGallery }: 
                     </svg>
                   </div>
                 )}
-              </div>
-              <div className='p-2'>
-                <p className='truncate text-sm font-medium leading-snug group-hover:text-primary'>
-                  {post.post_ttl}
-                </p>
-                <p className='mt-0.5 text-xs text-muted-foreground'>
-                  {post.rgst_usr_nm} ·{' '}
-                  {new Date(post.reg_dtm).toLocaleDateString('ko-KR', {
-                    month: '2-digit',
-                    day: '2-digit',
-                  })}
-                </p>
+
+                {/* 하단 그라데이션 오버레이 + 타이틀 */}
+                <div className='absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-90 transition-opacity duration-300 group-hover:opacity-100' />
+                <div className='absolute inset-x-0 bottom-0 p-4'>
+                  <h3 className='line-clamp-2 text-sm font-semibold leading-snug text-white drop-shadow-sm'>
+                    {post.post_ttl}
+                  </h3>
+                  <div className='mt-2 flex items-center gap-2 text-xs text-white/80'>
+                    {/* 작성자 이니셜 아바타 */}
+                    <span className='flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white/25 text-[10px] font-bold text-white backdrop-blur-sm'>
+                      {post.rgst_usr_nm.charAt(0).toUpperCase()}
+                    </span>
+                    <span className='truncate'>{post.rgst_usr_nm}</span>
+                    <span className='text-white/50'>·</span>
+                    <span className='shrink-0'>
+                      {new Date(post.reg_dtm).toLocaleDateString('ko-KR', {
+                        month: '2-digit',
+                        day: '2-digit',
+                      })}
+                    </span>
+                    {/* 조회수 */}
+                    <span className='ml-auto flex shrink-0 items-center gap-1 text-white/70'>
+                      <svg xmlns='http://www.w3.org/2000/svg' className='h-3.5 w-3.5' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 12a3 3 0 11-6 0 3 3 0 016 0z' />
+                        <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z' />
+                      </svg>
+                      {post.vw_cnt}
+                    </span>
+                  </div>
+                </div>
+
+                {/* 공지 배지 */}
+                {post.pin_yn === 'Y' && (
+                  <span className='absolute left-3 top-3 rounded-full bg-primary/90 px-2.5 py-0.5 text-[11px] font-semibold text-primary-foreground shadow backdrop-blur-sm'>
+                    {t('notice')}
+                  </span>
+                )}
               </div>
             </Link>
           ))}
