@@ -29,6 +29,7 @@
   "header": {
     "admin": "Admin",
     "board": "Board",
+    "shop": "Shop",
     "logout": "Logout",
     "piLogin": "Pi Login",
     "piLoginDev": "Pi Login (dev)",

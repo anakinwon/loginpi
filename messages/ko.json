@@ -28,6 +28,7 @@
   },
   "header": {
     "board": "게시판",
+    "shop": "Shop",
     "admin": "Admin",
     "logout": "로그아웃",
     "piLogin": "Pi 로그인",

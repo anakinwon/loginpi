@@ -20,6 +20,12 @@ export function BoardChatLinks() {
       >
         카페
       </Link>
+      <Link
+        href='/store'
+        className='text-muted-foreground hover:text-foreground text-sm transition-colors'
+      >
+        {t('shop')}
+      </Link>
     </>
   )
 }
