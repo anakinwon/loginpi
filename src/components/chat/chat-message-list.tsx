@@ -40,6 +40,32 @@ export function ChatMessageList({
     }
   }, [])
 
+  // 모바일 키보드가 올라오면(뷰포트 높이 감소) 항상 맨 아래로 스크롤
+  // 주소창 표시/숨김(~60px) 변화는 무시하고 키보드 수준(100px 초과)의 감소만 반응
+  useEffect(() => {
+    const vv = window.visualViewport
+    // 기준 높이 = 키보드 없는 상태의 뷰포트 높이 (커지면 갱신 — 키보드 내려감·회전 대응)
+    let baseHeight = vv?.height ?? window.innerHeight
+    const onResize = () => {
+      const height = vv?.height ?? window.innerHeight
+      if (height >= baseHeight) {
+        baseHeight = height
+        return
+      }
+      if (baseHeight - height <= 100) return
+      requestAnimationFrame(() => {
+        const c = containerRef.current
+        if (c) c.scrollTop = c.scrollHeight
+      })
+    }
+    vv?.addEventListener('resize', onResize)
+    window.addEventListener('resize', onResize)
+    return () => {
+      vv?.removeEventListener('resize', onResize)
+      window.removeEventListener('resize', onResize)
+    }
+  }, [])
+
   // 새 메시지가 추가될 때만 스크롤 (제자리 업데이트는 무시)
   // replaceMessage 인플레이스 교체 시 msg_id가 바뀌지 않으므로 이중 스크롤 방지
   useEffect(() => {
