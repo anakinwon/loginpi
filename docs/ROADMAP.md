@@ -886,15 +886,15 @@ if (meta?.type === 'CHAT_SUBSCR') {
 
 ---
 
-## Phase 13: MyPiShop(MPS) 🔜 (준비중)
+## Phase 13: MyPiShop(MPS) 🚧 (Phase 1 MVP 1차 구현 — 2026-06-11)
 
 > **목표**: Pi Coin 전용 P2P 직거래 마켓플레이스 — 에스크로 기반 안전 거래, 재고 관리, 매장 등록
 > **상세 스펙**: `docs/PRD_8_MPS.md` (v1.1) | **담당 에이전트**: `.claude/agents/commerce/mps-prd-architect.md`
 > **핵심 결정**: ① 에스크로 = **PiRC2 U2A 가상 에스크로** (운영자 Pi 계정 중간 보관, `metadata.type='MPS_ESCROW'`) ② 재고 = `stock_qty = reg_qty - ordered_qty` CHECK 제약 + 원자적 차감 ③ DB = `mps_` 접두사 6개 테이블 ④ 3단계 마일스톤 (Phase 1 MVP → Phase 2 확장 → Phase 3 PiRC3 마이그레이션)
 
-### TASK-100: DB 마이그레이션 `sql/029_mps.sql` 🔜
+### TASK-100: DB 마이그레이션 `sql/029_mps.sql` ✅ (2026-06-11)
 
-> 파일 번호 확정 (2026-06-11): 021은 `msg_usr_badge`, 024는 `sys_batch_log`가 사용 중 → MPS는 025
+> 파일 번호 확정 (2026-06-11): 025~028 병렬 점유(last_login·revenue·kakao·voice) → MPS는 029. 6개 테이블 + `fn_mps_order_create`/`fn_mps_order_cancel` RPC, Supabase 적용 완료
 
 > `mps_` 접두사 신규 주제영역 — DA 표준 시스템 컬럼 4개 + `del_yn` 논리삭제 전 테이블 적용 (`-- DA-APPROVED:` 주석 필수)
 
@@ -907,13 +907,13 @@ if (meta?.type === 'CHAT_SUBSCR') {
 - 🔜 `mps_order` — 주문 (`order_st_cd`: PENDING/ESCROW/TRADING/SELLER_DONE/DONE/CANCELLED, `escrow_txid`, `release_txid`, `fee_pi`, `fee_payer_id`)
 - 🔜 `mps_txn_hist` — 거래내역 (`txn_type_cd`: ESCROW_IN/RELEASE_OUT/REFUND/FEE)
 
-### TASK-101: lib 헬퍼 3종 🔜
+### TASK-101: lib 헬퍼 3종 ✅ (2026-06-11)
 
 - 🔜 `src/lib/mps-item.ts` — 상품 CRUD, 재고 원자적 차감 (`UPDATE ... WHERE stock_qty > 0 RETURNING`)
 - 🔜 `src/lib/mps-order.ts` — 주문 생성·상태 전이·에스크로 흐름
 - 🔜 `src/lib/mps-shop.ts` — 매장 CRUD
 
-### TASK-102: 상품 API (FR-01·FR-02·FR-04) 🔜
+### TASK-102: 상품 API (FR-01·FR-02·FR-04) ✅ (2026-06-11 — 이미지 업로드 엔드포인트만 후속)
 
 - 🔜 `GET /api/store/items` — 목록 조회 (카테고리·상태·키워드 필터, 커서 페이지네이션)
 - 🔜 `POST /api/store/items` — 상품 등록 (판매자 인증, Zod 검증)
@@ -922,7 +922,7 @@ if (meta?.type === 'CHAT_SUBSCR') {
 - 🔜 `DELETE /api/store/items/[itemId]` — 논리삭제 (`del_yn='Y'`, 물리 DELETE 금지)
 - 🔜 `POST /api/store/items/[itemId]/images` — 이미지 업로드 (Supabase Storage)
 
-### TASK-103: 재고 관리 (FR-07) 🔜
+### TASK-103: 재고 관리 (FR-07) ✅ (2026-06-11 — RPC 단일 트랜잭션 + 9999 센티널 + CHECK 이중 안전장치)
 
 > **핵심 불변 조건**: `stock_qty = reg_qty - ordered_qty` — CHECK 제약 + 원자적 UPDATE
 
@@ -931,7 +931,7 @@ if (meta?.type === 'CHAT_SUBSCR') {
 - 🔜 `reg_qty = 9999` 센티널 처리 — `stock_qty < 10` 임박 경고만, SOLD 자동전환 생략
 - 🔜 주문 취소 시 재고 복원: `ordered_qty - 1, stock_qty + 1`
 
-### TASK-104: 주문 + 에스크로 API (FR-08·FR-09·FR-11·FR-13) 🔜
+### TASK-104: 주문 + 에스크로 API (FR-08·FR-09·FR-11·FR-13) ✅ (2026-06-11 — 에스크로 완료는 별도 endpoint 대신 기존 `/api/payments/complete`의 `MPS_ESCROW` 분기로 통합, 양방향 확인 confirm/release + 취소 cancel 포함)
 
 > **에스크로 흐름**: 구매자 Pi 송금 → 운영자 계정 보관 → 거래 완료 후 판매자 송금
 
@@ -942,19 +942,19 @@ if (meta?.type === 'CHAT_SUBSCR') {
 - 🔜 `GET /api/store/orders` — 내 주문 목록 (판매자/구매자 분리 조회)
 - 🔜 `GET /api/store/orders/[orderId]` — 주문 상세
 
-### TASK-105: 상품 목록·상세 UI (SCR-01·SCR-02) 🔜
+### TASK-105: 상품 목록·상세 UI (SCR-01·SCR-02) ✅ (2026-06-11)
 
 - 🔜 `src/app/[locale]/store/page.tsx` — 상품 목록 (카테고리 필터, 검색바, 무한 스크롤)
 - 🔜 `src/app/[locale]/store/[itemId]/page.tsx` — 상품 상세 (이미지 갤러리, 구매 버튼, 재고 표시)
 - 🔜 `ClientStoreGate` — `getSessionUser()` null 시 클라이언트 게이트 (`redirect` 금지 — Pi Browser 무한 루프 방지)
 - 🔜 `piFetch` 의무 — 모든 API 호출에 `X-Pi-Token` 헤더 자동 첨부
 
-### TASK-106: 내 상품 관리 UI (SCR-03·SCR-04) 🔜
+### TASK-106: 내 상품 관리 UI (SCR-03·SCR-04) ✅ (2026-06-11 — 등록 폼 완료, 수정 폼·이미지 업로드 후속)
 
 - 🔜 `src/app/[locale]/store/my/items/page.tsx` — 내 상품 목록 (상태별 탭: DRAFT/OPEN/CLOSED/SOLD)
 - 🔜 `src/app/[locale]/store/my/items/new/page.tsx` — 상품 등록/수정 폼 (이미지 업로드 포함)
 
-### TASK-107: 주문 관리 UI (SCR-05·SCR-06) 🔜
+### TASK-107: 주문 관리 UI (SCR-05·SCR-06) ✅ (2026-06-11)
 
 - 🔜 `src/app/[locale]/store/my/sales/page.tsx` — 판매 주문 관리 (거래 완료 선언 버튼)
 - 🔜 `src/app/[locale]/store/my/orders/page.tsx` — 구매 주문 관리 (최종 확인 버튼)
@@ -1141,3 +1141,4 @@ if (meta?.type === 'CHAT_SUBSCR') {
 | v5.1 | 2026-06-11 | Phase 9 PiCafé 생태계 완료 — TASK-070~074 전체 구현. `sql/022_chat_ecosystem.sql`(msg_theme_follow·msg_bet·msg_bet_optn·msg_bet_entry·msg_webhook + fn_chat_marketplace·fn_room_analytics·fn_room_mau RPC). 마켓플레이스(테마 필터+가중 랭킹+팔로우), Pi Bet(생성·U2A 참가·균등 분배 정산·BET_NOTI), Webhook·봇(API Key 인증·메시지 push·어드민 현황), 분석 대시보드(일별 통계+MAU+plotly), 커스텀 스티커(ownr_usr_id·mkt_yn·노출 규칙). **msg_msg CHECK AI_REPLY 누락 버그 수정**. M18 달성. tsc·lint(0 errors)·build 통과. | anakin |
 | v5.0 | 2026-06-11 | Phase 8 수익화 전체 완료 현행화 — TASK-060~065 전체 🔜→✅. Pi Tip(`/api/tips` + `pi-tip-button.tsx`), 스티커 마켓(`sticker-picker.tsx` + `/api/stickers/packs`), 인라인 트리거 8종(Trigger 1~8 전체 구현 — 배지 시스템·이벤트방 알림 포함), 이벤트 카페(이벤트방 탭 다이얼로그 + `room_tp_cd='E'` API), AI 어시스턴트(`@ai` 멘션→Anthropic API→`AI_REPLY`), 파일·이미지·음성 메시지(Supabase Storage + IMAGE/VOICE/FILE 타입). Phase 11 후속 고도화 섹션 추가 — DAU/WAU/MAU 통계 버그 4건(activity-log lazy thenable·Vercel Cron GET·슬라이딩 윈도우·오늘 온디맨드), Top3 가중치 점수제(활동일수×0.2 + 콘텐츠×0.3 + 결제×0.5). M16·M17 ✅ 완료 처리. 기준일·버전 헤더 갱신. | anakin |
 | v5.3 | 2026-06-11 | 마이그레이션 번호 충돌 정리 — TASK-100 MPS `sql/021_mps.sql`→`sql/029_mps.sql`(021은 msg_usr_badge 점유), TASK-120 PiVoice `sql/024_voice_call.sql`→`sql/026_voice_call.sql`(024는 sys_batch_log 점유). M22 마일스톤 파일명 동기화, `PRD_9_VOICE_CHAT.md` 파일명 참조 갱신, `PRD_8_MPS.md` 헤더 버전 v1.0→v1.1 불일치 해소. 어드민 배치 실행 이력(`sys_batch_log` + `/api/admin/batch/logs` + 이력 테이블 UI)·결제 내역 테마 컬럼(통계와 동일 분류 규칙) 추가 반영. | anakin |
+| v5.4 | 2026-06-11 | **Phase 13 MyPiShop(MPS) Phase 1 MVP 1차 구현** — TASK-100~107 🔜→✅. `sql/029_mps.sql`(mps_ 6개 테이블 + fn_mps_order_create/fn_mps_order_cancel 원자적 재고 RPC, Supabase 적용), lib 3종(mps-item·mps-order·mps-shop), 상품 API(/api/store/items CRUD + 검색·필터·정렬), 주문 API(생성·취소·confirm·release + 당사자 403), 에스크로는 기존 `/api/payments/complete`에 `MPS_ESCROW` 분기 통합(PENDING→ESCROW + ESCROW_IN 이력 + 금액 서버 재검증), UI 6페이지(/store 목록·상세·my/items·new·sales·orders — usePiAuth 클라이언트 게이트, redirect 금지), store 번역 ko/en. tsc·lint(0 errors) 통과. **후속**: 이미지 업로드(Storage)·상품 수정 폼·SELLER_DONE 자동 DONE cron·실 Pi 정산(A2U)·Pi Browser 실기기 결제 검증. | anakin |
