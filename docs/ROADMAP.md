@@ -892,7 +892,9 @@ if (meta?.type === 'CHAT_SUBSCR') {
 > **상세 스펙**: `docs/PRD_8_MPS.md` (v1.1) | **담당 에이전트**: `.claude/agents/commerce/mps-prd-architect.md`
 > **핵심 결정**: ① 에스크로 = **PiRC2 U2A 가상 에스크로** (운영자 Pi 계정 중간 보관, `metadata.type='MPS_ESCROW'`) ② 재고 = `stock_qty = reg_qty - ordered_qty` CHECK 제약 + 원자적 차감 ③ DB = `mps_` 접두사 6개 테이블 ④ 3단계 마일스톤 (Phase 1 MVP → Phase 2 확장 → Phase 3 PiRC3 마이그레이션)
 
-### TASK-100: DB 마이그레이션 `sql/021_mps.sql` 🔜
+### TASK-100: DB 마이그레이션 `sql/029_mps.sql` 🔜
+
+> 파일 번호 확정 (2026-06-11): 021은 `msg_usr_badge`, 024는 `sys_batch_log`가 사용 중 → MPS는 025
 
 > `mps_` 접두사 신규 주제영역 — DA 표준 시스템 컬럼 4개 + `del_yn` 논리삭제 전 테이블 적용 (`-- DA-APPROVED:` 주석 필수)
 
@@ -1011,7 +1013,9 @@ if (meta?.type === 'CHAT_SUBSCR') {
 > **확정 결정 (2026-06-11)**: ① MVP = **1:1 음성만** ② TURN = **관리형 서비스로 시작**(Metered 등, 검증 후 자체 coturn 전환) ③ 수익화 = **베타 완전 무료**(결제 설계만) ④ 토폴로지 = P2P 메시(최대 4인, 초과 시 LiveKit 오디오 SFU)
 > **핵심 재사용**: `broadcastToRoom`(시그널링) · `getSupabaseClient`+presence(수신) · `piFetch`/`getSessionUser`(인증) · `ClientChatRoom` 게이트 패턴 · `getRoomMember`(권한) · DA DDL 표준
 
-### TASK-120: 데이터 모델 `sql/024_voice_call.sql` 🔜
+### TASK-120: 데이터 모델 `sql/026_voice_call.sql` 🔜
+
+> 파일 번호 확정 (2026-06-11): 024는 `sys_batch_log`, 025는 MPS(TASK-100) 예약 → PiVoice는 026
 
 - 🔜 `msg_call_log` — 통화 이력 (`caller_usr_id`/`callee_usr_id`, `call_st_cd` RINGING/CONNECTED/ENDED/DECLINED/MISSED, `relay_yn`, `duration_sec`, `end_rsn_cd`)
 - 🔜 `msg_call_quality_stat` — 품질 메트릭 (`rtt_ms`, `packet_loss_pct`, `jitter_ms`, UNIQUE(call_id, usr_id))
@@ -1072,7 +1076,7 @@ if (meta?.type === 'CHAT_SUBSCR') {
 | M19: 사용자 프로필 | Phase 10 | 2026-06-09 | 마이페이지 (개인정보·결제내역·구독현황), Pi Browser ClientGate | ✅ 완료 |
 | M20: 어드민 통계 대시보드 | Phase 11 | 2026-06-09 | DAU/WAU/MAU·테마별 매출 (react-plotly.js + 중간집계 rollup) | ✅ 완료 |
 | M21: PiTranslate™ MVP | Phase 12 | 2026-06-10 | sql/020 + chat-translate.ts + dedup + translate API + broadcast 확장 + 표시언어 설정 + 원문 토글 (TASK-090~097) | ✅ 완료 |
-| M22: MyPiShop(MPS) Phase 1 MVP | Phase 13 | — | sql/021_mps.sql (mps_ 6개 테이블) + lib 헬퍼 3종 + 상품·주문·에스크로 API 12종 + 화면 6종 (TASK-100~107) | 🔜 준비중 |
+| M22: MyPiShop(MPS) Phase 1 MVP | Phase 13 | — | sql/029_mps.sql (mps_ 6개 테이블) + lib 헬퍼 3종 + 상품·주문·에스크로 API 12종 + 화면 6종 (TASK-100~107) | 🔜 준비중 |
 | M23: PiVoice™ 1:1 음성 통화 | Phase 14 | — | sql/024 (msg_call_log·quality_stat) + TURN 발급 + 시그널링/통화 API + use-webrtc-call 훅 + 통화 UI (TASK-120~123) | 🔜 설계 완료 |
 
 ---
@@ -1136,3 +1140,4 @@ if (meta?.type === 'CHAT_SUBSCR') {
 | v5.2 | 2026-06-11 | Phase 14 PiVoice™ 음성통화 설계 추가 — `docs/PRD_9_VOICE_CHAT.md` v1.0 수용. WebRTC P2P 1:1 MVP, Supabase Realtime 시그널링 재사용(추가 인프라 0), 관리형 TURN으로 시작, 베타 무료. TASK-120~123(데이터모델·TURN발급·시그널링/통화API·WebRTC훅+UI) + S0~S3 Go/No-Go 로드맵. M23 마일스톤 추가. `voice-chat-architect` 에이전트 기준선 반영. | anakin |
 | v5.1 | 2026-06-11 | Phase 9 PiCafé 생태계 완료 — TASK-070~074 전체 구현. `sql/022_chat_ecosystem.sql`(msg_theme_follow·msg_bet·msg_bet_optn·msg_bet_entry·msg_webhook + fn_chat_marketplace·fn_room_analytics·fn_room_mau RPC). 마켓플레이스(테마 필터+가중 랭킹+팔로우), Pi Bet(생성·U2A 참가·균등 분배 정산·BET_NOTI), Webhook·봇(API Key 인증·메시지 push·어드민 현황), 분석 대시보드(일별 통계+MAU+plotly), 커스텀 스티커(ownr_usr_id·mkt_yn·노출 규칙). **msg_msg CHECK AI_REPLY 누락 버그 수정**. M18 달성. tsc·lint(0 errors)·build 통과. | anakin |
 | v5.0 | 2026-06-11 | Phase 8 수익화 전체 완료 현행화 — TASK-060~065 전체 🔜→✅. Pi Tip(`/api/tips` + `pi-tip-button.tsx`), 스티커 마켓(`sticker-picker.tsx` + `/api/stickers/packs`), 인라인 트리거 8종(Trigger 1~8 전체 구현 — 배지 시스템·이벤트방 알림 포함), 이벤트 카페(이벤트방 탭 다이얼로그 + `room_tp_cd='E'` API), AI 어시스턴트(`@ai` 멘션→Anthropic API→`AI_REPLY`), 파일·이미지·음성 메시지(Supabase Storage + IMAGE/VOICE/FILE 타입). Phase 11 후속 고도화 섹션 추가 — DAU/WAU/MAU 통계 버그 4건(activity-log lazy thenable·Vercel Cron GET·슬라이딩 윈도우·오늘 온디맨드), Top3 가중치 점수제(활동일수×0.2 + 콘텐츠×0.3 + 결제×0.5). M16·M17 ✅ 완료 처리. 기준일·버전 헤더 갱신. | anakin |
+| v5.3 | 2026-06-11 | 마이그레이션 번호 충돌 정리 — TASK-100 MPS `sql/021_mps.sql`→`sql/029_mps.sql`(021은 msg_usr_badge 점유), TASK-120 PiVoice `sql/024_voice_call.sql`→`sql/026_voice_call.sql`(024는 sys_batch_log 점유). M22 마일스톤 파일명 동기화, `PRD_9_VOICE_CHAT.md` 파일명 참조 갱신, `PRD_8_MPS.md` 헤더 버전 v1.0→v1.1 불일치 해소. 어드민 배치 실행 이력(`sys_batch_log` + `/api/admin/batch/logs` + 이력 테이블 UI)·결제 내역 테마 컬럼(통계와 동일 분류 규칙) 추가 반영. | anakin |
