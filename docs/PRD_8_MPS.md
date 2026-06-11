@@ -1,7 +1,7 @@
 # PRD_8_MPS.md — MyPiShop(MPS): Pi Coin P2P 직거래 마켓플레이스
 
 > **작성일**: 2026-06-10
-> **버전**: v1.0
+> **버전**: v1.1
 > **상태**: 초안
 > **작성자**: mps-prd-architect 에이전트 (검토: anakin)
 

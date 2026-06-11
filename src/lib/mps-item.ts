@@ -1,0 +1,244 @@
+import 'server-only'
+import { getSupabaseAdmin } from './supabase-admin'
+
+// MPS 상품 CRUD — 재고 불변 조건 stock_qty = reg_qty - ordered_qty (DB CHECK 이중 보장)
+
+export const UNLIMITED_QTY = 9999 // 무제한 재고 센티널 — 자동 SOLD 전환 억제
+
+export interface MpsItem {
+  item_id: string
+  seller_id: string
+  shop_id: string | null
+  ctgr_id: string | null
+  item_nm: string
+  item_desc: string | null
+  price_pi: number
+  item_cnd_cd: 'NEW' | 'USED' | 'HANDMADE'
+  item_st_cd: 'DRAFT' | 'OPEN' | 'CLOSED' | 'SOLD'
+  view_cnt: number
+  thumbnail_url: string | null
+  reg_qty: number
+  ordered_qty: number
+  stock_qty: number
+  reg_dtm: string
+  mod_dtm: string
+}
+
+export interface ItemListFilter {
+  ctgrId?: string
+  keyword?: string
+  cndCd?: string
+  sort?: 'latest' | 'price_asc' | 'price_desc' | 'views'
+  page?: number
+  limit?: number
+}
+
+export interface CreateItemInput {
+  item_nm: string
+  item_desc?: string
+  price_pi: number
+  item_cnd_cd: string
+  ctgr_id?: string
+  shop_id?: string
+  reg_qty?: number
+  thumbnail_url?: string
+  item_st_cd?: 'DRAFT' | 'OPEN'
+}
+
+const SORT_MAP = {
+  latest: { column: 'reg_dtm', ascending: false },
+  price_asc: { column: 'price_pi', ascending: true },
+  price_desc: { column: 'price_pi', ascending: false },
+  views: { column: 'view_cnt', ascending: false },
+} as const
+
+// 공개 목록 — OPEN 상태만 노출 (DRAFT·CLOSED·SOLD 제외)
+export async function listOpenItems(filter: ItemListFilter) {
+  const db = getSupabaseAdmin()
+  const limit = Math.min(filter.limit ?? 20, 50)
+  const page = Math.max(filter.page ?? 1, 1)
+  const sort = SORT_MAP[filter.sort ?? 'latest']
+
+  let q = db
+    .from('mps_item')
+    .select('*', { count: 'exact' })
+    .eq('del_yn', 'N')
+    .eq('item_st_cd', 'OPEN')
+
+  if (filter.ctgrId) q = q.eq('ctgr_id', filter.ctgrId)
+  if (filter.cndCd) q = q.eq('item_cnd_cd', filter.cndCd)
+  if (filter.keyword) {
+    const kw = filter.keyword.replaceAll('%', '\\%').replaceAll('_', '\\_')
+    q = q.or(`item_nm.ilike.%${kw}%,item_desc.ilike.%${kw}%`)
+  }
+
+  const { data, count, error } = await q
+    .order(sort.column, { ascending: sort.ascending })
+    .range((page - 1) * limit, page * limit - 1)
+
+  if (error) throw new Error(error.message)
+  return { items: (data ?? []) as MpsItem[], total: count ?? 0, page, limit }
+}
+
+// 판매자 본인 상품 목록 — 전체 상태 포함
+export async function listMyItems(sellerId: string) {
+  const { data, error } = await getSupabaseAdmin()
+    .from('mps_item')
+    .select('*')
+    .eq('seller_id', sellerId)
+    .eq('del_yn', 'N')
+    .order('reg_dtm', { ascending: false })
+
+  if (error) throw new Error(error.message)
+  return (data ?? []) as MpsItem[]
+}
+
+// 상세 조회 — 이미지·매장 포함. DRAFT는 판매자 본인에게만 노출
+export async function getItemDetail(itemId: string, viewerId?: string) {
+  const db = getSupabaseAdmin()
+  const [{ data: item }, { data: imgs }] = await Promise.all([
+    db.from('mps_item').select('*').eq('item_id', itemId).eq('del_yn', 'N').maybeSingle(),
+    db
+      .from('mps_item_img')
+      .select('img_id, img_url, sort_ord, thumbnail_yn')
+      .eq('item_id', itemId)
+      .eq('del_yn', 'N')
+      .order('sort_ord'),
+  ])
+
+  if (!item) return null
+  const row = item as MpsItem
+  if (row.item_st_cd === 'DRAFT' && row.seller_id !== viewerId) return null
+
+  let shop: Record<string, unknown> | null = null
+  if (row.shop_id) {
+    const { data } = await db
+      .from('mps_shop')
+      .select('shop_id, shop_nm, shop_type_cd, addr, biz_hour, contact_tel')
+      .eq('shop_id', row.shop_id)
+      .eq('del_yn', 'N')
+      .maybeSingle()
+    shop = data
+  }
+
+  return { ...row, images: imgs ?? [], shop }
+}
+
+// 조회수 증가 — 정밀 카운팅 불필요, 실패는 무시
+export async function incrementViewCnt(itemId: string, current: number) {
+  await getSupabaseAdmin()
+    .from('mps_item')
+    .update({ view_cnt: current + 1 })
+    .eq('item_id', itemId)
+}
+
+export async function createItem(sellerId: string, regrId: string, input: CreateItemInput) {
+  const regQty = input.reg_qty ?? 1
+  const { data, error } = await getSupabaseAdmin()
+    .from('mps_item')
+    .insert({
+      seller_id: sellerId,
+      item_nm: input.item_nm,
+      item_desc: input.item_desc ?? null,
+      price_pi: input.price_pi,
+      item_cnd_cd: input.item_cnd_cd,
+      ctgr_id: input.ctgr_id ?? null,
+      shop_id: input.shop_id ?? null,
+      item_st_cd: input.item_st_cd ?? 'DRAFT',
+      thumbnail_url: input.thumbnail_url ?? null,
+      reg_qty: regQty,
+      ordered_qty: 0,
+      stock_qty: regQty, // 불변 조건: reg_qty - 0
+      regr_id: regrId,
+      modr_id: regrId,
+    })
+    .select()
+    .single()
+
+  if (error) throw new Error(error.message)
+  return data as MpsItem
+}
+
+export interface UpdateItemPatch {
+  item_nm?: string
+  item_desc?: string
+  price_pi?: number
+  item_cnd_cd?: string
+  ctgr_id?: string | null
+  shop_id?: string | null
+  thumbnail_url?: string | null
+  item_st_cd?: 'DRAFT' | 'OPEN' | 'CLOSED'
+  reg_qty?: number
+}
+
+export type UpdateItemError = 'NOT_FOUND' | 'FORBIDDEN' | 'INVALID_STATUS' | 'QTY_BELOW_ORDERED'
+
+// 수정 — 본인 확인 + reg_qty 변경 시 재고 재계산 (new_reg_qty >= ordered_qty 검증)
+export async function updateItem(
+  itemId: string,
+  sellerId: string,
+  patch: UpdateItemPatch,
+): Promise<{ error: UpdateItemError } | { item: MpsItem }> {
+  const db = getSupabaseAdmin()
+  const { data: cur } = await db
+    .from('mps_item')
+    .select('*')
+    .eq('item_id', itemId)
+    .eq('del_yn', 'N')
+    .maybeSingle()
+
+  if (!cur) return { error: 'NOT_FOUND' as const }
+  const item = cur as MpsItem
+  if (item.seller_id !== sellerId) return { error: 'FORBIDDEN' as const }
+
+  const update: Record<string, unknown> = { modr_id: sellerId, mod_dtm: new Date().toISOString() }
+  for (const key of ['item_nm', 'item_desc', 'price_pi', 'item_cnd_cd', 'ctgr_id', 'shop_id', 'thumbnail_url', 'item_st_cd'] as const) {
+    if (patch[key] !== undefined) update[key] = patch[key]
+  }
+
+  // SOLD는 자동 전환 전용 — 수동 지정 불가 (DB CHECK과 별개로 명시 차단)
+  if (patch.item_st_cd && !['DRAFT', 'OPEN', 'CLOSED'].includes(patch.item_st_cd)) {
+    return { error: 'INVALID_STATUS' as const }
+  }
+
+  if (patch.reg_qty !== undefined) {
+    if (patch.reg_qty < item.ordered_qty) return { error: 'QTY_BELOW_ORDERED' as const }
+    update.reg_qty = patch.reg_qty
+    update.stock_qty = patch.reg_qty - item.ordered_qty
+    // SOLD 상품의 수량 증가 → OPEN 재전환 (FR-02)
+    if (item.item_st_cd === 'SOLD' && patch.reg_qty - item.ordered_qty > 0 && !patch.item_st_cd) {
+      update.item_st_cd = 'OPEN'
+    }
+  }
+
+  const { data, error } = await db
+    .from('mps_item')
+    .update(update)
+    .eq('item_id', itemId)
+    .select()
+    .single()
+
+  if (error) throw new Error(error.message)
+  return { item: data as MpsItem }
+}
+
+// 논리삭제 — 물리 DELETE 금지
+export async function softDeleteItem(itemId: string, sellerId: string, isAdminUser = false) {
+  const db = getSupabaseAdmin()
+  let q = db
+    .from('mps_item')
+    .update({
+      del_yn: 'Y',
+      del_dtm: new Date().toISOString(),
+      modr_id: sellerId,
+      mod_dtm: new Date().toISOString(),
+    })
+    .eq('item_id', itemId)
+    .eq('del_yn', 'N')
+
+  if (!isAdminUser) q = q.eq('seller_id', sellerId)
+
+  const { data, error } = await q.select('item_id')
+  if (error) throw new Error(error.message)
+  return (data ?? []).length > 0
+}

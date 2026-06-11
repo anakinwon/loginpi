@@ -220,10 +220,15 @@
       "col": {
         "user": "User",
         "amount": "Amount",
+        "theme": "Theme",
         "memo": "Memo",
         "status": "Status",
         "paymentId": "Payment ID",
         "date": "Date"
+      },
+      "theme": {
+        "subscription": "Subscription",
+        "unknown": "Other"
       }
     },
     "links": {
@@ -581,6 +586,102 @@
       "triggerManual": "Manual",
       "triggerBackfill": "Backfill"
     }
+  },
+  "store": {
+    "title": "MyPiShop",
+    "subtitle": "Trade safely with Pi Coin — escrow protected",
+    "navMyItems": "My Items",
+    "navSales": "Sales",
+    "navOrders": "Purchases",
+    "backToList": "Item List",
+    "searchPlaceholder": "Search by name or description",
+    "search": "Search",
+    "all": "All",
+    "loading": "Loading…",
+    "noItems": "No items registered",
+    "noOrders": "No orders",
+    "stockLeft": "Stock {count}",
+    "viewCount": "Views {count}",
+    "itemNotFound": "Item not found",
+    "loginRequired": "Login required",
+    "piBrowserOnly": "Payment is only available in Pi Browser",
+    "myOwnItem": "This is your own item",
+    "soldOut": "Sold Out",
+    "buying": "Processing payment…",
+    "buyEscrow": "🛒 Buy Now (Escrow Payment)",
+    "buySuccess": "Escrow payment completed! Proceed with the seller",
+    "buyFail": "Purchase failed",
+    "escrowNotice": "Your Pi is held safely in escrow and released to the seller after both parties confirm the deal",
+    "cnd": {
+      "NEW": "New",
+      "USED": "Used",
+      "HANDMADE": "Handmade"
+    },
+    "sort": {
+      "latest": "Latest",
+      "price_asc": "Price: Low to High",
+      "price_desc": "Price: High to Low",
+      "views": "Most Viewed"
+    },
+    "shopType": {
+      "ONLINE": "Online",
+      "OFFLINE": "Offline Shop",
+      "BOTH": "Online & Offline"
+    },
+    "itemSt": {
+      "DRAFT": "Draft",
+      "OPEN": "Listed",
+      "CLOSED": "Paused",
+      "SOLD": "Sold Out"
+    },
+    "orderSt": {
+      "PENDING": "Awaiting Payment",
+      "ESCROW": "In Escrow",
+      "TRADING": "Trading",
+      "SELLER_DONE": "Delivered (Awaiting Receipt)",
+      "DONE": "Completed",
+      "CANCELLED": "Cancelled"
+    },
+    "myItemsTitle": "My Items",
+    "newItemTitle": "Register Item",
+    "salesTitle": "Sales Orders",
+    "ordersTitle": "Purchase Orders",
+    "newItem": "+ New Item",
+    "statusChanged": "Status changed",
+    "deleteConfirm": "Delete this item?",
+    "deleteSuccess": "Deleted",
+    "saveFail": "Request failed",
+    "saving": "Saving…",
+    "actionOpen": "List",
+    "actionClose": "Pause",
+    "actionDelete": "Delete",
+    "form": {
+      "name": "Item Name",
+      "desc": "Description",
+      "price": "Price",
+      "cnd": "Condition",
+      "qty": "Quantity",
+      "unlimited": "Unlimited",
+      "unlimitedHint": "Use unlimited for items like drinks or pizza where stock tracking is meaningless",
+      "thumbUrl": "Thumbnail Image URL",
+      "publish": "Publish Now",
+      "saveDraft": "Save Draft"
+    },
+    "formInvalid": "Please check the item name and price",
+    "qtyInvalid": "Quantity must be between 1 and 9998",
+    "publishSuccess": "Item published",
+    "draftSuccess": "Draft saved",
+    "cancelReasonPrompt": "Please enter the cancellation reason",
+    "actionSellerDone": "Mark as Delivered",
+    "actionBuyerDone": "Confirm Receipt",
+    "actionCancel": "Cancel Order",
+    "actionDone": {
+      "confirm": "Marked as delivered. Waiting for buyer confirmation",
+      "release": "Receipt confirmed! Pi will be released to the seller",
+      "cancel": "Order cancelled"
+    },
+    "waitingBuyerConfirm": "Waiting for the buyer to confirm receipt",
+    "escrowReleased": "Both parties confirmed — escrow settlement in progress"
   },
   "adminSubscriptions": {
     "col": {

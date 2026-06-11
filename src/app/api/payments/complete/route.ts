@@ -3,6 +3,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { sendPaymentReceipt } from '@/lib/email'
 import { broadcastToRoom } from '@/lib/realtime-broadcast'
 import { canSendTip } from '@/lib/chat-auth'
+import { markEscrow } from '@/lib/mps-order'
 
 const PI_PAYMENTS_URL = 'https://api.minepi.com/v2/payments'
 
@@ -288,6 +289,34 @@ export async function POST(request: NextRequest) {
             },
             { onConflict: 'usr_id,pack_id' },
           )
+        }
+      }
+    } else if (meta?.type === 'MPS_ESCROW' && payment.user_uid) {
+      // MPS_ESCROW: 결제 완료 시 주문 PENDING → ESCROW + ESCROW_IN 이력 (TASK-104)
+      const orderId = String(meta.order_id ?? '')
+      const { data: buyer } = await db
+        .from('sys_user')
+        .select('id')
+        .eq('pi_uid', payment.user_uid)
+        .maybeSingle()
+
+      if (buyer && orderId) {
+        const buyerRow = buyer as { id: string }
+        // 결제 금액이 주문 가격 이상인지 서버 재검증 (부동소수 오차 허용)
+        const { data: orderRow } = await db
+          .from('mps_order')
+          .select('order_id, order_price_pi')
+          .eq('order_id', orderId)
+          .eq('buyer_id', buyerRow.id)
+          .eq('order_st_cd', 'PENDING')
+          .eq('del_yn', 'N')
+          .maybeSingle()
+
+        if (
+          orderRow &&
+          Number(payment.amount) + 1e-6 >= Number((orderRow as { order_price_pi: number }).order_price_pi)
+        ) {
+          await markEscrow(orderId, buyerRow.id, txid, Number(payment.amount))
         }
       }
     } else if (meta?.type === 'PI_BET' && payment.user_uid) {

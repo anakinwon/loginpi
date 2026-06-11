@@ -589,6 +589,102 @@
       "footnote2": "* \"DB→JSON 동기화\": DB에 저장된 번역 데이터를 JSON 파일에 반영만 합니다"
     }
   },
+  "store": {
+    "title": "MyPiShop",
+    "subtitle": "Pi Coin으로 안전하게 직거래하세요 — 에스크로 보호",
+    "navMyItems": "내 상품",
+    "navSales": "판매 관리",
+    "navOrders": "구매 내역",
+    "backToList": "상품 목록",
+    "searchPlaceholder": "상품명 또는 설명 검색",
+    "search": "검색",
+    "all": "전체",
+    "loading": "불러오는 중…",
+    "noItems": "등록된 상품이 없습니다",
+    "noOrders": "주문 내역이 없습니다",
+    "stockLeft": "재고 {count}",
+    "viewCount": "조회 {count}",
+    "itemNotFound": "상품을 찾을 수 없습니다",
+    "loginRequired": "로그인 후 이용할 수 있습니다",
+    "piBrowserOnly": "Pi Browser에서만 결제할 수 있습니다",
+    "myOwnItem": "내가 등록한 상품입니다",
+    "soldOut": "품절",
+    "buying": "결제 진행 중…",
+    "buyEscrow": "🛒 구매하기 (에스크로 결제)",
+    "buySuccess": "에스크로 결제 완료! 판매자와 거래를 진행하세요",
+    "buyFail": "구매 처리에 실패했습니다",
+    "escrowNotice": "결제한 Pi는 에스크로에 안전하게 보관되며, 양측 거래 확인 후 판매자에게 전달됩니다",
+    "cnd": {
+      "NEW": "새상품",
+      "USED": "중고",
+      "HANDMADE": "수제품"
+    },
+    "sort": {
+      "latest": "최신순",
+      "price_asc": "가격 낮은순",
+      "price_desc": "가격 높은순",
+      "views": "조회수순"
+    },
+    "shopType": {
+      "ONLINE": "온라인",
+      "OFFLINE": "오프라인 매장",
+      "BOTH": "온·오프라인"
+    },
+    "itemSt": {
+      "DRAFT": "임시저장",
+      "OPEN": "게시중",
+      "CLOSED": "게시중단",
+      "SOLD": "판매완료"
+    },
+    "orderSt": {
+      "PENDING": "결제 대기",
+      "ESCROW": "에스크로 완료",
+      "TRADING": "거래중",
+      "SELLER_DONE": "전달 완료 (수령 확인 대기)",
+      "DONE": "거래 완료",
+      "CANCELLED": "취소됨"
+    },
+    "myItemsTitle": "내 상품 관리",
+    "newItemTitle": "상품 등록",
+    "salesTitle": "판매 주문 관리",
+    "ordersTitle": "구매 주문 관리",
+    "newItem": "+ 상품 등록",
+    "statusChanged": "상태가 변경됐습니다",
+    "deleteConfirm": "상품을 삭제할까요?",
+    "deleteSuccess": "삭제됐습니다",
+    "saveFail": "처리에 실패했습니다",
+    "saving": "저장 중…",
+    "actionOpen": "게시",
+    "actionClose": "중단",
+    "actionDelete": "삭제",
+    "form": {
+      "name": "상품명",
+      "desc": "상품 설명",
+      "price": "가격",
+      "cnd": "상품 상태",
+      "qty": "판매 수량",
+      "unlimited": "무제한",
+      "unlimitedHint": "음료·피자 등 재고 추적이 무의미한 상품은 무제한으로 등록하세요",
+      "thumbUrl": "대표 이미지 URL",
+      "publish": "바로 게시",
+      "saveDraft": "임시저장"
+    },
+    "formInvalid": "상품명과 가격을 확인해주세요",
+    "qtyInvalid": "수량은 1~9998 사이로 입력해주세요",
+    "publishSuccess": "상품이 게시됐습니다",
+    "draftSuccess": "임시저장됐습니다",
+    "cancelReasonPrompt": "취소 사유를 입력해주세요",
+    "actionSellerDone": "물건 전달 완료",
+    "actionBuyerDone": "물건 수령 완료",
+    "actionCancel": "주문 취소",
+    "actionDone": {
+      "confirm": "전달 완료로 처리됐습니다. 구매자 수령 확인을 기다립니다",
+      "release": "수령 확인 완료! 판매자에게 Pi가 정산됩니다",
+      "cancel": "주문이 취소됐습니다"
+    },
+    "waitingBuyerConfirm": "구매자의 수령 확인을 기다리는 중입니다",
+    "escrowReleased": "양방향 확인 완료 — 에스크로 정산 처리"
+  },
   "profile": {
     "title": "내 프로필",
     "tabs": {
