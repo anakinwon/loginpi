@@ -15,6 +15,7 @@ export type RoomWithTheme = {
   max_mbr_cnt?: number
   cur_mbr_cnt?: number
   expr_dtm?: string
+  open_bet_yn?: string // 진행 중(OPEN) Pi Bet 보유 여부 — 🎲 뱃지 표시
   // msg_room.theme_cd → msg_theme FK (forward reference) → PostgREST가 단일 객체로 반환
   msg_theme: { theme_nm: string; theme_emoji: string; theme_tp_cd: string } | null
 }
@@ -54,6 +55,11 @@ function RoomCard({ room, href }: { room: RoomWithTheme; href: string }) {
           {isPremium && (
             <span className='ml-1.5 rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'>
               PREMIUM
+            </span>
+          )}
+          {room.open_bet_yn === 'Y' && (
+            <span className='ml-1.5 rounded-full bg-violet-100 px-1.5 py-0.5 text-[10px] font-medium text-violet-700 dark:bg-violet-900/30 dark:text-violet-400'>
+              🎲 Pi Bet
             </span>
           )}
           {room.room_tp_cd === 'G' && (() => {

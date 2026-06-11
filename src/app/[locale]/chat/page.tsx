@@ -12,6 +12,19 @@ function buildCntMap(mbrRows: { room_id: string }[]): Map<string, number> {
   return map
 }
 
+// 진행 중(OPEN) Pi Bet 보유 방에 open_bet_yn='Y' 부여 — 카페 목록 🎲 뱃지용
+async function attachOpenBetYn(rooms: RoomWithTheme[]): Promise<RoomWithTheme[]> {
+  if (rooms.length === 0) return rooms
+  const { data } = await getSupabaseAdmin()
+    .from('msg_bet')
+    .select('room_id')
+    .in('room_id', rooms.map(r => r.room_id))
+    .eq('bet_st_cd', 'OPEN')
+    .eq('del_yn', 'N')
+  const betRoomIds = new Set((data ?? []).map((b: { room_id: string }) => b.room_id))
+  return rooms.map(r => ({ ...r, open_bet_yn: betRoomIds.has(r.room_id) ? 'Y' : 'N' }))
+}
+
 export default async function ChatPage() {
   const user = await getSessionUser()
 
@@ -70,5 +83,10 @@ export default async function ChatPage() {
     }))
   }
 
-  return <ChatListView myRooms={myRooms} discoverRooms={discoverRooms} />
+  const [myRoomsWithBet, discoverRoomsWithBet] = await Promise.all([
+    attachOpenBetYn(myRooms),
+    attachOpenBetYn(discoverRooms),
+  ])
+
+  return <ChatListView myRooms={myRoomsWithBet} discoverRooms={discoverRoomsWithBet} />
 }

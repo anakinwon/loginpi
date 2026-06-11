@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
     }))
   }
 
-  if (!includePublic) return NextResponse.json({ rooms })
+  if (!includePublic) return NextResponse.json({ rooms: await attachOpenBetYn(rooms) })
 
   // 공개 그룹 카페 (최근 10개)
   const { data: publicRooms } = await getSupabaseAdmin()
@@ -83,7 +83,25 @@ export async function GET(request: NextRequest) {
     }))
   }
 
-  return NextResponse.json({ rooms, publicRooms: publicRoomsWithCnt })
+  const [roomsWithBet, publicRoomsWithBet] = await Promise.all([
+    attachOpenBetYn(rooms),
+    attachOpenBetYn(publicRoomsWithCnt),
+  ])
+  return NextResponse.json({ rooms: roomsWithBet, publicRooms: publicRoomsWithBet })
+}
+
+// 진행 중(OPEN) Pi Bet 보유 방에 open_bet_yn='Y' 부여 — 카페 목록 🎲 뱃지용
+async function attachOpenBetYn(rooms: unknown[]): Promise<unknown[]> {
+  const typed = rooms as { room_id: string }[]
+  if (typed.length === 0) return rooms
+  const { data } = await getSupabaseAdmin()
+    .from('msg_bet')
+    .select('room_id')
+    .in('room_id', typed.map(r => r.room_id))
+    .eq('bet_st_cd', 'OPEN')
+    .eq('del_yn', 'N')
+  const betRoomIds = new Set((data ?? []).map((b: { room_id: string }) => b.room_id))
+  return typed.map(r => ({ ...r, open_bet_yn: betRoomIds.has(r.room_id) ? 'Y' : 'N' }))
 }
 
 // POST /api/chat/rooms — 1:1 Direct Room 생성 (TASK-053에서 Group·Event 추가)
