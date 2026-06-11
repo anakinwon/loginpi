@@ -1,18 +1,10 @@
 'use client'
 
 import PlotlyPlot from './plotly-plot'
+import { themeLabel } from '@/lib/stats-labels'
 import type { RevenueDataPoint } from '@/types/stats'
 
 const COLORS = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#06b6d4', '#84cc16', '#f97316']
-
-// msg_theme에 등록되지 않은 시스템 코드 한국어 레이블
-const THEME_LABEL: Record<string, string> = {
-  SUBSCRIPTION: '구독',
-  UNKNOWN: '기타',
-}
-function themeLabel(cd: string): string {
-  return THEME_LABEL[cd] ?? cd
-}
 
 const BASE_LAYOUT = {
   paper_bgcolor: 'transparent',

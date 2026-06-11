@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import dynamic from 'next/dynamic'
 import { piFetch } from '@/lib/pi-fetch'
+import { themeLabel } from '@/lib/stats-labels'
 import { StatsCard } from './stats-card'
 import { StatsDateFilter } from './stats-date-filter'
 import type { ActivityStatsResponse, RevenueStatsResponse, TopUser, TopTheme, TopSpender } from '@/types/stats'
@@ -13,15 +14,6 @@ const RevenueTimelineChart = dynamic(() => import('@/components/charts/revenue-t
 const RevenueDonutChart = dynamic(() => import('@/components/charts/revenue-donut-chart'), { ssr: false })
 
 const MEDALS = ['🥇', '🥈', '🥉']
-
-// msg_theme에 등록되지 않은 시스템 코드 한국어 레이블
-const THEME_LABEL: Record<string, string> = {
-  SUBSCRIPTION: '구독',
-  UNKNOWN: '기타',
-}
-function themeLabel(cd: string): string {
-  return THEME_LABEL[cd] ?? cd
-}
 
 function TopUsersList({ users, loading }: { users: TopUser[]; loading: boolean }) {
   if (loading) {
@@ -130,7 +122,7 @@ function RankingCard({ title, children }: { title: string; children: React.React
 }
 
 export function StatsDashboard() {
-  const [period, setPeriod] = useState(30)
+  const [period, setPeriod] = useState(7)
   const [activityData, setActivityData] = useState<ActivityStatsResponse | null>(null)
   const [revenueData, setRevenueData] = useState<RevenueStatsResponse | null>(null)
   const [loading, setLoading] = useState(true)
