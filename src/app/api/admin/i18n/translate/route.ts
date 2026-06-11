@@ -6,19 +6,19 @@ import { getSessionUser, isAdmin } from '@/lib/auth-check'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
 )
 
 // Gemini 프롬프트 품질을 위한 언어명 override
 // - Intl.DisplayNames가 모호하거나 locale_cd가 언어코드가 아닌 경우만 등록
 // - 새 locale 추가 시 이 맵을 건드릴 필요 없음 (Intl.DisplayNames가 자동 처리)
 const LOCALE_NAME_OVERRIDES: Record<string, string> = {
-  zh:  'Chinese (Simplified)',  // Intl은 'Chinese'로만 반환
-  ar:  'Egyptian Arabic',       // 아랍어 방언 명확화
-  au:  'Australian English',    // country code 기반 locale
-  fil: 'Filipino',              // Intl 미인식
-  af:  'Afrikaans',             // Intl 미인식 가능
-  il:  'Hebrew',                // country code 기반 locale → 히브리어
+  zh: 'Chinese (Simplified)', // Intl은 'Chinese'로만 반환
+  ar: 'Egyptian Arabic', // 아랍어 방언 명확화
+  au: 'Australian English', // country code 기반 locale
+  fil: 'Filipino', // Intl 미인식
+  af: 'Afrikaans', // Intl 미인식 가능
+  il: 'Hebrew', // country code 기반 locale → 히브리어
 }
 
 // locale_cd → Gemini용 언어명
@@ -33,7 +33,10 @@ function getLocaleName(locale_cd: string): string {
   return locale_cd
 }
 
-function flattenJson(obj: Record<string, unknown>, prefix = ''): Record<string, string> {
+function flattenJson(
+  obj: Record<string, unknown>,
+  prefix = '',
+): Record<string, string> {
   const result: Record<string, string> = {}
   for (const [k, v] of Object.entries(obj)) {
     const key = prefix ? `${prefix}.${k}` : k
@@ -83,7 +86,10 @@ export async function POST(req: NextRequest) {
   const { locale } = (await req.json()) as { locale: string }
 
   if (!locale || locale === 'ko') {
-    return NextResponse.json({ error: '번역 대상 언어가 잘못됐습니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: '번역 대상 언어가 잘못됐습니다' },
+      { status: 400 },
+    )
   }
 
   const localeName = getLocaleName(locale)
@@ -91,8 +97,11 @@ export async function POST(req: NextRequest) {
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) {
     return NextResponse.json(
-      { error: 'GEMINI_API_KEY가 설정되지 않았습니다. aistudio.google.com/apikey에서 무료 발급 후 .env.local에 추가하세요.' },
-      { status: 500 }
+      {
+        error:
+          'GEMINI_API_KEY가 설정되지 않았습니다. aistudio.google.com/apikey에서 무료 발급 후 .env.local에 추가하세요.',
+      },
+      { status: 500 },
     )
   }
 
@@ -103,11 +112,17 @@ export async function POST(req: NextRequest) {
     const koJson = JSON.parse(raw) as Record<string, unknown>
     koFlat = flattenJson(koJson)
   } catch {
-    return NextResponse.json({ error: 'ko.json 파일을 읽을 수 없습니다' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'ko.json 파일을 읽을 수 없습니다' },
+      { status: 500 },
+    )
   }
 
   if (Object.keys(koFlat).length === 0) {
-    return NextResponse.json({ error: 'ko.json이 비어있습니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: 'ko.json이 비어있습니다' },
+      { status: 400 },
+    )
   }
 
   const { data: existingMsgs } = await supabase
@@ -115,7 +130,9 @@ export async function POST(req: NextRequest) {
     .select('msg_key, msg_val')
     .eq('locale_cd', locale)
 
-  const existingKeys = new Set((existingMsgs ?? []).filter((m) => m.msg_val).map((m) => m.msg_key))
+  const existingKeys = new Set(
+    (existingMsgs ?? []).filter((m) => m.msg_val).map((m) => m.msg_key),
+  )
 
   const toTranslate: Record<string, string> = {}
   for (const [key, val] of Object.entries(koFlat)) {
@@ -154,7 +171,10 @@ ${JSON.stringify(batch, null, 2)}`
       const msg = apiErr instanceof Error ? apiErr.message : 'Gemini API 오류'
       // 이미 번역된 데이터가 있으면 부분 성공 반환, 없으면 오류
       if (totalUpserted > 0) {
-        return NextResponse.json({ translated: totalUpserted, message: `${totalUpserted}개 번역 후 중단: ${msg}` })
+        return NextResponse.json({
+          translated: totalUpserted,
+          message: `${totalUpserted}개 번역 후 중단: ${msg}`,
+        })
       }
       return NextResponse.json({ error: `번역 실패: ${msg}` }, { status: 502 })
     }
@@ -167,10 +187,20 @@ ${JSON.stringify(batch, null, 2)}`
       continue
     }
 
-    const batchRows: { locale_cd: string; msg_key: string; msg_val: string; is_auto: string }[] = []
+    const batchRows: {
+      locale_cd: string
+      msg_key: string
+      msg_val: string
+      is_auto: string
+    }[] = []
     for (const [key, val] of Object.entries(translated)) {
       if (typeof val === 'string') {
-        batchRows.push({ locale_cd: locale, msg_key: key, msg_val: val, is_auto: 'Y' })
+        batchRows.push({
+          locale_cd: locale,
+          msg_key: key,
+          msg_val: val,
+          is_auto: 'Y',
+        })
       }
     }
 

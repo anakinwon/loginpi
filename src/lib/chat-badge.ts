@@ -55,7 +55,9 @@ export async function tryAwardBadge(params: {
     .single()
 
   await Promise.all([
-    sysMsg ? broadcastToRoom(params.roomId, 'new_msg', sysMsg) : Promise.resolve(),
+    sysMsg
+      ? broadcastToRoom(params.roomId, 'new_msg', sysMsg)
+      : Promise.resolve(),
     // 당사자 클라이언트가 수신해 축하 팝업(Trigger 7) 표시
     broadcastToRoom(params.roomId, 'badge_award', {
       usr_id: params.userId,
@@ -71,14 +73,20 @@ export async function getUserBadges(userId: string): Promise<UserBadge[]> {
   const db = getSupabaseAdmin()
   const { data } = await db
     .from('msg_usr_badge')
-    .select('badge_id, theme_cd, upgr_yn, noti_yn, reg_dtm, msg_theme(theme_nm, theme_emoji)')
+    .select(
+      'badge_id, theme_cd, upgr_yn, noti_yn, reg_dtm, msg_theme(theme_nm, theme_emoji)',
+    )
     .eq('usr_id', userId)
     .eq('del_yn', 'N')
     .order('reg_dtm', { ascending: false })
 
   return (data ?? []).map((row) => {
     const r = row as unknown as {
-      badge_id: string; theme_cd: string; upgr_yn: 'Y' | 'N'; noti_yn: 'Y' | 'N'; reg_dtm: string
+      badge_id: string
+      theme_cd: string
+      upgr_yn: 'Y' | 'N'
+      noti_yn: 'Y' | 'N'
+      reg_dtm: string
       msg_theme: { theme_nm: string; theme_emoji: string } | null
     }
     return {

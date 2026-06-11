@@ -33,23 +33,43 @@ export async function POST(request: NextRequest, { params }: Params) {
     .eq('pack_id', packId)
     .eq('del_yn', 'N')
     .maybeSingle()
-  if (!pack) return NextResponse.json({ error: '팩을 찾을 수 없습니다' }, { status: 404 })
+  if (!pack)
+    return NextResponse.json(
+      { error: '팩을 찾을 수 없습니다' },
+      { status: 404 },
+    )
 
   let formData: FormData
-  try { formData = await request.formData() } catch {
-    return NextResponse.json({ error: '잘못된 요청 형식입니다' }, { status: 400 })
+  try {
+    formData = await request.formData()
+  } catch {
+    return NextResponse.json(
+      { error: '잘못된 요청 형식입니다' },
+      { status: 400 },
+    )
   }
 
-  const files = formData.getAll('files').filter((f): f is File => f instanceof File)
+  const files = formData
+    .getAll('files')
+    .filter((f): f is File => f instanceof File)
   if (files.length < 1 || files.length > MAX_FILES) {
-    return NextResponse.json({ error: `스티커 이미지는 1~${MAX_FILES}개여야 합니다` }, { status: 400 })
+    return NextResponse.json(
+      { error: `스티커 이미지는 1~${MAX_FILES}개여야 합니다` },
+      { status: 400 },
+    )
   }
   for (const f of files) {
     if (f.size > MAX_BYTES) {
-      return NextResponse.json({ error: '스티커 이미지는 1장당 2MB 이하여야 합니다' }, { status: 413 })
+      return NextResponse.json(
+        { error: '스티커 이미지는 1장당 2MB 이하여야 합니다' },
+        { status: 413 },
+      )
     }
     if (!ALLOWED_MIME.has(f.type)) {
-      return NextResponse.json({ error: '허용되지 않은 이미지 형식입니다 (png/jpg/gif/webp)' }, { status: 415 })
+      return NextResponse.json(
+        { error: '허용되지 않은 이미지 형식입니다 (png/jpg/gif/webp)' },
+        { status: 415 },
+      )
     }
   }
 
@@ -64,20 +84,32 @@ export async function POST(request: NextRequest, { params }: Params) {
     .maybeSingle()
   const baseOrd = (lastStkr?.sort_ord ?? -1) + 1
 
-  const rows: { pack_id: string; stkr_nm: string; stkr_url: string; sort_ord: number; regr_id: string; modr_id: string }[] = []
+  const rows: {
+    pack_id: string
+    stkr_nm: string
+    stkr_url: string
+    sort_ord: number
+    regr_id: string
+    modr_id: string
+  }[] = []
   for (let i = 0; i < files.length; i++) {
     const f = files[i]
     const ext = ALLOWED_MIME.get(f.type)!
     const path = `stickers/${packId}/${crypto.randomUUID()}.${ext}`
     const { error: upError } = await db.storage
       .from(BUCKET)
-      .upload(path, await f.arrayBuffer(), { contentType: f.type, upsert: false })
+      .upload(path, await f.arrayBuffer(), {
+        contentType: f.type,
+        upsert: false,
+      })
     if (upError) continue
 
     const { data: urlData } = db.storage.from(BUCKET).getPublicUrl(path)
     rows.push({
       pack_id: packId,
-      stkr_nm: f.name.replace(/\.[^.]+$/, '').slice(0, 100) || `sticker-${baseOrd + i + 1}`,
+      stkr_nm:
+        f.name.replace(/\.[^.]+$/, '').slice(0, 100) ||
+        `sticker-${baseOrd + i + 1}`,
       stkr_url: urlData.publicUrl,
       sort_ord: baseOrd + i,
       regr_id: 'ADMIN',
@@ -86,7 +118,10 @@ export async function POST(request: NextRequest, { params }: Params) {
   }
 
   if (rows.length === 0) {
-    return NextResponse.json({ error: '스티커 이미지 업로드에 실패했습니다' }, { status: 500 })
+    return NextResponse.json(
+      { error: '스티커 이미지 업로드에 실패했습니다' },
+      { status: 500 },
+    )
   }
 
   const { data: inserted, error } = await db
@@ -94,6 +129,10 @@ export async function POST(request: NextRequest, { params }: Params) {
     .insert(rows)
     .select('stkr_id, stkr_nm, stkr_url, sort_ord')
 
-  if (error) return NextResponse.json({ error: '스티커 등록 실패' }, { status: 500 })
-  return NextResponse.json({ stickers: inserted ?? [], uploaded: rows.length }, { status: 201 })
+  if (error)
+    return NextResponse.json({ error: '스티커 등록 실패' }, { status: 500 })
+  return NextResponse.json(
+    { stickers: inserted ?? [], uploaded: rows.length },
+    { status: 201 },
+  )
 }

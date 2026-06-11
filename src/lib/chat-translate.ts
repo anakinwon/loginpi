@@ -41,7 +41,10 @@ function buildPrompt(text: string, targetLocale: string): string {
 function parseJsonResponse(raw: string): { translated: string; lang?: string } {
   const jsonMatch = raw.match(/\{[\s\S]*\}/)
   if (!jsonMatch) throw new Error('번역 응답 JSON 파싱 실패')
-  const parsed = JSON.parse(jsonMatch[0]) as { translated?: unknown; lang?: unknown }
+  const parsed = JSON.parse(jsonMatch[0]) as {
+    translated?: unknown
+    lang?: unknown
+  }
   if (typeof parsed.translated !== 'string' || !parsed.translated) {
     throw new Error('번역 응답에 translated 필드 없음')
   }
@@ -78,7 +81,10 @@ async function callGemini(prompt: string, apiKey: string): Promise<string> {
   return text
 }
 
-async function callClaudeHaiku(prompt: string, apiKey: string): Promise<string> {
+async function callClaudeHaiku(
+  prompt: string,
+  apiKey: string,
+): Promise<string> {
   const anthropic = new Anthropic({ apiKey, timeout: 15_000 })
   const message = await anthropic.messages.create({
     model: CLAUDE_FALLBACK_MODEL,
@@ -102,16 +108,28 @@ export async function translateMessage(
     try {
       const raw = await callGemini(prompt, geminiKey)
       const { translated, lang } = parseJsonResponse(raw)
-      return { translated, srcLangCd: lang ?? null, modelVer: GEMINI_TRANSLATE_MODEL }
+      return {
+        translated,
+        srcLangCd: lang ?? null,
+        modelVer: GEMINI_TRANSLATE_MODEL,
+      }
     } catch (err) {
-      console.error('[chat-translate] Gemini 실패 — Claude Haiku fallback:', err)
+      console.error(
+        '[chat-translate] Gemini 실패 — Claude Haiku fallback:',
+        err,
+      )
     }
   }
 
   const anthropicKey = process.env.ANTHROPIC_API_KEY
-  if (!anthropicKey) throw new Error('번역 엔진 미설정 (GEMINI_API_KEY / ANTHROPIC_API_KEY)')
+  if (!anthropicKey)
+    throw new Error('번역 엔진 미설정 (GEMINI_API_KEY / ANTHROPIC_API_KEY)')
 
   const raw = await callClaudeHaiku(prompt, anthropicKey)
   const { translated, lang } = parseJsonResponse(raw)
-  return { translated, srcLangCd: lang ?? null, modelVer: CLAUDE_FALLBACK_MODEL }
+  return {
+    translated,
+    srcLangCd: lang ?? null,
+    modelVer: CLAUDE_FALLBACK_MODEL,
+  }
 }

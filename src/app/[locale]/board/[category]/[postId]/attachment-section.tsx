@@ -26,9 +26,15 @@ function formatSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)}MB`
 }
 
-export function AttachmentSection({ category, postId, initialAttachments, canUpload }: Props) {
+export function AttachmentSection({
+  category,
+  postId,
+  initialAttachments,
+  canUpload,
+}: Props) {
   const t = useTranslations('attachment')
-  const [attachments, setAttachments] = useState<Attachment[]>(initialAttachments)
+  const [attachments, setAttachments] =
+    useState<Attachment[]>(initialAttachments)
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -47,10 +53,17 @@ export function AttachmentSection({ category, postId, initialAttachments, canUpl
       const { uploaded } = await res.json()
       setAttachments((prev) => [
         ...prev,
-        ...uploaded.map((u: { attch_id: string; fl_nm: string; fl_url: string; fl_sz: number }) => ({
-          ...u,
-          reg_dtm: new Date().toISOString(),
-        })),
+        ...uploaded.map(
+          (u: {
+            attch_id: string
+            fl_nm: string
+            fl_url: string
+            fl_sz: number
+          }) => ({
+            ...u,
+            reg_dtm: new Date().toISOString(),
+          }),
+        ),
       ])
       toast.success(t('uploadSuccess', { count: uploaded.length }))
     } else {
@@ -64,9 +77,12 @@ export function AttachmentSection({ category, postId, initialAttachments, canUpl
 
   const handleDelete = async (attchId: string) => {
     if (!confirm(t('deleteConfirm'))) return
-    const res = await fetch(`/api/board/${category}/${postId}/attachments/${attchId}`, {
-      method: 'DELETE',
-    })
+    const res = await fetch(
+      `/api/board/${category}/${postId}/attachments/${attchId}`,
+      {
+        method: 'DELETE',
+      },
+    )
     if (res.ok) {
       setAttachments((prev) => prev.filter((a) => a.attch_id !== attchId))
       toast.success(t('deleteSuccess'))
@@ -79,30 +95,35 @@ export function AttachmentSection({ category, postId, initialAttachments, canUpl
   if (attachments.length === 0 && !canUpload) return null
 
   return (
-    <div className='mb-8 rounded-lg border p-4'>
-      <h3 className='mb-3 text-sm font-medium'>
-        {attachments.length > 0 ? t('titleCount', { count: attachments.length }) : t('title')}
+    <div className="mb-8 rounded-lg border p-4">
+      <h3 className="mb-3 text-sm font-medium">
+        {attachments.length > 0
+          ? t('titleCount', { count: attachments.length })
+          : t('title')}
       </h3>
 
       {attachments.length > 0 && (
-        <ul className='mb-3 space-y-1.5'>
+        <ul className="mb-3 space-y-1.5">
           {attachments.map((att) => (
-            <li key={att.attch_id} className='flex items-center justify-between gap-2 text-sm'>
+            <li
+              key={att.attch_id}
+              className="flex items-center justify-between gap-2 text-sm"
+            >
               <a
                 href={att.fl_url}
-                target='_blank'
-                rel='noopener noreferrer'
-                className='flex min-w-0 items-center gap-1.5 text-blue-600 hover:underline dark:text-blue-400'
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex min-w-0 items-center gap-1.5 text-blue-600 hover:underline dark:text-blue-400"
               >
-                <span className='truncate'>{att.fl_nm}</span>
-                <span className='shrink-0 text-xs text-muted-foreground'>
+                <span className="truncate">{att.fl_nm}</span>
+                <span className="text-muted-foreground shrink-0 text-xs">
                   ({formatSize(att.fl_sz)})
                 </span>
               </a>
               {canUpload && (
                 <button
                   onClick={() => handleDelete(att.attch_id)}
-                  className='shrink-0 text-xs text-destructive hover:underline'
+                  className="text-destructive shrink-0 text-xs hover:underline"
                 >
                   {t('delete')}
                 </button>
@@ -116,20 +137,22 @@ export function AttachmentSection({ category, postId, initialAttachments, canUpl
         <>
           <input
             ref={fileInputRef}
-            type='file'
+            type="file"
             multiple
-            className='hidden'
+            className="hidden"
             onChange={(e) => e.target.files && handleUpload(e.target.files)}
           />
           <Button
-            variant='outline'
-            size='sm'
+            variant="outline"
+            size="sm"
             disabled={uploading}
             onClick={() => fileInputRef.current?.click()}
           >
             {uploading ? t('uploading') : t('upload')}
           </Button>
-          <p className='mt-1.5 text-xs text-muted-foreground'>{t('sizeLimit')}</p>
+          <p className="text-muted-foreground mt-1.5 text-xs">
+            {t('sizeLimit')}
+          </p>
         </>
       )}
     </div>

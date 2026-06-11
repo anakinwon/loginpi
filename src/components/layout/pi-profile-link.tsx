@@ -15,8 +15,8 @@ export function PiProfileLink() {
 
   return (
     <Link
-      href='/profile'
-      className='text-muted-foreground hover:text-foreground text-sm transition-colors'
+      href="/profile"
+      className="text-muted-foreground hover:text-foreground text-sm transition-colors"
     >
       {t('myProfile')}
     </Link>

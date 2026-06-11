@@ -17,8 +17,11 @@ export default async function StoreItemPage({
   const t = await getTranslations('store')
 
   return (
-    <div className='mx-auto max-w-4xl space-y-4 p-4 md:p-6'>
-      <Link href='/store' className='text-muted-foreground text-sm hover:underline'>
+    <div className="mx-auto max-w-4xl space-y-4 p-4 md:p-6">
+      <Link
+        href="/store"
+        className="text-muted-foreground text-sm hover:underline"
+      >
         ← {t('backToList')}
       </Link>
       <StoreItemDetail itemId={itemId} />

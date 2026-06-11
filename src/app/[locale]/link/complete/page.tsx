@@ -43,32 +43,32 @@ function LinkCompleteInner() {
 
   if (!code) {
     return (
-      <Card className='max-w-md mx-auto mt-20'>
-        <CardContent className='py-8 text-center'>
-          <p className='text-destructive text-sm'>{t('invalidLink')}</p>
+      <Card className="mx-auto mt-20 max-w-md">
+        <CardContent className="py-8 text-center">
+          <p className="text-destructive text-sm">{t('invalidLink')}</p>
         </CardContent>
       </Card>
     )
   }
 
   return (
-    <Card className='max-w-md mx-auto mt-20'>
+    <Card className="mx-auto mt-20 max-w-md">
       <CardHeader>
         <CardTitle>{t('completeTitle')}</CardTitle>
       </CardHeader>
       <CardContent>
         {result === 'pending' && (
-          <p className='text-muted-foreground text-sm'>
+          <p className="text-muted-foreground text-sm">
             {status === 'loading' ? t('checkingSession') : t('processing')}
           </p>
         )}
         {result === 'done' && (
-          <p className='text-green-600 dark:text-green-400 text-sm font-medium'>
+          <p className="text-sm font-medium text-green-600 dark:text-green-400">
             ✓ {t('linkedSuccess')}
           </p>
         )}
         {result === 'error' && (
-          <p className='text-destructive text-sm'>{errorMsg}</p>
+          <p className="text-destructive text-sm">{errorMsg}</p>
         )}
       </CardContent>
     </Card>
@@ -78,7 +78,9 @@ function LinkCompleteInner() {
 export default function LinkCompletePage() {
   const tc = useTranslations('common')
   return (
-    <Suspense fallback={<div className='text-center mt-20'>{tc('loading')}</div>}>
+    <Suspense
+      fallback={<div className="mt-20 text-center">{tc('loading')}</div>}
+    >
       <LinkCompleteInner />
     </Suspense>
   )

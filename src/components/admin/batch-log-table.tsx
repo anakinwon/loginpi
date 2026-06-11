@@ -60,41 +60,43 @@ export function BatchLogTable() {
   }, [load])
 
   return (
-    <div className='rounded-lg border p-5 space-y-4'>
-      <div className='flex items-end justify-between gap-3'>
+    <div className="space-y-4 rounded-lg border p-5">
+      <div className="flex items-end justify-between gap-3">
         <div>
-          <p className='text-sm font-semibold'>{t('logTitle')}</p>
-          <p className='text-muted-foreground text-xs mt-0.5'>{t('logDesc')}</p>
+          <p className="text-sm font-semibold">{t('logTitle')}</p>
+          <p className="text-muted-foreground mt-0.5 text-xs">{t('logDesc')}</p>
         </div>
-        <Button onClick={load} disabled={loading} variant='outline' size='sm'>
+        <Button onClick={load} disabled={loading} variant="outline" size="sm">
           {loading ? t('logLoading') : t('logRefresh')}
         </Button>
       </div>
 
       {logs === null ? (
-        <p className='text-muted-foreground text-sm'>{t('logLoading')}</p>
+        <p className="text-muted-foreground text-sm">{t('logLoading')}</p>
       ) : logs.length === 0 ? (
-        <p className='text-muted-foreground text-sm'>{t('logEmpty')}</p>
+        <p className="text-muted-foreground text-sm">{t('logEmpty')}</p>
       ) : (
-        <div className='overflow-x-auto'>
-          <table className='w-full text-sm'>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
             <thead>
-              <tr className='border-b text-left'>
-                <th className='py-2 pr-3 font-medium'>{t('logColStart')}</th>
-                <th className='py-2 pr-3 font-medium'>{t('logColTrigger')}</th>
-                <th className='py-2 pr-3 font-medium'>{t('logColPeriod')}</th>
-                <th className='py-2 pr-3 font-medium'>{t('logColResult')}</th>
-                <th className='py-2 pr-3 font-medium'>{t('logColDays')}</th>
-                <th className='py-2 pr-3 font-medium'>{t('logColDuration')}</th>
-                <th className='py-2 pr-3 font-medium'>{t('logColRunner')}</th>
-                <th className='py-2 font-medium'>{t('logColMsg')}</th>
+              <tr className="border-b text-left">
+                <th className="py-2 pr-3 font-medium">{t('logColStart')}</th>
+                <th className="py-2 pr-3 font-medium">{t('logColTrigger')}</th>
+                <th className="py-2 pr-3 font-medium">{t('logColPeriod')}</th>
+                <th className="py-2 pr-3 font-medium">{t('logColResult')}</th>
+                <th className="py-2 pr-3 font-medium">{t('logColDays')}</th>
+                <th className="py-2 pr-3 font-medium">{t('logColDuration')}</th>
+                <th className="py-2 pr-3 font-medium">{t('logColRunner')}</th>
+                <th className="py-2 font-medium">{t('logColMsg')}</th>
               </tr>
             </thead>
             <tbody>
-              {logs.map(log => (
-                <tr key={log.batch_log_id} className='border-b last:border-0'>
-                  <td className='py-2 pr-3 whitespace-nowrap'>{formatDtm(log.start_dtm)}</td>
-                  <td className='py-2 pr-3'>
+              {logs.map((log) => (
+                <tr key={log.batch_log_id} className="border-b last:border-0">
+                  <td className="py-2 pr-3 whitespace-nowrap">
+                    {formatDtm(log.start_dtm)}
+                  </td>
+                  <td className="py-2 pr-3">
                     <span
                       className={`rounded px-1.5 py-0.5 text-xs font-medium ${
                         log.trigger_cd === 'CRON'
@@ -105,10 +107,12 @@ export function BatchLogTable() {
                       {t(TRIGGER_KEY[log.trigger_cd])}
                     </span>
                   </td>
-                  <td className='py-2 pr-3 whitespace-nowrap'>
-                    {log.from_dt === log.to_dt ? log.from_dt : `${log.from_dt} ~ ${log.to_dt}`}
+                  <td className="py-2 pr-3 whitespace-nowrap">
+                    {log.from_dt === log.to_dt
+                      ? log.from_dt
+                      : `${log.from_dt} ~ ${log.to_dt}`}
                   </td>
-                  <td className='py-2 pr-3'>
+                  <td className="py-2 pr-3">
                     <span
                       className={`rounded px-1.5 py-0.5 text-xs font-medium ${
                         log.success_yn === 'Y'
@@ -119,16 +123,16 @@ export function BatchLogTable() {
                       {log.success_yn === 'Y' ? t('logSuccess') : t('logFail')}
                     </span>
                   </td>
-                  <td className='py-2 pr-3 whitespace-nowrap'>
+                  <td className="py-2 pr-3 whitespace-nowrap">
                     {log.failed_cnt > 0
                       ? `${log.total_cnt} (${t('logFailedCnt', { failed: log.failed_cnt })})`
                       : log.total_cnt}
                   </td>
-                  <td className='py-2 pr-3 whitespace-nowrap'>
+                  <td className="py-2 pr-3 whitespace-nowrap">
                     {durationSec(log.start_dtm, log.end_dtm)}
                   </td>
-                  <td className='py-2 pr-3'>{log.regr_id}</td>
-                  <td className='text-muted-foreground py-2 text-xs break-all'>
+                  <td className="py-2 pr-3">{log.regr_id}</td>
+                  <td className="text-muted-foreground py-2 text-xs break-all">
                     {log.result_msg ?? '—'}
                   </td>
                 </tr>

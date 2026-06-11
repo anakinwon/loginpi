@@ -4,14 +4,17 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 
 export async function GET(req: NextRequest) {
   const requester = await getSessionUser()
-  if (!isAdmin(requester)) return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+  if (!isAdmin(requester))
+    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
 
   const { searchParams } = new URL(req.url)
   const search = searchParams.get('search')?.trim() ?? ''
 
   let query = getSupabaseAdmin()
     .from('std_term')
-    .select('term_id, term_log_nm, term_phy_nm, term_phy_fll_nm, term_desc, apv_status, synced_at, reg_dtm, mod_dtm, regr_id')
+    .select(
+      'term_id, term_log_nm, term_phy_nm, term_phy_fll_nm, term_desc, apv_status, synced_at, reg_dtm, mod_dtm, regr_id',
+    )
     .eq('del_yn', 'N')
     .order('term_log_nm', { ascending: true })
 
@@ -28,7 +31,8 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const requester = await getSessionUser()
-  if (!isAdmin(requester)) return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+  if (!isAdmin(requester))
+    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
 
   const body = (await req.json()) as {
     term_log_nm: string
@@ -38,7 +42,10 @@ export async function POST(req: NextRequest) {
   }
 
   if (!body.term_log_nm?.trim() || !body.term_phy_nm?.trim()) {
-    return NextResponse.json({ error: '논리명과 물리명은 필수입니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: '논리명과 물리명은 필수입니다' },
+      { status: 400 },
+    )
   }
 
   const { data, error } = await getSupabaseAdmin()

@@ -12,16 +12,25 @@ export default async function StorePage() {
   const t = await getTranslations('store')
 
   return (
-    <div className='mx-auto max-w-5xl space-y-4 p-4 md:p-6'>
-      <div className='flex items-end justify-between gap-3'>
+    <div className="mx-auto max-w-5xl space-y-4 p-4 md:p-6">
+      <div className="flex items-end justify-between gap-3">
         <div>
-          <h1 className='text-2xl font-bold'>🛍️ {t('title')}</h1>
-          <p className='text-muted-foreground mt-1 text-sm'>{t('subtitle')}</p>
+          <h1 className="text-2xl font-bold">🛍️ {t('title')}</h1>
+          <p className="text-muted-foreground mt-1 text-sm">{t('subtitle')}</p>
         </div>
-        <nav className='flex gap-3 text-sm'>
-          <Link href='/store/my/items' className='text-primary hover:underline'>{t('navMyItems')}</Link>
-          <Link href='/store/my/sales' className='text-primary hover:underline'>{t('navSales')}</Link>
-          <Link href='/store/my/orders' className='text-primary hover:underline'>{t('navOrders')}</Link>
+        <nav className="flex gap-3 text-sm">
+          <Link href="/store/my/items" className="text-primary hover:underline">
+            {t('navMyItems')}
+          </Link>
+          <Link href="/store/my/sales" className="text-primary hover:underline">
+            {t('navSales')}
+          </Link>
+          <Link
+            href="/store/my/orders"
+            className="text-primary hover:underline"
+          >
+            {t('navOrders')}
+          </Link>
         </nav>
       </div>
       <StoreItemList />

@@ -8,7 +8,7 @@ import { upsertPiUser } from '@/lib/users'
 // pi-redirect(form POST)의 대체 1단계: Pi 토큰 검증 + 네비게이션 토큰 발급
 
 const PI_API_URL = 'https://api.minepi.com/v2/me'
-const NAV_TOKEN_TTL_MS = 30_000  // 30초 — GET URL 노출 최소화
+const NAV_TOKEN_TTL_MS = 30_000 // 30초 — GET URL 노출 최소화
 
 interface PiMeResponse {
   uid: string
@@ -21,7 +21,8 @@ interface PiMeResponse {
 
 function safeToPath(to: unknown): string {
   if (typeof to !== 'string') return '/'
-  if (!to.startsWith('/') || to.startsWith('//') || to.startsWith('/\\')) return '/'
+  if (!to.startsWith('/') || to.startsWith('//') || to.startsWith('/\\'))
+    return '/'
   return to
 }
 
@@ -34,7 +35,10 @@ export async function POST(request: NextRequest) {
   let accessToken: string | null = null
   let to = '/'
   try {
-    const body = (await request.json()) as { accessToken?: unknown; to?: unknown }
+    const body = (await request.json()) as {
+      accessToken?: unknown
+      to?: unknown
+    }
     accessToken = typeof body.accessToken === 'string' ? body.accessToken : null
     to = safeToPath(body.to)
   } catch {

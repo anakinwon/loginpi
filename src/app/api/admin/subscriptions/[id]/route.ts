@@ -11,7 +11,10 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   }
 
   const { id } = await params
-  const body = (await req.json()) as { extend_months?: number; plan_cd?: string }
+  const body = (await req.json()) as {
+    extend_months?: number
+    plan_cd?: string
+  }
   const now = new Date()
   const patch: Record<string, unknown> = {
     modr_id: requester?.display_name ?? 'ADMIN',
@@ -43,7 +46,10 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     .eq('subscr_id', id)
 
   if (error) {
-    return NextResponse.json({ error: '수정 실패: ' + error.message }, { status: 500 })
+    return NextResponse.json(
+      { error: '수정 실패: ' + error.message },
+      { status: 500 },
+    )
   }
 
   return NextResponse.json({ ok: true })
@@ -69,7 +75,10 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
     .eq('subscr_id', id)
 
   if (error) {
-    return NextResponse.json({ error: '취소 실패: ' + error.message }, { status: 500 })
+    return NextResponse.json(
+      { error: '취소 실패: ' + error.message },
+      { status: 500 },
+    )
   }
 
   return NextResponse.json({ ok: true })

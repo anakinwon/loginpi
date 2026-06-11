@@ -27,11 +27,12 @@ export async function getSessionUser(): Promise<UserRow | null> {
       // 헤더 토큰은 쿠키와 달리 maxAge 자동 만료가 없으므로 tokenValidUntil 명시 검증
       const notExpired =
         !!piSession &&
-        (!piSession.tokenValidUntil || new Date(piSession.tokenValidUntil) > new Date())
+        (!piSession.tokenValidUntil ||
+          new Date(piSession.tokenValidUntil) > new Date())
       if (piSession?.userId && notExpired) {
         const user = await getUserById(piSession.userId)
         if (user) {
-          touchLastLogin(user.id)  // Pi Browser 토큰 재사용 접속도 기록 (5분 스로틀)
+          touchLastLogin(user.id) // Pi Browser 토큰 재사용 접속도 기록 (5분 스로틀)
           return user
         }
       } else if (piSession?.uid && notExpired) {
@@ -65,7 +66,7 @@ export async function getSessionUser(): Promise<UserRow | null> {
   if (googleSession?.user?.id) {
     const user = await getUserById(googleSession.user.id)
     if (user) {
-      touchLastLogin(user.id)  // 일반 브라우저 세션 유지 접속도 기록 (5분 스로틀)
+      touchLastLogin(user.id) // 일반 브라우저 세션 유지 접속도 기록 (5분 스로틀)
       return user
     }
   }

@@ -34,7 +34,10 @@ export default async function PostDetailPage({ params }: Props) {
   if (error || !post) notFound()
 
   // 조회수 비동기 increment (응답 대기 없음)
-  db.from('brd_post').update({ vw_cnt: post.vw_cnt + 1 }).eq('post_id', postId).then(() => {})
+  db.from('brd_post')
+    .update({ vw_cnt: post.vw_cnt + 1 })
+    .eq('post_id', postId)
+    .then(() => {})
 
   const [{ data: comments }, { data: attachments }] = await Promise.all([
     db
@@ -57,29 +60,46 @@ export default async function PostDetailPage({ params }: Props) {
 
   // AttachmentSection에 넘기는 목록 — fl_tp, sort_ord 제외 (AttachmentSection 타입과 호환)
   const attachmentList = (attachments ?? []).map(
-    ({ fl_tp: _ft, sort_ord: _so, ...a }: { attch_id: string; fl_nm: string; fl_url: string; fl_sz: number; fl_tp?: string; sort_ord?: number; reg_dtm: string }) => a
+    ({
+      fl_tp: _ft,
+      sort_ord: _so,
+      ...a
+    }: {
+      attch_id: string
+      fl_nm: string
+      fl_url: string
+      fl_sz: number
+      fl_tp?: string
+      sort_ord?: number
+      reg_dtm: string
+    }) => a,
   )
 
   return (
-    <div className='mx-auto max-w-4xl px-4 py-8'>
-      <nav className='mb-6 text-sm text-muted-foreground'>
-        <Link href={`/board/${category}`} className='hover:text-foreground hover:underline'>
+    <div className="mx-auto max-w-4xl px-4 py-8">
+      <nav className="text-muted-foreground mb-6 text-sm">
+        <Link
+          href={`/board/${category}`}
+          className="hover:text-foreground hover:underline"
+        >
           {ctgr.ctgr_nm}
         </Link>
-        <span className='mx-2'>/</span>
-        <span className='max-w-xs inline-block truncate align-bottom text-foreground'>{post.post_ttl}</span>
+        <span className="mx-2">/</span>
+        <span className="text-foreground inline-block max-w-xs truncate align-bottom">
+          {post.post_ttl}
+        </span>
       </nav>
 
-      <div className='mb-6 border-b pb-6'>
-        <div className='flex items-start justify-between gap-4'>
-          <h1 className='text-2xl font-bold leading-tight'>
+      <div className="mb-6 border-b pb-6">
+        <div className="flex items-start justify-between gap-4">
+          <h1 className="text-2xl leading-tight font-bold">
             {post.pin_yn === 'Y' && (
-              <span className='mr-2 rounded bg-primary/10 px-1.5 py-0.5 text-sm font-medium text-primary'>
+              <span className="bg-primary/10 text-primary mr-2 rounded px-1.5 py-0.5 text-sm font-medium">
                 {t('notice')}
               </span>
             )}
             {ctgr.ctgr_cd === 'QNA' && post.answ_yn === 'Y' && (
-              <span className='mr-2 rounded bg-green-100 px-1.5 py-0.5 text-sm font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400'>
+              <span className="mr-2 rounded bg-green-100 px-1.5 py-0.5 text-sm font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
                 {t('adoptedComplete')}
               </span>
             )}
@@ -89,7 +109,7 @@ export default async function PostDetailPage({ params }: Props) {
             <PostDetailActions category={category} postId={postId} />
           )}
         </div>
-        <div className='mt-3 flex flex-wrap gap-4 text-sm text-muted-foreground'>
+        <div className="text-muted-foreground mt-3 flex flex-wrap gap-4 text-sm">
           <span>{post.rgst_usr_nm}</span>
           <span>{t('viewCount', { count: post.vw_cnt + 1 })}</span>
           <time dateTime={post.reg_dtm}>
@@ -101,14 +121,16 @@ export default async function PostDetailPage({ params }: Props) {
               minute: '2-digit',
             })}
           </time>
-          {post.reg_dtm !== post.mod_dtm && <span className='text-xs'>{t('modified')}</span>}
+          {post.reg_dtm !== post.mod_dtm && (
+            <span className="text-xs">{t('modified')}</span>
+          )}
         </div>
       </div>
 
       {ctgr.gallery_yn === 'Y' ? (
         <GalleryBodyRenderer postCont={post.post_cont} />
       ) : (
-        <div className='mb-8 min-h-32 whitespace-pre-wrap text-sm leading-relaxed'>
+        <div className="mb-8 min-h-32 text-sm leading-relaxed whitespace-pre-wrap">
           {post.post_cont ?? ''}
         </div>
       )}

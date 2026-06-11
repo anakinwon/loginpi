@@ -15,7 +15,9 @@ export function verifyPayload<T>(value: string, secret: string): T | null {
   if (dot === -1) return null
   const payload = value.slice(0, dot)
   const sig = value.slice(dot + 1)
-  const expected = createHmac('sha256', secret).update(payload).digest('base64url')
+  const expected = createHmac('sha256', secret)
+    .update(payload)
+    .digest('base64url')
   try {
     const sigBytes = Buffer.from(sig, 'base64url')
     const expectedBytes = Buffer.from(expected, 'base64url')

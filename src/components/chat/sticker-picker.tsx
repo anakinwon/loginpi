@@ -47,17 +47,22 @@ export function StickerPicker({ onSelect, onClose }: StickerPickerProps) {
     setShowSubscribePrompt(false)
   }, [])
 
-  const { subscribe, paying } = useSubscribePlan({ onSuccess: handleSubscribeSuccess })
+  const { subscribe, paying } = useSubscribePlan({
+    onSuccess: handleSubscribeSuccess,
+  })
 
   const loadPacks = useCallback(async () => {
     const res = await piFetch('/api/stickers/packs')
     if (!res.ok) throw new Error('load_failed')
-    return res.json() as Promise<{ ownedPacks: OwnedPack[]; storePacks: StorePack[] }>
+    return res.json() as Promise<{
+      ownedPacks: OwnedPack[]
+      storePacks: StorePack[]
+    }>
   }, [])
 
   useEffect(() => {
     loadPacks()
-      .then(d => {
+      .then((d) => {
         setOwnedPacks(d.ownedPacks)
         setStorePacks(d.storePacks)
         if (d.ownedPacks.length > 0) setActivePackId(d.ownedPacks[0].pack_id)
@@ -67,74 +72,93 @@ export function StickerPicker({ onSelect, onClose }: StickerPickerProps) {
       .finally(() => setLoading(false))
   }, [loadPacks])
 
-  const buyPack = useCallback(async (packId: string, packNm: string) => {
-    if (!window.Pi) {
-      toast.error('Pi Browser에서만 구매할 수 있습니다')
-      return
-    }
-    setBuying(packId)
-    try {
-      const prep = await piFetch(`/api/stickers/packs/${packId}/buy`, { method: 'POST' })
-      if (!prep.ok) {
-        const d = await prep.json() as { error?: string }
-        throw new Error(d.error ?? '결제 준비 실패')
+  const buyPack = useCallback(
+    async (packId: string, packNm: string) => {
+      if (!window.Pi) {
+        toast.error('Pi Browser에서만 구매할 수 있습니다')
+        return
       }
-      const params = await prep.json() as { amount: number; memo: string; metadata: Record<string, unknown> }
+      setBuying(packId)
+      try {
+        const prep = await piFetch(`/api/stickers/packs/${packId}/buy`, {
+          method: 'POST',
+        })
+        if (!prep.ok) {
+          const d = (await prep.json()) as { error?: string }
+          throw new Error(d.error ?? '결제 준비 실패')
+        }
+        const params = (await prep.json()) as {
+          amount: number
+          memo: string
+          metadata: Record<string, unknown>
+        }
 
-      window.Pi.createPayment(params, {
-        onReadyForServerApproval: async (paymentId) => {
-          await fetch('/api/payments/approve', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ paymentId }),
-          })
-        },
-        onReadyForServerCompletion: async (paymentId, txid) => {
-          const res = await fetch('/api/payments/complete', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ paymentId, txid }),
-          })
-          setBuying(null)
-          if (res.ok) {
-            toast.success(`${packNm} 구매 완료! 🎉`)
-            const updated = await loadPacks().catch(() => null)
-            if (updated) {
-              setOwnedPacks(updated.ownedPacks)
-              setStorePacks(updated.storePacks)
-              setActivePackId(packId)
-              setShowStore(false)
+        window.Pi.createPayment(params, {
+          onReadyForServerApproval: async (paymentId) => {
+            await fetch('/api/payments/approve', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ paymentId }),
+            })
+          },
+          onReadyForServerCompletion: async (paymentId, txid) => {
+            const res = await fetch('/api/payments/complete', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ paymentId, txid }),
+            })
+            setBuying(null)
+            if (res.ok) {
+              toast.success(`${packNm} 구매 완료! 🎉`)
+              const updated = await loadPacks().catch(() => null)
+              if (updated) {
+                setOwnedPacks(updated.ownedPacks)
+                setStorePacks(updated.storePacks)
+                setActivePackId(packId)
+                setShowStore(false)
+              }
+            } else {
+              toast.error('구매 완료 처리 실패')
             }
-          } else {
-            toast.error('구매 완료 처리 실패')
-          }
-        },
-        onCancel: () => setBuying(null),
-        onError: (e) => { setBuying(null); toast.error(e.message) },
-      })
-    } catch (e) {
-      setBuying(null)
-      toast.error(e instanceof Error ? e.message : '구매 오류')
-    }
-  }, [loadPacks])
+          },
+          onCancel: () => setBuying(null),
+          onError: (e) => {
+            setBuying(null)
+            toast.error(e.message)
+          },
+        })
+      } catch (e) {
+        setBuying(null)
+        toast.error(e instanceof Error ? e.message : '구매 오류')
+      }
+    },
+    [loadPacks],
+  )
 
-  const activePack = ownedPacks.find(p => p.pack_id === activePackId)
+  const activePack = ownedPacks.find((p) => p.pack_id === activePackId)
 
   return (
-    <div className='absolute bottom-full left-0 z-50 mb-2 w-72 overflow-hidden rounded-2xl border bg-popover shadow-xl'>
+    <div className="bg-popover absolute bottom-full left-0 z-50 mb-2 w-72 overflow-hidden rounded-2xl border shadow-xl">
       {/* 팩 탭 */}
-      <div className='flex items-center gap-1 overflow-x-auto border-b px-2 pt-2'>
+      <div className="flex items-center gap-1 overflow-x-auto border-b px-2 pt-2">
         {ownedPacks.map((pack, idx) => {
           const active = !showStore && activePackId === pack.pack_id
           // 커스텀(맨 앞 그룹)과 일반 팩 경계에 세로 구분선 — 가독성
-          const showDivider = !pack.is_custom && idx > 0 && ownedPacks[idx - 1].is_custom
+          const showDivider =
+            !pack.is_custom && idx > 0 && ownedPacks[idx - 1].is_custom
           return (
             <Fragment key={pack.pack_id}>
               {showDivider && (
-                <span className='mx-0.5 h-4 w-px shrink-0 self-center bg-border' aria-hidden />
+                <span
+                  className="bg-border mx-0.5 h-4 w-px shrink-0 self-center"
+                  aria-hidden
+                />
               )}
               <button
-                onClick={() => { setActivePackId(pack.pack_id); setShowStore(false) }}
+                onClick={() => {
+                  setActivePackId(pack.pack_id)
+                  setShowStore(false)
+                }}
                 title={pack.is_custom ? '내 커스텀 스티커팩' : undefined}
                 className={`shrink-0 rounded-t-lg px-2 py-1.5 text-xs font-medium transition-colors ${
                   active
@@ -153,7 +177,9 @@ export function StickerPicker({ onSelect, onClose }: StickerPickerProps) {
           <button
             onClick={() => setShowStore(true)}
             className={`ml-auto shrink-0 rounded-t-lg px-2 py-1.5 text-xs font-medium transition-colors ${
-              showStore ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+              showStore
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             🛒 스토어
@@ -161,47 +187,59 @@ export function StickerPicker({ onSelect, onClose }: StickerPickerProps) {
         )}
         <button
           onClick={() => setShowCreator(true)}
-          className='shrink-0 px-1 py-1.5 text-xs text-muted-foreground hover:text-foreground'
-          aria-label='커스텀 스티커 만들기'
-          title='커스텀 스티커팩 만들기 (Business)'
+          className="text-muted-foreground hover:text-foreground shrink-0 px-1 py-1.5 text-xs"
+          aria-label="커스텀 스티커 만들기"
+          title="커스텀 스티커팩 만들기 (Business)"
         >
           🎨
         </button>
         <button
           onClick={onClose}
-          className='shrink-0 px-1 py-1 text-xs text-muted-foreground hover:text-foreground'
-          aria-label='닫기'
+          className="text-muted-foreground hover:text-foreground shrink-0 px-1 py-1 text-xs"
+          aria-label="닫기"
         >
           ✕
         </button>
       </div>
 
       {/* 컨텐츠 */}
-      <div className='h-52 overflow-y-auto p-2'>
+      <div className="h-52 overflow-y-auto p-2">
         {loading ? (
-          <div className='flex h-full items-center justify-center text-sm text-muted-foreground'>
+          <div className="text-muted-foreground flex h-full items-center justify-center text-sm">
             불러오는 중…
           </div>
         ) : showStore ? (
-          <StoreView storePacks={storePacks} buying={buying} onBuy={buyPack} onSubscribeBanner={() => setShowSubscribePrompt(true)} />
+          <StoreView
+            storePacks={storePacks}
+            buying={buying}
+            onBuy={buyPack}
+            onSubscribeBanner={() => setShowSubscribePrompt(true)}
+          />
         ) : activePack ? (
-          <div className='grid grid-cols-4 gap-1'>
-            {activePack.stickers.map(s => (
+          <div className="grid grid-cols-4 gap-1">
+            {activePack.stickers.map((s) => (
               <button
                 key={s.stkr_id}
                 onClick={() => onSelect(s.stkr_id, s.stkr_url)}
-                className='aspect-square rounded-lg p-0.5 transition-colors hover:bg-muted'
+                className="hover:bg-muted aspect-square rounded-lg p-0.5 transition-colors"
                 title={s.stkr_nm}
               >
-                <img src={s.stkr_url} alt={s.stkr_nm} className='h-full w-full object-contain' />
+                <img
+                  src={s.stkr_url}
+                  alt={s.stkr_nm}
+                  className="h-full w-full object-contain"
+                />
               </button>
             ))}
           </div>
         ) : (
-          <div className='flex h-full flex-col items-center justify-center gap-2 text-sm text-muted-foreground'>
+          <div className="text-muted-foreground flex h-full flex-col items-center justify-center gap-2 text-sm">
             <span>보유한 스티커가 없습니다</span>
             {storePacks.length > 0 && (
-              <button onClick={() => setShowStore(true)} className='text-xs text-primary underline'>
+              <button
+                onClick={() => setShowStore(true)}
+                className="text-primary text-xs underline"
+              >
                 스토어 둘러보기
               </button>
             )}
@@ -214,7 +252,10 @@ export function StickerPicker({ onSelect, onClose }: StickerPickerProps) {
           onCreated={() => {
             setShowCreator(false)
             loadPacks()
-              .then(d => { setOwnedPacks(d.ownedPacks); setStorePacks(d.storePacks) })
+              .then((d) => {
+                setOwnedPacks(d.ownedPacks)
+                setStorePacks(d.storePacks)
+              })
               .catch(() => {})
           }}
           onClose={() => setShowCreator(false)}
@@ -222,8 +263,8 @@ export function StickerPicker({ onSelect, onClose }: StickerPickerProps) {
       )}
       <InlinePurchasePrompt
         isOpen={showSubscribePrompt}
-        featureName='스티커 팩 구독'
-        description='프리미엄 구독 시 매월 새 스티커 팩을 포함해 다양한 특혜를 누리세요.'
+        featureName="스티커 팩 구독"
+        description="프리미엄 구독 시 매월 새 스티커 팩을 포함해 다양한 특혜를 누리세요."
         piAmount={3}
         onSinglePurchase={() => setShowSubscribePrompt(false)}
         onSubscribe={subscribe}
@@ -247,31 +288,33 @@ function StoreView({
 }) {
   if (storePacks.length === 0) {
     return (
-      <p className='py-6 text-center text-sm text-muted-foreground'>구매 가능한 스티커팩이 없습니다</p>
+      <p className="text-muted-foreground py-6 text-center text-sm">
+        구매 가능한 스티커팩이 없습니다
+      </p>
     )
   }
   return (
-    <div className='flex flex-col gap-3'>
-      {storePacks.map(pack => (
-        <div key={pack.pack_id} className='rounded-xl border p-2'>
-          <div className='flex items-center justify-between'>
-            <span className='text-sm font-medium'>{pack.pack_nm}</span>
+    <div className="flex flex-col gap-3">
+      {storePacks.map((pack) => (
+        <div key={pack.pack_id} className="rounded-xl border p-2">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium">{pack.pack_nm}</span>
             <button
               onClick={() => onBuy(pack.pack_id, pack.pack_nm)}
               disabled={buying === pack.pack_id}
-              className='rounded-lg bg-primary px-2 py-1 text-xs font-medium text-primary-foreground disabled:opacity-50'
+              className="bg-primary text-primary-foreground rounded-lg px-2 py-1 text-xs font-medium disabled:opacity-50"
             >
               {buying === pack.pack_id ? '결제 중…' : `π${pack.price_pi}`}
             </button>
           </div>
           {pack.preview_stickers.length > 0 && (
-            <div className='mt-1.5 flex gap-1'>
-              {pack.preview_stickers.map(s => (
+            <div className="mt-1.5 flex gap-1">
+              {pack.preview_stickers.map((s) => (
                 <img
                   key={s.stkr_id}
                   src={s.stkr_url}
                   alt={s.stkr_nm}
-                  className='h-10 w-10 rounded-md object-contain'
+                  className="h-10 w-10 rounded-md object-contain"
                 />
               ))}
             </div>
@@ -281,7 +324,7 @@ function StoreView({
       {onSubscribeBanner && (
         <button
           onClick={onSubscribeBanner}
-          className='mt-1 w-full rounded-xl border border-primary/30 bg-primary/5 px-3 py-2 text-left text-xs text-primary transition-colors hover:bg-primary/10'
+          className="border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 mt-1 w-full rounded-xl border px-3 py-2 text-left text-xs transition-colors"
         >
           ✨ 구독하면 스티커 팩이 매월 포함됩니다 →
         </button>

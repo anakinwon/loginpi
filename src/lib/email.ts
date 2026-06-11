@@ -23,8 +23,12 @@ function esc(s: string): string {
 function buildReceiptHtml(opts: PaymentReceiptOptions): string {
   const { displayName, paymentId, amount, memo, completedAt } = opts
   const dateStr = completedAt.toLocaleString('ko-KR', {
-    year: 'numeric', month: '2-digit', day: '2-digit',
-    hour: '2-digit', minute: '2-digit', second: '2-digit',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
   })
 
   return `<!DOCTYPE html>
@@ -97,7 +101,9 @@ function buildReceiptHtml(opts: PaymentReceiptOptions): string {
 </html>`
 }
 
-export async function sendPaymentReceipt(opts: PaymentReceiptOptions): Promise<void> {
+export async function sendPaymentReceipt(
+  opts: PaymentReceiptOptions,
+): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY
   if (!apiKey) return
 

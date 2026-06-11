@@ -47,13 +47,17 @@ export default function StdTermsPage() {
   const limit = useDynamicLimit(CHROME_PX)
 
   // limit·검색어 변경 시 첫 페이지로 리셋
-  useEffect(() => { setPage(1) }, [limit, search])
+  useEffect(() => {
+    setPage(1)
+  }, [limit, search])
 
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState<TermRow | null>(null)
   const [termLogNm, setTermLogNm] = useState('')
   const [selectedWords, setSelectedWords] = useState<WordOption[]>([])
-  const [selectedDomain, setSelectedDomain] = useState<DomainOption | null>(null)
+  const [selectedDomain, setSelectedDomain] = useState<DomainOption | null>(
+    null,
+  )
   const [termDesc, setTermDesc] = useState('')
   const [wordSearch, setWordSearch] = useState('')
   const [saving, setSaving] = useState(false)
@@ -61,7 +65,10 @@ export default function StdTermsPage() {
 
   const autoPhyNm = useMemo(() => {
     if (!selectedDomain) return ''
-    const parts = [...selectedWords.map((w) => w.dic_phy_nm), selectedDomain.key_dom_phy_nm]
+    const parts = [
+      ...selectedWords.map((w) => w.dic_phy_nm),
+      selectedDomain.key_dom_phy_nm,
+    ]
     return parts.join('_').toLowerCase()
   }, [selectedWords, selectedDomain])
 
@@ -96,7 +103,7 @@ export default function StdTermsPage() {
     return allWords.filter(
       (w) =>
         !selectedWords.some((s) => s.dic_id === w.dic_id) &&
-        (w.dic_log_nm.includes(q) || w.dic_phy_nm.toLowerCase().includes(q))
+        (w.dic_log_nm.includes(q) || w.dic_phy_nm.toLowerCase().includes(q)),
     )
   }, [allWords, selectedWords, wordSearch])
 
@@ -139,8 +146,12 @@ export default function StdTermsPage() {
       return
     }
 
-    const term_phy_nm = editing && !selectedDomain ? editing.term_phy_nm : autoPhyNm
-    const term_phy_fll_nm = editing && !selectedDomain ? (editing.term_phy_fll_nm ?? '') : autoPhyFllNm
+    const term_phy_nm =
+      editing && !selectedDomain ? editing.term_phy_nm : autoPhyNm
+    const term_phy_fll_nm =
+      editing && !selectedDomain
+        ? (editing.term_phy_fll_nm ?? '')
+        : autoPhyFllNm
 
     if (!term_phy_nm) {
       toast.error(t('validationPhyNm'))
@@ -155,7 +166,9 @@ export default function StdTermsPage() {
         term_phy_fll_nm,
         term_desc: termDesc || null,
       }
-      const url = editing ? `/api/admin/std/terms/${editing.term_id}` : '/api/admin/std/terms'
+      const url = editing
+        ? `/api/admin/std/terms/${editing.term_id}`
+        : '/api/admin/std/terms'
       const method = editing ? 'PATCH' : 'POST'
       const res = await fetch(url, {
         method,
@@ -180,7 +193,9 @@ export default function StdTermsPage() {
     if (!confirm(t('deleteConfirm', { name: nm }))) return
     setDeleting(id)
     try {
-      const res = await fetch(`/api/admin/std/terms/${id}`, { method: 'DELETE' })
+      const res = await fetch(`/api/admin/std/terms/${id}`, {
+        method: 'DELETE',
+      })
       if (!res.ok) {
         const d = (await res.json()) as { error?: string }
         throw new Error(d.error ?? t('deleteFail'))
@@ -198,54 +213,65 @@ export default function StdTermsPage() {
   const displayedTerms = terms.slice((page - 1) * limit, page * limit)
 
   return (
-    <div className='space-y-4'>
-      <div className='flex items-center justify-between'>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className='text-2xl font-bold'>{t('title')}</h1>
-          <p className='text-muted-foreground mt-1 text-sm'>{t('totalCount', { count: terms.length })}</p>
+          <h1 className="text-2xl font-bold">{t('title')}</h1>
+          <p className="text-muted-foreground mt-1 text-sm">
+            {t('totalCount', { count: terms.length })}
+          </p>
         </div>
-        <Button onClick={openNew} size='sm'>{tc('newRegister')}</Button>
+        <Button onClick={openNew} size="sm">
+          {tc('newRegister')}
+        </Button>
       </div>
 
       <Input
         placeholder={t('searchPlaceholder')}
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className='max-w-64'
+        className="max-w-64"
       />
 
       {showForm && (
-        <div className='rounded-lg border bg-muted/30 p-4 space-y-4'>
-          <h2 className='font-semibold text-sm'>{editing ? t('formTitleEdit') : t('formTitleNew')}</h2>
+        <div className="bg-muted/30 space-y-4 rounded-lg border p-4">
+          <h2 className="text-sm font-semibold">
+            {editing ? t('formTitleEdit') : t('formTitleNew')}
+          </h2>
 
-          <label className='block space-y-1'>
-            <span className='text-xs text-muted-foreground'>{t('field.logNm')}</span>
+          <label className="block space-y-1">
+            <span className="text-muted-foreground text-xs">
+              {t('field.logNm')}
+            </span>
             <Input
               value={termLogNm}
               onChange={(e) => setTermLogNm(e.target.value)}
               placeholder={t('placeholder.logNm')}
-              className='max-w-64'
+              className="max-w-64"
             />
           </label>
 
-          <div className='space-y-2'>
-            <p className='text-xs text-muted-foreground font-medium'>
-              {t('field.wordSelect')} <span className='text-muted-foreground/60'>{t('field.wordSelectHint')}</span>
+          <div className="space-y-2">
+            <p className="text-muted-foreground text-xs font-medium">
+              {t('field.wordSelect')}{' '}
+              <span className="text-muted-foreground/60">
+                {t('field.wordSelectHint')}
+              </span>
             </p>
 
             {selectedWords.length > 0 && (
-              <div className='flex flex-wrap gap-1'>
+              <div className="flex flex-wrap gap-1">
                 {selectedWords.map((w, i) => (
                   <span
                     key={w.dic_id}
-                    className='inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary'
+                    className="bg-primary/10 text-primary inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium"
                   >
-                    <span className='text-muted-foreground'>{i + 1}.</span>
+                    <span className="text-muted-foreground">{i + 1}.</span>
                     {w.dic_log_nm}
-                    <span className='font-mono'>({w.dic_phy_nm})</span>
+                    <span className="font-mono">({w.dic_phy_nm})</span>
                     <button
                       onClick={() => removeWord(w.dic_id)}
-                      className='ml-0.5 text-muted-foreground hover:text-destructive'
+                      className="text-muted-foreground hover:text-destructive ml-0.5"
                     >
                       ×
                     </button>
@@ -254,22 +280,24 @@ export default function StdTermsPage() {
               </div>
             )}
 
-            <div className='relative max-w-64'>
+            <div className="relative max-w-64">
               <Input
                 value={wordSearch}
                 onChange={(e) => setWordSearch(e.target.value)}
                 placeholder={t('placeholder.wordSearch')}
               />
               {wordSearch && filteredWords.length > 0 && (
-                <div className='absolute z-10 mt-1 w-full rounded-md border bg-background shadow-lg max-h-48 overflow-y-auto'>
+                <div className="bg-background absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded-md border shadow-lg">
                   {filteredWords.slice(0, 10).map((w) => (
                     <button
                       key={w.dic_id}
                       onClick={() => addWord(w)}
-                      className='flex w-full items-center justify-between px-3 py-2 text-sm hover:bg-muted text-left'
+                      className="hover:bg-muted flex w-full items-center justify-between px-3 py-2 text-left text-sm"
                     >
                       <span>{w.dic_log_nm}</span>
-                      <span className='font-mono text-xs text-muted-foreground'>{w.dic_phy_nm}</span>
+                      <span className="text-muted-foreground font-mono text-xs">
+                        {w.dic_phy_nm}
+                      </span>
                     </button>
                   ))}
                 </div>
@@ -277,17 +305,20 @@ export default function StdTermsPage() {
             </div>
           </div>
 
-          <label className='block space-y-1'>
-            <span className='text-xs text-muted-foreground font-medium'>{t('field.domainSelect')}</span>
+          <label className="block space-y-1">
+            <span className="text-muted-foreground text-xs font-medium">
+              {t('field.domainSelect')}
+            </span>
             <select
               value={selectedDomain?.dom_id ?? ''}
               onChange={(e) => {
-                const found = allDomains.find((d) => d.dom_id === e.target.value) ?? null
+                const found =
+                  allDomains.find((d) => d.dom_id === e.target.value) ?? null
                 setSelectedDomain(found)
               }}
-              className='border-input bg-background h-9 max-w-64 w-full rounded-md border px-3 text-sm'
+              className="border-input bg-background h-9 w-full max-w-64 rounded-md border px-3 text-sm"
             >
-              <option value=''>{t('placeholder.domainSelect')}</option>
+              <option value="">{t('placeholder.domainSelect')}</option>
               {allDomains.map((d) => (
                 <option key={d.dom_id} value={d.dom_id}>
                   {d.dom_nm} ({d.key_dom_phy_nm})
@@ -297,28 +328,38 @@ export default function StdTermsPage() {
           </label>
 
           {autoPhyNm && (
-            <div className='rounded-md bg-muted px-3 py-2 space-y-0.5'>
-              <p className='text-xs text-muted-foreground'>{t('field.autoPhyNm')}</p>
-              <p className='font-mono text-sm'>{autoPhyNm}</p>
-              <p className='font-mono text-xs text-muted-foreground'>{autoPhyFllNm}</p>
+            <div className="bg-muted space-y-0.5 rounded-md px-3 py-2">
+              <p className="text-muted-foreground text-xs">
+                {t('field.autoPhyNm')}
+              </p>
+              <p className="font-mono text-sm">{autoPhyNm}</p>
+              <p className="text-muted-foreground font-mono text-xs">
+                {autoPhyFllNm}
+              </p>
             </div>
           )}
 
-          <label className='block space-y-1'>
-            <span className='text-xs text-muted-foreground'>{t('field.desc')}</span>
+          <label className="block space-y-1">
+            <span className="text-muted-foreground text-xs">
+              {t('field.desc')}
+            </span>
             <Input
               value={termDesc}
               onChange={(e) => setTermDesc(e.target.value)}
               placeholder={t('placeholder.desc')}
-              className='max-w-96'
+              className="max-w-96"
             />
           </label>
 
-          <div className='flex gap-2'>
-            <Button size='sm' onClick={save} disabled={saving}>
+          <div className="flex gap-2">
+            <Button size="sm" onClick={save} disabled={saving}>
               {saving ? tc('saving') : tc('save')}
             </Button>
-            <Button size='sm' variant='outline' onClick={() => setShowForm(false)}>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setShowForm(false)}
+            >
               {tc('cancel')}
             </Button>
           </div>
@@ -326,39 +367,59 @@ export default function StdTermsPage() {
       )}
 
       {loading ? (
-        <p className='text-muted-foreground text-sm'>{tc('loading')}</p>
+        <p className="text-muted-foreground text-sm">{tc('loading')}</p>
       ) : terms.length === 0 ? (
-        <p className='text-muted-foreground text-sm'>{t('noData')}</p>
+        <p className="text-muted-foreground text-sm">{t('noData')}</p>
       ) : (
-        <div className='rounded-lg border overflow-x-auto'>
-          <table className='w-full text-sm'>
-            <thead className='bg-muted/50 border-b'>
+        <div className="overflow-x-auto rounded-lg border">
+          <table className="w-full text-sm">
+            <thead className="bg-muted/50 border-b">
               <tr>
-                <th className='text-left px-4 py-2 font-medium'>{t('col.logNm')}</th>
-                <th className='text-left px-4 py-2 font-medium'>{t('col.phyNmLower')}</th>
-                <th className='text-left px-4 py-2 font-medium'>{t('col.phyNmUpper')}</th>
-                <th className='text-left px-4 py-2 font-medium'>{t('col.desc')}</th>
-                <th className='px-4 py-2'></th>
+                <th className="px-4 py-2 text-left font-medium">
+                  {t('col.logNm')}
+                </th>
+                <th className="px-4 py-2 text-left font-medium">
+                  {t('col.phyNmLower')}
+                </th>
+                <th className="px-4 py-2 text-left font-medium">
+                  {t('col.phyNmUpper')}
+                </th>
+                <th className="px-4 py-2 text-left font-medium">
+                  {t('col.desc')}
+                </th>
+                <th className="px-4 py-2"></th>
               </tr>
             </thead>
-            <tbody className='divide-y'>
+            <tbody className="divide-y">
               {displayedTerms.map((term) => (
-                <tr key={term.term_id} className='hover:bg-muted/30 transition-colors'>
-                  <td className='px-4 py-3 font-medium'>{term.term_log_nm}</td>
-                  <td className='px-4 py-3 font-mono text-xs'>{term.term_phy_nm}</td>
-                  <td className='px-4 py-3 font-mono text-xs text-muted-foreground'>
+                <tr
+                  key={term.term_id}
+                  className="hover:bg-muted/30 transition-colors"
+                >
+                  <td className="px-4 py-3 font-medium">{term.term_log_nm}</td>
+                  <td className="px-4 py-3 font-mono text-xs">
+                    {term.term_phy_nm}
+                  </td>
+                  <td className="text-muted-foreground px-4 py-3 font-mono text-xs">
                     {term.term_phy_fll_nm ?? '—'}
                   </td>
-                  <td className='px-4 py-3 text-muted-foreground text-xs max-w-56 truncate'>
+                  <td className="text-muted-foreground max-w-56 truncate px-4 py-3 text-xs">
                     {term.term_desc ?? '—'}
                   </td>
-                  <td className='px-4 py-3'>
-                    <div className='flex gap-1'>
-                      <Button variant='outline' size='sm' className='h-6 px-2 text-xs' onClick={() => openEdit(term)}>
+                  <td className="px-4 py-3">
+                    <div className="flex gap-1">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-6 px-2 text-xs"
+                        onClick={() => openEdit(term)}
+                      >
                         {tc('edit')}
                       </Button>
                       <Button
-                        variant='outline' size='sm' className='h-6 px-2 text-xs text-destructive hover:text-destructive'
+                        variant="outline"
+                        size="sm"
+                        className="text-destructive hover:text-destructive h-6 px-2 text-xs"
                         disabled={deleting === term.term_id}
                         onClick={() => remove(term.term_id, term.term_log_nm)}
                       >

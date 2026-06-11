@@ -44,7 +44,9 @@ export function BatchRunner() {
   const [backfillFrom, setBackfillFrom] = useState(yesterdayStr())
   const [backfillTo, setBackfillTo] = useState(todayStr())
   const [backfillRunning, setBackfillRunning] = useState(false)
-  const [backfillResult, setBackfillResult] = useState<BackfillResult | null>(null)
+  const [backfillResult, setBackfillResult] = useState<BackfillResult | null>(
+    null,
+  )
 
   async function runAggregate(date: string) {
     setRunning(true)
@@ -78,12 +80,18 @@ export function BatchRunner() {
       const res = await piFetch('/api/admin/stats/aggregate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ backfill: true, from: backfillFrom, to: backfillTo }),
+        body: JSON.stringify({
+          backfill: true,
+          from: backfillFrom,
+          to: backfillTo,
+        }),
       })
       const data = (await res.json()) as BackfillResult & { error?: string }
       if (res.ok) {
         setBackfillResult(data)
-        toast.success(t('backfillSuccess', { total: data.total, failed: data.failed }))
+        toast.success(
+          t('backfillSuccess', { total: data.total, failed: data.failed }),
+        )
       } else {
         toast.error(t('error', { msg: data.error ?? res.status }))
       }
@@ -95,43 +103,43 @@ export function BatchRunner() {
   }
 
   return (
-    <div className='space-y-6'>
+    <div className="space-y-6">
       {/* 빠른 실행 */}
-      <div className='rounded-lg border p-5 space-y-4'>
-        <div className='flex flex-wrap gap-2'>
+      <div className="space-y-4 rounded-lg border p-5">
+        <div className="flex flex-wrap gap-2">
           <Button
             onClick={() => runAggregate(todayStr())}
             disabled={running}
-            variant='default'
+            variant="default"
           >
             {running ? t('running') : t('runToday')}
           </Button>
           <Button
             onClick={() => runAggregate(yesterdayStr())}
             disabled={running}
-            variant='outline'
+            variant="outline"
           >
             {t('runYesterday')}
           </Button>
         </div>
 
         {/* 특정 날짜 */}
-        <div className='flex items-end gap-3'>
-          <div className='space-y-1.5'>
-            <Label htmlFor='agg-date'>{t('runDate')}</Label>
+        <div className="flex items-end gap-3">
+          <div className="space-y-1.5">
+            <Label htmlFor="agg-date">{t('runDate')}</Label>
             <Input
-              id='agg-date'
-              type='date'
+              id="agg-date"
+              type="date"
               value={dateInput}
-              onChange={e => setDateInput(e.target.value)}
+              onChange={(e) => setDateInput(e.target.value)}
               disabled={running}
-              className='w-44'
+              className="w-44"
             />
           </div>
           <Button
             onClick={() => runAggregate(dateInput)}
             disabled={running || !dateInput}
-            variant='outline'
+            variant="outline"
           >
             {t('runBtn')}
           </Button>
@@ -139,7 +147,9 @@ export function BatchRunner() {
 
         {/* 단일 실행 결과 */}
         {lastResult && (
-          <div className={`rounded-md px-4 py-2 text-sm ${lastResult.ok ? 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400' : 'bg-destructive/10 text-destructive'}`}>
+          <div
+            className={`rounded-md px-4 py-2 text-sm ${lastResult.ok ? 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400' : 'bg-destructive/10 text-destructive'}`}
+          >
             {lastResult.ok
               ? t('success', { date: lastResult.date })
               : t('error', { msg: lastResult.msg ?? '' })}
@@ -148,39 +158,41 @@ export function BatchRunner() {
       </div>
 
       {/* 기간 백필 */}
-      <div className='rounded-lg border p-5 space-y-4'>
+      <div className="space-y-4 rounded-lg border p-5">
         <div>
-          <p className='text-sm font-semibold'>{t('backfillTitle')}</p>
-          <p className='text-muted-foreground text-xs mt-0.5'>{t('backfillDesc')}</p>
+          <p className="text-sm font-semibold">{t('backfillTitle')}</p>
+          <p className="text-muted-foreground mt-0.5 text-xs">
+            {t('backfillDesc')}
+          </p>
         </div>
 
-        <div className='flex flex-wrap items-end gap-3'>
-          <div className='space-y-1.5'>
-            <Label htmlFor='bf-from'>{t('from')}</Label>
+        <div className="flex flex-wrap items-end gap-3">
+          <div className="space-y-1.5">
+            <Label htmlFor="bf-from">{t('from')}</Label>
             <Input
-              id='bf-from'
-              type='date'
+              id="bf-from"
+              type="date"
               value={backfillFrom}
-              onChange={e => setBackfillFrom(e.target.value)}
+              onChange={(e) => setBackfillFrom(e.target.value)}
               disabled={backfillRunning}
-              className='w-44'
+              className="w-44"
             />
           </div>
-          <div className='space-y-1.5'>
-            <Label htmlFor='bf-to'>{t('to')}</Label>
+          <div className="space-y-1.5">
+            <Label htmlFor="bf-to">{t('to')}</Label>
             <Input
-              id='bf-to'
-              type='date'
+              id="bf-to"
+              type="date"
               value={backfillTo}
-              onChange={e => setBackfillTo(e.target.value)}
+              onChange={(e) => setBackfillTo(e.target.value)}
               disabled={backfillRunning}
-              className='w-44'
+              className="w-44"
             />
           </div>
           <Button
             onClick={runBackfill}
             disabled={backfillRunning || !backfillFrom || !backfillTo}
-            variant='outline'
+            variant="outline"
           >
             {backfillRunning ? t('backfillRunning') : t('backfillRun')}
           </Button>
@@ -188,10 +200,15 @@ export function BatchRunner() {
 
         {/* 백필 결과 */}
         {backfillResult && (
-          <div className='rounded-md bg-muted px-4 py-3 text-sm space-y-1'>
-            <p>{t('backfillSuccess', { total: backfillResult.total, failed: backfillResult.failed })}</p>
+          <div className="bg-muted space-y-1 rounded-md px-4 py-3 text-sm">
+            <p>
+              {t('backfillSuccess', {
+                total: backfillResult.total,
+                failed: backfillResult.failed,
+              })}
+            </p>
             {backfillResult.failedDates.length > 0 && (
-              <p className='text-destructive text-xs'>
+              <p className="text-destructive text-xs">
                 실패 날짜: {backfillResult.failedDates.join(', ')}
               </p>
             )}

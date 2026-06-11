@@ -14,7 +14,10 @@ export default function middleware(req: NextRequest) {
 
   // DB에서 활성화됐지만 routing.ts에 아직 등록되지 않은 locale
   // → 404 대신 영어 경로로 폴백 리다이렉트 ("번역 미완료 시 영어 표시" 요건 구현)
-  if (LOCALE_SEGMENT_RE.test(firstSegment) && !supportedLocales.has(firstSegment)) {
+  if (
+    LOCALE_SEGMENT_RE.test(firstSegment) &&
+    !supportedLocales.has(firstSegment)
+  ) {
     const rest = pathname.slice(firstSegment.length + 1) // 남은 경로 ('/board' 등)
     return NextResponse.redirect(new URL('/en' + (rest || '/'), req.url))
   }
@@ -29,7 +32,9 @@ export default function middleware(req: NextRequest) {
     const cleanUrl = req.nextUrl.clone()
     cleanUrl.searchParams.delete('_pit')
     // intl 미들웨어에 _pit 없는 URL 전달 (locale 처리 정상 수행)
-    const intlRes = intlMiddleware(new NextRequest(cleanUrl, { headers: req.headers, method: req.method }))
+    const intlRes = intlMiddleware(
+      new NextRequest(cleanUrl, { headers: req.headers, method: req.method }),
+    )
     // intl이 리다이렉트 결정(예: locale 미등록 → /en) 시 그대로 따름
     if (intlRes.headers.has('location')) return intlRes
     // intl이 설정한 요청 헤더(locale 정보 등) 추출 후 x-pit-ticket 병합

@@ -22,7 +22,12 @@ export async function GET(request: NextRequest) {
     const googleSub = googleSession.user.sub ?? googleSession.user.id
     const googleEmail = googleSession.user.email
 
-    let row: { pi_uid: string | null; pi_username: string | null; google_id: string | null; google_email: string | null } | null = null
+    let row: {
+      pi_uid: string | null
+      pi_username: string | null
+      google_id: string | null
+      google_email: string | null
+    } | null = null
 
     // 1-A: google_id로 조회
     if (googleSub) {

@@ -12,10 +12,10 @@ export function AccountIntegrationSection() {
 
   if (piLoading) {
     return (
-      <section className='space-y-3'>
-        <h2 className='text-lg font-semibold'>계정 통합</h2>
-        <div className='flex items-center gap-2 text-sm text-muted-foreground'>
-          <div className='h-3 w-3 animate-spin rounded-full border border-muted-foreground border-t-transparent' />
+      <section className="space-y-3">
+        <h2 className="text-lg font-semibold">계정 통합</h2>
+        <div className="text-muted-foreground flex items-center gap-2 text-sm">
+          <div className="border-muted-foreground h-3 w-3 animate-spin rounded-full border border-t-transparent" />
           로딩 중…
         </div>
       </section>
@@ -23,23 +23,29 @@ export function AccountIntegrationSection() {
   }
 
   return (
-    <section className='space-y-3'>
-      <h2 className='text-lg font-semibold'>계정 통합</h2>
-      <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
+    <section className="space-y-3">
+      <h2 className="text-lg font-semibold">계정 통합</h2>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {showPiSection && (
           <div>
-            <p className='mb-2 text-xs font-medium text-muted-foreground'>Pi Network</p>
+            <p className="text-muted-foreground mb-2 text-xs font-medium">
+              Pi Network
+            </p>
             <PiUserCard />
           </div>
         )}
         {!isInPiBrowser && (
           <div>
-            <p className='mb-2 text-xs font-medium text-muted-foreground'>Google</p>
+            <p className="text-muted-foreground mb-2 text-xs font-medium">
+              Google
+            </p>
             <GoogleUserCard />
           </div>
         )}
         <div>
-          <p className='mb-2 text-xs font-medium text-muted-foreground'>계정 연동</p>
+          <p className="text-muted-foreground mb-2 text-xs font-medium">
+            계정 연동
+          </p>
           <AccountLinkCard />
         </div>
       </div>

@@ -26,11 +26,11 @@ export function BrowserName() {
   if (!isLoading && isInPiBrowser) {
     return (
       <Image
-        src='/pi-logo.png'
-        alt='Pi Network Login Test'
+        src="/pi-logo.png"
+        alt="Pi Network Login Test"
         width={40}
         height={40}
-        className='rounded-full'
+        className="rounded-full"
         priority
       />
     )

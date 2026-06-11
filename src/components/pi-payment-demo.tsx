@@ -83,7 +83,9 @@ export function PiPaymentDemo() {
             setStatus('waiting')
           } catch (err) {
             setStatus('error')
-            setErrorMsg(err instanceof Error ? err.message : '승인 중 오류 발생')
+            setErrorMsg(
+              err instanceof Error ? err.message : '승인 중 오류 발생',
+            )
           }
         },
 
@@ -104,7 +106,9 @@ export function PiPaymentDemo() {
             setStatus('done')
           } catch (err) {
             setStatus('error')
-            setErrorMsg(err instanceof Error ? err.message : '완료 처리 중 오류 발생')
+            setErrorMsg(
+              err instanceof Error ? err.message : '완료 처리 중 오류 발생',
+            )
           }
         },
 
@@ -117,15 +121,15 @@ export function PiPaymentDemo() {
           setStatus('error')
           setErrorMsg(error.message)
         },
-      }
+      },
     )
   }
 
   // Pi Browser가 아닌 환경 안내
   if (!isInPiBrowser) {
     return (
-      <div className='bg-muted rounded-xl p-6'>
-        <p className='text-muted-foreground text-sm'>
+      <div className="bg-muted rounded-xl p-6">
+        <p className="text-muted-foreground text-sm">
           Pi 결제는 <strong>Pi Browser</strong>에서만 사용할 수 있습니다.
         </p>
       </div>
@@ -134,34 +138,39 @@ export function PiPaymentDemo() {
 
   return (
     <Card>
-      <CardHeader className='pb-3'>
-        <CardTitle className='text-sm'>Pi Coin 결제 데모</CardTitle>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-sm">Pi Coin 결제 데모</CardTitle>
       </CardHeader>
-      <CardContent className='space-y-4'>
-
+      <CardContent className="space-y-4">
         {/* 금액 입력 */}
-        <div className='space-y-1.5'>
-          <Label htmlFor='pi-amount'>결제 금액</Label>
-          <div className='flex items-center gap-2'>
+        <div className="space-y-1.5">
+          <Label htmlFor="pi-amount">결제 금액</Label>
+          <div className="flex items-center gap-2">
             <Input
-              id='pi-amount'
-              type='number'
-              min='0.001'
-              step='0.001'
+              id="pi-amount"
+              type="number"
+              min="0.001"
+              step="0.001"
               value={amount}
               onChange={(e) => {
                 setAmount(e.target.value)
-                if (status === 'error' || status === 'done' || status === 'cancelled') {
+                if (
+                  status === 'error' ||
+                  status === 'done' ||
+                  status === 'cancelled'
+                ) {
                   setStatus('idle')
                   setErrorMsg(null)
                   setCancelMsg(null)
                 }
               }}
               disabled={isProcessing}
-              className='w-36'
-              placeholder='1'
+              className="w-36"
+              placeholder="1"
             />
-            <span className='text-muted-foreground font-serif text-base italic'>π Pi</span>
+            <span className="text-muted-foreground font-serif text-base italic">
+              π Pi
+            </span>
           </div>
         </div>
 
@@ -169,49 +178,54 @@ export function PiPaymentDemo() {
         <Button
           onClick={handlePayment}
           disabled={isProcessing}
-          className='gap-2'
+          className="gap-2"
         >
-          <span className='font-serif text-base italic leading-none' aria-hidden='true'>π</span>
+          <span
+            className="font-serif text-base leading-none italic"
+            aria-hidden="true"
+          >
+            π
+          </span>
           {STATUS_LABEL[status]}
         </Button>
 
         {/* 진행 중 안내 */}
         {status === 'waiting' && (
-          <p className='text-muted-foreground text-xs'>
+          <p className="text-muted-foreground text-xs">
             Pi Browser 지갑 화면에서 결제를 확인해 주세요.
           </p>
         )}
 
         {/* 취소 메시지 */}
         {cancelMsg && (
-          <p className='text-muted-foreground text-xs'>{cancelMsg}</p>
+          <p className="text-muted-foreground text-xs">{cancelMsg}</p>
         )}
 
         {/* 오류 메시지 */}
-        {errorMsg && (
-          <p className='text-destructive text-xs'>{errorMsg}</p>
-        )}
+        {errorMsg && <p className="text-destructive text-xs">{errorMsg}</p>}
 
         {/* 결제 성공 결과 */}
         {status === 'done' && result && (
-          <div className='rounded-lg bg-green-50 p-3 dark:bg-green-900/20 space-y-1.5'>
-            <p className='text-sm font-semibold text-green-700 dark:text-green-400'>
+          <div className="space-y-1.5 rounded-lg bg-green-50 p-3 dark:bg-green-900/20">
+            <p className="text-sm font-semibold text-green-700 dark:text-green-400">
               결제 완료! {parseFloat(amount)} π
             </p>
-            <div className='space-y-0.5'>
-              <p className='text-muted-foreground text-xs'>Payment ID</p>
-              <p className='break-all font-mono text-xs text-green-700 dark:text-green-400'>
+            <div className="space-y-0.5">
+              <p className="text-muted-foreground text-xs">Payment ID</p>
+              <p className="font-mono text-xs break-all text-green-700 dark:text-green-400">
                 {result.paymentId}
               </p>
             </div>
-            <div className='space-y-0.5'>
-              <p className='text-muted-foreground text-xs'>Transaction ID (TxID)</p>
-              <p className='break-all font-mono text-xs text-green-700 dark:text-green-400'>
+            <div className="space-y-0.5">
+              <p className="text-muted-foreground text-xs">
+                Transaction ID (TxID)
+              </p>
+              <p className="font-mono text-xs break-all text-green-700 dark:text-green-400">
                 {result.txid}
               </p>
             </div>
             {user && (
-              <p className='text-muted-foreground text-xs'>
+              <p className="text-muted-foreground text-xs">
                 결제자: @{user.username ?? user.displayName}
               </p>
             )}

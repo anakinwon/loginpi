@@ -14,7 +14,9 @@ export async function GET(req: NextRequest) {
 
   let query = getSupabaseAdmin()
     .from('std_dom')
-    .select('dom_id, dom_nm, key_dom_nm, key_dom_phy_nm, dom_type_cd, data_type_cd, data_len, data_scale, dom_desc, synced_at, reg_dtm, mod_dtm, regr_id')
+    .select(
+      'dom_id, dom_nm, key_dom_nm, key_dom_phy_nm, dom_type_cd, data_type_cd, data_len, data_scale, dom_desc, synced_at, reg_dtm, mod_dtm, regr_id',
+    )
     .eq('del_yn', 'N')
     .order('dom_nm', { ascending: true })
 
@@ -22,7 +24,9 @@ export async function GET(req: NextRequest) {
 
   if (search) {
     const s = search.replace(/[%_\\]/g, '\\$&')
-    query = query.or(`dom_nm.ilike.%${s}%,key_dom_nm.ilike.%${s}%,key_dom_phy_nm.ilike.%${s}%`)
+    query = query.or(
+      `dom_nm.ilike.%${s}%,key_dom_nm.ilike.%${s}%,key_dom_phy_nm.ilike.%${s}%`,
+    )
   }
 
   const { data, error } = await query
@@ -48,8 +52,15 @@ export async function POST(req: NextRequest) {
     dom_desc?: string
   }
 
-  if (!body.dom_nm?.trim() || !body.key_dom_nm?.trim() || !body.key_dom_phy_nm?.trim()) {
-    return NextResponse.json({ error: '도메인명, 키도메인명, 키도메인물리명은 필수입니다' }, { status: 400 })
+  if (
+    !body.dom_nm?.trim() ||
+    !body.key_dom_nm?.trim() ||
+    !body.key_dom_phy_nm?.trim()
+  ) {
+    return NextResponse.json(
+      { error: '도메인명, 키도메인명, 키도메인물리명은 필수입니다' },
+      { status: 400 },
+    )
   }
 
   const { data, error } = await getSupabaseAdmin()

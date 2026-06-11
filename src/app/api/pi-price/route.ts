@@ -7,7 +7,7 @@ export async function GET() {
   try {
     const res = await fetch(
       'https://api.coingecko.com/api/v3/simple/price?ids=pi-network&vs_currencies=usd',
-      { next: { revalidate: 300 } }
+      { next: { revalidate: 300 } },
     )
     if (!res.ok) throw new Error(`upstream ${res.status}`)
     const data = (await res.json()) as Record<string, { usd?: number }>

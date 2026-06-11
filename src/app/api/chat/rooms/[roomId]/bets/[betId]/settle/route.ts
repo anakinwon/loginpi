@@ -11,15 +11,21 @@ type Params = { params: Promise<{ roomId: string; betId: string }> }
 export async function POST(request: NextRequest, { params }: Params) {
   const { roomId, betId } = await params
   const user = await getSessionUser()
-  if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user)
+    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
   let body: unknown
-  try { body = await request.json() } catch {
+  try {
+    body = await request.json()
+  } catch {
     return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
   }
   const winOptnNo = Number((body as { win_optn_no?: number }).win_optn_no)
   if (!Number.isInteger(winOptnNo) || winOptnNo < 1) {
-    return NextResponse.json({ error: '유효하지 않은 승리 옵션 번호' }, { status: 400 })
+    return NextResponse.json(
+      { error: '유효하지 않은 승리 옵션 번호' },
+      { status: 400 },
+    )
   }
 
   const db = getSupabaseAdmin()
@@ -31,14 +37,29 @@ export async function POST(request: NextRequest, { params }: Params) {
     .eq('del_yn', 'N')
     .maybeSingle()
 
-  if (!bet) return NextResponse.json({ error: '베팅을 찾을 수 없습니다' }, { status: 404 })
+  if (!bet)
+    return NextResponse.json(
+      { error: '베팅을 찾을 수 없습니다' },
+      { status: 404 },
+    )
 
-  const betRow = bet as { bet_id: string; crtr_usr_id: string; bet_titl: string; bet_st_cd: string }
+  const betRow = bet as {
+    bet_id: string
+    crtr_usr_id: string
+    bet_titl: string
+    bet_st_cd: string
+  }
   if (betRow.crtr_usr_id !== user.id) {
-    return NextResponse.json({ error: '베팅 생성자만 정산할 수 있습니다' }, { status: 403 })
+    return NextResponse.json(
+      { error: '베팅 생성자만 정산할 수 있습니다' },
+      { status: 403 },
+    )
   }
   if (betRow.bet_st_cd === 'SETTLED' || betRow.bet_st_cd === 'CANCELLED') {
-    return NextResponse.json({ error: '이미 정산된 베팅입니다' }, { status: 409 })
+    return NextResponse.json(
+      { error: '이미 정산된 베팅입니다' },
+      { status: 409 },
+    )
   }
 
   const [{ data: optn }, { data: entries }] = await Promise.all([
@@ -56,13 +77,25 @@ export async function POST(request: NextRequest, { params }: Params) {
       .eq('del_yn', 'N'),
   ])
 
-  if (!optn) return NextResponse.json({ error: '존재하지 않는 선택지입니다' }, { status: 404 })
+  if (!optn)
+    return NextResponse.json(
+      { error: '존재하지 않는 선택지입니다' },
+      { status: 404 },
+    )
 
-  const allEntries = (entries ?? []) as { bet_entry_id: string; usr_id: string; optn_no: number; bet_amt_pi: number }[]
-  const winners = allEntries.filter(e => e.optn_no === winOptnNo)
+  const allEntries = (entries ?? []) as {
+    bet_entry_id: string
+    usr_id: string
+    optn_no: number
+    bet_amt_pi: number
+  }[]
+  const winners = allEntries.filter((e) => e.optn_no === winOptnNo)
   const totalPool = allEntries.reduce((sum, e) => sum + Number(e.bet_amt_pi), 0)
   // 승자 균등 분배 — 소수 4자리 절사 (DECIMAL(10,4) 정밀도)
-  const payoutEach = winners.length > 0 ? Math.floor((totalPool / winners.length) * 10000) / 10000 : 0
+  const payoutEach =
+    winners.length > 0
+      ? Math.floor((totalPool / winners.length) * 10000) / 10000
+      : 0
 
   const slug = user.display_name.slice(0, 20)
   const now = new Date().toISOString()
@@ -82,13 +115,21 @@ export async function POST(request: NextRequest, { params }: Params) {
     .select('bet_id')
 
   if (!settled || settled.length === 0) {
-    return NextResponse.json({ error: '정산 처리에 실패했습니다 (동시 요청 충돌)' }, { status: 409 })
+    return NextResponse.json(
+      { error: '정산 처리에 실패했습니다 (동시 요청 충돌)' },
+      { status: 409 },
+    )
   }
 
   if (winners.length > 0) {
     await db
       .from('msg_bet_entry')
-      .update({ win_yn: 'Y', payout_pi: payoutEach, modr_id: slug, mod_dtm: now })
+      .update({
+        win_yn: 'Y',
+        payout_pi: payoutEach,
+        modr_id: slug,
+        mod_dtm: now,
+      })
       .eq('bet_id', betId)
       .eq('optn_no', winOptnNo)
       .eq('del_yn', 'N')
@@ -96,9 +137,10 @@ export async function POST(request: NextRequest, { params }: Params) {
 
   // 정산 결과 BET_NOTI 발송
   const optnRow = optn as { optn_nm: string }
-  const resultText = winners.length > 0
-    ? `승자 ${winners.length}명 · 1인당 π${payoutEach} 분배`
-    : '적중자 없음'
+  const resultText =
+    winners.length > 0
+      ? `승자 ${winners.length}명 · 1인당 π${payoutEach} 분배`
+      : '적중자 없음'
   const { data: notiMsg } = await db
     .from('msg_msg')
     .insert({

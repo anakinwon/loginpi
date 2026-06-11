@@ -35,13 +35,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             // 2차: google_email fallback
             // 조건: email_verified=true + google_id가 아직 NULL인 행에만 허용
             // google_id가 이미 다른 값으로 세팅된 행은 건드리지 않음 (계정 탈취 방지)
-            const emailVerified = (profile as { email_verified?: boolean }).email_verified
+            const emailVerified = (profile as { email_verified?: boolean })
+              .email_verified
             if (profile.email && emailVerified === true) {
               const { data: byEmail } = await db
                 .from('sys_user')
                 .select('id, google_id')
                 .eq('google_email', profile.email as string)
-                .is('google_id', null)  // google_id가 NULL인 행만 매칭
+                .is('google_id', null) // google_id가 NULL인 행만 매칭
                 .maybeSingle()
 
               if (byEmail) {
@@ -50,9 +51,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 // google_id가 NULL이었던 행에 실제 sub 세팅 (1회성 데이터 복구)
                 await db
                   .from('sys_user')
-                  .update({ google_id: profile.sub as string, last_login_dtm: new Date().toISOString() })
+                  .update({
+                    google_id: profile.sub as string,
+                    last_login_dtm: new Date().toISOString(),
+                  })
                   .eq('id', byEmail.id)
-                  .is('google_id', null)  // 경쟁 조건 방지: NULL 확인 후 업데이트
+                  .is('google_id', null) // 경쟁 조건 방지: NULL 확인 후 업데이트
               } else {
                 token.userId = null
               }
@@ -72,7 +76,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         user: {
           ...session.user,
           id: (token.userId as string) ?? token.sub ?? '',
-          sub: token.sub,   // Google OAuth raw sub — link-complete에서 google_id로 사용
+          sub: token.sub, // Google OAuth raw sub — link-complete에서 google_id로 사용
         },
       }
     },

@@ -10,7 +10,9 @@ export async function GET() {
 
   const { data, error } = await getSupabaseAdmin()
     .from('sys_user')
-    .select('id, pi_uid, pi_username, google_id, google_email, google_name, display_name, role, reg_dtm')
+    .select(
+      'id, pi_uid, pi_username, google_id, google_email, google_name, display_name, role, reg_dtm',
+    )
     .order('reg_dtm', { ascending: false })
 
   if (error) {

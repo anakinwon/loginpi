@@ -88,7 +88,7 @@ export function ChatMarketplace() {
   async function toggleFollow(themeCd: string) {
     const isFollowing = followed.has(themeCd)
     // 낙관적 업데이트 — 실패 시 롤백
-    setFollowed(prev => {
+    setFollowed((prev) => {
       const next = new Set(prev)
       if (isFollowing) next.delete(themeCd)
       else next.add(themeCd)
@@ -98,7 +98,7 @@ export function ChatMarketplace() {
       method: isFollowing ? 'DELETE' : 'POST',
     })
     if (!res.ok) {
-      setFollowed(prev => {
+      setFollowed((prev) => {
         const next = new Set(prev)
         if (isFollowing) next.add(themeCd)
         else next.delete(themeCd)
@@ -112,28 +112,32 @@ export function ChatMarketplace() {
 
   return (
     <section>
-      <div className='mb-3 flex items-center justify-between'>
-        <h2 className='text-sm font-semibold uppercase tracking-wider text-muted-foreground'>
+      <div className="mb-3 flex items-center justify-between">
+        <h2 className="text-muted-foreground text-sm font-semibold tracking-wider uppercase">
           마켓플레이스 — 인기 카페
         </h2>
       </div>
 
       {/* 테마 필터 칩 */}
-      <div className='mb-4 flex gap-1.5 overflow-x-auto pb-1'>
+      <div className="mb-4 flex gap-1.5 overflow-x-auto pb-1">
         <button
           onClick={() => selectTheme(null)}
           className={`shrink-0 rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
-            activeTheme === null ? 'border-primary bg-primary text-primary-foreground' : 'hover:bg-muted'
+            activeTheme === null
+              ? 'border-primary bg-primary text-primary-foreground'
+              : 'hover:bg-muted'
           }`}
         >
           전체
         </button>
-        {themes.map(t => (
+        {themes.map((t) => (
           <button
             key={t.theme_cd}
             onClick={() => selectTheme(t.theme_cd)}
             className={`shrink-0 rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
-              activeTheme === t.theme_cd ? 'border-primary bg-primary text-primary-foreground' : 'hover:bg-muted'
+              activeTheme === t.theme_cd
+                ? 'border-primary bg-primary text-primary-foreground'
+                : 'hover:bg-muted'
             }`}
           >
             {t.theme_emoji} {t.theme_nm}
@@ -151,57 +155,73 @@ export function ChatMarketplace() {
               : 'text-muted-foreground hover:bg-muted'
           }`}
         >
-          {followed.has(activeTheme) ? '✓ 팔로우 중 — 이벤트방 알림 ON' : '+ 이 테마 팔로우 (이벤트방 알림)'}
+          {followed.has(activeTheme)
+            ? '✓ 팔로우 중 — 이벤트방 알림 ON'
+            : '+ 이 테마 팔로우 (이벤트방 알림)'}
         </button>
       )}
 
       {loading ? (
-        <div className='space-y-2'>
-          {[0, 1, 2].map(i => (
-            <div key={i} className='h-16 animate-pulse rounded-xl border bg-muted/40' />
+        <div className="space-y-2">
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className="bg-muted/40 h-16 animate-pulse rounded-xl border"
+            />
           ))}
         </div>
       ) : rooms.length === 0 ? (
-        <div className='rounded-xl border border-dashed py-8 text-center'>
-          <p className='text-sm text-muted-foreground'>해당 테마의 공개 카페가 아직 없습니다</p>
+        <div className="rounded-xl border border-dashed py-8 text-center">
+          <p className="text-muted-foreground text-sm">
+            해당 테마의 공개 카페가 아직 없습니다
+          </p>
         </div>
       ) : (
         <>
-          <div className='space-y-2'>
+          <div className="space-y-2">
             {visibleRooms.map(({ room, rank }) => (
               <Link
                 key={room.room_id}
                 href={`/chat/${room.room_id}`}
-                className='flex items-center gap-3 rounded-xl border p-3 transition-colors hover:bg-muted/50'
+                className="hover:bg-muted/50 flex items-center gap-3 rounded-xl border p-3 transition-colors"
               >
-                <span className='flex h-10 w-10 shrink-0 items-center justify-center text-3xl select-none'>
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center text-3xl select-none">
                   {room.theme_emoji}
                 </span>
-                <div className='min-w-0 flex-1'>
-                  <p className='truncate text-sm font-medium'>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium">
                     {rank < 3 ? (
-                      <span className='mr-1'>{RANK_BADGES[rank]}</span>
+                      <span className="mr-1">{RANK_BADGES[rank]}</span>
                     ) : (
-                      <span className='mr-1 text-muted-foreground'>{rank + 1}.</span>
+                      <span className="text-muted-foreground mr-1">
+                        {rank + 1}.
+                      </span>
                     )}
                     {room.room_nm}
                     {room.room_tp_cd === 'E' && (
-                      <span className='ml-1.5 rounded-full bg-violet-100 px-1.5 py-0.5 text-[10px] font-medium text-violet-700 dark:bg-violet-900/30 dark:text-violet-400'>
+                      <span className="ml-1.5 rounded-full bg-violet-100 px-1.5 py-0.5 text-[10px] font-medium text-violet-700 dark:bg-violet-900/30 dark:text-violet-400">
                         이벤트 π{room.entry_fee_pi}
                       </span>
                     )}
                   </p>
-                  <p className='text-xs text-muted-foreground'>
-                    {room.theme_nm} · 멤버 {room.mbr_cnt}명 · 주간 메시지 {room.msg_cnt_7d}건
-                    {Number(room.tip_amt_7d) > 0 && <span> · 주간 Tip π{room.tip_amt_7d}</span>}
+                  <p className="text-muted-foreground text-xs">
+                    {room.theme_nm} · 멤버 {room.mbr_cnt}명 · 주간 메시지{' '}
+                    {room.msg_cnt_7d}건
+                    {Number(room.tip_amt_7d) > 0 && (
+                      <span> · 주간 Tip π{room.tip_amt_7d}</span>
+                    )}
                   </p>
                 </div>
               </Link>
             ))}
           </div>
           {totalPages > 1 && (
-            <div className='mt-3'>
-              <AdminPagination page={safePage} totalPages={totalPages} onPage={setPage} />
+            <div className="mt-3">
+              <AdminPagination
+                page={safePage}
+                totalPages={totalPages}
+                onPage={setPage}
+              />
             </div>
           )}
         </>

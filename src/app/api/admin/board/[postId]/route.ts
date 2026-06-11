@@ -8,7 +8,8 @@ type Params = { params: Promise<{ postId: string }> }
 export async function PATCH(_request: NextRequest, { params }: Params) {
   const { postId } = await params
   const user = await getSessionUser()
-  if (!isAdmin(user)) return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+  if (!isAdmin(user))
+    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
 
   const db = getSupabaseAdmin()
 
@@ -19,7 +20,11 @@ export async function PATCH(_request: NextRequest, { params }: Params) {
     .eq('del_yn', 'N')
     .single()
 
-  if (!post) return NextResponse.json({ error: '게시글을 찾을 수 없습니다' }, { status: 404 })
+  if (!post)
+    return NextResponse.json(
+      { error: '게시글을 찾을 수 없습니다' },
+      { status: 404 },
+    )
 
   const newPinYn = post.pin_yn === 'Y' ? 'N' : 'Y'
 
@@ -40,7 +45,8 @@ export async function PATCH(_request: NextRequest, { params }: Params) {
 export async function DELETE(_request: NextRequest, { params }: Params) {
   const { postId } = await params
   const user = await getSessionUser()
-  if (!isAdmin(user)) return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+  if (!isAdmin(user))
+    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
 
   const { error } = await getSupabaseAdmin()
     .from('brd_post')

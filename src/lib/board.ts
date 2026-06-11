@@ -29,7 +29,10 @@ export interface PostRow {
 }
 
 const ROLE_LEVEL: Record<string, number> = {
-  ADMIN: 4, MASTER: 3, MANAGER: 2, USER: 1,
+  ADMIN: 4,
+  MASTER: 3,
+  MANAGER: 2,
+  USER: 1,
 }
 
 export function hasMinRole(userRole: string, minRole: string): boolean {

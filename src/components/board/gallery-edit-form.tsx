@@ -8,7 +8,11 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { GalleryBodyEditor } from './gallery-body-editor'
-import { parseBlocks, serializeBlocks, type EditorBlock } from './gallery-block-utils'
+import {
+  parseBlocks,
+  serializeBlocks,
+  type EditorBlock,
+} from './gallery-block-utils'
 
 interface Props {
   category: string
@@ -17,15 +21,25 @@ interface Props {
   initialContent: string
 }
 
-export function GalleryEditForm({ category, postId, initialTitle, initialContent }: Props) {
+export function GalleryEditForm({
+  category,
+  postId,
+  initialTitle,
+  initialContent,
+}: Props) {
   const router = useRouter()
   const [title, setTitle] = useState(initialTitle)
-  const [blocks, setBlocks] = useState<EditorBlock[]>(() => parseBlocks(initialContent))
+  const [blocks, setBlocks] = useState<EditorBlock[]>(() =>
+    parseBlocks(initialContent),
+  )
   const [submitting, setSubmitting] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!title.trim()) { toast.error('제목을 입력해주세요'); return }
+    if (!title.trim()) {
+      toast.error('제목을 입력해주세요')
+      return
+    }
     setSubmitting(true)
 
     const postCont = serializeBlocks(blocks)
@@ -49,20 +63,20 @@ export function GalleryEditForm({ category, postId, initialTitle, initialContent
   }
 
   return (
-    <form onSubmit={handleSubmit} className='space-y-5'>
-      <div className='space-y-1.5'>
-        <Label htmlFor='edit-title'>제목</Label>
+    <form onSubmit={handleSubmit} className="space-y-5">
+      <div className="space-y-1.5">
+        <Label htmlFor="edit-title">제목</Label>
         <Input
-          id='edit-title'
+          id="edit-title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder='제목을 입력하세요'
+          placeholder="제목을 입력하세요"
           required
           disabled={submitting}
         />
       </div>
 
-      <div className='space-y-1.5'>
+      <div className="space-y-1.5">
         <Label>본문</Label>
         <GalleryBodyEditor
           blocks={blocks}
@@ -73,11 +87,16 @@ export function GalleryEditForm({ category, postId, initialTitle, initialContent
         />
       </div>
 
-      <div className='flex gap-2'>
-        <Button type='submit' disabled={submitting}>
+      <div className="flex gap-2">
+        <Button type="submit" disabled={submitting}>
           {submitting ? '저장 중...' : '저장하기'}
         </Button>
-        <Button type='button' variant='outline' onClick={() => router.back()} disabled={submitting}>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => router.back()}
+          disabled={submitting}
+        >
           취소
         </Button>
       </div>

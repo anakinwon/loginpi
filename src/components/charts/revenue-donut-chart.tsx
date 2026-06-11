@@ -4,14 +4,27 @@ import PlotlyPlot from './plotly-plot'
 import { themeLabel } from '@/lib/stats-labels'
 import type { RevenueDataPoint } from '@/types/stats'
 
-const COLORS = ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#06b6d4', '#84cc16', '#f97316']
+const COLORS = [
+  '#3b82f6',
+  '#8b5cf6',
+  '#10b981',
+  '#f59e0b',
+  '#ef4444',
+  '#06b6d4',
+  '#84cc16',
+  '#f97316',
+]
 
 const BASE_LAYOUT = {
   paper_bgcolor: 'transparent',
   plot_bgcolor: 'transparent',
   font: { color: '#94a3b8', size: 11 },
   margin: { l: 16, r: 16, t: 10, b: 16 },
-  legend: { bgcolor: 'transparent', bordercolor: 'transparent', orientation: 'v' as const },
+  legend: {
+    bgcolor: 'transparent',
+    bordercolor: 'transparent',
+    orientation: 'v' as const,
+  },
   showlegend: true,
 }
 

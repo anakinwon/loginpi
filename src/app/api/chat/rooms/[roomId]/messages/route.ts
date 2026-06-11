@@ -3,7 +3,11 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth-check'
 import { getRoomMember, getRoom, getRecentMsgCount } from '@/lib/chat'
 import { getAiQuota } from '@/lib/chat-auth'
-import { getThemeSystemPrompt, extractAiQuestion, generateAiReply } from '@/lib/chat-ai-prompts'
+import {
+  getThemeSystemPrompt,
+  extractAiQuestion,
+  generateAiReply,
+} from '@/lib/chat-ai-prompts'
 import { tryAwardBadge } from '@/lib/chat-badge'
 import { broadcastToRoom } from '@/lib/realtime-broadcast'
 import { recordActivity } from '@/lib/activity-log'
@@ -19,10 +23,12 @@ type Params = { params: Promise<{ roomId: string }> }
 export async function GET(request: NextRequest, { params }: Params) {
   const { roomId } = await params
   const user = await getSessionUser()
-  if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user)
+    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
   const mbr = await getRoomMember(roomId, user.id)
-  if (!mbr) return NextResponse.json({ error: '카페 멤버가 아닙니다' }, { status: 403 })
+  if (!mbr)
+    return NextResponse.json({ error: '카페 멤버가 아닙니다' }, { status: 403 })
 
   const { searchParams } = new URL(request.url)
   const limit = Math.min(Number(searchParams.get('limit') ?? '50'), 100)
@@ -31,7 +37,9 @@ export async function GET(request: NextRequest, { params }: Params) {
 
   let query = getSupabaseAdmin()
     .from('msg_msg')
-    .select('msg_id, room_id, snd_usr_id, snd_usr_nm, msg_cont, msg_tp_cd, attch_url, stkr_id, ref_msg_id, src_lang_cd, del_yn, reg_dtm')
+    .select(
+      'msg_id, room_id, snd_usr_id, snd_usr_nm, msg_cont, msg_tp_cd, attch_url, stkr_id, ref_msg_id, src_lang_cd, del_yn, reg_dtm',
+    )
     .eq('room_id', roomId)
     .eq('del_yn', 'N')
     .order('reg_dtm', { ascending: false })
@@ -51,7 +59,8 @@ export async function GET(request: NextRequest, { params }: Params) {
 
   const { data: messages, error } = await query
 
-  if (error) return NextResponse.json({ error: '메시지 조회 실패' }, { status: 500 })
+  if (error)
+    return NextResponse.json({ error: '메시지 조회 실패' }, { status: 500 })
 
   const reversed = (messages ?? []).reverse()
   const hasMore = (messages ?? []).length === limit
@@ -62,13 +71,24 @@ export async function GET(request: NextRequest, { params }: Params) {
     const { data: transRows } = await getSupabaseAdmin()
       .from('msg_trans')
       .select('msg_id, trans_cont')
-      .in('msg_id', reversed.map(m => m.msg_id))
+      .in(
+        'msg_id',
+        reversed.map((m) => m.msg_id),
+      )
       .eq('locale_cd', locale)
       .eq('del_yn', 'N')
 
     if (transRows && transRows.length > 0) {
-      const transMap = new Map(transRows.map((t: { msg_id: string; trans_cont: string }) => [t.msg_id, t.trans_cont]))
-      for (const msg of reversed as Array<{ msg_id: string; trans_cont?: string }>) {
+      const transMap = new Map(
+        transRows.map((t: { msg_id: string; trans_cont: string }) => [
+          t.msg_id,
+          t.trans_cont,
+        ]),
+      )
+      for (const msg of reversed as Array<{
+        msg_id: string
+        trans_cont?: string
+      }>) {
         const trans = transMap.get(msg.msg_id)
         if (trans) msg.trans_cont = trans
       }
@@ -82,10 +102,12 @@ export async function GET(request: NextRequest, { params }: Params) {
 export async function POST(request: NextRequest, { params }: Params) {
   const { roomId } = await params
   const user = await getSessionUser()
-  if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user)
+    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
   const mbr = await getRoomMember(roomId, user.id)
-  if (!mbr) return NextResponse.json({ error: '카페 멤버가 아닙니다' }, { status: 403 })
+  if (!mbr)
+    return NextResponse.json({ error: '카페 멤버가 아닙니다' }, { status: 403 })
 
   // 메시지 전송 = 가장 명확한 활성 사용자 신호
   recordActivity(user.id, 'MSG')
@@ -93,15 +115,27 @@ export async function POST(request: NextRequest, { params }: Params) {
   // rate limiting: 1초 5건 초과 방지
   const recentCount = await getRecentMsgCount(roomId, user.id)
   if (recentCount >= 5) {
-    return NextResponse.json({ error: '너무 빠르게 메시지를 전송하고 있습니다' }, { status: 429 })
+    return NextResponse.json(
+      { error: '너무 빠르게 메시지를 전송하고 있습니다' },
+      { status: 429 },
+    )
   }
 
   let body: unknown
-  try { body = await request.json() } catch {
+  try {
+    body = await request.json()
+  } catch {
     return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
   }
 
-  const { msg_id: clientMsgId, msg_cont, msg_tp_cd = 'TEXT', ref_msg_id, stkr_id, attch_url } = body as {
+  const {
+    msg_id: clientMsgId,
+    msg_cont,
+    msg_tp_cd = 'TEXT',
+    ref_msg_id,
+    stkr_id,
+    attch_url,
+  } = body as {
     msg_id?: string
     msg_cont?: string
     msg_tp_cd?: string
@@ -111,20 +145,31 @@ export async function POST(request: NextRequest, { params }: Params) {
   }
 
   // 클라이언트가 broadcast와 동일한 UUID를 전달하면 DB primary key로 사용 (broadcast-DB msg_id 일치)
-  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-  const validMsgId = clientMsgId && UUID_RE.test(clientMsgId) ? clientMsgId : undefined
+  const UUID_RE =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+  const validMsgId =
+    clientMsgId && UUID_RE.test(clientMsgId) ? clientMsgId : undefined
 
   if (msg_tp_cd === 'TEXT' && !msg_cont?.trim()) {
-    return NextResponse.json({ error: '메시지 내용을 입력해주세요' }, { status: 400 })
+    return NextResponse.json(
+      { error: '메시지 내용을 입력해주세요' },
+      { status: 400 },
+    )
   }
 
   if (msg_tp_cd === 'STICKER' && !stkr_id) {
-    return NextResponse.json({ error: '스티커 ID가 필요합니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: '스티커 ID가 필요합니다' },
+      { status: 400 },
+    )
   }
 
   const validTypes = ['TEXT', 'IMAGE', 'FILE', 'VOICE', 'STICKER', 'SYSTEM']
   if (!validTypes.includes(msg_tp_cd)) {
-    return NextResponse.json({ error: '유효하지 않은 메시지 타입' }, { status: 400 })
+    return NextResponse.json(
+      { error: '유효하지 않은 메시지 타입' },
+      { status: 400 },
+    )
   }
 
   // TASK-065 보안: IMAGE/FILE/VOICE의 attch_url은 이 방의 Storage 공개 URL만 허용
@@ -132,12 +177,16 @@ export async function POST(request: NextRequest, { params }: Params) {
   if (msg_tp_cd === 'IMAGE' || msg_tp_cd === 'FILE' || msg_tp_cd === 'VOICE') {
     const expectedPrefix = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/chat-attachments/${roomId}/`
     if (!attch_url || !attch_url.startsWith(expectedPrefix)) {
-      return NextResponse.json({ error: '유효하지 않은 첨부 파일 URL입니다' }, { status: 400 })
+      return NextResponse.json(
+        { error: '유효하지 않은 첨부 파일 URL입니다' },
+        { status: 400 },
+      )
     }
   }
 
   // TASK-064: @ai 멘션 시 한도 사전 체크 — 초과면 메시지 삽입 없이 402 반환
-  const isAiMention = msg_tp_cd === 'TEXT' && /^@ai\s/i.test(msg_cont?.trim() ?? '')
+  const isAiMention =
+    msg_tp_cd === 'TEXT' && /^@ai\s/i.test(msg_cont?.trim() ?? '')
   if (isAiMention && process.env.ANTHROPIC_API_KEY) {
     const quota = await getAiQuota(user.id)
     if (quota.remaining === 0) {
@@ -160,7 +209,10 @@ export async function POST(request: NextRequest, { params }: Params) {
       .maybeSingle()
 
     if (!stkrRow) {
-      return NextResponse.json({ error: '존재하지 않는 스티커입니다' }, { status: 404 })
+      return NextResponse.json(
+        { error: '존재하지 않는 스티커입니다' },
+        { status: 404 },
+      )
     }
 
     const { data: packRow } = await db
@@ -171,10 +223,17 @@ export async function POST(request: NextRequest, { params }: Params) {
       .maybeSingle()
 
     if (!packRow) {
-      return NextResponse.json({ error: '스티커 팩을 찾을 수 없습니다' }, { status: 404 })
+      return NextResponse.json(
+        { error: '스티커 팩을 찾을 수 없습니다' },
+        { status: 404 },
+      )
     }
 
-    const pack = packRow as { pack_id: string; price_pi: number; is_dflt_yn: string }
+    const pack = packRow as {
+      pack_id: string
+      price_pi: number
+      is_dflt_yn: string
+    }
     const isFree = pack.is_dflt_yn === 'Y' || Number(pack.price_pi) === 0
 
     if (!isFree) {
@@ -187,7 +246,10 @@ export async function POST(request: NextRequest, { params }: Params) {
         .maybeSingle()
 
       if (!ownership) {
-        return NextResponse.json({ error: '이 스티커 팩을 구매하지 않았습니다' }, { status: 403 })
+        return NextResponse.json(
+          { error: '이 스티커 팩을 구매하지 않았습니다' },
+          { status: 403 },
+        )
       }
     }
 
@@ -213,7 +275,8 @@ export async function POST(request: NextRequest, { params }: Params) {
     .select()
     .single()
 
-  if (error) return NextResponse.json({ error: '메시지 전송 실패' }, { status: 500 })
+  if (error)
+    return NextResponse.json({ error: '메시지 전송 실패' }, { status: 500 })
 
   // 카페 mod_dtm 갱신 + 서버 브로드캐스트를 병렬 실행
   // 브로드캐스트는 서비스 롤 키 + REST API로 전송 → 클라이언트 직접 broadcast 불필요
@@ -235,23 +298,31 @@ export async function POST(request: NextRequest, { params }: Params) {
         roomId,
         msgId: data.msg_id,
         msgCont: data.msg_cont,
-      }).catch(err => console.error('[chat-translate] 번역 큐 오류', err)),
+      }).catch((err) => console.error('[chat-translate] 번역 큐 오류', err)),
     )
   }
 
   // TASK-072: 등록된 Webhook으로 신규 메시지 push (백그라운드 — Business 봇 연동)
   after(() =>
-    pushRoomWebhooks(roomId, data).catch(err =>
+    pushRoomWebhooks(roomId, data).catch((err) =>
       console.error('[chat-webhook] push 오류', err),
     ),
   )
 
   // TASK-062 Trigger 7: 테마 활동 배지 수여 체크 (백그라운드)
   // 배지 보유 시 RPC가 인덱스 1회 조회로 즉시 반환 — 매 메시지 비용 최소
-  if (msg_tp_cd === 'TEXT' || msg_tp_cd === 'IMAGE' || msg_tp_cd === 'FILE' || msg_tp_cd === 'VOICE') {
+  if (
+    msg_tp_cd === 'TEXT' ||
+    msg_tp_cd === 'IMAGE' ||
+    msg_tp_cd === 'FILE' ||
+    msg_tp_cd === 'VOICE'
+  ) {
     after(() =>
-      tryAwardBadge({ userId: user.id, roomId, displayName: user.display_name })
-        .catch(err => console.error('[chat-badge] 배지 수여 체크 실패', err)),
+      tryAwardBadge({
+        userId: user.id,
+        roomId,
+        displayName: user.display_name,
+      }).catch((err) => console.error('[chat-badge] 배지 수여 체크 실패', err)),
     )
   }
 

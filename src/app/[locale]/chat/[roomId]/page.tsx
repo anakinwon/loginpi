@@ -53,7 +53,9 @@ export default async function ChatRoomPage({ params }: Params) {
   const [{ data: rawMsgs }, { count: mbrCount }] = await Promise.all([
     getSupabaseAdmin()
       .from('msg_msg')
-      .select('msg_id, room_id, snd_usr_id, snd_usr_nm, msg_cont, msg_tp_cd, attch_url, stkr_id, ref_msg_id, src_lang_cd, del_yn, reg_dtm')
+      .select(
+        'msg_id, room_id, snd_usr_id, snd_usr_nm, msg_cont, msg_tp_cd, attch_url, stkr_id, ref_msg_id, src_lang_cd, del_yn, reg_dtm',
+      )
       .eq('room_id', roomId)
       .eq('del_yn', 'N')
       .order('reg_dtm', { ascending: false })
@@ -75,12 +77,20 @@ export default async function ChatRoomPage({ params }: Params) {
     const { data: transRows } = await getSupabaseAdmin()
       .from('msg_trans')
       .select('msg_id, trans_cont')
-      .in('msg_id', initialMessages.map(m => m.msg_id))
+      .in(
+        'msg_id',
+        initialMessages.map((m) => m.msg_id),
+      )
       .eq('locale_cd', locale)
       .eq('del_yn', 'N')
 
     if (transRows && transRows.length > 0) {
-      const transMap = new Map(transRows.map((t: { msg_id: string; trans_cont: string }) => [t.msg_id, t.trans_cont]))
+      const transMap = new Map(
+        transRows.map((t: { msg_id: string; trans_cont: string }) => [
+          t.msg_id,
+          t.trans_cont,
+        ]),
+      )
       for (const msg of initialMessages) {
         const trans = transMap.get(msg.msg_id)
         if (trans) msg.trans_cont = trans
@@ -95,13 +105,14 @@ export default async function ChatRoomPage({ params }: Params) {
     .eq('theme_cd', room.theme_cd)
     .single()
 
-  const themeEmoji = (themeData as { theme_emoji?: string } | null)?.theme_emoji ?? '💬'
+  const themeEmoji =
+    (themeData as { theme_emoji?: string } | null)?.theme_emoji ?? '💬'
 
   return (
     // 화면 직접 고정 프레임: top-14(사이트 헤더 아래) ~ bottom-0(화면 바닥).
     // fixed는 뷰포트 기준이라 URL바·키보드 변화를 자동 추적하고,
     // 레이아웃의 Footer가 아래에 있어도 페이지 전체 스크롤이 생기지 않는다 (본문만 스크롤).
-    <div className='fixed inset-x-0 top-14 bottom-0 z-40 mx-auto flex w-full max-w-2xl flex-col overflow-hidden bg-background'>
+    <div className="bg-background fixed inset-x-0 top-14 bottom-0 z-40 mx-auto flex w-full max-w-2xl flex-col overflow-hidden">
       {/* 헤더(제목+언어콤보 고정)·메시지(스크롤)·입력창(고정)은 ChatRoomPanel이 렌더 */}
       <ChatRoomPanel
         roomId={roomId}

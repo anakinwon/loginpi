@@ -17,9 +17,9 @@ export function AdminPagination({ page, totalPages, onPage }: Props) {
   const end = Math.min(totalPages, start + 9)
 
   return (
-    <div className='flex justify-center gap-1'>
+    <div className="flex justify-center gap-1">
       {page > 1 && (
-        <Button variant='outline' size='sm' onClick={() => onPage(page - 1)}>
+        <Button variant="outline" size="sm" onClick={() => onPage(page - 1)}>
           {tc('prev')}
         </Button>
       )}
@@ -27,14 +27,14 @@ export function AdminPagination({ page, totalPages, onPage }: Props) {
         <Button
           key={p}
           variant={p === page ? 'default' : 'outline'}
-          size='sm'
+          size="sm"
           onClick={() => onPage(p)}
         >
           {p}
         </Button>
       ))}
       {page < totalPages && (
-        <Button variant='outline' size='sm' onClick={() => onPage(page + 1)}>
+        <Button variant="outline" size="sm" onClick={() => onPage(page + 1)}>
           {tc('next')}
         </Button>
       )}

@@ -1,6 +1,9 @@
 import { getSessionUser } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
-import { ChatListView, type RoomWithTheme } from '@/components/chat/chat-list-view'
+import {
+  ChatListView,
+  type RoomWithTheme,
+} from '@/components/chat/chat-list-view'
 import { ClientChatList } from '@/components/chat/client-chat-list'
 
 const ROOM_SELECT = `room_id, room_nm, theme_cd, room_tp_cd, is_public_yn,
@@ -13,16 +16,26 @@ function buildCntMap(mbrRows: { room_id: string }[]): Map<string, number> {
 }
 
 // 진행 중(OPEN) Pi Bet 보유 방에 open_bet_yn='Y' 부여 — 카페 목록 🎲 뱃지용
-async function attachOpenBetYn(rooms: RoomWithTheme[]): Promise<RoomWithTheme[]> {
+async function attachOpenBetYn(
+  rooms: RoomWithTheme[],
+): Promise<RoomWithTheme[]> {
   if (rooms.length === 0) return rooms
   const { data } = await getSupabaseAdmin()
     .from('msg_bet')
     .select('room_id')
-    .in('room_id', rooms.map(r => r.room_id))
+    .in(
+      'room_id',
+      rooms.map((r) => r.room_id),
+    )
     .eq('bet_st_cd', 'OPEN')
     .eq('del_yn', 'N')
-  const betRoomIds = new Set((data ?? []).map((b: { room_id: string }) => b.room_id))
-  return rooms.map(r => ({ ...r, open_bet_yn: betRoomIds.has(r.room_id) ? 'Y' : 'N' }))
+  const betRoomIds = new Set(
+    (data ?? []).map((b: { room_id: string }) => b.room_id),
+  )
+  return rooms.map((r) => ({
+    ...r,
+    open_bet_yn: betRoomIds.has(r.room_id) ? 'Y' : 'N',
+  }))
 }
 
 export default async function ChatPage() {
@@ -48,9 +61,17 @@ export default async function ChatPage() {
   if (mbrs && mbrs.length > 0) {
     const roomIds = mbrs.map((m: { room_id: string }) => m.room_id)
     const [{ data }, { data: mbrRows }] = await Promise.all([
-      db.from('msg_room').select(ROOM_SELECT)
-        .in('room_id', roomIds).eq('del_yn', 'N').order('mod_dtm', { ascending: false }),
-      db.from('msg_room_mbr').select('room_id').in('room_id', roomIds).eq('del_yn', 'N'),
+      db
+        .from('msg_room')
+        .select(ROOM_SELECT)
+        .in('room_id', roomIds)
+        .eq('del_yn', 'N')
+        .order('mod_dtm', { ascending: false }),
+      db
+        .from('msg_room_mbr')
+        .select('room_id')
+        .in('room_id', roomIds)
+        .eq('del_yn', 'N'),
     ])
     const cntMap = buildCntMap(mbrRows ?? [])
     myRooms = (data ?? []).map((r: Record<string, unknown>) => ({
@@ -71,11 +92,14 @@ export default async function ChatPage() {
 
   let discoverRooms: RoomWithTheme[] = []
   if (publicRooms && publicRooms.length > 0) {
-    const myRoomIds = new Set(myRooms.map(r => r.room_id))
-    const filtered = publicRooms.filter(r => !myRoomIds.has(r.room_id))
-    const pubIds = filtered.map(r => r.room_id)
+    const myRoomIds = new Set(myRooms.map((r) => r.room_id))
+    const filtered = publicRooms.filter((r) => !myRoomIds.has(r.room_id))
+    const pubIds = filtered.map((r) => r.room_id)
     const { data: pubMbrRows } = await db
-      .from('msg_room_mbr').select('room_id').in('room_id', pubIds).eq('del_yn', 'N')
+      .from('msg_room_mbr')
+      .select('room_id')
+      .in('room_id', pubIds)
+      .eq('del_yn', 'N')
     const pubCntMap = buildCntMap(pubMbrRows ?? [])
     discoverRooms = filtered.map((r: Record<string, unknown>) => ({
       ...(r as unknown as RoomWithTheme),
@@ -88,5 +112,10 @@ export default async function ChatPage() {
     attachOpenBetYn(discoverRooms),
   ])
 
-  return <ChatListView myRooms={myRoomsWithBet} discoverRooms={discoverRoomsWithBet} />
+  return (
+    <ChatListView
+      myRooms={myRoomsWithBet}
+      discoverRooms={discoverRoomsWithBet}
+    />
+  )
 }

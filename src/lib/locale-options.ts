@@ -11,10 +11,12 @@ export interface LocaleOption {
 
 export function getLocaleOptions(displayLocale = 'ko'): LocaleOption[] {
   let names: Intl.DisplayNames | null = null
-  try { names = new Intl.DisplayNames([displayLocale], { type: 'language' }) } catch {}
+  try {
+    names = new Intl.DisplayNames([displayLocale], { type: 'language' })
+  } catch {}
   // routing.ts에 'ar'(아랍어/아르헨티나)처럼 언어·국가 코드가 중복 등록된 항목이 있어
   // dedupe 필수 — React key 충돌 방지
-  return [...new Set<string>(routing.locales)].map(cd => {
+  return [...new Set<string>(routing.locales)].map((cd) => {
     let label: string = cd
     try {
       const resolved = names?.of(cd)

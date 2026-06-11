@@ -26,8 +26,10 @@ export default async function EditPage({ params }: Props) {
   if (!user) {
     if (isGallery) {
       return (
-        <div className='mx-auto max-w-4xl px-4 py-8'>
-          <h1 className='mb-6 text-2xl font-bold'>{t('editTitle', { name: ctgr.ctgr_nm })}</h1>
+        <div className="mx-auto max-w-4xl px-4 py-8">
+          <h1 className="mb-6 text-2xl font-bold">
+            {t('editTitle', { name: ctgr.ctgr_nm })}
+          </h1>
           <ClientGalleryEditGate category={category} postId={postId} />
         </div>
       )
@@ -51,8 +53,10 @@ export default async function EditPage({ params }: Props) {
 
   if (isGallery) {
     return (
-      <div className='mx-auto max-w-4xl px-4 py-8'>
-        <h1 className='mb-6 text-2xl font-bold'>{t('editTitle', { name: ctgr.ctgr_nm })}</h1>
+      <div className="mx-auto max-w-4xl px-4 py-8">
+        <h1 className="mb-6 text-2xl font-bold">
+          {t('editTitle', { name: ctgr.ctgr_nm })}
+        </h1>
         <GalleryEditForm
           category={category}
           postId={postId}
@@ -76,8 +80,10 @@ export default async function EditPage({ params }: Props) {
     : { data: [] }
 
   return (
-    <div className='mx-auto max-w-4xl px-4 py-8'>
-      <h1 className='mb-6 text-2xl font-bold'>{t('editTitle', { name: ctgr.ctgr_nm })}</h1>
+    <div className="mx-auto max-w-4xl px-4 py-8">
+      <h1 className="mb-6 text-2xl font-bold">
+        {t('editTitle', { name: ctgr.ctgr_nm })}
+      </h1>
       <PostForm
         category={category}
         postId={postId}
@@ -85,12 +91,12 @@ export default async function EditPage({ params }: Props) {
         initialContent={post.post_cont ?? ''}
       />
       {canAttach && (
-        <div className='mt-6'>
+        <div className="mt-6">
           <AttachmentSection
             category={category}
             postId={postId}
             initialAttachments={(attachments ?? []).map(
-              ({ fl_tp: _tp, sort_ord: _so, ...a }) => a
+              ({ fl_tp: _tp, sort_ord: _so, ...a }) => a,
             )}
             canUpload
           />

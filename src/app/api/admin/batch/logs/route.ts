@@ -10,7 +10,10 @@ export async function GET(req: NextRequest) {
   }
 
   const limitParam = Number(req.nextUrl.searchParams.get('limit'))
-  const limit = Number.isInteger(limitParam) && limitParam > 0 && limitParam <= 200 ? limitParam : 50
+  const limit =
+    Number.isInteger(limitParam) && limitParam > 0 && limitParam <= 200
+      ? limitParam
+      : 50
 
   const { data, error } = await getSupabaseAdmin()
     .from('sys_batch_log')

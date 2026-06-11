@@ -23,19 +23,31 @@ export async function GET(_request: NextRequest, { params }: Params) {
     .order('sort_ord', { ascending: true })
     .order('reg_dtm', { ascending: true })
 
-  if (error) return NextResponse.json({ error: '첨부파일 조회 실패' }, { status: 500 })
+  if (error)
+    return NextResponse.json({ error: '첨부파일 조회 실패' }, { status: 500 })
   return NextResponse.json({ attachments: data ?? [] })
 }
 
 // POST /api/board/[category]/[postId]/attachments — 파일 업로드
 export async function POST(request: NextRequest, { params }: Params) {
   const { category, postId } = await params
-  const [ctgr, user] = await Promise.all([getCategory(category), getSessionUser()])
+  const [ctgr, user] = await Promise.all([
+    getCategory(category),
+    getSessionUser(),
+  ])
 
-  if (!ctgr) return NextResponse.json({ error: '존재하지 않는 게시판입니다' }, { status: 404 })
-  if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!ctgr)
+    return NextResponse.json(
+      { error: '존재하지 않는 게시판입니다' },
+      { status: 404 },
+    )
+  if (!user)
+    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
   if (ctgr.attch_yn !== 'Y') {
-    return NextResponse.json({ error: '이 게시판은 첨부파일을 지원하지 않습니다' }, { status: 403 })
+    return NextResponse.json(
+      { error: '이 게시판은 첨부파일을 지원하지 않습니다' },
+      { status: 403 },
+    )
   }
 
   const db = getSupabaseAdmin()
@@ -49,12 +61,19 @@ export async function POST(request: NextRequest, { params }: Params) {
     .eq('del_yn', 'N')
     .single()
 
-  if (!post) return NextResponse.json({ error: '게시글을 찾을 수 없습니다' }, { status: 404 })
+  if (!post)
+    return NextResponse.json(
+      { error: '게시글을 찾을 수 없습니다' },
+      { status: 404 },
+    )
 
   const isOwner = post.rgst_usr_id === user.id
   const isModerator = user.role === 'ADMIN' || user.role === 'MASTER'
   if (!isOwner && !isModerator) {
-    return NextResponse.json({ error: '첨부파일 업로드 권한이 없습니다' }, { status: 403 })
+    return NextResponse.json(
+      { error: '첨부파일 업로드 권한이 없습니다' },
+      { status: 403 },
+    )
   }
 
   // 기존 첨부파일 수 확인 (5개 제한)
@@ -65,18 +84,28 @@ export async function POST(request: NextRequest, { params }: Params) {
     .eq('del_yn', 'N')
 
   let formData: FormData
-  try { formData = await request.formData() } catch {
-    return NextResponse.json({ error: '잘못된 요청 형식입니다' }, { status: 400 })
+  try {
+    formData = await request.formData()
+  } catch {
+    return NextResponse.json(
+      { error: '잘못된 요청 형식입니다' },
+      { status: 400 },
+    )
   }
 
   const files = formData.getAll('files') as File[]
   if (files.length === 0) {
-    return NextResponse.json({ error: '업로드할 파일을 선택해주세요' }, { status: 400 })
+    return NextResponse.json(
+      { error: '업로드할 파일을 선택해주세요' },
+      { status: 400 },
+    )
   }
   if ((existing ?? 0) + files.length > MAX_FILES) {
     return NextResponse.json(
-      { error: `첨부파일은 최대 ${MAX_FILES}개까지 가능합니다 (현재 ${existing ?? 0}개)` },
-      { status: 400 }
+      {
+        error: `첨부파일은 최대 ${MAX_FILES}개까지 가능합니다 (현재 ${existing ?? 0}개)`,
+      },
+      { status: 400 },
     )
   }
 
@@ -84,14 +113,20 @@ export async function POST(request: NextRequest, { params }: Params) {
   const sortOrdRaw = formData.get('sort_ord')
   const baseSortOrd = sortOrdRaw !== null ? Number(sortOrdRaw) : (existing ?? 0)
 
-  const uploaded: { attch_id: string; fl_nm: string; fl_url: string; fl_sz: number; sort_ord: number }[] = []
+  const uploaded: {
+    attch_id: string
+    fl_nm: string
+    fl_url: string
+    fl_sz: number
+    sort_ord: number
+  }[] = []
 
   for (let i = 0; i < files.length; i++) {
     const file = files[i]
     if (file.size > MAX_SIZE) {
       return NextResponse.json(
         { error: `파일 크기는 20MB를 초과할 수 없습니다 (${file.name})` },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
@@ -106,10 +141,15 @@ export async function POST(request: NextRequest, { params }: Params) {
       })
 
     if (uploadErr) {
-      return NextResponse.json({ error: `업로드 실패: ${file.name}` }, { status: 500 })
+      return NextResponse.json(
+        { error: `업로드 실패: ${file.name}` },
+        { status: 500 },
+      )
     }
 
-    const { data: { publicUrl } } = db.storage.from(BUCKET).getPublicUrl(storagePath)
+    const {
+      data: { publicUrl },
+    } = db.storage.from(BUCKET).getPublicUrl(storagePath)
     const sortOrd = baseSortOrd + i
 
     const { data: row, error: dbErr } = await db
@@ -131,10 +171,19 @@ export async function POST(request: NextRequest, { params }: Params) {
     if (dbErr) {
       // DB 저장 실패 시 Storage 파일 롤백
       await db.storage.from(BUCKET).remove([storagePath])
-      return NextResponse.json({ error: `DB 저장 실패: ${file.name}` }, { status: 500 })
+      return NextResponse.json(
+        { error: `DB 저장 실패: ${file.name}` },
+        { status: 500 },
+      )
     }
 
-    uploaded.push({ attch_id: row.attch_id, fl_nm: file.name, fl_url: publicUrl, fl_sz: file.size, sort_ord: row.sort_ord })
+    uploaded.push({
+      attch_id: row.attch_id,
+      fl_nm: file.name,
+      fl_url: publicUrl,
+      fl_sz: file.size,
+      sort_ord: row.sort_ord,
+    })
   }
 
   return NextResponse.json({ uploaded }, { status: 201 })

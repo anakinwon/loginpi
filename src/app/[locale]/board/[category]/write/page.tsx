@@ -22,8 +22,10 @@ export default async function WritePage({ params }: Props) {
   const isGallery = ctgr.gallery_yn === 'Y' && ctgr.attch_yn === 'Y'
 
   return (
-    <div className='mx-auto max-w-4xl px-4 py-8'>
-      <h1 className='mb-6 text-2xl font-bold'>{t('writeTitle', { name: ctgr.ctgr_nm })}</h1>
+    <div className="mx-auto max-w-4xl px-4 py-8">
+      <h1 className="mb-6 text-2xl font-bold">
+        {t('writeTitle', { name: ctgr.ctgr_nm })}
+      </h1>
       {isGallery ? (
         <GalleryPostForm category={category} />
       ) : (

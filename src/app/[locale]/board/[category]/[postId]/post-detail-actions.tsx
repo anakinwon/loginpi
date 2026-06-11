@@ -19,7 +19,9 @@ export function PostDetailActions({ category, postId }: Props) {
   const handleDelete = async () => {
     if (!confirm(t('deletePost'))) return
     setDeleting(true)
-    const res = await fetch(`/api/board/${category}/${postId}`, { method: 'DELETE' })
+    const res = await fetch(`/api/board/${category}/${postId}`, {
+      method: 'DELETE',
+    })
     if (res.ok) {
       toast.success(t('deleteSuccess'))
       router.push(`/board/${category}`)
@@ -31,14 +33,19 @@ export function PostDetailActions({ category, postId }: Props) {
   }
 
   return (
-    <div className='flex shrink-0 gap-2'>
+    <div className="flex shrink-0 gap-2">
       <Link
         href={`/board/${category}/${postId}/edit`}
         className={cn(buttonVariants({ variant: 'outline', size: 'sm' }))}
       >
         {tc('edit')}
       </Link>
-      <Button variant='destructive' size='sm' onClick={handleDelete} disabled={deleting}>
+      <Button
+        variant="destructive"
+        size="sm"
+        onClick={handleDelete}
+        disabled={deleting}
+      >
         {deleting ? tc('deleting') : tc('delete')}
       </Button>
     </div>

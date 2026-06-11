@@ -9,7 +9,11 @@ export async function GET(req: NextRequest) {
 
   if (sp.get('mine') === '1') {
     const user = await getSessionUser()
-    if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+    if (!user)
+      return NextResponse.json(
+        { error: '로그인이 필요합니다' },
+        { status: 401 },
+      )
     const items = await listMyItems(user.id)
     return NextResponse.json({ items })
   }
@@ -19,7 +23,9 @@ export async function GET(req: NextRequest) {
     ctgrId: sp.get('ctgr') ?? undefined,
     keyword: sp.get('q') ?? undefined,
     cndCd: sp.get('cnd') ?? undefined,
-    sort: (['latest', 'price_asc', 'price_desc', 'views'] as const).find(s => s === sortParam),
+    sort: (['latest', 'price_asc', 'price_desc', 'views'] as const).find(
+      (s) => s === sortParam,
+    ),
     page: Number(sp.get('page')) || 1,
     limit: Number(sp.get('limit')) || 20,
   })
@@ -41,7 +47,8 @@ const createSchema = z.object({
 // POST /api/store/items — 상품 등록 (판매자 인증)
 export async function POST(req: NextRequest) {
   const user = await getSessionUser()
-  if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user)
+    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
   let body: unknown
   try {
@@ -52,7 +59,10 @@ export async function POST(req: NextRequest) {
 
   const parsed = createSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json({ error: '입력값이 올바르지 않습니다', detail: parsed.error.issues }, { status: 400 })
+    return NextResponse.json(
+      { error: '입력값이 올바르지 않습니다', detail: parsed.error.issues },
+      { status: 400 },
+    )
   }
 
   const slug = String(user.display_name ?? 'user').slice(0, 20)

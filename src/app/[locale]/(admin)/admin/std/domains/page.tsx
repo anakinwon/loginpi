@@ -30,7 +30,8 @@ const DOM_TYPE: Record<string, string> = {
   '0003': '일반',
 }
 const DOM_TYPE_COLOR: Record<string, string> = {
-  '0001': 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+  '0001':
+    'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
   '0002': 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
   '0003': 'bg-muted text-muted-foreground',
 }
@@ -42,7 +43,11 @@ const DATA_TYPE: Record<string, string> = {
   '0020': 'TIMESTAMP',
 }
 
-function fmtDataType(typeCd: string, len: number | null, scale: number | null): string {
+function fmtDataType(
+  typeCd: string,
+  len: number | null,
+  scale: number | null,
+): string {
   const base = DATA_TYPE[typeCd] ?? typeCd
   if (!len) return base
   if (scale) return `${base}(${len},${scale})`
@@ -78,7 +83,9 @@ export default function StdDomainsPage() {
   const [deleting, setDeleting] = useState<string | null>(null)
 
   // limit·검색어·타입필터 변경 시 첫 페이지로 리셋
-  useEffect(() => { setPage(1) }, [limit, search, typeFilter])
+  useEffect(() => {
+    setPage(1)
+  }, [limit, search, typeFilter])
 
   const load = useCallback(() => {
     setLoading(true)
@@ -118,7 +125,11 @@ export default function StdDomainsPage() {
   }
 
   async function save() {
-    if (!form.dom_nm.trim() || !form.key_dom_nm.trim() || !form.key_dom_phy_nm.trim()) {
+    if (
+      !form.dom_nm.trim() ||
+      !form.key_dom_nm.trim() ||
+      !form.key_dom_phy_nm.trim()
+    ) {
       toast.error(t('validationRequired'))
       return
     }
@@ -134,7 +145,9 @@ export default function StdDomainsPage() {
         data_scale: form.data_scale ? parseInt(form.data_scale) : null,
         dom_desc: form.dom_desc || null,
       }
-      const url = editing ? `/api/admin/std/domains/${editing.dom_id}` : '/api/admin/std/domains'
+      const url = editing
+        ? `/api/admin/std/domains/${editing.dom_id}`
+        : '/api/admin/std/domains'
       const method = editing ? 'PATCH' : 'POST'
       const res = await fetch(url, {
         method,
@@ -159,7 +172,9 @@ export default function StdDomainsPage() {
     if (!confirm(t('deleteConfirm', { name: nm }))) return
     setDeleting(id)
     try {
-      const res = await fetch(`/api/admin/std/domains/${id}`, { method: 'DELETE' })
+      const res = await fetch(`/api/admin/std/domains/${id}`, {
+        method: 'DELETE',
+      })
       if (!res.ok) {
         const d = (await res.json()) as { error?: string }
         throw new Error(d.error ?? t('deleteFail'))
@@ -177,24 +192,35 @@ export default function StdDomainsPage() {
   const displayedDomains = domains.slice((page - 1) * limit, page * limit)
 
   return (
-    <div className='space-y-4'>
-      <div className='flex items-center justify-between'>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className='text-2xl font-bold'>{t('title')}</h1>
-          <p className='text-muted-foreground mt-1 text-sm'>{t('totalCount', { count: domains.length })}</p>
+          <h1 className="text-2xl font-bold">{t('title')}</h1>
+          <p className="text-muted-foreground mt-1 text-sm">
+            {t('totalCount', { count: domains.length })}
+          </p>
         </div>
-        <Button onClick={openNew} size='sm'>{tc('newRegister')}</Button>
+        <Button onClick={openNew} size="sm">
+          {tc('newRegister')}
+        </Button>
       </div>
 
-      <div className='flex gap-2'>
+      <div className="flex gap-2">
         <Input
           placeholder={t('searchPlaceholder')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className='max-w-64'
+          className="max-w-64"
         />
-        <div className='flex gap-1'>
-          {([['', t('typeFilter.all')], ['0001', t('typeFilter.code')], ['0002', t('typeFilter.id')], ['0003', t('typeFilter.general')]] as [string, string][]).map(([val, label]) => (
+        <div className="flex gap-1">
+          {(
+            [
+              ['', t('typeFilter.all')],
+              ['0001', t('typeFilter.code')],
+              ['0002', t('typeFilter.id')],
+              ['0003', t('typeFilter.general')],
+            ] as [string, string][]
+          ).map(([val, label]) => (
             <button
               key={val}
               onClick={() => setTypeFilter(val)}
@@ -211,109 +237,203 @@ export default function StdDomainsPage() {
       </div>
 
       {showForm && (
-        <div className='rounded-lg border bg-muted/30 p-4 space-y-3'>
-          <h2 className='font-semibold text-sm'>
+        <div className="bg-muted/30 space-y-3 rounded-lg border p-4">
+          <h2 className="text-sm font-semibold">
             {editing ? t('formTitleEdit') : t('formTitleNew')}
           </h2>
-          <div className='grid grid-cols-2 gap-3 sm:grid-cols-3'>
-            <label className='space-y-1'>
-              <span className='text-xs text-muted-foreground'>{t('field.domNm')}</span>
-              <Input value={form.dom_nm} onChange={(e) => setForm((f) => ({ ...f, dom_nm: e.target.value }))} placeholder={t('placeholder.domNm')} />
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <label className="space-y-1">
+              <span className="text-muted-foreground text-xs">
+                {t('field.domNm')}
+              </span>
+              <Input
+                value={form.dom_nm}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, dom_nm: e.target.value }))
+                }
+                placeholder={t('placeholder.domNm')}
+              />
             </label>
-            <label className='space-y-1'>
-              <span className='text-xs text-muted-foreground'>{t('field.keyDomNm')}</span>
-              <Input value={form.key_dom_nm} onChange={(e) => setForm((f) => ({ ...f, key_dom_nm: e.target.value }))} placeholder={t('placeholder.keyDomNm')} />
+            <label className="space-y-1">
+              <span className="text-muted-foreground text-xs">
+                {t('field.keyDomNm')}
+              </span>
+              <Input
+                value={form.key_dom_nm}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, key_dom_nm: e.target.value }))
+                }
+                placeholder={t('placeholder.keyDomNm')}
+              />
             </label>
-            <label className='space-y-1'>
-              <span className='text-xs text-muted-foreground'>{t('field.keyDomPhyNm')}</span>
-              <Input value={form.key_dom_phy_nm} onChange={(e) => setForm((f) => ({ ...f, key_dom_phy_nm: e.target.value }))} placeholder={t('placeholder.keyDomPhyNm')} />
+            <label className="space-y-1">
+              <span className="text-muted-foreground text-xs">
+                {t('field.keyDomPhyNm')}
+              </span>
+              <Input
+                value={form.key_dom_phy_nm}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, key_dom_phy_nm: e.target.value }))
+                }
+                placeholder={t('placeholder.keyDomPhyNm')}
+              />
             </label>
-            <label className='space-y-1'>
-              <span className='text-xs text-muted-foreground'>{t('field.domType')}</span>
+            <label className="space-y-1">
+              <span className="text-muted-foreground text-xs">
+                {t('field.domType')}
+              </span>
               <select
                 value={form.dom_type_cd}
-                onChange={(e) => setForm((f) => ({ ...f, dom_type_cd: e.target.value }))}
-                className='border-input bg-background h-9 w-full rounded-md border px-3 text-sm'
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, dom_type_cd: e.target.value }))
+                }
+                className="border-input bg-background h-9 w-full rounded-md border px-3 text-sm"
               >
-                <option value='0001'>{t('selectDomType.code')}</option>
-                <option value='0002'>{t('selectDomType.id')}</option>
-                <option value='0003'>{t('selectDomType.general')}</option>
+                <option value="0001">{t('selectDomType.code')}</option>
+                <option value="0002">{t('selectDomType.id')}</option>
+                <option value="0003">{t('selectDomType.general')}</option>
               </select>
             </label>
-            <label className='space-y-1'>
-              <span className='text-xs text-muted-foreground'>{t('field.dataType')}</span>
+            <label className="space-y-1">
+              <span className="text-muted-foreground text-xs">
+                {t('field.dataType')}
+              </span>
               <select
                 value={form.data_type_cd}
-                onChange={(e) => setForm((f) => ({ ...f, data_type_cd: e.target.value }))}
-                className='border-input bg-background h-9 w-full rounded-md border px-3 text-sm'
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, data_type_cd: e.target.value }))
+                }
+                className="border-input bg-background h-9 w-full rounded-md border px-3 text-sm"
               >
-                <option value='0003'>{t('selectDataType.varchar')}</option>
-                <option value='0013'>{t('selectDataType.integer')}</option>
-                <option value='0015'>{t('selectDataType.numeric')}</option>
-                <option value='0018'>{t('selectDataType.date')}</option>
-                <option value='0020'>{t('selectDataType.timestamp')}</option>
+                <option value="0003">{t('selectDataType.varchar')}</option>
+                <option value="0013">{t('selectDataType.integer')}</option>
+                <option value="0015">{t('selectDataType.numeric')}</option>
+                <option value="0018">{t('selectDataType.date')}</option>
+                <option value="0020">{t('selectDataType.timestamp')}</option>
               </select>
             </label>
-            <label className='space-y-1'>
-              <span className='text-xs text-muted-foreground'>{t('field.dataLen')}</span>
-              <Input type='number' value={form.data_len} onChange={(e) => setForm((f) => ({ ...f, data_len: e.target.value }))} placeholder={t('placeholder.dataLen')} />
+            <label className="space-y-1">
+              <span className="text-muted-foreground text-xs">
+                {t('field.dataLen')}
+              </span>
+              <Input
+                type="number"
+                value={form.data_len}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, data_len: e.target.value }))
+                }
+                placeholder={t('placeholder.dataLen')}
+              />
             </label>
-            <label className='space-y-1'>
-              <span className='text-xs text-muted-foreground'>{t('field.dataScale')}</span>
-              <Input type='number' value={form.data_scale} onChange={(e) => setForm((f) => ({ ...f, data_scale: e.target.value }))} placeholder={t('placeholder.dataScale')} />
+            <label className="space-y-1">
+              <span className="text-muted-foreground text-xs">
+                {t('field.dataScale')}
+              </span>
+              <Input
+                type="number"
+                value={form.data_scale}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, data_scale: e.target.value }))
+                }
+                placeholder={t('placeholder.dataScale')}
+              />
             </label>
-            <label className='col-span-2 space-y-1'>
-              <span className='text-xs text-muted-foreground'>{t('field.desc')}</span>
-              <Input value={form.dom_desc} onChange={(e) => setForm((f) => ({ ...f, dom_desc: e.target.value }))} placeholder={t('placeholder.desc')} />
+            <label className="col-span-2 space-y-1">
+              <span className="text-muted-foreground text-xs">
+                {t('field.desc')}
+              </span>
+              <Input
+                value={form.dom_desc}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, dom_desc: e.target.value }))
+                }
+                placeholder={t('placeholder.desc')}
+              />
             </label>
           </div>
-          <div className='flex gap-2'>
-            <Button size='sm' onClick={save} disabled={saving}>{saving ? tc('saving') : tc('save')}</Button>
-            <Button size='sm' variant='outline' onClick={() => setShowForm(false)}>{tc('cancel')}</Button>
+          <div className="flex gap-2">
+            <Button size="sm" onClick={save} disabled={saving}>
+              {saving ? tc('saving') : tc('save')}
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setShowForm(false)}
+            >
+              {tc('cancel')}
+            </Button>
           </div>
         </div>
       )}
 
       {loading ? (
-        <p className='text-muted-foreground text-sm'>{tc('loading')}</p>
+        <p className="text-muted-foreground text-sm">{tc('loading')}</p>
       ) : domains.length === 0 ? (
-        <p className='text-muted-foreground text-sm'>{t('noData')}</p>
+        <p className="text-muted-foreground text-sm">{t('noData')}</p>
       ) : (
-        <div className='rounded-lg border overflow-x-auto'>
-          <table className='w-full text-sm'>
-            <thead className='bg-muted/50 border-b'>
+        <div className="overflow-x-auto rounded-lg border">
+          <table className="w-full text-sm">
+            <thead className="bg-muted/50 border-b">
               <tr>
-                <th className='text-left px-4 py-2 font-medium'>{t('col.domNm')}</th>
-                <th className='text-left px-4 py-2 font-medium'>{t('col.keyDomNm')}</th>
-                <th className='text-left px-4 py-2 font-medium'>{t('col.phyNm')}</th>
-                <th className='text-left px-4 py-2 font-medium'>{t('col.type')}</th>
-                <th className='text-left px-4 py-2 font-medium'>{t('col.dataType')}</th>
-                <th className='text-left px-4 py-2 font-medium'>{t('col.desc')}</th>
-                <th className='px-4 py-2'></th>
+                <th className="px-4 py-2 text-left font-medium">
+                  {t('col.domNm')}
+                </th>
+                <th className="px-4 py-2 text-left font-medium">
+                  {t('col.keyDomNm')}
+                </th>
+                <th className="px-4 py-2 text-left font-medium">
+                  {t('col.phyNm')}
+                </th>
+                <th className="px-4 py-2 text-left font-medium">
+                  {t('col.type')}
+                </th>
+                <th className="px-4 py-2 text-left font-medium">
+                  {t('col.dataType')}
+                </th>
+                <th className="px-4 py-2 text-left font-medium">
+                  {t('col.desc')}
+                </th>
+                <th className="px-4 py-2"></th>
               </tr>
             </thead>
-            <tbody className='divide-y'>
+            <tbody className="divide-y">
               {displayedDomains.map((d) => (
-                <tr key={d.dom_id} className='hover:bg-muted/30 transition-colors'>
-                  <td className='px-4 py-3 font-medium'>{d.dom_nm}</td>
-                  <td className='px-4 py-3'>{d.key_dom_nm}</td>
-                  <td className='px-4 py-3 font-mono text-xs'>{d.key_dom_phy_nm}</td>
-                  <td className='px-4 py-3'>
-                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${DOM_TYPE_COLOR[d.dom_type_cd] ?? ''}`}>
+                <tr
+                  key={d.dom_id}
+                  className="hover:bg-muted/30 transition-colors"
+                >
+                  <td className="px-4 py-3 font-medium">{d.dom_nm}</td>
+                  <td className="px-4 py-3">{d.key_dom_nm}</td>
+                  <td className="px-4 py-3 font-mono text-xs">
+                    {d.key_dom_phy_nm}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-xs font-medium ${DOM_TYPE_COLOR[d.dom_type_cd] ?? ''}`}
+                    >
                       {DOM_TYPE[d.dom_type_cd] ?? d.dom_type_cd}
                     </span>
                   </td>
-                  <td className='px-4 py-3 font-mono text-xs'>
+                  <td className="px-4 py-3 font-mono text-xs">
                     {fmtDataType(d.data_type_cd, d.data_len, d.data_scale)}
                   </td>
-                  <td className='px-4 py-3 text-muted-foreground text-xs max-w-52 truncate'>
+                  <td className="text-muted-foreground max-w-52 truncate px-4 py-3 text-xs">
                     {d.dom_desc ?? '—'}
                   </td>
-                  <td className='px-4 py-3'>
-                    <div className='flex gap-1'>
-                      <Button variant='outline' size='sm' className='h-6 px-2 text-xs' onClick={() => openEdit(d)}>{tc('edit')}</Button>
+                  <td className="px-4 py-3">
+                    <div className="flex gap-1">
                       <Button
-                        variant='outline' size='sm' className='h-6 px-2 text-xs text-destructive hover:text-destructive'
+                        variant="outline"
+                        size="sm"
+                        className="h-6 px-2 text-xs"
+                        onClick={() => openEdit(d)}
+                      >
+                        {tc('edit')}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-destructive hover:text-destructive h-6 px-2 text-xs"
                         disabled={deleting === d.dom_id}
                         onClick={() => remove(d.dom_id, d.dom_nm)}
                       >

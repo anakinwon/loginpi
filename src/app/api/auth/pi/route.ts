@@ -9,7 +9,8 @@ const MAX_COOKIE_AGE_SEC = 7 * 24 * 60 * 60
 
 function getSecret(): string {
   const secret = process.env.PI_SESSION_SECRET
-  if (!secret) throw new Error('PI_SESSION_SECRET 환경변수가 설정되지 않았습니다')
+  if (!secret)
+    throw new Error('PI_SESSION_SECRET 환경변수가 설정되지 않았습니다')
   return secret
 }
 
@@ -19,8 +20,13 @@ export async function GET(request: NextRequest) {
   if (!cookieValue) return NextResponse.json({ user: null })
 
   let secret: string
-  try { secret = getSecret() } catch {
-    return NextResponse.json({ error: 'PI_SESSION_SECRET 미설정' }, { status: 500 })
+  try {
+    secret = getSecret()
+  } catch {
+    return NextResponse.json(
+      { error: 'PI_SESSION_SECRET 미설정' },
+      { status: 500 },
+    )
   }
 
   const user = verifyPayload<PiSessionUser>(cookieValue, secret)
@@ -42,8 +48,13 @@ export async function GET(request: NextRequest) {
 // Pi accessToken 검증 → Supabase upsert → HMAC 서명 세션 쿠키 발급
 export async function POST(request: NextRequest) {
   let body: unknown
-  try { body = await request.json() } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문입니다' }, { status: 400 })
+  try {
+    body = await request.json()
+  } catch {
+    return NextResponse.json(
+      { error: '잘못된 요청 본문입니다' },
+      { status: 400 },
+    )
   }
 
   const { accessToken, walletAddress } = body as {
@@ -51,12 +62,20 @@ export async function POST(request: NextRequest) {
     walletAddress?: string | null
   }
   if (!accessToken || typeof accessToken !== 'string') {
-    return NextResponse.json({ error: 'accessToken이 필요합니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: 'accessToken이 필요합니다' },
+      { status: 400 },
+    )
   }
 
   let secret: string
-  try { secret = getSecret() } catch {
-    return NextResponse.json({ error: 'PI_SESSION_SECRET 미설정' }, { status: 500 })
+  try {
+    secret = getSecret()
+  } catch {
+    return NextResponse.json(
+      { error: 'PI_SESSION_SECRET 미설정' },
+      { status: 500 },
+    )
   }
 
   // Pi Network API로 토큰 검증
@@ -70,7 +89,10 @@ export async function POST(request: NextRequest) {
     }
     piUser = (await piRes.json()) as PiUserDTO
   } catch {
-    return NextResponse.json({ error: 'Pi Network API 연결 실패' }, { status: 502 })
+    return NextResponse.json(
+      { error: 'Pi Network API 연결 실패' },
+      { status: 502 },
+    )
   }
 
   // Supabase users 테이블에 upsert → userId·role·nick_nm 획득
@@ -94,7 +116,9 @@ export async function POST(request: NextRequest) {
   if (userId) recordActivity(userId, 'LOGIN')
 
   // Pi 토큰 만료 → 쿠키 maxAge
-  const tokenExpiresAt = new Date(piUser.credentials.valid_until.iso8601).getTime()
+  const tokenExpiresAt = new Date(
+    piUser.credentials.valid_until.iso8601,
+  ).getTime()
   const secondsUntilExpiry = Math.floor((tokenExpiresAt - Date.now()) / 1000)
   const maxAge = Math.min(Math.max(secondsUntilExpiry, 0), MAX_COOKIE_AGE_SEC)
 
@@ -113,7 +137,11 @@ export async function POST(request: NextRequest) {
   const signed = signPayload(sessionData, secret)
   // 쿠키(일반 브라우저) + token(Pi Browser localStorage→X-Pi-Token 헤더) 이중 제공.
   // Pi Browser WebView는 Set-Cookie를 저장하지 않으므로 클라이언트가 token을 보관해야 한다.
-  const response = NextResponse.json({ success: true, user: sessionData, token: signed })
+  const response = NextResponse.json({
+    success: true,
+    user: sessionData,
+    token: signed,
+  })
   response.cookies.set('pi_session', signed, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',

@@ -8,7 +8,7 @@ import { LOCALE_COUNTRY } from '@/lib/locale-country'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
 )
 
 // alpha-2 코드 → 국기 이모지 (Regional Indicator Symbol 변환)
@@ -43,7 +43,7 @@ async function addLocaleToRouting(locale_cd: string): Promise<boolean> {
     } else {
       updated = content.replace(
         /(\s+)(\],\s*\n\s*defaultLocale)/,
-        `$1'${locale_cd}',\n$1$2`
+        `$1'${locale_cd}',\n$1$2`,
       )
     }
 
@@ -79,7 +79,7 @@ export async function PATCH(req: NextRequest) {
   if (locale_cd === 'ko' && is_active === 'N') {
     return NextResponse.json(
       { error: '기본 언어(ko)는 비활성화할 수 없습니다' },
-      { status: 400 }
+      { status: 400 },
     )
   }
 
@@ -98,10 +98,12 @@ export async function PATCH(req: NextRequest) {
   const flag_emoji = country_cd ? toFlagEmoji(country_cd) : null
   const nm = locale_nm ?? locale_cd
 
-  const { error } = await supabase.from('i18n_locale').upsert(
-    { locale_cd, locale_nm: nm, flag_emoji, is_active, sort_ord },
-    { onConflict: 'locale_cd' }
-  )
+  const { error } = await supabase
+    .from('i18n_locale')
+    .upsert(
+      { locale_cd, locale_nm: nm, flag_emoji, is_active, sort_ord },
+      { onConflict: 'locale_cd' },
+    )
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
@@ -128,18 +130,26 @@ export async function PATCH(req: NextRequest) {
   if (is_active === 'Y') {
     if (!LOCALE_CURRENCY[locale_cd]) {
       mappingWarnings.push(
-        `통화 매핑 누락: src/lib/locale-currency.ts에 '${locale_cd}' 추가 후 재배포 필요 (현재 π 시세가 USD로 표시됨)`
+        `통화 매핑 누락: src/lib/locale-currency.ts에 '${locale_cd}' 추가 후 재배포 필요 (현재 π 시세가 USD로 표시됨)`,
       )
     }
     if (!LOCALE_COUNTRY[locale_cd]) {
       mappingWarnings.push(
-        `국가 매핑 누락: src/lib/locale-country.ts에 '${locale_cd}' 추가 후 재배포 필요 (국기·중복필터 fallback 동작)`
+        `국가 매핑 누락: src/lib/locale-country.ts에 '${locale_cd}' 추가 후 재배포 필요 (국기·중복필터 fallback 동작)`,
       )
     }
     if (mappingWarnings.length > 0) {
-      console.warn(`[i18n/locale] '${locale_cd}' 활성화 — 매핑 경고:\n  ${mappingWarnings.join('\n  ')}`)
+      console.warn(
+        `[i18n/locale] '${locale_cd}' 활성화 — 매핑 경고:\n  ${mappingWarnings.join('\n  ')}`,
+      )
     }
   }
 
-  return NextResponse.json({ ok: true, locale_cd, is_active, routingUpdated, mappingWarnings })
+  return NextResponse.json({
+    ok: true,
+    locale_cd,
+    is_active,
+    routingUpdated,
+    mappingWarnings,
+  })
 }

@@ -22,7 +22,8 @@ interface PackRow {
 // GET /api/stickers/packs — 보유팩(전체 스티커) + 미보유 스토어팩(미리보기 3개)
 export async function GET() {
   const user = await getSessionUser()
-  if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user)
+    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
   const db = getSupabaseAdmin()
 
@@ -40,11 +41,15 @@ export async function GET() {
   }
 
   const packs = allPacks as PackRow[]
-  const packIds = packs.map(p => p.pack_id)
+  const packIds = packs.map((p) => p.pack_id)
 
   // 구매 기록 + 스티커 목록 병렬 조회 (N+1 없이 2번 쿼리)
   const [{ data: myRows }, { data: allStickers }] = await Promise.all([
-    db.from('msg_usr_stkr').select('pack_id').eq('usr_id', user.id).eq('del_yn', 'N'),
+    db
+      .from('msg_usr_stkr')
+      .select('pack_id')
+      .eq('usr_id', user.id)
+      .eq('del_yn', 'N'),
     db
       .from('msg_stkr')
       .select('stkr_id, pack_id, stkr_nm, stkr_url, sort_ord')
@@ -57,8 +62,8 @@ export async function GET() {
     ...(myRows ?? []).map((r: { pack_id: string }) => r.pack_id),
     // 무료팩(기본팩 or price_pi=0)은 항상 보유로 처리
     ...packs
-      .filter(p => p.is_dflt_yn === 'Y' || Number(p.price_pi) === 0)
-      .map(p => p.pack_id),
+      .filter((p) => p.is_dflt_yn === 'Y' || Number(p.price_pi) === 0)
+      .map((p) => p.pack_id),
   ])
 
   // 스티커를 팩별로 그룹핑
@@ -80,7 +85,11 @@ export async function GET() {
     if (ownedPackIds.has(pack.pack_id)) {
       ownedPacks.push({ ...rest, is_custom, stickers })
     } else {
-      storePacks.push({ ...rest, is_custom, preview_stickers: stickers.slice(0, 3) })
+      storePacks.push({
+        ...rest,
+        is_custom,
+        preview_stickers: stickers.slice(0, 3),
+      })
     }
   }
 

@@ -17,13 +17,20 @@ interface StatsCardProps {
   loading?: boolean
 }
 
-export function StatsCard({ label, value, unit, sub, className, loading }: StatsCardProps) {
+export function StatsCard({
+  label,
+  value,
+  unit,
+  sub,
+  className,
+  loading,
+}: StatsCardProps) {
   if (loading) {
     return (
-      <div className={cn('rounded-lg border p-4 space-y-2', className)}>
-        <div className='h-4 w-20 bg-muted animate-pulse rounded' />
-        <div className='h-8 w-14 bg-muted animate-pulse rounded' />
-        <div className='h-3 w-24 bg-muted animate-pulse rounded' />
+      <div className={cn('space-y-2 rounded-lg border p-4', className)}>
+        <div className="bg-muted h-4 w-20 animate-pulse rounded" />
+        <div className="bg-muted h-8 w-14 animate-pulse rounded" />
+        <div className="bg-muted h-3 w-24 animate-pulse rounded" />
       </div>
     )
   }
@@ -32,14 +39,16 @@ export function StatsCard({ label, value, unit, sub, className, loading }: Stats
 
   return (
     <div className={cn('rounded-lg border p-4', className)}>
-      <p className='text-muted-foreground text-sm'>{label}</p>
-      <p className='mt-1 text-2xl font-bold'>
+      <p className="text-muted-foreground text-sm">{label}</p>
+      <p className="mt-1 text-2xl font-bold">
         {display}
         {unit && (
-          <span className='text-muted-foreground ml-1 text-sm font-normal'>{unit}</span>
+          <span className="text-muted-foreground ml-1 text-sm font-normal">
+            {unit}
+          </span>
         )}
       </p>
-      {sub && <p className='text-muted-foreground mt-1 text-xs'>{sub}</p>}
+      {sub && <p className="text-muted-foreground mt-1 text-xs">{sub}</p>}
     </div>
   )
 }

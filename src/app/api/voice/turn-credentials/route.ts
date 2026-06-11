@@ -8,7 +8,8 @@ import { getSessionUser } from '@/lib/auth-check'
 // coturn REST API 및 Metered 관리형 서비스 모두 이 패턴을 지원.
 export async function POST() {
   const user = await getSessionUser()
-  if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user)
+    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
   const host = process.env.TURN_HOST
   const secret = process.env.TURN_SECRET
@@ -24,7 +25,9 @@ export async function POST() {
 
   const expiry = Math.floor(Date.now() / 1000) + ttl
   const username = `${expiry}:${user.id}`
-  const credential = createHmac('sha256', secret).update(username).digest('base64')
+  const credential = createHmac('sha256', secret)
+    .update(username)
+    .digest('base64')
 
   return NextResponse.json({
     iceServers: [

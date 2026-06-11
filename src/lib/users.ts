@@ -46,7 +46,7 @@ export async function upsertPiUser(piUser: {
         display_name: piUser.username ?? `pi_${piUser.uid.slice(0, 8)}`,
         last_login_dtm: new Date().toISOString(),
       },
-      { onConflict: 'pi_uid' }
+      { onConflict: 'pi_uid' },
     )
     .select()
     .single()
@@ -60,11 +60,11 @@ export async function upsertPiUser(piUser: {
 export async function updatePiUserWithGoogle(
   piUserId: string,
   googleUser: {
-    id: string    // Google OAuth sub
+    id: string // Google OAuth sub
     email: string
     name: string | null
     image: string | null
-  }
+  },
 ): Promise<void> {
   const { error } = await getSupabaseAdmin()
     .from('sys_user')
@@ -90,7 +90,20 @@ export async function getUserById(id: string): Promise<UserRow | null> {
 
 export async function updateUserProfile(
   userId: string,
-  data: Partial<Pick<UserRow, 'display_name' | 'real_nm' | 'nick_nm' | 'phone_no' | 'addr' | 'addr_dtl' | 'display_locale_cd' | 'kakao_id' | 'self_intro'>>
+  data: Partial<
+    Pick<
+      UserRow,
+      | 'display_name'
+      | 'real_nm'
+      | 'nick_nm'
+      | 'phone_no'
+      | 'addr'
+      | 'addr_dtl'
+      | 'display_locale_cd'
+      | 'kakao_id'
+      | 'self_intro'
+    >
+  >,
 ): Promise<UserRow | null> {
   const { data: row } = await getSupabaseAdmin()
     .from('sys_user')
@@ -106,7 +119,7 @@ export async function updateUserProfile(
 // 로그인 시점 기록만으로는 이후 접속이 남지 않는다. getSessionUser() 인증 성공 시마다 호출해
 // "접속"도 기록하되, 쓰기 폭증을 막기 위해 5분 단위로 스로틀한다.
 const TOUCH_INTERVAL_MS = 5 * 60 * 1000
-const lastTouchAt = new Map<string, number>()  // 인스턴스 메모리 스로틀 (서버리스 재기동 시 초기화 — DB 조건이 2차 방어)
+const lastTouchAt = new Map<string, number>() // 인스턴스 메모리 스로틀 (서버리스 재기동 시 초기화 — DB 조건이 2차 방어)
 
 export function touchLastLogin(userId: string): void {
   const now = Date.now()

@@ -22,9 +22,14 @@ export async function GET() {
     .eq('del_yn', 'N')
     .order('price_pi', { ascending: true })
 
-  if (error) return NextResponse.json({ error: '플랜 목록 조회 실패' }, { status: 500 })
+  if (error)
+    return NextResponse.json({ error: '플랜 목록 조회 실패' }, { status: 500 })
 
-  let current: { plan_cd: string; expire_dtm: string | null; auto_renew_yn: 'Y' | 'N' | null } = {
+  let current: {
+    plan_cd: string
+    expire_dtm: string | null
+    auto_renew_yn: 'Y' | 'N' | null
+  } = {
     plan_cd: 'FREE',
     expire_dtm: null,
     auto_renew_yn: null,

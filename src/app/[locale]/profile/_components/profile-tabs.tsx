@@ -11,10 +11,10 @@ import type { UserRow } from '@/lib/users'
 import type { LocaleOption } from '@/lib/locale-options'
 
 const TABS = [
-  { id: 'info',    label: '개인정보' },
+  { id: 'info', label: '개인정보' },
   { id: 'payment', label: '결제 내역' },
-  { id: 'subscr',  label: '구독 현황' },
-  { id: 'store',   label: '🛍️ 스토어' },
+  { id: 'subscr', label: '구독 현황' },
+  { id: 'store', label: '🛍️ 스토어' },
 ] as const
 
 type TabId = (typeof TABS)[number]['id']
@@ -30,15 +30,15 @@ export function ProfileTabs({ initialUser, localeOptions }: Props) {
 
   return (
     <div>
-      <div className='mb-6 flex gap-1 border-b'>
-        {TABS.map(tab => (
+      <div className="mb-6 flex gap-1 border-b">
+        {TABS.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={[
               'px-4 py-2 text-sm font-medium transition-colors',
               activeTab === tab.id
-                ? 'border-b-2 border-primary text-primary'
+                ? 'border-primary text-primary border-b-2'
                 : 'text-muted-foreground hover:text-foreground',
             ].join(' ')}
           >
@@ -47,10 +47,16 @@ export function ProfileTabs({ initialUser, localeOptions }: Props) {
         ))}
       </div>
 
-      {activeTab === 'info'    && <ProfileForm initialUser={user} localeOptions={localeOptions} onSaved={setUser} />}
+      {activeTab === 'info' && (
+        <ProfileForm
+          initialUser={user}
+          localeOptions={localeOptions}
+          onSaved={setUser}
+        />
+      )}
       {activeTab === 'payment' && <PaymentHistory />}
-      {activeTab === 'subscr'  && <SubscriptionStatus />}
-      {activeTab === 'store'   && <StoreTab />}
+      {activeTab === 'subscr' && <SubscriptionStatus />}
+      {activeTab === 'store' && <StoreTab />}
     </div>
   )
 }
@@ -60,14 +66,26 @@ function StoreTab() {
   const t = useTranslations('store')
 
   return (
-    <div className='space-y-4'>
-      <div className='flex flex-wrap items-center justify-between gap-3'>
-        <p className='text-muted-foreground text-sm'>{t('subtitle')}</p>
-        <nav className='flex gap-3 text-sm'>
-          <Link href='/store/my/items' className='text-primary hover:underline'>{t('navMyItems')}</Link>
-          <Link href='/store/my/sales' className='text-primary hover:underline'>{t('navSales')}</Link>
-          <Link href='/store/my/orders' className='text-primary hover:underline'>{t('navOrders')}</Link>
-          <Link href='/store' className='text-muted-foreground hover:text-foreground hover:underline'>
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-muted-foreground text-sm">{t('subtitle')}</p>
+        <nav className="flex gap-3 text-sm">
+          <Link href="/store/my/items" className="text-primary hover:underline">
+            {t('navMyItems')}
+          </Link>
+          <Link href="/store/my/sales" className="text-primary hover:underline">
+            {t('navSales')}
+          </Link>
+          <Link
+            href="/store/my/orders"
+            className="text-primary hover:underline"
+          >
+            {t('navOrders')}
+          </Link>
+          <Link
+            href="/store"
+            className="text-muted-foreground hover:text-foreground hover:underline"
+          >
             전체 화면 →
           </Link>
         </nav>

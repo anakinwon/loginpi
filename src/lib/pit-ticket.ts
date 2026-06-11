@@ -12,15 +12,23 @@ function getDerivedKey(): Buffer {
   const secret = process.env.AUTH_SECRET
   if (!secret) throw new Error('AUTH_SECRET not configured')
   return Buffer.from(
-    hkdfSync('sha256', Buffer.from(secret), '', Buffer.from('pit-ticket-v1'), 32)
+    hkdfSync(
+      'sha256',
+      Buffer.from(secret),
+      '',
+      Buffer.from('pit-ticket-v1'),
+      32,
+    ),
   )
 }
 
 export function createPitTicket(userId: string): string {
   const payloadB64 = Buffer.from(
-    JSON.stringify({ uid: userId, exp: Date.now() + 60_000 })
+    JSON.stringify({ uid: userId, exp: Date.now() + 60_000 }),
   ).toString('base64url')
-  const sig = createHmac('sha256', getDerivedKey()).update(payloadB64).digest('hex')
+  const sig = createHmac('sha256', getDerivedKey())
+    .update(payloadB64)
+    .digest('hex')
   return `${payloadB64}.${sig}`
 }
 
@@ -30,11 +38,19 @@ export function verifyPitTicket(ticket: string): string | null {
     if (dotIdx === -1) return null
     const payloadB64 = ticket.slice(0, dotIdx)
     const sig = ticket.slice(dotIdx + 1)
-    const expectedBuf = createHmac('sha256', getDerivedKey()).update(payloadB64).digest()
+    const expectedBuf = createHmac('sha256', getDerivedKey())
+      .update(payloadB64)
+      .digest()
     const providedBuf = Buffer.from(sig, 'hex')
     // timingSafeEqual로 상수시간 비교 — 타이밍 공격으로 서명값 추론 방지
-    if (providedBuf.length !== expectedBuf.length || !timingSafeEqual(providedBuf, expectedBuf)) return null
-    const payload = JSON.parse(Buffer.from(payloadB64, 'base64url').toString()) as {
+    if (
+      providedBuf.length !== expectedBuf.length ||
+      !timingSafeEqual(providedBuf, expectedBuf)
+    )
+      return null
+    const payload = JSON.parse(
+      Buffer.from(payloadB64, 'base64url').toString(),
+    ) as {
       uid: string
       exp: number
     }

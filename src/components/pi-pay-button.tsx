@@ -6,7 +6,14 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { usePiAuth } from './pi-auth-provider'
 
-type Status = 'idle' | 'approving' | 'waiting' | 'completing' | 'done' | 'cancelled' | 'error'
+type Status =
+  | 'idle'
+  | 'approving'
+  | 'waiting'
+  | 'completing'
+  | 'done'
+  | 'cancelled'
+  | 'error'
 
 interface PayResult {
   paymentId: string
@@ -21,7 +28,8 @@ export function PiPayButton() {
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<PayResult | null>(null)
 
-  const busy = status === 'approving' || status === 'waiting' || status === 'completing'
+  const busy =
+    status === 'approving' || status === 'waiting' || status === 'completing'
 
   function reset() {
     setStatus('idle')
@@ -92,40 +100,53 @@ export function PiPayButton() {
         },
 
         onCancel: () => setStatus('cancelled'),
-        onError: (e) => { setStatus('error'); setError(e.message) },
-      }
+        onError: (e) => {
+          setStatus('error')
+          setError(e.message)
+        },
+      },
     )
   }
 
   return (
-    <div className='space-y-4'>
+    <div className="space-y-4">
       {/* 수량 입력 */}
-      <div className='space-y-1.5'>
-        <Label htmlFor='pay-amount'>Pi 코인 수량</Label>
-        <div className='flex items-center gap-2'>
+      <div className="space-y-1.5">
+        <Label htmlFor="pay-amount">Pi 코인 수량</Label>
+        <div className="flex items-center gap-2">
           <Input
-            id='pay-amount'
-            type='number'
-            min='0.001'
-            step='0.001'
+            id="pay-amount"
+            type="number"
+            min="0.001"
+            step="0.001"
             value={amount}
-            onChange={(e) => { setAmount(e.target.value); reset() }}
+            onChange={(e) => {
+              setAmount(e.target.value)
+              reset()
+            }}
             disabled={busy}
-            className='w-36 text-lg font-mono'
-            placeholder='1'
+            className="w-36 font-mono text-lg"
+            placeholder="1"
           />
-          <span className='font-serif text-xl italic text-muted-foreground'>π</span>
+          <span className="text-muted-foreground font-serif text-xl italic">
+            π
+          </span>
         </div>
       </div>
 
       {/* 결제 버튼 */}
       <Button
-        size='lg'
+        size="lg"
         onClick={status === 'done' || status === 'cancelled' ? reset : pay}
         disabled={busy}
-        className='w-full gap-2 text-base'
+        className="w-full gap-2 text-base"
       >
-        <span className='font-serif text-lg italic leading-none' aria-hidden='true'>π</span>
+        <span
+          className="font-serif text-lg leading-none italic"
+          aria-hidden="true"
+        >
+          π
+        </span>
         {busy
           ? STATUS_MSG[status]
           : status === 'done'
@@ -137,29 +158,29 @@ export function PiPayButton() {
 
       {/* 대기 안내 */}
       {status === 'waiting' && (
-        <p className='text-center text-xs text-muted-foreground'>
+        <p className="text-muted-foreground text-center text-xs">
           Pi 지갑 화면에서 결제를 승인해 주세요.
         </p>
       )}
 
       {/* 오류 */}
-      {error && <p className='text-xs text-destructive'>{error}</p>}
+      {error && <p className="text-destructive text-xs">{error}</p>}
 
       {/* 결제 성공 결과 */}
       {status === 'done' && result && (
-        <div className='rounded-xl border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-900/20 space-y-2'>
-          <p className='font-semibold text-green-700 dark:text-green-400'>
+        <div className="space-y-2 rounded-xl border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-900/20">
+          <p className="font-semibold text-green-700 dark:text-green-400">
             ✓ {result.amount} π 결제 완료
           </p>
-          <div className='space-y-1'>
-            <p className='text-xs text-muted-foreground'>Payment ID</p>
-            <p className='break-all font-mono text-xs text-green-700 dark:text-green-400'>
+          <div className="space-y-1">
+            <p className="text-muted-foreground text-xs">Payment ID</p>
+            <p className="font-mono text-xs break-all text-green-700 dark:text-green-400">
               {result.paymentId}
             </p>
           </div>
-          <div className='space-y-1'>
-            <p className='text-xs text-muted-foreground'>Transaction ID</p>
-            <p className='break-all font-mono text-xs text-green-700 dark:text-green-400'>
+          <div className="space-y-1">
+            <p className="text-muted-foreground text-xs">Transaction ID</p>
+            <p className="font-mono text-xs break-all text-green-700 dark:text-green-400">
               {result.txid}
             </p>
           </div>
@@ -168,7 +189,7 @@ export function PiPayButton() {
 
       {/* Pi Browser 아닐 때 안내 */}
       {!isInPiBrowser && (
-        <p className='text-xs text-muted-foreground text-center'>
+        <p className="text-muted-foreground text-center text-xs">
           Pi Browser에서만 결제가 동작합니다.
         </p>
       )}
@@ -177,7 +198,7 @@ export function PiPayButton() {
 }
 
 const STATUS_MSG: Partial<Record<Status, string>> = {
-  approving:  '승인 중…',
-  waiting:    '지갑 확인 중…',
+  approving: '승인 중…',
+  waiting: '지갑 확인 중…',
   completing: '처리 중…',
 }

@@ -6,8 +6,8 @@ import Script from 'next/script'
 export function PiSdkScript() {
   return (
     <Script
-      src='https://sdk.minepi.com/pi-sdk.js'
-      strategy='afterInteractive'
+      src="https://sdk.minepi.com/pi-sdk.js"
+      strategy="afterInteractive"
       onLoad={() => window.dispatchEvent(new Event('pi-sdk-loaded'))}
     />
   )

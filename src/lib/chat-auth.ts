@@ -81,14 +81,20 @@ export async function getChatPlan(userId: string): Promise<ChatPlan> {
   const [{ data }, { data: userRow }] = await Promise.all([
     getSupabaseAdmin()
       .from('msg_subscr')
-      .select('plan_cd, expire_dtm, auto_renew_yn, msg_subscr_plan(plan_nm, plan_tp_cd)')
+      .select(
+        'plan_cd, expire_dtm, auto_renew_yn, msg_subscr_plan(plan_nm, plan_tp_cd)',
+      )
       .eq('usr_id', userId)
       .eq('del_yn', 'N')
       .gt('expire_dtm', new Date().toISOString())
       .order('expire_dtm', { ascending: false })
       .limit(1)
       .maybeSingle(),
-    getSupabaseAdmin().from('sys_user').select('role').eq('id', userId).maybeSingle(),
+    getSupabaseAdmin()
+      .from('sys_user')
+      .select('role')
+      .eq('id', userId)
+      .maybeSingle(),
   ])
 
   const isOperator =
@@ -108,7 +114,9 @@ export async function getChatPlan(userId: string): Promise<ChatPlan> {
       | null
   }
 
-  const planRow = Array.isArray(row.msg_subscr_plan) ? row.msg_subscr_plan[0] : row.msg_subscr_plan
+  const planRow = Array.isArray(row.msg_subscr_plan)
+    ? row.msg_subscr_plan[0]
+    : row.msg_subscr_plan
   const subscrTier = (planRow?.plan_tp_cd ?? 'FREE') as PlanTier
   // 운영자는 구독 tier가 낮아도 BUSINESS 캡으로 승격 (구독 정보는 그대로 표시)
   const tier = isOperator ? 'BUSINESS' : subscrTier
@@ -128,7 +136,7 @@ export async function getChatPlan(userId: string): Promise<ChatPlan> {
 async function countOwnedRoomsThisMonth(userId: string): Promise<number> {
   const now = new Date()
   const monthStart = new Date(
-    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1),
   ).toISOString()
 
   const { data: owned } = await getSupabaseAdmin()
@@ -162,7 +170,7 @@ export interface RoomCreateAllowance {
 // plan을 넘기면 getChatPlan 중복 조회를 생략한다(check 라우트 최적화).
 export async function canCreateRoom(
   userId: string,
-  plan?: ChatPlan
+  plan?: ChatPlan,
 ): Promise<RoomCreateAllowance> {
   const p = plan ?? (await getChatPlan(userId))
   const quota = p.caps.monthlyRoomQuota
@@ -172,7 +180,10 @@ export async function canCreateRoom(
   return { allowed: used < quota, quota, used }
 }
 
-export async function canSendTip(userId: string, plan?: ChatPlan): Promise<boolean> {
+export async function canSendTip(
+  userId: string,
+  plan?: ChatPlan,
+): Promise<boolean> {
   const p = plan ?? (await getChatPlan(userId))
   return p.caps.canTip
 }
@@ -185,13 +196,18 @@ export interface AiQuota {
 
 // AI 봇 호출 잔여 한도.
 // 이번 달 @ai 멘션 TEXT 메시지 수를 msg_msg에서 직접 집계.
-export async function getAiQuota(userId: string, plan?: ChatPlan): Promise<AiQuota> {
+export async function getAiQuota(
+  userId: string,
+  plan?: ChatPlan,
+): Promise<AiQuota> {
   const p = plan ?? (await getChatPlan(userId))
   const limit = p.caps.aiMonthlyQuota
   if (limit === -1) return { limit: -1, used: 0, remaining: -1 }
 
   const now = new Date()
-  const monthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString()
+  const monthStart = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1),
+  ).toISOString()
   const { count } = await getSupabaseAdmin()
     .from('msg_msg')
     .select('msg_id', { count: 'exact', head: true })

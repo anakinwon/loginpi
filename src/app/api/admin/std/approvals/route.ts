@@ -6,12 +6,13 @@ const PAGE_SIZE = 30
 
 export async function GET(req: NextRequest) {
   const requester = await getSessionUser()
-  if (!isAdmin(requester)) return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+  if (!isAdmin(requester))
+    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
 
   const { searchParams } = new URL(req.url)
-  const status      = searchParams.get('status') ?? 'PENDING'
+  const status = searchParams.get('status') ?? 'PENDING'
   const entity_type = searchParams.get('entity_type') ?? ''
-  const page        = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10))
+  const page = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10))
 
   let query = getSupabaseAdmin()
     .from('approval_queue')
@@ -20,39 +21,48 @@ export async function GET(req: NextRequest) {
     .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1)
 
   if (status !== 'all') query = query.eq('apv_status', status)
-  if (entity_type)      query = query.eq('entity_type', entity_type)
+  if (entity_type) query = query.eq('entity_type', entity_type)
 
   const { data, error, count } = await query
   if (error) return NextResponse.json({ error: '조회 실패' }, { status: 500 })
 
-  return NextResponse.json({ approvals: data ?? [], total: count ?? 0, page, pageSize: PAGE_SIZE })
+  return NextResponse.json({
+    approvals: data ?? [],
+    total: count ?? 0,
+    page,
+    pageSize: PAGE_SIZE,
+  })
 }
 
 export async function POST(req: NextRequest) {
   const requester = await getSessionUser()
-  if (!isAdmin(requester)) return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+  if (!isAdmin(requester))
+    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
 
   const body = (await req.json()) as {
     entity_type: string
-    entity_id:   string
-    entity_nm?:  string
-    req_data?:   Record<string, unknown>
+    entity_id: string
+    entity_nm?: string
+    req_data?: Record<string, unknown>
   }
 
   if (!body.entity_type?.trim() || !body.entity_id?.trim()) {
-    return NextResponse.json({ error: 'entity_type, entity_id는 필수입니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: 'entity_type, entity_id는 필수입니다' },
+      { status: 400 },
+    )
   }
 
   const { data, error } = await getSupabaseAdmin()
     .from('approval_queue')
     .insert({
       entity_type: body.entity_type.trim(),
-      entity_id:   body.entity_id.trim(),
-      entity_nm:   body.entity_nm?.trim() ?? null,
-      apv_status:  'PENDING',
-      req_data:    body.req_data ?? null,
-      req_by:      requester!.id,
-      regr_id:     requester!.id,
+      entity_id: body.entity_id.trim(),
+      entity_nm: body.entity_nm?.trim() ?? null,
+      apv_status: 'PENDING',
+      req_data: body.req_data ?? null,
+      req_by: requester!.id,
+      regr_id: requester!.id,
     })
     .select()
     .single()

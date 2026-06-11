@@ -17,8 +17,8 @@ export default async function ProfilePage() {
   const localeOptions = getLocaleOptions(locale)
 
   return (
-    <div className='mx-auto max-w-2xl px-4 py-8'>
-      <h1 className='mb-6 text-2xl font-bold'>내 프로필</h1>
+    <div className="mx-auto max-w-2xl px-4 py-8">
+      <h1 className="mb-6 text-2xl font-bold">내 프로필</h1>
       <ProfileTabs initialUser={user} localeOptions={localeOptions} />
     </div>
   )

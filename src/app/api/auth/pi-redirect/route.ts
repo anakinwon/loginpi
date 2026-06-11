@@ -79,7 +79,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.redirect(new URL('/?error=db_error', request.url))
   }
 
-  const tokenExpiresAt = new Date(piUser.credentials.valid_until.iso8601).getTime()
+  const tokenExpiresAt = new Date(
+    piUser.credentials.valid_until.iso8601,
+  ).getTime()
   const secondsUntilExpiry = Math.floor((tokenExpiresAt - Date.now()) / 1000)
   const maxAge = Math.min(Math.max(secondsUntilExpiry, 0), MAX_COOKIE_AGE_SEC)
 

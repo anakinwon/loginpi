@@ -6,7 +6,7 @@ import { getSessionUser, isAdmin } from '@/lib/auth-check'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
 )
 
 // ko.json의 전체 flat 키 목록 반환 (source of truth)
@@ -32,7 +32,10 @@ export async function GET() {
   // 전체 번역 키 수: DB가 아닌 ko.json 파일에서 계산 (한국어가 source of truth)
   let totalKeys = 0
   try {
-    const raw = await readFile(join(process.cwd(), 'messages', 'ko.json'), 'utf-8')
+    const raw = await readFile(
+      join(process.cwd(), 'messages', 'ko.json'),
+      'utf-8',
+    )
     const koJson = JSON.parse(raw) as Record<string, unknown>
     totalKeys = flattenKeys(koJson).length
   } catch {
@@ -55,13 +58,14 @@ export async function GET() {
         .eq('locale_cd', loc.locale_cd)
         .not('msg_val', 'is', null)
       return [loc.locale_cd, count ?? 0] as [string, number]
-    })
+    }),
   )
   const countMap = Object.fromEntries(countEntries)
 
   const stats = (locales ?? []).map((loc) => {
     // 한국어는 ko.json이 source of truth → 항상 100% 완료
-    const translated = loc.locale_cd === 'ko' ? totalKeys : (countMap[loc.locale_cd] ?? 0)
+    const translated =
+      loc.locale_cd === 'ko' ? totalKeys : (countMap[loc.locale_cd] ?? 0)
     return {
       ...loc,
       translated,

@@ -10,7 +10,8 @@ export async function GET() {
 
   const { data, error } = await getSupabaseAdmin()
     .from('msg_subscr')
-    .select(`
+    .select(
+      `
       subscr_id,
       plan_cd,
       pymnt_id,
@@ -22,7 +23,8 @@ export async function GET() {
       mod_dtm,
       sys_user ( id, display_name, pi_username, google_email ),
       msg_subscr_plan ( plan_nm, plan_tp_cd, price_pi, mth_cnt )
-    `)
+    `,
+    )
     .eq('del_yn', 'N')
     .order('reg_dtm', { ascending: false })
 
@@ -70,11 +72,14 @@ export async function POST(req: NextRequest) {
         modr_id: requester?.display_name ?? 'ADMIN',
         mod_dtm: now.toISOString(),
       },
-      { onConflict: 'usr_id' }
+      { onConflict: 'usr_id' },
     )
 
   if (error) {
-    return NextResponse.json({ error: '구독 부여 실패: ' + error.message }, { status: 500 })
+    return NextResponse.json(
+      { error: '구독 부여 실패: ' + error.message },
+      { status: 500 },
+    )
   }
 
   return NextResponse.json({ ok: true })

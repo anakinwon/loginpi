@@ -7,21 +7,21 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
 const DOM_TYPE_MAP: Record<string, { pg: string; mysql: string }> = {
-  NM:    { pg: 'VARCHAR(100)',   mysql: 'VARCHAR(100)' },
-  CD:    { pg: 'VARCHAR(20)',    mysql: 'VARCHAR(20)' },
-  NO:    { pg: 'VARCHAR(50)',    mysql: 'VARCHAR(50)' },
-  ID:    { pg: 'VARCHAR(20)',    mysql: 'VARCHAR(20)' },
-  YN:    { pg: 'CHAR(1)',        mysql: 'CHAR(1)' },
-  DT:    { pg: 'DATE',           mysql: 'DATE' },
-  DTM:   { pg: 'TIMESTAMP',     mysql: 'DATETIME' },
-  ADDR:  { pg: 'TEXT',          mysql: 'TEXT' },
-  CONT:  { pg: 'TEXT',          mysql: 'TEXT' },
-  EMADDR:{ pg: 'VARCHAR(200)',  mysql: 'VARCHAR(200)' },
+  NM: { pg: 'VARCHAR(100)', mysql: 'VARCHAR(100)' },
+  CD: { pg: 'VARCHAR(20)', mysql: 'VARCHAR(20)' },
+  NO: { pg: 'VARCHAR(50)', mysql: 'VARCHAR(50)' },
+  ID: { pg: 'VARCHAR(20)', mysql: 'VARCHAR(20)' },
+  YN: { pg: 'CHAR(1)', mysql: 'CHAR(1)' },
+  DT: { pg: 'DATE', mysql: 'DATE' },
+  DTM: { pg: 'TIMESTAMP', mysql: 'DATETIME' },
+  ADDR: { pg: 'TEXT', mysql: 'TEXT' },
+  CONT: { pg: 'TEXT', mysql: 'TEXT' },
+  EMADDR: { pg: 'VARCHAR(200)', mysql: 'VARCHAR(200)' },
   PRICE: { pg: 'NUMERIC(15,2)', mysql: 'DECIMAL(15,2)' },
-  CNT:   { pg: 'INTEGER',       mysql: 'INT' },
-  LVL:   { pg: 'INTEGER',       mysql: 'INT' },
-  SZ:    { pg: 'INTEGER',       mysql: 'INT' },
-  TTL:   { pg: 'VARCHAR(500)',  mysql: 'VARCHAR(500)' },
+  CNT: { pg: 'INTEGER', mysql: 'INT' },
+  LVL: { pg: 'INTEGER', mysql: 'INT' },
+  SZ: { pg: 'INTEGER', mysql: 'INT' },
+  TTL: { pg: 'VARCHAR(500)', mysql: 'VARCHAR(500)' },
 }
 
 interface TermOption {
@@ -53,7 +53,7 @@ function buildDDL(
   tableName: string,
   tableLogNm: string,
   columns: ColumnDef[],
-  dbType: 'pg' | 'mysql'
+  dbType: 'pg' | 'mysql',
 ): string {
   if (!tableName || columns.length === 0) return ''
 
@@ -83,7 +83,9 @@ function buildDDL(
     lines.push('')
     lines.push(`COMMENT ON TABLE ${tableName} IS '${tableLogNm}';`)
     columns.forEach((col) => {
-      lines.push(`COMMENT ON COLUMN ${tableName}.${col.col_nm} IS '${col.col_log_nm}';`)
+      lines.push(
+        `COMMENT ON COLUMN ${tableName}.${col.col_nm} IS '${col.col_log_nm}';`,
+      )
     })
   }
 
@@ -108,13 +110,15 @@ export default function DdlExportPage() {
   const filteredTerms = useMemo(() => {
     const q = termSearch.toLowerCase()
     return allTerms
-      .filter((term) => term.term_log_nm.includes(q) || term.term_phy_nm.includes(q))
+      .filter(
+        (term) => term.term_log_nm.includes(q) || term.term_phy_nm.includes(q),
+      )
       .slice(0, 10)
   }, [allTerms, termSearch])
 
   const ddl = useMemo(
     () => buildDDL(tableName, tableLogNm, columns, dbType),
-    [tableName, tableLogNm, columns, dbType]
+    [tableName, tableLogNm, columns, dbType],
   )
 
   function addFromTerm(term: TermOption) {
@@ -151,7 +155,9 @@ export default function DdlExportPage() {
   }
 
   function updateColumn(id: string, patch: Partial<ColumnDef>) {
-    setColumns((prev) => prev.map((c) => (c.id === id ? { ...c, ...patch } : c)))
+    setColumns((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, ...patch } : c)),
+    )
   }
 
   function copyDdl() {
@@ -170,28 +176,31 @@ export default function DdlExportPage() {
   }
 
   return (
-    <div className='space-y-6'>
+    <div className="space-y-6">
       <div>
-        <h1 className='text-2xl font-bold'>{t('title')}</h1>
-        <p className='text-muted-foreground mt-1 text-sm'>{t('desc')}</p>
+        <h1 className="text-2xl font-bold">{t('title')}</h1>
+        <p className="text-muted-foreground mt-1 text-sm">{t('desc')}</p>
       </div>
 
-      <div className='grid gap-6 lg:grid-cols-2'>
-        <div className='space-y-4'>
-
-          <div className='rounded-lg border p-4 space-y-3'>
-            <h2 className='font-semibold text-sm'>{t('sectionTable')}</h2>
-            <div className='grid grid-cols-2 gap-3'>
-              <label className='space-y-1'>
-                <span className='text-xs text-muted-foreground'>{t('field.tableNmEn')}</span>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <div className="space-y-4">
+          <div className="space-y-3 rounded-lg border p-4">
+            <h2 className="text-sm font-semibold">{t('sectionTable')}</h2>
+            <div className="grid grid-cols-2 gap-3">
+              <label className="space-y-1">
+                <span className="text-muted-foreground text-xs">
+                  {t('field.tableNmEn')}
+                </span>
                 <Input
                   value={tableName}
                   onChange={(e) => setTableName(e.target.value)}
                   placeholder={t('placeholder.tableNmEn')}
                 />
               </label>
-              <label className='space-y-1'>
-                <span className='text-xs text-muted-foreground'>{t('field.tableNmKo')}</span>
+              <label className="space-y-1">
+                <span className="text-muted-foreground text-xs">
+                  {t('field.tableNmKo')}
+                </span>
                 <Input
                   value={tableLogNm}
                   onChange={(e) => setTableLogNm(e.target.value)}
@@ -201,24 +210,26 @@ export default function DdlExportPage() {
             </div>
           </div>
 
-          <div className='rounded-lg border p-4 space-y-2'>
-            <h2 className='font-semibold text-sm'>{t('sectionColumn')}</h2>
-            <div className='relative'>
+          <div className="space-y-2 rounded-lg border p-4">
+            <h2 className="text-sm font-semibold">{t('sectionColumn')}</h2>
+            <div className="relative">
               <Input
                 value={termSearch}
                 onChange={(e) => setTermSearch(e.target.value)}
                 placeholder={t('placeholder.termSearch')}
               />
               {termSearch && filteredTerms.length > 0 && (
-                <div className='absolute z-10 mt-1 w-full rounded-md border bg-background shadow-lg max-h-52 overflow-y-auto'>
+                <div className="bg-background absolute z-10 mt-1 max-h-52 w-full overflow-y-auto rounded-md border shadow-lg">
                   {filteredTerms.map((term) => (
                     <button
                       key={term.term_id}
                       onClick={() => addFromTerm(term)}
-                      className='flex w-full items-center justify-between px-3 py-2 text-sm hover:bg-muted text-left'
+                      className="hover:bg-muted flex w-full items-center justify-between px-3 py-2 text-left text-sm"
                     >
                       <span>{term.term_log_nm}</span>
-                      <span className='font-mono text-xs text-muted-foreground'>{term.term_phy_nm}</span>
+                      <span className="text-muted-foreground font-mono text-xs">
+                        {term.term_phy_nm}
+                      </span>
                     </button>
                   ))}
                 </div>
@@ -227,40 +238,55 @@ export default function DdlExportPage() {
           </div>
 
           {columns.length > 0 && (
-            <div className='rounded-lg border overflow-x-auto'>
-              <table className='w-full text-xs'>
-                <thead className='bg-muted/50 border-b'>
+            <div className="overflow-x-auto rounded-lg border">
+              <table className="w-full text-xs">
+                <thead className="bg-muted/50 border-b">
                   <tr>
-                    <th className='text-left px-3 py-2 font-medium'>{t('col.colLogNm')}</th>
-                    <th className='text-left px-3 py-2 font-medium'>{t('col.type')}</th>
-                    <th className='px-2 py-2 text-center font-medium'>{t('col.pk')}</th>
-                    <th className='px-2 py-2 text-center font-medium'>{t('col.nn')}</th>
-                    <th className='px-2 py-2'></th>
+                    <th className="px-3 py-2 text-left font-medium">
+                      {t('col.colLogNm')}
+                    </th>
+                    <th className="px-3 py-2 text-left font-medium">
+                      {t('col.type')}
+                    </th>
+                    <th className="px-2 py-2 text-center font-medium">
+                      {t('col.pk')}
+                    </th>
+                    <th className="px-2 py-2 text-center font-medium">
+                      {t('col.nn')}
+                    </th>
+                    <th className="px-2 py-2"></th>
                   </tr>
                 </thead>
-                <tbody className='divide-y'>
+                <tbody className="divide-y">
                   {columns.map((col, i) => (
-                    <tr key={col.id} className='hover:bg-muted/20'>
-                      <td className='px-3 py-2'>
-                        <div className='font-mono'>{col.col_nm}</div>
-                        <div className='text-muted-foreground text-xs'>{col.col_log_nm}</div>
+                    <tr key={col.id} className="hover:bg-muted/20">
+                      <td className="px-3 py-2">
+                        <div className="font-mono">{col.col_nm}</div>
+                        <div className="text-muted-foreground text-xs">
+                          {col.col_log_nm}
+                        </div>
                       </td>
-                      <td className='px-3 py-2'>
+                      <td className="px-3 py-2">
                         <Input
-                          value={dbType === 'pg' ? col.col_type_pg : col.col_type_mysql}
+                          value={
+                            dbType === 'pg'
+                              ? col.col_type_pg
+                              : col.col_type_mysql
+                          }
                           onChange={(e) =>
-                            updateColumn(col.id,
+                            updateColumn(
+                              col.id,
                               dbType === 'pg'
                                 ? { col_type_pg: e.target.value }
-                                : { col_type_mysql: e.target.value }
+                                : { col_type_mysql: e.target.value },
                             )
                           }
-                          className='h-7 text-xs font-mono w-36'
+                          className="h-7 w-36 font-mono text-xs"
                         />
                       </td>
-                      <td className='px-2 py-2 text-center'>
+                      <td className="px-2 py-2 text-center">
                         <input
-                          type='checkbox'
+                          type="checkbox"
                           checked={col.is_pk}
                           onChange={(e) =>
                             updateColumn(col.id, {
@@ -268,33 +294,41 @@ export default function DdlExportPage() {
                               not_null: e.target.checked ? true : col.not_null,
                             })
                           }
-                          className='cursor-pointer'
+                          className="cursor-pointer"
                         />
                       </td>
-                      <td className='px-2 py-2 text-center'>
+                      <td className="px-2 py-2 text-center">
                         <input
-                          type='checkbox'
+                          type="checkbox"
                           checked={col.not_null}
-                          onChange={(e) => updateColumn(col.id, { not_null: e.target.checked })}
-                          className='cursor-pointer'
+                          onChange={(e) =>
+                            updateColumn(col.id, { not_null: e.target.checked })
+                          }
+                          className="cursor-pointer"
                         />
                       </td>
-                      <td className='px-2 py-2'>
-                        <div className='flex gap-0.5'>
+                      <td className="px-2 py-2">
+                        <div className="flex gap-0.5">
                           <button
                             onClick={() => moveColumn(col.id, 'up')}
                             disabled={i === 0}
-                            className='px-1 py-0.5 text-muted-foreground hover:text-foreground disabled:opacity-25'
-                          >↑</button>
+                            className="text-muted-foreground hover:text-foreground px-1 py-0.5 disabled:opacity-25"
+                          >
+                            ↑
+                          </button>
                           <button
                             onClick={() => moveColumn(col.id, 'down')}
                             disabled={i === columns.length - 1}
-                            className='px-1 py-0.5 text-muted-foreground hover:text-foreground disabled:opacity-25'
-                          >↓</button>
+                            className="text-muted-foreground hover:text-foreground px-1 py-0.5 disabled:opacity-25"
+                          >
+                            ↓
+                          </button>
                           <button
                             onClick={() => removeColumn(col.id)}
-                            className='px-1 py-0.5 text-muted-foreground hover:text-destructive'
-                          >×</button>
+                            className="text-muted-foreground hover:text-destructive px-1 py-0.5"
+                          >
+                            ×
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -305,11 +339,11 @@ export default function DdlExportPage() {
           )}
         </div>
 
-        <div className='space-y-3'>
-          <div className='flex items-center justify-between'>
-            <h2 className='font-semibold text-sm'>{t('sectionPreview')}</h2>
-            <div className='flex items-center gap-2'>
-              <div className='flex rounded-md border overflow-hidden text-xs'>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-semibold">{t('sectionPreview')}</h2>
+            <div className="flex items-center gap-2">
+              <div className="flex overflow-hidden rounded-md border text-xs">
                 {(['pg', 'mysql'] as const).map((dbT) => (
                   <button
                     key={dbT}
@@ -325,11 +359,21 @@ export default function DdlExportPage() {
                 ))}
               </div>
               {ddl && (
-                <div className='flex gap-1'>
-                  <Button size='sm' variant='outline' className='h-7 text-xs' onClick={copyDdl}>
+                <div className="flex gap-1">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 text-xs"
+                    onClick={copyDdl}
+                  >
                     {t('copy')}
                   </Button>
-                  <Button size='sm' variant='outline' className='h-7 text-xs' onClick={downloadDdl}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 text-xs"
+                    onClick={downloadDdl}
+                  >
                     {t('download')}
                   </Button>
                 </div>
@@ -337,11 +381,9 @@ export default function DdlExportPage() {
             </div>
           </div>
 
-          <pre className='rounded-lg border bg-muted/30 p-4 text-xs font-mono min-h-72 overflow-x-auto whitespace-pre leading-relaxed'>
+          <pre className="bg-muted/30 min-h-72 overflow-x-auto rounded-lg border p-4 font-mono text-xs leading-relaxed whitespace-pre">
             {ddl || (
-              <span className='text-muted-foreground'>
-                {t('emptyPreview')}
-              </span>
+              <span className="text-muted-foreground">{t('emptyPreview')}</span>
             )}
           </pre>
         </div>

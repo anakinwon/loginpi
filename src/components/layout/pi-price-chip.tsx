@@ -5,8 +5,10 @@ import { LOCALE_CURRENCY } from '@/lib/locale-currency'
 
 // 통화별 가격 포매팅
 function fmtPrice(price: number): string {
-  if (price >= 10000) return price.toLocaleString('en-US', { maximumFractionDigits: 0 })
-  if (price >= 100) return price.toLocaleString('en-US', { maximumFractionDigits: 1 })
+  if (price >= 10000)
+    return price.toLocaleString('en-US', { maximumFractionDigits: 0 })
+  if (price >= 100)
+    return price.toLocaleString('en-US', { maximumFractionDigits: 1 })
   if (price >= 1) return price.toFixed(2)
   return price.toFixed(4)
 }
@@ -36,7 +38,7 @@ export function PiPriceChip({ locale }: { locale: string }) {
   // 매핑 누락 시 USD fallback — 침묵 누락이 et/mx 환율 버그의 은폐 원인이었으므로 dev에서 경고 (2026-06-08)
   if (process.env.NODE_ENV === 'development' && !LOCALE_CURRENCY[locale]) {
     console.warn(
-      `[pi-price-chip] locale '${locale}' 통화 매핑 누락 → USD fallback 중. src/lib/locale-currency.ts에 추가하세요 (pnpm validate:locales로 검증)`
+      `[pi-price-chip] locale '${locale}' 통화 매핑 누락 → USD fallback 중. src/lib/locale-currency.ts에 추가하세요 (pnpm validate:locales로 검증)`,
     )
   }
   const currency = LOCALE_CURRENCY[locale] ?? 'USD'
@@ -46,11 +48,13 @@ export function PiPriceChip({ locale }: { locale: string }) {
   return (
     <div
       title={`1 π ≈ ${piUsd.toFixed(4)} USD (CoinGecko)`}
-      className='flex items-center gap-1 rounded-full border border-border bg-muted/50 px-2.5 py-1 text-xs'
+      className="border-border bg-muted/50 flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs"
     >
-      <span className='font-serif italic text-foreground'>π</span>
-      <span className='tabular-nums font-semibold text-foreground'>{fmtPrice(price)}</span>
-      <span className='text-[10px] font-medium uppercase tracking-wide text-muted-foreground'>
+      <span className="text-foreground font-serif italic">π</span>
+      <span className="text-foreground font-semibold tabular-nums">
+        {fmtPrice(price)}
+      </span>
+      <span className="text-muted-foreground text-[10px] font-medium tracking-wide uppercase">
         {currency}
       </span>
     </div>

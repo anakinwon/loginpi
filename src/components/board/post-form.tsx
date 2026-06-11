@@ -16,7 +16,13 @@ type Props = {
   canAttach?: boolean
 }
 
-export function PostForm({ category, postId, initialTitle = '', initialContent = '', canAttach }: Props) {
+export function PostForm({
+  category,
+  postId,
+  initialTitle = '',
+  initialContent = '',
+  canAttach,
+}: Props) {
   const router = useRouter()
   const t = useTranslations('board')
   const tc = useTranslations('common')
@@ -42,8 +48,11 @@ export function PostForm({ category, postId, initialTitle = '', initialContent =
       {
         method: isEdit ? 'PATCH' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ post_ttl: title.trim(), post_cont: content.trim() }),
-      }
+        body: JSON.stringify({
+          post_ttl: title.trim(),
+          post_cont: content.trim(),
+        }),
+      },
     )
 
     if (res.ok) {
@@ -54,10 +63,13 @@ export function PostForm({ category, postId, initialTitle = '', initialContent =
       if (!isEdit && canAttach && files.length > 0) {
         const formData = new FormData()
         files.forEach((f) => formData.append('files', f))
-        const uploadRes = await fetch(`/api/board/${category}/${targetId}/attachments`, {
-          method: 'POST',
-          body: formData,
-        })
+        const uploadRes = await fetch(
+          `/api/board/${category}/${targetId}/attachments`,
+          {
+            method: 'POST',
+            body: formData,
+          },
+        )
         if (!uploadRes.ok) {
           toast.error(ta('uploadFail'))
         }
@@ -74,11 +86,11 @@ export function PostForm({ category, postId, initialTitle = '', initialContent =
   }
 
   return (
-    <form onSubmit={handleSubmit} className='space-y-4'>
-      <div className='space-y-1.5'>
-        <Label htmlFor='post-title'>{t('postTitle')}</Label>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="space-y-1.5">
+        <Label htmlFor="post-title">{t('postTitle')}</Label>
         <Input
-          id='post-title'
+          id="post-title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder={t('titlePlaceholder')}
@@ -87,63 +99,70 @@ export function PostForm({ category, postId, initialTitle = '', initialContent =
         />
       </div>
 
-      <div className='space-y-1.5'>
-        <Label htmlFor='post-content'>{t('postContent')}</Label>
+      <div className="space-y-1.5">
+        <Label htmlFor="post-content">{t('postContent')}</Label>
         <textarea
-          id='post-content'
+          id="post-content"
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder={t('contentPlaceholder')}
           rows={18}
           disabled={submitting}
-          className='w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50'
+          className="border-input bg-background placeholder:text-muted-foreground focus-visible:ring-ring w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
         />
       </div>
 
       {canAttach && !isEdit && (
-        <div className='space-y-1.5'>
+        <div className="space-y-1.5">
           <Label>{ta('title')}</Label>
-          <div className='flex flex-wrap items-center gap-2'>
+          <div className="flex flex-wrap items-center gap-2">
             <input
               ref={fileInputRef}
-              type='file'
+              type="file"
               multiple
-              className='hidden'
+              className="hidden"
               onChange={(e) => setFiles(Array.from(e.target.files ?? []))}
               disabled={submitting}
             />
             <Button
-              type='button'
-              variant='outline'
-              size='sm'
+              type="button"
+              variant="outline"
+              size="sm"
               onClick={() => fileInputRef.current?.click()}
               disabled={submitting}
             >
               {ta('upload')}
             </Button>
             {files.length > 0 && (
-              <ul className='flex flex-wrap gap-1.5'>
+              <ul className="flex flex-wrap gap-1.5">
                 {files.map((f, i) => (
-                  <li key={i} className='rounded bg-muted px-2 py-0.5 text-xs text-muted-foreground'>
+                  <li
+                    key={i}
+                    className="bg-muted text-muted-foreground rounded px-2 py-0.5 text-xs"
+                  >
                     {f.name}
                   </li>
                 ))}
               </ul>
             )}
           </div>
-          <p className='text-xs text-muted-foreground'>{ta('sizeLimit')}</p>
+          <p className="text-muted-foreground text-xs">{ta('sizeLimit')}</p>
         </div>
       )}
 
-      <div className='flex gap-2'>
-        <Button type='submit' disabled={submitting}>
+      <div className="flex gap-2">
+        <Button type="submit" disabled={submitting}>
           {submitting
-            ? isEdit ? t('saving') : tc('creating')
-            : isEdit ? t('editPost') : tc('create')}
+            ? isEdit
+              ? t('saving')
+              : tc('creating')
+            : isEdit
+              ? t('editPost')
+              : tc('create')}
         </Button>
         <Button
-          type='button'
-          variant='outline'
+          type="button"
+          variant="outline"
           onClick={() => router.back()}
           disabled={submitting}
         >

@@ -13,13 +13,17 @@ export async function GET(req: NextRequest) {
 
   let query = getSupabaseAdmin()
     .from('std_dic')
-    .select('dic_id, dic_log_nm, dic_phy_nm, dic_phy_fll_nm, dic_desc, data_type, data_len, apv_status, synced_at, reg_dtm, mod_dtm, regr_id')
+    .select(
+      'dic_id, dic_log_nm, dic_phy_nm, dic_phy_fll_nm, dic_desc, data_type, data_len, apv_status, synced_at, reg_dtm, mod_dtm, regr_id',
+    )
     .eq('del_yn', 'N')
     .order('dic_log_nm', { ascending: true })
 
   if (search) {
     const s = search.replace(/[%_\\]/g, '\\$&')
-    query = query.or(`dic_log_nm.ilike.%${s}%,dic_phy_nm.ilike.%${s}%,dic_phy_fll_nm.ilike.%${s}%`)
+    query = query.or(
+      `dic_log_nm.ilike.%${s}%,dic_phy_nm.ilike.%${s}%,dic_phy_fll_nm.ilike.%${s}%`,
+    )
   }
 
   const { data, error } = await query
@@ -44,7 +48,10 @@ export async function POST(req: NextRequest) {
   }
 
   if (!body.dic_log_nm?.trim() || !body.dic_phy_nm?.trim()) {
-    return NextResponse.json({ error: '논리명과 물리명은 필수입니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: '논리명과 물리명은 필수입니다' },
+      { status: 400 },
+    )
   }
 
   const { data, error } = await getSupabaseAdmin()

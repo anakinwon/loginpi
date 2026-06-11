@@ -31,9 +31,9 @@ const PERIODS = [7, 30, 90] as const
 
 function SummaryCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className='rounded-xl border p-3'>
-      <p className='text-xs text-muted-foreground'>{label}</p>
-      <p className='mt-1 text-lg font-bold'>{value}</p>
+    <div className="rounded-xl border p-3">
+      <p className="text-muted-foreground text-xs">{label}</p>
+      <p className="mt-1 text-lg font-bold">{value}</p>
     </div>
   )
 }
@@ -45,46 +45,62 @@ export function RoomAnalytics({ roomId }: { roomId: string }) {
   const [businessRequired, setBusinessRequired] = useState(false)
   const [loading, setLoading] = useState(true)
 
-  const load = useCallback(async (d: number) => {
-    setLoading(true)
-    setError(null)
-    try {
-      const res = await piFetch(`/api/chat/rooms/${roomId}/analytics?days=${d}`)
-      const json = (await res.json()) as AnalyticsData & { error?: string; businessRequired?: boolean }
-      if (!res.ok) {
-        setBusinessRequired(!!json.businessRequired)
-        setError(json.error ?? '분석 조회 실패')
-        setData(null)
-        return
+  const load = useCallback(
+    async (d: number) => {
+      setLoading(true)
+      setError(null)
+      try {
+        const res = await piFetch(
+          `/api/chat/rooms/${roomId}/analytics?days=${d}`,
+        )
+        const json = (await res.json()) as AnalyticsData & {
+          error?: string
+          businessRequired?: boolean
+        }
+        if (!res.ok) {
+          setBusinessRequired(!!json.businessRequired)
+          setError(json.error ?? '분석 조회 실패')
+          setData(null)
+          return
+        }
+        setData(json)
+      } catch {
+        setError('분석 조회 중 오류가 발생했습니다')
+      } finally {
+        setLoading(false)
       }
-      setData(json)
-    } catch {
-      setError('분석 조회 중 오류가 발생했습니다')
-    } finally {
-      setLoading(false)
-    }
-  }, [roomId])
+    },
+    [roomId],
+  )
 
-  useEffect(() => { void load(days) }, [load, days])
+  useEffect(() => {
+    void load(days)
+  }, [load, days])
 
   if (loading) {
-    return <div className='mx-auto max-w-3xl space-y-4 px-4 py-8'>
-      <div className='h-8 w-48 animate-pulse rounded-lg bg-muted' />
-      <div className='h-64 animate-pulse rounded-xl bg-muted' />
-    </div>
+    return (
+      <div className="mx-auto max-w-3xl space-y-4 px-4 py-8">
+        <div className="bg-muted h-8 w-48 animate-pulse rounded-lg" />
+        <div className="bg-muted h-64 animate-pulse rounded-xl" />
+      </div>
+    )
   }
 
   if (error) {
     return (
-      <div className='mx-auto max-w-3xl px-4 py-16 text-center'>
-        <p className='text-3xl'>{businessRequired ? '💼' : '🔒'}</p>
-        <p className='mt-3 text-sm text-muted-foreground'>{error}</p>
+      <div className="mx-auto max-w-3xl px-4 py-16 text-center">
+        <p className="text-3xl">{businessRequired ? '💼' : '🔒'}</p>
+        <p className="text-muted-foreground mt-3 text-sm">{error}</p>
         {businessRequired && (
-          <p className='mt-2 text-xs text-muted-foreground'>
-            Business 플랜(Pi Host)으로 업그레이드하면 카페 분석을 볼 수 있습니다.
+          <p className="text-muted-foreground mt-2 text-xs">
+            Business 플랜(Pi Host)으로 업그레이드하면 카페 분석을 볼 수
+            있습니다.
           </p>
         )}
-        <Link href={`/chat/${roomId}`} className='mt-4 inline-block text-sm text-primary underline'>
+        <Link
+          href={`/chat/${roomId}`}
+          className="text-primary mt-4 inline-block text-sm underline"
+        >
           카페로 돌아가기
         </Link>
       </div>
@@ -93,49 +109,72 @@ export function RoomAnalytics({ roomId }: { roomId: string }) {
 
   if (!data) return null
 
-  const dates = data.daily.map(r => r.stat_dt)
+  const dates = data.daily.map((r) => r.stat_dt)
 
   return (
-    <div className='mx-auto max-w-3xl px-4 py-8'>
-      <div className='mb-6 flex items-center justify-between'>
+    <div className="mx-auto max-w-3xl px-4 py-8">
+      <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className='text-xl font-bold'>📊 카페 분석</h1>
-          <p className='text-xs text-muted-foreground'>Business 전용 — 최근 {data.days}일</p>
+          <h1 className="text-xl font-bold">📊 카페 분석</h1>
+          <p className="text-muted-foreground text-xs">
+            Business 전용 — 최근 {data.days}일
+          </p>
         </div>
-        <div className='flex items-center gap-2'>
-          <div className='flex gap-1'>
-            {PERIODS.map(p => (
+        <div className="flex items-center gap-2">
+          <div className="flex gap-1">
+            {PERIODS.map((p) => (
               <button
                 key={p}
                 onClick={() => setDays(p)}
                 className={`rounded-lg border px-2.5 py-1 text-xs font-medium ${
-                  days === p ? 'border-primary bg-primary text-primary-foreground' : 'hover:bg-muted'
+                  days === p
+                    ? 'border-primary bg-primary text-primary-foreground'
+                    : 'hover:bg-muted'
                 }`}
               >
                 {p}일
               </button>
             ))}
           </div>
-          <Link href={`/chat/${roomId}`} className='text-sm text-muted-foreground hover:text-foreground'>✕</Link>
+          <Link
+            href={`/chat/${roomId}`}
+            className="text-muted-foreground hover:text-foreground text-sm"
+          >
+            ✕
+          </Link>
         </div>
       </div>
 
       {/* 요약 카드 */}
-      <div className='mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4'>
-        <SummaryCard label={`MAU (${data.days}일 활성)`} value={`${data.summary.mau}명`} />
-        <SummaryCard label='현재 멤버' value={`${data.summary.cur_mbr_cnt}명`} />
-        <SummaryCard label='총 메시지' value={`${data.summary.total_msg_cnt}건`} />
-        <SummaryCard label='Pi Tip 수익' value={`π${data.summary.total_tip_pi}`} />
+      <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <SummaryCard
+          label={`MAU (${data.days}일 활성)`}
+          value={`${data.summary.mau}명`}
+        />
+        <SummaryCard
+          label="현재 멤버"
+          value={`${data.summary.cur_mbr_cnt}명`}
+        />
+        <SummaryCard
+          label="총 메시지"
+          value={`${data.summary.total_msg_cnt}건`}
+        />
+        <SummaryCard
+          label="Pi Tip 수익"
+          value={`π${data.summary.total_tip_pi}`}
+        />
       </div>
 
       {/* 메시지·활성 사용자 추이 */}
-      <div className='mb-6 rounded-xl border p-3'>
-        <h2 className='mb-2 text-sm font-semibold'>메시지 · 활성 사용자 추이</h2>
+      <div className="mb-6 rounded-xl border p-3">
+        <h2 className="mb-2 text-sm font-semibold">
+          메시지 · 활성 사용자 추이
+        </h2>
         <PlotlyPlot
           data={[
             {
               x: dates,
-              y: data.daily.map(r => r.msg_cnt),
+              y: data.daily.map((r) => r.msg_cnt),
               type: 'scatter',
               mode: 'lines+markers',
               name: '메시지',
@@ -143,7 +182,7 @@ export function RoomAnalytics({ roomId }: { roomId: string }) {
             },
             {
               x: dates,
-              y: data.daily.map(r => r.active_usr_cnt),
+              y: data.daily.map((r) => r.active_usr_cnt),
               type: 'scatter',
               mode: 'lines+markers',
               name: '활성 사용자',
@@ -165,20 +204,20 @@ export function RoomAnalytics({ roomId }: { roomId: string }) {
       </div>
 
       {/* Pi 수익 · 신규 멤버 */}
-      <div className='rounded-xl border p-3'>
-        <h2 className='mb-2 text-sm font-semibold'>Pi Tip 수익 · 신규 멤버</h2>
+      <div className="rounded-xl border p-3">
+        <h2 className="mb-2 text-sm font-semibold">Pi Tip 수익 · 신규 멤버</h2>
         <PlotlyPlot
           data={[
             {
               x: dates,
-              y: data.daily.map(r => r.tip_amt_pi),
+              y: data.daily.map((r) => r.tip_amt_pi),
               type: 'bar',
               name: 'Tip (π)',
               marker: { color: '#f59e0b' },
             },
             {
               x: dates,
-              y: data.daily.map(r => r.new_mbr_cnt),
+              y: data.daily.map((r) => r.new_mbr_cnt),
               type: 'bar',
               name: '신규 멤버',
               marker: { color: '#3b82f6' },

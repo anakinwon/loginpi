@@ -16,10 +16,8 @@ const PlotlyPlot = dynamic(
   },
   {
     ssr: false,
-    loading: () => (
-      <div className='bg-muted h-64 animate-pulse rounded-lg' />
-    ),
-  }
+    loading: () => <div className="bg-muted h-64 animate-pulse rounded-lg" />,
+  },
 )
 
 export type { PlotParams }

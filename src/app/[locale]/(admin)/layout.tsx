@@ -27,11 +27,11 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className='flex flex-1'>
+    <div className="flex flex-1">
       {/* _pit 파라미터가 URL에 남아있으면 제거 (Pi Browser 인증 성공 후 cleanup) */}
       <PitUrlCleaner />
       <AdminSidebar />
-      <main className='flex-1 overflow-auto p-6'>{children}</main>
+      <main className="flex-1 overflow-auto p-6">{children}</main>
     </div>
   )
 }

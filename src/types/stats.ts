@@ -1,7 +1,7 @@
 // Phase 11 — 어드민 통계 대시보드 타입 (TASK-084)
 
 export interface ActivityDataPoint {
-  stat_dt: string   // YYYY-MM-DD
+  stat_dt: string // YYYY-MM-DD
   dau_cnt: number
   wau_cnt: number
   mau_cnt: number

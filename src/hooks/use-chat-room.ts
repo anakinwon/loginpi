@@ -14,8 +14,8 @@ export interface ChatMessage {
   attch_url: string | null
   stkr_id: string | null
   ref_msg_id: string | null
-  src_lang_cd?: string | null  // 원본 언어 코드 (PiTranslate™ 감지)
-  trans_cont?: string | null   // 번역된 텍스트 (PiTranslate™)
+  src_lang_cd?: string | null // 원본 언어 코드 (PiTranslate™ 감지)
+  trans_cont?: string | null // 번역된 텍스트 (PiTranslate™)
   trans_locale?: string | null // trans_cont가 번역된 대상 언어 — 캐시 비교용
   del_yn: 'Y' | 'N'
   reg_dtm: string
@@ -66,96 +66,136 @@ const BADGE_EVENT = 'badge_award'
 export function useChatRoom(
   roomId: string,
   initialMessages: ChatMessage[],
-  { currentUserId, currentUserDisplayName, userLocale, forceTranslate = false, onAiLimitExceeded, onBadgeAward }: UseChatRoomOptions,
+  {
+    currentUserId,
+    currentUserDisplayName,
+    userLocale,
+    forceTranslate = false,
+    onAiLimitExceeded,
+    onBadgeAward,
+  }: UseChatRoomOptions,
 ): UseChatRoomReturn {
   // 초기 메시지에 trans_locale 세팅 — 서버가 trans_cont를 미리 채운 경우 현재 locale로 표시
   const [messages, setMessages] = useState<ChatMessage[]>(() =>
     userLocale
-      ? initialMessages.map(m => (m.trans_cont ? { ...m, trans_locale: userLocale } : m))
+      ? initialMessages.map((m) =>
+          m.trans_cont ? { ...m, trans_locale: userLocale } : m,
+        )
       : initialMessages,
   )
   const [onlineUserIds, setOnlineUserIds] = useState<string[]>([])
-  const channelRef = useRef<ReturnType<ReturnType<typeof getSupabaseClient>['channel']> | null>(null)
+  const channelRef = useRef<ReturnType<
+    ReturnType<typeof getSupabaseClient>['channel']
+  > | null>(null)
   // 이미 번역 요청한 msg_id — broadcast 수신마다 중복 POST 방지
   const requestedTransRef = useRef<Set<string>>(new Set())
   // 배지 수여 콜백 최신 참조 — 콜백 변경 시 채널 재구독 방지
   const onBadgeAwardRef = useRef(onBadgeAward)
-  useEffect(() => { onBadgeAwardRef.current = onBadgeAward }, [onBadgeAward])
+  useEffect(() => {
+    onBadgeAwardRef.current = onBadgeAward
+  }, [onBadgeAward])
 
   const addMessage = useCallback((msg: ChatMessage) => {
-    setMessages(prev => {
-      if (prev.some(m => m.msg_id === msg.msg_id)) return prev
+    setMessages((prev) => {
+      if (prev.some((m) => m.msg_id === msg.msg_id)) return prev
       return [...prev, msg]
     })
   }, [])
 
   // 메시지 번역 텍스트 교체 — localeCd도 기록해 언어 전환 시 캐시 재사용 (PiTranslate™)
-  const applyTranslation = useCallback((msgId: string, transCont: string, localeCd: string) => {
-    setMessages(prev => prev.map(m =>
-      m.msg_id === msgId ? { ...m, trans_cont: transCont, trans_locale: localeCd } : m,
-    ))
-  }, [])
+  const applyTranslation = useCallback(
+    (msgId: string, transCont: string, localeCd: string) => {
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.msg_id === msgId
+            ? { ...m, trans_cont: transCont, trans_locale: localeCd }
+            : m,
+        ),
+      )
+    },
+    [],
+  )
 
   // 일괄 번역 (forceTranslate — 방 헤더 언어 콤보): 캐시 히트는 응답 map으로,
   // fresh 번역은 진행 중 msg_trans broadcast로도 점진 도착한다 (50건씩 청크)
-  const batchTranslate = useCallback(async (msgIds: string[]) => {
-    if (!userLocale) return
-    const locale = userLocale // 클로저 캡처 — async 완료 시점과 일치 보장
-    let totalApplied = 0
-    let attempted = 0
-    for (let i = 0; i < msgIds.length; i += 50) {
-      const chunk = msgIds.slice(i, i + 50)
-      attempted += chunk.length
-      try {
-        const res = await piFetch(`/api/chat/rooms/${roomId}/translate-batch`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ locale_cd: locale, msg_ids: chunk }),
-        })
-        if (!res.ok) continue
-        const { translations } = await res.json() as { translations: Record<string, string> }
-        totalApplied += Object.keys(translations).length
-        // trans_locale 기록: 언어 재전환 시 이 번역을 캐시로 재사용
-        setMessages(prev => prev.map(m =>
-          translations[m.msg_id] !== undefined
-            ? { ...m, trans_cont: translations[m.msg_id], trans_locale: locale }
-            : m,
-        ))
-      } catch {} // 실패 청크는 원문 표시 폴백
-    }
-    // 요청 전부가 실패하면 번역 엔진 장애(API 크레딧 소진 등) — 사용자에게 1회 안내
-    if (attempted > 0 && totalApplied === 0) {
-      toast.error('번역 서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.')
-    }
-  }, [roomId, userLocale])
+  const batchTranslate = useCallback(
+    async (msgIds: string[]) => {
+      if (!userLocale) return
+      const locale = userLocale // 클로저 캡처 — async 완료 시점과 일치 보장
+      let totalApplied = 0
+      let attempted = 0
+      for (let i = 0; i < msgIds.length; i += 50) {
+        const chunk = msgIds.slice(i, i + 50)
+        attempted += chunk.length
+        try {
+          const res = await piFetch(
+            `/api/chat/rooms/${roomId}/translate-batch`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ locale_cd: locale, msg_ids: chunk }),
+            },
+          )
+          if (!res.ok) continue
+          const { translations } = (await res.json()) as {
+            translations: Record<string, string>
+          }
+          totalApplied += Object.keys(translations).length
+          // trans_locale 기록: 언어 재전환 시 이 번역을 캐시로 재사용
+          setMessages((prev) =>
+            prev.map((m) =>
+              translations[m.msg_id] !== undefined
+                ? {
+                    ...m,
+                    trans_cont: translations[m.msg_id],
+                    trans_locale: locale,
+                  }
+                : m,
+            ),
+          )
+        } catch {} // 실패 청크는 원문 표시 폴백
+      }
+      // 요청 전부가 실패하면 번역 엔진 장애(API 크레딧 소진 등) — 사용자에게 1회 안내
+      if (attempted > 0 && totalApplied === 0) {
+        toast.error(
+          '번역 서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.',
+        )
+      }
+    },
+    [roomId, userLocale],
+  )
 
   // 수신 메시지 번역 요청 — 두 모드를 단일 함수로 통합.
   // • forceTranslate: batchTranslate를 즉시 호출해 새 수신 메시지도 누락 없이 번역.
   //   (effect만 의존하면 React 배치 타이밍에 따라 신규 메시지가 누락될 수 있음)
   // • 일반 모드: 단건 번역 API로 서버 display_locale_cd 큐를 보완.
   // requestedTransRef dedup으로 두 경로 모두 중복 호출 방지.
-  const requestTranslation = useCallback((msg: ChatMessage) => {
-    if (!userLocale) return
-    if (msg.msg_tp_cd !== 'TEXT' || !msg.msg_cont) return
-    if (requestedTransRef.current.has(msg.msg_id)) return
-    requestedTransRef.current.add(msg.msg_id)
+  const requestTranslation = useCallback(
+    (msg: ChatMessage) => {
+      if (!userLocale) return
+      if (msg.msg_tp_cd !== 'TEXT' || !msg.msg_cont) return
+      if (requestedTransRef.current.has(msg.msg_id)) return
+      requestedTransRef.current.add(msg.msg_id)
 
-    if (forceTranslate) {
-      // forceTranslate 모드: batchTranslate로 즉시 번역 (캐시 우선 — DB 미스 시 Gemini 호출)
-      void batchTranslate([msg.msg_id])
-    } else {
-      piFetch(`/api/chat/rooms/${roomId}/messages/${msg.msg_id}/translate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ locale_cd: userLocale }),
-      })
-        .then(res => res.ok ? res.json() : null)
-        .then((data: { trans_cont?: string; same_lang?: boolean } | null) => {
-          if (data?.trans_cont && !data.same_lang) applyTranslation(msg.msg_id, data.trans_cont, userLocale)
+      if (forceTranslate) {
+        // forceTranslate 모드: batchTranslate로 즉시 번역 (캐시 우선 — DB 미스 시 Gemini 호출)
+        void batchTranslate([msg.msg_id])
+      } else {
+        piFetch(`/api/chat/rooms/${roomId}/messages/${msg.msg_id}/translate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ locale_cd: userLocale }),
         })
-        .catch(() => {}) // 번역 실패는 원문 표시로 자연 폴백 — 카페 흐름을 막지 않음
-    }
-  }, [roomId, userLocale, forceTranslate, applyTranslation, batchTranslate])
+          .then((res) => (res.ok ? res.json() : null))
+          .then((data: { trans_cont?: string; same_lang?: boolean } | null) => {
+            if (data?.trans_cont && !data.same_lang)
+              applyTranslation(msg.msg_id, data.trans_cont, userLocale)
+          })
+          .catch(() => {}) // 번역 실패는 원문 표시로 자연 폴백 — 카페 흐름을 막지 않음
+      }
+    },
+    [roomId, userLocale, forceTranslate, applyTranslation, batchTranslate],
+  )
 
   // 표시 언어 변경 시: 대상 언어와 다른 번역만 비움 — 이미 이 언어로 번역된 것은 캐시 유지
   const prevLocaleRef = useRef<string | undefined>(userLocale)
@@ -163,10 +203,14 @@ export function useChatRoom(
     if (prevLocaleRef.current === userLocale) return
     prevLocaleRef.current = userLocale
     requestedTransRef.current.clear()
-    setMessages(prev => prev.map(m => {
-      if (m.trans_locale === userLocale) return m  // 대상 언어 캐시 유지 (언어 재선택 빠른 복원)
-      return m.trans_cont != null ? { ...m, trans_cont: null, trans_locale: null } : m
-    }))
+    setMessages((prev) =>
+      prev.map((m) => {
+        if (m.trans_locale === userLocale) return m // 대상 언어 캐시 유지 (언어 재선택 빠른 복원)
+        return m.trans_cont != null
+          ? { ...m, trans_cont: null, trans_locale: null }
+          : m
+      }),
+    )
   }, [userLocale])
 
   // forceTranslate: 초기 로드·scroll-up prepend·언어 변경 후 미번역 메시지 일괄 번역
@@ -174,19 +218,21 @@ export function useChatRoom(
   useEffect(() => {
     if (!forceTranslate || !userLocale) return
     const ids = messages
-      .filter(m =>
-        m.msg_tp_cd === 'TEXT' && m.msg_cont &&
-        m.trans_cont == null &&
-        !requestedTransRef.current.has(m.msg_id),
+      .filter(
+        (m) =>
+          m.msg_tp_cd === 'TEXT' &&
+          m.msg_cont &&
+          m.trans_cont == null &&
+          !requestedTransRef.current.has(m.msg_id),
       )
-      .map(m => m.msg_id)
+      .map((m) => m.msg_id)
     if (ids.length === 0) return
-    ids.forEach(id => requestedTransRef.current.add(id))
+    ids.forEach((id) => requestedTransRef.current.add(id))
     void batchTranslate(ids)
   }, [messages, forceTranslate, userLocale, batchTranslate])
 
   const removeMessage = useCallback((msgId: string) => {
-    setMessages(prev => prev.filter(m => m.msg_id !== msgId))
+    setMessages((prev) => prev.filter((m) => m.msg_id !== msgId))
   }, [])
 
   // 서버 응답으로 낙관적 temp 메시지를 교체
@@ -194,25 +240,25 @@ export function useChatRoom(
   // → 이 경우 제자리 업데이트(서버 타임스탬프 반영), 삭제 후 재추가 안 함
   // → 이후 도착하는 브로드캐스트는 addMessage dedup으로 무시됨
   const replaceMessage = useCallback((tempId: string, realMsg: ChatMessage) => {
-    setMessages(prev => {
+    setMessages((prev) => {
       if (tempId === realMsg.msg_id) {
         // 서버가 클라이언트 UUID 그대로 사용 — 제자리 교체
-        return prev.map(m => m.msg_id === tempId ? realMsg : m)
+        return prev.map((m) => (m.msg_id === tempId ? realMsg : m))
       }
       // 서버가 새 UUID를 생성한 경우 (레거시 경로)
-      if (prev.some(m => m.msg_id === realMsg.msg_id)) {
+      if (prev.some((m) => m.msg_id === realMsg.msg_id)) {
         // 브로드캐스트가 먼저 도착 → temp만 제거
-        return prev.filter(m => m.msg_id !== tempId)
+        return prev.filter((m) => m.msg_id !== tempId)
       }
       // API 응답이 먼저 도착 → temp → real 교체
-      return prev.map(m => m.msg_id === tempId ? realMsg : m)
+      return prev.map((m) => (m.msg_id === tempId ? realMsg : m))
     })
   }, [])
 
   const prependMessages = useCallback((msgs: ChatMessage[]) => {
-    setMessages(prev => {
-      const existingIds = new Set(prev.map(m => m.msg_id))
-      const newMsgs = msgs.filter(m => !existingIds.has(m.msg_id))
+    setMessages((prev) => {
+      const existingIds = new Set(prev.map((m) => m.msg_id))
+      const newMsgs = msgs.filter((m) => !existingIds.has(m.msg_id))
       return [...newMsgs, ...prev]
     })
   }, [])
@@ -244,7 +290,9 @@ export function useChatRoom(
       })
       .on('presence', { event: 'sync' }, () => {
         const state = channel.presenceState<{ userId: string }>()
-        const ids = Object.values(state).flat().map(p => p.userId)
+        const ids = Object.values(state)
+          .flat()
+          .map((p) => p.userId)
         setOnlineUserIds([...new Set(ids)])
       })
       .subscribe(async (status) => {
@@ -259,138 +307,202 @@ export function useChatRoom(
       supabase.removeChannel(channel)
       channelRef.current = null
     }
-  }, [roomId, currentUserId, userLocale, addMessage, applyTranslation, requestTranslation])
+  }, [
+    roomId,
+    currentUserId,
+    userLocale,
+    addMessage,
+    applyTranslation,
+    requestTranslation,
+  ])
 
-  const sendMessage = useCallback(async (text: string) => {
-    const trimmed = text.trim()
-    if (!trimmed) return
+  const sendMessage = useCallback(
+    async (text: string) => {
+      const trimmed = text.trim()
+      if (!trimmed) return
 
-    const tempId = crypto.randomUUID()
-    requestedTransRef.current.add(tempId)
-    const tempMsg: ChatMessage = {
-      msg_id: tempId,
-      room_id: roomId,
-      snd_usr_id: currentUserId,
-      snd_usr_nm: currentUserDisplayName,
-      msg_cont: trimmed,
-      msg_tp_cd: 'TEXT',
-      attch_url: null,
-      stkr_id: null,
-      ref_msg_id: null,
-      del_yn: 'N',
-      reg_dtm: new Date().toISOString(),
-    }
-    addMessage(tempMsg)
+      const tempId = crypto.randomUUID()
+      requestedTransRef.current.add(tempId)
+      const tempMsg: ChatMessage = {
+        msg_id: tempId,
+        room_id: roomId,
+        snd_usr_id: currentUserId,
+        snd_usr_nm: currentUserDisplayName,
+        msg_cont: trimmed,
+        msg_tp_cd: 'TEXT',
+        attch_url: null,
+        stkr_id: null,
+        ref_msg_id: null,
+        del_yn: 'N',
+        reg_dtm: new Date().toISOString(),
+      }
+      addMessage(tempMsg)
 
-    try {
+      try {
+        const res = await piFetch(`/api/chat/rooms/${roomId}/messages`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            msg_id: tempId,
+            msg_cont: trimmed,
+            msg_tp_cd: 'TEXT',
+          }),
+        })
+
+        if (res.status === 429) {
+          removeMessage(tempId)
+          throw new Error('rate_limit')
+        }
+        if (res.status === 402) {
+          // @ai 멘션 → 월 한도 초과 → 업그레이드 유도
+          removeMessage(tempId)
+          onAiLimitExceeded?.()
+          return
+        }
+        if (!res.ok) {
+          removeMessage(tempId)
+          throw new Error('send_failed')
+        }
+
+        const { message } = (await res.json()) as { message: ChatMessage }
+        replaceMessage(tempId, message)
+      } catch (err) {
+        throw err
+      }
+    },
+    [
+      roomId,
+      currentUserId,
+      currentUserDisplayName,
+      addMessage,
+      removeMessage,
+      replaceMessage,
+      onAiLimitExceeded,
+    ],
+  )
+
+  const sendSticker = useCallback(
+    async (stkrId: string, stkrUrl: string) => {
+      const tempId = crypto.randomUUID()
+      // 스티커는 번역 대상 아님 — dedup Set에 미리 추가해 forceTranslate 모드에서도 번역 API 호출 방지
+      requestedTransRef.current.add(tempId)
+      const tempMsg: ChatMessage = {
+        msg_id: tempId,
+        room_id: roomId,
+        snd_usr_id: currentUserId,
+        snd_usr_nm: currentUserDisplayName,
+        msg_cont: null,
+        msg_tp_cd: 'STICKER',
+        attch_url: stkrUrl,
+        stkr_id: stkrId,
+        ref_msg_id: null,
+        del_yn: 'N',
+        reg_dtm: new Date().toISOString(),
+      }
+      addMessage(tempMsg)
+
+      try {
+        const res = await piFetch(`/api/chat/rooms/${roomId}/messages`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            msg_id: tempId,
+            msg_tp_cd: 'STICKER',
+            stkr_id: stkrId,
+            attch_url: stkrUrl,
+          }),
+        })
+
+        if (!res.ok) {
+          removeMessage(tempId)
+          throw new Error('send_failed')
+        }
+
+        const { message } = (await res.json()) as { message: ChatMessage }
+        replaceMessage(tempId, message)
+      } catch (err) {
+        throw err
+      }
+    },
+    [
+      roomId,
+      currentUserId,
+      currentUserDisplayName,
+      addMessage,
+      removeMessage,
+      replaceMessage,
+    ],
+  )
+
+  const sendFile = useCallback(
+    async (file: File) => {
+      const form = new FormData()
+      form.append('file', file)
+
+      const uploadRes = await piFetch(`/api/chat/rooms/${roomId}/upload`, {
+        method: 'POST',
+        body: form,
+      })
+      if (!uploadRes.ok) throw new Error('upload_failed')
+
+      const { url, msg_tp_cd, file_name } = (await uploadRes.json()) as {
+        url: string
+        msg_tp_cd: 'IMAGE' | 'VOICE' | 'FILE'
+        file_name: string
+      }
+
+      const tempId = crypto.randomUUID()
+      requestedTransRef.current.add(tempId)
+      const tempMsg: ChatMessage = {
+        msg_id: tempId,
+        room_id: roomId,
+        snd_usr_id: currentUserId,
+        snd_usr_nm: currentUserDisplayName,
+        msg_cont: msg_tp_cd === 'FILE' ? file_name : null,
+        msg_tp_cd,
+        attch_url: url,
+        stkr_id: null,
+        ref_msg_id: null,
+        del_yn: 'N',
+        reg_dtm: new Date().toISOString(),
+      }
+      addMessage(tempMsg)
+
       const res = await piFetch(`/api/chat/rooms/${roomId}/messages`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ msg_id: tempId, msg_cont: trimmed, msg_tp_cd: 'TEXT' }),
+        body: JSON.stringify({
+          msg_id: tempId,
+          msg_tp_cd,
+          attch_url: url,
+          msg_cont: msg_tp_cd === 'FILE' ? file_name : null,
+        }),
       })
 
-      if (res.status === 429) {
-        removeMessage(tempId)
-        throw new Error('rate_limit')
-      }
-      if (res.status === 402) {
-        // @ai 멘션 → 월 한도 초과 → 업그레이드 유도
-        removeMessage(tempId)
-        onAiLimitExceeded?.()
-        return
-      }
       if (!res.ok) {
         removeMessage(tempId)
         throw new Error('send_failed')
       }
 
-      const { message } = await res.json() as { message: ChatMessage }
+      const { message } = (await res.json()) as { message: ChatMessage }
       replaceMessage(tempId, message)
-    } catch (err) {
-      throw err
-    }
-  }, [roomId, currentUserId, currentUserDisplayName, addMessage, removeMessage, replaceMessage, onAiLimitExceeded])
+    },
+    [
+      roomId,
+      currentUserId,
+      currentUserDisplayName,
+      addMessage,
+      removeMessage,
+      replaceMessage,
+    ],
+  )
 
-  const sendSticker = useCallback(async (stkrId: string, stkrUrl: string) => {
-    const tempId = crypto.randomUUID()
-    // 스티커는 번역 대상 아님 — dedup Set에 미리 추가해 forceTranslate 모드에서도 번역 API 호출 방지
-    requestedTransRef.current.add(tempId)
-    const tempMsg: ChatMessage = {
-      msg_id: tempId,
-      room_id: roomId,
-      snd_usr_id: currentUserId,
-      snd_usr_nm: currentUserDisplayName,
-      msg_cont: null,
-      msg_tp_cd: 'STICKER',
-      attch_url: stkrUrl,
-      stkr_id: stkrId,
-      ref_msg_id: null,
-      del_yn: 'N',
-      reg_dtm: new Date().toISOString(),
-    }
-    addMessage(tempMsg)
-
-    try {
-      const res = await piFetch(`/api/chat/rooms/${roomId}/messages`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ msg_id: tempId, msg_tp_cd: 'STICKER', stkr_id: stkrId, attch_url: stkrUrl }),
-      })
-
-      if (!res.ok) {
-        removeMessage(tempId)
-        throw new Error('send_failed')
-      }
-
-      const { message } = await res.json() as { message: ChatMessage }
-      replaceMessage(tempId, message)
-    } catch (err) {
-      throw err
-    }
-  }, [roomId, currentUserId, currentUserDisplayName, addMessage, removeMessage, replaceMessage])
-
-  const sendFile = useCallback(async (file: File) => {
-    const form = new FormData()
-    form.append('file', file)
-
-    const uploadRes = await piFetch(`/api/chat/rooms/${roomId}/upload`, { method: 'POST', body: form })
-    if (!uploadRes.ok) throw new Error('upload_failed')
-
-    const { url, msg_tp_cd, file_name } = await uploadRes.json() as {
-      url: string; msg_tp_cd: 'IMAGE' | 'VOICE' | 'FILE'; file_name: string
-    }
-
-    const tempId = crypto.randomUUID()
-    requestedTransRef.current.add(tempId)
-    const tempMsg: ChatMessage = {
-      msg_id: tempId,
-      room_id: roomId,
-      snd_usr_id: currentUserId,
-      snd_usr_nm: currentUserDisplayName,
-      msg_cont: msg_tp_cd === 'FILE' ? file_name : null,
-      msg_tp_cd,
-      attch_url: url,
-      stkr_id: null,
-      ref_msg_id: null,
-      del_yn: 'N',
-      reg_dtm: new Date().toISOString(),
-    }
-    addMessage(tempMsg)
-
-    const res = await piFetch(`/api/chat/rooms/${roomId}/messages`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ msg_id: tempId, msg_tp_cd, attch_url: url, msg_cont: msg_tp_cd === 'FILE' ? file_name : null }),
-    })
-
-    if (!res.ok) {
-      removeMessage(tempId)
-      throw new Error('send_failed')
-    }
-
-    const { message } = await res.json() as { message: ChatMessage }
-    replaceMessage(tempId, message)
-  }, [roomId, currentUserId, currentUserDisplayName, addMessage, removeMessage, replaceMessage])
-
-  return { messages, onlineUserIds, sendMessage, sendSticker, sendFile, prependMessages }
+  return {
+    messages,
+    onlineUserIds,
+    sendMessage,
+    sendSticker,
+    sendFile,
+    prependMessages,
+  }
 }

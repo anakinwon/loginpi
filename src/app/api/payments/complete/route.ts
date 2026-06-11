@@ -12,8 +12,11 @@ export async function POST(request: NextRequest) {
   const apiKey = process.env.PI_API_KEY
   if (!apiKey) {
     return NextResponse.json(
-      { error: 'PI_API_KEY 미설정 — Pi Developer Portal에서 발급 후 환경변수에 추가하세요' },
-      { status: 500 }
+      {
+        error:
+          'PI_API_KEY 미설정 — Pi Developer Portal에서 발급 후 환경변수에 추가하세요',
+      },
+      { status: 500 },
     )
   }
 
@@ -26,7 +29,10 @@ export async function POST(request: NextRequest) {
 
   const { paymentId, txid } = body as { paymentId?: string; txid?: string }
   if (!paymentId || !txid) {
-    return NextResponse.json({ error: 'paymentId와 txid가 필요합니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: 'paymentId와 txid가 필요합니다' },
+      { status: 400 },
+    )
   }
 
   try {
@@ -42,7 +48,7 @@ export async function POST(request: NextRequest) {
       const text = await res.text()
       return NextResponse.json(
         { error: `Pi 완료 처리 실패 (${res.status}): ${text}` },
-        { status: res.status }
+        { status: res.status },
       )
     }
     const payment = (await res.json()) as PaymentDTO
@@ -67,7 +73,9 @@ export async function POST(request: NextRequest) {
         .maybeSingle()
 
       if (owner) {
-        const slug = String((owner as Record<string, unknown>).display_name ?? 'user').slice(0, 20)
+        const slug = String(
+          (owner as Record<string, unknown>).display_name ?? 'user',
+        ).slice(0, 20)
         const { data: room } = await db
           .from('msg_room')
           .insert({
@@ -99,7 +107,11 @@ export async function POST(request: NextRequest) {
       // CHAT_SUBSCR: 결제 완료 시 구독 시작/갱신 (msg_subscr UPSERT — usr_id UNIQUE)
       const planCd = String(meta.plan_cd ?? '')
       const [{ data: owner }, { data: plan }] = await Promise.all([
-        db.from('sys_user').select('id, display_name').eq('pi_uid', payment.user_uid).maybeSingle(),
+        db
+          .from('sys_user')
+          .select('id, display_name')
+          .eq('pi_uid', payment.user_uid)
+          .maybeSingle(),
         db
           .from('msg_subscr_plan')
           .select('plan_cd, price_pi, mth_cnt')
@@ -111,7 +123,11 @@ export async function POST(request: NextRequest) {
 
       if (owner && plan) {
         const ownerRow = owner as { id: string; display_name: string | null }
-        const planRow = plan as { plan_cd: string; price_pi: number; mth_cnt: number }
+        const planRow = plan as {
+          plan_cd: string
+          price_pi: number
+          mth_cnt: number
+        }
         const slug = String(ownerRow.display_name ?? 'user').slice(0, 20)
 
         // 결제 금액이 플랜 가격 이상인지 서버 재검증 (클라이언트 amount 조작 방지, 부동소수 오차 허용)
@@ -137,7 +153,7 @@ export async function POST(request: NextRequest) {
                 modr_id: slug,
                 mod_dtm: now.toISOString(),
               },
-              { onConflict: 'usr_id' }
+              { onConflict: 'usr_id' },
             )
             .select()
             .single()
@@ -148,21 +164,45 @@ export async function POST(request: NextRequest) {
     } else if (meta?.type === 'PI_TIP' && payment.user_uid) {
       // PI_TIP: 결제 완료 시 TIP_NOTI 메시지 삽입 + 실시간 브로드캐스트
       const [{ data: sender }, { data: recipient }] = await Promise.all([
-        db.from('sys_user').select('id, display_name').eq('pi_uid', payment.user_uid).maybeSingle(),
-        db.from('sys_user').select('id, display_name').eq('id', String(meta.recipient_id ?? '')).maybeSingle(),
+        db
+          .from('sys_user')
+          .select('id, display_name')
+          .eq('pi_uid', payment.user_uid)
+          .maybeSingle(),
+        db
+          .from('sys_user')
+          .select('id, display_name')
+          .eq('id', String(meta.recipient_id ?? ''))
+          .maybeSingle(),
       ])
 
       if (sender && recipient && meta.room_id) {
         const senderRow = sender as { id: string; display_name: string | null }
-        const recipientRow = recipient as { id: string; display_name: string | null }
+        const recipientRow = recipient as {
+          id: string
+          display_name: string | null
+        }
         const roomId = String(meta.room_id)
 
         // 결제 완료 시점 권한 재검증 + 발신자·수신자 방 멤버십 검증
-        const [tipAllowed, { data: senderMbr }, { data: recipientMbr }] = await Promise.all([
-          canSendTip(senderRow.id),
-          db.from('msg_room_mbr').select('room_id').eq('room_id', roomId).eq('usr_id', senderRow.id).eq('del_yn', 'N').maybeSingle(),
-          db.from('msg_room_mbr').select('room_id').eq('room_id', roomId).eq('usr_id', recipientRow.id).eq('del_yn', 'N').maybeSingle(),
-        ])
+        const [tipAllowed, { data: senderMbr }, { data: recipientMbr }] =
+          await Promise.all([
+            canSendTip(senderRow.id),
+            db
+              .from('msg_room_mbr')
+              .select('room_id')
+              .eq('room_id', roomId)
+              .eq('usr_id', senderRow.id)
+              .eq('del_yn', 'N')
+              .maybeSingle(),
+            db
+              .from('msg_room_mbr')
+              .select('room_id')
+              .eq('room_id', roomId)
+              .eq('usr_id', recipientRow.id)
+              .eq('del_yn', 'N')
+              .maybeSingle(),
+          ])
 
         if (tipAllowed && senderMbr && recipientMbr) {
           const slug = String(senderRow.display_name ?? 'user').slice(0, 20)
@@ -187,13 +227,27 @@ export async function POST(request: NextRequest) {
       // EVENT_ROOM_JOIN: 결제 완료 시 GUEST로 이벤트방 입장 처리
       const roomIdStr = String(meta.room_id ?? '')
       const [{ data: owner }, { data: room }] = await Promise.all([
-        db.from('sys_user').select('id, display_name').eq('pi_uid', payment.user_uid).maybeSingle(),
-        db.from('msg_room').select('room_id, room_nm, entry_fee_pi, entry_expire_dtm').eq('room_id', roomIdStr).eq('del_yn', 'N').maybeSingle(),
+        db
+          .from('sys_user')
+          .select('id, display_name')
+          .eq('pi_uid', payment.user_uid)
+          .maybeSingle(),
+        db
+          .from('msg_room')
+          .select('room_id, room_nm, entry_fee_pi, entry_expire_dtm')
+          .eq('room_id', roomIdStr)
+          .eq('del_yn', 'N')
+          .maybeSingle(),
       ])
 
       if (owner && room) {
         const ownerRow = owner as { id: string; display_name: string | null }
-        const roomRow = room as { room_id: string; room_nm: string; entry_fee_pi: number; entry_expire_dtm: string | null }
+        const roomRow = room as {
+          room_id: string
+          room_nm: string
+          entry_fee_pi: number
+          entry_expire_dtm: string | null
+        }
         const slug = String(ownerRow.display_name ?? 'user').slice(0, 20)
 
         // 결제 금액이 입장료 이상인지 서버 재검증
@@ -232,11 +286,16 @@ export async function POST(request: NextRequest) {
               .select()
               .single()
 
-            if (sysMsg) await broadcastToRoom(roomRow.room_id, 'new_msg', sysMsg)
+            if (sysMsg)
+              await broadcastToRoom(roomRow.room_id, 'new_msg', sysMsg)
           }
         }
       }
-    } else if (meta?.type === 'FEATURE_ADDON' && meta?.feature_cd === 'BADGE_UPGRADE' && payment.user_uid) {
+    } else if (
+      meta?.type === 'FEATURE_ADDON' &&
+      meta?.feature_cd === 'BADGE_UPGRADE' &&
+      payment.user_uid
+    ) {
       // BADGE_UPGRADE: 결제 완료 시 배지 강화 (특별 디자인 + 카페 이름 옆 상시 표시)
       const themeCd = String(meta.theme_cd ?? '')
       const { data: owner } = await db
@@ -266,8 +325,17 @@ export async function POST(request: NextRequest) {
       // STICKER_PACK: 결제 완료 시 msg_usr_stkr UPSERT (UNIQUE usr_id,pack_id — 중복 구매 안전)
       const packId = String(meta.pack_id ?? '')
       const [{ data: owner }, { data: pack }] = await Promise.all([
-        db.from('sys_user').select('id, display_name').eq('pi_uid', payment.user_uid).maybeSingle(),
-        db.from('msg_stkr_pack').select('pack_id, price_pi').eq('pack_id', packId).eq('del_yn', 'N').maybeSingle(),
+        db
+          .from('sys_user')
+          .select('id, display_name')
+          .eq('pi_uid', payment.user_uid)
+          .maybeSingle(),
+        db
+          .from('msg_stkr_pack')
+          .select('pack_id, price_pi')
+          .eq('pack_id', packId)
+          .eq('del_yn', 'N')
+          .maybeSingle(),
       ])
 
       if (owner && pack) {
@@ -315,7 +383,8 @@ export async function POST(request: NextRequest) {
 
         if (
           orderRow &&
-          Number(payment.amount) + 1e-6 >= Number((orderRow as { order_price_pi: number }).order_price_pi)
+          Number(payment.amount) + 1e-6 >=
+            Number((orderRow as { order_price_pi: number }).order_price_pi)
         ) {
           await markEscrow(orderId, buyerRow.id, txid, Number(payment.amount))
         }
@@ -339,10 +408,16 @@ export async function POST(request: NextRequest) {
       const betId = String(meta.bet_id ?? '')
       const optnNo = Number(meta.optn_no)
       const [{ data: owner }, { data: bet }] = await Promise.all([
-        db.from('sys_user').select('id, display_name').eq('pi_uid', payment.user_uid).maybeSingle(),
+        db
+          .from('sys_user')
+          .select('id, display_name')
+          .eq('pi_uid', payment.user_uid)
+          .maybeSingle(),
         db
           .from('msg_bet')
-          .select('bet_id, room_id, bet_titl, bet_amt_pi, bet_st_cd, close_dtm, crtr_usr_id')
+          .select(
+            'bet_id, room_id, bet_titl, bet_amt_pi, bet_st_cd, close_dtm, crtr_usr_id',
+          )
           .eq('bet_id', betId)
           .eq('del_yn', 'N')
           .maybeSingle(),
@@ -378,17 +453,22 @@ export async function POST(request: NextRequest) {
               (!betRow.close_dtm || new Date(betRow.close_dtm) > new Date())
 
             // 결제 금액이 베팅 참가비 이상인지 서버 재검증
-            if (stillOpen && Number(payment.amount) + 1e-6 >= Number(betRow.bet_amt_pi)) {
+            if (
+              stillOpen &&
+              Number(payment.amount) + 1e-6 >= Number(betRow.bet_amt_pi)
+            ) {
               // UNIQUE(bet_id, usr_id) — 중복 참가는 insert 에러로 자연 차단
-              const { error: entryError } = await db.from('msg_bet_entry').insert({
-                bet_id: betRow.bet_id,
-                usr_id: ownerRow.id,
-                optn_no: optnNo,
-                bet_amt_pi: betRow.bet_amt_pi,
-                pymnt_id: paymentId,
-                regr_id: slug,
-                modr_id: slug,
-              })
+              const { error: entryError } = await db
+                .from('msg_bet_entry')
+                .insert({
+                  bet_id: betRow.bet_id,
+                  usr_id: ownerRow.id,
+                  optn_no: optnNo,
+                  bet_amt_pi: betRow.bet_amt_pi,
+                  pymnt_id: paymentId,
+                  regr_id: slug,
+                  modr_id: slug,
+                })
 
               if (!entryError) {
                 const { data: betMsg } = await db
@@ -405,7 +485,8 @@ export async function POST(request: NextRequest) {
                   .select()
                   .single()
 
-                if (betMsg) await broadcastToRoom(betRow.room_id, 'new_msg', betMsg)
+                if (betMsg)
+                  await broadcastToRoom(betRow.room_id, 'new_msg', betMsg)
               }
             }
           }
@@ -438,8 +519,16 @@ export async function POST(request: NextRequest) {
       })()
     }
 
-    return NextResponse.json({ success: true, payment, room: createdRoom, subscription: grantedSubscr })
+    return NextResponse.json({
+      success: true,
+      payment,
+      room: createdRoom,
+      subscription: grantedSubscr,
+    })
   } catch {
-    return NextResponse.json({ error: 'Pi Network API 연결 실패' }, { status: 502 })
+    return NextResponse.json(
+      { error: 'Pi Network API 연결 실패' },
+      { status: 502 },
+    )
   }
 }

@@ -16,27 +16,31 @@ export function ClientProfileGate() {
 
   useEffect(() => {
     piFetch('/api/profile')
-      .then(res => (res.ok ? res.json() : Promise.reject(res.status)))
+      .then((res) => (res.ok ? res.json() : Promise.reject(res.status)))
       .then((data: { user: UserRow }) => setUser(data.user))
       .catch(() => setError(true))
       .finally(() => setLoading(false))
   }, [])
 
   if (loading) {
-    return <div className='p-8 text-center text-sm text-muted-foreground'>로딩 중…</div>
+    return (
+      <div className="text-muted-foreground p-8 text-center text-sm">
+        로딩 중…
+      </div>
+    )
   }
 
   if (error || !user) {
     return (
-      <div className='flex flex-col items-center gap-4 py-16'>
-        <p className='text-sm text-muted-foreground'>로그인이 필요합니다</p>
+      <div className="flex flex-col items-center gap-4 py-16">
+        <p className="text-muted-foreground text-sm">로그인이 필요합니다</p>
       </div>
     )
   }
 
   return (
-    <div className='mx-auto max-w-2xl px-4 py-8'>
-      <h1 className='mb-6 text-2xl font-bold'>내 프로필</h1>
+    <div className="mx-auto max-w-2xl px-4 py-8">
+      <h1 className="mb-6 text-2xl font-bold">내 프로필</h1>
       <ProfileTabs initialUser={user} localeOptions={localeOptions} />
     </div>
   )

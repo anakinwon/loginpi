@@ -41,11 +41,18 @@ export async function getOrTranslateMessage(params: {
       .maybeSingle()
 
     if (cachedRow) {
-      return { transCont: cachedRow.trans_cont as string, srcLangCd: null, cached: true }
+      return {
+        transCont: cachedRow.trans_cont as string,
+        srcLangCd: null,
+        cached: true,
+      }
     }
 
     // 2. Gemini Flash 번역 (실패 시 Claude Haiku fallback)
-    const { translated, srcLangCd, modelVer } = await translateMessage(msgCont, localeCd)
+    const { translated, srcLangCd, modelVer } = await translateMessage(
+      msgCont,
+      localeCd,
+    )
 
     // 3. DB 캐시 저장 — 멀티 인스턴스 동시 번역 경합은 UPSERT로 흡수
     await supabase.from('msg_trans').upsert(
@@ -84,7 +91,9 @@ export async function getOrTranslateMessage(params: {
 }
 
 // 방 참가자들의 표시 언어 목록 (sys_user.display_locale_cd — 미설정 사용자는 제외)
-export async function getDistinctRoomLocales(roomId: string): Promise<string[]> {
+export async function getDistinctRoomLocales(
+  roomId: string,
+): Promise<string[]> {
   const supabase = getSupabaseAdmin()
 
   const { data: mbrs } = await supabase
@@ -125,10 +134,18 @@ export async function queueRoomTranslations(params: {
   for (const localeCd of locales) {
     if (detectedSrcLang && baseLang(localeCd) === detectedSrcLang) continue
     try {
-      const { srcLangCd } = await getOrTranslateMessage({ msgId, roomId, localeCd, msgCont })
+      const { srcLangCd } = await getOrTranslateMessage({
+        msgId,
+        roomId,
+        localeCd,
+        msgCont,
+      })
       if (!detectedSrcLang && srcLangCd) detectedSrcLang = baseLang(srcLangCd)
     } catch (err) {
-      console.error(`[chat-translate] 번역 큐 실패 msg:${msgId} locale:${localeCd}`, err)
+      console.error(
+        `[chat-translate] 번역 큐 실패 msg:${msgId} locale:${localeCd}`,
+        err,
+      )
     }
   }
 }

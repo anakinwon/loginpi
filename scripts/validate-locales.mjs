@@ -26,37 +26,53 @@ const locales = readdirSync(join(root, 'messages'))
   .sort()
 
 // 2. 각 소스 파일에서 등재 키 추출
-const currencySrc = readFileSync(join(root, 'src/lib/locale-currency.ts'), 'utf-8')
-const countrySrc = readFileSync(join(root, 'src/lib/locale-country.ts'), 'utf-8')
+const currencySrc = readFileSync(
+  join(root, 'src/lib/locale-currency.ts'),
+  'utf-8',
+)
+const countrySrc = readFileSync(
+  join(root, 'src/lib/locale-country.ts'),
+  'utf-8',
+)
 const routingSrc = readFileSync(join(root, 'src/i18n/routing.ts'), 'utf-8')
 
 const currencyKeys = new Set(
-  [...currencySrc.matchAll(/(\w+):\s*'[A-Z]{3}'/g)].map((m) => m[1])
+  [...currencySrc.matchAll(/(\w+):\s*'[A-Z]{3}'/g)].map((m) => m[1]),
 )
 const countryKeys = new Set(
-  [...countrySrc.matchAll(/(\w+):\s*'[a-z]{2}'/g)].map((m) => m[1])
+  [...countrySrc.matchAll(/(\w+):\s*'[a-z]{2}'/g)].map((m) => m[1]),
 )
 
 // 3. 교차 검증
 const errors = []
 for (const lc of locales) {
   if (!currencyKeys.has(lc))
-    errors.push(`[통화 누락] '${lc}' — src/lib/locale-currency.ts LOCALE_CURRENCY에 추가 필요 (예: ${lc}: 'XXX')`)
+    errors.push(
+      `[통화 누락] '${lc}' — src/lib/locale-currency.ts LOCALE_CURRENCY에 추가 필요 (예: ${lc}: 'XXX')`,
+    )
   if (!countryKeys.has(lc))
-    errors.push(`[국가 누락] '${lc}' — src/lib/locale-country.ts LOCALE_COUNTRY에 추가 필요 (예: ${lc}: 'xx')`)
+    errors.push(
+      `[국가 누락] '${lc}' — src/lib/locale-country.ts LOCALE_COUNTRY에 추가 필요 (예: ${lc}: 'xx')`,
+    )
   if (!routingSrc.includes(`'${lc}'`))
-    errors.push(`[라우팅 누락] '${lc}' — src/i18n/routing.ts locales 배열에 추가 필요`)
+    errors.push(
+      `[라우팅 누락] '${lc}' — src/i18n/routing.ts locales 배열에 추가 필요`,
+    )
 }
 
 // 4. 결과
 if (errors.length > 0) {
-  console.error(`\n❌ [validate-locales] locale 매핑 불일치 ${errors.length}건 — 빌드를 중단합니다.\n`)
+  console.error(
+    `\n❌ [validate-locales] locale 매핑 불일치 ${errors.length}건 — 빌드를 중단합니다.\n`,
+  )
   for (const e of errors) console.error(`  ${e}`)
   console.error(
     `\n  활성 locale ${locales.length}개: ${locales.join(' ')}` +
-    `\n  신규 locale 추가 시 수정 파일: locale-currency.ts · locale-country.ts · routing.ts (단일 소스 원칙)\n`
+      `\n  신규 locale 추가 시 수정 파일: locale-currency.ts · locale-country.ts · routing.ts (단일 소스 원칙)\n`,
   )
   process.exit(1)
 }
 
-console.log(`✅ [validate-locales] 활성 locale ${locales.length}개 매핑 완전성 검증 통과 (통화·국가·라우팅)`)
+console.log(
+  `✅ [validate-locales] 활성 locale ${locales.length}개 매핑 완전성 검증 통과 (통화·국가·라우팅)`,
+)

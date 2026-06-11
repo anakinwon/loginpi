@@ -18,21 +18,21 @@ export function PostSearch({ category, q }: { category: string; q?: string }) {
   }
 
   return (
-    <div className='mb-4 flex gap-2'>
+    <div className="mb-4 flex gap-2">
       <Input
         value={value}
         onChange={(e) => setValue(e.target.value)}
         onKeyDown={(e) => e.key === 'Enter' && search()}
         placeholder={t('searchPlaceholder')}
-        className='max-w-xs'
+        className="max-w-xs"
       />
-      <Button variant='outline' size='sm' onClick={search}>
+      <Button variant="outline" size="sm" onClick={search}>
         {tc('search')}
       </Button>
       {q && (
         <Button
-          variant='ghost'
-          size='sm'
+          variant="ghost"
+          size="sm"
           onClick={() => {
             setValue('')
             router.push(`/board/${category}`)

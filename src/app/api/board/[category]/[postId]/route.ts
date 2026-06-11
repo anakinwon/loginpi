@@ -10,7 +10,10 @@ export async function GET(_request: NextRequest, { params }: Params) {
   const { category, postId } = await params
   const ctgr = await getCategory(category)
   if (!ctgr) {
-    return NextResponse.json({ error: '존재하지 않는 게시판입니다' }, { status: 404 })
+    return NextResponse.json(
+      { error: '존재하지 않는 게시판입니다' },
+      { status: 404 },
+    )
   }
 
   const db = getSupabaseAdmin()
@@ -24,7 +27,10 @@ export async function GET(_request: NextRequest, { params }: Params) {
     .single()
 
   if (fetchErr || !postData) {
-    return NextResponse.json({ error: '게시글을 찾을 수 없습니다' }, { status: 404 })
+    return NextResponse.json(
+      { error: '게시글을 찾을 수 없습니다' },
+      { status: 404 },
+    )
   }
 
   // 조회수 비동기 증가 (응답 지연 없음)
@@ -59,10 +65,18 @@ export async function GET(_request: NextRequest, { params }: Params) {
 // PATCH /api/board/[category]/[postId] — 수정 (본인 또는 ADMIN/MASTER)
 export async function PATCH(request: NextRequest, { params }: Params) {
   const { category, postId } = await params
-  const [ctgr, user] = await Promise.all([getCategory(category), getSessionUser()])
+  const [ctgr, user] = await Promise.all([
+    getCategory(category),
+    getSessionUser(),
+  ])
 
-  if (!ctgr) return NextResponse.json({ error: '존재하지 않는 게시판입니다' }, { status: 404 })
-  if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!ctgr)
+    return NextResponse.json(
+      { error: '존재하지 않는 게시판입니다' },
+      { status: 404 },
+    )
+  if (!user)
+    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
   const { data: post } = await getSupabaseAdmin()
     .from('brd_post')
@@ -71,7 +85,11 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     .eq('del_yn', 'N')
     .single()
 
-  if (!post) return NextResponse.json({ error: '게시글을 찾을 수 없습니다' }, { status: 404 })
+  if (!post)
+    return NextResponse.json(
+      { error: '게시글을 찾을 수 없습니다' },
+      { status: 404 },
+    )
 
   const isOwner = post.rgst_usr_id === user.id
   const isModerator = user.role === 'ADMIN' || user.role === 'MASTER'
@@ -80,11 +98,16 @@ export async function PATCH(request: NextRequest, { params }: Params) {
   }
 
   let body: unknown
-  try { body = await request.json() } catch {
+  try {
+    body = await request.json()
+  } catch {
     return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
   }
 
-  const { post_ttl, post_cont } = body as { post_ttl?: string; post_cont?: string }
+  const { post_ttl, post_cont } = body as {
+    post_ttl?: string
+    post_cont?: string
+  }
   if (!post_ttl?.trim()) {
     return NextResponse.json({ error: '제목을 입력해주세요' }, { status: 400 })
   }
@@ -106,10 +129,18 @@ export async function PATCH(request: NextRequest, { params }: Params) {
 // DELETE /api/board/[category]/[postId] — 논리삭제 (본인 또는 ADMIN/MASTER)
 export async function DELETE(_request: NextRequest, { params }: Params) {
   const { category, postId } = await params
-  const [ctgr, user] = await Promise.all([getCategory(category), getSessionUser()])
+  const [ctgr, user] = await Promise.all([
+    getCategory(category),
+    getSessionUser(),
+  ])
 
-  if (!ctgr) return NextResponse.json({ error: '존재하지 않는 게시판입니다' }, { status: 404 })
-  if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!ctgr)
+    return NextResponse.json(
+      { error: '존재하지 않는 게시판입니다' },
+      { status: 404 },
+    )
+  if (!user)
+    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
   const { data: post } = await getSupabaseAdmin()
     .from('brd_post')
@@ -118,7 +149,11 @@ export async function DELETE(_request: NextRequest, { params }: Params) {
     .eq('del_yn', 'N')
     .single()
 
-  if (!post) return NextResponse.json({ error: '게시글을 찾을 수 없습니다' }, { status: 404 })
+  if (!post)
+    return NextResponse.json(
+      { error: '게시글을 찾을 수 없습니다' },
+      { status: 404 },
+    )
 
   const isOwner = post.rgst_usr_id === user.id
   const isModerator = user.role === 'ADMIN' || user.role === 'MASTER'

@@ -8,13 +8,18 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 // 일반 브라우저에서 Google 세션을 가진 채로 호출 → Pi row에 Google 필드 UPDATE
 export async function POST(request: NextRequest) {
   let body: unknown
-  try { body = await request.json() } catch {
+  try {
+    body = await request.json()
+  } catch {
     return NextResponse.json({ error: '잘못된 요청' }, { status: 400 })
   }
 
   const { code } = body as { code?: string }
   if (!code || !/^\d{6}$/.test(code)) {
-    return NextResponse.json({ error: '유효한 6자리 코드를 입력해주세요' }, { status: 400 })
+    return NextResponse.json(
+      { error: '유효한 6자리 코드를 입력해주세요' },
+      { status: 400 },
+    )
   }
 
   const supabase = getSupabaseAdmin()
@@ -26,16 +31,31 @@ export async function POST(request: NextRequest) {
     .single()
 
   if (fetchErr || !linkCode) {
-    return NextResponse.json({ error: '유효하지 않은 코드입니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: '유효하지 않은 코드입니다' },
+      { status: 400 },
+    )
   }
   if (linkCode.used_at) {
-    return NextResponse.json({ error: '이미 사용된 코드입니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: '이미 사용된 코드입니다' },
+      { status: 400 },
+    )
   }
   if (new Date(linkCode.expires_at) < new Date()) {
-    return NextResponse.json({ error: '코드가 만료됐습니다 (10분 초과)' }, { status: 400 })
+    return NextResponse.json(
+      { error: '코드가 만료됐습니다 (10분 초과)' },
+      { status: 400 },
+    )
   }
   if (linkCode.attempt_count >= 5) {
-    return NextResponse.json({ error: '시도 횟수 초과로 코드가 무효화됐습니다. Pi Browser에서 새 코드를 생성하세요.' }, { status: 400 })
+    return NextResponse.json(
+      {
+        error:
+          '시도 횟수 초과로 코드가 무효화됐습니다. Pi Browser에서 새 코드를 생성하세요.',
+      },
+      { status: 400 },
+    )
   }
 
   // 시도 횟수 즉시 증가 (브루트포스 방지)
@@ -46,16 +66,25 @@ export async function POST(request: NextRequest) {
 
   const googleSession = await auth()
   if (!googleSession?.user) {
-    return NextResponse.json({ error: 'Google 로그인이 필요합니다' }, { status: 401 })
+    return NextResponse.json(
+      { error: 'Google 로그인이 필요합니다' },
+      { status: 401 },
+    )
   }
 
   // Google OAuth sub를 google_id로 사용 (JWT token.sub = Google raw sub)
   const googleSub = googleSession.user.sub
   if (!googleSub) {
-    return NextResponse.json({ error: 'Google 인증 정보가 없습니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: 'Google 인증 정보가 없습니다' },
+      { status: 400 },
+    )
   }
   if (!googleSession.user.email) {
-    return NextResponse.json({ error: 'Google 이메일 정보가 없습니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: 'Google 이메일 정보가 없습니다' },
+      { status: 400 },
+    )
   }
 
   try {

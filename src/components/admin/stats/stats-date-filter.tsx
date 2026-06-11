@@ -17,7 +17,7 @@ interface Props {
 
 export function StatsDateFilter({ period, onChange, disabled }: Props) {
   return (
-    <div className='flex gap-1'>
+    <div className="flex gap-1">
       {PERIODS.map(({ value, label }) => (
         <button
           key={value}

@@ -13,7 +13,9 @@ function isBlockedIp(ip: string): boolean {
   if (net.isIP(v4) === 4) {
     const [a, b] = v4.split('.').map(Number)
     return (
-      a === 0 || a === 127 || a === 10 ||
+      a === 0 ||
+      a === 127 ||
+      a === 10 ||
       (a === 172 && b >= 16 && b <= 31) ||
       (a === 192 && b === 168) ||
       (a === 169 && b === 254) ||
@@ -22,7 +24,13 @@ function isBlockedIp(ip: string): boolean {
   }
   if (net.isIP(ip) === 6) {
     const low = ip.toLowerCase()
-    return low === '::1' || low === '::' || low.startsWith('fc') || low.startsWith('fd') || low.startsWith('fe8')
+    return (
+      low === '::1' ||
+      low === '::' ||
+      low.startsWith('fc') ||
+      low.startsWith('fd') ||
+      low.startsWith('fe8')
+    )
   }
   return false
 }
@@ -32,7 +40,9 @@ function isBlockedIp(ip: string): boolean {
 // 등록 후 DNS를 내부 IP로 바꾸는 rebinding 우회를 차단한다.
 export async function validateWebhookUrl(raw: string): Promise<string | null> {
   let parsed: URL
-  try { parsed = new URL(raw) } catch {
+  try {
+    parsed = new URL(raw)
+  } catch {
     return '유효하지 않은 Webhook URL'
   }
   if (parsed.protocol !== 'https:') return 'Webhook URL은 https만 허용됩니다'
@@ -40,11 +50,13 @@ export async function validateWebhookUrl(raw: string): Promise<string | null> {
   const host = parsed.hostname
   // 호스트가 IP 리터럴이면 직접 검사
   if (net.isIP(host) !== 0) {
-    return isBlockedIp(host) ? '내부 주소로의 Webhook은 허용되지 않습니다' : null
+    return isBlockedIp(host)
+      ? '내부 주소로의 Webhook은 허용되지 않습니다'
+      : null
   }
   try {
     const addrs = await lookup(host, { all: true })
-    if (addrs.length === 0 || addrs.some(a => isBlockedIp(a.address))) {
+    if (addrs.length === 0 || addrs.some((a) => isBlockedIp(a.address))) {
       return '내부 주소로의 Webhook은 허용되지 않습니다'
     }
   } catch {
@@ -63,7 +75,10 @@ interface WebhookMessage {
   reg_dtm: string
 }
 
-export async function pushRoomWebhooks(roomId: string, message: WebhookMessage): Promise<void> {
+export async function pushRoomWebhooks(
+  roomId: string,
+  message: WebhookMessage,
+): Promise<void> {
   const { data: hooks } = await getSupabaseAdmin()
     .from('msg_webhook')
     .select('webhook_id, webhook_url')
@@ -76,12 +91,14 @@ export async function pushRoomWebhooks(roomId: string, message: WebhookMessage):
 
   // 개별 실패는 다른 webhook에 영향 없음 — 5초 타임아웃
   await Promise.allSettled(
-    (hooks as { webhook_id: string; webhook_url: string }[]).map(async h => {
+    (hooks as { webhook_id: string; webhook_url: string }[]).map(async (h) => {
       try {
         // 발송 시점 재검증 — 등록 후 DNS를 내부 IP로 바꾸는 rebinding 차단
         const blocked = await validateWebhookUrl(h.webhook_url)
         if (blocked) {
-          console.error(`[chat-webhook] push 차단 (${h.webhook_id}): ${blocked}`)
+          console.error(
+            `[chat-webhook] push 차단 (${h.webhook_id}): ${blocked}`,
+          )
           return
         }
         await fetch(h.webhook_url, {

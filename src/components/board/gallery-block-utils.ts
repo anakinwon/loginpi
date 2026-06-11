@@ -50,7 +50,9 @@ export function parseBlocks(raw: string | null | undefined): EditorBlock[] {
   return [{ t: 'text', c: raw }]
 }
 
-type StoredBlock = { t: 'text'; c: string } | { t: 'img'; id: string; url: string; nm: string }
+type StoredBlock =
+  | { t: 'text'; c: string }
+  | { t: 'img'; id: string; url: string; nm: string }
 
 // EditorBlock 배열 → post_cont 저장 문자열
 // pending 이미지는 업로드 후 saved로 교체된 뒤 호출해야 함
@@ -58,7 +60,8 @@ export function serializeBlocks(blocks: EditorBlock[]): string | null {
   const items: StoredBlock[] = []
   for (const b of blocks) {
     if (b.t === 'text' && b.c.trim()) items.push({ t: 'text', c: b.c })
-    else if (b.t === 'img' && b.kind === 'saved') items.push({ t: 'img', id: b.id, url: b.url, nm: b.nm })
+    else if (b.t === 'img' && b.kind === 'saved')
+      items.push({ t: 'img', id: b.id, url: b.url, nm: b.nm })
   }
   return items.length > 0 ? JSON.stringify(items) : null
 }

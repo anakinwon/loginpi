@@ -51,11 +51,17 @@ async function onIncompletePayment(payment: PaymentDTO) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ paymentId: payment.identifier }),
       })
-    } else if (!payment.status.developer_completed && payment.transaction?.txid) {
+    } else if (
+      !payment.status.developer_completed &&
+      payment.transaction?.txid
+    ) {
       await fetch('/api/payments/complete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paymentId: payment.identifier, txid: payment.transaction.txid }),
+        body: JSON.stringify({
+          paymentId: payment.identifier,
+          txid: payment.transaction.txid,
+        }),
       })
     }
   } catch {
@@ -95,14 +101,18 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
   // Pi SDK 로드 완료 여부.
   // afterInteractive Script의 onLoad → 'pi-sdk-loaded' 이벤트를 수신해 true로 전환.
   // 하이드레이션 시점에 window.Pi가 이미 존재하면 즉시 true (캐시된 SDK).
-  const [piSdkReady, setPiSdkReady] = useState(() => typeof window !== 'undefined' && !!window.Pi)
+  const [piSdkReady, setPiSdkReady] = useState(
+    () => typeof window !== 'undefined' && !!window.Pi,
+  )
 
   const router = useRouter()
 
   // router를 ref로 관리: router.refresh() 후 router 참조가 바뀌어도 signIn 콜백 참조는 안정 유지
   // router가 useCallback 의존성에 있으면 refresh() → 새 router → signIn 재생성 → useEffect 재실행 → 무한루프
   const routerRef = useRef(router)
-  useEffect(() => { routerRef.current = router }, [router])
+  useEffect(() => {
+    routerRef.current = router
+  }, [router])
 
   // 동시 호출 방지: signIn이 실행 중이면 중복 호출 무시
   const isSigningInRef = useRef(false)
@@ -119,14 +129,17 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
     setError(null)
     try {
       await Promise.resolve(
-        window.Pi.init({ version: '2.0', sandbox: detectSandbox() })
+        window.Pi.init({ version: '2.0', sandbox: detectSandbox() }),
       )
 
       // Pi.authenticate()가 일반 브라우저에서 pending 상태로 멈출 수 있으므로 5초 타임아웃
       const auth = await Promise.race([
-        window.Pi.authenticate(['username', 'wallet_address', 'payments'], onIncompletePayment),
+        window.Pi.authenticate(
+          ['username', 'wallet_address', 'payments'],
+          onIncompletePayment,
+        ),
         new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error('timeout')), 5000)
+          setTimeout(() => reject(new Error('timeout')), 5000),
         ),
       ])
 
@@ -135,7 +148,9 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
 
       // 기존 세션 쿠키 확인 (이미 로그인된 경우 추가 POST 불필요)
       const checkRes = await fetch('/api/auth/pi', { credentials: 'include' })
-      const { user: existing } = (await checkRes.json()) as { user: PiSessionUser | null }
+      const { user: existing } = (await checkRes.json()) as {
+        user: PiSessionUser | null
+      }
       const rawNext = new URLSearchParams(window.location.search).get('next')
       const next = isSafeNext(rawNext) ? rawNext : null
       if (existing) {
@@ -178,7 +193,8 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
         routerRef.current.refresh()
       }
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Pi 인증 중 오류가 발생했습니다'
+      const msg =
+        err instanceof Error ? err.message : 'Pi 인증 중 오류가 발생했습니다'
       if (msg !== 'timeout') setError(msg)
       setIsInPiBrowser(false)
     } finally {
@@ -188,7 +204,7 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const updateUser = useCallback((patch: Partial<PiSessionUser>) => {
-    setUser(prev => (prev ? { ...prev, ...patch } : prev))
+    setUser((prev) => (prev ? { ...prev, ...patch } : prev))
   }, [])
 
   const signOut = useCallback(async () => {
@@ -234,8 +250,10 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
         // Pi SDK 미로드 → 일반 브라우저: 기존 세션만 복원
         setIsInPiBrowser(false)
         fetch('/api/auth/pi', { credentials: 'include' })
-          .then(r => r.json())
-          .then((data: { user: PiSessionUser | null }) => { if (data.user) setUser(data.user) })
+          .then((r) => r.json())
+          .then((data: { user: PiSessionUser | null }) => {
+            if (data.user) setUser(data.user)
+          })
           .catch(() => {})
           .finally(() => setIsLoading(false))
       }
@@ -259,7 +277,17 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <PiAuthContext.Provider
-      value={{ user, piAccessToken, isLoading, isInPiBrowser, signIn, signOut, devLogin, updateUser, error }}
+      value={{
+        user,
+        piAccessToken,
+        isLoading,
+        isInPiBrowser,
+        signIn,
+        signOut,
+        devLogin,
+        updateUser,
+        error,
+      }}
     >
       {/* SearchParamsWatcher: SPA 탐색 시 next 파라미터 변경을 감지해 signIn 재호출 (UI 없음) */}
       <Suspense fallback={null}>

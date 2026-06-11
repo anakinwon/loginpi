@@ -14,11 +14,14 @@ export default async function NewItemPage() {
   const user = await getSessionUser()
 
   return (
-    <div className='mx-auto max-w-3xl space-y-4 p-4 md:p-6'>
-      <Link href='/store/my/items' className='text-muted-foreground text-sm hover:underline'>
+    <div className="mx-auto max-w-3xl space-y-4 p-4 md:p-6">
+      <Link
+        href="/store/my/items"
+        className="text-muted-foreground text-sm hover:underline"
+      >
         ← {t('myItemsTitle')}
       </Link>
-      <h1 className='text-xl font-bold'>{t('newItemTitle')}</h1>
+      <h1 className="text-xl font-bold">{t('newItemTitle')}</h1>
       <StoreItemForm serverAuthed={!!user} />
     </div>
   )

@@ -7,7 +7,8 @@ import { getOrTranslateMessage } from '@/lib/chat-translate-dedup'
 
 type Params = { params: Promise<{ roomId: string }> }
 
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 const MAX_BATCH = 50
 
 // POST /api/chat/rooms/[roomId]/translate-batch — 방 헤더 언어 콤보 강제 번역 (PiTranslate™)
@@ -16,28 +17,49 @@ const MAX_BATCH = 50
 export async function POST(request: NextRequest, { params }: Params) {
   const { roomId } = await params
   const user = await getSessionUser()
-  if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user)
+    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
   const mbr = await getRoomMember(roomId, user.id)
-  if (!mbr) return NextResponse.json({ error: '카페 멤버가 아닙니다' }, { status: 403 })
+  if (!mbr)
+    return NextResponse.json({ error: '카페 멤버가 아닙니다' }, { status: 403 })
 
   let body: unknown
-  try { body = await request.json() } catch {
+  try {
+    body = await request.json()
+  } catch {
     return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
   }
 
-  const { locale_cd: localeCd, msg_ids: msgIds } = body as { locale_cd?: string; msg_ids?: unknown }
+  const { locale_cd: localeCd, msg_ids: msgIds } = body as {
+    locale_cd?: string
+    msg_ids?: unknown
+  }
   if (!localeCd || !LOCALE_CD_RE.test(localeCd)) {
-    return NextResponse.json({ error: '유효하지 않은 locale 코드' }, { status: 400 })
+    return NextResponse.json(
+      { error: '유효하지 않은 locale 코드' },
+      { status: 400 },
+    )
   }
   if (!Array.isArray(msgIds) || msgIds.length === 0) {
-    return NextResponse.json({ error: 'msg_ids 배열이 필요합니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: 'msg_ids 배열이 필요합니다' },
+      { status: 400 },
+    )
   }
 
-  const validIds = [...new Set(msgIds.filter((id): id is string => typeof id === 'string' && UUID_RE.test(id)))]
-    .slice(0, MAX_BATCH)
+  const validIds = [
+    ...new Set(
+      msgIds.filter(
+        (id): id is string => typeof id === 'string' && UUID_RE.test(id),
+      ),
+    ),
+  ].slice(0, MAX_BATCH)
   if (validIds.length === 0) {
-    return NextResponse.json({ error: '유효한 msg_id가 없습니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: '유효한 msg_id가 없습니다' },
+      { status: 400 },
+    )
   }
 
   const supabase = getSupabaseAdmin()
@@ -61,7 +83,10 @@ export async function POST(request: NextRequest, { params }: Params) {
   const { data: cachedRows } = await supabase
     .from('msg_trans')
     .select('msg_id, trans_cont')
-    .in('msg_id', msgs.map(m => m.msg_id))
+    .in(
+      'msg_id',
+      msgs.map((m) => m.msg_id),
+    )
     .eq('locale_cd', localeCd)
     .eq('del_yn', 'N')
 
@@ -87,7 +112,10 @@ export async function POST(request: NextRequest, { params }: Params) {
       translations[msg.msg_id] = transCont
     } catch (err) {
       // 개별 실패는 건너뜀 — 해당 메시지는 원문 표시로 자연 폴백
-      console.error(`[chat-translate] batch 항목 실패 msg:${msg.msg_id} locale:${localeCd}`, err)
+      console.error(
+        `[chat-translate] batch 항목 실패 msg:${msg.msg_id} locale:${localeCd}`,
+        err,
+      )
     }
   }
 

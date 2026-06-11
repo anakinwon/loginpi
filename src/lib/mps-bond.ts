@@ -35,7 +35,10 @@ export async function getBondStatus(sellerId: string): Promise<BondStatus> {
     .eq('del_yn', 'N')
     .maybeSingle()
 
-  const bond = data as Pick<SellerBond, 'bond_bal_pi' | 'rsv_pi' | 'cancel_cnt'> | null
+  const bond = data as Pick<
+    SellerBond,
+    'bond_bal_pi' | 'rsv_pi' | 'cancel_cnt'
+  > | null
   const bal = Number(bond?.bond_bal_pi ?? 0)
   const rsv = Number(bond?.rsv_pi ?? 0)
   const avail = Math.max(bal - rsv, 0)
@@ -58,7 +61,11 @@ export async function isSellerBonded(sellerId: string): Promise<boolean> {
 }
 
 // 예치 처리 — Pi 결제 완료 콜백(MPS_BOND)에서 호출. 원자적 UPSERT는 DB RPC 위임
-export async function depositBond(sellerId: string, pymntId: string, regrId: string) {
+export async function depositBond(
+  sellerId: string,
+  pymntId: string,
+  regrId: string,
+) {
   const { data, error } = await getSupabaseAdmin().rpc('fn_mps_bond_deposit', {
     p_seller_id: sellerId,
     p_pymnt_id: pymntId,

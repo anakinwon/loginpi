@@ -17,7 +17,12 @@ import { usePiAuth } from '@/components/pi-auth-provider'
 function LinkPageInner() {
   const t = useTranslations('link')
   const tc = useTranslations('common')
-  const { user: piUser, piAccessToken, isLoading: piLoading, signIn: piSignIn } = usePiAuth()
+  const {
+    user: piUser,
+    piAccessToken,
+    isLoading: piLoading,
+    signIn: piSignIn,
+  } = usePiAuth()
   const { data: googleSession, status: googleStatus } = useSession()
   const params = useSearchParams()
   const router = useRouter()
@@ -27,18 +32,25 @@ function LinkPageInner() {
 
   const codeFromUrl = (params.get('code') ?? '').replace(/\D/g, '').slice(0, 6)
 
-  const [genStatus, setGenStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
+  const [genStatus, setGenStatus] = useState<
+    'idle' | 'loading' | 'done' | 'error'
+  >('idle')
   const [genCode, setGenCode] = useState('')
   const [genErr, setGenErr] = useState('')
 
   const [inputCode, setInputCode] = useState(codeFromUrl)
-  const [linkStatus, setLinkStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
+  const [linkStatus, setLinkStatus] = useState<
+    'idle' | 'loading' | 'done' | 'error'
+  >('idle')
   const [linkErr, setLinkErr] = useState('')
 
   const digits = inputCode.replace(/\D/g, '').slice(0, 6)
-  const displayValue = digits.length > 3 ? `${digits.slice(0, 3)}-${digits.slice(3)}` : digits
+  const displayValue =
+    digits.length > 3 ? `${digits.slice(0, 3)}-${digits.slice(3)}` : digits
   const isValidCode = digits.length === 6
-  const displayGenCode = genCode ? `${genCode.slice(0, 3)}-${genCode.slice(3)}` : ''
+  const displayGenCode = genCode
+    ? `${genCode.slice(0, 3)}-${genCode.slice(3)}`
+    : ''
 
   async function generateCode(isRetry = false) {
     setGenStatus('loading')
@@ -57,7 +69,8 @@ function LinkPageInner() {
         await piSignIn()
         return generateCode(true)
       }
-      if (!res.ok || !data.code) throw new Error(data.error ?? t('generateFail'))
+      if (!res.ok || !data.code)
+        throw new Error(data.error ?? t('generateFail'))
       setGenCode(data.code)
       setGenStatus('done')
     } catch (err) {
@@ -95,11 +108,11 @@ function LinkPageInner() {
 
   if (piLoading) {
     return (
-      <div className='min-h-[60vh] flex items-center justify-center px-4'>
-        <Card className='w-full max-w-sm'>
-          <CardContent className='py-10 text-center space-y-3'>
-            <div className='mx-auto h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent' />
-            <p className='text-sm text-muted-foreground'>{t('checkingPi')}</p>
+      <div className="flex min-h-[60vh] items-center justify-center px-4">
+        <Card className="w-full max-w-sm">
+          <CardContent className="space-y-3 py-10 text-center">
+            <div className="border-primary mx-auto h-8 w-8 animate-spin rounded-full border-2 border-t-transparent" />
+            <p className="text-muted-foreground text-sm">{t('checkingPi')}</p>
           </CardContent>
         </Card>
       </div>
@@ -108,26 +121,28 @@ function LinkPageInner() {
 
   if (showGenerate) {
     return (
-      <div className='min-h-[60vh] flex items-center justify-center px-4'>
-        <Card className='w-full max-w-sm'>
+      <div className="flex min-h-[60vh] items-center justify-center px-4">
+        <Card className="w-full max-w-sm">
           <CardHeader>
             <CardTitle>{t('generateTitle')}</CardTitle>
           </CardHeader>
-          <CardContent className='space-y-4'>
+          <CardContent className="space-y-4">
             {!piUser ? (
-              <div className='space-y-3'>
-                <p className='text-sm text-muted-foreground'>{t('needPiLogin')}</p>
-                <Button className='w-full' onClick={() => piSignIn()}>
+              <div className="space-y-3">
+                <p className="text-muted-foreground text-sm">
+                  {t('needPiLogin')}
+                </p>
+                <Button className="w-full" onClick={() => piSignIn()}>
                   {t('piLogin')}
                 </Button>
               </div>
             ) : (
-              <div className='space-y-3'>
-                <p className='text-sm text-muted-foreground'>
+              <div className="space-y-3">
+                <p className="text-muted-foreground text-sm">
                   {t('generateDesc')}
                 </p>
                 <Button
-                  className='w-full'
+                  className="w-full"
                   disabled={genStatus === 'loading'}
                   onClick={() => generateCode()}
                 >
@@ -139,17 +154,23 @@ function LinkPageInner() {
                 </Button>
 
                 {genStatus === 'done' && displayGenCode && (
-                  <div className='rounded-lg border-2 border-primary/40 bg-primary/5 p-5 text-center space-y-2'>
-                    <p className='text-xs text-muted-foreground'>{t('codeLabel')}</p>
-                    <p className='text-5xl font-bold tracking-widest font-mono text-primary'>
+                  <div className="border-primary/40 bg-primary/5 space-y-2 rounded-lg border-2 p-5 text-center">
+                    <p className="text-muted-foreground text-xs">
+                      {t('codeLabel')}
+                    </p>
+                    <p className="text-primary font-mono text-5xl font-bold tracking-widest">
                       {displayGenCode}
                     </p>
-                    <p className='text-xs text-muted-foreground'>{t('codeExpiry')}</p>
+                    <p className="text-muted-foreground text-xs">
+                      {t('codeExpiry')}
+                    </p>
                   </div>
                 )}
 
                 {genStatus === 'error' && (
-                  <p className='text-destructive text-xs text-center'>{genErr}</p>
+                  <p className="text-destructive text-center text-xs">
+                    {genErr}
+                  </p>
                 )}
               </div>
             )}
@@ -160,46 +181,48 @@ function LinkPageInner() {
   }
 
   return (
-    <div className='min-h-[60vh] flex items-center justify-center px-4'>
-      <Card className='w-full max-w-sm'>
+    <div className="flex min-h-[60vh] items-center justify-center px-4">
+      <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle>{t('inputTitle')}</CardTitle>
         </CardHeader>
-        <CardContent className='space-y-5'>
+        <CardContent className="space-y-5">
           {linkStatus === 'done' ? (
-            <p className='text-green-600 dark:text-green-400 text-sm font-medium text-center py-4'>
+            <p className="py-4 text-center text-sm font-medium text-green-600 dark:text-green-400">
               ✓ {t('linkDone')}
             </p>
           ) : (
             <>
-              <p className='text-sm text-muted-foreground'>{t('inputDesc')}</p>
-              <form onSubmit={handleSubmit} className='space-y-4'>
-                <div className='space-y-1.5'>
-                  <Label htmlFor='link-code'>{t('codeInputLabel')}</Label>
+              <p className="text-muted-foreground text-sm">{t('inputDesc')}</p>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="link-code">{t('codeInputLabel')}</Label>
                   <Input
-                    id='link-code'
-                    inputMode='numeric'
-                    placeholder='000-000'
+                    id="link-code"
+                    inputMode="numeric"
+                    placeholder="000-000"
                     value={displayValue}
                     onChange={(e) =>
-                      setInputCode(e.target.value.replace(/\D/g, '').slice(0, 6))
+                      setInputCode(
+                        e.target.value.replace(/\D/g, '').slice(0, 6),
+                      )
                     }
-                    className='text-center text-2xl font-mono tracking-widest h-12'
+                    className="h-12 text-center font-mono text-2xl tracking-widest"
                     maxLength={7}
-                    autoComplete='one-time-code'
+                    autoComplete="one-time-code"
                   />
                 </div>
                 {!googleSession?.user && (
-                  <p className='text-xs text-muted-foreground bg-muted rounded-md p-2'>
+                  <p className="text-muted-foreground bg-muted rounded-md p-2 text-xs">
                     {t('googleLoginRequired')}
                   </p>
                 )}
                 {linkStatus === 'error' && (
-                  <p className='text-destructive text-xs'>{linkErr}</p>
+                  <p className="text-destructive text-xs">{linkErr}</p>
                 )}
                 <Button
-                  type='submit'
-                  className='w-full'
+                  type="submit"
+                  className="w-full"
                   disabled={!isValidCode || linkStatus === 'loading'}
                 >
                   {linkStatus === 'loading'
@@ -221,8 +244,8 @@ export default function LinkPage() {
   return (
     <Suspense
       fallback={
-        <div className='min-h-[60vh] flex items-center justify-center'>
-          <div className='h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent' />
+        <div className="flex min-h-[60vh] items-center justify-center">
+          <div className="border-primary h-8 w-8 animate-spin rounded-full border-2 border-t-transparent" />
         </div>
       }
     >

@@ -8,7 +8,11 @@ interface ChatInputProps {
   onSendFile?: (file: File) => Promise<void>
 }
 
-export function ChatInput({ onSend, onSendSticker, onSendFile }: ChatInputProps) {
+export function ChatInput({
+  onSend,
+  onSendSticker,
+  onSendFile,
+}: ChatInputProps) {
   const [text, setText] = useState('')
   const [isSending, setIsSending] = useState(false)
   const [showPicker, setShowPicker] = useState(false)
@@ -20,7 +24,8 @@ export function ChatInput({ onSend, onSendSticker, onSendFile }: ChatInputProps)
   useEffect(() => {
     if (!showPicker) return
     function handleMouseDown(e: MouseEvent) {
-      if (!containerRef.current?.contains(e.target as Node)) setShowPicker(false)
+      if (!containerRef.current?.contains(e.target as Node))
+        setShowPicker(false)
     }
     document.addEventListener('mousedown', handleMouseDown)
     return () => document.removeEventListener('mousedown', handleMouseDown)
@@ -63,36 +68,45 @@ export function ChatInput({ onSend, onSendSticker, onSendFile }: ChatInputProps)
     ta.style.height = `${Math.min(ta.scrollHeight, 120)}px`
   }, [])
 
-  const handleStickerSelect = useCallback(async (stkrId: string, stkrUrl: string) => {
-    setShowPicker(false)
-    await onSendSticker(stkrId, stkrUrl)
-  }, [onSendSticker])
+  const handleStickerSelect = useCallback(
+    async (stkrId: string, stkrUrl: string) => {
+      setShowPicker(false)
+      await onSendSticker(stkrId, stkrUrl)
+    },
+    [onSendSticker],
+  )
 
-  const handleFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file || !onSendFile) return
-    e.target.value = '' // 동일 파일 재선택 허용
-    setIsSending(true)
-    try {
-      await onSendFile(file)
-    } finally {
-      setIsSending(false)
-    }
-  }, [onSendFile])
+  const handleFileChange = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0]
+      if (!file || !onSendFile) return
+      e.target.value = '' // 동일 파일 재선택 허용
+      setIsSending(true)
+      try {
+        await onSendFile(file)
+      } finally {
+        setIsSending(false)
+      }
+    },
+    [onSendFile],
+  )
 
   return (
     <div
       ref={containerRef}
-      className='relative flex shrink-0 items-end gap-2 border-t border-border/50 bg-zinc-200 p-3 shadow-[0_-4px_12px_rgb(0_0_0_/_0.06)] dark:bg-zinc-700'
+      className="border-border/50 relative flex shrink-0 items-end gap-2 border-t bg-zinc-200 p-3 shadow-[0_-4px_12px_rgb(0_0_0_/_0.06)] dark:bg-zinc-700"
     >
       {showPicker && (
-        <StickerPicker onSelect={handleStickerSelect} onClose={() => setShowPicker(false)} />
+        <StickerPicker
+          onSelect={handleStickerSelect}
+          onClose={() => setShowPicker(false)}
+        />
       )}
       <button
-        onClick={() => setShowPicker(o => !o)}
-        className='shrink-0 rounded-xl p-2 text-lg text-muted-foreground transition-colors hover:bg-muted'
-        title='스티커'
-        aria-label='스티커 선택'
+        onClick={() => setShowPicker((o) => !o)}
+        className="text-muted-foreground hover:bg-muted shrink-0 rounded-xl p-2 text-lg transition-colors"
+        title="스티커"
+        aria-label="스티커 선택"
       >
         😊
       </button>
@@ -100,17 +114,17 @@ export function ChatInput({ onSend, onSendSticker, onSendFile }: ChatInputProps)
         <>
           <input
             ref={fileInputRef}
-            type='file'
-            className='hidden'
-            accept='image/*,audio/*,.pdf,.doc,.docx,.txt,.zip'
+            type="file"
+            className="hidden"
+            accept="image/*,audio/*,.pdf,.doc,.docx,.txt,.zip"
             onChange={handleFileChange}
           />
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={isSending}
-            className='shrink-0 rounded-xl p-2 text-lg text-muted-foreground transition-colors hover:bg-muted disabled:opacity-40'
-            title='파일 첨부'
-            aria-label='파일 첨부'
+            className="text-muted-foreground hover:bg-muted shrink-0 rounded-xl p-2 text-lg transition-colors disabled:opacity-40"
+            title="파일 첨부"
+            aria-label="파일 첨부"
           >
             📎
           </button>
@@ -121,17 +135,17 @@ export function ChatInput({ onSend, onSendSticker, onSendFile }: ChatInputProps)
         value={text}
         onChange={onInput}
         onKeyDown={onKeyDown}
-        placeholder='메시지를 입력하세요... (Enter 전송, Shift+Enter 줄바꿈)'
+        placeholder="메시지를 입력하세요... (Enter 전송, Shift+Enter 줄바꿈)"
         rows={1}
-        className='flex-1 resize-none rounded-xl border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring'
+        className="bg-background focus:ring-ring flex-1 resize-none rounded-xl border px-3 py-2 text-sm outline-none focus:ring-2"
         style={{ maxHeight: '120px' }}
       />
       <button
         onClick={send}
         // 터치/클릭 시 textarea의 포커스를 뺏지 않음 → 모바일 키보드 유지
-        onPointerDown={e => e.preventDefault()}
+        onPointerDown={(e) => e.preventDefault()}
         disabled={!text.trim() || isSending}
-        className='shrink-0 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-40'
+        className="bg-primary text-primary-foreground shrink-0 rounded-xl px-4 py-2 text-sm font-medium disabled:opacity-40"
       >
         {isSending ? '...' : '전송'}
       </button>

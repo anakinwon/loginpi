@@ -15,11 +15,14 @@ export default async function MyItemsPage() {
   const user = await getSessionUser()
 
   return (
-    <div className='mx-auto max-w-3xl space-y-4 p-4 md:p-6'>
-      <Link href='/store' className='text-muted-foreground text-sm hover:underline'>
+    <div className="mx-auto max-w-3xl space-y-4 p-4 md:p-6">
+      <Link
+        href="/store"
+        className="text-muted-foreground text-sm hover:underline"
+      >
         ← {t('backToList')}
       </Link>
-      <h1 className='text-xl font-bold'>{t('myItemsTitle')}</h1>
+      <h1 className="text-xl font-bold">{t('myItemsTitle')}</h1>
       <ClientMyItems serverAuthed={!!user} />
     </div>
   )

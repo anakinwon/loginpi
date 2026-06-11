@@ -14,33 +14,35 @@ export default async function BoardIndexPage() {
   ])
 
   return (
-    <div className='mx-auto max-w-4xl px-4 py-12'>
-      <h1 className='mb-8 text-2xl font-bold'>{t('title')}</h1>
+    <div className="mx-auto max-w-4xl px-4 py-12">
+      <h1 className="mb-8 text-2xl font-bold">{t('title')}</h1>
 
-      {(!categories || categories.length === 0) ? (
-        <p className='text-muted-foreground'>{t('noBoards')}</p>
+      {!categories || categories.length === 0 ? (
+        <p className="text-muted-foreground">{t('noBoards')}</p>
       ) : (
-        <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {(categories as CategoryRow[]).map((ctgr) => (
             <Link
               key={ctgr.ctgr_cd}
               href={`/board/${ctgr.ctgr_cd.toLowerCase()}`}
-              className='group rounded-lg border p-6 transition-colors hover:bg-muted/50'
+              className="group hover:bg-muted/50 rounded-lg border p-6 transition-colors"
             >
-              <h2 className='mb-1 font-semibold group-hover:text-primary'>{ctgr.ctgr_nm}</h2>
-              <div className='mt-3 flex flex-wrap gap-1.5'>
+              <h2 className="group-hover:text-primary mb-1 font-semibold">
+                {ctgr.ctgr_nm}
+              </h2>
+              <div className="mt-3 flex flex-wrap gap-1.5">
                 {ctgr.cmnt_yn === 'Y' && (
-                  <span className='rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground'>
+                  <span className="bg-muted text-muted-foreground rounded px-1.5 py-0.5 text-xs">
                     {t('featureComment')}
                   </span>
                 )}
                 {ctgr.attch_yn === 'Y' && (
-                  <span className='rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground'>
+                  <span className="bg-muted text-muted-foreground rounded px-1.5 py-0.5 text-xs">
                     {t('featureAttachment')}
                   </span>
                 )}
                 {ctgr.gallery_yn === 'Y' && (
-                  <span className='rounded bg-muted px-1.5 py-0.5 text-xs text-muted-foreground'>
+                  <span className="bg-muted text-muted-foreground rounded px-1.5 py-0.5 text-xs">
                     {t('featureGallery')}
                   </span>
                 )}

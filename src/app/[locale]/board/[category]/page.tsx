@@ -11,7 +11,10 @@ type Props = {
 export default async function BoardListPage({ params }: Props) {
   const { category } = await params
 
-  const [ctgr, user] = await Promise.all([getCategory(category), getSessionUser()])
+  const [ctgr, user] = await Promise.all([
+    getCategory(category),
+    getSessionUser(),
+  ])
   if (!ctgr) notFound()
 
   const canWrite = !!user && hasMinRole(user.role, ctgr.wr_min_role_cd)
@@ -31,12 +34,15 @@ export default async function BoardListPage({ params }: Props) {
 
 function ListSkeleton() {
   return (
-    <div className='mx-auto max-w-4xl px-4 py-8'>
-      <div className='mb-6 h-8 w-40 animate-pulse rounded bg-muted' />
-      <div className='mb-4 h-9 animate-pulse rounded-lg bg-muted' />
-      <div className='overflow-hidden rounded-lg border'>
+    <div className="mx-auto max-w-4xl px-4 py-8">
+      <div className="bg-muted mb-6 h-8 w-40 animate-pulse rounded" />
+      <div className="bg-muted mb-4 h-9 animate-pulse rounded-lg" />
+      <div className="overflow-hidden rounded-lg border">
         {Array.from({ length: 10 }).map((_, i) => (
-          <div key={i} className='h-12 border-b last:border-b-0 bg-muted/20 animate-pulse' />
+          <div
+            key={i}
+            className="bg-muted/20 h-12 animate-pulse border-b last:border-b-0"
+          />
         ))}
       </div>
     </div>

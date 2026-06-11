@@ -101,8 +101,8 @@ export function SubscriptionGate({
     return (
       loadingFallback ?? (
         <div
-          className='h-9 w-full animate-pulse rounded-xl bg-muted'
-          aria-label='권한 확인 중'
+          className="bg-muted h-9 w-full animate-pulse rounded-xl"
+          aria-label="권한 확인 중"
         />
       )
     )
@@ -116,9 +116,9 @@ export function SubscriptionGate({
   return (
     <>
       <button
-        type='button'
+        type="button"
         onClick={() => setPromptOpen(true)}
-        className='inline-flex items-center gap-1.5 rounded-xl border border-dashed px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted'
+        className="text-muted-foreground hover:bg-muted inline-flex items-center gap-1.5 rounded-xl border border-dashed px-4 py-2 text-sm transition-colors"
       >
         🔒 {FEATURE_LABEL[feature]} 잠금 해제
       </button>

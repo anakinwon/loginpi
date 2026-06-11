@@ -48,7 +48,10 @@ export function PiBetPanel({
     try {
       const res = await piFetch(`/api/chat/rooms/${roomId}/bets`)
       if (res.ok) {
-        const data = (await res.json()) as { bets: Bet[]; is_room_owner: boolean }
+        const data = (await res.json()) as {
+          bets: Bet[]
+          is_room_owner: boolean
+        }
         setBets(data.bets)
         setIsOwner(data.is_room_owner)
       }
@@ -57,10 +60,15 @@ export function PiBetPanel({
     }
   }, [roomId])
 
-  useEffect(() => { void load() }, [load])
+  useEffect(() => {
+    void load()
+  }, [load])
 
   async function createBet() {
-    const options = optionsText.split(',').map(s => s.trim()).filter(Boolean)
+    const options = optionsText
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean)
     if (!title.trim() || options.length < 2) {
       toast.error('주제와 선택지 2개 이상(쉼표 구분)을 입력해주세요')
       return
@@ -70,7 +78,11 @@ export function PiBetPanel({
       const res = await piFetch(`/api/chat/rooms/${roomId}/bets`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bet_titl: title.trim(), bet_amt_pi: Number(amount), options }),
+        body: JSON.stringify({
+          bet_titl: title.trim(),
+          bet_amt_pi: Number(amount),
+          options,
+        }),
       })
       if (!res.ok) {
         const d = (await res.json()) as { error?: string }
@@ -95,16 +107,23 @@ export function PiBetPanel({
     }
     setPaying(true)
     try {
-      const prep = await piFetch(`/api/chat/rooms/${roomId}/bets/${bet.bet_id}/entries`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ optn_no: optnNo }),
-      })
+      const prep = await piFetch(
+        `/api/chat/rooms/${roomId}/bets/${bet.bet_id}/entries`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ optn_no: optnNo }),
+        },
+      )
       if (!prep.ok) {
         const d = (await prep.json()) as { error?: string }
         throw new Error(d.error ?? '참가 준비 실패')
       }
-      const params = (await prep.json()) as { amount: number; memo: string; metadata: Record<string, unknown> }
+      const params = (await prep.json()) as {
+        amount: number
+        memo: string
+        metadata: Record<string, unknown>
+      }
 
       window.Pi.createPayment(params, {
         onReadyForServerApproval: async (paymentId) => {
@@ -128,8 +147,13 @@ export function PiBetPanel({
             toast.error('베팅 결제 완료 처리에 실패했습니다')
           }
         },
-        onCancel: () => { setPaying(false) },
-        onError: (e) => { setPaying(false); toast.error(e.message) },
+        onCancel: () => {
+          setPaying(false)
+        },
+        onError: (e) => {
+          setPaying(false)
+          toast.error(e.message)
+        },
       })
     } catch (e) {
       setPaying(false)
@@ -138,14 +162,22 @@ export function PiBetPanel({
   }
 
   async function settleBet(bet: Bet, winOptnNo: number) {
-    const res = await piFetch(`/api/chat/rooms/${roomId}/bets/${bet.bet_id}/settle`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ win_optn_no: winOptnNo }),
-    })
+    const res = await piFetch(
+      `/api/chat/rooms/${roomId}/bets/${bet.bet_id}/settle`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ win_optn_no: winOptnNo }),
+      },
+    )
     if (res.ok) {
-      const d = (await res.json()) as { winner_cnt: number; payout_each_pi: number }
-      toast.success(`정산 완료 — 승자 ${d.winner_cnt}명, 1인당 π${d.payout_each_pi}`)
+      const d = (await res.json()) as {
+        winner_cnt: number
+        payout_each_pi: number
+      }
+      toast.success(
+        `정산 완료 — 승자 ${d.winner_cnt}명, 1인당 π${d.payout_each_pi}`,
+      )
       void load()
     } else {
       const d = (await res.json()) as { error?: string }
@@ -154,57 +186,66 @@ export function PiBetPanel({
   }
 
   return (
-    <div className='fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:items-center' onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:items-center"
+      onClick={onClose}
+    >
       <div
-        className='max-h-[80vh] w-full max-w-md overflow-y-auto rounded-t-2xl border bg-background p-4 shadow-xl sm:rounded-2xl'
-        onClick={e => e.stopPropagation()}
+        className="bg-background max-h-[80vh] w-full max-w-md overflow-y-auto rounded-t-2xl border p-4 shadow-xl sm:rounded-2xl"
+        onClick={(e) => e.stopPropagation()}
       >
-        <div className='mb-3 flex items-center justify-between'>
-          <h3 className='text-base font-semibold'>🎲 Pi Bet</h3>
-          <div className='flex items-center gap-2'>
+        <div className="mb-3 flex items-center justify-between">
+          <h3 className="text-base font-semibold">🎲 Pi Bet</h3>
+          <div className="flex items-center gap-2">
             {isOwner && (
               <button
-                onClick={() => setShowForm(f => !f)}
-                className='rounded-lg bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground hover:opacity-90'
+                onClick={() => setShowForm((f) => !f)}
+                className="bg-primary text-primary-foreground rounded-lg px-2.5 py-1 text-xs font-medium hover:opacity-90"
               >
                 + 베팅 만들기
               </button>
             )}
-            <button onClick={onClose} className='text-muted-foreground hover:text-foreground' aria-label='닫기'>✕</button>
+            <button
+              onClick={onClose}
+              className="text-muted-foreground hover:text-foreground"
+              aria-label="닫기"
+            >
+              ✕
+            </button>
           </div>
         </div>
 
         {/* 베팅 생성 폼 (방장 전용) */}
         {showForm && (
-          <div className='mb-4 space-y-2 rounded-xl border p-3'>
+          <div className="mb-4 space-y-2 rounded-xl border p-3">
             <input
               value={title}
-              onChange={e => setTitle(e.target.value)}
-              placeholder='베팅 주제 (예: 오늘 경기 승자는?)'
-              className='w-full rounded-lg border bg-transparent px-2.5 py-1.5 text-sm'
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="베팅 주제 (예: 오늘 경기 승자는?)"
+              className="w-full rounded-lg border bg-transparent px-2.5 py-1.5 text-sm"
               maxLength={200}
             />
             <input
               value={optionsText}
-              onChange={e => setOptionsText(e.target.value)}
-              placeholder='선택지 (쉼표 구분, 예: 팀A, 팀B)'
-              className='w-full rounded-lg border bg-transparent px-2.5 py-1.5 text-sm'
+              onChange={(e) => setOptionsText(e.target.value)}
+              placeholder="선택지 (쉼표 구분, 예: 팀A, 팀B)"
+              className="w-full rounded-lg border bg-transparent px-2.5 py-1.5 text-sm"
             />
-            <div className='flex items-center gap-2'>
-              <label className='text-xs text-muted-foreground'>참가비 π</label>
+            <div className="flex items-center gap-2">
+              <label className="text-muted-foreground text-xs">참가비 π</label>
               <input
-                type='number'
+                type="number"
                 value={amount}
-                onChange={e => setAmount(e.target.value)}
-                min='0.01'
-                max='100'
-                step='0.01'
-                className='w-24 rounded-lg border bg-transparent px-2.5 py-1.5 text-sm'
+                onChange={(e) => setAmount(e.target.value)}
+                min="0.01"
+                max="100"
+                step="0.01"
+                className="w-24 rounded-lg border bg-transparent px-2.5 py-1.5 text-sm"
               />
               <button
                 onClick={createBet}
                 disabled={creating}
-                className='ml-auto rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50'
+                className="bg-primary text-primary-foreground ml-auto rounded-lg px-3 py-1.5 text-xs font-medium hover:opacity-90 disabled:opacity-50"
               >
                 {creating ? '생성 중…' : '생성'}
               </button>
@@ -214,17 +255,19 @@ export function PiBetPanel({
 
         {/* 베팅 목록 */}
         {loading ? (
-          <div className='py-8 text-center text-sm text-muted-foreground'>불러오는 중…</div>
+          <div className="text-muted-foreground py-8 text-center text-sm">
+            불러오는 중…
+          </div>
         ) : bets.length === 0 ? (
-          <div className='rounded-xl border border-dashed py-8 text-center text-sm text-muted-foreground'>
+          <div className="text-muted-foreground rounded-xl border border-dashed py-8 text-center text-sm">
             진행 중인 베팅이 없습니다
           </div>
         ) : (
-          <div className='space-y-3'>
-            {bets.map(bet => (
-              <div key={bet.bet_id} className='rounded-xl border p-3'>
-                <div className='mb-2 flex items-start justify-between gap-2'>
-                  <p className='text-sm font-medium'>{bet.bet_titl}</p>
+          <div className="space-y-3">
+            {bets.map((bet) => (
+              <div key={bet.bet_id} className="rounded-xl border p-3">
+                <div className="mb-2 flex items-start justify-between gap-2">
+                  <p className="text-sm font-medium">{bet.bet_titl}</p>
                   <span
                     className={`shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-medium ${
                       bet.bet_st_cd === 'OPEN'
@@ -232,42 +275,65 @@ export function PiBetPanel({
                         : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400'
                     }`}
                   >
-                    {bet.bet_st_cd === 'OPEN' ? '진행중' : bet.bet_st_cd === 'SETTLED' ? '정산완료' : '마감'}
+                    {bet.bet_st_cd === 'OPEN'
+                      ? '진행중'
+                      : bet.bet_st_cd === 'SETTLED'
+                        ? '정산완료'
+                        : '마감'}
                   </span>
                 </div>
-                <p className='mb-2 text-xs text-muted-foreground'>
+                <p className="text-muted-foreground mb-2 text-xs">
                   참가 π{bet.bet_amt_pi} · 총 풀 π{bet.total_pool_pi}
                   {bet.my_entry && (
-                    <span className='ml-1 text-primary'>
-                      · 내 선택: {bet.options.find(o => o.optn_no === bet.my_entry?.optn_no)?.optn_nm}
-                      {bet.bet_st_cd === 'SETTLED' && bet.my_entry.win_yn === 'Y' && (
-                        <span className='font-semibold'> 🎉 +π{bet.my_entry.payout_pi}</span>
-                      )}
+                    <span className="text-primary ml-1">
+                      · 내 선택:{' '}
+                      {
+                        bet.options.find(
+                          (o) => o.optn_no === bet.my_entry?.optn_no,
+                        )?.optn_nm
+                      }
+                      {bet.bet_st_cd === 'SETTLED' &&
+                        bet.my_entry.win_yn === 'Y' && (
+                          <span className="font-semibold">
+                            {' '}
+                            🎉 +π{bet.my_entry.payout_pi}
+                          </span>
+                        )}
                     </span>
                   )}
                 </p>
-                <div className='space-y-1.5'>
-                  {bet.options.map(opt => {
+                <div className="space-y-1.5">
+                  {bet.options.map((opt) => {
                     const isWin = bet.win_optn_no === opt.optn_no
                     return (
-                      <div key={opt.optn_no} className='flex items-center gap-2'>
-                        <span className={`flex-1 text-xs ${isWin ? 'font-semibold text-primary' : ''}`}>
-                          {isWin && '🏆 '}{opt.optn_nm}
-                          <span className='ml-1 text-muted-foreground'>({opt.entry_cnt}명)</span>
+                      <div
+                        key={opt.optn_no}
+                        className="flex items-center gap-2"
+                      >
+                        <span
+                          className={`flex-1 text-xs ${isWin ? 'text-primary font-semibold' : ''}`}
+                        >
+                          {isWin && '🏆 '}
+                          {opt.optn_nm}
+                          <span className="text-muted-foreground ml-1">
+                            ({opt.entry_cnt}명)
+                          </span>
                         </span>
-                        {bet.bet_st_cd === 'OPEN' && !bet.my_entry && !bet.is_creator && (
-                          <button
-                            disabled={paying}
-                            onClick={() => enterBet(bet, opt.optn_no)}
-                            className='rounded-lg bg-primary/10 px-2 py-1 text-[11px] font-medium text-primary hover:bg-primary/20 disabled:opacity-50'
-                          >
-                            π{bet.bet_amt_pi} 베팅
-                          </button>
-                        )}
+                        {bet.bet_st_cd === 'OPEN' &&
+                          !bet.my_entry &&
+                          !bet.is_creator && (
+                            <button
+                              disabled={paying}
+                              onClick={() => enterBet(bet, opt.optn_no)}
+                              className="bg-primary/10 text-primary hover:bg-primary/20 rounded-lg px-2 py-1 text-[11px] font-medium disabled:opacity-50"
+                            >
+                              π{bet.bet_amt_pi} 베팅
+                            </button>
+                          )}
                         {bet.bet_st_cd === 'OPEN' && bet.is_creator && (
                           <button
                             onClick={() => settleBet(bet, opt.optn_no)}
-                            className='rounded-lg border px-2 py-1 text-[11px] text-muted-foreground hover:bg-muted'
+                            className="text-muted-foreground hover:bg-muted rounded-lg border px-2 py-1 text-[11px]"
                           >
                             이 옵션으로 정산
                           </button>

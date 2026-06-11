@@ -20,14 +20,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
   }
 
-  const { theme_cd, room_nm, room_desc, is_public_yn, max_mbr_cnt, expr_dtm } = body as {
-    theme_cd?: string
-    room_nm?: string
-    room_desc?: string
-    is_public_yn?: 'Y' | 'N'
-    max_mbr_cnt?: number
-    expr_dtm?: string | null
-  }
+  const { theme_cd, room_nm, room_desc, is_public_yn, max_mbr_cnt, expr_dtm } =
+    body as {
+      theme_cd?: string
+      room_nm?: string
+      room_desc?: string
+      is_public_yn?: 'Y' | 'N'
+      max_mbr_cnt?: number
+      expr_dtm?: string | null
+    }
 
   if (!theme_cd) {
     return NextResponse.json({ error: '테마를 선택해 주세요' }, { status: 400 })
@@ -36,11 +37,17 @@ export async function POST(request: NextRequest) {
   if (!FREE_THEME_CODES.has(theme_cd)) {
     const allowance = await canCreateRoom(user.id)
     if (!allowance.allowed) {
-      return NextResponse.json({ error: '이 테마는 결제가 필요합니다' }, { status: 403 })
+      return NextResponse.json(
+        { error: '이 테마는 결제가 필요합니다' },
+        { status: 403 },
+      )
     }
   }
   if (!room_nm?.trim()) {
-    return NextResponse.json({ error: '카페 이름을 입력해 주세요' }, { status: 400 })
+    return NextResponse.json(
+      { error: '카페 이름을 입력해 주세요' },
+      { status: 400 },
+    )
   }
 
   try {

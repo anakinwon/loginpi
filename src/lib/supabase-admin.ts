@@ -12,7 +12,7 @@ export function getSupabaseAdmin(): SupabaseClient {
 
   if (!url || !key) {
     throw new Error(
-      'NEXT_PUBLIC_SUPABASE_URL 또는 SUPABASE_SERVICE_ROLE_KEY가 설정되지 않았습니다'
+      'NEXT_PUBLIC_SUPABASE_URL 또는 SUPABASE_SERVICE_ROLE_KEY가 설정되지 않았습니다',
     )
   }
 

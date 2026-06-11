@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 
-const ROW_HEIGHT_PX = 44  // 관리자 테이블 행: py-3(24px) + 텍스트(20px)
+const ROW_HEIGHT_PX = 44 // 관리자 테이블 행: py-3(24px) + 텍스트(20px)
 
 function calcLimit(chromeHeight: number): number {
   if (typeof window === 'undefined') return 15
-  const headerH = (document.querySelector('header') as HTMLElement | null)?.offsetHeight ?? 56
-  const footerH = (document.querySelector('footer') as HTMLElement | null)?.offsetHeight ?? 68
+  const headerH =
+    (document.querySelector('header') as HTMLElement | null)?.offsetHeight ?? 56
+  const footerH =
+    (document.querySelector('footer') as HTMLElement | null)?.offsetHeight ?? 68
   const available = window.innerHeight - headerH - footerH - chromeHeight
   return Math.max(5, Math.min(50, Math.floor(available / ROW_HEIGHT_PX)))
 }

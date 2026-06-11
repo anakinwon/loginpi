@@ -23,8 +23,10 @@ interface WordRow {
 }
 
 const STATUS_COLOR: Record<string, string> = {
-  APPROVED: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-  PENDING: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
+  APPROVED:
+    'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+  PENDING:
+    'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
   REJECTED: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
 }
 
@@ -54,7 +56,9 @@ export default function StdWordsPage() {
   const [deleting, setDeleting] = useState<string | null>(null)
 
   // limit 또는 검색어 변경 시 첫 페이지로 리셋
-  useEffect(() => { setPage(1) }, [limit, search])
+  useEffect(() => {
+    setPage(1)
+  }, [limit, search])
 
   const load = useCallback(() => {
     setLoading(true)
@@ -105,7 +109,9 @@ export default function StdWordsPage() {
         data_type: form.data_type || null,
         data_len: form.data_len ? parseInt(form.data_len) : null,
       }
-      const url = editing ? `/api/admin/std/words/${editing.dic_id}` : '/api/admin/std/words'
+      const url = editing
+        ? `/api/admin/std/words/${editing.dic_id}`
+        : '/api/admin/std/words'
       const method = editing ? 'PATCH' : 'POST'
       const res = await fetch(url, {
         method,
@@ -130,7 +136,9 @@ export default function StdWordsPage() {
     if (!confirm(t('deleteConfirm', { name: nm }))) return
     setDeleting(id)
     try {
-      const res = await fetch(`/api/admin/std/words/${id}`, { method: 'DELETE' })
+      const res = await fetch(`/api/admin/std/words/${id}`, {
+        method: 'DELETE',
+      })
       if (!res.ok) {
         const d = (await res.json()) as { error?: string }
         throw new Error(d.error ?? t('deleteFail'))
@@ -148,81 +156,115 @@ export default function StdWordsPage() {
   const displayedWords = words.slice((page - 1) * limit, page * limit)
 
   return (
-    <div className='space-y-4'>
-      <div className='flex items-center justify-between'>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className='text-2xl font-bold'>{t('title')}</h1>
-          <p className='text-muted-foreground mt-1 text-sm'>{t('totalCount', { count: words.length })}</p>
+          <h1 className="text-2xl font-bold">{t('title')}</h1>
+          <p className="text-muted-foreground mt-1 text-sm">
+            {t('totalCount', { count: words.length })}
+          </p>
         </div>
-        <Button onClick={openNew} size='sm'>{tc('newRegister')}</Button>
+        <Button onClick={openNew} size="sm">
+          {tc('newRegister')}
+        </Button>
       </div>
 
       <Input
         placeholder={t('searchPlaceholder')}
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className='max-w-64'
+        className="max-w-64"
       />
 
       {showForm && (
-        <div className='rounded-lg border bg-muted/30 p-4 space-y-3'>
-          <h2 className='font-semibold text-sm'>{editing ? t('formTitleEdit') : t('formTitleNew')}</h2>
-          <div className='grid grid-cols-2 gap-3 sm:grid-cols-3'>
-            <label className='space-y-1'>
-              <span className='text-xs text-muted-foreground'>{t('field.logNm')}</span>
+        <div className="bg-muted/30 space-y-3 rounded-lg border p-4">
+          <h2 className="text-sm font-semibold">
+            {editing ? t('formTitleEdit') : t('formTitleNew')}
+          </h2>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <label className="space-y-1">
+              <span className="text-muted-foreground text-xs">
+                {t('field.logNm')}
+              </span>
               <Input
                 value={form.dic_log_nm}
-                onChange={(e) => setForm((f) => ({ ...f, dic_log_nm: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, dic_log_nm: e.target.value }))
+                }
                 placeholder={t('placeholder.logNm')}
               />
             </label>
-            <label className='space-y-1'>
-              <span className='text-xs text-muted-foreground'>{t('field.phyNmAbbr')}</span>
+            <label className="space-y-1">
+              <span className="text-muted-foreground text-xs">
+                {t('field.phyNmAbbr')}
+              </span>
               <Input
                 value={form.dic_phy_nm}
-                onChange={(e) => setForm((f) => ({ ...f, dic_phy_nm: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, dic_phy_nm: e.target.value }))
+                }
                 placeholder={t('placeholder.phyNmAbbr')}
               />
             </label>
-            <label className='space-y-1'>
-              <span className='text-xs text-muted-foreground'>{t('field.phyNmFull')}</span>
+            <label className="space-y-1">
+              <span className="text-muted-foreground text-xs">
+                {t('field.phyNmFull')}
+              </span>
               <Input
                 value={form.dic_phy_fll_nm}
-                onChange={(e) => setForm((f) => ({ ...f, dic_phy_fll_nm: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, dic_phy_fll_nm: e.target.value }))
+                }
                 placeholder={t('placeholder.phyNmFull')}
               />
             </label>
-            <label className='space-y-1'>
-              <span className='text-xs text-muted-foreground'>{t('field.dataType')}</span>
+            <label className="space-y-1">
+              <span className="text-muted-foreground text-xs">
+                {t('field.dataType')}
+              </span>
               <Input
                 value={form.data_type}
-                onChange={(e) => setForm((f) => ({ ...f, data_type: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, data_type: e.target.value }))
+                }
                 placeholder={t('placeholder.dataType')}
               />
             </label>
-            <label className='space-y-1'>
-              <span className='text-xs text-muted-foreground'>{t('field.dataLen')}</span>
+            <label className="space-y-1">
+              <span className="text-muted-foreground text-xs">
+                {t('field.dataLen')}
+              </span>
               <Input
-                type='number'
+                type="number"
                 value={form.data_len}
-                onChange={(e) => setForm((f) => ({ ...f, data_len: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, data_len: e.target.value }))
+                }
                 placeholder={t('placeholder.dataLen')}
               />
             </label>
-            <label className='col-span-2 space-y-1 sm:col-span-3'>
-              <span className='text-xs text-muted-foreground'>{t('field.desc')}</span>
+            <label className="col-span-2 space-y-1 sm:col-span-3">
+              <span className="text-muted-foreground text-xs">
+                {t('field.desc')}
+              </span>
               <Input
                 value={form.dic_desc}
-                onChange={(e) => setForm((f) => ({ ...f, dic_desc: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, dic_desc: e.target.value }))
+                }
                 placeholder={t('placeholder.desc')}
               />
             </label>
           </div>
-          <div className='flex gap-2'>
-            <Button size='sm' onClick={save} disabled={saving}>
+          <div className="flex gap-2">
+            <Button size="sm" onClick={save} disabled={saving}>
               {saving ? tc('saving') : tc('save')}
             </Button>
-            <Button size='sm' variant='outline' onClick={() => setShowForm(false)}>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setShowForm(false)}
+            >
               {tc('cancel')}
             </Button>
           </div>
@@ -230,49 +272,77 @@ export default function StdWordsPage() {
       )}
 
       {loading ? (
-        <p className='text-muted-foreground text-sm'>{tc('loading')}</p>
+        <p className="text-muted-foreground text-sm">{tc('loading')}</p>
       ) : words.length === 0 ? (
-        <p className='text-muted-foreground text-sm'>{t('noData')}</p>
+        <p className="text-muted-foreground text-sm">{t('noData')}</p>
       ) : (
-        <div className='rounded-lg border overflow-x-auto'>
-          <table className='w-full text-sm'>
-            <thead className='bg-muted/50 border-b'>
+        <div className="overflow-x-auto rounded-lg border">
+          <table className="w-full text-sm">
+            <thead className="bg-muted/50 border-b">
               <tr>
-                <th className='text-left px-4 py-2 font-medium'>{t('col.logNm')}</th>
-                <th className='text-left px-4 py-2 font-medium'>{t('col.phyNmAbbr')}</th>
-                <th className='text-left px-4 py-2 font-medium'>{t('col.phyNmFull')}</th>
-                <th className='text-left px-4 py-2 font-medium'>{t('col.typeLen')}</th>
-                <th className='text-left px-4 py-2 font-medium'>{t('col.status')}</th>
-                <th className='text-left px-4 py-2 font-medium'>{t('col.desc')}</th>
-                <th className='px-4 py-2'></th>
+                <th className="px-4 py-2 text-left font-medium">
+                  {t('col.logNm')}
+                </th>
+                <th className="px-4 py-2 text-left font-medium">
+                  {t('col.phyNmAbbr')}
+                </th>
+                <th className="px-4 py-2 text-left font-medium">
+                  {t('col.phyNmFull')}
+                </th>
+                <th className="px-4 py-2 text-left font-medium">
+                  {t('col.typeLen')}
+                </th>
+                <th className="px-4 py-2 text-left font-medium">
+                  {t('col.status')}
+                </th>
+                <th className="px-4 py-2 text-left font-medium">
+                  {t('col.desc')}
+                </th>
+                <th className="px-4 py-2"></th>
               </tr>
             </thead>
-            <tbody className='divide-y'>
+            <tbody className="divide-y">
               {displayedWords.map((w) => (
-                <tr key={w.dic_id} className='hover:bg-muted/30 transition-colors'>
-                  <td className='px-4 py-3 font-medium'>{w.dic_log_nm}</td>
-                  <td className='px-4 py-3 font-mono text-xs'>{w.dic_phy_nm}</td>
-                  <td className='px-4 py-3 font-mono text-xs text-muted-foreground'>
+                <tr
+                  key={w.dic_id}
+                  className="hover:bg-muted/30 transition-colors"
+                >
+                  <td className="px-4 py-3 font-medium">{w.dic_log_nm}</td>
+                  <td className="px-4 py-3 font-mono text-xs">
+                    {w.dic_phy_nm}
+                  </td>
+                  <td className="text-muted-foreground px-4 py-3 font-mono text-xs">
                     {w.dic_phy_fll_nm ?? '—'}
                   </td>
-                  <td className='px-4 py-3 text-muted-foreground text-xs'>
-                    {w.data_type ? `${w.data_type}${w.data_len ? `(${w.data_len})` : ''}` : '—'}
+                  <td className="text-muted-foreground px-4 py-3 text-xs">
+                    {w.data_type
+                      ? `${w.data_type}${w.data_len ? `(${w.data_len})` : ''}`
+                      : '—'}
                   </td>
-                  <td className='px-4 py-3'>
-                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_COLOR[w.apv_status] ?? ''}`}>
+                  <td className="px-4 py-3">
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_COLOR[w.apv_status] ?? ''}`}
+                    >
                       {w.apv_status}
                     </span>
                   </td>
-                  <td className='px-4 py-3 text-muted-foreground text-xs max-w-48 truncate'>
+                  <td className="text-muted-foreground max-w-48 truncate px-4 py-3 text-xs">
                     {w.dic_desc ?? '—'}
                   </td>
-                  <td className='px-4 py-3'>
-                    <div className='flex gap-1'>
-                      <Button variant='outline' size='sm' className='h-6 px-2 text-xs' onClick={() => openEdit(w)}>
+                  <td className="px-4 py-3">
+                    <div className="flex gap-1">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-6 px-2 text-xs"
+                        onClick={() => openEdit(w)}
+                      >
                         {tc('edit')}
                       </Button>
                       <Button
-                        variant='outline' size='sm' className='h-6 px-2 text-xs text-destructive hover:text-destructive'
+                        variant="outline"
+                        size="sm"
+                        className="text-destructive hover:text-destructive h-6 px-2 text-xs"
                         disabled={deleting === w.dic_id}
                         onClick={() => remove(w.dic_id, w.dic_log_nm)}
                       >

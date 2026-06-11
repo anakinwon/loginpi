@@ -32,9 +32,11 @@ export function ClientChatList() {
         publicRooms?: RoomWithTheme[]
       }
       const mine = data.rooms ?? []
-      const mineIds = new Set(mine.map(r => r.room_id))
+      const mineIds = new Set(mine.map((r) => r.room_id))
       setMyRooms(mine)
-      setDiscoverRooms((data.publicRooms ?? []).filter(r => !mineIds.has(r.room_id)))
+      setDiscoverRooms(
+        (data.publicRooms ?? []).filter((r) => !mineIds.has(r.room_id)),
+      )
       setState('ready')
     })()
 
@@ -45,25 +47,38 @@ export function ClientChatList() {
 
   // Pi SDK 인증 진행 중
   if (authLoading) {
-    return <div className='py-20 text-center text-sm text-muted-foreground'>Pi 계정 인증 중…</div>
+    return (
+      <div className="text-muted-foreground py-20 text-center text-sm">
+        Pi 계정 인증 중…
+      </div>
+    )
   }
   // 인증이 끝났는데도 신원 없음 → 비로그인 (일반 브라우저 로그아웃 상태 등)
   if (!user) {
     return (
-      <div className='py-20 text-center'>
-        <p className='text-sm text-muted-foreground'>카페는 로그인 후 이용할 수 있습니다</p>
-        <Link href='/' className='mt-2 inline-block text-sm text-primary underline'>
+      <div className="py-20 text-center">
+        <p className="text-muted-foreground text-sm">
+          카페는 로그인 후 이용할 수 있습니다
+        </p>
+        <Link
+          href="/"
+          className="text-primary mt-2 inline-block text-sm underline"
+        >
           홈으로 이동
         </Link>
       </div>
     )
   }
   if (state === 'loading') {
-    return <div className='py-20 text-center text-sm text-muted-foreground'>카페를 불러오는 중…</div>
+    return (
+      <div className="text-muted-foreground py-20 text-center text-sm">
+        카페를 불러오는 중…
+      </div>
+    )
   }
   if (state === 'error') {
     return (
-      <div className='py-20 text-center text-sm text-muted-foreground'>
+      <div className="text-muted-foreground py-20 text-center text-sm">
         카페를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.
       </div>
     )

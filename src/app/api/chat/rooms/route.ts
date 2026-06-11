@@ -8,12 +8,14 @@ import { recordActivity } from '@/lib/activity-log'
 // Pi Browser 클라이언트 게이트(ClientChatList)가 X-Pi-Token 헤더로 호출한다.
 export async function GET(request: NextRequest) {
   const user = await getSessionUser()
-  if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user)
+    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
   // 카페 화면 진입 = 활성 사용자 신호 (하루 첫 호출만 INSERT, 이후 UPSERT no-op)
   recordActivity(user.id, 'CHAT')
 
-  const includePublic = new URL(request.url).searchParams.get('include') === 'public'
+  const includePublic =
+    new URL(request.url).searchParams.get('include') === 'public'
 
   // 내 카페
   const { data: mbrs } = await getSupabaseAdmin()
@@ -28,11 +30,13 @@ export async function GET(request: NextRequest) {
     const [{ data, error }, { data: mbrRows }] = await Promise.all([
       getSupabaseAdmin()
         .from('msg_room')
-        .select(`
+        .select(
+          `
           room_id, room_nm, room_desc, theme_cd, room_tp_cd,
           max_mbr_cnt, is_public_yn, del_yn, reg_dtm, expr_dtm,
           msg_theme(theme_nm, theme_emoji, theme_tp_cd)
-        `)
+        `,
+        )
         .in('room_id', roomIds)
         .eq('del_yn', 'N')
         .order('mod_dtm', { ascending: false }),
@@ -42,7 +46,11 @@ export async function GET(request: NextRequest) {
         .in('room_id', roomIds)
         .eq('del_yn', 'N'),
     ])
-    if (error) return NextResponse.json({ error: '카페 목록 조회 실패' }, { status: 500 })
+    if (error)
+      return NextResponse.json(
+        { error: '카페 목록 조회 실패' },
+        { status: 500 },
+      )
     const cntMap = new Map<string, number>()
     for (const m of mbrRows ?? []) {
       cntMap.set(m.room_id, (cntMap.get(m.room_id) ?? 0) + 1)
@@ -53,19 +61,22 @@ export async function GET(request: NextRequest) {
     }))
   }
 
-  if (!includePublic) return NextResponse.json({ rooms: await attachOpenBetYn(rooms) })
+  if (!includePublic)
+    return NextResponse.json({ rooms: await attachOpenBetYn(rooms) })
 
   // 공개 그룹 카페 (최근 10개)
   const { data: publicRooms } = await getSupabaseAdmin()
     .from('msg_room')
-    .select('room_id, room_nm, theme_cd, room_tp_cd, is_public_yn, max_mbr_cnt, expr_dtm, msg_theme(theme_nm, theme_emoji, theme_tp_cd)')
+    .select(
+      'room_id, room_nm, theme_cd, room_tp_cd, is_public_yn, max_mbr_cnt, expr_dtm, msg_theme(theme_nm, theme_emoji, theme_tp_cd)',
+    )
     .eq('is_public_yn', 'Y')
     .eq('room_tp_cd', 'G')
     .eq('del_yn', 'N')
     .order('reg_dtm', { ascending: false })
     .limit(10)
 
-  const pubRoomIds = (publicRooms ?? []).map(r => r.room_id)
+  const pubRoomIds = (publicRooms ?? []).map((r) => r.room_id)
   let publicRoomsWithCnt: unknown[] = publicRooms ?? []
   if (pubRoomIds.length > 0) {
     const { data: pubMbrRows } = await getSupabaseAdmin()
@@ -77,7 +88,7 @@ export async function GET(request: NextRequest) {
     for (const m of pubMbrRows ?? []) {
       pubCntMap.set(m.room_id, (pubCntMap.get(m.room_id) ?? 0) + 1)
     }
-    publicRoomsWithCnt = (publicRooms ?? []).map(r => ({
+    publicRoomsWithCnt = (publicRooms ?? []).map((r) => ({
       ...r,
       cur_mbr_cnt: pubCntMap.get(r.room_id) ?? 0,
     }))
@@ -87,7 +98,10 @@ export async function GET(request: NextRequest) {
     attachOpenBetYn(rooms),
     attachOpenBetYn(publicRoomsWithCnt),
   ])
-  return NextResponse.json({ rooms: roomsWithBet, publicRooms: publicRoomsWithBet })
+  return NextResponse.json({
+    rooms: roomsWithBet,
+    publicRooms: publicRoomsWithBet,
+  })
 }
 
 // 진행 중(OPEN) Pi Bet 보유 방에 open_bet_yn='Y' 부여 — 카페 목록 🎲 뱃지용
@@ -97,29 +111,46 @@ async function attachOpenBetYn(rooms: unknown[]): Promise<unknown[]> {
   const { data } = await getSupabaseAdmin()
     .from('msg_bet')
     .select('room_id')
-    .in('room_id', typed.map(r => r.room_id))
+    .in(
+      'room_id',
+      typed.map((r) => r.room_id),
+    )
     .eq('bet_st_cd', 'OPEN')
     .eq('del_yn', 'N')
-  const betRoomIds = new Set((data ?? []).map((b: { room_id: string }) => b.room_id))
-  return typed.map(r => ({ ...r, open_bet_yn: betRoomIds.has(r.room_id) ? 'Y' : 'N' }))
+  const betRoomIds = new Set(
+    (data ?? []).map((b: { room_id: string }) => b.room_id),
+  )
+  return typed.map((r) => ({
+    ...r,
+    open_bet_yn: betRoomIds.has(r.room_id) ? 'Y' : 'N',
+  }))
 }
 
 // POST /api/chat/rooms — 1:1 Direct Room 생성 (TASK-053에서 Group·Event 추가)
 export async function POST(request: NextRequest) {
   const user = await getSessionUser()
-  if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user)
+    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
   let body: unknown
-  try { body = await request.json() } catch {
+  try {
+    body = await request.json()
+  } catch {
     return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
   }
 
   const { target_usr_id } = body as { target_usr_id?: string }
   if (!target_usr_id) {
-    return NextResponse.json({ error: 'target_usr_id가 필요합니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: 'target_usr_id가 필요합니다' },
+      { status: 400 },
+    )
   }
   if (target_usr_id === user.id) {
-    return NextResponse.json({ error: '자기 자신과 카페를 만들 수 없습니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: '자기 자신과 카페를 만들 수 없습니다' },
+      { status: 400 },
+    )
   }
 
   // 상대방 존재 확인
@@ -129,10 +160,18 @@ export async function POST(request: NextRequest) {
     .eq('id', target_usr_id)
     .single()
 
-  if (!targetUser) return NextResponse.json({ error: '상대방 사용자를 찾을 수 없습니다' }, { status: 404 })
+  if (!targetUser)
+    return NextResponse.json(
+      { error: '상대방 사용자를 찾을 수 없습니다' },
+      { status: 404 },
+    )
 
   try {
-    const room = await getOrCreateDirectRoom(user.id, target_usr_id, user.display_name)
+    const room = await getOrCreateDirectRoom(
+      user.id,
+      target_usr_id,
+      user.display_name,
+    )
     return NextResponse.json({ room }, { status: 201 })
   } catch {
     return NextResponse.json({ error: '카페 생성 실패' }, { status: 500 })

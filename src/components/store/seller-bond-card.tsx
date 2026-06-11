@@ -55,7 +55,7 @@ export function SellerBondCard() {
       window.Pi.createPayment(
         { amount: prep.amount, memo: prep.memo, metadata: prep.metadata },
         {
-          onReadyForServerApproval: async paymentId => {
+          onReadyForServerApproval: async (paymentId) => {
             await fetch('/api/payments/approve', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -77,7 +77,7 @@ export function SellerBondCard() {
             }
           },
           onCancel: () => setPaying(false),
-          onError: e => {
+          onError: (e) => {
             setPaying(false)
             toast.error(e.message)
           },
@@ -92,10 +92,10 @@ export function SellerBondCard() {
   if (!bond) return null
 
   return (
-    <div className='rounded-lg border p-4 space-y-3'>
-      <div className='flex items-center justify-between gap-3'>
+    <div className="space-y-3 rounded-lg border p-4">
+      <div className="flex items-center justify-between gap-3">
         <div>
-          <p className='text-sm font-semibold'>
+          <p className="text-sm font-semibold">
             🛡️ {t('bond.title')}{' '}
             <span
               className={`ml-1 rounded-full px-2 py-0.5 text-xs font-medium ${
@@ -107,38 +107,50 @@ export function SellerBondCard() {
               {bond.bonded ? t('bond.active') : t('bond.inactive')}
             </span>
           </p>
-          <p className='text-muted-foreground mt-0.5 text-xs'>{t('bond.desc')}</p>
+          <p className="text-muted-foreground mt-0.5 text-xs">
+            {t('bond.desc')}
+          </p>
         </div>
-        <Button size='sm' onClick={deposit} disabled={paying}>
-          {paying ? t('buying') : bond.deposited ? t('bond.redeposit') : t('bond.deposit')}
+        <Button size="sm" onClick={deposit} disabled={paying}>
+          {paying
+            ? t('buying')
+            : bond.deposited
+              ? t('bond.redeposit')
+              : t('bond.deposit')}
         </Button>
       </div>
 
       {bond.deposited && (
-        <div className='grid grid-cols-2 gap-2 text-sm sm:grid-cols-4'>
-          <div className='bg-muted/50 rounded-md px-3 py-2'>
-            <p className='text-muted-foreground text-xs'>{t('bond.balance')}</p>
-            <p className='font-semibold tabular-nums'>{bond.bond_bal_pi} π</p>
+        <div className="grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
+          <div className="bg-muted/50 rounded-md px-3 py-2">
+            <p className="text-muted-foreground text-xs">{t('bond.balance')}</p>
+            <p className="font-semibold tabular-nums">{bond.bond_bal_pi} π</p>
           </div>
-          <div className='bg-muted/50 rounded-md px-3 py-2'>
-            <p className='text-muted-foreground text-xs'>{t('bond.avail')}</p>
-            <p className='font-semibold tabular-nums'>{bond.avail_pi.toFixed(1)} π</p>
+          <div className="bg-muted/50 rounded-md px-3 py-2">
+            <p className="text-muted-foreground text-xs">{t('bond.avail')}</p>
+            <p className="font-semibold tabular-nums">
+              {bond.avail_pi.toFixed(1)} π
+            </p>
           </div>
-          <div className='bg-muted/50 rounded-md px-3 py-2'>
-            <p className='text-muted-foreground text-xs'>{t('bond.remainCancels')}</p>
-            <p className='font-semibold tabular-nums'>{bond.remain_cancels}</p>
+          <div className="bg-muted/50 rounded-md px-3 py-2">
+            <p className="text-muted-foreground text-xs">
+              {t('bond.remainCancels')}
+            </p>
+            <p className="font-semibold tabular-nums">{bond.remain_cancels}</p>
           </div>
-          <div className='bg-muted/50 rounded-md px-3 py-2'>
-            <p className='text-muted-foreground text-xs'>{t('bond.cancelCnt')}</p>
-            <p className='font-semibold tabular-nums'>{bond.cancel_cnt}</p>
+          <div className="bg-muted/50 rounded-md px-3 py-2">
+            <p className="text-muted-foreground text-xs">
+              {t('bond.cancelCnt')}
+            </p>
+            <p className="font-semibold tabular-nums">{bond.cancel_cnt}</p>
           </div>
         </div>
       )}
 
       {bond.deposited && !bond.bonded && (
-        <p className='text-destructive text-xs'>{t('bond.exhausted')}</p>
+        <p className="text-destructive text-xs">{t('bond.exhausted')}</p>
       )}
-      <p className='text-muted-foreground text-xs'>{t('bond.notice')}</p>
+      <p className="text-muted-foreground text-xs">{t('bond.notice')}</p>
     </div>
   )
 }

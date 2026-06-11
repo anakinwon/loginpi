@@ -25,7 +25,10 @@ export function GalleryPostForm({ category }: Props) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!title.trim()) { toast.error('제목을 입력해주세요'); return }
+    if (!title.trim()) {
+      toast.error('제목을 입력해주세요')
+      return
+    }
     setSubmitting(true)
 
     // 1. 글 생성 (post_cont는 이후 PATCH로 채움)
@@ -54,17 +57,26 @@ export function GalleryPostForm({ category }: Props) {
       const fd = new FormData()
       fd.append('files', block.file)
       fd.append('sort_ord', String(finalBlocks.length))
-      const uploadRes = await piFetch(`/api/board/${category}/${post_id}/attachments`, {
-        method: 'POST',
-        body: fd,
-      })
+      const uploadRes = await piFetch(
+        `/api/board/${category}/${post_id}/attachments`,
+        {
+          method: 'POST',
+          body: fd,
+        },
+      )
       if (uploadRes.ok) {
         const data = (await uploadRes.json()) as {
           uploaded: { attch_id: string; fl_nm: string; fl_url: string }[]
         }
         const u = data.uploaded[0]
         URL.revokeObjectURL(block.blobUrl)
-        const saved: SavedImageBlock = { t: 'img', kind: 'saved', id: u.attch_id, url: u.fl_url, nm: u.fl_nm }
+        const saved: SavedImageBlock = {
+          t: 'img',
+          kind: 'saved',
+          id: u.attch_id,
+          url: u.fl_url,
+          nm: u.fl_nm,
+        }
         finalBlocks.push(saved)
       } else {
         toast.error(`이미지 업로드 실패: ${block.nm}`)
@@ -87,20 +99,20 @@ export function GalleryPostForm({ category }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className='space-y-5'>
-      <div className='space-y-1.5'>
-        <Label htmlFor='post-title'>제목</Label>
+    <form onSubmit={handleSubmit} className="space-y-5">
+      <div className="space-y-1.5">
+        <Label htmlFor="post-title">제목</Label>
         <Input
-          id='post-title'
+          id="post-title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder='제목을 입력하세요'
+          placeholder="제목을 입력하세요"
           required
           disabled={submitting}
         />
       </div>
 
-      <div className='space-y-1.5'>
+      <div className="space-y-1.5">
         <Label>본문</Label>
         <GalleryBodyEditor
           blocks={blocks}
@@ -109,11 +121,16 @@ export function GalleryPostForm({ category }: Props) {
         />
       </div>
 
-      <div className='flex gap-2'>
-        <Button type='submit' disabled={submitting}>
+      <div className="flex gap-2">
+        <Button type="submit" disabled={submitting}>
           {submitting ? '작성 중...' : '작성하기'}
         </Button>
-        <Button type='button' variant='outline' onClick={() => router.back()} disabled={submitting}>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => router.back()}
+          disabled={submitting}
+        >
           취소
         </Button>
       </div>

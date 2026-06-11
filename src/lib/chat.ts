@@ -26,7 +26,10 @@ export function hashRoomPassword(plain: string): string {
   return `scrypt$${salt.toString('hex')}$${hash.toString('hex')}`
 }
 
-export function verifyRoomPassword(plain: string, stored: string | null): boolean {
+export function verifyRoomPassword(
+  plain: string,
+  stored: string | null,
+): boolean {
   if (!stored) return false
   const parts = stored.split('$')
   if (parts.length !== 3 || parts[0] !== 'scrypt') return false
@@ -37,7 +40,9 @@ export function verifyRoomPassword(plain: string, stored: string | null): boolea
 }
 
 // 비밀번호 해시를 제거한 안전한 방 객체 — API 응답 직렬화용 (해시 유출 방지)
-export function toPublicRoom(room: MsgRoom): Omit<MsgRoom, 'join_pwd_hash'> & { has_join_pwd: boolean } {
+export function toPublicRoom(
+  room: MsgRoom,
+): Omit<MsgRoom, 'join_pwd_hash'> & { has_join_pwd: boolean } {
   const { join_pwd_hash, ...rest } = room
   return { ...rest, has_join_pwd: !!join_pwd_hash }
 }
@@ -48,7 +53,16 @@ export interface MsgMsg {
   snd_usr_id: string
   snd_usr_nm: string
   msg_cont: string | null
-  msg_tp_cd: 'TEXT' | 'IMAGE' | 'FILE' | 'VOICE' | 'STICKER' | 'TIP_NOTI' | 'SYSTEM' | 'AI_REPLY' | 'BET_NOTI'
+  msg_tp_cd:
+    | 'TEXT'
+    | 'IMAGE'
+    | 'FILE'
+    | 'VOICE'
+    | 'STICKER'
+    | 'TIP_NOTI'
+    | 'SYSTEM'
+    | 'AI_REPLY'
+    | 'BET_NOTI'
   attch_url: string | null
   stkr_id: string | null
   ref_msg_id: string | null
@@ -76,7 +90,10 @@ export async function getRoom(roomId: string): Promise<MsgRoom | null> {
   return (data as MsgRoom) ?? null
 }
 
-export async function getRoomMember(roomId: string, userId: string): Promise<MsgRoomMbr | null> {
+export async function getRoomMember(
+  roomId: string,
+  userId: string,
+): Promise<MsgRoomMbr | null> {
   const { data } = await getSupabaseAdmin()
     .from('msg_room_mbr')
     .select()
@@ -148,8 +165,20 @@ export async function getOrCreateDirectRoom(
   if (error || !room) throw new Error('카페 생성 실패')
 
   await supabase.from('msg_room_mbr').insert([
-    { room_id: room.room_id, usr_id: userId1, mbr_role_cd: 'OWNER',  regr_id: slug, modr_id: slug },
-    { room_id: room.room_id, usr_id: userId2, mbr_role_cd: 'MEMBER', regr_id: slug, modr_id: slug },
+    {
+      room_id: room.room_id,
+      usr_id: userId1,
+      mbr_role_cd: 'OWNER',
+      regr_id: slug,
+      modr_id: slug,
+    },
+    {
+      room_id: room.room_id,
+      usr_id: userId2,
+      mbr_role_cd: 'MEMBER',
+      regr_id: slug,
+      modr_id: slug,
+    },
   ])
 
   return room as MsgRoom
@@ -269,7 +298,8 @@ export async function updateRoom(
   if (input.room_desc !== undefined) patch.room_desc = input.room_desc
   if (input.is_public_yn !== undefined) patch.is_public_yn = input.is_public_yn
   if (input.max_mbr_cnt !== undefined) patch.max_mbr_cnt = input.max_mbr_cnt
-  if (input.join_pwd_hash !== undefined) patch.join_pwd_hash = input.join_pwd_hash
+  if (input.join_pwd_hash !== undefined)
+    patch.join_pwd_hash = input.join_pwd_hash
 
   const { data, error } = await getSupabaseAdmin()
     .from('msg_room')
@@ -284,7 +314,10 @@ export async function updateRoom(
 }
 
 // rate limiting: 최근 1초 내 해당 사용자의 메시지 수
-export async function getRecentMsgCount(roomId: string, userId: string): Promise<number> {
+export async function getRecentMsgCount(
+  roomId: string,
+  userId: string,
+): Promise<number> {
   const since = new Date(Date.now() - 1000).toISOString()
   const { count } = await getSupabaseAdmin()
     .from('msg_msg')

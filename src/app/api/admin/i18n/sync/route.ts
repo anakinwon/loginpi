@@ -7,7 +7,7 @@ import { routing } from '@/i18n/routing'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
 )
 
 // flat key → 중첩 객체 재구성 ('board.title' → { board: { title: '...' } })
@@ -42,12 +42,18 @@ export async function POST(req: NextRequest) {
 
   // ko는 source of truth — 명시적 요청도 거부
   if (targetLocale !== undefined && SYNC_SKIP.has(targetLocale)) {
-    return NextResponse.json({ error: 'ko는 DB→JSON 동기화 대상이 아닙니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: 'ko는 DB→JSON 동기화 대상이 아닙니다' },
+      { status: 400 },
+    )
   }
 
   // 요청 locale이 있으면 허용 목록에서 검증
   if (targetLocale !== undefined && !ALLOWED_LOCALES.has(targetLocale)) {
-    return NextResponse.json({ error: '유효하지 않은 locale입니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: '유효하지 않은 locale입니다' },
+      { status: 400 },
+    )
   }
 
   const { data: locales } = await supabase
@@ -56,11 +62,11 @@ export async function POST(req: NextRequest) {
     .eq('is_active', 'Y')
 
   // DB에서 실제 존재하는 locale만 사용 (DB 주입 방어 이중화)
-  const dbLocales = new Set((locales ?? []).map((l: { locale_cd: string }) => l.locale_cd))
+  const dbLocales = new Set(
+    (locales ?? []).map((l: { locale_cd: string }) => l.locale_cd),
+  )
 
-  const localeCodes = targetLocale
-    ? [targetLocale]
-    : [...dbLocales]
+  const localeCodes = targetLocale ? [targetLocale] : [...dbLocales]
 
   const messagesDir = resolve(process.cwd(), 'messages')
   const synced: string[] = []

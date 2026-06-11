@@ -7,12 +7,17 @@ type MessageRecord = Record<string, unknown>
 
 // ko.json을 기반(base)으로, 현재 로케일 번역을 위에 덮어씌운다.
 // 번역이 없는 키는 한국어로 표시됨 (key 이름 노출 방지)
-function deepMerge(base: MessageRecord, override: MessageRecord): MessageRecord {
+function deepMerge(
+  base: MessageRecord,
+  override: MessageRecord,
+): MessageRecord {
   const result: MessageRecord = { ...base }
   for (const [key, val] of Object.entries(override)) {
     if (
-      typeof val === 'object' && val !== null &&
-      typeof base[key] === 'object' && base[key] !== null
+      typeof val === 'object' &&
+      val !== null &&
+      typeof base[key] === 'object' &&
+      base[key] !== null
     ) {
       result[key] = deepMerge(base[key] as MessageRecord, val as MessageRecord)
     } else {
@@ -24,11 +29,15 @@ function deepMerge(base: MessageRecord, override: MessageRecord): MessageRecord 
 
 export default getRequestConfig(async ({ requestLocale }) => {
   let locale = await requestLocale
-  if (!locale || !routing.locales.includes(locale as (typeof routing.locales)[number])) {
+  if (
+    !locale ||
+    !routing.locales.includes(locale as (typeof routing.locales)[number])
+  ) {
     locale = routing.defaultLocale
   }
 
-  const koMessages = (await import('../../messages/ko.json')).default as MessageRecord
+  const koMessages = (await import('../../messages/ko.json'))
+    .default as MessageRecord
 
   if (locale === 'ko') {
     return { locale, messages: koMessages }

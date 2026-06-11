@@ -24,7 +24,10 @@ const ALLOWED_MIME = new Map<string, string>([
   ['text/plain', 'txt'],
   ['application/zip', 'zip'],
   ['application/msword', 'doc'],
-  ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'docx'],
+  [
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'docx',
+  ],
 ])
 
 function getMsgTpCd(mime: string): 'IMAGE' | 'VOICE' | 'FILE' {
@@ -38,52 +41,69 @@ function getMsgTpCd(mime: string): 'IMAGE' | 'VOICE' | 'FILE' {
 export async function POST(request: NextRequest, { params }: Params) {
   const { roomId } = await params
   const user = await getSessionUser()
-  if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user)
+    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
   const mbr = await getRoomMember(roomId, user.id)
-  if (!mbr) return NextResponse.json({ error: '카페 멤버가 아닙니다' }, { status: 403 })
+  if (!mbr)
+    return NextResponse.json({ error: '카페 멤버가 아닙니다' }, { status: 403 })
 
   let formData: FormData
   try {
     formData = await request.formData()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 형식입니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: '잘못된 요청 형식입니다' },
+      { status: 400 },
+    )
   }
 
   const file = formData.get('file')
   if (!(file instanceof File)) {
-    return NextResponse.json({ error: 'file 필드가 필요합니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: 'file 필드가 필요합니다' },
+      { status: 400 },
+    )
   }
 
   if (file.size > MAX_BYTES) {
-    return NextResponse.json({ error: '파일 크기는 10MB 이하여야 합니다' }, { status: 413 })
+    return NextResponse.json(
+      { error: '파일 크기는 10MB 이하여야 합니다' },
+      { status: 413 },
+    )
   }
 
   const ext = ALLOWED_MIME.get(file.type)
   if (!ext) {
-    return NextResponse.json({ error: '허용되지 않은 파일 형식입니다' }, { status: 415 })
+    return NextResponse.json(
+      { error: '허용되지 않은 파일 형식입니다' },
+      { status: 415 },
+    )
   }
 
   const uuid = crypto.randomUUID()
   const path = `${roomId}/${uuid}.${ext}`
   const buffer = await file.arrayBuffer()
-  const isMedia = file.type.startsWith('image/') || file.type.startsWith('audio/')
+  const isMedia =
+    file.type.startsWith('image/') || file.type.startsWith('audio/')
 
   const { error } = await getSupabaseAdmin()
-    .storage
-    .from(BUCKET)
+    .storage.from(BUCKET)
     .upload(path, buffer, { contentType: file.type, upsert: false })
 
   if (error) {
-    return NextResponse.json({ error: `업로드 실패: ${error.message}` }, { status: 500 })
+    return NextResponse.json(
+      { error: `업로드 실패: ${error.message}` },
+      { status: 500 },
+    )
   }
 
   // 미디어 외 파일은 ?download= 파라미터로 Content-Disposition: attachment 강제
   // — 브라우저 인라인 렌더(콘텐츠 스니핑 XSS) 차단. 파일명은 정제 후 사용
-  const safeName = file.name.replace(/[^\w.\-가-힣 ]/g, '_').slice(0, 80) || `file.${ext}`
+  const safeName =
+    file.name.replace(/[^\w.\-가-힣 ]/g, '_').slice(0, 80) || `file.${ext}`
   const { data: urlData } = getSupabaseAdmin()
-    .storage
-    .from(BUCKET)
+    .storage.from(BUCKET)
     .getPublicUrl(path, isMedia ? undefined : { download: safeName })
 
   return NextResponse.json({

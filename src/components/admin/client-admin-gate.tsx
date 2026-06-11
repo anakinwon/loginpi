@@ -12,8 +12,10 @@ import { piFetch } from '@/lib/pi-fetch'
 // 미들웨어가 _pit → x-pit-ticket 헤더로 변환 → auth-check가 ticket 검증 후 정상 admin UI 렌더.
 function GateBox({ children }: { children: React.ReactNode }) {
   return (
-    <div className='flex flex-1 items-center justify-center p-10'>
-      <div className='space-y-2 text-center text-sm text-muted-foreground'>{children}</div>
+    <div className="flex flex-1 items-center justify-center p-10">
+      <div className="text-muted-foreground space-y-2 text-center text-sm">
+        {children}
+      </div>
     </div>
   )
 }
@@ -32,11 +34,16 @@ export function ClientAdminGate() {
     piFetch('/api/admin/pit-ticket', { method: 'POST' })
       .then((res) => res.json())
       .then(({ ticket }: { ticket?: string }) => {
-        if (!ticket) { navigating.current = false; return }
+        if (!ticket) {
+          navigating.current = false
+          return
+        }
         url.searchParams.set('_pit', ticket)
         router.replace(url.pathname + url.search)
       })
-      .catch(() => { navigating.current = false })
+      .catch(() => {
+        navigating.current = false
+      })
   }, [user, router])
 
   if (isLoading) return <GateBox>Pi 계정 인증 중…</GateBox>
@@ -45,7 +52,9 @@ export function ClientAdminGate() {
     return (
       <GateBox>
         <p>관리자 로그인이 필요합니다</p>
-        <Link href='/' className='inline-block text-primary underline'>홈으로 이동</Link>
+        <Link href="/" className="text-primary inline-block underline">
+          홈으로 이동
+        </Link>
       </GateBox>
     )
   }
@@ -54,7 +63,9 @@ export function ClientAdminGate() {
     return (
       <GateBox>
         <p>접근 권한이 없습니다</p>
-        <Link href='/' className='inline-block text-primary underline'>홈으로 이동</Link>
+        <Link href="/" className="text-primary inline-block underline">
+          홈으로 이동
+        </Link>
       </GateBox>
     )
   }

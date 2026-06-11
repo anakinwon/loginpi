@@ -13,18 +13,32 @@ type Params = { params: Promise<{ roomId: string }> }
 
 async function requireOwnerBusiness(roomId: string) {
   const user = await getSessionUser()
-  if (!user) return { error: NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 }) }
+  if (!user)
+    return {
+      error: NextResponse.json(
+        { error: '로그인이 필요합니다' },
+        { status: 401 },
+      ),
+    }
 
   const mbr = await getRoomMember(roomId, user.id)
   if (!mbr || mbr.mbr_role_cd !== 'OWNER') {
-    return { error: NextResponse.json({ error: '방장만 Webhook을 관리할 수 있습니다' }, { status: 403 }) }
+    return {
+      error: NextResponse.json(
+        { error: '방장만 Webhook을 관리할 수 있습니다' },
+        { status: 403 },
+      ),
+    }
   }
 
   const plan = await getChatPlan(user.id)
   if (plan.tier !== 'BUSINESS') {
     return {
       error: NextResponse.json(
-        { error: 'Webhook은 Business 플랜 전용 기능입니다', businessRequired: true },
+        {
+          error: 'Webhook은 Business 플랜 전용 기능입니다',
+          businessRequired: true,
+        },
         { status: 402 },
       ),
     }
@@ -45,13 +59,19 @@ export async function GET(_request: NextRequest, { params }: Params) {
     .eq('del_yn', 'N')
     .order('reg_dtm', { ascending: false })
 
-  if (error) return NextResponse.json({ error: 'Webhook 목록 조회 실패' }, { status: 500 })
+  if (error)
+    return NextResponse.json(
+      { error: 'Webhook 목록 조회 실패' },
+      { status: 500 },
+    )
 
   // api_key는 앞 8자만 노출 (등록 시 1회 전체 반환)
-  const webhooks = (data ?? []).map((w: { api_key: string } & Record<string, unknown>) => ({
-    ...w,
-    api_key: `${w.api_key.slice(0, 8)}…`,
-  }))
+  const webhooks = (data ?? []).map(
+    (w: { api_key: string } & Record<string, unknown>) => ({
+      ...w,
+      api_key: `${w.api_key.slice(0, 8)}…`,
+    }),
+  )
   return NextResponse.json({ webhooks })
 }
 
@@ -64,10 +84,15 @@ export async function POST(request: NextRequest, { params }: Params) {
   const { user } = gate
 
   let body: unknown
-  try { body = await request.json() } catch {
+  try {
+    body = await request.json()
+  } catch {
     return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
   }
-  const { bot_nm, webhook_url } = body as { bot_nm?: string; webhook_url?: string }
+  const { bot_nm, webhook_url } = body as {
+    bot_nm?: string
+    webhook_url?: string
+  }
 
   if (webhook_url) {
     // SSRF 방어 — https 강제 + DNS 해석 결과의 loopback·사설·link-local 대역 차단
@@ -86,7 +111,10 @@ export async function POST(request: NextRequest, { params }: Params) {
     .eq('room_id', roomId)
     .eq('del_yn', 'N')
   if ((count ?? 0) >= 5) {
-    return NextResponse.json({ error: '방당 Webhook은 최대 5개까지 등록할 수 있습니다' }, { status: 409 })
+    return NextResponse.json(
+      { error: '방당 Webhook은 최대 5개까지 등록할 수 있습니다' },
+      { status: 409 },
+    )
   }
 
   const apiKey = `pibot_${randomBytes(24).toString('hex')}`
@@ -106,10 +134,14 @@ export async function POST(request: NextRequest, { params }: Params) {
     .select('webhook_id, bot_nm, webhook_url, reg_dtm')
     .single()
 
-  if (error) return NextResponse.json({ error: 'Webhook 등록 실패' }, { status: 500 })
+  if (error)
+    return NextResponse.json({ error: 'Webhook 등록 실패' }, { status: 500 })
 
   // api_key는 이 응답에서만 전체 노출 — 이후 조회는 마스킹
-  return NextResponse.json({ webhook: { ...data, api_key: apiKey } }, { status: 201 })
+  return NextResponse.json(
+    { webhook: { ...data, api_key: apiKey } },
+    { status: 201 },
+  )
 }
 
 // DELETE /api/chat/rooms/[roomId]/webhooks?id=<webhook_id> — 논리삭제
@@ -120,7 +152,11 @@ export async function DELETE(request: NextRequest, { params }: Params) {
   const { user } = gate
 
   const webhookId = new URL(request.url).searchParams.get('id')
-  if (!webhookId) return NextResponse.json({ error: 'webhook id가 필요합니다' }, { status: 400 })
+  if (!webhookId)
+    return NextResponse.json(
+      { error: 'webhook id가 필요합니다' },
+      { status: 400 },
+    )
 
   const { error } = await getSupabaseAdmin()
     .from('msg_webhook')
@@ -134,6 +170,7 @@ export async function DELETE(request: NextRequest, { params }: Params) {
     .eq('room_id', roomId)
     .eq('del_yn', 'N')
 
-  if (error) return NextResponse.json({ error: 'Webhook 삭제 실패' }, { status: 500 })
+  if (error)
+    return NextResponse.json({ error: 'Webhook 삭제 실패' }, { status: 500 })
   return NextResponse.json({ deleted: true })
 }

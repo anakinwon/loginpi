@@ -17,7 +17,9 @@ function randomSixDigit(): string {
 
 // Pi Network API로 accessToken 직접 검증 → userId 반환
 // WebView 쿠키 저장 실패 시 폴백 경로
-async function verifyPiTokenAndGetUserId(accessToken: string): Promise<string | null> {
+async function verifyPiTokenAndGetUserId(
+  accessToken: string,
+): Promise<string | null> {
   try {
     const piRes = await fetch('https://api.minepi.com/v2/me', {
       headers: { Authorization: `Bearer ${accessToken}` },
@@ -40,8 +42,13 @@ async function verifyPiTokenAndGetUserId(accessToken: string): Promise<string | 
 
 export async function POST(request: NextRequest) {
   let secret: string
-  try { secret = getSecret() } catch {
-    return NextResponse.json({ error: 'PI_SESSION_SECRET 미설정' }, { status: 500 })
+  try {
+    secret = getSecret()
+  } catch {
+    return NextResponse.json(
+      { error: 'PI_SESSION_SECRET 미설정' },
+      { status: 500 },
+    )
   }
 
   // ── 경로 1: pi_session 쿠키 검증 ──────────────────────────────
@@ -79,8 +86,11 @@ export async function POST(request: NextRequest) {
 
   if (!userId) {
     return NextResponse.json(
-      { error: 'Pi 로그인이 필요합니다. 페이지를 새로고침 후 다시 시도해주세요.' },
-      { status: 401 }
+      {
+        error:
+          'Pi 로그인이 필요합니다. 페이지를 새로고침 후 다시 시도해주세요.',
+      },
+      { status: 401 },
     )
   }
 
@@ -96,7 +106,10 @@ export async function POST(request: NextRequest) {
     })
     if (!error) break
     if (attempt === 2) {
-      return NextResponse.json({ error: '코드 생성 실패. 다시 시도해주세요.' }, { status: 500 })
+      return NextResponse.json(
+        { error: '코드 생성 실패. 다시 시도해주세요.' },
+        { status: 500 },
+      )
     }
   }
 

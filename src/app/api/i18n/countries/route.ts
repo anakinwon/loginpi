@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
 )
 
 export async function GET() {
@@ -15,9 +15,14 @@ export async function GET() {
       .order('sort_ord'),
     supabase
       .from('i18n_cntry_mst')
-      .select('country_cd, dis_ord_seq, country_eng_nm, country_mot_nm, currency_cd')
+      .select(
+        'country_cd, dis_ord_seq, country_eng_nm, country_mot_nm, currency_cd',
+      )
       .order('dis_ord_seq', { ascending: true }),
   ])
 
-  return NextResponse.json({ locales: locales ?? [], countries: countries ?? [] })
+  return NextResponse.json({
+    locales: locales ?? [],
+    countries: countries ?? [],
+  })
 }

@@ -7,8 +7,11 @@ export async function POST(request: NextRequest) {
   const apiKey = process.env.PI_API_KEY
   if (!apiKey) {
     return NextResponse.json(
-      { error: 'PI_API_KEY 미설정 — Pi Developer Portal에서 발급 후 환경변수에 추가하세요' },
-      { status: 500 }
+      {
+        error:
+          'PI_API_KEY 미설정 — Pi Developer Portal에서 발급 후 환경변수에 추가하세요',
+      },
+      { status: 500 },
     )
   }
 
@@ -21,7 +24,10 @@ export async function POST(request: NextRequest) {
 
   const { paymentId } = body as { paymentId?: string }
   if (!paymentId) {
-    return NextResponse.json({ error: 'paymentId가 필요합니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: 'paymentId가 필요합니다' },
+      { status: 400 },
+    )
   }
 
   try {
@@ -33,7 +39,10 @@ export async function POST(request: NextRequest) {
       const text = await res.text()
       // already_approved: 이미 승인된 결제 재요청 — 멱등성 처리 (오류 아님)
       try {
-        const errData = JSON.parse(text) as { error?: string; payment?: PaymentDTO }
+        const errData = JSON.parse(text) as {
+          error?: string
+          payment?: PaymentDTO
+        }
         if (errData.error === 'already_approved' && errData.payment) {
           const payment = errData.payment
           const db = getSupabaseAdmin()
@@ -43,22 +52,27 @@ export async function POST(request: NextRequest) {
             .eq('pi_uid', payment.user_uid)
             .single()
           if (user) {
-            await db.from('pi_pymnt').upsert({
-              payment_id: payment.identifier,
-              user_id: user.id,
-              amount: payment.amount,
-              memo: payment.memo,
-              metadata: payment.metadata,
-              status: 'approved',
-              mod_dtm: new Date().toISOString(),
-            }, { onConflict: 'payment_id' })
+            await db.from('pi_pymnt').upsert(
+              {
+                payment_id: payment.identifier,
+                user_id: user.id,
+                amount: payment.amount,
+                memo: payment.memo,
+                metadata: payment.metadata,
+                status: 'approved',
+                mod_dtm: new Date().toISOString(),
+              },
+              { onConflict: 'payment_id' },
+            )
           }
           return NextResponse.json({ success: true, payment })
         }
-      } catch { /* JSON 파싱 실패 시 아래 오류 반환으로 진행 */ }
+      } catch {
+        /* JSON 파싱 실패 시 아래 오류 반환으로 진행 */
+      }
       return NextResponse.json(
         { error: `Pi 승인 실패 (${res.status}): ${text}` },
-        { status: res.status }
+        { status: res.status },
       )
     }
     const payment = (await res.json()) as PaymentDTO
@@ -72,19 +86,25 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (user) {
-      await db.from('pi_pymnt').upsert({
-        payment_id: payment.identifier,
-        user_id: user.id,
-        amount: payment.amount,
-        memo: payment.memo,
-        metadata: payment.metadata,
-        status: 'approved',
-        mod_dtm: new Date().toISOString(),
-      }, { onConflict: 'payment_id' })
+      await db.from('pi_pymnt').upsert(
+        {
+          payment_id: payment.identifier,
+          user_id: user.id,
+          amount: payment.amount,
+          memo: payment.memo,
+          metadata: payment.metadata,
+          status: 'approved',
+          mod_dtm: new Date().toISOString(),
+        },
+        { onConflict: 'payment_id' },
+      )
     }
 
     return NextResponse.json({ success: true, payment })
   } catch {
-    return NextResponse.json({ error: 'Pi Network API 연결 실패' }, { status: 502 })
+    return NextResponse.json(
+      { error: 'Pi Network API 연결 실패' },
+      { status: 502 },
+    )
   }
 }

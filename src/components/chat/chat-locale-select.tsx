@@ -6,7 +6,11 @@ import { getLocaleOptions } from '@/lib/locale-options'
 // isSubscribed=false 시 disabled + 잠금 표시
 const LOCALE_OPTIONS = getLocaleOptions('ko')
 
-export function ChatLocaleSelect({ value, onChange, isSubscribed }: {
+export function ChatLocaleSelect({
+  value,
+  onChange,
+  isSubscribed,
+}: {
   value: string
   onChange: (locale: string) => void
   isSubscribed: boolean
@@ -14,20 +18,25 @@ export function ChatLocaleSelect({ value, onChange, isSubscribed }: {
   return (
     <select
       value={value}
-      onChange={e => onChange(e.target.value)}
+      onChange={(e) => onChange(e.target.value)}
       disabled={!isSubscribed}
-      aria-label='번역 언어 선택'
+      aria-label="번역 언어 선택"
       title={
         isSubscribed
           ? '이 방의 메시지를 선택한 언어로 번역해서 보여줍니다'
           : '구독 서비스를 신청한 회원만 사용할 수 있습니다'
       }
-      className='max-w-[10rem] shrink-0 rounded-md border bg-background px-2 py-1 text-xs outline-none focus:ring-2 focus:ring-primary/50 disabled:cursor-not-allowed disabled:opacity-50'
+      className="bg-background focus:ring-primary/50 max-w-[10rem] shrink-0 rounded-md border px-2 py-1 text-xs outline-none focus:ring-2 disabled:cursor-not-allowed disabled:opacity-50"
     >
-      <option value=''>{isSubscribed ? '🌐 구독특혜 자동번역' : '🔒 구독특혜 자동번역'}</option>
-      {isSubscribed && LOCALE_OPTIONS.map(({ value: cd, label }) => (
-        <option key={cd} value={cd}>{label}</option>
-      ))}
+      <option value="">
+        {isSubscribed ? '🌐 구독특혜 자동번역' : '🔒 구독특혜 자동번역'}
+      </option>
+      {isSubscribed &&
+        LOCALE_OPTIONS.map(({ value: cd, label }) => (
+          <option key={cd} value={cd}>
+            {label}
+          </option>
+        ))}
     </select>
   )
 }

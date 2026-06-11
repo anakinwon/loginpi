@@ -7,13 +7,14 @@ const VALID_AMOUNTS = [0.1, 0.5, 1] as const
 
 export async function POST(request: NextRequest) {
   const user = await getSessionUser()
-  if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user)
+    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
   const allowed = await canSendTip(user.id)
   if (!allowed) {
     return NextResponse.json(
       { error: 'Pi Tip은 PREMIUM 이상 구독자만 사용할 수 있습니다' },
-      { status: 403 }
+      { status: 403 },
     )
   }
 
@@ -31,33 +32,68 @@ export async function POST(request: NextRequest) {
   }
 
   if (!room_id || !recipient_id || amount === undefined) {
-    return NextResponse.json({ error: 'room_id, recipient_id, amount가 필요합니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: 'room_id, recipient_id, amount가 필요합니다' },
+      { status: 400 },
+    )
   }
 
   if (!(VALID_AMOUNTS as readonly number[]).includes(amount)) {
-    return NextResponse.json({ error: '유효한 금액: 0.1, 0.5, 1 Pi' }, { status: 400 })
+    return NextResponse.json(
+      { error: '유효한 금액: 0.1, 0.5, 1 Pi' },
+      { status: 400 },
+    )
   }
 
   if (recipient_id === user.id) {
-    return NextResponse.json({ error: '자기 자신에게 Tip을 보낼 수 없습니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: '자기 자신에게 Tip을 보낼 수 없습니다' },
+      { status: 400 },
+    )
   }
 
   const db = getSupabaseAdmin()
 
-  const [{ data: recipient }, { data: senderMbr }, { data: recipientMbr }] = await Promise.all([
-    db.from('sys_user').select('id, display_name').eq('id', recipient_id).maybeSingle(),
-    db.from('msg_room_mbr').select('room_id').eq('room_id', room_id).eq('usr_id', user.id).eq('del_yn', 'N').maybeSingle(),
-    db.from('msg_room_mbr').select('room_id').eq('room_id', room_id).eq('usr_id', recipient_id).eq('del_yn', 'N').maybeSingle(),
-  ])
+  const [{ data: recipient }, { data: senderMbr }, { data: recipientMbr }] =
+    await Promise.all([
+      db
+        .from('sys_user')
+        .select('id, display_name')
+        .eq('id', recipient_id)
+        .maybeSingle(),
+      db
+        .from('msg_room_mbr')
+        .select('room_id')
+        .eq('room_id', room_id)
+        .eq('usr_id', user.id)
+        .eq('del_yn', 'N')
+        .maybeSingle(),
+      db
+        .from('msg_room_mbr')
+        .select('room_id')
+        .eq('room_id', room_id)
+        .eq('usr_id', recipient_id)
+        .eq('del_yn', 'N')
+        .maybeSingle(),
+    ])
 
   if (!recipient) {
-    return NextResponse.json({ error: '수신자를 찾을 수 없습니다' }, { status: 404 })
+    return NextResponse.json(
+      { error: '수신자를 찾을 수 없습니다' },
+      { status: 404 },
+    )
   }
   if (!senderMbr) {
-    return NextResponse.json({ error: '해당 카페에 참여 중이 아닙니다' }, { status: 403 })
+    return NextResponse.json(
+      { error: '해당 카페에 참여 중이 아닙니다' },
+      { status: 403 },
+    )
   }
   if (!recipientMbr) {
-    return NextResponse.json({ error: '수신자가 해당 카페에 없습니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: '수신자가 해당 카페에 없습니다' },
+      { status: 400 },
+    )
   }
 
   const recipientRow = recipient as { id: string; display_name: string | null }

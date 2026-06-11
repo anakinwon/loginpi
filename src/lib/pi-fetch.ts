@@ -33,7 +33,10 @@ export function clearPiToken(): void {
 
 // X-Pi-Token 헤더를 자동 첨부하는 fetch 래퍼.
 // 인증이 필요한 모든 클라이언트→API 요청은 fetch 대신 piFetch를 사용한다.
-export function piFetch(input: string, init: RequestInit = {}): Promise<Response> {
+export function piFetch(
+  input: string,
+  init: RequestInit = {},
+): Promise<Response> {
   const token = getPiToken()
   const headers = new Headers(init.headers)
   if (token) headers.set('X-Pi-Token', token)

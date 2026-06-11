@@ -6,9 +6,11 @@ import { createOrder, listOrdersByRole } from '@/lib/mps-order'
 // GET /api/store/orders?role=buyer|seller — 내 주문 목록
 export async function GET(req: NextRequest) {
   const user = await getSessionUser()
-  if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user)
+    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
-  const role = req.nextUrl.searchParams.get('role') === 'seller' ? 'seller' : 'buyer'
+  const role =
+    req.nextUrl.searchParams.get('role') === 'seller' ? 'seller' : 'buyer'
   const orders = await listOrdersByRole(user.id, role)
   return NextResponse.json({ orders })
 }
@@ -22,7 +24,8 @@ const createSchema = z.object({
 // 응답: Pi SDK createPayment 파라미터 — 클라이언트가 결제 진행, 완료 시 MPS_ESCROW 분기 처리
 export async function POST(req: NextRequest) {
   const user = await getSessionUser()
-  if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user)
+    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
   let body: unknown
   try {
@@ -33,15 +36,26 @@ export async function POST(req: NextRequest) {
 
   const parsed = createSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json({ error: '입력값이 올바르지 않습니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: '입력값이 올바르지 않습니다' },
+      { status: 400 },
+    )
   }
 
   const slug = String(user.display_name ?? 'user').slice(0, 20)
-  const result = await createOrder(parsed.data.item_id, user.id, parsed.data.meet_loc_desc ?? null, slug)
+  const result = await createOrder(
+    parsed.data.item_id,
+    user.id,
+    parsed.data.meet_loc_desc ?? null,
+    slug,
+  )
 
   if ('error' in result) {
     const map = {
-      OUT_OF_STOCK: { msg: '재고가 없거나 판매 중인 상품이 아닙니다', status: 409 },
+      OUT_OF_STOCK: {
+        msg: '재고가 없거나 판매 중인 상품이 아닙니다',
+        status: 409,
+      },
       SELF_PURCHASE: { msg: '본인 상품은 구매할 수 없습니다', status: 400 },
       ORDER_NOT_FOUND: { msg: '주문을 찾을 수 없습니다', status: 404 },
       NOT_ALLOWED: { msg: '허용되지 않은 요청입니다', status: 403 },

@@ -29,7 +29,9 @@ interface PymntRow {
 // 4) metadata.room_id → msg_room.theme_cd (PI_TIP·PI_BET·EVENT_ROOM_JOIN)
 // 5) CHAT_ROOM_CREATE인데 theme_cd 누락 → msg_room.pymnt_id 역참조 (018 보완 로직)
 // 6) 그 외 → UNKNOWN
-async function resolveThemes(payments: PymntRow[]): Promise<Map<string, string>> {
+async function resolveThemes(
+  payments: PymntRow[],
+): Promise<Map<string, string>> {
   const db = getSupabaseAdmin()
 
   const roomIds = new Set<string>()
@@ -41,29 +43,54 @@ async function resolveThemes(payments: PymntRow[]): Promise<Map<string, string>>
     if (!m || m.theme_cd) continue
     if (m.type === 'STICKER_PACK' && m.pack_id) packIds.add(m.pack_id)
     else if (m.room_id) roomIds.add(m.room_id)
-    else if (m.type === 'CHAT_ROOM_CREATE') orphanRoomCreateIds.add(p.payment_id)
+    else if (m.type === 'CHAT_ROOM_CREATE')
+      orphanRoomCreateIds.add(p.payment_id)
   }
 
   const [roomRes, packRes, orphanRes] = await Promise.all([
     roomIds.size > 0
-      ? db.from('msg_room').select('room_id, theme_cd').in('room_id', [...roomIds])
+      ? db
+          .from('msg_room')
+          .select('room_id, theme_cd')
+          .in('room_id', [...roomIds])
       : Promise.resolve({ data: [] }),
     packIds.size > 0
-      ? db.from('msg_stkr_pack').select('pack_id, theme_cd').in('pack_id', [...packIds])
+      ? db
+          .from('msg_stkr_pack')
+          .select('pack_id, theme_cd')
+          .in('pack_id', [...packIds])
       : Promise.resolve({ data: [] }),
     orphanRoomCreateIds.size > 0
-      ? db.from('msg_room').select('pymnt_id, theme_cd').in('pymnt_id', [...orphanRoomCreateIds])
+      ? db
+          .from('msg_room')
+          .select('pymnt_id, theme_cd')
+          .in('pymnt_id', [...orphanRoomCreateIds])
       : Promise.resolve({ data: [] }),
   ])
 
   const roomTheme = new Map(
-    (roomRes.data ?? []).map((r: { room_id: string; theme_cd: string | null }) => [r.room_id, r.theme_cd]),
+    (roomRes.data ?? []).map(
+      (r: { room_id: string; theme_cd: string | null }) => [
+        r.room_id,
+        r.theme_cd,
+      ],
+    ),
   )
   const packTheme = new Map(
-    (packRes.data ?? []).map((r: { pack_id: string; theme_cd: string | null }) => [r.pack_id, r.theme_cd]),
+    (packRes.data ?? []).map(
+      (r: { pack_id: string; theme_cd: string | null }) => [
+        r.pack_id,
+        r.theme_cd,
+      ],
+    ),
   )
   const orphanTheme = new Map(
-    (orphanRes.data ?? []).map((r: { pymnt_id: string; theme_cd: string | null }) => [r.pymnt_id, r.theme_cd]),
+    (orphanRes.data ?? []).map(
+      (r: { pymnt_id: string; theme_cd: string | null }) => [
+        r.pymnt_id,
+        r.theme_cd,
+      ],
+    ),
   )
 
   const result = new Map<string, string>()
@@ -72,9 +99,11 @@ async function resolveThemes(payments: PymntRow[]): Promise<Map<string, string>>
     let theme: string | null | undefined
     if (m?.theme_cd) theme = m.theme_cd
     else if (m?.type === 'CHAT_SUBSCR') theme = 'SUBSCRIPTION'
-    else if (m?.type === 'STICKER_PACK' && m.pack_id) theme = packTheme.get(m.pack_id)
+    else if (m?.type === 'STICKER_PACK' && m.pack_id)
+      theme = packTheme.get(m.pack_id)
     else if (m?.room_id) theme = roomTheme.get(m.room_id)
-    else if (m?.type === 'CHAT_ROOM_CREATE') theme = orphanTheme.get(p.payment_id)
+    else if (m?.type === 'CHAT_ROOM_CREATE')
+      theme = orphanTheme.get(p.payment_id)
     result.set(p.id, theme ?? 'UNKNOWN')
   }
   return result
@@ -90,7 +119,8 @@ export async function GET() {
   const [pymntRes, themeRes] = await Promise.all([
     db
       .from('pi_pymnt')
-      .select(`
+      .select(
+        `
         id,
         payment_id,
         txid,
@@ -101,7 +131,8 @@ export async function GET() {
         reg_dtm,
         mod_dtm,
         sys_user ( display_name, pi_username, google_email )
-      `)
+      `,
+      )
       .order('reg_dtm', { ascending: false }),
     db.from('msg_theme').select('theme_cd, theme_nm, theme_emoji'),
   ])
@@ -114,18 +145,22 @@ export async function GET() {
   const themeMap = await resolveThemes(payments)
   const themeMst = new Map(
     (themeRes.data ?? []).map(
-      (t: { theme_cd: string; theme_nm: string | null; theme_emoji: string | null }) => [t.theme_cd, t],
+      (t: {
+        theme_cd: string
+        theme_nm: string | null
+        theme_emoji: string | null
+      }) => [t.theme_cd, t],
     ),
   )
 
-  const enriched = payments.map(p => {
+  const enriched = payments.map((p) => {
     const themeCd = themeMap.get(p.id) ?? 'UNKNOWN'
     const mst = themeMst.get(themeCd)
     return {
       ...p,
       pymnt_type: p.metadata?.type ?? null,
       theme_cd: themeCd,
-      theme_nm: mst?.theme_nm ?? null,     // SUBSCRIPTION·UNKNOWN은 클라이언트에서 번역
+      theme_nm: mst?.theme_nm ?? null, // SUBSCRIPTION·UNKNOWN은 클라이언트에서 번역
       theme_emoji: mst?.theme_emoji ?? null,
     }
   })

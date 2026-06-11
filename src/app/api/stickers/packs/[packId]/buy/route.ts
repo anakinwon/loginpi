@@ -8,7 +8,8 @@ type Params = { params: Promise<{ packId: string }> }
 export async function POST(_req: NextRequest, { params }: Params) {
   const { packId } = await params
   const user = await getSessionUser()
-  if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user)
+    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
   const db = getSupabaseAdmin()
 
@@ -21,13 +22,19 @@ export async function POST(_req: NextRequest, { params }: Params) {
     .maybeSingle()
 
   if (!pack) {
-    return NextResponse.json({ error: '존재하지 않는 스티커 팩입니다' }, { status: 404 })
+    return NextResponse.json(
+      { error: '존재하지 않는 스티커 팩입니다' },
+      { status: 404 },
+    )
   }
 
   const packRow = pack as { pack_id: string; pack_nm: string; price_pi: number }
 
   if (Number(packRow.price_pi) === 0) {
-    return NextResponse.json({ error: '무료 팩은 구매가 필요 없습니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: '무료 팩은 구매가 필요 없습니다' },
+      { status: 400 },
+    )
   }
 
   // 이미 보유 여부 확인 (중복 구매 방지)
@@ -40,12 +47,19 @@ export async function POST(_req: NextRequest, { params }: Params) {
     .maybeSingle()
 
   if (existing) {
-    return NextResponse.json({ error: '이미 보유한 스티커 팩입니다' }, { status: 409 })
+    return NextResponse.json(
+      { error: '이미 보유한 스티커 팩입니다' },
+      { status: 409 },
+    )
   }
 
   return NextResponse.json({
     amount: Number(packRow.price_pi),
     memo: `스티커팩 구매: ${packRow.pack_nm}`,
-    metadata: { type: 'STICKER_PACK', pack_id: packId, pack_nm: packRow.pack_nm },
+    metadata: {
+      type: 'STICKER_PACK',
+      pack_id: packId,
+      pack_nm: packRow.pack_nm,
+    },
   })
 }

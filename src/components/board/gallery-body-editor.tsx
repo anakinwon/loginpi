@@ -16,11 +16,17 @@ interface Props {
   blocks: EditorBlock[]
   onChange: (blocks: EditorBlock[]) => void
   category?: string
-  postId?: string   // 있으면 이미지 삽입 시 즉시 업로드 (수정 모드)
+  postId?: string // 있으면 이미지 삽입 시 즉시 업로드 (수정 모드)
   disabled?: boolean
 }
 
-export function GalleryBodyEditor({ blocks, onChange, category, postId, disabled }: Props) {
+export function GalleryBodyEditor({
+  blocks,
+  onChange,
+  category,
+  postId,
+  disabled,
+}: Props) {
   const fileRef = useRef<HTMLInputElement>(null)
   const insertPosRef = useRef<number>(0)
   const [uploading, setUploading] = useState(false)
@@ -68,10 +74,13 @@ export function GalleryBodyEditor({ blocks, onChange, category, postId, disabled
         const fd = new FormData()
         fd.append('files', file)
         fd.append('sort_ord', String(pos))
-        const res = await piFetch(`/api/board/${category}/${postId}/attachments`, {
-          method: 'POST',
-          body: fd,
-        })
+        const res = await piFetch(
+          `/api/board/${category}/${postId}/attachments`,
+          {
+            method: 'POST',
+            body: fd,
+          },
+        )
         if (!res.ok) throw new Error('업로드 실패')
         const data = (await res.json()) as {
           uploaded: { attch_id: string; fl_nm: string; fl_url: string }[]
@@ -115,16 +124,16 @@ export function GalleryBodyEditor({ blocks, onChange, category, postId, disabled
   }
 
   return (
-    <div className='rounded-md border border-input bg-background'>
+    <div className="border-input bg-background rounded-md border">
       <input
         ref={fileRef}
-        type='file'
-        accept='image/*'
-        className='hidden'
+        type="file"
+        accept="image/*"
+        className="hidden"
         onChange={handleFileChange}
       />
 
-      <div className='p-2 space-y-0'>
+      <div className="space-y-0 p-2">
         <InsertImageButton
           onClick={() => openFilePicker(0)}
           disabled={disabled || uploading}
@@ -145,7 +154,9 @@ export function GalleryBodyEditor({ blocks, onChange, category, postId, disabled
                   value={block.c}
                   onChange={(v) => updateText(idx, v)}
                   disabled={disabled || uploading}
-                  placeholder={idx === 0 ? '내용을 입력하세요...' : '계속 입력하세요...'}
+                  placeholder={
+                    idx === 0 ? '내용을 입력하세요...' : '계속 입력하세요...'
+                  }
                 />
               ) : (
                 <ImageBlockView
@@ -169,7 +180,7 @@ export function GalleryBodyEditor({ blocks, onChange, category, postId, disabled
       </div>
 
       {uploading && (
-        <p className='animate-pulse border-t border-border py-2 text-center text-xs text-muted-foreground'>
+        <p className="border-border text-muted-foreground animate-pulse border-t py-2 text-center text-xs">
           이미지 업로드 중...
         </p>
       )}
@@ -195,7 +206,7 @@ function AutoTextarea({
       disabled={disabled}
       placeholder={placeholder}
       rows={3}
-      className='w-full resize-none rounded-sm bg-transparent px-2 py-1.5 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50'
+      className="placeholder:text-muted-foreground focus:ring-ring w-full resize-none rounded-sm bg-transparent px-2 py-1.5 text-sm focus:ring-1 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
       onInput={(e) => {
         const el = e.currentTarget
         el.style.height = 'auto'
@@ -225,38 +236,44 @@ function ImageBlockView({
   const src = block.kind === 'pending' ? block.blobUrl : block.url
 
   return (
-    <div className='my-1 overflow-hidden rounded-md border border-border'>
-      <div className='flex max-h-96 items-center justify-center bg-muted/20'>
+    <div className="border-border my-1 overflow-hidden rounded-md border">
+      <div className="bg-muted/20 flex max-h-96 items-center justify-center">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={src} alt={block.nm} className='max-h-96 max-w-full object-contain' />
+        <img
+          src={src}
+          alt={block.nm}
+          className="max-h-96 max-w-full object-contain"
+        />
       </div>
-      <div className='flex items-center justify-between border-t border-border bg-background/80 px-3 py-1.5'>
-        <span className='max-w-xs truncate text-xs text-muted-foreground'>{block.nm}</span>
-        <div className='flex items-center gap-0.5'>
+      <div className="border-border bg-background/80 flex items-center justify-between border-t px-3 py-1.5">
+        <span className="text-muted-foreground max-w-xs truncate text-xs">
+          {block.nm}
+        </span>
+        <div className="flex items-center gap-0.5">
           <button
-            type='button'
+            type="button"
             onClick={onMoveUp}
             disabled={disabled || !canMoveUp}
-            title='위로'
-            className='rounded px-1.5 py-0.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-30'
+            title="위로"
+            className="text-muted-foreground hover:bg-muted hover:text-foreground rounded px-1.5 py-0.5 text-sm disabled:opacity-30"
           >
             ↑
           </button>
           <button
-            type='button'
+            type="button"
             onClick={onMoveDown}
             disabled={disabled || !canMoveDown}
-            title='아래로'
-            className='rounded px-1.5 py-0.5 text-sm text-muted-foreground hover:bg-muted hover:text-foreground disabled:opacity-30'
+            title="아래로"
+            className="text-muted-foreground hover:bg-muted hover:text-foreground rounded px-1.5 py-0.5 text-sm disabled:opacity-30"
           >
             ↓
           </button>
           <button
-            type='button'
+            type="button"
             onClick={onDelete}
             disabled={disabled}
-            title='삭제'
-            className='rounded px-1.5 py-0.5 text-sm text-destructive hover:bg-destructive/10 disabled:opacity-30'
+            title="삭제"
+            className="text-destructive hover:bg-destructive/10 rounded px-1.5 py-0.5 text-sm disabled:opacity-30"
           >
             ×
           </button>
@@ -274,17 +291,17 @@ function InsertImageButton({
   disabled?: boolean
 }) {
   return (
-    <div className='flex items-center gap-2 py-0.5'>
-      <div className='h-px flex-1 bg-border' />
+    <div className="flex items-center gap-2 py-0.5">
+      <div className="bg-border h-px flex-1" />
       <button
-        type='button'
+        type="button"
         onClick={onClick}
         disabled={disabled}
-        className='rounded-full border border-dashed border-border px-2.5 py-0.5 text-xs text-muted-foreground transition-colors hover:border-primary hover:text-primary disabled:cursor-not-allowed disabled:opacity-40'
+        className="border-border text-muted-foreground hover:border-primary hover:text-primary rounded-full border border-dashed px-2.5 py-0.5 text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-40"
       >
         + 이미지
       </button>
-      <div className='h-px flex-1 bg-border' />
+      <div className="bg-border h-px flex-1" />
     </div>
   )
 }

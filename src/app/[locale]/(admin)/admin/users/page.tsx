@@ -26,10 +26,11 @@ interface UserRow {
 }
 
 const ROLE_COLOR: Record<Role, string> = {
-  ADMIN:   'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-  MASTER:  'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+  ADMIN: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+  MASTER:
+    'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
   MANAGER: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-  USER:    'bg-muted text-muted-foreground',
+  USER: 'bg-muted text-muted-foreground',
 }
 
 export default function UsersPage() {
@@ -42,7 +43,9 @@ export default function UsersPage() {
   const limit = useDynamicLimit(CHROME_PX)
 
   // limit 변경 시 첫 페이지로 리셋
-  useEffect(() => { setPage(1) }, [limit])
+  useEffect(() => {
+    setPage(1)
+  }, [limit])
 
   useEffect(() => {
     fetch('/api/admin/users')
@@ -76,71 +79,96 @@ export default function UsersPage() {
   const displayedUsers = users.slice((page - 1) * limit, page * limit)
 
   return (
-    <div className='space-y-4'>
+    <div className="space-y-4">
       <div>
-        <h1 className='text-2xl font-bold'>{t('title')}</h1>
-        <p className='text-muted-foreground mt-1 text-sm'>
+        <h1 className="text-2xl font-bold">{t('title')}</h1>
+        <p className="text-muted-foreground mt-1 text-sm">
           {t('totalCount', { count: users.length })}
         </p>
       </div>
 
       {loading ? (
-        <p className='text-muted-foreground text-sm'>{tc('loading')}</p>
+        <p className="text-muted-foreground text-sm">{tc('loading')}</p>
       ) : users.length === 0 ? (
-        <p className='text-muted-foreground text-sm'>{t('noUsers')}</p>
+        <p className="text-muted-foreground text-sm">{t('noUsers')}</p>
       ) : (
-        <div className='overflow-hidden rounded-lg border'>
-          <table className='w-full text-sm'>
-            <thead className='border-b bg-muted/50'>
+        <div className="overflow-hidden rounded-lg border">
+          <table className="w-full text-sm">
+            <thead className="bg-muted/50 border-b">
               <tr>
-                <th className='px-4 py-2 text-left font-medium'>{t('col.user')}</th>
-                <th className='px-4 py-2 text-left font-medium'>{t('col.piAccount')}</th>
-                <th className='px-4 py-2 text-left font-medium'>{t('col.googleAccount')}</th>
-                <th className='px-4 py-2 text-left font-medium'>{t('col.role')}</th>
-                <th className='px-4 py-2 text-left font-medium'>{t('col.joinDate')}</th>
-                <th className='px-4 py-2 text-left font-medium'>{t('col.lastLogin')}</th>
-                <th className='px-4 py-2 text-left font-medium'>{t('col.changeRole')}</th>
+                <th className="px-4 py-2 text-left font-medium">
+                  {t('col.user')}
+                </th>
+                <th className="px-4 py-2 text-left font-medium">
+                  {t('col.piAccount')}
+                </th>
+                <th className="px-4 py-2 text-left font-medium">
+                  {t('col.googleAccount')}
+                </th>
+                <th className="px-4 py-2 text-left font-medium">
+                  {t('col.role')}
+                </th>
+                <th className="px-4 py-2 text-left font-medium">
+                  {t('col.joinDate')}
+                </th>
+                <th className="px-4 py-2 text-left font-medium">
+                  {t('col.lastLogin')}
+                </th>
+                <th className="px-4 py-2 text-left font-medium">
+                  {t('col.changeRole')}
+                </th>
               </tr>
             </thead>
-            <tbody className='divide-y'>
+            <tbody className="divide-y">
               {displayedUsers.map((user) => (
-                <tr key={user.id} className='transition-colors hover:bg-muted/30'>
-                  <td className='px-4 py-3 font-medium'>{user.display_name}</td>
-                  <td className='px-4 py-3 text-muted-foreground'>
+                <tr
+                  key={user.id}
+                  className="hover:bg-muted/30 transition-colors"
+                >
+                  <td className="px-4 py-3 font-medium">{user.display_name}</td>
+                  <td className="text-muted-foreground px-4 py-3">
                     {user.pi_username ? `@${user.pi_username}` : '—'}
                   </td>
-                  <td className='px-4 py-3 text-muted-foreground'>
+                  <td className="text-muted-foreground px-4 py-3">
                     {user.google_email ?? '—'}
                   </td>
-                  <td className='px-4 py-3'>
-                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${ROLE_COLOR[user.role]}`}>
+                  <td className="px-4 py-3">
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-xs font-medium ${ROLE_COLOR[user.role]}`}
+                    >
                       {user.role}
                     </span>
                   </td>
-                  <td className='px-4 py-3 text-xs text-muted-foreground'>
+                  <td className="text-muted-foreground px-4 py-3 text-xs">
                     {new Date(user.reg_dtm).toLocaleString('ko-KR', {
-                      year: 'numeric', month: '2-digit', day: '2-digit',
-                      hour: '2-digit', minute: '2-digit',
+                      year: 'numeric',
+                      month: '2-digit',
+                      day: '2-digit',
+                      hour: '2-digit',
+                      minute: '2-digit',
                     })}
                   </td>
-                  <td className='px-4 py-3 text-xs text-muted-foreground'>
+                  <td className="text-muted-foreground px-4 py-3 text-xs">
                     {user.last_login_dtm
                       ? new Date(user.last_login_dtm).toLocaleString('ko-KR', {
-                          year: 'numeric', month: '2-digit', day: '2-digit',
-                          hour: '2-digit', minute: '2-digit',
+                          year: 'numeric',
+                          month: '2-digit',
+                          day: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit',
                         })
                       : '—'}
                   </td>
-                  <td className='px-4 py-3'>
-                    <div className='flex flex-wrap gap-1'>
+                  <td className="px-4 py-3">
+                    <div className="flex flex-wrap gap-1">
                       {ROLES.filter((r) => r !== user.role).map((r) => (
                         <Button
                           key={r}
-                          variant='outline'
-                          size='sm'
+                          variant="outline"
+                          size="sm"
                           disabled={changing === user.id}
                           onClick={() => changeRole(user.id, r)}
-                          className='h-6 px-2 text-xs'
+                          className="h-6 px-2 text-xs"
                         >
                           {r}
                         </Button>

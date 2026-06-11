@@ -6,7 +6,12 @@ import { broadcastToCall } from '@/lib/realtime-broadcast'
 
 type Params = { params: Promise<{ roomId: string; callId: string }> }
 
-const SIGNAL_EVENTS = ['webrtc_offer', 'webrtc_answer', 'webrtc_candidate', 'call_hangup'] as const
+const SIGNAL_EVENTS = [
+  'webrtc_offer',
+  'webrtc_answer',
+  'webrtc_candidate',
+  'call_hangup',
+] as const
 
 const SignalSchema = z.object({
   event: z.enum(SIGNAL_EVENTS),
@@ -18,7 +23,8 @@ const SignalSchema = z.object({
 export async function POST(req: Request, { params }: Params) {
   const { roomId, callId } = await params
   const user = await getSessionUser()
-  if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user)
+    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
   // 통화 참여자 검증
   const { data: call } = await getSupabaseAdmin()
@@ -29,17 +35,29 @@ export async function POST(req: Request, { params }: Params) {
     .eq('del_yn', 'N')
     .maybeSingle()
 
-  if (!call) return NextResponse.json({ error: '통화를 찾을 수 없습니다' }, { status: 404 })
+  if (!call)
+    return NextResponse.json(
+      { error: '통화를 찾을 수 없습니다' },
+      { status: 404 },
+    )
 
-  const isParticipant = call.caller_usr_id === user.id || call.callee_usr_id === user.id
-  if (!isParticipant) return NextResponse.json({ error: '통화 참여자가 아닙니다' }, { status: 403 })
+  const isParticipant =
+    call.caller_usr_id === user.id || call.callee_usr_id === user.id
+  if (!isParticipant)
+    return NextResponse.json(
+      { error: '통화 참여자가 아닙니다' },
+      { status: 403 },
+    )
 
   let body: unknown
-  try { body = await req.json() } catch {
+  try {
+    body = await req.json()
+  } catch {
     return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
   }
   const parsed = SignalSchema.safeParse(body)
-  if (!parsed.success) return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
+  if (!parsed.success)
+    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
 
   const { event, payload } = parsed.data
 
@@ -59,7 +77,11 @@ export async function POST(req: Request, { params }: Params) {
 
   // 신원 키(call_id, from_usr_id)는 클라이언트 payload에서 제거하고 서버 검증값으로 덮어쓴다.
   // 스프레드를 먼저 펼친 뒤 서버 주입 필드를 마지막에 둬야 위장(spoofing)을 막을 수 있다.
-  const { call_id: _ignoredCallId, from_usr_id: _ignoredFrom, ...safePayload } = payload
+  const {
+    call_id: _ignoredCallId,
+    from_usr_id: _ignoredFrom,
+    ...safePayload
+  } = payload
   await broadcastToCall(roomId, event, {
     ...safePayload,
     call_id: callId,

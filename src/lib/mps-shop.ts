@@ -46,7 +46,11 @@ export async function listMyShops(sellerId: string) {
   return (data ?? []) as MpsShop[]
 }
 
-export async function createShop(sellerId: string, regrId: string, input: ShopInput) {
+export async function createShop(
+  sellerId: string,
+  regrId: string,
+  input: ShopInput,
+) {
   const { data, error } = await getSupabaseAdmin()
     .from('mps_shop')
     .insert({ ...input, seller_id: sellerId, regr_id: regrId, modr_id: regrId })
@@ -57,7 +61,11 @@ export async function createShop(sellerId: string, regrId: string, input: ShopIn
   return data as MpsShop
 }
 
-export async function updateShop(shopId: string, sellerId: string, patch: Partial<ShopInput>) {
+export async function updateShop(
+  shopId: string,
+  sellerId: string,
+  patch: Partial<ShopInput>,
+) {
   const { data, error } = await getSupabaseAdmin()
     .from('mps_shop')
     .update({ ...patch, modr_id: sellerId, mod_dtm: new Date().toISOString() })

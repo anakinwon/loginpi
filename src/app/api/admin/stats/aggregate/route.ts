@@ -53,7 +53,10 @@ async function rebuildRange(from: string, to: string): Promise<DayResult[]> {
 
 // 집계 대상 [from, to]에 더해 to 이후 WAU/MAU 파급 구간(to+1 ~ to+29, 오늘 이하)까지 재계산
 // — 과거 날짜의 로그가 바뀌면 그 날짜를 윈도우에 포함하는 이후 행들도 갱신해야 기준이 유지된다
-async function rebuildWithRipple(from: string, to: string): Promise<DayResult[]> {
+async function rebuildWithRipple(
+  from: string,
+  to: string,
+): Promise<DayResult[]> {
   const today = todayUtc()
   const rippleTo = addDays(to, RIPPLE_DAYS)
   const effectiveTo = rippleTo < today ? rippleTo : today
@@ -61,8 +64,12 @@ async function rebuildWithRipple(from: string, to: string): Promise<DayResult[]>
 }
 
 function summarize(results: DayResult[]) {
-  const failed = results.filter(r => !r.ok)
-  return { total: results.length, failed: failed.length, failedDates: failed.map(r => r.date) }
+  const failed = results.filter((r) => !r.ok)
+  return {
+    total: results.length,
+    failed: failed.length,
+    failedDates: failed.map((r) => r.date),
+  }
 }
 
 type TriggerCd = 'CRON' | 'MANUAL' | 'BACKFILL'
@@ -83,20 +90,25 @@ async function logBatchRun(
   summary: BatchSummary,
   regrId: string,
 ) {
-  const { error } = await getSupabaseAdmin().from('sys_batch_log').insert({
-    job_nm: 'stats_aggregate',
-    trigger_cd: triggerCd,
-    from_dt: fromDt,
-    to_dt: toDt,
-    start_dtm: startDtm.toISOString(),
-    end_dtm: new Date().toISOString(),
-    success_yn: summary.failed === 0 ? 'Y' : 'N',
-    total_cnt: summary.total,
-    failed_cnt: summary.failed,
-    result_msg: summary.failedDates.length > 0 ? `실패: ${summary.failedDates.join(', ')}` : null,
-    regr_id: regrId,
-    modr_id: regrId,
-  })
+  const { error } = await getSupabaseAdmin()
+    .from('sys_batch_log')
+    .insert({
+      job_nm: 'stats_aggregate',
+      trigger_cd: triggerCd,
+      from_dt: fromDt,
+      to_dt: toDt,
+      start_dtm: startDtm.toISOString(),
+      end_dtm: new Date().toISOString(),
+      success_yn: summary.failed === 0 ? 'Y' : 'N',
+      total_cnt: summary.total,
+      failed_cnt: summary.failed,
+      result_msg:
+        summary.failedDates.length > 0
+          ? `실패: ${summary.failedDates.join(', ')}`
+          : null,
+      regr_id: regrId,
+      modr_id: regrId,
+    })
   if (error) console.error('sys_batch_log 기록 실패:', error.message)
 }
 
@@ -136,7 +148,10 @@ export async function POST(req: NextRequest) {
 
   // 백필 모드: from ~ to 범위 전체 처리
   if (body.backfill === true) {
-    let to = typeof body.to === 'string' && isValidDate(body.to) ? body.to : yesterdayUtc()
+    let to =
+      typeof body.to === 'string' && isValidDate(body.to)
+        ? body.to
+        : yesterdayUtc()
     if (to > today) to = today
 
     // from 미지정 시 sys_user_actvty_log의 최초 날짜 사용
@@ -164,13 +179,21 @@ export async function POST(req: NextRequest) {
 
   // 단일 날짜 처리 (기본: 오늘 UTC — 온디맨드 최신화)
   // 클라이언트 로컬(KST 등) 날짜가 UTC보다 앞서는 경우 오늘로 보정
-  let date = typeof body.date === 'string' && isValidDate(body.date) ? body.date : today
+  let date =
+    typeof body.date === 'string' && isValidDate(body.date) ? body.date : today
   if (date > today) date = today
 
   const startDtm = new Date()
   const results = await rebuildWithRipple(date, date)
   const s = summarize(results)
-  await logBatchRun(cronAuth ? 'CRON' : 'MANUAL', date, date, startDtm, s, regrId)
+  await logBatchRun(
+    cronAuth ? 'CRON' : 'MANUAL',
+    date,
+    date,
+    startDtm,
+    s,
+    regrId,
+  )
 
   if (s.failed > 0) {
     return NextResponse.json(

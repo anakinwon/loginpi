@@ -7,7 +7,8 @@ import { getSessionUser } from '@/lib/auth-check'
 // (클라이언트가 amount를 조작해도 /payments/complete의 CHAT_SUBSCR 분기에서 재검증됨)
 export async function POST(request: NextRequest) {
   const user = await getSessionUser()
-  if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user)
+    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
   let body: unknown
   try {
@@ -16,7 +17,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
   }
   const { plan_cd } = body as { plan_cd?: string }
-  if (!plan_cd) return NextResponse.json({ error: 'plan_cd가 필요합니다' }, { status: 400 })
+  if (!plan_cd)
+    return NextResponse.json({ error: 'plan_cd가 필요합니다' }, { status: 400 })
 
   const { data: plan } = await getSupabaseAdmin()
     .from('msg_subscr_plan')
@@ -26,7 +28,11 @@ export async function POST(request: NextRequest) {
     .eq('del_yn', 'N')
     .maybeSingle()
 
-  if (!plan) return NextResponse.json({ error: '존재하지 않는 플랜입니다' }, { status: 404 })
+  if (!plan)
+    return NextResponse.json(
+      { error: '존재하지 않는 플랜입니다' },
+      { status: 404 },
+    )
   const planRow = plan as {
     plan_cd: string
     plan_nm: string
@@ -35,7 +41,10 @@ export async function POST(request: NextRequest) {
   }
 
   if (planRow.plan_tp_cd === 'FREE' || planRow.price_pi <= 0) {
-    return NextResponse.json({ error: '무료 플랜은 결제가 필요하지 않습니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: '무료 플랜은 결제가 필요하지 않습니다' },
+      { status: 400 },
+    )
   }
 
   // Pi createPayment에 그대로 넣을 파라미터 — amount는 서버 권위값
@@ -51,7 +60,8 @@ export async function POST(request: NextRequest) {
 // 즉시 권한 회수(논리삭제)는 환불 정책 확정 + PiRC2 cancel() 연동 시 처리 예정.
 export async function DELETE() {
   const user = await getSessionUser()
-  if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user)
+    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
   const db = getSupabaseAdmin()
   const { data: active } = await db
@@ -62,7 +72,8 @@ export async function DELETE() {
     .gt('expire_dtm', new Date().toISOString())
     .maybeSingle()
 
-  if (!active) return NextResponse.json({ error: '활성 구독이 없습니다' }, { status: 404 })
+  if (!active)
+    return NextResponse.json({ error: '활성 구독이 없습니다' }, { status: 404 })
   const row = active as { subscr_id: string; expire_dtm: string }
 
   const { error } = await db
@@ -74,7 +85,8 @@ export async function DELETE() {
     })
     .eq('subscr_id', row.subscr_id)
 
-  if (error) return NextResponse.json({ error: '구독 취소 실패' }, { status: 500 })
+  if (error)
+    return NextResponse.json({ error: '구독 취소 실패' }, { status: 500 })
 
   return NextResponse.json({
     message: '구독이 취소되었습니다. 만료일까지 이용할 수 있습니다.',
