@@ -72,7 +72,8 @@ function summarize(results: DayResult[]) {
   }
 }
 
-type TriggerCd = 'CRON' | 'MANUAL' | 'BACKFILL'
+// ONDEMAND: 통계 대시보드 접속 시 자동 최신화 — 어드민이 직접 실행한 MANUAL과 구분
+type TriggerCd = 'CRON' | 'ONDEMAND' | 'MANUAL' | 'BACKFILL'
 
 interface BatchSummary {
   total: number
@@ -186,14 +187,13 @@ export async function POST(req: NextRequest) {
   const startDtm = new Date()
   const results = await rebuildWithRipple(date, date)
   const s = summarize(results)
-  await logBatchRun(
-    cronAuth ? 'CRON' : 'MANUAL',
-    date,
-    date,
-    startDtm,
-    s,
-    regrId,
-  )
+  // 대시보드 자동 최신화(ondemand: true)는 ONDEMAND — 어드민 버튼 실행(MANUAL)과 구분
+  const triggerCd: TriggerCd = cronAuth
+    ? 'CRON'
+    : body.ondemand === true
+      ? 'ONDEMAND'
+      : 'MANUAL'
+  await logBatchRun(triggerCd, date, date, startDtm, s, regrId)
 
   if (s.failed > 0) {
     return NextResponse.json(

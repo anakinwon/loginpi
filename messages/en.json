@@ -583,9 +583,22 @@
       "logSuccess": "Success",
       "logFail": "Failed",
       "logFailedCnt": "{failed} failed",
-      "triggerCron": "CRON",
+      "triggerCron": "Auto (CRON)",
+      "triggerOndemand": "Auto (Dashboard)",
       "triggerManual": "Manual",
-      "triggerBackfill": "Backfill"
+      "triggerBackfill": "Manual (Backfill)",
+      "scheduleTitle": "Automated Job Schedule",
+      "scheduleDesc": "These jobs run automatically — execution history is recorded even without manual action",
+      "schedColJob": "Job",
+      "schedColTrigger": "Trigger Label",
+      "schedColWhen": "When",
+      "schedColDesc": "Description",
+      "schedCronWhen": "Daily at 00:00 UTC",
+      "schedCronDesc": "Vercel Cron — finalizes yesterday's stats + recalculates WAU/MAU ripple window",
+      "schedOndemandWhen": "When an admin opens the stats dashboard or changes the period",
+      "schedOndemandDesc": "On-demand refresh of today's (UTC) stats row — automatic, not a manual run",
+      "schedManualWhen": "When an admin runs it from this page",
+      "schedManualDesc": "Single-date aggregation or range backfill — recorded only for explicit admin runs"
     }
   },
   "store": {

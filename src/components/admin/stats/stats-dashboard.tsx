@@ -187,10 +187,11 @@ export function StatsDashboard() {
     setError(null)
     try {
       // 온디맨드 집계 — 오늘(UTC) 행을 최신화한 뒤 조회 (실패해도 기존 롤업으로 표시)
+      // ondemand: true → 배치 이력에 MANUAL(수동)이 아닌 ONDEMAND(자동)로 기록
       await piFetch('/api/admin/stats/aggregate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: '{}',
+        body: JSON.stringify({ ondemand: true }),
       }).catch(() => {})
       const [actRes, revRes] = await Promise.all([
         piFetch(`/api/admin/stats/activity?period=${p}`),

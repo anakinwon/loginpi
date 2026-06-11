@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 interface BatchLog {
   batch_log_id: number
   job_nm: string
-  trigger_cd: 'CRON' | 'MANUAL' | 'BACKFILL'
+  trigger_cd: 'CRON' | 'ONDEMAND' | 'MANUAL' | 'BACKFILL'
   from_dt: string | null
   to_dt: string | null
   start_dtm: string
@@ -22,8 +22,18 @@ interface BatchLog {
 
 const TRIGGER_KEY = {
   CRON: 'triggerCron',
+  ONDEMAND: 'triggerOndemand',
   MANUAL: 'triggerManual',
   BACKFILL: 'triggerBackfill',
+} as const
+
+// 자동 실행(CRON·ONDEMAND)은 색상 배지로 수동(MANUAL·BACKFILL)과 구분
+const TRIGGER_STYLE = {
+  CRON: 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400',
+  ONDEMAND:
+    'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400',
+  MANUAL: 'bg-muted text-muted-foreground',
+  BACKFILL: 'bg-muted text-muted-foreground',
 } as const
 
 function formatDtm(iso: string): string {
@@ -98,11 +108,7 @@ export function BatchLogTable() {
                   </td>
                   <td className="py-2 pr-3">
                     <span
-                      className={`rounded px-1.5 py-0.5 text-xs font-medium ${
-                        log.trigger_cd === 'CRON'
-                          ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'
-                          : 'bg-muted text-muted-foreground'
-                      }`}
+                      className={`rounded px-1.5 py-0.5 text-xs font-medium ${TRIGGER_STYLE[log.trigger_cd]}`}
                     >
                       {t(TRIGGER_KEY[log.trigger_cd])}
                     </span>
