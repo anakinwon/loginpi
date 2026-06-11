@@ -17,6 +17,10 @@ interface PaymentRow {
   amount: number
   memo: string | null
   status: PaymentStatus
+  pymnt_type: string | null
+  theme_cd: string
+  theme_nm: string | null
+  theme_emoji: string | null
   reg_dtm: string
   mod_dtm: string
   sys_user: {
@@ -69,6 +73,13 @@ export default function PaymentsPage() {
     error:     t('status.error'),
   }
 
+  // 테마 표시 — 미등록 코드(SUBSCRIPTION·UNKNOWN)는 통계 화면과 동일하게 번역 매핑
+  function themeLabel(p: PaymentRow): { emoji: string; name: string } {
+    if (p.theme_cd === 'SUBSCRIPTION') return { emoji: '💳', name: t('theme.subscription') }
+    if (p.theme_cd === 'UNKNOWN') return { emoji: '❓', name: t('theme.unknown') }
+    return { emoji: p.theme_emoji ?? '', name: p.theme_nm ?? p.theme_cd }
+  }
+
   return (
     <div className='space-y-4'>
       <div>
@@ -108,6 +119,7 @@ export default function PaymentsPage() {
               <tr>
                 <th className='px-4 py-2 text-left font-medium'>{t('col.user')}</th>
                 <th className='px-4 py-2 text-left font-medium'>{t('col.amount')}</th>
+                <th className='px-4 py-2 text-left font-medium'>{t('col.theme')}</th>
                 <th className='px-4 py-2 text-left font-medium'>{t('col.memo')}</th>
                 <th className='px-4 py-2 text-left font-medium'>{t('col.status')}</th>
                 <th className='px-4 py-2 text-left font-medium'>{t('col.paymentId')}</th>
@@ -125,6 +137,17 @@ export default function PaymentsPage() {
                   </td>
                   <td className='px-4 py-3 font-semibold tabular-nums'>
                     {p.amount.toFixed(4)} π
+                  </td>
+                  <td className='whitespace-nowrap px-4 py-3'>
+                    {(() => {
+                      const { emoji, name } = themeLabel(p)
+                      return (
+                        <span className='bg-muted inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium'>
+                          {emoji && <span>{emoji}</span>}
+                          {name}
+                        </span>
+                      )
+                    })()}
                   </td>
                   <td className='max-w-[160px] truncate px-4 py-3 text-muted-foreground'>
                     {p.memo ?? '—'}
