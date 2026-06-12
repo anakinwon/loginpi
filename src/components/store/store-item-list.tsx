@@ -28,6 +28,13 @@ export interface StoreItem {
   distance_km?: number | null
 }
 
+// GET /api/store/categories 트리 노드 (2단계)
+interface CtgrNode {
+  ctgr_id: string
+  ctgr_nm: string
+  children: CtgrNode[]
+}
+
 const CND_LIST = ['NEW', 'USED', 'HANDMADE'] as const
 // 기본 뷰(1페이지·검색/필터 없음·좌표 없음)만 localStorage SWR 캐시 — 재방문 즉시 표시
 const STORE_CACHE_KEY = 'store_items_default'
@@ -49,6 +56,8 @@ export function StoreItemList() {
   const [keyword, setKeyword] = useState('')
   const [searchInput, setSearchInput] = useState('')
   const [cnd, setCnd] = useState<string | null>(null)
+  const [ctgr, setCtgr] = useState<string | null>(null)
+  const [ctgrTree, setCtgrTree] = useState<CtgrNode[]>([])
   const [sort, setSort] = useState<SortType>('latest')
   const [loading, setLoading] = useState(true)
 
@@ -60,6 +69,16 @@ export function StoreItemList() {
   const [locLoading, setLocLoading] = useState(false)
 
   const limit = 5
+
+  // 카테고리 트리 로드 (공개 API)
+  useEffect(() => {
+    fetch('/api/store/categories')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: { categories?: CtgrNode[] } | null) => {
+        if (d?.categories) setCtgrTree(d.categories)
+      })
+      .catch(() => {})
+  }, [])
 
   // 마운트 시 LBS 동의 여부 확인 (Rule LBS-01: 동의자에게만 거리 UI 노출)
   useEffect(() => {
@@ -102,7 +121,12 @@ export function StoreItemList() {
   const load = useCallback(async () => {
     // 기본 뷰: 캐시 즉시 표시 (SWR) → 아래 네트워크 응답으로 교체
     const isDefaultView =
-      page === 1 && !keyword && !cnd && sort === 'latest' && userLat === null
+      page === 1 &&
+      !keyword &&
+      !cnd &&
+      !ctgr &&
+      sort === 'latest' &&
+      userLat === null
     let servedFromCache = false
     if (isDefaultView) {
       const cached = readCache<{ items: StoreItem[]; total: number }>(
@@ -124,6 +148,7 @@ export function StoreItemList() {
     })
     if (keyword) sp.set('q', keyword)
     if (cnd) sp.set('cnd', cnd)
+    if (ctgr) sp.set('ctgr', ctgr)
     // 좌표가 있으면 항상 전달 → 모든 정렬에서 distance_km 수신 (반경 필터는 주변순만)
     if (userLat !== null && userLng !== null) {
       sp.set('lat', String(userLat))
@@ -143,7 +168,7 @@ export function StoreItemList() {
     } finally {
       setLoading(false)
     }
-  }, [page, keyword, cnd, sort, userLat, userLng])
+  }, [page, keyword, cnd, ctgr, sort, userLat, userLng])
 
   useEffect(() => {
     void load()
@@ -222,20 +247,46 @@ export function StoreItemList() {
             {t(`cnd.${c}`)}
           </button>
         ))}
-        <select
-          value={sort === 'distance' ? 'latest' : sort}
-          onChange={(e) => {
-            setSort(e.target.value as BaseSort)
-            setPage(1)
-          }}
-          className="border-input bg-background ml-auto rounded-md border px-2 py-1 text-xs"
-        >
-          {BASE_SORT_LIST.map((s) => (
-            <option key={s} value={s}>
-              {t(`sort.${s}`)}
-            </option>
-          ))}
-        </select>
+        <div className="ml-auto flex items-center gap-2">
+          {ctgrTree.length > 0 && (
+            <select
+              value={ctgr ?? ''}
+              onChange={(e) => {
+                setCtgr(e.target.value || null)
+                setPage(1)
+              }}
+              className="border-input bg-background max-w-40 rounded-md border px-2 py-1 text-xs"
+            >
+              <option value="">{t('allCategories')}</option>
+              {ctgrTree.map((p) => (
+                <optgroup key={p.ctgr_id} label={p.ctgr_nm}>
+                  <option value={p.ctgr_id}>
+                    {p.ctgr_nm} · {t('form.categoryAll')}
+                  </option>
+                  {p.children.map((c) => (
+                    <option key={c.ctgr_id} value={c.ctgr_id}>
+                      {c.ctgr_nm}
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
+          )}
+          <select
+            value={sort === 'distance' ? 'latest' : sort}
+            onChange={(e) => {
+              setSort(e.target.value as BaseSort)
+              setPage(1)
+            }}
+            className="border-input bg-background rounded-md border px-2 py-1 text-xs"
+          >
+            {BASE_SORT_LIST.map((s) => (
+              <option key={s} value={s}>
+                {t(`sort.${s}`)}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {/* 거리순 활성화 표시 */}
@@ -264,7 +315,9 @@ export function StoreItemList() {
         </p>
       ) : items.length === 0 ? (
         <p className="text-muted-foreground py-16 text-center text-sm">
-          {sort === 'distance' ? t('noNearbyItems', { radius: 10 }) : t('noItems')}
+          {sort === 'distance'
+            ? t('noNearbyItems', { radius: 10 })
+            : t('noItems')}
         </p>
       ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">

@@ -29,6 +29,10 @@ const CHAT_NAV = [
   { href: '/admin/stickers', labelKey: 'stickers' },
 ] as const
 
+const STORE_NAV = [
+  { href: '/admin/store/categories', labelKey: 'storeCategories' },
+] as const
+
 const I18N_NAV = [{ href: '/admin/i18n', labelKey: 'i18n' }] as const
 
 function NavItem({
@@ -90,6 +94,18 @@ export function AdminSidebar() {
           {t('chatSection')}
         </p>
         {CHAT_NAV.map(({ href, labelKey }) => (
+          <NavItem
+            key={href}
+            href={href}
+            label={t(labelKey)}
+            pathname={pathname}
+          />
+        ))}
+
+        <p className="text-muted-foreground px-3 pt-3 pb-1 text-xs font-semibold tracking-wide uppercase">
+          {t('storeSection')}
+        </p>
+        {STORE_NAV.map(({ href, labelKey }) => (
           <NavItem
             key={href}
             href={href}

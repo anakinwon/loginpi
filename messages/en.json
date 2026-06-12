@@ -550,7 +550,9 @@
       "batch": "On-demand Batch",
       "chatSection": "Cafe Management",
       "subscriptions": "Subscription Management",
-      "stickers": "Sticker Management"
+      "stickers": "Sticker Management",
+      "storeSection": "Store",
+      "storeCategories": "Categories"
     },
     "batch": {
       "title": "On-demand Batch",
@@ -601,6 +603,37 @@
       "schedOndemandDesc": "Today's (UTC) statistics row on-demand update — automatic execution, not a manual task",
       "schedManualWhen": "When an administrator executes with a button on this page",
       "schedManualDesc": "Aggregate specific date or period backfill — recorded only when executed directly by an administrator"
+    },
+    "store": {
+      "categories": {
+        "title": "Product Categories",
+        "totalCount": "{count} total",
+        "noData": "No categories registered",
+        "disabled": "Disabled",
+        "rootOption": "— Register as top level —",
+        "useY": "Enabled",
+        "useN": "Disabled",
+        "formTitleNew": "New Category",
+        "formTitleEdit": "Edit Category",
+        "validationRequired": "Category name is required",
+        "saveSuccess": "Registered",
+        "editSuccess": "Updated",
+        "saveFail": "Failed to save",
+        "deleteConfirm": "Delete category \"{name}\"?",
+        "deleteSuccess": "Deleted",
+        "deleteFail": "Failed to delete",
+        "field": {
+          "parent": "Parent Category",
+          "name": "Category Name",
+          "desc": "Description",
+          "sortOrd": "Sort Order",
+          "useYn": "Status"
+        },
+        "placeholder": {
+          "name": "e.g. Digital/Electronics",
+          "desc": "Category description (optional)"
+        }
+      }
     }
   },
   "lbs": {
@@ -741,7 +774,10 @@
       "thumbUrl": "Thumbnail URL",
       "publish": "Publish Now",
       "saveDraft": "Save as Draft",
-      "saveEdit": "Save Changes"
+      "saveEdit": "Save Changes",
+      "category": "Category",
+      "categoryNone": "Uncategorized",
+      "categoryAll": "All"
     },
     "formInvalid": "Please check the item name and price.",
     "qtyInvalid": "Please enter a quantity between 1 and 9998.",
@@ -786,7 +822,8 @@
       "SOLD": "Sold"
     },
     "tradingCount": "Trading {count} items",
-    "notOnSale": "Not on sale"
+    "notOnSale": "Not on sale",
+    "allCategories": "All categories"
   },
   "adminSubscriptions": {
     "col": {

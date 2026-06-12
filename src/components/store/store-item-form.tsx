@@ -17,6 +17,13 @@ interface ItemFormProps {
   itemId?: string // 지정 시 수정 모드 — 기존 값 로드 후 PATCH
 }
 
+// GET /api/store/categories 트리 노드 (2단계)
+interface CtgrNode {
+  ctgr_id: string
+  ctgr_nm: string
+  children: CtgrNode[]
+}
+
 // 상품 등록·수정 폼 (SCR-04) — 이미지는 URL 입력 (Storage 업로드는 후속 TASK)
 export function StoreItemForm({ serverAuthed = false, itemId }: ItemFormProps) {
   const t = useTranslations('store')
@@ -32,6 +39,8 @@ export function StoreItemForm({ serverAuthed = false, itemId }: ItemFormProps) {
   const [regQty, setRegQty] = useState('1')
   const [unlimited, setUnlimited] = useState(false)
   const [thumbnailUrl, setThumbnailUrl] = useState('')
+  const [ctgrId, setCtgrId] = useState('')
+  const [ctgrTree, setCtgrTree] = useState<CtgrNode[]>([])
   const [saving, setSaving] = useState(false)
   const [loadingItem, setLoadingItem] = useState(editMode)
 
@@ -41,6 +50,16 @@ export function StoreItemForm({ serverAuthed = false, itemId }: ItemFormProps) {
   const [lat, setLat] = useState<number | null>(null)
   const [lng, setLng] = useState<number | null>(null)
   const [locLoading, setLocLoading] = useState(false)
+
+  // 카테고리 트리 로드 (공개 API — 로그인 불필요)
+  useEffect(() => {
+    fetch('/api/store/categories')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: { categories?: CtgrNode[] } | null) => {
+        if (d?.categories) setCtgrTree(d.categories)
+      })
+      .catch(() => {})
+  }, [])
 
   // 마운트 시 LBS 동의 여부 확인
   useEffect(() => {
@@ -77,6 +96,7 @@ export function StoreItemForm({ serverAuthed = false, itemId }: ItemFormProps) {
             item_desc: string | null
             price_pi: number
             item_cnd_cd: 'NEW' | 'USED' | 'HANDMADE'
+            ctgr_id: string | null
             reg_qty: number
             thumbnail_url: string | null
           }
@@ -85,6 +105,7 @@ export function StoreItemForm({ serverAuthed = false, itemId }: ItemFormProps) {
         setItemDesc(item.item_desc ?? '')
         setPricePi(String(item.price_pi))
         setCndCd(item.item_cnd_cd)
+        setCtgrId(item.ctgr_id ?? '')
         setUnlimited(item.reg_qty === 9999)
         setRegQty(item.reg_qty === 9999 ? '1' : String(item.reg_qty))
         setThumbnailUrl(item.thumbnail_url ?? '')
@@ -137,6 +158,12 @@ export function StoreItemForm({ serverAuthed = false, itemId }: ItemFormProps) {
       reg_qty: qty,
       thumbnail_url: thumbnailUrl.trim() || undefined,
       ...(status ? { item_st_cd: status } : {}),
+      // 카테고리 — 등록: 빈값이면 키 생략(uuid optional), 수정: 빈값은 null(미분류로 변경)
+      ...(editMode
+        ? { ctgr_id: ctgrId || null }
+        : ctgrId
+          ? { ctgr_id: ctgrId }
+          : {}),
       // 판매 위치 — 등록 모드에서 동의자가 위치를 잡은 경우만 전송
       ...(!editMode && lat !== null && lng !== null ? { lat, lng } : {}),
     }
@@ -193,6 +220,30 @@ export function StoreItemForm({ serverAuthed = false, itemId }: ItemFormProps) {
           maxLength={5000}
           className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
         />
+      </div>
+
+      <div className="space-y-1.5">
+        <Label htmlFor="item-ctgr">{t('form.category')}</Label>
+        <select
+          id="item-ctgr"
+          value={ctgrId}
+          onChange={(e) => setCtgrId(e.target.value)}
+          className="border-input bg-background h-9 w-full rounded-md border px-3 text-sm"
+        >
+          <option value="">{t('form.categoryNone')}</option>
+          {ctgrTree.map((p) => (
+            <optgroup key={p.ctgr_id} label={p.ctgr_nm}>
+              <option value={p.ctgr_id}>
+                {p.ctgr_nm} · {t('form.categoryAll')}
+              </option>
+              {p.children.map((c) => (
+                <option key={c.ctgr_id} value={c.ctgr_id}>
+                  {c.ctgr_nm}
+                </option>
+              ))}
+            </optgroup>
+          ))}
+        </select>
       </div>
 
       <div className="grid grid-cols-2 gap-4">

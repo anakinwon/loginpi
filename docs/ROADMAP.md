@@ -3,7 +3,7 @@
 Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Network 앱 플랫폼
 
 > **기준일**: 2026-06-12
-> **현재 버전**: Phase 7~12 완료 (PiCafé MVP · Pi 수익화 · 생태계 확장 · 사용자 프로필 · 통계 대시보드 · PiTranslate™ TASK-090~099 ✅) · **Phase 13 MyPiShop(MPS) Phase 1 MVP 완료 (TASK-100~107 ✅ · 108~113 확장 예정)** · **Phase 14 PiVoice™ v2.0 N:N 음성채널 구현 완료 (TASK-120~123 ✅, `docs/PRD_9_VOICE_CHAT.md` v2.0 — S0 실기기 검증·TURN env 잔여)** · **Phase 15 LBS P0+P1 완료 (TASK-130~139 ✅)** · 횡단 개선: 무한 스크롤·지연 로딩 성능 튜닝, Pi Tip→Bean 리브랜딩 (2026-06-12)
+> **현재 버전**: Phase 7~12 완료 (PiCafé MVP · Pi 수익화 · 생태계 확장 · 사용자 프로필 · 통계 대시보드 · PiTranslate™ TASK-090~099 ✅) · **Phase 13 MyPiShop(MPS) Phase 1 MVP 완료 (TASK-100~107 ✅ · 108~113 확장 예정)** · **Phase 14 PiVoice™ v3.0 권한 시스템 구현 완료 (TASK-120~125 ✅, `docs/PRD_9_VOICE_CHAT.md` v3.0 — 방장 보장 슬롯 + 멤버 자동 2/승인 2, S0 실기기 검증·TURN env 잔여)** · **Phase 15 LBS P0+P1 완료 (TASK-130~140 ✅, 상품 개별 위치 등록 포함)** · 횡단 개선: 무한 스크롤·지연 로딩 + SWR 캐싱·병렬 호출 성능 튜닝, Pi Tip→Bean 리브랜딩, 스티커 노출 개선 (2026-06-12)
 > **배포 URL**: https://loginpi.vercel.app
 > **기술 스택**: Next.js 16 App Router · React 19 · TypeScript 6 · Tailwind CSS v4 · NextAuth.js · Supabase PostgreSQL
 
@@ -29,9 +29,9 @@ Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Net
 | **11** | 통계 대시보드 | ✅ 완료 | 100% |
 | **12** | PiTranslate™ 동시통역 | ✅ 완료 | 100% |
 | **13** | MyPiShop(MPS) MVP | ✅ 완료 (P1) | 100% (확장: P2/P3 예정) |
-| **14** | PiVoice™ v2.0 | ✅ 완료 (v2.0) | 100% (S0 실기기 검증 잔여) |
-| **15** | LBS 위치기반서비스 | ✅ 완료 (P0+P1) | 100% (확장 예정) |
-| **횡단** | 성능 튜닝 | ✅ 완료 | 100% (무한 스크롤·지연 로딩·리브랜딩) |
+| **14** | PiVoice™ v3.0 | ✅ 완료 (v3.0 권한 시스템) | 100% (S0 실기기 검증 잔여) |
+| **15** | LBS 위치기반서비스 | ✅ 완료 (P0+P1) | 100% (상품 개별 위치 포함 · 지도 UI 확장 예정) |
+| **횡단** | 성능 튜닝 | ✅ 완료 | 100% (무한 스크롤·지연 로딩·SWR 캐싱·리브랜딩·스티커) |
 
 ### 통계
 - **총 Phase**: 16개 (0~15 + 횡단 개선)
@@ -46,7 +46,7 @@ Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Net
 - ✅ 203개 locale 글로벌 배포 (다국어·통화 자동 매핑)
 - ✅ 실시간 글로벌 동시통역 (Gemini Flash + Claude Haiku 하이브리드)
 - ✅ P2P 직거래 에스크로 (Pi Coin 자동 정산)
-- ✅ N:N 음성채널 (WebRTC Full Mesh, TURN 지원)
+- ✅ N:N 음성채널 (WebRTC Full Mesh, 방장 보장 슬롯 + 발언 승인 워크플로우, TURN 지원)
 - ✅ 위치기반 커머스 (직거래 성사율 향상)
 - ✅ 기업 수준 데이터 표준 (DA 시스템)
 
@@ -1017,10 +1017,18 @@ if (meta?.type === 'CHAT_SUBSCR') {
 
 ### Phase 2 — 확장
 
-### TASK-108: 카테고리 시스템 (FR-03) 🔜
+### TASK-108: 카테고리 시스템 (FR-03) ✅ (2026-06-12)
 
-- 🔜 `GET /api/store/categories` — 계층형 카테고리 트리 조회
-- 🔜 어드민 카테고리 CRUD (`/admin/store/categories`)
+- ✅ `sql/039_mps_ctgr_seed.sql` — 기본 카테고리 2단계 시드(대분류 6 + 소분류 14, 고정 UUID + `ON CONFLICT DO NOTHING` 멱등). 테이블 `mps_ctgr`는 sql/029에 기 정의
+- ✅ `src/lib/mps-ctgr.ts` — 인접 리스트(`parent_ctgr_id`) → 앱 레벨 트리 빌드, `listCategoryTree()`(공개·use_yn='Y')·`listAllCategories()`(어드민·부모명 부착)·create/update/softDelete
+- ✅ `GET /api/store/categories` — 계층형 카테고리 트리 조회 (Guest 허용, 상품 목록 `?ctgr=` 필터와 연동)
+- ✅ 어드민 CRUD API — `GET·POST /api/admin/store/categories` + `PATCH·DELETE /api/admin/store/categories/[ctgrId]` (isAdmin 게이트, 논리삭제)
+- ✅ 논리삭제 안전장치 — 하위 카테고리 존재 시 409 거부, 연결 상품은 `ctgr_id=NULL`(미분류)로 보존
+- ✅ 어드민 UI `/admin/store/categories` — 대분류 그룹 + 들여쓴 소분류, 부모 선택·정렬순서·사용여부 폼 (`std/words` 패턴)
+- ✅ `admin-sidebar.tsx` 스토어 관리 섹션 + `ko·en` 번역(`admin.store.categories`)
+- ✅ `sql/039` Supabase 적용 완료 — 대분류 6 + 소분류 13 = 19건 (supabase-js upsert, 멱등)
+- ✅ 상품 등록/수정 폼 카테고리 드롭다운 연결 — `store-item-form.tsx` 대분류 `<optgroup>` + 소분류 select, 등록(키 생략)·수정(null=미분류) payload 분기, 수정 모드 기존 `ctgr_id` 로드. 백엔드(`createItem`·`updateItem`·POST/PATCH 스키마)는 기존재 활용. `store.form.category` ko·en 번역
+- ✅ 상품 목록 카테고리 필터 UI — `store-item-list.tsx` 정렬 옆 `<optgroup>` select(대분류·소분류), `?ctgr=` 파라미터 전달 + 기존 `cnd`/검색/거리순과 조합, SWR 캐시 `isDefaultView` 조건에 `!ctgr` 추가(캐시 오염 방지). `store.allCategories` ko·en 번역
 
 ### TASK-109: 매장 관리 (FR-06·SCR-08) 🔜
 
@@ -1058,11 +1066,12 @@ if (meta?.type === 'CHAT_SUBSCR') {
 
 ---
 
-## Phase 14: PiVoice™ — WebRTC N:N 음성채널 ✅ (v2.0 구현 완료 — 2026-06-12)
+## Phase 14: PiVoice™ — WebRTC N:N 음성채널 ✅ (v3.0 권한 시스템 구현 완료 — 2026-06-12)
 
 > **목표**: 카페 멤버 간 브라우저 기반 N:N 다:다 음성채널(1~4명) — 추가 인프라 0(시그널링 재사용), 서버 미디어 비용 0(P2P Full Mesh)
-> **상세 스펙**: `docs/PRD_9_VOICE_CHAT.md` (**v2.0**) | **담당 에이전트**: `.claude/agents/chat/voice-chat-architect.md`
+> **상세 스펙**: `docs/PRD_9_VOICE_CHAT.md` (**v3.0**) | **담당 에이전트**: `.claude/agents/chat/voice-chat-architect.md`
 > **v2.0 확정 결정 (2026-06-12)**: ① 1:1 MVP 폐기 → **N:N 다:다 기본**(1명도 입장 가능, 혼자 대기) ② **동시 마이크 최대 4명**(초과 시 청취 전용) ③ **방장(OWNER/ADMIN) 마이크 원격 제어**(mic_mute_force/mic_unmute_allow) ④ TURN = 관리형(HMAC, 미설정 시 STUN 폴백) ⑤ 베타 완전 무료
+> **v3.0 권한 정책 (2026-06-12, PRD_9 v3.0 R1~R7)**: ① **방장 슬롯 무조건 보장**(입장 즉시 CONNECTED, 정원과 무관) ② **멤버 자동 슬롯 2명**(`VOICE_AUTO_SLOTS`) → 이후 입장자는 **PENDING(방장 승인 대기)** ③ 발언 정원 4명(`VOICE_MAX_MEMBER_SLOTS`) 초과 시 **청취 전용(LISTEN_ONLY)** ④ 마이크 상태 머신 `mic_st_cd`: CONNECTED·PENDING·LISTEN_ONLY ⑤ 방장 승인 흐름: approve/deny/revoke/grant ⑥ 청취 전용자 **발언 신청**(request → PENDING + 방장 알림) ⑦ env 오버라이드 지원
 > **핵심 재사용**: `broadcastToCall`(시그널링 — `room:{id}:call` 전용 토픽) · `getSupabaseClient`(수신) · `piFetch`/`getSessionUser`(인증) · `getRoomMember`(권한) · DA DDL 표준
 
 ### TASK-120: 데이터 모델 `sql/032_voice_channel.sql` ✅ (2026-06-12 — Supabase 적용 완료)
@@ -1092,6 +1101,23 @@ if (meta?.type === 'CHAT_SUBSCR') {
 - ✅ `voice-channel-panel.tsx` — 참여자 목록(마이크 상태)·본인 음소거·방장 "마이크 차단/허용" 버튼·청취 전용 안내
 - ✅ `chat-room-panel.tsx` — 헤더 🎙️ 버튼 + 참여 인원 배지, 원격 오디오는 패널 밖 렌더(패널 닫아도 통화 유지)
 - ✅ 방장 mute 흐름: 서버 검증 → broadcast → 클라이언트 `track.enabled=false` 자가 처리 (서버 진실 원본 + 협조적 집행)
+
+### TASK-124: v3.0 권한 시스템 — 방장 보장 슬롯 + 자동 2/승인 2 ✅ (2026-06-12 — PRD_9 v3.0 R1~R7)
+
+- ✅ `sql/035_voice_permission.sql` — `msg_call_participant.mic_st_cd`(CONNECTED/PENDING/LISTEN_ONLY) 컬럼 추가 (Supabase 적용 완료)
+- ✅ `src/lib/voice.ts` — 슬롯 설정값(`VOICE_AUTO_SLOTS=2`·`VOICE_MAX_MEMBER_SLOTS=4`, env 오버라이드), 방장 판정, `decideMicStateOnJoin()` 상태 머신
+- ✅ `join` — 방장 무조건 CONNECTED, 멤버 자동 2명 → 이후 PENDING(방장 승인 대기) → 정원 초과 시 LISTEN_ONLY(청취 전용)
+- ✅ `mic-control` — approve/deny/revoke/grant (+ mute/unmute 하위 호환), 승인 시 멤버 정원 재검증, `mic_st_change` broadcast
+- ✅ `POST .../request` 신설 — 청취 전용 → 발언 신청(PENDING) + 방장 알림(`mic_request` broadcast)
+- ✅ 훅·패널 — 본인 상태 머신 안내(승인 대기/청취 전용), 발언 신청 버튼, 방장 승인/거절/회수/허용 버튼, 👑 방장 표시
+- ✅ `src/env.ts` — `VOICE_AUTO_SLOTS`·`VOICE_MAX_MEMBER_SLOTS` 환경변수 추가
+
+### TASK-125: S0 진단 메시지 — 음성채널 입장 실패 사유 화면 표시 ✅ (2026-06-12)
+
+- ✅ `use-voice-channel.ts` — `getUserMedia`·시그널링·피어 연결 실패 사유를 단계별 진단 메시지로 캡처
+- ✅ `voice-channel-panel.tsx` — 입장 실패 시 사유 화면 노출 (Pi Browser 실기기 마이크 권한 디버깅용)
+- ✅ `chat-room-panel.tsx` — 진단 상태 전달
+- ✅ S0 Go/No-Go 검증 가속화 — iOS WKWebView `getUserMedia` 미지원/권한 거부 사유 즉시 식별
 
 ### 단계별 Go/No-Go (잔여)
 
@@ -1185,6 +1211,13 @@ if (meta?.type === 'CHAT_SUBSCR') {
 - ✅ 미동의(403) 포함 모든 실패 무시 — 서비스 차단 없음 (Rule LBS-02 서버 재검증)
 - 🔜 GPS 실패 시 서비스 차단 없음 → 위치 저장만 스킵, 나머지 기능 정상
 
+### TASK-140: 상품 개별 위치 등록 — 등록 시 판매자 GPS 저장 + 목록 거리 기준 전환 ✅ (2026-06-12)
+
+- ✅ `sql/036_item_location.sql` — `mps_item`에 위치 컬럼 추가 (매장 단위 → 상품 단위 위치로 세분화)
+- ✅ `store-item-form.tsx` — 상품 등록 폼에 GPS 좌표 수집(판매자 현재 위치) + `loc_tp_cd='04'`(상품거래) 위치 이력 저장
+- ✅ `/api/store/items` — 상품 위치 소스를 `mps_shop.lat/lng` → **상품 개별 좌표** 우선으로 전환 (매장 없는 개인 판매자 대응)
+- ✅ `mps-item.ts` — 거리 계산 기준을 상품 좌표로 확장 (TASK-136 거리 표시와 연동)
+
 > **P0 완료 = LBS MVP**: TASK-130 → 131 → 132 → 133 → 136 → 138 ✅ (동의 게이트 + MPS 거리 표시)
 > **P1 완료 (주변 탐색)**: TASK-134 → 135 → 137 → 139 ✅ (Geocoding 프록시 + 주변 탐색 API + 동의 UI + 로그인 위치 저장)
 > **P1 확장 완료**: reverse-geocode를 `/api/location/save`에 연결(좌표→행정구역 서버 자동 보강) + 주변 탐색 화면 `/nearby`(매장·채팅방 탭 + 반경 1/5/10km)
@@ -1220,9 +1253,10 @@ if (meta?.type === 'CHAT_SUBSCR') {
 | M20: 어드민 통계 대시보드 | Phase 11 | 2026-06-09 | DAU/WAU/MAU·테마별 매출 (react-plotly.js + 중간집계 rollup) | ✅ 완료 |
 | M21: PiTranslate™ 완성 | Phase 12 | 2026-06-12 | sql/020 + chat-translate.ts + dedup + translate API + broadcast 확장 + 표시언어 설정 + 원문 토글 + 어드민 번역 통계 + 품질 피드백 (TASK-090~099) | ✅ 완료 |
 | M22: MyPiShop(MPS) Phase 1 MVP | Phase 13 | 2026-06-11 | sql/029_mps.sql (mps_ 6개 테이블) + lib 헬퍼 3종 + 상품·주문·에스크로 API 12종 + 화면 6종 + 판매자 보증금 (TASK-100~107) | ✅ 완료 (Phase 2·3 확장 예정) |
-| M23: PiVoice™ v2.0 N:N 음성채널 | Phase 14 | 2026-06-12 | sql/032 (msg_call_participant 신규·call_log room 레벨 전환) + TURN 발급 + 음성채널 API 5종 + use-voice-channel 훅(Full Mesh) + 방장 마이크 제어 UI (TASK-120~123) | ✅ 구현 완료 (S0 실기기 검증·TURN env 잔여) |
+| M23: PiVoice™ v3.0 N:N 음성채널 + 권한 시스템 | Phase 14 | 2026-06-12 | sql/032 (msg_call_participant 신규·call_log room 레벨 전환) + sql/035 (mic_st_cd 3상태) + TURN 발급 + 음성채널 API 6종(join/leave/signal/mic-control/participants/request) + use-voice-channel 훅(Full Mesh) + 방장 보장 슬롯·자동 2/승인 2 권한 UI + S0 진단 메시지 (TASK-120~125) | ✅ 구현 완료 (S0 실기기 검증·TURN env 잔여) |
 | M24: LBS P0+P1 MVP | Phase 15 | 2026-06-12 | sql/033_lbs.sql (sys_user_consent·usr_loc_hist·fn_haversine_km) + 동의 API(GET/POST/DELETE) + 위치저장 API + 주변탐색 API(rooms/shops/history) + `/nearby` 화면 + MPS 거리 표시 + 동의 다이얼로그 CTA + 약관 페이지(`/docs/agreement/lbs`) + 로그인 위치 저장 (TASK-130~139) | ✅ 완료 |
 | M25: 횡단 개선 — 성능·리브랜딩 | — | 2026-06-12 | 무한 스크롤(Cafe·Shop)·대시보드 지연 로딩(use-infinite-scroll·LazySection) + Pi Tip→Bean 리브랜딩(표시명·이미지, 식별자 유지) + pi_pymnt 트리거 수리 + 21개 언어 번역 동기화 | ✅ 완료 |
+| M26: 횡단 2차 — SWR 캐싱·상품 위치·스티커 | — | 2026-06-12 | HOME·Shop·관리자·카페 목록 SWR 캐싱(localStorage) + 병렬(비동기) 호출 일괄 적용(`client-cache.ts`·`chat-room-list.ts`·`/api/admin/dashboard`) + 상품 개별 위치 등록(sql/036, store-item-form GPS) + 스티커 노출 개선(sql/038 골프·응원팩 최우선 정렬·2배 확대·저장 방지) + 다국어 동기화(LBS·카페 목록 키) | ✅ 완료 |
 
 ---
 
@@ -1295,3 +1329,5 @@ if (meta?.type === 'CHAT_SUBSCR') {
 | v5.4 | 2026-06-11 | **Phase 13 MyPiShop(MPS) Phase 1 MVP 1차 구현** — TASK-100~107 🔜→✅. `sql/029_mps.sql`(mps_ 6개 테이블 + fn_mps_order_create/fn_mps_order_cancel 원자적 재고 RPC, Supabase 적용), lib 3종(mps-item·mps-order·mps-shop), 상품 API(/api/store/items CRUD + 검색·필터·정렬), 주문 API(생성·취소·confirm·release + 당사자 403), 에스크로는 기존 `/api/payments/complete`에 `MPS_ESCROW` 분기 통합(PENDING→ESCROW + ESCROW_IN 이력 + 금액 서버 재검증), UI 6페이지(/store 목록·상세·my/items·new·sales·orders — usePiAuth 클라이언트 게이트, redirect 금지), store 번역 ko/en. tsc·lint(0 errors) 통과. **후속**: 이미지 업로드(Storage)·상품 수정 폼·SELLER_DONE 자동 DONE cron·실 Pi 정산(A2U)·Pi Browser 실기기 결제 검증. | anakin |
 | v6.0 | 2026-06-12 | **Phase 14 PiVoice™ v2.0 N:N 음성채널 구현 완료** — PRD_9 v2.0 확정(1:1 MVP 폐기 → N:N 1~4명·1인 대기·방장 마이크 제어·동시 마이크 4명 제한) 후 TASK-120~123 전체 구현. `sql/032_voice_channel.sql`(msg_call_participant 신규·call_log room 레벨 전환·quality_stat room upsert·RLS, Supabase 적용), 음성채널 API 5종(join/leave/signal/mic-control/participants — broadcastToCall 전용 토픽), `use-voice-channel.ts`(Full Mesh·단방향 offer glare 차단·candidate 큐·ICE restart), `voice-channel-panel.tsx`(방장 제어 UI). M23 달성(S0 실기기 검증·TURN env 잔여). | anakin |
 | v6.1 | 2026-06-12 | **횡단 개선 4종** — ① 화면 성능 튜닝: `use-infinite-scroll`(IntersectionObserver)·`LazySection` 공용 인프라, Home 대시보드 매출 API·Plotly 차트 뷰포트 진입 시 지연 로드, Cafe 마켓플레이스·내카페·Shop 목록 무한 스크롤 전환 ② **Pi Tip → Pi Bean 리브랜딩**: 사용자 노출 명칭·이미지(public/bean.png·bean-noti.png) 전면 교체, 기존 DB 메시지·결제 memo 일괄 변경, `fn_top_revenue_themes` 라벨 '빈(Bean)' 동기화 — 식별자(canTip·PI_TIP·msg_tip)는 호환성 유지 ③ LBS 약관 페이지 `/docs/agreement/lbs` 신설(react-markdown 서버 렌더 + outputFileTracingIncludes) — 동의 다이얼로그 404 해소 ④ **pi_pymnt 트리거 수리**: 구버전 updated_at 참조로 UPDATE 전면 실패하던 버그 → mod_dtm 갱신 교체(sql/034). TASK-098(번역 통계)·099(품질 피드백) 완료로 Phase 12 종결. M21 완성·M25 추가. PRD.md v10.0 동기화(섹션 16 PiVoice 신설·17~21 재번호). | anakin |
+| v6.2 | 2026-06-12 | **Phase 14 PiVoice™ v3.0 권한 시스템 + 횡단 2차 현행화** — ① **PiVoice v3.0**(PRD_9 v3.0 R1~R7, TASK-124): `sql/035_voice_permission.sql`(`mic_st_cd` CONNECTED/PENDING/LISTEN_ONLY 3상태, Supabase 적용), `lib/voice.ts` 슬롯 설정값(`VOICE_AUTO_SLOTS=2`·`VOICE_MAX_MEMBER_SLOTS=4` env 오버라이드)·`decideMicStateOnJoin()`, join(방장 무조건 CONNECTED·멤버 자동 2명→PENDING→정원초과 LISTEN_ONLY), mic-control(approve/deny/revoke/grant + mute/unmute 하위호환), `/request` API 신설(청취전용→발언신청 + `mic_request` 알림), 훅·패널 상태 머신 UI(발언 신청·방장 승인/거절/회수·👑). ② **S0 진단 메시지**(TASK-125): `use-voice-channel.ts` 입장 실패 사유 단계별 캡처 + 패널 화면 노출(Pi Browser 마이크 권한 디버깅). ③ **상품 개별 위치**(TASK-140): `sql/036_item_location.sql`, `store-item-form.tsx` 등록 시 판매자 GPS 저장(`loc_tp_cd='04'`), `/api/store/items` 위치 소스를 상품 개별 좌표 우선으로 전환. ④ **SWR 성능 튜닝 2차**: HOME·Shop·관리자·카페 목록 localStorage SWR 캐시 + 병렬 호출(`client-cache.ts`·`chat-room-list.ts`·`/api/admin/dashboard`·`admin-dashboard-stats.tsx`). ⑤ **스티커 노출 개선**: `sql/038_stkr_pack_sort.sql`(골프 인사·응원팩 최우선 정렬)·2배 확대·길게눌러 저장 방지(`sticker-img.tsx`). ⑥ 다국어 동기화(en·zh·ja·et·il·mx — LBS·카페 목록 키). M23 v3.0 갱신·M26 추가. **주의: `sql/035` 번호가 `035_bean_rebrand.sql`·`035_voice_permission.sql` 두 파일에 중복 — 적용 순서 무관(상이 테이블)하나 향후 번호 정리 권장.** | anakin |
+| v6.3 | 2026-06-12 | **Phase 13 MPS Phase 2 — TASK-108 카테고리 시스템 구현** — `mps_ctgr` 테이블·`mps_item.ctgr_id` FK·상품 API `?ctgr=` 필터는 기존재, 비어있던 시드·API·UI를 구현. `sql/039_mps_ctgr_seed.sql`(대분류 6 + 소분류 14, 고정 UUID + ON CONFLICT 멱등), `src/lib/mps-ctgr.ts`(인접 리스트→앱 레벨 트리 빌드 + CRUD + 논리삭제 — 하위 카테고리 있으면 거부·상품은 미분류 보존), `GET /api/store/categories`(공개 트리), 어드민 CRUD API 2종(`/api/admin/store/categories` + `[ctgrId]`), 어드민 UI `/admin/store/categories`(대분류 그룹+소분류 들여쓰기, std/words 패턴), `admin-sidebar.tsx` 스토어 관리 섹션, ko·en 번역(`admin.store.categories`). tsc(0 errors)·prettier 통과. **잔여: sql/039 Supabase 적용 + 상품 폼 카테고리 드롭다운 연결.** | anakin |

@@ -258,7 +258,9 @@
       "chatSection": "카페 관리",
       "subscriptions": "구독 관리",
       "stickers": "스티커 관리",
-      "backHome": "← 홈으로"
+      "backHome": "← 홈으로",
+      "storeSection": "스토어 관리",
+      "storeCategories": "상품 카테고리"
     },
     "batch": {
       "title": "온디멘드 배치",
@@ -658,6 +660,37 @@
       "syncFail": "동기화 실패",
       "footnote1": "* \"번역 + 동기화\": Claude AI로 미번역 키를 자동 번역 후 messages/*.json 갱신",
       "footnote2": "* \"DB→JSON 동기화\": DB에 저장된 번역 데이터를 JSON 파일에 반영만 합니다"
+    },
+    "store": {
+      "categories": {
+        "title": "상품 카테고리",
+        "totalCount": "총 {count}개",
+        "noData": "등록된 카테고리가 없습니다",
+        "disabled": "미사용",
+        "rootOption": "— 대분류로 등록 —",
+        "useY": "사용",
+        "useN": "미사용",
+        "formTitleNew": "카테고리 등록",
+        "formTitleEdit": "카테고리 수정",
+        "validationRequired": "카테고리명은 필수입니다",
+        "saveSuccess": "등록되었습니다",
+        "editSuccess": "수정되었습니다",
+        "saveFail": "저장에 실패했습니다",
+        "deleteConfirm": "\"{name}\" 카테고리를 삭제하시겠습니까?",
+        "deleteSuccess": "삭제되었습니다",
+        "deleteFail": "삭제에 실패했습니다",
+        "field": {
+          "parent": "상위 카테고리",
+          "name": "카테고리명",
+          "desc": "설명",
+          "sortOrd": "정렬순서",
+          "useYn": "사용여부"
+        },
+        "placeholder": {
+          "name": "예: 디지털/전자",
+          "desc": "카테고리 설명 (선택)"
+        }
+      }
     }
   },
   "store": {
@@ -755,7 +788,10 @@
       "thumbUrl": "대표 이미지 URL",
       "publish": "바로 게시",
       "saveDraft": "임시저장",
-      "saveEdit": "수정 저장"
+      "saveEdit": "수정 저장",
+      "category": "카테고리",
+      "categoryNone": "미분류",
+      "categoryAll": "전체"
     },
     "formInvalid": "상품명과 가격을 확인해주세요",
     "qtyInvalid": "수량은 1~9998 사이로 입력해주세요",
@@ -793,7 +829,8 @@
       "badgeFree": "자유 취소",
       "buyerNoticeBonded": "🛡️ 보증금 거래: 에스크로 결제 후 취소 시 취소 요청자가 0.1π 수수료를 상대방에게 지불합니다 (판매자 취소 시 0.1π를 보상받습니다)",
       "buyerNoticeFree": "자유 취소 거래: 취소수수료가 없습니다 (판매자 미예치 — 취소 보상도 없음)"
-    }
+    },
+    "allCategories": "전체 카테고리"
   },
   "profile": {
     "title": "내 프로필",
