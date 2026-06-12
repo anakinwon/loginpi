@@ -274,7 +274,7 @@ export function ChatRoomPanel({
         {isOwner && roomSettings && (
           <button
             onClick={() => setSettingsOpen(true)}
-            className="shrink-0 text-lg transition-transform hover:scale-110"
+            className="shrink-0 text-2xl transition-transform hover:scale-110"
             aria-label="카페 수정"
             title="카페 수정 (방장)"
           >
@@ -284,7 +284,7 @@ export function ChatRoomPanel({
         {/* TASK-073: 분석 대시보드 (Business — 권한은 API가 검증) */}
         <Link
           href={`/chat/${roomId}/analytics`}
-          className="shrink-0 text-lg transition-transform hover:scale-110"
+          className="shrink-0 text-2xl transition-transform hover:scale-110"
           aria-label="카페 분석"
           title="카페 분석 (Business)"
         >
@@ -293,7 +293,7 @@ export function ChatRoomPanel({
         {/* TASK-071: Pi Bet 패널 열기 */}
         <button
           onClick={() => setBetPanelOpen(true)}
-          className="shrink-0 text-lg transition-transform hover:scale-110"
+          className="shrink-0 text-2xl transition-transform hover:scale-110"
           aria-label="Pi Bet"
           title="Pi Bet 투표"
         >
@@ -302,7 +302,7 @@ export function ChatRoomPanel({
         {/* PiVoice™ v2.0 음성채널 버튼 — 참여 인원 배지 표시 */}
         <button
           onClick={() => setVoicePanelOpen((o) => !o)}
-          className="relative shrink-0 text-lg transition-transform hover:scale-110"
+          className="relative shrink-0 text-2xl transition-transform hover:scale-110"
           aria-label="음성채널"
           title="음성채널"
         >

@@ -3,7 +3,7 @@
 // fn_top_revenue_themes CASE 매핑과 반드시 동기화 유지)
 export const THEME_LABEL: Record<string, string> = {
   SUBSCRIPTION: '구독',
-  PI_TIP: '팁',
+  PI_TIP: '빈(Bean)',
   DIRECT_PAY: '직접 전송',
   PRODUCT_ORDER: '상품 구매',
   UNKNOWN: '기타',
