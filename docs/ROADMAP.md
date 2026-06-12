@@ -3,7 +3,7 @@
 Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Network 앱 플랫폼
 
 > **기준일**: 2026-06-12
-> **현재 버전**: Phase 7·8·9·10·11 완료 (PiCafé MVP · Pi 수익화 · 생태계 확장 · 사용자 프로필 · 통계 대시보드) · Phase 12 PiTranslate™ MVP 완료 (TASK-090~097 ✅ · 098~099 대기) · **Phase 13 MyPiShop(MPS) 준비중 (TASK-100~113)** · **Phase 14 PiVoice™ 음성통화 설계 완료 (TASK-120~123, `docs/PRD_9_VOICE_CHAT.md`)** · **Phase 15 LBS P1 주변탐색 완료 (TASK-130~133·135·136·137·138·139 ✅)**
+> **현재 버전**: Phase 7~12 완료 (PiCafé MVP · Pi 수익화 · 생태계 확장 · 사용자 프로필 · 통계 대시보드 · PiTranslate™ TASK-090~099 ✅) · **Phase 13 MyPiShop(MPS) Phase 1 MVP 완료 (TASK-100~107 ✅ · 108~113 확장 예정)** · **Phase 14 PiVoice™ v2.0 N:N 음성채널 구현 완료 (TASK-120~123 ✅, `docs/PRD_9_VOICE_CHAT.md` v2.0 — S0 실기기 검증·TURN env 잔여)** · **Phase 15 LBS P0+P1 완료 (TASK-130~139 ✅)** · 횡단 개선: 무한 스크롤·지연 로딩 성능 튜닝, Pi Tip→Bean 리브랜딩 (2026-06-12)
 > **배포 URL**: https://loginpi.vercel.app
 > **기술 스택**: Next.js 16 App Router · React 19 · TypeScript 6 · Tailwind CSS v4 · NextAuth.js · Supabase PostgreSQL
 
@@ -789,7 +789,7 @@ if (meta?.type === 'CHAT_SUBSCR') {
 
 ---
 
-## Phase 12: PiTranslate™ 글로벌 동시통역 ✅ MVP 완료 (2026-06-10 — TASK-090~097 · 098~099 대기)
+## Phase 12: PiTranslate™ 글로벌 동시통역 ✅ 완료 (2026-06-12 — TASK-090~099 전체)
 
 > **목표**: 카페에서 어떤 언어로 보내도, 각 사용자의 선택 언어로 실시간 자동 번역 — 언어 장벽 제로
 > **상세 스펙**: `docs/PRD_4_CHAT.md` (v1.6, Section 1-4) | **담당 에이전트**: 전용 에이전트 없음
@@ -1009,46 +1009,47 @@ if (meta?.type === 'CHAT_SUBSCR') {
 
 ---
 
-## Phase 14: PiVoice™ — WebRTC 실시간 음성 통화 🔜 (설계 완료, 구현 대기)
+## Phase 14: PiVoice™ — WebRTC N:N 음성채널 ✅ (v2.0 구현 완료 — 2026-06-12)
 
-> **목표**: 카페 멤버 간 브라우저 기반 1:1 음성 통화 — 추가 인프라 0(시그널링 재사용), 서버 미디어 비용 0(P2P 직결)
-> **상세 스펙**: `docs/PRD_9_VOICE_CHAT.md` (v1.0) | **담당 에이전트**: `.claude/agents/chat/voice-chat-architect.md`
-> **확정 결정 (2026-06-11)**: ① MVP = **1:1 음성만** ② TURN = **관리형 서비스로 시작**(Metered 등, 검증 후 자체 coturn 전환) ③ 수익화 = **베타 완전 무료**(결제 설계만) ④ 토폴로지 = P2P 메시(최대 4인, 초과 시 LiveKit 오디오 SFU)
-> **핵심 재사용**: `broadcastToRoom`(시그널링) · `getSupabaseClient`+presence(수신) · `piFetch`/`getSessionUser`(인증) · `ClientChatRoom` 게이트 패턴 · `getRoomMember`(권한) · DA DDL 표준
+> **목표**: 카페 멤버 간 브라우저 기반 N:N 다:다 음성채널(1~4명) — 추가 인프라 0(시그널링 재사용), 서버 미디어 비용 0(P2P Full Mesh)
+> **상세 스펙**: `docs/PRD_9_VOICE_CHAT.md` (**v2.0**) | **담당 에이전트**: `.claude/agents/chat/voice-chat-architect.md`
+> **v2.0 확정 결정 (2026-06-12)**: ① 1:1 MVP 폐기 → **N:N 다:다 기본**(1명도 입장 가능, 혼자 대기) ② **동시 마이크 최대 4명**(초과 시 청취 전용) ③ **방장(OWNER/ADMIN) 마이크 원격 제어**(mic_mute_force/mic_unmute_allow) ④ TURN = 관리형(HMAC, 미설정 시 STUN 폴백) ⑤ 베타 완전 무료
+> **핵심 재사용**: `broadcastToCall`(시그널링 — `room:{id}:call` 전용 토픽) · `getSupabaseClient`(수신) · `piFetch`/`getSessionUser`(인증) · `getRoomMember`(권한) · DA DDL 표준
 
-### TASK-120: 데이터 모델 `sql/026_voice_call.sql` 🔜
+### TASK-120: 데이터 모델 `sql/032_voice_channel.sql` ✅ (2026-06-12 — Supabase 적용 완료)
 
-> 파일 번호 확정 (2026-06-11): 024는 `sys_batch_log`, 025는 MPS(TASK-100) 예약 → PiVoice는 026
+- ✅ `msg_call_participant` 신규 — 참여자별 `mic_yn`·`join_dtm`/`leave_dtm`·`duration_sec`, 활성 중복 입장 차단 partial unique
+- ✅ `msg_call_log` — caller/callee 제거 → room 레벨 세션 메타 (첫 입장 시작·마지막 퇴장 종료, `end_rsn_cd` ALL_LEFT/TIMEOUT/FAILED)
+- ✅ `msg_call_quality_stat` — room+usr 기준 upsert로 전환 (`rtt_ms`·`packet_loss_pct`·`jitter_ms`·`relay_yn`)
+- ✅ DA 표준 + RLS 활성화 (anon 차단, 서버 service role만 접근)
 
-- 🔜 `msg_call_log` — 통화 이력 (`caller_usr_id`/`callee_usr_id`, `call_st_cd` RINGING/CONNECTED/ENDED/DECLINED/MISSED, `relay_yn`, `duration_sec`, `end_rsn_cd`)
-- 🔜 `msg_call_quality_stat` — 품질 메트릭 (`rtt_ms`, `packet_loss_pct`, `jitter_ms`, UNIQUE(call_id, usr_id))
-- 🔜 DA 표준 (시스템 컬럼 4개 + del_yn/del_dtm + TIMESTAMPTZ + `-- DA-APPROVED:` 주석), `da-ddl-guard` 통과
+### TASK-121: TURN 자격증명 발급 API ✅
 
-### TASK-121: TURN 자격증명 발급 API 🔜
+- ✅ `POST /api/voice/turn-credentials` — Pi 토큰 검증 → HMAC-SHA256 임시 자격증명(TTL 1h), TURN over TLS 443 경로 포함
+- ✅ TURN 미설정 시 STUN 전용 폴백 (개발·동일 네트워크 테스트용)
 
-- 🔜 `POST /api/voice/turn-credentials` — Pi 토큰 검증 → 관리형 TURN 임시 자격증명(TTL 1h) 반환, 클라이언트 하드코딩 금지
-- 🔜 `src/env.ts` + `.env.example` — `TURN_HOST`/`TURN_SECRET`/`TURN_CREDENTIAL_TTL` server 변수 추가
-- 🔜 TURN over TLS 443 경로 포함(제한망 대비)
+### TASK-122: 음성채널 API 5종 ✅
 
-### TASK-122: 시그널링 + 통화 API 🔜
+- ✅ `POST /api/voice/rooms/[roomId]/join` — 1인 대기 허용, 활성 마이크 4명 초과 시 `mic_yn='N'` 강제, 중복 join 멱등
+- ✅ `POST .../leave` — 품질 메트릭 적재 + 마지막 퇴장 시 세션 종료
+- ✅ `POST .../signal` — offer/answer/candidate 피어 지정 중계 (서버 `broadcastToCall` 경유 신원 보증)
+- ✅ `POST .../mic-control` — 방장(OWNER/ADMIN) 검증 + unmute 시 4명 상한 재확인
+- ✅ `GET .../participants` — 입장 전 채널 점유 현황
+- ✅ broadcast 이벤트: `call_participant_join`/`leave` · `webrtc_offer`/`answer`/`candidate` · `mic_mute_force`/`mic_unmute_allow`
 
-- 🔜 `POST /api/chat/rooms/[roomId]/call` — 통화 시작 (`getRoomMember` 권한 + `msg_call_log` INSERT(RINGING) + `call_invite` broadcast)
-- 🔜 `POST .../call/[callId]/signal` — offer/answer/candidate/hangup 중계 (서버 발신으로 신원 보증)
-- 🔜 `POST .../call/[callId]/end` — 종료 + `duration_sec`·`end_rsn_cd` 기록 + 품질 stat 적재
-- 🔜 신규 broadcast 이벤트: `call_invite`/`webrtc_offer`/`webrtc_answer`/`webrtc_candidate`/`call_hangup` (채널 `room:${roomId}` 재사용)
+### TASK-123: WebRTC 훅 + UI ✅
 
-### TASK-123: WebRTC 훅 + UI 🔜
+- ✅ `src/hooks/use-voice-channel.ts` — 피어별 RTCPeerConnection Map, 신규 입장자 단방향 offer(glare 차단), ICE candidate 큐잉, ICE restart(Wi-Fi↔LTE), `getStats()` 전체 피어 평균 품질, 언마운트 keepalive 퇴장
+- ✅ `voice-channel-panel.tsx` — 참여자 목록(마이크 상태)·본인 음소거·방장 "마이크 차단/허용" 버튼·청취 전용 안내
+- ✅ `chat-room-panel.tsx` — 헤더 🎙️ 버튼 + 참여 인원 배지, 원격 오디오는 패널 밖 렌더(패널 닫아도 통화 유지)
+- ✅ 방장 mute 흐름: 서버 검증 → broadcast → 클라이언트 `track.enabled=false` 자가 처리 (서버 진실 원본 + 협조적 집행)
 
-- 🔜 `src/hooks/use-webrtc-call.ts` — RTCPeerConnection 관리, 상태 머신(ringing 30초 타임아웃 → connected → ended), ICE restart(Wi-Fi↔LTE), `getUserMedia` 제약(echoCancellation/noiseSuppression/autoGainControl), `pc.getStats()` 품질 수집
-- 🔜 `src/app/[locale]/chat/[roomId]/call/page.tsx` — redirect 금지 → `ClientVoiceCall` 위임
-- 🔜 `client-voice-call.tsx`(Pi Browser 게이트) + `voice-call-panel.tsx`(발신/수신 벨·통화 화면) + 카페 헤더 📞 버튼
-
-### 단계별 Go/No-Go
+### 단계별 Go/No-Go (잔여)
 
 - 🔜 **S0 스파이크**: Pi Browser 실기기 마이크 권한 + `getUserMedia` 동작 확인 (iOS WKWebView 지원 여부 = 전체 go/no-go 핵심)
-- 🔜 **S1 1:1 MVP**: TASK-120~123 (동일/상이 네트워크 통화 연결·종료·품질 로깅)
+- 🔜 **TURN 운영 설정**: `TURN_HOST`/`TURN_SECRET` env 설정 (현재 STUN 폴백 — 상이 네트워크 연결 불가) — 관리형 TURN(Metered 등) 가입
 - 🔜 **S2 품질 검증**: TURN 경유율·packet loss 데이터로 자체 coturn 전환 판단
-- 🔜 **S3 확장**: (데이터 기반) 4인 메시 또는 LiveKit SFU / 결제 게이팅(`VOICE_CALL_CREDIT` + `voiceDailyFreeMinutes`) 활성화
+- 🔜 **S3 확장**: (데이터 기반) 5인+ LiveKit 오디오 SFU / 결제 게이팅(`VOICE_CALL_CREDIT` + `voiceDailyFreeMinutes`) 활성화
 
 ---
 
@@ -1168,10 +1169,11 @@ if (meta?.type === 'CHAT_SUBSCR') {
 | M18: PiCafé 생태계 | Phase 9 | 2026-06-11 | 마켓플레이스, Pi Bet, Webhook, 분석 대시보드, 커스텀 스티커 (sql/022 + API 12종 + UI 4종) | ✅ 완료 |
 | M19: 사용자 프로필 | Phase 10 | 2026-06-09 | 마이페이지 (개인정보·결제내역·구독현황), Pi Browser ClientGate | ✅ 완료 |
 | M20: 어드민 통계 대시보드 | Phase 11 | 2026-06-09 | DAU/WAU/MAU·테마별 매출 (react-plotly.js + 중간집계 rollup) | ✅ 완료 |
-| M21: PiTranslate™ MVP | Phase 12 | 2026-06-10 | sql/020 + chat-translate.ts + dedup + translate API + broadcast 확장 + 표시언어 설정 + 원문 토글 (TASK-090~097) | ✅ 완료 |
-| M22: MyPiShop(MPS) Phase 1 MVP | Phase 13 | — | sql/029_mps.sql (mps_ 6개 테이블) + lib 헬퍼 3종 + 상품·주문·에스크로 API 12종 + 화면 6종 (TASK-100~107) | 🔜 준비중 |
-| M23: PiVoice™ 1:1 음성 통화 | Phase 14 | — | sql/024 (msg_call_log·quality_stat) + TURN 발급 + 시그널링/통화 API + use-webrtc-call 훅 + 통화 UI (TASK-120~123) | 🔜 설계 완료 |
-| M24: LBS P0+P1 MVP | Phase 15 | 2026-06-12 | sql/033_lbs.sql (sys_user_consent·usr_loc_hist·fn_haversine_km) + 동의 API(GET/POST/DELETE) + 위치저장 API + 주변탐색 API(rooms/shops/history) + MPS 거리 표시 + 동의 다이얼로그 CTA + 로그인 위치 저장 (TASK-130~133·135~139) | ✅ 완료 |
+| M21: PiTranslate™ 완성 | Phase 12 | 2026-06-12 | sql/020 + chat-translate.ts + dedup + translate API + broadcast 확장 + 표시언어 설정 + 원문 토글 + 어드민 번역 통계 + 품질 피드백 (TASK-090~099) | ✅ 완료 |
+| M22: MyPiShop(MPS) Phase 1 MVP | Phase 13 | 2026-06-11 | sql/029_mps.sql (mps_ 6개 테이블) + lib 헬퍼 3종 + 상품·주문·에스크로 API 12종 + 화면 6종 + 판매자 보증금 (TASK-100~107) | ✅ 완료 (Phase 2·3 확장 예정) |
+| M23: PiVoice™ v2.0 N:N 음성채널 | Phase 14 | 2026-06-12 | sql/032 (msg_call_participant 신규·call_log room 레벨 전환) + TURN 발급 + 음성채널 API 5종 + use-voice-channel 훅(Full Mesh) + 방장 마이크 제어 UI (TASK-120~123) | ✅ 구현 완료 (S0 실기기 검증·TURN env 잔여) |
+| M24: LBS P0+P1 MVP | Phase 15 | 2026-06-12 | sql/033_lbs.sql (sys_user_consent·usr_loc_hist·fn_haversine_km) + 동의 API(GET/POST/DELETE) + 위치저장 API + 주변탐색 API(rooms/shops/history) + `/nearby` 화면 + MPS 거리 표시 + 동의 다이얼로그 CTA + 약관 페이지(`/docs/agreement/lbs`) + 로그인 위치 저장 (TASK-130~139) | ✅ 완료 |
+| M25: 횡단 개선 — 성능·리브랜딩 | — | 2026-06-12 | 무한 스크롤(Cafe·Shop)·대시보드 지연 로딩(use-infinite-scroll·LazySection) + Pi Tip→Bean 리브랜딩(표시명·이미지, 식별자 유지) + pi_pymnt 트리거 수리 + 21개 언어 번역 동기화 | ✅ 완료 |
 
 ---
 
@@ -1241,3 +1243,5 @@ if (meta?.type === 'CHAT_SUBSCR') {
 | v5.8 | 2026-06-12 | **Phase 15 TASK-134 Google Maps 서버 프록시 완료** — `src/lib/google-maps.ts`(`geocodeAddress()`·`reverseGeocode()` — Geocoding API 단일 호출 양방향, `import 'server-only'` 키 보호, 한국 행정구역 type 우선순위 fallback 파서, fetch 캐시 1일), `POST /api/location/geocode`(주소→좌표)·`POST /api/location/reverse-geocode`(좌표→주소+시도/시군구/동) — 로그인 필수·동의 불필요·유료 API 남용 방지, status별 처리(OK/ZERO_RESULTS 404/REQUEST_DENIED 등 502). `GOOGLE_MAPS_API_KEY` `.env.local` 기존 배치 확인(AIzaSy 39자). tsc·lint(0 errors) 통과. M24 P1 전체(TASK-134~139) 완료. | anakin |
 | v5.9 | 2026-06-12 | **Phase 15 LBS P1 확장 — 행정구역 자동 보강 + 주변 탐색 화면** — `reverseGeocode()`를 `/api/location/save`에 연결(클라이언트가 행정구역 미전송 시 서버가 좌표→시도/시군구/동 자동 채움, best-effort·실패 시 좌표만 저장). `reverseGeocode` 좌표 4자리 반올림으로 fetch 캐시 적중률↑(비용 절감). `nearby-explorer.tsx`(동의 게이트+GPS 수집+반경 1/5/10km+매장/채팅방 탭, 거리순) + `/[locale]/nearby/page.tsx`(클라이언트 게이트, redirect 금지) + 스토어 헤더 `📍 주변` 진입점. tsc(0 errors)·lint(신규 경고는 set-state-in-effect 보류 카테고리). | anakin |
 | v5.4 | 2026-06-11 | **Phase 13 MyPiShop(MPS) Phase 1 MVP 1차 구현** — TASK-100~107 🔜→✅. `sql/029_mps.sql`(mps_ 6개 테이블 + fn_mps_order_create/fn_mps_order_cancel 원자적 재고 RPC, Supabase 적용), lib 3종(mps-item·mps-order·mps-shop), 상품 API(/api/store/items CRUD + 검색·필터·정렬), 주문 API(생성·취소·confirm·release + 당사자 403), 에스크로는 기존 `/api/payments/complete`에 `MPS_ESCROW` 분기 통합(PENDING→ESCROW + ESCROW_IN 이력 + 금액 서버 재검증), UI 6페이지(/store 목록·상세·my/items·new·sales·orders — usePiAuth 클라이언트 게이트, redirect 금지), store 번역 ko/en. tsc·lint(0 errors) 통과. **후속**: 이미지 업로드(Storage)·상품 수정 폼·SELLER_DONE 자동 DONE cron·실 Pi 정산(A2U)·Pi Browser 실기기 결제 검증. | anakin |
+| v6.0 | 2026-06-12 | **Phase 14 PiVoice™ v2.0 N:N 음성채널 구현 완료** — PRD_9 v2.0 확정(1:1 MVP 폐기 → N:N 1~4명·1인 대기·방장 마이크 제어·동시 마이크 4명 제한) 후 TASK-120~123 전체 구현. `sql/032_voice_channel.sql`(msg_call_participant 신규·call_log room 레벨 전환·quality_stat room upsert·RLS, Supabase 적용), 음성채널 API 5종(join/leave/signal/mic-control/participants — broadcastToCall 전용 토픽), `use-voice-channel.ts`(Full Mesh·단방향 offer glare 차단·candidate 큐·ICE restart), `voice-channel-panel.tsx`(방장 제어 UI). M23 달성(S0 실기기 검증·TURN env 잔여). | anakin |
+| v6.1 | 2026-06-12 | **횡단 개선 4종** — ① 화면 성능 튜닝: `use-infinite-scroll`(IntersectionObserver)·`LazySection` 공용 인프라, Home 대시보드 매출 API·Plotly 차트 뷰포트 진입 시 지연 로드, Cafe 마켓플레이스·내카페·Shop 목록 무한 스크롤 전환 ② **Pi Tip → Pi Bean 리브랜딩**: 사용자 노출 명칭·이미지(public/bean.png·bean-noti.png) 전면 교체, 기존 DB 메시지·결제 memo 일괄 변경, `fn_top_revenue_themes` 라벨 '빈(Bean)' 동기화 — 식별자(canTip·PI_TIP·msg_tip)는 호환성 유지 ③ LBS 약관 페이지 `/docs/agreement/lbs` 신설(react-markdown 서버 렌더 + outputFileTracingIncludes) — 동의 다이얼로그 404 해소 ④ **pi_pymnt 트리거 수리**: 구버전 updated_at 참조로 UPDATE 전면 실패하던 버그 → mod_dtm 갱신 교체(sql/034). TASK-098(번역 통계)·099(품질 피드백) 완료로 Phase 12 종결. M21 완성·M25 추가. PRD.md v10.0 동기화(섹션 16 PiVoice 신설·17~21 재번호). | anakin |
