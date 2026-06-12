@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { usePiAuth } from '@/components/pi-auth-provider'
 import { piFetch } from '@/lib/pi-fetch'
@@ -21,6 +22,7 @@ interface RoomsPayload {
 // 성능: ① 캐시된 목록 즉시 표시(SWR) ② ChatListView를 로딩 완료 전에 렌더해
 //        마켓플레이스 fetch가 카페 목록 fetch와 병렬로 시작되도록 한다.
 export function ClientChatList() {
+  const t = useTranslations('chat.list')
   const { user, isLoading: authLoading } = usePiAuth()
   const [myRooms, setMyRooms] = useState<RoomWithTheme[]>([])
   const [discoverRooms, setDiscoverRooms] = useState<RoomWithTheme[]>([])
@@ -77,7 +79,7 @@ export function ClientChatList() {
   if (authLoading) {
     return (
       <div className="text-muted-foreground py-20 text-center text-sm">
-        Pi 계정 인증 중…
+        {t('authenticating')}
       </div>
     )
   }
@@ -86,13 +88,13 @@ export function ClientChatList() {
     return (
       <div className="py-20 text-center">
         <p className="text-muted-foreground text-sm">
-          카페는 로그인 후 이용할 수 있습니다
+          {t('loginRequired')}
         </p>
         <Link
           href="/"
           className="text-primary mt-2 inline-block text-sm underline"
         >
-          홈으로 이동
+          {t('goHome')}
         </Link>
       </div>
     )
@@ -100,7 +102,7 @@ export function ClientChatList() {
   if (error) {
     return (
       <div className="text-muted-foreground py-20 text-center text-sm">
-        카페를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.
+        {t('loadFailed')}
       </div>
     )
   }

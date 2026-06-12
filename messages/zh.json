@@ -810,7 +810,12 @@
       "SOLD": "已售罄"
     },
     "tradingCount": "交易中 {count} 件",
-    "notOnSale": "非销售中的商品"
+    "notOnSale": "非销售中的商品",
+    "nearbySort": "📍 附近",
+    "nearbyActive": "当前位置{radius}km内的商品（由近到远）",
+    "nearbyClear": "取消",
+    "noNearbyItems": "附近{radius}km内没有商品",
+    "scrollMore": "滚动查看更多…"
   },
   "adminStickers": {
     "title": "Sticker 管理",
@@ -874,5 +879,55 @@
     "shop": "Shop",
     "my": "我的信息",
     "admin": "管理员"
+  },
+  "lbs": {
+    "consentTitle": "📍 位置服务同意",
+    "consentDesc": "为了探索附近的商品、店铺和聊天室，我们会收集位置信息。",
+    "purposeTitle": "收集与使用目的",
+    "purpose1": "搜索附近的直接交易商品和店铺并显示距离",
+    "purpose2": "探索附近聊天室及本地社区",
+    "purpose3": "防止滥用并提升服务质量",
+    "retentionTitle": "保留与使用期限",
+    "retentionDesc": "达成目的后立即销毁。撤回同意时立即删除。",
+    "viewTerms": "查看位置服务条款全文 →",
+    "optionalNotice": "即使不同意也不影响使用其他服务，仅位置功能将被停用。",
+    "later": "以后再说",
+    "agreeStart": "同意并开始",
+    "processing": "处理中...",
+    "nearbyTitle": "📍 附近探索",
+    "nearbySubtitle": "按距离查找您附近的店铺和聊天室",
+    "loading": "加载中…",
+    "consentRequired": "附近探索需要您同意位置服务",
+    "consentBenefit": "同意后即可按距离浏览附近的店铺和聊天室。",
+    "consentCta": "📍 同意并开启位置服务",
+    "locating": "正在获取当前位置…",
+    "retry": "重试",
+    "radius": "半径",
+    "refreshLocation": "📍 刷新位置",
+    "tabShops": "🏪 店铺",
+    "tabRooms": "☕ 聊天室",
+    "searching": "正在搜索附近…",
+    "noShops": "半径{radius}km内没有店铺",
+    "noRooms": "半径{radius}km内没有聊天室"
+  },
+  "chat": {
+    "list": {
+      "subtitle": "Pi社区主题咖啡屋",
+      "myCafes": "我的咖啡屋",
+      "subscriptionCafes": "订阅咖啡屋",
+      "regularCafes": "普通咖啡屋",
+      "discover": "探索咖啡屋",
+      "noCafes": "您还没有加入任何咖啡屋",
+      "noCafesHint": "点击 + 创建咖啡屋 开设您的第一个房间",
+      "expired": "已过期",
+      "expiresToday": "今天到期",
+      "memberCount": "({cur}/{max}人)",
+      "direct": "1:1",
+      "scrollMore": "滚动查看更多…",
+      "authenticating": "正在验证Pi账户…",
+      "loginRequired": "登录后即可使用咖啡屋",
+      "goHome": "返回首页",
+      "loadFailed": "加载咖啡屋失败，请稍后重试。"
+    }
   }
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { GroupRoomCreator } from '@/components/chat/group-room-creator'
 import { ChatMarketplace } from '@/components/chat/chat-marketplace'
@@ -28,13 +29,18 @@ export type RoomWithTheme = {
   } | null
 }
 
-function exprLabel(exprDtm?: string): { text: string; warn: boolean } | null {
+type ListT = ReturnType<typeof useTranslations<'chat.list'>>
+
+function exprLabel(
+  exprDtm: string | undefined,
+  t: ListT,
+): { text: string; warn: boolean } | null {
   if (!exprDtm || exprDtm.startsWith('9999')) return null
   const daysLeft = Math.ceil(
     (new Date(exprDtm).getTime() - Date.now()) / 86_400_000,
   )
-  if (daysLeft < 0) return { text: '만료됨', warn: true }
-  if (daysLeft === 0) return { text: '오늘 만료', warn: true }
+  if (daysLeft < 0) return { text: t('expired'), warn: true }
+  if (daysLeft === 0) return { text: t('expiresToday'), warn: true }
   return { text: `D-${daysLeft}`, warn: daysLeft <= 3 }
 }
 
@@ -49,6 +55,7 @@ function ThemeEmoji({ room }: { room: RoomWithTheme }) {
 }
 
 function RoomCard({ room, href }: { room: RoomWithTheme; href: string }) {
+  const t = useTranslations('chat.list')
   const themeName = room.msg_theme?.theme_nm ?? room.theme_cd
   const isPremium = room.msg_theme?.theme_tp_cd === 'PREMIUM'
 
@@ -74,7 +81,7 @@ function RoomCard({ room, href }: { room: RoomWithTheme; href: string }) {
           )}
           {room.room_tp_cd === 'G' &&
             (() => {
-              const el = exprLabel(room.expr_dtm)
+              const el = exprLabel(room.expr_dtm, t)
               if (!el) return null
               return (
                 <span
@@ -86,11 +93,11 @@ function RoomCard({ room, href }: { room: RoomWithTheme; href: string }) {
             })()}
           {room.room_tp_cd === 'G' && room.max_mbr_cnt != null && (
             <span className="text-muted-foreground/70 ml-1">
-              ({room.cur_mbr_cnt ?? 0}/{room.max_mbr_cnt}명)
+              {t('memberCount', { cur: room.cur_mbr_cnt ?? 0, max: room.max_mbr_cnt })}
             </span>
           )}
           {room.room_tp_cd === 'D' && (
-            <span className="text-muted-foreground/70 ml-1">· 1:1</span>
+            <span className="text-muted-foreground/70 ml-1">· {t('direct')}</span>
           )}
         </p>
       </div>
@@ -109,6 +116,7 @@ function SectionHeader({ label }: { label: string }) {
 // 무한 스크롤 룸 목록 — 섹션마다 독립적인 노출 개수 상태를 가진다.
 // 데이터는 호출부가 전부 로드해 두므로 추가 fetch 없이 스크롤 시 노출만 늘린다 (렌더 비용 절감).
 function PagedRoomList({ rooms }: { rooms: RoomWithTheme[] }) {
+  const t = useTranslations('chat.list')
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const visible = useMemo(
     () => rooms.slice(0, visibleCount),
@@ -136,7 +144,7 @@ function PagedRoomList({ rooms }: { rooms: RoomWithTheme[] }) {
       {hasMore && (
         <div ref={sentinelRef} className="flex justify-center py-3">
           <span className="text-muted-foreground animate-pulse text-xs">
-            스크롤하여 더 보기…
+            {t('scrollMore')}
           </span>
         </div>
       )}
@@ -176,6 +184,7 @@ export function ChatListView({
   // Pi Browser 클라이언트 게이트가 목록 fetch 중일 때 true — 섹션 스켈레톤 표시
   roomsLoading?: boolean
 }) {
+  const t = useTranslations('chat.list')
   // 내 카페를 구독/일반 두 섹션으로 분리 (discover와 완전히 별도)
   const subscriptionRooms = myRooms.filter(
     (r) => r.msg_theme?.theme_tp_cd === 'PREMIUM',
@@ -191,7 +200,7 @@ export function ChatListView({
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">PiCafé</h1>
-          <p className="text-muted-foreground text-sm">Pi 커뮤니티 테마 카페</p>
+          <p className="text-muted-foreground text-sm">{t('subtitle')}</p>
         </div>
         <GroupRoomCreator />
       </div>
@@ -199,7 +208,7 @@ export function ChatListView({
       {/* 목록 로딩 중 — 섹션 스켈레톤 (마켓플레이스는 아래에서 병렬 로드) */}
       {roomsLoading && (
         <section className="mb-8">
-          <SectionHeader label="내 카페" />
+          <SectionHeader label={t('myCafes')} />
           <RoomListSkeleton />
         </section>
       )}
@@ -208,7 +217,7 @@ export function ChatListView({
       {!roomsLoading && subscriptionRooms.length > 0 && (
         <section className="mb-8">
           <div className="mb-3 flex items-center gap-2">
-            <SectionHeader label="구독 카페" />
+            <SectionHeader label={t('subscriptionCafes')} />
             <span className="mb-3 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
               PREMIUM
             </span>
@@ -220,14 +229,14 @@ export function ChatListView({
       {/* 일반 카페 — 비PREMIUM 내 방, PREMIUM 테마 먼저 정렬 */}
       {!roomsLoading && (regularRooms.length > 0 || myRooms.length === 0) && (
         <section className="mb-8">
-          <SectionHeader label="일반 카페" />
+          <SectionHeader label={t('regularCafes')} />
           {myRooms.length === 0 ? (
             <div className="rounded-xl border border-dashed py-8 text-center">
               <p className="text-muted-foreground text-sm">
-                아직 참여 중인 카페가 없습니다
+                {t('noCafes')}
               </p>
               <p className="text-muted-foreground mt-1 text-xs">
-                + 카페 만들기로 첫 방을 개설해 보세요
+                {t('noCafesHint')}
               </p>
             </div>
           ) : (
@@ -239,7 +248,7 @@ export function ChatListView({
       {/* 공개 카페 탐색 — PREMIUM 테마 먼저 */}
       {!roomsLoading && sortedDiscover.length > 0 && (
         <section className="mb-8">
-          <SectionHeader label="카페 탐색" />
+          <SectionHeader label={t('discover')} />
           <PagedRoomList rooms={sortedDiscover} />
         </section>
       )}

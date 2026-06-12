@@ -810,7 +810,12 @@
       "SOLD": "販売完了"
     },
     "tradingCount": "取引中 {count}件",
-    "notOnSale": "販売中の商品ではありません"
+    "notOnSale": "販売中の商品ではありません",
+    "nearbySort": "📍 近い順",
+    "nearbyActive": "現在地から{radius}km以内の商品（近い順）",
+    "nearbyClear": "解除",
+    "noNearbyItems": "周辺{radius}km以内に商品がありません",
+    "scrollMore": "スクロールしてもっと見る…"
   },
   "adminStickers": {
     "stickers": "Sticker一覧",
@@ -874,5 +879,55 @@
     "shop": "Shop",
     "my": "私の情報",
     "admin": "管理者"
+  },
+  "lbs": {
+    "consentTitle": "📍 位置情報サービスへの同意",
+    "consentDesc": "近くの商品・店舗・チャットルームを探すために位置情報を収集します。",
+    "purposeTitle": "収集・利用目的",
+    "purpose1": "近くの直接取引商品・店舗の検索と距離表示",
+    "purpose2": "近くのチャットルーム探索と地域コミュニティ",
+    "purpose3": "不正利用の防止とサービス品質の向上",
+    "retentionTitle": "保有・利用期間",
+    "retentionDesc": "目的達成後すぐに破棄。撤回時は即時削除されます。",
+    "viewTerms": "位置情報サービス利用規約の全文を見る →",
+    "optionalNotice": "同意しなくても通常のサービスは制限なくご利用いただけます。位置機能のみ無効になります。",
+    "later": "あとで",
+    "agreeStart": "同意して開始",
+    "processing": "処理中...",
+    "nearbyTitle": "📍 周辺さがし",
+    "nearbySubtitle": "近くの店舗とチャットルームを距離順に探せます",
+    "loading": "読み込み中…",
+    "consentRequired": "周辺さがしには位置情報サービスへの同意が必要です",
+    "consentBenefit": "同意すると、近くの店舗・チャットルームを距離順に閲覧できます。",
+    "consentCta": "📍 位置情報サービスに同意して開始",
+    "locating": "現在地を確認しています…",
+    "retry": "再試行",
+    "radius": "半径",
+    "refreshLocation": "📍 位置を更新",
+    "tabShops": "🏪 店舗",
+    "tabRooms": "☕ チャットルーム",
+    "searching": "周辺を検索中…",
+    "noShops": "半径{radius}km以内に店舗がありません",
+    "noRooms": "半径{radius}km以内にチャットルームがありません"
+  },
+  "chat": {
+    "list": {
+      "subtitle": "Piコミュニティのテーマカフェ",
+      "myCafes": "マイカフェ",
+      "subscriptionCafes": "サブスクカフェ",
+      "regularCafes": "一般カフェ",
+      "discover": "カフェをさがす",
+      "noCafes": "まだ参加中のカフェがありません",
+      "noCafesHint": "「+ カフェ作成」で最初のルームを開設しましょう",
+      "expired": "期限切れ",
+      "expiresToday": "本日期限",
+      "memberCount": "({cur}/{max}名)",
+      "direct": "1:1",
+      "scrollMore": "スクロールしてもっと見る…",
+      "authenticating": "Piアカウントを認証中…",
+      "loginRequired": "カフェはログイン後にご利用いただけます",
+      "goHome": "ホームへ戻る",
+      "loadFailed": "カフェを読み込めませんでした。しばらくしてから再度お試しください。"
+    }
   }
 }

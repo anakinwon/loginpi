@@ -1,4 +1,54 @@
 {
+  "lbs": {
+    "consentTitle": "📍 Location Service Consent",
+    "consentDesc": "We collect location data to find nearby items, shops, and chat rooms.",
+    "purposeTitle": "Purpose of Collection & Use",
+    "purpose1": "Search nearby P2P items and shops with distance display",
+    "purpose2": "Discover nearby chat rooms and local communities",
+    "purpose3": "Prevent abuse and improve service quality",
+    "retentionTitle": "Retention Period",
+    "retentionDesc": "Discarded immediately after use. Deleted instantly upon withdrawal.",
+    "viewTerms": "View full Location Service Terms →",
+    "optionalNotice": "You can use all other services without consenting. Only location features will be disabled.",
+    "later": "Later",
+    "agreeStart": "Agree & Start",
+    "processing": "Processing...",
+    "nearbyTitle": "📍 Nearby Explorer",
+    "nearbySubtitle": "Find shops and chat rooms around you, sorted by distance",
+    "loading": "Loading…",
+    "consentRequired": "Nearby Explorer requires location service consent",
+    "consentBenefit": "Once you agree, you can browse nearby shops and chat rooms by distance.",
+    "consentCta": "📍 Agree & Start Location Service",
+    "locating": "Locating your current position…",
+    "retry": "Try Again",
+    "radius": "Radius",
+    "refreshLocation": "📍 Refresh Location",
+    "tabShops": "🏪 Shops",
+    "tabRooms": "☕ Chat Rooms",
+    "searching": "Searching nearby…",
+    "noShops": "No shops within {radius}km",
+    "noRooms": "No chat rooms within {radius}km"
+  },
+  "chat": {
+    "list": {
+      "subtitle": "Pi community themed cafés",
+      "myCafes": "My Cafés",
+      "subscriptionCafes": "Subscription Cafés",
+      "regularCafes": "Cafés",
+      "discover": "Discover Cafés",
+      "noCafes": "You haven't joined any cafés yet",
+      "noCafesHint": "Create your first café with + New Café",
+      "expired": "Expired",
+      "expiresToday": "Expires today",
+      "memberCount": "({cur}/{max})",
+      "direct": "1:1",
+      "scrollMore": "Scroll for more…",
+      "authenticating": "Authenticating Pi account…",
+      "loginRequired": "Log in to use cafés",
+      "goHome": "Go Home",
+      "loadFailed": "Failed to load cafés. Please try again later."
+    }
+  },
   "common": {
     "loading": "Loading...",
     "save": "Save",
@@ -810,7 +860,12 @@
       "SOLD": "Sold"
     },
     "tradingCount": "Trading {count} items",
-    "notOnSale": "Not on sale"
+    "notOnSale": "Not on sale",
+    "nearbySort": "📍 Nearby",
+    "nearbyActive": "Items within {radius}km of your location (nearest first)",
+    "nearbyClear": "Clear",
+    "noNearbyItems": "No items within {radius}km",
+    "scrollMore": "Scroll for more…"
   },
   "adminStickers": {
     "title": "Sticker Management",
