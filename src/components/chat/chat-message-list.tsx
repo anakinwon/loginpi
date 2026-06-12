@@ -400,11 +400,14 @@ function MessageBubble({
             : 'bg-muted rounded-bl-sm'
         }`}
       >
-        {/* PiTranslate™ — 번역본이 있고 원문과 다르면 번역 표시 + 원문 토글 */}
+        {/* PiTranslate™ — 번역본이 있고 원문과 다르면 번역 표시 + 원문 토글 + 👍/👎 피드백 */}
         {msg.trans_cont && msg.trans_cont !== msg.msg_cont ? (
           <TranslatedMessage
             original={msg.msg_cont ?? ''}
             translated={msg.trans_cont}
+            roomId={roomId}
+            msgId={msg.msg_id}
+            localeCd={msg.trans_locale}
           />
         ) : (
           msg.msg_cont

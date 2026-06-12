@@ -874,15 +874,18 @@ if (meta?.type === 'CHAT_SUBSCR') {
 - ✅ 헤더를 `ChatRoomPanel`로 통합 (page.tsx·client-chat-room 중복 제거) — **제목 섹션·입력 섹션 고정(`shrink-0`), 본문만 스크롤(`min-h-0 overflow-y-auto`)**
 - ✅ 방금 보낸 내 메시지는 번역 제외(`requestedTransRef` 선등록 — DB 저장 전 404 race 방지)
 
-### TASK-098: 어드민 번역 통계 🔜 (후속)
+### TASK-098: 어드민 번역 통계 ✅ (2026-06-12)
 
-- 🔜 어드민 대시보드에 번역 통계 탭 추가
-- 🔜 일별 번역 건수 · 캐시 히트율 · 예상 비용 (Gemini API 토큰 기준)
+- ✅ 어드민 통계 대시보드에 "번역 (PiTranslate™)" 섹션 추가 (`translate-stats-section.tsx` — LazySection 지연 로드)
+- ✅ 일별 번역 건수 · 캐시 히트율 · 예상 비용 (Gemini 토큰 추정: 1 token ≈ 4 chars) · 모델별 분포 · 피드백 합계
+- ✅ `msg_trans.hit_cnt` 캐시 히트 카운터 + `fn_msg_trans_hit`(원자적 증가) + `fn_translate_stats` RPC (sql/034, Supabase 적용 완료)
+- ✅ `GET /api/admin/stats/translate?period=7|30|90|365` (admin 전용)
 
-### TASK-099: 번역 품질 피드백 🔜 (후속)
+### TASK-099: 번역 품질 피드백 ✅ (2026-06-12)
 
-- 🔜 메시지별 번역 👍/👎 피드백 UI
-- 🔜 `msg_trans.feedback_yn CHAR(1)` 컬럼 추가 (향후 fine-tune 데이터)
+- ✅ 메시지별 번역 👍/👎 피드백 UI (`translated-message.tsx` — 원문 토글 옆, 선택 상태 하이라이트)
+- ✅ `msg_trans.feedback_yn CHAR(1)` 컬럼 추가 (sql/034 — 향후 fine-tune 데이터)
+- ✅ `POST /api/chat/rooms/[roomId]/messages/[msgId]/translate/feedback` (멤버 검증 + locale 화이트리스트)
 
 ---
 

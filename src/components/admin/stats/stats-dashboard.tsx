@@ -7,6 +7,7 @@ import { themeLabel } from '@/lib/stats-labels'
 import { LazySection } from '@/components/lazy-section'
 import { StatsCard } from './stats-card'
 import { StatsDateFilter } from './stats-date-filter'
+import { TranslateStatsSection } from './translate-stats-section'
 import type {
   ActivityStatsResponse,
   RevenueStatsResponse,
@@ -406,6 +407,28 @@ export function StatsDashboard() {
               </RankingCard>
             </div>
           </div>
+        </LazySection>
+      </section>
+
+      {/* ─── 번역 섹션 (PiTranslate™) — 스크롤 진입 시 마운트·로드 ───── */}
+      <section className="space-y-4">
+        <h2 className="text-lg font-semibold">번역 (PiTranslate™)</h2>
+        <LazySection
+          fallback={
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+                {[0, 1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className="bg-muted h-20 animate-pulse rounded-lg"
+                  />
+                ))}
+              </div>
+              <div className="bg-muted h-40 animate-pulse rounded-lg" />
+            </div>
+          }
+        >
+          <TranslateStatsSection period={period} />
         </LazySection>
       </section>
     </div>

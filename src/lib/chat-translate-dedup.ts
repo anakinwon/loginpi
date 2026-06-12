@@ -41,6 +41,13 @@ export async function getOrTranslateMessage(params: {
       .maybeSingle()
 
     if (cachedRow) {
+      // 캐시 히트 카운터 증가 — 통계용 (TASK-098), 실패해도 번역 응답에 영향 없음
+      void supabase
+        .rpc('fn_msg_trans_hit', { p_msg_id: msgId, p_locale_cd: localeCd })
+        .then(({ error }) => {
+          if (error)
+            console.error('[chat-translate] hit_cnt 증가 실패:', error.message)
+        })
       return {
         transCont: cachedRow.trans_cont as string,
         srcLangCd: null,
