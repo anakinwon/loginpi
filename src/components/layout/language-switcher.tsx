@@ -156,7 +156,9 @@ export function LanguageSwitcher({ locale }: { locale: string }) {
         <div
           role="listbox"
           aria-label="언어 목록"
-          className="border-border bg-background absolute top-full right-0 z-50 mt-1 max-h-[440px] w-72 overflow-y-auto rounded-lg border shadow-xl"
+          // 모바일: 뷰포트 기준 풀폭(fixed inset-x-2)으로 왼쪽 잘림 방지
+          // 데스크톱(sm+): 기존 버튼 우측 정렬 드롭다운으로 복귀
+          className="border-border bg-background fixed inset-x-2 top-[3.75rem] z-50 mx-auto max-h-[70vh] w-auto max-w-sm overflow-y-auto rounded-lg border shadow-xl sm:absolute sm:inset-x-auto sm:top-full sm:right-0 sm:mt-1 sm:max-h-[440px] sm:w-72 sm:max-w-none"
         >
           {loading ? (
             <div className="text-muted-foreground flex items-center justify-center py-10 text-xs">
