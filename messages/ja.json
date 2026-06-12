@@ -34,7 +34,8 @@
     "piLoginDev": "Pi Login (dev)",
     "piAuthenticating": "認証中…",
     "googleLogin": "Google Login",
-    "myProfile": "My Profile"
+    "myProfile": "My Profile",
+    "shop": "ストア"
   },
   "home": {
     "title": "Next.js Starter Kit",
@@ -199,7 +200,8 @@
       "stats": "統計",
       "batch": "On-demand Batch",
       "chatSection": "Cafe 管理",
-      "subscriptions": "購読管理"
+      "subscriptions": "購読管理",
+      "stickers": "Sticker 管理"
     },
     "dashboard": {
       "title": "Dashboard",
@@ -223,7 +225,8 @@
         "googleAccount": "Googleアカウント",
         "role": "役割",
         "joinDate": "登録日",
-        "changeRole": "役割変更"
+        "changeRole": "役割変更",
+        "lastLogin": "最終ログイン"
       },
       "roleChanged": "役割が変更されました",
       "changeFail": "変更失敗"
@@ -245,7 +248,12 @@
         "memo": "メモ",
         "status": "ステータス",
         "paymentId": "決済 ID",
-        "date": "日時"
+        "date": "日時",
+        "theme": "Theme"
+      },
+      "theme": {
+        "subscription": "購読",
+        "unknown": "その他"
       }
     },
     "links": {
@@ -560,7 +568,39 @@
       "backfillRunning": "Backfill 実行中…",
       "backfillSuccess": "{total}日集計完了 (失敗 {failed}件)",
       "from": "開始日",
-      "to": "終了日"
+      "to": "終了日",
+      "logTitle": "タスク実行履歴",
+      "logDesc": "CRON 自動実行と手動実行の結果を確認します (最新 50件)",
+      "logRefresh": "更新",
+      "logLoading": "読み込み中…",
+      "logEmpty": "実行履歴がありません",
+      "logColStart": "開始日時",
+      "logColTrigger": "実行主体",
+      "logColPeriod": "対象期間",
+      "logColResult": "結果",
+      "logColDays": "処理日数",
+      "logColDuration": "所要時間",
+      "logColRunner": "実行者",
+      "logColMsg": "メッセージ",
+      "logSuccess": "成功",
+      "logFail": "失敗",
+      "logFailedCnt": "失敗 {failed}",
+      "triggerCron": "CRON",
+      "triggerManual": "手動",
+      "triggerBackfill": "Backfill",
+      "triggerOndemand": "自動(Dashboard)",
+      "scheduleTitle": "自動作業スケジュール",
+      "scheduleDesc": "直接実行しなくても、以下のスケジュールに従って実行履歴が自動的に記録されます",
+      "schedColJob": "作業",
+      "schedColTrigger": "実行主体表記",
+      "schedColWhen": "実行時点",
+      "schedColDesc": "説明",
+      "schedCronWhen": "毎日 00:00 UTC (韓国時間 09:00)",
+      "schedCronDesc": "Vercel Cron — 昨日日付の統計確定 + WAU/MAU波及区間再計算",
+      "schedOndemandWhen": "管理者統計Dashboardアクセスまたは照会期間変更時",
+      "schedOndemandDesc": "本日(UTC)統計行 On-demand 最新化 — 自動実行であり手動作業ではありません",
+      "schedManualWhen": "このページで管理者がボタンで実行時",
+      "schedManualDesc": "特定日付集計または期間 Backfill — 管理者が直接実行した場合のみ記録"
     }
   },
   "profile": {
@@ -579,7 +619,7 @@
       "addrDtl": "詳細住所",
       "saved": "保存されました。",
       "saveError": "保存に失敗しました。再度お試しください。",
-      "kakaoId": "カカオトーク ID",
+      "kakaoId": "KakaoTalk ID",
       "selfIntro": "自己紹介"
     },
     "payment": {
@@ -641,5 +681,198 @@
     "grantFail": "付与失敗",
     "grantValidation": "ユーザーIDとPlanを選択してください",
     "extendMonths": "延長ヶ月数"
+  },
+  "store": {
+    "title": "MyPiShop",
+    "subtitle": "Pi Coinで安全に直接取引してください — Escrow 保護",
+    "navMyItems": "マイ商品",
+    "navSales": "販売管理",
+    "navOrders": "購入履歴",
+    "backToList": "商品リスト",
+    "searchPlaceholder": "商品名または説明を検索",
+    "search": "検索",
+    "all": "すべて",
+    "loading": "読み込み中…",
+    "noItems": "登録された商品がありません",
+    "noOrders": "注文履歴がありません",
+    "stockLeft": "在庫 {count}",
+    "viewCount": "閲覧 {count}",
+    "itemNotFound": "商品が見つかりません",
+    "loginRequired": "ログイン後に利用できます",
+    "piBrowserOnly": "Pi Browserでのみ決済できます",
+    "myOwnItem": "ご自身で登録した商品です",
+    "soldOut": "品切れ",
+    "buying": "決済処理中…",
+    "buyEscrow": "🛒 購入する (Escrow 決済)",
+    "buySuccess": "Escrow 決済完了！販売者と取引を進めてください",
+    "buyFail": "購入処理に失敗しました",
+    "escrowNotice": "決済されたPiはEscrowに安全に保管され、双方の取引確認後に販売者に送金されます",
+    "cnd": {
+      "NEW": "新品",
+      "USED": "中古",
+      "HANDMADE": "ハンドメイド"
+    },
+    "sort": {
+      "latest": "最新順",
+      "price_asc": "価格の安い順",
+      "price_desc": "価格の高い順",
+      "views": "閲覧数順"
+    },
+    "shopType": {
+      "ONLINE": "Online",
+      "OFFLINE": "Offline店舗",
+      "BOTH": "Online・Offline"
+    },
+    "itemSt": {
+      "DRAFT": "下書き保存",
+      "OPEN": "公開中",
+      "CLOSED": "公開停止",
+      "SOLD": "販売完了"
+    },
+    "orderSt": {
+      "PENDING": "決済待ち",
+      "ESCROW": "Escrow完了",
+      "TRADING": "取引中",
+      "SELLER_DONE": "引き渡し完了 (受領確認待ち)",
+      "BUYER_DONE": "受領完了 (取引完了待ち)",
+      "DONE": "取引完了",
+      "CANCELLED": "キャンセル済み"
+    },
+    "myItemsTitle": "My Item管理",
+    "newItemTitle": "Item登録",
+    "editItemTitle": "Item編集",
+    "editSuccess": "Itemが編集されました",
+    "actionEdit": "編集",
+    "salesTitle": "販売 Order管理",
+    "ordersTitle": "購入 Order管理",
+    "newItem": "+ Item登録",
+    "statusChanged": "Statusが変更されました",
+    "deleteConfirm": "Itemを削除しますか？",
+    "deleteSuccess": "削除されました",
+    "saveFail": "処理に失敗しました",
+    "saving": "保存中…",
+    "actionOpen": "公開",
+    "actionClose": "停止",
+    "actionDelete": "削除",
+    "form": {
+      "name": "Item名",
+      "desc": "Item説明",
+      "price": "価格",
+      "cnd": "Item Status",
+      "qty": "販売数量",
+      "unlimited": "無制限",
+      "unlimitedHint": "飲料・Pizzaなど、在庫追跡が無意味なItemは無制限で登録してください",
+      "thumbUrl": "代表 Image URL",
+      "publish": "すぐに公開",
+      "saveDraft": "下書き保存",
+      "saveEdit": "編集保存"
+    },
+    "formInvalid": "Item名と価格を確認してください",
+    "qtyInvalid": "数量は1〜9998の間で入力してください",
+    "publishSuccess": "Itemが公開されました",
+    "draftSuccess": "一時保存されました",
+    "cancelReasonPrompt": "キャンセル理由を入力してください",
+    "actionSellerDone": "商品引き渡し完了",
+    "actionBuyerDone": "商品受領完了",
+    "actionComplete": "取引完了",
+    "actionCancel": "注文キャンセル",
+    "actionDone": {
+      "confirm": "引き渡し完了として処理されました。購入者の受領確認をお待ちください",
+      "release": "受領確認完了！販売者の取引完了処理をお待ちください",
+      "complete": "取引が完了しました！エスクローPiが決済されます",
+      "cancel": "注文がキャンセルされました"
+    },
+    "waitingBuyerConfirm": "購入者の受領確認をお待ちしています",
+    "waitingSellerComplete": "販売者の取引完了処理をお待ちしています",
+    "escrowReleased": "取引終了 — エスクロー決済処理",
+    "bond": {
+      "title": "販売者保証金",
+      "desc": "1π預託でキャンセル手数料9回分をカバー — 購入者キャンセル時に0.1πの報酬を受け取れます",
+      "active": "有効",
+      "inactive": "未預託",
+      "deposit": "1πを預託する",
+      "redeposit": "追加で1πを預託",
+      "depositSuccess": "保証金1πが預託されました (キャンセル手数料9回分 + 支払準備金0.1π)",
+      "balance": "残高",
+      "avail": "利用可能残高",
+      "remainCancels": "残り負担回数",
+      "cancelCnt": "累計キャンセル",
+      "exhausted": "保証金が枯渇しました — 追加で1πを預託するまで無保証金モードに切り替わります (手数料受領不可)",
+      "notice": "預託額1πのうち0.1πは支払準備金として手数料の充当には使用されません。返還機能は法的検討後に提供予定です。",
+      "badgeBonded": "保証金取引",
+      "badgeFree": "自由キャンセル",
+      "buyerNoticeBonded": "🛡️ 保証金取引: エスクロー決済後にキャンセルした場合、キャンセル要求者が0.1πの手数料を相手に支払います (販売者キャンセル時は0.1πを報酬として受け取ります)",
+      "buyerNoticeFree": "自由キャンセル取引: キャンセル手数料はありません (販売者未預託 — キャンセル報酬もなし)"
+    },
+    "tradeSt": {
+      "OPEN": "販売中",
+      "TRADING": "取引中",
+      "SOLD": "販売完了"
+    },
+    "tradingCount": "取引中 {count}件",
+    "notOnSale": "販売中の商品ではありません"
+  },
+  "adminStickers": {
+    "stickers": "Sticker一覧",
+    "title": "Sticker管理",
+    "desc": "合計 {count} Pack · 公式 {official} · Custom {custom} · 販売中 {active}",
+    "createTitle": "新しいSticker Packを作成",
+    "packNm": "Pack名",
+    "packDesc": "説明",
+    "theme": "Theme",
+    "price": "価格 (π)",
+    "isDflt": "ThemeデフォルトPack",
+    "createBtn": "Pack作成",
+    "creating": "作成中…",
+    "createSuccess": "Sticker Packが作成されました",
+    "createFail": "Pack作成に失敗しました",
+    "createValidation": "Pack名を入力してください",
+    "filter": {
+      "all": "すべて",
+      "official": "公式",
+      "custom": "Custom",
+      "stopped": "販売停止"
+    },
+    "col": {
+      "pack": "Pack",
+      "theme": "Theme",
+      "type": "Type",
+      "price": "価格",
+      "stkrCnt": "Sticker",
+      "ownrCnt": "所有者",
+      "status": "Status",
+      "regDtm": "登録日",
+      "manage": "管理"
+    },
+    "typeOfficial": "公式",
+    "typeCustom": "Custom",
+    "statusOn": "販売中",
+    "statusOff": "停止",
+    "dfltBadge": "基本",
+    "free": "無料",
+    "detail": "詳細",
+    "close": "閉じる",
+    "edit": "編集",
+    "delete": "削除",
+    "deleteConfirm": "'{name}' Packを削除しますか？ストアには表示されなくなります。",
+    "deleteSuccess": "Packが削除されました",
+    "deleteFail": "Packの削除に失敗しました",
+    "updateSuccess": "Pack情報が更新されました",
+    "updateFail": "Packの更新に失敗しました",
+    "noData": "Sticker Packがありません",
+    "noStickers": "登録されたStickerがありません — 画像をアップロードして追加してください",
+    "addStickers": "+ Stickerを追加 (png/jpg/gif/webp, 2MB)",
+    "uploading": "アップロード中…",
+    "uploadSuccess": "{count}個のStickerが追加されました",
+    "uploadFail": "Stickerのアップロードに失敗しました",
+    "stkrDeleteConfirm": "このStickerを削除しますか？",
+    "stkrDeleteFail": "Stickerの削除に失敗しました"
+  },
+  "nav": {
+    "home": "Home",
+    "cafe": "Cafe",
+    "shop": "Shop",
+    "my": "私の情報",
+    "admin": "管理者"
   }
 }

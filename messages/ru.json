@@ -3,7 +3,7 @@
     "successToast": "Success Toast",
     "errorToast": "Error Toast",
     "title": "Next.js Starter Kit",
-    "subtitle": "Boilerplate Next.js 16 + Tailwind CSS v4 + shadcn/ui для быстрого старта",
+    "subtitle": "Boilerplate Next.js 15 + Tailwind CSS v4 + shadcn/ui для быстрого старта",
     "loginSection": "Login",
     "detectingEnv": "Обнаружение среды…",
     "piNetwork": "Pi Network",

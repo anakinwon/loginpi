@@ -37,7 +37,7 @@
   },
   "home": {
     "title": "Next.js Starter Kit",
-    "subtitle": "Kiire algus Next.js 16 + Tailwind CSS v4 + shadcn/ui Boilerplate'iga",
+    "subtitle": "Kiire algus Next.js 15 + Tailwind CSS v4 + shadcn/ui Boilerplate'iga",
     "loginSection": "Login",
     "detectingEnv": "Keskkonna tuvastamine…",
     "piNetwork": "Pi Network",

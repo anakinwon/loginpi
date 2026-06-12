@@ -2,7 +2,7 @@
   "home": {
     "successToast": "Success Toast",
     "title": "Next.js Starter Kit",
-    "subtitle": "Begin vinnig met Next.js 16 + Tailwind CSS v4 + shadcn/ui Boilerplate",
+    "subtitle": "Begin vinnig met Next.js 15 + Tailwind CSS v4 + shadcn/ui Boilerplate",
     "loginSection": "Login",
     "detectingEnv": "Bespeur omgewing tans...",
     "piNetwork": "Pi Network",

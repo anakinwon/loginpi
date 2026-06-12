@@ -34,7 +34,8 @@
     "piLoginDev": "Pi Login (dev)",
     "piAuthenticating": "认证中...",
     "googleLogin": "Google Login",
-    "myProfile": "我的个人资料"
+    "myProfile": "我的个人资料",
+    "shop": "Store"
   },
   "home": {
     "title": "Next.js 启动套件",
@@ -201,7 +202,8 @@
         "googleAccount": "Google 账户",
         "role": "角色",
         "joinDate": "加入日期",
-        "changeRole": "更改角色"
+        "changeRole": "更改角色",
+        "lastLogin": "最近 Login"
       },
       "roleChanged": "角色已更改",
       "changeFail": "更改失败"
@@ -223,7 +225,12 @@
         "memo": "备注",
         "status": "状态",
         "paymentId": "支付 ID",
-        "date": "日期"
+        "date": "日期",
+        "theme": "Theme"
+      },
+      "theme": {
+        "subscription": "订阅",
+        "unknown": "其他"
       }
     },
     "links": {
@@ -542,7 +549,8 @@
       "stats": "统计",
       "batch": "按需 Batch",
       "chatSection": "咖啡厅管理",
-      "subscriptions": "订阅管理"
+      "subscriptions": "订阅管理",
+      "stickers": "Sticker 管理"
     },
     "batch": {
       "title": "按需 Batch",
@@ -560,7 +568,39 @@
       "backfillRunning": "Backfill 运行中…",
       "backfillSuccess": "{total}天聚合完成 (失败 {failed}项)",
       "from": "开始日期",
-      "to": "结束日期"
+      "to": "结束日期",
+      "logTitle": "任务执行历史",
+      "logDesc": "查看 CRON 自动执行和手动执行结果 (最近 50 条)",
+      "logRefresh": "刷新",
+      "logLoading": "加载中…",
+      "logEmpty": "无执行历史",
+      "logColStart": "开始时间",
+      "logColTrigger": "执行主体",
+      "logColPeriod": "目标期间",
+      "logColResult": "结果",
+      "logColDays": "处理天数",
+      "logColDuration": "耗时",
+      "logColRunner": "执行者",
+      "logColMsg": "Message",
+      "logSuccess": "成功",
+      "logFail": "失败",
+      "logFailedCnt": "失败 {failed}",
+      "triggerCron": "CRON",
+      "triggerManual": "手动",
+      "triggerBackfill": "Backfill",
+      "triggerOndemand": "自动(Dashboard)",
+      "scheduleTitle": "自动任务 Schedule",
+      "scheduleDesc": "即使不手动执行，执行历史也会根据以下 Schedule 自动记录",
+      "schedColJob": "任务",
+      "schedColTrigger": "执行主体标记",
+      "schedColWhen": "执行时间",
+      "schedColDesc": "说明",
+      "schedCronWhen": "每天 00:00 UTC (韩国时间 09:00)",
+      "schedCronDesc": "Vercel Cron — 确认昨日统计 + 重新计算 WAU/MAU 影响区间",
+      "schedOndemandWhen": "管理员统计 Dashboard 访问或查询期间变更时",
+      "schedOndemandDesc": "今日(UTC) 统计行 On-demand 最新化 — 自动执行而非手动任务",
+      "schedManualWhen": "在此页面管理员通过按钮执行时",
+      "schedManualDesc": "特定日期汇总或期间回填 — 仅在管理员手动执行时记录"
     }
   },
   "profile": {
@@ -580,7 +620,7 @@
       "saved": "已保存。",
       "saveError": "保存失败。请重试。",
       "kakaoId": "KakaoTalk ID",
-      "selfIntro": "个人简介"
+      "selfIntro": "自我介绍"
     },
     "payment": {
       "empty": "没有支付记录。",
@@ -641,5 +681,198 @@
     "grantFail": "授予失败",
     "grantValidation": "请选择用户 ID 和 Plan",
     "extendMonths": "延长月数"
+  },
+  "store": {
+    "title": "MyPiShop",
+    "subtitle": "使用 Pi Coin 安全地直接交易 — 托管保护",
+    "navMyItems": "我的商品",
+    "navSales": "销售管理",
+    "navOrders": "购买历史",
+    "backToList": "商品列表",
+    "searchPlaceholder": "搜索商品名称或描述",
+    "search": "搜索",
+    "all": "全部",
+    "loading": "加载中…",
+    "noItems": "没有商品",
+    "noOrders": "没有订单",
+    "stockLeft": "库存 {count}",
+    "viewCount": "浏览 {count}",
+    "itemNotFound": "未找到商品",
+    "loginRequired": "Login 后才能使用",
+    "piBrowserOnly": "只能在 Pi Browser 中支付",
+    "myOwnItem": "我注册的商品",
+    "soldOut": "售罄",
+    "buying": "支付进行中…",
+    "buyEscrow": "🛒 购买 (Escrow 支付)",
+    "buySuccess": "Escrow 支付完成！请与卖家进行交易",
+    "buyFail": "购买处理失败",
+    "escrowNotice": "已支付的 Pi 将在 Escrow 中安全保管，双方确认交易后转交给卖家",
+    "cnd": {
+      "NEW": "新商品",
+      "USED": "二手",
+      "HANDMADE": "手工制品"
+    },
+    "sort": {
+      "latest": "最新",
+      "price_asc": "价格从低到高",
+      "price_desc": "价格从高到低",
+      "views": "浏览量"
+    },
+    "shopType": {
+      "ONLINE": "Online",
+      "OFFLINE": "Offline Store",
+      "BOTH": "Online·Offline"
+    },
+    "itemSt": {
+      "DRAFT": "草稿",
+      "OPEN": "发布中",
+      "CLOSED": "已暂停发布",
+      "SOLD": "已售罄"
+    },
+    "orderSt": {
+      "PENDING": "待支付",
+      "ESCROW": "Escrow 完成",
+      "TRADING": "交易中",
+      "SELLER_DONE": "已交付 (待买家确认收货)",
+      "BUYER_DONE": "已收货 (待交易完成)",
+      "DONE": "交易完成",
+      "CANCELLED": "已取消"
+    },
+    "myItemsTitle": "我的商品管理",
+    "newItemTitle": "发布商品",
+    "editItemTitle": "编辑商品",
+    "editSuccess": "商品已修改",
+    "actionEdit": "修改",
+    "salesTitle": "销售订单管理",
+    "ordersTitle": "购买订单管理",
+    "newItem": "+ 发布商品",
+    "statusChanged": "状态已更改",
+    "deleteConfirm": "确定要删除商品吗？",
+    "deleteSuccess": "已删除",
+    "saveFail": "处理失败",
+    "saving": "保存中…",
+    "actionOpen": "发布",
+    "actionClose": "暂停",
+    "actionDelete": "删除",
+    "form": {
+      "name": "商品名",
+      "desc": "商品说明",
+      "price": "价格",
+      "cnd": "商品状态",
+      "qty": "销售数量",
+      "unlimited": "无限制",
+      "unlimitedHint": "对于饮料、披萨等无需追踪库存的商品，请设置为无限制。",
+      "thumbUrl": "代表图片 URL",
+      "publish": "立即发布",
+      "saveDraft": "保存草稿",
+      "saveEdit": "保存修改"
+    },
+    "formInvalid": "请检查商品名和价格",
+    "qtyInvalid": "数量请输入1~9998之间的数字",
+    "publishSuccess": "商品已发布",
+    "draftSuccess": "已保存草稿",
+    "cancelReasonPrompt": "请输入取消原因",
+    "actionSellerDone": "物品已交付",
+    "actionBuyerDone": "物品已收货",
+    "actionComplete": "交易完成",
+    "actionCancel": "取消订单",
+    "actionDone": {
+      "confirm": "已处理为交付完成。等待买家确认收货",
+      "release": "收货确认完成！等待卖家处理交易完成",
+      "complete": "交易已完成！托管Pi将结算",
+      "cancel": "订单已取消"
+    },
+    "waitingBuyerConfirm": "正在等待买家确认收货",
+    "waitingSellerComplete": "正在等待卖家处理交易完成",
+    "escrowReleased": "交易结束 — 托管结算处理",
+    "bond": {
+      "title": "卖家保证金",
+      "desc": "存入1π可抵扣9次取消费用 — 买家取消时可获得0.1π补偿",
+      "active": "活跃",
+      "inactive": "未存入",
+      "deposit": "存入1π",
+      "redeposit": "追加存入1π",
+      "depositSuccess": "已存入保证金1π (9次取消费用 + 0.1π备付金)",
+      "balance": "余额",
+      "avail": "可用余额",
+      "remainCancels": "剩余可抵扣次数",
+      "cancelCnt": "累计取消",
+      "exhausted": "保证金已用尽 — 在追加存入1π之前将切换为无保证金模式 (无法收取手续费)",
+      "notice": "存入的1π中，0.1π作为备付金不用于抵扣手续费。退还功能将在法律审查后提供。",
+      "badgeBonded": "保证金交易",
+      "badgeFree": "自由取消",
+      "buyerNoticeBonded": "🛡️ 保证金交易：托管支付后取消时，取消请求方需向对方支付0.1π手续费 (卖家取消时可获得0.1π补偿)",
+      "buyerNoticeFree": "自由取消交易：无取消费用 (卖家未存入 — 也无取消补偿)"
+    },
+    "tradeSt": {
+      "OPEN": "销售中",
+      "TRADING": "交易中",
+      "SOLD": "已售罄"
+    },
+    "tradingCount": "交易中 {count} 件",
+    "notOnSale": "非销售中的商品"
+  },
+  "adminStickers": {
+    "title": "Sticker 管理",
+    "desc": "总计 {count} Pack · 官方 {official} · Custom {custom} · 销售中 {active}",
+    "createTitle": "创建新 Sticker Pack",
+    "packNm": "Pack 名称",
+    "packDesc": "说明",
+    "theme": "Theme",
+    "price": "价格 (π)",
+    "isDflt": "Theme 默认 Pack",
+    "createBtn": "创建 Pack",
+    "creating": "创建中…",
+    "createSuccess": "Sticker Pack 已创建",
+    "createFail": "Pack 创建失败",
+    "createValidation": "请输入 Pack 名称",
+    "filter": {
+      "all": "全部",
+      "official": "官方",
+      "custom": "Custom",
+      "stopped": "停止销售"
+    },
+    "col": {
+      "pack": "Pack",
+      "theme": "Theme",
+      "type": "类型",
+      "price": "价格",
+      "stkrCnt": "Sticker",
+      "ownrCnt": "拥有者",
+      "status": "状态",
+      "regDtm": "注册日期",
+      "manage": "管理"
+    },
+    "typeOfficial": "官方",
+    "typeCustom": "Custom",
+    "statusOn": "销售中",
+    "statusOff": "停止",
+    "dfltBadge": "默认",
+    "free": "免费",
+    "detail": "详情",
+    "close": "关闭",
+    "edit": "编辑",
+    "delete": "删除",
+    "deleteConfirm": "确定删除“{name}”Pack吗？它将不再在商店中显示。",
+    "deleteSuccess": "Pack已删除",
+    "deleteFail": "删除Pack失败",
+    "updateSuccess": "Pack信息已修改",
+    "updateFail": "修改Pack失败",
+    "noData": "没有Sticker Pack",
+    "stickers": "Sticker列表",
+    "noStickers": "没有注册的Sticker — 请上传图片添加",
+    "addStickers": "+ 添加Sticker (png/jpg/gif/webp, 2MB)",
+    "uploading": "上传中…",
+    "uploadSuccess": "已添加{count}个Sticker",
+    "uploadFail": "Sticker上传失败",
+    "stkrDeleteConfirm": "确定删除此Sticker吗？",
+    "stkrDeleteFail": "Sticker删除失败"
+  },
+  "nav": {
+    "home": "Home",
+    "cafe": "Cafe",
+    "shop": "Shop",
+    "my": "我的信息",
+    "admin": "管理员"
   }
 }
