@@ -31,12 +31,46 @@ interface VoiceChannelPanelProps {
 
 // 원격 피어 1명분 오디오 출력 — srcObject는 ref로만 설정 가능.
 // 패널이 아닌 채팅방 레벨에서 렌더 (패널을 닫아도 통화 오디오 유지)
+//
+// ⚠️ 모바일 WebView(iOS Pi Browser 등) 무음 대응:
+//  1) display:none(=hidden)은 일부 WebView에서 오디오 재생 차단 → 화면 밖 1px로 숨김
+//  2) autoPlay 속성만으론 autoplay 정책에 걸려 조용히 실패 → 명시적 play() + 터치 시 재개
 export function RemoteAudio({ stream }: { stream: MediaStream }) {
   const ref = useRef<HTMLAudioElement>(null)
   useEffect(() => {
-    if (ref.current) ref.current.srcObject = stream
+    const el = ref.current
+    if (!el) return
+    el.srcObject = stream
+    const play = () => {
+      el.play().catch(() => {
+        /* autoplay 차단 — 아래 제스처 폴백으로 재개 */
+      })
+    }
+    play()
+    // 차단 시 다음 사용자 제스처(터치/클릭)에서 1회 재개
+    const resume = () => play()
+    document.addEventListener('touchend', resume, { once: true })
+    document.addEventListener('click', resume, { once: true })
+    return () => {
+      document.removeEventListener('touchend', resume)
+      document.removeEventListener('click', resume)
+    }
   }, [stream])
-  return <audio ref={ref} autoPlay playsInline className="hidden" />
+  return (
+    <audio
+      ref={ref}
+      autoPlay
+      playsInline
+      style={{
+        position: 'fixed',
+        left: -9999,
+        width: 1,
+        height: 1,
+        opacity: 0,
+        pointerEvents: 'none',
+      }}
+    />
+  )
 }
 
 // 참여자 상태 아이콘·라벨
@@ -94,7 +128,8 @@ export function VoiceChannelPanel({
           <ul className="mb-3 max-h-48 space-y-1 overflow-y-auto">
             {participants.map((p) => {
               const isMe = p.usr_id === currentUserId
-              const st = p.mic_st_cd ?? (p.mic_yn === 'Y' ? 'CONNECTED' : 'LISTEN_ONLY')
+              const st =
+                p.mic_st_cd ?? (p.mic_yn === 'Y' ? 'CONNECTED' : 'LISTEN_ONLY')
               const stLabel = MIC_ST_LABEL[st]
               return (
                 <li
@@ -217,7 +252,11 @@ export function VoiceChannelPanel({
                 }`}
                 aria-label={isMuted ? '음소거 해제' : '음소거'}
                 title={
-                  canSpeak ? (isMuted ? '음소거 해제' : '음소거') : '발언 권한 없음'
+                  canSpeak
+                    ? isMuted
+                      ? '음소거 해제'
+                      : '음소거'
+                    : '발언 권한 없음'
                 }
               >
                 {isMuted || !canSpeak ? '🔇' : '🎙️'}
