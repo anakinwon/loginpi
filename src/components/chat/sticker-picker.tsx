@@ -5,6 +5,7 @@ import { piFetch } from '@/lib/pi-fetch'
 import { useSubscribePlan } from '@/hooks/use-subscribe-plan'
 import { InlinePurchasePrompt } from './inline-purchase-prompt'
 import { CustomStickerCreator } from './custom-sticker-creator'
+import { StickerImg } from './sticker-img'
 
 interface Sticker {
   stkr_id: string
@@ -224,7 +225,7 @@ export function StickerPicker({ onSelect, onClose }: StickerPickerProps) {
                 className="hover:bg-muted aspect-square rounded-lg p-0.5 transition-colors"
                 title={s.stkr_nm}
               >
-                <img
+                <StickerImg
                   src={s.stkr_url}
                   alt={s.stkr_nm}
                   className="h-full w-full object-contain"
@@ -310,7 +311,7 @@ function StoreView({
           {pack.preview_stickers.length > 0 && (
             <div className="mt-1.5 flex gap-1">
               {pack.preview_stickers.map((s) => (
-                <img
+                <StickerImg
                   key={s.stkr_id}
                   src={s.stkr_url}
                   alt={s.stkr_nm}

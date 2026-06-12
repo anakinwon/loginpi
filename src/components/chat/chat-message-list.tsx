@@ -3,6 +3,7 @@ import { useEffect, useRef, useCallback, useState } from 'react'
 import { piFetch } from '@/lib/pi-fetch'
 import type { ChatMessage } from '@/hooks/use-chat-room'
 import { PiTipButton } from './pi-tip-button'
+import { StickerImg } from './sticker-img'
 import { TranslatedMessage } from './translated-message'
 
 interface ChatMessageListProps {
@@ -269,13 +270,13 @@ function MessageBubble({
           </span>
         )}
         {msg.attch_url ? (
-          <img
+          <StickerImg
             src={msg.attch_url}
             alt="스티커"
-            className="h-24 w-24 rounded-xl object-contain"
+            className="h-48 w-48 rounded-xl object-contain"
           />
         ) : (
-          <div className="bg-muted flex h-24 w-24 items-center justify-center rounded-xl text-4xl">
+          <div className="bg-muted flex h-48 w-48 items-center justify-center rounded-xl text-7xl">
             🎭
           </div>
         )}
