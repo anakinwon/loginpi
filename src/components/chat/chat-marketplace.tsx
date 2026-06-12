@@ -3,9 +3,14 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from '@/i18n/navigation'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
+import { readCache, writeCache } from '@/lib/client-cache'
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll'
 
 const PAGE_SIZE = 10
+// 기본(전체 테마) 뷰만 localStorage SWR 캐시 — 재방문 시 즉시 표시 후 백그라운드 갱신
+// rooms·themes는 공용 데이터라 사용자 무관 캐시 안전. followedThemes(사용자별)는 네트워크 전용
+const MARKET_CACHE_KEY = 'chat_market_all'
+const MARKET_CACHE_MAX_AGE_MS = 10 * 60_000
 
 // TASK-070: 카페 마켓플레이스 — 테마 필터 칩 + 인기 랭킹 + 테마 팔로우
 // 데이터는 클라이언트에서 piFetch로 로드 (Pi Browser X-Pi-Token 이중 경로 자동 지원)
@@ -47,8 +52,23 @@ export function ChatMarketplace() {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
 
   const load = useCallback(async (theme: string | null) => {
-    setLoading(true)
     setVisibleCount(PAGE_SIZE) // 테마 전환·재로드 시 첫 페이지 분량으로 리셋
+
+    // 기본 뷰: 캐시 즉시 표시 (stale) → 아래 네트워크 응답으로 교체 (revalidate)
+    let servedFromCache = false
+    if (!theme) {
+      const cached = readCache<{ rooms: MarketRoom[]; themes: MarketTheme[] }>(
+        MARKET_CACHE_KEY,
+        MARKET_CACHE_MAX_AGE_MS,
+      )
+      if (cached) {
+        setRooms(cached.rooms)
+        setThemes(cached.themes)
+        servedFromCache = true
+      }
+    }
+    setLoading(!servedFromCache)
+
     try {
       const qs = theme ? `?theme=${encodeURIComponent(theme)}` : ''
       const res = await piFetch(`/api/chat/marketplace${qs}`)
@@ -61,6 +81,9 @@ export function ChatMarketplace() {
       setRooms(data.rooms)
       setThemes(data.themes)
       setFollowed(new Set(data.followedThemes))
+      if (!theme) {
+        writeCache(MARKET_CACHE_KEY, { rooms: data.rooms, themes: data.themes })
+      }
     } finally {
       setLoading(false)
     }

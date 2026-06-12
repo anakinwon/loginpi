@@ -3,9 +3,11 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth-check'
 import { getOrCreateDirectRoom } from '@/lib/chat'
 import { recordActivity } from '@/lib/activity-log'
+import { getChatRoomLists } from '@/lib/chat-room-list'
 
 // GET /api/chat/rooms — 내가 참여 중인 카페 목록 (+?include=public 시 공개 그룹방)
 // Pi Browser 클라이언트 게이트(ClientChatList)가 X-Pi-Token 헤더로 호출한다.
+// 내 카페·공개 카페 파이프라인 병렬 + Bet 뱃지 1쿼리 — chat-room-list 공통 모듈
 export async function GET(request: NextRequest) {
   const user = await getSessionUser()
   if (!user)
@@ -17,113 +19,16 @@ export async function GET(request: NextRequest) {
   const includePublic =
     new URL(request.url).searchParams.get('include') === 'public'
 
-  // 내 카페
-  const { data: mbrs } = await getSupabaseAdmin()
-    .from('msg_room_mbr')
-    .select('room_id')
-    .eq('usr_id', user.id)
-    .eq('del_yn', 'N')
-
-  let rooms: unknown[] = []
-  if (mbrs && mbrs.length > 0) {
-    const roomIds = mbrs.map((m: { room_id: string }) => m.room_id)
-    const [{ data, error }, { data: mbrRows }] = await Promise.all([
-      getSupabaseAdmin()
-        .from('msg_room')
-        .select(
-          `
-          room_id, room_nm, room_desc, theme_cd, room_tp_cd,
-          max_mbr_cnt, is_public_yn, del_yn, reg_dtm, expr_dtm,
-          msg_theme(theme_nm, theme_emoji, theme_tp_cd)
-        `,
-        )
-        .in('room_id', roomIds)
-        .eq('del_yn', 'N')
-        .order('mod_dtm', { ascending: false }),
-      getSupabaseAdmin()
-        .from('msg_room_mbr')
-        .select('room_id')
-        .in('room_id', roomIds)
-        .eq('del_yn', 'N'),
-    ])
-    if (error)
-      return NextResponse.json(
-        { error: '카페 목록 조회 실패' },
-        { status: 500 },
-      )
-    const cntMap = new Map<string, number>()
-    for (const m of mbrRows ?? []) {
-      cntMap.set(m.room_id, (cntMap.get(m.room_id) ?? 0) + 1)
-    }
-    rooms = (data ?? []).map((r: Record<string, unknown>) => ({
-      ...r,
-      cur_mbr_cnt: cntMap.get(r.room_id as string) ?? 0,
-    }))
-  }
-
-  if (!includePublic)
-    return NextResponse.json({ rooms: await attachOpenBetYn(rooms) })
-
-  // 공개 그룹 카페 (최근 10개)
-  const { data: publicRooms } = await getSupabaseAdmin()
-    .from('msg_room')
-    .select(
-      'room_id, room_nm, theme_cd, room_tp_cd, is_public_yn, max_mbr_cnt, expr_dtm, msg_theme(theme_nm, theme_emoji, theme_tp_cd)',
+  try {
+    const { rooms, publicRooms } = await getChatRoomLists(
+      user.id,
+      includePublic,
     )
-    .eq('is_public_yn', 'Y')
-    .eq('room_tp_cd', 'G')
-    .eq('del_yn', 'N')
-    .order('reg_dtm', { ascending: false })
-    .limit(10)
-
-  const pubRoomIds = (publicRooms ?? []).map((r) => r.room_id)
-  let publicRoomsWithCnt: unknown[] = publicRooms ?? []
-  if (pubRoomIds.length > 0) {
-    const { data: pubMbrRows } = await getSupabaseAdmin()
-      .from('msg_room_mbr')
-      .select('room_id')
-      .in('room_id', pubRoomIds)
-      .eq('del_yn', 'N')
-    const pubCntMap = new Map<string, number>()
-    for (const m of pubMbrRows ?? []) {
-      pubCntMap.set(m.room_id, (pubCntMap.get(m.room_id) ?? 0) + 1)
-    }
-    publicRoomsWithCnt = (publicRooms ?? []).map((r) => ({
-      ...r,
-      cur_mbr_cnt: pubCntMap.get(r.room_id) ?? 0,
-    }))
+    if (!includePublic) return NextResponse.json({ rooms })
+    return NextResponse.json({ rooms, publicRooms })
+  } catch {
+    return NextResponse.json({ error: '카페 목록 조회 실패' }, { status: 500 })
   }
-
-  const [roomsWithBet, publicRoomsWithBet] = await Promise.all([
-    attachOpenBetYn(rooms),
-    attachOpenBetYn(publicRoomsWithCnt),
-  ])
-  return NextResponse.json({
-    rooms: roomsWithBet,
-    publicRooms: publicRoomsWithBet,
-  })
-}
-
-// 진행 중(OPEN) Pi Bet 보유 방에 open_bet_yn='Y' 부여 — 카페 목록 🎲 뱃지용
-async function attachOpenBetYn(rooms: unknown[]): Promise<unknown[]> {
-  const typed = rooms as { room_id: string }[]
-  if (typed.length === 0) return rooms
-  const { data } = await getSupabaseAdmin()
-    .from('msg_bet')
-    .select('room_id')
-    .in(
-      'room_id',
-      typed.map((r) => r.room_id),
-    )
-    .eq('bet_st_cd', 'OPEN')
-    .eq('del_yn', 'N')
-  const betRoomIds = new Set(
-    (data ?? []).map((b: { room_id: string }) => b.room_id),
-  )
-  return typed.map((r) => ({
-    ...r,
-    open_bet_yn: betRoomIds.has(r.room_id) ? 'Y' : 'N',
-  }))
 }
 
 // POST /api/chat/rooms — 1:1 Direct Room 생성 (TASK-053에서 Group·Event 추가)

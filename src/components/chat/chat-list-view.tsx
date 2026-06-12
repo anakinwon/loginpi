@@ -152,12 +152,29 @@ function sortByPremiumFirst(rooms: RoomWithTheme[]): RoomWithTheme[] {
   })
 }
 
+// 카페 섹션 스켈레톤 — 목록 로딩 중에도 페이지 골격·마켓플레이스는 먼저 렌더된다
+function RoomListSkeleton() {
+  return (
+    <div className="space-y-2">
+      {[0, 1, 2].map((i) => (
+        <div
+          key={i}
+          className="bg-muted/40 h-16 animate-pulse rounded-xl border"
+        />
+      ))}
+    </div>
+  )
+}
+
 export function ChatListView({
   myRooms,
   discoverRooms,
+  roomsLoading = false,
 }: {
   myRooms: RoomWithTheme[]
   discoverRooms: RoomWithTheme[]
+  // Pi Browser 클라이언트 게이트가 목록 fetch 중일 때 true — 섹션 스켈레톤 표시
+  roomsLoading?: boolean
 }) {
   // 내 카페를 구독/일반 두 섹션으로 분리 (discover와 완전히 별도)
   const subscriptionRooms = myRooms.filter(
@@ -179,8 +196,16 @@ export function ChatListView({
         <GroupRoomCreator />
       </div>
 
+      {/* 목록 로딩 중 — 섹션 스켈레톤 (마켓플레이스는 아래에서 병렬 로드) */}
+      {roomsLoading && (
+        <section className="mb-8">
+          <SectionHeader label="내 카페" />
+          <RoomListSkeleton />
+        </section>
+      )}
+
       {/* 구독 카페 — PREMIUM 테마 방만 */}
-      {subscriptionRooms.length > 0 && (
+      {!roomsLoading && subscriptionRooms.length > 0 && (
         <section className="mb-8">
           <div className="mb-3 flex items-center gap-2">
             <SectionHeader label="구독 카페" />
@@ -193,7 +218,7 @@ export function ChatListView({
       )}
 
       {/* 일반 카페 — 비PREMIUM 내 방, PREMIUM 테마 먼저 정렬 */}
-      {(regularRooms.length > 0 || myRooms.length === 0) && (
+      {!roomsLoading && (regularRooms.length > 0 || myRooms.length === 0) && (
         <section className="mb-8">
           <SectionHeader label="일반 카페" />
           {myRooms.length === 0 ? (
@@ -212,7 +237,7 @@ export function ChatListView({
       )}
 
       {/* 공개 카페 탐색 — PREMIUM 테마 먼저 */}
-      {sortedDiscover.length > 0 && (
+      {!roomsLoading && sortedDiscover.length > 0 && (
         <section className="mb-8">
           <SectionHeader label="카페 탐색" />
           <PagedRoomList rooms={sortedDiscover} />
