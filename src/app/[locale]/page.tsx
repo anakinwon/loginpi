@@ -1,5 +1,4 @@
 import { StatsDashboard } from '@/components/admin/stats/stats-dashboard'
-import { AccountIntegrationSection } from '@/components/account-integration-section'
 
 export const metadata = { title: '통계 대시보드' }
 
@@ -13,7 +12,6 @@ export default function HomePage() {
         </p>
       </div>
       <StatsDashboard />
-      <AccountIntegrationSection />
     </div>
   )
 }

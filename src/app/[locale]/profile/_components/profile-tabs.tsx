@@ -8,6 +8,7 @@ import { PaymentHistory } from './payment-history'
 import { SubscriptionStatus } from './subscription-status'
 import { StoreItemList } from '@/components/store/store-item-list'
 import { LbsSettings } from './lbs-settings'
+import { AccountIntegrationSection } from '@/components/account-integration-section'
 import type { UserRow } from '@/lib/users'
 import type { LocaleOption } from '@/lib/locale-options'
 
@@ -50,11 +51,14 @@ export function ProfileTabs({ initialUser, localeOptions }: Props) {
       </div>
 
       {activeTab === 'info' && (
-        <ProfileForm
-          initialUser={user}
-          localeOptions={localeOptions}
-          onSaved={setUser}
-        />
+        <div className="space-y-8">
+          <AccountIntegrationSection />
+          <ProfileForm
+            initialUser={user}
+            localeOptions={localeOptions}
+            onSaved={setUser}
+          />
+        </div>
       )}
       {activeTab === 'payment' && <PaymentHistory />}
       {activeTab === 'subscr' && <SubscriptionStatus />}
