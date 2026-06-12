@@ -3,12 +3,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from '@/i18n/navigation'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
-import { AdminPagination } from '@/components/admin/admin-pagination'
+import { useInfiniteScroll } from '@/hooks/use-infinite-scroll'
 
 const PAGE_SIZE = 10
 
 // TASK-070: 카페 마켓플레이스 — 테마 필터 칩 + 인기 랭킹 + 테마 팔로우
 // 데이터는 클라이언트에서 piFetch로 로드 (Pi Browser X-Pi-Token 이중 경로 자동 지원)
+// 목록은 무한 스크롤 — PAGE_SIZE씩 노출하고 스크롤 끝 도달 시 추가 렌더 (성능 튜닝)
 
 interface MarketRoom {
   room_id: string
@@ -43,11 +44,11 @@ export function ChatMarketplace() {
   const [followed, setFollowed] = useState<Set<string>>(new Set())
   const [activeTheme, setActiveTheme] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
-  const [page, setPage] = useState(1)
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
 
   const load = useCallback(async (theme: string | null) => {
     setLoading(true)
-    setPage(1) // 테마 전환·재로드 시 첫 페이지로 리셋
+    setVisibleCount(PAGE_SIZE) // 테마 전환·재로드 시 첫 페이지 분량으로 리셋
     try {
       const qs = theme ? `?theme=${encodeURIComponent(theme)}` : ''
       const res = await piFetch(`/api/chat/marketplace${qs}`)
@@ -69,16 +70,20 @@ export function ChatMarketplace() {
     void load(null)
   }, [load])
 
-  const totalPages = Math.ceil(rooms.length / PAGE_SIZE)
-  const safePage = Math.min(page, Math.max(1, totalPages))
-  // 현재 페이지 슬라이스 + 전역 순위(rank) 부여 — 🥇🥈🥉는 전역 TOP 3에만 표시
+  // 앞에서부터 visibleCount개 노출 + 전역 순위(rank) 부여 — 🥇🥈🥉는 전역 TOP 3에만 표시
   const visibleRooms = useMemo(
     () =>
-      rooms
-        .slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE)
-        .map((room, i) => ({ room, rank: (safePage - 1) * PAGE_SIZE + i })),
-    [rooms, safePage],
+      rooms.slice(0, visibleCount).map((room, i) => ({ room, rank: i })),
+    [rooms, visibleCount],
   )
+  const hasMore = visibleCount < rooms.length
+
+  // 스크롤 끝 sentinel 도달 시 PAGE_SIZE만큼 추가 노출
+  const sentinelRef = useInfiniteScroll({
+    hasMore,
+    loading,
+    onLoadMore: () => setVisibleCount((c) => c + PAGE_SIZE),
+  })
 
   function selectTheme(theme: string | null) {
     setActiveTheme(theme)
@@ -215,13 +220,12 @@ export function ChatMarketplace() {
               </Link>
             ))}
           </div>
-          {totalPages > 1 && (
-            <div className="mt-3">
-              <AdminPagination
-                page={safePage}
-                totalPages={totalPages}
-                onPage={setPage}
-              />
+          {/* 무한 스크롤 sentinel — 뷰포트 진입 시 다음 분량 자동 로드 */}
+          {hasMore && (
+            <div ref={sentinelRef} className="flex justify-center py-3">
+              <span className="text-muted-foreground animate-pulse text-xs">
+                스크롤하여 더 보기…
+              </span>
             </div>
           )}
         </>

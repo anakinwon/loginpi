@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react'
 import { Link } from '@/i18n/navigation'
 import { GroupRoomCreator } from '@/components/chat/group-room-creator'
 import { ChatMarketplace } from '@/components/chat/chat-marketplace'
-import { AdminPagination } from '@/components/admin/admin-pagination'
+import { useInfiniteScroll } from '@/hooks/use-infinite-scroll'
 
 const PAGE_SIZE = 5
 
@@ -106,17 +106,21 @@ function SectionHeader({ label }: { label: string }) {
   )
 }
 
-// 5개씩 클라이언트 페이지네이션 — 섹션마다 독립적인 page 상태를 가진다.
-// 데이터는 호출부가 전부 로드해 두므로 추가 fetch 없이 슬라이스만 한다.
+// 무한 스크롤 룸 목록 — 섹션마다 독립적인 노출 개수 상태를 가진다.
+// 데이터는 호출부가 전부 로드해 두므로 추가 fetch 없이 스크롤 시 노출만 늘린다 (렌더 비용 절감).
 function PagedRoomList({ rooms }: { rooms: RoomWithTheme[] }) {
-  const [page, setPage] = useState(1)
-  const totalPages = Math.ceil(rooms.length / PAGE_SIZE)
-  // 목록이 줄어 현재 page가 범위를 벗어나면 마지막 페이지로 보정
-  const safePage = Math.min(page, Math.max(1, totalPages))
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const visible = useMemo(
-    () => rooms.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE),
-    [rooms, safePage],
+    () => rooms.slice(0, visibleCount),
+    [rooms, visibleCount],
   )
+  const hasMore = visibleCount < rooms.length
+
+  const sentinelRef = useInfiniteScroll({
+    hasMore,
+    loading: false,
+    onLoadMore: () => setVisibleCount((c) => c + PAGE_SIZE),
+  })
 
   return (
     <>
@@ -129,13 +133,11 @@ function PagedRoomList({ rooms }: { rooms: RoomWithTheme[] }) {
           />
         ))}
       </div>
-      {totalPages > 1 && (
-        <div className="mt-3">
-          <AdminPagination
-            page={safePage}
-            totalPages={totalPages}
-            onPage={setPage}
-          />
+      {hasMore && (
+        <div ref={sentinelRef} className="flex justify-center py-3">
+          <span className="text-muted-foreground animate-pulse text-xs">
+            스크롤하여 더 보기…
+          </span>
         </div>
       )}
     </>

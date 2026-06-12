@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react'
 import dynamic from 'next/dynamic'
 import { piFetch } from '@/lib/pi-fetch'
 import { themeLabel } from '@/lib/stats-labels'
+import { LazySection } from '@/components/lazy-section'
 import { StatsCard } from './stats-card'
 import { StatsDateFilter } from './stats-date-filter'
 import type {
@@ -180,9 +181,12 @@ export function StatsDashboard() {
     null,
   )
   const [loading, setLoading] = useState(true)
+  const [revLoading, setRevLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  // 매출 섹션이 뷰포트에 진입한 뒤에만 revenue API 호출 (스크롤 지연 로딩)
+  const [revVisible, setRevVisible] = useState(false)
 
-  const fetchData = useCallback(async (p: number) => {
+  const fetchActivity = useCallback(async (p: number) => {
     setLoading(true)
     setError(null)
     try {
@@ -193,17 +197,9 @@ export function StatsDashboard() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ondemand: true }),
       }).catch(() => {})
-      const [actRes, revRes] = await Promise.all([
-        piFetch(`/api/admin/stats/activity?period=${p}`),
-        piFetch(`/api/admin/stats/revenue?period=${p}`),
-      ])
-      if (!actRes.ok || !revRes.ok) throw new Error('데이터 조회 실패')
-      const [act, rev] = await Promise.all([
-        actRes.json() as Promise<ActivityStatsResponse>,
-        revRes.json() as Promise<RevenueStatsResponse>,
-      ])
-      setActivityData(act)
-      setRevenueData(rev)
+      const actRes = await piFetch(`/api/admin/stats/activity?period=${p}`)
+      if (!actRes.ok) throw new Error('데이터 조회 실패')
+      setActivityData((await actRes.json()) as ActivityStatsResponse)
     } catch (e) {
       setError(e instanceof Error ? e.message : '오류 발생')
     } finally {
@@ -211,9 +207,27 @@ export function StatsDashboard() {
     }
   }, [])
 
+  const fetchRevenue = useCallback(async (p: number) => {
+    setRevLoading(true)
+    try {
+      const revRes = await piFetch(`/api/admin/stats/revenue?period=${p}`)
+      if (!revRes.ok) throw new Error('데이터 조회 실패')
+      setRevenueData((await revRes.json()) as RevenueStatsResponse)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : '오류 발생')
+    } finally {
+      setRevLoading(false)
+    }
+  }, [])
+
   useEffect(() => {
-    fetchData(period)
-  }, [period, fetchData])
+    fetchActivity(period)
+  }, [period, fetchActivity])
+
+  // 매출 데이터는 섹션이 화면에 보일 때 최초 로드, 이후 기간 변경 시 갱신
+  useEffect(() => {
+    if (revVisible) fetchRevenue(period)
+  }, [revVisible, period, fetchRevenue])
 
   // 기간 내 가장 최신 데이터 포인트에서 DAU/WAU/MAU 추출
   const lastActivity = activityData?.series.at(-1)
@@ -233,7 +247,10 @@ export function StatsDashboard() {
       <div className="border-destructive/30 bg-destructive/5 rounded-lg border p-6 text-center">
         <p className="text-destructive text-sm">{error}</p>
         <button
-          onClick={() => fetchData(period)}
+          onClick={() => {
+            fetchActivity(period)
+            if (revVisible) fetchRevenue(period)
+          }}
           className="text-muted-foreground mt-2 text-sm underline"
         >
           다시 시도
@@ -284,13 +301,15 @@ export function StatsDashboard() {
           />
         </div>
 
-        {/* DAU/WAU/MAU 추이 차트 */}
+        {/* DAU/WAU/MAU 추이 차트 — 뷰포트 진입 시에만 Plotly 마운트 */}
         <div className="rounded-lg border p-4">
-          {activityData && activityData.series.length > 0 ? (
-            <DauWauMauChart data={activityData.series} />
-          ) : (
-            <div className="bg-muted h-64 animate-pulse rounded-lg" />
-          )}
+          <LazySection>
+            {activityData && activityData.series.length > 0 ? (
+              <DauWauMauChart data={activityData.series} />
+            ) : (
+              <div className="bg-muted h-64 animate-pulse rounded-lg" />
+            )}
+          </LazySection>
         </div>
 
         {/* Top-3 활성 사용자 */}
@@ -302,73 +321,92 @@ export function StatsDashboard() {
         </RankingCard>
       </section>
 
-      {/* ─── 매출 섹션 ───────────────────────────────── */}
+      {/* ─── 매출 섹션 — 스크롤 진입 시 데이터 로드 + 차트 마운트 ───── */}
       <section className="space-y-4">
         <h2 className="text-lg font-semibold">매출</h2>
 
-        {/* 매출 KPI 카드 — 총합 / 거래건수 / 구독 / 일반 */}
-        <div className="grid grid-cols-2 gap-3">
-          <StatsCard
-            label={`기간 총 매출 (${period}일)`}
-            value={totalRevPi.toFixed(4)}
-            unit="π"
-            loading={loading}
-          />
-          <StatsCard
-            label="기간 총 거래"
-            value={totalTxn}
-            unit="건"
-            loading={loading}
-          />
-          <StatsCard
-            label="구독 요금제 매출"
-            value={subscRevPi.toFixed(4)}
-            unit="π"
-            loading={loading}
-          />
-          <StatsCard
-            label="일반 요금제 매출"
-            value={genRevPi.toFixed(4)}
-            unit="π"
-            loading={loading}
-          />
-        </div>
-
-        {/* 매출 시계열 + 도넛 */}
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <div className="rounded-lg border p-4">
-            <p className="mb-2 text-sm font-medium">테마별 일별 매출</p>
-            {revenueData && revenueData.series.length > 0 ? (
-              <RevenueTimelineChart data={revenueData.series} />
-            ) : (
+        <LazySection
+          onVisible={() => setRevVisible(true)}
+          fallback={
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                {[0, 1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className="bg-muted h-20 animate-pulse rounded-lg"
+                  />
+                ))}
+              </div>
               <div className="bg-muted h-64 animate-pulse rounded-lg" />
-            )}
-          </div>
-          <div className="rounded-lg border p-4">
-            <p className="mb-2 text-sm font-medium">테마별 매출 비중</p>
-            {revenueData && revenueData.series.length > 0 ? (
-              <RevenueDonutChart data={revenueData.series} />
-            ) : (
-              <div className="bg-muted h-64 animate-pulse rounded-lg" />
-            )}
-          </div>
-        </div>
+            </div>
+          }
+        >
+          <div className="space-y-4">
+            {/* 매출 KPI 카드 — 총합 / 거래건수 / 구독 / 일반 */}
+            <div className="grid grid-cols-2 gap-3">
+              <StatsCard
+                label={`기간 총 매출 (${period}일)`}
+                value={totalRevPi.toFixed(4)}
+                unit="π"
+                loading={revLoading}
+              />
+              <StatsCard
+                label="기간 총 거래"
+                value={totalTxn}
+                unit="건"
+                loading={revLoading}
+              />
+              <StatsCard
+                label="구독 요금제 매출"
+                value={subscRevPi.toFixed(4)}
+                unit="π"
+                loading={revLoading}
+              />
+              <StatsCard
+                label="일반 요금제 매출"
+                value={genRevPi.toFixed(4)}
+                unit="π"
+                loading={revLoading}
+              />
+            </div>
 
-        {/* Top-3 지출자 + Top-3 테마 */}
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <RankingCard title={`Top 3 구매왕 (최근 ${period}일)`}>
-            <TopSpendersList
-              spenders={revenueData?.topSpenders ?? []}
-              loading={loading}
-            />
-          </RankingCard>
-          <RankingCard title={`Top 3 테마 매출 (최근 ${period}일)`}>
-            <TopThemesList
-              themes={revenueData?.topThemes ?? []}
-              loading={loading}
-            />
-          </RankingCard>
-        </div>
+            {/* 매출 시계열 + 도넛 */}
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+              <div className="rounded-lg border p-4">
+                <p className="mb-2 text-sm font-medium">테마별 일별 매출</p>
+                {revenueData && revenueData.series.length > 0 ? (
+                  <RevenueTimelineChart data={revenueData.series} />
+                ) : (
+                  <div className="bg-muted h-64 animate-pulse rounded-lg" />
+                )}
+              </div>
+              <div className="rounded-lg border p-4">
+                <p className="mb-2 text-sm font-medium">테마별 매출 비중</p>
+                {revenueData && revenueData.series.length > 0 ? (
+                  <RevenueDonutChart data={revenueData.series} />
+                ) : (
+                  <div className="bg-muted h-64 animate-pulse rounded-lg" />
+                )}
+              </div>
+            </div>
+
+            {/* Top-3 지출자 + Top-3 테마 */}
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <RankingCard title={`Top 3 구매왕 (최근 ${period}일)`}>
+                <TopSpendersList
+                  spenders={revenueData?.topSpenders ?? []}
+                  loading={revLoading}
+                />
+              </RankingCard>
+              <RankingCard title={`Top 3 테마 매출 (최근 ${period}일)`}>
+                <TopThemesList
+                  themes={revenueData?.topThemes ?? []}
+                  loading={revLoading}
+                />
+              </RankingCard>
+            </div>
+          </div>
+        </LazySection>
       </section>
     </div>
   )
