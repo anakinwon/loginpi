@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { useRouter } from '@/i18n/navigation'
@@ -9,6 +9,7 @@ import { piFetch } from '@/lib/pi-fetch'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { LbsConsentDialog } from '@/components/lbs/lbs-consent-dialog'
 
 interface ItemFormProps {
   serverAuthed?: boolean // 서버 getSessionUser() 확인 결과 (Google 쿠키 로그인 포함)
@@ -32,6 +33,45 @@ export function StoreItemForm({ serverAuthed = false, itemId }: ItemFormProps) {
   const [thumbnailUrl, setThumbnailUrl] = useState('')
   const [saving, setSaving] = useState(false)
   const [loadingItem, setLoadingItem] = useState(editMode)
+
+  // 판매 위치 (LBS) — 동의자만 GPS 수집해 상품에 저장 (Rule LBS-01)
+  const [lbsConsent, setLbsConsent] = useState<'Y' | 'N' | null>(null)
+  const [consentOpen, setConsentOpen] = useState(false)
+  const [lat, setLat] = useState<number | null>(null)
+  const [lng, setLng] = useState<number | null>(null)
+  const [locLoading, setLocLoading] = useState(false)
+
+  // 마운트 시 LBS 동의 여부 확인
+  useEffect(() => {
+    if (!authed) return
+    piFetch('/api/location/consent')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: { consent_yn?: string } | null) => {
+        setLbsConsent(d?.consent_yn === 'Y' ? 'Y' : 'N')
+      })
+      .catch(() => setLbsConsent('N'))
+  }, [authed])
+
+  // 현재 위치 수집 (동의자 전용)
+  const captureLocation = useCallback(() => {
+    if (!navigator.geolocation) {
+      toast.error('이 브라우저는 위치 서비스를 지원하지 않습니다')
+      return
+    }
+    setLocLoading(true)
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLat(pos.coords.latitude)
+        setLng(pos.coords.longitude)
+        setLocLoading(false)
+      },
+      () => {
+        toast.error('위치를 가져오지 못했습니다')
+        setLocLoading(false)
+      },
+      { timeout: 10000 },
+    )
+  }, [])
 
   // 수정 모드 — 기존 상품 값 로드
   useEffect(() => {
@@ -105,6 +145,8 @@ export function StoreItemForm({ serverAuthed = false, itemId }: ItemFormProps) {
       reg_qty: qty,
       thumbnail_url: thumbnailUrl.trim() || undefined,
       ...(status ? { item_st_cd: status } : {}),
+      // 판매 위치 — 등록 모드에서 동의자가 위치를 잡은 경우만 전송
+      ...(!editMode && lat !== null && lng !== null ? { lat, lng } : {}),
     }
 
     setSaving(true)
@@ -228,6 +270,45 @@ export function StoreItemForm({ serverAuthed = false, itemId }: ItemFormProps) {
         />
       </div>
 
+      {/* 판매 위치 — 등록 모드 전용. 동의자: GPS 수집, 미동의자: 동의 다이얼로그 (Rule LBS-01) */}
+      {!editMode && (
+        <div className="space-y-1.5">
+          <Label>📍 판매 위치</Label>
+          {lat !== null && lng !== null ? (
+            <div className="flex items-center gap-2 text-sm">
+              <span className="bg-muted rounded px-2 py-1 text-xs">
+                위치 등록됨 ({lat.toFixed(4)}, {lng.toFixed(4)})
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setLat(null)
+                  setLng(null)
+                }}
+                className="text-destructive text-xs underline"
+              >
+                해제
+              </button>
+            </div>
+          ) : (
+            <Button
+              type="button"
+              variant="outline"
+              disabled={locLoading || lbsConsent === null}
+              onClick={() =>
+                lbsConsent === 'Y' ? captureLocation() : setConsentOpen(true)
+              }
+            >
+              {locLoading ? '📍 위치 확인 중…' : '📍 현재 위치 등록'}
+            </Button>
+          )}
+          <p className="text-muted-foreground text-xs">
+            위치를 등록하면 구매자 목록에 거리로 표시되고 주변순 검색에
+            노출됩니다. (위치 서비스 동의자만)
+          </p>
+        </div>
+      )}
+
       <div className="flex gap-2 pt-2">
         {editMode ? (
           <Button onClick={() => submit()} disabled={saving} className="flex-1">
@@ -252,6 +333,16 @@ export function StoreItemForm({ serverAuthed = false, itemId }: ItemFormProps) {
           </>
         )}
       </div>
+
+      {/* 위치 서비스 동의 다이얼로그 — 미동의 판매자가 위치 등록 클릭 시 */}
+      <LbsConsentDialog
+        open={consentOpen}
+        onOpenChange={setConsentOpen}
+        onConsented={() => {
+          setLbsConsent('Y')
+          captureLocation()
+        }}
+      />
     </div>
   )
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getSessionUser } from '@/lib/auth-check'
+import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { listOpenItems, listMyItems, createItem } from '@/lib/mps-item'
 
 // GET /api/store/items — 공개 목록 (Guest 허용) | ?mine=1 — 내 상품 (인증)
@@ -60,6 +61,9 @@ const createSchema = z.object({
   reg_qty: z.number().int().min(1).max(9999).optional(),
   thumbnail_url: z.url().optional(),
   item_st_cd: z.enum(['DRAFT', 'OPEN']).optional(),
+  // 상품 판매 위치 — LBS 동의 판매자만 저장 (미동의 시 서버에서 제거)
+  lat: z.number().min(-90).max(90).optional(),
+  lng: z.number().min(-180).max(180).optional(),
 })
 
 // POST /api/store/items — 상품 등록 (판매자 인증)
@@ -84,6 +88,37 @@ export async function POST(req: NextRequest) {
   }
 
   const slug = String(user.display_name ?? 'user').slice(0, 20)
-  const item = await createItem(user.id, slug, parsed.data)
+
+  // 위치는 LBS 동의 판매자만 저장 (Rule LBS-01) — 미동의면 좌표 무시하고 등록 진행
+  const input = { ...parsed.data }
+  const hasLoc = input.lat !== undefined && input.lng !== undefined
+  const lbsConsented = user.lbs_consent_yn === 'Y'
+  if (hasLoc && !lbsConsented) {
+    delete input.lat
+    delete input.lng
+  }
+
+  const item = await createItem(user.id, slug, input)
+
+  // 위치 이력 기록 (loc_tp_cd=04 상품거래, ref_id=item_id) — 실패해도 등록은 유지
+  if (hasLoc && lbsConsented) {
+    await getSupabaseAdmin()
+      .from('usr_loc_hist')
+      .insert({
+        user_str_id: user.id,
+        loc_tp_cd: '04',
+        lat: input.lat,
+        lng: input.lng,
+        ref_id: item.item_id,
+        consent_yn: 'Y',
+        consent_dtm: new Date().toISOString(),
+        regr_id: slug,
+        modr_id: slug,
+      })
+      .then(({ error }) => {
+        if (error) console.error('상품 위치 이력 기록 실패:', error.message)
+      })
+  }
+
   return NextResponse.json({ item }, { status: 201 })
 }

@@ -21,6 +21,8 @@ export interface MpsItem {
   reg_qty: number
   ordered_qty: number
   stock_qty: number
+  lat: number | null
+  lng: number | null
   reg_dtm: string
   mod_dtm: string
 }
@@ -48,6 +50,9 @@ export interface CreateItemInput {
   reg_qty?: number
   thumbnail_url?: string
   item_st_cd?: 'DRAFT' | 'OPEN'
+  // 상품 판매 위치 (LBS 동의 판매자만 — route에서 동의 검증 후 전달)
+  lat?: number
+  lng?: number
 }
 
 const SORT_MAP = {
@@ -101,16 +106,16 @@ type ItemWithShop = MpsItem & {
   mps_shop?: { shop_id: string; lat: number | null; lng: number | null } | null
 }
 
-// 매장 좌표 기준 사용자와의 거리(km, 소수 1자리) — 좌표 없는 상품은 null
+// 사용자와의 거리(km, 소수 1자리) — 상품 개별 좌표 우선, 없으면 매장 좌표 폴백
 function calcDistanceKm(
   r: ItemWithShop,
   uLat: number,
   uLng: number,
 ): number | null {
-  const shopLat = r.mps_shop?.lat ?? null
-  const shopLng = r.mps_shop?.lng ?? null
-  return shopLat !== null && shopLng !== null
-    ? Math.round(haversineKm(uLat, uLng, shopLat, shopLng) * 10) / 10
+  const itemLat = r.lat ?? r.mps_shop?.lat ?? null
+  const itemLng = r.lng ?? r.mps_shop?.lng ?? null
+  return itemLat !== null && itemLng !== null
+    ? Math.round(haversineKm(uLat, uLng, itemLat, itemLng) * 10) / 10
     : null
 }
 
@@ -284,6 +289,8 @@ export async function createItem(
       shop_id: input.shop_id ?? null,
       item_st_cd: input.item_st_cd ?? 'DRAFT',
       thumbnail_url: input.thumbnail_url ?? null,
+      lat: input.lat ?? null,
+      lng: input.lng ?? null,
       reg_qty: regQty,
       ordered_qty: 0,
       stock_qty: regQty, // 불변 조건: reg_qty - 0
