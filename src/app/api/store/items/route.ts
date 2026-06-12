@@ -19,15 +19,32 @@ export async function GET(req: NextRequest) {
   }
 
   const sortParam = sp.get('sort')
+  const latParam = sp.get('lat')
+  const lngParam = sp.get('lng')
+
+  // sort=distance 요청 시 사용자 동의 확인 (Rule LBS-04)
+  let userLat: number | undefined
+  let userLng: number | undefined
+  if (sortParam === 'distance' && latParam && lngParam) {
+    const user = await getSessionUser()
+    if (user?.lbs_consent_yn === 'Y') {
+      userLat = parseFloat(latParam)
+      userLng = parseFloat(lngParam)
+    }
+  }
+
   const result = await listOpenItems({
     ctgrId: sp.get('ctgr') ?? undefined,
     keyword: sp.get('q') ?? undefined,
     cndCd: sp.get('cnd') ?? undefined,
-    sort: (['latest', 'price_asc', 'price_desc', 'views'] as const).find(
+    sort: (['latest', 'price_asc', 'price_desc', 'views', 'distance'] as const).find(
       (s) => s === sortParam,
     ),
     page: Number(sp.get('page')) || 1,
     limit: Number(sp.get('limit')) || 20,
+    userLat,
+    userLng,
+    radiusKm: sp.get('radius') ? Number(sp.get('radius')) : undefined,
   })
   return NextResponse.json(result)
 }

@@ -26,6 +26,10 @@ export interface UserRow {
   self_intro: string | null
   // 마이그레이션 025 — 최근 로그인 일시 (도입 이전 사용자는 null)
   last_login_dtm: string | null
+  // 마이그레이션 033 — LBS 위치기반서비스 동의 (Phase 15)
+  lbs_consent_yn: string | null
+  lbs_consent_dtm: string | null
+  lbs_consent_ver: string | null
   reg_dtm: string
   mod_dtm: string
 }

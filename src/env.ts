@@ -21,12 +21,14 @@ export const env = createEnv({
     TURN_HOST: z.string().optional(),
     TURN_SECRET: z.string().optional(),
     TURN_CREDENTIAL_TTL: z.coerce.number().optional(),
+    GOOGLE_MAPS_API_KEY: z.string().optional(),
   },
   client: {
     NEXT_PUBLIC_APP_URL: z.string().url(),
     NEXT_PUBLIC_PI_SANDBOX: z.enum(['true', 'false']).optional(),
     NEXT_PUBLIC_SUPABASE_URL: z.string().url().optional(),
     NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: z.string().optional(),
+    NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: z.string().optional(),
   },
   runtimeEnv: {
     PI_SESSION_SECRET: process.env.PI_SESSION_SECRET,
@@ -43,11 +45,13 @@ export const env = createEnv({
     TURN_HOST: process.env.TURN_HOST,
     TURN_SECRET: process.env.TURN_SECRET,
     TURN_CREDENTIAL_TTL: process.env.TURN_CREDENTIAL_TTL,
+    GOOGLE_MAPS_API_KEY: process.env.GOOGLE_MAPS_API_KEY,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_PI_SANDBOX: process.env.NEXT_PUBLIC_PI_SANDBOX,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:
       process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+    NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
   },
   emptyStringAsUndefined: true,
 })

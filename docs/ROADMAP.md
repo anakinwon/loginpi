@@ -2,8 +2,8 @@
 
 Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Network 앱 플랫폼
 
-> **기준일**: 2026-06-11
-> **현재 버전**: Phase 7·8·9·10·11 완료 (PiCafé MVP · Pi 수익화 · 생태계 확장 · 사용자 프로필 · 통계 대시보드) · Phase 12 PiTranslate™ MVP 완료 (TASK-090~097 ✅ · 098~099 대기) · **Phase 13 MyPiShop(MPS) 준비중 (TASK-100~113)** · **Phase 14 PiVoice™ 음성통화 설계 완료 (TASK-120~123, `docs/PRD_9_VOICE_CHAT.md`)**
+> **기준일**: 2026-06-12
+> **현재 버전**: Phase 7·8·9·10·11 완료 (PiCafé MVP · Pi 수익화 · 생태계 확장 · 사용자 프로필 · 통계 대시보드) · Phase 12 PiTranslate™ MVP 완료 (TASK-090~097 ✅ · 098~099 대기) · **Phase 13 MyPiShop(MPS) 준비중 (TASK-100~113)** · **Phase 14 PiVoice™ 음성통화 설계 완료 (TASK-120~123, `docs/PRD_9_VOICE_CHAT.md`)** · **Phase 15 LBS P1 주변탐색 완료 (TASK-130~133·135·136·137·138·139 ✅)**
 > **배포 URL**: https://loginpi.vercel.app
 > **기술 스택**: Next.js 16 App Router · React 19 · TypeScript 6 · Tailwind CSS v4 · NextAuth.js · Supabase PostgreSQL
 
@@ -1049,6 +1049,91 @@ if (meta?.type === 'CHAT_SUBSCR') {
 
 ---
 
+## Phase 15: LBS 위치기반서비스 🚧 (P0 MVP 구현 완료)
+
+> **목표**: 동의 기반 위치 수집 + 주변 탐색 + MPS 직거래 거리 표시로 거래 성사율 향상
+> **상세 스펙**: `docs/PRD_10_GPS.md` (v1.2) | **담당 에이전트**: `.claude/agents/gps/lbs-consulting-architect.md`
+> **핵심 결정**: ① 동의 게이트 = `lbs_consent_yn` 컬럼 기반 이중 제어(UI + API 403) ② 거리 계산 = Haversine SQL(PostGIS 불필요) ③ mps_shop.lat/lng 재활용(이중 저장 금지) ④ 법적 근거 = `docs/law/agreement/위치기반서비스이용약관...kor.md`
+
+### TASK-130: DB 마이그레이션 `sql/033_lbs.sql` ✅
+
+- ✅ `sys_user_consent` — 동의 이력 (`consent_tp_cd`: 'LBS'/'MKT'/'PUSH', 6개월 보관 의무, client_ip/user_agent 감사 로그)
+- ✅ `usr_loc_hist` — 위치 수집 이력 (`loc_tp_cd`: '01'가입/'02'로그인/'03'매장/'04'상품, `lat DECIMAL(10,8)`, `lng DECIMAL(11,8)`, `ref_id`)
+- ✅ `sys_user` 컬럼 추가: `lbs_consent_yn CHAR(1) DEFAULT 'N'`, `lbs_consent_dtm TIMESTAMPTZ`, `lbs_consent_ver TEXT`
+- ✅ `fn_haversine_km(lat1, lng1, lat2, lng2)` DB 함수 — Haversine 거리 계산 (PostGIS 불필요)
+- ✅ DA 표준: 시스템 컬럼 4개 + del_yn/del_dtm + `-- DA-APPROVED:` 주석
+- ✅ `src/lib/users.ts` `UserRow` 타입에 lbs_* 컬럼 추가
+
+### TASK-131: 환경변수 + Google Maps API 설정 ✅
+
+- ✅ `src/env.ts` + `.env.example` — `GOOGLE_MAPS_API_KEY`(서버 전용), `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`(지도 뷰 클라이언트)
+- ✅ Geocoding/Reverse Geocoding/Places API — 서버 API Route에서만 호출 (클라이언트 직접 호출 금지)
+
+### TASK-132: 동의 API (`/api/location/consent` GET/POST/DELETE) ✅
+
+- ✅ GET — 현재 동의 상태 조회 (`sys_user.lbs_consent_yn`)
+- ✅ POST — 동의 등록: `sys_user.lbs_consent_yn='Y'` + `sys_user_consent` INSERT (client_ip/user_agent 감사 로그)
+- ✅ DELETE — 동의 철회: `lbs_consent_yn='N'` + `usr_loc_hist.del_yn='Y'` 즉시 파기 (Rule LBS-03, 위치정보법 제5조)
+
+### TASK-133: 위치 저장 API (`POST /api/location/save`) ✅
+
+- ✅ 미동의 시 403 즉시 반환 (Rule LBS-02 서버 재검증)
+- ✅ WGS84 좌표 범위 검증 (lat -90~90, lng -180~180)
+- ✅ loc_tp_cd 분기: '01'(가입) / '02'(로그인) / '03'(매장) / '04'(상품거래)
+- ✅ `piFetch()` 사용 — X-Pi-Token 헤더 이중 경로 지원
+
+### TASK-134: Google Maps 서버 프록시 API 🔜
+
+- 🔜 `POST /api/location/geocode` — 주소 → 좌표 (서버에서만 호출, GOOGLE_MAPS_API_KEY 보호)
+- 🔜 `POST /api/location/reverse-geocode` — 좌표 → 주소 + 행정구역 파싱
+
+### TASK-135: 주변 탐색 API (`/api/location/nearby/*`) ✅
+
+- ✅ `GET /api/location/nearby/rooms?lat=&lng=&radius=` — 주변 채팅방 (Haversine + `usr_loc_hist` 채팅방 위치)
+- ✅ `GET /api/location/nearby/shops?lat=&lng=&radius=` — 주변 MPS 매장 (`mps_shop.lat/lng` 활용)
+- ✅ `GET /api/location/history` — 내 위치 이력 열람 (위치정보법 제16조 정보주체 열람권, 최근 50건)
+- ✅ Rule LBS-01: 미동의 사용자 403 반환
+
+### TASK-136: MPS 상품 목록 거리 표시 (Rule LBS-04) ✅
+
+> **직거래 핵심**: MPS는 배송 없음 → 거리 = 구매 가능성 판단 기준
+
+- ✅ `/api/store/items` 파라미터 확장: `?lat=&lng=&radius=&sort=distance`
+- ✅ 상품 위치 소스: `mps_shop.lat/lng` — mps_shop JOIN + JS Haversine 계산 (초기 MVP)
+- ✅ 동의 확인: sort=distance 요청 시 서버에서 `lbs_consent_yn='Y'` 재검증 (미동의 시 위치 파라미터 무시)
+- ✅ 거리 기준 오름차순 정렬 + 반경(기본 10km) 필터
+- ✅ `mps-item.ts` `ItemListFilter`에 `userLat/userLng/radiusKm` 추가
+- ✅ `haversineKm()` 유틸 함수 추가 (6371km 지구 반지름)
+
+### TASK-137: 클라이언트 동의 플로우 UI ✅
+
+- ✅ `LbsConsentDialog` — @base-ui/react 기반 동의 다이얼로그 (약관 요약 + 목적 + 전문 링크)
+- ✅ `store-item-list.tsx` 미동의 CTA 버튼 — `lbsConsent === 'N'`일 때 `📍 주변순` 클릭 시 다이얼로그 오픈
+- ✅ 동의 완료 시 `setLbsConsent('Y')` 업데이트 → GPS 즉시 요청 → `sort='distance'` 자동 전환
+- ✅ `lbs-settings.tsx` 마이페이지 위치 서비스 탭 — 동의 상태 카드 + 이력 열람 (LbsConsentDialog 통합)
+- ✅ `profile-tabs.tsx` `📍 위치 서비스` 탭 추가
+
+### TASK-138: MPS 상품 카드 거리 UI + 반경 필터 UI ✅
+
+- ✅ `store-item-list.tsx` — LBS 동의 여부 조회 + GPS 위치 수집 + 거리순 정렬 버튼 (동의자만 노출, Rule LBS-01)
+- ✅ 상품 카드 우하단 거리 배지 `📍 xxx m / x.x km` (동의자 + distance_km 있는 경우만, Rule LBS-04)
+- ✅ `formatDistance(km)`: 1km 미만 → `"xxx m"`, 이상 → `"x.x km"`
+- ✅ 거리순 활성화 표시 바 + "해제" 버튼 → sort='latest' 복귀
+- ✅ 위치 없는 경우 "주변 10km 내 상품이 없습니다" 메시지
+
+### TASK-139: `touchLastLogin()` 연동 + Pi Browser GPS 검증 ✅
+
+- ✅ `pi-auth-provider.tsx` `signIn()` — 기존 세션 복원·신규 로그인 완료 시 `saveLoginLocation()` side-effect 호출
+- ✅ `saveLoginLocation()` — GPS `getCurrentPosition()` → `POST /api/location/save` (`loc_tp_cd='02'`) fire-and-forget
+- ✅ 미동의(403) 포함 모든 실패 무시 — 서비스 차단 없음 (Rule LBS-02 서버 재검증)
+- 🔜 GPS 실패 시 서비스 차단 없음 → 위치 저장만 스킵, 나머지 기능 정상
+
+> **P0 완료 = LBS MVP**: TASK-130 → 131 → 132 → 133 → 136 → 138 ✅ (동의 게이트 + MPS 거리 표시)
+> **P1 완료 (주변 탐색)**: TASK-135 → 137 → 139 ✅ (주변 채팅방·매장 API + 동의 UI + 로그인 위치 저장)
+> **TASK-134 보류**: Google Maps API Key 필요 (geocode/reverse-geocode 서버 프록시)
+
+---
+
 ## 마일스톤 요약
 
 | 마일스톤 | Phase | 완료일 | 주요 산출물 | 상태 |
@@ -1078,6 +1163,7 @@ if (meta?.type === 'CHAT_SUBSCR') {
 | M21: PiTranslate™ MVP | Phase 12 | 2026-06-10 | sql/020 + chat-translate.ts + dedup + translate API + broadcast 확장 + 표시언어 설정 + 원문 토글 (TASK-090~097) | ✅ 완료 |
 | M22: MyPiShop(MPS) Phase 1 MVP | Phase 13 | — | sql/029_mps.sql (mps_ 6개 테이블) + lib 헬퍼 3종 + 상품·주문·에스크로 API 12종 + 화면 6종 (TASK-100~107) | 🔜 준비중 |
 | M23: PiVoice™ 1:1 음성 통화 | Phase 14 | — | sql/024 (msg_call_log·quality_stat) + TURN 발급 + 시그널링/통화 API + use-webrtc-call 훅 + 통화 UI (TASK-120~123) | 🔜 설계 완료 |
+| M24: LBS P0+P1 MVP | Phase 15 | 2026-06-12 | sql/033_lbs.sql (sys_user_consent·usr_loc_hist·fn_haversine_km) + 동의 API(GET/POST/DELETE) + 위치저장 API + 주변탐색 API(rooms/shops/history) + MPS 거리 표시 + 동의 다이얼로그 CTA + 로그인 위치 저장 (TASK-130~133·135~139) | ✅ 완료 |
 
 ---
 
@@ -1141,4 +1227,7 @@ if (meta?.type === 'CHAT_SUBSCR') {
 | v5.1 | 2026-06-11 | Phase 9 PiCafé 생태계 완료 — TASK-070~074 전체 구현. `sql/022_chat_ecosystem.sql`(msg_theme_follow·msg_bet·msg_bet_optn·msg_bet_entry·msg_webhook + fn_chat_marketplace·fn_room_analytics·fn_room_mau RPC). 마켓플레이스(테마 필터+가중 랭킹+팔로우), Pi Bet(생성·U2A 참가·균등 분배 정산·BET_NOTI), Webhook·봇(API Key 인증·메시지 push·어드민 현황), 분석 대시보드(일별 통계+MAU+plotly), 커스텀 스티커(ownr_usr_id·mkt_yn·노출 규칙). **msg_msg CHECK AI_REPLY 누락 버그 수정**. M18 달성. tsc·lint(0 errors)·build 통과. | anakin |
 | v5.0 | 2026-06-11 | Phase 8 수익화 전체 완료 현행화 — TASK-060~065 전체 🔜→✅. Pi Tip(`/api/tips` + `pi-tip-button.tsx`), 스티커 마켓(`sticker-picker.tsx` + `/api/stickers/packs`), 인라인 트리거 8종(Trigger 1~8 전체 구현 — 배지 시스템·이벤트방 알림 포함), 이벤트 카페(이벤트방 탭 다이얼로그 + `room_tp_cd='E'` API), AI 어시스턴트(`@ai` 멘션→Anthropic API→`AI_REPLY`), 파일·이미지·음성 메시지(Supabase Storage + IMAGE/VOICE/FILE 타입). Phase 11 후속 고도화 섹션 추가 — DAU/WAU/MAU 통계 버그 4건(activity-log lazy thenable·Vercel Cron GET·슬라이딩 윈도우·오늘 온디맨드), Top3 가중치 점수제(활동일수×0.2 + 콘텐츠×0.3 + 결제×0.5). M16·M17 ✅ 완료 처리. 기준일·버전 헤더 갱신. | anakin |
 | v5.3 | 2026-06-11 | 마이그레이션 번호 충돌 정리 — TASK-100 MPS `sql/021_mps.sql`→`sql/029_mps.sql`(021은 msg_usr_badge 점유), TASK-120 PiVoice `sql/024_voice_call.sql`→`sql/026_voice_call.sql`(024는 sys_batch_log 점유). M22 마일스톤 파일명 동기화, `PRD_9_VOICE_CHAT.md` 파일명 참조 갱신, `PRD_8_MPS.md` 헤더 버전 v1.0→v1.1 불일치 해소. 어드민 배치 실행 이력(`sys_batch_log` + `/api/admin/batch/logs` + 이력 테이블 UI)·결제 내역 테마 컬럼(통계와 동일 분류 규칙) 추가 반영. | anakin |
+| v5.5 | 2026-06-12 | Phase 15 LBS 위치기반서비스 로드맵 추가 — `docs/PRD_10_GPS.md` v1.2 수용. 동의 게이트 Rule LBS-01~04(UI·API·철회·MPS 거리), `sql/030_lbs.sql`(sys_user_consent·usr_loc_hist·sys_user 컬럼 3개), Google Maps API 서버 프록시, Haversine SQL 거리 계산, `/api/store/items` 거리 파라미터 확장(Rule LBS-04). TASK-130~139. M24 마일스톤 추가. 헤더 현재 버전 갱신. `PRD.md` v9.0 통합(섹션 16 신설). | anakin |
+| v5.6 | 2026-06-12 | **Phase 15 LBS P0 MVP 구현** — TASK-130~133·136·138 완료. `sql/033_lbs.sql`(sys_user_consent·usr_loc_hist·fn_haversine_km·sys_user 컬럼 3개·DA-APPROVED), `src/env.ts`·`.env.example`(GOOGLE_MAPS_API_KEY·NEXT_PUBLIC_GOOGLE_MAPS_API_KEY), `/api/location/consent`(GET/POST/DELETE — 동의 등록·철회·즉시파기 Rule LBS-03), `/api/location/save`(동의 서버 재검증 Rule LBS-02), `mps-item.ts` haversineKm() + sort=distance 확장, `store-item-list.tsx` GPS 위치 수집 + 📍 거리 배지(Rule LBS-04). tsc(0 errors) 통과. | anakin |
+| v5.7 | 2026-06-12 | **Phase 15 LBS P1 주변탐색 완료** — TASK-135·137·139 완료. `/api/location/nearby/rooms`(방 생성자 최근 위치 기반 Haversine)·`/api/location/nearby/shops`(mps_shop.lat/lng 활용)·`/api/location/history`(열람권 50건), `lbs-consent-dialog.tsx`(동의 다이얼로그·약관 요약+전문링크), `store-item-list.tsx` `LbsConsentDialog` 통합(미동의 CTA 버튼 → 동의 후 GPS 즉시 요청), `lbs-settings.tsx`+`profile-tabs.tsx`(마이페이지 위치 서비스 탭), `pi-auth-provider.tsx` `saveLoginLocation()` side-effect(로그인 완료 시 `loc_tp_cd='02'` fire-and-forget). M24 ✅ 달성. tsc(0 errors) 통과. | anakin |
 | v5.4 | 2026-06-11 | **Phase 13 MyPiShop(MPS) Phase 1 MVP 1차 구현** — TASK-100~107 🔜→✅. `sql/029_mps.sql`(mps_ 6개 테이블 + fn_mps_order_create/fn_mps_order_cancel 원자적 재고 RPC, Supabase 적용), lib 3종(mps-item·mps-order·mps-shop), 상품 API(/api/store/items CRUD + 검색·필터·정렬), 주문 API(생성·취소·confirm·release + 당사자 403), 에스크로는 기존 `/api/payments/complete`에 `MPS_ESCROW` 분기 통합(PENDING→ESCROW + ESCROW_IN 이력 + 금액 서버 재검증), UI 6페이지(/store 목록·상세·my/items·new·sales·orders — usePiAuth 클라이언트 게이트, redirect 금지), store 번역 ko/en. tsc·lint(0 errors) 통과. **후속**: 이미지 업로드(Storage)·상품 수정 폼·SELLER_DONE 자동 DONE cron·실 Pi 정산(A2U)·Pi Browser 실기기 결제 검증. | anakin |

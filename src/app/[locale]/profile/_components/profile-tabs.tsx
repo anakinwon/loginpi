@@ -7,6 +7,7 @@ import { ProfileForm } from './profile-form'
 import { PaymentHistory } from './payment-history'
 import { SubscriptionStatus } from './subscription-status'
 import { StoreItemList } from '@/components/store/store-item-list'
+import { LbsSettings } from './lbs-settings'
 import type { UserRow } from '@/lib/users'
 import type { LocaleOption } from '@/lib/locale-options'
 
@@ -15,6 +16,7 @@ const TABS = [
   { id: 'payment', label: '결제 내역' },
   { id: 'subscr', label: '구독 현황' },
   { id: 'store', label: '🛍️ 스토어' },
+  { id: 'lbs', label: '📍 위치 서비스' },
 ] as const
 
 type TabId = (typeof TABS)[number]['id']
@@ -57,6 +59,7 @@ export function ProfileTabs({ initialUser, localeOptions }: Props) {
       {activeTab === 'payment' && <PaymentHistory />}
       {activeTab === 'subscr' && <SubscriptionStatus />}
       {activeTab === 'store' && <StoreTab />}
+      {activeTab === 'lbs' && <LbsSettings />}
     </div>
   )
 }

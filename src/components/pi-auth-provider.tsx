@@ -10,7 +10,7 @@ import {
   useState,
 } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { setPiToken, clearPiToken } from '@/lib/pi-fetch'
+import { setPiToken, clearPiToken, piFetch } from '@/lib/pi-fetch'
 import type { PiSessionUser } from '@/types/pi-session'
 
 export type { PiSessionUser }
@@ -41,6 +41,26 @@ function detectSandbox(): boolean {
     if (hostname === 'localhost' || hostname === '127.0.0.1') return true
   }
   return process.env.NEXT_PUBLIC_PI_SANDBOX === 'true'
+}
+
+// 로그인 완료 시 위치 저장 side-effect (Rule LBS-02: 서버에서 동의 여부 재검증 → 미동의 시 403 무시)
+function saveLoginLocation() {
+  if (typeof navigator === 'undefined' || !navigator.geolocation) return
+  navigator.geolocation.getCurrentPosition(
+    ({ coords }) => {
+      piFetch('/api/location/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          lat: coords.latitude,
+          lng: coords.longitude,
+          loc_tp_cd: '02',
+        }),
+      }).catch(() => {})
+    },
+    () => {},
+    { timeout: 8000 },
+  )
 }
 
 async function onIncompletePayment(payment: PaymentDTO) {
@@ -155,6 +175,7 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
       const next = isSafeNext(rawNext) ? rawNext : null
       if (existing) {
         setUser(existing)
+        saveLoginLocation()
         if (next) {
           // 쿠키 있음 + next 파라미터 → 목적지로 바로 이동 (전체 페이지 이동으로 쿠키 전달 보장)
           window.location.assign(next)
@@ -183,6 +204,7 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
       const data = (await res.json()) as { user: PiSessionUser; token?: string }
       if (data.token) setPiToken(data.token)
       setUser(data.user)
+      saveLoginLocation()
 
       if (next) {
         // 목적지로 클라이언트 라우팅(풀 리로드 없음 → 무한 루프 불가).

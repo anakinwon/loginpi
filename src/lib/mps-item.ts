@@ -29,9 +29,13 @@ export interface ItemListFilter {
   ctgrId?: string
   keyword?: string
   cndCd?: string
-  sort?: 'latest' | 'price_asc' | 'price_desc' | 'views'
+  sort?: 'latest' | 'price_asc' | 'price_desc' | 'views' | 'distance'
   page?: number
   limit?: number
+  // LBS 거리 필터 (Rule LBS-04 — 동의자 전용, 클라이언트에서 동의 확인 후 전달)
+  userLat?: number
+  userLng?: number
+  radiusKm?: number
 }
 
 export interface CreateItemInput {
@@ -52,6 +56,18 @@ const SORT_MAP = {
   price_desc: { column: 'price_pi', ascending: false },
   views: { column: 'view_cnt', ascending: false },
 } as const
+
+function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371
+  const dLat = ((lat2 - lat1) * Math.PI) / 180
+  const dLon = ((lng2 - lng1) * Math.PI) / 180
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) ** 2
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+}
 
 // 진행 중 주문 상태 — 재고를 선점하고 아직 종결되지 않은 주문 (거래중 표시 기준)
 const ACTIVE_ORDER_STS = [
@@ -86,11 +102,16 @@ export async function listOpenItems(filter: ItemListFilter) {
   const db = getSupabaseAdmin()
   const limit = Math.min(filter.limit ?? 20, 50)
   const page = Math.max(filter.page ?? 1, 1)
-  const sort = SORT_MAP[filter.sort ?? 'latest']
+  const useDistance =
+    filter.sort === 'distance' &&
+    filter.userLat !== undefined &&
+    filter.userLng !== undefined
 
   let q = db
     .from('mps_item')
-    .select('*', { count: 'exact' })
+    .select(useDistance ? '*, mps_shop(shop_id, lat, lng)' : '*', {
+      count: useDistance ? undefined : 'exact',
+    })
     .eq('del_yn', 'N')
     .in('item_st_cd', ['OPEN', 'SOLD'])
 
@@ -101,13 +122,51 @@ export async function listOpenItems(filter: ItemListFilter) {
     q = q.or(`item_nm.ilike.%${kw}%,item_desc.ilike.%${kw}%`)
   }
 
+  // 거리 정렬: 전체 조회 후 JS에서 Haversine 계산 → 반경 필터 → 거리순 정렬 → 페이지네이션
+  if (useDistance) {
+    const { data, error } = await q.order('reg_dtm', { ascending: false })
+    if (error) throw new Error(error.message)
+
+    const uLat = filter.userLat!
+    const uLng = filter.userLng!
+    const radius = filter.radiusKm ?? 10
+
+    type ItemWithShop = MpsItem & {
+      mps_shop?: { shop_id: string; lat: number | null; lng: number | null } | null
+    }
+    const withDist = (data as unknown as ItemWithShop[])
+      .map((r) => {
+        const shopLat = r.mps_shop?.lat ?? null
+        const shopLng = r.mps_shop?.lng ?? null
+        const distance_km =
+          shopLat !== null && shopLng !== null
+            ? Math.round(haversineKm(uLat, uLng, shopLat, shopLng) * 10) / 10
+            : null
+        const { mps_shop: _, ...item } = r
+        return { ...item, distance_km }
+      })
+      .filter((r) => r.distance_km !== null && r.distance_km <= radius)
+      .sort((a, b) => (a.distance_km ?? Infinity) - (b.distance_km ?? Infinity))
+
+    const total = withDist.length
+    const sliced = withDist.slice((page - 1) * limit, page * limit)
+    const tradingCounts = await getTradingCounts(sliced.map((r) => r.item_id))
+    const items = sliced.map((r) => ({
+      ...r,
+      trading_cnt: tradingCounts.get(r.item_id) ?? 0,
+    }))
+    return { items, total, page, limit }
+  }
+
+  const sortKey = (filter.sort ?? 'latest') in SORT_MAP ? (filter.sort as keyof typeof SORT_MAP) : 'latest'
+  const sort = SORT_MAP[sortKey]
   const { data, count, error } = await q
     .order(sort.column, { ascending: sort.ascending })
     .range((page - 1) * limit, page * limit - 1)
 
   if (error) throw new Error(error.message)
 
-  const rows = (data ?? []) as MpsItem[]
+  const rows = (data ?? []) as unknown as MpsItem[]
   const tradingCounts = await getTradingCounts(rows.map((r) => r.item_id))
   const items = rows.map((r) => ({
     ...r,
