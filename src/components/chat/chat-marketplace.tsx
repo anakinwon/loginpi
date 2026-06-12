@@ -95,8 +95,7 @@ export function ChatMarketplace() {
 
   // 앞에서부터 visibleCount개 노출 + 전역 순위(rank) 부여 — 🥇🥈🥉는 전역 TOP 3에만 표시
   const visibleRooms = useMemo(
-    () =>
-      rooms.slice(0, visibleCount).map((room, i) => ({ room, rank: i })),
+    () => rooms.slice(0, visibleCount).map((room, i) => ({ room, rank: i })),
     [rooms, visibleCount],
   )
   const hasMore = visibleCount < rooms.length
@@ -139,9 +138,13 @@ export function ChatMarketplace() {
   }
 
   return (
-    <section>
+    <section className="bg-muted/30 rounded-2xl p-4 sm:p-5">
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-muted-foreground text-sm font-semibold tracking-wider uppercase">
+        <h2 className="flex items-center gap-2 text-lg font-bold">
+          <span
+            className="bg-primary h-5 w-1 shrink-0 rounded-full"
+            aria-hidden
+          />
           마켓플레이스 — 인기 카페
         </h2>
       </div>
@@ -190,7 +193,7 @@ export function ChatMarketplace() {
       )}
 
       {loading ? (
-        <div className="space-y-2">
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {[0, 1, 2].map((i) => (
             <div
               key={i}
@@ -206,12 +209,12 @@ export function ChatMarketplace() {
         </div>
       ) : (
         <>
-          <div className="space-y-2">
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {visibleRooms.map(({ room, rank }) => (
               <Link
                 key={room.room_id}
                 href={`/chat/${room.room_id}`}
-                className="hover:bg-muted/50 flex items-center gap-3 rounded-xl border p-3 transition-colors"
+                className="bg-card hover:bg-muted/50 flex items-center gap-3 rounded-xl border p-3 transition-colors"
               >
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center text-3xl select-none">
                   {room.theme_emoji}

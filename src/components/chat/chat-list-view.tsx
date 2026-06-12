@@ -7,7 +7,8 @@ import { GroupRoomCreator } from '@/components/chat/group-room-creator'
 import { ChatMarketplace } from '@/components/chat/chat-marketplace'
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll'
 
-const PAGE_SIZE = 5
+// 6 = 2칸(sm)·3칸(lg) 그리드 모두 균등하게 채워지는 페이지 단위
+const PAGE_SIZE = 6
 
 // 서버(SSR)·클라이언트(Pi Browser 게이트) 양쪽에서 공유하는 카페 목록 표현 컴포넌트.
 // 데이터 로딩은 각 호출부가 담당하고, 이 컴포넌트는 렌더링만 책임진다.
@@ -20,6 +21,7 @@ export type RoomWithTheme = {
   max_mbr_cnt?: number
   cur_mbr_cnt?: number
   expr_dtm?: string
+  reg_dtm?: string // 생성일시 — 목록 최신순 정렬 기준
   open_bet_yn?: string // 진행 중(OPEN) Pi Bet 보유 여부 — 🎲 뱃지 표시
   // msg_room.theme_cd → msg_theme FK (forward reference) → PostgREST가 단일 객체로 반환
   msg_theme: {
@@ -62,7 +64,7 @@ function RoomCard({ room, href }: { room: RoomWithTheme; href: string }) {
   return (
     <Link
       href={href}
-      className="hover:bg-muted/50 flex items-center gap-3 rounded-xl border p-3 transition-colors"
+      className="bg-card hover:bg-muted/50 flex items-center gap-3 rounded-xl border p-3 transition-colors"
     >
       <ThemeEmoji room={room} />
       <div className="min-w-0 flex-1">
@@ -93,11 +95,16 @@ function RoomCard({ room, href }: { room: RoomWithTheme; href: string }) {
             })()}
           {room.room_tp_cd === 'G' && room.max_mbr_cnt != null && (
             <span className="text-muted-foreground/70 ml-1">
-              {t('memberCount', { cur: room.cur_mbr_cnt ?? 0, max: room.max_mbr_cnt })}
+              {t('memberCount', {
+                cur: room.cur_mbr_cnt ?? 0,
+                max: room.max_mbr_cnt,
+              })}
             </span>
           )}
           {room.room_tp_cd === 'D' && (
-            <span className="text-muted-foreground/70 ml-1">· {t('direct')}</span>
+            <span className="text-muted-foreground/70 ml-1">
+              · {t('direct')}
+            </span>
           )}
         </p>
       </div>
@@ -107,7 +114,8 @@ function RoomCard({ room, href }: { room: RoomWithTheme; href: string }) {
 
 function SectionHeader({ label }: { label: string }) {
   return (
-    <h2 className="text-muted-foreground mb-3 text-sm font-semibold tracking-wider uppercase">
+    <h2 className="mb-3 flex items-center gap-2 text-lg font-bold">
+      <span className="bg-primary h-5 w-1 shrink-0 rounded-full" aria-hidden />
       {label}
     </h2>
   )
@@ -132,7 +140,7 @@ function PagedRoomList({ rooms }: { rooms: RoomWithTheme[] }) {
 
   return (
     <>
-      <div className="space-y-2">
+      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
         {visible.map((room) => (
           <RoomCard
             key={room.room_id}
@@ -152,18 +160,19 @@ function PagedRoomList({ rooms }: { rooms: RoomWithTheme[] }) {
   )
 }
 
-function sortByPremiumFirst(rooms: RoomWithTheme[]): RoomWithTheme[] {
+// 최신 카페가 항상 상단 — 생성일시(reg_dtm) 내림차순, reg_dtm 없는 행은 맨 뒤
+function sortByNewest(rooms: RoomWithTheme[]): RoomWithTheme[] {
   return [...rooms].sort((a, b) => {
-    const aP = a.msg_theme?.theme_tp_cd === 'PREMIUM' ? 0 : 1
-    const bP = b.msg_theme?.theme_tp_cd === 'PREMIUM' ? 0 : 1
-    return aP - bP
+    const aT = a.reg_dtm ? new Date(a.reg_dtm).getTime() : 0
+    const bT = b.reg_dtm ? new Date(b.reg_dtm).getTime() : 0
+    return bT - aT
   })
 }
 
 // 카페 섹션 스켈레톤 — 목록 로딩 중에도 페이지 골격·마켓플레이스는 먼저 렌더된다
 function RoomListSkeleton() {
   return (
-    <div className="space-y-2">
+    <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
       {[0, 1, 2].map((i) => (
         <div
           key={i}
@@ -185,17 +194,17 @@ export function ChatListView({
   roomsLoading?: boolean
 }) {
   const t = useTranslations('chat.list')
-  // 내 카페를 구독/일반 두 섹션으로 분리 (discover와 완전히 별도)
-  const subscriptionRooms = myRooms.filter(
-    (r) => r.msg_theme?.theme_tp_cd === 'PREMIUM',
+  // 내 카페를 구독/일반 두 섹션으로 분리 (discover와 완전히 별도) — 각 섹션 내 최신 생성순
+  const subscriptionRooms = sortByNewest(
+    myRooms.filter((r) => r.msg_theme?.theme_tp_cd === 'PREMIUM'),
   )
-  const regularRooms = sortByPremiumFirst(
+  const regularRooms = sortByNewest(
     myRooms.filter((r) => r.msg_theme?.theme_tp_cd !== 'PREMIUM'),
   )
-  const sortedDiscover = sortByPremiumFirst(discoverRooms)
+  const sortedDiscover = sortByNewest(discoverRooms)
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8">
+    <div className="mx-auto max-w-5xl px-4 py-8">
       {/* 헤더 */}
       <div className="mb-8 flex items-center justify-between">
         <div>
@@ -207,7 +216,7 @@ export function ChatListView({
 
       {/* 목록 로딩 중 — 섹션 스켈레톤 (마켓플레이스는 아래에서 병렬 로드) */}
       {roomsLoading && (
-        <section className="mb-8">
+        <section className="bg-muted/30 mb-6 rounded-2xl p-4 sm:p-5">
           <SectionHeader label={t('myCafes')} />
           <RoomListSkeleton />
         </section>
@@ -215,7 +224,7 @@ export function ChatListView({
 
       {/* 구독 카페 — PREMIUM 테마 방만 */}
       {!roomsLoading && subscriptionRooms.length > 0 && (
-        <section className="mb-8">
+        <section className="bg-muted/30 mb-6 rounded-2xl p-4 sm:p-5">
           <div className="mb-3 flex items-center gap-2">
             <SectionHeader label={t('subscriptionCafes')} />
             <span className="mb-3 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
@@ -226,15 +235,13 @@ export function ChatListView({
         </section>
       )}
 
-      {/* 일반 카페 — 비PREMIUM 내 방, PREMIUM 테마 먼저 정렬 */}
+      {/* 일반 카페 — 비PREMIUM 내 방, 최신 생성순 */}
       {!roomsLoading && (regularRooms.length > 0 || myRooms.length === 0) && (
-        <section className="mb-8">
+        <section className="bg-muted/30 mb-6 rounded-2xl p-4 sm:p-5">
           <SectionHeader label={t('regularCafes')} />
           {myRooms.length === 0 ? (
             <div className="rounded-xl border border-dashed py-8 text-center">
-              <p className="text-muted-foreground text-sm">
-                {t('noCafes')}
-              </p>
+              <p className="text-muted-foreground text-sm">{t('noCafes')}</p>
               <p className="text-muted-foreground mt-1 text-xs">
                 {t('noCafesHint')}
               </p>
@@ -245,9 +252,9 @@ export function ChatListView({
         </section>
       )}
 
-      {/* 공개 카페 탐색 — PREMIUM 테마 먼저 */}
+      {/* 공개 카페 탐색 — 최신 생성순 */}
       {!roomsLoading && sortedDiscover.length > 0 && (
-        <section className="mb-8">
+        <section className="bg-muted/30 mb-6 rounded-2xl p-4 sm:p-5">
           <SectionHeader label={t('discover')} />
           <PagedRoomList rooms={sortedDiscover} />
         </section>

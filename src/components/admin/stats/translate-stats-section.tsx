@@ -78,8 +78,9 @@ export function TranslateStatsSection({ period }: { period: number }) {
     <div className="space-y-4">
       {/* KPI 카드 — 신규 번역 / 캐시 히트율 / 예상 비용 / 피드백 */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {/* 메시지 1건이 N개 언어로 번역되면 N건 — API 호출(비용) 단위 집계 */}
         <StatsCard
-          label={`신규 번역 (${period}일)`}
+          label={`신규 번역 (${period}일, 메시지×언어)`}
           value={t?.trans_cnt ?? 0}
           unit="건"
           loading={loading}
@@ -160,8 +161,7 @@ export function TranslateStatsSection({ period }: { period: number }) {
 
       <p className="text-muted-foreground text-xs">
         예상 비용은 번역문 문자수 기반 추정치입니다 (1 token ≈ 4 chars, 입력
-        토큰 ≈ 출력×2 가정) — 실제 청구액은 Google AI Studio 콘솔을
-        확인하세요.
+        토큰 ≈ 출력×2 가정) — 실제 청구액은 Google AI Studio 콘솔을 확인하세요.
       </p>
     </div>
   )

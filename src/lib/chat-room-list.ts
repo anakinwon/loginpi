@@ -34,7 +34,7 @@ async function listMyRooms(userId: string): Promise<RoomRow[]> {
       .select(ROOM_SELECT)
       .in('room_id', roomIds)
       .eq('del_yn', 'N')
-      .order('mod_dtm', { ascending: false }),
+      .order('reg_dtm', { ascending: false }),
     db
       .from('msg_room_mbr')
       .select('room_id')
@@ -79,9 +79,7 @@ async function listPublicRooms(limit = 10): Promise<RoomRow[]> {
 }
 
 // 진행 중(OPEN) Pi Bet 보유 방에 open_bet_yn='Y' 부여 — 두 목록을 합쳐 1쿼리로 처리
-async function attachOpenBetYn(
-  lists: RoomRow[][],
-): Promise<RoomRow[][]> {
+async function attachOpenBetYn(lists: RoomRow[][]): Promise<RoomRow[][]> {
   const allIds = lists.flat().map((r) => r.room_id)
   if (allIds.length === 0) return lists
 
