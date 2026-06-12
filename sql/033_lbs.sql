@@ -110,3 +110,10 @@ LANGUAGE SQL IMMUTABLE PARALLEL SAFE AS $$
 $$;
 
 COMMENT ON FUNCTION public.fn_haversine_km IS 'Haversine 공식 두 WGS84 좌표 간 거리(km) — PostGIS 불필요';
+
+-- ──────────────────────────────────────────────────────────────
+-- 5. RLS 활성화 — 프로젝트 표준: anon 차단, 서버 service role만 접근 (정책 없음)
+--    위치 이력·동의 이력은 위치정보법 대상 민감 정보 — anon 노출 차단 필수
+-- ──────────────────────────────────────────────────────────────
+ALTER TABLE public.sys_user_consent ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.usr_loc_hist ENABLE ROW LEVEL SECURITY;

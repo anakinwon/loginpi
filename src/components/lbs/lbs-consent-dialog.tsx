@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { Link } from '@/i18n/navigation'
 import { piFetch } from '@/lib/pi-fetch'
 import {
   Dialog,
@@ -57,14 +58,14 @@ export function LbsConsentDialog({ open, onOpenChange, onConsented }: Props) {
           </ul>
           <p className="font-medium text-foreground pt-1">보유·이용 기간</p>
           <p className="text-muted-foreground">목적 달성 후 즉시 파기. 철회 시 즉시 삭제.</p>
-          <a
+          <Link
             href="/docs/agreement/lbs"
             target="_blank"
             rel="noopener noreferrer"
             className="text-primary underline underline-offset-2 block pt-1"
           >
             위치기반서비스 이용약관 전문 보기 →
-          </a>
+          </Link>
         </div>
 
         <p className="text-muted-foreground text-xs">

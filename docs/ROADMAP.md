@@ -1082,10 +1082,14 @@ if (meta?.type === 'CHAT_SUBSCR') {
 - ✅ loc_tp_cd 분기: '01'(가입) / '02'(로그인) / '03'(매장) / '04'(상품거래)
 - ✅ `piFetch()` 사용 — X-Pi-Token 헤더 이중 경로 지원
 
-### TASK-134: Google Maps 서버 프록시 API 🔜
+### TASK-134: Google Maps 서버 프록시 API ✅
 
-- 🔜 `POST /api/location/geocode` — 주소 → 좌표 (서버에서만 호출, GOOGLE_MAPS_API_KEY 보호)
-- 🔜 `POST /api/location/reverse-geocode` — 좌표 → 주소 + 행정구역 파싱
+- ✅ `src/lib/google-maps.ts` — `geocodeAddress()`·`reverseGeocode()` (Geocoding API 단일 호출 양방향), `import 'server-only'` 키 보호
+- ✅ `POST /api/location/geocode` — 주소 → 좌표 (로그인 필수·동의 불필요, 유료 API 남용 방지)
+- ✅ `POST /api/location/reverse-geocode` — 좌표 → 주소 + 한국 행정구역(시도/시군구/동) 파싱
+- ✅ 한국 주소 type 우선순위 fallback (administrative_area_level_1/2 → locality → sublocality_*)
+- ✅ Next.js fetch 캐시 1일(`revalidate: 86400`) — 동일 좌표/주소 반복 변환 비용 절감
+- ✅ status별 처리: OK·ZERO_RESULTS(404)·그 외(REQUEST_DENIED 등 502, error_message 서버 로그)
 
 ### TASK-135: 주변 탐색 API (`/api/location/nearby/*`) ✅
 
@@ -1129,8 +1133,8 @@ if (meta?.type === 'CHAT_SUBSCR') {
 - 🔜 GPS 실패 시 서비스 차단 없음 → 위치 저장만 스킵, 나머지 기능 정상
 
 > **P0 완료 = LBS MVP**: TASK-130 → 131 → 132 → 133 → 136 → 138 ✅ (동의 게이트 + MPS 거리 표시)
-> **P1 완료 (주변 탐색)**: TASK-135 → 137 → 139 ✅ (주변 채팅방·매장 API + 동의 UI + 로그인 위치 저장)
-> **TASK-134 보류**: Google Maps API Key 필요 (geocode/reverse-geocode 서버 프록시)
+> **P1 완료 (주변 탐색)**: TASK-134 → 135 → 137 → 139 ✅ (Geocoding 프록시 + 주변 탐색 API + 동의 UI + 로그인 위치 저장)
+> **남은 작업**: `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` + Maps JavaScript API(지도 UI)·Places API(매장 검색)는 향후 Phase
 
 ---
 
@@ -1230,4 +1234,5 @@ if (meta?.type === 'CHAT_SUBSCR') {
 | v5.5 | 2026-06-12 | Phase 15 LBS 위치기반서비스 로드맵 추가 — `docs/PRD_10_GPS.md` v1.2 수용. 동의 게이트 Rule LBS-01~04(UI·API·철회·MPS 거리), `sql/030_lbs.sql`(sys_user_consent·usr_loc_hist·sys_user 컬럼 3개), Google Maps API 서버 프록시, Haversine SQL 거리 계산, `/api/store/items` 거리 파라미터 확장(Rule LBS-04). TASK-130~139. M24 마일스톤 추가. 헤더 현재 버전 갱신. `PRD.md` v9.0 통합(섹션 16 신설). | anakin |
 | v5.6 | 2026-06-12 | **Phase 15 LBS P0 MVP 구현** — TASK-130~133·136·138 완료. `sql/033_lbs.sql`(sys_user_consent·usr_loc_hist·fn_haversine_km·sys_user 컬럼 3개·DA-APPROVED), `src/env.ts`·`.env.example`(GOOGLE_MAPS_API_KEY·NEXT_PUBLIC_GOOGLE_MAPS_API_KEY), `/api/location/consent`(GET/POST/DELETE — 동의 등록·철회·즉시파기 Rule LBS-03), `/api/location/save`(동의 서버 재검증 Rule LBS-02), `mps-item.ts` haversineKm() + sort=distance 확장, `store-item-list.tsx` GPS 위치 수집 + 📍 거리 배지(Rule LBS-04). tsc(0 errors) 통과. | anakin |
 | v5.7 | 2026-06-12 | **Phase 15 LBS P1 주변탐색 완료** — TASK-135·137·139 완료. `/api/location/nearby/rooms`(방 생성자 최근 위치 기반 Haversine)·`/api/location/nearby/shops`(mps_shop.lat/lng 활용)·`/api/location/history`(열람권 50건), `lbs-consent-dialog.tsx`(동의 다이얼로그·약관 요약+전문링크), `store-item-list.tsx` `LbsConsentDialog` 통합(미동의 CTA 버튼 → 동의 후 GPS 즉시 요청), `lbs-settings.tsx`+`profile-tabs.tsx`(마이페이지 위치 서비스 탭), `pi-auth-provider.tsx` `saveLoginLocation()` side-effect(로그인 완료 시 `loc_tp_cd='02'` fire-and-forget). M24 ✅ 달성. tsc(0 errors) 통과. | anakin |
+| v5.8 | 2026-06-12 | **Phase 15 TASK-134 Google Maps 서버 프록시 완료** — `src/lib/google-maps.ts`(`geocodeAddress()`·`reverseGeocode()` — Geocoding API 단일 호출 양방향, `import 'server-only'` 키 보호, 한국 행정구역 type 우선순위 fallback 파서, fetch 캐시 1일), `POST /api/location/geocode`(주소→좌표)·`POST /api/location/reverse-geocode`(좌표→주소+시도/시군구/동) — 로그인 필수·동의 불필요·유료 API 남용 방지, status별 처리(OK/ZERO_RESULTS 404/REQUEST_DENIED 등 502). `GOOGLE_MAPS_API_KEY` `.env.local` 기존 배치 확인(AIzaSy 39자). tsc·lint(0 errors) 통과. M24 P1 전체(TASK-134~139) 완료. | anakin |
 | v5.4 | 2026-06-11 | **Phase 13 MyPiShop(MPS) Phase 1 MVP 1차 구현** — TASK-100~107 🔜→✅. `sql/029_mps.sql`(mps_ 6개 테이블 + fn_mps_order_create/fn_mps_order_cancel 원자적 재고 RPC, Supabase 적용), lib 3종(mps-item·mps-order·mps-shop), 상품 API(/api/store/items CRUD + 검색·필터·정렬), 주문 API(생성·취소·confirm·release + 당사자 403), 에스크로는 기존 `/api/payments/complete`에 `MPS_ESCROW` 분기 통합(PENDING→ESCROW + ESCROW_IN 이력 + 금액 서버 재검증), UI 6페이지(/store 목록·상세·my/items·new·sales·orders — usePiAuth 클라이언트 게이트, redirect 금지), store 번역 ko/en. tsc·lint(0 errors) 통과. **후속**: 이미지 업로드(Storage)·상품 수정 폼·SELLER_DONE 자동 DONE cron·실 Pi 정산(A2U)·Pi Browser 실기기 결제 검증. | anakin |

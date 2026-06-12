@@ -1,0 +1,128 @@
+import 'server-only'
+
+// Google Maps Geocoding API 서버 프록시 (Phase 15 LBS — TASK-134)
+// 주소 ↔ 좌표 양방향 변환. Geocoding API 하나로 forward/reverse 모두 처리.
+// API Key는 서버에서만 사용 (GOOGLE_MAPS_API_KEY) — 클라이언트 노출 금지 (PRD 섹션 10)
+
+const GEOCODE_URL = 'https://maps.googleapis.com/maps/api/geocode/json'
+
+// 한국 행정구역 — 정밀 좌표 대신 행정구역 단위로 표시 (위치 프라이버시)
+export interface GeoComponents {
+  sido_nm: string | null // 시/도 (서울특별시, 경기도)
+  sigungu_nm: string | null // 시/군/구 (수원시, 강남구)
+  dong_nm: string | null // 동/읍/면 (매탄동)
+}
+
+export interface GeocodeResult {
+  lat: number
+  lng: number
+  full_addr: string
+  place_id: string | null
+  components: GeoComponents
+}
+
+interface GoogleAddressComponent {
+  long_name: string
+  short_name: string
+  types: string[]
+}
+
+interface GoogleGeocodeItem {
+  formatted_address: string
+  place_id: string
+  geometry: { location: { lat: number; lng: number } }
+  address_components: GoogleAddressComponent[]
+}
+
+interface GoogleGeocodeResponse {
+  status: string
+  error_message?: string
+  results: GoogleGeocodeItem[]
+}
+
+// types 우선순위 배열에서 가장 먼저 매칭되는 컴포넌트의 long_name 반환
+function pickComponent(
+  components: GoogleAddressComponent[],
+  types: string[],
+): string | null {
+  for (const t of types) {
+    const c = components.find((comp) => comp.types.includes(t))
+    if (c) return c.long_name
+  }
+  return null
+}
+
+// 한국 주소 컴포넌트 → 행정구역 3단계 파싱.
+// Google의 한국 주소 매핑은 지역별로 type이 달라 우선순위 fallback이 필요하다.
+// - 시도: administrative_area_level_1
+// - 시군구: administrative_area_level_2 우선 → locality 폴백(광역시 자치구 등)
+// - 동읍면: sublocality_level_2 → sublocality_level_1 → sublocality 순 폴백
+function parseKoreanRegion(
+  components: GoogleAddressComponent[],
+): GeoComponents {
+  return {
+    sido_nm: pickComponent(components, ['administrative_area_level_1']),
+    sigungu_nm: pickComponent(components, [
+      'administrative_area_level_2',
+      'locality',
+    ]),
+    dong_nm: pickComponent(components, [
+      'sublocality_level_2',
+      'sublocality_level_1',
+      'sublocality',
+    ]),
+  }
+}
+
+// Geocoding API 호출 결과를 표준 형태로 정규화.
+// status별 처리: OK → 결과, ZERO_RESULTS → null(에러 아님), 그 외 → throw
+async function callGeocode(
+  params: Record<string, string>,
+): Promise<GeocodeResult | null> {
+  const key = process.env.GOOGLE_MAPS_API_KEY
+  if (!key) throw new Error('GOOGLE_MAPS_API_KEY 미설정')
+
+  const sp = new URLSearchParams({ ...params, key, language: 'ko' })
+  const res = await fetch(`${GEOCODE_URL}?${sp}`, {
+    // 동일 좌표/주소 반복 변환 방지 — Next.js fetch 캐시 1일(비용 절감)
+    next: { revalidate: 86400 },
+  })
+
+  if (!res.ok) {
+    throw new Error(`Geocoding API HTTP ${res.status}`)
+  }
+
+  const data = (await res.json()) as GoogleGeocodeResponse
+
+  if (data.status === 'ZERO_RESULTS') return null
+  if (data.status !== 'OK') {
+    // REQUEST_DENIED(API 미사용설정/결제 미연결), OVER_QUERY_LIMIT 등
+    throw new Error(
+      `Geocoding API ${data.status}${data.error_message ? `: ${data.error_message}` : ''}`,
+    )
+  }
+
+  const item = data.results[0]
+  return {
+    lat: item.geometry.location.lat,
+    lng: item.geometry.location.lng,
+    full_addr: item.formatted_address,
+    place_id: item.place_id ?? null,
+    components: parseKoreanRegion(item.address_components),
+  }
+}
+
+// 주소 → 좌표 (forward geocoding) — 가입 위치 수동 입력 등
+export async function geocodeAddress(
+  address: string,
+): Promise<GeocodeResult | null> {
+  return callGeocode({ address })
+}
+
+// 좌표 → 주소 + 행정구역 (reverse geocoding) — GPS 좌표를 사람이 읽는 주소로
+export async function reverseGeocode(
+  lat: number,
+  lng: number,
+): Promise<GeocodeResult | null> {
+  return callGeocode({ latlng: `${lat},${lng}` })
+}
