@@ -107,7 +107,17 @@ function TopThemesList({
       {themes.map((t, i) => (
         <li key={t.theme_cd} className="flex items-center gap-2 text-sm">
           <span className="text-base">{MEDALS[i] ?? `${i + 1}.`}</span>
-          <span className="shrink-0">{t.theme_emoji ?? ''}</span>
+          {/* Bean(PI_TIP)은 이모지 대신 럭셔리 콩 이미지로 표시 */}
+          {t.theme_cd === 'PI_TIP' ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src="/bean-noti.png"
+              alt="Bean"
+              className="inline-block h-6 w-6 shrink-0"
+            />
+          ) : (
+            <span className="shrink-0">{t.theme_emoji ?? ''}</span>
+          )}
           <span className="min-w-0 flex-1 truncate font-medium">
             {t.theme_nm ?? themeLabel(t.theme_cd)}
           </span>
