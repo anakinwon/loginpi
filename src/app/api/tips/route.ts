@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
   const allowed = await canSendTip(user.id)
   if (!allowed) {
     return NextResponse.json(
-      { error: 'Pi Tip은 PREMIUM 이상 구독자만 사용할 수 있습니다' },
+      { error: 'Pi Bean은 PREMIUM 이상 구독자만 사용할 수 있습니다' },
       { status: 403 },
     )
   }
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
 
   if (recipient_id === user.id) {
     return NextResponse.json(
-      { error: '자기 자신에게 Tip을 보낼 수 없습니다' },
+      { error: '자기 자신에게 Bean을 보낼 수 없습니다' },
       { status: 400 },
     )
   }

@@ -4,7 +4,7 @@ import { getSessionUser } from '@/lib/auth-check'
 
 // TASK-070: 카페 마켓플레이스 — 테마별 공개방 디렉토리 + 인기 랭킹
 // GET /api/chat/marketplace?theme=<theme_cd>
-// 랭킹 = fn_chat_marketplace RPC (멤버수×2 + 최근7일 메시지×0.5 + 최근7일 Tip×10)
+// 랭킹 = fn_chat_marketplace RPC (멤버수×2 + 최근7일 메시지×0.5 + 최근7일 Bean×10)
 export async function GET(request: NextRequest) {
   const user = await getSessionUser()
   if (!user)

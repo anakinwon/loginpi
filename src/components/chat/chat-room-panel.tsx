@@ -376,7 +376,7 @@ export function ChatRoomPanel({
         onSendFile={sendFile}
       />
 
-      {/* Trigger 2: Tip 업그레이드 모달 */}
+      {/* Trigger 2: Bean 업그레이드 모달 */}
       <InlinePurchasePrompt
         isOpen={tipPromptOpen}
         featureName="Bean 보내기"

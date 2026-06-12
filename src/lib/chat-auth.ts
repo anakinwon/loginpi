@@ -12,7 +12,7 @@ export interface PlanCaps {
   tier: PlanTier
   monthlyRoomQuota: number // 월 무료 그룹방 생성 수 (-1=무제한, 0=건당 결제)
   aiMonthlyQuota: number // 월 AI 호출 한도 (-1=무제한)
-  canTip: boolean // Pi Tip 전송 가능
+  canTip: boolean // Pi Bean 전송 가능
   canUsePremiumTheme: boolean // PREMIUM 테마 무료 사용
   canCreateEventRoom: boolean // 이벤트방(room_tp_cd='E') 개설
 }
