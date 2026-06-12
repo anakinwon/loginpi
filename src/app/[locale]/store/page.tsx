@@ -19,6 +19,9 @@ export default async function StorePage() {
           <p className="text-muted-foreground mt-1 text-sm">{t('subtitle')}</p>
         </div>
         <nav className="flex gap-3 text-sm">
+          <Link href="/nearby" className="text-primary hover:underline">
+            📍 주변
+          </Link>
           <Link href="/store/my/items" className="text-primary hover:underline">
             {t('navMyItems')}
           </Link>

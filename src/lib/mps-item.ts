@@ -97,19 +97,35 @@ async function getTradingCounts(
   return map
 }
 
+type ItemWithShop = MpsItem & {
+  mps_shop?: { shop_id: string; lat: number | null; lng: number | null } | null
+}
+
+// 매장 좌표 기준 사용자와의 거리(km, 소수 1자리) — 좌표 없는 상품은 null
+function calcDistanceKm(
+  r: ItemWithShop,
+  uLat: number,
+  uLng: number,
+): number | null {
+  const shopLat = r.mps_shop?.lat ?? null
+  const shopLng = r.mps_shop?.lng ?? null
+  return shopLat !== null && shopLng !== null
+    ? Math.round(haversineKm(uLat, uLng, shopLat, shopLng) * 10) / 10
+    : null
+}
+
 // 공개 목록 — OPEN·SOLD 노출 (DRAFT·CLOSED 제외). SOLD는 거래중/판매완료 배지 표시용
 export async function listOpenItems(filter: ItemListFilter) {
   const db = getSupabaseAdmin()
   const limit = Math.min(filter.limit ?? 20, 50)
   const page = Math.max(filter.page ?? 1, 1)
-  const useDistance =
-    filter.sort === 'distance' &&
-    filter.userLat !== undefined &&
-    filter.userLng !== undefined
+  // 좌표가 있으면 정렬 방식과 무관하게 distance_km 계산 (목록 거리 배지용)
+  const hasLoc = filter.userLat !== undefined && filter.userLng !== undefined
+  const useDistance = filter.sort === 'distance' && hasLoc
 
   let q = db
     .from('mps_item')
-    .select(useDistance ? '*, mps_shop(shop_id, lat, lng)' : '*', {
+    .select(hasLoc ? '*, mps_shop(shop_id, lat, lng)' : '*', {
       count: useDistance ? undefined : 'exact',
     })
     .eq('del_yn', 'N')
@@ -131,17 +147,9 @@ export async function listOpenItems(filter: ItemListFilter) {
     const uLng = filter.userLng!
     const radius = filter.radiusKm ?? 10
 
-    type ItemWithShop = MpsItem & {
-      mps_shop?: { shop_id: string; lat: number | null; lng: number | null } | null
-    }
     const withDist = (data as unknown as ItemWithShop[])
       .map((r) => {
-        const shopLat = r.mps_shop?.lat ?? null
-        const shopLng = r.mps_shop?.lng ?? null
-        const distance_km =
-          shopLat !== null && shopLng !== null
-            ? Math.round(haversineKm(uLat, uLng, shopLat, shopLng) * 10) / 10
-            : null
+        const distance_km = calcDistanceKm(r, uLat, uLng)
         const { mps_shop: _, ...item } = r
         return { ...item, distance_km }
       })
@@ -166,12 +174,19 @@ export async function listOpenItems(filter: ItemListFilter) {
 
   if (error) throw new Error(error.message)
 
-  const rows = (data ?? []) as unknown as MpsItem[]
+  const rows = (data ?? []) as unknown as ItemWithShop[]
   const tradingCounts = await getTradingCounts(rows.map((r) => r.item_id))
-  const items = rows.map((r) => ({
-    ...r,
-    trading_cnt: tradingCounts.get(r.item_id) ?? 0,
-  }))
+  const items = rows.map((r) => {
+    const distance_km = hasLoc
+      ? calcDistanceKm(r, filter.userLat!, filter.userLng!)
+      : undefined
+    const { mps_shop: _, ...item } = r
+    return {
+      ...item,
+      ...(distance_km !== undefined && { distance_km }),
+      trading_cnt: tradingCounts.get(r.item_id) ?? 0,
+    }
+  })
   return { items, total: count ?? 0, page, limit }
 }
 

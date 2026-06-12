@@ -119,10 +119,14 @@ export async function geocodeAddress(
   return callGeocode({ address })
 }
 
-// 좌표 → 주소 + 행정구역 (reverse geocoding) — GPS 좌표를 사람이 읽는 주소로
+// 좌표 → 주소 + 행정구역 (reverse geocoding) — GPS 좌표를 사람이 읽는 주소로.
+// 좌표를 소수점 4자리(~11m)로 반올림해 호출 — 행정구역(시군구/동) 해상도에는 영향 없고,
+// 미세하게 흔들리는 GPS 좌표의 fetch 캐시(1일) 적중률을 크게 높여 API 비용을 절감한다.
 export async function reverseGeocode(
   lat: number,
   lng: number,
 ): Promise<GeocodeResult | null> {
-  return callGeocode({ latlng: `${lat},${lng}` })
+  const rLat = Math.round(lat * 1e4) / 1e4
+  const rLng = Math.round(lng * 1e4) / 1e4
+  return callGeocode({ latlng: `${rLat},${rLng}` })
 }

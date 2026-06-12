@@ -65,6 +65,21 @@ export function StoreItemList() {
       .catch(() => setLbsConsent('N'))
   }, [])
 
+  // 동의자는 마운트 시 자동으로 현재 위치 수집 → 모든 상품 카드에 거리 배지 표시.
+  // 정렬은 바꾸지 않는다 (📍 주변순 버튼과 별개 — 거리 표시 전용)
+  useEffect(() => {
+    if (lbsConsent !== 'Y' || userLat !== null || !navigator.geolocation) return
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setUserLat(pos.coords.latitude)
+        setUserLng(pos.coords.longitude)
+        setPage(1)
+      },
+      () => {}, // 거부·실패 시 거리 없이 목록만 표시
+      { timeout: 10000 },
+    )
+  }, [lbsConsent, userLat])
+
   // GPS 위치 수집 (동의자만 — Rule LBS-01)
   const requestLocation = useCallback(() => {
     if (lbsConsent !== 'Y' || !navigator.geolocation) return
@@ -93,13 +108,15 @@ export function StoreItemList() {
     })
     if (keyword) sp.set('q', keyword)
     if (cnd) sp.set('cnd', cnd)
-    if (sort === 'distance' && userLat !== null && userLng !== null) {
+    // 좌표가 있으면 항상 전달 → 모든 정렬에서 distance_km 수신 (반경 필터는 주변순만)
+    if (userLat !== null && userLng !== null) {
       sp.set('lat', String(userLat))
       sp.set('lng', String(userLng))
-      sp.set('radius', '10')
+      if (sort === 'distance') sp.set('radius', '10')
     }
     try {
-      const res = await fetch(`/api/store/items?${sp}`)
+      // piFetch: 서버의 LBS 동의 검증(Rule LBS-04)이 Pi Browser에서도 통과하도록 X-Pi-Token 첨부
+      const res = await piFetch(`/api/store/items?${sp}`)
       if (res.ok) {
         const data = (await res.json()) as { items: StoreItem[]; total: number }
         // 무한 스크롤 — 첫 페이지는 교체, 이후 페이지는 누적 append

@@ -22,10 +22,11 @@ export async function GET(req: NextRequest) {
   const latParam = sp.get('lat')
   const lngParam = sp.get('lng')
 
-  // sort=distance 요청 시 사용자 동의 확인 (Rule LBS-04)
+  // lat/lng 제공 시 사용자 동의 확인 후 거리 계산 허용 (Rule LBS-04)
+  // sort=distance(주변순)뿐 아니라 일반 정렬 목록의 상품별 거리 표시에도 사용
   let userLat: number | undefined
   let userLng: number | undefined
-  if (sortParam === 'distance' && latParam && lngParam) {
+  if (latParam && lngParam) {
     const user = await getSessionUser()
     if (user?.lbs_consent_yn === 'Y') {
       userLat = parseFloat(latParam)

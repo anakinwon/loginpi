@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { reverseGeocode } from '@/lib/google-maps'
 
 // Rule LBS-02: 서버에서 동의 재검증 — 클라이언트 캐시와 관계없이 DB 상태 기준
 export async function POST(request: NextRequest) {
@@ -66,6 +67,36 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: '유효하지 않은 좌표값입니다' }, { status: 400 })
   }
 
+  // 행정구역 자동 보강 — 클라이언트가 시도/시군구/동/주소를 하나도 안 보냈을 때만
+  // 서버에서 reverseGeocode로 채운다(좌표→주소). 실패해도 위치 저장은 진행(best-effort).
+  // 주변 채팅방/매장 표시에 시군구 단위가 필요하므로 로그인 위치(02)에 특히 유용.
+  let resolvedFullAddr = full_addr ?? null
+  let resolvedSido = sido_nm ?? null
+  let resolvedSigungu = sigungu_nm ?? null
+  let resolvedDong = dong_nm ?? null
+  let resolvedPlaceId = place_id ?? null
+
+  const hasNoRegion =
+    !resolvedSido && !resolvedSigungu && !resolvedDong && !resolvedFullAddr
+  if (hasNoRegion) {
+    try {
+      const geo = await reverseGeocode(lat, lng)
+      if (geo) {
+        resolvedFullAddr = geo.full_addr
+        resolvedSido = geo.components.sido_nm
+        resolvedSigungu = geo.components.sigungu_nm
+        resolvedDong = geo.components.dong_nm
+        resolvedPlaceId = resolvedPlaceId ?? geo.place_id
+      }
+    } catch (err) {
+      // Geocoding 실패(키 미설정·할당량 등)는 무시 — 좌표만으로 저장 지속
+      console.error(
+        '[location/save] reverseGeocode 실패:',
+        err instanceof Error ? err.message : err,
+      )
+    }
+  }
+
   const now = new Date().toISOString()
   const { data, error } = await getSupabaseAdmin()
     .from('usr_loc_hist')
@@ -75,11 +106,11 @@ export async function POST(request: NextRequest) {
       lat,
       lng,
       accuracy_m: accuracy_m ?? null,
-      full_addr: full_addr ?? null,
-      sido_nm: sido_nm ?? null,
-      sigungu_nm: sigungu_nm ?? null,
-      dong_nm: dong_nm ?? null,
-      place_id: place_id ?? null,
+      full_addr: resolvedFullAddr,
+      sido_nm: resolvedSido,
+      sigungu_nm: resolvedSigungu,
+      dong_nm: resolvedDong,
+      place_id: resolvedPlaceId,
       ref_id: ref_id ?? null,
       consent_yn: 'Y',
       consent_dtm: user.lbs_consent_dtm ?? now,
