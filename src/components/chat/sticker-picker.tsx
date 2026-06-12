@@ -31,9 +31,15 @@ interface StorePack {
 interface StickerPickerProps {
   onSelect: (stkrId: string, stkrUrl: string) => void
   onClose: () => void
+  // 미리보기 대기 중인 스티커 — 하이라이트 + "한 번 더 누르면 전송" 안내
+  selectedId?: string | null
 }
 
-export function StickerPicker({ onSelect, onClose }: StickerPickerProps) {
+export function StickerPicker({
+  onSelect,
+  onClose,
+  selectedId = null,
+}: StickerPickerProps) {
   const [ownedPacks, setOwnedPacks] = useState<OwnedPack[]>([])
   const [storePacks, setStorePacks] = useState<StorePack[]>([])
   const [activePackId, setActivePackId] = useState<string | null>(null)
@@ -217,22 +223,37 @@ export function StickerPicker({ onSelect, onClose }: StickerPickerProps) {
             onSubscribeBanner={() => setShowSubscribePrompt(true)}
           />
         ) : activePack ? (
-          <div className="grid grid-cols-4 gap-1">
-            {activePack.stickers.map((s) => (
-              <button
-                key={s.stkr_id}
-                onClick={() => onSelect(s.stkr_id, s.stkr_url)}
-                className="hover:bg-muted aspect-square rounded-lg p-0.5 transition-colors"
-                title={s.stkr_nm}
-              >
-                <StickerImg
-                  src={s.stkr_url}
-                  alt={s.stkr_nm}
-                  className="h-full w-full object-contain"
-                />
-              </button>
-            ))}
-          </div>
+          <>
+            {selectedId && (
+              <p className="text-primary mb-1 text-center text-[11px] font-medium">
+                같은 스티커를 한 번 더 누르면 전송됩니다
+              </p>
+            )}
+            <div className="grid grid-cols-4 gap-1">
+              {activePack.stickers.map((s) => (
+                <button
+                  key={s.stkr_id}
+                  onClick={() => onSelect(s.stkr_id, s.stkr_url)}
+                  className={`aspect-square rounded-lg p-0.5 transition-colors ${
+                    selectedId === s.stkr_id
+                      ? 'ring-primary bg-muted ring-2'
+                      : 'hover:bg-muted'
+                  }`}
+                  title={
+                    selectedId === s.stkr_id
+                      ? '한 번 더 누르면 전송'
+                      : s.stkr_nm
+                  }
+                >
+                  <StickerImg
+                    src={s.stkr_url}
+                    alt={s.stkr_nm}
+                    className="h-full w-full object-contain"
+                  />
+                </button>
+              ))}
+            </div>
+          </>
         ) : (
           <div className="text-muted-foreground flex h-full flex-col items-center justify-center gap-2 text-sm">
             <span>보유한 스티커가 없습니다</span>
