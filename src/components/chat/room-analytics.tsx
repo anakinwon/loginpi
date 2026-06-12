@@ -160,7 +160,7 @@ export function RoomAnalytics({ roomId }: { roomId: string }) {
           value={`${data.summary.total_msg_cnt}건`}
         />
         <SummaryCard
-          label="Pi Tip 수익"
+          label="Pi Bean 수익"
           value={`π${data.summary.total_tip_pi}`}
         />
       </div>
@@ -205,14 +205,14 @@ export function RoomAnalytics({ roomId }: { roomId: string }) {
 
       {/* Pi 수익 · 신규 멤버 */}
       <div className="rounded-xl border p-3">
-        <h2 className="mb-2 text-sm font-semibold">Pi Tip 수익 · 신규 멤버</h2>
+        <h2 className="mb-2 text-sm font-semibold">Pi Bean 수익 · 신규 멤버</h2>
         <PlotlyPlot
           data={[
             {
               x: dates,
               y: data.daily.map((r) => r.tip_amt_pi),
               type: 'bar',
-              name: 'Tip (π)',
+              name: 'Bean (π)',
               marker: { color: '#f59e0b' },
             },
             {

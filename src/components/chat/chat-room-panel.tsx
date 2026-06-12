@@ -379,8 +379,8 @@ export function ChatRoomPanel({
       {/* Trigger 2: Tip 업그레이드 모달 */}
       <InlinePurchasePrompt
         isOpen={tipPromptOpen}
-        featureName="Tip 보내기"
-        description="프리미엄 구독자는 다른 참가자에게 Pi Tip을 보낼 수 있습니다."
+        featureName="Bean 보내기"
+        description="프리미엄 구독자는 다른 참가자에게 Pi Bean을 보낼 수 있습니다."
         piAmount={3}
         onSinglePurchase={() => setTipPromptOpen(false)}
         onSubscribe={subscribe}

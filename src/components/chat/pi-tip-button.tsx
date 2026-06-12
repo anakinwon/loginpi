@@ -21,7 +21,7 @@ export function PiTipButton({
 
   async function sendTip(amount: number) {
     if (!window.Pi) {
-      toast.error('Pi Browser에서만 Tip을 보낼 수 있습니다')
+      toast.error('Pi Browser에서만 Bean을 보낼 수 있습니다')
       setOpen(false)
       return
     }
@@ -38,7 +38,7 @@ export function PiTipButton({
       })
       if (!prep.ok) {
         const d = (await prep.json()) as { error?: string }
-        throw new Error(d.error ?? 'Tip 준비 실패')
+        throw new Error(d.error ?? 'Bean 준비 실패')
       }
       const params = (await prep.json()) as {
         amount: number
@@ -63,8 +63,8 @@ export function PiTipButton({
           setPaying(false)
           setOpen(false)
           if (res.ok)
-            toast.success(`${recipientName} 님께 π${amount} Tip을 보냈습니다!`)
-          else toast.error('Tip 결제 완료 처리에 실패했습니다')
+            toast.success(`${recipientName} 님께 π${amount} Bean을 보냈습니다!`)
+          else toast.error('Bean 결제 완료 처리에 실패했습니다')
         },
         onCancel: () => {
           setPaying(false)
@@ -76,7 +76,7 @@ export function PiTipButton({
       })
     } catch (e) {
       setPaying(false)
-      toast.error(e instanceof Error ? e.message : 'Tip 오류')
+      toast.error(e instanceof Error ? e.message : 'Bean 오류')
     }
   }
 
@@ -85,14 +85,15 @@ export function PiTipButton({
       <button
         onClick={() => setOpen((o) => !o)}
         className="hover:bg-muted rounded-full px-2 py-0.5 text-xs opacity-0 transition-opacity group-hover:opacity-100"
-        title={`${recipientName}님께 Pi Tip 보내기`}
+        title={`${recipientName}님께 Pi Bean 보내기`}
       >
-        💰
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/bean.png" alt="Bean" className="inline-block h-4 w-4" />
       </button>
       {open && (
         <div className="bg-popover absolute bottom-full left-0 z-20 mb-1 min-w-[160px] rounded-xl border p-2 shadow-lg">
           <div className="text-muted-foreground mb-1.5 px-1 text-xs">
-            Tip 금액 선택
+            Bean 금액 선택
           </div>
           <div className="flex gap-1">
             {TIP_AMOUNTS.map((amt) => (

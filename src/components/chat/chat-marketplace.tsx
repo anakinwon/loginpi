@@ -213,7 +213,7 @@ export function ChatMarketplace() {
                     {room.theme_nm} · 멤버 {room.mbr_cnt}명 · 주간 메시지{' '}
                     {room.msg_cnt_7d}건
                     {Number(room.tip_amt_7d) > 0 && (
-                      <span> · 주간 Tip π{room.tip_amt_7d}</span>
+                      <span> · 주간 Bean π{room.tip_amt_7d}</span>
                     )}
                   </p>
                 </div>

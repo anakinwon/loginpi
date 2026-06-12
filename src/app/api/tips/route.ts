@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({
     amount,
-    memo: `💰 @${user.display_name} → @${recipientRow.display_name ?? 'user'} Pi Tip`,
+    memo: `🫘 @${user.display_name} → @${recipientRow.display_name ?? 'user'} Pi Bean`,
     metadata: {
       type: 'PI_TIP',
       room_id,

@@ -238,7 +238,7 @@ function MessageBubble({
             onClick={onUpgradeForTip}
             className="text-primary ml-1.5 underline"
           >
-            나도 Tip 보내기
+            나도 Bean 보내기
           </button>
         )}
       </div>
