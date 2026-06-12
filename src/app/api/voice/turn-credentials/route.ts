@@ -15,10 +15,25 @@ export async function POST() {
   const secret = process.env.TURN_SECRET
   const ttl = Number(process.env.TURN_CREDENTIAL_TTL ?? 3600)
 
-  // TURN 미설정 시 STUN 전용으로 폴백 (개발 환경 대응)
+  // TURN 미설정 시 폴백: STUN + 무료 공개 TURN(Metered Open Relay).
+  // ⚠️ 공개 무료 TURN은 임시·검증용 — 음성은 DTLS-SRTP로 암호화 중계되나(내용 비노출),
+  //    신뢰성·대역폭 무보장. 운영은 TURN_HOST/TURN_SECRET(전용 coturn·관리형)으로 오버라이드.
+  //    모바일 CGNAT(대칭 NAT) 환경에서는 relay가 유일한 연결 경로라 STUN만으로는 음성 전달 불가.
   if (!host || !secret) {
     return NextResponse.json({
-      iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
+      iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' },
+        { urls: 'stun:stun.relay.metered.ca:80' },
+        {
+          urls: [
+            'turn:openrelay.metered.ca:80',
+            'turn:openrelay.metered.ca:443',
+            'turns:openrelay.metered.ca:443?transport=tcp',
+          ],
+          username: 'openrelayproject',
+          credential: 'openrelayproject',
+        },
+      ],
       ttlSec: 0,
     })
   }

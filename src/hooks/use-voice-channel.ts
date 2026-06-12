@@ -112,8 +112,21 @@ export function useVoiceChannel({
       }
 
       // Wi-Fi↔LTE 전환 등 일시 단절 → ICE restart로 자동 복구 시도
+      // failed = NAT 통과 실패(대개 TURN 부재) — 자동 재시도 + 진단 노출
       pc.onconnectionstatechange = () => {
-        if (pc.connectionState === 'disconnected') pc.restartIce()
+        if (pc.connectionState === 'disconnected') {
+          pc.restartIce()
+        } else if (pc.connectionState === 'failed') {
+          pc.restartIce()
+          setJoinError(
+            '상대와 음성 연결에 실패했습니다 — 네트워크(NAT) 통과 불가. TURN 릴레이 서버가 필요할 수 있습니다.',
+          )
+        } else if (pc.connectionState === 'connected') {
+          // 재협상·복구로 연결 성공 시 직전 연결 오류 메시지 해제
+          setJoinError((prev) =>
+            prev?.startsWith('상대와 음성 연결에 실패') ? null : prev,
+          )
+        }
       }
 
       return pc
@@ -193,7 +206,10 @@ export function useVoiceChannel({
     setJoinError(null)
 
     // S0 진단 1: WebRTC API 지원 여부 (구형 WebView·비보안 컨텍스트면 undefined)
-    if (!navigator.mediaDevices?.getUserMedia || typeof RTCPeerConnection === 'undefined') {
+    if (
+      !navigator.mediaDevices?.getUserMedia ||
+      typeof RTCPeerConnection === 'undefined'
+    ) {
       setJoinError('이 브라우저는 음성통화(WebRTC)를 지원하지 않습니다')
       return
     }
@@ -207,7 +223,9 @@ export function useVoiceChannel({
         piFetch(`/api/voice/rooms/${roomId}/join`, { method: 'POST' }),
       ])
       if (!joinRes.ok) {
-        const d = (await joinRes.json().catch(() => null)) as { error?: string } | null
+        const d = (await joinRes.json().catch(() => null)) as {
+          error?: string
+        } | null
         setJoinError(d?.error ?? `입장 실패 (HTTP ${joinRes.status})`)
         setVoiceState('idle')
         return
@@ -246,7 +264,9 @@ export function useVoiceChannel({
               : `마이크 접근 실패 (${name || '알 수 없음'})`
         setJoinError(msg)
         // 입장 등록은 됐으므로 퇴장 처리 후 원복
-        await piFetch(`/api/voice/rooms/${roomId}/leave`, { method: 'POST' }).catch(() => {})
+        await piFetch(`/api/voice/rooms/${roomId}/leave`, {
+          method: 'POST',
+        }).catch(() => {})
         setVoiceState('idle')
         return
       }
@@ -312,7 +332,9 @@ export function useVoiceChannel({
         body: JSON.stringify({ target_usr_id: targetUsrId, action }),
       })
       if (!res.ok) {
-        const d = (await res.json().catch(() => null)) as { error?: string } | null
+        const d = (await res.json().catch(() => null)) as {
+          error?: string
+        } | null
         if (d?.error) setJoinError(d.error)
       }
       return res.ok
