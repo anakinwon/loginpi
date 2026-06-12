@@ -180,7 +180,7 @@ export function ChatInput({
               <StickerImg
                 src={pendingSticker.url}
                 alt="전송할 스티커 미리보기"
-                className="h-16 w-16 object-contain"
+                className="h-21 w-21 object-contain"
               />
               <button
                 onClick={() => setPendingSticker(null)}
@@ -198,7 +198,7 @@ export function ChatInput({
                 <img
                   src={filePreviewUrl}
                   alt="전송할 사진 미리보기"
-                  className="h-16 w-16 rounded-lg object-cover"
+                  className="h-21 w-21 rounded-lg object-cover"
                 />
               ) : (
                 <span className="text-2xl" aria-hidden>
