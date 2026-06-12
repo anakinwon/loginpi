@@ -2,6 +2,7 @@ import NextAuth from 'next-auth'
 import Google from 'next-auth/providers/google'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { recordActivity } from '@/lib/activity-log'
+import { upsertGoogleUser } from '@/lib/users'
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
@@ -58,7 +59,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                   .eq('id', byEmail.id)
                   .is('google_id', null) // 경쟁 조건 방지: NULL 확인 후 업데이트
               } else {
-                token.userId = null
+                // DB에 일치하는 행 없음 → Google 전용 계정으로 자동 생성
+                // (Pi 미사용 PC 사용자가 Google로 처음 로그인하는 경우)
+                const newUser = await upsertGoogleUser({
+                  id: profile.sub as string,
+                  email: (profile.email as string) ?? null,
+                  name: (profile.name as string) ?? null,
+                  image: (profile as { picture?: string }).picture ?? null,
+                })
+                token.userId = newUser.id
+                recordActivity(newUser.id, 'LOGIN')
               }
             } else {
               token.userId = null

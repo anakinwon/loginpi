@@ -158,3 +158,42 @@ export async function getUserByPiUid(uid: string): Promise<UserRow | null> {
     .single()
   return (data as UserRow) ?? null
 }
+
+export async function getUserByGoogleId(
+  googleId: string,
+): Promise<UserRow | null> {
+  const { data } = await getSupabaseAdmin()
+    .from('sys_user')
+    .select()
+    .eq('google_id', googleId)
+    .maybeSingle()
+  return (data as UserRow) ?? null
+}
+
+// Google 전용 사용자 신규 생성 — Pi 계정 없이 Google만으로 로그인하는 PC 사용자용
+export async function upsertGoogleUser(googleUser: {
+  id: string
+  email: string | null
+  name: string | null
+  image: string | null
+}): Promise<UserRow> {
+  const { data, error } = await getSupabaseAdmin()
+    .from('sys_user')
+    .upsert(
+      {
+        google_id: googleUser.id,
+        google_email: googleUser.email,
+        google_name: googleUser.name,
+        google_image: googleUser.image,
+        display_name:
+          googleUser.name ?? googleUser.email ?? `google_${googleUser.id.slice(0, 8)}`,
+        last_login_dtm: new Date().toISOString(),
+      },
+      { onConflict: 'google_id' },
+    )
+    .select()
+    .single()
+
+  if (error) throw new Error(error.message ?? 'Google 사용자 저장 실패')
+  return data as UserRow
+}
