@@ -10,6 +10,7 @@ interface VoiceChannelPanelProps {
   participants: VoiceParticipant[]
   isMuted: boolean
   micAllowed: boolean
+  joinError: string | null // S0 진단 — 입장 실패 사유 표시
   currentUserId: string
   canControlMic: boolean // 방장(OWNER/ADMIN) — 서버가 재검증
   onJoin: () => void
@@ -34,6 +35,7 @@ export function VoiceChannelPanel({
   participants,
   isMuted,
   micAllowed,
+  joinError,
   currentUserId,
   canControlMic,
   onJoin,
@@ -109,6 +111,13 @@ export function VoiceChannelPanel({
               )
             })}
           </ul>
+        )}
+
+        {/* S0 진단 — 입장 실패 사유 (Pi Browser 실기기 검증용) */}
+        {joinError && (
+          <p className="bg-destructive/10 text-destructive mb-2 rounded-lg px-3 py-1.5 text-xs">
+            ⚠️ {joinError}
+          </p>
         )}
 
         {/* 방장 강제 mute 안내 */}

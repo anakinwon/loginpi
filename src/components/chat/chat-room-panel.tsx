@@ -115,6 +115,7 @@ export function ChatRoomPanel({
     remoteStreams,
     isMuted,
     micAllowed,
+    joinError,
     join: joinVoice,
     leave: leaveVoice,
     toggleMute,
@@ -446,6 +447,7 @@ export function ChatRoomPanel({
           participants={voiceParticipants}
           isMuted={isMuted}
           micAllowed={micAllowed}
+          joinError={joinError}
           currentUserId={currentUserId}
           canControlMic={canControlMic}
           onJoin={joinVoice}

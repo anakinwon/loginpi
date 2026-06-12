@@ -38,6 +38,8 @@ export function useVoiceChannel({
   )
   const [isMuted, setIsMuted] = useState(false) // 본인 자가 음소거 (로컬)
   const [micAllowed, setMicAllowed] = useState(true) // 서버 mic_yn — 방장 강제/4명 제한
+  // S0 실기기 검증 진단 — 입장 실패 단계·사유를 화면에 노출 (Pi Browser 디버깅용)
+  const [joinError, setJoinError] = useState<string | null>(null)
 
   const pcsRef = useRef<Map<string, RTCPeerConnection>>(new Map())
   // setRemoteDescription 전에 도착한 ICE candidate 보관 큐 (피어별)
@@ -174,6 +176,14 @@ export function useVoiceChannel({
   // ─── 입장 — 1명도 가능 (혼자 대기) ──────────────────────────────────────────
   const join = useCallback(async () => {
     if (joinedRef.current || voiceState === 'joining') return
+    setJoinError(null)
+
+    // S0 진단 1: WebRTC API 지원 여부 (구형 WebView·비보안 컨텍스트면 undefined)
+    if (!navigator.mediaDevices?.getUserMedia || typeof RTCPeerConnection === 'undefined') {
+      setJoinError('이 브라우저는 음성통화(WebRTC)를 지원하지 않습니다')
+      return
+    }
+
     setVoiceState('joining')
 
     try {
@@ -183,6 +193,8 @@ export function useVoiceChannel({
         piFetch(`/api/voice/rooms/${roomId}/join`, { method: 'POST' }),
       ])
       if (!joinRes.ok) {
+        const d = (await joinRes.json().catch(() => null)) as { error?: string } | null
+        setJoinError(d?.error ?? `입장 실패 (HTTP ${joinRes.status})`)
         setVoiceState('idle')
         return
       }
@@ -199,14 +211,31 @@ export function useVoiceChannel({
       setParticipants(list)
 
       // 청취 전용이어도 마이크 권한은 확보 (방장 unmute 시 즉시 송출 가능)
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true,
-        },
-        video: false,
-      })
+      // S0 진단 2: getUserMedia 실패 사유 구분 (권한 거부/마이크 없음/기타)
+      let stream: MediaStream
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true,
+          },
+          video: false,
+        })
+      } catch (e) {
+        const name = e instanceof DOMException ? e.name : ''
+        const msg =
+          name === 'NotAllowedError' || name === 'SecurityError'
+            ? '마이크 권한이 거부되었습니다 — 브라우저/앱 설정에서 마이크를 허용해 주세요'
+            : name === 'NotFoundError'
+              ? '사용 가능한 마이크를 찾지 못했습니다'
+              : `마이크 접근 실패 (${name || '알 수 없음'})`
+        setJoinError(msg)
+        // 입장 등록은 됐으므로 퇴장 처리 후 원복
+        await piFetch(`/api/voice/rooms/${roomId}/leave`, { method: 'POST' }).catch(() => {})
+        setVoiceState('idle')
+        return
+      }
       localStreamRef.current = stream
       syncLocalTrack()
 
@@ -223,7 +252,8 @@ export function useVoiceChannel({
           await sendSignal('webrtc_offer', peer.usr_id, { sdp: offer })
         }),
       )
-    } catch {
+    } catch (e) {
+      setJoinError(e instanceof Error ? `연결 오류: ${e.message}` : '연결 오류')
       cleanup()
     }
   }, [
@@ -390,6 +420,7 @@ export function useVoiceChannel({
     remoteStreams,
     isMuted,
     micAllowed,
+    joinError,
     join,
     leave,
     toggleMute,
