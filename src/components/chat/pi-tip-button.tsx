@@ -63,7 +63,7 @@ export function PiTipButton({
           setPaying(false)
           setOpen(false)
           if (res.ok)
-            toast.success(`${recipientName} 님께 π${amount} Bean을 보냈습니다!`)
+            toast.success(`${recipientName} 님께 π${amount} Bean을 선물했습니다!`)
           else toast.error('Bean 결제 완료 처리에 실패했습니다')
         },
         onCancel: () => {
@@ -91,7 +91,7 @@ export function PiTipButton({
         <img
           src="/bean.png"
           alt="Bean"
-          className="inline-block h-6 w-6 brightness-125"
+          className="inline-block h-8 w-8 brightness-125"
         />
       </button>
       {open && (

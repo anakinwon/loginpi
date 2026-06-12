@@ -212,7 +212,7 @@ export async function POST(request: NextRequest) {
               room_id: roomId,
               snd_usr_id: senderRow.id,
               snd_usr_nm: String(senderRow.display_name ?? 'user'),
-              msg_cont: `🫘 ${senderRow.display_name} 님이 ${recipientRow.display_name} 님께 π${payment.amount} Bean을 보냈습니다`,
+              msg_cont: `🫘 ${senderRow.display_name} 님이 ${recipientRow.display_name} 님께 π${payment.amount} Bean을 선물했습니다`,
               msg_tp_cd: 'TIP_NOTI',
               regr_id: slug,
               modr_id: slug,

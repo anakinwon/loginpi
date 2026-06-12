@@ -232,7 +232,20 @@ function MessageBubble({
   ) {
     return (
       <div className="text-muted-foreground py-1 text-center text-xs">
-        {msg.msg_cont}
+        {/* Bean 알림은 🫘 이모지를 럭셔리 콩 이미지로 치환해 표시 (DB 텍스트는 이모지 유지) */}
+        {msg.msg_tp_cd === 'TIP_NOTI' ? (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/bean-noti.png"
+              alt="Bean"
+              className="mr-1 inline-block h-5 w-5 align-text-bottom"
+            />
+            {(msg.msg_cont ?? '').replace(/^🫘\s*/, '')}
+          </>
+        ) : (
+          msg.msg_cont
+        )}
         {msg.msg_tp_cd === 'TIP_NOTI' && !canTip && onUpgradeForTip && (
           <button
             onClick={onUpgradeForTip}
