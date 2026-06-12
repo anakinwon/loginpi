@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import dynamic from 'next/dynamic'
 import { piFetch } from '@/lib/pi-fetch'
+import { readCache, writeCache } from '@/lib/client-cache'
 import { themeLabel } from '@/lib/stats-labels'
 import { LazySection } from '@/components/lazy-section'
 import { StatsCard } from './stats-card'
@@ -197,35 +198,74 @@ export function StatsDashboard() {
   // 매출 섹션이 뷰포트에 진입한 뒤에만 revenue API 호출 (스크롤 지연 로딩)
   const [revVisible, setRevVisible] = useState(false)
 
+  // period 전환 시 늦게 도착한 이전 기간 응답이 화면을 덮어쓰지 않도록 가드
+  // (fetch effect보다 먼저 선언 — 같은 렌더 사이클에서 ref가 먼저 동기화된다)
+  const periodRef = useRef(period)
+  useEffect(() => {
+    periodRef.current = period
+  }, [period])
+
   const fetchActivity = useCallback(async (p: number) => {
-    setLoading(true)
     setError(null)
-    try {
-      // 온디맨드 집계 — 오늘(UTC) 행을 최신화한 뒤 조회 (실패해도 기존 롤업으로 표시)
-      // ondemand: true → 배치 이력에 MANUAL(수동)이 아닌 ONDEMAND(자동)로 기록
-      await piFetch('/api/admin/stats/aggregate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ondemand: true }),
-      }).catch(() => {})
+    const cacheKey = `stats_activity_${p}`
+
+    // 1) 캐시 즉시 표시 (SWR) — 재방문 시 스켈레톤 없이 0ms 렌더
+    const cached = readCache<ActivityStatsResponse>(cacheKey, 5 * 60_000)
+    if (cached) {
+      setActivityData(cached)
+      setLoading(false)
+    } else {
+      setLoading(true)
+    }
+
+    // 어제까지의 롤업으로 즉시 조회 — 온디맨드 집계를 기다리지 않는다
+    const loadActivity = async () => {
       const actRes = await piFetch(`/api/admin/stats/activity?period=${p}`)
       if (!actRes.ok) throw new Error('데이터 조회 실패')
-      setActivityData((await actRes.json()) as ActivityStatsResponse)
+      const data = (await actRes.json()) as ActivityStatsResponse
+      if (periodRef.current !== p) return // 기간이 바뀌었으면 stale 응답 폐기
+      setActivityData(data)
+      writeCache(cacheKey, data)
+    }
+
+    try {
+      await loadActivity()
     } catch (e) {
-      setError(e instanceof Error ? e.message : '오류 발생')
+      if (!cached) setError(e instanceof Error ? e.message : '오류 발생')
     } finally {
       setLoading(false)
     }
+
+    // 2) 온디맨드 집계는 백그라운드 병렬 — 완료되면 오늘(UTC) 행을 반영해 한 번 더 갱신
+    //    (기존: 집계 완료까지 화면 전체 대기 — HOME 로딩 지연의 주범)
+    //    ondemand: true → 배치 이력에 MANUAL(수동)이 아닌 ONDEMAND(자동)로 기록
+    void piFetch('/api/admin/stats/aggregate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ondemand: true }),
+    })
+      .then((r) => (r.ok ? loadActivity() : undefined))
+      .catch(() => {})
   }, [])
 
   const fetchRevenue = useCallback(async (p: number) => {
-    setRevLoading(true)
+    const cacheKey = `stats_revenue_${p}`
+    const cached = readCache<RevenueStatsResponse>(cacheKey, 5 * 60_000)
+    if (cached) {
+      setRevenueData(cached)
+      setRevLoading(false)
+    } else {
+      setRevLoading(true)
+    }
     try {
       const revRes = await piFetch(`/api/admin/stats/revenue?period=${p}`)
       if (!revRes.ok) throw new Error('데이터 조회 실패')
-      setRevenueData((await revRes.json()) as RevenueStatsResponse)
+      const data = (await revRes.json()) as RevenueStatsResponse
+      if (periodRef.current !== p) return
+      setRevenueData(data)
+      writeCache(cacheKey, data)
     } catch (e) {
-      setError(e instanceof Error ? e.message : '오류 발생')
+      if (!cached) setError(e instanceof Error ? e.message : '오류 발생')
     } finally {
       setRevLoading(false)
     }

@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { deriveTradeStatus, TRADE_ST_STYLE } from '@/lib/mps-trade-status'
 import { piFetch } from '@/lib/pi-fetch'
+import { readCache, writeCache } from '@/lib/client-cache'
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll'
 import { LbsConsentDialog } from '@/components/lbs/lbs-consent-dialog'
 
@@ -26,6 +27,9 @@ export interface StoreItem {
 }
 
 const CND_LIST = ['NEW', 'USED', 'HANDMADE'] as const
+// 기본 뷰(1페이지·검색/필터 없음·좌표 없음)만 localStorage SWR 캐시 — 재방문 즉시 표시
+const STORE_CACHE_KEY = 'store_items_default'
+const STORE_CACHE_MAX_AGE_MS = 5 * 60_000
 const BASE_SORT_LIST = ['latest', 'price_asc', 'price_desc', 'views'] as const
 type BaseSort = (typeof BASE_SORT_LIST)[number]
 type SortType = BaseSort | 'distance'
@@ -100,7 +104,23 @@ export function StoreItemList() {
   }, [lbsConsent])
 
   const load = useCallback(async () => {
-    setLoading(true)
+    // 기본 뷰: 캐시 즉시 표시 (SWR) → 아래 네트워크 응답으로 교체
+    const isDefaultView =
+      page === 1 && !keyword && !cnd && sort === 'latest' && userLat === null
+    let servedFromCache = false
+    if (isDefaultView) {
+      const cached = readCache<{ items: StoreItem[]; total: number }>(
+        STORE_CACHE_KEY,
+        STORE_CACHE_MAX_AGE_MS,
+      )
+      if (cached) {
+        setItems(cached.items)
+        setTotal(cached.total)
+        servedFromCache = true
+      }
+    }
+    setLoading(!servedFromCache)
+
     const sp = new URLSearchParams({
       page: String(page),
       limit: String(limit),
@@ -122,6 +142,7 @@ export function StoreItemList() {
         // 무한 스크롤 — 첫 페이지는 교체, 이후 페이지는 누적 append
         setItems((prev) => (page === 1 ? data.items : [...prev, ...data.items]))
         setTotal(data.total)
+        if (isDefaultView) writeCache(STORE_CACHE_KEY, data)
       }
     } finally {
       setLoading(false)

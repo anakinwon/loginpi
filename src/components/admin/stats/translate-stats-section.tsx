@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { piFetch } from '@/lib/pi-fetch'
+import { readCache, writeCache } from '@/lib/client-cache'
 import { StatsCard } from './stats-card'
 
 // PiTranslate™ 번역 통계 섹션 (TASK-098)
@@ -36,16 +37,27 @@ export function TranslateStatsSection({ period }: { period: number }) {
 
   useEffect(() => {
     let cancelled = false
+    const cacheKey = `stats_translate_${period}`
     void (async () => {
-      setLoading(true)
       setError(null)
+      // 캐시 즉시 표시 (SWR) → 네트워크 응답으로 교체
+      const cached = readCache<TranslateStatsResponse>(cacheKey, 5 * 60_000)
+      if (cached) {
+        setData(cached)
+        setLoading(false)
+      } else {
+        setLoading(true)
+      }
       try {
         const res = await piFetch(`/api/admin/stats/translate?period=${period}`)
         if (!res.ok) throw new Error('번역 통계 조회 실패')
         const body = (await res.json()) as TranslateStatsResponse
-        if (!cancelled) setData(body)
+        if (cancelled) return
+        setData(body)
+        writeCache(cacheKey, body)
       } catch (e) {
-        if (!cancelled) setError(e instanceof Error ? e.message : '오류 발생')
+        if (!cancelled && !cached)
+          setError(e instanceof Error ? e.message : '오류 발생')
       } finally {
         if (!cancelled) setLoading(false)
       }
