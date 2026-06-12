@@ -88,7 +88,11 @@ export function PiTipButton({
         title={`${recipientName}님께 Pi Bean 보내기`}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/bean.png" alt="Bean" className="inline-block h-4 w-4" />
+        <img
+          src="/bean.png"
+          alt="Bean"
+          className="inline-block h-6 w-6 brightness-125"
+        />
       </button>
       {open && (
         <div className="bg-popover absolute bottom-full left-0 z-20 mb-1 min-w-[160px] rounded-xl border p-2 shadow-lg">
