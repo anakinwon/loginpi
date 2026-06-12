@@ -4,16 +4,17 @@ import { getRoomMember } from '@/lib/chat'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { broadcastToCall } from '@/lib/realtime-broadcast'
 import {
-  MAX_ACTIVE_MICS,
   getActiveParticipants,
   getActiveParticipant,
+  decideMicStateOnJoin,
   openCallSessionIfFirst,
 } from '@/lib/voice'
 
 type Params = { params: Promise<{ roomId: string }> }
 
 // POST /api/voice/rooms/[roomId]/join — 음성채널 입장 (1명도 가능, 혼자 대기)
-// 활성 마이크 4명 초과 시 청취 전용(mic_yn='N')으로 강제 입장.
+// v3.0 권한 정책: 방장 무조건 CONNECTED(R1), 멤버 자동 슬롯 2(R3),
+// 초과분은 PENDING 승인 대기(R4), 멤버 정원 4 초과 시 청취 전용(R6)
 export async function POST(_req: Request, { params }: Params) {
   const { roomId } = await params
   const user = await getSessionUser()
@@ -24,15 +25,20 @@ export async function POST(_req: Request, { params }: Params) {
   if (!mbr)
     return NextResponse.json({ error: '카페 멤버가 아닙니다' }, { status: 403 })
 
+  const isOwner = mbr.mbr_role_cd === 'OWNER' || mbr.mbr_role_cd === 'ADMIN'
+
   // 이미 입장 중이면 현재 상태 그대로 반환 (중복 join 멱등 처리)
   const existing = await getActiveParticipant(roomId, user.id)
   const participants = await getActiveParticipants(roomId)
   if (existing) {
-    return NextResponse.json({ mic_yn: existing.mic_yn, participants })
+    return NextResponse.json({
+      mic_yn: existing.mic_yn,
+      mic_st_cd: existing.mic_st_cd,
+      participants,
+    })
   }
 
-  const activeMicCount = participants.filter((p) => p.mic_yn === 'Y').length
-  const micYn: 'Y' | 'N' = activeMicCount >= MAX_ACTIVE_MICS ? 'N' : 'Y'
+  const micState = decideMicStateOnJoin(isOwner, participants)
 
   // 첫 참여자면 통화 세션 메타 시작 (best-effort)
   await openCallSessionIfFirst(roomId, participants.length)
@@ -43,7 +49,8 @@ export async function POST(_req: Request, { params }: Params) {
     .insert({
       room_id: roomId,
       usr_id: user.id,
-      mic_yn: micYn,
+      mic_yn: micState === 'CONNECTED' ? 'Y' : 'N',
+      mic_st_cd: micState,
       regr_id: slug,
       modr_id: slug,
     })
@@ -53,6 +60,7 @@ export async function POST(_req: Request, { params }: Params) {
     if (retry) {
       return NextResponse.json({
         mic_yn: retry.mic_yn,
+        mic_st_cd: retry.mic_st_cd,
         participants: await getActiveParticipants(roomId),
       })
     }
@@ -65,9 +73,23 @@ export async function POST(_req: Request, { params }: Params) {
   await broadcastToCall(roomId, 'call_participant_join', {
     usr_id: user.id,
     display_nm: user.display_name,
-    mic_yn: micYn,
+    mic_yn: micState === 'CONNECTED' ? 'Y' : 'N',
+    mic_st_cd: micState,
     participants: updated,
   })
 
-  return NextResponse.json({ mic_yn: micYn, participants: updated })
+  // PENDING 입장이면 방장에게 승인 요청 알림 (R4)
+  if (micState === 'PENDING') {
+    await broadcastToCall(roomId, 'mic_request', {
+      usr_id: user.id,
+      display_nm: user.display_name,
+      participants: updated,
+    })
+  }
+
+  return NextResponse.json({
+    mic_yn: micState === 'CONNECTED' ? 'Y' : 'N',
+    mic_st_cd: micState,
+    participants: updated,
+  })
 }

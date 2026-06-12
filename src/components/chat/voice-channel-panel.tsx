@@ -1,22 +1,31 @@
 'use client'
 import { useEffect, useRef } from 'react'
-import type { VoiceState, VoiceParticipant } from '@/hooks/use-voice-channel'
+import type {
+  VoiceState,
+  VoiceParticipant,
+  MicState,
+} from '@/hooks/use-voice-channel'
 
-// PiVoice™ v2.0 — N:N 음성채널 패널 (PRD_9_VOICE_CHAT v2.0)
-// 참여자 목록 + 마이크 상태, 본인 음소거, 방장(OWNER/ADMIN) 원격 마이크 제어.
+// PiVoice™ v3.0 — N:N 음성채널 패널 (PRD_9_VOICE_CHAT v3.0)
+// 권한 정책: 방장 👑 보장 슬롯, 멤버 자동 2/승인 2.
+// 방장은 PENDING 승인/거절, CONNECTED 회수, LISTEN_ONLY 직접 허용 가능.
 
 interface VoiceChannelPanelProps {
   voiceState: VoiceState
   participants: VoiceParticipant[]
   isMuted: boolean
-  micAllowed: boolean
+  micState: MicState // 본인 권한 상태
   joinError: string | null // S0 진단 — 입장 실패 사유 표시
   currentUserId: string
   canControlMic: boolean // 방장(OWNER/ADMIN) — 서버가 재검증
   onJoin: () => void
   onLeave: () => void
   onToggleMute: () => void
-  onControlMic: (targetUsrId: string, action: 'mute' | 'unmute') => void
+  onControlMic: (
+    targetUsrId: string,
+    action: 'approve' | 'deny' | 'revoke' | 'grant',
+  ) => void
+  onRequestMic: () => void
   onClose: () => void
 }
 
@@ -30,11 +39,23 @@ export function RemoteAudio({ stream }: { stream: MediaStream }) {
   return <audio ref={ref} autoPlay playsInline className="hidden" />
 }
 
+// 참여자 상태 아이콘·라벨
+const MIC_ST_ICON: Record<MicState, string> = {
+  CONNECTED: '🎙️',
+  PENDING: '⏳',
+  LISTEN_ONLY: '🔇',
+}
+const MIC_ST_LABEL: Record<MicState, string | null> = {
+  CONNECTED: null,
+  PENDING: '승인 대기',
+  LISTEN_ONLY: '청취 전용',
+}
+
 export function VoiceChannelPanel({
   voiceState,
   participants,
   isMuted,
-  micAllowed,
+  micState,
   joinError,
   currentUserId,
   canControlMic,
@@ -42,9 +63,11 @@ export function VoiceChannelPanel({
   onLeave,
   onToggleMute,
   onControlMic,
+  onRequestMic,
   onClose,
 }: VoiceChannelPanelProps) {
   const joined = voiceState === 'joined'
+  const canSpeak = micState === 'CONNECTED'
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-50 flex items-end justify-center p-4 sm:bottom-4">
@@ -62,7 +85,7 @@ export function VoiceChannelPanel({
           </button>
         </div>
 
-        {/* 참여자 목록 — 마이크 상태 + 방장 원격 제어 */}
+        {/* 참여자 목록 — 권한 상태 + 방장 제어 */}
         {participants.length === 0 ? (
           <p className="text-muted-foreground py-4 text-center text-xs">
             아직 아무도 없습니다. 먼저 입장해서 기다릴 수 있어요.
@@ -71,15 +94,17 @@ export function VoiceChannelPanel({
           <ul className="mb-3 max-h-48 space-y-1 overflow-y-auto">
             {participants.map((p) => {
               const isMe = p.usr_id === currentUserId
-              const micOn = p.mic_yn === 'Y'
+              const st = p.mic_st_cd ?? (p.mic_yn === 'Y' ? 'CONNECTED' : 'LISTEN_ONLY')
+              const stLabel = MIC_ST_LABEL[st]
               return (
                 <li
                   key={p.usr_id}
                   className="hover:bg-muted/50 flex items-center justify-between gap-2 rounded-lg px-3 py-1.5 text-sm"
                 >
                   <span className="flex min-w-0 items-center gap-2">
-                    <span className="shrink-0">{micOn ? '🎙️' : '🔇'}</span>
+                    <span className="shrink-0">{MIC_ST_ICON[st]}</span>
                     <span className="truncate">
+                      {p.owner_yn === 'Y' && <span className="mr-0.5">👑</span>}
                       {p.display_nm}
                       {isMe && (
                         <span className="text-muted-foreground ml-1 text-xs">
@@ -88,24 +113,51 @@ export function VoiceChannelPanel({
                       )}
                     </span>
                   </span>
-                  {!micOn && (
+                  {stLabel && (
                     <span className="text-muted-foreground shrink-0 text-[10px]">
-                      청취 전용
+                      {stLabel}
                     </span>
                   )}
-                  {/* 방장 원격 마이크 제어 — 본인 제외 */}
-                  {canControlMic && !isMe && joined && (
-                    <button
-                      onClick={() =>
-                        onControlMic(p.usr_id, micOn ? 'mute' : 'unmute')
-                      }
-                      className="bg-muted hover:bg-muted/70 shrink-0 rounded-md px-2 py-0.5 text-[10px] transition-colors"
-                      title={
-                        micOn ? '마이크 끄기 (방장)' : '마이크 허용 (방장)'
-                      }
-                    >
-                      {micOn ? '마이크 차단' : '마이크 허용'}
-                    </button>
+                  {/* 방장 권한 제어 — 본인·다른 방장 제외 */}
+                  {canControlMic && !isMe && joined && p.owner_yn !== 'Y' && (
+                    <span className="flex shrink-0 gap-1">
+                      {st === 'PENDING' && (
+                        <>
+                          <button
+                            onClick={() => onControlMic(p.usr_id, 'approve')}
+                            className="rounded-md bg-green-500/15 px-2 py-0.5 text-[10px] text-green-700 transition-colors hover:bg-green-500/25 dark:text-green-400"
+                            title="발언 승인 (방장)"
+                          >
+                            승인
+                          </button>
+                          <button
+                            onClick={() => onControlMic(p.usr_id, 'deny')}
+                            className="bg-destructive/10 text-destructive hover:bg-destructive/20 rounded-md px-2 py-0.5 text-[10px] transition-colors"
+                            title="발언 거절 (방장)"
+                          >
+                            거절
+                          </button>
+                        </>
+                      )}
+                      {st === 'CONNECTED' && (
+                        <button
+                          onClick={() => onControlMic(p.usr_id, 'revoke')}
+                          className="bg-muted hover:bg-muted/70 rounded-md px-2 py-0.5 text-[10px] transition-colors"
+                          title="발언 권한 회수 (방장)"
+                        >
+                          권한 회수
+                        </button>
+                      )}
+                      {st === 'LISTEN_ONLY' && (
+                        <button
+                          onClick={() => onControlMic(p.usr_id, 'grant')}
+                          className="bg-muted hover:bg-muted/70 rounded-md px-2 py-0.5 text-[10px] transition-colors"
+                          title="발언 허용 (방장)"
+                        >
+                          발언 허용
+                        </button>
+                      )}
+                    </span>
                   )}
                 </li>
               )
@@ -113,23 +165,28 @@ export function VoiceChannelPanel({
           </ul>
         )}
 
-        {/* S0 진단 — 입장 실패 사유 (Pi Browser 실기기 검증용) */}
+        {/* S0 진단 — 입장·제어 실패 사유 */}
         {joinError && (
           <p className="bg-destructive/10 text-destructive mb-2 rounded-lg px-3 py-1.5 text-xs">
             ⚠️ {joinError}
           </p>
         )}
 
-        {/* 방장 강제 mute 안내 */}
-        {joined && !micAllowed && (
-          <p className="mb-2 rounded-lg bg-yellow-500/10 px-3 py-1.5 text-xs text-yellow-700 dark:text-yellow-400">
-            🔇 마이크가 제한되었습니다 (방장 제어 또는 동시 4명 초과). 청취만
+        {/* 본인 권한 상태 안내 */}
+        {joined && micState === 'PENDING' && (
+          <p className="mb-2 rounded-lg bg-blue-500/10 px-3 py-1.5 text-xs text-blue-700 dark:text-blue-400">
+            ⏳ 방장의 발언 승인을 기다리는 중입니다 — 승인 전까지 청취만
             가능합니다.
+          </p>
+        )}
+        {joined && micState === 'LISTEN_ONLY' && (
+          <p className="mb-2 rounded-lg bg-yellow-500/10 px-3 py-1.5 text-xs text-yellow-700 dark:text-yellow-400">
+            🔇 청취 전용 상태입니다. 발언하려면 아래에서 신청하세요.
           </p>
         )}
 
         {/* 액션 버튼 */}
-        <div className="flex justify-center gap-4">
+        <div className="flex items-center justify-center gap-4">
           {!joined ? (
             <button
               onClick={onJoin}
@@ -140,9 +197,19 @@ export function VoiceChannelPanel({
             </button>
           ) : (
             <>
+              {/* 청취 전용 → 발언 신청 (R4) */}
+              {micState === 'LISTEN_ONLY' && (
+                <button
+                  onClick={onRequestMic}
+                  className="flex h-12 items-center gap-1 rounded-full bg-blue-500 px-5 text-sm font-semibold text-white shadow"
+                  title="발언 신청 — 방장 승인 후 송출 가능"
+                >
+                  🙋 발언 신청
+                </button>
+              )}
               <button
                 onClick={onToggleMute}
-                disabled={!micAllowed}
+                disabled={!canSpeak}
                 className={`flex h-12 w-12 items-center justify-center rounded-full text-xl shadow disabled:opacity-40 ${
                   isMuted
                     ? 'bg-yellow-400 text-white'
@@ -150,14 +217,10 @@ export function VoiceChannelPanel({
                 }`}
                 aria-label={isMuted ? '음소거 해제' : '음소거'}
                 title={
-                  micAllowed
-                    ? isMuted
-                      ? '음소거 해제'
-                      : '음소거'
-                    : '마이크 제한됨'
+                  canSpeak ? (isMuted ? '음소거 해제' : '음소거') : '발언 권한 없음'
                 }
               >
-                {isMuted || !micAllowed ? '🔇' : '🎙️'}
+                {isMuted || !canSpeak ? '🔇' : '🎙️'}
               </button>
               <button
                 onClick={onLeave}

@@ -22,6 +22,9 @@ export const env = createEnv({
     TURN_SECRET: z.string().optional(),
     TURN_CREDENTIAL_TTL: z.coerce.number().optional(),
     GOOGLE_MAPS_API_KEY: z.string().optional(),
+    // PiVoice v3.0 권한 슬롯 (R7 — 향후 확대 가능, 기본 자동 2/멤버 4)
+    VOICE_AUTO_SLOTS: z.coerce.number().int().positive().optional(),
+    VOICE_MAX_MEMBER_SLOTS: z.coerce.number().int().positive().optional(),
   },
   client: {
     NEXT_PUBLIC_APP_URL: z.string().url(),
@@ -46,6 +49,8 @@ export const env = createEnv({
     TURN_SECRET: process.env.TURN_SECRET,
     TURN_CREDENTIAL_TTL: process.env.TURN_CREDENTIAL_TTL,
     GOOGLE_MAPS_API_KEY: process.env.GOOGLE_MAPS_API_KEY,
+    VOICE_AUTO_SLOTS: process.env.VOICE_AUTO_SLOTS,
+    VOICE_MAX_MEMBER_SLOTS: process.env.VOICE_MAX_MEMBER_SLOTS,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_PI_SANDBOX: process.env.NEXT_PUBLIC_PI_SANDBOX,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,

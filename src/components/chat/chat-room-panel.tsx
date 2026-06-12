@@ -108,18 +108,19 @@ export function ChatRoomPanel({
     checkSubscription()
   }, [checkSubscription])
 
-  // PiVoice™ v2.0 — N:N 음성채널 훅 (1명도 입장 가능, 최대 마이크 4명)
+  // PiVoice™ v3.0 — N:N 음성채널 훅 (방장 보장 + 멤버 자동 2/승인 2)
   const {
     voiceState,
     participants: voiceParticipants,
     remoteStreams,
     isMuted,
-    micAllowed,
+    micState,
     joinError,
     join: joinVoice,
     leave: leaveVoice,
     toggleMute,
     controlMic,
+    requestMic,
   } = useVoiceChannel({ roomId, currentUserId })
 
   // 방 메타 조회 — 방장(OWNER)이고 그룹/이벤트방이면 수정 버튼 노출
@@ -440,13 +441,13 @@ export function ChatRoomPanel({
         onClose={() => setAiLimitPromptOpen(false)}
       />
 
-      {/* PiVoice™ v2.0 음성채널 패널 — N:N(1~4명 마이크), 방장 원격 제어 */}
+      {/* PiVoice™ v3.0 음성채널 패널 — 방장 보장 + 멤버 자동 2/승인 2 */}
       {voicePanelOpen && (
         <VoiceChannelPanel
           voiceState={voiceState}
           participants={voiceParticipants}
           isMuted={isMuted}
-          micAllowed={micAllowed}
+          micState={micState}
           joinError={joinError}
           currentUserId={currentUserId}
           canControlMic={canControlMic}
@@ -454,6 +455,7 @@ export function ChatRoomPanel({
           onLeave={leaveVoice}
           onToggleMute={toggleMute}
           onControlMic={controlMic}
+          onRequestMic={requestMic}
           onClose={() => setVoicePanelOpen(false)}
         />
       )}

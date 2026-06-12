@@ -3,16 +3,20 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { getSupabaseClient } from '@/lib/supabase-client'
 import { piFetch } from '@/lib/pi-fetch'
 
-// PiVoice™ v2.0 — N:N Full Mesh 음성채널 훅 (PRD_9_VOICE_CHAT v2.0)
+// PiVoice™ v3.0 — N:N Full Mesh 음성채널 훅 (PRD_9_VOICE_CHAT v3.0)
 // 1명도 입장 가능(혼자 대기), 신규 입장자가 기존 피어 전원에게 offer를 보내 glare 차단.
-// 방장 mic_mute_force 수신 시 클라이언트가 자가 mute (서버는 미디어를 직접 제어하지 않음).
+// 권한 정책: 방장 보장 슬롯 + 멤버 자동 2/승인 2 — 본인 상태는 mic_st_change 수신으로 동기화.
 
 export type VoiceState = 'idle' | 'joining' | 'joined'
+// 본인 발언 권한 상태 — CONNECTED(송출) | PENDING(방장 승인 대기) | LISTEN_ONLY(청취 전용)
+export type MicState = 'CONNECTED' | 'PENDING' | 'LISTEN_ONLY'
 
 export interface VoiceParticipant {
   usr_id: string
   display_nm: string
   mic_yn: 'Y' | 'N'
+  mic_st_cd: MicState
+  owner_yn: 'Y' | 'N' // 방장(OWNER/ADMIN) — 보장 슬롯, 👑 표시
 }
 
 interface VoiceStats {
@@ -37,7 +41,8 @@ export function useVoiceChannel({
     new Map(),
   )
   const [isMuted, setIsMuted] = useState(false) // 본인 자가 음소거 (로컬)
-  const [micAllowed, setMicAllowed] = useState(true) // 서버 mic_yn — 방장 강제/4명 제한
+  // 본인 발언 권한 상태 (서버 mic_st_cd) — 방장 제어·승인 플로우로 변경됨
+  const [micState, setMicState] = useState<MicState>('CONNECTED')
   // S0 실기기 검증 진단 — 입장 실패 단계·사유를 화면에 노출 (Pi Browser 디버깅용)
   const [joinError, setJoinError] = useState<string | null>(null)
 
@@ -50,7 +55,7 @@ export function useVoiceChannel({
   const iceServersRef = useRef<RTCIceServer[]>([])
   const joinedRef = useRef(false)
   const isMutedRef = useRef(false)
-  const micAllowedRef = useRef(true)
+  const micStateRef = useRef<MicState>('CONNECTED')
 
   // ─── 시그널 송신 (서버 중계 — 신원 보증) ────────────────────────────────────
   const sendSignal = useCallback(
@@ -68,13 +73,22 @@ export function useVoiceChannel({
   )
 
   // ─── 로컬 마이크 track 활성 상태 동기화 ─────────────────────────────────────
-  // 송출 = 서버 허용(micAllowed) AND 본인이 음소거하지 않음(!isMuted)
+  // 송출 = 서버 권한 CONNECTED AND 본인이 음소거하지 않음(!isMuted)
   const syncLocalTrack = useCallback(() => {
-    const enabled = micAllowedRef.current && !isMutedRef.current
+    const enabled = micStateRef.current === 'CONNECTED' && !isMutedRef.current
     localStreamRef.current?.getAudioTracks().forEach((t) => {
       t.enabled = enabled
     })
   }, [])
+
+  const applyMicState = useCallback(
+    (st: MicState) => {
+      micStateRef.current = st
+      setMicState(st)
+      syncLocalTrack()
+    },
+    [syncLocalTrack],
+  )
 
   // ─── 피어 연결 생성 ─────────────────────────────────────────────────────────
   const createPeer = useCallback(
@@ -167,9 +181,9 @@ export function useVoiceChannel({
     setRemoteStreams(new Map())
     joinedRef.current = false
     isMutedRef.current = false
-    micAllowedRef.current = true
+    micStateRef.current = 'CONNECTED'
     setIsMuted(false)
-    setMicAllowed(true)
+    setMicState('CONNECTED')
     setVoiceState('idle')
   }, [])
 
@@ -201,16 +215,16 @@ export function useVoiceChannel({
       const { iceServers } = (await credsRes.json()) as {
         iceServers: RTCIceServer[]
       }
-      const { mic_yn, participants: list } = (await joinRes.json()) as {
-        mic_yn: 'Y' | 'N'
+      const { mic_st_cd, participants: list } = (await joinRes.json()) as {
+        mic_st_cd: MicState
         participants: VoiceParticipant[]
       }
       iceServersRef.current = iceServers
-      micAllowedRef.current = mic_yn === 'Y'
-      setMicAllowed(mic_yn === 'Y')
+      micStateRef.current = mic_st_cd
+      setMicState(mic_st_cd)
       setParticipants(list)
 
-      // 청취 전용이어도 마이크 권한은 확보 (방장 unmute 시 즉시 송출 가능)
+      // 청취 전용·대기여도 마이크 권한은 확보 (승인 즉시 송출 가능)
       // S0 진단 2: getUserMedia 실패 사유 구분 (권한 거부/마이크 없음/기타)
       let stream: MediaStream
       try {
@@ -285,18 +299,43 @@ export function useVoiceChannel({
     syncLocalTrack()
   }, [syncLocalTrack])
 
-  // ─── 방장 원격 마이크 제어 (UI에서 OWNER/ADMIN만 노출 — 서버가 재검증) ──────
+  // ─── 방장 권한 제어 (UI에서 OWNER/ADMIN만 노출 — 서버가 재검증) ─────────────
+  // approve(승인)·deny(거절)·revoke(회수)·grant(직접 허용)
   const controlMic = useCallback(
-    async (targetUsrId: string, action: 'mute' | 'unmute') => {
+    async (
+      targetUsrId: string,
+      action: 'approve' | 'deny' | 'revoke' | 'grant',
+    ) => {
       const res = await piFetch(`/api/voice/rooms/${roomId}/mic-control`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ target_usr_id: targetUsrId, action }),
       })
+      if (!res.ok) {
+        const d = (await res.json().catch(() => null)) as { error?: string } | null
+        if (d?.error) setJoinError(d.error)
+      }
       return res.ok
     },
     [roomId],
   )
+
+  // ─── 발언 신청 (청취 전용 → 방장 승인 대기) — R4 ───────────────────────────
+  const requestMic = useCallback(async () => {
+    const res = await piFetch(`/api/voice/rooms/${roomId}/request`, {
+      method: 'POST',
+    })
+    const d = (await res.json().catch(() => null)) as {
+      mic_st_cd?: MicState
+      error?: string
+    } | null
+    if (!res.ok) {
+      if (d?.error) setJoinError(d.error)
+      return false
+    }
+    if (d?.mic_st_cd) applyMicState(d.mic_st_cd)
+    return true
+  }, [roomId, applyMicState])
 
   // ─── 시그널링 수신 ──────────────────────────────────────────────────────────
   useEffect(() => {
@@ -364,28 +403,23 @@ export function useVoiceChannel({
           /* 무시 */
         }
       })
-      .on('broadcast', { event: 'mic_mute_force' }, ({ payload }) => {
+      .on('broadcast', { event: 'mic_st_change' }, ({ payload }) => {
+        // 방장의 승인/거절/회수/허용 — 본인 대상이면 권한 상태·트랙 동기화
         setParticipants(payload.participants ?? [])
-        if (payload.target_usr_id === currentUserId) {
-          micAllowedRef.current = false
-          setMicAllowed(false)
-          syncLocalTrack()
+        if (payload.target_usr_id === currentUserId && payload.mic_st_cd) {
+          applyMicState(payload.mic_st_cd as MicState)
         }
       })
-      .on('broadcast', { event: 'mic_unmute_allow' }, ({ payload }) => {
+      .on('broadcast', { event: 'mic_request' }, ({ payload }) => {
+        // 발언 신청 발생 — 참여자 목록 갱신 (방장 UI가 PENDING 행에 승인/거절 노출)
         setParticipants(payload.participants ?? [])
-        if (payload.target_usr_id === currentUserId) {
-          micAllowedRef.current = true
-          setMicAllowed(true)
-          syncLocalTrack()
-        }
       })
       .subscribe()
 
     return () => {
       supabase.removeChannel(ch)
     }
-  }, [roomId, currentUserId, createPeer, closePeer, sendSignal, syncLocalTrack])
+  }, [roomId, currentUserId, createPeer, closePeer, sendSignal, applyMicState])
 
   // ─── 초기 참여자 현황 로드 (입장 전 점유 표시) ──────────────────────────────
   useEffect(() => {
@@ -419,11 +453,13 @@ export function useVoiceChannel({
     participants,
     remoteStreams,
     isMuted,
-    micAllowed,
+    micState, // 본인 권한 상태 — CONNECTED/PENDING/LISTEN_ONLY
+    micAllowed: micState === 'CONNECTED', // 하위 호환 파생값
     joinError,
     join,
     leave,
     toggleMute,
     controlMic,
+    requestMic,
   }
 }
