@@ -1121,8 +1121,8 @@ if (meta?.type === 'CHAT_SUBSCR') {
 
 ### 단계별 Go/No-Go (잔여)
 
-- 🔜 **S0 스파이크**: Pi Browser 실기기 마이크 권한 + `getUserMedia` 동작 확인 (iOS WKWebView 지원 여부 = 전체 go/no-go 핵심)
-- 🔜 **TURN 운영 설정**: `TURN_HOST`/`TURN_SECRET` env 설정 (현재 STUN 폴백 — 상이 네트워크 연결 불가) — 관리형 TURN(Metered 등) 가입
+- ✅ **S0 스파이크 — 음성 전달 검증 완료 (2026-06-12)**: Pi Browser 실기기 2대 간 입장·마이크·**음성 전달 정상 확인**. 무음 원인 2종(① TURN relay 부재 → 모바일 CGNAT P2P 불가 ② RemoteAudio `display:none`+autoplay 재생 차단) 해결. 상세 트러블슈팅 → `docs/PRD_9_VOICE_CHAT.md` §11
+- 🔜 **TURN 운영 설정**: 현재 무료 공개 TURN(Metered Open Relay) 임시 폴백으로 동작 중 — 운영은 `TURN_HOST`/`TURN_SECRET` 전용 TURN(자체 coturn `static-auth-secret` HMAC 호환 또는 관리형) 설정 필요 (무료 공개 TURN은 대역폭·가동률 무보장)
 - 🔜 **S2 품질 검증**: TURN 경유율·packet loss 데이터로 자체 coturn 전환 판단
 - 🔜 **S3 확장**: (데이터 기반) 5인+ LiveKit 오디오 SFU / 결제 게이팅(`VOICE_CALL_CREDIT` + `voiceDailyFreeMinutes`) 활성화
 

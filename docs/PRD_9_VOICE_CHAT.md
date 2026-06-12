@@ -395,6 +395,39 @@ CREATE INDEX IF NOT EXISTS idx_msg_call_qual_room     ON public.msg_call_quality
 
 ---
 
+## 11. 트러블슈팅 (실전 해결 사례)
+
+### 사례 #1 — 모바일 실기기 간 "입장·상대 표시는 OK, 음성만 안 들림" (2026-06-12 해결 ✅)
+
+**증상**: Pi Browser 실기기 2대(모바일)에서 음성채널 입장·참여자 목록 표시·마이크 권한은 모두 정상인데, **상대 음성이 전혀 전달되지 않음**.
+
+**근본 원인 — 2가지가 겹침**:
+
+| # | 레이어 | 원인 |
+|---|---|---|
+| 1 | **미디어 경로** | `TURN_HOST`/`TURN_SECRET` 미설정 → STUN-only 폴백. 모바일 캐리어 **CGNAT(대칭 NAT)** 양쪽은 STUN만으로 P2P 성립 불가 → ICE `failed`, 미디어(RTP) 0바이트 |
+| 2 | **재생 레이어** | `RemoteAudio`가 `display:none`(Tailwind `hidden`) + `autoPlay` 의존 → iOS WebView(Pi Browser)에서 **숨긴 미디어 재생 차단 + autoplay 정책으로 조용한 실패** |
+
+**진단 방법 (두 갈래 구분)** — 음성채널 패널 하단의 빨간 ⚠️ 진단 메시지로 판별:
+- **빨간 "NAT 통과 불가" 메시지 O** → ICE 연결 실패 = TURN 문제(#1)
+- **메시지 없이 무음** → 연결은 됐는데 재생 차단 = RemoteAudio 문제(#2)
+
+**해결**:
+1. **TURN relay 확보** (`api/voice/turn-credentials`, 커밋 `4797854`): TURN 미설정 시 폴백에 무료 공개 TURN(Metered Open Relay) 추가 → 모바일 CGNAT 간 relay 경로 확보. *임시·검증용 — 음성은 DTLS-SRTP 암호화 중계되나 대역폭·가동률 무보장.*
+2. **원격 오디오 재생** (`voice-channel-panel.tsx` `RemoteAudio`, 커밋 `ecc1a38`): `display:none` → 화면 밖 1px 배치(`position:fixed; left:-9999`), `autoPlay` 의존 → 명시적 `el.play()` + autoplay 차단 시 다음 사용자 터치/클릭에서 1회 재개.
+3. **진단 가시화** (`use-voice-channel.ts`, 커밋 `4797854`): ICE `connectionState === 'failed'` 시 화면 진단 메시지 + `restartIce()` 자동 재시도, `connected` 복구 시 메시지 해제.
+
+**운영 권장 (필수)**: 무료 공개 TURN은 검증용. 모바일 운영은 **전용 TURN**을 `TURN_HOST`/`TURN_SECRET`로 설정(코드 무수정 오버라이드):
+- **자체 coturn**(VPS): `static-auth-secret`=`TURN_SECRET`, `use-auth-secret` — 코드의 HMAC 패턴(`username=만료:userId`, `credential=HMAC-SHA256(secret, username)`)과 정확히 호환
+- Cloudflare Realtime TURN(무료 1TB/월): 자격증명 API 방식이라 코드 일부 수정 필요
+
+**교훈**:
+- WebRTC "연결됐는데 무음"은 **미디어 경로(TURN)** 와 **재생 레이어(autoplay/display:none)** 를 항상 분리해 진단한다.
+- 참여자 목록 표시(GET API)는 **시그널링 broadcast 동작을 보장하지 않는다** — 표시가 돼도 offer/answer 교환은 별도 검증.
+- 모바일↔모바일은 거의 항상 CGNAT → **TURN relay가 사실상 필수**, STUN-only는 동일 네트워크에서만 동작.
+
+---
+
 ## 자기검증 체크리스트 (제출 전 점검 — 완료)
 
 - [x] Pi Browser 쿠키 미저장 제약 위반 없음(piFetch + X-Pi-Token, redirect 금지)
