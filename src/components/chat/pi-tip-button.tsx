@@ -91,7 +91,7 @@ export function PiTipButton({
         <img
           src="/bean.png"
           alt="Bean"
-          className="inline-block h-8 w-8 brightness-125"
+          className="inline-block h-10 w-10 brightness-125"
         />
       </button>
       {open && (

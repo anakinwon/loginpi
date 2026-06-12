@@ -239,7 +239,7 @@ function MessageBubble({
             <img
               src="/bean-noti.png"
               alt="Bean"
-              className="mr-1 inline-block h-5 w-5 align-text-bottom"
+              className="mr-1 inline-block h-7 w-7 align-text-bottom"
             />
             {(msg.msg_cont ?? '').replace(/^🫘\s*/, '')}
           </>
