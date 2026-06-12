@@ -22,10 +22,12 @@ export async function GET(request: NextRequest) {
 
   const { data, error } = await getSupabaseAdmin()
     .from('mps_shop')
-    .select('shop_id, shop_nm, shop_type_cd, addr, contact_tel, biz_hour, lat, lng, place_id')
+    .select(
+      'shop_id, shop_nm, shop_type_cd, addr, contact_tel, biz_hour, lat:latd_crd, lng:lngt_crd, place_id',
+    )
     .eq('del_yn', 'N')
-    .not('lat', 'is', null)
-    .not('lng', 'is', null)
+    .not('latd_crd', 'is', null)
+    .not('lngt_crd', 'is', null)
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 

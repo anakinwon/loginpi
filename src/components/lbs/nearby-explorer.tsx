@@ -1,9 +1,11 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { Button } from '@/components/ui/button'
 import { piFetch } from '@/lib/pi-fetch'
+import { getCurrentPosition } from '@/lib/geo'
 import { LbsConsentDialog } from '@/components/lbs/lbs-consent-dialog'
 
 // 주변 탐색 — 동의자에게만 GPS 기준 주변 매장·채팅방 노출 (Rule LBS-01)
@@ -37,6 +39,7 @@ function formatDistance(km: number): string {
 }
 
 export function NearbyExplorer() {
+  const t = useTranslations('lbs')
   const [lbsConsent, setLbsConsent] = useState<'Y' | 'N' | null>(null)
   const [consentOpen, setConsentOpen] = useState(false)
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(
@@ -49,6 +52,7 @@ export function NearbyExplorer() {
   const [shops, setShops] = useState<NearbyShop[]>([])
   const [rooms, setRooms] = useState<NearbyRoom[]>([])
   const [loading, setLoading] = useState(false)
+  const [loadError, setLoadError] = useState<string | null>(null)
 
   // 마운트 시 동의 여부 확인 (Rule LBS-01)
   useEffect(() => {
@@ -60,18 +64,13 @@ export function NearbyExplorer() {
       .catch(() => setLbsConsent('N'))
   }, [])
 
-  // GPS 수집 (동의자만)
-  const requestLocation = useCallback(() => {
-    if (!navigator.geolocation) {
-      setLocError('이 기기에서 위치를 사용할 수 없습니다')
-      return
-    }
+  // GPS 수집 (동의자만) — 실패 원인별 메시지 구분 (권한 차단·측위 불가·타임아웃)
+  // fresh: '위치 갱신' 클릭 시 60초 캐시를 무시하고 새로 측위
+  const requestLocation = useCallback((fresh = false) => {
     setLocError(null)
-    navigator.geolocation.getCurrentPosition(
-      (pos) => setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-      () => setLocError('위치 권한을 허용해 주세요'),
-      { timeout: 10000 },
-    )
+    getCurrentPosition({ fresh })
+      .then(setCoords)
+      .catch((e: Error) => setLocError(e.message))
   }, [])
 
   // 동의자 진입 시 자동으로 위치 1회 수집
@@ -79,7 +78,7 @@ export function NearbyExplorer() {
     if (lbsConsent === 'Y' && !coords) requestLocation()
   }, [lbsConsent, coords, requestLocation])
 
-  // 좌표·반경 변경 시 주변 데이터 로드
+  // 좌표·반경 변경 시 주변 데이터 로드 — API 실패는 빈 목록으로 위장하지 않고 표시
   useEffect(() => {
     if (lbsConsent !== 'Y' || !coords) return
     const sp = new URLSearchParams({
@@ -88,19 +87,30 @@ export function NearbyExplorer() {
       radius: String(radius),
     })
     setLoading(true)
+    setLoadError(null)
+    const fetchJson = async (url: string) => {
+      const r = await piFetch(url)
+      const body = (await r.json().catch(() => ({}))) as {
+        error?: string
+        shops?: NearbyShop[]
+        rooms?: NearbyRoom[]
+      }
+      if (!r.ok) throw new Error(body.error ?? `조회 실패 (${r.status})`)
+      return body
+    }
     Promise.all([
-      piFetch(`/api/location/nearby/shops?${sp}`).then((r) =>
-        r.ok ? r.json() : { shops: [] },
-      ),
-      piFetch(`/api/location/nearby/rooms?${sp}`).then((r) =>
-        r.ok ? r.json() : { rooms: [] },
-      ),
+      fetchJson(`/api/location/nearby/shops?${sp}`),
+      fetchJson(`/api/location/nearby/rooms?${sp}`),
     ])
       .then(([s, r]) => {
-        setShops((s.shops ?? []) as NearbyShop[])
-        setRooms((r.rooms ?? []) as NearbyRoom[])
+        setShops(s.shops ?? [])
+        setRooms(r.rooms ?? [])
       })
-      .catch(() => {})
+      .catch((e: Error) => {
+        setShops([])
+        setRooms([])
+        setLoadError(e.message)
+      })
       .finally(() => setLoading(false))
   }, [lbsConsent, coords, radius])
 
@@ -108,7 +118,7 @@ export function NearbyExplorer() {
   if (lbsConsent === null) {
     return (
       <p className="text-muted-foreground py-16 text-center text-sm">
-        불러오는 중…
+        {t('loading')}
       </p>
     )
   }
@@ -119,13 +129,13 @@ export function NearbyExplorer() {
       <div className="space-y-4 py-12 text-center">
         <p className="text-5xl">📍</p>
         <div className="space-y-1">
-          <p className="font-medium">주변 탐색은 위치 서비스 동의가 필요합니다</p>
+          <p className="font-medium">{t('consentRequired')}</p>
           <p className="text-muted-foreground text-sm">
-            동의하면 내 주변 매장·채팅방을 거리순으로 볼 수 있어요.
+            {t('consentBenefit')}
           </p>
         </div>
         <Button onClick={() => setConsentOpen(true)}>
-          📍 위치 서비스 동의하고 시작
+          {t('consentCta')}
         </Button>
         <LbsConsentDialog
           open={consentOpen}
@@ -145,11 +155,11 @@ export function NearbyExplorer() {
       <div className="space-y-4 py-12 text-center">
         <p className="text-5xl">📡</p>
         <p className="text-muted-foreground text-sm">
-          {locError ?? '현재 위치를 확인하는 중…'}
+          {locError ?? t('locating')}
         </p>
         {locError && (
-          <Button variant="outline" onClick={requestLocation}>
-            다시 시도
+          <Button variant="outline" onClick={() => requestLocation(true)}>
+            {t('retry')}
           </Button>
         )}
       </div>
@@ -160,7 +170,7 @@ export function NearbyExplorer() {
     <div className="space-y-4">
       {/* 반경 선택 */}
       <div className="flex items-center gap-2">
-        <span className="text-muted-foreground text-xs">반경</span>
+        <span className="text-muted-foreground text-xs">{t('radius')}</span>
         {RADIUS_OPTIONS.map((r) => (
           <button
             key={r}
@@ -170,13 +180,24 @@ export function NearbyExplorer() {
             {r}km
           </button>
         ))}
+        {/* 현재 측위 좌표 — 위치가 엉뚱하게 잡혔는지 즉시 확인용 */}
+        <span className="text-muted-foreground/70 ml-auto font-mono text-[10px]">
+          ({coords.lat.toFixed(4)}, {coords.lng.toFixed(4)})
+        </span>
         <button
-          onClick={requestLocation}
-          className="text-muted-foreground hover:text-foreground ml-auto text-xs underline"
+          onClick={() => requestLocation(true)}
+          className="text-muted-foreground hover:text-foreground text-xs underline"
         >
-          📍 위치 갱신
+          {t('refreshLocation')}
         </button>
       </div>
+
+      {/* API 조회 실패 — 빈 목록으로 위장하지 않고 원인 표시 */}
+      {loadError && (
+        <p className="text-destructive rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs dark:border-red-900 dark:bg-red-950">
+          ⚠️ {loadError}
+        </p>
+      )}
 
       {/* 탭 */}
       <div className="flex gap-1 border-b">
@@ -184,24 +205,24 @@ export function NearbyExplorer() {
           onClick={() => setTab('shops')}
           className={`px-4 py-2 text-sm font-medium transition-colors ${tab === 'shops' ? 'border-primary text-primary border-b-2' : 'text-muted-foreground hover:text-foreground'}`}
         >
-          🏪 매장 {shops.length > 0 && `(${shops.length})`}
+          {t('tabShops')} {shops.length > 0 && `(${shops.length})`}
         </button>
         <button
           onClick={() => setTab('rooms')}
           className={`px-4 py-2 text-sm font-medium transition-colors ${tab === 'rooms' ? 'border-primary text-primary border-b-2' : 'text-muted-foreground hover:text-foreground'}`}
         >
-          ☕ 채팅방 {rooms.length > 0 && `(${rooms.length})`}
+          {t('tabRooms')} {rooms.length > 0 && `(${rooms.length})`}
         </button>
       </div>
 
       {loading ? (
         <p className="text-muted-foreground py-16 text-center text-sm">
-          주변을 찾는 중…
+          {t('searching')}
         </p>
       ) : tab === 'shops' ? (
         shops.length === 0 ? (
           <p className="text-muted-foreground py-16 text-center text-sm">
-            반경 {radius}km 내 매장이 없습니다
+            {t('noShops', { radius })}
           </p>
         ) : (
           <ul className="space-y-2">
@@ -232,7 +253,7 @@ export function NearbyExplorer() {
         )
       ) : rooms.length === 0 ? (
         <p className="text-muted-foreground py-16 text-center text-sm">
-          반경 {radius}km 내 채팅방이 없습니다
+          {t('noRooms', { radius })}
         </p>
       ) : (
         <ul className="space-y-2">

@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
   const creatorIds = [...new Set((rooms as { regr_id: string }[]).map((r) => r.regr_id))]
   const { data: locs } = await db
     .from('usr_loc_hist')
-    .select('user_str_id, lat, lng, sigungu_nm')
+    .select('user_str_id, lat:latd_crd, lng:lngt_crd, sigungu_nm')
     .in('user_str_id', creatorIds)
     .eq('loc_tp_cd', '02')
     .eq('del_yn', 'N')

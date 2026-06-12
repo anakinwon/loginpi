@@ -603,86 +603,62 @@
       "schedManualDesc": "特定日期汇总或期间回填 — 仅在管理员手动执行时记录"
     }
   },
-  "profile": {
-    "title": "我的个人资料",
-    "tabs": {
-      "info": "个人信息",
-      "payment": "支付记录",
-      "subscr": "订阅状态"
-    },
-    "info": {
-      "displayName": "显示名称",
-      "realNm": "真实姓名",
-      "nickNm": "昵称",
-      "phoneNo": "联系方式",
-      "addr": "地址",
-      "addrDtl": "详细地址",
-      "saved": "已保存。",
-      "saveError": "保存失败。请重试。",
-      "kakaoId": "KakaoTalk ID",
-      "selfIntro": "自我介绍"
-    },
-    "payment": {
-      "empty": "没有支付记录。",
-      "status": {
-        "pending": "待处理",
-        "approved": "已批准",
-        "completed": "已完成"
-      }
-    },
-    "subscr": {
-      "currentPlan": "当前 Plan",
-      "expireDate": "到期日期: {date}",
-      "autoRenewOn": "自动续订已启用",
-      "autoRenewOff": "自动续订已取消。",
-      "cancelAutoRenew": "取消自动续订",
-      "cancelConfirm": "取消订阅后，您可以使用到期日，之后将停止自动续订。是否继续？",
-      "cancelOk": "订阅已取消。您可以使用到期日。",
-      "cancelError": "取消失败。请重试。"
-    },
-    "loginRequired": "需要登录"
+  "lbs": {
+    "consentTitle": "📍 位置服务同意",
+    "consentDesc": "为探索周边商品、商店、聊天室，我们将收集您的位置信息。",
+    "purposeTitle": "收集·使用目的",
+    "purpose1": "搜索周边直购商品·商店并显示距离",
+    "purpose2": "探索周边聊天室及基于区域的社区",
+    "purpose3": "防止不正当使用及提升服务质量",
+    "retentionTitle": "保留·使用期限",
+    "retentionDesc": "目的达成后立即销毁。撤回时立即删除。",
+    "viewTerms": "查看位置服务使用条款全文 →",
+    "optionalNotice": "即使不同意，也不会限制使用一般服务。仅位置服务将被禁用。",
+    "later": "稍后",
+    "agreeStart": "同意并开始",
+    "processing": "处理中...",
+    "nearbyTitle": "📍 探索周边",
+    "nearbySubtitle": "按距离顺序查找我附近的商店和聊天室",
+    "loading": "加载中…",
+    "consentRequired": "探索周边需要位置服务同意",
+    "consentBenefit": "同意后，您可以按距离顺序查看我附近的商店·聊天室。",
+    "consentCta": "📍 同意位置服务并开始",
+    "locating": "正在确认当前位置…",
+    "retry": "重试",
+    "radius": "半径",
+    "refreshLocation": "📍 刷新位置",
+    "tabShops": "🏪 商店",
+    "tabRooms": "☕ 聊天室",
+    "searching": "正在搜索周边…",
+    "noShops": "半径 {radius}km 内没有商店",
+    "noRooms": "半径 {radius}km 内没有聊天室"
   },
-  "adminSubscriptions": {
-    "title": "订阅管理",
-    "desc": "全部 {count}个 · Business {business}个 · Premium {premium}个",
-    "noData": "没有活跃的订阅。",
-    "filter": {
-      "all": "全部",
-      "business": "Business",
-      "premium": "Premium"
-    },
-    "col": {
-      "user": "用户",
-      "plan": "Plan",
-      "tier": "等级",
-      "expireAt": "到期日",
-      "autoRenew": "自动续订",
-      "startAt": "开始日期",
-      "manage": "管理"
-    },
-    "expired": "已到期",
-    "dday": "D-{n}",
-    "autoRenewYes": "是",
-    "autoRenewNo": "否",
-    "extend": "延长",
-    "revoke": "取消",
-    "revokeConfirm": "取消 \"{name}\" 的订阅吗？",
-    "revokeSuccess": "订阅已取消",
-    "revokeFail": "取消失败",
-    "extendSuccess": "到期日已延长",
-    "extendFail": "延长失败",
-    "grantTitle": "手动授予订阅",
-    "grantUsrId": "用户 ID (UUID)",
-    "grantPlan": "Plan",
-    "grantMonths": "期限(月)",
-    "grantBtn": "授予",
-    "granting": "处理中…",
-    "grantSuccess": "订阅已授予",
-    "grantFail": "授予失败",
-    "grantValidation": "请选择用户 ID 和 Plan",
-    "extendMonths": "延长月数"
+  "chat": {
+    "list": {
+      "subtitle": "Pi 社区主题 Cafe",
+      "myCafes": "我的 Cafe",
+      "subscriptionCafes": "订阅 Cafe",
+      "regularCafes": "普通 Cafe",
+      "discover": "探索 Cafe",
+      "noCafes": "尚未参与任何 Cafe",
+      "noCafesHint": "+ 通过创建 Cafe 开启第一个房间",
+      "expired": "已过期",
+      "expiresToday": "今日过期",
+      "memberCount": "({cur}/{max}人)",
+      "direct": "1:1",
+      "scrollMore": "滚动查看更多…",
+      "authenticating": "Pi 账户认证中…",
+      "loginRequired": "登录后方可使用 Cafe",
+      "goHome": "前往首页",
+      "loadFailed": "未能加载 Cafe。请稍后重试。"
+    }
   },
   "store": {
+    "nearbySort": "📍 按周边排序",
+    "nearbyActive": "当前位置 {radius}km 内的商品 (按距离从近到远)",
+    "nearbyClear": "解除",
+    "noNearbyItems": "周边 {radius}km 内没有商品",
+    "scrollMore": "滚动查看更多…",
     "title": "MyPiShop",
     "subtitle": "使用 Pi Coin 安全地直接交易 — 托管保护",
     "navMyItems": "我的商品",
@@ -810,12 +786,86 @@
       "SOLD": "已售罄"
     },
     "tradingCount": "交易中 {count} 件",
-    "notOnSale": "非销售中的商品",
-    "nearbySort": "📍 附近",
-    "nearbyActive": "当前位置{radius}km内的商品（由近到远）",
-    "nearbyClear": "取消",
-    "noNearbyItems": "附近{radius}km内没有商品",
-    "scrollMore": "滚动查看更多…"
+    "notOnSale": "非销售中的商品"
+  },
+  "profile": {
+    "title": "我的个人资料",
+    "tabs": {
+      "info": "个人信息",
+      "payment": "支付记录",
+      "subscr": "订阅状态"
+    },
+    "info": {
+      "displayName": "显示名称",
+      "realNm": "真实姓名",
+      "nickNm": "昵称",
+      "phoneNo": "联系方式",
+      "addr": "地址",
+      "addrDtl": "详细地址",
+      "saved": "已保存。",
+      "saveError": "保存失败。请重试。",
+      "kakaoId": "KakaoTalk ID",
+      "selfIntro": "自我介绍"
+    },
+    "payment": {
+      "empty": "没有支付记录。",
+      "status": {
+        "pending": "待处理",
+        "approved": "已批准",
+        "completed": "已完成"
+      }
+    },
+    "subscr": {
+      "currentPlan": "当前 Plan",
+      "expireDate": "到期日期: {date}",
+      "autoRenewOn": "自动续订已启用",
+      "autoRenewOff": "自动续订已取消。",
+      "cancelAutoRenew": "取消自动续订",
+      "cancelConfirm": "取消订阅后，您可以使用到期日，之后将停止自动续订。是否继续？",
+      "cancelOk": "订阅已取消。您可以使用到期日。",
+      "cancelError": "取消失败。请重试。"
+    },
+    "loginRequired": "需要登录"
+  },
+  "adminSubscriptions": {
+    "title": "订阅管理",
+    "desc": "全部 {count}个 · Business {business}个 · Premium {premium}个",
+    "noData": "没有活跃的订阅。",
+    "filter": {
+      "all": "全部",
+      "business": "Business",
+      "premium": "Premium"
+    },
+    "col": {
+      "user": "用户",
+      "plan": "Plan",
+      "tier": "等级",
+      "expireAt": "到期日",
+      "autoRenew": "自动续订",
+      "startAt": "开始日期",
+      "manage": "管理"
+    },
+    "expired": "已到期",
+    "dday": "D-{n}",
+    "autoRenewYes": "是",
+    "autoRenewNo": "否",
+    "extend": "延长",
+    "revoke": "取消",
+    "revokeConfirm": "取消 \"{name}\" 的订阅吗？",
+    "revokeSuccess": "订阅已取消",
+    "revokeFail": "取消失败",
+    "extendSuccess": "到期日已延长",
+    "extendFail": "延长失败",
+    "grantTitle": "手动授予订阅",
+    "grantUsrId": "用户 ID (UUID)",
+    "grantPlan": "Plan",
+    "grantMonths": "期限(月)",
+    "grantBtn": "授予",
+    "granting": "处理中…",
+    "grantSuccess": "订阅已授予",
+    "grantFail": "授予失败",
+    "grantValidation": "请选择用户 ID 和 Plan",
+    "extendMonths": "延长月数"
   },
   "adminStickers": {
     "title": "Sticker 管理",
@@ -879,55 +929,5 @@
     "shop": "Shop",
     "my": "我的信息",
     "admin": "管理员"
-  },
-  "lbs": {
-    "consentTitle": "📍 位置服务同意",
-    "consentDesc": "为了探索附近的商品、店铺和聊天室，我们会收集位置信息。",
-    "purposeTitle": "收集与使用目的",
-    "purpose1": "搜索附近的直接交易商品和店铺并显示距离",
-    "purpose2": "探索附近聊天室及本地社区",
-    "purpose3": "防止滥用并提升服务质量",
-    "retentionTitle": "保留与使用期限",
-    "retentionDesc": "达成目的后立即销毁。撤回同意时立即删除。",
-    "viewTerms": "查看位置服务条款全文 →",
-    "optionalNotice": "即使不同意也不影响使用其他服务，仅位置功能将被停用。",
-    "later": "以后再说",
-    "agreeStart": "同意并开始",
-    "processing": "处理中...",
-    "nearbyTitle": "📍 附近探索",
-    "nearbySubtitle": "按距离查找您附近的店铺和聊天室",
-    "loading": "加载中…",
-    "consentRequired": "附近探索需要您同意位置服务",
-    "consentBenefit": "同意后即可按距离浏览附近的店铺和聊天室。",
-    "consentCta": "📍 同意并开启位置服务",
-    "locating": "正在获取当前位置…",
-    "retry": "重试",
-    "radius": "半径",
-    "refreshLocation": "📍 刷新位置",
-    "tabShops": "🏪 店铺",
-    "tabRooms": "☕ 聊天室",
-    "searching": "正在搜索附近…",
-    "noShops": "半径{radius}km内没有店铺",
-    "noRooms": "半径{radius}km内没有聊天室"
-  },
-  "chat": {
-    "list": {
-      "subtitle": "Pi社区主题咖啡屋",
-      "myCafes": "我的咖啡屋",
-      "subscriptionCafes": "订阅咖啡屋",
-      "regularCafes": "普通咖啡屋",
-      "discover": "探索咖啡屋",
-      "noCafes": "您还没有加入任何咖啡屋",
-      "noCafesHint": "点击 + 创建咖啡屋 开设您的第一个房间",
-      "expired": "已过期",
-      "expiresToday": "今天到期",
-      "memberCount": "({cur}/{max}人)",
-      "direct": "1:1",
-      "scrollMore": "滚动查看更多…",
-      "authenticating": "正在验证Pi账户…",
-      "loginRequired": "登录后即可使用咖啡屋",
-      "goHome": "返回首页",
-      "loadFailed": "加载咖啡屋失败，请稍后重试。"
-    }
   }
 }

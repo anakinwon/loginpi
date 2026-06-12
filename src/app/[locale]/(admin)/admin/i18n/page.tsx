@@ -114,9 +114,18 @@ export default function I18nPage() {
     const pendingKeys = locStat
       ? locStat.total - locStat.translated
       : (stats?.totalKeys ?? 0)
+    // 소요시간 동적 산정 — 서버는 50개 키를 1회 Gemini 호출(배치)로 번역하고,
+    // 배치 사이에만 4.5초 rate limit 대기(Gemini 무료 15 RPM). 키당 처리가 아님.
+    // ETA = 배치당 처리 ~8초 + 배치 간 대기 4.5초 × (배치수-1)
+    const batches = Math.max(Math.ceil(pendingKeys / 50), 1)
+    const etaSec = Math.ceil(batches * 8 + (batches - 1) * 4.5)
+    const etaText =
+      etaSec >= 60
+        ? `약 ${Math.ceil(etaSec / 60)}분`
+        : `약 ${etaSec}초`
     setTranslating(locale)
     const toastId = toast.loading(
-      `${locale.toUpperCase()} ${t('translating')} (${pendingKeys}개 키, 최대 2분 소요)`,
+      `${locale.toUpperCase()} ${t('translating')} (${pendingKeys}개 키 · ${batches}배치 · ${etaText} 소요 예상)`,
     )
     try {
       const res = await fetch('/api/admin/i18n/translate', {

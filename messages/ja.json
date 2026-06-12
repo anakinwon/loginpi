@@ -603,86 +603,62 @@
       "schedManualDesc": "特定日付集計または期間 Backfill — 管理者が直接実行した場合のみ記録"
     }
   },
-  "profile": {
-    "title": "My Profile",
-    "tabs": {
-      "info": "個人情報",
-      "payment": "決済履歴",
-      "subscr": "購読状況"
-    },
-    "info": {
-      "displayName": "表示名",
-      "realNm": "実名",
-      "nickNm": "Nickname",
-      "phoneNo": "連絡先",
-      "addr": "住所",
-      "addrDtl": "詳細住所",
-      "saved": "保存されました。",
-      "saveError": "保存に失敗しました。再度お試しください。",
-      "kakaoId": "KakaoTalk ID",
-      "selfIntro": "自己紹介"
-    },
-    "payment": {
-      "empty": "決済履歴がありません。",
-      "status": {
-        "pending": "保留中",
-        "approved": "承認済み",
-        "completed": "完了"
-      }
-    },
-    "subscr": {
-      "currentPlan": "現在の Plan",
-      "expireDate": "有効期限: {date}",
-      "autoRenewOn": "自動更新が有効です",
-      "autoRenewOff": "自動更新はキャンセルされています。",
-      "cancelAutoRenew": "自動更新をキャンセル",
-      "cancelConfirm": "購読をキャンセルすると、有効期限までご利用後、自動更新が停止されます。続行しますか？",
-      "cancelOk": "購読がキャンセルされました。有効期限までご利用いただけます。",
-      "cancelError": "キャンセルに失敗しました。再度お試しください。"
-    },
-    "loginRequired": "Login が必要です"
+  "lbs": {
+    "consentTitle": "📍 Location-based Service 同意",
+    "consentDesc": "周辺の商品・店舗・Chat Room 検索のため、位置情報を収集します。",
+    "purposeTitle": "収集・利用目的",
+    "purpose1": "周辺の直接取引商品・店舗の検索および距離表示",
+    "purpose2": "周辺の Chat Room 探索および地域ベース Community",
+    "purpose3": "不正利用防止および Service 品質向上",
+    "retentionTitle": "保有・利用期間",
+    "retentionDesc": "目的達成後、直ちに破棄。撤回時、直ちに削除。",
+    "viewTerms": "Location-based Service 利用規約全文を見る →",
+    "optionalNotice": "同意しなくても一般 Service の利用に制限はありません。位置 Service のみが無効になります。",
+    "later": "後で",
+    "agreeStart": "同意して開始",
+    "processing": "処理中...",
+    "nearbyTitle": "📍 周辺探索",
+    "nearbySubtitle": "自分の周辺の店舗と Chat Room を距離順で探してみましょう",
+    "loading": "読み込み中…",
+    "consentRequired": "周辺探索には位置 Service の同意が必要です",
+    "consentBenefit": "同意すると、自分の周辺の店舗・Chat Room を距離順で見ることができます。",
+    "consentCta": "📍 位置 Service に同意して開始",
+    "locating": "現在位置を確認中…",
+    "retry": "再試行",
+    "radius": "半径",
+    "refreshLocation": "📍 位置更新",
+    "tabShops": "🏪 店舗",
+    "tabRooms": "☕ Chat Room",
+    "searching": "周辺を検索中…",
+    "noShops": "半径 {radius}km 以内に店舗はありません",
+    "noRooms": "半径 {radius}km 以内に Chat Room はありません"
   },
-  "adminSubscriptions": {
-    "title": "購読管理",
-    "desc": "合計 {count}件 ・ Business {business}件 ・ Premium {premium}件",
-    "noData": "アクティブな購読はありません。",
-    "filter": {
-      "all": "すべて",
-      "business": "Business",
-      "premium": "Premium"
-    },
-    "col": {
-      "user": "ユーザー",
-      "plan": "Plan",
-      "tier": "ティア",
-      "expireAt": "有効期限",
-      "autoRenew": "自動更新",
-      "startAt": "開始日",
-      "manage": "管理"
-    },
-    "expired": "期限切れ",
-    "dday": "D-{n}",
-    "autoRenewYes": "O",
-    "autoRenewNo": "-",
-    "extend": "延長",
-    "revoke": "キャンセル",
-    "revokeConfirm": "\"{name}\"さんの購読をキャンセルしますか？",
-    "revokeSuccess": "購読がキャンセルされました",
-    "revokeFail": "キャンセル失敗",
-    "extendSuccess": "有効期限が延長されました",
-    "extendFail": "延長失敗",
-    "grantTitle": "購読 手動付与",
-    "grantUsrId": "ユーザーID (UUID)",
-    "grantPlan": "Plan",
-    "grantMonths": "期間(ヶ月)",
-    "grantBtn": "付与",
-    "granting": "処理中…",
-    "grantSuccess": "購読が付与されました",
-    "grantFail": "付与失敗",
-    "grantValidation": "ユーザーIDとPlanを選択してください",
-    "extendMonths": "延長ヶ月数"
+  "chat": {
+    "list": {
+      "subtitle": "Pi Community Theme Cafe",
+      "myCafes": "自分の Cafe",
+      "subscriptionCafes": "購読 Cafe",
+      "regularCafes": "一般 Cafe",
+      "discover": "Cafe 探索",
+      "noCafes": "まだ参加中の Cafe はありません",
+      "noCafesHint": "+ Cafe 作成で最初の Room を開設してみましょう",
+      "expired": "期限切れ",
+      "expiresToday": "今日期限切れ",
+      "memberCount": "({cur}/{max}人)",
+      "direct": "1:1",
+      "scrollMore": "スクロールしてさらに表示…",
+      "authenticating": "Pi アカウント認証中…",
+      "loginRequired": "Cafe は Login 後利用できます",
+      "goHome": "Home へ移動",
+      "loadFailed": "Cafe を読み込めませんでした。しばらくしてから再試行してください。"
+    }
   },
   "store": {
+    "nearbySort": "📍 周辺順",
+    "nearbyActive": "現在位置基準 {radius}km 以内の商品 (距離が近い順)",
+    "nearbyClear": "解除",
+    "noNearbyItems": "周辺 {radius}km 以内に商品はありません",
+    "scrollMore": "スクロールしてさらに表示…",
     "title": "MyPiShop",
     "subtitle": "Pi Coinで安全に直接取引してください — Escrow 保護",
     "navMyItems": "マイ商品",
@@ -810,12 +786,86 @@
       "SOLD": "販売完了"
     },
     "tradingCount": "取引中 {count}件",
-    "notOnSale": "販売中の商品ではありません",
-    "nearbySort": "📍 近い順",
-    "nearbyActive": "現在地から{radius}km以内の商品（近い順）",
-    "nearbyClear": "解除",
-    "noNearbyItems": "周辺{radius}km以内に商品がありません",
-    "scrollMore": "スクロールしてもっと見る…"
+    "notOnSale": "販売中の商品ではありません"
+  },
+  "profile": {
+    "title": "My Profile",
+    "tabs": {
+      "info": "個人情報",
+      "payment": "決済履歴",
+      "subscr": "購読状況"
+    },
+    "info": {
+      "displayName": "表示名",
+      "realNm": "実名",
+      "nickNm": "Nickname",
+      "phoneNo": "連絡先",
+      "addr": "住所",
+      "addrDtl": "詳細住所",
+      "saved": "保存されました。",
+      "saveError": "保存に失敗しました。再度お試しください。",
+      "kakaoId": "KakaoTalk ID",
+      "selfIntro": "自己紹介"
+    },
+    "payment": {
+      "empty": "決済履歴がありません。",
+      "status": {
+        "pending": "保留中",
+        "approved": "承認済み",
+        "completed": "完了"
+      }
+    },
+    "subscr": {
+      "currentPlan": "現在の Plan",
+      "expireDate": "有効期限: {date}",
+      "autoRenewOn": "自動更新が有効です",
+      "autoRenewOff": "自動更新はキャンセルされています。",
+      "cancelAutoRenew": "自動更新をキャンセル",
+      "cancelConfirm": "購読をキャンセルすると、有効期限までご利用後、自動更新が停止されます。続行しますか？",
+      "cancelOk": "購読がキャンセルされました。有効期限までご利用いただけます。",
+      "cancelError": "キャンセルに失敗しました。再度お試しください。"
+    },
+    "loginRequired": "Login が必要です"
+  },
+  "adminSubscriptions": {
+    "title": "購読管理",
+    "desc": "合計 {count}件 ・ Business {business}件 ・ Premium {premium}件",
+    "noData": "アクティブな購読はありません。",
+    "filter": {
+      "all": "すべて",
+      "business": "Business",
+      "premium": "Premium"
+    },
+    "col": {
+      "user": "ユーザー",
+      "plan": "Plan",
+      "tier": "ティア",
+      "expireAt": "有効期限",
+      "autoRenew": "自動更新",
+      "startAt": "開始日",
+      "manage": "管理"
+    },
+    "expired": "期限切れ",
+    "dday": "D-{n}",
+    "autoRenewYes": "O",
+    "autoRenewNo": "-",
+    "extend": "延長",
+    "revoke": "キャンセル",
+    "revokeConfirm": "\"{name}\"さんの購読をキャンセルしますか？",
+    "revokeSuccess": "購読がキャンセルされました",
+    "revokeFail": "キャンセル失敗",
+    "extendSuccess": "有効期限が延長されました",
+    "extendFail": "延長失敗",
+    "grantTitle": "購読 手動付与",
+    "grantUsrId": "ユーザーID (UUID)",
+    "grantPlan": "Plan",
+    "grantMonths": "期間(ヶ月)",
+    "grantBtn": "付与",
+    "granting": "処理中…",
+    "grantSuccess": "購読が付与されました",
+    "grantFail": "付与失敗",
+    "grantValidation": "ユーザーIDとPlanを選択してください",
+    "extendMonths": "延長ヶ月数"
   },
   "adminStickers": {
     "stickers": "Sticker一覧",
@@ -879,55 +929,5 @@
     "shop": "Shop",
     "my": "私の情報",
     "admin": "管理者"
-  },
-  "lbs": {
-    "consentTitle": "📍 位置情報サービスへの同意",
-    "consentDesc": "近くの商品・店舗・チャットルームを探すために位置情報を収集します。",
-    "purposeTitle": "収集・利用目的",
-    "purpose1": "近くの直接取引商品・店舗の検索と距離表示",
-    "purpose2": "近くのチャットルーム探索と地域コミュニティ",
-    "purpose3": "不正利用の防止とサービス品質の向上",
-    "retentionTitle": "保有・利用期間",
-    "retentionDesc": "目的達成後すぐに破棄。撤回時は即時削除されます。",
-    "viewTerms": "位置情報サービス利用規約の全文を見る →",
-    "optionalNotice": "同意しなくても通常のサービスは制限なくご利用いただけます。位置機能のみ無効になります。",
-    "later": "あとで",
-    "agreeStart": "同意して開始",
-    "processing": "処理中...",
-    "nearbyTitle": "📍 周辺さがし",
-    "nearbySubtitle": "近くの店舗とチャットルームを距離順に探せます",
-    "loading": "読み込み中…",
-    "consentRequired": "周辺さがしには位置情報サービスへの同意が必要です",
-    "consentBenefit": "同意すると、近くの店舗・チャットルームを距離順に閲覧できます。",
-    "consentCta": "📍 位置情報サービスに同意して開始",
-    "locating": "現在地を確認しています…",
-    "retry": "再試行",
-    "radius": "半径",
-    "refreshLocation": "📍 位置を更新",
-    "tabShops": "🏪 店舗",
-    "tabRooms": "☕ チャットルーム",
-    "searching": "周辺を検索中…",
-    "noShops": "半径{radius}km以内に店舗がありません",
-    "noRooms": "半径{radius}km以内にチャットルームがありません"
-  },
-  "chat": {
-    "list": {
-      "subtitle": "Piコミュニティのテーマカフェ",
-      "myCafes": "マイカフェ",
-      "subscriptionCafes": "サブスクカフェ",
-      "regularCafes": "一般カフェ",
-      "discover": "カフェをさがす",
-      "noCafes": "まだ参加中のカフェがありません",
-      "noCafesHint": "「+ カフェ作成」で最初のルームを開設しましょう",
-      "expired": "期限切れ",
-      "expiresToday": "本日期限",
-      "memberCount": "({cur}/{max}名)",
-      "direct": "1:1",
-      "scrollMore": "スクロールしてもっと見る…",
-      "authenticating": "Piアカウントを認証中…",
-      "loginRequired": "カフェはログイン後にご利用いただけます",
-      "goHome": "ホームへ戻る",
-      "loadFailed": "カフェを読み込めませんでした。しばらくしてから再度お試しください。"
-    }
   }
 }

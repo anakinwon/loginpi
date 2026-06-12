@@ -103,8 +103,9 @@ export async function POST(request: NextRequest) {
     .insert({
       user_str_id: user.id,
       loc_tp_cd,
-      lat,
-      lng,
+      // API 입력 lat/lng → DB 표준용어 latd_crd/lngt_crd
+      latd_crd: lat,
+      lngt_crd: lng,
       accuracy_m: accuracy_m ?? null,
       full_addr: resolvedFullAddr,
       sido_nm: resolvedSido,

@@ -21,8 +21,8 @@ export interface MpsItem {
   reg_qty: number
   ordered_qty: number
   stock_qty: number
-  lat: number | null
-  lng: number | null
+  latd_crd: number | null
+  lngt_crd: number | null
   reg_dtm: string
   mod_dtm: string
 }
@@ -103,7 +103,11 @@ async function getTradingCounts(
 }
 
 type ItemWithShop = MpsItem & {
-  mps_shop?: { shop_id: string; lat: number | null; lng: number | null } | null
+  mps_shop?: {
+    shop_id: string
+    latd_crd: number | null
+    lngt_crd: number | null
+  } | null
 }
 
 // 사용자와의 거리(km, 소수 1자리) — 상품 개별 좌표 우선, 없으면 매장 좌표 폴백
@@ -112,8 +116,8 @@ function calcDistanceKm(
   uLat: number,
   uLng: number,
 ): number | null {
-  const itemLat = r.lat ?? r.mps_shop?.lat ?? null
-  const itemLng = r.lng ?? r.mps_shop?.lng ?? null
+  const itemLat = r.latd_crd ?? r.mps_shop?.latd_crd ?? null
+  const itemLng = r.lngt_crd ?? r.mps_shop?.lngt_crd ?? null
   return itemLat !== null && itemLng !== null
     ? Math.round(haversineKm(uLat, uLng, itemLat, itemLng) * 10) / 10
     : null
@@ -130,7 +134,7 @@ export async function listOpenItems(filter: ItemListFilter) {
 
   let q = db
     .from('mps_item')
-    .select(hasLoc ? '*, mps_shop(shop_id, lat, lng)' : '*', {
+    .select(hasLoc ? '*, mps_shop(shop_id, latd_crd, lngt_crd)' : '*', {
       count: useDistance ? undefined : 'exact',
     })
     .eq('del_yn', 'N')
@@ -289,8 +293,9 @@ export async function createItem(
       shop_id: input.shop_id ?? null,
       item_st_cd: input.item_st_cd ?? 'DRAFT',
       thumbnail_url: input.thumbnail_url ?? null,
-      lat: input.lat ?? null,
-      lng: input.lng ?? null,
+      // API 입력은 보편표기 lat/lng → DB 표준용어 latd_crd/lngt_crd로 매핑
+      latd_crd: input.lat ?? null,
+      lngt_crd: input.lng ?? null,
       reg_qty: regQty,
       ordered_qty: 0,
       stock_qty: regQty, // 불변 조건: reg_qty - 0

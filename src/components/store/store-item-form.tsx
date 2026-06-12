@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { useRouter } from '@/i18n/navigation'
 import { usePiAuth } from '@/components/pi-auth-provider'
 import { piFetch } from '@/lib/pi-fetch'
+import { getCurrentPosition } from '@/lib/geo'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -52,25 +53,16 @@ export function StoreItemForm({ serverAuthed = false, itemId }: ItemFormProps) {
       .catch(() => setLbsConsent('N'))
   }, [authed])
 
-  // 현재 위치 수집 (동의자 전용)
+  // 현재 위치 수집 (동의자 전용) — 실패 원인별 메시지 안내
   const captureLocation = useCallback(() => {
-    if (!navigator.geolocation) {
-      toast.error('이 브라우저는 위치 서비스를 지원하지 않습니다')
-      return
-    }
     setLocLoading(true)
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setLat(pos.coords.latitude)
-        setLng(pos.coords.longitude)
-        setLocLoading(false)
-      },
-      () => {
-        toast.error('위치를 가져오지 못했습니다')
-        setLocLoading(false)
-      },
-      { timeout: 10000 },
-    )
+    getCurrentPosition()
+      .then((p) => {
+        setLat(p.lat)
+        setLng(p.lng)
+      })
+      .catch((e: Error) => toast.error(e.message))
+      .finally(() => setLocLoading(false))
   }, [])
 
   // 수정 모드 — 기존 상품 값 로드

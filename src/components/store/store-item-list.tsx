@@ -2,11 +2,13 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
+import { toast } from 'sonner'
 import { Link } from '@/i18n/navigation'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { deriveTradeStatus, TRADE_ST_STYLE } from '@/lib/mps-trade-status'
 import { piFetch } from '@/lib/pi-fetch'
+import { getCurrentPosition } from '@/lib/geo'
 import { readCache, writeCache } from '@/lib/client-cache'
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll'
 import { LbsConsentDialog } from '@/components/lbs/lbs-consent-dialog'
@@ -72,35 +74,29 @@ export function StoreItemList() {
   // 동의자는 마운트 시 자동으로 현재 위치 수집 → 모든 상품 카드에 거리 배지 표시.
   // 정렬은 바꾸지 않는다 (📍 주변순 버튼과 별개 — 거리 표시 전용)
   useEffect(() => {
-    if (lbsConsent !== 'Y' || userLat !== null || !navigator.geolocation) return
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setUserLat(pos.coords.latitude)
-        setUserLng(pos.coords.longitude)
+    if (lbsConsent !== 'Y' || userLat !== null) return
+    getCurrentPosition()
+      .then((p) => {
+        setUserLat(p.lat)
+        setUserLng(p.lng)
         setPage(1)
-      },
-      () => {}, // 거부·실패 시 거리 없이 목록만 표시
-      { timeout: 10000 },
-    )
+      })
+      .catch(() => {}) // 거부·실패 시 거리 없이 목록만 표시
   }, [lbsConsent, userLat])
 
-  // GPS 위치 수집 (동의자만 — Rule LBS-01)
+  // GPS 위치 수집 (동의자만 — Rule LBS-01) — 실패 시 원인별 메시지 안내
   const requestLocation = useCallback(() => {
-    if (lbsConsent !== 'Y' || !navigator.geolocation) return
+    if (lbsConsent !== 'Y') return
     setLocLoading(true)
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setUserLat(pos.coords.latitude)
-        setUserLng(pos.coords.longitude)
+    getCurrentPosition()
+      .then((p) => {
+        setUserLat(p.lat)
+        setUserLng(p.lng)
         setSort('distance')
         setPage(1)
-        setLocLoading(false)
-      },
-      () => {
-        setLocLoading(false)
-      },
-      { timeout: 10000 },
-    )
+      })
+      .catch((e: Error) => toast.error(e.message))
+      .finally(() => setLocLoading(false))
   }, [lbsConsent])
 
   const load = useCallback(async () => {
@@ -190,7 +186,7 @@ export function StoreItemList() {
             disabled={locLoading}
             className="shrink-0"
           >
-            {locLoading ? '📍...' : '📍 주변순'}
+            {locLoading ? '📍...' : t('nearbySort')}
           </Button>
         ) : lbsConsent === 'N' ? (
           <Button
@@ -199,7 +195,7 @@ export function StoreItemList() {
             onClick={() => setConsentOpen(true)}
             className="text-muted-foreground shrink-0"
           >
-            📍 주변순
+            {t('nearbySort')}
           </Button>
         ) : null}
       </form>
@@ -246,7 +242,7 @@ export function StoreItemList() {
       {sort === 'distance' && userLat !== null && (
         <p className="text-muted-foreground flex items-center gap-1 text-xs">
           <span>📍</span>
-          <span>현재 위치 기준 10km 내 상품 (거리 가까운 순)</span>
+          <span>{t('nearbyActive', { radius: 10 })}</span>
           <button
             onClick={() => {
               setSort('latest')
@@ -256,7 +252,7 @@ export function StoreItemList() {
             }}
             className="text-destructive ml-1 underline"
           >
-            해제
+            {t('nearbyClear')}
           </button>
         </p>
       )}
@@ -268,7 +264,7 @@ export function StoreItemList() {
         </p>
       ) : items.length === 0 ? (
         <p className="text-muted-foreground py-16 text-center text-sm">
-          {sort === 'distance' ? '주변 10km 내 상품이 없습니다' : t('noItems')}
+          {sort === 'distance' ? t('noNearbyItems', { radius: 10 }) : t('noItems')}
         </p>
       ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
@@ -333,7 +329,7 @@ export function StoreItemList() {
       {hasMore && (
         <div ref={sentinelRef} className="flex justify-center py-3">
           <span className="text-muted-foreground animate-pulse text-xs">
-            {loading ? t('loading') : '스크롤하여 더 보기…'}
+            {loading ? t('loading') : t('scrollMore')}
           </span>
         </div>
       )}

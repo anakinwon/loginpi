@@ -1,54 +1,4 @@
 {
-  "lbs": {
-    "consentTitle": "📍 Location Service Consent",
-    "consentDesc": "We collect location data to find nearby items, shops, and chat rooms.",
-    "purposeTitle": "Purpose of Collection & Use",
-    "purpose1": "Search nearby P2P items and shops with distance display",
-    "purpose2": "Discover nearby chat rooms and local communities",
-    "purpose3": "Prevent abuse and improve service quality",
-    "retentionTitle": "Retention Period",
-    "retentionDesc": "Discarded immediately after use. Deleted instantly upon withdrawal.",
-    "viewTerms": "View full Location Service Terms →",
-    "optionalNotice": "You can use all other services without consenting. Only location features will be disabled.",
-    "later": "Later",
-    "agreeStart": "Agree & Start",
-    "processing": "Processing...",
-    "nearbyTitle": "📍 Nearby Explorer",
-    "nearbySubtitle": "Find shops and chat rooms around you, sorted by distance",
-    "loading": "Loading…",
-    "consentRequired": "Nearby Explorer requires location service consent",
-    "consentBenefit": "Once you agree, you can browse nearby shops and chat rooms by distance.",
-    "consentCta": "📍 Agree & Start Location Service",
-    "locating": "Locating your current position…",
-    "retry": "Try Again",
-    "radius": "Radius",
-    "refreshLocation": "📍 Refresh Location",
-    "tabShops": "🏪 Shops",
-    "tabRooms": "☕ Chat Rooms",
-    "searching": "Searching nearby…",
-    "noShops": "No shops within {radius}km",
-    "noRooms": "No chat rooms within {radius}km"
-  },
-  "chat": {
-    "list": {
-      "subtitle": "Pi community themed cafés",
-      "myCafes": "My Cafés",
-      "subscriptionCafes": "Subscription Cafés",
-      "regularCafes": "Cafés",
-      "discover": "Discover Cafés",
-      "noCafes": "You haven't joined any cafés yet",
-      "noCafesHint": "Create your first café with + New Café",
-      "expired": "Expired",
-      "expiresToday": "Expires today",
-      "memberCount": "({cur}/{max})",
-      "direct": "1:1",
-      "scrollMore": "Scroll for more…",
-      "authenticating": "Authenticating Pi account…",
-      "loginRequired": "Log in to use cafés",
-      "goHome": "Go Home",
-      "loadFailed": "Failed to load cafés. Please try again later."
-    }
-  },
   "common": {
     "loading": "Loading...",
     "save": "Save",
@@ -653,86 +603,62 @@
       "schedManualDesc": "Aggregate specific date or period backfill — recorded only when executed directly by an administrator"
     }
   },
-  "adminSubscriptions": {
-    "col": {
-      "plan": "Plan",
-      "tier": "Tier",
-      "expireAt": "Expiration Date",
-      "autoRenew": "Auto-renew",
-      "startAt": "Start Date",
-      "manage": "Manage",
-      "user": "User"
-    },
-    "expired": "Expired",
-    "title": "Subscription Management",
-    "desc": "Total {count} · Business {business} · Premium {premium}",
-    "noData": "No active subscriptions.",
-    "filter": {
-      "all": "All",
-      "business": "Business",
-      "premium": "Premium"
-    },
-    "dday": "D-{n}",
-    "autoRenewYes": "Yes",
-    "autoRenewNo": "No",
-    "extend": "Extend",
-    "revoke": "Revoke",
-    "revokeConfirm": "Revoke \"{name}\"'s subscription?",
-    "revokeSuccess": "Subscription revoked",
-    "revokeFail": "Revocation failed",
-    "extendSuccess": "Expiration date extended",
-    "extendFail": "Extension failed",
-    "grantTitle": "Grant Subscription Manually",
-    "grantUsrId": "User ID (UUID)",
-    "grantPlan": "Plan",
-    "grantMonths": "Duration (Months)",
-    "grantBtn": "Grant",
-    "granting": "Processing...",
-    "grantSuccess": "Subscription granted",
-    "grantFail": "Grant failed",
-    "grantValidation": "Please select User ID and Plan",
-    "extendMonths": "Extension Months"
+  "lbs": {
+    "consentTitle": "📍 Location-Based Service Consent",
+    "consentDesc": "We collect location information to search for nearby products, shops, and chat rooms.",
+    "purposeTitle": "Purpose of Collection and Use",
+    "purpose1": "Search for nearby direct transaction products/shops and display distance",
+    "purpose2": "Explore nearby chat rooms and local communities",
+    "purpose3": "Prevent fraudulent use and improve service quality",
+    "retentionTitle": "Retention and Use Period",
+    "retentionDesc": "Immediately destroyed after purpose fulfillment. Immediately deleted upon withdrawal.",
+    "viewTerms": "View full Location-Based Service Terms of Use →",
+    "optionalNotice": "Even if you do not agree, there are no restrictions on using general services. Only location services will be disabled.",
+    "later": "Later",
+    "agreeStart": "Agree and Start",
+    "processing": "Processing...",
+    "nearbyTitle": "📍 Explore Nearby",
+    "nearbySubtitle": "Find shops and chat rooms near you by distance",
+    "loading": "Loading...",
+    "consentRequired": "Exploring nearby requires location service consent",
+    "consentBenefit": "If you agree, you can see nearby shops and chat rooms by distance.",
+    "consentCta": "📍 Agree to Location Services and Start",
+    "locating": "Locating current position...",
+    "retry": "Retry",
+    "radius": "Radius",
+    "refreshLocation": "📍 Refresh Location",
+    "tabShops": "🏪 Shops",
+    "tabRooms": "☕ Chat Rooms",
+    "searching": "Searching nearby...",
+    "noShops": "No shops within {radius}km radius",
+    "noRooms": "No chat rooms within {radius}km radius"
   },
-  "profile": {
-    "title": "My Profile",
-    "tabs": {
-      "info": "Personal Information",
-      "payment": "Payment History",
-      "subscr": "Subscription Status"
-    },
-    "info": {
-      "displayName": "Display Name",
-      "realNm": "Real Name",
-      "nickNm": "Nickname",
-      "phoneNo": "Contact Number",
-      "addr": "Address",
-      "addrDtl": "Detailed Address",
-      "saved": "Saved.",
-      "saveError": "Failed to save. Please try again.",
-      "kakaoId": "KakaoTalk ID",
-      "selfIntro": "Self-introduction"
-    },
-    "payment": {
-      "empty": "No payment history.",
-      "status": {
-        "pending": "Pending",
-        "approved": "Approved",
-        "completed": "Completed"
-      }
-    },
-    "subscr": {
-      "currentPlan": "Current Plan",
-      "expireDate": "Expiration Date: {date}",
-      "autoRenewOn": "Auto-renewal enabled",
-      "autoRenewOff": "Auto-renewal is canceled.",
-      "cancelAutoRenew": "Cancel Auto-renewal",
-      "cancelConfirm": "If you cancel your subscription, auto-renewal will stop after you use it until the expiration date. Do you want to continue?",
-      "cancelOk": "Subscription has been canceled. You can use it until the expiration date.",
-      "cancelError": "Failed to cancel. Please try again."
-    },
-    "loginRequired": "Login Required"
+  "chat": {
+    "list": {
+      "subtitle": "Pi Community Theme Cafes",
+      "myCafes": "My Cafes",
+      "subscriptionCafes": "Subscription Cafes",
+      "regularCafes": "Regular Cafes",
+      "discover": "Discover Cafes",
+      "noCafes": "You haven't joined any cafes yet",
+      "noCafesHint": "+ Create your first room by making a cafe",
+      "expired": "Expired",
+      "expiresToday": "Expires Today",
+      "memberCount": "({cur}/{max} members)",
+      "direct": "1:1",
+      "scrollMore": "Scroll to see more...",
+      "authenticating": "Authenticating Pi account...",
+      "loginRequired": "Cafes can be used after logging in",
+      "goHome": "Go to Home",
+      "loadFailed": "Failed to load cafes. Please try again shortly."
+    }
   },
   "store": {
+    "nearbySort": "📍 Nearby",
+    "nearbyActive": "Products within {radius}km of current location (closest distance first)",
+    "nearbyClear": "Clear",
+    "noNearbyItems": "No products within {radius}km nearby",
+    "scrollMore": "Scroll to see more...",
     "title": "MyPiShop",
     "subtitle": "Safely trade directly with Pi Coin — Escrow Protection",
     "navMyItems": "My Items",
@@ -860,12 +786,86 @@
       "SOLD": "Sold"
     },
     "tradingCount": "Trading {count} items",
-    "notOnSale": "Not on sale",
-    "nearbySort": "📍 Nearby",
-    "nearbyActive": "Items within {radius}km of your location (nearest first)",
-    "nearbyClear": "Clear",
-    "noNearbyItems": "No items within {radius}km",
-    "scrollMore": "Scroll for more…"
+    "notOnSale": "Not on sale"
+  },
+  "adminSubscriptions": {
+    "col": {
+      "plan": "Plan",
+      "tier": "Tier",
+      "expireAt": "Expiration Date",
+      "autoRenew": "Auto-renew",
+      "startAt": "Start Date",
+      "manage": "Manage",
+      "user": "User"
+    },
+    "expired": "Expired",
+    "title": "Subscription Management",
+    "desc": "Total {count} · Business {business} · Premium {premium}",
+    "noData": "No active subscriptions.",
+    "filter": {
+      "all": "All",
+      "business": "Business",
+      "premium": "Premium"
+    },
+    "dday": "D-{n}",
+    "autoRenewYes": "Yes",
+    "autoRenewNo": "No",
+    "extend": "Extend",
+    "revoke": "Revoke",
+    "revokeConfirm": "Revoke \"{name}\"'s subscription?",
+    "revokeSuccess": "Subscription revoked",
+    "revokeFail": "Revocation failed",
+    "extendSuccess": "Expiration date extended",
+    "extendFail": "Extension failed",
+    "grantTitle": "Grant Subscription Manually",
+    "grantUsrId": "User ID (UUID)",
+    "grantPlan": "Plan",
+    "grantMonths": "Duration (Months)",
+    "grantBtn": "Grant",
+    "granting": "Processing...",
+    "grantSuccess": "Subscription granted",
+    "grantFail": "Grant failed",
+    "grantValidation": "Please select User ID and Plan",
+    "extendMonths": "Extension Months"
+  },
+  "profile": {
+    "title": "My Profile",
+    "tabs": {
+      "info": "Personal Information",
+      "payment": "Payment History",
+      "subscr": "Subscription Status"
+    },
+    "info": {
+      "displayName": "Display Name",
+      "realNm": "Real Name",
+      "nickNm": "Nickname",
+      "phoneNo": "Contact Number",
+      "addr": "Address",
+      "addrDtl": "Detailed Address",
+      "saved": "Saved.",
+      "saveError": "Failed to save. Please try again.",
+      "kakaoId": "KakaoTalk ID",
+      "selfIntro": "Self-introduction"
+    },
+    "payment": {
+      "empty": "No payment history.",
+      "status": {
+        "pending": "Pending",
+        "approved": "Approved",
+        "completed": "Completed"
+      }
+    },
+    "subscr": {
+      "currentPlan": "Current Plan",
+      "expireDate": "Expiration Date: {date}",
+      "autoRenewOn": "Auto-renewal enabled",
+      "autoRenewOff": "Auto-renewal is canceled.",
+      "cancelAutoRenew": "Cancel Auto-renewal",
+      "cancelConfirm": "If you cancel your subscription, auto-renewal will stop after you use it until the expiration date. Do you want to continue?",
+      "cancelOk": "Subscription has been canceled. You can use it until the expiration date.",
+      "cancelError": "Failed to cancel. Please try again."
+    },
+    "loginRequired": "Login Required"
   },
   "adminStickers": {
     "title": "Sticker Management",

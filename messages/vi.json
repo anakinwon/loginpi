@@ -603,6 +603,36 @@
       "schedManualDesc": "Tổng hợp ngày cụ thể hoặc điền lại khoảng thời gian — Chỉ ghi lại khi quản trị viên tự thực thi"
     }
   },
+  "lbs": {
+    "consentTitle": "📍 Đồng ý Dịch vụ dựa trên vị trí",
+    "consentDesc": "Chúng tôi thu thập thông tin vị trí để tìm kiếm sản phẩm, cửa hàng, phòng chat lân cận.",
+    "purposeTitle": "Mục đích thu thập và sử dụng",
+    "purpose1": "Tìm kiếm sản phẩm giao dịch trực tiếp, cửa hàng lân cận và hiển thị khoảng cách",
+    "purpose2": "Tìm kiếm phòng chat lân cận và cộng đồng dựa trên khu vực",
+    "purpose3": "Ngăn chặn lạm dụng và cải thiện chất lượng dịch vụ",
+    "retentionTitle": "Thời gian lưu giữ và sử dụng",
+    "retentionDesc": "Hủy bỏ ngay sau khi đạt được mục đích. Xóa ngay lập tức khi rút lại.",
+    "viewTerms": "Xem toàn văn Điều khoản sử dụng dịch vụ dựa trên vị trí →",
+    "optionalNotice": "Ngay cả khi không đồng ý, việc sử dụng dịch vụ thông thường không bị hạn chế. Chỉ dịch vụ vị trí bị vô hiệu hóa.",
+    "later": "Để sau",
+    "agreeStart": "Đồng ý và bắt đầu",
+    "processing": "Đang xử lý...",
+    "nearbyTitle": "📍 Tìm kiếm lân cận",
+    "nearbySubtitle": "Tìm cửa hàng và phòng chat quanh bạn theo thứ tự khoảng cách",
+    "loading": "Đang tải...",
+    "consentRequired": "Để tìm kiếm lân cận, cần có sự đồng ý về dịch vụ vị trí",
+    "consentBenefit": "Nếu đồng ý, bạn có thể xem các cửa hàng và phòng chat quanh mình theo thứ tự khoảng cách.",
+    "consentCta": "📍 Đồng ý dịch vụ vị trí và bắt đầu",
+    "locating": "Đang xác định vị trí hiện tại...",
+    "retry": "Thử lại",
+    "radius": "Bán kính",
+    "refreshLocation": "📍 Cập nhật vị trí",
+    "tabShops": "🏪 Cửa hàng",
+    "tabRooms": "☕ Phòng chat",
+    "searching": "Đang tìm kiếm xung quanh...",
+    "noShops": "Không có cửa hàng trong bán kính {radius}km",
+    "noRooms": "Không có phòng chat trong bán kính {radius}km"
+  },
   "adminStickers": {
     "col": {
       "type": "Loại",
@@ -781,13 +811,18 @@
       "buyerNoticeBonded": "🛡️ Giao dịch có thế chấp: Khi hủy sau thanh toán Escrow, người yêu cầu hủy sẽ trả 0.1π phí cho bên kia (người bán hủy sẽ được bồi thường 0.1π)",
       "buyerNoticeFree": "Giao dịch hủy tự do: Không có phí hủy (người bán không đặt cọc — không có bồi thường hủy)"
     },
+    "nearbySort": "📍 Theo khoảng cách gần nhất",
+    "nearbyActive": "Sản phẩm trong bán kính {radius}km từ vị trí hiện tại (theo khoảng cách gần nhất)",
     "tradeSt": {
       "OPEN": "Đang bán",
       "TRADING": "Đang giao dịch",
       "SOLD": "Đã bán"
     },
     "tradingCount": "{count} giao dịch đang diễn ra",
-    "notOnSale": "Sản phẩm không được bán"
+    "notOnSale": "Sản phẩm không được bán",
+    "nearbyClear": "Hủy bỏ",
+    "noNearbyItems": "Không có sản phẩm trong bán kính {radius}km",
+    "scrollMore": "Cuộn để xem thêm..."
   },
   "profile": {
     "title": "Hồ sơ của tôi",
@@ -827,6 +862,26 @@
       "cancelError": "Hủy thất bại. Vui lòng thử lại."
     },
     "loginRequired": "Yêu cầu đăng nhập"
+  },
+  "chat": {
+    "list": {
+      "subtitle": "Cafe chủ đề Cộng đồng Pi",
+      "myCafes": "Cafe của tôi",
+      "subscriptionCafes": "Cafe đã đăng ký",
+      "regularCafes": "Cafe thông thường",
+      "discover": "Khám phá Cafe",
+      "noCafes": "Chưa tham gia Cafe nào",
+      "noCafesHint": "+ Thử tạo Cafe đầu tiên của bạn",
+      "expired": "Đã hết hạn",
+      "expiresToday": "Hết hạn hôm nay",
+      "memberCount": "({cur}/{max} người)",
+      "direct": "1:1",
+      "scrollMore": "Cuộn để xem thêm...",
+      "authenticating": "Đang xác thực tài khoản Pi...",
+      "loginRequired": "Cafe có thể được sử dụng sau khi đăng nhập",
+      "goHome": "Về trang chủ",
+      "loadFailed": "Không thể tải Cafe. Vui lòng thử lại sau giây lát."
+    }
   },
   "adminSubscriptions": {
     "title": "Quản lý gói đăng ký",
