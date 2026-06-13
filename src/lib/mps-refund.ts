@@ -124,7 +124,9 @@ export async function refundCancelledOrder(
     }
   }
 
-  await db.from('mps_txn_hist').insert({
+  // 송금은 이미 완료(txid 확정) — 장부 기록 실패 시에도 throw 금지(재시도 시 이중송금 방지).
+  // 대신 txid를 CRITICAL 로그로 남겨 수동 복구 가능하게 한다.
+  const { error: refundLogErr } = await db.from('mps_txn_hist').insert({
     order_id: orderId,
     user_id: order.buyer_id,
     txn_type_cd: 'REFUND_IN',
@@ -136,6 +138,10 @@ export async function refundCancelledOrder(
     regr_id: actorId,
     modr_id: actorId,
   })
+  if (refundLogErr)
+    console.error(
+      `[refund] CRITICAL 송금 성공했으나 장부기록 실패 — 수동기록 필요. order=${orderId} txid=${txid} amount=${refundAmount} err=${refundLogErr.message}`,
+    )
 
   // 2) 보증금 거래면 판매자 보상 0.1π A2U (베스트 에포트 — 실패해도 구매자 환불은 확정)
   let sellerComp: number | undefined
@@ -154,7 +160,7 @@ export async function refundCancelledOrder(
           memo: 'MPS cancel comp',
           metadata: { type: 'MPS_CANCEL_COMP', order_id: orderId },
         })
-        await db.from('mps_txn_hist').insert({
+        const { error: compErr } = await db.from('mps_txn_hist').insert({
           order_id: orderId,
           user_id: order.seller_id,
           txn_type_cd: 'CANCEL_FEE_IN',
@@ -164,6 +170,10 @@ export async function refundCancelledOrder(
           regr_id: actorId,
           modr_id: actorId,
         })
+        if (compErr)
+          console.error(
+            `[refund] CRITICAL 판매자 보상 송금 성공했으나 장부기록 실패 — 수동기록 필요. order=${orderId} txid=${res.txid} err=${compErr.message}`,
+          )
         sellerComp = FEE_PI
       } catch (e) {
         console.error('[refund] 판매자 보상 A2U 실패(환불은 완료):', orderId, e)

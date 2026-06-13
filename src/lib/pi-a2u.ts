@@ -32,8 +32,16 @@ export function isA2UEnabled(): boolean {
 // txid가 있으면 complete, 없으면 cancel (베스트 에포트 — 실패해도 본 송금 시도).
 async function recoverIncomplete(pi: PiNetwork): Promise<void> {
   try {
-    const incompletes = await pi.getIncompleteServerPayments()
-    for (const p of incompletes) {
+    // SDK가 배열 또는 { incomplete_server_payments: [...] } 형태로 반환할 수 있어 방어적 처리
+    const raw = (await pi.getIncompleteServerPayments()) as unknown
+    const incompletes = Array.isArray(raw)
+      ? raw
+      : ((raw as { incomplete_server_payments?: unknown[] })
+          ?.incomplete_server_payments ?? [])
+    for (const p of incompletes as Array<{
+      identifier: string
+      transaction: { txid: string } | null
+    }>) {
       try {
         if (p.transaction?.txid) {
           await pi.completePayment(p.identifier, p.transaction.txid)
