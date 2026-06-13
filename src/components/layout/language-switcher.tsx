@@ -26,6 +26,64 @@ interface Country {
   currency_cd: string
 }
 
+// ─── 다국어 콤보 데이터 캐시 ─────────────────────────────────────────────────
+// 활성 locale·국가·환율은 모두 저빈도 변경 데이터. 드롭다운을 열 때마다 재조회하면
+// 매번 로딩 지연이 생기므로, 모듈 메모리(같은 페이지 재마운트) + sessionStorage(탭 내
+// 페이지 이동)에 TTL 캐시한다. 신선하면 네트워크 없이 즉시 표시 → 첫 클릭 외 지연 0.
+const CACHE_KEY = 'langSwitcher:v1'
+const CACHE_TTL = 10 * 60 * 1000 // 10분 (서버 revalidate 600s·환율 캐시 900s와 정합)
+
+interface SwitcherCache {
+  locales: ActiveLocale[]
+  countries: Country[]
+  rates: Record<string, number>
+  ts: number
+}
+
+let memCache: SwitcherCache | null = null
+
+function readCache(): SwitcherCache | null {
+  const fresh = (c: SwitcherCache | null) =>
+    c && Date.now() - c.ts < CACHE_TTL ? c : null
+  if (memCache) return fresh(memCache)
+  try {
+    const raw = sessionStorage.getItem(CACHE_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw) as SwitcherCache
+    memCache = parsed
+    return fresh(parsed)
+  } catch {
+    return null
+  }
+}
+
+function writeCache(data: Omit<SwitcherCache, 'ts'>): void {
+  const entry: SwitcherCache = { ...data, ts: Date.now() }
+  memCache = entry
+  try {
+    sessionStorage.setItem(CACHE_KEY, JSON.stringify(entry))
+  } catch {
+    // 용량 초과·차단 환경 → 메모리 캐시만으로 동작
+  }
+}
+
+// requestIdleCallback 미지원(Safari 등) 환경 폴백
+type IdleWindow = Window & {
+  requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number
+  cancelIdleCallback?: (id: number) => void
+}
+function requestIdle(cb: () => void): number {
+  const w = window as IdleWindow
+  return w.requestIdleCallback
+    ? w.requestIdleCallback(cb, { timeout: 2000 })
+    : window.setTimeout(cb, 300)
+}
+function cancelIdle(id: number): void {
+  const w = window as IdleWindow
+  if (w.cancelIdleCallback) w.cancelIdleCallback(id)
+  else clearTimeout(id)
+}
+
 // 1 USD 기준 환율 포매팅
 function fmtRate(rate: number | undefined): string {
   if (!rate) return '—'
@@ -52,12 +110,20 @@ export function LanguageSwitcher({ locale }: { locale: string }) {
   const router = useRouter()
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
-  const [activeLocales, setActiveLocales] = useState<ActiveLocale[]>([])
-  const [countries, setCountries] = useState<Country[]>([])
-  const [rates, setRates] = useState<Record<string, number>>({})
+  // lazy initializer로 캐시를 첫 렌더에 바로 반영 → 캐시 적중 시 effect·재렌더 없이 즉시 표시.
+  // (드롭다운 내용은 open=true일 때만 렌더되므로 SSR↔CSR 초기 DOM 차이 없음 → hydration 안전)
+  const [activeLocales, setActiveLocales] = useState<ActiveLocale[]>(
+    () => readCache()?.locales ?? [],
+  )
+  const [countries, setCountries] = useState<Country[]>(
+    () => readCache()?.countries ?? [],
+  )
+  const [rates, setRates] = useState<Record<string, number>>(
+    () => readCache()?.rates ?? {},
+  )
   const [loading, setLoading] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
-  const loadedRef = useRef(false)
+  const loadedRef = useRef(readCache() !== null)
 
   // 드롭다운 외부 클릭 시 닫기
   useEffect(() => {
@@ -73,8 +139,21 @@ export function LanguageSwitcher({ locale }: { locale: string }) {
     return () => document.removeEventListener('mousedown', onDown)
   }, [])
 
+  function applyData(d: Omit<SwitcherCache, 'ts'>) {
+    setActiveLocales(d.locales)
+    setCountries(d.countries)
+    setRates(d.rates)
+  }
+
   async function loadData() {
     if (loadedRef.current) return
+    // 신선한 캐시가 있으면 네트워크 없이 즉시 표시
+    const cached = readCache()
+    if (cached) {
+      applyData(cached)
+      loadedRef.current = true
+      return
+    }
     setLoading(true)
     try {
       const [cRes, rRes] = await Promise.all([
@@ -86,9 +165,13 @@ export function LanguageSwitcher({ locale }: { locale: string }) {
         countries: Country[]
       }
       const rData = (await rRes.json()) as { rates: Record<string, number> }
-      setActiveLocales(cData.locales ?? [])
-      setCountries(cData.countries ?? [])
-      setRates(rData.rates ?? {})
+      const bundle = {
+        locales: cData.locales ?? [],
+        countries: cData.countries ?? [],
+        rates: rData.rates ?? {},
+      }
+      applyData(bundle)
+      writeCache(bundle)
       loadedRef.current = true
     } catch {
       // 실패 시 빈 데이터 유지
@@ -97,11 +180,22 @@ export function LanguageSwitcher({ locale }: { locale: string }) {
     }
   }
 
+  // 캐시 미적중 시에만 idle 시점에 백그라운드 프리페치(페이지 로드와 경합 방지) →
+  // 세션 첫 클릭도 지연 0. 적중 시엔 lazy initializer가 이미 채웠으므로 아무것도 안 함.
+  useEffect(() => {
+    if (loadedRef.current) return
+    const id = requestIdle(() => {
+      void loadData()
+    })
+    return () => cancelIdle(id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   function toggle() {
-    const next = !open
-    setOpen(next)
-    if (next) loadData()
-    else loadedRef.current = false // 닫을 때 초기화 → 다음 열기 시 최신 데이터 로드
+    setOpen((prev) => !prev)
+    // 캐시가 있으면 loadData가 즉시 반환, 없을 때만 fetch.
+    // (닫을 때 loadedRef를 초기화하지 않아 재열기 시 재조회 없음)
+    void loadData()
   }
 
   async function switchLocale(next: string) {
