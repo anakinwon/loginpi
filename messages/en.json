@@ -500,6 +500,7 @@
     "period90": "90 days",
     "revenue": "Revenue",
     "scoreFormula": "Score = active days×0.2 + content (cafés·posts·comments)×0.3 + payments×0.5",
+    "scorePoints": "{score} pts",
     "subscrRevenue": "Subscription Plan Revenue",
     "subtitle": "Active users · revenue statistics (daily rollup)",
     "themeDaily": "Daily Revenue by Theme",
@@ -525,9 +526,8 @@
       "noData": "No translation data in this period"
     },
     "translateSection": "Translation (PiTranslate™)",
-    "unitPerson": "users",
     "unitCase": "txns",
-    "scorePoints": "{score} pts",
+    "unitPerson": "users",
     "userActivity": "Active {days}d · Content {content} · Payments {payments}"
   },
   "adminStd": {
