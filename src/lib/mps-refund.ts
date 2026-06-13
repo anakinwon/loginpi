@@ -57,11 +57,8 @@ export async function refundCancelledOrder(
 
   // 결제 안 된 주문(에스크로 입금 없음)은 환불 대상 아님
   if (!order.escrow_txid) return { status: 'skipped', reason: 'NOT_PAID' }
-  // 구매자 취소만 환불 (취소 상태 + 취소요청자 = 구매자)
-  if (
-    order.order_st_cd !== 'CANCELLED' ||
-    order.cancel_req_id !== order.buyer_id
-  )
+  // 취소된 주문만 환불 (취소 주체 무관 — 구매자·판매자·관리자 취소 모두 구매자에게 환불)
+  if (order.order_st_cd !== 'CANCELLED')
     return { status: 'skipped', reason: 'NOT_BUYER_CANCEL' }
 
   // 멱등 — 이미 환불(REFUND_IN) 기록이 있으면 재송금 금지 (실거래 이중지급 방지)
@@ -74,18 +71,23 @@ export async function refundCancelledOrder(
   if (already && already.length > 0)
     return { status: 'skipped', reason: 'ALREADY_REFUNDED' }
 
-  // 취소수수료 적용 여부 — cancelOrder RPC가 보증금 활성 거래에만 남긴 FEE 행으로 판정
+  // 취소수수료 적용 주체 판정 — cancelOrder RPC가 보증금 활성 거래에만 남긴 FEE 행으로 구분.
+  //   buyer FEE 존재  = 구매자 취소(보증금 거래) → 구매자 환불에서 0.1 공제 + 판매자에게 0.1 보상
+  //   seller FEE 존재 = 판매자 취소(보증금 거래) → 구매자에게 0.1 보상 가산(판매자 보증금에서 충당)
   const { data: feeRows } = await db
     .from('mps_txn_hist')
-    .select('txn_id')
+    .select('user_id')
     .eq('order_id', orderId)
     .eq('txn_type_cd', 'FEE')
-    .eq('user_id', order.buyer_id)
-    .limit(1)
-  const feeApplied = !!(feeRows && feeRows.length > 0)
+  const feeBuyer = !!feeRows?.some((r) => r.user_id === order.buyer_id)
+  const feeSeller = !!feeRows?.some((r) => r.user_id === order.seller_id)
 
   const price = Number(order.order_price_pi)
-  const refundAmount = round7(feeApplied ? price - FEE_PI : price)
+  // 통합 환불 공식: 결제액 − 구매자수수료 + 판매자수수료
+  //   구매자 취소(보증금): price − 0.1 / 판매자 취소(보증금): price + 0.1 / 무보증금·관리자: price
+  const refundAmount = round7(
+    price - (feeBuyer ? FEE_PI : 0) + (feeSeller ? FEE_PI : 0),
+  )
 
   // 구매자 Pi UID (A2U 수신자)
   const { data: buyer } = await db
@@ -109,7 +111,8 @@ export async function refundCancelledOrder(
       metadata: {
         type: 'MPS_REFUND',
         order_id: orderId,
-        fee_applied: feeApplied,
+        fee_buyer: feeBuyer,
+        fee_seller: feeSeller,
       },
     })
     txid = res.txid
@@ -132,9 +135,11 @@ export async function refundCancelledOrder(
     txn_type_cd: 'REFUND_IN',
     pi_amt: refundAmount,
     pi_txid: txid,
-    memo: feeApplied
+    memo: feeBuyer
       ? `구매자 취소 환불 (결제 ${price}π − 수수료 ${FEE_PI}π)`
-      : `구매자 취소 환불 (전액 ${price}π)`,
+      : feeSeller
+        ? `판매자 취소 환불 (결제 ${price}π + 보상 ${FEE_PI}π)`
+        : `취소 환불 (전액 ${price}π)`,
     regr_id: actorId,
     modr_id: actorId,
   })
@@ -143,9 +148,10 @@ export async function refundCancelledOrder(
       `[refund] CRITICAL 송금 성공했으나 장부기록 실패 — 수동기록 필요. order=${orderId} txid=${txid} amount=${refundAmount} err=${refundLogErr.message}`,
     )
 
-  // 2) 보증금 거래면 판매자 보상 0.1π A2U (베스트 에포트 — 실패해도 구매자 환불은 확정)
+  // 2) 구매자 취소(보증금 거래)면 판매자에게 보상 0.1π A2U (베스트 에포트 — 실패해도 구매자 환불은 확정).
+  //    판매자 취소(feeSeller)는 그 0.1π가 이미 구매자 환불액에 가산되므로 별도 지급 없음.
   let sellerComp: number | undefined
-  if (feeApplied) {
+  if (feeBuyer) {
     const { data: seller } = await db
       .from('sys_user')
       .select('pi_uid')
