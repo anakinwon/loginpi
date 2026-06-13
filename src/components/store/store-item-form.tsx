@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { useRouter } from '@/i18n/navigation'
@@ -58,6 +58,19 @@ export function StoreItemForm({ serverAuthed = false, itemId }: ItemFormProps) {
   const [lat, setLat] = useState<number | null>(null)
   const [lng, setLng] = useState<number | null>(null)
   const [locLoading, setLocLoading] = useState(false)
+  const autoLocTried = useRef(false) // 마운트 시 위치 자동수집 1회 가드 (중복 GPS 호출 방지)
+
+  // 현재 위치 수집 (동의자 전용) — 실패 원인별 메시지 안내
+  const captureLocation = useCallback(() => {
+    setLocLoading(true)
+    getCurrentPosition()
+      .then((p) => {
+        setLat(p.lat)
+        setLng(p.lng)
+      })
+      .catch((e: Error) => toast.error(e.message))
+      .finally(() => setLocLoading(false))
+  }, [])
 
   // 카테고리 트리 로드 (공개 API — 로그인 불필요)
   useEffect(() => {
@@ -80,28 +93,22 @@ export function StoreItemForm({ serverAuthed = false, itemId }: ItemFormProps) {
       .catch(() => {})
   }, [authed])
 
-  // 마운트 시 LBS 동의 여부 확인
+  // 마운트 시 LBS 동의 여부 확인 + 동의자는 화면 로딩과 동시에 현재 위치 자동 수집 (등록 모드, 1회)
   useEffect(() => {
     if (!authed) return
     piFetch('/api/location/consent')
       .then((r) => (r.ok ? r.json() : null))
       .then((d: { consent_yn?: string } | null) => {
-        setLbsConsent(d?.consent_yn === 'Y' ? 'Y' : 'N')
+        const consented = d?.consent_yn === 'Y'
+        setLbsConsent(consented ? 'Y' : 'N')
+        // 동의자 + 등록 모드: 마운트 직후 GPS 자동 수집 (미동의자는 Rule LBS-01에 따라 자동 수집 금지)
+        if (consented && !editMode && !autoLocTried.current) {
+          autoLocTried.current = true
+          captureLocation()
+        }
       })
       .catch(() => setLbsConsent('N'))
-  }, [authed])
-
-  // 현재 위치 수집 (동의자 전용) — 실패 원인별 메시지 안내
-  const captureLocation = useCallback(() => {
-    setLocLoading(true)
-    getCurrentPosition()
-      .then((p) => {
-        setLat(p.lat)
-        setLng(p.lng)
-      })
-      .catch((e: Error) => toast.error(e.message))
-      .finally(() => setLocLoading(false))
-  }, [])
+  }, [authed, editMode, captureLocation])
 
   // 수정 모드 — 기존 상품 값 로드
   useEffect(() => {
@@ -168,6 +175,11 @@ export function StoreItemForm({ serverAuthed = false, itemId }: ItemFormProps) {
     }
     if (!unlimited && (!Number.isInteger(qty) || qty < 1 || qty > 9998)) {
       toast.error(t('qtyInvalid'))
+      return
+    }
+    // 게시(OPEN)는 판매 위치 필수 — 현재 위치 등록 후에만 게시 가능 (임시저장은 위치 없이 허용)
+    if (status === 'OPEN' && !editMode && (lat === null || lng === null)) {
+      toast.error('현재 위치를 등록해야 게시할 수 있습니다')
       return
     }
 
@@ -396,6 +408,12 @@ export function StoreItemForm({ serverAuthed = false, itemId }: ItemFormProps) {
             위치를 등록하면 구매자 목록에 거리로 표시되고 주변순 검색에
             노출됩니다. (위치 서비스 동의자만)
           </p>
+          {lat === null && (
+            <p className="text-destructive text-xs">
+              게시하려면 현재 위치 등록이 필요합니다. (임시저장은 위치 없이
+              가능)
+            </p>
+          )}
         </div>
       )}
 
@@ -408,7 +426,7 @@ export function StoreItemForm({ serverAuthed = false, itemId }: ItemFormProps) {
           <>
             <Button
               onClick={() => submit('OPEN')}
-              disabled={saving}
+              disabled={saving || lat === null || lng === null}
               className="flex-1"
             >
               {saving ? t('saving') : t('form.publish')}
