@@ -1519,7 +1519,11 @@
       "colChars": "번역 문자수",
       "modelDist": "번역 모델 분포",
       "costNote": "예상 비용은 번역문 문자수 기반 추정치입니다 (1 token ≈ 4 chars, 입력 토큰 ≈ 출력×2 가정) — 실제 청구액은 Google AI Studio 콘솔을 확인하세요."
-    }
+    },
+    "unitPerson": "명",
+    "unitCase": "건",
+    "scorePoints": "{score}점",
+    "userActivity": "활동 {days}일 · 콘텐츠 {content} · 결제 {payments}"
   },
   "adminI18n": {
     "activeLangs": "활성 언어",

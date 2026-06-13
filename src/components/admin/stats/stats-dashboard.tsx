@@ -66,12 +66,15 @@ function TopUsersList({
             <div className="min-w-0 flex-1">
               <p className="truncate font-medium">{u.display_nm}</p>
               <p className="text-muted-foreground text-xs">
-                활동 {u.activity_days}일 · 콘텐츠 {u.content_cnt} · 결제{' '}
-                {u.action_cnt}
+                {t('userActivity', {
+                  days: u.activity_days,
+                  content: u.content_cnt,
+                  payments: u.action_cnt,
+                })}
               </p>
             </div>
             <span className="shrink-0 font-semibold">
-              {u.score.toFixed(1)}점
+              {t('scorePoints', { score: u.score.toFixed(1) })}
             </span>
           </li>
         ))}
@@ -339,19 +342,19 @@ export function StatsDashboard() {
           <StatsCard
             label="DAU"
             value={lastActivity?.dau_cnt ?? 0}
-            unit="명"
+            unit={t('unitPerson')}
             loading={loading}
           />
           <StatsCard
             label="WAU"
             value={lastActivity?.wau_cnt ?? 0}
-            unit="명"
+            unit={t('unitPerson')}
             loading={loading}
           />
           <StatsCard
             label="MAU"
             value={lastActivity?.mau_cnt ?? 0}
-            unit="명"
+            unit={t('unitPerson')}
             loading={loading}
           />
         </div>
@@ -408,7 +411,7 @@ export function StatsDashboard() {
               <StatsCard
                 label={t('totalTrades')}
                 value={totalTxn}
-                unit="건"
+                unit={t('unitCase')}
                 loading={revLoading}
               />
               <StatsCard

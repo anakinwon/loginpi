@@ -524,7 +524,11 @@
       "newTrans": "New Translations ({period} days, message×language)",
       "noData": "No translation data in this period"
     },
-    "translateSection": "Translation (PiTranslate™)"
+    "translateSection": "Translation (PiTranslate™)",
+    "unitPerson": "users",
+    "unitCase": "txns",
+    "scorePoints": "{score} pts",
+    "userActivity": "Active {days}d · Content {content} · Payments {payments}"
   },
   "adminStd": {
     "domainTypeCode": "Code",

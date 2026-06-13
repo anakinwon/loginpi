@@ -33,6 +33,7 @@ interface TranslateStatsResponse {
 
 export function TranslateStatsSection({ period }: { period: number }) {
   const tr = useTranslations('adminStats.translate')
+  const ta = useTranslations('adminStats')
   const [data, setData] = useState<TranslateStatsResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -84,7 +85,7 @@ export function TranslateStatsSection({ period }: { period: number }) {
         <StatsCard
           label={tr('newTrans', { period })}
           value={t?.trans_cnt ?? 0}
-          unit="건"
+          unit={ta('unitCase')}
           loading={loading}
         />
         <StatsCard
