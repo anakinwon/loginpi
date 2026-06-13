@@ -53,7 +53,7 @@ Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Net
 
 **다음 단계** (본문 Phase별 TASK 기준):
 - ✅ MPS Phase 2 (TASK-108~111) 완료 (2026-06-13): 카테고리 시스템 · 매장 관리 · 양방향 주문 취소 · 거래 내역
-- MPS Phase 3 (TASK-112~113): PiRC3 실 에스크로 마이그레이션 · Google Maps 연동 — *MPS는 배송 없는 직거래 전용* (외부 의존: 테스트넷 컨트랙트·Maps API 키)
+- MPS Phase 3 (TASK-112~113): **TASK-112 PiRC3 실 에스크로 = 🔒 보류**(2026-06-13 공식 확인 — PiRC3 미존재·Pi SDK `invokeContract` 미지원 → 플랫폼 가상 에스크로 유지) · TASK-113 Google Maps 연동(`NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` 필요) — *MPS는 배송 없는 직거래 전용*
 - PiVoice 잔여 (S0~S3): Pi Browser 실기기 마이크 검증 · TURN 운영 설정(`TURN_HOST`/`TURN_SECRET`) · 품질 데이터 기반 coturn 전환 판단 · 5인+ LiveKit SFU/결제 게이팅 검토
 - LBS 향후 Phase: Maps JavaScript API 지도 UI · Places API 매장 검색
 
@@ -1063,11 +1063,18 @@ if (meta?.type === 'CHAT_SUBSCR') {
 
 ### Phase 3 — 고도화
 
-### TASK-112: PiRC3 실 에스크로 마이그레이션 🔜
+### TASK-112: PiRC3 실 에스크로 마이그레이션 🔒 보류 (2026-06-13 공식 확인 — 선결 조건 미충족)
 
-- 🔜 PiRC2 U2A 가상 에스크로 → PiRC3 스마트 컨트랙트 실 에스크로로 전환
-- 🔜 `mps_order.escrow_txid` → PiRC3 Contract transaction hash로 교체
-- 🔜 `subscribe()` 방식의 Pi Wallet 서명 기반 에스크로 잠금
+> **결정**: 플랫폼(운영자 Pi 계정) 가상 에스크로를 **공식 지원 확인 시점까지 정식 방식으로 유지**. 임시방편이 아니라 현 Pi 생태계에서 유일하게 동작 가능한 올바른 설계.
+> **2026-06-13 웹 직접 확인 (블로킹 사유)**:
+> - `github.com/PiNetwork/PiRC` — **PiRC1·PiRC2만 존재** (PiRC3·에스크로 컨트랙트 디렉토리 없음)
+> - `pi-apps/pi-platform-docs` — Pi SDK 공식 메서드는 `authenticate()`·`createPayment()` **2개뿐** (`invokeContract`·컨트랙트 호출·에스크로 미노출)
+> - `minepi.com/blog/rpc-server` — 스마트 컨트랙트 RPC는 **Testnet 한정**(2026-04-08), 사용자 지갑 서명 컨트랙트 호출 수단 미문서화
+> **재개 트리거 (둘 다 충족 시)**: ⓐ PiRC 저장소에 에스크로 컨트랙트(또는 PiRC3) 공개 **AND** ⓑ Pi SDK가 사용자 서명 컨트랙트 호출 메서드 제공
+
+- 🔒 (재개 시) PiRC2 U2A 가상 에스크로 → 스마트 컨트랙트 실 에스크로로 전환
+- 🔒 (재개 시) `mps_order.escrow_txid` → Contract transaction hash로 교체
+- 🔒 (재개 시) Pi Wallet 서명 기반 에스크로 잠금
 
 ### TASK-113: Google Maps 연동 🔜
 
