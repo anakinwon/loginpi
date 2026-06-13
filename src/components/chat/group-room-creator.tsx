@@ -1,5 +1,6 @@
 'use client'
 import { useState, useCallback, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import { useRouter } from '@/i18n/navigation'
 import { toast } from 'sonner'
 import { usePiAuth } from '@/components/pi-auth-provider'
@@ -53,6 +54,7 @@ function localDtmNow(): string {
 }
 
 export function GroupRoomCreator() {
+  const t = useTranslations('chat.creator')
   const router = useRouter()
   const { isInPiBrowser } = usePiAuth()
   const [open, setOpen] = useState(false)
@@ -310,7 +312,7 @@ export function GroupRoomCreator() {
         onClick={() => setOpen(true)}
         className="bg-primary text-primary-foreground inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium transition-opacity hover:opacity-90"
       >
-        + 카페 만들기
+        {t('openBtn')}
       </button>
 
       <Dialog open={open} onOpenChange={setOpen}>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { piFetch } from '@/lib/pi-fetch'
 import { readCache, writeCache } from '@/lib/client-cache'
 import { StatsCard } from './stats-card'
@@ -31,6 +32,7 @@ interface TranslateStatsResponse {
 }
 
 export function TranslateStatsSection({ period }: { period: number }) {
+  const tr = useTranslations('adminStats.translate')
   const [data, setData] = useState<TranslateStatsResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -80,25 +82,25 @@ export function TranslateStatsSection({ period }: { period: number }) {
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {/* 메시지 1건이 N개 언어로 번역되면 N건 — API 호출(비용) 단위 집계 */}
         <StatsCard
-          label={`신규 번역 (${period}일, 메시지×언어)`}
+          label={tr('newTrans', { period })}
           value={t?.trans_cnt ?? 0}
           unit="건"
           loading={loading}
         />
         <StatsCard
-          label="캐시 히트율"
+          label={tr('hitRate')}
           value={t ? (t.hit_rate * 100).toFixed(1) : '0.0'}
           unit="%"
           loading={loading}
         />
         <StatsCard
-          label="예상 비용 (Gemini 토큰 추정)"
+          label={tr('estCost')}
           value={t ? `$${t.est_cost_usd.toFixed(4)}` : '$0'}
           unit=""
           loading={loading}
         />
         <StatsCard
-          label="번역 피드백 👍 / 👎"
+          label={tr('feedback')}
           value={fb ? `${fb.up_cnt} / ${fb.down_cnt}` : '0 / 0'}
           unit=""
           loading={loading}
@@ -107,22 +109,20 @@ export function TranslateStatsSection({ period }: { period: number }) {
 
       {/* 일별 번역 테이블 */}
       <div className="rounded-lg border p-4">
-        <p className="mb-2 text-sm font-medium">일별 번역 현황</p>
+        <p className="mb-2 text-sm font-medium">{tr('dailyTitle')}</p>
         {loading ? (
           <div className="bg-muted h-40 animate-pulse rounded-lg" />
         ) : !data || data.series.length === 0 ? (
-          <p className="text-muted-foreground text-sm">
-            기간 내 번역 데이터가 없습니다
-          </p>
+          <p className="text-muted-foreground text-sm">{tr('noData')}</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b text-left">
-                  <th className="py-2 pr-3 font-medium">날짜</th>
-                  <th className="py-2 pr-3 font-medium">신규 번역</th>
-                  <th className="py-2 pr-3 font-medium">캐시 히트</th>
-                  <th className="py-2 font-medium">번역 문자수</th>
+                  <th className="py-2 pr-3 font-medium">{tr('colDate')}</th>
+                  <th className="py-2 pr-3 font-medium">{tr('colNew')}</th>
+                  <th className="py-2 pr-3 font-medium">{tr('colHit')}</th>
+                  <th className="py-2 font-medium">{tr('colChars')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -145,7 +145,7 @@ export function TranslateStatsSection({ period }: { period: number }) {
       {/* 모델별 분포 — Gemini 주력 / Claude fallback 비율 확인 */}
       {data && data.models.length > 0 && (
         <div className="rounded-lg border p-4">
-          <p className="mb-2 text-sm font-medium">번역 모델 분포</p>
+          <p className="mb-2 text-sm font-medium">{tr('modelDist')}</p>
           <ul className="space-y-1 text-sm">
             {data.models.map((m) => (
               <li key={m.model_ver} className="flex items-center gap-2">
@@ -159,10 +159,7 @@ export function TranslateStatsSection({ period }: { period: number }) {
         </div>
       )}
 
-      <p className="text-muted-foreground text-xs">
-        예상 비용은 번역문 문자수 기반 추정치입니다 (1 token ≈ 4 chars, 입력
-        토큰 ≈ 출력×2 가정) — 실제 청구액은 Google AI Studio 콘솔을 확인하세요.
-      </p>
+      <p className="text-muted-foreground text-xs">{tr('costNote')}</p>
     </div>
   )
 }

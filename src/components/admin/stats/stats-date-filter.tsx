@@ -1,12 +1,14 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 
+// 기간 필터 — 레이블은 adminStats.period* 번역키 사용
 const PERIODS = [
-  { value: 7, label: '7일' },
-  { value: 30, label: '30일' },
-  { value: 90, label: '90일' },
-  { value: 365, label: '1년' },
+  { value: 7, labelKey: 'period7' },
+  { value: 30, labelKey: 'period30' },
+  { value: 90, labelKey: 'period90' },
+  { value: 365, labelKey: 'period365' },
 ] as const
 
 interface Props {
@@ -16,9 +18,11 @@ interface Props {
 }
 
 export function StatsDateFilter({ period, onChange, disabled }: Props) {
+  const t = useTranslations('adminStats')
+
   return (
     <div className="flex gap-1">
-      {PERIODS.map(({ value, label }) => (
+      {PERIODS.map(({ value, labelKey }) => (
         <button
           key={value}
           onClick={() => onChange(value)}
@@ -30,7 +34,7 @@ export function StatsDateFilter({ period, onChange, disabled }: Props) {
               : 'bg-muted text-muted-foreground hover:bg-muted/70',
           )}
         >
-          {label}
+          {t(labelKey)}
         </button>
       ))}
     </div>

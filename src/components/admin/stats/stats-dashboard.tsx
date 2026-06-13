@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback, useRef } from 'react'
+import { useTranslations } from 'next-intl'
 import dynamic from 'next/dynamic'
 import { piFetch } from '@/lib/pi-fetch'
 import { readCache, writeCache } from '@/lib/client-cache'
@@ -40,6 +41,7 @@ function TopUsersList({
   users: TopUser[]
   loading: boolean
 }) {
+  const t = useTranslations('adminStats')
   if (loading) {
     return (
       <div className="space-y-2">
@@ -54,7 +56,7 @@ function TopUsersList({
     )
   }
   if (users.length === 0)
-    return <p className="text-muted-foreground text-sm">데이터 없음</p>
+    return <p className="text-muted-foreground text-sm">{t('noData')}</p>
   return (
     <div className="space-y-3">
       <ol className="space-y-2">
@@ -74,9 +76,7 @@ function TopUsersList({
           </li>
         ))}
       </ol>
-      <p className="text-muted-foreground text-xs">
-        점수 = 활동일수×0.2 + 콘텐츠(카페·게시글·댓글)×0.3 + 결제건수×0.5
-      </p>
+      <p className="text-muted-foreground text-xs">{t('scoreFormula')}</p>
     </div>
   )
 }
@@ -88,6 +88,7 @@ function TopThemesList({
   themes: TopTheme[]
   loading: boolean
 }) {
+  const tr = useTranslations('adminStats')
   if (loading) {
     return (
       <div className="space-y-2">
@@ -102,7 +103,7 @@ function TopThemesList({
     )
   }
   if (themes.length === 0)
-    return <p className="text-muted-foreground text-sm">데이터 없음</p>
+    return <p className="text-muted-foreground text-sm">{tr('noData')}</p>
   return (
     <ol className="space-y-2">
       {themes.map((t, i) => (
@@ -138,6 +139,7 @@ function TopSpendersList({
   spenders: TopSpender[]
   loading: boolean
 }) {
+  const t = useTranslations('adminStats')
   if (loading) {
     return (
       <div className="space-y-2">
@@ -152,7 +154,7 @@ function TopSpendersList({
     )
   }
   if (spenders.length === 0)
-    return <p className="text-muted-foreground text-sm">데이터 없음</p>
+    return <p className="text-muted-foreground text-sm">{t('noData')}</p>
   return (
     <ol className="space-y-2">
       {spenders.map((s, i) => (
@@ -186,6 +188,8 @@ function RankingCard({
 }
 
 export function StatsDashboard() {
+  const t = useTranslations('adminStats')
+  const tc = useTranslations('common')
   const [period, setPeriod] = useState(7)
   const [activityData, setActivityData] =
     useState<ActivityStatsResponse | null>(null)
@@ -304,7 +308,7 @@ export function StatsDashboard() {
           }}
           className="text-muted-foreground mt-2 text-sm underline"
         >
-          다시 시도
+          {tc('retry')}
         </button>
       </div>
     )
@@ -321,14 +325,14 @@ export function StatsDashboard() {
         />
         {loading && (
           <span className="text-muted-foreground animate-pulse text-sm">
-            불러오는 중…
+            {tc('fetching')}
           </span>
         )}
       </div>
 
       {/* ─── 활성 사용자 섹션 ─────────────────────────── */}
       <section className="space-y-4">
-        <h2 className="text-lg font-semibold">활성 사용자</h2>
+        <h2 className="text-lg font-semibold">{t('activeUsers')}</h2>
 
         {/* DAU / WAU / MAU 카드 */}
         <div className="grid grid-cols-3 gap-3">
@@ -364,7 +368,7 @@ export function StatsDashboard() {
         </div>
 
         {/* Top-3 활성 사용자 */}
-        <RankingCard title={`Top 3 활성 사용자 (최근 ${period}일)`}>
+        <RankingCard title={t('top3Active', { period })}>
           <TopUsersList
             users={activityData?.topUsers ?? []}
             loading={loading}
@@ -374,7 +378,7 @@ export function StatsDashboard() {
 
       {/* ─── 매출 섹션 — 스크롤 진입 시 데이터 로드 + 차트 마운트 ───── */}
       <section className="space-y-4">
-        <h2 className="text-lg font-semibold">매출</h2>
+        <h2 className="text-lg font-semibold">{t('revenue')}</h2>
 
         <LazySection
           onVisible={() => setRevVisible(true)}
@@ -396,25 +400,25 @@ export function StatsDashboard() {
             {/* 매출 KPI 카드 — 총합 / 거래건수 / 구독 / 일반 */}
             <div className="grid grid-cols-2 gap-3">
               <StatsCard
-                label={`기간 총 매출 (${period}일)`}
+                label={t('totalRevenue', { period })}
                 value={totalRevPi.toFixed(4)}
                 unit="π"
                 loading={revLoading}
               />
               <StatsCard
-                label="기간 총 거래"
+                label={t('totalTrades')}
                 value={totalTxn}
                 unit="건"
                 loading={revLoading}
               />
               <StatsCard
-                label="구독 요금제 매출"
+                label={t('subscrRevenue')}
                 value={subscRevPi.toFixed(4)}
                 unit="π"
                 loading={revLoading}
               />
               <StatsCard
-                label="일반 요금제 매출"
+                label={t('normalRevenue')}
                 value={genRevPi.toFixed(4)}
                 unit="π"
                 loading={revLoading}
@@ -424,7 +428,7 @@ export function StatsDashboard() {
             {/* 매출 시계열 + 도넛 */}
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
               <div className="rounded-lg border p-4">
-                <p className="mb-2 text-sm font-medium">테마별 일별 매출</p>
+                <p className="mb-2 text-sm font-medium">{t('themeDaily')}</p>
                 {revenueData && revenueData.series.length > 0 ? (
                   <RevenueTimelineChart data={revenueData.series} />
                 ) : (
@@ -432,7 +436,7 @@ export function StatsDashboard() {
                 )}
               </div>
               <div className="rounded-lg border p-4">
-                <p className="mb-2 text-sm font-medium">테마별 매출 비중</p>
+                <p className="mb-2 text-sm font-medium">{t('themeShare')}</p>
                 {revenueData && revenueData.series.length > 0 ? (
                   <RevenueDonutChart data={revenueData.series} />
                 ) : (
@@ -443,13 +447,13 @@ export function StatsDashboard() {
 
             {/* Top-3 지출자 + Top-3 테마 */}
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <RankingCard title={`Top 3 구매왕 (최근 ${period}일)`}>
+              <RankingCard title={t('top3Buyers', { period })}>
                 <TopSpendersList
                   spenders={revenueData?.topSpenders ?? []}
                   loading={revLoading}
                 />
               </RankingCard>
-              <RankingCard title={`Top 3 테마 매출 (최근 ${period}일)`}>
+              <RankingCard title={t('top3Themes', { period })}>
                 <TopThemesList
                   themes={revenueData?.topThemes ?? []}
                   loading={revLoading}
@@ -462,7 +466,7 @@ export function StatsDashboard() {
 
       {/* ─── 번역 섹션 (PiTranslate™) — 스크롤 진입 시 마운트·로드 ───── */}
       <section className="space-y-4">
-        <h2 className="text-lg font-semibold">번역 (PiTranslate™)</h2>
+        <h2 className="text-lg font-semibold">{t('translateSection')}</h2>
         <LazySection
           fallback={
             <div className="space-y-4">

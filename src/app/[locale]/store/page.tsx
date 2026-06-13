@@ -20,7 +20,7 @@ export default async function StorePage() {
         </div>
         <nav className="flex gap-3 text-sm">
           <Link href="/nearby" className="text-primary hover:underline">
-            📍 주변
+            {t('nearbyNav')}
           </Link>
           <Link href="/store/my/items" className="text-primary hover:underline">
             {t('navMyItems')}

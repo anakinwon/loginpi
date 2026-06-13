@@ -1,5 +1,6 @@
 'use client'
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
@@ -44,6 +45,7 @@ interface MarketTheme {
 const RANK_BADGES = ['🥇', '🥈', '🥉'] as const
 
 export function ChatMarketplace() {
+  const t = useTranslations('chat.market')
   const [rooms, setRooms] = useState<MarketRoom[]>([])
   const [themes, setThemes] = useState<MarketTheme[]>([])
   const [followed, setFollowed] = useState<Set<string>>(new Set())
@@ -145,7 +147,7 @@ export function ChatMarketplace() {
             className="bg-primary h-5 w-1 shrink-0 rounded-full"
             aria-hidden
           />
-          마켓플레이스 — 인기 카페
+          {t('title')}
         </h2>
       </div>
 
@@ -203,9 +205,7 @@ export function ChatMarketplace() {
         </div>
       ) : rooms.length === 0 ? (
         <div className="rounded-xl border border-dashed py-8 text-center">
-          <p className="text-muted-foreground text-sm">
-            해당 테마의 공개 카페가 아직 없습니다
-          </p>
+          <p className="text-muted-foreground text-sm">{t('empty')}</p>
         </div>
       ) : (
         <>
