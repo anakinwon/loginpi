@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { usePathname, useRouter } from '@/i18n/navigation'
+import { piFetch } from '@/lib/pi-fetch'
 import { LOCALE_CURRENCY } from '@/lib/locale-currency'
 import {
   LOCALE_COUNTRY,
@@ -103,14 +104,29 @@ export function LanguageSwitcher({ locale }: { locale: string }) {
     else loadedRef.current = false // 닫을 때 초기화 → 다음 열기 시 최신 데이터 로드
   }
 
-  function switchLocale(next: string) {
+  async function switchLocale(next: string) {
     setOpen(false)
     if (next === locale) return
-    // admin 경로는 _pit 단기 티켓으로 인증된 상태 — next-intl soft navigation으로 locale만
-    // 바꾸면 새 URL에 _pit가 없어 서버 인증이 풀리고 게이트 재진입과 경합해 전환이 멈춘다.
-    // 하드 네비게이션으로 서버가 locale·인증을 처음부터 재평가하게 한다 (게이트가 _pit 재발급).
+    // ── admin 경로: Pi Browser 무반응 방지 ──────────────────────────────────
+    // Pi Browser는 Set-Cookie를 저장하지 않으므로, 티켓 없는 하드 네비게이션은 새 locale의
+    // 첫 서버 요청이 미인증(getSessionUser null) → ClientAdminGate만 렌더된다. 이후 게이트가
+    // soft router.replace로 재인증을 시도하지만 Pi Browser WebView에서 이 2차 재렌더가 안정적으로
+    // 잡히지 않아 'checking' 상태로 멈춰 무반응처럼 보인다.
+    // → 전환 시점에 _pit 티켓을 직접 발급받아 URL에 실어 하드 네비게이션하면, 미들웨어가
+    //   첫 요청부터 x-pit-ticket 헤더로 변환해 인증된 admin UI를 즉시 렌더한다(게이트 왕복 제거).
+    //   일반 브라우저는 piFetch가 401이어도 쿠키로 인증되므로 티켓 없이 이동해도 정상 동작한다.
     if (pathname.startsWith('/admin')) {
-      window.location.assign(`/${next}${pathname}`)
+      let target = `/${next}${pathname}`
+      try {
+        const res = await piFetch('/api/admin/pit-ticket', { method: 'POST' })
+        if (res.ok) {
+          const { ticket } = (await res.json()) as { ticket?: string }
+          if (ticket) target += `?_pit=${encodeURIComponent(ticket)}`
+        }
+      } catch {
+        // 티켓 발급 실패 → 티켓 없이 이동, 쿠키 인증 또는 게이트가 처리
+      }
+      window.location.assign(target)
       return
     }
     router.replace(pathname, { locale: next })
