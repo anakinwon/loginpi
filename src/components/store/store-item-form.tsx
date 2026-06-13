@@ -24,6 +24,12 @@ interface CtgrNode {
   children: CtgrNode[]
 }
 
+// GET /api/store/shops 내 매장 (상품 소속 매장 선택용 — FR-06 N:1)
+interface ShopOption {
+  shop_id: string
+  shop_nm: string
+}
+
 // 상품 등록·수정 폼 (SCR-04) — 이미지는 URL 입력 (Storage 업로드는 후속 TASK)
 export function StoreItemForm({ serverAuthed = false, itemId }: ItemFormProps) {
   const t = useTranslations('store')
@@ -41,6 +47,8 @@ export function StoreItemForm({ serverAuthed = false, itemId }: ItemFormProps) {
   const [thumbnailUrl, setThumbnailUrl] = useState('')
   const [ctgrId, setCtgrId] = useState('')
   const [ctgrTree, setCtgrTree] = useState<CtgrNode[]>([])
+  const [shopId, setShopId] = useState('')
+  const [myShops, setMyShops] = useState<ShopOption[]>([])
   const [saving, setSaving] = useState(false)
   const [loadingItem, setLoadingItem] = useState(editMode)
 
@@ -60,6 +68,17 @@ export function StoreItemForm({ serverAuthed = false, itemId }: ItemFormProps) {
       })
       .catch(() => {})
   }, [])
+
+  // 내 매장 목록 로드 (상품 소속 매장 선택 — 매장 없으면 드롭다운 숨김)
+  useEffect(() => {
+    if (!authed) return
+    piFetch('/api/store/shops')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: { shops?: ShopOption[] } | null) => {
+        if (d?.shops) setMyShops(d.shops)
+      })
+      .catch(() => {})
+  }, [authed])
 
   // 마운트 시 LBS 동의 여부 확인
   useEffect(() => {
@@ -97,6 +116,7 @@ export function StoreItemForm({ serverAuthed = false, itemId }: ItemFormProps) {
             price_pi: number
             item_cnd_cd: 'NEW' | 'USED' | 'HANDMADE'
             ctgr_id: string | null
+            shop_id: string | null
             reg_qty: number
             thumbnail_url: string | null
           }
@@ -106,6 +126,7 @@ export function StoreItemForm({ serverAuthed = false, itemId }: ItemFormProps) {
         setPricePi(String(item.price_pi))
         setCndCd(item.item_cnd_cd)
         setCtgrId(item.ctgr_id ?? '')
+        setShopId(item.shop_id ?? '')
         setUnlimited(item.reg_qty === 9999)
         setRegQty(item.reg_qty === 9999 ? '1' : String(item.reg_qty))
         setThumbnailUrl(item.thumbnail_url ?? '')
@@ -163,6 +184,12 @@ export function StoreItemForm({ serverAuthed = false, itemId }: ItemFormProps) {
         ? { ctgr_id: ctgrId || null }
         : ctgrId
           ? { ctgr_id: ctgrId }
+          : {}),
+      // 소속 매장 — 카테고리와 동일 규칙(등록: 키 생략, 수정: null=매장 없음)
+      ...(editMode
+        ? { shop_id: shopId || null }
+        : shopId
+          ? { shop_id: shopId }
           : {}),
       // 판매 위치 — 등록 모드에서 동의자가 위치를 잡은 경우만 전송
       ...(!editMode && lat !== null && lng !== null ? { lat, lng } : {}),
@@ -245,6 +272,26 @@ export function StoreItemForm({ serverAuthed = false, itemId }: ItemFormProps) {
           ))}
         </select>
       </div>
+
+      {/* 소속 매장 — 등록된 매장이 있을 때만 노출 (FR-06 N:1, 선택) */}
+      {myShops.length > 0 && (
+        <div className="space-y-1.5">
+          <Label htmlFor="item-shop">{t('form.shop')}</Label>
+          <select
+            id="item-shop"
+            value={shopId}
+            onChange={(e) => setShopId(e.target.value)}
+            className="border-input bg-background h-9 w-full rounded-md border px-3 text-sm"
+          >
+            <option value="">{t('form.shopNone')}</option>
+            {myShops.map((s) => (
+              <option key={s.shop_id} value={s.shop_id}>
+                {s.shop_nm}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5">

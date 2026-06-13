@@ -34,6 +34,12 @@ export default async function StorePage() {
           >
             {t('navOrders')}
           </Link>
+          <Link
+            href="/store/my/history"
+            className="text-primary hover:underline"
+          >
+            {t('navHistory')}
+          </Link>
         </nav>
       </div>
       <StoreItemList />

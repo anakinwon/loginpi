@@ -2,14 +2,14 @@
 
 Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Network 앱 플랫폼
 
-> **기준일**: 2026-06-12
-> **현재 버전**: Phase 7~12 완료 (PiCafé MVP · Pi 수익화 · 생태계 확장 · 사용자 프로필 · 통계 대시보드 · PiTranslate™ TASK-090~099 ✅) · **Phase 13 MyPiShop(MPS) Phase 1 MVP 완료 (TASK-100~107 ✅ · 108~113 확장 예정)** · **Phase 14 PiVoice™ v3.0 권한 시스템 구현 완료 (TASK-120~125 ✅, `docs/PRD_9_VOICE_CHAT.md` v3.0 — 방장 보장 슬롯 + 멤버 자동 2/승인 2, S0 실기기 검증·TURN env 잔여)** · **Phase 15 LBS P0+P1 완료 (TASK-130~140 ✅, 상품 개별 위치 등록 포함)** · 횡단 개선: 무한 스크롤·지연 로딩 + SWR 캐싱·병렬 호출 성능 튜닝, Pi Tip→Bean 리브랜딩, 스티커 노출 개선 (2026-06-12)
+> **기준일**: 2026-06-13
+> **현재 버전**: Phase 7~12 완료 (PiCafé MVP · Pi 수익화 · 생태계 확장 · 사용자 프로필 · 통계 대시보드 · PiTranslate™ TASK-090~099 ✅) · **Phase 13 MyPiShop(MPS) Phase 1 MVP + Phase 2 확장 완료 (TASK-100~111 ✅ · 카테고리·매장관리·양방향취소·거래내역 · Phase 3 PiRC3·Maps 예정)** · **Phase 14 PiVoice™ v3.0 권한 시스템 구현 완료 (TASK-120~125 ✅, `docs/PRD_9_VOICE_CHAT.md` v3.0 — 방장 보장 슬롯 + 멤버 자동 2/승인 2, S0 실기기 검증·TURN env 잔여)** · **Phase 15 LBS P0+P1 완료 (TASK-130~140 ✅, 상품 개별 위치 등록 포함)** · 횡단 개선: 무한 스크롤·지연 로딩 + SWR 캐싱·병렬 호출 성능 튜닝, Pi Tip→Bean 리브랜딩, 스티커 노출 개선 (2026-06-12) · **횡단 3차 (2026-06-13): Pi Browser admin 다국어 전환 무반응 수정(_pit 티켓 선발급) + 헤더 다국어 콤보 3계층 캐시 성능 개선**
 > **배포 URL**: https://loginpi.vercel.app
 > **기술 스택**: Next.js 16 App Router · React 19 · TypeScript 6 · Tailwind CSS v4 · NextAuth.js · Supabase PostgreSQL
 
 ---
 
-## 📊 전체 진행률 요약 (2026-06-12)
+## 📊 전체 진행률 요약 (2026-06-13)
 
 ### Phase 완료 현황
 
@@ -28,10 +28,11 @@ Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Net
 | **10** | 사용자 프로필 | ✅ 완료 | 100% |
 | **11** | 통계 대시보드 | ✅ 완료 | 100% |
 | **12** | PiTranslate™ 동시통역 | ✅ 완료 | 100% |
-| **13** | MyPiShop(MPS) MVP | ✅ 완료 (P1) | 100% (확장: P2/P3 예정) |
+| **13** | MyPiShop(MPS) | ✅ 완료 (P1+P2) | 100% (P2 카테고리·매장·양방향취소·거래내역 완료 · P3 PiRC3·Maps 예정) |
 | **14** | PiVoice™ v3.0 | ✅ 완료 (v3.0 권한 시스템) | 100% (S0 실기기 검증 잔여) |
 | **15** | LBS 위치기반서비스 | ✅ 완료 (P0+P1) | 100% (상품 개별 위치 포함 · 지도 UI 확장 예정) |
 | **횡단** | 성능 튜닝 | ✅ 완료 | 100% (무한 스크롤·지연 로딩·SWR 캐싱·리브랜딩·스티커) |
+| **횡단3** | Pi Browser 안정화·콤보 성능 (2026-06-13) | ✅ 완료 | 100% (admin 다국어 전환 무반응 수정·헤더 콤보 3계층 캐시) |
 
 ### 통계
 - **총 Phase**: 16개 (0~15 + 횡단 개선)
@@ -51,8 +52,8 @@ Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Net
 - ✅ 기업 수준 데이터 표준 (DA 시스템)
 
 **다음 단계** (본문 Phase별 TASK 기준):
-- MPS Phase 2 (TASK-108~111): 카테고리 시스템 · 매장 관리 UI · 양방향 주문 취소 · 거래 내역 화면
-- MPS Phase 3 (TASK-112~113): PiRC3 실 에스크로 마이그레이션 · Google Maps 연동 — *MPS는 배송 없는 직거래 전용*
+- ✅ MPS Phase 2 (TASK-108~111) 완료 (2026-06-13): 카테고리 시스템 · 매장 관리 · 양방향 주문 취소 · 거래 내역
+- MPS Phase 3 (TASK-112~113): PiRC3 실 에스크로 마이그레이션 · Google Maps 연동 — *MPS는 배송 없는 직거래 전용* (외부 의존: 테스트넷 컨트랙트·Maps API 키)
 - PiVoice 잔여 (S0~S3): Pi Browser 실기기 마이크 검증 · TURN 운영 설정(`TURN_HOST`/`TURN_SECRET`) · 품질 데이터 기반 coturn 전환 판단 · 5인+ LiveKit SFU/결제 게이팅 검토
 - LBS 향후 Phase: Maps JavaScript API 지도 UI · Places API 매장 검색
 
@@ -938,7 +939,7 @@ if (meta?.type === 'CHAT_SUBSCR') {
 
 ---
 
-## Phase 13: MyPiShop(MPS) 🚧 (Phase 1 MVP 1차 구현 — 2026-06-11)
+## Phase 13: MyPiShop(MPS) ✅ (Phase 1 MVP + Phase 2 확장 완료 — 2026-06-13, Phase 3 고도화 예정)
 
 > **목표**: Pi Coin 전용 P2P 직거래 마켓플레이스 — 에스크로 기반 안전 거래, 재고 관리, 매장 등록
 > **상세 스펙**: `docs/PRD_8_MPS.md` (v1.1) | **담당 에이전트**: `.claude/agents/commerce/mps-prd-architect.md`
@@ -1030,24 +1031,33 @@ if (meta?.type === 'CHAT_SUBSCR') {
 - ✅ 상품 등록/수정 폼 카테고리 드롭다운 연결 — `store-item-form.tsx` 대분류 `<optgroup>` + 소분류 select, 등록(키 생략)·수정(null=미분류) payload 분기, 수정 모드 기존 `ctgr_id` 로드. 백엔드(`createItem`·`updateItem`·POST/PATCH 스키마)는 기존재 활용. `store.form.category` ko·en 번역
 - ✅ 상품 목록 카테고리 필터 UI — `store-item-list.tsx` 정렬 옆 `<optgroup>` select(대분류·소분류), `?ctgr=` 파라미터 전달 + 기존 `cnd`/검색/거리순과 조합, SWR 캐시 `isDefaultView` 조건에 `!ctgr` 추가(캐시 오염 방지). `store.allCategories` ko·en 번역
 
-### TASK-109: 매장 관리 (FR-06·SCR-08) 🔜
+### TASK-109: 매장 관리 (FR-06·SCR-08) ✅ (2026-06-13)
 
-- 🔜 `GET /api/store/shops` — 내 매장 목록
-- 🔜 `POST /api/store/shops` — 매장 등록 (`place_id`·`lat`·`lng` 저장 준비)
-- 🔜 `PATCH /api/store/shops/[shopId]` — 매장 수정
-- 🔜 `DELETE /api/store/shops/[shopId]` — 논리삭제
-- 🔜 `src/app/[locale]/store/my/shops/page.tsx` — 매장 관리 UI (SCR-08)
+- ✅ `GET·POST /api/store/shops` — 내 매장 목록 조회 + 매장 등록 (zod 검증, `getSessionUser` 인증)
+- ✅ `PATCH·DELETE /api/store/shops/[shopId]` — 본인 매장만 수정·논리삭제 (`seller_id` 일치 조건, 소속 상품 `shop_id=NULL` 보존)
+- ✅ `src/components/store/client-my-shops.tsx` — 목록 + 인라인 등록/수정 폼(매장명·유형 ONLINE/OFFLINE/BOTH·소개·주소·영업시간·연락처·SNS·대표이미지), usePiAuth 클라이언트 게이트
+- ✅ `src/app/[locale]/store/my/shops/page.tsx` (SCR-08) — redirect 금지·서버 세션 OR Pi 로그인 게이트, 내 상품 관리에서 `매장 관리` 링크 진입
+- ✅ 상품 폼 매장 선택 — `store-item-form.tsx` 내 매장 드롭다운(등록 매장 있을 때만 노출, N:1 선택), 등록/수정 payload `shop_id` 분기. 백엔드(`mps-item` create/update·PATCH 스키마 `shop_id`)·상품 상세 매장 노출은 기존재 활용
+- ✅ DB 변경 없음 — `mps_shop`(place_id 예약 포함)·`mps-shop.ts` lib는 sql/029에서 기 완비. 신규 마이그레이션 불필요
+- ✅ i18n — `store.shop.*`·`store.form.shop/shopNone` ko.json + en.json + i18n_message DB en upsert(is_auto='N', sync 안전)
 
-### TASK-110: 양방향 주문 취소 (FR-10) 🔜
+### TASK-110: 양방향 주문 취소 (FR-10) ✅ (구현 확인 — 2026-06-13)
 
-- 🔜 `POST /api/store/orders/[orderId]/cancel` — 취소 요청 (취소 요청자 수수료 부담)
-- 🔜 에스크로 환불 흐름 (`metadata.type='MPS_CANCEL_REFUND'`)
-- 🔜 ESCROW 상태에서만 취소 허용 (SELLER_DONE 이후는 불가)
+> 기존 구현이 FR-10을 이미 충족함을 검증해 🔜→✅ 정정. 환불은 별도 `MPS_CANCEL_REFUND` 결제 대신 `fn_mps_order_cancel` RPC 단일 트랜잭션(재고 복원 원자성 + 보증금 수수료)으로 통합 구현됨.
 
-### TASK-111: 거래 내역 (FR-12·SCR-07) 🔜
+- ✅ `POST /api/store/orders/[orderId]/cancel` — 취소 사유 필수(zod), `getSessionUser` 인증, `cancelOrder(orderId, userId, reason, isAdmin)` 위임
+- ✅ 양방향 취소 UI — 구매·판매 모두 `ClientMyOrders`(role prop) 공유, 취소 버튼이 구매자·판매자 양쪽 노출. FR-10 상태 규칙: `PENDING`·`TRADING`(레거시 `ESCROW` 포함) 당사자·관리자 취소, 레거시 `SELLER_DONE`은 구매자·관리자만, `DONE` 불가
+- ✅ `fn_mps_order_cancel` RPC — 취소 시 재고 원자적 복원(`stock_qty += 1`) + 보증금 활성 판매자 거래의 거래중 취소에 한해 0.1π 취소수수료(피해 상대방 보상, v1.9) + 환불 처리. `cancel_req_id`·`cancel_reason` 기록
+- ✅ 취소 사유 입력(prompt) + 취소된 주문에 사유 표시
 
-- 🔜 `GET /api/store/txns` — 내 거래내역 조회 (`mps_txn_hist`)
-- 🔜 `src/app/[locale]/store/my/history/page.tsx` — 거래 내역 UI (SCR-07)
+### TASK-111: 거래 내역 (FR-12·SCR-07) ✅ (2026-06-13)
+
+- ✅ `src/lib/mps-txn.ts` — `listTxns(userId, {from,to,limit})` — `mps_txn_hist` + `mps_order`→`mps_item` 2단계 조인(상품명·주문상태 부착), `txnCategory()`(BUY/SELL/ETC 매핑)
+- ✅ `GET /api/store/txns` — 내 거래 내역(`?from=&to=` 날짜 범위), 관리자 `?all=1` 전체 조회(FR-12 관리자 요건), `to`는 당일 23:59:59 보정
+- ✅ `src/components/store/client-my-history.tsx` — 구매/판매/기타 탭(건수 배지) + 날짜 범위 필터 + 입출금 부호(+/−) 색상, usePiAuth 게이트, 미정의 유형코드 `t.has()` 안전 폴백
+- ✅ `src/app/[locale]/store/my/history/page.tsx` (SCR-07) — redirect 금지 게이트, `/store` nav에 `거래 내역` 링크 추가
+- ✅ DB 변경 없음 — `mps_txn_hist`(ESCROW_IN·RELEASE_OUT 등 적재 중)는 sql/029에서 기 완비
+- ✅ i18n — `store.history.*`·`store.navHistory` ko.json + en.json + i18n_message DB en upsert(is_auto='N', 거래유형 라벨 7종 포함)
 
 ---
 
@@ -1257,6 +1267,8 @@ if (meta?.type === 'CHAT_SUBSCR') {
 | M24: LBS P0+P1 MVP | Phase 15 | 2026-06-12 | sql/033_lbs.sql (sys_user_consent·usr_loc_hist·fn_haversine_km) + 동의 API(GET/POST/DELETE) + 위치저장 API + 주변탐색 API(rooms/shops/history) + `/nearby` 화면 + MPS 거리 표시 + 동의 다이얼로그 CTA + 약관 페이지(`/docs/agreement/lbs`) + 로그인 위치 저장 (TASK-130~139) | ✅ 완료 |
 | M25: 횡단 개선 — 성능·리브랜딩 | — | 2026-06-12 | 무한 스크롤(Cafe·Shop)·대시보드 지연 로딩(use-infinite-scroll·LazySection) + Pi Tip→Bean 리브랜딩(표시명·이미지, 식별자 유지) + pi_pymnt 트리거 수리 + 21개 언어 번역 동기화 | ✅ 완료 |
 | M26: 횡단 2차 — SWR 캐싱·상품 위치·스티커 | — | 2026-06-12 | HOME·Shop·관리자·카페 목록 SWR 캐싱(localStorage) + 병렬(비동기) 호출 일괄 적용(`client-cache.ts`·`chat-room-list.ts`·`/api/admin/dashboard`) + 상품 개별 위치 등록(sql/036, store-item-form GPS) + 스티커 노출 개선(sql/038 골프·응원팩 최우선 정렬·2배 확대·저장 방지) + 다국어 동기화(LBS·카페 목록 키) | ✅ 완료 |
+| M28: MPS Phase 2 확장 | Phase 13 | 2026-06-13 | 카테고리(108 검증)·매장 관리(109 신규: shops API 2종+관리 UI+상품폼 매장선택)·양방향 취소(110 검증)·거래 내역(111 신규: txns API+history UI+날짜필터) — 신규 라우트 3종, DB 마이그레이션 0(기존 테이블 활용), i18n ko/en+DB upsert | ✅ 완료 |
+| M27: 횡단 3차 — Pi Browser 안정화·콤보 성능 | — | 2026-06-13 | ① **admin 다국어 전환 무반응 수정**: `language-switcher.tsx` admin 분기에서 `piFetch`로 `_pit` 티켓 선발급 후 URL(`?_pit=`)에 실어 하드 네비게이션 → 첫 요청부터 인증(게이트 왕복·soft-nav 의존 제거) ② **헤더 다국어 콤보 3계층 캐시**: `/api/i18n/countries` revalidate=600(서버), sessionStorage+메모리 TTL 10분(클라이언트, lazy initializer 즉시 반영), requestIdleCallback 프리페치 — 재열기·페이지 이동 시 지연 0 | ✅ 완료 |
 
 ---
 
@@ -1330,4 +1342,6 @@ if (meta?.type === 'CHAT_SUBSCR') {
 | v6.0 | 2026-06-12 | **Phase 14 PiVoice™ v2.0 N:N 음성채널 구현 완료** — PRD_9 v2.0 확정(1:1 MVP 폐기 → N:N 1~4명·1인 대기·방장 마이크 제어·동시 마이크 4명 제한) 후 TASK-120~123 전체 구현. `sql/032_voice_channel.sql`(msg_call_participant 신규·call_log room 레벨 전환·quality_stat room upsert·RLS, Supabase 적용), 음성채널 API 5종(join/leave/signal/mic-control/participants — broadcastToCall 전용 토픽), `use-voice-channel.ts`(Full Mesh·단방향 offer glare 차단·candidate 큐·ICE restart), `voice-channel-panel.tsx`(방장 제어 UI). M23 달성(S0 실기기 검증·TURN env 잔여). | anakin |
 | v6.1 | 2026-06-12 | **횡단 개선 4종** — ① 화면 성능 튜닝: `use-infinite-scroll`(IntersectionObserver)·`LazySection` 공용 인프라, Home 대시보드 매출 API·Plotly 차트 뷰포트 진입 시 지연 로드, Cafe 마켓플레이스·내카페·Shop 목록 무한 스크롤 전환 ② **Pi Tip → Pi Bean 리브랜딩**: 사용자 노출 명칭·이미지(public/bean.png·bean-noti.png) 전면 교체, 기존 DB 메시지·결제 memo 일괄 변경, `fn_top_revenue_themes` 라벨 '빈(Bean)' 동기화 — 식별자(canTip·PI_TIP·msg_tip)는 호환성 유지 ③ LBS 약관 페이지 `/docs/agreement/lbs` 신설(react-markdown 서버 렌더 + outputFileTracingIncludes) — 동의 다이얼로그 404 해소 ④ **pi_pymnt 트리거 수리**: 구버전 updated_at 참조로 UPDATE 전면 실패하던 버그 → mod_dtm 갱신 교체(sql/034). TASK-098(번역 통계)·099(품질 피드백) 완료로 Phase 12 종결. M21 완성·M25 추가. PRD.md v10.0 동기화(섹션 16 PiVoice 신설·17~21 재번호). | anakin |
 | v6.2 | 2026-06-12 | **Phase 14 PiVoice™ v3.0 권한 시스템 + 횡단 2차 현행화** — ① **PiVoice v3.0**(PRD_9 v3.0 R1~R7, TASK-124): `sql/035_voice_permission.sql`(`mic_st_cd` CONNECTED/PENDING/LISTEN_ONLY 3상태, Supabase 적용), `lib/voice.ts` 슬롯 설정값(`VOICE_AUTO_SLOTS=2`·`VOICE_MAX_MEMBER_SLOTS=4` env 오버라이드)·`decideMicStateOnJoin()`, join(방장 무조건 CONNECTED·멤버 자동 2명→PENDING→정원초과 LISTEN_ONLY), mic-control(approve/deny/revoke/grant + mute/unmute 하위호환), `/request` API 신설(청취전용→발언신청 + `mic_request` 알림), 훅·패널 상태 머신 UI(발언 신청·방장 승인/거절/회수·👑). ② **S0 진단 메시지**(TASK-125): `use-voice-channel.ts` 입장 실패 사유 단계별 캡처 + 패널 화면 노출(Pi Browser 마이크 권한 디버깅). ③ **상품 개별 위치**(TASK-140): `sql/036_item_location.sql`, `store-item-form.tsx` 등록 시 판매자 GPS 저장(`loc_tp_cd='04'`), `/api/store/items` 위치 소스를 상품 개별 좌표 우선으로 전환. ④ **SWR 성능 튜닝 2차**: HOME·Shop·관리자·카페 목록 localStorage SWR 캐시 + 병렬 호출(`client-cache.ts`·`chat-room-list.ts`·`/api/admin/dashboard`·`admin-dashboard-stats.tsx`). ⑤ **스티커 노출 개선**: `sql/038_stkr_pack_sort.sql`(골프 인사·응원팩 최우선 정렬)·2배 확대·길게눌러 저장 방지(`sticker-img.tsx`). ⑥ 다국어 동기화(en·zh·ja·et·il·mx — LBS·카페 목록 키). M23 v3.0 갱신·M26 추가. **주의: `sql/035` 번호가 `035_bean_rebrand.sql`·`035_voice_permission.sql` 두 파일에 중복 — 적용 순서 무관(상이 테이블)하나 향후 번호 정리 권장.** | anakin |
+| v6.5 | 2026-06-13 | **Phase 13 MPS Phase 2 확장 완료 — TASK-108~111** — ① TASK-108 카테고리: 기 구현 검증(시드 19행 적용·상품폼 드롭다운 연결 완료 확인). ② **TASK-109 매장 관리(신규)**: `GET·POST /api/store/shops` + `PATCH·DELETE /api/store/shops/[shopId]`(본인 매장만·소속 상품 shop_id=NULL 보존), `client-my-shops.tsx`(목록+인라인 등록/수정 폼·유형 ONLINE/OFFLINE/BOTH), `/store/my/shops` 페이지(SCR-08), 상품 폼 매장 선택 드롭다운, 내 상품→매장관리 링크. `mps_shop`·`mps-shop.ts`는 sql/029 기 완비라 DB 변경 없음. ③ **TASK-110 양방향 취소**: 기존 구현이 FR-10 충족 검증(`ClientMyOrders` role 공유·구매자/판매자 양쪽 취소 버튼·`fn_mps_order_cancel` RPC 재고복원+보증금 수수료) → 🔜→✅ 정정. ④ **TASK-111 거래 내역(신규)**: `mps-txn.ts`(`listTxns` txn_hist+order+item 조인·BUY/SELL/ETC 분류), `GET /api/store/txns`(날짜필터·관리자 all=1), `client-my-history.tsx`(탭+날짜범위+부호색상), `/store/my/history` 페이지(SCR-07)·nav 링크. `mps_txn_hist` 기 완비. i18n: `store.shop.*`·`store.history.*` ko/en JSON + i18n_message DB en upsert(is_auto='N'). tsc·**pnpm build 통과**(신규 라우트 3종·locale 검증). Phase 13 P2 종결, M28 추가. | anakin |
+| v6.4 | 2026-06-13 | **횡단 3차 — Pi Browser admin 다국어 전환 무반응 수정 + 헤더 콤보 성능 캐시(M27)** — ① `language-switcher.tsx` admin 분기: 티켓 없는 하드 네비게이션이 Pi Browser(쿠키 미저장)에서 미인증 게이트로 빠지고 게이트의 soft `router.replace` 재렌더가 WebView에서 안정적으로 잡히지 않아 'checking' 멈춤(무반응)이던 문제를, locale 전환 시점에 `piFetch('/api/admin/pit-ticket')`로 `_pit` 티켓 선발급 후 `?_pit=`에 실어 하드 네비게이션 → 미들웨어가 첫 요청부터 `x-pit-ticket` 헤더로 변환해 인증된 admin UI 즉시 렌더(게이트 왕복 제거, 일반 브라우저는 쿠키 인증 호환) ② 헤더 다국어 콤보 매 열기 재조회 지연 제거: `/api/i18n/countries` `revalidate=600`(서버 CDN 캐시·환율은 기존 900 유지) + `language-switcher.tsx` sessionStorage+모듈 메모리 TTL 10분 캐시(`useState` lazy initializer 첫 렌더 즉시 반영·닫을 때 초기화 제거) + 캐시 미적중 시 `requestIdleCallback` 백그라운드 프리페치 → 재열기·페이지 이동·세션 첫 클릭 지연 0. tsc·lint·prettier 통과, 2건 커밋·배포(70bfaac·9c62512). | anakin |
 | v6.3 | 2026-06-12 | **Phase 13 MPS Phase 2 — TASK-108 카테고리 시스템 구현** — `mps_ctgr` 테이블·`mps_item.ctgr_id` FK·상품 API `?ctgr=` 필터는 기존재, 비어있던 시드·API·UI를 구현. `sql/039_mps_ctgr_seed.sql`(대분류 6 + 소분류 14, 고정 UUID + ON CONFLICT 멱등), `src/lib/mps-ctgr.ts`(인접 리스트→앱 레벨 트리 빌드 + CRUD + 논리삭제 — 하위 카테고리 있으면 거부·상품은 미분류 보존), `GET /api/store/categories`(공개 트리), 어드민 CRUD API 2종(`/api/admin/store/categories` + `[ctgrId]`), 어드민 UI `/admin/store/categories`(대분류 그룹+소분류 들여쓰기, std/words 패턴), `admin-sidebar.tsx` 스토어 관리 섹션, ko·en 번역(`admin.store.categories`). tsc(0 errors)·prettier 통과. **잔여: sql/039 Supabase 적용 + 상품 폼 카테고리 드롭다운 연결.** | anakin |

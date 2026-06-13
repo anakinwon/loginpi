@@ -112,7 +112,12 @@ export function ClientMyItems({
             </span>
           </button>
         ))}
-        <Link href="/store/my/items/new" className="ml-auto">
+        <Link href="/store/my/shops" className="ml-auto">
+          <Button size="sm" variant="outline">
+            {t('shop.manage')}
+          </Button>
+        </Link>
+        <Link href="/store/my/items/new">
           <Button size="sm">{t('newItem')}</Button>
         </Link>
       </div>
