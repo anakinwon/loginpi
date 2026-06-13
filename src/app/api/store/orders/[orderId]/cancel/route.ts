@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { cancelOrder } from '@/lib/mps-order'
+import { refundCancelledOrder } from '@/lib/mps-refund'
 
 const cancelSchema = z.object({
   reason: z.string().min(1).max(500), // 취소 사유 필수 (FR-10)
@@ -52,5 +53,17 @@ export async function POST(
       { status: 403 },
     )
   }
-  return NextResponse.json({ order: result.order })
+
+  // 결제 완료 주문을 구매자가 취소한 경우 자동 환불(A2U). 환불 실패·시드 미설정은
+  // 취소 자체를 막지 않음(취소는 이미 확정) — 환불 상태만 응답에 실어 클라이언트가 안내.
+  const refund = await refundCancelledOrder(orderId, user.id).catch((e) => {
+    console.error('[cancel] 환불 처리 예외:', orderId, e)
+    return {
+      status: 'pending' as const,
+      amount: 0,
+      reason: 'A2U_FAILED' as const,
+    }
+  })
+
+  return NextResponse.json({ order: result.order, refund })
 }

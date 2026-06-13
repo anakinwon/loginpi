@@ -4,6 +4,9 @@ allowBuilds:
   es5-ext: true
   msw: true
   sharp: true
+  # sodium-native: stellar-sdk(pi-backend)의 optional 네이티브 가속 — 미빌드 시 순수 JS(tweetnacl) 폴백.
+  # 네이티브 컴파일 회피(Windows·Vercel 빌드 안정성) 위해 false.
+  sodium-native: false
   unrs-resolver: true
 patchedDependencies:
   next-themes@0.4.6: patches/next-themes@0.4.6.patch

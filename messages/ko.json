@@ -1058,6 +1058,10 @@
         "BOND_DEPOSIT": "보증금 예치"
       }
     },
+    "refund": {
+      "done": "{amount}π가 환불되었습니다",
+      "pending": "취소 완료 — 환불은 곧 처리됩니다"
+    },
     "backToList": "상품 목록",
     "searchPlaceholder": "상품명 또는 설명 검색",
     "search": "검색",

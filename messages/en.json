@@ -1427,6 +1427,10 @@
     "all": "All",
     "allCategories": "All Categories",
     "backToList": "Item List",
+    "refund": {
+      "done": "{amount}π refunded",
+      "pending": "Cancelled — refund will be processed shortly"
+    },
     "bond": {
       "active": "Active",
       "avail": "Available Balance",

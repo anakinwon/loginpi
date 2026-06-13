@@ -112,7 +112,21 @@ export function ClientMyOrders({
         ...(body ? { body } : {}),
       })
       if (res.ok) {
-        toast.success(t(`actionDone.${action}`))
+        // 취소 응답에 환불 결과가 실려 오면 환불 상태로 안내(구매자 결제분 환불)
+        const data = (await res.json().catch(() => ({}))) as {
+          refund?: { status: string; amount?: number }
+        }
+        if (action === 'cancel' && data.refund) {
+          if (data.refund.status === 'refunded') {
+            toast.success(t('refund.done', { amount: data.refund.amount ?? 0 }))
+          } else if (data.refund.status === 'pending') {
+            toast.success(t('refund.pending'))
+          } else {
+            toast.success(t('actionDone.cancel'))
+          }
+        } else {
+          toast.success(t(`actionDone.${action}`))
+        }
         void load()
       } else {
         const { error } = (await res.json()) as { error?: string }

@@ -12,6 +12,9 @@ export const env = createEnv({
     GOOGLE_CLIENT_ID: z.string().optional(),
     GOOGLE_CLIENT_SECRET: z.string().optional(),
     PI_API_KEY: z.string().optional(),
+    // A2U(App→User) 환불·정산 송금용 앱 지갑 시드 (Pi Developer Portal, 'S'로 시작).
+    // 미설정 시 환불은 PENDING 장부 기록만 하고 실송금은 스킵 (서버 전용 비밀, 절대 클라이언트 노출 금지)
+    PI_WALLET_PRIVATE_SEED: z.string().optional(),
     SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
     ANTHROPIC_API_KEY: z.string().optional(),
     GEMINI_API_KEY: z.string().optional(),
@@ -39,6 +42,7 @@ export const env = createEnv({
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     PI_API_KEY: process.env.PI_API_KEY,
+    PI_WALLET_PRIVATE_SEED: process.env.PI_WALLET_PRIVATE_SEED,
     SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
     ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
     GEMINI_API_KEY: process.env.GEMINI_API_KEY,
@@ -56,7 +60,8 @@ export const env = createEnv({
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:
       process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
-    NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
+    NEXT_PUBLIC_GOOGLE_MAPS_API_KEY:
+      process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
   },
   emptyStringAsUndefined: true,
 })
