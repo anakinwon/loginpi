@@ -60,6 +60,7 @@ interface Country {
 export default function I18nPage() {
   const t = useTranslations('admin.i18n')
   const tc = useTranslations('common')
+  const ta = useTranslations('adminI18n')
 
   const [stats, setStats] = useState<StatsData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -121,11 +122,16 @@ export default function I18nPage() {
     const etaSec = Math.ceil(batches * 8 + (batches - 1) * 4.5)
     const etaText =
       etaSec >= 60
-        ? `약 ${Math.ceil(etaSec / 60)}분`
-        : `약 ${etaSec}초`
+        ? ta('etaMin', { min: Math.ceil(etaSec / 60) })
+        : ta('etaSec', { sec: etaSec })
     setTranslating(locale)
     const toastId = toast.loading(
-      `${locale.toUpperCase()} ${t('translating')} (${pendingKeys}개 키 · ${batches}배치 · ${etaText} 소요 예상)`,
+      ta('translatingEta', {
+        locale: locale.toUpperCase(),
+        keys: pendingKeys,
+        batches,
+        eta: etaText,
+      }),
     )
     try {
       const res = await fetch('/api/admin/i18n/translate', {
@@ -211,21 +217,19 @@ export default function I18nPage() {
         error?: string
         routingUpdated?: boolean
       }
-      if (!res.ok) throw new Error(d.error ?? '상태 변경 실패')
+      if (!res.ok) throw new Error(d.error ?? ta('statusChangeFail'))
 
       if (is_active === 'Y') {
         if (d.routingUpdated) {
           // 로컬 개발 환경: routing.ts 자동 수정 성공 → 재배포만 하면 즉시 반영
-          toast.success(`${locale_cd} 활성화 완료`, {
-            description:
-              'routing.ts가 자동 수정됐습니다. 재배포 후 즉시 반영됩니다.',
+          toast.success(ta('activatedDone', { locale: locale_cd }), {
+            description: ta('routingAutoFixed'),
             duration: 5000,
           })
         } else {
           // Vercel 프로덕션 또는 routing.ts에 이미 등록된 경우
-          toast.success(`${locale_cd} 활성화됨`, {
-            description:
-              'routing.ts에 이미 등록된 locale입니다. 즉시 서비스됩니다.',
+          toast.success(ta('activated', { locale: locale_cd }), {
+            description: ta('routingAlready'),
             duration: 4000,
           })
         }
@@ -236,13 +240,13 @@ export default function I18nPage() {
           )
         }
       } else {
-        toast.success(`${locale_cd} 비활성화됨`)
+        toast.success(ta('deactivated', { locale: locale_cd }))
       }
       // 활성·비활성 목록 모두 갱신
       loadStats()
       loadCountries()
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : '오류가 발생했습니다')
+      toast.error(err instanceof Error ? err.message : tc('errorOccurred'))
     } finally {
       setToggling(null)
     }
@@ -330,12 +334,12 @@ export default function I18nPage() {
           </div>
           <div className="rounded-lg border p-4">
             <p className="text-muted-foreground text-xs font-medium">
-              비활성 국가
+              {ta('inactiveCountries')}
             </p>
             <p className="mt-1 text-3xl font-bold">
               {ratesLoading ? '…' : inactiveCountries.length}
             </p>
-            <p className="text-muted-foreground text-xs">지원 예정</p>
+            <p className="text-muted-foreground text-xs">{ta('planned')}</p>
           </div>
         </div>
       )}
@@ -346,9 +350,9 @@ export default function I18nPage() {
       ) : (
         <div className="overflow-hidden rounded-lg border">
           <div className="bg-muted/50 flex items-center justify-between border-b px-4 py-2">
-            <span className="text-sm font-semibold">활성 언어</span>
+            <span className="text-sm font-semibold">{ta('activeLangs')}</span>
             <span className="text-muted-foreground text-xs">
-              {stats?.locales.length}개
+              {ta('countItems', { count: stats?.locales.length ?? 0 })}
             </span>
           </div>
           <table className="w-full text-sm">
@@ -364,11 +368,11 @@ export default function I18nPage() {
                 </th>
                 {/* 3. π 시세 */}
                 <th className="px-4 py-2 text-right font-medium">
-                  <span className="font-serif italic">π</span> 시세
+                  <span className="font-serif italic">π</span> {ta('price')}
                 </th>
                 {/* 4. 활성/비활성 토글 */}
                 <th className="px-4 py-2 text-center font-medium">
-                  활성/비활성
+                  {ta('activeToggle')}
                 </th>
                 {/* 5. 번역 키 */}
                 <th className="px-4 py-2 text-right font-medium">
@@ -417,7 +421,7 @@ export default function I18nPage() {
                               ].join('\n')}
                               className="inline-flex cursor-help items-center gap-0.5 text-[10px] font-medium text-amber-600 dark:text-amber-400"
                             >
-                              ⚠ 라우팅 미등록
+                              {ta('routingMissing')}
                             </span>
                           )}
                         </div>
@@ -457,17 +461,17 @@ export default function I18nPage() {
                     <td className="px-4 py-3 text-center">
                       {loc.locale_cd === 'ko' ? (
                         <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-[11px] font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                          기본
+                          {ta('default')}
                         </span>
                       ) : (
                         <button
                           onClick={() => toggleLocale(loc.locale_cd, 'N')}
                           disabled={isToggling}
                           className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-0.5 text-[11px] font-medium text-green-700 transition-colors hover:bg-red-100 hover:text-red-600 disabled:opacity-50 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-red-900/30 dark:hover:text-red-400"
-                          title="클릭하여 비활성화"
+                          title={ta('clickToDeactivate')}
                         >
                           <span className="h-1.5 w-1.5 rounded-full bg-current" />
-                          {isToggling ? '처리 중…' : '활성'}
+                          {isToggling ? ta('processing') : ta('active')}
                         </button>
                       )}
                     </td>
@@ -494,7 +498,7 @@ export default function I18nPage() {
                             : syncing === loc.locale_cd
                               ? t('syncingLocale')
                               : loc.pct === 100
-                                ? '완료'
+                                ? ta('done')
                                 : t('translate')}
                         </Button>
                       )}
@@ -526,10 +530,12 @@ export default function I18nPage() {
       <div className="overflow-hidden rounded-lg border">
         <div className="bg-muted/50 flex items-center justify-between border-b px-4 py-2">
           <span className="text-muted-foreground text-sm font-semibold">
-            전체 국가 (비활성)
+            {ta('allCountriesInactive')}
           </span>
           <span className="text-muted-foreground text-xs">
-            {ratesLoading ? '…' : `${inactiveCountries.length}개`}
+            {ratesLoading
+              ? '…'
+              : ta('countItems', { count: inactiveCountries.length })}
           </span>
         </div>
 
@@ -539,7 +545,7 @@ export default function I18nPage() {
               <tr>
                 {/* 1. 언어 */}
                 <th className="text-muted-foreground px-4 py-2 text-left text-xs font-medium">
-                  국가
+                  {ta('country')}
                 </th>
                 {/* 2. 1 USD = */}
                 <th className="text-muted-foreground px-4 py-2 text-right text-xs font-medium">
@@ -547,11 +553,11 @@ export default function I18nPage() {
                 </th>
                 {/* 3. π 시세 */}
                 <th className="text-muted-foreground px-4 py-2 text-right text-xs font-medium">
-                  <span className="font-serif italic">π</span> 시세
+                  <span className="font-serif italic">π</span> {ta('price')}
                 </th>
                 {/* 4. 활성화 버튼 */}
                 <th className="text-muted-foreground px-4 py-2 text-center text-xs font-medium">
-                  활성화
+                  {ta('activate')}
                 </th>
               </tr>
             </thead>
@@ -562,7 +568,7 @@ export default function I18nPage() {
                     colSpan={4}
                     className="text-muted-foreground px-4 py-8 text-center text-xs"
                   >
-                    환율 · 시세 불러오는 중…
+                    {ta('priceLoading')}
                   </td>
                 </tr>
               ) : (
@@ -636,7 +642,9 @@ export default function I18nPage() {
                             }
                             disabled={isToggling}
                             className="inline-flex items-center gap-1 rounded-md border border-green-200 bg-green-50 px-2.5 py-1 text-[11px] font-medium text-green-700 transition-colors hover:bg-green-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-green-800 dark:bg-green-900/20 dark:text-green-400 dark:hover:bg-green-900/40"
-                            title={`${derivedLocale} 활성화`}
+                            title={ta('activateDerived', {
+                              locale: derivedLocale,
+                            })}
                           >
                             {isToggling ? (
                               <>
@@ -660,7 +668,7 @@ export default function I18nPage() {
                                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
                                   />
                                 </svg>
-                                처리 중…
+                                {ta('processing')}
                               </>
                             ) : (
                               <>
@@ -678,13 +686,13 @@ export default function I18nPage() {
                                     strokeLinejoin="round"
                                   />
                                 </svg>
-                                활성화
+                                {ta('activate')}
                               </>
                             )}
                           </button>
                         ) : (
                           <span className="text-muted-foreground/40 text-[11px]">
-                            이미 활성
+                            {ta('alreadyActive')}
                           </span>
                         )}
                       </td>
