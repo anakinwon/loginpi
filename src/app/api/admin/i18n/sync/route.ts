@@ -90,20 +90,34 @@ export async function POST(req: NextRequest) {
       continue
     }
 
-    const { data: msgs, error } = await supabase
-      .from('i18n_message')
-      .select('msg_key, msg_val')
-      .eq('locale_cd', lc)
-      .not('msg_val', 'is', null)
-
-    if (error) {
-      errors.push(`${lc}: ${error.message}`)
-      continue
+    // PostgREST 기본 1,000행 제한 회피 — range 페이징으로 전체 행 수집
+    // (누락 시 1,000키 초과 locale의 json이 잘려서 생성되는 치명적 버그)
+    const flat: Record<string, string> = {}
+    const PAGE = 1000
+    let from = 0
+    let pageError: string | null = null
+    for (;;) {
+      const { data: msgs, error } = await supabase
+        .from('i18n_message')
+        .select('msg_key, msg_val')
+        .eq('locale_cd', lc)
+        .not('msg_val', 'is', null)
+        .order('msg_key')
+        .range(from, from + PAGE - 1)
+      if (error) {
+        pageError = error.message
+        break
+      }
+      for (const { msg_key, msg_val } of msgs ?? []) {
+        flat[msg_key] = msg_val
+      }
+      if (!msgs || msgs.length < PAGE) break
+      from += PAGE
     }
 
-    const flat: Record<string, string> = {}
-    for (const { msg_key, msg_val } of msgs ?? []) {
-      flat[msg_key] = msg_val
+    if (pageError) {
+      errors.push(`${lc}: ${pageError}`)
+      continue
     }
 
     // DB에 데이터가 없으면 기존 파일을 덮어쓰지 않음 (skip — 오류 아님)

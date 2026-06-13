@@ -125,14 +125,26 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  const { data: existingMsgs } = await supabase
-    .from('i18n_message')
-    .select('msg_key, msg_val')
-    .eq('locale_cd', locale)
-
-  const existingKeys = new Set(
-    (existingMsgs ?? []).filter((m) => m.msg_val).map((m) => m.msg_key),
-  )
+  // PostgREST 기본 1,000행 제한 회피 — 전체 기존 키를 페이징 수집
+  // (누락 시 1,000키 초과분을 미번역으로 오판 → Gemini 재번역이 수동 번역을 덮어씀)
+  const existingKeys = new Set<string>()
+  {
+    const PAGE = 1000
+    let from = 0
+    for (;;) {
+      const { data: existingMsgs } = await supabase
+        .from('i18n_message')
+        .select('msg_key, msg_val')
+        .eq('locale_cd', locale)
+        .order('msg_key')
+        .range(from, from + PAGE - 1)
+      for (const m of existingMsgs ?? []) {
+        if (m.msg_val) existingKeys.add(m.msg_key)
+      }
+      if (!existingMsgs || existingMsgs.length < PAGE) break
+      from += PAGE
+    }
+  }
 
   const toTranslate: Record<string, string> = {}
   for (const [key, val] of Object.entries(koFlat)) {
