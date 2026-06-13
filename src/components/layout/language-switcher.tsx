@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { usePathname, useRouter } from '@/i18n/navigation'
 import { LOCALE_CURRENCY } from '@/lib/locale-currency'
 import {
@@ -45,6 +46,8 @@ function FlagIcon({
 }
 
 export function LanguageSwitcher({ locale }: { locale: string }) {
+  const t = useTranslations('langSwitcher')
+  const tc = useTranslations('common')
   const router = useRouter()
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
@@ -101,8 +104,16 @@ export function LanguageSwitcher({ locale }: { locale: string }) {
   }
 
   function switchLocale(next: string) {
-    router.replace(pathname, { locale: next })
     setOpen(false)
+    if (next === locale) return
+    // admin 경로는 _pit 단기 티켓으로 인증된 상태 — next-intl soft navigation으로 locale만
+    // 바꾸면 새 URL에 _pit가 없어 서버 인증이 풀리고 게이트 재진입과 경합해 전환이 멈춘다.
+    // 하드 네비게이션으로 서버가 locale·인증을 처음부터 재평가하게 한다 (게이트가 _pit 재발급).
+    if (pathname.startsWith('/admin')) {
+      window.location.assign(`/${next}${pathname}`)
+      return
+    }
+    router.replace(pathname, { locale: next })
   }
 
   // country_cd(대문자) → currency_cd 맵 (신규 활성화 locale 환율 표시용)
@@ -130,7 +141,7 @@ export function LanguageSwitcher({ locale }: { locale: string }) {
         onClick={toggle}
         aria-haspopup="listbox"
         aria-expanded={open}
-        aria-label="언어 선택"
+        aria-label={t('label')}
         className="text-muted-foreground hover:text-foreground flex items-center gap-1 rounded px-2 py-1 text-sm transition-colors"
       >
         <FlagIcon code={currentCountry} className="text-sm" />
@@ -155,24 +166,24 @@ export function LanguageSwitcher({ locale }: { locale: string }) {
       {open && (
         <div
           role="listbox"
-          aria-label="언어 목록"
+          aria-label={t('listLabel')}
           // 모바일: 뷰포트 기준 풀폭(fixed inset-x-2)으로 왼쪽 잘림 방지
           // 데스크톱(sm+): 기존 버튼 우측 정렬 드롭다운으로 복귀
           className="border-border bg-background fixed inset-x-2 top-[3.75rem] z-50 mx-auto max-h-[70vh] w-auto max-w-sm overflow-y-auto rounded-lg border shadow-xl sm:absolute sm:inset-x-auto sm:top-full sm:right-0 sm:mt-1 sm:max-h-[440px] sm:w-72 sm:max-w-none"
         >
           {loading ? (
             <div className="text-muted-foreground flex items-center justify-center py-10 text-xs">
-              불러오는 중…
+              {tc('fetching')}
             </div>
           ) : (
             <>
               {/* ── 활성 언어 섹션 ── */}
               <div className="bg-muted/70 flex items-center gap-1.5 border-b px-3 py-1.5">
                 <span className="text-foreground text-[11px] font-semibold">
-                  활성 언어
+                  {t('activeLangs')}
                 </span>
                 <span className="text-muted-foreground ml-auto text-[11px]">
-                  {activeLocales.length}개
+                  {t('activeCount', { count: activeLocales.length })}
                 </span>
               </div>
 
@@ -229,10 +240,10 @@ export function LanguageSwitcher({ locale }: { locale: string }) {
               {/* ── 구분선 · 비활성 국가 ── */}
               <div className="bg-muted/70 flex items-center gap-1.5 border-y px-3 py-1.5">
                 <span className="text-muted-foreground text-[11px] font-semibold">
-                  전체 국가
+                  {t('allCountries')}
                 </span>
                 <span className="text-muted-foreground ml-auto text-[11px]">
-                  {inactiveCountries.length}개 · 비활성
+                  {t('inactiveCount', { count: inactiveCountries.length })}
                 </span>
               </div>
 

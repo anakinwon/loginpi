@@ -1208,8 +1208,10 @@
     "title": "Next.js Starter Kit"
   },
   "langSwitcher": {
+    "activeCount": "{count}",
     "activeLangs": "Active Languages",
     "allCountries": "All Countries",
+    "inactiveCount": "{count} · inactive",
     "label": "Select Language",
     "listLabel": "Language List"
   },

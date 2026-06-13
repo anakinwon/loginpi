@@ -1375,7 +1375,9 @@
     "label": "언어 선택",
     "listLabel": "언어 목록",
     "activeLangs": "활성 언어",
-    "allCountries": "전체 국가"
+    "allCountries": "전체 국가",
+    "activeCount": "{count}개",
+    "inactiveCount": "{count}개 · 비활성"
   },
   "auth": {
     "pi": {

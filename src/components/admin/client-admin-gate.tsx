@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { Link } from '@/i18n/navigation'
 import { usePiAuth } from '@/components/pi-auth-provider'
@@ -21,6 +22,8 @@ function GateBox({ children }: { children: React.ReactNode }) {
 }
 
 export function ClientAdminGate() {
+  const t = useTranslations('auth.adminGate')
+  const tc = useTranslations('common')
   const { user, isLoading } = usePiAuth()
   const router = useRouter()
   const navigating = useRef(false)
@@ -46,14 +49,14 @@ export function ClientAdminGate() {
       })
   }, [user, router])
 
-  if (isLoading) return <GateBox>Pi 계정 인증 중…</GateBox>
+  if (isLoading) return <GateBox>{t('authenticating')}</GateBox>
 
   if (!user) {
     return (
       <GateBox>
-        <p>관리자 로그인이 필요합니다</p>
+        <p>{t('loginRequired')}</p>
         <Link href="/" className="text-primary inline-block underline">
-          홈으로 이동
+          {tc('goHome')}
         </Link>
       </GateBox>
     )
@@ -62,14 +65,14 @@ export function ClientAdminGate() {
   if (user.role !== 'ADMIN' && user.role !== 'MASTER') {
     return (
       <GateBox>
-        <p>접근 권한이 없습니다</p>
+        <p>{t('denied')}</p>
         <Link href="/" className="text-primary inline-block underline">
-          홈으로 이동
+          {tc('goHome')}
         </Link>
       </GateBox>
     )
   }
 
   // Pi ADMIN 확인 완료 — _pit 파라미터로 재내비게이션 진행 중
-  return <GateBox>관리자 권한 확인 중…</GateBox>
+  return <GateBox>{t('checking')}</GateBox>
 }
