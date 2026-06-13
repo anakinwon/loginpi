@@ -34,6 +34,7 @@ interface TranslateStatsResponse {
 export function TranslateStatsSection({ period }: { period: number }) {
   const tr = useTranslations('adminStats.translate')
   const ta = useTranslations('adminStats')
+  const tc = useTranslations('common')
   const [data, setData] = useState<TranslateStatsResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -152,7 +153,7 @@ export function TranslateStatsSection({ period }: { period: number }) {
               <li key={m.model_ver} className="flex items-center gap-2">
                 <span className="min-w-0 flex-1 truncate">{m.model_ver}</span>
                 <span className="text-muted-foreground shrink-0">
-                  {m.cnt}건
+                  {tc('count', { count: m.cnt })}
                 </span>
               </li>
             ))}
