@@ -1555,7 +1555,11 @@
     "tradingCount": "{count} Artikel im Handel",
     "viewCount": "Aufrufe {count}",
     "waitingBuyerConfirm": "Warten auf die Empfangsbestätigung des Käufers.",
-    "waitingSellerComplete": "Warten auf die Transaktionsabschlussverarbeitung des Verkäufers."
+    "waitingSellerComplete": "Warten auf die Transaktionsabschlussverarbeitung des Verkäufers.",
+    "actionCancelBuyer": "Käufer storniert",
+    "actionCancelingBuyer": "⏳ Käufer storniert...",
+    "actionCancelingSeller": "⏳ Verkäufer storniert...",
+    "actionCancelSeller": "Verkäufer storniert"
   },
   "themeToggle": {
     "dark": "Dunkel",

@@ -60,7 +60,10 @@ export function ClientMyOrders({
   const authed = serverAuthed || !!user
   const [orders, setOrders] = useState<OrderRow[]>([])
   const [loading, setLoading] = useState(true)
-  const [acting, setActing] = useState<string | null>(null)
+  const [acting, setActing] = useState<{
+    id: string
+    action: 'release' | 'complete' | 'cancel'
+  } | null>(null)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -104,7 +107,7 @@ export function ClientMyOrders({
       if (!reason?.trim()) return
       body = JSON.stringify({ reason: reason.trim() })
     }
-    setActing(orderId)
+    setActing({ id: orderId, action })
     try {
       const res = await piFetch(`/api/store/orders/${orderId}/${action}`, {
         method: 'POST',
@@ -149,7 +152,9 @@ export function ClientMyOrders({
         </p>
       ) : (
         orders.map((o) => {
-          const busy = acting === o.order_id
+          const busy = acting?.id === o.order_id
+          // 취소 진행 중 여부 — 동일 주문의 수령/완료 액션과 구분해 "취소중"만 정확히 표시
+          const canceling = busy && acting?.action === 'cancel'
           return (
             <div key={o.order_id} className="space-y-2 rounded-lg border p-4">
               <div className="flex items-center justify-between gap-2">
@@ -205,7 +210,17 @@ export function ClientMyOrders({
                     disabled={busy}
                     onClick={() => act(o.order_id, 'cancel')}
                   >
-                    {t('actionCancel')}
+                    {canceling
+                      ? t(
+                          role === 'buyer'
+                            ? 'actionCancelingBuyer'
+                            : 'actionCancelingSeller',
+                        )
+                      : t(
+                          role === 'buyer'
+                            ? 'actionCancelBuyer'
+                            : 'actionCancelSeller',
+                        )}
                   </Button>
                 )}
               </div>

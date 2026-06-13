@@ -1555,7 +1555,11 @@
     "tradingCount": "กำลังซื้อขาย {count} รายการ",
     "viewCount": "การดู {count}",
     "waitingBuyerConfirm": "กำลังรอการยืนยันการรับสินค้าจากผู้ซื้อ",
-    "waitingSellerComplete": "กำลังรอผู้ขายดำเนินการเสร็จสิ้นการทำรายการ"
+    "waitingSellerComplete": "กำลังรอผู้ขายดำเนินการเสร็จสิ้นการทำรายการ",
+    "actionCancelBuyer": "ยกเลิก (ผู้ซื้อ)",
+    "actionCancelingBuyer": "⏳ กำลังยกเลิก (ผู้ซื้อ)...",
+    "actionCancelingSeller": "⏳ กำลังยกเลิก (ผู้ขาย)...",
+    "actionCancelSeller": "ยกเลิก (ผู้ขาย)"
   },
   "themeToggle": {
     "dark": "Dark",

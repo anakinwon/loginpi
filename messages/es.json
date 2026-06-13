@@ -1555,7 +1555,11 @@
     "tradingCount": "{count} artículos en comercio",
     "viewCount": "Vistas {count}",
     "waitingBuyerConfirm": "Esperando la confirmación de recepción del comprador.",
-    "waitingSellerComplete": "Esperando que el vendedor procese la transacción como completada."
+    "waitingSellerComplete": "Esperando que el vendedor procese la transacción como completada.",
+    "actionCancelBuyer": "Cancelar (comprador)",
+    "actionCancelingBuyer": "⏳ Cancelando (comprador)...",
+    "actionCancelingSeller": "⏳ Cancelando (vendedor)...",
+    "actionCancelSeller": "Cancelar (vendedor)"
   },
   "themeToggle": {
     "dark": "Dark",

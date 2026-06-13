@@ -1555,7 +1555,11 @@
     "tradingCount": "{count} giao dịch đang diễn ra",
     "viewCount": "Lượt xem {count}",
     "waitingBuyerConfirm": "Đang chờ người mua xác nhận nhận hàng",
-    "waitingSellerComplete": "Đang chờ người bán xử lý hoàn tất giao dịch"
+    "waitingSellerComplete": "Đang chờ người bán xử lý hoàn tất giao dịch",
+    "actionCancelBuyer": "Hủy (người mua)",
+    "actionCancelingBuyer": "⏳ Đang hủy (người mua)...",
+    "actionCancelingSeller": "⏳ Đang hủy (người bán)...",
+    "actionCancelSeller": "Hủy (người bán)"
   },
   "themeToggle": {
     "dark": "Dark",

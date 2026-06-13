@@ -1555,7 +1555,11 @@
     "tradingCount": "取引中 {count}件",
     "viewCount": "閲覧 {count}",
     "waitingBuyerConfirm": "購入者の受領確認をお待ちしています",
-    "waitingSellerComplete": "販売者の取引完了処理をお待ちしています"
+    "waitingSellerComplete": "販売者の取引完了処理をお待ちしています",
+    "actionCancelBuyer": "購入者キャンセル",
+    "actionCancelingBuyer": "⏳ 購入者キャンセル中...",
+    "actionCancelingSeller": "⏳ 販売者キャンセル中...",
+    "actionCancelSeller": "販売者キャンセル"
   },
   "themeToggle": {
     "dark": "Dark",

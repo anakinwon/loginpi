@@ -1555,7 +1555,11 @@
     "tradingCount": "{count} Nakikipagkalakalan",
     "viewCount": "Mga View {count}",
     "waitingBuyerConfirm": "Naghihintay ng kumpirmasyon ng pagtanggap mula sa mamimili.",
-    "waitingSellerComplete": "Naghihintay ng pagproseso ng pagkumpleto ng transaksyon mula sa nagbebenta."
+    "waitingSellerComplete": "Naghihintay ng pagproseso ng pagkumpleto ng transaksyon mula sa nagbebenta.",
+    "actionCancelBuyer": "Kanselahin (mamimili)",
+    "actionCancelingBuyer": "⏳ Kinakansela (mamimili)...",
+    "actionCancelingSeller": "⏳ Kinakansela (nagbebenta)...",
+    "actionCancelSeller": "Kanselahin (nagbebenta)"
   },
   "themeToggle": {
     "dark": "Dark",

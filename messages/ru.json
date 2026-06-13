@@ -1555,7 +1555,11 @@
     "tradingCount": "В процессе торговли: {count}",
     "viewCount": "Просмотров {count}",
     "waitingBuyerConfirm": "Ожидается подтверждение получения от покупателя",
-    "waitingSellerComplete": "Ожидается завершение сделки продавцом"
+    "waitingSellerComplete": "Ожидается завершение сделки продавцом",
+    "actionCancelBuyer": "Отмена (покупатель)",
+    "actionCancelingBuyer": "⏳ Отмена (покупатель)...",
+    "actionCancelingSeller": "⏳ Отмена (продавец)...",
+    "actionCancelSeller": "Отмена (продавец)"
   },
   "themeToggle": {
     "dark": "Dark",

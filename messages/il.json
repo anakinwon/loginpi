@@ -1555,7 +1555,11 @@
     "tradingCount": "{count} פריטים במסחר",
     "viewCount": "צפיות {count}",
     "waitingBuyerConfirm": "ממתין לאישור קבלת הקונה.",
-    "waitingSellerComplete": "ממתין למוכר להשלים את העסקה."
+    "waitingSellerComplete": "ממתין למוכר להשלים את העסקה.",
+    "actionCancelBuyer": "ביטול (קונה)",
+    "actionCancelingBuyer": "⏳ מבטל (קונה)...",
+    "actionCancelingSeller": "⏳ מבטל (מוכר)...",
+    "actionCancelSeller": "ביטול (מוכר)"
   },
   "themeToggle": {
     "dark": "Dark",

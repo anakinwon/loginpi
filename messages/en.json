@@ -1412,6 +1412,10 @@
   "store": {
     "actionBuyerDone": "Item received",
     "actionCancel": "Cancel order",
+    "actionCancelBuyer": "Cancel order",
+    "actionCancelSeller": "Cancel order",
+    "actionCancelingBuyer": "⏳ Cancelling order...",
+    "actionCancelingSeller": "⏳ Cancelling order...",
     "actionClose": "Unpublish",
     "actionComplete": "Transaction complete",
     "actionDelete": "Delete",

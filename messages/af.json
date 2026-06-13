@@ -1555,7 +1555,11 @@
     "tradingCount": "{count} items word verhandel",
     "viewCount": "Besigtigings {count}",
     "waitingBuyerConfirm": "Wag vir koper se ontvangsbevestiging",
-    "waitingSellerComplete": "Wag vir verkoper om transaksie te voltooi"
+    "waitingSellerComplete": "Wag vir verkoper om transaksie te voltooi",
+    "actionCancelBuyer": "Koper kanselleer",
+    "actionCancelingBuyer": "⏳ Koper kanselleer tans...",
+    "actionCancelingSeller": "⏳ Verkoper kanselleer tans...",
+    "actionCancelSeller": "Verkoper kanselleer"
   },
   "themeToggle": {
     "dark": "Dark",

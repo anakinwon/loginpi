@@ -1199,6 +1199,10 @@
     "actionBuyerDone": "물건 수령 완료",
     "actionComplete": "거래 완료",
     "actionCancel": "주문 취소",
+    "actionCancelBuyer": "구매자 주문취소",
+    "actionCancelSeller": "판매자 주문취소",
+    "actionCancelingBuyer": "⏳ 구매자 주문 취소중...",
+    "actionCancelingSeller": "⏳ 판매자 주문 취소중...",
     "actionDone": {
       "confirm": "전달 완료로 처리됐습니다. 구매자 수령 확인을 기다립니다",
       "release": "수령 확인 완료! 판매자의 거래 완료 처리를 기다립니다",

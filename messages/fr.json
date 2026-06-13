@@ -1555,7 +1555,11 @@
     "tradingCount": "TRADING {count} articles",
     "viewCount": "{count} vues",
     "waitingBuyerConfirm": "En attente de la confirmation de réception de l'acheteur.",
-    "waitingSellerComplete": "En attente du traitement de finalisation de la transaction par le vendeur."
+    "waitingSellerComplete": "En attente du traitement de finalisation de la transaction par le vendeur.",
+    "actionCancelBuyer": "Annuler (acheteur)",
+    "actionCancelingBuyer": "⏳ Annulation (acheteur)...",
+    "actionCancelingSeller": "⏳ Annulation (vendeur)...",
+    "actionCancelSeller": "Annuler (vendeur)"
   },
   "themeToggle": {
     "dark": "Dark",

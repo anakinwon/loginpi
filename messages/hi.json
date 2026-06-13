@@ -1555,7 +1555,11 @@
     "tradingCount": "{count} आइटम लेनदेन में",
     "viewCount": "देखे गए {count}",
     "waitingBuyerConfirm": "खरीदार की प्राप्ति की पुष्टि का इंतजार है",
-    "waitingSellerComplete": "विक्रेता द्वारा लेनदेन पूरा करने का इंतजार है"
+    "waitingSellerComplete": "विक्रेता द्वारा लेनदेन पूरा करने का इंतजार है",
+    "actionCancelBuyer": "खरीदार रद्द करें",
+    "actionCancelingBuyer": "⏳ खरीदार रद्द हो रहा है...",
+    "actionCancelingSeller": "⏳ विक्रेता रद्द हो रहा है...",
+    "actionCancelSeller": "विक्रेता रद्द करें"
   },
   "themeToggle": {
     "dark": "Dark",

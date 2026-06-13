@@ -928,6 +928,10 @@
     "tradingCount": "{count} Trading",
     "viewCount": "Views {count}",
     "waitingBuyerConfirm": "Waiting for buyer's receipt confirmation.",
-    "waitingSellerComplete": "Waiting for seller to complete the transaction."
+    "waitingSellerComplete": "Waiting for seller to complete the transaction.",
+    "actionCancelBuyer": "Cancelar (comprador)",
+    "actionCancelingBuyer": "⏳ Cancelando (comprador)...",
+    "actionCancelingSeller": "⏳ Cancelando (vendedor)...",
+    "actionCancelSeller": "Cancelar (vendedor)"
   }
 }

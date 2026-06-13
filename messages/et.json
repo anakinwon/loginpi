@@ -1555,7 +1555,11 @@
     "tradingCount": "Müügis {count} eset",
     "viewCount": "Vaatamisi {count}",
     "waitingBuyerConfirm": "Ootame ostja kättesaamise kinnitust.",
-    "waitingSellerComplete": "Ootame müüja tehingu lõpetamist."
+    "waitingSellerComplete": "Ootame müüja tehingu lõpetamist.",
+    "actionCancelBuyer": "Ostja tühistab",
+    "actionCancelingBuyer": "⏳ Ostja tühistab...",
+    "actionCancelingSeller": "⏳ Müüja tühistab...",
+    "actionCancelSeller": "Müüja tühistab"
   },
   "themeToggle": {
     "dark": "Tume",

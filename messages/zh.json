@@ -1555,7 +1555,11 @@
     "tradingCount": "交易中 {count} 件",
     "viewCount": "浏览 {count}",
     "waitingBuyerConfirm": "正在等待买家确认收货",
-    "waitingSellerComplete": "正在等待卖家处理交易完成"
+    "waitingSellerComplete": "正在等待卖家处理交易完成",
+    "actionCancelBuyer": "买家取消",
+    "actionCancelingBuyer": "⏳ 买家取消中...",
+    "actionCancelingSeller": "⏳ 卖家取消中...",
+    "actionCancelSeller": "卖家取消"
   },
   "themeToggle": {
     "dark": "Dark",

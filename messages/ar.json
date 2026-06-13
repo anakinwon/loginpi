@@ -1555,7 +1555,11 @@
     "tradingCount": "{count} سلعة قيد التداول",
     "viewCount": "المشاهدات {count}",
     "waitingBuyerConfirm": "في انتظار تأكيد استلام المشتري.",
-    "waitingSellerComplete": "في انتظار إتمام البائع للمعاملة."
+    "waitingSellerComplete": "في انتظار إتمام البائع للمعاملة.",
+    "actionCancelBuyer": "إلغاء المشتري",
+    "actionCancelingBuyer": "⏳ جارٍ إلغاء المشتري...",
+    "actionCancelingSeller": "⏳ جارٍ إلغاء البائع...",
+    "actionCancelSeller": "إلغاء البائع"
   },
   "themeToggle": {
     "dark": "Dark",

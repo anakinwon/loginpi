@@ -1555,7 +1555,11 @@
     "tradingCount": "{count} item sedang berdagang",
     "viewCount": "Dilihat {count}",
     "waitingBuyerConfirm": "Menunggu konfirmasi penerimaan dari pembeli.",
-    "waitingSellerComplete": "Menunggu penjual menyelesaikan transaksi."
+    "waitingSellerComplete": "Menunggu penjual menyelesaikan transaksi.",
+    "actionCancelBuyer": "Batalkan (pembeli)",
+    "actionCancelingBuyer": "⏳ Membatalkan (pembeli)...",
+    "actionCancelingSeller": "⏳ Membatalkan (penjual)...",
+    "actionCancelSeller": "Batalkan (penjual)"
   },
   "themeToggle": {
     "dark": "Dark",

@@ -1555,7 +1555,11 @@
     "tradingCount": "{count} em negociação",
     "viewCount": "Visualizações {count}",
     "waitingBuyerConfirm": "Aguardando a confirmação de recebimento do comprador.",
-    "waitingSellerComplete": "Aguardando o vendedor finalizar a transação."
+    "waitingSellerComplete": "Aguardando o vendedor finalizar a transação.",
+    "actionCancelBuyer": "Cancelar (comprador)",
+    "actionCancelingBuyer": "⏳ Cancelando (comprador)...",
+    "actionCancelingSeller": "⏳ Cancelando (vendedor)...",
+    "actionCancelSeller": "Cancelar (vendedor)"
   },
   "themeToggle": {
     "dark": "Dark",
