@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { usePathname, useRouter } from '@/i18n/navigation'
+import { routing } from '@/i18n/routing'
 import { piFetch } from '@/lib/pi-fetch'
 import { LOCALE_CURRENCY } from '@/lib/locale-currency'
 import {
@@ -32,6 +33,10 @@ interface Country {
 // 페이지 이동)에 TTL 캐시한다. 신선하면 네트워크 없이 즉시 표시 → 첫 클릭 외 지연 0.
 const CACHE_KEY = 'langSwitcher:v1'
 const CACHE_TTL = 10 * 60 * 1000 // 10분 (서버 revalidate 600s·환율 캐시 900s와 정합)
+
+// 마지막 선택 언어 — 쿠키 대신 localStorage 사용(Pi Browser는 Set-Cookie 미저장).
+// 다음 접속 시 이 값으로 1회 자동 전환된다.
+const PREF_LOCALE_KEY = 'preferred_locale'
 
 interface SwitcherCache {
   locales: ActiveLocale[]
@@ -139,6 +144,25 @@ export function LanguageSwitcher({ locale }: { locale: string }) {
     return () => document.removeEventListener('mousedown', onDown)
   }, [])
 
+  // 마지막 선택 언어 자동 적용 — 마운트 시 선호 locale로 1회 전환.
+  // 전환 후 URL locale = 선호값이 되어 재전환 루프가 생기지 않는다.
+  useEffect(() => {
+    let pref: string | null = null
+    try {
+      pref = localStorage.getItem(PREF_LOCALE_KEY)
+    } catch {
+      pref = null
+    }
+    if (
+      pref &&
+      pref !== locale &&
+      (routing.locales as readonly string[]).includes(pref)
+    ) {
+      void switchLocale(pref)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   function applyData(d: Omit<SwitcherCache, 'ts'>) {
     setActiveLocales(d.locales)
     setCountries(d.countries)
@@ -201,6 +225,12 @@ export function LanguageSwitcher({ locale }: { locale: string }) {
   async function switchLocale(next: string) {
     setOpen(false)
     if (next === locale) return
+    // 선택 언어 기억 — 다음 접속 시 자동 적용 (실패해도 전환은 정상 진행)
+    try {
+      localStorage.setItem(PREF_LOCALE_KEY, next)
+    } catch {
+      // localStorage 차단 환경 — 기억 기능만 비활성
+    }
     // ── admin 경로: Pi Browser 무반응 방지 ──────────────────────────────────
     // Pi Browser는 Set-Cookie를 저장하지 않으므로, 티켓 없는 하드 네비게이션은 새 locale의
     // 첫 서버 요청이 미인증(getSessionUser null) → ClientAdminGate만 렌더된다. 이후 게이트가
