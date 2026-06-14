@@ -17,15 +17,15 @@ function isValidDate(s: string): boolean {
   return /^\d{4}-\d{2}-\d{2}$/.test(s) && !isNaN(Date.parse(s))
 }
 
-// 집계 파이프라인 전체가 UTC 날짜 기준 (sys_user_actvty_log.actvty_dt = CURRENT_DATE)
-function todayUtc(): string {
-  return new Date().toISOString().slice(0, 10)
+// 집계 파이프라인 전체가 KST 날짜 기준 (043: fn_record_activity·fn_build_daily_stats KST 통일)
+function todayKst(): string {
+  return new Date(Date.now() + 9 * 3600_000).toISOString().slice(0, 10)
 }
 
-function yesterdayUtc(): string {
-  const d = new Date()
-  d.setUTCDate(d.getUTCDate() - 1)
-  return d.toISOString().slice(0, 10)
+function yesterdayKst(): string {
+  return new Date(Date.now() + 9 * 3600_000 - 86400_000)
+    .toISOString()
+    .slice(0, 10)
 }
 
 function addDays(date: string, n: number): string {
@@ -57,7 +57,7 @@ async function rebuildWithRipple(
   from: string,
   to: string,
 ): Promise<DayResult[]> {
-  const today = todayUtc()
+  const today = todayKst()
   const rippleTo = addDays(to, RIPPLE_DAYS)
   const effectiveTo = rippleTo < today ? rippleTo : today
   return rebuildRange(from, effectiveTo < from ? from : effectiveTo)
@@ -119,7 +119,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
   }
   const startDtm = new Date()
-  const target = yesterdayUtc()
+  const target = yesterdayKst()
   const results = await rebuildWithRipple(target, target)
   const s = summarize(results)
   await logBatchRun('CRON', target, target, startDtm, s, 'SYSTEM')
@@ -145,14 +145,14 @@ export async function POST(req: NextRequest) {
     // 빈 body 허용
   }
 
-  const today = todayUtc()
+  const today = todayKst()
 
   // 백필 모드: from ~ to 범위 전체 처리
   if (body.backfill === true) {
     let to =
       typeof body.to === 'string' && isValidDate(body.to)
         ? body.to
-        : yesterdayUtc()
+        : yesterdayKst()
     if (to > today) to = today
 
     // from 미지정 시 sys_user_actvty_log의 최초 날짜 사용
@@ -178,8 +178,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ backfill: true, ...s })
   }
 
-  // 단일 날짜 처리 (기본: 오늘 UTC — 온디맨드 최신화)
-  // 클라이언트 로컬(KST 등) 날짜가 UTC보다 앞서는 경우 오늘로 보정
+  // 단일 날짜 처리 (기본: 오늘 KST — 온디맨드 최신화). 미래 날짜 요청은 오늘로 보정
   let date =
     typeof body.date === 'string' && isValidDate(body.date) ? body.date : today
   if (date > today) date = today

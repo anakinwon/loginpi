@@ -9,8 +9,9 @@ import type {
 
 const VALID_PERIODS = [7, 30, 90, 365] as const
 
+// KST 기준 오늘에서 period-1일 전 (집계가 KST 날짜 기준 — 043)
 function calcFromDate(period: number): string {
-  const d = new Date()
+  const d = new Date(Date.now() + 9 * 3600_000)
   d.setUTCDate(d.getUTCDate() - (period - 1))
   return d.toISOString().slice(0, 10)
 }
