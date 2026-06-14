@@ -27,7 +27,7 @@ export function BrowserName() {
     return (
       <Image
         src="/pi-logo.png"
-        alt="Pi Network Login Test"
+        alt="CafePi"
         width={40}
         height={40}
         className="rounded-full"
