@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from 'react'
 import { useTranslations } from 'next-intl'
-import { useRouter } from 'next/navigation'
 import { Link } from '@/i18n/navigation'
 import { usePiAuth } from '@/components/pi-auth-provider'
 import { piFetch } from '@/lib/pi-fetch'
@@ -25,7 +24,6 @@ export function ClientAdminGate() {
   const t = useTranslations('auth.adminGate')
   const tc = useTranslations('common')
   const { user, isLoading } = usePiAuth()
-  const router = useRouter()
   const navigating = useRef(false)
 
   useEffect(() => {
@@ -42,12 +40,15 @@ export function ClientAdminGate() {
           return
         }
         url.searchParams.set('_pit', ticket)
-        router.replace(url.pathname + url.search)
+        // hard navigation 필수 — Pi Browser WebView에서 soft navigation(router.replace)은
+        // admin layout 서버 재실행을 안정적으로 일으키지 않아 x-pit-ticket 인증이 갱신되지 않고
+        // 'checking' 상태로 멈춘다. 전체 문서 재요청으로 미들웨어→서버 인증을 확실히 태운다.
+        window.location.assign(url.pathname + url.search)
       })
       .catch(() => {
         navigating.current = false
       })
-  }, [user, router])
+  }, [user])
 
   if (isLoading) return <GateBox>{t('authenticating')}</GateBox>
 
