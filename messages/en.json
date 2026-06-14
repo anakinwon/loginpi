@@ -1215,8 +1215,8 @@
         "name": "Create PREMIUM Cafe + Auto-translation(PiRC1)"
       },
       "M4": {
-        "desc": "Create Pi Bet in Cafe and distribute to participants",
-        "name": "Create Pi Bet and Distribute"
+        "desc": "Subscribe to Pi subscription service, then create a Pi Bet in Cafe and distribute to participants",
+        "name": "Apply Pi Subscription, then Create & Distribute Pi Bet (PiRC2)"
       },
       "M5": {
         "desc": "Transfer Bean to 1 or more people in chat",
@@ -1228,11 +1228,11 @@
       },
       "M7": {
         "desc": "Register my product on PiShop, then cancel seller transaction during trade",
-        "name": "Seller Transaction Cancellation(PiRC2)"
+        "name": "Seller Transaction Cancellation(PiRC3)"
       },
       "M8": {
         "desc": "Buyer transaction cancellation after purchasing another person's product in PiShop",
-        "name": "Buyer Transaction Cancellation"
+        "name": "Buyer Transaction Cancellation(PiRC3)"
       },
       "M9": {
         "desc": "Deposit 1Pi or more as PiShop Seller Deposit + Consent to location-based services",

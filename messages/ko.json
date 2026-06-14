@@ -1219,8 +1219,8 @@
         "desc": "PiCafe에서 PREMIUM Cafe 생성 + 자동번역 기능 사용"
       },
       "M4": {
-        "name": "Pi Bet 생성 후 분배",
-        "desc": "Cafe에서 Pi Bet 생성 후 참여자에게 분배"
+        "name": "Pi구독서비스 신청 후 Pi Bet 생성 및 분배(PiRC2)",
+        "desc": "Pi구독서비스 신청 후, Cafe에서 Pi Bet 생성 + 참여자에게 분배"
       },
       "M5": {
         "name": "Bean 전송 테스트",
@@ -1231,11 +1231,11 @@
         "desc": "스티커 이용 / 파일 전송 / 음성채널 이용 중 1가지 이상"
       },
       "M7": {
-        "name": "판매자 거래 취소(PiRC2)",
+        "name": "판매자 거래 취소(PiRC3)",
         "desc": "PiShop에 내 상품 등록 후 거래중 판매자 거래 취소"
       },
       "M8": {
-        "name": "구매자 거래 취소",
+        "name": "구매자 거래 취소(PiRC3)",
         "desc": "PiShop에서 타인 상품 구매 후 구매자 거래 취소"
       },
       "M9": {
