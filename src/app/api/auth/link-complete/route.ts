@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { updatePiUserWithGoogle } from '@/lib/users'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { recordUserAction } from '@/lib/event'
 
 // POST /api/auth/link-complete
 // Body: { code: string }
@@ -100,6 +101,10 @@ export async function POST(request: NextRequest) {
       .from('auth_link_cd')
       .update({ used_at: new Date().toISOString() })
       .eq('code', code)
+
+    // M1: 계정 통합 미션 기록 (비블로킹)
+    recordUserAction('account_link', linkCode.pi_user_id)
+      .catch(err => console.error(`[M1] 미션 기록 실패: ${err.message}`))
 
     return NextResponse.json({ success: true })
   } catch (err) {

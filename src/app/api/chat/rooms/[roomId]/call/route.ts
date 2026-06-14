@@ -4,6 +4,7 @@ import { getSessionUser } from '@/lib/auth-check'
 import { getRoomMember } from '@/lib/chat'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { broadcastToCall } from '@/lib/realtime-broadcast'
+import { recordUserAction } from '@/lib/event'
 
 type Params = { params: Promise<{ roomId: string }> }
 
@@ -84,6 +85,10 @@ export async function POST(req: Request, { params }: Params) {
     caller_nm: caller.display_name,
     callee_usr_id,
   })
+
+  // M6: 음성채팅 이용 미션 기록 (비블로킹) — MULTI_OR 중 1개
+  recordUserAction('voice_join', caller.id, { roomId, call_id: call.call_id })
+    .catch(err => console.error(`[M6-voice] 미션 기록 실패: ${err.message}`))
 
   return NextResponse.json({ call_id: call.call_id })
 }

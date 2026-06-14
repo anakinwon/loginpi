@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { cancelOrder } from '@/lib/mps-order'
 import { refundCancelledOrder } from '@/lib/mps-refund'
+import { recordUserAction } from '@/lib/event'
 
 const cancelSchema = z.object({
   reason: z.string().min(1).max(500), // 취소 사유 필수 (FR-10)
@@ -64,6 +65,25 @@ export async function POST(
       reason: 'A2U_FAILED' as const,
     }
   })
+
+  // M7/M8: 거래 취소 미션 기록 (판매자 vs 구매자 판별)
+  if (result.order) {
+    const order = result.order as unknown
+    const orderObj = order as Record<string, unknown>
+
+    const seller_usr_id = String(orderObj?.seller_usr_id ?? '')
+    const buyer_usr_id = String(orderObj?.buyer_usr_id ?? '')
+
+    if (user.id === seller_usr_id) {
+      // M7: 판매자 거래 취소
+      recordUserAction('seller_cancel', user.id, { order_id: orderId })
+        .catch(err => console.error(`[M7] 미션 기록 실패: ${err.message}`))
+    } else if (user.id === buyer_usr_id) {
+      // M8: 구매자 거래 취소
+      recordUserAction('buyer_cancel', user.id, { order_id: orderId })
+        .catch(err => console.error(`[M8] 미션 기록 실패: ${err.message}`))
+    }
+  }
 
   return NextResponse.json({ order: result.order, refund })
 }

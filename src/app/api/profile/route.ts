@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { getSessionUser } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { signPayload, verifyPayload } from '@/lib/pi-session-crypto'
+import { recordUserAction } from '@/lib/event'
 import type { PiSessionUser } from '@/types/pi-session'
 
 const ProfileUpdateSchema = z.object({
@@ -97,6 +98,12 @@ export async function PATCH(req: Request) {
         )
       }
     }
+  }
+
+  // M2: 별명 + 카톡ID 입력 미션 기록 (둘 다 있어야 함)
+  if (data?.nick_nm && data?.kakao_id) {
+    recordUserAction('profile_update', user.id)
+      .catch(err => console.error(`[M2] 미션 기록 실패: ${err.message}`))
   }
 
   const response = NextResponse.json({

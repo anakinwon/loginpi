@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth-check'
 import { getRoomMember } from '@/lib/chat'
+import { recordUserAction } from '@/lib/event'
 
 type Params = { params: Promise<{ roomId: string }> }
 
@@ -105,6 +106,14 @@ export async function POST(request: NextRequest, { params }: Params) {
   const { data: urlData } = getSupabaseAdmin()
     .storage.from(BUCKET)
     .getPublicUrl(path, isMedia ? undefined : { download: safeName })
+
+  // M6: 파일 전송 미션 기록 (비블로킹) — MULTI_OR 중 1개
+  recordUserAction('file_send', user.id, {
+    roomId,
+    file_type: getMsgTpCd(file.type),
+    file_size: file.size,
+  })
+    .catch(err => console.error(`[M6-file] 미션 기록 실패: ${err.message}`))
 
   return NextResponse.json({
     url: urlData.publicUrl,

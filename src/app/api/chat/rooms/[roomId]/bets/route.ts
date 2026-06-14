@@ -3,6 +3,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth-check'
 import { getRoomMember } from '@/lib/chat'
 import { broadcastToRoom } from '@/lib/realtime-broadcast'
+import { recordUserAction } from '@/lib/event'
 
 type Params = { params: Promise<{ roomId: string }> }
 
@@ -213,6 +214,10 @@ export async function POST(request: NextRequest, { params }: Params) {
     .single()
 
   if (notiMsg) await broadcastToRoom(roomId, 'new_msg', notiMsg)
+
+  // M4: Pi Bet 생성 미션 기록 (비블로킹)
+  recordUserAction('pibet_create', user.id, { roomId, bet_id: bet.bet_id })
+    .catch(err => console.error(`[M4] 미션 기록 실패: ${err.message}`))
 
   return NextResponse.json({ bet }, { status: 201 })
 }

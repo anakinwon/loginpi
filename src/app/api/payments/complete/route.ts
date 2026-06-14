@@ -5,6 +5,7 @@ import { broadcastToRoom } from '@/lib/realtime-broadcast'
 import { canSendTip } from '@/lib/chat-auth'
 import { markEscrow } from '@/lib/mps-order'
 import { depositBond, BOND_DEPOSIT_PI } from '@/lib/mps-bond'
+import { recordUserAction } from '@/lib/event'
 
 const PI_PAYMENTS_URL = 'https://api.minepi.com/v2/payments'
 
@@ -220,7 +221,16 @@ export async function POST(request: NextRequest) {
             .select()
             .single()
 
-          if (tipMsg) await broadcastToRoom(roomId, 'new_msg', tipMsg)
+          if (tipMsg) {
+            await broadcastToRoom(roomId, 'new_msg', tipMsg)
+
+            // M5: Bean 전송 미션 기록 (비블로킹)
+            recordUserAction('bean_send', senderRow.id, {
+              room_id: roomId,
+              recipient_id: recipientRow.id,
+            })
+              .catch(err => console.error(`[M5] 미션 기록 실패: ${err.message}`))
+          }
         }
       }
     } else if (meta?.type === 'EVENT_ROOM_JOIN' && payment.user_uid) {
@@ -402,6 +412,10 @@ export async function POST(request: NextRequest) {
         const sellerRow = seller as { id: string; display_name: string | null }
         const slug = String(sellerRow.display_name ?? 'user').slice(0, 20)
         await depositBond(sellerRow.id, paymentId, slug)
+
+        // M9: 판매자 보증금 예치 미션 기록 (비블로킹)
+        recordUserAction('bond_deposit', sellerRow.id)
+          .catch(err => console.error(`[M9] 미션 기록 실패: ${err.message}`))
       }
     } else if (meta?.type === 'PI_BET' && payment.user_uid) {
       // PI_BET: 결제 완료 시 베팅 참가 INSERT + BET_NOTI 발송 (TASK-071)
@@ -487,6 +501,13 @@ export async function POST(request: NextRequest) {
 
                 if (betMsg)
                   await broadcastToRoom(betRow.room_id, 'new_msg', betMsg)
+
+                // M4.2: Pi Bet 참가 미션 기록 (비블로킹)
+                recordUserAction('pibet_entry', ownerRow.id, {
+                  bet_id: betRow.bet_id,
+                  room_id: betRow.room_id,
+                })
+                  .catch(err => console.error(`[M4.2] 미션 기록 실패: ${err.message}`))
               }
             }
           }

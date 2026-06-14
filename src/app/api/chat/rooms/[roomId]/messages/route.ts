@@ -14,6 +14,7 @@ import { recordActivity } from '@/lib/activity-log'
 import { LOCALE_CD_RE } from '@/lib/chat-translate'
 import { queueRoomTranslations } from '@/lib/chat-translate-dedup'
 import { pushRoomWebhooks } from '@/lib/chat-webhook'
+import { recordUserAction } from '@/lib/event'
 
 type Params = { params: Promise<{ roomId: string }> }
 
@@ -308,6 +309,12 @@ export async function POST(request: NextRequest, { params }: Params) {
       console.error('[chat-webhook] push 오류', err),
     ),
   )
+
+  // M6: 스티커 이용 미션 기록 (비블로킹) — MULTI_OR 중 1개
+  if (msg_tp_cd === 'STICKER') {
+    recordUserAction('sticker_use', user.id, { roomId, stkr_id })
+      .catch(err => console.error(`[M6-sticker] 미션 기록 실패: ${err.message}`))
+  }
 
   // TASK-062 Trigger 7: 테마 활동 배지 수여 체크 (백그라운드)
   // 배지 보유 시 RPC가 인덱스 1회 조회로 즉시 반환 — 매 메시지 비용 최소

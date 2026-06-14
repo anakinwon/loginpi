@@ -4,6 +4,7 @@ import { getSessionUser } from '@/lib/auth-check'
 import { getRoomMember } from '@/lib/chat'
 import { LOCALE_CD_RE, baseLang } from '@/lib/chat-translate'
 import { getOrTranslateMessage } from '@/lib/chat-translate-dedup'
+import { recordUserAction } from '@/lib/event'
 
 type Params = { params: Promise<{ roomId: string; msgId: string }> }
 
@@ -71,6 +72,11 @@ export async function POST(request: NextRequest, { params }: Params) {
       localeCd,
       msgCont: msg.msg_cont,
     })
+
+    // M3.2: 자동번역 기능 사용 미션 기록 (비블로킹)
+    recordUserAction('cafe_translate_use', user.id, { roomId, localeCd })
+      .catch(err => console.error(`[M3.2] 미션 기록 실패: ${err.message}`))
+
     return NextResponse.json({ trans_cont: transCont, cached })
   } catch (err) {
     console.error(

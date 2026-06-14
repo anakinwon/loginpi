@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
 import { canCreateRoom } from '@/lib/chat-auth'
 import { createGroupRoom } from '@/lib/chat'
+import { recordUserAction } from '@/lib/event'
 
 // 무료 테마(FITNESS) 또는 구독자의 월 무료 쿼터 내에서는 결제 없이 그룹방 생성 가능
 // 서버에서 화이트리스트·구독 권한 검증 — 클라이언트 우회 방지
@@ -61,6 +62,11 @@ export async function POST(request: NextRequest) {
       max_mbr_cnt: typeof max_mbr_cnt === 'number' ? max_mbr_cnt : 50,
       expr_dtm: expr_dtm ?? null,
     })
+
+    // M3: PREMIUM Cafe 생성 미션 기록 (비블로킹)
+    recordUserAction('premium_cafe_create', user.id, { theme_cd, room_nm })
+      .catch(err => console.error(`[M3] 미션 기록 실패: ${err.message}`))
+
     return NextResponse.json({ room }, { status: 201 })
   } catch {
     return NextResponse.json({ error: '카페 생성 실패' }, { status: 500 })
