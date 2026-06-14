@@ -1201,7 +1201,49 @@
     "gradeTrainee": "Trainee",
     "gradeAgent": "Agent",
     "gradeVeteran": "Veteran",
-    "gradeMaster": "Master"
+    "gradeMaster": "Master",
+    "missions": {
+      "M1": {
+        "name": "Account Integration",
+        "desc": "Pi Browser login + Google login (both completed)"
+      },
+      "M2": {
+        "name": "Profile Completion",
+        "desc": "Add nickname + KakaoTalk ID to linked account"
+      },
+      "M3": {
+        "name": "Create PREMIUM Cafe + Auto-translate",
+        "desc": "Create a PREMIUM Cafe in PiCafe + use the auto-translate feature"
+      },
+      "M4": {
+        "name": "Create Pi Bet + Distribute",
+        "desc": "Create a Pi Bet in Cafe and distribute to participants"
+      },
+      "M5": {
+        "name": "Bean Transfer Test",
+        "desc": "Send Beans to 1 or more users in chat"
+      },
+      "M6": {
+        "name": "Use Chat Multi-features",
+        "desc": "Use stickers / file transfer / voice channel — at least 1"
+      },
+      "M7": {
+        "name": "Seller Trade Cancel",
+        "desc": "List a product on PiShop, start a trade, then cancel as seller"
+      },
+      "M8": {
+        "name": "Buyer Trade Cancel",
+        "desc": "Purchase another user's product on PiShop, then cancel as buyer"
+      },
+      "M9": {
+        "name": "Seller Deposit + Location Consent",
+        "desc": "Deposit 1+ Pi as seller on PiShop + agree to location-based service"
+      },
+      "M10": {
+        "name": "Deposit-Active Cancel Fee",
+        "desc": "(After M9) Redo missions 7 & 8 — experience cancellation fee while deposit is active"
+      }
+    }
   },
   "header": {
     "admin": "Admin",

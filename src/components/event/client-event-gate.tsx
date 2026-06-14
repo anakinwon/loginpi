@@ -57,8 +57,11 @@ function maskAgentName(r: Ranking, isAdmin: boolean, noName: string): string {
   return isAdmin ? name : name.slice(0, 4) + '***'
 }
 
+type MissionTranslation = { name?: string; desc?: string }
+
 export function ClientEventGate() {
   const t = useTranslations('event')
+  const missionsT = t.raw('missions') as Record<string, MissionTranslation | undefined>
   const [loading, setLoading] = useState(true)
   const [progress, setProgress] = useState<EventProgress | null>(null)
   const [missions, setMissions] = useState<Mission[]>([])
@@ -255,32 +258,32 @@ export function ClientEventGate() {
         {expandedMissions && (
           <div className="mt-3 space-y-2">
             {missions.map((m) => {
+              const cd = m.mission_cd.trim()
+              const mT = missionsT[cd]
+              const displayName = mT?.name ?? m.mission_nm
+              const displayDesc = mT?.desc ?? m.mission_guide_desc
               const completed = progress?.missions.find(
                 (pm) => pm.mission_cd === m.mission_cd,
               )?.is_completed
               return (
                 <div
-                  key={m.mission_cd}
+                  key={cd}
                   className={`rounded-lg border p-3 transition-colors ${completed ? 'border-green-300 bg-green-50 dark:border-green-700 dark:bg-green-950' : 'bg-card'}`}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="mb-2 flex items-center gap-2">
-                        <span className="text-sm font-bold">
-                          {m.mission_cd.trim()}
-                        </span>
-                        <span className="text-sm font-medium">
-                          {m.mission_nm}
-                        </span>
+                        <span className="text-sm font-bold">{cd}</span>
+                        <span className="text-sm font-medium">{displayName}</span>
                         {completed && (
                           <span className="ml-auto text-sm font-bold text-green-600 dark:text-green-400">
                             ✓
                           </span>
                         )}
                       </div>
-                      {m.mission_guide_desc && (
+                      {displayDesc && (
                         <p className="text-muted-foreground text-xs">
-                          {m.mission_guide_desc}
+                          {displayDesc}
                         </p>
                       )}
                       {m.complete_type_cd === 'MULTI_OR' && (

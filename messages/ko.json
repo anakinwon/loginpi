@@ -1204,7 +1204,49 @@
     "gradeTrainee": "수습요원",
     "gradeAgent": "정요원",
     "gradeVeteran": "선임요원",
-    "gradeMaster": "마스터"
+    "gradeMaster": "마스터",
+    "missions": {
+      "M1": {
+        "name": "계정 통합",
+        "desc": "Pi 브라우저 로그인 + Google 로그인 (둘 다 완료)"
+      },
+      "M2": {
+        "name": "프로필 완성",
+        "desc": "통합 계정에 별명 + 카카오톡 ID 입력"
+      },
+      "M3": {
+        "name": "PREMIUM 카페 생성 + 자동번역",
+        "desc": "PiCafe에서 PREMIUM Cafe 생성 + 자동번역 기능 사용"
+      },
+      "M4": {
+        "name": "Pi Bet 생성 후 분배",
+        "desc": "Cafe에서 Pi Bet 생성 후 참여자에게 분배"
+      },
+      "M5": {
+        "name": "Bean 전송 테스트",
+        "desc": "채팅 내 Bean을 1인 이상에게 전송"
+      },
+      "M6": {
+        "name": "채팅 멀티 기능 사용",
+        "desc": "스티커 이용 / 파일 전송 / 음성채널 이용 중 1가지 이상"
+      },
+      "M7": {
+        "name": "판매자 거래 취소",
+        "desc": "PiShop에 내 상품 등록 후 거래중 판매자 거래 취소"
+      },
+      "M8": {
+        "name": "구매자 거래 취소",
+        "desc": "PiShop에서 타인 상품 구매 후 구매자 거래 취소"
+      },
+      "M9": {
+        "name": "판매자 보증금 + 위치동의",
+        "desc": "PiShop 판매자 보증금 1Pi 이상 예치 + 위치 기반 서비스 동의"
+      },
+      "M10": {
+        "name": "보증금 활성 거래 취소 수수료",
+        "desc": "(M9 후) 7·8번을 다시 수행 — 보증금 활성 상태에서 취소수수료 경험"
+      }
+    }
   },
   "header": {
     "board": "게시판",
