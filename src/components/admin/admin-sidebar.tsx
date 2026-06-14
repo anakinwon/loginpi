@@ -32,6 +32,8 @@ const STORE_NAV = [
   { href: '/admin/store/categories', labelKey: 'storeCategories' },
 ] as const
 
+const EVENT_NAV = [{ href: '/admin/event/gifts', labelKey: 'eventGifts' }] as const
+
 const I18N_NAV = [{ href: '/admin/i18n', labelKey: 'i18n' }] as const
 
 function NavItem({
@@ -105,6 +107,18 @@ export function AdminSidebar() {
           {t('storeSection')}
         </p>
         {STORE_NAV.map(({ href, labelKey }) => (
+          <NavItem
+            key={href}
+            href={href}
+            label={t(labelKey)}
+            pathname={pathname}
+          />
+        ))}
+
+        <p className="text-muted-foreground px-3 pt-3 pb-1 text-xs font-semibold tracking-wide uppercase">
+          {t('eventSection')}
+        </p>
+        {EVENT_NAV.map(({ href, labelKey }) => (
           <NavItem
             key={href}
             href={href}
