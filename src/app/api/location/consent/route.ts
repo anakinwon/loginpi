@@ -68,9 +68,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: '동의 처리 중 오류가 발생했습니다' }, { status: 500 })
   }
 
-  // M10: 위치기반서비스 동의 미션 기록 (비블로킹)
+  // M9: 위치기반서비스 동의 미션 기록 (보증금 예치 bond_deposit와 함께 MULTI_AND, 비블로킹)
   recordUserAction('lbs_consent', user.id, { consent_ver: consentVer })
-    .catch(err => console.error(`[M10] 미션 기록 실패: ${err.message}`))
+    .catch((err) => console.error(`[M9] 미션 기록 실패: ${err.message}`))
 
   return NextResponse.json({ ok: true, consent_yn: 'Y', consent_ver: consentVer })
 }

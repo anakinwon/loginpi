@@ -136,7 +136,7 @@ async function evaluateMissionCompletion(
       // 1개 action_cd 발생 확인
       const { data } = await db
         .from('evt_action_log')
-        .select('1')
+        .select('evt_action_log_id')
         .eq('user_id', userId)
         .eq('action_cd', mission.required_action_cds_tx[0])
         .limit(1)
@@ -148,7 +148,7 @@ async function evaluateMissionCompletion(
       for (const actionCd of mission.required_action_cds_tx) {
         const { data } = await db
           .from('evt_action_log')
-          .select('1')
+          .select('evt_action_log_id')
           .eq('user_id', userId)
           .eq('action_cd', actionCd)
           .limit(1)
@@ -162,7 +162,7 @@ async function evaluateMissionCompletion(
       for (const actionCd of mission.required_action_cds_tx) {
         const { data } = await db
           .from('evt_action_log')
-          .select('1')
+          .select('evt_action_log_id')
           .eq('user_id', userId)
           .eq('action_cd', actionCd)
           .limit(1)
@@ -194,7 +194,7 @@ async function evaluateMissionCompletion(
       for (const actionCd of mission.required_action_cds_tx) {
         const { data } = await db
           .from('evt_action_log')
-          .select('1')
+          .select('evt_action_log_id')
           .eq('user_id', userId)
           .eq('action_cd', actionCd)
           .gte('action_dtm', priorMission.complete_dtm)
@@ -220,29 +220,28 @@ async function checkCancelWithFee(
 ): Promise<boolean> {
   const db = getSupabaseAdmin()
 
-  // mps_txn_hist에서 FEE가 발생한 거래 확인
-  // seller 또는 buyer 입장 모두 가능
+  // mps_txn_hist에서 취소 수수료가 발생한 거래 확인 (실제 컬럼명 user_id, 실제 코드값 CANCEL_FEE_IN)
+  // seller·buyer 모두 취소 수수료 부담 시 user_id에 취소자가 기록됨
   const { data: feeRecords } = await db
     .from('mps_txn_hist')
     .select('order_id')
-    .in('txn_type_cd', ['FEE_SELLER_CANCEL', 'FEE_BUYER_CANCEL'])
-    .in('usr_id', [userId]) // seller or buyer
+    .eq('txn_type_cd', 'CANCEL_FEE_IN')
+    .eq('user_id', userId)
     .gte('reg_dtm', afterDtm)
-    .limit(1)
+    .limit(10)
 
-  // 더 정확한 확인: REFUND_IN과 FEE가 동일 order에 함께 존재하는지 확인
+  // 더 정확한 확인: REFUND_IN과 취소수수료가 동일 order에 함께 존재하는지 확인
   if (feeRecords && feeRecords.length > 0) {
     for (const fee of feeRecords) {
       const { data: refund } = await db
         .from('mps_txn_hist')
-        .select('1')
+        .select('order_id')
         .eq('order_id', fee.order_id)
         .eq('txn_type_cd', 'REFUND_IN')
-        .gte('reg_dtm', afterDtm)
         .limit(1)
 
       if (refund?.length) {
-        return true // REFUND + FEE 동시 존재
+        return true // 취소수수료 + 환불 동시 존재
       }
     }
   }
@@ -330,6 +329,7 @@ export async function getEventRanking(eventId: string, limit: number = 100) {
     {
       count: number
       firstCompleteDtm: string
+      lastCompleteDtm: string
       nick_nm: string | null
       display_name: string | null
       pi_username: string | null
@@ -357,6 +357,11 @@ export async function getEventRanking(eventId: string, limit: number = 100) {
             ? existing.firstCompleteDtm
             : mission.complete_dtm
           : mission.complete_dtm,
+        lastCompleteDtm: existing
+          ? existing.lastCompleteDtm > mission.complete_dtm
+            ? existing.lastCompleteDtm
+            : mission.complete_dtm
+          : mission.complete_dtm,
         nick_nm: sysUser.nick_nm,
         display_name: sysUser.display_name,
         pi_username: sysUser.pi_username,
@@ -364,38 +369,24 @@ export async function getEventRanking(eventId: string, limit: number = 100) {
     }
   }
 
-  // 정렬 (count 내림차순, firstCompleteDtm 오름차순)
+  // 정렬 (count 내림차순, 동점 시 마지막 수행 일시 오름차순 — 먼저 끝낸 사람이 상위)
   const sorted = Array.from(userStats.entries())
     .sort(([, a], [, b]) => {
       if (b.count !== a.count) return b.count - a.count
-      return a.firstCompleteDtm.localeCompare(b.firstCompleteDtm)
+      return a.lastCompleteDtm.localeCompare(b.lastCompleteDtm)
     })
     .slice(0, limit)
 
-  // 순위 계산
-  const result = []
-  let currentRank = 1
-  let prevCount = -1
-
-  for (let i = 0; i < sorted.length; i++) {
-    const [userId, stats] = sorted[i]
-
-    if (stats.count !== prevCount) {
-      currentRank = i + 1
-      prevCount = stats.count
-    }
-
-    result.push({
-      rank: currentRank,
-      user_id: userId,
-      mission_count: stats.count,
-      first_complete_dtm: stats.firstCompleteDtm,
-      nick_nm: stats.nick_nm ?? stats.display_name,
-      pi_username: stats.pi_username,
-    })
-  }
-
-  return result
+  // 순위 계산 (정렬 순서대로 순차 부여 — 동점자도 마지막 수행 일시로 순위 구분)
+  return sorted.map(([userId, stats], i) => ({
+    rank: i + 1,
+    user_id: userId,
+    mission_count: stats.count,
+    first_complete_dtm: stats.firstCompleteDtm,
+    last_complete_dtm: stats.lastCompleteDtm,
+    nick_nm: stats.nick_nm ?? stats.display_name,
+    pi_username: stats.pi_username,
+  }))
 }
 
 /**

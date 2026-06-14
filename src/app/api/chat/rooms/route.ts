@@ -9,19 +9,18 @@ import { getChatRoomLists } from '@/lib/chat-room-list'
 // Pi Browser 클라이언트 게이트(ClientChatList)가 X-Pi-Token 헤더로 호출한다.
 // 내 카페·공개 카페 파이프라인 병렬 + Bet 뱃지 1쿼리 — chat-room-list 공통 모듈
 export async function GET(request: NextRequest) {
+  // 비로그인(게스트)도 공개 카페 목록 조회 가능 (Shop처럼 공개) — 내 카페는 로그인 시만
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
   // 카페 화면 진입 = 활성 사용자 신호 (하루 첫 호출만 INSERT, 이후 UPSERT no-op)
-  recordActivity(user.id, 'CHAT')
+  if (user) recordActivity(user.id, 'CHAT')
 
   const includePublic =
     new URL(request.url).searchParams.get('include') === 'public'
 
   try {
     const { rooms, publicRooms } = await getChatRoomLists(
-      user.id,
+      user?.id ?? null,
       includePublic,
     )
     if (!includePublic) return NextResponse.json({ rooms })

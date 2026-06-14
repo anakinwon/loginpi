@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { maskDisplayName } from '@/lib/display-mask'
 import type {
   ActivityStatsResponse,
   ActivityDataPoint,
@@ -17,10 +18,9 @@ function calcFromDate(period: number): string {
 }
 
 export async function GET(req: NextRequest) {
-  const user = await getSessionUser()
-  if (!isAdmin(user)) {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 401 })
-  }
+  // Home 통계는 게스트 포함 전체 공개 (운영 결정 2026-06-15)
+  // 단, 상위 사용자 명단의 개인 식별 정보는 관리자에게만 (집계만 공개·개인항목 마스킹)
+  const admin = isAdmin(await getSessionUser())
 
   const { searchParams } = new URL(req.url)
   const raw = Number(searchParams.get('period') ?? '30')
@@ -50,8 +50,11 @@ export async function GET(req: NextRequest) {
   const topUsers: TopUser[] = (
     (topUsersResult.data as TopUser[] | null) ?? []
   ).map((row) => ({
-    usr_id: row.usr_id,
-    display_nm: row.display_nm ?? '(이름 없음)',
+    // 비관리자: UID 제거 + 이름 마스킹 (개인 식별 차단, 활동 점수는 공개)
+    usr_id: admin ? row.usr_id : '',
+    display_nm: admin
+      ? (row.display_nm ?? '(이름 없음)')
+      : maskDisplayName(row.display_nm),
     activity_days: Number(row.activity_days),
     content_cnt: Number(row.content_cnt),
     action_cnt: Number(row.action_cnt),

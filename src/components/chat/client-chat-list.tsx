@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { Link } from '@/i18n/navigation'
 import { usePiAuth } from '@/components/pi-auth-provider'
 import { piFetch } from '@/lib/pi-fetch'
 import { readCache, writeCache } from '@/lib/client-cache'
@@ -31,10 +30,10 @@ export function ClientChatList() {
   const [error, setError] = useState(false)
 
   useEffect(() => {
-    // 인증 완료(setPiToken→setUser) 전에는 토큰이 없어 401이 나므로 user 확정 후 로드
-    if (!user) return
+    // 인증 진행 중엔 대기(토큰 확정 후 호출해야 401 방지). 비로그인(게스트)도 공개 카페는 로드한다.
+    if (authLoading) return
     let cancelled = false
-    const cacheKey = `chat_list_${user.userId}`
+    const cacheKey = user ? `chat_list_${user.userId}` : 'chat_list_guest'
 
     const apply = (data: RoomsPayload) => {
       const mine = data.rooms ?? []
@@ -73,7 +72,7 @@ export function ClientChatList() {
     return () => {
       cancelled = true
     }
-  }, [user])
+  }, [user, authLoading])
 
   // Pi SDK 인증 진행 중
   if (authLoading) {
@@ -83,22 +82,7 @@ export function ClientChatList() {
       </div>
     )
   }
-  // 인증이 끝났는데도 신원 없음 → 비로그인 (일반 브라우저 로그아웃 상태 등)
-  if (!user) {
-    return (
-      <div className="py-20 text-center">
-        <p className="text-muted-foreground text-sm">
-          {t('loginRequired')}
-        </p>
-        <Link
-          href="/"
-          className="text-primary mt-2 inline-block text-sm underline"
-        >
-          {t('goHome')}
-        </Link>
-      </div>
-    )
-  }
+  // 비로그인(게스트)도 공개 카페 목록을 볼 수 있다 — '내 카페'는 비어 있고 공개 카페만 노출
   if (error) {
     return (
       <div className="text-muted-foreground py-20 text-center text-sm">

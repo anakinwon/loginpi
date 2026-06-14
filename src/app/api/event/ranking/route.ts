@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSessionUser } from '@/lib/auth-check'
+import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getEventRanking } from '@/lib/event'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 
 // GET /api/event/ranking?limit=100 — 미션 합계 내림차순 랭킹 + M1~M10 체크리스트 (제외 대상자 필터링됨)
 export async function GET(request: NextRequest) {
+  // 비로그인도 랭킹 조회 가능 (Shop처럼 공개) — 마스킹/관리자 기능은 is_admin으로 분기
   const user = await getSessionUser()
-  if (!user) {
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
-  }
 
   const { searchParams } = new URL(request.url)
   const limit = Math.min(Number(searchParams.get('limit') ?? '100'), 200)
@@ -52,7 +50,10 @@ export async function GET(request: NextRequest) {
       },
     }))
 
-    return NextResponse.json({ ranking: rankingWithMissions })
+    return NextResponse.json({
+      ranking: rankingWithMissions,
+      is_admin: user ? isAdmin(user) : false,
+    })
   } catch (err) {
     console.error('[event/ranking] 조회 실패:', err)
     return NextResponse.json({ error: '랭킹 조회 실패' }, { status: 500 })

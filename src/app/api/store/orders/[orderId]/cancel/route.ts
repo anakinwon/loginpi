@@ -67,21 +67,18 @@ export async function POST(
   })
 
   // M7/M8: 거래 취소 미션 기록 (판매자 vs 구매자 판별)
+  // result.order는 MpsOrder 타입 — 실제 컬럼명 seller_id/buyer_id를 직접 구조분해(오타 방지)
   if (result.order) {
-    const order = result.order as unknown
-    const orderObj = order as Record<string, unknown>
+    const { seller_id, buyer_id } = result.order
 
-    const seller_usr_id = String(orderObj?.seller_usr_id ?? '')
-    const buyer_usr_id = String(orderObj?.buyer_usr_id ?? '')
-
-    if (user.id === seller_usr_id) {
+    if (user.id === seller_id) {
       // M7: 판매자 거래 취소
       recordUserAction('seller_cancel', user.id, { order_id: orderId })
-        .catch(err => console.error(`[M7] 미션 기록 실패: ${err.message}`))
-    } else if (user.id === buyer_usr_id) {
+        .catch((err) => console.error(`[M7] 미션 기록 실패: ${err.message}`))
+    } else if (user.id === buyer_id) {
       // M8: 구매자 거래 취소
       recordUserAction('buyer_cancel', user.id, { order_id: orderId })
-        .catch(err => console.error(`[M8] 미션 기록 실패: ${err.message}`))
+        .catch((err) => console.error(`[M8] 미션 기록 실패: ${err.message}`))
     }
   }
 

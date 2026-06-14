@@ -69,7 +69,17 @@ export async function POST(request: NextRequest) {
     reason?: string
   }
 
-  if (!pi_username?.trim()) {
+  // 콤마로 구분된 다중 입력 지원 (단일 입력도 동일 경로) — 공백 제거 + 중복 제거
+  const names = [
+    ...new Set(
+      (pi_username ?? '')
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean),
+    ),
+  ]
+
+  if (names.length === 0) {
     return NextResponse.json(
       { error: 'Pi 사용자명을 입력해주세요' },
       { status: 400 },
@@ -80,51 +90,50 @@ export async function POST(request: NextRequest) {
     const db = getSupabaseAdmin()
     const slug = user.display_name.slice(0, 20)
 
-    // pi_username으로 요원(sys_user) 조회
-    const { data: target, error: targetErr } = await db
-      .from('sys_user')
-      .select('id, nick_nm, display_name, pi_username')
-      .eq('pi_username', pi_username.trim())
-      .maybeSingle()
-    if (targetErr) throw targetErr
-    if (!target) {
-      return NextResponse.json(
-        { error: `Pi 사용자명 '${pi_username.trim()}'을 찾을 수 없습니다` },
-        { status: 404 },
-      )
-    }
+    const added: string[] = [] // 신규 제외 완료
+    const already: string[] = [] // 이미 제외됨
+    const notFound: string[] = [] // 요원 미발견
 
-    // 이미 제외 대상자인지 확인
-    const { data: existing, error: checkErr } = await db
-      .from('evt_exclude')
-      .select('evt_exclude_id')
-      .eq('event_id', 'evt-20260614-001')
-      .eq('user_id', target.id)
-      .eq('del_yn', 'N')
-      .maybeSingle()
-    if (checkErr) throw checkErr
-    if (existing) {
-      return NextResponse.json(
-        { error: '이미 제외된 요원입니다' },
-        { status: 409 },
-      )
-    }
+    for (const name of names) {
+      // pi_username으로 요원(sys_user) 조회
+      const { data: target, error: targetErr } = await db
+        .from('sys_user')
+        .select('id, pi_username')
+        .eq('pi_username', name)
+        .maybeSingle()
+      if (targetErr) throw targetErr
+      if (!target) {
+        notFound.push(name)
+        continue
+      }
 
-    // 제외 대상자 추가
-    const { data, error } = await db
-      .from('evt_exclude')
-      .insert({
+      // 이미 제외 대상자인지 확인
+      const { data: existing, error: checkErr } = await db
+        .from('evt_exclude')
+        .select('evt_exclude_id')
+        .eq('event_id', 'evt-20260614-001')
+        .eq('user_id', target.id)
+        .eq('del_yn', 'N')
+        .maybeSingle()
+      if (checkErr) throw checkErr
+      if (existing) {
+        already.push(name)
+        continue
+      }
+
+      // 제외 대상자 추가
+      const { error } = await db.from('evt_exclude').insert({
         event_id: 'evt-20260614-001',
         user_id: target.id,
         exclude_reason_tx: reason?.trim() || '관리자 판단',
         regr_id: slug,
         modr_id: slug,
       })
-      .select()
-      .maybeSingle()
-    if (error) throw error
+      if (error) throw error
+      added.push(name)
+    }
 
-    return NextResponse.json({ excluded: data }, { status: 201 })
+    return NextResponse.json({ added, already, notFound }, { status: 201 })
   } catch (err) {
     console.error('[admin/event/exclude] POST 실패:', err)
     return NextResponse.json({ error: '제외 추가 실패' }, { status: 500 })

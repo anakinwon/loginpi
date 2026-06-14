@@ -34,25 +34,26 @@ export default function AdminEventExcludePage() {
   const [deleting, setDeleting] = useState<Record<string, boolean>>({})
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    const fetchExcluded = async () => {
-      try {
-        const res = await piFetch('/api/admin/event/exclude')
-        if (!res.ok) {
-          setError('제외 대상자 목록 로드 실패')
-          return
-        }
-        const data = await res.json()
-        setExcluded(data.excluded ?? [])
-      } catch (err) {
-        console.error('Fetch error:', err)
-        setError('네트워크 오류')
-      } finally {
-        setLoading(false)
+  const fetchExcluded = async () => {
+    try {
+      const res = await piFetch('/api/admin/event/exclude')
+      if (!res.ok) {
+        setError('제외 대상자 목록 로드 실패')
+        return
       }
+      const data = await res.json()
+      setExcluded(data.excluded ?? [])
+    } catch (err) {
+      console.error('Fetch error:', err)
+      setError('네트워크 오류')
+    } finally {
+      setLoading(false)
     }
+  }
 
+  useEffect(() => {
     fetchExcluded()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleAddExclude = async () => {
@@ -78,7 +79,16 @@ export default function AdminEventExcludePage() {
         return
       }
 
-      setExcluded((prev) => [data.excluded, ...prev])
+      // 새 응답 형식: { added, already, notFound } (콤마 다중 입력 지원)
+      const msgs: string[] = []
+      if (data.added?.length) msgs.push(`제외 ${data.added.length}명`)
+      if (data.already?.length)
+        msgs.push(`이미 제외: ${data.already.join(', ')}`)
+      if (data.notFound?.length)
+        msgs.push(`미발견: ${data.notFound.join(', ')}`)
+      if (msgs.length) alert(msgs.join('\n'))
+
+      await fetchExcluded()
       setPiUsername('')
       setReason('')
     } catch (err) {

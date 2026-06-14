@@ -103,11 +103,12 @@ async function attachOpenBetYn(lists: RoomRow[][]): Promise<RoomRow[][]> {
 
 // 카페 목록 통합 조회 — 내 카페·공개 카페 병렬 + Bet 뱃지 1쿼리
 export async function getChatRoomLists(
-  userId: string,
+  userId: string | null,
   includePublic: boolean,
 ): Promise<{ rooms: RoomRow[]; publicRooms: RoomRow[] }> {
   const [myRooms, publicRooms] = await Promise.all([
-    listMyRooms(userId),
+    // 비로그인(게스트)은 내 카페 없음 — 공개 카페만 노출
+    userId ? listMyRooms(userId) : Promise.resolve([] as RoomRow[]),
     includePublic ? listPublicRooms(10) : Promise.resolve([] as RoomRow[]),
   ])
   const [roomsWithBet, publicWithBet] = await attachOpenBetYn([

@@ -62,7 +62,7 @@ function TopUsersList({
     <div className="space-y-3">
       <ol className="space-y-2">
         {users.map((u, i) => (
-          <li key={u.usr_id} className="flex items-center gap-2 text-sm">
+          <li key={u.usr_id || i} className="flex items-center gap-2 text-sm">
             <span className="text-base">{MEDALS[i] ?? `${i + 1}.`}</span>
             <div className="min-w-0 flex-1">
               <p className="truncate font-medium">{u.display_nm}</p>
@@ -162,7 +162,7 @@ function TopSpendersList({
   return (
     <ol className="space-y-2">
       {spenders.map((s, i) => (
-        <li key={s.usr_id} className="flex items-center gap-2 text-sm">
+        <li key={s.usr_id || i} className="flex items-center gap-2 text-sm">
           <span className="text-base">{MEDALS[i] ?? `${i + 1}.`}</span>
           <span className="min-w-0 flex-1 truncate font-medium">
             {s.display_nm}
