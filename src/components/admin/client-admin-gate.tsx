@@ -43,7 +43,9 @@ export function ClientAdminGate() {
         // hard navigation 필수 — Pi Browser WebView에서 soft navigation(router.replace)은
         // admin layout 서버 재실행을 안정적으로 일으키지 않아 x-pit-ticket 인증이 갱신되지 않고
         // 'checking' 상태로 멈춘다. 전체 문서 재요청으로 미들웨어→서버 인증을 확실히 태운다.
-        window.location.assign(url.pathname + url.search)
+        // origin 포함 절대 URL로 이동 — protocol-relative(//host) 오해석에 의한 open redirect 차단
+        // (url은 window.location 파생이라 same-origin이 보장됨)
+        window.location.assign(url.toString())
       })
       .catch(() => {
         navigating.current = false
