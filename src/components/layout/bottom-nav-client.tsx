@@ -1,7 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { Coffee, House, ShieldCheck, Store, UserRound } from 'lucide-react'
+import { Coffee, House, ShieldCheck, Store, UserRound, Zap } from 'lucide-react'
 import { Link, usePathname } from '@/i18n/navigation'
 import { usePiAuth } from '@/components/pi-auth-provider'
 import { cn } from '@/lib/utils'
@@ -38,12 +38,18 @@ export function BottomNavClient({ serverIsAdmin }: { serverIsAdmin: boolean }) {
       icon: Store,
       active: pathname.startsWith('/store'),
     },
+    {
+      href: '/event',
+      label: t('event'),
+      icon: Zap,
+      active: pathname.startsWith('/event'),
+    },
     { ...myTab, active: pathname.startsWith(myTab.href) },
   ]
 
   return (
     <nav className="bg-background/95 fixed inset-x-0 bottom-0 z-50 border-t pb-[env(safe-area-inset-bottom)] backdrop-blur-sm">
-      <div className="mx-auto grid h-16 max-w-5xl grid-cols-4">
+      <div className="mx-auto grid h-16 max-w-5xl grid-cols-5">
         {tabs.map((tab) => {
           const Icon = tab.icon
           return (
