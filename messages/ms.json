@@ -168,7 +168,8 @@
         "paymentId": "ID Pembayaran",
         "status": "Status",
         "theme": "Tema",
-        "user": "Pengguna"
+        "user": "Pengguna",
+        "txnDiv": "Jenis transaksi"
       },
       "noPayments": "Tiada sejarah pembayaran.",
       "status": {
@@ -178,12 +179,21 @@
         "error": "Ralat",
         "pending": "Menunggu"
       },
-      "theme": {
-        "subscription": "Langganan",
-        "unknown": "Lain-lain"
-      },
       "title": "Sejarah Pembayaran",
-      "totalCount": "Jumlah {count} transaksi · Jumlah selesai {total} π"
+      "totalCount": "Jumlah {count} transaksi · Jumlah selesai {total} π",
+      "txnDiv": {
+        "PRODUCT_PAY": "Bayaran produk",
+        "BOND_DEPOSIT": "Deposit jaminan",
+        "SUBSCRIPTION": "Langganan",
+        "ROOM_CREATE": "Cipta bilik",
+        "TIP": "Tip",
+        "BET": "Pertaruhan",
+        "ETC": "Lain-lain",
+        "REFUND": "Bayaran balik",
+        "CANCEL_FEE": "Yuran pembatalan",
+        "CANCEL_FEE_RECV": "Yuran diterima",
+        "SETTLEMENT": "Penyelesaian"
+      }
     },
     "std": {
       "approvals": {

@@ -168,7 +168,8 @@
         "paymentId": "Betaling ID",
         "status": "Status",
         "theme": "Tema",
-        "user": "Gebruiker"
+        "user": "Gebruiker",
+        "txnDiv": "Transaksietipe"
       },
       "noPayments": "Geen betalingsgeskiedenis nie.",
       "status": {
@@ -178,12 +179,21 @@
         "error": "Fout",
         "pending": "Hangende"
       },
-      "theme": {
-        "subscription": "Subskripsie",
-        "unknown": "Ander"
-      },
       "title": "Betalingsgeskiedenis",
-      "totalCount": "Totaal {count} items · Voltooide totaal {total} π"
+      "totalCount": "Totaal {count} items · Voltooide totaal {total} π",
+      "txnDiv": {
+        "PRODUCT_PAY": "Produkbetaling",
+        "BOND_DEPOSIT": "Borgdeposito",
+        "SUBSCRIPTION": "Intekening",
+        "ROOM_CREATE": "Kamerskepping",
+        "TIP": "Fooi",
+        "BET": "Weddenskap",
+        "ETC": "Ander",
+        "REFUND": "Terugbetaling",
+        "CANCEL_FEE": "Kansellasiefooi",
+        "CANCEL_FEE_RECV": "Fooi ontvang",
+        "SETTLEMENT": "Vereffening"
+      }
     },
     "std": {
       "approvals": {

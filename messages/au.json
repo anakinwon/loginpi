@@ -168,7 +168,8 @@
         "paymentId": "Payment ID",
         "status": "Status",
         "theme": "Theme",
-        "user": "User"
+        "user": "User",
+        "txnDiv": "Transaction type"
       },
       "noPayments": "No payment history found.",
       "status": {
@@ -178,12 +179,21 @@
         "error": "Error",
         "pending": "Pending"
       },
-      "theme": {
-        "subscription": "Subscription",
-        "unknown": "Other"
-      },
       "title": "Payment History",
-      "totalCount": "Total {count} transactions · Completed total {total} π"
+      "totalCount": "Total {count} transactions · Completed total {total} π",
+      "txnDiv": {
+        "PRODUCT_PAY": "Product payment",
+        "BOND_DEPOSIT": "Bond deposit",
+        "SUBSCRIPTION": "Subscription",
+        "ROOM_CREATE": "Room creation",
+        "TIP": "Tip",
+        "BET": "Bet",
+        "ETC": "Other",
+        "REFUND": "Refund",
+        "CANCEL_FEE": "Cancellation fee",
+        "CANCEL_FEE_RECV": "Fee received",
+        "SETTLEMENT": "Settlement"
+      }
     },
     "std": {
       "approvals": {

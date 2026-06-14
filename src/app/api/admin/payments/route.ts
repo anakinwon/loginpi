@@ -1,112 +1,34 @@
 import { NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { type TxnDivCd, pymntTypeToDiv, mpsTxnToDiv } from '@/lib/txn-div'
+
+// 결제 내역 = pi_pymnt(U2A 결제) + mps_txn_hist(취소·환불·수수료·정산) 통합.
+// 각 거래에 거래구분코드(txn_div_cd)를 부여해 단일 목록으로 반환한다.
+// ESCROW_IN은 pi_pymnt MPS_ESCROW와 동일 입금이라 mps 쪽에서 제외(mpsTxnToDiv가 null).
 
 interface PymntMeta {
   type?: string
-  theme_cd?: string
-  room_id?: string
-  pack_id?: string
 }
 
-interface PymntRow {
+interface UserRef {
+  display_name: string
+  nick_nm: string | null
+  real_nm: string | null
+  pi_username: string | null
+  google_email: string | null
+}
+
+interface UnifiedTxn {
   id: string
-  payment_id: string
-  txid: string | null
-  amount: number
+  source: 'pymnt' | 'mps'
+  txn_div_cd: TxnDivCd
+  amount: number // 부호 유지 — 환불/수령 양수, 수수료/정산 음수
   memo: string | null
-  status: string
-  metadata: PymntMeta | null
+  status: 'pending' | 'approved' | 'completed' | 'cancelled' | 'error'
+  payment_id: string | null
   reg_dtm: string
-  mod_dtm: string
-  sys_user: unknown
-}
-
-// 테마 판별 — fn_build_daily_stats(테마별 일별 매출)와 동일한 분류 규칙
-// 1) metadata.theme_cd 직접 지정 (CHAT_ROOM_CREATE·FEATURE_ADDON)
-// 2) CHAT_SUBSCR → SUBSCRIPTION 고정
-// 3) STICKER_PACK → msg_stkr_pack.theme_cd
-// 4) metadata.room_id → msg_room.theme_cd (PI_TIP·PI_BET·EVENT_ROOM_JOIN)
-// 5) CHAT_ROOM_CREATE인데 theme_cd 누락 → msg_room.pymnt_id 역참조 (018 보완 로직)
-// 6) 그 외 → UNKNOWN
-async function resolveThemes(
-  payments: PymntRow[],
-): Promise<Map<string, string>> {
-  const db = getSupabaseAdmin()
-
-  const roomIds = new Set<string>()
-  const packIds = new Set<string>()
-  const orphanRoomCreateIds = new Set<string>() // theme_cd 누락된 방 생성 결제
-
-  for (const p of payments) {
-    const m = p.metadata
-    if (!m || m.theme_cd) continue
-    if (m.type === 'STICKER_PACK' && m.pack_id) packIds.add(m.pack_id)
-    else if (m.room_id) roomIds.add(m.room_id)
-    else if (m.type === 'CHAT_ROOM_CREATE')
-      orphanRoomCreateIds.add(p.payment_id)
-  }
-
-  const [roomRes, packRes, orphanRes] = await Promise.all([
-    roomIds.size > 0
-      ? db
-          .from('msg_room')
-          .select('room_id, theme_cd')
-          .in('room_id', [...roomIds])
-      : Promise.resolve({ data: [] }),
-    packIds.size > 0
-      ? db
-          .from('msg_stkr_pack')
-          .select('pack_id, theme_cd')
-          .in('pack_id', [...packIds])
-      : Promise.resolve({ data: [] }),
-    orphanRoomCreateIds.size > 0
-      ? db
-          .from('msg_room')
-          .select('pymnt_id, theme_cd')
-          .in('pymnt_id', [...orphanRoomCreateIds])
-      : Promise.resolve({ data: [] }),
-  ])
-
-  const roomTheme = new Map(
-    (roomRes.data ?? []).map(
-      (r: { room_id: string; theme_cd: string | null }) => [
-        r.room_id,
-        r.theme_cd,
-      ],
-    ),
-  )
-  const packTheme = new Map(
-    (packRes.data ?? []).map(
-      (r: { pack_id: string; theme_cd: string | null }) => [
-        r.pack_id,
-        r.theme_cd,
-      ],
-    ),
-  )
-  const orphanTheme = new Map(
-    (orphanRes.data ?? []).map(
-      (r: { pymnt_id: string; theme_cd: string | null }) => [
-        r.pymnt_id,
-        r.theme_cd,
-      ],
-    ),
-  )
-
-  const result = new Map<string, string>()
-  for (const p of payments) {
-    const m = p.metadata
-    let theme: string | null | undefined
-    if (m?.theme_cd) theme = m.theme_cd
-    else if (m?.type === 'CHAT_SUBSCR') theme = 'SUBSCRIPTION'
-    else if (m?.type === 'STICKER_PACK' && m.pack_id)
-      theme = packTheme.get(m.pack_id)
-    else if (m?.room_id) theme = roomTheme.get(m.room_id)
-    else if (m?.type === 'CHAT_ROOM_CREATE')
-      theme = orphanTheme.get(p.payment_id)
-    result.set(p.id, theme ?? 'UNKNOWN')
-  }
-  return result
+  sys_user: UserRef | null
 }
 
 export async function GET() {
@@ -116,54 +38,100 @@ export async function GET() {
   }
 
   const db = getSupabaseAdmin()
-  const [pymntRes, themeRes] = await Promise.all([
+
+  // 결제외 거래만(REFUND_IN·FEE·CANCEL_FEE_IN·RELEASE_OUT) — ESCROW_IN 제외
+  const [pymntRes, mpsRes] = await Promise.all([
     db
       .from('pi_pymnt')
       .select(
-        `
-        id,
-        payment_id,
-        txid,
-        amount,
-        memo,
-        status,
-        metadata,
-        reg_dtm,
-        mod_dtm,
-        sys_user ( display_name, pi_username, google_email )
-      `,
+        `id, payment_id, txid, amount, memo, status, metadata, reg_dtm,
+         sys_user ( display_name, nick_nm, real_nm, pi_username, google_email )`,
       )
       .order('reg_dtm', { ascending: false }),
-    db.from('msg_theme').select('theme_cd, theme_nm, theme_emoji'),
+    db
+      .from('mps_txn_hist')
+      .select('txn_id, user_id, txn_type_cd, pi_amt, pi_txid, memo, txn_dtm')
+      .eq('del_yn', 'N')
+      .in('txn_type_cd', ['REFUND_IN', 'FEE', 'CANCEL_FEE_IN', 'RELEASE_OUT'])
+      .order('txn_dtm', { ascending: false }),
   ])
 
   if (pymntRes.error) {
     return NextResponse.json({ error: '결제 내역 조회 실패' }, { status: 500 })
   }
 
-  const payments = (pymntRes.data ?? []) as unknown as PymntRow[]
-  const themeMap = await resolveThemes(payments)
-  const themeMst = new Map(
-    (themeRes.data ?? []).map(
-      (t: {
-        theme_cd: string
-        theme_nm: string | null
-        theme_emoji: string | null
-      }) => [t.theme_cd, t],
-    ),
-  )
+  // pi_pymnt → 통합 행
+  const pymntRows = (pymntRes.data ?? []) as unknown as Array<{
+    id: string
+    payment_id: string
+    amount: number
+    memo: string | null
+    status: UnifiedTxn['status']
+    metadata: PymntMeta | null
+    reg_dtm: string
+    sys_user: UserRef | null
+  }>
+  const pymntTxns: UnifiedTxn[] = pymntRows.map((p) => ({
+    id: p.id,
+    source: 'pymnt',
+    txn_div_cd: pymntTypeToDiv(p.metadata?.type),
+    amount: Number(p.amount),
+    memo: p.memo,
+    status: p.status,
+    payment_id: p.payment_id,
+    reg_dtm: p.reg_dtm,
+    sys_user: p.sys_user,
+  }))
 
-  const enriched = payments.map((p) => {
-    const themeCd = themeMap.get(p.id) ?? 'UNKNOWN'
-    const mst = themeMst.get(themeCd)
-    return {
-      ...p,
-      pymnt_type: p.metadata?.type ?? null,
-      theme_cd: themeCd,
-      theme_nm: mst?.theme_nm ?? null, // SUBSCRIPTION·UNKNOWN은 클라이언트에서 번역
-      theme_emoji: mst?.theme_emoji ?? null,
+  // mps_txn_hist → 통합 행 (user_id로 sys_user 수동 조인)
+  const mpsRows = (mpsRes.data ?? []) as Array<{
+    txn_id: string
+    user_id: string
+    txn_type_cd: string
+    pi_amt: number
+    pi_txid: string | null
+    memo: string | null
+    txn_dtm: string
+  }>
+  const userIds = [...new Set(mpsRows.map((r) => r.user_id))]
+  const userMap = new Map<string, UserRef>()
+  if (userIds.length > 0) {
+    const { data: users } = await db
+      .from('sys_user')
+      .select('id, display_name, nick_nm, real_nm, pi_username, google_email')
+      .in('id', userIds)
+    for (const u of (users ?? []) as Array<{ id: string } & UserRef>) {
+      userMap.set(u.id, {
+        display_name: u.display_name,
+        nick_nm: u.nick_nm,
+        real_nm: u.real_nm,
+        pi_username: u.pi_username,
+        google_email: u.google_email,
+      })
     }
+  }
+  const mpsTxns: UnifiedTxn[] = mpsRows.flatMap((r) => {
+    const div = mpsTxnToDiv(r.txn_type_cd)
+    if (!div) return [] // 결제 중복/대상 외
+    return [
+      {
+        id: r.txn_id,
+        source: 'mps' as const,
+        txn_div_cd: div,
+        amount: Number(r.pi_amt),
+        memo: r.memo,
+        status: 'completed' as const, // mps 거래는 이미 완료
+        payment_id: r.pi_txid,
+        reg_dtm: r.txn_dtm,
+        sys_user: userMap.get(r.user_id) ?? null,
+      },
+    ]
   })
 
-  return NextResponse.json({ payments: enriched })
+  // 통합 + 일시 내림차순 정렬
+  const txns = [...pymntTxns, ...mpsTxns].sort((a, b) =>
+    a.reg_dtm < b.reg_dtm ? 1 : a.reg_dtm > b.reg_dtm ? -1 : 0,
+  )
+
+  return NextResponse.json({ payments: txns })
 }

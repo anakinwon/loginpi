@@ -168,7 +168,8 @@
         "paymentId": "ID thanh toán",
         "status": "Trạng thái",
         "theme": "Theme",
-        "user": "Người dùng"
+        "user": "Người dùng",
+        "txnDiv": "Loại giao dịch"
       },
       "noPayments": "Không có lịch sử thanh toán.",
       "status": {
@@ -178,12 +179,21 @@
         "error": "Lỗi",
         "pending": "Đang chờ"
       },
-      "theme": {
-        "subscription": "Đăng ký",
-        "unknown": "Khác"
-      },
       "title": "Lịch sử thanh toán",
-      "totalCount": "Tổng cộng {count} giao dịch · Tổng số đã hoàn thành {total} π"
+      "totalCount": "Tổng cộng {count} giao dịch · Tổng số đã hoàn thành {total} π",
+      "txnDiv": {
+        "PRODUCT_PAY": "Thanh toán sản phẩm",
+        "BOND_DEPOSIT": "Đặt cọc bảo đảm",
+        "SUBSCRIPTION": "Đăng ký",
+        "ROOM_CREATE": "Tạo phòng",
+        "TIP": "Tiền boa",
+        "BET": "Đặt cược",
+        "ETC": "Khác",
+        "REFUND": "Hoàn tiền",
+        "CANCEL_FEE": "Phí hủy",
+        "CANCEL_FEE_RECV": "Phí nhận được",
+        "SETTLEMENT": "Quyết toán"
+      }
     },
     "std": {
       "approvals": {

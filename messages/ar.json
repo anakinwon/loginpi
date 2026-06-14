@@ -168,7 +168,8 @@
         "paymentId": "ID الدفع",
         "status": "الحالة",
         "theme": "Theme",
-        "user": "المستخدم"
+        "user": "المستخدم",
+        "txnDiv": "نوع المعاملة"
       },
       "noPayments": "لا يوجد سجل مدفوعات.",
       "status": {
@@ -178,12 +179,21 @@
         "error": "خطأ",
         "pending": "معلق"
       },
-      "theme": {
-        "subscription": "اشتراك",
-        "unknown": "أخرى"
-      },
       "title": "سجل المدفوعات",
-      "totalCount": "إجمالي {count} معاملة · إجمالي المكتمل {total} π"
+      "totalCount": "إجمالي {count} معاملة · إجمالي المكتمل {total} π",
+      "txnDiv": {
+        "PRODUCT_PAY": "دفع المنتج",
+        "BOND_DEPOSIT": "إيداع الضمان",
+        "SUBSCRIPTION": "اشتراك",
+        "ROOM_CREATE": "إنشاء غرفة",
+        "TIP": "إكرامية",
+        "BET": "رهان",
+        "ETC": "أخرى",
+        "REFUND": "استرداد",
+        "CANCEL_FEE": "رسوم الإلغاء",
+        "CANCEL_FEE_RECV": "رسوم مستلمة",
+        "SETTLEMENT": "تسوية"
+      }
     },
     "std": {
       "approvals": {

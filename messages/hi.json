@@ -168,7 +168,8 @@
         "paymentId": "भुगतान ID",
         "status": "स्थिति",
         "theme": "Theme",
-        "user": "उपयोगकर्ता"
+        "user": "उपयोगकर्ता",
+        "txnDiv": "लेन-देन प्रकार"
       },
       "noPayments": "कोई भुगतान इतिहास नहीं है।",
       "status": {
@@ -178,12 +179,21 @@
         "error": "त्रुटि",
         "pending": "लंबित"
       },
-      "theme": {
-        "subscription": "सदस्यता",
-        "unknown": "अन्य"
-      },
       "title": "भुगतान इतिहास",
-      "totalCount": "कुल {count} आइटम · पूर्ण योग {total} π"
+      "totalCount": "कुल {count} आइटम · पूर्ण योग {total} π",
+      "txnDiv": {
+        "PRODUCT_PAY": "उत्पाद भुगतान",
+        "BOND_DEPOSIT": "जमा राशि",
+        "SUBSCRIPTION": "सदस्यता",
+        "ROOM_CREATE": "कक्ष निर्माण",
+        "TIP": "टिप",
+        "BET": "सट्टा",
+        "ETC": "अन्य",
+        "REFUND": "धनवापसी",
+        "CANCEL_FEE": "रद्दीकरण शुल्क",
+        "CANCEL_FEE_RECV": "शुल्क प्राप्त",
+        "SETTLEMENT": "निपटान"
+      }
     },
     "std": {
       "approvals": {

@@ -680,6 +680,7 @@
       "title": "결제 내역",
       "totalCount": "전체 {count}건 · 완료 합계 {total} π",
       "noPayments": "결제 내역이 없습니다.",
+      "searchPiUsername": "Pi 사용자명 검색 (앞부분 일치)",
       "status": {
         "completed": "완료",
         "approved": "승인",
@@ -690,15 +691,24 @@
       "col": {
         "user": "사용자",
         "amount": "금액",
-        "theme": "테마",
+        "txnDiv": "거래 구분",
         "memo": "메모",
         "status": "상태",
         "paymentId": "결제 ID",
         "date": "일시"
       },
-      "theme": {
-        "subscription": "구독",
-        "unknown": "기타"
+      "txnDiv": {
+        "PRODUCT_PAY": "상품 결제",
+        "BOND_DEPOSIT": "보증금 예치",
+        "SUBSCRIPTION": "구독",
+        "ROOM_CREATE": "방 생성",
+        "TIP": "팁",
+        "BET": "베팅",
+        "ETC": "기타",
+        "REFUND": "환불",
+        "CANCEL_FEE": "취소수수료",
+        "CANCEL_FEE_RECV": "취소수수료 수령",
+        "SETTLEMENT": "정산 출금"
       }
     },
     "links": {

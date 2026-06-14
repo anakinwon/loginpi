@@ -168,7 +168,8 @@
         "paymentId": "Payment ID",
         "status": "สถานะ",
         "theme": "Theme",
-        "user": "ผู้ใช้"
+        "user": "ผู้ใช้",
+        "txnDiv": "ประเภทธุรกรรม"
       },
       "noPayments": "ไม่มีประวัติการชำระเงิน",
       "status": {
@@ -178,12 +179,21 @@
         "error": "ข้อผิดพลาด",
         "pending": "รอดำเนินการ"
       },
-      "theme": {
-        "subscription": "การสมัครสมาชิก",
-        "unknown": "อื่น ๆ"
-      },
       "title": "ประวัติการชำระเงิน",
-      "totalCount": "ทั้งหมด {count} รายการ · ยอดรวมที่เสร็จสมบูรณ์ {total} π"
+      "totalCount": "ทั้งหมด {count} รายการ · ยอดรวมที่เสร็จสมบูรณ์ {total} π",
+      "txnDiv": {
+        "PRODUCT_PAY": "ชำระค่าสินค้า",
+        "BOND_DEPOSIT": "เงินมัดจำ",
+        "SUBSCRIPTION": "สมัครสมาชิก",
+        "ROOM_CREATE": "สร้างห้อง",
+        "TIP": "ทิป",
+        "BET": "เดิมพัน",
+        "ETC": "อื่นๆ",
+        "REFUND": "คืนเงิน",
+        "CANCEL_FEE": "ค่าธรรมเนียมยกเลิก",
+        "CANCEL_FEE_RECV": "รับค่าธรรมเนียม",
+        "SETTLEMENT": "ชำระบัญชี"
+      }
     },
     "std": {
       "approvals": {

@@ -168,7 +168,8 @@
         "paymentId": "支付 ID",
         "status": "状态",
         "theme": "Theme",
-        "user": "用户"
+        "user": "用户",
+        "txnDiv": "交易类型"
       },
       "noPayments": "没有支付记录。",
       "status": {
@@ -178,12 +179,21 @@
         "error": "错误",
         "pending": "待处理"
       },
-      "theme": {
-        "subscription": "订阅",
-        "unknown": "其他"
-      },
       "title": "支付记录",
-      "totalCount": "共 {count} 笔 · 完成总计 {total} π"
+      "totalCount": "共 {count} 笔 · 完成总计 {total} π",
+      "txnDiv": {
+        "PRODUCT_PAY": "商品支付",
+        "BOND_DEPOSIT": "保证金存入",
+        "SUBSCRIPTION": "订阅",
+        "ROOM_CREATE": "创建房间",
+        "TIP": "打赏",
+        "BET": "投注",
+        "ETC": "其他",
+        "REFUND": "退款",
+        "CANCEL_FEE": "取消手续费",
+        "CANCEL_FEE_RECV": "手续费收取",
+        "SETTLEMENT": "结算提现"
+      }
     },
     "std": {
       "approvals": {

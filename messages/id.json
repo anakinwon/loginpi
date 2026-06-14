@@ -168,7 +168,8 @@
         "paymentId": "ID Pembayaran",
         "status": "Status",
         "theme": "Tema",
-        "user": "Pengguna"
+        "user": "Pengguna",
+        "txnDiv": "Jenis transaksi"
       },
       "noPayments": "Tidak ada riwayat pembayaran.",
       "status": {
@@ -178,12 +179,21 @@
         "error": "Error",
         "pending": "Tertunda"
       },
-      "theme": {
-        "subscription": "Langganan",
-        "unknown": "Lainnya"
-      },
       "title": "Riwayat Pembayaran",
-      "totalCount": "Total {count} item · Total Selesai {total} π"
+      "totalCount": "Total {count} item · Total Selesai {total} π",
+      "txnDiv": {
+        "PRODUCT_PAY": "Pembayaran produk",
+        "BOND_DEPOSIT": "Setoran jaminan",
+        "SUBSCRIPTION": "Langganan",
+        "ROOM_CREATE": "Buat ruang",
+        "TIP": "Tip",
+        "BET": "Taruhan",
+        "ETC": "Lainnya",
+        "REFUND": "Pengembalian dana",
+        "CANCEL_FEE": "Biaya pembatalan",
+        "CANCEL_FEE_RECV": "Biaya diterima",
+        "SETTLEMENT": "Penyelesaian"
+      }
     },
     "std": {
       "approvals": {

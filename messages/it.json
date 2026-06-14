@@ -168,7 +168,8 @@
         "paymentId": "ID Pagamento",
         "status": "Stato",
         "theme": "Tema",
-        "user": "Utente"
+        "user": "Utente",
+        "txnDiv": "Tipo di transazione"
       },
       "noPayments": "Nessun storico pagamenti.",
       "status": {
@@ -178,12 +179,21 @@
         "error": "Errore",
         "pending": "In sospeso"
       },
-      "theme": {
-        "subscription": "Abbonamento",
-        "unknown": "Altro"
-      },
       "title": "Storico pagamenti",
-      "totalCount": "Totale {count} transazioni · Completato {total} π"
+      "totalCount": "Totale {count} transazioni · Completato {total} π",
+      "txnDiv": {
+        "PRODUCT_PAY": "Pagamento prodotto",
+        "BOND_DEPOSIT": "Deposito cauzionale",
+        "SUBSCRIPTION": "Abbonamento",
+        "ROOM_CREATE": "Creazione stanza",
+        "TIP": "Mancia",
+        "BET": "Scommessa",
+        "ETC": "Altro",
+        "REFUND": "Rimborso",
+        "CANCEL_FEE": "Commissione di annullamento",
+        "CANCEL_FEE_RECV": "Commissione ricevuta",
+        "SETTLEMENT": "Liquidazione"
+      }
     },
     "std": {
       "approvals": {

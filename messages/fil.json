@@ -168,7 +168,8 @@
         "paymentId": "Payment ID",
         "status": "Status",
         "theme": "Tema",
-        "user": "User"
+        "user": "User",
+        "txnDiv": "Uri ng transaksyon"
       },
       "noPayments": "Walang Kasaysayan ng Bayad",
       "status": {
@@ -178,12 +179,21 @@
         "error": "Error",
         "pending": "Nakabinbin"
       },
-      "theme": {
-        "subscription": "Subscription",
-        "unknown": "Iba pa"
-      },
       "title": "Kasaysayan ng Bayad",
-      "totalCount": "Kabuuang {count} Item · Kabuuang Kumpleto {total} π"
+      "totalCount": "Kabuuang {count} Item · Kabuuang Kumpleto {total} π",
+      "txnDiv": {
+        "PRODUCT_PAY": "Bayad sa produkto",
+        "BOND_DEPOSIT": "Deposito ng garantiya",
+        "SUBSCRIPTION": "Subscription",
+        "ROOM_CREATE": "Paggawa ng room",
+        "TIP": "Tip",
+        "BET": "Taya",
+        "ETC": "Iba pa",
+        "REFUND": "Refund",
+        "CANCEL_FEE": "Bayad sa pagkansela",
+        "CANCEL_FEE_RECV": "Bayad na natanggap",
+        "SETTLEMENT": "Settlement"
+      }
     },
     "std": {
       "approvals": {

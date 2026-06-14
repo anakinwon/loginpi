@@ -168,7 +168,8 @@
         "paymentId": "מזהה תשלום",
         "status": "סטטוס",
         "theme": "Theme",
-        "user": "משתמש"
+        "user": "משתמש",
+        "txnDiv": "סוג עסקה"
       },
       "noPayments": "אין היסטוריית תשלומים.",
       "status": {
@@ -178,12 +179,21 @@
         "error": "שגיאה",
         "pending": "ממתין"
       },
-      "theme": {
-        "subscription": "מינוי",
-        "unknown": "אחר"
-      },
       "title": "היסטוריית תשלומים",
-      "totalCount": "סה\"כ {count} פריטים · סכום שהושלם {total} π"
+      "totalCount": "סה\"כ {count} פריטים · סכום שהושלם {total} π",
+      "txnDiv": {
+        "PRODUCT_PAY": "תשלום מוצר",
+        "BOND_DEPOSIT": "פיקדון ערבות",
+        "SUBSCRIPTION": "מנוי",
+        "ROOM_CREATE": "יצירת חדר",
+        "TIP": "טיפ",
+        "BET": "הימור",
+        "ETC": "אחר",
+        "REFUND": "החזר",
+        "CANCEL_FEE": "דמי ביטול",
+        "CANCEL_FEE_RECV": "עמלה התקבלה",
+        "SETTLEMENT": "סילוק"
+      }
     },
     "std": {
       "approvals": {

@@ -168,7 +168,8 @@
         "paymentId": "決済 ID",
         "status": "ステータス",
         "theme": "Theme",
-        "user": "ユーザー"
+        "user": "ユーザー",
+        "txnDiv": "取引区分"
       },
       "noPayments": "支払い履歴がありません。",
       "status": {
@@ -178,12 +179,21 @@
         "error": "エラー",
         "pending": "待機"
       },
-      "theme": {
-        "subscription": "購読",
-        "unknown": "その他"
-      },
       "title": "支払い履歴",
-      "totalCount": "全 {count}件 · 完了合計 {total} π"
+      "totalCount": "全 {count}件 · 完了合計 {total} π",
+      "txnDiv": {
+        "PRODUCT_PAY": "商品決済",
+        "BOND_DEPOSIT": "保証金預入",
+        "SUBSCRIPTION": "サブスク",
+        "ROOM_CREATE": "ルーム作成",
+        "TIP": "チップ",
+        "BET": "ベット",
+        "ETC": "その他",
+        "REFUND": "返金",
+        "CANCEL_FEE": "キャンセル手数料",
+        "CANCEL_FEE_RECV": "手数料受取",
+        "SETTLEMENT": "精算出金"
+      }
     },
     "std": {
       "approvals": {

@@ -168,7 +168,8 @@
         "paymentId": "Zahlungs-ID",
         "status": "Status",
         "theme": "Thema",
-        "user": "Benutzer"
+        "user": "Benutzer",
+        "txnDiv": "Transaktionstyp"
       },
       "noPayments": "Keine Zahlungen vorhanden.",
       "status": {
@@ -178,12 +179,21 @@
         "error": "Fehler",
         "pending": "Ausstehend"
       },
-      "theme": {
-        "subscription": "Abonnement",
-        "unknown": "Sonstiges"
-      },
       "title": "Zahlungsverlauf",
-      "totalCount": "Insgesamt {count} Transaktionen · Gesamtabschluss {total} π"
+      "totalCount": "Insgesamt {count} Transaktionen · Gesamtabschluss {total} π",
+      "txnDiv": {
+        "PRODUCT_PAY": "Produktzahlung",
+        "BOND_DEPOSIT": "Kaution",
+        "SUBSCRIPTION": "Abonnement",
+        "ROOM_CREATE": "Raumerstellung",
+        "TIP": "Trinkgeld",
+        "BET": "Wette",
+        "ETC": "Sonstige",
+        "REFUND": "Rückerstattung",
+        "CANCEL_FEE": "Stornogebühr",
+        "CANCEL_FEE_RECV": "Gebühr erhalten",
+        "SETTLEMENT": "Abrechnung"
+      }
     },
     "std": {
       "approvals": {

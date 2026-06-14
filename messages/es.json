@@ -168,7 +168,8 @@
         "paymentId": "ID de pago",
         "status": "Estado",
         "theme": "Tema",
-        "user": "Usuario"
+        "user": "Usuario",
+        "txnDiv": "Tipo de transacción"
       },
       "noPayments": "No hay historial de pagos.",
       "status": {
@@ -178,12 +179,21 @@
         "error": "Error",
         "pending": "Pendiente"
       },
-      "theme": {
-        "subscription": "Suscripción",
-        "unknown": "Otro"
-      },
       "title": "Historial de pagos",
-      "totalCount": "Total {count} transacciones · Suma completada {total} π"
+      "totalCount": "Total {count} transacciones · Suma completada {total} π",
+      "txnDiv": {
+        "PRODUCT_PAY": "Pago de producto",
+        "BOND_DEPOSIT": "Depósito de garantía",
+        "SUBSCRIPTION": "Suscripción",
+        "ROOM_CREATE": "Creación de sala",
+        "TIP": "Propina",
+        "BET": "Apuesta",
+        "ETC": "Otro",
+        "REFUND": "Reembolso",
+        "CANCEL_FEE": "Tarifa de cancelación",
+        "CANCEL_FEE_RECV": "Tarifa recibida",
+        "SETTLEMENT": "Liquidación"
+      }
     },
     "std": {
       "approvals": {

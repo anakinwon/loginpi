@@ -168,7 +168,8 @@
         "paymentId": "Makse ID",
         "status": "Olek",
         "theme": "Teema",
-        "user": "Kasutaja"
+        "user": "Kasutaja",
+        "txnDiv": "Tehingu tüüp"
       },
       "noPayments": "Maksete ajalugu pole.",
       "status": {
@@ -178,12 +179,21 @@
         "error": "Viga",
         "pending": "Ootel"
       },
-      "theme": {
-        "subscription": "Tellimus",
-        "unknown": "Muu"
-      },
       "title": "Maksete ajalugu",
-      "totalCount": "Kokku {count} kirjet · Lõpetatud kokku {total} π"
+      "totalCount": "Kokku {count} kirjet · Lõpetatud kokku {total} π",
+      "txnDiv": {
+        "PRODUCT_PAY": "Toote makse",
+        "BOND_DEPOSIT": "Tagatisraha",
+        "SUBSCRIPTION": "Tellimus",
+        "ROOM_CREATE": "Toa loomine",
+        "TIP": "Jootraha",
+        "BET": "Panus",
+        "ETC": "Muu",
+        "REFUND": "Tagasimakse",
+        "CANCEL_FEE": "Tühistustasu",
+        "CANCEL_FEE_RECV": "Tasu saadud",
+        "SETTLEMENT": "Arveldus"
+      }
     },
     "std": {
       "approvals": {

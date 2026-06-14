@@ -168,7 +168,8 @@
         "paymentId": "ID de paiement",
         "status": "Statut",
         "theme": "Thème",
-        "user": "Utilisateur"
+        "user": "Utilisateur",
+        "txnDiv": "Type de transaction"
       },
       "noPayments": "Aucun historique de paiement.",
       "status": {
@@ -178,12 +179,21 @@
         "error": "Erreur",
         "pending": "En attente"
       },
-      "theme": {
-        "subscription": "Abonnement",
-        "unknown": "Autre"
-      },
       "title": "Historique des paiements",
-      "totalCount": "Total {count} transactions · Total terminé {total} π"
+      "totalCount": "Total {count} transactions · Total terminé {total} π",
+      "txnDiv": {
+        "PRODUCT_PAY": "Paiement produit",
+        "BOND_DEPOSIT": "Dépôt de garantie",
+        "SUBSCRIPTION": "Abonnement",
+        "ROOM_CREATE": "Création de salon",
+        "TIP": "Pourboire",
+        "BET": "Pari",
+        "ETC": "Autre",
+        "REFUND": "Remboursement",
+        "CANCEL_FEE": "Frais d'annulation",
+        "CANCEL_FEE_RECV": "Frais reçus",
+        "SETTLEMENT": "Règlement"
+      }
     },
     "std": {
       "approvals": {
