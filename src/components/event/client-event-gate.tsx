@@ -28,6 +28,7 @@ interface Ranking {
   rank: number
   user_id: string
   nick_nm: string | null
+  pi_username: string | null
   mission_count: number
   first_complete_dtm: string
   missions: Record<string, boolean>
@@ -229,7 +230,9 @@ export function ClientEventGate() {
                     #{r.rank}
                   </td>
                   <td className="sticky left-12 z-10 bg-white p-2 dark:bg-slate-950">
-                    {r.nick_nm ?? '(이름 없음)'}
+                    {r.pi_username
+                      ? `@${r.pi_username}`
+                      : (r.nick_nm ?? '(이름 없음)')}
                   </td>
                   <td className="p-2 text-center font-bold">
                     {r.mission_count}/10

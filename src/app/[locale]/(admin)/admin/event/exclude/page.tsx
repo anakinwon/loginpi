@@ -13,15 +13,22 @@ interface ExcludedUser {
     id: string
     nick_nm: string | null
     display_name: string | null
+    pi_username: string | null
   }
   reason: string | null
   reg_dtm: string
 }
 
+// 요원명 표시 — pi_username 우선(@표기), 없으면 별명/이름 폴백
+function agentLabel(u: ExcludedUser['sys_user']): string {
+  if (u.pi_username) return `@${u.pi_username}`
+  return u.nick_nm || u.display_name || '(이름 없음)'
+}
+
 export default function AdminEventExcludePage() {
   const [loading, setLoading] = useState(true)
   const [excluded, setExcluded] = useState<ExcludedUser[]>([])
-  const [userId, setUserId] = useState('')
+  const [piUsername, setPiUsername] = useState('')
   const [reason, setReason] = useState('')
   const [adding, setAdding] = useState(false)
   const [deleting, setDeleting] = useState<Record<string, boolean>>({})
@@ -49,8 +56,8 @@ export default function AdminEventExcludePage() {
   }, [])
 
   const handleAddExclude = async () => {
-    if (!userId.trim()) {
-      alert('사용자 ID를 입력하세요')
+    if (!piUsername.trim()) {
+      alert('Pi 사용자명을 입력하세요')
       return
     }
 
@@ -59,21 +66,20 @@ export default function AdminEventExcludePage() {
       const res = await piFetch('/api/admin/event/exclude', {
         method: 'POST',
         body: JSON.stringify({
-          user_id: userId.trim(),
+          pi_username: piUsername.trim(),
           reason: reason.trim() || undefined,
         }),
       })
 
+      const data = await res.json()
       if (!res.ok) {
-        const data = await res.json()
         alert(data.error || '제외 추가 실패')
         setAdding(false)
         return
       }
 
-      const data = await res.json()
       setExcluded((prev) => [data.excluded, ...prev])
-      setUserId('')
+      setPiUsername('')
       setReason('')
     } catch (err) {
       console.error('Add error:', err)
@@ -83,8 +89,11 @@ export default function AdminEventExcludePage() {
     }
   }
 
+  // 제외 해제(다시 포함) — 논리삭제 해제
   const handleRemoveExclude = async (userId: string) => {
-    if (!window.confirm('이 사용자를 제외 목록에서 제거하시겠습니까?')) {
+    if (
+      !window.confirm('이 요원을 제외 목록에서 빼고 다시 랭킹에 포함할까요?')
+    ) {
       return
     }
 
@@ -119,7 +128,7 @@ export default function AdminEventExcludePage() {
   }
 
   if (error) {
-    return <div className="text-center py-10 text-red-600">{error}</div>
+    return <div className="py-10 text-center text-red-600">{error}</div>
   }
 
   return (
@@ -127,25 +136,33 @@ export default function AdminEventExcludePage() {
       <div>
         <h1 className="text-3xl font-bold">🚫 이벤트 제외 대상자 관리</h1>
         <p className="text-muted-foreground mt-2">
-          제외된 사용자는 이벤트 랭킹과 선물 대상에서 제외됩니다
+          제외된 요원은 이벤트 랭킹과 선물 대상에서 빠집니다. 해제하면 다시
+          포함됩니다.
         </p>
       </div>
 
-      {/* 제외 추가 */}
-      <div className="border rounded-lg p-6 bg-card space-y-4">
+      {/* 제외 추가 (Pi 사용자명 입력) */}
+      <div className="bg-card space-y-4 rounded-lg border p-6">
         <h2 className="text-lg font-semibold">제외 대상자 추가</h2>
         <div className="space-y-3">
           <div>
-            <label className="block text-sm font-medium mb-1">사용자 ID</label>
+            <label className="mb-1 block text-sm font-medium">
+              Pi 사용자명 (요원)
+            </label>
             <Input
-              placeholder="사용자의 UUID를 입력하세요"
-              value={userId}
-              onChange={(e) => setUserId(e.target.value)}
+              placeholder="제외할 요원의 Pi 사용자명 (예: anakin)"
+              value={piUsername}
+              onChange={(e) => setPiUsername(e.target.value)}
               disabled={adding}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleAddExclude()
+              }}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">사유 (선택)</label>
+            <label className="mb-1 block text-sm font-medium">
+              사유 (선택)
+            </label>
             <Input
               placeholder="제외 사유를 입력하세요"
               value={reason}
@@ -156,11 +173,11 @@ export default function AdminEventExcludePage() {
           <Button onClick={handleAddExclude} disabled={adding}>
             {adding ? (
               <>
-                <Loader2 className="size-4 animate-spin mr-2" />
+                <Loader2 className="mr-2 size-4 animate-spin" />
                 추가 중…
               </>
             ) : (
-              '추가'
+              '제외 추가'
             )}
           </Button>
         </div>
@@ -168,39 +185,40 @@ export default function AdminEventExcludePage() {
 
       {/* 제외 목록 */}
       <div>
-        <h2 className="text-lg font-semibold mb-4">
-          제외된 사용자 ({excluded.length}명)
+        <h2 className="mb-4 text-lg font-semibold">
+          제외된 요원 ({excluded.length}명)
         </h2>
         {excluded.length === 0 ? (
-          <div className="text-center py-10 text-muted-foreground border rounded-lg">
-            제외된 사용자가 없습니다
+          <div className="text-muted-foreground rounded-lg border py-10 text-center">
+            제외된 요원이 없습니다
           </div>
         ) : (
           <div className="space-y-2">
             {excluded.map((e) => (
               <div
                 key={e.user_id}
-                className="flex items-center justify-between p-4 border rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                className="bg-muted/50 hover:bg-muted flex items-center justify-between rounded-lg border p-4 transition-colors"
               >
                 <div className="flex-1">
-                  <p className="font-medium">
-                    {e.sys_user.nick_nm || e.sys_user.display_name || '(이름 없음)'}
-                  </p>
-                  <p className="text-xs font-mono text-muted-foreground">
-                    {e.user_id}
-                  </p>
+                  <p className="font-medium">{agentLabel(e.sys_user)}</p>
+                  {(e.sys_user.nick_nm || e.sys_user.display_name) && (
+                    <p className="text-muted-foreground text-xs">
+                      {e.sys_user.nick_nm || e.sys_user.display_name}
+                    </p>
+                  )}
                   {e.reason && (
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-muted-foreground mt-1 text-sm">
                       사유: {e.reason}
                     </p>
                   )}
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="text-muted-foreground mt-1 text-xs">
                     {new Date(e.reg_dtm).toLocaleDateString('ko-KR')}
                   </p>
                 </div>
                 <Button
                   size="sm"
                   variant="ghost"
+                  title="제외 해제 (다시 포함)"
                   onClick={() => handleRemoveExclude(e.user_id)}
                   disabled={deleting[e.user_id] ?? false}
                 >

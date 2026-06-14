@@ -12,7 +12,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 export async function recordUserAction(
   actionCd: string,
   userId: string,
-  metadata?: Record<string, unknown>
+  metadata?: Record<string, unknown>,
 ): Promise<void> {
   const db = getSupabaseAdmin()
 
@@ -33,8 +33,8 @@ export async function recordUserAction(
 
   // 비동기로 미션 평가 트리거 (non-blocking)
   // 실제 환경에서는 queue/cron job으로 처리 권장
-  evaluateUserMissions(userId).catch(err =>
-    console.error('미션 평가 실패:', err.message)
+  evaluateUserMissions(userId).catch((err) =>
+    console.error('미션 평가 실패:', err.message),
   )
 }
 
@@ -45,7 +45,7 @@ export async function recordUserAction(
  */
 export async function evaluateUserMissions(
   userId: string,
-  eventId?: string
+  eventId?: string,
 ): Promise<void> {
   const db = getSupabaseAdmin()
 
@@ -72,13 +72,20 @@ export async function evaluateUserMissions(
       .eq('del_yn', 'N')
 
     if (missionError || !missions) {
-      console.error(`미션 조회 실패 [${event.event_id}]:`, missionError?.message)
+      console.error(
+        `미션 조회 실패 [${event.event_id}]:`,
+        missionError?.message,
+      )
       continue
     }
 
     // 3. 각 미션별 완료 판정
     for (const mission of missions) {
-      const isCompleted = await evaluateMissionCompletion(userId, event.event_id, mission)
+      const isCompleted = await evaluateMissionCompletion(
+        userId,
+        event.event_id,
+        mission,
+      )
 
       if (isCompleted) {
         // 4. evt_user_mission에 멱등 upsert
@@ -93,13 +100,13 @@ export async function evaluateUserMissions(
           },
           {
             onConflict: 'event_id,user_id,mission_cd',
-          }
+          },
         )
 
         if (upsertError) {
           console.error(
             `미션 기록 실패 [${mission.mission_cd}]:`,
-            upsertError.message
+            upsertError.message,
           )
         }
       }
@@ -120,7 +127,7 @@ interface Mission {
 async function evaluateMissionCompletion(
   userId: string,
   eventId: string,
-  mission: Mission
+  mission: Mission,
 ): Promise<boolean> {
   const db = getSupabaseAdmin()
 
@@ -207,7 +214,10 @@ async function evaluateMissionCompletion(
  * 근거: src/lib/mps-refund.ts, sql/041
  * 보증금 활성 시 환불액 = 원금±0.1π(수수료 반영)
  */
-async function checkCancelWithFee(userId: string, afterDtm: string): Promise<boolean> {
+async function checkCancelWithFee(
+  userId: string,
+  afterDtm: string,
+): Promise<boolean> {
   const db = getSupabaseAdmin()
 
   // mps_txn_hist에서 FEE가 발생한 거래 확인
@@ -279,11 +289,12 @@ export async function getEventProgress(userId: string, eventId: string) {
     eventId,
     totalCount,
     tier,
-    missions: completedMissions?.map(m => ({
-      mission_cd: m.mission_cd.trim(),
-      completed: true,
-      complete_dtm: m.complete_dtm,
-    })) ?? [],
+    missions:
+      completedMissions?.map((m) => ({
+        mission_cd: m.mission_cd.trim(),
+        completed: true,
+        complete_dtm: m.complete_dtm,
+      })) ?? [],
   }
 }
 
@@ -301,14 +312,14 @@ export async function getEventRanking(eventId: string, limit: number = 100) {
     .eq('event_id', eventId)
     .eq('del_yn', 'N')
 
-  const excludedUserIds = new Set(excludedUsers?.map(e => e.user_id) ?? [])
+  const excludedUserIds = new Set(excludedUsers?.map((e) => e.user_id) ?? [])
 
   // 모든 완료 미션 조회 (sys_user 정보 포함)
   const { data: allMissions } = await db
     .from('evt_user_mission')
     .select(
       `user_id, mission_cd, complete_dtm,
-       sys_user!inner(id, nick_nm, display_name)`
+       sys_user!inner(id, nick_nm, display_name, pi_username)`,
     )
     .eq('event_id', eventId)
     .eq('del_yn', 'N')
@@ -321,6 +332,7 @@ export async function getEventRanking(eventId: string, limit: number = 100) {
       firstCompleteDtm: string
       nick_nm: string | null
       display_name: string | null
+      pi_username: string | null
     }
   >()
 
@@ -332,6 +344,7 @@ export async function getEventRanking(eventId: string, limit: number = 100) {
         id: string
         nick_nm: string | null
         display_name: string | null
+        pi_username: string | null
       }
 
       const existing = userStats.get(mission.user_id)
@@ -346,6 +359,7 @@ export async function getEventRanking(eventId: string, limit: number = 100) {
           : mission.complete_dtm,
         nick_nm: sysUser.nick_nm,
         display_name: sysUser.display_name,
+        pi_username: sysUser.pi_username,
       })
     }
   }
@@ -377,6 +391,7 @@ export async function getEventRanking(eventId: string, limit: number = 100) {
       mission_count: stats.count,
       first_complete_dtm: stats.firstCompleteDtm,
       nick_nm: stats.nick_nm ?? stats.display_name,
+      pi_username: stats.pi_username,
     })
   }
 
@@ -397,7 +412,7 @@ export async function getTop10ForGift(eventId: string) {
     .eq('event_id', eventId)
     .eq('del_yn', 'N')
 
-  const excludedUserIds = new Set(excludedUsers?.map(e => e.user_id) ?? [])
+  const excludedUserIds = new Set(excludedUsers?.map((e) => e.user_id) ?? [])
 
   // 모든 완료 미션 조회
   const { data: allMissions } = await db

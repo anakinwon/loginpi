@@ -23,7 +23,7 @@ export async function GET() {
         `
         exclude_id:evt_exclude_id,
         user_id,
-        sys_user (id, nick_nm, display_name),
+        sys_user (id, nick_nm, display_name, pi_username),
         reason:exclude_reason_tx,
         reg_dtm
       `,
@@ -64,14 +64,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
   }
 
-  const { user_id, reason } = body as {
-    user_id?: string
+  const { pi_username, reason } = body as {
+    pi_username?: string
     reason?: string
   }
 
-  if (!user_id?.trim()) {
+  if (!pi_username?.trim()) {
     return NextResponse.json(
-      { error: '사용자 ID가 필요합니다' },
+      { error: 'Pi 사용자명을 입력해주세요' },
       { status: 400 },
     )
   }
@@ -79,24 +79,33 @@ export async function POST(request: NextRequest) {
   try {
     const db = getSupabaseAdmin()
     const slug = user.display_name.slice(0, 20)
-    const now = new Date().toISOString()
+
+    // pi_username으로 요원(sys_user) 조회
+    const { data: target, error: targetErr } = await db
+      .from('sys_user')
+      .select('id, nick_nm, display_name, pi_username')
+      .eq('pi_username', pi_username.trim())
+      .maybeSingle()
+    if (targetErr) throw targetErr
+    if (!target) {
+      return NextResponse.json(
+        { error: `Pi 사용자명 '${pi_username.trim()}'을 찾을 수 없습니다` },
+        { status: 404 },
+      )
+    }
 
     // 이미 제외 대상자인지 확인
     const { data: existing, error: checkErr } = await db
       .from('evt_exclude')
-      .select('exclude_id')
+      .select('evt_exclude_id')
       .eq('event_id', 'evt-20260614-001')
-      .eq('user_id', user_id.trim())
+      .eq('user_id', target.id)
       .eq('del_yn', 'N')
       .maybeSingle()
-
-    if (checkErr) {
-      throw checkErr
-    }
-
+    if (checkErr) throw checkErr
     if (existing) {
       return NextResponse.json(
-        { error: '이미 제외된 사용자입니다' },
+        { error: '이미 제외된 요원입니다' },
         { status: 409 },
       )
     }
@@ -106,17 +115,14 @@ export async function POST(request: NextRequest) {
       .from('evt_exclude')
       .insert({
         event_id: 'evt-20260614-001',
-        user_id: user_id.trim(),
+        user_id: target.id,
         exclude_reason_tx: reason?.trim() || '관리자 판단',
         regr_id: slug,
         modr_id: slug,
       })
       .select()
       .maybeSingle()
-
-    if (error) {
-      throw error
-    }
+    if (error) throw error
 
     return NextResponse.json({ excluded: data }, { status: 201 })
   } catch (err) {
