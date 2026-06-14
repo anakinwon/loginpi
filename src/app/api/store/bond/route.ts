@@ -21,7 +21,7 @@ export async function POST() {
 
   return NextResponse.json({
     amount: BOND_DEPOSIT_PI,
-    memo: '🛡️ MyPiShop 판매자 보증금 예치 (1π = 취소수수료 9회분 + 지급준비금 0.1π)',
+    memo: '🛡️ PiShop 판매자 보증금 예치 (1π = 취소수수료 9회분 + 지급준비금 0.1π)',
     metadata: { type: 'MPS_BOND' },
   })
 }

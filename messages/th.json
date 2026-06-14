@@ -1556,7 +1556,7 @@
     "statusChanged": "สถานะถูกเปลี่ยนแล้ว",
     "stockLeft": "เหลือในสต็อก {count}",
     "subtitle": "ซื้อขายโดยตรงอย่างปลอดภัยด้วย Pi Coin — การคุ้มครอง Escrow",
-    "title": "MyPiShop",
+    "title": "PiShop",
     "tradeSt": {
       "OPEN": "กำลังขาย",
       "SOLD": "ขายแล้ว",

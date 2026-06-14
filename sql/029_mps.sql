@@ -1,4 +1,4 @@
--- DA-APPROVED: mps_ 주제영역 신규 등록 (TASK-100) — MyPiShop P2P 마켓플레이스 6개 테이블 + 주문 RPC 2종
+-- DA-APPROVED: mps_ 주제영역 신규 등록 (TASK-100) — PiShop P2P 마켓플레이스 6개 테이블 + 주문 RPC 2종
 -- Phase 13: PRD_8_MPS.md v1.1 §7 DB 스키마 — 핵심 불변 조건 stock_qty = reg_qty - ordered_qty
 
 -- ──────────────────────────────────────────────────────────────

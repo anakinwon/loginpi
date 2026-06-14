@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
       order,
       // Pi SDK createPayment 파라미터 (use-subscribe-plan 패턴)
       amount: Number(order.order_price_pi),
-      memo: `🛒 MyPiShop 에스크로 결제`,
+      memo: `🛒 PiShop 에스크로 결제`,
       metadata: {
         type: 'MPS_ESCROW',
         order_id: order.order_id,
