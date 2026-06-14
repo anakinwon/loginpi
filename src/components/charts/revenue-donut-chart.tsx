@@ -1,19 +1,8 @@
 'use client'
 
 import PlotlyPlot from './plotly-plot'
-import { themeLabel } from '@/lib/stats-labels'
+import { themeLabel, themeColorMap } from '@/lib/stats-labels'
 import type { RevenueDataPoint } from '@/types/stats'
-
-const COLORS = [
-  '#3b82f6',
-  '#8b5cf6',
-  '#10b981',
-  '#f59e0b',
-  '#ef4444',
-  '#06b6d4',
-  '#84cc16',
-  '#f97316',
-]
 
 const BASE_LAYOUT = {
   paper_bgcolor: 'transparent',
@@ -42,6 +31,7 @@ export default function RevenueDonutChart({ data }: Props) {
   const themeCds = Object.keys(themeMap)
   const labels = themeCds.map(themeLabel)
   const values = Object.values(themeMap)
+  const colorOf = themeColorMap(themeCds)
 
   const traces = [
     {
@@ -49,7 +39,9 @@ export default function RevenueDonutChart({ data }: Props) {
       hole: 0.55,
       labels,
       values,
-      marker: { colors: COLORS },
+      marker: {
+        colors: themeCds.map((cd) => colorOf[cd]),
+      },
       textinfo: 'percent' as const,
       hovertemplate: '%{label}<br>%{value:.4f} Pi<br>%{percent}<extra></extra>',
     },

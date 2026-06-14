@@ -1,10 +1,11 @@
 'use client'
 
 import { useMemo } from 'react'
-import { themeLabel } from '@/lib/stats-labels'
+import { themeLabel, themeColorMap } from '@/lib/stats-labels'
 import type { RevenueDataPoint } from '@/types/stats'
 
-// coin360 스타일 트리맵 — 면적 = 테마별 매출 비중, 색 농도 = 규모.
+// coin360 스타일 트리맵 — 면적 = 테마별 매출 비중. 색은 도넛 차트와 동일 팔레트로
+// 테마 코드에 고정(themeColorMap)해 두 차트의 테마 색을 일치시킨다.
 // plotly.js-basic 번들에 treemap이 없어 순수 CSS로 squarified treemap을 직접 구현.
 
 interface Props {
@@ -15,6 +16,7 @@ interface Item {
   cd: string
   label: string
   value: number
+  color: string
 }
 interface Tile extends Item {
   pct: number
@@ -79,6 +81,7 @@ function squarify(items: Item[], W = 100, H = 100): Tile[] {
           cd: t.cd,
           label: t.label,
           value: t.value,
+          color: t.color,
           pct: t.pct,
           x,
           y: cy,
@@ -99,6 +102,7 @@ function squarify(items: Item[], W = 100, H = 100): Tile[] {
           cd: t.cd,
           label: t.label,
           value: t.value,
+          color: t.color,
           pct: t.pct,
           x: cx,
           y,
@@ -115,19 +119,21 @@ function squarify(items: Item[], W = 100, H = 100): Tile[] {
   return out
 }
 
-// 비중이 클수록 진한 초록 (coin360의 색 강조 효과)
-function tileColor(pct: number): string {
-  const l = 58 - Math.min(pct, 0.5) * 56 // 58%(작음) → 30%(큼)
-  return `hsl(158 64% ${l}%)`
-}
-
 export default function RevenueTreemapChart({ data }: Props) {
   const tiles = useMemo(() => {
     const map: Record<string, number> = {}
     for (const r of data) map[r.theme_cd] = (map[r.theme_cd] ?? 0) + r.rev_pi
-    const items: Item[] = Object.entries(map)
-      .filter(([, v]) => v > 0)
-      .map(([cd, value]) => ({ cd, label: themeLabel(cd), value }))
+    // 도넛과 동일한 키 순서(데이터 등장 순)로 색 매핑 → 테마별 색 일치
+    const allCds = Object.keys(map)
+    const colorOf = themeColorMap(allCds)
+    const items: Item[] = allCds
+      .filter((cd) => map[cd] > 0)
+      .map((cd) => ({
+        cd,
+        label: themeLabel(cd),
+        value: map[cd],
+        color: colorOf[cd],
+      }))
     return squarify(items)
   }, [data])
 
@@ -148,7 +154,7 @@ export default function RevenueTreemapChart({ data }: Props) {
             top: `${t.y}%`,
             width: `${t.w}%`,
             height: `${t.h}%`,
-            background: tileColor(t.pct),
+            background: t.color,
           }}
           title={`${t.label} · ${t.value.toFixed(4)} π · ${(t.pct * 100).toFixed(1)}%`}
         >
