@@ -141,6 +141,9 @@
       "board": "Board Management",
       "chatSection": "Cafe Management",
       "dashboard": "Dashboard",
+      "eventExclude": "Manage Exclusions",
+      "eventGifts": "Send Gifts",
+      "eventSection": "Event",
       "i18n": "Multilingual Management",
       "i18nSection": "Multilingual",
       "links": "Account Link Status",
@@ -167,6 +170,7 @@
         "memo": "Memo",
         "paymentId": "Payment ID",
         "status": "Status",
+        "theme": "Theme",
         "txnDiv": "Transaction type",
         "user": "User"
       },
@@ -179,21 +183,25 @@
         "error": "Error",
         "pending": "Pending"
       },
-      "txnDiv": {
-        "PRODUCT_PAY": "Product payment",
-        "BOND_DEPOSIT": "Bond deposit",
-        "SUBSCRIPTION": "Subscription",
-        "ROOM_CREATE": "Room creation",
-        "TIP": "Tip",
-        "BET": "Bet",
-        "ETC": "Other",
-        "REFUND": "Refund",
-        "CANCEL_FEE": "Cancellation fee",
-        "CANCEL_FEE_RECV": "Fee received",
-        "SETTLEMENT": "Settlement"
+      "theme": {
+        "subscription": "Subscription",
+        "unknown": "Other"
       },
       "title": "Payment History",
-      "totalCount": "Total {count} items · Completed total {total} π"
+      "totalCount": "Total {count} items · Completed total {total} π",
+      "txnDiv": {
+        "BET": "Bet",
+        "BOND_DEPOSIT": "Bond deposit",
+        "CANCEL_FEE": "Cancellation fee",
+        "CANCEL_FEE_RECV": "Fee received",
+        "ETC": "Other",
+        "PRODUCT_PAY": "Product payment",
+        "REFUND": "Refund",
+        "ROOM_CREATE": "Room creation",
+        "SETTLEMENT": "Settlement",
+        "SUBSCRIPTION": "Subscription",
+        "TIP": "Tip"
+      }
     },
     "std": {
       "approvals": {
@@ -1169,81 +1177,81 @@
     "yes": "Yes"
   },
   "event": {
-    "title": "🎖️ Mission Event",
-    "subtitle": "Complete 10 missions and claim your 🎁 Kakao Gift!",
+    "agentCol": "Agent Name",
+    "alreadyExcluded": "Already Excluded: {names}",
+    "completionTitle": "10 Missions Completed! Congratulations 🎉",
+    "excludedAgents": "Excluded Agents:",
+    "excludedN": "{count} Excluded",
+    "excludeFailed": "Failed to exclude",
+    "excludePlaceholder": "Enter agent names (comma-separated)",
+    "giftAlt": "Mission Completion Gift",
+    "gradeAgent": "Regular Agent",
+    "gradeMaster": "Master",
+    "gradeRecruit": "Recruit",
+    "gradeTrainee": "Trainee Agent",
+    "gradeVeteran": "Senior Agent",
+    "includeFailed": "Failed to remove from exclusion",
+    "includeTitle": "Include in Ranking Again",
+    "keepGoingTitle": "Keep going! You haven't completed it yet",
+    "lastPerformedCol": "Last Performed",
+    "loadError": "Failed to load Data",
     "loginHint": "Log in to see your mission progress and agent grade",
     "missionListTitle": "📋 Mission List",
-    "multiOrHint": "💡 Hint: Complete just 1 of the available methods",
-    "rankingTitle": "🏆 Mission Ranking",
-    "excludePlaceholder": "Enter agent name(s), comma-separated",
-    "processing": "Processing...",
-    "removeRank": "Remove from Ranking",
-    "excludedAgents": "Excluded agents:",
-    "includeTitle": "Re-include in ranking",
-    "rankCol": "Rank",
-    "agentCol": "Agent",
-    "totalCol": "Total",
-    "lastPerformedCol": "Last Activity",
-    "rewardCol": "Reward",
-    "giftAlt": "Mission completion gift",
-    "completionTitle": "All 10 missions complete! Congratulations 🎉",
-    "keepGoingTitle": "Keep it up! Not all missions completed yet",
-    "noName": "(No name)",
-    "loadError": "Failed to load data",
-    "networkError": "Network error",
-    "excludeFailed": "Failed to exclude agent",
-    "includeFailed": "Failed to re-include agent",
-    "noChange": "No changes made",
-    "excludedN": "Excluded {count}",
-    "alreadyExcluded": "Already excluded: {names}",
-    "notFoundAgents": "Not found: {names}",
-    "gradeRecruit": "Recruit",
-    "gradeTrainee": "Trainee",
-    "gradeAgent": "Agent",
-    "gradeVeteran": "Veteran",
-    "gradeMaster": "Master",
     "missions": {
       "M1": {
-        "name": "Account Integration",
-        "desc": "Pi Browser login + Google login (both completed)"
-      },
-      "M2": {
-        "name": "Profile Completion",
-        "desc": "Add nickname + KakaoTalk ID to linked account"
-      },
-      "M3": {
-        "name": "Create PREMIUM Cafe + Auto-translate",
-        "desc": "Create a PREMIUM Cafe in PiCafe + use the auto-translate feature"
-      },
-      "M4": {
-        "name": "Create Pi Bet + Distribute",
-        "desc": "Create a Pi Bet in Cafe and distribute to participants"
-      },
-      "M5": {
-        "name": "Bean Transfer Test",
-        "desc": "Send Beans to 1 or more users in chat"
-      },
-      "M6": {
-        "name": "Use Chat Multi-features",
-        "desc": "Use stickers / file transfer / voice channel — at least 1"
-      },
-      "M7": {
-        "name": "Seller Trade Cancel",
-        "desc": "List a product on PiShop, start a trade, then cancel as seller"
-      },
-      "M8": {
-        "name": "Buyer Trade Cancel",
-        "desc": "Purchase another user's product on PiShop, then cancel as buyer"
-      },
-      "M9": {
-        "name": "Seller Deposit + Location Consent",
-        "desc": "Deposit 1+ Pi as seller on PiShop + agree to location-based service"
+        "desc": "Pi Browser Login + Google Login (Complete both)",
+        "name": "Account Integration"
       },
       "M10": {
-        "name": "Deposit-Active Cancel Fee",
-        "desc": "(After M9) Redo missions 7 & 8 — experience cancellation fee while deposit is active"
+        "desc": "(After M9) Repeat missions 7 and 8 — Experience cancellation fee in active deposit status",
+        "name": "Active Deposit Transaction Cancellation Fee"
+      },
+      "M2": {
+        "desc": "Enter nickname + KakaoTalk ID in integrated account",
+        "name": "Complete Profile"
+      },
+      "M3": {
+        "desc": "Create PREMIUM Cafe in PiCafe + Use auto-translation feature",
+        "name": "Create PREMIUM Cafe + Auto-translation(PiRC1)"
+      },
+      "M4": {
+        "desc": "Create Pi Bet in Cafe and distribute to participants",
+        "name": "Create Pi Bet and Distribute"
+      },
+      "M5": {
+        "desc": "Transfer Bean to 1 or more people in chat",
+        "name": "Bean Transfer Test"
+      },
+      "M6": {
+        "desc": "Use stickers / Send files / Use voice channel (1 or more)",
+        "name": "Use Chat Multi-function"
+      },
+      "M7": {
+        "desc": "Register my product on PiShop, then cancel seller transaction during trade",
+        "name": "Seller Transaction Cancellation(PiRC2)"
+      },
+      "M8": {
+        "desc": "Buyer transaction cancellation after purchasing another person's product in PiShop",
+        "name": "Buyer Transaction Cancellation"
+      },
+      "M9": {
+        "desc": "Deposit 1Pi or more as PiShop Seller Deposit + Consent to location-based services",
+        "name": "Seller Deposit + Location Consent"
       }
-    }
+    },
+    "multiOrHint": "💡 Hint: You only need to complete one of several methods",
+    "networkError": "Network Error",
+    "noChange": "No Changes",
+    "noName": "(No Name)",
+    "notFoundAgents": "Not Found: {names}",
+    "processing": "Processing...",
+    "rankCol": "Rank",
+    "rankingTitle": "🏆 Mission Ranking",
+    "removeRank": "Remove Rank",
+    "rewardCol": "Reward",
+    "subtitle": "Complete 10 missions and receive a 🎁 Kakao gift",
+    "title": "🎖️ Mission Event",
+    "totalCol": "Total"
   },
   "header": {
     "admin": "Admin",
@@ -1369,6 +1377,7 @@
   "nav": {
     "admin": "Admin",
     "cafe": "Cafe",
+    "event": "Event",
     "home": "Home",
     "my": "My Info",
     "shop": "Shop"
@@ -1501,9 +1510,9 @@
     "actionBuyerDone": "Item received",
     "actionCancel": "Cancel order",
     "actionCancelBuyer": "Cancel order",
-    "actionCancelSeller": "Cancel order",
     "actionCancelingBuyer": "⏳ Cancelling order...",
     "actionCancelingSeller": "⏳ Cancelling order...",
+    "actionCancelSeller": "Cancel order",
     "actionClose": "Unpublish",
     "actionComplete": "Transaction complete",
     "actionDelete": "Delete",
@@ -1519,10 +1528,6 @@
     "all": "All",
     "allCategories": "All Categories",
     "backToList": "Item List",
-    "refund": {
-      "done": "{amount}π refunded",
-      "pending": "Cancelled — refund will be processed shortly"
-    },
     "bond": {
       "active": "Active",
       "avail": "Available Balance",
@@ -1578,37 +1583,27 @@
       "unlimitedHint": "For items where inventory tracking is not meaningful (e.g., beverages, pizza), register them as unlimited."
     },
     "formInvalid": "Please check the item name and price.",
-    "shop": {
-      "title": "Manage Shops",
-      "manage": "Manage Shops",
-      "intro": "Register online/offline shops to build buyer trust",
-      "add": "Add Shop",
-      "addTitle": "New Shop",
-      "editTitle": "Edit Shop",
-      "edit": "Edit",
-      "delete": "Delete",
-      "deleteConfirm": "Delete this shop? Its items remain; only the shop link is removed.",
-      "deleteSuccess": "Shop deleted",
-      "createSuccess": "Shop registered",
-      "editSuccess": "Shop updated",
-      "empty": "No shops registered yet",
-      "name": "Shop Name",
-      "nameRequired": "Please enter a shop name",
-      "type": "Shop Type",
-      "type_ONLINE": "Online",
-      "type_OFFLINE": "Offline",
-      "type_BOTH": "Both",
-      "desc": "Shop Description",
-      "addr": "Address",
-      "addrHint": "Offline shop address. Coordinates (map pin) coming soon.",
-      "bizHour": "Business Hours",
-      "bizHourPlaceholder": "e.g., Weekdays 10:00–19:00",
-      "tel": "Phone",
-      "email": "Email",
-      "sns": "SNS Link",
-      "thumb": "Thumbnail URL",
-      "save": "Save",
-      "cancel": "Cancel"
+    "history": {
+      "clearFilter": "Clear filter",
+      "empty": "No transactions yet",
+      "from": "From",
+      "tab": {
+        "ALL": "All",
+        "BUY": "Purchases",
+        "ETC": "Other",
+        "SELL": "Sales"
+      },
+      "title": "Transaction History",
+      "to": "To",
+      "type": {
+        "BOND_DEPOSIT": "Bond Deposit",
+        "CANCEL_FEE_IN": "Cancellation Fee Received",
+        "CANCEL_REFUND": "Cancellation Refund",
+        "ESCROW_IN": "Escrow Payment",
+        "REFUND_IN": "Refund Received",
+        "RELEASE_OUT": "Sale Settlement",
+        "SETTLE_OUT": "Settlement Payout"
+      }
     },
     "itemNotFound": "Item not found",
     "itemSt": {
@@ -1628,28 +1623,6 @@
     "loginRequired": "Login required to use",
     "myItemsTitle": "My Items",
     "myOwnItem": "This is my registered item",
-    "history": {
-      "title": "Transaction History",
-      "tab": {
-        "ALL": "All",
-        "BUY": "Purchases",
-        "SELL": "Sales",
-        "ETC": "Other"
-      },
-      "from": "From",
-      "to": "To",
-      "clearFilter": "Clear filter",
-      "empty": "No transactions yet",
-      "type": {
-        "ESCROW_IN": "Escrow Payment",
-        "RELEASE_OUT": "Sale Settlement",
-        "CANCEL_REFUND": "Cancellation Refund",
-        "CANCEL_FEE_IN": "Cancellation Fee Received",
-        "REFUND_IN": "Refund Received",
-        "SETTLE_OUT": "Settlement Payout",
-        "BOND_DEPOSIT": "Bond Deposit"
-      }
-    },
     "navHistory": "Transaction History",
     "navMyItems": "My Items",
     "navOrders": "Order History",
@@ -1678,12 +1651,48 @@
     "piBrowserOnly": "Payment is only available in Pi Browser",
     "publishSuccess": "Item published successfully.",
     "qtyInvalid": "Please enter a quantity between 1 and 9998.",
+    "refund": {
+      "done": "{amount}π refunded",
+      "pending": "Cancelled — refund will be processed shortly"
+    },
     "salesTitle": "Sales Orders",
     "saveFail": "Failed to process.",
     "saving": "Saving...",
     "scrollMore": "Scroll to see more...",
     "search": "Search",
     "searchPlaceholder": "Search item name or description",
+    "shop": {
+      "add": "Add Shop",
+      "addr": "Address",
+      "addrHint": "Offline shop address. Coordinates (map pin) coming soon.",
+      "addTitle": "New Shop",
+      "bizHour": "Business Hours",
+      "bizHourPlaceholder": "e.g., Weekdays 10:00-19:00",
+      "cancel": "Cancel",
+      "createSuccess": "Shop registered",
+      "delete": "Delete",
+      "deleteConfirm": "Delete this shop? Its items remain; only the shop link is removed.",
+      "deleteSuccess": "Shop deleted",
+      "desc": "Shop Description",
+      "edit": "Edit",
+      "editSuccess": "Shop updated",
+      "editTitle": "Edit Shop",
+      "email": "Email",
+      "empty": "No shops registered yet",
+      "intro": "Register online/offline shops to build buyer trust",
+      "manage": "Manage Shops",
+      "name": "Shop Name",
+      "nameRequired": "Please enter a shop name",
+      "save": "Save",
+      "sns": "SNS Link",
+      "tel": "Phone",
+      "thumb": "Thumbnail URL",
+      "title": "Manage Shops",
+      "type": "Shop Type",
+      "type_BOTH": "Both",
+      "type_OFFLINE": "Offline",
+      "type_ONLINE": "Online"
+    },
     "shopType": {
       "BOTH": "Online & Offline",
       "OFFLINE": "Offline Store",
