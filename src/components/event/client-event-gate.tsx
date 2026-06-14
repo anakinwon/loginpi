@@ -1,8 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useTranslations } from 'next-intl'
-import { Loader2 } from 'lucide-react'
+import { Loader2, ChevronDown } from 'lucide-react'
 import { piFetch } from '@/lib/pi-fetch'
 
 interface Mission {
@@ -35,12 +34,12 @@ interface Ranking {
 }
 
 export function ClientEventGate() {
-  const t = useTranslations('event')
   const [loading, setLoading] = useState(true)
   const [progress, setProgress] = useState<EventProgress | null>(null)
   const [missions, setMissions] = useState<Mission[]>([])
   const [ranking, setRanking] = useState<Ranking[]>([])
   const [error, setError] = useState<string | null>(null)
+  const [expandedMission, setExpandedMission] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -75,7 +74,7 @@ export function ClientEventGate() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex min-h-screen items-center justify-center">
         <Loader2 className="size-6 animate-spin" />
       </div>
     )
@@ -83,7 +82,7 @@ export function ClientEventGate() {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
           <p className="text-muted-foreground">{error}</p>
         </div>
@@ -95,8 +94,10 @@ export function ClientEventGate() {
   const gradeStyles = {
     Recruit: 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100',
     Trainee: 'bg-blue-200 dark:bg-blue-700 text-blue-900 dark:text-blue-100',
-    Agent: 'bg-purple-200 dark:bg-purple-700 text-purple-900 dark:text-purple-100',
-    Veteran: 'bg-orange-200 dark:bg-orange-700 text-orange-900 dark:text-orange-100',
+    Agent:
+      'bg-purple-200 dark:bg-purple-700 text-purple-900 dark:text-purple-100',
+    Veteran:
+      'bg-orange-200 dark:bg-orange-700 text-orange-900 dark:text-orange-100',
     Master: 'bg-red-200 dark:bg-red-700 text-red-900 dark:text-red-100',
   }
 
@@ -111,19 +112,19 @@ export function ClientEventGate() {
   return (
     <div className="space-y-8 pb-24">
       {/* 헤더: 요원 등급 + 미션 카운트 */}
-      <div className="text-center space-y-3">
+      <div className="space-y-3 text-center">
         <h1 className="text-3xl font-bold">🎖️ 미션 이벤트</h1>
         {progress && (
           <>
             <div
-              className={`inline-block px-4 py-2 rounded-full font-semibold ${gradeStyles[progress.grade]}`}
+              className={`inline-block rounded-full px-4 py-2 font-semibold ${gradeStyles[progress.grade]}`}
             >
               {gradeKo[progress.grade]}
             </div>
             <p className="text-lg font-semibold">
               미션 {progress.mission_count}/10 완료
             </p>
-            <div className="w-full bg-muted rounded-full h-2">
+            <div className="bg-muted h-2 w-full rounded-full">
               <div
                 className="bg-primary h-2 rounded-full transition-all duration-300"
                 style={{
@@ -135,42 +136,60 @@ export function ClientEventGate() {
         )}
       </div>
 
-      {/* 미션 목록 (안내문 포함) */}
+      {/* 미션 목록 (아코디언 UI) */}
       <div>
-        <h2 className="text-xl font-bold mb-4">📋 미션 목록</h2>
-        <div className="space-y-3">
+        <h2 className="mb-4 text-xl font-bold">📋 미션 목록</h2>
+        <div className="space-y-2">
           {missions.map((m) => {
             const completed = progress?.missions.find(
-              (pm) => pm.mission_cd === m.mission_cd
+              (pm) => pm.mission_cd === m.mission_cd,
             )?.is_completed
+            const isExpanded = expandedMission === m.mission_cd
             return (
               <div
                 key={m.mission_cd}
-                className={`rounded-lg border p-4 ${completed ? 'bg-green-50 dark:bg-green-950 border-green-300 dark:border-green-700' : 'bg-card'}`}
+                className={`rounded-lg border transition-colors ${completed ? 'border-green-300 bg-green-50 dark:border-green-700 dark:bg-green-950' : 'bg-card'}`}
               >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="font-bold text-lg">{m.mission_cd}</span>
-                      <span className="font-semibold">{m.mission_nm}</span>
-                      {completed && (
-                        <span className="text-green-600 dark:text-green-400 font-bold">
-                          ✓
-                        </span>
-                      )}
-                    </div>
+                {/* 헤더: 항상 보임 */}
+                <button
+                  onClick={() =>
+                    setExpandedMission(isExpanded ? null : m.mission_cd)
+                  }
+                  className="hover:bg-muted/50 flex w-full items-center justify-between px-4 py-3 text-left transition-colors"
+                >
+                  <div className="flex min-w-0 flex-1 items-center gap-2">
+                    <span className="text-sm font-bold">
+                      {m.mission_cd.trim()}
+                    </span>
+                    <span className="truncate text-sm font-medium">
+                      {m.mission_nm}
+                    </span>
+                    {completed && (
+                      <span className="ml-auto flex-shrink-0 text-sm font-bold text-green-600 dark:text-green-400">
+                        ✓
+                      </span>
+                    )}
+                  </div>
+                  <ChevronDown
+                    className={`ml-2 size-4 flex-shrink-0 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                  />
+                </button>
+
+                {/* 본문: 펼쳤을 때만 보임 */}
+                {isExpanded && (
+                  <div className="space-y-2 border-t px-4 pt-3 pb-3 text-sm">
                     {m.mission_guide_desc && (
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-muted-foreground text-xs">
                         {m.mission_guide_desc}
                       </p>
                     )}
                     {m.complete_type_cd === 'MULTI_OR' && (
-                      <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                      <p className="text-xs text-amber-600 dark:text-amber-400">
                         💡 힌트: 여러 방법 중 1가지만 완료하면 됩니다
                       </p>
                     )}
                   </div>
-                </div>
+                )}
               </div>
             )
           })}
@@ -179,15 +198,15 @@ export function ClientEventGate() {
 
       {/* 랭킹 보드 (체크리스트 매트릭스) */}
       <div>
-        <h2 className="text-xl font-bold mb-4">🏆 미션 랭킹 (상위 50명)</h2>
-        <div className="overflow-x-auto border rounded-lg">
-          <table className="w-full text-sm border-collapse">
+        <h2 className="mb-4 text-xl font-bold">🏆 미션 랭킹 (상위 50명)</h2>
+        <div className="overflow-x-auto rounded-lg border">
+          <table className="w-full border-collapse text-sm">
             <thead>
-              <tr className="border-b bg-muted">
-                <th className="p-2 text-left font-semibold sticky left-0 bg-muted z-10">
+              <tr className="bg-muted border-b">
+                <th className="bg-muted sticky left-0 z-10 p-2 text-left font-semibold">
                   순위
                 </th>
-                <th className="p-2 text-left font-semibold sticky left-12 bg-muted z-10">
+                <th className="bg-muted sticky left-12 z-10 p-2 text-left font-semibold">
                   요원명
                 </th>
                 <th className="p-2 text-center font-semibold">합계</th>
@@ -207,28 +226,39 @@ export function ClientEventGate() {
               {ranking.slice(0, 50).map((r) => (
                 <tr
                   key={r.user_id}
-                  className="border-b hover:bg-muted/50 transition-colors"
+                  className="hover:bg-muted/50 border-b transition-colors"
                 >
-                  <td className="p-2 font-semibold sticky left-0 bg-white dark:bg-slate-950 z-10">
+                  <td className="sticky left-0 z-10 bg-white p-2 font-semibold dark:bg-slate-950">
                     #{r.rank}
                   </td>
-                  <td className="p-2 sticky left-12 bg-white dark:bg-slate-950 z-10">
+                  <td className="sticky left-12 z-10 bg-white p-2 dark:bg-slate-950">
                     {r.nick_nm ?? '(이름 없음)'}
                   </td>
-                  <td className="p-2 text-center font-bold">{r.mission_count}/10</td>
-                  {['M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7', 'M8', 'M9', 'M10'].map(
-                    (m) => (
-                      <td key={m} className="p-2 text-center">
-                        {r.missions[m] ? (
-                          <span className="text-green-600 dark:text-green-400 font-bold">
-                            ✓
-                          </span>
-                        ) : (
-                          <span className="text-muted-foreground">-</span>
-                        )}
-                      </td>
-                    )
-                  )}
+                  <td className="p-2 text-center font-bold">
+                    {r.mission_count}/10
+                  </td>
+                  {[
+                    'M1',
+                    'M2',
+                    'M3',
+                    'M4',
+                    'M5',
+                    'M6',
+                    'M7',
+                    'M8',
+                    'M9',
+                    'M10',
+                  ].map((m) => (
+                    <td key={m} className="p-2 text-center">
+                      {r.missions[m] ? (
+                        <span className="font-bold text-green-600 dark:text-green-400">
+                          ✓
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground">-</span>
+                      )}
+                    </td>
+                  ))}
                 </tr>
               ))}
             </tbody>
