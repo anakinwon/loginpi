@@ -1575,6 +1575,7 @@
     "top3Themes": "Top 3 테마 매출 (최근 {period}일)",
     "themeDaily": "테마별 일별 매출",
     "themeShare": "테마별 매출 비중",
+    "themeTreemap": "테마별 매출 비중 (트리맵)",
     "translateSection": "번역 (PiTranslate™)",
     "noData": "데이터 없음",
     "scoreFormula": "점수 = 활동일수×0.2 + 콘텐츠(카페·게시글·댓글)×0.3 + 결제건수×0.5",

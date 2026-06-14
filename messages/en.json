@@ -515,6 +515,7 @@
     "subtitle": "Active users · revenue statistics (daily rollup)",
     "themeDaily": "Daily Revenue by Theme",
     "themeShare": "Revenue Share by Theme",
+    "themeTreemap": "Revenue Share by Theme (Treemap)",
     "top3Active": "Top 3 Active Users (last {period} days)",
     "top3Buyers": "Top 3 Buyers (last {period} days)",
     "top3Themes": "Top 3 Theme Revenue (last {period} days)",
