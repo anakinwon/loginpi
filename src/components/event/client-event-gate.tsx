@@ -39,7 +39,7 @@ export function ClientEventGate() {
   const [missions, setMissions] = useState<Mission[]>([])
   const [ranking, setRanking] = useState<Ranking[]>([])
   const [error, setError] = useState<string | null>(null)
-  const [expandedMission, setExpandedMission] = useState<string | null>(null)
+  const [expandedMissions, setExpandedMissions] = useState(true)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -136,64 +136,61 @@ export function ClientEventGate() {
         )}
       </div>
 
-      {/* 미션 목록 (아코디언 UI) */}
+      {/* 미션 목록 (섹션 전체 아코디언) */}
       <div>
-        <h2 className="mb-4 text-xl font-bold">📋 미션 목록</h2>
-        <div className="space-y-2">
-          {missions.map((m) => {
-            const completed = progress?.missions.find(
-              (pm) => pm.mission_cd === m.mission_cd,
-            )?.is_completed
-            const isExpanded = expandedMission === m.mission_cd
-            return (
-              <div
-                key={m.mission_cd}
-                className={`rounded-lg border transition-colors ${completed ? 'border-green-300 bg-green-50 dark:border-green-700 dark:bg-green-950' : 'bg-card'}`}
-              >
-                {/* 헤더: 항상 보임 */}
-                <button
-                  onClick={() =>
-                    setExpandedMission(isExpanded ? null : m.mission_cd)
-                  }
-                  className="hover:bg-muted/50 flex w-full items-center justify-between px-4 py-3 text-left transition-colors"
-                >
-                  <div className="flex min-w-0 flex-1 items-center gap-2">
-                    <span className="text-sm font-bold">
-                      {m.mission_cd.trim()}
-                    </span>
-                    <span className="truncate text-sm font-medium">
-                      {m.mission_nm}
-                    </span>
-                    {completed && (
-                      <span className="ml-auto flex-shrink-0 text-sm font-bold text-green-600 dark:text-green-400">
-                        ✓
-                      </span>
-                    )}
-                  </div>
-                  <ChevronDown
-                    className={`ml-2 size-4 flex-shrink-0 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
-                  />
-                </button>
+        <button
+          onClick={() => setExpandedMissions(!expandedMissions)}
+          className="hover:bg-muted/50 flex w-full items-center justify-between rounded-lg px-4 py-3 text-left transition-colors"
+        >
+          <h2 className="text-xl font-bold">📋 미션 목록</h2>
+          <ChevronDown
+            className={`size-5 flex-shrink-0 transition-transform ${expandedMissions ? 'rotate-180' : ''}`}
+          />
+        </button>
 
-                {/* 본문: 펼쳤을 때만 보임 */}
-                {isExpanded && (
-                  <div className="space-y-2 border-t px-4 pt-3 pb-3 text-sm">
-                    {m.mission_guide_desc && (
-                      <p className="text-muted-foreground text-xs">
-                        {m.mission_guide_desc}
-                      </p>
-                    )}
-                    {m.complete_type_cd === 'MULTI_OR' && (
-                      <p className="text-xs text-amber-600 dark:text-amber-400">
-                        💡 힌트: 여러 방법 중 1가지만 완료하면 됩니다
-                      </p>
-                    )}
+        {expandedMissions && (
+          <div className="mt-3 space-y-2">
+            {missions.map((m) => {
+              const completed = progress?.missions.find(
+                (pm) => pm.mission_cd === m.mission_cd,
+              )?.is_completed
+              return (
+                <div
+                  key={m.mission_cd}
+                  className={`rounded-lg border p-3 transition-colors ${completed ? 'border-green-300 bg-green-50 dark:border-green-700 dark:bg-green-950' : 'bg-card'}`}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="mb-2 flex items-center gap-2">
+                        <span className="text-sm font-bold">
+                          {m.mission_cd.trim()}
+                        </span>
+                        <span className="text-sm font-medium">
+                          {m.mission_nm}
+                        </span>
+                        {completed && (
+                          <span className="ml-auto text-sm font-bold text-green-600 dark:text-green-400">
+                            ✓
+                          </span>
+                        )}
+                      </div>
+                      {m.mission_guide_desc && (
+                        <p className="text-muted-foreground text-xs">
+                          {m.mission_guide_desc}
+                        </p>
+                      )}
+                      {m.complete_type_cd === 'MULTI_OR' && (
+                        <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">
+                          💡 힌트: 여러 방법 중 1가지만 완료하면 됩니다
+                        </p>
+                      )}
+                    </div>
                   </div>
-                )}
-              </div>
-            )
-          })}
-        </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
       </div>
 
       {/* 랭킹 보드 (체크리스트 매트릭스) */}
