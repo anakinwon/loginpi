@@ -303,40 +303,49 @@ export async function getEventRanking(eventId: string, limit: number = 100) {
 
   const excludedUserIds = new Set(excludedUsers?.map(e => e.user_id) ?? [])
 
-  // 모든 완료 미션 조회 후 클라이언트 집계
+  // 모든 완료 미션 조회 (sys_user 정보 포함)
   const { data: allMissions } = await db
     .from('evt_user_mission')
-    .select('user_id, mission_cd, complete_dtm')
+    .select(
+      `user_id, mission_cd, complete_dtm,
+       sys_user!inner(id, nick_nm, display_name)`
+    )
     .eq('event_id', eventId)
     .eq('del_yn', 'N')
 
   // 사용자별 집계
   const userStats = new Map<
     string,
-    { count: number; firstCompleteDtm: string; lastCompleteDtm: string }
+    {
+      count: number
+      firstCompleteDtm: string
+      nick_nm: string | null
+      display_name: string | null
+    }
   >()
 
   if (allMissions) {
     for (const mission of allMissions) {
       if (excludedUserIds.has(mission.user_id)) continue
 
+      const sysUser = mission.sys_user as unknown as {
+        id: string
+        nick_nm: string | null
+        display_name: string | null
+      }
+
       const existing = userStats.get(mission.user_id)
       const count = (existing?.count ?? 0) + 1
-      const firstCompleteDtm = existing
-        ? existing.firstCompleteDtm < mission.complete_dtm
-          ? existing.firstCompleteDtm
-          : mission.complete_dtm
-        : mission.complete_dtm
-      const lastCompleteDtm = existing
-        ? existing.lastCompleteDtm > mission.complete_dtm
-          ? existing.lastCompleteDtm
-          : mission.complete_dtm
-        : mission.complete_dtm
 
       userStats.set(mission.user_id, {
         count,
-        firstCompleteDtm,
-        lastCompleteDtm,
+        firstCompleteDtm: existing
+          ? existing.firstCompleteDtm < mission.complete_dtm
+            ? existing.firstCompleteDtm
+            : mission.complete_dtm
+          : mission.complete_dtm,
+        nick_nm: sysUser.nick_nm,
+        display_name: sysUser.display_name,
       })
     }
   }
@@ -365,8 +374,9 @@ export async function getEventRanking(eventId: string, limit: number = 100) {
     result.push({
       rank: currentRank,
       user_id: userId,
-      total_count: stats.count,
+      mission_count: stats.count,
       first_complete_dtm: stats.firstCompleteDtm,
+      nick_nm: stats.nick_nm ?? stats.display_name,
     })
   }
 

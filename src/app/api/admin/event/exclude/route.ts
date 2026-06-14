@@ -21,10 +21,10 @@ export async function GET() {
       .from('evt_exclude')
       .select(
         `
-        exclude_id,
+        exclude_id:evt_exclude_id,
         user_id,
         sys_user (id, nick_nm, display_name),
-        reason,
+        reason:exclude_reason_tx,
         reg_dtm
       `,
       )
@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
       .insert({
         event_id: 'evt-20260614-001',
         user_id: user_id.trim(),
-        reason: reason?.trim() || '관리자 판단',
+        exclude_reason_tx: reason?.trim() || '관리자 판단',
         regr_id: slug,
         modr_id: slug,
       })

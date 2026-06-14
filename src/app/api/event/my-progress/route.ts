@@ -21,7 +21,13 @@ export async function GET() {
         .order('mission_ord', { ascending: true }),
     ])
 
-    return NextResponse.json({ progress, missions: missions ?? [] })
+    // mission_cd CHAR 패딩 제거
+    const trimmedMissions = (missions ?? []).map((m) => ({
+      ...m,
+      mission_cd: m.mission_cd.trim(),
+    }))
+
+    return NextResponse.json({ progress, missions: trimmedMissions })
   } catch (err) {
     console.error('[event/my-progress] 조회 실패:', err)
     return NextResponse.json(

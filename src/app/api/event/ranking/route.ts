@@ -25,14 +25,14 @@ export async function GET(request: NextRequest) {
       .eq('del_yn', 'N')
       .in('user_id', userIds)
 
-    // 사용자별 미션 완료 매트릭스 구성
+    // 사용자별 미션 완료 매트릭스 구성 (mission_cd CHAR 패딩 제거)
     const missionMap = new Map<string, Set<string>>()
     ;(userMissions ?? []).forEach((um) => {
       const key = um.user_id
       if (!missionMap.has(key)) {
         missionMap.set(key, new Set())
       }
-      missionMap.get(key)!.add(um.mission_cd)
+      missionMap.get(key)!.add(um.mission_cd.trim())
     })
 
     // 랭킹에 미션 체크리스트 추가
