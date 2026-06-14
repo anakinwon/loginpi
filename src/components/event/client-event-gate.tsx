@@ -5,6 +5,14 @@ import { useTranslations } from 'next-intl'
 import { Loader2 } from 'lucide-react'
 import { piFetch } from '@/lib/pi-fetch'
 
+interface Mission {
+  mission_cd: string
+  mission_nm: string
+  mission_guide_desc?: string
+  complete_type_cd: string
+  mission_ord?: number
+}
+
 interface EventProgress {
   user_id: string
   mission_count: number
@@ -23,12 +31,14 @@ interface Ranking {
   nick_nm: string | null
   mission_count: number
   first_complete_dtm: string
+  missions: Record<string, boolean>
 }
 
 export function ClientEventGate() {
   const t = useTranslations('event')
   const [loading, setLoading] = useState(true)
   const [progress, setProgress] = useState<EventProgress | null>(null)
+  const [missions, setMissions] = useState<Mission[]>([])
   const [ranking, setRanking] = useState<Ranking[]>([])
   const [error, setError] = useState<string | null>(null)
 
@@ -50,7 +60,8 @@ export function ClientEventGate() {
         const rankingData = await rankingRes.json()
 
         setProgress(progressData.progress)
-        setRanking(rankingData.ranking)
+        setMissions(progressData.missions ?? [])
+        setRanking(rankingData.ranking ?? [])
       } catch (err) {
         console.error('[event-gate] fetch error:', err)
         setError('네트워크 오류')
@@ -80,26 +91,7 @@ export function ClientEventGate() {
     )
   }
 
-  // 미션 진행도 UI
-  const missionGrid =
-    progress?.missions.map((m) => (
-      <div
-        key={m.mission_cd}
-        className="rounded-lg border p-4 bg-card text-center"
-      >
-        <div className="text-sm font-medium text-muted-foreground mb-2">
-          {m.mission_cd}
-        </div>
-        <div className="font-semibold mb-3">{m.mission_nm}</div>
-        <div
-          className={`text-lg font-bold ${m.is_completed ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}
-        >
-          {m.is_completed ? '✓ 완료' : '미완료'}
-        </div>
-      </div>
-    )) ?? []
-
-  // 요원 등급 배지
+  // 요원 등급 스타일
   const gradeStyles = {
     Recruit: 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100',
     Trainee: 'bg-blue-200 dark:bg-blue-700 text-blue-900 dark:text-blue-100',
@@ -143,22 +135,72 @@ export function ClientEventGate() {
         )}
       </div>
 
-      {/* 미션 목록 */}
+      {/* 미션 목록 (안내문 포함) */}
       <div>
         <h2 className="text-xl font-bold mb-4">📋 미션 목록</h2>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">{missionGrid}</div>
+        <div className="space-y-3">
+          {missions.map((m) => {
+            const completed = progress?.missions.find(
+              (pm) => pm.mission_cd === m.mission_cd
+            )?.is_completed
+            return (
+              <div
+                key={m.mission_cd}
+                className={`rounded-lg border p-4 ${completed ? 'bg-green-50 dark:bg-green-950 border-green-300 dark:border-green-700' : 'bg-card'}`}
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="font-bold text-lg">{m.mission_cd}</span>
+                      <span className="font-semibold">{m.mission_nm}</span>
+                      {completed && (
+                        <span className="text-green-600 dark:text-green-400 font-bold">
+                          ✓
+                        </span>
+                      )}
+                    </div>
+                    {m.mission_guide_desc && (
+                      <p className="text-sm text-muted-foreground">
+                        {m.mission_guide_desc}
+                      </p>
+                    )}
+                    {m.complete_type_cd === 'MULTI_OR' && (
+                      <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                        💡 힌트: 여러 방법 중 1가지만 완료하면 됩니다
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
       </div>
 
-      {/* 랭킹 보드 */}
+      {/* 랭킹 보드 (체크리스트 매트릭스) */}
       <div>
         <h2 className="text-xl font-bold mb-4">🏆 미션 랭킹 (상위 50명)</h2>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto border rounded-lg">
           <table className="w-full text-sm border-collapse">
             <thead>
               <tr className="border-b bg-muted">
-                <th className="p-2 text-left font-semibold">순위</th>
-                <th className="p-2 text-left font-semibold">요원명</th>
-                <th className="p-2 text-center font-semibold">미션 완료</th>
+                <th className="p-2 text-left font-semibold sticky left-0 bg-muted z-10">
+                  순위
+                </th>
+                <th className="p-2 text-left font-semibold sticky left-12 bg-muted z-10">
+                  요원명
+                </th>
+                <th className="p-2 text-center font-semibold">합계</th>
+                <th className="p-2 text-center font-semibold">M1</th>
+                <th className="p-2 text-center font-semibold">M2</th>
+                <th className="p-2 text-center font-semibold">M3</th>
+                <th className="p-2 text-center font-semibold">M4</th>
+                <th className="p-2 text-center font-semibold">M5</th>
+                <th className="p-2 text-center font-semibold">M6</th>
+                <th className="p-2 text-center font-semibold">M7</th>
+                <th className="p-2 text-center font-semibold">M8</th>
+                <th className="p-2 text-center font-semibold">M9</th>
+                <th className="p-2 text-center font-semibold">M10</th>
               </tr>
             </thead>
             <tbody>
@@ -167,9 +209,26 @@ export function ClientEventGate() {
                   key={r.user_id}
                   className="border-b hover:bg-muted/50 transition-colors"
                 >
-                  <td className="p-2 font-semibold">#{r.rank}</td>
-                  <td className="p-2">{r.nick_nm ?? '(이름 없음)'}</td>
+                  <td className="p-2 font-semibold sticky left-0 bg-white dark:bg-slate-950 z-10">
+                    #{r.rank}
+                  </td>
+                  <td className="p-2 sticky left-12 bg-white dark:bg-slate-950 z-10">
+                    {r.nick_nm ?? '(이름 없음)'}
+                  </td>
                   <td className="p-2 text-center font-bold">{r.mission_count}/10</td>
+                  {['M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7', 'M8', 'M9', 'M10'].map(
+                    (m) => (
+                      <td key={m} className="p-2 text-center">
+                        {r.missions[m] ? (
+                          <span className="text-green-600 dark:text-green-400 font-bold">
+                            ✓
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
+                        )}
+                      </td>
+                    )
+                  )}
                 </tr>
               ))}
             </tbody>
