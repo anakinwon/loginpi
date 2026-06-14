@@ -50,9 +50,38 @@ export interface CreateItemInput {
   reg_qty?: number
   thumbnail_url?: string
   item_st_cd?: 'DRAFT' | 'OPEN'
+  // 상품 이미지 원본 공개 URL 배열 (최대 3장, mps_item_img에 저장)
+  images?: string[]
   // 상품 판매 위치 (LBS 동의 판매자만 — route에서 동의 검증 후 전달)
   lat?: number
   lng?: number
+}
+
+const MAX_IMAGES = 3
+
+// 상품 이미지 동기화 — 기존 이미지 전부 논리삭제 후 재삽입(순서·대표 재구성)
+// sort_ord = 배열 인덱스, thumbnail_yn = 첫 장만 'Y'(대표)
+async function syncItemImages(itemId: string, urls: string[], actorId: string) {
+  const db = getSupabaseAdmin()
+  const now = new Date().toISOString()
+  await db
+    .from('mps_item_img')
+    .update({ del_yn: 'Y', del_dtm: now, modr_id: actorId, mod_dtm: now })
+    .eq('item_id', itemId)
+    .eq('del_yn', 'N')
+
+  const rows = urls.slice(0, MAX_IMAGES).map((url, i) => ({
+    item_id: itemId,
+    img_url: url,
+    sort_ord: i,
+    thumbnail_yn: i === 0 ? 'Y' : 'N',
+    regr_id: actorId,
+    modr_id: actorId,
+  }))
+  if (rows.length > 0) {
+    const { error } = await db.from('mps_item_img').insert(rows)
+    if (error) throw new Error(error.message)
+  }
 }
 
 const SORT_MAP = {
@@ -62,7 +91,12 @@ const SORT_MAP = {
   views: { column: 'view_cnt', ascending: false },
 } as const
 
-function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+function haversineKm(
+  lat1: number,
+  lng1: number,
+  lat2: number,
+  lng2: number,
+): number {
   const R = 6371
   const dLat = ((lat2 - lat1) * Math.PI) / 180
   const dLon = ((lng2 - lng1) * Math.PI) / 180
@@ -175,7 +209,10 @@ export async function listOpenItems(filter: ItemListFilter) {
     return { items, total, page, limit }
   }
 
-  const sortKey = (filter.sort ?? 'latest') in SORT_MAP ? (filter.sort as keyof typeof SORT_MAP) : 'latest'
+  const sortKey =
+    (filter.sort ?? 'latest') in SORT_MAP
+      ? (filter.sort as keyof typeof SORT_MAP)
+      : 'latest'
   const sort = SORT_MAP[sortKey]
   const { data, count, error } = await q
     .order(sort.column, { ascending: sort.ascending })
@@ -306,7 +343,13 @@ export async function createItem(
     .single()
 
   if (error) throw new Error(error.message)
-  return data as MpsItem
+  const item = data as MpsItem
+
+  // 이미지 등록 — mps_item_img에 순서·대표와 함께 저장
+  if (input.images && input.images.length > 0) {
+    await syncItemImages(item.item_id, input.images, regrId)
+  }
+  return item
 }
 
 export interface UpdateItemPatch {
@@ -319,6 +362,8 @@ export interface UpdateItemPatch {
   thumbnail_url?: string | null
   item_st_cd?: 'DRAFT' | 'OPEN' | 'CLOSED'
   reg_qty?: number
+  // 이미지 원본 URL 배열 — 지정 시 기존 이미지 전체 교체(순서·대표 재구성)
+  images?: string[]
 }
 
 export type UpdateItemError =
@@ -393,6 +438,11 @@ export async function updateItem(
     .single()
 
   if (error) throw new Error(error.message)
+
+  // 이미지 교체 — 지정된 경우에만 mps_item_img 재구성
+  if (patch.images !== undefined) {
+    await syncItemImages(itemId, patch.images, sellerId)
+  }
   return { item: data as MpsItem }
 }
 

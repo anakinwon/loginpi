@@ -11,6 +11,10 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { LbsConsentDialog } from '@/components/lbs/lbs-consent-dialog'
+import {
+  ProductImageUploader,
+  type ProductImage,
+} from '@/components/store/product-image-uploader'
 
 interface ItemFormProps {
   serverAuthed?: boolean // 서버 getSessionUser() 확인 결과 (Google 쿠키 로그인 포함)
@@ -44,7 +48,7 @@ export function StoreItemForm({ serverAuthed = false, itemId }: ItemFormProps) {
   const [cndCd, setCndCd] = useState<'NEW' | 'USED' | 'HANDMADE'>('USED')
   const [regQty, setRegQty] = useState('1')
   const [unlimited, setUnlimited] = useState(false)
-  const [thumbnailUrl, setThumbnailUrl] = useState('')
+  const [images, setImages] = useState<ProductImage[]>([])
   const [ctgrId, setCtgrId] = useState('')
   const [ctgrTree, setCtgrTree] = useState<CtgrNode[]>([])
   const [shopId, setShopId] = useState('')
@@ -126,6 +130,11 @@ export function StoreItemForm({ serverAuthed = false, itemId }: ItemFormProps) {
             shop_id: string | null
             reg_qty: number
             thumbnail_url: string | null
+            images?: {
+              img_url: string
+              sort_ord: number
+              thumbnail_yn: string
+            }[]
           }
         }
         setItemNm(item.item_nm)
@@ -136,7 +145,15 @@ export function StoreItemForm({ serverAuthed = false, itemId }: ItemFormProps) {
         setShopId(item.shop_id ?? '')
         setUnlimited(item.reg_qty === 9999)
         setRegQty(item.reg_qty === 9999 ? '1' : String(item.reg_qty))
-        setThumbnailUrl(item.thumbnail_url ?? '')
+        // 기존 이미지 복원 — 첫 장 썸네일은 목록용 thumbnail_url 유지(나머지는 원본 미리보기)
+        const imgs = (item.images ?? [])
+          .slice()
+          .sort((a, b) => a.sort_ord - b.sort_ord)
+          .map((im, i) => ({
+            url: im.img_url,
+            thumbUrl: i === 0 ? (item.thumbnail_url ?? im.img_url) : im.img_url,
+          }))
+        setImages(imgs)
       } else {
         toast.error(t('itemNotFound'))
       }
@@ -189,7 +206,19 @@ export function StoreItemForm({ serverAuthed = false, itemId }: ItemFormProps) {
       price_pi: price,
       item_cnd_cd: cndCd,
       reg_qty: qty,
-      thumbnail_url: thumbnailUrl.trim() || undefined,
+      // 이미지 — 등록: 있을 때만 전송 / 수정: 항상 전송(빈 배열=전체 삭제).
+      // thumbnail_url = 첫 장(대표)의 목록용 썸네일
+      ...(editMode
+        ? {
+            images: images.map((im) => im.url),
+            thumbnail_url: images[0]?.thumbUrl ?? null,
+          }
+        : images.length > 0
+          ? {
+              images: images.map((im) => im.url),
+              thumbnail_url: images[0].thumbUrl,
+            }
+          : {}),
       ...(status ? { item_st_cd: status } : {}),
       // 카테고리 — 등록: 빈값이면 키 생략(uuid optional), 수정: 빈값은 null(미분류로 변경)
       ...(editMode
@@ -362,14 +391,8 @@ export function StoreItemForm({ serverAuthed = false, itemId }: ItemFormProps) {
       </div>
 
       <div className="space-y-1.5">
-        <Label htmlFor="item-thumb">{t('form.thumbUrl')}</Label>
-        <Input
-          id="item-thumb"
-          type="url"
-          value={thumbnailUrl}
-          onChange={(e) => setThumbnailUrl(e.target.value)}
-          placeholder="https://…"
-        />
+        <Label>상품 이미지</Label>
+        <ProductImageUploader images={images} onChange={setImages} max={3} />
       </div>
 
       {/* 판매 위치 — 등록 모드 전용. 동의자: GPS 수집, 미동의자: 동의 다이얼로그 (Rule LBS-01) */}

@@ -39,9 +39,9 @@ export async function GET(req: NextRequest) {
     ctgrId: sp.get('ctgr') ?? undefined,
     keyword: sp.get('q') ?? undefined,
     cndCd: sp.get('cnd') ?? undefined,
-    sort: (['latest', 'price_asc', 'price_desc', 'views', 'distance'] as const).find(
-      (s) => s === sortParam,
-    ),
+    sort: (
+      ['latest', 'price_asc', 'price_desc', 'views', 'distance'] as const
+    ).find((s) => s === sortParam),
     page: Number(sp.get('page')) || 1,
     limit: Number(sp.get('limit')) || 20,
     userLat,
@@ -60,6 +60,7 @@ const createSchema = z.object({
   shop_id: z.uuid().optional(),
   reg_qty: z.number().int().min(1).max(9999).optional(),
   thumbnail_url: z.url().optional(),
+  images: z.array(z.url()).max(3).optional(),
   item_st_cd: z.enum(['DRAFT', 'OPEN']).optional(),
   // 상품 판매 위치 — LBS 동의 판매자만 저장 (미동의 시 서버에서 제거)
   lat: z.number().min(-90).max(90).optional(),

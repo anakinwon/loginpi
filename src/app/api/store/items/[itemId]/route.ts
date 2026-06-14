@@ -38,6 +38,7 @@ const patchSchema = z.object({
   thumbnail_url: z.url().nullable().optional(),
   item_st_cd: z.enum(['DRAFT', 'OPEN', 'CLOSED']).optional(),
   reg_qty: z.number().int().min(1).max(9999).optional(),
+  images: z.array(z.url()).max(3).optional(),
 })
 
 // PATCH /api/store/items/[itemId] — 수정 (본인만)
