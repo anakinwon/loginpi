@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { Loader2, ChevronDown } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { piFetch } from '@/lib/pi-fetch'
 
 interface Mission {
@@ -50,13 +51,14 @@ interface ExcludedAgent {
 
 // 요원명 표시: 관리자는 실명 그대로, 일반 회원은 앞 4글자만 노출하고 나머지 *** 처리
 // (예: 일반 회원 → anak***, 관리자 → anakin2)
-function maskAgentName(r: Ranking, isAdmin: boolean): string {
+function maskAgentName(r: Ranking, isAdmin: boolean, noName: string): string {
   const name = r.pi_username ?? r.nick_nm
-  if (!name) return '(이름 없음)'
+  if (!name) return noName
   return isAdmin ? name : name.slice(0, 4) + '***'
 }
 
 export function ClientEventGate() {
+  const t = useTranslations('event')
   const [loading, setLoading] = useState(true)
   const [progress, setProgress] = useState<EventProgress | null>(null)
   const [missions, setMissions] = useState<Mission[]>([])
@@ -97,7 +99,7 @@ export function ClientEventGate() {
         ])
 
         if (!progressRes.ok || !rankingRes.ok) {
-          setError('데이터 로드 실패')
+          setError(t('loadError'))
           return
         }
 
@@ -111,7 +113,7 @@ export function ClientEventGate() {
         if (rankingData.is_admin) await fetchExcluded()
       } catch (err) {
         console.error('[event-gate] fetch error:', err)
-        setError('네트워크 오류')
+        setError(t('networkError'))
       } finally {
         setLoading(false)
       }
@@ -134,16 +136,16 @@ export function ClientEventGate() {
       })
       const data = await res.json()
       if (!res.ok) {
-        setExcludeMsg(data.error ?? '제외 처리에 실패했습니다')
+        setExcludeMsg(data.error ?? t('excludeFailed'))
         return
       }
       const parts: string[] = []
-      if (data.added?.length) parts.push(`제외 ${data.added.length}명`)
+      if (data.added?.length) parts.push(t('excludedN', { count: data.added.length }))
       if (data.already?.length)
-        parts.push(`이미 제외: ${data.already.join(', ')}`)
+        parts.push(t('alreadyExcluded', { names: data.already.join(', ') }))
       if (data.notFound?.length)
-        parts.push(`미발견: ${data.notFound.join(', ')}`)
-      setExcludeMsg(parts.join(' · ') || '변경 사항 없음')
+        parts.push(t('notFoundAgents', { names: data.notFound.join(', ') }))
+      setExcludeMsg(parts.join(' · ') || t('noChange'))
       setExcludeInput('')
       await refetchRanking()
     } catch (err) {
@@ -163,14 +165,14 @@ export function ClientEventGate() {
       )
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
-        setExcludeMsg(data.error ?? '제외 해제에 실패했습니다')
+        setExcludeMsg(data.error ?? t('includeFailed'))
         return
       }
       setExcludeMsg(null)
       await refetchRanking()
     } catch (err) {
       console.error('[event-gate] include error:', err)
-      setExcludeMsg('네트워크 오류')
+      setExcludeMsg(t('networkError'))
     }
   }
 
@@ -204,21 +206,19 @@ export function ClientEventGate() {
   }
 
   const gradeKo = {
-    Recruit: '요원',
-    Trainee: '수습요원',
-    Agent: '정요원',
-    Veteran: '선임요원',
-    Master: '마스터',
+    Recruit: t('gradeRecruit'),
+    Trainee: t('gradeTrainee'),
+    Agent: t('gradeAgent'),
+    Veteran: t('gradeVeteran'),
+    Master: t('gradeMaster'),
   }
 
   return (
     <div className="space-y-8 pb-24">
       {/* 헤더: 요원 등급 + 미션 카운트 */}
       <div className="space-y-3 text-center">
-        <h1 className="text-3xl font-bold">🎖️ 미션 이벤트</h1>
-        <p className="text-lg font-semibold">
-          10개 미션을 완수하고, 🎁 카카오 선물 수령하자
-        </p>
+        <h1 className="text-3xl font-bold">{t('title')}</h1>
+        <p className="text-lg font-semibold">{t('subtitle')}</p>
         {progress ? (
           <>
             <div
@@ -236,9 +236,7 @@ export function ClientEventGate() {
             </div>
           </>
         ) : (
-          <p className="text-muted-foreground text-sm">
-            로그인하면 나의 미션 진행도와 요원 등급이 표시됩니다
-          </p>
+          <p className="text-muted-foreground text-sm">{t('loginHint')}</p>
         )}
       </div>
 
@@ -248,7 +246,7 @@ export function ClientEventGate() {
           onClick={() => setExpandedMissions(!expandedMissions)}
           className="hover:bg-muted/50 flex w-full items-center justify-between rounded-lg px-4 py-3 text-left transition-colors"
         >
-          <h2 className="text-xl font-bold">📋 미션 목록</h2>
+          <h2 className="text-xl font-bold">{t('missionListTitle')}</h2>
           <ChevronDown
             className={`size-5 flex-shrink-0 transition-transform ${expandedMissions ? 'rotate-180' : ''}`}
           />
@@ -287,7 +285,7 @@ export function ClientEventGate() {
                       )}
                       {m.complete_type_cd === 'MULTI_OR' && (
                         <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">
-                          💡 힌트: 여러 방법 중 1가지만 완료하면 됩니다
+                          {t('multiOrHint')}
                         </p>
                       )}
                     </div>
@@ -302,7 +300,7 @@ export function ClientEventGate() {
       {/* 랭킹 보드 (체크리스트 매트릭스) */}
       <div>
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-xl font-bold">🏆 미션 랭킹</h2>
+          <h2 className="text-xl font-bold">{t('rankingTitle')}</h2>
           {isAdmin && (
             <div className="flex flex-col items-end gap-1">
               <div className="flex items-center gap-2">
@@ -313,7 +311,7 @@ export function ClientEventGate() {
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') handleExclude()
                   }}
-                  placeholder="요원명 입력 (콤마로 구분)"
+                  placeholder={t('excludePlaceholder')}
                   className="border-input bg-background w-56 rounded-md border px-2 py-1 text-sm"
                 />
                 <button
@@ -322,7 +320,7 @@ export function ClientEventGate() {
                   disabled={excluding || !excludeInput.trim()}
                   className="rounded-md bg-red-600 px-3 py-1 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50"
                 >
-                  {excluding ? '처리 중…' : '순위 제거'}
+                  {excluding ? t('processing') : t('removeRank')}
                 </button>
               </div>
               {excludeMsg && (
@@ -331,7 +329,7 @@ export function ClientEventGate() {
               {excludedList.length > 0 && (
                 <div className="flex flex-wrap items-center justify-end gap-1">
                   <span className="text-muted-foreground text-xs">
-                    제외된 요원:
+                    {t('excludedAgents')}
                   </span>
                   {excludedList.map((e) => (
                     <span
@@ -340,11 +338,11 @@ export function ClientEventGate() {
                     >
                       {e.sys_user?.pi_username ??
                         e.sys_user?.nick_nm ??
-                        '(이름 없음)'}
+                        t('noName')}
                       <button
                         type="button"
                         onClick={() => handleInclude(e.user_id)}
-                        title="랭킹에 다시 포함"
+                        title={t('includeTitle')}
                         className="font-bold hover:text-red-600"
                       >
                         ×
@@ -361,12 +359,12 @@ export function ClientEventGate() {
             <thead>
               <tr className="bg-muted border-b">
                 <th className="bg-muted sticky left-0 z-10 w-12 p-2 text-left font-semibold">
-                  순위
+                  {t('rankCol')}
                 </th>
                 <th className="bg-muted sticky left-12 z-10 p-2 text-left font-semibold">
-                  요원명
+                  {t('agentCol')}
                 </th>
-                <th className="p-2 text-center font-semibold">합계</th>
+                <th className="p-2 text-center font-semibold">{t('totalCol')}</th>
                 <th className="p-2 text-center font-semibold">M1</th>
                 <th className="p-2 text-center font-semibold">M2</th>
                 <th className="p-2 text-center font-semibold">M3</th>
@@ -378,9 +376,9 @@ export function ClientEventGate() {
                 <th className="p-2 text-center font-semibold">M9</th>
                 <th className="p-2 text-center font-semibold">M10</th>
                 <th className="p-2 text-center font-semibold whitespace-nowrap">
-                  마지막 수행
+                  {t('lastPerformedCol')}
                 </th>
-                <th className="p-2 text-center font-semibold">보상</th>
+                <th className="p-2 text-center font-semibold">{t('rewardCol')}</th>
               </tr>
             </thead>
             <tbody>
@@ -393,7 +391,7 @@ export function ClientEventGate() {
                     #{r.rank}
                   </td>
                   <td className="sticky left-12 z-10 bg-white px-2 dark:bg-slate-950">
-                    {maskAgentName(r, isAdmin)}
+                    {maskAgentName(r, isAdmin, t('noName'))}
                   </td>
                   <td className="px-2 text-center font-bold">
                     {r.mission_count}/10
@@ -436,15 +434,15 @@ export function ClientEventGate() {
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src="https://img1.kakaocdn.net/thumb/C375x375@2x.fwebp.q82/?fname=https%3A%2F%2Fst.kakaocdn.net%2Fproduct%2Fgift%2Fproduct%2F20250203140848_135c92640a004b0682f214bd5b5a94f3.png"
-                        alt="미션 완료 선물"
-                        title="10개 미션 완료! 축하합니다 🎉"
+                        alt={t('giftAlt')}
+                        title={t('completionTitle')}
                         loading="lazy"
                         className="mx-auto h-12 w-20 rounded-md object-cover object-center"
                       />
                     ) : (
                       <span
                         className="text-lg"
-                        title="조금만 더 힘내요! 아직 완료하지 못했어요"
+                        title={t('keepGoingTitle')}
                       >
                         🥺
                       </span>
