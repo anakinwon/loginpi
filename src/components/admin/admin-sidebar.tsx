@@ -32,7 +32,10 @@ const STORE_NAV = [
   { href: '/admin/store/categories', labelKey: 'storeCategories' },
 ] as const
 
-const EVENT_NAV = [{ href: '/admin/event/gifts', labelKey: 'eventGifts' }] as const
+const EVENT_NAV = [
+  { href: '/admin/event/gifts', labelKey: 'eventGifts' },
+  { href: '/admin/event/exclude', labelKey: 'eventExclude' },
+] as const
 
 const I18N_NAV = [{ href: '/admin/i18n', labelKey: 'i18n' }] as const
 

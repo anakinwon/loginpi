@@ -591,6 +591,7 @@
       "stdApprovals": "승인 워크플로우",
       "eventSection": "이벤트",
       "eventGifts": "선물 발송",
+      "eventExclude": "제외 관리",
       "i18nSection": "다국어",
       "i18n": "다국어 관리",
       "batch": "온디멘드 배치",
