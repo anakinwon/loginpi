@@ -146,7 +146,10 @@ export function LanguageSwitcher({ locale }: { locale: string }) {
 
   // 마지막 선택 언어 자동 적용 — 마운트 시 선호 locale로 1회 전환.
   // 전환 후 URL locale = 선호값이 되어 재전환 루프가 생기지 않는다.
+  // admin 경로는 제외 — Pi Browser에서 pit-ticket 기반 hard navigation이 필요해
+  // 자동 전환이 인증 흐름과 충돌할 수 있다(수동 전환은 switchLocale이 안전 처리).
   useEffect(() => {
+    if (pathname.startsWith('/admin')) return
     let pref: string | null = null
     try {
       pref = localStorage.getItem(PREF_LOCALE_KEY)
