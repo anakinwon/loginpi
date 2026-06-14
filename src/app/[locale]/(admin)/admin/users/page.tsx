@@ -6,9 +6,11 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { useDynamicLimit } from '@/hooks/use-dynamic-limit'
 import { AdminPagination } from '@/components/admin/admin-pagination'
+import { AdminDashboardStats } from '@/components/admin/admin-dashboard-stats'
 
-// p-6(48) + 제목+설명(56) + gap(16) + 테이블헤더(33) + gap(16) + 페이지네이션(36)
-const CHROME_PX = 205
+// p-6(48) + 제목+설명(56) + gap(16) + 통계카드(110) + gap(16) + 테이블헤더(33)
+// + gap(16) + 페이지네이션(36)
+const CHROME_PX = 331
 
 const ROLES = ['ADMIN', 'MASTER', 'MANAGER', 'USER'] as const
 type Role = (typeof ROLES)[number]
@@ -86,6 +88,9 @@ export default function UsersPage() {
           {t('totalCount', { count: users.length })}
         </p>
       </div>
+
+      {/* 사용자 연동 통계 (전체·Pi전용·Google전용·계정연동) — 구 대시보드에서 이동 */}
+      <AdminDashboardStats />
 
       {loading ? (
         <p className="text-muted-foreground text-sm">{tc('loading')}</p>

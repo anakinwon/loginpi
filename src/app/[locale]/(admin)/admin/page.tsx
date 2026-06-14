@@ -1,28 +1,13 @@
-import { getTranslations } from 'next-intl/server'
-import { getSessionUser } from '@/lib/auth-check'
-import { AdminDashboardStats } from '@/components/admin/admin-dashboard-stats'
+import { redirect } from 'next/navigation'
 
-// 관리자 대시보드 — 통계 카드는 클라이언트 fetch(AdminDashboardStats)로 전환
-// ① SSR 4쿼리 제거 → 페이지 골격 즉시 표시 ② Pi Browser(쿠키 없음)에서 0 표시되던 버그 해결
-export default async function AdminDashboard() {
-  const [user, t] = await Promise.all([
-    getSessionUser(),
-    getTranslations('admin.dashboard'),
-  ])
-
-  return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">{t('title')}</h1>
-        <p className="text-muted-foreground mt-1 text-sm">
-          {t('greeting', {
-            name: user?.display_name ?? '',
-            role: user?.role ?? '',
-          })}
-        </p>
-      </div>
-
-      <AdminDashboardStats />
-    </div>
-  )
+// 구 관리자 대시보드는 사용자 관리(/admin/users)로 통합됨.
+// 사용자 연동 통계 카드는 users 페이지 상단으로 이동, 대시보드 메뉴는 제거.
+// /admin 직접 진입 시 users로 이동 (경로 redirect — 인증 무관, 무한루프 없음).
+export default async function AdminIndex({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}) {
+  const { locale } = await params
+  redirect(`/${locale}/admin/users`)
 }
