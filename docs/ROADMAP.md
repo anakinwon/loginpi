@@ -2,14 +2,14 @@
 
 Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Network 앱 플랫폼
 
-> **기준일**: 2026-06-13
-> **현재 버전**: Phase 7~12 완료 (PiCafé MVP · Pi 수익화 · 생태계 확장 · 사용자 프로필 · 통계 대시보드 · PiTranslate™ TASK-090~099 ✅) · **Phase 13 PiShop(MPS) Phase 1 MVP + Phase 2 확장 완료 (TASK-100~111 ✅ · 카테고리·매장관리·양방향취소·거래내역 · Phase 3 PiRC3·Maps 예정)** · **Phase 14 PiVoice™ v3.0 권한 시스템 구현 완료 (TASK-120~125 ✅, `docs/PRD_9_VOICE_CHAT.md` v3.0 — 방장 보장 슬롯 + 멤버 자동 2/승인 2, S0 실기기 검증·TURN env 잔여)** · **Phase 15 LBS P0+P1 완료 (TASK-130~140 ✅, 상품 개별 위치 등록 포함)** · 횡단 개선: 무한 스크롤·지연 로딩 + SWR 캐싱·병렬 호출 성능 튜닝, Pi Tip→Bean 리브랜딩, 스티커 노출 개선 (2026-06-12) · **횡단 3차 (2026-06-13): Pi Browser admin 다국어 전환 무반응 수정(_pit 티켓 선발급) + 헤더 다국어 콤보 3계층 캐시 성능 개선**
+> **기준일**: 2026-06-14
+> **현재 버전**: Phase 7~12 완료 (PiCafé MVP · Pi 수익화 · 생태계 확장 · 사용자 프로필 · 통계 대시보드 · PiTranslate™ TASK-090~099 ✅) · **Phase 13 PiShop(MPS) Phase 1+2 완료 (TASK-100~111 ✅ · 카테고리·매장관리·양방향취소·거래내역) + 후속 개선(A2U 자동 환불·상품 이미지 업로드·취소 UI) · Phase 3 PiRC3 보류·Maps 예정** · **Phase 14 PiVoice™ v3.0 권한 시스템 구현 완료 (TASK-120~125 ✅, `docs/PRD_9_VOICE_CHAT.md` v3.0 — 방장 보장 슬롯 + 멤버 자동 2/승인 2, S0 실기기 검증·TURN env 잔여)** · **Phase 15 LBS P0+P1 완료 (TASK-130~140 ✅, 상품 개별 위치 등록 포함)** · 횡단 개선: 무한 스크롤·지연 로딩 + SWR 캐싱·병렬 호출 성능 튜닝, Pi Tip→Bean 리브랜딩, 스티커 노출 개선 (2026-06-12) · **횡단 3차 (2026-06-13): Pi Browser admin 다국어 전환 무반응 수정(_pit 티켓 선발급) + 헤더 다국어 콤보 3계층 캐시 성능 개선** · **횡단 4차 (2026-06-14): CafePi 헤더 로고 교체·Pi Bet UI 아코디언·다국어 선택기 기억·PiShop 브랜드 통일·admin open redirect 방어 + 어드민 대시보드 고도화(coin360 트리맵·사용자 관리 통합·KST 집계 교정·결제내역 개선)**
 > **배포 URL**: https://loginpi.vercel.app
 > **기술 스택**: Next.js 16 App Router · React 19 · TypeScript 6 · Tailwind CSS v4 · NextAuth.js · Supabase PostgreSQL
 
 ---
 
-## 📊 전체 진행률 요약 (2026-06-13)
+## 📊 전체 진행률 요약 (2026-06-14)
 
 ### Phase 완료 현황
 
@@ -31,12 +31,14 @@ Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Net
 | **13** | PiShop(MPS) | ✅ 완료 (P1+P2) | 100% (P2 카테고리·매장·양방향취소·거래내역 완료 · P3 PiRC3·Maps 예정) |
 | **14** | PiVoice™ v3.0 | ✅ 완료 (v3.0 권한 시스템) | 100% (S0 실기기 검증 잔여) |
 | **15** | LBS 위치기반서비스 | ✅ 완료 (P0+P1) | 100% (상품 개별 위치 포함 · 지도 UI 확장 예정) |
+| **16** | 이벤트 미션 시스템 (Pi 요원 육성) | 📋 기획 완료 | PRD_11_EVENT.md v1.2 — 구현 대기 |
 | **횡단** | 성능 튜닝 | ✅ 완료 | 100% (무한 스크롤·지연 로딩·SWR 캐싱·리브랜딩·스티커) |
 | **횡단3** | Pi Browser 안정화·콤보 성능 (2026-06-13) | ✅ 완료 | 100% (admin 다국어 전환 무반응 수정·헤더 콤보 3계층 캐시) |
+| **횡단4** | Pi Browser 안정화 4차·MPS 후속·대시보드 고도화 (2026-06-14) | ✅ 완료 | 100% (A2U 환불·트리맵·Pi Bet UI·헤더 로고·다국어 기억·브랜드 등) |
 
 ### 통계
-- **총 Phase**: 16개 (0~15 + 횡단 개선)
-- **완료**: 16개 (100%)
+- **총 Phase**: 17개 (0~16 + 횡단 개선)
+- **완료**: 16개 구현 완료 · 1개(Phase 16 이벤트) 📋 기획 완료(구현 대기)
 - **진행 중**: 0개
 - **예정**: 확장 Phase (MPS P2/P3, LBS 확장, PiVoice 추가 기능)
 
@@ -53,9 +55,11 @@ Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Net
 
 **다음 단계** (본문 Phase별 TASK 기준):
 - ✅ MPS Phase 2 (TASK-108~111) 완료 (2026-06-13): 카테고리 시스템 · 매장 관리 · 양방향 주문 취소 · 거래 내역
+- ✅ MPS 후속 개선 완료 (2026-06-14): A2U 자동 환불 · FR-10 교정 · 상품 이미지 업로드 · 상품 등록 위치 수집
 - MPS Phase 3 (TASK-112~113): **TASK-112 PiRC3 실 에스크로 = 🔒 보류**(2026-06-13 공식 확인 — PiRC3 미존재·Pi SDK `invokeContract` 미지원 → 플랫폼 가상 에스크로 유지) · TASK-113 Google Maps 연동(`NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` 필요) — *MPS는 배송 없는 직거래 전용*
 - PiVoice 잔여 (S0~S3): Pi Browser 실기기 마이크 검증 · TURN 운영 설정(`TURN_HOST`/`TURN_SECRET`) · 품질 데이터 기반 coturn 전환 판단 · 5인+ LiveKit SFU/결제 게이팅 검토
 - LBS 향후 Phase: Maps JavaScript API 지도 UI · Places API 매장 검색
+- Phase 16 이벤트 미션 시스템: 📋 기획 완료 (PRD_11_EVENT.md v1.2) — 구현 대기
 
 ---
 
@@ -694,6 +698,14 @@ if (meta?.type === 'CHAT_SUBSCR') {
 - ✅ `custom-sticker-creator.tsx` — 스티커 피커 🎨 버튼 → 제작 다이얼로그 (미리보기·판매 옵션)
 - ℹ️ PRD의 제작비 0.5 Pi는 **Business 플랜 포함**으로 처리 (BUSINESS 전용 기능 — 별도 결제 흐름 생략)
 
+### Phase 9 후속 — Pi Bet UI 개선 ✅ 완료 (2026-06-14)
+
+- ✅ Pi Bet 패널 아코디언 구조 (`c490fb7`) — 항목별 접기/펼치기, OPEN 상태 기본 펼침
+- ✅ 선택지 색상 팔레트 4종 순환 (cyan·purple·amber·emerald) + 상태별 헤더 색상 구분
+- ✅ 당첨자 황금 스포트라이트 글로우 애니메이션 (`bet-spotlight` CSS keyframe, 1.6s 맥동)
+- ✅ 당첨 배너 shimmer 효과 (`bet-shimmer`) — 아코디언 밖 항상 표시, 획득 Pi 금액 표기
+- ✅ `globals.css`에 3종 `@keyframes` 추가 (bet-spotlight·bet-confetti·bet-shimmer)
+
 ---
 
 ## Phase 10: 사용자 프로필 관리 (마이페이지) ✅ 완료 (2026-06-09)
@@ -837,6 +849,19 @@ if (meta?.type === 'CHAT_SUBSCR') {
   - 결제 활성 사용자를 상위로 부상시켜 수익화 기여도 반영
 - ✅ `fn_top_active_users` RPC 수정 — Supabase 재배포 완료
 
+### Phase 11 후속 고도화 2차 ✅ 완료 (2026-06-14)
+
+#### 어드민 대시보드 고도화 4종
+
+- ✅ coin360 스타일 테마별 매출 비중 트리맵 추가 (`3738ffc`) — Plotly squarify 트리맵, 영역 크기=매출액, 색상=테마별 고정. 기존 도넛 차트와 나란히 배치
+- ✅ 관리자 대시보드 → 사용자 관리 통합 + 대시보드 메뉴 제거 (`b5611bf`) — 사용자 관리가 대시보드 기능 흡수, 메뉴 단순화
+- ✅ 매출 차트 색상 도넛·트리맵 일치 + 테마별 고정색 구분 (`cacba8e`) — 동일 테마는 모든 차트에서 동일 색상 보장
+- ✅ 통계 집계 시간대 UTC→KST 통일 (`c46d9c3`) — DAU/WAU/MAU·매출 날짜 경계를 KST 기준으로 교정(자정 오프셋 -9h 해소)
+
+#### 관리자 결제내역 개선
+
+- ✅ 거래구분 통합 + 취소내역 포함 + 사용자표시·검색 개선 (`6172020`) — 결제 유형별 필터·취소 내역 별도 탭·사용자명/Pi UID 표시 및 검색
+
 ---
 
 ## Phase 12: PiTranslate™ 글로벌 동시통역 ✅ 완료 (2026-06-12 — TASK-090~099 전체)
@@ -966,14 +991,14 @@ if (meta?.type === 'CHAT_SUBSCR') {
 - 🔜 `src/lib/mps-order.ts` — 주문 생성·상태 전이·에스크로 흐름
 - 🔜 `src/lib/mps-shop.ts` — 매장 CRUD
 
-### TASK-102: 상품 API (FR-01·FR-02·FR-04) ✅ (2026-06-11 — 이미지 업로드 엔드포인트만 후속)
+### TASK-102: 상품 API (FR-01·FR-02·FR-04) ✅ (2026-06-11 — 이미지 업로드 엔드포인트 2026-06-14 완료)
 
-- 🔜 `GET /api/store/items` — 목록 조회 (카테고리·상태·키워드 필터, 커서 페이지네이션)
-- 🔜 `POST /api/store/items` — 상품 등록 (판매자 인증, Zod 검증)
-- 🔜 `GET /api/store/items/[itemId]` — 상세 조회 (이미지 포함)
-- 🔜 `PATCH /api/store/items/[itemId]` — 수정 (소유자 확인)
-- 🔜 `DELETE /api/store/items/[itemId]` — 논리삭제 (`del_yn='Y'`, 물리 DELETE 금지)
-- 🔜 `POST /api/store/items/[itemId]/images` — 이미지 업로드 (Supabase Storage)
+- ✅ `GET /api/store/items` — 목록 조회 (카테고리·상태·키워드 필터, 커서 페이지네이션)
+- ✅ `POST /api/store/items` — 상품 등록 (판매자 인증, Zod 검증)
+- ✅ `GET /api/store/items/[itemId]` — 상세 조회 (이미지 포함)
+- ✅ `PATCH /api/store/items/[itemId]` — 수정 (소유자 확인)
+- ✅ `DELETE /api/store/items/[itemId]` — 논리삭제 (`del_yn='Y'`, 물리 DELETE 금지)
+- ✅ `POST /api/store/items/[itemId]/images` — 이미지 업로드 (Supabase Storage, 3cd0bc8)
 
 ### TASK-103: 재고 관리 (FR-07) ✅ (2026-06-11 — RPC 단일 트랜잭션 + 9999 센티널 + CHECK 이중 안전장치)
 
@@ -1002,15 +1027,15 @@ if (meta?.type === 'CHAT_SUBSCR') {
 - 🔜 `ClientStoreGate` — `getSessionUser()` null 시 클라이언트 게이트 (`redirect` 금지 — Pi Browser 무한 루프 방지)
 - 🔜 `piFetch` 의무 — 모든 API 호출에 `X-Pi-Token` 헤더 자동 첨부
 
-### TASK-106: 내 상품 관리 UI (SCR-03·SCR-04) ✅ (2026-06-11 — 등록 폼 완료, 수정 폼·이미지 업로드 후속)
+### TASK-106: 내 상품 관리 UI (SCR-03·SCR-04) ✅ (2026-06-11 — 등록 폼 완료, 이미지 업로드 2026-06-14 완료)
 
-- 🔜 `src/app/[locale]/store/my/items/page.tsx` — 내 상품 목록 (상태별 탭: DRAFT/OPEN/CLOSED/SOLD)
-- 🔜 `src/app/[locale]/store/my/items/new/page.tsx` — 상품 등록/수정 폼 (이미지 업로드 포함)
+- ✅ `src/app/[locale]/store/my/items/page.tsx` — 내 상품 목록 (상태별 탭: DRAFT/OPEN/CLOSED/SOLD)
+- ✅ `src/app/[locale]/store/my/items/new/page.tsx` — 상품 등록/수정 폼 + 이미지 업로드 (product-image-uploader.tsx)
 
 ### TASK-107: 주문 관리 UI (SCR-05·SCR-06) ✅ (2026-06-11)
 
-- 🔜 `src/app/[locale]/store/my/sales/page.tsx` — 판매 주문 관리 (거래 완료 선언 버튼)
-- 🔜 `src/app/[locale]/store/my/orders/page.tsx` — 구매 주문 관리 (최종 확인 버튼)
+- ✅ `src/app/[locale]/store/my/sales/page.tsx` — 판매 주문 관리 (거래 완료 선언 버튼 + 취소 버튼)
+- ✅ `src/app/[locale]/store/my/orders/page.tsx` — 구매 주문 관리 (최종 확인 버튼 + 취소 버튼 — 7b2203a 개선)
 
 > **P0 완료 = Phase 1 MVP**: TASK-100 → 101 → 102 → 103 → 104 → 105 → 106 → 107
 
@@ -1058,6 +1083,31 @@ if (meta?.type === 'CHAT_SUBSCR') {
 - ✅ `src/app/[locale]/store/my/history/page.tsx` (SCR-07) — redirect 금지 게이트, `/store` nav에 `거래 내역` 링크 추가
 - ✅ DB 변경 없음 — `mps_txn_hist`(ESCROW_IN·RELEASE_OUT 등 적재 중)는 sql/029에서 기 완비
 - ✅ i18n — `store.history.*`·`store.navHistory` ko.json + en.json + i18n_message DB en upsert(is_auto='N', 거래유형 라벨 7종 포함)
+
+---
+
+### Phase 13 후속 개선 ✅ 완료 (2026-06-14)
+
+#### A2U 자동 환불 구축 (FR-10 확장)
+
+- ✅ 구매자 취소 시 결제액-수수료 실송금 A2U 자동 환불 (`512a4a5`) — Pi 플랫폼 계정→구매자 계정 실송금, 환불 거래유형 `MPS_CANCEL_REFUND` 신규
+- ✅ A2U 환불 거래유형 제약 확장 + 송금 후 장부기록 실패 안전화 (`a619378`) — DB 기록 실패가 송금 성공을 롤백하지 않도록 단계 분리
+- ✅ 판매자 취소 시 구매자 환불 누락 수정 (`76e2fb7`) — 통합 환불 공식 적용, 양방향 취소 모두 환불 처리(FR-10)
+- ✅ FR-10 ADMIN 게이트 버그 교정 (`c8829c4`) — 취소수수료 판정 기준을 관리자 여부→거래 당사자 여부로 교정
+
+#### 주문 관리 UI 개선
+
+- ✅ 주문관리 취소 버튼 구매자/판매자 역할 구분 표시 (`7b2203a`) — 역할별 버튼 레이블 분리, 취소 중(CANCELLING) 상태 시각화
+
+#### 상품 이미지 업로드
+
+- ✅ 상품 이미지 업로드 구현 (`3cd0bc8`) — 갤러리/촬영 소스 선택, 클라이언트 1MB 자동 압축(`image-resize.ts`), 최대 3장, 썸네일 지정
+- ✅ `POST /api/store/items/[itemId]/images` 신규 엔드포인트 + `product-image-uploader.tsx` 컴포넌트
+- ✅ Supabase Storage `mps-images` 버킷 활용, `mps_item_img` 테이블(`sql/042_mps_item_images.sql`)
+
+#### 상품 등록 시 위치 자동수집
+
+- ✅ 상품 등록 시 동의자 현재 위치 자동수집 + 게시 위치 필수화 (`23bf3ba`) — LBS 동의 사용자 상품 등록 시 `loc_tp_cd='04'` GPS 좌표 자동 기록
 
 ---
 
@@ -1276,6 +1326,9 @@ if (meta?.type === 'CHAT_SUBSCR') {
 | M26: 횡단 2차 — SWR 캐싱·상품 위치·스티커 | — | 2026-06-12 | HOME·Shop·관리자·카페 목록 SWR 캐싱(localStorage) + 병렬(비동기) 호출 일괄 적용(`client-cache.ts`·`chat-room-list.ts`·`/api/admin/dashboard`) + 상품 개별 위치 등록(sql/036, store-item-form GPS) + 스티커 노출 개선(sql/038 골프·응원팩 최우선 정렬·2배 확대·저장 방지) + 다국어 동기화(LBS·카페 목록 키) | ✅ 완료 |
 | M28: MPS Phase 2 확장 | Phase 13 | 2026-06-13 | 카테고리(108 검증)·매장 관리(109 신규: shops API 2종+관리 UI+상품폼 매장선택)·양방향 취소(110 검증)·거래 내역(111 신규: txns API+history UI+날짜필터) — 신규 라우트 3종, DB 마이그레이션 0(기존 테이블 활용), i18n ko/en+DB upsert | ✅ 완료 |
 | M27: 횡단 3차 — Pi Browser 안정화·콤보 성능 | — | 2026-06-13 | ① **admin 다국어 전환 무반응 수정**: `language-switcher.tsx` admin 분기에서 `piFetch`로 `_pit` 티켓 선발급 후 URL(`?_pit=`)에 실어 하드 네비게이션 → 첫 요청부터 인증(게이트 왕복·soft-nav 의존 제거) ② **헤더 다국어 콤보 3계층 캐시**: `/api/i18n/countries` revalidate=600(서버), sessionStorage+메모리 TTL 10분(클라이언트, lazy initializer 즉시 반영), requestIdleCallback 프리페치 — 재열기·페이지 이동 시 지연 0 | ✅ 완료 |
+| M29: MPS 후속 개선 | Phase 13 | 2026-06-14 | A2U 자동 환불(MPS_CANCEL_REFUND · 512a4a5·a619378·76e2fb7)·FR-10 ADMIN 게이트 버그 교정(c8829c4)·주문관리 취소 버튼 역할 구분(7b2203a)·상품 이미지 업로드 3장·1MB·썸네일(3cd0bc8·sql/042)·상품 등록 시 위치 자동수집(23bf3ba) | ✅ 완료 |
+| M30: 대시보드 고도화 | Phase 11 | 2026-06-14 | coin360 트리맵(3738ffc)·사용자 관리 통합+대시보드 메뉴 제거(b5611bf)·차트 색상 통일(cacba8e)·KST 집계 교정(c46d9c3)·결제내역 거래구분 통합+취소내역(6172020) | ✅ 완료 |
+| M31: 횡단 4차 — Pi Browser 안정화 | 횡단 | 2026-06-14 | CafePi 헤더 로고 교체(12118e7)·Pi Bet UI 아코디언+스포트라이트(c490fb7)·다국어 선택기 기억(d52d7ef)·PiShop 브랜드 전면 치환(04c9350)·admin 게이트 open redirect 방어(43ab342·8f419ee) | ✅ 완료 |
 
 ---
 
@@ -1309,10 +1362,37 @@ if (meta?.type === 'CHAT_SUBSCR') {
 
 ---
 
+## Phase 16: 이벤트 미션 시스템 (Pi 요원 육성) 📋 기획 완료 (2026-06-14 — 구현 대기)
+
+> 상세 요구사항: **`docs/PRD_11_EVENT.md` v1.2** · `PRD.md` 섹션 18
+
+10가지 미션을 실제 비즈니스 로직 트리거에서 멱등 자동 감지 → 전부 완료 시 화이트리스트 → 미션 수행 합계(sum) 내림차순 랭킹. 첫 완료 **선착순 10명**에게 카카오 선물. 컨셉: "Pi 요원 육성"(요원 등급 5단계 Recruit→Master Agent), Footer 'Event' 탭 신설.
+
+### TASK-150: 이벤트 DB 스키마 📋
+- `evt_mission`(미션 정의)·`evt_user_mission`(완료 이력 `UNIQUE(user_id, mission_cd)`)·`evt_exclude`(제외)·`evt_gift_log`(선물 발송 추적) + 미션 M1~M10 시드. DA 표준 시스템 컬럼 4개 + 논리삭제.
+
+### TASK-151: 미션 완료 자동 감지 훅 📋
+- 기존 API(계정연동·프로필·카페생성·Pi Bet·Bean·음성/파일/스티커·PiShop 취소·보증금·위치동의)에 `recordUserMission()` 멱등 upsert 삽입. M10은 M9 완료 시각 이후 취소(FEE 발생) 판정.
+
+### TASK-152: Footer Event 탭 + 이벤트 페이지 📋
+- Footer `[Home][Cafe][Shop][Event][My]` 확장 → `/[locale]/event`(미션 진행도·요원 등급·랭킹). 클라이언트 게이트(`ClientEventGate`)·`piFetch`(Pi Browser 쿠키 미저장 대응).
+
+### TASK-153: 랭킹 + 선착순 선물 관리 📋
+- sum 내림차순 랭킹(요원명 ✓ 매트릭스·제외자 필터·tie-break `complete_dtm`). 선착순 10명 카카오 선물(`gift.kakao.com/product/11105359`, M2 카톡ID 수동 발송·`evt_gift_log` 추적·10명 마감 배너).
+
+### TASK-154: 관리자 제외 관리 📋
+- `/admin/event/exclude`(`isAdmin` 게이트, `evt_exclude` 논리삭제 토글, 제외 시 차순위 자동 승격).
+
+⚠️ **확인 필요**: 선착순 기준(전체 미션 완료 vs 1개 이상) 확정 · M10 완료 판정/중복 기록 정책 · i18n 키 분리.
+
+---
+
 ## 변경 이력
 
 | 버전 | 날짜 | 변경 내용 | 작성자 |
 |------|------|---------|-------|
+| v8.0 | 2026-06-14 | **Jun 14 전체 개선 현행화** — ① Phase 13 MPS 후속: A2U 자동 환불(512a4a5·a619378·76e2fb7)·FR-10 ADMIN 게이트 버그 교정(c8829c4)·주문관리 취소 UI(7b2203a)·상품 이미지 업로드(3cd0bc8·sql/042)·상품 등록 위치 자동수집(23bf3ba) ② Phase 11 후속 2차: coin360 트리맵(3738ffc)·대시보드 사용자 관리 통합(b5611bf)·차트 색상 통일(cacba8e)·KST 집계 교정(c46d9c3)·결제내역 개선(6172020) ③ Phase 9 후속: Pi Bet UI 아코디언·스포트라이트(c490fb7) ④ 횡단4차: 헤더 로고(12118e7)·다국어 기억(d52d7ef)·PiShop 브랜드 치환(04c9350)·admin open redirect 방어(8f419ee·43ab342). M29~M31 마일스톤 추가. 기준일·버전 헤더 2026-06-14 갱신. | anakin |
+| v7.0 | 2026-06-14 | **Phase 16 이벤트 미션 시스템(Pi 요원 육성) 로드맵 추가** — `docs/PRD_11_EVENT.md` v1.2 수용. 10미션 게이미피케이션(M1 계정통합~M10 보증금 활성 취소수수료 경험)·미션 완료 멱등 자동감지·화이트리스트·요원 등급 5단계·sum 내림차순 랭킹·관리자 제외·보상 3계층(전원 뱃지/선착순 10명 카카오 선물·M2 카톡ID 발송/Phase2+ Pi A2U). TASK-150~154. 데이터모델 `evt_mission`·`evt_user_mission`·`evt_exclude`·`evt_gift_log`. Phase 완료 현황 표·통계 갱신(총 17개). PRD.md v11.0 동기화(섹션 18 신설). ⚠️ 확인 필요: 선착순 기준·M10 판정 로직. | anakin |
 | v1.0 | 2026-06-05 | 초안 작성 — Pi Network 플랫폼 기준으로 전면 재작성. Phase 0~2 완료, Phase 3 진행 중 반영 | anakin |
 | v1.1 | 2026-06-05 | Phase 3 완료(관리자 결제·연동현황), Phase 4 완료(통합 게시판 TASK-021~025), 보안 수정(PostgREST ilike 인젝션) | anakin |
 | v1.2 | 2026-06-06 | Phase 5 TASK-030~033 완료 반영 (표준단어·도메인·용어·DDL Export), M9 달성 | anakin |
