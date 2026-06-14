@@ -56,7 +56,7 @@ function localDtmNow(): string {
 export function GroupRoomCreator() {
   const t = useTranslations('chat.creator')
   const router = useRouter()
-  const { isInPiBrowser } = usePiAuth()
+  const { isInPiBrowser, user } = usePiAuth()
   const [open, setOpen] = useState(false)
   const [step, setStep] = useState<Step>(1)
   const [selectedTheme, setSelectedTheme] = useState<ThemeRow | null>(null)
@@ -304,6 +304,10 @@ export function GroupRoomCreator() {
     setPayStatus('idle')
     setPayError(null)
   }, [])
+
+  // 카페 만들기는 Pi Browser에서 로그인한 사용자만 가능 (비로그인·일반 브라우저는 버튼 숨김)
+  // 목록은 게스트 공개지만, 생성은 Pi 결제·소유권이 걸려 있어 Pi 로그인 필수
+  if (!isInPiBrowser || !user) return null
 
   return (
     <>
