@@ -141,6 +141,9 @@
       "board": "ניהול Board",
       "chatSection": "ניהול Cafe",
       "dashboard": "Dashboard",
+      "eventExclude": "ניהול החרגה",
+      "eventGifts": "שליחת מתנות",
+      "eventSection": "אירוע",
       "i18n": "ניהול רב לשוני",
       "i18nSection": "רב לשוני",
       "links": "סטטוס קישור חשבונות",
@@ -172,6 +175,7 @@
         "user": "משתמש"
       },
       "noPayments": "אין היסטוריית תשלומים.",
+      "searchPiUsername": "חיפוש שם משתמש של Pi (התאמה חלקית)",
       "status": {
         "approved": "אושר",
         "cancelled": "מבוטל",
@@ -480,6 +484,12 @@
     "activeToggle": "פעיל/לא פעיל",
     "allCountriesInactive": "כל המדינות (לא פעילות)",
     "alreadyActive": "כבר פעיל",
+    "autoAll": "תרגום אוטומטי מלא",
+    "autoDone": "תרגום אוטומטי מלא הושלם ({count} שפות)",
+    "autoNoPending": "אין שפות ממתינות לתרגום אוטומטי",
+    "autoProgress": "מתבצע תרגום אוטומטי ({current}/{total})",
+    "autoStop": "עצור",
+    "autoStopped": "תרגום אוטומטי הופסק ({done}/{total} הושלמו)",
     "clickToDeactivate": "לחץ כדי להשבית",
     "countItems": "{count} פריטים",
     "country": "מדינה",
@@ -519,6 +529,7 @@
     "subtitle": "משתמשים פעילים · סטטיסטיקות הכנסות (מבוססות צבירה יומית)",
     "themeDaily": "הכנסות יומיות לפי Theme",
     "themeShare": "נתח הכנסות לפי Theme",
+    "themeTreemap": "יחס מכירות לפי Theme (Treemap)",
     "top3Active": "Top 3 משתמשים פעילים (ב-{period} הימים האחרונים)",
     "top3Buyers": "Top 3 קונים (ב-{period} הימים האחרונים)",
     "top3Themes": "Top 3 הכנסות מ-Theme (ב-{period} הימים האחרונים)",
@@ -1171,6 +1182,83 @@
     "upgrade": "Upgrade",
     "yes": "כן"
   },
+  "event": {
+    "agentCol": "שם סוכן",
+    "alreadyExcluded": "כבר הוחרגו: {names}",
+    "completionTitle": "10 Missions הושלמו! מזל טוב 🎉",
+    "excludedAgents": "סוכנים שהוחרגו:",
+    "excludedN": "הוחרגו {count} אנשים",
+    "excludeFailed": "נכשל בעיבוד החרגה",
+    "excludePlaceholder": "הזן שם סוכן (מופרד ב-Comma)",
+    "giftAlt": "מתנת השלמת Mission",
+    "gradeAgent": "סוכן",
+    "gradeMaster": "Master",
+    "gradeRecruit": "מגויס",
+    "gradeTrainee": "מתאמן",
+    "gradeVeteran": "ותיק",
+    "includeFailed": "נכשל בשחרור החרגה",
+    "includeTitle": "כלול שוב ב-Ranking",
+    "keepGoingTitle": "עוד קצת מאמץ! עדיין לא הושלם",
+    "lastPerformedCol": "בוצע לאחרונה",
+    "loadError": "נכשל בטעינת Data",
+    "loginHint": "Login כדי לראות את התקדמות ה-Mission שלך ואת דרגת הסוכן",
+    "missionListTitle": "📋 רשימת Missions",
+    "missions": {
+      "M1": {
+        "desc": "Login ל-Pi Browser + Login ל-Google (השלם את שניהם)",
+        "name": "איחוד חשבונות"
+      },
+      "M10": {
+        "desc": "(לאחר M9) בצע שוב את משימות 7 ו-8 — חווה את עמלת הביטול במצב של פיקדון פעיל",
+        "name": "עמלת ביטול עסקה עם פיקדון פעיל"
+      },
+      "M2": {
+        "desc": "הזן כינוי + KakaoTalk ID בחשבון המאוחד (נדרש לקבלת מתנה)",
+        "name": "השלם Profile"
+      },
+      "M3": {
+        "desc": "צור PREMIUM Cafe ב-PiCafe + השתמש בתכונת התרגום האוטומטי",
+        "name": "צור PREMIUM Cafe (PiRC1) + תרגום אוטומטי"
+      },
+      "M4": {
+        "desc": "העבר Bean ליותר מאדם אחד בצ'אט",
+        "name": "Bean העברה Test (PiRC1)"
+      },
+      "M5": {
+        "desc": "לאחר הרשמה ל-Pi Subscription Service, יצירה של Pi Bet ב-Cafe + הפצה למשתתפים",
+        "name": "לאחר הרשמה ל-Pi Subscription Service (PiRC2), יצירה והפצה של Pi Bet"
+      },
+      "M6": {
+        "desc": "אחד או יותר מהבאים: שימוש ב-Sticker / העברת File / שימוש ב-Voice Channel",
+        "name": "שימוש ב-Chat Multi-function"
+      },
+      "M7": {
+        "desc": "לאחר רישום המוצר שלי ב-PiShop, ביטול עסקה על ידי מוכר במהלך עסקה",
+        "name": "ביטול עסקה על ידי מוכר (Escrow Service;PiRC3)"
+      },
+      "M8": {
+        "desc": "לאחר רכישת מוצר של אחר ב-PiShop, ביטול עסקה על ידי קונה",
+        "name": "ביטול עסקה על ידי קונה (Escrow Service;PiRC3)"
+      },
+      "M9": {
+        "desc": "הפקדת פיקדון מוכר של 1Pi או יותר ב-PiShop + הסכמה ל-Location Based Service",
+        "name": "פיקדון מוכר + הסכמה ל-Location (Escrow Service;PiRC3)"
+      }
+    },
+    "multiOrHint": "💡 Hint: רק אחת מכמה שיטות צריכה להסתיים",
+    "networkError": "שגיאת Network",
+    "noChange": "אין שינויים",
+    "noName": "(ללא שם)",
+    "notFoundAgents": "לא נמצאו: {names}",
+    "processing": "בעיבוד...",
+    "rankCol": "דירוג",
+    "rankingTitle": "🏆 Ranking Missions",
+    "removeRank": "הסר דירוג",
+    "rewardCol": "פרס",
+    "subtitle": "השלם 10 Missions וקבל 🎁 מתנת Kakao",
+    "title": "🎖️ Event Mission",
+    "totalCol": "סך הכל"
+  },
   "header": {
     "admin": "Admin",
     "board": "Board",
@@ -1295,6 +1383,7 @@
   "nav": {
     "admin": "מנהל",
     "cafe": "Cafe",
+    "event": "Event",
     "home": "Home",
     "my": "המידע שלי",
     "shop": "Shop"
@@ -1493,11 +1582,35 @@
       "qty": "כמות למכירה",
       "saveDraft": "שמור כטיוטה",
       "saveEdit": "שמור שינויים",
+      "shop": "חנות",
+      "shopNone": "אין חנות",
       "thumbUrl": "URL תמונת תצוגה",
       "unlimited": "ללא הגבלה",
       "unlimitedHint": "רשום פריטים כמו משקאות או פיצה, שמעקב מלאי עבורם חסר משמעות, כ'ללא הגבלה'."
     },
     "formInvalid": "אנא בדוק את שם הפריט והמחיר",
+    "history": {
+      "clearFilter": "נקה Filter",
+      "empty": "אין היסטוריית עסקאות",
+      "from": "תאריך התחלה",
+      "tab": {
+        "ALL": "הכל",
+        "BUY": "קנייה",
+        "ETC": "אחר",
+        "SELL": "מכירה"
+      },
+      "title": "היסטוריית עסקאות",
+      "to": "תאריך סיום",
+      "type": {
+        "BOND_DEPOSIT": "הפקדת פיקדון",
+        "CANCEL_FEE_IN": "קבלת עמלת ביטול",
+        "CANCEL_REFUND": "ביטול והחזר",
+        "ESCROW_IN": "הפקדת קנייה",
+        "REFUND_IN": "הפקדת החזר",
+        "RELEASE_OUT": "הסדר מכירה",
+        "SETTLE_OUT": "משיכת הסדר"
+      }
+    },
     "itemNotFound": "הפריט לא נמצא",
     "itemSt": {
       "CLOSED": "הושהה",
@@ -1516,6 +1629,7 @@
     "loginRequired": "זמין לאחר התחברות",
     "myItemsTitle": "ניהול הפריטים שלי",
     "myOwnItem": "זהו פריט שרשמתי",
+    "navHistory": "היסטוריית עסקאות",
     "navMyItems": "הפריטים שלי",
     "navOrders": "היסטוריית הזמנות",
     "navSales": "ניהול מכירות",
@@ -1543,12 +1657,48 @@
     "piBrowserOnly": "ניתן לשלם רק ב-Pi Browser",
     "publishSuccess": "הפריט פורסם בהצלחה",
     "qtyInvalid": "אנא הזן כמות בין 1 ל-9998",
+    "refund": {
+      "done": "{amount}π הוחזרו",
+      "pending": "הביטול הושלם — ההחזר יטופל בקרוב"
+    },
     "salesTitle": "ניהול הזמנות מכירה",
     "saveFail": "הפעולה נכשלה",
     "saving": "שומר…",
     "scrollMore": "גלול למטה כדי לראות עוד…",
     "search": "חיפוש",
     "searchPlaceholder": "חפש שם פריט או תיאור",
+    "shop": {
+      "add": "רישום חנות",
+      "addr": "כתובת",
+      "addrHint": "זוהי כתובת חנות Offline. קואורדינטות (סיכת מפה) ייתמכו בעתיד.",
+      "addTitle": "רישום חנות חדשה",
+      "bizHour": "שעות פעילות",
+      "bizHourPlaceholder": "לדוגמה: ימי חול 10:00–19:00",
+      "cancel": "ביטול",
+      "createSuccess": "החנות נרשמה",
+      "delete": "מחק",
+      "deleteConfirm": "האם למחוק חנות זו? המוצרים המשויכים יישארו ורק קישור החנות ינותק",
+      "deleteSuccess": "החנות נמחקה",
+      "desc": "תיאור חנות",
+      "edit": "ערוך",
+      "editSuccess": "פרטי החנות עודכנו",
+      "editTitle": "עריכת חנות",
+      "email": "Email",
+      "empty": "אין חנויות רשומות",
+      "intro": "רשום חנות Online/Offline כדי להגביר את אמון הקונים",
+      "manage": "ניהול חנות",
+      "name": "שם חנות",
+      "nameRequired": "שם החנות נדרש",
+      "save": "שמור",
+      "sns": "SNS Link",
+      "tel": "טלפון",
+      "thumb": "URL תמונה ראשית",
+      "title": "ניהול חנות",
+      "type": "סוג חנות",
+      "type_BOTH": "Online ו-Offline",
+      "type_OFFLINE": "Offline",
+      "type_ONLINE": "Online"
+    },
     "shopType": {
       "BOTH": "Online ו-Offline",
       "OFFLINE": "חנות Offline",

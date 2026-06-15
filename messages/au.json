@@ -141,6 +141,9 @@
       "board": "Board Management",
       "chatSection": "Cafe Management",
       "dashboard": "Dashboard",
+      "eventExclude": "Manage Exclusions",
+      "eventGifts": "Send Gifts",
+      "eventSection": "Event",
       "i18n": "Internationalisation Management",
       "i18nSection": "Internationalisation",
       "links": "Linked Accounts",
@@ -172,6 +175,7 @@
         "user": "User"
       },
       "noPayments": "No payment history found.",
+      "searchPiUsername": "Search Pi Username (partial match)",
       "status": {
         "approved": "Approved",
         "cancelled": "Cancelled",
@@ -480,6 +484,12 @@
     "activeToggle": "Active/Inactive",
     "allCountriesInactive": "All Countries (Inactive)",
     "alreadyActive": "Already Active",
+    "autoAll": "Auto-translate All",
+    "autoDone": "Auto-translation complete ({count} languages)",
+    "autoNoPending": "No pending languages to auto-translate",
+    "autoProgress": "Auto-translating ({current}/{total})",
+    "autoStop": "Stop",
+    "autoStopped": "Auto-translation stopped ({done}/{total} completed)",
     "clickToDeactivate": "Click to deactivate",
     "countItems": "{count} items",
     "country": "Country",
@@ -519,6 +529,7 @@
     "subtitle": "Active Users · Revenue Statistics (Based on daily aggregation)",
     "themeDaily": "Daily Revenue by Theme",
     "themeShare": "Theme Revenue Share",
+    "themeTreemap": "Sales Proportion by Theme (Treemap)",
     "top3Active": "Top 3 Active Users (Last {period} days)",
     "top3Buyers": "Top 3 Buyers (Last {period} days)",
     "top3Themes": "Top 3 Theme Revenue (Last {period} days)",
@@ -1171,6 +1182,83 @@
     "upgrade": "Upgrade",
     "yes": "Yes"
   },
+  "event": {
+    "agentCol": "Agent Name",
+    "alreadyExcluded": "Already excluded: {names}",
+    "completionTitle": "10 Missions Completed! Congratulations 🎉",
+    "excludedAgents": "Excluded Agents:",
+    "excludedN": "{count} excluded",
+    "excludeFailed": "Failed to process exclusion",
+    "excludePlaceholder": "Enter agent names (comma-separated)",
+    "giftAlt": "Mission Completion Gift",
+    "gradeAgent": "Agent",
+    "gradeMaster": "Master",
+    "gradeRecruit": "Recruit",
+    "gradeTrainee": "Trainee Agent",
+    "gradeVeteran": "Senior Agent",
+    "includeFailed": "Failed to remove exclusion",
+    "includeTitle": "Include in Ranking Again",
+    "keepGoingTitle": "Keep going! You haven't completed it yet",
+    "lastPerformedCol": "Last Performed",
+    "loadError": "Failed to load data",
+    "loginHint": "Log in to see your mission progress and agent rank",
+    "missionListTitle": "📋 Mission List",
+    "missions": {
+      "M1": {
+        "desc": "Pi Browser Login + Google Login (complete both)",
+        "name": "Account Integration"
+      },
+      "M10": {
+        "desc": "(After M9) Perform 7 and 8 again — experience cancellation fee with active deposit",
+        "name": "Active Deposit Transaction Cancellation Fee"
+      },
+      "M2": {
+        "desc": "Enter nickname + KakaoTalk ID in integrated account (required for gift reception)",
+        "name": "Complete Profile"
+      },
+      "M3": {
+        "desc": "Create PREMIUM Cafe in PiCafe + Use auto-translate feature",
+        "name": "Create PREMIUM Cafe (PiRC1) + Auto-translate"
+      },
+      "M4": {
+        "desc": "Send Bean to one or more people in chat",
+        "name": "Bean Transfer Test (PiRC1)"
+      },
+      "M5": {
+        "desc": "After applying for Pi Subscription Service, create Pi Bet in Cafe + distribute to participants",
+        "name": "Create and Distribute Pi Bet After Applying for Pi Subscription Service (PiRC2)"
+      },
+      "M6": {
+        "desc": "Use stickers / send files / use voice channel (1 or more of these)",
+        "name": "Use Chat Multi-function"
+      },
+      "M7": {
+        "desc": "After registering my product on PiShop, cancel seller transaction during trade",
+        "name": "Seller Transaction Cancellation (Escrow Service;PiRC3)"
+      },
+      "M8": {
+        "desc": "After purchasing another person's product on PiShop, cancel buyer transaction",
+        "name": "Buyer Transaction Cancellation (Escrow Service;PiRC3)"
+      },
+      "M9": {
+        "desc": "Deposit 1Pi or more as PiShop seller deposit + consent to location-based service",
+        "name": "Seller Deposit + Location Consent (Escrow Service;PiRC3)"
+      }
+    },
+    "multiOrHint": "💡 Hint: Only one of several methods needs to be completed",
+    "networkError": "Network Error",
+    "noChange": "No changes",
+    "noName": "(No Name)",
+    "notFoundAgents": "Not found: {names}",
+    "processing": "Processing…",
+    "rankCol": "Rank",
+    "rankingTitle": "🏆 Mission Ranking",
+    "removeRank": "Remove Rank",
+    "rewardCol": "Reward",
+    "subtitle": "Complete 10 missions and receive a 🎁 Kakao gift",
+    "title": "🎖️ Mission Event",
+    "totalCol": "Total"
+  },
   "header": {
     "admin": "Admin",
     "board": "Board",
@@ -1295,6 +1383,7 @@
   "nav": {
     "admin": "Admin",
     "cafe": "Cafe",
+    "event": "Event",
     "home": "Home",
     "my": "My Info",
     "shop": "Shop"
@@ -1493,11 +1582,35 @@
       "qty": "Quantity",
       "saveDraft": "Save Draft",
       "saveEdit": "Save Changes",
+      "shop": "Affiliated Shop",
+      "shopNone": "No Shop",
       "thumbUrl": "Main Image URL",
       "unlimited": "Unlimited",
       "unlimitedHint": "For items where inventory tracking is not meaningful (e.g., drinks, pizza), list as unlimited."
     },
     "formInvalid": "Please check the item name and price",
+    "history": {
+      "clearFilter": "Clear Filter",
+      "empty": "No transaction history",
+      "from": "Start Date",
+      "tab": {
+        "ALL": "All",
+        "BUY": "Buy",
+        "ETC": "Other",
+        "SELL": "Sell"
+      },
+      "title": "Transaction History",
+      "to": "End Date",
+      "type": {
+        "BOND_DEPOSIT": "Bond Deposit",
+        "CANCEL_FEE_IN": "Cancellation Fee Received",
+        "CANCEL_REFUND": "Cancellation Refund",
+        "ESCROW_IN": "Purchase Deposit",
+        "REFUND_IN": "Refund Deposit",
+        "RELEASE_OUT": "Sales Settlement",
+        "SETTLE_OUT": "Settlement Withdrawal"
+      }
+    },
     "itemNotFound": "Item not found",
     "itemSt": {
       "CLOSED": "Closed",
@@ -1516,6 +1629,7 @@
     "loginRequired": "Login required",
     "myItemsTitle": "Manage My Items",
     "myOwnItem": "This is your item",
+    "navHistory": "Transaction History",
     "navMyItems": "My Items",
     "navOrders": "Order History",
     "navSales": "Sales Management",
@@ -1543,12 +1657,48 @@
     "piBrowserOnly": "Payment is only available in Pi Browser",
     "publishSuccess": "Item published successfully",
     "qtyInvalid": "Please enter a quantity between 1 and 9998",
+    "refund": {
+      "done": "{amount}π has been refunded",
+      "pending": "Cancellation complete — refund will be processed soon"
+    },
     "salesTitle": "Manage Sales Orders",
     "saveFail": "Failed to process",
     "saving": "Saving...",
     "scrollMore": "Scroll for more...",
     "search": "Search",
     "searchPlaceholder": "Search item name or description",
+    "shop": {
+      "add": "Add Shop",
+      "addr": "Address",
+      "addrHint": "This is the offline shop address. Coordinates (map pin) will be supported in the future",
+      "addTitle": "Add New Shop",
+      "bizHour": "Business Hours",
+      "bizHourPlaceholder": "e.g.: Weekdays 10:00–19:00",
+      "cancel": "Cancel",
+      "createSuccess": "Shop has been registered",
+      "delete": "Delete",
+      "deleteConfirm": "Delete this shop? Associated products will remain, only the shop connection will be removed.",
+      "deleteSuccess": "Shop has been deleted",
+      "desc": "Shop Description",
+      "edit": "Edit",
+      "editSuccess": "Shop information has been updated",
+      "editTitle": "Edit Shop",
+      "email": "Email",
+      "empty": "No registered shops",
+      "intro": "Register your online/offline shop to increase buyer trust",
+      "manage": "Manage Shop",
+      "name": "Shop Name",
+      "nameRequired": "Shop name is required",
+      "save": "Save",
+      "sns": "SNS Link",
+      "tel": "Phone",
+      "thumb": "Main Image URL",
+      "title": "Shop Management",
+      "type": "Shop Type",
+      "type_BOTH": "Online & Offline",
+      "type_OFFLINE": "Offline",
+      "type_ONLINE": "Online"
+    },
     "shopType": {
       "BOTH": "Online & Offline",
       "OFFLINE": "Offline Store",

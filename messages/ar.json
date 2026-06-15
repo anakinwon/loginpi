@@ -141,6 +141,9 @@
       "board": "إدارة Board",
       "chatSection": "إدارة الكافيه",
       "dashboard": "Dashboard",
+      "eventExclude": "إدارة الاستثناءات",
+      "eventGifts": "إرسال هدايا",
+      "eventSection": "Event",
       "i18n": "إدارة اللغات المتعددة",
       "i18nSection": "اللغات المتعددة",
       "links": "حالة ربط الحسابات",
@@ -172,6 +175,7 @@
         "user": "المستخدم"
       },
       "noPayments": "لا يوجد سجل مدفوعات.",
+      "searchPiUsername": "بحث عن اسم مستخدم Pi (تطابق جزئي)",
       "status": {
         "approved": "موافق عليه",
         "cancelled": "ملغي",
@@ -480,6 +484,12 @@
     "activeToggle": "تفعيل/إلغاء تفعيل",
     "allCountriesInactive": "كل الدول (غير نشطة)",
     "alreadyActive": "نشط بالفعل",
+    "autoAll": "ترجمة تلقائية للكل",
+    "autoDone": "اكتملت الترجمة التلقائية ({count} لغة)",
+    "autoNoPending": "لا توجد لغات معلقة للترجمة التلقائية",
+    "autoProgress": "جاري الترجمة التلقائية ({current}/{total})",
+    "autoStop": "إيقاف",
+    "autoStopped": "تم إيقاف الترجمة التلقائية ({done}/{total} مكتملة)",
     "clickToDeactivate": "اضغط لإلغاء التفعيل",
     "countItems": "{count} عنصر",
     "country": "الدولة",
@@ -519,6 +529,7 @@
     "subtitle": "المستخدمون النشطون · إحصائيات الإيرادات (بناءً على التجميع اليومي)",
     "themeDaily": "الإيرادات اليومية حسب Theme",
     "themeShare": "حصة الإيرادات حسب Theme",
+    "themeTreemap": "نسبة المبيعات حسب Theme (Treemap)",
     "top3Active": "Top 3 المستخدمون النشطون (آخر {period} يوم)",
     "top3Buyers": "Top 3 المشترون (آخر {period} يوم)",
     "top3Themes": "Top 3 إيرادات Theme (آخر {period} يوم)",
@@ -1171,6 +1182,83 @@
     "upgrade": "Upgrade",
     "yes": "نعم"
   },
+  "event": {
+    "agentCol": "اسم العميل",
+    "alreadyExcluded": "مستبعد بالفعل: {names}",
+    "completionTitle": "تم إكمال 10 Missions! تهانينا 🎉",
+    "excludedAgents": "العملاء المستبعدون:",
+    "excludedN": "{count} مستبعد",
+    "excludeFailed": "فشل في معالجة الاستبعاد",
+    "excludePlaceholder": "أدخل اسم العميل (مفصول بـComma)",
+    "giftAlt": "هدية إكمال الـMission",
+    "gradeAgent": "عميل عادي",
+    "gradeMaster": "Master",
+    "gradeRecruit": "عميل",
+    "gradeTrainee": "عميل متدرب",
+    "gradeVeteran": "عميل أقدم",
+    "includeFailed": "فشل في إزالة الاستبعاد",
+    "includeTitle": "إعادة التضمين في الـRanking",
+    "keepGoingTitle": "استمر قليلاً بعد! لم تكتمل بعد",
+    "lastPerformedCol": "آخر أداء",
+    "loadError": "فشل تحميل الـData",
+    "loginHint": "سجل الدخول لترى تقدمك في الـMission ورتبة العميل",
+    "missionListTitle": "📋 قائمة الـMissions",
+    "missions": {
+      "M1": {
+        "desc": "تسجيل الدخول لمتصفح Pi + تسجيل الدخول لـGoogle (أكمل الاثنين)",
+        "name": "دمج الحسابات"
+      },
+      "M10": {
+        "desc": "(بعد M9) أعد تنفيذ المهمتين 7 و 8 — تجربة رسوم الإلغاء مع الضمان النشط",
+        "name": "رسوم إلغاء المعاملة مع الضمان النشط"
+      },
+      "M2": {
+        "desc": "أدخل اسم مستعار + KakaoTalk ID في الحساب المدمج (مطلوب لاستلام الهدية)",
+        "name": "إكمال الـProfile"
+      },
+      "M3": {
+        "desc": "إنشاء PREMIUM Cafe في PiCafe + استخدام خاصية الترجمة التلقائية",
+        "name": "إنشاء PREMIUM Cafe (PiRC1) + ترجمة تلقائية"
+      },
+      "M4": {
+        "desc": "إرسال Bean لشخص واحد أو أكثر في الدردشة",
+        "name": "اختبار إرسال Bean (PiRC1)"
+      },
+      "M5": {
+        "desc": "بعد التقديم على Pi Subscription Service، إنشاء Pi Bet في Cafe + توزيعه على المشاركين",
+        "name": "التقديم على Pi Subscription Service (PiRC2) ثم إنشاء وتوزيع Pi Bet"
+      },
+      "M6": {
+        "desc": "واحد أو أكثر من: استخدام Stickers / إرسال File / استخدام Voice Channel",
+        "name": "استخدام Multi-function في الدردشة"
+      },
+      "M7": {
+        "desc": "بعد تسجيل منتجي في PiShop، إلغاء معاملة البائع أثناء المعاملة",
+        "name": "إلغاء معاملة البائع (Escrow Service; PiRC3)"
+      },
+      "M8": {
+        "desc": "بعد شراء منتج شخص آخر من PiShop، إلغاء معاملة المشتري",
+        "name": "إلغاء معاملة المشتري (Escrow Service; PiRC3)"
+      },
+      "M9": {
+        "desc": "إيداع 1Pi أو أكثر كضمان للبائع في PiShop + الموافقة على خدمة الموقع",
+        "name": "إيداع البائع + الموافقة على الموقع (Escrow Service; PiRC3)"
+      }
+    },
+    "multiOrHint": "💡 Hint: تحتاج لإكمال طريقة واحدة فقط من عدة طرق",
+    "networkError": "خطأ في الـNetwork",
+    "noChange": "لا توجد تغييرات",
+    "noName": "(لا يوجد اسم)",
+    "notFoundAgents": "لم يتم العثور عليهم: {names}",
+    "processing": "جاري المعالجة...",
+    "rankCol": "الترتيب",
+    "rankingTitle": "🏆 Mission Ranking",
+    "removeRank": "إزالة الترتيب",
+    "rewardCol": "المكافأة",
+    "subtitle": "أكمل 10 Missions، واستلم 🎁 هدية Kakao",
+    "title": "🎖️ Mission Event",
+    "totalCol": "الإجمالي"
+  },
   "header": {
     "admin": "Admin",
     "board": "Board",
@@ -1295,6 +1383,7 @@
   "nav": {
     "admin": "مسؤول",
     "cafe": "Cafe",
+    "event": "Event",
     "home": "Home",
     "my": "معلوماتي",
     "shop": "Shop"
@@ -1493,11 +1582,35 @@
       "qty": "كمية البيع",
       "saveDraft": "حفظ كمسودة",
       "saveEdit": "حفظ التعديلات",
+      "shop": "المتجر التابع",
+      "shopNone": "لا يوجد متجر",
       "thumbUrl": "URL الصورة الرئيسية",
       "unlimited": "غير محدود",
       "unlimitedHint": "سجل السلع اللي تتبع مخزونها ملوش معنى (زي المشروبات والبيتزا) على إنها غير محدودة."
     },
     "formInvalid": "يرجى التحقق من اسم السلعة والسعر",
+    "history": {
+      "clearFilter": "إزالة Filter",
+      "empty": "لا يوجد سجل معاملات",
+      "from": "تاريخ البدء",
+      "tab": {
+        "ALL": "الكل",
+        "BUY": "شراء",
+        "ETC": "أخرى",
+        "SELL": "بيع"
+      },
+      "title": "سجل المعاملات",
+      "to": "تاريخ الانتهاء",
+      "type": {
+        "BOND_DEPOSIT": "إيداع الضمان",
+        "CANCEL_FEE_IN": "استلام رسوم الإلغاء",
+        "CANCEL_REFUND": "إلغاء واسترداد",
+        "ESCROW_IN": "إيداع الشراء",
+        "REFUND_IN": "إيداع الاسترداد",
+        "RELEASE_OUT": "تسوية البيع",
+        "SETTLE_OUT": "سحب التسوية"
+      }
+    },
     "itemNotFound": "لم يتم العثور على المنتج",
     "itemSt": {
       "CLOSED": "إيقاف النشر",
@@ -1516,6 +1629,7 @@
     "loginRequired": "يمكن استخدامه بعد تسجيل الدخول",
     "myItemsTitle": "إدارة سلعك",
     "myOwnItem": "هذا المنتج مسجل بواسطتي",
+    "navHistory": "سجل المعاملات",
     "navMyItems": "منتجاتي",
     "navOrders": "سجل الطلبات",
     "navSales": "إدارة المبيعات",
@@ -1543,12 +1657,48 @@
     "piBrowserOnly": "يمكن الدفع فقط في Pi Browser",
     "publishSuccess": "تم نشر السلعة",
     "qtyInvalid": "يرجى إدخال الكمية بين 1 و 9998",
+    "refund": {
+      "done": "تم استرداد {amount}π",
+      "pending": "تم الإلغاء — سيتم معالجة الاسترداد قريبًا"
+    },
     "salesTitle": "إدارة طلبات البيع",
     "saveFail": "فشل في المعالجة",
     "saving": "جاري الحفظ…",
     "scrollMore": "مرر لرؤية المزيد…",
     "search": "بحث",
     "searchPlaceholder": "ابحث عن اسم المنتج أو الوصف",
+    "shop": {
+      "add": "تسجيل متجر",
+      "addr": "العنوان",
+      "addrHint": "ده عنوان المتجر الـ Offline. الإحداثيات (دبوس الخريطة) هيتم دعمها في المستقبل.",
+      "addTitle": "تسجيل متجر جديد",
+      "bizHour": "مواعيد العمل",
+      "bizHourPlaceholder": "مثال: أيام الأسبوع 10:00–19:00",
+      "cancel": "إلغاء",
+      "createSuccess": "تم تسجيل المتجر",
+      "delete": "حذف",
+      "deleteConfirm": "هل تريد حذف هذا المتجر؟ ستبقى المنتجات التابعة وسيتم فقط إلغاء ربط المتجر",
+      "deleteSuccess": "تم حذف المتجر",
+      "desc": "وصف المتجر",
+      "edit": "تعديل",
+      "editSuccess": "تم تعديل معلومات المتجر",
+      "editTitle": "تعديل المتجر",
+      "email": "Email",
+      "empty": "لا يوجد متجر مسجل",
+      "intro": "سجل متجرك عبر الإنترنت أو دون اتصال لزيادة ثقة المشتري",
+      "manage": "إدارة المتاجر",
+      "name": "اسم المتجر",
+      "nameRequired": "من فضلك أدخل اسم المتجر",
+      "save": "حفظ",
+      "sns": "SNS Link",
+      "tel": "تليفون",
+      "thumb": "URL الصورة الرئيسية",
+      "title": "إدارة المتاجر",
+      "type": "نوع المتجر",
+      "type_BOTH": "Online and Offline",
+      "type_OFFLINE": "Offline",
+      "type_ONLINE": "Online"
+    },
     "shopType": {
       "BOTH": "Online و Offline",
       "OFFLINE": "متجر Offline",
