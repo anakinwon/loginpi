@@ -31,7 +31,7 @@ interface Country {
 // 활성 locale·국가·환율은 모두 저빈도 변경 데이터. 드롭다운을 열 때마다 재조회하면
 // 매번 로딩 지연이 생기므로, 모듈 메모리(같은 페이지 재마운트) + sessionStorage(탭 내
 // 페이지 이동)에 TTL 캐시한다. 신선하면 네트워크 없이 즉시 표시 → 첫 클릭 외 지연 0.
-const CACHE_KEY = 'langSwitcher:v1'
+const CACHE_KEY = 'langSwitcher:v2'
 const CACHE_TTL = 10 * 60 * 1000 // 10분 (서버 revalidate 600s·환율 캐시 900s와 정합)
 
 // 마지막 선택 언어 — 쿠키 대신 localStorage 사용(Pi Browser는 Set-Cookie 미저장).
