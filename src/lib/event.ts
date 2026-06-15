@@ -2,6 +2,7 @@
 // Server-only: 이벤트 행위 기록 + 미션 평가 엔진
 // 'use server' 지시어 추가 필수
 
+import { after } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 
 /**
@@ -14,28 +15,36 @@ export async function recordUserAction(
   userId: string,
   metadata?: Record<string, unknown>,
 ): Promise<void> {
-  const db = getSupabaseAdmin()
+  // Vercel serverless는 응답을 반환하면 인스턴스를 종료하므로,
+  // await/after 없이 던진 floating promise(행위 기록·미션 평가)가 유실된다.
+  // after()로 응답 스트리밍 후 실행을 보장한다.
+  // 또한 after 콜백은 등록 순서대로 순차 실행되어, 동일 요청에서 여러 행위를
+  // 병렬로 기록해도(M1: account_link+google_link) 평가 시점 race가 발생하지 않는다.
+  after(async () => {
+    const db = getSupabaseAdmin()
 
-  // evt_action_log에 행위 기록
-  const { error } = await db.from('evt_action_log').insert({
-    user_id: userId,
-    action_cd: actionCd,
-    action_dtm: new Date().toISOString(),
-    metadata_tx: metadata ?? null,
-    regr_id: 'SYSTEM',
-    modr_id: 'SYSTEM',
+    // evt_action_log에 행위 기록
+    const { error } = await db.from('evt_action_log').insert({
+      user_id: userId,
+      action_cd: actionCd,
+      action_dtm: new Date().toISOString(),
+      metadata_tx: metadata ?? null,
+      regr_id: 'SYSTEM',
+      modr_id: 'SYSTEM',
+    })
+
+    if (error) {
+      console.error(`행위 기록 실패 [${actionCd}]:`, error.message)
+      return
+    }
+
+    // 행위 기록 후 미션 평가 (await로 완료까지 보장)
+    try {
+      await evaluateUserMissions(userId)
+    } catch (err) {
+      console.error('미션 평가 실패:', (err as Error).message)
+    }
   })
-
-  if (error) {
-    console.error(`행위 기록 실패 [${actionCd}]:`, error.message)
-    return
-  }
-
-  // 비동기로 미션 평가 트리거 (non-blocking)
-  // 실제 환경에서는 queue/cron job으로 처리 권장
-  evaluateUserMissions(userId).catch((err) =>
-    console.error('미션 평가 실패:', err.message),
-  )
 }
 
 /**
