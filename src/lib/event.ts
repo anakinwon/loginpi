@@ -187,7 +187,15 @@ async function evaluateMissionCompletion(
         .eq('action_cd', mission.required_action_cds_tx[0])
         .gte('action_dtm', eventStartDtm)
         .limit(1)
-      return !!data?.length
+      if (!data?.length) return false
+
+      // M2(프로필 완성) 특수: kakao_id 필수 — 당첨(선착순 top10) 시
+      // 카카오 선물 전달에 kakao_id가 있어야 하므로, profile_update 액션만으로는
+      // 불충분(별명만 입력한 경우 방지). 핵심 미션 수행 요소.
+      if (mission.mission_cd.trim() === 'M2') {
+        return await hasKakaoId(userId)
+      }
+      return true
     }
 
     case 'MULTI_AND': {
@@ -271,6 +279,22 @@ async function evaluateMissionCompletion(
     default:
       return false
   }
+}
+
+/**
+ * M2 보조 평가: kakao_id 보유 여부
+ * 당첨(선착순 top10) 시 카카오 선물 전달에 kakao_id가 필수이므로,
+ * M2(프로필 완성)는 profile_update 액션 + kakao_id가 모두 있어야 완료된다.
+ */
+async function hasKakaoId(userId: string): Promise<boolean> {
+  const db = getSupabaseAdmin()
+  const { data } = await db
+    .from('sys_user')
+    .select('kakao_id')
+    .eq('id', userId)
+    .maybeSingle()
+  const kakaoId = (data as { kakao_id: string | null } | null)?.kakao_id
+  return !!kakaoId && kakaoId.trim() !== ''
 }
 
 /**
