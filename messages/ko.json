@@ -125,7 +125,12 @@
         "memo": "메모",
         "status": "상태",
         "paymentId": "결제 ID",
-        "date": "일시"
+        "date": "일시",
+        "theme": "테마"
+      },
+      "theme": {
+        "subscription": "구독",
+        "unknown": "기타"
       },
       "txnDiv": {
         "PRODUCT_PAY": "상품 결제",

@@ -169,6 +169,10 @@
         "user": "User",
         "txnDiv": "Tipo de transacción"
       },
+      "theme": {
+        "subscription": "Subscription",
+        "unknown": "Other"
+      },
       "noPayments": "No payment history.",
       "status": {
         "approved": "Approved",
