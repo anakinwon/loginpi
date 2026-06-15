@@ -9,6 +9,20 @@ Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Net
 
 ---
 
+## ⚠️ 운영 인프라 제약사항 (필독)
+
+> 개발·배포 시 반드시 확인해야 할 플랫폼 제약. 위반 시 배포 차단 또는 서비스 오동작 발생.
+
+| 항목 | 제약 | 현재 설정 | 해결책 |
+|---|---|---|---|
+| **Vercel Hobby — Cron 주기** | 하루 1회(`0 H * * *`) 초과 불가 — 위반 시 배포 자체 차단, FAILED 로그도 미기록 | `0 0 * * *` (매일 자정) | Pro 플랜($20/월) 업그레이드 시 고빈도 가능 |
+| **Pi Browser — Set-Cookie** | WebView에서 모든 방식의 Set-Cookie 저장 안 됨 | 쿠키 + `X-Pi-Token` 헤더 이중 경로 | `piFetch` 사용 필수, `redirect` 금지 |
+| **NextAuth v5** | beta.31 유지 — stable 미출시 | `5.0.0-beta.31` | stable 출시 시 UPGRADE_STRATEGY.md 참조 |
+
+> 상세 트러블슈팅: `docs/TROUBLESHOOT.md`
+
+---
+
 ## 📊 전체 진행률 요약 (2026-06-14)
 
 ### Phase 완료 현황
