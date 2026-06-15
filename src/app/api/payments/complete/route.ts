@@ -224,12 +224,12 @@ export async function POST(request: NextRequest) {
           if (tipMsg) {
             await broadcastToRoom(roomId, 'new_msg', tipMsg)
 
-            // M5: Bean 전송 미션 기록 (비블로킹)
+            // M4: Bean 전송 미션 기록 (비블로킹)
             recordUserAction('bean_send', senderRow.id, {
               room_id: roomId,
               recipient_id: recipientRow.id,
             })
-              .catch(err => console.error(`[M5] 미션 기록 실패: ${err.message}`))
+              .catch(err => console.error(`[M4] 미션 기록 실패: ${err.message}`))
           }
         }
       }
@@ -502,16 +502,16 @@ export async function POST(request: NextRequest) {
                 if (betMsg)
                   await broadcastToRoom(betRow.room_id, 'new_msg', betMsg)
 
-                // M4.2: Pi Bet 참가 미션 기록 — 베팅 생성자(주관자) 기준 (비블로킹)
-                // M4(MULTI_AND)=pibet_create+pibet_entry는 한 사람이 둘 다 충족해야 하는데,
-                // 생성자는 자기 베팅에 참가 불가(line 454)이므로 참가자(ownerRow)로 기록하면 M4 완료 불가.
+                // M5: Pi Bet 분배 미션 기록 — 베팅 생성자(주관자) 기준 (비블로킹)
+                // M5(MULTI_AND)=pibet_create+pibet_entry는 한 사람이 둘 다 충족해야 하는데,
+                // 생성자는 자기 베팅에 참가 불가(line 454)이므로 참가자(ownerRow)로 기록하면 M5 완료 불가.
                 // 참가가 발생하면 '주관자(생성자)의 분배 미션'이 진척된 것으로 본다.
                 recordUserAction('pibet_entry', betRow.crtr_usr_id, {
                   bet_id: betRow.bet_id,
                   room_id: betRow.room_id,
                   entrant_id: ownerRow.id,
                 })
-                  .catch((err) => console.error(`[M4.2] 미션 기록 실패: ${err.message}`))
+                  .catch((err) => console.error(`[M5] pibet_entry 기록 실패: ${err.message}`))
               }
             }
           }
