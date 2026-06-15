@@ -1207,7 +1207,7 @@
         "name": "Active Deposit Transaction Cancellation Fee"
       },
       "M2": {
-        "desc": "Enter nickname + KakaoTalk ID in integrated account",
+        "desc": "Enter nickname + KakaoTalk ID in integrated account (required for gift delivery)",
         "name": "Complete Profile"
       },
       "M3": {
