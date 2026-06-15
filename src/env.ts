@@ -20,7 +20,13 @@ export const env = createEnv({
     GEMINI_API_KEY: z.string().optional(),
     RESEND_API_KEY: z.string().optional(),
     RESEND_FROM_EMAIL: z.string().optional(),
-    CRON_SECRET: z.string().optional(),
+    // cron 인증 비밀. 미설정 시 cron 핸들러가 전량 401 → 재평가 안전망이 조용히 죽는다.
+    // Vercel 프로덕션 빌드(VERCEL_ENV='production')에서만 필수로 강제해 조용한 실패를 차단한다.
+    // 로컬·프리뷰 빌드는 VERCEL_ENV가 다르므로 optional 유지(개발 편의).
+    CRON_SECRET:
+      process.env.VERCEL_ENV === 'production'
+        ? z.string().min(1, 'CRON_SECRET은 프로덕션에서 필수입니다 (cron 인증)')
+        : z.string().optional(),
     TURN_HOST: z.string().optional(),
     TURN_SECRET: z.string().optional(),
     TURN_CREDENTIAL_TTL: z.coerce.number().optional(),
