@@ -30,7 +30,7 @@ const PLAN_CAPS: Record<PlanTier, PlanCaps> = {
   },
   PREMIUM: {
     tier: 'PREMIUM',
-    monthlyRoomQuota: 3,
+    monthlyRoomQuota: -1, // 구독자(PREMIUM)는 모든 채팅방 생성 무제한 무료 (결제 유도 없음)
     aiMonthlyQuota: 10,
     canTip: true,
     canUsePremiumTheme: true,
