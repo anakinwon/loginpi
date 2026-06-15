@@ -31,16 +31,16 @@ Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Net
 | **13** | PiShop(MPS) | ✅ 완료 (P1+P2) | 100% (P2 카테고리·매장·양방향취소·거래내역 완료 · P3 PiRC3·Maps 예정) |
 | **14** | PiVoice™ v3.0 | ✅ 완료 (v3.0 권한 시스템) | 100% (S0 실기기 검증 잔여) |
 | **15** | LBS 위치기반서비스 | ✅ 완료 (P0+P1) | 100% (상품 개별 위치 포함 · 지도 UI 확장 예정) |
-| **16** | 이벤트 미션 시스템 (Pi 요원 육성) | 📋 기획 완료 | PRD_11_EVENT.md v1.2 — 구현 대기 |
+| **16** | 이벤트 미션 시스템 (Pi 요원 육성) | ✅ 완료 | 구현·운영 중 (참여 7·완주 1, 2026-06-15 명칭/순서 현행화) |
 | **횡단** | 성능 튜닝 | ✅ 완료 | 100% (무한 스크롤·지연 로딩·SWR 캐싱·리브랜딩·스티커) |
 | **횡단3** | Pi Browser 안정화·콤보 성능 (2026-06-13) | ✅ 완료 | 100% (admin 다국어 전환 무반응 수정·헤더 콤보 3계층 캐시) |
 | **횡단4** | Pi Browser 안정화 4차·MPS 후속·대시보드 고도화 (2026-06-14) | ✅ 완료 | 100% (A2U 환불·트리맵·Pi Bet UI·헤더 로고·다국어 기억·브랜드 등) |
 
 ### 통계
 - **총 Phase**: 17개 (0~16 + 횡단 개선)
-- **완료**: 16개 구현 완료 · 1개(Phase 16 이벤트) 📋 기획 완료(구현 대기)
+- **완료**: 17개 구현 완료 (Phase 16 이벤트 미션 시스템 포함 — 구현·운영 중)
 - **진행 중**: 0개
-- **예정**: 확장 Phase (MPS P2/P3, LBS 확장, PiVoice 추가 기능)
+- **예정**: 확장 Phase (MPS P3 PiRC3·Maps, LBS 지도 UI, PiVoice 추가 기능, 이벤트 행위훅 전수 점검)
 
 ### 핵심 마일스톤
 
@@ -59,7 +59,7 @@ Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Net
 - MPS Phase 3 (TASK-112~113): **TASK-112 PiRC3 실 에스크로 = 🔒 보류**(2026-06-13 공식 확인 — PiRC3 미존재·Pi SDK `invokeContract` 미지원 → 플랫폼 가상 에스크로 유지) · TASK-113 Google Maps 연동(`NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` 필요) — *MPS는 배송 없는 직거래 전용*
 - PiVoice 잔여 (S0~S3): Pi Browser 실기기 마이크 검증 · TURN 운영 설정(`TURN_HOST`/`TURN_SECRET`) · 품질 데이터 기반 coturn 전환 판단 · 5인+ LiveKit SFU/결제 게이팅 검토
 - LBS 향후 Phase: Maps JavaScript API 지도 UI · Places API 매장 검색
-- Phase 16 이벤트 미션 시스템: 📋 기획 완료 (PRD_11_EVENT.md v1.2) — 구현 대기
+- ✅ Phase 16 이벤트 미션 시스템 (2026-06-15): M1~M10 평가 엔진·sum 랭킹·선착순 10명 선물·관리자 제외 구현·운영 중. M4↔M5 순서 교환 + M3/M5/M7/M8/M9 PiRC 표기 정비 반영. 잔여: `recordUserAction` 행위 훅 전수 점검(action_log 19 < 완료기록 34)
 
 ---
 
@@ -1362,28 +1362,29 @@ if (meta?.type === 'CHAT_SUBSCR') {
 
 ---
 
-## Phase 16: 이벤트 미션 시스템 (Pi 요원 육성) 📋 기획 완료 (2026-06-14 — 구현 대기)
+## Phase 16: 이벤트 미션 시스템 (Pi 요원 육성) ✅ 구현 완료·운영 중 (2026-06-15)
 
-> 상세 요구사항: **`docs/PRD_11_EVENT.md` v1.2** · `PRD.md` 섹션 18
+> 상세 요구사항: **`docs/PRD_11_EVENT.md` v2.x** · `PRD.md` 섹션 18
 
 10가지 미션을 실제 비즈니스 로직 트리거에서 멱등 자동 감지 → 전부 완료 시 화이트리스트 → 미션 수행 합계(sum) 내림차순 랭킹. 첫 완료 **선착순 10명**에게 카카오 선물. 컨셉: "Pi 요원 육성"(요원 등급 5단계 Recruit→Master Agent), Footer 'Event' 탭 신설.
+**운영 현황(2026-06-15)**: 참여자 7 · 완료기록 34 · 10미션 완주 1 · 제외 0 · `evt_action_log` 19건.
 
-### TASK-150: 이벤트 DB 스키마 📋
-- `evt_mission`(미션 정의)·`evt_user_mission`(완료 이력 `UNIQUE(user_id, mission_cd)`)·`evt_exclude`(제외)·`evt_gift_log`(선물 발송 추적) + 미션 M1~M10 시드. DA 표준 시스템 컬럼 4개 + 논리삭제.
+### TASK-150: 이벤트 DB 스키마 ✅
+- `sql/044_event_mission.sql`(`evt_event`·`evt_action_log`·`evt_mission`·`evt_user_mission`·`evt_exclude`·`evt_gift_log` 6테이블 + M1~M10 시드) · `sql/045_event_mission_guide.sql`(안내문/정정). DA 표준 시스템 컬럼 4개 + 논리삭제, Supabase 적용 완료.
 
-### TASK-151: 미션 완료 자동 감지 훅 📋
-- 기존 API(계정연동·프로필·카페생성·Pi Bet·Bean·음성/파일/스티커·PiShop 취소·보증금·위치동의)에 `recordUserMission()` 멱등 upsert 삽입. M10은 M9 완료 시각 이후 취소(FEE 발생) 판정.
+### TASK-151: 미션 완료 자동 감지(평가 엔진) ✅
+- `src/lib/event.ts` — `recordUserAction()`(evt_action_log 기록) + `evaluateUserMissions()`(SINGLE/MULTI_AND/MULTI_OR/SEQUENCE 4종 판정 + 멱등 upsert). M10은 `checkCancelWithFee`(M9 완료 후 `CANCEL_FEE_IN`+동일 order `REFUND_IN`). ⚠️ 행위 훅(`recordUserAction`)의 일부 API 미삽입 정황 — 전수 점검 권장.
 
-### TASK-152: Footer Event 탭 + 이벤트 페이지 📋
-- Footer `[Home][Cafe][Shop][Event][My]` 확장 → `/[locale]/event`(미션 진행도·요원 등급·랭킹). 클라이언트 게이트(`ClientEventGate`)·`piFetch`(Pi Browser 쿠키 미저장 대응).
+### TASK-152: Footer Event 탭 + 이벤트 페이지 ✅
+- `/[locale]/event`(`src/app/[locale]/event/page.tsx` + `ClientEventGate`) — 미션 진행도·요원 등급·랭킹. `piFetch`(Pi Browser 쿠키 미저장 대응) + 클라이언트 게이트(redirect 금지).
 
-### TASK-153: 랭킹 + 선착순 선물 관리 📋
-- sum 내림차순 랭킹(요원명 ✓ 매트릭스·제외자 필터·tie-break `complete_dtm`). 선착순 10명 카카오 선물(`gift.kakao.com/product/11105359`, M2 카톡ID 수동 발송·`evt_gift_log` 추적·10명 마감 배너).
+### TASK-153: 랭킹 + 선착순 선물 관리 ✅
+- `/api/event/ranking`(sum 내림차순·✓ 매트릭스·제외 필터·tie-break `last_complete_dtm`) · `/api/event/my-progress` · `/api/event/top-10-gifts`(**선착순 = 전체 10미션 완주자** `count===10`) · `/admin/event/gifts`. 카카오 선물(`gift.kakao.com/product/11105359`)·`evt_gift_log` 추적.
 
-### TASK-154: 관리자 제외 관리 📋
-- `/admin/event/exclude`(`isAdmin` 게이트, `evt_exclude` 논리삭제 토글, 제외 시 차순위 자동 승격).
+### TASK-154: 관리자 제외 관리 ✅
+- `/api/admin/event/exclude`(`isAdmin` 게이트, `evt_exclude` 논리삭제 토글) + `ClientEventGate` 내 관리자 전용 제외 UI.
 
-⚠️ **확인 필요**: 선착순 기준(전체 미션 완료 vs 1개 이상) 확정 · M10 완료 판정/중복 기록 정책 · i18n 키 분리.
+✅ **확인 필요 항목 해소**: 선착순 = 전체 10미션 완주 확정 · M10 = `checkCancelWithFee` 구현 · i18n 키 `event.missions.M1~M10.{name,desc}`(ko=ko.json 정본, en=i18n_message). **잔여**: 행위 훅 전수 점검.
 
 ---
 
@@ -1391,6 +1392,7 @@ if (meta?.type === 'CHAT_SUBSCR') {
 
 | 버전 | 날짜 | 변경 내용 | 작성자 |
 |------|------|---------|-------|
+| v9.0 | 2026-06-15 | **Phase 16 이벤트 미션 시스템 ✅ 구현 완료·운영 중 현행화** — 기획(📋)→구현 완료로 상태 전환. TASK-150~154 전부 ✅ + 실제 구현 파일 매핑(`sql/044`·`045`·`src/lib/event.ts`·`ClientEventGate`·`/api/event/*`·`/api/admin/event/*`). 확인 필요 3건 해소(선착순=전체 10미션 완주 `count===10` · M10=`checkCancelWithFee` · i18n 키 구조). 운영 통계 반영(참여 7·완주 1·제외 0·action_log 19). **미션 명칭/순서 현행화**: M4↔M5 순서 교환(Bean을 M4로·PiBet을 M5로, DB 완료기록·i18n_message·sql 시드 전 계층 정합) + M3/M5/M7/M8/M9 PiRC 표기 정비(PiRC1 위치·PiRC2·에스크로서비스;PiRC3). PRD.md v11.2 동기화(섹션 18 미션표·상태 갱신). **잔여**: `recordUserAction` 행위 훅 전수 점검(action_log 19 < 완료기록 34). | anakin |
 | v8.0 | 2026-06-14 | **Jun 14 전체 개선 현행화** — ① Phase 13 MPS 후속: A2U 자동 환불(512a4a5·a619378·76e2fb7)·FR-10 ADMIN 게이트 버그 교정(c8829c4)·주문관리 취소 UI(7b2203a)·상품 이미지 업로드(3cd0bc8·sql/042)·상품 등록 위치 자동수집(23bf3ba) ② Phase 11 후속 2차: coin360 트리맵(3738ffc)·대시보드 사용자 관리 통합(b5611bf)·차트 색상 통일(cacba8e)·KST 집계 교정(c46d9c3)·결제내역 개선(6172020) ③ Phase 9 후속: Pi Bet UI 아코디언·스포트라이트(c490fb7) ④ 횡단4차: 헤더 로고(12118e7)·다국어 기억(d52d7ef)·PiShop 브랜드 치환(04c9350)·admin open redirect 방어(8f419ee·43ab342). M29~M31 마일스톤 추가. 기준일·버전 헤더 2026-06-14 갱신. | anakin |
 | v7.0 | 2026-06-14 | **Phase 16 이벤트 미션 시스템(Pi 요원 육성) 로드맵 추가** — `docs/PRD_11_EVENT.md` v1.2 수용. 10미션 게이미피케이션(M1 계정통합~M10 보증금 활성 취소수수료 경험)·미션 완료 멱등 자동감지·화이트리스트·요원 등급 5단계·sum 내림차순 랭킹·관리자 제외·보상 3계층(전원 뱃지/선착순 10명 카카오 선물·M2 카톡ID 발송/Phase2+ Pi A2U). TASK-150~154. 데이터모델 `evt_mission`·`evt_user_mission`·`evt_exclude`·`evt_gift_log`. Phase 완료 현황 표·통계 갱신(총 17개). PRD.md v11.0 동기화(섹션 18 신설). ⚠️ 확인 필요: 선착순 기준·M10 판정 로직. | anakin |
 | v1.0 | 2026-06-05 | 초안 작성 — Pi Network 플랫폼 기준으로 전면 재작성. Phase 0~2 완료, Phase 3 진행 중 반영 | anakin |
