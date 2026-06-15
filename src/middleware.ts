@@ -8,6 +8,11 @@ const supportedLocales = new Set<string>(routing.locales)
 // BCP 47 locale 세그먼트 패턴: "au", "en-AU", "zh-CN" 등
 const LOCALE_SEGMENT_RE = /^[a-z]{2,3}(-[a-zA-Z]{2,4})?$/
 
+// 2~3글자여서 locale 패턴에 매칭되지만 실제 앱 라우트인 세그먼트 목록
+// localePrefix: 'as-needed'이면 기본 locale(ko)은 프리픽스 없이 /map 등으로 접근 →
+// LOCALE_SEGMENT_RE에 걸려 /en/으로 리다이렉트되는 것을 방지
+const APP_ROUTE_SEGMENTS = new Set(['map'])
+
 export default function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
   const firstSegment = pathname.split('/')[1] ?? ''
@@ -16,7 +21,8 @@ export default function middleware(req: NextRequest) {
   // → 404 대신 영어 경로로 폴백 리다이렉트 ("번역 미완료 시 영어 표시" 요건 구현)
   if (
     LOCALE_SEGMENT_RE.test(firstSegment) &&
-    !supportedLocales.has(firstSegment)
+    !supportedLocales.has(firstSegment) &&
+    !APP_ROUTE_SEGMENTS.has(firstSegment)
   ) {
     const rest = pathname.slice(firstSegment.length + 1) // 남은 경로 ('/board' 등)
     return NextResponse.redirect(new URL('/en' + (rest || '/'), req.url))
