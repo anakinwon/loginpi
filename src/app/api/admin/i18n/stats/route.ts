@@ -66,15 +66,22 @@ export async function GET() {
     // 한국어는 ko.json이 source of truth → 항상 100% 완료
     const translated =
       loc.locale_cd === 'ko' ? totalKeys : (countMap[loc.locale_cd] ?? 0)
+    // pct는 표시용 — Math.round는 99.x%를 100%로 올려 '2개 미번역'을 완료로
+    // 오표기하므로 floor(+100 clamp) 사용. 완료 판정은 키 수 일치(complete)로 분리해,
+    // 반올림된 pct가 자동 번역 대상 선정/완료 카운트를 왜곡하지 않게 한다.
     return {
       ...loc,
       translated,
       total: totalKeys,
-      pct: totalKeys > 0 ? Math.round((translated / totalKeys) * 100) : 0,
+      pct:
+        totalKeys > 0
+          ? Math.min(100, Math.floor((translated / totalKeys) * 100))
+          : 0,
+      complete: totalKeys > 0 && translated >= totalKeys,
     }
   })
 
-  const completed = stats.filter((s) => s.pct === 100).length
+  const completed = stats.filter((s) => s.complete).length
 
   return NextResponse.json({ locales: stats, totalKeys, completed })
 }
