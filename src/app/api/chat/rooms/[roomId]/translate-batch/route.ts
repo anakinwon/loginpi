@@ -4,6 +4,7 @@ import { getSessionUser } from '@/lib/auth-check'
 import { getRoomMember } from '@/lib/chat'
 import { LOCALE_CD_RE, baseLang } from '@/lib/chat-translate'
 import { getOrTranslateMessage } from '@/lib/chat-translate-dedup'
+import { recordUserAction } from '@/lib/event'
 
 type Params = { params: Promise<{ roomId: string }> }
 
@@ -118,6 +119,11 @@ export async function POST(request: NextRequest, { params }: Params) {
       )
     }
   }
+
+  // M3: 자동번역 사용 미션 기록 (방 언어 일괄 번역 = PiTranslate 자동번역 주력 경로)
+  // 단건 번역(messages/[msgId]/translate)뿐 아니라 이 경로도 '자동번역 사용'으로 집계해야
+  // M3(premium_cafe_create + cafe_translate_use) 누락이 발생하지 않는다.
+  recordUserAction('cafe_translate_use', user.id, { roomId, localeCd })
 
   return NextResponse.json({ translations })
 }
