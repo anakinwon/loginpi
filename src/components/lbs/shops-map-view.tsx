@@ -3,6 +3,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { setOptions, importLibrary } from '@googlemaps/js-api-loader'
+import type { BizCategory } from '@/components/lbs/nearby-explorer'
 
 interface NearbyShop {
   shop_id: string
@@ -19,14 +20,31 @@ interface Props {
   userLat: number
   userLng: number
   apiKey: string | undefined
+  bizCategory: BizCategory
+  radiusMeters: number
 }
 
-export function ShopsMapView({ shops, userLat, userLng, apiKey }: Props) {
+// 업종별 핀 색상 + Google Places 타입
+const CATEGORY_CONFIG: Record<
+  BizCategory,
+  { bg: string; border: string; placeType: string; label: string }
+> = {
+  ALL:        { bg: '#f97316', border: '#c2410c', placeType: '',           label: 'Pi 매장' },
+  CAFE:       { bg: '#22c55e', border: '#15803d', placeType: 'cafe',       label: '카페' },
+  RESTAURANT: { bg: '#ef4444', border: '#b91c1c', placeType: 'restaurant', label: '식당' },
+  BAR:        { bg: '#a855f7', border: '#7e22ce', placeType: 'bar',        label: '술집' },
+}
+
+export function ShopsMapView({ shops, userLat, userLng, apiKey, bizCategory, radiusMeters }: Props) {
   const mapRef = useRef<HTMLDivElement>(null)
   const [loadError, setLoadError] = useState<string | null>(null)
+  const [placesCount, setPlacesCount] = useState<number | null>(null)
 
   useEffect(() => {
     if (!mapRef.current) return
+    setLoadError(null)
+    setPlacesCount(null)
+
     if (!apiKey) {
       setLoadError('Google Maps API 키가 설정되지 않았습니다 (NEXT_PUBLIC_GOOGLE_MAPS_API_KEY)')
       return
@@ -55,6 +73,7 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey }: Props) {
         infoWindow = new InfoWindow()
 
         const { AdvancedMarkerElement, PinElement } = await importLibrary('marker') as google.maps.MarkerLibrary
+        const { LatLngBounds } = await importLibrary('core') as google.maps.CoreLibrary
 
         // 사용자 위치 마커 (파란 핀)
         const userPin = new PinElement({
@@ -71,70 +90,116 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey }: Props) {
           title: '내 위치',
         })
 
-        // 매장 마커들
-        markers = shops.map((shop) => {
+        const cfg = CATEGORY_CONFIG[bizCategory]
+        const bounds = new LatLngBounds()
+        bounds.extend({ lat: userLat, lng: userLng })
+
+        const addMarker = (
+          position: { lat: number; lng: number },
+          title: string,
+          infoContent: HTMLElement,
+        ) => {
           const pin = new PinElement({
-            background: '#f97316',
-            borderColor: '#c2410c',
+            background: cfg.bg,
+            borderColor: cfg.border,
             glyphColor: '#ffffff',
           })
-          const marker = new AdvancedMarkerElement({
-            map,
-            position: { lat: shop.lat, lng: shop.lng },
-            content: pin.element,
-            title: shop.shop_nm,
+          const marker = new AdvancedMarkerElement({ map, position, content: pin.element, title })
+          marker.addListener('click', () => {
+            infoWindow!.setContent(infoContent)
+            infoWindow!.open(map, marker)
+          })
+          bounds.extend(position)
+          markers.push(marker)
+        }
+
+        const buildShopInfo = (nm: string, dist: string, addr: string | null, biz_hour: string | null) => {
+          const wrap = document.createElement('div')
+          wrap.style.cssText = 'font-family:system-ui,sans-serif;min-width:160px;padding:4px 0'
+          const nameEl = document.createElement('p')
+          nameEl.style.cssText = 'font-weight:600;font-size:14px;margin:0 0 4px'
+          nameEl.textContent = nm
+          wrap.appendChild(nameEl)
+          const distEl = document.createElement('p')
+          distEl.style.cssText = `color:${cfg.bg};font-size:12px;margin:0 0 4px`
+          distEl.textContent = `📍 ${dist}`
+          wrap.appendChild(distEl)
+          if (addr) {
+            const a = document.createElement('p')
+            a.style.cssText = 'color:#6b7280;font-size:12px;margin:0 0 2px'
+            a.textContent = addr
+            wrap.appendChild(a)
+          }
+          if (biz_hour) {
+            const h = document.createElement('p')
+            h.style.cssText = 'color:#6b7280;font-size:12px;margin:0'
+            h.textContent = `🕒 ${biz_hour}`
+            wrap.appendChild(h)
+          }
+          return wrap
+        }
+
+        if (bizCategory === 'ALL') {
+          // Pi 등록 매장 표시
+          for (const shop of shops) {
+            const dist = shop.distance_km < 1
+              ? `${Math.round(shop.distance_km * 1000)}m`
+              : `${shop.distance_km.toFixed(1)}km`
+            addMarker(
+              { lat: shop.lat, lng: shop.lng },
+              shop.shop_nm,
+              buildShopInfo(shop.shop_nm, dist, shop.addr, shop.biz_hour),
+            )
+          }
+        } else {
+          // Google Places Nearby Search (New API)
+          const { Place } = await importLibrary('places') as google.maps.PlacesLibrary
+
+          const { places } = await Place.searchNearby({
+            fields: ['displayName', 'location', 'formattedAddress', 'rating', 'userRatingCount', 'regularOpeningHours'],
+            locationRestriction: {
+              center: new google.maps.LatLng(userLat, userLng),
+              radius: radiusMeters,
+            },
+            includedPrimaryTypes: [cfg.placeType],
+            maxResultCount: 20,
           })
 
-          marker.addListener('click', () => {
-            const distanceText =
-              shop.distance_km < 1
-                ? `${Math.round(shop.distance_km * 1000)}m`
-                : `${shop.distance_km.toFixed(1)}km`
+          setPlacesCount(places.length)
 
-            // DOM API로 구성 — textContent 할당으로 XSS 원천 차단 (HTML 파싱 없음)
+          for (const place of places) {
+            const loc = place.location
+            if (!loc) continue
+
             const wrap = document.createElement('div')
-            wrap.style.cssText =
-              'font-family:system-ui,sans-serif;min-width:160px;padding:4px 0'
+            wrap.style.cssText = 'font-family:system-ui,sans-serif;min-width:160px;padding:4px 0'
 
             const nameEl = document.createElement('p')
             nameEl.style.cssText = 'font-weight:600;font-size:14px;margin:0 0 4px'
-            nameEl.textContent = shop.shop_nm
+            nameEl.textContent = place.displayName ?? '이름 없음'
             wrap.appendChild(nameEl)
 
-            const distEl = document.createElement('p')
-            distEl.style.cssText = 'color:#f97316;font-size:12px;margin:0 0 4px'
-            distEl.textContent = `📍 ${distanceText}`
-            wrap.appendChild(distEl)
+            if (place.rating) {
+              const rateEl = document.createElement('p')
+              rateEl.style.cssText = 'color:#f59e0b;font-size:12px;margin:0 0 4px'
+              rateEl.textContent = `⭐ ${place.rating.toFixed(1)} (${place.userRatingCount ?? 0})`
+              wrap.appendChild(rateEl)
+            }
 
-            if (shop.addr) {
+            if (place.formattedAddress) {
               const addrEl = document.createElement('p')
               addrEl.style.cssText = 'color:#6b7280;font-size:12px;margin:0 0 2px'
-              addrEl.textContent = shop.addr
+              addrEl.textContent = place.formattedAddress
               wrap.appendChild(addrEl)
             }
 
-            if (shop.biz_hour) {
-              const hourEl = document.createElement('p')
-              hourEl.style.cssText = 'color:#6b7280;font-size:12px;margin:0'
-              hourEl.textContent = `🕒 ${shop.biz_hour}`
-              wrap.appendChild(hourEl)
-            }
+            addMarker({ lat: loc.lat(), lng: loc.lng() }, place.displayName ?? '', wrap)
+          }
+        }
 
-            infoWindow!.setContent(wrap)
-            infoWindow!.open(map, marker)
-          })
-
-          return marker
-        })
-
-        // 모든 마커가 보이도록 지도 범위 자동 조정
-        if (shops.length > 0) {
-          const { LatLngBounds } = await importLibrary('core') as google.maps.CoreLibrary
-          const bounds = new LatLngBounds()
-          bounds.extend({ lat: userLat, lng: userLng })
-          shops.forEach((s) => bounds.extend({ lat: s.lat, lng: s.lng }))
+        // 모든 마커가 보이도록 범위 조정
+        if (markers.length > 0) {
           map.fitBounds(bounds, 80)
-          // 너무 가까이 확대되면 zoom 16으로 제한
           const listener = google.maps.event.addListenerOnce(map, 'idle', () => {
             const z = map.getZoom()
             if (z !== undefined && z > 16) map.setZoom(16)
@@ -142,7 +207,13 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey }: Props) {
           void listener
         }
       } catch (e) {
-        setLoadError(e instanceof Error ? e.message : '지도 로드 실패')
+        const msg = e instanceof Error ? e.message : '지도 로드 실패'
+        // Places API (New) 미활성화 시 명확한 안내
+        if (msg.includes('PERMISSION_DENIED') || msg.includes('places.googleapis.com')) {
+          setLoadError('Places API (New) 미활성화 — Google Cloud Console에서 "Places API (New)"를 활성화해 주세요')
+        } else {
+          setLoadError(msg)
+        }
       }
     })()
 
@@ -150,7 +221,8 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey }: Props) {
       markers.forEach((m) => (m.map = null))
       infoWindow?.close()
     }
-  }, [shops, userLat, userLng, apiKey])
+  // radius 또는 category 바뀌면 지도 재초기화
+  }, [shops, userLat, userLng, apiKey, bizCategory, radiusMeters])
 
   if (loadError) {
     return (
@@ -160,10 +232,20 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey }: Props) {
     )
   }
 
+  const cfg = CATEGORY_CONFIG[bizCategory]
+
   return (
-    <div
-      ref={mapRef}
-      className="h-[420px] w-full overflow-hidden rounded-lg border"
-    />
+    <div className="space-y-1">
+      {placesCount !== null && bizCategory !== 'ALL' && (
+        <p className="text-muted-foreground text-xs">
+          <span style={{ color: cfg.bg }}>●</span>{' '}
+          반경 {(radiusMeters / 1000).toFixed(0)}km 내 {cfg.label} {placesCount}곳
+        </p>
+      )}
+      <div
+        ref={mapRef}
+        className="h-[420px] w-full overflow-hidden rounded-lg border"
+      />
+    </div>
   )
 }
