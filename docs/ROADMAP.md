@@ -2,8 +2,8 @@
 
 Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Network 앱 플랫폼
 
-> **기준일**: 2026-06-15
-> **현재 버전**: Phase 7~12 완료 (PiCafé MVP · Pi 수익화 · 생태계 확장 · 사용자 프로필 · 통계 대시보드 · PiTranslate™ TASK-090~099 ✅) · **Phase 13 PiShop(MPS) Phase 1+2 완료 (TASK-100~111 ✅ · 카테고리·매장관리·양방향취소·거래내역) + 후속 개선(A2U 자동 환불·상품 이미지 업로드·취소 UI) · Phase 3 PiRC3 보류·Maps 예정** · **Phase 14 PiVoice™ v3.0 권한 시스템 구현 완료 (TASK-120~125 ✅, `docs/PRD_9_VOICE_CHAT.md` v3.0 — 방장 보장 슬롯 + 멤버 자동 2/승인 2, S0 실기기 검증·TURN env 잔여)** · **Phase 15 LBS P0+P1 완료 (TASK-130~140 ✅, 상품 개별 위치 등록 포함)** · 횡단 개선: 무한 스크롤·지연 로딩 + SWR 캐싱·병렬 호출 성능 튜닝, Pi Tip→Bean 리브랜딩, 스티커 노출 개선 (2026-06-12) · **횡단 3차 (2026-06-13): Pi Browser admin 다국어 전환 무반응 수정(_pit 티켓 선발급) + 헤더 다국어 콤보 3계층 캐시 성능 개선** · **횡단 4차 (2026-06-14): CafePi 헤더 로고 교체·Pi Bet UI 아코디언·다국어 선택기 기억·PiShop 브랜드 통일·admin open redirect 방어 + 어드민 대시보드 고도화(coin360 트리맵·사용자 관리 통합·KST 집계 교정·결제내역 개선)** · **Phase 16 평가 엔진 정밀화 (2026-06-15): M2 상태형 양방향 멱등·평가엔진 select후분기 복구·CHAR→VARCHAR(sql/046)·CRON_SECRET 프로덕션 필수·재평가 안전망 cron·관리자 재평가 버튼** · **횡단 5차 (2026-06-15): i18n 전체 자동번역 서버 after() 백그라운드화 + 번역률 반올림 버그·콤보 캐시 키 v2 무효화**
+> **기준일**: 2026-06-16
+> **현재 버전**: Phase 7~12 완료 (PiCafé MVP · Pi 수익화 · 생태계 확장 · 사용자 프로필 · 통계 대시보드 · PiTranslate™ TASK-090~099 ✅) · **Phase 13 PiShop(MPS) Phase 1+2 완료 (TASK-100~111 ✅ · 카테고리·매장관리·양방향취소·거래내역) + 후속 개선(A2U 자동 환불·상품 이미지 업로드·취소 UI) · Phase 3 PiRC3 보류·Maps 예정** · **Phase 14 PiVoice™ v3.0 권한 시스템 구현 완료 (TASK-120~125 ✅, `docs/PRD_9_VOICE_CHAT.md` v3.0 — 방장 보장 슬롯 + 멤버 자동 2/승인 2, S0 실기기 검증·TURN env 잔여)** · **Phase 15 LBS P0+P1 완료 (TASK-130~140 ✅, 상품 개별 위치 등록 포함)** · 횡단 개선: 무한 스크롤·지연 로딩 + SWR 캐싱·병렬 호출 성능 튜닝, Pi Tip→Bean 리브랜딩, 스티커 노출 개선 (2026-06-12) · **횡단 3차 (2026-06-13): Pi Browser admin 다국어 전환 무반응 수정(_pit 티켓 선발급) + 헤더 다국어 콤보 3계층 캐시 성능 개선** · **횡단 4차 (2026-06-14): CafePi 헤더 로고 교체·Pi Bet UI 아코디언·다국어 선택기 기억·PiShop 브랜드 통일·admin open redirect 방어 + 어드민 대시보드 고도화(coin360 트리맵·사용자 관리 통합·KST 집계 교정·결제내역 개선)** · **Phase 16 평가 엔진 정밀화 (2026-06-15): M2 상태형 양방향 멱등·평가엔진 select후분기 복구·CHAR→VARCHAR(sql/046)·CRON_SECRET 프로덕션 필수·재평가 안전망 cron·관리자 재평가 버튼** · **횡단 5차 (2026-06-15): i18n 전체 자동번역 서버 after() 백그라운드화 + 번역률 반올림 버그·콤보 캐시 키 v2 무효화** · **GTM 문서화 (2026-06-16): 제품소개서(단기 4목표 13장) + 공개·라이선스 정책(오픈코어 3계층) + 성능 리스크 레지스터(7종 병목 분석) + 운영 이슈 기록(Vercel Hobby cron·GitHub Webhook)**
 > **배포 URL**: https://loginpi.vercel.app
 > **기술 스택**: Next.js 16 App Router · React 19 · TypeScript 6 · Tailwind CSS v4 · NextAuth.js · Supabase PostgreSQL
 
@@ -23,7 +23,7 @@ Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Net
 
 ---
 
-## 📊 전체 진행률 요약 (2026-06-15)
+## 📊 전체 진행률 요약 (2026-06-16)
 
 ### Phase 완료 현황
 
@@ -49,12 +49,13 @@ Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Net
 | **횡단** | 성능 튜닝 | ✅ 완료 | 100% (무한 스크롤·지연 로딩·SWR 캐싱·리브랜딩·스티커) |
 | **횡단3** | Pi Browser 안정화·콤보 성능 (2026-06-13) | ✅ 완료 | 100% (admin 다국어 전환 무반응 수정·헤더 콤보 3계층 캐시) |
 | **횡단4** | Pi Browser 안정화 4차·MPS 후속·대시보드 고도화 (2026-06-14) | ✅ 완료 | 100% (A2U 환불·트리맵·Pi Bet UI·헤더 로고·다국어 기억·브랜드 등) |
+| **문서화** | GTM 문서화 (2026-06-16) | ✅ 완료 | 100% (제품소개서 13장 + 공개·라이선스 정책 + 성능 리스크 레지스터 + 운영 이슈 기록) |
 
 ### 통계
-- **총 Phase**: 17개 (0~16 + 횡단 개선)
-- **완료**: 17개 구현 완료 (Phase 16 이벤트 미션 시스템 포함 — 구현·운영 중)
+- **총 Phase**: 18개 (0~16 + 횡단 개선 + 문서화)
+- **완료**: 18개 구현 완료 (Phase 16 이벤트 미션 시스템 포함 — 구현·운영 중)
 - **진행 중**: 0개
-- **예정**: 확장 Phase (MPS P3 PiRC3·Maps, LBS 지도 UI, PiVoice 추가 기능, 이벤트 행위훅 전수 점검)
+- **예정**: 확장 Phase (MPS P3 Maps, LBS 지도 UI, PiVoice TURN 운영, 이벤트 행위훅 전수 점검, StarterKit 패키지 제품화)
 
 ### 핵심 마일스톤
 
@@ -66,14 +67,17 @@ Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Net
 - ✅ N:N 음성채널 (WebRTC Full Mesh, 방장 보장 슬롯 + 발언 승인 워크플로우, TURN 지원)
 - ✅ 위치기반 커머스 (직거래 성사율 향상)
 - ✅ 기업 수준 데이터 표준 (DA 시스템)
+- ✅ GTM 준비: 제품소개서(단기 4목표 13장 슬라이드) + 공개·라이선스 정책(오픈코어 3계층) 완성
 
 **다음 단계** (본문 Phase별 TASK 기준):
 - ✅ MPS Phase 2 (TASK-108~111) 완료 (2026-06-13): 카테고리 시스템 · 매장 관리 · 양방향 주문 취소 · 거래 내역
 - ✅ MPS 후속 개선 완료 (2026-06-14): A2U 자동 환불 · FR-10 교정 · 상품 이미지 업로드 · 상품 등록 위치 수집
-- MPS Phase 3 (TASK-112~113): **TASK-112 PiRC3 실 에스크로 = 🔒 보류**(2026-06-13 공식 확인 — PiRC3 미존재·Pi SDK `invokeContract` 미지원 → 플랫폼 가상 에스크로 유지) · TASK-113 Google Maps 연동(`NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` 필요) — *MPS는 배송 없는 직거래 전용*
-- PiVoice 잔여 (S0~S3): Pi Browser 실기기 마이크 검증 · TURN 운영 설정(`TURN_HOST`/`TURN_SECRET`) · 품질 데이터 기반 coturn 전환 판단 · 5인+ LiveKit SFU/결제 게이팅 검토
+- ✅ GTM 문서화 완료 (2026-06-16): 제품소개서 + 공개정책 + 성능 리스크 레지스터 + 운영 이슈 기록
+- MPS Phase 3 (TASK-112~113): **TASK-112 PiRC3 실 에스크로 = 🔒 보류**(2026-06-13 공식 확인 — PiRC3 미존재·Pi SDK `invokeContract` 미지원 → 플랫폼 가상 에스크로 유지) · **TASK-113 Google Maps 연동**(`NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` 필요) — *MPS는 배송 없는 직거래 전용*
+- PiVoice 잔여 (S0~S3): Pi Browser 실기기 마이크 검증 · **TURN 운영 설정**(`TURN_HOST`/`TURN_SECRET`) · 품질 데이터 기반 coturn 전환 판단 · 5인+ LiveKit SFU/결제 게이팅 검토
 - LBS 향후 Phase: Maps JavaScript API 지도 UI · Places API 매장 검색
-- ✅ Phase 16 이벤트 미션 시스템 (2026-06-15): M1~M10 평가 엔진·sum 랭킹·선착순 10명 선물·관리자 제외 구현·운영 중. M4↔M5 순서 교환 + M3/M5/M7/M8/M9 PiRC 표기 정비 반영. 잔여: `recordUserAction` 행위 훅 전수 점검(action_log 19 < 완료기록 34)
+- 이벤트 잔여: `recordUserAction` **행위 훅 전수 점검**(action_log 19 < 완료기록 34) — 일부 미션 트리거 누락 의심
+- **StarterKit 패키지 제품화**: 베이직/프리미엄/플래티넘/인피니티 4계층 패키지 구성, 외주 연계 파이프라인 설계 (`docs/PRD_0_INT.md` 기반)
 
 ---
 
@@ -1418,10 +1422,48 @@ if (meta?.type === 'CHAT_SUBSCR') {
 
 ---
 
+## GTM 문서화 ✅ (2026-06-16)
+
+> **목표**: 외부 공개·파트너 제안용 GTM 자료 완성 + 운영 리스크 proactive 관리
+
+### 제품소개서 (단기 4목표 13장 슬라이드) — `cd9b19c`
+
+- ✅ `docs/제품설명서_202060615.pptx` — cafe.pi 직영 광장 + 단기 4목표 기준 13장 슬라이드
+  - 훈민정음 철학(모든 Pi 사용자가 콘텐츠를 쉽게) + 핵심기술 7가지 별표 등급 분류
+  - 단기 4목표: ① PiChat 무료→소액수수료 ② PiShop 오프라인 교두보·매집 ③ StarterKit $100~500 ④ 외주연계
+  - 북극성 지표: **활성 사용자 수** (홈 StatsDashboard 첫 화면)
+- ✅ `docs/.pptx-build/build.js` + `package.json` — 재생성 스크립트(pptxgenjs 기반)
+- ✅ `.gitignore` — 빌드 부산물(`node_modules/`) 제외
+
+> **비고**: 글로벌 5단계 비전 로드맵(온라인 커뮤니티→O2O 오프라인 카페 완전 순환)은 대외비 — 제품소개서·공개 자료 어디에도 미포함
+
+### 공개·라이선스 정책 — `cd9b19c`
+
+- ✅ `docs/공개_라이선스_정책.md` — 오픈코어 3계층 전략 정의
+  - **미끼층(공개 MIT)**: 스타터킷, 인증/결제 스켈레톤, DA 거버넌스 템플릿
+  - **상품층(BSL/시간제한)**: 카페/마켓 기능, i18n 엔진, LBS, PiVoice
+  - **금고층(비매, 직영 전용)**: PiChat 실시간 엔진 + PiShop 에스크로 코어 + 코어 5종
+  - 왕관보석(PiChat·PiShop 직영) 비매 원칙 — 목적=선점 창·단기 시장점유, 영구 비밀유지 아님
+
+### 성능 리스크 레지스터 + 운영 이슈 기록 — `TROUBLESHOOT.md`
+
+- ✅ **A. 성능 리스크 레지스터** (proactive) — 7종 기능의 병목 사전 분석
+  - 🔴 최우선: 실시간 채팅(동접 연결 한도·팬아웃) + LBS 위치기반 직거래(공간 인덱스 풀스캔)
+  - 🟠 주의: 에스크로(상태 경합·앱 레벨 정합성) + 구독(cron 배치 집중)
+  - 🟡 관리: 결제(체인 RPC 지연) + 계정통합(요청당 권한 검증)
+  - 🟢 양호: 다국어(번역 I/O·빌드 검증 비용)
+  - **공통 천장**: service_role 커넥션 풀 — 모든 부하가 수렴, PgBouncer 풀 사이즈가 숨은 한계
+- ✅ **B. 운영 이슈 기록** (reactive) — 실제 발생 2건
+  - `[2026-06-15]` Vercel Hobby 플랜 Cron 주기 제약: `*/5 * * * *` 배포 자체 차단 → `0 0 * * *` 적용
+  - `[2026-06-15]` Vercel GitHub Integration Webhook 누락: cron 실패 반복→webhook 비활성 추정 → `vercel deploy --prod --yes` 수동 배포로 해결
+
+---
+
 ## 변경 이력
 
 | 버전 | 날짜 | 변경 내용 | 작성자 |
 |------|------|---------|-------|
+| v10.1 | 2026-06-16 | **GTM 문서화 + 성능 리스크 레지스터 현행화** — ① **`docs/공개_라이선스_정책.md` 신규**: 오픈코어 3계층(미끼/상품/금고), 왕관보석(PiChat·PiShop 직영) 비매 원칙, 목적=선점 창·단기 시장점유. ② **`docs/제품설명서_202060615.pptx` 신규**: 단기 4목표(PiChat 무료→수수료·PiShop 오프라인 교두보·StarterKit $100~500·외주연계) 13장 슬라이드. ③ **`docs/TROUBLESHOOT.md` 갱신**: A. 성능 리스크 레지스터(7종 — 채팅🔴·LBS🔴·에스크로🟠·구독🟠·결제🟡·계정통합🟡·다국어🟢, 공통 천장=service_role 커넥션 풀 한계) + B. 운영 이슈 기록(Vercel Hobby cron 제약·GitHub Webhook 누락 대응). ④ 기준일·진행률 요약·다음 단계 2026-06-16 갱신. PRD.md v11.4 동기화. | anakin |
 | v10.0 | 2026-06-15 | **Jun 15 후속 현행화** — ① **Phase 16 TASK-155 평가 엔진 정밀화(`4f623d9`)**: M2 상태형 양방향 멱등(별명+카톡ID 유무, 미충족 취소)·평가엔진 `upsert`→`select`후 `insert`/`update`(부분 unique 회피 + 논리삭제 복구)·SEQUENCE `del_yn='N'` 필터·`mission_ord` 순 평가·프로필 빈값 저장(빈문자열→null)·관리자 재평가 버튼 + `/api/admin/event/reeval`·`CHAR(3)`→`VARCHAR(10)`(sql/046)·`CRON_SECRET` 프로덕션 필수·재평가 안전망 cron·`voice_join` 트리거 연결. ② **횡단 5차 i18n 자동번역 백그라운드화**: 서버 `after()` 전환·번역률 반올림 버그·콤보 캐시 키 v2 무효화·validate-locales 초과 키 차단. ③ 헤더 기준일·진행률 요약 2026-06-15 갱신. PRD.md v11.3 동기화. **후속 권장**: `reevaluateAllActiveUsers` 대상 선정(행위 로그 기반)이 M2 상태형과 불일치 — 프로필 보유자 UNION. | anakin |
 | v9.0 | 2026-06-15 | **Phase 16 이벤트 미션 시스템 ✅ 구현 완료·운영 중 현행화** — 기획(📋)→구현 완료로 상태 전환. TASK-150~154 전부 ✅ + 실제 구현 파일 매핑(`sql/044`·`045`·`src/lib/event.ts`·`ClientEventGate`·`/api/event/*`·`/api/admin/event/*`). 확인 필요 3건 해소(선착순=전체 10미션 완주 `count===10` · M10=`checkCancelWithFee` · i18n 키 구조). 운영 통계 반영(참여 7·완주 1·제외 0·action_log 19). **미션 명칭/순서 현행화**: M4↔M5 순서 교환(Bean을 M4로·PiBet을 M5로, DB 완료기록·i18n_message·sql 시드 전 계층 정합) + M3/M5/M7/M8/M9 PiRC 표기 정비(PiRC1 위치·PiRC2·에스크로서비스;PiRC3). PRD.md v11.2 동기화(섹션 18 미션표·상태 갱신). **잔여**: `recordUserAction` 행위 훅 전수 점검(action_log 19 < 완료기록 34). | anakin |
 | v8.0 | 2026-06-14 | **Jun 14 전체 개선 현행화** — ① Phase 13 MPS 후속: A2U 자동 환불(512a4a5·a619378·76e2fb7)·FR-10 ADMIN 게이트 버그 교정(c8829c4)·주문관리 취소 UI(7b2203a)·상품 이미지 업로드(3cd0bc8·sql/042)·상품 등록 위치 자동수집(23bf3ba) ② Phase 11 후속 2차: coin360 트리맵(3738ffc)·대시보드 사용자 관리 통합(b5611bf)·차트 색상 통일(cacba8e)·KST 집계 교정(c46d9c3)·결제내역 개선(6172020) ③ Phase 9 후속: Pi Bet UI 아코디언·스포트라이트(c490fb7) ④ 횡단4차: 헤더 로고(12118e7)·다국어 기억(d52d7ef)·PiShop 브랜드 치환(04c9350)·admin open redirect 방어(8f419ee·43ab342). M29~M31 마일스톤 추가. 기준일·버전 헤더 2026-06-14 갱신. | anakin |
