@@ -45,9 +45,16 @@ export function ProfileForm({ initialUser, localeOptions, onSaved }: Props) {
     setMessage(null)
 
     const fd = new FormData(e.currentTarget)
+    // display_name은 필수(빈값 시 전송 제외 → 기존값 유지).
+    // 나머지 선택 필드는 빈값('')도 전송해야 '지우기'가 서버에 반영된다.
+    // (빈값을 제외하면 서버 optional 스키마가 "수정 안 함"으로 처리해 옛값이 남는 버그)
+    const REQUIRED_FIELDS = new Set(['display_name'])
     const body: Record<string, string> = {}
     fd.forEach((v, k) => {
-      if (typeof v === 'string' && v.trim() !== '') body[k] = v.trim()
+      if (typeof v !== 'string') return
+      const val = v.trim()
+      if (val === '' && REQUIRED_FIELDS.has(k)) return
+      body[k] = val
     })
 
     // piFetch — X-Pi-Token 헤더 자동 첨부 (Pi Browser 필수)

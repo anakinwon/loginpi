@@ -77,11 +77,14 @@ export async function evaluateUserMissions(
 
   // 2. 각 이벤트별 미션 평가
   for (const event of events) {
+    // mission_ord 순으로 평가 — SEQUENCE(M10)가 선행(M9) 상태를 같은 루프에서
+    // 올바르게 참조하도록 보장 (M9 취소 후 M10 재평가 가능)
     const { data: missions, error: missionError } = await db
       .from('evt_mission')
       .select('*')
       .eq('event_id', event.event_id)
       .eq('del_yn', 'N')
+      .order('mission_ord', { ascending: true })
 
     if (missionError || !missions) {
       console.error(
@@ -91,7 +94,10 @@ export async function evaluateUserMissions(
       continue
     }
 
-    // 3. 각 미션별 완료 판정
+    // 3. 각 미션별 양방향 멱등 평가
+    //    충족: 신규 INSERT / 논리삭제됐으면 복구 / 이미 완료면 skip
+    //    미충족: 완료 상태면 취소(del_yn='Y') / 없거나 이미 삭제면 skip
+    //    → 상태(예: kakao_id)가 사라지면 해당 미션이 즉시 미완료로 되돌아간다.
     for (const mission of missions) {
       const isCompleted = await evaluateMissionCompletion(
         userId,
@@ -99,30 +105,66 @@ export async function evaluateUserMissions(
         mission,
         event.start_dtm, // 이벤트 기간 전 행위 배제
       )
+      const mc = mission.mission_cd.trim()
+      const nowIso = new Date().toISOString()
+
+      // 기존 기록(논리삭제 포함) 확인 — upsert 대신 select 후 분기하여
+      // 부분 unique 인덱스(WHERE del_yn='N')의 ON CONFLICT 충돌을 회피
+      const { data: existingRaw } = await db
+        .from('evt_user_mission')
+        .select('evt_user_mission_id, del_yn')
+        .eq('event_id', event.event_id)
+        .eq('user_id', userId)
+        .eq('mission_cd', mc)
+        .maybeSingle()
+      const existing = existingRaw as {
+        evt_user_mission_id: string
+        del_yn: string
+      } | null
 
       if (isCompleted) {
-        // 4. evt_user_mission에 멱등 upsert
-        const { error: upsertError } = await db.from('evt_user_mission').upsert(
-          {
+        if (!existing) {
+          const { error } = await db.from('evt_user_mission').insert({
             event_id: event.event_id,
             user_id: userId,
-            mission_cd: mission.mission_cd.trim(),
-            complete_dtm: new Date().toISOString(),
+            mission_cd: mc,
+            complete_dtm: nowIso,
             regr_id: 'SYSTEM',
             modr_id: 'SYSTEM',
-          },
-          {
-            onConflict: 'event_id,user_id,mission_cd',
-          },
-        )
-
-        if (upsertError) {
-          console.error(
-            `미션 기록 실패 [${mission.mission_cd}]:`,
-            upsertError.message,
-          )
+          })
+          if (error) console.error(`미션 기록 실패 [${mc}]:`, error.message)
+        } else if (existing.del_yn === 'Y') {
+          // 논리삭제됐다 재충족 → 복구
+          const { error } = await db
+            .from('evt_user_mission')
+            .update({
+              del_yn: 'N',
+              del_dtm: null,
+              complete_dtm: nowIso,
+              modr_id: 'SYSTEM',
+              mod_dtm: nowIso,
+            })
+            .eq('evt_user_mission_id', existing.evt_user_mission_id)
+          if (error) console.error(`미션 복구 실패 [${mc}]:`, error.message)
         }
+        // existing.del_yn === 'N' → 이미 완료, 멱등 skip
+      } else if (mc === 'M2' && existing && existing.del_yn === 'N') {
+        // M2(별명+카톡ID)는 상태형 미션 — 도메인 상태(sys_user)만 보므로
+        // 이벤트 전 수행 오판 위험이 없어, 조건 미충족 시 완료 취소가 안전하다.
+        const { error } = await db
+          .from('evt_user_mission')
+          .update({
+            del_yn: 'Y',
+            del_dtm: nowIso,
+            modr_id: 'SYSTEM',
+            mod_dtm: nowIso,
+          })
+          .eq('evt_user_mission_id', existing.evt_user_mission_id)
+        if (error) console.error('M2 미션 취소 실패:', error.message)
       }
+      // 그 외 미충족(행위형 M1·M4 등): 아무것도 하지 않는다.
+      // 평가가 evt_action_log(이벤트 기간 내)만 보므로, 이벤트 전 수행을 로그로 못 봐
+      // 미충족으로 오판할 수 있어 행위형 완료는 자동 취소하지 않는다.
     }
   }
 }
@@ -179,7 +221,14 @@ async function evaluateMissionCompletion(
 
   switch (mission.complete_type_cd) {
     case 'SINGLE': {
-      // 1개 action_cd 발생 확인 (이벤트 기간 내)
+      // M2(프로필 완성)는 상태형 미션 — 카톡ID 존재 여부만으로 판정한다.
+      // 선물 전달 가능 상태가 본질이므로 profile_update 행위 로그·이벤트 기간과 무관하게
+      // 현재 kakao_id가 있으면 완료, 없으면 미완료. (kakao_id 삭제 시 즉시 미완료로 회수)
+      if (mission.mission_cd.trim() === 'M2') {
+        return await hasNickAndKakao(userId)
+      }
+
+      // 그 외 SINGLE: 이벤트 기간 내 1개 action_cd 발생 확인
       const { data } = await db
         .from('evt_action_log')
         .select('evt_action_log_id')
@@ -187,15 +236,7 @@ async function evaluateMissionCompletion(
         .eq('action_cd', mission.required_action_cds_tx[0])
         .gte('action_dtm', eventStartDtm)
         .limit(1)
-      if (!data?.length) return false
-
-      // M2(프로필 완성) 특수: kakao_id 필수 — 당첨(선착순 top10) 시
-      // 카카오 선물 전달에 kakao_id가 있어야 하므로, profile_update 액션만으로는
-      // 불충분(별명만 입력한 경우 방지). 핵심 미션 수행 요소.
-      if (mission.mission_cd.trim() === 'M2') {
-        return await hasKakaoId(userId)
-      }
-      return true
+      return !!data?.length
     }
 
     case 'MULTI_AND': {
@@ -238,6 +279,7 @@ async function evaluateMissionCompletion(
         .eq('event_id', eventId)
         .eq('user_id', userId)
         .eq('mission_cd', mission.sequence_prior_mission_cd.trim())
+        .eq('del_yn', 'N') // 취소(논리삭제)된 선행 미션은 미완료로 간주
         .maybeSingle()
 
       if (error || !priorMission) return false // 선행 미션 미완료
@@ -282,19 +324,20 @@ async function evaluateMissionCompletion(
 }
 
 /**
- * M2 보조 평가: kakao_id 보유 여부
- * 당첨(선착순 top10) 시 카카오 선물 전달에 kakao_id가 필수이므로,
- * M2(프로필 완성)는 profile_update 액션 + kakao_id가 모두 있어야 완료된다.
+ * M2(프로필 완성) 평가: 통합 계정에 별명(nick_nm) + 카톡ID(kakao_id)가 모두 있는지.
+ * 상태형 미션 — 두 필드 유무만으로 판정(행위 로그 무관). 하나라도 비면 미완료.
  */
-async function hasKakaoId(userId: string): Promise<boolean> {
+async function hasNickAndKakao(userId: string): Promise<boolean> {
   const db = getSupabaseAdmin()
   const { data } = await db
     .from('sys_user')
-    .select('kakao_id')
+    .select('nick_nm, kakao_id')
     .eq('id', userId)
     .maybeSingle()
-  const kakaoId = (data as { kakao_id: string | null } | null)?.kakao_id
-  return !!kakaoId && kakaoId.trim() !== ''
+  const u = data as { nick_nm: string | null; kakao_id: string | null } | null
+  const hasNick = !!u?.nick_nm && u.nick_nm.trim() !== ''
+  const hasKakao = !!u?.kakao_id && u.kakao_id.trim() !== ''
+  return hasNick && hasKakao
 }
 
 /**

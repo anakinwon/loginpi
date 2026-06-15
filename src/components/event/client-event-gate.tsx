@@ -73,6 +73,7 @@ export function ClientEventGate() {
   const [excluding, setExcluding] = useState(false)
   const [excludeMsg, setExcludeMsg] = useState<string | null>(null)
   const [excludedList, setExcludedList] = useState<ExcludedAgent[]>([])
+  const [reevaluating, setReevaluating] = useState(false)
 
   // 제외 목록 조회 (관리자 전용 API — 비관리자는 403이라 무시됨)
   const fetchExcluded = async () => {
@@ -90,6 +91,21 @@ export function ClientEventGate() {
     setRanking(data.ranking ?? [])
     setIsAdmin(!!data.is_admin)
     if (data.is_admin) await fetchExcluded()
+  }
+
+  // 관리자 전용: 온디맨드 미션 재평가 → 완료 후 랭킹 재조회
+  // cron(자정 1회) 사이 실시간 평가가 누락된 미션을 즉시 일괄 재평가한다.
+  const handleReeval = async () => {
+    setReevaluating(true)
+    try {
+      const res = await piFetch('/api/admin/event/reeval', { method: 'POST' })
+      if (!res.ok) return
+      await refetchRanking()
+    } catch (err) {
+      console.error('[reeval] 재평가 실패:', err)
+    } finally {
+      setReevaluating(false)
+    }
   }
 
   useEffect(() => {
@@ -303,7 +319,20 @@ export function ClientEventGate() {
       {/* 랭킹 보드 (체크리스트 매트릭스) */}
       <div>
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-xl font-bold">{t('rankingTitle')}</h2>
+          <div className="flex items-center gap-2">
+            <h2 className="text-xl font-bold">{t('rankingTitle')}</h2>
+            {isAdmin && (
+              <button
+                type="button"
+                onClick={handleReeval}
+                disabled={reevaluating}
+                title="미션 재평가 후 랭킹 재조회 (관리자 전용)"
+                className="border-input bg-background hover:bg-muted rounded-md border px-2 py-1 text-xs font-medium transition-colors disabled:opacity-50"
+              >
+                {reevaluating ? t('processing') : '🔄 미션 재평가'}
+              </button>
+            )}
+          </div>
           {isAdmin && (
             <div className="flex flex-col items-end gap-1">
               <div className="flex items-center gap-2">

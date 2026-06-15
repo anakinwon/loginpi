@@ -63,10 +63,16 @@ export async function PATCH(req: Request) {
     return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
   }
 
+  // 빈 문자열은 null로 정규화 — '지우기'(빈값 전송) 시 DB에 빈 문자열 대신 null 저장.
+  // (kakao_id 등 선택 필드를 비우면 null이 되어 M2 hasKakaoId 등 판정과 정합)
+  const normalized = Object.fromEntries(
+    Object.entries(parsed.data).map(([k, v]) => [k, v === '' ? null : v]),
+  )
+
   const { data, error } = await getSupabaseAdmin()
     .from('sys_user')
     .update({
-      ...parsed.data,
+      ...normalized,
       modr_id: user.id,
       mod_dtm: new Date().toISOString(),
     })
