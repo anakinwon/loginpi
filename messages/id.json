@@ -141,6 +141,9 @@
       "board": "Manajemen Board",
       "chatSection": "Manajemen Cafe",
       "dashboard": "Dashboard",
+      "eventExclude": "Kelola Pengecualian",
+      "eventGifts": "Kirim Hadiah",
+      "eventSection": "Event",
       "i18n": "Manajemen Multibahasa",
       "i18nSection": "Multibahasa",
       "links": "Status Penautan Akun",
@@ -172,6 +175,7 @@
         "user": "Pengguna"
       },
       "noPayments": "Tidak ada riwayat pembayaran.",
+      "searchPiUsername": "Cari Username Pi (cocok sebagian)",
       "status": {
         "approved": "Disetujui",
         "cancelled": "Batal",
@@ -519,6 +523,7 @@
     "subtitle": "Pengguna Aktif · Statistik Pendapatan (berdasarkan agregasi harian)",
     "themeDaily": "Pendapatan Harian berdasarkan Theme",
     "themeShare": "Porsi Pendapatan berdasarkan Theme",
+    "themeTreemap": "Proporsi Penjualan berdasarkan Tema (Treemap)",
     "top3Active": "Top 3 Pengguna Aktif (terakhir {period} hari)",
     "top3Buyers": "Top 3 Pembeli (terakhir {period} hari)",
     "top3Themes": "Top 3 Pendapatan Theme (terakhir {period} hari)",
@@ -1171,6 +1176,83 @@
     "upgrade": "Upgrade",
     "yes": "Ya"
   },
+  "event": {
+    "agentCol": "Nama Agen",
+    "alreadyExcluded": "Sudah dikecualikan: {names}",
+    "completionTitle": "10 Mission Selesai! Selamat 🎉",
+    "excludedAgents": "Agen yang Dikecualikan:",
+    "excludedN": "{count} orang dikecualikan",
+    "excludeFailed": "Gagal memproses pengecualian",
+    "excludePlaceholder": "Masukkan nama Agen (dipisahkan koma)",
+    "giftAlt": "Hadiah Penyelesaian Mission",
+    "gradeAgent": "Agen Penuh",
+    "gradeMaster": "Master",
+    "gradeRecruit": "Agen",
+    "gradeTrainee": "Agen Trainee",
+    "gradeVeteran": "Agen Senior",
+    "includeFailed": "Gagal membatalkan pengecualian",
+    "includeTitle": "Sertakan Kembali dalam Ranking",
+    "keepGoingTitle": "Semangat sedikit lagi! Belum selesai",
+    "lastPerformedCol": "Terakhir Dilakukan",
+    "loadError": "Gagal Load Data",
+    "loginHint": "Login untuk melihat progres Mission dan peringkat Agen Anda",
+    "missionListTitle": "📋 Daftar Mission",
+    "missions": {
+      "M1": {
+        "desc": "Login Pi Browser + Login Google (selesaikan keduanya)",
+        "name": "Integrasi Akun"
+      },
+      "M10": {
+        "desc": "(Setelah M9) Lakukan Misi 7 dan 8 lagi — alami biaya pembatalan saat deposit aktif",
+        "name": "Biaya Pembatalan Transaksi Deposit Aktif"
+      },
+      "M2": {
+        "desc": "Masukkan nama panggilan + ID KakaoTalk di akun terintegrasi (diperlukan saat menerima hadiah)",
+        "name": "Selesaikan Profile"
+      },
+      "M3": {
+        "desc": "Buat PREMIUM Cafe di PiCafe + Gunakan fitur terjemahan otomatis",
+        "name": "Buat PREMIUM Cafe (PiRC1) + Terjemahan Otomatis"
+      },
+      "M4": {
+        "desc": "Transfer Bean ke 1 orang atau lebih dalam chat",
+        "name": "Test Transfer Bean (PiRC1)"
+      },
+      "M5": {
+        "desc": "Setelah mendaftar Pi Subscription Service, buat Pi Bet di Cafe + distribusikan kepada peserta",
+        "name": "Setelah mendaftar Pi Subscription Service (PiRC2), buat dan distribusikan Pi Bet"
+      },
+      "M6": {
+        "desc": "Gunakan Sticker / Transfer File / Gunakan Saluran Suara (salah satu atau lebih)",
+        "name": "Gunakan Fitur Multi Chat"
+      },
+      "M7": {
+        "desc": "Penjual membatalkan transaksi setelah mendaftarkan produk saya di PiShop dan selama transaksi berlangsung.",
+        "name": "Pembatalan Transaksi Penjual (Layanan Escrow;PiRC3)"
+      },
+      "M8": {
+        "desc": "Pembeli membatalkan transaksi setelah membeli produk orang lain di PiShop.",
+        "name": "Pembatalan Transaksi Pembeli (Layanan Escrow;PiRC3)"
+      },
+      "M9": {
+        "desc": "Menyetorkan deposit penjual PiShop minimal 1Pi + menyetujui layanan berbasis lokasi",
+        "name": "Deposit Penjual + Persetujuan Lokasi (Layanan Escrow;PiRC3)"
+      }
+    },
+    "multiOrHint": "💡 Hint: Anda hanya perlu menyelesaikan 1 dari beberapa metode",
+    "networkError": "Network Error",
+    "noChange": "Tidak Ada Perubahan",
+    "noName": "(Tanpa Nama)",
+    "notFoundAgents": "Tidak ditemukan: {names}",
+    "processing": "Memproses…",
+    "rankCol": "Peringkat",
+    "rankingTitle": "🏆 Mission Ranking",
+    "removeRank": "Hapus Peringkat",
+    "rewardCol": "Hadiah",
+    "subtitle": "Selesaikan 10 Mission dan terima 🎁 Hadiah Kakao",
+    "title": "🎖️ Mission Event",
+    "totalCol": "Total"
+  },
   "header": {
     "admin": "Admin",
     "board": "Board",
@@ -1295,6 +1377,7 @@
   "nav": {
     "admin": "Admin",
     "cafe": "Cafe",
+    "event": "Event",
     "home": "Home",
     "my": "Informasi Saya",
     "shop": "Shop"
@@ -1493,11 +1576,35 @@
       "qty": "Jumlah Penjualan",
       "saveDraft": "Simpan Draf",
       "saveEdit": "Simpan Perubahan",
+      "shop": "Toko Terdaftar",
+      "shopNone": "Tidak ada toko",
       "thumbUrl": "URL Gambar Utama",
       "unlimited": "Tidak Terbatas",
       "unlimitedHint": "Daftarkan produk seperti minuman atau pizza, yang pelacakan stoknya tidak relevan, sebagai tidak terbatas"
     },
     "formInvalid": "Mohon periksa nama produk dan harga",
+    "history": {
+      "clearFilter": "Hapus Filter",
+      "empty": "Tidak ada riwayat transaksi",
+      "from": "Tanggal Mulai",
+      "tab": {
+        "ALL": "Semua",
+        "BUY": "Beli",
+        "ETC": "Lainnya",
+        "SELL": "Jual"
+      },
+      "title": "Riwayat Transaksi",
+      "to": "Tanggal Akhir",
+      "type": {
+        "BOND_DEPOSIT": "Penyetoran Deposit",
+        "CANCEL_FEE_IN": "Penerimaan Biaya Pembatalan",
+        "CANCEL_REFUND": "Pembatalan Pengembalian Dana",
+        "ESCROW_IN": "Deposit Pembelian",
+        "REFUND_IN": "Deposit Pengembalian Dana",
+        "RELEASE_OUT": "Penyelesaian Penjualan",
+        "SETTLE_OUT": "Penarikan Penyelesaian"
+      }
+    },
     "itemNotFound": "Barang tidak ditemukan",
     "itemSt": {
       "CLOSED": "Tidak Dipublikasikan",
@@ -1516,6 +1623,7 @@
     "loginRequired": "Tersedia setelah login",
     "myItemsTitle": "Kelola Produk Saya",
     "myOwnItem": "Ini adalah barang yang saya daftarkan",
+    "navHistory": "Riwayat Transaksi",
     "navMyItems": "Barang Saya",
     "navOrders": "Riwayat Pembelian",
     "navSales": "Manajemen Penjualan",
@@ -1543,12 +1651,48 @@
     "piBrowserOnly": "Pembayaran hanya dapat dilakukan di Pi Browser",
     "publishSuccess": "Produk telah dipublikasikan",
     "qtyInvalid": "Mohon masukkan jumlah antara 1 dan 9998",
+    "refund": {
+      "done": "{amount}π telah dikembalikan",
+      "pending": "Pembatalan selesai — pengembalian dana akan segera diproses"
+    },
     "salesTitle": "Kelola Pesanan Penjualan",
     "saveFail": "Gagal memproses",
     "saving": "Menyimpan…",
     "scrollMore": "Gulir untuk melihat lebih banyak…",
     "search": "Cari",
     "searchPlaceholder": "Cari nama atau deskripsi barang",
+    "shop": {
+      "add": "Daftarkan Toko",
+      "addr": "Alamat",
+      "addrHint": "Ini adalah alamat toko offline. Koordinat (pin peta) akan didukung di masa mendatang.",
+      "addTitle": "Daftarkan Toko Baru",
+      "bizHour": "Jam Operasional",
+      "bizHourPlaceholder": "Contoh: Hari kerja 10:00–19:00",
+      "cancel": "Batal",
+      "createSuccess": "Toko telah didaftarkan",
+      "delete": "Hapus",
+      "deleteConfirm": "Hapus toko ini? Produk yang terkait akan tetap ada, hanya koneksi toko yang akan dilepaskan.",
+      "deleteSuccess": "Toko telah dihapus",
+      "desc": "Deskripsi Toko",
+      "edit": "Edit",
+      "editSuccess": "Informasi toko telah diperbarui",
+      "editTitle": "Edit Toko",
+      "email": "Email",
+      "empty": "Tidak ada toko terdaftar",
+      "intro": "Daftarkan toko online dan offline Anda untuk meningkatkan kepercayaan pembeli",
+      "manage": "Kelola Toko",
+      "name": "Nama Toko",
+      "nameRequired": "Masukkan nama toko",
+      "save": "Simpan",
+      "sns": "Tautan SNS",
+      "tel": "Telepon",
+      "thumb": "URL Gambar Utama",
+      "title": "Manajemen Toko",
+      "type": "Jenis Toko",
+      "type_BOTH": "Online dan Offline",
+      "type_OFFLINE": "Offline",
+      "type_ONLINE": "Online"
+    },
     "shopType": {
       "BOTH": "Online & Offline",
       "OFFLINE": "Toko Offline",

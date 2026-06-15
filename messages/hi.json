@@ -141,6 +141,9 @@
       "board": "Board प्रबंधन",
       "chatSection": "Cafe प्रबंधन",
       "dashboard": "Dashboard",
+      "eventExclude": "बहिष्करण प्रबंधित करें",
+      "eventGifts": "उपहार भेजें",
+      "eventSection": "Event",
       "i18n": "बहुभाषी प्रबंधन",
       "i18nSection": "बहुभाषी",
       "links": "खाता लिंकिंग स्थिति",
@@ -172,6 +175,7 @@
         "user": "उपयोगकर्ता"
       },
       "noPayments": "कोई भुगतान इतिहास नहीं है।",
+      "searchPiUsername": "Pi उपयोगकर्ता नाम खोजें (आंशिक मिलान)",
       "status": {
         "approved": "अनुमोदित",
         "cancelled": "रद्द",
@@ -519,6 +523,7 @@
     "subtitle": "Active Users · Revenue Statistics (दैनिक एकत्रीकरण पर आधारित)",
     "themeDaily": "Theme के अनुसार दैनिक Revenue",
     "themeShare": "Theme के अनुसार Revenue हिस्सा",
+    "themeTreemap": "Theme के अनुसार बिक्री का अनुपात (Treemap)",
     "top3Active": "Top 3 Active Users (पिछले {period} दिन)",
     "top3Buyers": "Top 3 Buyers (पिछले {period} दिन)",
     "top3Themes": "Top 3 Themes Revenue (पिछले {period} दिन)",
@@ -1171,6 +1176,83 @@
     "upgrade": "Upgrade",
     "yes": "हाँ"
   },
+  "event": {
+    "agentCol": "एजेंट का नाम",
+    "alreadyExcluded": "पहले से बहिष्कृत: {names}",
+    "completionTitle": "10 Mission पूरे हुए! बधाई हो 🎉",
+    "excludedAgents": "बहिष्कृत एजेंट:",
+    "excludedN": "{count} बहिष्कृत",
+    "excludeFailed": "बहिष्करण प्रक्रिया विफल रही",
+    "excludePlaceholder": "एजेंट का नाम दर्ज करें (कॉमा से अलग करें)",
+    "giftAlt": "Mission पूरा होने का उपहार",
+    "gradeAgent": "एजेंट",
+    "gradeMaster": "Master",
+    "gradeRecruit": "रिक्रूट",
+    "gradeTrainee": "ट्रेनी एजेंट",
+    "gradeVeteran": "वेटरन एजेंट",
+    "includeFailed": "बहिष्करण रद्द करने में विफल",
+    "includeTitle": "Ranking में फिर से शामिल करें",
+    "keepGoingTitle": "थोड़ा और प्रयास करें! अभी तक पूरा नहीं हुआ है",
+    "lastPerformedCol": "अंतिम प्रदर्शन",
+    "loadError": "Data लोड करने में विफल",
+    "loginHint": "Login करने पर आपकी Mission प्रगति और एजेंट रैंक प्रदर्शित होगी",
+    "missionListTitle": "📋 Mission सूची",
+    "missions": {
+      "M1": {
+        "desc": "Pi Browser Login + Google Login (दोनों पूरे करें)",
+        "name": "खाता एकीकरण"
+      },
+      "M10": {
+        "desc": "(M9 के बाद) 7 और 8 को फिर से करें — जमा सक्रिय स्थिति में रद्द शुल्क का अनुभव करें",
+        "name": "जमा सक्रिय लेनदेन रद्द शुल्क"
+      },
+      "M2": {
+        "desc": "एकीकृत खाते में उपनाम + KakaoTalk ID दर्ज करें (उपहार प्राप्त करने के लिए आवश्यक)",
+        "name": "Profile पूरा करें"
+      },
+      "M3": {
+        "desc": "PiCafe में PREMIUM Cafe बनाएँ + स्वचालित अनुवाद फ़ंक्शन का उपयोग करें",
+        "name": "PREMIUM Cafe बनाएँ (PiRC1) + स्वचालित अनुवाद"
+      },
+      "M4": {
+        "desc": "Chat में 1 या अधिक लोगों को Bean भेजें",
+        "name": "Bean Transfer Test (PiRC1)"
+      },
+      "M5": {
+        "desc": "Pi Subscription Service के लिए आवेदन करने के बाद, Cafe में Pi Bet बनाएँ + प्रतिभागियों को वितरित करें",
+        "name": "Pi Subscription Service (PiRC2) के लिए आवेदन करने के बाद, Pi Bet बनाएँ और वितरित करें"
+      },
+      "M6": {
+        "desc": "Sticker का उपयोग करें / File Transfer करें / Voice Channel का उपयोग करें (इनमें से 1 या अधिक)",
+        "name": "Chat Multi-function का उपयोग करें"
+      },
+      "M7": {
+        "desc": "PiShop पर मेरा उत्पाद पंजीकृत करने के बाद लेनदेन के दौरान विक्रेता द्वारा लेनदेन रद्द करना",
+        "name": "विक्रेता लेनदेन रद्द करना (Escrow Service; PiRC3)"
+      },
+      "M8": {
+        "desc": "PiShop पर किसी और का उत्पाद खरीदने के बाद क्रेता द्वारा लेनदेन रद्द करना",
+        "name": "क्रेता लेनदेन रद्द करना (Escrow Service; PiRC3)"
+      },
+      "M9": {
+        "desc": "PiShop विक्रेता जमा के रूप में 1Pi या अधिक जमा करें + स्थान-आधारित सेवा के लिए सहमति दें",
+        "name": "विक्रेता जमा + स्थान सहमति (Escrow Service; PiRC3)"
+      }
+    },
+    "multiOrHint": "💡 Hint: आपको कई तरीकों में से केवल एक पूरा करना होगा",
+    "networkError": "Network त्रुटि",
+    "noChange": "कोई बदलाव नहीं",
+    "noName": "(कोई नाम नहीं)",
+    "notFoundAgents": "नहीं मिला: {names}",
+    "processing": "प्रसंस्करण हो रहा है…",
+    "rankCol": "रैंक",
+    "rankingTitle": "🏆 Mission Ranking",
+    "removeRank": "रैंक हटाएँ",
+    "rewardCol": "इनाम",
+    "subtitle": "10 Mission पूरे करें और 🎁 Kakao उपहार प्राप्त करें",
+    "title": "🎖️ Mission Event",
+    "totalCol": "कुल"
+  },
   "header": {
     "admin": "Admin",
     "board": "Board",
@@ -1295,6 +1377,7 @@
   "nav": {
     "admin": "प्रशासक",
     "cafe": "Cafe",
+    "event": "Event",
     "home": "Home",
     "my": "मेरी जानकारी",
     "shop": "Shop"
@@ -1493,11 +1576,35 @@
       "qty": "बिक्री मात्रा",
       "saveDraft": "ड्राफ्ट सहेजें",
       "saveEdit": "संशोधन सहेजें",
+      "shop": "दुकान",
+      "shopNone": "कोई दुकान नहीं",
       "thumbUrl": "प्रतिनिधि छवि URL",
       "unlimited": "असीमित",
       "unlimitedHint": "पेय, पिज्जा आदि जैसे उत्पादों के लिए इन्वेंट्री ट्रैकिंग अर्थहीन है, उन्हें असीमित के रूप में पंजीकृत करें।"
     },
     "formInvalid": "कृपया उत्पाद का नाम और कीमत जांचें",
+    "history": {
+      "clearFilter": "फ़िल्टर साफ़ करें",
+      "empty": "कोई लेनदेन इतिहास नहीं है",
+      "from": "प्रारंभ तिथि",
+      "tab": {
+        "ALL": "सभी",
+        "BUY": "खरीदें",
+        "ETC": "अन्य",
+        "SELL": "बेचें"
+      },
+      "title": "लेनदेन इतिहास",
+      "to": "समाप्ति तिथि",
+      "type": {
+        "BOND_DEPOSIT": "जमा बांड",
+        "CANCEL_FEE_IN": "रद्दीकरण शुल्क प्राप्त करें",
+        "CANCEL_REFUND": "रद्दीकरण वापसी",
+        "ESCROW_IN": "खरीद जमा",
+        "REFUND_IN": "वापसी जमा",
+        "RELEASE_OUT": "बिक्री निपटान",
+        "SETTLE_OUT": "निपटान निकासी"
+      }
+    },
     "itemNotFound": "Item नहीं मिला",
     "itemSt": {
       "CLOSED": "बंद",
@@ -1516,6 +1623,7 @@
     "loginRequired": "Login के बाद उपयोग कर सकते हैं",
     "myItemsTitle": "मेरे Items का प्रबंधन",
     "myOwnItem": "यह मेरा अपना Item है",
+    "navHistory": "लेनदेन इतिहास",
     "navMyItems": "मेरे Items",
     "navOrders": "खरीद इतिहास",
     "navSales": "Sales प्रबंधन",
@@ -1543,12 +1651,48 @@
     "piBrowserOnly": "केवल Pi Browser में भुगतान कर सकते हैं",
     "publishSuccess": "उत्पाद प्रकाशित हो गया है",
     "qtyInvalid": "कृपया मात्रा 1 से 9998 के बीच दर्ज करें",
+    "refund": {
+      "done": "{amount}π वापस कर दिया गया है",
+      "pending": "रद्दीकरण पूर्ण — वापसी जल्द ही संसाधित की जाएगी"
+    },
     "salesTitle": "Sales Orders का प्रबंधन",
     "saveFail": "प्रक्रिया विफल रही",
     "saving": "सहेजा जा रहा है…",
     "scrollMore": "अधिक देखने के लिए स्क्रॉल करें...",
     "search": "खोजें",
     "searchPlaceholder": "Item नाम या विवरण खोजें",
+    "shop": {
+      "add": "दुकान पंजीकृत करें",
+      "addr": "पता",
+      "addrHint": "यह Offline Store का पता है। निर्देशांक (Map Pin) के लिए समर्थन भविष्य में उपलब्ध होगा।",
+      "addTitle": "नई दुकान पंजीकृत करें",
+      "bizHour": "Business Hours",
+      "bizHourPlaceholder": "उदाहरण: कार्यदिवस 10:00–19:00",
+      "cancel": "Cancel",
+      "createSuccess": "दुकान पंजीकृत हो गई है",
+      "delete": "हटाएँ",
+      "deleteConfirm": "क्या आप इस दुकान को हटाना चाहते हैं? संबद्ध उत्पाद बने रहेंगे और केवल दुकान का कनेक्शन हटा दिया जाएगा।",
+      "deleteSuccess": "दुकान हटा दी गई है",
+      "desc": "दुकान का परिचय",
+      "edit": "संपादित करें",
+      "editSuccess": "दुकान की जानकारी संशोधित कर दी गई है",
+      "editTitle": "दुकान संपादित करें",
+      "email": "Email",
+      "empty": "कोई पंजीकृत दुकान नहीं है",
+      "intro": "खरीदार का विश्वास बढ़ाने के लिए Online और Offline दुकानें पंजीकृत करें",
+      "manage": "दुकान प्रबंधन",
+      "name": "दुकान का नाम",
+      "nameRequired": "कृपया दुकान का नाम दर्ज करें",
+      "save": "Save",
+      "sns": "SNS Link",
+      "tel": "Phone",
+      "thumb": "Main Image URL",
+      "title": "दुकान प्रबंधन",
+      "type": "दुकान का प्रकार",
+      "type_BOTH": "Online/Offline",
+      "type_OFFLINE": "Offline",
+      "type_ONLINE": "Online"
+    },
     "shopType": {
       "BOTH": "Online और Offline",
       "OFFLINE": "Offline Store",

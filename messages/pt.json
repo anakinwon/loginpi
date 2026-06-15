@@ -141,6 +141,9 @@
       "board": "Gerenciamento de Board",
       "chatSection": "Gerenciamento de Café",
       "dashboard": "Dashboard",
+      "eventExclude": "Gerenciar exclusão",
+      "eventGifts": "Enviar presentes",
+      "eventSection": "Evento",
       "i18n": "Gerenciamento Multilíngue",
       "i18nSection": "Multilíngue",
       "links": "Status da Vinculação de Conta",
@@ -172,6 +175,7 @@
         "user": "Usuário"
       },
       "noPayments": "Nenhum histórico de pagamentos.",
+      "searchPiUsername": "Pesquisar nome de usuário Pi (correspondência parcial)",
       "status": {
         "approved": "Aprovado",
         "cancelled": "Cancelado",
@@ -519,6 +523,7 @@
     "subtitle": "Usuários ativos · Estatísticas de vendas (com base em agregação diária)",
     "themeDaily": "Receita diária por tema",
     "themeShare": "Proporção da receita por tema",
+    "themeTreemap": "Proporção de vendas por tema (Treemap)",
     "top3Active": "Top 3 Usuários Ativos (últimos {period} dias)",
     "top3Buyers": "Top 3 Compradores (últimos {period} dias)",
     "top3Themes": "Top 3 Receita por Tema (últimos {period} dias)",
@@ -1171,6 +1176,83 @@
     "upgrade": "Upgrade",
     "yes": "Sim"
   },
+  "event": {
+    "agentCol": "Nome do Agente",
+    "alreadyExcluded": "Já excluídos: {names}",
+    "completionTitle": "10 Missões concluídas! Parabéns 🎉",
+    "excludedAgents": "Agentes excluídos:",
+    "excludedN": "{count} excluídos",
+    "excludeFailed": "Falha na exclusão",
+    "excludePlaceholder": "Digite o nome do agente (separado por vírgulas)",
+    "giftAlt": "Presente de conclusão de Missão",
+    "gradeAgent": "Agente Regular",
+    "gradeMaster": "Mestre",
+    "gradeRecruit": "Recruta",
+    "gradeTrainee": "Agente em Treinamento",
+    "gradeVeteran": "Agente Veterano",
+    "includeFailed": "Falha ao remover exclusão",
+    "includeTitle": "Incluir novamente no Ranking",
+    "keepGoingTitle": "Continue! Ainda não foi concluído",
+    "lastPerformedCol": "Última Realização",
+    "loadError": "Falha ao carregar Data",
+    "loginHint": "Faça login para ver seu progresso de missão e sua classificação de agente",
+    "missionListTitle": "📋 Lista de Missões",
+    "missions": {
+      "M1": {
+        "desc": "Login no Pi Browser + Login no Google (concluir ambos)",
+        "name": "Integração de Conta"
+      },
+      "M10": {
+        "desc": "(Após M9) realizar as missões 7 e 8 novamente — experimentar a taxa de cancelamento com o depósito ativo",
+        "name": "Taxa de cancelamento de transação com depósito ativo"
+      },
+      "M2": {
+        "desc": "Inserir apelido + ID do KakaoTalk na conta integrada (necessário para receber o presente)",
+        "name": "Conclusão de Perfil"
+      },
+      "M3": {
+        "desc": "Criar Cafe PREMIUM no PiCafe + usar função de Tradução Automática",
+        "name": "Criar Cafe PREMIUM (PiRC1) + Tradução Automática"
+      },
+      "M4": {
+        "desc": "Transferir Bean para 1 ou mais pessoas no chat",
+        "name": "Teste de Transferência de Bean (PiRC1)"
+      },
+      "M5": {
+        "desc": "Após solicitar o Serviço de Assinatura Pi, criar Pi Bet no Cafe + distribuir aos participantes",
+        "name": "Após solicitar o Serviço de Assinatura Pi (PiRC2), criar e distribuir Pi Bet"
+      },
+      "M6": {
+        "desc": "Usar Stickers / Enviar arquivos / Usar canal de voz (1 ou mais)",
+        "name": "Usar função multi-chat"
+      },
+      "M7": {
+        "desc": "Após registrar meu produto no PiShop, cancelar a transação do vendedor durante a transação",
+        "name": "Cancelamento de transação do vendedor (Serviço de Escrow;PiRC3)"
+      },
+      "M8": {
+        "desc": "Após comprar o produto de outra pessoa no PiShop, cancelar a transação do comprador",
+        "name": "Cancelamento de transação do comprador (Serviço de Escrow;PiRC3)"
+      },
+      "M9": {
+        "desc": "Depositar mais de 1Pi de depósito do vendedor no PiShop + concordar com o serviço baseado em localização",
+        "name": "Depósito do vendedor + Consentimento de localização (Serviço de Escrow;PiRC3)"
+      }
+    },
+    "multiOrHint": "💡 Dica: Apenas um dos vários métodos precisa ser concluído",
+    "networkError": "Erro de Rede",
+    "noChange": "Nenhuma alteração",
+    "noName": "(Sem nome)",
+    "notFoundAgents": "Não encontrados: {names}",
+    "processing": "Processando…",
+    "rankCol": "Classificação",
+    "rankingTitle": "🏆 Ranking de Missões",
+    "removeRank": "Remover classificação",
+    "rewardCol": "Recompensa",
+    "subtitle": "Complete 10 missões e receba um presente Kakao 🎁",
+    "title": "🎖️ Evento de Missão",
+    "totalCol": "Total"
+  },
   "header": {
     "admin": "Admin",
     "board": "Board",
@@ -1295,6 +1377,7 @@
   "nav": {
     "admin": "Administrador",
     "cafe": "Cafe",
+    "event": "Event",
     "home": "Home",
     "my": "Minhas Informações",
     "shop": "Shop"
@@ -1493,11 +1576,35 @@
       "qty": "Quantidade à venda",
       "saveDraft": "Salvar rascunho",
       "saveEdit": "Salvar edição",
+      "shop": "Loja",
+      "shopNone": "Nenhuma loja",
       "thumbUrl": "URL da imagem principal",
       "unlimited": "Ilimitado",
       "unlimitedHint": "Para produtos onde o rastreamento de estoque é irrelevante (ex: bebidas, pizzas), registre como ilimitado."
     },
     "formInvalid": "Verifique o nome e o preço do produto",
+    "history": {
+      "clearFilter": "Limpar filtro",
+      "empty": "Não há histórico de transações",
+      "from": "Data de início",
+      "tab": {
+        "ALL": "Todos",
+        "BUY": "Compra",
+        "ETC": "Outros",
+        "SELL": "Venda"
+      },
+      "title": "Histórico de transações",
+      "to": "Data de término",
+      "type": {
+        "BOND_DEPOSIT": "Depósito de garantia",
+        "CANCEL_FEE_IN": "Recebimento de taxa de cancelamento",
+        "CANCEL_REFUND": "Reembolso de cancelamento",
+        "ESCROW_IN": "Depósito de compra",
+        "REFUND_IN": "Depósito de reembolso",
+        "RELEASE_OUT": "Liquidação de venda",
+        "SETTLE_OUT": "Saque de liquidação"
+      }
+    },
     "itemNotFound": "Item não encontrado",
     "itemSt": {
       "CLOSED": "Fechado",
@@ -1516,6 +1623,7 @@
     "loginRequired": "Disponível após o login",
     "myItemsTitle": "Gerenciar meus produtos",
     "myOwnItem": "Este é um item que você registrou",
+    "navHistory": "Histórico de transações",
     "navMyItems": "Meus Itens",
     "navOrders": "Histórico de Pedidos",
     "navSales": "Gerenciar Vendas",
@@ -1543,12 +1651,48 @@
     "piBrowserOnly": "O pagamento só pode ser feito no Pi Browser",
     "publishSuccess": "Produto publicado com sucesso",
     "qtyInvalid": "A quantidade deve ser entre 1 e 9998",
+    "refund": {
+      "done": "{amount}π foi reembolsado",
+      "pending": "Cancelamento concluído — o reembolso será processado em breve"
+    },
     "salesTitle": "Gerenciar pedidos de venda",
     "saveFail": "Falha ao processar",
     "saving": "Salvando…",
     "scrollMore": "Role para ver mais…",
     "search": "Pesquisar",
     "searchPlaceholder": "Pesquisar nome ou descrição do item",
+    "shop": {
+      "add": "Registrar loja",
+      "addr": "Endereço",
+      "addrHint": "Este é o endereço da loja física. Coordenadas (pin do mapa) serão suportadas no futuro.",
+      "addTitle": "Registrar nova loja",
+      "bizHour": "Horário de funcionamento",
+      "bizHourPlaceholder": "Ex: Dias úteis 10:00–19:00",
+      "cancel": "Cancelar",
+      "createSuccess": "A loja foi registrada",
+      "delete": "Excluir",
+      "deleteConfirm": "Deseja excluir esta loja? Os produtos associados serão mantidos e apenas a conexão da loja será desfeita",
+      "deleteSuccess": "A loja foi excluída",
+      "desc": "Descrição da loja",
+      "edit": "Editar",
+      "editSuccess": "As informações da loja foram atualizadas",
+      "editTitle": "Editar loja",
+      "email": "Email",
+      "empty": "Nenhuma loja registrada",
+      "intro": "Registre lojas online e offline para aumentar a confiança do comprador",
+      "manage": "Gerenciar lojas",
+      "name": "Nome da loja",
+      "nameRequired": "Por favor, insira o nome da loja",
+      "save": "Salvar",
+      "sns": "Link do SNS",
+      "tel": "Telefone",
+      "thumb": "URL da Imagem Principal",
+      "title": "Gerenciamento de lojas",
+      "type": "Tipo de loja",
+      "type_BOTH": "Online e Offline",
+      "type_OFFLINE": "Offline",
+      "type_ONLINE": "Online"
+    },
     "shopType": {
       "BOTH": "Online e Física",
       "OFFLINE": "Loja Física",

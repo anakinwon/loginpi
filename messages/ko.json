@@ -503,7 +503,13 @@
     "howToFix": "해결 방법:",
     "translatingEta": "{locale} 번역 중 ({keys}개 키 · {batches}배치 · {eta} 소요 예상)",
     "etaMin": "약 {min}분",
-    "etaSec": "약 {sec}초"
+    "etaSec": "약 {sec}초",
+    "autoAll": "전체 자동 번역",
+    "autoStop": "중단",
+    "autoProgress": "자동 번역 중 ({current}/{total})",
+    "autoDone": "전체 자동 번역 완료 ({count}개 언어)",
+    "autoStopped": "자동 번역 중단됨 ({done}/{total} 완료)",
+    "autoNoPending": "자동 번역할 미완료 언어가 없습니다"
   },
   "adminStats": {
     "homeTitle": "대시보드",

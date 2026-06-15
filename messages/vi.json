@@ -141,6 +141,9 @@
       "board": "Quản lý Board",
       "chatSection": "Quản lý Cafe",
       "dashboard": "Dashboard",
+      "eventExclude": "Quản lý loại trừ",
+      "eventGifts": "Gửi quà",
+      "eventSection": "Event",
       "i18n": "Quản lý đa ngôn ngữ",
       "i18nSection": "Đa ngôn ngữ",
       "links": "Trạng thái liên kết tài khoản",
@@ -172,6 +175,7 @@
         "user": "Người dùng"
       },
       "noPayments": "Không có lịch sử thanh toán.",
+      "searchPiUsername": "Tìm kiếm tên người dùng Pi (khớp một phần)",
       "status": {
         "approved": "Đã phê duyệt",
         "cancelled": "Hủy",
@@ -519,6 +523,7 @@
     "subtitle": "Người dùng hoạt động · Thống kê doanh thu (dựa trên tổng hợp hàng ngày)",
     "themeDaily": "Doanh thu Theme hàng ngày theo Theme",
     "themeShare": "Tỷ trọng doanh thu theo Theme",
+    "themeTreemap": "Tỷ trọng doanh thu theo Theme (Treemap)",
     "top3Active": "Top 3 người dùng hoạt động (trong {period} ngày gần đây)",
     "top3Buyers": "Top 3 người mua nhiều nhất (trong {period} ngày gần đây)",
     "top3Themes": "Top 3 doanh thu Theme (trong {period} ngày gần đây)",
@@ -1171,6 +1176,83 @@
     "upgrade": "Upgrade",
     "yes": "Có"
   },
+  "event": {
+    "agentCol": "Tên đặc vụ",
+    "alreadyExcluded": "Đã loại trừ: {names}",
+    "completionTitle": "Hoàn thành 10 Mission! Chúc mừng 🎉",
+    "excludedAgents": "Đặc vụ bị loại trừ:",
+    "excludedN": "Đã loại trừ {count} người",
+    "excludeFailed": "Xử lý loại trừ thất bại",
+    "excludePlaceholder": "Nhập tên đặc vụ (phân cách bằng dấu phẩy)",
+    "giftAlt": "Quà hoàn thành Mission",
+    "gradeAgent": "Đặc vụ chính thức",
+    "gradeMaster": "Master",
+    "gradeRecruit": "Đặc vụ",
+    "gradeTrainee": "Đặc vụ tập sự",
+    "gradeVeteran": "Đặc vụ cấp cao",
+    "includeFailed": "Hủy loại trừ thất bại",
+    "includeTitle": "Bao gồm lại vào Ranking",
+    "keepGoingTitle": "Cố gắng thêm chút nữa! Bạn vẫn chưa hoàn thành",
+    "lastPerformedCol": "Lần thực hiện cuối",
+    "loadError": "Tải Data thất bại",
+    "loginHint": "Khi Login, tiến độ Mission và cấp độ đặc vụ của bạn sẽ được hiển thị",
+    "missionListTitle": "📋 Danh sách Mission",
+    "missions": {
+      "M1": {
+        "desc": "Login trình duyệt Pi + Login Google (hoàn thành cả hai)",
+        "name": "Tích hợp tài khoản"
+      },
+      "M10": {
+        "desc": "(Sau M9) Thực hiện lại nhiệm vụ 7 và 8 — trải nghiệm phí hủy khi tiền đặt cọc đang hoạt động",
+        "name": "Phí hủy giao dịch khi tiền đặt cọc đang hoạt động"
+      },
+      "M2": {
+        "desc": "Nhập biệt danh + ID KakaoTalk vào tài khoản tích hợp (cần thiết khi nhận quà)",
+        "name": "Hoàn thành Profile"
+      },
+      "M3": {
+        "desc": "Tạo PREMIUM Cafe trong PiCafe + Sử dụng tính năng dịch tự động",
+        "name": "Tạo PREMIUM Cafe (PiRC1) + Dịch tự động"
+      },
+      "M4": {
+        "desc": "Chuyển Bean trong Chat cho 1 người trở lên",
+        "name": "Kiểm tra chuyển Bean (PiRC1)"
+      },
+      "M5": {
+        "desc": "Sau khi đăng ký Dịch vụ đăng ký Pi, tạo Pi Bet trong Cafe + phân phối cho người tham gia",
+        "name": "Đăng ký Dịch vụ đăng ký Pi (PiRC2) sau đó tạo và phân phối Pi Bet"
+      },
+      "M6": {
+        "desc": "Sử dụng Sticker / Chuyển File / Sử dụng kênh thoại (1 trong số các cách sau)",
+        "name": "Sử dụng tính năng đa nhiệm Chat"
+      },
+      "M7": {
+        "desc": "Sau khi đăng ký sản phẩm của tôi trên PiShop, hủy giao dịch của người bán trong khi giao dịch",
+        "name": "Hủy giao dịch của người bán (Escrow Service;PiRC3)"
+      },
+      "M8": {
+        "desc": "Sau khi mua sản phẩm của người khác trên PiShop, hủy giao dịch của người mua",
+        "name": "Hủy giao dịch của người mua (Escrow Service;PiRC3)"
+      },
+      "M9": {
+        "desc": "Người bán PiShop đặt cọc ít nhất 1Pi + Đồng ý dịch vụ dựa trên vị trí",
+        "name": "Tiền đặt cọc của người bán + Đồng ý vị trí (Escrow Service;PiRC3)"
+      }
+    },
+    "multiOrHint": "💡 Hint: Chỉ cần hoàn thành 1 trong nhiều cách",
+    "networkError": "Lỗi Network",
+    "noChange": "Không có thay đổi",
+    "noName": "(Không có tên)",
+    "notFoundAgents": "Không tìm thấy: {names}",
+    "processing": "Đang xử lý…",
+    "rankCol": "Ranking",
+    "rankingTitle": "🏆 Mission Ranking",
+    "removeRank": "Xóa Ranking",
+    "rewardCol": "Phần thưởng",
+    "subtitle": "Hoàn thành 10 Mission và nhận 🎁 quà Kakao",
+    "title": "🎖️ Mission Event",
+    "totalCol": "Tổng cộng"
+  },
   "header": {
     "admin": "Admin",
     "board": "Board",
@@ -1295,6 +1377,7 @@
   "nav": {
     "admin": "Quản trị viên",
     "cafe": "Cafe",
+    "event": "Event",
     "home": "Home",
     "my": "Thông tin của tôi",
     "shop": "Shop"
@@ -1493,11 +1576,35 @@
       "qty": "Số lượng bán",
       "saveDraft": "Lưu nháp",
       "saveEdit": "Lưu chỉnh sửa",
+      "shop": "Cửa hàng trực thuộc",
+      "shopNone": "Không có cửa hàng",
       "thumbUrl": "URL hình ảnh đại diện",
       "unlimited": "Không giới hạn",
       "unlimitedHint": "Đăng ký không giới hạn cho các sản phẩm không cần theo dõi tồn kho như đồ uống, pizza."
     },
     "formInvalid": "Vui lòng kiểm tra tên sản phẩm và giá",
+    "history": {
+      "clearFilter": "Xóa Filter",
+      "empty": "Không có lịch sử giao dịch",
+      "from": "Ngày bắt đầu",
+      "tab": {
+        "ALL": "Tất cả",
+        "BUY": "Mua",
+        "ETC": "Khác",
+        "SELL": "Bán"
+      },
+      "title": "Lịch sử giao dịch",
+      "to": "Ngày kết thúc",
+      "type": {
+        "BOND_DEPOSIT": "Đặt cọc tiền bảo lãnh",
+        "CANCEL_FEE_IN": "Nhận phí hủy",
+        "CANCEL_REFUND": "Hoàn tiền hủy",
+        "ESCROW_IN": "Tiền gửi mua hàng",
+        "REFUND_IN": "Tiền gửi hoàn lại",
+        "RELEASE_OUT": "Thanh toán bán hàng",
+        "SETTLE_OUT": "Rút tiền thanh toán"
+      }
+    },
     "itemNotFound": "Không tìm thấy sản phẩm",
     "itemSt": {
       "CLOSED": "Ngừng đăng",
@@ -1516,6 +1623,7 @@
     "loginRequired": "Bạn có thể sử dụng sau khi đăng nhập",
     "myItemsTitle": "Quản lý sản phẩm của tôi",
     "myOwnItem": "Đây là sản phẩm của tôi",
+    "navHistory": "Lịch sử giao dịch",
     "navMyItems": "Sản phẩm của tôi",
     "navOrders": "Đơn hàng của tôi",
     "navSales": "Quản lý bán hàng",
@@ -1543,12 +1651,48 @@
     "piBrowserOnly": "Chỉ có thể thanh toán trong Pi Browser",
     "publishSuccess": "Sản phẩm đã được đăng",
     "qtyInvalid": "Vui lòng nhập số lượng từ 1 đến 9998",
+    "refund": {
+      "done": "{amount}π đã được hoàn tiền",
+      "pending": "Hủy hoàn tất — việc hoàn tiền sẽ sớm được xử lý"
+    },
     "salesTitle": "Quản lý đơn hàng bán",
     "saveFail": "Xử lý thất bại",
     "saving": "Đang lưu…",
     "scrollMore": "Cuộn để xem thêm...",
     "search": "Tìm kiếm",
     "searchPlaceholder": "Tìm kiếm tên sản phẩm hoặc mô tả",
+    "shop": {
+      "add": "Đăng ký cửa hàng",
+      "addr": "Địa chỉ",
+      "addrHint": "Đây là địa chỉ của cửa hàng ngoại tuyến. Tọa độ (ghim bản đồ) sẽ được hỗ trợ trong tương lai.",
+      "addTitle": "Đăng ký cửa hàng mới",
+      "bizHour": "Giờ mở cửa",
+      "bizHourPlaceholder": "Ví dụ: Các ngày trong tuần 10:00–19:00",
+      "cancel": "Hủy",
+      "createSuccess": "Cửa hàng đã được đăng ký",
+      "delete": "Xóa",
+      "deleteConfirm": "Bạn có muốn xóa cửa hàng này không? Các sản phẩm trực thuộc sẽ được giữ lại và chỉ hủy liên kết cửa hàng",
+      "deleteSuccess": "Cửa hàng đã được xóa",
+      "desc": "Giới thiệu cửa hàng",
+      "edit": "Chỉnh sửa",
+      "editSuccess": "Thông tin cửa hàng đã được chỉnh sửa",
+      "editTitle": "Chỉnh sửa cửa hàng",
+      "email": "Email",
+      "empty": "Không có cửa hàng nào được đăng ký",
+      "intro": "Đăng ký cửa hàng Online/Offline để tăng sự tin cậy của người mua",
+      "manage": "Quản lý cửa hàng",
+      "name": "Tên cửa hàng",
+      "nameRequired": "Vui lòng nhập tên cửa hàng",
+      "save": "Lưu",
+      "sns": "Link SNS",
+      "tel": "Điện thoại",
+      "thumb": "URL ảnh đại diện",
+      "title": "Quản lý cửa hàng",
+      "type": "Loại cửa hàng",
+      "type_BOTH": "Online/Offline",
+      "type_OFFLINE": "Offline",
+      "type_ONLINE": "Online"
+    },
     "shopType": {
       "BOTH": "Online & Offline",
       "OFFLINE": "Cửa hàng Offline",

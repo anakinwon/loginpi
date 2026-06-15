@@ -141,6 +141,9 @@
       "board": "Gestione Board",
       "chatSection": "Gestione Cafe",
       "dashboard": "Dashboard",
+      "eventExclude": "Gestisci esclusione",
+      "eventGifts": "Invia regali",
+      "eventSection": "Eventi",
       "i18n": "Gestione multilingua",
       "i18nSection": "Multilingua",
       "links": "Stato collegamento account",
@@ -172,6 +175,7 @@
         "user": "Utente"
       },
       "noPayments": "Nessun storico pagamenti.",
+      "searchPiUsername": "Cerca nome utente Pi (corrispondenza prefisso)",
       "status": {
         "approved": "Approvato",
         "cancelled": "Annullato",
@@ -519,6 +523,7 @@
     "subtitle": "Utenti attivi · Statistiche di vendita (basate su aggregazione giornaliera)",
     "themeDaily": "Ricavi giornalieri per tema",
     "themeShare": "Quota di ricavi per tema",
+    "themeTreemap": "Proporzione delle vendite per tema (Treemap)",
     "top3Active": "Top 3 Utenti attivi (ultimi {period} giorni)",
     "top3Buyers": "Top 3 Acquirenti (ultimi {period} giorni)",
     "top3Themes": "Top 3 Ricavi per tema (ultimi {period} giorni)",
@@ -1171,6 +1176,83 @@
     "upgrade": "Upgrade",
     "yes": "Sì"
   },
+  "event": {
+    "agentCol": "Nome Agente",
+    "alreadyExcluded": "Già esclusi: {names}",
+    "completionTitle": "10 Missioni completate! Congratulazioni 🎉",
+    "excludedAgents": "Agenti esclusi:",
+    "excludedN": "{count} esclusi",
+    "excludeFailed": "Esclusione fallita",
+    "excludePlaceholder": "Inserisci nome Agente (separati da virgola)",
+    "giftAlt": "Regalo per il completamento della Missione",
+    "gradeAgent": "Agente",
+    "gradeMaster": "Master",
+    "gradeRecruit": "Recluta",
+    "gradeTrainee": "Agente in formazione",
+    "gradeVeteran": "Agente veterano",
+    "includeFailed": "Rimozione dell'esclusione fallita",
+    "includeTitle": "Includi di nuovo nella classifica",
+    "keepGoingTitle": "Ancora un piccolo sforzo! Non hai ancora completato",
+    "lastPerformedCol": "Ultima esecuzione",
+    "loadError": "Caricamento dati fallito",
+    "loginHint": "Accedi per visualizzare i tuoi progressi Missione e il tuo grado Agente",
+    "missionListTitle": "📋 Elenco Missioni",
+    "missions": {
+      "M1": {
+        "desc": "Accesso al browser Pi + Accesso Google (completa entrambi)",
+        "name": "Integrazione Account"
+      },
+      "M10": {
+        "desc": "(Dopo M9) Esegui di nuovo i passaggi 7 e 8 — Sperimenta la commissione di cancellazione con il deposito attivo",
+        "name": "Commissione di cancellazione della transazione con deposito attivo"
+      },
+      "M2": {
+        "desc": "Nell'Account integrato, inserisci soprannome + ID KakaoTalk (necessario per ricevere il regalo)",
+        "name": "Completamento Profilo"
+      },
+      "M3": {
+        "desc": "In PiCafe, crea un Cafe PREMIUM e usa la funzione di traduzione automatica",
+        "name": "Crea Cafe PREMIUM (PiRC1) + Traduzione automatica"
+      },
+      "M4": {
+        "desc": "Invia Bean nella chat a 1 o più persone",
+        "name": "Test di trasferimento Bean (PiRC1)"
+      },
+      "M5": {
+        "desc": "Dopo aver richiesto il servizio di abbonamento Pi, crea Pi Bet nel Cafe e distribuiscilo ai partecipanti",
+        "name": "Dopo aver richiesto il servizio di abbonamento Pi (PiRC2), crea e distribuisci Pi Bet"
+      },
+      "M6": {
+        "desc": "Usa gli Sticker / Invia File / Usa il canale vocale (uno o più di questi)",
+        "name": "Usa la funzione multi-chat"
+      },
+      "M7": {
+        "desc": "Cancellazione della transazione da parte del venditore durante una transazione dopo aver registrato il proprio prodotto su PiShop.",
+        "name": "Cancellazione della transazione del venditore (Servizio di deposito a garanzia; PiRC3)"
+      },
+      "M8": {
+        "desc": "Cancellazione della transazione da parte dell'acquirente dopo aver acquistato il prodotto di un altro utente su PiShop.",
+        "name": "Cancellazione della transazione dell'acquirente (Servizio di deposito a garanzia; PiRC3)"
+      },
+      "M9": {
+        "desc": "Deposita un minimo di 1Pi come deposito del venditore su PiShop e acconsenti ai servizi basati sulla posizione",
+        "name": "Deposito del venditore + Consenso alla posizione (Servizio di deposito a garanzia; PiRC3)"
+      }
+    },
+    "multiOrHint": "💡 Suggerimento: È sufficiente completare solo uno dei diversi metodi",
+    "networkError": "Errore di rete",
+    "noChange": "Nessuna modifica",
+    "noName": "(Nessun nome)",
+    "notFoundAgents": "Non trovati: {names}",
+    "processing": "Elaborazione in corso…",
+    "rankCol": "Posizione",
+    "rankingTitle": "🏆 Classifica Missioni",
+    "removeRank": "Rimuovi dalla classifica",
+    "rewardCol": "Ricompensa",
+    "subtitle": "Completa 10 Missioni e ricevi un regalo Kakao 🎁",
+    "title": "🎖️ Evento Missione",
+    "totalCol": "Totale"
+  },
   "header": {
     "admin": "Admin",
     "board": "Board",
@@ -1295,6 +1377,7 @@
   "nav": {
     "admin": "Amministratore",
     "cafe": "Cafe",
+    "event": "Event",
     "home": "Home",
     "my": "Mio",
     "shop": "Shop"
@@ -1493,11 +1576,35 @@
       "qty": "Quantità in vendita",
       "saveDraft": "Salva bozza",
       "saveEdit": "Salva modifiche",
+      "shop": "Negozio affiliato",
+      "shopNone": "Nessun negozio",
       "thumbUrl": "URL immagine principale",
       "unlimited": "Illimitato",
       "unlimitedHint": "Registra come illimitato per articoli in cui il tracciamento dell'inventario è irrilevante, come bevande o pizza."
     },
     "formInvalid": "Controlla il nome e il prezzo dell'articolo",
+    "history": {
+      "clearFilter": "Cancella filtro",
+      "empty": "Nessuna cronologia delle transazioni",
+      "from": "Data di inizio",
+      "tab": {
+        "ALL": "Tutto",
+        "BUY": "Acquisto",
+        "ETC": "Altro",
+        "SELL": "Vendita"
+      },
+      "title": "Cronologia delle transazioni",
+      "to": "Data di fine",
+      "type": {
+        "BOND_DEPOSIT": "Deposito cauzionale",
+        "CANCEL_FEE_IN": "Ricezione commissione di cancellazione",
+        "CANCEL_REFUND": "Rimborso per cancellazione",
+        "ESCROW_IN": "Deposito di acquisto",
+        "REFUND_IN": "Deposito di rimborso",
+        "RELEASE_OUT": "Liquidazione di vendita",
+        "SETTLE_OUT": "Prelievo di liquidazione"
+      }
+    },
     "itemNotFound": "Articolo non trovato",
     "itemSt": {
       "CLOSED": "Non pubblicato",
@@ -1516,6 +1623,7 @@
     "loginRequired": "Accesso richiesto",
     "myItemsTitle": "Gestisci i miei articoli",
     "myOwnItem": "Questo è un articolo che ho registrato",
+    "navHistory": "Cronologia delle transazioni",
     "navMyItems": "I miei articoli",
     "navOrders": "Cronologia ordini",
     "navSales": "Gestione vendite",
@@ -1543,12 +1651,48 @@
     "piBrowserOnly": "Il pagamento è disponibile solo in Pi Browser",
     "publishSuccess": "Articolo pubblicato con successo",
     "qtyInvalid": "Inserisci una quantità tra 1 e 9998",
+    "refund": {
+      "done": "{amount}π è stato rimborsato",
+      "pending": "Cancellazione completata — il rimborso sarà elaborato a breve"
+    },
     "salesTitle": "Gestisci ordini di vendita",
     "saveFail": "Elaborazione fallita",
     "saving": "Salvataggio in corso…",
     "scrollMore": "Scorri per vedere altro…",
     "search": "Cerca",
     "searchPlaceholder": "Cerca nome articolo o descrizione",
+    "shop": {
+      "add": "Registra negozio",
+      "addr": "Indirizzo",
+      "addrHint": "Questo è l'indirizzo del negozio fisico. Le coordinate (segnaposto sulla mappa) saranno supportate in futuro.",
+      "addTitle": "Registra nuovo negozio",
+      "bizHour": "Orari di apertura",
+      "bizHourPlaceholder": "Es: Giorni feriali 10:00–19:00",
+      "cancel": "Annulla",
+      "createSuccess": "Il negozio è stato registrato",
+      "delete": "Elimina",
+      "deleteConfirm": "Vuoi eliminare questo negozio? I prodotti associati rimarranno e solo il collegamento al negozio verrà rimosso",
+      "deleteSuccess": "Il negozio è stato eliminato",
+      "desc": "Descrizione del negozio",
+      "edit": "Modifica",
+      "editSuccess": "Le informazioni del negozio sono state modificate",
+      "editTitle": "Modifica negozio",
+      "email": "Email",
+      "empty": "Nessun negozio registrato",
+      "intro": "Registra negozi online e offline per aumentare la fiducia degli acquirenti",
+      "manage": "Gestisci negozi",
+      "name": "Nome del negozio",
+      "nameRequired": "Inserisci il nome del negozio",
+      "save": "Salva",
+      "sns": "Link SNS",
+      "tel": "Telefono",
+      "thumb": "URL immagine principale",
+      "title": "Gestione negozi",
+      "type": "Tipo di negozio",
+      "type_BOTH": "Online e offline",
+      "type_OFFLINE": "Offline",
+      "type_ONLINE": "Online"
+    },
     "shopType": {
       "BOTH": "Online e fisico",
       "OFFLINE": "Negozio fisico",

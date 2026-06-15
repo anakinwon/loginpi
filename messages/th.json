@@ -141,6 +141,9 @@
       "board": "การจัดการ Board",
       "chatSection": "จัดการคาเฟ่",
       "dashboard": "Dashboard",
+      "eventExclude": "จัดการการยกเว้น",
+      "eventGifts": "ส่งของขวัญ",
+      "eventSection": "Event",
       "i18n": "การจัดการหลายภาษา",
       "i18nSection": "หลายภาษา",
       "links": "สถานะการเชื่อมโยงบัญชี",
@@ -172,6 +175,7 @@
         "user": "ผู้ใช้"
       },
       "noPayments": "ไม่มีประวัติการชำระเงิน",
+      "searchPiUsername": "ค้นหาชื่อผู้ใช้ Pi (ตรงกันบางส่วน)",
       "status": {
         "approved": "อนุมัติ",
         "cancelled": "ยกเลิก",
@@ -519,6 +523,7 @@
     "subtitle": "ผู้ใช้งานที่ใช้งานอยู่ · สถิติรายได้ (อิงตามการรวบรวมรายวัน)",
     "themeDaily": "รายได้รายวันราย Theme",
     "themeShare": "สัดส่วนรายได้ราย Theme",
+    "themeTreemap": "สัดส่วนยอดขายตาม Theme (Treemap)",
     "top3Active": "Top 3 ผู้ใช้งานที่ใช้งานอยู่ (ล่าสุด {period} วัน)",
     "top3Buyers": "Top 3 ผู้ซื้อสูงสุด (ล่าสุด {period} วัน)",
     "top3Themes": "Top 3 รายได้จาก Theme (ล่าสุด {period} วัน)",
@@ -1171,6 +1176,83 @@
     "upgrade": "Upgrade",
     "yes": "ใช่"
   },
+  "event": {
+    "agentCol": "ชื่อ Agent",
+    "alreadyExcluded": "ถูกยกเว้นแล้ว: {names}",
+    "completionTitle": "ทำ Mission ครบ 10 อย่างแล้ว! ยินดีด้วย 🎉",
+    "excludedAgents": "Agent ที่ถูกยกเว้น:",
+    "excludedN": "ยกเว้น {count} คน",
+    "excludeFailed": "ดำเนินการยกเว้นล้มเหลว",
+    "excludePlaceholder": "ป้อนชื่อ Agent (คั่นด้วย Comma)",
+    "giftAlt": "ของขวัญเมื่อทำ Mission สำเร็จ",
+    "gradeAgent": "Regular Agent",
+    "gradeMaster": "Master",
+    "gradeRecruit": "Agent",
+    "gradeTrainee": "Trainee Agent",
+    "gradeVeteran": "Veteran Agent",
+    "includeFailed": "ยกเลิกการยกเว้นล้มเหลว",
+    "includeTitle": "รวมใน Ranking อีกครั้ง",
+    "keepGoingTitle": "พยายามอีกนิด! ยังไม่สำเร็จ",
+    "lastPerformedCol": "ดำเนินการล่าสุด",
+    "loadError": "โหลด Data ล้มเหลว",
+    "loginHint": "หาก Login ความคืบหน้าของ Mission และระดับ Agent ของคุณจะแสดงขึ้น",
+    "missionListTitle": "📋 รายการ Mission",
+    "missions": {
+      "M1": {
+        "desc": "Login Pi Browser + Login Google (ทำทั้งสองอย่าง)",
+        "name": "การรวมบัญชี"
+      },
+      "M10": {
+        "desc": "(หลังจาก M9) ดำเนินการข้อ 7 และ 8 อีกครั้ง — สัมผัสประสบการณ์ค่าธรรมเนียมการยกเลิกในสถานะที่เงินประกันใช้งานอยู่",
+        "name": "ค่าธรรมเนียมการยกเลิกธุรกรรมเมื่อเงินประกันใช้งานอยู่"
+      },
+      "M2": {
+        "desc": "ป้อนชื่อเล่น + KakaoTalk ID ในบัญชีรวม (จำเป็นสำหรับการรับของขวัญ)",
+        "name": "กรอก Profile ให้สมบูรณ์"
+      },
+      "M3": {
+        "desc": "สร้าง PREMIUM Cafe ใน PiCafe + ใช้ฟังก์ชันการแปลอัตโนมัติ",
+        "name": "สร้าง PREMIUM Cafe (PiRC1) + การแปลอัตโนมัติ"
+      },
+      "M4": {
+        "desc": "ส่ง Bean ให้กับ 1 คนขึ้นไปใน Chat",
+        "name": "Test การโอน Bean (PiRC1)"
+      },
+      "M5": {
+        "desc": "หลังจากสมัคร Pi Subscription Service ให้สร้าง Pi Bet ใน Cafe + แจกจ่ายให้กับผู้เข้าร่วม",
+        "name": "หลังจากสมัคร Pi Subscription Service (PiRC2) ให้สร้างและแจกจ่าย Pi Bet"
+      },
+      "M6": {
+        "desc": "ใช้ Sticker / ส่ง File / ใช้ Voice Channel (อย่างน้อย 1 อย่าง)",
+        "name": "ใช้ฟังก์ชัน Chat Multi"
+      },
+      "M7": {
+        "desc": "ผู้ขายยกเลิกธุรกรรมระหว่างการทำธุรกรรมหลังจากลงทะเบียนสินค้าของฉันใน PiShop",
+        "name": "การยกเลิกธุรกรรมโดยผู้ขาย (Escrow Service;PiRC3)"
+      },
+      "M8": {
+        "desc": "ผู้ซื้อยกเลิกธุรกรรมหลังจากซื้อสินค้าของผู้อื่นใน PiShop",
+        "name": "การยกเลิกธุรกรรมโดยผู้ซื้อ (Escrow Service;PiRC3)"
+      },
+      "M9": {
+        "desc": "ฝากเงินประกันผู้ขายใน PiShop อย่างน้อย 1Pi + ยินยอมบริการตามตำแหน่ง",
+        "name": "เงินประกันผู้ขาย + การยินยอมตำแหน่ง (Escrow Service;PiRC3)"
+      }
+    },
+    "multiOrHint": "💡 Hint: คุณต้องทำเพียงวิธีเดียวจากหลายวิธี",
+    "networkError": "Network Error",
+    "noChange": "ไม่มีการเปลี่ยนแปลง",
+    "noName": "(ไม่มีชื่อ)",
+    "notFoundAgents": "ไม่พบ: {names}",
+    "processing": "กำลังดำเนินการ…",
+    "rankCol": "อันดับ",
+    "rankingTitle": "🏆 Mission Ranking",
+    "removeRank": "ลบอันดับ",
+    "rewardCol": "รางวัล",
+    "subtitle": "ทำ Mission ให้ครบ 10 อย่าง และรับ 🎁 ของขวัญ Kakao",
+    "title": "🎖️ Mission Event",
+    "totalCol": "รวม"
+  },
   "header": {
     "admin": "Admin",
     "board": "Board",
@@ -1295,6 +1377,7 @@
   "nav": {
     "admin": "ผู้ดูแลระบบ",
     "cafe": "Cafe",
+    "event": "Event",
     "home": "Home",
     "my": "ข้อมูลของฉัน",
     "shop": "Shop"
@@ -1493,11 +1576,35 @@
       "qty": "จำนวนที่ขาย",
       "saveDraft": "บันทึกฉบับร่าง",
       "saveEdit": "บันทึกการแก้ไข",
+      "shop": "ร้านค้าที่สังกัด",
+      "shopNone": "ไม่มีร้านค้า",
       "thumbUrl": "URL รูปภาพหลัก",
       "unlimited": "ไม่จำกัด",
       "unlimitedHint": "สำหรับสินค้าที่ไม่จำเป็นต้องติดตามสต็อก เช่น เครื่องดื่มหรือพิซซ่า ให้ลงทะเบียนเป็นไม่จำกัด"
     },
     "formInvalid": "โปรดตรวจสอบชื่อสินค้าและราคา",
+    "history": {
+      "clearFilter": "ล้าง Filter",
+      "empty": "ไม่มีประวัติการทำธุรกรรม",
+      "from": "วันที่เริ่มต้น",
+      "tab": {
+        "ALL": "ทั้งหมด",
+        "BUY": "ซื้อ",
+        "ETC": "อื่น ๆ",
+        "SELL": "ขาย"
+      },
+      "title": "ประวัติการทำธุรกรรม",
+      "to": "วันที่สิ้นสุด",
+      "type": {
+        "BOND_DEPOSIT": "การฝากเงินประกัน",
+        "CANCEL_FEE_IN": "รับค่าธรรมเนียมการยกเลิก",
+        "CANCEL_REFUND": "การคืนเงินจากการยกเลิก",
+        "ESCROW_IN": "เงินฝากซื้อ",
+        "REFUND_IN": "เงินฝากคืน",
+        "RELEASE_OUT": "การชำระเงินจากการขาย",
+        "SETTLE_OUT": "การถอนเงินชำระ"
+      }
+    },
     "itemNotFound": "ไม่พบสินค้า",
     "itemSt": {
       "CLOSED": "หยุดเผยแพร่",
@@ -1516,6 +1623,7 @@
     "loginRequired": "สามารถใช้งานได้หลังจากเข้าสู่ระบบ",
     "myItemsTitle": "จัดการสินค้าของฉัน",
     "myOwnItem": "นี่คือสินค้าที่ฉันลงทะเบียน",
+    "navHistory": "ประวัติการทำธุรกรรม",
     "navMyItems": "สินค้าของฉัน",
     "navOrders": "ประวัติการซื้อ",
     "navSales": "การจัดการการขาย",
@@ -1543,12 +1651,48 @@
     "piBrowserOnly": "สามารถชำระเงินได้เฉพาะใน Pi Browser เท่านั้น",
     "publishSuccess": "สินค้าถูกเผยแพร่แล้ว",
     "qtyInvalid": "โปรดป้อนจำนวนระหว่าง 1 ถึง 9998",
+    "refund": {
+      "done": "{amount}π ได้รับการคืนเงินแล้ว",
+      "pending": "ยกเลิกเสร็จสมบูรณ์ — การคืนเงินจะดำเนินการในไม่ช้า"
+    },
     "salesTitle": "จัดการคำสั่งซื้อที่ขาย",
     "saveFail": "ดำเนินการไม่สำเร็จ",
     "saving": "กำลังบันทึก…",
     "scrollMore": "Scroll เพื่อดูเพิ่มเติม…",
     "search": "ค้นหา",
     "searchPlaceholder": "ค้นหาชื่อสินค้าหรือคำอธิบาย",
+    "shop": {
+      "add": "ลงทะเบียนร้านค้า",
+      "addr": "ที่อยู่",
+      "addrHint": "ที่อยู่ของร้านค้าออฟไลน์ พิกัด (หมุดแผนที่) จะรองรับในอนาคต",
+      "addTitle": "ลงทะเบียนร้านค้าใหม่",
+      "bizHour": "เวลาทำการ",
+      "bizHourPlaceholder": "ตัวอย่าง: วันธรรมดา 10:00–19:00 น.",
+      "cancel": "ยกเลิก",
+      "createSuccess": "ลงทะเบียนร้านค้าแล้ว",
+      "delete": "ลบ",
+      "deleteConfirm": "คุณต้องการลบร้านค้านี้หรือไม่? สินค้าที่สังกัดจะยังคงอยู่และจะยกเลิกการเชื่อมต่อร้านค้าเท่านั้น",
+      "deleteSuccess": "ลบร้านค้าแล้ว",
+      "desc": "แนะนำร้านค้า",
+      "edit": "แก้ไข",
+      "editSuccess": "แก้ไขข้อมูลร้านค้าแล้ว",
+      "editTitle": "แก้ไขร้านค้า",
+      "email": "Email",
+      "empty": "ไม่มีร้านค้าที่ลงทะเบียน",
+      "intro": "ลงทะเบียนร้านค้า Online และ Offline เพื่อเพิ่มความน่าเชื่อถือของผู้ซื้อ",
+      "manage": "จัดการร้านค้า",
+      "name": "ชื่อร้านค้า",
+      "nameRequired": "กรุณากรอกชื่อร้านค้า",
+      "save": "บันทึก",
+      "sns": "SNS Link",
+      "tel": "โทรศัพท์",
+      "thumb": "Main Image URL",
+      "title": "การจัดการร้านค้า",
+      "type": "ประเภทร้านค้า",
+      "type_BOTH": "Online และ Offline",
+      "type_OFFLINE": "Offline",
+      "type_ONLINE": "Online"
+    },
     "shopType": {
       "BOTH": "Online และ Offline",
       "OFFLINE": "ร้านค้า Offline",

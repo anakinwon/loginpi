@@ -141,6 +141,9 @@
       "board": "Pengurusan Board",
       "chatSection": "Pengurusan Kafe",
       "dashboard": "Dashboard",
+      "eventExclude": "Urus Pengecualian",
+      "eventGifts": "Hantar Hadiah",
+      "eventSection": "Event",
       "i18n": "Pengurusan Pelbagai Bahasa",
       "i18nSection": "Pelbagai Bahasa",
       "links": "Status Pautan Akaun",
@@ -172,6 +175,7 @@
         "user": "Pengguna"
       },
       "noPayments": "Tiada sejarah pembayaran.",
+      "searchPiUsername": "Cari Nama Pengguna Pi (Padanan Awal)",
       "status": {
         "approved": "Diluluskan",
         "cancelled": "Batal",
@@ -519,6 +523,7 @@
     "subtitle": "Pengguna Aktif · Statistik Jualan (Berdasarkan agregat harian)",
     "themeDaily": "Jualan Harian mengikut Tema",
     "themeShare": "Perkongsian Jualan mengikut Tema",
+    "themeTreemap": "Perkongsian Jualan mengikut Theme (Treemap)",
     "top3Active": "Top 3 Pengguna Aktif (terkini {period} hari)",
     "top3Buyers": "Top 3 Pembeli (terkini {period} hari)",
     "top3Themes": "Top 3 Jualan Tema (terkini {period} hari)",
@@ -1171,6 +1176,83 @@
     "upgrade": "Upgrade",
     "yes": "Ya"
   },
+  "event": {
+    "agentCol": "Nama Ejen",
+    "alreadyExcluded": "Sudah dikecualikan: {names}",
+    "completionTitle": "10 Mission selesai! Tahniah 🎉",
+    "excludedAgents": "Ejen yang dikecualikan:",
+    "excludedN": "Dikecualikan {count} orang",
+    "excludeFailed": "Gagal memproses pengecualian",
+    "excludePlaceholder": "Masukkan nama ejen (dipisahkan oleh Comma)",
+    "giftAlt": "Hadiah Selesai Mission",
+    "gradeAgent": "Ejen Penuh",
+    "gradeMaster": "Master",
+    "gradeRecruit": "Ejen",
+    "gradeTrainee": "Ejen Pelatih",
+    "gradeVeteran": "Ejen Senior",
+    "includeFailed": "Gagal membatalkan pengecualian",
+    "includeTitle": "Sertakan semula dalam Ranking",
+    "keepGoingTitle": "Teruskan sedikit lagi! Belum selesai",
+    "lastPerformedCol": "Terakhir Dilakukan",
+    "loadError": "Gagal Load Data",
+    "loginHint": "Apabila Login, kemajuan Mission saya dan gred ejen akan dipaparkan",
+    "missionListTitle": "📋 Senarai Mission",
+    "missions": {
+      "M1": {
+        "desc": "Login Pi Browser + Login Google (kedua-duanya selesai)",
+        "name": "Integrasi Akaun"
+      },
+      "M10": {
+        "desc": "(Selepas M9) lakukan semula 7 dan 8 — alami yuran pembatalan semasa deposit aktif",
+        "name": "Yuran Pembatalan Transaksi Deposit Aktif"
+      },
+      "M2": {
+        "desc": "Masukkan nama panggilan + ID KakaoTalk ke akaun bersepadu (diperlukan semasa menerima hadiah)",
+        "name": "Lengkapkan Profile"
+      },
+      "M3": {
+        "desc": "Cipta PREMIUM Cafe dalam PiCafe + Gunakan fungsi terjemahan automatik",
+        "name": "Cipta PREMIUM Cafe (PiRC1) + Terjemahan Automatik"
+      },
+      "M4": {
+        "desc": "Pindahkan Bean kepada 1 orang atau lebih dalam Chat",
+        "name": "Test Pemindahan Bean (PiRC1)"
+      },
+      "M5": {
+        "desc": "Selepas memohon Pi Subscription Service, cipta Pi Bet dalam Cafe + agihkan kepada peserta",
+        "name": "Selepas memohon Pi Subscription Service (PiRC2), cipta dan agihkan Pi Bet"
+      },
+      "M6": {
+        "desc": "1 atau lebih daripada: Guna Sticker / Pindahkan File / Guna saluran suara",
+        "name": "Gunakan fungsi Multi Chat"
+      },
+      "M7": {
+        "desc": "Selepas mendaftar produk saya di PiShop, penjual membatalkan transaksi semasa transaksi",
+        "name": "Pembatalan Transaksi Penjual (Escrow Service;PiRC3)"
+      },
+      "M8": {
+        "desc": "Selepas membeli produk orang lain di PiShop, pembeli membatalkan transaksi",
+        "name": "Pembatalan Transaksi Pembeli (Escrow Service;PiRC3)"
+      },
+      "M9": {
+        "desc": "Deposit sekurang-kurangnya 1Pi sebagai deposit penjual PiShop + bersetuju dengan perkhidmatan berasaskan lokasi",
+        "name": "Deposit Penjual + Persetujuan Lokasi (Escrow Service;PiRC3)"
+      }
+    },
+    "multiOrHint": "💡 Hint: Hanya perlu selesaikan 1 daripada beberapa kaedah",
+    "networkError": "Network Error",
+    "noChange": "Tiada perubahan",
+    "noName": "(Tiada nama)",
+    "notFoundAgents": "Tidak ditemui: {names}",
+    "processing": "Sedang diproses…",
+    "rankCol": "Kedudukan",
+    "rankingTitle": "🏆 Mission Ranking",
+    "removeRank": "Buang Kedudukan",
+    "rewardCol": "Ganjaran",
+    "subtitle": "Selesaikan 10 Mission, dan terima 🎁 hadiah Kakao",
+    "title": "🎖️ Mission Event",
+    "totalCol": "Jumlah"
+  },
   "header": {
     "admin": "Admin",
     "board": "Board",
@@ -1295,6 +1377,7 @@
   "nav": {
     "admin": "Admin",
     "cafe": "Cafe",
+    "event": "Event",
     "home": "Home",
     "my": "Saya",
     "shop": "Shop"
@@ -1493,11 +1576,35 @@
       "qty": "Kuantiti Jualan",
       "saveDraft": "Simpan Draf",
       "saveEdit": "Simpan Perubahan",
+      "shop": "Kedai",
+      "shopNone": "Tiada Kedai",
       "thumbUrl": "URL Imej Utama",
       "unlimited": "Tanpa Had",
       "unlimitedHint": "Daftarkan item seperti minuman atau pizza, di mana penjejakan inventori tidak bermakna, sebagai tanpa had"
     },
     "formInvalid": "Sila semak nama item dan harga",
+    "history": {
+      "clearFilter": "Kosongkan Filter",
+      "empty": "Tiada Sejarah Transaksi",
+      "from": "Tarikh Mula",
+      "tab": {
+        "ALL": "Semua",
+        "BUY": "Beli",
+        "ETC": "Lain-lain",
+        "SELL": "Jual"
+      },
+      "title": "Sejarah Transaksi",
+      "to": "Tarikh Tamat",
+      "type": {
+        "BOND_DEPOSIT": "Deposit Jaminan",
+        "CANCEL_FEE_IN": "Penerimaan Yuran Pembatalan",
+        "CANCEL_REFUND": "Pembatalan Bayaran Balik",
+        "ESCROW_IN": "Deposit Pembelian",
+        "REFUND_IN": "Deposit Bayaran Balik",
+        "RELEASE_OUT": "Penyelesaian Jualan",
+        "SETTLE_OUT": "Pengeluaran Penyelesaian"
+      }
+    },
     "itemNotFound": "Barangan tidak ditemui",
     "itemSt": {
       "CLOSED": "Siaran dihentikan",
@@ -1516,6 +1623,7 @@
     "loginRequired": "Boleh digunakan selepas log masuk",
     "myItemsTitle": "Urus Item Saya",
     "myOwnItem": "Ini adalah barangan yang saya daftarkan",
+    "navHistory": "Sejarah Transaksi",
     "navMyItems": "Barangan saya",
     "navOrders": "Sejarah Pesanan",
     "navSales": "Pengurusan Jualan",
@@ -1543,12 +1651,48 @@
     "piBrowserOnly": "Pembayaran hanya boleh dibuat di Pi Browser",
     "publishSuccess": "Item telah diterbitkan",
     "qtyInvalid": "Sila masukkan kuantiti antara 1 hingga 9998",
+    "refund": {
+      "done": "{amount}π telah dibayar balik",
+      "pending": "Pembatalan Selesai — bayaran balik akan diproses tidak lama lagi"
+    },
     "salesTitle": "Urus Pesanan Jualan",
     "saveFail": "Pemprosesan gagal",
     "saving": "Sedang menyimpan…",
     "scrollMore": "Skrol untuk melihat lebih banyak…",
     "search": "Cari",
     "searchPlaceholder": "Cari nama atau penerangan barangan",
+    "shop": {
+      "add": "Daftar Kedai",
+      "addr": "Alamat",
+      "addrHint": "Ini adalah alamat kedai fizikal. Koordinat (pin peta) akan disokong pada masa hadapan.",
+      "addTitle": "Daftar Kedai Baharu",
+      "bizHour": "Waktu Perniagaan",
+      "bizHourPlaceholder": "Contoh: Hari bekerja 10:00–19:00",
+      "cancel": "Batal",
+      "createSuccess": "Kedai telah didaftarkan",
+      "delete": "Padam",
+      "deleteConfirm": "Padam kedai ini? Produk yang berkaitan akan kekal dan hanya sambungan kedai akan diputuskan",
+      "deleteSuccess": "Kedai telah dipadam",
+      "desc": "Penerangan Kedai",
+      "edit": "Edit",
+      "editSuccess": "Maklumat kedai telah dikemas kini",
+      "editTitle": "Edit Kedai",
+      "email": "Email",
+      "empty": "Tiada kedai yang didaftarkan",
+      "intro": "Daftarkan kedai dalam talian dan luar talian anda untuk meningkatkan kepercayaan pembeli",
+      "manage": "Urus Kedai",
+      "name": "Nama Kedai",
+      "nameRequired": "Sila masukkan nama kedai",
+      "save": "Simpan",
+      "sns": "Pautan SNS",
+      "tel": "Telefon",
+      "thumb": "URL Imej Utama",
+      "title": "Pengurusan Kedai",
+      "type": "Jenis Kedai",
+      "type_BOTH": "Online dan Offline",
+      "type_OFFLINE": "Offline",
+      "type_ONLINE": "Online"
+    },
     "shopType": {
       "BOTH": "Dalam talian & Luar talian",
       "OFFLINE": "Kedai fizikal",

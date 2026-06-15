@@ -141,6 +141,9 @@
       "board": "Board Bestuur",
       "chatSection": "Kafee Bestuur",
       "dashboard": "Dashboard",
+      "eventExclude": "Bestuur uitsluitings",
+      "eventGifts": "Stuur geskenke",
+      "eventSection": "Event",
       "i18n": "Meertalige Bestuur",
       "i18nSection": "Meertalig",
       "links": "Rekeningkoppelingsstatus",
@@ -172,6 +175,7 @@
         "user": "Gebruiker"
       },
       "noPayments": "Geen betalingsgeskiedenis nie.",
+      "searchPiUsername": "Soek Pi gebruikersnaam (voorvoegsel pas)",
       "status": {
         "approved": "Goedgekeur",
         "cancelled": "Gekanselleer",
@@ -519,6 +523,7 @@
     "subtitle": "Aktiewe gebruikers · Verkoopstatistieke (gebaseer op daaglikse opsomming)",
     "themeDaily": "Daaglikse inkomste per Tema",
     "themeShare": "Tema-inkomsteaandeel",
+    "themeTreemap": "Verkopeaandeel per Tema (Treemap)",
     "top3Active": "Top 3 aktiewe gebruikers (afgelope {period} dae)",
     "top3Buyers": "Top 3 kopers (afgelope {period} dae)",
     "top3Themes": "Top 3 Tema-inkomste (afgelope {period} dae)",
@@ -1171,6 +1176,83 @@
     "upgrade": "Upgrade",
     "yes": "Ja"
   },
+  "event": {
+    "agentCol": "Agentnaam",
+    "alreadyExcluded": "Reeds uitgesluit: {names}",
+    "completionTitle": "10 Missies voltooi! Baie geluk 🎉",
+    "excludedAgents": "Uitgeslote agente:",
+    "excludedN": "{count} uitgesluit",
+    "excludeFailed": "Uitsluiting het misluk",
+    "excludePlaceholder": "Voer agentnaam in (geskei deur kommas)",
+    "giftAlt": "Missie voltooiingsgeskenk",
+    "gradeAgent": "Gereelde Agent",
+    "gradeMaster": "Master",
+    "gradeRecruit": "Agent",
+    "gradeTrainee": "Trainee Agent",
+    "gradeVeteran": "Senior Agent",
+    "includeFailed": "Uitsluiting ongedaan maak het misluk",
+    "includeTitle": "Sluit weer in by Ranking",
+    "keepGoingTitle": "Hou net aan! Nog nie voltooi nie",
+    "lastPerformedCol": "Laas uitgevoer",
+    "loadError": "Data laai fout",
+    "loginHint": "Meld aan om jou missie vordering en agent graad te sien",
+    "missionListTitle": "📋 Missie Lys",
+    "missions": {
+      "M1": {
+        "desc": "Pi Browser aanmelding + Google aanmelding (voltooi albei)",
+        "name": "Rekening Integrasie"
+      },
+      "M10": {
+        "desc": "(Na M9) Voer 7 en 8 weer uit — Ervaar kansellasiefooi in aktiewe deposito-staat",
+        "name": "Deposito Aktiewe Transaksie Kansellasie Fooi"
+      },
+      "M2": {
+        "desc": "Voer bynaam + KakaoTalk ID in vir geïntegreerde rekening (benodig vir geskenkontvangs)",
+        "name": "Voltooi Profile"
+      },
+      "M3": {
+        "desc": "Skep PREMIUM Cafe in PiCafe + Gebruik outomatiese vertaal funksie",
+        "name": "Skep PREMIUM Cafe (PiRC1) + Outomatiese vertaling"
+      },
+      "M4": {
+        "desc": "Stuur Bean aan 1 of meer persone in Chat",
+        "name": "Bean Oordrag Toets (PiRC1)"
+      },
+      "M5": {
+        "desc": "Na aansoek vir Pi Subscription Service, skep Pi Bet in Cafe + versprei aan deelnemers",
+        "name": "Na aansoek vir Pi Subscription Service (PiRC2), skep en versprei Pi Bet"
+      },
+      "M6": {
+        "desc": "Gebruik Sticker / Lêer oordrag / Stemkanaal (een of meer)",
+        "name": "Gebruik Chat Multi Funksie"
+      },
+      "M7": {
+        "desc": "Verkoper Transaksie Kansellasie tydens 'n transaksie nadat my produk op PiShop geregistreer is",
+        "name": "Verkoper Transaksie Kansellasie (Escrow Service;PiRC3)"
+      },
+      "M8": {
+        "desc": "Koper Transaksie Kansellasie nadat 'n ander se produk op PiShop gekoop is",
+        "name": "Koper Transaksie Kansellasie (Escrow Service;PiRC3)"
+      },
+      "M9": {
+        "desc": "Deponeer 1Pi of meer as PiShop Verkoper Deposito + Stem in tot ligginggebaseerde diens",
+        "name": "Verkoper Deposito + Liggingstoestemming (Escrow Service;PiRC3)"
+      }
+    },
+    "multiOrHint": "💡 Wenk: Voltooi slegs een van die verskeie metodes",
+    "networkError": "Netwerk fout",
+    "noChange": "Geen veranderinge",
+    "noName": "(Geen naam)",
+    "notFoundAgents": "Nie gevind nie: {names}",
+    "processing": "Besig om te verwerk…",
+    "rankCol": "Rang",
+    "rankingTitle": "🏆 Missie Ranking",
+    "removeRank": "Verwyder Rang",
+    "rewardCol": "Beloning",
+    "subtitle": "Voltooi 10 missies en ontvang 🎁 Kakao geskenke",
+    "title": "🎖️ Missie Event",
+    "totalCol": "Totaal"
+  },
   "header": {
     "admin": "Admin",
     "board": "Board",
@@ -1295,6 +1377,7 @@
   "nav": {
     "admin": "Admin",
     "cafe": "Cafe",
+    "event": "Event",
     "home": "Home",
     "my": "My Inligting",
     "shop": "Shop"
@@ -1493,11 +1576,35 @@
       "qty": "Verkoophoeveelheid",
       "saveDraft": "Stoor konsep",
       "saveEdit": "Stoor wysigings",
+      "shop": "Geaffilieerde Winkel",
+      "shopNone": "Geen winkel",
       "thumbUrl": "Hoofbeeld URL",
       "unlimited": "Onbeperk",
       "unlimitedHint": "Registreer items soos drankies of pizzas, waar voorraadopsporing sinloos is, as onbeperk."
     },
     "formInvalid": "Kontroleer asseblief die itemnaam en prys",
+    "history": {
+      "clearFilter": "Maak Filter skoon",
+      "empty": "Geen transaksiegeskiedenis nie",
+      "from": "Begindatum",
+      "tab": {
+        "ALL": "Alles",
+        "BUY": "Koop",
+        "ETC": "Ander",
+        "SELL": "Verkoop"
+      },
+      "title": "Transaksiegeskiedenis",
+      "to": "Einddatum",
+      "type": {
+        "BOND_DEPOSIT": "Deposito Borgtog",
+        "CANCEL_FEE_IN": "Ontvang Kansellasiefooi",
+        "CANCEL_REFUND": "Kansellasie Terugbetaling",
+        "ESCROW_IN": "Koop Deposito",
+        "REFUND_IN": "Terugbetaling Deposito",
+        "RELEASE_OUT": "Verkoop Vereffening",
+        "SETTLE_OUT": "Vereffening Onttrekking"
+      }
+    },
     "itemNotFound": "Item nie gevind nie",
     "itemSt": {
       "CLOSED": "Gesluit",
@@ -1516,6 +1623,7 @@
     "loginRequired": "Beskikbaar na aanmelding",
     "myItemsTitle": "Bestuur my items",
     "myOwnItem": "Dit is my eie geregistreerde Item",
+    "navHistory": "Transaksiegeskiedenis",
     "navMyItems": "My Items",
     "navOrders": "Koopgeskiedenis",
     "navSales": "Verkoopbestuur",
@@ -1543,12 +1651,48 @@
     "piBrowserOnly": "Betaling is slegs moontlik in Pi Browser",
     "publishSuccess": "Item is gepubliseer",
     "qtyInvalid": "Voer asseblief 'n hoeveelheid tussen 1 en 9998 in",
+    "refund": {
+      "done": "{amount}π is terugbetaal",
+      "pending": "Kansellasie voltooi — Terugbetaling sal binnekort verwerk word"
+    },
     "salesTitle": "Bestuur verkoopbestellings",
     "saveFail": "Verwerking het misluk",
     "saving": "Besig om te stoor…",
     "scrollMore": "Rollees vir meer…",
     "search": "Soek",
     "searchPlaceholder": "Soek Itemnaam of beskrywing",
+    "shop": {
+      "add": "Registreer Winkel",
+      "addr": "adres",
+      "addrHint": "Dit is die vanlyn winkeladres. Koördinate (kaartpen) sal in die toekoms ondersteun word.",
+      "addTitle": "Registreer Nuwe Winkel",
+      "bizHour": "Openingstye",
+      "bizHourPlaceholder": "Bv.: Weeksdae 10:00–19:00",
+      "cancel": "Kanselleer",
+      "createSuccess": "Winkel is geregistreer",
+      "delete": "Vee uit",
+      "deleteConfirm": "Wil jy hierdie winkel uitvee? Geaffilieerde produkte sal behou word en slegs die winkelverbinding sal ontkoppel word",
+      "deleteSuccess": "Winkel is uitgevee",
+      "desc": "Winkel Inleiding",
+      "edit": "Wysig",
+      "editSuccess": "Winkelinligting is gewysig",
+      "editTitle": "Winkel Wysig",
+      "email": "Email",
+      "empty": "Geen geregistreerde winkels nie",
+      "intro": "Registreer aanlyn/aflyn winkels om kopervertroue te verhoog",
+      "manage": "Winkelbestuur",
+      "name": "Winkelnaam",
+      "nameRequired": "Voer asseblief winkelnaam in",
+      "save": "Stoor",
+      "sns": "SNS Link",
+      "tel": "Telefoon",
+      "thumb": "Representative Image URL",
+      "title": "Winkelbestuur",
+      "type": "Winkel Tipe",
+      "type_BOTH": "Online/Offline",
+      "type_OFFLINE": "Offline",
+      "type_ONLINE": "Online"
+    },
     "shopType": {
       "BOTH": "Online en Offline",
       "OFFLINE": "Offline winkel",

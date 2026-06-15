@@ -141,6 +141,9 @@
       "board": "Board Management",
       "chatSection": "Cafe Management",
       "dashboard": "Dashboard",
+      "eventExclude": "Manage Exclusion",
+      "eventGifts": "Magpadala ng Regalo",
+      "eventSection": "Event",
       "i18n": "Multilingual Management",
       "i18nSection": "Multilingual",
       "links": "Status ng Pag-link ng Account",
@@ -172,6 +175,7 @@
         "user": "User"
       },
       "noPayments": "Walang Kasaysayan ng Bayad",
+      "searchPiUsername": "Search Pi Username (Partial Match)",
       "status": {
         "approved": "Aprubado",
         "cancelled": "Kinansela",
@@ -519,6 +523,7 @@
     "subtitle": "Mga Aktibong User · Statistics ng Kita (Batay sa Araw-araw na Aggregation)",
     "themeDaily": "Araw-araw na Kita ayon sa Theme",
     "themeShare": "Bahagi ng Kita ayon sa Theme",
+    "themeTreemap": "Sales Proportion by Theme (Treemap)",
     "top3Active": "Top 3 Aktibong User (huling {period} araw)",
     "top3Buyers": "Top 3 Buyers (huling {period} araw)",
     "top3Themes": "Top 3 Theme Revenue (huling {period} araw)",
@@ -1171,6 +1176,83 @@
     "upgrade": "Upgrade",
     "yes": "Oo"
   },
+  "event": {
+    "agentCol": "Pangalan ng Agent",
+    "alreadyExcluded": "Na-exclude na: {names}",
+    "completionTitle": "10 Mission Kumpleto! Binabati Kita 🎉",
+    "excludedAgents": "Mga Na-exclude na Agent:",
+    "excludedN": "{count} Na-exclude",
+    "excludeFailed": "Failed to Exclude",
+    "excludePlaceholder": "Ilagay ang Pangalan ng Agent (Pinaghiwalay ng Comma)",
+    "giftAlt": "Regalo sa Pagkumpleto ng Mission",
+    "gradeAgent": "Agent",
+    "gradeMaster": "Master",
+    "gradeRecruit": "Recruit",
+    "gradeTrainee": "Trainee Agent",
+    "gradeVeteran": "Veteran Agent",
+    "includeFailed": "Failed to Un-exclude",
+    "includeTitle": "Isama Muli sa Ranking",
+    "keepGoingTitle": "Kaunting Push Pa! Hindi Pa Kumpleto",
+    "lastPerformedCol": "Huling Ginawa",
+    "loadError": "Nabigo ang Pag-Load ng Data",
+    "loginHint": "Kapag nag-Login, ipapakita ang iyong Mission Progress at Agent Rank",
+    "missionListTitle": "📋 Listahan ng Mission",
+    "missions": {
+      "M1": {
+        "desc": "Pi Browser Login + Google Login (Kumpletuhin ang Pareho)",
+        "name": "Pagsasama ng Account"
+      },
+      "M10": {
+        "desc": "(Pagkatapos ng M9) Gawin muli ang 7 at 8 — maranasan ang bayad sa pagkansela habang aktibo ang deposit",
+        "name": "Bayad sa Pagkansela ng Transaksyon ng Aktibong Deposit"
+      },
+      "M2": {
+        "desc": "Ilagay ang Nickname + KakaoTalk ID sa Integrated Account (Kailangan para sa pagtanggap ng regalo)",
+        "name": "Pagkumpleto ng Profile"
+      },
+      "M3": {
+        "desc": "Gumawa ng PREMIUM Cafe sa PiCafe + Gamitin ang Awtomatikong Pagsasalin na Function",
+        "name": "Gumawa ng PREMIUM Cafe (PiRC1) + Awtomatikong Pagsasalin"
+      },
+      "M4": {
+        "desc": "Magpadala ng Bean sa 1 o Higit pang Tao sa Chat",
+        "name": "Bean Send Test (PiRC1)"
+      },
+      "M5": {
+        "desc": "Pagkatapos Mag-apply para sa Pi Subscription Service, Gumawa ng Pi Bet sa Cafe + Ipamahagi sa mga Kalahok",
+        "name": "Pagkatapos Mag-apply para sa Pi Subscription Service (PiRC2), Gumawa at Ipamahagi ang Pi Bet"
+      },
+      "M6": {
+        "desc": "Gumamit ng Sticker / Magpadala ng File / Gumamit ng Voice Channel (Isa o Higit Pa)",
+        "name": "Use Chat Multi-Function"
+      },
+      "M7": {
+        "desc": "Pagkatapos magrehistro ng aking produkto sa PiShop, kanselahin ang transaksyon ng nagbebenta habang may transaksyon",
+        "name": "Pagkansela ng Transaksyon ng Nagbebenta (Escrow Service;PiRC3)"
+      },
+      "M8": {
+        "desc": "Pagkatapos bumili ng produkto ng iba sa PiShop, kanselahin ang transaksyon ng mamimili",
+        "name": "Pagkansela ng Transaksyon ng Mamimili (Escrow Service;PiRC3)"
+      },
+      "M9": {
+        "desc": "Magdeposito ng 1Pi o higit pa sa Deposit ng Nagbebenta sa PiShop + sumang-ayon sa serbisyo batay sa lokasyon",
+        "name": "Deposit ng Nagbebenta + Pahintulot sa Lokasyon (Escrow Service;PiRC3)"
+      }
+    },
+    "multiOrHint": "💡 Hint: Kailangan lang kumpletuhin ang isa sa maraming paraan",
+    "networkError": "Network Error",
+    "noChange": "Walang Pagbabago",
+    "noName": "(Walang Pangalan)",
+    "notFoundAgents": "Hindi Natagpuan: {names}",
+    "processing": "Pinoproseso…",
+    "rankCol": "Rank",
+    "rankingTitle": "🏆 Mission Ranking",
+    "removeRank": "Alisin ang Rank",
+    "rewardCol": "Gantimpala",
+    "subtitle": "Kumpletuhin ang 10 Mission, at 🎁 Tanggapin ang Kakao Regalo",
+    "title": "🎖️ Mission Event",
+    "totalCol": "Total"
+  },
   "header": {
     "admin": "Admin",
     "board": "Board",
@@ -1295,6 +1377,7 @@
   "nav": {
     "admin": "Admin",
     "cafe": "Cafe",
+    "event": "Event",
     "home": "Home",
     "my": "Aking Impormasyon",
     "shop": "Shop"
@@ -1493,11 +1576,35 @@
       "qty": "Dami ng Ibinebenta",
       "saveDraft": "I-save bilang Draft",
       "saveEdit": "I-save ang Pagbabago",
+      "shop": "Kaakibat na Tindahan",
+      "shopNone": "Walang Tindahan",
       "thumbUrl": "URL ng Pangunahing Larawan",
       "unlimited": "Walang limit",
       "unlimitedHint": "Irehistro bilang walang limit ang mga item tulad ng inumin o pizza kung saan walang saysay ang pagsubaybay sa imbentaryo."
     },
     "formInvalid": "Pakisuri ang pangalan ng item at presyo",
+    "history": {
+      "clearFilter": "I-clear ang Filter",
+      "empty": "Walang Kasaysayan ng Transaksyon",
+      "from": "Petsa ng Simula",
+      "tab": {
+        "ALL": "Lahat",
+        "BUY": "Bumili",
+        "ETC": "Iba Pa",
+        "SELL": "Magbenta"
+      },
+      "title": "Kasaysayan ng Transaksyon",
+      "to": "Petsa ng Pagtatapos",
+      "type": {
+        "BOND_DEPOSIT": "Deposit ng Bond",
+        "CANCEL_FEE_IN": "Pagtanggap ng Bayad sa Pagkansela",
+        "CANCEL_REFUND": "Refund sa Pagkansela",
+        "ESCROW_IN": "Deposit sa Pagbili",
+        "REFUND_IN": "Deposit sa Refund",
+        "RELEASE_OUT": "Settlement ng Pagbebenta",
+        "SETTLE_OUT": "Withdrawal ng Settlement"
+      }
+    },
     "itemNotFound": "Hindi makita ang item",
     "itemSt": {
       "CLOSED": "Closed",
@@ -1516,6 +1623,7 @@
     "loginRequired": "Magagamit pagkatapos mag-login",
     "myItemsTitle": "Pamahalaan ang Aking Mga Item",
     "myOwnItem": "Ito ang item na aking inirehistro",
+    "navHistory": "Kasaysayan ng Transaksyon",
     "navMyItems": "Aking Mga Item",
     "navOrders": "Kasaysayan ng Order",
     "navSales": "Pamamahala ng Benta",
@@ -1543,12 +1651,48 @@
     "piBrowserOnly": "Maaari lamang magbayad sa Pi Browser",
     "publishSuccess": "Na-publish na ang item",
     "qtyInvalid": "Pakilagay ang dami sa pagitan ng 1 at 9998",
+    "refund": {
+      "done": "{amount}π ay na-refund",
+      "pending": "Nakansela na — ang refund ay ipoproseso sa lalong madaling panahon"
+    },
     "salesTitle": "Pamahalaan ang Mga Order sa Pagbebenta",
     "saveFail": "Nabigo ang pagproseso",
     "saving": "Nagse-save…",
     "scrollMore": "Mag-scroll para makita pa…",
     "search": "Hanapin",
     "searchPlaceholder": "Maghanap ng pangalan ng item o paglalarawan",
+    "shop": {
+      "add": "Magrehistro ng Tindahan",
+      "addr": "Address",
+      "addrHint": "Ito ang Address ng offline na tindahan. Ang Coordinates (map pin) ay susuportahan sa hinaharap.",
+      "addTitle": "Magrehistro ng Bagong Tindahan",
+      "bizHour": "Oras ng Negosyo",
+      "bizHourPlaceholder": "Halimbawa: Mga Araw ng Trabaho 10:00–19:00",
+      "cancel": "Kanselahin",
+      "createSuccess": "Narehistro na ang tindahan",
+      "delete": "Tanggalin",
+      "deleteConfirm": "Tanggalin ang tindahang ito? Mananatili ang mga kaakibat na produkto at ang koneksyon lamang sa tindahan ang aalisin",
+      "deleteSuccess": "Natanggal na ang tindahan",
+      "desc": "Paglalarawan ng Tindahan",
+      "edit": "I-edit",
+      "editSuccess": "Na-update na ang impormasyon ng tindahan",
+      "editTitle": "I-edit ang Tindahan",
+      "email": "Email",
+      "empty": "Walang nakarehistrong tindahan",
+      "intro": "Magrehistro ng online at offline na tindahan upang mapataas ang tiwala ng mamimili",
+      "manage": "Pamamahala ng Tindahan",
+      "name": "Pangalan ng Tindahan",
+      "nameRequired": "Pakipasok ang pangalan ng tindahan",
+      "save": "I-save",
+      "sns": "SNS Link",
+      "tel": "Telepono",
+      "thumb": "Pangunahing Image URL",
+      "title": "Pamamahala ng Tindahan",
+      "type": "Uri ng Tindahan",
+      "type_BOTH": "Online at Offline",
+      "type_OFFLINE": "Offline",
+      "type_ONLINE": "Online"
+    },
     "shopType": {
       "BOTH": "Online at Offline",
       "OFFLINE": "Offline Store",

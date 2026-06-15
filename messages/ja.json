@@ -141,6 +141,9 @@
       "board": "Board管理",
       "chatSection": "Cafe 管理",
       "dashboard": "Dashboard",
+      "eventExclude": "除外管理",
+      "eventGifts": "ギフト発送",
+      "eventSection": "Event",
       "i18n": "多言語管理",
       "i18nSection": "多言語",
       "links": "アカウント連携状況",
@@ -172,6 +175,7 @@
         "user": "ユーザー"
       },
       "noPayments": "支払い履歴がありません。",
+      "searchPiUsername": "Pi Username検索 (前方一致)",
       "status": {
         "approved": "承認",
         "cancelled": "キャンセル",
@@ -519,6 +523,7 @@
     "subtitle": "アクティブユーザー · 売上統計 (日別集計ベース)",
     "themeDaily": "テーマ別日別売上",
     "themeShare": "テーマ別売上比重",
+    "themeTreemap": "Theme別売上比重 (Treemap)",
     "top3Active": "Top 3 アクティブユーザー (最近 {period}日)",
     "top3Buyers": "Top 3 購入王 (最近 {period}日)",
     "top3Themes": "Top 3 テーマ売上 (最近 {period}日)",
@@ -1171,6 +1176,83 @@
     "upgrade": "Upgrade",
     "yes": "はい"
   },
+  "event": {
+    "agentCol": "エージェント名",
+    "alreadyExcluded": "既に除外: {names}",
+    "completionTitle": "10個のMission完了！おめでとうございます 🎉",
+    "excludedAgents": "除外されたエージェント:",
+    "excludedN": "除外 {count}名",
+    "excludeFailed": "除外処理に失敗しました",
+    "excludePlaceholder": "エージェント名入力 (Comma区切り)",
+    "giftAlt": "Mission完了ギフト",
+    "gradeAgent": "正規エージェント",
+    "gradeMaster": "Master",
+    "gradeRecruit": "エージェント",
+    "gradeTrainee": "研修生エージェント",
+    "gradeVeteran": "ベテランエージェント",
+    "includeFailed": "除外解除に失敗しました",
+    "includeTitle": "Rankingに再含める",
+    "keepGoingTitle": "もう少し頑張って！まだ完了していません",
+    "lastPerformedCol": "最終実行",
+    "loadError": "Dataロード失敗",
+    "loginHint": "Loginすると、私のMission進行度とエージェント等級が表示されます",
+    "missionListTitle": "📋 Mission List",
+    "missions": {
+      "M1": {
+        "desc": "Pi Browser Login + Google Login (両方完了)",
+        "name": "Account統合"
+      },
+      "M10": {
+        "desc": "(M9後) 7・8番を再度実行 — 保証金有効な状態でキャンセル手数料を経験",
+        "name": "保証金有効 取引キャンセル手数料"
+      },
+      "M2": {
+        "desc": "統合Accountにニックネーム + カカオトークID入力(ギフト受領時に必要)",
+        "name": "Profile完成"
+      },
+      "M3": {
+        "desc": "PiCafeでPREMIUM Cafe作成 + 自動翻訳機能使用",
+        "name": "PREMIUM Cafe作成(PiRC1) + 自動翻訳"
+      },
+      "M4": {
+        "desc": "Chat内でBeanを1人以上に転送",
+        "name": "Bean転送 Test(PiRC1)"
+      },
+      "M5": {
+        "desc": "Pi Subscription Service申請後、CafeでPi Bet作成 + 参加者に分配",
+        "name": "Pi Subscription Service(PiRC2)申請後 Pi Bet作成および分配"
+      },
+      "M6": {
+        "desc": "Sticker利用 / File転送 / 音声チャンネル利用のうち1つ以上",
+        "name": "Chat Multi機能使用"
+      },
+      "M7": {
+        "desc": "PiShopに自分の商品を登録後、取引中に販売者 取引キャンセル",
+        "name": "販売者 取引キャンセル (Escrow Service;PiRC3)"
+      },
+      "M8": {
+        "desc": "PiShopで他人の商品を購入後、購入者 取引キャンセル",
+        "name": "購入者 取引キャンセル (Escrow Service;PiRC3)"
+      },
+      "M9": {
+        "desc": "PiShop 販売者 保証金 1Pi以上預け入れ + 位置情報サービス同意",
+        "name": "販売者 保証金 + 位置情報同意 (Escrow Service;PiRC3)"
+      }
+    },
+    "multiOrHint": "💡 Hint: 複数の方法のうち1つだけ完了すれば良いです",
+    "networkError": "Networkエラー",
+    "noChange": "変更なし",
+    "noName": "(名前なし)",
+    "notFoundAgents": "未発見: {names}",
+    "processing": "処理中…",
+    "rankCol": "順位",
+    "rankingTitle": "🏆 Mission Ranking",
+    "removeRank": "順位削除",
+    "rewardCol": "報酬",
+    "subtitle": "10個のMissionを完遂して、🎁 カカオギフトを受け取ろう",
+    "title": "🎖️ Mission Event",
+    "totalCol": "合計"
+  },
   "header": {
     "admin": "Admin",
     "board": "掲示板",
@@ -1295,6 +1377,7 @@
   "nav": {
     "admin": "管理者",
     "cafe": "Cafe",
+    "event": "Event",
     "home": "Home",
     "my": "私の情報",
     "shop": "Shop"
@@ -1493,11 +1576,35 @@
       "qty": "販売数量",
       "saveDraft": "下書き保存",
       "saveEdit": "編集保存",
+      "shop": "所属店舗",
+      "shopNone": "店舗なし",
       "thumbUrl": "代表 Image URL",
       "unlimited": "無制限",
       "unlimitedHint": "飲料・Pizzaなど、在庫追跡が無意味なItemは無制限で登録してください"
     },
     "formInvalid": "Item名と価格を確認してください",
+    "history": {
+      "clearFilter": "Filter 解除",
+      "empty": "取引履歴がありません",
+      "from": "開始日",
+      "tab": {
+        "ALL": "全て",
+        "BUY": "購入",
+        "ETC": "その他",
+        "SELL": "販売"
+      },
+      "title": "取引履歴",
+      "to": "終了日",
+      "type": {
+        "BOND_DEPOSIT": "保証金預け入れ",
+        "CANCEL_FEE_IN": "キャンセル手数料受領",
+        "CANCEL_REFUND": "キャンセル払い戻し",
+        "ESCROW_IN": "購入入金",
+        "REFUND_IN": "払い戻し入金",
+        "RELEASE_OUT": "販売精算",
+        "SETTLE_OUT": "精算出金"
+      }
+    },
     "itemNotFound": "商品が見つかりません",
     "itemSt": {
       "CLOSED": "公開停止",
@@ -1516,6 +1623,7 @@
     "loginRequired": "ログイン後に利用できます",
     "myItemsTitle": "My Item管理",
     "myOwnItem": "ご自身で登録した商品です",
+    "navHistory": "取引履歴",
     "navMyItems": "マイ商品",
     "navOrders": "購入履歴",
     "navSales": "販売管理",
@@ -1543,12 +1651,48 @@
     "piBrowserOnly": "Pi Browserでのみ決済できます",
     "publishSuccess": "Itemが公開されました",
     "qtyInvalid": "数量は1〜9998の間で入力してください",
+    "refund": {
+      "done": "{amount}πが払い戻されました",
+      "pending": "キャンセル完了 — 払い戻しはまもなく処理されます"
+    },
     "salesTitle": "販売 Order管理",
     "saveFail": "処理に失敗しました",
     "saving": "保存中…",
     "scrollMore": "スクロールしてさらに表示…",
     "search": "検索",
     "searchPlaceholder": "商品名または説明を検索",
+    "shop": {
+      "add": "店舗登録",
+      "addr": "住所",
+      "addrHint": "Offline 店舗の住所です。座標（地図 Pin）は今後 Support 予定です",
+      "addTitle": "新規店舗登録",
+      "bizHour": "営業時間",
+      "bizHourPlaceholder": "例: 平日 10:00–19:00",
+      "cancel": "Cancel",
+      "createSuccess": "店舗が登録されました",
+      "delete": "削除",
+      "deleteConfirm": "この店舗を削除しますか？所属商品は維持され、店舗の紐付けのみ解除されます",
+      "deleteSuccess": "店舗が削除されました",
+      "desc": "店舗紹介",
+      "edit": "編集",
+      "editSuccess": "店舗情報が修正されました",
+      "editTitle": "店舗編集",
+      "email": "Email",
+      "empty": "登録された店舗がありません",
+      "intro": "オンライン・オフライン店舗を登録して購入者の信頼を高めましょう",
+      "manage": "店舗管理",
+      "name": "店舗名",
+      "nameRequired": "店舗名を入力してください",
+      "save": "保存",
+      "sns": "SNS Link",
+      "tel": "電話",
+      "thumb": "代表 Image URL",
+      "title": "店舗管理",
+      "type": "店舗タイプ",
+      "type_BOTH": "Online・Offline",
+      "type_OFFLINE": "Offline",
+      "type_ONLINE": "Online"
+    },
     "shopType": {
       "BOTH": "Online・Offline",
       "OFFLINE": "Offline店舗",

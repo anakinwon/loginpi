@@ -141,6 +141,9 @@
       "board": "Board-Verwaltung",
       "chatSection": "Café-Verwaltung",
       "dashboard": "Dashboard",
+      "eventExclude": "Ausschluss verwalten",
+      "eventGifts": "Geschenk senden",
+      "eventSection": "Event",
       "i18n": "Internationalisierungsverwaltung",
       "i18nSection": "Internationalisierung",
       "links": "Kontoverknüpfungsstatus",
@@ -172,6 +175,7 @@
         "user": "Benutzer"
       },
       "noPayments": "Keine Zahlungen vorhanden.",
+      "searchPiUsername": "Pi Benutzername suchen (Teilweise Übereinstimmung)",
       "status": {
         "approved": "Genehmigt",
         "cancelled": "Abgebrochen",
@@ -519,6 +523,7 @@
     "subtitle": "Aktive Benutzer · Umsatzstatistik (basierend auf täglichen Aggregationen)",
     "themeDaily": "Täglicher Umsatz nach Theme",
     "themeShare": "Umsatzanteil nach Theme",
+    "themeTreemap": "Umsatzanteil nach Theme (Treemap)",
     "top3Active": "Top 3 aktive Benutzer (letzte {period} Tage)",
     "top3Buyers": "Top 3 Käufer (letzte {period} Tage)",
     "top3Themes": "Top 3 Theme Umsatz (letzte {period} Tage)",
@@ -1171,6 +1176,83 @@
     "upgrade": "Upgrade",
     "yes": "Ja"
   },
+  "event": {
+    "agentCol": "Agentenname",
+    "alreadyExcluded": "Bereits ausgeschlossen: {names}",
+    "completionTitle": "10 Missionen abgeschlossen! Herzlichen Glückwunsch 🎉",
+    "excludedAgents": "Ausgeschlossene Agenten:",
+    "excludedN": "{count} ausgeschlossen",
+    "excludeFailed": "Ausschluss fehlgeschlagen",
+    "excludePlaceholder": "Agentennamen eingeben (durch Komma getrennt)",
+    "giftAlt": "Mission Abschlussgeschenk",
+    "gradeAgent": "Regulärer Agent",
+    "gradeMaster": "Master",
+    "gradeRecruit": "Rekrut",
+    "gradeTrainee": "Auszubildender Agent",
+    "gradeVeteran": "Veteranen Agent",
+    "includeFailed": "Aufnahme fehlgeschlagen",
+    "includeTitle": "Wieder im Ranking aufnehmen",
+    "keepGoingTitle": "Nur noch ein bisschen! Noch nicht abgeschlossen",
+    "lastPerformedCol": "Zuletzt ausgeführt",
+    "loadError": "Data Laden fehlgeschlagen",
+    "loginHint": "Melde dich an, um deinen Mission-Fortschritt und Agentenrang zu sehen",
+    "missionListTitle": "📋 Mission Liste",
+    "missions": {
+      "M1": {
+        "desc": "Pi Browser Login + Google Login (beides abschließen)",
+        "name": "Konto Integration"
+      },
+      "M10": {
+        "desc": "(Nach M9) Führen Sie die Nummern 7 und 8 erneut aus — Erleben Sie die Stornierungsgebühr bei aktiver Kaution",
+        "name": "Stornierungsgebühr bei aktiver Kaution"
+      },
+      "M2": {
+        "desc": "Spitzname + KakaoTalk ID im integrierten Konto eingeben (für Geschenkempfang erforderlich)",
+        "name": "Profile Vervollständigung"
+      },
+      "M3": {
+        "desc": "PREMIUM Cafe in PiCafe erstellen + Automatische Übersetzungsfunktion nutzen",
+        "name": "PREMIUM Cafe erstellen (PiRC1) + Automatische Übersetzung"
+      },
+      "M4": {
+        "desc": "Bean im Chat an 1 oder mehr Personen senden",
+        "name": "Bean Transfer Test (PiRC1)"
+      },
+      "M5": {
+        "desc": "Nach Beantragung des Pi Subscription Service, Pi Bet im Cafe erstellen + an Teilnehmer verteilen",
+        "name": "Nach Beantragung des Pi Subscription Service (PiRC2), Pi Bet erstellen und verteilen"
+      },
+      "M6": {
+        "desc": "Sticker nutzen / File senden / Sprachkanal nutzen - 1 oder mehr davon",
+        "name": "Chat Multi Funktion nutzen"
+      },
+      "M7": {
+        "desc": "Verkäufer-Transaktionsstornierung während einer Transaktion, nachdem mein Produkt im PiShop registriert wurde",
+        "name": "Verkäufer-Transaktionsstornierung (Escrow-Service; PiRC3)"
+      },
+      "M8": {
+        "desc": "Käufer-Transaktionsstornierung nach dem Kauf eines Produkts von jemand anderem im PiShop",
+        "name": "Käufer-Transaktionsstornierung (Escrow-Service; PiRC3)"
+      },
+      "M9": {
+        "desc": "Einzahlung einer Verkäufer-Kaution von mindestens 1 Pi im PiShop + Zustimmung zu standortbasierten Diensten",
+        "name": "Verkäufer-Kaution + Standortzustimmung (Escrow-Service; PiRC3)"
+      }
+    },
+    "multiOrHint": "💡 Hinweis: Nur eine von mehreren Methoden muss abgeschlossen werden",
+    "networkError": "Netzwerk Fehler",
+    "noChange": "Keine Änderungen",
+    "noName": "(Kein Name)",
+    "notFoundAgents": "Nicht gefunden: {names}",
+    "processing": "Wird verarbeitet…",
+    "rankCol": "Rang",
+    "rankingTitle": "🏆 Mission Ranking",
+    "removeRank": "Rang entfernen",
+    "rewardCol": "Belohnung",
+    "subtitle": "Schließe 10 Missionen ab und erhalte ein 🎁 Kakao Geschenk",
+    "title": "🎖️ Mission Event",
+    "totalCol": "Gesamt"
+  },
   "header": {
     "admin": "Admin",
     "board": "Board",
@@ -1295,6 +1377,7 @@
   "nav": {
     "admin": "Administrator",
     "cafe": "Cafe",
+    "event": "Event",
     "home": "Home",
     "my": "Meine Informationen",
     "shop": "Shop"
@@ -1493,11 +1576,35 @@
       "qty": "Verkaufsmenge",
       "saveDraft": "Als Entwurf speichern",
       "saveEdit": "Änderungen speichern",
+      "shop": "Zugehöriger Shop",
+      "shopNone": "Kein Shop",
       "thumbUrl": "Vorschaubild-URL",
       "unlimited": "Unbegrenzt",
       "unlimitedHint": "Registrieren Sie Artikel wie Getränke oder Pizza, bei denen die Bestandsverfolgung bedeutungslos ist, als unbegrenzt."
     },
     "formInvalid": "Bitte überprüfen Sie Artikelname und Preis",
+    "history": {
+      "clearFilter": "Filter löschen",
+      "empty": "Kein Transaktionsverlauf vorhanden",
+      "from": "Startdatum",
+      "tab": {
+        "ALL": "Alle",
+        "BUY": "Käufe",
+        "ETC": "Sonstiges",
+        "SELL": "Verkäufe"
+      },
+      "title": "Transaktionsverlauf",
+      "to": "Enddatum",
+      "type": {
+        "BOND_DEPOSIT": "Kautionshinterlegung",
+        "CANCEL_FEE_IN": "Erhalt der Stornierungsgebühr",
+        "CANCEL_REFUND": "Stornierungsrückerstattung",
+        "ESCROW_IN": "Kauf-Einzahlung",
+        "REFUND_IN": "Rückerstattungseinzahlung",
+        "RELEASE_OUT": "Verkaufsabwicklung",
+        "SETTLE_OUT": "Auszahlung der Abrechnung"
+      }
+    },
     "itemNotFound": "Artikel nicht gefunden",
     "itemSt": {
       "CLOSED": "Nicht veröffentlicht",
@@ -1516,6 +1623,7 @@
     "loginRequired": "Login erforderlich",
     "myItemsTitle": "Meine Artikel verwalten",
     "myOwnItem": "Dies ist Ihr eigener Artikel",
+    "navHistory": "Transaktionsverlauf",
     "navMyItems": "Meine Artikel",
     "navOrders": "Bestellverlauf",
     "navSales": "Verkaufsverwaltung",
@@ -1543,12 +1651,48 @@
     "piBrowserOnly": "Zahlung nur im Pi Browser möglich",
     "publishSuccess": "Artikel wurde veröffentlicht",
     "qtyInvalid": "Bitte geben Sie eine Menge zwischen 1 und 9998 ein",
+    "refund": {
+      "done": "{amount}π wurde zurückerstattet",
+      "pending": "Stornierung abgeschlossen — Die Rückerstattung wird in Kürze bearbeitet"
+    },
     "salesTitle": "Verkaufsaufträge verwalten",
     "saveFail": "Verarbeitung fehlgeschlagen",
     "saving": "Speichern…",
     "scrollMore": "Scrollen für mehr…",
     "search": "Suchen",
     "searchPlaceholder": "Artikelname oder Beschreibung suchen",
+    "shop": {
+      "add": "Shop registrieren",
+      "addr": "Adresse",
+      "addrHint": "Dies ist die Adresse des Offline-Geschäfts. Koordinaten (Karten-Pin) werden zukünftig unterstützt.",
+      "addTitle": "Neuen Shop registrieren",
+      "bizHour": "Öffnungszeiten",
+      "bizHourPlaceholder": "Beispiel: Wochentags 10:00–19:00",
+      "cancel": "Abbrechen",
+      "createSuccess": "Der Shop wurde registriert",
+      "delete": "Löschen",
+      "deleteConfirm": "Diesen Shop löschen? Zugehörige Produkte bleiben erhalten und nur die Shop-Verbindung wird aufgehoben.",
+      "deleteSuccess": "Der Shop wurde gelöscht",
+      "desc": "Shop-Beschreibung",
+      "edit": "Bearbeiten",
+      "editSuccess": "Die Shop-Informationen wurden aktualisiert",
+      "editTitle": "Shop bearbeiten",
+      "email": "Email",
+      "empty": "Keine Shops registriert",
+      "intro": "Registrieren Sie Online- und Offline-Shops, um das Vertrauen der Käufer zu erhöhen",
+      "manage": "Shop verwalten",
+      "name": "Shop-Name",
+      "nameRequired": "Bitte geben Sie den Shop-Namen ein",
+      "save": "Speichern",
+      "sns": "SNS Link",
+      "tel": "Telefon",
+      "thumb": "Thumbnail Image URL",
+      "title": "Shop-Verwaltung",
+      "type": "Shop-Typ",
+      "type_BOTH": "Online & Offline",
+      "type_OFFLINE": "Offline",
+      "type_ONLINE": "Online"
+    },
     "shopType": {
       "BOTH": "Online & Offline",
       "OFFLINE": "Offline-Geschäft",
