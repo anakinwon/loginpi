@@ -32,8 +32,12 @@ const ALLOWED_LOCALES = new Set<string>(routing.locales)
 const SYNC_SKIP = new Set(['ko'])
 
 export async function POST(req: NextRequest) {
+  // admin 세션 또는 cron/self-call(CRON_SECRET) 둘 다 허용 — 백그라운드 자동 번역이 재사용
   const user = await getSessionUser()
-  if (!isAdmin(user)) {
+  const cronOk =
+    !!process.env.CRON_SECRET &&
+    req.headers.get('authorization') === `Bearer ${process.env.CRON_SECRET}`
+  if (!isAdmin(user) && !cronOk) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
   }
 

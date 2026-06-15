@@ -117,30 +117,33 @@ export default function I18nPage() {
   }, [loadStats])
 
   // ── 번역 + 동기화 ──────────────────────────────────
+  // 자동 순차 루프에서도 안전하도록 모든 로직을 try 안에 두어 절대 throw하지 않는다.
+  // (try 밖에서 throw하면 호출부 루프가 중단되어 다음 언어로 진행되지 않는다)
   async function translateAndSync(locale: string) {
-    const locStat = stats?.locales.find((l) => l.locale_cd === locale)
-    const pendingKeys = locStat
-      ? locStat.total - locStat.translated
-      : (stats?.totalKeys ?? 0)
-    // 소요시간 동적 산정 — 서버는 50개 키를 1회 Gemini 호출(배치)로 번역하고,
-    // 배치 사이에만 4.5초 rate limit 대기(Gemini 무료 15 RPM). 키당 처리가 아님.
-    // ETA = 배치당 처리 ~8초 + 배치 간 대기 4.5초 × (배치수-1)
-    const batches = Math.max(Math.ceil(pendingKeys / 50), 1)
-    const etaSec = Math.ceil(batches * 8 + (batches - 1) * 4.5)
-    const etaText =
-      etaSec >= 60
-        ? ta('etaMin', { min: Math.ceil(etaSec / 60) })
-        : ta('etaSec', { sec: etaSec })
     setTranslating(locale)
-    const toastId = toast.loading(
-      ta('translatingEta', {
-        locale: locale.toUpperCase(),
-        keys: pendingKeys,
-        batches,
-        eta: etaText,
-      }),
-    )
+    let toastId: string | number | undefined
     try {
+      const locStat = stats?.locales.find((l) => l.locale_cd === locale)
+      const pendingKeys = locStat
+        ? locStat.total - locStat.translated
+        : (stats?.totalKeys ?? 0)
+      // 소요시간 동적 산정 — 서버는 50개 키를 1회 Gemini 호출(배치)로 번역하고,
+      // 배치 사이에만 4.5초 rate limit 대기(Gemini 무료 15 RPM). 키당 처리가 아님.
+      // ETA = 배치당 처리 ~8초 + 배치 간 대기 4.5초 × (배치수-1)
+      const batches = Math.max(Math.ceil(pendingKeys / 50), 1)
+      const etaSec = Math.ceil(batches * 8 + (batches - 1) * 4.5)
+      const etaText =
+        etaSec >= 60
+          ? ta('etaMin', { min: Math.ceil(etaSec / 60) })
+          : ta('etaSec', { sec: etaSec })
+      toastId = toast.loading(
+        ta('translatingEta', {
+          locale: locale.toUpperCase(),
+          keys: pendingKeys,
+          batches,
+          eta: etaText,
+        }),
+      )
       const res = await fetch('/api/admin/i18n/translate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -170,9 +173,10 @@ export default function I18nPage() {
         )
       loadStats()
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : tc('error'), {
-        id: toastId,
-      })
+      toast.error(
+        err instanceof Error ? err.message : tc('error'),
+        toastId ? { id: toastId } : undefined,
+      )
     } finally {
       setTranslating(null)
       setSyncing(null)
@@ -184,7 +188,6 @@ export default function I18nPage() {
   // translateAndSync는 내부에서 에러를 toast로 처리하고 throw하지 않으므로,
   // 한 언어가 실패해도 루프가 멈추지 않고 다음 언어로 계속 진행한다.
   async function translateAndSyncAll() {
-    // 시작 시점 스냅샷으로 대상 고정 (진행 중 stats 갱신과 무관)
     const targets = (stats?.locales ?? []).filter(
       (l) => l.locale_cd !== 'ko' && l.pct < 100,
     )
@@ -192,20 +195,48 @@ export default function I18nPage() {
       toast.info(ta('autoNoPending'))
       return
     }
+    const total = targets.length
     autoAbortRef.current = false
     setAutoRunning(true)
-    let done = 0
+    setAutoProgress({ current: 0, total })
     try {
-      for (let i = 0; i < targets.length; i++) {
+      // 서버 백그라운드로 시작 — 페이지를 떠나거나 브라우저를 닫아도
+      // 서버(로컬 dev)가 after()로 끝까지 translate+sync를 진행한다.
+      const res = await fetch('/api/admin/i18n/translate-all', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ locales: targets.map((l) => l.locale_cd) }),
+      })
+      const d = (await res.json()) as { started?: number; error?: string }
+      if (!res.ok) throw new Error(d.error ?? t('translateFail'))
+      toast.success(ta('autoBgStarted', { count: d.started ?? total }))
+      // 진행률은 별도 폴링으로 표시(서버 작업과 독립). 폴링을 멈춰도 서버는 계속 진행.
+      void pollProgress(new Set(targets.map((l) => l.locale_cd)), total)
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : tc('error'))
+      setAutoRunning(false)
+      setAutoProgress(null)
+    }
+  }
+
+  // 백그라운드 진행 폴링 — stats를 주기 조회해 대상 locale의 완료 수로 진행률 표시.
+  async function pollProgress(targetCds: Set<string>, total: number) {
+    try {
+      for (;;) {
+        await new Promise((r) => setTimeout(r, 5000))
         if (autoAbortRef.current) break
-        setAutoProgress({ current: i + 1, total: targets.length })
-        await translateAndSync(targets[i].locale_cd)
-        done++
-      }
-      if (autoAbortRef.current) {
-        toast.info(ta('autoStopped', { done, total: targets.length }))
-      } else {
-        toast.success(ta('autoDone', { count: done }))
+        const fresh = (await fetch('/api/admin/i18n/stats').then((r) =>
+          r.json(),
+        )) as StatsData
+        setStats(fresh)
+        const remaining = (fresh.locales ?? []).filter(
+          (l) => targetCds.has(l.locale_cd) && l.pct < 100,
+        ).length
+        setAutoProgress({ current: total - remaining, total })
+        if (remaining === 0) {
+          toast.success(ta('autoDone', { count: total }))
+          break
+        }
       }
     } finally {
       setAutoRunning(false)
@@ -214,9 +245,10 @@ export default function I18nPage() {
     }
   }
 
-  // 진행 중 중단 요청 (현재 처리 중인 언어는 끝낸 뒤 멈춤)
+  // 진행 표시 중단 — 폴링만 멈출 뿐 서버 백그라운드 번역은 계속된다.
   function stopAuto() {
     autoAbortRef.current = true
+    toast.info(ta('autoStopPolling'))
   }
 
   // ── 전체 동기화 ────────────────────────────────────
