@@ -15,31 +15,46 @@ interface GiftRecord {
   gift_nm: string
 }
 
+interface Completion {
+  rank: number
+  user_id: string
+  pi_username: string | null
+  nick_nm: string | null
+  kakao_id: string | null
+  last_complete_dtm: string
+}
+
 export default function AdminEventGiftsPage() {
   const [loading, setLoading] = useState(true)
   const [gifts, setGifts] = useState<GiftRecord[]>([])
+  const [completions, setCompletions] = useState<Completion[]>([])
   const [updating, setUpdating] = useState<Record<string, boolean>>({})
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const fetchGifts = async () => {
+    const fetchAll = async () => {
       try {
-        const res = await piFetch('/api/event/top-10-gifts')
-        if (!res.ok) {
-          setError('선물 목록 로드 실패')
+        const [giftsRes, completionsRes] = await Promise.all([
+          piFetch('/api/event/top-10-gifts'),
+          piFetch('/api/admin/event/completions'),
+        ])
+        if (!giftsRes.ok || !completionsRes.ok) {
+          setError('데이터 로드 실패')
           return
         }
-        const data = await res.json()
-        setGifts(data.gifts ?? [])
+        const giftsData = await giftsRes.json()
+        const completionsData = await completionsRes.json()
+        setGifts(giftsData.gifts ?? [])
+        setCompletions(completionsData.completions ?? [])
       } catch (err) {
-        console.error('Gift fetch error:', err)
+        console.error('Fetch error:', err)
         setError('네트워크 오류')
       } finally {
         setLoading(false)
       }
     }
 
-    fetchGifts()
+    fetchAll()
   }, [])
 
   const handleToggleSent = async (userId: string, currentSent: string) => {
@@ -164,6 +179,77 @@ export default function AdminEventGiftsPage() {
           아직 미션 10/10을 완료한 사용자가 없습니다
         </div>
       )}
+
+      {/* 전체 미션 완료자 목록 */}
+      <div>
+        <div className="mb-3">
+          <h2 className="text-xl font-bold">
+            🏅 미션 10/10 전체 완료자{' '}
+            <span className="text-base font-normal text-muted-foreground">
+              ({completions.length}명)
+            </span>
+          </h2>
+          <p className="text-muted-foreground text-sm mt-1">
+            선착순 정렬 · 제외 대상자 제외 · Pi 계정명 / 최종성공일시 / 카카오톡 ID
+          </p>
+        </div>
+
+        <div className="overflow-x-auto border rounded-lg">
+          <table className="w-full text-sm">
+            <thead className="bg-muted border-b">
+              <tr>
+                <th className="p-3 text-left font-semibold w-12">순위</th>
+                <th className="p-3 text-left font-semibold">Pi 계정명</th>
+                <th className="p-3 text-left font-semibold">닉네임</th>
+                <th className="p-3 text-left font-semibold">카카오톡 ID</th>
+                <th className="p-3 text-left font-semibold whitespace-nowrap">최종 성공 일시</th>
+              </tr>
+            </thead>
+            <tbody>
+              {completions.map((c) => (
+                <tr
+                  key={c.user_id}
+                  className={`border-b hover:bg-muted/50 ${c.rank <= 10 ? 'bg-amber-50 dark:bg-amber-950/30' : ''}`}
+                >
+                  <td className="p-3 font-semibold">
+                    {c.rank <= 10 ? (
+                      <span className="text-amber-600 dark:text-amber-400">#{c.rank}</span>
+                    ) : (
+                      <span className="text-muted-foreground">#{c.rank}</span>
+                    )}
+                  </td>
+                  <td className="p-3 font-mono text-xs">{c.pi_username ?? '-'}</td>
+                  <td className="p-3">{c.nick_nm ?? '-'}</td>
+                  <td className="p-3 font-mono text-xs">
+                    {c.kakao_id ? (
+                      <span className="text-green-700 dark:text-green-400">{c.kakao_id}</span>
+                    ) : (
+                      <span className="text-red-500">미입력</span>
+                    )}
+                  </td>
+                  <td className="p-3 text-xs text-muted-foreground whitespace-nowrap">
+                    {new Date(c.last_complete_dtm).toLocaleString('ko-KR', {
+                      timeZone: 'Asia/Seoul',
+                      year: '2-digit',
+                      month: '2-digit',
+                      day: '2-digit',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      second: '2-digit',
+                    })}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {completions.length === 0 && (
+          <div className="text-center py-10 text-muted-foreground">
+            아직 미션 10/10을 완료한 사용자가 없습니다
+          </div>
+        )}
+      </div>
     </div>
   )
 }
