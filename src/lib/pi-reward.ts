@@ -86,8 +86,8 @@ export async function triggerPiReward(
             user_id: userId,
             reward_type: 'MISSION_COMPLETE',
           },
+          uid: piUid,
         },
-        uid: piUid,
       }),
     })
 
