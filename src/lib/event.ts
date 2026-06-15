@@ -124,6 +124,38 @@ export async function evaluateUserMissions(
 }
 
 /**
+ * 전체 활성 사용자(행위 기록 보유) 미션 재평가 — 평가 유실·지연 안전망(cron 전용).
+ *
+ * 신뢰 보장 설계: recordUserAction의 after() 평가가 어떤 이유로든(배포 타이밍·일시 장애)
+ * 유실되어도, 이 함수가 주기적으로 모든 사용자를 정식 평가 로직(evaluateUserMissions)으로
+ * 재평가한다. SQL 백필과 달리 SINGLE/MULTI_AND/MULTI_OR/SEQUENCE(M10) 전 타입을 동일 코드로
+ * 커버하므로 타입별 누락이 발생하지 않는다. evt_user_mission은 멱등 upsert라 중복 실행 안전.
+ */
+export async function reevaluateAllActiveUsers(): Promise<{ users: number }> {
+  const db = getSupabaseAdmin()
+
+  // 행위가 한 번이라도 기록된 사용자만 평가 대상 (평가할 근거가 있는 사용자)
+  const { data } = await db
+    .from('evt_action_log')
+    .select('user_id')
+    .eq('del_yn', 'N')
+
+  const userIds = [
+    ...new Set((data ?? []).map((r) => (r as { user_id: string }).user_id)),
+  ]
+
+  for (const uid of userIds) {
+    try {
+      await evaluateUserMissions(uid)
+    } catch (err) {
+      console.error(`[reeval] 사용자 평가 실패 ${uid}:`, (err as Error).message)
+    }
+  }
+
+  return { users: userIds.length }
+}
+
+/**
  * 미션 완료 판정 로직 (complete_type별)
  */
 interface Mission {
@@ -194,9 +226,23 @@ async function evaluateMissionCompletion(
 
       if (error || !priorMission) return false // 선행 미션 미완료
 
-      // M10 특수: REFUND_IN + FEE 동시 확인
+      // M10 특수: 보증금 활성 상태의 취소 수수료 경험 확인.
+      // 기준 시각은 M9 미션 complete_dtm(= 평가 실행 시각, 행위보다 늦을 수 있음)이 아니라
+      // 실제 bond_deposit 행위 시각을 사용한다. 그래야 보증금 예치 직후 발생한 취소수수료를
+      // '미션 평가가 늦게 돌았다'는 이유로 놓치지 않는다.
       if (mission.mission_cd.trim() === 'M10') {
-        return await checkCancelWithFee(userId, priorMission.complete_dtm)
+        const { data: bond } = await db
+          .from('evt_action_log')
+          .select('action_dtm')
+          .eq('user_id', userId)
+          .eq('action_cd', 'bond_deposit')
+          .order('action_dtm', { ascending: true })
+          .limit(1)
+          .maybeSingle()
+        const bondDtm =
+          (bond as { action_dtm: string } | null)?.action_dtm ??
+          priorMission.complete_dtm
+        return await checkCancelWithFee(userId, bondDtm)
       }
 
       // 일반 SEQUENCE: action_cd 발생 확인
