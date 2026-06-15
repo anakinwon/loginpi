@@ -60,6 +60,33 @@ for (const lc of locales) {
     )
 }
 
+// 3-2. 번역키 정합성 — ko(source of truth) 초과 키(extra) 차단
+//   ko.json에 없는데 다른 locale에만 있는 키는 다국어 통계 "기준 초과" 불일치를 유발한다.
+//   (예: 결제 theme 키를 ko에 누락한 채 타 locale에만 추가한 fce0c91 사례)
+//   미번역(ko엔 있고 타 locale엔 없음 = missing)은 정상이므로 검사하지 않는다 — extra만 차단.
+function flattenKeys(obj, prefix = '') {
+  let keys = []
+  for (const k in obj) {
+    const np = prefix ? `${prefix}.${k}` : k
+    const v = obj[k]
+    if (v && typeof v === 'object' && !Array.isArray(v))
+      keys = keys.concat(flattenKeys(v, np))
+    else keys.push(np)
+  }
+  return keys
+}
+const readMsg = (lc) =>
+  JSON.parse(readFileSync(join(root, 'messages', `${lc}.json`), 'utf-8'))
+const koKeySet = new Set(flattenKeys(readMsg('ko')))
+for (const lc of locales) {
+  if (lc === 'ko') continue
+  const extra = flattenKeys(readMsg(lc)).filter((k) => !koKeySet.has(k))
+  if (extra.length > 0)
+    errors.push(
+      `[키 초과] '${lc}' — ko.json에 없는 키 ${extra.length}개 (ko에 먼저 추가 필요): ${extra.slice(0, 5).join(', ')}${extra.length > 5 ? ' 외' : ''}`,
+    )
+}
+
 // 4. 결과
 if (errors.length > 0) {
   console.error(
@@ -68,11 +95,12 @@ if (errors.length > 0) {
   for (const e of errors) console.error(`  ${e}`)
   console.error(
     `\n  활성 locale ${locales.length}개: ${locales.join(' ')}` +
-      `\n  신규 locale 추가 시 수정 파일: locale-currency.ts · locale-country.ts · routing.ts (단일 소스 원칙)\n`,
+      `\n  신규 locale 추가 시 수정 파일: locale-currency.ts · locale-country.ts · routing.ts (단일 소스 원칙)` +
+      `\n  [키 초과] 해소: 새 번역키는 반드시 ko.json(source of truth)에 먼저 추가하세요. ko에 없는 키가 타 locale/DB에만 있으면 안 됩니다.\n`,
   )
   process.exit(1)
 }
 
 console.log(
-  `✅ [validate-locales] 활성 locale ${locales.length}개 매핑 완전성 검증 통과 (통화·국가·라우팅)`,
+  `✅ [validate-locales] 활성 locale ${locales.length}개 매핑 완전성 + 번역키 정합성(ko 기준 초과 0) 검증 통과`,
 )
