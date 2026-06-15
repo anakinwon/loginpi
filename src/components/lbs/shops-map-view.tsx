@@ -1,7 +1,7 @@
 /// <reference types="@types/google.maps" />
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { setOptions, importLibrary } from '@googlemaps/js-api-loader'
 import type { BizCategory } from '@/components/lbs/nearby-explorer'
 
@@ -22,6 +22,13 @@ interface Props {
   apiKey: string | undefined
   bizCategory: BizCategory
   radiusMeters: number
+  focusShopId?: string | null
+}
+
+interface MarkerEntry {
+  marker: google.maps.marker.AdvancedMarkerElement
+  content: HTMLElement
+  position: { lat: number; lng: number }
 }
 
 // 업종별 핀 색상 + Google Places 타입
@@ -35,10 +42,34 @@ const CATEGORY_CONFIG: Record<
   BAR:        { bg: '#a855f7', border: '#7e22ce', placeType: 'bar',        label: '술집' },
 }
 
-export function ShopsMapView({ shops, userLat, userLng, apiKey, bizCategory, radiusMeters }: Props) {
+export function ShopsMapView({ shops, userLat, userLng, apiKey, bizCategory, radiusMeters, focusShopId }: Props) {
   const mapRef = useRef<HTMLDivElement>(null)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [placesCount, setPlacesCount] = useState<number | null>(null)
+
+  // 지도 인스턴스·마커를 ref에 보관 — 포커스 effect와 초기화 effect가 공유
+  const mapInstanceRef = useRef<google.maps.Map | null>(null)
+  const infoWindowRef = useRef<google.maps.InfoWindow | null>(null)
+  const markerMapRef = useRef(new Map<string, MarkerEntry>())
+  // 초기화 async 내부에서 최신 focusShopId를 읽기 위한 mirror ref
+  const focusShopIdRef = useRef(focusShopId)
+  useEffect(() => { focusShopIdRef.current = focusShopId }, [focusShopId])
+
+  // 이미 초기화된 지도에서 focusShopId 변경 시 panTo + InfoWindow
+  const applyFocus = useCallback((id: string) => {
+    const mapInst = mapInstanceRef.current
+    const iw = infoWindowRef.current
+    const entry = markerMapRef.current.get(id)
+    if (!mapInst || !iw || !entry) return
+    mapInst.panTo(entry.position)
+    mapInst.setZoom(17)
+    iw.setContent(entry.content)
+    iw.open(mapInst, entry.marker)
+  }, [])
+
+  useEffect(() => {
+    if (focusShopId && mapInstanceRef.current) applyFocus(focusShopId)
+  }, [focusShopId, applyFocus])
 
   useEffect(() => {
     if (!mapRef.current) return
@@ -54,6 +85,7 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey, bizCategory, rad
 
     let markers: google.maps.marker.AdvancedMarkerElement[] = []
     let infoWindow: google.maps.InfoWindow | null = null
+    markerMapRef.current.clear()
 
     ;(async () => {
       try {
@@ -71,6 +103,8 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey, bizCategory, rad
         })
 
         infoWindow = new InfoWindow()
+        mapInstanceRef.current = map
+        infoWindowRef.current = infoWindow
 
         const { AdvancedMarkerElement, PinElement } = await importLibrary('marker') as google.maps.MarkerLibrary
         const { LatLngBounds } = await importLibrary('core') as google.maps.CoreLibrary
@@ -98,6 +132,7 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey, bizCategory, rad
           position: { lat: number; lng: number },
           title: string,
           infoContent: HTMLElement,
+          shopId?: string,
         ) => {
           const pin = new PinElement({
             background: cfg.bg,
@@ -111,6 +146,7 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey, bizCategory, rad
           })
           bounds.extend(position)
           markers.push(marker)
+          if (shopId) markerMapRef.current.set(shopId, { marker, content: infoContent, position })
         }
 
         const buildShopInfo = (nm: string, dist: string, addr: string | null, biz_hour: string | null) => {
@@ -149,6 +185,7 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey, bizCategory, rad
               { lat: shop.lat, lng: shop.lng },
               shop.shop_nm,
               buildShopInfo(shop.shop_nm, dist, shop.addr, shop.biz_hour),
+              shop.shop_id,
             )
           }
         } else {
@@ -206,6 +243,18 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey, bizCategory, rad
           })
           void listener
         }
+
+        // 목록→지도 전환 시 클릭된 매장이 있으면 즉시 포커스
+        const pendingId = focusShopIdRef.current
+        if (pendingId && bizCategory === 'ALL') {
+          const entry = markerMapRef.current.get(pendingId)
+          if (entry && infoWindow) {
+            map.panTo(entry.position)
+            map.setZoom(17)
+            infoWindow.setContent(entry.content)
+            infoWindow.open(map, entry.marker)
+          }
+        }
       } catch (e) {
         const msg = e instanceof Error ? e.message : '지도 로드 실패'
         // Places API (New) 미활성화 시 명확한 안내
@@ -220,9 +269,12 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey, bizCategory, rad
     return () => {
       markers.forEach((m) => (m.map = null))
       infoWindow?.close()
+      mapInstanceRef.current = null
+      infoWindowRef.current = null
     }
-  // radius 또는 category 바뀌면 지도 재초기화
-  }, [shops, userLat, userLng, apiKey, bizCategory, radiusMeters])
+  // radius 또는 category 바뀌면 지도 재초기화 (focusShopId는 별도 effect 처리)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shops, userLat, userLng, apiKey, bizCategory, radiusMeters, applyFocus])
 
   if (loadError) {
     return (

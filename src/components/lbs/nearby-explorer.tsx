@@ -67,6 +67,7 @@ export function NearbyExplorer() {
   const [loadError, setLoadError] = useState<string | null>(null)
   const [shopsViewMode, setShopsViewMode] = useState<ShopsViewMode>('map')
   const [bizCategory, setBizCategory] = useState<BizCategory>('ALL')
+  const [focusShopId, setFocusShopId] = useState<string | null>(null)
 
   // 마운트 시 동의 여부 확인 (Rule LBS-01)
   useEffect(() => {
@@ -287,6 +288,7 @@ export function NearbyExplorer() {
               apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
               bizCategory={bizCategory}
               radiusMeters={radius * 1000}
+              focusShopId={focusShopId}
             />
           ) : shops.length === 0 ? (
             <p className="text-muted-foreground py-16 text-center text-sm">
@@ -297,7 +299,11 @@ export function NearbyExplorer() {
               {shops.map((s) => (
                 <li
                   key={s.shop_id}
-                  className="flex items-center justify-between rounded-lg border p-3"
+                  onClick={() => {
+                    setFocusShopId(s.shop_id)
+                    setShopsViewMode('map')
+                  }}
+                  className="flex cursor-pointer items-center justify-between rounded-lg border p-3 transition-colors hover:bg-muted/50"
                 >
                   <div className="min-w-0">
                     <p className="truncate font-medium">{s.shop_nm}</p>

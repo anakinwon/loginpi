@@ -7,6 +7,16 @@ import { Link } from '@/i18n/navigation'
 import { usePiAuth } from '@/components/pi-auth-provider'
 import { piFetch } from '@/lib/pi-fetch'
 import { Button } from '@/components/ui/button'
+import { buildGoogleMapsUrl, buildNaverMapUrl, buildKakaoMapUrl } from '@/lib/navigation'
+import type { ShopLocation } from '@/lib/navigation'
+
+interface ShopInfo {
+  shop_nm: string | null
+  addr: string | null
+  latd_crd: number | null
+  lngt_crd: number | null
+  place_id: string | null
+}
 
 interface OrderRow {
   order_id: string
@@ -24,7 +34,7 @@ interface OrderRow {
     | 'CANCELLED'
   cancel_reason: string | null
   reg_dtm: string
-  mps_item: { item_nm: string; thumbnail_url: string | null } | null
+  mps_item: { item_nm: string; thumbnail_url: string | null; mps_shop: ShopInfo | null } | null
 }
 
 // ESCROW·SELLER_DONE은 구버전 주문 레거시 상태 — 화면에는 거래중과 동일 계열로 표시
@@ -183,6 +193,52 @@ export function ClientMyOrders({
 
               {/* 상태별 액션 — 2단계 확인: ①수령(구매자) ②거래완료(판매자) */}
               <div className="flex flex-wrap gap-1.5">
+                {/* 구매자 거래중 상태: 매장 출발하기 버튼 — 딥링크로 네이티브 지도 앱에 위임 */}
+                {role === 'buyer' && IN_TRADE.includes(o.order_st_cd) && (() => {
+                  const shop = o.mps_item?.mps_shop ?? null
+                  const loc: ShopLocation = {
+                    place_id: shop?.place_id,
+                    latd_crd: shop?.latd_crd,
+                    lngt_crd: shop?.lngt_crd,
+                    addr: shop?.addr,
+                    shop_nm: shop?.shop_nm,
+                  }
+                  const googleUrl = buildGoogleMapsUrl(loc)
+                  const naverUrl = buildNaverMapUrl(loc)
+                  const kakaoUrl = buildKakaoMapUrl(loc)
+                  if (!googleUrl && !naverUrl && !kakaoUrl) return null
+                  return (
+                    <div className="flex flex-wrap gap-1">
+                      {googleUrl && (
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => window.open(googleUrl, '_blank')}
+                        >
+                          🗺️ {t('navigateGoogle')}
+                        </Button>
+                      )}
+                      {naverUrl && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => window.open(naverUrl, '_blank')}
+                        >
+                          {t('navigateNaver')}
+                        </Button>
+                      )}
+                      {kakaoUrl && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => window.open(kakaoUrl, '_blank')}
+                        >
+                          {t('navigateKakao')}
+                        </Button>
+                      )}
+                    </div>
+                  )
+                })()}
                 {role === 'buyer' && IN_TRADE.includes(o.order_st_cd) && (
                   <Button
                     size="sm"

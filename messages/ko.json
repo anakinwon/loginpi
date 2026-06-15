@@ -1384,11 +1384,15 @@
   },
   "nav": {
     "home": "Home",
+    "event": "Event",
     "cafe": "Cafe",
     "shop": "Shop",
-    "event": "Event",
-    "my": "나의정보",
-    "admin": "관리자"
+    "map": "Map",
+    "my": "My Info",
+    "admin": "Admin",
+    "mapSubtitle": "Pi Shop 가맹점 위치를 확인하세요",
+    "mapEmpty": "등록된 매장이 없습니다",
+    "navigateGo": "출발"
   },
   "pay": {
     "approving": "승인 중…",
@@ -1681,6 +1685,9 @@
     "draftSuccess": "임시저장됐습니다",
     "cancelReasonPrompt": "취소 사유를 입력해주세요",
     "actionSellerDone": "물건 전달 완료",
+    "navigateGoogle": "구글맵으로 출발",
+    "navigateNaver": "네이버지도",
+    "navigateKakao": "카카오맵",
     "actionBuyerDone": "물건 수령 완료",
     "actionComplete": "거래 완료",
     "actionCancel": "주문 취소",

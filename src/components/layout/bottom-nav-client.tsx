@@ -1,12 +1,12 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { Coffee, House, ShieldCheck, Store, UserRound, Zap } from 'lucide-react'
+import { Coffee, House, MapPin, ShieldCheck, Store, UserRound, Zap } from 'lucide-react'
 import { Link, usePathname } from '@/i18n/navigation'
 import { usePiAuth } from '@/components/pi-auth-provider'
 import { cn } from '@/lib/utils'
 
-// 하단 고정 네비게이션 (Home · Cafe · Shop · 나의정보/관리자)
+// 하단 고정 네비게이션 (Home · Event · Cafe · Shop · Map · 나의정보/관리자)
 // 관리자 여부는 서버 판정(쿠키·Google 세션) OR Pi Browser 클라이언트 세션(role)으로 보완한다.
 // Pi Browser는 Set-Cookie를 저장하지 않아 서버 판정만으로는 관리자 탭이 안 보이기 때문.
 export function BottomNavClient({ serverIsAdmin }: { serverIsAdmin: boolean }) {
@@ -27,6 +27,12 @@ export function BottomNavClient({ serverIsAdmin }: { serverIsAdmin: boolean }) {
   const tabs = [
     { href: '/', label: t('home'), icon: House, active: pathname === '/' },
     {
+      href: '/event',
+      label: t('event'),
+      icon: Zap,
+      active: pathname.startsWith('/event'),
+    },
+    {
       href: '/chat',
       label: t('cafe'),
       icon: Coffee,
@@ -39,17 +45,17 @@ export function BottomNavClient({ serverIsAdmin }: { serverIsAdmin: boolean }) {
       active: pathname.startsWith('/store'),
     },
     {
-      href: '/event',
-      label: t('event'),
-      icon: Zap,
-      active: pathname.startsWith('/event'),
+      href: '/map',
+      label: t('map'),
+      icon: MapPin,
+      active: pathname.startsWith('/map'),
     },
     { ...myTab, active: pathname.startsWith(myTab.href) },
   ]
 
   return (
     <nav className="bg-background/95 fixed inset-x-0 bottom-0 z-50 border-t pb-[env(safe-area-inset-bottom)] backdrop-blur-sm">
-      <div className="mx-auto grid h-16 max-w-5xl grid-cols-5">
+      <div className="mx-auto grid h-16 max-w-5xl grid-cols-6">
         {tabs.map((tab) => {
           const Icon = tab.icon
           return (

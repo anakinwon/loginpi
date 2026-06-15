@@ -194,6 +194,7 @@ export async function getOrderForUser(
 }
 
 // 내 주문 목록 — role: buyer(구매) | seller(판매)
+// mps_shop 위치 필드(place_id·좌표·주소)를 포함해 클라이언트가 네비게이션 딥링크를 생성할 수 있게 한다
 export async function listOrdersByRole(
   userId: string,
   role: 'buyer' | 'seller',
@@ -201,7 +202,9 @@ export async function listOrdersByRole(
   const column = role === 'buyer' ? 'buyer_id' : 'seller_id'
   const { data, error } = await getSupabaseAdmin()
     .from('mps_order')
-    .select('*, mps_item ( item_nm, thumbnail_url )')
+    .select(
+      '*, mps_item ( item_nm, thumbnail_url, mps_shop ( shop_nm, addr, latd_crd, lngt_crd, place_id ) )',
+    )
     .eq(column, userId)
     .eq('del_yn', 'N')
     .order('reg_dtm', { ascending: false })
