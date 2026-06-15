@@ -58,8 +58,11 @@ export async function evaluateUserMissions(
 ): Promise<void> {
   const db = getSupabaseAdmin()
 
-  // 1. 활성 이벤트 조회
-  const query = db.from('evt_event').select('event_id').eq('active_yn', 'Y')
+  // 1. 활성 이벤트 조회 (start_dtm: 기간 전 행위 필터링 기준)
+  const query = db
+    .from('evt_event')
+    .select('event_id, start_dtm')
+    .eq('active_yn', 'Y')
 
   if (eventId) {
     query.eq('event_id', eventId)
@@ -94,6 +97,7 @@ export async function evaluateUserMissions(
         userId,
         event.event_id,
         mission,
+        event.start_dtm, // 이벤트 기간 전 행위 배제
       )
 
       if (isCompleted) {
@@ -169,29 +173,32 @@ async function evaluateMissionCompletion(
   userId: string,
   eventId: string,
   mission: Mission,
+  eventStartDtm: string, // 이벤트 시작 이후 행위만 유효
 ): Promise<boolean> {
   const db = getSupabaseAdmin()
 
   switch (mission.complete_type_cd) {
     case 'SINGLE': {
-      // 1개 action_cd 발생 확인
+      // 1개 action_cd 발생 확인 (이벤트 기간 내)
       const { data } = await db
         .from('evt_action_log')
         .select('evt_action_log_id')
         .eq('user_id', userId)
         .eq('action_cd', mission.required_action_cds_tx[0])
+        .gte('action_dtm', eventStartDtm)
         .limit(1)
       return !!data?.length
     }
 
     case 'MULTI_AND': {
-      // 모든 action_cd 발생 확인
+      // 모든 action_cd 발생 확인 (이벤트 기간 내)
       for (const actionCd of mission.required_action_cds_tx) {
         const { data } = await db
           .from('evt_action_log')
           .select('evt_action_log_id')
           .eq('user_id', userId)
           .eq('action_cd', actionCd)
+          .gte('action_dtm', eventStartDtm)
           .limit(1)
         if (!data?.length) return false
       }
@@ -199,13 +206,14 @@ async function evaluateMissionCompletion(
     }
 
     case 'MULTI_OR': {
-      // 1개 이상 action_cd 발생 확인 (M6)
+      // 1개 이상 action_cd 발생 확인 (M6, 이벤트 기간 내)
       for (const actionCd of mission.required_action_cds_tx) {
         const { data } = await db
           .from('evt_action_log')
           .select('evt_action_log_id')
           .eq('user_id', userId)
           .eq('action_cd', actionCd)
+          .gte('action_dtm', eventStartDtm)
           .limit(1)
         if (data?.length) return true // 1개만 발생해도 완료
       }
@@ -236,6 +244,7 @@ async function evaluateMissionCompletion(
           .select('action_dtm')
           .eq('user_id', userId)
           .eq('action_cd', 'bond_deposit')
+          .gte('action_dtm', eventStartDtm)
           .order('action_dtm', { ascending: true })
           .limit(1)
           .maybeSingle()
@@ -433,15 +442,36 @@ export async function getEventRanking(eventId: string, limit: number = 100) {
     .slice(0, limit)
 
   // 순위 계산 (정렬 순서대로 순차 부여 — 동점자도 마지막 수행 일시로 순위 구분)
-  return sorted.map(([userId, stats], i) => ({
+  const ranked = sorted.map(([userId, stats], i) => ({
     rank: i + 1,
     user_id: userId,
     mission_count: stats.count,
-    first_complete_dtm: stats.firstCompleteDtm,
-    last_complete_dtm: stats.lastCompleteDtm,
+    first_complete_dtm: stats.firstCompleteDtm as string | null,
+    last_complete_dtm: stats.lastCompleteDtm as string | null,
     nick_nm: stats.nick_nm ?? stats.display_name,
     pi_username: stats.pi_username,
   }))
+
+  // UNION ALL: 미션 완료 0개 사용자 — 제외 대상자·이미 랭킹된 사용자 제외 후 최근 가입순 하위 추가
+  const rankedUserIds = new Set(sorted.map(([userId]) => userId))
+  const { data: allUsers } = await db
+    .from('sys_user')
+    .select('id, nick_nm, display_name, pi_username, reg_dtm')
+    .order('reg_dtm', { ascending: false }) // 최근 가입순
+
+  const unranked = (allUsers ?? [])
+    .filter((u) => !rankedUserIds.has(u.id) && !excludedUserIds.has(u.id))
+    .map((u) => ({
+      rank: null as number | null,          // 순위 미표시
+      user_id: u.id,
+      mission_count: null as number | null, // 합계 미표시
+      first_complete_dtm: null as string | null,
+      last_complete_dtm: null as string | null,
+      nick_nm: (u.nick_nm as string | null) ?? (u.display_name as string | null),
+      pi_username: u.pi_username as string | null,
+    }))
+
+  return [...ranked, ...unranked]
 }
 
 /**

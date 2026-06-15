@@ -26,13 +26,13 @@ interface EventProgress {
 }
 
 interface Ranking {
-  rank: number
+  rank: number | null        // 미션 0개는 null (순위 미부여)
   user_id: string
   nick_nm: string | null
   pi_username: string | null
-  mission_count: number
-  first_complete_dtm: string
-  last_complete_dtm: string
+  mission_count: number | null // 미션 0개는 null (합계 미표시)
+  first_complete_dtm: string | null
+  last_complete_dtm: string | null
   missions: Record<string, boolean>
 }
 
@@ -391,13 +391,13 @@ export function ClientEventGate() {
                   className="hover:bg-muted/50 h-12 border-b transition-colors"
                 >
                   <td className="sticky left-0 z-10 w-9 bg-white pr-0 pl-2 font-semibold dark:bg-slate-950">
-                    {r.rank}
+                    {r.rank ?? '-'}
                   </td>
                   <td className="sticky left-9 z-10 bg-white pr-2 pl-1 dark:bg-slate-950">
                     {maskAgentName(r, isAdmin, t('noName'))}
                   </td>
                   <td className="px-2 text-center font-bold">
-                    {r.mission_count}/10
+                    {r.mission_count !== null ? `${r.mission_count}/10` : ''}
                   </td>
                   {[
                     'M1',
@@ -433,7 +433,7 @@ export function ClientEventGate() {
                       : '-'}
                   </td>
                   <td className="px-2 text-center">
-                    {r.mission_count === 10 ? (
+                    {r.mission_count === null ? null : r.mission_count === 10 ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src="https://img1.kakaocdn.net/thumb/C375x375@2x.fwebp.q82/?fname=https%3A%2F%2Fst.kakaocdn.net%2Fproduct%2Fgift%2Fproduct%2F20250203140848_135c92640a004b0682f214bd5b5a94f3.png"
