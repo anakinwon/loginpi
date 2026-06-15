@@ -60,3 +60,7 @@ next-env.d.ts
 !public/*.svg
 !public/*.ico
 package-lock.json
+
+# pptx 빌드 작업 폴더 (build.js는 커밋, 의존성·임시 unzip 폴더는 제외)
+docs/.pptx-build/node_modules/
+docs/.pptx-build/qa*/
