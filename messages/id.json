@@ -168,8 +168,8 @@
         "paymentId": "ID Pembayaran",
         "status": "Status",
         "theme": "Tema",
-        "user": "Pengguna",
-        "txnDiv": "Jenis transaksi"
+        "txnDiv": "Jenis transaksi",
+        "user": "Pengguna"
       },
       "noPayments": "Tidak ada riwayat pembayaran.",
       "status": {
@@ -179,20 +179,24 @@
         "error": "Error",
         "pending": "Tertunda"
       },
+      "theme": {
+        "subscription": "Langganan",
+        "unknown": "Lainnya"
+      },
       "title": "Riwayat Pembayaran",
       "totalCount": "Total {count} item · Total Selesai {total} π",
       "txnDiv": {
-        "PRODUCT_PAY": "Pembayaran produk",
-        "BOND_DEPOSIT": "Setoran jaminan",
-        "SUBSCRIPTION": "Langganan",
-        "ROOM_CREATE": "Buat ruang",
-        "TIP": "Tip",
         "BET": "Taruhan",
-        "ETC": "Lainnya",
-        "REFUND": "Pengembalian dana",
+        "BOND_DEPOSIT": "Setoran jaminan",
         "CANCEL_FEE": "Biaya pembatalan",
         "CANCEL_FEE_RECV": "Biaya diterima",
-        "SETTLEMENT": "Penyelesaian"
+        "ETC": "Lainnya",
+        "PRODUCT_PAY": "Pembayaran produk",
+        "REFUND": "Pengembalian dana",
+        "ROOM_CREATE": "Buat ruang",
+        "SETTLEMENT": "Penyelesaian",
+        "SUBSCRIPTION": "Langganan",
+        "TIP": "Tip"
       }
     },
     "std": {
@@ -1422,6 +1426,10 @@
   "store": {
     "actionBuyerDone": "Penerimaan Barang Selesai",
     "actionCancel": "Batalkan Pesanan",
+    "actionCancelBuyer": "Batalkan (pembeli)",
+    "actionCancelingBuyer": "⏳ Membatalkan (pembeli)...",
+    "actionCancelingSeller": "⏳ Membatalkan (penjual)...",
+    "actionCancelSeller": "Batalkan (penjual)",
     "actionClose": "Hentikan",
     "actionComplete": "Transaksi Selesai",
     "actionDelete": "Hapus",
@@ -1565,11 +1573,7 @@
     "tradingCount": "{count} item sedang berdagang",
     "viewCount": "Dilihat {count}",
     "waitingBuyerConfirm": "Menunggu konfirmasi penerimaan dari pembeli.",
-    "waitingSellerComplete": "Menunggu penjual menyelesaikan transaksi.",
-    "actionCancelBuyer": "Batalkan (pembeli)",
-    "actionCancelingBuyer": "⏳ Membatalkan (pembeli)...",
-    "actionCancelingSeller": "⏳ Membatalkan (penjual)...",
-    "actionCancelSeller": "Batalkan (penjual)"
+    "waitingSellerComplete": "Menunggu penjual menyelesaikan transaksi."
   },
   "themeToggle": {
     "dark": "Dark",

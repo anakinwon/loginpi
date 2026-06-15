@@ -168,8 +168,8 @@
         "paymentId": "מזהה תשלום",
         "status": "סטטוס",
         "theme": "Theme",
-        "user": "משתמש",
-        "txnDiv": "סוג עסקה"
+        "txnDiv": "סוג עסקה",
+        "user": "משתמש"
       },
       "noPayments": "אין היסטוריית תשלומים.",
       "status": {
@@ -179,20 +179,24 @@
         "error": "שגיאה",
         "pending": "ממתין"
       },
+      "theme": {
+        "subscription": "מינוי",
+        "unknown": "אחר"
+      },
       "title": "היסטוריית תשלומים",
       "totalCount": "סה\"כ {count} פריטים · סכום שהושלם {total} π",
       "txnDiv": {
-        "PRODUCT_PAY": "תשלום מוצר",
-        "BOND_DEPOSIT": "פיקדון ערבות",
-        "SUBSCRIPTION": "מנוי",
-        "ROOM_CREATE": "יצירת חדר",
-        "TIP": "טיפ",
         "BET": "הימור",
-        "ETC": "אחר",
-        "REFUND": "החזר",
+        "BOND_DEPOSIT": "פיקדון ערבות",
         "CANCEL_FEE": "דמי ביטול",
         "CANCEL_FEE_RECV": "עמלה התקבלה",
-        "SETTLEMENT": "סילוק"
+        "ETC": "אחר",
+        "PRODUCT_PAY": "תשלום מוצר",
+        "REFUND": "החזר",
+        "ROOM_CREATE": "יצירת חדר",
+        "SETTLEMENT": "סילוק",
+        "SUBSCRIPTION": "מנוי",
+        "TIP": "טיפ"
       }
     },
     "std": {
@@ -1422,6 +1426,10 @@
   "store": {
     "actionBuyerDone": "קבלת פריט הושלמה",
     "actionCancel": "ביטול הזמנה",
+    "actionCancelBuyer": "ביטול (קונה)",
+    "actionCancelingBuyer": "⏳ מבטל (קונה)...",
+    "actionCancelingSeller": "⏳ מבטל (מוכר)...",
+    "actionCancelSeller": "ביטול (מוכר)",
     "actionClose": "הסר פרסום",
     "actionComplete": "עסקה הושלמה",
     "actionDelete": "מחק",
@@ -1565,11 +1573,7 @@
     "tradingCount": "{count} פריטים במסחר",
     "viewCount": "צפיות {count}",
     "waitingBuyerConfirm": "ממתין לאישור קבלת הקונה.",
-    "waitingSellerComplete": "ממתין למוכר להשלים את העסקה.",
-    "actionCancelBuyer": "ביטול (קונה)",
-    "actionCancelingBuyer": "⏳ מבטל (קונה)...",
-    "actionCancelingSeller": "⏳ מבטל (מוכר)...",
-    "actionCancelSeller": "ביטול (מוכר)"
+    "waitingSellerComplete": "ממתין למוכר להשלים את העסקה."
   },
   "themeToggle": {
     "dark": "Dark",

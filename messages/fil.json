@@ -168,8 +168,8 @@
         "paymentId": "Payment ID",
         "status": "Status",
         "theme": "Tema",
-        "user": "User",
-        "txnDiv": "Uri ng transaksyon"
+        "txnDiv": "Uri ng transaksyon",
+        "user": "User"
       },
       "noPayments": "Walang Kasaysayan ng Bayad",
       "status": {
@@ -179,20 +179,24 @@
         "error": "Error",
         "pending": "Nakabinbin"
       },
+      "theme": {
+        "subscription": "Subscription",
+        "unknown": "Iba pa"
+      },
       "title": "Kasaysayan ng Bayad",
       "totalCount": "Kabuuang {count} Item · Kabuuang Kumpleto {total} π",
       "txnDiv": {
-        "PRODUCT_PAY": "Bayad sa produkto",
-        "BOND_DEPOSIT": "Deposito ng garantiya",
-        "SUBSCRIPTION": "Subscription",
-        "ROOM_CREATE": "Paggawa ng room",
-        "TIP": "Tip",
         "BET": "Taya",
-        "ETC": "Iba pa",
-        "REFUND": "Refund",
+        "BOND_DEPOSIT": "Deposito ng garantiya",
         "CANCEL_FEE": "Bayad sa pagkansela",
         "CANCEL_FEE_RECV": "Bayad na natanggap",
-        "SETTLEMENT": "Settlement"
+        "ETC": "Iba pa",
+        "PRODUCT_PAY": "Bayad sa produkto",
+        "REFUND": "Refund",
+        "ROOM_CREATE": "Paggawa ng room",
+        "SETTLEMENT": "Settlement",
+        "SUBSCRIPTION": "Subscription",
+        "TIP": "Tip"
       }
     },
     "std": {
@@ -1422,6 +1426,10 @@
   "store": {
     "actionBuyerDone": "Kumpleto na ang Resibo ng Item",
     "actionCancel": "Kanselahin ang Order",
+    "actionCancelBuyer": "Kanselahin (mamimili)",
+    "actionCancelingBuyer": "⏳ Kinakansela (mamimili)...",
+    "actionCancelingSeller": "⏳ Kinakansela (nagbebenta)...",
+    "actionCancelSeller": "Kanselahin (nagbebenta)",
     "actionClose": "Itigil",
     "actionComplete": "Kumpleto ang Transaksyon",
     "actionDelete": "Burahin",
@@ -1565,11 +1573,7 @@
     "tradingCount": "{count} Nakikipagkalakalan",
     "viewCount": "Mga View {count}",
     "waitingBuyerConfirm": "Naghihintay ng kumpirmasyon ng pagtanggap mula sa mamimili.",
-    "waitingSellerComplete": "Naghihintay ng pagproseso ng pagkumpleto ng transaksyon mula sa nagbebenta.",
-    "actionCancelBuyer": "Kanselahin (mamimili)",
-    "actionCancelingBuyer": "⏳ Kinakansela (mamimili)...",
-    "actionCancelingSeller": "⏳ Kinakansela (nagbebenta)...",
-    "actionCancelSeller": "Kanselahin (nagbebenta)"
+    "waitingSellerComplete": "Naghihintay ng pagproseso ng pagkumpleto ng transaksyon mula sa nagbebenta."
   },
   "themeToggle": {
     "dark": "Dark",

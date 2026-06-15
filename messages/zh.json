@@ -141,6 +141,9 @@
       "board": "公告板管理",
       "chatSection": "咖啡厅管理",
       "dashboard": "仪表盘",
+      "eventExclude": "排除管理",
+      "eventGifts": "发送礼物",
+      "eventSection": "Event",
       "i18n": "多语言管理",
       "i18nSection": "多语言",
       "links": "账户关联状态",
@@ -168,10 +171,11 @@
         "paymentId": "支付 ID",
         "status": "状态",
         "theme": "Theme",
-        "user": "用户",
-        "txnDiv": "交易类型"
+        "txnDiv": "交易类型",
+        "user": "用户"
       },
       "noPayments": "没有支付记录。",
+      "searchPiUsername": "搜索 Pi 用户名 (前缀匹配)",
       "status": {
         "approved": "已批准",
         "cancelled": "已取消",
@@ -179,20 +183,24 @@
         "error": "错误",
         "pending": "待处理"
       },
+      "theme": {
+        "subscription": "订阅",
+        "unknown": "其他"
+      },
       "title": "支付记录",
       "totalCount": "共 {count} 笔 · 完成总计 {total} π",
       "txnDiv": {
-        "PRODUCT_PAY": "商品支付",
-        "BOND_DEPOSIT": "保证金存入",
-        "SUBSCRIPTION": "订阅",
-        "ROOM_CREATE": "创建房间",
-        "TIP": "打赏",
         "BET": "投注",
-        "ETC": "其他",
-        "REFUND": "退款",
+        "BOND_DEPOSIT": "保证金存入",
         "CANCEL_FEE": "取消手续费",
         "CANCEL_FEE_RECV": "手续费收取",
-        "SETTLEMENT": "结算提现"
+        "ETC": "其他",
+        "PRODUCT_PAY": "商品支付",
+        "REFUND": "退款",
+        "ROOM_CREATE": "创建房间",
+        "SETTLEMENT": "结算提现",
+        "SUBSCRIPTION": "订阅",
+        "TIP": "打赏"
       }
     },
     "std": {
@@ -515,6 +523,7 @@
     "subtitle": "活跃用户 · 销售额统计 (基于每日汇总)",
     "themeDaily": "按 Theme 每日销售额",
     "themeShare": "按 Theme 销售额占比",
+    "themeTreemap": "Theme销售占比 (Treemap)",
     "top3Active": "Top 3 活跃用户 (最近 {period}天)",
     "top3Buyers": "Top 3 购买者 (最近 {period}天)",
     "top3Themes": "Top 3 Theme 销售额 (最近 {period}天)",
@@ -1167,6 +1176,83 @@
     "upgrade": "Upgrade",
     "yes": "是"
   },
+  "event": {
+    "agentCol": "特工名",
+    "alreadyExcluded": "已排除: {names}",
+    "completionTitle": "10个 Mission 完成！恭喜 🎉",
+    "excludedAgents": "已排除的特工:",
+    "excludedN": "已排除 {count}人",
+    "excludeFailed": "排除处理失败",
+    "excludePlaceholder": "输入特工名 (以 Comma 分隔)",
+    "giftAlt": "Mission 完成礼物",
+    "gradeAgent": "正式特工",
+    "gradeMaster": "Master",
+    "gradeRecruit": "特工",
+    "gradeTrainee": "实习特工",
+    "gradeVeteran": "资深特工",
+    "includeFailed": "取消排除失败",
+    "includeTitle": "重新包含在 Ranking 中",
+    "keepGoingTitle": "再加把劲！尚未完成",
+    "lastPerformedCol": "最后执行",
+    "loadError": "Data 加载失败",
+    "loginHint": "Login后将显示我的 Mission 进度和特工等级",
+    "missionListTitle": "📋 Mission 列表",
+    "missions": {
+      "M1": {
+        "desc": "Pi Browser Login + Google Login (两者都完成)",
+        "name": "账户整合"
+      },
+      "M10": {
+        "desc": "(M9后) 再次执行7·8号任务 — 在保证金激活状态下体验取消手续费",
+        "name": "保证金激活交易取消手续费"
+      },
+      "M2": {
+        "desc": "在整合账户中输入昵称 + KakaoTalk ID",
+        "name": "Profile 完善"
+      },
+      "M3": {
+        "desc": "在 PiCafe 中创建 PREMIUM Cafe + 使用自动翻译功能",
+        "name": "创建 PREMIUM Cafe (PiRC1) + 自动翻译"
+      },
+      "M4": {
+        "desc": "在 Chatting 内将 Bean 发送给1人以上",
+        "name": "Bean 发送 Test (PiRC1)"
+      },
+      "M5": {
+        "desc": "申请 Pi订阅 Service 后，在 Cafe 中创建 Pi Bet + 分配给参与者",
+        "name": "申请 Pi订阅 Service (PiRC2) 后创建并分配 Pi Bet"
+      },
+      "M6": {
+        "desc": "使用 Sticker / 发送 File / 使用语音频道中1种以上",
+        "name": "Chatting Multi 功能使用"
+      },
+      "M7": {
+        "desc": "在PiShop注册我的商品后，交易中卖家取消交易",
+        "name": "卖家取消交易(Escrow Service;PiRC3)"
+      },
+      "M8": {
+        "desc": "在PiShop购买他人商品后，买家取消交易",
+        "name": "买家取消交易(Escrow Service;PiRC3)"
+      },
+      "M9": {
+        "desc": "PiShop卖家保证金存入1Pi以上 + 同意基于位置的服务",
+        "name": "卖家保证金 + 位置同意(Escrow Service;PiRC3)"
+      }
+    },
+    "multiOrHint": "💡 Hint: 多种方法中只需完成其中一种",
+    "networkError": "Network 错误",
+    "noChange": "无更改",
+    "noName": "(无名)",
+    "notFoundAgents": "未发现: {names}",
+    "processing": "处理中…",
+    "rankCol": "排名",
+    "rankingTitle": "🏆 Mission Ranking",
+    "removeRank": "移除排名",
+    "rewardCol": "奖励",
+    "subtitle": "完成10个 Mission，🎁 领取 Kakao 礼物",
+    "title": "🎖️ Mission Event",
+    "totalCol": "总计"
+  },
   "header": {
     "admin": "管理员",
     "board": "公告板",
@@ -1291,6 +1377,7 @@
   "nav": {
     "admin": "管理员",
     "cafe": "Cafe",
+    "event": "Event",
     "home": "Home",
     "my": "我的信息",
     "shop": "Shop"
@@ -1422,6 +1509,10 @@
   "store": {
     "actionBuyerDone": "物品已收货",
     "actionCancel": "取消订单",
+    "actionCancelBuyer": "买家取消",
+    "actionCancelingBuyer": "⏳ 买家取消中...",
+    "actionCancelingSeller": "⏳ 卖家取消中...",
+    "actionCancelSeller": "卖家取消",
     "actionClose": "暂停",
     "actionComplete": "交易完成",
     "actionDelete": "删除",
@@ -1485,11 +1576,35 @@
       "qty": "销售数量",
       "saveDraft": "保存草稿",
       "saveEdit": "保存修改",
+      "shop": "所属店铺",
+      "shopNone": "无店铺",
       "thumbUrl": "代表图片 URL",
       "unlimited": "无限制",
       "unlimitedHint": "对于饮料、披萨等无需追踪库存的商品，请设置为无限制。"
     },
     "formInvalid": "请检查商品名和价格",
+    "history": {
+      "clearFilter": "清除Filter",
+      "empty": "没有交易记录",
+      "from": "开始日期",
+      "tab": {
+        "ALL": "全部",
+        "BUY": "购买",
+        "ETC": "其他",
+        "SELL": "销售"
+      },
+      "title": "交易记录",
+      "to": "结束日期",
+      "type": {
+        "BOND_DEPOSIT": "保证金存入",
+        "CANCEL_FEE_IN": "收取取消手续费",
+        "CANCEL_REFUND": "取消退款",
+        "ESCROW_IN": "购买入账",
+        "REFUND_IN": "退款入账",
+        "RELEASE_OUT": "销售结算",
+        "SETTLE_OUT": "结算出账"
+      }
+    },
     "itemNotFound": "未找到商品",
     "itemSt": {
       "CLOSED": "已暂停发布",
@@ -1508,6 +1623,7 @@
     "loginRequired": "Login 后才能使用",
     "myItemsTitle": "我的商品管理",
     "myOwnItem": "我注册的商品",
+    "navHistory": "交易记录",
     "navMyItems": "我的商品",
     "navOrders": "购买历史",
     "navSales": "销售管理",
@@ -1535,12 +1651,48 @@
     "piBrowserOnly": "只能在 Pi Browser 中支付",
     "publishSuccess": "商品已发布",
     "qtyInvalid": "数量请输入1~9998之间的数字",
+    "refund": {
+      "done": "{amount}π已退款",
+      "pending": "取消完成 — 退款将很快处理"
+    },
     "salesTitle": "销售订单管理",
     "saveFail": "处理失败",
     "saving": "保存中…",
     "scrollMore": "滚动查看更多…",
     "search": "搜索",
     "searchPlaceholder": "搜索商品名称或描述",
+    "shop": {
+      "add": "注册店铺",
+      "addr": "地址",
+      "addrHint": "线下门店地址。坐标（地图图钉）将在未来支持",
+      "addTitle": "注册新店铺",
+      "bizHour": "营业时间",
+      "bizHourPlaceholder": "例：平日 10:00–19:00",
+      "cancel": "取消",
+      "createSuccess": "店铺已注册",
+      "delete": "删除",
+      "deleteConfirm": "要删除此店铺吗？所属商品将保留，仅解除店铺关联",
+      "deleteSuccess": "店铺已删除",
+      "desc": "店铺介绍",
+      "edit": "修改",
+      "editSuccess": "店铺信息已修改",
+      "editTitle": "修改店铺",
+      "email": "Email",
+      "empty": "没有注册的店铺",
+      "intro": "注册线上·线下店铺，提高买家信任度",
+      "manage": "店铺管理",
+      "name": "店铺名称",
+      "nameRequired": "请输入店铺名称",
+      "save": "保存",
+      "sns": "SNS Link",
+      "tel": "电话",
+      "thumb": "主 Image URL",
+      "title": "店铺管理",
+      "type": "店铺类型",
+      "type_BOTH": "Online·Offline",
+      "type_OFFLINE": "Offline",
+      "type_ONLINE": "Online"
+    },
     "shopType": {
       "BOTH": "线上·线下",
       "OFFLINE": "线下门店",
@@ -1565,11 +1717,7 @@
     "tradingCount": "交易中 {count} 件",
     "viewCount": "浏览 {count}",
     "waitingBuyerConfirm": "正在等待买家确认收货",
-    "waitingSellerComplete": "正在等待卖家处理交易完成",
-    "actionCancelBuyer": "买家取消",
-    "actionCancelingBuyer": "⏳ 买家取消中...",
-    "actionCancelingSeller": "⏳ 卖家取消中...",
-    "actionCancelSeller": "卖家取消"
+    "waitingSellerComplete": "正在等待卖家处理交易完成"
   },
   "themeToggle": {
     "dark": "Dark",

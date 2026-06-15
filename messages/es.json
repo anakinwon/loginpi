@@ -168,8 +168,8 @@
         "paymentId": "ID de pago",
         "status": "Estado",
         "theme": "Tema",
-        "user": "Usuario",
-        "txnDiv": "Tipo de transacción"
+        "txnDiv": "Tipo de transacción",
+        "user": "Usuario"
       },
       "noPayments": "No hay historial de pagos.",
       "status": {
@@ -179,20 +179,24 @@
         "error": "Error",
         "pending": "Pendiente"
       },
+      "theme": {
+        "subscription": "Suscripción",
+        "unknown": "Otro"
+      },
       "title": "Historial de pagos",
       "totalCount": "Total {count} transacciones · Suma completada {total} π",
       "txnDiv": {
-        "PRODUCT_PAY": "Pago de producto",
-        "BOND_DEPOSIT": "Depósito de garantía",
-        "SUBSCRIPTION": "Suscripción",
-        "ROOM_CREATE": "Creación de sala",
-        "TIP": "Propina",
         "BET": "Apuesta",
-        "ETC": "Otro",
-        "REFUND": "Reembolso",
+        "BOND_DEPOSIT": "Depósito de garantía",
         "CANCEL_FEE": "Tarifa de cancelación",
         "CANCEL_FEE_RECV": "Tarifa recibida",
-        "SETTLEMENT": "Liquidación"
+        "ETC": "Otro",
+        "PRODUCT_PAY": "Pago de producto",
+        "REFUND": "Reembolso",
+        "ROOM_CREATE": "Creación de sala",
+        "SETTLEMENT": "Liquidación",
+        "SUBSCRIPTION": "Suscripción",
+        "TIP": "Propina"
       }
     },
     "std": {
@@ -1422,6 +1426,10 @@
   "store": {
     "actionBuyerDone": "Recepción del artículo completada",
     "actionCancel": "Cancelar pedido",
+    "actionCancelBuyer": "Cancelar (comprador)",
+    "actionCancelingBuyer": "⏳ Cancelando (comprador)...",
+    "actionCancelingSeller": "⏳ Cancelando (vendedor)...",
+    "actionCancelSeller": "Cancelar (vendedor)",
     "actionClose": "Desactivar",
     "actionComplete": "Transacción completa",
     "actionDelete": "Eliminar",
@@ -1565,11 +1573,7 @@
     "tradingCount": "{count} artículos en comercio",
     "viewCount": "Vistas {count}",
     "waitingBuyerConfirm": "Esperando la confirmación de recepción del comprador.",
-    "waitingSellerComplete": "Esperando que el vendedor procese la transacción como completada.",
-    "actionCancelBuyer": "Cancelar (comprador)",
-    "actionCancelingBuyer": "⏳ Cancelando (comprador)...",
-    "actionCancelingSeller": "⏳ Cancelando (vendedor)...",
-    "actionCancelSeller": "Cancelar (vendedor)"
+    "waitingSellerComplete": "Esperando que el vendedor procese la transacción como completada."
   },
   "themeToggle": {
     "dark": "Dark",

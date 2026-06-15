@@ -168,8 +168,8 @@
         "paymentId": "ID الدفع",
         "status": "الحالة",
         "theme": "Theme",
-        "user": "المستخدم",
-        "txnDiv": "نوع المعاملة"
+        "txnDiv": "نوع المعاملة",
+        "user": "المستخدم"
       },
       "noPayments": "لا يوجد سجل مدفوعات.",
       "status": {
@@ -179,20 +179,24 @@
         "error": "خطأ",
         "pending": "معلق"
       },
+      "theme": {
+        "subscription": "اشتراك",
+        "unknown": "أخرى"
+      },
       "title": "سجل المدفوعات",
       "totalCount": "إجمالي {count} معاملة · إجمالي المكتمل {total} π",
       "txnDiv": {
-        "PRODUCT_PAY": "دفع المنتج",
-        "BOND_DEPOSIT": "إيداع الضمان",
-        "SUBSCRIPTION": "اشتراك",
-        "ROOM_CREATE": "إنشاء غرفة",
-        "TIP": "إكرامية",
         "BET": "رهان",
-        "ETC": "أخرى",
-        "REFUND": "استرداد",
+        "BOND_DEPOSIT": "إيداع الضمان",
         "CANCEL_FEE": "رسوم الإلغاء",
         "CANCEL_FEE_RECV": "رسوم مستلمة",
-        "SETTLEMENT": "تسوية"
+        "ETC": "أخرى",
+        "PRODUCT_PAY": "دفع المنتج",
+        "REFUND": "استرداد",
+        "ROOM_CREATE": "إنشاء غرفة",
+        "SETTLEMENT": "تسوية",
+        "SUBSCRIPTION": "اشتراك",
+        "TIP": "إكرامية"
       }
     },
     "std": {
@@ -1422,6 +1426,10 @@
   "store": {
     "actionBuyerDone": "تم استلام السلعة",
     "actionCancel": "إلغاء الطلب",
+    "actionCancelBuyer": "إلغاء المشتري",
+    "actionCancelingBuyer": "⏳ جارٍ إلغاء المشتري...",
+    "actionCancelingSeller": "⏳ جارٍ إلغاء البائع...",
+    "actionCancelSeller": "إلغاء البائع",
     "actionClose": "إيقاف",
     "actionComplete": "تمت المعاملة",
     "actionDelete": "حذف",
@@ -1565,11 +1573,7 @@
     "tradingCount": "{count} سلعة قيد التداول",
     "viewCount": "المشاهدات {count}",
     "waitingBuyerConfirm": "في انتظار تأكيد استلام المشتري.",
-    "waitingSellerComplete": "في انتظار إتمام البائع للمعاملة.",
-    "actionCancelBuyer": "إلغاء المشتري",
-    "actionCancelingBuyer": "⏳ جارٍ إلغاء المشتري...",
-    "actionCancelingSeller": "⏳ جارٍ إلغاء البائع...",
-    "actionCancelSeller": "إلغاء البائع"
+    "waitingSellerComplete": "في انتظار إتمام البائع للمعاملة."
   },
   "themeToggle": {
     "dark": "Dark",

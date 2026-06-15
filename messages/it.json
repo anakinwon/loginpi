@@ -168,8 +168,8 @@
         "paymentId": "ID Pagamento",
         "status": "Stato",
         "theme": "Tema",
-        "user": "Utente",
-        "txnDiv": "Tipo di transazione"
+        "txnDiv": "Tipo di transazione",
+        "user": "Utente"
       },
       "noPayments": "Nessun storico pagamenti.",
       "status": {
@@ -179,20 +179,24 @@
         "error": "Errore",
         "pending": "In sospeso"
       },
+      "theme": {
+        "subscription": "Abbonamento",
+        "unknown": "Altro"
+      },
       "title": "Storico pagamenti",
       "totalCount": "Totale {count} transazioni · Completato {total} π",
       "txnDiv": {
-        "PRODUCT_PAY": "Pagamento prodotto",
-        "BOND_DEPOSIT": "Deposito cauzionale",
-        "SUBSCRIPTION": "Abbonamento",
-        "ROOM_CREATE": "Creazione stanza",
-        "TIP": "Mancia",
         "BET": "Scommessa",
-        "ETC": "Altro",
-        "REFUND": "Rimborso",
+        "BOND_DEPOSIT": "Deposito cauzionale",
         "CANCEL_FEE": "Commissione di annullamento",
         "CANCEL_FEE_RECV": "Commissione ricevuta",
-        "SETTLEMENT": "Liquidazione"
+        "ETC": "Altro",
+        "PRODUCT_PAY": "Pagamento prodotto",
+        "REFUND": "Rimborso",
+        "ROOM_CREATE": "Creazione stanza",
+        "SETTLEMENT": "Liquidazione",
+        "SUBSCRIPTION": "Abbonamento",
+        "TIP": "Mancia"
       }
     },
     "std": {
@@ -1422,6 +1426,10 @@
   "store": {
     "actionBuyerDone": "Ricezione articolo completata",
     "actionCancel": "Annulla ordine",
+    "actionCancelBuyer": "Annulla (acquirente)",
+    "actionCancelingBuyer": "⏳ Annullamento (acquirente)...",
+    "actionCancelingSeller": "⏳ Annullamento (venditore)...",
+    "actionCancelSeller": "Annulla (venditore)",
     "actionClose": "Sospendi",
     "actionComplete": "Transazione completata",
     "actionDelete": "Elimina",
@@ -1565,11 +1573,7 @@
     "tradingCount": "In negoziazione: {count} articoli",
     "viewCount": "Visualizzazioni {count}",
     "waitingBuyerConfirm": "In attesa della conferma di ricezione da parte dell'acquirente.",
-    "waitingSellerComplete": "In attesa dell'elaborazione del completamento della transazione da parte del venditore.",
-    "actionCancelBuyer": "Annulla (acquirente)",
-    "actionCancelingBuyer": "⏳ Annullamento (acquirente)...",
-    "actionCancelingSeller": "⏳ Annullamento (venditore)...",
-    "actionCancelSeller": "Annulla (venditore)"
+    "waitingSellerComplete": "In attesa dell'elaborazione del completamento della transazione da parte del venditore."
   },
   "themeToggle": {
     "dark": "Dark",

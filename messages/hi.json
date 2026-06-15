@@ -168,8 +168,8 @@
         "paymentId": "भुगतान ID",
         "status": "स्थिति",
         "theme": "Theme",
-        "user": "उपयोगकर्ता",
-        "txnDiv": "लेन-देन प्रकार"
+        "txnDiv": "लेन-देन प्रकार",
+        "user": "उपयोगकर्ता"
       },
       "noPayments": "कोई भुगतान इतिहास नहीं है।",
       "status": {
@@ -179,20 +179,24 @@
         "error": "त्रुटि",
         "pending": "लंबित"
       },
+      "theme": {
+        "subscription": "सदस्यता",
+        "unknown": "अन्य"
+      },
       "title": "भुगतान इतिहास",
       "totalCount": "कुल {count} आइटम · पूर्ण योग {total} π",
       "txnDiv": {
-        "PRODUCT_PAY": "उत्पाद भुगतान",
-        "BOND_DEPOSIT": "जमा राशि",
-        "SUBSCRIPTION": "सदस्यता",
-        "ROOM_CREATE": "कक्ष निर्माण",
-        "TIP": "टिप",
         "BET": "सट्टा",
-        "ETC": "अन्य",
-        "REFUND": "धनवापसी",
+        "BOND_DEPOSIT": "जमा राशि",
         "CANCEL_FEE": "रद्दीकरण शुल्क",
         "CANCEL_FEE_RECV": "शुल्क प्राप्त",
-        "SETTLEMENT": "निपटान"
+        "ETC": "अन्य",
+        "PRODUCT_PAY": "उत्पाद भुगतान",
+        "REFUND": "धनवापसी",
+        "ROOM_CREATE": "कक्ष निर्माण",
+        "SETTLEMENT": "निपटान",
+        "SUBSCRIPTION": "सदस्यता",
+        "TIP": "टिप"
       }
     },
     "std": {
@@ -1422,6 +1426,10 @@
   "store": {
     "actionBuyerDone": "सामान की प्राप्ति पूरी हुई",
     "actionCancel": "ऑर्डर रद्द करें",
+    "actionCancelBuyer": "खरीदार रद्द करें",
+    "actionCancelingBuyer": "⏳ खरीदार रद्द हो रहा है...",
+    "actionCancelingSeller": "⏳ विक्रेता रद्द हो रहा है...",
+    "actionCancelSeller": "विक्रेता रद्द करें",
     "actionClose": "बंद करें",
     "actionComplete": "लेनदेन पूरा करें",
     "actionDelete": "हटाएँ",
@@ -1565,11 +1573,7 @@
     "tradingCount": "{count} आइटम लेनदेन में",
     "viewCount": "देखे गए {count}",
     "waitingBuyerConfirm": "खरीदार की प्राप्ति की पुष्टि का इंतजार है",
-    "waitingSellerComplete": "विक्रेता द्वारा लेनदेन पूरा करने का इंतजार है",
-    "actionCancelBuyer": "खरीदार रद्द करें",
-    "actionCancelingBuyer": "⏳ खरीदार रद्द हो रहा है...",
-    "actionCancelingSeller": "⏳ विक्रेता रद्द हो रहा है...",
-    "actionCancelSeller": "विक्रेता रद्द करें"
+    "waitingSellerComplete": "विक्रेता द्वारा लेनदेन पूरा करने का इंतजार है"
   },
   "themeToggle": {
     "dark": "Dark",

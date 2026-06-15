@@ -168,8 +168,8 @@
         "paymentId": "Zahlungs-ID",
         "status": "Status",
         "theme": "Thema",
-        "user": "Benutzer",
-        "txnDiv": "Transaktionstyp"
+        "txnDiv": "Transaktionstyp",
+        "user": "Benutzer"
       },
       "noPayments": "Keine Zahlungen vorhanden.",
       "status": {
@@ -179,20 +179,24 @@
         "error": "Fehler",
         "pending": "Ausstehend"
       },
+      "theme": {
+        "subscription": "Abonnement",
+        "unknown": "Sonstiges"
+      },
       "title": "Zahlungsverlauf",
       "totalCount": "Insgesamt {count} Transaktionen · Gesamtabschluss {total} π",
       "txnDiv": {
-        "PRODUCT_PAY": "Produktzahlung",
-        "BOND_DEPOSIT": "Kaution",
-        "SUBSCRIPTION": "Abonnement",
-        "ROOM_CREATE": "Raumerstellung",
-        "TIP": "Trinkgeld",
         "BET": "Wette",
-        "ETC": "Sonstige",
-        "REFUND": "Rückerstattung",
+        "BOND_DEPOSIT": "Kaution",
         "CANCEL_FEE": "Stornogebühr",
         "CANCEL_FEE_RECV": "Gebühr erhalten",
-        "SETTLEMENT": "Abrechnung"
+        "ETC": "Sonstige",
+        "PRODUCT_PAY": "Produktzahlung",
+        "REFUND": "Rückerstattung",
+        "ROOM_CREATE": "Raumerstellung",
+        "SETTLEMENT": "Abrechnung",
+        "SUBSCRIPTION": "Abonnement",
+        "TIP": "Trinkgeld"
       }
     },
     "std": {
@@ -1422,6 +1426,10 @@
   "store": {
     "actionBuyerDone": "Artikel erhalten",
     "actionCancel": "Bestellung stornieren",
+    "actionCancelBuyer": "Käufer storniert",
+    "actionCancelingBuyer": "⏳ Käufer storniert...",
+    "actionCancelingSeller": "⏳ Verkäufer storniert...",
+    "actionCancelSeller": "Verkäufer storniert",
     "actionClose": "Beenden",
     "actionComplete": "Transaktion abgeschlossen",
     "actionDelete": "Löschen",
@@ -1565,11 +1573,7 @@
     "tradingCount": "{count} Artikel im Handel",
     "viewCount": "Aufrufe {count}",
     "waitingBuyerConfirm": "Warten auf die Empfangsbestätigung des Käufers.",
-    "waitingSellerComplete": "Warten auf die Transaktionsabschlussverarbeitung des Verkäufers.",
-    "actionCancelBuyer": "Käufer storniert",
-    "actionCancelingBuyer": "⏳ Käufer storniert...",
-    "actionCancelingSeller": "⏳ Verkäufer storniert...",
-    "actionCancelSeller": "Verkäufer storniert"
+    "waitingSellerComplete": "Warten auf die Transaktionsabschlussverarbeitung des Verkäufers."
   },
   "themeToggle": {
     "dark": "Dunkel",

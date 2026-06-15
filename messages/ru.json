@@ -168,8 +168,8 @@
         "paymentId": "ID платежа",
         "status": "Статус",
         "theme": "Тема",
-        "user": "Пользователь",
-        "txnDiv": "Тип транзакции"
+        "txnDiv": "Тип транзакции",
+        "user": "Пользователь"
       },
       "noPayments": "Истории платежей нет.",
       "status": {
@@ -179,20 +179,24 @@
         "error": "Ошибка",
         "pending": "В ожидании"
       },
+      "theme": {
+        "subscription": "Подписка",
+        "unknown": "Прочее"
+      },
       "title": "История платежей",
       "totalCount": "Всего {count} записей · Общая сумма завершенных {total} π",
       "txnDiv": {
-        "PRODUCT_PAY": "Оплата товара",
-        "BOND_DEPOSIT": "Залог",
-        "SUBSCRIPTION": "Подписка",
-        "ROOM_CREATE": "Создание комнаты",
-        "TIP": "Чаевые",
         "BET": "Ставка",
-        "ETC": "Прочее",
-        "REFUND": "Возврат",
+        "BOND_DEPOSIT": "Залог",
         "CANCEL_FEE": "Комиссия за отмену",
         "CANCEL_FEE_RECV": "Комиссия получена",
-        "SETTLEMENT": "Расчёт"
+        "ETC": "Прочее",
+        "PRODUCT_PAY": "Оплата товара",
+        "REFUND": "Возврат",
+        "ROOM_CREATE": "Создание комнаты",
+        "SETTLEMENT": "Расчёт",
+        "SUBSCRIPTION": "Подписка",
+        "TIP": "Чаевые"
       }
     },
     "std": {
@@ -1422,6 +1426,10 @@
   "store": {
     "actionBuyerDone": "Товар получен",
     "actionCancel": "Отмена заказа",
+    "actionCancelBuyer": "Отмена (покупатель)",
+    "actionCancelingBuyer": "⏳ Отмена (покупатель)...",
+    "actionCancelingSeller": "⏳ Отмена (продавец)...",
+    "actionCancelSeller": "Отмена (продавец)",
     "actionClose": "Приостановить",
     "actionComplete": "Сделка завершена",
     "actionDelete": "Удалить",
@@ -1565,11 +1573,7 @@
     "tradingCount": "В процессе торговли: {count}",
     "viewCount": "Просмотров {count}",
     "waitingBuyerConfirm": "Ожидается подтверждение получения от покупателя",
-    "waitingSellerComplete": "Ожидается завершение сделки продавцом",
-    "actionCancelBuyer": "Отмена (покупатель)",
-    "actionCancelingBuyer": "⏳ Отмена (покупатель)...",
-    "actionCancelingSeller": "⏳ Отмена (продавец)...",
-    "actionCancelSeller": "Отмена (продавец)"
+    "waitingSellerComplete": "Ожидается завершение сделки продавцом"
   },
   "themeToggle": {
     "dark": "Dark",

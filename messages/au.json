@@ -168,8 +168,8 @@
         "paymentId": "Payment ID",
         "status": "Status",
         "theme": "Theme",
-        "user": "User",
-        "txnDiv": "Transaction type"
+        "txnDiv": "Transaction type",
+        "user": "User"
       },
       "noPayments": "No payment history found.",
       "status": {
@@ -179,20 +179,24 @@
         "error": "Error",
         "pending": "Pending"
       },
+      "theme": {
+        "subscription": "Subscription",
+        "unknown": "Other"
+      },
       "title": "Payment History",
       "totalCount": "Total {count} transactions · Completed total {total} π",
       "txnDiv": {
-        "PRODUCT_PAY": "Product payment",
-        "BOND_DEPOSIT": "Bond deposit",
-        "SUBSCRIPTION": "Subscription",
-        "ROOM_CREATE": "Room creation",
-        "TIP": "Tip",
         "BET": "Bet",
-        "ETC": "Other",
-        "REFUND": "Refund",
+        "BOND_DEPOSIT": "Bond deposit",
         "CANCEL_FEE": "Cancellation fee",
         "CANCEL_FEE_RECV": "Fee received",
-        "SETTLEMENT": "Settlement"
+        "ETC": "Other",
+        "PRODUCT_PAY": "Product payment",
+        "REFUND": "Refund",
+        "ROOM_CREATE": "Room creation",
+        "SETTLEMENT": "Settlement",
+        "SUBSCRIPTION": "Subscription",
+        "TIP": "Tip"
       }
     },
     "std": {
@@ -1422,6 +1426,10 @@
   "store": {
     "actionBuyerDone": "Mark as Received",
     "actionCancel": "Order Cancelled",
+    "actionCancelBuyer": "Cancel order",
+    "actionCancelingBuyer": "⏳ Cancelling order...",
+    "actionCancelingSeller": "⏳ Cancelling order...",
+    "actionCancelSeller": "Cancel order",
     "actionClose": "Close",
     "actionComplete": "Transaction Complete",
     "actionDelete": "Delete",
@@ -1565,11 +1573,7 @@
     "tradingCount": "{count} items trading",
     "viewCount": "Views {count}",
     "waitingBuyerConfirm": "Waiting for buyer's receipt confirmation.",
-    "waitingSellerComplete": "Waiting for seller to complete the transaction.",
-    "actionCancelBuyer": "Cancel order",
-    "actionCancelingBuyer": "⏳ Cancelling order...",
-    "actionCancelingSeller": "⏳ Cancelling order...",
-    "actionCancelSeller": "Cancel order"
+    "waitingSellerComplete": "Waiting for seller to complete the transaction."
   },
   "themeToggle": {
     "dark": "Dark",

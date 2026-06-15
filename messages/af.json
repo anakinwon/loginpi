@@ -168,8 +168,8 @@
         "paymentId": "Betaling ID",
         "status": "Status",
         "theme": "Tema",
-        "user": "Gebruiker",
-        "txnDiv": "Transaksietipe"
+        "txnDiv": "Transaksietipe",
+        "user": "Gebruiker"
       },
       "noPayments": "Geen betalingsgeskiedenis nie.",
       "status": {
@@ -179,20 +179,24 @@
         "error": "Fout",
         "pending": "Hangende"
       },
+      "theme": {
+        "subscription": "Subskripsie",
+        "unknown": "Ander"
+      },
       "title": "Betalingsgeskiedenis",
       "totalCount": "Totaal {count} items · Voltooide totaal {total} π",
       "txnDiv": {
-        "PRODUCT_PAY": "Produkbetaling",
-        "BOND_DEPOSIT": "Borgdeposito",
-        "SUBSCRIPTION": "Intekening",
-        "ROOM_CREATE": "Kamerskepping",
-        "TIP": "Fooi",
         "BET": "Weddenskap",
-        "ETC": "Ander",
-        "REFUND": "Terugbetaling",
+        "BOND_DEPOSIT": "Borgdeposito",
         "CANCEL_FEE": "Kansellasiefooi",
         "CANCEL_FEE_RECV": "Fooi ontvang",
-        "SETTLEMENT": "Vereffening"
+        "ETC": "Ander",
+        "PRODUCT_PAY": "Produkbetaling",
+        "REFUND": "Terugbetaling",
+        "ROOM_CREATE": "Kamerskepping",
+        "SETTLEMENT": "Vereffening",
+        "SUBSCRIPTION": "Intekening",
+        "TIP": "Fooi"
       }
     },
     "std": {
@@ -1422,6 +1426,10 @@
   "store": {
     "actionBuyerDone": "Item ontvangs voltooi",
     "actionCancel": "Kanselleer bestelling",
+    "actionCancelBuyer": "Koper kanselleer",
+    "actionCancelingBuyer": "⏳ Koper kanselleer tans...",
+    "actionCancelingSeller": "⏳ Verkoper kanselleer tans...",
+    "actionCancelSeller": "Verkoper kanselleer",
     "actionClose": "Deaktiveer",
     "actionComplete": "Transaksie voltooi",
     "actionDelete": "Vee uit",
@@ -1565,11 +1573,7 @@
     "tradingCount": "{count} items word verhandel",
     "viewCount": "Besigtigings {count}",
     "waitingBuyerConfirm": "Wag vir koper se ontvangsbevestiging",
-    "waitingSellerComplete": "Wag vir verkoper om transaksie te voltooi",
-    "actionCancelBuyer": "Koper kanselleer",
-    "actionCancelingBuyer": "⏳ Koper kanselleer tans...",
-    "actionCancelingSeller": "⏳ Verkoper kanselleer tans...",
-    "actionCancelSeller": "Verkoper kanselleer"
+    "waitingSellerComplete": "Wag vir verkoper om transaksie te voltooi"
   },
   "themeToggle": {
     "dark": "Dark",

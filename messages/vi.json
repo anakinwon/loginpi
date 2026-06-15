@@ -168,8 +168,8 @@
         "paymentId": "ID thanh toán",
         "status": "Trạng thái",
         "theme": "Theme",
-        "user": "Người dùng",
-        "txnDiv": "Loại giao dịch"
+        "txnDiv": "Loại giao dịch",
+        "user": "Người dùng"
       },
       "noPayments": "Không có lịch sử thanh toán.",
       "status": {
@@ -179,20 +179,24 @@
         "error": "Lỗi",
         "pending": "Đang chờ"
       },
+      "theme": {
+        "subscription": "Đăng ký",
+        "unknown": "Khác"
+      },
       "title": "Lịch sử thanh toán",
       "totalCount": "Tổng cộng {count} giao dịch · Tổng số đã hoàn thành {total} π",
       "txnDiv": {
-        "PRODUCT_PAY": "Thanh toán sản phẩm",
-        "BOND_DEPOSIT": "Đặt cọc bảo đảm",
-        "SUBSCRIPTION": "Đăng ký",
-        "ROOM_CREATE": "Tạo phòng",
-        "TIP": "Tiền boa",
         "BET": "Đặt cược",
-        "ETC": "Khác",
-        "REFUND": "Hoàn tiền",
+        "BOND_DEPOSIT": "Đặt cọc bảo đảm",
         "CANCEL_FEE": "Phí hủy",
         "CANCEL_FEE_RECV": "Phí nhận được",
-        "SETTLEMENT": "Quyết toán"
+        "ETC": "Khác",
+        "PRODUCT_PAY": "Thanh toán sản phẩm",
+        "REFUND": "Hoàn tiền",
+        "ROOM_CREATE": "Tạo phòng",
+        "SETTLEMENT": "Quyết toán",
+        "SUBSCRIPTION": "Đăng ký",
+        "TIP": "Tiền boa"
       }
     },
     "std": {
@@ -1422,6 +1426,10 @@
   "store": {
     "actionBuyerDone": "Đã nhận hàng",
     "actionCancel": "Hủy đơn hàng",
+    "actionCancelBuyer": "Hủy (người mua)",
+    "actionCancelingBuyer": "⏳ Đang hủy (người mua)...",
+    "actionCancelingSeller": "⏳ Đang hủy (người bán)...",
+    "actionCancelSeller": "Hủy (người bán)",
     "actionClose": "Ngừng",
     "actionComplete": "Giao dịch hoàn tất",
     "actionDelete": "Xóa",
@@ -1565,11 +1573,7 @@
     "tradingCount": "{count} giao dịch đang diễn ra",
     "viewCount": "Lượt xem {count}",
     "waitingBuyerConfirm": "Đang chờ người mua xác nhận nhận hàng",
-    "waitingSellerComplete": "Đang chờ người bán xử lý hoàn tất giao dịch",
-    "actionCancelBuyer": "Hủy (người mua)",
-    "actionCancelingBuyer": "⏳ Đang hủy (người mua)...",
-    "actionCancelingSeller": "⏳ Đang hủy (người bán)...",
-    "actionCancelSeller": "Hủy (người bán)"
+    "waitingSellerComplete": "Đang chờ người bán xử lý hoàn tất giao dịch"
   },
   "themeToggle": {
     "dark": "Dark",

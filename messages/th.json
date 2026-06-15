@@ -168,8 +168,8 @@
         "paymentId": "Payment ID",
         "status": "สถานะ",
         "theme": "Theme",
-        "user": "ผู้ใช้",
-        "txnDiv": "ประเภทธุรกรรม"
+        "txnDiv": "ประเภทธุรกรรม",
+        "user": "ผู้ใช้"
       },
       "noPayments": "ไม่มีประวัติการชำระเงิน",
       "status": {
@@ -179,20 +179,24 @@
         "error": "ข้อผิดพลาด",
         "pending": "รอดำเนินการ"
       },
+      "theme": {
+        "subscription": "การสมัครสมาชิก",
+        "unknown": "อื่น ๆ"
+      },
       "title": "ประวัติการชำระเงิน",
       "totalCount": "ทั้งหมด {count} รายการ · ยอดรวมที่เสร็จสมบูรณ์ {total} π",
       "txnDiv": {
-        "PRODUCT_PAY": "ชำระค่าสินค้า",
-        "BOND_DEPOSIT": "เงินมัดจำ",
-        "SUBSCRIPTION": "สมัครสมาชิก",
-        "ROOM_CREATE": "สร้างห้อง",
-        "TIP": "ทิป",
         "BET": "เดิมพัน",
-        "ETC": "อื่นๆ",
-        "REFUND": "คืนเงิน",
+        "BOND_DEPOSIT": "เงินมัดจำ",
         "CANCEL_FEE": "ค่าธรรมเนียมยกเลิก",
         "CANCEL_FEE_RECV": "รับค่าธรรมเนียม",
-        "SETTLEMENT": "ชำระบัญชี"
+        "ETC": "อื่นๆ",
+        "PRODUCT_PAY": "ชำระค่าสินค้า",
+        "REFUND": "คืนเงิน",
+        "ROOM_CREATE": "สร้างห้อง",
+        "SETTLEMENT": "ชำระบัญชี",
+        "SUBSCRIPTION": "สมัครสมาชิก",
+        "TIP": "ทิป"
       }
     },
     "std": {
@@ -1422,6 +1426,10 @@
   "store": {
     "actionBuyerDone": "ผู้ซื้อรับสินค้าแล้ว",
     "actionCancel": "ยกเลิกคำสั่งซื้อ",
+    "actionCancelBuyer": "ยกเลิก (ผู้ซื้อ)",
+    "actionCancelingBuyer": "⏳ กำลังยกเลิก (ผู้ซื้อ)...",
+    "actionCancelingSeller": "⏳ กำลังยกเลิก (ผู้ขาย)...",
+    "actionCancelSeller": "ยกเลิก (ผู้ขาย)",
     "actionClose": "ระงับ",
     "actionComplete": "ทำรายการเสร็จสมบูรณ์",
     "actionDelete": "ลบ",
@@ -1565,11 +1573,7 @@
     "tradingCount": "กำลังซื้อขาย {count} รายการ",
     "viewCount": "การดู {count}",
     "waitingBuyerConfirm": "กำลังรอการยืนยันการรับสินค้าจากผู้ซื้อ",
-    "waitingSellerComplete": "กำลังรอผู้ขายดำเนินการเสร็จสิ้นการทำรายการ",
-    "actionCancelBuyer": "ยกเลิก (ผู้ซื้อ)",
-    "actionCancelingBuyer": "⏳ กำลังยกเลิก (ผู้ซื้อ)...",
-    "actionCancelingSeller": "⏳ กำลังยกเลิก (ผู้ขาย)...",
-    "actionCancelSeller": "ยกเลิก (ผู้ขาย)"
+    "waitingSellerComplete": "กำลังรอผู้ขายดำเนินการเสร็จสิ้นการทำรายการ"
   },
   "themeToggle": {
     "dark": "Dark",
