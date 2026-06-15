@@ -271,6 +271,8 @@ async function evaluateMissionCompletion(
 
     case 'SEQUENCE': {
       // 선행 미션 완료 후 조건 확인 (M10)
+      // 참고: M10 required_action_cds_tx=['cancel_with_fee']는 DB 메타데이터 전용.
+      // 이 action_cd는 evt_action_log에 기록되지 않으며, 평가는 checkCancelWithFee()로 직접 수행.
       if (!mission.sequence_prior_mission_cd) return false
 
       const { data: priorMission, error } = await db
