@@ -9,6 +9,7 @@ import {
   decideMicStateOnJoin,
   openCallSessionIfFirst,
 } from '@/lib/voice'
+import { recordUserAction } from '@/lib/event'
 
 type Params = { params: Promise<{ roomId: string }> }
 
@@ -86,6 +87,11 @@ export async function POST(_req: Request, { params }: Params) {
       participants: updated,
     })
   }
+
+  // M6: 음성채널 입장 미션 기록 (현행 N:N 입장 경로).
+  // 레거시 1:1 call route에만 있던 voice_join을 본 경로에도 심어, 음성채널만 이용한
+  // 사용자가 M6(voice_join/file_send/sticker_use 중 1개)에서 누락되지 않게 한다.
+  recordUserAction('voice_join', user.id, { roomId })
 
   return NextResponse.json({
     mic_yn: micState === 'CONNECTED' ? 'Y' : 'N',
