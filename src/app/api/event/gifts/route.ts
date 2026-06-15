@@ -45,7 +45,7 @@ export async function PATCH(request: NextRequest) {
     const now = new Date().toISOString()
     const slug = user.display_name.slice(0, 20)
 
-    // UPSERT: user_id별로 고유, 발송 상태 업데이트
+    // UPSERT: (event_id, user_id) 복합 unique constraint 기준
     const { data, error } = await db
       .from('evt_gift_log')
       .upsert(
@@ -59,7 +59,7 @@ export async function PATCH(request: NextRequest) {
           modr_id: slug,
           mod_dtm: now,
         },
-        { onConflict: 'user_id' },
+        { onConflict: 'event_id,user_id' },
       )
       .select()
       .maybeSingle()
