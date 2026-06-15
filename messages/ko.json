@@ -475,6 +475,9 @@
     }
   },
   "adminI18n": {
+    "autoAll": "전체 자동 번역",
+    "autoNoPending": "번역할 미완료 언어가 없습니다",
+    "autoStop": "중단",
     "activeLangs": "활성 언어",
     "inactiveCountries": "비활성 국가",
     "allCountriesInactive": "전체 국가 (비활성)",

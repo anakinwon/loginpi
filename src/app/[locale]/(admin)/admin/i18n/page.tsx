@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -67,6 +67,13 @@ export default function I18nPage() {
   const [translating, setTranslating] = useState<string | null>(null)
   const [syncing, setSyncing] = useState<string | null>(null)
   const [toggling, setToggling] = useState<string | null>(null)
+  // 전체 자동 번역(순차) 상태 + 중단 플래그
+  const [autoRunning, setAutoRunning] = useState(false)
+  const [autoProgress, setAutoProgress] = useState<{
+    current: number
+    total: number
+  } | null>(null)
+  const autoAbortRef = useRef(false)
   // 낙관적 업데이트: API 성공 즉시 비활성 목록에서 제거할 country_cd 집합
   const [activatedCountryCds, setActivatedCountryCds] = useState<Set<string>>(
     new Set(),
@@ -170,6 +177,46 @@ export default function I18nPage() {
       setTranslating(null)
       setSyncing(null)
     }
+  }
+
+  // ── 전체 자동 번역 (미완료 locale 순차 처리) ─────────
+  // 한 번 클릭으로 미완료 언어를 처음부터 끝까지 자동 순차 처리.
+  // translateAndSync는 내부에서 에러를 toast로 처리하고 throw하지 않으므로,
+  // 한 언어가 실패해도 루프가 멈추지 않고 다음 언어로 계속 진행한다.
+  async function translateAndSyncAll() {
+    // 시작 시점 스냅샷으로 대상 고정 (진행 중 stats 갱신과 무관)
+    const targets = (stats?.locales ?? []).filter(
+      (l) => l.locale_cd !== 'ko' && l.pct < 100,
+    )
+    if (targets.length === 0) {
+      toast.info(ta('autoNoPending'))
+      return
+    }
+    autoAbortRef.current = false
+    setAutoRunning(true)
+    let done = 0
+    try {
+      for (let i = 0; i < targets.length; i++) {
+        if (autoAbortRef.current) break
+        setAutoProgress({ current: i + 1, total: targets.length })
+        await translateAndSync(targets[i].locale_cd)
+        done++
+      }
+      if (autoAbortRef.current) {
+        toast.info(ta('autoStopped', { done, total: targets.length }))
+      } else {
+        toast.success(ta('autoDone', { count: done }))
+      }
+    } finally {
+      setAutoRunning(false)
+      setAutoProgress(null)
+      autoAbortRef.current = false
+    }
+  }
+
+  // 진행 중 중단 요청 (현재 처리 중인 언어는 끝낸 뒤 멈춤)
+  function stopAuto() {
+    autoAbortRef.current = true
   }
 
   // ── 전체 동기화 ────────────────────────────────────
@@ -297,10 +344,33 @@ export default function I18nPage() {
               <span className="text-muted-foreground text-xs">USDT</span>
             </div>
           )}
+          {autoRunning ? (
+            <>
+              {autoProgress && (
+                <span className="text-muted-foreground text-xs tabular-nums">
+                  {ta('autoProgress', {
+                    current: autoProgress.current,
+                    total: autoProgress.total,
+                  })}
+                </span>
+              )}
+              <Button variant="destructive" size="sm" onClick={stopAuto}>
+                {ta('autoStop')}
+              </Button>
+            </>
+          ) : (
+            <Button
+              size="sm"
+              disabled={!!translating || !!syncing}
+              onClick={translateAndSyncAll}
+            >
+              {ta('autoAll')}
+            </Button>
+          )}
           <Button
             variant="outline"
             size="sm"
-            disabled={syncing === 'all'}
+            disabled={syncing === 'all' || autoRunning}
             onClick={syncAll}
           >
             {syncing === 'all' ? t('syncing') : t('syncAll')}
@@ -489,7 +559,10 @@ export default function I18nPage() {
                           variant="outline"
                           className="h-7 text-xs"
                           disabled={
-                            !!translating || !!syncing || loc.pct === 100
+                            !!translating ||
+                            !!syncing ||
+                            autoRunning ||
+                            loc.pct === 100
                           }
                           onClick={() => translateAndSync(loc.locale_cd)}
                         >
