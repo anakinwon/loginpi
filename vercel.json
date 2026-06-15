@@ -6,7 +6,7 @@
     },
     {
       "path": "/api/cron/event-reeval",
-      "schedule": "0 * * * *"
+      "schedule": "*/5 * * * *"
     }
   ]
 }
