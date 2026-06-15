@@ -1212,15 +1212,15 @@
       },
       "M3": {
         "desc": "Create PREMIUM Cafe in PiCafe + Use auto-translation feature",
-        "name": "Create PREMIUM Cafe + Auto-translation(PiRC1)"
+        "name": "Create PREMIUM Cafe (PiRC1) + Auto-translation"
       },
       "M4": {
-        "desc": "Subscribe to Pi subscription service, then create a Pi Bet in Cafe and distribute to participants",
-        "name": "Apply Pi Subscription, then Create & Distribute Pi Bet (PiRC2)"
+        "desc": "Transfer Bean to 1 or more people in chat",
+        "name": "Bean Transfer Test (PiRC1)"
       },
       "M5": {
-        "desc": "Transfer Bean to 1 or more people in chat",
-        "name": "Bean Transfer Test"
+        "desc": "Subscribe to Pi subscription service, then create a Pi Bet in Cafe and distribute to participants",
+        "name": "Apply Pi Subscription (PiRC2), then Create & Distribute Pi Bet"
       },
       "M6": {
         "desc": "Use stickers / Send files / Use voice channel (1 or more)",
@@ -1228,15 +1228,15 @@
       },
       "M7": {
         "desc": "Register my product on PiShop, then cancel seller transaction during trade",
-        "name": "Seller Transaction Cancellation(PiRC3)"
+        "name": "Seller Transaction Cancellation (Escrow Service; PiRC3)"
       },
       "M8": {
         "desc": "Buyer transaction cancellation after purchasing another person's product in PiShop",
-        "name": "Buyer Transaction Cancellation(PiRC3)"
+        "name": "Buyer Transaction Cancellation (Escrow Service; PiRC3)"
       },
       "M9": {
         "desc": "Deposit 1Pi or more as PiShop Seller Deposit + Consent to location-based services",
-        "name": "Seller Deposit + Location Consent"
+        "name": "Seller Deposit + Location Consent (Escrow Service; PiRC3)"
       }
     },
     "multiOrHint": "💡 Hint: You only need to complete one of several methods",

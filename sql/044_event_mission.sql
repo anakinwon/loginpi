@@ -205,24 +205,24 @@ INSERT INTO evt_mission (
   'MULTI_AND', '["premium_cafe_create","cafe_translate_use"]'::jsonb, 3
 ) ON CONFLICT (event_id, mission_cd) DO UPDATE SET modr_id='ADMIN', mod_dtm=CURRENT_TIMESTAMP;
 
--- M4: Pi Bet 생성 + 분배
+-- M4: Bean 전송 (M5와 순서 교환됨 — 2026-06-15)
 INSERT INTO evt_mission (
   event_id, mission_cd, mission_nm, skill_desc,
   complete_type_cd, required_action_cds_tx, mission_ord
 ) VALUES (
-  'evt-20260614-001', 'M4', 'Pi Bet 생성 후 분배',
-  '예측 게임 주관',
-  'MULTI_AND', '["pibet_create","pibet_entry"]'::jsonb, 4
+  'evt-20260614-001', 'M4', 'Bean 전송 테스트(PiRC1)',
+  '보상 전달 기술',
+  'SINGLE', '["bean_send"]'::jsonb, 4
 ) ON CONFLICT (event_id, mission_cd) DO UPDATE SET modr_id='ADMIN', mod_dtm=CURRENT_TIMESTAMP;
 
--- M5: Bean 전송
+-- M5: Pi Bet 생성 + 분배 (M4와 순서 교환됨 — 2026-06-15)
 INSERT INTO evt_mission (
   event_id, mission_cd, mission_nm, skill_desc,
   complete_type_cd, required_action_cds_tx, mission_ord
 ) VALUES (
-  'evt-20260614-001', 'M5', 'Bean 전송 테스트',
-  '보상 전달 기술',
-  'SINGLE', '["bean_send"]'::jsonb, 5
+  'evt-20260614-001', 'M5', 'Pi Bet 생성 후 분배',
+  '예측 게임 주관',
+  'MULTI_AND', '["pibet_create","pibet_entry"]'::jsonb, 5
 ) ON CONFLICT (event_id, mission_cd) DO UPDATE SET modr_id='ADMIN', mod_dtm=CURRENT_TIMESTAMP;
 
 -- M6: 채팅 멀티 기능 (3종 중 1개)
