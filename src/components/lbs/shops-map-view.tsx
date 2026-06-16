@@ -149,11 +149,11 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey, bizCategory, rad
           if (shopId) markerMapRef.current.set(shopId, { marker, content: infoContent, position })
         }
 
-        // 길찾기 버튼: Google Maps(글로벌) + 카카오맵(국내 도보·자전거 지원)
-        // 한국 정부 지도 반출 금지로 Google Maps 도보·자전거 경로 미지원 → 카카오맵 병행
+        // 길찾기 버튼: Google Maps(글로벌) + 카카오맵 + 네이버지도(국내)
+        // 한국 정부 지도 반출 금지로 Google Maps 도보·자전거 경로 미지원 → 카카오/네이버 병행
         const buildNavLinks = (lat: number, lng: number, name: string) => {
           const wrap = document.createElement('div')
-          wrap.style.cssText = 'margin-top:8px;display:flex;flex-direction:column;gap:6px'
+          wrap.style.cssText = 'margin-top:8px;display:flex;flex-direction:column;gap:6px;max-height:180px;overflow-y:auto'
 
           // ── Google Maps (글로벌) ──
           const gLabel = document.createElement('p')
@@ -180,19 +180,33 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey, bizCategory, rad
           }
           wrap.appendChild(gRow)
 
-          // ── 카카오맵 (국내 도보·자전거 완전 지원) ──
-          const kLabel = document.createElement('p')
-          kLabel.style.cssText = 'font-size:11px;color:#6b7280;margin:0'
-          kLabel.textContent = '🗺️ 카카오맵 (국내 도보·자전거 추천)'
-          wrap.appendChild(kLabel)
+          // ── 카카오맵 + 네이버지도 (국내 도보·자전거 완전 지원) ──
+          const knLabel = document.createElement('p')
+          knLabel.style.cssText = 'font-size:11px;color:#6b7280;margin:0'
+          knLabel.textContent = '🇰🇷 국내 지도 (도보·자전거 지원)'
+          wrap.appendChild(knLabel)
+
+          const knRow = document.createElement('div')
+          knRow.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap'
 
           const kBtn = document.createElement('a')
           kBtn.href = `https://map.kakao.com/link/to/${encodeURIComponent(name)},${lat},${lng}`
           kBtn.target = '_blank'
           kBtn.rel = 'noopener noreferrer'
-          kBtn.textContent = '🚀 카카오맵 길찾기'
-          kBtn.style.cssText = 'display:inline-block;padding:3px 10px;font-size:11px;border-radius:4px;background:#FEE500;color:#3C1E1E;text-decoration:none;font-weight:600;border:none'
-          wrap.appendChild(kBtn)
+          kBtn.textContent = '카카오맵'
+          kBtn.style.cssText = 'display:inline-block;padding:4px 12px;font-size:11px;border-radius:4px;background:#FEE500;color:#3C1E1E;text-decoration:none;font-weight:600'
+          knRow.appendChild(kBtn)
+
+          // 네이버지도: 경도(lng),위도(lat),이름 순서 (GeoJSON x,y 컨벤션)
+          const nBtn = document.createElement('a')
+          nBtn.href = `https://map.naver.com/v5/directions/-/${lng},${lat},${encodeURIComponent(name)}//car`
+          nBtn.target = '_blank'
+          nBtn.rel = 'noopener noreferrer'
+          nBtn.textContent = '네이버지도'
+          nBtn.style.cssText = 'display:inline-block;padding:4px 12px;font-size:11px;border-radius:4px;background:#03C75A;color:#ffffff;text-decoration:none;font-weight:600'
+          knRow.appendChild(nBtn)
+
+          wrap.appendChild(knRow)
 
           return wrap
         }
