@@ -3,6 +3,7 @@ import { getSessionUser } from '@/lib/auth-check'
 import { getChatPlan } from '@/lib/chat-auth'
 import { createEventRoom } from '@/lib/chat'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { recordUserAction } from '@/lib/event'
 
 // POST /api/chat/rooms/event — 이벤트 카페 생성 (Business 플랜 전용)
 // 참가자는 entry_fee_pi 결제 후 payments/complete에서 GUEST 입장 처리
@@ -79,6 +80,13 @@ export async function POST(request: NextRequest) {
       entry_fee_pi: typeof entry_fee_pi === 'number' ? entry_fee_pi : 0,
       entry_expire_dtm,
     })
+
+    // M5: 이벤트방 카페 생성 미션 기록 (비블로킹)
+    recordUserAction('event_cafe_create', user.id, {
+      roomId: room.room_id,
+    }).catch((err) =>
+      console.error(`[M5] event_cafe_create 기록 실패: ${err.message}`),
+    )
 
     // LBS 동의자 이벤트방 위치 저장 (loc_tp_cd='05' 카페생성) — 비블로킹
     const validLat = typeof lat === 'number' && isFinite(lat) && lat >= -90 && lat <= 90

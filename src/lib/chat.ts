@@ -62,7 +62,6 @@ export interface MsgMsg {
     | 'TIP_NOTI'
     | 'SYSTEM'
     | 'AI_REPLY'
-    | 'BET_NOTI'
   attch_url: string | null
   stkr_id: string | null
   ref_msg_id: string | null

@@ -10,7 +10,6 @@ import { ChatInput } from './chat-input'
 import { ChatLocaleSelect } from './chat-locale-select'
 import { InlinePurchasePrompt } from './inline-purchase-prompt'
 import { BadgeAwardPopup, type BadgeAwardInfo } from './badge-award-popup'
-import { PiBetPanel } from './pi-bet-panel'
 import { RoomSettingsDialog, type RoomSettings } from './room-settings-dialog'
 import { VoiceChannelPanel, RemoteAudio } from './voice-channel-panel'
 import { useVoiceChannel } from '@/hooks/use-voice-channel'
@@ -61,8 +60,6 @@ export function ChatRoomPanel({
   const [upgradedBadge, setUpgradedBadge] = useState<BadgeAwardInfo | null>(
     null,
   )
-  // TASK-071: Pi Bet 패널
-  const [betPanelOpen, setBetPanelOpen] = useState(false)
   // 방장 전용 카페 수정 — 방 메타 조회 후 OWNER일 때만 버튼 노출
   const [isOwner, setIsOwner] = useState(false)
   const [roomSettings, setRoomSettings] = useState<RoomSettings | null>(null)
@@ -292,15 +289,6 @@ export function ChatRoomPanel({
         >
           📊
         </Link>
-        {/* TASK-071: Pi Bet 패널 열기 */}
-        <button
-          onClick={() => setBetPanelOpen(true)}
-          className="shrink-0 text-2xl transition-transform hover:scale-110"
-          aria-label="Pi Bet"
-          title="Pi Bet 투표"
-        >
-          🎲
-        </button>
         {/* PiVoice™ v2.0 음성채널 버튼 — 참여 인원 배지 표시 */}
         <button
           onClick={() => setVoicePanelOpen((o) => !o)}
@@ -408,11 +396,6 @@ export function ChatRoomPanel({
         onUpgraded={onBadgeUpgraded}
         onClose={() => setBadgeAward(null)}
       />
-
-      {/* TASK-071: Pi Bet 패널 */}
-      {betPanelOpen && (
-        <PiBetPanel roomId={roomId} onClose={() => setBetPanelOpen(false)} />
-      )}
 
       {/* 방장 전용 카페 수정 다이얼로그 */}
       {settingsOpen && roomSettings && (

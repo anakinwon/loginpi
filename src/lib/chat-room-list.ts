@@ -78,30 +78,7 @@ async function listPublicRooms(limit = 10): Promise<RoomRow[]> {
   return rows.map((r) => ({ ...r, cur_mbr_cnt: cntMap.get(r.room_id) ?? 0 }))
 }
 
-// 진행 중(OPEN) Pi Bet 보유 방에 open_bet_yn='Y' 부여 — 두 목록을 합쳐 1쿼리로 처리
-async function attachOpenBetYn(lists: RoomRow[][]): Promise<RoomRow[][]> {
-  const allIds = lists.flat().map((r) => r.room_id)
-  if (allIds.length === 0) return lists
-
-  const { data } = await getSupabaseAdmin()
-    .from('msg_bet')
-    .select('room_id')
-    .in('room_id', allIds)
-    .eq('bet_st_cd', 'OPEN')
-    .eq('del_yn', 'N')
-
-  const betRoomIds = new Set(
-    (data ?? []).map((b: { room_id: string }) => b.room_id),
-  )
-  return lists.map((rooms) =>
-    rooms.map((r) => ({
-      ...r,
-      open_bet_yn: betRoomIds.has(r.room_id) ? 'Y' : 'N',
-    })),
-  )
-}
-
-// 카페 목록 통합 조회 — 내 카페·공개 카페 병렬 + Bet 뱃지 1쿼리
+// 카페 목록 통합 조회 — 내 카페·공개 카페 병렬
 export async function getChatRoomLists(
   userId: string | null,
   includePublic: boolean,
@@ -111,9 +88,5 @@ export async function getChatRoomLists(
     userId ? listMyRooms(userId) : Promise.resolve([] as RoomRow[]),
     includePublic ? listPublicRooms(10) : Promise.resolve([] as RoomRow[]),
   ])
-  const [roomsWithBet, publicWithBet] = await attachOpenBetYn([
-    myRooms,
-    publicRooms,
-  ])
-  return { rooms: roomsWithBet, publicRooms: publicWithBet }
+  return { rooms: myRooms, publicRooms }
 }

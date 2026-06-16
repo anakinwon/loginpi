@@ -41,6 +41,8 @@ export const env = createEnv({
     NEXT_PUBLIC_SUPABASE_URL: z.string().url().optional(),
     NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: z.string().optional(),
     NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: z.string().optional(),
+    // Pi 시세 칩(법정화폐 환산) 노출 여부 — Pi 정책(가치평가 언급 최소화) 대응, 기본 비활성
+    NEXT_PUBLIC_FEATURE_PI_PRICE: z.enum(['true', 'false']).optional(),
   },
   runtimeEnv: {
     PI_SESSION_SECRET: process.env.PI_SESSION_SECRET,
@@ -68,6 +70,7 @@ export const env = createEnv({
       process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
     NEXT_PUBLIC_GOOGLE_MAPS_API_KEY:
       process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
+    NEXT_PUBLIC_FEATURE_PI_PRICE: process.env.NEXT_PUBLIC_FEATURE_PI_PRICE,
   },
   emptyStringAsUndefined: true,
 })

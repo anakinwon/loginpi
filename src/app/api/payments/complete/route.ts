@@ -199,6 +199,13 @@ export async function POST(request: NextRequest) {
             .single()
 
           grantedSubscr = (subscr as Record<string, unknown>) ?? null
+
+          // M5: PiRC2 구독 신청 미션 기록 (비블로킹)
+          recordUserAction('subscr_apply', ownerRow.id, {
+            plan_cd: planRow.plan_cd,
+          }).catch((err) =>
+            console.error(`[M5] subscr_apply 기록 실패: ${err.message}`),
+          )
         }
       }
     } else if (meta?.type === 'PI_TIP' && payment.user_uid) {
@@ -482,107 +489,6 @@ export async function POST(request: NextRequest) {
         recordUserAction('bond_deposit', sellerRow.id).catch((err) =>
           console.error(`[M9] 미션 기록 실패: ${err.message}`),
         )
-      }
-    } else if (meta?.type === 'PI_BET' && payment.user_uid) {
-      // PI_BET: 결제 완료 시 베팅 참가 INSERT + BET_NOTI 발송 (TASK-071)
-      const betId = String(meta.bet_id ?? '')
-      const optnNo = Number(meta.optn_no)
-      const [{ data: owner }, { data: bet }] = await Promise.all([
-        db
-          .from('sys_user')
-          .select('id, display_name')
-          .eq('pi_uid', payment.user_uid)
-          .maybeSingle(),
-        db
-          .from('msg_bet')
-          .select(
-            'bet_id, room_id, bet_titl, bet_amt_pi, bet_st_cd, close_dtm, crtr_usr_id',
-          )
-          .eq('bet_id', betId)
-          .eq('del_yn', 'N')
-          .maybeSingle(),
-      ])
-
-      if (owner && bet && Number.isInteger(optnNo) && optnNo >= 1) {
-        const ownerRow = owner as { id: string; display_name: string | null }
-        const betRow = bet as {
-          bet_id: string
-          room_id: string
-          bet_titl: string
-          bet_amt_pi: number
-          bet_st_cd: string
-          close_dtm: string | null
-          crtr_usr_id: string
-        }
-
-        // 베팅 생성자는 자신의 베팅에 참가 불가 — 결과 조작 인센티브 차단
-        // 선택 옵션 실존 여부 DB 재검증 — Pi SDK 메타데이터는 공격자 제어 입력
-        if (ownerRow.id !== betRow.crtr_usr_id) {
-          const { data: optnRow } = await db
-            .from('msg_bet_optn')
-            .select('optn_no')
-            .eq('bet_id', betRow.bet_id)
-            .eq('optn_no', optnNo)
-            .eq('del_yn', 'N')
-            .maybeSingle()
-
-          if (optnRow) {
-            const slug = String(ownerRow.display_name ?? 'user').slice(0, 20)
-            const stillOpen =
-              betRow.bet_st_cd === 'OPEN' &&
-              (!betRow.close_dtm || new Date(betRow.close_dtm) > new Date())
-
-            // 결제 금액이 베팅 참가비 이상인지 서버 재검증
-            if (
-              stillOpen &&
-              Number(payment.amount) + 1e-6 >= Number(betRow.bet_amt_pi)
-            ) {
-              // UNIQUE(bet_id, usr_id) — 중복 참가는 insert 에러로 자연 차단
-              const { error: entryError } = await db
-                .from('msg_bet_entry')
-                .insert({
-                  bet_id: betRow.bet_id,
-                  usr_id: ownerRow.id,
-                  optn_no: optnNo,
-                  bet_amt_pi: betRow.bet_amt_pi,
-                  pymnt_id: paymentId,
-                  regr_id: slug,
-                  modr_id: slug,
-                })
-
-              if (!entryError) {
-                const { data: betMsg } = await db
-                  .from('msg_msg')
-                  .insert({
-                    room_id: betRow.room_id,
-                    snd_usr_id: ownerRow.id,
-                    snd_usr_nm: String(ownerRow.display_name ?? 'user'),
-                    msg_cont: `🎲 ${ownerRow.display_name} 님이 "${betRow.bet_titl}" 베팅에 π${betRow.bet_amt_pi} 참가했습니다`,
-                    msg_tp_cd: 'BET_NOTI',
-                    regr_id: slug,
-                    modr_id: slug,
-                  })
-                  .select()
-                  .single()
-
-                if (betMsg)
-                  await broadcastToRoom(betRow.room_id, 'new_msg', betMsg)
-
-                // M5: Pi Bet 분배 미션 기록 — 베팅 생성자(주관자) 기준 (비블로킹)
-                // M5(MULTI_AND)=pibet_create+pibet_entry는 한 사람이 둘 다 충족해야 하는데,
-                // 생성자는 자기 베팅에 참가 불가(line 454)이므로 참가자(ownerRow)로 기록하면 M5 완료 불가.
-                // 참가가 발생하면 '주관자(생성자)의 분배 미션'이 진척된 것으로 본다.
-                recordUserAction('pibet_entry', betRow.crtr_usr_id, {
-                  bet_id: betRow.bet_id,
-                  room_id: betRow.room_id,
-                  entrant_id: ownerRow.id,
-                }).catch((err) =>
-                  console.error(`[M5] pibet_entry 기록 실패: ${err.message}`),
-                )
-              }
-            }
-          }
-        }
       }
     }
 

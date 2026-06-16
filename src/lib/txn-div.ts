@@ -9,7 +9,6 @@ export type TxnDivCd =
   | 'SUBSCRIPTION' // CHAT_SUBSCR — 구독
   | 'ROOM_CREATE' // CHAT_ROOM_CREATE — 채팅방 생성
   | 'TIP' // PI_TIP — 팁
-  | 'BET' // PI_BET — 베팅
   | 'ETC' // 미분류(metadata.type 없음)
   // ── 취소·정산(mps_txn_hist) 계열 ──
   | 'REFUND' // REFUND_IN — 취소 환불(구매자 지급)
@@ -24,7 +23,6 @@ export const TXN_DIV_CODES: TxnDivCd[] = [
   'SUBSCRIPTION',
   'ROOM_CREATE',
   'TIP',
-  'BET',
   'ETC',
   'REFUND',
   'CANCEL_FEE',
@@ -38,7 +36,6 @@ export const TXN_DIV_EMOJI: Record<TxnDivCd, string> = {
   SUBSCRIPTION: '💳',
   ROOM_CREATE: '🏠',
   TIP: '🎁',
-  BET: '🎲',
   ETC: '❓',
   REFUND: '↩️',
   CANCEL_FEE: '✂️',
@@ -53,7 +50,6 @@ const PAYMENT_DIVS = new Set<TxnDivCd>([
   'SUBSCRIPTION',
   'ROOM_CREATE',
   'TIP',
-  'BET',
   'ETC',
 ])
 export const isPaymentDiv = (cd: TxnDivCd): boolean => PAYMENT_DIVS.has(cd)
@@ -71,8 +67,6 @@ export function pymntTypeToDiv(type: string | null | undefined): TxnDivCd {
       return 'ROOM_CREATE'
     case 'PI_TIP':
       return 'TIP'
-    case 'PI_BET':
-      return 'BET'
     default:
       return 'ETC'
   }
