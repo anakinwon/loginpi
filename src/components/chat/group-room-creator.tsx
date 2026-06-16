@@ -290,6 +290,8 @@ export function GroupRoomCreator() {
           max_mbr_cnt: maxMbr,
           entry_fee_pi: entryFee,
           entry_expire_dtm: new Date(eventEndDtm).toISOString(),
+          lat: gpsCoords?.lat ?? null,
+          lng: gpsCoords?.lng ?? null,
         }),
       })
       if (!res.ok) {
@@ -315,6 +317,7 @@ export function GroupRoomCreator() {
     maxMbr,
     entryFee,
     eventEndDtm,
+    gpsCoords,
     router,
   ])
 

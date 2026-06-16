@@ -128,13 +128,15 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
   }
 
-  const { room_nm, room_desc, is_public_yn, max_mbr_cnt, join_pwd } = body as {
+  const { room_nm, room_desc, is_public_yn, max_mbr_cnt, join_pwd, lat, lng } = body as {
     room_nm?: string
     room_desc?: string | null
     is_public_yn?: 'Y' | 'N'
     max_mbr_cnt?: number
     // null/'' = 비밀번호 제거, 문자열 = 신규 설정, 누락(undefined) = 변경 안 함
     join_pwd?: string | null
+    lat?: number
+    lng?: number
   }
 
   const patch: Parameters<typeof updateRoom>[2] = {}
@@ -209,6 +211,28 @@ export async function PATCH(request: NextRequest, { params }: Params) {
   const updated = await updateRoom(roomId, user.display_name, patch)
   if (!updated)
     return NextResponse.json({ error: '카페 수정 실패' }, { status: 500 })
+
+  // LBS 동의자 카페 위치 수정 저장 — 비블로킹
+  const validLat = typeof lat === 'number' && isFinite(lat) && lat >= -90 && lat <= 90
+  const validLng = typeof lng === 'number' && isFinite(lng) && lng >= -180 && lng <= 180
+  if (validLat && validLng && user.lbs_consent_yn === 'Y') {
+    const db = getSupabaseAdmin()
+    const slug = String(user.display_name ?? 'user').slice(0, 20)
+    Promise.all([
+      db.from('msg_room').update({ latd_crd: lat, lngt_crd: lng }).eq('room_id', roomId),
+      db.from('usr_loc_hist').insert({
+        user_str_id: user.id,
+        loc_tp_cd: '05',
+        latd_crd: lat,
+        lngt_crd: lng,
+        ref_id: roomId,
+        consent_yn: 'Y',
+        consent_dtm: new Date().toISOString(),
+        regr_id: slug,
+        modr_id: slug,
+      }),
+    ]).catch(err => console.error('[카페 위치] 수정 저장 실패:', err.message))
+  }
 
   return NextResponse.json({ room: toPublicRoom(updated) })
 }
