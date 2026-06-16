@@ -103,6 +103,13 @@ export function StoreItemForm({
       .catch(() => {})
   }, [authed])
 
+  // 심층방어: URL ?shop= 등으로 들어온 prefill이 내 매장이 아니면 떨궈낸다
+  // (서버가 최종 차단하지만, 잘못된 선택을 UI에서 미리 제거 — 수정 모드는 기존 값 유지)
+  useEffect(() => {
+    if (editMode || !shopId || myShops.length === 0) return
+    if (!myShops.some((s) => s.shop_id === shopId)) setShopId('')
+  }, [myShops, shopId, editMode])
+
   // 마운트 시 LBS 동의 여부 확인 + 동의자는 화면 로딩과 동시에 현재 위치 자동 수집 (등록 모드, 1회)
   useEffect(() => {
     if (!authed) return
