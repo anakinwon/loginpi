@@ -137,8 +137,8 @@ export function ShopsMapView({
           fullscreenControl: false,
         })
 
-        // maxWidth 명시 — 미지정 시 InfoWindow가 폭을 좁게 제한해 2열 썸네일이 잘림
-        infoWindow = new InfoWindow({ maxWidth: 360 })
+        // maxWidth 명시 + globals.css의 .gm-style-iw 폭 강제와 함께 2열 썸네일 표시
+        infoWindow = new InfoWindow({ maxWidth: 380 })
         mapInstanceRef.current = map
         infoWindowRef.current = infoWindow
 
