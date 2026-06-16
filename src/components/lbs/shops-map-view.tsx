@@ -292,9 +292,9 @@ export function ShopsMapView({
           items: ShopItem[],
         ) => {
           const wrap = document.createElement('div')
-          // 매장 팝업 기본 폭 확대(200), 상품 있을 땐 더 넓혀(260) 2배 썸네일 공간 확보
+          // 매장 팝업 기본 폭(200), 상품 있을 땐 2개 큰 썸네일이 들어가도록 가로폭 확대(320)
           wrap.style.cssText = `font-family:system-ui,sans-serif;min-width:${
-            items.length > 0 ? '260px' : '200px'
+            items.length > 0 ? '320px' : '200px'
           };padding:4px 0`
           const nameEl = document.createElement('p')
           nameEl.style.cssText = 'font-weight:600;font-size:14px;margin:0 0 4px'
