@@ -102,7 +102,8 @@ export async function cancelOrder(
   return { order: data as MpsOrder }
 }
 
-// 에스크로 입금 완료 — Pi 결제 complete 콜백에서 호출 (PENDING → TRADING, 구매자·금액 검증은 호출자 책임)
+// 에스크로 입금 완료 — Pi 결제 complete 콜백에서 호출 (구매자·금액 검증은 호출자 책임)
+//   오프라인(매장 소속 상품) 주문 → ORDERED(상품주문중) / 직거래 → TRADING(거래중)
 export async function markEscrow(
   orderId: string,
   buyerId: string,
@@ -110,10 +111,22 @@ export async function markEscrow(
   amountPi: number,
 ) {
   const db = getSupabaseAdmin()
+
+  // 오프라인 여부 판정 — 주문 상품이 매장 소속(shop_id 존재)이면 오프라인 흐름
+  const { data: ord } = await db
+    .from('mps_order')
+    .select('mps_item(shop_id)')
+    .eq('order_id', orderId)
+    .maybeSingle()
+  const isOffline = !!(
+    ord as { mps_item?: { shop_id?: string | null } | null } | null
+  )?.mps_item?.shop_id
+  const nextState = isOffline ? 'ORDERED' : 'TRADING'
+
   const { data, error } = await db
     .from('mps_order')
     .update({
-      order_st_cd: 'TRADING',
+      order_st_cd: nextState,
       escrow_txid: txid,
       modr_id: buyerId,
       mod_dtm: new Date().toISOString(),
@@ -190,6 +203,113 @@ export async function markComplete(orderId: string, sellerId: string) {
     modr_id: sellerId,
   })
   return order
+}
+
+// ──────────────────────────────────────────────────────────────
+// 오프라인 매장 주문 흐름 — ORDERED → PREPARING → READY → DONE
+// ──────────────────────────────────────────────────────────────
+
+// 판매자 "접수" — ORDERED → PREPARING (상품준비중)
+export async function markPreparing(orderId: string, sellerId: string) {
+  const { data } = await getSupabaseAdmin()
+    .from('mps_order')
+    .update({
+      order_st_cd: 'PREPARING',
+      modr_id: sellerId,
+      mod_dtm: new Date().toISOString(),
+    })
+    .eq('order_id', orderId)
+    .eq('seller_id', sellerId)
+    .eq('order_st_cd', 'ORDERED') // 단계 강제 — 주문중에서만 접수
+    .eq('del_yn', 'N')
+    .select()
+    .maybeSingle()
+  return (data as MpsOrder | null) ?? null
+}
+
+// 판매자 "준비완료" — PREPARING → READY (상품준비완료, 10분 자동완료 타이머 시작)
+export async function markReady(orderId: string, sellerId: string) {
+  const now = new Date().toISOString()
+  const { data } = await getSupabaseAdmin()
+    .from('mps_order')
+    .update({
+      order_st_cd: 'READY',
+      ready_dtm: now, // 자동완료 기준 시각
+      modr_id: sellerId,
+      mod_dtm: now,
+    })
+    .eq('order_id', orderId)
+    .eq('seller_id', sellerId)
+    .eq('order_st_cd', 'PREPARING') // 단계 강제 — 준비중에서만 준비완료
+    .eq('del_yn', 'N')
+    .select()
+    .maybeSingle()
+  return (data as MpsOrder | null) ?? null
+}
+
+// 정산 이력 INSERT (RELEASE_OUT) — markComplete·markPickup·자동완료 공용
+async function insertReleaseOut(
+  db: ReturnType<typeof getSupabaseAdmin>,
+  order: MpsOrder,
+  actorId: string,
+) {
+  await db.from('mps_txn_hist').insert({
+    order_id: order.order_id,
+    user_id: order.seller_id,
+    txn_type_cd: 'RELEASE_OUT',
+    pi_amt: -order.order_price_pi,
+    memo: '판매자 정산 대기 — 운영자 에스크로 계정에서 송금 처리 필요',
+    regr_id: actorId,
+    modr_id: actorId,
+  })
+}
+
+// 구매자 "픽업" — READY → DONE + 정산 (구매자 액션)
+export async function markPickup(orderId: string, buyerId: string) {
+  const db = getSupabaseAdmin()
+  const { data } = await db
+    .from('mps_order')
+    .update({
+      order_st_cd: 'DONE',
+      modr_id: buyerId,
+      mod_dtm: new Date().toISOString(),
+    })
+    .eq('order_id', orderId)
+    .eq('buyer_id', buyerId)
+    .eq('order_st_cd', 'READY') // 준비완료에서만 픽업
+    .eq('del_yn', 'N')
+    .select()
+    .maybeSingle()
+
+  if (!data) return null
+  const order = data as MpsOrder
+  await insertReleaseOut(db, order, buyerId)
+  return order
+}
+
+// 자동완료 배치 — READY + ready_dtm 10분 경과 주문을 DONE 처리 (on-demand sweep)
+// 반환: 자동완료된 주문 수
+export async function autoCompleteReadyOrders(): Promise<number> {
+  const db = getSupabaseAdmin()
+  const cutoff = new Date(Date.now() - 10 * 60 * 1000).toISOString()
+
+  const { data } = await db
+    .from('mps_order')
+    .update({
+      order_st_cd: 'DONE',
+      modr_id: 'SYSTEM',
+      mod_dtm: new Date().toISOString(),
+    })
+    .eq('order_st_cd', 'READY')
+    .lte('ready_dtm', cutoff)
+    .eq('del_yn', 'N')
+    .select()
+
+  const orders = (data as MpsOrder[] | null) ?? []
+  for (const order of orders) {
+    await insertReleaseOut(db, order, 'SYSTEM')
+  }
+  return orders.length
 }
 
 // 주문 상세 — 당사자(구매자·판매자)·관리자만

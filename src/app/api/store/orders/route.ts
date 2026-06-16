@@ -2,13 +2,22 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
-import { createOrder, listOrdersByRole } from '@/lib/mps-order'
+import {
+  createOrder,
+  listOrdersByRole,
+  autoCompleteReadyOrders,
+} from '@/lib/mps-order'
 
 // GET /api/store/orders?role=buyer|seller — 내 주문 목록
 export async function GET(req: NextRequest) {
   const user = await getSessionUser()
   if (!user)
     return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+
+  // on-demand 배치 — READY 10분 경과 주문 자동완료 (조회 시점에 마감 처리, sql 032 패턴)
+  autoCompleteReadyOrders().catch((e) =>
+    console.error('[자동완료] 처리 실패:', e),
+  )
 
   const role =
     req.nextUrl.searchParams.get('role') === 'seller' ? 'seller' : 'buyer'
