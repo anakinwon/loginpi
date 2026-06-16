@@ -119,22 +119,25 @@ export async function findVerifiedShopByPlaceId(placeId: string) {
   return (data as { shop_id: string; seller_id: string } | null) ?? null
 }
 
-export interface GpsClaimInput {
+export interface ClaimInput {
   place_id: string
   shop_nm: string
-  addr?: string | null
-  lat: number // 구글 place 좌표 (매장 위치로 저장)
+  addr: string // 필수 입력 (검증 안 함, 신고 항목)
+  lat: number // 구글 place 좌표 (권위 기준, 매장 위치로 저장)
   lng: number
+  contact_tel: string // 전화번호 — 구글과 대조 검증된 값
+  owner_nm: string // 대표자명 — 필수 입력 (검증 안 함, 신고 항목)
+  contact_email: string // 이메일 — 필수 입력 (검증 안 함, 신고 항목)
   biz_hour?: string | null
-  contact_tel?: string | null
 }
 
-// GPS 현장 검증 통과 매장 생성 — owner_verified_yn='Y', verify_method_cd='GPS'
+// 반자동 인증 통과 매장 생성 — owner_verified_yn='Y', verify_method_cd='MATCH'
+// (place_id·전화번호는 구글 대조 검증, 대표자명·주소·이메일은 필수 신고 항목)
 // place_id 중복 시 Postgres 23505 throw → 라우트에서 409로 변환
-export async function createGpsVerifiedShop(
+export async function createVerifiedShop(
   sellerId: string,
   regrId: string,
-  input: GpsClaimInput,
+  input: ClaimInput,
 ) {
   const { data, error } = await getSupabaseAdmin()
     .from('mps_shop')
@@ -142,14 +145,16 @@ export async function createGpsVerifiedShop(
       seller_id: sellerId,
       shop_nm: input.shop_nm,
       shop_type_cd: 'OFFLINE', // 구글 카페는 실물 오프라인 매장
-      addr: input.addr ?? null,
+      addr: input.addr,
       latd_crd: input.lat,
       lngt_crd: input.lng,
       place_id: input.place_id,
+      contact_tel: input.contact_tel,
+      contact_email: input.contact_email,
+      owner_nm: input.owner_nm,
       biz_hour: input.biz_hour ?? null,
-      contact_tel: input.contact_tel ?? null,
       owner_verified_yn: 'Y',
-      verify_method_cd: 'GPS',
+      verify_method_cd: 'MATCH',
       verify_dtm: new Date().toISOString(),
       regr_id: regrId,
       modr_id: regrId,

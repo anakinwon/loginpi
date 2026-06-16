@@ -3,8 +3,10 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { setOptions, importLibrary } from '@googlemaps/js-api-loader'
-import { toast } from 'sonner'
-import { piFetch } from '@/lib/pi-fetch'
+import {
+  ShopClaimDialog,
+  type ClaimTarget,
+} from '@/components/lbs/shop-claim-dialog'
 import type { BizCategory } from '@/components/lbs/nearby-explorer'
 
 interface NearbyShop {
@@ -62,6 +64,8 @@ export function ShopsMapView({
   const mapRef = useRef<HTMLDivElement>(null)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [placesCount, setPlacesCount] = useState<number | null>(null)
+  // 구글 카페 인증 등록 폼(모달) 대상 — DOM InfoWindow 버튼이 set, React가 렌더
+  const [claimTarget, setClaimTarget] = useState<ClaimTarget | null>(null)
 
   // 지도 인스턴스·마커를 ref에 보관 — 포커스 effect와 초기화 effect가 공유
   const mapInstanceRef = useRef<google.maps.Map | null>(null)
@@ -250,60 +254,19 @@ export function ShopsMapView({
           return wrap
         }
 
-        // 구글 카페 → 내 매장 등록 버튼 (현장 GPS 자동인증, place_id 강제 매핑)
-        // userLat/userLng(현재 GPS)와 선택한 place 좌표로 서버가 ≤100m 거리 검증 후 자동 등록
+        // 구글 카페 → 내 매장 인증 등록 버튼 — 클릭 시 React 폼 모달을 연다
+        // (전화번호 구글 대조 + 대표자명·주소·이메일 필수 입력은 ShopClaimDialog가 담당)
         const buildClaimButton = (
           placeId: string,
           name: string,
           addr: string | null,
-          lat: number,
-          lng: number,
         ) => {
           const btn = document.createElement('button')
           btn.textContent = '🏪 내 매장으로 등록'
           btn.style.cssText =
             'margin-top:8px;width:100%;padding:7px 10px;font-size:12px;border-radius:6px;background:#7c3aed;color:#fff;border:none;font-weight:700;cursor:pointer'
-          btn.addEventListener('click', async () => {
-            btn.disabled = true
-            const orig = btn.textContent
-            btn.textContent = '등록 중…'
-            btn.style.opacity = '0.7'
-            try {
-              const res = await piFetch('/api/store/shops/claim', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  place_id: placeId,
-                  shop_nm: name,
-                  addr: addr ?? undefined,
-                  place_lat: lat,
-                  place_lng: lng,
-                  user_lat: userLat,
-                  user_lng: userLng,
-                }),
-              })
-              const data = (await res.json().catch(() => ({}))) as {
-                error?: string
-              }
-              if (res.ok) {
-                toast.success(
-                  '✅ 내 매장으로 등록되었습니다! 이제 메뉴를 추가해보세요',
-                )
-                btn.textContent = '✅ 등록 완료'
-                btn.style.background = '#16a34a'
-                btn.style.opacity = '1'
-              } else {
-                toast.error(data.error ?? '등록에 실패했습니다')
-                btn.disabled = false
-                btn.textContent = orig
-                btn.style.opacity = '1'
-              }
-            } catch {
-              toast.error('등록 중 오류가 발생했습니다')
-              btn.disabled = false
-              btn.textContent = orig
-              btn.style.opacity = '1'
-            }
+          btn.addEventListener('click', () => {
+            setClaimTarget({ place_id: placeId, name, addr })
           })
           return btn
         }
@@ -440,8 +403,6 @@ export function ShopsMapView({
                   place.id,
                   place.displayName ?? '이름 미상 매장',
                   place.formattedAddress ?? null,
-                  loc.lat(),
-                  loc.lng(),
                 ),
               )
             }
@@ -526,6 +487,14 @@ export function ShopsMapView({
         ref={mapRef}
         className="h-[calc(100dvh-210px)] min-h-[300px] w-full overflow-hidden rounded-lg border"
       />
+      {claimTarget && (
+        <ShopClaimDialog
+          target={claimTarget}
+          userLat={userLat}
+          userLng={userLng}
+          onClose={() => setClaimTarget(null)}
+        />
+      )}
     </div>
   )
 }
