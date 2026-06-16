@@ -292,8 +292,10 @@ export function ShopsMapView({
           items: ShopItem[],
         ) => {
           const wrap = document.createElement('div')
-          wrap.style.cssText =
-            'font-family:system-ui,sans-serif;min-width:160px;padding:4px 0'
+          // 매장 팝업 기본 폭 확대(200), 상품 있을 땐 더 넓혀(260) 2배 썸네일 공간 확보
+          wrap.style.cssText = `font-family:system-ui,sans-serif;min-width:${
+            items.length > 0 ? '260px' : '200px'
+          };padding:4px 0`
           const nameEl = document.createElement('p')
           nameEl.style.cssText = 'font-weight:600;font-size:14px;margin:0 0 4px'
           nameEl.textContent = nm
@@ -326,8 +328,9 @@ export function ShopsMapView({
             wrap.appendChild(head)
 
             const grid = document.createElement('div')
+            // 썸네일 2배 — 4열 → 2열 (Pi Browser 가독성). InfoWindow 폭도 확장
             grid.style.cssText =
-              'display:grid;grid-template-columns:repeat(4,1fr);gap:4px;max-height:160px;overflow-y:auto'
+              'display:grid;grid-template-columns:repeat(2,1fr);gap:6px;max-height:280px;overflow-y:auto'
             for (const it of items) {
               const itemId = it.item_id
               const cell = document.createElement('a')
