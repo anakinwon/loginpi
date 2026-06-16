@@ -60,99 +60,47 @@ export async function isSellerBonded(sellerId: string): Promise<boolean> {
   return status.bonded
 }
 
+// 보상 지급 결과 — DB 함수 fn_evt_grant_bond_reward의 반환값
+export type BondRewardResult =
+  | 'GRANTED' // 신규 지급 완료
+  | 'ALREADY' // 이미 지급(BONDED/PAID) — 중복 차단됨
+  | 'NOT_ELIGIBLE' // 미션 미완료
+  | 'NO_EVENT' // 이벤트 없음
+  | 'ERROR' // RPC 오류
+
 /**
- * 이벤트 미션 완료 보상 — Pi 송금 없이 보증금 잔액에 1π 직접 적립
+ * 이벤트 미션 완료 보상 — 판매보증금 1π 직접 적립 (Pi 송금 없음)
  *
- * 멱등 보장: evt_pi_reward_log UNIQUE(event_id, user_id) + reward_st_cd='BONDED'
- *   - BONDED → 즉시 skip (중복 적립 방지)
- *   - 기존 mps_seller_bond 있으면 잔액+1 / 없으면 신규 계좌 생성
+ * 중복 지급 방지: DB 함수 fn_evt_grant_bond_reward(sql/061)에 위임하여
+ * 단일 트랜잭션 + FOR UPDATE 행 잠금 + reward_st_cd('BONDED'/'PAID') 게이트로
+ * 원자적 처리한다. 앱 레벨 check-then-act의 TOCTOU race를 원천 차단.
+ *   - GRANTED: 보상 로그 BONDED 기록 + mps_seller_bond 1π/0.1π 적립 (둘 다 또는 둘 다 롤백)
+ *   - ALREADY: 이미 지급된 사용자 — 보증금 변동 없음
  */
 export async function grantBondReward(
   eventId: string,
   userId: string,
-): Promise<void> {
-  const db = getSupabaseAdmin()
-  const now = new Date().toISOString()
+): Promise<BondRewardResult> {
+  const { data, error } = await getSupabaseAdmin().rpc(
+    'fn_evt_grant_bond_reward',
+    { p_event_id: eventId, p_user_id: userId },
+  )
 
-  // 멱등: 이미 적립됐으면 skip
-  const { data: existing } = await db
-    .from('evt_pi_reward_log')
-    .select('reward_st_cd')
-    .eq('event_id', eventId)
-    .eq('user_id', userId)
-    .maybeSingle()
-  if ((existing as { reward_st_cd: string } | null)?.reward_st_cd === 'BONDED') return
-
-  // pi_uid 조회 (로그 기록용 — NOT NULL 제약 대응, 없으면 폴백값)
-  const { data: userRow } = await db
-    .from('sys_user')
-    .select('pi_uid')
-    .eq('id', userId)
-    .maybeSingle()
-  const piUid =
-    (userRow as { pi_uid: string | null } | null)?.pi_uid ?? 'BOND_GRANT'
-
-  // mps_seller_bond 현재 상태 조회
-  const { data: bond } = await db
-    .from('mps_seller_bond')
-    .select('bond_bal_pi, rsv_pi')
-    .eq('seller_id', userId)
-    .eq('del_yn', 'N')
-    .maybeSingle()
-  const b = bond as { bond_bal_pi: number; rsv_pi: number } | null
-
-  if (b) {
-    // 기존 계좌: 잔액 +1π, 지급준비금 +0.1π
-    const { error } = await db
-      .from('mps_seller_bond')
-      .update({
-        bond_bal_pi: Number(b.bond_bal_pi) + BOND_DEPOSIT_PI,
-        rsv_pi: Number(b.rsv_pi) + RESERVE_PI,
-        modr_id: 'SYSTEM',
-        mod_dtm: now,
-      })
-      .eq('seller_id', userId)
-      .eq('del_yn', 'N')
-    if (error) {
-      console.error(`[이벤트 보증금] 잔액 증가 실패 user=${userId}:`, error.message)
-      return
-    }
-  } else {
-    // 신규 계좌 생성 (보증금 1π, 지급준비금 0.1π)
-    const { error } = await db
-      .from('mps_seller_bond')
-      .insert({
-        seller_id: userId,
-        bond_bal_pi: BOND_DEPOSIT_PI,
-        rsv_pi: RESERVE_PI,
-        cancel_cnt: 0,
-        regr_id: 'SYSTEM',
-        modr_id: 'SYSTEM',
-      })
-    if (error) {
-      console.error(`[이벤트 보증금] 신규 계좌 생성 실패 user=${userId}:`, error.message)
-      return
-    }
+  if (error) {
+    console.error(
+      `[이벤트 보증금] 보상 지급 실패 event=${eventId} user=${userId}:`,
+      error.message,
+    )
+    return 'ERROR'
   }
 
-  // 보상 로그 기록 (Pi A2U와 동일 테이블, reward_st_cd='BONDED'로 구분)
-  await db.from('evt_pi_reward_log').upsert(
-    {
-      event_id: eventId,
-      user_id: userId,
-      pi_uid: piUid,
-      reward_amt: BOND_DEPOSIT_PI,
-      reward_st_cd: 'BONDED',
-      paid_dtm: now,
-      modr_id: 'SYSTEM',
-      mod_dtm: now,
-    },
-    { onConflict: 'event_id,user_id' },
-  )
-
-  console.info(
-    `[이벤트 보증금] 1π 적립 완료 — event=${eventId} user=${userId}`,
-  )
+  const result = (data as BondRewardResult) ?? 'ERROR'
+  if (result === 'GRANTED') {
+    console.info(
+      `[이벤트 보증금] 1π 적립 완료 — event=${eventId} user=${userId}`,
+    )
+  }
+  return result
 }
 
 // 예치 처리 — Pi 결제 완료 콜백(MPS_BOND)에서 호출. 원자적 UPSERT는 DB RPC 위임

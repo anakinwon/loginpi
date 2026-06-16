@@ -26,7 +26,7 @@ interface EventProgress {
 }
 
 interface Ranking {
-  rank: number | null        // 미션 0개는 null (순위 미부여)
+  rank: number | null // 미션 0개는 null (순위 미부여)
   user_id: string
   nick_nm: string | null
   pi_username: string | null
@@ -61,7 +61,10 @@ type MissionTranslation = { name?: string; desc?: string }
 
 export function ClientEventGate() {
   const t = useTranslations('event')
-  const missionsT = t.raw('missions') as Record<string, MissionTranslation | undefined>
+  const missionsT = t.raw('missions') as Record<
+    string,
+    MissionTranslation | undefined
+  >
   const [loading, setLoading] = useState(true)
   const [progress, setProgress] = useState<EventProgress | null>(null)
   const [missions, setMissions] = useState<Mission[]>([])
@@ -74,6 +77,7 @@ export function ClientEventGate() {
   const [excludeMsg, setExcludeMsg] = useState<string | null>(null)
   const [excludedList, setExcludedList] = useState<ExcludedAgent[]>([])
   const [reevaluating, setReevaluating] = useState(false)
+  const [granting, setGranting] = useState(false)
 
   // 제외 목록 조회 (관리자 전용 API — 비관리자는 403이라 무시됨)
   const fetchExcluded = async () => {
@@ -105,6 +109,42 @@ export function ClientEventGate() {
       console.error('[reeval] 재평가 실패:', err)
     } finally {
       setReevaluating(false)
+    }
+  }
+
+  // 관리자 전용: 10개 미션 완료 미지급자에게 판매보증금 1π 지급
+  // 중복 지급은 서버 RPC(fn_evt_grant_bond_reward)가 원자적으로 차단 — 이미 받은 사람은 건너뜀
+  const handleBondReward = async () => {
+    if (granting) return
+    if (
+      !window.confirm(
+        '10개 미션을 완료한 미지급자에게 판매보증금 1π를 지급합니다.\n이미 지급된 사용자는 자동으로 제외됩니다. 진행할까요?',
+      )
+    )
+      return
+    setGranting(true)
+    try {
+      const res = await piFetch('/api/admin/event/bond-reward', {
+        method: 'POST',
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        alert(data.error ?? '보상 지급에 실패했습니다')
+        return
+      }
+      alert(
+        `보상 지급 완료\n` +
+          `· 자격자: ${data.eligible}명\n` +
+          `· 신규 지급: ${data.granted}명\n` +
+          `· 이미 지급(건너뜀): ${data.already}명` +
+          (data.failed ? `\n· 실패: ${data.failed}명` : ''),
+      )
+      await refetchRanking()
+    } catch (err) {
+      console.error('[bond-reward] 지급 실패:', err)
+      alert('네트워크 오류가 발생했습니다')
+    } finally {
+      setGranting(false)
     }
   }
 
@@ -159,7 +199,8 @@ export function ClientEventGate() {
         return
       }
       const parts: string[] = []
-      if (data.added?.length) parts.push(t('excludedN', { count: data.added.length }))
+      if (data.added?.length)
+        parts.push(t('excludedN', { count: data.added.length }))
       if (data.already?.length)
         parts.push(t('alreadyExcluded', { names: data.already.join(', ') }))
       if (data.notFound?.length)
@@ -290,7 +331,9 @@ export function ClientEventGate() {
                     <div className="flex-1">
                       <div className="mb-2 flex items-center gap-2">
                         <span className="text-sm font-bold">{cd}</span>
-                        <span className="text-sm font-medium">{displayName}</span>
+                        <span className="text-sm font-medium">
+                          {displayName}
+                        </span>
                         {completed && (
                           <span className="ml-auto text-sm font-bold text-green-600 dark:text-green-400">
                             ✓
@@ -322,15 +365,26 @@ export function ClientEventGate() {
           <div className="flex items-center gap-2">
             <h2 className="text-xl font-bold">{t('rankingTitle')}</h2>
             {isAdmin && (
-              <button
-                type="button"
-                onClick={handleReeval}
-                disabled={reevaluating}
-                title="미션 재평가 후 랭킹 재조회 (관리자 전용)"
-                className="border-input bg-background hover:bg-muted rounded-md border px-2 py-1 text-xs font-medium transition-colors disabled:opacity-50"
-              >
-                {reevaluating ? t('processing') : '🔄 미션 재평가'}
-              </button>
+              <>
+                <button
+                  type="button"
+                  onClick={handleReeval}
+                  disabled={reevaluating}
+                  title="미션 재평가 후 랭킹 재조회 (관리자 전용)"
+                  className="border-input bg-background hover:bg-muted rounded-md border px-2 py-1 text-xs font-medium transition-colors disabled:opacity-50"
+                >
+                  {reevaluating ? t('processing') : '🔄 미션 재평가'}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleBondReward}
+                  disabled={granting}
+                  title="10개 미션 완료 미지급자에게 판매보증금 1π 지급 (관리자 전용)"
+                  className="rounded-md border border-amber-500 bg-amber-50 px-2 py-1 text-xs font-medium text-amber-900 transition-colors hover:bg-amber-100 disabled:opacity-50 dark:border-amber-600 dark:bg-amber-950 dark:text-amber-200 dark:hover:bg-amber-900"
+                >
+                  {granting ? t('processing') : '💰 1Pi 판매보증금 지급'}
+                </button>
+              </>
             )}
           </div>
           {isAdmin && (
@@ -396,7 +450,9 @@ export function ClientEventGate() {
                 <th className="bg-muted sticky left-9 z-10 py-2 pr-2 pl-1 text-left font-semibold">
                   {t('agentCol')}
                 </th>
-                <th className="p-2 text-center font-semibold">{t('totalCol')}</th>
+                <th className="p-2 text-center font-semibold">
+                  {t('totalCol')}
+                </th>
                 <th className="p-2 text-center font-semibold">M1</th>
                 <th className="p-2 text-center font-semibold">M2</th>
                 <th className="p-2 text-center font-semibold">M3</th>
@@ -410,7 +466,9 @@ export function ClientEventGate() {
                 <th className="p-2 text-center font-semibold whitespace-nowrap">
                   {t('lastPerformedCol')}
                 </th>
-                <th className="p-2 text-center font-semibold">{t('rewardCol')}</th>
+                <th className="p-2 text-center font-semibold">
+                  {t('rewardCol')}
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -462,7 +520,8 @@ export function ClientEventGate() {
                       : '-'}
                   </td>
                   <td className="px-2 text-center">
-                    {r.mission_count === null ? null : r.mission_count === 10 ? (
+                    {r.mission_count === null ? null : r.mission_count ===
+                      10 ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src="https://img1.kakaocdn.net/thumb/C375x375@2x.fwebp.q82/?fname=https%3A%2F%2Fst.kakaocdn.net%2Fproduct%2Fgift%2Fproduct%2F20250203140848_135c92640a004b0682f214bd5b5a94f3.png"
@@ -472,10 +531,7 @@ export function ClientEventGate() {
                         className="mx-auto h-12 w-20 rounded-md object-cover object-center"
                       />
                     ) : (
-                      <span
-                        className="text-lg"
-                        title={t('keepGoingTitle')}
-                      >
+                      <span className="text-lg" title={t('keepGoingTitle')}>
                         🥺
                       </span>
                     )}
