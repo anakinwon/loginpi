@@ -167,7 +167,7 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey, bizCategory, rad
           ]
           for (const m of modes) {
             const a = document.createElement('a')
-            a.href = `https://maps.google.com/maps?daddr=${lat},${lng}&dirflg=${m.dirflg}`
+            a.href = `https://maps.google.com/maps?saddr=${userLat},${userLng}&daddr=${lat},${lng}&dirflg=${m.dirflg}`
             a.target = '_blank'
             a.rel = 'noopener noreferrer'
             a.textContent = `${m.icon} ${m.label}`
