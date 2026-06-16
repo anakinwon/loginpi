@@ -296,7 +296,7 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey, bizCategory, rad
       )}
       <div
         ref={mapRef}
-        className="h-[calc(100dvh-360px)] min-h-[260px] w-full overflow-hidden rounded-lg border"
+        className="h-[calc(100dvh-210px)] min-h-[300px] w-full overflow-hidden rounded-lg border"
       />
     </div>
   )

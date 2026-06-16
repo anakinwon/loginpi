@@ -12,13 +12,7 @@ export default async function MapPage() {
   const t = await getTranslations('lbs')
 
   return (
-    <div className="mx-auto max-w-5xl space-y-4 p-4 md:p-6">
-      <div>
-        <h1 className="text-2xl font-bold">{t('nearbyTitle')}</h1>
-        <p className="text-muted-foreground mt-1 text-sm">
-          {t('nearbySubtitle')}
-        </p>
-      </div>
+    <div className="mx-auto max-w-5xl p-4 md:p-6">
       <NearbyExplorer />
     </div>
   )

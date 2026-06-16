@@ -182,29 +182,21 @@ export function NearbyExplorer() {
   }
 
   return (
-    <div className="space-y-4">
-      {/* 반경 선택 + 위치 갱신 */}
+    <div className="space-y-3">
+      {/* 타이틀 + 반경 선택 (한 줄) */}
       <div className="flex items-center gap-2">
-        <span className="text-muted-foreground text-xs">{t('radius')}</span>
-        {RADIUS_OPTIONS.map((r) => (
-          <button
-            key={r}
-            onClick={() => setRadius(r)}
-            className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${radius === r ? 'border-primary bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted'}`}
-          >
-            {r}km
-          </button>
-        ))}
-        {/* 현재 측위 좌표 — 위치가 엉뚱하게 잡혔는지 즉시 확인용 */}
-        <span className="text-muted-foreground/70 ml-auto font-mono text-[10px]">
-          ({coords.lat.toFixed(4)}, {coords.lng.toFixed(4)})
-        </span>
-        <button
-          onClick={() => requestLocation(true)}
-          className="text-muted-foreground hover:text-foreground text-xs underline"
-        >
-          {t('refreshLocation')}
-        </button>
+        <h1 className="shrink-0 text-lg font-semibold">{t('nearbyTitle')}</h1>
+        <div className="flex items-center gap-1.5">
+          {RADIUS_OPTIONS.map((r) => (
+            <button
+              key={r}
+              onClick={() => setRadius(r)}
+              className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${radius === r ? 'border-primary bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted'}`}
+            >
+              {r}km
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* API 조회 실패 — 빈 목록으로 위장하지 않고 원인 표시 */}
@@ -214,8 +206,8 @@ export function NearbyExplorer() {
         </p>
       )}
 
-      {/* 탭 */}
-      <div className="flex gap-1 border-b">
+      {/* 탭 + 위치 갱신 (한 줄) */}
+      <div className="flex items-center gap-1 border-b">
         <button
           onClick={() => setTab('shops')}
           className={`px-4 py-2 text-sm font-medium transition-colors ${tab === 'shops' ? 'border-primary text-primary border-b-2' : 'text-muted-foreground hover:text-foreground'}`}
@@ -227,6 +219,12 @@ export function NearbyExplorer() {
           className={`px-4 py-2 text-sm font-medium transition-colors ${tab === 'rooms' ? 'border-primary text-primary border-b-2' : 'text-muted-foreground hover:text-foreground'}`}
         >
           {t('tabRooms')} {rooms.length > 0 && `(${rooms.length})`}
+        </button>
+        <button
+          onClick={() => requestLocation(true)}
+          className="text-muted-foreground hover:text-foreground ml-auto pb-2 text-xs underline"
+        >
+          {t('refreshLocation')}
         </button>
       </div>
 
