@@ -26,6 +26,7 @@ export function ShopClaimDialog({
   onClose: () => void
   onSuccess?: () => void
 }) {
+  const [placeIdTail, setPlaceIdTail] = useState('')
   const [shopNm, setShopNm] = useState(target.name ?? '')
   const [tel, setTel] = useState('')
   const [ownerNm, setOwnerNm] = useState('')
@@ -33,15 +34,24 @@ export function ShopClaimDialog({
   const [email, setEmail] = useState('')
   const [saving, setSaving] = useState(false)
 
+  // place_id 끝 5자리 (정답) — 입력값과 즉시 대조
+  const tailAnswer = target.place_id.slice(-5)
+
   async function submit() {
     if (
+      !placeIdTail.trim() ||
       !shopNm.trim() ||
       !tel.trim() ||
       !ownerNm.trim() ||
       !addr.trim() ||
       !email.trim()
     ) {
-      toast.error('매장명·전화번호·대표자명·주소·이메일을 모두 입력해주세요')
+      toast.error('모든 항목을 입력해주세요')
+      return
+    }
+    // place_id 끝 5자리 클라이언트 1차 검증 (서버도 최종 강제)
+    if (placeIdTail.trim() !== tailAnswer) {
+      toast.error('place_id 끝 5자리가 일치하지 않습니다')
       return
     }
     setSaving(true)
@@ -51,6 +61,7 @@ export function ShopClaimDialog({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           place_id: target.place_id,
+          place_id_tail: placeIdTail.trim(),
           user_lat: userLat,
           user_lng: userLng,
           shop_nm: shopNm.trim(),
@@ -112,6 +123,30 @@ export function ShopClaimDialog({
               readOnly
               className="text-muted-foreground bg-muted/50 w-full truncate rounded-lg border px-2.5 py-1.5 text-xs"
             />
+          </div>
+          <div>
+            <label className="text-muted-foreground mb-1 block text-xs">
+              place_id 끝 5자리 확인{' '}
+              <span className="text-primary">(직접 입력)</span>
+            </label>
+            <input
+              value={placeIdTail}
+              onChange={(e) => setPlaceIdTail(e.target.value)}
+              placeholder={`위 식별자의 마지막 5자리`}
+              maxLength={5}
+              className={`w-full rounded-lg border bg-transparent px-2.5 py-1.5 text-sm ${
+                placeIdTail && placeIdTail.trim() !== tailAnswer
+                  ? 'border-red-400'
+                  : placeIdTail.trim() === tailAnswer
+                    ? 'border-emerald-400'
+                    : ''
+              }`}
+            />
+            {placeIdTail && placeIdTail.trim() !== tailAnswer && (
+              <p className="mt-1 text-[10px] text-red-500">
+                끝 5자리가 일치하지 않습니다
+              </p>
+            )}
           </div>
           <div>
             <label className="text-muted-foreground mb-1 block text-xs">

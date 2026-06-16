@@ -21,6 +21,8 @@ const CLAIM_RADIUS_M = 100
 
 const claimSchema = z.object({
   place_id: z.string().min(1).max(500),
+  // place_id 끝 5자리 — 사용자가 직접 입력해 매핑 확인 (오선택·무성의 선점 방지)
+  place_id_tail: z.string().min(1).max(5),
   // 신청자 현재 GPS (현장 검증용)
   user_lat: z.number().min(-90).max(90),
   user_lng: z.number().min(-180).max(180),
@@ -81,6 +83,18 @@ export async function POST(req: NextRequest) {
     )
   }
   const c = parsed.data
+
+  // ⓪ place_id 끝 5자리 확인 — 입력값이 실제 place_id 끝 5자리와 일치해야 함
+  //    (구글 조회 비용 발생 전 차단. 오선택·무성의 선점 1차 필터)
+  if (c.place_id_tail !== c.place_id.slice(-5)) {
+    return NextResponse.json(
+      {
+        error: 'place_id 끝 5자리가 일치하지 않습니다',
+        code: 'PLACE_ID_TAIL_MISMATCH',
+      },
+      { status: 422 },
+    )
+  }
 
   // ① 서버가 place_id로 구글 Place Details 직접 조회 (권위 기준값)
   let place
