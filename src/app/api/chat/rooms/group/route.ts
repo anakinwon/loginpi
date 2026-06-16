@@ -110,28 +110,6 @@ export async function POST(request: NextRequest) {
       ]).catch((err) => console.error('[카페 위치] 저장 실패:', err.message))
     }
 
-    // LBS 동의자 카페 위치 저장 (loc_tp_cd='05' 카페생성) — 비블로킹
-    const validLat = typeof lat === 'number' && isFinite(lat) && lat >= -90 && lat <= 90
-    const validLng = typeof lng === 'number' && isFinite(lng) && lng >= -180 && lng <= 180
-    if (validLat && validLng && user.lbs_consent_yn === 'Y') {
-      const db = getSupabaseAdmin()
-      const slug = String(user.display_name ?? 'user').slice(0, 20)
-      Promise.all([
-        db.from('msg_room').update({ latd_crd: lat, lngt_crd: lng }).eq('room_id', room.room_id),
-        db.from('usr_loc_hist').insert({
-          user_str_id: user.id,
-          loc_tp_cd: '05',
-          latd_crd: lat,
-          lngt_crd: lng,
-          ref_id: room.room_id,
-          consent_yn: 'Y',
-          consent_dtm: new Date().toISOString(),
-          regr_id: slug,
-          modr_id: slug,
-        }),
-      ]).catch(err => console.error('[카페 위치] 저장 실패:', err.message))
-    }
-
     return NextResponse.json({ room }, { status: 201 })
   } catch {
     return NextResponse.json({ error: '카페 생성 실패' }, { status: 500 })
