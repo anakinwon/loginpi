@@ -149,7 +149,8 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey, bizCategory, rad
           if (shopId) markerMapRef.current.set(shopId, { marker, content: infoContent, position })
         }
 
-        // Google Maps 이동수단별 길찾기 버튼 (dirflg로 모드 직접 지정)
+        // Google Maps 이동수단별 길찾기 버튼 (공식 maps/dir URL — travelmode 파라미터)
+        // dirflg(레거시)는 WebView 리다이렉트 시 유실 → travelmode로 교체
         const buildNavLinks = (lat: number, lng: number, _name: string) => {
           const wrap = document.createElement('div')
           wrap.style.cssText = 'margin-top:8px'
@@ -160,14 +161,14 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey, bizCategory, rad
           const row = document.createElement('div')
           row.style.cssText = 'display:flex;gap:4px;flex-wrap:wrap'
           const modes = [
-            { icon: '🚗', label: '자가용', dirflg: 'd' },
-            { icon: '🚌', label: '대중교통', dirflg: 'r' },
-            { icon: '🚶', label: '도보', dirflg: 'w' },
-            { icon: '🚲', label: '자전거', dirflg: 'b' },
+            { icon: '🚗', label: '자가용', travelmode: 'driving' },
+            { icon: '🚌', label: '대중교통', travelmode: 'transit' },
+            { icon: '🚶', label: '도보', travelmode: 'walking' },
+            { icon: '🚲', label: '자전거', travelmode: 'bicycling' },
           ]
           for (const m of modes) {
             const a = document.createElement('a')
-            a.href = `https://maps.google.com/maps?saddr=${userLat},${userLng}&daddr=${lat},${lng}&dirflg=${m.dirflg}`
+            a.href = `https://www.google.com/maps/dir/?api=1&origin=${userLat},${userLng}&destination=${lat},${lng}&travelmode=${m.travelmode}`
             a.target = '_blank'
             a.rel = 'noopener noreferrer'
             a.textContent = `${m.icon} ${m.label}`
