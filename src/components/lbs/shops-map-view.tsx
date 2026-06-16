@@ -149,18 +149,33 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey, bizCategory, rad
           if (shopId) markerMapRef.current.set(shopId, { marker, content: infoContent, position })
         }
 
-        // Google Maps 길찾기 버튼 (글로벌 서비스 기준 단일 연동)
+        // Google Maps 이동수단별 길찾기 버튼 (dirflg로 모드 직접 지정)
         const buildNavLinks = (lat: number, lng: number, _name: string) => {
+          const wrap = document.createElement('div')
+          wrap.style.cssText = 'margin-top:8px'
+          const label = document.createElement('p')
+          label.style.cssText = 'font-size:11px;color:#6b7280;margin:0 0 4px'
+          label.textContent = '🧭 Google Maps 길찾기'
+          wrap.appendChild(label)
           const row = document.createElement('div')
-          row.style.cssText = 'margin-top:8px'
-          const a = document.createElement('a')
-          a.href = `https://maps.google.com/?daddr=${lat},${lng}`
-          a.target = '_blank'
-          a.rel = 'noopener noreferrer'
-          a.textContent = '🧭 Google Maps 길찾기'
-          a.style.cssText = 'display:inline-block;padding:4px 10px;font-size:12px;border-radius:4px;border:1px solid #4285F4;color:#4285F4;text-decoration:none;font-weight:500'
-          row.appendChild(a)
-          return row
+          row.style.cssText = 'display:flex;gap:4px;flex-wrap:wrap'
+          const modes = [
+            { icon: '🚗', label: '자가용', dirflg: 'd' },
+            { icon: '🚌', label: '대중교통', dirflg: 'r' },
+            { icon: '🚶', label: '도보', dirflg: 'w' },
+            { icon: '🚲', label: '자전거', dirflg: 'b' },
+          ]
+          for (const m of modes) {
+            const a = document.createElement('a')
+            a.href = `https://maps.google.com/maps?daddr=${lat},${lng}&dirflg=${m.dirflg}`
+            a.target = '_blank'
+            a.rel = 'noopener noreferrer'
+            a.textContent = `${m.icon} ${m.label}`
+            a.style.cssText = 'display:inline-block;padding:3px 7px;font-size:11px;border-radius:4px;border:1px solid #d1d5db;color:#374151;text-decoration:none;white-space:nowrap'
+            row.appendChild(a)
+          }
+          wrap.appendChild(row)
+          return wrap
         }
 
         const buildShopInfo = (nm: string, dist: string, addr: string | null, biz_hour: string | null, lat: number, lng: number) => {
