@@ -112,15 +112,16 @@ export async function markEscrow(
 ) {
   const db = getSupabaseAdmin()
 
-  // 오프라인 여부 판정 — 주문 상품이 매장 소속(shop_id 존재)이면 오프라인 흐름
+  // 오프라인 여부 판정 — 주문 상품이 매장 소속(shop_id 존재)이면 오프라인 흐름.
+  // PostgREST 중첩 응답이 객체/배열 둘 다 올 수 있어 양쪽 모두 대응 (배열이면 [0])
   const { data: ord } = await db
     .from('mps_order')
     .select('mps_item(shop_id)')
     .eq('order_id', orderId)
     .maybeSingle()
-  const isOffline = !!(
-    ord as { mps_item?: { shop_id?: string | null } | null } | null
-  )?.mps_item?.shop_id
+  const rawItem = (ord as { mps_item?: unknown } | null)?.mps_item
+  const itemObj = Array.isArray(rawItem) ? rawItem[0] : rawItem
+  const isOffline = !!(itemObj as { shop_id?: string | null } | null)?.shop_id
   const nextState = isOffline ? 'ORDERED' : 'TRADING'
 
   const { data, error } = await db

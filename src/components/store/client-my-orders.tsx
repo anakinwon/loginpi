@@ -77,7 +77,7 @@ const MTHD_LABEL: Record<string, string> = {
 
 // 오프라인 액션 성공 메시지
 const OFFLINE_ACTION_MSG: Partial<Record<OrderAction, string>> = {
-  accept: '상품준비를 시작합니다 — 준비중',
+  accept: '상품접수 완료 — 준비중',
   ready: '상품완료 — 수령 대기중 (10분 후 자동 판매완료)',
 }
 
@@ -321,14 +321,14 @@ export function ClientMyOrders({
             </Button>
           )}
 
-          {/* 오프라인 — 판매자 상품준비 (주문중 → 준비중) */}
+          {/* 오프라인 — 판매자 상품접수 (주문중 → 준비중) */}
           {role === 'seller' && o.order_st_cd === 'ORDERED' && (
             <Button
               size="sm"
               disabled={busy}
               onClick={() => act(o.order_id, 'accept')}
             >
-              🍳 상품준비
+              📥 상품접수
             </Button>
           )}
           {/* 오프라인 — 판매자 상품완료 (준비중 → 상품대기중) */}
@@ -383,8 +383,8 @@ export function ClientMyOrders({
         {o.order_st_cd === 'ORDERED' && (
           <p className="text-muted-foreground text-xs">
             {role === 'seller'
-              ? '👉 상품준비를 눌러 준비를 시작하세요'
-              : '사장님 확인 대기중입니다'}
+              ? '👉 상품접수를 눌러 준비를 시작하세요'
+              : '사장님 접수 대기중입니다'}
           </p>
         )}
         {o.order_st_cd === 'PREPARING' && (
