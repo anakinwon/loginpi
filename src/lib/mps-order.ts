@@ -54,6 +54,8 @@ export async function createOrder(
   buyerId: string,
   meetLoc: string | null,
   regrId: string,
+  orderMthd?: 'DINE_IN' | 'PICKUP' | 'DELIVERY' | null,
+  dlvrAddr?: string | null,
 ): Promise<{ order: MpsOrder } | { error: OrderError }> {
   const { data, error } = await getSupabaseAdmin().rpc('fn_mps_order_create', {
     p_item_id: itemId,
@@ -62,7 +64,23 @@ export async function createOrder(
     p_regr_id: regrId,
   })
   if (error) return { error: mapRpcError(error.message) }
-  return { order: data as MpsOrder }
+  const order = data as MpsOrder
+
+  // 주문방법·배달주소 반영 — RPC는 재고 원자성만 담당, 방법은 사후 UPDATE (재고 무관)
+  if (orderMthd) {
+    const { data: updated } = await getSupabaseAdmin()
+      .from('mps_order')
+      .update({
+        order_mthd_cd: orderMthd,
+        dlvr_addr: orderMthd === 'DELIVERY' ? (dlvrAddr ?? null) : null,
+        modr_id: regrId,
+      })
+      .eq('order_id', order.order_id)
+      .select('*')
+      .single()
+    if (updated) return { order: updated as MpsOrder }
+  }
+  return { order }
 }
 
 // 주문 취소 — 상태·권한 검증 + 재고 복원 (RPC 단일 트랜잭션)

@@ -34,6 +34,7 @@ interface Shop {
   biz_status_cd: string | null
   rating_cnt: number | null
   google_place_json: unknown
+  dlvr_yn: string | null
 }
 
 interface ShopForm {
@@ -53,6 +54,7 @@ interface ShopForm {
   gmap_url: string
   biz_status_cd: string
   rating_cnt: string
+  dlvr_yn: boolean
 }
 
 const EMPTY_FORM: ShopForm = {
@@ -71,6 +73,7 @@ const EMPTY_FORM: ShopForm = {
   gmap_url: '',
   biz_status_cd: '',
   rating_cnt: '',
+  dlvr_yn: false,
 }
 
 const SHOP_TYPES: ShopType[] = ['ONLINE', 'OFFLINE', 'BOTH']
@@ -147,6 +150,7 @@ export function ClientMyShops({
       gmap_url: shop.gmap_url ?? '',
       biz_status_cd: shop.biz_status_cd ?? '',
       rating_cnt: shop.rating_cnt != null ? String(shop.rating_cnt) : '',
+      dlvr_yn: shop.dlvr_yn === 'Y',
     })
     setEditingId(shop.shop_id)
   }
@@ -185,6 +189,7 @@ export function ClientMyShops({
       gmap_url: form.gmap_url.trim() || undefined,
       biz_status_cd: form.biz_status_cd.trim() || undefined,
       rating_cnt: ratingCnt ? Number(ratingCnt) : undefined,
+      dlvr_yn: form.dlvr_yn ? 'Y' : 'N',
     }
 
     setSaving(true)
@@ -283,6 +288,22 @@ export function ClientMyShops({
               className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
             />
           </div>
+
+          {/* 배달 가능 — 켜면 구매자에게 '배달' 주문방법이 노출됨 */}
+          <label className="flex cursor-pointer items-center justify-between rounded-lg border p-3">
+            <div>
+              <p className="text-sm font-medium">🛵 배달 가능</p>
+              <p className="text-muted-foreground text-xs">
+                켜면 구매 시 &lsquo;배달&rsquo; 주문방법이 노출됩니다
+              </p>
+            </div>
+            <input
+              type="checkbox"
+              checked={form.dlvr_yn}
+              onChange={(e) => set('dlvr_yn', e.target.checked)}
+              className="size-5"
+            />
+          </label>
 
           {/* 주소 — OFFLINE/BOTH에서 의미. 좌표는 향후 지도 핀 UI로 보강(FR-06) */}
           {form.shop_type_cd !== 'ONLINE' && (

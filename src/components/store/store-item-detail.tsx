@@ -31,7 +31,12 @@ interface ItemDetail {
   view_cnt: number
   thumbnail_url: string | null
   images: ItemImage[]
-  shop: { shop_nm: string; shop_type_cd: string; addr: string | null } | null
+  shop: {
+    shop_nm: string
+    shop_type_cd: string
+    addr: string | null
+    dlvr_yn?: string | null
+  } | null
   seller_bonded: boolean // 판매자 보증금 활성 — 취소수수료 0.1π 발생 거래 (FR-10 단서 공시)
   trading_cnt: number // 진행 중 주문 수 — 거래중/판매완료 배지 구분
 }
@@ -53,6 +58,11 @@ export function StoreItemDetail({ itemId }: { itemId: string }) {
   )
   const [activeImg, setActiveImg] = useState<string | null>(null)
   const [buying, setBuying] = useState(false)
+  // 주문방법 3종 (기본 매장이용) + 배달주소
+  const [orderMthd, setOrderMthd] = useState<'DINE_IN' | 'PICKUP' | 'DELIVERY'>(
+    'DINE_IN',
+  )
+  const [dlvrAddr, setDlvrAddr] = useState('')
 
   useEffect(() => {
     void (async () => {
@@ -88,12 +98,20 @@ export function StoreItemDetail({ itemId }: { itemId: string }) {
       toast.error(t('piBrowserOnly'))
       return
     }
+    if (orderMthd === 'DELIVERY' && !dlvrAddr.trim()) {
+      toast.error('배달 위치를 입력해주세요')
+      return
+    }
     setBuying(true)
     try {
       const res = await piFetch('/api/store/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ item_id: itemId }),
+        body: JSON.stringify({
+          item_id: itemId,
+          order_mthd_cd: orderMthd,
+          dlvr_addr: orderMthd === 'DELIVERY' ? dlvrAddr.trim() : undefined,
+        }),
       })
       if (!res.ok) {
         const { error } = (await res.json()) as { error?: string }
@@ -264,6 +282,53 @@ export function StoreItemDetail({ itemId }: { itemId: string }) {
               {t(`shopType.${item.shop.shop_type_cd}`)}
               {item.shop.addr && ` · ${item.shop.addr}`}
             </p>
+          </div>
+        )}
+
+        {/* 주문방법 3종 — 매장이용·픽업·배달(배달가능 매장만). 배달 시 위치 입력 */}
+        {!isMine && (
+          <div className="space-y-2">
+            <p className="text-sm font-medium">주문방법</p>
+            <div className="flex flex-wrap gap-1.5">
+              {(
+                [
+                  { cd: 'DINE_IN', label: '🍽️ 매장이용' },
+                  { cd: 'PICKUP', label: '🥡 픽업이용' },
+                  ...(item.shop?.dlvr_yn === 'Y'
+                    ? [{ cd: 'DELIVERY', label: '🛵 배달이용' }]
+                    : []),
+                ] as const
+              ).map((m) => (
+                <button
+                  key={m.cd}
+                  type="button"
+                  onClick={() =>
+                    setOrderMthd(m.cd as 'DINE_IN' | 'PICKUP' | 'DELIVERY')
+                  }
+                  className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                    orderMthd === m.cd
+                      ? 'border-primary bg-primary text-primary-foreground'
+                      : 'text-muted-foreground hover:bg-muted'
+                  }`}
+                >
+                  {m.label}
+                </button>
+              ))}
+            </div>
+            {orderMthd === 'DELIVERY' && (
+              <div className="space-y-1">
+                <label className="text-muted-foreground text-xs">
+                  배달 위치 *
+                </label>
+                <input
+                  value={dlvrAddr}
+                  onChange={(e) => setDlvrAddr(e.target.value)}
+                  placeholder="배달받을 주소를 입력하세요"
+                  maxLength={500}
+                  className="w-full rounded-lg border bg-transparent px-2.5 py-1.5 text-sm"
+                />
+              </div>
+            )}
           </div>
         )}
 

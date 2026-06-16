@@ -23,6 +23,8 @@ const patchSchema = z.object({
   gmap_url: z.url().max(1000).optional(),
   biz_status_cd: z.string().max(20).optional(),
   rating_cnt: z.number().int().min(0).optional(),
+  // 배달 가능 여부 (점주 설정) — 배달 주문방법 노출 게이트
+  dlvr_yn: z.enum(['Y', 'N']).optional(),
 })
 
 // PATCH /api/store/shops/[shopId] — 매장 수정 (본인 매장만, FR-06)

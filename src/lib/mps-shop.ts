@@ -43,6 +43,7 @@ export interface MpsShop {
   biz_status_cd: string | null
   rating_cnt: number | null
   google_place_json: unknown
+  dlvr_yn: string | null
 }
 
 export interface ShopInput {
@@ -64,6 +65,7 @@ export interface ShopInput {
   gmap_url?: string
   biz_status_cd?: string
   rating_cnt?: number
+  dlvr_yn?: string
 }
 
 export async function listMyShops(sellerId: string) {
