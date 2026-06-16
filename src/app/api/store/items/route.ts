@@ -108,8 +108,8 @@ export async function POST(req: NextRequest) {
       .insert({
         user_str_id: user.id,
         loc_tp_cd: '04',
-        lat: input.lat,
-        lng: input.lng,
+        latd_crd: input.lat,
+        lngt_crd: input.lng,
         ref_id: item.item_id,
         consent_yn: 'Y',
         consent_dtm: new Date().toISOString(),
