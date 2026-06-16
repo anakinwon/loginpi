@@ -69,14 +69,13 @@ export async function POST(request: NextRequest) {
     if (meta?.type === 'CHAT_ROOM_CREATE' && payment.user_uid) {
       const { data: owner } = await db
         .from('sys_user')
-        .select('id, display_name')
+        .select('id, display_name, lbs_consent_yn')
         .eq('pi_uid', payment.user_uid)
         .maybeSingle()
 
       if (owner) {
-        const slug = String(
-          (owner as Record<string, unknown>).display_name ?? 'user',
-        ).slice(0, 20)
+        const ownerRow = owner as { id: string; display_name: string | null; lbs_consent_yn: string | null }
+        const slug = String(ownerRow.display_name ?? 'user').slice(0, 20)
         const { data: room } = await db
           .from('msg_room')
           .insert({
@@ -94,14 +93,35 @@ export async function POST(request: NextRequest) {
           .single()
 
         if (room) {
+          const roomId = String((room as Record<string, unknown>).room_id)
           await db.from('msg_room_mbr').insert({
-            room_id: (room as Record<string, unknown>).room_id,
-            usr_id: (owner as Record<string, unknown>).id,
+            room_id: roomId,
+            usr_id: ownerRow.id,
             mbr_role_cd: 'OWNER',
             regr_id: slug,
             modr_id: slug,
           })
           createdRoom = room as Record<string, unknown>
+
+          // LBS 동의자 카페 위치 저장 (loc_tp_cd='05') — 메타데이터 lat/lng 사용
+          const metaLat = typeof meta.lat === 'number' && isFinite(meta.lat as number) ? meta.lat as number : null
+          const metaLng = typeof meta.lng === 'number' && isFinite(meta.lng as number) ? meta.lng as number : null
+          if (ownerRow.lbs_consent_yn === 'Y' && metaLat !== null && metaLng !== null) {
+            Promise.all([
+              db.from('msg_room').update({ latd_crd: metaLat, lngt_crd: metaLng }).eq('room_id', roomId),
+              db.from('usr_loc_hist').insert({
+                user_str_id: ownerRow.id,
+                loc_tp_cd: '05',
+                latd_crd: metaLat,
+                lngt_crd: metaLng,
+                ref_id: roomId,
+                consent_yn: 'Y',
+                consent_dtm: new Date().toISOString(),
+                regr_id: slug,
+                modr_id: slug,
+              }),
+            ]).catch(err => console.error('[카페 위치] 결제 완료 저장 실패:', err))
+          }
         }
       }
     } else if (meta?.type === 'CHAT_SUBSCR' && payment.user_uid) {
