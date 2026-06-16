@@ -129,6 +129,13 @@ export interface ClaimInput {
   owner_nm: string // 대표자명 — 필수 입력 (검증 안 함, 신고 항목)
   contact_email: string // 이메일 — 필수 입력 (검증 안 함, 신고 항목)
   biz_hour?: string | null
+  // 구글 Place 정보 (모두 nullable) — 구글이 제공하는 모든 정보 보관
+  google_nm?: string | null
+  website_url?: string | null
+  gmap_url?: string | null
+  biz_status_cd?: string | null
+  rating_cnt?: number | null
+  google_place_json?: unknown
 }
 
 // 반자동 인증 통과 매장 생성 — owner_verified_yn='Y', verify_method_cd='MATCH'
@@ -153,6 +160,13 @@ export async function createVerifiedShop(
       contact_email: input.contact_email,
       owner_nm: input.owner_nm,
       biz_hour: input.biz_hour ?? null,
+      // 구글 Place 정보 보관
+      google_nm: input.google_nm ?? null,
+      website_url: input.website_url ?? null,
+      gmap_url: input.gmap_url ?? null,
+      biz_status_cd: input.biz_status_cd ?? null,
+      rating_cnt: input.rating_cnt ?? null,
+      google_place_json: input.google_place_json ?? null,
       owner_verified_yn: 'Y',
       verify_method_cd: 'MATCH',
       verify_dtm: new Date().toISOString(),

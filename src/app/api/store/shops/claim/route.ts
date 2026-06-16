@@ -193,6 +193,14 @@ export async function POST(req: NextRequest) {
       contact_tel: c.contact_tel,
       owner_nm: c.owner_nm,
       contact_email: c.contact_email,
+      biz_hour: place.biz_hours,
+      // 구글이 제공하는 모든 정보 보관
+      google_nm: place.name,
+      website_url: place.website_uri,
+      gmap_url: place.google_maps_uri,
+      biz_status_cd: place.business_status,
+      rating_cnt: place.user_rating_count,
+      google_place_json: place.raw,
     })
 
     // 매장 위치 이력 기록 (loc_tp_cd='03'=매장, 비블로킹) — DA 표준 컬럼 latd_crd/lngt_crd
