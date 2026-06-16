@@ -59,11 +59,13 @@ type OrderAction =
   | 'ready'
   | 'pickup'
 
-// 오프라인 상태 라벨·스타일 (i18n 키 누락 회피 — 로컬 한글 맵)
+// 오프라인 상태 라벨 (i18n 키 누락 회피 — 로컬 한글 맵)
+// 주문중 → 준비중 → 상품대기중 → (10분 후) 판매완료
+// DONE은 오프라인일 때만 '판매완료'로 표시 (renderCard에서 분기, 직거래는 거래완료 유지)
 const OFFLINE_LABEL: Partial<Record<OrderRow['order_st_cd'], string>> = {
-  ORDERED: '🛒 상품주문중',
-  PREPARING: '👨‍🍳 상품준비중',
-  READY: '✅ 상품준비완료',
+  ORDERED: '🛒 주문중',
+  PREPARING: '👨‍🍳 준비중',
+  READY: '📦 상품대기중',
 }
 
 // 주문방법 라벨
@@ -75,9 +77,8 @@ const MTHD_LABEL: Record<string, string> = {
 
 // 오프라인 액션 성공 메시지
 const OFFLINE_ACTION_MSG: Partial<Record<OrderAction, string>> = {
-  accept: '접수했습니다 — 상품준비중',
-  ready: '준비완료 처리했습니다',
-  pickup: '픽업 완료 — 거래가 완료되었습니다',
+  accept: '상품준비를 시작합니다 — 준비중',
+  ready: '상품완료 — 수령 대기중 (10분 후 자동 판매완료)',
 }
 
 // ESCROW·SELLER_DONE은 구버전 주문 레거시 상태 — 화면에는 거래중과 동일 계열로 표시
@@ -210,6 +211,16 @@ export function ClientMyOrders({
     const busy = acting?.id === o.order_id
     // 취소 진행 중 여부 — 동일 주문의 수령/완료 액션과 구분해 "취소중"만 정확히 표시
     const canceling = busy && acting?.action === 'cancel'
+    const offline = isOffline(o)
+    // 상태 배지 라벨 — 오프라인 신규상태는 로컬 라벨, 오프라인 DONE은 '판매완료',
+    // 그 외(직거래·레거시)는 i18n (ESCROW·SELLER_DONE은 거래중으로 통합)
+    const stLabel =
+      OFFLINE_LABEL[o.order_st_cd] ??
+      (offline && o.order_st_cd === 'DONE'
+        ? '🎉 판매완료'
+        : t(
+            `orderSt.${IN_TRADE.includes(o.order_st_cd) ? 'TRADING' : o.order_st_cd}`,
+          ))
     return (
       <div key={o.order_id} className="space-y-2 rounded-lg border p-4">
         <div className="flex items-center justify-between gap-2">
@@ -222,11 +233,7 @@ export function ClientMyOrders({
           <span
             className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${ST_STYLE[o.order_st_cd]}`}
           >
-            {/* 오프라인 상태는 로컬 라벨, 레거시 ESCROW·SELLER_DONE은 "거래중" */}
-            {OFFLINE_LABEL[o.order_st_cd] ??
-              t(
-                `orderSt.${IN_TRADE.includes(o.order_st_cd) ? 'TRADING' : o.order_st_cd}`,
-              )}
+            {stLabel}
           </span>
         </div>
         <p className="text-muted-foreground text-xs">
@@ -314,36 +321,27 @@ export function ClientMyOrders({
             </Button>
           )}
 
-          {/* 오프라인 — 판매자 주문접수 (상품주문중 → 상품준비중) */}
+          {/* 오프라인 — 판매자 상품준비 (주문중 → 준비중) */}
           {role === 'seller' && o.order_st_cd === 'ORDERED' && (
             <Button
               size="sm"
               disabled={busy}
               onClick={() => act(o.order_id, 'accept')}
             >
-              📥 주문접수
+              🍳 상품준비
             </Button>
           )}
-          {/* 오프라인 — 판매자 준비완료 (상품준비중 → 상품준비완료) */}
+          {/* 오프라인 — 판매자 상품완료 (준비중 → 상품대기중) */}
           {role === 'seller' && o.order_st_cd === 'PREPARING' && (
             <Button
               size="sm"
               disabled={busy}
               onClick={() => act(o.order_id, 'ready')}
             >
-              ✅ 준비완료
+              📦 상품완료
             </Button>
           )}
-          {/* 오프라인 — 구매자 픽업 (상품준비완료 → 거래완료) */}
-          {role === 'buyer' && o.order_st_cd === 'READY' && (
-            <Button
-              size="sm"
-              disabled={busy}
-              onClick={() => act(o.order_id, 'pickup')}
-            >
-              🥡 픽업 완료
-            </Button>
-          )}
+          {/* 상품대기중(READY)은 구매자 액션 없음 — 10분 후 자동 판매완료 */}
           {(o.order_st_cd === 'PENDING' ||
             (IN_TRADE.includes(o.order_st_cd) &&
               (role === 'buyer' || o.order_st_cd !== 'SELLER_DONE')) ||
@@ -385,22 +383,22 @@ export function ClientMyOrders({
         {o.order_st_cd === 'ORDERED' && (
           <p className="text-muted-foreground text-xs">
             {role === 'seller'
-              ? '👉 접수하기를 눌러 준비를 시작하세요'
-              : '사장님 접수 대기중입니다'}
+              ? '👉 상품준비를 눌러 준비를 시작하세요'
+              : '사장님 확인 대기중입니다'}
           </p>
         )}
         {o.order_st_cd === 'PREPARING' && (
           <p className="text-muted-foreground text-xs">
             {role === 'seller'
-              ? '👉 준비가 끝나면 준비완료를 눌러주세요'
+              ? '👉 준비가 끝나면 상품완료를 눌러주세요'
               : '상품을 준비하고 있습니다'}
           </p>
         )}
         {o.order_st_cd === 'READY' && (
           <p className="text-muted-foreground text-xs">
             {role === 'buyer'
-              ? '🥡 픽업하러 가세요! (10분 후 자동 거래완료)'
-              : '구매자 픽업 대기중 (10분 후 자동 거래완료)'}
+              ? '📦 상품이 준비됐어요! 곧 받으실 수 있습니다 (10분 후 자동 판매완료)'
+              : '구매자 수령 대기중 (10분 후 자동 판매완료)'}
           </p>
         )}
         {o.order_st_cd === 'DONE' && (
