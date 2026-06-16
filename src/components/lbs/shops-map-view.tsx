@@ -317,7 +317,8 @@ export function ShopsMapView({
             a.textContent = addr
             wrap.appendChild(a)
           }
-          // 판매중 상품이 있으면 영업시간 자리에 상품 목록 대체 표시 (탭 → 에스크로 거래)
+          // 판매중 상품이 있으면 영업시간 자리에 썸네일 그리드 대체 표시
+          // (썸네일만 노출, 상품명은 마우스오버 title로, 탭 → 에스크로 거래)
           if (items.length > 0) {
             const head = document.createElement('p')
             head.style.cssText =
@@ -325,27 +326,32 @@ export function ShopsMapView({
             head.textContent = '🛒 판매 상품 (탭하여 에스크로 거래)'
             wrap.appendChild(head)
 
-            const list = document.createElement('div')
-            list.style.cssText =
-              'display:flex;flex-direction:column;gap:3px;max-height:150px;overflow-y:auto'
+            const grid = document.createElement('div')
+            grid.style.cssText =
+              'display:grid;grid-template-columns:repeat(4,1fr);gap:4px;max-height:160px;overflow-y:auto'
             for (const it of items) {
-              const row = document.createElement('a')
-              row.href = `/${locale}/store/${it.item_id}`
-              row.style.cssText =
-                'display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 7px;border:1px solid #e5e7eb;border-radius:5px;text-decoration:none;color:#111827'
-              const nameSpan = document.createElement('span')
-              nameSpan.style.cssText =
-                'font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap'
-              nameSpan.textContent = it.item_nm
-              const priceSpan = document.createElement('span')
-              priceSpan.style.cssText =
-                'font-size:12px;font-weight:700;color:#7c3aed;white-space:nowrap'
-              priceSpan.textContent = `${Number(it.price_pi)} π`
-              row.appendChild(nameSpan)
-              row.appendChild(priceSpan)
-              list.appendChild(row)
+              const cell = document.createElement('a')
+              cell.href = `/${locale}/store/${it.item_id}`
+              // 상품명은 마우스오버(title)로만 노출
+              cell.title = `${it.item_nm} · ${Number(it.price_pi)} π`
+              cell.style.cssText =
+                'display:block;aspect-ratio:1;border:1px solid #e5e7eb;border-radius:6px;overflow:hidden;background:#f3f4f6'
+              if (it.thumbnail_url) {
+                const img = document.createElement('img')
+                img.src = it.thumbnail_url
+                img.alt = ''
+                img.style.cssText =
+                  'width:100%;height:100%;object-fit:cover;display:block'
+                cell.appendChild(img)
+              } else {
+                // 썸네일 없으면 아이콘 플레이스홀더 (이름은 title로 확인)
+                cell.style.cssText +=
+                  ';display:flex;align-items:center;justify-content:center;font-size:18px'
+                cell.textContent = '🛒'
+              }
+              grid.appendChild(cell)
             }
-            wrap.appendChild(list)
+            wrap.appendChild(grid)
           } else if (biz_hour) {
             const h = document.createElement('p')
             h.style.cssText = 'color:#6b7280;font-size:12px;margin:0'
