@@ -149,24 +149,17 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey, bizCategory, rad
           if (shopId) markerMapRef.current.set(shopId, { marker, content: infoContent, position })
         }
 
-        // 길찾기 버튼 행 (Google · Naver · Kakao 외부 앱 연동)
-        const buildNavLinks = (lat: number, lng: number, name: string) => {
+        // Google Maps 길찾기 버튼 (글로벌 서비스 기준 단일 연동)
+        const buildNavLinks = (lat: number, lng: number, _name: string) => {
           const row = document.createElement('div')
-          row.style.cssText = 'display:flex;gap:5px;margin-top:8px;flex-wrap:wrap'
-          const navItems = [
-            { label: 'Google', url: `https://maps.google.com/?daddr=${lat},${lng}` },
-            { label: 'Naver', url: `https://map.naver.com/index.nhn?lng=${lng}&lat=${lat}&title=${encodeURIComponent(name)}&menu=route` },
-            { label: 'Kakao', url: `https://map.kakao.com/link/to/${encodeURIComponent(name)},${lat},${lng}` },
-          ]
-          for (const { label, url } of navItems) {
-            const a = document.createElement('a')
-            a.href = url
-            a.target = '_blank'
-            a.rel = 'noopener noreferrer'
-            a.textContent = `🧭 ${label}`
-            a.style.cssText = 'display:inline-block;padding:3px 7px;font-size:11px;border-radius:4px;border:1px solid #d1d5db;color:#374151;text-decoration:none;white-space:nowrap'
-            row.appendChild(a)
-          }
+          row.style.cssText = 'margin-top:8px'
+          const a = document.createElement('a')
+          a.href = `https://maps.google.com/?daddr=${lat},${lng}`
+          a.target = '_blank'
+          a.rel = 'noopener noreferrer'
+          a.textContent = '🧭 Google Maps 길찾기'
+          a.style.cssText = 'display:inline-block;padding:4px 10px;font-size:12px;border-radius:4px;border:1px solid #4285F4;color:#4285F4;text-decoration:none;font-weight:500'
+          row.appendChild(a)
           return row
         }
 
