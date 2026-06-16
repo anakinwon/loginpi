@@ -9,6 +9,13 @@ import {
 } from '@/components/lbs/shop-claim-dialog'
 import type { BizCategory } from '@/components/lbs/nearby-explorer'
 
+interface ShopItem {
+  item_id: string
+  item_nm: string
+  price_pi: number | string
+  thumbnail_url: string | null
+}
+
 interface NearbyShop {
   shop_id: string
   shop_nm: string
@@ -18,6 +25,7 @@ interface NearbyShop {
   lat: number
   lng: number
   owner_verified_yn?: string | null
+  items?: ShopItem[]
 }
 
 interface Props {
@@ -271,6 +279,9 @@ export function ShopsMapView({
           return btn
         }
 
+        // 내부 라우팅용 locale (vanilla DOM 링크라 경로에서 직접 추출)
+        const locale = window.location.pathname.split('/')[1] || 'en'
+
         const buildShopInfo = (
           nm: string,
           dist: string,
@@ -279,6 +290,7 @@ export function ShopsMapView({
           lat: number,
           lng: number,
           verified: boolean,
+          items: ShopItem[],
         ) => {
           const wrap = document.createElement('div')
           wrap.style.cssText =
@@ -305,7 +317,36 @@ export function ShopsMapView({
             a.textContent = addr
             wrap.appendChild(a)
           }
-          if (biz_hour) {
+          // 판매중 상품이 있으면 영업시간 자리에 상품 목록 대체 표시 (탭 → 에스크로 거래)
+          if (items.length > 0) {
+            const head = document.createElement('p')
+            head.style.cssText =
+              'font-size:11px;font-weight:700;color:#374151;margin:6px 0 3px'
+            head.textContent = '🛒 판매 상품 (탭하여 에스크로 거래)'
+            wrap.appendChild(head)
+
+            const list = document.createElement('div')
+            list.style.cssText =
+              'display:flex;flex-direction:column;gap:3px;max-height:150px;overflow-y:auto'
+            for (const it of items) {
+              const row = document.createElement('a')
+              row.href = `/${locale}/store/${it.item_id}`
+              row.style.cssText =
+                'display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 7px;border:1px solid #e5e7eb;border-radius:5px;text-decoration:none;color:#111827'
+              const nameSpan = document.createElement('span')
+              nameSpan.style.cssText =
+                'font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap'
+              nameSpan.textContent = it.item_nm
+              const priceSpan = document.createElement('span')
+              priceSpan.style.cssText =
+                'font-size:12px;font-weight:700;color:#7c3aed;white-space:nowrap'
+              priceSpan.textContent = `${Number(it.price_pi)} π`
+              row.appendChild(nameSpan)
+              row.appendChild(priceSpan)
+              list.appendChild(row)
+            }
+            wrap.appendChild(list)
+          } else if (biz_hour) {
             const h = document.createElement('p')
             h.style.cssText = 'color:#6b7280;font-size:12px;margin:0'
             h.textContent = `🕒 ${biz_hour}`
@@ -333,6 +374,7 @@ export function ShopsMapView({
                 shop.lat,
                 shop.lng,
                 shop.owner_verified_yn === 'Y',
+                shop.items ?? [],
               ),
               shop.shop_id,
             )

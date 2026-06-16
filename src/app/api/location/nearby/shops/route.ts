@@ -75,5 +75,36 @@ export async function GET(request: NextRequest) {
     .filter((s) => s.distance_km <= radius)
     .sort((a, b) => a.distance_km - b.distance_km)
 
-  return NextResponse.json({ shops, total: shops.length })
+  // 각 매장의 판매중(OPEN) 상품을 한 번에 묶어 조회 → InfoWindow에서 영업시간 대신 표시·거래
+  type ItemMini = {
+    item_id: string
+    item_nm: string
+    price_pi: number | string
+    shop_id: string
+    thumbnail_url: string | null
+  }
+  const shopIds = shops.map((s) => s.shop_id)
+  const itemsByShop: Record<string, ItemMini[]> = {}
+  if (shopIds.length > 0) {
+    const { data: items } = await getSupabaseAdmin()
+      .from('mps_item')
+      .select('item_id, item_nm, price_pi, shop_id, thumbnail_url')
+      .in('shop_id', shopIds)
+      .eq('item_st_cd', 'OPEN')
+      .eq('del_yn', 'N')
+      .order('reg_dtm', { ascending: false })
+    for (const it of (items as ItemMini[] | null) ?? []) {
+      ;(itemsByShop[it.shop_id] ??= []).push(it)
+    }
+  }
+
+  const shopsWithItems = shops.map((s) => ({
+    ...s,
+    items: (itemsByShop[s.shop_id] ?? []).slice(0, 10), // 매장당 최대 10개
+  }))
+
+  return NextResponse.json({
+    shops: shopsWithItems,
+    total: shopsWithItems.length,
+  })
 }
