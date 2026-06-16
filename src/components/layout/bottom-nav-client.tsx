@@ -1,7 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { Coffee, House, MapPin, ShieldCheck, Store, UserRound, Zap } from 'lucide-react'
+import { Coffee, House, MapPin, ShieldCheck, Store, Zap } from 'lucide-react'
 import { Link, usePathname } from '@/i18n/navigation'
 import { usePiAuth } from '@/components/pi-auth-provider'
 import { cn } from '@/lib/utils'
@@ -20,11 +20,7 @@ export function BottomNavClient({ serverIsAdmin }: { serverIsAdmin: boolean }) {
   const isAdminUser =
     serverIsAdmin || piUser?.role === 'ADMIN' || piUser?.role === 'MASTER'
 
-  const myTab = isAdminUser
-    ? { href: '/admin', label: t('admin'), icon: ShieldCheck }
-    : { href: '/profile', label: t('my'), icon: UserRound }
-
-  const tabs = [
+  const baseTabs = [
     { href: '/', label: t('home'), icon: House, active: pathname === '/' },
     {
       href: '/event',
@@ -50,12 +46,24 @@ export function BottomNavClient({ serverIsAdmin }: { serverIsAdmin: boolean }) {
       icon: MapPin,
       active: pathname.startsWith('/map'),
     },
-    { ...myTab, active: pathname.startsWith(myTab.href) },
   ]
+
+  // 관리자만 Admin 탭 추가 — 비관리자는 헤더 사용자명 클릭으로 My Info 이동
+  const tabs = isAdminUser
+    ? [
+        ...baseTabs,
+        {
+          href: '/admin',
+          label: t('admin'),
+          icon: ShieldCheck,
+          active: pathname.startsWith('/admin'),
+        },
+      ]
+    : baseTabs
 
   return (
     <nav className="bg-background/95 fixed inset-x-0 bottom-0 z-50 border-t pb-[env(safe-area-inset-bottom)] backdrop-blur-sm">
-      <div className="mx-auto grid h-16 max-w-5xl grid-cols-6">
+      <div className={`mx-auto grid h-16 max-w-5xl ${isAdminUser ? 'grid-cols-6' : 'grid-cols-5'}`}>
         {tabs.map((tab) => {
           const Icon = tab.icon
           return (
