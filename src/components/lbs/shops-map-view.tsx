@@ -138,7 +138,7 @@ export function ShopsMapView({
         })
 
         // maxWidth 명시 + globals.css의 .gm-style-iw 폭 강제와 함께 2열 썸네일 표시
-        infoWindow = new InfoWindow({ maxWidth: 380 })
+        infoWindow = new InfoWindow({ maxWidth: 270 })
         mapInstanceRef.current = map
         infoWindowRef.current = infoWindow
 
@@ -293,9 +293,10 @@ export function ShopsMapView({
           items: ShopItem[],
         ) => {
           const wrap = document.createElement('div')
-          // 매장 팝업 기본 폭(200), 상품 있을 땐 2개 큰 썸네일이 들어가도록 가로폭 확대(320)
+          // 썸네일 70% 축소(108px 2열) → 콘텐츠를 좁게(~230px) 만들어 Pi Browser에서도
+          // 캡되는 폭 안에 2장이 들어가게 함 (CSS 강제 의존 최소화)
           wrap.style.cssText = `font-family:system-ui,sans-serif;min-width:${
-            items.length > 0 ? '320px' : '200px'
+            items.length > 0 ? '230px' : '200px'
           };padding:4px 0`
           const nameEl = document.createElement('p')
           nameEl.style.cssText = 'font-weight:600;font-size:14px;margin:0 0 4px'
@@ -331,7 +332,7 @@ export function ShopsMapView({
             const grid = document.createElement('div')
             // 썸네일 2배 — 4열 → 2열 (Pi Browser 가독성). InfoWindow 폭도 확장
             grid.style.cssText =
-              'display:grid;grid-template-columns:repeat(2,1fr);gap:6px;max-height:280px;overflow-y:auto'
+              'display:grid;grid-template-columns:repeat(2,108px);gap:6px;max-height:240px;overflow-y:auto;justify-content:start'
             for (const it of items) {
               const itemId = it.item_id
               const cell = document.createElement('a')

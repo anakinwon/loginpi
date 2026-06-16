@@ -182,9 +182,9 @@ body {
    Google이 동적으로 다는 .gm-style-iw-d(스크롤 컨테이너)의 max-width가 콘텐츠를
    잘라내므로, maxWidth 옵션만으론 부족 → CSS로 직접 폭 허용 (shops-map-view) */
 .gm-style-iw-c {
-  max-width: 380px !important;
+  max-width: 270px !important;
 }
 .gm-style-iw-d {
-  max-width: 380px !important;
+  max-width: 270px !important;
   overflow-x: hidden !important;
 }
