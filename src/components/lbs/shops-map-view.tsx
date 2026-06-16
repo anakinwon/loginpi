@@ -199,7 +199,7 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey, bizCategory, rad
 
           // 네이버지도: 경도(lng),위도(lat),이름 순서 (GeoJSON x,y 컨벤션)
           const nBtn = document.createElement('a')
-          nBtn.href = `https://map.naver.com/v5/directions/-/${lng},${lat},${encodeURIComponent(name)}//car`
+          nBtn.href = `https://map.naver.com/v5/directions/-/${lng},${lat},${encodeURIComponent(name)}/car`
           nBtn.target = '_blank'
           nBtn.rel = 'noopener noreferrer'
           nBtn.textContent = '네이버지도'
