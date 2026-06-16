@@ -91,12 +91,14 @@ export async function cancelOrder(
   userId: string,
   reason: string,
   isAdminUser: boolean,
+  cancelRole?: 'BUYER' | 'SELLER' | null, // 취소 화면 역할 — self-purchase 구분용
 ): Promise<{ order: MpsOrder } | { error: OrderError }> {
   const { data, error } = await getSupabaseAdmin().rpc('fn_mps_order_cancel', {
     p_order_id: orderId,
     p_cancel_req_id: userId,
     p_reason: reason,
     p_is_admin: isAdminUser,
+    p_cancel_role: cancelRole ?? null,
   })
   if (error) return { error: mapRpcError(error.message) }
   return { order: data as MpsOrder }

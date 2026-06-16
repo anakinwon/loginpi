@@ -161,7 +161,8 @@ export function ClientMyOrders({
     if (action === 'cancel') {
       const reason = prompt(t('cancelReasonPrompt'))
       if (!reason?.trim()) return
-      body = JSON.stringify({ reason: reason.trim() })
+      // role 동봉 — 판매관리(seller)/구매관리(buyer)에서 취소한 역할 (수수료 당사자 구분)
+      body = JSON.stringify({ reason: reason.trim(), role })
     }
     setActing({ id: orderId, action })
     try {
