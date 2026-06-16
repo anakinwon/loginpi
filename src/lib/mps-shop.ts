@@ -32,6 +32,17 @@ export interface MpsShop {
   sns_url: string | null
   thumb_url: string | null
   reg_dtm: string
+  // 인증·구글 정보 (읽기전용 식별자 포함)
+  place_id: string | null
+  owner_nm: string | null
+  owner_verified_yn: string | null
+  verify_method_cd: string | null
+  google_nm: string | null
+  website_url: string | null
+  gmap_url: string | null
+  biz_status_cd: string | null
+  rating_cnt: number | null
+  google_place_json: unknown
 }
 
 export interface ShopInput {
@@ -46,6 +57,13 @@ export interface ShopInput {
   contact_email?: string
   sns_url?: string
   thumb_url?: string
+  // 구글 제공 정보 (수정 가능) — place_id·인증상태는 수정 대상 아님
+  owner_nm?: string
+  google_nm?: string
+  website_url?: string
+  gmap_url?: string
+  biz_status_cd?: string
+  rating_cnt?: number
 }
 
 export async function listMyShops(sellerId: string) {
