@@ -317,14 +317,14 @@ export function ClientMyOrders({
                   </Button>
                 )}
 
-                {/* 오프라인 — 판매자 접수 (상품주문중 → 상품준비중) */}
+                {/* 오프라인 — 판매자 주문접수 (상품주문중 → 상품준비중) */}
                 {role === 'seller' && o.order_st_cd === 'ORDERED' && (
                   <Button
                     size="sm"
                     disabled={busy}
                     onClick={() => act(o.order_id, 'accept')}
                   >
-                    👨‍🍳 접수하기
+                    📥 주문접수
                   </Button>
                 )}
                 {/* 오프라인 — 판매자 준비완료 (상품준비중 → 상품준비완료) */}
@@ -350,10 +350,9 @@ export function ClientMyOrders({
                 {(o.order_st_cd === 'PENDING' ||
                   (IN_TRADE.includes(o.order_st_cd) &&
                     (role === 'buyer' || o.order_st_cd !== 'SELLER_DONE')) ||
-                  // 오프라인: 상품주문중은 양측 취소 가능(구매자 수수료/판매자 거절),
-                  //          상품준비중은 판매자만(수수료). 상품준비완료는 취소 불가.
-                  o.order_st_cd === 'ORDERED' ||
-                  (o.order_st_cd === 'PREPARING' && role === 'seller')) && (
+                  // 오프라인: 상품주문중만 취소 가능(구매자 수수료/판매자 거절).
+                  //          접수 후(상품준비중·준비완료)는 양측 취소 불가.
+                  o.order_st_cd === 'ORDERED') && (
                   <Button
                     size="sm"
                     variant="outline"
