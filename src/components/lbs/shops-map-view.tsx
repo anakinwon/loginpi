@@ -3,6 +3,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { setOptions, importLibrary } from '@googlemaps/js-api-loader'
+import { toast } from 'sonner'
+import { piFetch } from '@/lib/pi-fetch'
 import type { BizCategory } from '@/components/lbs/nearby-explorer'
 
 interface NearbyShop {
@@ -36,13 +38,26 @@ const CATEGORY_CONFIG: Record<
   BizCategory,
   { bg: string; border: string; placeType: string; label: string }
 > = {
-  ALL:        { bg: '#f97316', border: '#c2410c', placeType: '',           label: 'Pi 매장' },
-  CAFE:       { bg: '#22c55e', border: '#15803d', placeType: 'cafe',       label: '카페' },
-  RESTAURANT: { bg: '#ef4444', border: '#b91c1c', placeType: 'restaurant', label: '식당' },
-  BAR:        { bg: '#a855f7', border: '#7e22ce', placeType: 'bar',        label: '술집' },
+  ALL: { bg: '#f97316', border: '#c2410c', placeType: '', label: 'Pi 매장' },
+  CAFE: { bg: '#22c55e', border: '#15803d', placeType: 'cafe', label: '카페' },
+  RESTAURANT: {
+    bg: '#ef4444',
+    border: '#b91c1c',
+    placeType: 'restaurant',
+    label: '식당',
+  },
+  BAR: { bg: '#a855f7', border: '#7e22ce', placeType: 'bar', label: '술집' },
 }
 
-export function ShopsMapView({ shops, userLat, userLng, apiKey, bizCategory, radiusMeters, focusShopId }: Props) {
+export function ShopsMapView({
+  shops,
+  userLat,
+  userLng,
+  apiKey,
+  bizCategory,
+  radiusMeters,
+  focusShopId,
+}: Props) {
   const mapRef = useRef<HTMLDivElement>(null)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [placesCount, setPlacesCount] = useState<number | null>(null)
@@ -53,7 +68,9 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey, bizCategory, rad
   const markerMapRef = useRef(new Map<string, MarkerEntry>())
   // 초기화 async 내부에서 최신 focusShopId를 읽기 위한 mirror ref
   const focusShopIdRef = useRef(focusShopId)
-  useEffect(() => { focusShopIdRef.current = focusShopId }, [focusShopId])
+  useEffect(() => {
+    focusShopIdRef.current = focusShopId
+  }, [focusShopId])
 
   // 이미 초기화된 지도에서 focusShopId 변경 시 panTo + InfoWindow
   const applyFocus = useCallback((id: string) => {
@@ -77,7 +94,9 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey, bizCategory, rad
     setPlacesCount(null)
 
     if (!apiKey) {
-      setLoadError('Google Maps API 키가 설정되지 않았습니다 (NEXT_PUBLIC_GOOGLE_MAPS_API_KEY)')
+      setLoadError(
+        'Google Maps API 키가 설정되지 않았습니다 (NEXT_PUBLIC_GOOGLE_MAPS_API_KEY)',
+      )
       return
     }
 
@@ -86,10 +105,11 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey, bizCategory, rad
     let markers: google.maps.marker.AdvancedMarkerElement[] = []
     let infoWindow: google.maps.InfoWindow | null = null
     markerMapRef.current.clear()
-
     ;(async () => {
       try {
-        const { Map, InfoWindow } = await importLibrary('maps') as google.maps.MapsLibrary
+        const { Map, InfoWindow } = (await importLibrary(
+          'maps',
+        )) as google.maps.MapsLibrary
         if (!mapRef.current) return
 
         const map = new Map(mapRef.current, {
@@ -106,8 +126,12 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey, bizCategory, rad
         mapInstanceRef.current = map
         infoWindowRef.current = infoWindow
 
-        const { AdvancedMarkerElement, PinElement } = await importLibrary('marker') as google.maps.MarkerLibrary
-        const { LatLngBounds } = await importLibrary('core') as google.maps.CoreLibrary
+        const { AdvancedMarkerElement, PinElement } = (await importLibrary(
+          'marker',
+        )) as google.maps.MarkerLibrary
+        const { LatLngBounds } = (await importLibrary(
+          'core',
+        )) as google.maps.CoreLibrary
 
         // 사용자 위치 마커 (파란 핀)
         const userPin = new PinElement({
@@ -139,21 +163,32 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey, bizCategory, rad
             borderColor: cfg.border,
             glyphColor: '#ffffff',
           })
-          const marker = new AdvancedMarkerElement({ map, position, content: pin.element, title })
+          const marker = new AdvancedMarkerElement({
+            map,
+            position,
+            content: pin.element,
+            title,
+          })
           marker.addListener('click', () => {
             infoWindow!.setContent(infoContent)
             infoWindow!.open(map, marker)
           })
           bounds.extend(position)
           markers.push(marker)
-          if (shopId) markerMapRef.current.set(shopId, { marker, content: infoContent, position })
+          if (shopId)
+            markerMapRef.current.set(shopId, {
+              marker,
+              content: infoContent,
+              position,
+            })
         }
 
         // 길찾기 버튼: Google Maps(글로벌) + 카카오맵 + 네이버지도(국내)
         // 한국 정부 지도 반출 금지로 Google Maps 도보·자전거 경로 미지원 → 카카오/네이버 병행
         const buildNavLinks = (lat: number, lng: number, name: string) => {
           const wrap = document.createElement('div')
-          wrap.style.cssText = 'margin-top:8px;display:flex;flex-direction:column;gap:6px;max-height:180px;overflow-y:auto'
+          wrap.style.cssText =
+            'margin-top:8px;display:flex;flex-direction:column;gap:6px;max-height:180px;overflow-y:auto'
 
           // ── Google Maps (글로벌) ──
           const gLabel = document.createElement('p')
@@ -175,7 +210,8 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey, bizCategory, rad
             a.target = '_blank'
             a.rel = 'noopener noreferrer'
             a.textContent = `${m.icon} ${m.label}`
-            a.style.cssText = 'display:inline-block;padding:3px 7px;font-size:11px;border-radius:4px;border:1px solid #d1d5db;color:#374151;text-decoration:none;white-space:nowrap'
+            a.style.cssText =
+              'display:inline-block;padding:3px 7px;font-size:11px;border-radius:4px;border:1px solid #d1d5db;color:#374151;text-decoration:none;white-space:nowrap'
             gRow.appendChild(a)
           }
           wrap.appendChild(gRow)
@@ -194,7 +230,8 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey, bizCategory, rad
           kBtn.target = '_blank'
           kBtn.rel = 'noopener noreferrer'
           kBtn.textContent = '카카오맵'
-          kBtn.style.cssText = 'display:inline-block;padding:4px 12px;font-size:11px;border-radius:4px;background:#FEE500;color:#3C1E1E;text-decoration:none;font-weight:600'
+          kBtn.style.cssText =
+            'display:inline-block;padding:4px 12px;font-size:11px;border-radius:4px;background:#FEE500;color:#3C1E1E;text-decoration:none;font-weight:600'
           knRow.appendChild(kBtn)
 
           // 네이버지도: 경도(lng),위도(lat),이름 순서 (GeoJSON x,y 컨벤션)
@@ -203,7 +240,8 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey, bizCategory, rad
           nBtn.target = '_blank'
           nBtn.rel = 'noopener noreferrer'
           nBtn.textContent = '네이버지도'
-          nBtn.style.cssText = 'display:inline-block;padding:4px 12px;font-size:11px;border-radius:4px;background:#03C75A;color:#ffffff;text-decoration:none;font-weight:600'
+          nBtn.style.cssText =
+            'display:inline-block;padding:4px 12px;font-size:11px;border-radius:4px;background:#03C75A;color:#ffffff;text-decoration:none;font-weight:600'
           knRow.appendChild(nBtn)
 
           wrap.appendChild(knRow)
@@ -211,9 +249,75 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey, bizCategory, rad
           return wrap
         }
 
-        const buildShopInfo = (nm: string, dist: string, addr: string | null, biz_hour: string | null, lat: number, lng: number) => {
+        // 구글 카페 → 내 매장 등록 버튼 (현장 GPS 자동인증, place_id 강제 매핑)
+        // userLat/userLng(현재 GPS)와 선택한 place 좌표로 서버가 ≤100m 거리 검증 후 자동 등록
+        const buildClaimButton = (
+          placeId: string,
+          name: string,
+          addr: string | null,
+          lat: number,
+          lng: number,
+        ) => {
+          const btn = document.createElement('button')
+          btn.textContent = '🏪 내 매장으로 등록'
+          btn.style.cssText =
+            'margin-top:8px;width:100%;padding:7px 10px;font-size:12px;border-radius:6px;background:#7c3aed;color:#fff;border:none;font-weight:700;cursor:pointer'
+          btn.addEventListener('click', async () => {
+            btn.disabled = true
+            const orig = btn.textContent
+            btn.textContent = '등록 중…'
+            btn.style.opacity = '0.7'
+            try {
+              const res = await piFetch('/api/store/shops/claim', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  place_id: placeId,
+                  shop_nm: name,
+                  addr: addr ?? undefined,
+                  place_lat: lat,
+                  place_lng: lng,
+                  user_lat: userLat,
+                  user_lng: userLng,
+                }),
+              })
+              const data = (await res.json().catch(() => ({}))) as {
+                error?: string
+              }
+              if (res.ok) {
+                toast.success(
+                  '✅ 내 매장으로 등록되었습니다! 이제 메뉴를 추가해보세요',
+                )
+                btn.textContent = '✅ 등록 완료'
+                btn.style.background = '#16a34a'
+                btn.style.opacity = '1'
+              } else {
+                toast.error(data.error ?? '등록에 실패했습니다')
+                btn.disabled = false
+                btn.textContent = orig
+                btn.style.opacity = '1'
+              }
+            } catch {
+              toast.error('등록 중 오류가 발생했습니다')
+              btn.disabled = false
+              btn.textContent = orig
+              btn.style.opacity = '1'
+            }
+          })
+          return btn
+        }
+
+        const buildShopInfo = (
+          nm: string,
+          dist: string,
+          addr: string | null,
+          biz_hour: string | null,
+          lat: number,
+          lng: number,
+        ) => {
           const wrap = document.createElement('div')
-          wrap.style.cssText = 'font-family:system-ui,sans-serif;min-width:160px;padding:4px 0'
+          wrap.style.cssText =
+            'font-family:system-ui,sans-serif;min-width:160px;padding:4px 0'
           const nameEl = document.createElement('p')
           nameEl.style.cssText = 'font-weight:600;font-size:14px;margin:0 0 4px'
           nameEl.textContent = nm
@@ -241,22 +345,40 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey, bizCategory, rad
         if (bizCategory === 'ALL') {
           // Pi 등록 매장 표시
           for (const shop of shops) {
-            const dist = shop.distance_km < 1
-              ? `${Math.round(shop.distance_km * 1000)}m`
-              : `${shop.distance_km.toFixed(1)}km`
+            const dist =
+              shop.distance_km < 1
+                ? `${Math.round(shop.distance_km * 1000)}m`
+                : `${shop.distance_km.toFixed(1)}km`
             addMarker(
               { lat: shop.lat, lng: shop.lng },
               shop.shop_nm,
-              buildShopInfo(shop.shop_nm, dist, shop.addr, shop.biz_hour, shop.lat, shop.lng),
+              buildShopInfo(
+                shop.shop_nm,
+                dist,
+                shop.addr,
+                shop.biz_hour,
+                shop.lat,
+                shop.lng,
+              ),
               shop.shop_id,
             )
           }
         } else {
           // Google Places Nearby Search (New API)
-          const { Place } = await importLibrary('places') as google.maps.PlacesLibrary
+          const { Place } = (await importLibrary(
+            'places',
+          )) as google.maps.PlacesLibrary
 
           const { places } = await Place.searchNearby({
-            fields: ['displayName', 'location', 'formattedAddress', 'rating', 'userRatingCount', 'regularOpeningHours'],
+            fields: [
+              'id',
+              'displayName',
+              'location',
+              'formattedAddress',
+              'rating',
+              'userRatingCount',
+              'regularOpeningHours',
+            ],
             locationRestriction: {
               center: new google.maps.LatLng(userLat, userLng),
               radius: radiusMeters,
@@ -272,39 +394,65 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey, bizCategory, rad
             if (!loc) continue
 
             const wrap = document.createElement('div')
-            wrap.style.cssText = 'font-family:system-ui,sans-serif;min-width:160px;padding:4px 0'
+            wrap.style.cssText =
+              'font-family:system-ui,sans-serif;min-width:160px;padding:4px 0'
 
             const nameEl = document.createElement('p')
-            nameEl.style.cssText = 'font-weight:600;font-size:14px;margin:0 0 4px'
+            nameEl.style.cssText =
+              'font-weight:600;font-size:14px;margin:0 0 4px'
             nameEl.textContent = place.displayName ?? '이름 없음'
             wrap.appendChild(nameEl)
 
             if (place.rating) {
               const rateEl = document.createElement('p')
-              rateEl.style.cssText = 'color:#f59e0b;font-size:12px;margin:0 0 4px'
+              rateEl.style.cssText =
+                'color:#f59e0b;font-size:12px;margin:0 0 4px'
               rateEl.textContent = `⭐ ${place.rating.toFixed(1)} (${place.userRatingCount ?? 0})`
               wrap.appendChild(rateEl)
             }
 
             if (place.formattedAddress) {
               const addrEl = document.createElement('p')
-              addrEl.style.cssText = 'color:#6b7280;font-size:12px;margin:0 0 2px'
+              addrEl.style.cssText =
+                'color:#6b7280;font-size:12px;margin:0 0 2px'
               addrEl.textContent = place.formattedAddress
               wrap.appendChild(addrEl)
             }
 
-            wrap.appendChild(buildNavLinks(loc.lat(), loc.lng(), place.displayName ?? ''))
-            addMarker({ lat: loc.lat(), lng: loc.lng() }, place.displayName ?? '', wrap)
+            wrap.appendChild(
+              buildNavLinks(loc.lat(), loc.lng(), place.displayName ?? ''),
+            )
+            // place_id가 있으면 내 매장 등록 버튼 노출 (현장 GPS 자동인증)
+            if (place.id) {
+              wrap.appendChild(
+                buildClaimButton(
+                  place.id,
+                  place.displayName ?? '이름 미상 매장',
+                  place.formattedAddress ?? null,
+                  loc.lat(),
+                  loc.lng(),
+                ),
+              )
+            }
+            addMarker(
+              { lat: loc.lat(), lng: loc.lng() },
+              place.displayName ?? '',
+              wrap,
+            )
           }
         }
 
         // 모든 마커가 보이도록 범위 조정
         if (markers.length > 0) {
           map.fitBounds(bounds, 80)
-          const listener = google.maps.event.addListenerOnce(map, 'idle', () => {
-            const z = map.getZoom()
-            if (z !== undefined && z > 16) map.setZoom(16)
-          })
+          const listener = google.maps.event.addListenerOnce(
+            map,
+            'idle',
+            () => {
+              const z = map.getZoom()
+              if (z !== undefined && z > 16) map.setZoom(16)
+            },
+          )
           void listener
         }
 
@@ -322,8 +470,13 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey, bizCategory, rad
       } catch (e) {
         const msg = e instanceof Error ? e.message : '지도 로드 실패'
         // Places API (New) 미활성화 시 명확한 안내
-        if (msg.includes('PERMISSION_DENIED') || msg.includes('places.googleapis.com')) {
-          setLoadError('Places API (New) 미활성화 — Google Cloud Console에서 "Places API (New)"를 활성화해 주세요')
+        if (
+          msg.includes('PERMISSION_DENIED') ||
+          msg.includes('places.googleapis.com')
+        ) {
+          setLoadError(
+            'Places API (New) 미활성화 — Google Cloud Console에서 "Places API (New)"를 활성화해 주세요',
+          )
         } else {
           setLoadError(msg)
         }
@@ -336,8 +489,8 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey, bizCategory, rad
       mapInstanceRef.current = null
       infoWindowRef.current = null
     }
-  // radius 또는 category 바뀌면 지도 재초기화 (focusShopId는 별도 effect 처리)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // radius 또는 category 바뀌면 지도 재초기화 (focusShopId는 별도 effect 처리)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shops, userLat, userLng, apiKey, bizCategory, radiusMeters, applyFocus])
 
   if (loadError) {
@@ -354,8 +507,8 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey, bizCategory, rad
     <div className="space-y-1">
       {placesCount !== null && bizCategory !== 'ALL' && (
         <p className="text-muted-foreground text-xs">
-          <span style={{ color: cfg.bg }}>●</span>{' '}
-          반경 {(radiusMeters / 1000).toFixed(0)}km 내 {cfg.label} {placesCount}곳
+          <span style={{ color: cfg.bg }}>●</span> 반경{' '}
+          {(radiusMeters / 1000).toFixed(0)}km 내 {cfg.label} {placesCount}곳
         </p>
       )}
       <div
