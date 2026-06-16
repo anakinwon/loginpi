@@ -160,44 +160,8 @@ export async function refundCancelledOrder(
       `[refund] CRITICAL 송금 성공했으나 장부기록 실패 — 수동기록 필요. order=${orderId} txid=${txid} amount=${refundAmount} err=${refundLogErr.message}`,
     )
 
-  // 2) 구매자 취소(보증금 거래)면 판매자에게 보상 0.1π A2U (베스트 에포트 — 실패해도 구매자 환불은 확정).
-  //    판매자 취소(feeSeller)는 그 0.1π가 이미 구매자 환불액에 가산되므로 별도 지급 없음.
-  let sellerComp: number | undefined
-  if (feeBuyer) {
-    const { data: seller } = await db
-      .from('sys_user')
-      .select('pi_uid')
-      .eq('id', order.seller_id)
-      .maybeSingle()
-    const sellerUid = (seller as { pi_uid?: string } | null)?.pi_uid
-    if (sellerUid) {
-      try {
-        const res = await sendA2U({
-          uid: sellerUid,
-          amount: FEE_PI,
-          memo: 'MPS cancel comp',
-          metadata: { type: 'MPS_CANCEL_COMP', order_id: orderId },
-        })
-        const { error: compErr } = await db.from('mps_txn_hist').insert({
-          order_id: orderId,
-          user_id: order.seller_id,
-          txn_type_cd: 'CANCEL_FEE_IN',
-          pi_amt: FEE_PI,
-          pi_txid: res.txid,
-          memo: '구매자 취소 보상 (취소수수료 수령)',
-          regr_id: actorId,
-          modr_id: actorId,
-        })
-        if (compErr)
-          console.error(
-            `[refund] CRITICAL 판매자 보상 송금 성공했으나 장부기록 실패 — 수동기록 필요. order=${orderId} txid=${res.txid} err=${compErr.message}`,
-          )
-        sellerComp = FEE_PI
-      } catch (e) {
-        console.error('[refund] 판매자 보상 A2U 실패(환불은 완료):', orderId, e)
-      }
-    }
-  }
-
-  return { status: 'refunded', amount: refundAmount, txid, sellerComp }
+  // 구매자 취소 시: 공제된 0.1π는 판매자에게 송금하지 않고 플랫폼에 귀속(미송금).
+  //   (구매자 1.0 − 수수료 0.1 = 0.9π만 환불, 추가 송금 없음)
+  // 판매자 취소 시(feeSeller): 0.1π는 이미 구매자 환불액(1.1)에 가산되어 처리됨.
+  return { status: 'refunded', amount: refundAmount, txid }
 }
