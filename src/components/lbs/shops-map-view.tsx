@@ -15,6 +15,7 @@ interface NearbyShop {
   distance_km: number
   lat: number
   lng: number
+  owner_verified_yn?: string | null
 }
 
 interface Props {
@@ -314,6 +315,7 @@ export function ShopsMapView({
           biz_hour: string | null,
           lat: number,
           lng: number,
+          verified: boolean,
         ) => {
           const wrap = document.createElement('div')
           wrap.style.cssText =
@@ -321,6 +323,14 @@ export function ShopsMapView({
           const nameEl = document.createElement('p')
           nameEl.style.cssText = 'font-weight:600;font-size:14px;margin:0 0 4px'
           nameEl.textContent = nm
+          // 소유권 인증 매장 배지 (현장 GPS 검증 완료)
+          if (verified) {
+            const badge = document.createElement('span')
+            badge.textContent = '✅ 인증'
+            badge.style.cssText =
+              'display:inline-block;margin-left:6px;padding:1px 6px;font-size:10px;font-weight:700;border-radius:9999px;background:#dcfce7;color:#15803d;vertical-align:middle'
+            nameEl.appendChild(badge)
+          }
           wrap.appendChild(nameEl)
           const distEl = document.createElement('p')
           distEl.style.cssText = `color:${cfg.bg};font-size:12px;margin:0 0 4px`
@@ -359,6 +369,7 @@ export function ShopsMapView({
                 shop.biz_hour,
                 shop.lat,
                 shop.lng,
+                shop.owner_verified_yn === 'Y',
               ),
               shop.shop_id,
             )

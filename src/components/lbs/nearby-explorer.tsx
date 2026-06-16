@@ -21,6 +21,7 @@ interface NearbyShop {
   distance_km: number
   lat: number
   lng: number
+  owner_verified_yn?: string | null
 }
 
 interface NearbyRoom {
@@ -145,13 +146,9 @@ export function NearbyExplorer() {
         <p className="text-5xl">📍</p>
         <div className="space-y-1">
           <p className="font-medium">{t('consentRequired')}</p>
-          <p className="text-muted-foreground text-sm">
-            {t('consentBenefit')}
-          </p>
+          <p className="text-muted-foreground text-sm">{t('consentBenefit')}</p>
         </div>
-        <Button onClick={() => setConsentOpen(true)}>
-          {t('consentCta')}
-        </Button>
+        <Button onClick={() => setConsentOpen(true)}>{t('consentCta')}</Button>
         <LbsConsentDialog
           open={consentOpen}
           onOpenChange={setConsentOpen}
@@ -301,10 +298,17 @@ export function NearbyExplorer() {
                     setFocusShopId(s.shop_id)
                     setShopsViewMode('map')
                   }}
-                  className="flex cursor-pointer items-center justify-between rounded-lg border p-3 transition-colors hover:bg-muted/50"
+                  className="hover:bg-muted/50 flex cursor-pointer items-center justify-between rounded-lg border p-3 transition-colors"
                 >
                   <div className="min-w-0">
-                    <p className="truncate font-medium">{s.shop_nm}</p>
+                    <p className="flex items-center gap-1.5 truncate font-medium">
+                      <span className="truncate">{s.shop_nm}</span>
+                      {s.owner_verified_yn === 'Y' && (
+                        <span className="shrink-0 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400">
+                          ✅ 인증
+                        </span>
+                      )}
+                    </p>
                     {s.addr && (
                       <p className="text-muted-foreground truncate text-xs">
                         {s.addr}
@@ -316,7 +320,7 @@ export function NearbyExplorer() {
                       </p>
                     )}
                   </div>
-                  <span className="text-primary shrink-0 rounded-full bg-muted px-2 py-1 text-xs font-medium">
+                  <span className="text-primary bg-muted shrink-0 rounded-full px-2 py-1 text-xs font-medium">
                     📍 {formatDistance(s.distance_km)}
                   </span>
                 </li>
@@ -334,7 +338,7 @@ export function NearbyExplorer() {
             <Link
               key={r.room_id}
               href={`/chat/${r.room_id}`}
-              className="flex items-center justify-between rounded-lg border p-3 transition-colors hover:bg-muted/50"
+              className="hover:bg-muted/50 flex items-center justify-between rounded-lg border p-3 transition-colors"
             >
               <div className="flex min-w-0 items-center gap-2">
                 <span className="text-2xl">{r.theme_emoji}</span>
@@ -346,7 +350,7 @@ export function NearbyExplorer() {
                   </p>
                 </div>
               </div>
-              <span className="text-primary shrink-0 rounded-full bg-muted px-2 py-1 text-xs font-medium">
+              <span className="text-primary bg-muted shrink-0 rounded-full px-2 py-1 text-xs font-medium">
                 📍 {formatDistance(r.distance_km)}
               </span>
             </Link>
