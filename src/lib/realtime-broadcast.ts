@@ -40,6 +40,16 @@ export async function broadcastToRoom(
   return broadcastToTopic(`room:${roomId}`, event, payload)
 }
 
+// 판매자 주문 알림 전용 토픽 — 결제완료(에스크로) 시 사장님에게 보이스 알림 push.
+// 클라이언트는 seller:{내 user.userId}를 구독 (OrderAlertListener)
+export async function broadcastToSeller(
+  sellerId: string,
+  event: string,
+  payload: unknown,
+): Promise<void> {
+  return broadcastToTopic(`seller:${sellerId}`, event, payload)
+}
+
 // PiVoice 통화 시그널링 전용 토픽 — useChatRoom의 `room:{id}`와 반드시 분리.
 // supabase-js는 같은 토픽의 채널 인스턴스를 재사용하므로, 토픽을 공유하면
 // 두 번째 훅이 이미 subscribe된 인스턴스를 받아 presence .on()에서 throw된다.

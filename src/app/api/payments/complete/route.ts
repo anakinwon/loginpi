@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { sendPaymentReceipt } from '@/lib/email'
-import { broadcastToRoom } from '@/lib/realtime-broadcast'
+import { broadcastToRoom, broadcastToSeller } from '@/lib/realtime-broadcast'
 import { canSendTip } from '@/lib/chat-auth'
 import { markEscrow } from '@/lib/mps-order'
 import { depositBond, BOND_DEPOSIT_PI } from '@/lib/mps-bond'
@@ -74,7 +74,11 @@ export async function POST(request: NextRequest) {
         .maybeSingle()
 
       if (owner) {
-        const ownerRow = owner as { id: string; display_name: string | null; lbs_consent_yn: string | null }
+        const ownerRow = owner as {
+          id: string
+          display_name: string | null
+          lbs_consent_yn: string | null
+        }
         const slug = String(ownerRow.display_name ?? 'user').slice(0, 20)
         const { data: room } = await db
           .from('msg_room')
@@ -104,11 +108,24 @@ export async function POST(request: NextRequest) {
           createdRoom = room as Record<string, unknown>
 
           // LBS 동의자 카페 위치 저장 (loc_tp_cd='05') — 메타데이터 lat/lng 사용
-          const metaLat = typeof meta.lat === 'number' && isFinite(meta.lat as number) ? meta.lat as number : null
-          const metaLng = typeof meta.lng === 'number' && isFinite(meta.lng as number) ? meta.lng as number : null
-          if (ownerRow.lbs_consent_yn === 'Y' && metaLat !== null && metaLng !== null) {
+          const metaLat =
+            typeof meta.lat === 'number' && isFinite(meta.lat as number)
+              ? (meta.lat as number)
+              : null
+          const metaLng =
+            typeof meta.lng === 'number' && isFinite(meta.lng as number)
+              ? (meta.lng as number)
+              : null
+          if (
+            ownerRow.lbs_consent_yn === 'Y' &&
+            metaLat !== null &&
+            metaLng !== null
+          ) {
             Promise.all([
-              db.from('msg_room').update({ latd_crd: metaLat, lngt_crd: metaLng }).eq('room_id', roomId),
+              db
+                .from('msg_room')
+                .update({ latd_crd: metaLat, lngt_crd: metaLng })
+                .eq('room_id', roomId),
               db.from('usr_loc_hist').insert({
                 user_str_id: ownerRow.id,
                 loc_tp_cd: '05',
@@ -120,7 +137,9 @@ export async function POST(request: NextRequest) {
                 regr_id: slug,
                 modr_id: slug,
               }),
-            ]).catch(err => console.error('[카페 위치] 결제 완료 저장 실패:', err))
+            ]).catch((err) =>
+              console.error('[카페 위치] 결제 완료 저장 실패:', err),
+            )
           }
         }
       }
@@ -248,8 +267,9 @@ export async function POST(request: NextRequest) {
             recordUserAction('bean_send', senderRow.id, {
               room_id: roomId,
               recipient_id: recipientRow.id,
-            })
-              .catch(err => console.error(`[M4] 미션 기록 실패: ${err.message}`))
+            }).catch((err) =>
+              console.error(`[M4] 미션 기록 실패: ${err.message}`),
+            )
           }
         }
       }
@@ -417,6 +437,31 @@ export async function POST(request: NextRequest) {
             Number((orderRow as { order_price_pi: number }).order_price_pi)
         ) {
           await markEscrow(orderId, buyerRow.id, txid, Number(payment.amount))
+
+          // 사장님 보이스 주문 알림 — seller:{sellerId} 토픽 broadcast (비블로킹)
+          const { data: ord } = await db
+            .from('mps_order')
+            .select(
+              'seller_id, order_mthd_cd, dlvr_addr, order_price_pi, mps_item(item_nm)',
+            )
+            .eq('order_id', orderId)
+            .maybeSingle()
+          if (ord) {
+            const o = ord as {
+              seller_id: string
+              order_mthd_cd: string | null
+              dlvr_addr: string | null
+              order_price_pi: number
+              mps_item?: { item_nm?: string } | null
+            }
+            broadcastToSeller(o.seller_id, 'new_order', {
+              order_id: orderId,
+              item_nm: o.mps_item?.item_nm ?? '상품',
+              price_pi: Number(o.order_price_pi),
+              order_mthd_cd: o.order_mthd_cd,
+              dlvr_addr: o.dlvr_addr,
+            }).catch((e) => console.error('[주문알림] broadcast 실패', e))
+          }
         }
       }
     } else if (meta?.type === 'MPS_BOND' && payment.user_uid) {
@@ -434,8 +479,9 @@ export async function POST(request: NextRequest) {
         await depositBond(sellerRow.id, paymentId, slug)
 
         // M9: 판매자 보증금 예치 미션 기록 (비블로킹)
-        recordUserAction('bond_deposit', sellerRow.id)
-          .catch(err => console.error(`[M9] 미션 기록 실패: ${err.message}`))
+        recordUserAction('bond_deposit', sellerRow.id).catch((err) =>
+          console.error(`[M9] 미션 기록 실패: ${err.message}`),
+        )
       }
     } else if (meta?.type === 'PI_BET' && payment.user_uid) {
       // PI_BET: 결제 완료 시 베팅 참가 INSERT + BET_NOTI 발송 (TASK-071)
@@ -530,8 +576,9 @@ export async function POST(request: NextRequest) {
                   bet_id: betRow.bet_id,
                   room_id: betRow.room_id,
                   entrant_id: ownerRow.id,
-                })
-                  .catch((err) => console.error(`[M5] pibet_entry 기록 실패: ${err.message}`))
+                }).catch((err) =>
+                  console.error(`[M5] pibet_entry 기록 실패: ${err.message}`),
+                )
               }
             }
           }
