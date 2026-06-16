@@ -149,33 +149,51 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey, bizCategory, rad
           if (shopId) markerMapRef.current.set(shopId, { marker, content: infoContent, position })
         }
 
-        // Google Maps 이동수단별 길찾기 버튼 (공식 maps/dir URL — travelmode 파라미터)
-        // dirflg(레거시)는 WebView 리다이렉트 시 유실 → travelmode로 교체
-        const buildNavLinks = (lat: number, lng: number, _name: string) => {
+        // 길찾기 버튼: Google Maps(글로벌) + 카카오맵(국내 도보·자전거 지원)
+        // 한국 정부 지도 반출 금지로 Google Maps 도보·자전거 경로 미지원 → 카카오맵 병행
+        const buildNavLinks = (lat: number, lng: number, name: string) => {
           const wrap = document.createElement('div')
-          wrap.style.cssText = 'margin-top:8px'
-          const label = document.createElement('p')
-          label.style.cssText = 'font-size:11px;color:#6b7280;margin:0 0 4px'
-          label.textContent = '🧭 Google Maps 길찾기'
-          wrap.appendChild(label)
-          const row = document.createElement('div')
-          row.style.cssText = 'display:flex;gap:4px;flex-wrap:wrap'
-          const modes = [
+          wrap.style.cssText = 'margin-top:8px;display:flex;flex-direction:column;gap:6px'
+
+          // ── Google Maps (글로벌) ──
+          const gLabel = document.createElement('p')
+          gLabel.style.cssText = 'font-size:11px;color:#6b7280;margin:0'
+          gLabel.textContent = '🌍 Google Maps'
+          wrap.appendChild(gLabel)
+
+          const gRow = document.createElement('div')
+          gRow.style.cssText = 'display:flex;gap:4px;flex-wrap:wrap'
+          const gModes = [
             { icon: '🚗', label: '자가용', travelmode: 'driving' },
             { icon: '🚌', label: '대중교통', travelmode: 'transit' },
             { icon: '🚶', label: '도보', travelmode: 'walking' },
             { icon: '🚲', label: '자전거', travelmode: 'bicycling' },
           ]
-          for (const m of modes) {
+          for (const m of gModes) {
             const a = document.createElement('a')
             a.href = `https://www.google.com/maps/dir/?api=1&origin=${userLat},${userLng}&destination=${lat},${lng}&travelmode=${m.travelmode}`
             a.target = '_blank'
             a.rel = 'noopener noreferrer'
             a.textContent = `${m.icon} ${m.label}`
             a.style.cssText = 'display:inline-block;padding:3px 7px;font-size:11px;border-radius:4px;border:1px solid #d1d5db;color:#374151;text-decoration:none;white-space:nowrap'
-            row.appendChild(a)
+            gRow.appendChild(a)
           }
-          wrap.appendChild(row)
+          wrap.appendChild(gRow)
+
+          // ── 카카오맵 (국내 도보·자전거 완전 지원) ──
+          const kLabel = document.createElement('p')
+          kLabel.style.cssText = 'font-size:11px;color:#6b7280;margin:0'
+          kLabel.textContent = '🗺️ 카카오맵 (국내 도보·자전거 추천)'
+          wrap.appendChild(kLabel)
+
+          const kBtn = document.createElement('a')
+          kBtn.href = `https://map.kakao.com/link/to/${encodeURIComponent(name)},${lat},${lng}`
+          kBtn.target = '_blank'
+          kBtn.rel = 'noopener noreferrer'
+          kBtn.textContent = '🚀 카카오맵 길찾기'
+          kBtn.style.cssText = 'display:inline-block;padding:3px 10px;font-size:11px;border-radius:4px;background:#FEE500;color:#3C1E1E;text-decoration:none;font-weight:600;border:none'
+          wrap.appendChild(kBtn)
+
           return wrap
         }
 
