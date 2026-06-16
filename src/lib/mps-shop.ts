@@ -102,6 +102,65 @@ export async function updateShop(
   return (data as unknown as MpsShop | null) ?? null
 }
 
+// ──────────────────────────────────────────────────────────────
+// 구글 카페 GPS 자동인증 등록 — place_id 강제 매핑 + 현장 근접 검증
+// ──────────────────────────────────────────────────────────────
+
+// 이미 검증 등록된 place_id인지 확인 ("한 카페 = 한 주인" 사전 안내용)
+// DB 부분 유니크 인덱스(uq_mps_shop_place_verified)가 최종 강제, 이건 친절한 사전 검사
+export async function findVerifiedShopByPlaceId(placeId: string) {
+  const { data } = await getSupabaseAdmin()
+    .from('mps_shop')
+    .select('shop_id, seller_id')
+    .eq('place_id', placeId)
+    .eq('owner_verified_yn', 'Y')
+    .eq('del_yn', 'N')
+    .maybeSingle()
+  return (data as { shop_id: string; seller_id: string } | null) ?? null
+}
+
+export interface GpsClaimInput {
+  place_id: string
+  shop_nm: string
+  addr?: string | null
+  lat: number // 구글 place 좌표 (매장 위치로 저장)
+  lng: number
+  biz_hour?: string | null
+  contact_tel?: string | null
+}
+
+// GPS 현장 검증 통과 매장 생성 — owner_verified_yn='Y', verify_method_cd='GPS'
+// place_id 중복 시 Postgres 23505 throw → 라우트에서 409로 변환
+export async function createGpsVerifiedShop(
+  sellerId: string,
+  regrId: string,
+  input: GpsClaimInput,
+) {
+  const { data, error } = await getSupabaseAdmin()
+    .from('mps_shop')
+    .insert({
+      seller_id: sellerId,
+      shop_nm: input.shop_nm,
+      shop_type_cd: 'OFFLINE', // 구글 카페는 실물 오프라인 매장
+      addr: input.addr ?? null,
+      latd_crd: input.lat,
+      lngt_crd: input.lng,
+      place_id: input.place_id,
+      biz_hour: input.biz_hour ?? null,
+      contact_tel: input.contact_tel ?? null,
+      owner_verified_yn: 'Y',
+      verify_method_cd: 'GPS',
+      verify_dtm: new Date().toISOString(),
+      regr_id: regrId,
+      modr_id: regrId,
+    })
+    .select(SHOP_SELECT)
+    .single()
+
+  if (error) throw error // PostgrestError (code 23505 = place_id 중복)
+  return data as unknown as MpsShop
+}
+
 // 논리삭제 — 소속 상품은 shop_id NULL 처리 (상품 자체 삭제 금지, FR-06)
 export async function softDeleteShop(shopId: string, sellerId: string) {
   const db = getSupabaseAdmin()
