@@ -4,7 +4,6 @@
 
 import { after } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
-import { grantBondReward } from '@/lib/mps-bond'
 
 /**
  * 행위 기록: evt_action_log에 사용자 행위 저장
@@ -170,33 +169,9 @@ export async function evaluateUserMissions(
       // 미충족으로 오판할 수 있어 행위형 완료는 자동 취소하지 않는다.
     }
 
-    // ── 보증금 보상 자동 적립 ────────────────────────────────────────────────
-    // 조건: reward_pi_yn='Y' + 이벤트 기간 내 + 완료 미션 수 ≥ 보상 기준 수
-    // Pi A2U 송금 없이 mps_seller_bond 잔액에 1π 직접 적립
-    const evt = event as {
-      end_dtm: string
-      reward_pi_yn: string
-      reward_mission_count_no: number
-    }
-    if (evt.reward_pi_yn !== 'Y') continue
-
-    const now = Date.now()
-    if (now > new Date(evt.end_dtm).getTime()) continue
-
-    const { data: completedRows } = await db
-      .from('evt_user_mission')
-      .select('mission_cd')
-      .eq('event_id', event.event_id)
-      .eq('user_id', userId)
-      .eq('del_yn', 'N')
-
-    const completedCount = completedRows?.length ?? 0
-    if (completedCount >= evt.reward_mission_count_no) {
-      // 비블로킹 — 보증금 1π 직접 적립 (Pi A2U 송금 없음, 멱등: 이미 BONDED면 skip)
-      grantBondReward(event.event_id, userId).catch((err: Error) =>
-        console.error(`[보증금 보상] 비동기 실패: ${err.message}`),
-      )
-    }
+    // 미션 평가만 수행한다. 보상(판매보증금 1π) 지급은 자동으로 하지 않는다.
+    // → 관리자 수동 버튼(POST /api/admin/event/bond-reward)에서만 트리거.
+    //   자동 적립과 분리하여 의도치 않은 대량 지급·동시성 race를 원천 차단한다.
   }
 }
 
@@ -562,12 +537,13 @@ export async function getEventRanking(eventId: string, limit: number = 100) {
   const unranked = (allUsers ?? [])
     .filter((u) => !rankedUserIds.has(u.id) && !excludedUserIds.has(u.id))
     .map((u) => ({
-      rank: null as number | null,          // 순위 미표시
+      rank: null as number | null, // 순위 미표시
       user_id: u.id,
       mission_count: null as number | null, // 합계 미표시
       first_complete_dtm: null as string | null,
       last_complete_dtm: null as string | null,
-      nick_nm: (u.nick_nm as string | null) ?? (u.display_name as string | null),
+      nick_nm:
+        (u.nick_nm as string | null) ?? (u.display_name as string | null),
       pi_username: u.pi_username as string | null,
     }))
 

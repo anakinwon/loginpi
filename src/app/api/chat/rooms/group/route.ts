@@ -22,17 +22,25 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
   }
 
-  const { theme_cd, room_nm, room_desc, is_public_yn, max_mbr_cnt, expr_dtm, lat, lng } =
-    body as {
-      theme_cd?: string
-      room_nm?: string
-      room_desc?: string
-      is_public_yn?: 'Y' | 'N'
-      max_mbr_cnt?: number
-      expr_dtm?: string | null
-      lat?: number
-      lng?: number
-    }
+  const {
+    theme_cd,
+    room_nm,
+    room_desc,
+    is_public_yn,
+    max_mbr_cnt,
+    expr_dtm,
+    lat,
+    lng,
+  } = body as {
+    theme_cd?: string
+    room_nm?: string
+    room_desc?: string
+    is_public_yn?: 'Y' | 'N'
+    max_mbr_cnt?: number
+    expr_dtm?: string | null
+    lat?: number
+    lng?: number
+  }
 
   if (!theme_cd) {
     return NextResponse.json({ error: '테마를 선택해 주세요' }, { status: 400 })
@@ -67,17 +75,27 @@ export async function POST(request: NextRequest) {
     })
 
     // M3: PREMIUM Cafe 생성 미션 기록 (비블로킹)
-    recordUserAction('premium_cafe_create', user.id, { theme_cd, room_nm })
-      .catch(err => console.error(`[M3] 미션 기록 실패: ${err.message}`))
+    // 무료 테마(FITNESS)는 PREMIUM 카페가 아니므로 미션에서 제외 — 무료 생성으로 M3 우회 차단
+    if (!FREE_THEME_CODES.has(theme_cd)) {
+      recordUserAction('premium_cafe_create', user.id, {
+        theme_cd,
+        room_nm,
+      }).catch((err) => console.error(`[M3] 미션 기록 실패: ${err.message}`))
+    }
 
     // LBS 동의자 카페 위치 저장 (loc_tp_cd='05' 카페생성) — 비블로킹
-    const validLat = typeof lat === 'number' && isFinite(lat) && lat >= -90 && lat <= 90
-    const validLng = typeof lng === 'number' && isFinite(lng) && lng >= -180 && lng <= 180
+    const validLat =
+      typeof lat === 'number' && isFinite(lat) && lat >= -90 && lat <= 90
+    const validLng =
+      typeof lng === 'number' && isFinite(lng) && lng >= -180 && lng <= 180
     if (validLat && validLng && user.lbs_consent_yn === 'Y') {
       const db = getSupabaseAdmin()
       const slug = String(user.display_name ?? 'user').slice(0, 20)
       Promise.all([
-        db.from('msg_room').update({ latd_crd: lat, lngt_crd: lng }).eq('room_id', room.room_id),
+        db
+          .from('msg_room')
+          .update({ latd_crd: lat, lngt_crd: lng })
+          .eq('room_id', room.room_id),
         db.from('usr_loc_hist').insert({
           user_str_id: user.id,
           loc_tp_cd: '05',
@@ -89,7 +107,7 @@ export async function POST(request: NextRequest) {
           regr_id: slug,
           modr_id: slug,
         }),
-      ]).catch(err => console.error('[카페 위치] 저장 실패:', err.message))
+      ]).catch((err) => console.error('[카페 위치] 저장 실패:', err.message))
     }
 
     return NextResponse.json({ room }, { status: 201 })
