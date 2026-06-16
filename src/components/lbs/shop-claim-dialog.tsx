@@ -26,7 +26,7 @@ export function ShopClaimDialog({
   onClose: () => void
   onSuccess?: () => void
 }) {
-  const [placeIdTail, setPlaceIdTail] = useState('')
+  const [placeIdConfirm, setPlaceIdConfirm] = useState('')
   const [shopNm, setShopNm] = useState(target.name ?? '')
   const [tel, setTel] = useState('')
   const [ownerNm, setOwnerNm] = useState('')
@@ -34,12 +34,12 @@ export function ShopClaimDialog({
   const [email, setEmail] = useState('')
   const [saving, setSaving] = useState(false)
 
-  // place_id 끝 5자리 (정답) — 입력값과 즉시 대조
-  const tailAnswer = target.place_id.slice(-5)
+  // place_id 전체 일치 여부 — 대소문자 구분 정확 비교 (복사 차단 → 직접 타이핑 강제)
+  const placeIdMatches = placeIdConfirm === target.place_id
 
   async function submit() {
     if (
-      !placeIdTail.trim() ||
+      !placeIdConfirm.trim() ||
       !shopNm.trim() ||
       !tel.trim() ||
       !ownerNm.trim() ||
@@ -49,9 +49,9 @@ export function ShopClaimDialog({
       toast.error('모든 항목을 입력해주세요')
       return
     }
-    // place_id 끝 5자리 클라이언트 1차 검증 (서버도 최종 강제)
-    if (placeIdTail.trim() !== tailAnswer) {
-      toast.error('place_id 끝 5자리가 일치하지 않습니다')
+    // place_id 전체 일치 클라이언트 1차 검증 (대소문자 구분, 서버도 최종 강제)
+    if (!placeIdMatches) {
+      toast.error('place_id가 정확히 일치하지 않습니다 (대소문자 구분)')
       return
     }
     setSaving(true)
@@ -61,7 +61,7 @@ export function ShopClaimDialog({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           place_id: target.place_id,
-          place_id_tail: placeIdTail.trim(),
+          place_id_confirm: placeIdConfirm,
           user_lat: userLat,
           user_lng: userLng,
           shop_nm: shopNm.trim(),
@@ -116,35 +116,50 @@ export function ShopClaimDialog({
           <div>
             <label className="text-muted-foreground mb-1 block text-xs">
               place_id{' '}
-              <span className="text-muted-foreground">(구글 매장 식별자)</span>
+              <span className="text-muted-foreground">
+                (구글 매장 식별자 — 복사 불가)
+              </span>
             </label>
-            <input
-              value={target.place_id}
-              readOnly
-              className="text-muted-foreground bg-muted/50 w-full truncate rounded-lg border px-2.5 py-1.5 text-xs"
-            />
+            {/* 복사·선택·드래그 차단 → 눈으로 보고 직접 타이핑 강제 */}
+            <div
+              onCopy={(e) => e.preventDefault()}
+              onCut={(e) => e.preventDefault()}
+              onContextMenu={(e) => e.preventDefault()}
+              draggable={false}
+              className="text-muted-foreground bg-muted/50 w-full rounded-lg border px-2.5 py-1.5 font-mono text-xs break-all select-none"
+              style={{ WebkitUserSelect: 'none', userSelect: 'none' }}
+            >
+              {target.place_id}
+            </div>
           </div>
           <div>
             <label className="text-muted-foreground mb-1 block text-xs">
-              place_id 끝 5자리 확인{' '}
-              <span className="text-primary">(직접 입력)</span>
+              place_id 전체 입력{' '}
+              <span className="text-primary">
+                (대소문자 구분, 붙여넣기 불가)
+              </span>
             </label>
             <input
-              value={placeIdTail}
-              onChange={(e) => setPlaceIdTail(e.target.value)}
-              placeholder={`위 식별자의 마지막 5자리`}
-              maxLength={5}
-              className={`w-full rounded-lg border bg-transparent px-2.5 py-1.5 text-sm ${
-                placeIdTail && placeIdTail.trim() !== tailAnswer
+              value={placeIdConfirm}
+              onChange={(e) => setPlaceIdConfirm(e.target.value)}
+              onPaste={(e) => e.preventDefault()}
+              autoComplete="off"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              placeholder="위 식별자를 그대로 직접 입력"
+              maxLength={500}
+              className={`w-full rounded-lg border bg-transparent px-2.5 py-1.5 font-mono text-xs break-all ${
+                placeIdConfirm && !placeIdMatches
                   ? 'border-red-400'
-                  : placeIdTail.trim() === tailAnswer
+                  : placeIdMatches
                     ? 'border-emerald-400'
                     : ''
               }`}
             />
-            {placeIdTail && placeIdTail.trim() !== tailAnswer && (
+            {placeIdConfirm && !placeIdMatches && (
               <p className="mt-1 text-[10px] text-red-500">
-                끝 5자리가 일치하지 않습니다
+                place_id가 일치하지 않습니다 (대소문자까지 정확히)
               </p>
             )}
           </div>
