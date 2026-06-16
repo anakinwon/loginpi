@@ -12,7 +12,7 @@ const FEE_PI = 0.1
 const round7 = (n: number) => Math.round(n * 1e7) / 1e7
 
 export type RefundResult =
-  | { status: 'refunded'; amount: number; txid: string; sellerComp?: number }
+  | { status: 'refunded'; amount: number; txid: string }
   | {
       status: 'pending'
       amount: number
