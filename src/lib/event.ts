@@ -4,6 +4,7 @@
 
 import { after } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { grantBondReward } from '@/lib/mps-bond'
 
 /**
  * 행위 기록: evt_action_log에 사용자 행위 저장
@@ -61,7 +62,9 @@ export async function evaluateUserMissions(
   // 1. 활성 이벤트 조회 (start_dtm: 기간 전 행위 필터링 기준)
   const query = db
     .from('evt_event')
-    .select('event_id, start_dtm')
+    .select(
+      'event_id, start_dtm, end_dtm, reward_pi_yn, reward_mission_count_no',
+    )
     .eq('active_yn', 'Y')
 
   if (eventId) {
@@ -165,6 +168,34 @@ export async function evaluateUserMissions(
       // 그 외 미충족(행위형 M1·M4 등): 아무것도 하지 않는다.
       // 평가가 evt_action_log(이벤트 기간 내)만 보므로, 이벤트 전 수행을 로그로 못 봐
       // 미충족으로 오판할 수 있어 행위형 완료는 자동 취소하지 않는다.
+    }
+
+    // ── 보증금 보상 자동 적립 ────────────────────────────────────────────────
+    // 조건: reward_pi_yn='Y' + 이벤트 기간 내 + 완료 미션 수 ≥ 보상 기준 수
+    // Pi A2U 송금 없이 mps_seller_bond 잔액에 1π 직접 적립
+    const evt = event as {
+      end_dtm: string
+      reward_pi_yn: string
+      reward_mission_count_no: number
+    }
+    if (evt.reward_pi_yn !== 'Y') continue
+
+    const now = Date.now()
+    if (now > new Date(evt.end_dtm).getTime()) continue
+
+    const { data: completedRows } = await db
+      .from('evt_user_mission')
+      .select('mission_cd')
+      .eq('event_id', event.event_id)
+      .eq('user_id', userId)
+      .eq('del_yn', 'N')
+
+    const completedCount = completedRows?.length ?? 0
+    if (completedCount >= evt.reward_mission_count_no) {
+      // 비블로킹 — 보증금 1π 직접 적립 (Pi A2U 송금 없음, 멱등: 이미 BONDED면 skip)
+      grantBondReward(event.event_id, userId).catch((err: Error) =>
+        console.error(`[보증금 보상] 비동기 실패: ${err.message}`),
+      )
     }
   }
 }
@@ -271,6 +302,8 @@ async function evaluateMissionCompletion(
 
     case 'SEQUENCE': {
       // 선행 미션 완료 후 조건 확인 (M10)
+      // 참고: M10 required_action_cds_tx=['cancel_with_fee']는 DB 메타데이터 전용.
+      // 이 action_cd는 evt_action_log에 기록되지 않으며, 평가는 checkCancelWithFee()로 직접 수행.
       if (!mission.sequence_prior_mission_cd) return false
 
       const { data: priorMission, error } = await db

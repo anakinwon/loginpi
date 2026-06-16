@@ -19,6 +19,7 @@ import {
 interface ItemFormProps {
   serverAuthed?: boolean // 서버 getSessionUser() 확인 결과 (Google 쿠키 로그인 포함)
   itemId?: string // 지정 시 수정 모드 — 기존 값 로드 후 PATCH
+  defaultShopId?: string // 신규 등록 시 소속 매장 미리 선택 (?shop= 쿼리)
 }
 
 // GET /api/store/categories 트리 노드 (2단계)
@@ -35,7 +36,11 @@ interface ShopOption {
 }
 
 // 상품 등록·수정 폼 (SCR-04) — 이미지는 URL 입력 (Storage 업로드는 후속 TASK)
-export function StoreItemForm({ serverAuthed = false, itemId }: ItemFormProps) {
+export function StoreItemForm({
+  serverAuthed = false,
+  itemId,
+  defaultShopId,
+}: ItemFormProps) {
   const t = useTranslations('store')
   const router = useRouter()
   const { user, isLoading } = usePiAuth()
@@ -51,7 +56,8 @@ export function StoreItemForm({ serverAuthed = false, itemId }: ItemFormProps) {
   const [images, setImages] = useState<ProductImage[]>([])
   const [ctgrId, setCtgrId] = useState('')
   const [ctgrTree, setCtgrTree] = useState<CtgrNode[]>([])
-  const [shopId, setShopId] = useState('')
+  // 신규 등록 시 ?shop= 쿼리로 소속 매장 미리 선택 (수정 모드는 기존 값 로드가 덮어씀)
+  const [shopId, setShopId] = useState(itemId ? '' : (defaultShopId ?? ''))
   const [myShops, setMyShops] = useState<ShopOption[]>([])
   const [saving, setSaving] = useState(false)
   const [loadingItem, setLoadingItem] = useState(editMode)
@@ -96,6 +102,13 @@ export function StoreItemForm({ serverAuthed = false, itemId }: ItemFormProps) {
       })
       .catch(() => {})
   }, [authed])
+
+  // 심층방어: URL ?shop= 등으로 들어온 prefill이 내 매장이 아니면 떨궈낸다
+  // (서버가 최종 차단하지만, 잘못된 선택을 UI에서 미리 제거 — 수정 모드는 기존 값 유지)
+  useEffect(() => {
+    if (editMode || !shopId || myShops.length === 0) return
+    if (!myShops.some((s) => s.shop_id === shopId)) setShopId('')
+  }, [myShops, shopId, editMode])
 
   // 마운트 시 LBS 동의 여부 확인 + 동의자는 화면 로딩과 동시에 현재 위치 자동 수집 (등록 모드, 1회)
   useEffect(() => {

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { piFetch } from '@/lib/pi-fetch'
 import { getCurrentPosition } from '@/lib/geo'
 import { LbsConsentDialog } from '@/components/lbs/lbs-consent-dialog'
+import { ShopsMapView } from '@/components/lbs/shops-map-view'
 
 // 주변 탐색 — 동의자에게만 GPS 기준 주변 매장·채팅방 노출 (Rule LBS-01)
 // nearby/shops·nearby/rooms API를 보여주는 화면. Pi Browser 클라이언트 게이트 패턴.
@@ -18,6 +19,9 @@ interface NearbyShop {
   addr: string | null
   biz_hour: string | null
   distance_km: number
+  lat: number
+  lng: number
+  owner_verified_yn?: string | null
 }
 
 interface NearbyRoom {
@@ -31,7 +35,16 @@ interface NearbyRoom {
 }
 
 type Tab = 'shops' | 'rooms'
+type ShopsViewMode = 'list' | 'map'
+export type BizCategory = 'ALL' | 'CAFE' | 'RESTAURANT' | 'BAR'
 const RADIUS_OPTIONS = [1, 5, 10] as const
+
+const BIZ_CATEGORIES: { value: BizCategory; label: string }[] = [
+  { value: 'ALL', label: '전체 (Pi 매장)' },
+  { value: 'CAFE', label: '☕ 카페' },
+  { value: 'RESTAURANT', label: '🍽️ 식당' },
+  { value: 'BAR', label: '🍺 술집' },
+]
 
 function formatDistance(km: number): string {
   if (km < 1) return `${Math.round(km * 1000)}m`
@@ -46,13 +59,16 @@ export function NearbyExplorer() {
     null,
   )
   const [locError, setLocError] = useState<string | null>(null)
-  const [radius, setRadius] = useState<number>(5)
+  const [radius, setRadius] = useState<number>(1)
   const [tab, setTab] = useState<Tab>('shops')
 
   const [shops, setShops] = useState<NearbyShop[]>([])
   const [rooms, setRooms] = useState<NearbyRoom[]>([])
   const [loading, setLoading] = useState(false)
   const [loadError, setLoadError] = useState<string | null>(null)
+  const [shopsViewMode, setShopsViewMode] = useState<ShopsViewMode>('map')
+  const [bizCategory, setBizCategory] = useState<BizCategory>('ALL')
+  const [focusShopId, setFocusShopId] = useState<string | null>(null)
 
   // 마운트 시 동의 여부 확인 (Rule LBS-01)
   useEffect(() => {
@@ -130,13 +146,9 @@ export function NearbyExplorer() {
         <p className="text-5xl">📍</p>
         <div className="space-y-1">
           <p className="font-medium">{t('consentRequired')}</p>
-          <p className="text-muted-foreground text-sm">
-            {t('consentBenefit')}
-          </p>
+          <p className="text-muted-foreground text-sm">{t('consentBenefit')}</p>
         </div>
-        <Button onClick={() => setConsentOpen(true)}>
-          {t('consentCta')}
-        </Button>
+        <Button onClick={() => setConsentOpen(true)}>{t('consentCta')}</Button>
         <LbsConsentDialog
           open={consentOpen}
           onOpenChange={setConsentOpen}
@@ -167,29 +179,21 @@ export function NearbyExplorer() {
   }
 
   return (
-    <div className="space-y-4">
-      {/* 반경 선택 */}
+    <div className="space-y-3">
+      {/* 타이틀 + 반경 선택 (한 줄) */}
       <div className="flex items-center gap-2">
-        <span className="text-muted-foreground text-xs">{t('radius')}</span>
-        {RADIUS_OPTIONS.map((r) => (
-          <button
-            key={r}
-            onClick={() => setRadius(r)}
-            className={`rounded-full border px-3 py-1 text-xs font-medium ${radius === r ? 'border-primary bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted'}`}
-          >
-            {r}km
-          </button>
-        ))}
-        {/* 현재 측위 좌표 — 위치가 엉뚱하게 잡혔는지 즉시 확인용 */}
-        <span className="text-muted-foreground/70 ml-auto font-mono text-[10px]">
-          ({coords.lat.toFixed(4)}, {coords.lng.toFixed(4)})
-        </span>
-        <button
-          onClick={() => requestLocation(true)}
-          className="text-muted-foreground hover:text-foreground text-xs underline"
-        >
-          {t('refreshLocation')}
-        </button>
+        <h1 className="shrink-0 text-lg font-semibold">{t('nearbyTitle')}</h1>
+        <div className="flex items-center gap-1.5">
+          {RADIUS_OPTIONS.map((r) => (
+            <button
+              key={r}
+              onClick={() => setRadius(r)}
+              className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${radius === r ? 'border-primary bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted'}`}
+            >
+              {r}km
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* API 조회 실패 — 빈 목록으로 위장하지 않고 원인 표시 */}
@@ -199,8 +203,8 @@ export function NearbyExplorer() {
         </p>
       )}
 
-      {/* 탭 */}
-      <div className="flex gap-1 border-b">
+      {/* 탭 + 위치 갱신 (한 줄) */}
+      <div className="flex items-center gap-1 border-b">
         <button
           onClick={() => setTab('shops')}
           className={`px-4 py-2 text-sm font-medium transition-colors ${tab === 'shops' ? 'border-primary text-primary border-b-2' : 'text-muted-foreground hover:text-foreground'}`}
@@ -213,6 +217,12 @@ export function NearbyExplorer() {
         >
           {t('tabRooms')} {rooms.length > 0 && `(${rooms.length})`}
         </button>
+        <button
+          onClick={() => requestLocation(true)}
+          className="text-muted-foreground hover:text-foreground ml-auto pb-2 text-xs underline"
+        >
+          {t('refreshLocation')}
+        </button>
       </div>
 
       {loading ? (
@@ -220,37 +230,104 @@ export function NearbyExplorer() {
           {t('searching')}
         </p>
       ) : tab === 'shops' ? (
-        shops.length === 0 ? (
-          <p className="text-muted-foreground py-16 text-center text-sm">
-            {t('noShops', { radius })}
-          </p>
-        ) : (
-          <ul className="space-y-2">
-            {shops.map((s) => (
-              <li
-                key={s.shop_id}
-                className="flex items-center justify-between rounded-lg border p-3"
-              >
-                <div className="min-w-0">
-                  <p className="truncate font-medium">{s.shop_nm}</p>
-                  {s.addr && (
-                    <p className="text-muted-foreground truncate text-xs">
-                      {s.addr}
+        <div className="space-y-3">
+          {/* 툴바: [🗺️ 지도] [☰ 등록매장목록] ... [카테고리 ▼] */}
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setShopsViewMode('map')}
+              className={`rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${
+                shopsViewMode === 'map'
+                  ? 'border-primary bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:bg-muted'
+              }`}
+            >
+              🗺️ 지도
+            </button>
+            <button
+              onClick={() => {
+                setShopsViewMode('list')
+                setBizCategory('ALL')
+              }}
+              className={`rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${
+                shopsViewMode === 'list'
+                  ? 'border-primary bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:bg-muted'
+              }`}
+            >
+              ☰ 등록매장목록
+            </button>
+            <div className="flex-1" />
+            <select
+              value={bizCategory}
+              onChange={(e) => {
+                const val = e.target.value as BizCategory
+                setBizCategory(val)
+                if (val !== 'ALL') setShopsViewMode('map')
+              }}
+              className="text-foreground bg-background rounded-md border px-2 py-1.5 text-xs font-medium focus:outline-none"
+            >
+              {BIZ_CATEGORIES.map((cat) => (
+                <option key={cat.value} value={cat.value}>
+                  {cat.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* 지도 뷰: ALL=Pi 매장, 나머지=Google Places */}
+          {shopsViewMode === 'map' ? (
+            <ShopsMapView
+              shops={shops}
+              userLat={coords.lat}
+              userLng={coords.lng}
+              apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
+              bizCategory={bizCategory}
+              radiusMeters={radius * 1000}
+              focusShopId={focusShopId}
+            />
+          ) : shops.length === 0 ? (
+            <p className="text-muted-foreground py-16 text-center text-sm">
+              {t('noShops', { radius })}
+            </p>
+          ) : (
+            <ul className="space-y-2">
+              {shops.map((s) => (
+                <li
+                  key={s.shop_id}
+                  onClick={() => {
+                    setFocusShopId(s.shop_id)
+                    setShopsViewMode('map')
+                  }}
+                  className="hover:bg-muted/50 flex cursor-pointer items-center justify-between rounded-lg border p-3 transition-colors"
+                >
+                  <div className="min-w-0">
+                    <p className="flex items-center gap-1.5 truncate font-medium">
+                      <span className="truncate">{s.shop_nm}</span>
+                      {s.owner_verified_yn === 'Y' && (
+                        <span className="shrink-0 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400">
+                          ✅ 인증
+                        </span>
+                      )}
                     </p>
-                  )}
-                  {s.biz_hour && (
-                    <p className="text-muted-foreground text-xs">
-                      🕒 {s.biz_hour}
-                    </p>
-                  )}
-                </div>
-                <span className="text-primary shrink-0 rounded-full bg-muted px-2 py-1 text-xs font-medium">
-                  📍 {formatDistance(s.distance_km)}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )
+                    {s.addr && (
+                      <p className="text-muted-foreground truncate text-xs">
+                        {s.addr}
+                      </p>
+                    )}
+                    {s.biz_hour && (
+                      <p className="text-muted-foreground text-xs">
+                        🕒 {s.biz_hour}
+                      </p>
+                    )}
+                  </div>
+                  <span className="text-primary bg-muted shrink-0 rounded-full px-2 py-1 text-xs font-medium">
+                    📍 {formatDistance(s.distance_km)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       ) : rooms.length === 0 ? (
         <p className="text-muted-foreground py-16 text-center text-sm">
           {t('noRooms', { radius })}
@@ -261,7 +338,7 @@ export function NearbyExplorer() {
             <Link
               key={r.room_id}
               href={`/chat/${r.room_id}`}
-              className="flex items-center justify-between rounded-lg border p-3 transition-colors hover:bg-muted/50"
+              className="hover:bg-muted/50 flex items-center justify-between rounded-lg border p-3 transition-colors"
             >
               <div className="flex min-w-0 items-center gap-2">
                 <span className="text-2xl">{r.theme_emoji}</span>
@@ -273,7 +350,7 @@ export function NearbyExplorer() {
                   </p>
                 </div>
               </div>
-              <span className="text-primary shrink-0 rounded-full bg-muted px-2 py-1 text-xs font-medium">
+              <span className="text-primary bg-muted shrink-0 rounded-full px-2 py-1 text-xs font-medium">
                 📍 {formatDistance(r.distance_km)}
               </span>
             </Link>

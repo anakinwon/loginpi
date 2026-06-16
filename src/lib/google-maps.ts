@@ -130,3 +130,141 @@ export async function reverseGeocode(
   const rLng = Math.round(lng * 1e4) / 1e4
   return callGeocode({ latlng: `${rLat},${rLng}` })
 }
+
+// ──────────────────────────────────────────────────────────────
+// Place Details (New) — 매장 소유권 반자동 인증의 권위 기준값 조회
+// 서버가 place_id로 구글에 직접 조회해 전화번호·좌표를 받아 입력값과 대조한다.
+// (클라이언트가 보낸 "구글 데이터"는 위조 가능하므로 반드시 서버에서 재조회)
+// ──────────────────────────────────────────────────────────────
+const PLACE_DETAILS_URL = 'https://places.googleapis.com/v1/places'
+
+export interface PlaceDetails {
+  place_id: string
+  name: string | null
+  formatted_addr: string | null
+  national_phone: string | null
+  international_phone: string | null
+  lat: number | null
+  lng: number | null
+  // 확장 필드 — 구글이 제공하는 모든 정보 (mps_shop 보관용)
+  website_uri: string | null
+  google_maps_uri: string | null
+  business_status: string | null
+  rating: number | null
+  user_rating_count: number | null
+  biz_hours: string | null // regularOpeningHours.weekdayDescriptions 줄바꿈 결합
+  primary_type: string | null
+  raw: GooglePlaceResponse // 전체 원본 (google_place_json 저장용)
+}
+
+interface GooglePlaceResponse {
+  id?: string
+  displayName?: { text?: string }
+  formattedAddress?: string
+  shortFormattedAddress?: string
+  nationalPhoneNumber?: string
+  internationalPhoneNumber?: string
+  location?: { latitude?: number; longitude?: number }
+  websiteUri?: string
+  googleMapsUri?: string
+  businessStatus?: string
+  rating?: number
+  userRatingCount?: number
+  regularOpeningHours?: { weekdayDescriptions?: string[] }
+  primaryType?: string
+  primaryTypeDisplayName?: { text?: string }
+  types?: string[]
+  priceLevel?: string
+  plusCode?: { globalCode?: string; compoundCode?: string }
+  utcOffsetMinutes?: number
+  [key: string]: unknown
+}
+
+// Place Details (New) 필드 마스크 — 구글이 제공하는 주요 정보 일괄 요청.
+// 주의: 필드가 많을수록 상위 과금 SKU(Preferred). 등록 1회·1일 캐시라 비용 영향 작음.
+const PLACE_FIELD_MASK = [
+  'id',
+  'displayName',
+  'formattedAddress',
+  'shortFormattedAddress',
+  'nationalPhoneNumber',
+  'internationalPhoneNumber',
+  'location',
+  'websiteUri',
+  'googleMapsUri',
+  'businessStatus',
+  'rating',
+  'userRatingCount',
+  'regularOpeningHours',
+  'primaryType',
+  'primaryTypeDisplayName',
+  'types',
+  'priceLevel',
+  'plusCode',
+  'utcOffsetMinutes',
+].join(',')
+
+// place_id로 Place Details (New) 조회. 존재하지 않으면 null, API 오류는 throw.
+export async function getPlaceDetails(
+  placeId: string,
+): Promise<PlaceDetails | null> {
+  const key = process.env.GOOGLE_MAPS_API_KEY
+  if (!key) throw new Error('GOOGLE_MAPS_API_KEY 미설정')
+
+  const res = await fetch(
+    `${PLACE_DETAILS_URL}/${encodeURIComponent(placeId)}?languageCode=ko`,
+    {
+      headers: {
+        'X-Goog-Api-Key': key,
+        'X-Goog-FieldMask': PLACE_FIELD_MASK,
+      },
+      // 매장 정보는 자주 안 바뀜 — 1일 캐시(검증 비용 절감)
+      next: { revalidate: 86400 },
+    },
+  )
+
+  if (res.status === 404) return null
+  if (!res.ok) {
+    const body = await res.text().catch(() => '')
+    throw new Error(
+      `Place Details API HTTP ${res.status}${body ? `: ${body.slice(0, 200)}` : ''}`,
+    )
+  }
+
+  const d = (await res.json()) as GooglePlaceResponse
+  return {
+    place_id: d.id ?? placeId,
+    name: d.displayName?.text ?? null,
+    formatted_addr: d.formattedAddress ?? null,
+    national_phone: d.nationalPhoneNumber ?? null,
+    international_phone: d.internationalPhoneNumber ?? null,
+    lat: d.location?.latitude ?? null,
+    lng: d.location?.longitude ?? null,
+    website_uri: d.websiteUri ?? null,
+    google_maps_uri: d.googleMapsUri ?? null,
+    business_status: d.businessStatus ?? null,
+    rating: d.rating ?? null,
+    user_rating_count: d.userRatingCount ?? null,
+    biz_hours: d.regularOpeningHours?.weekdayDescriptions?.join('\n') ?? null,
+    primary_type: d.primaryTypeDisplayName?.text ?? d.primaryType ?? null,
+    raw: d,
+  }
+}
+
+// 전화번호 정규화 — 숫자만 추출해 형식 차이(공백·하이픈·국가코드) 흡수 후 비교용.
+// 국가코드 흡수: 국제번호(+82 10...)와 국내번호(010...)를 끝 9자리로 느슨히 비교.
+export function normalizePhone(phone: string): string {
+  return phone.replace(/\D/g, '')
+}
+
+// 두 전화번호가 같은지 — 정규화 후 한쪽이 다른 쪽의 끝부분을 포함하면 일치로 본다
+// (국내 010-1234-5678 ↔ 국제 +82 10-1234-5678 동일 처리, 마지막 9자리 기준)
+export function phoneMatches(a: string, b: string): boolean {
+  const na = normalizePhone(a)
+  const nb = normalizePhone(b)
+  if (!na || !nb) return false
+  if (na === nb) return true
+  const tailA = na.slice(-9)
+  const tailB = nb.slice(-9)
+  return tailA.length === 9 && tailA === tailB
+}

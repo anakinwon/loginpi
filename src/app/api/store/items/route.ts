@@ -90,6 +90,23 @@ export async function POST(req: NextRequest) {
 
   const slug = String(user.display_name ?? 'user').slice(0, 20)
 
+  // shop_id 지정 시 본인 매장인지 검증 (IDOR 방지 — 타인 매장에 상품 부착 차단)
+  if (parsed.data.shop_id) {
+    const { data: ownShop } = await getSupabaseAdmin()
+      .from('mps_shop')
+      .select('shop_id')
+      .eq('shop_id', parsed.data.shop_id)
+      .eq('seller_id', user.id)
+      .eq('del_yn', 'N')
+      .maybeSingle()
+    if (!ownShop) {
+      return NextResponse.json(
+        { error: '본인 매장이 아니거나 존재하지 않는 매장입니다' },
+        { status: 403 },
+      )
+    }
+  }
+
   // 위치는 LBS 동의 판매자만 저장 (Rule LBS-01) — 미동의면 좌표 무시하고 등록 진행
   const input = { ...parsed.data }
   const hasLoc = input.lat !== undefined && input.lng !== undefined
@@ -108,8 +125,8 @@ export async function POST(req: NextRequest) {
       .insert({
         user_str_id: user.id,
         loc_tp_cd: '04',
-        lat: input.lat,
-        lng: input.lng,
+        latd_crd: input.lat,
+        lngt_crd: input.lng,
         ref_id: item.item_id,
         consent_yn: 'Y',
         consent_dtm: new Date().toISOString(),

@@ -87,6 +87,8 @@ export async function POST(req: Request, { params }: Params) {
   })
 
   // M6: 음성채팅 이용 미션 기록 (비블로킹) — MULTI_OR 중 1개
+  // 레거시 1:1 통화 경로. N:N 음성채널은 voice/rooms/[roomId]/join에서 별도 기록.
+  // 둘 다 voice_join을 기록해 어떤 경로로 입장해도 M6가 누락되지 않게 한다.
   recordUserAction('voice_join', caller.id, { roomId, call_id: call.call_id })
     .catch(err => console.error(`[M6-voice] 미션 기록 실패: ${err.message}`))
 

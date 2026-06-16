@@ -5,6 +5,7 @@ import { useRouter } from '@/i18n/navigation'
 import { toast } from 'sonner'
 import { usePiAuth } from '@/components/pi-auth-provider'
 import { piFetch } from '@/lib/pi-fetch'
+import { getCurrentPosition } from '@/lib/geo'
 import {
   Dialog,
   DialogContent,
@@ -74,6 +75,7 @@ export function GroupRoomCreator() {
   const [canCreateEventRoom, setCanCreateEventRoom] = useState(false)
   const [entryFee, setEntryFee] = useState<EntryFee>(0)
   const [eventEndDtm, setEventEndDtm] = useState('')
+  const [gpsCoords, setGpsCoords] = useState<{ lat: number; lng: number } | null>(null)
 
   // 다이얼로그 열릴 때마다 폼 초기화 + 구독 상태 재확인
   // 구독 직후 동일 세션에서 방 생성 시에도 최신 권한 반영
@@ -91,6 +93,17 @@ export function GroupRoomCreator() {
     setRoomType('G')
     setEntryFee(0)
     setEventEndDtm('')
+    setGpsCoords(null)
+
+    // LBS 동의자이면 카페 위치 자동 수집 (서버가 동의 여부 재검증 후 저장)
+    piFetch('/api/location/consent')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: { consent_yn?: string } | null) => {
+        if (d?.consent_yn === 'Y') {
+          getCurrentPosition().then(setGpsCoords).catch(() => { /* 위치 수집 실패 시 조용히 무시 */ })
+        }
+      })
+      .catch(() => { /* 조용히 무시 */ })
 
     piFetch('/api/subscriptions/check')
       .then((r) => (r.ok ? r.json() : null))
@@ -154,6 +167,8 @@ export function GroupRoomCreator() {
             exprDays === 0
               ? null
               : new Date(Date.now() + exprDays * 86400000).toISOString(),
+          lat: gpsCoords?.lat ?? null,
+          lng: gpsCoords?.lng ?? null,
         },
       },
       {
@@ -215,6 +230,7 @@ export function GroupRoomCreator() {
     isPublic,
     maxMbr,
     exprDays,
+    gpsCoords,
     router,
   ])
 
@@ -236,6 +252,8 @@ export function GroupRoomCreator() {
             exprDays === 0
               ? null
               : new Date(Date.now() + exprDays * 86400000).toISOString(),
+          lat: gpsCoords?.lat,
+          lng: gpsCoords?.lng,
         }),
       })
       if (!res.ok) {
@@ -253,7 +271,7 @@ export function GroupRoomCreator() {
       setPayStatus('error')
       setPayError(e instanceof Error ? e.message : '방 생성 오류')
     }
-  }, [selectedTheme, roomNm, roomDesc, isPublic, maxMbr, exprDays, router])
+  }, [selectedTheme, roomNm, roomDesc, isPublic, maxMbr, exprDays, gpsCoords, router])
 
   // TASK-063: 이벤트방 생성 — BUSINESS 전용, 생성 결제 없음 (참가자가 입장료 결제)
   const createEventRoomUi = useCallback(async () => {
@@ -272,6 +290,8 @@ export function GroupRoomCreator() {
           max_mbr_cnt: maxMbr,
           entry_fee_pi: entryFee,
           entry_expire_dtm: new Date(eventEndDtm).toISOString(),
+          lat: gpsCoords?.lat ?? null,
+          lng: gpsCoords?.lng ?? null,
         }),
       })
       if (!res.ok) {
@@ -297,6 +317,7 @@ export function GroupRoomCreator() {
     maxMbr,
     entryFee,
     eventEndDtm,
+    gpsCoords,
     router,
   ])
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
+import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import {
   getItemDetail,
   incrementViewCnt,
@@ -64,6 +65,23 @@ export async function PATCH(
       { error: '입력값이 올바르지 않습니다', detail: parsed.error.issues },
       { status: 400 },
     )
+  }
+
+  // shop_id를 비-null로 지정 시 본인 매장인지 검증 (IDOR 방지 — null은 매장 해제로 허용)
+  if (parsed.data.shop_id) {
+    const { data: ownShop } = await getSupabaseAdmin()
+      .from('mps_shop')
+      .select('shop_id')
+      .eq('shop_id', parsed.data.shop_id)
+      .eq('seller_id', user.id)
+      .eq('del_yn', 'N')
+      .maybeSingle()
+    if (!ownShop) {
+      return NextResponse.json(
+        { error: '본인 매장이 아니거나 존재하지 않는 매장입니다' },
+        { status: 403 },
+      )
+    }
   }
 
   const result = await updateItem(itemId, user.id, parsed.data)

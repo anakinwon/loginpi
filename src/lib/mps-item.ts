@@ -281,7 +281,9 @@ export async function getItemDetail(itemId: string, viewerId?: string) {
   if (row.shop_id) {
     const { data } = await db
       .from('mps_shop')
-      .select('shop_id, shop_nm, shop_type_cd, addr, biz_hour, contact_tel')
+      .select(
+        'shop_id, shop_nm, shop_type_cd, addr, biz_hour, contact_tel, dlvr_yn',
+      )
       .eq('shop_id', row.shop_id)
       .eq('del_yn', 'N')
       .maybeSingle()

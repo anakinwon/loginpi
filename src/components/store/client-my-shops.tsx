@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
+import { useRouter } from '@/i18n/navigation'
 import { usePiAuth } from '@/components/pi-auth-provider'
 import { piFetch } from '@/lib/pi-fetch'
 import { Button } from '@/components/ui/button'
@@ -22,6 +23,18 @@ interface Shop {
   contact_email: string | null
   sns_url: string | null
   thumb_url: string | null
+  // 인증·구글 정보
+  place_id: string | null
+  owner_nm: string | null
+  owner_verified_yn: string | null
+  verify_method_cd: string | null
+  google_nm: string | null
+  website_url: string | null
+  gmap_url: string | null
+  biz_status_cd: string | null
+  rating_cnt: number | null
+  google_place_json: unknown
+  dlvr_yn: string | null
 }
 
 interface ShopForm {
@@ -34,6 +47,14 @@ interface ShopForm {
   contact_email: string
   sns_url: string
   thumb_url: string
+  // 구글 제공 정보 (수정 가능)
+  owner_nm: string
+  google_nm: string
+  website_url: string
+  gmap_url: string
+  biz_status_cd: string
+  rating_cnt: string
+  dlvr_yn: boolean
 }
 
 const EMPTY_FORM: ShopForm = {
@@ -46,6 +67,13 @@ const EMPTY_FORM: ShopForm = {
   contact_email: '',
   sns_url: '',
   thumb_url: '',
+  owner_nm: '',
+  google_nm: '',
+  website_url: '',
+  gmap_url: '',
+  biz_status_cd: '',
+  rating_cnt: '',
+  dlvr_yn: false,
 }
 
 const SHOP_TYPES: ShopType[] = ['ONLINE', 'OFFLINE', 'BOTH']
@@ -58,6 +86,7 @@ export function ClientMyShops({
   serverAuthed?: boolean
 }) {
   const t = useTranslations('store')
+  const router = useRouter()
   const { user, isLoading } = usePiAuth()
   const authed = serverAuthed || !!user
 
@@ -115,9 +144,22 @@ export function ClientMyShops({
       contact_email: shop.contact_email ?? '',
       sns_url: shop.sns_url ?? '',
       thumb_url: shop.thumb_url ?? '',
+      owner_nm: shop.owner_nm ?? '',
+      google_nm: shop.google_nm ?? '',
+      website_url: shop.website_url ?? '',
+      gmap_url: shop.gmap_url ?? '',
+      biz_status_cd: shop.biz_status_cd ?? '',
+      rating_cnt: shop.rating_cnt != null ? String(shop.rating_cnt) : '',
+      dlvr_yn: shop.dlvr_yn === 'Y',
     })
     setEditingId(shop.shop_id)
   }
+
+  // 수정 중인 매장(읽기전용 place_id·인증상태·원본 JSON 표시용)
+  const editingShop =
+    editingId && editingId !== ''
+      ? (shops.find((s) => s.shop_id === editingId) ?? null)
+      : null
 
   function set<K extends keyof ShopForm>(key: K, value: ShopForm[K]) {
     setForm((f) => ({ ...f, [key]: value }))
@@ -129,6 +171,7 @@ export function ClientMyShops({
       return
     }
     // 빈 문자열은 서버 스키마(email/url)에서 거부되므로 미전송으로 변환
+    const ratingCnt = form.rating_cnt.trim()
     const payload = {
       shop_nm: form.shop_nm.trim(),
       shop_type_cd: form.shop_type_cd,
@@ -139,6 +182,14 @@ export function ClientMyShops({
       contact_email: form.contact_email.trim() || undefined,
       sns_url: form.sns_url.trim() || undefined,
       thumb_url: form.thumb_url.trim() || undefined,
+      // 구글 제공 정보 (수정 가능)
+      owner_nm: form.owner_nm.trim() || undefined,
+      google_nm: form.google_nm.trim() || undefined,
+      website_url: form.website_url.trim() || undefined,
+      gmap_url: form.gmap_url.trim() || undefined,
+      biz_status_cd: form.biz_status_cd.trim() || undefined,
+      rating_cnt: ratingCnt ? Number(ratingCnt) : undefined,
+      dlvr_yn: form.dlvr_yn ? 'Y' : 'N',
     }
 
     setSaving(true)
@@ -238,6 +289,22 @@ export function ClientMyShops({
             />
           </div>
 
+          {/* 배달 가능 — 켜면 구매자에게 '배달' 주문방법이 노출됨 */}
+          <label className="flex cursor-pointer items-center justify-between rounded-lg border p-3">
+            <div>
+              <p className="text-sm font-medium">🛵 배달 가능</p>
+              <p className="text-muted-foreground text-xs">
+                켜면 구매 시 &lsquo;배달&rsquo; 주문방법이 노출됩니다
+              </p>
+            </div>
+            <input
+              type="checkbox"
+              checked={form.dlvr_yn}
+              onChange={(e) => set('dlvr_yn', e.target.checked)}
+              className="size-5"
+            />
+          </label>
+
           {/* 주소 — OFFLINE/BOTH에서 의미. 좌표는 향후 지도 핀 UI로 보강(FR-06) */}
           {form.shop_type_cd !== 'ONLINE' && (
             <div className="space-y-1.5">
@@ -310,6 +377,109 @@ export function ClientMyShops({
             </div>
           </div>
 
+          {/* 🌍 구글 제공 정보 — 인증 등록 매장은 자동 채워짐, 직접 수정 가능 */}
+          <div className="space-y-3 rounded-lg border border-dashed p-3">
+            <p className="text-sm font-semibold">
+              🌍 구글 제공 정보 (수정 가능)
+            </p>
+
+            {/* 읽기전용: place_id·인증상태 (식별·검증 앵커라 수정 불가) */}
+            {editingShop?.place_id && (
+              <div className="space-y-1.5">
+                <Label className="text-muted-foreground">
+                  place_id (읽기전용)
+                </Label>
+                <p className="bg-muted/50 text-muted-foreground rounded-md border px-2.5 py-1.5 font-mono text-xs break-all">
+                  {editingShop.place_id}
+                </p>
+                {editingShop.owner_verified_yn === 'Y' && (
+                  <p className="text-xs text-emerald-600 dark:text-emerald-400">
+                    ✅ 인증 매장 (검증수단:{' '}
+                    {editingShop.verify_method_cd ?? '—'})
+                  </p>
+                )}
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="space-y-1.5">
+                <Label htmlFor="shop-owner">대표자명</Label>
+                <Input
+                  id="shop-owner"
+                  value={form.owner_nm}
+                  onChange={(e) => set('owner_nm', e.target.value)}
+                  maxLength={100}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="shop-gnm">구글 매장명</Label>
+                <Input
+                  id="shop-gnm"
+                  value={form.google_nm}
+                  onChange={(e) => set('google_nm', e.target.value)}
+                  maxLength={200}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="shop-website">웹사이트</Label>
+              <Input
+                id="shop-website"
+                type="url"
+                value={form.website_url}
+                onChange={(e) => set('website_url', e.target.value)}
+                placeholder="https://…"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="shop-gmap">구글지도 URL</Label>
+              <Input
+                id="shop-gmap"
+                type="url"
+                value={form.gmap_url}
+                onChange={(e) => set('gmap_url', e.target.value)}
+                placeholder="https://maps.google.com/…"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="shop-bizstatus">영업상태</Label>
+                <Input
+                  id="shop-bizstatus"
+                  value={form.biz_status_cd}
+                  onChange={(e) => set('biz_status_cd', e.target.value)}
+                  maxLength={20}
+                  placeholder="OPERATIONAL"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="shop-ratingcnt">평점 수</Label>
+                <Input
+                  id="shop-ratingcnt"
+                  type="number"
+                  min="0"
+                  value={form.rating_cnt}
+                  onChange={(e) => set('rating_cnt', e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* 원본 JSON — 구글이 준 전체 정보 (읽기전용 펼침 보기) */}
+            {editingShop?.google_place_json != null && (
+              <details className="text-xs">
+                <summary className="text-muted-foreground cursor-pointer select-none">
+                  구글 Place 원본 전체 보기 (JSON)
+                </summary>
+                <pre className="bg-muted/50 mt-2 max-h-60 overflow-auto rounded-md border p-2 text-[10px] break-all whitespace-pre-wrap">
+                  {JSON.stringify(editingShop.google_place_json, null, 2)}
+                </pre>
+              </details>
+            )}
+          </div>
+
           <div className="flex gap-2 pt-1">
             <Button onClick={save} disabled={saving} className="flex-1">
               {saving ? t('saving') : t('shop.save')}
@@ -363,6 +533,11 @@ export function ClientMyShops({
                   <span className="bg-muted text-muted-foreground shrink-0 rounded-full px-2 py-0.5 text-xs">
                     {t(`shop.type_${shop.shop_type_cd}`)}
                   </span>
+                  {shop.owner_verified_yn === 'Y' && (
+                    <span className="shrink-0 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400">
+                      ✅ 인증
+                    </span>
+                  )}
                 </div>
                 {shop.addr && (
                   <p className="text-muted-foreground truncate text-xs">
@@ -370,7 +545,15 @@ export function ClientMyShops({
                   </p>
                 )}
               </div>
-              <div className="flex shrink-0 gap-1.5">
+              <div className="flex shrink-0 flex-wrap justify-end gap-1.5">
+                <Button
+                  size="sm"
+                  onClick={() =>
+                    router.push(`/store/my/items/new?shop=${shop.shop_id}`)
+                  }
+                >
+                  + 메뉴 추가
+                </Button>
                 <Button
                   size="sm"
                   variant="outline"

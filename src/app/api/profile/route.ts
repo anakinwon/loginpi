@@ -106,8 +106,10 @@ export async function PATCH(req: Request) {
     }
   }
 
-  // M2: 별명 + 카톡ID 입력 미션 기록 (둘 다 있어야 함)
-  if (data?.nick_nm && data?.kakao_id) {
+  // M2: 프로필 업데이트 기록 — kakao_id 유무와 무관하게 항상 기록.
+  // evaluateUserMissions의 M2 평가가 DB 상태(kakao_id null 여부)를 직접 확인하므로,
+  // 여기서 조건 필터링하면 kakao_id 삭제 시 평가 자체가 실행되지 않아 M2 취소가 지연됨.
+  if (data) {
     recordUserAction('profile_update', user.id)
       .catch(err => console.error(`[M2] 미션 기록 실패: ${err.message}`))
   }

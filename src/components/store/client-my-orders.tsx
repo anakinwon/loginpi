@@ -7,6 +7,20 @@ import { Link } from '@/i18n/navigation'
 import { usePiAuth } from '@/components/pi-auth-provider'
 import { piFetch } from '@/lib/pi-fetch'
 import { Button } from '@/components/ui/button'
+import {
+  buildGoogleMapsUrl,
+  buildNaverMapUrl,
+  buildKakaoMapUrl,
+} from '@/lib/navigation'
+import type { ShopLocation } from '@/lib/navigation'
+
+interface ShopInfo {
+  shop_nm: string | null
+  addr: string | null
+  latd_crd: number | null
+  lngt_crd: number | null
+  place_id: string | null
+}
 
 interface OrderRow {
   order_id: string
@@ -22,9 +36,49 @@ interface OrderRow {
     | 'BUYER_DONE'
     | 'DONE'
     | 'CANCELLED'
+    // 오프라인 매장 주문 상태
+    | 'ORDERED'
+    | 'PREPARING'
+    | 'READY'
+  order_mthd_cd: 'DINE_IN' | 'PICKUP' | 'DELIVERY' | null
+  dlvr_addr: string | null
   cancel_reason: string | null
   reg_dtm: string
-  mps_item: { item_nm: string; thumbnail_url: string | null } | null
+  mps_item: {
+    item_nm: string
+    thumbnail_url: string | null
+    mps_shop: ShopInfo | null
+  } | null
+}
+
+type OrderAction =
+  | 'release'
+  | 'complete'
+  | 'cancel'
+  | 'accept'
+  | 'ready'
+  | 'pickup'
+
+// 오프라인 상태 라벨 (i18n 키 누락 회피 — 로컬 한글 맵)
+// 주문중 → 준비중 → 상품대기중 → (10분 후) 판매완료
+// DONE은 오프라인일 때만 '판매완료'로 표시 (renderCard에서 분기, 직거래는 거래완료 유지)
+const OFFLINE_LABEL: Partial<Record<OrderRow['order_st_cd'], string>> = {
+  ORDERED: '🛒 주문중',
+  PREPARING: '👨‍🍳 준비중',
+  READY: '📦 상품대기중',
+}
+
+// 주문방법 라벨
+const MTHD_LABEL: Record<string, string> = {
+  DINE_IN: '🍽️ 매장이용',
+  PICKUP: '🥡 픽업',
+  DELIVERY: '🛵 배달',
+}
+
+// 오프라인 액션 성공 메시지
+const OFFLINE_ACTION_MSG: Partial<Record<OrderAction, string>> = {
+  accept: '상품접수 완료 — 준비중',
+  ready: '상품완료 — 수령 대기중 (10분 후 자동 판매완료)',
 }
 
 // ESCROW·SELLER_DONE은 구버전 주문 레거시 상태 — 화면에는 거래중과 동일 계열로 표시
@@ -41,6 +95,11 @@ const ST_STYLE: Record<OrderRow['order_st_cd'], string> = {
     'bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400',
   DONE: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
   CANCELLED: 'bg-muted text-muted-foreground',
+  ORDERED:
+    'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
+  PREPARING:
+    'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
+  READY: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
 }
 
 // 결제 완료 후 거래 진행 중인 상태 (레거시 포함) — 구매자 수령 확인 가능 구간
@@ -62,7 +121,7 @@ export function ClientMyOrders({
   const [loading, setLoading] = useState(true)
   const [acting, setActing] = useState<{
     id: string
-    action: 'release' | 'complete' | 'cancel'
+    action: OrderAction
   } | null>(null)
 
   const load = useCallback(async () => {
@@ -97,15 +156,13 @@ export function ClientMyOrders({
     )
   }
 
-  async function act(
-    orderId: string,
-    action: 'release' | 'complete' | 'cancel',
-  ) {
+  async function act(orderId: string, action: OrderAction) {
     let body: string | undefined
     if (action === 'cancel') {
       const reason = prompt(t('cancelReasonPrompt'))
       if (!reason?.trim()) return
-      body = JSON.stringify({ reason: reason.trim() })
+      // role 동봉 — 판매관리(seller)/구매관리(buyer)에서 취소한 역할 (수수료 당사자 구분)
+      body = JSON.stringify({ reason: reason.trim(), role })
     }
     setActing({ id: orderId, action })
     try {
@@ -127,6 +184,9 @@ export function ClientMyOrders({
           } else {
             toast.success(t('actionDone.cancel'))
           }
+        } else if (OFFLINE_ACTION_MSG[action]) {
+          // 오프라인 액션(접수·준비완료·픽업)은 로컬 메시지
+          toast.success(OFFLINE_ACTION_MSG[action]!)
         } else {
           toast.success(t(`actionDone.${action}`))
         }
@@ -140,6 +200,215 @@ export function ClientMyOrders({
     }
   }
 
+  // 오프라인 매장 주문 vs 직거래 — 상품의 매장 소속(mps_shop) 유무로 구분
+  const isOffline = (o: OrderRow) => o.mps_item?.mps_shop != null
+  const offlineOrders = orders.filter(isOffline)
+  const directOrders = orders.filter((o) => !isOffline(o))
+  const offlineLabel =
+    role === 'seller' ? '🏪 오프라인 매장 판매' : '🏪 오프라인 매장 구매'
+  const directLabel = role === 'seller' ? '🔄 직거래 판매' : '🔄 직거래 구매'
+
+  const renderCard = (o: OrderRow) => {
+    const busy = acting?.id === o.order_id
+    // 취소 진행 중 여부 — 동일 주문의 수령/완료 액션과 구분해 "취소중"만 정확히 표시
+    const canceling = busy && acting?.action === 'cancel'
+    const offline = isOffline(o)
+    // 상태 배지 라벨 — 오프라인 신규상태는 로컬 라벨, 오프라인 DONE은 '판매완료',
+    // 그 외(직거래·레거시)는 i18n (ESCROW·SELLER_DONE은 거래중으로 통합)
+    const stLabel =
+      OFFLINE_LABEL[o.order_st_cd] ??
+      (offline && o.order_st_cd === 'DONE'
+        ? '🎉 판매완료'
+        : t(
+            `orderSt.${IN_TRADE.includes(o.order_st_cd) ? 'TRADING' : o.order_st_cd}`,
+          ))
+    return (
+      <div key={o.order_id} className="space-y-2 rounded-lg border p-4">
+        <div className="flex items-center justify-between gap-2">
+          <Link
+            href={`/store/${o.item_id}`}
+            className="truncate text-sm font-medium hover:underline"
+          >
+            {o.mps_item?.item_nm ?? t('itemNotFound')}
+          </Link>
+          <span
+            className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${ST_STYLE[o.order_st_cd]}`}
+          >
+            {stLabel}
+          </span>
+        </div>
+        <p className="text-muted-foreground text-xs">
+          {Number(o.order_price_pi)} π ·{' '}
+          {o.order_mthd_cd && MTHD_LABEL[o.order_mthd_cd]
+            ? `${MTHD_LABEL[o.order_mthd_cd]} · `
+            : ''}
+          {new Date(o.reg_dtm).toLocaleString()}
+          {o.order_st_cd === 'CANCELLED' &&
+            o.cancel_reason &&
+            ` · ${o.cancel_reason}`}
+        </p>
+        {o.order_mthd_cd === 'DELIVERY' && o.dlvr_addr && (
+          <p className="text-muted-foreground text-xs">
+            🛵 배달: {o.dlvr_addr}
+          </p>
+        )}
+
+        {/* 상태별 액션 — 2단계 확인: ①수령(구매자) ②거래완료(판매자) */}
+        <div className="flex flex-wrap gap-1.5">
+          {/* 구매자 거래중 상태: 매장 출발하기 버튼 — 딥링크로 네이티브 지도 앱에 위임 */}
+          {role === 'buyer' &&
+            IN_TRADE.includes(o.order_st_cd) &&
+            (() => {
+              const shop = o.mps_item?.mps_shop ?? null
+              const loc: ShopLocation = {
+                place_id: shop?.place_id,
+                latd_crd: shop?.latd_crd,
+                lngt_crd: shop?.lngt_crd,
+                addr: shop?.addr,
+                shop_nm: shop?.shop_nm,
+              }
+              const googleUrl = buildGoogleMapsUrl(loc)
+              const naverUrl = buildNaverMapUrl(loc)
+              const kakaoUrl = buildKakaoMapUrl(loc)
+              if (!googleUrl && !naverUrl && !kakaoUrl) return null
+              return (
+                <div className="flex flex-wrap gap-1">
+                  {googleUrl && (
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => window.open(googleUrl, '_blank')}
+                    >
+                      🗺️ {t('navigateGoogle')}
+                    </Button>
+                  )}
+                  {naverUrl && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => window.open(naverUrl, '_blank')}
+                    >
+                      {t('navigateNaver')}
+                    </Button>
+                  )}
+                  {kakaoUrl && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => window.open(kakaoUrl, '_blank')}
+                    >
+                      {t('navigateKakao')}
+                    </Button>
+                  )}
+                </div>
+              )
+            })()}
+          {role === 'buyer' && IN_TRADE.includes(o.order_st_cd) && (
+            <Button
+              size="sm"
+              disabled={busy}
+              onClick={() => act(o.order_id, 'release')}
+            >
+              {t('actionBuyerDone')}
+            </Button>
+          )}
+          {role === 'seller' && o.order_st_cd === 'BUYER_DONE' && (
+            <Button
+              size="sm"
+              disabled={busy}
+              onClick={() => act(o.order_id, 'complete')}
+            >
+              {t('actionComplete')}
+            </Button>
+          )}
+
+          {/* 오프라인 — 판매자 상품접수 (주문중 → 준비중) */}
+          {role === 'seller' && o.order_st_cd === 'ORDERED' && (
+            <Button
+              size="sm"
+              disabled={busy}
+              onClick={() => act(o.order_id, 'accept')}
+            >
+              📥 상품접수
+            </Button>
+          )}
+          {/* 오프라인 — 판매자 상품완료 (준비중 → 상품대기중) */}
+          {role === 'seller' && o.order_st_cd === 'PREPARING' && (
+            <Button
+              size="sm"
+              disabled={busy}
+              onClick={() => act(o.order_id, 'ready')}
+            >
+              📦 상품완료
+            </Button>
+          )}
+          {/* 상품대기중(READY)은 구매자 액션 없음 — 10분 후 자동 판매완료 */}
+          {(o.order_st_cd === 'PENDING' ||
+            (IN_TRADE.includes(o.order_st_cd) &&
+              (role === 'buyer' || o.order_st_cd !== 'SELLER_DONE')) ||
+            // 오프라인: 상품주문중만 취소 가능(구매자 수수료/판매자 거절).
+            //          접수 후(상품준비중·준비완료)는 양측 취소 불가.
+            o.order_st_cd === 'ORDERED') && (
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={busy}
+              onClick={() => act(o.order_id, 'cancel')}
+            >
+              {canceling
+                ? t(
+                    role === 'buyer'
+                      ? 'actionCancelingBuyer'
+                      : 'actionCancelingSeller',
+                  )
+                : t(
+                    role === 'buyer'
+                      ? 'actionCancelBuyer'
+                      : 'actionCancelSeller',
+                  )}
+            </Button>
+          )}
+        </div>
+
+        {role === 'seller' && IN_TRADE.includes(o.order_st_cd) && (
+          <p className="text-muted-foreground text-xs">
+            {t('waitingBuyerConfirm')}
+          </p>
+        )}
+        {role === 'buyer' && o.order_st_cd === 'BUYER_DONE' && (
+          <p className="text-muted-foreground text-xs">
+            {t('waitingSellerComplete')}
+          </p>
+        )}
+        {/* 오프라인 상태 안내 */}
+        {o.order_st_cd === 'ORDERED' && (
+          <p className="text-muted-foreground text-xs">
+            {role === 'seller'
+              ? '👉 상품접수를 눌러 준비를 시작하세요'
+              : '사장님 접수 대기중입니다'}
+          </p>
+        )}
+        {o.order_st_cd === 'PREPARING' && (
+          <p className="text-muted-foreground text-xs">
+            {role === 'seller'
+              ? '👉 준비가 끝나면 상품완료를 눌러주세요'
+              : '상품을 준비하고 있습니다'}
+          </p>
+        )}
+        {o.order_st_cd === 'READY' && (
+          <p className="text-muted-foreground text-xs">
+            {role === 'buyer'
+              ? '📦 상품이 준비됐어요! 곧 받으실 수 있습니다 (10분 후 자동 판매완료)'
+              : '구매자 수령 대기중 (10분 후 자동 판매완료)'}
+          </p>
+        )}
+        {o.order_st_cd === 'DONE' && (
+          <p className="text-muted-foreground text-xs">{t('escrowReleased')}</p>
+        )}
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-3">
       {loading ? (
@@ -151,98 +420,24 @@ export function ClientMyOrders({
           {t('noOrders')}
         </p>
       ) : (
-        orders.map((o) => {
-          const busy = acting?.id === o.order_id
-          // 취소 진행 중 여부 — 동일 주문의 수령/완료 액션과 구분해 "취소중"만 정확히 표시
-          const canceling = busy && acting?.action === 'cancel'
-          return (
-            <div key={o.order_id} className="space-y-2 rounded-lg border p-4">
-              <div className="flex items-center justify-between gap-2">
-                <Link
-                  href={`/store/${o.item_id}`}
-                  className="truncate text-sm font-medium hover:underline"
-                >
-                  {o.mps_item?.item_nm ?? t('itemNotFound')}
-                </Link>
-                <span
-                  className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${ST_STYLE[o.order_st_cd]}`}
-                >
-                  {/* 레거시 ESCROW·SELLER_DONE도 "거래중"으로 표시 */}
-                  {t(
-                    `orderSt.${IN_TRADE.includes(o.order_st_cd) ? 'TRADING' : o.order_st_cd}`,
-                  )}
-                </span>
-              </div>
-              <p className="text-muted-foreground text-xs">
-                {Number(o.order_price_pi)} π ·{' '}
-                {new Date(o.reg_dtm).toLocaleString()}
-                {o.order_st_cd === 'CANCELLED' &&
-                  o.cancel_reason &&
-                  ` · ${o.cancel_reason}`}
-              </p>
-
-              {/* 상태별 액션 — 2단계 확인: ①수령(구매자) ②거래완료(판매자) */}
-              <div className="flex flex-wrap gap-1.5">
-                {role === 'buyer' && IN_TRADE.includes(o.order_st_cd) && (
-                  <Button
-                    size="sm"
-                    disabled={busy}
-                    onClick={() => act(o.order_id, 'release')}
-                  >
-                    {t('actionBuyerDone')}
-                  </Button>
-                )}
-                {role === 'seller' && o.order_st_cd === 'BUYER_DONE' && (
-                  <Button
-                    size="sm"
-                    disabled={busy}
-                    onClick={() => act(o.order_id, 'complete')}
-                  >
-                    {t('actionComplete')}
-                  </Button>
-                )}
-                {(o.order_st_cd === 'PENDING' ||
-                  (IN_TRADE.includes(o.order_st_cd) &&
-                    (role === 'buyer' || o.order_st_cd !== 'SELLER_DONE'))) && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    disabled={busy}
-                    onClick={() => act(o.order_id, 'cancel')}
-                  >
-                    {canceling
-                      ? t(
-                          role === 'buyer'
-                            ? 'actionCancelingBuyer'
-                            : 'actionCancelingSeller',
-                        )
-                      : t(
-                          role === 'buyer'
-                            ? 'actionCancelBuyer'
-                            : 'actionCancelSeller',
-                        )}
-                  </Button>
-                )}
-              </div>
-
-              {role === 'seller' && IN_TRADE.includes(o.order_st_cd) && (
-                <p className="text-muted-foreground text-xs">
-                  {t('waitingBuyerConfirm')}
-                </p>
-              )}
-              {role === 'buyer' && o.order_st_cd === 'BUYER_DONE' && (
-                <p className="text-muted-foreground text-xs">
-                  {t('waitingSellerComplete')}
-                </p>
-              )}
-              {o.order_st_cd === 'DONE' && (
-                <p className="text-muted-foreground text-xs">
-                  {t('escrowReleased')}
-                </p>
-              )}
-            </div>
-          )
-        })
+        <div className="space-y-5">
+          {offlineOrders.length > 0 && (
+            <section className="space-y-3">
+              <h2 className="text-sm font-bold">
+                {offlineLabel} ({offlineOrders.length})
+              </h2>
+              {offlineOrders.map(renderCard)}
+            </section>
+          )}
+          {directOrders.length > 0 && (
+            <section className="space-y-3">
+              <h2 className="text-sm font-bold">
+                {directLabel} ({directOrders.length})
+              </h2>
+              {directOrders.map(renderCard)}
+            </section>
+          )}
+        </div>
       )}
     </div>
   )

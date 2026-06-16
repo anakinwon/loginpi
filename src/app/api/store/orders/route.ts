@@ -1,13 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { getSessionUser } from '@/lib/auth-check'
-import { createOrder, listOrdersByRole } from '@/lib/mps-order'
+import { getSessionUser, isAdmin } from '@/lib/auth-check'
+import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import {
+  createOrder,
+  listOrdersByRole,
+  autoCompleteReadyOrders,
+} from '@/lib/mps-order'
 
 // GET /api/store/orders?role=buyer|seller — 내 주문 목록
 export async function GET(req: NextRequest) {
   const user = await getSessionUser()
   if (!user)
     return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+
+  // on-demand 배치 — READY 10분 경과 주문 자동완료 (조회 시점에 마감 처리, sql 032 패턴)
+  autoCompleteReadyOrders().catch((e) =>
+    console.error('[자동완료] 처리 실패:', e),
+  )
 
   const role =
     req.nextUrl.searchParams.get('role') === 'seller' ? 'seller' : 'buyer'
@@ -18,6 +28,9 @@ export async function GET(req: NextRequest) {
 const createSchema = z.object({
   item_id: z.uuid(),
   meet_loc_desc: z.string().max(500).optional(),
+  // 주문방법 3종 (기본 매장이용). DELIVERY는 배달가능 매장 + 배달주소 필수
+  order_mthd_cd: z.enum(['DINE_IN', 'PICKUP', 'DELIVERY']).optional(),
+  dlvr_addr: z.string().max(500).optional(),
 })
 
 // POST /api/store/orders — 주문 생성 (재고 원자적 차감 + PENDING)
@@ -42,12 +55,40 @@ export async function POST(req: NextRequest) {
     )
   }
 
+  const orderMthd = parsed.data.order_mthd_cd ?? 'DINE_IN'
+
+  // 배달(DELIVERY) 검증 — 배달주소 필수 + 해당 상품 매장이 배달가능(dlvr_yn='Y')해야 함
+  if (orderMthd === 'DELIVERY') {
+    if (!parsed.data.dlvr_addr?.trim()) {
+      return NextResponse.json(
+        { error: '배달 위치를 입력해주세요' },
+        { status: 400 },
+      )
+    }
+    const { data: item } = await getSupabaseAdmin()
+      .from('mps_item')
+      .select('shop_id, mps_shop(dlvr_yn)')
+      .eq('item_id', parsed.data.item_id)
+      .maybeSingle()
+    const dlvrYn = (item as { mps_shop?: { dlvr_yn?: string } | null } | null)
+      ?.mps_shop?.dlvr_yn
+    if (dlvrYn !== 'Y') {
+      return NextResponse.json(
+        { error: '이 매장은 배달을 지원하지 않습니다' },
+        { status: 400 },
+      )
+    }
+  }
+
   const slug = String(user.display_name ?? 'user').slice(0, 20)
   const result = await createOrder(
     parsed.data.item_id,
     user.id,
     parsed.data.meet_loc_desc ?? null,
     slug,
+    orderMthd,
+    parsed.data.dlvr_addr ?? null,
+    isAdmin(user), // 관리자는 본인상품 테스트 결제 허용
   )
 
   if ('error' in result) {

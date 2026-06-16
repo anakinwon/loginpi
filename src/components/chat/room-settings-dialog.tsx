@@ -1,7 +1,8 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
+import { getCurrentPosition } from '@/lib/geo'
 
 // 카페 수정 다이얼로그 (방장 OWNER 전용)
 // 공개/비밀 전환 · 비밀방 비밀번호 설정/변경/제거 · 이름 · 설명 · 정원
@@ -33,6 +34,19 @@ export function RoomSettingsDialog({
   const [newPwd, setNewPwd] = useState('')
   const [removePwd, setRemovePwd] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [gpsCoords, setGpsCoords] = useState<{ lat: number; lng: number } | null>(null)
+
+  // 다이얼로그 마운트 시 LBS 동의자이면 현재 위치 자동 수집
+  useEffect(() => {
+    piFetch('/api/location/consent')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: { consent_yn?: string } | null) => {
+        if (d?.consent_yn === 'Y') {
+          getCurrentPosition().then(setGpsCoords).catch(() => {})
+        }
+      })
+      .catch(() => {})
+  }, [])
 
   async function save() {
     const nm = roomNm.trim()
@@ -60,6 +74,10 @@ export function RoomSettingsDialog({
       room_desc: roomDesc.trim() || null,
       is_public_yn: isPublic ? 'Y' : 'N',
       max_mbr_cnt: cnt,
+    }
+    if (gpsCoords) {
+      payload.lat = gpsCoords.lat
+      payload.lng = gpsCoords.lng
     }
     if (!isPublic) {
       if (removePwd) payload.join_pwd = null

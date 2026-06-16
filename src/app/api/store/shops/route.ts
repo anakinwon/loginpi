@@ -26,6 +26,7 @@ const shopSchema = z.object({
   contact_email: z.email().max(200).optional(),
   sns_url: z.url().max(500).optional(),
   thumb_url: z.url().max(1000).optional(),
+  dlvr_yn: z.enum(['Y', 'N']).optional(),
 })
 
 // POST /api/store/shops — 매장 등록 (판매자 인증)

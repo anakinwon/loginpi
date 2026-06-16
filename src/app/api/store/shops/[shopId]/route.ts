@@ -16,6 +16,15 @@ const patchSchema = z.object({
   contact_email: z.email().max(200).optional(),
   sns_url: z.url().max(500).optional(),
   thumb_url: z.url().max(1000).optional(),
+  // 구글 제공 정보 (수정 가능) — place_id·인증상태(owner_verified_yn 등)는 수정 불가
+  owner_nm: z.string().max(100).optional(),
+  google_nm: z.string().max(200).optional(),
+  website_url: z.url().max(1000).optional(),
+  gmap_url: z.url().max(1000).optional(),
+  biz_status_cd: z.string().max(20).optional(),
+  rating_cnt: z.number().int().min(0).optional(),
+  // 배달 가능 여부 (점주 설정) — 배달 주문방법 노출 게이트
+  dlvr_yn: z.enum(['Y', 'N']).optional(),
 })
 
 // PATCH /api/store/shops/[shopId] — 매장 수정 (본인 매장만, FR-06)

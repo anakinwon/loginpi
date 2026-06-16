@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { sendPaymentReceipt } from '@/lib/email'
-import { broadcastToRoom } from '@/lib/realtime-broadcast'
+import { broadcastToRoom, broadcastToSeller } from '@/lib/realtime-broadcast'
 import { canSendTip } from '@/lib/chat-auth'
 import { markEscrow } from '@/lib/mps-order'
 import { depositBond, BOND_DEPOSIT_PI } from '@/lib/mps-bond'
@@ -69,14 +69,17 @@ export async function POST(request: NextRequest) {
     if (meta?.type === 'CHAT_ROOM_CREATE' && payment.user_uid) {
       const { data: owner } = await db
         .from('sys_user')
-        .select('id, display_name')
+        .select('id, display_name, lbs_consent_yn')
         .eq('pi_uid', payment.user_uid)
         .maybeSingle()
 
       if (owner) {
-        const slug = String(
-          (owner as Record<string, unknown>).display_name ?? 'user',
-        ).slice(0, 20)
+        const ownerRow = owner as {
+          id: string
+          display_name: string | null
+          lbs_consent_yn: string | null
+        }
+        const slug = String(ownerRow.display_name ?? 'user').slice(0, 20)
         const { data: room } = await db
           .from('msg_room')
           .insert({
@@ -94,14 +97,50 @@ export async function POST(request: NextRequest) {
           .single()
 
         if (room) {
+          const roomId = String((room as Record<string, unknown>).room_id)
           await db.from('msg_room_mbr').insert({
-            room_id: (room as Record<string, unknown>).room_id,
-            usr_id: (owner as Record<string, unknown>).id,
+            room_id: roomId,
+            usr_id: ownerRow.id,
             mbr_role_cd: 'OWNER',
             regr_id: slug,
             modr_id: slug,
           })
           createdRoom = room as Record<string, unknown>
+
+          // LBS 동의자 카페 위치 저장 (loc_tp_cd='05') — 메타데이터 lat/lng 사용
+          const metaLat =
+            typeof meta.lat === 'number' && isFinite(meta.lat as number)
+              ? (meta.lat as number)
+              : null
+          const metaLng =
+            typeof meta.lng === 'number' && isFinite(meta.lng as number)
+              ? (meta.lng as number)
+              : null
+          if (
+            ownerRow.lbs_consent_yn === 'Y' &&
+            metaLat !== null &&
+            metaLng !== null
+          ) {
+            Promise.all([
+              db
+                .from('msg_room')
+                .update({ latd_crd: metaLat, lngt_crd: metaLng })
+                .eq('room_id', roomId),
+              db.from('usr_loc_hist').insert({
+                user_str_id: ownerRow.id,
+                loc_tp_cd: '05',
+                latd_crd: metaLat,
+                lngt_crd: metaLng,
+                ref_id: roomId,
+                consent_yn: 'Y',
+                consent_dtm: new Date().toISOString(),
+                regr_id: slug,
+                modr_id: slug,
+              }),
+            ]).catch((err) =>
+              console.error('[카페 위치] 결제 완료 저장 실패:', err),
+            )
+          }
         }
       }
     } else if (meta?.type === 'CHAT_SUBSCR' && payment.user_uid) {
@@ -224,12 +263,13 @@ export async function POST(request: NextRequest) {
           if (tipMsg) {
             await broadcastToRoom(roomId, 'new_msg', tipMsg)
 
-            // M5: Bean 전송 미션 기록 (비블로킹)
+            // M4: Bean 전송 미션 기록 (비블로킹)
             recordUserAction('bean_send', senderRow.id, {
               room_id: roomId,
               recipient_id: recipientRow.id,
-            })
-              .catch(err => console.error(`[M5] 미션 기록 실패: ${err.message}`))
+            }).catch((err) =>
+              console.error(`[M4] 미션 기록 실패: ${err.message}`),
+            )
           }
         }
       }
@@ -397,6 +437,31 @@ export async function POST(request: NextRequest) {
             Number((orderRow as { order_price_pi: number }).order_price_pi)
         ) {
           await markEscrow(orderId, buyerRow.id, txid, Number(payment.amount))
+
+          // 사장님 보이스 주문 알림 — seller:{sellerId} 토픽 broadcast (비블로킹)
+          const { data: ord } = await db
+            .from('mps_order')
+            .select(
+              'seller_id, order_mthd_cd, dlvr_addr, order_price_pi, mps_item(item_nm)',
+            )
+            .eq('order_id', orderId)
+            .maybeSingle()
+          if (ord) {
+            const o = ord as {
+              seller_id: string
+              order_mthd_cd: string | null
+              dlvr_addr: string | null
+              order_price_pi: number
+              mps_item?: { item_nm?: string } | null
+            }
+            broadcastToSeller(o.seller_id, 'new_order', {
+              order_id: orderId,
+              item_nm: o.mps_item?.item_nm ?? '상품',
+              price_pi: Number(o.order_price_pi),
+              order_mthd_cd: o.order_mthd_cd,
+              dlvr_addr: o.dlvr_addr,
+            }).catch((e) => console.error('[주문알림] broadcast 실패', e))
+          }
         }
       }
     } else if (meta?.type === 'MPS_BOND' && payment.user_uid) {
@@ -414,8 +479,9 @@ export async function POST(request: NextRequest) {
         await depositBond(sellerRow.id, paymentId, slug)
 
         // M9: 판매자 보증금 예치 미션 기록 (비블로킹)
-        recordUserAction('bond_deposit', sellerRow.id)
-          .catch(err => console.error(`[M9] 미션 기록 실패: ${err.message}`))
+        recordUserAction('bond_deposit', sellerRow.id).catch((err) =>
+          console.error(`[M9] 미션 기록 실패: ${err.message}`),
+        )
       }
     } else if (meta?.type === 'PI_BET' && payment.user_uid) {
       // PI_BET: 결제 완료 시 베팅 참가 INSERT + BET_NOTI 발송 (TASK-071)
@@ -502,16 +568,17 @@ export async function POST(request: NextRequest) {
                 if (betMsg)
                   await broadcastToRoom(betRow.room_id, 'new_msg', betMsg)
 
-                // M4.2: Pi Bet 참가 미션 기록 — 베팅 생성자(주관자) 기준 (비블로킹)
-                // M4(MULTI_AND)=pibet_create+pibet_entry는 한 사람이 둘 다 충족해야 하는데,
-                // 생성자는 자기 베팅에 참가 불가(line 454)이므로 참가자(ownerRow)로 기록하면 M4 완료 불가.
+                // M5: Pi Bet 분배 미션 기록 — 베팅 생성자(주관자) 기준 (비블로킹)
+                // M5(MULTI_AND)=pibet_create+pibet_entry는 한 사람이 둘 다 충족해야 하는데,
+                // 생성자는 자기 베팅에 참가 불가(line 454)이므로 참가자(ownerRow)로 기록하면 M5 완료 불가.
                 // 참가가 발생하면 '주관자(생성자)의 분배 미션'이 진척된 것으로 본다.
                 recordUserAction('pibet_entry', betRow.crtr_usr_id, {
                   bet_id: betRow.bet_id,
                   room_id: betRow.room_id,
                   entrant_id: ownerRow.id,
-                })
-                  .catch((err) => console.error(`[M4.2] 미션 기록 실패: ${err.message}`))
+                }).catch((err) =>
+                  console.error(`[M5] pibet_entry 기록 실패: ${err.message}`),
+                )
               }
             }
           }
