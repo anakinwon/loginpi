@@ -149,7 +149,28 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey, bizCategory, rad
           if (shopId) markerMapRef.current.set(shopId, { marker, content: infoContent, position })
         }
 
-        const buildShopInfo = (nm: string, dist: string, addr: string | null, biz_hour: string | null) => {
+        // 길찾기 버튼 행 (Google · Naver · Kakao 외부 앱 연동)
+        const buildNavLinks = (lat: number, lng: number, name: string) => {
+          const row = document.createElement('div')
+          row.style.cssText = 'display:flex;gap:5px;margin-top:8px;flex-wrap:wrap'
+          const navItems = [
+            { label: 'Google', url: `https://maps.google.com/?daddr=${lat},${lng}` },
+            { label: 'Naver', url: `https://map.naver.com/index.nhn?lng=${lng}&lat=${lat}&title=${encodeURIComponent(name)}&menu=route` },
+            { label: 'Kakao', url: `https://map.kakao.com/link/to/${encodeURIComponent(name)},${lat},${lng}` },
+          ]
+          for (const { label, url } of navItems) {
+            const a = document.createElement('a')
+            a.href = url
+            a.target = '_blank'
+            a.rel = 'noopener noreferrer'
+            a.textContent = `🧭 ${label}`
+            a.style.cssText = 'display:inline-block;padding:3px 7px;font-size:11px;border-radius:4px;border:1px solid #d1d5db;color:#374151;text-decoration:none;white-space:nowrap'
+            row.appendChild(a)
+          }
+          return row
+        }
+
+        const buildShopInfo = (nm: string, dist: string, addr: string | null, biz_hour: string | null, lat: number, lng: number) => {
           const wrap = document.createElement('div')
           wrap.style.cssText = 'font-family:system-ui,sans-serif;min-width:160px;padding:4px 0'
           const nameEl = document.createElement('p')
@@ -172,6 +193,7 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey, bizCategory, rad
             h.textContent = `🕒 ${biz_hour}`
             wrap.appendChild(h)
           }
+          wrap.appendChild(buildNavLinks(lat, lng, nm))
           return wrap
         }
 
@@ -184,7 +206,7 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey, bizCategory, rad
             addMarker(
               { lat: shop.lat, lng: shop.lng },
               shop.shop_nm,
-              buildShopInfo(shop.shop_nm, dist, shop.addr, shop.biz_hour),
+              buildShopInfo(shop.shop_nm, dist, shop.addr, shop.biz_hour, shop.lat, shop.lng),
               shop.shop_id,
             )
           }
@@ -230,6 +252,7 @@ export function ShopsMapView({ shops, userLat, userLng, apiKey, bizCategory, rad
               wrap.appendChild(addrEl)
             }
 
+            wrap.appendChild(buildNavLinks(loc.lat(), loc.lng(), place.displayName ?? ''))
             addMarker({ lat: loc.lat(), lng: loc.lng() }, place.displayName ?? '', wrap)
           }
         }
