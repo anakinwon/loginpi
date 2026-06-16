@@ -4,7 +4,7 @@
 
 import { after } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
-import { triggerPiReward } from '@/lib/pi-reward'
+import { grantBondReward } from '@/lib/mps-bond'
 
 /**
  * 행위 기록: evt_action_log에 사용자 행위 저장
@@ -63,7 +63,7 @@ export async function evaluateUserMissions(
   const query = db
     .from('evt_event')
     .select(
-      'event_id, start_dtm, end_dtm, reward_pi_yn, reward_pi_amt, reward_pi_memo, reward_mission_count_no',
+      'event_id, start_dtm, end_dtm, reward_pi_yn, reward_mission_count_no',
     )
     .eq('active_yn', 'Y')
 
@@ -170,13 +170,12 @@ export async function evaluateUserMissions(
       // 미충족으로 오판할 수 있어 행위형 완료는 자동 취소하지 않는다.
     }
 
-    // ── Pi 보상 자동 지급 ─────────────────────────────────────────────────────
+    // ── 보증금 보상 자동 적립 ────────────────────────────────────────────────
     // 조건: reward_pi_yn='Y' + 이벤트 기간 내 + 완료 미션 수 ≥ 보상 기준 수
+    // Pi A2U 송금 없이 mps_seller_bond 잔액에 1π 직접 적립
     const evt = event as {
       end_dtm: string
       reward_pi_yn: string
-      reward_pi_amt: number
-      reward_pi_memo: string
       reward_mission_count_no: number
     }
     if (evt.reward_pi_yn !== 'Y') continue
@@ -193,14 +192,9 @@ export async function evaluateUserMissions(
 
     const completedCount = completedRows?.length ?? 0
     if (completedCount >= evt.reward_mission_count_no) {
-      // 비블로킹 — 응답 후 Pi A2U 결제 진행 (멱등: 이미 PAID면 내부에서 skip)
-      triggerPiReward(
-        event.event_id,
-        userId,
-        Number(evt.reward_pi_amt),
-        evt.reward_pi_memo,
-      ).catch((err: Error) =>
-        console.error(`[Pi 보상] 비동기 실패: ${err.message}`),
+      // 비블로킹 — 보증금 1π 직접 적립 (Pi A2U 송금 없음, 멱등: 이미 BONDED면 skip)
+      grantBondReward(event.event_id, userId).catch((err: Error) =>
+        console.error(`[보증금 보상] 비동기 실패: ${err.message}`),
       )
     }
   }
