@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { getSessionUser } from '@/lib/auth-check'
+import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { createOrder, listOrdersByRole } from '@/lib/mps-order'
 
@@ -79,6 +79,7 @@ export async function POST(req: NextRequest) {
     slug,
     orderMthd,
     parsed.data.dlvr_addr ?? null,
+    isAdmin(user), // 관리자는 본인상품 테스트 결제 허용
   )
 
   if ('error' in result) {

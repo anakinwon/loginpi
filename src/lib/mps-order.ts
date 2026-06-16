@@ -56,12 +56,14 @@ export async function createOrder(
   regrId: string,
   orderMthd?: 'DINE_IN' | 'PICKUP' | 'DELIVERY' | null,
   dlvrAddr?: string | null,
+  allowSelf = false, // 관리자 본인상품 테스트 결제 허용 (기본 차단)
 ): Promise<{ order: MpsOrder } | { error: OrderError }> {
   const { data, error } = await getSupabaseAdmin().rpc('fn_mps_order_create', {
     p_item_id: itemId,
     p_buyer_id: buyerId,
     p_meet_loc: meetLoc,
     p_regr_id: regrId,
+    p_allow_self: allowSelf,
   })
   if (error) return { error: mapRpcError(error.message) }
   const order = data as MpsOrder

@@ -180,6 +180,9 @@ export function StoreItemDetail({ itemId }: { itemId: string }) {
   const buyable = canPurchase(item)
   const tradeSt = deriveTradeStatus(item)
   const isMine = user?.userId === item.seller_id
+  // 관리자는 본인 상품도 테스트 결제 가능 (서버도 isAdmin으로 동일 허용)
+  const isAdminUser = user?.role === 'ADMIN' || user?.role === 'MASTER'
+  const canSelfTest = isMine && isAdminUser
   const gallery =
     item.images.length > 0
       ? item.images.map((i) => i.img_url)
@@ -286,7 +289,7 @@ export function StoreItemDetail({ itemId }: { itemId: string }) {
         )}
 
         {/* 주문방법 3종 — 매장이용·픽업·배달(배달가능 매장만). 배달 시 위치 입력 */}
-        {!isMine && (
+        {(!isMine || canSelfTest) && (
           <div className="space-y-2">
             <p className="text-sm font-medium">주문방법</p>
             <div className="flex flex-wrap gap-1.5">
@@ -333,7 +336,12 @@ export function StoreItemDetail({ itemId }: { itemId: string }) {
         )}
 
         <div className="pt-2">
-          {isMine ? (
+          {canSelfTest && (
+            <p className="mb-2 rounded-md bg-amber-50 px-2.5 py-1.5 text-xs text-amber-700 dark:bg-amber-950 dark:text-amber-400">
+              ⚠️ 관리자 테스트 결제 — 본인 상품을 결제합니다
+            </p>
+          )}
+          {isMine && !canSelfTest ? (
             <p className="text-muted-foreground text-sm">{t('myOwnItem')}</p>
           ) : (
             <Button
