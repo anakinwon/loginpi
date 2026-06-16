@@ -19,6 +19,7 @@ import {
 interface ItemFormProps {
   serverAuthed?: boolean // 서버 getSessionUser() 확인 결과 (Google 쿠키 로그인 포함)
   itemId?: string // 지정 시 수정 모드 — 기존 값 로드 후 PATCH
+  defaultShopId?: string // 신규 등록 시 소속 매장 미리 선택 (?shop= 쿼리)
 }
 
 // GET /api/store/categories 트리 노드 (2단계)
@@ -35,7 +36,11 @@ interface ShopOption {
 }
 
 // 상품 등록·수정 폼 (SCR-04) — 이미지는 URL 입력 (Storage 업로드는 후속 TASK)
-export function StoreItemForm({ serverAuthed = false, itemId }: ItemFormProps) {
+export function StoreItemForm({
+  serverAuthed = false,
+  itemId,
+  defaultShopId,
+}: ItemFormProps) {
   const t = useTranslations('store')
   const router = useRouter()
   const { user, isLoading } = usePiAuth()
@@ -51,7 +56,8 @@ export function StoreItemForm({ serverAuthed = false, itemId }: ItemFormProps) {
   const [images, setImages] = useState<ProductImage[]>([])
   const [ctgrId, setCtgrId] = useState('')
   const [ctgrTree, setCtgrTree] = useState<CtgrNode[]>([])
-  const [shopId, setShopId] = useState('')
+  // 신규 등록 시 ?shop= 쿼리로 소속 매장 미리 선택 (수정 모드는 기존 값 로드가 덮어씀)
+  const [shopId, setShopId] = useState(itemId ? '' : (defaultShopId ?? ''))
   const [myShops, setMyShops] = useState<ShopOption[]>([])
   const [saving, setSaving] = useState(false)
   const [loadingItem, setLoadingItem] = useState(editMode)

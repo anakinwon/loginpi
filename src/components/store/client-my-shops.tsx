@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
+import { useRouter } from '@/i18n/navigation'
 import { usePiAuth } from '@/components/pi-auth-provider'
 import { piFetch } from '@/lib/pi-fetch'
 import { Button } from '@/components/ui/button'
@@ -82,6 +83,7 @@ export function ClientMyShops({
   serverAuthed?: boolean
 }) {
   const t = useTranslations('store')
+  const router = useRouter()
   const { user, isLoading } = usePiAuth()
   const authed = serverAuthed || !!user
 
@@ -522,7 +524,15 @@ export function ClientMyShops({
                   </p>
                 )}
               </div>
-              <div className="flex shrink-0 gap-1.5">
+              <div className="flex shrink-0 flex-wrap justify-end gap-1.5">
+                <Button
+                  size="sm"
+                  onClick={() =>
+                    router.push(`/store/my/items/new?shop=${shop.shop_id}`)
+                  }
+                >
+                  + 메뉴 추가
+                </Button>
                 <Button
                   size="sm"
                   variant="outline"

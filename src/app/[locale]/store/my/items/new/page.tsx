@@ -9,9 +9,15 @@ export async function generateMetadata() {
 }
 
 // SCR-04 상품 등록 — redirect 금지, 서버 세션(Google 포함) + Pi 로그인 OR 게이트
-export default async function NewItemPage() {
+// ?shop=<shopId> 쿼리가 있으면 소속 매장 미리 선택 (매장 관리 → "+ 메뉴 추가" 동선)
+export default async function NewItemPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ shop?: string }>
+}) {
   const t = await getTranslations('store')
   const user = await getSessionUser()
+  const { shop } = await searchParams
 
   return (
     <div className="mx-auto max-w-3xl space-y-4 p-4 md:p-6">
@@ -22,7 +28,7 @@ export default async function NewItemPage() {
         ← {t('myItemsTitle')}
       </Link>
       <h1 className="text-xl font-bold">{t('newItemTitle')}</h1>
-      <StoreItemForm serverAuthed={!!user} />
+      <StoreItemForm serverAuthed={!!user} defaultShopId={shop} />
     </div>
   )
 }
