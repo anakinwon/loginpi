@@ -3,6 +3,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { setOptions, importLibrary } from '@googlemaps/js-api-loader'
+import { useRouter } from '@/i18n/navigation'
 import {
   ShopClaimDialog,
   type ClaimTarget,
@@ -69,6 +70,7 @@ export function ShopsMapView({
   radiusMeters,
   focusShopId,
 }: Props) {
+  const router = useRouter() // next-intl 라우터 — locale 접두사 자동 처리
   const mapRef = useRef<HTMLDivElement>(null)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [placesCount, setPlacesCount] = useState<number | null>(null)
@@ -279,9 +281,6 @@ export function ShopsMapView({
           return btn
         }
 
-        // 내부 라우팅용 locale (vanilla DOM 링크라 경로에서 직접 추출)
-        const locale = window.location.pathname.split('/')[1] || 'en'
-
         const buildShopInfo = (
           nm: string,
           dist: string,
@@ -330,12 +329,17 @@ export function ShopsMapView({
             grid.style.cssText =
               'display:grid;grid-template-columns:repeat(4,1fr);gap:4px;max-height:160px;overflow-y:auto'
             for (const it of items) {
+              const itemId = it.item_id
               const cell = document.createElement('a')
-              cell.href = `/${locale}/store/${it.item_id}`
+              // next-intl 라우터로 이동 (locale 접두사 자동 처리, 직접 URL 조립 금지)
+              cell.addEventListener('click', (e) => {
+                e.preventDefault()
+                router.push(`/store/${itemId}`)
+              })
               // 상품명은 마우스오버(title)로만 노출
               cell.title = `${it.item_nm} · ${Number(it.price_pi)} π`
               cell.style.cssText =
-                'display:block;aspect-ratio:1;border:1px solid #e5e7eb;border-radius:6px;overflow:hidden;background:#f3f4f6'
+                'display:block;aspect-ratio:1;border:1px solid #e5e7eb;border-radius:6px;overflow:hidden;background:#f3f4f6;cursor:pointer'
               if (it.thumbnail_url) {
                 const img = document.createElement('img')
                 img.src = it.thumbnail_url
