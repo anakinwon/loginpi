@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/navigation'
 import { getSessionUser } from '@/lib/auth-check'
+import { StoreNav } from '@/components/store/store-nav'
 import { ClientMyHistory } from '@/components/store/client-my-history'
 
 export async function generateMetadata() {
@@ -15,6 +16,7 @@ export default async function MyHistoryPage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-4 p-4 md:p-6">
+      <StoreNav active="history" />
       <Link
         href="/store"
         className="text-muted-foreground text-sm hover:underline"

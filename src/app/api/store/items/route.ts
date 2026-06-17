@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { getSessionUser } from '@/lib/auth-check'
+import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { listOpenItems, listMyItems, createItem } from '@/lib/mps-item'
 
@@ -15,7 +15,9 @@ export async function GET(req: NextRequest) {
         { error: '로그인이 필요합니다' },
         { status: 401 },
       )
-    const items = await listMyItems(user.id)
+    // 관리자 전체보기 — ?all=1 + isAdmin일 때만 전체 판매자 상품(null), 그 외 본인만
+    const wantAll = sp.get('all') === '1' && isAdmin(user)
+    const items = await listMyItems(wantAll ? null : user.id)
     return NextResponse.json({ items })
   }
 

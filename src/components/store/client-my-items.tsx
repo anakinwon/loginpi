@@ -1,11 +1,12 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { Link } from '@/i18n/navigation'
 import { usePiAuth } from '@/components/pi-auth-provider'
 import { piFetch } from '@/lib/pi-fetch'
+import { formatCcy } from '@/lib/format-ccy'
 import { Button } from '@/components/ui/button'
 import { SellerBondCard } from './seller-bond-card'
 import { deriveTradeStatus, TRADE_ST_STYLE } from '@/lib/mps-trade-status'
@@ -22,8 +23,12 @@ export function ClientMyItems({
   serverAuthed?: boolean
 }) {
   const t = useTranslations('store')
+  const locale = useLocale()
   const { user, isLoading } = usePiAuth()
   const authed = serverAuthed || !!user
+  // 관리자(ADMIN/MASTER)만 전체 판매자 상품 보기 토글 노출 (서버도 isAdmin 재검증)
+  const isAdminUser = user?.role === 'ADMIN' || user?.role === 'MASTER'
+  const [showAll, setShowAll] = useState(false)
   const [items, setItems] = useState<StoreItem[]>([])
   const [tab, setTab] = useState<(typeof ST_TABS)[number]>('ALL')
   const [loading, setLoading] = useState(true)
@@ -31,7 +36,9 @@ export function ClientMyItems({
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await piFetch('/api/store/items?mine=1')
+      const res = await piFetch(
+        `/api/store/items?mine=1${showAll ? '&all=1' : ''}`,
+      )
       if (res.ok) {
         const data = (await res.json()) as { items: StoreItem[] }
         setItems(data.items)
@@ -39,7 +46,7 @@ export function ClientMyItems({
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [showAll])
 
   useEffect(() => {
     if (authed) void load()
@@ -112,7 +119,18 @@ export function ClientMyItems({
             </span>
           </button>
         ))}
-        <Link href="/store/my/shops" className="ml-auto">
+        {isAdminUser && (
+          <button
+            onClick={() => setShowAll((v) => !v)}
+            className={`ml-auto rounded-full border px-3 py-1 text-xs font-medium ${showAll ? 'border-primary bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted'}`}
+          >
+            {showAll ? '🛡️ 전체 판매자' : '🛡️ 내 상품만'}
+          </button>
+        )}
+        <Link
+          href="/store/my/shops"
+          className={isAdminUser ? '' : 'ml-auto'}
+        >
           <Button size="sm" variant="outline">
             {t('shop.manage')}
           </Button>
@@ -176,7 +194,14 @@ export function ClientMyItems({
                     </span>
                   </div>
                   <p className="text-muted-foreground text-xs">
-                    {Number(item.price_pi)} π
+                    {/* Pi 금액 강조 — 한 단계 크게 */}
+                    <span className="text-foreground text-sm font-semibold">
+                      {Number(item.price_pi)} π
+                    </span>
+                    {/* 등록 당시 자국통화 — 판매자 본인 장부용(항상 표시) */}
+                    {item.ccy_cd &&
+                      item.ccy_amt != null &&
+                      ` · ≈ ${formatCcy(locale, item.ccy_cd, Number(item.ccy_amt))}`}
                     {item.reg_qty !== 9999 &&
                       ` · ${t('stockLeft', { count: item.stock_qty })}`}
                     {item.trading_cnt > 0 &&

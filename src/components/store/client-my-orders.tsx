@@ -117,6 +117,9 @@ export function ClientMyOrders({
   const t = useTranslations('store')
   const { user, isLoading } = usePiAuth()
   const authed = serverAuthed || !!user
+  // 관리자(ADMIN/MASTER)만 전체 주문 보기 토글 노출 (서버도 isAdmin 재검증)
+  const isAdminUser = user?.role === 'ADMIN' || user?.role === 'MASTER'
+  const [showAll, setShowAll] = useState(false)
   const [orders, setOrders] = useState<OrderRow[]>([])
   const [loading, setLoading] = useState(true)
   const [acting, setActing] = useState<{
@@ -127,7 +130,9 @@ export function ClientMyOrders({
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await piFetch(`/api/store/orders?role=${role}`)
+      const res = await piFetch(
+        `/api/store/orders?role=${role}${showAll ? '&all=1' : ''}`,
+      )
       if (res.ok) {
         const data = (await res.json()) as { orders: OrderRow[] }
         setOrders(data.orders)
@@ -135,7 +140,7 @@ export function ClientMyOrders({
     } finally {
       setLoading(false)
     }
-  }, [role])
+  }, [role, showAll])
 
   useEffect(() => {
     if (authed) void load()
@@ -411,6 +416,20 @@ export function ClientMyOrders({
 
   return (
     <div className="space-y-3">
+      {isAdminUser && (
+        <div className="flex justify-end">
+          <button
+            onClick={() => setShowAll((v) => !v)}
+            className={`rounded-full border px-3 py-1 text-xs font-medium ${showAll ? 'border-primary bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted'}`}
+          >
+            {showAll
+              ? role === 'seller'
+                ? '🛡️ 전체 판매주문'
+                : '🛡️ 전체 구매주문'
+              : '🛡️ 내 주문만'}
+          </button>
+        </div>
+      )}
       {loading ? (
         <p className="text-muted-foreground py-16 text-center text-sm">
           {t('loading')}

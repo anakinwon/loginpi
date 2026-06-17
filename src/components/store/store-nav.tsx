@@ -1,0 +1,34 @@
+import { getTranslations } from 'next-intl/server'
+import { Link } from '@/i18n/navigation'
+
+// 스토어 공용 상단 네비 — 목록·판매관리·구매내역·거래내역 등 하위 페이지에서 공유(단일 소스).
+// active로 현재 페이지를 강조한다.
+type StoreNavKey = 'nearby' | 'items' | 'sales' | 'orders' | 'history'
+
+export async function StoreNav({ active }: { active?: StoreNavKey }) {
+  const t = await getTranslations('store')
+  const links: { key: StoreNavKey; href: string; label: string }[] = [
+    { key: 'nearby', href: '/map', label: t('nearbyNav') },
+    { key: 'items', href: '/store/my/items', label: t('navMyItems') },
+    { key: 'sales', href: '/store/my/sales', label: t('navSales') },
+    { key: 'orders', href: '/store/my/orders', label: t('navOrders') },
+    { key: 'history', href: '/store/my/history', label: t('navHistory') },
+  ]
+  return (
+    <nav className="flex flex-wrap gap-3 text-sm">
+      {links.map((l) => (
+        <Link
+          key={l.key}
+          href={l.href}
+          className={
+            active === l.key
+              ? 'text-foreground font-semibold underline'
+              : 'text-primary hover:underline'
+          }
+        >
+          {l.label}
+        </Link>
+      ))}
+    </nav>
+  )
+}

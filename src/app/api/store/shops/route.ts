@@ -1,15 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { getSessionUser } from '@/lib/auth-check'
+import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { listMyShops, createShop } from '@/lib/mps-shop'
 
 // GET /api/store/shops — 내 매장 목록 (판매자 인증, FR-06)
-export async function GET() {
+//   ?all=1 — 관리자 전체 매장 (그 외 본인 매장만)
+export async function GET(req: NextRequest) {
   const user = await getSessionUser()
   if (!user)
     return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
-  const shops = await listMyShops(user.id)
+  const wantAll = req.nextUrl.searchParams.get('all') === '1' && isAdmin(user)
+  const shops = await listMyShops(wantAll ? null : user.id)
   return NextResponse.json({ shops })
 }
 

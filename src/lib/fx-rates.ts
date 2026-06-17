@@ -48,6 +48,8 @@ export interface FiatPiQuote {
 }
 
 const round7 = (n: number) => Math.round(n * 1e7) / 1e7
+// 환율 변동이 심해 Pi 환산가는 소수점 1자리로 버림(truncate) — 잦은 끝자리 변동 억제, 안정적 표시가.
+const trunc1 = (n: number) => Math.floor(n * 10) / 10
 
 // 자국통화 금액 → Pi 환산 (등록시점 1회). 환율 조회 실패·미지원 통화 시 null → 호출자는 Pi 직접입력으로 폴백.
 export async function convertFiatToPi(
@@ -62,7 +64,8 @@ export async function convertFiatToPi(
   if (!ccyPerUsd || ccyPerUsd <= 0) return null
 
   const usd = ccyAmt / ccyPerUsd // 자국통화 → USD
-  const pricePi = round7(usd / piUsd) // USD → Pi
+  // USD → Pi 후 소수점 1자리 버림. 0.1π 미만으로 떨어지면 0.0 → 아래 가드가 null 처리(Pi 직접입력 유도)
+  const pricePi = trunc1(usd / piUsd)
   if (!(pricePi > 0)) return null
 
   return {

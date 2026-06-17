@@ -68,13 +68,16 @@ export interface ShopInput {
   dlvr_yn?: string
 }
 
-export async function listMyShops(sellerId: string) {
-  const { data, error } = await getSupabaseAdmin()
+// 내 매장 목록 — 한 사용자가 여러 매장 등록 가능(seller_id 유니크 제약 없음)
+// sellerId=null → 전체 매장(관리자 전체보기 전용 — 호출자가 isAdmin 검증 후 null 전달)
+export async function listMyShops(sellerId: string | null) {
+  let q = getSupabaseAdmin()
     .from('mps_shop')
     .select(SHOP_SELECT)
-    .eq('seller_id', sellerId)
     .eq('del_yn', 'N')
     .order('reg_dtm', { ascending: false })
+  if (sellerId) q = q.eq('seller_id', sellerId)
+  const { data, error } = await q
 
   if (error) throw new Error(error.message)
   return (data ?? []) as unknown as MpsShop[]

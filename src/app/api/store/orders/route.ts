@@ -21,7 +21,9 @@ export async function GET(req: NextRequest) {
 
   const role =
     req.nextUrl.searchParams.get('role') === 'seller' ? 'seller' : 'buyer'
-  const orders = await listOrdersByRole(user.id, role)
+  // 관리자 전체보기 — ?all=1 + isAdmin일 때만 전체 주문(null), 그 외 본인만(role 컬럼 기준)
+  const wantAll = req.nextUrl.searchParams.get('all') === '1' && isAdmin(user)
+  const orders = await listOrdersByRole(wantAll ? null : user.id, role)
   return NextResponse.json({ orders })
 }
 

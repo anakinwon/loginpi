@@ -1,5 +1,5 @@
 import { getTranslations } from 'next-intl/server'
-import { Link } from '@/i18n/navigation'
+import { StoreNav } from '@/components/store/store-nav'
 import { StoreItemList } from '@/components/store/store-item-list'
 
 export async function generateMetadata() {
@@ -18,29 +18,7 @@ export default async function StorePage() {
           <h1 className="text-2xl font-bold">🛍️ {t('title')}</h1>
           <p className="text-muted-foreground mt-1 text-sm">{t('subtitle')}</p>
         </div>
-        <nav className="flex gap-3 text-sm">
-          <Link href="/map" className="text-primary hover:underline">
-            {t('nearbyNav')}
-          </Link>
-          <Link href="/store/my/items" className="text-primary hover:underline">
-            {t('navMyItems')}
-          </Link>
-          <Link href="/store/my/sales" className="text-primary hover:underline">
-            {t('navSales')}
-          </Link>
-          <Link
-            href="/store/my/orders"
-            className="text-primary hover:underline"
-          >
-            {t('navOrders')}
-          </Link>
-          <Link
-            href="/store/my/history"
-            className="text-primary hover:underline"
-          >
-            {t('navHistory')}
-          </Link>
-        </nav>
+        <StoreNav />
       </div>
       <StoreItemList />
     </div>

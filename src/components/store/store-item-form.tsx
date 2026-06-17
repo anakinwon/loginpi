@@ -15,7 +15,8 @@ import {
   ProductImageUploader,
   type ProductImage,
 } from '@/components/store/product-image-uploader'
-import { SUPPORTED_CCY_CODES, defaultCcyForLocale } from '@/lib/format-ccy'
+import { defaultCcyForLocale } from '@/lib/format-ccy'
+import { CurrencyCombo } from '@/components/store/currency-combo'
 
 interface ItemFormProps {
   serverAuthed?: boolean // 서버 getSessionUser() 확인 결과 (Google 쿠키 로그인 포함)
@@ -456,22 +457,14 @@ export function StoreItemForm({
       <div className="space-y-1.5">
         <Label htmlFor="item-price">{t('form.price')} *</Label>
         <div className="flex gap-2">
-          <select
-            aria-label={t('form.priceCcy')}
+          {/* 통화 콤보 — 헤더 LanguageSwitcher와 동일한 국기·통화·환율 UI(로케일 이동 없이 통화만 선택) */}
+          <CurrencyCombo
             value={priceCcy}
-            onChange={(e) => {
+            onChange={(ccy) => {
               priceTouchedRef.current = true
-              setPriceCcy(e.target.value)
+              setPriceCcy(ccy)
             }}
-            className="border-input bg-background h-9 w-24 shrink-0 rounded-md border px-2 text-sm"
-          >
-            <option value="PI">π Pi</option>
-            {SUPPORTED_CCY_CODES.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
+          />
           <Input
             id="item-price"
             type="number"

@@ -89,6 +89,9 @@ export function ClientMyShops({
   const router = useRouter()
   const { user, isLoading } = usePiAuth()
   const authed = serverAuthed || !!user
+  // 관리자(ADMIN/MASTER)만 전체 매장 보기 토글 노출 (서버도 isAdmin 재검증)
+  const isAdminUser = user?.role === 'ADMIN' || user?.role === 'MASTER'
+  const [showAll, setShowAll] = useState(false)
 
   const [shops, setShops] = useState<Shop[]>([])
   const [loading, setLoading] = useState(true)
@@ -99,7 +102,7 @@ export function ClientMyShops({
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await piFetch('/api/store/shops')
+      const res = await piFetch(`/api/store/shops${showAll ? '?all=1' : ''}`)
       if (res.ok) {
         const data = (await res.json()) as { shops: Shop[] }
         setShops(data.shops)
@@ -107,7 +110,7 @@ export function ClientMyShops({
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [showAll])
 
   useEffect(() => {
     if (authed) void load()
@@ -235,13 +238,23 @@ export function ClientMyShops({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2">
         <p className="text-muted-foreground text-sm">{t('shop.intro')}</p>
-        {!formOpen && (
-          <Button size="sm" onClick={openNew}>
-            {t('shop.add')}
-          </Button>
-        )}
+        <div className="flex shrink-0 items-center gap-2">
+          {isAdminUser && (
+            <button
+              onClick={() => setShowAll((v) => !v)}
+              className={`rounded-full border px-3 py-1 text-xs font-medium ${showAll ? 'border-primary bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted'}`}
+            >
+              {showAll ? '🛡️ 전체 매장' : '🛡️ 내 매장만'}
+            </button>
+          )}
+          {!formOpen && (
+            <Button size="sm" onClick={openNew}>
+              {t('shop.add')}
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* 등록/수정 인라인 폼 */}

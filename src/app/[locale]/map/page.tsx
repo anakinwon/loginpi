@@ -1,4 +1,5 @@
 import { getTranslations } from 'next-intl/server'
+import { StoreNav } from '@/components/store/store-nav'
 import { NearbyExplorer } from '@/components/lbs/nearby-explorer'
 
 export async function generateMetadata() {
@@ -9,10 +10,9 @@ export async function generateMetadata() {
 // 주변 매장·채팅방 탐색 (Phase 15 LBS P1).
 // 인증/동의 게이트는 NearbyExplorer(클라이언트)가 담당 — Pi Browser redirect 금지 패턴.
 export default async function MapPage() {
-  const t = await getTranslations('lbs')
-
   return (
-    <div className="mx-auto max-w-5xl p-4 md:p-6">
+    <div className="mx-auto max-w-5xl space-y-4 p-4 md:p-6">
+      <StoreNav active="nearby" />
       <NearbyExplorer />
     </div>
   )

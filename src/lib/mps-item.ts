@@ -244,13 +244,15 @@ export async function listOpenItems(filter: ItemListFilter) {
 }
 
 // 판매자 본인 상품 목록 — 전체 상태 포함 + 진행 중 주문 수 (거래중/판매완료 배지)
-export async function listMyItems(sellerId: string) {
-  const { data, error } = await getSupabaseAdmin()
+// sellerId=null → 전체 판매자 상품(관리자 전체보기 전용 — 호출자가 isAdmin 검증 후 null 전달)
+export async function listMyItems(sellerId: string | null) {
+  let q = getSupabaseAdmin()
     .from('mps_item')
     .select('*')
-    .eq('seller_id', sellerId)
     .eq('del_yn', 'N')
     .order('reg_dtm', { ascending: false })
+  if (sellerId) q = q.eq('seller_id', sellerId)
+  const { data, error } = await q
 
   if (error) throw new Error(error.message)
 
