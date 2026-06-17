@@ -10,8 +10,12 @@ interface PreviewOrder {
   order_id: string
   seller_id: string
   order_price_pi: number
+  ccy_cd: string | null
+  ccy_amt: number | null
+  reg_dtm: string
   seller_pi_username: string | null
   seller_linked: boolean
+  buyer_display: string
 }
 
 interface Preview {
@@ -27,6 +31,17 @@ interface SettleResp {
 }
 
 const round7 = (n: number) => Math.round(n * 1e7) / 1e7
+
+// 자국통화 표기 — 등록시점 고정 참고가 (Pi 직거래는 ccy 없음 → '—')
+function fmtCcy(amt: number | null, cd: string | null): string {
+  if (amt == null || !cd) return '—'
+  return `${amt.toLocaleString()} ${cd}`
+}
+
+// 판매일자 — 날짜만 (관리자 브라우저 로컬 타임존)
+function fmtDate(iso: string): string {
+  return new Date(iso).toLocaleDateString('sv-SE')
+}
 
 // 미정산 판매자 정산 — 목록 미리보기(GET) → 행 선택 → 확인 클릭 시에만 실송금(POST).
 // 실제 돈은 사람 클릭 때만 이동. 미연동 판매자(송금 불가)는 선택 불가로 막는다.
@@ -118,13 +133,6 @@ export function PendingSettleRunner() {
 
   return (
     <div className="space-y-4 rounded-lg border p-5">
-      <div>
-        <p className="text-sm font-semibold">{t('settleTitle')}</p>
-        <p className="text-muted-foreground mt-0.5 text-xs">
-          {t('settleDesc')}
-        </p>
-      </div>
-
       <Button onClick={loadPreview} disabled={loading} variant="outline">
         {loading ? t('settleLoading') : t('settleLoad')}
       </Button>
@@ -167,7 +175,16 @@ export function PendingSettleRunner() {
                         {t('settleColSeller')}
                       </th>
                       <th className="py-2 pr-3 font-medium">
+                        {t('settleColBuyer')}
+                      </th>
+                      <th className="py-2 pr-3 font-medium">
                         {t('settleColAmount')}
+                      </th>
+                      <th className="py-2 pr-3 font-medium">
+                        {t('settleColCcy')}
+                      </th>
+                      <th className="py-2 pr-3 font-medium">
+                        {t('settleColDate')}
                       </th>
                       <th className="py-2 font-medium">
                         {t('settleColLinked')}
@@ -192,7 +209,16 @@ export function PendingSettleRunner() {
                             : o.seller_id.slice(0, 8)}
                         </td>
                         <td className="py-2 pr-3 whitespace-nowrap">
+                          {o.buyer_display}
+                        </td>
+                        <td className="py-2 pr-3 whitespace-nowrap">
                           {o.order_price_pi}
+                        </td>
+                        <td className="text-muted-foreground py-2 pr-3 whitespace-nowrap">
+                          {fmtCcy(o.ccy_amt, o.ccy_cd)}
+                        </td>
+                        <td className="text-muted-foreground py-2 pr-3 whitespace-nowrap">
+                          {fmtDate(o.reg_dtm)}
                         </td>
                         <td className="py-2">
                           {o.seller_linked ? (

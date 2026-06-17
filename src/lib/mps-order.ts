@@ -582,13 +582,14 @@ export type UnsettledOrder = Pick<
   | 'order_price_pi'
   | 'ccy_cd'
   | 'ccy_amt'
+  | 'reg_dtm'
   | 'mod_dtm'
 >
 export async function listUnsettledOrders(): Promise<UnsettledOrder[]> {
   const { data } = await getSupabaseAdmin()
     .from('mps_order')
     .select(
-      'order_id, seller_id, buyer_id, order_price_pi, ccy_cd, ccy_amt, mod_dtm',
+      'order_id, seller_id, buyer_id, order_price_pi, ccy_cd, ccy_amt, reg_dtm, mod_dtm',
     )
     .eq('order_st_cd', 'DONE')
     .is('release_txid', null)

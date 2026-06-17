@@ -15,30 +15,43 @@ export async function GET() {
 
   const orders = await listUnsettledOrders()
 
-  // 판매자 Pi 연동 여부 첨부 — pi_uid 없으면 A2U 불가(수동 정산 대상)
-  const sellerIds = [...new Set(orders.map((o) => o.seller_id))]
-  const { data: sellers } = sellerIds.length
+  // 판매자·구매자 표시정보 일괄 조회 — buyer/seller_id는 FK 없는 TEXT라 임베드 불가(별도 조회 후 매핑)
+  const userIds = [...new Set(orders.flatMap((o) => [o.seller_id, o.buyer_id]))]
+  const { data: users } = userIds.length
     ? await getSupabaseAdmin()
         .from('sys_user')
-        .select('id, pi_uid, pi_username')
-        .in('id', sellerIds)
+        .select('id, pi_uid, pi_username, nick_nm, display_name')
+        .in('id', userIds)
     : { data: [] }
+  type UserRow = {
+    id: string
+    pi_uid: string | null
+    pi_username: string | null
+    nick_nm: string | null
+    display_name: string | null
+  }
   const byId = new Map(
-    (sellers ?? []).map((s) => [(s as { id: string }).id, s]),
+    (users ?? []).map((u) => [(u as UserRow).id, u as UserRow]),
   )
+  const displayName = (id: string) => {
+    const u = byId.get(id)
+    if (!u) return id.slice(0, 8)
+    return u.pi_username
+      ? `@${u.pi_username}`
+      : (u.nick_nm ?? u.display_name ?? id.slice(0, 8))
+  }
 
   return NextResponse.json({
     a2u_enabled: isA2UEnabled(),
     count: orders.length,
     total_pi: orders.reduce((sum, o) => sum + Number(o.order_price_pi), 0),
     orders: orders.map((o) => {
-      const s = byId.get(o.seller_id) as
-        | { pi_uid: string | null; pi_username: string | null }
-        | undefined
+      const seller = byId.get(o.seller_id)
       return {
-        ...o,
-        seller_pi_username: s?.pi_username ?? null,
-        seller_linked: !!s?.pi_uid, // false면 A2U 불가 → 수동 정산 필요
+        ...o, // order_price_pi·ccy_cd·ccy_amt·reg_dtm·mod_dtm 포함
+        seller_pi_username: seller?.pi_username ?? null,
+        seller_linked: !!seller?.pi_uid, // false면 A2U 불가 → 수동 정산 필요
+        buyer_display: displayName(o.buyer_id),
       }
     }),
   })

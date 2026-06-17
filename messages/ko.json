@@ -24,6 +24,7 @@
       "chatSection": "카페 관리",
       "subscriptions": "구독 관리",
       "stickers": "스티커 관리",
+      "settle": "정산 관리",
       "backHome": "← 홈으로",
       "storeSection": "스토어 관리",
       "storeCategories": "상품 카테고리"
@@ -91,7 +92,10 @@
       "settleSelectedSummary": "선택 {count}건 · 합계 {total}π",
       "settleColSelect": "선택",
       "settleColSeller": "판매자",
+      "settleColBuyer": "구매자",
       "settleColAmount": "금액(π)",
+      "settleColCcy": "자국통화",
+      "settleColDate": "판매일자",
       "settleColLinked": "Pi 연동",
       "settleLinkedYes": "연동",
       "settleLinkedNo": "미연동(송금 불가)",
