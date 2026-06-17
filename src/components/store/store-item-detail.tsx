@@ -14,6 +14,14 @@ import {
 } from '@/lib/mps-trade-status'
 import { formatCcy } from '@/lib/format-ccy'
 import { addToCart, replaceShopAndAdd } from '@/hooks/use-cart'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog'
 
 interface ItemImage {
   img_id: string
@@ -71,6 +79,7 @@ export function StoreItemDetail({ itemId }: { itemId: string }) {
   )
   const [dlvrAddr, setDlvrAddr] = useState('')
   const [qty, setQty] = useState(1) // 카트 담기 수량(오프라인매장)
+  const [cartDialogOpen, setCartDialogOpen] = useState(false) // 담기 완료 팝업
 
   useEffect(() => {
     void (async () => {
@@ -223,11 +232,11 @@ export function StoreItemDetail({ itemId }: { itemId: string }) {
       // 카트에 다른 매장 상품이 있음 — 비우고 새로 담기 확인
       if (confirm(t('cart.conflictConfirm'))) {
         replaceShopAndAdd(input)
-        toast.success(t('cart.added', { n: qty }))
+        setCartDialogOpen(true)
       }
       return
     }
-    toast.success(t('cart.added', { n: qty }))
+    setCartDialogOpen(true)
   }
 
   return (
@@ -465,6 +474,32 @@ export function StoreItemDetail({ itemId }: { itemId: string }) {
           </p>
         </div>
       </div>
+
+      {/* 카트 담기 완료 팝업 — 카트가기 / 쇼핑계속 */}
+      <Dialog open={cartDialogOpen} onOpenChange={setCartDialogOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>{t('cart.addedTitle')}</DialogTitle>
+            <DialogDescription>{t('cart.added', { n: qty })}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setCartDialogOpen(false)}
+            >
+              {t('cart.continueShopping')}
+            </Button>
+            <Button
+              onClick={() => {
+                setCartDialogOpen(false)
+                router.push('/store/cart')
+              }}
+            >
+              {t('cart.goToCart')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

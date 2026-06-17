@@ -1638,8 +1638,17 @@
     "cart": {
       "add": "🛒 카트 담기",
       "added": "{n}개를 카트에 담았습니다",
+      "addedTitle": "카트에 담았어요 🛒",
       "qty": "수량",
-      "conflictConfirm": "카트에 다른 매장 상품이 담겨 있습니다. 비우고 새로 담을까요?"
+      "conflictConfirm": "카트에 다른 매장 상품이 담겨 있습니다. 비우고 새로 담을까요?",
+      "goToCart": "카트 가기",
+      "continueShopping": "쇼핑 계속",
+      "title": "장바구니",
+      "empty": "카트가 비어 있습니다",
+      "clear": "카트 비우기",
+      "remove": "삭제",
+      "checkout": "주문하기 ({count}개)",
+      "checkoutPending": "주문(체크아웃) 기능은 곧 제공됩니다"
     },
     "form": {
       "name": "상품명",
