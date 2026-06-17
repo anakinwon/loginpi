@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { deriveTradeStatus, TRADE_ST_STYLE } from '@/lib/mps-trade-status'
 import { formatCcy } from '@/lib/format-ccy'
 import { piFetch } from '@/lib/pi-fetch'
+import { usePiAuth } from '@/components/pi-auth-provider'
 import { getCurrentPosition } from '@/lib/geo'
 import { readCache, writeCache } from '@/lib/client-cache'
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll'
@@ -62,6 +63,8 @@ interface StoreItemListProps {
 export function StoreItemList({ mine = false }: StoreItemListProps) {
   const t = useTranslations('store')
   const locale = useLocale()
+  // Pi Browser에서는 스타벅스 Order 스타일의 간결한 1열 리스트로 표시 (그 외엔 그리드 카드)
+  const { isInPiBrowser } = usePiAuth()
   const [items, setItems] = useState<StoreItem[]>([])
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
@@ -356,7 +359,25 @@ export function StoreItemList({ mine = false }: StoreItemListProps) {
               : t('noItems')}
         </p>
       ) : mine ? (
-        <MyItemGroups items={items} locale={locale} t={t} />
+        <MyItemGroups
+          items={items}
+          locale={locale}
+          t={t}
+          piMode={isInPiBrowser}
+        />
+      ) : isInPiBrowser ? (
+        <ul className="divide-y rounded-lg border">
+          {items.map((item) => (
+            <ItemRow
+              key={item.item_id}
+              item={item}
+              locale={locale}
+              t={t}
+              href={`/store/${item.item_id}`}
+              lbsConsent={lbsConsent}
+            />
+          ))}
+        </ul>
       ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
           {items.map((item) => (
@@ -474,15 +495,98 @@ function ItemCard({
   )
 }
 
+// 스타벅스 Order 스타일 1열 리스트 행 (Pi Browser 전용) — 원형 썸네일 + 제목/가격.
+// href·ownerBadge를 받아 메인 목록·스토어프론트(소유자 수정) 양쪽에서 재사용.
+export function ItemRow({
+  item,
+  locale,
+  t,
+  href,
+  lbsConsent = null,
+  ownerBadge = false,
+}: {
+  item: StoreItem
+  locale: string
+  t: TFunc
+  href: string
+  lbsConsent?: 'Y' | 'N' | null
+  ownerBadge?: boolean
+}) {
+  const tradeSt = deriveTradeStatus(item)
+  return (
+    <li>
+      <Link
+        href={href}
+        className="hover:bg-muted/50 flex items-center gap-4 px-1 py-3 transition-colors"
+      >
+        {/* 원형 썸네일 */}
+        <div className="bg-muted flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-full">
+          {item.thumbnail_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={item.thumbnail_url}
+              alt={item.item_nm}
+              className={`h-full w-full object-cover ${tradeSt !== 'OPEN' ? 'opacity-60' : ''}`}
+            />
+          ) : (
+            <span className="text-2xl">🛒</span>
+          )}
+        </div>
+
+        {/* 제목 + 가격 + 메타 */}
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-1.5">
+            <p className="truncate font-semibold">{item.item_nm}</p>
+            {ownerBadge && (
+              <span className="text-primary shrink-0 text-xs">✏️</span>
+            )}
+            {tradeSt !== 'OPEN' && (
+              <span
+                className={`shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-medium ${TRADE_ST_STYLE[tradeSt]}`}
+              >
+                {t(`tradeSt.${tradeSt}`)}
+              </span>
+            )}
+          </div>
+          <p className="text-muted-foreground mt-0.5 text-sm">
+            <span className="text-foreground font-bold">
+              {Number(item.price_pi)} π
+            </span>
+            {item.ccy_cd && item.ccy_amt != null && (
+              <span>
+                {' '}
+                · ≈ {formatCcy(locale, item.ccy_cd, Number(item.ccy_amt))}
+              </span>
+            )}
+          </p>
+          <div className="text-muted-foreground mt-0.5 flex flex-wrap items-center gap-2 text-xs">
+            <span className="bg-muted rounded px-1.5 py-0.5">
+              {t(`cnd.${item.item_cnd_cd}`)}
+            </span>
+            {item.reg_qty !== 9999 && (
+              <span>{t('stockLeft', { count: item.stock_qty })}</span>
+            )}
+            {lbsConsent === 'Y' && item.distance_km != null && (
+              <span>📍 {formatDistance(item.distance_km)}</span>
+            )}
+          </div>
+        </div>
+      </Link>
+    </li>
+  )
+}
+
 // 매장 등록 상품 / 직거래 상품 그룹 — mine 모드 전용
 function MyItemGroups({
   items,
   locale,
   t,
+  piMode = false,
 }: {
   items: StoreItem[]
   locale: string
   t: TFunc
+  piMode?: boolean
 }) {
   // 매장별 그룹핑: shop_id 기준으로 Map 구성, null → 직거래
   const shopMap = new Map<string, { shopNm: string; items: StoreItem[] }>()
@@ -518,17 +622,31 @@ function MyItemGroups({
                   ({group.items.length}개)
                 </span>
               </div>
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-                {group.items.map((item) => (
-                  <ItemCard
-                    key={item.item_id}
-                    item={item}
-                    locale={locale}
-                    t={t}
-                    lbsConsent={null}
-                  />
-                ))}
-              </div>
+              {piMode ? (
+                <ul className="divide-y rounded-lg border">
+                  {group.items.map((item) => (
+                    <ItemRow
+                      key={item.item_id}
+                      item={item}
+                      locale={locale}
+                      t={t}
+                      href={`/store/${item.item_id}`}
+                    />
+                  ))}
+                </ul>
+              ) : (
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+                  {group.items.map((item) => (
+                    <ItemCard
+                      key={item.item_id}
+                      item={item}
+                      locale={locale}
+                      t={t}
+                      lbsConsent={null}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -543,17 +661,31 @@ function MyItemGroups({
               ({directItems.length}개)
             </span>
           </h3>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-            {directItems.map((item) => (
-              <ItemCard
-                key={item.item_id}
-                item={item}
-                locale={locale}
-                t={t}
-                lbsConsent={null}
-              />
-            ))}
-          </div>
+          {piMode ? (
+            <ul className="divide-y rounded-lg border">
+              {directItems.map((item) => (
+                <ItemRow
+                  key={item.item_id}
+                  item={item}
+                  locale={locale}
+                  t={t}
+                  href={`/store/${item.item_id}`}
+                />
+              ))}
+            </ul>
+          ) : (
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              {directItems.map((item) => (
+                <ItemCard
+                  key={item.item_id}
+                  item={item}
+                  locale={locale}
+                  t={t}
+                  lbsConsent={null}
+                />
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>

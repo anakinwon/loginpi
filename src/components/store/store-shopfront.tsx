@@ -6,7 +6,7 @@ import { Link } from '@/i18n/navigation'
 import { usePiAuth } from '@/components/pi-auth-provider'
 import { formatCcy } from '@/lib/format-ccy'
 import { deriveTradeStatus, TRADE_ST_STYLE } from '@/lib/mps-trade-status'
-import type { StoreItem } from './store-item-list'
+import { ItemRow, type StoreItem } from './store-item-list'
 
 // 매장 스토어프론트 상품 그리드 (FR-15·SCR-10) — 특정 매장의 상품을 예쁘게 모아보기.
 // 방문자: 카드 클릭 → 상품 상세(카트 담기·구매). 공개(게스트 포함).
@@ -22,7 +22,7 @@ export function StoreShopfront({
 }) {
   const t = useTranslations('store')
   const locale = useLocale()
-  const { user } = usePiAuth()
+  const { user, isInPiBrowser } = usePiAuth()
   const isOwner = !!ownerSellerId && user?.userId === ownerSellerId
   const [items, setItems] = useState<StoreItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -62,6 +62,24 @@ export function StoreShopfront({
         <p className="text-muted-foreground py-16 text-center text-sm">
           {t('noItems')}
         </p>
+      ) : isInPiBrowser ? (
+        // Pi Browser: 스타벅스 Order 스타일 1열 리스트 (소유자는 클릭 시 수정)
+        <ul className="divide-y rounded-lg border">
+          {items.map((item) => (
+            <ItemRow
+              key={item.item_id}
+              item={item}
+              locale={locale}
+              t={t}
+              href={
+                isOwner
+                  ? `/store/my/items/${item.item_id}/edit`
+                  : `/store/${item.item_id}`
+              }
+              ownerBadge={isOwner}
+            />
+          ))}
+        </ul>
       ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
           {items.map((item) => {

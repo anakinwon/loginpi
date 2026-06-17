@@ -258,7 +258,9 @@ export async function listMyItems(sellerId: string | null) {
 
   if (error) throw new Error(error.message)
 
-  const rows = (data ?? []) as (MpsItem & { mps_shop?: { shop_nm: string } | null })[]
+  const rows = (data ?? []) as (MpsItem & {
+    mps_shop?: { shop_nm: string } | null
+  })[]
   const tradingCounts = await getTradingCounts(rows.map((r) => r.item_id))
   return rows.map((r) => {
     const { mps_shop, ...rest } = r
