@@ -5,6 +5,7 @@
 > **상태**: 사용처 9종 백서·PRD 동기화 · T01 KYC 임시승인 · T02 in-app Launchpad(Mainnet 미출시) · T05 법무 지연 가능 · 백서 v0.2·법무 의뢰서 작성 완료
 > **작성자**: asoká (pi-launchpad-token-consultant 에이전트) / 검토: anakin
 > **관련 문서**: PRD_0_INT.md (플랫폼 전략), PRD_4_CHAT.md (카페), PRD_8_MPS.md (마켓플레이스), PRD_9_VOICE_CHAT.md (보이스챗), PRD_11_EVENT.md (이벤트)
+> **토큰 문서 세트**: `PRD_12_TOKEN_백서.md`·`_WHITEPAPER_EN.md` (백서) · `docs/dist/*.pdf` (배포본) · `_법무자문의뢰서.md` (법무) · **`docs/GAOPEN/checkList.md` (GA 개방 시 제출 체크리스트)**
 
 ---
 
