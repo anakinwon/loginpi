@@ -79,7 +79,7 @@ type OrderAction =
   | 'pickup'
 
 // 오프라인 상태 라벨 (i18n 키 누락 회피 — 로컬 한글 맵)
-// 주문중 → 준비중 → 상품대기중 → (10분 후) 판매완료
+// 주문중 → 준비중 → 상품대기중 → (5분 후) 판매완료
 // DONE은 오프라인일 때만 '판매완료'로 표시 (renderCard에서 분기, 직거래는 거래완료 유지)
 const OFFLINE_LABEL: Partial<Record<OrderRow['order_st_cd'], string>> = {
   ORDERED: '🛒 주문중',
@@ -97,7 +97,7 @@ const MTHD_LABEL: Record<string, string> = {
 // 오프라인 액션 성공 메시지
 const OFFLINE_ACTION_MSG: Partial<Record<OrderAction, string>> = {
   accept: '상품접수 완료 — 준비중',
-  ready: '상품완료 — 수령 대기중 (10분 후 자동 판매완료)',
+  ready: '상품완료 — 수령 대기중 (5분 후 자동 판매완료)',
 }
 
 // ESCROW·SELLER_DONE은 구버전 주문 레거시 상태 — 화면에는 거래중과 동일 계열로 표시
@@ -407,7 +407,7 @@ export function ClientMyOrders({
               📦 상품완료
             </Button>
           )}
-          {/* 상품대기중(READY)은 구매자 액션 없음 — 10분 후 자동 판매완료 */}
+          {/* 상품대기중(READY)은 구매자 액션 없음 — 5분 후 자동 판매완료 */}
           {(o.order_st_cd === 'PENDING' ||
             (IN_TRADE.includes(o.order_st_cd) &&
               (role === 'buyer' || o.order_st_cd !== 'SELLER_DONE')) ||
@@ -463,13 +463,12 @@ export function ClientMyOrders({
         {o.order_st_cd === 'READY' &&
           (role === 'buyer' ? (
             <p className="text-muted-foreground text-xs">
-              📦 상품이 준비됐어요! 곧 받으실 수 있습니다 (10분 후 자동
-              판매완료)
+              📦 상품이 준비됐어요! 곧 받으실 수 있습니다 (5분 후 자동 판매완료)
             </p>
           ) : (
             // 준비완료 → 판매자가 주문자 호명 (요건)
             <p className="text-sm font-semibold text-amber-700 dark:text-amber-400">
-              📣 {buyerName(o.buyer)}님 호명 — 수령 대기중 (10분 후 자동
+              📣 {buyerName(o.buyer)}님 호명 — 수령 대기중 (5분 후 자동
               판매완료)
             </p>
           ))}

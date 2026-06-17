@@ -2,11 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
-import {
-  createOrder,
-  listOrdersByRole,
-  autoCompleteReadyOrders,
-} from '@/lib/mps-order'
+import { createOrder, listOrdersByRole } from '@/lib/mps-order'
 
 // GET /api/store/orders?role=buyer|seller — 내 주문 목록
 export async function GET(req: NextRequest) {
@@ -14,11 +10,8 @@ export async function GET(req: NextRequest) {
   if (!user)
     return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
-  // on-demand 배치 — READY 10분 경과 주문 자동완료 (조회 시점에 마감 처리, sql 032 패턴)
-  autoCompleteReadyOrders().catch((e) =>
-    console.error('[자동완료] 처리 실패:', e),
-  )
-
+  // 자동완료·정산은 5분 cron(/api/cron/order-autocomplete)이 단독 담당 — A2U 실송금을
+  // fire-and-forget으로 돌리면 응답 후 함수 종료로 송금이 잘릴 수 있어 온디맨드 sweep 제거.
   const role =
     req.nextUrl.searchParams.get('role') === 'seller' ? 'seller' : 'buyer'
   // 관리자 전체보기 — ?all=1 + isAdmin일 때만 전체 주문(null), 그 외 본인만(role 컬럼 기준)
