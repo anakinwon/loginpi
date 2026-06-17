@@ -49,6 +49,14 @@ interface OrderRow {
     thumbnail_url: string | null
     mps_shop: ShopInfo | null
   } | null
+  // 카트 주문 라인(다중상품) — 단건 주문은 빈 배열/null
+  lines?:
+    | {
+        ord_qty: number
+        price_pi: number
+        item: { item_nm: string } | null
+      }[]
+    | null
 }
 
 type OrderAction =
@@ -256,6 +264,22 @@ export function ClientMyOrders({
           <p className="text-muted-foreground text-xs">
             🛵 배달: {o.dlvr_addr}
           </p>
+        )}
+
+        {/* 카트 주문 라인 — 개별 상품명·수량(판매자 준비용). 단건 주문은 표시 안 함 */}
+        {o.lines && o.lines.length > 0 && (
+          <ul className="bg-muted/50 space-y-0.5 rounded-md px-3 py-2 text-sm">
+            {o.lines.map((l, i) => (
+              <li key={i} className="flex items-center justify-between gap-2">
+                <span className="truncate">
+                  {l.item?.item_nm ?? t('itemNotFound')}
+                </span>
+                <span className="text-muted-foreground shrink-0">
+                  × {l.ord_qty}
+                </span>
+              </li>
+            ))}
+          </ul>
         )}
 
         {/* 상태별 액션 — 2단계 확인: ①수령(구매자) ②거래완료(판매자) */}
