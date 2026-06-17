@@ -118,7 +118,9 @@ export function StoreShopfront({
                   )}
                 </div>
                 <div className="space-y-1 p-3">
-                  <p className="truncate text-sm font-medium">{item.item_nm}</p>
+                  <p className="truncate text-sm font-medium text-sky-600 dark:text-sky-400">
+                    {item.item_nm}
+                  </p>
                   <p className="text-base font-bold">
                     {Number(item.price_pi)} π
                   </p>

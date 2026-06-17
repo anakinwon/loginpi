@@ -540,7 +540,7 @@ export function ClientMyShops({
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="truncate text-sm font-medium">
+                  <span className="truncate text-base font-semibold text-amber-600 dark:text-amber-400">
                     {shop.shop_nm}
                   </span>
                   <span className="bg-muted text-muted-foreground shrink-0 rounded-full px-2 py-0.5 text-xs">

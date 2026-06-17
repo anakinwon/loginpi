@@ -51,6 +51,26 @@ function formatDistance(km: number): string {
   return `${km.toFixed(1)}km`
 }
 
+// 두 좌표 간 거리(km) — Haversine. 실시간 추적 시 '의미 있는 이동'(임계 거리) 판정용
+function haversineKm(
+  lat1: number,
+  lng1: number,
+  lat2: number,
+  lng2: number,
+): number {
+  const dLat = ((lat2 - lat1) * Math.PI) / 180
+  const dLng = ((lng2 - lng1) * Math.PI) / 180
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLng / 2) ** 2
+  return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+}
+
+// 이 거리(km) 이상 이동했을 때만 재조회 → watchPosition 콜백 폭주로 인한 과도한 API 호출 방지
+const LIVE_MOVE_THRESHOLD_KM = 0.03 // 30m
+
 export function NearbyExplorer() {
   const t = useTranslations('lbs')
   const [lbsConsent, setLbsConsent] = useState<'Y' | 'N' | null>(null)
@@ -61,6 +81,8 @@ export function NearbyExplorer() {
   const [locError, setLocError] = useState<string | null>(null)
   const [radius, setRadius] = useState<number>(1)
   const [tab, setTab] = useState<Tab>('shops')
+  // 이동 중 실시간 위치 추적 (watchPosition) — 기본 ON, 토글로 끌 수 있음
+  const [liveTracking, setLiveTracking] = useState(true)
 
   const [shops, setShops] = useState<NearbyShop[]>([])
   const [rooms, setRooms] = useState<NearbyRoom[]>([])
@@ -93,6 +115,30 @@ export function NearbyExplorer() {
   useEffect(() => {
     if (lbsConsent === 'Y' && !coords) requestLocation()
   }, [lbsConsent, coords, requestLocation])
+
+  // 이동 중 실시간 추적 — 동의자 + liveTracking ON일 때 watchPosition 구독.
+  // 30m 이상 이동했을 때만 좌표를 갱신 → 기존 조회 effect가 자동으로 거리순 재정렬.
+  // (멈춰 있으면 좌표 동일 → 재조회 없음, 걸어가면 목록이 실시간으로 바뀐다)
+  useEffect(() => {
+    if (lbsConsent !== 'Y' || !liveTracking) return
+    if (typeof navigator === 'undefined' || !navigator.geolocation) return
+    const watchId = navigator.geolocation.watchPosition(
+      (pos) => {
+        const next = { lat: pos.coords.latitude, lng: pos.coords.longitude }
+        setCoords((prev) =>
+          prev &&
+          haversineKm(prev.lat, prev.lng, next.lat, next.lng) <
+            LIVE_MOVE_THRESHOLD_KM
+            ? prev // 미미한 이동(GPS 지터)은 무시해 재조회 방지
+            : next,
+        )
+        setLocError(null)
+      },
+      () => {}, // 일시적 측위 실패는 무시 — 다음 콜백에서 회복
+      { enableHighAccuracy: true, maximumAge: 10_000, timeout: 20_000 },
+    )
+    return () => navigator.geolocation.clearWatch(watchId)
+  }, [lbsConsent, liveTracking])
 
   // 좌표·반경 변경 시 주변 데이터 로드 — API 실패는 빈 목록으로 위장하지 않고 표시
   useEffect(() => {
@@ -217,9 +263,17 @@ export function NearbyExplorer() {
         >
           {t('tabRooms')} {rooms.length > 0 && `(${rooms.length})`}
         </button>
+        {/* 이동 중 실시간 추적 토글 — ON이면 걸어가는 대로 거리순 목록이 갱신됨 */}
+        <button
+          onClick={() => setLiveTracking((v) => !v)}
+          className={`ml-auto pb-2 text-xs font-medium transition-colors ${liveTracking ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+          aria-pressed={liveTracking}
+        >
+          {liveTracking ? '🔴 실시간 ON' : '⚪ 실시간'}
+        </button>
         <button
           onClick={() => requestLocation(true)}
-          className="text-muted-foreground hover:text-foreground ml-auto pb-2 text-xs underline"
+          className="text-muted-foreground hover:text-foreground ml-3 pb-2 text-xs underline"
         >
           {t('refreshLocation')}
         </button>
@@ -301,8 +355,10 @@ export function NearbyExplorer() {
                   className="hover:bg-muted/50 flex cursor-pointer items-center justify-between rounded-lg border p-3 transition-colors"
                 >
                   <div className="min-w-0">
-                    <p className="flex items-center gap-1.5 truncate font-medium">
-                      <span className="truncate">{s.shop_nm}</span>
+                    <p className="flex items-center gap-1.5 truncate font-semibold">
+                      <span className="truncate text-amber-600 dark:text-amber-400">
+                        {s.shop_nm}
+                      </span>
                       {s.owner_verified_yn === 'Y' && (
                         <span className="shrink-0 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400">
                           ✅ 인증

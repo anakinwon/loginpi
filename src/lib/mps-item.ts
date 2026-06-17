@@ -146,7 +146,7 @@ async function getTradingCounts(
 
 type ItemWithShop = MpsItem & {
   mps_shop?: {
-    shop_id: string
+    shop_nm: string | null
     latd_crd: number | null
     lngt_crd: number | null
   } | null
@@ -176,9 +176,12 @@ export async function listOpenItems(filter: ItemListFilter) {
 
   let q = db
     .from('mps_item')
-    .select(hasLoc ? '*, mps_shop(shop_id, latd_crd, lngt_crd)' : '*', {
-      count: useDistance ? undefined : 'exact',
-    })
+    .select(
+      hasLoc
+        ? '*, mps_shop(shop_nm, latd_crd, lngt_crd)'
+        : '*, mps_shop(shop_nm)',
+      { count: useDistance ? undefined : 'exact' },
+    )
     .eq('del_yn', 'N')
     .in('item_st_cd', ['OPEN', 'SOLD'])
 
@@ -202,8 +205,8 @@ export async function listOpenItems(filter: ItemListFilter) {
     const withDist = (data as unknown as ItemWithShop[])
       .map((r) => {
         const distance_km = calcDistanceKm(r, uLat, uLng)
-        const { mps_shop: _, ...item } = r
-        return { ...item, distance_km }
+        const { mps_shop, ...item } = r
+        return { ...item, shop_nm: mps_shop?.shop_nm ?? null, distance_km }
       })
       .filter((r) => r.distance_km !== null && r.distance_km <= radius)
       .sort((a, b) => (a.distance_km ?? Infinity) - (b.distance_km ?? Infinity))
@@ -235,9 +238,10 @@ export async function listOpenItems(filter: ItemListFilter) {
     const distance_km = hasLoc
       ? calcDistanceKm(r, filter.userLat!, filter.userLng!)
       : undefined
-    const { mps_shop: _, ...item } = r
+    const { mps_shop, ...item } = r
     return {
       ...item,
+      shop_nm: mps_shop?.shop_nm ?? null,
       ...(distance_km !== undefined && { distance_km }),
       trading_cnt: tradingCounts.get(r.item_id) ?? 0,
     }

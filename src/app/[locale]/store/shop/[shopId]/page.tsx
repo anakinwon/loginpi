@@ -61,7 +61,9 @@ export default async function ShopfrontPage({
           {/* 매장 헤더 */}
           <div className="rounded-lg border p-4">
             <div className="flex flex-wrap items-center gap-2">
-              <h1 className="text-xl font-bold">🏪 {shop.shop_nm}</h1>
+              <h1 className="text-2xl font-bold text-amber-600 dark:text-amber-400">
+                🏪 {shop.shop_nm}
+              </h1>
               {shop.owner_verified_yn === 'Y' && (
                 <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
                   ✅ 인증

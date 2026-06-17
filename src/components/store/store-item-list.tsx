@@ -365,31 +365,14 @@ export function StoreItemList({ mine = false }: StoreItemListProps) {
           t={t}
           piMode={isInPiBrowser}
         />
-      ) : isInPiBrowser ? (
-        <ul className="divide-y rounded-lg border">
-          {items.map((item) => (
-            <ItemRow
-              key={item.item_id}
-              item={item}
-              locale={locale}
-              t={t}
-              href={`/store/${item.item_id}`}
-              lbsConsent={lbsConsent}
-            />
-          ))}
-        </ul>
       ) : (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          {items.map((item) => (
-            <ItemCard
-              key={item.item_id}
-              item={item}
-              locale={locale}
-              t={t}
-              lbsConsent={lbsConsent}
-            />
-          ))}
-        </div>
+        <PublicItemGroups
+          items={items}
+          locale={locale}
+          t={t}
+          lbsConsent={lbsConsent}
+          piMode={isInPiBrowser}
+        />
       )}
 
       {/* 무한 스크롤 sentinel — 내 상품 모드에서는 전체 반환이므로 불필요 */}
@@ -472,7 +455,9 @@ function ItemCard({
         )}
       </div>
       <div className="space-y-1 p-3">
-        <p className="truncate text-sm font-medium">{item.item_nm}</p>
+        <p className="truncate text-sm font-medium text-sky-600 dark:text-sky-400">
+          {item.item_nm}
+        </p>
         <p className="text-base font-bold">{Number(item.price_pi)} π</p>
         {item.ccy_cd && item.ccy_amt != null && (
           <p className="text-muted-foreground text-xs">
@@ -536,7 +521,9 @@ export function ItemRow({
         {/* 제목 + 가격 + 메타 */}
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5">
-            <p className="truncate font-semibold">{item.item_nm}</p>
+            <p className="truncate font-semibold text-sky-600 dark:text-sky-400">
+              {item.item_nm}
+            </p>
             {ownerBadge && (
               <span className="text-primary shrink-0 text-xs">✏️</span>
             )}
@@ -573,6 +560,111 @@ export function ItemRow({
         </div>
       </Link>
     </li>
+  )
+}
+
+// 공개 스토어 — 오프라인 매장 그룹 vs 직거래 그룹, 각 그룹 내 거리 오름차순
+function PublicItemGroups({
+  items,
+  locale,
+  t,
+  lbsConsent,
+  piMode = false,
+}: {
+  items: StoreItem[]
+  locale: string
+  t: TFunc
+  lbsConsent: 'Y' | 'N' | null
+  piMode?: boolean
+}) {
+  // shop_id 유무로만 분리 — 매장별 세분화 없음
+  const shopItems = items
+    .filter((i) => i.shop_id)
+    .sort((a, b) => (a.distance_km ?? Infinity) - (b.distance_km ?? Infinity))
+  const directItems = items
+    .filter((i) => !i.shop_id)
+    .sort((a, b) => (a.distance_km ?? Infinity) - (b.distance_km ?? Infinity))
+
+  const gridCls = 'grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4'
+
+  return (
+    <div className="space-y-8">
+      {/* 오프라인 매장 상품 그룹 */}
+      {shopItems.length > 0 && (
+        <div className="space-y-3">
+          <h3 className="text-sm font-semibold">
+            🏪 오프라인 매장 상품
+            <span className="text-muted-foreground ml-2 text-xs font-normal">
+              ({shopItems.length}개)
+            </span>
+          </h3>
+          {piMode ? (
+            <ul className="divide-y rounded-lg border">
+              {shopItems.map((item) => (
+                <ItemRow
+                  key={item.item_id}
+                  item={item}
+                  locale={locale}
+                  t={t}
+                  href={`/store/${item.item_id}`}
+                  lbsConsent={lbsConsent}
+                />
+              ))}
+            </ul>
+          ) : (
+            <div className={gridCls}>
+              {shopItems.map((item) => (
+                <ItemCard
+                  key={item.item_id}
+                  item={item}
+                  locale={locale}
+                  t={t}
+                  lbsConsent={lbsConsent}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* 직거래 상품 그룹 */}
+      {directItems.length > 0 && (
+        <div className="space-y-3">
+          <h3 className="text-sm font-semibold">
+            🤝 직거래 상품
+            <span className="text-muted-foreground ml-2 text-xs font-normal">
+              ({directItems.length}개)
+            </span>
+          </h3>
+          {piMode ? (
+            <ul className="divide-y rounded-lg border">
+              {directItems.map((item) => (
+                <ItemRow
+                  key={item.item_id}
+                  item={item}
+                  locale={locale}
+                  t={t}
+                  href={`/store/${item.item_id}`}
+                  lbsConsent={lbsConsent}
+                />
+              ))}
+            </ul>
+          ) : (
+            <div className={gridCls}>
+              {directItems.map((item) => (
+                <ItemCard
+                  key={item.item_id}
+                  item={item}
+                  locale={locale}
+                  t={t}
+                  lbsConsent={lbsConsent}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   )
 }
 
@@ -617,7 +709,9 @@ function MyItemGroups({
           {Array.from(shopMap.entries()).map(([shopId, group]) => (
             <div key={shopId} className="space-y-3">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium">{group.shopNm}</span>
+                <span className="text-base font-semibold text-amber-600 dark:text-amber-400">
+                  {group.shopNm}
+                </span>
                 <span className="text-muted-foreground text-xs">
                   ({group.items.length}개)
                 </span>
