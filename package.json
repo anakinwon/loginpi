@@ -10,7 +10,8 @@
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "build:whitepaper": "node .whitepaper-build/build.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.101.0",

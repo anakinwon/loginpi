@@ -64,3 +64,6 @@ package-lock.json
 # pptx 빌드 작업 폴더 (build.js는 커밋, 의존성·임시 unzip 폴더는 제외)
 docs/.pptx-build/node_modules/
 docs/.pptx-build/qa*/
+
+# 백서 PDF 빌드 중간 HTML(재생성 가능, build.js·PDF만 커밋)
+.whitepaper-build/*.html
