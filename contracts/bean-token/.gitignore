@@ -2,3 +2,6 @@
 /target
 **/*.rs.bk
 *.wasm
+
+# soroban 테스트 스냅샷(재생성 산출물)
+test_snapshots/
