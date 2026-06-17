@@ -35,6 +35,8 @@ interface OrderRow {
   seller_id: string
   order_st_cd: string
   order_price_pi: number
+  ccy_cd: string | null
+  ccy_amt: number | null
   escrow_txid: string | null
   cancel_req_id: string | null
 }
@@ -49,7 +51,7 @@ export async function refundCancelledOrder(
   const { data: orderData } = await db
     .from('mps_order')
     .select(
-      'order_id, buyer_id, seller_id, order_st_cd, order_price_pi, escrow_txid, cancel_req_id',
+      'order_id, buyer_id, seller_id, order_st_cd, order_price_pi, ccy_cd, ccy_amt, escrow_txid, cancel_req_id',
     )
     .eq('order_id', orderId)
     .maybeSingle()
@@ -146,6 +148,9 @@ export async function refundCancelledOrder(
     user_id: order.buyer_id,
     txn_type_cd: 'REFUND_IN',
     pi_amt: refundAmount,
+    // 자국통화 참고가 스냅샷 — 구매자 환불(입금)이므로 부호 +
+    ccy_cd: order.ccy_cd ?? null,
+    ccy_amt: order.ccy_amt != null ? Number(order.ccy_amt) : null,
     pi_txid: txid,
     memo: feeBuyer
       ? `구매자 취소 환불 (결제 ${price}π − 수수료 ${FEE_PI}π)`

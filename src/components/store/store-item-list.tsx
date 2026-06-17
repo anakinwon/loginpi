@@ -1,12 +1,14 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { Link } from '@/i18n/navigation'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { deriveTradeStatus, TRADE_ST_STYLE } from '@/lib/mps-trade-status'
+import { formatCcy } from '@/lib/format-ccy'
+import { env } from '@/env'
 import { piFetch } from '@/lib/pi-fetch'
 import { getCurrentPosition } from '@/lib/geo'
 import { readCache, writeCache } from '@/lib/client-cache'
@@ -17,6 +19,9 @@ export interface StoreItem {
   item_id: string
   item_nm: string
   price_pi: number
+  // 등록시점 자국통화 참고가 — 표시는 FEATURE 플래그 게이트
+  ccy_cd?: string | null
+  ccy_amt?: number | null
   item_cnd_cd: 'NEW' | 'USED' | 'HANDMADE'
   item_st_cd: string
   stock_qty: number
@@ -48,8 +53,12 @@ function formatDistance(km: number): string {
   return `${km.toFixed(1)}km`
 }
 
+// 자국통화 참고가 노출 여부 — Pi 가치평가 노출 최소화 위해 기본 비활성(env 게이트)
+const SHOW_FIAT_REF = env.NEXT_PUBLIC_FEATURE_PI_PRICE === 'true'
+
 export function StoreItemList() {
   const t = useTranslations('store')
+  const locale = useLocale()
   const [items, setItems] = useState<StoreItem[]>([])
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
@@ -358,6 +367,12 @@ export function StoreItemList() {
                   <p className="text-base font-bold">
                     {Number(item.price_pi)} π
                   </p>
+                  {/* 등록시점 자국통화 참고가 — FEATURE 플래그 on + 통화 등록 상품만 */}
+                  {SHOW_FIAT_REF && item.ccy_cd && item.ccy_amt != null && (
+                    <p className="text-muted-foreground text-xs">
+                      ≈ {formatCcy(locale, item.ccy_cd, Number(item.ccy_amt))}
+                    </p>
+                  )}
                   <div className="text-muted-foreground flex items-center gap-2 text-xs">
                     <span className="bg-muted rounded px-1.5 py-0.5">
                       {t(`cnd.${item.item_cnd_cd}`)}

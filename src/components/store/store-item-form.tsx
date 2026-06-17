@@ -1,9 +1,9 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { toast } from 'sonner'
-import { useRouter } from '@/i18n/navigation'
+import { useRouter, Link } from '@/i18n/navigation'
 import { usePiAuth } from '@/components/pi-auth-provider'
 import { piFetch } from '@/lib/pi-fetch'
 import { getCurrentPosition } from '@/lib/geo'
@@ -15,11 +15,14 @@ import {
   ProductImageUploader,
   type ProductImage,
 } from '@/components/store/product-image-uploader'
+import { SUPPORTED_CCY_CODES, defaultCcyForLocale } from '@/lib/format-ccy'
 
 interface ItemFormProps {
   serverAuthed?: boolean // 서버 getSessionUser() 확인 결과 (Google 쿠키 로그인 포함)
   itemId?: string // 지정 시 수정 모드 — 기존 값 로드 후 PATCH
   defaultShopId?: string // 신규 등록 시 소속 매장 미리 선택 (?shop= 쿼리)
+  // 등록 유형: p2p=중고직거래(매장 미연결) | offline=오프라인매장(매장 필수·자국통화 우선)
+  mode?: 'p2p' | 'offline'
 }
 
 // GET /api/store/categories 트리 노드 (2단계)
@@ -40,8 +43,10 @@ export function StoreItemForm({
   serverAuthed = false,
   itemId,
   defaultShopId,
+  mode = 'p2p',
 }: ItemFormProps) {
   const t = useTranslations('store')
+  const locale = useLocale()
   const router = useRouter()
   const { user, isLoading } = usePiAuth()
   const authed = serverAuthed || !!user
@@ -49,7 +54,16 @@ export function StoreItemForm({
 
   const [itemNm, setItemNm] = useState('')
   const [itemDesc, setItemDesc] = useState('')
-  const [pricePi, setPricePi] = useState('')
+  // 가격 — 통화 선택('PI'=Pi 직접입력, 그 외=자국통화) + 입력 금액. 자국통화는 견적으로 Pi 환산
+  const [priceCcy, setPriceCcy] = useState<string>(() =>
+    defaultCcyForLocale(locale),
+  )
+  const [priceInput, setPriceInput] = useState('')
+  const [quotePi, setQuotePi] = useState<number | null>(null) // 환산된 Pi(자국통화 모드)
+  const [quoting, setQuoting] = useState(false)
+  const [quoteErr, setQuoteErr] = useState<string | null>(null)
+  // 수정 모드에서 가격을 실제로 손댔는지 — 미변경 시 저장된 Pi가를 유지(불필요 재환산·환율 장애 차단 회피)
+  const priceTouchedRef = useRef(false)
   const [cndCd, setCndCd] = useState<'NEW' | 'USED' | 'HANDMADE'>('USED')
   const [regQty, setRegQty] = useState('1')
   const [unlimited, setUnlimited] = useState(false)
@@ -138,6 +152,8 @@ export function StoreItemForm({
             item_nm: string
             item_desc: string | null
             price_pi: number
+            ccy_cd: string | null
+            ccy_amt: number | null
             item_cnd_cd: 'NEW' | 'USED' | 'HANDMADE'
             ctgr_id: string | null
             shop_id: string | null
@@ -152,7 +168,16 @@ export function StoreItemForm({
         }
         setItemNm(item.item_nm)
         setItemDesc(item.item_desc ?? '')
-        setPricePi(String(item.price_pi))
+        // 가격 복원 — 자국통화로 등록됐으면 통화·금액 복원(Pi 환산은 quote 효과가 재계산),
+        // 아니면 Pi 직접입력 모드. quotePi 시드로 변경 전까지 저장 Pi가 유지되게 한다
+        if (item.ccy_cd) {
+          setPriceCcy(item.ccy_cd)
+          setPriceInput(item.ccy_amt != null ? String(item.ccy_amt) : '')
+          setQuotePi(item.price_pi)
+        } else {
+          setPriceCcy('PI')
+          setPriceInput(String(item.price_pi))
+        }
         setCndCd(item.item_cnd_cd)
         setCtgrId(item.ctgr_id ?? '')
         setShopId(item.shop_id ?? '')
@@ -173,6 +198,55 @@ export function StoreItemForm({
       setLoadingItem(false)
     })()
   }, [editMode, authed, itemId, t])
+
+  // 자국통화 → Pi 환산 견적 (디바운스 500ms). 'PI' 모드·빈 금액은 견적 없이 통과.
+  // ⚠️ 등록시점 1회 환산 보조 — 견적 결과(quotePi)가 곧 저장될 Pi 정본가가 된다.
+  useEffect(() => {
+    if (priceCcy === 'PI') {
+      setQuotePi(null)
+      setQuoteErr(null)
+      setQuoting(false)
+      return
+    }
+    const amt = Number(priceInput)
+    if (!amt || amt <= 0) {
+      setQuotePi(null)
+      setQuoteErr(null)
+      setQuoting(false)
+      return
+    }
+    // 수정 모드에서 가격 미변경이면 저장된 Pi가(시드)를 유지 — 자동 재환산하지 않음
+    if (editMode && !priceTouchedRef.current) return
+    setQuoting(true)
+    setQuoteErr(null)
+    const ctrl = new AbortController()
+    const timer = setTimeout(() => {
+      piFetch(`/api/store/price-quote?ccy=${priceCcy}&amt=${amt}`, {
+        signal: ctrl.signal,
+      })
+        .then(async (r) => {
+          if (r.ok) {
+            const q = (await r.json()) as { price_pi: number }
+            setQuotePi(q.price_pi)
+            setQuoteErr(null)
+          } else {
+            const { error } = (await r.json()) as { error?: string }
+            setQuotePi(null)
+            setQuoteErr(error ?? t('form.priceQuoteFail'))
+          }
+        })
+        .catch((e: Error) => {
+          if (e.name === 'AbortError') return
+          setQuotePi(null)
+          setQuoteErr(t('form.priceQuoteFail'))
+        })
+        .finally(() => setQuoting(false))
+    }, 500)
+    return () => {
+      clearTimeout(timer)
+      ctrl.abort()
+    }
+  }, [priceCcy, priceInput, editMode, t])
 
   if (!authed && isLoading) {
     return (
@@ -197,10 +271,22 @@ export function StoreItemForm({
   }
 
   async function submit(status?: 'DRAFT' | 'OPEN') {
-    const price = Number(pricePi)
+    const fiatMode = priceCcy !== 'PI'
+    // 정본 Pi가 — Pi 모드는 입력값 그대로, 자국통화 모드는 환산 견적(quotePi)
+    const price = fiatMode ? (quotePi ?? 0) : Number(priceInput)
     const qty = unlimited ? 9999 : Number(regQty)
     if (!itemNm.trim() || !price || price <= 0) {
       toast.error(t('formInvalid'))
+      return
+    }
+    // 오프라인매장 상품은 소속 매장 필수 (중고직거래는 매장 미연결)
+    if (mode === 'offline' && !shopId) {
+      toast.error(t('form.shopRequired'))
+      return
+    }
+    // 자국통화 모드인데 환율 견적이 없으면(조회 실패·진행 중) 저장 차단 — Pi 직접입력 유도
+    if (fiatMode && (quotePi == null || quoteErr || quoting)) {
+      toast.error(quoteErr ?? t('form.priceQuoteRequired'))
       return
     }
     if (!unlimited && (!Number.isInteger(qty) || qty < 1 || qty > 9998)) {
@@ -217,6 +303,12 @@ export function StoreItemForm({
       item_nm: itemNm.trim(),
       item_desc: itemDesc.trim() || undefined,
       price_pi: price,
+      // 자국통화 모드: 통화·금액 스냅샷 동봉 / 수정 중 Pi 모드 전환: null로 통화 해제
+      ...(fiatMode
+        ? { ccy_cd: priceCcy, ccy_amt: Number(priceInput) }
+        : editMode
+          ? { ccy_cd: null, ccy_amt: null }
+          : {}),
       item_cnd_cd: cndCd,
       reg_qty: qty,
       // 이미지 — 등록: 있을 때만 전송 / 수정: 항상 전송(빈 배열=전체 삭제).
@@ -327,52 +419,107 @@ export function StoreItemForm({
         </select>
       </div>
 
-      {/* 소속 매장 — 등록된 매장이 있을 때만 노출 (FR-06 N:1, 선택) */}
-      {myShops.length > 0 && (
-        <div className="space-y-1.5">
-          <Label htmlFor="item-shop">{t('form.shop')}</Label>
+      {/* 소속 매장 — 오프라인매장 모드: 필수 선택(매장 없으면 등록 유도). 중고직거래(p2p): 매장 미연결(숨김) */}
+      {mode === 'offline' &&
+        (myShops.length > 0 ? (
+          <div className="space-y-1.5">
+            <Label htmlFor="item-shop">{t('form.shop')} *</Label>
+            <select
+              id="item-shop"
+              value={shopId}
+              onChange={(e) => setShopId(e.target.value)}
+              className="border-input bg-background h-9 w-full rounded-md border px-3 text-sm"
+            >
+              <option value="">{t('form.shopSelect')}</option>
+              {myShops.map((s) => (
+                <option key={s.shop_id} value={s.shop_id}>
+                  {s.shop_nm}
+                </option>
+              ))}
+            </select>
+          </div>
+        ) : (
+          <div className="space-y-1.5 rounded-md border border-dashed p-3">
+            <p className="text-muted-foreground text-sm">
+              {t('form.noShopYet')}
+            </p>
+            <Link
+              href="/store/my/shops"
+              className="text-primary text-xs underline"
+            >
+              {t('shop.manage')}
+            </Link>
+          </div>
+        ))}
+
+      {/* 가격 — 자국통화로 등록하면 등록시점 환율로 Pi 환산(정본=Pi). Pi 직접입력도 가능 */}
+      <div className="space-y-1.5">
+        <Label htmlFor="item-price">{t('form.price')} *</Label>
+        <div className="flex gap-2">
           <select
-            id="item-shop"
-            value={shopId}
-            onChange={(e) => setShopId(e.target.value)}
-            className="border-input bg-background h-9 w-full rounded-md border px-3 text-sm"
+            aria-label={t('form.priceCcy')}
+            value={priceCcy}
+            onChange={(e) => {
+              priceTouchedRef.current = true
+              setPriceCcy(e.target.value)
+            }}
+            className="border-input bg-background h-9 w-24 shrink-0 rounded-md border px-2 text-sm"
           >
-            <option value="">{t('form.shopNone')}</option>
-            {myShops.map((s) => (
-              <option key={s.shop_id} value={s.shop_id}>
-                {s.shop_nm}
+            <option value="PI">π Pi</option>
+            {SUPPORTED_CCY_CODES.map((c) => (
+              <option key={c} value={c}>
+                {c}
               </option>
             ))}
           </select>
-        </div>
-      )}
-
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-1.5">
-          <Label htmlFor="item-price">{t('form.price')} (π) *</Label>
           <Input
             id="item-price"
             type="number"
-            min="0.0000001"
+            min="0"
             step="any"
-            value={pricePi}
-            onChange={(e) => setPricePi(e.target.value)}
+            value={priceInput}
+            onChange={(e) => {
+              priceTouchedRef.current = true
+              setPriceInput(e.target.value)
+            }}
+            placeholder={priceCcy === 'PI' ? '0.0' : '0'}
           />
         </div>
-        <div className="space-y-1.5">
-          <Label>{t('form.cnd')}</Label>
-          <div className="flex gap-1.5">
-            {(['NEW', 'USED', 'HANDMADE'] as const).map((c) => (
-              <button
-                key={c}
-                type="button"
-                onClick={() => setCndCd(c)}
-                className={`rounded-full border px-3 py-1.5 text-xs font-medium ${cndCd === c ? 'border-primary bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted'}`}
-              >
-                {t(`cnd.${c}`)}
-              </button>
-            ))}
-          </div>
+        {/* 환산 미리보기 — 자국통화 모드에서만. 견적 결과가 저장될 Pi 정본가 */}
+        {priceCcy !== 'PI' && (
+          <p className="text-xs">
+            {quoting ? (
+              <span className="text-muted-foreground">
+                {t('form.priceConverting')}
+              </span>
+            ) : quoteErr ? (
+              <span className="text-destructive">{quoteErr}</span>
+            ) : quotePi != null ? (
+              <span className="text-muted-foreground">
+                {t('form.priceConverted', { pi: String(quotePi) })}
+              </span>
+            ) : (
+              <span className="text-muted-foreground">
+                {t('form.priceConvertHint')}
+              </span>
+            )}
+          </p>
+        )}
+      </div>
+
+      <div className="space-y-1.5">
+        <Label>{t('form.cnd')}</Label>
+        <div className="flex gap-1.5">
+          {(['NEW', 'USED', 'HANDMADE'] as const).map((c) => (
+            <button
+              key={c}
+              type="button"
+              onClick={() => setCndCd(c)}
+              className={`rounded-full border px-3 py-1.5 text-xs font-medium ${cndCd === c ? 'border-primary bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted'}`}
+            >
+              {t(`cnd.${c}`)}
+            </button>
+          ))}
         </div>
       </div>
 

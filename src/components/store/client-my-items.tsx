@@ -118,7 +118,12 @@ export function ClientMyItems({
           </Button>
         </Link>
         <Link href="/store/my/items/new">
-          <Button size="sm">{t('newItem')}</Button>
+          <Button size="sm" variant="outline">
+            {t('newItemP2P')}
+          </Button>
+        </Link>
+        <Link href="/store/my/shop-items/new">
+          <Button size="sm">{t('newItemShop')}</Button>
         </Link>
       </div>
 

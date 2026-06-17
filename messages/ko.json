@@ -1621,6 +1621,11 @@
     "salesTitle": "판매 주문 관리",
     "ordersTitle": "구매 주문 관리",
     "newItem": "+ 상품 등록",
+    "newItemP2P": "+ 중고직거래",
+    "newItemShop": "+ 오프라인매장",
+    "newP2PTitle": "중고직거래 상품 등록",
+    "newShopTitle": "오프라인매장 상품 등록",
+    "newShopHint": "매장을 선택하고 자국통화로 가격을 등록하세요. 결제는 Pi로 진행됩니다.",
     "statusChanged": "상태가 변경됐습니다",
     "deleteConfirm": "상품을 삭제할까요?",
     "deleteSuccess": "삭제됐습니다",
@@ -1629,6 +1634,7 @@
     "actionOpen": "게시",
     "actionClose": "중단",
     "actionDelete": "삭제",
+    "fiatRefAt": "{date} 환율 기준",
     "form": {
       "name": "상품명",
       "desc": "상품 설명",
@@ -1645,7 +1651,16 @@
       "categoryNone": "미분류",
       "categoryAll": "전체",
       "shop": "소속 매장",
-      "shopNone": "매장 없음"
+      "shopNone": "매장 없음",
+      "shopSelect": "매장을 선택하세요",
+      "noShopYet": "등록된 매장이 없습니다. 먼저 매장을 등록해 주세요.",
+      "shopRequired": "오프라인매장 상품은 매장 선택이 필수입니다",
+      "priceCcy": "통화",
+      "priceConverting": "환율 환산 중…",
+      "priceConverted": "≈ {pi} π (등록시점 환율 기준)",
+      "priceConvertHint": "자국통화로 입력하면 등록시점 환율로 Pi 가격이 정해집니다",
+      "priceQuoteFail": "환율을 가져오지 못했습니다. Pi로 직접 입력해 주세요.",
+      "priceQuoteRequired": "환율 환산을 마친 뒤 저장해 주세요"
     },
     "shop": {
       "title": "매장 관리",

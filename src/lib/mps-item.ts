@@ -14,6 +14,10 @@ export interface MpsItem {
   item_nm: string
   item_desc: string | null
   price_pi: number
+  // 등록시점 자국통화 스냅샷 — ccy_cd NULL이면 Pi 직접입력(법정화폐 미사용)
+  ccy_cd: string | null
+  ccy_amt: number | null
+  fx_snap_dtm: string | null
   item_cnd_cd: 'NEW' | 'USED' | 'HANDMADE'
   item_st_cd: 'DRAFT' | 'OPEN' | 'CLOSED' | 'SOLD'
   view_cnt: number
@@ -44,6 +48,9 @@ export interface CreateItemInput {
   item_nm: string
   item_desc?: string
   price_pi: number
+  // 자국통화 등록 — 판매자가 본인 통화로 입력 시 전달(price_pi는 견적 환산 Pi). 미전달 시 Pi 직접입력
+  ccy_cd?: string
+  ccy_amt?: number
   item_cnd_cd: string
   ctgr_id?: string
   shop_id?: string
@@ -327,6 +334,10 @@ export async function createItem(
       item_nm: input.item_nm,
       item_desc: input.item_desc ?? null,
       price_pi: input.price_pi,
+      // 자국통화 등록시점 스냅샷 — ccy_cd 있을 때만 환율 일시 기록(서버 시각이 정본)
+      ccy_cd: input.ccy_cd ?? null,
+      ccy_amt: input.ccy_cd ? (input.ccy_amt ?? null) : null,
+      fx_snap_dtm: input.ccy_cd ? new Date().toISOString() : null,
       item_cnd_cd: input.item_cnd_cd,
       ctgr_id: input.ctgr_id ?? null,
       shop_id: input.shop_id ?? null,
@@ -358,6 +369,9 @@ export interface UpdateItemPatch {
   item_nm?: string
   item_desc?: string
   price_pi?: number
+  // 자국통화 재등록 — ccy_cd 지정 시 ccy 스냅샷 갱신(fx_snap_dtm 재기록), null이면 Pi 직접입력으로 전환
+  ccy_cd?: string | null
+  ccy_amt?: number | null
   item_cnd_cd?: string
   ctgr_id?: string | null
   shop_id?: string | null
@@ -407,6 +421,13 @@ export async function updateItem(
     'item_st_cd',
   ] as const) {
     if (patch[key] !== undefined) update[key] = patch[key]
+  }
+
+  // 자국통화 스냅샷 — ccy_cd 지정 시 갱신. null이면 Pi 직접입력 전환(통화 필드 일괄 해제)
+  if (patch.ccy_cd !== undefined) {
+    update.ccy_cd = patch.ccy_cd
+    update.ccy_amt = patch.ccy_cd ? (patch.ccy_amt ?? null) : null
+    update.fx_snap_dtm = patch.ccy_cd ? new Date().toISOString() : null
   }
 
   // SOLD는 자동 전환 전용 — 수동 지정 불가 (DB CHECK과 별개로 명시 차단)

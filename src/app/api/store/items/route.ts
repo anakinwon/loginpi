@@ -55,6 +55,12 @@ const createSchema = z.object({
   item_nm: z.string().min(1).max(300),
   item_desc: z.string().max(5000).optional(),
   price_pi: z.number().positive().max(1_000_000),
+  // 자국통화 등록(선택) — 둘 다 있을 때만 ccy 스냅샷 저장(price_pi는 견적 환산 Pi)
+  ccy_cd: z
+    .string()
+    .regex(/^[A-Z]{3}$/)
+    .optional(),
+  ccy_amt: z.number().positive().max(1_000_000_000_000).optional(),
   item_cnd_cd: z.enum(['NEW', 'USED', 'HANDMADE']),
   ctgr_id: z.uuid().optional(),
   shop_id: z.uuid().optional(),
@@ -109,6 +115,11 @@ export async function POST(req: NextRequest) {
 
   // 위치는 LBS 동의 판매자만 저장 (Rule LBS-01) — 미동의면 좌표 무시하고 등록 진행
   const input = { ...parsed.data }
+  // 자국통화는 코드+금액이 모두 있을 때만 유효 — 한쪽만 오면 Pi 직접입력으로 간주
+  if (!(input.ccy_cd && input.ccy_amt)) {
+    delete input.ccy_cd
+    delete input.ccy_amt
+  }
   const hasLoc = input.lat !== undefined && input.lng !== undefined
   const lbsConsented = user.lbs_consent_yn === 'Y'
   if (hasLoc && !lbsConsented) {

@@ -12,6 +12,9 @@ export interface MpsOrder {
   buyer_id: string
   seller_id: string
   order_price_pi: number
+  // 주문 시점 자국통화 스냅샷(판매이력) — item에서 복사. ccy_cd NULL = Pi 직접거래
+  ccy_cd: string | null
+  ccy_amt: number | null
   order_st_cd:
     | 'PENDING'
     | 'ESCROW'
@@ -68,15 +71,29 @@ export async function createOrder(
   if (error) return { error: mapRpcError(error.message) }
   const order = data as MpsOrder
 
-  // 주문방법·배달주소 반영 — RPC는 재고 원자성만 담당, 방법은 사후 UPDATE (재고 무관)
+  // 자국통화 스냅샷 — 주문 시점 item 통화값을 주문에 복사(판매이력 보존, 등록시점 고정 참고가)
+  const { data: itemCcy } = await getSupabaseAdmin()
+    .from('mps_item')
+    .select('ccy_cd, ccy_amt')
+    .eq('item_id', itemId)
+    .maybeSingle()
+  const ccy = itemCcy as { ccy_cd: string | null; ccy_amt: number | null } | null
+
+  // 주문방법·배달주소(RPC는 재고 원자성만 담당) + 통화 스냅샷을 단일 사후 UPDATE로 반영
+  const patch: Record<string, unknown> = { modr_id: regrId }
+  if (ccy?.ccy_cd) {
+    patch.ccy_cd = ccy.ccy_cd
+    patch.ccy_amt = ccy.ccy_amt
+  }
   if (orderMthd) {
+    patch.order_mthd_cd = orderMthd
+    patch.dlvr_addr = orderMthd === 'DELIVERY' ? (dlvrAddr ?? null) : null
+  }
+
+  if (ccy?.ccy_cd || orderMthd) {
     const { data: updated } = await getSupabaseAdmin()
       .from('mps_order')
-      .update({
-        order_mthd_cd: orderMthd,
-        dlvr_addr: orderMthd === 'DELIVERY' ? (dlvrAddr ?? null) : null,
-        modr_id: regrId,
-      })
+      .update(patch)
       .eq('order_id', order.order_id)
       .select('*')
       .single()
@@ -118,10 +135,15 @@ export async function markEscrow(
   // PostgREST 중첩 응답이 객체/배열 둘 다 올 수 있어 양쪽 모두 대응 (배열이면 [0])
   const { data: ord } = await db
     .from('mps_order')
-    .select('mps_item(shop_id)')
+    .select('ccy_cd, ccy_amt, mps_item(shop_id)')
     .eq('order_id', orderId)
     .maybeSingle()
-  const rawItem = (ord as { mps_item?: unknown } | null)?.mps_item
+  const ordRow = ord as {
+    ccy_cd?: string | null
+    ccy_amt?: number | null
+    mps_item?: unknown
+  } | null
+  const rawItem = ordRow?.mps_item
   const itemObj = Array.isArray(rawItem) ? rawItem[0] : rawItem
   const isOffline = !!(itemObj as { shop_id?: string | null } | null)?.shop_id
   const nextState = isOffline ? 'ORDERED' : 'TRADING'
@@ -148,6 +170,9 @@ export async function markEscrow(
     user_id: buyerId,
     txn_type_cd: 'ESCROW_IN',
     pi_amt: amountPi,
+    // 자국통화 참고가 스냅샷 — 입금이므로 부호 +(pi_amt 부호 일치)
+    ccy_cd: ordRow?.ccy_cd ?? null,
+    ccy_amt: ordRow?.ccy_amt ?? null,
     pi_txid: txid,
     memo: '구매자 → 에스크로 입금',
     regr_id: buyerId,
@@ -201,6 +226,9 @@ export async function markComplete(orderId: string, sellerId: string) {
     user_id: order.seller_id,
     txn_type_cd: 'RELEASE_OUT',
     pi_amt: -order.order_price_pi,
+    // 자국통화 참고가 스냅샷 — 출금이므로 부호 −(pi_amt 부호 일치)
+    ccy_cd: order.ccy_cd ?? null,
+    ccy_amt: order.ccy_amt != null ? -Number(order.ccy_amt) : null,
     memo: '판매자 정산 대기 — 운영자 에스크로 계정에서 송금 처리 필요',
     regr_id: sellerId,
     modr_id: sellerId,
@@ -261,6 +289,9 @@ async function insertReleaseOut(
     user_id: order.seller_id,
     txn_type_cd: 'RELEASE_OUT',
     pi_amt: -order.order_price_pi,
+    // 자국통화 참고가 스냅샷 — 출금이므로 부호 −(pi_amt 부호 일치)
+    ccy_cd: order.ccy_cd ?? null,
+    ccy_amt: order.ccy_amt != null ? -Number(order.ccy_amt) : null,
     memo: '판매자 정산 대기 — 운영자 에스크로 계정에서 송금 처리 필요',
     regr_id: actorId,
     modr_id: actorId,

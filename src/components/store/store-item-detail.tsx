@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { useRouter } from '@/i18n/navigation'
 import { usePiAuth } from '@/components/pi-auth-provider'
@@ -12,6 +12,11 @@ import {
   deriveTradeStatus,
   TRADE_ST_STYLE,
 } from '@/lib/mps-trade-status'
+import { formatCcy } from '@/lib/format-ccy'
+import { env } from '@/env'
+
+// 자국통화 참고가 노출 여부 — Pi 가치평가 노출 최소화 위해 기본 비활성(env 게이트)
+const SHOW_FIAT_REF = env.NEXT_PUBLIC_FEATURE_PI_PRICE === 'true'
 
 interface ItemImage {
   img_id: string
@@ -24,6 +29,9 @@ interface ItemDetail {
   item_nm: string
   item_desc: string | null
   price_pi: number
+  ccy_cd: string | null
+  ccy_amt: number | null
+  fx_snap_dtm: string | null
   item_cnd_cd: 'NEW' | 'USED' | 'HANDMADE'
   item_st_cd: string
   stock_qty: number
@@ -50,6 +58,7 @@ interface OrderPrep {
 
 export function StoreItemDetail({ itemId }: { itemId: string }) {
   const t = useTranslations('store')
+  const locale = useLocale()
   const router = useRouter()
   const { user } = usePiAuth()
   const [item, setItem] = useState<ItemDetail | null>(null)
@@ -242,6 +251,20 @@ export function StoreItemDetail({ itemId }: { itemId: string }) {
           </div>
           <h1 className="mt-2 text-xl font-bold">{item.item_nm}</h1>
           <p className="mt-2 text-2xl font-bold">{Number(item.price_pi)} π</p>
+          {/* 등록시점 자국통화 참고가 — FEATURE 플래그 on + 통화 등록 상품만 */}
+          {SHOW_FIAT_REF && item.ccy_cd && item.ccy_amt != null && (
+            <p className="text-muted-foreground mt-1 text-sm">
+              ≈ {formatCcy(locale, item.ccy_cd, Number(item.ccy_amt))}
+              {item.fx_snap_dtm && (
+                <span className="ml-1 text-xs">
+                  ·{' '}
+                  {t('fiatRefAt', {
+                    date: new Date(item.fx_snap_dtm).toLocaleDateString(locale),
+                  })}
+                </span>
+              )}
+            </p>
+          )}
         </div>
 
         <div className="text-muted-foreground flex flex-wrap gap-2 text-sm">

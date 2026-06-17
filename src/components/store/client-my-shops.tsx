@@ -549,7 +549,7 @@ export function ClientMyShops({
                 <Button
                   size="sm"
                   onClick={() =>
-                    router.push(`/store/my/items/new?shop=${shop.shop_id}`)
+                    router.push(`/store/my/shop-items/new?shop=${shop.shop_id}`)
                   }
                 >
                   + 메뉴 추가

@@ -33,6 +33,13 @@ const patchSchema = z.object({
   item_nm: z.string().min(1).max(300).optional(),
   item_desc: z.string().max(5000).optional(),
   price_pi: z.number().positive().max(1_000_000).optional(),
+  // 자국통화 재등록(선택) — ccy_cd=null이면 Pi 직접입력 전환
+  ccy_cd: z
+    .string()
+    .regex(/^[A-Z]{3}$/)
+    .nullable()
+    .optional(),
+  ccy_amt: z.number().positive().max(1_000_000_000_000).nullable().optional(),
   item_cnd_cd: z.enum(['NEW', 'USED', 'HANDMADE']).optional(),
   ctgr_id: z.uuid().nullable().optional(),
   shop_id: z.uuid().nullable().optional(),
