@@ -13,6 +13,8 @@ import {
   clearCart,
 } from '@/hooks/use-cart'
 
+const round7 = (n: number) => Math.round(n * 1e7) / 1e7
+
 // 장바구니(카트) 화면 (SCR-09) — 오프라인매장 다중상품 카트 보기·편집 (FR-14)
 // 카트 상태는 클라이언트 전역 스토어(useCart). 체크아웃 백엔드(mps_order_item)는 후속.
 export function ClientCart() {
@@ -69,11 +71,21 @@ export function ClientCart() {
               >
                 {l.itemNm}
               </Link>
+              {/* 단가 × 수량 */}
               <p className="text-muted-foreground text-xs">
-                {l.unitPricePi} π
+                {l.unitPricePi} π × {l.qty}
                 {l.ccyCd &&
                   l.ccyAmt != null &&
-                  ` · ≈ ${formatCcy(locale, l.ccyCd, l.ccyAmt)}`}
+                  ` (≈ ${formatCcy(locale, l.ccyCd, l.ccyAmt)})`}
+              </p>
+              {/* = 소계(단가 × 수량) */}
+              <p className="text-sm font-semibold">
+                = {round7(l.unitPricePi * l.qty)} π
+                {l.ccyCd && l.ccyAmt != null && (
+                  <span className="text-muted-foreground ml-1 text-xs font-normal">
+                    ≈ {formatCcy(locale, l.ccyCd, l.ccyAmt * l.qty)}
+                  </span>
+                )}
               </p>
             </div>
             {/* 수량 스테퍼 */}
