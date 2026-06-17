@@ -1522,6 +1522,7 @@
     "title": "PiShop",
     "subtitle": "Pi Coin으로 안전하게 직거래하세요 — 에스크로 보호",
     "navMyItems": "내 상품",
+    "navMyShops": "내 매장",
     "navSales": "판매 관리",
     "navOrders": "구매 내역",
     "navHistory": "거래 내역",
@@ -1552,6 +1553,9 @@
       "pending": "취소 완료 — 환불은 곧 처리됩니다"
     },
     "backToList": "상품 목록",
+    "shopfrontOwnerHint": "내 매장입니다 — 상품을 누르면 바로 수정할 수 있어요",
+    "shopfrontEditBadge": "✏️ 수정",
+    "shopfrontAddItem": "+ 메뉴 추가",
     "searchPlaceholder": "상품명 또는 설명 검색",
     "search": "검색",
     "all": "전체",

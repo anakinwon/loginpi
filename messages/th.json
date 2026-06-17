@@ -1227,8 +1227,8 @@
         "name": "Test การโอน Bean (PiRC1)"
       },
       "M5": {
-        "desc": "หลังจากสมัคร Pi Subscription Service ให้สร้าง Pi Bet ใน Cafe + แจกจ่ายให้กับผู้เข้าร่วม",
-        "name": "หลังจากสมัคร Pi Subscription Service (PiRC2) ให้สร้างและแจกจ่าย Pi Bet"
+        "desc": "หลังจากสมัครสมาชิก PiRC2 ให้สร้างคาเฟ่เฉพาะอีเวนต์ด้วยแพ็กเกจ Business",
+        "name": "สมัครสมาชิก Pi (PiRC2) แล้วสร้างคาเฟ่อีเวนต์"
       },
       "M6": {
         "desc": "ใช้ Sticker / ส่ง File / ใช้ Voice Channel (อย่างน้อย 1 อย่าง)",
@@ -1387,7 +1387,11 @@
     "cafe": "Cafe",
     "event": "Event",
     "home": "Home",
+    "map": "Map",
+    "mapEmpty": "ไม่มีร้านค้าที่ลงทะเบียน",
+    "mapSubtitle": "ตรวจสอบตำแหน่งร้านค้า Pi Shop",
     "my": "ข้อมูลของฉัน",
+    "navigateGo": "ไป",
     "shop": "Shop"
   },
   "pay": {
@@ -1560,6 +1564,23 @@
     "buying": "กำลังดำเนินการชำระเงิน…",
     "buySuccess": "การชำระเงิน Escrow เสร็จสมบูรณ์! ดำเนินการซื้อขายกับผู้ขาย",
     "cancelReasonPrompt": "โปรดระบุเหตุผลในการยกเลิก",
+    "cart": {
+      "add": "🛒 เพิ่มลง Cart",
+      "added": "เพิ่ม {n} ชิ้นลง Cart แล้ว",
+      "addedTitle": "เพิ่มลง Cart แล้ว 🛒",
+      "checkingOut": "กำลังดำเนินการชำระเงิน…",
+      "checkout": "สั่งซื้อ ({count} ชิ้น)",
+      "checkoutFail": "ดำเนินการสั่งซื้อล้มเหลว",
+      "checkoutSuccess": "ได้รับคำสั่งซื้อแล้ว",
+      "clear": "ล้าง Cart",
+      "conflictConfirm": "มีสินค้าจากร้านค้าอื่นอยู่ใน Cart ต้องการล้างและเพิ่มใหม่หรือไม่?",
+      "continueShopping": "Shopping ต่อ",
+      "empty": "Cart ว่างเปล่า",
+      "goToCart": "ไปที่ Cart",
+      "qty": "จำนวน",
+      "remove": "ลบ",
+      "title": "Cart"
+    },
     "cnd": {
       "HANDMADE": "สินค้าทำมือ",
       "NEW": "สินค้าใหม่",
@@ -1572,6 +1593,7 @@
     "editSuccess": "แก้ไขสินค้าแล้ว",
     "escrowNotice": "Pi ที่ชำระเงินจะถูกเก็บไว้อย่างปลอดภัยใน Escrow และจะถูกส่งมอบให้ผู้ขายหลังจากยืนยันการทำธุรกรรมจากทั้งสองฝ่าย",
     "escrowReleased": "สิ้นสุดการทำรายการ — กำลังดำเนินการชำระ Escrow",
+    "fiatRefAt": "ตามอัตราแลกเปลี่ยน ณ วันที่ {date}",
     "form": {
       "category": "Category",
       "categoryAll": "ทั้งหมด",
@@ -1579,13 +1601,23 @@
       "cnd": "สภาพสินค้า",
       "desc": "คำอธิบายสินค้า",
       "name": "ชื่อสินค้า",
+      "noShopYet": "ไม่มีร้านค้าที่ลงทะเบียน กรุณาลงทะเบียนร้านค้าก่อน",
       "price": "ราคา",
+      "priceCcy": "สกุลเงิน",
+      "priceCcyPi": "π Pi ป้อนเอง",
+      "priceConverted": "≈ {pi} π (ตามอัตราแลกเปลี่ยน ณ เวลาที่ลงทะเบียน)",
+      "priceConvertHint": "หากป้อนด้วยสกุลเงินท้องถิ่น ราคา Pi จะถูกกำหนดตามอัตราแลกเปลี่ยน ณ เวลาที่ลงทะเบียน",
+      "priceConverting": "กำลังแปลงอัตราแลกเปลี่ยน…",
+      "priceQuoteFail": "ไม่สามารถดึงอัตราแลกเปลี่ยนได้ กรุณาป้อนด้วย Pi โดยตรง",
+      "priceQuoteRequired": "หลังจากแปลงอัตราแลกเปลี่ยนแล้ว กรุณาบันทึก",
       "publish": "เผยแพร่ทันที",
       "qty": "จำนวนที่ขาย",
       "saveDraft": "บันทึกฉบับร่าง",
       "saveEdit": "บันทึกการแก้ไข",
       "shop": "ร้านค้าที่สังกัด",
       "shopNone": "ไม่มีร้านค้า",
+      "shopRequired": "สำหรับสินค้าของร้านค้าออฟไลน์ จำเป็นต้องเลือกร้านค้า",
+      "shopSelect": "เลือกร้านค้า",
       "thumbUrl": "URL รูปภาพหลัก",
       "unlimited": "ไม่จำกัด",
       "unlimitedHint": "สำหรับสินค้าที่ไม่จำเป็นต้องติดตามสต็อก เช่น เครื่องดื่มหรือพิซซ่า ให้ลงทะเบียนเป็นไม่จำกัด"
@@ -1632,7 +1664,11 @@
     "myItemsTitle": "จัดการสินค้าของฉัน",
     "myOwnItem": "นี่คือสินค้าที่ฉันลงทะเบียน",
     "navHistory": "ประวัติการทำธุรกรรม",
+    "navigateGoogle": "ไป Google Map",
+    "navigateKakao": "Kakao Map",
+    "navigateNaver": "Naver Map",
     "navMyItems": "สินค้าของฉัน",
+    "navMyShops": "ร้านค้าของฉัน",
     "navOrders": "ประวัติการซื้อ",
     "navSales": "การจัดการการขาย",
     "nearbyActive": "สินค้าภายใน {radius} กม. จากตำแหน่งปัจจุบัน (เรียงตามระยะทางใกล้สุด)",
@@ -1640,7 +1676,12 @@
     "nearbyNav": "📍 ใกล้เคียง",
     "nearbySort": "📍 เรียงตามระยะทาง",
     "newItem": "+ ลงทะเบียนสินค้า",
+    "newItemP2P": "+ สินค้ามือสอง",
+    "newItemShop": "+ ร้านค้าออฟไลน์",
     "newItemTitle": "ลงทะเบียนสินค้าใหม่",
+    "newP2PTitle": "ลงทะเบียนสินค้ามือสอง",
+    "newShopHint": "เลือกร้านค้าและลงทะเบียนราคาด้วยสกุลเงินท้องถิ่นของคุณ การชำระเงินจะดำเนินการด้วย Pi",
+    "newShopTitle": "ลงทะเบียนสินค้าสำหรับร้านค้าออฟไลน์",
     "noItems": "ไม่มีสินค้าที่ลงทะเบียน",
     "noNearbyItems": "ไม่มีสินค้าภายใน {radius} กม. รอบตัวคุณ",
     "noOrders": "ไม่มีประวัติการสั่งซื้อ",
@@ -1701,6 +1742,9 @@
       "type_OFFLINE": "Offline",
       "type_ONLINE": "Online"
     },
+    "shopfrontAddItem": "+ เพิ่ม Menu",
+    "shopfrontEditBadge": "✏️ แก้ไข",
+    "shopfrontOwnerHint": "นี่คือร้านค้าของคุณ — คุณสามารถแก้ไขสินค้าได้ทันทีโดยการแตะที่สินค้า",
     "shopType": {
       "BOTH": "Online และ Offline",
       "OFFLINE": "ร้านค้า Offline",

@@ -73,9 +73,14 @@ export async function POST(req: Request, { params }: Params) {
     if (targetRow?.owner_yn !== 'Y') {
       const { connected } = countMemberSlots(participants)
       // 본인이 이미 CONNECTED면 멱등 — 카운트에서 제외할 필요 없음 (아래서 그대로 CONNECTED)
-      if (target.mic_st_cd !== 'CONNECTED' && connected >= VOICE_MAX_MEMBER_SLOTS) {
+      if (
+        target.mic_st_cd !== 'CONNECTED' &&
+        connected >= VOICE_MAX_MEMBER_SLOTS
+      ) {
         return NextResponse.json(
-          { error: `동시 보이스챗은 멤버 최대 ${VOICE_MAX_MEMBER_SLOTS}명까지입니다` },
+          {
+            error: `동시 보이스챗은 멤버 최대 ${VOICE_MAX_MEMBER_SLOTS}명까지입니다`,
+          },
           { status: 400 },
         )
       }

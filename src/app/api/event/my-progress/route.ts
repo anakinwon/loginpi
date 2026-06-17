@@ -11,7 +11,9 @@ export async function GET() {
   try {
     const { data: missions } = await getSupabaseAdmin()
       .from('evt_mission')
-      .select('mission_cd, mission_nm, mission_guide_desc, complete_type_cd, mission_ord')
+      .select(
+        'mission_cd, mission_nm, mission_guide_desc, complete_type_cd, mission_ord',
+      )
       .eq('event_id', 'evt-20260614-001')
       .eq('del_yn', 'N')
       .order('mission_ord', { ascending: true })

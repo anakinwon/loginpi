@@ -312,8 +312,9 @@ export async function POST(request: NextRequest, { params }: Params) {
 
   // M6: 스티커 이용 미션 기록 (비블로킹) — MULTI_OR 중 1개
   if (msg_tp_cd === 'STICKER') {
-    recordUserAction('sticker_use', user.id, { roomId, stkr_id })
-      .catch(err => console.error(`[M6-sticker] 미션 기록 실패: ${err.message}`))
+    recordUserAction('sticker_use', user.id, { roomId, stkr_id }).catch((err) =>
+      console.error(`[M6-sticker] 미션 기록 실패: ${err.message}`),
+    )
   }
 
   // TASK-062 Trigger 7: 테마 활동 배지 수여 체크 (백그라운드)

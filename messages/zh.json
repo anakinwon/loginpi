@@ -1227,8 +1227,8 @@
         "name": "Bean 发送 Test (PiRC1)"
       },
       "M5": {
-        "desc": "申请 Pi订阅 Service 后，在 Cafe 中创建 Pi Bet + 分配给参与者",
-        "name": "申请 Pi订阅 Service (PiRC2) 后创建并分配 Pi Bet"
+        "desc": "订阅 PiRC2 后，使用 Business 套餐创建活动专属咖啡厅",
+        "name": "申请 Pi订阅服务(PiRC2)后创建活动咖啡厅"
       },
       "M6": {
         "desc": "使用 Sticker / 发送 File / 使用语音频道中1种以上",
@@ -1387,7 +1387,11 @@
     "cafe": "Cafe",
     "event": "Event",
     "home": "Home",
+    "map": "Map",
+    "mapEmpty": "没有注册的店铺",
+    "mapSubtitle": "查看 Pi Shop 商家位置",
     "my": "我的信息",
+    "navigateGo": "出发",
     "shop": "Shop"
   },
   "pay": {
@@ -1560,6 +1564,23 @@
     "buying": "支付进行中…",
     "buySuccess": "Escrow 支付完成！请与卖家进行交易",
     "cancelReasonPrompt": "请输入取消原因",
+    "cart": {
+      "add": "🛒 Add to Cart",
+      "added": "已将 {n} 件商品添加到 Cart",
+      "addedTitle": "已添加到 Cart 🛒",
+      "checkingOut": "正在结账…",
+      "checkout": "下单 ({count} 件)",
+      "checkoutFail": "订单处理失败",
+      "checkoutSuccess": "订单已提交",
+      "clear": "清空 Cart",
+      "conflictConfirm": "Cart 中有其他店铺的商品。要清空并重新添加吗？",
+      "continueShopping": "继续 Shopping",
+      "empty": "Cart 为空",
+      "goToCart": "前往 Cart",
+      "qty": "数量",
+      "remove": "删除",
+      "title": "购物车"
+    },
     "cnd": {
       "HANDMADE": "手工制品",
       "NEW": "新商品",
@@ -1572,6 +1593,7 @@
     "editSuccess": "商品已修改",
     "escrowNotice": "已支付的 Pi 将在 Escrow 中安全保管，双方确认交易后转交给卖家",
     "escrowReleased": "交易结束 — 托管结算处理",
+    "fiatRefAt": "{date} 汇率参考",
     "form": {
       "category": "Category",
       "categoryAll": "全部",
@@ -1579,13 +1601,23 @@
       "cnd": "商品状态",
       "desc": "商品说明",
       "name": "商品名",
+      "noShopYet": "没有注册的店铺。请先注册店铺。",
       "price": "价格",
+      "priceCcy": "货币",
+      "priceCcyPi": "π Pi 直接输入",
+      "priceConverted": "≈ {pi} π (以注册时汇率为准)",
+      "priceConvertHint": "以当地货币输入，Pi 价格将以注册时汇率确定",
+      "priceConverting": "正在换算汇率…",
+      "priceQuoteFail": "未能获取汇率。请直接输入 Pi。",
+      "priceQuoteRequired": "完成汇率换算后请保存",
       "publish": "立即发布",
       "qty": "销售数量",
       "saveDraft": "保存草稿",
       "saveEdit": "保存修改",
       "shop": "所属店铺",
       "shopNone": "无店铺",
+      "shopRequired": "Offline 店铺商品必须选择店铺",
+      "shopSelect": "请选择店铺",
       "thumbUrl": "代表图片 URL",
       "unlimited": "无限制",
       "unlimitedHint": "对于饮料、披萨等无需追踪库存的商品，请设置为无限制。"
@@ -1632,7 +1664,11 @@
     "myItemsTitle": "我的商品管理",
     "myOwnItem": "我注册的商品",
     "navHistory": "交易记录",
+    "navigateGoogle": "前往 Google Map",
+    "navigateKakao": "Kakao Map",
+    "navigateNaver": "Naver 地图",
     "navMyItems": "我的商品",
+    "navMyShops": "我的店铺",
     "navOrders": "购买历史",
     "navSales": "销售管理",
     "nearbyActive": "当前位置 {radius}km 内的商品 (按距离从近到远)",
@@ -1640,7 +1676,12 @@
     "nearbyNav": "📍 附近",
     "nearbySort": "📍 按周边排序",
     "newItem": "+ 发布商品",
+    "newItemP2P": "+ P2P 二手交易",
+    "newItemShop": "+ Offline 店铺",
     "newItemTitle": "发布商品",
+    "newP2PTitle": "注册 P2P 二手商品",
+    "newShopHint": "选择店铺并以当地货币注册价格。支付将以 Pi 进行。",
+    "newShopTitle": "注册 Offline 店铺商品",
     "noItems": "没有商品",
     "noNearbyItems": "周边 {radius}km 内没有商品",
     "noOrders": "没有订单",
@@ -1701,6 +1742,9 @@
       "type_OFFLINE": "Offline",
       "type_ONLINE": "Online"
     },
+    "shopfrontAddItem": "+ Menu 添加",
+    "shopfrontEditBadge": "✏️ 编辑",
+    "shopfrontOwnerHint": "这是我的店铺 — 点击商品即可编辑",
     "shopType": {
       "BOTH": "线上·线下",
       "OFFLINE": "线下门店",

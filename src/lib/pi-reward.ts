@@ -65,7 +65,9 @@ export async function triggerPiReward(
       reward_st_cd: 'FAILED',
       fail_reason_tx: 'PI_API_KEY 환경변수 미설정',
     })
-    console.error(`[Pi 보상] PI_API_KEY 미설정 — event=${eventId} user=${userId}`)
+    console.error(
+      `[Pi 보상] PI_API_KEY 미설정 — event=${eventId} user=${userId}`,
+    )
     return
   }
 
@@ -112,10 +114,13 @@ export async function triggerPiReward(
     }
 
     // Step 3: 완료
-    const completeRes = await fetch(`${PI_PAYMENTS_URL}/${paymentId}/complete`, {
-      method: 'POST',
-      headers: { Authorization: `Key ${apiKey}` },
-    })
+    const completeRes = await fetch(
+      `${PI_PAYMENTS_URL}/${paymentId}/complete`,
+      {
+        method: 'POST',
+        headers: { Authorization: `Key ${apiKey}` },
+      },
+    )
     if (!completeRes.ok) {
       throw new Error(
         `결제 완료 실패 (${completeRes.status}): ${await completeRes.text()}`,
@@ -136,7 +141,9 @@ export async function triggerPiReward(
       reward_st_cd: 'FAILED',
       fail_reason_tx: msg.slice(0, 500),
     })
-    console.error(`[Pi 보상] 지급 실패 — event=${eventId} user=${userId}: ${msg}`)
+    console.error(
+      `[Pi 보상] 지급 실패 — event=${eventId} user=${userId}: ${msg}`,
+    )
   }
 }
 

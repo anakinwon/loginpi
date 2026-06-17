@@ -1227,8 +1227,8 @@
         "name": "اختبار إرسال Bean (PiRC1)"
       },
       "M5": {
-        "desc": "بعد التقديم على Pi Subscription Service، إنشاء Pi Bet في Cafe + توزيعه على المشاركين",
-        "name": "التقديم على Pi Subscription Service (PiRC2) ثم إنشاء وتوزيع Pi Bet"
+        "desc": "بعد الاشتراك في PiRC2، أنشئ مقهى مخصصًا للفعاليات باستخدام خطة Business",
+        "name": "الاشتراك في Pi (PiRC2) ثم إنشاء مقهى للفعاليات"
       },
       "M6": {
         "desc": "واحد أو أكثر من: استخدام Stickers / إرسال File / استخدام Voice Channel",
@@ -1387,7 +1387,11 @@
     "cafe": "Cafe",
     "event": "Event",
     "home": "Home",
+    "map": "خريطة",
+    "mapEmpty": "مفيش محلات متسجلة",
+    "mapSubtitle": "شوف أماكن محلات Pi Shop",
     "my": "معلوماتي",
+    "navigateGo": "انطلق",
     "shop": "Shop"
   },
   "pay": {
@@ -1560,6 +1564,23 @@
     "buying": "جاري معالجة الدفع…",
     "buySuccess": "تم الدفع بالضمان بنجاح! يرجى متابعة المعاملة مع البائع",
     "cancelReasonPrompt": "يرجى إدخال سبب الإلغاء",
+    "cart": {
+      "add": "🛒 إضافة إلى Cart",
+      "added": "تم إضافة {n} منتج إلى Cart",
+      "addedTitle": "تمت الإضافة إلى Cart 🛒",
+      "checkingOut": "جاري إتمام الدفع…",
+      "checkout": "إتمام الطلب ({count} منتج)",
+      "checkoutFail": "فشل في معالجة الطلب",
+      "checkoutSuccess": "تم استلام طلبك",
+      "clear": "إفراغ Cart",
+      "conflictConfirm": "Cart فيها منتجات من محل تاني. عايز تفضيها وتضيف منتجات جديدة؟",
+      "continueShopping": "متابعة Shopping",
+      "empty": "Cart فارغة",
+      "goToCart": "اذهب إلى Cart",
+      "qty": "الكمية",
+      "remove": "إزالة",
+      "title": "السلة"
+    },
     "cnd": {
       "HANDMADE": "مصنوع يدويًا",
       "NEW": "جديد",
@@ -1572,6 +1593,7 @@
     "editSuccess": "تم تعديل السلعة",
     "escrowNotice": "يتم الاحتفاظ بعملة Pi المدفوعة بأمان في الضمان، وسيتم تحويلها إلى البائع بعد تأكيد المعاملة من الطرفين",
     "escrowReleased": "تم إغلاق المعاملة — جاري تسوية الضمان.",
+    "fiatRefAt": "حسب سعر الصرف في {date}",
     "form": {
       "category": "Category",
       "categoryAll": "الكل",
@@ -1579,13 +1601,23 @@
       "cnd": "حالة السلعة",
       "desc": "وصف السلعة",
       "name": "اسم السلعة",
+      "noShopYet": "مفيش محلات متسجلة. من فضلك سجل محل الأول.",
       "price": "السعر",
+      "priceCcy": "العملة",
+      "priceCcyPi": "π Pi إدخال مباشر",
+      "priceConverted": "≈ {pi} π (حسب سعر الصرف وقت التسجيل)",
+      "priceConvertHint": "لو دخلت السعر بالعملة المحلية، سعر Pi هيتحدد بسعر الصرف وقت التسجيل",
+      "priceConverting": "جاري تحويل سعر الصرف…",
+      "priceQuoteFail": "فشل في جلب سعر الصرف. من فضلك أدخل السعر بـ Pi مباشرة.",
+      "priceQuoteRequired": "من فضلك احفظ بعد الانتهاء من تحويل سعر الصرف",
       "publish": "نشر فوري",
       "qty": "كمية البيع",
       "saveDraft": "حفظ كمسودة",
       "saveEdit": "حفظ التعديلات",
       "shop": "المتجر التابع",
       "shopNone": "لا يوجد متجر",
+      "shopRequired": "اختيار المحل إجباري لمنتجات المتجر الفعلي",
+      "shopSelect": "اختار المحل",
       "thumbUrl": "URL الصورة الرئيسية",
       "unlimited": "غير محدود",
       "unlimitedHint": "سجل السلع اللي تتبع مخزونها ملوش معنى (زي المشروبات والبيتزا) على إنها غير محدودة."
@@ -1632,7 +1664,11 @@
     "myItemsTitle": "إدارة سلعك",
     "myOwnItem": "هذا المنتج مسجل بواسطتي",
     "navHistory": "سجل المعاملات",
+    "navigateGoogle": "انطلق بـ Google Map",
+    "navigateKakao": "Kakao Map",
+    "navigateNaver": "Naver Map",
     "navMyItems": "منتجاتي",
+    "navMyShops": "محلاتي",
     "navOrders": "سجل الطلبات",
     "navSales": "إدارة المبيعات",
     "nearbyActive": "سلع في نطاق {radius} كيلومتر من موقعك الحالي (الأقرب أولاً)",
@@ -1640,7 +1676,12 @@
     "nearbyNav": "📍 قريب",
     "nearbySort": "📍 حسب الأقرب",
     "newItem": "+ إضافة سلعة",
+    "newItemP2P": "+ منتج مستعمل مباشر",
+    "newItemShop": "+ محل",
     "newItemTitle": "إضافة سلعة جديدة",
+    "newP2PTitle": "تسجيل منتج مستعمل مباشر",
+    "newShopHint": "اختار المحل وسجل السعر بالعملة المحلية. الدفع هيتم بـ Pi.",
+    "newShopTitle": "تسجيل منتج للمحل",
     "noItems": "لا توجد منتجات مسجلة",
     "noNearbyItems": "لا توجد سلع في نطاق {radius} كيلومتر",
     "noOrders": "لا يوجد سجل طلبات",
@@ -1701,6 +1742,9 @@
       "type_OFFLINE": "Offline",
       "type_ONLINE": "Online"
     },
+    "shopfrontAddItem": "+ إضافة Menu",
+    "shopfrontEditBadge": "✏️ تعديل",
+    "shopfrontOwnerHint": "ده محلي — دوس على المنتج عشان تعدله على طول",
     "shopType": {
       "BOTH": "Online و Offline",
       "OFFLINE": "متجر Offline",

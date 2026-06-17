@@ -47,9 +47,10 @@ export function ClientChatList() {
 
     // 1) 캐시 즉시 표시 (stale) — 재방문 시 스켈레톤 없이 0ms 렌더
     const cached = readCache<RoomsPayload>(cacheKey, CACHE_MAX_AGE_MS)
-    if (cached) apply(cached)
+    if (cached)
+      apply(cached)
 
-    // 2) 백그라운드 재검증 (revalidate) — 최신 데이터로 교체 + 캐시 갱신
+      // 2) 백그라운드 재검증 (revalidate) — 최신 데이터로 교체 + 캐시 갱신
     ;(async () => {
       const res = await piFetch('/api/chat/rooms?include=public').catch(
         () => null,

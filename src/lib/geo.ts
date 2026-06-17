@@ -59,7 +59,11 @@ export async function getCurrentPosition(opts?: {
     })
   } catch (e) {
     if (e instanceof GeoError && (e.code === 2 || e.code === 3)) {
-      return getOnce({ timeout: 12_000, maximumAge: 0, enableHighAccuracy: true })
+      return getOnce({
+        timeout: 12_000,
+        maximumAge: 0,
+        enableHighAccuracy: true,
+      })
     }
     throw e
   }

@@ -264,7 +264,9 @@ export function ClientMyOrders({
 
         {/* 판매자: 주문자(호명용) / 구매자: 픽업 매장명 */}
         {role === 'seller' && o.buyer && (
-          <p className="text-sm font-semibold">🙋 주문자: {buyerName(o.buyer)}</p>
+          <p className="text-sm font-semibold">
+            🙋 주문자: {buyerName(o.buyer)}
+          </p>
         )}
         {role === 'buyer' && o.mps_item?.mps_shop?.shop_nm && (
           <p className="text-sm font-semibold">
@@ -461,7 +463,8 @@ export function ClientMyOrders({
         {o.order_st_cd === 'READY' &&
           (role === 'buyer' ? (
             <p className="text-muted-foreground text-xs">
-              📦 상품이 준비됐어요! 곧 받으실 수 있습니다 (10분 후 자동 판매완료)
+              📦 상품이 준비됐어요! 곧 받으실 수 있습니다 (10분 후 자동
+              판매완료)
             </p>
           ) : (
             // 준비완료 → 판매자가 주문자 호명 (요건)

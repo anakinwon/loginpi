@@ -29,7 +29,11 @@ export default async function NewShopItemPage({
       </Link>
       <h1 className="text-xl font-bold">{t('newShopTitle')}</h1>
       <p className="text-muted-foreground text-sm">{t('newShopHint')}</p>
-      <StoreItemForm serverAuthed={!!user} mode="offline" defaultShopId={shop} />
+      <StoreItemForm
+        serverAuthed={!!user}
+        mode="offline"
+        defaultShopId={shop}
+      />
     </div>
   )
 }

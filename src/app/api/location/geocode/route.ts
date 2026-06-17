@@ -6,7 +6,8 @@ import { geocodeAddress } from '@/lib/google-maps'
 // 동의 불필요(PRD 섹션 6). 단, 유료 API 남용 방지를 위해 로그인 세션은 필수.
 export async function POST(request: NextRequest) {
   const user = await getSessionUser()
-  if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user)
+    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
   let body: unknown
   try {

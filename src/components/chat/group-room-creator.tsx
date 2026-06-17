@@ -75,7 +75,10 @@ export function GroupRoomCreator() {
   const [canCreateEventRoom, setCanCreateEventRoom] = useState(false)
   const [entryFee, setEntryFee] = useState<EntryFee>(0)
   const [eventEndDtm, setEventEndDtm] = useState('')
-  const [gpsCoords, setGpsCoords] = useState<{ lat: number; lng: number } | null>(null)
+  const [gpsCoords, setGpsCoords] = useState<{
+    lat: number
+    lng: number
+  } | null>(null)
 
   // 다이얼로그 열릴 때마다 폼 초기화 + 구독 상태 재확인
   // 구독 직후 동일 세션에서 방 생성 시에도 최신 권한 반영
@@ -100,10 +103,16 @@ export function GroupRoomCreator() {
       .then((r) => (r.ok ? r.json() : null))
       .then((d: { consent_yn?: string } | null) => {
         if (d?.consent_yn === 'Y') {
-          getCurrentPosition().then(setGpsCoords).catch(() => { /* 위치 수집 실패 시 조용히 무시 */ })
+          getCurrentPosition()
+            .then(setGpsCoords)
+            .catch(() => {
+              /* 위치 수집 실패 시 조용히 무시 */
+            })
         }
       })
-      .catch(() => { /* 조용히 무시 */ })
+      .catch(() => {
+        /* 조용히 무시 */
+      })
 
     piFetch('/api/subscriptions/check')
       .then((r) => (r.ok ? r.json() : null))
@@ -271,7 +280,16 @@ export function GroupRoomCreator() {
       setPayStatus('error')
       setPayError(e instanceof Error ? e.message : '방 생성 오류')
     }
-  }, [selectedTheme, roomNm, roomDesc, isPublic, maxMbr, exprDays, gpsCoords, router])
+  }, [
+    selectedTheme,
+    roomNm,
+    roomDesc,
+    isPublic,
+    maxMbr,
+    exprDays,
+    gpsCoords,
+    router,
+  ])
 
   // TASK-063: 이벤트방 생성 — BUSINESS 전용, 생성 결제 없음 (참가자가 입장료 결제)
   const createEventRoomUi = useCallback(async () => {

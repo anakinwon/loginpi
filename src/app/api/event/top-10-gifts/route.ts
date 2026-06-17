@@ -5,8 +5,10 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 // GET /api/event/top-10-gifts — 미션 10/10 선착순 상위 10명 + 선물 발송 상태 (관리자 전용)
 export async function GET() {
   const user = await getSessionUser()
-  if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
-  if (!isAdmin(user)) return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+  if (!user)
+    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!isAdmin(user))
+    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
 
   try {
     const db = getSupabaseAdmin()
@@ -23,27 +25,36 @@ export async function GET() {
     // 전체 미션 기록 조회
     const { data: missions, error: err1 } = await db
       .from('evt_user_mission')
-      .select('user_id, mission_cd, complete_dtm, sys_user!inner(nick_nm, kakao_id)')
+      .select(
+        'user_id, mission_cd, complete_dtm, sys_user!inner(nick_nm, kakao_id)',
+      )
       .eq('event_id', EVENT_ID)
       .eq('del_yn', 'N')
 
     if (err1) throw err1
 
     // 사용자별 집계: 제외 대상자 제외, mission_cd Set + 마지막 완료 시간
-    const statsMap = new Map<string, {
-      missionCds: Set<string>
-      lastCompleteDtm: string
-      nick_nm: string | null
-      kakao_id: string | null
-    }>()
+    const statsMap = new Map<
+      string,
+      {
+        missionCds: Set<string>
+        lastCompleteDtm: string
+        nick_nm: string | null
+        kakao_id: string | null
+      }
+    >()
 
     for (const m of missions ?? []) {
       if (excludedSet.has(m.user_id)) continue
-      const su = m.sys_user as unknown as { nick_nm: string | null; kakao_id: string | null }
+      const su = m.sys_user as unknown as {
+        nick_nm: string | null
+        kakao_id: string | null
+      }
       const existing = statsMap.get(m.user_id)
       if (existing) {
         existing.missionCds.add(m.mission_cd.trim())
-        if (m.complete_dtm > existing.lastCompleteDtm) existing.lastCompleteDtm = m.complete_dtm
+        if (m.complete_dtm > existing.lastCompleteDtm)
+          existing.lastCompleteDtm = m.complete_dtm
       } else {
         statsMap.set(m.user_id, {
           missionCds: new Set([m.mission_cd.trim()]),
@@ -57,7 +68,9 @@ export async function GET() {
     // 10/10 완료자만 → 선착순(lastCompleteDtm ASC) → 상위 10명
     const top10 = Array.from(statsMap.entries())
       .filter(([, s]) => s.missionCds.size === 10)
-      .sort(([, a], [, b]) => a.lastCompleteDtm.localeCompare(b.lastCompleteDtm))
+      .sort(([, a], [, b]) =>
+        a.lastCompleteDtm.localeCompare(b.lastCompleteDtm),
+      )
       .slice(0, 10)
       .map(([userId, s]) => ({ userId, ...s }))
 

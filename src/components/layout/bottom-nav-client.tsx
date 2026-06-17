@@ -63,7 +63,9 @@ export function BottomNavClient({ serverIsAdmin }: { serverIsAdmin: boolean }) {
 
   return (
     <nav className="bg-background/95 fixed inset-x-0 bottom-0 z-50 border-t pb-[env(safe-area-inset-bottom)] backdrop-blur-sm">
-      <div className={`mx-auto grid h-16 max-w-5xl ${isAdminUser ? 'grid-cols-6' : 'grid-cols-5'}`}>
+      <div
+        className={`mx-auto grid h-16 max-w-5xl ${isAdminUser ? 'grid-cols-6' : 'grid-cols-5'}`}
+      >
         {tabs.map((tab) => {
           const Icon = tab.icon
           return (

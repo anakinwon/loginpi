@@ -250,7 +250,7 @@ export async function listOpenItems(filter: ItemListFilter) {
 export async function listMyItems(sellerId: string | null) {
   let q = getSupabaseAdmin()
     .from('mps_item')
-    .select('*')
+    .select('*, mps_shop(shop_nm)')
     .eq('del_yn', 'N')
     .order('reg_dtm', { ascending: false })
   if (sellerId) q = q.eq('seller_id', sellerId)
@@ -258,12 +258,16 @@ export async function listMyItems(sellerId: string | null) {
 
   if (error) throw new Error(error.message)
 
-  const rows = (data ?? []) as MpsItem[]
+  const rows = (data ?? []) as (MpsItem & { mps_shop?: { shop_nm: string } | null })[]
   const tradingCounts = await getTradingCounts(rows.map((r) => r.item_id))
-  return rows.map((r) => ({
-    ...r,
-    trading_cnt: tradingCounts.get(r.item_id) ?? 0,
-  }))
+  return rows.map((r) => {
+    const { mps_shop, ...rest } = r
+    return {
+      ...rest,
+      shop_nm: mps_shop?.shop_nm ?? null,
+      trading_cnt: tradingCounts.get(r.item_id) ?? 0,
+    }
+  })
 }
 
 // 상세 조회 — 이미지·매장 포함. DRAFT는 판매자 본인에게만 노출

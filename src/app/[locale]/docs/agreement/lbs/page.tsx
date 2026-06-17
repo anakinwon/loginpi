@@ -39,7 +39,9 @@ export default async function LbsAgreementPage({
             h3: ({ children }) => (
               <h3 className="mt-6 text-base font-semibold">{children}</h3>
             ),
-            p: ({ children }) => <p className="text-foreground/90">{children}</p>,
+            p: ({ children }) => (
+              <p className="text-foreground/90">{children}</p>
+            ),
             ul: ({ children }) => (
               <ul className="list-disc space-y-1 pl-5">{children}</ul>
             ),

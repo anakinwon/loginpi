@@ -17,8 +17,18 @@ const DIST_DIR = path.join(ROOT, 'docs', 'dist')
 
 // 빌드 대상: { 소스 마크다운, 출력 파일명, 표지 제목, 언어 }
 const TARGETS = [
-  { src: 'docs/PRD_12_TOKEN_백서.md', out: 'BEAN_Whitepaper_KO', title: 'BEAN White Paper (한국어)', lang: 'ko' },
-  { src: 'docs/PRD_12_TOKEN_WHITEPAPER_EN.md', out: 'BEAN_Whitepaper_EN', title: 'BEAN White Paper (English)', lang: 'en' },
+  {
+    src: 'docs/PRD_12_TOKEN_백서.md',
+    out: 'BEAN_Whitepaper_KO',
+    title: 'BEAN White Paper (한국어)',
+    lang: 'ko',
+  },
+  {
+    src: 'docs/PRD_12_TOKEN_WHITEPAPER_EN.md',
+    out: 'BEAN_Whitepaper_EN',
+    title: 'BEAN White Paper (English)',
+    lang: 'en',
+  },
 ]
 
 // ---------- 마크다운 → HTML (필요한 부분집합만) ----------
@@ -74,29 +84,62 @@ function mdToHtml(md) {
     if (/^```/.test(line)) {
       i++
       const code = []
-      while (i < N && !/^```\s*$/.test(lines[i])) { code.push(lines[i]); i++ }
+      while (i < N && !/^```\s*$/.test(lines[i])) {
+        code.push(lines[i])
+        i++
+      }
       i++
       html += `<pre><code>${escapeHtml(code.join('\n'))}</code></pre>\n`
       continue
     }
-    if (/^\s*$/.test(line)) { i++; continue }
-    if (/^---+\s*$/.test(line)) { html += '<hr/>\n'; i++; continue }
+    if (/^\s*$/.test(line)) {
+      i++
+      continue
+    }
+    if (/^---+\s*$/.test(line)) {
+      html += '<hr/>\n'
+      i++
+      continue
+    }
     const h = line.match(/^(#{1,6})\s+(.*)$/)
-    if (h) { const l = h[1].length; html += `<h${l}>${inline(h[2])}</h${l}>\n`; i++; continue }
+    if (h) {
+      const l = h[1].length
+      html += `<h${l}>${inline(h[2])}</h${l}>\n`
+      i++
+      continue
+    }
     // 인용
     if (/^>\s?/.test(line)) {
       const buf = []
-      while (i < N && /^>\s?/.test(lines[i])) { buf.push(lines[i].replace(/^>\s?/, '')); i++ }
+      while (i < N && /^>\s?/.test(lines[i])) {
+        buf.push(lines[i].replace(/^>\s?/, ''))
+        i++
+      }
       html += `<blockquote>${buf.map((b) => (b.trim() === '' ? '' : inline(b))).join('<br/>')}</blockquote>\n`
       continue
     }
     // 표
-    if (/^\s*\|/.test(line) && i + 1 < N && /-/.test(lines[i + 1]) && /^\s*\|?[\s:|-]+\|?\s*$/.test(lines[i + 1])) {
+    if (
+      /^\s*\|/.test(line) &&
+      i + 1 < N &&
+      /-/.test(lines[i + 1]) &&
+      /^\s*\|?[\s:|-]+\|?\s*$/.test(lines[i + 1])
+    ) {
       const rows = [splitRow(line)]
       i += 2
-      while (i < N && /^\s*\|/.test(lines[i])) { rows.push(splitRow(lines[i])); i++ }
-      let t = '<table>\n<thead><tr>' + rows[0].map((c) => `<th>${inline(c)}</th>`).join('') + '</tr></thead>\n<tbody>\n'
-      for (let r = 1; r < rows.length; r++) t += '<tr>' + rows[r].map((c) => `<td>${inline(c)}</td>`).join('') + '</tr>\n'
+      while (i < N && /^\s*\|/.test(lines[i])) {
+        rows.push(splitRow(lines[i]))
+        i++
+      }
+      let t =
+        '<table>\n<thead><tr>' +
+        rows[0].map((c) => `<th>${inline(c)}</th>`).join('') +
+        '</tr></thead>\n<tbody>\n'
+      for (let r = 1; r < rows.length; r++)
+        t +=
+          '<tr>' +
+          rows[r].map((c) => `<td>${inline(c)}</td>`).join('') +
+          '</tr>\n'
       t += '</tbody></table>\n'
       html += t
       continue
@@ -104,16 +147,27 @@ function mdToHtml(md) {
     // 목록
     if (/^(\s*)([-*]|\d+\.)\s+/.test(line)) {
       const block = []
-      while (i < N && !/^\s*$/.test(lines[i]) && (/^(\s*)([-*]|\d+\.)\s+/.test(lines[i]) || /^\s{2,}\S/.test(lines[i]))) {
-        block.push(lines[i]); i++
+      while (
+        i < N &&
+        !/^\s*$/.test(lines[i]) &&
+        (/^(\s*)([-*]|\d+\.)\s+/.test(lines[i]) || /^\s{2,}\S/.test(lines[i]))
+      ) {
+        block.push(lines[i])
+        i++
       }
       html += renderList(block)
       continue
     }
     // 문단
-    const para = [line]; i++
-    while (i < N && !/^\s*$/.test(lines[i]) && !/^(#{1,6}\s|>|```|---+\s*$|\s*\||(\s*)([-*]|\d+\.)\s+)/.test(lines[i])) {
-      para.push(lines[i]); i++
+    const para = [line]
+    i++
+    while (
+      i < N &&
+      !/^\s*$/.test(lines[i]) &&
+      !/^(#{1,6}\s|>|```|---+\s*$|\s*\||(\s*)([-*]|\d+\.)\s+)/.test(lines[i])
+    ) {
+      para.push(lines[i])
+      i++
     }
     html += `<p>${inline(para.join(' '))}</p>\n`
   }
@@ -168,7 +222,13 @@ function findBrowser() {
 }
 function printPdf(browser, htmlPath, pdfPath) {
   const url = pathToFileURL(htmlPath).href
-  const baseArgs = ['--disable-gpu', '--no-sandbox', '--print-to-pdf-no-header', `--print-to-pdf=${pdfPath}`, url]
+  const baseArgs = [
+    '--disable-gpu',
+    '--no-sandbox',
+    '--print-to-pdf-no-header',
+    `--print-to-pdf=${pdfPath}`,
+    url,
+  ]
   try {
     execFileSync(browser, ['--headless=new', ...baseArgs], { stdio: 'ignore' })
   } catch (_e) {
@@ -180,13 +240,18 @@ function printPdf(browser, htmlPath, pdfPath) {
 function main() {
   const browser = findBrowser()
   if (!browser) {
-    console.error('✘ Edge/Chrome 실행파일을 찾지 못했습니다. BROWSER_PDF_PATH 환경변수로 지정하세요.')
+    console.error(
+      '✘ Edge/Chrome 실행파일을 찾지 못했습니다. BROWSER_PDF_PATH 환경변수로 지정하세요.',
+    )
     process.exit(1)
   }
   fs.mkdirSync(DIST_DIR, { recursive: true })
   for (const t of TARGETS) {
     const srcAbs = path.join(ROOT, t.src)
-    if (!fs.existsSync(srcAbs)) { console.warn(`- 건너뜀(소스 없음): ${t.src}`); continue }
+    if (!fs.existsSync(srcAbs)) {
+      console.warn(`- 건너뜀(소스 없음): ${t.src}`)
+      continue
+    }
     const md = fs.readFileSync(srcAbs, 'utf8')
     const html = htmlDoc(t.title, mdToHtml(md))
     const htmlPath = path.join(BUILD_DIR, `${t.out}.html`)
@@ -194,7 +259,9 @@ function main() {
     fs.writeFileSync(htmlPath, html, 'utf8')
     printPdf(browser, htmlPath, pdfPath)
     const ok = fs.existsSync(pdfPath)
-    console.log(`${ok ? '✓' : '✘'} ${t.out}.pdf ${ok ? '(' + Math.round(fs.statSync(pdfPath).size / 1024) + ' KB)' : '생성 실패'}`)
+    console.log(
+      `${ok ? '✓' : '✘'} ${t.out}.pdf ${ok ? '(' + Math.round(fs.statSync(pdfPath).size / 1024) + ' KB)' : '생성 실패'}`,
+    )
   }
   console.log(`\n출력 위치: ${path.relative(ROOT, DIST_DIR)}`)
 }

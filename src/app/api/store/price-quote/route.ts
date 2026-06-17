@@ -17,9 +17,15 @@ export async function GET(req: NextRequest) {
   const amt = Number(sp.get('amt'))
 
   if (!/^[A-Z]{3}$/.test(ccy))
-    return NextResponse.json({ error: '통화 코드가 올바르지 않습니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: '통화 코드가 올바르지 않습니다' },
+      { status: 400 },
+    )
   if (!Number.isFinite(amt) || amt <= 0)
-    return NextResponse.json({ error: '금액이 올바르지 않습니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: '금액이 올바르지 않습니다' },
+      { status: 400 },
+    )
 
   // 환율 맵에 없는 통화·시세 조회 실패는 convertFiatToPi가 null 반환 → 503
   const quote = await convertFiatToPi(ccy, amt)

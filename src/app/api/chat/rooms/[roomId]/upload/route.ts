@@ -112,8 +112,7 @@ export async function POST(request: NextRequest, { params }: Params) {
     roomId,
     file_type: getMsgTpCd(file.type),
     file_size: file.size,
-  })
-    .catch(err => console.error(`[M6-file] 미션 기록 실패: ${err.message}`))
+  }).catch((err) => console.error(`[M6-file] 미션 기록 실패: ${err.message}`))
 
   return NextResponse.json({
     url: urlData.publicUrl,

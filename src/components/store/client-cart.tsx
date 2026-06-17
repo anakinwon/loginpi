@@ -79,7 +79,10 @@ export function ClientCart() {
               body: JSON.stringify({ paymentId }),
             })
           },
-          onReadyForServerCompletion: async (paymentId: string, txid: string) => {
+          onReadyForServerCompletion: async (
+            paymentId: string,
+            txid: string,
+          ) => {
             const r = await fetch('/api/payments/complete', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },

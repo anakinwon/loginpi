@@ -9,7 +9,8 @@ const CONSENT_VER = 'v1.0'
 // GET /api/location/consent — 현재 LBS 동의 상태 조회
 export async function GET() {
   const user = await getSessionUser()
-  if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user)
+    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
   return NextResponse.json({
     consent_yn: user.lbs_consent_yn ?? 'N',
@@ -21,7 +22,8 @@ export async function GET() {
 // POST /api/location/consent — LBS 동의 등록 (Rule LBS-01 게이트 활성화)
 export async function POST(request: NextRequest) {
   const user = await getSessionUser()
-  if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user)
+    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
   let body: { consent_ver?: string } = {}
   try {
@@ -65,20 +67,29 @@ export async function POST(request: NextRequest) {
   ])
 
   if (updateResult.error || consentResult.error) {
-    return NextResponse.json({ error: '동의 처리 중 오류가 발생했습니다' }, { status: 500 })
+    return NextResponse.json(
+      { error: '동의 처리 중 오류가 발생했습니다' },
+      { status: 500 },
+    )
   }
 
   // M9: 위치기반서비스 동의 미션 기록 (보증금 예치 bond_deposit와 함께 MULTI_AND, 비블로킹)
-  recordUserAction('lbs_consent', user.id, { consent_ver: consentVer })
-    .catch((err) => console.error(`[M9] 미션 기록 실패: ${err.message}`))
+  recordUserAction('lbs_consent', user.id, { consent_ver: consentVer }).catch(
+    (err) => console.error(`[M9] 미션 기록 실패: ${err.message}`),
+  )
 
-  return NextResponse.json({ ok: true, consent_yn: 'Y', consent_ver: consentVer })
+  return NextResponse.json({
+    ok: true,
+    consent_yn: 'Y',
+    consent_ver: consentVer,
+  })
 }
 
 // DELETE /api/location/consent — LBS 동의 철회 + 위치 이력 즉시 논리삭제 (Rule LBS-03)
 export async function DELETE() {
   const user = await getSessionUser()
-  if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user)
+    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
   const headerStore = await headers()
   const clientIp =
@@ -119,7 +130,10 @@ export async function DELETE() {
   ])
 
   if (updateResult.error || consentResult.error) {
-    return NextResponse.json({ error: '철회 처리 중 오류가 발생했습니다' }, { status: 500 })
+    return NextResponse.json(
+      { error: '철회 처리 중 오류가 발생했습니다' },
+      { status: 500 },
+    )
   }
 
   return NextResponse.json({

@@ -9,7 +9,9 @@ import { createCartOrder } from '@/lib/mps-order'
 const cartSchema = z.object({
   shop_id: z.uuid(),
   items: z
-    .array(z.object({ item_id: z.uuid(), qty: z.number().int().min(1).max(999) }))
+    .array(
+      z.object({ item_id: z.uuid(), qty: z.number().int().min(1).max(999) }),
+    )
     .min(1)
     .max(50),
   order_mthd_cd: z.enum(['DINE_IN', 'PICKUP', 'DELIVERY']).optional(),
@@ -38,7 +40,10 @@ export async function POST(req: NextRequest) {
 
   const orderMthd = parsed.data.order_mthd_cd ?? 'DINE_IN'
   if (orderMthd === 'DELIVERY' && !parsed.data.dlvr_addr?.trim()) {
-    return NextResponse.json({ error: '배달 위치를 입력해주세요' }, { status: 400 })
+    return NextResponse.json(
+      { error: '배달 위치를 입력해주세요' },
+      { status: 400 },
+    )
   }
 
   const slug = String(user.display_name ?? 'user').slice(0, 20)
@@ -58,7 +63,10 @@ export async function POST(req: NextRequest) {
         msg: '재고가 부족하거나 판매 중이 아닌 상품이 있습니다',
         status: 409,
       },
-      SELF_PURCHASE: { msg: '본인 매장 상품은 구매할 수 없습니다', status: 400 },
+      SELF_PURCHASE: {
+        msg: '본인 매장 상품은 구매할 수 없습니다',
+        status: 400,
+      },
       SHOP_NOT_FOUND: { msg: '매장을 찾을 수 없습니다', status: 404 },
       EMPTY_CART: { msg: '카트가 비어 있습니다', status: 400 },
       BAD_QTY: { msg: '수량이 올바르지 않습니다', status: 400 },

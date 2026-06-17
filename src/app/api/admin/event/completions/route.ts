@@ -6,8 +6,10 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 // pi_username, 최종성공일시(last_complete_dtm), kakao_id 반환, 선착순 정렬
 export async function GET() {
   const user = await getSessionUser()
-  if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
-  if (!isAdmin(user)) return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+  if (!user)
+    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!isAdmin(user))
+    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
 
   const db = getSupabaseAdmin()
   const EVENT_ID = 'evt-20260614-001'
@@ -23,8 +25,10 @@ export async function GET() {
   // 전체 미션 완료 기록 (sys_user join)
   const { data: missions, error } = await db
     .from('evt_user_mission')
-    .select(`user_id, mission_cd, complete_dtm,
-             sys_user!inner(pi_username, nick_nm, display_name, kakao_id)`)
+    .select(
+      `user_id, mission_cd, complete_dtm,
+             sys_user!inner(pi_username, nick_nm, display_name, kakao_id)`,
+    )
     .eq('event_id', EVENT_ID)
     .eq('del_yn', 'N')
 
@@ -34,14 +38,17 @@ export async function GET() {
   }
 
   // 사용자별 집계
-  const statsMap = new Map<string, {
-    missionCds: Set<string>
-    lastCompleteDtm: string
-    pi_username: string | null
-    nick_nm: string | null
-    display_name: string | null
-    kakao_id: string | null
-  }>()
+  const statsMap = new Map<
+    string,
+    {
+      missionCds: Set<string>
+      lastCompleteDtm: string
+      pi_username: string | null
+      nick_nm: string | null
+      display_name: string | null
+      kakao_id: string | null
+    }
+  >()
 
   for (const m of missions ?? []) {
     if (excludedIds.has(m.user_id)) continue

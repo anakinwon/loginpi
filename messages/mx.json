@@ -1227,8 +1227,8 @@
         "name": "Prueba de envío de Bean (PiRC1)"
       },
       "M5": {
-        "desc": "Después de solicitar Pi Subscription Service, crear Pi Bet en el Cafe + distribuir a los participantes",
-        "name": "Solicitar Pi Subscription Service (PiRC2) y luego crear y distribuir Pi Bet"
+        "desc": "Tras suscribirte a PiRC2, crea un Cafe exclusivo para eventos con el plan Business",
+        "name": "Solicitar suscripción Pi (PiRC2) y crear un Cafe de evento"
       },
       "M6": {
         "desc": "Usar stickers / Enviar archivos / Usar canal de voz (al menos uno)",
@@ -1387,7 +1387,11 @@
     "cafe": "Cafe",
     "event": "Event",
     "home": "Home",
+    "map": "Map",
+    "mapEmpty": "No registered stores",
+    "mapSubtitle": "Check the location of Pi Shop affiliated stores",
     "my": "My Info",
+    "navigateGo": "Go",
     "shop": "Shop"
   },
   "pay": {
@@ -1560,6 +1564,23 @@
     "buying": "Processing payment…",
     "buySuccess": "Escrow payment complete! Proceed with the transaction with the seller",
     "cancelReasonPrompt": "Please enter cancellation reason",
+    "cart": {
+      "add": "🛒 Add to Cart",
+      "added": "{n} items added to cart",
+      "addedTitle": "Added to Cart 🛒",
+      "checkingOut": "Checking out…",
+      "checkout": "Checkout ({count} items)",
+      "checkoutFail": "Order processing failed",
+      "checkoutSuccess": "Order received",
+      "clear": "Clear Cart",
+      "conflictConfirm": "Your cart contains items from another store. Clear the cart and add new items?",
+      "continueShopping": "Continue Shopping",
+      "empty": "Cart is empty",
+      "goToCart": "Go to Cart",
+      "qty": "Quantity",
+      "remove": "Remove",
+      "title": "Cart"
+    },
     "cnd": {
       "HANDMADE": "Handmade",
       "NEW": "New",
@@ -1572,6 +1593,7 @@
     "editSuccess": "Item updated",
     "escrowNotice": "Paid Pi is securely held in escrow and will be transferred to the seller after both parties confirm the transaction",
     "escrowReleased": "Transaction closed — Escrow settlement processing.",
+    "fiatRefAt": "Exchange rate as of {date}",
     "form": {
       "category": "Category",
       "categoryAll": "Todas",
@@ -1579,13 +1601,23 @@
       "cnd": "Item Condition",
       "desc": "Item Description",
       "name": "Item Name",
+      "noShopYet": "No registered stores yet. Please register a store first.",
       "price": "Price",
+      "priceCcy": "Currency",
+      "priceCcyPi": "π Pi Direct Input",
+      "priceConverted": "≈ {pi} π (based on exchange rate at time of registration)",
+      "priceConvertHint": "If you enter in local currency, the Pi price will be determined by the exchange rate at the time of registration.",
+      "priceConverting": "Converting exchange rate…",
+      "priceQuoteFail": "Failed to fetch exchange rate. Please enter in Pi directly.",
+      "priceQuoteRequired": "Please save after exchange rate conversion is complete",
       "publish": "Publish Immediately",
       "qty": "Quantity for Sale",
       "saveDraft": "Save Draft",
       "saveEdit": "Save Changes",
       "shop": "Tienda asociada",
       "shopNone": "Ninguna tienda",
+      "shopRequired": "Selecting a store is required for offline store items",
+      "shopSelect": "Select a store",
       "thumbUrl": "Thumbnail Image URL",
       "unlimited": "Unlimited",
       "unlimitedHint": "Register items like drinks or pizza, where inventory tracking is meaningless, as unlimited."
@@ -1632,7 +1664,11 @@
     "myItemsTitle": "Manage My Items",
     "myOwnItem": "This is my registered item",
     "navHistory": "Historial de transacciones",
+    "navigateGoogle": "Navigate with Google Maps",
+    "navigateKakao": "Kakao Map",
+    "navigateNaver": "Naver Map",
     "navMyItems": "My Items",
+    "navMyShops": "My Stores",
     "navOrders": "Order History",
     "navSales": "Sales Management",
     "nearbyActive": "Items within {radius}km of current location (closest first)",
@@ -1640,7 +1676,12 @@
     "nearbyNav": "📍 Cerca",
     "nearbySort": "📍 Nearby",
     "newItem": "+ Register Item",
+    "newItemP2P": "+ P2P Used Item",
+    "newItemShop": "+ Offline Store Item",
     "newItemTitle": "Register Item",
+    "newP2PTitle": "Register P2P Used Item",
+    "newShopHint": "Select a store and register the price in local currency. Payment will be made in Pi.",
+    "newShopTitle": "Register Offline Store Item",
     "noItems": "No items registered",
     "noNearbyItems": "No items within {radius}km",
     "noOrders": "No order history",
@@ -1701,6 +1742,9 @@
       "type_OFFLINE": "Offline",
       "type_ONLINE": "Online"
     },
+    "shopfrontAddItem": "+ Add Item",
+    "shopfrontEditBadge": "✏️ Edit",
+    "shopfrontOwnerHint": "This is my store — tap a product to edit it immediately",
     "shopType": {
       "BOTH": "Online & Offline",
       "OFFLINE": "Offline Store",

@@ -14,16 +14,16 @@ export async function Header() {
   const locale = await getLocale()
 
   return (
-    <header className='bg-background/80 sticky top-0 z-50 border-b backdrop-blur-sm'>
-      <div className='mx-auto flex h-14 max-w-5xl items-center justify-between px-4'>
-        <Link href='/' className='text-foreground font-semibold tracking-tight'>
+    <header className="bg-background/80 sticky top-0 z-50 border-b backdrop-blur-sm">
+      <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
+        <Link href="/" className="text-foreground font-semibold tracking-tight">
           <BrowserName />
         </Link>
-        <nav className='flex items-center gap-3'>
+        <nav className="flex items-center gap-3">
           {/* 계정명·로그아웃 버튼은 각 로그인 버튼 컴포넌트가 세션 상태에 따라 렌더 */}
           <GoogleLoginButton />
           <PiLoginButton />
-          <span className='hidden md:inline-flex'>
+          <span className="hidden md:inline-flex">
             <ThemeToggle />
           </span>
           <LanguageSwitcher locale={locale} />

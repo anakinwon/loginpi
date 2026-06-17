@@ -38,7 +38,9 @@ function FlagIcon({
   className?: string
 }) {
   return (
-    <span className={`fi fi-${code.toLowerCase()} rounded-[2px] ${className}`} />
+    <span
+      className={`fi fi-${code.toLowerCase()} rounded-[2px] ${className}`}
+    />
   )
 }
 
@@ -92,7 +94,9 @@ export function ChatLocaleSelect({
       ) ?? countries.find((c) => c.locale_cd === value))
     : null
 
-  const autoLabel = isSubscribed ? '🌐 구독특혜 자동번역' : '🔒 구독특혜 자동번역'
+  const autoLabel = isSubscribed
+    ? '🌐 구독특혜 자동번역'
+    : '🔒 구독특혜 자동번역'
 
   return (
     <div className="relative shrink-0" ref={containerRef}>

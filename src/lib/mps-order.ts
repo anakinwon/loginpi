@@ -83,7 +83,10 @@ export async function createOrder(
     .select('ccy_cd, ccy_amt')
     .eq('item_id', itemId)
     .maybeSingle()
-  const ccy = itemCcy as { ccy_cd: string | null; ccy_amt: number | null } | null
+  const ccy = itemCcy as {
+    ccy_cd: string | null
+    ccy_amt: number | null
+  } | null
 
   // 주문방법·배달주소(RPC는 재고 원자성만 담당) + 통화 스냅샷을 단일 사후 UPDATE로 반영
   const patch: Record<string, unknown> = { modr_id: regrId }

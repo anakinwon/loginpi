@@ -23,6 +23,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ ok: true, ...result })
   } catch (err) {
     console.error('[cron/event-reeval] 재평가 실패:', err)
-    return NextResponse.json({ ok: false, error: 'reeval_failed' }, { status: 500 })
+    return NextResponse.json(
+      { ok: false, error: 'reeval_failed' },
+      { status: 500 },
+    )
   }
 }

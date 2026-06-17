@@ -1227,8 +1227,8 @@
         "name": "Bean העברה Test (PiRC1)"
       },
       "M5": {
-        "desc": "לאחר הרשמה ל-Pi Subscription Service, יצירה של Pi Bet ב-Cafe + הפצה למשתתפים",
-        "name": "לאחר הרשמה ל-Pi Subscription Service (PiRC2), יצירה והפצה של Pi Bet"
+        "desc": "לאחר הרשמה ל-PiRC2, צור קפה ייעודי לאירועים עם תוכנית Business",
+        "name": "הירשם למנוי Pi (PiRC2) ואז צור קפה אירועים"
       },
       "M6": {
         "desc": "אחד או יותר מהבאים: שימוש ב-Sticker / העברת File / שימוש ב-Voice Channel",
@@ -1387,7 +1387,11 @@
     "cafe": "Cafe",
     "event": "Event",
     "home": "Home",
+    "map": "מפה",
+    "mapEmpty": "אין חנויות רשומות",
+    "mapSubtitle": "בדוק את מיקומי החנויות השותפות של Pi Shop",
     "my": "המידע שלי",
+    "navigateGo": "צא לדרך",
     "shop": "Shop"
   },
   "pay": {
@@ -1560,6 +1564,23 @@
     "buying": "מעבד תשלום…",
     "buySuccess": "תשלום בנאמנות הושלם! המשך בעסקה עם המוכר",
     "cancelReasonPrompt": "אנא הזן סיבת ביטול",
+    "cart": {
+      "add": "🛒 הוסף לעגלה",
+      "added": "{n} פריטים נוספו לעגלה",
+      "addedTitle": "נוסף לעגלה 🛒",
+      "checkingOut": "מעבד תשלום…",
+      "checkout": "בצע הזמנה ({count} פריטים)",
+      "checkoutFail": "עיבוד ההזמנה נכשל",
+      "checkoutSuccess": "ההזמנה התקבלה",
+      "clear": "נקה עגלה",
+      "conflictConfirm": "העגלה מכילה פריטים מחנות אחרת. לרוקן ולהוסיף חדשים?",
+      "continueShopping": "המשך קניות",
+      "empty": "העגלה ריקה",
+      "goToCart": "עבור לעגלה",
+      "qty": "כמות",
+      "remove": "הסר",
+      "title": "עגלת קניות"
+    },
     "cnd": {
       "HANDMADE": "עבודת יד",
       "NEW": "חדש",
@@ -1572,6 +1593,7 @@
     "editSuccess": "הפריט עודכן בהצלחה",
     "escrowNotice": "ה-Pi ששולם נשמר בבטחה בנאמנות, ויועבר למוכר לאחר אישור העסקה על ידי שני הצדדים",
     "escrowReleased": "העסקה הסתיימה — עיבוד סילוק נאמנות.",
+    "fiatRefAt": "לפי שער חליפין ב-{date}",
     "form": {
       "category": "Category",
       "categoryAll": "הכל",
@@ -1579,13 +1601,23 @@
       "cnd": "מצב הפריט",
       "desc": "תיאור הפריט",
       "name": "שם הפריט",
+      "noShopYet": "אין חנויות רשומות. אנא רשום חנות תחילה.",
       "price": "מחיר",
+      "priceCcy": "מטבע",
+      "priceCcyPi": "π Pi הזנה ישירה",
+      "priceConverted": "≈ {pi} π (לפי שער חליפין בעת הרישום)",
+      "priceConvertHint": "אם תזין במטבע המקומי, מחיר ה-Pi ייקבע לפי שער החליפין בעת הרישום",
+      "priceConverting": "ממיר שער חליפין…",
+      "priceQuoteFail": "לא ניתן היה לקבל את שער החליפין. אנא הזן ישירות ב-Pi.",
+      "priceQuoteRequired": "אנא שמור לאחר השלמת המרת שער החליפין",
       "publish": "פרסם מיד",
       "qty": "כמות למכירה",
       "saveDraft": "שמור כטיוטה",
       "saveEdit": "שמור שינויים",
       "shop": "חנות",
       "shopNone": "אין חנות",
+      "shopRequired": "בחירת חנות היא חובה עבור פריטי חנות Offline",
+      "shopSelect": "בחר חנות",
       "thumbUrl": "URL תמונת תצוגה",
       "unlimited": "ללא הגבלה",
       "unlimitedHint": "רשום פריטים כמו משקאות או פיצה, שמעקב מלאי עבורם חסר משמעות, כ'ללא הגבלה'."
@@ -1632,7 +1664,11 @@
     "myItemsTitle": "ניהול הפריטים שלי",
     "myOwnItem": "זהו פריט שרשמתי",
     "navHistory": "היסטוריית עסקאות",
+    "navigateGoogle": "צא לדרך עם Google Maps",
+    "navigateKakao": "מפת Kakao",
+    "navigateNaver": "מפת Naver",
     "navMyItems": "הפריטים שלי",
+    "navMyShops": "החנויות שלי",
     "navOrders": "היסטוריית הזמנות",
     "navSales": "ניהול מכירות",
     "nearbyActive": "פריטים בטווח {radius} ק\"מ מהמיקום הנוכחי (לפי מרחק קצר ביותר)",
@@ -1640,7 +1676,12 @@
     "nearbyNav": "📍 קרוב",
     "nearbySort": "📍 לפי קרבה",
     "newItem": "+ רישום פריט",
+    "newItemP2P": "+ P2P יד שנייה",
+    "newItemShop": "+ חנות Offline",
     "newItemTitle": "רישום פריט חדש",
+    "newP2PTitle": "רישום פריט P2P יד שנייה",
+    "newShopHint": "בחר חנות ורשום את המחיר במטבע המקומי. התשלום יתבצע ב-Pi.",
+    "newShopTitle": "רישום פריט לחנות Offline",
     "noItems": "אין פריטים רשומים",
     "noNearbyItems": "אין פריטים בטווח {radius} ק\"מ בסביבה",
     "noOrders": "אין היסטוריית הזמנות",
@@ -1701,6 +1742,9 @@
       "type_OFFLINE": "Offline",
       "type_ONLINE": "Online"
     },
+    "shopfrontAddItem": "+ הוסף פריט",
+    "shopfrontEditBadge": "✏️ ערוך",
+    "shopfrontOwnerHint": "זו החנות שלי — הקש על מוצר כדי לערוך אותו מיד",
     "shopType": {
       "BOTH": "Online ו-Offline",
       "OFFLINE": "חנות Offline",

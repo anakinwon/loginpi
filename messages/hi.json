@@ -1227,8 +1227,8 @@
         "name": "Bean Transfer Test (PiRC1)"
       },
       "M5": {
-        "desc": "Pi Subscription Service के लिए आवेदन करने के बाद, Cafe में Pi Bet बनाएँ + प्रतिभागियों को वितरित करें",
-        "name": "Pi Subscription Service (PiRC2) के लिए आवेदन करने के बाद, Pi Bet बनाएँ और वितरित करें"
+        "desc": "PiRC2 की सदस्यता के बाद, Business प्लान के साथ इवेंट-समर्पित कैफे बनाएँ",
+        "name": "Pi सदस्यता (PiRC2) के लिए आवेदन करें, फिर इवेंट कैफे बनाएँ"
       },
       "M6": {
         "desc": "Sticker का उपयोग करें / File Transfer करें / Voice Channel का उपयोग करें (इनमें से 1 या अधिक)",
@@ -1387,7 +1387,11 @@
     "cafe": "Cafe",
     "event": "Event",
     "home": "Home",
+    "map": "Map",
+    "mapEmpty": "कोई पंजीकृत दुकान नहीं है",
+    "mapSubtitle": "Pi Shop व्यापारियों के स्थान देखें",
     "my": "मेरी जानकारी",
+    "navigateGo": "जाएँ",
     "shop": "Shop"
   },
   "pay": {
@@ -1560,6 +1564,23 @@
     "buying": "भुगतान प्रगति पर है…",
     "buySuccess": "Escrow भुगतान पूरा हुआ! विक्रेता के साथ लेन-देन जारी रखें",
     "cancelReasonPrompt": "कृपया रद्द करने का कारण दर्ज करें",
+    "cart": {
+      "add": "🛒 Cart में जोड़ें",
+      "added": "{n} आइटम Cart में जोड़े गए",
+      "addedTitle": "Cart में जोड़ा गया 🛒",
+      "checkingOut": "Checkout किया जा रहा है…",
+      "checkout": "Checkout करें ({count} आइटम)",
+      "checkoutFail": "Order संसाधित करने में विफल रहा",
+      "checkoutSuccess": "Order प्राप्त हो गया है",
+      "clear": "Cart खाली करें",
+      "conflictConfirm": "आपके Cart में किसी अन्य दुकान के उत्पाद हैं। क्या आप इसे खाली करके नए उत्पाद जोड़ना चाहेंगे?",
+      "continueShopping": "Shopping जारी रखें",
+      "empty": "Cart खाली है",
+      "goToCart": "Cart पर जाएँ",
+      "qty": "मात्रा",
+      "remove": "हटाएँ",
+      "title": "Shopping Cart"
+    },
     "cnd": {
       "HANDMADE": "हस्तनिर्मित",
       "NEW": "नया Item",
@@ -1572,6 +1593,7 @@
     "editSuccess": "Item संपादित किया गया है",
     "escrowNotice": "भुगतान किया गया Pi Escrow में सुरक्षित रूप से रखा जाएगा, और दोनों पक्षों द्वारा लेन-देन की पुष्टि के बाद विक्रेता को हस्तांतरित किया जाएगा",
     "escrowReleased": "लेनदेन समाप्त — एस्क्रो निपटान प्रक्रिया",
+    "fiatRefAt": "{date} विनिमय दर के अनुसार",
     "form": {
       "category": "Category",
       "categoryAll": "सभी",
@@ -1579,13 +1601,23 @@
       "cnd": "उत्पाद की स्थिति",
       "desc": "उत्पाद विवरण",
       "name": "उत्पाद का नाम",
+      "noShopYet": "कोई पंजीकृत दुकान नहीं है। कृपया पहले एक दुकान पंजीकृत करें।",
       "price": "कीमत",
+      "priceCcy": "मुद्रा",
+      "priceCcyPi": "π Pi सीधा इनपुट",
+      "priceConverted": "≈ {pi} π (पंजीकरण के समय की विनिमय दर के अनुसार)",
+      "priceConvertHint": "यदि आप स्थानीय मुद्रा में दर्ज करते हैं, तो Pi की कीमत पंजीकरण के समय की विनिमय दर के अनुसार निर्धारित की जाएगी।",
+      "priceConverting": "विनिमय दर परिवर्तित हो रही है…",
+      "priceQuoteFail": "विनिमय दर प्राप्त करने में विफल रहा। कृपया सीधे Pi में दर्ज करें।",
+      "priceQuoteRequired": "विनिमय दर रूपांतरण पूरा करने के बाद सहेजें।",
       "publish": "तुरंत प्रकाशित करें",
       "qty": "बिक्री मात्रा",
       "saveDraft": "ड्राफ्ट सहेजें",
       "saveEdit": "संशोधन सहेजें",
       "shop": "दुकान",
       "shopNone": "कोई दुकान नहीं",
+      "shopRequired": "Offline Shop उत्पादों के लिए दुकान का चयन अनिवार्य है",
+      "shopSelect": "एक दुकान चुनें",
       "thumbUrl": "प्रतिनिधि छवि URL",
       "unlimited": "असीमित",
       "unlimitedHint": "पेय, पिज्जा आदि जैसे उत्पादों के लिए इन्वेंट्री ट्रैकिंग अर्थहीन है, उन्हें असीमित के रूप में पंजीकृत करें।"
@@ -1632,7 +1664,11 @@
     "myItemsTitle": "मेरे Items का प्रबंधन",
     "myOwnItem": "यह मेरा अपना Item है",
     "navHistory": "लेनदेन इतिहास",
+    "navigateGoogle": "Google Map से जाएँ",
+    "navigateKakao": "Kakao Map",
+    "navigateNaver": "Naver Map",
     "navMyItems": "मेरे Items",
+    "navMyShops": "मेरी दुकानें",
     "navOrders": "खरीद इतिहास",
     "navSales": "Sales प्रबंधन",
     "nearbyActive": "वर्तमान स्थान के आधार पर {radius} किमी के भीतर उत्पाद (दूरी के अनुसार सबसे करीब)",
@@ -1640,7 +1676,12 @@
     "nearbyNav": "📍 आस-पास",
     "nearbySort": "📍 आस-पास के क्रम में",
     "newItem": "+ उत्पाद जोड़ें",
+    "newItemP2P": "+ P2P",
+    "newItemShop": "+ Offline Shop",
     "newItemTitle": "Item पंजीकृत करें",
+    "newP2PTitle": "P2P उत्पाद पंजीकरण",
+    "newShopHint": "एक दुकान चुनें और स्थानीय मुद्रा में कीमत दर्ज करें। भुगतान Pi में किया जाएगा।",
+    "newShopTitle": "Offline Shop उत्पाद पंजीकरण",
     "noItems": "कोई Items नहीं हैं",
     "noNearbyItems": "आस-पास {radius} किमी के भीतर कोई उत्पाद नहीं है",
     "noOrders": "कोई Orders नहीं हैं",
@@ -1701,6 +1742,9 @@
       "type_OFFLINE": "Offline",
       "type_ONLINE": "Online"
     },
+    "shopfrontAddItem": "+ Menu जोड़ें",
+    "shopfrontEditBadge": "✏️ संपादित करें",
+    "shopfrontOwnerHint": "यह मेरी दुकान है — उत्पाद पर टैप करके आप उसे तुरंत संपादित कर सकते हैं",
     "shopType": {
       "BOTH": "Online और Offline",
       "OFFLINE": "Offline Store",

@@ -1227,8 +1227,8 @@
         "name": "Kiểm tra chuyển Bean (PiRC1)"
       },
       "M5": {
-        "desc": "Sau khi đăng ký Dịch vụ đăng ký Pi, tạo Pi Bet trong Cafe + phân phối cho người tham gia",
-        "name": "Đăng ký Dịch vụ đăng ký Pi (PiRC2) sau đó tạo và phân phối Pi Bet"
+        "desc": "Sau khi đăng ký PiRC2, tạo Cafe dành riêng cho sự kiện với gói Business",
+        "name": "Đăng ký gói Pi (PiRC2) rồi tạo Cafe Sự kiện"
       },
       "M6": {
         "desc": "Sử dụng Sticker / Chuyển File / Sử dụng kênh thoại (1 trong số các cách sau)",
@@ -1387,7 +1387,11 @@
     "cafe": "Cafe",
     "event": "Event",
     "home": "Home",
+    "map": "Map",
+    "mapEmpty": "Không có cửa hàng nào được đăng ký",
+    "mapSubtitle": "Xem vị trí các cửa hàng Pi Shop",
     "my": "Thông tin của tôi",
+    "navigateGo": "Đi",
     "shop": "Shop"
   },
   "pay": {
@@ -1560,6 +1564,23 @@
     "buying": "Đang xử lý thanh toán…",
     "buySuccess": "Thanh toán Escrow hoàn tất! Vui lòng tiến hành giao dịch với người bán",
     "cancelReasonPrompt": "Vui lòng nhập lý do hủy",
+    "cart": {
+      "add": "🛒 Thêm vào Cart",
+      "added": "Đã thêm {n} sản phẩm vào Cart",
+      "addedTitle": "Đã thêm vào Cart 🛒",
+      "checkingOut": "Đang xử lý thanh toán…",
+      "checkout": "Đặt hàng ({count} sản phẩm)",
+      "checkoutFail": "Xử lý đơn hàng thất bại",
+      "checkoutSuccess": "Đơn hàng đã được nhận",
+      "clear": "Xóa Cart",
+      "conflictConfirm": "Cart đang chứa sản phẩm từ cửa hàng khác. Bạn có muốn xóa và thêm sản phẩm mới không?",
+      "continueShopping": "Tiếp tục Shopping",
+      "empty": "Cart trống",
+      "goToCart": "Đi đến Cart",
+      "qty": "Số lượng",
+      "remove": "Xóa",
+      "title": "Giỏ hàng"
+    },
     "cnd": {
       "HANDMADE": "Thủ công",
       "NEW": "Mới",
@@ -1572,6 +1593,7 @@
     "editSuccess": "Sản phẩm đã được chỉnh sửa",
     "escrowNotice": "Pi đã thanh toán được giữ an toàn trong Escrow và sẽ được chuyển cho người bán sau khi cả hai bên xác nhận giao dịch",
     "escrowReleased": "Kết thúc giao dịch — Xử lý thanh toán Escrow",
+    "fiatRefAt": "Dựa trên tỷ giá hối đoái vào {date}",
     "form": {
       "category": "Category",
       "categoryAll": "Tất cả",
@@ -1579,13 +1601,23 @@
       "cnd": "Tình trạng sản phẩm",
       "desc": "Mô tả sản phẩm",
       "name": "Tên sản phẩm",
+      "noShopYet": "Không có cửa hàng nào được đăng ký. Vui lòng đăng ký cửa hàng trước.",
       "price": "Giá",
+      "priceCcy": "Tiền tệ",
+      "priceCcyPi": "π Pi nhập trực tiếp",
+      "priceConverted": "≈ {pi} π (dựa trên tỷ giá hối đoái tại thời điểm đăng ký)",
+      "priceConvertHint": "Nếu bạn nhập bằng nội tệ, giá Pi sẽ được xác định theo tỷ giá hối đoái tại thời điểm đăng ký.",
+      "priceConverting": "Đang chuyển đổi tỷ giá hối đoái…",
+      "priceQuoteFail": "Không thể lấy tỷ giá hối đoái. Vui lòng nhập trực tiếp bằng Pi.",
+      "priceQuoteRequired": "Vui lòng lưu sau khi hoàn tất chuyển đổi tỷ giá hối đoái.",
       "publish": "Đăng ngay",
       "qty": "Số lượng bán",
       "saveDraft": "Lưu nháp",
       "saveEdit": "Lưu chỉnh sửa",
       "shop": "Cửa hàng trực thuộc",
       "shopNone": "Không có cửa hàng",
+      "shopRequired": "Đối với sản phẩm cửa hàng Offline, việc chọn cửa hàng là bắt buộc",
+      "shopSelect": "Chọn một cửa hàng",
       "thumbUrl": "URL hình ảnh đại diện",
       "unlimited": "Không giới hạn",
       "unlimitedHint": "Đăng ký không giới hạn cho các sản phẩm không cần theo dõi tồn kho như đồ uống, pizza."
@@ -1632,7 +1664,11 @@
     "myItemsTitle": "Quản lý sản phẩm của tôi",
     "myOwnItem": "Đây là sản phẩm của tôi",
     "navHistory": "Lịch sử giao dịch",
+    "navigateGoogle": "Đi bằng Google Map",
+    "navigateKakao": "Kakao Map",
+    "navigateNaver": "Bản đồ Naver",
     "navMyItems": "Sản phẩm của tôi",
+    "navMyShops": "Cửa hàng của tôi",
     "navOrders": "Đơn hàng của tôi",
     "navSales": "Quản lý bán hàng",
     "nearbyActive": "Sản phẩm trong bán kính {radius}km từ vị trí hiện tại (theo khoảng cách gần nhất)",
@@ -1640,7 +1676,12 @@
     "nearbyNav": "📍 Gần đây",
     "nearbySort": "📍 Theo khoảng cách gần nhất",
     "newItem": "+ Đăng sản phẩm",
+    "newItemP2P": "+ Giao dịch trực tiếp đồ cũ",
+    "newItemShop": "+ Cửa hàng Offline",
     "newItemTitle": "Đăng ký sản phẩm",
+    "newP2PTitle": "Đăng sản phẩm giao dịch trực tiếp đồ cũ",
+    "newShopHint": "Chọn cửa hàng và đăng giá bằng nội tệ. Thanh toán sẽ được thực hiện bằng Pi.",
+    "newShopTitle": "Đăng sản phẩm cửa hàng Offline",
     "noItems": "Không có sản phẩm nào được đăng ký",
     "noNearbyItems": "Không có sản phẩm trong bán kính {radius}km",
     "noOrders": "Không có đơn hàng nào",
@@ -1701,6 +1742,9 @@
       "type_OFFLINE": "Offline",
       "type_ONLINE": "Online"
     },
+    "shopfrontAddItem": "+ Thêm sản phẩm",
+    "shopfrontEditBadge": "✏️ Chỉnh sửa",
+    "shopfrontOwnerHint": "Đây là cửa hàng của tôi — bạn có thể chỉnh sửa sản phẩm ngay lập tức bằng cách nhấn vào chúng",
     "shopType": {
       "BOTH": "Online & Offline",
       "OFFLINE": "Cửa hàng Offline",

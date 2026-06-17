@@ -61,7 +61,12 @@ export function LbsSettings() {
   }, [status, loadHistory])
 
   async function handleRevoke() {
-    if (!confirm('위치 서비스 동의를 철회하면 수집된 위치 정보가 즉시 삭제됩니다. 계속하시겠습니까?')) return
+    if (
+      !confirm(
+        '위치 서비스 동의를 철회하면 수집된 위치 정보가 즉시 삭제됩니다. 계속하시겠습니까?',
+      )
+    )
+      return
     setRevoking(true)
     try {
       const res = await piFetch('/api/location/consent', { method: 'DELETE' })
@@ -75,17 +80,17 @@ export function LbsSettings() {
   }
 
   if (!status) {
-    return <p className="text-muted-foreground text-sm py-4">불러오는 중...</p>
+    return <p className="text-muted-foreground py-4 text-sm">불러오는 중...</p>
   }
 
   return (
     <div className="space-y-6">
       {/* 동의 상태 카드 */}
-      <div className="rounded-lg border p-4 space-y-3">
+      <div className="space-y-3 rounded-lg border p-4">
         <div className="flex items-center justify-between">
           <div>
-            <p className="font-medium text-sm">위치 기반 서비스</p>
-            <p className="text-muted-foreground text-xs mt-0.5">
+            <p className="text-sm font-medium">위치 기반 서비스</p>
+            <p className="text-muted-foreground mt-0.5 text-xs">
               주변 상품·매장·채팅방 탐색 기능
             </p>
           </div>
@@ -133,23 +138,24 @@ export function LbsSettings() {
         <div className="space-y-2">
           <p className="text-sm font-medium">내 위치 수집 이력</p>
           <p className="text-muted-foreground text-xs">
-            위치정보법 제16조에 따른 정보주체 열람권. 행정구역 단위만 표시됩니다.
+            위치정보법 제16조에 따른 정보주체 열람권. 행정구역 단위만
+            표시됩니다.
           </p>
           {histLoading ? (
-            <p className="text-muted-foreground text-xs py-2">불러오는 중...</p>
+            <p className="text-muted-foreground py-2 text-xs">불러오는 중...</p>
           ) : history.length === 0 ? (
-            <p className="text-muted-foreground text-xs py-2">
+            <p className="text-muted-foreground py-2 text-xs">
               수집된 위치 이력이 없습니다.
             </p>
           ) : (
-            <ul className="space-y-1.5 max-h-48 overflow-y-auto">
+            <ul className="max-h-48 space-y-1.5 overflow-y-auto">
               {history.map((h) => (
                 <li
                   key={h.loc_hist_id}
-                  className="bg-muted/50 rounded px-3 py-2 text-xs flex items-center justify-between"
+                  className="bg-muted/50 flex items-center justify-between rounded px-3 py-2 text-xs"
                 >
                   <span className="text-muted-foreground">
-                    <span className="font-medium text-foreground">
+                    <span className="text-foreground font-medium">
                       {LOC_TP_LABEL[h.loc_tp_cd] ?? h.loc_tp_cd}
                     </span>{' '}
                     ·{' '}
@@ -157,7 +163,7 @@ export function LbsSettings() {
                       .filter(Boolean)
                       .join(' ') || '위치 정보 없음'}
                   </span>
-                  <span className="text-muted-foreground shrink-0 ml-2">
+                  <span className="text-muted-foreground ml-2 shrink-0">
                     {new Date(h.reg_dtm).toLocaleDateString('ko-KR')}
                   </span>
                 </li>

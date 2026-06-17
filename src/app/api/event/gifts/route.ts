@@ -27,10 +27,7 @@ export async function PATCH(request: NextRequest) {
   }
 
   if (!user_id) {
-    return NextResponse.json(
-      { error: 'user_id가 필요합니다' },
-      { status: 400 },
-    )
+    return NextResponse.json({ error: 'user_id가 필요합니다' }, { status: 400 })
   }
 
   if (!['Y', 'N'].includes(sent_yn ?? '')) {

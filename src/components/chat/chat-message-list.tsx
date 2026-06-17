@@ -226,10 +226,7 @@ function MessageBubble({
   onUpgradeForTip?: () => void
 }) {
   // 시스템·Bean(팁) 알림은 중앙 정렬 알림 스타일
-  if (
-    msg.msg_tp_cd === 'SYSTEM' ||
-    msg.msg_tp_cd === 'TIP_NOTI'
-  ) {
+  if (msg.msg_tp_cd === 'SYSTEM' || msg.msg_tp_cd === 'TIP_NOTI') {
     return (
       <div className="text-muted-foreground py-1 text-center text-xs">
         {/* Bean 알림은 🫘 이모지를 럭셔리 콩 이미지로 치환해 표시 (DB 텍스트는 이모지 유지) */}

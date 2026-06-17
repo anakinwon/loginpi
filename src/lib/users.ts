@@ -186,7 +186,9 @@ export async function upsertGoogleUser(googleUser: {
         google_name: googleUser.name,
         google_image: googleUser.image,
         display_name:
-          googleUser.name ?? googleUser.email ?? `google_${googleUser.id.slice(0, 8)}`,
+          googleUser.name ??
+          googleUser.email ??
+          `google_${googleUser.id.slice(0, 8)}`,
         last_login_dtm: new Date().toISOString(),
       },
       { onConflict: 'google_id' },

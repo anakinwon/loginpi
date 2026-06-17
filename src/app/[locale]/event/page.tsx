@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function EventPage() {
   return (
-    <main className="container mx-auto px-4 py-8">
+    <main className="mx-auto max-w-5xl px-4 py-8">
       <ClientEventGate />
     </main>
   )

@@ -58,8 +58,9 @@ export async function POST(request: NextRequest, { params }: Params) {
 
   // M3.2: 자동번역 기능 사용 미션 기록 (비블로킹)
   // 검증 통과 직후 기록 — same_lang early return 경로에서도 누락되지 않도록 분기 이전에 둔다
-  recordUserAction('cafe_translate_use', user.id, { roomId, localeCd })
-    .catch(err => console.error(`[M3.2] 미션 기록 실패: ${err.message}`))
+  recordUserAction('cafe_translate_use', user.id, { roomId, localeCd }).catch(
+    (err) => console.error(`[M3.2] 미션 기록 실패: ${err.message}`),
+  )
 
   // 원본 언어가 이미 감지되어 있고 대상 언어와 같으면 번역 불필요
   if (msg.src_lang_cd && baseLang(msg.src_lang_cd) === baseLang(localeCd)) {

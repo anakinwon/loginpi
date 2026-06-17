@@ -93,7 +93,10 @@ export interface AddCartInput {
 
 // 카트 담기. 다른 매장 상품을 비어있지 않은 카트에 담으면 { conflict:true } 반환 →
 // 호출자가 "기존 카트 비우고 담기" 확인 후 replaceShopAndAdd() 호출.
-export function addToCart(input: AddCartInput): { ok: boolean; conflict: boolean } {
+export function addToCart(input: AddCartInput): {
+  ok: boolean
+  conflict: boolean
+} {
   ensureHydrated()
   if (state.shopId && state.shopId !== input.shopId && state.lines.length > 0) {
     return { ok: false, conflict: true }

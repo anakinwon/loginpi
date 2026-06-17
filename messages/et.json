@@ -1227,8 +1227,8 @@
         "name": "Bean Transfer Test (PiRC1)"
       },
       "M5": {
-        "desc": "Pärast Pi Subscription Service taotlemist loo Pi Bet Cafe's + jaga osalejatele",
-        "name": "Pärast Pi Subscription Service (PiRC2) taotlemist loo ja jaga Pi Bet"
+        "desc": "Pärast PiRC2 tellimist loo Business-paketiga ainult üritustele mõeldud Cafe",
+        "name": "Telli Pi tellimus (PiRC2) ja loo ürituse Cafe"
       },
       "M6": {
         "desc": "Kasuta Sticker'it / File Transfer'it / Kasuta Voice Channel'it, 1 või enam neist",
@@ -1387,7 +1387,11 @@
     "cafe": "Cafe",
     "event": "Event",
     "home": "Home",
+    "map": "Map",
+    "mapEmpty": "Registreeritud poode pole",
+    "mapSubtitle": "Kontrollige Pi Shopi sidusettevõtete asukohta",
     "my": "Minu info",
+    "navigateGo": "Mine",
     "shop": "Shop"
   },
   "pay": {
@@ -1560,6 +1564,23 @@
     "buying": "Makse töötlemine…",
     "buySuccess": "Escrow makse edukas! Jätkake tehingut müüjaga",
     "cancelReasonPrompt": "Palun sisestage tühistamise põhjus",
+    "cart": {
+      "add": "🛒 Lisa Carti",
+      "added": "{n} toodet lisati Carti",
+      "addedTitle": "Lisatud Carti 🛒",
+      "checkingOut": "Makse töötlemisel…",
+      "checkout": "Vormista tellimus ({count} tk)",
+      "checkoutFail": "Tellimuse töötlemine ebaõnnestus",
+      "checkoutSuccess": "Tellimus on vastu võetud",
+      "clear": "Tühjenda Cart",
+      "conflictConfirm": "Cart sisaldab teise poe tooteid. Kas tühjendada ja lisada uued?",
+      "continueShopping": "Jätka Shoppingut",
+      "empty": "Cart on tühi",
+      "goToCart": "Mine Carti",
+      "qty": "Kogus",
+      "remove": "Eemalda",
+      "title": "Ostukorv"
+    },
     "cnd": {
       "HANDMADE": "Käsitöö",
       "NEW": "Uus",
@@ -1572,6 +1593,7 @@
     "editSuccess": "Toode on muudetud",
     "escrowNotice": "Makstud Pi hoitakse turvaliselt Escrow's ja edastatakse müüjale pärast tehingu kinnitamist mõlema poole poolt",
     "escrowReleased": "Tehing lõpetatud — Escrow arveldamine.",
+    "fiatRefAt": "Vahetuskursi alusel {date}",
     "form": {
       "category": "Category",
       "categoryAll": "Kõik",
@@ -1579,13 +1601,23 @@
       "cnd": "Toote seisukord",
       "desc": "Toote kirjeldus",
       "name": "Toote nimi",
+      "noShopYet": "Registreeritud poode pole. Palun registreerige esmalt pood.",
       "price": "Hind",
+      "priceCcy": "Valuuta",
+      "priceCcyPi": "π Pi otse sisestamine",
+      "priceConverted": "≈ {pi} π (registreerimise hetke vahetuskursi alusel)",
+      "priceConvertHint": "Kui sisestate kohalikus valuutas, määratakse Pi hind registreerimise hetke vahetuskursi alusel.",
+      "priceConverting": "Vahetuskursi teisendamine…",
+      "priceQuoteFail": "Vahetuskurssi ei õnnestunud hankida. Palun sisestage otse Pi-s.",
+      "priceQuoteRequired": "Palun salvestage pärast vahetuskursi teisendamise lõpetamist.",
       "publish": "Avalda kohe",
       "qty": "Müügikogus",
       "saveDraft": "Salvesta mustandina",
       "saveEdit": "Salvesta muudatused",
       "shop": "Affiliated Shop",
       "shopNone": "Shop puudub",
+      "shopRequired": "Füüsilise poe toodete puhul on poe valimine kohustuslik.",
+      "shopSelect": "Valige pood",
       "thumbUrl": "Põhipildi URL",
       "unlimited": "Piiramatu",
       "unlimitedHint": "Registreerige piiramatult tooteid, mille laoseisu jälgimine on ebaoluline, nt joogid, pitsad jne."
@@ -1632,7 +1664,11 @@
     "myItemsTitle": "Minu toodete haldamine",
     "myOwnItem": "See on minu registreeritud toode",
     "navHistory": "Transaction History",
+    "navigateGoogle": "Mine Google Mapiga",
+    "navigateKakao": "Kakao Map",
+    "navigateNaver": "Naver Map",
     "navMyItems": "Minu tooted",
+    "navMyShops": "Minu poed",
     "navOrders": "Ostude ajalugu",
     "navSales": "Müügi haldamine",
     "nearbyActive": "Tooted {radius}km raadiuses praegusest asukohast (kauguse järgi)",
@@ -1640,7 +1676,12 @@
     "nearbyNav": "📍 Läheduses",
     "nearbySort": "📍 Lähedus",
     "newItem": "+ Lisa toode",
+    "newItemP2P": "+ Kasutatud otsetehing",
+    "newItemShop": "+ Füüsilise poe toode",
     "newItemTitle": "Lisa uus toode",
+    "newP2PTitle": "Registreeri kasutatud otsetehingu toode",
+    "newShopHint": "Valige pood ja registreerige hind kohalikus valuutas. Makse toimub Pi-ga.",
+    "newShopTitle": "Registreeri füüsilise poe toode",
     "noItems": "Tooteid pole registreeritud",
     "noNearbyItems": "Läheduses {radius}km raadiuses tooteid ei ole",
     "noOrders": "Tellimusi pole",
@@ -1701,6 +1742,9 @@
       "type_OFFLINE": "Offline",
       "type_ONLINE": "Online"
     },
+    "shopfrontAddItem": "+ Lisa Menu",
+    "shopfrontEditBadge": "✏️ Muuda",
+    "shopfrontOwnerHint": "See on minu pood — saate kaupu kohe muuta, neid puudutades",
     "shopType": {
       "BOTH": "Online ja füüsiline",
       "OFFLINE": "Füüsiline pood",

@@ -1227,8 +1227,8 @@
         "name": "Bean転送 Test(PiRC1)"
       },
       "M5": {
-        "desc": "Pi Subscription Service申請後、CafeでPi Bet作成 + 参加者に分配",
-        "name": "Pi Subscription Service(PiRC2)申請後 Pi Bet作成および分配"
+        "desc": "PiRC2購読申請後、Businessプランでイベント専用カフェを作成しましょう",
+        "name": "Pi購読サービス(PiRC2)申請後、イベントカフェを作成"
       },
       "M6": {
         "desc": "Sticker利用 / File転送 / 音声チャンネル利用のうち1つ以上",
@@ -1387,7 +1387,11 @@
     "cafe": "Cafe",
     "event": "Event",
     "home": "Home",
+    "map": "Map",
+    "mapEmpty": "登録された店舗がありません",
+    "mapSubtitle": "Pi Shop 加盟店の位置を確認してください",
     "my": "私の情報",
+    "navigateGo": "出発",
     "shop": "Shop"
   },
   "pay": {
@@ -1560,6 +1564,23 @@
     "buying": "決済処理中…",
     "buySuccess": "Escrow 決済完了！販売者と取引を進めてください",
     "cancelReasonPrompt": "キャンセル理由を入力してください",
+    "cart": {
+      "add": "🛒 Cartに入れる",
+      "added": "{n}個をCartに入れました",
+      "addedTitle": "Cartに入れました 🛒",
+      "checkingOut": "決済処理中…",
+      "checkout": "注文する ({count}個)",
+      "checkoutFail": "注文処理に失敗しました",
+      "checkoutSuccess": "注文が受け付けられました",
+      "clear": "Cartを空にする",
+      "conflictConfirm": "Cartに他の店舗の商品が入っています。空にして新しく入れますか？",
+      "continueShopping": "ショッピングを続ける",
+      "empty": "Cartが空です",
+      "goToCart": "Cartへ行く",
+      "qty": "数量",
+      "remove": "削除",
+      "title": "ショッピングCart"
+    },
     "cnd": {
       "HANDMADE": "ハンドメイド",
       "NEW": "新品",
@@ -1572,6 +1593,7 @@
     "editSuccess": "Itemが編集されました",
     "escrowNotice": "決済されたPiはEscrowに安全に保管され、双方の取引確認後に販売者に送金されます",
     "escrowReleased": "取引終了 — エスクロー決済処理",
+    "fiatRefAt": "{date} 為替レート基準",
     "form": {
       "category": "Category",
       "categoryAll": "全て",
@@ -1579,13 +1601,23 @@
       "cnd": "商品 Status",
       "desc": "Item説明",
       "name": "Item名",
+      "noShopYet": "登録された店舗がありません。まず店舗を登録してください。",
       "price": "価格",
+      "priceCcy": "通貨",
+      "priceCcyPi": "π Pi 直接入力",
+      "priceConverted": "≈ {pi} π (登録時点の為替レート基準)",
+      "priceConvertHint": "自国通貨で入力すると、登録時点の為替レートでPi価格が決定されます",
+      "priceConverting": "為替レート換算中…",
+      "priceQuoteFail": "為替レートを取得できませんでした。Piで直接入力してください。",
+      "priceQuoteRequired": "為替レート換算を完了してから保存してください",
       "publish": "すぐに公開",
       "qty": "販売数量",
       "saveDraft": "下書き保存",
       "saveEdit": "編集保存",
       "shop": "所属店舗",
       "shopNone": "店舗なし",
+      "shopRequired": "オフライン店舗の商品は店舗選択が必須です",
+      "shopSelect": "店舗を選択してください",
       "thumbUrl": "代表 Image URL",
       "unlimited": "無制限",
       "unlimitedHint": "飲料・Pizzaなど、在庫追跡が無意味なItemは無制限で登録してください"
@@ -1632,7 +1664,11 @@
     "myItemsTitle": "My Item管理",
     "myOwnItem": "ご自身で登録した商品です",
     "navHistory": "取引履歴",
+    "navigateGoogle": "Google Mapで出発",
+    "navigateKakao": "Kakao Map",
+    "navigateNaver": "Naver Map",
     "navMyItems": "マイ商品",
+    "navMyShops": "自分の店舗",
     "navOrders": "購入履歴",
     "navSales": "販売管理",
     "nearbyActive": "現在位置基準 {radius}km 以内の商品 (距離が近い順)",
@@ -1640,7 +1676,12 @@
     "nearbyNav": "📍 周辺",
     "nearbySort": "📍 周辺順",
     "newItem": "+ Item登録",
+    "newItemP2P": "+ 中古品直接取引",
+    "newItemShop": "+ オフライン店舗",
     "newItemTitle": "Item登録",
+    "newP2PTitle": "中古品直接取引商品登録",
+    "newShopHint": "店舗を選択し、自国通貨で価格を登録してください。決済はPiで行われます。",
+    "newShopTitle": "オフライン店舗商品登録",
     "noItems": "登録された商品がありません",
     "noNearbyItems": "周辺 {radius}km 以内に商品はありません",
     "noOrders": "注文履歴がありません",
@@ -1701,6 +1742,9 @@
       "type_OFFLINE": "Offline",
       "type_ONLINE": "Online"
     },
+    "shopfrontAddItem": "+ メニュー追加",
+    "shopfrontEditBadge": "✏️ 編集",
+    "shopfrontOwnerHint": "自分の店舗です — 商品をタップするとすぐに編集できます",
     "shopType": {
       "BOTH": "Online・Offline",
       "OFFLINE": "Offline店舗",

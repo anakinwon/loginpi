@@ -7,7 +7,8 @@ import { reverseGeocode } from '@/lib/google-maps'
 // 동의 불필요(PRD 섹션 6). 유료 API 남용 방지를 위해 로그인 세션 필수.
 export async function POST(request: NextRequest) {
   const user = await getSessionUser()
-  if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user)
+    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
   let body: unknown
   try {
@@ -18,12 +19,18 @@ export async function POST(request: NextRequest) {
 
   const { lat, lng } = body as { lat?: number; lng?: number }
   if (lat === undefined || lng === undefined) {
-    return NextResponse.json({ error: 'lat, lng는 필수입니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: 'lat, lng는 필수입니다' },
+      { status: 400 },
+    )
   }
 
   // WGS84 좌표 범위 검증
   if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
-    return NextResponse.json({ error: '유효하지 않은 좌표값입니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: '유효하지 않은 좌표값입니다' },
+      { status: 400 },
+    )
   }
 
   try {
@@ -36,7 +43,10 @@ export async function POST(request: NextRequest) {
     }
     return NextResponse.json(result)
   } catch (err) {
-    console.error('[reverse-geocode] 실패:', err instanceof Error ? err.message : err)
+    console.error(
+      '[reverse-geocode] 실패:',
+      err instanceof Error ? err.message : err,
+    )
     return NextResponse.json(
       { error: '좌표 변환 중 오류가 발생했습니다' },
       { status: 502 },

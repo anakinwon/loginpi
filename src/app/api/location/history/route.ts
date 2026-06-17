@@ -5,10 +5,14 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 // GET /api/location/history — 내 위치 수집 이력 열람 (위치정보법 제16조 정보주체 열람권)
 export async function GET() {
   const user = await getSessionUser()
-  if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user)
+    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
   if (user.lbs_consent_yn !== 'Y') {
-    return NextResponse.json({ error: '위치기반서비스 이용약관에 동의하지 않으셨습니다' }, { status: 403 })
+    return NextResponse.json(
+      { error: '위치기반서비스 이용약관에 동의하지 않으셨습니다' },
+      { status: 403 },
+    )
   }
 
   const { data, error } = await getSupabaseAdmin()

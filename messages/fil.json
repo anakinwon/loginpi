@@ -1227,8 +1227,8 @@
         "name": "Bean Send Test (PiRC1)"
       },
       "M5": {
-        "desc": "Pagkatapos Mag-apply para sa Pi Subscription Service, Gumawa ng Pi Bet sa Cafe + Ipamahagi sa mga Kalahok",
-        "name": "Pagkatapos Mag-apply para sa Pi Subscription Service (PiRC2), Gumawa at Ipamahagi ang Pi Bet"
+        "desc": "Pagkatapos mag-subscribe sa PiRC2, gumawa ng Cafe na pang-event gamit ang Business plan",
+        "name": "Mag-apply para sa Pi Subscription (PiRC2), tapos gumawa ng Event Cafe"
       },
       "M6": {
         "desc": "Gumamit ng Sticker / Magpadala ng File / Gumamit ng Voice Channel (Isa o Higit Pa)",
@@ -1387,7 +1387,11 @@
     "cafe": "Cafe",
     "event": "Event",
     "home": "Home",
+    "map": "Map",
+    "mapEmpty": "Walang nakarehistrong tindahan.",
+    "mapSubtitle": "Tingnan ang lokasyon ng mga Pi Shop na tindahan.",
     "my": "Aking Impormasyon",
+    "navigateGo": "Pumunta",
     "shop": "Shop"
   },
   "pay": {
@@ -1560,6 +1564,23 @@
     "buying": "Pinoproseso ang pagbabayad…",
     "buySuccess": "Kumpleto na ang Escrow Payment! Ipagpatuloy ang transaksyon sa nagbebenta",
     "cancelReasonPrompt": "Pakilagay ang dahilan ng pagkansela",
+    "cart": {
+      "add": "🛒 Idagdag sa Cart",
+      "added": "{n} na item ang naidagdag sa Cart",
+      "addedTitle": "Naidagdag sa Cart 🛒",
+      "checkingOut": "Nagpo-proseso ng pagbabayad…",
+      "checkout": "Mag-order ({count} item)",
+      "checkoutFail": "Nabigo ang pagproseso ng order",
+      "checkoutSuccess": "Natanggap na ang order",
+      "clear": "Alisin ang laman ng Cart",
+      "conflictConfirm": "May mga item mula sa ibang tindahan sa Cart. Gusto mo bang alisin at magdagdag ng bago?",
+      "continueShopping": "Magpatuloy sa Shopping",
+      "empty": "Walang laman ang Cart",
+      "goToCart": "Pumunta sa Cart",
+      "qty": "Dami",
+      "remove": "Alisin",
+      "title": "Cart"
+    },
     "cnd": {
       "HANDMADE": "Handmade",
       "NEW": "Bagong Item",
@@ -1572,6 +1593,7 @@
     "editSuccess": "Na-edit na ang item",
     "escrowNotice": "Ang binayarang Pi ay ligtas na itatago sa escrow, at ililipat sa nagbebenta pagkatapos kumpirmahin ang transaksyon ng magkabilang panig",
     "escrowReleased": "Tapos na ang Transaksyon — Pagproseso ng Escrow Settlement",
+    "fiatRefAt": "{date} Batay sa exchange rate",
     "form": {
       "category": "Category",
       "categoryAll": "Lahat",
@@ -1579,13 +1601,23 @@
       "cnd": "Kondisyon ng Item",
       "desc": "Deskripsyon ng Item",
       "name": "Pangalan ng Item",
+      "noShopYet": "Walang nakarehistrong tindahan. Mangyaring magrehistro muna ng tindahan.",
       "price": "Presyo",
+      "priceCcy": "Currency",
+      "priceCcyPi": "π Pi Direktang Input",
+      "priceConverted": "≈ {pi} π (Batay sa exchange rate sa oras ng pagpaparehistro)",
+      "priceConvertHint": "Kung ipasok sa lokal na currency, ang presyo ng Pi ay itatakda batay sa exchange rate sa oras ng pagpaparehistro",
+      "priceConverting": "Nagko-convert ng exchange rate…",
+      "priceQuoteFail": "Hindi makuha ang exchange rate. Mangyaring direktang ipasok sa Pi.",
+      "priceQuoteRequired": "Mangyaring i-save pagkatapos makumpleto ang conversion ng exchange rate",
       "publish": "I-publish Agad",
       "qty": "Dami ng Ibinebenta",
       "saveDraft": "I-save bilang Draft",
       "saveEdit": "I-save ang Pagbabago",
       "shop": "Kaakibat na Tindahan",
       "shopNone": "Walang Tindahan",
+      "shopRequired": "Ang pagpili ng tindahan ay kinakailangan para sa mga item sa Offline Store",
+      "shopSelect": "Piliin ang tindahan",
       "thumbUrl": "URL ng Pangunahing Larawan",
       "unlimited": "Walang limit",
       "unlimitedHint": "Irehistro bilang walang limit ang mga item tulad ng inumin o pizza kung saan walang saysay ang pagsubaybay sa imbentaryo."
@@ -1632,7 +1664,11 @@
     "myItemsTitle": "Pamahalaan ang Aking Mga Item",
     "myOwnItem": "Ito ang item na aking inirehistro",
     "navHistory": "Kasaysayan ng Transaksyon",
+    "navigateGoogle": "Pumunta sa Google Maps",
+    "navigateKakao": "Kakao Map",
+    "navigateNaver": "Naver Map",
     "navMyItems": "Aking Mga Item",
+    "navMyShops": "Aking mga Tindahan",
     "navOrders": "Kasaysayan ng Order",
     "navSales": "Pamamahala ng Benta",
     "nearbyActive": "Mga item sa loob ng {radius}km mula sa kasalukuyang lokasyon (ayon sa pinakamalapit na distansya)",
@@ -1640,7 +1676,12 @@
     "nearbyNav": "📍 Malapit",
     "nearbySort": "📍 Ayon sa Kalapitan",
     "newItem": "+ Magrehistro ng Item",
+    "newItemP2P": "+ Second-hand Item",
+    "newItemShop": "+ Offline Store",
     "newItemTitle": "Magrehistro ng Item",
+    "newP2PTitle": "Magrehistro ng Second-hand Item",
+    "newShopHint": "Piliin ang tindahan at irehistro ang presyo sa lokal na currency. Ang pagbabayad ay gagawin sa Pi.",
+    "newShopTitle": "Magrehistro ng Item sa Offline Store",
     "noItems": "Walang nakarehistrong item",
     "noNearbyItems": "Walang item sa loob ng {radius}km sa paligid",
     "noOrders": "Walang kasaysayan ng order",
@@ -1701,6 +1742,9 @@
       "type_OFFLINE": "Offline",
       "type_ONLINE": "Online"
     },
+    "shopfrontAddItem": "+ Magdagdag ng Item",
+    "shopfrontEditBadge": "✏️ I-edit",
+    "shopfrontOwnerHint": "Ito ang iyong tindahan — i-tap ang produkto para i-edit kaagad.",
     "shopType": {
       "BOTH": "Online at Offline",
       "OFFLINE": "Offline Store",

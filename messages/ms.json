@@ -1227,8 +1227,8 @@
         "name": "Test Pemindahan Bean (PiRC1)"
       },
       "M5": {
-        "desc": "Selepas memohon Pi Subscription Service, cipta Pi Bet dalam Cafe + agihkan kepada peserta",
-        "name": "Selepas memohon Pi Subscription Service (PiRC2), cipta dan agihkan Pi Bet"
+        "desc": "Selepas melanggan PiRC2, cipta Cafe khusus acara dengan pelan Business",
+        "name": "Mohon langganan Pi (PiRC2) kemudian cipta Cafe Acara"
       },
       "M6": {
         "desc": "1 atau lebih daripada: Guna Sticker / Pindahkan File / Guna saluran suara",
@@ -1387,7 +1387,11 @@
     "cafe": "Cafe",
     "event": "Event",
     "home": "Home",
+    "map": "Map",
+    "mapEmpty": "Tiada kedai berdaftar",
+    "mapSubtitle": "Semak lokasi kedai gabungan Pi Shop",
     "my": "Saya",
+    "navigateGo": "Mula",
     "shop": "Shop"
   },
   "pay": {
@@ -1560,6 +1564,23 @@
     "buying": "Pembayaran sedang diproses…",
     "buySuccess": "Pembayaran Escrow selesai! Sila teruskan transaksi dengan penjual",
     "cancelReasonPrompt": "Sila masukkan sebab pembatalan",
+    "cart": {
+      "add": "🛒 Tambah ke Cart",
+      "added": "{n} item telah ditambahkan ke Cart",
+      "addedTitle": "Telah ditambahkan ke Cart 🛒",
+      "checkingOut": "Memproses pembayaran…",
+      "checkout": "Checkout ({count} item)",
+      "checkoutFail": "Gagal memproses pesanan",
+      "checkoutSuccess": "Pesanan telah diterima",
+      "clear": "Kosongkan Cart",
+      "conflictConfirm": "Cart mengandungi item dari kedai lain. Adakah anda ingin mengosongkan dan menambah yang baru?",
+      "continueShopping": "Teruskan Shopping",
+      "empty": "Cart kosong",
+      "goToCart": "Pergi ke Cart",
+      "qty": "Kuantiti",
+      "remove": "Buang",
+      "title": "Cart"
+    },
     "cnd": {
       "HANDMADE": "Buatan tangan",
       "NEW": "Barangan baharu",
@@ -1572,6 +1593,7 @@
     "editSuccess": "Item telah diubah suai",
     "escrowNotice": "Pi yang dibayar akan disimpan dengan selamat dalam escrow, dan akan diserahkan kepada penjual selepas pengesahan transaksi oleh kedua-dua pihak",
     "escrowReleased": "Penamatan Transaksi — Pemprosesan Penyelesaian Escrow",
+    "fiatRefAt": "Berdasarkan kadar pertukaran pada {date}",
     "form": {
       "category": "Category",
       "categoryAll": "Semua",
@@ -1579,13 +1601,23 @@
       "cnd": "Keadaan Item",
       "desc": "Penerangan Item",
       "name": "Nama Item",
+      "noShopYet": "Tiada kedai berdaftar lagi. Sila daftar kedai dahulu.",
       "price": "Harga",
+      "priceCcy": "Mata Wang",
+      "priceCcyPi": "π Pi Input Langsung",
+      "priceConverted": "≈ {pi} π (Berdasarkan kadar pertukaran pada masa pendaftaran)",
+      "priceConvertHint": "Jika anda memasukkan dalam mata wang tempatan, harga Pi akan ditetapkan mengikut kadar pertukaran pada masa pendaftaran",
+      "priceConverting": "Menukar kadar pertukaran…",
+      "priceQuoteFail": "Gagal mendapatkan kadar pertukaran. Sila masukkan terus dalam Pi.",
+      "priceQuoteRequired": "Sila simpan selepas selesai penukaran kadar pertukaran",
       "publish": "Terbitkan Segera",
       "qty": "Kuantiti Jualan",
       "saveDraft": "Simpan Draf",
       "saveEdit": "Simpan Perubahan",
       "shop": "Kedai",
       "shopNone": "Tiada Kedai",
+      "shopRequired": "Pemilihan kedai adalah wajib untuk produk kedai Offline",
+      "shopSelect": "Pilih kedai",
       "thumbUrl": "URL Imej Utama",
       "unlimited": "Tanpa Had",
       "unlimitedHint": "Daftarkan item seperti minuman atau pizza, di mana penjejakan inventori tidak bermakna, sebagai tanpa had"
@@ -1632,7 +1664,11 @@
     "myItemsTitle": "Urus Item Saya",
     "myOwnItem": "Ini adalah barangan yang saya daftarkan",
     "navHistory": "Sejarah Transaksi",
+    "navigateGoogle": "Mula dengan Google Map",
+    "navigateKakao": "Kakao Map",
+    "navigateNaver": "Naver Map",
     "navMyItems": "Barangan saya",
+    "navMyShops": "Kedai Saya",
     "navOrders": "Sejarah Pesanan",
     "navSales": "Pengurusan Jualan",
     "nearbyActive": "Item dalam lingkungan {radius}km dari lokasi semasa (jarak terdekat dahulu)",
@@ -1640,7 +1676,12 @@
     "nearbyNav": "📍 Berdekatan",
     "nearbySort": "📍 Ikut Berdekatan",
     "newItem": "+ Daftar Item",
+    "newItemP2P": "+ Transaksi Langsung Barang Terpakai",
+    "newItemShop": "+ Kedai Offline",
     "newItemTitle": "Daftar Item",
+    "newP2PTitle": "Pendaftaran Produk Transaksi Langsung Barang Terpakai",
+    "newShopHint": "Pilih kedai dan daftar harga dalam mata wang tempatan. Pembayaran akan diproses dengan Pi.",
+    "newShopTitle": "Pendaftaran Produk Kedai Offline",
     "noItems": "Tiada barangan berdaftar",
     "noNearbyItems": "Tiada item dalam lingkungan {radius}km berdekatan",
     "noOrders": "Tiada sejarah pesanan",
@@ -1701,6 +1742,9 @@
       "type_OFFLINE": "Offline",
       "type_ONLINE": "Online"
     },
+    "shopfrontAddItem": "+ Tambah Menu",
+    "shopfrontEditBadge": "✏️ Edit",
+    "shopfrontOwnerHint": "Ini kedai saya — anda boleh edit item dengan segera apabila diklik",
     "shopType": {
       "BOTH": "Dalam talian & Luar talian",
       "OFFLINE": "Kedai fizikal",

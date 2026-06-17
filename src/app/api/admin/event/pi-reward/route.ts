@@ -21,8 +21,7 @@ export async function GET(req: Request) {
     .eq('event_id', eventId)
     .order('reg_dtm', { ascending: false })
 
-  if (error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   return NextResponse.json({ rewards: data ?? [] })
 }
@@ -42,10 +41,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
   }
 
-  const {
-    event_id: eventId = 'evt-20260614-001',
-    target = 'failed',
-  } = body as { event_id?: string; target?: string }
+  const { event_id: eventId = 'evt-20260614-001', target = 'failed' } =
+    body as { event_id?: string; target?: string }
 
   const db = getSupabaseAdmin()
 
@@ -66,8 +63,7 @@ export async function POST(req: Request) {
   // target === 'all': PENDING + FAILED 전체
 
   const { data: targets, error } = await query
-  if (error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   if (!targets?.length)
     return NextResponse.json({ message: '재시도 대상 없음', count: 0 })
@@ -87,14 +83,16 @@ export async function POST(req: Request) {
   const BATCH = 10
   for (let i = 0; i < targets.length; i += BATCH) {
     await Promise.allSettled(
-      targets.slice(i, i + BATCH).map((r) =>
-        triggerPiReward(
-          r.event_id,
-          r.user_id,
-          evt?.reward_pi_amt ?? 1,
-          evt?.reward_pi_memo ?? '이벤트 미션 완료 보상',
+      targets
+        .slice(i, i + BATCH)
+        .map((r) =>
+          triggerPiReward(
+            r.event_id,
+            r.user_id,
+            evt?.reward_pi_amt ?? 1,
+            evt?.reward_pi_memo ?? '이벤트 미션 완료 보상',
+          ),
         ),
-      ),
     )
   }
 

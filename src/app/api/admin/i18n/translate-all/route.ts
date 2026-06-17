@@ -31,7 +31,10 @@ export async function POST(req: NextRequest) {
   const secret = process.env.CRON_SECRET
   if (!secret) {
     return NextResponse.json(
-      { error: 'CRON_SECRET이 설정되지 않아 백그라운드 작업을 시작할 수 없습니다' },
+      {
+        error:
+          'CRON_SECRET이 설정되지 않아 백그라운드 작업을 시작할 수 없습니다',
+      },
       { status: 500 },
     )
   }
@@ -70,7 +73,9 @@ export async function POST(req: NextRequest) {
         console.error(`[i18n-bg] ${lc} 처리 오류:`, e)
       }
     }
-    console.log(`[i18n-bg] 백그라운드 자동 번역 종료 — ${done}/${targets.length} 완료`)
+    console.log(
+      `[i18n-bg] 백그라운드 자동 번역 종료 — ${done}/${targets.length} 완료`,
+    )
   })
 
   return NextResponse.json({ started: targets.length })

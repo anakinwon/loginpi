@@ -427,11 +427,14 @@ export function StoreItemDetail({ itemId }: { itemId: string }) {
                       value={qty}
                       onChange={(e) =>
                         setQty(
-                          Math.min(maxQty, Math.max(1, Number(e.target.value) || 1)),
+                          Math.min(
+                            maxQty,
+                            Math.max(1, Number(e.target.value) || 1),
+                          ),
                         )
                       }
                       aria-label={t('cart.qty')}
-                      className="w-12 bg-transparent text-center text-sm [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
+                      className="w-12 [appearance:textfield] bg-transparent text-center text-sm [&::-webkit-inner-spin-button]:appearance-none"
                     />
                     <button
                       type="button"
@@ -483,10 +486,7 @@ export function StoreItemDetail({ itemId }: { itemId: string }) {
             <DialogDescription>{t('cart.added', { n: qty })}</DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2 sm:gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setCartDialogOpen(false)}
-            >
+            <Button variant="outline" onClick={() => setCartDialogOpen(false)}>
               {t('cart.continueShopping')}
             </Button>
             <Button

@@ -13,11 +13,7 @@ export function defaultCcyForLocale(locale: string): string {
 }
 
 // 자국통화 금액 포맷 — Intl.NumberFormat(currency). 실패 시 '<amt> <ccy>' 폴백.
-export function formatCcy(
-  locale: string,
-  ccyCd: string,
-  amt: number,
-): string {
+export function formatCcy(locale: string, ccyCd: string, amt: number): string {
   try {
     return new Intl.NumberFormat(locale, {
       style: 'currency',

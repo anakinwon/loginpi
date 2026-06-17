@@ -101,7 +101,7 @@ export default function AdminEventGiftsPage() {
   }
 
   if (error) {
-    return <div className="text-center py-10 text-red-600">{error}</div>
+    return <div className="py-10 text-center text-red-600">{error}</div>
   }
 
   return (
@@ -113,7 +113,7 @@ export default function AdminEventGiftsPage() {
         </p>
       </div>
 
-      <div className="overflow-x-auto border rounded-lg">
+      <div className="overflow-x-auto rounded-lg border">
         <table className="w-full text-sm">
           <thead className="bg-muted border-b">
             <tr>
@@ -128,7 +128,7 @@ export default function AdminEventGiftsPage() {
           </thead>
           <tbody>
             {gifts.map((g) => (
-              <tr key={g.user_id} className="border-b hover:bg-muted/50">
+              <tr key={g.user_id} className="hover:bg-muted/50 border-b">
                 <td className="p-3 font-semibold">#{g.rank}</td>
                 <td className="p-3">{g.nick_nm ?? '(이름 없음)'}</td>
                 <td className="p-3 font-mono text-xs">
@@ -137,16 +137,16 @@ export default function AdminEventGiftsPage() {
                 <td className="p-3">{g.gift_nm}</td>
                 <td className="p-3 text-center">
                   <span
-                    className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${
+                    className={`inline-block rounded-full px-2 py-1 text-xs font-semibold ${
                       g.sent_yn === 'Y'
-                        ? 'bg-green-200 dark:bg-green-700 text-green-900 dark:text-green-100'
-                        : 'bg-yellow-200 dark:bg-yellow-700 text-yellow-900 dark:text-yellow-100'
+                        ? 'bg-green-200 text-green-900 dark:bg-green-700 dark:text-green-100'
+                        : 'bg-yellow-200 text-yellow-900 dark:bg-yellow-700 dark:text-yellow-100'
                     }`}
                   >
                     {g.sent_yn === 'Y' ? '발송됨' : '미발송'}
                   </span>
                 </td>
-                <td className="p-3 text-center text-xs text-muted-foreground">
+                <td className="text-muted-foreground p-3 text-center text-xs">
                   {g.sent_dtm
                     ? new Date(g.sent_dtm).toLocaleDateString('ko-KR')
                     : '-'}
@@ -175,7 +175,7 @@ export default function AdminEventGiftsPage() {
       </div>
 
       {gifts.length === 0 && (
-        <div className="text-center py-10 text-muted-foreground">
+        <div className="text-muted-foreground py-10 text-center">
           아직 미션 10/10을 완료한 사용자가 없습니다
         </div>
       )}
@@ -185,49 +185,58 @@ export default function AdminEventGiftsPage() {
         <div className="mb-3">
           <h2 className="text-xl font-bold">
             🏅 미션 10/10 전체 완료자{' '}
-            <span className="text-base font-normal text-muted-foreground">
+            <span className="text-muted-foreground text-base font-normal">
               ({completions.length}명)
             </span>
           </h2>
-          <p className="text-muted-foreground text-sm mt-1">
-            선착순 정렬 · 제외 대상자 제외 · Pi 계정명 / 최종성공일시 / 카카오톡 ID
+          <p className="text-muted-foreground mt-1 text-sm">
+            선착순 정렬 · 제외 대상자 제외 · Pi 계정명 / 최종성공일시 / 카카오톡
+            ID
           </p>
         </div>
 
-        <div className="overflow-x-auto border rounded-lg">
+        <div className="overflow-x-auto rounded-lg border">
           <table className="w-full text-sm">
             <thead className="bg-muted border-b">
               <tr>
-                <th className="p-3 text-left font-semibold w-12">순위</th>
+                <th className="w-12 p-3 text-left font-semibold">순위</th>
                 <th className="p-3 text-left font-semibold">Pi 계정명</th>
                 <th className="p-3 text-left font-semibold">닉네임</th>
                 <th className="p-3 text-left font-semibold">카카오톡 ID</th>
-                <th className="p-3 text-left font-semibold whitespace-nowrap">최종 성공 일시</th>
+                <th className="p-3 text-left font-semibold whitespace-nowrap">
+                  최종 성공 일시
+                </th>
               </tr>
             </thead>
             <tbody>
               {completions.map((c) => (
                 <tr
                   key={c.user_id}
-                  className={`border-b hover:bg-muted/50 ${c.rank <= 10 ? 'bg-amber-50 dark:bg-amber-950/30' : ''}`}
+                  className={`hover:bg-muted/50 border-b ${c.rank <= 10 ? 'bg-amber-50 dark:bg-amber-950/30' : ''}`}
                 >
                   <td className="p-3 font-semibold">
                     {c.rank <= 10 ? (
-                      <span className="text-amber-600 dark:text-amber-400">#{c.rank}</span>
+                      <span className="text-amber-600 dark:text-amber-400">
+                        #{c.rank}
+                      </span>
                     ) : (
                       <span className="text-muted-foreground">#{c.rank}</span>
                     )}
                   </td>
-                  <td className="p-3 font-mono text-xs">{c.pi_username ?? '-'}</td>
+                  <td className="p-3 font-mono text-xs">
+                    {c.pi_username ?? '-'}
+                  </td>
                   <td className="p-3">{c.nick_nm ?? '-'}</td>
                   <td className="p-3 font-mono text-xs">
                     {c.kakao_id ? (
-                      <span className="text-green-700 dark:text-green-400">{c.kakao_id}</span>
+                      <span className="text-green-700 dark:text-green-400">
+                        {c.kakao_id}
+                      </span>
                     ) : (
                       <span className="text-red-500">미입력</span>
                     )}
                   </td>
-                  <td className="p-3 text-xs text-muted-foreground whitespace-nowrap">
+                  <td className="text-muted-foreground p-3 text-xs whitespace-nowrap">
                     {new Date(c.last_complete_dtm).toLocaleString('ko-KR', {
                       timeZone: 'Asia/Seoul',
                       year: '2-digit',
@@ -245,7 +254,7 @@ export default function AdminEventGiftsPage() {
         </div>
 
         {completions.length === 0 && (
-          <div className="text-center py-10 text-muted-foreground">
+          <div className="text-muted-foreground py-10 text-center">
             아직 미션 10/10을 완료한 사용자가 없습니다
           </div>
         )}

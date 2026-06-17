@@ -1227,8 +1227,8 @@
         "name": "Test d'envoi de Bean (PiRC1)"
       },
       "M5": {
-        "desc": "Après avoir souscrit au service d'abonnement Pi, créer des Pi Bet dans le Cafe + les distribuer aux participants",
-        "name": "Après avoir souscrit au service d'abonnement Pi (PiRC2), créer et distribuer des Pi Bet"
+        "desc": "Après l'abonnement PiRC2, créez un Cafe dédié aux événements avec le forfait Business",
+        "name": "Souscrire à l'abonnement Pi (PiRC2) puis créer un Cafe événementiel"
       },
       "M6": {
         "desc": "Utiliser des Stickers / Envoyer des fichiers / Utiliser un canal vocal (au moins un)",
@@ -1387,7 +1387,11 @@
     "cafe": "Cafe",
     "event": "Event",
     "home": "Home",
+    "map": "Map",
+    "mapEmpty": "Aucun magasin enregistré",
+    "mapSubtitle": "Vérifiez l'emplacement des magasins Pi Shop",
     "my": "Mon compte",
+    "navigateGo": "Aller",
     "shop": "Shop"
   },
   "pay": {
@@ -1560,6 +1564,23 @@
     "buying": "Paiement en cours…",
     "buySuccess": "Paiement Escrow terminé ! Veuillez procéder à la transaction avec le vendeur",
     "cancelReasonPrompt": "Veuillez entrer la raison de l'annulation",
+    "cart": {
+      "add": "🛒 Ajouter au Cart",
+      "added": "{n} articles ajoutés au Cart",
+      "addedTitle": "Ajouté au Cart 🛒",
+      "checkingOut": "Paiement en cours…",
+      "checkout": "Commander ({count} articles)",
+      "checkoutFail": "Échec du traitement de la commande",
+      "checkoutSuccess": "Commande reçue",
+      "clear": "Vider le Cart",
+      "conflictConfirm": "Votre Cart contient des articles d'un autre magasin. Voulez-vous le vider et ajouter de nouveaux articles ?",
+      "continueShopping": "Continuer le Shopping",
+      "empty": "Le Cart est vide",
+      "goToCart": "Aller au Cart",
+      "qty": "Quantité",
+      "remove": "Supprimer",
+      "title": "Panier"
+    },
     "cnd": {
       "HANDMADE": "Fait main",
       "NEW": "Neuf",
@@ -1572,6 +1593,7 @@
     "editSuccess": "L'article a été modifié",
     "escrowNotice": "Les Pi payés sont conservés en toute sécurité en Escrow et seront transférés au vendeur après confirmation de la transaction par les deux parties",
     "escrowReleased": "Transaction terminée — Traitement du règlement Escrow.",
+    "fiatRefAt": "Taux de change au {date}",
     "form": {
       "category": "Category",
       "categoryAll": "Toutes les Categories",
@@ -1579,13 +1601,23 @@
       "cnd": "État de l'article",
       "desc": "Description de l'article",
       "name": "Nom de l'article",
+      "noShopYet": "Aucun magasin enregistré. Veuillez d'abord enregistrer un magasin.",
       "price": "Prix",
+      "priceCcy": "Devise",
+      "priceCcyPi": "π Pi saisie directe",
+      "priceConverted": "≈ {pi} π (selon le taux de change au moment de l'enregistrement)",
+      "priceConvertHint": "Si vous entrez le prix dans votre monnaie locale, le prix en Pi sera déterminé par le taux de change au moment de l'enregistrement.",
+      "priceConverting": "Conversion du taux de change en cours…",
+      "priceQuoteFail": "Impossible d'obtenir le taux de change. Veuillez entrer le prix directement en Pi.",
+      "priceQuoteRequired": "Veuillez enregistrer après avoir terminé la conversion du taux de change.",
       "publish": "Publier immédiatement",
       "qty": "Quantité en vente",
       "saveDraft": "Enregistrer comme brouillon",
       "saveEdit": "Enregistrer les modifications",
       "shop": "Magasin affilié",
       "shopNone": "Aucun magasin",
+      "shopRequired": "La sélection d'un magasin est obligatoire pour les articles de magasin physique",
+      "shopSelect": "Sélectionnez un magasin",
       "thumbUrl": "URL de l'image principale",
       "unlimited": "Illimité",
       "unlimitedHint": "Pour les articles dont le suivi des stocks n'est pas pertinent (boissons, pizzas, etc.), enregistrez-les comme illimités."
@@ -1632,7 +1664,11 @@
     "myItemsTitle": "Gérer mes articles",
     "myOwnItem": "C'est mon propre article enregistré",
     "navHistory": "Historique des transactions",
+    "navigateGoogle": "Aller avec Google Maps",
+    "navigateKakao": "Kakao Map",
+    "navigateNaver": "Naver Map",
     "navMyItems": "Mes Articles",
+    "navMyShops": "Mes magasins",
     "navOrders": "Historique des commandes",
     "navSales": "Gestion des ventes",
     "nearbyActive": "Articles dans un rayon de {radius}km de votre position actuelle (du plus proche au plus éloigné)",
@@ -1640,7 +1676,12 @@
     "nearbyNav": "📍 À proximité",
     "nearbySort": "📍 Par proximité",
     "newItem": "+ Ajouter un article",
+    "newItemP2P": "+ P2P d'occasion",
+    "newItemShop": "+ Magasin physique",
     "newItemTitle": "Ajouter un nouvel article",
+    "newP2PTitle": "Enregistrer un article P2P d'occasion",
+    "newShopHint": "Sélectionnez un magasin et enregistrez le prix dans votre monnaie locale. Le paiement sera effectué en Pi.",
+    "newShopTitle": "Enregistrer un article de magasin physique",
     "noItems": "Aucun article enregistré",
     "noNearbyItems": "Aucun article dans un rayon de {radius}km",
     "noOrders": "Aucun historique de commande",
@@ -1701,6 +1742,9 @@
       "type_OFFLINE": "Offline",
       "type_ONLINE": "Online"
     },
+    "shopfrontAddItem": "+ Ajouter un article",
+    "shopfrontEditBadge": "✏️ Modifier",
+    "shopfrontOwnerHint": "C'est mon magasin — touchez un article pour le modifier immédiatement",
     "shopType": {
       "BOTH": "Online et Offline",
       "OFFLINE": "Magasin Offline",

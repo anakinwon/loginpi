@@ -127,10 +127,7 @@ export function ClientMyItems({
             {showAll ? '🛡️ 전체 판매자' : '🛡️ 내 상품만'}
           </button>
         )}
-        <Link
-          href="/store/my/shops"
-          className={isAdminUser ? '' : 'ml-auto'}
-        >
+        <Link href="/store/my/shops" className={isAdminUser ? '' : 'ml-auto'}>
           <Button size="sm" variant="outline">
             {t('shop.manage')}
           </Button>

@@ -48,7 +48,9 @@ export function LazySection({
     <div ref={ref}>
       {visible
         ? children
-        : (fallback ?? <div className="bg-muted h-64 animate-pulse rounded-lg" />)}
+        : (fallback ?? (
+            <div className="bg-muted h-64 animate-pulse rounded-lg" />
+          ))}
     </div>
   )
 }

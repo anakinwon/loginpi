@@ -1227,8 +1227,8 @@
         "name": "Bean Oordrag Toets (PiRC1)"
       },
       "M5": {
-        "desc": "Na aansoek vir Pi Subscription Service, skep Pi Bet in Cafe + versprei aan deelnemers",
-        "name": "Na aansoek vir Pi Subscription Service (PiRC2), skep en versprei Pi Bet"
+        "desc": "Na PiRC2-intekening, skep 'n geleentheid-spesifieke Cafe met die Business-plan",
+        "name": "Doen aansoek vir Pi-intekening (PiRC2), skep dan 'n Geleentheid-Cafe"
       },
       "M6": {
         "desc": "Gebruik Sticker / Lêer oordrag / Stemkanaal (een of meer)",
@@ -1387,7 +1387,11 @@
     "cafe": "Cafe",
     "event": "Event",
     "home": "Home",
+    "map": "Map",
+    "mapEmpty": "Geen winkels geregistreer nie",
+    "mapSubtitle": "Sien die ligging van Pi Shop-handelaars",
     "my": "My Inligting",
+    "navigateGo": "Gaan",
     "shop": "Shop"
   },
   "pay": {
@@ -1560,6 +1564,23 @@
     "buying": "Betaling aan die gang…",
     "buySuccess": "Escrow-betaling voltooi! Gaan voort met die transaksie met die verkoper",
     "cancelReasonPrompt": "Voer asseblief die rede vir kansellasie in",
+    "cart": {
+      "add": "🛒 Voeg by Cart",
+      "added": "{n} items by Cart gevoeg",
+      "addedTitle": "By Cart gevoeg 🛒",
+      "checkingOut": "Besig met betaling…",
+      "checkout": "Betaal ({count} items)",
+      "checkoutFail": "Bestellingverwerking het misluk",
+      "checkoutSuccess": "Bestelling ontvang",
+      "clear": "Maak Cart leeg",
+      "conflictConfirm": "Die Cart bevat items van 'n ander winkel. Leegmaak en nuwes byvoeg?",
+      "continueShopping": "Gaan voort met Shopping",
+      "empty": "Cart is leeg",
+      "goToCart": "Gaan na Cart",
+      "qty": "Hoeveelheid",
+      "remove": "Verwyder",
+      "title": "Cart"
+    },
     "cnd": {
       "HANDMADE": "Handgemaak",
       "NEW": "Nuwe Item",
@@ -1572,6 +1593,7 @@
     "editSuccess": "Item is gewysig",
     "escrowNotice": "Die betaalde Pi word veilig in Escrow gehou en sal na die verkoper oorgedra word na bevestiging van die transaksie deur beide partye",
     "escrowReleased": "Transaksie afgehandel — Escrow vereffening verwerk",
+    "fiatRefAt": "Wisselkoers op {date}",
     "form": {
       "category": "Category",
       "categoryAll": "Alles",
@@ -1579,13 +1601,23 @@
       "cnd": "Itemtoestand",
       "desc": "Itembeskrywing",
       "name": "Itemnaam",
+      "noShopYet": "Geen winkels geregistreer nie. Registreer asseblief eers 'n winkel.",
       "price": "Prys",
+      "priceCcy": "Geldeenheid",
+      "priceCcyPi": "π Pi direkte invoer",
+      "priceConverted": "≈ {pi} π (gebaseer op wisselkoers ten tye van registrasie)",
+      "priceConvertHint": "As jy in plaaslike geldeenheid invoer, sal die Pi-prys bepaal word deur die wisselkoers ten tye van registrasie.",
+      "priceConverting": "Besig met wisselkoersomskakeling…",
+      "priceQuoteFail": "Kon nie wisselkoers kry nie. Voer asseblief direk in Pi in.",
+      "priceQuoteRequired": "Stoor asseblief nadat die wisselkoersomskakeling voltooi is.",
       "publish": "Publiseer nou",
       "qty": "Verkoophoeveelheid",
       "saveDraft": "Stoor konsep",
       "saveEdit": "Stoor wysigings",
       "shop": "Geaffilieerde Winkel",
       "shopNone": "Geen winkel",
+      "shopRequired": "Vir Offline Store-items is die keuse van 'n winkel verpligtend.",
+      "shopSelect": "Kies 'n winkel",
       "thumbUrl": "Hoofbeeld URL",
       "unlimited": "Onbeperk",
       "unlimitedHint": "Registreer items soos drankies of pizzas, waar voorraadopsporing sinloos is, as onbeperk."
@@ -1632,7 +1664,11 @@
     "myItemsTitle": "Bestuur my items",
     "myOwnItem": "Dit is my eie geregistreerde Item",
     "navHistory": "Transaksiegeskiedenis",
+    "navigateGoogle": "Gaan met Google Map",
+    "navigateKakao": "Kakao Map",
+    "navigateNaver": "Naver Kaart",
     "navMyItems": "My Items",
+    "navMyShops": "My winkels",
     "navOrders": "Koopgeskiedenis",
     "navSales": "Verkoopbestuur",
     "nearbyActive": "Items binne {radius}km van huidige ligging (naaste afstand eerste)",
@@ -1640,7 +1676,12 @@
     "nearbyNav": "📍 Naby",
     "nearbySort": "📍 Volgens nabyheid",
     "newItem": "+ Registreer item",
+    "newItemP2P": "+ P2P",
+    "newItemShop": "+ Offline Winkel",
     "newItemTitle": "Registreer item",
+    "newP2PTitle": "P2P Item Registrasie",
+    "newShopHint": "Kies 'n winkel en registreer die prys in plaaslike geldeenheid. Betaling sal in Pi geskied.",
+    "newShopTitle": "Offline Store Item Registrasie",
     "noItems": "Geen Items geregistreer nie",
     "noNearbyItems": "Geen items binne {radius}km in die omgewing nie",
     "noOrders": "Geen bestellingsgeskiedenis nie",
@@ -1701,6 +1742,9 @@
       "type_OFFLINE": "Offline",
       "type_ONLINE": "Online"
     },
+    "shopfrontAddItem": "+ Voeg Menu by",
+    "shopfrontEditBadge": "✏️ Wysig",
+    "shopfrontOwnerHint": "Dit is my winkel — jy kan items dadelik wysig deur daarop te tik.",
     "shopType": {
       "BOTH": "Online en Offline",
       "OFFLINE": "Offline winkel",

@@ -80,6 +80,9 @@ function StoreTab() {
           <Link href="/store/my/items" className="text-primary hover:underline">
             {t('navMyItems')}
           </Link>
+          <Link href="/store/my/shops" className="text-primary hover:underline">
+            🏪 {t('navMyShops')}
+          </Link>
           <Link href="/store/my/sales" className="text-primary hover:underline">
             {t('navSales')}
           </Link>
@@ -97,7 +100,7 @@ function StoreTab() {
           </Link>
         </nav>
       </div>
-      <StoreItemList />
+      <StoreItemList mine />
     </div>
   )
 }

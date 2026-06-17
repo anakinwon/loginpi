@@ -1227,8 +1227,8 @@
         "name": "Teste de Transferência de Bean (PiRC1)"
       },
       "M5": {
-        "desc": "Após solicitar o Serviço de Assinatura Pi, criar Pi Bet no Cafe + distribuir aos participantes",
-        "name": "Após solicitar o Serviço de Assinatura Pi (PiRC2), criar e distribuir Pi Bet"
+        "desc": "Após assinar o PiRC2, crie um Cafe exclusivo para eventos com o plano Business",
+        "name": "Solicitar assinatura Pi (PiRC2) e criar um Cafe de evento"
       },
       "M6": {
         "desc": "Usar Stickers / Enviar arquivos / Usar canal de voz (1 ou mais)",
@@ -1387,7 +1387,11 @@
     "cafe": "Cafe",
     "event": "Event",
     "home": "Home",
+    "map": "Map",
+    "mapEmpty": "Nenhuma loja registrada",
+    "mapSubtitle": "Verifique a localização das lojas Pi Shop",
     "my": "Minhas Informações",
+    "navigateGo": "Ir",
     "shop": "Shop"
   },
   "pay": {
@@ -1560,6 +1564,23 @@
     "buying": "Processando pagamento…",
     "buySuccess": "Pagamento Escrow concluído! Prossiga com a transação com o vendedor",
     "cancelReasonPrompt": "Insira o motivo do cancelamento",
+    "cart": {
+      "add": "🛒 Adicionar ao Carrinho",
+      "added": "{n} itens adicionados ao carrinho",
+      "addedTitle": "Adicionado ao carrinho 🛒",
+      "checkingOut": "Processando pagamento…",
+      "checkout": "Finalizar Pedido ({count} itens)",
+      "checkoutFail": "Falha ao processar o pedido",
+      "checkoutSuccess": "Pedido recebido",
+      "clear": "Esvaziar Carrinho",
+      "conflictConfirm": "O carrinho contém itens de outra loja. Deseja esvaziá-lo e adicionar os novos itens?",
+      "continueShopping": "Continuar Comprando",
+      "empty": "O carrinho está vazio",
+      "goToCart": "Ir para o Carrinho",
+      "qty": "Quantidade",
+      "remove": "Remover",
+      "title": "Carrinho de Compras"
+    },
     "cnd": {
       "HANDMADE": "Feito à mão",
       "NEW": "Novo",
@@ -1572,6 +1593,7 @@
     "editSuccess": "O produto foi editado",
     "escrowNotice": "O Pi pago é mantido com segurança em Escrow e será entregue ao vendedor após a confirmação da transação por ambas as partes",
     "escrowReleased": "Transação encerrada — Processamento de liquidação de escrow",
+    "fiatRefAt": "Taxa de câmbio em {date}",
     "form": {
       "category": "Category",
       "categoryAll": "Todas",
@@ -1579,13 +1601,23 @@
       "cnd": "Condição do produto",
       "desc": "Descrição do produto",
       "name": "Nome do produto",
+      "noShopYet": "Nenhuma loja registrada. Por favor, registre uma loja primeiro.",
       "price": "Preço",
+      "priceCcy": "Moeda",
+      "priceCcyPi": "π Pi Inserir diretamente",
+      "priceConverted": "≈ {pi} π (com base na taxa de câmbio no momento do registro)",
+      "priceConvertHint": "Ao inserir na moeda local, o preço em Pi será determinado pela taxa de câmbio no momento do registro",
+      "priceConverting": "Convertendo taxa de câmbio…",
+      "priceQuoteFail": "Não foi possível obter a taxa de câmbio. Por favor, insira o valor em Pi diretamente.",
+      "priceQuoteRequired": "Por favor, salve após a conversão da taxa de câmbio",
       "publish": "Publicar agora",
       "qty": "Quantidade à venda",
       "saveDraft": "Salvar rascunho",
       "saveEdit": "Salvar edição",
       "shop": "Loja",
       "shopNone": "Nenhuma loja",
+      "shopRequired": "A seleção da loja é obrigatória para itens de loja física",
+      "shopSelect": "Selecione uma loja",
       "thumbUrl": "URL da imagem principal",
       "unlimited": "Ilimitado",
       "unlimitedHint": "Para produtos onde o rastreamento de estoque é irrelevante (ex: bebidas, pizzas), registre como ilimitado."
@@ -1632,7 +1664,11 @@
     "myItemsTitle": "Gerenciar meus produtos",
     "myOwnItem": "Este é um item que você registrou",
     "navHistory": "Histórico de transações",
+    "navigateGoogle": "Ir com Google Maps",
+    "navigateKakao": "Kakao Map",
+    "navigateNaver": "Naver Map",
     "navMyItems": "Meus Itens",
+    "navMyShops": "Minhas Lojas",
     "navOrders": "Histórico de Pedidos",
     "navSales": "Gerenciar Vendas",
     "nearbyActive": "Produtos a {radius}km da localização atual (mais próximos primeiro)",
@@ -1640,7 +1676,12 @@
     "nearbyNav": "📍 Próximo",
     "nearbySort": "📍 Por proximidade",
     "newItem": "+ Registrar produto",
+    "newItemP2P": "+ P2P de Usados",
+    "newItemShop": "+ Loja Física",
     "newItemTitle": "Registrar produto",
+    "newP2PTitle": "Registrar Item P2P de Usados",
+    "newShopHint": "Selecione uma loja e registre o preço na moeda local. O pagamento será feito em Pi.",
+    "newShopTitle": "Registrar Item de Loja Física",
     "noItems": "Nenhum item registrado",
     "noNearbyItems": "Não há produtos a {radius}km de distância",
     "noOrders": "Nenhum pedido",
@@ -1701,6 +1742,9 @@
       "type_OFFLINE": "Offline",
       "type_ONLINE": "Online"
     },
+    "shopfrontAddItem": "+ Adicionar Item",
+    "shopfrontEditBadge": "✏️ Editar",
+    "shopfrontOwnerHint": "Esta é a minha loja — toque em um produto para editá-lo imediatamente",
     "shopType": {
       "BOTH": "Online e Física",
       "OFFLINE": "Loja Física",

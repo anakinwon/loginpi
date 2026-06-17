@@ -8,18 +8,36 @@ export async function generateMetadata() {
 }
 
 // 자동 작업 스케줄표 — 직접 실행하지 않아도 이력이 기록되는 작업을 명시해 오해 방지
-function ScheduleTable({ t }: { t: Awaited<ReturnType<typeof getTranslations>> }) {
+function ScheduleTable({
+  t,
+}: {
+  t: Awaited<ReturnType<typeof getTranslations>>
+}) {
   const rows = [
-    { trigger: t('triggerCron'), when: t('schedCronWhen'), desc: t('schedCronDesc') },
-    { trigger: t('triggerOndemand'), when: t('schedOndemandWhen'), desc: t('schedOndemandDesc') },
-    { trigger: `${t('triggerManual')} / ${t('triggerBackfill')}`, when: t('schedManualWhen'), desc: t('schedManualDesc') },
+    {
+      trigger: t('triggerCron'),
+      when: t('schedCronWhen'),
+      desc: t('schedCronDesc'),
+    },
+    {
+      trigger: t('triggerOndemand'),
+      when: t('schedOndemandWhen'),
+      desc: t('schedOndemandDesc'),
+    },
+    {
+      trigger: `${t('triggerManual')} / ${t('triggerBackfill')}`,
+      when: t('schedManualWhen'),
+      desc: t('schedManualDesc'),
+    },
   ]
 
   return (
     <div className="space-y-4 rounded-lg border p-5">
       <div>
         <p className="text-sm font-semibold">{t('scheduleTitle')}</p>
-        <p className="text-muted-foreground mt-0.5 text-xs">{t('scheduleDesc')}</p>
+        <p className="text-muted-foreground mt-0.5 text-xs">
+          {t('scheduleDesc')}
+        </p>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">

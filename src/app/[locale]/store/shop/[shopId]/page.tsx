@@ -6,11 +6,14 @@ import { StoreShopfront } from '@/components/store/store-shopfront'
 async function getShop(shopId: string) {
   const { data } = await getSupabaseAdmin()
     .from('mps_shop')
-    .select('shop_nm, shop_type_cd, addr, biz_hour, owner_verified_yn, dlvr_yn')
+    .select(
+      'seller_id, shop_nm, shop_type_cd, addr, biz_hour, owner_verified_yn, dlvr_yn',
+    )
     .eq('shop_id', shopId)
     .eq('del_yn', 'N')
     .maybeSingle()
   return data as {
+    seller_id: string
     shop_nm: string
     shop_type_cd: string
     addr: string | null
@@ -73,7 +76,7 @@ export default async function ShopfrontPage({
             </p>
           </div>
 
-          <StoreShopfront shopId={shopId} />
+          <StoreShopfront shopId={shopId} ownerSellerId={shop.seller_id} />
         </>
       )}
     </div>

@@ -36,9 +36,7 @@ export async function getRoomOwnerIds(roomId: string): Promise<Set<string>> {
     .eq('room_id', roomId)
     .in('mbr_role_cd', ['OWNER', 'ADMIN'])
     .eq('del_yn', 'N')
-  return new Set(
-    ((data ?? []) as { usr_id: string }[]).map((r) => r.usr_id),
-  )
+  return new Set(((data ?? []) as { usr_id: string }[]).map((r) => r.usr_id))
 }
 
 // 방의 활성 참여자 목록 (표시명·방장 여부 포함)

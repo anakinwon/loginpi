@@ -1227,8 +1227,8 @@
         "name": "Test Transfer Bean (PiRC1)"
       },
       "M5": {
-        "desc": "Setelah mendaftar Pi Subscription Service, buat Pi Bet di Cafe + distribusikan kepada peserta",
-        "name": "Setelah mendaftar Pi Subscription Service (PiRC2), buat dan distribusikan Pi Bet"
+        "desc": "Setelah berlangganan PiRC2, buat Cafe khusus acara dengan paket Business",
+        "name": "Daftar langganan Pi (PiRC2) lalu buat Cafe Acara"
       },
       "M6": {
         "desc": "Gunakan Sticker / Transfer File / Gunakan Saluran Suara (salah satu atau lebih)",
@@ -1387,7 +1387,11 @@
     "cafe": "Cafe",
     "event": "Event",
     "home": "Home",
+    "map": "Map",
+    "mapEmpty": "Tidak ada toko yang terdaftar",
+    "mapSubtitle": "Lihat lokasi toko Pi Shop",
     "my": "Informasi Saya",
+    "navigateGo": "Mulai",
     "shop": "Shop"
   },
   "pay": {
@@ -1560,6 +1564,23 @@
     "buying": "Memproses pembayaran…",
     "buySuccess": "Pembayaran Escrow selesai! Lanjutkan transaksi dengan penjual",
     "cancelReasonPrompt": "Mohon masukkan alasan pembatalan",
+    "cart": {
+      "add": "🛒 Tambah ke Keranjang",
+      "added": "{n} item telah ditambahkan ke keranjang",
+      "addedTitle": "Ditambahkan ke Keranjang 🛒",
+      "checkingOut": "Memproses Pembayaran…",
+      "checkout": "Pesan ({count} item)",
+      "checkoutFail": "Gagal memproses pesanan",
+      "checkoutSuccess": "Pesanan berhasil diterima",
+      "clear": "Kosongkan Keranjang",
+      "conflictConfirm": "Keranjang berisi produk dari toko lain. Kosongkan dan tambahkan yang baru?",
+      "continueShopping": "Lanjutkan Belanja",
+      "empty": "Keranjang kosong",
+      "goToCart": "Pergi ke Keranjang",
+      "qty": "Jumlah",
+      "remove": "Hapus",
+      "title": "Keranjang Belanja"
+    },
     "cnd": {
       "HANDMADE": "Buatan Tangan",
       "NEW": "Baru",
@@ -1572,6 +1593,7 @@
     "editSuccess": "Produk telah diedit",
     "escrowNotice": "Pi yang dibayarkan akan disimpan dengan aman di escrow, dan akan diserahkan kepada penjual setelah konfirmasi transaksi dari kedua belah pihak",
     "escrowReleased": "Transaksi ditutup — Pemrosesan penyelesaian escrow.",
+    "fiatRefAt": "Berdasarkan nilai tukar {date}",
     "form": {
       "category": "Category",
       "categoryAll": "Semua",
@@ -1579,13 +1601,23 @@
       "cnd": "Kondisi Produk",
       "desc": "Deskripsi Produk",
       "name": "Nama Produk",
+      "noShopYet": "Belum ada toko yang terdaftar. Harap daftarkan toko terlebih dahulu.",
       "price": "Harga",
+      "priceCcy": "Mata Uang",
+      "priceCcyPi": "π Pi Masukkan Langsung",
+      "priceConverted": "≈ {pi} π (Berdasarkan nilai tukar saat pendaftaran)",
+      "priceConvertHint": "Jika Anda memasukkan dalam mata uang lokal, harga Pi akan ditentukan berdasarkan nilai tukar saat pendaftaran",
+      "priceConverting": "Mengonversi nilai tukar…",
+      "priceQuoteFail": "Gagal mendapatkan nilai tukar. Harap masukkan langsung dalam Pi.",
+      "priceQuoteRequired": "Harap simpan setelah konversi nilai tukar selesai",
       "publish": "Publikasikan Sekarang",
       "qty": "Jumlah Penjualan",
       "saveDraft": "Simpan Draf",
       "saveEdit": "Simpan Perubahan",
       "shop": "Toko Terdaftar",
       "shopNone": "Tidak ada toko",
+      "shopRequired": "Pilihan toko wajib untuk produk toko offline",
+      "shopSelect": "Pilih toko",
       "thumbUrl": "URL Gambar Utama",
       "unlimited": "Tidak Terbatas",
       "unlimitedHint": "Daftarkan produk seperti minuman atau pizza, yang pelacakan stoknya tidak relevan, sebagai tidak terbatas"
@@ -1632,7 +1664,11 @@
     "myItemsTitle": "Kelola Produk Saya",
     "myOwnItem": "Ini adalah barang yang saya daftarkan",
     "navHistory": "Riwayat Transaksi",
+    "navigateGoogle": "Mulai dengan Google Maps",
+    "navigateKakao": "Kakao Maps",
+    "navigateNaver": "Naver Maps",
     "navMyItems": "Barang Saya",
+    "navMyShops": "Toko Saya",
     "navOrders": "Riwayat Pembelian",
     "navSales": "Manajemen Penjualan",
     "nearbyActive": "Produk dalam radius {radius}km dari lokasi saat ini (urutkan berdasarkan jarak terdekat)",
@@ -1640,7 +1676,12 @@
     "nearbyNav": "📍 Terdekat",
     "nearbySort": "📍 Urutkan Terdekat",
     "newItem": "+ Daftarkan Produk",
+    "newItemP2P": "+ P2P Bekas",
+    "newItemShop": "+ Toko Offline",
     "newItemTitle": "Daftarkan Produk Baru",
+    "newP2PTitle": "Daftar Produk P2P Bekas",
+    "newShopHint": "Pilih toko dan daftarkan harga dalam mata uang lokal Anda. Pembayaran akan dilakukan dengan Pi.",
+    "newShopTitle": "Daftar Produk Toko Offline",
     "noItems": "Tidak ada barang terdaftar",
     "noNearbyItems": "Tidak ada produk dalam radius {radius}km di sekitar",
     "noOrders": "Tidak ada riwayat pesanan",
@@ -1701,6 +1742,9 @@
       "type_OFFLINE": "Offline",
       "type_ONLINE": "Online"
     },
+    "shopfrontAddItem": "+ Tambah Item",
+    "shopfrontEditBadge": "✏️ Edit",
+    "shopfrontOwnerHint": "Ini toko saya — Anda dapat langsung mengedit produk dengan mengetuknya",
     "shopType": {
       "BOTH": "Online & Offline",
       "OFFLINE": "Toko Offline",

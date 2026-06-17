@@ -104,10 +104,12 @@ export async function POST(request: NextRequest) {
 
     // M1: 계정 통합 미션 기록 (MULTI_AND: account_link + google_link 둘 다 필요)
     // 연동은 이 시점에 원자적으로 성립하므로 두 행위를 함께 기록한다 (비블로킹)
-    recordUserAction('account_link', linkCode.pi_user_id)
-      .catch((err) => console.error(`[M1] account_link 기록 실패: ${err.message}`))
-    recordUserAction('google_link', linkCode.pi_user_id)
-      .catch((err) => console.error(`[M1] google_link 기록 실패: ${err.message}`))
+    recordUserAction('account_link', linkCode.pi_user_id).catch((err) =>
+      console.error(`[M1] account_link 기록 실패: ${err.message}`),
+    )
+    recordUserAction('google_link', linkCode.pi_user_id).catch((err) =>
+      console.error(`[M1] google_link 기록 실패: ${err.message}`),
+    )
 
     return NextResponse.json({ success: true })
   } catch (err) {

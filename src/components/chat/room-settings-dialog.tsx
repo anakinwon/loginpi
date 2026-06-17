@@ -34,7 +34,10 @@ export function RoomSettingsDialog({
   const [newPwd, setNewPwd] = useState('')
   const [removePwd, setRemovePwd] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [gpsCoords, setGpsCoords] = useState<{ lat: number; lng: number } | null>(null)
+  const [gpsCoords, setGpsCoords] = useState<{
+    lat: number
+    lng: number
+  } | null>(null)
 
   // 다이얼로그 마운트 시 LBS 동의자이면 현재 위치 자동 수집
   useEffect(() => {
@@ -42,7 +45,9 @@ export function RoomSettingsDialog({
       .then((r) => (r.ok ? r.json() : null))
       .then((d: { consent_yn?: string } | null) => {
         if (d?.consent_yn === 'Y') {
-          getCurrentPosition().then(setGpsCoords).catch(() => {})
+          getCurrentPosition()
+            .then(setGpsCoords)
+            .catch(() => {})
         }
       })
       .catch(() => {})

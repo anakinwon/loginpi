@@ -110,8 +110,9 @@ export async function PATCH(req: Request) {
   // evaluateUserMissions의 M2 평가가 DB 상태(kakao_id null 여부)를 직접 확인하므로,
   // 여기서 조건 필터링하면 kakao_id 삭제 시 평가 자체가 실행되지 않아 M2 취소가 지연됨.
   if (data) {
-    recordUserAction('profile_update', user.id)
-      .catch(err => console.error(`[M2] 미션 기록 실패: ${err.message}`))
+    recordUserAction('profile_update', user.id).catch((err) =>
+      console.error(`[M2] 미션 기록 실패: ${err.message}`),
+    )
   }
 
   const response = NextResponse.json({

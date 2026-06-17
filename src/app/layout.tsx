@@ -1,6 +1,15 @@
-import { Inter, Geist_Mono, Noto_Serif, Raleway, Merriweather } from 'next/font/google'
+import {
+  Inter,
+  Geist_Mono,
+  Noto_Serif,
+  Raleway,
+  Merriweather,
+} from 'next/font/google'
 
-const merriweather = Merriweather({subsets:['latin'],variable:'--font-serif'})
+const merriweather = Merriweather({
+  subsets: ['latin'],
+  variable: '--font-serif',
+})
 
 const ralewayHeading = Raleway({
   subsets: ['latin'],

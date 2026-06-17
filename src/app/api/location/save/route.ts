@@ -6,7 +6,8 @@ import { reverseGeocode } from '@/lib/google-maps'
 // Rule LBS-02: 서버에서 동의 재검증 — 클라이언트 캐시와 관계없이 DB 상태 기준
 export async function POST(request: NextRequest) {
   const user = await getSessionUser()
-  if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user)
+    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
   // 동의하지 않은 사용자는 403 반환 (Rule LBS-02)
   if (user.lbs_consent_yn !== 'Y') {
@@ -64,7 +65,10 @@ export async function POST(request: NextRequest) {
 
   // WGS84 좌표 범위 검증
   if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
-    return NextResponse.json({ error: '유효하지 않은 좌표값입니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: '유효하지 않은 좌표값입니다' },
+      { status: 400 },
+    )
   }
 
   // 행정구역 자동 보강 — 클라이언트가 시도/시군구/동/주소를 하나도 안 보냈을 때만
@@ -122,7 +126,10 @@ export async function POST(request: NextRequest) {
     .single()
 
   if (error) {
-    return NextResponse.json({ error: '위치 저장 중 오류가 발생했습니다' }, { status: 500 })
+    return NextResponse.json(
+      { error: '위치 저장 중 오류가 발생했습니다' },
+      { status: 500 },
+    )
   }
 
   return NextResponse.json({ ok: true, loc_hist_id: data.loc_hist_id })
