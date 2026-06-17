@@ -121,7 +121,7 @@ export async function createCartOrder(
   orderMthd: 'DINE_IN' | 'PICKUP' | 'DELIVERY' = 'DINE_IN',
   dlvrAddr: string | null = null,
   allowSelf = false,
-): Promise<{ order: MpsOrder } | { error: OrderError }> {
+): Promise<{ order: MpsOrder } | { error: OrderError; detail?: string }> {
   const { data, error } = await getSupabaseAdmin().rpc(
     'fn_mps_cart_order_create',
     {
@@ -134,7 +134,10 @@ export async function createCartOrder(
       p_allow_self: allowSelf,
     },
   )
-  if (error) return { error: mapRpcError(error.message) }
+  if (error) {
+    console.error('[cart order] RPC error:', error.message)
+    return { error: mapRpcError(error.message), detail: error.message }
+  }
   return { order: data as MpsOrder }
 }
 

@@ -67,7 +67,8 @@ export async function POST(req: NextRequest) {
       UNKNOWN: { msg: '주문 생성에 실패했습니다', status: 500 },
     } as const
     const { msg, status } = map[result.error]
-    return NextResponse.json({ error: msg }, { status })
+    // detail: RPC 원본 에러(임시 진단용) — 마이그레이션/SQL 원인 파악 후 제거
+    return NextResponse.json({ error: msg, detail: result.detail }, { status })
   }
 
   const { order } = result
