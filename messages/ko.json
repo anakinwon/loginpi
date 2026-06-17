@@ -1635,6 +1635,12 @@
     "actionClose": "중단",
     "actionDelete": "삭제",
     "fiatRefAt": "{date} 환율 기준",
+    "cart": {
+      "add": "🛒 카트 담기",
+      "added": "{n}개를 카트에 담았습니다",
+      "qty": "수량",
+      "conflictConfirm": "카트에 다른 매장 상품이 담겨 있습니다. 비우고 새로 담을까요?"
+    },
     "form": {
       "name": "상품명",
       "desc": "상품 설명",

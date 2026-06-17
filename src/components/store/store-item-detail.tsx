@@ -13,6 +13,7 @@ import {
   TRADE_ST_STYLE,
 } from '@/lib/mps-trade-status'
 import { formatCcy } from '@/lib/format-ccy'
+import { addToCart, replaceShopAndAdd } from '@/hooks/use-cart'
 
 interface ItemImage {
   img_id: string
@@ -36,6 +37,7 @@ interface ItemDetail {
   thumbnail_url: string | null
   images: ItemImage[]
   shop: {
+    shop_id: string
     shop_nm: string
     shop_type_cd: string
     addr: string | null
@@ -68,6 +70,7 @@ export function StoreItemDetail({ itemId }: { itemId: string }) {
     'DINE_IN',
   )
   const [dlvrAddr, setDlvrAddr] = useState('')
+  const [qty, setQty] = useState(1) // 카트 담기 수량(오프라인매장)
 
   useEffect(() => {
     void (async () => {
@@ -194,6 +197,38 @@ export function StoreItemDetail({ itemId }: { itemId: string }) {
       : item.thumbnail_url
         ? [item.thumbnail_url]
         : []
+
+  // 카트 담기 — 오프라인매장 상품(shop 보유)·구매가능·본인상품 아님(또는 관리자 테스트)일 때만
+  const offlineCart = !!item.shop && buyable && (!isMine || canSelfTest)
+  const maxQty = item.reg_qty === 9999 ? 9999 : item.stock_qty
+
+  function addCart() {
+    if (!item?.shop) return
+    const input = {
+      shopId: item.shop.shop_id,
+      shopNm: item.shop.shop_nm,
+      line: {
+        itemId: item.item_id,
+        itemNm: item.item_nm,
+        thumbUrl: item.thumbnail_url,
+        unitPricePi: Number(item.price_pi),
+        ccyCd: item.ccy_cd,
+        ccyAmt: item.ccy_amt,
+        stockQty: maxQty,
+        qty,
+      },
+    }
+    const res = addToCart(input)
+    if (res.conflict) {
+      // 카트에 다른 매장 상품이 있음 — 비우고 새로 담기 확인
+      if (confirm(t('cart.conflictConfirm'))) {
+        replaceShopAndAdd(input)
+        toast.success(t('cart.added', { n: qty }))
+      }
+      return
+    }
+    toast.success(t('cart.added', { n: qty }))
+  }
 
   return (
     <div className="grid gap-6 md:grid-cols-2">
@@ -363,22 +398,67 @@ export function StoreItemDetail({ itemId }: { itemId: string }) {
           {isMine && !canSelfTest ? (
             <p className="text-muted-foreground text-sm">{t('myOwnItem')}</p>
           ) : (
-            <Button
-              onClick={buy}
-              disabled={!buyable || buying}
-              className="w-full"
-              size="lg"
-            >
-              {buying
-                ? t('buying')
-                : buyable
-                  ? t('buyEscrow')
-                  : tradeSt === 'TRADING'
-                    ? t('tradeSt.TRADING')
-                    : item.item_st_cd === 'CLOSED'
-                      ? t('notOnSale')
-                      : t('soldOut')}
-            </Button>
+            <div className="space-y-2">
+              {/* 오프라인매장: 수량 입력 + 카트 담기 (구매하기와 함께) */}
+              {offlineCart && (
+                <div className="flex items-stretch gap-2">
+                  <div className="flex items-center rounded-lg border">
+                    <button
+                      type="button"
+                      aria-label="−"
+                      onClick={() => setQty((q) => Math.max(1, q - 1))}
+                      className="hover:bg-muted px-3 py-2 text-lg leading-none"
+                    >
+                      −
+                    </button>
+                    <input
+                      type="number"
+                      min={1}
+                      max={maxQty}
+                      value={qty}
+                      onChange={(e) =>
+                        setQty(
+                          Math.min(maxQty, Math.max(1, Number(e.target.value) || 1)),
+                        )
+                      }
+                      aria-label={t('cart.qty')}
+                      className="w-12 bg-transparent text-center text-sm [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
+                    />
+                    <button
+                      type="button"
+                      aria-label="+"
+                      onClick={() => setQty((q) => Math.min(maxQty, q + 1))}
+                      className="hover:bg-muted px-3 py-2 text-lg leading-none"
+                    >
+                      +
+                    </button>
+                  </div>
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={addCart}
+                  >
+                    {t('cart.add')}
+                  </Button>
+                </div>
+              )}
+              <Button
+                onClick={buy}
+                disabled={!buyable || buying}
+                className="w-full"
+                size="lg"
+              >
+                {buying
+                  ? t('buying')
+                  : buyable
+                    ? t('buyEscrow')
+                    : tradeSt === 'TRADING'
+                      ? t('tradeSt.TRADING')
+                      : item.item_st_cd === 'CLOSED'
+                        ? t('notOnSale')
+                        : t('soldOut')}
+              </Button>
+            </div>
           )}
           <p className="text-muted-foreground mt-2 text-center text-xs">
             {t('escrowNotice')}
