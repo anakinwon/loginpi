@@ -1,6 +1,10 @@
 # BEAN — Pi Launchpad GA-Open 제출 체크리스트
 
-> **목적**: Mainnet Launchpad(발행사용)가 GA(정식 개방)되는 순간 **지체 없이 신청·발행**할 수 있도록 모든 준비를 미리 끝내 두고, 당일엔 이 파일만 보고 실행한다.
+> 📖 **GA = General Availability (정식 출시·일반 개방)**
+> 소프트웨어/서비스가 **테스트넷·베타 같은 시험 단계를 끝내고 누구나 정식으로 사용할 수 있게 공개되는 시점**을 뜻하는 업계 표준 용어. (단계: alpha → beta → **GA**)
+> 이 문서에서 "GA"는 **Pi Mainnet Launchpad가 토큰 발행사(issuer)에게 정식 개방되는 시점**을 가리킨다. 현재는 Testnet(SLICE 테스트 토큰) 단계이며 발행사용 Mainnet 창구는 아직 GA 전이다.
+
+> **목적**: Mainnet Launchpad(발행사용)가 **GA(정식 개방)**되는 순간 **지체 없이 신청·발행**할 수 있도록 모든 준비를 미리 끝내 두고, 당일엔 이 파일만 보고 실행한다.
 > **작성일**: 2026-06-17 · **상태**: GA 대기 중 · **정본 문서**: `docs/PRD_12_TOKEN.md` v1.9
 > **관련**: 백서 `PRD_12_TOKEN_백서.md`(KO)·`PRD_12_TOKEN_WHITEPAPER_EN.md`(EN)·`docs/dist/*.pdf` · 법무 `PRD_12_TOKEN_법무자문의뢰서.md`
 > **갱신 규칙**: 항목 완료 시 `[ ]`→`[x]` + 날짜 기재. 새 사실 확인 시 §변경이력에 한 줄 추가.
