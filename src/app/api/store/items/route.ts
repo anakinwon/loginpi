@@ -41,6 +41,7 @@ export async function GET(req: NextRequest) {
     ctgrId: sp.get('ctgr') ?? undefined,
     keyword: sp.get('q') ?? undefined,
     cndCd: sp.get('cnd') ?? undefined,
+    shopId: sp.get('shop') ?? undefined, // 매장 스토어프론트 (FR-15)
     sort: (
       ['latest', 'price_asc', 'price_desc', 'views', 'distance'] as const
     ).find((s) => s === sortParam),

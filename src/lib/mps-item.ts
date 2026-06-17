@@ -35,6 +35,7 @@ export interface ItemListFilter {
   ctgrId?: string
   keyword?: string
   cndCd?: string
+  shopId?: string // 매장 스토어프론트 — 해당 매장 상품만 (FR-15)
   sort?: 'latest' | 'price_asc' | 'price_desc' | 'views' | 'distance'
   page?: number
   limit?: number
@@ -183,6 +184,7 @@ export async function listOpenItems(filter: ItemListFilter) {
 
   if (filter.ctgrId) q = q.eq('ctgr_id', filter.ctgrId)
   if (filter.cndCd) q = q.eq('item_cnd_cd', filter.cndCd)
+  if (filter.shopId) q = q.eq('shop_id', filter.shopId)
   if (filter.keyword) {
     const kw = filter.keyword.replaceAll('%', '\\%').replaceAll('_', '\\_')
     q = q.or(`item_nm.ilike.%${kw}%,item_desc.ilike.%${kw}%`)

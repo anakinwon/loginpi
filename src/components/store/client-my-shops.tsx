@@ -561,6 +561,13 @@ export function ClientMyShops({
               <div className="flex shrink-0 flex-wrap justify-end gap-1.5">
                 <Button
                   size="sm"
+                  variant="secondary"
+                  onClick={() => router.push(`/store/shop/${shop.shop_id}`)}
+                >
+                  🏪 매장 보기
+                </Button>
+                <Button
+                  size="sm"
                   onClick={() =>
                     router.push(`/store/my/shop-items/new?shop=${shop.shop_id}`)
                   }
