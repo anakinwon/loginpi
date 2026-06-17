@@ -7,7 +7,9 @@ import { ProfileForm } from './profile-form'
 import { PaymentHistory } from './payment-history'
 import { SubscriptionStatus } from './subscription-status'
 import { StoreItemList } from '@/components/store/store-item-list'
+import { SalesNotiBadge } from '@/components/store/sales-noti-badge'
 import { LbsSettings } from './lbs-settings'
+import { TelegramConnect } from './telegram-connect'
 import { AccountIntegrationSection } from '@/components/account-integration-section'
 import type { UserRow } from '@/lib/users'
 import type { LocaleOption } from '@/lib/locale-options'
@@ -53,6 +55,7 @@ export function ProfileTabs({ initialUser, localeOptions }: Props) {
       {activeTab === 'info' && (
         <div className="space-y-8">
           <AccountIntegrationSection />
+          <TelegramConnect />
           <ProfileForm
             initialUser={user}
             localeOptions={localeOptions}
@@ -85,6 +88,7 @@ function StoreTab() {
           </Link>
           <Link href="/store/my/sales" className="text-primary hover:underline">
             {t('navSales')}
+            <SalesNotiBadge />
           </Link>
           <Link
             href="/store/my/orders"
