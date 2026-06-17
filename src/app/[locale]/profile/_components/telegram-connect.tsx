@@ -93,6 +93,33 @@ export function TelegramConnect() {
               </button>
             </div>
             {hint && <p className="text-muted-foreground text-xs">{hint}</p>}
+
+            <details className="bg-muted/40 rounded-lg p-3 text-xs">
+              <summary className="text-foreground cursor-pointer font-medium select-none">
+                ❓ 처음이세요? 연동 방법 보기
+              </summary>
+              <ol className="text-muted-foreground mt-3 list-decimal space-y-2 pl-4">
+                <li>
+                  휴대폰에 <b>Telegram(텔레그램)</b> 앱이 없다면 먼저
+                  설치하세요. (앱스토어/플레이스토어에서 “Telegram” 검색)
+                </li>
+                <li>
+                  위 <b>“📨 Telegram 봇 열어 연동하기”</b> 버튼을 누르면
+                  텔레그램이 열립니다.
+                </li>
+                <li>
+                  텔레그램 화면 맨 아래 <b>“시작(START)”</b> 버튼을 한 번
+                  누르세요.
+                </li>
+                <li>
+                  이 화면으로 돌아와 <b>“연동 확인”</b>을 누르면 완료! ✅
+                </li>
+              </ol>
+              <p className="text-muted-foreground mt-3">
+                연동하면 새 주문이 들어올 때마다 텔레그램으로 알림이 와요.{' '}
+                <b>앱을 닫아도</b> 휴대폰 알림으로 받을 수 있습니다.
+              </p>
+            </details>
           </div>
         )}
       </div>
