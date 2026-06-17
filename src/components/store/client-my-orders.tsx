@@ -57,6 +57,17 @@ interface OrderRow {
         item: { item_nm: string } | null
       }[]
     | null
+  // 주문자 정보(판매 관리 전용) — 준비완료 호명용
+  buyer?: {
+    nick_nm: string | null
+    display_name: string | null
+    pi_username: string | null
+  } | null
+}
+
+// 주문자 표시명 — 별명 우선, 없으면 Pi username, 없으면 display_name
+function buyerName(b: OrderRow['buyer']): string {
+  return b?.nick_nm || b?.pi_username || b?.display_name || '구매자'
 }
 
 type OrderAction =
@@ -250,6 +261,17 @@ export function ClientMyOrders({
             {stLabel}
           </span>
         </div>
+
+        {/* 판매자: 주문자(호명용) / 구매자: 픽업 매장명 */}
+        {role === 'seller' && o.buyer && (
+          <p className="text-sm font-semibold">🙋 주문자: {buyerName(o.buyer)}</p>
+        )}
+        {role === 'buyer' && o.mps_item?.mps_shop?.shop_nm && (
+          <p className="text-sm font-semibold">
+            🏪 {o.mps_item.mps_shop.shop_nm}
+          </p>
+        )}
+
         <p className="text-muted-foreground text-xs">
           {Number(o.order_price_pi)} π ·{' '}
           {o.order_mthd_cd && MTHD_LABEL[o.order_mthd_cd]
@@ -268,13 +290,25 @@ export function ClientMyOrders({
 
         {/* 카트 주문 라인 — 개별 상품명·수량(판매자 준비용). 단건 주문은 표시 안 함 */}
         {o.lines && o.lines.length > 0 && (
-          <ul className="bg-muted/50 space-y-0.5 rounded-md px-3 py-2 text-sm">
+          <ul
+            className={`space-y-1 rounded-md px-3 py-2 text-sm ring-1 ${
+              role === 'seller'
+                ? 'bg-amber-50 ring-amber-200/70 dark:bg-amber-950/40 dark:ring-amber-900/50'
+                : 'bg-emerald-50 ring-emerald-200/70 dark:bg-emerald-950/40 dark:ring-emerald-900/50'
+            }`}
+          >
             {o.lines.map((l, i) => (
               <li key={i} className="flex items-center justify-between gap-2">
-                <span className="truncate">
+                <span className="truncate font-medium">
                   {l.item?.item_nm ?? t('itemNotFound')}
                 </span>
-                <span className="text-muted-foreground shrink-0">
+                <span
+                  className={`shrink-0 font-semibold ${
+                    role === 'seller'
+                      ? 'text-amber-700 dark:text-amber-400'
+                      : 'text-emerald-700 dark:text-emerald-400'
+                  }`}
+                >
                   × {l.ord_qty}
                 </span>
               </li>
@@ -424,13 +458,18 @@ export function ClientMyOrders({
               : '상품을 준비하고 있습니다'}
           </p>
         )}
-        {o.order_st_cd === 'READY' && (
-          <p className="text-muted-foreground text-xs">
-            {role === 'buyer'
-              ? '📦 상품이 준비됐어요! 곧 받으실 수 있습니다 (10분 후 자동 판매완료)'
-              : '구매자 수령 대기중 (10분 후 자동 판매완료)'}
-          </p>
-        )}
+        {o.order_st_cd === 'READY' &&
+          (role === 'buyer' ? (
+            <p className="text-muted-foreground text-xs">
+              📦 상품이 준비됐어요! 곧 받으실 수 있습니다 (10분 후 자동 판매완료)
+            </p>
+          ) : (
+            // 준비완료 → 판매자가 주문자 호명 (요건)
+            <p className="text-sm font-semibold text-amber-700 dark:text-amber-400">
+              📣 {buyerName(o.buyer)}님 호명 — 수령 대기중 (10분 후 자동
+              판매완료)
+            </p>
+          ))}
         {o.order_st_cd === 'DONE' && (
           <p className="text-muted-foreground text-xs">{t('escrowReleased')}</p>
         )}

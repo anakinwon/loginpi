@@ -446,7 +446,27 @@ export async function listOrdersByRole(
   const { data, error } = await q
 
   if (error) throw new Error(error.message)
-  return data ?? []
+  const orders = data ?? []
+
+  // 판매 관리: 주문자(buyer) 별명/PI username 첨부 — 준비완료 시 호명용.
+  // buyer_id는 FK 없는 TEXT(sys_user.id)라 임베드 불가 → 별도 조회 후 매핑.
+  if (role === 'seller' && orders.length > 0) {
+    const buyerIds = [
+      ...new Set(orders.map((o) => (o as { buyer_id: string }).buyer_id)),
+    ]
+    const { data: buyers } = await getSupabaseAdmin()
+      .from('sys_user')
+      .select('id, nick_nm, display_name, pi_username')
+      .in('id', buyerIds)
+    const byId = new Map(
+      (buyers ?? []).map((b) => [(b as { id: string }).id, b]),
+    )
+    return orders.map((o) => ({
+      ...(o as object),
+      buyer: byId.get((o as { buyer_id: string }).buyer_id) ?? null,
+    }))
+  }
+  return orders
 }
 
 // 거래 이력 — FR-12
