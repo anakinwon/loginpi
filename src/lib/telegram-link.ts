@@ -28,6 +28,8 @@ export function createLinkCode(userId: string): string {
 }
 
 // /start 페이로드 → userId(UUID) | null (위조·만료·형식오류)
+//   단발성(single-use)은 바인딩 계층에서 강제 — webhook이 conn_yn='N' 원자 가드로
+//   이미 연동된 계정 재바인딩을 차단하므로, 코드 재생(replay)으로 알림을 탈취할 수 없다.
 export function verifyLinkCode(code: string): string | null {
   const parts = code.split('_')
   if (parts.length !== 3) return null
