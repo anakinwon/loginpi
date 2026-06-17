@@ -67,3 +67,6 @@ docs/.pptx-build/qa*/
 
 # 백서 PDF 빌드 중간 HTML(재생성 가능, build.js·PDF만 커밋)
 .whitepaper-build/*.html
+
+# 환경변수 템플릿은 추적(실값 없는 placeholder만). 실값 파일(.env.local 등)은 위 .env* 규칙으로 제외 유지
+!.env.example
