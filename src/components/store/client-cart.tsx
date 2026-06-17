@@ -1,8 +1,11 @@
 'use client'
 
+import { useState } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
 import { toast } from 'sonner'
-import { Link } from '@/i18n/navigation'
+import { Link, useRouter } from '@/i18n/navigation'
+import { usePiAuth } from '@/components/pi-auth-provider'
+import { piFetch } from '@/lib/pi-fetch'
 import { Button } from '@/components/ui/button'
 import { formatCcy } from '@/lib/format-ccy'
 import {
@@ -22,6 +25,91 @@ export function ClientCart() {
   const locale = useLocale()
   const cart = useCart()
   const totals = cartTotals(cart)
+  const router = useRouter()
+  const { user } = usePiAuth()
+  const [checking, setChecking] = useState(false)
+
+  // 체크아웃 — 카트 → 다중라인 주문 1건 + 단일 Pi 결제(에스크로). buy() 흐름 미러링.
+  async function checkout() {
+    if (cart.lines.length === 0 || !cart.shopId) return
+    if (!user) {
+      toast.error(t('loginRequired'))
+      return
+    }
+    if (typeof window === 'undefined' || !window.Pi) {
+      toast.error(t('piBrowserOnly'))
+      return
+    }
+    setChecking(true)
+    try {
+      const res = await piFetch('/api/store/orders/cart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          shop_id: cart.shopId,
+          items: cart.lines.map((l) => ({ item_id: l.itemId, qty: l.qty })),
+        }),
+      })
+      if (!res.ok) {
+        const { error } = (await res.json()) as { error?: string }
+        throw new Error(error ?? t('cart.checkoutFail'))
+      }
+      const prep = (await res.json()) as {
+        order: { order_id: string }
+        amount: number
+        memo: string
+        metadata: Record<string, unknown>
+      }
+      const orderId = prep.order.order_id
+      // 결제 중단·오류 시 PENDING 카트 주문 롤백(라인 전체 재고 복원)
+      const rollback = () => {
+        void piFetch('/api/store/orders/cart/cancel', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ order_id: orderId, reason: '결제 미완료' }),
+        })
+      }
+      window.Pi.createPayment(
+        { amount: prep.amount, memo: prep.memo, metadata: prep.metadata },
+        {
+          onReadyForServerApproval: async (paymentId: string) => {
+            await fetch('/api/payments/approve', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ paymentId }),
+            })
+          },
+          onReadyForServerCompletion: async (paymentId: string, txid: string) => {
+            const r = await fetch('/api/payments/complete', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ paymentId, txid }),
+            })
+            setChecking(false)
+            if (r.ok) {
+              clearCart()
+              toast.success(t('cart.checkoutSuccess'))
+              router.push('/store/my/orders')
+            } else {
+              toast.error(t('cart.checkoutFail'))
+            }
+          },
+          onCancel: () => {
+            rollback()
+            setChecking(false)
+          },
+          onError: (e: Error) => {
+            rollback()
+            setChecking(false)
+            toast.error(e.message)
+          },
+        },
+      )
+    } catch (e) {
+      setChecking(false)
+      toast.error(e instanceof Error ? e.message : t('cart.checkoutFail'))
+    }
+  }
 
   if (cart.lines.length === 0) {
     return (
@@ -141,9 +229,12 @@ export function ClientCart() {
       <Button
         className="w-full"
         size="lg"
-        onClick={() => toast.info(t('cart.checkoutPending'))}
+        disabled={checking}
+        onClick={checkout}
       >
-        {t('cart.checkout', { count: totals.count })}
+        {checking
+          ? t('cart.checkingOut')
+          : t('cart.checkout', { count: totals.count })}
       </Button>
     </div>
   )

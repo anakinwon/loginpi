@@ -102,6 +102,9 @@ export async function POST(req: NextRequest) {
       SELF_PURCHASE: { msg: '본인 상품은 구매할 수 없습니다', status: 400 },
       ORDER_NOT_FOUND: { msg: '주문을 찾을 수 없습니다', status: 404 },
       NOT_ALLOWED: { msg: '허용되지 않은 요청입니다', status: 403 },
+      EMPTY_CART: { msg: '주문 항목이 없습니다', status: 400 },
+      SHOP_NOT_FOUND: { msg: '매장을 찾을 수 없습니다', status: 404 },
+      BAD_QTY: { msg: '수량이 올바르지 않습니다', status: 400 },
       UNKNOWN: { msg: '주문 생성에 실패했습니다', status: 500 },
     } as const
     const { msg, status } = map[result.error]

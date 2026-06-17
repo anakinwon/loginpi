@@ -1648,7 +1648,9 @@
       "clear": "카트 비우기",
       "remove": "삭제",
       "checkout": "주문하기 ({count}개)",
-      "checkoutPending": "주문(체크아웃) 기능은 곧 제공됩니다"
+      "checkingOut": "결제 진행 중…",
+      "checkoutSuccess": "주문이 접수됐습니다",
+      "checkoutFail": "주문 처리에 실패했습니다"
     },
     "form": {
       "name": "상품명",

@@ -37,6 +37,9 @@ export type OrderError =
   | 'SELF_PURCHASE'
   | 'ORDER_NOT_FOUND'
   | 'NOT_ALLOWED'
+  | 'EMPTY_CART'
+  | 'SHOP_NOT_FOUND'
+  | 'BAD_QTY'
   | 'UNKNOWN'
 
 function mapRpcError(message: string): OrderError {
@@ -45,6 +48,9 @@ function mapRpcError(message: string): OrderError {
     'SELF_PURCHASE',
     'ORDER_NOT_FOUND',
     'NOT_ALLOWED',
+    'EMPTY_CART',
+    'SHOP_NOT_FOUND',
+    'BAD_QTY',
   ] as const) {
     if (message.includes(code)) return code
   }
@@ -100,6 +106,56 @@ export async function createOrder(
     if (updated) return { order: updated as MpsOrder }
   }
   return { order }
+}
+
+// 카트 다중라인 주문 생성 — 라인별 원자적 재고차감 + 헤더/라인(단일 트랜잭션, RPC) (FR-14)
+export interface CartLineInput {
+  item_id: string
+  qty: number
+}
+export async function createCartOrder(
+  shopId: string,
+  items: CartLineInput[],
+  buyerId: string,
+  regrId: string,
+  orderMthd: 'DINE_IN' | 'PICKUP' | 'DELIVERY' = 'DINE_IN',
+  dlvrAddr: string | null = null,
+  allowSelf = false,
+): Promise<{ order: MpsOrder } | { error: OrderError }> {
+  const { data, error } = await getSupabaseAdmin().rpc(
+    'fn_mps_cart_order_create',
+    {
+      p_shop_id: shopId,
+      p_buyer_id: buyerId,
+      p_items: items,
+      p_regr_id: regrId,
+      p_order_mthd: orderMthd,
+      p_dlvr_addr: dlvrAddr,
+      p_allow_self: allowSelf,
+    },
+  )
+  if (error) return { error: mapRpcError(error.message) }
+  return { order: data as MpsOrder }
+}
+
+// 카트 주문 롤백 — 결제 미완료(PENDING) 라인 전체 재고 복원 + CANCELLED (RPC)
+export async function cancelCartOrder(
+  orderId: string,
+  userId: string,
+  reason: string | null,
+  regrId: string,
+): Promise<{ order: MpsOrder } | { error: OrderError }> {
+  const { data, error } = await getSupabaseAdmin().rpc(
+    'fn_mps_cart_order_cancel',
+    {
+      p_order_id: orderId,
+      p_user_id: userId,
+      p_reason: reason,
+      p_regr_id: regrId,
+    },
+  )
+  if (error) return { error: mapRpcError(error.message) }
+  return { order: data as MpsOrder }
 }
 
 // 주문 취소 — 상태·권한 검증 + 재고 복원 (RPC 단일 트랜잭션)
