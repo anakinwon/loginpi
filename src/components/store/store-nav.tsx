@@ -1,5 +1,6 @@
 import { getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/navigation'
+import { SalesNotiBadge } from './sales-noti-badge'
 
 // 스토어 공용 상단 네비 — 목록·판매관리·구매내역·거래내역 등 하위 페이지에서 공유(단일 소스).
 // active로 현재 페이지를 강조한다.
@@ -27,6 +28,7 @@ export async function StoreNav({ active }: { active?: StoreNavKey }) {
           }
         >
           {l.label}
+          {l.key === 'sales' && <SalesNotiBadge />}
         </Link>
       ))}
     </nav>

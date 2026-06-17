@@ -165,6 +165,15 @@ export function ClientMyOrders({
     if (authed) void load()
   }, [authed, load])
 
+  // 판매 관리 진입 시 안읽은 주문 알림 읽음 처리 — StoreNav 뱃지 클리어(Pull 안전망)
+  useEffect(() => {
+    if (authed && role === 'seller') {
+      void piFetch('/api/store/notifications', { method: 'POST' }).catch(
+        () => {},
+      )
+    }
+  }, [authed, role])
+
   if (!authed && isLoading) {
     return (
       <p className="text-muted-foreground py-16 text-center text-sm">
