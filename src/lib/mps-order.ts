@@ -26,6 +26,9 @@ export interface MpsOrder {
     | 'CANCELLED'
   escrow_txid: string | null
   release_txid: string | null
+  // 판매자 정산 상태 — UNSETTLED 미정산 / SETTLED 정산완료 / FAILED 정산실패 / NO_UID 미연동 / DISABLED 비활성
+  settle_st_cd: 'UNSETTLED' | 'SETTLED' | 'FAILED' | 'NO_UID' | 'DISABLED'
+  settle_dtm: string | null
   cancel_req_id: string | null
   cancel_reason: string | null
   meet_loc_desc: string | null
@@ -428,9 +431,27 @@ async function insertPendingRelease(
   })
 }
 
+// 주문 정산 상태 갱신 (settle_st_cd) — settleOrder 각 결과 분기 공용
+type SettleSt = 'UNSETTLED' | 'SETTLED' | 'FAILED' | 'NO_UID' | 'DISABLED'
+async function markSettleSt(
+  db: ReturnType<typeof getSupabaseAdmin>,
+  orderId: string,
+  st: SettleSt,
+  actorId: string,
+) {
+  await db
+    .from('mps_order')
+    .update({
+      settle_st_cd: st,
+      modr_id: actorId,
+      mod_dtm: new Date().toISOString(),
+    })
+    .eq('order_id', orderId)
+}
+
 // 판매자 정산 — 에스크로(앱 지갑) → 판매자 A2U 실송금. markComplete·markPickup·자동완료·백필 공용.
-//   성공: order.release_txid 기록 + RELEASE_OUT(txid) 정산완료 (멱등 핵심 = release_txid)
-//   실패/비활성/UID없음: RELEASE_OUT(미송금) 정산대기 → 백필/재시도 대상으로 남김
+//   성공: order.release_txid + settle_st_cd='SETTLED' + RELEASE_OUT(txid) (멱등 핵심 = release_txid)
+//   실패/비활성/UID없음: settle_st_cd 기록 + RELEASE_OUT(미송금) → 백필/재시도 대상으로 남김
 async function settleOrder(
   db: ReturnType<typeof getSupabaseAdmin>,
   order: MpsOrder,
@@ -465,6 +486,7 @@ async function settleOrder(
       actorId,
       '판매자 Pi 미연동 — 운영자 수동 정산 필요',
     )
+    await markSettleSt(db, order.order_id, 'NO_UID', actorId)
     return { status: 'pending', reason: 'NO_UID' }
   }
 
@@ -475,6 +497,7 @@ async function settleOrder(
       actorId,
       'A2U 비활성 — 운영자 수동 정산 필요',
     )
+    await markSettleSt(db, order.order_id, 'DISABLED', actorId)
     return { status: 'pending', reason: 'A2U_DISABLED' }
   }
 
@@ -497,16 +520,20 @@ async function settleOrder(
       actorId,
       'A2U 송금 실패 — 재시도/수동 정산 필요',
     )
+    await markSettleSt(db, order.order_id, 'FAILED', actorId)
     return { status: 'pending', reason: 'A2U_FAILED', detail }
   }
 
   // 송금 완료(txid 확정) — 이후 장부 실패해도 throw 금지(재시도 시 이중송금 방지), CRITICAL 로그로 복구
+  const settledAt = new Date().toISOString()
   await db
     .from('mps_order')
     .update({
       release_txid: txid,
+      settle_st_cd: 'SETTLED',
+      settle_dtm: settledAt,
       modr_id: actorId,
-      mod_dtm: new Date().toISOString(),
+      mod_dtm: settledAt,
     })
     .eq('order_id', order.order_id)
 
@@ -573,7 +600,8 @@ export async function settleOrderById(
   return settleOrder(db, order, actorId)
 }
 
-// 백필 미리보기 — 미정산(release_txid 없음) DONE 주문 목록 (오래된 순)
+// 백필 미리보기 — 미완료(정산완료 아님) DONE 주문 목록 (판매일자 오래된 순)
+//   settle_st_cd: UNSETTLED 미정산 / FAILED 정산실패 / NO_UID 미연동 / DISABLED 비활성 (SETTLED 제외)
 export type UnsettledOrder = Pick<
   MpsOrder,
   | 'order_id'
@@ -582,6 +610,8 @@ export type UnsettledOrder = Pick<
   | 'order_price_pi'
   | 'ccy_cd'
   | 'ccy_amt'
+  | 'settle_st_cd'
+  | 'settle_dtm'
   | 'reg_dtm'
   | 'mod_dtm'
 >
@@ -589,12 +619,12 @@ export async function listUnsettledOrders(): Promise<UnsettledOrder[]> {
   const { data } = await getSupabaseAdmin()
     .from('mps_order')
     .select(
-      'order_id, seller_id, buyer_id, order_price_pi, ccy_cd, ccy_amt, reg_dtm, mod_dtm',
+      'order_id, seller_id, buyer_id, order_price_pi, ccy_cd, ccy_amt, settle_st_cd, settle_dtm, reg_dtm, mod_dtm',
     )
     .eq('order_st_cd', 'DONE')
-    .is('release_txid', null)
+    .neq('settle_st_cd', 'SETTLED')
     .eq('del_yn', 'N')
-    .order('mod_dtm', { ascending: true })
+    .order('reg_dtm', { ascending: true })
   return (data as UnsettledOrder[] | null) ?? []
 }
 

@@ -6,6 +6,8 @@ import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
 import { Button } from '@/components/ui/button'
 
+type SettleSt = 'UNSETTLED' | 'SETTLED' | 'FAILED' | 'NO_UID' | 'DISABLED'
+
 interface PreviewOrder {
   order_id: string
   seller_id: string
@@ -13,6 +15,8 @@ interface PreviewOrder {
   ccy_cd: string | null
   ccy_amt: number | null
   reg_dtm: string
+  settle_st_cd: SettleSt
+  settle_dtm: string | null
   seller_pi_username: string | null
   seller_linked: boolean
   buyer_display: string
@@ -41,6 +45,22 @@ function fmtCcy(amt: number | null, cd: string | null): string {
 // 판매일자 — 날짜만 (관리자 브라우저 로컬 타임존)
 function fmtDate(iso: string): string {
   return new Date(iso).toLocaleDateString('sv-SE')
+}
+
+// 정산 상태 색상·라벨키
+const ST_STYLE: Record<SettleSt, string> = {
+  UNSETTLED: 'text-muted-foreground',
+  SETTLED: 'text-green-600 dark:text-green-400',
+  FAILED: 'text-destructive',
+  NO_UID: 'text-destructive',
+  DISABLED: 'text-amber-600 dark:text-amber-400',
+}
+const ST_LABEL_KEY: Record<SettleSt, string> = {
+  UNSETTLED: 'settleStUnsettled',
+  SETTLED: 'settleStSettled',
+  FAILED: 'settleStFailed',
+  NO_UID: 'settleStNoUid',
+  DISABLED: 'settleStDisabled',
 }
 
 // 미정산 판매자 정산 — 목록 미리보기(GET) → 행 선택 → 확인 클릭 시에만 실송금(POST).
@@ -186,6 +206,9 @@ export function PendingSettleRunner() {
                       <th className="py-2 pr-3 font-medium">
                         {t('settleColDate')}
                       </th>
+                      <th className="py-2 pr-3 font-medium">
+                        {t('settleColStatus')}
+                      </th>
                       <th className="py-2 font-medium">
                         {t('settleColLinked')}
                       </th>
@@ -219,6 +242,11 @@ export function PendingSettleRunner() {
                         </td>
                         <td className="text-muted-foreground py-2 pr-3 whitespace-nowrap">
                           {fmtDate(o.reg_dtm)}
+                        </td>
+                        <td className="py-2 pr-3 whitespace-nowrap">
+                          <span className={ST_STYLE[o.settle_st_cd]}>
+                            {t(ST_LABEL_KEY[o.settle_st_cd])}
+                          </span>
                         </td>
                         <td className="py-2">
                           {o.seller_linked ? (
