@@ -51,14 +51,8 @@ export function ClientCart() {
         }),
       })
       if (!res.ok) {
-        // detail: RPC 원본 에러(임시 진단). 원인 파악 후 detail 노출 제거 예정.
-        const { error, detail } = (await res.json()) as {
-          error?: string
-          detail?: string
-        }
-        throw new Error(
-          detail ? `${error ?? ''} — ${detail}` : (error ?? t('cart.checkoutFail')),
-        )
+        const { error } = (await res.json()) as { error?: string }
+        throw new Error(error ?? t('cart.checkoutFail'))
       }
       const prep = (await res.json()) as {
         order: { order_id: string }

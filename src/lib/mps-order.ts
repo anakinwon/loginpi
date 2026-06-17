@@ -121,7 +121,7 @@ export async function createCartOrder(
   orderMthd: 'DINE_IN' | 'PICKUP' | 'DELIVERY' = 'DINE_IN',
   dlvrAddr: string | null = null,
   allowSelf = false,
-): Promise<{ order: MpsOrder } | { error: OrderError; detail?: string }> {
+): Promise<{ order: MpsOrder } | { error: OrderError }> {
   const { data, error } = await getSupabaseAdmin().rpc(
     'fn_mps_cart_order_create',
     {
@@ -135,8 +135,8 @@ export async function createCartOrder(
     },
   )
   if (error) {
-    console.error('[cart order] RPC error:', error.message)
-    return { error: mapRpcError(error.message), detail: error.message }
+    console.error('[cart order] RPC error:', error.message) // 서버 로그만(클라이언트 미노출)
+    return { error: mapRpcError(error.message) }
   }
   return { order: data as MpsOrder }
 }

@@ -67,12 +67,7 @@ export async function POST(req: NextRequest) {
       UNKNOWN: { msg: '주문 생성에 실패했습니다', status: 500 },
     } as const
     const { msg, status } = map[result.error]
-    // detail(RPC 원본 에러)은 관리자에게만 노출 — 일반 사용자에 DB 구조 유출 방지(보안).
-    // 서버 로그(console.error)엔 항상 기록. 원인 확정 후 detail 자체 제거 예정.
-    return NextResponse.json(
-      { error: msg, detail: isAdmin(user) ? result.detail : undefined },
-      { status },
-    )
+    return NextResponse.json({ error: msg }, { status })
   }
 
   const { order } = result
