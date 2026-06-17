@@ -13,10 +13,6 @@ import {
   TRADE_ST_STYLE,
 } from '@/lib/mps-trade-status'
 import { formatCcy } from '@/lib/format-ccy'
-import { env } from '@/env'
-
-// 자국통화 참고가 노출 여부 — Pi 가치평가 노출 최소화 위해 기본 비활성(env 게이트)
-const SHOW_FIAT_REF = env.NEXT_PUBLIC_FEATURE_PI_PRICE === 'true'
 
 interface ItemImage {
   img_id: string
@@ -251,8 +247,8 @@ export function StoreItemDetail({ itemId }: { itemId: string }) {
           </div>
           <h1 className="mt-2 text-xl font-bold">{item.item_nm}</h1>
           <p className="mt-2 text-2xl font-bold">{Number(item.price_pi)} π</p>
-          {/* 등록시점 자국통화 참고가 — FEATURE 플래그 on + 통화 등록 상품만 */}
-          {SHOW_FIAT_REF && item.ccy_cd && item.ccy_amt != null && (
+          {/* 등록 당시 자국통화 참고가 — 등록시점 고정값(실시간 틱커 아님), 통화 등록 상품만 항상 표시 */}
+          {item.ccy_cd && item.ccy_amt != null && (
             <p className="text-muted-foreground mt-1 text-sm">
               ≈ {formatCcy(locale, item.ccy_cd, Number(item.ccy_amt))}
               {item.fx_snap_dtm && (
