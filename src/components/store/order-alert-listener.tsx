@@ -32,6 +32,11 @@ export function OrderAlertListener() {
   const locale = useLocale()
   const [enabled, setEnabled] = useState(false)
   const audioCtxRef = useRef<AudioContext | null>(null)
+  // 구독 핸들러가 최신 enabled를 읽도록 ref로 보관 — 토글마다 재구독되지 않게 함
+  const enabledRef = useRef(enabled)
+  useEffect(() => {
+    enabledRef.current = enabled
+  }, [enabled])
 
   // 마운트 시 이전 설정 복원
   useEffect(() => {
@@ -115,16 +120,15 @@ export function OrderAlertListener() {
     toast('🔕 음성 주문 알림을 껐습니다')
   }, [])
 
-  // seller:{userId} 토픽 구독 — 활성화 + 로그인 시에만
+  // seller:{userId} 토픽 구독 — 로그인 시 항상. 토스트는 무조건, 소리는 enabled일 때만.
   useEffect(() => {
-    if (!enabled || !user?.userId) return
+    if (!user?.userId) return
     const supabase = getSupabaseClient()
     const channel = supabase
       .channel(`seller:${user.userId}`)
       .on('broadcast', { event: 'new_order' }, ({ payload }) => {
         const p = payload as NewOrderPayload
-        playChime()
-        speak3()
+        // 시각 토스트는 제스처 없이도 항상 표시 — 즉시 인지 보장
         toast.success(`🛒 새 주문: ${p.item_nm ?? '상품'}`, {
           description:
             p.order_mthd_cd === 'DELIVERY'
@@ -134,12 +138,17 @@ export function OrderAlertListener() {
                 : '🍽️ 매장이용',
           duration: 10000,
         })
+        // 차임·TTS는 브라우저 자동재생 정책상 1회 잠금해제(enabled) 후에만
+        if (enabledRef.current) {
+          playChime()
+          speak3()
+        }
       })
       .subscribe()
     return () => {
       void supabase.removeChannel(channel)
     }
-  }, [enabled, user?.userId, playChime, speak3])
+  }, [user?.userId, playChime, speak3])
 
   // 로그인 사용자에게만 노출 (비로그인은 알림 대상 아님)
   if (!user) return null
