@@ -15,19 +15,34 @@ function ScheduleTable({
 }) {
   const rows = [
     {
+      job: 'stats_aggregate',
       trigger: t('triggerCron'),
       when: t('schedCronWhen'),
       desc: t('schedCronDesc'),
     },
     {
+      job: 'stats_aggregate',
       trigger: t('triggerOndemand'),
       when: t('schedOndemandWhen'),
       desc: t('schedOndemandDesc'),
     },
     {
+      job: 'stats_aggregate',
       trigger: `${t('triggerManual')} / ${t('triggerBackfill')}`,
       when: t('schedManualWhen'),
       desc: t('schedManualDesc'),
+    },
+    {
+      job: 'order_autocomplete',
+      trigger: t('triggerCron'),
+      when: t('schedOrderCronWhen'),
+      desc: t('schedOrderCronDesc'),
+    },
+    {
+      job: 'order_autocomplete',
+      trigger: t('triggerBackfill'),
+      when: t('schedOrderBackfillWhen'),
+      desc: t('schedOrderBackfillDesc'),
     },
   ]
 
@@ -51,8 +66,11 @@ function ScheduleTable({
           </thead>
           <tbody>
             {rows.map((r) => (
-              <tr key={r.trigger} className="border-b last:border-0">
-                <td className="py-2 pr-3 whitespace-nowrap">stats_aggregate</td>
+              <tr
+                key={`${r.job}-${r.trigger}`}
+                className="border-b last:border-0"
+              >
+                <td className="py-2 pr-3 whitespace-nowrap">{r.job}</td>
                 <td className="py-2 pr-3 whitespace-nowrap">{r.trigger}</td>
                 <td className="py-2 pr-3">{r.when}</td>
                 <td className="text-muted-foreground py-2 text-xs">{r.desc}</td>

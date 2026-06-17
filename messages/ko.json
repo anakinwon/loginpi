@@ -76,7 +76,11 @@
       "schedOndemandWhen": "관리자 통계 대시보드 접속 또는 조회 기간 변경 시",
       "schedOndemandDesc": "오늘(UTC) 통계 행 온디맨드 최신화 — 자동 실행이며 수동 작업이 아님",
       "schedManualWhen": "이 페이지에서 관리자가 버튼으로 실행 시",
-      "schedManualDesc": "특정 날짜 집계 또는 기간 백필 — 관리자가 직접 실행한 경우에만 기록"
+      "schedManualDesc": "특정 날짜 집계 또는 기간 백필 — 관리자가 직접 실행한 경우에만 기록",
+      "schedOrderCronWhen": "5분마다 (Vercel Cron */5)",
+      "schedOrderCronDesc": "상품준비완료(READY) 5분 경과 주문을 자동 거래완료 + 판매자에게 에스크로 A2U 자동 정산",
+      "schedOrderBackfillWhen": "관리자가 미정산 정산을 실행 시",
+      "schedOrderBackfillDesc": "미정산(release_txid 없음) 거래완료 주문을 판매자에게 A2U 일괄 정산 — /api/admin/store/settle"
     },
     "dashboard": {
       "title": "대시보드",
