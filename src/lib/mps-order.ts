@@ -29,6 +29,7 @@ export interface MpsOrder {
   // 판매자 정산 상태 — UNSETTLED 미정산 / SETTLED 정산완료 / FAILED 정산실패 / NO_UID 미연동 / DISABLED 비활성
   settle_st_cd: 'UNSETTLED' | 'SETTLED' | 'FAILED' | 'NO_UID' | 'DISABLED'
   settle_dtm: string | null
+  settle_err_tx: string | null
   cancel_req_id: string | null
   cancel_reason: string | null
   meet_loc_desc: string | null
@@ -438,11 +439,13 @@ async function markSettleSt(
   orderId: string,
   st: SettleSt,
   actorId: string,
+  errTx: string | null = null, // 실패 사유(성공 시 null로 초기화)
 ) {
   await db
     .from('mps_order')
     .update({
       settle_st_cd: st,
+      settle_err_tx: errTx,
       modr_id: actorId,
       mod_dtm: new Date().toISOString(),
     })
@@ -486,7 +489,13 @@ async function settleOrder(
       actorId,
       '판매자 Pi 미연동 — 운영자 수동 정산 필요',
     )
-    await markSettleSt(db, order.order_id, 'NO_UID', actorId)
+    await markSettleSt(
+      db,
+      order.order_id,
+      'NO_UID',
+      actorId,
+      '판매자 Pi 미연동 (pi_uid 없음)',
+    )
     return { status: 'pending', reason: 'NO_UID' }
   }
 
@@ -497,7 +506,13 @@ async function settleOrder(
       actorId,
       'A2U 비활성 — 운영자 수동 정산 필요',
     )
-    await markSettleSt(db, order.order_id, 'DISABLED', actorId)
+    await markSettleSt(
+      db,
+      order.order_id,
+      'DISABLED',
+      actorId,
+      'A2U 비활성 (PI_API_KEY/PI_WALLET_PRIVATE_SEED 미설정)',
+    )
     return { status: 'pending', reason: 'A2U_DISABLED' }
   }
 
@@ -520,7 +535,13 @@ async function settleOrder(
       actorId,
       'A2U 송금 실패 — 재시도/수동 정산 필요',
     )
-    await markSettleSt(db, order.order_id, 'FAILED', actorId)
+    await markSettleSt(
+      db,
+      order.order_id,
+      'FAILED',
+      actorId,
+      detail.slice(0, 500),
+    )
     return { status: 'pending', reason: 'A2U_FAILED', detail }
   }
 
@@ -532,6 +553,7 @@ async function settleOrder(
       release_txid: txid,
       settle_st_cd: 'SETTLED',
       settle_dtm: settledAt,
+      settle_err_tx: null, // 성공 시 이전 실패 사유 초기화
       modr_id: actorId,
       mod_dtm: settledAt,
     })
@@ -612,6 +634,7 @@ export type UnsettledOrder = Pick<
   | 'ccy_amt'
   | 'settle_st_cd'
   | 'settle_dtm'
+  | 'settle_err_tx'
   | 'reg_dtm'
   | 'mod_dtm'
 >
@@ -619,7 +642,7 @@ export async function listUnsettledOrders(): Promise<UnsettledOrder[]> {
   const { data } = await getSupabaseAdmin()
     .from('mps_order')
     .select(
-      'order_id, seller_id, buyer_id, order_price_pi, ccy_cd, ccy_amt, settle_st_cd, settle_dtm, reg_dtm, mod_dtm',
+      'order_id, seller_id, buyer_id, order_price_pi, ccy_cd, ccy_amt, settle_st_cd, settle_dtm, settle_err_tx, reg_dtm, mod_dtm',
     )
     .eq('order_st_cd', 'DONE')
     .neq('settle_st_cd', 'SETTLED')

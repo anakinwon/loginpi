@@ -17,6 +17,7 @@ interface PreviewOrder {
   reg_dtm: string
   settle_st_cd: SettleSt
   settle_dtm: string | null
+  settle_err_tx: string | null
   seller_pi_username: string | null
   seller_linked: boolean
   buyer_display: string
@@ -32,6 +33,10 @@ interface Preview {
 interface SettleResp {
   attempted: number
   settled: number
+  results?: Array<{
+    order_id: string
+    result?: { status?: string; reason?: string; detail?: string }
+  }>
 }
 
 const round7 = (n: number) => Math.round(n * 1e7) / 1e7
@@ -131,6 +136,16 @@ export function PendingSettleRunner() {
             attempted: data.attempted,
           }),
         )
+        // 실패 건이 있으면 첫 사유를 그대로 노출 — 원인 즉시 진단
+        const firstFail = data.results?.find(
+          (r) => r.result?.status !== 'settled',
+        )
+        if (firstFail?.result) {
+          const r = firstFail.result
+          toast.error(`정산 실패 (${r.reason ?? 'ERROR'}): ${r.detail ?? ''}`, {
+            duration: 15000,
+          })
+        }
         await loadPreview() // 정산 후 잔여 목록 갱신
       } else {
         toast.error(t('settleError', { msg: data.error ?? res.status }))
@@ -243,10 +258,18 @@ export function PendingSettleRunner() {
                         <td className="text-muted-foreground py-2 pr-3 whitespace-nowrap">
                           {fmtDate(o.reg_dtm)}
                         </td>
-                        <td className="py-2 pr-3 whitespace-nowrap">
+                        <td className="py-2 pr-3">
                           <span className={ST_STYLE[o.settle_st_cd]}>
                             {t(ST_LABEL_KEY[o.settle_st_cd])}
                           </span>
+                          {o.settle_err_tx && (
+                            <span
+                              className="text-destructive ml-1 cursor-help"
+                              title={o.settle_err_tx}
+                            >
+                              ⚠
+                            </span>
+                          )}
                         </td>
                         <td className="py-2">
                           {o.seller_linked ? (
