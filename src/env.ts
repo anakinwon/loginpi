@@ -27,6 +27,13 @@ export const env = createEnv({
       process.env.VERCEL_ENV === 'production'
         ? z.string().min(1, 'CRON_SECRET은 프로덕션에서 필수입니다 (cron 인증)')
         : z.string().optional(),
+    // Telegram 봇 토큰(@BotFather 발급) — 판매자 주문 알림 발송용. 서버 전용.
+    // 미설정 시 발송 비활성(Outbox 행은 sent_yn='N'로 보존 → 토큰 설정 후 디스패처가 재발송).
+    TELEGRAM_BOT_TOKEN: z.string().optional(),
+    // 봇 username(@ 제외) — 연동 딥링크 t.me/<username>?start=... 생성용.
+    TELEGRAM_BOT_USERNAME: z.string().optional(),
+    // webhook 검증 시크릿 — setWebhook 시 등록, 요청 헤더와 대조해 위조 차단.
+    TELEGRAM_WEBHOOK_SECRET: z.string().optional(),
     TURN_HOST: z.string().optional(),
     TURN_SECRET: z.string().optional(),
     TURN_CREDENTIAL_TTL: z.coerce.number().optional(),
@@ -57,6 +64,9 @@ export const env = createEnv({
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     RESEND_FROM_EMAIL: process.env.RESEND_FROM_EMAIL,
     CRON_SECRET: process.env.CRON_SECRET,
+    TELEGRAM_BOT_TOKEN: process.env.TELEGRAM_BOT_TOKEN,
+    TELEGRAM_BOT_USERNAME: process.env.TELEGRAM_BOT_USERNAME,
+    TELEGRAM_WEBHOOK_SECRET: process.env.TELEGRAM_WEBHOOK_SECRET,
     TURN_HOST: process.env.TURN_HOST,
     TURN_SECRET: process.env.TURN_SECRET,
     TURN_CREDENTIAL_TTL: process.env.TURN_CREDENTIAL_TTL,
