@@ -41,7 +41,7 @@
 | 2-2 | Cafe.pi **Pi App Studio 등록 상태** 확인 (발행 자격 = 작동하는 앱) | 개발 | [ ] |
 | 2-3 | **법무 자문(T05)** 송부·회신 — `_법무자문의뢰서.md` 변호사 전달 | 아나킨/법무 | [ ] |
 | 2-4 | **백서 최종화** — 법무 회신 반영(§3·§6·§10) 후 PDF 재빌드(`pnpm build:whitepaper`) | 아소카 | [ ] |
-| 2-5 | **Soroban 토큰 컨트랙트** — 초안 작성됨 `contracts/bean-token/`. 잔여: `cargo test`·`stellar contract build` 검증 + Testnet 배포 | 개발 | 🔶 초안 |
+| 2-5 | **Soroban 토큰 컨트랙트** `contracts/bean-token/` — ✅ 빌드 검증 완료(cargo test 6/6 · wasm 13KB, 2026-06-17). 잔여: 외부 감사 + Testnet 배포 | 개발 | 🔶 검증완료 |
 | 2-6 | **보안 감사** — RFQ 작성됨 `docs/contracts/AUDIT_RFQ.md`. 잔여: 업체 발송·견적 수령·선정 | 개발/재무 | 🔶 RFQ준비 |
 | 2-7 | 발행 주체(개인) **세금·VASP** 자문 결과 반영 | 법무 | [ ] |
 

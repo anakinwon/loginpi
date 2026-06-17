@@ -43,9 +43,19 @@ cargo install --locked stellar-cli
 cargo test
 
 # WASM 빌드 (배포 산출물)
-stellar contract build
+cargo build --target wasm32-unknown-unknown --release
+# (또는) stellar contract build
 # → target/wasm32-unknown-unknown/release/bean_token.wasm
 ```
+
+> ✅ **빌드 검증 (2026-06-17, soroban-sdk 22.0.11 / rustc 1.96.0)**
+> - `cargo build --target wasm32-unknown-unknown --release` → **성공** (`bean_token.wasm` ~13KB)
+> - `cargo test` → **6/6 통과** (메타·전송·승인/위임·소각·중복초기화/잔액부족 실패)
+>
+> ⚠️ **Windows + GNU 툴체인 주의**: `crate-type`에 `cdylib`가 있으면 네이티브 `cargo test`가
+> 링크 단계에서 `export ordinal too large`로 실패한다(Windows DLL 한계, **코드 무관**).
+> 네이티브 테스트만 돌릴 땐 일시적으로 `crate-type = ["rlib"]`로 바꿔 실행하거나, wasm 빌드로 검증한다.
+> (Linux/macOS에서는 그대로 `cargo test` 동작.)
 
 ## 배포 (Pi Network)
 
@@ -72,9 +82,9 @@ stellar contract invoke --id <CONTRACT_ID> \
 
 ## 감사 전 자체 점검 (체크리스트)
 
-- [ ] `cargo test` 전체 통과
-- [ ] `stellar contract build` WASM 생성 확인
-- [ ] 고정 공급 — 공개 mint 함수 부재 재확인
-- [ ] 모든 상태 변경 함수에 `require_auth` 적용 확인
-- [ ] 음수 금액·오버플로우 방지(overflow-checks) 확인
-- [ ] 외부 보안 감사 의뢰 (`docs/contracts/AUDIT_RFQ.md`)
+- [x] `cargo test` 전체 통과 — 6/6 (2026-06-17)
+- [x] WASM 생성 확인 — `bean_token.wasm` ~13KB (2026-06-17)
+- [x] 고정 공급 — 공개 mint 함수 부재 재확인
+- [x] 모든 상태 변경 함수에 `require_auth` 적용 확인
+- [x] 음수 금액·오버플로우 방지(overflow-checks) 확인
+- [ ] 외부 보안 감사 의뢰 (`docs/contracts/AUDIT_RFQ.md`) ← 잔여
