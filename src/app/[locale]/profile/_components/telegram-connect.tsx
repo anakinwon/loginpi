@@ -51,8 +51,7 @@ export function TelegramConnect() {
     <section className="space-y-3">
       <h2 className="text-lg font-semibold">📨 Telegram 주문 알림</h2>
       <p className="text-muted-foreground text-sm">
-        매장에 새 주문이 들어오면 Telegram으로 즉시 알려드립니다. 앱을 닫아도
-        받을 수 있어요.
+        Pi Browser 자체 알림이 없으므로, Telegram 알림을 추천합니다.
       </p>
 
       <div className="bg-card rounded-xl border p-4">
