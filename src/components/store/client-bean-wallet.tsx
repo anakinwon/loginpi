@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
 import { Button } from '@/components/ui/button'
+import { BeanIcon } from '@/components/ui/bean-icon'
 import { CHARGE_PRESETS, BEAN_PER_PI, type BeanTxn } from '@/lib/bean-shared'
 
 interface WalletData {
@@ -14,10 +15,25 @@ interface WalletData {
 
 // 거래 유형별 배지 색·부호
 const TXN_STYLE: Record<string, { color: string; emoji: string }> = {
-  CHARGE: { color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400', emoji: '🟢' },
-  SPEND: { color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400', emoji: '🔵' },
-  REWARD: { color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400', emoji: '🎁' },
-  REFUND: { color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400', emoji: '🟠' },
+  CHARGE: {
+    color:
+      'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+    emoji: '🟢',
+  },
+  SPEND: {
+    color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+    emoji: '🔵',
+  },
+  REWARD: {
+    color:
+      'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+    emoji: '🎁',
+  },
+  REFUND: {
+    color:
+      'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
+    emoji: '🟠',
+  },
 }
 
 export function ClientBeanWallet({ serverAuthed }: { serverAuthed: boolean }) {
@@ -85,7 +101,9 @@ export function ClientBeanWallet({ serverAuthed }: { serverAuthed: boolean }) {
           })
           setPaying(false)
           if (r.ok) {
-            toast.success(t('chargeSuccess', { bean: beanAmt.toLocaleString() }))
+            toast.success(
+              t('chargeSuccess', { bean: beanAmt.toLocaleString() }),
+            )
             setCustom('')
             void load()
           } else {
@@ -104,7 +122,8 @@ export function ClientBeanWallet({ serverAuthed }: { serverAuthed: boolean }) {
     }
   }
 
-  if (loading) return <p className="text-muted-foreground text-sm">{t('loading')}</p>
+  if (loading)
+    return <p className="text-muted-foreground text-sm">{t('loading')}</p>
 
   if (!authed)
     return (
@@ -122,7 +141,8 @@ export function ClientBeanWallet({ serverAuthed }: { serverAuthed: boolean }) {
       <div className="from-primary/10 to-primary/5 flex flex-col items-center gap-1 rounded-2xl bg-gradient-to-b p-6">
         <p className="text-muted-foreground text-sm">{t('myBalance')}</p>
         <p className="text-4xl font-bold tabular-nums">
-          {balance.toLocaleString()} <span className="text-2xl">☕</span>
+          {balance.toLocaleString()}{' '}
+          <BeanIcon className="inline-block h-7 w-7 align-text-bottom" />
         </p>
         <p className="text-muted-foreground text-xs">Bean</p>
       </div>
@@ -142,7 +162,8 @@ export function ClientBeanWallet({ serverAuthed }: { serverAuthed: boolean }) {
               className="hover:border-primary flex flex-col items-center gap-0.5 rounded-xl border p-3 transition-colors disabled:opacity-50"
             >
               <span className="text-base font-bold tabular-nums">
-                {amt.toLocaleString()} ☕
+                {amt.toLocaleString()}{' '}
+                <BeanIcon className="inline-block h-4 w-4 align-text-bottom" />
               </span>
               <span className="text-muted-foreground text-xs">
                 {amt / BEAN_PER_PI} π
@@ -213,7 +234,8 @@ export function ClientBeanWallet({ serverAuthed }: { serverAuthed: boolean }) {
                     className={`font-semibold tabular-nums ${positive ? 'text-green-600 dark:text-green-400' : 'text-foreground'}`}
                   >
                     {positive ? '+' : ''}
-                    {tx.bean_amt.toLocaleString()} ☕
+                    {tx.bean_amt.toLocaleString()}{' '}
+                    <BeanIcon className="inline-block h-4 w-4 align-text-bottom" />
                   </span>
                 </li>
               )

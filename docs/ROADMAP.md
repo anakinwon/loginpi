@@ -47,6 +47,7 @@ Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Net
 | **15** | LBS 위치기반서비스 | ✅ 완료 (P0+P1) | 100% (상품 개별 위치 포함 · 지도 UI 확장 예정) |
 | **16** | 이벤트 미션 시스템 (Pi 요원 육성) | ✅ 완료 | 구현·운영 중 (참여 7·완주 1) · 2026-06-15 평가 엔진 정밀화(M2 상태형 양방향·select후분기 복구·CHAR→VARCHAR·재평가 버튼) · 2026-06-17 보상 전환(A2U→1π 보증금 적립·관리자 수동 지급·원자적 RPC 이중지급 차단·M3 유료테마 게이트, TASK-156) |
 | **17** | BEAN 토큰 발행 (Pi Launchpad) | 📝 기획·문서 | PRD_12 v1.7 — 토큰명 BEAN(기존 Pi Bean 온체인화·`1 Pi=100 BEAN`)·세일 0.01 Pi·분배 40/25/15/12/8·발행주체 개인·유동성 Pi 단독(레드라인 #2). **발행 전 코드 0(문서 전용)**. 잔여: T05 증권성 법무자문·T01 개인 KYC·T02 Launchpad 신청(외부 회신 대기) |
+| **19** | Bean Token 경제 관리 시스템 | 🚧 구현 중 | PRD_16_TOKEN_MNG.md v1.2 — ☕빈토큰지갑(`bean_token_wallet`) PLATFORM/USER 이중구조, Bean 경제 어드민 대시보드. DB migration(bean_wlt→bean_token_wallet+PLATFORM 지갑 신설) + 어드민 KPI/거래/지갑/수동조정 화면 P0. 2026-06-19 착수 (TASK-180~186) |
 | **18** | 판매자 주문 알림 (Telegram + Realtime + Pull) | ✅ 완료 | 100% (2026-06-18 — Outbox 3계층: 결제완료 즉시 Telegram 발송·인앱 Realtime 토스트·안읽은 뱃지 / 판매자 봇 연동 온보딩(딥링크+webhook) / 보안 하드닝(webhook fail-closed·재바인딩 차단) · `sql/064` · PRD_13_MSG) |
 | **횡단** | 성능 튜닝 | ✅ 완료 | 100% (무한 스크롤·지연 로딩·SWR 캐싱·리브랜딩·스티커) |
 | **횡단3** | Pi Browser 안정화·콤보 성능 (2026-06-13) | ✅ 완료 | 100% (admin 다국어 전환 무반응 수정·헤더 콤보 3계층 캐시) |

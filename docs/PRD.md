@@ -1,8 +1,8 @@
 # PRD: Pi Network 기반 풀스택 앱 플랫폼
 
-> **버전**: v11.9
+> **버전**: v12.0
 > **작성일**: 2026-06-05
-> **최종 업데이트**: 2026-06-18
+> **최종 업데이트**: 2026-06-19
 > **작성자**: anakin
 > **배포 URL**: https://loginpi.vercel.app
 > **저장소**: https://github.com/anakinwon/loginpi
@@ -13,6 +13,7 @@
 > **사용자 매뉴얼(쉬움)**: `docs/Cafe.pi_쉬운_사용자매뉴얼.pptx` — 컴맹 기준 7장(로그인·Bean·구독·PiCafe 동시통역·중고장터·PiStore O2O·차별점)
 > **구독 요금제**: `docs/PRD_14_SUBSC.md` (v1.0) — PiCafe(Explorer·Creator·Host) + PiStore(PiShop Seller 신설안) 월간/연간, Bean 환산(1 Pi=100 Bean), 원화는 비공개 설계참고. ⚠️ 시드·plan_tp_cd 결정 후 적용
 > **종합 요금 표준**: `docs/PRD_15_FEE.md` (v0.1) — ⭐Bean 경제 표준 요금 마스터(`bean_fee_plan`), 카페·스토어·자동번역 구독+일반요금 43행. 모든 SPEND/REWARD 금액 출처. ⚠️ xlsx 교정 후 시드 확정
+> **Bean Token 경제 관리**: `docs/PRD_16_TOKEN_MNG.md` (v1.2) — ☕빈토큰지갑(`bean_token_wallet`) 핵심 개념 확정 + 어드민 경제 관리 시스템. wallet_type PLATFORM(발행)/USER(보유) 이중구조. 소각 없음, 1Pi=100Bean 고정불변. Phase 19 구현 목표.
 > **토큰 발행 (기획)**: `docs/PRD_12_TOKEN.md` (v1.8) · `_백서.md` · `_법무자문의뢰서.md` — BEAN 생태계 토큰, Pi Launchpad. ⚠️ 발행 전 **앱 코드 미포함**(레드라인 #2 유지) — 단 문서는 git 커밋(파일럿 인큐베이팅, 2026-06-17 정책)
 
 ---

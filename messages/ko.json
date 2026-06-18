@@ -27,7 +27,11 @@
       "settle": "정산 관리",
       "backHome": "← 홈으로",
       "storeSection": "스토어 관리",
-      "storeCategories": "상품 카테고리"
+      "storeCategories": "상품 카테고리",
+      "beanSection": "☕ Bean 경제",
+      "beanToken": "Bean 대시보드",
+      "beanTxn": "거래 내역",
+      "beanWallets": "지갑 관리"
     },
     "batch": {
       "title": "온디멘드 배치",

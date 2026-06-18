@@ -5,6 +5,7 @@ import { useLocale } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { usePiAuth } from '@/components/pi-auth-provider'
 import { piFetch } from '@/lib/pi-fetch'
+import { BeanIcon } from '@/components/ui/bean-icon'
 import { ChatRoomPanel } from './chat-room-panel'
 import type { ChatMessage } from '@/hooks/use-chat-room'
 
@@ -267,7 +268,8 @@ export function ClientChatRoom({ roomId }: { roomId: string }) {
           beanConfirm.balance >= beanConfirm.feeBean ? (
             <>
               <p>
-                ☕ 이 카페 입장에는{' '}
+                <BeanIcon className="inline-block h-4 w-4 align-text-bottom" /> 이
+                카페 입장에는{' '}
                 <b className="text-primary">{beanConfirm.feeBean} Bean</b>이
                 소진됩니다
               </p>
@@ -289,7 +291,8 @@ export function ClientChatRoom({ roomId }: { roomId: string }) {
           ) : (
             <>
               <p>
-                ☕ 입장에{' '}
+                <BeanIcon className="inline-block h-4 w-4 align-text-bottom" />{' '}
+                입장에{' '}
                 <b className="text-primary">{beanConfirm.feeBean} Bean</b>이
                 필요하지만 잔액이 부족합니다
               </p>

@@ -5,6 +5,7 @@ import { useRouter } from '@/i18n/navigation'
 import { toast } from 'sonner'
 import { usePiAuth } from '@/components/pi-auth-provider'
 import { piFetch } from '@/lib/pi-fetch'
+import { BeanIcon } from '@/components/ui/bean-icon'
 import { getCurrentPosition } from '@/lib/geo'
 import {
   Dialog,
@@ -563,20 +564,27 @@ export function GroupRoomCreator() {
                       disabled={isBusy}
                       className="bg-primary text-primary-foreground flex-1 rounded-xl px-4 py-2 text-sm font-medium disabled:opacity-40"
                     >
-                      {isBusy
-                        ? '생성 중…'
-                        : createCostBean > 0
-                          ? `${createCostBean} ☕ 결제하고 방 만들기`
-                          : canCreateRoomFree && isPremium
-                            ? '구독 혜택으로 방 만들기'
-                            : '무료로 방 만들기'}
+                      {isBusy ? (
+                        '생성 중…'
+                      ) : createCostBean > 0 ? (
+                        <>
+                          {createCostBean}{' '}
+                          <BeanIcon className="inline-block h-4 w-4 align-text-bottom" />{' '}
+                          결제하고 방 만들기
+                        </>
+                      ) : canCreateRoomFree && isPremium ? (
+                        '구독 혜택으로 방 만들기'
+                      ) : (
+                        '무료로 방 만들기'
+                      )}
                     </button>
                   )}
                 </div>
                 {createCostBean > 0 && (
                   <p className="text-muted-foreground text-center text-xs">
-                    PREMIUM 카페 생성료 {createCostBean} ☕ Bean이 차감됩니다
-                    (잔액 부족 시 충전 안내)
+                    PREMIUM 카페 생성료 {createCostBean}{' '}
+                    <BeanIcon className="inline-block h-3.5 w-3.5 align-text-bottom" />{' '}
+                    Bean이 차감됩니다 (잔액 부족 시 충전 안내)
                   </p>
                 )}
                 {payError && (

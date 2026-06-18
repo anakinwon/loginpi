@@ -53,7 +53,10 @@ export async function POST(request: NextRequest) {
     if (result.error === 'INSUFFICIENT_BEAN')
       return NextResponse.json({ error: 'INSUFFICIENT_BEAN' }, { status: 402 })
     if (result.error === 'INVALID_PLAN')
-      return NextResponse.json({ error: '존재하지 않는 구독 상품' }, { status: 404 })
+      return NextResponse.json(
+        { error: '존재하지 않는 구독 상품' },
+        { status: 404 },
+      )
     return NextResponse.json({ error: '구독 처리 실패' }, { status: 500 })
   }
 

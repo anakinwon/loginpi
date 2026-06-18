@@ -2,24 +2,25 @@ import 'server-only'
 import { getSupabaseAdmin } from './supabase-admin'
 import type { BeanTxn, BeanTxnType } from './bean-shared'
 
-// Bean 토큰 이코노미 1단계 — Pi로 Bean(플랫폼 내부 적립금) 충전 (서버 전용 DB 접근)
-// Bean Token은 미발행(레드라인 Phase 17) → 오프체인 내부 잔액(store credit). 1 Pi = 100 Bean 고정·정수 전용.
-// 클라이언트 공용 상수/타입(BEAN_PER_PI·CHARGE_PRESETS·beanToPi·BeanTxn)은 './bean-shared'에 분리.
+// Bean Token 경제 서버 전용 DB 접근 (PRD_16_TOKEN_MNG v1.2)
+// 빈토큰지갑(bean_token_wallet): wallet_type=PLATFORM(발행 관리) / USER(사용자 보유)
+// 소각 없음 — Bean은 USER↔PLATFORM 순환. 1 Pi = 100 Bean 고정·정수 전용.
+// TODO: rename to bean_token_wallet (migration sql/069 적용 후)
 
-// 서버 코드가 '@/lib/bean'에서 함께 import할 수 있도록 재노출
 export { BEAN_PER_PI, CHARGE_PRESETS, beanToPi } from './bean-shared'
 export type { BeanTxn, BeanTxnType } from './bean-shared'
 
 interface BeanWallet {
-  bean_amt: number // 현재 잔액 (정수)
+  bean_amt: number
 }
 
-// 내 Bean 잔액 — 지갑 없으면 0
+// 내 Bean 잔액 — USER 지갑 없으면 0
 export async function getBalance(usrId: string): Promise<number> {
   const { data } = await getSupabaseAdmin()
-    .from('bean_wlt')
+    .from('bean_token_wallet')
     .select('bean_amt')
     .eq('usr_id', usrId)
+    .eq('wallet_type', 'USER')
     .eq('del_yn', 'N')
     .maybeSingle()
   return Number((data as BeanWallet | null)?.bean_amt ?? 0)

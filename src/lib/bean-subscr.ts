@@ -24,7 +24,9 @@ export async function getMySubscriptions(
 ): Promise<ActiveSubscr[]> {
   const { data } = await getSupabaseAdmin()
     .from('bean_subscr')
-    .select('prod_ctgr_cd, grade_cd, bill_cycle_cd, fee_plan_cd, expire_dtm, auto_renew_yn')
+    .select(
+      'prod_ctgr_cd, grade_cd, bill_cycle_cd, fee_plan_cd, expire_dtm, auto_renew_yn',
+    )
     .eq('usr_id', usrId)
     .eq('del_yn', 'N')
     .gt('expire_dtm', new Date().toISOString())

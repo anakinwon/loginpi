@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/navigation'
 import { SalesNotiBadge } from './sales-noti-badge'
+import { BeanIcon } from '@/components/ui/bean-icon'
 
 // 스토어 공용 상단 네비 — 목록·판매관리·구매내역·거래내역 등 하위 페이지에서 공유(단일 소스).
 // active로 현재 페이지를 강조한다.
@@ -28,7 +29,14 @@ export async function StoreNav({ active }: { active?: StoreNavKey }) {
               : 'text-primary hover:underline'
           }
         >
-          {l.label}
+          {l.key === 'bean' ? (
+            <span className="inline-flex items-center gap-1">
+              <BeanIcon className="inline-block h-5 w-5" />
+              {l.label.replace(/^☕\s*/, '')}
+            </span>
+          ) : (
+            l.label
+          )}
           {l.key === 'sales' && <SalesNotiBadge />}
         </Link>
       ))}

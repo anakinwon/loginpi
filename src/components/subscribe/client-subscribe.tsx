@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { Link } from '@/i18n/navigation'
 import { piFetch } from '@/lib/pi-fetch'
 import { Button } from '@/components/ui/button'
+import { BeanIcon } from '@/components/ui/bean-icon'
 import {
   SUBSCR_PLANS,
   findPlan,
@@ -114,7 +115,8 @@ export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
         <span className="text-sm">
           {t('myBalance')}{' '}
           <span className="font-bold tabular-nums">
-            {(resp?.balance ?? 0).toLocaleString()} ☕
+            {(resp?.balance ?? 0).toLocaleString()}{' '}
+            <BeanIcon className="inline-block h-4 w-4 align-text-bottom" />
           </span>
         </span>
         <Link
@@ -195,7 +197,8 @@ export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
                   </p>
                   <p className="mt-1">
                     <span className="text-lg font-bold tabular-nums">
-                      {plan.bean_amt.toLocaleString()} ☕
+                      {plan.bean_amt.toLocaleString()}{' '}
+                      <BeanIcon className="inline-block h-4 w-4 align-text-bottom" />
                     </span>
                     <span className="text-muted-foreground text-sm">
                       {' '}
@@ -266,7 +269,8 @@ export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
                         >
                           {t(`storeGrade.${g}`)}
                           <span className="block tabular-nums">
-                            {gp?.bean_amt.toLocaleString()} ☕
+                            {gp?.bean_amt.toLocaleString()}{' '}
+                            <BeanIcon className="inline-block h-4 w-4 align-text-bottom" />
                           </span>
                         </button>
                       )

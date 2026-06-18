@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
   const amountPi = beanToPi(beanAmt)
   return NextResponse.json({
     amount: amountPi,
-    memo: `☕ Bean ${beanAmt.toLocaleString()} 충전 (${amountPi}π)`,
+    memo: `Bean ${beanAmt.toLocaleString()} 충전 (${amountPi}π)`,
     // bean_amt를 메타데이터에 박아 complete 분기에서 결제금액과 교차검증
     metadata: { type: 'BEAN_CHARGE', bean_amt: beanAmt },
   })

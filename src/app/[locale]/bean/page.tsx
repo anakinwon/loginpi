@@ -3,6 +3,7 @@ import { Link } from '@/i18n/navigation'
 import { getSessionUser } from '@/lib/auth-check'
 import { StoreNav } from '@/components/store/store-nav'
 import { ClientBeanWallet } from '@/components/store/client-bean-wallet'
+import { BeanIcon } from '@/components/ui/bean-icon'
 
 export async function generateMetadata() {
   const t = await getTranslations('bean')
@@ -24,7 +25,9 @@ export default async function BeanWalletPage() {
       >
         ← {t('backToStore')}
       </Link>
-      <h1 className="text-xl font-bold">☕ {t('title')}</h1>
+      <h1 className="flex items-center gap-2 text-xl font-bold">
+        <BeanIcon className="inline-block h-6 w-6" /> {t('title')}
+      </h1>
       <ClientBeanWallet serverAuthed={!!user} />
     </div>
   )
