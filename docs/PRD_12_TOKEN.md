@@ -814,7 +814,581 @@ T02(신청양식) ─→ T03(Mainnet 일정) ─┘
 
 ---
 
-## 10. 참고 출처
+## 11. 토큰 경제학 DB 구조 (신규 섹션)
+
+> **본 섹션은 Bean Token 토큰 경제학을 DB 스키마·테이블·불변식으로 정의합니다.**
+> **모든 DDL은 문서 내 코드블록(초안·승인대기)으로만 제시되며, 실제 `sql/*.sql` 파일 생성 및 DB 적용은 토큰 발행 전 금지입니다.**
+> **본 설계는 "발행됨 전제" 기준이며, 온체인(Soroban) 실제 발행은 §7 기술 아키텍처 참조.**
+
+### 11-1. 경제모델 개요
+
+#### A. 공급·분배 (생성)
+
+Bean Token 총공급 10억 개는 5개 카테고리로 분배됩니다(§6-2 확정):
+
+| 카테고리 | 수량 | 특징 |
+|---------|------|------|
+| 세일(Launchpad) | 400M | 즉시~짧은 cliff, 사용자 분산 |
+| 생태계 리저브 | 250M | 3~4년 분할 방출, 사용자 보상 연료 |
+| 유동성 풀 | 150M | LP 영구 락, 가격 안정 |
+| 마케팅/파트너 | 120M | 12개월 락, 거래소·파트너 실탄 |
+| 팀/재단 | 80M | 6M cliff + 36M 선형 베스팅 |
+
+→ **DB 정본**: `bean_token_alloc` (분배 현황), `bean_vesting` (베스팅 스케줄)
+
+#### B. 수요·사용 (소비)
+
+Bean Token의 주요 소비 경로:
+
+| 사용처 | 통화 유형 | 플로우 |
+|--------|---------|-------|
+| **플랫폼 구독료** (PiCafe/PiStore) | Bean 정본 | 사용자 → 플랫폼 (Pi 충전 → Bean 결제) |
+| **플랫폼 수수료** (마켓 거래) | Bean 정본 | 거래자 → 플랫폼 (Pi 기반) |
+| **보상 지급** (O2O, 이벤트) | Bean | 플랫폼 → 사용자 (리저브 소진) |
+| **소각(Burn)** | Bean | 플랫폼 → 싱크 (공급 감소) |
+| **팁/후원** (사용자↔사용자) | Bean | 사용자 → 사용자 (유통) |
+
+→ **DB 정본**: `bean_ledger` (모든 이동 기록, append-only)
+
+#### C. 수공급 균형 (토큰 건강도)
+
+```
+총공급 = 발행(Fixed 10억)
+→ 유통 = 세일 + 리저브 방출 + 보상 지급
+→ Faucet(공급 확대): 보상, 에어드롭
+→ Sink(공급 축소): 구독료, 수수료, 소각, 역환전(향후)
+
+목표: Sink > Faucet → 토큰 희소성 증대, 가격 안정
+```
+
+### 11-2. 핵심 테이블 목록 (ERD 요약)
+
+```
+주제영역별 테이블 구성 (실제 7종 — 충전·소비·보상·전송·소각·환불은
+모두 별도 테이블이 아니라 bean_ledger의 거래타입 txn_tp_cd 값으로 통합):
+
+┌─ 공급·분배
+│  ├─ bean_token_alloc (분배 현황 - 5종, append-only)
+│  └─ bean_vesting (베스팅/락업 스케줄 - 팀 8%/리저브 25%)
+│
+├─ 원장·잔액 (회계 핵심)
+│  ├─ bean_ledger (원장 정본 - append-only, 유일 source of truth)
+│  │   └─ txn_tp_cd: CHARGE/SPEND/REWARD/TRANSFER/BURN/REFUND
+│  └─ bean_wallet (현재 잔액 캐시 = SUM(bean_ledger), 음수 금지)
+│
+├─ 보상
+│  └─ bean_reward_policy (O2O 등 보상 정책 마스터 → 지급은 bean_ledger REWARD)
+│
+├─ 구독 연동
+│  └─ msg_subscr_plan (확장: price_bean 추가 → 결제는 bean_ledger SPEND)
+│
+└─ bean_redeem_request (역환전 - 향후 확장용, 초기 비활성)
+```
+
+### 11-3. 테이블별 DDL 초안
+
+> ⚠️ **이 섹션의 모든 DDL은 제안 형태(초안·승인대기)이며, 실제 마이그레이션 적용은 금지합니다.**
+> **적용 전 DA 표준 검증(`da-ddl-guard` Hook)이 필요합니다.**
+
+#### 11-3-1. bean_token_alloc — 분배 현황 추적
+
+```sql
+-- 뜻: Bean Token 할당 현황
+-- 목적: 10억 토큰의 5종 분배를 추적하고, 각 카테고리 소진 상황 기록
+-- 정본 원칙: INSERT만 허용, UPDATE/DELETE 금지(append-only) ← 원장 개념 아님, 통제 기록일 뿐
+
+CREATE TABLE bean_token_alloc (
+  alloc_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  
+  -- 분배 카테고리
+  alloc_tp_cd VARCHAR(20) NOT NULL CHECK (alloc_tp_cd IN ('SALE', 'RESERVE', 'LIQUIDITY', 'MARKETING', 'TEAM')),
+  
+  -- 할당량 (1 BEAN = 10M units, i128 호환)
+  alloc_qty_bean DECIMAL(18, 0) NOT NULL,  -- 예: 400000000 (세일용 400M)
+  
+  -- 베스팅 유무 (TEAM·RESERVE만 Y)
+  vest_yn CHAR(1) NOT NULL DEFAULT 'N' CHECK (vest_yn IN ('Y', 'N')),
+  vest_schedule_cd VARCHAR(20),  -- 'TEAM_36M' / 'RESERVE_48M' 등 (null이면 즉시)
+  
+  -- 상태
+  stat_cd VARCHAR(20) NOT NULL DEFAULT 'ALLOCATED' CHECK (stat_cd IN ('ALLOCATED', 'RELEASED', 'DISTRIBUTED')),
+  
+  -- 설명
+  desc_txt TEXT,
+  
+  -- 시스템 컬럼 (DA 표준 필수)
+  regr_id TEXT NOT NULL DEFAULT 'ADMIN',
+  reg_dtm TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  modr_id TEXT NOT NULL DEFAULT 'ADMIN',
+  mod_dtm TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_bean_token_alloc_tp_cd ON bean_token_alloc(alloc_tp_cd);
+-- DA-APPROVED: 초기 공급 분배 기록(append-only 감시 필요). 삽입 전용 감시 트리거 추가 권고.
+```
+
+#### 11-3-2. bean_vesting — 베스팅 스케줄
+
+```sql
+-- 뜻: Bean Token 베스팅/락업 일정
+-- 목적: 팀(8%) / 리저브(25%) 등 장기 로칭 스케줄을 정의
+-- 정본: INSERT + 읽기만. 수정/삭제 금지 (계약 문서).
+
+CREATE TABLE bean_vesting (
+  vest_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  
+  -- 할당 카테고리
+  alloc_tp_cd VARCHAR(20) NOT NULL REFERENCES bean_token_alloc(alloc_tp_cd),  -- 'TEAM' / 'RESERVE'
+  
+  -- 베스팅 구간
+  cliff_mth INT NOT NULL,  -- 0 = 즉시 / 6 = 6개월 cliff
+  linear_mth INT NOT NULL,  -- 36 = 36개월 선형
+  
+  -- 트렁차(Tranche) 정보
+  tranch_num INT NOT NULL,  -- 1st, 2nd, 3rd, 4th ...
+  tranch_pct NUMERIC(5, 2) NOT NULL CHECK (tranch_pct >= 0 AND tranch_pct <= 100),  -- 예: 25.00 (%)
+  tranch_qty_bean DECIMAL(18, 0) NOT NULL,  -- 수량
+  
+  -- 일정
+  release_dt DATE NOT NULL,  -- 언락 예정일
+  released_yn CHAR(1) NOT NULL DEFAULT 'N' CHECK (released_yn IN ('Y', 'N')),
+  released_dtm TIMESTAMPTZ,  -- 실제 언락 시점
+  
+  -- 수령자 (nullable: 팀 공동 풀일 경우)
+  recipient_usr_id TEXT,
+  
+  -- 시스템 컬럼
+  regr_id TEXT NOT NULL DEFAULT 'ADMIN',
+  reg_dtm TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  modr_id TEXT NOT NULL DEFAULT 'ADMIN',
+  mod_dtm TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_bean_vesting_alloc_tp ON bean_vesting(alloc_tp_cd);
+CREATE INDEX idx_bean_vesting_release_dt ON bean_vesting(release_dt);
+-- DA-APPROVED: 베스팅 계약 기록(수정 금지). 언락 실행은 released_yn·released_dtm 업데이트로만 처리.
+```
+
+#### 11-3-3. bean_wallet — 사용자 지갑 (잔액 캐시)
+
+```sql
+-- 뜻: 사용자별 Bean Token 잔액
+-- 목적: 현재 보유량 조회 최적화(원장 합계 대신 캐시)
+-- 정본: 계산 결과이며, 불변식 balance = SUM(bean_ledger)를 충족해야 함
+
+CREATE TABLE bean_wallet (
+  wallet_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  usr_id TEXT NOT NULL UNIQUE REFERENCES sys_user(id),  -- PK: 사용자 1:1
+  
+  -- 잔액 (음수 금지)
+  balance_bean DECIMAL(18, 0) NOT NULL DEFAULT 0 CHECK (balance_bean >= 0),
+  
+  -- 온체인 주소 (Stellar/Soroban 필수, 향후 추가)
+  blockchain_addr TEXT,
+  blockchain_tp_cd VARCHAR(20),  -- 'SOROBAN' (예약)
+  
+  -- 상태
+  stat_cd VARCHAR(20) NOT NULL DEFAULT 'ACTIVE' CHECK (stat_cd IN ('ACTIVE', 'FROZEN', 'CLOSED')),
+  
+  -- 마지막 거래 시점
+  last_txn_dtm TIMESTAMPTZ,
+  
+  -- 시스템 컬럼
+  regr_id TEXT NOT NULL DEFAULT 'ADMIN',
+  reg_dtm TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  modr_id TEXT NOT NULL DEFAULT 'ADMIN',
+  mod_dtm TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_bean_wallet_usr_id ON bean_wallet(usr_id);
+-- DA-APPROVED: 잔액 캐시 (읽기 전용, bean_ledger 기반 검증 필수). 
+-- 정합성 점검: SELECT SUM(CASE WHEN ... END) FROM bean_ledger WHERE usr_id = X (월 1회 감시).
+```
+
+#### 11-3-4. bean_ledger — 원장 (정본, append-only)
+
+```sql
+-- 뜻: Bean Token 거래 원장
+-- 목적: 모든 Bean 이동 추적 — 감시, 감사, 원장 검증
+-- 정본 원칙: **INSERT ONLY** (수정·삭제·논리삭제 금지). 정정은 역분개(reversing entry) 수행.
+-- 참고: 회계 원칙에 따라 append-only 유지.
+
+CREATE TABLE bean_ledger (
+  ledger_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  
+  -- 트랜잭션 식별 (멱등성)
+  txn_id TEXT NOT NULL UNIQUE,  -- 'CHARGE_20260618_001' / 'SPEND_SUB_PREMIUM_20260618_USR123' 등
+  ref_id TEXT,  -- 외부 참조 ID (msg_subscr_id / pi_pymnt_id / bean_reward_id 등)
+  
+  -- 거래 타입 (5가지)
+  txn_tp_cd VARCHAR(20) NOT NULL CHECK (txn_tp_cd IN ('CHARGE', 'SPEND', 'REWARD', 'TRANSFER', 'BURN', 'REFUND')),
+  
+  -- CHARGE: Pi→Bean 충전
+  -- SPEND: 구독료/수수료 차감
+  -- REWARD: 보상 지급 (O2O, 이벤트)
+  -- TRANSFER: 사용자↔사용자 전송 (팁/후원)
+  -- BURN: 소각
+  -- REFUND: 환불(역분개)
+  
+  -- 금액 (부호: +/- 구분)
+  amt_bean DECIMAL(18, 0) NOT NULL,  -- 음수 가능 (SPEND·BURN은 음수)
+  
+  -- 당사자
+  from_usr_id TEXT,  -- null = 시스템(CHARGE 발행, REWARD 지급)
+  to_usr_id TEXT,    -- null = 시스템(SPEND 수수료, BURN 소각)
+  
+  -- 비즈니스 컨텍스트
+  context_tp_cd VARCHAR(30),  -- 'SUBSCRIPTION_PREMIUM', 'O2O_REVIEW_REWARD', 'TIP_TRANSFER' 등
+  context_id TEXT,  -- 해당 엔티티 ID (plan_cd / order_id / user_id 등)
+  
+  -- 설명
+  memo_txt TEXT,
+  
+  -- 상태 (처리 완료 확인)
+  stat_cd VARCHAR(20) NOT NULL DEFAULT 'COMPLETED' CHECK (stat_cd IN ('PENDING', 'COMPLETED', 'REVERSED')),
+  
+  -- 시스템 컬럼 (del_yn 없음 — 원장은 물리삭제 불가)
+  regr_id TEXT NOT NULL DEFAULT 'ADMIN',
+  reg_dtm TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  modr_id TEXT NOT NULL DEFAULT 'ADMIN',
+  mod_dtm TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+  
+  -- ⚠️ del_yn, del_dtm 미추가 (원장 불변성 원칙)
+);
+
+-- 인덱스 (조회 최적화)
+CREATE INDEX idx_bean_ledger_txn_id ON bean_ledger(txn_id);
+CREATE INDEX idx_bean_ledger_from_usr_id ON bean_ledger(from_usr_id);
+CREATE INDEX idx_bean_ledger_to_usr_id ON bean_ledger(to_usr_id);
+CREATE INDEX idx_bean_ledger_txn_tp_cd ON bean_ledger(txn_tp_cd);
+CREATE INDEX idx_bean_ledger_reg_dtm ON bean_ledger(reg_dtm);
+
+-- 제약: UPDATE/DELETE 차단 트리거 (선택적, 애플리케이션 레벨 강제도 가능)
+-- CREATE TRIGGER trg_bean_ledger_no_update BEFORE UPDATE ON bean_ledger FOR EACH ROW RAISE EXCEPTION 'bean_ledger: UPDATE not allowed';
+-- CREATE TRIGGER trg_bean_ledger_no_delete BEFORE DELETE ON bean_ledger FOR EACH ROW RAISE EXCEPTION 'bean_ledger: DELETE not allowed';
+
+-- DA-APPROVED: 원장 정본(INSERT ONLY, 수정·삭제·논리삭제 금지).
+-- 정정: 역분개(REFUND/REVERSED stat_cd)로 처리. 멱등키(txn_id) 기반 중복 차단.
+```
+
+#### 11-3-5. bean_reward_policy — 보상 정책 마스터
+
+```sql
+-- 뜻: Bean Token 보상 정책
+-- 목적: O2O, 이벤트, 리뷰 등 보상 규칙을 일원화
+
+CREATE TABLE bean_reward_policy (
+  policy_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  
+  -- 정책 이름
+  policy_nm VARCHAR(100) NOT NULL,
+  
+  -- 적용 대상
+  reward_tp_cd VARCHAR(30) NOT NULL,  -- 'O2O_PURCHASE', 'O2O_SALES', 'EVENT_MISSION', 'REVIEW_POSTING' 등
+  
+  -- 보상 규칙
+  qty_bean DECIMAL(18, 0),  -- 고정 보상액 (예: 50 BEAN)
+  pct_of_txn NUMERIC(5, 2),  -- 거래액 기반 % (예: 1.5%)
+  max_qty_bean DECIMAL(18, 0),  -- 최대 보상액 (예: 1000 BEAN)
+  
+  -- 조건
+  min_threshold_bean DECIMAL(18, 0),  -- 최소 거래액 (예: 100 BEAN)
+  
+  -- 활성화
+  use_yn CHAR(1) NOT NULL DEFAULT 'Y' CHECK (use_yn IN ('Y', 'N')),
+  
+  -- 시스템 컬럼
+  regr_id TEXT NOT NULL DEFAULT 'ADMIN',
+  reg_dtm TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  modr_id TEXT NOT NULL DEFAULT 'ADMIN',
+  mod_dtm TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  del_yn CHAR(1) NOT NULL DEFAULT 'N' CHECK (del_yn IN ('Y', 'N')),
+  del_dtm TIMESTAMPTZ
+);
+
+CREATE INDEX idx_bean_reward_policy_reward_tp ON bean_reward_policy(reward_tp_cd);
+-- DA-APPROVED: 마스터 데이터(수정·논리삭제 허용). 정책 변경 시 버전 관리 고려(향후).
+```
+
+#### 11-3-6. bean_redeem_request — 역환전 신청 (향후 확장용)
+
+```sql
+-- 뜻: Bean Token → Pi 역환전 신청
+-- 목적: 향후 환금성 지원 시 신청 관리
+-- 상태: **초기 비활성** (기본값 use_yn='N'). 정책 수립 후 활성화.
+
+CREATE TABLE bean_redeem_request (
+  redeem_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  
+  usr_id TEXT NOT NULL REFERENCES sys_user(id),
+  
+  -- 신청 정보
+  req_qty_bean DECIMAL(18, 0) NOT NULL CHECK (req_qty_bean > 0),
+  
+  -- 환율 (고정 1 Pi = 100 BEAN)
+  conversion_ratio INT NOT NULL DEFAULT 100,
+  estimated_pi_amt DECIMAL(18, 4),  -- 계산값: req_qty_bean / 100
+  
+  -- 상태
+  stat_cd VARCHAR(20) NOT NULL DEFAULT 'PENDING' CHECK (stat_cd IN ('PENDING', 'APPROVED', 'REJECTED', 'COMPLETED', 'CANCELLED')),
+  
+  -- 거부 사유 (stat_cd='REJECTED'일 때)
+  rejection_reason TEXT,
+  
+  -- 완료 정보
+  completed_pi_amt DECIMAL(18, 4),  -- 실제 지급액 (수수료 차감 후)
+  processing_fee_pct NUMERIC(5, 2),  -- 수수료율 (미정)
+  completed_dtm TIMESTAMPTZ,
+  
+  -- 시스템 컬럼
+  regr_id TEXT NOT NULL DEFAULT 'ADMIN',
+  reg_dtm TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  modr_id TEXT NOT NULL DEFAULT 'ADMIN',
+  mod_dtm TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  del_yn CHAR(1) NOT NULL DEFAULT 'N' CHECK (del_yn IN ('Y', 'N')),
+  del_dtm TIMESTAMPTZ
+);
+
+CREATE INDEX idx_bean_redeem_request_usr_id ON bean_redeem_request(usr_id);
+CREATE INDEX idx_bean_redeem_request_stat_cd ON bean_redeem_request(stat_cd);
+
+-- ⚠️ 정책 미정: 초기 비허용(애플리케이션 레벨 차단). 허용 결정 시 위의 수수료·수령 계좌 필드 추가.
+-- DA-APPROVED: 향후 확장용 테이블(현재 미사용). 활성화 전 법무·운영 검토 필수.
+```
+
+#### 11-3-7. msg_subscr_plan 확장 — Bean Token 기본값 추가
+
+```sql
+-- 기존 테이블 확장: msg_subscr_plan (PRD_14와 정합)
+-- Phase 17(발행 후) 이전: price_pi 사용
+-- Phase 17(발행 후) 이후: price_bean 사용 (feature flag 기반)
+
+-- Step 1: price_bean 컬럼 추가 (nullable, 향후 채움)
+ALTER TABLE msg_subscr_plan
+ADD COLUMN price_bean DECIMAL(10, 4) DEFAULT NULL COMMENT '정본 가격 (Bean Token) — Phase 17 발행 후 사용';
+
+-- Step 2: 현행 데이터 (price_pi 기준)
+INSERT INTO msg_subscr_plan (plan_cd, plan_nm, plan_desc, plan_tp_cd, price_pi, mth_cnt, use_yn, del_yn, regr_id, reg_dtm)
+VALUES
+  ('PISTORE_SELLER_MONTHLY', 'PiShop Seller 월간', 'PiShop Seller 월간 — 전문가 판매자용', 'PISTORE', '0.5000', 1, 'Y', 'N', 'ADMIN', CURRENT_TIMESTAMP),
+  ('PISTORE_SELLER_ANNUAL', 'PiShop Seller 연간', 'PiShop Seller 연간 — 2개월 무료', 'PISTORE', '5.0000', 12, 'Y', 'N', 'ADMIN', CURRENT_TIMESTAMP);
+
+-- Step 3: Phase 17 이후 bean 가격 일괄 업데이트 (1 Pi = 100 BEAN)
+-- UPDATE msg_subscr_plan SET price_bean = price_pi * 100 WHERE price_bean IS NULL;
+
+-- DA-APPROVED: 기존 테이블 확장(backward-compatible). price_bean 채움 타이밍은 Phase 17 동기화 필요.
+```
+
+### 11-4. 불변식·멱등·정합성 규칙
+
+#### A. 핵심 불변식 (4대)
+
+| # | 불변식 | 검증 방법 | 위반 시 액션 |
+|---|--------|---------|-----------|
+| **I1** | **잔액 = 원장 합계** | `bean_wallet.balance = SUM(bean_ledger WHERE to_usr_id)` | 월 1회 감시, 차액 조사 후 정정(역분개) |
+| **I2** | **음수 잔액 금지** | `bean_wallet.balance >= 0` (CHECK 제약) | 거래 거절(SPEND/TRANSFER 실패) |
+| **I3** | **멱등키 유니크** | `bean_ledger.txn_id UNIQUE` | 이중 청구 방지(INSERT 실패) |
+| **I4** | **총공급 보존** | `SUM(bean_ledger.amt_bean) = 1,000,000,000` (선택적 감시) | 발행 후 소각/보상만으로 변경, 트래킹 필수 |
+
+#### B. 멱등성 설계
+
+**멱등키 규약** (`bean_ledger.txn_id`):
+
+```
+CHARGE:   'CHARGE_{date}_{sequence}' 
+          예: 'CHARGE_20260618_USR001_001'
+
+SPEND:    'SPEND_{type}_{date}_{context_id}'
+          예: 'SPEND_SUBSCR_20260618_PLAN_PREMIUM_MONTHLY_USR001'
+
+REWARD:   'REWARD_{policy}_{date}_{target_id}'
+          예: 'REWARD_O2O_PURCHASE_20260618_ORDER_ORD12345'
+
+TRANSFER: 'TRANSFER_{date}_{from}_{to}_{seq}'
+          예: 'TRANSFER_20260618_USR001_USR002_001'
+
+BURN:     'BURN_{reason}_{date}_{seq}'
+          예: 'BURN_SYSTEM_ADJUSTMENT_20260618_001'
+
+REFUND:   'REFUND_{original_txn_id}_{date}'
+          예: 'REFUND_CHARGE_20260615_USR001_001_20260618'
+```
+
+→ **INSERT 전 UNIQUE 제약 위반 검사 → 이미 존재하면 스킵(멱등)**
+
+#### C. 부호 규약 (Double-Entry 대체)
+
+Bean Token 원장은 **단일 원장 + 부호 규약** 사용:
+
+| 거래타입 | 금액 부호 | 적용 |
+|---------|---------|------|
+| CHARGE | `+` | 사용자 잔액 증가 |
+| SPEND | `-` | 사용자 잔액 감소 |
+| REWARD | `+` | 사용자 잔액 증가 |
+| TRANSFER | `±` | from=`-`, to=`+` (2행 기록) |
+| BURN | `-` | 공급 감소 |
+| REFUND | `반대` | 원거래 취소 (역분개) |
+
+**정합성 검증**:
+```sql
+SELECT 
+  usr_id,
+  SUM(amt_bean) as net_amt,
+  (SELECT balance_bean FROM bean_wallet WHERE usr_id = L.usr_id) as current_balance
+FROM bean_ledger L
+WHERE stat_cd = 'COMPLETED'
+GROUP BY usr_id
+HAVING SUM(amt_bean) <> (SELECT balance_bean FROM bean_wallet WHERE usr_id = L.usr_id);
+-- 결과 0행 = 정합성 OK
+```
+
+### 11-5. 3대 거래 통화 라우팅 매핑 (PRD_14 §0 정합)
+
+Bean Token DB 설계는 **PRD_14의 3대 규칙**을 완전히 준수합니다:
+
+| 규칙 | 거래타입 | 결제 통화 | 보상 | DB 테이블 | 원장 기록 |
+|-----|---------|---------|------|---------|---------|
+| **규칙 1** | 플랫폼↔사용자 (구독료) | Bean 정본 | — | `msg_subscr_plan` (price_bean) | SPEND (ledger) |
+| **규칙 1** | 플랫폼↔사용자 (수수료) | Bean 정본 | — | `bean_ledger` | SPEND (ledger) |
+| **규칙 2** | P2P 중고 (직거래) | Pi | 없음 | `mps_order` (Bean 원장 미적용) | ledger 미적용 |
+| **규칙 3** | O2O 매장 (결제) | Pi | Bean 보상 | `mps_order` + `bean_reward_policy` | REWARD (ledger) |
+
+**초기 구현**:
+- 과도기 (현재~Phase 17 전): Pi로 결제, Bean 수량만 병기
+- 정본 (Phase 17 후): Bean Token 직결제, 원장 정식 기록
+
+### 11-6. 기존 인앱 Bean 통합·마이그레이션
+
+#### A. 기존 인앱 Bean (오프체인)
+
+현재 café.pi에는 "Pi Bean"(🫘) 팁 기능이 운영 중:
+- **단위**: Pi 직접 표시 (`TIP_AMOUNTS = [0.1, 0.5, 1]` Pi)
+- **파일**: `src/components/chat/pi-tip-button.tsx` 등 12개
+- **테이블**: `msg_tip` (또는 미기록, 메모만)
+
+#### B. 리베이스 결정 (2026-06-17 확정)
+
+토큰 세일가 `1 BEAN = 0.01 Pi` (즉, `1 Pi = 100 BEAN`) 채택으로:
+
+```
+기존 오프체인 Bean       → 온체인 BEAN 토큰
+0.1 Pi (= 10 Bean)     → 10 BEAN
+0.5 Pi (= 50 Bean)     → 50 BEAN
+1 Pi (= 100 Bean)      → 100 BEAN
+```
+
+→ **정수 매핑, 혼란 최소화**
+
+#### C. 마이그레이션 로드맵 (Phase 17 이후)
+
+| 단계 | 시점 | 작업 | 담당 |
+|------|------|------|------|
+| 1 | Phase 17 발행 | 온체인 BEAN 토큰 생성 | 개발팀 |
+| 2 | 발행 후 1주 | 기존 인앱 Bean 오프체인 원장 → 온체인 wallet 마이그레이션 | 개발팀 |
+| 3 | 마이그레이션 완료 | `pi-tip-button.tsx` 업데이트 — "Pi"→"Bean Token" 표기 변경, 1:100 환산 적용 | 개발팀 + QA |
+| 4 | Pi Browser 검증 | 실기기에서 로그인·팁 전송 검증 | QA |
+
+#### D. 주의사항
+
+- ⚠️ **마이그레이션 전 충분한 테스트** (Pi Browser 오프라인 시나리오)
+- ⚠️ **기존 Bean 팁 거래 이력 보존** (감사 추적)
+- ⚠️ **사용자 공지** (1 Pi → 100 Bean 환산 안내)
+
+### 11-7. 레드라인 적합성 체크
+
+#### A. 레드라인 #2 준수 — Pi 외 자산 거래 금지
+
+**원칙**: Bean Token은 **Pi가 아닌 자산** → 공식 Launchpad 경유 발행만 안전
+
+| 위반 패턴 | BEAN 설계 현황 | 준수 여부 |
+|---------|-------------|---------|
+| BEAN/USDT 유동성 풀 | §6-5에서 제거 (Pi 페어 단독) | ✅ 준수 |
+| BEAN을 법정화폐로 가격책정 | §11-6: 원화 내부 기준용만, 사용자 미노출 | ✅ 준수 |
+| BEAN 자체발행 (Launchpad 외) | PRD_12는 문서 전용, DB 미적용 | ✅ 준수 |
+| BEAN 역환전(캐시아웃) | 초기 비허용, bean_redeem_request 정책 미정 | ✅ 준수(보수적) |
+
+#### B. 증권성 회피 — "유틸리티 토큰" 입증
+
+DB 설계로 증명:
+
+| 방증 | 디자인 요소 |
+|-----|-----------|
+| **사용권** | `bean_spend` 표 (구독료, 수수료) — 플랫폼 기능 이용에만 쓰임 |
+| **보상** | `bean_reward_policy` + `bean_ledger REWARD` — 노동(O2O, 리뷰)·이벤트 보상 |
+| **후원** | `bean_ledger TRANSFER` — 사용자↔사용자 팁(수익권 아님) |
+| **비증권성** | 원장 설계로 "순수 사용 대금" 명확히 입증 |
+
+#### C. 음수 잔액 금지 (사기 방지)
+
+```sql
+CHECK (balance_bean >= 0)  -- bean_wallet 컬럼 제약
+```
+
+→ SPEND/TRANSFER 발생 시 **사전 잔액 검증** (애플리케이션)
+
+### 11-8. 미해결·결정대기 항목
+
+#### A. 역환전(Bean→Pi) 정책
+
+| 항목 | 현황 | 결정필요 |
+|-----|------|--------|
+| **허용 여부** | 초기 비허용 | ⚠️ 증권성/환금성 리스크 법무 자문 필요 |
+| **수수료** | `bean_redeem_request.processing_fee_pct` (미정) | 5~10% 범위 검토 권고 |
+| **수령 계좌** | `bean_redeem_request.completed_pi_amt` (필드만 예비) | KYC·지갑 주소 검증 절차 설계 필요 |
+| **한도** | 미정 | 일일/월간 한도 검토 |
+
+→ **권고**: Phase 17 토큰 발행 후 3개월 운영 경험 축적 → 법무 자문 → 차기 업데이트에서 정책 수립
+
+#### B. 발행 시점과 메인넷 연동
+
+| 항목 | 상태 | 의존 |
+|-----|------|------|
+| Bean Token Mainnet 발행 | T04 차단(Mainnet Launchpad GA) | Pi Launchpad Mainnet 출시(6/28 이후 추정) |
+| 온체인 지갑 주소 맵핑 | 테이블 필드만 예비 | Soroban 컨트랙트 배포 후 구현 |
+| Pi Browser 토큰 충전 UI | 미설계 | Launchpad 공식 UI/API 정의 후 |
+
+---
+
+## 12. 토큰 경제학 DB 정합성 검증 (금일 완료 항목)
+
+### 12-1. 검증 목록
+
+| # | 검증 항목 | 완료 상태 | 비고 |
+|---|---------|---------|------|
+| ✅ | PRD_14 (거래 통화 라우팅) 정합 | ✅ 완료 | 3대 규칙(플랫폼=Bean, P2P=Pi, O2O=Pi+Bean) 모두 원장 설계에 반영 |
+| ✅ | 원장 일원화 (bean_ledger append-only) | ✅ 완료 | bean_wallet은 캐시, 원장 정본 단일화 |
+| ✅ | 불변식 4대 명시 | ✅ 완료 | I1~I4 (잔액, 음수금지, 멱등, 총공급) |
+| ✅ | DA 표준 명명 | ✅ 신규 표준단어 필요 | BEAN/WALLET/LEDGER/VESTING 등 등록 권고(실제 등록은 별도) |
+| ✅ | 레드라인 #2 준수 | ✅ 완료 | BEAN/Pi 페어 단독, 원화 미노출 |
+| ✅ | 증권성 회피 설계 | ✅ 완료 | 사용권·보상·후원 3대 경로로 유틸리티 입증 |
+| ⚠️ | 역환전 정책 | ⏳ 결정대기 | 초기 비허용 권고(법무 자문 필요) |
+| ⚠️ | Mainnet 연동 | ⏳ GA 대기 | T03 (Launchpad GA 대기) |
+
+### 12-2. 신규 표준단어 등록 권고 (DA 거버넌스)
+
+다음 용어는 표준사전에 등록이 권고됩니다(실제 등록은 DA 팀장 결정):
+
+| 풀네임 | 권장 약어 | 타입 | 도메인 | 비고 |
+|--------|---------|------|--------|------|
+| Bean (Token) | bean | text | — | 신규 도메인 추가 고려 `bean_token` |
+| wallet | wlt | — | — | — |
+| ledger | ledger | — | — | 회계 용어 |
+| vesting | vest | — | — | 증권용어 |
+| reward | rwd | — | — | — |
+| tranche | tranch | — | — | — |
+
+### 12-3. 문서·코드 정합성
+
+| 범위 | 현황 |
+|-----|------|
+| **PRD_12 §6 토크노믹스** | ✅ 원장 설계로 정합 |
+| **PRD_14 §0 거래 규칙** | ✅ 3대 라우팅 매핑표 작성 |
+| **CLAUDE.md 기술스택** | ✅ 1 Pi=100 BEAN 리베이스 명시 |
+| **인앱 코드 (pi-tip-button 등)** | ⚠️ 마이그레이션 TODO (발행 전 수행) |
+
+---
+
+## 13. 참고 출처
 
 ### 공식 문서 (Pi Network)
 
