@@ -15,6 +15,12 @@ const ORDER_MTHD_LABEL: Record<string, string> = {
   DELIVERY: '배달',
 }
 
+interface NotiLine {
+  nm: string
+  qty: number
+  unit: number // 단가 (소계 = unit × qty)
+}
+
 interface NotiBody {
   order_id: string
   item_nm: string | null
@@ -22,7 +28,11 @@ interface NotiBody {
   buyer_alias: string
   order_mthd_cd: string | null
   reg_dtm: string
+  lines?: NotiLine[]
 }
+
+// 소수 7자리 반올림 (Pi 정밀도 정합)
+const round7 = (n: number) => Math.round(n * 1e7) / 1e7
 
 // 판매자 주문 관리 화면 딥링크 — 인증된 앱 내에서 상세 확인(외부 채널엔 PII 미노출)
 function orderDeepLink(): string {
@@ -40,11 +50,25 @@ function buildMessage(body: NotiBody): string {
     dateStyle: 'short',
     timeStyle: 'short',
   })
+  // 메뉴별 명칭·수량·금액 라인. 라인 없으면(직거래 단건) item_nm 폴백.
+  let itemsBlock: string[]
+  if (body.lines && body.lines.length > 0) {
+    itemsBlock = ['📦 <b>주문 내역</b>']
+    for (const l of body.lines) {
+      const subtotal = round7(l.unit * l.qty)
+      itemsBlock.push(
+        ` • ${escapeHtml(l.nm)}  ${l.qty}개 × ${l.unit} π = ${subtotal} π`,
+      )
+    }
+  } else {
+    itemsBlock = [`📦 상품   ${escapeHtml(body.item_nm ?? '상품')}`]
+  }
+
   return [
     '🛒 <b>새 주문이 들어왔습니다</b>',
     '',
-    `📦 상품   ${escapeHtml(body.item_nm ?? '상품')}`,
-    `💰 금액   ${body.order_price_pi} π`,
+    ...itemsBlock,
+    `💰 합계   ${body.order_price_pi} π`,
     `👤 구매자  ${escapeHtml(body.buyer_alias)}`,
     `📍 수령   ${escapeHtml(mthd)}`,
     `🕐 주문   ${when}`,

@@ -288,6 +288,27 @@ async function enqueueOrderNoti(
   } | null
   const buyerAlias = b?.nick_nm || b?.display_name || b?.pi_username || '구매자'
 
+  // 주문 라인 스냅샷 — 메뉴별 명칭·수량·단가(price_pi=단가, 소계=단가×수량).
+  // 카트 주문(오프라인 매장)은 라인 N개, 직거래 단건은 라인 없음 → item_nm 폴백 사용.
+  const { data: lineRows } = await db
+    .from('mps_order_item')
+    .select('ord_qty, price_pi, mps_item(item_nm)')
+    .eq('order_id', order.order_id)
+    .eq('del_yn', 'N')
+  const lines = ((lineRows as unknown[] | null) ?? []).map((row) => {
+    const l = row as {
+      ord_qty: number
+      price_pi: number
+      mps_item?: unknown
+    }
+    const it = Array.isArray(l.mps_item) ? l.mps_item[0] : l.mps_item
+    return {
+      nm: (it as { item_nm?: string } | null)?.item_nm ?? '상품',
+      qty: Number(l.ord_qty),
+      unit: Number(l.price_pi),
+    }
+  })
+
   const body = JSON.stringify({
     order_id: order.order_id,
     item_nm: itemNm,
@@ -295,6 +316,7 @@ async function enqueueOrderNoti(
     buyer_alias: buyerAlias,
     order_mthd_cd: orderMthdCd,
     reg_dtm: order.reg_dtm,
+    lines, // 메뉴별 명칭·수량·단가 (없으면 빈 배열 → 빌더가 item_nm 폴백)
   })
 
   await db.from('msg_noti_outbox').insert({
