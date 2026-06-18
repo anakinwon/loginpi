@@ -23,7 +23,7 @@ Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Net
 
 ---
 
-## 📊 전체 진행률 요약 (2026-06-17)
+## 📊 전체 진행률 요약 (2026-06-18)
 
 ### Phase 완료 현황
 
@@ -47,6 +47,7 @@ Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Net
 | **15** | LBS 위치기반서비스 | ✅ 완료 (P0+P1) | 100% (상품 개별 위치 포함 · 지도 UI 확장 예정) |
 | **16** | 이벤트 미션 시스템 (Pi 요원 육성) | ✅ 완료 | 구현·운영 중 (참여 7·완주 1) · 2026-06-15 평가 엔진 정밀화(M2 상태형 양방향·select후분기 복구·CHAR→VARCHAR·재평가 버튼) · 2026-06-17 보상 전환(A2U→1π 보증금 적립·관리자 수동 지급·원자적 RPC 이중지급 차단·M3 유료테마 게이트, TASK-156) |
 | **17** | BEAN 토큰 발행 (Pi Launchpad) | 📝 기획·문서 | PRD_12 v1.7 — 토큰명 BEAN(기존 Pi Bean 온체인화·`1 Pi=100 BEAN`)·세일 0.01 Pi·분배 40/25/15/12/8·발행주체 개인·유동성 Pi 단독(레드라인 #2). **발행 전 코드 0(문서 전용)**. 잔여: T05 증권성 법무자문·T01 개인 KYC·T02 Launchpad 신청(외부 회신 대기) |
+| **18** | 판매자 주문 알림 (Telegram + Realtime + Pull) | ✅ 완료 | 100% (2026-06-18 — Outbox 3계층: 결제완료 즉시 Telegram 발송·인앱 Realtime 토스트·안읽은 뱃지 / 판매자 봇 연동 온보딩(딥링크+webhook) / 보안 하드닝(webhook fail-closed·재바인딩 차단) · `sql/064` · PRD_13_MSG) |
 | **횡단** | 성능 튜닝 | ✅ 완료 | 100% (무한 스크롤·지연 로딩·SWR 캐싱·리브랜딩·스티커) |
 | **횡단3** | Pi Browser 안정화·콤보 성능 (2026-06-13) | ✅ 완료 | 100% (admin 다국어 전환 무반응 수정·헤더 콤보 3계층 캐시) |
 | **횡단4** | Pi Browser 안정화 4차·MPS 후속·대시보드 고도화 (2026-06-14) | ✅ 완료 | 100% (A2U 환불·트리맵·Pi Bet UI·헤더 로고·다국어 기억·브랜드 등) |
@@ -55,11 +56,12 @@ Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Net
 | **13-P4** | PiShop 카트 다건 일괄 판매 + 자국통화 (2026-06-17) | ✅ 완료 | 등록 페이지 분리(중고직거래/오프라인매장)·자국통화 등록표시(등록시점 고정 참고가 sql/062)·오프라인매장 카트(매장단위·담기 팝업·장바구니·라인 소계)→다중상품 단일 Pi 결제(`mps_order_item`+원자 RPC `fn_mps_cart_order_create`/`_cancel` sql/063)·주문관리 라인/호명/매장명/색상. ⚠️ sql 062·063 적용+실기기 결제 검증 잔여 |
 
 ### 통계
-- **총 Phase**: 19개 (0~17 + 횡단 개선 + 문서화)
-- **완료**: 18개 구현 완료 (Phase 16 이벤트 미션 시스템 포함 — 구현·운영 중)
+- **총 Phase**: 20개 (0~18 + 횡단 개선 + 문서화)
+- **완료**: 19개 구현 완료 (Phase 18 판매자 주문 알림 포함 — 2026-06-18)
 - **진행 중**: 0개
 - **기획·문서**: 1개 (Phase 17 BEAN 토큰 발행 — 문서 전용·앱 코드 0, T01/T02/T05 외부 회신 대기)
-- **예정**: 확장 Phase (PiRC3 실 에스크로 보류 해제 대기, LBS 지도 UI 추가 확장, PiVoice TURN 운영, 이벤트 행위훅 전수 점검, StarterKit 패키지 제품화) · **O2O 후속**: 외부 알림 채널(Telegram/이메일/카카오 알림톡)로 사장님 화면 미접속 시 알림 확장
+- **예정**: 확장 Phase (PiRC3 실 에스크로 보류 해제 대기, LBS 지도 UI 추가 확장, PiVoice TURN 운영, 이벤트 행위훅 전수 점검, StarterKit 패키지 제품화) · **알림 Phase 2**: 카카오 알림톡(한국 판매자)·Telegram webhook 양방향(버튼으로 접수/거절)
+- ✅ **O2O 후속 완료(2026-06-18)**: 외부 알림 채널(Telegram)로 사장님 화면 미접속 시에도 주문 알림 도달 — Phase 18에서 구현
 
 ### 핵심 마일스톤
 
@@ -1510,10 +1512,69 @@ if (meta?.type === 'CHAT_SUBSCR') {
 
 ---
 
+## Phase 18: 판매자 주문 알림 (Telegram + Realtime + Pull) ✅ 완료 (2026-06-18)
+
+> 상세 요구사항: **`docs/PRD_13_MSG.md`**
+> 해결한 문제: "구매요청 시 판매자에게 반드시 알림" — 사장님이 앱을 안 켜둬도 주문을 놓치지 않게 한다.
+
+### 설계 원칙 — Outbox 3계층 (단일 채널에 '반드시'를 맡기지 않음)
+
+| 계층 | 메커니즘 | 특성 |
+|---|---|---|
+| 즉시(Realtime) | 결제완료 시 `broadcastToSeller('new_order')` → `OrderAlertListener` 토스트+차임+TTS | 앱 켜둔 동안 0초·휘발성 |
+| Push(Telegram) | `markEscrow` 시 `msg_noti_outbox` 적재 → 결제완료 즉시 `dispatchOrderNotis()` 발송 | 앱 닫아도 폰 도달·durable |
+| Pull(뱃지) | `viewed_yn='N'` 안읽은 수 → StoreNav 빨간 뱃지 | 최종 보증·무조건 보임 |
+
+세 계층이 독립적이라 한 인프라(WebSocket/Telegram/cron)가 죽어도 나머지가 도달한다.
+
+### TASK-170: 알림 아웃박스 + Telegram 발송 파이프라인 ✅ 완료
+
+- `sql/064_msg_noti_outbox.sql`(DA 승인 — Outbox 테이블 + `sys_user` Telegram 컬럼 3개, Supabase 적용·검증)
+- `markEscrow()` → `enqueueOrderNoti()`(주문 확정 트랜잭션과 같은 흐름에서 적재, 멱등키 order_id, 구매자 별칭만 스냅샷·PII 제외)
+- `src/lib/telegram.ts`(Bot API 발송 래퍼·HTML·인라인 버튼), `src/lib/mps-noti.ts`(디스패처·멱등·재시도 3회)
+- 디스패처를 `order-autocomplete` cron(`*/5`)에 통합 — **안전망**으로만 사용
+
+### TASK-171: 판매자 Telegram 연동 온보딩 ✅ 완료
+
+- `src/lib/telegram-link.ts`(HMAC 서명 딥링크 토큰·만료 30분·64자 제약 대응 57자)
+- `GET/DELETE /api/auth/telegram`(상태·딥링크·해제), `POST /api/telegram/webhook`(`/start <code>` 검증→`chat_id` 저장)
+- `telegram-connect.tsx`(내 정보 연동 카드 + 판매자용 4단계 가이드 인앱 노출)
+- 저장 위치: `sys_user.tlgm_chat_id`·`tlgm_conn_yn`·`tlgm_conn_dtm` (옵션 A 확정)
+
+### TASK-172: 안읽은 주문 뱃지 (Pull 안전망) ✅ 완료
+
+- `GET/POST /api/store/notifications`(안읽은 수·읽음 처리), `sales-noti-badge.tsx`
+- `StoreNav`·프로필 판매관리 링크에 빨간 뱃지, 판매 관리 진입 시 자동 읽음
+
+### TASK-173: 결제완료 즉시 발송 + 인앱 Realtime 토스트 개선 ✅ 완료
+
+- `payments/complete`의 MPS_ESCROW 분기에서 `dispatchOrderNotis()` 동기 호출 → **cron 대기 없이 즉시 Telegram 발송**(Vercel cron 최소 1분이라 초 단위 불가 → 요청 시점 발송으로 해결)
+- `OrderAlertListener` 구독을 로그인 시 항상으로 분리 — 시각 토스트는 제스처 없이 즉시, 소리(차임·TTS)만 자동재생 잠금해제 후
+
+### TASK-174: 보안 하드닝 ✅ 완료 (자동 보안 리뷰 대응)
+
+- webhook **fail-closed**: `TELEGRAM_WEBHOOK_SECRET` 미설정/불일치 시 401(웹훅 URL이 유일한 인증 경계)
+- 연동 **재바인딩 차단**: `tlgm_conn_yn='N'` 원자 가드로 이미 연동된 계정 덮어쓰기 금지(코드 탈취·재생 시 알림 탈취 방지)
+
+### 관련 수정 (Phase 13 MPS)
+
+- **수량 버그 수정**: 상품 상세의 수량 선택기가 '카트 담기'에만 적용되고 '구매하기'는 항상 1개로 주문되던 버그 → 오프라인 매장 상품의 '구매하기'를 수량 지원 카트 주문 RPC(`fn_mps_cart_order_create`)로 라우팅, 직거래는 단건 유지(`store-item-detail.tsx`)
+
+### 운영 셋업 (코드 외 1회)
+
+- @BotFather 봇 생성 → env 3종(`TELEGRAM_BOT_TOKEN`·`TELEGRAM_BOT_USERNAME`·`TELEGRAM_WEBHOOK_SECRET`) Vercel 설정 → `setWebhook`(secret_token 일치). **PowerShell `curl`은 별명(Invoke-WebRequest)이라 `curl.exe` 사용 필수**(POST `-d` 미지원 함정).
+
+### Phase 2 (예정)
+
+- 카카오 알림톡(한국 판매자·신뢰도·열람률) · Telegram webhook 양방향(메시지 버튼으로 접수/거절) · 단발성 강화(발급 nonce 컬럼)
+
+---
+
 ## 변경 이력
 
 | 버전 | 날짜 | 변경 내용 | 작성자 |
 |------|------|---------|-------|
+| v10.5 | 2026-06-18 | **Phase 18 판매자 주문 알림 (Telegram + Realtime + Pull) ✅ 완료** — "구매요청 시 판매자에게 반드시 알림" 해결. Outbox 3계층(즉시 Realtime 토스트·Telegram push·안읽은 뱃지)으로 단일 채널 비의존 보장. TASK-170 아웃박스+Telegram 파이프라인(`sql/064`·`telegram.ts`·`mps-noti.ts`·`markEscrow` enqueue·디스패처를 `*/5` cron 안전망에 통합), TASK-171 판매자 봇 연동 온보딩(HMAC 딥링크 `telegram-link.ts`·`/api/auth/telegram`·`/api/telegram/webhook`·연동 카드+4단계 가이드·`sys_user` Telegram 컬럼 옵션A), TASK-172 Pull 안읽은 뱃지(`/api/store/notifications`·`sales-noti-badge`·StoreNav/프로필), TASK-173 **결제완료 즉시 발송**(`payments/complete`에서 `dispatchOrderNotis()` 동기 호출 — Vercel cron 분 단위 한계로 초 단위 불가 → 요청시점 발송)+Realtime 토스트 제스처 분리, TASK-174 보안 하드닝(webhook fail-closed·재바인딩 차단, 자동 보안리뷰 대응). **관련 MPS 수정**: 수량 버그(상세 '구매하기'가 수량 무시 1개 주문 → 오프라인은 카트 RPC 라우팅). 운영: @BotFather 봇+env 3종+setWebhook(PowerShell은 `curl.exe`). PRD.md·PRD_13_MSG.md 동기화. Phase 완료현황·통계(총 20개·완료 19개) 갱신. | anakin |
 | v10.4 | 2026-06-17 | **PiShop 카트 다건 일괄 판매 + 자국통화 (PRD_8 v2.1, FR-14·15) — 13-P4** — ① **등록 페이지 분리**(`StoreItemForm` mode: 중고직거래 `/store/my/items/new`·오프라인매장 `/store/my/shop-items/new`). ② **자국통화 등록·표시**(`fx-rates.ts`·`/api/store/price-quote`, 등록시점 1회 환산 고정 참고가, ccy 스냅샷 sql/062, 레드라인 #2 정적 가격표만·시세칩 디커플링). ③ **오프라인매장 카트**: `useCart`(useSyncExternalStore·localStorage·매장단위)·담기 팝업(카트가기/쇼핑계속)·장바구니 화면(라인 소계)·**다중상품 단일 Pi 결제**(`mps_order_item`+원자 RPC `fn_mps_cart_order_create`/`_cancel` sql/063, `/api/store/orders/cart`(+`/cancel`), /complete의 MPS_ESCROW by order_id 재사용·결제실패 시 라인전체 재고복원). ④ **주문관리 고도화**: 라인(상품명×수량)·판매자 주문자 호명(준비완료 `📣 OOO님 호명`)·구매자 픽업 매장명·판매(앰버)/구매(에메랄드) 색상. 진단 detail은 보안 게이트 후 제거. ⚠️ sql 062·063 DB적용+Pi Browser 결제 실기기 검증 필요. PRD.md v11.7·PRD_8_MPS.md v2.1 동기화. | anakin |
 | v10.3 | 2026-06-17 | **Phase 17 BEAN 토큰 발행 기획 추가** — `docs/PRD_12_TOKEN.md` v1.7 수용. Pi Launchpad 통한 Cafe.pi 생태계 유틸리티 토큰 10억 개 발행 기획. 확정: 토큰명 BEAN(기존 Pi Bean 팁 온체인화·`1 Pi=100 BEAN` 리베이스)·세일 0.01 Pi·분배 세일40/리저브25/유동성15/마케팅12/팀8·발행주체 개인(아나킨)·유동성 BEAN/Pi 단독(레드라인 #2). 잔여(외부 대기): TASK-160 증권성 법무자문·TASK-161 개인 KYC·TASK-162 Launchpad 신청양식·TASK-163 Mainnet 일정·TASK-164 Bean 리베이스 코드 정렬(발행 전). Phase 완료 현황 표·통계(총 19개·기획 1개) 갱신. ⚠️ **발행 전 앱 코드 0(문서 전용)** — 레드라인 정책상 PRD_12 git 비추적. PRD.md v11.6 동기화. | anakin |
 | v10.2 | 2026-06-17 | **Phase 16 TASK-156 — 이벤트 10미션 완주 보상 전환 (A2U → 1π 보증금 적립 + 관리자 수동 지급)** — ① 보상 매체 전환: Pi A2U 직접 송금(시드 미설정·실패 시 PENDING)을 폐기하고 `mps_seller_bond` 보증금 1π 직접 적립으로 전환(`5f5e6b9`·`d540f68`), `event.ts`의 `triggerPiReward`·`reward_pi_*` 의존 제거. ② **자동 → 관리자 수동 지급**(`a277b80`): 미션 평가의 자동 보상 호출 제거 + 이벤트 화면 '1Pi 판매보증금 지급' 버튼 + `POST /api/admin/event/bond-reward`(isAdmin 이중검증), 10미션 완주·미지급·비제외자만. ③ **원자적 중복방지** `fn_evt_grant_bond_reward`(`sql/061`) — 단일 트랜잭션 + `FOR UPDATE` 행잠금 + `reward_st_cd`('BONDED'/'PAID') 게이트로 TOCTOU race·A2U-보증금 교차 이중지급 차단, `grantBondReward` RPC 래퍼 교체. ④ 추적 `evt_pi_reward_log`(`sql/048`). ⑤ M3 우회 결함 수정(`premium_cafe_create` 유료테마 게이트) + 병합 부작용 LBS 블록 중복 제거(`6a648b5`). `PRD.md` v11.5·`PRD_11_EVENT.md` v2.1 동기화. | anakin |

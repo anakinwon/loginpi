@@ -1,10 +1,10 @@
 # PRD_13_MSG.md — 판매자 주문 알림 (Telegram)
 
 > **작성일**: 2026-06-18
-> **버전**: v1.0
-> **상태**: Phase 1 설계 완료, Phase 2 기획 단계
+> **버전**: v1.1
+> **상태**: ✅ Phase 1 구현 완료·실기기 연동 확인 (2026-06-18), Phase 2 기획
 > **작성자**: 아소카 (Telegram Order Notifier Design Specialist)
-> **검토**: 아나킨 마스터님 (대기)
+> **검토**: 아나킨 마스터님
 
 ---
 
@@ -12,6 +12,7 @@
 
 | 버전 | 날짜 | 변경 내용 | 작성자 |
 |------|------|-----------|--------|
+| v1.1 | 2026-06-18 | **Phase 1 구현 완료·실기기 연동 확인** — `sql/064`(Outbox+sys_user Telegram 컬럼, DA 승인)·`markEscrow` enqueue·`telegram.ts`/`mps-noti.ts` 디스패처·온보딩(딥링크+webhook)·안읽은 뱃지·**결제완료 즉시 발송**(cron 의존 제거)·인앱 Realtime 토스트 제스처 분리·보안 하드닝(webhook fail-closed·재바인딩 차단). 설계 대비: webhook을 Phase 1로 앞당김, cron 주기발송→즉시발송+cron 안전망. (ROADMAP Phase 18) | 아소카 |
 | v1.0 | 2026-06-18 | **Phase 1 설계 완료** — Outbox 패턴 + HTML parse_mode sendMessage/sendPhoto 템플릿 + url 딥링크 버튼 + Realtime Webhook 준비(Phase 2) | 아소카 |
 
 ---
@@ -1567,19 +1568,24 @@ console.log(data)
 
 ## 16. 마일스톤 및 로드맵
 
-### Phase 1: 단방향 발송 (지금)
+### Phase 1: 단방향 발송 — ✅ 구현 완료 (2026-06-18)
 
-| 항목 | 상태 | 예상 기한 |
+| 항목 | 상태 | 완료일 |
 |------|------|----------|
-| Outbox 테이블 설계 + DDL | 진행 중 | 2026-06-20 |
-| markEscrow() 통합 | 진행 중 | 2026-06-22 |
-| Realtime broadcast (Layer 1) | 미시작 | 2026-06-25 |
-| Cron dispatcher (Layer 2) | 미시작 | 2026-06-28 |
-| Pull 레이어 (Layer 3) UI | 미시작 | 2026-07-02 |
-| 판매자 온보딩 UI (봇 연동) | 미시작 | 2026-07-05 |
-| 로컬 테스트 완료 | 미시작 | 2026-07-08 |
-| Staging 검증 | 미시작 | 2026-07-10 |
-| **Phase 1 출시** | **예정** | **2026-07-15** |
+| Outbox 테이블 설계 + DDL (`sql/064`, DA 승인·Supabase 적용) | ✅ 완료 | 2026-06-18 |
+| markEscrow() 통합 (`enqueueOrderNoti`) | ✅ 완료 | 2026-06-18 |
+| Realtime broadcast (Layer 1) — 기존 자산 + 토스트 제스처 분리 개선 | ✅ 완료 | 2026-06-18 |
+| Telegram 디스패처 (Layer 2) `mps-noti.ts` + cron 안전망 통합 | ✅ 완료 | 2026-06-18 |
+| **결제완료 즉시 발송** (cron 의존 제거 — `payments/complete`) | ✅ 완료 | 2026-06-18 |
+| Pull 레이어 (Layer 3) 안읽은 뱃지 | ✅ 완료 | 2026-06-18 |
+| 판매자 온보딩 UI (봇 연동 딥링크 + webhook) | ✅ 완료 | 2026-06-18 |
+| 보안 하드닝 (webhook fail-closed · 재바인딩 차단) | ✅ 완료 | 2026-06-18 |
+| 운영 셋업 (BotFather 봇 · env 3종 · setWebhook) | ✅ 실기기 연동 확인 | 2026-06-18 |
+
+> **설계 대비 변경점**
+> - **Webhook을 Phase 1에 구현**: 판매자 연동(chat_id 저장)에 webhook이 필수라 Phase 2에서 앞당김(단, 양방향 버튼 콜백은 여전히 Phase 2).
+> - **cron 주기 발송 → 결제완료 즉시 발송**: 사장님은 즉시 알림이 필요한데 Vercel cron은 분 단위가 최소(초 단위 불가)라, `payments/complete`에서 디스패처를 동기 호출해 즉시 발송. cron(`*/5`)은 즉시 발송 실패·유실분만 줍는 **안전망**으로 격하.
+> - **보안 하드닝 추가**: 자동 보안 리뷰 대응(webhook fail-closed, 연동 재바인딩 차단).
 
 ### Phase 2: 양방향 인터랙션
 

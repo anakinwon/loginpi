@@ -1,14 +1,15 @@
 # PRD: Pi Network 기반 풀스택 앱 플랫폼
 
-> **버전**: v11.7
+> **버전**: v11.8
 > **작성일**: 2026-06-05
-> **최종 업데이트**: 2026-06-17
+> **최종 업데이트**: 2026-06-18
 > **작성자**: anakin
 > **배포 URL**: https://loginpi.vercel.app
 > **저장소**: https://github.com/anakinwon/loginpi
 > **카페 상세 스펙**: `docs/PRD_4_CHAT.md` (v1.6)
 > **GTM 문서**: `docs/제품설명서_202060615.pptx` (단기 4목표 13장 슬라이드) · `docs/공개_라이선스_정책.md` (오픈코어 3계층)
 > **운영 리스크**: `docs/TROUBLESHOOT.md` (A. 성능 리스크 레지스터 7종 + B. 운영 이슈 기록)
+> **판매자 주문 알림**: `docs/PRD_13_MSG.md` (v1.1) — Telegram+Realtime+Pull 3계층 Outbox, 결제완료 즉시 발송 (✅ Phase 1 구현 완료 2026-06-18, ROADMAP Phase 18)
 > **토큰 발행 (기획)**: `docs/PRD_12_TOKEN.md` (v1.8) · `_백서.md` · `_법무자문의뢰서.md` — BEAN 생태계 토큰, Pi Launchpad. ⚠️ 발행 전 **앱 코드 미포함**(레드라인 #2 유지) — 단 문서는 git 커밋(파일럿 인큐베이팅, 2026-06-17 정책)
 
 ---
