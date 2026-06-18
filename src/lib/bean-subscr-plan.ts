@@ -19,22 +19,97 @@ export interface SubscrPlan {
 
 // bean_fee_plan §4-1 구독요금제 10행 미러 (정수 Bean)
 export const SUBSCR_PLANS: SubscrPlan[] = [
-  { fee_plan_cd: 'SM100', product: 'PICAFE', grade: 'GENERAL', cycle: 'M', bean_amt: 3000, item_limit: 0 },
-  { fee_plan_cd: 'SY100', product: 'PICAFE', grade: 'GENERAL', cycle: 'Y', bean_amt: 30000, item_limit: 0 },
-  { fee_plan_cd: 'SM200', product: 'PISTORE', grade: 'S', cycle: 'M', bean_amt: 3000, item_limit: 30 },
-  { fee_plan_cd: 'SM300', product: 'PISTORE', grade: 'M', cycle: 'M', bean_amt: 4000, item_limit: 50 },
-  { fee_plan_cd: 'SM400', product: 'PISTORE', grade: 'L', cycle: 'M', bean_amt: 5000, item_limit: 0 },
-  { fee_plan_cd: 'SY200', product: 'PISTORE', grade: 'S', cycle: 'Y', bean_amt: 30000, item_limit: 30 },
-  { fee_plan_cd: 'SY300', product: 'PISTORE', grade: 'M', cycle: 'Y', bean_amt: 40000, item_limit: 50 },
-  { fee_plan_cd: 'SY400', product: 'PISTORE', grade: 'L', cycle: 'Y', bean_amt: 50000, item_limit: 0 },
-  { fee_plan_cd: 'SM500', product: 'TRANSLATE', grade: 'GENERAL', cycle: 'M', bean_amt: 1000, item_limit: 0 },
-  { fee_plan_cd: 'SY500', product: 'TRANSLATE', grade: 'GENERAL', cycle: 'Y', bean_amt: 10000, item_limit: 0 },
+  {
+    fee_plan_cd: 'SM100',
+    product: 'PICAFE',
+    grade: 'GENERAL',
+    cycle: 'M',
+    bean_amt: 3000,
+    item_limit: 0,
+  },
+  {
+    fee_plan_cd: 'SY100',
+    product: 'PICAFE',
+    grade: 'GENERAL',
+    cycle: 'Y',
+    bean_amt: 30000,
+    item_limit: 0,
+  },
+  {
+    fee_plan_cd: 'SM200',
+    product: 'PISTORE',
+    grade: 'S',
+    cycle: 'M',
+    bean_amt: 3000,
+    item_limit: 30,
+  },
+  {
+    fee_plan_cd: 'SM300',
+    product: 'PISTORE',
+    grade: 'M',
+    cycle: 'M',
+    bean_amt: 4000,
+    item_limit: 50,
+  },
+  {
+    fee_plan_cd: 'SM400',
+    product: 'PISTORE',
+    grade: 'L',
+    cycle: 'M',
+    bean_amt: 5000,
+    item_limit: 0,
+  },
+  {
+    fee_plan_cd: 'SY200',
+    product: 'PISTORE',
+    grade: 'S',
+    cycle: 'Y',
+    bean_amt: 30000,
+    item_limit: 30,
+  },
+  {
+    fee_plan_cd: 'SY300',
+    product: 'PISTORE',
+    grade: 'M',
+    cycle: 'Y',
+    bean_amt: 40000,
+    item_limit: 50,
+  },
+  {
+    fee_plan_cd: 'SY400',
+    product: 'PISTORE',
+    grade: 'L',
+    cycle: 'Y',
+    bean_amt: 50000,
+    item_limit: 0,
+  },
+  {
+    fee_plan_cd: 'SM500',
+    product: 'TRANSLATE',
+    grade: 'GENERAL',
+    cycle: 'M',
+    bean_amt: 1000,
+    item_limit: 0,
+  },
+  {
+    fee_plan_cd: 'SY500',
+    product: 'TRANSLATE',
+    grade: 'GENERAL',
+    cycle: 'Y',
+    bean_amt: 10000,
+    item_limit: 0,
+  },
 ]
 
-export const SUBSCR_PRODUCTS: SubscrProduct[] = ['PICAFE', 'PISTORE', 'TRANSLATE']
+export const SUBSCR_PRODUCTS: SubscrProduct[] = [
+  'PICAFE',
+  'PISTORE',
+  'TRANSLATE',
+]
 
 // 주기 → 개월 수 (M=1, Y=12). 연간은 월×10 가격 = 2개월 무료.
-export const cycleMonths = (cycle: SubscrCycle): number => (cycle === 'Y' ? 12 : 1)
+export const cycleMonths = (cycle: SubscrCycle): number =>
+  cycle === 'Y' ? 12 : 1
 
 // (product, grade, cycle)로 요금 1행 선택 — 서버 권위 조회.
 export function findPlan(
@@ -45,6 +120,24 @@ export function findPlan(
   return SUBSCR_PLANS.find(
     (p) => p.product === product && p.grade === grade && p.cycle === cycle,
   )
+}
+
+// 연간 절약 = 월간×12 − 연간. (월×10 정책이라 2개월 무료, 약 17%)
+export function annualSaving(
+  product: SubscrProduct,
+  grade: SubscrGrade,
+): { saveBean: number; pct: number; monthsFree: number } | null {
+  const m = findPlan(product, grade, 'M')
+  const y = findPlan(product, grade, 'Y')
+  if (!m || !y || m.bean_amt <= 0) return null
+  const full = m.bean_amt * 12 // 월간 12개월 결제액
+  const saveBean = full - y.bean_amt
+  if (saveBean <= 0) return null
+  return {
+    saveBean,
+    pct: Math.round((saveBean / full) * 100),
+    monthsFree: Math.round(saveBean / m.bean_amt),
+  }
 }
 
 // PiStore 등급 자동 추천 (현재 상품 수 기준): 30개↓ S · 50개↓ M · 초과 L

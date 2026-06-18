@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import {
   SUBSCR_PLANS,
   findPlan,
+  annualSaving,
   recommendStoreGrade,
   type SubscrProduct,
   type SubscrGrade,
@@ -116,26 +117,52 @@ export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
             {(resp?.balance ?? 0).toLocaleString()} ☕
           </span>
         </span>
-        <Link href="/bean" className="text-primary text-sm font-medium hover:underline">
+        <Link
+          href="/bean"
+          className="text-primary text-sm font-medium hover:underline"
+        >
           + {t('charge')}
         </Link>
       </div>
 
-      {/* 사상 안내 + 월/년 토글 */}
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-muted-foreground text-xs">💡 {t('tagline')}</p>
-        <div className="bg-muted inline-flex shrink-0 rounded-lg p-1 text-sm">
-          {(['M', 'Y'] as SubscrCycle[]).map((c) => (
-            <button
-              key={c}
-              onClick={() => setCycle(c)}
-              className={`rounded-md px-3 py-1 font-medium transition-colors ${
-                cycle === c ? 'bg-background shadow-sm' : 'text-muted-foreground'
+      {/* 사상 안내 */}
+      <p className="text-muted-foreground text-xs">💡 {t('tagline')}</p>
+
+      {/* 결제 주기 선택 — 연간 강조(2개월 무료). 전폭 세그먼트 + 앰버 배지 + (미선택 시에도) primary 링 */}
+      <div className="space-y-1.5">
+        <p className="text-muted-foreground text-xs font-medium">
+          {t('cycleHeading')}
+        </p>
+        <div className="bg-muted grid grid-cols-2 gap-1.5 rounded-xl p-1.5">
+          <button
+            onClick={() => setCycle('M')}
+            className={`rounded-lg py-2.5 text-sm font-medium transition-colors ${
+              cycle === 'M'
+                ? 'bg-background shadow-sm'
+                : 'text-muted-foreground'
+            }`}
+          >
+            {t('monthly')}
+          </button>
+          <button
+            onClick={() => setCycle('Y')}
+            className={`relative flex items-center justify-center gap-1.5 rounded-lg py-2.5 text-sm font-bold transition-colors ${
+              cycle === 'Y'
+                ? 'bg-primary text-primary-foreground shadow-sm'
+                : 'text-foreground ring-primary/40 ring-2'
+            }`}
+          >
+            {t('annual')}
+            <span
+              className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
+                cycle === 'Y'
+                  ? 'bg-amber-300 text-amber-950'
+                  : 'bg-amber-400 text-amber-950'
               }`}
             >
-              {t(c === 'Y' ? 'annual' : 'monthly')}
-            </button>
-          ))}
+              {t('annualBadge')}
+            </span>
+          </button>
         </div>
       </div>
 
@@ -171,12 +198,38 @@ export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
                       {plan.bean_amt.toLocaleString()} ☕
                     </span>
                     <span className="text-muted-foreground text-sm">
-                      {' '}/ {cycle === 'Y' ? t('perYear') : t('perMonth')}
+                      {' '}
+                      / {cycle === 'Y' ? t('perYear') : t('perMonth')}
                     </span>
                     <span className="text-muted-foreground ml-1 text-xs">
                       (= {plan.bean_amt / 100} π)
                     </span>
                   </p>
+                  {/* 연간 절약 안내 — 선택 시 절약액(초록), 월간일 때 연간 전환 넛지(앰버) */}
+                  {(() => {
+                    const sv = annualSaving(product, grade)
+                    if (!sv) return null
+                    return cycle === 'Y' ? (
+                      <p className="mt-0.5 text-xs font-semibold text-green-600 dark:text-green-400">
+                        {t('annualSave', {
+                          bean: sv.saveBean.toLocaleString(),
+                          months: sv.monthsFree,
+                        })}
+                      </p>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setCycle('Y')}
+                        className="mt-0.5 text-left text-xs font-medium text-amber-600 hover:underline dark:text-amber-400"
+                      >
+                        💡{' '}
+                        {t('annualNudge', {
+                          months: sv.monthsFree,
+                          pct: sv.pct,
+                        })}
+                      </button>
+                    )
+                  })()}
                 </div>
                 <Button
                   size="sm"
