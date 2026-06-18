@@ -50,7 +50,6 @@ export async function POST(request: NextRequest) {
 
   // 프리미엄 카페(무료 테마 외) 생성료 — 구독자는 무료, 비구독자는 Bean 결제(생성 후 차감)
   const plan = await getChatPlan(user.id)
-  const isSubscriber = plan.tier !== 'FREE'
   let createFeeBean = 0
   if (!FREE_THEME_CODES.has(theme_cd)) {
     const allowance = await canCreateRoom(user.id, plan)
@@ -78,9 +77,9 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  // 무료 개설 방(비구독자가 0 Bean으로 만든 방) = 생성 시점부터 7일만 유효 + 연장 불가.
-  // 결제(프리미엄 Bean)·구독으로 만든 방은 영구(클라이언트 지정 만료일 또는 DB 기본 9999).
-  const isFreeRoom = createFeeBean === 0 && !isSubscriber
+  // 무료로 개설되는 모든 방(생성료 0 Bean — 무료 테마·구독 혜택 무료 생성 포함) = 7일 고정·연장 불가.
+  // Bean 결제로 만든 방만 영구(클라이언트 지정 만료일 또는 DB 기본 9999). 기간 선택은 결제 방에만 허용.
+  const isFreeRoom = createFeeBean === 0
   const FREE_ROOM_TTL_MS = 7 * 24 * 60 * 60 * 1000
   const finalExprDtm = isFreeRoom
     ? new Date(Date.now() + FREE_ROOM_TTL_MS).toISOString()

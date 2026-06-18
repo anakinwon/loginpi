@@ -137,9 +137,9 @@ export function GroupRoomCreator() {
   const isPremium = selectedTheme?.theme_tp_cd === 'PREMIUM'
   // FITNESS(PT/피트니스)는 무료, 또는 구독자의 월 무료 쿼터 내에서는 결제 없이 생성
   const isFree = selectedTheme?.theme_cd === 'FITNESS' || canCreateRoomFree
-  // 무료 개설(비구독자가 무료 테마로 생성)은 서버에서 7일 고정·연장 불가 → 유효기간 선택 불가
-  const isFreeRoom7d =
-    selectedTheme?.theme_cd === 'FITNESS' && !canCreateRoomFree
+  // 무료로 개설되는 모든 방(무료 테마·구독 혜택 무료 생성 포함)은 서버에서 7일 고정·연장 불가
+  // → 유효기간 선택 불가. 결제로 만드는 방만 기간 선택 가능.
+  const isFreeRoom7d = isFree
   // 비구독자만 결제: PREMIUM 테마는 0.3π(방0.1+테마0.2), BASIC은 0.1π
   const payAmount = isPremium && !canUsePremiumTheme ? 0.3 : 0.1
   const isBusy =
@@ -531,9 +531,8 @@ export function GroupRoomCreator() {
                     <div className="bg-muted/40 rounded-xl border p-3 text-sm">
                       <p className="font-medium">유효기간 7일 (무료 개설)</p>
                       <p className="text-muted-foreground mt-1 text-xs">
-                        무료로 개설한 카페는 7일간만 유지되며 연장할 수
-                        없습니다. 계속 운영하려면 구독 또는 프리미엄 개설을
-                        이용하세요.
+                        무료로 개설하는 카페는 무조건 7일간만 유지되며 연장할 수
+                        없습니다. 기간을 직접 지정하려면 Bean 결제로 개설하세요.
                       </p>
                     </div>
                   ) : (
