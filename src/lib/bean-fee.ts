@@ -13,21 +13,22 @@ export type RoomGrade = 'GENERAL' | 'PREMIUM' | 'EVENT'
 // 요금 종류 — bean_fee_plan.fee_knd_cd 일부 (CREATE 생성 / ENTER 입장).
 export type RoomFeeKind = 'CREATE' | 'ENTER'
 
-// 무료 테마 = 일반(GENERAL) 카페. 그 외 그룹 테마 = 프리미엄(PREMIUM).
-// (group route의 무료 테마 판정과 단일 소스로 공유)
-export const FREE_THEME_CODES = new Set(['FITNESS'])
+// 무료/유료 카페의 단일 진실 소스 = msg_theme.theme_tp_cd ('BASIC' | 'PREMIUM').
+// 생성 요금(group route)도 theme_tp_cd로 판정하므로, 입장 등급도 같은 컬럼을 따라야
+// "무료로 생성된 방인데 입장은 유료" 같은 모순이 생기지 않는다.
+// (테마 코드 화이트리스트 하드코딩은 테마 추가 시 drift → DB 컬럼을 권위 소스로 사용)
 
-// 방 타입·테마로 카페 등급을 도출.
+// 방 타입·테마타입으로 카페 등급을 도출.
 //   이벤트방(room_tp_cd='E') → EVENT
-//   그룹방 + 무료 테마        → GENERAL (일반카페)
-//   그룹방 + 그 외 테마       → PREMIUM (프리미엄카페)
+//   그룹방 + PREMIUM 테마      → PREMIUM (프리미엄카페)
+//   그룹방 + BASIC/미상 테마   → GENERAL (일반카페·무료)
 export function getRoomGrade(
   roomTpCd: string,
-  themeCd: string | null | undefined,
+  themeTpCd: string | null | undefined,
 ): RoomGrade {
   if (roomTpCd === 'E') return 'EVENT'
-  if (themeCd && FREE_THEME_CODES.has(themeCd)) return 'GENERAL'
-  return 'PREMIUM'
+  if (themeTpCd === 'PREMIUM') return 'PREMIUM'
+  return 'GENERAL'
 }
 
 // 비구독(일반요금제) 기준 Bean 요금표. 0 = 무료.

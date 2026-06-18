@@ -12,6 +12,7 @@ import { InlinePurchasePrompt } from './inline-purchase-prompt'
 import { BadgeAwardPopup, type BadgeAwardInfo } from './badge-award-popup'
 import { RoomSettingsDialog, type RoomSettings } from './room-settings-dialog'
 import { VoiceChannelPanel, RemoteAudio } from './voice-channel-panel'
+import { MemberListPanel } from './member-list-panel'
 import { useVoiceChannel } from '@/hooks/use-voice-channel'
 
 interface ChatRoomPanelProps {
@@ -68,6 +69,8 @@ export function ChatRoomPanel({
   const [displayRoomNm, setDisplayRoomNm] = useState(roomNm)
   // PiVoice™ v2.0 — 음성채널 패널 표시 + 방장 마이크 제어 권한
   const [voicePanelOpen, setVoicePanelOpen] = useState(false)
+  // 카페 입장 멤버 목록(online/offline) 패널
+  const [memberPanelOpen, setMemberPanelOpen] = useState(false)
   const [canControlMic, setCanControlMic] = useState(false)
   const [displayRoomDesc, setDisplayRoomDesc] = useState<string | null>(
     roomDesc ?? null,
@@ -217,8 +220,14 @@ export function ChatRoomPanel({
   // 콤보 선택 언어가 URL locale보다 우선 — 이 방의 모든 메시지가 해당 언어로 보임
   const effectiveLocale = viewLocale || urlLocale
 
-  const { messages, sendMessage, sendSticker, sendFile, prependMessages } =
-    useChatRoom(roomId, initialMessages, {
+  const {
+    messages,
+    onlineUserIds,
+    sendMessage,
+    sendSticker,
+    sendFile,
+    prependMessages,
+  } = useChatRoom(roomId, initialMessages, {
       currentUserId,
       currentUserDisplayName,
       userLocale: effectiveLocale,
@@ -289,6 +298,20 @@ export function ChatRoomPanel({
         >
           📊
         </Link>
+        {/* 카페 입장 멤버 목록 — 현재 접속(online) 인원 배지 표시 */}
+        <button
+          onClick={() => setMemberPanelOpen((o) => !o)}
+          className="relative shrink-0 text-2xl transition-transform hover:scale-110"
+          aria-label="카페 멤버"
+          title="카페 멤버 (접속 현황)"
+        >
+          👥
+          {onlineUserIds.length > 0 && (
+            <span className="absolute -top-1 -right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-green-500 px-0.5 text-[10px] font-bold text-white">
+              {onlineUserIds.length}
+            </span>
+          )}
+        </button>
         {/* PiVoice™ v2.0 음성채널 버튼 — 참여 인원 배지 표시 */}
         <button
           onClick={() => setVoicePanelOpen((o) => !o)}
@@ -423,6 +446,16 @@ export function ChatRoomPanel({
         subscribing={paying}
         onClose={() => setAiLimitPromptOpen(false)}
       />
+
+      {/* 카페 입장 멤버 목록 패널 — online/offline 실시간 표시 */}
+      {memberPanelOpen && (
+        <MemberListPanel
+          roomId={roomId}
+          currentUserId={currentUserId}
+          onlineUserIds={onlineUserIds}
+          onClose={() => setMemberPanelOpen(false)}
+        />
+      )}
 
       {/* PiVoice™ v3.0 음성채널 패널 — 방장 보장 + 멤버 자동 2/승인 2 */}
       {voicePanelOpen && (

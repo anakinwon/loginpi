@@ -6,9 +6,11 @@ import {
   getRoomMember,
   verifyRoomPassword,
   isRoomExpired,
+  resolveRoomGrade,
+  joinRoomMember,
 } from '@/lib/chat'
 import { getChatPlan } from '@/lib/chat-auth'
-import { getRoomGrade, getRoomFeeBean } from '@/lib/bean-fee'
+import { getRoomFeeBean } from '@/lib/bean-fee'
 import { applyBean, getBalance } from '@/lib/bean'
 
 type Params = { params: Promise<{ roomId: string }> }
@@ -117,7 +119,7 @@ export async function POST(request: NextRequest, { params }: Params) {
 
   // 입장료 — 구독자 무료, 비구독자는 등급별 Bean 결제 ([currency-routing-rule] 플랫폼 요금 = Bean).
   // 내가 만든 방(OWNER) 재입장은 위에서 '이미 멤버'로 통과되므로 여기까지 오지 않음 = 무료.
-  const grade = getRoomGrade(room.room_tp_cd, room.theme_cd)
+  const grade = await resolveRoomGrade(room)
   const plan = await getChatPlan(user.id)
   const enterFeeBean = getRoomFeeBean('ENTER', grade, plan.tier !== 'FREE')
   if (enterFeeBean > 0) {
@@ -155,15 +157,8 @@ export async function POST(request: NextRequest, { params }: Params) {
     }
   }
 
-  const { error } = await getSupabaseAdmin()
-    .from('msg_room_mbr')
-    .insert({
-      room_id: roomId,
-      usr_id: user.id,
-      mbr_role_cd: 'MEMBER',
-      regr_id: user.display_name.slice(0, 20),
-      modr_id: user.display_name.slice(0, 20),
-    })
+  // 재가입 시 논리삭제된 과거 멤버십을 복구(upsert) — blind INSERT의 중복키 실패 방지
+  const { error } = await joinRoomMember(roomId, user.id, user.display_name)
 
   if (error) {
     // 멤버 삽입 실패 시 입장료 환불 (정원은 위에서 검증 — 드문 경합 대비)

@@ -18,14 +18,20 @@ export async function GET(_req: Request, { params }: Params) {
 
   const { data } = await getSupabaseAdmin()
     .from('msg_room_mbr')
-    .select('usr_id, sys_user!inner(display_name)')
+    .select('usr_id, mbr_role_cd, reg_dtm, sys_user!inner(display_name)')
     .eq('room_id', roomId)
     .eq('del_yn', 'N')
+    .order('reg_dtm', { ascending: true }) // 가입 순 — 패널은 접속 상태로 재정렬
 
-  type Row = { usr_id: string; sys_user: { display_name: string } | null }
+  type Row = {
+    usr_id: string
+    mbr_role_cd: string
+    sys_user: { display_name: string } | null
+  }
   const members = ((data ?? []) as unknown as Row[]).map((r) => ({
     usr_id: r.usr_id,
     display_nm: r.sys_user?.display_name ?? r.usr_id.slice(0, 8),
+    mbr_role_cd: r.mbr_role_cd,
   }))
 
   return NextResponse.json({ members })

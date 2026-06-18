@@ -1,6 +1,7 @@
 import 'server-only'
 import { randomBytes, scryptSync, timingSafeEqual } from 'node:crypto'
 import { getSupabaseAdmin } from './supabase-admin'
+import { getRoomGrade, type RoomGrade } from './bean-fee'
 
 export interface MsgRoom {
   room_id: string
@@ -23,6 +24,54 @@ export interface MsgRoom {
 // 카페 만료 여부 — 무료 개설 방(7일 제한)이 만료됐는지 판정. 목록·입장·조회 공통 사용.
 export function isRoomExpired(room: { expr_dtm?: string | null }): boolean {
   return !!room.expr_dtm && new Date(room.expr_dtm) <= new Date()
+}
+
+// 멤버 등록(재가입 포함). UNIQUE(room_id, usr_id) 충돌 시 논리삭제된 과거 멤버십을 복구한다.
+// ⚠️ 탈퇴·제외는 물리 DELETE 금지(del_yn='Y')라 행이 남으므로, blind INSERT는 중복키로 실패한다.
+//    → upsert(onConflict)로 재활성화해 "탈퇴 후 재입장 영구 차단 + Bean 차감/환불 반복" 버그를 차단.
+//    (reg_dtm은 미포함 → 최초 가입일 보존, 충돌 시 del_yn/modr만 갱신)
+export async function joinRoomMember(
+  roomId: string,
+  userId: string,
+  displayName: string,
+): Promise<{ error: { message: string } | null }> {
+  const slug = displayName.slice(0, 20)
+  const { error } = await getSupabaseAdmin()
+    .from('msg_room_mbr')
+    .upsert(
+      {
+        room_id: roomId,
+        usr_id: userId,
+        mbr_role_cd: 'MEMBER',
+        del_yn: 'N',
+        del_dtm: null,
+        regr_id: slug,
+        modr_id: slug,
+        mod_dtm: new Date().toISOString(),
+      },
+      { onConflict: 'room_id,usr_id' },
+    )
+  return { error }
+}
+
+// 방의 요금 등급(GENERAL/PREMIUM/EVENT)을 DB 권위 소스(msg_theme.theme_tp_cd)로 해석.
+// 생성 요금 판정과 동일 기준 — BASIC 테마 방은 입장도 무료. 입장료 산정의 단일 진입점.
+export async function resolveRoomGrade(room: {
+  room_tp_cd: string
+  theme_cd: string | null
+}): Promise<RoomGrade> {
+  if (room.room_tp_cd === 'E') return 'EVENT'
+  if (!room.theme_cd) return 'GENERAL'
+  const { data } = await getSupabaseAdmin()
+    .from('msg_theme')
+    .select('theme_tp_cd')
+    .eq('theme_cd', room.theme_cd)
+    .eq('del_yn', 'N')
+    .maybeSingle()
+  return getRoomGrade(
+    room.room_tp_cd,
+    (data as { theme_tp_cd?: string } | null)?.theme_tp_cd,
+  )
 }
 
 // 비밀방 입장 비밀번호 해시 — scrypt(salt 내장). 형식: scrypt$<saltHex>$<hashHex>
