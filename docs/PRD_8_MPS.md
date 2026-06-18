@@ -1,4 +1,4 @@
-# PRD_8_MPS.md — PiShop(MPS): Pi Coin P2P 직거래 마켓플레이스
+# PRD_8_MPS.md — PiShop(MPS): Pi Coin P2P·O2O 마켓플레이스
 
 > **작성일**: 2026-06-10 (최종 수정 2026-06-12)
 > **버전**: v2.0
@@ -47,7 +47,7 @@
 
 ### 1-1. 제품명
 
-**PiShop (MPS)** — Pi Coin 전용 P2P 직거래 마켓플레이스
+**PiShop (MPS)** — Pi Coin 전용 P2P·O2O 마켓플레이스
 
 ### 1-2. 한 줄 요약
 

@@ -990,7 +990,7 @@ if (meta?.type === 'CHAT_SUBSCR') {
 
 ## Phase 13: PiShop(MPS) ✅ (Phase 1 MVP + Phase 2 확장 완료 — 2026-06-13, Phase 3 고도화 예정)
 
-> **목표**: Pi Coin 전용 P2P 직거래 마켓플레이스 — 에스크로 기반 안전 거래, 재고 관리, 매장 등록
+> **목표**: Pi Coin 전용 P2P·O2O 마켓플레이스 — 에스크로 기반 안전 거래(P2P 직거래) + 오프라인 매장 커머스(O2O), 재고 관리, 매장 등록
 > **상세 스펙**: `docs/PRD_8_MPS.md` (v1.1) | **담당 에이전트**: `.claude/agents/commerce/mps-prd-architect.md`
 > **핵심 결정**: ① 에스크로 = **PiRC2 U2A 가상 에스크로** (운영자 Pi 계정 중간 보관, `metadata.type='MPS_ESCROW'`) ② 재고 = `stock_qty = reg_qty - ordered_qty` CHECK 제약 + 원자적 차감 ③ DB = `mps_` 접두사 6개 테이블 ④ 3단계 마일스톤 (Phase 1 MVP → Phase 2 확장 → Phase 3 PiRC3 마이그레이션)
 

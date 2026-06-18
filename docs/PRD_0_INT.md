@@ -280,7 +280,7 @@
 | **U2A** | User-to-App, Pi Network 공식 결제 프로토콜 |
 | **PiCafé** | 테마 기반 Pi Network 커뮤니티 카페 플랫폼 |
 | **PiTranslate™** | 글로벌 실시간 동시통역 (Gemini + Claude 하이브리드) |
-| **PiShop(MPS)** | Pi Coin P2P 직거래 마켓플레이스 |
+| **PiShop(MPS)** | Pi Coin P2P·O2O 마켓플레이스 |
 | **PiVoice™** | WebRTC 기반 N:N 음성채널 |
 | **LBS** | Location-Based Service, 위치기반서비스 |
 | **DA** | Data Architecture, 데이터 표준화 관리 시스템 |
