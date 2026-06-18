@@ -55,7 +55,6 @@ export function ProfileTabs({ initialUser, localeOptions }: Props) {
       {activeTab === 'info' && (
         <div className="space-y-8">
           <AccountIntegrationSection />
-          <TelegramConnect />
           <ProfileForm
             initialUser={user}
             localeOptions={localeOptions}
@@ -104,6 +103,7 @@ function StoreTab() {
           </Link>
         </nav>
       </div>
+      <TelegramConnect />
       <StoreItemList mine />
     </div>
   )
