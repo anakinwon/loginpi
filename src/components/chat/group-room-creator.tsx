@@ -147,6 +147,19 @@ export function GroupRoomCreator() {
     payStatus === 'waiting' ||
     payStatus === 'completing'
 
+  // 무료로 개설되는 그룹방은 무조건 공개 + 최대 정원 10명 제한 (마스터 정책).
+  // Bean 결제로 만드는 방만 비공개·정원 확대 선택 가능.
+  const restrictFreeRoom = roomType === 'G' && isFree
+  const FREE_ROOM_MAX = 10
+
+  // 무료 방으로 확정되면 공개·정원 10명을 강제 (잘못된 이전 선택값 정정)
+  useEffect(() => {
+    if (restrictFreeRoom) {
+      setIsPublic('Y')
+      setMaxMbr(FREE_ROOM_MAX)
+    }
+  }, [restrictFreeRoom])
+
   const handleThemeSelect = useCallback((theme: ThemeRow) => {
     setSelectedTheme(theme)
     setStep(2)
@@ -490,40 +503,64 @@ export function GroupRoomCreator() {
               <div className="space-y-4">
                 <div>
                   <p className="mb-2 text-sm font-medium">공개 여부</p>
-                  <div className="flex gap-2">
-                    {(['Y', 'N'] as const).map((v) => (
-                      <button
-                        key={v}
-                        onClick={() => setIsPublic(v)}
-                        className={`flex-1 rounded-xl border px-4 py-2 text-sm font-medium transition-colors ${
-                          isPublic === v
-                            ? 'border-primary bg-primary/10 text-primary'
-                            : 'hover:bg-muted'
-                        }`}
-                      >
-                        {v === 'Y' ? '🌐 공개' : '🔒 비공개'}
-                      </button>
-                    ))}
-                  </div>
+                  {restrictFreeRoom ? (
+                    <>
+                      <div className="border-primary bg-primary/10 text-primary rounded-xl border px-4 py-2 text-center text-sm font-medium">
+                        🌐 공개
+                      </div>
+                      <p className="text-muted-foreground mt-1 text-xs">
+                        무료로 만드는 카페는 공개로만 개설할 수 있어요.
+                      </p>
+                    </>
+                  ) : (
+                    <div className="flex gap-2">
+                      {(['Y', 'N'] as const).map((v) => (
+                        <button
+                          key={v}
+                          onClick={() => setIsPublic(v)}
+                          className={`flex-1 rounded-xl border px-4 py-2 text-sm font-medium transition-colors ${
+                            isPublic === v
+                              ? 'border-primary bg-primary/10 text-primary'
+                              : 'hover:bg-muted'
+                          }`}
+                        >
+                          {v === 'Y' ? '🌐 공개' : '🔒 비공개'}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <div>
                   <p className="mb-2 text-sm font-medium">최대 정원</p>
                   <div className="grid grid-cols-4 gap-2">
-                    {([10, 30, 50, 100] as Capacity[]).map((n) => (
-                      <button
-                        key={n}
-                        onClick={() => setMaxMbr(n)}
-                        className={`rounded-xl border py-2 text-sm font-medium transition-colors ${
-                          maxMbr === n
-                            ? 'border-primary bg-primary/10 text-primary'
-                            : 'hover:bg-muted'
-                        }`}
-                      >
-                        {n}명
-                      </button>
-                    ))}
+                    {([10, 30, 50, 100] as Capacity[]).map((n) => {
+                      const locked = restrictFreeRoom && n !== FREE_ROOM_MAX
+                      return (
+                        <button
+                          key={n}
+                          onClick={() => {
+                            if (!locked) setMaxMbr(n)
+                          }}
+                          disabled={locked}
+                          className={`rounded-xl border py-2 text-sm font-medium transition-colors ${
+                            maxMbr === n
+                              ? 'border-primary bg-primary/10 text-primary'
+                              : locked
+                                ? 'cursor-not-allowed opacity-40'
+                                : 'hover:bg-muted'
+                          }`}
+                        >
+                          {n}명
+                        </button>
+                      )
+                    })}
                   </div>
+                  {restrictFreeRoom && (
+                    <p className="text-muted-foreground mt-1 text-xs">
+                      무료로 만드는 카페는 최대 10명까지 가능해요.
+                    </p>
+                  )}
                 </div>
 
                 {roomType === 'G' ? (

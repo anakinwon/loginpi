@@ -85,6 +85,15 @@ export async function POST(request: NextRequest) {
     ? new Date(Date.now() + FREE_ROOM_TTL_MS).toISOString()
     : (expr_dtm ?? null)
 
+  // 무료로 개설되는 방은 무조건 공개 + 최대 정원 10명으로 강제 (클라이언트 우회 방지).
+  // Bean 결제로 만든 방만 비공개·정원 확대 가능.
+  const FREE_ROOM_MAX_MBR = 10
+  const reqMaxMbr = typeof max_mbr_cnt === 'number' ? max_mbr_cnt : 50
+  const finalPublicYn = isFreeRoom ? 'Y' : (is_public_yn ?? 'Y')
+  const finalMaxMbr = isFreeRoom
+    ? Math.min(reqMaxMbr, FREE_ROOM_MAX_MBR)
+    : reqMaxMbr
+
   try {
     const room = await createGroupRoom({
       userId: user.id,
@@ -92,8 +101,8 @@ export async function POST(request: NextRequest) {
       theme_cd,
       room_nm: room_nm.trim(),
       room_desc: room_desc?.trim() || null,
-      is_public_yn: is_public_yn ?? 'Y',
-      max_mbr_cnt: typeof max_mbr_cnt === 'number' ? max_mbr_cnt : 50,
+      is_public_yn: finalPublicYn,
+      max_mbr_cnt: finalMaxMbr,
       expr_dtm: finalExprDtm,
     })
 
