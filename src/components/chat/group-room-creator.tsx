@@ -135,8 +135,8 @@ export function GroupRoomCreator() {
   }, [open])
 
   const isPremium = selectedTheme?.theme_tp_cd === 'PREMIUM'
-  // FITNESS(PT/피트니스)는 무료, 또는 구독자의 월 무료 쿼터 내에서는 결제 없이 생성
-  const isFree = selectedTheme?.theme_cd === 'FITNESS' || canCreateRoomFree
+  // 일반(BASIC) 테마 그룹 카페는 무료 생성. PREMIUM 테마만 유료(구독자는 구독 혜택으로 무료).
+  const isFree = !isPremium || canCreateRoomFree
   // 무료로 개설되는 모든 방(무료 테마·구독 혜택 무료 생성 포함)은 서버에서 7일 고정·연장 불가
   // → 유효기간 선택 불가. 결제로 만드는 방만 기간 선택 가능.
   const isFreeRoom7d = isFree
@@ -668,10 +668,9 @@ export function GroupRoomCreator() {
                     >
                       {isBusy
                         ? '생성 중…'
-                        : canCreateRoomFree &&
-                            selectedTheme?.theme_cd !== 'FITNESS'
+                        : canCreateRoomFree && isPremium
                           ? '구독 혜택으로 방 만들기'
-                          : '무료 방 만들기'}
+                          : '무료로 방 만들기'}
                     </button>
                   ) : (
                     <button

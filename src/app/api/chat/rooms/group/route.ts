@@ -4,7 +4,7 @@ import { canCreateRoom, getChatPlan } from '@/lib/chat-auth'
 import { createGroupRoom } from '@/lib/chat'
 import { recordUserAction } from '@/lib/event'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
-import { FREE_THEME_CODES, getRoomFeeBean } from '@/lib/bean-fee'
+import { getRoomFeeBean } from '@/lib/bean-fee'
 import { applyBean, getBalance } from '@/lib/bean'
 
 // 무료 테마(FITNESS) = 일반카페(무료). 그 외 테마 = 프리미엄카페.
@@ -48,10 +48,20 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: '테마를 선택해 주세요' }, { status: 400 })
   }
 
-  // 프리미엄 카페(무료 테마 외) 생성료 — 구독자는 무료, 비구독자는 Bean 결제(생성 후 차감)
+  // 테마 등급으로 무료/유료 판정: 일반(BASIC) 테마 그룹 카페는 무료, PREMIUM 테마만 Bean 결제.
+  // (구독자는 PREMIUM 테마도 구독 혜택으로 무료)
+  const { data: themeRow } = await getSupabaseAdmin()
+    .from('msg_theme')
+    .select('theme_tp_cd')
+    .eq('theme_cd', theme_cd)
+    .eq('del_yn', 'N')
+    .maybeSingle()
+  const isPremiumTheme =
+    (themeRow as { theme_tp_cd?: string } | null)?.theme_tp_cd === 'PREMIUM'
+
   const plan = await getChatPlan(user.id)
   let createFeeBean = 0
-  if (!FREE_THEME_CODES.has(theme_cd)) {
+  if (isPremiumTheme) {
     const allowance = await canCreateRoom(user.id, plan)
     if (!allowance.allowed) {
       // 비구독자: 프리미엄 카페 생성료를 Bean으로 결제 (구독자는 allowance.allowed → 무료)
@@ -134,8 +144,8 @@ export async function POST(request: NextRequest) {
     }
 
     // M3: PREMIUM Cafe 생성 미션 기록 (비블로킹)
-    // 무료 테마(FITNESS)는 PREMIUM 카페가 아니므로 미션에서 제외 — 무료 생성으로 M3 우회 차단
-    if (!FREE_THEME_CODES.has(theme_cd)) {
+    // 일반(BASIC) 테마는 PREMIUM 카페가 아니므로 미션에서 제외 — 무료 생성으로 M3 우회 차단
+    if (isPremiumTheme) {
       recordUserAction('premium_cafe_create', user.id, {
         theme_cd,
         room_nm,
