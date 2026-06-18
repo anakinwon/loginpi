@@ -1558,6 +1558,31 @@
       "locTypeTrade": "상품 거래"
     }
   },
+  "bean": {
+    "title": "Bean 지갑",
+    "backToStore": "PiShop으로",
+    "loading": "불러오는 중…",
+    "loginRequired": "로그인 후 이용할 수 있습니다",
+    "myBalance": "내 Bean 잔액",
+    "chargeTitle": "Bean 충전",
+    "rateHint": "1 Pi = {per} Bean (고정)",
+    "customLabel": "직접 입력 (Bean)",
+    "chargeBtn": "충전",
+    "buying": "결제 진행 중…",
+    "piBrowserOnly": "Pi Browser에서만 충전할 수 있습니다",
+    "piBrowserHint": "Bean 충전은 Pi Browser에서만 가능합니다",
+    "minCharge": "최소 {min} Bean(1π)부터 정수로 충전할 수 있습니다",
+    "chargeSuccess": "{bean} Bean 충전 완료!",
+    "chargeFail": "충전 처리에 실패했습니다",
+    "txnTitle": "거래 내역",
+    "txnEmpty": "거래 내역이 없습니다",
+    "type": {
+      "CHARGE": "충전",
+      "SPEND": "사용",
+      "REWARD": "보상",
+      "REFUND": "환불"
+    }
+  },
   "store": {
     "title": "PiShop",
     "subtitle": "Pi Coin으로 안전하게 직거래하세요 — 에스크로 보호",
@@ -1566,6 +1591,7 @@
     "navSales": "판매 관리",
     "navOrders": "구매 내역",
     "navHistory": "거래 내역",
+    "navBean": "☕ Bean 지갑",
     "history": {
       "title": "거래 내역",
       "tab": {

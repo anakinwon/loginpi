@@ -4,7 +4,7 @@ import { SalesNotiBadge } from './sales-noti-badge'
 
 // 스토어 공용 상단 네비 — 목록·판매관리·구매내역·거래내역 등 하위 페이지에서 공유(단일 소스).
 // active로 현재 페이지를 강조한다.
-type StoreNavKey = 'nearby' | 'items' | 'sales' | 'orders' | 'history'
+type StoreNavKey = 'nearby' | 'items' | 'sales' | 'orders' | 'history' | 'bean'
 
 export async function StoreNav({ active }: { active?: StoreNavKey }) {
   const t = await getTranslations('store')
@@ -14,6 +14,7 @@ export async function StoreNav({ active }: { active?: StoreNavKey }) {
     { key: 'sales', href: '/store/my/sales', label: t('navSales') },
     { key: 'orders', href: '/store/my/orders', label: t('navOrders') },
     { key: 'history', href: '/store/my/history', label: t('navHistory') },
+    { key: 'bean', href: '/bean', label: t('navBean') },
   ]
   return (
     <nav className="flex flex-wrap gap-3 text-sm">

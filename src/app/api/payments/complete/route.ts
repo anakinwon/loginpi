@@ -6,6 +6,7 @@ import { canSendTip } from '@/lib/chat-auth'
 import { markEscrow } from '@/lib/mps-order'
 import { dispatchOrderNotis } from '@/lib/mps-noti'
 import { depositBond, BOND_DEPOSIT_PI } from '@/lib/mps-bond'
+import { applyBean, BEAN_PER_PI } from '@/lib/bean'
 import { recordUserAction } from '@/lib/event'
 
 const PI_PAYMENTS_URL = 'https://api.minepi.com/v2/payments'
@@ -498,6 +499,32 @@ export async function POST(request: NextRequest) {
         recordUserAction('bond_deposit', sellerRow.id).catch((err) =>
           console.error(`[M9] 미션 기록 실패: ${err.message}`),
         )
+      }
+    } else if (meta?.type === 'BEAN_CHARGE' && payment.user_uid) {
+      // BEAN_CHARGE: Pi 결제 완료 → Bean 내부 적립금 충전 (fn_bean_apply 원자적 적립)
+      const beanAmt = Math.floor(Number(meta.bean_amt))
+      const { data: owner } = await db
+        .from('sys_user')
+        .select('id, display_name')
+        .eq('pi_uid', payment.user_uid)
+        .maybeSingle()
+
+      if (owner && Number.isInteger(beanAmt) && beanAmt >= BEAN_PER_PI) {
+        const ownerRow = owner as { id: string; display_name: string | null }
+        const slug = String(ownerRow.display_name ?? 'user').slice(0, 20)
+        // 결제 금액(Pi)이 Bean 환산가 이상인지 서버 재검증 (1 Pi = 100 Bean, 부동소수 오차 허용)
+        const requiredPi = beanAmt / BEAN_PER_PI
+        if (Number(payment.amount) + 1e-6 >= requiredPi) {
+          await applyBean({
+            usrId: ownerRow.id,
+            txnTp: 'CHARGE',
+            beanAmt,
+            piAmt: Number(payment.amount),
+            pymntId: paymentId,
+            memo: `Bean ${beanAmt} 충전`,
+            regrId: slug,
+          })
+        }
       }
     }
 
