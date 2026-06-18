@@ -1184,7 +1184,7 @@ VALUES
 
 ### 11-4. 불변식·멱등·정합성 규칙
 
-#### A. 핵심 불변식 (4대)
+#### A. 핵심 불변식 (5대)
 
 | # | 불변식 | 검증 방법 | 위반 시 액션 |
 |---|--------|---------|-----------|
@@ -1192,6 +1192,7 @@ VALUES
 | **I2** | **음수 잔액 금지** | `bean_wallet.balance >= 0` (CHECK 제약) | 거래 거절(SPEND/TRANSFER 실패) |
 | **I3** | **멱등키 유니크** | `bean_ledger.txn_id UNIQUE` | 이중 청구 방지(INSERT 실패) |
 | **I4** | **총공급 보존** | `SUM(bean_ledger.amt_bean) = 1,000,000,000` (선택적 감시) | 발행 후 소각/보상만으로 변경, 트래킹 필수 |
+| **I5** | **유통 역량 보증** (커스터디 모델) | `treasury보유 >= SUM(bean_ledger 누적 발급액)` | 발급 게이트 차단(용량 초과 시 보상 일시중단) |
 
 #### B. 멱등성 설계
 
@@ -1329,6 +1330,192 @@ CHECK (balance_bean >= 0)  -- bean_wallet 컬럼 제약
 
 → SPEND/TRANSFER 발생 시 **사전 잔액 검증** (애플리케이션)
 
+### 11-8a. 커스터디 스왑 설계 (IOU→Bean Token 교체) — ✅ 확정 (2026-06-18)
+
+> **본 섹션은 Bean Token 발행 후 기존 IOU(앱 내 사용권 선구매 영수증)를 실토큰으로 1:1 교체하는 메커니즘을 정의합니다.**
+> **핵심 원칙: "커스터디(플랫폼 보관) 모델 강제" — 사용자는 온체인 지갑을 소유하지 않으며, Bean Token은 트레저리 지갑에 의탁되어 사용자 잔액은 DB로만 관리됩니다.**
+
+#### A. 커스터디 모델 의무화 (요건 1)
+
+**원칙**: Bean Token 발행 후 모든 사용자 보유분은 **플랫폼 트레저리 지갑에 의탁(custody)**됨.
+
+```
+발행: 10억 BEAN → cafe.pi 트레저리 주소(Soroban)
+     ↓
+배분: 트레저리에서 출금하지 않음
+     ├─ 세일분(400M): Launchpad 구조상 LP 풀로 예치(유동성)
+     ├─ 리저브(250M): 트레저리 보관, 사용자 보상으로만 지급
+     ├─ 유동성(150M): LP 영구 락
+     ├─ 마케팅(120M): 파트너/거래소용 보관
+     └─ 팀(80M): 베스팅 스케줄 관리
+     
+사용자 보유:
+     ├─ 온체인 지갑 X (개인 자산 관리 없음)
+     └─ DB 잔액만 ✅ (bean_wallet.balance_bean = 진정한 가치 소유)
+```
+
+**실제 구현**: 
+- 사용자가 Bean을 "보유"한다는 것은 **`bean_wallet.balance_bean` 값을 관리**하는 것
+- 온체인 토큰 자체는 **트레저리 복수 서명 지갑** 또는 **마스터 계정**에서 관리
+- 인출(개인지갑 전송) = Pi SDK `invokeContract()` 공식 지원 후 2단계 프로세스(§11-8a-E 참조)
+
+#### B. IOU 1:1 실토큰 보증 (요건 2)
+
+**정의**: IOU Bean = 플랫폼이 발행한 Bean Token 1:1 보증
+
+| 개념 | 상태 | 단위 | 1:1 매칭 |
+|-----|------|------|---------|
+| **IOU Bean** (Phase 1~16) | 오프체인, 사용권 선구매 영수증 | 1 IOU = Pi 직접 표시(예: 0.1 Pi) | ✅ 1:1 |
+| **Bean Token** (Phase 17+) | 온체인 실토큰 | 1 BEAN = 0.01 Pi (세일가) | ✅ 1:1 |
+| **환율** | 고정 | 1 Pi = 100 Bean(모두) | ✅ 동일 단위 |
+
+예시:
+```
+Phase 16 상태: 사용자 A가 보유한 IOU
+  ├─ 팁 적립: 50 IOU Bean (= 0.5 Pi 상당)
+  ├─ 구독료 결제: 100 IOU Bean (= 1 Pi 상당)
+  └─ 이벤트 보상: 200 IOU Bean (= 2 Pi 상당)
+  → 총 350 IOU Bean
+
+Phase 17 발행 직후: 커스터디 스왑
+  IOU 350 → Bean Token 350 (1:1 확정)
+  → bean_wallet.balance_bean = 350 (음수 없음, 캐시)
+```
+
+→ **재환산 없음, 단순 표시 변경**
+
+#### C. 불변식 I5 추가: 유통 역량 보증 (요건 3)
+
+**신규 불변식 I5 (§11-4에 추가)**:
+
+$$
+\text{유통 발행분 (treasury보유)} \geq \sum(\text{미상환 IOU 적립액}) + \sum(\text{active 사용자 bean\_wallet})
+$$
+
+즉, **재무적 커버**: 트레저리가 모든 사용자 청구권을 충족할 수 있어야 함.
+
+| # | 불변식 | 검증 SQL 예시 | 위반 시 액션 |
+|---|--------|------------|-----------|
+| **I5** | 유통 역량 | `SELECT (유동성제외 treasury보유) - SUM(bean_ledger 누적) >= 0` | 발급 게이트 차단 |
+
+**발급 게이트** (애플리케이션 레벨):
+
+```
+사용자에게 Bean 지급 (CHARGE/REWARD)
+  ↓
+[게이트 검증]
+  IF (bean_ledger 누적 + 신규지급액) > bean_token_alloc 유통분:
+    REJECT("유통 역량 초과 — 보상 일시 중단")
+  ELSE:
+    INSERT into bean_ledger (APPROVED)
+    UPDATE bean_wallet.balance_bean
+```
+
+→ **결과**: 플랫폼이 "약속한 보상 > 보유 토큰" 상황 방지
+
+#### D. 1:1 단위 동일 (요건 4)
+
+**확정**: 모든 단위가 동일하게 1 Pi = 100 Bean
+
+| 거래타입 | IOU(Phase 16까지) | Bean Token(Phase 17+) | 환산 |
+|---------|----------------|--------------------|------|
+| CHARGE | 100 IOU (1 Pi) | 100 BEAN | 1:1 |
+| SPEND | -50 IOU (0.5 Pi) | -50 BEAN | 1:1 |
+| REWARD | +25 IOU (0.25 Pi) | +25 BEAN | 1:1 |
+| TRANSFER | ±10 IOU (0.1 Pi) | ±10 BEAN | 1:1 |
+
+→ **사용자가 단위 변환 인지 불필요**, 투명성 극대화
+
+#### E. 전환 이벤트 기록 의무화 (요건 5)
+
+**불변 기록 (append-only)**:
+
+```sql
+-- bean_token_alloc 테이블 확장
+ALTER TABLE bean_token_alloc
+ADD COLUMN state_change_log JSONB DEFAULT '[]';
+
+-- 발행 이벤트
+UPDATE bean_token_alloc
+SET state_change_log = jsonb_append(
+  state_change_log,
+  jsonb_build_object(
+    'event_tp_cd', 'TOKEN_ISSUED',
+    'evt_dtm', CURRENT_TIMESTAMP,
+    'issued_qty_bean', 1000000000,
+    'issued_to', 'TREASURY_MULTISIG_ADDRESS',
+    'blockchain_txid', '...',
+    'evt_desc', 'Initial 1B BEAN minting on Mainnet'
+  )
+)
+WHERE alloc_tp_cd = 'SALE';
+
+-- 스왑 이벤트
+UPDATE bean_token_alloc
+SET state_change_log = jsonb_append(
+  state_change_log,
+  jsonb_build_object(
+    'event_tp_cd', 'IOU_SWAP_COMPLETED',
+    'evt_dtm', CURRENT_TIMESTAMP,
+    'swapped_qty_bean', 1000000000,  -- 누적 IOU = 실토큰
+    'legacy_ious_retired', TRUE,
+    'evt_desc', 'Phase 16→17 전환: IOU 1:1 폐기·실토큰 활성화'
+  )
+)
+WHERE alloc_tp_cd IN ('RESERVE', 'MARKETING', 'TEAM');
+```
+
+→ **목적**: 감시·감사 추적, Pi 심사 신뢰성
+
+#### F. 출금(개인지갑) 2단계 모델 (요건 6)
+
+**초기 상태** (Phase 17 직후): **비활성**
+
+```
+사용자 요청: "100 Bean을 내 지갑으로 출금하고 싶어"
+  ↓
+[현재 상태]
+  ❌ 불가능 — Pi SDK invokeContract() 공식 미지원
+  → PiRC2, PiRC3 대체(MPS 에스크로와 동일 블로커)
+  
+[정책]
+  "Bean Token 출금(개인지갑 전송)은 Pi가 
+   invokeContract() 공식 지원 후 2단계 프로세스로 개방"
+```
+
+**2단계 프로세스** (향후, Pi SDK 지원 이후):
+
+| 단계 | 주체 | 액션 | 조건 |
+|-----|------|------|------|
+| **1단계: 신청** | 사용자 | bean_redeem_request 행 생성 | 최소 1 BEAN, 일일 한도 적용 |
+| **2단계: 승인·실행** | 플랫폼(트레저리 multisig) | invokeContract() 호출 → 개인지갑으로 송금 | KYC 재검증, 보안 감시 |
+
+```sql
+-- bean_redeem_request (§11-3-6)
+-- Phase 17 직후: use_yn='N' (애플리케이션 차단)
+-- Pi SDK invokeContract 공식화 후: use_yn='Y' (정책 변경 필요)
+
+SELECT * FROM bean_redeem_request
+WHERE use_yn = 'Y'  -- 현재는 항상 false
+  AND stat_cd IN ('PENDING', 'APPROVED');
+```
+
+**정책 근거**:
+- **초기 비활성**: 온체인 출금 = 토큰 환금성 = 증권성 리스크 급증
+- **2단계 위임**: Pi 공식 SDK 지원이 기술적 선결조건
+- **보수적 운영**: 보상·팁 = 앱 내 사용(sink)만 강조, 환금성 없음
+
+#### G. 커스터디 스왑 설계 정합성 체크
+
+| 항목 | 상태 | 근거 |
+|-----|------|------|
+| ✅ 레드라인 #2(Pi 외 자산 거래 금지) | **준수** | BEAN은 Launchpad 공식 발행, 트레저리 보관, Pi 페어 단독 |
+| ✅ 증권성 회피 | **강화** | 커스터디=사용권만, 출금 비활성=환금성 배제 |
+| ✅ 멱등성/정합성 | **I5 추가** | 유통 역량 게이트, 이중발급·초과보상 방지 |
+| ✅ 투명성 | **이벤트 기록** | state_change_log append-only, 감시·감사 용 |
+
+---
+
 ### 11-8. 미해결·결정대기 항목
 
 #### A. 역환전(Bean→Pi) 정책
@@ -1349,6 +1536,92 @@ CHECK (balance_bean >= 0)  -- bean_wallet 컬럼 제약
 | Bean Token Mainnet 발행 | T04 차단(Mainnet Launchpad GA) | Pi Launchpad Mainnet 출시(6/28 이후 추정) |
 | 온체인 지갑 주소 맵핑 | 테이블 필드만 예비 | Soroban 컨트랙트 배포 후 구현 |
 | Pi Browser 토큰 충전 UI | 미설계 | Launchpad 공식 UI/API 정의 후 |
+
+### 11-9. Pi Network 공식 정책상 IOU 리스크 검토 (⭐ 핵심 규제 리스크)
+
+> **본 섹션은 Pi Network 공식 정책을 조사하여 Bean Token 발행 전 "IOU(오프체인 약속) 방식"의 규제 리스크를 평가합니다.**
+> **출처는 모두 Pi Network 공식 블로그·문서(2025-2026)이며, 불명확한 판단은 "추정/미확인"으로 명시합니다.**
+
+#### A. Pi Network 공식 정책 리서치 결과
+
+| 정책 항목 | Pi 공식 입장 | 출처 | Cafe.pi IOU와의 관련성 |
+|---------|-----------|------|------------------|
+| **IOU 정의** | "IOU/derivatives = 진짜 토큰 아님" (인정) | [[1]](#footnote1) | ⚠️ 우리 IOU도 "미인가 자산"으로 분류될 수 있음 |
+| **Pre-sale 금지** | 명시 금지 조항 **없음** | [[2]](#footnote2) | ✅ "오프체인 약속" 자체는 공식 금지 없음 |
+| **Unauthorized pre-sale 금지** | "타사 주최 미인가 사전판매" 금지 | [[3]](#footnote3) | ⚠️ **cafe.pi가 자체 발행 약속 시 "미인가" 우려** |
+| **Product-First 요건** | "발행 전 작동하는 앱 필수" | [[2]](#footnote2) | ✅ cafe.pi는 이미 운영 중 — **충족** |
+| **Custody 정책** | "KYB 확인 비즈니스만 non-custodial 지갑 가능" | [[4]](#footnote4) | ✅ 커스터디 모델 = Pi 정책과 **일치** |
+
+#### B. 리스크 평가
+
+| 리스크 범주 | 평가 | 이유 | 영향 범위 |
+|----------|------|------|---------|
+| **IOU 합법성** | 🟡 **중간** | Pi가 "IOU=가짜 토큰" 판단하되, 오프체인 약속 자체는 금지 명시 없음. 그러나 "미인가 자산 취급" 여지 있음 | Launchpad 심사 시 "제3자 회사가 토큰 전에 사용권 약속" 부분이 질의 대상 |
+| **미인가 금융상품** | 🔴 **높음** | Bean을 사용권 선구매로 팔면 → "미인가 증권/금융상품" 분류 가능성 | 증권성 법무 자문 필수, 표시·광고 신중 필요 |
+| **Launchpad 심사 거절** | 🔴 **높음** | 발행 전 "사용권 약속 판매" = "자체 자금조달" 해석 → "Product-First" 원칙 위반 우려 | Launchpad는 "공식 발행 후 커뮤니티 획득", 사전약속 아님 강조 |
+| **Pi 등재 금지** | 🟡 **중간** | 직접 금지 명시 없으나, "비인가 자산" 분류 시 상장 불가 | Phase 17 이후 메인넷 Launchpad 심사 단계에서 도자 |
+
+**결론**: Pi 공식 문서상 "IOU 금지" **명시 없음**이나, **실질적으로는 "미인가 금융상품" 리스크가 높음**.
+
+#### C. 안전 설계 권고 (증권성 리스크 최소화)
+
+**원칙**: IOU를 "사용권 약속"이 아닌 **"적립 기록/인정서"**로 포지셔닝.
+
+| 항목 | 현재 설계 | 권고 개선 | 목적 |
+|-----|---------|---------|------|
+| **명칭** | "IOU Bean" | → "Bean Token 선적립증" 또는 "Bean 계정 잔액" | "약속" 톤 제거, "기록" 강조 |
+| **설명** | "Bean Token 발행 전 사용 가능한 약속 토큰" | → "Bean Token 발행 예정 시까지 플랫폼 내 사용권 기록" | 미래 권리가 아닌 현재 적립으로 표현 |
+| **마케팅** | "Bean Token을 미리 구매할 기회!" | → "플랫폼 사용권을 적립하고, 발행 후 실토큰으로 교환 예정" | 투자 권유성 배제 |
+| **환금성 명시** | (암시적) | → **명시: "환금(Pi 환전) 불가, 플랫폼 사용만 가능"** | 증권성 회피의 핵심 |
+| **법적 공시** | (미기재) | → 백서·약관에 명시: "IOU는 미인가 증권이 아닌 사용권 기록" | 규제 리스크 선점 공시 |
+
+#### D. Launchpad 심사 대비 전략
+
+**피해야 할 표현**:
+- ❌ "Bean Token 투자 기회"
+- ❌ "가격 상승으로 수익"
+- ❌ "미리 구매하고 이득 보세요"
+- ❌ "토큰 발행 전 미리 나눠줍니다(presale)"
+- ❌ "Bean은 회사(cafe.pi)가 보증합니다" (증권성 암시)
+
+**권장 표현** (Launchpad 심사 통과 기준):
+- ✅ "Bean Token은 cafe.pi 플랫폼 사용권 토큰입니다"
+- ✅ "IOU 잔액은 Phase 17 발행 후 실토큰으로 1:1 교환됩니다"
+- ✅ "환금(Pi 환전)은 불가, 플랫폼 내 사용만 가능합니다"
+- ✅ "cafe.pi는 보상·가격 상승을 보장하지 않습니다"
+- ✅ "토큰은 Pi Launchpad 공식 경로를 통해 발행됩니다"
+
+#### E. 미확인/결정대기 사항
+
+| 사항 | 현황 | 필요 액션 |
+|-----|------|---------|
+| **Pi 공식 IOU 정책 문의** | 미확인 (공식 문서상 명시 없음) | T02 이메일(developers@minepi.com)에 추가 질의: "오프체인 IOU/사용권 약속의 Launchpad 정책 적용 여부?" |
+| **법무 자문(한국)** | 대기중(§8-1-1) | 한국 자본시장법상 IOU 분류 (투자계약증권 여부) 필수 자문 |
+| **표시·광고 가이드** | 미정 | Launchpad 심사 제출 시 "IOU 설명 텍스트" Pi와 사전 검토 권장 |
+
+---
+
+#### 주석
+
+<a name="footnote1">**[1]**</a> Pi Network Addresses Unauthorized Token Listings (2026)
+- URL: https://minepi.com/blog/unauthorized-exchange-listings/
+- 인용: "IOUs or other derivatives are not the real Pi tokens"
+
+<a name="footnote2">**[2]**</a> Pi Launchpad Released on Testnet; Product-First Requirement
+- URL: https://minepi.com/blog/pi-launchpad/
+- URL: https://minepi.com/blog/pi-day-2026/
+- 인용: "projects [must have] a functional app" 및 "ecosystem tokens are designed for user acquisition and product utility, rather than serving primarily to raise capital"
+- **추정**: "Pre-sale" 금지 명시 없음, Launchpad 공식 경로 강조만 있음
+
+<a name="footnote3">**[3]**</a> Beware of unauthorized activities
+- URL: https://minepi.com/unaffiliated-unauthorized-activities/
+- 인용: "illegal participation in and advocating for unauthorized pre-sales and sales"
+- **해석**: "타사 주최" 미인가 판매만 금지, cafe.pi 자체 약속의 합법성은 미확인
+
+<a name="footnote4">**[4]**</a> KYB Business & Custody Policy
+- URL: https://minepi.com/kyb-business-pi/
+- 인용: "Only KYB-verified businesses are eligible to create individual non-custodial Mainnet Pi Wallets"
+- **결론**: 커스터디 모델(사용자 비보관)은 Pi 정책과 일치
 
 ---
 
