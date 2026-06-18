@@ -4,10 +4,12 @@ import { canCreateRoom } from '@/lib/chat-auth'
 import { createGroupRoom } from '@/lib/chat'
 import { recordUserAction } from '@/lib/event'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { FREE_THEME_CODES, getRoomFeeBean } from '@/lib/bean-fee'
+import { applyBean, getBalance } from '@/lib/bean'
 
-// 무료 테마(FITNESS) 또는 구독자의 월 무료 쿼터 내에서는 결제 없이 그룹방 생성 가능
-// 서버에서 화이트리스트·구독 권한 검증 — 클라이언트 우회 방지
-const FREE_THEME_CODES = new Set(['FITNESS'])
+// 무료 테마(FITNESS) = 일반카페(무료). 그 외 테마 = 프리미엄카페.
+// 프리미엄 생성료: 구독자는 패키지 할인으로 무료, 비구독자는 Bean으로 결제.
+// 서버에서 화이트리스트·구독 권한 검증 — 클라이언트 우회 방지 ([currency-routing-rule] 플랫폼 요금 = Bean)
 
 export async function POST(request: NextRequest) {
   const user = await getSessionUser()
@@ -46,13 +48,25 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: '테마를 선택해 주세요' }, { status: 400 })
   }
 
+  // 프리미엄 카페(무료 테마 외) 생성료 — 구독자는 무료, 비구독자는 Bean 결제(생성 후 차감)
+  let createFeeBean = 0
   if (!FREE_THEME_CODES.has(theme_cd)) {
     const allowance = await canCreateRoom(user.id)
     if (!allowance.allowed) {
-      return NextResponse.json(
-        { error: '이 테마는 결제가 필요합니다' },
-        { status: 403 },
-      )
+      // 비구독자: 프리미엄 카페 생성료를 Bean으로 결제 (구독자는 allowance.allowed → 무료)
+      createFeeBean = getRoomFeeBean('CREATE', 'PREMIUM', false)
+      const bal = await getBalance(user.id)
+      if (bal < createFeeBean) {
+        return NextResponse.json(
+          {
+            error: 'Bean 잔액이 부족합니다. 충전 후 다시 시도하세요.',
+            requiresBean: true,
+            feeBean: createFeeBean,
+            balance: bal,
+          },
+          { status: 402 },
+        )
+      }
     }
   }
   if (!room_nm?.trim()) {
@@ -73,6 +87,33 @@ export async function POST(request: NextRequest) {
       max_mbr_cnt: typeof max_mbr_cnt === 'number' ? max_mbr_cnt : 50,
       expr_dtm: expr_dtm ?? null,
     })
+
+    // 프리미엄 생성료 Bean 차감 (refId=room_id로 원장 추적). 동시성 등으로 실패 시 방 논리삭제 롤백.
+    if (createFeeBean > 0) {
+      const charge = await applyBean({
+        usrId: user.id,
+        txnTp: 'SPEND',
+        beanAmt: -createFeeBean,
+        refTp: 'ROOM_CREATE',
+        refId: room.room_id,
+        memo: `프리미엄 카페 생성료 (${room_nm.trim()})`,
+        regrId: user.display_name.slice(0, 20),
+      })
+      if (!charge.ok) {
+        await getSupabaseAdmin()
+          .from('msg_room')
+          .update({ del_yn: 'Y', del_dtm: new Date().toISOString() })
+          .eq('room_id', room.room_id)
+        return NextResponse.json(
+          {
+            error: 'Bean 잔액이 부족합니다. 충전 후 다시 시도하세요.',
+            requiresBean: true,
+            feeBean: createFeeBean,
+          },
+          { status: 402 },
+        )
+      }
+    }
 
     // M3: PREMIUM Cafe 생성 미션 기록 (비블로킹)
     // 무료 테마(FITNESS)는 PREMIUM 카페가 아니므로 미션에서 제외 — 무료 생성으로 M3 우회 차단
