@@ -109,7 +109,12 @@
       "settleRunning": "정산 중…",
       "settleConfirm": "미정산 {count}건에 실제 Pi를 송금합니다. 진행할까요?",
       "settleResult": "정산 완료 {settled}/{attempted}건",
-      "settleError": "정산 실패: {msg}"
+      "settleError": "정산 실패: {msg}",
+      "settledTitle": "정산 완료 목록",
+      "settledEmpty": "정산 완료 내역이 없습니다",
+      "settledSummary": "정산 완료 {count}건",
+      "settleColSettledAt": "정산일시",
+      "settleColTxid": "송금 txid"
     },
     "dashboard": {
       "title": "대시보드",

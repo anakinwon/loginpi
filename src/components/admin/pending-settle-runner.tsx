@@ -23,11 +23,23 @@ interface PreviewOrder {
   buyer_display: string
 }
 
+interface SettledRow {
+  order_id: string
+  order_price_pi: number
+  ccy_cd: string | null
+  ccy_amt: number | null
+  settle_dtm: string | null
+  release_txid: string | null
+  seller_pi_username: string | null
+  buyer_display: string
+}
+
 interface Preview {
   a2u_enabled: boolean
   count: number
   total_pi: number
   orders: PreviewOrder[]
+  settled: SettledRow[]
 }
 
 interface SettleResp {
@@ -50,6 +62,18 @@ function fmtCcy(amt: number | null, cd: string | null): string {
 // 판매일자 — 날짜만 (관리자 브라우저 로컬 타임존)
 function fmtDate(iso: string): string {
   return new Date(iso).toLocaleDateString('sv-SE')
+}
+
+// 정산일시 — 날짜+시각 (성공일자)
+function fmtDateTime(iso: string | null): string {
+  if (!iso) return '—'
+  return new Date(iso).toLocaleString('sv-SE').slice(0, 16)
+}
+
+// txid 축약 — 앞6…뒤6
+function shortTxid(txid: string | null): string {
+  if (!txid) return '—'
+  return txid.length > 14 ? `${txid.slice(0, 6)}…${txid.slice(-6)}` : txid
 }
 
 // 정산 상태 색상·라벨키
@@ -305,6 +329,80 @@ export function PendingSettleRunner() {
               </Button>
             </>
           )}
+
+          {/* 정산 완료 목록 — 성공일자(settle_dtm) 최신순 */}
+          <div className="space-y-2 border-t pt-4">
+            <p className="text-sm font-semibold">
+              {t('settledTitle')}
+              {preview.settled.length > 0 && (
+                <span className="text-muted-foreground ml-2 text-xs font-normal">
+                  {t('settledSummary', { count: preview.settled.length })}
+                </span>
+              )}
+            </p>
+            {preview.settled.length === 0 ? (
+              <p className="text-muted-foreground text-sm">
+                {t('settledEmpty')}
+              </p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b text-left">
+                      <th className="py-2 pr-3 font-medium">
+                        {t('settleColSeller')}
+                      </th>
+                      <th className="py-2 pr-3 font-medium">
+                        {t('settleColBuyer')}
+                      </th>
+                      <th className="py-2 pr-3 font-medium">
+                        {t('settleColAmount')}
+                      </th>
+                      <th className="py-2 pr-3 font-medium">
+                        {t('settleColCcy')}
+                      </th>
+                      <th className="py-2 pr-3 font-medium">
+                        {t('settleColSettledAt')}
+                      </th>
+                      <th className="py-2 font-medium">{t('settleColTxid')}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {preview.settled.map((s) => (
+                      <tr key={s.order_id} className="border-b last:border-0">
+                        <td className="py-2 pr-3 whitespace-nowrap">
+                          {s.seller_pi_username
+                            ? `@${s.seller_pi_username}`
+                            : '—'}
+                        </td>
+                        <td className="py-2 pr-3 whitespace-nowrap">
+                          {s.buyer_display}
+                        </td>
+                        <td className="py-2 pr-3 whitespace-nowrap">
+                          {s.order_price_pi}
+                        </td>
+                        <td className="text-muted-foreground py-2 pr-3 whitespace-nowrap">
+                          {fmtCcy(s.ccy_amt, s.ccy_cd)}
+                        </td>
+                        <td className="py-2 pr-3 whitespace-nowrap text-green-600 dark:text-green-400">
+                          {fmtDateTime(s.settle_dtm)}
+                        </td>
+                        <td className="text-muted-foreground py-2 font-mono text-xs">
+                          {s.release_txid ? (
+                            <span title={s.release_txid}>
+                              {shortTxid(s.release_txid)}
+                            </span>
+                          ) : (
+                            '—'
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

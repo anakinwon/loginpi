@@ -651,6 +651,33 @@ export async function listUnsettledOrders(): Promise<UnsettledOrder[]> {
   return (data as UnsettledOrder[] | null) ?? []
 }
 
+// 정산 완료 목록 — 정산완료(SETTLED) 주문, 정산일시(성공일자) 최신순
+export type SettledOrder = Pick<
+  MpsOrder,
+  | 'order_id'
+  | 'seller_id'
+  | 'buyer_id'
+  | 'order_price_pi'
+  | 'ccy_cd'
+  | 'ccy_amt'
+  | 'settle_dtm'
+  | 'release_txid'
+  | 'reg_dtm'
+>
+export async function listSettledOrders(limit = 50): Promise<SettledOrder[]> {
+  const { data } = await getSupabaseAdmin()
+    .from('mps_order')
+    .select(
+      'order_id, seller_id, buyer_id, order_price_pi, ccy_cd, ccy_amt, settle_dtm, release_txid, reg_dtm',
+    )
+    .eq('order_st_cd', 'DONE')
+    .eq('settle_st_cd', 'SETTLED')
+    .eq('del_yn', 'N')
+    .order('settle_dtm', { ascending: false })
+    .limit(limit)
+  return (data as SettledOrder[] | null) ?? []
+}
+
 // 구매자 "픽업" — READY → DONE + 정산 (구매자 액션)
 export async function markPickup(orderId: string, buyerId: string) {
   const db = getSupabaseAdmin()

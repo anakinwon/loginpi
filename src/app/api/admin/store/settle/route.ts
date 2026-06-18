@@ -2,7 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { isA2UEnabled } from '@/lib/pi-a2u'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
-import { listUnsettledOrders, settleOrderById } from '@/lib/mps-order'
+import {
+  listUnsettledOrders,
+  listSettledOrders,
+  settleOrderById,
+} from '@/lib/mps-order'
 
 // 미정산(release_txid 없음) DONE 주문의 판매자 A2U 일괄 정산 — 관리자 백필/재시도 전용.
 // GET 으로 대상 미리보기 → POST 로 실행. settleOrder가 멱등이라 재실행 안전(이중송금 방지).
@@ -13,10 +17,17 @@ export async function GET() {
   if (!user || !isAdmin(user))
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
 
-  const orders = await listUnsettledOrders()
+  const [orders, settled] = await Promise.all([
+    listUnsettledOrders(),
+    listSettledOrders(),
+  ])
 
   // 판매자·구매자 표시정보 일괄 조회 — buyer/seller_id는 FK 없는 TEXT라 임베드 불가(별도 조회 후 매핑)
-  const userIds = [...new Set(orders.flatMap((o) => [o.seller_id, o.buyer_id]))]
+  const userIds = [
+    ...new Set(
+      [...orders, ...settled].flatMap((o) => [o.seller_id, o.buyer_id]),
+    ),
+  ]
   const { data: users } = userIds.length
     ? await getSupabaseAdmin()
         .from('sys_user')
@@ -48,12 +59,18 @@ export async function GET() {
     orders: orders.map((o) => {
       const seller = byId.get(o.seller_id)
       return {
-        ...o, // order_price_pi·ccy_cd·ccy_amt·reg_dtm·mod_dtm 포함
+        ...o, // order_price_pi·ccy_cd·ccy_amt·settle_st_cd·settle_dtm·settle_err_tx·reg_dtm 포함
         seller_pi_username: seller?.pi_username ?? null,
         seller_linked: !!seller?.pi_uid, // false면 A2U 불가 → 수동 정산 필요
         buyer_display: displayName(o.buyer_id),
       }
     }),
+    // 정산 완료 목록 — 성공일자(settle_dtm) 최신순
+    settled: settled.map((o) => ({
+      ...o, // settle_dtm·release_txid·ccy 포함
+      seller_pi_username: byId.get(o.seller_id)?.pi_username ?? null,
+      buyer_display: displayName(o.buyer_id),
+    })),
   })
 }
 
