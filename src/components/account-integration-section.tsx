@@ -2,7 +2,6 @@
 
 import { usePiAuth } from './pi-auth-provider'
 import { PiUserCard } from './pi-user-card'
-import { GoogleUserCard } from './google-user-card'
 import { AccountLinkCard } from './account-link-card'
 
 export function AccountIntegrationSection() {
@@ -32,14 +31,6 @@ export function AccountIntegrationSection() {
               Pi Network
             </p>
             <PiUserCard />
-          </div>
-        )}
-        {!isInPiBrowser && (
-          <div>
-            <p className="text-muted-foreground mb-2 text-xs font-medium">
-              Google
-            </p>
-            <GoogleUserCard />
           </div>
         )}
         <div>
