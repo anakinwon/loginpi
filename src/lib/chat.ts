@@ -12,11 +12,17 @@ export interface MsgRoom {
   is_public_yn: 'Y' | 'N'
   entry_fee_pi: number
   entry_expire_dtm: string | null
+  expr_dtm: string // 카페 만료일시 (무료방=생성+7일, 그 외 기본 9999-12-31=영구)
   pymnt_id: string | null
   join_pwd_hash: string | null
   del_yn: 'Y' | 'N'
   reg_dtm: string
   mod_dtm: string
+}
+
+// 카페 만료 여부 — 무료 개설 방(7일 제한)이 만료됐는지 판정. 목록·입장·조회 공통 사용.
+export function isRoomExpired(room: { expr_dtm?: string | null }): boolean {
+  return !!room.expr_dtm && new Date(room.expr_dtm) <= new Date()
 }
 
 // 비밀방 입장 비밀번호 해시 — scrypt(salt 내장). 형식: scrypt$<saltHex>$<hashHex>

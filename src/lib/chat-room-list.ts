@@ -34,6 +34,7 @@ async function listMyRooms(userId: string): Promise<RoomRow[]> {
       .select(ROOM_SELECT)
       .in('room_id', roomIds)
       .eq('del_yn', 'N')
+      .gt('expr_dtm', new Date().toISOString()) // 만료된 무료방 숨김
       .order('reg_dtm', { ascending: false }),
     db
       .from('msg_room_mbr')
@@ -59,6 +60,7 @@ async function listPublicRooms(limit = 10): Promise<RoomRow[]> {
     .eq('is_public_yn', 'Y')
     .eq('room_tp_cd', 'G')
     .eq('del_yn', 'N')
+    .gt('expr_dtm', new Date().toISOString()) // 만료된 무료방 숨김
     .order('reg_dtm', { ascending: false })
     .limit(limit)
 

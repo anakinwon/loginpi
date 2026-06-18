@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth-check'
-import { getRoom, getRoomMember, verifyRoomPassword } from '@/lib/chat'
+import {
+  getRoom,
+  getRoomMember,
+  verifyRoomPassword,
+  isRoomExpired,
+} from '@/lib/chat'
 import { getChatPlan } from '@/lib/chat-auth'
 import { getRoomGrade, getRoomFeeBean } from '@/lib/bean-fee'
-import { applyBean } from '@/lib/bean'
+import { applyBean, getBalance } from '@/lib/bean'
 
 type Params = { params: Promise<{ roomId: string }> }
 
@@ -28,6 +33,14 @@ export async function POST(request: NextRequest, { params }: Params) {
     return NextResponse.json(
       { error: '1:1 카페에는 직접 입장할 수 없습니다' },
       { status: 403 },
+    )
+  }
+
+  // 기간이 만료된 카페(무료방 7일 초과 등)는 입장 불가
+  if (isRoomExpired(room)) {
+    return NextResponse.json(
+      { error: '기간이 만료된 카페입니다', expired: true },
+      { status: 410 },
     )
   }
 
@@ -66,7 +79,10 @@ export async function POST(request: NextRequest, { params }: Params) {
   } catch {
     body = {}
   }
-  const { join_pwd } = body as { join_pwd?: string }
+  const { join_pwd, confirm } = body as {
+    join_pwd?: string
+    confirm?: boolean
+  }
 
   // 비밀방(is_public_yn='N')은 비밀번호로만 입장 가능
   // 비밀번호 미설정(join_pwd_hash=null) 비밀방은 초대/생성자 전용 → 입장 불가
@@ -105,6 +121,19 @@ export async function POST(request: NextRequest, { params }: Params) {
   const plan = await getChatPlan(user.id)
   const enterFeeBean = getRoomFeeBean('ENTER', grade, plan.tier !== 'FREE')
   if (enterFeeBean > 0) {
+    // 소진 사전 안내 — confirm 없이 들어오면 차감하지 않고 입장 여부를 먼저 묻는다.
+    if (confirm !== true) {
+      const balance = await getBalance(user.id)
+      return NextResponse.json(
+        {
+          requiresBeanConfirm: true,
+          feeBean: enterFeeBean,
+          balance,
+          grade,
+        },
+        { status: 402 },
+      )
+    }
     const charge = await applyBean({
       usrId: user.id,
       txnTp: 'SPEND',

@@ -137,6 +137,9 @@ export function GroupRoomCreator() {
   const isPremium = selectedTheme?.theme_tp_cd === 'PREMIUM'
   // FITNESS(PT/피트니스)는 무료, 또는 구독자의 월 무료 쿼터 내에서는 결제 없이 생성
   const isFree = selectedTheme?.theme_cd === 'FITNESS' || canCreateRoomFree
+  // 무료 개설(비구독자가 무료 테마로 생성)은 서버에서 7일 고정·연장 불가 → 유효기간 선택 불가
+  const isFreeRoom7d =
+    selectedTheme?.theme_cd === 'FITNESS' && !canCreateRoomFree
   // 비구독자만 결제: PREMIUM 테마는 0.3π(방0.1+테마0.2), BASIC은 0.1π
   const payAmount = isPremium && !canUsePremiumTheme ? 0.3 : 0.1
   const isBusy =
@@ -524,30 +527,41 @@ export function GroupRoomCreator() {
                 </div>
 
                 {roomType === 'G' ? (
-                  <div>
-                    <p className="mb-2 text-sm font-medium">유효기간</p>
-                    <div className="grid grid-cols-5 gap-2">
-                      {[
-                        { days: 0 as ExprDays, label: '무기한' },
-                        { days: 1 as ExprDays, label: '1일' },
-                        { days: 3 as ExprDays, label: '3일' },
-                        { days: 7 as ExprDays, label: '7일' },
-                        { days: 30 as ExprDays, label: '30일' },
-                      ].map(({ days, label }) => (
-                        <button
-                          key={days}
-                          onClick={() => setExprDays(days)}
-                          className={`rounded-xl border py-2 text-xs font-medium transition-colors ${
-                            exprDays === days
-                              ? 'border-primary bg-primary/10 text-primary'
-                              : 'hover:bg-muted'
-                          }`}
-                        >
-                          {label}
-                        </button>
-                      ))}
+                  isFreeRoom7d ? (
+                    <div className="bg-muted/40 rounded-xl border p-3 text-sm">
+                      <p className="font-medium">유효기간 7일 (무료 개설)</p>
+                      <p className="text-muted-foreground mt-1 text-xs">
+                        무료로 개설한 카페는 7일간만 유지되며 연장할 수
+                        없습니다. 계속 운영하려면 구독 또는 프리미엄 개설을
+                        이용하세요.
+                      </p>
                     </div>
-                  </div>
+                  ) : (
+                    <div>
+                      <p className="mb-2 text-sm font-medium">유효기간</p>
+                      <div className="grid grid-cols-5 gap-2">
+                        {[
+                          { days: 0 as ExprDays, label: '무기한' },
+                          { days: 1 as ExprDays, label: '1일' },
+                          { days: 3 as ExprDays, label: '3일' },
+                          { days: 7 as ExprDays, label: '7일' },
+                          { days: 30 as ExprDays, label: '30일' },
+                        ].map(({ days, label }) => (
+                          <button
+                            key={days}
+                            onClick={() => setExprDays(days)}
+                            className={`rounded-xl border py-2 text-xs font-medium transition-colors ${
+                              exprDays === days
+                                ? 'border-primary bg-primary/10 text-primary'
+                                : 'hover:bg-muted'
+                            }`}
+                          >
+                            {label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )
                 ) : (
                   <>
                     {/* TASK-063: 이벤트방 — 입장료 + 종료 시각 */}

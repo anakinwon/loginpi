@@ -35,9 +35,20 @@ export function ClientChatRoom({ roomId }: { roomId: string }) {
   const [themeEmoji, setThemeEmoji] = useState('💬')
   const [initialMessages, setInitialMessages] = useState<ChatMessage[]>([])
   const [state, setState] = useState<
-    'loading' | 'ready' | 'joinable' | 'joining' | 'forbidden' | 'error'
+    | 'loading'
+    | 'ready'
+    | 'joinable'
+    | 'joining'
+    | 'forbidden'
+    | 'error'
+    | 'expired'
   >('loading')
   const [joinPreview, setJoinPreview] = useState<PublicPreview | null>(null)
+  // 남의 프리미엄방 입장 시 Bean 소진 사전 안내용 (서버 requiresBeanConfirm 응답)
+  const [beanConfirm, setBeanConfirm] = useState<{
+    feeBean: number
+    balance: number
+  } | null>(null)
   const [loadKey, setLoadKey] = useState(0)
 
   useEffect(() => {
@@ -48,6 +59,11 @@ export function ClientChatRoom({ roomId }: { roomId: string }) {
       setState('loading')
       const roomRes = await piFetch(`/api/chat/rooms/${roomId}`)
       if (cancelled) return
+      if (roomRes.status === 410) {
+        // 기간 만료 카페 — 방장·멤버 포함 입장 불가
+        setState('expired')
+        return
+      }
       if (roomRes.status === 403) {
         try {
           const errData = (await roomRes.json()) as {
@@ -96,37 +112,68 @@ export function ClientChatRoom({ roomId }: { roomId: string }) {
     }
   }, [user, roomId, loadKey, userLocale])
 
-  const handleJoin = useCallback(async () => {
-    setState('joining')
-    try {
-      const res = await piFetch(`/api/chat/rooms/${roomId}/join`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({}),
-      })
-      if (res.ok) {
-        setLoadKey((k) => k + 1)
-      } else if (res.status === 402) {
-        // 유료 이벤트방 — 결제 필요. 미리보기에 입장료를 채워 결제 CTA로 전환
-        const d = (await res.json()) as { entryFeePi?: number }
-        setJoinPreview((prev) =>
-          prev
-            ? { ...prev, room_tp_cd: 'E', entry_fee_pi: d.entryFeePi ?? 0 }
-            : {
-                room_nm: '',
-                theme_cd: '',
-                room_tp_cd: 'E',
-                entry_fee_pi: d.entryFeePi ?? 0,
-              },
-        )
-        setState('joinable')
-      } else {
+  // confirm=true이면 Bean 차감을 승인하고 입장 (소진 안내 후 사용자가 '입장' 누른 경우)
+  const handleJoin = useCallback(
+    async (confirm = false) => {
+      setState('joining')
+      try {
+        const res = await piFetch(`/api/chat/rooms/${roomId}/join`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(confirm ? { confirm: true } : {}),
+        })
+        const d = (await res.json().catch(() => ({}))) as {
+          requiresBeanConfirm?: boolean
+          requiresBean?: boolean
+          entryFeePi?: number
+          feeBean?: number
+          balance?: number
+        }
+
+        // 1) Bean 소진 사전 안내 — 차감 전, 입장 여부 확인 UI로 전환
+        if (d.requiresBeanConfirm) {
+          setBeanConfirm({ feeBean: d.feeBean ?? 0, balance: d.balance ?? 0 })
+          setState('joinable')
+          return
+        }
+        if (res.ok) {
+          setBeanConfirm(null)
+          setLoadKey((k) => k + 1)
+          return
+        }
+        // 2) Bean 잔액 부족
+        if (res.status === 402 && d.requiresBean) {
+          setBeanConfirm({ feeBean: d.feeBean ?? 0, balance: d.balance ?? 0 })
+          setState('joinable')
+          return
+        }
+        // 3) 유료 이벤트방 — Pi 결제 CTA로 전환
+        if (res.status === 402 && d.entryFeePi !== undefined) {
+          setJoinPreview((prev) =>
+            prev
+              ? { ...prev, room_tp_cd: 'E', entry_fee_pi: d.entryFeePi ?? 0 }
+              : {
+                  room_nm: '',
+                  theme_cd: '',
+                  room_tp_cd: 'E',
+                  entry_fee_pi: d.entryFeePi ?? 0,
+                },
+          )
+          setState('joinable')
+          return
+        }
+        // 4) 기간 만료 카페
+        if (res.status === 410) {
+          setState('expired')
+          return
+        }
+        setState('forbidden')
+      } catch {
         setState('forbidden')
       }
-    } catch {
-      setState('forbidden')
-    }
-  }, [roomId])
+    },
+    [roomId],
+  )
 
   // TASK-062 Trigger 8: 이벤트방 유료 입장 — Pi 결제 완료 시 payments/complete가 GUEST 삽입
   const handlePaidJoin = useCallback(
@@ -216,13 +263,52 @@ export function ClientChatRoom({ roomId }: { roomId: string }) {
                 : `π${joinPreview.entry_fee_pi} 결제하고 입장`}
             </button>
           </>
+        ) : beanConfirm ? (
+          beanConfirm.balance >= beanConfirm.feeBean ? (
+            <>
+              <p>
+                ☕ 이 카페 입장에는{' '}
+                <b className="text-primary">{beanConfirm.feeBean} Bean</b>이
+                소진됩니다
+              </p>
+              <p className="text-xs">
+                현재 잔액 {beanConfirm.balance} Bean → 입장 후{' '}
+                {beanConfirm.balance - beanConfirm.feeBean} Bean
+              </p>
+              <button
+                type="button"
+                disabled={state === 'joining'}
+                onClick={() => handleJoin(true)}
+                className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-5 py-2.5 text-sm font-medium transition-colors disabled:opacity-50"
+              >
+                {state === 'joining'
+                  ? '입장 중…'
+                  : `${beanConfirm.feeBean} Bean 쓰고 입장`}
+              </button>
+            </>
+          ) : (
+            <>
+              <p>
+                ☕ 입장에{' '}
+                <b className="text-primary">{beanConfirm.feeBean} Bean</b>이
+                필요하지만 잔액이 부족합니다
+              </p>
+              <p className="text-xs">현재 잔액 {beanConfirm.balance} Bean</p>
+              <Link
+                href="/bean"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-5 py-2.5 text-sm font-medium transition-colors"
+              >
+                Bean 충전하기
+              </Link>
+            </>
+          )
         ) : (
           <>
             <p>공개 카페입니다. 입장하시겠습니까?</p>
             <button
               type="button"
               disabled={state === 'joining'}
-              onClick={handleJoin}
+              onClick={() => handleJoin()}
               className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-5 py-2.5 text-sm font-medium transition-colors disabled:opacity-50"
             >
               {state === 'joining' ? '입장 중…' : '입장하기'}
@@ -236,6 +322,19 @@ export function ClientChatRoom({ roomId }: { roomId: string }) {
     )
   }
 
+  if (state === 'expired') {
+    return (
+      <Centered>
+        <p className="font-semibold">⏰ 기간이 만료된 카페입니다</p>
+        <p className="text-xs">
+          무료로 개설된 카페는 7일간만 유지되며 연장할 수 없습니다.
+        </p>
+        <Link href="/chat" className="text-primary underline">
+          카페 목록으로
+        </Link>
+      </Centered>
+    )
+  }
   if (state === 'forbidden') {
     return (
       <Centered>

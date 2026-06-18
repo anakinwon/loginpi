@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
-import { canCreateRoom } from '@/lib/chat-auth'
+import { canCreateRoom, getChatPlan } from '@/lib/chat-auth'
 import { createGroupRoom } from '@/lib/chat'
 import { recordUserAction } from '@/lib/event'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
@@ -49,9 +49,11 @@ export async function POST(request: NextRequest) {
   }
 
   // 프리미엄 카페(무료 테마 외) 생성료 — 구독자는 무료, 비구독자는 Bean 결제(생성 후 차감)
+  const plan = await getChatPlan(user.id)
+  const isSubscriber = plan.tier !== 'FREE'
   let createFeeBean = 0
   if (!FREE_THEME_CODES.has(theme_cd)) {
-    const allowance = await canCreateRoom(user.id)
+    const allowance = await canCreateRoom(user.id, plan)
     if (!allowance.allowed) {
       // 비구독자: 프리미엄 카페 생성료를 Bean으로 결제 (구독자는 allowance.allowed → 무료)
       createFeeBean = getRoomFeeBean('CREATE', 'PREMIUM', false)
@@ -76,6 +78,14 @@ export async function POST(request: NextRequest) {
     )
   }
 
+  // 무료 개설 방(비구독자가 0 Bean으로 만든 방) = 생성 시점부터 7일만 유효 + 연장 불가.
+  // 결제(프리미엄 Bean)·구독으로 만든 방은 영구(클라이언트 지정 만료일 또는 DB 기본 9999).
+  const isFreeRoom = createFeeBean === 0 && !isSubscriber
+  const FREE_ROOM_TTL_MS = 7 * 24 * 60 * 60 * 1000
+  const finalExprDtm = isFreeRoom
+    ? new Date(Date.now() + FREE_ROOM_TTL_MS).toISOString()
+    : (expr_dtm ?? null)
+
   try {
     const room = await createGroupRoom({
       userId: user.id,
@@ -85,7 +95,7 @@ export async function POST(request: NextRequest) {
       room_desc: room_desc?.trim() || null,
       is_public_yn: is_public_yn ?? 'Y',
       max_mbr_cnt: typeof max_mbr_cnt === 'number' ? max_mbr_cnt : 50,
-      expr_dtm: expr_dtm ?? null,
+      expr_dtm: finalExprDtm,
     })
 
     // 프리미엄 생성료 Bean 차감 (refId=room_id로 원장 추적). 동시성 등으로 실패 시 방 논리삭제 롤백.

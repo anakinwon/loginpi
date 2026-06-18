@@ -7,6 +7,7 @@ import {
   updateRoom,
   hashRoomPassword,
   toPublicRoom,
+  isRoomExpired,
 } from '@/lib/chat'
 
 type Params = { params: Promise<{ roomId: string }> }
@@ -28,6 +29,13 @@ export async function GET(_request: Request, { params }: Params) {
       { error: '카페를 찾을 수 없습니다' },
       { status: 404 },
     )
+  // 기간 만료 카페(무료방 7일 초과 등)는 방장·멤버 포함 누구도 열 수 없음
+  if (isRoomExpired(room)) {
+    return NextResponse.json(
+      { error: '기간이 만료된 카페입니다', expired: true },
+      { status: 410 },
+    )
+  }
   if (!mbr) {
     // 공개 그룹방·이벤트방이면 클라이언트가 입장 CTA를 보여줄 수 있도록 방 미리보기 포함
     // 이벤트방(E)은 entry_fee_pi를 함께 내려 결제 후 입장(Trigger 8) UI를 띄울 수 있게 한다
