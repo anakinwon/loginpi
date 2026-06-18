@@ -4,6 +4,7 @@ import { sendPaymentReceipt } from '@/lib/email'
 import { broadcastToRoom, broadcastToSeller } from '@/lib/realtime-broadcast'
 import { canSendTip } from '@/lib/chat-auth'
 import { markEscrow } from '@/lib/mps-order'
+import { dispatchOrderNotis } from '@/lib/mps-noti'
 import { depositBond, BOND_DEPOSIT_PI } from '@/lib/mps-bond'
 import { recordUserAction } from '@/lib/event'
 
@@ -468,6 +469,14 @@ export async function POST(request: NextRequest) {
               order_mthd_cd: o.order_mthd_cd,
               dlvr_addr: o.dlvr_addr,
             }).catch((e) => console.error('[주문알림] broadcast 실패', e))
+          }
+
+          // Telegram 즉시 발송 — cron 대기 없이 결제 완료 시점에 바로 발송(연동된 판매자).
+          // 안전망 cron(/api/cron/order-autocomplete)은 이 즉시 발송이 실패/유실된 건만 재시도.
+          try {
+            await dispatchOrderNotis()
+          } catch (e) {
+            console.error('[주문알림] Telegram 즉시 발송 실패', e)
           }
         }
       }
