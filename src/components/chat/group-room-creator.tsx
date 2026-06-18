@@ -13,6 +13,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { ThemeSelector, type ThemeRow } from './theme-selector'
+import { getRoomFeeBean } from '@/lib/bean-fee'
 
 type Step = 1 | 2 | 3 | 4
 type PayStatus =
@@ -28,13 +29,7 @@ type ExprDays = 0 | 1 | 3 | 7 | 30
 type RoomType = 'G' | 'E'
 type EntryFee = 0 | 0.1 | 0.5 | 1
 
-const PAY_STATUS_MSG: Partial<Record<PayStatus, string>> = {
-  approving: '승인 중…',
-  waiting: '지갑 확인 중…',
-  completing: '방 생성 중…',
-}
-
-function StepBar({ current, total = 4 }: { current: Step; total?: number }) {
+function StepBar({ current, total = 3 }: { current: Step; total?: number }) {
   return (
     <div className="flex items-center gap-1.5">
       {Array.from({ length: total }, (_, i) => i + 1).map((s) => (
@@ -140,8 +135,9 @@ export function GroupRoomCreator() {
   // 무료로 개설되는 모든 방(무료 테마·구독 혜택 무료 생성 포함)은 서버에서 7일 고정·연장 불가
   // → 유효기간 선택 불가. 결제로 만드는 방만 기간 선택 가능.
   const isFreeRoom7d = isFree
-  // 비구독자만 결제: PREMIUM 테마는 0.3π(방0.1+테마0.2), BASIC은 0.1π
-  const payAmount = isPremium && !canUsePremiumTheme ? 0.3 : 0.1
+  // PREMIUM 테마 비구독자 생성료 = 일반요금제 Bean(10). 구독자·BASIC은 0(무료).
+  // 결제 통화 = Bean (Pi 직접결제 폐기). 서버가 권위 부과·차감.
+  const createCostBean = isPremium ? getRoomFeeBean('CREATE', 'PREMIUM', canCreateRoomFree) : 0
   const isBusy =
     payStatus === 'approving' ||
     payStatus === 'waiting' ||
@@ -164,100 +160,6 @@ export function GroupRoomCreator() {
     setSelectedTheme(theme)
     setStep(2)
   }, [])
-
-  const startPayment = useCallback(() => {
-    if (!window.Pi) {
-      setPayError('Pi Browser에서만 결제가 가능합니다')
-      setPayStatus('error')
-      return
-    }
-    if (!selectedTheme) return
-
-    setPayStatus('approving')
-    setPayError(null)
-
-    window.Pi.createPayment(
-      {
-        amount: payAmount,
-        memo: `카페 생성: ${roomNm}`,
-        metadata: {
-          type: 'CHAT_ROOM_CREATE',
-          theme_cd: selectedTheme.theme_cd,
-          theme_tp_cd: selectedTheme.theme_tp_cd,
-          room_nm: roomNm,
-          room_desc: roomDesc || null,
-          is_public_yn: isPublic,
-          max_mbr_cnt: maxMbr,
-          expr_dtm:
-            exprDays === 0
-              ? null
-              : new Date(Date.now() + exprDays * 86400000).toISOString(),
-          lat: gpsCoords?.lat ?? null,
-          lng: gpsCoords?.lng ?? null,
-        },
-      },
-      {
-        onReadyForServerApproval: async (paymentId) => {
-          try {
-            const res = await fetch('/api/payments/approve', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ paymentId }),
-            })
-            if (!res.ok) {
-              const d = (await res.json()) as { error?: string }
-              throw new Error(d.error ?? '서버 승인 실패')
-            }
-            setPayStatus('waiting')
-          } catch (e) {
-            setPayStatus('error')
-            setPayError(e instanceof Error ? e.message : '승인 오류')
-          }
-        },
-
-        onReadyForServerCompletion: async (paymentId, txid) => {
-          setPayStatus('completing')
-          try {
-            const res = await fetch('/api/payments/complete', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ paymentId, txid }),
-            })
-            if (!res.ok) {
-              const d = (await res.json()) as { error?: string }
-              throw new Error(d.error ?? '완료 처리 실패')
-            }
-            const data = (await res.json()) as { room?: { room_id: string } }
-            setPayStatus('done')
-            setOpen(false)
-            toast.success('카페가 생성되었습니다!')
-            if (data.room?.room_id) {
-              router.push(`/chat/${data.room.room_id}`)
-            }
-          } catch (e) {
-            setPayStatus('error')
-            setPayError(e instanceof Error ? e.message : '완료 오류')
-          }
-        },
-
-        onCancel: () => setPayStatus('cancelled'),
-        onError: (e) => {
-          setPayStatus('error')
-          setPayError(e.message)
-        },
-      },
-    )
-  }, [
-    selectedTheme,
-    payAmount,
-    roomNm,
-    roomDesc,
-    isPublic,
-    maxMbr,
-    exprDays,
-    gpsCoords,
-    router,
-  ])
 
   const createFreeRoom = useCallback(async () => {
     if (!selectedTheme) return
@@ -355,13 +257,8 @@ export function GroupRoomCreator() {
     router,
   ])
 
-  const retryPayment = useCallback(() => {
-    setPayStatus('idle')
-    setPayError(null)
-  }, [])
-
   // 카페 만들기는 Pi Browser에서 로그인한 사용자만 가능 (비로그인·일반 브라우저는 버튼 숨김)
-  // 목록은 게스트 공개지만, 생성은 Pi 결제·소유권이 걸려 있어 Pi 로그인 필수
+  // 생성·소유권이 걸려 있어 Pi 로그인 필수 (요금은 Bean 차감)
   if (!isInPiBrowser || !user) return null
 
   return (
@@ -383,7 +280,7 @@ export function GroupRoomCreator() {
           </DialogHeader>
 
           <div className="flex flex-col gap-5">
-            <StepBar current={step} total={roomType === 'E' ? 3 : 4} />
+            <StepBar current={step} total={3} />
 
             {/* Step 1: 방 유형 + 테마 선택 */}
             {step === 1 && (
@@ -660,7 +557,7 @@ export function GroupRoomCreator() {
                     >
                       {isBusy ? '생성 중…' : '🎟️ 이벤트방 만들기'}
                     </button>
-                  ) : isFree ? (
+                  ) : (
                     <button
                       onClick={createFreeRoom}
                       disabled={isBusy}
@@ -668,123 +565,28 @@ export function GroupRoomCreator() {
                     >
                       {isBusy
                         ? '생성 중…'
-                        : canCreateRoomFree && isPremium
-                          ? '구독 혜택으로 방 만들기'
-                          : '무료로 방 만들기'}
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => setStep(4)}
-                      className="bg-primary text-primary-foreground flex-1 rounded-xl px-4 py-2 text-sm font-medium"
-                    >
-                      다음
+                        : createCostBean > 0
+                          ? `${createCostBean} ☕ 결제하고 방 만들기`
+                          : canCreateRoomFree && isPremium
+                            ? '구독 혜택으로 방 만들기'
+                            : '무료로 방 만들기'}
                     </button>
                   )}
                 </div>
-                {roomType === 'E' && payError && (
-                  <p className="text-destructive text-center text-xs">
-                    {payError}
-                  </p>
-                )}
-              </div>
-            )}
-
-            {/* Step 4: 결제 확인 */}
-            {step === 4 && selectedTheme && (
-              <div className="space-y-4">
-                <div className="bg-muted/40 space-y-2 rounded-xl border p-4 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">테마</span>
-                    <span>
-                      {selectedTheme.theme_emoji} {selectedTheme.theme_nm}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">카페 이름</span>
-                    <span className="max-w-[60%] truncate text-right font-medium">
-                      {roomNm}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">공개 여부</span>
-                    <span>{isPublic === 'Y' ? '공개' : '비공개'}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">최대 정원</span>
-                    <span>{maxMbr}명</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">유효기간</span>
-                    <span>{exprDays === 0 ? '무기한' : `${exprDays}일`}</span>
-                  </div>
-                  <div className="border-t pt-2">
-                    {isPremium && !canUsePremiumTheme && (
-                      <div className="flex justify-between text-amber-600 dark:text-amber-400">
-                        <span>PREMIUM 테마 단건</span>
-                        <span>0.2 π</span>
-                      </div>
-                    )}
-                    {isPremium && canUsePremiumTheme && (
-                      <div className="flex justify-between text-emerald-600 dark:text-emerald-400">
-                        <span>PREMIUM 테마</span>
-                        <span>구독 혜택 (무료)</span>
-                      </div>
-                    )}
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">방 생성</span>
-                      <span>0.1 π</span>
-                    </div>
-                    <div className="mt-1.5 flex justify-between border-t pt-1.5 font-semibold">
-                      <span>합계</span>
-                      <span className="text-primary">{payAmount} π</span>
-                    </div>
-                  </div>
-                </div>
-
-                {!isInPiBrowser && (
-                  <p className="rounded-xl bg-yellow-50 px-4 py-2.5 text-center text-xs text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400">
-                    Pi Browser에서만 결제가 가능합니다
-                  </p>
-                )}
-
-                {payStatus === 'waiting' && (
+                {createCostBean > 0 && (
                   <p className="text-muted-foreground text-center text-xs">
-                    Pi 지갑 화면에서 결제를 승인해 주세요.
+                    PREMIUM 카페 생성료 {createCostBean} ☕ Bean이 차감됩니다
+                    (잔액 부족 시 충전 안내)
                   </p>
                 )}
-
                 {payError && (
                   <p className="text-destructive text-center text-xs">
                     {payError}
                   </p>
                 )}
-
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setStep(3)}
-                    disabled={isBusy}
-                    className="hover:bg-muted flex-1 rounded-xl border px-4 py-2 text-sm disabled:opacity-40"
-                  >
-                    이전
-                  </button>
-                  <button
-                    onClick={
-                      payStatus === 'cancelled' || payStatus === 'error'
-                        ? retryPayment
-                        : startPayment
-                    }
-                    disabled={isBusy || !isInPiBrowser}
-                    className="bg-primary text-primary-foreground flex-1 rounded-xl px-4 py-2 text-sm font-medium disabled:opacity-40"
-                  >
-                    {isBusy
-                      ? (PAY_STATUS_MSG[payStatus] ?? '처리 중…')
-                      : payStatus === 'cancelled' || payStatus === 'error'
-                        ? '다시 시도'
-                        : `${payAmount} π 결제 및 방 만들기`}
-                  </button>
-                </div>
               </div>
             )}
+
           </div>
         </DialogContent>
       </Dialog>

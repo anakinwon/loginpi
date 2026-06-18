@@ -1,7 +1,5 @@
 'use client'
-import { useCallback, useEffect, useState } from 'react'
-import { useSubscribePlan } from '@/hooks/use-subscribe-plan'
-import { InlinePurchasePrompt } from './inline-purchase-prompt'
+import { useEffect, useState } from 'react'
 
 export interface ThemeRow {
   theme_cd: string
@@ -15,24 +13,16 @@ export interface ThemeRow {
 interface ThemeSelectorProps {
   selectedThemeCode: string | null
   onSelect: (theme: ThemeRow) => void
+  // 미사용 — 프리미엄 테마는 구독 강요 없이 누구나 선택 가능(생성 시 Bean 요금 부과)
   hasPremiumAccess?: boolean
 }
 
 export function ThemeSelector({
   selectedThemeCode,
   onSelect,
-  hasPremiumAccess = false,
 }: ThemeSelectorProps) {
   const [themes, setThemes] = useState<ThemeRow[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [promptTheme, setPromptTheme] = useState<ThemeRow | null>(null)
-
-  const { subscribe, paying } = useSubscribePlan({
-    onSuccess: useCallback(() => {
-      if (promptTheme) onSelect(promptTheme)
-      setPromptTheme(null)
-    }, [promptTheme, onSelect]),
-  })
 
   useEffect(() => {
     fetch('/api/chat/themes')
@@ -51,60 +41,33 @@ export function ThemeSelector({
   }
 
   return (
-    <>
-      <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-4">
-        {themes.map((theme) => {
-          const isSelected = theme.theme_cd === selectedThemeCode
-          const isPremium = theme.theme_tp_cd === 'PREMIUM'
+    <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-4">
+      {themes.map((theme) => {
+        const isSelected = theme.theme_cd === selectedThemeCode
+        const isPremium = theme.theme_tp_cd === 'PREMIUM'
 
-          return (
-            <button
-              key={theme.theme_cd}
-              onClick={() =>
-                isPremium && !hasPremiumAccess
-                  ? setPromptTheme(theme)
-                  : onSelect(theme)
-              }
-              className={`relative flex flex-col items-center gap-1.5 rounded-xl border p-3 text-center transition-colors ${
-                isSelected
-                  ? 'border-primary bg-primary/10'
-                  : 'hover:border-muted-foreground/40 hover:bg-muted/40'
-              }`}
-            >
-              {isPremium && !hasPremiumAccess && (
-                <span className="absolute top-1.5 right-1.5 text-[10px]">
-                  🔒
-                </span>
-              )}
-              <span className="text-2xl leading-none">{theme.theme_emoji}</span>
-              <span className="text-xs leading-tight font-medium">
-                {theme.theme_nm}
+        return (
+          <button
+            key={theme.theme_cd}
+            onClick={() => onSelect(theme)}
+            className={`relative flex flex-col items-center gap-1.5 rounded-xl border p-3 text-center transition-colors ${
+              isSelected
+                ? 'border-primary bg-primary/10'
+                : 'hover:border-muted-foreground/40 hover:bg-muted/40'
+            }`}
+          >
+            <span className="text-2xl leading-none">{theme.theme_emoji}</span>
+            <span className="text-xs leading-tight font-medium">
+              {theme.theme_nm}
+            </span>
+            {isPremium && (
+              <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+                PREMIUM
               </span>
-              {isPremium && (
-                <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
-                  PREMIUM
-                </span>
-              )}
-            </button>
-          )
-        })}
-      </div>
-
-      <InlinePurchasePrompt
-        isOpen={!!promptTheme}
-        featureName={`${promptTheme?.theme_emoji ?? ''} ${promptTheme?.theme_nm ?? ''} 테마`}
-        description="PREMIUM 테마는 단건 구매 또는 구독 후 이용할 수 있습니다"
-        piAmount={0.2}
-        onSinglePurchase={() => {
-          if (promptTheme) onSelect(promptTheme)
-          setPromptTheme(null)
-        }}
-        onSubscribe={subscribe}
-        subscribing={paying}
-        onClose={() => {
-          if (!paying) setPromptTheme(null)
-        }}
-      />
-    </>
+            )}
+          </button>
+        )
+      })}
+    </div>
   )
 }
