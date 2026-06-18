@@ -48,9 +48,14 @@ export function TelegramConnect() {
   }
 
   return (
-    <section className="space-y-3">
-      <h2 className="text-lg font-semibold">📨 Telegram 주문 알림</h2>
-      <p className="text-muted-foreground text-sm">
+    <section className="space-y-3 rounded-2xl border-2 border-amber-300/70 bg-amber-50/70 p-4 dark:border-amber-700/50 dark:bg-amber-950/20">
+      <div className="flex items-center gap-2">
+        <h2 className="text-lg font-semibold">📨 Telegram 주문 알림</h2>
+        <span className="rounded-full bg-amber-400 px-2 py-0.5 text-xs font-bold text-amber-950">
+          추천
+        </span>
+      </div>
+      <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
         Pi Browser 자체 알림이 없으므로, Telegram 알림을 추천합니다.
       </p>
 
