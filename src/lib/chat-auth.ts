@@ -15,6 +15,7 @@ export interface PlanCaps {
   canTip: boolean // Pi Bean 전송 가능
   canUsePremiumTheme: boolean // PREMIUM 테마 무료 사용
   canCreateEventRoom: boolean // 이벤트방(room_tp_cd='E') 개설
+  canAutoTranslate: boolean // 자동번역(PiTranslate) 사용 — 미구독(FREE)은 불가
 }
 
 // 시드된 플랜(msg_subscr_plan)의 plan_tp_cd → 기능 한도 매핑.
@@ -27,6 +28,7 @@ const PLAN_CAPS: Record<PlanTier, PlanCaps> = {
     canTip: false,
     canUsePremiumTheme: false,
     canCreateEventRoom: false,
+    canAutoTranslate: false, // 미구독은 자동번역 불가 (구독 후 이용)
   },
   PREMIUM: {
     tier: 'PREMIUM',
@@ -35,6 +37,7 @@ const PLAN_CAPS: Record<PlanTier, PlanCaps> = {
     canTip: true,
     canUsePremiumTheme: true,
     canCreateEventRoom: false,
+    canAutoTranslate: true,
   },
   BUSINESS: {
     tier: 'BUSINESS',
@@ -43,6 +46,7 @@ const PLAN_CAPS: Record<PlanTier, PlanCaps> = {
     canTip: true,
     canUsePremiumTheme: true,
     canCreateEventRoom: true,
+    canAutoTranslate: true,
   },
 }
 
@@ -186,6 +190,16 @@ export async function canSendTip(
 ): Promise<boolean> {
   const p = plan ?? (await getChatPlan(userId))
   return p.caps.canTip
+}
+
+// 자동번역(PiTranslate) 사용 가능 여부 — 미구독(FREE)은 false.
+// (엑셀 요금표: 자동번역은 구독 또는 1회 1 Bean. 현재는 구독 게이트만.)
+export async function canAutoTranslate(
+  userId: string,
+  plan?: ChatPlan,
+): Promise<boolean> {
+  const p = plan ?? (await getChatPlan(userId))
+  return p.caps.canAutoTranslate
 }
 
 export interface AiQuota {

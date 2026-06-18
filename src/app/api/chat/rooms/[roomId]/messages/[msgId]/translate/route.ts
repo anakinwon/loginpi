@@ -4,6 +4,7 @@ import { getSessionUser } from '@/lib/auth-check'
 import { getRoomMember } from '@/lib/chat'
 import { LOCALE_CD_RE, baseLang } from '@/lib/chat-translate'
 import { getOrTranslateMessage } from '@/lib/chat-translate-dedup'
+import { canAutoTranslate } from '@/lib/chat-auth'
 import { recordUserAction } from '@/lib/event'
 
 type Params = { params: Promise<{ roomId: string; msgId: string }> }
@@ -20,6 +21,18 @@ export async function POST(request: NextRequest, { params }: Params) {
   const mbr = await getRoomMember(roomId, user.id)
   if (!mbr)
     return NextResponse.json({ error: '카페 멤버가 아닙니다' }, { status: 403 })
+
+  // 자동번역은 구독 기능 — 미구독(FREE)은 차단
+  if (!(await canAutoTranslate(user.id))) {
+    return NextResponse.json(
+      {
+        error: '자동번역은 구독 후 이용할 수 있습니다',
+        requiresSubscription: true,
+        feature: 'AUTO_TRANSLATE',
+      },
+      { status: 403 },
+    )
+  }
 
   let body: unknown
   try {
