@@ -68,42 +68,9 @@ export function GoogleUserCard() {
               {(user.name ?? user.email ?? 'G').charAt(0).toUpperCase()}
             </div>
           )}
-          <div>
-            <p className="text-sm font-medium">{user.name ?? '(이름 없음)'}</p>
-            <p className="text-muted-foreground text-xs">{user.email}</p>
-          </div>
-        </div>
-
-        <InfoRow label="이메일" value={user.email ?? '(없음)'} />
-        <InfoRow label="사용자 ID" value={user.id} mono />
-        <div className="grid grid-cols-[6.5rem_1fr] items-start gap-2 text-sm">
-          <span className="text-muted-foreground shrink-0">인증 제공자</span>
-          <span className="flex items-center gap-1.5">
-            <GoogleColorIcon />
-            <span>Google</span>
-          </span>
         </div>
       </CardContent>
     </Card>
-  )
-}
-
-function InfoRow({
-  label,
-  value,
-  mono,
-}: {
-  label: string
-  value: string
-  mono?: boolean
-}) {
-  return (
-    <div className="grid grid-cols-[6.5rem_1fr] items-start gap-2 text-sm">
-      <span className="text-muted-foreground shrink-0">{label}</span>
-      <span className={`break-all${mono ? 'font-mono text-xs' : ''}`}>
-        {value}
-      </span>
-    </div>
   )
 }
 
