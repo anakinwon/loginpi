@@ -782,6 +782,14 @@ Pi 메인넷/런치패드 심사는 아래 위반 시 **즉시 거절**. T01~T03
   3. KYC requirements for the issuing entity (individual vs. organization)
   4. Mainnet Launchpad availability timeline
   5. Any restrictions on tokenomics, sale structure, or liquidity pairs
+  6. Is an OFF-CHAIN, pre-issuance "usage credit" system allowed under
+     Launchpad/Mainnet policy? Specifically: users earn/charge an in-app,
+     NON-cashable balance (no fiat/Pi withdrawal) that is custodied by the
+     platform and redeemed 1:1 for the BEAN token AFTER official issuance.
+     We treat this internally as an accounting "IOU" but present it to users
+     only as an accrued platform usage-right (no pre-sale, no investment
+     framing). Does this conflict with the "Product-First / not capital
+     raising" principle or any unauthorized-pre-sale rules?
 
   Thank you.
   — cafe.pi team
@@ -820,8 +828,11 @@ T02(신청양식) ─→ T03(Mainnet 일정) ─┘
 > **모든 DDL은 문서 내 코드블록(초안·승인대기)으로만 제시되며, 실제 `sql/*.sql` 파일 생성 및 DB 적용은 토큰 발행 전 금지입니다.**
 > **본 설계는 "발행됨 전제" 기준이며, 온체인(Soroban) 실제 발행은 §7 기술 아키텍처 참조.**
 >
-> **⭐ 표기 규약**: 정식 토큰 **발행 전**에는 공식 표기를 **"Bean Token(IOU)"** 로 한다. **IOU = "I Owe You"**(발행 시 인도하기로 한 약속분). **발행 후**에는 **"Bean Token"**. 본 문서의 DDL·식별자는 발행 후 기준명(`bean_*`)을 쓰되, 사용자 노출 문구가 발행 전 맥락이면 "Bean Token(IOU)"로 표기한다.
-> ⚠️ **증권성 주의**: "IOU"는 채무증서로 오인될 수 있으므로, 사용자 안내·약관에서는 **"발행 후 사용 가능한 사용권 선구매(영수증)"** 성격으로 설명해 채무·투자 인상을 피한다(레드라인·증권성 회피, §11-7 참조).
+> **⭐ 표기 규약 (확정 2026-06-18)**:
+> - **"IOU"(I Owe You)는 내부 기술·회계 용어로만** 사용한다(원장 = 갚아야 할 잔액. 식별자 `bean_*` 유지).
+> - **사용자·마케팅·Launchpad 노출 표기는 "Bean 선적립증 / 사용권 기록 / Bean 계정 잔액"** 으로 하고, **"환금(Pi 환전) 불가 · 플랫폼 사용 전용"** 을 반드시 명시한다.
+> - **"구매·투자·presale·약속" 표현 금지** (증권성·Pi Launchpad Product-First 위반 리스크 회피, §11-9 참조).
+> - **발행 후**에는 **"Bean Token"**.
 
 ### 11-1. 경제모델 개요
 
