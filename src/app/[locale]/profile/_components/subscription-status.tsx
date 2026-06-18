@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { Link } from '@/i18n/navigation'
 import { piFetch } from '@/lib/pi-fetch'
 
 interface SubscrCheck {
@@ -96,6 +97,13 @@ export function SubscriptionStatus() {
       )}
 
       {message && <p className="text-muted-foreground text-sm">{message}</p>}
+
+      <Link
+        href="/subscribe"
+        className="bg-primary text-primary-foreground inline-flex w-full items-center justify-center rounded-xl px-4 py-2.5 text-sm font-medium transition-opacity hover:opacity-90"
+      >
+        구독 상품 보기 →
+      </Link>
 
       {cancelModalOpen && (
         <CancelPolicyModal
