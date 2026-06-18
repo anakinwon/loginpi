@@ -11,6 +11,7 @@
 > **운영 리스크**: `docs/TROUBLESHOOT.md` (A. 성능 리스크 레지스터 7종 + B. 운영 이슈 기록)
 > **판매자 주문 알림**: `docs/PRD_13_MSG.md` (v1.1) — Telegram+Realtime+Pull 3계층 Outbox, 결제완료 즉시 발송 (✅ Phase 1 구현 완료 2026-06-18, ROADMAP Phase 18)
 > **사용자 매뉴얼(쉬움)**: `docs/Cafe.pi_쉬운_사용자매뉴얼.pptx` — 컴맹 기준 7장(로그인·Bean·구독·PiCafe 동시통역·중고장터·PiStore O2O·차별점)
+> **구독 요금제**: `docs/PRD_14_SUBSC.md` (v1.0) — PiCafe(Explorer·Creator·Host) + PiStore(PiShop Seller 신설안) 월간/연간, Bean 환산(1 Pi=100 Bean), 원화는 비공개 설계참고. ⚠️ 시드·plan_tp_cd 결정 후 적용
 > **토큰 발행 (기획)**: `docs/PRD_12_TOKEN.md` (v1.8) · `_백서.md` · `_법무자문의뢰서.md` — BEAN 생태계 토큰, Pi Launchpad. ⚠️ 발행 전 **앱 코드 미포함**(레드라인 #2 유지) — 단 문서는 git 커밋(파일럿 인큐베이팅, 2026-06-17 정책)
 
 ---
