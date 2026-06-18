@@ -11,6 +11,7 @@
 
 | 버전 | 날짜 | 변경 내용 | 작성자 |
 |------|------|-----------|--------|
+| **v1.2** | 2026-06-18 | **구독 요금제 구체화 + UX·진입 경로 추가** — ① 기능·한도 정밀화(테마·그룹방·AI·이벤트·분석·봇·매장 수·상품 수·우선노출 구체 수치) + 취소/자동갱신/만료강등/업그레이드 규칙 명확화. ② 구독 신청 페이지 신규 섹션(라우트·화면구성·상태) + 진입경로(6곳) + 결제흐름(과도기·정본) + API 계약(/api/subscriptions) + Pi Browser 제약(getSessionUser null게이트) + 와이어프레임(텍스트 ASCII). | asoká |
 | **v1.1** | 2026-06-18 | **거래 통화 라우팅 규칙(최상위 원칙) 확정** — ① 플랫폼↔사용자 거래(구독)는 Bean Token 정본(Pi는 과도기) ② P2P 중고장터 = Pi 결제 ③ O2O 매장주문 = Pi 결제 + Bean Token 보상. 모든 금액표기·결제흐름·기능매트릭스·레드라인 체크 반영. 시가연동(원화 단정 금지)·용어 통일(Pi Bean→Bean Token) 적용. | asoká |
 | **v1.0** | 2026-06-18 | 최초 작성 — PiCafe 3-tier 현행화 + Bean 환산(1 Pi=100 Bean) + PiStore 플랜 신설 + 연간 할인 근거 + 레드라인 체크 | asoká |
 
@@ -28,9 +29,10 @@
 7. [기능·권한 매트릭스](#7-기능권한-매트릭스)
 8. [결제 연동 고려사항](#8-결제-연동-고려사항)
 9. [기간 표기 및 패키지 정책 정합](#9-기간-표기-및-패키지-정책-정합)
-10. [시세 변동 시 재계산 절차](#10-시세-변동-시-재계산-절차)
-11. [Pi 등재 레드라인 준수 체크](#11-pi-등재-레드라인-준수-체크)
-12. [DB 시드 초안 (승인 대기)](#12-db-시드-초안-승인-대기)
+10. [구독 신청 UX·진입 경로 (신규)](#10-구독-신청-ux진입-경로-신규)
+11. [시세 변동 시 재계산 절차](#11-시세-변동-시-재계산-절차)
+12. [Pi 등재 레드라인 준수 체크](#12-pi-등재-레드라인-준수-체크)
+13. [DB 시드 초안 (승인 대기)](#13-db-시드-초안-승인-대기)
 
 ---
 
@@ -235,30 +237,61 @@ Cafe.pi 플랫폼은 다음 두 가지 전략으로 활성 사용자를 확보·
 | **연간 가격** | 0 Pi / 0 Bean |
 | **설명** | 기본 무료 플랜 — 기초 카페 기능 무제한 이용 |
 | **적용 대상** | 모든 신규 사용자 (기본값) |
+| **자동갱신** | N/A (무료) |
+| **취소 정책** | 언제든지 가능, 비용 없음 |
+| **우측 업그레이드** | PREMIUM으로 언제든 업그레이드 가능 (월/연 선택) |
+
+**기능 상세** (§7-1 참조):
+- 테마: 기본 6개만
+- 채팅: 1:1 무제한, 그룹방 0개(유료 결제로 각 1개씩 추가 가능)
+- AI: 0회/월
+- Bean Token 팁: 불가
+- 이벤트방: 불가
+- 분석·봇: 불가
 
 #### 4-1-2. Pi Creator (PREMIUM)
 
 | 항목 | 정본(Bean Token) | 과도기(Pi) | 비고 |
 |---|---|---|---|
-| **요금제명** | Pi Creator | Pi Creator | — |
+| **요금제명** | Pi Creator | Pi Creator | 전문가/라이트 운영자용 |
 | **티어** | PREMIUM | PREMIUM | — |
 | **월간 가격** | **100 Bean Token** | **1 Pi** (= 100 Bean) | 발행 후 Bean Token으로 직결제 |
 | **연간 가격** | **1,000 Bean Token** | **10 Pi** (= 1,000 Bean) | 2개월 무료 (16.7% 할인) |
-| **갱신 주기** | 월 / 연 (자동갱신) | 월 / 연 (자동갱신) | — |
-| **취소 정책** | 만료일까지 이용, 환불 불가 | 만료일까지 이용, 환불 불가 | PiRC2 구조 준수 |
-| **설명** | PREMIUM 테마 무제한, 그룹방 생성 무제한, AI 비서 월 10회 이용, Bean Token 전송 가능 | (동일) | — |
+| **갱신 주기** | 월 / 연 (자동갱신) | 월 / 연 (자동갱신) | 갱신 24시간 전 알림 |
+| **취소 정책** | 만료일까지 이용, 환불 불가 | 만료일까지 이용, 환불 불가 | PiRC2 구조 준수, 취소 즉시 적용 |
+| **업그레이드** | BUSINESS로 원활한 전환 (차액만 청구) | (동일) | 월간→연간 수동 전환 (환불 없음) |
+| **다운그레이드** | FREE로 즉시 강등, 남은 기간 손실 | (동일) | 환불 없음, 다음 갱신일부터 적용 옵션 |
+
+**기능 상세** (§7-1 참조):
+- 테마: PREMIUM 전체 무제한
+- 채팅: 1:1 무제한 + 그룹방 무제한
+- AI: 월 10회
+- Bean Token 팁: 가능 (후원·사용자↔사용자)
+- 이벤트방: 불가 (BUSINESS 전용)
+- 분석·봇: 불가
+- 우선 지원: 없음
 
 #### 4-1-3. Pi Host (BUSINESS)
 
 | 항목 | 정본(Bean Token) | 과도기(Pi) | 비고 |
 |---|---|---|---|
-| **요금제명** | Pi Host | Pi Host | — |
+| **요금제명** | Pi Host | Pi Host | 커뮤니티 운영자/플랫폼 파트너용 |
 | **티어** | BUSINESS | BUSINESS | — |
 | **월간 가격** | **500 Bean Token** | **5 Pi** (= 500 Bean) | 발행 후 Bean Token으로 직결제 |
 | **연간 가격** | **5,000 Bean Token** | **50 Pi** (= 5,000 Bean) | 2개월 무료 (16.7% 할인) |
-| **갱신 주기** | 월 / 연 (자동갱신) | 월 / 연 (자동갱신) | — |
-| **취소 정책** | 만료일까지 이용, 환불 불가 | 만료일까지 이용, 환불 불가 | PiRC2 구조 준수 |
-| **설명** | 무제한 그룹방/이벤트방 생성, AI 비서 무제한, 분석 대시보드, Webhook/봇 API, 우선 지원 | (동일) | — |
+| **갱신 주기** | 월 / 연 (자동갱신) | 월 / 연 (자동갱신) | 갱신 24시간 전 알림 |
+| **취소 정책** | 만료일까지 이용, 환불 불가 | 만료일까지 이용, 환불 불가 | PiRC2 구조 준수, 취소 즉시 적용 |
+| **다운그레이드** | PREMIUM으로 강등 (이벤트방·Webhook 즉시 비활성) | (동일) | 남은 기간 비례 환불 없음 |
+
+**기능 상세** (§7-1 참조):
+- 테마: PREMIUM 전체 무제한
+- 채팅: 1:1 무제한 + 그룹방 무제한 + 이벤트방 무제한
+- AI: 월 무제한 (시간 제한 없음)
+- Bean Token 팁: 가능
+- 이벤트방: 무제한 ✅ (커뮤니티 행사·마케팅 전용)
+- 분석 대시보드: ✅ (방별 참여자·메시지·활동 통계)
+- Webhook/봇 API: ✅ (카스톰 봇 통합, 자동화)
+- 우선 고객지원: ✅ (전용 슬랙 채널, 24시간 대응 예정)
 
 ### 4-2. 기간 표기 (월간/연간)
 
@@ -292,18 +325,31 @@ Cafe.pi 플랫폼은 다음 두 가지 전략으로 활성 사용자를 확보·
 3. **기능 차등화**: 기본→프리미엄 판매자용 추가 기능 제공
 4. **활성 사용자 증가**: 판매자 생태계 성숙도 향상
 
-### 5-2. PiShop Seller (PREMIUM) — 신설
+### 5-2. PiShop Seller (PREMIUM) — 신설 (O2O 매장 운영자용)
 
 | 항목 | 정본(Bean Token) | 과도기(Pi) | 비고 |
 |---|---|---|---|
-| **요금제명** | PiShop Seller | PiShop Seller | — |
-| **티어** | PREMIUM | PREMIUM | — |
-| **대상 사용자** | 오프라인/온라인 매장 운영 판매자 | (동일) | — |
+| **요금제명** | PiShop Seller | PiShop Seller | O2O 오프라인 매장 운영 전용 |
+| **티어** | PREMIUM | PREMIUM | §0 규칙 3 (Pi 결제 + Bean Token 보상) |
+| **대상 사용자** | 온라인/오프라인 매장 운영 판매자 | (동일) | P2P 중고 판매자는 무료 (구독 불필요) |
 | **월간 가격** | **50 Bean Token** | **0.5 Pi** (= 50 Bean) | 발행 후 Bean Token 직결제 |
 | **연간 가격** | **500 Bean Token** | **5 Pi** (= 500 Bean) | 2개월 무료 (16.7% 할인) |
-| **자동갱신** | Y | Y | 만료 시 갱신 선택 |
+| **갱신 주기** | 월 / 연 (자동갱신) | 월 / 연 (자동갱신) | 갱신 24시간 전 알림 |
 | **취소 정책** | 만료일까지 이용, 환불 불가 | 만료일까지 이용, 환불 불가 | PiRC2 구조 준수 |
-| **설명** | 매장 통계 대시보드, 상품 무제한 등록, 다중 매장(최대 3개) 관리, 우선 노출(검색 상위), 판매자 배지 | (동일) | — |
+| **다운그레이드** | 즉시 기본 FREE(1매장)로 강등 | (동일) | 다중 매장 접근 즉시 차단, 통계 읽기만 가능 |
+
+**기능 상세** (§7-2 O2O 참조):
+- 매장 개설: 최대 3개 (FREE: 1개)
+- 상품 등록: 무제한 (FREE: 50개 제한)
+- 매장 통계 대시보드: 일 매출, 주 주문 수, 월 리뷰 평점 ✅
+- 우선 검색 노출: 카테고리별 상위 노출 ✅
+- 판매자 배지: "Verified Seller" 뱃지 표시 ✅
+- 마케팅 도구: 상품 할인, 이벤트 기획 (Bean Token 기반) ✅
+- **Bean Token 보상** (§0 규칙 3): ✅ 구매자/판매자 모두 수령 (구독자만)
+
+**보증금 명확화**:
+- 1 Pi 거래 안전 보증금: 구독과 독립적 (선택)
+- 보증금은 취소수수료 담보용, 구독료와 별도 청구
 
 ### 5-3. 신설 플랜 추가 기능
 
@@ -541,6 +587,331 @@ INSERT INTO msg_subscr (
 
 **향후** (PiRC2 반복 결제):
 - 스마트 컨트랙트 `subscribe()` 호출로 온체인 자동갱신 (만료 시 자동 청구)
+
+---
+
+## 10. 구독 신청 UX·진입 경로 (신규)
+
+### 10-1. 진입 경로 (Entry Points) — 사용자가 구독을 만나는 모든 지점
+
+**6가지 핵심 진입 경로**:
+
+| # | 경로 | 사용자 상태 | 화면 | 액션 |
+|---|---|---|---|---|
+| **1** | 내 정보(프로필) | 모든 사용자 | 프로필 페이지 → "구독 현황" 카드 | 구독 신청/변경 페이지로 이동 |
+| **2** | 헤더 (한정시 배너) | 미인증/FREE | 헤더 상단 프로모션 배너 | "구독 신청" CTA → 신청 페이지 |
+| **3** | PiCafe 그룹방 생성 | PREMIUM 필요 | 그룹방 생성 모달 (FREE 사용자) | "업그레이드 필요" → 신청 페이지 |
+| **4** | PiCafe 기능 게이트 | 한도 초과 시 | AI 호출/이벤트방/분석 사용 불가 | "구독 필요" 팝업 → 신청 페이지 |
+| **5** | PiStore 매장관리 | 판매자 | `/store/my/shops` → 매장 카드 | "PiShop Seller 구독" CTA → 신청 페이지 |
+| **6** | 만료 알림 | 구독 만료 근처 | 24시간 전 푸시/이메일 | "갱신하기" 버튼 → 신청 페이지 |
+
+**동선 요약**:
+```
+진입 경로 (6곳) → 신청 페이지 (/[locale]/subscribe) 
+              → 플랜 선택 
+              → 월간/연간 토글 
+              → 요약 정보 
+              → 결제 실행 (Pi Browser U2A)
+              → msg_subscr 생성 → 성공 페이지
+```
+
+### 10-2. 구독 신청 페이지 명세
+
+#### **라우트 & 상태**
+
+| 항목 | 값 |
+|---|---|
+| **라우트** | `GET /[locale]/subscribe?from=<entry_point>&plan=<plan_cd>` |
+| **모달 대안** | 기존 `SubscriptionStatus` 확장하여 모달로도 제공 가능 |
+| **인증 요구** | ✅ `getSessionUser()` 필수 — null 시 클라이언트 게이트(`<ClientGate />`) 렌더 |
+
+#### **화면 상태 (State Machine)**
+
+| 상태 | 렌더 | 비고 |
+|---|---|---|
+| **1. 미인증** | 로그인 유도 (클라이언트 게이트) | `getSessionUser()` 호출 → null → 게이트 |
+| **2. FREE (기본)** | 3개 플랜 카드 (FREE/PREMIUM/BUSINESS 또는 PISTORE) | 현재 plankcd=FREE 표시 |
+| **3. PREMIUM 구독중** | BUSINESS로 업그레이드 추천 또는 다운그레이드 옵션 | 갱신 일정 표시 |
+| **4. BUSINESS 구독중** | 다운그레이드만 가능 (FREE/PREMIUM) | 상위 플랜이므로 업그레이드 없음 |
+| **5. 판매자 (PiStore)** | PiShop Seller 구독 카드 (O2O용) | P2P 판매자는 구독 불필요 표시 |
+| **6. 결제 대기중** | "결제 승인 대기..." 로딩 | `window.Pi.createPayment` 실행 중 |
+| **7. 결제 완료** | 성공 화면 → "/[locale]/chat" 또는 유입 페이지로 리다이렉트 | 2초 후 자동 이동 |
+
+#### **화면 구성 (Wireframe, ASCII)**
+
+```
+┌─────────────────────────────────────────┐
+│ [<] Cafe.pi 구독 신청                      │
+├─────────────────────────────────────────┤
+│                                         │
+│ 📋 구독 플랜 선택                        │
+│                                         │
+│ [월간 선택 버튼]  [연간 선택 버튼]    │
+│                                         │
+├─────────────────────────────────────────┤
+│                                         │
+│ ┌─────────────────────────────────────┐ │
+│ │ 🆓 Pi Explorer (FREE)              │ │
+│ │ 월 0 Pi                             │ │
+│ │ • 기본 테마 6개                     │ │
+│ │ • 1:1 채팅 무제한                  │ │
+│ │ [선택 버튼]                         │ │
+│ └─────────────────────────────────────┘ │
+│                                         │
+│ ┌─────────────────────────────────────┐ │
+│ │ ⭐ Pi Creator (PREMIUM)            │ │ ← 추천 배지
+│ │ 월 1 Pi / 100 Bean Token           │ │
+│ │ 연간 구독 시 2개월 무료 (10 Pi)   │ │
+│ │ • PREMIUM 테마 무제한               │ │
+│ │ • 그룹방 무제한                     │ │
+│ │ • AI 비서 10회/월                  │ │
+│ │ • Bean Token 팁 전송                │ │
+│ │ [선택 버튼]                         │ │
+│ └─────────────────────────────────────┘ │
+│                                         │
+│ ┌─────────────────────────────────────┐ │
+│ │ 🔥 Pi Host (BUSINESS)              │ │
+│ │ 월 5 Pi / 500 Bean Token           │ │
+│ │ • 모든 기능 무제한                  │ │
+│ │ • 분석 대시보드 + 봇 API           │ │
+│ │ • 우선 지원                         │ │
+│ │ [선택 버튼]                         │ │
+│ └─────────────────────────────────────┘ │
+│                                         │
+├─────────────────────────────────────────┤
+│ [현재 구독: PREMIUM, 만료: 2026-07-18]  │
+│                                         │
+│ [결제하기 버튼]                         │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+#### **플랜 비교표 (숨겨진 섹션)**
+
+```
+테마 비교:
+┌─────────────────────┬────────┬──────────┬──────────┐
+│ 기능                │ FREE   │ PREMIUM  │ BUSINESS │
+├─────────────────────┼────────┼──────────┼──────────┤
+│ 기본 테마(6개)      │ ✅    │ ✅      │ ✅      │
+│ PREMIUM 테마        │ ❌    │ ✅      │ ✅      │
+│ 그룹방 개수         │ 0      │ -1(무제) │ -1(무제) │
+│ 이벤트방            │ ❌    │ ❌      │ ✅      │
+│ AI 월 호출 수       │ 0      │ 10      │ -1(무제) │
+│ 분석 대시보드       │ ❌    │ ❌      │ ✅      │
+│ Webhook/봇 API     │ ❌    │ ❌      │ ✅      │
+└─────────────────────┴────────┴──────────┴──────────┘
+```
+
+### 10-3. 결제 흐름 (과도기 & 정본)
+
+#### **Step A: 과도기 (현재~Phase 17 전) — Pi U2A 결제**
+
+```typescript
+// 신청 페이지에서 [결제하기] 클릭
+
+1. 클라이언트:
+   POST /api/subscriptions/create
+   {
+     plan_cd: "PREMIUM_MONTHLY",
+     period: "monthly"
+   }
+
+2. 서버 응답:
+   {
+     paymentId: "sub_xxx",
+     amount: "1000000",        // stroops (1 Pi)
+     memo: "PREMIUM_MONTHLY",
+     metadata: {
+       type: "CHAT_SUBSCR",
+       plan_cd: "PREMIUM_MONTHLY",
+       bean_amount: 100
+     }
+   }
+
+3. 클라이언트 (Pi Browser):
+   await window.Pi.createPayment({
+     amount: "1000000",
+     memo: "PREMIUM_MONTHLY",
+     metadata: { type: "CHAT_SUBSCR", bean_amount: 100 }
+   })
+     .then(approvePayment)
+     .then(completePayment)
+     .then(() => POST /api/subscriptions/complete)
+     .then(() => redirect to /[locale]/chat)
+
+4. msg_subscr 생성:
+   INSERT INTO msg_subscr (
+     plan_cd: "PREMIUM_MONTHLY",
+     usr_id: "user_xxx",
+     expire_dtm: NOW() + 1 MONTH,
+     auto_renew_yn: "Y"
+   )
+```
+
+#### **Step B: 정본 (Phase 17 이후) — Bean Token 직결제**
+
+```typescript
+// Bean Token 발행 후, feature flag 활성화 시
+
+1. 클라이언트:
+   POST /api/subscriptions/create
+   {
+     plan_cd: "PREMIUM_MONTHLY",
+     period: "monthly",
+     currency: "BEAN_TOKEN"  // ← 신규 param
+   }
+
+2. 서버 (feature flag: BEAN_SUBSCRIPTION = true):
+   {
+     paymentId: "sub_xxx",
+     bean_amount: 100,
+     metadata: {
+       type: "CHAT_SUBSCR",
+       plan_cd: "PREMIUM_MONTHLY"
+     }
+   }
+
+3. 클라이언트 (Bean Token 충전 API):
+   // Bean Token 직결제 (구현 TBD)
+   // Pi로 Bean Token 충전 후 결제 또는
+   // Bean Token 지갑에서 직접 차감
+
+4. msg_subscr 생성:
+   INSERT INTO msg_subscr (
+     plan_cd: "PREMIUM_MONTHLY",
+     usr_id: "user_xxx",
+     expire_dtm: NOW() + 1 MONTH,
+     auto_renew_yn: "Y",
+     payment_currency: "BEAN_TOKEN"  // ← 추적용
+   )
+```
+
+### 10-4. API 계약 (`/api/subscriptions`)
+
+#### **기존 엔드포인트 확장**
+
+```typescript
+// GET /api/subscriptions/plans
+// 모든 구독 플랜 조회
+GET /api/subscriptions/plans
+  Response: {
+    plans: [
+      {
+        plan_cd: "FREE",
+        plan_nm: "Pi Explorer",
+        price_pi: "0.0000",
+        price_bean: null,  // Phase 17 이후 추가
+        mth_cnt: 0,
+        features: { ... }
+      },
+      { ... PREMIUM ... },
+      { ... BUSINESS ... },
+      { ... PISTORE_SELLER_MONTHLY ... }
+    ]
+  }
+
+// POST /api/subscriptions/create
+// 결제 준비 (이전 endoint 확장)
+POST /api/subscriptions/create
+  Body: {
+    plan_cd: "PREMIUM_MONTHLY",
+    period: "monthly",
+    currency?: "PI" | "BEAN_TOKEN"  // 신규 (기본: PI)
+  }
+  Response: {
+    paymentId: string,
+    amount: string,  // stroops 또는 BEAN amount
+    memo: string,
+    metadata: { type, plan_cd, bean_amount }
+  }
+  Error: 401 (미인증), 400 (이미 구독중)
+
+// POST /api/subscriptions/complete
+// 결제 완료 콜백
+POST /api/subscriptions/complete
+  Body: { paymentId, txId }
+  Response: { subscriptionId, expire_dtm }
+  Error: 402 (결제 실패), 409 (중복)
+
+// DELETE /api/subscriptions/{subscriptionId}
+// 구독 취소
+DELETE /api/subscriptions/{subscriptionId}
+  Response: { cancelled_at }
+  Error: 404, 403 (만료된 구독)
+
+// GET /api/subscriptions/status
+// 현재 구독 상태 조회
+GET /api/subscriptions/status
+  Response: {
+    plan_cd: "PREMIUM_MONTHLY",
+    expire_dtm: "2026-07-18T...",
+    auto_renew_yn: "Y",
+    days_left: 30
+  }
+  (미구독: 404 또는 empty)
+```
+
+### 10-5. Pi Browser 제약 준수
+
+**치명적 제약**: Pi Browser WebView는 쿠키 미저장 + `Set-Cookie` 무시
+
+**신청 페이지 준수**:
+
+```typescript
+// 1. 인증 필수 — redirect 금지, 클라이언트 게이트 필수
+// (src/components/ClientGate.tsx 참조)
+
+export default async function SubscribePage() {
+  const user = await getSessionUser()
+  if (!user) {
+    // ❌ 절대 금지: return redirect('/auth/pi')
+    // ✅ 필수: 클라이언트 게이트 렌더
+    return <ClientSubscriptionGate />
+  }
+  
+  return <SubscriptionPage user={user} />
+}
+
+// 2. 결제 요청 시 piFetch 사용 (X-Pi-Token 헤더 자동 추가)
+// (src/lib/pi-fetch.ts 참조)
+
+const response = await piFetch('/api/subscriptions/create', {
+  method: 'POST',
+  body: JSON.stringify({ plan_cd: 'PREMIUM_MONTHLY' })
+})
+
+// 3. Pi Payment API는 window.Pi 객체 선검사
+if (typeof window !== 'undefined' && window.Pi) {
+  await window.Pi.createPayment(...)
+} else {
+  // Pi Browser 환경 아님 - 폴백 UI
+  showAlert('Pi Browser가 필요합니다')
+}
+```
+
+**API 요청시 쿠키 + 헤더 양쪽 검증**:
+
+```typescript
+// src/lib/auth-check.ts getSessionUser()
+// 쿠키 우선 → X-Pi-Token 헤더 폴백
+
+export async function getSessionUser() {
+  // 1. 쿠키에서 pi_session 확인
+  const cookieToken = cookies().get('pi_session')?.value
+  if (cookieToken && validateToken(cookieToken)) {
+    return getCachedUser()
+  }
+  
+  // 2. X-Pi-Token 헤더 폴백 (Pi Browser)
+  const headerToken = headers().get('X-Pi-Token')
+  if (headerToken && validateToken(headerToken)) {
+    return getCachedUser()
+  }
+  
+  return null
+}
+```
 
 ---
 
