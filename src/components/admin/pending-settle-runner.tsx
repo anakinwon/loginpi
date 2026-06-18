@@ -125,6 +125,15 @@ export function PendingSettleRunner() {
     }
   }
 
+  async function copyTxid(txid: string) {
+    try {
+      await navigator.clipboard.writeText(txid)
+      toast.success(t('settleTxidCopied'))
+    } catch {
+      toast.error(t('settleError', { msg: 'clipboard' }))
+    }
+  }
+
   function toggle(orderId: string) {
     setSelected((prev) => {
       const next = new Set(prev)
@@ -204,6 +213,7 @@ export function PendingSettleRunner() {
             </div>
           )}
 
+          <p className="text-sm font-semibold">{t('settleNeedTitle')}</p>
           {preview.count === 0 ? (
             <p className="text-muted-foreground text-sm">{t('settleEmpty')}</p>
           ) : (
@@ -362,6 +372,9 @@ export function PendingSettleRunner() {
                         {t('settleColCcy')}
                       </th>
                       <th className="py-2 pr-3 font-medium">
+                        {t('settleColStatus')}
+                      </th>
+                      <th className="py-2 pr-3 font-medium">
                         {t('settleColSettledAt')}
                       </th>
                       <th className="py-2 font-medium">{t('settleColTxid')}</th>
@@ -384,14 +397,24 @@ export function PendingSettleRunner() {
                         <td className="text-muted-foreground py-2 pr-3 whitespace-nowrap">
                           {fmtCcy(s.ccy_amt, s.ccy_cd)}
                         </td>
+                        <td className="py-2 pr-3 whitespace-nowrap">
+                          <span className={ST_STYLE.SETTLED}>
+                            {t('settleStSettled')}
+                          </span>
+                        </td>
                         <td className="py-2 pr-3 whitespace-nowrap text-green-600 dark:text-green-400">
                           {fmtDateTime(s.settle_dtm)}
                         </td>
                         <td className="text-muted-foreground py-2 font-mono text-xs">
                           {s.release_txid ? (
-                            <span title={s.release_txid}>
+                            <button
+                              type="button"
+                              onClick={() => copyTxid(s.release_txid!)}
+                              title={`${s.release_txid}\n(클릭하여 복사)`}
+                              className="hover:text-foreground cursor-pointer underline-offset-2 hover:underline"
+                            >
                               {shortTxid(s.release_txid)}
-                            </span>
+                            </button>
                           ) : (
                             '—'
                           )}

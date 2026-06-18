@@ -98,14 +98,15 @@
       "settleColDate": "판매일자",
       "settleColStatus": "정산 상태",
       "settleStUnsettled": "미정산",
-      "settleStSettled": "정산완료",
-      "settleStFailed": "정산실패",
+      "settleStSettled": "재정산완료",
+      "settleStFailed": "재정산실패",
       "settleStNoUid": "미연동",
       "settleStDisabled": "A2U 비활성",
       "settleColLinked": "Pi 연동",
       "settleLinkedYes": "연동",
       "settleLinkedNo": "미연동(송금 불가)",
-      "settleRun": "정산 실행 (실제 송금)",
+      "settleNeedTitle": "재정산 필요 목록",
+      "settleRun": "재정산 실행 (실제 송금)",
       "settleRunning": "정산 중…",
       "settleConfirm": "미정산 {count}건에 실제 Pi를 송금합니다. 진행할까요?",
       "settleResult": "정산 완료 {settled}/{attempted}건",
@@ -114,7 +115,8 @@
       "settledEmpty": "정산 완료 내역이 없습니다",
       "settledSummary": "정산 완료 {count}건",
       "settleColSettledAt": "정산일시",
-      "settleColTxid": "송금 txid"
+      "settleColTxid": "송금 txid",
+      "settleTxidCopied": "송금 txid를 복사했습니다"
     },
     "dashboard": {
       "title": "대시보드",
