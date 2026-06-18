@@ -66,7 +66,7 @@ export function StoreItemDetail({ itemId }: { itemId: string }) {
   const t = useTranslations('store')
   const locale = useLocale()
   const router = useRouter()
-  const { user } = usePiAuth()
+  const { user, signIn } = usePiAuth()
   const [item, setItem] = useState<ItemDetail | null>(null)
   const [state, setState] = useState<'loading' | 'ready' | 'notfound'>(
     'loading',
@@ -107,12 +107,15 @@ export function StoreItemDetail({ itemId }: { itemId: string }) {
   }
 
   async function buy() {
-    if (!user) {
-      toast.error(t('loginRequired'))
-      return
-    }
+    // 결제는 반드시 Pi Browser에서만 (일반 브라우저 결제 금지)
     if (!window.Pi) {
       toast.error(t('piBrowserOnly'))
+      return
+    }
+    // 지도 유입 등으로 세션 인증이 유실/지연된 경우 재인증 후 진행 (서버는 X-Pi-Token으로 최종 판정)
+    const activeUser = user ?? (await signIn({ silent: true }))
+    if (!activeUser) {
+      toast.error(t('loginRequired'))
       return
     }
     if (orderMthd === 'DELIVERY' && !dlvrAddr.trim()) {

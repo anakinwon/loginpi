@@ -26,18 +26,21 @@ export function ClientCart() {
   const cart = useCart()
   const totals = cartTotals(cart)
   const router = useRouter()
-  const { user } = usePiAuth()
+  const { user, signIn } = usePiAuth()
   const [checking, setChecking] = useState(false)
 
   // 체크아웃 — 카트 → 다중라인 주문 1건 + 단일 Pi 결제(에스크로). buy() 흐름 미러링.
   async function checkout() {
     if (cart.lines.length === 0 || !cart.shopId) return
-    if (!user) {
-      toast.error(t('loginRequired'))
-      return
-    }
+    // 결제는 반드시 Pi Browser에서만 (일반 브라우저 결제 금지)
     if (typeof window === 'undefined' || !window.Pi) {
       toast.error(t('piBrowserOnly'))
+      return
+    }
+    // 지도 유입 등으로 세션 인증이 유실/지연된 경우 재인증 후 진행 (서버는 X-Pi-Token으로 최종 판정)
+    const activeUser = user ?? (await signIn({ silent: true }))
+    if (!activeUser) {
+      toast.error(t('loginRequired'))
       return
     }
     setChecking(true)

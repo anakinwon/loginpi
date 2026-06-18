@@ -34,7 +34,7 @@ export function PiUserCard() {
         <div className="bg-muted flex flex-wrap items-center gap-6 rounded-xl p-6">
           <div className="flex flex-col gap-2">
             <Button
-              onClick={useDevLogin ? devLogin : signIn}
+              onClick={() => (useDevLogin ? devLogin() : signIn())}
               disabled={isLoading}
               className="gap-2"
             >

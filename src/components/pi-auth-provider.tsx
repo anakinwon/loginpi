@@ -20,7 +20,8 @@ interface PiAuthContextValue {
   piAccessToken: string | null
   isLoading: boolean
   isInPiBrowser: boolean
-  signIn: () => Promise<void>
+  // silent=true: 라우터 refresh/이동 없이 재인증만 (결제 직전 세션 복구용). 인증된 user 반환
+  signIn: (opts?: { silent?: boolean }) => Promise<PiSessionUser | null>
   signOut: () => Promise<void>
   devLogin: () => Promise<void>
   updateUser: (patch: Partial<PiSessionUser>) => void
@@ -95,7 +96,7 @@ function SearchParamsWatcher({
   signIn,
   piSdkReady,
 }: {
-  signIn: () => Promise<void>
+  signIn: (opts?: { silent?: boolean }) => Promise<PiSessionUser | null>
   piSdkReady: boolean
 }) {
   const searchParams = useSearchParams()
@@ -137,93 +138,108 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
   // 동시 호출 방지: signIn이 실행 중이면 중복 호출 무시
   const isSigningInRef = useRef(false)
 
-  const signIn = useCallback(async () => {
-    if (!window.Pi) {
-      setIsInPiBrowser(false)
-      setIsLoading(false)
-      return
-    }
-    if (isSigningInRef.current) return
-    isSigningInRef.current = true
-    setIsLoading(true)
-    setError(null)
-    try {
-      await Promise.resolve(
-        window.Pi.init({ version: '2.0', sandbox: detectSandbox() }),
-      )
-
-      // Pi.authenticate()가 일반 브라우저에서 pending 상태로 멈출 수 있으므로 5초 타임아웃
-      const auth = await Promise.race([
-        window.Pi.authenticate(
-          ['username', 'wallet_address', 'payments'],
-          onIncompletePayment,
-        ),
-        new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error('timeout')), 5000),
-        ),
-      ])
-
-      setIsInPiBrowser(true)
-      setPiAccessToken(auth.accessToken)
-
-      // 기존 세션 쿠키 확인 (이미 로그인된 경우 추가 POST 불필요)
-      const checkRes = await fetch('/api/auth/pi', { credentials: 'include' })
-      const { user: existing } = (await checkRes.json()) as {
-        user: PiSessionUser | null
+  const signIn = useCallback(
+    async (opts?: { silent?: boolean }): Promise<PiSessionUser | null> => {
+      if (!window.Pi) {
+        setIsInPiBrowser(false)
+        setIsLoading(false)
+        return null
       }
-      const rawNext = new URLSearchParams(window.location.search).get('next')
-      const next = isSafeNext(rawNext) ? rawNext : null
-      if (existing) {
-        setUser(existing)
-        saveLoginLocation()
-        if (next) {
-          // 쿠키 있음 + next 파라미터 → 목적지로 바로 이동 (전체 페이지 이동으로 쿠키 전달 보장)
-          window.location.assign(next)
-          return
+      if (isSigningInRef.current) return null
+      isSigningInRef.current = true
+      setIsLoading(true)
+      setError(null)
+      try {
+        await Promise.resolve(
+          window.Pi.init({ version: '2.0', sandbox: detectSandbox() }),
+        )
+
+        // window.Pi 존재 = Pi Browser/sandbox. authenticate는 신뢰 가능하나 지도 등
+        // 무거운 화면(Maps SDK·위치권한) 진입 시 지연될 수 있어 타임아웃을 넉넉히(20s) 둔다.
+        // (일반 브라우저는 위 !window.Pi early-return으로 이미 걸러짐)
+        const auth = await Promise.race([
+          window.Pi.authenticate(
+            ['username', 'wallet_address', 'payments'],
+            onIncompletePayment,
+          ),
+          new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error('timeout')), 20000),
+          ),
+        ])
+
+        setIsInPiBrowser(true)
+        setPiAccessToken(auth.accessToken)
+
+        // 기존 세션 쿠키 확인 (이미 로그인된 경우 추가 POST 불필요)
+        const checkRes = await fetch('/api/auth/pi', { credentials: 'include' })
+        const { user: existing } = (await checkRes.json()) as {
+          user: PiSessionUser | null
         }
-        routerRef.current.refresh()
-        return
-      }
+        const rawNext = new URLSearchParams(window.location.search).get('next')
+        const next = isSafeNext(rawNext) ? rawNext : null
+        if (existing) {
+          setUser(existing)
+          saveLoginLocation()
+          // silent(결제 직전 복구): 라우터 이동·refresh 없이 user만 반환
+          if (!opts?.silent) {
+            if (next) {
+              // 쿠키 있음 + next → 목적지로 바로 이동 (전체 페이지 이동으로 쿠키 전달 보장)
+              window.location.assign(next)
+              return existing
+            }
+            routerRef.current.refresh()
+          }
+          return existing
+        }
 
-      // 세션 없음 → 서버 인증 + 세션 토큰 발급.
-      // Pi Browser는 쿠키가 저장되지 않으므로 응답의 token을 localStorage에 보관하고,
-      // 이후 모든 인증 요청에 X-Pi-Token 헤더로 전달한다(piFetch).
-      const res = await fetch('/api/auth/pi', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          accessToken: auth.accessToken,
-          walletAddress: auth.user.wallet_address ?? null,
-        }),
-      })
-      if (!res.ok) {
-        const data = (await res.json()) as { error?: string }
-        throw new Error(data.error ?? '서버 인증 실패')
-      }
-      const data = (await res.json()) as { user: PiSessionUser; token?: string }
-      if (data.token) setPiToken(data.token)
-      setUser(data.user)
-      saveLoginLocation()
+        // 세션 없음 → 서버 인증 + 세션 토큰 발급.
+        // Pi Browser는 쿠키가 저장되지 않으므로 응답의 token을 localStorage에 보관하고,
+        // 이후 모든 인증 요청에 X-Pi-Token 헤더로 전달한다(piFetch).
+        const res = await fetch('/api/auth/pi', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            accessToken: auth.accessToken,
+            walletAddress: auth.user.wallet_address ?? null,
+          }),
+        })
+        if (!res.ok) {
+          const data = (await res.json()) as { error?: string }
+          throw new Error(data.error ?? '서버 인증 실패')
+        }
+        const data = (await res.json()) as {
+          user: PiSessionUser
+          token?: string
+        }
+        if (data.token) setPiToken(data.token)
+        setUser(data.user)
+        saveLoginLocation()
 
-      if (next) {
-        // 목적지로 클라이언트 라우팅(풀 리로드 없음 → 무한 루프 불가).
-        // 보호 페이지가 쿠키로 신원을 못 찾으면(Pi Browser) 클라이언트 게이트가
-        // X-Pi-Token 헤더로 데이터를 로드한다.
-        routerRef.current.push(next)
-      } else {
-        routerRef.current.refresh()
+        if (!opts?.silent) {
+          if (next) {
+            // 목적지로 클라이언트 라우팅(풀 리로드 없음 → 무한 루프 불가).
+            // 보호 페이지가 쿠키로 신원을 못 찾으면(Pi Browser) 클라이언트 게이트가
+            // X-Pi-Token 헤더로 데이터를 로드한다.
+            routerRef.current.push(next)
+          } else {
+            routerRef.current.refresh()
+          }
+        }
+        return data.user
+      } catch (err) {
+        const msg =
+          err instanceof Error ? err.message : 'Pi 인증 중 오류가 발생했습니다'
+        if (msg !== 'timeout') setError(msg)
+        setIsInPiBrowser(false)
+        return null
+      } finally {
+        setIsLoading(false)
+        isSigningInRef.current = false
       }
-    } catch (err) {
-      const msg =
-        err instanceof Error ? err.message : 'Pi 인증 중 오류가 발생했습니다'
-      if (msg !== 'timeout') setError(msg)
-      setIsInPiBrowser(false)
-    } finally {
-      setIsLoading(false)
-      isSigningInRef.current = false
-    }
-  }, [])
+    },
+    [],
+  )
 
   const updateUser = useCallback((patch: Partial<PiSessionUser>) => {
     setUser((prev) => (prev ? { ...prev, ...patch } : prev))
@@ -293,7 +309,7 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!piSdkReady) return
     const hasNext = new URLSearchParams(window.location.search).has('next')
-    if (!hasNext) signIn()
+    if (!hasNext) void signIn()
     // hasNext인 경우: SearchParamsWatcher가 piSdkReady dep으로 재실행되어 처리
   }, [signIn, piSdkReady])
 

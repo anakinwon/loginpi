@@ -41,7 +41,7 @@ export function PiLoginButton() {
   return (
     <div className="flex items-center gap-1">
       <Button
-        onClick={useDevLogin ? devLogin : signIn}
+        onClick={() => (useDevLogin ? devLogin() : signIn())}
         disabled={isLoading}
         size="sm"
         className="gap-1.5"
