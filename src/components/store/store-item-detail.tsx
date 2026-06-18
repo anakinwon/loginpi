@@ -119,23 +119,53 @@ export function StoreItemDetail({ itemId }: { itemId: string }) {
       toast.error('배달 위치를 입력해주세요')
       return
     }
+    // 오프라인 매장 상품은 수량(qty) 반영을 위해 카트 주문 경로 재사용(단일 라인).
+    // 직거래(매장 없음)는 수량 개념이 없어 단건 주문 경로 유지.
+    const isShopItem = !!item?.shop
     setBuying(true)
     try {
-      const res = await piFetch('/api/store/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          item_id: itemId,
-          order_mthd_cd: orderMthd,
-          dlvr_addr: orderMthd === 'DELIVERY' ? dlvrAddr.trim() : undefined,
-        }),
-      })
+      const res = isShopItem
+        ? await piFetch('/api/store/orders/cart', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              shop_id: item!.shop!.shop_id,
+              items: [{ item_id: itemId, qty }],
+              order_mthd_cd: orderMthd,
+              dlvr_addr: orderMthd === 'DELIVERY' ? dlvrAddr.trim() : undefined,
+            }),
+          })
+        : await piFetch('/api/store/orders', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              item_id: itemId,
+              order_mthd_cd: orderMthd,
+              dlvr_addr: orderMthd === 'DELIVERY' ? dlvrAddr.trim() : undefined,
+            }),
+          })
       if (!res.ok) {
         const { error } = (await res.json()) as { error?: string }
         throw new Error(error ?? t('buyFail'))
       }
       const prep = (await res.json()) as OrderPrep
       const orderId = prep.order.order_id
+
+      // 결제 중단·오류 시 주문 취소(재고 복원) — 생성 경로에 맞는 취소 엔드포인트 사용
+      const rollback = () => {
+        if (isShopItem) {
+          void piFetch('/api/store/orders/cart/cancel', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              order_id: orderId,
+              reason: '결제 미완료 (사용자 취소 또는 오류)',
+            }),
+          })
+        } else {
+          void rollbackOrder(orderId)
+        }
+      }
 
       window.Pi.createPayment(
         { amount: prep.amount, memo: prep.memo, metadata: prep.metadata },
@@ -162,11 +192,11 @@ export function StoreItemDetail({ itemId }: { itemId: string }) {
             }
           },
           onCancel: () => {
-            void rollbackOrder(orderId)
+            rollback()
             setBuying(false)
           },
           onError: (e) => {
-            void rollbackOrder(orderId)
+            rollback()
             setBuying(false)
             toast.error(e.message)
           },
