@@ -98,6 +98,7 @@ const MTHD_LABEL: Record<string, string> = {
 const OFFLINE_ACTION_MSG: Partial<Record<OrderAction, string>> = {
   accept: '상품접수 완료 — 준비중',
   ready: '상품완료 — 수령 대기중 (5분 후 자동 판매완료)',
+  pickup: '상품 수령 완료 — 거래가 완료되었습니다',
 }
 
 // ESCROW·SELLER_DONE은 구버전 주문 레거시 상태 — 화면에는 거래중과 동일 계열로 표시
@@ -416,7 +417,17 @@ export function ClientMyOrders({
               📦 상품완료
             </Button>
           )}
-          {/* 상품대기중(READY)은 구매자 액션 없음 — 5분 후 자동 판매완료 */}
+          {/* 오프라인 — 구매자 상품수령 (상품대기중 → 거래완료 + 즉시 정산 송금).
+              미수령 시 5분 후 자동 판매완료(cron)가 안전망. markPickup이 release_txid 멱등이라 중복 안전 */}
+          {role === 'buyer' && o.order_st_cd === 'READY' && (
+            <Button
+              size="sm"
+              disabled={busy}
+              onClick={() => act(o.order_id, 'pickup')}
+            >
+              📦 상품수령
+            </Button>
+          )}
           {(o.order_st_cd === 'PENDING' ||
             (IN_TRADE.includes(o.order_st_cd) &&
               (role === 'buyer' || o.order_st_cd !== 'SELLER_DONE')) ||
@@ -472,7 +483,8 @@ export function ClientMyOrders({
         {o.order_st_cd === 'READY' &&
           (role === 'buyer' ? (
             <p className="text-muted-foreground text-xs">
-              📦 상품이 준비됐어요! 곧 받으실 수 있습니다 (5분 후 자동 판매완료)
+              📦 상품이 준비됐어요! 받으셨으면 「상품수령」을 눌러 거래를
+              완료하세요 (미수령 시 5분 후 자동 판매완료)
             </p>
           ) : (
             // 준비완료 → 판매자가 주문자 호명 (요건)
