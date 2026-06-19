@@ -723,7 +723,8 @@ export async function markPickup(orderId: string, buyerId: string) {
   return order
 }
 
-// 자동완료 배치 — READY + ready_dtm 5분 경과 주문을 DONE 처리 + 판매자 A2U 자동 정산 (on-demand sweep + 5분 cron)
+// 자동완료 배치 — READY + ready_dtm 5분 경과 주문을 DONE 처리 + 판매자 A2U 자동 정산 (3분 주기 cron 단독 호출)
+// 자동완료 기준(ready_dtm + 5분, 고객 안내값)은 유지. cron 주기만 3분으로 좁혀 수거 지연을 단축.
 // 반환: 자동완료된 주문 수
 export async function autoCompleteReadyOrders(): Promise<number> {
   const db = getSupabaseAdmin()

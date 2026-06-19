@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
   if (!user)
     return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
-  // 자동완료·정산은 5분 cron(/api/cron/order-autocomplete)이 단독 담당 — A2U 실송금을
+  // 자동완료·정산은 3분 주기 cron(/api/cron/order-autocomplete)이 단독 담당 — A2U 실송금을
   // fire-and-forget으로 돌리면 응답 후 함수 종료로 송금이 잘릴 수 있어 온디맨드 sweep 제거.
   const role =
     req.nextUrl.searchParams.get('role') === 'seller' ? 'seller' : 'buyer'

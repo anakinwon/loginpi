@@ -10,7 +10,7 @@
     },
     {
       "path": "/api/cron/order-autocomplete",
-      "schedule": "*/5 * * * *"
+      "schedule": "*/3 * * * *"
     }
   ]
 }
