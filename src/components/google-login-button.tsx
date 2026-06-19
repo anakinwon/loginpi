@@ -1,6 +1,6 @@
 'use client'
 
-import { signIn, signOut, useSession } from 'next-auth/react'
+import { signIn, useSession } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { Button } from '@/components/ui/button'
@@ -17,15 +17,13 @@ export function GoogleLoginButton() {
   if (session?.user) {
     return (
       <div className="flex items-center gap-2">
+        {/* 별명 클릭 → /profile(로그아웃 기능 포함). 헤더 로그아웃 버튼은 제거. */}
         <Link
           href="/profile"
-          className="text-sm font-medium text-[navy] hover:underline dark:text-blue-300"
+          className="inline-block max-w-[45vw] truncate align-middle text-sm font-medium whitespace-nowrap text-[navy] hover:underline dark:text-blue-300"
         >
           {session.user.name ?? session.user.email}
         </Link>
-        <Button variant="outline" size="sm" onClick={() => signOut()}>
-          {t('logout')}
-        </Button>
       </div>
     )
   }
