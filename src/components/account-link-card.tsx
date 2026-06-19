@@ -1,7 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { signIn as googleSignIn, useSession } from 'next-auth/react'
+import {
+  signIn as googleSignIn,
+  signOut as googleSignOut,
+  useSession,
+} from 'next-auth/react'
+import { useLocale } from 'next-intl'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { usePiAuth } from './pi-auth-provider'
@@ -15,9 +20,21 @@ export function AccountLinkCard() {
     piAccessToken,
     isLoading: piLoading,
     signIn: piSignIn,
+    signOut: piSignOut,
     isInPiBrowser,
   } = usePiAuth()
   const { data: googleSession } = useSession()
+  const locale = useLocale()
+
+  // 로그인된 세션(Pi·Google)만 로그아웃 버튼 노출 — 헤더에서 제거한 로그아웃을 여기로 이전.
+  const isLoggedIn = !!piUser || !!googleSession?.user
+
+  // 활성 세션 정리: Pi(토큰·쿠키 → router.refresh) + Google(NextAuth → 홈 리다이렉트).
+  // 연동 계정이면 양쪽 다 정리. Google이 있으면 리다이렉트가 최종 처리.
+  async function handleLogout() {
+    if (piUser) await piSignOut()
+    if (googleSession?.user) await googleSignOut({ callbackUrl: `/${locale}` })
+  }
 
   const [genStatus, setGenStatus] = useState<
     'idle' | 'loading' | 'done' | 'error'
@@ -113,9 +130,7 @@ export function AccountLinkCard() {
   if (piLoading || linkStatusLoading) {
     return (
       <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm">계정 연동</CardTitle>
-        </CardHeader>
+        <LinkCardHeader showLogout={isLoggedIn} onLogout={handleLogout} />
         <CardContent>
           <div className="text-muted-foreground flex items-center gap-2 text-xs">
             <div className="border-muted-foreground h-3 w-3 animate-spin rounded-full border border-t-transparent" />
@@ -130,9 +145,7 @@ export function AccountLinkCard() {
   if (linkStatus?.linked) {
     return (
       <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm">계정 연동</CardTitle>
-        </CardHeader>
+        <LinkCardHeader showLogout={isLoggedIn} onLogout={handleLogout} />
         <CardContent className="space-y-3 text-sm">
           <div className="space-y-3 rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-950/30">
             <p className="text-xs font-semibold text-green-700 dark:text-green-400">
@@ -290,6 +303,31 @@ export function AccountLinkCard() {
         </div>
       </CardContent>
     </Card>
+  )
+}
+
+// 계정 연동 카드 헤더 — 제목 좌측 + 로그아웃 버튼 우측 상단(로그인 상태에서만 노출).
+function LinkCardHeader({
+  showLogout,
+  onLogout,
+}: {
+  showLogout: boolean
+  onLogout: () => void
+}) {
+  return (
+    <CardHeader className="flex flex-row items-center justify-between pb-3">
+      <CardTitle className="text-sm">계정 연동</CardTitle>
+      {showLogout && (
+        <Button
+          variant="outline"
+          size="sm"
+          className="text-muted-foreground h-7 px-2 text-xs"
+          onClick={onLogout}
+        >
+          로그아웃
+        </Button>
+      )}
+    </CardHeader>
   )
 }
 
