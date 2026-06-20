@@ -146,7 +146,36 @@ export async function createCartOrder(
     console.error('[cart order] RPC error:', error.message) // 서버 로그만(클라이언트 미노출)
     return { error: mapRpcError(error.message) }
   }
-  return { order: data as MpsOrder }
+  const order = data as MpsOrder
+
+  // 자국통화 헤더 스냅샷 — 카트 RPC는 라인(mps_order_item)에만 ccy를 기록하므로
+  // 정산이 참조하는 헤더(mps_order)에 라인 합계 SUM(ccy_amt×ord_qty)를 사후 반영.
+  // (단건 createOrder의 헤더 ccy 복사와 동일 취지 — 없으면 settleOrder의 자국통화가 NULL로 전파됨)
+  const { data: lines } = await getSupabaseAdmin()
+    .from('mps_order_item')
+    .select('ccy_cd, ccy_amt, ord_qty')
+    .eq('order_id', order.order_id)
+  const ccyLines = (
+    (lines ?? []) as {
+      ccy_cd: string | null
+      ccy_amt: number | null
+      ord_qty: number | null
+    }[]
+  ).filter((l) => l.ccy_cd)
+  if (ccyLines.length > 0) {
+    const ccyAmt = ccyLines.reduce(
+      (s, l) => s + Number(l.ccy_amt ?? 0) * Number(l.ord_qty ?? 1),
+      0,
+    )
+    const { data: updated } = await getSupabaseAdmin()
+      .from('mps_order')
+      .update({ ccy_cd: ccyLines[0].ccy_cd, ccy_amt: ccyAmt, modr_id: regrId })
+      .eq('order_id', order.order_id)
+      .select('*')
+      .single()
+    if (updated) return { order: updated as MpsOrder }
+  }
+  return { order }
 }
 
 // 카트 주문 롤백 — 결제 미완료(PENDING) 라인 전체 재고 복원 + CANCELLED (RPC)
