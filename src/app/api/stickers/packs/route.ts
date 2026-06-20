@@ -14,7 +14,7 @@ interface PackRow {
   pack_id: string
   pack_nm: string
   pack_desc: string | null
-  price_pi: number
+  price_bean: number
   is_dflt_yn: string
   ownr_usr_id: string | null
 }
@@ -30,13 +30,13 @@ export async function GET() {
   // TASK-074: 노출 범위 — 플랫폼 기본팩(ownr 없음) + 마켓 판매 커스텀팩 + 내가 만든 팩
   const { data: allPacks } = await db
     .from('msg_stkr_pack')
-    .select('pack_id, pack_nm, pack_desc, price_pi, is_dflt_yn, ownr_usr_id')
+    .select('pack_id, pack_nm, pack_desc, price_bean, is_dflt_yn, ownr_usr_id')
     .eq('use_yn', 'Y')
     .eq('del_yn', 'N')
     .or(`ownr_usr_id.is.null,mkt_yn.eq.Y,ownr_usr_id.eq.${user.id}`)
     // sort_ord(노출 순서) 우선, 같으면 가격순 — 골프 인사/응원팩 등 우선 노출 팩 제어
     .order('sort_ord')
-    .order('price_pi')
+    .order('price_bean')
 
   if (!allPacks?.length) {
     return NextResponse.json({ ownedPacks: [], storePacks: [] })
@@ -62,9 +62,9 @@ export async function GET() {
 
   const ownedPackIds = new Set<string>([
     ...(myRows ?? []).map((r: { pack_id: string }) => r.pack_id),
-    // 무료팩(기본팩 or price_pi=0)은 항상 보유로 처리
+    // 무료팩(기본팩 or price_bean=0)은 항상 보유로 처리
     ...packs
-      .filter((p) => p.is_dflt_yn === 'Y' || Number(p.price_pi) === 0)
+      .filter((p) => p.is_dflt_yn === 'Y' || Number(p.price_bean) === 0)
       .map((p) => p.pack_id),
   ])
 

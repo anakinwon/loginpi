@@ -18,7 +18,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
     db
       .from('msg_stkr_pack')
       .select(
-        'pack_id, pack_nm, pack_desc, theme_cd, price_pi, is_dflt_yn, use_yn, ownr_usr_id, mkt_yn, reg_dtm',
+        'pack_id, pack_nm, pack_desc, theme_cd, price_bean, is_dflt_yn, use_yn, ownr_usr_id, mkt_yn, reg_dtm',
       )
       .eq('pack_id', packId)
       .eq('del_yn', 'N')
@@ -52,12 +52,12 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   } catch {
     return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
   }
-  const { pack_nm, pack_desc, theme_cd, price_pi, use_yn, is_dflt_yn } =
+  const { pack_nm, pack_desc, theme_cd, price_bean, use_yn, is_dflt_yn } =
     body as {
       pack_nm?: string
       pack_desc?: string
       theme_cd?: string | null
-      price_pi?: number
+      price_bean?: number
       use_yn?: string
       is_dflt_yn?: string
     }
@@ -79,15 +79,15 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   }
   if (pack_desc !== undefined) update.pack_desc = pack_desc.trim() || null
   if (theme_cd !== undefined) update.theme_cd = theme_cd || null
-  if (price_pi !== undefined) {
-    const price = Number(price_pi)
-    if (!Number.isFinite(price) || price < 0 || price > 1000) {
+  if (price_bean !== undefined) {
+    const price = Number(price_bean)
+    if (!Number.isInteger(price) || price < 0 || price > 100000) {
       return NextResponse.json(
-        { error: '가격은 0~1000 Pi여야 합니다' },
+        { error: '가격은 0~100000 Bean 정수여야 합니다' },
         { status: 400 },
       )
     }
-    update.price_pi = price
+    update.price_bean = price
   }
   if (use_yn !== undefined) update.use_yn = use_yn === 'Y' ? 'Y' : 'N'
   if (is_dflt_yn !== undefined)

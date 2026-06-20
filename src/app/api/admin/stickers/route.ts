@@ -21,7 +21,7 @@ export async function GET() {
       .from('msg_stkr_pack')
       .select(
         `
-          pack_id, pack_nm, pack_desc, theme_cd, price_pi, is_dflt_yn, use_yn,
+          pack_id, pack_nm, pack_desc, theme_cd, price_bean, is_dflt_yn, use_yn,
           ownr_usr_id, mkt_yn, reg_dtm,
           msg_theme(theme_nm, theme_emoji)
         `,
@@ -74,11 +74,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
   }
 
-  const { pack_nm, pack_desc, theme_cd, price_pi, is_dflt_yn } = body as {
+  const { pack_nm, pack_desc, theme_cd, price_bean, is_dflt_yn } = body as {
     pack_nm?: string
     pack_desc?: string
     theme_cd?: string
-    price_pi?: number
+    price_bean?: number
     is_dflt_yn?: string
   }
 
@@ -89,10 +89,10 @@ export async function POST(req: NextRequest) {
       { status: 400 },
     )
   }
-  const price = Number(price_pi ?? 0)
-  if (!Number.isFinite(price) || price < 0 || price > 1000) {
+  const price = Number(price_bean ?? 0)
+  if (!Number.isInteger(price) || price < 0 || price > 100000) {
     return NextResponse.json(
-      { error: '가격은 0~1000 Pi여야 합니다' },
+      { error: '가격은 0~100000 Bean 정수여야 합니다' },
       { status: 400 },
     )
   }
@@ -120,7 +120,7 @@ export async function POST(req: NextRequest) {
       pack_nm: name,
       pack_desc: pack_desc?.trim() || null,
       theme_cd: theme_cd || null,
-      price_pi: price,
+      price_bean: price,
       is_dflt_yn: is_dflt_yn === 'Y' ? 'Y' : 'N',
       regr_id: 'ADMIN',
       modr_id: 'ADMIN',

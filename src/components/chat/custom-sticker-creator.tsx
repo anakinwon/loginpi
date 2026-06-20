@@ -14,7 +14,7 @@ export function CustomStickerCreator({
   onClose: () => void
 }) {
   const [packNm, setPackNm] = useState('')
-  const [pricePi, setPricePi] = useState('0.5')
+  const [priceBean, setPriceBean] = useState('50')
   const [mktYn, setMktYn] = useState(false)
   const [files, setFiles] = useState<File[]>([])
   const [submitting, setSubmitting] = useState(false)
@@ -40,7 +40,7 @@ export function CustomStickerCreator({
     try {
       const fd = new FormData()
       fd.set('pack_nm', packNm.trim())
-      fd.set('price_pi', mktYn ? pricePi : '0')
+      fd.set('price_bean', mktYn ? priceBean : '0')
       fd.set('mkt_yn', mktYn ? 'Y' : 'N')
       for (const f of files) fd.append('files', f)
 
@@ -145,18 +145,18 @@ export function CustomStickerCreator({
               checked={mktYn}
               onChange={(e) => setMktYn(e.target.checked)}
             />
-            마켓플레이스에 판매 (다른 사용자가 Pi로 구매)
+            마켓플레이스에 판매 (다른 사용자가 Bean으로 구매)
           </label>
           {mktYn && (
             <div className="flex items-center gap-2">
-              <label className="text-muted-foreground text-xs">판매가 π</label>
+              <label className="text-muted-foreground text-xs">판매가 ☕ Bean</label>
               <input
                 type="number"
-                value={pricePi}
-                onChange={(e) => setPricePi(e.target.value)}
+                value={priceBean}
+                onChange={(e) => setPriceBean(e.target.value)}
                 min="0"
-                max="100"
-                step="0.1"
+                max="10000"
+                step="1"
                 className="w-24 rounded-lg border bg-transparent px-2.5 py-1.5 text-sm"
               />
             </div>

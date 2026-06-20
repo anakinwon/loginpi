@@ -218,7 +218,7 @@ export async function POST(request: NextRequest, { params }: Params) {
 
     const { data: packRow } = await db
       .from('msg_stkr_pack')
-      .select('pack_id, price_pi, is_dflt_yn')
+      .select('pack_id, price_bean, is_dflt_yn')
       .eq('pack_id', (stkrRow as { pack_id: string }).pack_id)
       .eq('del_yn', 'N')
       .maybeSingle()
@@ -232,10 +232,10 @@ export async function POST(request: NextRequest, { params }: Params) {
 
     const pack = packRow as {
       pack_id: string
-      price_pi: number
+      price_bean: number
       is_dflt_yn: string
     }
-    const isFree = pack.is_dflt_yn === 'Y' || Number(pack.price_pi) === 0
+    const isFree = pack.is_dflt_yn === 'Y' || Number(pack.price_bean) === 0
 
     if (!isFree) {
       const { data: ownership } = await db

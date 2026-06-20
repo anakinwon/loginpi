@@ -16,7 +16,6 @@ interface Sticker {
 interface OwnedPack {
   pack_id: string
   pack_nm: string
-  price_pi: number
   stickers: Sticker[]
   is_custom?: boolean
 }
@@ -24,7 +23,7 @@ interface OwnedPack {
 interface StorePack {
   pack_id: string
   pack_nm: string
-  price_pi: number
+  price_bean: number
   preview_stickers: Sticker[]
 }
 
@@ -81,62 +80,41 @@ export function StickerPicker({
 
   const buyPack = useCallback(
     async (packId: string, packNm: string) => {
-      if (!window.Pi) {
-        toast.error('Pi Browser에서만 구매할 수 있습니다')
-        return
-      }
       setBuying(packId)
       try {
-        const prep = await piFetch(`/api/stickers/packs/${packId}/buy`, {
+        const res = await piFetch(`/api/stickers/packs/${packId}/buy`, {
           method: 'POST',
         })
-        if (!prep.ok) {
-          const d = (await prep.json()) as { error?: string }
-          throw new Error(d.error ?? '결제 준비 실패')
-        }
-        const params = (await prep.json()) as {
-          amount: number
-          memo: string
-          metadata: Record<string, unknown>
+        const data = (await res.json()) as {
+          ok?: boolean
+          error?: string
+          requiresBean?: boolean
+          feeBean?: number
         }
 
-        window.Pi.createPayment(params, {
-          onReadyForServerApproval: async (paymentId) => {
-            await fetch('/api/payments/approve', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ paymentId }),
-            })
-          },
-          onReadyForServerCompletion: async (paymentId, txid) => {
-            const res = await fetch('/api/payments/complete', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ paymentId, txid }),
-            })
-            setBuying(null)
-            if (res.ok) {
-              toast.success(`${packNm} 구매 완료! 🎉`)
-              const updated = await loadPacks().catch(() => null)
-              if (updated) {
-                setOwnedPacks(updated.ownedPacks)
-                setStorePacks(updated.storePacks)
-                setActivePackId(packId)
-                setShowStore(false)
-              }
-            } else {
-              toast.error('구매 완료 처리 실패')
-            }
-          },
-          onCancel: () => setBuying(null),
-          onError: (e) => {
-            setBuying(null)
-            toast.error(e.message)
-          },
-        })
+        if (!res.ok) {
+          if (data.requiresBean) {
+            toast.error(
+              `Bean이 부족합니다 (${data.feeBean ?? 0} Bean 필요). /bean 에서 충전하세요.`,
+            )
+          } else {
+            toast.error(data.error ?? '구매 실패')
+          }
+          return
+        }
+
+        toast.success(`${packNm} 구매 완료!`)
+        const updated = await loadPacks().catch(() => null)
+        if (updated) {
+          setOwnedPacks(updated.ownedPacks)
+          setStorePacks(updated.storePacks)
+          setActivePackId(packId)
+          setShowStore(false)
+        }
       } catch (e) {
-        setBuying(null)
         toast.error(e instanceof Error ? e.message : '구매 오류')
+      } finally {
+        setBuying(null)
       }
     },
     [loadPacks],
@@ -326,7 +304,7 @@ function StoreView({
               disabled={buying === pack.pack_id}
               className="bg-primary text-primary-foreground rounded-lg px-2 py-1 text-xs font-medium disabled:opacity-50"
             >
-              {buying === pack.pack_id ? '결제 중…' : `π${pack.price_pi}`}
+              {buying === pack.pack_id ? '구매 중…' : `${pack.price_bean} Bean`}
             </button>
           </div>
           {pack.preview_stickers.length > 0 && (

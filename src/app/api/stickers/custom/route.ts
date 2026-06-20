@@ -4,7 +4,7 @@ import { getSessionUser } from '@/lib/auth-check'
 import { getChatPlan } from '@/lib/chat-auth'
 
 // TASK-074: 커스텀 스티커 제작 (Business 전용)
-// POST /api/stickers/custom — multipart: pack_nm, price_pi, mkt_yn, files(1~10)
+// POST /api/stickers/custom — multipart: pack_nm, price_bean, mkt_yn, files(1~10)
 // 제작은 Business 플랜 포함 기능 — 마켓 판매 시 구매자는 기존 STICKER_PACK 결제 흐름 사용
 const MAX_STICKERS = 10
 const MAX_BYTES = 2 * 1024 * 1024 // 스티커 1장 2MB
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
   }
 
   const packNm = String(formData.get('pack_nm') ?? '').trim()
-  const pricePi = Number(formData.get('price_pi') ?? 0)
+  const priceBean = Number(formData.get('price_bean') ?? 0)
   const mktYn = formData.get('mkt_yn') === 'Y' ? 'Y' : 'N'
   const files = formData
     .getAll('files')
@@ -58,9 +58,9 @@ export async function POST(request: NextRequest) {
       { status: 400 },
     )
   }
-  if (!Number.isFinite(pricePi) || pricePi < 0 || pricePi > 100) {
+  if (!Number.isInteger(priceBean) || priceBean < 0 || priceBean > 10000) {
     return NextResponse.json(
-      { error: '판매가는 0~100 Pi여야 합니다' },
+      { error: '판매가는 0~10000 Bean 정수여야 합니다' },
       { status: 400 },
     )
   }
@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
     .insert({
       pack_nm: packNm,
       pack_desc: `${user.display_name} 님의 커스텀 스티커팩`,
-      price_pi: pricePi,
+      price_bean: priceBean,
       is_dflt_yn: 'N',
       ownr_usr_id: user.id,
       mkt_yn: mktYn,

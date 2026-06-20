@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth-check'
+import { applyBean } from '@/lib/bean'
 
 type Params = { params: Promise<{ packId: string }> }
 
-// POST /api/stickers/packs/[packId]/buy — Pi 결제 파라미터 반환
+// POST /api/stickers/packs/[packId]/buy — Bean 차감 후 즉시 소유권 부여
+// (기존 Pi 3단계 결제 흐름 → Bean 단일 서버 호출로 전환: PRD_15_FEE §1-6 #8)
 export async function POST(_req: NextRequest, { params }: Params) {
   const { packId } = await params
   const user = await getSessionUser()
@@ -15,7 +17,7 @@ export async function POST(_req: NextRequest, { params }: Params) {
 
   const { data: pack } = await db
     .from('msg_stkr_pack')
-    .select('pack_id, pack_nm, price_pi')
+    .select('pack_id, pack_nm, price_bean, is_dflt_yn')
     .eq('pack_id', packId)
     .eq('use_yn', 'Y')
     .eq('del_yn', 'N')
@@ -28,16 +30,22 @@ export async function POST(_req: NextRequest, { params }: Params) {
     )
   }
 
-  const packRow = pack as { pack_id: string; pack_nm: string; price_pi: number }
+  const packRow = pack as {
+    pack_id: string
+    pack_nm: string
+    price_bean: number
+    is_dflt_yn: string
+  }
 
-  if (Number(packRow.price_pi) === 0) {
+  const isFree = packRow.is_dflt_yn === 'Y' || Number(packRow.price_bean) === 0
+  if (isFree) {
     return NextResponse.json(
       { error: '무료 팩은 구매가 필요 없습니다' },
       { status: 400 },
     )
   }
 
-  // 이미 보유 여부 확인 (중복 구매 방지)
+  // 중복 구매 방지
   const { data: existing } = await db
     .from('msg_usr_stkr')
     .select('usr_stkr_id')
@@ -53,13 +61,44 @@ export async function POST(_req: NextRequest, { params }: Params) {
     )
   }
 
-  return NextResponse.json({
-    amount: Number(packRow.price_pi),
+  const feeBean = Number(packRow.price_bean)
+  const slug = String(user.display_name ?? 'user').slice(0, 20)
+
+  // Bean 차감 (잔액 부족 시 402)
+  const charge = await applyBean({
+    usrId: user.id,
+    txnTp: 'SPEND',
+    beanAmt: -feeBean,
+    refTp: 'STICKER_PACK',
+    refId: packId,
     memo: `스티커팩 구매: ${packRow.pack_nm}`,
-    metadata: {
-      type: 'STICKER_PACK',
-      pack_id: packId,
-      pack_nm: packRow.pack_nm,
-    },
+    regrId: slug,
   })
+
+  if (!charge.ok) {
+    return NextResponse.json(
+      {
+        error: 'Bean 잔액이 부족합니다. 충전 후 다시 시도하세요.',
+        requiresBean: true,
+        feeBean,
+      },
+      { status: 402 },
+    )
+  }
+
+  // 소유권 UPSERT (Bean 차감 성공 후)
+  await db.from('msg_usr_stkr').upsert(
+    {
+      usr_id: user.id,
+      pack_id: packRow.pack_id,
+      del_yn: 'N',
+      del_dtm: null,
+      regr_id: slug,
+      modr_id: slug,
+      mod_dtm: new Date().toISOString(),
+    },
+    { onConflict: 'usr_id,pack_id' },
+  )
+
+  return NextResponse.json({ ok: true, balance: charge.balance })
 }
