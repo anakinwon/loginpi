@@ -13,6 +13,11 @@ interface WalletData {
   txns: BeanTxn[]
 }
 
+// reg_dtm(TIMESTAMPTZ)을 사용자 현지 시간대 기준 날짜 + 시·분·초로 표시
+function formatLocal(dtm: string): string {
+  return new Date(dtm).toLocaleString() // 디바이스 로컬 시간대로 자동 변환
+}
+
 // 거래 유형별 배지 색·부호
 const TXN_STYLE: Record<string, { color: string; emoji: string }> = {
   CHARGE: {
@@ -225,8 +230,8 @@ export function ClientBeanWallet({ serverAuthed }: { serverAuthed: boolean }) {
                     >
                       {t(`type.${tx.txn_tp_cd}`)}
                     </span>
-                    <span className="text-muted-foreground text-xs">
-                      {new Date(tx.reg_dtm).toLocaleDateString()}
+                    <span className="text-muted-foreground text-xs tabular-nums">
+                      {formatLocal(tx.reg_dtm)}
                       {tx.pi_amt != null && ` · ${tx.pi_amt}π`}
                     </span>
                   </div>
