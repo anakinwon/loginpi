@@ -203,6 +203,15 @@ export function StoreItemList({ mine = false }: StoreItemListProps) {
     }
   }, [mine, page, keyword, cnd, ctgr, sort, userLat, userLng])
 
+  // 카페 마켓플레이스와 동일하게 입력 즉시(300ms debounce) 검색 — 엔터 불필요
+  useEffect(() => {
+    const id = setTimeout(() => {
+      setPage(1)
+      setKeyword(searchInput.trim())
+    }, 300)
+    return () => clearTimeout(id)
+  }, [searchInput])
+
   useEffect(() => {
     void load()
   }, [load])
