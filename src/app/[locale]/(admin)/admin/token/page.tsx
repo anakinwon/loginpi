@@ -67,6 +67,151 @@ function KpiCard({
   )
 }
 
+// 대차대조표 한 줄 (라벨 + Bean + π 환산)
+function BsRow({
+  label,
+  bean,
+  indent,
+  strong,
+  dotColor,
+}: {
+  label: string
+  bean: number
+  indent?: boolean
+  strong?: boolean
+  dotColor?: string
+}) {
+  return (
+    <div
+      className={`flex items-baseline justify-between gap-2 py-1.5 ${indent ? 'pl-4' : ''}`}
+    >
+      <span
+        className={`flex items-center gap-1.5 text-sm ${strong ? 'font-semibold' : 'text-muted-foreground'}`}
+      >
+        {dotColor && (
+          <span className={`inline-block h-2 w-2 rounded-full ${dotColor}`} />
+        )}
+        {label}
+      </span>
+      <span className="text-right">
+        <span
+          className={`tabular-nums ${strong ? 'text-base font-bold' : 'text-sm font-medium'}`}
+        >
+          {bean.toLocaleString()}
+        </span>
+        <span className="text-muted-foreground ml-1.5 text-xs tabular-nums">
+          ≈ π{(bean / 100).toFixed(2)}
+        </span>
+      </span>
+    </div>
+  )
+}
+
+// Bean 대차대조표 — 차변(발행) = 대변(유통 + 회수)
+function BalanceSheet({ kpi }: { kpi: TokenKpi }) {
+  const debit = kpi.total_issued_bean // 차변: 발행 원천
+  const credit = kpi.circulating_bean + kpi.total_collected_bean // 대변: 현재 소재
+  const diff = debit - credit // 0이면 균형
+  const balanced = Math.abs(diff) <= 1
+
+  return (
+    <div className="border-border overflow-hidden rounded-lg border">
+      {/* 헤더 */}
+      <div className="bg-muted/40 flex items-center justify-between border-b px-4 py-2.5">
+        <p className="text-sm font-semibold">Bean 대차대조표</p>
+        {balanced ? (
+          <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-semibold text-green-700 dark:bg-green-950/40 dark:text-green-400">
+            ✓ 균형 (차변 = 대변)
+          </span>
+        ) : (
+          <span className="rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-700 dark:bg-red-950/40 dark:text-red-400">
+            ✗ 불일치 diff {diff > 0 ? '+' : ''}
+            {diff.toLocaleString()}
+          </span>
+        )}
+      </div>
+
+      {/* T 계정: 차변 | 대변 (모바일 세로 / md 이상 2열) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 md:divide-x">
+        {/* ── 차변 (좌변) ── */}
+        <div className="border-b px-4 py-3 md:border-b-0">
+          <p className="text-muted-foreground mb-1 text-xs font-semibold uppercase tracking-wide">
+            차변 (발행 — 원천)
+          </p>
+          <BsRow
+            label="총 발행량"
+            bean={kpi.total_issued_bean}
+            strong
+            dotColor="bg-blue-500"
+          />
+          <p className="text-muted-foreground mt-0.5 text-xs">
+            전체 CHARGE 합계 — Pi 충전으로 발행된 Bean 총량
+          </p>
+        </div>
+
+        {/* ── 대변 (우변) ── */}
+        <div className="px-4 py-3">
+          <p className="text-muted-foreground mb-1 text-xs font-semibold uppercase tracking-wide">
+            대변 (소재 — 유통 + 회수)
+          </p>
+          <BsRow
+            label="유통 (사용자 보유)"
+            bean={kpi.circulating_bean}
+            strong
+            dotColor="bg-green-500"
+          />
+          <div className="mt-1.5 border-t pt-1.5">
+            <BsRow
+              label="회수 소계 (거버넌스)"
+              bean={kpi.total_collected_bean}
+              strong
+              dotColor="bg-amber-500"
+            />
+            <BsRow
+              label="PLATFORM 운영"
+              bean={kpi.platform_balance_bean}
+              indent
+              dotColor="bg-purple-400"
+            />
+            <BsRow
+              label="REWARD_POOL 생태계"
+              bean={kpi.reward_pool_balance_bean}
+              indent
+              dotColor="bg-teal-400"
+            />
+            <BsRow
+              label="FOUNDATION 재단"
+              bean={kpi.foundation_balance_bean}
+              indent
+              dotColor="bg-rose-400"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* 합계 행 (차변 합계 = 대변 합계) */}
+      <div className="grid grid-cols-1 border-t md:grid-cols-2 md:divide-x">
+        <div className="bg-muted/30 flex items-baseline justify-between border-b px-4 py-2.5 md:border-b-0">
+          <span className="text-sm font-bold">차변 합계</span>
+          <span className="text-base font-bold tabular-nums">
+            {debit.toLocaleString()}
+          </span>
+        </div>
+        <div
+          className={`flex items-baseline justify-between px-4 py-2.5 ${balanced ? 'bg-muted/30' : 'bg-red-50 dark:bg-red-950/20'}`}
+        >
+          <span className="text-sm font-bold">대변 합계</span>
+          <span
+            className={`text-base font-bold tabular-nums ${balanced ? '' : 'text-red-600 dark:text-red-400'}`}
+          >
+            {credit.toLocaleString()}
+          </span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function TokenAdminPage() {
   const [data, setData] = useState<StatsResponse | null>(null)
   const [loading, setLoading] = useState(true)
@@ -116,6 +261,9 @@ export default function TokenAdminPage() {
               ) + 회수({kpi.total_collected_bean}). DB 점검 필요.
             </div>
           )}
+
+          {/* Bean 대차대조표 (차변 = 대변) — 메인 */}
+          <BalanceSheet kpi={kpi} />
 
           {/* 공급량 KPI 3종 */}
           <div>
@@ -174,43 +322,11 @@ export default function TokenAdminPage() {
             </div>
           </div>
 
-          {/* 항등식 + 배분 상세 */}
-          <div className="border-border rounded-lg border p-4">
-            <p className="text-muted-foreground mb-3 text-xs font-semibold uppercase tracking-wide">
-              Bean 항등식 검증
-            </p>
-            <p className="font-mono text-sm">
-              <span className="text-blue-600 dark:text-blue-400">
-                발행 {kpi.total_issued_bean.toLocaleString()}
-              </span>
-              {' = '}
-              <span className="text-green-600 dark:text-green-400">
-                유통 {kpi.circulating_bean.toLocaleString()}
-              </span>
-              {' + '}
-              <span className="text-purple-600 dark:text-purple-400">
-                PLATFORM {kpi.platform_balance_bean.toLocaleString()}
-              </span>
-              {' + '}
-              <span className="text-rose-600 dark:text-rose-400">
-                FOUNDATION {kpi.foundation_balance_bean.toLocaleString()}
-              </span>
-              {' + '}
-              <span className="text-teal-600 dark:text-teal-400">
-                REWARD_POOL {kpi.reward_pool_balance_bean.toLocaleString()}
-              </span>
-              {' '}
-              {kpi.identity_ok ? (
-                <span className="text-green-600 dark:text-green-400">✓ 일치</span>
-              ) : (
-                <span className="text-red-600">✗ 불일치</span>
-              )}
-            </p>
-            <p className="text-muted-foreground mt-2 text-xs">
-              소비(SPEND/SUBSCRIBE/TIP/FEE) 회수분 배분: 운영 70% → PLATFORM · 생태계 20% →
-              REWARD_POOL · 재단 10% → FOUNDATION
-            </p>
-          </div>
+          {/* 배분 정책 안내 */}
+          <p className="text-muted-foreground text-xs">
+            소비(SPEND/SUBSCRIBE/TIP/FEE) 회수분 배분: 운영 70% → PLATFORM · 생태계 20% →
+            REWARD_POOL · 재단 10% → FOUNDATION · 환불(REFUND)은 동일 비율로 역차감
+          </p>
         </>
       )}
     </div>
