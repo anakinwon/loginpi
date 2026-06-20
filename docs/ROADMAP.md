@@ -569,15 +569,21 @@ Step 4: Pi 결제 (BASIC 0.1 π / PREMIUM 0.3 π)
 
 #### 구현 파일
 
-- ✅ `src/lib/chat-auth.ts` — `getChatPlan()`·`canCreateRoom()`·`canSendTip()`·`getAiQuota()` (server-only). 등급별 한도를 `PLAN_CAPS` 단일 매트릭스로 관리(무제한 = `-1` 센티넬)
-- ✅ `GET /api/subscriptions/plans` — 플랜 목록 + 현재 사용자 등급
-- ✅ `POST /api/subscriptions` — 구독 결제 준비. 서버가 `price_pi`로 amount를 권위 있게 확정해 `createPayment` 파라미터 반환(metadata.type=`CHAT_SUBSCR`)
-- ✅ `DELETE /api/subscriptions` — 구독 취소. `auto_renew_yn='N'`만 해제하고 `expire_dtm`까지 이용 유지(만료 시 `getChatPlan`이 자동 FREE 강등). 즉시 논리삭제는 환불정책+PiRC2 `cancel()` 연동 시로 보류
-- ✅ `GET /api/subscriptions/check` — 기능별 권한 매트릭스 `{ tier, canTip, canUsePremiumTheme, canCreateEventRoom, canCreateRoomFree, aiQuota... }`
-- ✅ `/api/payments/complete` — `CHAT_SUBSCR` 분기 추가. 결제 amount ≥ `price_pi` 서버 재검증 후 `mth_cnt` 기반 만료일 계산 + `msg_subscr` UPSERT(`usr_id` UNIQUE)
-- ✅ `src/components/chat/subscription-gate.tsx` — 유료 기능 접근 게이트(piFetch 권한확인 → 잠금 시 InlinePurchasePrompt 구독 결제)
+> ⚠️ **2026-06-20 Bean 구독 전환** (PRD_15_FEE §1-6 순위1): 채팅 권한 출처를 레거시 `msg_subscr`(Pi)에서 `bean_subscr`(Bean)로 일원화. 아래 목록은 전환 후 현행 상태.
+
+- ✅ `src/lib/chat-auth.ts` — `getChatPlan()`·`canCreateRoom()`·`canSendTip()`·`canAutoTranslate()`·`getAiQuota()` (server-only). 등급별 한도를 `PLAN_CAPS` 단일 매트릭스로 관리(무제한 = `-1` 센티넬). **권한 출처 = `bean_subscr`** — PICAFE 구독→PREMIUM 캡, TRANSLATE 구독→자동번역, 운영자→BUSINESS. 레거시 `msg_subscr` 미참조
+- ✅ `POST /api/subscriptions/products/subscribe` — **현행 구독 결제**(Bean SPEND). 서버 권위 금액(`bean-subscr-plan.ts`) → `fn_bean_subscribe_product`(Bean 차감 원자처리). 잔액부족 402 → `/bean` 충전 유도
+- ✅ `DELETE /api/subscriptions` — 구독 취소. `bean_subscr` 활성 구독 자동갱신 해제(`auto_renew_yn='N'`), `expire_dtm`까지 이용 유지(만료 시 `getChatPlan`이 자동 FREE 강등)
+- ✅ `GET /api/subscriptions/check` — 기능별 권한 매트릭스 `{ tier, canTip, canUsePremiumTheme, canCreateEventRoom, canCreateRoomFree, aiQuota... }` (`getChatPlan` 기반 → Bean 구독 자동 인식)
+- ✅ `src/components/chat/subscription-gate.tsx` — 유료 기능 접근 게이트(piFetch 권한확인 → 잠금 시 `/subscribe`(Bean) 유도)
+- ⚠️ `POST /api/subscriptions` — **410 폐기**(레거시 Pi 구독 결제 준비, `CHAT_SUBSCR`)
+- ⚠️ `/api/payments/complete` `CHAT_SUBSCR` 분기 — **제거됨**(레거시 Pi 구독 폐기)
+- ⚠️ `GET /api/subscriptions/plans` — 레거시 `msg_subscr_plan` 목록 조회(死코드, 후속 정리 대상)
+- 🗑️ `src/hooks/use-subscribe-plan.ts` — **삭제**(레거시 Pi 구독 결제 훅)
 
 #### PiRC2 통합 전략
+
+> 🗑️ **2026-06-20 폐기 — 아래는 역사적 기록**: 단기 U2A 흐름(Pi `createPayment` → `msg_subscr` UPSERT), Pi 가격표(PREMIUM_MONTHLY 1π 등), `CHAT_SUBSCR` 코드 예시는 모두 **레거시**다. 현행 구독은 Bean 결제(`bean_subscr` + `fn_bean_subscribe_product`, 1 Pi = 100 Bean)로 전환됨 — 가격 정본 = `src/lib/bean-subscr-plan.ts`(PRD_15_FEE §4-1), 권한 = `getChatPlan`(bean_subscr 기반). 상세 = PRD_15_FEE §1-6 순위1.
 
 **단기 (TASK-054)**: 기존 U2A 결제 흐름 유지 — Pi SDK `createPayment()` → `/payments/complete`에서 `msg_subscr` UPSERT. PiRC2 컨트랙트 없이 앱 레벨 구독 관리.
 
@@ -1583,6 +1589,7 @@ if (meta?.type === 'CHAT_SUBSCR') {
 
 | 버전 | 날짜 | 변경 내용 | 작성자 |
 |------|------|---------|-------|
+| v10.7 | 2026-06-20 | **레거시 Pi 구독(CHAT_SUBSCR) → Bean 구독 흡수 ✅** (PRD_15_FEE §1-6 순위1) — 채팅 권한 출처를 `msg_subscr`(Pi)에서 `bean_subscr`(Bean)로 일원화. `getChatPlan` 재작성(PICAFE→PREMIUM 캡·TRANSLATE→자동번역·운영자→BUSINESS, 레거시 미참조), `POST /api/subscriptions` **410 폐기**·`DELETE`는 `bean_subscr` 자동갱신 해제, `payments/complete` `CHAT_SUBSCR` 분기·`use-subscribe-plan` 훅 **제거**, 채팅 유료 게이트(subscription-gate·chat-room-panel·sticker-picker)는 `/subscribe`(Bean) 유도. 기존 활성 레거시 구독자(일반 2명)는 권한 미인정·Bean 재구독 유도(마스터 결정). tsc·빌드 통과(변경파일 lint 0 errors). 구독 시스템 구현파일 목록·PiRC2 레거시 블록 폐기 마킹. 잔여 정리대상: `/api/subscriptions/plans`(死코드)·`admin/subscriptions`. PRD_15_FEE v0.4 동기화. | asoká |
 | v10.6 | 2026-06-18 | **Phase 18 후속 개선 + 사용자 매뉴얼** — ① 주문 알림 **메뉴별 명칭·수량·금액 라인 표기**(라인 스냅샷+빌더). ② Telegram 연동 카드 **스토어 탭으로 이동**(판매자 전용)·앰버 하이라이트·문구 변경. ③ 프로필 **Google 계정 정보 섹션 제거**. ④ **지도 유입 결제 세션 복구**(결제 직전 silent 재인증, `pi-auth-provider`·`store-item-detail`·`client-cart`). ⑤ **매장별 주인 분리 발송 검증**(수신자=주문 seller_id, 매장 격리). ⑥ **`docs/Cafe.pi_쉬운_사용자매뉴얼.pptx` 신규**(컴맹 기준 7장 — 로그인·Bean·구독·PiCafe 동시통역·중고장터·PiStore O2O·차별점). PRD.md v11.9 동기화. | anakin |
 | v10.5 | 2026-06-18 | **Phase 18 판매자 주문 알림 (Telegram + Realtime + Pull) ✅ 완료** — "구매요청 시 판매자에게 반드시 알림" 해결. Outbox 3계층(즉시 Realtime 토스트·Telegram push·안읽은 뱃지)으로 단일 채널 비의존 보장. TASK-170 아웃박스+Telegram 파이프라인(`sql/064`·`telegram.ts`·`mps-noti.ts`·`markEscrow` enqueue·디스패처를 `*/5` cron 안전망에 통합), TASK-171 판매자 봇 연동 온보딩(HMAC 딥링크 `telegram-link.ts`·`/api/auth/telegram`·`/api/telegram/webhook`·연동 카드+4단계 가이드·`sys_user` Telegram 컬럼 옵션A), TASK-172 Pull 안읽은 뱃지(`/api/store/notifications`·`sales-noti-badge`·StoreNav/프로필), TASK-173 **결제완료 즉시 발송**(`payments/complete`에서 `dispatchOrderNotis()` 동기 호출 — Vercel cron 분 단위 한계로 초 단위 불가 → 요청시점 발송)+Realtime 토스트 제스처 분리, TASK-174 보안 하드닝(webhook fail-closed·재바인딩 차단, 자동 보안리뷰 대응). **관련 MPS 수정**: 수량 버그(상세 '구매하기'가 수량 무시 1개 주문 → 오프라인은 카트 RPC 라우팅). 운영: @BotFather 봇+env 3종+setWebhook(PowerShell은 `curl.exe`). PRD.md·PRD_13_MSG.md 동기화. Phase 완료현황·통계(총 20개·완료 19개) 갱신. | anakin |
 | v10.4 | 2026-06-17 | **PiShop 카트 다건 일괄 판매 + 자국통화 (PRD_8 v2.1, FR-14·15) — 13-P4** — ① **등록 페이지 분리**(`StoreItemForm` mode: 중고직거래 `/store/my/items/new`·오프라인매장 `/store/my/shop-items/new`). ② **자국통화 등록·표시**(`fx-rates.ts`·`/api/store/price-quote`, 등록시점 1회 환산 고정 참고가, ccy 스냅샷 sql/062, 레드라인 #2 정적 가격표만·시세칩 디커플링). ③ **오프라인매장 카트**: `useCart`(useSyncExternalStore·localStorage·매장단위)·담기 팝업(카트가기/쇼핑계속)·장바구니 화면(라인 소계)·**다중상품 단일 Pi 결제**(`mps_order_item`+원자 RPC `fn_mps_cart_order_create`/`_cancel` sql/063, `/api/store/orders/cart`(+`/cancel`), /complete의 MPS_ESCROW by order_id 재사용·결제실패 시 라인전체 재고복원). ④ **주문관리 고도화**: 라인(상품명×수량)·판매자 주문자 호명(준비완료 `📣 OOO님 호명`)·구매자 픽업 매장명·판매(앰버)/구매(에메랄드) 색상. 진단 detail은 보안 게이트 후 제거. ⚠️ sql 062·063 DB적용+Pi Browser 결제 실기기 검증 필요. PRD.md v11.7·PRD_8_MPS.md v2.1 동기화. | anakin |

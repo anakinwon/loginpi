@@ -1,8 +1,8 @@
 # PRD_15_FEE.md — Cafe.pi 종합 요금 표준 (Bean 경제 표준 마스터)
 
 > **작성일**: 2026-06-18 / **최종 현행화**: 2026-06-20
-> **버전**: v0.2 (요금 코드 미러 라이브 · `bean_fee_plan` 테이블만 미적용)
-> **상태**: **일부 적용 운영 중** — 카페 생성/입장·상품 구독은 Bean 결제 라이브, 잔여 Pi 결제 4종은 Bean 전환 대기
+> **버전**: v0.4 (요금 코드 미러 라이브 · `bean_fee_plan` 테이블만 미적용)
+> **상태**: **거의 전면 적용** — 플랫폼↔사용자 요금은 전부 Bean 결제 라이브(레거시 구독 #5 전환 완료). 잔여 Pi는 스티커팩(#8)·P2P(팁)·O2O(매장 결제)만
 > **정본 위상**: ⭐ **BEAN 토큰 경제학의 표준 요금** — 플랫폼의 모든 과금(SPEND)·보상(REWARD) 금액의 단일 출처
 > **입력 원본**: `docs/Fees/Cafe.pi요금제_20260618_v0.1.xlsx` ("요금제종합" 43행)
 > **연계**: [[PRD_12_TOKEN.md]](Bean 원장 금액 출처) · [[PRD_14_SUBSC.md]](구독 요금) · [[PRD_16_TOKEN_MNG.md]](Bean 경제 관리)
@@ -15,6 +15,8 @@
 
 | 버전 | 날짜 | 변경 내용 | 작성자 |
 |------|------|-----------|--------|
+| v0.4 | 2026-06-20 | **#5 레거시 구독(CHAT_SUBSCR) Pi→Bean 흡수 완료** (§1-6 순위1): 채팅 권한 출처를 `msg_subscr`(Pi)에서 `bean_subscr`(Bean)로 일원화. `getChatPlan`을 `bean_subscr` 기반 재작성(PICAFE→PREMIUM 캡, TRANSLATE→자동번역, 운영자→BUSINESS). `api/subscriptions` POST 410 폐기·DELETE는 `bean_subscr` 자동갱신 해제. `payments/complete` `CHAT_SUBSCR` 분기·`use-subscribe-plan` 훅 제거. 채팅 유료 게이트는 `/subscribe`(Bean) 유도. 기존 `msg_subscr` 활성 구독은 권한 미인정(마스터 결정 — Bean 재구독 유도, 영향 일반사용자 2명). §1-5·§1-6 #5 갱신. | asoká |
+| v0.3 | 2026-06-20 | **#6 이벤트방 입장료 Pi→Bean 전환 완료**: `entry_fee_pi`×100 Bean(호스트 지정 티켓가·구독 할인 없음)·GUEST 한시입장으로 전환. `bean-shared.eventEntryFeeBean` 신설, `/join` 이벤트 분기·page.tsx·client-chat-room이 동일 Bean 확인 UI(`RoomEntryFeeGate`/`beanConfirm`)로 일원화(Pi `createPayment` 제거). `payments/complete`의 `EVENT_ROOM_JOIN` 분기는 비활성(dead). §1-5·§1-6 #6 갱신. | asoká |
 | v0.2 | 2026-06-20 | **현행화 — 플랫폼 Bean 결제 정책 반영**: ① §1-5 "플랫폼 Bean 결제 종류·적용 현황" 신설(라이브 DB 검증 기준 적용여부·테스트 가능 여부 전수). ② 요금 정본이 `bean_fee_plan` DB가 아닌 **코드 미러**(`bean-fee.ts`·`bean-subscr-plan.ts`)로 라이브 운영 중임을 명시. ③ "Pi 결제 → Bean 선충전 후 Bean 결제 일원화" 정책 + 잔여 Pi 결제 4종 전환 로드맵(§1-6). P2P(팁)·O2O(매장결제)는 정책 제외. | asoká |
 | v0.1 | 2026-06-18 | 최초 초안 — 엑셀 "요금제종합" 43행을 `bean_fee_plan` 표준 스키마로 매핑. 코드 정규화·공존 전략·통화/표기 규약·데이터 품질 교정 대기 목록. DB 미적용(문서 내 DDL 초안). | asoká |
 
@@ -72,8 +74,8 @@
    │  ◀──── 이후 Pi 접점 없음 ────                │
    │                                              │
    │  ② Bean 결제(SPEND, fn_bean_apply) ─────▶  USER→PLATFORM 회수
-   │     · 카페 생성료   · 카페 입장료
-   │     · 상품 구독료   · (전환예정) 이벤트입장·배지·스티커
+   │     · 카페 생성료   · 카페 입장료   · 이벤트방 입장료
+   │     · 상품 구독료   · 배지 강화     · 스티커팩
 ```
 
 ### 1-5-2. 종류별 적용·테스트 현황 (라이브 DB 검증 — 2026-06-20)
@@ -86,8 +88,8 @@
 | 2 | **카페 생성료** (프리미엄) | Bean (OUT) | 10 | `api/chat/rooms/group` | `ref=ROOM_CREATE` | ✅ **라이브** (1건 확인) | ✅ 일반 브라우저 가능 |
 | 3 | **카페 입장료** (프리미엄) | Bean (OUT) | 10 | `api/chat/rooms/[id]/join` · `[roomId]/page` · `room-entry-fee-gate` | `ref=ROOM_ENTER` | ✅ **라이브** (5건+환불2 확인) | ✅ 일반 브라우저 가능 |
 | 4 | **상품 구독료** (PiCafe·PiStore S/M/L·자동번역) | Bean (OUT) | 1,000~50,000 (§4-1) | `api/subscriptions/products/subscribe` → `fn_bean_subscribe_product` | `bean_subscr` | ✅ **배포됨** (실사용 0건) | ✅ **테스트 가능** (잔액만 있으면) |
-| 5 | 레거시 구독 (msg_subscr_plan 5종) | **Pi (OUT)** | — | `api/subscriptions` · `payments/complete` `CHAT_SUBSCR` | `meta=CHAT_SUBSCR` | ⏳ **전환대기** (현재 Pi, #4와 공존) | ✅ (Pi Browser) |
-| 6 | 이벤트방 입장료 | **Pi (OUT)** | — (`entry_fee_pi`) | `payments/complete` `EVENT_ROOM_JOIN` | `meta=EVENT_ROOM_JOIN` | ⏳ **전환대기** | ✅ (Pi Browser) |
+| 5 | ~~레거시 구독 (msg_subscr_plan 5종)~~ → #4 Bean 구독 흡수 | Bean (OUT) | §4-1 | `getChatPlan`(bean_subscr 기반) · `api/subscriptions` POST 410 · `payments/complete` `CHAT_SUBSCR` 분기 제거 | `bean_subscr` | ✅ **전환완료** (2026-06-20) | ✅ 일반 브라우저 가능 |
+| 6 | 이벤트방 입장료 | Bean (OUT) | `entry_fee_pi`×100 (호스트 지정 티켓가) | `api/chat/rooms/[id]/join` · `[roomId]/page` · `room-entry-fee-gate` | `ref=EVENT_ENTER` | ✅ **라이브** | ✅ 일반 브라우저 가능 |
 | 7 | 배지 강화 (BADGE_UPGRADE) | Bean (OUT) | 10 Bean (=0.1 Pi) | `api/badges/upgrade` | `refTp=BADGE_UPGRADE` | ✅ **라이브** | ✅ 일반 브라우저 가능 |
 | 8 | 스티커팩 구매 | **Pi (OUT)** | — (`price_pi`) | `payments/complete` `STICKER_PACK` | `meta=STICKER_PACK` | ⏳ **전환대기** | ✅ (Pi Browser) |
 | 9 | 스토어 노출료(EXPOSE)·연장료(EXTEND)·프리미엄 상품생성료 | Bean (OUT) 예정 | 5~20 (§4-3) | — | — | 🚧 **미구현** (요금표만) | ❌ |
@@ -101,7 +103,7 @@
 | 상품 구매 에스크로 | Pi | **O2O** 매장 결제 | `payments/complete` `MPS_ESCROW` |
 | 판매자 보증금 1π | Pi | **O2O** 판매자↔플랫폼(매장 운영) | `payments/complete` `MPS_BOND` |
 
-> ※ #1~4가 정책의 골격(충전 1 + Bean 결제 3)이며 **이미 라이브**다. #5~8은 동일 정책으로 Bean 전환이 남은 잔여 Pi 결제, #9~10은 요금표에만 있는 미구현 항목이다.
+> ※ #1~4 + #6~8이 Bean 결제로 **라이브**다(충전 1 + Bean 결제 6). **#5 레거시 구독만 잔여 Pi 결제**(전환 대기), #9~10은 요금표에만 있는 미구현 항목이다.
 
 ---
 
@@ -111,8 +113,8 @@
 
 | 순위 | 대상 | 작업 요지 | 비고 |
 |---|---|---|---|
-| 1 | #5 레거시 구독 | `CHAT_SUBSCR` Pi 경로 폐기, #4 Bean 구독으로 흡수 | `msg_subscr_plan` 5종 → `bean_subscr` 통합(보류 중) |
-| 2 | #6 이벤트방 입장 | `entry_fee_pi` → Bean(EVENT 등급, §4-2 CGEE3 등) | `bean-fee.ts`에 EVENT 상수 이미 존재(20) |
+| 1 | #5 레거시 구독 | ~~`CHAT_SUBSCR` Pi 경로 폐기, #4 Bean 구독으로 흡수~~ | ✅ **완료** (2026-06-20) — `getChatPlan`을 `bean_subscr` 기반으로 재작성(PICAFE→PREMIUM 캡, TRANSLATE→자동번역). `api/subscriptions` POST 410·DELETE는 `bean_subscr` 자동갱신 해제. `payments/complete` `CHAT_SUBSCR` 분기·`use-subscribe-plan` 훅 제거. 채팅 게이트는 `/subscribe`(Bean) 유도. 기존 `msg_subscr` 활성 구독은 권한 미인정(Bean 재구독 유도) |
+| 2 | #6 이벤트방 입장 | ~~`entry_fee_pi` → Bean~~ | ✅ **완료** — 호스트 지정가×100 Bean·GUEST 한시입장, `bean-shared.eventEntryFeeBean`. `payments/complete`의 `EVENT_ROOM_JOIN` 분기는 비활성(dead, 후속 정리) |
 | 3 | #7 배지 강화 | ~~0.1 Pi → Bean 정액~~ | ✅ **완료** — 10 Bean, `api/badges/upgrade`, `bean-fee.ts` |
 | 4 | #8 스티커팩 | `price_pi` → `price_bean` | `msg_stkr_pack` 컬럼 추가 |
 
