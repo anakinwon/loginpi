@@ -146,6 +146,7 @@ if (!isAdmin(user)) return NextResponse.json({ error: 'unauthorized' }, { status
 - RLS **비활성화** — 모든 접근은 서버 전용 `SUPABASE_SERVICE_ROLE_KEY`
 - `src/lib/supabase-admin.ts` — lazy init (빌드 시 SERVICE_ROLE_KEY 미설정 방지)
 - anon key 클라이언트 직접 사용 금지 | 단건 조회: `.maybeSingle()` (`.single()`은 결과 없을 때 에러)
+- **텍스트 부분일치 검색 표준**: `%검색어%`(substring) 검색엔 `pg_trgm` GIN 인덱스(`gin_trgm_ops`)를 표준으로 쓴다. PostgREST `.ilike`는 대소문자 무시로 GIN을 **자동 가속**(코드 변경 0), `lower() LIKE` RPC는 `lower()` 식 인덱스 필요. 활성행 부분 인덱스(`WHERE del_yn='N'`)·UI 최소 2글자 권장(trigram=3글자 단위). 적용: 카페 `sql/072`·상품·게시판 `sql/076`. 신규 검색 추가 시 동일 패턴 따를 것.
 
 ---
 
