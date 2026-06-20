@@ -108,7 +108,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json(
     {
       order,
-      // Pi SDK createPayment 파라미터 (use-subscribe-plan 패턴)
+      // Pi SDK createPayment 파라미터 (O2O 에스크로 결제 — Pi 유지, 통화 라우팅 §0)
       amount: Number(order.order_price_pi),
       memo: `🛒 PiShop 에스크로 결제`,
       metadata: {

@@ -100,10 +100,13 @@ export async function POST(req: NextRequest) {
   const slug = String(user.display_name ?? 'user').slice(0, 20)
 
   // shop_id 지정 시 본인 매장인지 검증 (IDOR 방지 — 타인 매장에 상품 부착 차단)
+  // 매장 좌표도 함께 조회해서 상품에 자동 상속 (O2O 상품 위치 = 매장 위치)
+  let shopCoords: { latd_crd: number | null; lngt_crd: number | null } | null =
+    null
   if (parsed.data.shop_id) {
     const { data: ownShop } = await getSupabaseAdmin()
       .from('mps_shop')
-      .select('shop_id')
+      .select('shop_id, latd_crd, lngt_crd')
       .eq('shop_id', parsed.data.shop_id)
       .eq('seller_id', user.id)
       .eq('del_yn', 'N')
@@ -114,26 +117,43 @@ export async function POST(req: NextRequest) {
         { status: 403 },
       )
     }
+    shopCoords = ownShop as { latd_crd: number | null; lngt_crd: number | null }
   }
 
-  // 위치는 LBS 동의 판매자만 저장 (Rule LBS-01) — 미동의면 좌표 무시하고 등록 진행
   const input = { ...parsed.data }
   // 자국통화는 코드+금액이 모두 있을 때만 유효 — 한쪽만 오면 Pi 직접입력으로 간주
   if (!(input.ccy_cd && input.ccy_amt)) {
     delete input.ccy_cd
     delete input.ccy_amt
   }
-  const hasLoc = input.lat !== undefined && input.lng !== undefined
+
   const lbsConsented = user.lbs_consent_yn === 'Y'
-  if (hasLoc && !lbsConsented) {
+  let hasLoc = false
+
+  if (shopCoords) {
+    // 매장 상품: 클라이언트 입력 좌표 무시 → 매장 위치 자동 상속 (O2O 원칙)
     delete input.lat
     delete input.lng
+    if (shopCoords.latd_crd !== null && shopCoords.lngt_crd !== null) {
+      input.lat = shopCoords.latd_crd
+      input.lng = shopCoords.lngt_crd
+      hasLoc = true
+    }
+  } else {
+    // P2P 상품: LBS 동의 판매자만 본인 입력 좌표 저장 (Rule LBS-01)
+    hasLoc = input.lat !== undefined && input.lng !== undefined
+    if (hasLoc && !lbsConsented) {
+      delete input.lat
+      delete input.lng
+      hasLoc = false
+    }
   }
 
   const item = await createItem(user.id, slug, input)
 
   // 위치 이력 기록 (loc_tp_cd=04 상품거래, ref_id=item_id) — 실패해도 등록은 유지
-  if (hasLoc && lbsConsented) {
+  // P2P: LBS 동의 판매자만 / 매장 상품: 매장 좌표 상속된 경우
+  if (hasLoc && (lbsConsented || shopCoords !== null)) {
     await getSupabaseAdmin()
       .from('usr_loc_hist')
       .insert({

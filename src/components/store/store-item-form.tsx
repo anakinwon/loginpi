@@ -133,8 +133,8 @@ export function StoreItemForm({
       .then((d: { consent_yn?: string } | null) => {
         const consented = d?.consent_yn === 'Y'
         setLbsConsent(consented ? 'Y' : 'N')
-        // 동의자 + 등록 모드: 마운트 직후 GPS 자동 수집 (미동의자는 Rule LBS-01에 따라 자동 수집 금지)
-        if (consented && !editMode && !autoLocTried.current) {
+        // 동의자 + 등록 모드 + P2P: 마운트 직후 GPS 자동 수집 (offline 모드는 매장 좌표 상속으로 GPS 불필요)
+        if (consented && !editMode && mode !== 'offline' && !autoLocTried.current) {
           autoLocTried.current = true
           captureLocation()
         }
@@ -294,8 +294,13 @@ export function StoreItemForm({
       toast.error(t('qtyInvalid'))
       return
     }
-    // 게시(OPEN)는 판매 위치 필수 — 현재 위치 등록 후에만 게시 가능 (임시저장은 위치 없이 허용)
-    if (status === 'OPEN' && !editMode && (lat === null || lng === null)) {
+    // 게시(OPEN)는 P2P 모드에서 판매 위치 필수 — offline 모드는 매장 좌표 자동 상속
+    if (
+      status === 'OPEN' &&
+      !editMode &&
+      mode !== 'offline' &&
+      (lat === null || lng === null)
+    ) {
       toast.error('현재 위치를 등록해야 게시할 수 있습니다')
       return
     }
@@ -338,8 +343,10 @@ export function StoreItemForm({
         : shopId
           ? { shop_id: shopId }
           : {}),
-      // 판매 위치 — 등록 모드에서 동의자가 위치를 잡은 경우만 전송
-      ...(!editMode && lat !== null && lng !== null ? { lat, lng } : {}),
+      // 판매 위치 — P2P 등록 모드 + 동의자가 위치를 잡은 경우만 전송 (offline은 서버에서 매장 좌표 자동 상속)
+      ...(!editMode && mode !== 'offline' && lat !== null && lng !== null
+        ? { lat, lng }
+        : {}),
     }
 
     setSaving(true)
@@ -548,8 +555,8 @@ export function StoreItemForm({
         <ProductImageUploader images={images} onChange={setImages} max={3} />
       </div>
 
-      {/* 판매 위치 — 등록 모드 전용. 동의자: GPS 수집, 미동의자: 동의 다이얼로그 (Rule LBS-01) */}
-      {!editMode && (
+      {/* 판매 위치 — P2P 등록 모드 전용. offline 모드는 매장 좌표 자동 상속이므로 표시 안 함 */}
+      {!editMode && mode !== 'offline' && (
         <div className="space-y-1.5">
           <Label>📍 판매 위치</Label>
           {lat !== null && lng !== null ? (
@@ -602,7 +609,7 @@ export function StoreItemForm({
           <>
             <Button
               onClick={() => submit('OPEN')}
-              disabled={saving || lat === null || lng === null}
+              disabled={saving || (mode !== 'offline' && (lat === null || lng === null))}
               className="flex-1"
             >
               {saving ? t('saving') : t('form.publish')}
