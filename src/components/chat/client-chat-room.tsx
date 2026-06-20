@@ -13,9 +13,6 @@ type RoomInfo = { room_nm: string; room_desc: string | null; theme_cd: string }
 type PublicPreview = {
   room_nm: string
   theme_cd: string
-  room_tp_cd?: 'D' | 'G' | 'E'
-  entry_fee_pi?: number
-  entry_expire_dtm?: string | null
 }
 
 // Pi Browser 전용 카페 게이트.
@@ -126,12 +123,12 @@ export function ClientChatRoom({ roomId }: { roomId: string }) {
         const d = (await res.json().catch(() => ({}))) as {
           requiresBeanConfirm?: boolean
           requiresBean?: boolean
-          entryFeePi?: number
           feeBean?: number
           balance?: number
         }
 
         // 1) Bean 소진 사전 안내 — 차감 전, 입장 여부 확인 UI로 전환
+        //    (프리미엄 카페·이벤트방 입장료 모두 동일 Bean 확인 흐름을 탄다)
         if (d.requiresBeanConfirm) {
           setBeanConfirm({ feeBean: d.feeBean ?? 0, balance: d.balance ?? 0 })
           setState('joinable')
@@ -148,22 +145,7 @@ export function ClientChatRoom({ roomId }: { roomId: string }) {
           setState('joinable')
           return
         }
-        // 3) 유료 이벤트방 — Pi 결제 CTA로 전환
-        if (res.status === 402 && d.entryFeePi !== undefined) {
-          setJoinPreview((prev) =>
-            prev
-              ? { ...prev, room_tp_cd: 'E', entry_fee_pi: d.entryFeePi ?? 0 }
-              : {
-                  room_nm: '',
-                  theme_cd: '',
-                  room_tp_cd: 'E',
-                  entry_fee_pi: d.entryFeePi ?? 0,
-                },
-          )
-          setState('joinable')
-          return
-        }
-        // 4) 기간 만료 카페
+        // 3) 기간 만료 카페·종료된 이벤트방
         if (res.status === 410) {
           setState('expired')
           return
@@ -176,44 +158,8 @@ export function ClientChatRoom({ roomId }: { roomId: string }) {
     [roomId],
   )
 
-  // TASK-062 Trigger 8: 이벤트방 유료 입장 — Pi 결제 완료 시 payments/complete가 GUEST 삽입
-  const handlePaidJoin = useCallback(
-    (entryFeePi: number, roomNm: string) => {
-      if (!window.Pi) {
-        setState('forbidden')
-        return
-      }
-      setState('joining')
-      window.Pi.createPayment(
-        {
-          amount: entryFeePi,
-          memo: `이벤트방 입장: ${roomNm}`.slice(0, 100),
-          metadata: { type: 'EVENT_ROOM_JOIN', room_id: roomId },
-        },
-        {
-          onReadyForServerApproval: async (paymentId) => {
-            await fetch('/api/payments/approve', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ paymentId }),
-            })
-          },
-          onReadyForServerCompletion: async (paymentId, txid) => {
-            const res = await fetch('/api/payments/complete', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ paymentId, txid }),
-            })
-            if (res.ok) setLoadKey((k) => k + 1)
-            else setState('joinable')
-          },
-          onCancel: () => setState('joinable'),
-          onError: () => setState('joinable'),
-        },
-      )
-    },
-    [roomId],
-  )
+  // 이벤트방 입장료도 Bean으로 전환됨(PRD_15_FEE #6) — 별도 Pi 결제 핸들러 불필요.
+  // 위 handleJoin이 /join 응답(requiresBeanConfirm)을 받아 동일 Bean 확인 흐름으로 처리한다.
 
   if (authLoading) return <Centered>Pi 계정 인증 중…</Centered>
   if (!user) {
@@ -229,42 +175,12 @@ export function ClientChatRoom({ roomId }: { roomId: string }) {
   if (state === 'loading') return <Centered>카페를 불러오는 중…</Centered>
 
   if (state === 'joinable' || state === 'joining') {
-    const isPaidEvent =
-      joinPreview?.room_tp_cd === 'E' && (joinPreview.entry_fee_pi ?? 0) > 0
     return (
       <Centered>
         {joinPreview?.room_nm && (
           <p className="font-semibold">{joinPreview.room_nm}</p>
         )}
-        {isPaidEvent ? (
-          <>
-            <p>🎟️ 유료 이벤트방입니다</p>
-            <p className="text-primary text-lg font-bold">
-              입장료 π{joinPreview.entry_fee_pi}
-            </p>
-            {joinPreview.entry_expire_dtm && (
-              <p className="text-xs">
-                이벤트 종료:{' '}
-                {new Date(joinPreview.entry_expire_dtm).toLocaleString('ko-KR')}
-              </p>
-            )}
-            <button
-              type="button"
-              disabled={state === 'joining'}
-              onClick={() =>
-                handlePaidJoin(
-                  joinPreview.entry_fee_pi ?? 0,
-                  joinPreview.room_nm,
-                )
-              }
-              className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-5 py-2.5 text-sm font-medium transition-colors disabled:opacity-50"
-            >
-              {state === 'joining'
-                ? '결제 진행 중…'
-                : `π${joinPreview.entry_fee_pi} 결제하고 입장`}
-            </button>
-          </>
-        ) : beanConfirm ? (
+        {beanConfirm ? (
           beanConfirm.balance >= beanConfirm.feeBean ? (
             <>
               <p>

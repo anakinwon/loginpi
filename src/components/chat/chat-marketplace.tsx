@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
+import { eventEntryFeeBean } from '@/lib/bean-shared'
 import { readCache, writeCache } from '@/lib/client-cache'
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll'
 
@@ -231,7 +232,9 @@ export function ChatMarketplace() {
                     {room.room_nm}
                     {room.room_tp_cd === 'E' && (
                       <span className="ml-1.5 rounded-full bg-violet-100 px-1.5 py-0.5 text-[10px] font-medium text-violet-700 dark:bg-violet-900/30 dark:text-violet-400">
-                        이벤트 π{room.entry_fee_pi}
+                        {room.entry_fee_pi > 0
+                          ? `이벤트 ${eventEntryFeeBean(room.entry_fee_pi)} Bean`
+                          : '이벤트 무료'}
                       </span>
                     )}
                   </p>

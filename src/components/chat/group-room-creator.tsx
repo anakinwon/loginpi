@@ -316,7 +316,7 @@ export function GroupRoomCreator() {
                 </div>
                 {roomType === 'E' && (
                   <p className="mb-2 rounded-xl bg-violet-500/10 px-3 py-2 text-xs text-violet-700 dark:text-violet-300">
-                    참가자가 입장료(π)를 결제하고 입장하는 기간 한정 방입니다.
+                    참가자가 입장료(Bean)를 소진하고 입장하는 기간 한정 방입니다.
                     생성 비용은 없습니다.
                   </p>
                 )}
@@ -501,7 +501,7 @@ export function GroupRoomCreator() {
                     {/* TASK-063: 이벤트방 — 입장료 + 종료 시각 */}
                     <div>
                       <p className="mb-2 text-sm font-medium">
-                        입장료 (참가자 결제)
+                        입장료 (참가자 Bean 소진)
                       </p>
                       <div className="grid grid-cols-4 gap-2">
                         {([0, 0.1, 0.5, 1] as EntryFee[]).map((fee) => (
@@ -514,7 +514,7 @@ export function GroupRoomCreator() {
                                 : 'hover:bg-muted'
                             }`}
                           >
-                            {fee === 0 ? '무료' : `π${fee}`}
+                            {fee === 0 ? '무료' : `${fee * 100} Bean`}
                           </button>
                         ))}
                       </div>

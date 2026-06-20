@@ -10,6 +10,7 @@ import {
 } from '@/lib/chat'
 import { getChatPlan } from '@/lib/chat-auth'
 import { getRoomFeeBean } from '@/lib/bean-fee'
+import { eventEntryFeeBean } from '@/lib/bean-shared'
 import { getBalance } from '@/lib/bean'
 import { ChatRoomPanel } from '@/components/chat/chat-room-panel'
 import { ClientChatRoom } from '@/components/chat/client-chat-room'
@@ -35,11 +36,20 @@ export default async function ChatRoomPage({ params }: Params) {
 
   if (!room) redirect(`/${locale}/chat`)
 
-  // 비멤버: 공개 그룹방만 입장 허용 (비공개·이벤트방은 목록으로)
+  // 비멤버: 공개 그룹방·공개 이벤트방만 입장 허용 (비공개·1:1은 목록으로)
   if (!mbr) {
-    if (room.room_tp_cd === 'G' && room.is_public_yn === 'Y') {
+    const isEvent = room.room_tp_cd === 'E'
+    const isPublicGroup = room.room_tp_cd === 'G' && room.is_public_yn === 'Y'
+    if (isPublicGroup || (isEvent && room.is_public_yn === 'Y')) {
       // 기간 만료 카페(무료방 7일 초과)는 신규 입장 불가 — join API·GET 410과 동일 룰
       if (isRoomExpired(room)) redirect(`/${locale}/chat`)
+      // 종료된 이벤트방도 신규 입장 불가
+      if (
+        isEvent &&
+        room.entry_expire_dtm &&
+        new Date(room.entry_expire_dtm) <= new Date()
+      )
+        redirect(`/${locale}/chat`)
 
       const { count } = await getSupabaseAdmin()
         .from('msg_room_mbr')
@@ -48,11 +58,16 @@ export default async function ChatRoomPage({ params }: Params) {
         .eq('del_yn', 'N')
       if ((count ?? 0) >= room.max_mbr_cnt) redirect(`/${locale}/chat`)
 
-      // 타인이 만든 유료(프리미엄) 카페 입장료 — 구독자·BASIC(무료) 테마는 0.
+      // 입장료(Bean): 이벤트방=호스트 지정가(entry_fee_pi×100), 그 외=등급 정액(구독자·BASIC 테마 0).
       // 요금이 있으면 사일런트 자동입장 금지 → Bean 소진 동의 게이트로 위임(확인 후 차감).
-      const grade = await resolveRoomGrade(room)
-      const plan = await getChatPlan(user.id)
-      const enterFeeBean = getRoomFeeBean('ENTER', grade, plan.tier !== 'FREE')
+      let enterFeeBean = 0
+      if (isEvent) {
+        enterFeeBean = eventEntryFeeBean(room.entry_fee_pi)
+      } else {
+        const grade = await resolveRoomGrade(room)
+        const plan = await getChatPlan(user.id)
+        enterFeeBean = getRoomFeeBean('ENTER', grade, plan.tier !== 'FREE')
+      }
       if (enterFeeBean > 0) {
         const balance = await getBalance(user.id)
         return (
@@ -65,8 +80,15 @@ export default async function ChatRoomPage({ params }: Params) {
         )
       }
 
-      // 무료 입장 — 멤버 즉시 등록(재가입 시 논리삭제 복구) 후 이하 코드에서 그대로 렌더
-      await joinRoomMember(roomId, user.id, user.display_name)
+      // 무료 입장 — 이벤트방은 GUEST+종료시각, 그 외 일반 MEMBER. 재가입 시 논리삭제 복구.
+      await joinRoomMember(
+        roomId,
+        user.id,
+        user.display_name,
+        isEvent
+          ? { role: 'GUEST', expireDtm: room.entry_expire_dtm }
+          : undefined,
+      )
     } else {
       redirect(`/${locale}/chat`)
     }

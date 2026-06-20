@@ -10,13 +10,17 @@ import {
   joinRoomMember,
 } from '@/lib/chat'
 import { getChatPlan } from '@/lib/chat-auth'
-import { getRoomFeeBean } from '@/lib/bean-fee'
+import { getRoomFeeBean, type RoomGrade } from '@/lib/bean-fee'
+import { eventEntryFeeBean } from '@/lib/bean-shared'
 import { applyBean, getBalance } from '@/lib/bean'
 
 type Params = { params: Promise<{ roomId: string }> }
 
-// POST /api/chat/rooms/[roomId]/join — 공개 그룹방 입장
-// 유료 입장(이벤트방)은 TASK-053 결제 연동 후 처리
+// POST /api/chat/rooms/[roomId]/join — 공개 그룹방·이벤트방 입장
+// 입장료는 전부 Bean 차감([currency-routing-rule] 플랫폼 요금 = Bean):
+//   · 그룹방(프리미엄)  → 등급 정액(getRoomFeeBean), 구독자 무료
+//   · 이벤트방(E)       → 호스트 지정 티켓가(entry_fee_pi×100), 구독 할인 없음·GUEST 한시 입장
+// confirm 없이 들어오면 차감 전 requiresBeanConfirm(402)로 소진 동의를 먼저 받는다.
 export async function POST(request: NextRequest, { params }: Params) {
   const { roomId } = await params
   const user = await getSessionUser()
@@ -46,8 +50,10 @@ export async function POST(request: NextRequest, { params }: Params) {
     )
   }
 
-  // 이벤트방 만료 확인
-  if (room.room_tp_cd === 'E' && room.entry_expire_dtm) {
+  const isEvent = room.room_tp_cd === 'E'
+
+  // 이벤트방 종료 시각 확인
+  if (isEvent && room.entry_expire_dtm) {
     if (new Date(room.entry_expire_dtm) <= new Date()) {
       return NextResponse.json(
         { error: '종료된 이벤트입니다' },
@@ -56,22 +62,7 @@ export async function POST(request: NextRequest, { params }: Params) {
     }
   }
 
-  // TASK-063: 유료 이벤트방 — 결제 완료 후 payments/complete에서 GUEST 삽입됨
-  // 결제 없이 직접 join 시도 시 402 반환 (클라이언트가 Pi SDK 결제 흐름으로 안내)
-  if (room.room_tp_cd === 'E' && room.entry_fee_pi > 0) {
-    const existing = await getRoomMember(roomId, user.id)
-    if (existing) return NextResponse.json({ message: '이미 카페 멤버입니다' })
-    return NextResponse.json(
-      {
-        error: '유료 이벤트방입니다. 결제 후 입장하세요.',
-        requiresPayment: true,
-        entryFeePi: room.entry_fee_pi,
-      },
-      { status: 402 },
-    )
-  }
-
-  // 이미 멤버면 비밀번호 없이 통과 (재입장)
+  // 이미 멤버면 비밀번호 없이 통과 (재입장 — 내가 만든 방 OWNER 포함 → 무료)
   const existing = await getRoomMember(roomId, user.id)
   if (existing) return NextResponse.json({ message: '이미 카페 멤버입니다' })
 
@@ -86,9 +77,17 @@ export async function POST(request: NextRequest, { params }: Params) {
     confirm?: boolean
   }
 
-  // 비밀방(is_public_yn='N')은 비밀번호로만 입장 가능
-  // 비밀번호 미설정(join_pwd_hash=null) 비밀방은 초대/생성자 전용 → 입장 불가
+  // 비밀방(is_public_yn='N') 입장 규칙 — 비멤버는 공개방만 입장 가능(page.tsx 불변식과 동일).
+  //   · 일반 그룹방 → 비밀번호로만 입장 (미설정 비밀방은 초대/생성자 전용 → 불가)
+  //   · 이벤트방   → 비번 체계가 없으므로 비공개 이벤트는 초대/생성자 전용 → 요금 결제로도 우회 불가(IDOR 차단)
+  //     (생성자는 위 '이미 멤버'에서 통과하므로 본인 비공개 이벤트 접근은 영향 없음)
   if (room.is_public_yn === 'N') {
+    if (isEvent) {
+      return NextResponse.json(
+        { error: '비공개 이벤트입니다' },
+        { status: 403 },
+      )
+    }
     if (!room.join_pwd_hash) {
       return NextResponse.json({ error: '비공개 카페입니다' }, { status: 403 })
     }
@@ -117,11 +116,30 @@ export async function POST(request: NextRequest, { params }: Params) {
     )
   }
 
-  // 입장료 — 구독자 무료, 비구독자는 등급별 Bean 결제 ([currency-routing-rule] 플랫폼 요금 = Bean).
-  // 내가 만든 방(OWNER) 재입장은 위에서 '이미 멤버'로 통과되므로 여기까지 오지 않음 = 무료.
-  const grade = await resolveRoomGrade(room)
-  const plan = await getChatPlan(user.id)
-  const enterFeeBean = getRoomFeeBean('ENTER', grade, plan.tier !== 'FREE')
+  // 입장료(Bean) 산정 — 이벤트방은 호스트 지정가, 그 외는 등급 정액(구독자 무료).
+  let enterFeeBean = 0
+  let gradeForResp: RoomGrade = 'GENERAL'
+  let refTpCd = 'ROOM_ENTER'
+  let feeMemo = ''
+  let memberOpts:
+    | { role: 'MEMBER' | 'GUEST'; expireDtm?: string | null }
+    | undefined
+
+  if (isEvent) {
+    enterFeeBean = eventEntryFeeBean(room.entry_fee_pi)
+    gradeForResp = 'EVENT'
+    refTpCd = 'EVENT_ENTER'
+    feeMemo = `이벤트방 입장료 (${room.room_nm})`
+    // GUEST + 이벤트 종료시각까지 한시 입장
+    memberOpts = { role: 'GUEST', expireDtm: room.entry_expire_dtm }
+  } else {
+    const grade = await resolveRoomGrade(room)
+    const plan = await getChatPlan(user.id)
+    enterFeeBean = getRoomFeeBean('ENTER', grade, plan.tier !== 'FREE')
+    gradeForResp = grade
+    feeMemo = `${grade} 카페 입장료`
+  }
+
   if (enterFeeBean > 0) {
     // 소진 사전 안내 — confirm 없이 들어오면 차감하지 않고 입장 여부를 먼저 묻는다.
     if (confirm !== true) {
@@ -131,7 +149,7 @@ export async function POST(request: NextRequest, { params }: Params) {
           requiresBeanConfirm: true,
           feeBean: enterFeeBean,
           balance,
-          grade,
+          grade: gradeForResp,
         },
         { status: 402 },
       )
@@ -140,9 +158,9 @@ export async function POST(request: NextRequest, { params }: Params) {
       usrId: user.id,
       txnTp: 'SPEND',
       beanAmt: -enterFeeBean,
-      refTp: 'ROOM_ENTER',
+      refTp: refTpCd,
       refId: roomId,
-      memo: `${grade} 카페 입장료`,
+      memo: feeMemo,
       regrId: user.display_name.slice(0, 20),
     })
     if (!charge.ok) {
@@ -158,7 +176,12 @@ export async function POST(request: NextRequest, { params }: Params) {
   }
 
   // 재가입 시 논리삭제된 과거 멤버십을 복구(upsert) — blind INSERT의 중복키 실패 방지
-  const { error } = await joinRoomMember(roomId, user.id, user.display_name)
+  const { error } = await joinRoomMember(
+    roomId,
+    user.id,
+    user.display_name,
+    memberOpts,
+  )
 
   if (error) {
     // 멤버 삽입 실패 시 입장료 환불 (정원은 위에서 검증 — 드문 경합 대비)
@@ -167,9 +190,9 @@ export async function POST(request: NextRequest, { params }: Params) {
         usrId: user.id,
         txnTp: 'REFUND',
         beanAmt: enterFeeBean,
-        refTp: 'ROOM_ENTER',
+        refTp: refTpCd,
         refId: roomId,
-        memo: `${grade} 카페 입장 실패 환불`,
+        memo: `${feeMemo} 입장 실패 환불`,
         regrId: user.display_name.slice(0, 20),
       })
     }

@@ -20,3 +20,10 @@ export interface BeanTxn {
 
 // Bean → Pi 환산 (정수 Bean ÷ 100). 결제 amount 계산용.
 export const beanToPi = (bean: number): number => bean / BEAN_PER_PI
+
+// 이벤트방 입장료 환산 — 호스트 지정 entry_fee_pi(Pi 표시값) → Bean.
+// 이벤트방은 '호스트 지정 티켓가'라 등급 정액(EVENT 20)이 아닌 지정가를 그대로 Bean으로 받는다.
+// (구독 할인 없음 — 기존 Pi 결제와 동일하게 전원 동일 입장료. 1 Pi = 100 Bean 고정·정수)
+export const eventEntryFeeBean = (
+  entryFeePi: number | null | undefined,
+): number => Math.round((entryFeePi ?? 0) * BEAN_PER_PI)

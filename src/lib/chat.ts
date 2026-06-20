@@ -30,10 +30,12 @@ export function isRoomExpired(room: { expr_dtm?: string | null }): boolean {
 // ⚠️ 탈퇴·제외는 물리 DELETE 금지(del_yn='Y')라 행이 남으므로, blind INSERT는 중복키로 실패한다.
 //    → upsert(onConflict)로 재활성화해 "탈퇴 후 재입장 영구 차단 + Bean 차감/환불 반복" 버그를 차단.
 //    (reg_dtm은 미포함 → 최초 가입일 보존, 충돌 시 del_yn/modr만 갱신)
+// opts: 이벤트방은 role='GUEST' + expireDtm(이벤트 종료시각)로 한시 입장. 기본은 일반 MEMBER 영구.
 export async function joinRoomMember(
   roomId: string,
   userId: string,
   displayName: string,
+  opts?: { role?: 'MEMBER' | 'GUEST'; expireDtm?: string | null },
 ): Promise<{ error: { message: string } | null }> {
   const slug = displayName.slice(0, 20)
   const { error } = await getSupabaseAdmin()
@@ -42,7 +44,11 @@ export async function joinRoomMember(
       {
         room_id: roomId,
         usr_id: userId,
-        mbr_role_cd: 'MEMBER',
+        mbr_role_cd: opts?.role ?? 'MEMBER',
+        // expireDtm을 명시한 경우에만 갱신(undefined면 컬럼 미포함 → 일반방 영구 유지)
+        ...(opts?.expireDtm !== undefined
+          ? { expire_dtm: opts.expireDtm }
+          : {}),
         del_yn: 'N',
         del_dtm: null,
         regr_id: slug,

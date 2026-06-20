@@ -13,6 +13,7 @@
 
 | 버전 | 날짜 | 변경 내용 | 작성자 |
 |------|------|-----------|--------|
+| v1.4 | 2026-06-20 | **이벤트방 입장료 Bean 전환 반영**: §2-3-1 결제(OUT) 표에 "이벤트방 입장료(`entry_fee_pi`×100, `ref=EVENT_ENTER`, GUEST 한시입장)" 추가, 잔여 Pi 결제 표에서 제거. [[PRD_15_FEE]] #6 완료와 동기화. | asoká |
 | v1.3 | 2026-06-20 | **플랫폼 Bean 결제 정책·실적용 현황 반영**: §2-3-1 신설 — "Pi 직결제 폐기 → Bean 선충전 후 Bean 결제 일원화" 정책 + 라이브 DB 검증(충전 1·SPEND 4·REFUND 2, ref_tp=ROOM_CREATE/ROOM_ENTER)으로 결제 종류별 적용·테스트 여부 전수. 요금 정본 위치([[PRD_15_FEE]] §1-5) 링크. 충전(IN)=유일 Pi 접점, 결제(OUT)=Bean SPEND 명문화. | asoká |
 | v1.2 | 2026-06-19 | **소각(Burn) 개념 전면 제거**: Bean은 소각 없음 — USER↔PLATFORM 지갑 간 순환만 존재. §2-5-1 "소각 없음 원칙" 신설. `Total Burned`→`Total Collected`, `burn_rate_percent`→`collection_rate_percent`, `burned_bean_daily`→`collected_bean_daily` 전환. KPI "Platform Revenue Ratio"→"Platform Collection Rate" 재정의. | asoká |
 | v1.1 | 2026-06-19 | **핵심 개념 확정 — 빈토큰지갑(bean_token_wallet) 통일**: §2-7(핵심 개념), §2-8(명명 규칙) 신설. `bean_wlt` 전체 → `bean_token_wallet` 교체. `wallet_type`(PLATFORM/USER) 도입으로 발행 관리와 사용자 보유를 단일 엔티티로 통합. PLATFORM 지갑 DDL·일관성 검증식 추가. §13-0 명명 규칙 비즈니스 규칙 6항 추가. | asoká |
@@ -143,6 +144,7 @@ Cafe.pi의 Bean Token(☕ 커피빈 토큰) 경제를 통합 관리하는 어드
 |---|---|---|---|---|---|
 | 카페 생성료(프리미엄) | 10 | `ref=ROOM_CREATE` | `api/chat/rooms/group` | ✅ 라이브(1건) | ✅ 일반 브라우저 |
 | 카페 입장료(프리미엄) | 10 | `ref=ROOM_ENTER` | `api/chat/rooms/[id]/join` | ✅ 라이브(5건+환불2) | ✅ 일반 브라우저 |
+| 이벤트방 입장료 | `entry_fee_pi`×100 (호스트 지정) | `ref=EVENT_ENTER` | `api/chat/rooms/[id]/join`(GUEST 한시입장) | ✅ 라이브 | ✅ 일반 브라우저 |
 | 상품 구독료(PiCafe·PiStore S/M/L·자동번역) | 1,000~50,000 | `bean_subscr` | `api/subscriptions/products/subscribe`→`fn_bean_subscribe_product` | ✅ 배포(실사용 0) | ✅ 잔액만 있으면 |
 
 **잔여 Pi 결제(⏳ Bean 전환 대기) / 미구현(🚧)** — 상세·로드맵은 [[PRD_15_FEE]] §1-5-2, §1-6
@@ -150,8 +152,6 @@ Cafe.pi의 Bean Token(☕ 커피빈 토큰) 경제를 통합 관리하는 어드
 | 종류 | 현재 통화 | 상태 |
 |---|---|---|
 | 레거시 구독(msg_subscr_plan 5종) | Pi (`CHAT_SUBSCR`) | ⏳ Bean 구독으로 흡수 예정 |
-| 이벤트방 입장료 | Pi (`entry_fee_pi`) | ⏳ EVENT 등급 Bean 전환 |
-| 배지 강화 / 스티커팩 | Pi | ⏳ Bean 정액 전환 |
 | 스토어 노출·연장·프리미엄 생성료 / 자동번역 건당 | — | 🚧 미구현(요금표만) |
 
 > **라이브 검증(bean_txn)**: `CHARGE` 1 · `SPEND` 4(-40 Bean) · `REFUND` 2(+20 Bean), `wallet_type` PLATFORM 1 + USER 보유. 정책 골격(충전 1 + Bean 결제 3)은 **이미 운영 중**이다.
