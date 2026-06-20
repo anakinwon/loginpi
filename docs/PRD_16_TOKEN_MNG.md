@@ -13,6 +13,7 @@
 
 | 버전 | 날짜 | 변경 내용 | 작성자 |
 |------|------|-----------|--------|
+| v1.3 | 2026-06-20 | **플랫폼 Bean 결제 정책·실적용 현황 반영**: §2-3-1 신설 — "Pi 직결제 폐기 → Bean 선충전 후 Bean 결제 일원화" 정책 + 라이브 DB 검증(충전 1·SPEND 4·REFUND 2, ref_tp=ROOM_CREATE/ROOM_ENTER)으로 결제 종류별 적용·테스트 여부 전수. 요금 정본 위치([[PRD_15_FEE]] §1-5) 링크. 충전(IN)=유일 Pi 접점, 결제(OUT)=Bean SPEND 명문화. | asoká |
 | v1.2 | 2026-06-19 | **소각(Burn) 개념 전면 제거**: Bean은 소각 없음 — USER↔PLATFORM 지갑 간 순환만 존재. §2-5-1 "소각 없음 원칙" 신설. `Total Burned`→`Total Collected`, `burn_rate_percent`→`collection_rate_percent`, `burned_bean_daily`→`collected_bean_daily` 전환. KPI "Platform Revenue Ratio"→"Platform Collection Rate" 재정의. | asoká |
 | v1.1 | 2026-06-19 | **핵심 개념 확정 — 빈토큰지갑(bean_token_wallet) 통일**: §2-7(핵심 개념), §2-8(명명 규칙) 신설. `bean_wlt` 전체 → `bean_token_wallet` 교체. `wallet_type`(PLATFORM/USER) 도입으로 발행 관리와 사용자 보유를 단일 엔티티로 통합. PLATFORM 지갑 DDL·일관성 검증식 추가. §13-0 명명 규칙 비즈니스 규칙 6항 추가. | asoká |
 | v1.0 | 2026-06-19 | 최초 초안 — Bean Token 경제 시스템 완전 명세. ① 토큰 대시보드(발행·유통·소각 KPI) ② 매출 관리(Pi→Bean 충전 매출·구독 소비·수수료) ③ 순환 관리(입금·출금·소각·감사) ④ 보상 경제 설계(O2O 보상 Bean 지급 정책) ⑤ 어드민 조치(수동 조정·이상거래 감지·동결) ⑥ KPI 지표(유통속도·충전소비비율·잔고분포). DB 스키마·API·화면·비즈니스 규칙 전수. | asoká |
@@ -123,6 +124,37 @@ Cafe.pi의 Bean Token(☕ 커피빈 토큰) 경제를 통합 관리하는 어드
 │ → Bean 보상 (플랫폼 인센티브)          │
 └─────────────────────────────────────────┘
 ```
+
+### 2-3-1. ⭐ 플랫폼 Bean 결제 종류 — 정책 + 실적용 현황 (2026-06-20)
+
+> **정책**: 플랫폼(↔사용자) 요금은 **Pi 직접 결제를 폐기**하고 **① Pi로 Bean 선충전(IN) → ② Bean으로 결제(OUT)** 2단계로 일원화한다.
+> **사용자의 유일한 Pi 접점 = "Bean 충전" 1곳.** 요금 금액 정본은 [[PRD_15_FEE]] §1-5(코드 미러 `bean-fee.ts`·`bean-subscr-plan.ts`).
+> **정책 제외**: **P2P**(팁, Pi) · **O2O/매장 결제**(상품 에스크로·판매자 보증금, Pi) — §2-3 라우팅 유지.
+
+**충전(IN) — 유일한 Pi 접점**
+
+| 종류 | 통화 | txn | 코드 | 적용 | 테스트 |
+|---|---|---|---|---|---|
+| Bean 충전 | Pi→Bean | `CHARGE` | `payments/complete` `BEAN_CHARGE` · `api/bean/charge` | ✅ 라이브(충전 1건) | ✅ Pi Browser 필수 |
+
+**결제(OUT) — Bean SPEND (`fn_bean_apply`)**
+
+| 종류 | 금액(Bean) | ref/meta | 코드 | 적용 | 테스트 |
+|---|---|---|---|---|---|
+| 카페 생성료(프리미엄) | 10 | `ref=ROOM_CREATE` | `api/chat/rooms/group` | ✅ 라이브(1건) | ✅ 일반 브라우저 |
+| 카페 입장료(프리미엄) | 10 | `ref=ROOM_ENTER` | `api/chat/rooms/[id]/join` | ✅ 라이브(5건+환불2) | ✅ 일반 브라우저 |
+| 상품 구독료(PiCafe·PiStore S/M/L·자동번역) | 1,000~50,000 | `bean_subscr` | `api/subscriptions/products/subscribe`→`fn_bean_subscribe_product` | ✅ 배포(실사용 0) | ✅ 잔액만 있으면 |
+
+**잔여 Pi 결제(⏳ Bean 전환 대기) / 미구현(🚧)** — 상세·로드맵은 [[PRD_15_FEE]] §1-5-2, §1-6
+
+| 종류 | 현재 통화 | 상태 |
+|---|---|---|
+| 레거시 구독(msg_subscr_plan 5종) | Pi (`CHAT_SUBSCR`) | ⏳ Bean 구독으로 흡수 예정 |
+| 이벤트방 입장료 | Pi (`entry_fee_pi`) | ⏳ EVENT 등급 Bean 전환 |
+| 배지 강화 / 스티커팩 | Pi | ⏳ Bean 정액 전환 |
+| 스토어 노출·연장·프리미엄 생성료 / 자동번역 건당 | — | 🚧 미구현(요금표만) |
+
+> **라이브 검증(bean_txn)**: `CHARGE` 1 · `SPEND` 4(-40 Bean) · `REFUND` 2(+20 Bean), `wallet_type` PLATFORM 1 + USER 보유. 정책 골격(충전 1 + Bean 결제 3)은 **이미 운영 중**이다.
 
 ### 2-4. 환율
 
