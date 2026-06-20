@@ -2,7 +2,6 @@
 import { useEffect, useState, useCallback, Fragment } from 'react'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
-import { useSubscribePlan } from '@/hooks/use-subscribe-plan'
 import { InlinePurchasePrompt } from './inline-purchase-prompt'
 import { CustomStickerCreator } from './custom-sticker-creator'
 import { StickerImg } from './sticker-img'
@@ -48,14 +47,6 @@ export function StickerPicker({
   const [showSubscribePrompt, setShowSubscribePrompt] = useState(false)
   // TASK-074: 커스텀 스티커 제작 다이얼로그 (Business — 권한은 API 검증)
   const [showCreator, setShowCreator] = useState(false)
-
-  const handleSubscribeSuccess = useCallback(() => {
-    setShowSubscribePrompt(false)
-  }, [])
-
-  const { subscribe, paying } = useSubscribePlan({
-    onSuccess: handleSubscribeSuccess,
-  })
 
   const loadPacks = useCallback(async () => {
     const res = await piFetch('/api/stickers/packs')
@@ -265,10 +256,6 @@ export function StickerPicker({
         isOpen={showSubscribePrompt}
         featureName="스티커 팩 구독"
         description="프리미엄 구독 시 매월 새 스티커 팩을 포함해 다양한 특혜를 누리세요."
-        piAmount={3}
-        onSinglePurchase={() => setShowSubscribePrompt(false)}
-        onSubscribe={subscribe}
-        subscribing={paying}
         onClose={() => setShowSubscribePrompt(false)}
       />
     </div>

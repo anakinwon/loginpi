@@ -66,7 +66,8 @@ export async function POST(request: NextRequest) {
 
     // CHAT_ROOM_CREATE: 결제 완료 시 그룹 카페 생성
     let createdRoom: Record<string, unknown> | null = null
-    let grantedSubscr: Record<string, unknown> | null = null
+    // 레거시 Pi 구독(CHAT_SUBSCR) 폐기로 항상 null — 응답 스키마 호환 위해 필드 유지
+    const grantedSubscr: Record<string, unknown> | null = null
     const meta = payment.metadata as Record<string, unknown> | null
     if (meta?.type === 'CHAT_ROOM_CREATE' && payment.user_uid) {
       const { data: owner } = await db
@@ -145,71 +146,8 @@ export async function POST(request: NextRequest) {
           }
         }
       }
-    } else if (meta?.type === 'CHAT_SUBSCR' && payment.user_uid) {
-      // CHAT_SUBSCR: 결제 완료 시 구독 시작/갱신 (msg_subscr UPSERT — usr_id UNIQUE)
-      const planCd = String(meta.plan_cd ?? '')
-      const [{ data: owner }, { data: plan }] = await Promise.all([
-        db
-          .from('sys_user')
-          .select('id, display_name')
-          .eq('pi_uid', payment.user_uid)
-          .maybeSingle(),
-        db
-          .from('msg_subscr_plan')
-          .select('plan_cd, price_pi, mth_cnt')
-          .eq('plan_cd', planCd)
-          .eq('use_yn', 'Y')
-          .eq('del_yn', 'N')
-          .maybeSingle(),
-      ])
-
-      if (owner && plan) {
-        const ownerRow = owner as { id: string; display_name: string | null }
-        const planRow = plan as {
-          plan_cd: string
-          price_pi: number
-          mth_cnt: number
-        }
-        const slug = String(ownerRow.display_name ?? 'user').slice(0, 20)
-
-        // 결제 금액이 플랜 가격 이상인지 서버 재검증 (클라이언트 amount 조작 방지, 부동소수 오차 허용)
-        if (Number(payment.amount) + 1e-6 >= planRow.price_pi) {
-          const months = planRow.mth_cnt > 0 ? planRow.mth_cnt : 1
-          const now = new Date()
-          const expire = new Date(now)
-          expire.setMonth(expire.getMonth() + months)
-
-          const { data: subscr } = await db
-            .from('msg_subscr')
-            .upsert(
-              {
-                usr_id: ownerRow.id,
-                plan_cd: planRow.plan_cd,
-                pymnt_id: paymentId,
-                start_dtm: now.toISOString(),
-                expire_dtm: expire.toISOString(),
-                auto_renew_yn: 'Y',
-                del_yn: 'N',
-                del_dtm: null,
-                regr_id: slug,
-                modr_id: slug,
-                mod_dtm: now.toISOString(),
-              },
-              { onConflict: 'usr_id' },
-            )
-            .select()
-            .single()
-
-          grantedSubscr = (subscr as Record<string, unknown>) ?? null
-
-          // M5: PiRC2 구독 신청 미션 기록 (비블로킹)
-          recordUserAction('subscr_apply', ownerRow.id, {
-            plan_cd: planRow.plan_cd,
-          }).catch((err) =>
-            console.error(`[M5] subscr_apply 기록 실패: ${err.message}`),
-          )
-        }
-      }
+      // 레거시 Pi 구독(CHAT_SUBSCR) 분기는 폐기됨 (PRD_15_FEE §1-6 — Bean 구독으로 일원화).
+      // 구독 결제는 POST /api/subscriptions/products/subscribe (Bean SPEND)가 단독 담당.
     } else if (meta?.type === 'PI_TIP' && payment.user_uid) {
       // PI_TIP: 결제 완료 시 TIP_NOTI 메시지 삽입 + 실시간 브로드캐스트
       const [{ data: sender }, { data: recipient }] = await Promise.all([

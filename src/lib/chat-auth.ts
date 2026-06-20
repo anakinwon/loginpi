@@ -18,8 +18,10 @@ export interface PlanCaps {
   canAutoTranslate: boolean // 자동번역(PiTranslate) 사용 — 미구독(FREE)은 불가
 }
 
-// 시드된 플랜(msg_subscr_plan)의 plan_tp_cd → 기능 한도 매핑.
-// FREE: Pi Explorer / PREMIUM: Pi Creator / BUSINESS: Pi Host
+// 채팅 등급별 기능 한도 매핑.
+// FREE: Pi Explorer(미구독) / PREMIUM: PiCafe 구독자 / BUSINESS: 운영자(ADMIN/MASTER) 전용.
+// ※ canAutoTranslate는 PLAN_CAPS 값과 무관하게 getChatPlan에서 TRANSLATE 구독 유무로 재정의된다
+//    (PRD_15_FEE §1-6: 자동번역은 TRANSLATE 별도 구독 전용). 운영자(BUSINESS)만 항상 true.
 const PLAN_CAPS: Record<PlanTier, PlanCaps> = {
   FREE: {
     tier: 'FREE',
@@ -78,22 +80,21 @@ const OPERATOR_PLAN: ChatPlan = {
   caps: PLAN_CAPS.BUSINESS,
 }
 
-// 사용자의 현재 활성 구독 플랜.
-// 만료(expire_dtm <= now)·논리삭제(del_yn='Y')는 자동 제외 → 없으면 FREE로 강등.
-// 운영자(ADMIN/MASTER)는 구독·tier와 무관하게 BUSINESS 캡 보장 (Business 전용 기능 운영·검증)
+// 사용자의 현재 채팅 권한 — Bean 상품 구독(bean_subscr) 기반.
+//   PICAFE 구독 → PREMIUM 캡(그룹방 무제한·AI 10회·팁·프리미엄 테마),
+//   TRANSLATE 구독 → 자동번역(canAutoTranslate)만 부여.
+//   레거시 Pi 구독(msg_subscr)은 더 이상 참조하지 않는다 (PRD_15_FEE §1-6 — CHAT_SUBSCR Pi 경로 폐기).
+// 만료(expire_dtm <= now)·논리삭제(del_yn='Y')는 자동 제외 → 없으면 FREE.
+// 운영자(ADMIN/MASTER)는 구독과 무관하게 BUSINESS 캡 보장(전 기능 운영·검증).
 export async function getChatPlan(userId: string): Promise<ChatPlan> {
-  const [{ data }, { data: userRow }] = await Promise.all([
+  const [{ data: subs }, { data: userRow }] = await Promise.all([
     getSupabaseAdmin()
-      .from('msg_subscr')
-      .select(
-        'plan_cd, expire_dtm, auto_renew_yn, msg_subscr_plan(plan_nm, plan_tp_cd)',
-      )
+      .from('bean_subscr')
+      .select('prod_ctgr_cd, expire_dtm, auto_renew_yn')
       .eq('usr_id', userId)
       .eq('del_yn', 'N')
-      .gt('expire_dtm', new Date().toISOString())
-      .order('expire_dtm', { ascending: false })
-      .limit(1)
-      .maybeSingle(),
+      .in('prod_ctgr_cd', ['PICAFE', 'TRANSLATE'])
+      .gt('expire_dtm', new Date().toISOString()),
     getSupabaseAdmin()
       .from('sys_user')
       .select('role')
@@ -104,34 +105,37 @@ export async function getChatPlan(userId: string): Promise<ChatPlan> {
   const isOperator =
     (userRow as { role?: string } | null)?.role === 'ADMIN' ||
     (userRow as { role?: string } | null)?.role === 'MASTER'
+  // 운영자는 구독 없이도 BUSINESS 전 기능(자동번역 포함)
+  if (isOperator) return OPERATOR_PLAN
 
-  if (!data) return isOperator ? OPERATOR_PLAN : FREE_PLAN
-
-  const row = data as {
-    plan_cd: string
+  type ActiveRow = {
+    prod_ctgr_cd: string
     expire_dtm: string
-    auto_renew_yn: 'Y' | 'N' | null
-    // PostgREST는 1:1 FK도 배열로 반환할 수 있어 양쪽 모두 방어
-    msg_subscr_plan:
-      | { plan_nm: string; plan_tp_cd: PlanTier }
-      | { plan_nm: string; plan_tp_cd: PlanTier }[]
-      | null
+    auto_renew_yn: string | null
+  }
+  const rows = (subs as ActiveRow[] | null) ?? []
+  const picafe = rows.find((r) => r.prod_ctgr_cd === 'PICAFE')
+  const translate = rows.find((r) => r.prod_ctgr_cd === 'TRANSLATE')
+
+  // 미구독(PICAFE·TRANSLATE 둘 다 없음) → FREE
+  if (!picafe && !translate) return FREE_PLAN
+
+  // 채팅 등급은 PICAFE 구독 유무로 결정(PREMIUM 캡). 자동번역은 TRANSLATE 구독 전용으로 재정의.
+  const tier: PlanTier = picafe ? 'PREMIUM' : 'FREE'
+  const caps: PlanCaps = {
+    ...PLAN_CAPS[tier],
+    canAutoTranslate: !!translate,
   }
 
-  const planRow = Array.isArray(row.msg_subscr_plan)
-    ? row.msg_subscr_plan[0]
-    : row.msg_subscr_plan
-  const subscrTier = (planRow?.plan_tp_cd ?? 'FREE') as PlanTier
-  // 운영자는 구독 tier가 낮아도 BUSINESS 캡으로 승격 (구독 정보는 그대로 표시)
-  const tier = isOperator ? 'BUSINESS' : subscrTier
-
+  // 만료·자동갱신 표시는 PICAFE 우선, 없으면 TRANSLATE
+  const primary = picafe ?? translate!
   return {
-    plan_cd: row.plan_cd,
-    plan_nm: planRow?.plan_nm ?? row.plan_cd,
+    plan_cd: picafe ? 'PICAFE_SUBSCR' : 'TRANSLATE_SUBSCR',
+    plan_nm: picafe ? 'PiCafe 구독' : 'PiTranslate 구독',
     tier,
-    expire_dtm: row.expire_dtm,
-    auto_renew_yn: row.auto_renew_yn ?? null,
-    caps: PLAN_CAPS[tier] ?? PLAN_CAPS.FREE,
+    expire_dtm: primary.expire_dtm,
+    auto_renew_yn: (primary.auto_renew_yn as 'Y' | 'N' | null) ?? null,
+    caps,
   }
 }
 

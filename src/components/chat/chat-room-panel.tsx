@@ -3,7 +3,6 @@ import { useState, useEffect, useCallback } from 'react'
 import { useLocale } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { useChatRoom, type ChatMessage } from '@/hooks/use-chat-room'
-import { useSubscribePlan } from '@/hooks/use-subscribe-plan'
 import { piFetch } from '@/lib/pi-fetch'
 import { ChatMessageList } from './chat-message-list'
 import { ChatInput } from './chat-input'
@@ -159,17 +158,6 @@ export function ChatRoomPanel({
       )
       .catch(() => {})
   }, [roomId])
-
-  const handleSubscribeSuccess = useCallback(() => {
-    setTipPromptOpen(false)
-    setExpirePromptOpen(false)
-    setAiLimitPromptOpen(false)
-    checkSubscription()
-  }, [checkSubscription])
-
-  const { subscribe, paying } = useSubscribePlan({
-    onSuccess: handleSubscribeSuccess,
-  })
 
   const onUpgradeForTip = useCallback(() => setTipPromptOpen(true), [])
   const onAiLimitExceeded = useCallback(() => setAiLimitPromptOpen(true), [])
@@ -393,11 +381,7 @@ export function ChatRoomPanel({
       <InlinePurchasePrompt
         isOpen={tipPromptOpen}
         featureName="Bean 보내기"
-        description="프리미엄 구독자는 다른 참가자에게 Pi Bean을 보낼 수 있습니다."
-        piAmount={3}
-        onSinglePurchase={() => setTipPromptOpen(false)}
-        onSubscribe={subscribe}
-        subscribing={paying}
+        description="프리미엄 구독자는 다른 참가자에게 Bean을 보낼 수 있습니다."
         onClose={() => setTipPromptOpen(false)}
       />
 
@@ -406,10 +390,6 @@ export function ChatRoomPanel({
         isOpen={expirePromptOpen}
         featureName="카페 보관 · 정원 확장"
         description="프리미엄 구독으로 메시지를 무제한 보관하고 카페 정원을 늘리세요."
-        piAmount={3}
-        onSinglePurchase={() => setExpirePromptOpen(false)}
-        onSubscribe={subscribe}
-        subscribing={paying}
         onClose={() => setExpirePromptOpen(false)}
       />
 
@@ -440,10 +420,6 @@ export function ChatRoomPanel({
         isOpen={aiLimitPromptOpen}
         featureName="AI 카페 비서 한도 초과"
         description="이번 달 @ai 멘션 한도를 초과했습니다. 프리미엄 구독으로 무제한 AI 질문을 이용하세요."
-        piAmount={3}
-        onSinglePurchase={() => setAiLimitPromptOpen(false)}
-        onSubscribe={subscribe}
-        subscribing={paying}
         onClose={() => setAiLimitPromptOpen(false)}
       />
 
