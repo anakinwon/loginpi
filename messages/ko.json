@@ -22,6 +22,7 @@
       "i18n": "다국어 관리",
       "batch": "온디멘드 배치",
       "chatSection": "카페 관리",
+      "themes": "테마 관리",
       "subscriptions": "구독 관리",
       "stickers": "스티커 관리",
       "settle": "정산 관리",
@@ -32,6 +33,55 @@
       "beanToken": "Bean 대시보드",
       "beanTxn": "거래 내역",
       "beanWallets": "지갑 관리"
+    },
+    "themes": {
+      "title": "테마 관리",
+      "totalCount": "총 {count}개 테마",
+      "noData": "등록된 테마가 없습니다",
+      "searchPlaceholder": "테마 코드·이름 검색",
+      "tpFilter": {
+        "all": "전체",
+        "basic": "일반",
+        "premium": "프리미엄"
+      },
+      "formTitleNew": "새 테마 등록",
+      "formTitleEdit": "테마 수정",
+      "field": {
+        "cd": "테마 코드",
+        "nm": "테마명",
+        "emoji": "이모지",
+        "tp": "그룹",
+        "sortOrd": "정렬순서",
+        "useYn": "노출",
+        "desc": "설명·태그"
+      },
+      "placeholder": {
+        "cd": "ESPORTS",
+        "nm": "e스포츠",
+        "desc": "#태그 #키워드"
+      },
+      "selectTp": {
+        "basic": "일반(BASIC)",
+        "premium": "프리미엄(PREMIUM)"
+      },
+      "useYnOn": "노출",
+      "useYnOff": "숨김",
+      "col": {
+        "theme": "테마",
+        "cd": "코드",
+        "tp": "그룹",
+        "sortOrd": "순서",
+        "useYn": "노출",
+        "desc": "설명"
+      },
+      "validationCd": "테마 코드는 영문 대문자·숫자·_ 조합 1~20자여야 합니다",
+      "validationRequired": "테마명과 이모지는 필수입니다",
+      "saveSuccess": "테마가 등록되었습니다",
+      "editSuccess": "테마가 수정되었습니다",
+      "saveFail": "저장에 실패했습니다",
+      "deleteConfirm": "'{name}' 테마를 삭제할까요? (기존 카페는 유지됩니다)",
+      "deleteSuccess": "테마가 삭제되었습니다",
+      "deleteFail": "삭제에 실패했습니다"
     },
     "batch": {
       "title": "온디멘드 배치",
@@ -870,6 +920,7 @@
       "expiresToday": "오늘 만료",
       "memberCount": "({cur}/{max}명)",
       "direct": "1:1",
+      "private": "비공개",
       "scrollMore": "스크롤하여 더 보기…",
       "authenticating": "Pi 계정 인증 중…",
       "loginRequired": "카페는 로그인 후 이용할 수 있습니다",
