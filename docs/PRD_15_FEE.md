@@ -1,11 +1,13 @@
 # PRD_15_FEE.md — Cafe.pi 종합 요금 표준 (Bean 경제 표준 마스터)
 
-> **작성일**: 2026-06-18
-> **버전**: v0.1 (초안 · DB 미적용)
-> **상태**: 설계 — 엑셀 교정본 확정 후 시드 확정
+> **작성일**: 2026-06-18 / **최종 현행화**: 2026-06-20
+> **버전**: v0.2 (요금 코드 미러 라이브 · `bean_fee_plan` 테이블만 미적용)
+> **상태**: **일부 적용 운영 중** — 카페 생성/입장·상품 구독은 Bean 결제 라이브, 잔여 Pi 결제 4종은 Bean 전환 대기
 > **정본 위상**: ⭐ **BEAN 토큰 경제학의 표준 요금** — 플랫폼의 모든 과금(SPEND)·보상(REWARD) 금액의 단일 출처
 > **입력 원본**: `docs/Fees/Cafe.pi요금제_20260618_v0.1.xlsx` ("요금제종합" 43행)
-> **연계**: [[PRD_12_TOKEN.md]](Bean 원장 금액 출처) · [[PRD_14_SUBSC.md]](구독 요금)
+> **연계**: [[PRD_12_TOKEN.md]](Bean 원장 금액 출처) · [[PRD_14_SUBSC.md]](구독 요금) · [[PRD_16_TOKEN_MNG.md]](Bean 경제 관리)
+>
+> ⚠️ **"미적용" 범위 정정**: `bean_fee_plan` **DB 테이블**은 아직 미생성이며, 요금 금액은 **코드 단일 소스**(`src/lib/bean-fee.ts`·`src/lib/bean-subscr-plan.ts`)에 미러돼 라이브로 차감 중이다. 즉 *요금 인프라는 적용*, *마스터 테이블만 문서 초안* 상태. 온체인 Bean 발행(레드라인 Phase 17)과 무관하게, 오프체인 Bean 원장(store-credit)은 운영 중이다.
 
 ---
 
@@ -13,6 +15,7 @@
 
 | 버전 | 날짜 | 변경 내용 | 작성자 |
 |------|------|-----------|--------|
+| v0.2 | 2026-06-20 | **현행화 — 플랫폼 Bean 결제 정책 반영**: ① §1-5 "플랫폼 Bean 결제 종류·적용 현황" 신설(라이브 DB 검증 기준 적용여부·테스트 가능 여부 전수). ② 요금 정본이 `bean_fee_plan` DB가 아닌 **코드 미러**(`bean-fee.ts`·`bean-subscr-plan.ts`)로 라이브 운영 중임을 명시. ③ "Pi 결제 → Bean 선충전 후 Bean 결제 일원화" 정책 + 잔여 Pi 결제 4종 전환 로드맵(§1-6). P2P(팁)·O2O(매장결제)는 정책 제외. | asoká |
 | v0.1 | 2026-06-18 | 최초 초안 — 엑셀 "요금제종합" 43행을 `bean_fee_plan` 표준 스키마로 매핑. 코드 정규화·공존 전략·통화/표기 규약·데이터 품질 교정 대기 목록. DB 미적용(문서 내 DDL 초안). | asoká |
 
 ---
@@ -51,6 +54,67 @@
 
 - **과금 선택 규칙 (구현 핵심 분기)**: 어떤 행위에 과금할 때 → **사용자가 해당 상품 구독자면 `*_SUBSCR` 행 요금**, 아니면 **`*_GENERAL` 행 요금** 을 적용한다. (billing 함수가 `구독여부 × prod_ctgr × fee_knd × grade × cycle`로 1행을 선택)
 - 즉 구독료는 "기능 잠금해제"가 아니라 **"반복 행위 비용의 선납 할인권"** — 활성 사용자(많이 쓰는 사람)일수록 구독 이득이 커지는 구조.
+
+---
+
+## 1-5. ⭐ 플랫폼 Bean 결제 종류 — 전수 목록 + 적용 현황
+
+> **정책 (2026-06-20 확정)**: 플랫폼(↔사용자) 요금은 **Pi 직접 결제를 폐기**하고, **① Pi로 Bean 선충전 → ② Bean으로 결제**의 2단계로 일원화한다.
+> **사용자의 유일한 Pi 접점 = "Bean 충전" 1곳.** 이후 모든 플랫폼 요금은 Bean 잔액에서 차감(`fn_bean_apply` SPEND).
+> **정책 제외(통화 라우팅 §0 유지)**: **P2P**(사용자↔사용자 = 팁, Pi) · **O2O/매장 결제**(상품 구매 에스크로·판매자 보증금, Pi).
+
+### 1-5-1. 결제 흐름 한눈에
+
+```
+[사용자]      Pi 결제 (Pi Browser 전용)      [플랫폼]
+   │  ──────── ① Bean 충전(CHARGE) ────────▶  PLATFORM→USER 지갑
+   │                                              │
+   │  ◀──── 이후 Pi 접점 없음 ────                │
+   │                                              │
+   │  ② Bean 결제(SPEND, fn_bean_apply) ─────▶  USER→PLATFORM 회수
+   │     · 카페 생성료   · 카페 입장료
+   │     · 상품 구독료   · (전환예정) 이벤트입장·배지·스티커
+```
+
+### 1-5-2. 종류별 적용·테스트 현황 (라이브 DB 검증 — 2026-06-20)
+
+> **충전(IN)** = 유일한 Pi 접점. **결제(OUT)** = Bean 차감. ✅적용 / ⏳전환대기(현재 Pi) / 🚧미구현.
+
+| # | 결제 종류 | 통화·방향 | 금액(Bean) | 코드 위치 | ref/meta | 적용 | 테스트 가능 |
+|---|---|---|---|---|---|---|---|
+| 1 | **Bean 충전** | Pi→Bean (IN) | 1 Pi = 100 Bean | `payments/complete` `BEAN_CHARGE` · `api/bean/charge` | `txn=CHARGE` | ✅ **라이브** (충전 1건 확인) | ✅ **Pi Browser 필수** |
+| 2 | **카페 생성료** (프리미엄) | Bean (OUT) | 10 | `api/chat/rooms/group` | `ref=ROOM_CREATE` | ✅ **라이브** (1건 확인) | ✅ 일반 브라우저 가능 |
+| 3 | **카페 입장료** (프리미엄) | Bean (OUT) | 10 | `api/chat/rooms/[id]/join` · `[roomId]/page` · `room-entry-fee-gate` | `ref=ROOM_ENTER` | ✅ **라이브** (5건+환불2 확인) | ✅ 일반 브라우저 가능 |
+| 4 | **상품 구독료** (PiCafe·PiStore S/M/L·자동번역) | Bean (OUT) | 1,000~50,000 (§4-1) | `api/subscriptions/products/subscribe` → `fn_bean_subscribe_product` | `bean_subscr` | ✅ **배포됨** (실사용 0건) | ✅ **테스트 가능** (잔액만 있으면) |
+| 5 | 레거시 구독 (msg_subscr_plan 5종) | **Pi (OUT)** | — | `api/subscriptions` · `payments/complete` `CHAT_SUBSCR` | `meta=CHAT_SUBSCR` | ⏳ **전환대기** (현재 Pi, #4와 공존) | ✅ (Pi Browser) |
+| 6 | 이벤트방 입장료 | **Pi (OUT)** | — (`entry_fee_pi`) | `payments/complete` `EVENT_ROOM_JOIN` | `meta=EVENT_ROOM_JOIN` | ⏳ **전환대기** | ✅ (Pi Browser) |
+| 7 | 배지 강화 (BADGE_UPGRADE) | Bean (OUT) | 10 Bean (=0.1 Pi) | `api/badges/upgrade` | `refTp=BADGE_UPGRADE` | ✅ **라이브** | ✅ 일반 브라우저 가능 |
+| 8 | 스티커팩 구매 | **Pi (OUT)** | — (`price_pi`) | `payments/complete` `STICKER_PACK` | `meta=STICKER_PACK` | ⏳ **전환대기** | ✅ (Pi Browser) |
+| 9 | 스토어 노출료(EXPOSE)·연장료(EXTEND)·프리미엄 상품생성료 | Bean (OUT) 예정 | 5~20 (§4-3) | — | — | 🚧 **미구현** (요금표만) | ❌ |
+| 10 | 자동번역 건당(1 Bean)·음성채팅(무료) | Bean (OUT) 예정 | 1 / 0 | — (구독 #4로만 제공) | — | 🚧 **미구현** (건당 미과금) | ❌ |
+
+**정책 제외 (P2P·O2O — Pi 유지, Bean 전환 대상 아님)**
+
+| 결제 종류 | 통화 | 분류 | 코드 |
+|---|---|---|---|
+| 팁(Bean 선물) | Pi | **P2P** 사용자↔사용자 | `pi-tip-button` · `payments/complete` `PI_TIP` |
+| 상품 구매 에스크로 | Pi | **O2O** 매장 결제 | `payments/complete` `MPS_ESCROW` |
+| 판매자 보증금 1π | Pi | **O2O** 판매자↔플랫폼(매장 운영) | `payments/complete` `MPS_BOND` |
+
+> ※ #1~4가 정책의 골격(충전 1 + Bean 결제 3)이며 **이미 라이브**다. #5~8은 동일 정책으로 Bean 전환이 남은 잔여 Pi 결제, #9~10은 요금표에만 있는 미구현 항목이다.
+
+---
+
+## 1-6. 잔여 Pi 결제 → Bean 전환 로드맵
+
+각 항목은 "Pi `createPayment` 제거 → Bean `fn_bean_apply` SPEND 호출"로 #2·#3과 동일 패턴 전환한다(서버에서 잔액 검증→402→`/bean` 충전 유도).
+
+| 순위 | 대상 | 작업 요지 | 비고 |
+|---|---|---|---|
+| 1 | #5 레거시 구독 | `CHAT_SUBSCR` Pi 경로 폐기, #4 Bean 구독으로 흡수 | `msg_subscr_plan` 5종 → `bean_subscr` 통합(보류 중) |
+| 2 | #6 이벤트방 입장 | `entry_fee_pi` → Bean(EVENT 등급, §4-2 CGEE3 등) | `bean-fee.ts`에 EVENT 상수 이미 존재(20) |
+| 3 | #7 배지 강화 | ~~0.1 Pi → Bean 정액~~ | ✅ **완료** — 10 Bean, `api/badges/upgrade`, `bean-fee.ts` |
+| 4 | #8 스티커팩 | `price_pi` → `price_bean` | `msg_stkr_pack` 컬럼 추가 |
 
 ---
 

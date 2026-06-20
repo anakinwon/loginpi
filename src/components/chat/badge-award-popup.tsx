@@ -1,12 +1,13 @@
 'use client'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
+import { piFetch } from '@/lib/pi-fetch'
+import { BADGE_UPGRADE_BEAN } from '@/lib/bean-fee'
 
 // TASK-062 Trigger 7: 활동 배지 강화 팝업
-// 배지 자동 수여 시 축하 + "배지 강화 0.1 Pi" 단건 구매 유도
-// 전환 포인트: 배지를 자랑하고 싶은 성취감
-
-const BADGE_UPGRADE_PI = 0.1
+// 배지 자동 수여 시 축하 + "배지 강화 10 Bean" 단건 구매 유도
+// PRD_15_FEE §1-6 #7: Pi 직접결제(FEATURE_ADDON) → Bean SPEND 전환
 
 export interface BadgeAwardInfo {
   badge_id: string
@@ -27,57 +28,46 @@ export function BadgeAwardPopup({
   onClose,
 }: BadgeAwardPopupProps) {
   const [paying, setPaying] = useState(false)
+  const router = useRouter()
 
   if (!badge) return null
 
-  function upgrade() {
+  async function upgrade() {
     if (!badge) return
-    if (!window.Pi) {
-      toast.error('Pi Browser에서만 배지를 강화할 수 있습니다')
-      return
-    }
     setPaying(true)
-    window.Pi.createPayment(
-      {
-        amount: BADGE_UPGRADE_PI,
-        memo: `배지 강화: ${badge.theme_nm}`.slice(0, 100),
-        metadata: {
-          type: 'FEATURE_ADDON',
-          feature_cd: 'BADGE_UPGRADE',
-          theme_cd: badge.theme_cd,
-        },
-      },
-      {
-        onReadyForServerApproval: async (paymentId) => {
-          await fetch('/api/payments/approve', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ paymentId }),
-          })
-        },
-        onReadyForServerCompletion: async (paymentId, txid) => {
-          const res = await fetch('/api/payments/complete', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ paymentId, txid }),
-          })
-          setPaying(false)
-          if (res.ok) {
-            toast.success(
-              `${badge.theme_emoji} ${badge.theme_nm} 배지가 강화되었습니다!`,
-            )
-            onUpgraded()
-          } else {
-            toast.error('배지 강화 결제 완료 처리에 실패했습니다')
-          }
-        },
-        onCancel: () => setPaying(false),
-        onError: (e) => {
-          setPaying(false)
-          toast.error(e.message)
-        },
-      },
-    )
+    try {
+      const res = await piFetch('/api/badges/upgrade', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ badge_id: badge.badge_id, theme_cd: badge.theme_cd }),
+      })
+
+      if (res.ok) {
+        toast.success(
+          `${badge.theme_emoji} ${badge.theme_nm} 배지가 강화되었습니다!`,
+        )
+        onUpgraded()
+        return
+      }
+
+      const data = await res.json().catch(() => ({}))
+      if (res.status === 402 && data.requiresBean) {
+        toast.error('Bean이 부족합니다. 충전 페이지로 이동합니다.')
+        onClose()
+        router.push('/bean')
+        return
+      }
+      if (res.status === 409) {
+        toast.info('이미 강화된 배지입니다')
+        onClose()
+        return
+      }
+      toast.error(data.error ?? '배지 강화에 실패했습니다')
+    } catch {
+      toast.error('네트워크 오류가 발생했습니다')
+    } finally {
+      setPaying(false)
+    }
   }
 
   return (
@@ -112,8 +102,7 @@ export function BadgeAwardPopup({
               '결제 진행 중…'
             ) : (
               <>
-                <span className="font-serif italic">π</span> {BADGE_UPGRADE_PI}{' '}
-                배지 강화
+                ☕ {BADGE_UPGRADE_BEAN} Bean 배지 강화
               </>
             )}
           </button>

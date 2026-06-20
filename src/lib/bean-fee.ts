@@ -1,4 +1,4 @@
-// Bean 플랫폼 요금 단일 소스 — 카페 생성·입장 등 건당 과금(SPEND) 금액의 정본.
+// Bean 플랫폼 요금 단일 소스 — 카페 생성·입장·배지 강화 등 건당 과금(SPEND) 금액의 정본.
 // 정책 변경 시 이 파일만 수정 (chat-auth.ts PLAN_CAPS·locale-currency 단일 소스와 동일 원칙).
 //
 // 출처: docs/PRD_15_FEE.md / bean_fee_plan 표준(엑셀 요금제종합 v0.1)을 코드로 미러.
@@ -6,6 +6,9 @@
 //   - 구독 = 패키지 할인 → 구독자(PREMIUM/BUSINESS)는 건당 요금 면제(0).
 //   - 1 Pi = 100 Bean 고정. Bean 정수 전용.
 // ⚠️ Bean 미발행(레드라인 Phase 17) → 현재는 오프체인 내부 잔액(store credit) 차감.
+
+// 배지 강화 요금 — 0.1 Pi × 100 = 10 Bean (PRD_15_FEE §1-6 #7)
+export const BADGE_UPGRADE_BEAN = 10
 
 // 카페 등급 — 요금표의 grade_cd(GENERAL/PREMIUM/EVENT)에 대응.
 export type RoomGrade = 'GENERAL' | 'PREMIUM' | 'EVENT'
