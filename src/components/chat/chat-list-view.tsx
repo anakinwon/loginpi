@@ -21,6 +21,7 @@ export type RoomWithTheme = {
   max_mbr_cnt?: number
   cur_mbr_cnt?: number
   expr_dtm?: string
+  entry_expire_dtm?: string // 이벤트방(E) 입장 마감 — E방 유효기간 표시 소스
   reg_dtm?: string // 생성일시 — 목록 최신순 정렬 기준
   // msg_room.theme_cd → msg_theme FK (forward reference) → PostgREST가 단일 객체로 반환
   msg_theme: {
@@ -32,17 +33,25 @@ export type RoomWithTheme = {
 
 type ListT = ReturnType<typeof useTranslations<'chat.list'>>
 
+// 유효기간 라벨 — 무기한방(만료값 없음 또는 9999 sentinel)은 '무기한', 그 외는 D-N/만료
 function exprLabel(
   exprDtm: string | undefined,
   t: ListT,
-): { text: string; warn: boolean } | null {
-  if (!exprDtm || exprDtm.startsWith('9999')) return null
+): { text: string; warn: boolean } {
+  if (!exprDtm || exprDtm.startsWith('9999'))
+    return { text: t('unlimited'), warn: false }
   const daysLeft = Math.ceil(
     (new Date(exprDtm).getTime() - Date.now()) / 86_400_000,
   )
   if (daysLeft < 0) return { text: t('expired'), warn: true }
   if (daysLeft === 0) return { text: t('expiresToday'), warn: true }
   return { text: `D-${daysLeft}`, warn: daysLeft <= 3 }
+}
+
+// 유효기간 소스 — 이벤트방(E)은 expr_dtm이 항상 9999(영구 존속)이라 입장마감(entry_expire_dtm)을
+// 유효기간으로 본다. 그 외(그룹·1:1)는 방 만료 expr_dtm. (isEndedEvent와 동일 기준)
+function roomExpiry(room: RoomWithTheme): string | undefined {
+  return room.room_tp_cd === 'E' ? room.entry_expire_dtm : room.expr_dtm
 }
 
 function ThemeEmoji({ room }: { room: RoomWithTheme }) {
@@ -59,6 +68,11 @@ function RoomCard({ room, href }: { room: RoomWithTheme; href: string }) {
   const t = useTranslations('chat.list')
   const themeName = room.msg_theme?.theme_nm ?? room.theme_cd
   const isPremium = room.msg_theme?.theme_tp_cd === 'PREMIUM'
+  // 비공개 그룹·이벤트방 — 멤버에게만 보이는 '내 방'임을 명시(공개 디렉토리엔 미노출).
+  // 1:1(D)은 본디 비공개라 배지 생략(노이즈 방지).
+  const isPrivateRoom =
+    room.is_public_yn === 'N' &&
+    (room.room_tp_cd === 'G' || room.room_tp_cd === 'E')
 
   return (
     <Link
@@ -75,18 +89,22 @@ function RoomCard({ room, href }: { room: RoomWithTheme; href: string }) {
               PREMIUM
             </span>
           )}
-          {room.room_tp_cd === 'G' &&
-            (() => {
-              const el = exprLabel(room.expr_dtm, t)
-              if (!el) return null
-              return (
-                <span
-                  className={`ml-1 ${el.warn ? 'text-orange-500 dark:text-orange-400' : 'text-muted-foreground/70'}`}
-                >
-                  · {el.text}
-                </span>
-              )
-            })()}
+          {isPrivateRoom && (
+            <span className="ml-1.5 rounded-full bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+              🔒 {t('private')}
+            </span>
+          )}
+          {/* 유효기간 — 모든 방에 표시. 무기한방은 '무기한'(exprLabel 처리) */}
+          {(() => {
+            const el = exprLabel(roomExpiry(room), t)
+            return (
+              <span
+                className={`ml-1 ${el.warn ? 'text-orange-500 dark:text-orange-400' : 'text-muted-foreground/70'}`}
+              >
+                · {el.text}
+              </span>
+            )
+          })()}
           {room.room_tp_cd === 'G' && room.max_mbr_cnt != null && (
             <span className="text-muted-foreground/70 ml-1">
               {t('memberCount', {
@@ -112,6 +130,20 @@ function SectionHeader({ label }: { label: string }) {
       <span className="bg-primary h-5 w-1 shrink-0 rounded-full" aria-hidden />
       {label}
     </h2>
+  )
+}
+
+// '내 카페' 그룹 내부의 구독/일반 서브섹션 헤더 — 상위 SectionHeader보다 작고 옅게
+function SubSectionHeader({ label, badge }: { label: string; badge?: string }) {
+  return (
+    <div className="mb-2 flex items-center gap-2">
+      <h3 className="text-muted-foreground text-sm font-semibold">{label}</h3>
+      {badge && (
+        <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+          {badge}
+        </span>
+      )}
+    </div>
   )
 }
 
@@ -216,23 +248,21 @@ export function ChatListView({
         </section>
       )}
 
-      {/* 구독 카페 — PREMIUM 테마 방만 */}
-      {!roomsLoading && subscriptionRooms.length > 0 && (
+      {/* 내 카페 — '구독'·'일반' 서브섹션으로 묶은 '내가 참여 중인 방'.
+          공개 디렉토리(아래 '카페 탐색'·마켓플레이스)와 별개이며, 비공개방도 내 방이면 여기 표시된다. */}
+      {!roomsLoading && (
         <section className="bg-muted/30 mb-6 rounded-2xl p-4 sm:p-5">
-          <div className="mb-3 flex items-center gap-2">
-            <SectionHeader label={t('subscriptionCafes')} />
-            <span className="mb-3 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
-              PREMIUM
-            </span>
-          </div>
-          <PagedRoomList rooms={subscriptionRooms} />
-        </section>
-      )}
+          <SectionHeader label={t('myCafes')} />
 
-      {/* 일반 카페 — 비PREMIUM 내 방, 최신 생성순 */}
-      {!roomsLoading && (regularRooms.length > 0 || myRooms.length === 0) && (
-        <section className="bg-muted/30 mb-6 rounded-2xl p-4 sm:p-5">
-          <SectionHeader label={t('regularCafes')} />
+          {/* 구독 서브섹션 — PREMIUM 테마 방만 */}
+          {subscriptionRooms.length > 0 && (
+            <div className="mb-5">
+              <SubSectionHeader label={t('subscriptionCafes')} badge="PREMIUM" />
+              <PagedRoomList rooms={subscriptionRooms} />
+            </div>
+          )}
+
+          {/* 일반 서브섹션 — 비PREMIUM 방. 구독만 있을 땐(일반 0건) 숨김 */}
           {myRooms.length === 0 ? (
             <div className="rounded-xl border border-dashed py-8 text-center">
               <p className="text-muted-foreground text-sm">{t('noCafes')}</p>
@@ -241,7 +271,12 @@ export function ChatListView({
               </p>
             </div>
           ) : (
-            <PagedRoomList rooms={regularRooms} />
+            regularRooms.length > 0 && (
+              <div>
+                <SubSectionHeader label={t('regularCafes')} />
+                <PagedRoomList rooms={regularRooms} />
+              </div>
+            )
           )}
         </section>
       )}
