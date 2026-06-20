@@ -89,6 +89,67 @@
 
 ---
 
+## 📐 카페방 조회 — 구현 수준과 성능 보장 한계 [2026-06-20]
+
+> 카페 목록·검색·인기 랭킹의 현재 구현과, 데이터/사용자 규모별 한계 추정. (차수 추정 — 정확치는 `EXPLAIN ANALYZE`+부하테스트 필요)
+
+### 현재 구현 수준
+
+| 영역 | 구현 | 인덱스 |
+|---|---|---|
+| 내 카페 / 탐색 목록 | 병렬 3단계 + 멤버수 1쿼리 집계 (`chat-room-list.ts`) | `idx_msg_room_mbr_usr/room`, `idx_msg_room_public` |
+| 마켓 검색 | pg_trgm GIN substring (`sql/072`) | `idx_msg_room_nm/desc_trgm` |
+| 마켓 인기 랭킹 | LATERAL 실시간 집계 + score 정렬 (`fn_chat_marketplace`) | `idx_msg_msg_room_dtm` 등 |
+
+### 성능 보장 한계 (추정)
+
+| 차원 | 쾌적 보장 | 첫 병목 | 병목 지점 |
+|---|---|---|---|
+| 카페 수 | ~수만 개 | ~10만+ | 마켓 인기 랭킹 실시간 LATERAL 집계 |
+| 동시 사용자 | 수백~1천 req/s | 그 이상 | Vercel 함수 동시성 × Supabase 커넥션 풀 |
+| 카페당 멤버 | ~수천 | ~수만+ | 멤버수를 `COUNT` 아닌 JS로 집계 |
+| 카페당 메시지 | 7일 윈도우라 누적 무관 | 한 방 7일 수십만+ | 랭킹의 `COUNT(7일 메시지)` |
+
+- **가장 먼저 무너지는 곳 = 마켓 인기 랭킹**(매 호출 실시간 집계). 목록 조회(내 카페·탐색)는 `limit 10`이라 데이터 증가에 거의 무영향.
+- 검색은 trigram GIN으로 이미 수십만 행 대비됨 → 역설적으로 "검색보다 랭킹 집계가 먼저 한계".
+- **공통 천장:** service_role 단일 커넥션 풀(A 서문 참조).
+
+### 확장 사다리 (한계 도달 시 순서)
+1. **랭킹 score 사전계산** — 매시간 배치로 테이블/MV에 저장 → 실시간 LATERAL 제거 (효과 최대)
+2. **멤버수 비정규화** — `msg_room.cur_mbr_cnt` 카운터 + 가입/탈퇴 시 증감 → JS 집계 제거
+3. **커넥션 풀** — PgBouncer transaction mode + 읽기 복제본
+4. 검색은 trigram으로 선대비됨
+
+**결론:** 현 구조는 **수만 카페 / 동시 수백~천 사용자 / 카페당 멤버 수천**까지 안정. 초기~중기 충분, 그 이상은 1→2 순서로 점진 대응.
+
+---
+
+## 🔍 substring 검색 trigram 확대 — 상품·게시판 [2026-06-20]
+
+> 카페 검색(`sql/072`)에 적용한 pg_trgm GIN을 다른 `%검색어%` 풀스캔 지점으로 확대.
+
+### 배경 — 같은 풀스캔이 상품에 남아있음
+`mps-item.ts:193`은 이미 `item_nm.ilike.%kw%,item_desc.ilike.%kw%` substring 검색인데, `mps_item` 인덱스는 `seller_id/ctgr_id/item_st_cd/좌표`뿐 — **텍스트 인덱스가 없어 풀스캔**. 카페가 071→072로 푼 문제가 상품엔 그대로 남음.
+
+### 적용 우선순위 (ROI 순)
+
+| 순위 | 대상 | 컬럼 | 비고 |
+|---|---|---|---|
+| 1 ⭐ | `mps_item` (상품) | `item_nm`, `item_desc` | 사용자 대면 + 풀스캔 중 |
+| 2 | `brd_post` (게시판) | `post_ttl`, `post_cont` | 사용자 대면 (`board/[category]:47`) |
+| 3 | admin (std 단어/용어/도메인 등) | 각 명칭 | 데이터 수백 건 → ROI 낮음, 생략 무방 |
+
+### 기술 포인트 — 카페보다 간단
+- 카페 RPC는 `lower(room_nm) LIKE`라 lower() 식 인덱스가 필요했지만, 상품/게시판은 PostgREST `.ilike`(=ILIKE 연산). **`gin_trgm_ops`는 ILIKE를 대소문자 무시로 직접 가속** → lower() 식 불필요, **코드 변경 0**, 인덱스만 추가하면 기존 ILIKE 쿼리가 자동으로 색인 사용.
+- 적용: `sql/076_search_trgm_expand.sql`
+
+### 주의점
+- **2글자 미만 검색어**는 trigram(3글자 단위) 효율 저하 → UI에 최소 2글자 제한 권장.
+- GIN 인덱스는 **쓰기 비용 소폭 증가** — 등록 빈도 낮으면 무시 가능.
+- 긴 본문(`item_desc`/`post_cont`)은 인덱스 커짐 → 제목 우선, 본문은 선택.
+
+---
+
 # B. 운영 이슈 기록 (Operational Issues)
 
 ---
