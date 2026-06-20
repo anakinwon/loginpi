@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useMemo } from 'react'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -31,6 +31,52 @@ const TP_COLOR: Record<string, string> = {
     'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
 }
 
+// 테마용 이모지 팔레트 — 카테고리별 큐레이션(외부 라이브러리 없이 클릭 선택)
+const EMOJI_PALETTE: { key: string; items: string[] }[] = [
+  {
+    key: 'sports',
+    items: [
+      '⚽', '🏀', '⚾', '🏈', '🎾', '🏐', '🏉', '⛳', '🏌️', '🏊',
+      '🏄', '🚴', '🏃', '🥊', '🥋', '🏎️', '🏍️', '🏆', '🥇', '🎮',
+    ],
+  },
+  {
+    key: 'daily',
+    items: [
+      '🏘️', '🏠', '🌤️', '☀️', '🌧️', '✈️', '🗺️', '🍽️', '🍜', '☕',
+      '💬', '📢', '♻️', '🎯', '📚', '🎵', '🐕', '💰', '📈', '🛒',
+    ],
+  },
+  {
+    key: 'emphasis',
+    items: ['⭐', '❤️', '🔥', '✨', '🎉', '👍', '💡', '🌱', '🎨', '🙌'],
+  },
+]
+
+// 테마명/코드 키워드 → 추천 이모지
+const EMOJI_HINTS: { kw: RegExp; emoji: string }[] = [
+  { kw: /축구|월드컵|프리미어|epl|k리그|챔피언|ucl|soccer|football/i, emoji: '⚽' },
+  { kw: /야구|메이저|mlb|baseball/i, emoji: '⚾' },
+  { kw: /농구|nba|basket/i, emoji: '🏀' },
+  { kw: /게임|e?스포츠|esports|lol|롤/i, emoji: '🎮' },
+  { kw: /골프|pga|golf/i, emoji: '⛳' },
+  { kw: /테니스|tennis|atp/i, emoji: '🎾' },
+  { kw: /격투|ufc|mma|복싱/i, emoji: '🥊' },
+  { kw: /레이싱|포뮬러|f1|모터/i, emoji: '🏎️' },
+  { kw: /날씨|기상|weather/i, emoji: '🌤️' },
+  { kw: /여행|travel|관광/i, emoji: '✈️' },
+  { kw: /맛집|음식|먹|food|카페/i, emoji: '🍽️' },
+  { kw: /동네|지역|이웃|town|local/i, emoji: '🏘️' },
+  { kw: /투자|pi|코인|시세|crypto|재테크/i, emoji: '💰' },
+  { kw: /수다|일상|채팅|chat|잡담/i, emoji: '💬' },
+  { kw: /정보|공유|꿀팁|info/i, emoji: '📢' },
+  { kw: /중고|나눔|직거래|second/i, emoji: '♻️' },
+  { kw: /취미|동호회|hobby|모임/i, emoji: '🎯' },
+  { kw: /음악|music|밴드/i, emoji: '🎵' },
+  { kw: /반려|동물|pet|강아지|고양이/i, emoji: '🐕' },
+  { kw: /독서|책|book|스터디/i, emoji: '📚' },
+]
+
 const EMPTY_FORM = {
   theme_cd: '',
   theme_nm: '',
@@ -57,6 +103,13 @@ export default function AdminThemesPage() {
   const [form, setForm] = useState(EMPTY_FORM)
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState<string | null>(null)
+
+  // 테마명·코드에 맞춰 추천 이모지 계산 (입력 중 실시간 반응)
+  const suggestedEmojis = useMemo(() => {
+    const text = `${form.theme_nm} ${form.theme_cd}`
+    const hits = EMOJI_HINTS.filter((h) => h.kw.test(text)).map((h) => h.emoji)
+    return [...new Set(hits)]
+  }, [form.theme_nm, form.theme_cd])
 
   useEffect(() => {
     setPage(1)
@@ -245,18 +298,6 @@ export default function AdminThemesPage() {
             </label>
             <label className="space-y-1">
               <span className="text-muted-foreground text-xs">
-                {t('field.emoji')}
-              </span>
-              <Input
-                value={form.theme_emoji}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, theme_emoji: e.target.value }))
-                }
-                placeholder="⚽"
-              />
-            </label>
-            <label className="space-y-1">
-              <span className="text-muted-foreground text-xs">
                 {t('field.tp')}
               </span>
               <select
@@ -298,6 +339,71 @@ export default function AdminThemesPage() {
                 <option value="N">{t('useYnOff')}</option>
               </select>
             </label>
+            {/* 이모지 — 직접 입력 + 추천 + 카테고리 팔레트 클릭 선택 */}
+            <div className="col-span-2 space-y-2 sm:col-span-3">
+              <span className="text-muted-foreground text-xs">
+                {t('field.emoji')}
+              </span>
+              <div className="flex flex-wrap items-center gap-2">
+                <Input
+                  value={form.theme_emoji}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, theme_emoji: e.target.value }))
+                  }
+                  placeholder="⚽"
+                  className="w-16 text-center text-lg"
+                />
+                <span className="text-2xl" aria-hidden>
+                  {form.theme_emoji || '—'}
+                </span>
+                {suggestedEmojis.length > 0 && (
+                  <div className="flex items-center gap-1">
+                    <span className="text-muted-foreground text-xs">
+                      {t('emojiSuggest')}
+                    </span>
+                    {suggestedEmojis.map((e) => (
+                      <button
+                        key={e}
+                        type="button"
+                        onClick={() =>
+                          setForm((f) => ({ ...f, theme_emoji: e }))
+                        }
+                        className="hover:bg-muted rounded-md border px-1.5 py-0.5 text-lg transition-colors"
+                      >
+                        {e}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className="space-y-1.5 rounded-md border p-2">
+                {EMOJI_PALETTE.map((grp) => (
+                  <div key={grp.key}>
+                    <p className="text-muted-foreground mb-1 text-[10px] font-medium">
+                      {t(`emojiGroup.${grp.key}`)}
+                    </p>
+                    <div className="flex flex-wrap gap-1">
+                      {grp.items.map((e) => (
+                        <button
+                          key={e}
+                          type="button"
+                          onClick={() =>
+                            setForm((f) => ({ ...f, theme_emoji: e }))
+                          }
+                          className={`hover:bg-muted rounded-md border px-1.5 py-1 text-lg transition-colors ${
+                            form.theme_emoji === e
+                              ? 'border-primary bg-primary/10'
+                              : ''
+                          }`}
+                        >
+                          {e}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
             <label className="col-span-2 space-y-1 sm:col-span-3">
               <span className="text-muted-foreground text-xs">
                 {t('field.desc')}

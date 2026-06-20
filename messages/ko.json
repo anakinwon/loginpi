@@ -64,6 +64,12 @@
         "basic": "일반(BASIC)",
         "premium": "프리미엄(PREMIUM)"
       },
+      "emojiSuggest": "추천:",
+      "emojiGroup": {
+        "sports": "스포츠",
+        "daily": "일상·범용",
+        "emphasis": "감정·강조"
+      },
       "useYnOn": "노출",
       "useYnOff": "숨김",
       "col": {
