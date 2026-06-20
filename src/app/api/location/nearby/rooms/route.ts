@@ -46,6 +46,7 @@ export async function GET(request: NextRequest) {
     .eq('del_yn', 'N')
     .eq('is_public_yn', 'Y')
     .eq('room_tp_cd', 'G')
+    .gt('expr_dtm', new Date().toISOString()) // 만료된 무료 카페는 지도/탐색에서 제외
     .not('latd_crd', 'is', null)
     .not('lngt_crd', 'is', null)
     .limit(200)

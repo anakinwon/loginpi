@@ -6,7 +6,15 @@ import { getSupabaseAdmin } from './supabase-admin'
 // 기존 직렬 5단계 → 3단계로 단축 (카페 목록 로딩 속도 개선)
 
 const ROOM_SELECT = `room_id, room_nm, room_desc, theme_cd, room_tp_cd, is_public_yn,
-  max_mbr_cnt, expr_dtm, reg_dtm, msg_theme(theme_nm, theme_emoji, theme_tp_cd)`
+  max_mbr_cnt, expr_dtm, entry_expire_dtm, reg_dtm, msg_theme(theme_nm, theme_emoji, theme_tp_cd)`
+
+// 종료/만료 방 여부 — 그룹방은 expr_dtm(쿼리에서 처리), 이벤트방은 entry_expire_dtm 경과 시 종료.
+// 종료된 방은 어떤 목록(구독·일반·탐색·마켓·검색)에도 노출하지 않는다.
+function isEndedEvent(r: RoomRow): boolean {
+  if (r.room_tp_cd !== 'E') return false
+  const ee = r.entry_expire_dtm as string | null | undefined
+  return !!ee && new Date(ee).getTime() <= Date.now()
+}
 
 export type RoomRow = Record<string, unknown> & { room_id: string }
 
@@ -45,10 +53,13 @@ async function listMyRooms(userId: string): Promise<RoomRow[]> {
   if (error) throw new Error(error.message)
 
   const cntMap = buildCntMap((mbrRows ?? []) as { room_id: string }[])
-  return ((data ?? []) as unknown as RoomRow[]).map((r) => ({
-    ...r,
-    cur_mbr_cnt: cntMap.get(r.room_id) ?? 0,
-  }))
+  // 내가 참여 중이라도 종료된 이벤트방은 목록에서 제외 (그룹 만료는 위 expr_dtm 쿼리에서 처리)
+  return ((data ?? []) as unknown as RoomRow[])
+    .filter((r) => !isEndedEvent(r))
+    .map((r) => ({
+      ...r,
+      cur_mbr_cnt: cntMap.get(r.room_id) ?? 0,
+    }))
 }
 
 // 공개 그룹 카페 (최근 N개) — 방 조회 후 멤버수 로드
