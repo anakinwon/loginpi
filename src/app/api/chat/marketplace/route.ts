@@ -10,7 +10,8 @@ export async function GET(request: NextRequest) {
   if (!user)
     return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
-  const themeCd = new URL(request.url).searchParams.get('theme')
+  const sp = new URL(request.url).searchParams
+  const themeCd = sp.get('theme')
   // theme_cd 화이트리스트 패턴 (영대문자·숫자·언더스코어 20자) — 인젝션 방어
   if (themeCd && !/^[A-Z0-9_]{1,20}$/.test(themeCd)) {
     return NextResponse.json(
@@ -19,13 +20,25 @@ export async function GET(request: NextRequest) {
     )
   }
 
+  // 통합 검색어 — 카페이름·소개 prefix 검색. 길이 제한(50)만, 와일드카드 이스케이프는 RPC가 처리.
+  const q = (sp.get('q') ?? '').trim().slice(0, 50)
+
   const db = getSupabaseAdmin()
-  const [{ data: rooms, error }, { data: themes }, { data: follows }] =
-    await Promise.all([
-      db.rpc('fn_chat_marketplace', {
+  // 검색어가 있으면 검색 RPC(이름·소개 UNION ALL prefix), 없으면 기존 인기 랭킹 RPC.
+  const roomsRpc = q
+    ? db.rpc('fn_chat_marketplace_search', {
+        p_q: q,
         p_theme_cd: themeCd ?? null,
         p_limit: 30,
-      }),
+      })
+    : db.rpc('fn_chat_marketplace', {
+        p_theme_cd: themeCd ?? null,
+        p_limit: 30,
+      })
+
+  const [{ data: rooms, error }, { data: themes }, { data: follows }] =
+    await Promise.all([
+      roomsRpc,
       db
         .from('msg_theme')
         .select('theme_cd, theme_nm, theme_emoji, theme_tp_cd')

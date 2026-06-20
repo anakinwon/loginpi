@@ -51,15 +51,24 @@ export function ChatMarketplace() {
   const [themes, setThemes] = useState<MarketTheme[]>([])
   const [followed, setFollowed] = useState<Set<string>>(new Set())
   const [activeTheme, setActiveTheme] = useState<string | null>(null)
+  const [search, setSearch] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
   const [loading, setLoading] = useState(true)
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
 
-  const load = useCallback(async (theme: string | null) => {
-    setVisibleCount(PAGE_SIZE) // 테마 전환·재로드 시 첫 페이지 분량으로 리셋
+  // 검색어 디바운스(300ms) — 타이핑마다가 아니라 입력이 멎으면 1회 조회
+  useEffect(() => {
+    const id = setTimeout(() => setDebouncedSearch(search.trim()), 300)
+    return () => clearTimeout(id)
+  }, [search])
 
-    // 기본 뷰: 캐시 즉시 표시 (stale) → 아래 네트워크 응답으로 교체 (revalidate)
+  const load = useCallback(async (theme: string | null, q: string) => {
+    setVisibleCount(PAGE_SIZE) // 테마 전환·검색·재로드 시 첫 페이지 분량으로 리셋
+
+    // 기본 뷰(테마·검색어 없음)만 캐시 즉시 표시(stale) → 네트워크 응답으로 교체(revalidate)
+    const isDefault = !theme && !q
     let servedFromCache = false
-    if (!theme) {
+    if (isDefault) {
       const cached = readCache<{ rooms: MarketRoom[]; themes: MarketTheme[] }>(
         MARKET_CACHE_KEY,
         MARKET_CACHE_MAX_AGE_MS,
@@ -73,7 +82,10 @@ export function ChatMarketplace() {
     setLoading(!servedFromCache)
 
     try {
-      const qs = theme ? `?theme=${encodeURIComponent(theme)}` : ''
+      const params = new URLSearchParams()
+      if (theme) params.set('theme', theme)
+      if (q) params.set('q', q)
+      const qs = params.toString() ? `?${params.toString()}` : ''
       const res = await piFetch(`/api/chat/marketplace${qs}`)
       if (!res.ok) return
       const data = (await res.json()) as {
@@ -84,7 +96,7 @@ export function ChatMarketplace() {
       setRooms(data.rooms)
       setThemes(data.themes)
       setFollowed(new Set(data.followedThemes))
-      if (!theme) {
+      if (isDefault) {
         writeCache(MARKET_CACHE_KEY, { rooms: data.rooms, themes: data.themes })
       }
     } finally {
@@ -92,9 +104,10 @@ export function ChatMarketplace() {
     }
   }, [])
 
+  // 테마·검색어 변화 시 재조회(초기 로드 포함). 검색어는 디바운스된 값 사용.
   useEffect(() => {
-    void load(null)
-  }, [load])
+    void load(activeTheme, debouncedSearch)
+  }, [load, activeTheme, debouncedSearch])
 
   // 앞에서부터 visibleCount개 노출 + 전역 순위(rank) 부여 — 🥇🥈🥉는 전역 TOP 3에만 표시
   const visibleRooms = useMemo(
@@ -111,8 +124,7 @@ export function ChatMarketplace() {
   })
 
   function selectTheme(theme: string | null) {
-    setActiveTheme(theme)
-    void load(theme)
+    setActiveTheme(theme) // 재조회는 위 useEffect가 처리 (현재 검색어와 결합)
   }
 
   async function toggleFollow(themeCd: string) {
@@ -150,6 +162,34 @@ export function ChatMarketplace() {
           />
           {t('title')}
         </h2>
+      </div>
+
+      {/* 통합 검색 — 카페 이름·소개 prefix 검색 (서버 UNION ALL) */}
+      <div className="relative mb-3">
+        <span
+          className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-sm"
+          aria-hidden
+        >
+          🔍
+        </span>
+        <input
+          type="search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          maxLength={50}
+          placeholder="카페 이름·소개 검색"
+          className="bg-background focus:border-primary w-full rounded-xl border py-2 pr-9 pl-9 text-sm outline-none"
+        />
+        {search && (
+          <button
+            type="button"
+            onClick={() => setSearch('')}
+            aria-label="검색어 지우기"
+            className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 text-sm"
+          >
+            ✕
+          </button>
+        )}
       </div>
 
       {/* 테마 필터 칩 */}
@@ -206,7 +246,11 @@ export function ChatMarketplace() {
         </div>
       ) : rooms.length === 0 ? (
         <div className="rounded-xl border border-dashed py-8 text-center">
-          <p className="text-muted-foreground text-sm">{t('empty')}</p>
+          <p className="text-muted-foreground text-sm">
+            {debouncedSearch
+              ? `'${debouncedSearch}' 검색 결과가 없습니다`
+              : t('empty')}
+          </p>
         </div>
       ) : (
         <>
