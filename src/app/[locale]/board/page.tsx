@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import type { CategoryRow } from '@/lib/board'
+import { BoardSearch } from './board-search'
 
 export default async function BoardIndexPage() {
   const [{ data: categories }, t] = await Promise.all([
@@ -15,7 +16,10 @@ export default async function BoardIndexPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-12">
-      <h1 className="mb-8 text-2xl font-bold">{t('title')}</h1>
+      <h1 className="mb-6 text-2xl font-bold">{t('title')}</h1>
+
+      {/* 통합검색 — 전 게시판 가로질러 검색, 결과는 해당 게시글로 연결 */}
+      <BoardSearch />
 
       {!categories || categories.length === 0 ? (
         <p className="text-muted-foreground">{t('noBoards')}</p>
