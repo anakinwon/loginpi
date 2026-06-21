@@ -235,6 +235,9 @@ function MessageBubble({
   hideTime: boolean
   onUpgradeForTip?: () => void
 }) {
+  // 메시지 탭 시 선물 버튼 노출 (hover 없는 모바일 대응)
+  const [showActions, setShowActions] = useState(false)
+
   // 시스템·Bean(팁) 알림은 중앙 정렬 알림 스타일
   if (msg.msg_tp_cd === 'SYSTEM' || msg.msg_tp_cd === 'TIP_NOTI') {
     return (
@@ -408,6 +411,7 @@ function MessageBubble({
 
   return (
     <div
+      onClick={() => setShowActions((v) => !v)}
       className={`group flex flex-col gap-0.5 ${isMe ? 'items-end' : 'items-start'}`}
     >
       {!isMe && (
@@ -446,15 +450,15 @@ function MessageBubble({
           msg.msg_cont
         )}
       </div>
-      {/* 시간은 hideTime일 때 숨기되, 선물 버튼은 모든 남의 메시지에 항상 노출 */}
-      {(!hideTime || (!isMe && canTip)) && (
+      {/* 시간은 hideTime일 때 숨김. 선물 버튼은 메시지 탭(showActions) 시 노출 */}
+      {(!hideTime || (showActions && !isMe && canTip)) && (
         <div className="flex items-center gap-1">
           {!hideTime && (
             <span className="text-muted-foreground text-[10px]">
               {formatKoreanTime(msg.reg_dtm)}
             </span>
           )}
-          {!isMe && canTip && (
+          {showActions && !isMe && canTip && (
             <PiTipButton
               roomId={roomId}
               recipientId={msg.snd_usr_id}
