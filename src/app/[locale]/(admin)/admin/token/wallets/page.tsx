@@ -58,6 +58,12 @@ export default function TokenWalletsPage() {
     reason: REASONS[0].value,
   })
   const [adjustMsg, setAdjustMsg] = useState<string | null>(null)
+  // 프로모션 발행(거버넌스 지갑 충전)
+  const [minting, setMinting] = useState(false)
+  const [mintAmt, setMintAmt] = useState('')
+  const [mintDest, setMintDest] = useState('REWARD_POOL')
+  const [mintReason, setMintReason] = useState('')
+  const [mintMsg, setMintMsg] = useState<string | null>(null)
 
   const load = () => {
     setLoading(true)
@@ -124,6 +130,46 @@ export default function TokenWalletsPage() {
     }
   }
 
+  async function mint() {
+    const amt = Math.floor(Number(mintAmt))
+    if (!Number.isInteger(amt) || amt <= 0) {
+      setMintMsg('발행액은 1 이상의 정수여야 합니다')
+      return
+    }
+    if (!mintReason.trim()) {
+      setMintMsg('발행 사유는 필수입니다')
+      return
+    }
+    setMinting(true)
+    setMintMsg(null)
+    try {
+      const res = await fetch('/api/admin/token/mint', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          bean_amt: amt,
+          dest_wallet: mintDest,
+          reason: mintReason.trim(),
+        }),
+      })
+      const d = (await res.json()) as { error?: string; balance?: number }
+      if (!res.ok) {
+        setMintMsg(`오류: ${d.error ?? res.status}`)
+      } else {
+        setMintMsg(
+          `발행 완료 — ${mintDest} 잔액 ${d.balance?.toLocaleString()} Bean`,
+        )
+        setMintAmt('')
+        setMintReason('')
+        load()
+      }
+    } catch {
+      setMintMsg('네트워크 오류')
+    } finally {
+      setMinting(false)
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -139,7 +185,7 @@ export default function TokenWalletsPage() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {platform && (
           <div className="rounded-lg border border-purple-200 bg-purple-50 p-4 dark:border-purple-800 dark:bg-purple-950/30">
-            <p className="text-xs font-semibold uppercase tracking-wide text-purple-600 dark:text-purple-400">
+            <p className="text-xs font-semibold tracking-wide text-purple-600 uppercase dark:text-purple-400">
               PLATFORM · 운영 수익 (70%)
             </p>
             <p className="mt-1 flex items-center gap-2 text-2xl font-bold tabular-nums">
@@ -147,13 +193,14 @@ export default function TokenWalletsPage() {
               {platform.bean_amt.toLocaleString()}
             </p>
             <p className="text-muted-foreground text-xs">
-              ≈ π {(platform.bean_amt / 100).toFixed(2)} · {new Date(platform.mod_dtm).toLocaleString('ko-KR')}
+              ≈ π {(platform.bean_amt / 100).toFixed(2)} ·{' '}
+              {new Date(platform.mod_dtm).toLocaleString('ko-KR')}
             </p>
           </div>
         )}
         {foundation && (
           <div className="rounded-lg border border-rose-200 bg-rose-50 p-4 dark:border-rose-800 dark:bg-rose-950/30">
-            <p className="text-xs font-semibold uppercase tracking-wide text-rose-600 dark:text-rose-400">
+            <p className="text-xs font-semibold tracking-wide text-rose-600 uppercase dark:text-rose-400">
               FOUNDATION · 재단 적립금 (10%)
             </p>
             <p className="mt-1 flex items-center gap-2 text-2xl font-bold tabular-nums">
@@ -161,13 +208,14 @@ export default function TokenWalletsPage() {
               {foundation.bean_amt.toLocaleString()}
             </p>
             <p className="text-muted-foreground text-xs">
-              ≈ π {(foundation.bean_amt / 100).toFixed(2)} · Pi Network 재단 기준
+              ≈ π {(foundation.bean_amt / 100).toFixed(2)} · Pi Network 재단
+              기준
             </p>
           </div>
         )}
         {rewardPool && (
           <div className="rounded-lg border border-teal-200 bg-teal-50 p-4 dark:border-teal-800 dark:bg-teal-950/30">
-            <p className="text-xs font-semibold uppercase tracking-wide text-teal-600 dark:text-teal-400">
+            <p className="text-xs font-semibold tracking-wide text-teal-600 uppercase dark:text-teal-400">
               REWARD_POOL · 생태계 기금 (20%)
             </p>
             <p className="mt-1 flex items-center gap-2 text-2xl font-bold tabular-nums">
@@ -175,10 +223,67 @@ export default function TokenWalletsPage() {
               {rewardPool.bean_amt.toLocaleString()}
             </p>
             <p className="text-muted-foreground text-xs">
-              ≈ π {(rewardPool.bean_amt / 100).toFixed(2)} · Pi Network 생태계 기금 기준
+              ≈ π {(rewardPool.bean_amt / 100).toFixed(2)} · Pi Network 생태계
+              기금 기준
             </p>
           </div>
         )}
+      </div>
+
+      {/* 프로모션 발행 — 거버넌스 지갑 충전(보상 캠페인 재원) */}
+      <div className="border-border rounded-lg border p-4">
+        <p className="text-sm font-semibold">🆕 프로모션 Bean 발행</p>
+        <p className="text-muted-foreground mt-0.5 mb-3 text-xs">
+          현금(Pi) 없는 보조금성 발행 — 보상 캠페인 재원. 대차대조표 발행 총량에
+          포함됩니다(매출 아님).
+        </p>
+        <div className="flex flex-wrap items-end gap-2">
+          <div>
+            <label className="text-muted-foreground mb-1 block text-xs">
+              발행액 (Bean)
+            </label>
+            <input
+              type="number"
+              value={mintAmt}
+              onChange={(e) => setMintAmt(e.target.value)}
+              placeholder="1000000"
+              className="w-36 rounded-lg border bg-transparent px-2.5 py-1.5 text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-muted-foreground mb-1 block text-xs">
+              대상 지갑
+            </label>
+            <select
+              value={mintDest}
+              onChange={(e) => setMintDest(e.target.value)}
+              className="rounded-lg border bg-transparent px-2.5 py-1.5 text-sm"
+            >
+              <option value="REWARD_POOL">REWARD_POOL (보상 재원)</option>
+              <option value="PLATFORM">PLATFORM (운영)</option>
+              <option value="FOUNDATION">FOUNDATION (재단)</option>
+            </select>
+          </div>
+          <div className="min-w-[180px] flex-1">
+            <label className="text-muted-foreground mb-1 block text-xs">
+              발행 사유
+            </label>
+            <input
+              value={mintReason}
+              onChange={(e) => setMintReason(e.target.value)}
+              placeholder="예: 매장 선착순 보상 캠페인 재원"
+              className="w-full rounded-lg border bg-transparent px-2.5 py-1.5 text-sm"
+            />
+          </div>
+          <button
+            onClick={mint}
+            disabled={minting}
+            className="bg-primary text-primary-foreground rounded-lg px-4 py-1.5 text-sm font-medium hover:opacity-90 disabled:opacity-50"
+          >
+            {minting ? '발행 중…' : '발행'}
+          </button>
+        </div>
+        {mintMsg && <p className="mt-2 text-xs">{mintMsg}</p>}
       </div>
 
       {/* 수동 조정 패널 */}
@@ -203,9 +308,7 @@ export default function TokenWalletsPage() {
           />
           <select
             value={form.reason}
-            onChange={(e) =>
-              setForm((f) => ({ ...f, reason: e.target.value }))
-            }
+            onChange={(e) => setForm((f) => ({ ...f, reason: e.target.value }))}
             className="border-input bg-background h-9 rounded-md border px-3 text-sm"
           >
             {REASONS.map((r) => (
