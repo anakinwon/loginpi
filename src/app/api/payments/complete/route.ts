@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { sendPaymentReceipt } from '@/lib/email'
-import { broadcastToRoom, broadcastToSeller } from '@/lib/realtime-broadcast'
+import { broadcastToSeller } from '@/lib/realtime-broadcast'
 import { markEscrow } from '@/lib/mps-order'
 import { dispatchOrderNotis } from '@/lib/mps-noti'
 import { depositBond, BOND_DEPOSIT_PI } from '@/lib/mps-bond'
@@ -63,199 +63,13 @@ export async function POST(request: NextRequest) {
       .update({ txid, status: 'completed', mod_dtm: new Date().toISOString() })
       .eq('payment_id', paymentId)
 
-    // CHAT_ROOM_CREATE: 결제 완료 시 그룹 카페 생성
-    let createdRoom: Record<string, unknown> | null = null
-    // 레거시 Pi 구독(CHAT_SUBSCR) 폐기로 항상 null — 응답 스키마 호환 위해 필드 유지
+    // 레거시 Pi 결제 분기 제거(2026-06-21): CHAT_ROOM_CREATE·EVENT_ROOM_JOIN·STICKER_PACK·CHAT_SUBSCR·PI_TIP
+    //   → 카페 생성/입장/스티커/구독/선물은 모두 Bean(SPEND·구독·전송)으로 전환 완료.
+    //   현재 Pi 결제 경로는 BEAN_CHARGE·MPS_ESCROW·MPS_BOND 뿐. createdRoom/grantedSubscr는 응답 스키마 호환용 null.
+    const createdRoom: Record<string, unknown> | null = null
     const grantedSubscr: Record<string, unknown> | null = null
     const meta = payment.metadata as Record<string, unknown> | null
-    if (meta?.type === 'CHAT_ROOM_CREATE' && payment.user_uid) {
-      const { data: owner } = await db
-        .from('sys_user')
-        .select('id, display_name, lbs_consent_yn')
-        .eq('pi_uid', payment.user_uid)
-        .maybeSingle()
-
-      if (owner) {
-        const ownerRow = owner as {
-          id: string
-          display_name: string | null
-          lbs_consent_yn: string | null
-        }
-        const slug = String(ownerRow.display_name ?? 'user').slice(0, 20)
-        const { data: room } = await db
-          .from('msg_room')
-          .insert({
-            room_nm: String(meta.room_nm ?? '카페'),
-            room_desc: meta.room_desc ? String(meta.room_desc) : null,
-            theme_cd: String(meta.theme_cd ?? 'CODING'),
-            room_tp_cd: 'G',
-            max_mbr_cnt: Number(meta.max_mbr_cnt ?? 50),
-            is_public_yn: String(meta.is_public_yn ?? 'Y'),
-            pymnt_id: paymentId,
-            regr_id: slug,
-            modr_id: slug,
-          })
-          .select()
-          .single()
-
-        if (room) {
-          const roomId = String((room as Record<string, unknown>).room_id)
-          await db.from('msg_room_mbr').insert({
-            room_id: roomId,
-            usr_id: ownerRow.id,
-            mbr_role_cd: 'OWNER',
-            regr_id: slug,
-            modr_id: slug,
-          })
-          createdRoom = room as Record<string, unknown>
-
-          // LBS 동의자 카페 위치 저장 (loc_tp_cd='05') — 메타데이터 lat/lng 사용
-          const metaLat =
-            typeof meta.lat === 'number' && isFinite(meta.lat as number)
-              ? (meta.lat as number)
-              : null
-          const metaLng =
-            typeof meta.lng === 'number' && isFinite(meta.lng as number)
-              ? (meta.lng as number)
-              : null
-          if (
-            ownerRow.lbs_consent_yn === 'Y' &&
-            metaLat !== null &&
-            metaLng !== null
-          ) {
-            Promise.all([
-              db
-                .from('msg_room')
-                .update({ latd_crd: metaLat, lngt_crd: metaLng })
-                .eq('room_id', roomId),
-              db.from('usr_loc_hist').insert({
-                user_str_id: ownerRow.id,
-                loc_tp_cd: '05',
-                latd_crd: metaLat,
-                lngt_crd: metaLng,
-                ref_id: roomId,
-                consent_yn: 'Y',
-                consent_dtm: new Date().toISOString(),
-                regr_id: slug,
-                modr_id: slug,
-              }),
-            ]).catch((err) =>
-              console.error('[카페 위치] 결제 완료 저장 실패:', err),
-            )
-          }
-        }
-      }
-      // 레거시 Pi 구독(CHAT_SUBSCR) 분기는 폐기됨 (PRD_15_FEE §1-6 — Bean 구독으로 일원화).
-      // 구독 결제는 POST /api/subscriptions/products/subscribe (Bean SPEND)가 단독 담당.
-      // PI_TIP(Pi 결제 선물)은 폐기 — 카페방 선물은 Bean 실전송(POST /api/tips, fn_bean_transfer)으로 일원화
-    } else if (meta?.type === 'EVENT_ROOM_JOIN' && payment.user_uid) {
-      // EVENT_ROOM_JOIN: 결제 완료 시 GUEST로 이벤트방 입장 처리
-      const roomIdStr = String(meta.room_id ?? '')
-      const [{ data: owner }, { data: room }] = await Promise.all([
-        db
-          .from('sys_user')
-          .select('id, display_name')
-          .eq('pi_uid', payment.user_uid)
-          .maybeSingle(),
-        db
-          .from('msg_room')
-          .select('room_id, room_nm, entry_fee_pi, entry_expire_dtm')
-          .eq('room_id', roomIdStr)
-          .eq('del_yn', 'N')
-          .maybeSingle(),
-      ])
-
-      if (owner && room) {
-        const ownerRow = owner as { id: string; display_name: string | null }
-        const roomRow = room as {
-          room_id: string
-          room_nm: string
-          entry_fee_pi: number
-          entry_expire_dtm: string | null
-        }
-        const slug = String(ownerRow.display_name ?? 'user').slice(0, 20)
-
-        // 결제 금액이 입장료 이상인지 서버 재검증
-        if (Number(payment.amount) + 1e-6 >= Number(roomRow.entry_fee_pi)) {
-          // 이미 입장한 경우 중복 삽입 방지
-          const { data: existingMbr } = await db
-            .from('msg_room_mbr')
-            .select('room_mbr_id')
-            .eq('room_id', roomRow.room_id)
-            .eq('usr_id', ownerRow.id)
-            .eq('del_yn', 'N')
-            .maybeSingle()
-
-          if (!existingMbr) {
-            await db.from('msg_room_mbr').insert({
-              room_id: roomRow.room_id,
-              usr_id: ownerRow.id,
-              mbr_role_cd: 'GUEST',
-              expire_dtm: roomRow.entry_expire_dtm,
-              regr_id: slug,
-              modr_id: slug,
-            })
-
-            // 입장 SYSTEM 메시지 브로드캐스트
-            const { data: sysMsg } = await db
-              .from('msg_msg')
-              .insert({
-                room_id: roomRow.room_id,
-                snd_usr_id: ownerRow.id,
-                snd_usr_nm: String(ownerRow.display_name ?? 'user'),
-                msg_cont: `🎟️ ${ownerRow.display_name} 님이 이벤트방에 입장했습니다`,
-                msg_tp_cd: 'SYSTEM',
-                regr_id: slug,
-                modr_id: slug,
-              })
-              .select()
-              .single()
-
-            if (sysMsg)
-              await broadcastToRoom(roomRow.room_id, 'new_msg', sysMsg)
-          }
-        }
-      }
-    } else if (meta?.type === 'STICKER_PACK' && payment.user_uid) {
-      // STICKER_PACK: 결제 완료 시 msg_usr_stkr UPSERT (UNIQUE usr_id,pack_id — 중복 구매 안전)
-      const packId = String(meta.pack_id ?? '')
-      const [{ data: owner }, { data: pack }] = await Promise.all([
-        db
-          .from('sys_user')
-          .select('id, display_name')
-          .eq('pi_uid', payment.user_uid)
-          .maybeSingle(),
-        db
-          .from('msg_stkr_pack')
-          .select('pack_id, price_pi')
-          .eq('pack_id', packId)
-          .eq('del_yn', 'N')
-          .maybeSingle(),
-      ])
-
-      if (owner && pack) {
-        const ownerRow = owner as { id: string; display_name: string | null }
-        const packRow = pack as { pack_id: string; price_pi: number }
-        const slug = String(ownerRow.display_name ?? 'user').slice(0, 20)
-
-        // 결제 금액 서버 재검증 (부동소수 오차 허용)
-        if (Number(payment.amount) + 1e-6 >= Number(packRow.price_pi)) {
-          await db.from('msg_usr_stkr').upsert(
-            {
-              usr_id: ownerRow.id,
-              pack_id: packRow.pack_id,
-              pymnt_id: paymentId,
-              del_yn: 'N',
-              del_dtm: null,
-              regr_id: slug,
-              modr_id: slug,
-              mod_dtm: new Date().toISOString(),
-            },
-            { onConflict: 'usr_id,pack_id' },
-          )
-        }
-      }
-    } else if (meta?.type === 'MPS_ESCROW' && payment.user_uid) {
+    if (meta?.type === 'MPS_ESCROW' && payment.user_uid) {
       // MPS_ESCROW: 결제 완료 시 주문 PENDING → ESCROW + ESCROW_IN 이력 (TASK-104)
       const orderId = String(meta.order_id ?? '')
       const { data: buyer } = await db
