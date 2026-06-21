@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { BeanIcon } from '@/components/ui/bean-icon'
+import { TokenRevenue } from '@/components/admin/token-revenue'
 
 interface TokenKpi {
   total_issued_bean: number
@@ -41,17 +42,24 @@ function KpiCard({
   badge?: string
 }) {
   const colors: Record<Accent, string> = {
-    blue:   'border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/30',
-    green:  'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/30',
-    amber:  'border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30',
-    purple: 'border-purple-200 bg-purple-50 dark:border-purple-800 dark:bg-purple-950/30',
-    rose:   'border-rose-200 bg-rose-50 dark:border-rose-800 dark:bg-rose-950/30',
-    teal:   'border-teal-200 bg-teal-50 dark:border-teal-800 dark:bg-teal-950/30',
+    blue: 'border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/30',
+    green:
+      'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/30',
+    amber:
+      'border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30',
+    purple:
+      'border-purple-200 bg-purple-50 dark:border-purple-800 dark:bg-purple-950/30',
+    rose: 'border-rose-200 bg-rose-50 dark:border-rose-800 dark:bg-rose-950/30',
+    teal: 'border-teal-200 bg-teal-50 dark:border-teal-800 dark:bg-teal-950/30',
   }
   return (
-    <div className={`rounded-lg border p-4 ${accent ? colors[accent] : 'border-border bg-card'}`}>
+    <div
+      className={`rounded-lg border p-4 ${accent ? colors[accent] : 'border-border bg-card'}`}
+    >
       <div className="flex items-center justify-between">
-        <p className="text-muted-foreground text-xs font-medium uppercase tracking-wide">{label}</p>
+        <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+          {label}
+        </p>
         {badge && (
           <span className="rounded bg-black/10 px-1.5 py-0.5 text-xs font-semibold dark:bg-white/10">
             {badge}
@@ -61,7 +69,9 @@ function KpiCard({
       <p className="mt-1 flex items-center gap-1.5 text-2xl font-bold tabular-nums">
         <BeanIcon className="inline-block h-5 w-5" /> {bean.toLocaleString()}
       </p>
-      <p className="text-muted-foreground text-sm tabular-nums">≈ π {(bean / 100).toFixed(2)}</p>
+      <p className="text-muted-foreground text-sm tabular-nums">
+        ≈ π {(bean / 100).toFixed(2)}
+      </p>
       {sub && <p className="text-muted-foreground mt-1 text-xs">{sub}</p>}
     </div>
   )
@@ -135,7 +145,7 @@ function BalanceSheet({ kpi }: { kpi: TokenKpi }) {
       <div className="grid grid-cols-1 md:grid-cols-2 md:divide-x">
         {/* ── 차변 (좌변) ── */}
         <div className="border-b px-4 py-3 md:border-b-0">
-          <p className="text-muted-foreground mb-1 text-xs font-semibold uppercase tracking-wide">
+          <p className="text-muted-foreground mb-1 text-xs font-semibold tracking-wide uppercase">
             차변 (발행 — 원천)
           </p>
           <BsRow
@@ -151,7 +161,7 @@ function BalanceSheet({ kpi }: { kpi: TokenKpi }) {
 
         {/* ── 대변 (우변) ── */}
         <div className="px-4 py-3">
-          <p className="text-muted-foreground mb-1 text-xs font-semibold uppercase tracking-wide">
+          <p className="text-muted-foreground mb-1 text-xs font-semibold tracking-wide uppercase">
             대변 (소재 — 유통 + 회수)
           </p>
           <BsRow
@@ -238,7 +248,8 @@ export default function TokenAdminPage() {
             <BeanIcon className="inline-block h-6 w-6" /> Bean 경제 대시보드
           </h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            PRD_16_TOKEN_MNG v1.3 — Pi Network 기준 거버넌스 · 소각 없음 · 1π = 100{' '}
+            PRD_16_TOKEN_MNG v1.3 — Pi Network 기준 거버넌스 · 소각 없음 · 1π =
+            100{' '}
             <BeanIcon className="inline-block h-3.5 w-3.5 align-text-bottom" />
           </p>
         </div>
@@ -257,17 +268,21 @@ export default function TokenAdminPage() {
           {/* 항등식 검증 배너 */}
           {!kpi.identity_ok && (
             <div className="rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700 dark:border-red-700 dark:bg-red-950/30 dark:text-red-400">
-              ⚠️ Bean 항등식 불일치 — 발행({kpi.total_issued_bean}) ≠ 유통({kpi.circulating_bean}
-              ) + 회수({kpi.total_collected_bean}). DB 점검 필요.
+              ⚠️ Bean 항등식 불일치 — 발행({kpi.total_issued_bean}) ≠ 유통(
+              {kpi.circulating_bean}) + 회수({kpi.total_collected_bean}). DB
+              점검 필요.
             </div>
           )}
 
           {/* Bean 대차대조표 (차변 = 대변) — 메인 */}
           <BalanceSheet kpi={kpi} />
 
+          {/* 매출 분석 — Pi 현금 + Bean 회수 항목별 */}
+          <TokenRevenue />
+
           {/* 공급량 KPI 3종 */}
           <div>
-            <p className="text-muted-foreground mb-2 text-xs font-semibold uppercase tracking-wide">
+            <p className="text-muted-foreground mb-2 text-xs font-semibold tracking-wide uppercase">
               공급량 현황
             </p>
             <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
@@ -294,7 +309,7 @@ export default function TokenAdminPage() {
 
           {/* 거버넌스 지갑 3종 — Pi Network 공식 기준 */}
           <div>
-            <p className="text-muted-foreground mb-2 text-xs font-semibold uppercase tracking-wide">
+            <p className="text-muted-foreground mb-2 text-xs font-semibold tracking-wide uppercase">
               거버넌스 지갑 (Pi Network 공식 기준)
             </p>
             <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
@@ -324,8 +339,9 @@ export default function TokenAdminPage() {
 
           {/* 배분 정책 안내 */}
           <p className="text-muted-foreground text-xs">
-            소비(SPEND/SUBSCRIBE/TIP/FEE) 회수분 배분: 운영 70% → PLATFORM · 생태계 20% →
-            REWARD_POOL · 재단 10% → FOUNDATION · 환불(REFUND)은 동일 비율로 역차감
+            소비(SPEND/SUBSCRIBE/TIP/FEE) 회수분 배분: 운영 70% → PLATFORM ·
+            생태계 20% → REWARD_POOL · 재단 10% → FOUNDATION · 환불(REFUND)은
+            동일 비율로 역차감
           </p>
         </>
       )}

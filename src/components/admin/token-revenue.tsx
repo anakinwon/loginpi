@@ -1,0 +1,138 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import { BeanIcon } from '@/components/ui/bean-icon'
+
+interface RevenueData {
+  pi_revenue: { total_pi: number; total_bean: number; charge_cnt: number }
+  bean_by_item: { ref_tp_cd: string; txn_cnt: number; net_bean: number }[]
+  bean_total: number
+}
+
+// 항목별 라벨·색 (콩 이모지 금지 — Bean 표시는 BeanIcon만)
+const ITEM_META: Record<string, { label: string; emoji: string; bar: string }> =
+  {
+    SUBSCR: { label: '구독', emoji: '🔄', bar: 'bg-purple-500' },
+    ROOM_CREATE: { label: '카페 생성', emoji: '🏗️', bar: 'bg-blue-500' },
+    ROOM_ENTER: { label: '카페 입장', emoji: '🚪', bar: 'bg-cyan-500' },
+    EVENT_ENTER: { label: '이벤트 입장', emoji: '🎟️', bar: 'bg-amber-500' },
+    STICKER_PACK: { label: '스티커팩', emoji: '🎨', bar: 'bg-pink-500' },
+    BADGE_UPGRADE: { label: '뱃지 강화', emoji: '🏅', bar: 'bg-emerald-500' },
+    ETC: { label: '기타', emoji: '❓', bar: 'bg-gray-400' },
+  }
+
+export function TokenRevenue() {
+  const [data, setData] = useState<RevenueData | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetch('/api/admin/token/revenue')
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`)
+        return r.json() as Promise<RevenueData>
+      })
+      .then(setData)
+      .catch((e: Error) => setError(e.message))
+      .finally(() => setLoading(false))
+  }, [])
+
+  if (loading)
+    return <p className="text-muted-foreground text-sm">매출 집계 중...</p>
+  if (error) return <p className="text-sm text-red-500">매출 오류: {error}</p>
+  if (!data) return null
+
+  const items = [...data.bean_by_item].sort((a, b) => b.net_bean - a.net_bean)
+  const maxBean = Math.max(...items.map((i) => i.net_bean), 1)
+
+  return (
+    <div className="space-y-3">
+      <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
+        매출 분석
+      </p>
+
+      {/* 매출 2층위 카드 */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {/* ① Pi 현금 매출 */}
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950/30">
+          <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+            Pi 현금 매출 (충전)
+          </p>
+          <p className="mt-1 text-2xl font-bold tabular-nums">
+            π {Number(data.pi_revenue.total_pi).toLocaleString()}
+          </p>
+          <p className="text-muted-foreground text-xs">
+            충전 {data.pi_revenue.charge_cnt}건 · 발행{' '}
+            {Number(data.pi_revenue.total_bean).toLocaleString()}{' '}
+            <BeanIcon className="inline-block h-3.5 w-3.5 align-text-bottom" />
+          </p>
+          <p className="text-muted-foreground mt-1 text-[11px]">
+            외부에서 유입된 유일한 현금
+          </p>
+        </div>
+
+        {/* ② Bean 회수 매출 */}
+        <div className="rounded-lg border border-purple-200 bg-purple-50 p-4 dark:border-purple-800 dark:bg-purple-950/30">
+          <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+            Bean 회수 매출 (소비)
+          </p>
+          <p className="mt-1 flex items-center gap-1.5 text-2xl font-bold tabular-nums">
+            <BeanIcon className="inline-block h-5 w-5" />{' '}
+            {Number(data.bean_total).toLocaleString()}
+          </p>
+          <p className="text-muted-foreground text-xs">
+            ≈ π {(Number(data.bean_total) / 100).toFixed(2)} · 거버넌스 회수
+          </p>
+          <p className="text-muted-foreground mt-1 text-[11px]">
+            충전분의 수익 실현 (이연수익)
+          </p>
+        </div>
+      </div>
+
+      {/* Bean 회수 항목별 막대 */}
+      <div className="border-border rounded-lg border p-4">
+        <p className="text-muted-foreground mb-3 text-xs font-semibold tracking-wide uppercase">
+          Bean 회수 매출 — 항목별
+        </p>
+        {items.length === 0 ? (
+          <p className="text-muted-foreground text-sm">
+            아직 매출 거래가 없습니다.
+          </p>
+        ) : (
+          <ul className="space-y-2.5">
+            {items.map((it) => {
+              const meta = ITEM_META[it.ref_tp_cd] ?? ITEM_META.ETC
+              const pct = Math.max(2, (it.net_bean / maxBean) * 100)
+              const share =
+                data.bean_total > 0
+                  ? ((it.net_bean / Number(data.bean_total)) * 100).toFixed(1)
+                  : '0.0'
+              return (
+                <li key={it.ref_tp_cd} className="space-y-1">
+                  <div className="flex items-baseline justify-between text-sm">
+                    <span className="font-medium">
+                      {meta.emoji} {meta.label}
+                      <span className="text-muted-foreground ml-1.5 text-xs">
+                        {it.txn_cnt}건 · {share}%
+                      </span>
+                    </span>
+                    <span className="font-semibold tabular-nums">
+                      {Number(it.net_bean).toLocaleString()}{' '}
+                      <BeanIcon className="inline-block h-4 w-4 align-text-bottom" />
+                    </span>
+                  </div>
+                  <div className="bg-muted h-2 w-full overflow-hidden rounded-full">
+                    <div
+                      className={`h-full rounded-full ${meta.bar}`}
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                </li>
+              )
+            })}
+          </ul>
+        )}
+      </div>
+    </div>
+  )
+}
