@@ -16,21 +16,31 @@ export async function GET(_req: Request, { params }: Params) {
   if (!mbr)
     return NextResponse.json({ error: '카페 멤버가 아닙니다' }, { status: 403 })
 
-  const { data } = await getSupabaseAdmin()
+  // msg_room_mbr ↔ sys_user 는 FK 제약이 없어 PostgREST 임베디드 조인 불가 →
+  // 멤버를 먼저 조회하고 usr_id로 사용자명을 별도 조회해 병합한다.
+  const db = getSupabaseAdmin()
+  const { data } = await db
     .from('msg_room_mbr')
-    .select('usr_id, mbr_role_cd, reg_dtm, sys_user!inner(display_name)')
+    .select('usr_id, mbr_role_cd, reg_dtm')
     .eq('room_id', roomId)
     .eq('del_yn', 'N')
     .order('reg_dtm', { ascending: true }) // 가입 순 — 패널은 접속 상태로 재정렬
 
-  type Row = {
-    usr_id: string
-    mbr_role_cd: string
-    sys_user: { display_name: string } | null
+  const rows = (data ?? []) as { usr_id: string; mbr_role_cd: string }[]
+  const userIds = [...new Set(rows.map((r) => r.usr_id))]
+  const nameMap = new Map<string, string>()
+  if (userIds.length > 0) {
+    const { data: users } = await db
+      .from('sys_user')
+      .select('id, display_name')
+      .in('id', userIds)
+    for (const u of (users ?? []) as { id: string; display_name: string }[])
+      nameMap.set(u.id, u.display_name)
   }
-  const members = ((data ?? []) as unknown as Row[]).map((r) => ({
+
+  const members = rows.map((r) => ({
     usr_id: r.usr_id,
-    display_nm: r.sys_user?.display_name ?? r.usr_id.slice(0, 8),
+    display_nm: nameMap.get(r.usr_id) ?? r.usr_id.slice(0, 8),
     mbr_role_cd: r.mbr_role_cd,
   }))
 
