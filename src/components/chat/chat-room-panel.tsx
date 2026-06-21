@@ -48,7 +48,8 @@ export function ChatRoomPanel({
   const urlLocale = useLocale()
   // '' = 자동 (URL locale 기준 수신 번역만) / locale 코드 = 이 방 전체 강제 번역
   const [viewLocale, setViewLocale] = useState('')
-  const [canTip, setCanTip] = useState(false)
+  // Bean 선물은 모든 사용자 허용 — 항상 활성(잔액 부족은 전송 시 차단)
+  const [canTip] = useState(true)
   // 자동번역 자격 — undefined(확인 전)면 수동 번역 버튼 미노출(깜빡임 방지)
   const [canAutoTranslate, setCanAutoTranslate] = useState<boolean | undefined>(
     undefined,
@@ -113,7 +114,6 @@ export function ChatRoomPanel({
             canAutoTranslate?: boolean
           } | null,
         ) => {
-          if (d?.canTip) setCanTip(true)
           if (d?.tier && d.tier !== 'FREE') setIsSubscribed(true)
           if (d) setCanAutoTranslate(!!d.canAutoTranslate)
         },

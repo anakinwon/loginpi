@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
-import { canSendTip } from '@/lib/chat-auth'
 import { transferBean } from '@/lib/bean'
 import { TIP_PRESETS_BEAN } from '@/lib/bean-shared'
 import { broadcastToRoom } from '@/lib/realtime-broadcast'
@@ -16,13 +15,8 @@ export async function POST(request: NextRequest) {
   if (!user)
     return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
-  const allowed = await canSendTip(user.id)
-  if (!allowed) {
-    return NextResponse.json(
-      { error: 'Bean 선물은 PREMIUM 이상 구독자만 사용할 수 있습니다' },
-      { status: 403 },
-    )
-  }
+  // Bean 선물은 모든 사용자 허용 — 자기 Bean을 보내는 P2P 전송이라 구독 게이트 없음.
+  // (잔액 부족은 transferBean이 INSUFFICIENT_BEAN으로 차단)
 
   let body: unknown
   try {
