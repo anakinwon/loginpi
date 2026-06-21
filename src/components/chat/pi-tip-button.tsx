@@ -55,7 +55,7 @@ export function PiTipButton({
     <div className="relative">
       <button
         onClick={() => (open ? close() : setOpen(true))}
-        className="hover:bg-muted rounded-full px-2 py-0.5 text-xs opacity-0 transition-opacity group-hover:opacity-100"
+        className="hover:bg-muted rounded-full px-2 py-0.5 text-xs opacity-70 transition-opacity hover:opacity-100"
         title={`${recipientName}님께 Bean 선물하기`}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
