@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
   }
 
   const { searchParams } = req.nextUrl
-  const txnTp = searchParams.get('txn_tp') ?? undefined // CHARGE|SPEND|REWARD|REFUND
+  const txnTp = searchParams.get('txn_tp') ?? undefined // CHARGE|SPEND|REWARD|REFUND|SUBSCRIBE|TRANSFER(팁)|FEE
   const usrId = searchParams.get('usr_id') ?? undefined
   const limitStr = searchParams.get('limit') ?? '100'
   const offsetStr = searchParams.get('offset') ?? '0'

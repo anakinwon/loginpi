@@ -10,7 +10,7 @@ const TXN_TP_LABEL: Record<string, string> = {
   REWARD: '보상',
   REFUND: '환불',
   SUBSCRIBE: '구독',
-  TIP: '팁',
+  TRANSFER: '팁', // 카페방 P2P Bean 선물(fn_bean_transfer) — 보낸이 −/받은이 + 2건
   FEE: '수수료',
 }
 
@@ -23,7 +23,7 @@ const TXN_TP_COLOR: Record<string, string> = {
     'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
   SUBSCRIBE:
     'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
-  TIP: 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400',
+  TRANSFER: 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400',
   FEE: 'bg-muted text-muted-foreground',
 }
 
