@@ -112,7 +112,7 @@ export function StoreShopfront({
                   </span>
                   {/* 본인 매장: 수정 가능 배지 (우상단) */}
                   {isOwner && (
-                    <span className="bg-primary text-primary-foreground absolute top-2 right-2 rounded-full px-2 py-0.5 text-xs font-medium opacity-0 transition-opacity group-hover:opacity-100">
+                    <span className="bg-primary text-primary-foreground absolute top-2 right-2 rounded-full px-2 py-0.5 text-xs font-medium opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100">
                       {t('shopfrontEditBadge')}
                     </span>
                   )}
