@@ -247,8 +247,8 @@ export function ChatRoomPanel({
     currentUserId,
     currentUserDisplayName,
     userLocale: effectiveLocale,
-    // isSubscribed 이중 게이트 — localStorage에 남은 이전 viewLocale이 비구독자에게 활성화되는 것 방지
-    forceTranslate: isSubscribed && !!viewLocale,
+    // 자동번역 강제는 canAutoTranslate(TRANSLATE 구독) 기준 — TRANSLATE 단독 구독자(tier=FREE)도 사용 가능
+    forceTranslate: !!canAutoTranslate && !!viewLocale,
     // TASK-064 Trigger 3: @ai 멘션 한도 초과 → 업그레이드 모달
     onAiLimitExceeded,
     // TASK-062 Trigger 7: 배지 수여 broadcast → 축하 팝업
@@ -342,11 +342,11 @@ export function ChatRoomPanel({
             </span>
           )}
         </button>
-        {/* PiTranslate™ 방별 번역 언어 콤보 — 구독자 전용 특혜 */}
+        {/* PiTranslate™ 방별 번역 언어 콤보 — 자동번역 구독(canAutoTranslate) 전용 특혜 */}
         <ChatLocaleSelect
           value={viewLocale}
           onChange={handleLocaleChange}
-          isSubscribed={isSubscribed}
+          isSubscribed={!!canAutoTranslate}
         />
       </header>
 
