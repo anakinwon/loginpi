@@ -115,47 +115,34 @@ export default function TokenTransactionsPage() {
             : '해당 유형의 거래가 없습니다.'}
         </p>
       ) : (
-        <div className="overflow-hidden overflow-x-auto rounded-lg border">
-          <table className="w-full text-sm">
-            <thead className="bg-muted/50 border-b">
-              <tr>
-                <th className="px-4 py-2 text-left font-medium">사용자</th>
-                <th className="px-4 py-2 text-left font-medium">유형</th>
-                <th className="px-4 py-2 text-right font-medium">증감</th>
-                <th className="px-4 py-2 text-right font-medium">잔액</th>
-                <th className="px-4 py-2 text-left font-medium">Pi 금액</th>
-                <th className="px-4 py-2 text-left font-medium">메모</th>
-                <th className="px-4 py-2 text-left font-medium">일시</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {displayed.map((t) => (
-                <tr
-                  key={t.txn_id}
-                  className="hover:bg-muted/30 transition-colors"
-                >
-                  <td className="px-4 py-3">
-                    <p className="font-medium">
+        <>
+          {/* 모바일: 카드형 목록 (md 미만) */}
+          <div className="space-y-2 md:hidden">
+            {displayed.map((t) => (
+              <div key={t.txn_id} className="rounded-lg border p-3 text-sm">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="truncate font-medium">
                       {t.sys_user?.nick_nm ||
                         t.sys_user?.real_nm ||
                         t.sys_user?.display_name ||
                         '—'}
                     </p>
-                    <p className="text-muted-foreground text-xs">
+                    <p className="text-muted-foreground truncate text-xs">
                       {t.sys_user?.pi_username
                         ? `@${t.sys_user.pi_username}`
                         : t.usr_id.slice(0, 8)}
                     </p>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={`rounded-full px-2 py-0.5 text-xs font-medium ${TXN_TP_COLOR[t.txn_tp_cd] ?? 'bg-muted'}`}
-                    >
-                      {TXN_TP_LABEL[t.txn_tp_cd] ?? t.txn_tp_cd}
-                    </span>
-                  </td>
-                  <td
-                    className={`px-4 py-3 text-right font-semibold tabular-nums ${
+                  </div>
+                  <span
+                    className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${TXN_TP_COLOR[t.txn_tp_cd] ?? 'bg-muted'}`}
+                  >
+                    {TXN_TP_LABEL[t.txn_tp_cd] ?? t.txn_tp_cd}
+                  </span>
+                </div>
+                <div className="mt-2 flex items-baseline justify-between gap-2">
+                  <span
+                    className={`font-semibold tabular-nums ${
                       t.bean_amt > 0
                         ? 'text-blue-600 dark:text-blue-400'
                         : 'text-red-600 dark:text-red-400'
@@ -164,25 +151,94 @@ export default function TokenTransactionsPage() {
                     {t.bean_amt > 0 ? '+' : ''}
                     {t.bean_amt.toLocaleString()}{' '}
                     <BeanIcon className="inline-block h-3.5 w-3.5 align-text-bottom" />
-                  </td>
-                  <td className="text-muted-foreground px-4 py-3 text-right tabular-nums">
-                    {t.bal_amt.toLocaleString()}{' '}
-                    <BeanIcon className="inline-block h-3.5 w-3.5 align-text-bottom" />
-                  </td>
-                  <td className="text-muted-foreground px-4 py-3 text-sm">
-                    {t.pi_amt != null ? `π ${t.pi_amt}` : '—'}
-                  </td>
-                  <td className="text-muted-foreground max-w-[160px] truncate px-4 py-3">
-                    {t.memo_txt ?? '—'}
-                  </td>
-                  <td className="text-muted-foreground px-4 py-3 text-xs whitespace-nowrap">
-                    {new Date(t.reg_dtm).toLocaleString('ko-KR')}
-                  </td>
+                  </span>
+                  <span className="text-muted-foreground text-xs tabular-nums">
+                    잔액 {t.bal_amt.toLocaleString()}
+                    {t.pi_amt != null ? ` · π ${t.pi_amt}` : ''}
+                  </span>
+                </div>
+                {t.memo_txt && (
+                  <p className="text-muted-foreground mt-1 truncate text-xs">
+                    {t.memo_txt}
+                  </p>
+                )}
+                <p className="text-muted-foreground mt-1 text-xs">
+                  {new Date(t.reg_dtm).toLocaleString('ko-KR')}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          {/* 데스크탑: 테이블 (md 이상) */}
+          <div className="hidden overflow-x-auto rounded-lg border md:block">
+            <table className="w-full text-sm">
+              <thead className="bg-muted/50 border-b">
+                <tr>
+                  <th className="px-4 py-2 text-left font-medium">사용자</th>
+                  <th className="px-4 py-2 text-left font-medium">유형</th>
+                  <th className="px-4 py-2 text-right font-medium">증감</th>
+                  <th className="px-4 py-2 text-right font-medium">잔액</th>
+                  <th className="px-4 py-2 text-left font-medium">Pi 금액</th>
+                  <th className="px-4 py-2 text-left font-medium">메모</th>
+                  <th className="px-4 py-2 text-left font-medium">일시</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y">
+                {displayed.map((t) => (
+                  <tr
+                    key={t.txn_id}
+                    className="hover:bg-muted/30 transition-colors"
+                  >
+                    <td className="px-4 py-3">
+                      <p className="font-medium">
+                        {t.sys_user?.nick_nm ||
+                          t.sys_user?.real_nm ||
+                          t.sys_user?.display_name ||
+                          '—'}
+                      </p>
+                      <p className="text-muted-foreground text-xs">
+                        {t.sys_user?.pi_username
+                          ? `@${t.sys_user.pi_username}`
+                          : t.usr_id.slice(0, 8)}
+                      </p>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-xs font-medium ${TXN_TP_COLOR[t.txn_tp_cd] ?? 'bg-muted'}`}
+                      >
+                        {TXN_TP_LABEL[t.txn_tp_cd] ?? t.txn_tp_cd}
+                      </span>
+                    </td>
+                    <td
+                      className={`px-4 py-3 text-right font-semibold tabular-nums ${
+                        t.bean_amt > 0
+                          ? 'text-blue-600 dark:text-blue-400'
+                          : 'text-red-600 dark:text-red-400'
+                      }`}
+                    >
+                      {t.bean_amt > 0 ? '+' : ''}
+                      {t.bean_amt.toLocaleString()}{' '}
+                      <BeanIcon className="inline-block h-3.5 w-3.5 align-text-bottom" />
+                    </td>
+                    <td className="text-muted-foreground px-4 py-3 text-right tabular-nums">
+                      {t.bal_amt.toLocaleString()}{' '}
+                      <BeanIcon className="inline-block h-3.5 w-3.5 align-text-bottom" />
+                    </td>
+                    <td className="text-muted-foreground px-4 py-3 text-sm">
+                      {t.pi_amt != null ? `π ${t.pi_amt}` : '—'}
+                    </td>
+                    <td className="text-muted-foreground max-w-[160px] truncate px-4 py-3">
+                      {t.memo_txt ?? '—'}
+                    </td>
+                    <td className="text-muted-foreground px-4 py-3 text-xs whitespace-nowrap">
+                      {new Date(t.reg_dtm).toLocaleString('ko-KR')}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
 
       <AdminPagination page={page} totalPages={totalPages} onPage={setPage} />
