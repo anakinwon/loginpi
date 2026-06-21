@@ -452,7 +452,10 @@ function MessageBubble({
       </div>
       {/* 시간은 hideTime일 때 숨김. 선물 버튼은 메시지 탭(showActions) 시 노출 */}
       {(!hideTime || (showActions && !isMe && canTip)) && (
-        <div className="flex items-center gap-1">
+        <div
+          className="flex items-center gap-1"
+          onClick={(e) => e.stopPropagation()}
+        >
           {!hideTime && (
             <span className="text-muted-foreground text-[10px]">
               {formatKoreanTime(msg.reg_dtm)}
