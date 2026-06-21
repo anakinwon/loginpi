@@ -43,6 +43,7 @@ const BEAN_NAV = [
   { href: '/admin/token', labelKey: 'beanToken' },
   { href: '/admin/token/transactions', labelKey: 'beanTxn' },
   { href: '/admin/token/wallets', labelKey: 'beanWallets' },
+  { href: '/admin/campaign', labelKey: 'campaign' },
 ] as const
 
 const I18N_NAV = [{ href: '/admin/i18n', labelKey: 'i18n' }] as const
