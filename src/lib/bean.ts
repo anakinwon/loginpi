@@ -7,7 +7,12 @@ import type { BeanTxn, BeanTxnType } from './bean-shared'
 // 소각 없음 — Bean은 USER↔PLATFORM 순환. 1 Pi = 100 Bean 고정·정수 전용.
 // TODO: rename to bean_token_wallet (migration sql/069 적용 후)
 
-export { BEAN_PER_PI, CHARGE_PRESETS, beanToPi } from './bean-shared'
+export {
+  BEAN_PER_PI,
+  CHARGE_PRESETS,
+  TIP_PRESETS_BEAN,
+  beanToPi,
+} from './bean-shared'
 export type { BeanTxn, BeanTxnType } from './bean-shared'
 
 interface BeanWallet {
@@ -72,4 +77,37 @@ export async function applyBean(args: {
     return { ok: false, error: insufficient ? 'INSUFFICIENT_BEAN' : 'ERROR' }
   }
   return { ok: true, balance: Number((data as BeanWallet)?.bean_amt ?? 0) }
+}
+
+// Bean P2P 전송 (USER→USER) — fn_bean_transfer에 위임 (양쪽 지갑 + 원장 2건 단일 트랜잭션)
+// 거버넌스 무변동(순수 이전). 잔액 부족 시 INSUFFICIENT_BEAN 반환.
+export async function transferBean(args: {
+  fromUsrId: string
+  toUsrId: string
+  beanAmt: number // 양수 전송액
+  refId?: string | null
+  memo?: string | null
+  regrId?: string
+}): Promise<{ ok: boolean; fromBalance?: number; error?: string }> {
+  const { data, error } = await getSupabaseAdmin().rpc('fn_bean_transfer', {
+    p_from_usr: args.fromUsrId,
+    p_to_usr: args.toUsrId,
+    p_bean_amt: args.beanAmt,
+    p_ref_id: args.refId ?? null,
+    p_memo: args.memo ?? null,
+    p_regr_id: args.regrId ?? 'SYSTEM',
+  })
+
+  if (error) {
+    const msg = error.message ?? ''
+    const known = ['INSUFFICIENT_BEAN', 'SELF_TRANSFER', 'INVALID_AMOUNT'].find(
+      (e) => msg.includes(e),
+    )
+    console.error('[Bean] 전송 실패:', msg)
+    return { ok: false, error: known ?? 'ERROR' }
+  }
+  const row = (Array.isArray(data) ? data[0] : data) as {
+    out_from_bal: number
+  } | null
+  return { ok: true, fromBalance: Number(row?.out_from_bal ?? 0) }
 }

@@ -1697,7 +1697,8 @@
       "CHARGE": "충전",
       "SPEND": "사용",
       "REWARD": "보상",
-      "REFUND": "환불"
+      "REFUND": "환불",
+      "TRANSFER": "선물"
     }
   },
   "store": {

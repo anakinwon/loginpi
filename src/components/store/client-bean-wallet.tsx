@@ -39,6 +39,11 @@ const TXN_STYLE: Record<string, { color: string; emoji: string }> = {
       'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
     emoji: '🟠',
   },
+  TRANSFER: {
+    color:
+      'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+    emoji: '🫘',
+  },
 }
 
 export function ClientBeanWallet({ serverAuthed }: { serverAuthed: boolean }) {

@@ -2,8 +2,14 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { canSendTip } from '@/lib/chat-auth'
+import { transferBean } from '@/lib/bean'
+import { TIP_PRESETS_BEAN } from '@/lib/bean-shared'
+import { broadcastToRoom } from '@/lib/realtime-broadcast'
+import { recordUserAction } from '@/lib/event'
 
-const VALID_AMOUNTS = [0.1, 0.5, 1] as const
+// 카페방 P2P Bean 선물 — Pi 결제가 아닌 Bean 실전송(USER→USER).
+// 보내는 사람 Bean 차감 + 받는 사람 적립을 fn_bean_transfer로 원자적 수행 후 TIP_NOTI 알림.
+const VALID_AMOUNTS = TIP_PRESETS_BEAN as readonly number[]
 
 export async function POST(request: NextRequest) {
   const user = await getSessionUser()
@@ -13,7 +19,7 @@ export async function POST(request: NextRequest) {
   const allowed = await canSendTip(user.id)
   if (!allowed) {
     return NextResponse.json(
-      { error: 'Pi Bean은 PREMIUM 이상 구독자만 사용할 수 있습니다' },
+      { error: 'Bean 선물은 PREMIUM 이상 구독자만 사용할 수 있습니다' },
       { status: 403 },
     )
   }
@@ -38,9 +44,9 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  if (!(VALID_AMOUNTS as readonly number[]).includes(amount)) {
+  if (!VALID_AMOUNTS.includes(amount)) {
     return NextResponse.json(
-      { error: '유효한 금액: 0.1, 0.5, 1 Pi' },
+      { error: `유효한 금액: ${VALID_AMOUNTS.join(', ')} Bean` },
       { status: 400 },
     )
   }
@@ -97,15 +103,62 @@ export async function POST(request: NextRequest) {
   }
 
   const recipientRow = recipient as { id: string; display_name: string | null }
+  const senderNm = user.display_name ?? 'user'
+  const recipientNm = recipientRow.display_name ?? 'user'
+  const slug = String(senderNm).slice(0, 20)
+
+  // Bean 실전송 (USER→USER 원자적 이전)
+  const result = await transferBean({
+    fromUsrId: user.id,
+    toUsrId: recipientRow.id,
+    beanAmt: amount,
+    refId: room_id,
+    memo: `🫘 @${senderNm} → @${recipientNm} ${amount} Bean`,
+    regrId: slug,
+  })
+
+  if (!result.ok) {
+    const insufficient = result.error === 'INSUFFICIENT_BEAN'
+    return NextResponse.json(
+      {
+        error: insufficient
+          ? 'Bean 잔액이 부족합니다. 충전 후 다시 시도하세요.'
+          : 'Bean 전송에 실패했습니다',
+        requiresBean: insufficient,
+      },
+      { status: insufficient ? 402 : 500 },
+    )
+  }
+
+  // TIP_NOTI 알림 메시지 삽입 + 실시간 브로드캐스트
+  const { data: tipMsg } = await db
+    .from('msg_msg')
+    .insert({
+      room_id,
+      snd_usr_id: user.id,
+      snd_usr_nm: senderNm,
+      msg_cont: `🫘 ${senderNm} 님이 ${recipientNm} 님께 ${amount} Bean을 선물했습니다`,
+      msg_tp_cd: 'TIP_NOTI',
+      regr_id: slug,
+      modr_id: slug,
+    })
+    .select()
+    .single()
+
+  if (tipMsg) {
+    await broadcastToRoom(room_id, 'new_msg', tipMsg)
+
+    // M4: Bean 전송 미션 기록 (비블로킹)
+    recordUserAction('bean_send', user.id, {
+      room_id,
+      recipient_id: recipientRow.id,
+    }).catch((err) => console.error(`[M4] 미션 기록 실패: ${err.message}`))
+  }
 
   return NextResponse.json({
+    ok: true,
     amount,
-    memo: `🫘 @${user.display_name} → @${recipientRow.display_name ?? 'user'} Pi Bean`,
-    metadata: {
-      type: 'PI_TIP',
-      room_id,
-      recipient_id,
-      recipient_nm: recipientRow.display_name ?? 'user',
-    },
+    recipient_nm: recipientNm,
+    from_balance: result.fromBalance,
   })
 }

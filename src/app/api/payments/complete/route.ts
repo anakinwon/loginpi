@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { sendPaymentReceipt } from '@/lib/email'
 import { broadcastToRoom, broadcastToSeller } from '@/lib/realtime-broadcast'
-import { canSendTip } from '@/lib/chat-auth'
 import { markEscrow } from '@/lib/mps-order'
 import { dispatchOrderNotis } from '@/lib/mps-noti'
 import { depositBond, BOND_DEPOSIT_PI } from '@/lib/mps-bond'
@@ -148,78 +147,7 @@ export async function POST(request: NextRequest) {
       }
       // 레거시 Pi 구독(CHAT_SUBSCR) 분기는 폐기됨 (PRD_15_FEE §1-6 — Bean 구독으로 일원화).
       // 구독 결제는 POST /api/subscriptions/products/subscribe (Bean SPEND)가 단독 담당.
-    } else if (meta?.type === 'PI_TIP' && payment.user_uid) {
-      // PI_TIP: 결제 완료 시 TIP_NOTI 메시지 삽입 + 실시간 브로드캐스트
-      const [{ data: sender }, { data: recipient }] = await Promise.all([
-        db
-          .from('sys_user')
-          .select('id, display_name')
-          .eq('pi_uid', payment.user_uid)
-          .maybeSingle(),
-        db
-          .from('sys_user')
-          .select('id, display_name')
-          .eq('id', String(meta.recipient_id ?? ''))
-          .maybeSingle(),
-      ])
-
-      if (sender && recipient && meta.room_id) {
-        const senderRow = sender as { id: string; display_name: string | null }
-        const recipientRow = recipient as {
-          id: string
-          display_name: string | null
-        }
-        const roomId = String(meta.room_id)
-
-        // 결제 완료 시점 권한 재검증 + 발신자·수신자 방 멤버십 검증
-        const [tipAllowed, { data: senderMbr }, { data: recipientMbr }] =
-          await Promise.all([
-            canSendTip(senderRow.id),
-            db
-              .from('msg_room_mbr')
-              .select('room_id')
-              .eq('room_id', roomId)
-              .eq('usr_id', senderRow.id)
-              .eq('del_yn', 'N')
-              .maybeSingle(),
-            db
-              .from('msg_room_mbr')
-              .select('room_id')
-              .eq('room_id', roomId)
-              .eq('usr_id', recipientRow.id)
-              .eq('del_yn', 'N')
-              .maybeSingle(),
-          ])
-
-        if (tipAllowed && senderMbr && recipientMbr) {
-          const slug = String(senderRow.display_name ?? 'user').slice(0, 20)
-          const { data: tipMsg } = await db
-            .from('msg_msg')
-            .insert({
-              room_id: roomId,
-              snd_usr_id: senderRow.id,
-              snd_usr_nm: String(senderRow.display_name ?? 'user'),
-              msg_cont: `🫘 ${senderRow.display_name} 님이 ${recipientRow.display_name} 님께 π${payment.amount} Bean을 선물했습니다`,
-              msg_tp_cd: 'TIP_NOTI',
-              regr_id: slug,
-              modr_id: slug,
-            })
-            .select()
-            .single()
-
-          if (tipMsg) {
-            await broadcastToRoom(roomId, 'new_msg', tipMsg)
-
-            // M4: Bean 전송 미션 기록 (비블로킹)
-            recordUserAction('bean_send', senderRow.id, {
-              room_id: roomId,
-              recipient_id: recipientRow.id,
-            }).catch((err) =>
-              console.error(`[M4] 미션 기록 실패: ${err.message}`),
-            )
-          }
-        }
-      }
+      // PI_TIP(Pi 결제 선물)은 폐기 — 카페방 선물은 Bean 실전송(POST /api/tips, fn_bean_transfer)으로 일원화
     } else if (meta?.type === 'EVENT_ROOM_JOIN' && payment.user_uid) {
       // EVENT_ROOM_JOIN: 결제 완료 시 GUEST로 이벤트방 입장 처리
       const roomIdStr = String(meta.room_id ?? '')
