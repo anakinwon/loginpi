@@ -13,7 +13,6 @@ import { PiSdkScript } from '@/components/pi-sdk-script'
 import { Header } from '@/components/layout/header'
 import { BottomNav } from '@/components/layout/bottom-nav'
 import { Toaster } from '@/components/ui/sonner'
-import { OrderAlertListener } from '@/components/store/order-alert-listener'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -90,7 +89,6 @@ export default async function LocaleLayout({
                 <main className="flex-1 pb-16">{children}</main>
                 <BottomNav />
                 <Toaster richColors />
-                <OrderAlertListener />
               </PiAuthProvider>
             </ThemeProvider>
           </SessionProvider>
