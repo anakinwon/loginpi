@@ -17,9 +17,12 @@ const TXN_TP_LABEL: Record<string, string> = {
 const TXN_TP_COLOR: Record<string, string> = {
   CHARGE: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
   SPEND: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
-  REWARD: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-  REFUND: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
-  SUBSCRIBE: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+  REWARD:
+    'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+  REFUND:
+    'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
+  SUBSCRIBE:
+    'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
   TIP: 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400',
   FEE: 'bg-muted text-muted-foreground',
 }
@@ -52,20 +55,21 @@ export default function TokenTransactionsPage() {
   const [filter, setFilter] = useState<string>('all')
   const [page, setPage] = useState(1)
 
+  // 전체 거래를 1회 조회 — 필터는 클라이언트에서 적용해 탭 카운트가 항상 전체 기준이 되게 함
   useEffect(() => {
-    const params = new URLSearchParams({ limit: '500' })
-    if (filter !== 'all') params.set('txn_tp', filter)
     setLoading(true)
-    fetch(`/api/admin/token/transactions?${params}`)
+    fetch(`/api/admin/token/transactions?limit=500`)
       .then((r) => r.json())
       .then((d: { transactions: TxnRow[] }) => setTxns(d.transactions ?? []))
       .finally(() => setLoading(false))
-  }, [filter])
+  }, [])
 
   useEffect(() => setPage(1), [filter])
 
-  const totalPages = Math.ceil(txns.length / PAGE_SIZE)
-  const displayed = txns.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
+  const filtered =
+    filter === 'all' ? txns : txns.filter((t) => t.txn_tp_cd === filter)
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
+  const displayed = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
   const types = ['all', ...Object.keys(TXN_TP_LABEL)]
 
@@ -92,7 +96,7 @@ export default function TokenTransactionsPage() {
                 : 'border-border text-muted-foreground hover:bg-muted'
             }`}
           >
-            {tp === 'all' ? '전체' : TXN_TP_LABEL[tp] ?? tp}
+            {tp === 'all' ? '전체' : (TXN_TP_LABEL[tp] ?? tp)}
             {tp !== 'all' && (
               <span className="ml-1">
                 ({txns.filter((t) => t.txn_tp_cd === tp).length})
@@ -104,8 +108,12 @@ export default function TokenTransactionsPage() {
 
       {loading ? (
         <p className="text-muted-foreground text-sm">불러오는 중...</p>
-      ) : txns.length === 0 ? (
-        <p className="text-muted-foreground text-sm">거래 내역이 없습니다.</p>
+      ) : filtered.length === 0 ? (
+        <p className="text-muted-foreground text-sm">
+          {txns.length === 0
+            ? '거래 내역이 없습니다.'
+            : '해당 유형의 거래가 없습니다.'}
+        </p>
       ) : (
         <div className="overflow-hidden overflow-x-auto rounded-lg border">
           <table className="w-full text-sm">
@@ -122,7 +130,10 @@ export default function TokenTransactionsPage() {
             </thead>
             <tbody className="divide-y">
               {displayed.map((t) => (
-                <tr key={t.txn_id} className="hover:bg-muted/30 transition-colors">
+                <tr
+                  key={t.txn_id}
+                  className="hover:bg-muted/30 transition-colors"
+                >
                   <td className="px-4 py-3">
                     <p className="font-medium">
                       {t.sys_user?.nick_nm ||
