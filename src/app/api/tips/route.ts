@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
     toUsrId: recipientRow.id,
     beanAmt: amount,
     refId: room_id,
-    memo: `🫘 @${senderNm} → @${recipientNm} ${amount} Bean`,
+    memo: `@${senderNm} → @${recipientNm} ${amount} Bean`,
     regrId: slug,
   })
 
@@ -137,7 +137,7 @@ export async function POST(request: NextRequest) {
       room_id,
       snd_usr_id: user.id,
       snd_usr_nm: senderNm,
-      msg_cont: `🫘 ${senderNm} 님이 ${recipientNm} 님께 ${amount} Bean을 선물했습니다`,
+      msg_cont: `${senderNm} 님이 ${recipientNm} 님께 ${amount} Bean을 선물했습니다`,
       msg_tp_cd: 'TIP_NOTI',
       regr_id: slug,
       modr_id: slug,

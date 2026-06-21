@@ -229,7 +229,7 @@ function MessageBubble({
   if (msg.msg_tp_cd === 'SYSTEM' || msg.msg_tp_cd === 'TIP_NOTI') {
     return (
       <div className="text-muted-foreground py-1 text-center text-xs">
-        {/* Bean 알림은 🫘 이모지를 럭셔리 콩 이미지로 치환해 표시 (DB 텍스트는 이모지 유지) */}
+        {/* Bean 알림은 항상 /bean-noti.png 이미지로 표시 (과거 데이터의 선두 🫘 마커는 제거) */}
         {msg.msg_tp_cd === 'TIP_NOTI' ? (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}

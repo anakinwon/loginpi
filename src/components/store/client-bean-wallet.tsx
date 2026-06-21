@@ -18,31 +18,26 @@ function formatLocal(dtm: string): string {
   return new Date(dtm).toLocaleString() // 디바이스 로컬 시간대로 자동 변환
 }
 
-// 거래 유형별 배지 색·부호
-const TXN_STYLE: Record<string, { color: string; emoji: string }> = {
+// 거래 유형별 배지 색
+const TXN_STYLE: Record<string, { color: string }> = {
   CHARGE: {
     color:
       'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-    emoji: '🟢',
   },
   SPEND: {
     color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-    emoji: '🔵',
   },
   REWARD: {
     color:
       'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
-    emoji: '🎁',
   },
   REFUND: {
     color:
       'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
-    emoji: '🟠',
   },
   TRANSFER: {
     color:
       'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
-    emoji: '🫘',
   },
 }
 
@@ -152,7 +147,7 @@ export function ClientBeanWallet({ serverAuthed }: { serverAuthed: boolean }) {
         <p className="text-muted-foreground text-sm">{t('myBalance')}</p>
         <p className="text-4xl font-bold tabular-nums">
           {balance.toLocaleString()}{' '}
-          <BeanIcon className="inline-block h-7 w-7 align-text-bottom" />
+          <BeanIcon className="inline-block h-9 w-9 align-text-bottom" />
         </p>
         <p className="text-muted-foreground text-xs">Bean</p>
       </div>
@@ -245,7 +240,7 @@ export function ClientBeanWallet({ serverAuthed }: { serverAuthed: boolean }) {
                   >
                     {positive ? '+' : ''}
                     {tx.bean_amt.toLocaleString()}{' '}
-                    <BeanIcon className="inline-block h-4 w-4 align-text-bottom" />
+                    <BeanIcon className="inline-block h-5 w-5 align-text-bottom" />
                   </span>
                 </li>
               )
