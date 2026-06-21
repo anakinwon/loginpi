@@ -5,12 +5,15 @@ import type { ChatMessage } from '@/hooks/use-chat-room'
 import { PiTipButton } from './pi-tip-button'
 import { StickerImg } from './sticker-img'
 import { TranslatedMessage } from './translated-message'
+import { ManualTranslateButton } from './manual-translate-button'
+import { TRANSLATE_ONCE_BEAN } from '@/lib/bean-fee'
 
 interface ChatMessageListProps {
   roomId: string
   messages: ChatMessage[]
   currentUserId: string
   canTip: boolean
+  canAutoTranslate?: boolean // 자동번역 자격(구독자). false면 비구독자 → 수동 번역 버튼(건당 과금) 노출
   userLocale?: string // PiTranslate™ — scroll-up 로드 시 캐시된 번역 pre-populate
   prependMessages: (msgs: ChatMessage[]) => void
   onUpgradeForTip?: () => void
@@ -21,6 +24,7 @@ export function ChatMessageList({
   messages,
   currentUserId,
   canTip,
+  canAutoTranslate,
   userLocale,
   prependMessages,
   onUpgradeForTip,
@@ -158,6 +162,8 @@ export function ChatMessageList({
               msg={msg}
               isMe={msg.snd_usr_id === currentUserId}
               canTip={canTip}
+              canAutoTranslate={canAutoTranslate}
+              userLocale={userLocale}
               roomId={roomId}
               hideTime={hideTime}
               onUpgradeForTip={onUpgradeForTip}
@@ -214,6 +220,8 @@ function MessageBubble({
   msg,
   isMe,
   canTip,
+  canAutoTranslate,
+  userLocale,
   roomId,
   hideTime,
   onUpgradeForTip,
@@ -221,6 +229,8 @@ function MessageBubble({
   msg: ChatMessage
   isMe: boolean
   canTip: boolean
+  canAutoTranslate?: boolean
+  userLocale?: string
   roomId: string
   hideTime: boolean
   onUpgradeForTip?: () => void
@@ -418,6 +428,19 @@ function MessageBubble({
             roomId={roomId}
             msgId={msg.msg_id}
             localeCd={msg.trans_locale}
+          />
+        ) : !isMe &&
+          canAutoTranslate === false &&
+          userLocale &&
+          msg.msg_tp_cd === 'TEXT' &&
+          msg.msg_cont ? (
+          // 비구독자 — 수동 번역 버튼(건당 Bean 과금). 구독자는 자동번역되므로 미노출
+          <ManualTranslateButton
+            roomId={roomId}
+            msgId={msg.msg_id}
+            localeCd={userLocale}
+            original={msg.msg_cont}
+            feeBean={TRANSLATE_ONCE_BEAN}
           />
         ) : (
           msg.msg_cont

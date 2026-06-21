@@ -5,6 +5,8 @@ import { getRoomMember } from '@/lib/chat'
 import { LOCALE_CD_RE, baseLang } from '@/lib/chat-translate'
 import { getOrTranslateMessage } from '@/lib/chat-translate-dedup'
 import { canAutoTranslate } from '@/lib/chat-auth'
+import { applyBean, getBalance } from '@/lib/bean'
+import { TRANSLATE_ONCE_BEAN } from '@/lib/bean-fee'
 import { recordUserAction } from '@/lib/event'
 
 type Params = { params: Promise<{ roomId: string; msgId: string }> }
@@ -22,17 +24,8 @@ export async function POST(request: NextRequest, { params }: Params) {
   if (!mbr)
     return NextResponse.json({ error: '카페 멤버가 아닙니다' }, { status: 403 })
 
-  // 자동번역은 구독 기능 — 미구독(FREE)은 차단
-  if (!(await canAutoTranslate(user.id))) {
-    return NextResponse.json(
-      {
-        error: '자동번역은 구독 후 이용할 수 있습니다',
-        requiresSubscription: true,
-        feature: 'AUTO_TRANSLATE',
-      },
-      { status: 403 },
-    )
-  }
+  // 자동번역 과금: 구독자(TRANSLATE/PiCafe)는 무료, 비구독자는 건당 Bean 과금(맛보기·전환 유도)
+  const isSubscriber = await canAutoTranslate(user.id)
 
   let body: unknown
   try {
@@ -41,7 +34,10 @@ export async function POST(request: NextRequest, { params }: Params) {
     return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
   }
 
-  const { locale_cd: localeCd } = body as { locale_cd?: string }
+  const { locale_cd: localeCd, confirm } = body as {
+    locale_cd?: string
+    confirm?: boolean
+  }
   if (!localeCd || !LOCALE_CD_RE.test(localeCd)) {
     return NextResponse.json(
       { error: '유효하지 않은 locale 코드' },
@@ -75,13 +71,44 @@ export async function POST(request: NextRequest, { params }: Params) {
     (err) => console.error(`[M3.2] 미션 기록 실패: ${err.message}`),
   )
 
-  // 원본 언어가 이미 감지되어 있고 대상 언어와 같으면 번역 불필요
+  // 원본 언어가 이미 감지되어 있고 대상 언어와 같으면 번역 불필요 (과금 없음)
   if (msg.src_lang_cd && baseLang(msg.src_lang_cd) === baseLang(localeCd)) {
     return NextResponse.json({
       trans_cont: msg.msg_cont,
       cached: true,
       same_lang: true,
     })
+  }
+
+  // 비구독자 건당 과금 — 동의 없는 자동 호출은 과금 금지(원문 폴백), confirm=true(수동 번역 클릭)만 과금
+  if (!isSubscriber) {
+    if (confirm !== true) {
+      // 자동 번역 경로: 비구독자는 번역하지 않고 건당 과금 안내만 반환 → 클라이언트는 원문 유지
+      return NextResponse.json(
+        {
+          error: '자동번역은 구독자 전용입니다',
+          requiresBean: true,
+          requiresConfirm: true,
+          feeBean: TRANSLATE_ONCE_BEAN,
+          requiresSubscription: true,
+          feature: 'AUTO_TRANSLATE',
+        },
+        { status: 402 },
+      )
+    }
+    const bal = await getBalance(user.id)
+    if (bal < TRANSLATE_ONCE_BEAN) {
+      return NextResponse.json(
+        {
+          error: `번역 1회에 ${TRANSLATE_ONCE_BEAN} Bean이 필요합니다. Bean을 충전하거나 자동번역을 구독하세요.`,
+          requiresBean: true,
+          feeBean: TRANSLATE_ONCE_BEAN,
+          requiresSubscription: true,
+          feature: 'AUTO_TRANSLATE',
+        },
+        { status: 402 },
+      )
+    }
   }
 
   try {
@@ -92,7 +119,28 @@ export async function POST(request: NextRequest, { params }: Params) {
       msgCont: msg.msg_cont,
     })
 
-    return NextResponse.json({ trans_cont: transCont, cached })
+    // 비구독자 + 신규 번역(캐시 미스)만 과금 — 캐시 재사용은 무료(실제 번역 비용 없음)
+    if (!isSubscriber && !cached) {
+      const charge = await applyBean({
+        usrId: user.id,
+        txnTp: 'SPEND',
+        beanAmt: -TRANSLATE_ONCE_BEAN,
+        refTp: 'TRANSLATE_ONCE',
+        refId: msgId,
+        memo: '자동번역 건당',
+        regrId: user.display_name.slice(0, 20),
+      })
+      if (!charge.ok)
+        console.error(
+          `[자동번역] 건당 과금 실패 user:${user.id} msg:${msgId} (${charge.error})`,
+        )
+    }
+
+    return NextResponse.json({
+      trans_cont: transCont,
+      cached,
+      charged: !isSubscriber && !cached,
+    })
   } catch (err) {
     console.error(
       `[chat-translate] 번역 실패 msg:${msgId} locale:${localeCd}`,

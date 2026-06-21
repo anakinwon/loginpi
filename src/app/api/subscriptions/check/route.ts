@@ -23,6 +23,7 @@ export async function GET() {
     expire_dtm: plan.expire_dtm,
     auto_renew_yn: plan.auto_renew_yn,
     canTip: plan.caps.canTip,
+    canAutoTranslate: plan.caps.canAutoTranslate,
     canUsePremiumTheme: plan.caps.canUsePremiumTheme,
     canCreateEventRoom: plan.caps.canCreateEventRoom,
     canCreateRoomFree: room.allowed,

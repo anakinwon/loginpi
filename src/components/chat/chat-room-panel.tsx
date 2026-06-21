@@ -49,6 +49,10 @@ export function ChatRoomPanel({
   // '' = 자동 (URL locale 기준 수신 번역만) / locale 코드 = 이 방 전체 강제 번역
   const [viewLocale, setViewLocale] = useState('')
   const [canTip, setCanTip] = useState(false)
+  // 자동번역 자격 — undefined(확인 전)면 수동 번역 버튼 미노출(깜빡임 방지)
+  const [canAutoTranslate, setCanAutoTranslate] = useState<boolean | undefined>(
+    undefined,
+  )
   // 구독 확인 전까지 false(fail-closed) — 비구독자가 짧은 틈에 강제 번역 사용하는 것 방지
   const [isSubscribed, setIsSubscribed] = useState(false)
   const [tipPromptOpen, setTipPromptOpen] = useState(false)
@@ -96,10 +100,19 @@ export function ChatRoomPanel({
   const checkSubscription = useCallback(() => {
     piFetch('/api/subscriptions/check')
       .then((r) => (r.ok ? r.json() : null))
-      .then((d: { canTip?: boolean; tier?: string } | null) => {
-        if (d?.canTip) setCanTip(true)
-        if (d?.tier && d.tier !== 'FREE') setIsSubscribed(true)
-      })
+      .then(
+        (
+          d: {
+            canTip?: boolean
+            tier?: string
+            canAutoTranslate?: boolean
+          } | null,
+        ) => {
+          if (d?.canTip) setCanTip(true)
+          if (d?.tier && d.tier !== 'FREE') setIsSubscribed(true)
+          if (d) setCanAutoTranslate(!!d.canAutoTranslate)
+        },
+      )
       .catch(() => {})
   }, [])
 
@@ -216,16 +229,16 @@ export function ChatRoomPanel({
     sendFile,
     prependMessages,
   } = useChatRoom(roomId, initialMessages, {
-      currentUserId,
-      currentUserDisplayName,
-      userLocale: effectiveLocale,
-      // isSubscribed 이중 게이트 — localStorage에 남은 이전 viewLocale이 비구독자에게 활성화되는 것 방지
-      forceTranslate: isSubscribed && !!viewLocale,
-      // TASK-064 Trigger 3: @ai 멘션 한도 초과 → 업그레이드 모달
-      onAiLimitExceeded,
-      // TASK-062 Trigger 7: 배지 수여 broadcast → 축하 팝업
-      onBadgeAward,
-    })
+    currentUserId,
+    currentUserDisplayName,
+    userLocale: effectiveLocale,
+    // isSubscribed 이중 게이트 — localStorage에 남은 이전 viewLocale이 비구독자에게 활성화되는 것 방지
+    forceTranslate: isSubscribed && !!viewLocale,
+    // TASK-064 Trigger 3: @ai 멘션 한도 초과 → 업그레이드 모달
+    onAiLimitExceeded,
+    // TASK-062 Trigger 7: 배지 수여 broadcast → 축하 팝업
+    onBadgeAward,
+  })
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
@@ -365,6 +378,7 @@ export function ChatRoomPanel({
         messages={messages}
         currentUserId={currentUserId}
         canTip={canTip}
+        canAutoTranslate={canAutoTranslate}
         userLocale={effectiveLocale}
         prependMessages={prependMessages}
         onUpgradeForTip={onUpgradeForTip}
