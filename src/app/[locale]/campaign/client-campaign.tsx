@@ -18,6 +18,7 @@ interface Status {
     mission: boolean
   }
   eligible: boolean
+  grant_status: 'PENDING' | 'APPROVED' | 'REJECTED' | null
   claimed: boolean
   granted_cnt: number
   max_cnt: number
@@ -25,12 +26,11 @@ interface Status {
 }
 
 const CLAIM_MSG: Record<string, { text: string; ok: boolean }> = {
-  GRANTED: { text: '🎉 보상이 지급되었습니다!', ok: true },
-  ALREADY_GRANTED: { text: '이미 보상을 받으셨습니다', ok: false },
-  SOLD_OUT: { text: '선착순이 마감되었습니다', ok: false },
+  SUBMITTED: { text: '✅ 신청 완료! 관리자 승인 후 지급됩니다', ok: true },
+  ALREADY_SUBMITTED: { text: '이미 신청하셨습니다', ok: false },
   NOT_ELIGIBLE: { text: '아직 자격 조건을 충족하지 않았습니다', ok: false },
-  INSUFFICIENT_POOL: { text: '보상 재원이 소진되었습니다', ok: false },
   NOT_ACTIVE: { text: '진행 중인 캠페인이 아닙니다', ok: false },
+  NO_CAMPAIGN: { text: '캠페인을 찾을 수 없습니다', ok: false },
 }
 
 export function ClientCampaign() {
@@ -176,27 +176,40 @@ export function ClientCampaign() {
         </ul>
       </div>
 
-      {/* 청구 버튼 / 상태 */}
-      {st.claimed ? (
+      {/* 신청 버튼 / 상태 — 자동 지급 없음, 관리자 승인 후 지급 */}
+      {st.grant_status === 'APPROVED' ? (
         <div className="rounded-lg border border-green-300 bg-green-50 p-4 text-center text-sm font-medium text-green-700 dark:border-green-800 dark:bg-green-950/30 dark:text-green-400">
-          ✅ 이미 보상을 받으셨습니다
+          🎉 승인 완료 — {st.reward_bean.toLocaleString()} Bean이 지급되었습니다
+        </div>
+      ) : st.grant_status === 'PENDING' ? (
+        <div className="rounded-lg border border-amber-300 bg-amber-50 p-4 text-center text-sm font-medium text-amber-700 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-400">
+          ⏳ 신청 완료 — 관리자 승인 대기 중입니다
+        </div>
+      ) : st.grant_status === 'REJECTED' ? (
+        <div className="text-muted-foreground rounded-lg border p-4 text-center text-sm">
+          신청이 거절되었습니다
         </div>
       ) : st.sold_out ? (
         <div className="text-muted-foreground rounded-lg border p-4 text-center text-sm">
           선착순이 마감되었습니다
         </div>
       ) : (
-        <button
-          onClick={claim}
-          disabled={!st.eligible || claiming}
-          className="bg-primary text-primary-foreground w-full rounded-xl py-3 text-sm font-semibold hover:opacity-90 disabled:opacity-50"
-        >
-          {claiming
-            ? '처리 중…'
-            : st.eligible
-              ? `${st.reward_bean.toLocaleString()} Bean 받기`
-              : '조건을 모두 충족하면 받을 수 있어요'}
-        </button>
+        <>
+          <button
+            onClick={claim}
+            disabled={!st.eligible || claiming}
+            className="bg-primary text-primary-foreground w-full rounded-xl py-3 text-sm font-semibold hover:opacity-90 disabled:opacity-50"
+          >
+            {claiming
+              ? '처리 중…'
+              : st.eligible
+                ? `${st.reward_bean.toLocaleString()} Bean 신청하기`
+                : '조건을 모두 충족하면 신청할 수 있어요'}
+          </button>
+          <p className="text-muted-foreground mt-1.5 text-center text-xs">
+            신청 후 관리자 승인을 거쳐 지급됩니다
+          </p>
+        </>
       )}
     </div>
   )

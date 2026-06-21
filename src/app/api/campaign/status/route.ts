@@ -40,15 +40,17 @@ export async function GET() {
         .eq('del_yn', 'N'),
       db
         .from('bean_campaign_grant')
-        .select('grant_id')
+        .select('grant_id, grant_st_cd')
         .eq('campaign_cd', CAMPAIGN_CD)
         .eq('usr_id', user.id)
         .eq('del_yn', 'N')
         .maybeSingle(),
+      // 선착순은 '승인된' 수 기준
       db
         .from('bean_campaign_grant')
         .select('grant_id', { count: 'exact', head: true })
         .eq('campaign_cd', CAMPAIGN_CD)
+        .eq('grant_st_cd', 'APPROVED')
         .eq('del_yn', 'N'),
     ])
 
@@ -79,8 +81,9 @@ export async function GET() {
     mission: camp.require_mission_cnt <= 0 || missionOk,
   }
   const eligible = Object.values(conditions).every(Boolean)
-  const claimed = !!grantRes.data
-  const grantedCnt = cntRes.count ?? 0
+  const grant = grantRes.data as { grant_st_cd: string } | null
+  const grantStatus = grant?.grant_st_cd ?? null // null | PENDING | APPROVED | REJECTED
+  const approvedCnt = cntRes.count ?? 0
 
   return NextResponse.json({
     campaign_nm: camp.campaign_nm,
@@ -89,9 +92,10 @@ export async function GET() {
     active: camp.active_yn === 'Y',
     conditions,
     eligible,
-    claimed,
-    granted_cnt: grantedCnt,
+    grant_status: grantStatus,
+    claimed: !!grant,
+    granted_cnt: approvedCnt, // 승인(지급)된 매장 수
     max_cnt: camp.max_grant_cnt,
-    sold_out: grantedCnt >= camp.max_grant_cnt,
+    sold_out: approvedCnt >= camp.max_grant_cnt,
   })
 }
