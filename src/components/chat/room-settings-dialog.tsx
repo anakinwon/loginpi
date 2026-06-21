@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
 import { getCurrentPosition } from '@/lib/geo'
+import { ROOM_BOOST_BEAN, ROOM_BOOST_DAYS } from '@/lib/bean-fee'
 
 // 카페 수정 다이얼로그 (방장 OWNER 전용)
 // 공개/비밀 전환 · 비밀방 비밀번호 설정/변경/제거 · 이름 · 설명 · 정원
@@ -34,6 +35,7 @@ export function RoomSettingsDialog({
   const [newPwd, setNewPwd] = useState('')
   const [removePwd, setRemovePwd] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [boosting, setBoosting] = useState(false)
   const [gpsCoords, setGpsCoords] = useState<{
     lat: number
     lng: number
@@ -116,6 +118,23 @@ export function RoomSettingsDialog({
       toast.error('수정 중 오류가 발생했습니다')
     } finally {
       setSaving(false)
+    }
+  }
+
+  async function boost() {
+    setBoosting(true)
+    try {
+      const res = await piFetch(`/api/chat/rooms/${roomId}/boost`, {
+        method: 'POST',
+      })
+      const d = (await res.json()) as { error?: string }
+      if (res.ok)
+        toast.success(`🚀 부스트 완료! ${ROOM_BOOST_DAYS}일간 상단 노출됩니다`)
+      else toast.error(d.error ?? '부스트에 실패했습니다')
+    } catch {
+      toast.error('부스트 중 오류가 발생했습니다')
+    } finally {
+      setBoosting(false)
     }
   }
 
@@ -248,6 +267,24 @@ export function RoomSettingsDialog({
                 )}
               </div>
             )}
+          </div>
+
+          {/* 카페 부스트 — 공개 카페 목록 상단 노출(노출 우선) */}
+          <div className="rounded-xl border border-orange-200 bg-orange-50 p-3 dark:border-orange-900 dark:bg-orange-950/20">
+            <p className="text-sm font-medium">🚀 카페 부스트</p>
+            <p className="text-muted-foreground text-xs">
+              공개 카페 목록 상단에 {ROOM_BOOST_DAYS}일간 우선 노출됩니다. (기간
+              내 재구매 시 연장)
+            </p>
+            <button
+              onClick={boost}
+              disabled={boosting}
+              className="mt-2 w-full rounded-lg bg-orange-500 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
+            >
+              {boosting
+                ? '처리 중…'
+                : `${ROOM_BOOST_DAYS}일 부스트 (${ROOM_BOOST_BEAN} Bean)`}
+            </button>
           </div>
 
           <button

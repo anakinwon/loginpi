@@ -16,6 +16,7 @@ const ITEM_META: Record<string, { label: string; emoji: string; bar: string }> =
     TRANSLATE_ONCE: { label: '번역(건당)', emoji: '🌐', bar: 'bg-indigo-500' },
     AI_EXTRA: { label: 'AI 추가호출', emoji: '🤖', bar: 'bg-violet-500' },
     ROOM_CREATE: { label: '카페 생성', emoji: '🏗️', bar: 'bg-blue-500' },
+    ROOM_BOOST: { label: '카페 부스트', emoji: '🚀', bar: 'bg-orange-500' },
     ROOM_ENTER: { label: '카페 입장', emoji: '🚪', bar: 'bg-cyan-500' },
     EVENT_ENTER: { label: '이벤트 입장', emoji: '🎟️', bar: 'bg-amber-500' },
     STICKER_PACK: { label: '스티커팩', emoji: '🎨', bar: 'bg-pink-500' },

@@ -23,6 +23,7 @@ export type RoomWithTheme = {
   expr_dtm?: string
   entry_expire_dtm?: string // 이벤트방(E) 입장 마감 — E방 유효기간 표시 소스
   reg_dtm?: string // 생성일시 — 목록 최신순 정렬 기준
+  boost_expire_dtm?: string | null // 부스트 만료 — 미래면 노출 우선 + 🚀 배지
   // msg_room.theme_cd → msg_theme FK (forward reference) → PostgREST가 단일 객체로 반환
   msg_theme: {
     theme_nm: string
@@ -68,6 +69,8 @@ function RoomCard({ room, href }: { room: RoomWithTheme; href: string }) {
   const t = useTranslations('chat.list')
   const themeName = room.msg_theme?.theme_nm ?? room.theme_cd
   const isPremium = room.msg_theme?.theme_tp_cd === 'PREMIUM'
+  const isBoosted =
+    !!room.boost_expire_dtm && new Date(room.boost_expire_dtm) > new Date()
   // 비공개 그룹·이벤트방 — 멤버에게만 보이는 '내 방'임을 명시(공개 디렉토리엔 미노출).
   // 1:1(D)은 본디 비공개라 배지 생략(노이즈 방지).
   const isPrivateRoom =
@@ -81,7 +84,10 @@ function RoomCard({ room, href }: { room: RoomWithTheme; href: string }) {
     >
       <ThemeEmoji room={room} />
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium">{room.room_nm}</p>
+        <p className="truncate text-sm font-medium">
+          {isBoosted && <span className="mr-1">🚀</span>}
+          {room.room_nm}
+        </p>
         <p className="text-muted-foreground text-xs">
           {themeName}
           {isPremium && (
@@ -257,7 +263,10 @@ export function ChatListView({
           {/* 구독 서브섹션 — PREMIUM 테마 방만 */}
           {subscriptionRooms.length > 0 && (
             <div className="mb-5">
-              <SubSectionHeader label={t('subscriptionCafes')} badge="PREMIUM" />
+              <SubSectionHeader
+                label={t('subscriptionCafes')}
+                badge="PREMIUM"
+              />
               <PagedRoomList rooms={subscriptionRooms} />
             </div>
           )}

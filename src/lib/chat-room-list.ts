@@ -6,7 +6,7 @@ import { getSupabaseAdmin } from './supabase-admin'
 // 기존 직렬 5단계 → 3단계로 단축 (카페 목록 로딩 속도 개선)
 
 const ROOM_SELECT = `room_id, room_nm, room_desc, theme_cd, room_tp_cd, is_public_yn,
-  max_mbr_cnt, expr_dtm, entry_expire_dtm, reg_dtm, msg_theme(theme_nm, theme_emoji, theme_tp_cd)`
+  max_mbr_cnt, expr_dtm, entry_expire_dtm, boost_expire_dtm, reg_dtm, msg_theme(theme_nm, theme_emoji, theme_tp_cd)`
 
 // 종료/만료 방 여부 — 그룹방은 expr_dtm(쿼리에서 처리), 이벤트방은 entry_expire_dtm 경과 시 종료.
 // 종료된 방은 어떤 목록(구독·일반·탐색·마켓·검색)에도 노출하지 않는다.
@@ -62,20 +62,41 @@ async function listMyRooms(userId: string): Promise<RoomRow[]> {
     }))
 }
 
-// 공개 그룹 카페 (최근 N개) — 방 조회 후 멤버수 로드
+// 공개 그룹 카페 (최근 N개) — 부스트(노출 우선) 카페를 상단에 배치 후 최신순
 async function listPublicRooms(limit = 10): Promise<RoomRow[]> {
   const db = getSupabaseAdmin()
-  const { data: publicRooms } = await db
+  const now = new Date().toISOString()
+
+  // 1) 활성 부스트 카페 (boost_expire_dtm 미래) — 만료 늦은 순(최근 구매 우선)
+  const { data: boostedRooms } = await db
     .from('msg_room')
     .select(ROOM_SELECT)
     .eq('is_public_yn', 'Y')
     .eq('room_tp_cd', 'G')
     .eq('del_yn', 'N')
-    .gt('expr_dtm', new Date().toISOString()) // 만료된 무료방 숨김
+    .gt('expr_dtm', now)
+    .gt('boost_expire_dtm', now)
+    .order('boost_expire_dtm', { ascending: false })
+    .limit(limit)
+  const boosted = (boostedRooms ?? []) as unknown as RoomRow[]
+  const boostedIds = boosted.map((r) => r.room_id)
+
+  // 2) 일반 카페 (부스트 제외) — 최신순, 남은 자리만큼
+  let normalQuery = db
+    .from('msg_room')
+    .select(ROOM_SELECT)
+    .eq('is_public_yn', 'Y')
+    .eq('room_tp_cd', 'G')
+    .eq('del_yn', 'N')
+    .gt('expr_dtm', now)
     .order('reg_dtm', { ascending: false })
     .limit(limit)
+  if (boostedIds.length > 0)
+    normalQuery = normalQuery.not('room_id', 'in', `(${boostedIds.join(',')})`)
+  const { data: normalRooms } = await normalQuery
+  const normal = (normalRooms ?? []) as unknown as RoomRow[]
 
-  const rows = (publicRooms ?? []) as unknown as RoomRow[]
+  const rows = [...boosted, ...normal].slice(0, limit)
   if (rows.length === 0) return []
 
   const { data: pubMbrRows } = await db

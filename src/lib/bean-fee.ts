@@ -19,6 +19,11 @@ export const TRANSLATE_ONCE_BEAN = 1
 //   PREMIUM 월 10회 무료 → 초과분만 건당 과금. 동의(confirm) 없는 차감 금지.
 export const AI_EXTRA_BEAN = 5
 
+// 카페 부스팅(노출 우선) — 방장이 공개 목록 상단 노출권을 시간제 구매. 기간 내 재구매 시 연장.
+//   1회 = 7일 50 Bean(=0.5 Pi). 광고성 매출이라 건당 과금보다 높게 책정.
+export const ROOM_BOOST_BEAN = 50
+export const ROOM_BOOST_DAYS = 7
+
 // 카페 등급 — 요금표의 grade_cd(GENERAL/PREMIUM/EVENT)에 대응.
 export type RoomGrade = 'GENERAL' | 'PREMIUM' | 'EVENT'
 
