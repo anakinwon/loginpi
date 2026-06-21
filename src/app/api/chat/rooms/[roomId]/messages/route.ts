@@ -3,6 +3,8 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth-check'
 import { getRoomMember, getRoom, getRecentMsgCount } from '@/lib/chat'
 import { getAiQuota } from '@/lib/chat-auth'
+import { applyBean, getBalance } from '@/lib/bean'
+import { AI_EXTRA_BEAN } from '@/lib/bean-fee'
 import {
   getThemeSystemPrompt,
   extractAiQuestion,
@@ -136,6 +138,7 @@ export async function POST(request: NextRequest, { params }: Params) {
     ref_msg_id,
     stkr_id,
     attch_url,
+    confirm, // AI 한도 초과 시 추가 호출(건당 과금) 동의
   } = body as {
     msg_id?: string
     msg_cont?: string
@@ -143,6 +146,7 @@ export async function POST(request: NextRequest, { params }: Params) {
     ref_msg_id?: string
     stkr_id?: string
     attch_url?: string
+    confirm?: boolean
   }
 
   // 클라이언트가 broadcast와 동일한 UUID를 전달하면 DB primary key로 사용 (broadcast-DB msg_id 일치)
@@ -185,16 +189,40 @@ export async function POST(request: NextRequest, { params }: Params) {
     }
   }
 
-  // TASK-064: @ai 멘션 시 한도 사전 체크 — 초과면 메시지 삽입 없이 402 반환
+  // TASK-064: @ai 멘션 시 한도 사전 체크 — 초과 시 건당 과금 동의(confirm) 없으면 402
   const isAiMention =
     msg_tp_cd === 'TEXT' && /^@ai\s/i.test(msg_cont?.trim() ?? '')
+  let aiExtraCharge = false // 한도 초과 + 동의 → 추가 호출 건당 과금 대상
   if (isAiMention && process.env.ANTHROPIC_API_KEY) {
     const quota = await getAiQuota(user.id)
     if (quota.remaining === 0) {
-      return NextResponse.json(
-        { error: 'AI 월 호출 한도를 초과했습니다', aiLimitExceeded: true },
-        { status: 402 },
-      )
+      // 한도 초과 — 동의(confirm) 없으면 과금 안내만 반환(메시지 미삽입)
+      if (confirm !== true) {
+        return NextResponse.json(
+          {
+            error: 'AI 월 호출 한도를 초과했습니다',
+            aiLimitExceeded: true,
+            requiresBean: true,
+            feeBean: AI_EXTRA_BEAN,
+          },
+          { status: 402 },
+        )
+      }
+      // 동의함 — 잔액 확인 후 과금 예약(메시지 삽입 성공 후 차감)
+      const bal = await getBalance(user.id)
+      if (bal < AI_EXTRA_BEAN) {
+        return NextResponse.json(
+          {
+            error: `추가 AI 호출 1회에 ${AI_EXTRA_BEAN} Bean이 필요합니다`,
+            aiLimitExceeded: true,
+            requiresBean: true,
+            feeBean: AI_EXTRA_BEAN,
+            insufficientBean: true,
+          },
+          { status: 402 },
+        )
+      }
+      aiExtraCharge = true
     }
   }
 
@@ -278,6 +306,21 @@ export async function POST(request: NextRequest, { params }: Params) {
 
   if (error)
     return NextResponse.json({ error: '메시지 전송 실패' }, { status: 500 })
+
+  // AI 한도 초과분 건당 과금 (동의·잔액 확인 완료 후) — 메시지 삽입 성공 시에만 차감
+  if (aiExtraCharge) {
+    const charge = await applyBean({
+      usrId: user.id,
+      txnTp: 'SPEND',
+      beanAmt: -AI_EXTRA_BEAN,
+      refTp: 'AI_EXTRA',
+      refId: data.msg_id,
+      memo: 'AI 추가 호출(한도 초과)',
+      regrId: user.display_name.slice(0, 20),
+    })
+    if (!charge.ok)
+      console.error(`[AI추가] 과금 실패 user:${user.id} msg:${data.msg_id}`)
+  }
 
   // 카페 mod_dtm 갱신 + 서버 브로드캐스트를 병렬 실행
   // 브로드캐스트는 서비스 롤 키 + REST API로 전송 → 클라이언트 직접 broadcast 불필요

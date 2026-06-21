@@ -15,6 +15,10 @@ export const BADGE_UPGRADE_BEAN = 10
 //   캐시(이미 번역된 것) 재사용·동일언어는 과금 없음(실제 번역 비용 발생 시에만 과금).
 export const TRANSLATE_ONCE_BEAN = 1
 
+// AI(@ai) 월 한도 초과 후 추가 호출 1회 요금 — LLM 호출 비용 반영해 번역보다 높게(5 Bean=0.05 Pi).
+//   PREMIUM 월 10회 무료 → 초과분만 건당 과금. 동의(confirm) 없는 차감 금지.
+export const AI_EXTRA_BEAN = 5
+
 // 카페 등급 — 요금표의 grade_cd(GENERAL/PREMIUM/EVENT)에 대응.
 export type RoomGrade = 'GENERAL' | 'PREMIUM' | 'EVENT'
 

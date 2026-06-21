@@ -7,6 +7,9 @@ interface InlinePurchasePromptProps {
   featureName: string
   description: string
   onClose: () => void
+  // 선택: 구독 대신 즉시 해결하는 보조 액션(예: 건당 Bean 결제). 있으면 상단 강조 버튼으로 노출.
+  secondaryActionLabel?: string
+  onSecondaryAction?: () => void
 }
 
 // 유료 기능 잠금 시 Bean 구독(/subscribe)으로 유도하는 안내 모달.
@@ -16,6 +19,8 @@ export function InlinePurchasePrompt({
   featureName,
   description,
   onClose,
+  secondaryActionLabel,
+  onSecondaryAction,
 }: InlinePurchasePromptProps) {
   if (!isOpen) return null
 
@@ -35,10 +40,25 @@ export function InlinePurchasePrompt({
         </div>
 
         <div className="space-y-2.5">
+          {secondaryActionLabel && onSecondaryAction && (
+            <button
+              onClick={() => {
+                onSecondaryAction()
+                onClose()
+              }}
+              className="bg-primary text-primary-foreground block w-full rounded-xl px-4 py-2.5 text-center text-sm font-medium transition-opacity hover:opacity-90"
+            >
+              {secondaryActionLabel}
+            </button>
+          )}
           <Link
             href="/subscribe"
             onClick={onClose}
-            className="bg-primary text-primary-foreground block w-full rounded-xl px-4 py-2.5 text-center text-sm font-medium transition-opacity hover:opacity-90"
+            className={`block w-full rounded-xl px-4 py-2.5 text-center text-sm font-medium transition-opacity hover:opacity-90 ${
+              secondaryActionLabel && onSecondaryAction
+                ? 'bg-muted text-foreground'
+                : 'bg-primary text-primary-foreground'
+            }`}
           >
             구독하러 가기 →
           </Link>

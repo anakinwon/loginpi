@@ -45,7 +45,11 @@ interface UseChatRoomOptions {
   // userLocale로 일괄 번역하고, 이후 추가되는 메시지도 전부 번역한다
   forceTranslate?: boolean
   // @ai 멘션 전송 시 월 한도 초과 → panel에서 업그레이드 모달 표시
-  onAiLimitExceeded?: () => void
+  onAiLimitExceeded?: (info?: {
+    feeBean?: number
+    insufficientBean?: boolean
+    text?: string
+  }) => void
   // 내 배지 수여 broadcast 수신 → panel에서 축하 팝업(Trigger 7) 표시
   onBadgeAward?: (badge: BadgeAwardPayload) => void
 }
@@ -53,7 +57,7 @@ interface UseChatRoomOptions {
 interface UseChatRoomReturn {
   messages: ChatMessage[]
   onlineUserIds: string[]
-  sendMessage: (text: string) => Promise<void>
+  sendMessage: (text: string, confirm?: boolean) => Promise<void>
   sendSticker: (stkrId: string, stkrUrl: string) => Promise<void>
   sendFile: (file: File) => Promise<void>
   prependMessages: (msgs: ChatMessage[]) => void
@@ -317,7 +321,7 @@ export function useChatRoom(
   ])
 
   const sendMessage = useCallback(
-    async (text: string) => {
+    async (text: string, confirm = false) => {
       const trimmed = text.trim()
       if (!trimmed) return
 
@@ -346,6 +350,7 @@ export function useChatRoom(
             msg_id: tempId,
             msg_cont: trimmed,
             msg_tp_cd: 'TEXT',
+            ...(confirm ? { confirm: true } : {}),
           }),
         })
 
@@ -354,9 +359,17 @@ export function useChatRoom(
           throw new Error('rate_limit')
         }
         if (res.status === 402) {
-          // @ai 멘션 → 월 한도 초과 → 업그레이드 유도
+          // @ai 멘션 → 월 한도 초과 → 추가 호출(건당 과금) 또는 구독 유도
           removeMessage(tempId)
-          onAiLimitExceeded?.()
+          const d = (await res.json().catch(() => ({}))) as {
+            feeBean?: number
+            insufficientBean?: boolean
+          }
+          onAiLimitExceeded?.({
+            feeBean: d.feeBean,
+            insufficientBean: d.insufficientBean,
+            text: trimmed,
+          })
           return
         }
         if (!res.ok) {

@@ -58,6 +58,11 @@ export function ChatRoomPanel({
   const [tipPromptOpen, setTipPromptOpen] = useState(false)
   const [expirePromptOpen, setExpirePromptOpen] = useState(false)
   const [aiLimitPromptOpen, setAiLimitPromptOpen] = useState(false)
+  const [aiLimitInfo, setAiLimitInfo] = useState<{
+    feeBean?: number
+    insufficientBean?: boolean
+    text?: string
+  } | null>(null)
   const [expireBannerDismissed, setExpireBannerDismissed] = useState(false)
   // TASK-062 Trigger 7: 배지 수여 축하 팝업 + 강화 배지 헤더 상시 표시
   const [badgeAward, setBadgeAward] = useState<BadgeAwardInfo | null>(null)
@@ -173,7 +178,17 @@ export function ChatRoomPanel({
   }, [roomId])
 
   const onUpgradeForTip = useCallback(() => setTipPromptOpen(true), [])
-  const onAiLimitExceeded = useCallback(() => setAiLimitPromptOpen(true), [])
+  const onAiLimitExceeded = useCallback(
+    (info?: {
+      feeBean?: number
+      insufficientBean?: boolean
+      text?: string
+    }) => {
+      setAiLimitInfo(info ?? null)
+      setAiLimitPromptOpen(true)
+    },
+    [],
+  )
 
   // 팝업을 봤다는 표시 — 다음 방문 시 중복 표시 방지
   const markBadgeNotified = useCallback((badgeId: string) => {
@@ -433,7 +448,21 @@ export function ChatRoomPanel({
       <InlinePurchasePrompt
         isOpen={aiLimitPromptOpen}
         featureName="AI 카페 비서 한도 초과"
-        description="이번 달 @ai 멘션 한도를 초과했습니다. 프리미엄 구독으로 무제한 AI 질문을 이용하세요."
+        description={
+          aiLimitInfo?.insufficientBean
+            ? 'Bean이 부족합니다. 충전 후 추가 호출하거나 구독으로 무제한 이용하세요.'
+            : '이번 달 @ai 멘션 한도를 초과했습니다. 추가 호출(건당 Bean) 또는 구독을 선택하세요.'
+        }
+        secondaryActionLabel={
+          aiLimitInfo && !aiLimitInfo.insufficientBean && aiLimitInfo.feeBean
+            ? `추가 ${aiLimitInfo.feeBean} Bean으로 보내기`
+            : undefined
+        }
+        onSecondaryAction={
+          aiLimitInfo?.text && !aiLimitInfo.insufficientBean
+            ? () => sendMessage(aiLimitInfo.text!, true)
+            : undefined
+        }
         onClose={() => setAiLimitPromptOpen(false)}
       />
 
