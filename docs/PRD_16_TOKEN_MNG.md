@@ -45,7 +45,7 @@
 
 ### 1-1. 목적
 
-Cafe.pi의 Bean Token(☕ 커피빈 토큰) 경제를 통합 관리하는 어드민 시스템을 구축한다.
+Cafe.pi의 Bean Token(☕ 카페빈 토큰) 경제를 통합 관리하는 어드민 시스템을 구축한다.
 
 **목표**:
 - **발행·유통·회수 전체 흐름 가시화** — 총 발행량, 유통량, 플랫폼 회수량, 수익 추이
@@ -75,7 +75,7 @@ Cafe.pi의 Bean Token(☕ 커피빈 토큰) 경제를 통합 관리하는 어드
 
 | 용어 | 정의 |
 |---|---|
-| **Bean Token** | Cafe.pi의 커피빈(☕) 오프체인 토큰. **1 Pi = 100 Bean 고정 불변**. 플랫폼↔사용자 거래의 정본 통화. 소각 없음. |
+| **Bean Token** | Cafe.pi의 카페빈(☕) 오프체인 토큰. **1 Pi = 100 Bean 고정 불변**. 플랫폼↔사용자 거래의 정본 통화. 소각 없음. |
 | **발행(Issued)** | Pi 결제 시 PLATFORM 지갑에서 USER 지갑으로 이전된 총 Bean 누적. |
 | **유통(Circulating)** | 현재 모든 USER 지갑에 보유 중인 Bean 합계. 활성도의 핵심 지표. |
 | **회수(Collected)** | 구독료, 팁, 수수료 등으로 USER → PLATFORM 지갑으로 되돌아온 Bean. **소각 아님 — Bean은 사라지지 않는다.** |
@@ -90,7 +90,7 @@ Cafe.pi의 Bean Token(☕ 커피빈 토큰) 경제를 통합 관리하는 어드
 
 ### 2-1. 정의
 
-- **Bean = 커피빈(Coffee Bean·원두)** — 일반 콩(legume) 절대 아님
+- **Bean = 카페빈(Cafe Bean·원두)** — 일반 콩(legume) 절대 아님
 - 모든 표기·비유·이모지·문맥이 커피 맥락(☕)으로 통일
 - 금액 정본: **Bean 단위** (Pi 환산값은 보조)
 
@@ -1638,7 +1638,7 @@ IF platform_balance + circulating ≠ total_issued:
 
 ### A. 용어 정의
 
-- **Bean Token**: cafe.pi의 오프체인 토큰 (☕ 커피빈)
+- **Bean Token**: cafe.pi의 오프체인 토큰 (☕ 카페빈)
 - **Pi**: Pi Network의 암호화폐 (1 Pi = 100 Bean 고정)
 - **발행 (Issued)**: Pi 충전으로 탄생한 Bean (누적)
 - **판매 (Sold)**: 사용자 손에 넘어간 Bean (확정)
