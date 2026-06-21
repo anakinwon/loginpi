@@ -24,6 +24,19 @@ const ITEM_META: Record<string, { label: string; emoji: string; bar: string }> =
     ETC: { label: '기타', emoji: '❓', bar: 'bg-gray-400' },
   }
 
+// 항상 표시할 매출 라인업 (거래 없어도 0으로 노출). ETC는 거래 있을 때만 별도 추가.
+const ALL_REVENUE_ITEMS = [
+  'SUBSCR',
+  'TRANSLATE_ONCE',
+  'AI_EXTRA',
+  'ROOM_CREATE',
+  'ROOM_BOOST',
+  'ROOM_ENTER',
+  'EVENT_ENTER',
+  'STICKER_PACK',
+  'BADGE_UPGRADE',
+] as const
+
 export function TokenRevenue() {
   const [data, setData] = useState<RevenueData | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -45,7 +58,16 @@ export function TokenRevenue() {
   if (error) return <p className="text-sm text-red-500">매출 오류: {error}</p>
   if (!data) return null
 
-  const items = [...data.bean_by_item].sort((a, b) => b.net_bean - a.net_bean)
+  // 정의된 전체 매출 라인업 — 거래 없는 항목도 0으로 표시(매출 0 자체가 정보)
+  const dataMap = new Map(data.bean_by_item.map((it) => [it.ref_tp_cd, it]))
+  const filled = ALL_REVENUE_ITEMS.map(
+    (key) => dataMap.get(key) ?? { ref_tp_cd: key, txn_cnt: 0, net_bean: 0 },
+  )
+  // ALL_REVENUE_ITEMS에 없는 기타(ETC 등) 항목은 거래가 있을 때만 뒤에 추가
+  const extras = data.bean_by_item.filter(
+    (it) => !(ALL_REVENUE_ITEMS as readonly string[]).includes(it.ref_tp_cd),
+  )
+  const items = [...filled, ...extras].sort((a, b) => b.net_bean - a.net_bean)
   const maxBean = Math.max(...items.map((i) => i.net_bean), 1)
 
   return (
@@ -97,44 +119,54 @@ export function TokenRevenue() {
         <p className="text-muted-foreground mb-3 text-xs font-semibold tracking-wide uppercase">
           Bean 회수 매출 — 항목별
         </p>
-        {items.length === 0 ? (
-          <p className="text-muted-foreground text-sm">
-            아직 매출 거래가 없습니다.
-          </p>
-        ) : (
-          <ul className="space-y-2.5">
-            {items.map((it) => {
-              const meta = ITEM_META[it.ref_tp_cd] ?? ITEM_META.ETC
-              const pct = Math.max(2, (it.net_bean / maxBean) * 100)
-              const share =
-                data.bean_total > 0
-                  ? ((it.net_bean / Number(data.bean_total)) * 100).toFixed(1)
-                  : '0.0'
-              return (
-                <li key={it.ref_tp_cd} className="space-y-1">
-                  <div className="flex items-baseline justify-between text-sm">
-                    <span className="font-medium">
-                      {meta.emoji} {meta.label}
-                      <span className="text-muted-foreground ml-1.5 text-xs">
-                        {it.txn_cnt}건 · {share}%
-                      </span>
+        <ul className="space-y-2.5">
+          {items.map((it) => {
+            const meta = ITEM_META[it.ref_tp_cd] ?? ITEM_META.ETC
+            const pct = Math.max(2, (it.net_bean / maxBean) * 100)
+            const isZero = Number(it.net_bean) === 0
+            const share =
+              data.bean_total > 0
+                ? ((it.net_bean / Number(data.bean_total)) * 100).toFixed(1)
+                : '0.0'
+            return (
+              <li
+                key={it.ref_tp_cd}
+                className={`space-y-1 ${isZero ? 'opacity-45' : ''}`}
+              >
+                <div className="flex items-baseline justify-between text-sm">
+                  <span className="font-medium">
+                    {meta.emoji} {meta.label}
+                    <span className="text-muted-foreground ml-1.5 text-xs">
+                      {it.txn_cnt}건 · {share}%
                     </span>
-                    <span className="font-semibold tabular-nums">
-                      {Number(it.net_bean).toLocaleString()}{' '}
-                      <BeanIcon className="inline-block h-4 w-4 align-text-bottom" />
-                    </span>
-                  </div>
-                  <div className="bg-muted h-2 w-full overflow-hidden rounded-full">
-                    <div
-                      className={`h-full rounded-full ${meta.bar}`}
-                      style={{ width: `${pct}%` }}
-                    />
-                  </div>
-                </li>
-              )
-            })}
-          </ul>
-        )}
+                  </span>
+                  <span className="font-semibold tabular-nums">
+                    {Number(it.net_bean).toLocaleString()}{' '}
+                    <BeanIcon className="inline-block h-4 w-4 align-text-bottom" />
+                  </span>
+                </div>
+                <div className="bg-muted h-2 w-full overflow-hidden rounded-full">
+                  <div
+                    className={`h-full rounded-full ${meta.bar}`}
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+              </li>
+            )
+          })}
+        </ul>
+
+        {/* Bean 회수 매출 합계 */}
+        <div className="mt-3 flex items-baseline justify-between border-t pt-2.5 text-sm font-bold">
+          <span>Bean 회수 매출 합계</span>
+          <span className="tabular-nums">
+            {Number(data.bean_total).toLocaleString()}{' '}
+            <BeanIcon className="inline-block h-4 w-4 align-text-bottom" />
+            <span className="text-muted-foreground ml-1 text-xs font-normal">
+              ≈ π{(Number(data.bean_total) / 100).toFixed(2)}
+            </span>
+          </span>
+        </div>
       </div>
     </div>
   )
