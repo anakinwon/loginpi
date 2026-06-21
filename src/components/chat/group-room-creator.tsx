@@ -1,7 +1,7 @@
 'use client'
 import { useState, useCallback, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
-import { useRouter } from '@/i18n/navigation'
+import { useRouter, Link } from '@/i18n/navigation'
 import { toast } from 'sonner'
 import { usePiAuth } from '@/components/pi-auth-provider'
 import { piFetch } from '@/lib/pi-fetch'
@@ -138,7 +138,9 @@ export function GroupRoomCreator() {
   const isFreeRoom7d = isFree
   // PREMIUM 테마 비구독자 생성료 = 일반요금제 Bean(10). 구독자·BASIC은 0(무료).
   // 결제 통화 = Bean (Pi 직접결제 폐기). 서버가 권위 부과·차감.
-  const createCostBean = isPremium ? getRoomFeeBean('CREATE', 'PREMIUM', canCreateRoomFree) : 0
+  const createCostBean = isPremium
+    ? getRoomFeeBean('CREATE', 'PREMIUM', canCreateRoomFree)
+    : 0
   const isBusy =
     payStatus === 'approving' ||
     payStatus === 'waiting' ||
@@ -316,8 +318,8 @@ export function GroupRoomCreator() {
                 </div>
                 {roomType === 'E' && (
                   <p className="mb-2 rounded-xl bg-violet-500/10 px-3 py-2 text-xs text-violet-700 dark:text-violet-300">
-                    참가자가 입장료(Bean)를 소진하고 입장하는 기간 한정 방입니다.
-                    생성 비용은 없습니다.
+                    참가자가 입장료(Bean)를 소진하고 입장하는 기간 한정
+                    방입니다. 생성 비용은 없습니다.
                   </p>
                 )}
                 <p className="text-muted-foreground mb-3 text-sm">
@@ -588,13 +590,22 @@ export function GroupRoomCreator() {
                   </p>
                 )}
                 {payError && (
-                  <p className="text-destructive text-center text-xs">
-                    {payError}
-                  </p>
+                  <div className="space-y-1 text-center">
+                    <p className="text-destructive text-xs">{payError}</p>
+                    {payError.includes('충전') && (
+                      <Link
+                        href="/bean"
+                        onClick={() => setOpen(false)}
+                        className="text-primary inline-block text-xs font-medium hover:underline"
+                      >
+                        <BeanIcon className="mr-1 inline-block h-3.5 w-3.5 align-text-bottom" />
+                        Bean 충전하러 가기 →
+                      </Link>
+                    )}
+                  </div>
                 )}
               </div>
             )}
-
           </div>
         </DialogContent>
       </Dialog>
