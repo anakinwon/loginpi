@@ -31,19 +31,25 @@ export async function getBalance(usrId: string): Promise<number> {
   return Number((data as BeanWallet | null)?.bean_amt ?? 0)
 }
 
-// 거래 내역 (최신순)
+// 거래 내역 (최신순) — 페이지네이션 + 유형 필터 + 총건수
 export async function listBeanTxns(
   usrId: string,
-  limit = 50,
-): Promise<BeanTxn[]> {
-  const { data } = await getSupabaseAdmin()
+  opts: { limit?: number; offset?: number; type?: BeanTxnType } = {},
+): Promise<{ txns: BeanTxn[]; total: number }> {
+  const limit = opts.limit ?? 50
+  const offset = opts.offset ?? 0
+  let q = getSupabaseAdmin()
     .from('bean_txn')
-    .select('txn_id, txn_tp_cd, bean_amt, bal_amt, pi_amt, memo_txt, reg_dtm')
+    .select('txn_id, txn_tp_cd, bean_amt, bal_amt, pi_amt, memo_txt, reg_dtm', {
+      count: 'exact',
+    })
     .eq('usr_id', usrId)
     .eq('del_yn', 'N')
+  if (opts.type) q = q.eq('txn_tp_cd', opts.type)
+  const { data, count } = await q
     .order('reg_dtm', { ascending: false })
-    .limit(limit)
-  return (data as BeanTxn[] | null) ?? []
+    .range(offset, offset + limit - 1)
+  return { txns: (data as BeanTxn[] | null) ?? [], total: count ?? 0 }
 }
 
 // Bean 증감 원자적 적용 — fn_bean_apply에 위임 (원장 INSERT + 잔액 UPDATE 단일 트랜잭션)

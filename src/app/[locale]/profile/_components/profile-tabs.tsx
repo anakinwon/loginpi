@@ -10,12 +10,15 @@ import { StoreItemList } from '@/components/store/store-item-list'
 import { SalesNotiBadge } from '@/components/store/sales-noti-badge'
 import { LbsSettings } from './lbs-settings'
 import { TelegramConnect } from './telegram-connect'
+import { BeanWalletPanel } from './bean-wallet-panel'
+import { BeanIcon } from '@/components/ui/bean-icon'
 import { AccountIntegrationSection } from '@/components/account-integration-section'
 import type { UserRow } from '@/lib/users'
 import type { LocaleOption } from '@/lib/locale-options'
 
 const TABS = [
   { id: 'info', label: '개인정보' },
+  { id: 'bean', label: 'Bean 지갑' },
   { id: 'payment', label: '결제 내역' },
   { id: 'subscr', label: '구독 현황' },
   { id: 'store', label: '🛍️ 스토어' },
@@ -47,7 +50,14 @@ export function ProfileTabs({ initialUser, localeOptions }: Props) {
                 : 'text-muted-foreground hover:text-foreground',
             ].join(' ')}
           >
-            {tab.label}
+            {tab.id === 'bean' ? (
+              <span className="inline-flex items-center gap-1">
+                <BeanIcon className="h-5 w-5" />
+                {tab.label}
+              </span>
+            ) : (
+              tab.label
+            )}
           </button>
         ))}
       </div>
@@ -62,6 +72,7 @@ export function ProfileTabs({ initialUser, localeOptions }: Props) {
           />
         </div>
       )}
+      {activeTab === 'bean' && <BeanWalletPanel />}
       {activeTab === 'payment' && <PaymentHistory />}
       {activeTab === 'subscr' && <SubscriptionStatus />}
       {activeTab === 'store' && <StoreTab />}
