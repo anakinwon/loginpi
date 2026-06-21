@@ -446,11 +446,14 @@ function MessageBubble({
           msg.msg_cont
         )}
       </div>
-      {!hideTime && (
+      {/* 시간은 hideTime일 때 숨기되, 선물 버튼은 모든 남의 메시지에 항상 노출 */}
+      {(!hideTime || (!isMe && canTip)) && (
         <div className="flex items-center gap-1">
-          <span className="text-muted-foreground text-[10px]">
-            {formatKoreanTime(msg.reg_dtm)}
-          </span>
+          {!hideTime && (
+            <span className="text-muted-foreground text-[10px]">
+              {formatKoreanTime(msg.reg_dtm)}
+            </span>
+          )}
           {!isMe && canTip && (
             <PiTipButton
               roomId={roomId}
