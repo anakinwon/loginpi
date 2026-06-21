@@ -13,17 +13,34 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
   const eventId = searchParams.get('event_id') ?? 'evt-20260614-001'
 
-  const { data, error } = await getSupabaseAdmin()
+  const db = getSupabaseAdmin()
+  const { data, error } = await db
     .from('evt_pi_reward_log')
     .select(
-      'evt_pi_reward_log_id, user_id, pi_uid, reward_amt, payment_id, reward_st_cd, paid_dtm, fail_reason_tx, reg_dtm, sys_user!inner(display_name, pi_username)',
+      'evt_pi_reward_log_id, user_id, pi_uid, reward_amt, payment_id, reward_st_cd, paid_dtm, fail_reason_tx, reg_dtm',
     )
     .eq('event_id', eventId)
     .order('reg_dtm', { ascending: false })
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  return NextResponse.json({ rewards: data ?? [] })
+  // FK 부재로 조인 불가 → user_id로 사용자 정보 별도 병합
+  const rows = (data ?? []) as { user_id: string }[]
+  const ids = [...new Set(rows.map((r) => r.user_id))]
+  const uMap = new Map<string, Record<string, unknown>>()
+  if (ids.length > 0) {
+    const { data: us } = await db
+      .from('sys_user')
+      .select('id, display_name, pi_username')
+      .in('id', ids)
+    for (const u of (us ?? []) as { id: string }[]) uMap.set(u.id, u)
+  }
+  const rewards = rows.map((r) => ({
+    ...r,
+    sys_user: uMap.get(r.user_id) ?? null,
+  }))
+
+  return NextResponse.json({ rewards })
 }
 
 // POST /api/admin/event/pi-reward

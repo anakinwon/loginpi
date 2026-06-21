@@ -22,19 +22,32 @@ export async function GET() {
     .eq('del_yn', 'N')
   const excludedIds = new Set((excluded ?? []).map((e) => e.user_id))
 
-  // 전체 미션 완료 기록 (sys_user join)
+  // 전체 미션 완료 기록 (FK 부재로 조인 불가 → user_id로 사용자 정보 별도 병합)
   const { data: missions, error } = await db
     .from('evt_user_mission')
-    .select(
-      `user_id, mission_cd, complete_dtm,
-             sys_user!inner(pi_username, nick_nm, display_name, kakao_id)`,
-    )
+    .select('user_id, mission_cd, complete_dtm')
     .eq('event_id', EVENT_ID)
     .eq('del_yn', 'N')
 
   if (error) {
     console.error('[admin/event/completions] 조회 실패:', error.message)
     return NextResponse.json({ error: '조회 실패' }, { status: 500 })
+  }
+
+  type Su = {
+    pi_username: string | null
+    nick_nm: string | null
+    display_name: string | null
+    kakao_id: string | null
+  }
+  const mUserIds = [...new Set((missions ?? []).map((m) => m.user_id))]
+  const uMap = new Map<string, Su>()
+  if (mUserIds.length > 0) {
+    const { data: us } = await db
+      .from('sys_user')
+      .select('id, pi_username, nick_nm, display_name, kakao_id')
+      .in('id', mUserIds)
+    for (const u of (us ?? []) as ({ id: string } & Su)[]) uMap.set(u.id, u)
   }
 
   // 사용자별 집계
@@ -53,11 +66,11 @@ export async function GET() {
   for (const m of missions ?? []) {
     if (excludedIds.has(m.user_id)) continue
 
-    const su = m.sys_user as unknown as {
-      pi_username: string | null
-      nick_nm: string | null
-      display_name: string | null
-      kakao_id: string | null
+    const su: Su = uMap.get(m.user_id) ?? {
+      pi_username: null,
+      nick_nm: null,
+      display_name: null,
+      kakao_id: null,
     }
 
     const existing = statsMap.get(m.user_id)

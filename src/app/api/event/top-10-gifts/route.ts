@@ -22,16 +22,25 @@ export async function GET() {
       .eq('del_yn', 'N')
     const excludedSet = new Set((excluded ?? []).map((e) => e.user_id))
 
-    // 전체 미션 기록 조회
+    // 전체 미션 기록 조회 (FK 부재로 조인 불가 → user_id로 별도 병합)
     const { data: missions, error: err1 } = await db
       .from('evt_user_mission')
-      .select(
-        'user_id, mission_cd, complete_dtm, sys_user!inner(nick_nm, kakao_id)',
-      )
+      .select('user_id, mission_cd, complete_dtm')
       .eq('event_id', EVENT_ID)
       .eq('del_yn', 'N')
 
     if (err1) throw err1
+
+    type Su = { nick_nm: string | null; kakao_id: string | null }
+    const mUserIds = [...new Set((missions ?? []).map((m) => m.user_id))]
+    const uMap = new Map<string, Su>()
+    if (mUserIds.length > 0) {
+      const { data: us } = await db
+        .from('sys_user')
+        .select('id, nick_nm, kakao_id')
+        .in('id', mUserIds)
+      for (const u of (us ?? []) as ({ id: string } & Su)[]) uMap.set(u.id, u)
+    }
 
     // 사용자별 집계: 제외 대상자 제외, mission_cd Set + 마지막 완료 시간
     const statsMap = new Map<
@@ -46,10 +55,7 @@ export async function GET() {
 
     for (const m of missions ?? []) {
       if (excludedSet.has(m.user_id)) continue
-      const su = m.sys_user as unknown as {
-        nick_nm: string | null
-        kakao_id: string | null
-      }
+      const su: Su = uMap.get(m.user_id) ?? { nick_nm: null, kakao_id: null }
       const existing = statsMap.get(m.user_id)
       if (existing) {
         existing.missionCds.add(m.mission_cd.trim())

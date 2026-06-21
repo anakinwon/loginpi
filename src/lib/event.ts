@@ -452,15 +452,28 @@ export async function getEventRanking(eventId: string, limit: number = 100) {
 
   const excludedUserIds = new Set(excludedUsers?.map((e) => e.user_id) ?? [])
 
-  // 모든 완료 미션 조회 (sys_user 정보 포함)
+  // 모든 완료 미션 조회 (FK 부재로 조인 불가 → user_id로 사용자 정보 별도 병합)
   const { data: allMissions } = await db
     .from('evt_user_mission')
-    .select(
-      `user_id, mission_cd, complete_dtm,
-       sys_user!inner(id, nick_nm, display_name, pi_username)`,
-    )
+    .select('user_id, mission_cd, complete_dtm')
     .eq('event_id', eventId)
     .eq('del_yn', 'N')
+
+  type SuRow = {
+    id: string
+    nick_nm: string | null
+    display_name: string | null
+    pi_username: string | null
+  }
+  const amUserIds = [...new Set((allMissions ?? []).map((m) => m.user_id))]
+  const suMap = new Map<string, SuRow>()
+  if (amUserIds.length > 0) {
+    const { data: us } = await db
+      .from('sys_user')
+      .select('id, nick_nm, display_name, pi_username')
+      .in('id', amUserIds)
+    for (const u of (us ?? []) as SuRow[]) suMap.set(u.id, u)
+  }
 
   // 사용자별 집계
   const userStats = new Map<
@@ -479,11 +492,11 @@ export async function getEventRanking(eventId: string, limit: number = 100) {
     for (const mission of allMissions) {
       if (excludedUserIds.has(mission.user_id)) continue
 
-      const sysUser = mission.sys_user as unknown as {
-        id: string
-        nick_nm: string | null
-        display_name: string | null
-        pi_username: string | null
+      const sysUser: SuRow = suMap.get(mission.user_id) ?? {
+        id: mission.user_id,
+        nick_nm: null,
+        display_name: null,
+        pi_username: null,
       }
 
       const existing = userStats.get(mission.user_id)

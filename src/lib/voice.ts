@@ -46,9 +46,7 @@ export async function getActiveParticipants(
   const [{ data }, ownerIds] = await Promise.all([
     getSupabaseAdmin()
       .from('msg_call_participant')
-      .select(
-        'participant_id, usr_id, mic_yn, mic_st_cd, join_dtm, sys_user!inner(display_name)',
-      )
+      .select('participant_id, usr_id, mic_yn, mic_st_cd, join_dtm')
       .eq('room_id', roomId)
       .is('leave_dtm', null)
       .eq('del_yn', 'N')
@@ -62,10 +60,21 @@ export async function getActiveParticipants(
     mic_yn: 'Y' | 'N'
     mic_st_cd: MicState
     join_dtm: string
-    sys_user: { display_name: string } | { display_name: string }[] | null
   }
-  return ((data ?? []) as unknown as Row[]).map((r) => {
-    const su = Array.isArray(r.sys_user) ? r.sys_user[0] : r.sys_user
+  const rows = (data ?? []) as unknown as Row[]
+  // FK 부재로 조인 불가 → usr_id로 사용자명 별도 병합
+  const nameMap = new Map<string, string>()
+  const pIds = [...new Set(rows.map((r) => r.usr_id))]
+  if (pIds.length > 0) {
+    const { data: us } = await getSupabaseAdmin()
+      .from('sys_user')
+      .select('id, display_name')
+      .in('id', pIds)
+    for (const u of (us ?? []) as { id: string; display_name: string }[])
+      nameMap.set(u.id, u.display_name)
+  }
+  return rows.map((r) => {
+    const su = { display_name: nameMap.get(r.usr_id) ?? null }
     return {
       participant_id: r.participant_id,
       usr_id: r.usr_id,
