@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { BeanIcon } from '@/components/ui/bean-icon'
 import { TokenRevenue } from '@/components/admin/token-revenue'
+import { TokenDistribution } from '@/components/admin/token-distribution'
 import BeanDailyChart, {
   type BeanDailyRow,
 } from '@/components/admin/bean-daily-chart'
@@ -286,6 +287,9 @@ export default function TokenAdminPage() {
 
           {/* 일별 시계열 — 최근 30일 충전·소비·보상·환불 흐름 */}
           <BeanDailyChart rows={data?.trends ?? []} />
+
+          {/* 거래 유형별 분포 — 매출에 없는 충전·보상·전송까지 활동 전반 */}
+          <TokenDistribution />
 
           {/* 공급량 KPI 3종 */}
           <div>
