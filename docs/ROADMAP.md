@@ -47,7 +47,7 @@ Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Net
 | **15** | LBS 위치기반서비스 | ✅ 완료 (P0+P1) | 100% (상품 개별 위치 포함 · 지도 UI 확장 예정) |
 | **16** | 이벤트 미션 시스템 (Pi 요원 육성) | ✅ 완료 | 구현·운영 중 (참여 7·완주 1) · 2026-06-15 평가 엔진 정밀화(M2 상태형 양방향·select후분기 복구·CHAR→VARCHAR·재평가 버튼) · 2026-06-17 보상 전환(A2U→1π 보증금 적립·관리자 수동 지급·원자적 RPC 이중지급 차단·M3 유료테마 게이트, TASK-156) |
 | **17** | BEAN 토큰 발행 (Pi Launchpad) | 📝 기획·문서 | PRD_12 v1.7 — 토큰명 BEAN(기존 Pi Bean 온체인화·`1 Pi=100 BEAN`)·세일 0.01 Pi·분배 40/25/15/12/8·발행주체 개인·유동성 Pi 단독(레드라인 #2). **발행 전 코드 0(문서 전용)**. 잔여: T05 증권성 법무자문·T01 개인 KYC·T02 Launchpad 신청(외부 회신 대기) |
-| **19** | Bean Token 경제 관리 시스템 | 🔶 P0 완료·후속 진행 | PRD_16_TOKEN_MNG.md v1.4 — Bean 대차대조표·2층위 매출·P2P 선물·신규 매출원 4종·캠페인 어드민·거래내역 반응형 UI·**감사 로그 조회**(P0-4 완료, `/admin/token/audit`·`GET /api/admin/token/audit`·사이드바 링크, 2026-06-22). 잔여: O2O 구매 자동 캠페인 트리거·bean_fee_plan DB 이전 |
+| **19** | Bean Token 경제 관리 시스템 | 🔶 P0 완료·후속 진행 | PRD_16_TOKEN_MNG.md v1.4 — Bean 대차대조표·2층위 매출·P2P 선물·신규 매출원 4종·캠페인 어드민·거래내역 반응형 UI·**감사 로그 조회**(P0-4 완료, `/admin/token/audit`·`GET /api/admin/token/audit`·사이드바 링크, 2026-06-22). 잔여: `bean_fee_plan` 하드코딩 DB 이전(보류) |
 | **18** | 판매자 주문 알림 (Telegram + Realtime + Pull) | ✅ 완료 | 100% (2026-06-18 — Outbox 3계층: 결제완료 즉시 Telegram 발송·인앱 Realtime 토스트·안읽은 뱃지 / 판매자 봇 연동 온보딩(딥링크+webhook) / 보안 하드닝(webhook fail-closed·재바인딩 차단) · `sql/064` · PRD_13_MSG) |
 | **횡단** | 성능 튜닝 | ✅ 완료 | 100% (무한 스크롤·지연 로딩·SWR 캐싱·리브랜딩·스티커) |
 | **횡단3** | Pi Browser 안정화·콤보 성능 (2026-06-13) | ✅ 완료 | 100% (admin 다국어 전환 무반응 수정·헤더 콤보 3계층 캐시) |
@@ -84,7 +84,7 @@ Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Net
 - MPS Phase 3 (TASK-112~113): **TASK-112 PiRC3 실 에스크로 = 🔒 보류**(2026-06-13 공식 확인 — PiRC3 미존재·Pi SDK `invokeContract` 미지원 → 플랫폼 가상 에스크로 유지) · **TASK-113 Google Maps 연동**(`NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` 필요) — *MPS는 배송 없는 직거래 전용*
 - PiVoice 잔여 (S0~S3): Pi Browser 실기기 마이크 검증 · **TURN 운영 설정**(`TURN_HOST`/`TURN_SECRET`) · 품질 데이터 기반 coturn 전환 판단 · 5인+ LiveKit SFU/결제 게이팅 검토
 - LBS 향후 Phase: Maps JavaScript API 지도 UI · Places API 매장 검색
-- 이벤트 잔여: `recordUserAction` **행위 훅 전수 점검**(action_log 19 < 완료기록 34) — 일부 미션 트리거 누락 의심
+- ✅ **이벤트 후속 완료(2026-06-22)**: `reevaluateAllActiveUsers`에서 M2 상태형(kakao_id 보유자) 누락 버그 수정 — `sys_user.kakao_id IS NOT NULL` 사용자 UNION 추가로 action_log 없는 M2 대상자도 재평가 대상에 포함
 - **StarterKit 패키지 제품화**: 베이직/프리미엄/플래티넘/인피니티 4계층 패키지 구성, 외주 연계 파이프라인 설계 (`docs/PRD_0_INT.md` 기반)
 
 ---
@@ -1435,7 +1435,7 @@ if (meta?.type === 'CHAT_SUBSCR') {
 - **프로필 빈값 저장**: 선택 필드 빈값(`''`) 전송(필수 `display_name` 제외) + 서버 빈문자열→`null` 정규화(`kakao_id` 삭제 반영).
 - **관리자 재평가 버튼**: `/event` 랭킹 옆 '🔄 미션 재평가' + `POST /api/admin/event/reeval`(온디맨드 전체 재평가).
 - **인프라 안정화**: `evt` 미션코드 `CHAR(3)`→`VARCHAR(10)`(`sql/046`) · `CRON_SECRET` 프로덕션 필수 강제(`d9f0f78`) · 재평가 안전망 cron(`e9ba9f2`) · `voice_join` 트리거 현행 경로 연결(`8fa087d`) · M3 자동번역 트리거 누락 수정(`ccedddd`) · `recordUserAction` `after()` 보장(`15fcaa4`) · 랭킹 미참여자 `UNION ALL` 표시(`236ba28`).
-- ⚠️ **후속 권장(코드 리뷰 식별)**: `reevaluateAllActiveUsers`가 `evt_action_log` 보유자만 재평가 대상으로 삼아, M2 상태형(행위 로그 무관)과 불일치 → 프로필(`nick_nm`/`kakao_id`) 보유자 UNION 권장.
+- ✅ **후속 수정 완료(2026-06-22)**: `reevaluateAllActiveUsers`에서 `sys_user.kakao_id IS NOT NULL` 사용자 UNION 추가 — M2 상태형 대상자(action_log 없는 kakao_id 보유자) 재평가 누락 해소.
 
 ### TASK-156: 10미션 완주 보상 전환 — A2U → 1π 보증금 적립 + 관리자 수동 지급 ✅ (2026-06-16~17)
 실 보상 신뢰도(고객 자금 직결)를 위해 Pi A2U 송금을 폐기하고 판매보증금 직접 적립으로 전환.
@@ -1658,7 +1658,7 @@ if (meta?.type === 'CHAT_SUBSCR') {
 
 | 항목 | 상태 |
 |---|---|
-| O2O 구매 완료 시 캠페인 자동 트리거 연결 | 🔶 미구현 |
+| O2O 구매 완료 시 캠페인 자동 트리거 연결 | ✅ 완료 (sql/089·`mps-order.ts` markPickup/autoCompleteReadyOrders — 첫 구매 PENDING 신청→관리자 승인 구조, 2026-06-22) |
 | `bean_fee_plan` 하드코딩 항목 DB 이전 | 🔶 보류 |
 
 ---
@@ -1667,6 +1667,7 @@ if (meta?.type === 'CHAT_SUBSCR') {
 
 | 버전 | 날짜 | 변경 내용 | 작성자 |
 |------|------|---------|-------|
+| v11.2 | 2026-06-22 | **이벤트·Bean 후속 완료** — ① **`reevaluateAllActiveUsers` M2 누락 수정**: M2는 상태형 미션(kakao_id 보유 여부)이라 `evt_action_log`가 없어도 대상이 돼야 하나, cron 재평가 함수가 action_log 보유자만 평가해 kakao_id 설정 사용자가 재평가 대상에서 누락. `sys_user.kakao_id IS NOT NULL` 사용자를 UNION으로 추가(`src/lib/event.ts` `reevaluateAllActiveUsers`). ② **O2O 구매 완료 Bean 캠페인 자동 트리거**: `markPickup`(구매자 픽업)·`autoCompleteReadyOrders`(자동완료 cron)에서 `fn_bean_campaign_grant(buyerId, 'O2O_PURCHASE')` 베스트 에포트 호출 추가. 첫 O2O 구매 → PENDING 신청 자동 생성 → 관리자 `/admin/campaign`에서 승인 시 REWARD_POOL에서 10 Bean 지급. `sql/089` O2O_PURCHASE 캠페인 시드(reward_bean=10·max_grant_cnt=9999·자격 없음). Phase 19 잔여 테이블 갱신. | asoká |
 | v11.1 | 2026-06-22 | **Phase 19 P0-4 감사 로그 조회 마무리** — ① `GET /api/admin/token/audit` 신규: `bean_audit_log` 조회(usr_id 필터·최신 100건·총 건수). ② `/admin/token/audit` 페이지 신규: 조정 전→조정량(+/− 색상)→조정 후 잔액·사유 라벨·증빙 URL 테이블 + usr_id 필터. ③ 어드민 사이드바 `beanAudit` 링크 추가 + `ko.json` 번역 키("감사 로그"). PRD_16 P0-4 항목(bean_audit_log 테이블+insert+조회 API+화면) 전체 완결. Phase 19 §19.9 추가. 요약 테이블 상태 🔶 P0 완료·후속 진행으로 갱신. | asoká |
 | v11.0 | 2026-06-22 | **Phase 19 어드민 완성 + 카페빈 통일** — ① **보상 캠페인 운영 어드민** (`45f4bcf`): `/admin/campaign` 다중 캠페인 목록·재원 충전(`fn_bean_mint` 거버넌스 지갑)·신청 목록 조회·개별 승인(`fn_bean_campaign_approve`→`fn_bean_apply('REWARD')`) + 어드민 사이드바·홈 진입점. 자동→신청+승인 전환 확정. SQL 0 (sql/082~084 기 배포). ② **Bean 거래내역 반응형 UI** (`bf0026d`): 모바일=카드형, 데스크탑=테이블형 분기. ③ **거래내역 팁(0) 집계 오류** 수정 (`669886e`): TRANSFER 유형 집계 누락으로 팁 합계가 0 표시되던 버그. ④ **커피빈 → 카페빈** 전면 통일 (`826e71c`): 대기업 상호 차용(커피빈 Coffee Bean) 회피 — 이모지·텍스트·i18n 키 전수 교체. ⑤ **구독관리 화면 복구** (`51e5413`): `/admin/subscriptions` 조회 오류 수정·구독 건수 통계 차트 추가·username 검색 지원. Phase 19 §19.7~19.8 완료. 잔여: O2O 구매 자동 캠페인 트리거. 기준일 2026-06-22 갱신. | asoká |
 | v10.9 | 2026-06-21 | **Phase 19 Bean Token 경제 가시화 및 회계 정합성** — ① **Bean 대차대조표 대시보드**(`/admin/token`, §19.1): 차변(ΣCHARGE+Σmint) = 대변(ΣUSER+ΣGOVERNANCE) T계정 시각화 + `fn_bean_revenue_summary`(sql/079)로 항목별 매출 집계. ② **2층위 매출 분석**(§19.2): Pi 현금매출(충전) vs Bean 회수매출(구독·번역·AI·부스팅) 분리. ③ **사용자 Bean 지갑 개선**(§19.3): 프로필 Bean 탭(거래내역 현지시간) + 카페 생성 Bean 부족 시 `/bean` 링크. ④ **회계 정합성 수정**(§19.4): REFUND 거버넌스 역차감 버그(sql/077)·sys_user FK 조인 6곳(별도 병합)·중복 구독함수 오버로드 DROP(sql/085). ⑤ **카페방 선물 Bean P2P**(§19.5, sql/078): fn_bean_transfer(USER→USER)·금액 10/50/100 Bean·모든 사용자 허용·일반 브라우저 가능. ⑥ **신규 매출원 4종**(§19.6): 자동번역 건당 1 Bean(비구독 확인)·AI 한도초과 건당 5 Bean·카페 부스팅 7일 50 Bean(sql/080)·프로모션 발행(sql/081). ⑦ **매장 온보딩 캠페인**(§19.7, sql/082~084): 선착순 100매점 10,000 Bean/점(REWARD_POOL 100만 발행·관리자 승인제). ⑧ **UX·정책**(§19.8): BeanIcon 통일·자동번역 TRANSLATE 구독자도 사용가능·주문알림 버튼 제거. PRD.md v12.0 신규 Phase 19 섹션·섹션 재번호화(19→20~23 환경변수·디렉토리·DB·이력). | asoká |
