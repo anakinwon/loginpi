@@ -7,7 +7,7 @@ import { piFetch } from '@/lib/pi-fetch'
 import { readCache, writeCache } from '@/lib/client-cache'
 import { themeLabel } from '@/lib/stats-labels'
 import { LazySection } from '@/components/lazy-section'
-import RevenueTreemapChart from '@/components/charts/revenue-treemap-chart'
+import { BeanRevenueDistribution } from '@/components/admin/token-distribution'
 import { StatsCard } from './stats-card'
 import { StatsDateFilter } from './stats-date-filter'
 import { TranslateStatsSection } from './translate-stats-section'
@@ -28,11 +28,6 @@ const RevenueTimelineChart = dynamic(
   () => import('@/components/charts/revenue-timeline-chart'),
   { ssr: false },
 )
-const RevenueDonutChart = dynamic(
-  () => import('@/components/charts/revenue-donut-chart'),
-  { ssr: false },
-)
-
 const MEDALS = ['🥇', '🥈', '🥉']
 
 function TopUsersList({
@@ -439,24 +434,7 @@ export function StatsDashboard() {
                   <div className="bg-muted h-64 animate-pulse rounded-lg" />
                 )}
               </div>
-              <div className="rounded-lg border p-4">
-                <p className="mb-2 text-sm font-medium">{t('themeShare')}</p>
-                {revenueData && revenueData.series.length > 0 ? (
-                  <RevenueDonutChart data={revenueData.series} />
-                ) : (
-                  <div className="bg-muted h-64 animate-pulse rounded-lg" />
-                )}
-              </div>
-            </div>
-
-            {/* coin360 스타일 트리맵 — 면적 = 테마별 매출 비중 */}
-            <div className="rounded-lg border p-4">
-              <p className="mb-2 text-sm font-medium">{t('themeTreemap')}</p>
-              {revenueData && revenueData.series.length > 0 ? (
-                <RevenueTreemapChart data={revenueData.series} />
-              ) : (
-                <div className="bg-muted h-80 animate-pulse rounded-lg" />
-              )}
+              <BeanRevenueDistribution period={period} />
             </div>
 
             {/* Top-3 지출자 + Top-3 테마 */}
