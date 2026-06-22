@@ -5,18 +5,16 @@ import { useTranslations } from 'next-intl'
 import dynamic from 'next/dynamic'
 import { piFetch } from '@/lib/pi-fetch'
 import { readCache, writeCache } from '@/lib/client-cache'
-import { themeLabel } from '@/lib/stats-labels'
 import { LazySection } from '@/components/lazy-section'
 import RevenueTreemapChart from '@/components/charts/revenue-treemap-chart'
 import { StatsCard } from './stats-card'
 import { StatsDateFilter } from './stats-date-filter'
 import { TranslateStatsSection } from './translate-stats-section'
+import { BeanTopSpenders } from './bean-top-spenders'
 import type {
   ActivityStatsResponse,
   RevenueStatsResponse,
   TopUser,
-  TopTheme,
-  TopSpender,
 } from '@/types/stats'
 
 // 차트는 Plotly(window 의존) 사용 — SSR 불가, dynamic + ssr:false 필수
@@ -82,97 +80,6 @@ function TopUsersList({
       </ol>
       <p className="text-muted-foreground text-xs">{t('scoreFormula')}</p>
     </div>
-  )
-}
-
-function TopThemesList({
-  themes,
-  loading,
-}: {
-  themes: TopTheme[]
-  loading: boolean
-}) {
-  const tr = useTranslations('adminStats')
-  if (loading) {
-    return (
-      <div className="space-y-2">
-        {[0, 1, 2].map((i) => (
-          <div key={i} className="flex items-center gap-3">
-            <div className="bg-muted h-5 w-5 animate-pulse rounded" />
-            <div className="bg-muted h-4 w-28 animate-pulse rounded" />
-            <div className="bg-muted ml-auto h-4 w-14 animate-pulse rounded" />
-          </div>
-        ))}
-      </div>
-    )
-  }
-  if (themes.length === 0)
-    return <p className="text-muted-foreground text-sm">{tr('noData')}</p>
-  return (
-    <ol className="space-y-2">
-      {themes.map((t, i) => (
-        <li key={t.theme_cd} className="flex items-center gap-2 text-sm">
-          <span className="text-base">{MEDALS[i] ?? `${i + 1}.`}</span>
-          {/* Bean(PI_TIP)은 이모지 대신 럭셔리 콩 이미지로 표시 */}
-          {t.theme_cd === 'PI_TIP' ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src="/bean-noti.png"
-              alt="Bean"
-              className="inline-block h-6 w-6 shrink-0"
-            />
-          ) : (
-            <span className="shrink-0">{t.theme_emoji ?? ''}</span>
-          )}
-          <span className="min-w-0 flex-1 truncate font-medium">
-            {t.theme_nm ?? themeLabel(t.theme_cd)}
-          </span>
-          <span className="text-muted-foreground shrink-0">
-            {t.total_pi.toFixed(2)} π
-          </span>
-        </li>
-      ))}
-    </ol>
-  )
-}
-
-function TopSpendersList({
-  spenders,
-  loading,
-}: {
-  spenders: TopSpender[]
-  loading: boolean
-}) {
-  const t = useTranslations('adminStats')
-  if (loading) {
-    return (
-      <div className="space-y-2">
-        {[0, 1, 2].map((i) => (
-          <div key={i} className="flex items-center gap-3">
-            <div className="bg-muted h-5 w-5 animate-pulse rounded" />
-            <div className="bg-muted h-4 w-32 animate-pulse rounded" />
-            <div className="bg-muted ml-auto h-4 w-14 animate-pulse rounded" />
-          </div>
-        ))}
-      </div>
-    )
-  }
-  if (spenders.length === 0)
-    return <p className="text-muted-foreground text-sm">{t('noData')}</p>
-  return (
-    <ol className="space-y-2">
-      {spenders.map((s, i) => (
-        <li key={s.usr_id || i} className="flex items-center gap-2 text-sm">
-          <span className="text-base">{MEDALS[i] ?? `${i + 1}.`}</span>
-          <span className="min-w-0 flex-1 truncate font-medium">
-            {s.display_nm}
-          </span>
-          <span className="text-muted-foreground shrink-0">
-            {s.total_pi.toFixed(2)} π
-          </span>
-        </li>
-      ))}
-    </ol>
   )
 }
 
@@ -459,21 +366,9 @@ export function StatsDashboard() {
               )}
             </div>
 
-            {/* Top-3 지출자 + Top-3 테마 */}
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <RankingCard title={t('top3Buyers', { period })}>
-                <TopSpendersList
-                  spenders={revenueData?.topSpenders ?? []}
-                  loading={revLoading}
-                />
-              </RankingCard>
-              <RankingCard title={t('top3Themes', { period })}>
-                <TopThemesList
-                  themes={revenueData?.topThemes ?? []}
-                  loading={revLoading}
-                />
-              </RankingCard>
-            </div>
+            {/* Top-3 지출자 — Pi 결제/테마 랭킹을 Bean 소비액 랭킹으로 교체
+                (currency-routing-rule: 플랫폼↔사용자 소비는 Bean이 정본) */}
+            <BeanTopSpenders period={period} />
           </div>
         </LazySection>
       </section>
