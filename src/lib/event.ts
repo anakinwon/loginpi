@@ -374,12 +374,14 @@ async function checkCancelWithFee(
 ): Promise<boolean> {
   const db = getSupabaseAdmin()
 
-  // mps_txn_hist에서 취소 수수료가 발생한 거래 확인 (실제 컬럼명 user_id, 실제 코드값 CANCEL_FEE_IN)
-  // seller·buyer 모두 취소 수수료 부담 시 user_id에 취소자가 기록됨
+  // mps_txn_hist에서 취소 수수료가 발생한 거래 확인.
+  // 실제 코드값은 'FEE' (cancelOrder RPC: sql/041·059·060, mps-refund.ts와 일치).
+  //   ※ 과거 'CANCEL_FEE_IN'으로 조회하던 버그로 M10이 전혀 완료되지 않았음 — 'FEE'로 수정.
+  // seller·buyer 모두 취소 수수료 부담 시 user_id에 취소자가 기록됨.
   const { data: feeRecords } = await db
     .from('mps_txn_hist')
     .select('order_id')
-    .eq('txn_type_cd', 'CANCEL_FEE_IN')
+    .eq('txn_type_cd', 'FEE')
     .eq('user_id', userId)
     .gte('reg_dtm', afterDtm)
     .limit(10)
