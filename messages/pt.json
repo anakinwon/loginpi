@@ -549,7 +549,7 @@
       "fetchFail": "Falha ao buscar estatísticas de tradução",
       "hitRate": "Taxa de acerto do cache",
       "modelDist": "Distribuição do Model de tradução",
-      "newTrans": "Novas traduções",
+      "newTrans": "Novas traduções ({period} dias, mensagens×idioma)",
       "noData": "Nenhum Data de tradução para o período"
     },
     "translateSection": "Tradução (PiTranslate™)",

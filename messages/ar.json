@@ -549,7 +549,7 @@
       "fetchFail": "فشل جلب إحصائيات الترجمة",
       "hitRate": "معدل نجاح Cache",
       "modelDist": "توزيع Model الترجمة",
-      "newTrans": "ترجمات جديدة",
+      "newTrans": "ترجمات جديدة ({period} يوم، رسالة × لغة)",
       "noData": "لا يوجد Data ترجمة خلال هذه الفترة"
     },
     "translateSection": "الترجمة (PiTranslate™)",

@@ -549,7 +549,7 @@
       "fetchFail": "翻訳統計照会失敗",
       "hitRate": "キャッシュヒット率",
       "modelDist": "翻訳モデル分布",
-      "newTrans": "新規翻訳",
+      "newTrans": "新規翻訳 ({period}日, メッセージ×言語)",
       "noData": "期間内翻訳 Data がありません"
     },
     "translateSection": "翻訳 (PiTranslate™)",

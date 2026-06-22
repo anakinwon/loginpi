@@ -549,7 +549,7 @@
       "fetchFail": "Vertalingstatistieke-ophaal het misluk",
       "hitRate": "Kas-treffersyfer",
       "modelDist": "Translation Model verspreiding",
-      "newTrans": "Nuwe vertalings",
+      "newTrans": "Nuwe vertalings ({period} dae, boodskap×taal)",
       "noData": "Daar is geen Translation Data binne die tydperk nie"
     },
     "translateSection": "Vertaling (PiTranslate™)",

@@ -549,7 +549,7 @@
       "fetchFail": "כשל באחזור סטטיסטיקות תרגום",
       "hitRate": "Cache Hit Rate",
       "modelDist": "התפלגות Translation Model",
-      "newTrans": "תרגומים חדשים",
+      "newTrans": "תרגומים חדשים ({period} ימים, הודעות×שפות)",
       "noData": "אין Data תרגום בתקופה זו"
     },
     "translateSection": "תרגום (PiTranslate™)",

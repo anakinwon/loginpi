@@ -549,7 +549,7 @@
       "fetchFail": "Nabigo ang pagkuha ng Translation Statistics",
       "hitRate": "Cache Hit Rate",
       "modelDist": "Distribution ng Translation Model",
-      "newTrans": "Bagong Translation",
+      "newTrans": "Bagong Translation ({period} araw, Mensahe×Wika)",
       "noData": "Walang Translation Data para sa panahon."
     },
     "translateSection": "Translation (PiTranslate™)",

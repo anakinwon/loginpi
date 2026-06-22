@@ -549,7 +549,7 @@
       "fetchFail": "Truy vấn thống kê dịch thất bại",
       "hitRate": "Tỷ lệ Cache Hit",
       "modelDist": "Phân phối Translation Model",
-      "newTrans": "Bản dịch mới",
+      "newTrans": "Bản dịch mới ({period} ngày, tin nhắn×ngôn ngữ)",
       "noData": "Không có Translation Data trong khoảng thời gian này"
     },
     "translateSection": "Dịch (PiTranslate™)",

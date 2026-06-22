@@ -549,7 +549,7 @@
       "fetchFail": "Не удалось получить статистику перевода",
       "hitRate": "Cache Hit Rate",
       "modelDist": "Распределение Translation Model",
-      "newTrans": "Новые переводы",
+      "newTrans": "Новые переводы ({period} дней, сообщений × языков)",
       "noData": "За этот период нет Translation Data"
     },
     "translateSection": "Перевод (PiTranslate™)",

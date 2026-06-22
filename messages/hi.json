@@ -549,7 +549,7 @@
       "fetchFail": "अनुवाद Statistics प्राप्त करने में विफल",
       "hitRate": "Cache Hit Rate",
       "modelDist": "अनुवाद Model वितरण",
-      "newTrans": "नया अनुवाद",
+      "newTrans": "नया अनुवाद ({period} दिन, Message×भाषा)",
       "noData": "इस अवधि में अनुवाद Data नहीं है"
     },
     "translateSection": "अनुवाद (PiTranslate™)",

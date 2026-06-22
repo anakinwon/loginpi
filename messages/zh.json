@@ -549,7 +549,7 @@
       "fetchFail": "翻译统计查询失败",
       "hitRate": "缓存命中率",
       "modelDist": "翻译 Model 分布",
-      "newTrans": "新翻译",
+      "newTrans": "新翻译 ({period}天, 消息×语言)",
       "noData": "期间内无翻译 Data"
     },
     "translateSection": "翻译 (PiTranslate™)",

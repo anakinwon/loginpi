@@ -549,7 +549,7 @@
       "fetchFail": "Gagal mengambil Statistik Terjemahan",
       "hitRate": "Kadar Hit Cache",
       "modelDist": "Taburan Model Terjemahan",
-      "newTrans": "Terjemahan Baharu",
+      "newTrans": "Terjemahan Baharu ({period} hari, Mesej×Bahasa)",
       "noData": "Tiada Data terjemahan dalam tempoh ini"
     },
     "translateSection": "Terjemahan (PiTranslate™)",

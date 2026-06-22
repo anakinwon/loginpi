@@ -549,7 +549,7 @@
       "fetchFail": "ดึงสถิติการแปลล้มเหลว",
       "hitRate": "Cache Hit Rate",
       "modelDist": "การกระจาย Model การแปล",
-      "newTrans": "การแปลใหม่",
+      "newTrans": "การแปลใหม่ ({period} วัน, ข้อความ×ภาษา)",
       "noData": "ไม่มี Data การแปลในช่วงเวลา"
     },
     "translateSection": "การแปล (PiTranslate™)",
