@@ -40,8 +40,47 @@
       "schedManualWhen": "Apabila pentadbir menjalankan dengan butang di halaman ini",
       "schedOndemandDesc": "Kemas kini baris statistik hari ini (UTC) atas permintaan — dijalankan secara automatik, bukan operasi manual",
       "schedOndemandWhen": "Apabila mengakses Dashboard statistik pentadbir atau menukar tempoh pertanyaan",
+      "schedOrderBackfillDesc": "Selesaikan pesanan yang telah selesai transaksi tetapi belum diselesaikan (tiada release_txid) secara kelompok A2U kepada penjual — /api/admin/store/settle",
+      "schedOrderBackfillWhen": "Apabila Admin menjalankan penyelesaian belum selesai",
+      "schedOrderCronDesc": "Pesanan yang telah melepasi 5 minit selepas 'Sedia Produk' (READY) akan diselesaikan secara automatik + penyelesaian Escrow A2U automatik kepada penjual",
+      "schedOrderCronWhen": "Setiap 5 minit (Vercel Cron */5)",
       "scheduleDesc": "Walaupun tidak dijalankan secara langsung, sejarah pelaksanaan akan direkodkan secara automatik mengikut jadual di bawah",
       "scheduleTitle": "Jadual Tugas Automatik",
+      "settleA2uDisabled": "⚠️ A2U dinyahaktifkan — walaupun dijalankan, ia tidak akan dipindahkan dan hanya akan kekal sebagai menunggu penyelesaian (Perlu semak PI_WALLET_PRIVATE_SEED)",
+      "settleColAmount": "Jumlah (π)",
+      "settleColBuyer": "Pembeli",
+      "settleColCcy": "Mata Wang Tempatan",
+      "settleColDate": "Tarikh Jualan",
+      "settleColLinked": "Pi Dipautkan",
+      "settleColSelect": "Pilih",
+      "settleColSeller": "Penjual",
+      "settleColSettledAt": "Tarikh/Masa Penyelesaian",
+      "settleColStatus": "Status Penyelesaian",
+      "settleColTxid": "Pemindahan txid",
+      "settleConfirm": "Memindahkan Pi sebenar untuk {count} item belum diselesaikan. Teruskan?",
+      "settledEmpty": "Tiada sejarah penyelesaian selesai",
+      "settleDesc": "Menyelesaikan pesanan yang telah selesai transaksi tetapi belum dipindahkan kepada penjual dengan A2U (Pi sebenar). Untuk memulihkan kes-kes lalu/gagal yang tidak ditangani oleh cron 5 minit.",
+      "settledSummary": "Penyelesaian Selesai {count} item",
+      "settledTitle": "Senarai Penyelesaian Selesai",
+      "settleEmpty": "Tiada pesanan belum diselesaikan ✅",
+      "settleError": "Penyelesaian Gagal: {msg}",
+      "settleLinkedNo": "Tidak Dipautkan (Tidak boleh dipindahkan)",
+      "settleLinkedYes": "Dipautkan",
+      "settleLoad": "Muat Senarai Belum Diselesaikan",
+      "settleLoading": "Memuatkan…",
+      "settleNeedTitle": "Senarai Perlu Penyelesaian Semula",
+      "settleResult": "Penyelesaian Selesai {settled}/{attempted} item",
+      "settleRun": "Jalankan Penyelesaian Semula (Pemindahan sebenar)",
+      "settleRunning": "Menyelesaikan…",
+      "settleSelectedSummary": "{count} item dipilih · Jumlah {total}π",
+      "settleStDisabled": "A2U Dinyahaktifkan",
+      "settleStFailed": "Penyelesaian Semula Gagal",
+      "settleStNoUid": "Tidak Dipautkan",
+      "settleStSettled": "Penyelesaian Semula Selesai",
+      "settleStUnsettled": "Belum Diselesaikan",
+      "settleSummary": "{count} item belum diselesaikan · Jumlah {total}π",
+      "settleTitle": "Penyelesaian Penjual Belum Diselesaikan",
+      "settleTxidCopied": "txid pemindahan telah disalin",
       "success": "Agregasi {date} Selesai",
       "title": "On-demand Batch",
       "to": "Tarikh Tamat",
@@ -138,7 +177,15 @@
     "nav": {
       "backHome": "← Ke Laman Utama",
       "batch": "On-demand Batch",
+      "beanAudit": "Log Audit",
+      "beanFeePlan": "Pengurusan Pelan Yuran",
+      "beanSection": "☕ Ekonomi Bean",
+      "beanToken": "Dashboard Bean",
+      "beanTopUsers": "Pengguna Teratas",
+      "beanTxn": "Sejarah Transaksi",
+      "beanWallets": "Pengurusan Dompet",
       "board": "Pengurusan Board",
+      "campaign": "Kelulusan Campaign",
       "chatSection": "Pengurusan Kafe",
       "dashboard": "Dashboard",
       "eventExclude": "Urus Pengecualian",
@@ -148,6 +195,7 @@
       "i18nSection": "Pelbagai Bahasa",
       "links": "Status Pautan Akaun",
       "payments": "Sejarah Pembayaran",
+      "settle": "Pengurusan Penyelesaian",
       "stats": "Statistik",
       "stdApprovals": "Workflow Kelulusan",
       "stdAudit": "Sejarah Perubahan",
@@ -160,6 +208,7 @@
       "storeCategories": "Category Produk",
       "storeSection": "Pengurusan Store",
       "subscriptions": "Pengurusan Langganan",
+      "themes": "Pengurusan Theme",
       "title": "Admin",
       "users": "Pengurusan Pengguna"
     },
@@ -190,6 +239,7 @@
       "title": "Sejarah Pembayaran",
       "totalCount": "Jumlah {count} transaksi · Jumlah selesai {total} π",
       "txnDiv": {
+        "BEAN_CHARGE": "Caj Bean",
         "BET": "Pertaruhan",
         "BOND_DEPOSIT": "Deposit jaminan",
         "CANCEL_FEE": "Yuran pembatalan",
@@ -456,6 +506,61 @@
         "useY": "Digunakan",
         "validationRequired": "Nama Category adalah wajib"
       }
+    },
+    "themes": {
+      "col": {
+        "cd": "Code",
+        "desc": "Penerangan",
+        "sortOrd": "Susunan",
+        "theme": "Theme",
+        "tp": "Group",
+        "useYn": "Papar"
+      },
+      "deleteConfirm": "Adakah anda ingin memadamkan Theme '{name}'? (Cafe sedia ada akan dikekalkan)",
+      "deleteFail": "Gagal memadamkan",
+      "deleteSuccess": "Theme telah dipadamkan",
+      "editSuccess": "Theme telah diubah",
+      "emojiGroup": {
+        "daily": "Harian · Umum",
+        "emphasis": "Emosi · Penekanan",
+        "sports": "Sports"
+      },
+      "emojiSuggest": "Cadangan:",
+      "field": {
+        "cd": "Code Theme",
+        "desc": "Penerangan · Tag",
+        "emoji": "Emoji",
+        "nm": "Nama Theme",
+        "sortOrd": "Susunan Isih",
+        "tp": "Group",
+        "useYn": "Papar"
+      },
+      "formTitleEdit": "Ubah Theme",
+      "formTitleNew": "Pendaftaran Theme Baharu",
+      "noData": "Tiada Theme yang didaftarkan",
+      "placeholder": {
+        "cd": "ESPORTS",
+        "desc": "#Tag #Keyword",
+        "nm": "e-sports"
+      },
+      "saveFail": "Gagal menyimpan",
+      "saveSuccess": "Theme telah didaftarkan",
+      "searchPlaceholder": "Cari Code Theme · Nama",
+      "selectTp": {
+        "basic": "Asas (BASIC)",
+        "premium": "Premium (PREMIUM)"
+      },
+      "title": "Pengurusan Theme",
+      "totalCount": "Jumlah {count} Theme",
+      "tpFilter": {
+        "all": "Semua",
+        "basic": "Asas",
+        "premium": "Premium"
+      },
+      "useYnOff": "Sembunyi",
+      "useYnOn": "Papar",
+      "validationCd": "Code Theme mestilah gabungan huruf besar Inggeris, nombor, dan _ antara 1 hingga 20 aksara",
+      "validationRequired": "Nama Theme dan Emoji adalah wajib"
     },
     "users": {
       "changeFail": "Gagal Tukar",
@@ -744,6 +849,32 @@
       "wallet": "Alamat dompet"
     }
   },
+  "bean": {
+    "backToStore": "Kembali ke PiShop",
+    "buying": "Pembayaran sedang diproses…",
+    "chargeBtn": "Cas semula",
+    "chargeFail": "Gagal memproses pengecasan semula",
+    "chargeSuccess": "Pengecasan semula {bean} Bean selesai!",
+    "chargeTitle": "Cas semula Bean",
+    "customLabel": "Masukkan sendiri (Bean)",
+    "loading": "Sedang memuatkan…",
+    "loginRequired": "Boleh digunakan selepas log masuk",
+    "minCharge": "Boleh dicas semula dalam nombor bulat bermula dari minimum {min} Bean (1π)",
+    "myBalance": "Baki Bean saya",
+    "piBrowserHint": "Pengecasan semula Bean hanya boleh dilakukan dalam Pi Browser",
+    "piBrowserOnly": "Hanya boleh dicas semula dalam Pi Browser",
+    "rateHint": "1 Pi = {per} Bean (tetap)",
+    "title": "Dompet Bean",
+    "txnEmpty": "Tiada sejarah transaksi",
+    "txnTitle": "Sejarah Transaksi",
+    "type": {
+      "CHARGE": "Cas semula",
+      "REFUND": "Pulangan",
+      "REWARD": "Ganjaran",
+      "SPEND": "Guna",
+      "TRANSFER": "Pindahan"
+    }
+  },
   "board": {
     "adopted": "Diterima",
     "adoptedComplete": "Penerimaan Selesai",
@@ -805,6 +936,9 @@
     "postContent": "Kandungan Post",
     "postTitle": "Tajuk Post",
     "saving": "Sedang mengedit…",
+    "searchAllPlaceholder": "Carian bersepadu semua Board…",
+    "searching": "Mencari…",
+    "searchNoResults": "Tiada hasil carian",
     "searchPlaceholder": "Cari tajuk atau kandungan",
     "submitPost": "Hantar",
     "title": "Board",
@@ -981,10 +1115,12 @@
       "myCafes": "Kafe Saya",
       "noCafes": "Tiada kafe yang anda sertai lagi",
       "noCafesHint": "+ Cipta Kafe untuk membuka bilik pertama anda",
+      "private": "Peribadi",
       "regularCafes": "Kafe Biasa",
       "scrollMore": "Tatal untuk melihat lebih banyak…",
       "subscriptionCafes": "Kafe Langganan",
-      "subtitle": "Kafe Bertema Komuniti Pi"
+      "subtitle": "Kafe Bertema Komuniti Pi",
+      "unlimited": "Tidak Terhad"
     },
     "localeSelect": {
       "autoLocked": "🔒 Terjemahan Auto Faedah Langganan",
@@ -1663,6 +1799,7 @@
     "loginRequired": "Boleh digunakan selepas log masuk",
     "myItemsTitle": "Urus Item Saya",
     "myOwnItem": "Ini adalah barangan yang saya daftarkan",
+    "navBean": "☕ Bean Dompet",
     "navHistory": "Sejarah Transaksi",
     "navigateGoogle": "Mula dengan Google Map",
     "navigateKakao": "Kakao Map",
@@ -1770,6 +1907,58 @@
     "viewCount": "Paparan {count}",
     "waitingBuyerConfirm": "Menunggu pengesahan penerimaan daripada pembeli.",
     "waitingSellerComplete": "Menunggu pemprosesan penyelesaian transaksi daripada penjual."
+  },
+  "subscribe": {
+    "active": "Sedang melanggan",
+    "annual": "Tahunan",
+    "annualBadge": "2 bulan percuma",
+    "annualNudge": "Tukar kepada tahunan untuk {months} bulan percuma (jimat kira-kira {pct}%)",
+    "annualSave": "Jimat {bean}☕ dengan pembayaran tahunan — {months} bulan percuma! 🎉",
+    "backHome": "Ke Laman Utama",
+    "charge": "Caj Bean",
+    "cycleHeading": "Pilih kitaran pembayaran",
+    "expireAt": "Tarikh luput: {date}",
+    "feat": {
+      "PICAFE": [
+        "Pengecualian yuran penciptaan kafe Premium/Acara",
+        "Pengecualian yuran kemasukan kafe Premium/Acara"
+      ],
+      "PISHOP": [
+        "Pengecualian Yuran Pendedahan Produk",
+        "Pengecualian Yuran Penciptaan Produk Premium",
+        "Penyediaan Had Bilangan Produk Mengikut Peringkat"
+      ],
+      "TRANSLATE": [
+        "Terjemahan mesej automatik tanpa had",
+        "Bukan langganan 1 kali 1 ☕ → Langganan tanpa had percuma"
+      ]
+    },
+    "insufficient": "Baki Bean tidak mencukupi — sila cas semula dahulu",
+    "loading": "Memuatkan…",
+    "loginRequired": "Boleh digunakan selepas log masuk",
+    "monthly": "Bulanan",
+    "myBalance": "Baki Bean saya",
+    "notice": "Yuran langganan akan ditolak daripada Bean yang dicaj. Langganan tahunan percuma 2 bulan. Tidak boleh ditukar tunai·Untuk kegunaan platform sahaja.",
+    "perMonth": "Bulan",
+    "perYear": "Tahun",
+    "processing": "Sedang memproses…",
+    "product": {
+      "PICAFE": "Langganan PiCafe",
+      "PISHOP": "Langganan PiShop",
+      "TRANSLATE": "Langganan Terjemahan Automatik"
+    },
+    "renewBtn": "Perbaharui/Tukar",
+    "storeGrade": {
+      "L": "L (50 ke atas)",
+      "M": "M (50 ke bawah)",
+      "S": "S (30 ke bawah)"
+    },
+    "storeGradeHint": "{count} produk saya — pilih Gred",
+    "subscribeBtn": "Langgan",
+    "subscribeFail": "Gagal memproses langganan",
+    "subscribeSuccess": "Langganan {product} anda telah bermula!",
+    "tagline": "Langganan = Pakej pengecualian yuran setiap transaksi. Lebih banyak anda gunakan, lebih banyak faedah!",
+    "title": "Langganan Cafe.pi"
   },
   "themeToggle": {
     "dark": "Dark",

@@ -40,8 +40,47 @@
       "schedManualWhen": "Kapag pinatakbo ng Admin sa pahinang ito gamit ang button",
       "schedOndemandDesc": "On-demand na pag-update ng row ng istatistika ngayong araw (UTC) — Awtomatikong tumatakbo at hindi manu-manong gawain",
       "schedOndemandWhen": "Kapag na-access ang Admin Statistics Dashboard o binago ang panahon ng pagtingin",
+      "schedOrderBackfillDesc": "Batch settlement A2U sa seller para sa mga nakumpletong order na unsettled (walang release_txid) — /api/admin/store/settle",
+      "schedOrderBackfillWhen": "Kapag pinatakbo ng admin ang unsettled settlement",
+      "schedOrderCronDesc": "Awtomatikong kumpletuhin ang transaksyon para sa mga order na lumipas ng 5 minuto pagkatapos ng Product preparation complete (READY) + Awtomatikong i-settle ang Escrow A2U sa nagbebenta.",
+      "schedOrderCronWhen": "Every 5 minutes (Vercel Cron */5)",
       "scheduleDesc": "Kahit hindi direktang patakbuhin, awtomatikong naitatala ang kasaysayan ng pagpapatakbo ayon sa iskedyul sa ibaba.",
       "scheduleTitle": "Awtomatikong Job Schedule",
+      "settleA2uDisabled": "⚠️ A2U Disabled — Hindi ito ipapadala kahit patakbuhin, mananatili lang bilang pending settlement (Kailangan i-verify ang PI_WALLET_PRIVATE_SEED)",
+      "settleColAmount": "Amount (π)",
+      "settleColBuyer": "Buyer",
+      "settleColCcy": "Local Currency",
+      "settleColDate": "Date Sold",
+      "settleColLinked": "Pi Link",
+      "settleColSelect": "Piliin",
+      "settleColSeller": "Seller",
+      "settleColSettledAt": "Settled At",
+      "settleColStatus": "Settlement Status",
+      "settleColTxid": "Transfer txid",
+      "settleConfirm": "Magpapadala ng real Pi sa {count} unsettled transactions. Ituloy?",
+      "settledEmpty": "Walang settled na history",
+      "settleDesc": "Sinisettle ang mga order na nakumpleto na ngunit hindi pa naipadala sa seller bilang A2U (real Pi). Para sa pagbawi ng mga nakaraang o nabigong transaksyon na hindi naproseso ng 5-minutong cron.",
+      "settledSummary": "{count} Settled",
+      "settledTitle": "Settled List",
+      "settleEmpty": "Walang unsettled na order ✅",
+      "settleError": "Settlement Failed: {msg}",
+      "settleLinkedNo": "Not Linked (Cannot Send)",
+      "settleLinkedYes": "Linked",
+      "settleLoad": "I-load ang Unsettled List",
+      "settleLoading": "Naglo-load…",
+      "settleNeedTitle": "List of Settlements Needed",
+      "settleResult": "Settlement Completed {settled}/{attempted} transactions",
+      "settleRun": "Run Resettlement (Real Transfer)",
+      "settleRunning": "Nagsasagawa ng Settlement…",
+      "settleSelectedSummary": "{count} Selected · Total {total}π",
+      "settleStDisabled": "A2U Disabled",
+      "settleStFailed": "Resettlement Failed",
+      "settleStNoUid": "Not Linked",
+      "settleStSettled": "Resettled",
+      "settleStUnsettled": "Unsettled",
+      "settleSummary": "{count} Unsettled · Total {total}π",
+      "settleTitle": "Unsettled Seller Settlement",
+      "settleTxidCopied": "Kinopya ang transfer txid",
       "success": "Kumpleto ang Aggregation ng {date}",
       "title": "On-demand Batch",
       "to": "Petsa ng Pagtatapos",
@@ -138,7 +177,15 @@
     "nav": {
       "backHome": "← Bumalik sa Home",
       "batch": "On-demand Batch",
+      "beanAudit": "Audit Log",
+      "beanFeePlan": "Pamamahala ng Fee Plan",
+      "beanSection": "☕ Bean Economy",
+      "beanToken": "Bean Dashboard",
+      "beanTopUsers": "Mga Top User",
+      "beanTxn": "Transaction History",
+      "beanWallets": "Wallet Management",
       "board": "Board Management",
+      "campaign": "Campaign Approval",
       "chatSection": "Cafe Management",
       "dashboard": "Dashboard",
       "eventExclude": "Manage Exclusion",
@@ -148,6 +195,7 @@
       "i18nSection": "Multilingual",
       "links": "Status ng Pag-link ng Account",
       "payments": "Kasaysayan ng Bayad",
+      "settle": "Settlement Management",
       "stats": "Stats",
       "stdApprovals": "Approval Workflow",
       "stdAudit": "Kasaysayan ng Pagbabago",
@@ -160,6 +208,7 @@
       "storeCategories": "Mga Category ng Produkto",
       "storeSection": "Pamamahala ng Store",
       "subscriptions": "Subscription Management",
+      "themes": "Theme Management",
       "title": "Admin",
       "users": "Pamamahala ng User"
     },
@@ -190,6 +239,7 @@
       "title": "Kasaysayan ng Bayad",
       "totalCount": "Kabuuang {count} Item · Kabuuang Kumpleto {total} π",
       "txnDiv": {
+        "BEAN_CHARGE": "Bean Charge",
         "BET": "Taya",
         "BOND_DEPOSIT": "Deposito ng garantiya",
         "CANCEL_FEE": "Bayad sa pagkansela",
@@ -456,6 +506,61 @@
         "useY": "Gamitin",
         "validationRequired": "Ang pangalan ng Category ay kinakailangan"
       }
+    },
+    "themes": {
+      "col": {
+        "cd": "Code",
+        "desc": "Description",
+        "sortOrd": "Order",
+        "theme": "Theme",
+        "tp": "Group",
+        "useYn": "Display"
+      },
+      "deleteConfirm": "I-delete ang '{name}' Theme? (Mananatili ang mga kasalukuyang cafe)",
+      "deleteFail": "Nabigo ang pag-delete.",
+      "deleteSuccess": "Matagumpay na na-delete ang Theme.",
+      "editSuccess": "Matagumpay na na-edit ang Theme.",
+      "emojiGroup": {
+        "daily": "Daily · General Purpose",
+        "emphasis": "Emotion · Emphasis",
+        "sports": "Sports"
+      },
+      "emojiSuggest": "Recommendation:",
+      "field": {
+        "cd": "Theme Code",
+        "desc": "Description · Tag",
+        "emoji": "Emoji",
+        "nm": "Theme Name",
+        "sortOrd": "Sort Order",
+        "tp": "Group",
+        "useYn": "Display"
+      },
+      "formTitleEdit": "Edit Theme",
+      "formTitleNew": "New Theme Registration",
+      "noData": "Walang nakarehistrong Theme",
+      "placeholder": {
+        "cd": "ESPORTS",
+        "desc": "#Tag #Keyword",
+        "nm": "eSports"
+      },
+      "saveFail": "Nabigo ang pag-save.",
+      "saveSuccess": "Matagumpay na nairehistro ang Theme.",
+      "searchPlaceholder": "Search Theme Code · Name",
+      "selectTp": {
+        "basic": "Basic (BASIC)",
+        "premium": "Premium (PREMIUM)"
+      },
+      "title": "Theme Management",
+      "totalCount": "Total {count} Themes",
+      "tpFilter": {
+        "all": "Lahat",
+        "basic": "Basic",
+        "premium": "Premium"
+      },
+      "useYnOff": "Hide",
+      "useYnOn": "Show",
+      "validationCd": "Ang Theme Code ay dapat na kombinasyon ng uppercase English letters, numbers, at _ na may 1 hanggang 20 character.",
+      "validationRequired": "Ang Theme Name at Emoji ay kinakailangan."
     },
     "users": {
       "changeFail": "Nabigo ang Pagbabago",
@@ -744,6 +849,32 @@
       "wallet": "Address ng Wallet"
     }
   },
+  "bean": {
+    "backToStore": "Pabalik sa PiShop",
+    "buying": "Pinoproseso ang pagbabayad…",
+    "chargeBtn": "Charge",
+    "chargeFail": "Nabigo ang pagproseso ng Charge",
+    "chargeSuccess": "{bean} Bean Charge Kumpleto!",
+    "chargeTitle": "Bean Charge",
+    "customLabel": "Manu-manong Input (Bean)",
+    "loading": "Naglo-load…",
+    "loginRequired": "Magagamit pagkatapos mag-login",
+    "minCharge": "Maaaring mag-charge ng integer mula sa minimum na {min} Bean (1π)",
+    "myBalance": "Aking Bean Balance",
+    "piBrowserHint": "Ang Bean Charge ay posible lamang sa Pi Browser",
+    "piBrowserOnly": "Maaaring mag-charge sa Pi Browser lamang",
+    "rateHint": "1 Pi = {per} Bean (Fixed)",
+    "title": "Bean Wallet",
+    "txnEmpty": "Walang Transaction History",
+    "txnTitle": "Transaction History",
+    "type": {
+      "CHARGE": "Charge",
+      "REFUND": "Refund",
+      "REWARD": "Reward",
+      "SPEND": "Spend",
+      "TRANSFER": "Regalo"
+    }
+  },
   "board": {
     "adopted": "Adopted",
     "adoptedComplete": "Adopted Complete",
@@ -805,6 +936,9 @@
     "postContent": "Content",
     "postTitle": "Title",
     "saving": "Nagse-save…",
+    "searchAllPlaceholder": "Integrated Search sa All Boards…",
+    "searching": "Naghahanap…",
+    "searchNoResults": "Walang resulta ng paghahanap",
     "searchPlaceholder": "Maghanap ng Title o Content",
     "submitPost": "Isumite",
     "title": "Board",
@@ -981,10 +1115,12 @@
       "myCafes": "Aking Cafe",
       "noCafes": "Wala pang Cafe na sinasalihan",
       "noCafesHint": "+ Subukang gumawa ng unang room sa pamamagitan ng paggawa ng Cafe",
+      "private": "Private",
       "regularCafes": "Regular Cafe",
       "scrollMore": "Mag-scroll para makita pa…",
       "subscriptionCafes": "Subscription Cafe",
-      "subtitle": "Pi Community Theme Cafe"
+      "subtitle": "Pi Community Theme Cafe",
+      "unlimited": "Unlimited"
     },
     "localeSelect": {
       "autoLocked": "🔒 Subscription Benefit Auto-translation",
@@ -1663,6 +1799,7 @@
     "loginRequired": "Magagamit pagkatapos mag-login",
     "myItemsTitle": "Pamahalaan ang Aking Mga Item",
     "myOwnItem": "Ito ang item na aking inirehistro",
+    "navBean": "☕ Bean Wallet",
     "navHistory": "Kasaysayan ng Transaksyon",
     "navigateGoogle": "Pumunta sa Google Maps",
     "navigateKakao": "Kakao Map",
@@ -1770,6 +1907,58 @@
     "viewCount": "Mga View {count}",
     "waitingBuyerConfirm": "Naghihintay ng kumpirmasyon ng pagtanggap mula sa mamimili.",
     "waitingSellerComplete": "Naghihintay ng pagproseso ng pagkumpleto ng transaksyon mula sa nagbebenta."
+  },
+  "subscribe": {
+    "active": "Naka-subscribe",
+    "annual": "Taunan",
+    "annualBadge": "2 buwan libre",
+    "annualNudge": "{months} buwan libre kapag lumipat sa taunan (humigit-kumulang {pct}% na tipid)",
+    "annualSave": "Makatipid ng {bean}☕ sa taunang bayad — {months} buwan libre! 🎉",
+    "backHome": "Pabalik sa Home",
+    "charge": "I-charge ang Bean",
+    "cycleHeading": "Piliin ang siklo ng pagbabayad",
+    "expireAt": "Petsa ng pag-expire: {date}",
+    "feat": {
+      "PICAFE": [
+        "Exemption sa bayad sa paggawa ng Premium·Event Cafe",
+        "Exemption sa bayad sa pagpasok sa Premium·Event Cafe"
+      ],
+      "PISHOP": [
+        "Exemption sa Fee sa Pagpapakita ng Product",
+        "Exemption sa Fee sa Paglikha ng Premium Product",
+        "Pagbibigay ng Limitasyon sa Dami ng Product Ayon sa Grade"
+      ],
+      "TRANSLATE": [
+        "Unlimited na Automatic Message Translation",
+        "Hindi subscriber 1 beses 1 ☕ → Subscriber unlimited libre"
+      ]
+    },
+    "insufficient": "Hindi sapat ang balanse ng Bean — mangyaring mag-charge muna",
+    "loading": "Naglo-load…",
+    "loginRequired": "Maaaring gamitin pagkatapos mag-log in",
+    "monthly": "Monthly",
+    "myBalance": "Aking Bean Balance",
+    "notice": "Ang bayad sa subscription ay ibabawas mula sa na-charge na Bean. Ang taunan ay may 2 buwan libre. Hindi refundable·Para lamang sa paggamit ng Platform.",
+    "perMonth": "Buwan",
+    "perYear": "Taon",
+    "processing": "Pinoproseso…",
+    "product": {
+      "PICAFE": "PiCafe Subscription",
+      "PISHOP": "Subscription sa PiShop",
+      "TRANSLATE": "Automatic Translation Subscription"
+    },
+    "renewBtn": "I-renew/Baguhin",
+    "storeGrade": {
+      "L": "L (50 o higit pa)",
+      "M": "M (50 o mas kaunti)",
+      "S": "S (30 o mas kaunti)"
+    },
+    "storeGradeHint": "Aking {count} produkto — pumili ng grade",
+    "subscribeBtn": "Mag-subscribe",
+    "subscribeFail": "Nabigo ang pagproseso ng subscription",
+    "subscribeSuccess": "Nagsimula na ang iyong {product} subscription!",
+    "tagline": "Subscription = Package na walang bayad per transaction. Mas marami ang gamit, mas malaki ang benepisyo!",
+    "title": "Cafe.pi Subscription"
   },
   "themeToggle": {
     "dark": "Dark",

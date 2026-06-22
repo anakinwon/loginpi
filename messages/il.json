@@ -40,8 +40,47 @@
       "schedManualWhen": "כאשר מנהל מפעיל באמצעות כפתור בדף זה",
       "schedOndemandDesc": "עדכון שורת הסטטיסטיקות של היום (UTC) לפי דרישה — מופעל אוטומטית, לא פעולה ידנית",
       "schedOndemandWhen": "בעת גישה ל-Dashboard הסטטיסטיקות של המנהל או שינוי תקופת הצפייה",
+      "schedOrderBackfillDesc": "הסדרת תשלומים בצובר A2U למוכרים עבור הזמנות שהושלמו ולא סולקו (ללא release_txid) — /api/admin/store/settle",
+      "schedOrderBackfillWhen": "כאשר מנהל מערכת מפעיל הסדרת תשלומים שלא סולקו",
+      "schedOrderCronDesc": "השלמת עסקאות אוטומטית להזמנות שעברו 5 דקות מאז השלמת הכנת המוצר (READY) + הסדר אוטומטי של Escrow A2U למוכר.",
+      "schedOrderCronWhen": "כל 5 דקות (Vercel Cron */5)",
       "scheduleDesc": "גם אם לא מופעל ישירות, היסטוריית ההפעלה נרשמת אוטומטית לפי ה-Schedule למטה",
       "scheduleTitle": "Automatic Task Schedule",
+      "settleA2uDisabled": "⚠️ A2U מושבת — גם אם יופעל, לא יועבר כסף ויישאר במצב המתנה להסדרת תשלומים בלבד (יש לוודא PI_WALLET_PRIVATE_SEED)",
+      "settleColAmount": "סכום (π)",
+      "settleColBuyer": "קונה",
+      "settleColCcy": "מטבע מקומי",
+      "settleColDate": "תאריך מכירה",
+      "settleColLinked": "קישור Pi",
+      "settleColSelect": "בחר",
+      "settleColSeller": "מוכר",
+      "settleColSettledAt": "תאריך ושעת הסדרת תשלומים",
+      "settleColStatus": "סטטוס הסדרת תשלומים",
+      "settleColTxid": "txid העברה",
+      "settleConfirm": "יועבר Pi אמיתי עבור {count} פריטים שלא סולקו. להמשיך?",
+      "settledEmpty": "אין היסטוריית תשלומים שסולקו",
+      "settleDesc": "הסדרת תשלומים למוכרים ב-A2U (Pi אמיתי) עבור הזמנות שהושלמו אך טרם הועברו. לשחזור מקרים קודמים/כושלים שלא טופלו על ידי ה-cron של 5 דקות.",
+      "settledSummary": "{count} פריטים שסולקו",
+      "settledTitle": "רשימת תשלומים שסולקו",
+      "settleEmpty": "אין הזמנות שלא סולקו ✅",
+      "settleError": "הסדרת תשלומים נכשלה: {msg}",
+      "settleLinkedNo": "לא מקושר (לא ניתן להעביר)",
+      "settleLinkedYes": "מקושר",
+      "settleLoad": "טען רשימת תשלומים שלא סולקו",
+      "settleLoading": "טוען…",
+      "settleNeedTitle": "רשימה הדורשת הסדרת תשלומים מחדש",
+      "settleResult": "הסדרת תשלומים הושלמה {settled}/{attempted} פריטים",
+      "settleRun": "הפעל הסדרת תשלומים מחדש (העברה בפועל)",
+      "settleRunning": "מבצע הסדרת תשלומים…",
+      "settleSelectedSummary": "{count} פריטים נבחרו · סה\"כ {total}π",
+      "settleStDisabled": "A2U מושבת",
+      "settleStFailed": "הסדרת תשלומים נכשלה מחדש",
+      "settleStNoUid": "לא מקושר",
+      "settleStSettled": "הסדרת תשלומים הושלמה מחדש",
+      "settleStUnsettled": "לא סולק",
+      "settleSummary": "{count} פריטים שלא סולקו · סה\"כ {total}π",
+      "settleTitle": "הסדרת תשלומים למוכרים שלא סולקו",
+      "settleTxidCopied": "txid העברה הועתק",
       "success": "צבירה הושלמה עבור {date}",
       "title": "On-demand Batch",
       "to": "תאריך סיום",
@@ -138,7 +177,15 @@
     "nav": {
       "backHome": "← חזרה לדף הבית",
       "batch": "On-demand Batch",
+      "beanAudit": "יומן ביקורת",
+      "beanFeePlan": "ניהול תוכנית עמלות",
+      "beanSection": "כלכלת Bean ☕",
+      "beanToken": "Dashboard Bean",
+      "beanTopUsers": "משתמשים מובילים",
+      "beanTxn": "היסטוריית עסקאות",
+      "beanWallets": "ניהול ארנקים",
       "board": "ניהול Board",
+      "campaign": "אישור Campaign",
       "chatSection": "ניהול Cafe",
       "dashboard": "Dashboard",
       "eventExclude": "ניהול החרגה",
@@ -148,6 +195,7 @@
       "i18nSection": "רב לשוני",
       "links": "סטטוס קישור חשבונות",
       "payments": "היסטוריית תשלומים",
+      "settle": "ניהול התחשבנות",
       "stats": "סטטיסטיקה",
       "stdApprovals": "תהליך אישור",
       "stdAudit": "היסטוריית שינויים",
@@ -160,6 +208,7 @@
       "storeCategories": "Product Categories",
       "storeSection": "ניהול Store",
       "subscriptions": "ניהול מנויים",
+      "themes": "ניהול Theme",
       "title": "מנהל",
       "users": "ניהול משתמשים"
     },
@@ -190,6 +239,7 @@
       "title": "היסטוריית תשלומים",
       "totalCount": "סה\"כ {count} פריטים · סכום שהושלם {total} π",
       "txnDiv": {
+        "BEAN_CHARGE": "טעינת Bean",
         "BET": "הימור",
         "BOND_DEPOSIT": "פיקדון ערבות",
         "CANCEL_FEE": "דמי ביטול",
@@ -456,6 +506,61 @@
         "useY": "שימוש",
         "validationRequired": "שם ה-Category נדרש"
       }
+    },
+    "themes": {
+      "col": {
+        "cd": "Code",
+        "desc": "תיאור",
+        "sortOrd": "סדר",
+        "theme": "Theme",
+        "tp": "Group",
+        "useYn": "הצגה"
+      },
+      "deleteConfirm": "למחוק את ה-Theme '{name}'? (בתי קפה קיימים יישמרו)",
+      "deleteFail": "המחיקה נכשלה",
+      "deleteSuccess": "ה-Theme נמחק בהצלחה",
+      "editSuccess": "ה-Theme עודכן בהצלחה",
+      "emojiGroup": {
+        "daily": "יומי·כללי",
+        "emphasis": "רגש·הדגשה",
+        "sports": "Sports"
+      },
+      "emojiSuggest": "מומלץ:",
+      "field": {
+        "cd": "Theme Code",
+        "desc": "תיאור·Tag",
+        "emoji": "Emoji",
+        "nm": "Theme Name",
+        "sortOrd": "סדר מיון",
+        "tp": "Group",
+        "useYn": "הצגה"
+      },
+      "formTitleEdit": "עריכת Theme",
+      "formTitleNew": "רישום Theme חדש",
+      "noData": "אין Themes רשומים",
+      "placeholder": {
+        "cd": "ESPORTS",
+        "desc": "#Tag #Keyword",
+        "nm": "e-sports"
+      },
+      "saveFail": "השמירה נכשלה",
+      "saveSuccess": "ה-Theme נרשם בהצלחה",
+      "searchPlaceholder": "חפש Theme Code·Name",
+      "selectTp": {
+        "basic": "Basic (BASIC)",
+        "premium": "Premium (PREMIUM)"
+      },
+      "title": "ניהול Theme",
+      "totalCount": "סה\"כ {count} Themes",
+      "tpFilter": {
+        "all": "הכל",
+        "basic": "Basic",
+        "premium": "Premium"
+      },
+      "useYnOff": "מוסתר",
+      "useYnOn": "מוצג",
+      "validationCd": "Theme Code חייב להיות שילוב של אותיות אנגליות גדולות, מספרים ו-_, באורך 1 עד 20 תווים.",
+      "validationRequired": "Theme Name ו-Emoji הם שדות חובה"
     },
     "users": {
       "changeFail": "שינוי נכשל",
@@ -744,6 +849,32 @@
       "wallet": "כתובת ארנק"
     }
   },
+  "bean": {
+    "backToStore": "חזרה ל-PiShop",
+    "buying": "התשלום מתבצע…",
+    "chargeBtn": "טען",
+    "chargeFail": "עיבוד הטעינה נכשל",
+    "chargeSuccess": "טעינת {bean} Bean הושלמה!",
+    "chargeTitle": "טעינת Bean",
+    "customLabel": "הזנה ידנית (Bean)",
+    "loading": "בטעינה…",
+    "loginRequired": "זמין לאחר התחברות",
+    "minCharge": "ניתן לטעון מספרים שלמים החל ממינימום של {min} Bean (1π)",
+    "myBalance": "יתרת ה-Bean שלי",
+    "piBrowserHint": "טעינת Bean אפשרית רק ב-Pi Browser",
+    "piBrowserOnly": "ניתן לטעון רק ב-Pi Browser",
+    "rateHint": "1 Pi = {per} Bean (קבוע)",
+    "title": "ארנק Bean",
+    "txnEmpty": "אין היסטוריית עסקאות",
+    "txnTitle": "היסטוריית עסקאות",
+    "type": {
+      "CHARGE": "טעינה",
+      "REFUND": "החזר כספי",
+      "REWARD": "תגמול",
+      "SPEND": "שימוש",
+      "TRANSFER": "העברה"
+    }
+  },
   "board": {
     "adopted": "אומץ",
     "adoptedComplete": "אימוץ הושלם",
@@ -805,6 +936,9 @@
     "postContent": "תוכן",
     "postTitle": "כותרת",
     "saving": "שומר...",
+    "searchAllPlaceholder": "חיפוש משולב בכל ה-Board-ים…",
+    "searching": "מחפש…",
+    "searchNoResults": "אין תוצאות חיפוש",
     "searchPlaceholder": "חפש כותרת או תוכן",
     "submitPost": "שלח",
     "title": "Board",
@@ -981,10 +1115,12 @@
       "myCafes": "בתי הקפה שלי",
       "noCafes": "אין Cafes שאתה משתתף בהם כרגע",
       "noCafesHint": "+ נסה לפתוח את החדר הראשון שלך על ידי יצירת Cafe",
+      "private": "פרטי",
       "regularCafes": "בתי קפה רגילים",
       "scrollMore": "גלול כדי לראות עוד...",
       "subscriptionCafes": "בתי קפה במנוי",
-      "subtitle": "בתי קפה נושאיים של קהילת Pi"
+      "subtitle": "בתי קפה נושאיים של קהילת Pi",
+      "unlimited": "ללא הגבלה"
     },
     "localeSelect": {
       "autoLocked": "🔒 תרגום אוטומטי - הטבת מנוי",
@@ -1663,6 +1799,7 @@
     "loginRequired": "זמין לאחר התחברות",
     "myItemsTitle": "ניהול הפריטים שלי",
     "myOwnItem": "זהו פריט שרשמתי",
+    "navBean": "☕ Bean ארנק",
     "navHistory": "היסטוריית עסקאות",
     "navigateGoogle": "צא לדרך עם Google Maps",
     "navigateKakao": "מפת Kakao",
@@ -1770,6 +1907,58 @@
     "viewCount": "צפיות {count}",
     "waitingBuyerConfirm": "ממתין לאישור קבלת הקונה.",
     "waitingSellerComplete": "ממתין למוכר להשלים את העסקה."
+  },
+  "subscribe": {
+    "active": "מנוי פעיל",
+    "annual": "שנתי",
+    "annualBadge": "חודשיים חינם",
+    "annualNudge": "{months} חודשים חינם במעבר לשנתי (חיסכון של כ-{pct}%)",
+    "annualSave": "חסוך {bean}☕ בתשלום שנתי — {months} חודשים חינם! 🎉",
+    "backHome": "חזרה לדף הבית",
+    "charge": "טען Bean",
+    "cycleHeading": "בחר מחזור תשלום",
+    "expireAt": "תאריך תפוגה: {date}",
+    "feat": {
+      "PICAFE": [
+        "פטור מדמי יצירת בתי קפה Premium/אירועים",
+        "פטור מדמי כניסה לבתי קפה Premium/אירועים"
+      ],
+      "PISHOP": [
+        "פטור מדמי חשיפת מוצר",
+        "פטור מדמי יצירת מוצר Premium",
+        "הגבלת כמות מוצרים לפי דרגה"
+      ],
+      "TRANSLATE": [
+        "תרגום הודעות אוטומטי ללא הגבלה",
+        "לא מנוי: 1 ☕ לפעם ← מנוי: חינם ללא הגבלה"
+      ]
+    },
+    "insufficient": "יתרת ה-Bean אינה מספקת — אנא טען קודם",
+    "loading": "טוען…",
+    "loginRequired": "זמין לאחר התחברות",
+    "monthly": "חודשי",
+    "myBalance": "יתרת ה-Bean שלי",
+    "notice": "דמי המנוי ינוכו מיתרת ה-Bean שנטענה. מנוי שנתי מקנה חודשיים חינם. לא ניתן להחזיר כסף · לשימוש בפלטפורמה בלבד.",
+    "perMonth": "לחודש",
+    "perYear": "לשנה",
+    "processing": "בעיבוד…",
+    "product": {
+      "PICAFE": "מנוי PiCafe",
+      "PISHOP": "מינוי PiShop",
+      "TRANSLATE": "מנוי תרגום אוטומטי"
+    },
+    "renewBtn": "חדש/שנה",
+    "storeGrade": {
+      "L": "L (מעל 50 פריטים)",
+      "M": "M (עד 50 פריטים)",
+      "S": "S (עד 30 פריטים)"
+    },
+    "storeGradeHint": "{count} מוצרים שלי — בחר דרגה",
+    "subscribeBtn": "הירשם",
+    "subscribeFail": "עיבוד המנוי נכשל",
+    "subscribeSuccess": "המנוי ל-{product} החל בהצלחה!",
+    "tagline": "מנוי = חבילת פטור מתשלום לפי שימוש. ככל שתשתמש יותר, כך תרוויח יותר!",
+    "title": "מנוי ל-Cafe.pi"
   },
   "themeToggle": {
     "dark": "Dark",

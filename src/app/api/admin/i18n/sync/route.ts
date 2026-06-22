@@ -10,19 +10,35 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!,
 )
 
-// flat key → 중첩 객체 재구성 ('board.title' → { board: { title: '...' } })
+// 키가 '0','1','2',… 연속 정수 인덱스인 객체를 배열로 변환 (재귀).
+// DB는 배열을 'feat.PISHOP.0/.1/.2' 평탄 키로 저장하므로, 복원 시 객체가 아닌
+// 배열로 돌려놔야 ko.json(source) 및 코드(t.raw(...) as string[])와 구조가 일치한다.
+function arrayify(node: unknown): unknown {
+  if (node === null || typeof node !== 'object' || Array.isArray(node)) return node
+  const obj = node as Record<string, unknown>
+  for (const k of Object.keys(obj)) obj[k] = arrayify(obj[k])
+  const keys = Object.keys(obj)
+  if (keys.length > 0 && keys.every((k, i) => k === String(i))) {
+    return keys.map((k) => obj[k])
+  }
+  return obj
+}
+
+// flat key → 중첩 객체 재구성 ('board.title' → { board: { title: '...' } }).
+// 숫자 인덱스 키 묶음은 arrayify로 배열 복원 (ko.json 배열 구조 정합).
 function unflattenJson(flat: Record<string, string>): Record<string, unknown> {
   const result: Record<string, unknown> = {}
   for (const [key, val] of Object.entries(flat)) {
     const parts = key.split('.')
     let cursor: Record<string, unknown> = result
     for (let i = 0; i < parts.length - 1; i++) {
-      if (typeof cursor[parts[i]] !== 'object') cursor[parts[i]] = {}
+      if (typeof cursor[parts[i]] !== 'object' || cursor[parts[i]] === null)
+        cursor[parts[i]] = {}
       cursor = cursor[parts[i]] as Record<string, unknown>
     }
     cursor[parts[parts.length - 1]] = val
   }
-  return result
+  return arrayify(result) as Record<string, unknown>
 }
 
 // 허용 locale 집합 (routing.ts 정의 기준)

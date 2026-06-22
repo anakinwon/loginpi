@@ -40,8 +40,47 @@
       "schedManualWhen": "在此页面管理员通过按钮执行时",
       "schedOndemandDesc": "今日(UTC) 统计行 On-demand 最新化 — 自动执行而非手动任务",
       "schedOndemandWhen": "管理员统计 Dashboard 访问或查询期间变更时",
+      "schedOrderBackfillDesc": "向卖家 A2U 批量结算已完成交易但未结算（无 release_txid）的订单 — /api/admin/store/settle",
+      "schedOrderBackfillWhen": "管理员执行未结算结算时",
+      "schedOrderCronDesc": "商品准备完成(READY) 5 分钟后，订单自动交易完成 + 自动向卖家 Escrow A2U 结算",
+      "schedOrderCronWhen": "每 5 分钟 (Vercel Cron */5)",
       "scheduleDesc": "即使不手动执行，执行历史也会根据以下 Schedule 自动记录",
       "scheduleTitle": "自动任务 Schedule",
+      "settleA2uDisabled": "⚠️ A2U 已禁用 — 即使执行也不会汇款，只会保留为待结算（需要检查 PI_WALLET_PRIVATE_SEED）",
+      "settleColAmount": "金额(π)",
+      "settleColBuyer": "买家",
+      "settleColCcy": "本国货币",
+      "settleColDate": "销售日期",
+      "settleColLinked": "Pi 关联",
+      "settleColSelect": "选择",
+      "settleColSeller": "卖家",
+      "settleColSettledAt": "结算时间",
+      "settleColStatus": "结算状态",
+      "settleColTxid": "汇款 txid",
+      "settleConfirm": "将向 {count} 笔未结算订单汇款实际 Pi。是否继续？",
+      "settledEmpty": "没有已结算记录",
+      "settleDesc": "将已完成交易但尚未汇款的订单以 A2U（实际 Pi）向卖家结算。用于恢复 5 分钟 cron 未处理的过去或失败的记录。",
+      "settledSummary": "已结算 {count} 笔",
+      "settledTitle": "已结算列表",
+      "settleEmpty": "没有未结算订单 ✅",
+      "settleError": "结算失败：{msg}",
+      "settleLinkedNo": "未关联（无法汇款）",
+      "settleLinkedYes": "已关联",
+      "settleLoad": "加载未结算列表",
+      "settleLoading": "加载中…",
+      "settleNeedTitle": "需要重新结算的列表",
+      "settleResult": "结算完成 {settled}/{attempted} 笔",
+      "settleRun": "执行重新结算（实际汇款）",
+      "settleRunning": "结算中…",
+      "settleSelectedSummary": "已选择 {count} 笔 · 总计 {total}π",
+      "settleStDisabled": "A2U 已禁用",
+      "settleStFailed": "重新结算失败",
+      "settleStNoUid": "未关联",
+      "settleStSettled": "重新结算完成",
+      "settleStUnsettled": "未结算",
+      "settleSummary": "未结算 {count} 笔 · 总计 {total}π",
+      "settleTitle": "未结算卖家结算",
+      "settleTxidCopied": "已复制汇款 txid",
       "success": "{date} 聚合完成",
       "title": "按需 Batch",
       "to": "结束日期",
@@ -138,7 +177,15 @@
     "nav": {
       "backHome": "← 返回首页",
       "batch": "按需 Batch",
+      "beanAudit": "审计 Log",
+      "beanFeePlan": "资费计划管理",
+      "beanSection": "☕ Bean 经济",
+      "beanToken": "Bean Dashboard",
+      "beanTopUsers": "顶级用户",
+      "beanTxn": "交易明细",
+      "beanWallets": "钱包管理",
       "board": "公告板管理",
+      "campaign": "Campaign 审批",
       "chatSection": "咖啡厅管理",
       "dashboard": "仪表盘",
       "eventExclude": "排除管理",
@@ -148,6 +195,7 @@
       "i18nSection": "多语言",
       "links": "账户关联状态",
       "payments": "支付记录",
+      "settle": "结算管理",
       "stats": "统计",
       "stdApprovals": "审批工作流",
       "stdAudit": "变更历史",
@@ -160,6 +208,7 @@
       "storeCategories": "商品 Category",
       "storeSection": "Store 管理",
       "subscriptions": "订阅管理",
+      "themes": "Theme 管理",
       "title": "管理",
       "users": "用户管理"
     },
@@ -190,6 +239,7 @@
       "title": "支付记录",
       "totalCount": "共 {count} 笔 · 完成总计 {total} π",
       "txnDiv": {
+        "BEAN_CHARGE": "Bean 充值",
         "BET": "投注",
         "BOND_DEPOSIT": "保证金存入",
         "CANCEL_FEE": "取消手续费",
@@ -456,6 +506,61 @@
         "useY": "使用",
         "validationRequired": "Category 名称是必填项"
       }
+    },
+    "themes": {
+      "col": {
+        "cd": "Code",
+        "desc": "说明",
+        "sortOrd": "顺序",
+        "theme": "Theme",
+        "tp": "Group",
+        "useYn": "显示"
+      },
+      "deleteConfirm": "确定删除 '{name}' Theme 吗？(现有 Cafe 将保留)",
+      "deleteFail": "删除失败",
+      "deleteSuccess": "Theme 已删除",
+      "editSuccess": "Theme 已修改",
+      "emojiGroup": {
+        "daily": "日常·通用",
+        "emphasis": "情感·强调",
+        "sports": "Sports"
+      },
+      "emojiSuggest": "推荐:",
+      "field": {
+        "cd": "Theme Code",
+        "desc": "说明·Tag",
+        "emoji": "Emoji",
+        "nm": "Theme 名称",
+        "sortOrd": "排序顺序",
+        "tp": "Group",
+        "useYn": "显示"
+      },
+      "formTitleEdit": "修改 Theme",
+      "formTitleNew": "注册新 Theme",
+      "noData": "没有注册的 Theme",
+      "placeholder": {
+        "cd": "ESPORTS",
+        "desc": "#Tag #Keyword",
+        "nm": "eSports"
+      },
+      "saveFail": "保存失败",
+      "saveSuccess": "Theme 已注册",
+      "searchPlaceholder": "搜索 Theme Code·名称",
+      "selectTp": {
+        "basic": "普通(BASIC)",
+        "premium": "Premium(PREMIUM)"
+      },
+      "title": "Theme 管理",
+      "totalCount": "共 {count} 个 Theme",
+      "tpFilter": {
+        "all": "全部",
+        "basic": "普通",
+        "premium": "Premium"
+      },
+      "useYnOff": "隐藏",
+      "useYnOn": "显示",
+      "validationCd": "Theme Code 必须是英文大写字母、数字、_ 组合，长度为 1~20 个字符",
+      "validationRequired": "Theme 名称和 Emoji 是必填项"
     },
     "users": {
       "changeFail": "更改失败",
@@ -744,6 +849,32 @@
       "wallet": "钱包地址"
     }
   },
+  "bean": {
+    "backToStore": "返回 PiShop",
+    "buying": "支付进行中…",
+    "chargeBtn": "充值",
+    "chargeFail": "充值处理失败",
+    "chargeSuccess": "{bean} Bean 充值完成！",
+    "chargeTitle": "Bean 充值",
+    "customLabel": "手动输入 (Bean)",
+    "loading": "加载中…",
+    "loginRequired": "登录后方可使用",
+    "minCharge": "最低可充值 {min} Bean (1π)，且为整数",
+    "myBalance": "我的 Bean 余额",
+    "piBrowserHint": "Bean 充值仅限在 Pi Browser 中进行",
+    "piBrowserOnly": "仅限在 Pi Browser 中充值",
+    "rateHint": "1 Pi = {per} Bean (固定)",
+    "title": "Bean 钱包",
+    "txnEmpty": "无交易记录",
+    "txnTitle": "交易记录",
+    "type": {
+      "CHARGE": "充值",
+      "REFUND": "退款",
+      "REWARD": "奖励",
+      "SPEND": "使用",
+      "TRANSFER": "转移"
+    }
+  },
   "board": {
     "adopted": "采纳",
     "adoptedComplete": "已采纳",
@@ -805,6 +936,9 @@
     "postContent": "内容",
     "postTitle": "标题",
     "saving": "正在修改…",
+    "searchAllPlaceholder": "所有 Board 综合搜索…",
+    "searching": "搜索中…",
+    "searchNoResults": "没有搜索结果",
     "searchPlaceholder": "搜索标题或内容",
     "submitPost": "发布",
     "title": "公告板",
@@ -981,10 +1115,12 @@
       "myCafes": "我的 Cafe",
       "noCafes": "尚未参与任何 Cafe",
       "noCafesHint": "+ 通过创建 Cafe 开启第一个房间",
+      "private": "私密",
       "regularCafes": "普通 Cafe",
       "scrollMore": "滚动查看更多…",
       "subscriptionCafes": "订阅 Cafe",
-      "subtitle": "Pi 社区主题 Cafe"
+      "subtitle": "Pi 社区主题 Cafe",
+      "unlimited": "无限期"
     },
     "localeSelect": {
       "autoLocked": "🔒 订阅特权自动翻译",
@@ -1663,6 +1799,7 @@
     "loginRequired": "Login 后才能使用",
     "myItemsTitle": "我的商品管理",
     "myOwnItem": "我注册的商品",
+    "navBean": "☕ Bean 钱包",
     "navHistory": "交易记录",
     "navigateGoogle": "前往 Google Map",
     "navigateKakao": "Kakao Map",
@@ -1770,6 +1907,58 @@
     "viewCount": "浏览 {count}",
     "waitingBuyerConfirm": "正在等待买家确认收货",
     "waitingSellerComplete": "正在等待卖家处理交易完成"
+  },
+  "subscribe": {
+    "active": "已订阅",
+    "annual": "年度",
+    "annualBadge": "2个月免费",
+    "annualNudge": "切换至年度订阅可享 {months}个月免费（约节省 {pct}%）",
+    "annualSave": "年度支付可节省 {bean}☕ — {months}个月免费！🎉",
+    "backHome": "返回主页",
+    "charge": "充值 Bean",
+    "cycleHeading": "选择支付周期",
+    "expireAt": "到期日: {date}",
+    "feat": {
+      "PICAFE": [
+        "免除创建高级·活动 Cafe 费用",
+        "免除进入高级·活动 Cafe 费用"
+      ],
+      "PISHOP": [
+        "商品曝光费用免除",
+        "Premium 商品创建费用免除",
+        "提供等级商品数量限制"
+      ],
+      "TRANSLATE": [
+        "消息自动翻译无限次",
+        "非订阅用户 1次 1 ☕ → 订阅用户无限次免费"
+      ]
+    },
+    "insufficient": "Bean 余额不足 — 请先充值",
+    "loading": "加载中…",
+    "loginRequired": "登录后方可使用",
+    "monthly": "每月",
+    "myBalance": "我的 Bean 余额",
+    "notice": "订阅费将从充值的 Bean 中扣除。年度订阅可享2个月免费。不可兑换现金·仅限平台使用。",
+    "perMonth": "月",
+    "perYear": "年",
+    "processing": "处理中…",
+    "product": {
+      "PICAFE": "PiCafe 订阅",
+      "PISHOP": "PiShop 订阅",
+      "TRANSLATE": "自动翻译订阅"
+    },
+    "renewBtn": "续订/更改",
+    "storeGrade": {
+      "L": "L (50个↑)",
+      "M": "M (50个↓)",
+      "S": "S (30个↓)"
+    },
+    "storeGradeHint": "我的商品 {count}个 — 请选择等级",
+    "subscribeBtn": "订阅",
+    "subscribeFail": "订阅处理失败",
+    "subscribeSuccess": "{product} 订阅已开始！",
+    "tagline": "订阅 = 按次计费免除套餐。用得越多越划算！",
+    "title": "Cafe.pi 订阅"
   },
   "themeToggle": {
     "dark": "Dark",

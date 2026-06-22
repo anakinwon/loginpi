@@ -40,8 +40,47 @@
       "schedManualWhen": "Wanneer die administrateur dit met 'n knoppie op hierdie bladsy uitvoer",
       "schedOndemandDesc": "Vandag (UTC) statistiekry op-aanvraag opdatering — outomatiese uitvoering, nie 'n handmatige taak nie",
       "schedOndemandWhen": "Wanneer die administrateur die statistiek Dashboard besoek of die navraagperiode verander",
+      "schedOrderBackfillDesc": "A2U grootmaat vereffening van voltooide bestellings (geen release_txid) aan verkopers — /api/admin/store/settle",
+      "schedOrderBackfillWhen": "Wanneer administrateur onvereffende vereffening uitvoer",
+      "schedOrderCronDesc": "Outomatiese transaksie voltooiing vir bestellings wat 5 minute na produkvoorbereiding (READY) verloop het + outomatiese A2U-skikking vir verkopers",
+      "schedOrderCronWhen": "Elke 5 minute (Vercel Cron */5)",
       "scheduleDesc": "Selfs al word dit nie handmatig uitgevoer nie, word die uitvoergeskiedenis outomaties volgens die onderstaande skedule aangeteken",
       "scheduleTitle": "Outomatiese Taakskedule",
+      "settleA2uDisabled": "⚠️ A2U gedeaktiveer — selfs al word dit uitgevoer, sal dit nie oorgeplaas word nie en sal dit slegs as 'hangende vereffening' bly (PI_WALLET_PRIVATE_SEED moet nagegaan word)",
+      "settleColAmount": "Bedrag (π)",
+      "settleColBuyer": "Koper",
+      "settleColCcy": "Plaaslike geldeenheid",
+      "settleColDate": "Verkoopdatum",
+      "settleColLinked": "Pi gekoppel",
+      "settleColSelect": "Kies",
+      "settleColSeller": "Verkoper",
+      "settleColSettledAt": "Vereffeningstyd",
+      "settleColStatus": "Vereffeningstatus",
+      "settleColTxid": "Oordrag txid",
+      "settleConfirm": "Werklike Pi sal oorgeplaas word vir {count} onvereffende items. Wil jy voortgaan?",
+      "settledEmpty": "Geen voltooide vereffeninggeskiedenis nie",
+      "settleDesc": "Vereffen bestellings wat voltooi is, maar nog nie aan verkopers oorgeplaas is nie, met A2U (regte Pi). Vir die herstel van vorige/mislukte gevalle wat die 5-minute cron gemis het.",
+      "settledSummary": "{count} voltooide vereffening",
+      "settledTitle": "Lys van voltooide vereffening",
+      "settleEmpty": "Geen onvereffende bestellings nie ✅",
+      "settleError": "Vereffening misluk: {msg}",
+      "settleLinkedNo": "Nie gekoppel nie (oordrag onmoontlik)",
+      "settleLinkedYes": "Gekoppel",
+      "settleLoad": "Laai Onvereffende Lys",
+      "settleLoading": "Besig om te laai…",
+      "settleNeedTitle": "Lys van benodigde hervereffening",
+      "settleResult": "Vereffening voltooi {settled}/{attempted} items",
+      "settleRun": "Voer hervereffening uit (Werklike oordrag)",
+      "settleRunning": "Besig om te vereffen…",
+      "settleSelectedSummary": "{count} geselekteerde items · Totaal {total}π",
+      "settleStDisabled": "A2U gedeaktiveer",
+      "settleStFailed": "Hervereffening misluk",
+      "settleStNoUid": "Nie gekoppel nie",
+      "settleStSettled": "Hervereffen",
+      "settleStUnsettled": "Onvereffen",
+      "settleSummary": "{count} onvereffende items · Totaal {total}π",
+      "settleTitle": "Onvereffende Verkoper Vereffening",
+      "settleTxidCopied": "Oordrag txid gekopieer",
       "success": "{date} aggregasie voltooi",
       "title": "On-demand Batch",
       "to": "Einddatum",
@@ -138,7 +177,15 @@
     "nav": {
       "backHome": "← Na Tuis",
       "batch": "On-demand Batch",
+      "beanAudit": "Audit Log",
+      "beanFeePlan": "Fooiplanbestuur",
+      "beanSection": "☕ Bean Ekonomie",
+      "beanToken": "Bean Dashboard",
+      "beanTopUsers": "Topgebruikers",
+      "beanTxn": "Transaksiegeskiedenis",
+      "beanWallets": "Beursie Bestuur",
       "board": "Board Bestuur",
+      "campaign": "Veldtog Goedkeuring",
       "chatSection": "Kafee Bestuur",
       "dashboard": "Dashboard",
       "eventExclude": "Bestuur uitsluitings",
@@ -148,6 +195,7 @@
       "i18nSection": "Meertalig",
       "links": "Rekeningkoppelingsstatus",
       "payments": "Betalingsgeskiedenis",
+      "settle": "Vereffening Bestuur",
       "stats": "Statistiek",
       "stdApprovals": "Goedkeurings Workflow",
       "stdAudit": "Veranderingsgeskiedenis",
@@ -160,6 +208,7 @@
       "storeCategories": "Produk Category",
       "storeSection": "Store Bestuur",
       "subscriptions": "Intekening Bestuur",
+      "themes": "Tema Bestuur",
       "title": "Admin",
       "users": "Gebruikersbestuur"
     },
@@ -190,6 +239,7 @@
       "title": "Betalingsgeskiedenis",
       "totalCount": "Totaal {count} items · Voltooide totaal {total} π",
       "txnDiv": {
+        "BEAN_CHARGE": "Bean Charge",
         "BET": "Weddenskap",
         "BOND_DEPOSIT": "Borgdeposito",
         "CANCEL_FEE": "Kansellasiefooi",
@@ -456,6 +506,61 @@
         "useY": "Aktief",
         "validationRequired": "Category naam is verpligtend"
       }
+    },
+    "themes": {
+      "col": {
+        "cd": "Kode",
+        "desc": "Beskrywing",
+        "sortOrd": "Volgorde",
+        "theme": "Tema",
+        "tp": "Groep",
+        "useYn": "Blootstelling"
+      },
+      "deleteConfirm": "Wil jy die '{name}' tema uitvee? (Bestaande kafees sal behou word)",
+      "deleteFail": "Kon nie uitvee nie",
+      "deleteSuccess": "Tema is uitgevee",
+      "editSuccess": "Tema is gewysig",
+      "emojiGroup": {
+        "daily": "Daagliks·Algemeen",
+        "emphasis": "Emosie·Klem",
+        "sports": "Sport"
+      },
+      "emojiSuggest": "Voorgestel:",
+      "field": {
+        "cd": "Tema Kode",
+        "desc": "Beskrywing·Tag",
+        "emoji": "Emoji",
+        "nm": "Tema Naam",
+        "sortOrd": "Sorteervolgorde",
+        "tp": "Groep",
+        "useYn": "Blootstelling"
+      },
+      "formTitleEdit": "Wysig Tema",
+      "formTitleNew": "Registreer Nuwe Tema",
+      "noData": "Geen temas geregistreer nie",
+      "placeholder": {
+        "cd": "ESPORTS",
+        "desc": "#Tag #Sleutelwoord",
+        "nm": "e-sport"
+      },
+      "saveFail": "Kon nie stoor nie",
+      "saveSuccess": "Tema is geregistreer",
+      "searchPlaceholder": "Soek Tema Kode·Naam",
+      "selectTp": {
+        "basic": "Basies (BASIC)",
+        "premium": "Premium (PREMIUM)"
+      },
+      "title": "Tema Bestuur",
+      "totalCount": "Totaal {count} Temas",
+      "tpFilter": {
+        "all": "Alles",
+        "basic": "Basies",
+        "premium": "Premium"
+      },
+      "useYnOff": "Versteek",
+      "useYnOn": "Blootgestel",
+      "validationCd": "Tema Kode moet 'n kombinasie van 1-20 hoofletters, syfers en _ wees",
+      "validationRequired": "Tema Naam en Emoji is verpligtend"
     },
     "users": {
       "changeFail": "Verandering misluk",
@@ -744,6 +849,32 @@
       "wallet": "Beursie-adres"
     }
   },
+  "bean": {
+    "backToStore": "Terug na PiShop",
+    "buying": "Betaling tans aan die gang…",
+    "chargeBtn": "Laai op",
+    "chargeFail": "Oplaai verwerking het misluk",
+    "chargeSuccess": "{bean} Bean-oplaai voltooi!",
+    "chargeTitle": "Laai Bean op",
+    "customLabel": "Voer self in (Bean)",
+    "loading": "Laai tans…",
+    "loginRequired": "Beskikbaar na aanmelding",
+    "minCharge": "Kan opgelaai word met 'n minimum van {min} Bean (1π) as 'n heelgetal",
+    "myBalance": "My Bean-saldo",
+    "piBrowserHint": "Bean-oplaai is slegs moontlik in Pi Browser",
+    "piBrowserOnly": "Kan slegs in Pi Browser opgelaai word",
+    "rateHint": "1 Pi = {per} Bean (vas)",
+    "title": "Bean Wallet",
+    "txnEmpty": "Geen transaksiegeskiedenis nie",
+    "txnTitle": "Transaksiegeskiedenis",
+    "type": {
+      "CHARGE": "Oplaai",
+      "REFUND": "terugbetaling",
+      "REWARD": "Beloning",
+      "SPEND": "Gebruik",
+      "TRANSFER": "oordrag"
+    }
+  },
   "board": {
     "adopted": "Aanvaar",
     "adoptedComplete": "Aanneming voltooi",
@@ -805,6 +936,9 @@
     "postContent": "Inhoud",
     "postTitle": "Titel",
     "saving": "Besig om te stoor…",
+    "searchAllPlaceholder": "Geïntegreerde soektog vir alle Boards…",
+    "searching": "Besig om te soek…",
+    "searchNoResults": "Geen soekresultate nie",
     "searchPlaceholder": "Soek Titel of inhoud",
     "submitPost": "Dien in",
     "title": "Board",
@@ -981,10 +1115,12 @@
       "myCafes": "My Cafes",
       "noCafes": "Geen Cafes waaraan tans deelgeneem word nie",
       "noCafesHint": "+ Probeer die eerste kamer oopmaak deur 'n Cafe te skep",
+      "private": "Privaat",
       "regularCafes": "Regular Cafes",
       "scrollMore": "Rollees om meer te sien...",
       "subscriptionCafes": "Subscription Cafes",
-      "subtitle": "Pi Community Theme Cafe"
+      "subtitle": "Pi Community Theme Cafe",
+      "unlimited": "Onbeperk"
     },
     "localeSelect": {
       "autoLocked": "🔒 Intekeningvoordeel Outomatiese vertaling",
@@ -1663,6 +1799,7 @@
     "loginRequired": "Beskikbaar na aanmelding",
     "myItemsTitle": "Bestuur my items",
     "myOwnItem": "Dit is my eie geregistreerde Item",
+    "navBean": "☕ Bean beursie",
     "navHistory": "Transaksiegeskiedenis",
     "navigateGoogle": "Gaan met Google Map",
     "navigateKakao": "Kakao Map",
@@ -1770,6 +1907,58 @@
     "viewCount": "Besigtigings {count}",
     "waitingBuyerConfirm": "Wag vir koper se ontvangsbevestiging",
     "waitingSellerComplete": "Wag vir verkoper om transaksie te voltooi"
+  },
+  "subscribe": {
+    "active": "Aktief",
+    "annual": "Jaarliks",
+    "annualBadge": "2 maande gratis",
+    "annualNudge": "Skakel oor na jaarliks en kry {months} maande gratis (ongeveer {pct}% besparing)",
+    "annualSave": "Bespaar {bean}☕ met jaarlikse betaling — {months} maande gratis! 🎉",
+    "backHome": "Terug na Tuis",
+    "charge": "Laai Bean",
+    "cycleHeading": "Kies jou betaalsiklus",
+    "expireAt": "Verval op: {date}",
+    "feat": {
+      "PICAFE": [
+        "Vrystelling van fooie vir die skep van Premium- en Event-Cafe's",
+        "Vrystelling van toegangsgelde vir Premium- en Event-Cafe's"
+      ],
+      "PISHOP": [
+        "Vrystelling van Produkblootstellingsfooi",
+        "Premium Product Creation Fee Exemption",
+        "Voorsiening van Produkhoeveelheidsbeperking per Graad"
+      ],
+      "TRANSLATE": [
+        "Onbeperkte outomatiese Message-vertaling",
+        "Nie-ingeskryf 1 keer 1 ☕ → Ingeskryf onbeperk gratis"
+      ]
+    },
+    "insufficient": "Onvoldoende Bean-saldo — laai asseblief eers op",
+    "loading": "Besig om te laai…",
+    "loginRequired": "Beskikbaar na aanmelding",
+    "monthly": "Maandeliks",
+    "myBalance": "My Bean-saldo",
+    "notice": "Inskrywingsfooi word van gelaaide Bean afgetrek. Jaarliks is 2 maande gratis. Nie-terugbetaalbaar · Slegs vir platformgebruik.",
+    "perMonth": "per maand",
+    "perYear": "per jaar",
+    "processing": "Verwerk tans…",
+    "product": {
+      "PICAFE": "PiCafe Inskrywing",
+      "PISHOP": "PiShop Subscription",
+      "TRANSLATE": "Outomatiese Vertaling Inskrywing"
+    },
+    "renewBtn": "Hernu/Verander",
+    "storeGrade": {
+      "L": "L (50↑)",
+      "M": "M (50↓)",
+      "S": "S (30↓)"
+    },
+    "storeGradeHint": "My produkte {count} — kies 'n graad",
+    "subscribeBtn": "Teken in",
+    "subscribeFail": "Inskrywing verwerking het misluk",
+    "subscribeSuccess": "{product} inskrywing het begin!",
+    "tagline": "Subskripsie = pakket vir vrystelling van fooie per item. Hoe meer jy gebruik, hoe meer voordeel!",
+    "title": "Cafe.pi Subskripsie"
   },
   "themeToggle": {
     "dark": "Dark",

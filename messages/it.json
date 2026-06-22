@@ -40,8 +40,47 @@
       "schedManualWhen": "Quando l'amministratore esegue tramite pulsante su questa pagina",
       "schedOndemandDesc": "Aggiornamento on-demand delle righe statistiche di oggi (UTC) — Esecuzione automatica, non un'operazione manuale",
       "schedOndemandWhen": "Quando si accede alla Dashboard delle statistiche dell'amministratore o si modifica il periodo di visualizzazione",
+      "schedOrderBackfillDesc": "Regolamento A2U in batch per i venditori di ordini completati non saldati (senza release_txid) — /api/admin/store/settle",
+      "schedOrderBackfillWhen": "Quando l'amministratore esegue il regolamento non saldato",
+      "schedOrderCronDesc": "Completamento automatico delle transazioni per gli ordini con stato 'Pronto per la spedizione' (READY) dopo 5 minuti + liquidazione automatica dell'escrow A2U al venditore.",
+      "schedOrderCronWhen": "Ogni 5 minuti (Vercel Cron */5)",
       "scheduleDesc": "Anche se non eseguito direttamente, la cronologia di esecuzione viene registrata automaticamente secondo lo schedule sottostante",
       "scheduleTitle": "Schedule Job Automatico",
+      "settleA2uDisabled": "⚠️ A2U disabilitato — L'esecuzione non trasferirà fondi, rimarrà solo in attesa di regolamento (È necessario controllare PI_WALLET_PRIVATE_SEED)",
+      "settleColAmount": "Importo (π)",
+      "settleColBuyer": "Acquirente",
+      "settleColCcy": "Valuta locale",
+      "settleColDate": "Data di vendita",
+      "settleColLinked": "Collegamento Pi",
+      "settleColSelect": "Seleziona",
+      "settleColSeller": "Venditore",
+      "settleColSettledAt": "Data/ora regolamento",
+      "settleColStatus": "Stato regolamento",
+      "settleColTxid": "Txid trasferimento",
+      "settleConfirm": "Trasferire Pi reale per {count} ordini non saldati. Procedere?",
+      "settledEmpty": "Nessun dettaglio di regolamento completato",
+      "settleDesc": "Regola gli ordini completati ma non ancora trasferiti ai venditori tramite A2U (Pi reale). Per recuperare casi passati o falliti che il cron di 5 minuti non ha gestito.",
+      "settledSummary": "{count} regolati",
+      "settledTitle": "Elenco regolato",
+      "settleEmpty": "Nessun ordine non saldato ✅",
+      "settleError": "Regolamento fallito: {msg}",
+      "settleLinkedNo": "Non collegato (trasferimento impossibile)",
+      "settleLinkedYes": "Collegato",
+      "settleLoad": "Carica elenco non saldato",
+      "settleLoading": "Caricamento…",
+      "settleNeedTitle": "Elenco da regolare di nuovo",
+      "settleResult": "Regolamento completato {settled}/{attempted}",
+      "settleRun": "Esegui regolamento di nuovo (trasferimento reale)",
+      "settleRunning": "Regolamento in corso…",
+      "settleSelectedSummary": "{count} selezionati · Totale {total}π",
+      "settleStDisabled": "A2U disabilitato",
+      "settleStFailed": "Regolamento fallito",
+      "settleStNoUid": "Non collegato",
+      "settleStSettled": "Regolato di nuovo",
+      "settleStUnsettled": "Non saldato",
+      "settleSummary": "{count} non saldati · Totale {total}π",
+      "settleTitle": "Regolamento venditore non saldato",
+      "settleTxidCopied": "Txid trasferimento copiato",
       "success": "Aggregazione di {date} completata",
       "title": "Batch On-demand",
       "to": "Data di fine",
@@ -138,7 +177,15 @@
     "nav": {
       "backHome": "← Alla Home",
       "batch": "Batch On-demand",
+      "beanAudit": "Log di Audit",
+      "beanFeePlan": "Gestione piani tariffari",
+      "beanSection": "☕ Economia Bean",
+      "beanToken": "Bean Dashboard",
+      "beanTopUsers": "Utenti principali",
+      "beanTxn": "Cronologia Transazioni",
+      "beanWallets": "Gestione Portafogli",
       "board": "Gestione Board",
+      "campaign": "Approvazione Campagne",
       "chatSection": "Gestione Cafe",
       "dashboard": "Dashboard",
       "eventExclude": "Gestisci esclusione",
@@ -148,6 +195,7 @@
       "i18nSection": "Multilingua",
       "links": "Stato collegamento account",
       "payments": "Storico pagamenti",
+      "settle": "Gestione Liquidazioni",
       "stats": "Statistiche",
       "stdApprovals": "Workflow di approvazione",
       "stdAudit": "Storico modifiche",
@@ -160,6 +208,7 @@
       "storeCategories": "Category prodotti",
       "storeSection": "Gestione Store",
       "subscriptions": "Gestione Abbonamenti",
+      "themes": "Gestione Temi",
       "title": "Admin",
       "users": "Gestione utenti"
     },
@@ -190,6 +239,7 @@
       "title": "Storico pagamenti",
       "totalCount": "Totale {count} transazioni · Completato {total} π",
       "txnDiv": {
+        "BEAN_CHARGE": "Ricarica Bean",
         "BET": "Scommessa",
         "BOND_DEPOSIT": "Deposito cauzionale",
         "CANCEL_FEE": "Commissione di annullamento",
@@ -456,6 +506,61 @@
         "useY": "In uso",
         "validationRequired": "Il nome della Category è obbligatorio"
       }
+    },
+    "themes": {
+      "col": {
+        "cd": "Codice",
+        "desc": "Descrizione",
+        "sortOrd": "Ordine",
+        "theme": "Tema",
+        "tp": "Gruppo",
+        "useYn": "Visibilità"
+      },
+      "deleteConfirm": "Eliminare il tema '{name}'? (I caffè esistenti rimarranno.)",
+      "deleteFail": "Eliminazione fallita.",
+      "deleteSuccess": "Tema eliminato con successo.",
+      "editSuccess": "Tema modificato con successo.",
+      "emojiGroup": {
+        "daily": "Quotidiano·Generale",
+        "emphasis": "Emozione·Enfasi",
+        "sports": "Sport"
+      },
+      "emojiSuggest": "Suggerimento:",
+      "field": {
+        "cd": "Codice Tema",
+        "desc": "Descrizione·Tag",
+        "emoji": "Emoji",
+        "nm": "Nome Tema",
+        "sortOrd": "Ordine di Ordinamento",
+        "tp": "Gruppo",
+        "useYn": "Visibilità"
+      },
+      "formTitleEdit": "Modifica tema",
+      "formTitleNew": "Registra nuovo tema",
+      "noData": "Nessun tema registrato",
+      "placeholder": {
+        "cd": "ESPORTS",
+        "desc": "#Tag #ParoleChiave",
+        "nm": "eSports"
+      },
+      "saveFail": "Salvataggio fallito.",
+      "saveSuccess": "Tema registrato con successo.",
+      "searchPlaceholder": "Cerca codice tema·nome",
+      "selectTp": {
+        "basic": "Base (BASIC)",
+        "premium": "Premium (PREMIUM)"
+      },
+      "title": "Gestione Temi",
+      "totalCount": "Totale {count} Temi",
+      "tpFilter": {
+        "all": "Tutti",
+        "basic": "Base",
+        "premium": "Premium"
+      },
+      "useYnOff": "Nascosto",
+      "useYnOn": "Visibile",
+      "validationCd": "Il codice del tema deve essere una combinazione di lettere maiuscole, numeri e _ da 1 a 20 caratteri.",
+      "validationRequired": "Il nome del tema e l'emoji sono obbligatori."
     },
     "users": {
       "changeFail": "Modifica fallita",
@@ -744,6 +849,32 @@
       "wallet": "Indirizzo portafoglio"
     }
   },
+  "bean": {
+    "backToStore": "Torna a PiShop",
+    "buying": "Pagamento in corso…",
+    "chargeBtn": "Ricarica",
+    "chargeFail": "Impossibile elaborare la ricarica",
+    "chargeSuccess": "Ricarica di {bean} Bean completata!",
+    "chargeTitle": "Ricarica Bean",
+    "customLabel": "Inserisci manualmente (Bean)",
+    "loading": "Caricamento in corso…",
+    "loginRequired": "Disponibile dopo il login",
+    "minCharge": "Puoi ricaricare un minimo di {min} Bean (1π) in numeri interi",
+    "myBalance": "Il mio saldo Bean",
+    "piBrowserHint": "La ricarica dei Bean è possibile solo in Pi Browser",
+    "piBrowserOnly": "La ricarica è possibile solo in Pi Browser",
+    "rateHint": "1 Pi = {per} Bean (fisso)",
+    "title": "Portafoglio Bean",
+    "txnEmpty": "Nessuna cronologia transazioni",
+    "txnTitle": "Cronologia transazioni",
+    "type": {
+      "CHARGE": "Ricarica",
+      "REFUND": "Rimborso",
+      "REWARD": "Ricompensa",
+      "SPEND": "Spesa",
+      "TRANSFER": "Trasferimento"
+    }
+  },
   "board": {
     "adopted": "Adottato",
     "adoptedComplete": "Adozione completata",
@@ -805,6 +936,9 @@
     "postContent": "Contenuto",
     "postTitle": "Titolo",
     "saving": "Salvataggio in corso…",
+    "searchAllPlaceholder": "Ricerca integrata in tutte le Board…",
+    "searching": "Ricerca in corso…",
+    "searchNoResults": "Nessun risultato di ricerca",
     "searchPlaceholder": "Cerca titolo o contenuto",
     "submitPost": "Invia",
     "title": "Board",
@@ -981,10 +1115,12 @@
       "myCafes": "I miei Cafe",
       "noCafes": "Non partecipi ancora a nessun Cafe",
       "noCafesHint": "+ Crea un Cafe per aprire la tua prima stanza",
+      "private": "Privato",
       "regularCafes": "Cafe regolari",
       "scrollMore": "Scorri per vedere altro…",
       "subscriptionCafes": "Cafe in abbonamento",
-      "subtitle": "Cafe a tema della Comunità Pi"
+      "subtitle": "Cafe a tema della Comunità Pi",
+      "unlimited": "Illimitato"
     },
     "localeSelect": {
       "autoLocked": "🔒 Vantaggio abbonamento Traduzione automatica",
@@ -1663,6 +1799,7 @@
     "loginRequired": "Accesso richiesto",
     "myItemsTitle": "Gestisci i miei articoli",
     "myOwnItem": "Questo è un articolo che ho registrato",
+    "navBean": "☕ Portafoglio Bean",
     "navHistory": "Cronologia delle transazioni",
     "navigateGoogle": "Vai con Google Maps",
     "navigateKakao": "Mappa Kakao",
@@ -1770,6 +1907,58 @@
     "viewCount": "Visualizzazioni {count}",
     "waitingBuyerConfirm": "In attesa della conferma di ricezione da parte dell'acquirente.",
     "waitingSellerComplete": "In attesa dell'elaborazione del completamento della transazione da parte del venditore."
+  },
+  "subscribe": {
+    "active": "Abbonato",
+    "annual": "Annuale",
+    "annualBadge": "2 mesi gratis",
+    "annualNudge": "Passa all'annuale e ottieni {months} mesi gratis (risparmia circa il {pct}%)",
+    "annualSave": "Risparmia {bean}☕ con il pagamento annuale — {months} mesi gratis! 🎉",
+    "backHome": "Torna alla Home",
+    "charge": "Ricarica Bean",
+    "cycleHeading": "Seleziona il ciclo di pagamento",
+    "expireAt": "Scadenza: {date}",
+    "feat": {
+      "PICAFE": [
+        "Esente dalla tariffa di creazione di caffè premium/evento",
+        "Esente dalla tariffa di ingresso ai caffè premium/evento"
+      ],
+      "PISHOP": [
+        "Esenzione dalla tariffa di esposizione del prodotto",
+        "Esenzione dalla tariffa di creazione del prodotto Premium",
+        "Limite al numero di prodotti per livello"
+      ],
+      "TRANSLATE": [
+        "Traduzione automatica dei messaggi illimitata",
+        "Non abbonato 1 ☕ per utilizzo → Abbonato illimitato gratis"
+      ]
+    },
+    "insufficient": "Saldo Bean insufficiente — ricarica prima",
+    "loading": "Caricamento…",
+    "loginRequired": "Disponibile dopo il login",
+    "monthly": "Mensile",
+    "myBalance": "Il mio saldo Bean",
+    "notice": "La quota di abbonamento verrà detratta dai Bean ricaricati. L'annuale include 2 mesi gratis. Non rimborsabile · Solo per l'uso della piattaforma.",
+    "perMonth": "al mese",
+    "perYear": "all'anno",
+    "processing": "Elaborazione in corso…",
+    "product": {
+      "PICAFE": "Abbonamento PiCafe",
+      "PISHOP": "Abbonamento PiShop",
+      "TRANSLATE": "Abbonamento Traduzione Automatica"
+    },
+    "renewBtn": "Rinnova/Modifica",
+    "storeGrade": {
+      "L": "L (50↑)",
+      "M": "M (50↓)",
+      "S": "S (30↓)"
+    },
+    "storeGradeHint": "I miei prodotti {count} — Seleziona il grado",
+    "subscribeBtn": "Abbonati",
+    "subscribeFail": "Impossibile elaborare l'abbonamento",
+    "subscribeSuccess": "L'abbonamento a {product} è iniziato!",
+    "tagline": "Abbonamento = pacchetto esente da costi per transazione. Più lo usi, più risparmi!",
+    "title": "Abbonamento Cafe.pi"
   },
   "themeToggle": {
     "dark": "Dark",

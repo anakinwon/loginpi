@@ -40,8 +40,47 @@
       "schedManualWhen": "عند تشغيله بواسطة المسؤول باستخدام زر في هذه الصفحة",
       "schedOndemandDesc": "تحديث صف إحصائيات اليوم (UTC) عند الطلب — يتم تشغيله تلقائيًا وليس يدويًا",
       "schedOndemandWhen": "عند الوصول إلى Dashboard إحصائيات المسؤول أو تغيير فترة العرض",
+      "schedOrderBackfillDesc": "تسوية دفعات A2U مجمعة للطلبات المكتملة (التي لا تحتوي على release_txid) غير المسددة للبائعين — /api/admin/store/settle",
+      "schedOrderBackfillWhen": "عندما يقوم المسؤول بتشغيل تسوية غير مسددة",
+      "schedOrderCronDesc": "إتمام المعاملة تلقائيًا للطلبات اللي عدى عليها 5 دقايق من جاهزية المنتج (READY) + تسوية Escrow A2U تلقائية للبائع",
+      "schedOrderCronWhen": "كل 5 دقايق (Vercel Cron */5)",
       "scheduleDesc": "يتم تسجيل سجلات التشغيل تلقائيًا وفقًا للجدول الزمني أدناه، حتى لو لم يتم تشغيلها يدويًا.",
       "scheduleTitle": "جدول المهام التلقائية",
+      "settleA2uDisabled": "⚠️ A2U معطل — لن يتم التحويل حتى لو تم تشغيله، وسيبقى في انتظار التسوية فقط (تحقق من PI_WALLET_PRIVATE_SEED مطلوب)",
+      "settleColAmount": "المبلغ (π)",
+      "settleColBuyer": "المشتري",
+      "settleColCcy": "العملة المحلية",
+      "settleColDate": "تاريخ البيع",
+      "settleColLinked": "ربط Pi",
+      "settleColSelect": "تحديد",
+      "settleColSeller": "البائع",
+      "settleColSettledAt": "تاريخ ووقت التسوية",
+      "settleColStatus": "حالة التسوية",
+      "settleColTxid": "معرف التحويل txid",
+      "settleConfirm": "سيتم تحويل Pi حقيقي لـ {count} من الطلبات غير المسددة. هل تريد المتابعة؟",
+      "settledEmpty": "لا توجد سجلات تسوية مكتملة",
+      "settleDesc": "تسوية الطلبات المكتملة التي لم يتم تحويلها بعد للبائعين باستخدام A2U (Pi حقيقي). لاستعادة الحالات السابقة أو الفاشلة التي لم يتم التعامل معها بواسطة cron كل 5 دقائق.",
+      "settledSummary": "{count} تسوية مكتملة",
+      "settledTitle": "قائمة التسويات المكتملة",
+      "settleEmpty": "لا توجد طلبات غير مسددة ✅",
+      "settleError": "فشلت التسوية: {msg}",
+      "settleLinkedNo": "غير مرتبطة (لا يمكن التحويل)",
+      "settleLinkedYes": "مرتبطة",
+      "settleLoad": "تحميل قائمة غير المسددة",
+      "settleLoading": "جاري التحميل…",
+      "settleNeedTitle": "قائمة تحتاج إلى تسوية",
+      "settleResult": "تمت التسوية {settled}/{attempted}",
+      "settleRun": "تشغيل التسوية (تحويل حقيقي)",
+      "settleRunning": "جاري التسوية…",
+      "settleSelectedSummary": "{count} مختارة · إجمالي {total}π",
+      "settleStDisabled": "A2U معطل",
+      "settleStFailed": "فشلت التسوية",
+      "settleStNoUid": "غير مرتبطة",
+      "settleStSettled": "تمت التسوية",
+      "settleStUnsettled": "غير مسددة",
+      "settleSummary": "{count} غير مسددة · إجمالي {total}π",
+      "settleTitle": "تسوية غير مسددة للبائعين",
+      "settleTxidCopied": "تم نسخ معرف التحويل txid",
       "success": "تم تجميع {date}",
       "title": "Batch عند الطلب",
       "to": "تاريخ الانتهاء",
@@ -138,7 +177,15 @@
     "nav": {
       "backHome": "← للرئيسية",
       "batch": "Batch عند الطلب",
+      "beanAudit": "مراجعة Log",
+      "beanFeePlan": "إدارة Fee Plan",
+      "beanSection": "اقتصاد Bean ☕",
+      "beanToken": "Dashboard Bean",
+      "beanTopUsers": "أعلى المستخدمين",
+      "beanTxn": "سجل المعاملات",
+      "beanWallets": "إدارة المحافظ",
       "board": "إدارة Board",
+      "campaign": "الموافقة على Campaign",
       "chatSection": "إدارة الكافيه",
       "dashboard": "Dashboard",
       "eventExclude": "إدارة الاستثناءات",
@@ -148,6 +195,7 @@
       "i18nSection": "اللغات المتعددة",
       "links": "حالة ربط الحسابات",
       "payments": "سجل المدفوعات",
+      "settle": "إدارة التسويات",
       "stats": "إحصائيات",
       "stdApprovals": "سير عمل الموافقات",
       "stdAudit": "سجل التغييرات",
@@ -160,6 +208,7 @@
       "storeCategories": "Product Category",
       "storeSection": "إدارة Store",
       "subscriptions": "إدارة الاشتراكات",
+      "themes": "إدارة Theme",
       "title": "Admin",
       "users": "إدارة المستخدمين"
     },
@@ -190,6 +239,7 @@
       "title": "سجل المدفوعات",
       "totalCount": "إجمالي {count} معاملة · إجمالي المكتمل {total} π",
       "txnDiv": {
+        "BEAN_CHARGE": "شحن Bean",
         "BET": "رهان",
         "BOND_DEPOSIT": "إيداع الضمان",
         "CANCEL_FEE": "رسوم الإلغاء",
@@ -456,6 +506,61 @@
         "useY": "مفعل",
         "validationRequired": "اسم الـ Category مطلوب"
       }
+    },
+    "themes": {
+      "col": {
+        "cd": "Code",
+        "desc": "الوصف",
+        "sortOrd": "الترتيب",
+        "theme": "Theme",
+        "tp": "Group",
+        "useYn": "عرض"
+      },
+      "deleteConfirm": "هل تريد حذف Theme '{name}'؟ (الكافيهات الموجودة هتفضل زي ما هي)",
+      "deleteFail": "فشل الحذف",
+      "deleteSuccess": "تم حذف Theme بنجاح",
+      "editSuccess": "تم تعديل Theme بنجاح",
+      "emojiGroup": {
+        "daily": "يومي وعام",
+        "emphasis": "مشاعر وتأكيد",
+        "sports": "Sports"
+      },
+      "emojiSuggest": "مقترح:",
+      "field": {
+        "cd": "Theme Code",
+        "desc": "وصف و Tag",
+        "emoji": "Emoji",
+        "nm": "اسم Theme",
+        "sortOrd": "ترتيب الفرز",
+        "tp": "Group",
+        "useYn": "عرض"
+      },
+      "formTitleEdit": "تعديل Theme",
+      "formTitleNew": "تسجيل Theme جديد",
+      "noData": "لا يوجد Theme مسجل",
+      "placeholder": {
+        "cd": "ESPORTS",
+        "desc": "#Tag #Keyword",
+        "nm": "e-sports"
+      },
+      "saveFail": "فشل الحفظ",
+      "saveSuccess": "تم تسجيل Theme بنجاح",
+      "searchPlaceholder": "ابحث عن Theme Code أو الاسم",
+      "selectTp": {
+        "basic": "أساسي (BASIC)",
+        "premium": "Premium (PREMIUM)"
+      },
+      "title": "إدارة Theme",
+      "totalCount": "إجمالي عدد الـ Themes: {count}",
+      "tpFilter": {
+        "all": "الكل",
+        "basic": "أساسي",
+        "premium": "Premium"
+      },
+      "useYnOff": "إخفاء",
+      "useYnOn": "عرض",
+      "validationCd": "Theme Code لازم يكون من 1 لـ 20 حرف، مكون من حروف إنجليزية كبيرة وأرقام و _",
+      "validationRequired": "اسم Theme و Emoji مطلوبين"
     },
     "users": {
       "changeFail": "فشل التغيير",
@@ -744,6 +849,32 @@
       "wallet": "عنوان المحفظة"
     }
   },
+  "bean": {
+    "backToStore": "العودة إلى PiShop",
+    "buying": "جاري عملية الدفع…",
+    "chargeBtn": "شحن",
+    "chargeFail": "فشل في معالجة الشحن",
+    "chargeSuccess": "تم شحن {bean} Bean بنجاح!",
+    "chargeTitle": "شحن Bean",
+    "customLabel": "إدخال يدوي (Bean)",
+    "loading": "جاري التحميل…",
+    "loginRequired": "يمكنك استخدامه بعد تسجيل الدخول",
+    "minCharge": "يمكنك شحن عدد صحيح من Bean بدءًا من {min} Bean (1π)",
+    "myBalance": "رصيد Bean الخاص بي",
+    "piBrowserHint": "شحن Bean متاح فقط في Pi Browser",
+    "piBrowserOnly": "يمكن الشحن فقط من خلال Pi Browser",
+    "rateHint": "1 Pi = {per} Bean (ثابت)",
+    "title": "محفظة Bean",
+    "txnEmpty": "لا يوجد سجل معاملات",
+    "txnTitle": "سجل المعاملات",
+    "type": {
+      "CHARGE": "شحن",
+      "REFUND": "استرداد",
+      "REWARD": "مكافأة",
+      "SPEND": "استخدام",
+      "TRANSFER": "تحويل"
+    }
+  },
   "board": {
     "adopted": "مقبول",
     "adoptedComplete": "تم القبول",
@@ -805,6 +936,9 @@
     "postContent": "المحتوى",
     "postTitle": "العنوان",
     "saving": "جاري التعديل...",
+    "searchAllPlaceholder": "بحث موحد في جميع الـ Boards…",
+    "searching": "جاري البحث…",
+    "searchNoResults": "لا توجد نتائج بحث",
     "searchPlaceholder": "ابحث عن العنوان أو Content",
     "submitPost": "إرسال",
     "title": "Board",
@@ -981,10 +1115,12 @@
       "myCafes": "My Cafes",
       "noCafes": "مافيش أي Cafe مشترك فيها لسه.",
       "noCafesHint": "+ ابدأ أول غرفة بإنشاء Cafe جديد.",
+      "private": "خاص",
       "regularCafes": "Regular Cafes",
       "scrollMore": "اسحب عشان تشوف أكتر…",
       "subscriptionCafes": "Subscription Cafes",
-      "subtitle": "Theme Cafe لمجتمع Pi"
+      "subtitle": "Theme Cafe لمجتمع Pi",
+      "unlimited": "غير محدود"
     },
     "localeSelect": {
       "autoLocked": "🔒 ترجمة تلقائية ميزة الاشتراك",
@@ -1663,6 +1799,7 @@
     "loginRequired": "يمكن استخدامه بعد تسجيل الدخول",
     "myItemsTitle": "إدارة سلعك",
     "myOwnItem": "هذا المنتج مسجل بواسطتي",
+    "navBean": "☕ محفظة Bean",
     "navHistory": "سجل المعاملات",
     "navigateGoogle": "انطلق بـ Google Map",
     "navigateKakao": "Kakao Map",
@@ -1770,6 +1907,58 @@
     "viewCount": "المشاهدات {count}",
     "waitingBuyerConfirm": "في انتظار تأكيد استلام المشتري.",
     "waitingSellerComplete": "في انتظار إتمام البائع للمعاملة."
+  },
+  "subscribe": {
+    "active": "مشترك حاليًا",
+    "annual": "سنوي",
+    "annualBadge": "شهرين مجانًا",
+    "annualNudge": "عند التحويل لسنوي، {months} شهر مجانًا (توفير حوالي {pct}%)",
+    "annualSave": "وفر {bean}☕ مع الدفع السنوي — {months} شهر مجانًا! 🎉",
+    "backHome": "العودة إلى الرئيسية",
+    "charge": "شحن Bean",
+    "cycleHeading": "اختر دورة الدفع",
+    "expireAt": "تاريخ الانتهاء: {date}",
+    "feat": {
+      "PICAFE": [
+        "إعفاء من رسوم إنشاء مقهى Premium/Event",
+        "إعفاء من رسوم دخول مقهى Premium/Event"
+      ],
+      "PISHOP": [
+        "إعفاء من رسوم عرض المنتجات",
+        "إعفاء من رسوم إنشاء المنتجات Premium",
+        "توفير حد لعدد المنتجات حسب الفئة"
+      ],
+      "TRANSLATE": [
+        "ترجمة الرسائل التلقائية غير محدودة",
+        "غير مشترك: 1 ☕ لكل مرة → مشترك: مجاني غير محدود"
+      ]
+    },
+    "insufficient": "رصيد Bean غير كافٍ — يرجى الشحن أولاً",
+    "loading": "جاري التحميل…",
+    "loginRequired": "يمكنك استخدامه بعد تسجيل الدخول",
+    "monthly": "شهري",
+    "myBalance": "رصيد Bean الخاص بي",
+    "notice": "سيتم خصم رسوم الاشتراك من رصيد Bean المشحون. الاشتراك السنوي شهرين مجانًا. غير قابل للاسترداد · للاستخدام داخل المنصة فقط.",
+    "perMonth": "شهريًا",
+    "perYear": "سنويًا",
+    "processing": "جاري المعالجة…",
+    "product": {
+      "PICAFE": "اشتراك PiCafe",
+      "PISHOP": "اشتراك PiShop",
+      "TRANSLATE": "اشتراك الترجمة التلقائية"
+    },
+    "renewBtn": "تجديد/تغيير",
+    "storeGrade": {
+      "L": "L (أكثر من 50)",
+      "M": "M (أقل من 50)",
+      "S": "S (أقل من 30)"
+    },
+    "storeGradeHint": "{count} منتج خاص بي — اختر الفئة",
+    "subscribeBtn": "اشترك الآن",
+    "subscribeFail": "فشل في معالجة الاشتراك",
+    "subscribeSuccess": "تم بدء اشتراك {product}!",
+    "tagline": "الاشتراك = باقة إعفاء من الرسوم لكل معاملة. كلما استخدمت أكثر، كلما ربحت أكثر!",
+    "title": "اشتراك Cafe.pi"
   },
   "themeToggle": {
     "dark": "Dark",

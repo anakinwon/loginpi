@@ -40,8 +40,47 @@
       "schedManualWhen": "When an administrator executes with a button on this page",
       "schedOndemandDesc": "Today's (UTC) statistics row on-demand update — Automatic execution, not a manual task",
       "schedOndemandWhen": "When accessing the Admin Statistics Dashboard or changing the query period",
+      "schedOrderBackfillDesc": "Batch settle A2U for completed orders (no release_txid) to sellers — /api/admin/store/settle",
+      "schedOrderBackfillWhen": "When Admin executes unsettled settlement",
+      "schedOrderCronDesc": "Automatically complete orders that have been in 'Product Ready' (READY) for 5 minutes + automatically settle escrow A2U to sellers",
+      "schedOrderCronWhen": "Every 5 minutes (Vercel Cron */5)",
       "scheduleDesc": "Execution history is automatically recorded according to the schedule below, even without manual intervention.",
       "scheduleTitle": "Automatic Job Schedule",
+      "settleA2uDisabled": "⚠️ A2U Disabled — Even if executed, it will not be remitted and will remain as settlement pending (PI_WALLET_PRIVATE_SEED check required)",
+      "settleColAmount": "Amount(π)",
+      "settleColBuyer": "Buyer",
+      "settleColCcy": "Local Currency",
+      "settleColDate": "Sale Date",
+      "settleColLinked": "Pi Linked",
+      "settleColSelect": "Select",
+      "settleColSeller": "Seller",
+      "settleColSettledAt": "Settlement Date/Time",
+      "settleColStatus": "Settlement Status",
+      "settleColTxid": "Remittance txid",
+      "settleConfirm": "Remit actual Pi for {count} unsettled items. Proceed?",
+      "settledEmpty": "No settlement completed history",
+      "settleDesc": "Settle A2U (real Pi) to sellers for orders that are completed but not yet remitted. For recovering past/failed cases missed by the 5-minute cron.",
+      "settledSummary": "Settlement Completed {count} items",
+      "settledTitle": "Settlement Completed List",
+      "settleEmpty": "No unsettled orders ✅",
+      "settleError": "Settlement Failed: {msg}",
+      "settleLinkedNo": "Not Linked (Remittance Impossible)",
+      "settleLinkedYes": "Linked",
+      "settleLoad": "Load Unsettled List",
+      "settleLoading": "Loading…",
+      "settleNeedTitle": "Resettlement Needed List",
+      "settleResult": "Settlement Completed {settled}/{attempted} items",
+      "settleRun": "Run Resettlement (Actual Remittance)",
+      "settleRunning": "Settling…",
+      "settleSelectedSummary": "Selected {count} items · Total {total}π",
+      "settleStDisabled": "A2U Disabled",
+      "settleStFailed": "Resettlement Failed",
+      "settleStNoUid": "Not Linked",
+      "settleStSettled": "Resettlement Completed",
+      "settleStUnsettled": "Unsettled",
+      "settleSummary": "Unsettled {count} items · Total {total}π",
+      "settleTitle": "Unsettled Seller Settlement",
+      "settleTxidCopied": "Remittance txid copied",
       "success": "{date} Aggregation Completed",
       "title": "On-demand Batch",
       "to": "End Date",
@@ -138,7 +177,15 @@
     "nav": {
       "backHome": "← Back to Home",
       "batch": "On-demand Batch",
+      "beanAudit": "Audit Log",
+      "beanFeePlan": "Fee Plan Management",
+      "beanSection": "☕ Bean Economy",
+      "beanToken": "Bean Dashboard",
+      "beanTopUsers": "Top Users",
+      "beanTxn": "Transaction History",
+      "beanWallets": "Wallet Management",
       "board": "Board Management",
+      "campaign": "Campaign Approval",
       "chatSection": "Cafe Management",
       "dashboard": "Dashboard",
       "eventExclude": "Gestionar exclusiones",
@@ -148,6 +195,7 @@
       "i18nSection": "Multilingual",
       "links": "Account Linking Status",
       "payments": "Payment History",
+      "settle": "Settlement Management",
       "stats": "Statistics",
       "stdApprovals": "Approval Workflow",
       "stdAudit": "Change History",
@@ -160,6 +208,7 @@
       "storeCategories": "Category de productos",
       "storeSection": "Gestión de Store",
       "subscriptions": "Subscription Management",
+      "themes": "Theme Management",
       "title": "Admin",
       "users": "User Management"
     },
@@ -190,6 +239,7 @@
       "title": "Payment History",
       "totalCount": "Total {count} items · Completed total {total} π",
       "txnDiv": {
+        "BEAN_CHARGE": "Bean Charge",
         "BET": "Apuesta",
         "BOND_DEPOSIT": "Depósito de garantía",
         "CANCEL_FEE": "Tarifa de cancelación",
@@ -456,6 +506,61 @@
         "useY": "Activo",
         "validationRequired": "El nombre de Category es obligatorio"
       }
+    },
+    "themes": {
+      "col": {
+        "cd": "Code",
+        "desc": "Description",
+        "sortOrd": "Order",
+        "theme": "Theme",
+        "tp": "Group",
+        "useYn": "Display"
+      },
+      "deleteConfirm": "Delete '{name}' theme? (Existing cafes will be maintained)",
+      "deleteFail": "Failed to delete",
+      "deleteSuccess": "Theme deleted successfully",
+      "editSuccess": "Theme updated successfully",
+      "emojiGroup": {
+        "daily": "Daily·General",
+        "emphasis": "Emotion·Emphasis",
+        "sports": "Sports"
+      },
+      "emojiSuggest": "Recommended:",
+      "field": {
+        "cd": "Theme Code",
+        "desc": "Description·Tags",
+        "emoji": "Emoji",
+        "nm": "Theme Name",
+        "sortOrd": "Sort Order",
+        "tp": "Group",
+        "useYn": "Display"
+      },
+      "formTitleEdit": "Edit Theme",
+      "formTitleNew": "Register New Theme",
+      "noData": "No registered themes",
+      "placeholder": {
+        "cd": "ESPORTS",
+        "desc": "#Tags #Keywords",
+        "nm": "eSports"
+      },
+      "saveFail": "Failed to save",
+      "saveSuccess": "Theme registered successfully",
+      "searchPlaceholder": "Search Theme Code or Name",
+      "selectTp": {
+        "basic": "Basic (BASIC)",
+        "premium": "Premium (PREMIUM)"
+      },
+      "title": "Theme Management",
+      "totalCount": "Total {count} Themes",
+      "tpFilter": {
+        "all": "All",
+        "basic": "Basic",
+        "premium": "Premium"
+      },
+      "useYnOff": "Hidden",
+      "useYnOn": "Display",
+      "validationCd": "Theme code must be 1-20 characters, a combination of uppercase English letters, numbers, and _",
+      "validationRequired": "Theme name and emoji are required"
     },
     "users": {
       "changeFail": "Change Failed",
@@ -744,6 +849,32 @@
       "wallet": "Dirección de billetera"
     }
   },
+  "bean": {
+    "backToStore": "To PiShop",
+    "buying": "Payment in progress…",
+    "chargeBtn": "Charge",
+    "chargeFail": "Charge processing failed",
+    "chargeSuccess": "{bean} Bean charge complete!",
+    "chargeTitle": "Charge Bean",
+    "customLabel": "Enter manually (Bean)",
+    "loading": "Loading…",
+    "loginRequired": "Available after login",
+    "minCharge": "Can charge integers starting from minimum {min} Bean (1π)",
+    "myBalance": "My Bean balance",
+    "piBrowserHint": "Bean charging is only possible in Pi Browser",
+    "piBrowserOnly": "Can only be charged in Pi Browser",
+    "rateHint": "1 Pi = {per} Bean (fixed)",
+    "title": "Bean Wallet",
+    "txnEmpty": "No transaction history",
+    "txnTitle": "Transaction History",
+    "type": {
+      "CHARGE": "Charge",
+      "REFUND": "Refund",
+      "REWARD": "Reward",
+      "SPEND": "Spend",
+      "TRANSFER": "Gift"
+    }
+  },
   "board": {
     "adopted": "Adopted",
     "adoptedComplete": "Adopted complete",
@@ -805,6 +936,9 @@
     "postContent": "Content",
     "postTitle": "Title",
     "saving": "Saving...",
+    "searchAllPlaceholder": "Integrated search across all Boards…",
+    "searching": "Searching…",
+    "searchNoResults": "No search results",
     "searchPlaceholder": "Search title or content",
     "submitPost": "Submit",
     "title": "Board",
@@ -981,10 +1115,12 @@
       "myCafes": "My Cafes",
       "noCafes": "No cafes joined yet",
       "noCafesHint": "+ Create a Cafe to open your first room",
+      "private": "Private",
       "regularCafes": "Regular Cafes",
       "scrollMore": "Scroll for more…",
       "subscriptionCafes": "Subscription Cafes",
-      "subtitle": "Pi Community Theme Cafe"
+      "subtitle": "Pi Community Theme Cafe",
+      "unlimited": "Unlimited"
     },
     "localeSelect": {
       "autoLocked": "🔒 Traducción automática (Beneficio de suscripción)",
@@ -1663,6 +1799,7 @@
     "loginRequired": "Login required",
     "myItemsTitle": "Manage My Items",
     "myOwnItem": "This is my registered item",
+    "navBean": "☕ Bean Wallet",
     "navHistory": "Historial de transacciones",
     "navigateGoogle": "Navigate with Google Maps",
     "navigateKakao": "Kakao Map",
@@ -1770,6 +1907,58 @@
     "viewCount": "Views {count}",
     "waitingBuyerConfirm": "Waiting for buyer's receipt confirmation.",
     "waitingSellerComplete": "Waiting for seller to complete the transaction."
+  },
+  "subscribe": {
+    "active": "Subscribed",
+    "annual": "Annual",
+    "annualBadge": "2 months free",
+    "annualNudge": "Switch to annual for {months} months free (save approx. {pct}%)",
+    "annualSave": "Save {bean}☕ with annual payment — {months} months free! 🎉",
+    "backHome": "Back to Home",
+    "charge": "Charge Bean",
+    "cycleHeading": "Select payment cycle",
+    "expireAt": "Expires: {date}",
+    "feat": {
+      "PICAFE": [
+        "Premium·Event Cafe creation fee waived",
+        "Premium·Event Cafe entry fee waived"
+      ],
+      "PISHOP": [
+        "Product Exposure Fee Waiver",
+        "Premium Product Creation Fee Waiver",
+        "Provide Tier-specific Product Count Limit"
+      ],
+      "TRANSLATE": [
+        "Unlimited message auto-translation",
+        "Non-subscriber 1☕ per use → Subscriber unlimited free"
+      ]
+    },
+    "insufficient": "Insufficient Bean balance — please charge first",
+    "loading": "Loading…",
+    "loginRequired": "Available after Login",
+    "monthly": "Monthly",
+    "myBalance": "My Bean Balance",
+    "notice": "Subscription fees are deducted from charged Beans. Annual plan includes 2 months free. Non-refundable·Platform use only.",
+    "perMonth": "Month",
+    "perYear": "Year",
+    "processing": "Processing…",
+    "product": {
+      "PICAFE": "PiCafe Subscription",
+      "PISHOP": "PiShop Subscription",
+      "TRANSLATE": "Auto-Translate Subscription"
+    },
+    "renewBtn": "Renew/Change",
+    "storeGrade": {
+      "L": "L (50↑)",
+      "M": "M (50↓)",
+      "S": "S (30↓)"
+    },
+    "storeGradeHint": "My products {count} — select a grade",
+    "subscribeBtn": "Subscribe",
+    "subscribeFail": "Subscription processing failed",
+    "subscribeSuccess": "{product} subscription has started!",
+    "tagline": "Subscription = Per-item fee exemption package. The more you use, the more you benefit!",
+    "title": "Cafe.pi Subscribe"
   },
   "themeToggle": {
     "dark": "Dark",

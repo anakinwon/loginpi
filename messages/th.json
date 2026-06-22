@@ -40,8 +40,47 @@
       "schedManualWhen": "เมื่อผู้ดูแลระบบเรียกใช้ด้วยปุ่มในหน้านี้",
       "schedOndemandDesc": "อัปเดตแถวสถิติของวันนี้ (UTC) แบบ On-demand — ทำงานอัตโนมัติ ไม่ใช่การดำเนินการด้วยตนเอง",
       "schedOndemandWhen": "เมื่อเข้าถึง Dashboard สถิติผู้ดูแลระบบ หรือเปลี่ยนช่วงเวลาการดู",
+      "schedOrderBackfillDesc": "ชำระเงิน A2U แบบ Batch สำหรับคำสั่งซื้อที่เสร็จสมบูรณ์แต่ยังไม่ได้รับการชำระ (ไม่มี release_txid) ให้กับผู้ขาย — /api/admin/store/settle",
+      "schedOrderBackfillWhen": "เมื่อผู้ดูแลระบบดำเนินการชำระเงินที่ยังไม่ได้รับการชำระ",
+      "schedOrderCronDesc": "คำสั่งซื้อที่สถานะสินค้าพร้อม (READY) เกิน 5 นาที จะถูกทำธุรกรรมเสร็จสมบูรณ์โดยอัตโนมัติ + ชำระบัญชี Escrow A2U ให้ผู้ขายโดยอัตโนมัติ",
+      "schedOrderCronWhen": "ทุก 5 นาที (Vercel Cron */5)",
       "scheduleDesc": "แม้ไม่ได้เรียกใช้ด้วยตนเอง ประวัติการเรียกใช้จะถูกบันทึกโดยอัตโนมัติตามกำหนดการด้านล่าง",
       "scheduleTitle": "กำหนดการทำงานอัตโนมัติ",
+      "settleA2uDisabled": "⚠️ A2U ถูกปิดใช้งาน — แม้จะดำเนินการแล้วก็จะไม่ถูกโอนเงินและจะยังคงอยู่ในสถานะรอการชำระเงินเท่านั้น (ต้องตรวจสอบ PI_WALLET_PRIVATE_SEED)",
+      "settleColAmount": "จำนวนเงิน (π)",
+      "settleColBuyer": "ผู้ซื้อ",
+      "settleColCcy": "สกุลเงินท้องถิ่น",
+      "settleColDate": "วันที่ขาย",
+      "settleColLinked": "การเชื่อมโยง Pi",
+      "settleColSelect": "เลือก",
+      "settleColSeller": "ผู้ขาย",
+      "settleColSettledAt": "วันที่และเวลาที่ชำระเงิน",
+      "settleColStatus": "สถานะการชำระเงิน",
+      "settleColTxid": "txid การโอนเงิน",
+      "settleConfirm": "จะโอน Pi จริงสำหรับ {count} รายการที่ยังไม่ได้รับการชำระ ดำเนินการต่อหรือไม่?",
+      "settledEmpty": "ไม่มีประวัติการชำระเงินที่เสร็จสิ้นแล้ว",
+      "settleDesc": "ชำระเงินสำหรับคำสั่งซื้อที่เสร็จสมบูรณ์แล้วแต่ยังไม่ได้โอนเงินให้กับผู้ขายด้วย A2U (Pi จริง) สำหรับกู้คืนรายการที่พลาดหรือล้มเหลวที่ cron 5 นาทีไม่สามารถจัดการได้",
+      "settledSummary": "ชำระเงินเสร็จสิ้น {count} รายการ",
+      "settledTitle": "รายการที่ชำระเงินเสร็จสิ้นแล้ว",
+      "settleEmpty": "ไม่มีคำสั่งซื้อที่ยังไม่ได้รับการชำระ ✅",
+      "settleError": "ชำระเงินล้มเหลว: {msg}",
+      "settleLinkedNo": "ไม่ได้เชื่อมโยง (ไม่สามารถโอนเงินได้)",
+      "settleLinkedYes": "เชื่อมโยงแล้ว",
+      "settleLoad": "โหลดรายการที่ยังไม่ได้รับการชำระ",
+      "settleLoading": "กำลังโหลด...",
+      "settleNeedTitle": "รายการที่ต้องชำระเงินซ้ำ",
+      "settleResult": "ชำระเงินเสร็จสิ้น {settled}/{attempted} รายการ",
+      "settleRun": "ดำเนินการชำระเงินซ้ำ (โอนเงินจริง)",
+      "settleRunning": "กำลังชำระเงิน...",
+      "settleSelectedSummary": "{count} รายการที่เลือก · รวม {total}π",
+      "settleStDisabled": "A2U ถูกปิดใช้งาน",
+      "settleStFailed": "ชำระเงินซ้ำล้มเหลว",
+      "settleStNoUid": "ไม่ได้เชื่อมโยง",
+      "settleStSettled": "ชำระเงินซ้ำแล้ว",
+      "settleStUnsettled": "ยังไม่ได้รับการชำระ",
+      "settleSummary": "{count} รายการที่ยังไม่ได้รับการชำระ · รวม {total}π",
+      "settleTitle": "การชำระเงินที่ยังไม่ได้รับการชำระของผู้ขาย",
+      "settleTxidCopied": "คัดลอก txid การโอนเงินแล้ว",
       "success": "รวบรวมข้อมูลวันที่ {date} เสร็จสมบูรณ์",
       "title": "Batch On-Demand",
       "to": "วันที่สิ้นสุด",
@@ -138,7 +177,15 @@
     "nav": {
       "backHome": "← กลับหน้าแรก",
       "batch": "Batch On-Demand",
+      "beanAudit": "บันทึกการตรวจสอบ",
+      "beanFeePlan": "การจัดการแผนค่าธรรมเนียม",
+      "beanSection": "☕ Bean Economy",
+      "beanToken": "Bean Dashboard",
+      "beanTopUsers": "ผู้ใช้ยอดนิยม",
+      "beanTxn": "ประวัติการทำธุรกรรม",
+      "beanWallets": "จัดการ Wallet",
       "board": "การจัดการ Board",
+      "campaign": "อนุมัติ Campaign",
       "chatSection": "จัดการคาเฟ่",
       "dashboard": "Dashboard",
       "eventExclude": "จัดการการยกเว้น",
@@ -148,6 +195,7 @@
       "i18nSection": "หลายภาษา",
       "links": "สถานะการเชื่อมโยงบัญชี",
       "payments": "ประวัติการชำระเงิน",
+      "settle": "จัดการการชำระบัญชี",
       "stats": "สถิติ",
       "stdApprovals": "เวิร์กโฟลว์การอนุมัติ",
       "stdAudit": "ประวัติการเปลี่ยนแปลง",
@@ -160,6 +208,7 @@
       "storeCategories": "Category สินค้า",
       "storeSection": "การจัดการ Store",
       "subscriptions": "จัดการการสมัครสมาชิก",
+      "themes": "จัดการ Theme",
       "title": "Admin",
       "users": "การจัดการผู้ใช้"
     },
@@ -190,6 +239,7 @@
       "title": "ประวัติการชำระเงิน",
       "totalCount": "ทั้งหมด {count} รายการ · ยอดรวมที่เสร็จสมบูรณ์ {total} π",
       "txnDiv": {
+        "BEAN_CHARGE": "เติม Bean",
         "BET": "เดิมพัน",
         "BOND_DEPOSIT": "เงินมัดจำ",
         "CANCEL_FEE": "ค่าธรรมเนียมยกเลิก",
@@ -456,6 +506,61 @@
         "useY": "ใช้งาน",
         "validationRequired": "ต้องระบุชื่อ Category"
       }
+    },
+    "themes": {
+      "col": {
+        "cd": "Code",
+        "desc": "คำอธิบาย",
+        "sortOrd": "ลำดับ",
+        "theme": "Theme",
+        "tp": "Group",
+        "useYn": "การแสดงผล"
+      },
+      "deleteConfirm": "คุณต้องการลบ Theme '{name}' หรือไม่? (คาเฟ่ที่มีอยู่จะยังคงอยู่)",
+      "deleteFail": "ลบไม่สำเร็จ",
+      "deleteSuccess": "ลบ Theme เรียบร้อยแล้ว",
+      "editSuccess": "แก้ไข Theme เรียบร้อยแล้ว",
+      "emojiGroup": {
+        "daily": "ชีวิตประจำวัน·ทั่วไป",
+        "emphasis": "อารมณ์·เน้นย้ำ",
+        "sports": "Sports"
+      },
+      "emojiSuggest": "แนะนำ:",
+      "field": {
+        "cd": "Theme Code",
+        "desc": "คำอธิบาย·Tag",
+        "emoji": "Emoji",
+        "nm": "ชื่อ Theme",
+        "sortOrd": "ลำดับการจัดเรียง",
+        "tp": "Group",
+        "useYn": "การแสดงผล"
+      },
+      "formTitleEdit": "แก้ไข Theme",
+      "formTitleNew": "ลงทะเบียน Theme ใหม่",
+      "noData": "ไม่มี Theme ที่ลงทะเบียน",
+      "placeholder": {
+        "cd": "ESPORTS",
+        "desc": "#Tag #Keyword",
+        "nm": "e-sports"
+      },
+      "saveFail": "บันทึกไม่สำเร็จ",
+      "saveSuccess": "ลงทะเบียน Theme เรียบร้อยแล้ว",
+      "searchPlaceholder": "ค้นหา Theme Code·ชื่อ",
+      "selectTp": {
+        "basic": "ทั่วไป (BASIC)",
+        "premium": "Premium (PREMIUM)"
+      },
+      "title": "จัดการ Theme",
+      "totalCount": "รวม {count} Theme",
+      "tpFilter": {
+        "all": "ทั้งหมด",
+        "basic": "ทั่วไป",
+        "premium": "Premium"
+      },
+      "useYnOff": "ซ่อน",
+      "useYnOn": "แสดง",
+      "validationCd": "Theme Code ต้องเป็นตัวอักษรภาษาอังกฤษตัวพิมพ์ใหญ่·ตัวเลข·_ รวมกัน 1-20 ตัวอักษร",
+      "validationRequired": "ชื่อ Theme และ Emoji เป็นสิ่งจำเป็น"
     },
     "users": {
       "changeFail": "เปลี่ยนไม่สำเร็จ",
@@ -744,6 +849,32 @@
       "wallet": "ที่อยู่ Wallet"
     }
   },
+  "bean": {
+    "backToStore": "กลับไปที่ PiShop",
+    "buying": "กำลังดำเนินการชำระเงิน…",
+    "chargeBtn": "เติมเงิน",
+    "chargeFail": "ดำเนินการเติมเงินไม่สำเร็จ",
+    "chargeSuccess": "เติม {bean} Bean สำเร็จ!",
+    "chargeTitle": "เติม Bean",
+    "customLabel": "ป้อนเอง (Bean)",
+    "loading": "กำลังโหลด…",
+    "loginRequired": "สามารถใช้งานได้หลังจากเข้าสู่ระบบ",
+    "minCharge": "สามารถเติมเงินได้ตั้งแต่ {min} Bean (1π) ขึ้นไปเป็นจำนวนเต็ม",
+    "myBalance": "ยอด Bean ของฉัน",
+    "piBrowserHint": "การเติม Bean สามารถทำได้เฉพาะใน Pi Browser เท่านั้น",
+    "piBrowserOnly": "สามารถเติมเงินได้เฉพาะใน Pi Browser เท่านั้น",
+    "rateHint": "1 Pi = {per} Bean (คงที่)",
+    "title": "กระเป๋า Bean",
+    "txnEmpty": "ไม่มีประวัติการทำรายการ",
+    "txnTitle": "ประวัติการทำรายการ",
+    "type": {
+      "CHARGE": "เติมเงิน",
+      "REFUND": "คืนเงิน",
+      "REWARD": "รางวัล",
+      "SPEND": "ใช้จ่าย",
+      "TRANSFER": "โอน"
+    }
+  },
   "board": {
     "adopted": "เลือก",
     "adoptedComplete": "เลือกแล้ว",
@@ -805,6 +936,9 @@
     "postContent": "เนื้อหา",
     "postTitle": "หัวข้อ",
     "saving": "กำลังบันทึก…",
+    "searchAllPlaceholder": "ค้นหา Board ทั้งหมด...",
+    "searching": "กำลังค้นหา...",
+    "searchNoResults": "ไม่มีผลการค้นหา",
     "searchPlaceholder": "ค้นหาหัวข้อหรือเนื้อหา",
     "submitPost": "ส่ง",
     "title": "Board",
@@ -981,10 +1115,12 @@
       "myCafes": "My Cafe",
       "noCafes": "ยังไม่มี Cafe ที่เข้าร่วม",
       "noCafesHint": "+ สร้าง Cafe เพื่อเปิดห้องแรกของคุณ",
+      "private": "ส่วนตัว",
       "regularCafes": "Regular Cafe",
       "scrollMore": "เลื่อนเพื่อดูเพิ่มเติม...",
       "subscriptionCafes": "Subscription Cafe",
-      "subtitle": "Pi Community Theme Cafe"
+      "subtitle": "Pi Community Theme Cafe",
+      "unlimited": "ไม่จำกัดระยะเวลา"
     },
     "localeSelect": {
       "autoLocked": "🔒 สิทธิประโยชน์การสมัครสมาชิก แปลอัตโนมัติ",
@@ -1663,6 +1799,7 @@
     "loginRequired": "สามารถใช้งานได้หลังจากเข้าสู่ระบบ",
     "myItemsTitle": "จัดการสินค้าของฉัน",
     "myOwnItem": "นี่คือสินค้าที่ฉันลงทะเบียน",
+    "navBean": "☕ Bean กระเป๋าเงิน",
     "navHistory": "ประวัติการทำธุรกรรม",
     "navigateGoogle": "ไป Google Map",
     "navigateKakao": "Kakao Map",
@@ -1770,6 +1907,58 @@
     "viewCount": "การดู {count}",
     "waitingBuyerConfirm": "กำลังรอการยืนยันการรับสินค้าจากผู้ซื้อ",
     "waitingSellerComplete": "กำลังรอผู้ขายดำเนินการเสร็จสิ้นการทำรายการ"
+  },
+  "subscribe": {
+    "active": "กำลังสมัครสมาชิก",
+    "annual": "รายปี",
+    "annualBadge": "ฟรี 2 เดือน",
+    "annualNudge": "ฟรี {months} เดือนเมื่อเปลี่ยนเป็นรายปี (ประหยัดประมาณ {pct}%)",
+    "annualSave": "ประหยัด {bean}☕ ด้วยการชำระเงินรายปี — ฟรี {months} เดือน! 🎉",
+    "backHome": "กลับหน้าแรก",
+    "charge": "เติม Bean",
+    "cycleHeading": "เลือกช่วงเวลาการชำระเงิน",
+    "expireAt": "วันหมดอายุ: {date}",
+    "feat": {
+      "PICAFE": [
+        "ยกเว้นค่าธรรมเนียมการสร้าง Premium·Event Cafe",
+        "ยกเว้นค่าธรรมเนียมการเข้า Premium·Event Cafe"
+      ],
+      "PISHOP": [
+        "ยกเว้นค่าธรรมเนียมการแสดงสินค้า",
+        "ยกเว้นค่าธรรมเนียมการสร้างสินค้า Premium",
+        "กำหนดจำนวนสินค้าตามระดับ"
+      ],
+      "TRANSLATE": [
+        "แปล Message อัตโนมัติไม่จำกัด",
+        "ไม่สมัครสมาชิก 1 ครั้ง 1 ☕ → สมัครสมาชิกฟรีไม่จำกัด"
+      ]
+    },
+    "insufficient": "ยอด Bean ไม่เพียงพอ — โปรดเติมเงินก่อน",
+    "loading": "กำลังโหลด...",
+    "loginRequired": "สามารถใช้งานได้หลังจากเข้าสู่ระบบ",
+    "monthly": "รายเดือน",
+    "myBalance": "ยอด Bean ของฉัน",
+    "notice": "ค่าสมัครสมาชิกจะถูกหักจาก Bean ที่เติมเงินไว้ รายปีฟรี 2 เดือน ไม่สามารถแลกคืนเป็นเงินสดได้ · ใช้สำหรับแพลตฟอร์มเท่านั้น",
+    "perMonth": "ต่อเดือน",
+    "perYear": "ต่อปี",
+    "processing": "กำลังดำเนินการ…",
+    "product": {
+      "PICAFE": "สมัครสมาชิก PiCafe",
+      "PISHOP": "การสมัครสมาชิก PiShop",
+      "TRANSLATE": "สมัครสมาชิกการแปลอัตโนมัติ"
+    },
+    "renewBtn": "ต่ออายุ/เปลี่ยน",
+    "storeGrade": {
+      "L": "L (มากกว่า 50 รายการ)",
+      "M": "M (ไม่เกิน 50 รายการ)",
+      "S": "S (ไม่เกิน 30 รายการ)"
+    },
+    "storeGradeHint": "สินค้าของฉัน {count} รายการ — เลือกระดับ",
+    "subscribeBtn": "สมัครสมาชิก",
+    "subscribeFail": "ดำเนินการสมัครสมาชิกไม่สำเร็จ",
+    "subscribeSuccess": "การสมัครสมาชิก {product} ของคุณได้เริ่มต้นขึ้นแล้ว!",
+    "tagline": "สมัครสมาชิก = แพ็กเกจยกเว้นค่าธรรมเนียมต่อรายการ ยิ่งใช้มากยิ่งคุ้มค่า!",
+    "title": "สมัครสมาชิก Cafe.pi"
   },
   "themeToggle": {
     "dark": "Dark",

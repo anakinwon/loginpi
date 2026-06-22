@@ -40,8 +40,47 @@
       "schedManualWhen": "Khi quản trị viên thực thi bằng nút trên trang này",
       "schedOndemandDesc": "Cập nhật theo yêu cầu hàng thống kê hôm nay (UTC) — Tự động thực thi, không phải tác vụ thủ công",
       "schedOndemandWhen": "Khi truy cập Dashboard thống kê của quản trị viên hoặc thay đổi khoảng thời gian truy vấn",
+      "schedOrderBackfillDesc": "Quyết toán hàng loạt A2U cho người bán các đơn hàng đã hoàn tất giao dịch nhưng chưa quyết toán (không có release_txid) — /api/admin/store/settle",
+      "schedOrderBackfillWhen": "Khi Admin thực hiện thanh toán chưa quyết toán",
+      "schedOrderCronDesc": "Tự động hoàn tất giao dịch cho các đơn hàng đã sẵn sàng (READY) sau 5 phút + Tự động thanh toán ký quỹ A2U cho người bán",
+      "schedOrderCronWhen": "Mỗi 5 phút (Vercel Cron */5)",
       "scheduleDesc": "Ngay cả khi không chạy thủ công, lịch sử thực thi sẽ tự động được ghi lại theo lịch trình dưới đây",
       "scheduleTitle": "Lịch trình tác vụ tự động",
+      "settleA2uDisabled": "⚠️ A2U bị vô hiệu hóa — dù thực hiện cũng sẽ không được chuyển khoản và chỉ còn lại trạng thái chờ quyết toán (cần kiểm tra PI_WALLET_PRIVATE_SEED)",
+      "settleColAmount": "Số tiền(π)",
+      "settleColBuyer": "Người mua",
+      "settleColCcy": "Tiền tệ địa phương",
+      "settleColDate": "Ngày bán",
+      "settleColLinked": "Liên kết Pi",
+      "settleColSelect": "Chọn",
+      "settleColSeller": "Người bán",
+      "settleColSettledAt": "Ngày/giờ quyết toán",
+      "settleColStatus": "Trạng thái quyết toán",
+      "settleColTxid": "txid chuyển khoản",
+      "settleConfirm": "Sẽ chuyển khoản Pi thực cho {count} mục chưa quyết toán. Tiếp tục chứ?",
+      "settledEmpty": "Không có lịch sử quyết toán hoàn tất",
+      "settleDesc": "Quyết toán bằng A2U (Pi thực) cho người bán các đơn hàng đã hoàn tất giao dịch nhưng chưa được chuyển khoản. Để khôi phục các trường hợp cũ/thất bại mà cron 5 phút đã bỏ lỡ.",
+      "settledSummary": "{count} mục đã quyết toán",
+      "settledTitle": "Danh sách đã quyết toán",
+      "settleEmpty": "Không có đơn hàng chưa quyết toán ✅",
+      "settleError": "Quyết toán thất bại: {msg}",
+      "settleLinkedNo": "Chưa liên kết (không thể chuyển khoản)",
+      "settleLinkedYes": "Đã liên kết",
+      "settleLoad": "Tải danh sách chưa quyết toán",
+      "settleLoading": "Đang tải…",
+      "settleNeedTitle": "Danh sách cần quyết toán lại",
+      "settleResult": "Đã quyết toán {settled}/{attempted} mục",
+      "settleRun": "Thực hiện quyết toán lại (chuyển khoản thực tế)",
+      "settleRunning": "Đang quyết toán…",
+      "settleSelectedSummary": "{count} mục đã chọn · Tổng cộng {total}π",
+      "settleStDisabled": "A2U bị vô hiệu hóa",
+      "settleStFailed": "Quyết toán lại thất bại",
+      "settleStNoUid": "Chưa liên kết",
+      "settleStSettled": "Đã quyết toán lại",
+      "settleStUnsettled": "Chưa quyết toán",
+      "settleSummary": "{count} mục chưa quyết toán · Tổng cộng {total}π",
+      "settleTitle": "Quyết toán cho người bán chưa quyết toán",
+      "settleTxidCopied": "Đã sao chép txid chuyển khoản",
       "success": "Tổng hợp {date} hoàn tất",
       "title": "On-demand Batch",
       "to": "Ngày kết thúc",
@@ -138,7 +177,15 @@
     "nav": {
       "backHome": "← Về trang chủ",
       "batch": "On-demand Batch",
+      "beanAudit": "Log kiểm toán",
+      "beanFeePlan": "Quản lý gói Plan",
+      "beanSection": "☕ Kinh tế Bean",
+      "beanToken": "Bean Dashboard",
+      "beanTopUsers": "Người dùng hàng đầu",
+      "beanTxn": "Lịch sử giao dịch",
+      "beanWallets": "Quản lý ví",
       "board": "Quản lý Board",
+      "campaign": "Phê duyệt Campaign",
       "chatSection": "Quản lý Cafe",
       "dashboard": "Dashboard",
       "eventExclude": "Quản lý loại trừ",
@@ -148,6 +195,7 @@
       "i18nSection": "Đa ngôn ngữ",
       "links": "Trạng thái liên kết tài khoản",
       "payments": "Lịch sử thanh toán",
+      "settle": "Quản lý thanh toán",
       "stats": "Thống kê",
       "stdApprovals": "Workflow phê duyệt",
       "stdAudit": "Lịch sử thay đổi",
@@ -160,6 +208,7 @@
       "storeCategories": "Category Sản phẩm",
       "storeSection": "Quản lý Store",
       "subscriptions": "Quản lý đăng ký",
+      "themes": "Quản lý Theme",
       "title": "Admin",
       "users": "Quản lý người dùng"
     },
@@ -190,6 +239,7 @@
       "title": "Lịch sử thanh toán",
       "totalCount": "Tổng cộng {count} giao dịch · Tổng số đã hoàn thành {total} π",
       "txnDiv": {
+        "BEAN_CHARGE": "Bean Charge",
         "BET": "Đặt cược",
         "BOND_DEPOSIT": "Đặt cọc bảo đảm",
         "CANCEL_FEE": "Phí hủy",
@@ -456,6 +506,61 @@
         "useY": "Đang sử dụng",
         "validationRequired": "Tên Category là bắt buộc"
       }
+    },
+    "themes": {
+      "col": {
+        "cd": "Mã",
+        "desc": "Mô tả",
+        "sortOrd": "Thứ tự",
+        "theme": "Theme",
+        "tp": "Group",
+        "useYn": "Hiển thị"
+      },
+      "deleteConfirm": "Bạn có muốn xóa Theme '{name}' không? (Các quán cà phê hiện có sẽ được giữ lại)",
+      "deleteFail": "Xóa thất bại",
+      "deleteSuccess": "Theme đã được xóa thành công",
+      "editSuccess": "Theme đã được chỉnh sửa thành công",
+      "emojiGroup": {
+        "daily": "Hàng ngày·Đa dụng",
+        "emphasis": "Cảm xúc·Nhấn mạnh",
+        "sports": "Sports"
+      },
+      "emojiSuggest": "Đề xuất:",
+      "field": {
+        "cd": "Mã Theme",
+        "desc": "Mô tả·Tag",
+        "emoji": "Emoji",
+        "nm": "Tên Theme",
+        "sortOrd": "Thứ tự sắp xếp",
+        "tp": "Group",
+        "useYn": "Hiển thị"
+      },
+      "formTitleEdit": "Chỉnh sửa Theme",
+      "formTitleNew": "Đăng ký Theme mới",
+      "noData": "Không có Theme nào được đăng ký",
+      "placeholder": {
+        "cd": "ESPORTS",
+        "desc": "#Tag #Keyword",
+        "nm": "e-sports"
+      },
+      "saveFail": "Lưu thất bại",
+      "saveSuccess": "Theme đã được đăng ký thành công",
+      "searchPlaceholder": "Tìm kiếm mã·tên Theme",
+      "selectTp": {
+        "basic": "Cơ bản (BASIC)",
+        "premium": "Premium (PREMIUM)"
+      },
+      "title": "Quản lý Theme",
+      "totalCount": "Tổng {count} Theme",
+      "tpFilter": {
+        "all": "Tất cả",
+        "basic": "Cơ bản",
+        "premium": "Premium"
+      },
+      "useYnOff": "Ẩn",
+      "useYnOn": "Hiển thị",
+      "validationCd": "Mã Theme phải là sự kết hợp của chữ cái in hoa tiếng Anh, số và _ từ 1 đến 20 ký tự",
+      "validationRequired": "Tên Theme và Emoji là bắt buộc"
     },
     "users": {
       "changeFail": "Thay đổi thất bại",
@@ -744,6 +849,32 @@
       "wallet": "Địa chỉ ví"
     }
   },
+  "bean": {
+    "backToStore": "Về PiShop",
+    "buying": "Đang xử lý thanh toán…",
+    "chargeBtn": "Nạp tiền",
+    "chargeFail": "Xử lý nạp tiền thất bại",
+    "chargeSuccess": "Nạp {bean} Bean thành công!",
+    "chargeTitle": "Nạp Bean",
+    "customLabel": "Nhập thủ công (Bean)",
+    "loading": "Đang tải…",
+    "loginRequired": "Bạn có thể sử dụng sau khi đăng nhập",
+    "minCharge": "Bạn có thể nạp tối thiểu {min} Bean (1π) dưới dạng số nguyên",
+    "myBalance": "Số dư Bean của tôi",
+    "piBrowserHint": "Nạp Bean chỉ có thể thực hiện trong Pi Browser",
+    "piBrowserOnly": "Chỉ có thể nạp Bean trong Pi Browser",
+    "rateHint": "1 Pi = {per} Bean (cố định)",
+    "title": "Ví Bean",
+    "txnEmpty": "Không có lịch sử giao dịch",
+    "txnTitle": "Lịch sử giao dịch",
+    "type": {
+      "CHARGE": "Nạp tiền",
+      "REFUND": "Hoàn tiền",
+      "REWARD": "Thưởng",
+      "SPEND": "Sử dụng",
+      "TRANSFER": "Chuyển"
+    }
+  },
   "board": {
     "adopted": "Đã chọn",
     "adoptedComplete": "Đã chọn hoàn tất",
@@ -805,6 +936,9 @@
     "postContent": "Nội dung",
     "postTitle": "Tiêu đề",
     "saving": "Đang sửa...",
+    "searchAllPlaceholder": "Tìm kiếm tích hợp trên tất cả Board…",
+    "searching": "Đang tìm kiếm…",
+    "searchNoResults": "Không có kết quả tìm kiếm",
     "searchPlaceholder": "Tìm kiếm tiêu đề hoặc nội dung",
     "submitPost": "Đăng",
     "title": "Board",
@@ -981,10 +1115,12 @@
       "myCafes": "Cafe của tôi",
       "noCafes": "Chưa tham gia Cafe nào",
       "noCafesHint": "+ Thử tạo Cafe đầu tiên của bạn",
+      "private": "Riêng tư",
       "regularCafes": "Cafe thông thường",
       "scrollMore": "Cuộn để xem thêm...",
       "subscriptionCafes": "Cafe đã đăng ký",
-      "subtitle": "Cafe chủ đề Cộng đồng Pi"
+      "subtitle": "Cafe chủ đề Cộng đồng Pi",
+      "unlimited": "Vô thời hạn"
     },
     "localeSelect": {
       "autoLocked": "🔒 Đặc quyền đăng ký Dịch tự động",
@@ -1663,6 +1799,7 @@
     "loginRequired": "Bạn có thể sử dụng sau khi đăng nhập",
     "myItemsTitle": "Quản lý sản phẩm của tôi",
     "myOwnItem": "Đây là sản phẩm của tôi",
+    "navBean": "☕ Bean Ví",
     "navHistory": "Lịch sử giao dịch",
     "navigateGoogle": "Đi bằng Google Map",
     "navigateKakao": "Kakao Map",
@@ -1770,6 +1907,58 @@
     "viewCount": "Lượt xem {count}",
     "waitingBuyerConfirm": "Đang chờ người mua xác nhận nhận hàng",
     "waitingSellerComplete": "Đang chờ người bán xử lý hoàn tất giao dịch"
+  },
+  "subscribe": {
+    "active": "Đang đăng ký",
+    "annual": "Hàng năm",
+    "annualBadge": "Miễn phí 2 tháng",
+    "annualNudge": "Miễn phí {months} tháng khi chuyển sang hàng năm (tiết kiệm khoảng {pct}%)",
+    "annualSave": "Tiết kiệm {bean}☕ với thanh toán hàng năm — Miễn phí {months} tháng! 🎉",
+    "backHome": "Về Trang chủ",
+    "charge": "Nạp Bean",
+    "cycleHeading": "Chọn chu kỳ thanh toán",
+    "expireAt": "Ngày hết hạn: {date}",
+    "feat": {
+      "PICAFE": [
+        "Miễn phí tạo Premium·Event Cafe",
+        "Miễn phí vào Premium·Event Cafe"
+      ],
+      "PISHOP": [
+        "Miễn phí hiển thị sản phẩm",
+        "Miễn phí tạo sản phẩm Premium",
+        "Cung cấp giới hạn số lượng sản phẩm theo cấp"
+      ],
+      "TRANSLATE": [
+        "Dịch tự động tin nhắn không giới hạn",
+        "Không đăng ký 1 lần 1 ☕ → Đăng ký miễn phí không giới hạn"
+      ]
+    },
+    "insufficient": "Số dư Bean không đủ — Vui lòng nạp tiền trước",
+    "loading": "Đang tải…",
+    "loginRequired": "Có thể sử dụng sau khi đăng nhập",
+    "monthly": "Hàng tháng",
+    "myBalance": "Số dư Bean của tôi",
+    "notice": "Phí đăng ký sẽ được trừ từ Bean đã nạp. Gói hàng năm miễn phí 2 tháng. Không thể hoàn tiền·Chỉ dùng cho nền tảng.",
+    "perMonth": "Tháng",
+    "perYear": "Năm",
+    "processing": "Đang xử lý…",
+    "product": {
+      "PICAFE": "Đăng ký PiCafe",
+      "PISHOP": "PiShop Subscribe",
+      "TRANSLATE": "Đăng ký Dịch tự động"
+    },
+    "renewBtn": "Gia hạn/Thay đổi",
+    "storeGrade": {
+      "L": "L (trên 50)",
+      "M": "M (dưới 50)",
+      "S": "S (dưới 30)"
+    },
+    "storeGradeHint": "Sản phẩm của tôi {count} — Chọn cấp độ",
+    "subscribeBtn": "Đăng ký",
+    "subscribeFail": "Xử lý đăng ký thất bại",
+    "subscribeSuccess": "Đăng ký {product} của bạn đã bắt đầu!",
+    "tagline": "Đăng ký = gói miễn phí phí mỗi giao dịch. Càng dùng nhiều càng có lợi!",
+    "title": "Đăng ký Cafe.pi"
   },
   "themeToggle": {
     "dark": "Dark",

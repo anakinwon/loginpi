@@ -40,8 +40,47 @@
       "schedManualWhen": "जब इस पृष्ठ पर प्रशासक द्वारा बटन से निष्पादित किया जाता है",
       "schedOndemandDesc": "आज (UTC) की सांख्यिकी पंक्ति ऑन-डिमांड अपडेट — स्वचालित निष्पादन है, मैन्युअल कार्य नहीं",
       "schedOndemandWhen": "प्रशासक सांख्यिकी Dashboard तक पहुँचने या पूछताछ अवधि बदलने पर",
+      "schedOrderBackfillDesc": "अनसेटल (release_txid नहीं) पूरे हुए ऑर्डर को विक्रेता को A2U बैच सेटलमेंट — /api/admin/store/settle",
+      "schedOrderBackfillWhen": "जब प्रशासक अनसेटलमेंट सेटलमेंट चलाता है",
+      "schedOrderCronDesc": "उत्पाद तैयार (READY) होने के 5 मिनट बाद ऑर्डर को स्वचालित रूप से पूरा करें + विक्रेताओं को Escrow A2U का स्वचालित निपटान करें",
+      "schedOrderCronWhen": "हर 5 मिनट में (Vercel Cron */5)",
       "scheduleDesc": "सीधे निष्पादित न होने पर भी, निष्पादन इतिहास नीचे दिए गए शेड्यूल के अनुसार स्वचालित रूप से रिकॉर्ड किया जाता है",
       "scheduleTitle": "स्वचालित कार्य शेड्यूल",
+      "settleA2uDisabled": "⚠️ A2U अक्षम — चलाने पर भी प्रेषित नहीं होगा और केवल सेटलमेंट के लिए लंबित रहेगा (PI_WALLET_PRIVATE_SEED की जाँच आवश्यक है)",
+      "settleColAmount": "राशि(π)",
+      "settleColBuyer": "खरीददार",
+      "settleColCcy": "स्थानीय मुद्रा",
+      "settleColDate": "बिक्री की तारीख",
+      "settleColLinked": "Pi लिंक्ड",
+      "settleColSelect": "चयन करें",
+      "settleColSeller": "विक्रेता",
+      "settleColSettledAt": "सेटलमेंट की तारीख/समय",
+      "settleColStatus": "सेटलमेंट स्थिति",
+      "settleColTxid": "प्रेषण txid",
+      "settleConfirm": "{count} अनसेटल मामलों के लिए वास्तविक Pi प्रेषित किया जाएगा। आगे बढ़ें?",
+      "settledEmpty": "कोई सेटलमेंट पूरा हुआ विवरण नहीं है",
+      "settleDesc": "पूरे हुए लेकिन अभी तक भेजे नहीं गए ऑर्डर को विक्रेता को A2U (वास्तविक Pi) के रूप में सेटल करता है। 5 मिनट के cron द्वारा छूट गए पिछले/असफल मामलों को पुनर्प्राप्त करने के लिए।",
+      "settledSummary": "सेटलमेंट पूरा हुआ {count} मामले",
+      "settledTitle": "सेटलमेंट पूरा हुआ सूची",
+      "settleEmpty": "कोई अनसेटल ऑर्डर नहीं है ✅",
+      "settleError": "सेटलमेंट विफल: {msg}",
+      "settleLinkedNo": "लिंक नहीं किया गया (प्रेषण संभव नहीं)",
+      "settleLinkedYes": "लिंक्ड",
+      "settleLoad": "अनसेटल सूची लोड करें",
+      "settleLoading": "लोड हो रहा है…",
+      "settleNeedTitle": "पुनः सेटलमेंट आवश्यक सूची",
+      "settleResult": "सेटलमेंट पूरा हुआ {settled}/{attempted} मामले",
+      "settleRun": "पुनः सेटलमेंट चलाएँ (वास्तविक प्रेषण)",
+      "settleRunning": "सेटलमेंट हो रहा है…",
+      "settleSelectedSummary": "चयनित {count} मामले · कुल {total}π",
+      "settleStDisabled": "A2U अक्षम",
+      "settleStFailed": "पुनः सेटलमेंट विफल",
+      "settleStNoUid": "लिंक नहीं किया गया",
+      "settleStSettled": "पुनः सेटल किया गया",
+      "settleStUnsettled": "अनसेटल",
+      "settleSummary": "अनसेटल {count} मामले · कुल {total}π",
+      "settleTitle": "अनसेटल विक्रेता सेटलमेंट",
+      "settleTxidCopied": "प्रेषण txid कॉपी किया गया है",
       "success": "{date} का Aggregation पूरा हुआ",
       "title": "On-demand Batch",
       "to": "समाप्त होने की तारीख",
@@ -138,7 +177,15 @@
     "nav": {
       "backHome": "← होम पर वापस",
       "batch": "On-demand Batch",
+      "beanAudit": "ऑडिट लॉग",
+      "beanFeePlan": "शुल्क योजना प्रबंधन",
+      "beanSection": "☕ Bean अर्थव्यवस्था",
+      "beanToken": "Bean Dashboard",
+      "beanTopUsers": "टॉप यूज़र्स",
+      "beanTxn": "लेन-देन का इतिहास",
+      "beanWallets": "वॉलेट प्रबंधन",
       "board": "Board प्रबंधन",
+      "campaign": "Campaign स्वीकृति",
       "chatSection": "Cafe प्रबंधन",
       "dashboard": "Dashboard",
       "eventExclude": "बहिष्करण प्रबंधित करें",
@@ -148,6 +195,7 @@
       "i18nSection": "बहुभाषी",
       "links": "खाता लिंकिंग स्थिति",
       "payments": "भुगतान इतिहास",
+      "settle": "निपटान प्रबंधन",
       "stats": "आँकड़े",
       "stdApprovals": "अनुमोदन Workflow",
       "stdAudit": "परिवर्तन इतिहास",
@@ -160,6 +208,7 @@
       "storeCategories": "उत्पाद Category",
       "storeSection": "Store प्रबंधन",
       "subscriptions": "सदस्यता प्रबंधन",
+      "themes": "Theme प्रबंधन",
       "title": "Admin",
       "users": "उपयोगकर्ता प्रबंधन"
     },
@@ -190,6 +239,7 @@
       "title": "भुगतान इतिहास",
       "totalCount": "कुल {count} आइटम · पूर्ण योग {total} π",
       "txnDiv": {
+        "BEAN_CHARGE": "Bean चार्ज",
         "BET": "सट्टा",
         "BOND_DEPOSIT": "जमा राशि",
         "CANCEL_FEE": "रद्दीकरण शुल्क",
@@ -456,6 +506,61 @@
         "useY": "सक्रिय",
         "validationRequired": "Category नाम अनिवार्य है"
       }
+    },
+    "themes": {
+      "col": {
+        "cd": "Code",
+        "desc": "विवरण",
+        "sortOrd": "क्रम",
+        "theme": "Theme",
+        "tp": "Group",
+        "useYn": "प्रदर्शित करें"
+      },
+      "deleteConfirm": "क्या आप '{name}' Theme को हटाना चाहते हैं? (मौजूदा कैफे बने रहेंगे)",
+      "deleteFail": "हटाने में विफल रहा",
+      "deleteSuccess": "Theme हटा दिया गया है",
+      "editSuccess": "Theme संपादित हो गया है",
+      "emojiGroup": {
+        "daily": "दैनिक·सामान्य",
+        "emphasis": "भावना·ज़ोर",
+        "sports": "Sports"
+      },
+      "emojiSuggest": "सुझाव:",
+      "field": {
+        "cd": "Theme Code",
+        "desc": "विवरण·Tag",
+        "emoji": "Emoji",
+        "nm": "Theme नाम",
+        "sortOrd": "क्रमबद्धता क्रम",
+        "tp": "Group",
+        "useYn": "प्रदर्शित करें"
+      },
+      "formTitleEdit": "Theme संपादित करें",
+      "formTitleNew": "नया Theme पंजीकृत करें",
+      "noData": "कोई Theme पंजीकृत नहीं है",
+      "placeholder": {
+        "cd": "ESPORTS",
+        "desc": "#Tag #Keyword",
+        "nm": "e-sports"
+      },
+      "saveFail": "सहेजने में विफल रहा",
+      "saveSuccess": "Theme पंजीकृत हो गया है",
+      "searchPlaceholder": "Theme Code·नाम खोजें",
+      "selectTp": {
+        "basic": "सामान्य(BASIC)",
+        "premium": "Premium(PREMIUM)"
+      },
+      "title": "Theme प्रबंधन",
+      "totalCount": "कुल {count} Theme",
+      "tpFilter": {
+        "all": "सभी",
+        "basic": "सामान्य",
+        "premium": "Premium"
+      },
+      "useYnOff": "छिपा हुआ",
+      "useYnOn": "प्रदर्शित करें",
+      "validationCd": "Theme Code में 1 से 20 अक्षर होने चाहिए, जिसमें बड़े अंग्रेज़ी अक्षर, संख्याएँ और _ का संयोजन हो।",
+      "validationRequired": "Theme नाम और Emoji आवश्यक हैं"
     },
     "users": {
       "changeFail": "बदलने में विफल",
@@ -744,6 +849,32 @@
       "wallet": "वॉलेट पता"
     }
   },
+  "bean": {
+    "backToStore": "PiShop पर वापस",
+    "buying": "भुगतान प्रक्रिया जारी है…",
+    "chargeBtn": "रिचार्ज करें",
+    "chargeFail": "रिचार्ज प्रक्रिया विफल रही",
+    "chargeSuccess": "{bean} Bean रिचार्ज सफल!",
+    "chargeTitle": "Bean रिचार्ज करें",
+    "customLabel": "मैन्युअल रूप से दर्ज करें (Bean)",
+    "loading": "लोड हो रहा है…",
+    "loginRequired": "लॉगिन करने के बाद उपलब्ध है",
+    "minCharge": "न्यूनतम {min} Bean (1π) से पूर्णांक में रिचार्ज किया जा सकता है",
+    "myBalance": "मेरा Bean शेष",
+    "piBrowserHint": "Bean रिचार्ज केवल Pi Browser में संभव है",
+    "piBrowserOnly": "केवल Pi Browser में रिचार्ज किया जा सकता है",
+    "rateHint": "1 Pi = {per} Bean (स्थिर)",
+    "title": "Bean वॉलेट",
+    "txnEmpty": "कोई लेन-देन इतिहास नहीं है",
+    "txnTitle": "लेन-देन इतिहास",
+    "type": {
+      "CHARGE": "रिचार्ज",
+      "REFUND": "वापसी",
+      "REWARD": "इनाम",
+      "SPEND": "उपयोग",
+      "TRANSFER": "उपहार"
+    }
+  },
   "board": {
     "adopted": "अपनाया गया",
     "adoptedComplete": "अपनाया गया पूर्ण",
@@ -805,6 +936,9 @@
     "postContent": "Content",
     "postTitle": "Post शीर्षक",
     "saving": "सहेजा जा रहा है…",
+    "searchAllPlaceholder": "सभी Board एकीकृत खोज…",
+    "searching": "खोज हो रही है…",
+    "searchNoResults": "कोई खोज परिणाम नहीं है",
     "searchPlaceholder": "शीर्षक या Content खोजें",
     "submitPost": "Post सबमिट करें",
     "title": "Board",
@@ -981,10 +1115,12 @@
       "myCafes": "मेरे Cafe",
       "noCafes": "अभी तक किसी Cafe में शामिल नहीं हैं",
       "noCafesHint": "+ Cafe बनाकर पहला रूम खोलें",
+      "private": "निजी",
       "regularCafes": "Regular Cafe",
       "scrollMore": "अधिक देखने के लिए स्क्रॉल करें...",
       "subscriptionCafes": "Subscription Cafe",
-      "subtitle": "Pi Community Theme Cafe"
+      "subtitle": "Pi Community Theme Cafe",
+      "unlimited": "असीमित"
     },
     "localeSelect": {
       "autoLocked": "🔒 सदस्यता लाभ स्वचालित अनुवाद",
@@ -1663,6 +1799,7 @@
     "loginRequired": "Login के बाद उपयोग कर सकते हैं",
     "myItemsTitle": "मेरे Items का प्रबंधन",
     "myOwnItem": "यह मेरा अपना Item है",
+    "navBean": "☕ Bean वॉलेट",
     "navHistory": "लेनदेन इतिहास",
     "navigateGoogle": "Google Map से जाएँ",
     "navigateKakao": "Kakao Map",
@@ -1770,6 +1907,58 @@
     "viewCount": "देखे गए {count}",
     "waitingBuyerConfirm": "खरीदार की प्राप्ति की पुष्टि का इंतजार है",
     "waitingSellerComplete": "विक्रेता द्वारा लेनदेन पूरा करने का इंतजार है"
+  },
+  "subscribe": {
+    "active": "सदस्यता ली गई",
+    "annual": "वार्षिक",
+    "annualBadge": "2 महीने मुफ़्त",
+    "annualNudge": "वार्षिक पर स्विच करने पर {months} महीने मुफ़्त (लगभग {pct}% की बचत)",
+    "annualSave": "वार्षिक भुगतान से {bean}☕ बचाएं — {months} महीने मुफ़्त! 🎉",
+    "backHome": "होम पर वापस",
+    "charge": "Bean चार्ज करें",
+    "cycleHeading": "भुगतान चक्र चुनें",
+    "expireAt": "समाप्ति तिथि: {date}",
+    "feat": {
+      "PICAFE": [
+        "Premium और Event Cafe निर्माण शुल्क से छूट",
+        "Premium और Event Cafe प्रवेश शुल्क से छूट"
+      ],
+      "PISHOP": [
+        "प्रोडक्ट एक्सपोजर शुल्क से छूट",
+        "प्रीमियम प्रोडक्ट निर्माण शुल्क से छूट",
+        "ग्रेड के अनुसार प्रोडक्ट संख्या की सीमा"
+      ],
+      "TRANSLATE": [
+        "असीमित संदेश स्वचालित अनुवाद",
+        "गैर-सदस्यता 1 बार 1 ☕ → सदस्यता असीमित मुफ़्त"
+      ]
+    },
+    "insufficient": "Bean शेष अपर्याप्त है — कृपया पहले रिचार्ज करें",
+    "loading": "लोड हो रहा है…",
+    "loginRequired": "लॉगिन के बाद उपलब्ध है",
+    "monthly": "मासिक",
+    "myBalance": "मेरा Bean शेष",
+    "notice": "सदस्यता शुल्क आपके रिचार्ज किए गए Bean से काटा जाएगा। वार्षिक पर 2 महीने मुफ़्त। गैर-वापसी योग्य · केवल प्लेटफ़ॉर्म उपयोग के लिए।",
+    "perMonth": "मासिक",
+    "perYear": "वार्षिक",
+    "processing": "प्रक्रिया जारी है…",
+    "product": {
+      "PICAFE": "PiCafe सदस्यता",
+      "PISHOP": "PiShop सदस्यता",
+      "TRANSLATE": "स्वचालित अनुवाद सदस्यता"
+    },
+    "renewBtn": "नवीनीकृत/बदलें",
+    "storeGrade": {
+      "L": "L (50↑)",
+      "M": "M (50↓)",
+      "S": "S (30↓)"
+    },
+    "storeGradeHint": "मेरे {count} उत्पाद — ग्रेड चुनें",
+    "subscribeBtn": "सदस्यता लें",
+    "subscribeFail": "सदस्यता प्रक्रिया विफल रही",
+    "subscribeSuccess": "{product} सदस्यता शुरू हो गई है!",
+    "tagline": "सदस्यता = प्रति-लेनदेन शुल्क छूट पैकेज। जितना अधिक उपयोग करेंगे, उतना अधिक लाभ!",
+    "title": "Cafe.pi सदस्यता"
   },
   "themeToggle": {
     "dark": "Dark",

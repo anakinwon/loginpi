@@ -40,8 +40,47 @@
       "schedManualWhen": "При запуске администратором с помощью кнопки на этой странице",
       "schedOndemandDesc": "Обновление строк статистики за сегодня (UTC) по запросу — автоматическое выполнение, не ручная операция",
       "schedOndemandWhen": "При доступе к статистическому Dashboard администратора или изменении периода просмотра",
+      "schedOrderBackfillDesc": "Массовый расчет A2U для продавцов по завершенным, но невыплаченным заказам (без release_txid) — /api/admin/store/settle",
+      "schedOrderBackfillWhen": "Когда администратор запускает расчет невыплаченных средств",
+      "schedOrderCronDesc": "Заказы, по которым прошло 5 минут с момента готовности товара (READY), автоматически завершаются + автоматический расчет A2U через эскроу для продавца",
+      "schedOrderCronWhen": "Каждые 5 минут (Vercel Cron */5)",
       "scheduleDesc": "Даже если не запускать вручную, история выполнения будет автоматически записываться в соответствии с расписанием ниже",
       "scheduleTitle": "Расписание автоматических задач",
+      "settleA2uDisabled": "⚠️ A2U отключен — даже при запуске средства не будут переведены и останутся в статусе ожидания расчета (Необходимо проверить PI_WALLET_PRIVATE_SEED)",
+      "settleColAmount": "Сумма (π)",
+      "settleColBuyer": "Покупатель",
+      "settleColCcy": "Местная валюта",
+      "settleColDate": "Дата продажи",
+      "settleColLinked": "Привязка Pi",
+      "settleColSelect": "Выбрать",
+      "settleColSeller": "Продавец",
+      "settleColSettledAt": "Дата и время расчета",
+      "settleColStatus": "Статус расчета",
+      "settleColTxid": "Txid перевода",
+      "settleConfirm": "Будет переведено реальное Pi для {count} невыплаченных заказов. Продолжить?",
+      "settledEmpty": "Нет завершенных расчетов",
+      "settleDesc": "Расчет A2U (реальные Pi) для продавцов по завершенным, но еще не переведенным заказам. Для восстановления прошлых или неудачных случаев, которые не были обработаны 5-минутным cron.",
+      "settledSummary": "Завершено расчетов: {count}",
+      "settledTitle": "Список завершенных расчетов",
+      "settleEmpty": "Нет невыплаченных заказов ✅",
+      "settleError": "Ошибка расчета: {msg}",
+      "settleLinkedNo": "Не привязано (перевод невозможен)",
+      "settleLinkedYes": "Привязано",
+      "settleLoad": "Загрузить список невыплаченных средств",
+      "settleLoading": "Загрузка…",
+      "settleNeedTitle": "Список требующих расчета",
+      "settleResult": "Расчет завершен: {settled}/{attempted}",
+      "settleRun": "Выполнить расчет (фактический перевод)",
+      "settleRunning": "Расчет…",
+      "settleSelectedSummary": "Выбрано {count} · всего {total}π",
+      "settleStDisabled": "A2U отключен",
+      "settleStFailed": "Расчет не удался",
+      "settleStNoUid": "Не привязано",
+      "settleStSettled": "Расчет завершен",
+      "settleStUnsettled": "Невыплачено",
+      "settleSummary": "{count} невыплаченных · всего {total}π",
+      "settleTitle": "Расчеты с продавцами по невыплаченным средствам",
+      "settleTxidCopied": "Txid перевода скопирован",
       "success": "Агрегация за {date} завершена",
       "title": "On-demand Batch",
       "to": "Дата окончания",
@@ -138,7 +177,15 @@
     "nav": {
       "backHome": "← На главную",
       "batch": "On-demand Batch",
+      "beanAudit": "Журнал аудита",
+      "beanFeePlan": "Управление тарифными планами",
+      "beanSection": "☕ Bean Экономика",
+      "beanToken": "Bean Dashboard",
+      "beanTopUsers": "Лучшие пользователи",
+      "beanTxn": "История транзакций",
+      "beanWallets": "Управление кошельками",
       "board": "Управление Board",
+      "campaign": "Одобрение Campaign",
       "chatSection": "Управление кафе",
       "dashboard": "Dashboard",
       "eventExclude": "Управление исключениями",
@@ -148,6 +195,7 @@
       "i18nSection": "Многоязычие",
       "links": "Статус привязки аккаунтов",
       "payments": "История платежей",
+      "settle": "Управление расчетами",
       "stats": "Статистика",
       "stdApprovals": "Рабочий процесс утверждения",
       "stdAudit": "История изменений",
@@ -160,6 +208,7 @@
       "storeCategories": "Product Category",
       "storeSection": "Управление Store",
       "subscriptions": "Управление подписками",
+      "themes": "Управление Themes",
       "title": "Admin",
       "users": "Управление пользователями"
     },
@@ -190,6 +239,7 @@
       "title": "История платежей",
       "totalCount": "Всего {count} записей · Общая сумма завершенных {total} π",
       "txnDiv": {
+        "BEAN_CHARGE": "Пополнение Bean",
         "BET": "Ставка",
         "BOND_DEPOSIT": "Залог",
         "CANCEL_FEE": "Комиссия за отмену",
@@ -456,6 +506,61 @@
         "useY": "Используется",
         "validationRequired": "Название Category обязательно"
       }
+    },
+    "themes": {
+      "col": {
+        "cd": "Code",
+        "desc": "Описание",
+        "sortOrd": "Порядок",
+        "theme": "Theme",
+        "tp": "Группа",
+        "useYn": "Отображение"
+      },
+      "deleteConfirm": "Удалить Theme '{name}'? (Существующие кафе будут сохранены)",
+      "deleteFail": "Удаление не удалось",
+      "deleteSuccess": "Theme удален",
+      "editSuccess": "Theme изменен",
+      "emojiGroup": {
+        "daily": "Ежедневные и Общие",
+        "emphasis": "Эмоции и Акцент",
+        "sports": "Sports"
+      },
+      "emojiSuggest": "Рекомендуемые:",
+      "field": {
+        "cd": "Code Theme",
+        "desc": "Описание и Tag",
+        "emoji": "Emoji",
+        "nm": "Имя Theme",
+        "sortOrd": "Порядок сортировки",
+        "tp": "Группа",
+        "useYn": "Отображение"
+      },
+      "formTitleEdit": "Редактирование Theme",
+      "formTitleNew": "Регистрация нового Theme",
+      "noData": "Нет зарегистрированных Theme",
+      "placeholder": {
+        "cd": "ESPORTS",
+        "desc": "#Tag #Keyword",
+        "nm": "eSports"
+      },
+      "saveFail": "Сохранение не удалось",
+      "saveSuccess": "Theme зарегистрирован",
+      "searchPlaceholder": "Поиск по Code Theme или имени",
+      "selectTp": {
+        "basic": "Обычный (BASIC)",
+        "premium": "Premium (PREMIUM)"
+      },
+      "title": "Управление Themes",
+      "totalCount": "Всего {count} Theme",
+      "tpFilter": {
+        "all": "Все",
+        "basic": "Обычный",
+        "premium": "Premium"
+      },
+      "useYnOff": "Скрывать",
+      "useYnOn": "Отображать",
+      "validationCd": "Code Theme должен содержать сочетание заглавных латинских букв, цифр и _ от 1 до 20 символов",
+      "validationRequired": "Имя Theme и Emoji обязательны"
     },
     "users": {
       "changeFail": "Сбой изменения",
@@ -744,6 +849,32 @@
       "wallet": "Адрес кошелька"
     }
   },
+  "bean": {
+    "backToStore": "В PiShop",
+    "buying": "Обработка платежа…",
+    "chargeBtn": "Пополнить",
+    "chargeFail": "Не удалось обработать пополнение",
+    "chargeSuccess": "Пополнение {bean} Bean завершено!",
+    "chargeTitle": "Пополнение Bean",
+    "customLabel": "Ввести вручную (Bean)",
+    "loading": "Загрузка…",
+    "loginRequired": "Доступно после входа в систему",
+    "minCharge": "Вы можете пополнить от {min} Bean (1π) целыми числами",
+    "myBalance": "Мой баланс Bean",
+    "piBrowserHint": "Пополнение Bean возможно только в Pi Browser",
+    "piBrowserOnly": "Пополнение доступно только в Pi Browser",
+    "rateHint": "1 Pi = {per} Bean (фиксировано)",
+    "title": "Кошелек Bean",
+    "txnEmpty": "Нет истории транзакций",
+    "txnTitle": "История транзакций",
+    "type": {
+      "CHARGE": "Пополнение",
+      "REFUND": "Возврат",
+      "REWARD": "Награда",
+      "SPEND": "Использование",
+      "TRANSFER": "Перевод"
+    }
+  },
   "board": {
     "adopted": "Принято",
     "adoptedComplete": "Принято",
@@ -805,6 +936,9 @@
     "postContent": "Содержание",
     "postTitle": "Заголовок",
     "saving": "Сохранение...",
+    "searchAllPlaceholder": "Интегрированный поиск по всем доскам…",
+    "searching": "Поиск…",
+    "searchNoResults": "Нет результатов поиска",
     "searchPlaceholder": "Поиск по заголовку или содержанию",
     "submitPost": "Опубликовать",
     "title": "Board",
@@ -981,10 +1115,12 @@
       "myCafes": "Мои Cafe",
       "noCafes": "Вы еще не участвуете ни в одном Cafe.",
       "noCafesHint": "+ Создайте Cafe, чтобы открыть первую комнату",
+      "private": "Приватный",
       "regularCafes": "Обычные Cafe",
       "scrollMore": "Прокрутите, чтобы увидеть больше...",
       "subscriptionCafes": "Подписки на Cafe",
-      "subtitle": "Тематические Cafe сообщества Pi"
+      "subtitle": "Тематические Cafe сообщества Pi",
+      "unlimited": "Безлимитный"
     },
     "localeSelect": {
       "autoLocked": "🔒 Автоматический перевод по подписке",
@@ -1663,6 +1799,7 @@
     "loginRequired": "Доступно после входа",
     "myItemsTitle": "Управление моими товарами",
     "myOwnItem": "Это мой зарегистрированный товар",
+    "navBean": "☕ Bean Кошелек",
     "navHistory": "История транзакций",
     "navigateGoogle": "Начать с Google Map",
     "navigateKakao": "Kakao Map",
@@ -1770,6 +1907,58 @@
     "viewCount": "Просмотров {count}",
     "waitingBuyerConfirm": "Ожидается подтверждение получения от покупателя",
     "waitingSellerComplete": "Ожидается завершение сделки продавцом"
+  },
+  "subscribe": {
+    "active": "Подписано",
+    "annual": "Годовой",
+    "annualBadge": "2 месяца бесплатно",
+    "annualNudge": "Перейдите на годовую подписку и получите {months} месяцев бесплатно (экономия около {pct}%)",
+    "annualSave": "Экономьте {bean}☕ с годовой подпиской — {months} месяцев бесплатно! 🎉",
+    "backHome": "На главную",
+    "charge": "Пополнить Bean",
+    "cycleHeading": "Выберите период оплаты",
+    "expireAt": "Срок действия истекает: {date}",
+    "feat": {
+      "PICAFE": [
+        "Освобождение от платы за создание премиум- и ивент-кафе",
+        "Освобождение от платы за вход в премиум- и ивент-кафе"
+      ],
+      "PISHOP": [
+        "Освобождение от платы за размещение товаров",
+        "Освобождение от платы за создание Premium Product",
+        "Предоставление лимита на количество товаров по уровню"
+      ],
+      "TRANSLATE": [
+        "Неограниченный автоматический перевод сообщений",
+        "Без подписки: 1 ☕ за 1 раз → С подпиской: неограниченно бесплатно"
+      ]
+    },
+    "insufficient": "Недостаточно Bean — сначала пополните баланс",
+    "loading": "Загрузка…",
+    "loginRequired": "Доступно после входа",
+    "monthly": "Ежемесячно",
+    "myBalance": "Мой баланс Bean",
+    "notice": "Плата за подписку будет вычтена из вашего баланса Bean. Годовая подписка включает 2 месяца бесплатно. Не подлежит возврату, только для использования на платформе.",
+    "perMonth": "В месяц",
+    "perYear": "В год",
+    "processing": "Обработка…",
+    "product": {
+      "PICAFE": "Подписка PiCafe",
+      "PISHOP": "Подписка PiShop",
+      "TRANSLATE": "Подписка на автоматический перевод"
+    },
+    "renewBtn": "Продлить/Изменить",
+    "storeGrade": {
+      "L": "L (более 50 товаров)",
+      "M": "M (до 50 товаров)",
+      "S": "S (до 30 товаров)"
+    },
+    "storeGradeHint": "Мои товары: {count} — выберите уровень",
+    "subscribeBtn": "Подписаться",
+    "subscribeFail": "Не удалось обработать подписку",
+    "subscribeSuccess": "Подписка на {product} активирована!",
+    "tagline": "Подписка = пакет без комиссии за транзакцию. Чем больше используете, тем выгоднее!",
+    "title": "Подписка на Cafe.pi"
   },
   "themeToggle": {
     "dark": "Dark",

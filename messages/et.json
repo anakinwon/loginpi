@@ -40,8 +40,47 @@
       "schedManualWhen": "Kui administraator käivitab sellel lehel nupuga",
       "schedOndemandDesc": "Tänase (UTC) statistika rea On-demand värskendamine — automaatne, mitte käsitsi toiming",
       "schedOndemandWhen": "Administraatori statistika Dashboardile sisenemisel või vaateperioodi muutmisel",
+      "schedOrderBackfillDesc": "Arveldamata (release_txid puudub) lõpetatud tellimuste A2U hulgiarveldamine müüjatele — /api/admin/store/settle",
+      "schedOrderBackfillWhen": "Kui administraator käivitab arveldamata arvelduse",
+      "schedOrderCronDesc": "Automaatne tehingu lõpetamine tellimustele, mis on olnud 5 minutit pärast toote valmisolekut (READY) + automaatne A2U escrow arveldus müüjale",
+      "schedOrderCronWhen": "Iga 5 minuti järel (Vercel Cron */5)",
       "scheduleDesc": "Isegi kui te ei käivita seda käsitsi, salvestatakse käivitamise ajalugu automaatselt vastavalt allolevale ajakavale",
       "scheduleTitle": "Automaatse töö ajakava",
+      "settleA2uDisabled": "⚠️ A2U keelatud – isegi käivitamisel ei kanta raha üle ja see jääb ainult arveldamise ootele (vaja kontrollida PI_WALLET_PRIVATE_SEED)",
+      "settleColAmount": "Summa(π)",
+      "settleColBuyer": "Ostja",
+      "settleColCcy": "Kohalik valuuta",
+      "settleColDate": "Müügikuupäev",
+      "settleColLinked": "Pi link",
+      "settleColSelect": "Vali",
+      "settleColSeller": "Müüja",
+      "settleColSettledAt": "Arveldamise kuupäev/aeg",
+      "settleColStatus": "Arvelduse olek",
+      "settleColTxid": "Ülekanne txid",
+      "settleConfirm": "Kandke tegelik Pi üle {count} arveldamata juhtumi eest. Kas jätkata?",
+      "settledEmpty": "Arveldatud kirjeid pole",
+      "settleDesc": "Arveldab müüjatele A2U-ga (tegelik Pi) tellimused, mis on lõpetatud, kuid mida pole veel üle kantud. Taastab varasemad/ebaõnnestunud juhtumid, mida 5-minutiline cron ei käsitlenud.",
+      "settledSummary": "{count} arveldatud",
+      "settledTitle": "Arveldatud loend",
+      "settleEmpty": "Arveldamata tellimusi pole ✅",
+      "settleError": "Arveldamine ebaõnnestus: {msg}",
+      "settleLinkedNo": "Linkimata (ülekanne pole võimalik)",
+      "settleLinkedYes": "Lingitud",
+      "settleLoad": "Laadi arveldamata loend",
+      "settleLoading": "Laadimine…",
+      "settleNeedTitle": "Uuesti arveldamist vajavate loend",
+      "settleResult": "Arveldatud {settled}/{attempted} juhtumit",
+      "settleRun": "Käivita uuesti arveldamine (tegelik ülekanne)",
+      "settleRunning": "Arveldamine…",
+      "settleSelectedSummary": "{count} valitud · Kokku {total}π",
+      "settleStDisabled": "A2U keelatud",
+      "settleStFailed": "Uuesti arveldamine ebaõnnestus",
+      "settleStNoUid": "Linkimata",
+      "settleStSettled": "Uuesti arveldatud",
+      "settleStUnsettled": "Arveldamata",
+      "settleSummary": "{count} arveldamata · Kokku {total}π",
+      "settleTitle": "Arveldamata müüja arveldamine",
+      "settleTxidCopied": "Ülekande txid kopeeritud",
       "success": "{date} koondamine lõpetatud",
       "title": "On-demand Batch",
       "to": "Lõppkuupäev",
@@ -138,7 +177,15 @@
     "nav": {
       "backHome": "← Avalehele",
       "batch": "On-demand Batch",
+      "beanAudit": "Auditi Log",
+      "beanFeePlan": "Tasuliste plaanide haldus",
+      "beanSection": "☕ Beani majandus",
+      "beanToken": "Bean Dashboard",
+      "beanTopUsers": "Parimad kasutajad",
+      "beanTxn": "Tehingute ajalugu",
+      "beanWallets": "Rahakottide haldus",
       "board": "Board haldus",
+      "campaign": "Campaigni kinnitus",
       "chatSection": "Kohviku haldus",
       "dashboard": "Dashboard",
       "eventExclude": "Väljaarvamise haldamine",
@@ -148,6 +195,7 @@
       "i18nSection": "Mitmekeelsus",
       "links": "Konto linkimise staatus",
       "payments": "Maksete ajalugu",
+      "settle": "Arvelduse haldus",
       "stats": "Statistika",
       "stdApprovals": "Kinnituse töövoog",
       "stdAudit": "Muudatuste ajalugu",
@@ -160,6 +208,7 @@
       "storeCategories": "Toote Category",
       "storeSection": "Store haldus",
       "subscriptions": "Tellimuste haldus",
+      "themes": "Teemade haldus",
       "title": "Admin",
       "users": "Kasutajate haldus"
     },
@@ -190,6 +239,7 @@
       "title": "Maksete ajalugu",
       "totalCount": "Kokku {count} kirjet · Lõpetatud kokku {total} π",
       "txnDiv": {
+        "BEAN_CHARGE": "Beani laadimine",
         "BET": "Panus",
         "BOND_DEPOSIT": "Tagatisraha",
         "CANCEL_FEE": "Tühistustasu",
@@ -456,6 +506,61 @@
         "useY": "Kasutusel",
         "validationRequired": "Category nimi on kohustuslik"
       }
+    },
+    "themes": {
+      "col": {
+        "cd": "Kood",
+        "desc": "Kirjeldus",
+        "sortOrd": "Järjekord",
+        "theme": "Theme",
+        "tp": "Group",
+        "useYn": "Nähtavus"
+      },
+      "deleteConfirm": "Kas kustutada Theme '{name}'? (Olemasolevad kohvikud jäävad alles)",
+      "deleteFail": "Kustutamine ebaõnnestus",
+      "deleteSuccess": "Theme on kustutatud",
+      "editSuccess": "Theme on muudetud",
+      "emojiGroup": {
+        "daily": "Igapäevane·Üldine",
+        "emphasis": "Emotsioon·Rõhuasetus",
+        "sports": "Sports"
+      },
+      "emojiSuggest": "Soovitus:",
+      "field": {
+        "cd": "Theme'i kood",
+        "desc": "Kirjeldus·Tag",
+        "emoji": "Emoji",
+        "nm": "Theme'i nimi",
+        "sortOrd": "Sorteerimisjärjekord",
+        "tp": "Group",
+        "useYn": "Nähtavus"
+      },
+      "formTitleEdit": "Theme'i muutmine",
+      "formTitleNew": "Uue Theme'i registreerimine",
+      "noData": "Registreeritud Theme'e pole",
+      "placeholder": {
+        "cd": "ESPORTS",
+        "desc": "#Tag #Keyword",
+        "nm": "e-sports"
+      },
+      "saveFail": "Salvestamine ebaõnnestus",
+      "saveSuccess": "Theme on registreeritud",
+      "searchPlaceholder": "Otsi Theme'i koodi või nime",
+      "selectTp": {
+        "basic": "Basic (BASIC)",
+        "premium": "Premium (PREMIUM)"
+      },
+      "title": "Teemade haldus",
+      "totalCount": "Kokku {count} Theme'i",
+      "tpFilter": {
+        "all": "Kõik",
+        "basic": "Basic",
+        "premium": "Premium"
+      },
+      "useYnOff": "Peidetud",
+      "useYnOn": "Nähtav",
+      "validationCd": "Theme'i kood peab olema 1-20 tähemärki, koosnedes suurtähtedest, numbritest ja alakriipsust (_)",
+      "validationRequired": "Theme'i nimi ja Emoji on kohustuslikud"
     },
     "users": {
       "changeFail": "Muutmine ebaõnnestus",
@@ -744,6 +849,32 @@
       "wallet": "Rahakoti aadress"
     }
   },
+  "bean": {
+    "backToStore": "Tagasi PiShop'i",
+    "buying": "Makse töötlemine…",
+    "chargeBtn": "Lae",
+    "chargeFail": "Laadimise töötlemine ebaõnnestus",
+    "chargeSuccess": "{bean} Bean'i laadimine edukas!",
+    "chargeTitle": "Bean'i laadimine",
+    "customLabel": "Sisesta käsitsi (Bean)",
+    "loading": "Laadimine…",
+    "loginRequired": "Saadaval pärast sisselogimist",
+    "minCharge": "Saad laadida vähemalt {min} Bean'i (1π) täisarvudes",
+    "myBalance": "Minu Bean'i saldo",
+    "piBrowserHint": "Bean'i laadimine on võimalik ainult Pi Browseris",
+    "piBrowserOnly": "Saab laadida ainult Pi Browseris",
+    "rateHint": "1 Pi = {per} Bean (fikseeritud)",
+    "title": "Bean'i rahakott",
+    "txnEmpty": "Tehingute ajalugu puudub",
+    "txnTitle": "Tehingute ajalugu",
+    "type": {
+      "CHARGE": "Laadimine",
+      "REFUND": "tagasimakse",
+      "REWARD": "Preemia",
+      "SPEND": "Kulutamine",
+      "TRANSFER": "ülekanne"
+    }
+  },
   "board": {
     "adopted": "Vastu võetud",
     "adoptedComplete": "Vastu võetud",
@@ -805,6 +936,9 @@
     "postContent": "Sisu",
     "postTitle": "Pealkiri",
     "saving": "Salvestamine...",
+    "searchAllPlaceholder": "Integreeritud otsing kõigis Boardides…",
+    "searching": "Otsimine…",
+    "searchNoResults": "Otsingutulemusi pole",
     "searchPlaceholder": "Otsi pealkirja või sisu",
     "submitPost": "Esita",
     "title": "Board",
@@ -981,10 +1115,12 @@
       "myCafes": "Minu kohvikud",
       "noCafes": "Te ei osale veel üheski kohvikus",
       "noCafesHint": "+ Kohviku loomisega proovige avada oma esimene tuba",
+      "private": "Privaatne",
       "regularCafes": "Tavakohvikud",
       "scrollMore": "Kerige, et näha rohkem...",
       "subscriptionCafes": "Tellitud kohvikud",
-      "subtitle": "Pi kogukonna teemakohvik"
+      "subtitle": "Pi kogukonna teemakohvik",
+      "unlimited": "Piiramatu"
     },
     "localeSelect": {
       "autoLocked": "🔒 Tellimuse eelis automaattõlge",
@@ -1663,6 +1799,7 @@
     "loginRequired": "Saadaval pärast sisselogimist",
     "myItemsTitle": "Minu toodete haldamine",
     "myOwnItem": "See on minu registreeritud toode",
+    "navBean": "☕ Bean rahakott",
     "navHistory": "Transaction History",
     "navigateGoogle": "Mine Google Mapiga",
     "navigateKakao": "Kakao Map",
@@ -1770,6 +1907,58 @@
     "viewCount": "Vaatamisi {count}",
     "waitingBuyerConfirm": "Ootame ostja kättesaamise kinnitust.",
     "waitingSellerComplete": "Ootame müüja tehingu lõpetamist."
+  },
+  "subscribe": {
+    "active": "Tellitud",
+    "annual": "Aastane",
+    "annualBadge": "2 kuud tasuta",
+    "annualNudge": "Aastasele üleminekul {months} kuud tasuta (säästad umbes {pct}%)",
+    "annualSave": "Säästa {bean}☕ aastase maksega — {months} kuud tasuta! 🎉",
+    "backHome": "Tagasi koju",
+    "charge": "Laadi Bean",
+    "cycleHeading": "Vali maksetsükkel",
+    "expireAt": "Aegub: {date}",
+    "feat": {
+      "PICAFE": [
+        "Premium- ja ürituste Cafe loomise tasu vabastus",
+        "Premium- ja ürituste Cafe sisenemistasu vabastus"
+      ],
+      "PISHOP": [
+        "Toote kuvamise tasu vabastus",
+        "Premium toote loomise tasu vabastus",
+        "Tasemepõhine toodete arvu piirang"
+      ],
+      "TRANSLATE": [
+        "Sõnumite automaattõlge piiramatu",
+        "Mittetellijale 1 kord 1 ☕ → Tellijale piiramatu tasuta"
+      ]
+    },
+    "insufficient": "Bean'i saldo on ebapiisav — palun lae esmalt",
+    "loading": "Laadimine…",
+    "loginRequired": "Saadaval pärast sisselogimist",
+    "monthly": "Igakuine",
+    "myBalance": "Minu Bean saldo",
+    "notice": "Tellimistasu arvestatakse maha laetud Bean'idest. Aastane tellimus annab 2 kuud tasuta. Ei ole tagastatav · Ainult platvormi kasutamiseks.",
+    "perMonth": "Kuu",
+    "perYear": "Aasta",
+    "processing": "Töötlemine…",
+    "product": {
+      "PICAFE": "PiCafe tellimus",
+      "PISHOP": "PiShopi tellimus",
+      "TRANSLATE": "Automaattõlke tellimus"
+    },
+    "renewBtn": "Uuenda/Muuda",
+    "storeGrade": {
+      "L": "L (üle 50)",
+      "M": "M (kuni 50)",
+      "S": "S (kuni 30)"
+    },
+    "storeGradeHint": "Minu {count} toodet — vali tase",
+    "subscribeBtn": "Telli",
+    "subscribeFail": "Tellimuse töötlemine ebaõnnestus",
+    "subscribeSuccess": "{product} tellimus on alanud!",
+    "tagline": "Tellimus = tasu-per-tehingu vabastuspakett. Mida rohkem kasutate, seda rohkem säästate!",
+    "title": "Cafe.pi tellimus"
   },
   "themeToggle": {
     "dark": "Tume",

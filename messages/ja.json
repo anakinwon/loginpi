@@ -40,8 +40,47 @@
       "schedManualWhen": "このページで管理者がボタンで実行時",
       "schedOndemandDesc": "本日(UTC)統計行 On-demand 最新化 — 自動実行であり手動作業ではありません",
       "schedOndemandWhen": "管理者統計Dashboardアクセスまたは照会期間変更時",
+      "schedOrderBackfillDesc": "未決済(release_txidなし)の取引完了済み注文を販売者にA2Uで一括決済 — /api/admin/store/settle",
+      "schedOrderBackfillWhen": "管理者が未決済の決済を実行時",
+      "schedOrderCronDesc": "商品準備完了(READY)から5分経過した注文を自動で取引完了 + 販売者へエスクローA2U自動精算",
+      "schedOrderCronWhen": "5分ごと (Vercel Cron */5)",
       "scheduleDesc": "直接実行しなくても、以下のスケジュールに従って実行履歴が自動的に記録されます",
       "scheduleTitle": "自動作業スケジュール",
+      "settleA2uDisabled": "⚠️ A2U無効 — 実行しても送金されず、決済待機状態のままになります (PI_WALLET_PRIVATE_SEEDの確認が必要です)",
+      "settleColAmount": "金額(π)",
+      "settleColBuyer": "購入者",
+      "settleColCcy": "自国通貨",
+      "settleColDate": "販売日",
+      "settleColLinked": "Pi連携",
+      "settleColSelect": "選択",
+      "settleColSeller": "販売者",
+      "settleColSettledAt": "決済日時",
+      "settleColStatus": "決済Status",
+      "settleColTxid": "送金txid",
+      "settleConfirm": "未決済 {count}件に実際のPiを送金します。続行しますか？",
+      "settledEmpty": "決済完了履歴がありません",
+      "settleDesc": "取引完了済みだがまだ送金されていない注文を、販売者にA2U(実際のPi)で決済します。5分cronで処理できなかった過去・失敗した案件の復旧用。",
+      "settledSummary": "決済完了 {count}件",
+      "settledTitle": "決済完了List",
+      "settleEmpty": "未決済の注文はありません ✅",
+      "settleError": "決済失敗: {msg}",
+      "settleLinkedNo": "未連携(送金不可)",
+      "settleLinkedYes": "連携",
+      "settleLoad": "未決済Listを読み込む",
+      "settleLoading": "読み込み中…",
+      "settleNeedTitle": "再決済が必要なList",
+      "settleResult": "決済完了 {settled}/{attempted}件",
+      "settleRun": "再決済実行 (実際の送金)",
+      "settleRunning": "決済中…",
+      "settleSelectedSummary": "選択 {count}件 · 合計 {total}π",
+      "settleStDisabled": "A2U無効",
+      "settleStFailed": "再決済失敗",
+      "settleStNoUid": "未連携",
+      "settleStSettled": "再決済完了",
+      "settleStUnsettled": "未決済",
+      "settleSummary": "未決済 {count}件 · 合計 {total}π",
+      "settleTitle": "未決済販売者の決済",
+      "settleTxidCopied": "送金txidをコピーしました",
       "success": "{date} 集計完了",
       "title": "オンデマンド Batch",
       "to": "終了日",
@@ -138,7 +177,15 @@
     "nav": {
       "backHome": "← ホームへ",
       "batch": "オンデマンド Batch",
+      "beanAudit": "監査 Log",
+      "beanFeePlan": "料金プラン管理",
+      "beanSection": "☕ Bean 経済",
+      "beanToken": "Bean Dashboard",
+      "beanTopUsers": "上位ユーザー",
+      "beanTxn": "取引履歴",
+      "beanWallets": "ウォレット管理",
       "board": "Board管理",
+      "campaign": "キャンペーン承認",
       "chatSection": "Cafe 管理",
       "dashboard": "Dashboard",
       "eventExclude": "除外管理",
@@ -148,6 +195,7 @@
       "i18nSection": "多言語",
       "links": "アカウント連携状況",
       "payments": "支払い履歴",
+      "settle": "精算管理",
       "stats": "統計",
       "stdApprovals": "承認Workflow",
       "stdAudit": "変更履歴",
@@ -160,6 +208,7 @@
       "storeCategories": "商品 Category",
       "storeSection": "Store 管理",
       "subscriptions": "購読管理",
+      "themes": "テーマ管理",
       "title": "Admin",
       "users": "ユーザー管理"
     },
@@ -190,6 +239,7 @@
       "title": "支払い履歴",
       "totalCount": "全 {count}件 · 完了合計 {total} π",
       "txnDiv": {
+        "BEAN_CHARGE": "Bean チャージ",
         "BET": "ベット",
         "BOND_DEPOSIT": "保証金預入",
         "CANCEL_FEE": "キャンセル手数料",
@@ -456,6 +506,61 @@
         "useY": "使用",
         "validationRequired": "Category 名は必須です"
       }
+    },
+    "themes": {
+      "col": {
+        "cd": "コード",
+        "desc": "説明",
+        "sortOrd": "順序",
+        "theme": "テーマ",
+        "tp": "グループ",
+        "useYn": "表示"
+      },
+      "deleteConfirm": "'{name}' テーマを削除しますか？ (既存のカフェは維持されます)",
+      "deleteFail": "削除に失敗しました",
+      "deleteSuccess": "テーマが削除されました",
+      "editSuccess": "テーマが修正されました",
+      "emojiGroup": {
+        "daily": "日常・汎用",
+        "emphasis": "感情・強調",
+        "sports": "スポーツ"
+      },
+      "emojiSuggest": "おすすめ:",
+      "field": {
+        "cd": "テーマコード",
+        "desc": "説明・タグ",
+        "emoji": "絵文字",
+        "nm": "テーマ名",
+        "sortOrd": "ソート順",
+        "tp": "グループ",
+        "useYn": "表示"
+      },
+      "formTitleEdit": "テーマ修正",
+      "formTitleNew": "新規テーマ登録",
+      "noData": "登録されたテーマがありません",
+      "placeholder": {
+        "cd": "ESPORTS",
+        "desc": "#タグ #キーワード",
+        "nm": "eスポーツ"
+      },
+      "saveFail": "保存に失敗しました",
+      "saveSuccess": "テーマが登録されました",
+      "searchPlaceholder": "テーマコード・名前検索",
+      "selectTp": {
+        "basic": "一般(BASIC)",
+        "premium": "Premium(PREMIUM)"
+      },
+      "title": "テーマ管理",
+      "totalCount": "合計 {count}個のテーマ",
+      "tpFilter": {
+        "all": "すべて",
+        "basic": "一般",
+        "premium": "Premium"
+      },
+      "useYnOff": "非表示",
+      "useYnOn": "表示",
+      "validationCd": "テーマコードは英大文字・数字・_の組み合わせで1〜20文字である必要があります",
+      "validationRequired": "テーマ名と絵文字は必須です"
     },
     "users": {
       "changeFail": "変更失敗",
@@ -744,6 +849,32 @@
       "wallet": "ウォレットアドレス"
     }
   },
+  "bean": {
+    "backToStore": "PiShopへ",
+    "buying": "決済進行中…",
+    "chargeBtn": "チャージ",
+    "chargeFail": "チャージ処理に失敗しました",
+    "chargeSuccess": "{bean} Bean チャージ完了！",
+    "chargeTitle": "Bean チャージ",
+    "customLabel": "直接入力 (Bean)",
+    "loading": "読み込み中…",
+    "loginRequired": "Login 後に利用できます",
+    "minCharge": "最小 {min} Bean (1π) から整数でチャージできます",
+    "myBalance": "私のBean残高",
+    "piBrowserHint": "Bean チャージは Pi Browser でのみ可能です",
+    "piBrowserOnly": "Pi Browser でのみチャージできます",
+    "rateHint": "1 Pi = {per} Bean (固定)",
+    "title": "Bean ウォレット",
+    "txnEmpty": "取引履歴がありません",
+    "txnTitle": "取引履歴",
+    "type": {
+      "CHARGE": "チャージ",
+      "REFUND": "返金",
+      "REWARD": "報酬",
+      "SPEND": "使用",
+      "TRANSFER": "ギフト"
+    }
+  },
   "board": {
     "adopted": "採用",
     "adoptedComplete": "採用完了",
@@ -805,6 +936,9 @@
     "postContent": "内容",
     "postTitle": "タイトル",
     "saving": "修正中…",
+    "searchAllPlaceholder": "全体Board統合検索…",
+    "searching": "検索中…",
+    "searchNoResults": "検索結果がありません",
     "searchPlaceholder": "TitleまたはContentを検索",
     "submitPost": "登録",
     "title": "Board",
@@ -981,10 +1115,12 @@
       "myCafes": "自分の Cafe",
       "noCafes": "まだ参加中の Cafe はありません",
       "noCafesHint": "+ Cafe 作成で最初の Room を開設してみましょう",
+      "private": "非公開",
       "regularCafes": "一般 Cafe",
       "scrollMore": "スクロールしてさらに表示…",
       "subscriptionCafes": "購読 Cafe",
-      "subtitle": "Pi Community Theme Cafe"
+      "subtitle": "Pi Community Theme Cafe",
+      "unlimited": "無期限"
     },
     "localeSelect": {
       "autoLocked": "🔒 購読特典 自動翻訳",
@@ -1663,6 +1799,7 @@
     "loginRequired": "ログイン後に利用できます",
     "myItemsTitle": "My Item管理",
     "myOwnItem": "ご自身で登録した商品です",
+    "navBean": "☕ Bean ウォレット",
     "navHistory": "取引履歴",
     "navigateGoogle": "Google Mapで出発",
     "navigateKakao": "Kakao Map",
@@ -1770,6 +1907,58 @@
     "viewCount": "閲覧 {count}",
     "waitingBuyerConfirm": "購入者の受領確認をお待ちしています",
     "waitingSellerComplete": "販売者の取引完了処理をお待ちしています"
+  },
+  "subscribe": {
+    "active": "購読中",
+    "annual": "年間",
+    "annualBadge": "2ヶ月無料",
+    "annualNudge": "年間プランへの切り替えで {months}ヶ月無料 (約 {pct}% 節約)",
+    "annualSave": "年間決済で {bean}☕ 節約 — {months}ヶ月無料！ 🎉",
+    "backHome": "Homeへ",
+    "charge": "Bean Charge",
+    "cycleHeading": "決済サイクルを選択してください",
+    "expireAt": "有効期限: {date}",
+    "feat": {
+      "PICAFE": [
+        "Premium・イベント Cafe 作成料金免除",
+        "Premium・イベント Cafe 入場料金免除"
+      ],
+      "PISHOP": [
+        "商品露出料金免除",
+        "Premium商品作成料金免除",
+        "ランク別商品数上限提供"
+      ],
+      "TRANSLATE": [
+        "Message 自動翻訳 無制限",
+        "非購読 1回 1 ☕ → 購読 無制限無料"
+      ]
+    },
+    "insufficient": "Bean 残高が不足しています — まずチャージしてください",
+    "loading": "読み込み中…",
+    "loginRequired": "Login後利用できます",
+    "monthly": "月間",
+    "myBalance": "My Bean残高",
+    "notice": "購読料はチャージしたBeanから差し引かれます。年間プランは2ヶ月無料。換金不可・プラットフォーム使用専用。",
+    "perMonth": "月",
+    "perYear": "年",
+    "processing": "処理中…",
+    "product": {
+      "PICAFE": "PiCafe 購読",
+      "PISHOP": "PiShop サブスクリプション",
+      "TRANSLATE": "自動翻訳 購読"
+    },
+    "renewBtn": "更新/変更",
+    "storeGrade": {
+      "L": "L (50個↑)",
+      "M": "M (50個↓)",
+      "S": "S (30個↓)"
+    },
+    "storeGradeHint": "商品 {count}個 — グレードを選択してください",
+    "subscribeBtn": "購読する",
+    "subscribeFail": "購読処理に失敗しました",
+    "subscribeSuccess": "{product} の購読が開始されました！",
+    "tagline": "購読 = 1件あたりの料金免除Package。多く使うほどお得！",
+    "title": "Cafe.pi購読"
   },
   "themeToggle": {
     "dark": "Dark",
