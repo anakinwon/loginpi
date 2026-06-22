@@ -34,6 +34,17 @@ const TYPE_META: Record<
     bar: 'bg-purple-500',
     flow: 'out',
   },
+  // 구독료 — 상품 구독 차감(SPEND군: USER 감소 → 거버넌스 회수)
+  SUBSCRIBE: {
+    label: '구독료',
+    emoji: '📅',
+    bar: 'bg-indigo-500',
+    flow: 'out',
+  },
+  // 팁 — fn_bean_apply의 'TIP'(SPEND군 거버넌스 회수). P2P 선물(TRANSFER)과 별개
+  TIP: { label: '팁', emoji: '💝', bar: 'bg-rose-500', flow: 'out' },
+  // 수수료 — 플랫폼 수수료(SPEND군 회수)
+  FEE: { label: '수수료', emoji: '🧾', bar: 'bg-orange-500', flow: 'out' },
   TRANSFER: {
     label: 'P2P 선물',
     emoji: '🤝',
@@ -71,12 +82,15 @@ function BeanDistList({ data }: { data: DistributionData }) {
         전체 {data.total_cnt.toLocaleString()}건 · 총거래량{' '}
         {totalGross.toLocaleString()}{' '}
         <BeanIcon className="inline-block h-3.5 w-3.5 align-text-bottom" />{' '}
-        (절댓값 합 — 충전·사용·보상·환불·전송 포함)
+        (절댓값 합 — 충전·사용·구독료·팁·수수료·보상·환불·전송 등 전 유형)
       </p>
 
       <ul className="space-y-2.5">
         {items.map((it) => {
-          const meta = TYPE_META[it.txn_tp_cd] ?? TYPE_META.ETC
+          const known = TYPE_META[it.txn_tp_cd]
+          const meta = known ?? TYPE_META.ETC
+          // 미매핑 코드는 '기타'로 뭉뚱그리지 않고 원본 코드를 노출해 추적 가능하게
+          const label = known ? known.label : `${meta.label} (${it.txn_tp_cd})`
           const gross = Number(it.gross_bean)
           const net = Number(it.net_bean)
           const pct = Math.max(2, (gross / maxGross) * 100)
@@ -88,7 +102,7 @@ function BeanDistList({ data }: { data: DistributionData }) {
               <div className="flex items-baseline justify-between gap-2 text-sm">
                 <span className="flex min-w-0 items-center gap-1.5 font-medium">
                   <span className="shrink-0">
-                    {meta.emoji} {meta.label}
+                    {meta.emoji} {label}
                   </span>
                   <span
                     className={`shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${badge.cls}`}
