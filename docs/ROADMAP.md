@@ -2,7 +2,7 @@
 
 Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Network 앱 플랫폼
 
-> **기준일**: 2026-06-21
+> **기준일**: 2026-06-22
 > **현재 버전**: Phase 7~12 완료 (PiCafé MVP · Pi 수익화 · 생태계 확장 · 사용자 프로필 · 통계 대시보드 · PiTranslate™ TASK-090~099 ✅) · **Phase 13 PiShop(MPS) Phase 1+2+3 완료 — P1+P2(TASK-100~111 ✅) + 후속 개선(A2U 환불·이미지 업로드) + Phase 3 O2O 오프라인 매장 커머스 완료 (TASK-113~120 ✅ 2026-06-16: 구글 카페 half-인증 등록·오프라인 주문 상태머신(주문중→준비중→상품대기중→10분 자동완료)·주문방법 3종·취소수수료·보이스 주문알림·지도 상품판매·IDOR 차단, `sql/050~060`) · PiRC3만 보류** · **Phase 14 PiVoice™ v3.0 권한 시스템 구현 완료 (TASK-120~125 ✅, `docs/PRD_9_VOICE_CHAT.md` v3.0 — 방장 보장 슬롯 + 멤버 자동 2/승인 2, S0 실기기 검증·TURN env 잔여)** · **Phase 15 LBS P0+P1 완료 (TASK-130~140 ✅, 상품 개별 위치 등록 포함)** · 횡단 개선: 무한 스크롤·지연 로딩 + SWR 캐싱·병렬 호출 성능 튜닝, Pi Tip→Bean 리브랜딩, 스티커 노출 개선 (2026-06-12) · **횡단 3차 (2026-06-13): Pi Browser admin 다국어 전환 무반응 수정(_pit 티켓 선발급) + 헤더 다국어 콤보 3계층 캐시 성능 개선** · **횡단 4차 (2026-06-14): CafePi 헤더 로고 교체·Pi Bet UI 아코디언·다국어 선택기 기억·PiShop 브랜드 통일·admin open redirect 방어 + 어드민 대시보드 고도화(coin360 트리맵·사용자 관리 통합·KST 집계 교정·결제내역 개선)** · **Phase 16 평가 엔진 정밀화 (2026-06-15): M2 상태형 양방향 멱등·평가엔진 select후분기 복구·CHAR→VARCHAR(sql/046)·CRON_SECRET 프로덕션 필수·재평가 안전망 cron·관리자 재평가 버튼** · **횡단 5차 (2026-06-15): i18n 전체 자동번역 서버 after() 백그라운드화 + 번역률 반올림 버그·콤보 캐시 키 v2 무효화** · **GTM 문서화 (2026-06-16): 제품소개서(단기 4목표 13장) + 공개·라이선스 정책(오픈코어 3계층) + 성능 리스크 레지스터(7종 병목 분석) + 운영 이슈 기록(Vercel Hobby cron·GitHub Webhook)** · **이벤트 보상 전환 (2026-06-17, TASK-156): 10미션 완주 보상을 Pi A2U 송금 → mps_seller_bond 1π 직접 적립으로 전환, 자동→관리자 수동 지급 버튼, 원자적 RPC `fn_evt_grant_bond_reward`(FOR UPDATE+reward_st_cd 게이트)로 이중지급 차단, M3 유료테마 게이트 결함 수정** · **PiShop 카트 다건 일괄 판매 (2026-06-17, 13-P4): 등록 페이지 분리(중고직거래/오프라인매장)+자국통화 등록표시(등록시점 고정 참고가 sql/062)+오프라인매장 카트 다중상품 단일 Pi 결제(`mps_order_item`·원자 RPC `fn_mps_cart_order_create`/`_cancel` sql/063)+주문관리 라인/호명/픽업매장명/색상. ⚠️ sql 062·063 적용+실기기 결제 검증 잔여**
 > **배포 URL**: https://loginpi.vercel.app
 > **기술 스택**: Next.js 16 App Router · React 19 · TypeScript 6 · Tailwind CSS v4 · NextAuth.js · Supabase PostgreSQL
@@ -47,7 +47,7 @@ Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Net
 | **15** | LBS 위치기반서비스 | ✅ 완료 (P0+P1) | 100% (상품 개별 위치 포함 · 지도 UI 확장 예정) |
 | **16** | 이벤트 미션 시스템 (Pi 요원 육성) | ✅ 완료 | 구현·운영 중 (참여 7·완주 1) · 2026-06-15 평가 엔진 정밀화(M2 상태형 양방향·select후분기 복구·CHAR→VARCHAR·재평가 버튼) · 2026-06-17 보상 전환(A2U→1π 보증금 적립·관리자 수동 지급·원자적 RPC 이중지급 차단·M3 유료테마 게이트, TASK-156) |
 | **17** | BEAN 토큰 발행 (Pi Launchpad) | 📝 기획·문서 | PRD_12 v1.7 — 토큰명 BEAN(기존 Pi Bean 온체인화·`1 Pi=100 BEAN`)·세일 0.01 Pi·분배 40/25/15/12/8·발행주체 개인·유동성 Pi 단독(레드라인 #2). **발행 전 코드 0(문서 전용)**. 잔여: T05 증권성 법무자문·T01 개인 KYC·T02 Launchpad 신청(외부 회신 대기) |
-| **19** | Bean Token 경제 관리 시스템 | 🚧 구현 중 | PRD_16_TOKEN_MNG.md v1.2 — ☕빈토큰지갑(`bean_token_wallet`) PLATFORM/USER 이중구조, Bean 경제 어드민 대시보드. DB migration(bean_wlt→bean_token_wallet+PLATFORM 지갑 신설) + 어드민 KPI/거래/지갑/수동조정 화면 P0. 2026-06-19 착수 (TASK-180~186) |
+| **19** | Bean Token 경제 관리 시스템 | 🚧 구현 중 (P0 완료·후속 진행) | PRD_16_TOKEN_MNG.md v1.2 — Bean 대차대조표 대시보드(`/admin/token` T계정 시각화)·2층위 매출 분석·P2P 선물·신규 매출원 4종(자동번역·AI·부스팅·프로모션)·캠페인 운영 어드민(`/admin/campaign` 다중·재원충전·신청승인)·구독관리 통계 차트+username 검색·거래내역 반응형 UI(모바일 카드/데스크탑 테이블)·TRANSFER 팁 집계 오류 수정·카페빈 통일 (2026-06-22). 잔여: O2O 구매 자동 캠페인 트리거 |
 | **18** | 판매자 주문 알림 (Telegram + Realtime + Pull) | ✅ 완료 | 100% (2026-06-18 — Outbox 3계층: 결제완료 즉시 Telegram 발송·인앱 Realtime 토스트·안읽은 뱃지 / 판매자 봇 연동 온보딩(딥링크+webhook) / 보안 하드닝(webhook fail-closed·재바인딩 차단) · `sql/064` · PRD_13_MSG) |
 | **횡단** | 성능 튜닝 | ✅ 완료 | 100% (무한 스크롤·지연 로딩·SWR 캐싱·리브랜딩·스티커) |
 | **횡단3** | Pi Browser 안정화·콤보 성능 (2026-06-13) | ✅ 완료 | 100% (admin 다국어 전환 무반응 수정·헤더 콤보 3계층 캐시) |
@@ -1586,10 +1586,81 @@ if (meta?.type === 'CHAT_SUBSCR') {
 
 ---
 
+## Phase 19: Bean Token 경제 관리 시스템 🚧 진행 중 (2026-06-19~)
+
+> 상세 요구사항: **`docs/PRD_16_TOKEN_MNG.md` v1.2**
+> Bean 경제 가시화·회계 정합성·신규 매출원 추가·캠페인 운영 어드민. 2026-06-19 착수 (TASK-180~186).
+
+### §19.1 Bean 대차대조표 대시보드 (`/admin/token`) ✅ 완료
+
+- ✅ T계정 시각화: 차변(ΣCHARGE + Σmint) = 대변(ΣUSER + ΣGOVERNANCE) 잔액 대조
+- ✅ `fn_bean_revenue_summary` (sql/079) — 항목별(구독·번역·AI·부스팅·선물) Bean 매출 집계
+- ✅ Bean 지갑 목록 (`bean_token_wallet`) — PLATFORM / USER 이중구조
+
+### §19.2 2층위 매출 분석 ✅ 완료
+
+- ✅ **Pi 현금매출** (충전): Pi→Bean 환전 총량, 충전 건수·금액 차트
+- ✅ **Bean 회수매출** (구독·번역·AI·부스팅): Bean SPEND 유형별 집계 분리
+
+### §19.3 사용자 Bean 지갑 개선 ✅ 완료
+
+- ✅ 프로필 Bean 탭: 거래내역 현지 시간대 표시 (`toLocaleString`, 시·분·초 포함)
+- ✅ 카페 생성 Bean 부족 시 `/bean` 충전 화면 링크 안내
+
+### §19.4 회계 정합성 수정 ✅ 완료
+
+- ✅ REFUND 거버넌스 역차감 버그 수정 (sql/077)
+- ✅ `sys_user` FK 임베딩 6곳 → 별도 병합으로 교체 (PostgREST 조인 실패 방지)
+- ✅ 중복 구독 함수 오버로드 DROP (sql/085) — `fn_bean_subscribe_product` 레거시 제거
+
+### §19.5 카페방 선물 Bean P2P (sql/078) ✅ 완료
+
+- ✅ `fn_bean_transfer` (USER→USER): 금액 10 / 50 / 100 Bean 3단계
+- ✅ 모든 사용자 허용 (`canTip` 게이트 제거) · 일반 브라우저에서도 가능
+- ✅ 선물 버튼: 메시지 탭 시 노출(상시→토글), 이벤트 전파 차단, 연속 메시지 지원
+- ✅ Bean 선물 저장 = `msg_msg` TIP_NOTI (msg_tip은 미사용 레거시)
+
+### §19.6 신규 매출원 4종 ✅ 완료
+
+| 매출원 | 과금 | SQL |
+|---|---|---|
+| 자동번역 (비구독 확인) | 건당 1 Bean SPEND | — |
+| AI 한도 초과 | 건당 5 Bean SPEND | — |
+| 카페 부스팅 (노출 우선 7일) | 50 Bean SPEND (sql/080) | `sql/080` |
+| 프로모션 Bean 발행 | 거버넌스 지갑 충전 (sql/081) | `sql/081` |
+
+### §19.7 매장 온보딩 캠페인 + 어드민 운영 ✅ 완료 (2026-06-22)
+
+- ✅ 선착순 100매점 × 10,000 Bean/점 보상 캠페인 (REWARD_POOL 100만 Bean 발행 — `fn_bean_mint` + `sql/082~084`)
+- ✅ 자동 지급 → **신청 + 관리자 승인 후 지급** 전환 (`fn_bean_campaign_approve`)
+- ✅ `/admin/campaign` 캠페인 운영 어드민:
+  - 다중 캠페인 목록 · 신규 캠페인 등록
+  - 재원 충전 (거버넌스 지갑 → 캠페인 배분 `fn_bean_mint`)
+  - 신청 목록 조회 · 개별 승인 (`fn_bean_apply('REWARD')` 원자 지급)
+- ✅ 어드민 사이드바 · 홈 캠페인 진입점 추가
+
+### §19.8 Bean 어드민 UX 완성 (2026-06-21~22)
+
+- ✅ Bean 거래내역 반응형 UI: 모바일 카드 / 데스크탑 테이블 분기 (`bf0026d`)
+- ✅ 거래내역 TRANSFER 유형 누락 팁(0) 집계 오류 수정 (`669886e`)
+- ✅ 구독관리 화면(`/admin/subscriptions`) 조회 복구 · 통계 차트 · username 검색 (`51e5413`)
+- ✅ 커피빈 → **카페빈** 전면 통일 (대기업 상호 차용 회피, `826e71c`)
+- ✅ BeanIcon (`bean.png`) 통일 — 콩 이모지 전면 교체
+
+### 잔여 (Phase 19 후속)
+
+| 항목 | 상태 |
+|---|---|
+| O2O 구매 완료 시 캠페인 자동 트리거 연결 | 🔶 미구현 |
+| `bean_fee_plan` 하드코딩 항목 DB 이전 | 🔶 보류 |
+
+---
+
 ## 변경 이력
 
 | 버전 | 날짜 | 변경 내용 | 작성자 |
 |------|------|---------|-------|
+| v11.0 | 2026-06-22 | **Phase 19 어드민 완성 + 카페빈 통일** — ① **보상 캠페인 운영 어드민** (`45f4bcf`): `/admin/campaign` 다중 캠페인 목록·재원 충전(`fn_bean_mint` 거버넌스 지갑)·신청 목록 조회·개별 승인(`fn_bean_campaign_approve`→`fn_bean_apply('REWARD')`) + 어드민 사이드바·홈 진입점. 자동→신청+승인 전환 확정. SQL 0 (sql/082~084 기 배포). ② **Bean 거래내역 반응형 UI** (`bf0026d`): 모바일=카드형, 데스크탑=테이블형 분기. ③ **거래내역 팁(0) 집계 오류** 수정 (`669886e`): TRANSFER 유형 집계 누락으로 팁 합계가 0 표시되던 버그. ④ **커피빈 → 카페빈** 전면 통일 (`826e71c`): 대기업 상호 차용(커피빈 Coffee Bean) 회피 — 이모지·텍스트·i18n 키 전수 교체. ⑤ **구독관리 화면 복구** (`51e5413`): `/admin/subscriptions` 조회 오류 수정·구독 건수 통계 차트 추가·username 검색 지원. Phase 19 §19.7~19.8 완료. 잔여: O2O 구매 자동 캠페인 트리거. 기준일 2026-06-22 갱신. | asoká |
 | v10.9 | 2026-06-21 | **Phase 19 Bean Token 경제 가시화 및 회계 정합성** — ① **Bean 대차대조표 대시보드**(`/admin/token`, §19.1): 차변(ΣCHARGE+Σmint) = 대변(ΣUSER+ΣGOVERNANCE) T계정 시각화 + `fn_bean_revenue_summary`(sql/079)로 항목별 매출 집계. ② **2층위 매출 분석**(§19.2): Pi 현금매출(충전) vs Bean 회수매출(구독·번역·AI·부스팅) 분리. ③ **사용자 Bean 지갑 개선**(§19.3): 프로필 Bean 탭(거래내역 현지시간) + 카페 생성 Bean 부족 시 `/bean` 링크. ④ **회계 정합성 수정**(§19.4): REFUND 거버넌스 역차감 버그(sql/077)·sys_user FK 조인 6곳(별도 병합)·중복 구독함수 오버로드 DROP(sql/085). ⑤ **카페방 선물 Bean P2P**(§19.5, sql/078): fn_bean_transfer(USER→USER)·금액 10/50/100 Bean·모든 사용자 허용·일반 브라우저 가능. ⑥ **신규 매출원 4종**(§19.6): 자동번역 건당 1 Bean(비구독 확인)·AI 한도초과 건당 5 Bean·카페 부스팅 7일 50 Bean(sql/080)·프로모션 발행(sql/081). ⑦ **매장 온보딩 캠페인**(§19.7, sql/082~084): 선착순 100매점 10,000 Bean/점(REWARD_POOL 100만 발행·관리자 승인제). ⑧ **UX·정책**(§19.8): BeanIcon 통일·자동번역 TRANSLATE 구독자도 사용가능·주문알림 버튼 제거. PRD.md v12.0 신규 Phase 19 섹션·섹션 재번호화(19→20~23 환경변수·디렉토리·DB·이력). | asoká |
 | v10.8 | 2026-06-20 | **통합 텍스트 검색 trgm GIN 표준화 + 카페 검색 UX + 정산 자국통화 무결성** — ① **3대 검색(카페·상품·게시판) 통합·표준화** (오늘 핵심 성과): **백엔드** — 카페 검색(`sql/072` prefix→substring trigram 전환, `6ceb29e`)의 pg_trgm GIN을 상품(`mps_item` item_nm/desc)·게시판(`brd_post` post_ttl/cont)으로 확대(`sql/076`, `004a024`). `gin_trgm_ops`가 PostgREST `.ilike`를 대소문자 무시로 직접 가속 → **앱 코드 0줄 변경**으로 `%검색어%` 풀스캔 제거. **프론트** — 상품(`87fe65d`)·게시판(`d224383`) 검색을 카페식 **입력 즉시(debounce) 검색**으로 통일 + **게시판 전체 통합검색 신규**(`dd5199c`, 검색결과→해당 게시글 딥링크). 카페·상품·게시판이 동일 색인 표준 + 동일 검색 경험으로 수렴(`TROUBLESHOOT.md` §substring 검색 trigram 확대 동기화). 주의: 2글자 미만은 trigram 효율 저하 → UI 최소 2글자 권장. ② **카페 검색·목록 UX**: '모야' 0건 신고 진단 — 검색엔진은 정상이고 해당 방이 비공개라 공개 검색에서 제외(정상)임을 3계층 교차검증으로 규명 → '내 카페'를 구독/일반 서브섹션으로 그룹화 + 🔒비공개 배지(공개 디렉토리 미노출 명시) + 전 카페 유효기간/무기한 표시(이벤트방은 `entry_expire_dtm` 기준, 그 외 `expr_dtm`). ③ **정산 자국통화 무결성(돈 양보없음)**: 카트 주문 RPC가 ccy를 라인(`mps_order_item`)에만 기록·헤더(`mps_order`) 누락 → 정산 `settleOrder`가 헤더를 읽어 NULL이 정산장부(RELEASE_OUT)까지 전파된 버그. 주문생성 RPC에 헤더 ccy를 동일 트랜잭션 원자 내장(`sql/074`) + TS 사후 보정 2차 방어 + 기존 누락분 소급(주문헤더 3·장부 4건, **소스 실재 건만**·Pi직거래는 NULL 유지·부호 정합). RPC 직접호출 실증 검증(테스트 주문 생성→확인→취소). ④ **마켓 회귀 수정**: 폐기 테마(`del_yn='Y'`) 쓰던 기존 카페가 INNER JOIN에서 탈락하던 마켓 노출 회귀 수정(`sql/075`). ⚠️ sql 074~076 DB 적용 완료(074·076 실증 검증). | asoká |
 | v10.7 | 2026-06-20 | **레거시 Pi 구독(CHAT_SUBSCR) → Bean 구독 흡수 ✅** (PRD_15_FEE §1-6 순위1) — 채팅 권한 출처를 `msg_subscr`(Pi)에서 `bean_subscr`(Bean)로 일원화. `getChatPlan` 재작성(PICAFE→PREMIUM 캡·TRANSLATE→자동번역·운영자→BUSINESS, 레거시 미참조), `POST /api/subscriptions` **410 폐기**·`DELETE`는 `bean_subscr` 자동갱신 해제, `payments/complete` `CHAT_SUBSCR` 분기·`use-subscribe-plan` 훅 **제거**, 채팅 유료 게이트(subscription-gate·chat-room-panel·sticker-picker)는 `/subscribe`(Bean) 유도. 기존 활성 레거시 구독자(일반 2명)는 권한 미인정·Bean 재구독 유도(마스터 결정). tsc·빌드 통과(변경파일 lint 0 errors). 구독 시스템 구현파일 목록·PiRC2 레거시 블록 폐기 마킹. 잔여 정리대상: `/api/subscriptions/plans`(死코드)·`admin/subscriptions`. PRD_15_FEE v0.4 동기화. | asoká |

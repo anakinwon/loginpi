@@ -134,7 +134,12 @@ export async function evaluateUserMissions(
             regr_id: 'SYSTEM',
             modr_id: 'SYSTEM',
           })
-          if (error) console.error(`미션 기록 실패 [${mc}]:`, error.message)
+          // 23505(unique_violation): 동시 평가 race — 다른 요청(별도 행위)·cron 재평가가
+          // 같은 미션을 먼저 INSERT한 경우다. 부분 유니크가 WHERE del_yn='N'이라 이 충돌은
+          // '이미 활성 완료 행이 존재'를 의미하므로, 멱등 성공으로 간주하고 로그를 남기지 않는다.
+          if (error && error.code !== '23505') {
+            console.error(`미션 기록 실패 [${mc}]:`, error.message)
+          }
         } else if (existing.del_yn === 'Y') {
           // 논리삭제됐다 재충족 → 복구
           const { error } = await db
