@@ -24,8 +24,8 @@ const DauWauMauChart = dynamic(
   () => import('@/components/charts/dau-wau-mau-chart'),
   { ssr: false },
 )
-const RevenueTimelineChart = dynamic(
-  () => import('@/components/charts/revenue-timeline-chart'),
+const BeanRevenueTimeline = dynamic(
+  () => import('@/components/admin/bean-daily-chart'),
   { ssr: false },
 )
 const RevenueDonutChart = dynamic(
@@ -434,7 +434,7 @@ export function StatsDashboard() {
               <div className="rounded-lg border p-4">
                 <p className="mb-2 text-sm font-medium">{t('themeDaily')}</p>
                 {revenueData && revenueData.series.length > 0 ? (
-                  <RevenueTimelineChart data={revenueData.series} />
+                  <BeanRevenueTimeline period={period} />
                 ) : (
                   <div className="bg-muted h-64 animate-pulse rounded-lg" />
                 )}
