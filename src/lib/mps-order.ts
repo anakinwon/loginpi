@@ -749,6 +749,13 @@ export async function markPickup(orderId: string, buyerId: string) {
   if (!data) return null
   const order = data as MpsOrder
   await settleOrder(db, order, buyerId)
+  // O2O 첫 구매 완료 Bean 보상 — PENDING 신청(관리자 승인 후 지급). 베스트 에포트.
+  db.rpc('fn_bean_campaign_grant', {
+    p_usr_id: buyerId,
+    p_campaign_cd: 'O2O_PURCHASE',
+  }).then(({ error }) => {
+    if (error) console.error('[O2O 캠페인] 픽업 신청 실패:', error.message)
+  })
   return order
 }
 
@@ -774,6 +781,14 @@ export async function autoCompleteReadyOrders(): Promise<number> {
   const orders = (data as MpsOrder[] | null) ?? []
   for (const order of orders) {
     await settleOrder(db, order, 'SYSTEM')
+    // O2O 첫 구매 완료 Bean 보상 — PENDING 신청. 정산 흐름과 독립(베스트 에포트).
+    db.rpc('fn_bean_campaign_grant', {
+      p_usr_id: order.buyer_id,
+      p_campaign_cd: 'O2O_PURCHASE',
+    }).then(({ error }) => {
+      if (error)
+        console.error('[O2O 캠페인] 자동완료 신청 실패:', error.message)
+    })
   }
   return orders.length
 }

@@ -33,7 +33,9 @@
       "beanToken": "Bean 대시보드",
       "beanTxn": "거래 내역",
       "beanWallets": "지갑 관리",
+      "beanTopUsers": "상위 사용자",
       "beanAudit": "감사 로그",
+      "beanFeePlan": "요금제 관리",
       "campaign": "캠페인 승인"
     },
     "themes": {
@@ -235,6 +237,7 @@
         "unknown": "기타"
       },
       "txnDiv": {
+        "BEAN_CHARGE": "Bean 충전",
         "PRODUCT_PAY": "상품 결제",
         "BOND_DEPOSIT": "보증금 예치",
         "SUBSCRIPTION": "구독",

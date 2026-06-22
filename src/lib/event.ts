@@ -191,14 +191,24 @@ export async function evaluateUserMissions(
 export async function reevaluateAllActiveUsers(): Promise<{ users: number }> {
   const db = getSupabaseAdmin()
 
-  // 행위가 한 번이라도 기록된 사용자만 평가 대상 (평가할 근거가 있는 사용자)
-  const { data } = await db
+  // 행위 기록 보유 사용자
+  const { data: actionUsers } = await db
     .from('evt_action_log')
     .select('user_id')
     .eq('del_yn', 'N')
 
+  // M2는 상태형 미션(kakao_id 존재 여부) — evt_action_log에 기록이 없어도
+  // kakao_id 보유자는 평가 대상에 포함해야 완료/취소가 정확히 반영된다.
+  const { data: m2Users } = await db
+    .from('sys_user')
+    .select('id')
+    .not('kakao_id', 'is', null)
+
   const userIds = [
-    ...new Set((data ?? []).map((r) => (r as { user_id: string }).user_id)),
+    ...new Set([
+      ...(actionUsers ?? []).map((r) => (r as { user_id: string }).user_id),
+      ...(m2Users ?? []).map((r) => (r as { id: string }).id),
+    ]),
   ]
 
   for (const uid of userIds) {

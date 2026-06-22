@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react'
 import { BeanIcon } from '@/components/ui/bean-icon'
 import { TokenRevenue } from '@/components/admin/token-revenue'
+import { BeanRevenueDistribution } from '@/components/admin/token-distribution'
+import BeanRevenueTimeline from '@/components/admin/bean-daily-chart'
 
 interface TokenKpi {
   total_issued_bean: number
@@ -279,6 +281,12 @@ export default function TokenAdminPage() {
 
           {/* 매출 분석 — Pi 현금 + Bean 회수 항목별 */}
           <TokenRevenue />
+
+          {/* 일별 시계열 — 최근 30일 충전·소비·보상·환불 흐름 */}
+          <BeanRevenueTimeline period={30} />
+
+          {/* 거래 유형별 분포 — 매출에 없는 충전·보상·전송까지 활동 전반 */}
+          <BeanRevenueDistribution period={30} />
 
           {/* 공급량 KPI 3종 */}
           <div>

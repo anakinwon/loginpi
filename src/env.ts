@@ -37,6 +37,10 @@ export const env = createEnv({
     TURN_HOST: z.string().optional(),
     TURN_SECRET: z.string().optional(),
     TURN_CREDENTIAL_TTL: z.coerce.number().optional(),
+    // Cloudflare Realtime TURN (운영 권장 — 무료 1TB/월). 둘 다 설정 시 최우선 사용.
+    // Cloudflare 대시보드 → Realtime → TURN 앱 생성 시 발급. 서버 전용(클라이언트 노출 금지).
+    CLOUDFLARE_TURN_TOKEN_ID: z.string().optional(),
+    CLOUDFLARE_TURN_API_TOKEN: z.string().optional(),
     GOOGLE_MAPS_API_KEY: z.string().optional(),
     // PiVoice v3.0 권한 슬롯 (R7 — 향후 확대 가능, 기본 자동 2/멤버 4)
     VOICE_AUTO_SLOTS: z.coerce.number().int().positive().optional(),
@@ -70,6 +74,8 @@ export const env = createEnv({
     TURN_HOST: process.env.TURN_HOST,
     TURN_SECRET: process.env.TURN_SECRET,
     TURN_CREDENTIAL_TTL: process.env.TURN_CREDENTIAL_TTL,
+    CLOUDFLARE_TURN_TOKEN_ID: process.env.CLOUDFLARE_TURN_TOKEN_ID,
+    CLOUDFLARE_TURN_API_TOKEN: process.env.CLOUDFLARE_TURN_API_TOKEN,
     GOOGLE_MAPS_API_KEY: process.env.GOOGLE_MAPS_API_KEY,
     VOICE_AUTO_SLOTS: process.env.VOICE_AUTO_SLOTS,
     VOICE_MAX_MEMBER_SLOTS: process.env.VOICE_MAX_MEMBER_SLOTS,
