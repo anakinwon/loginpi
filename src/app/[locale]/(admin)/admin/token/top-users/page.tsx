@@ -142,7 +142,9 @@ export default function BeanTopUsersPage() {
                   <tr>
                     <th className="px-3 py-2 text-center font-medium">#</th>
                     <th className="px-3 py-2 text-left font-medium">사용자</th>
-                    <th className="px-3 py-2 text-right font-medium">현재 잔액</th>
+                    <th className="px-3 py-2 text-right font-medium">
+                      현재 잔액
+                    </th>
                     <th className="px-3 py-2 text-right font-medium">
                       누적 충전
                     </th>
@@ -150,7 +152,9 @@ export default function BeanTopUsersPage() {
                       누적 사용
                     </th>
                     <th className="px-3 py-2 text-right font-medium">보상</th>
-                    <th className="px-3 py-2 text-right font-medium">선물 수신</th>
+                    <th className="px-3 py-2 text-right font-medium">
+                      선물 수신
+                    </th>
                     <th className="px-3 py-2 text-right font-medium">거래</th>
                   </tr>
                 </thead>
