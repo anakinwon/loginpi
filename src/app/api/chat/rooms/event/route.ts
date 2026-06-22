@@ -1,23 +1,41 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
-import { getChatPlan } from '@/lib/chat-auth'
+import { canCreateRoom, getChatPlan } from '@/lib/chat-auth'
 import { createEventRoom } from '@/lib/chat'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { recordUserAction } from '@/lib/event'
+import { getRoomFeeBean } from '@/lib/bean-fee'
+import { applyBean, getBalance } from '@/lib/bean'
 
-// POST /api/chat/rooms/event — 이벤트 카페 생성 (Business 플랜 전용)
-// 참가자는 entry_fee_pi 결제 후 payments/complete에서 GUEST 입장 처리
+// POST /api/chat/rooms/event — 이벤트 카페 생성
+// Business 플랜 폐지: 그룹방 PREMIUM과 동일하게 구독·Bean 요금만 체크한다.
+//   구독자(PREMIUM/운영자) → 패키지 할인으로 무료, 비구독자(FREE) → EVENT 생성료 Bean 결제.
+// 참가자는 entry_fee_pi(Bean) 소진 후 payments/complete에서 GUEST 입장 처리
 export async function POST(request: NextRequest) {
   const user = await getSessionUser()
   if (!user)
     return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
+  // 구독 여부로 생성료 판정 (그룹방 PREMIUM 테마 처리와 동일 패턴).
+  // canCreateRoom.allowed=true → 구독자(월 무제한 무료) → 생성료 0,
+  // false → 비구독자 → EVENT 카페 생성료를 Bean으로 결제.
   const plan = await getChatPlan(user.id)
-  if (!plan.caps.canCreateEventRoom) {
-    return NextResponse.json(
-      { error: '이벤트 카페는 Business 플랜 전용입니다' },
-      { status: 403 },
-    )
+  const allowance = await canCreateRoom(user.id, plan)
+  let createFeeBean = 0
+  if (!allowance.allowed) {
+    createFeeBean = getRoomFeeBean('CREATE', 'EVENT', false)
+    const bal = await getBalance(user.id)
+    if (bal < createFeeBean) {
+      return NextResponse.json(
+        {
+          error: 'Bean 잔액이 부족합니다. 충전 후 다시 시도하세요.',
+          requiresBean: true,
+          feeBean: createFeeBean,
+          balance: bal,
+        },
+        { status: 402 },
+      )
+    }
   }
 
   let body: unknown
@@ -80,6 +98,34 @@ export async function POST(request: NextRequest) {
       entry_fee_pi: typeof entry_fee_pi === 'number' ? entry_fee_pi : 0,
       entry_expire_dtm,
     })
+
+    // 비구독자 EVENT 카페 생성료 Bean 차감 (refId=room_id로 원장 추적).
+    // 동시성 등으로 차감 실패 시 방을 논리삭제해 롤백 (그룹방 group/route와 동일).
+    if (createFeeBean > 0) {
+      const charge = await applyBean({
+        usrId: user.id,
+        txnTp: 'SPEND',
+        beanAmt: -createFeeBean,
+        refTp: 'ROOM_CREATE',
+        refId: room.room_id,
+        memo: `이벤트 카페 생성료 (${room_nm.trim()})`,
+        regrId: user.display_name.slice(0, 20),
+      })
+      if (!charge.ok) {
+        await getSupabaseAdmin()
+          .from('msg_room')
+          .update({ del_yn: 'Y', del_dtm: new Date().toISOString() })
+          .eq('room_id', room.room_id)
+        return NextResponse.json(
+          {
+            error: 'Bean 잔액이 부족합니다. 충전 후 다시 시도하세요.',
+            requiresBean: true,
+            feeBean: createFeeBean,
+          },
+          { status: 402 },
+        )
+      }
+    }
 
     // M5: 이벤트방 카페 생성 미션 기록 (비블로킹)
     recordUserAction('event_cafe_create', user.id, {

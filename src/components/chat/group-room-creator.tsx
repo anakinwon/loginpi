@@ -66,9 +66,8 @@ export function GroupRoomCreator() {
   const [payError, setPayError] = useState<string | null>(null)
   const [canUsePremiumTheme, setCanUsePremiumTheme] = useState(false)
   const [canCreateRoomFree, setCanCreateRoomFree] = useState(false)
-  // TASK-063: 이벤트방 모드 (BUSINESS 전용 — 결제 단계 없이 3단계 생성)
+  // TASK-063: 이벤트방 모드 (Business 폐지 — 구독자 무료·비구독자 Bean 생성료)
   const [roomType, setRoomType] = useState<RoomType>('G')
-  const [canCreateEventRoom, setCanCreateEventRoom] = useState(false)
   const [entryFee, setEntryFee] = useState<EntryFee>(0)
   const [eventEndDtm, setEventEndDtm] = useState('')
   const [gpsCoords, setGpsCoords] = useState<{
@@ -117,12 +116,10 @@ export function GroupRoomCreator() {
           d: {
             canUsePremiumTheme?: boolean
             canCreateRoomFree?: boolean
-            canCreateEventRoom?: boolean
           } | null,
         ) => {
           setCanUsePremiumTheme(d?.canUsePremiumTheme ?? false)
           setCanCreateRoomFree(d?.canCreateRoomFree ?? false)
-          setCanCreateEventRoom(d?.canCreateEventRoom ?? false)
         },
       )
       .catch(() => {
@@ -141,6 +138,12 @@ export function GroupRoomCreator() {
   const createCostBean = isPremium
     ? getRoomFeeBean('CREATE', 'PREMIUM', canCreateRoomFree)
     : 0
+  // 이벤트 카페 생성료 — 구독자는 무료(0), 비구독자는 EVENT 요금(Bean). 서버가 권위 부과·차감.
+  const eventCreateCostBean = getRoomFeeBean(
+    'CREATE',
+    'EVENT',
+    canCreateRoomFree,
+  )
   const isBusy =
     payStatus === 'approving' ||
     payStatus === 'waiting' ||
@@ -288,7 +291,7 @@ export function GroupRoomCreator() {
             {/* Step 1: 방 유형 + 테마 선택 */}
             {step === 1 && (
               <div>
-                {/* TASK-063: 이벤트방 탭 — BUSINESS 플랜만 선택 가능 */}
+                {/* 방 유형 선택 — 이벤트방은 구독자 무료·비구독자 Bean 생성료 (Business 폐지) */}
                 <div className="mb-3 grid grid-cols-2 gap-2">
                   <button
                     onClick={() => setRoomType('G')}
@@ -301,25 +304,22 @@ export function GroupRoomCreator() {
                     💬 그룹방
                   </button>
                   <button
-                    onClick={() => {
-                      if (canCreateEventRoom) setRoomType('E')
-                      else toast.info('이벤트 카페는 Business 플랜 전용입니다')
-                    }}
+                    onClick={() => setRoomType('E')}
                     className={`rounded-xl border px-3 py-2 text-sm font-medium transition-colors ${
                       roomType === 'E'
                         ? 'border-primary bg-primary/10 text-primary'
-                        : canCreateEventRoom
-                          ? 'hover:bg-muted'
-                          : 'hover:bg-muted opacity-60'
+                        : 'hover:bg-muted'
                     }`}
                   >
-                    🎟️ 이벤트방 {!canCreateEventRoom && '🔒'}
+                    🎟️ 이벤트방
                   </button>
                 </div>
                 {roomType === 'E' && (
                   <p className="mb-2 rounded-xl bg-violet-500/10 px-3 py-2 text-xs text-violet-700 dark:text-violet-300">
-                    참가자가 입장료(Bean)를 소진하고 입장하는 기간 한정
-                    방입니다. 생성 비용은 없습니다.
+                    참가자가 입장료(Bean)를 소진하고 입장하는 기간 한정 방입니다.
+                    {eventCreateCostBean > 0
+                      ? ` 생성료 ${eventCreateCostBean} Bean이 차감됩니다.`
+                      : ' 구독 혜택으로 생성료가 무료입니다.'}
                   </p>
                 )}
                 <p className="text-muted-foreground mb-3 text-sm">
@@ -558,7 +558,17 @@ export function GroupRoomCreator() {
                       }
                       className="bg-primary text-primary-foreground flex-1 rounded-xl px-4 py-2 text-sm font-medium disabled:opacity-40"
                     >
-                      {isBusy ? '생성 중…' : '🎟️ 이벤트방 만들기'}
+                      {isBusy ? (
+                        '생성 중…'
+                      ) : eventCreateCostBean > 0 ? (
+                        <>
+                          {eventCreateCostBean}{' '}
+                          <BeanIcon className="inline-block h-4 w-4 align-text-bottom" />{' '}
+                          결제하고 이벤트방 만들기
+                        </>
+                      ) : (
+                        '🎟️ 이벤트방 만들기'
+                      )}
                     </button>
                   ) : (
                     <button
@@ -582,9 +592,16 @@ export function GroupRoomCreator() {
                     </button>
                   )}
                 </div>
-                {createCostBean > 0 && (
+                {roomType === 'G' && createCostBean > 0 && (
                   <p className="text-muted-foreground text-center text-xs">
                     PREMIUM 카페 생성료 {createCostBean}{' '}
+                    <BeanIcon className="inline-block h-3.5 w-3.5 align-text-bottom" />{' '}
+                    Bean이 차감됩니다 (잔액 부족 시 충전 안내)
+                  </p>
+                )}
+                {roomType === 'E' && eventCreateCostBean > 0 && (
+                  <p className="text-muted-foreground text-center text-xs">
+                    이벤트 카페 생성료 {eventCreateCostBean}{' '}
                     <BeanIcon className="inline-block h-3.5 w-3.5 align-text-bottom" />{' '}
                     Bean이 차감됩니다 (잔액 부족 시 충전 안내)
                   </p>
