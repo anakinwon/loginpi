@@ -135,11 +135,9 @@ export default function BeanFeePlanPage() {
             }`}
           >
             {label}
-            {value === '' && (
-              <span className="text-muted-foreground ml-1 text-xs">
-                ({rows.length})
-              </span>
-            )}
+            <span className="text-muted-foreground ml-1 text-xs">
+              ({filterByTab(rows, value).length})
+            </span>
           </button>
         ))}
       </div>
