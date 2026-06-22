@@ -115,10 +115,26 @@ export function ClientBeanWallet({ serverAuthed }: { serverAuthed: boolean }) {
             toast.error(t('chargeFail'))
           }
         },
-        onCancel: () => setPaying(false),
-        onError: (e) => {
+        onCancel: (paymentId) => {
+          setPaying(false)
+          // 잔액 부족·사용자 취소 시 approve로 기록된 'approved' row를 'cancelled'로 정정.
+          // piFetch: Pi Browser에서 X-Pi-Token 헤더 첨부 → 서버 getSessionUser 인증 통과
+          void piFetch('/api/payments/cancel', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ paymentId }),
+          })
+        },
+        onError: (e, payment) => {
           setPaying(false)
           toast.error(e.message)
+          if (payment?.identifier) {
+            void piFetch('/api/payments/cancel', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ paymentId: payment.identifier }),
+            })
+          }
         },
       })
     } catch (e) {
