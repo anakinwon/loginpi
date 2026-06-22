@@ -34,6 +34,7 @@
       "beanTxn": "거래 내역",
       "beanWallets": "지갑 관리",
       "beanAudit": "감사 로그",
+      "beanFeePlan": "요금제 관리",
       "campaign": "캠페인 승인"
     },
     "themes": {
