@@ -136,6 +136,18 @@ export default function BeanAuditLogPage() {
                 <tbody className="divide-y">
                   {rows.map((row) => {
                     const isGrant = row.adj_bean > 0
+                    // javascript:/data: URL Stored XSS 방어 — http(s)만 허용
+                    const safeEvidenceUrl = (() => {
+                      if (!row.evidence_url) return null
+                      try {
+                        const u = new URL(row.evidence_url)
+                        return u.protocol === 'https:' || u.protocol === 'http:'
+                          ? u.toString()
+                          : null
+                      } catch {
+                        return null
+                      }
+                    })()
                     return (
                       <tr
                         key={row.audit_id}
@@ -176,9 +188,9 @@ export default function BeanAuditLogPage() {
                           </span>
                         </td>
                         <td className="px-4 py-3 text-xs">
-                          {row.evidence_url ? (
+                          {safeEvidenceUrl ? (
                             <a
-                              href={row.evidence_url}
+                              href={safeEvidenceUrl}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="text-blue-600 underline dark:text-blue-400"

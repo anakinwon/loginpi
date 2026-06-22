@@ -43,6 +43,20 @@ export async function POST(req: NextRequest) {
       { status: 400 },
     )
   }
+  // evidence_url — javascript:/data: Stored XSS 차단: http(s)만 허용, 길이 상한
+  if (body.evidence_url !== undefined && body.evidence_url !== null) {
+    if (body.evidence_url.length > 2048) {
+      return NextResponse.json({ error: 'evidence_url이 너무 깁니다 (최대 2048자)' }, { status: 400 })
+    }
+    try {
+      const u = new URL(body.evidence_url)
+      if (u.protocol !== 'https:' && u.protocol !== 'http:') {
+        return NextResponse.json({ error: 'evidence_url은 http(s) URL만 허용합니다' }, { status: 400 })
+      }
+    } catch {
+      return NextResponse.json({ error: 'evidence_url이 유효한 URL이 아닙니다' }, { status: 400 })
+    }
+  }
 
   const db = getSupabaseAdmin()
 
