@@ -30,7 +30,7 @@ const SubscrStatsCharts = dynamic(
 // p-6(48) + 제목+설명(56) + gap+추이차트(368) + gap+차트3종(352) + gap+검색(52) + gap+필터(36) + gap+테이블헤더(33) + gap+페이지(36)
 const CHROME_PX = 1045
 
-type SubscrProduct = 'PICAFE' | 'PISTORE' | 'TRANSLATE'
+type SubscrProduct = 'PICAFE' | 'PISHOP' | 'TRANSLATE'
 type SubscrGrade = 'GENERAL' | 'S' | 'M' | 'L'
 type SubscrCycle = 'M' | 'Y'
 
@@ -55,14 +55,14 @@ interface SubscrRow {
 const PRODUCT_COLOR: Record<SubscrProduct, string> = {
   PICAFE:
     'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
-  PISTORE: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+  PISHOP: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
   TRANSLATE:
     'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
 }
 
 const PRODUCT_LABEL: Record<SubscrProduct, string> = {
   PICAFE: 'PiCafe',
-  PISTORE: 'PiStore',
+  PISHOP: 'PiShop',
   TRANSLATE: '번역',
 }
 
@@ -146,8 +146,8 @@ export default function SubscriptionsPage() {
         <h1 className="text-2xl font-bold">{t('title')}</h1>
         <p className="text-muted-foreground mt-1 text-sm">
           전체 {allRows.length}건 · PiCafe{' '}
-          {allRows.filter((r) => r.prod_ctgr_cd === 'PICAFE').length}건 · PiStore{' '}
-          {allRows.filter((r) => r.prod_ctgr_cd === 'PISTORE').length}건 · 번역{' '}
+          {allRows.filter((r) => r.prod_ctgr_cd === 'PICAFE').length}건 · PiShop{' '}
+          {allRows.filter((r) => r.prod_ctgr_cd === 'PISHOP').length}건 · 번역{' '}
           {allRows.filter((r) => r.prod_ctgr_cd === 'TRANSLATE').length}건
         </p>
       </div>
@@ -177,7 +177,7 @@ export default function SubscriptionsPage() {
 
       {/* 상품군 필터 */}
       <div className="flex flex-wrap gap-2">
-        {(['all', 'PICAFE', 'PISTORE', 'TRANSLATE'] as const).map((prod) => (
+        {(['all', 'PICAFE', 'PISHOP', 'TRANSLATE'] as const).map((prod) => (
           <button
             key={prod}
             onClick={() => setFilter(prod)}

@@ -87,7 +87,7 @@
 | 1 | **Bean 충전** | Pi→Bean (IN) | 1 Pi = 100 Bean | `payments/complete` `BEAN_CHARGE` · `api/bean/charge` | `txn=CHARGE` | ✅ **라이브** (충전 1건 확인) | ✅ **Pi Browser 필수** |
 | 2 | **카페 생성료** (프리미엄) | Bean (OUT) | 10 | `api/chat/rooms/group` | `ref=ROOM_CREATE` | ✅ **라이브** (1건 확인) | ✅ 일반 브라우저 가능 |
 | 3 | **카페 입장료** (프리미엄) | Bean (OUT) | 10 | `api/chat/rooms/[id]/join` · `[roomId]/page` · `room-entry-fee-gate` | `ref=ROOM_ENTER` | ✅ **라이브** (5건+환불2 확인) | ✅ 일반 브라우저 가능 |
-| 4 | **상품 구독료** (PiCafe·PiStore S/M/L·자동번역) | Bean (OUT) | 1,000~50,000 (§4-1) | `api/subscriptions/products/subscribe` → `fn_bean_subscribe_product` | `bean_subscr` | ✅ **배포됨** (실사용 0건) | ✅ **테스트 가능** (잔액만 있으면) |
+| 4 | **상품 구독료** (PiCafe·PiShop S/M/L·자동번역) | Bean (OUT) | 1,000~50,000 (§4-1) | `api/subscriptions/products/subscribe` → `fn_bean_subscribe_product` | `bean_subscr` | ✅ **배포됨** (실사용 0건) | ✅ **테스트 가능** (잔액만 있으면) |
 | 5 | ~~레거시 구독 (msg_subscr_plan 5종)~~ → #4 Bean 구독 흡수 | Bean (OUT) | §4-1 | `getChatPlan`(bean_subscr 기반) · `api/subscriptions` POST 410 · `payments/complete` `CHAT_SUBSCR` 분기 제거 | `bean_subscr` | ✅ **전환완료** (2026-06-20) | ✅ 일반 브라우저 가능 |
 | 6 | 이벤트방 입장료 | Bean (OUT) | `entry_fee_pi`×100 (호스트 지정 티켓가) | `api/chat/rooms/[id]/join` · `[roomId]/page` · `room-entry-fee-gate` | `ref=EVENT_ENTER` | ✅ **라이브** | ✅ 일반 브라우저 가능 |
 | 7 | 배지 강화 (BADGE_UPGRADE) | Bean (OUT) | 10 Bean (=0.1 Pi) | `api/badges/upgrade` | `refTp=BADGE_UPGRADE` | ✅ **라이브** | ✅ 일반 브라우저 가능 |
@@ -125,7 +125,7 @@
 | 차원 | 엑셀 값 | 표준코드 |
 |---|---|---|
 | 구독구분(`subscr_div_cd`) | 구독요금제 / 일반요금제 | `SUBSCR` / `GENERAL` |
-| 상품구분(`prod_ctgr_cd`) | 카페구독 / 카페일반 / 스토어구독 / 스토어일반 / 자동번역구독 | `PICAFE_SUBSCR` / `PICAFE_GENERAL` / `PISTORE_SUBSCR` / `PISTORE_GENERAL` / `TRANSLATE_SUBSCR` |
+| 상품구분(`prod_ctgr_cd`) | 카페구독 / 카페일반 / 스토어구독 / 스토어일반 / 자동번역구독 | `PICAFE_SUBSCR` / `PICAFE_GENERAL` / `PISHOP_SUBSCR` / `PISHOP_GENERAL` / `TRANSLATE_SUBSCR` |
 | 요금종류(`fee_knd_cd`) | 구독 / 생성 / 입장 / 노출 / 연장 | `SUBSCR` / `CREATE` / `ENTER` / `EXPOSE` / `EXTEND` |
 | 등급(`grade_cd`) | 일반 / 프리미엄 / 이벤트 | `GENERAL` / `PREMIUM` / `EVENT` |
 | 결제주기(`bill_cycle_cd`) | Month / Year / W / M / 1 | `M` / `Y` / `W` / `M` / `ONCE` |
@@ -144,7 +144,7 @@ CREATE TABLE public.bean_fee_plan (
   fee_plan_id    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   fee_plan_cd    VARCHAR(20) NOT NULL UNIQUE,           -- 요금제코드 원본 (SM100, CGPC2 ...)
   subscr_div_cd  VARCHAR(10) NOT NULL CHECK (subscr_div_cd IN ('SUBSCR','GENERAL')),
-  prod_ctgr_cd   VARCHAR(24) NOT NULL,                  -- PICAFE_SUBSCR / PISTORE_GENERAL ...
+  prod_ctgr_cd   VARCHAR(24) NOT NULL,                  -- PICAFE_SUBSCR / PISHOP_GENERAL ...
   fee_knd_cd     VARCHAR(16) NOT NULL,                  -- SUBSCR/CREATE/ENTER/EXPOSE/EXTEND
   grade_cd       VARCHAR(10) NOT NULL DEFAULT 'GENERAL' CHECK (grade_cd IN ('GENERAL','PREMIUM','EVENT')),
   bill_cycle_cd  VARCHAR(8)  NOT NULL CHECK (bill_cycle_cd IN ('M','Y','W','ONCE')),
@@ -179,12 +179,12 @@ CREATE INDEX idx_bean_fee_plan_use  ON public.bean_fee_plan(use_yn, del_yn);
 |---|---|---|---|---|---|
 | SM100 | PICAFE_SUBSCR | M | 3000 | 30 | 카페 구독 — 단일 품목 |
 | SY100 | PICAFE_SUBSCR | Y | 30000 | 300 | 카페 구독 — 년 |
-| SM200 | PISTORE_SUBSCR (S) | M | 3000 | 30 | 스토어 구독 S — 상품 30개 이하 |
-| SM300 | PISTORE_SUBSCR (M) | M | 4000 | 40 | 스토어 구독 M — 상품 50개 이하 |
-| SM400 | PISTORE_SUBSCR (L) | M | 5000 | 50 | 스토어 구독 L — 상품 50개 초과 |
-| SY200 | PISTORE_SUBSCR (S) | Y | 30000 | 300 | 스토어 구독 S — 년 |
-| SY300 | PISTORE_SUBSCR (M) | Y | 40000 | 400 | 스토어 구독 M — 년 ⚠️("년월단위" 오타) |
-| SY400 | PISTORE_SUBSCR (L) | Y | 50000 | 500 | 스토어 구독 L — 년 |
+| SM200 | PISHOP_SUBSCR (S) | M | 3000 | 30 | 스토어 구독 S — 상품 30개 이하 |
+| SM300 | PISHOP_SUBSCR (M) | M | 4000 | 40 | 스토어 구독 M — 상품 50개 이하 |
+| SM400 | PISHOP_SUBSCR (L) | M | 5000 | 50 | 스토어 구독 L — 상품 50개 초과 |
+| SY200 | PISHOP_SUBSCR (S) | Y | 30000 | 300 | 스토어 구독 S — 년 |
+| SY300 | PISHOP_SUBSCR (M) | Y | 40000 | 400 | 스토어 구독 M — 년 ⚠️("년월단위" 오타) |
+| SY400 | PISHOP_SUBSCR (L) | Y | 50000 | 500 | 스토어 구독 L — 년 |
 | SM500 | TRANSLATE_SUBSCR | M | 1000 | 10 | 자동번역 구독 — 월 |
 | SY500 | TRANSLATE_SUBSCR | Y | 10000 | 100 | 자동번역 구독 — 년 |
 
@@ -207,30 +207,30 @@ CREATE INDEX idx_bean_fee_plan_use  ON public.bean_fee_plan(use_yn, del_yn);
 
 > 별도 시트: 자동번역 1회 = 1 Bean, 음성채팅 10분 = 무료. (요금종류 `TRANSLATE`/`VOICE`로 추후 행 추가 검토)
 
-### 4-3. 일반요금제 — 스토어 (`PISTORE_GENERAL` = 스토어일반, `PISTORE_SUBSCR` = 스토어구독자 대상)
+### 4-3. 일반요금제 — 스토어 (`PISHOP_GENERAL` = 스토어일반, `PISHOP_SUBSCR` = 스토어구독자 대상)
 
 | 코드 | 상품구분 | 요금종류 | 등급 | 주기 | Bean | 수량 | 설명 |
 |---|---|---|---|---|---|---|---|
-| SGGC1 | PISTORE_GENERAL | CREATE | GENERAL | ONCE | 0 | 0 | 스토어 상품 생성 일반 (무제한) |
-| SGPC2 | PISTORE_GENERAL | CREATE | PREMIUM | ONCE | 10 | 0 | 스토어 상품 생성 프리미엄 |
-| SGGDW | PISTORE_GENERAL | EXPOSE | GENERAL | W | 5 | 1 | 노출 1주 일반 |
-| SGPDW | PISTORE_GENERAL | EXPOSE | PREMIUM | W | 10 | 1 | 노출 1주 프리미엄 |
-| SGGDM | PISTORE_GENERAL | EXPOSE | GENERAL | M | 10 | 1 | 노출 1개월 일반 |
-| SGPDM | PISTORE_GENERAL | EXPOSE | PREMIUM | M | 20 | 1 | 노출 1개월 프리미엄 |
-| SGGEW | PISTORE_GENERAL | EXTEND | GENERAL | W | 5 | 1 | 연장 1주 일반 |
-| SGPEW | PISTORE_GENERAL | EXTEND | PREMIUM | W | 10 | 1 | 연장 1주 프리미엄 |
-| SGGEM | PISTORE_GENERAL | EXTEND | GENERAL | M | 10 | 1 | 연장 1개월 일반 |
-| SGPEM | PISTORE_GENERAL | EXTEND | PREMIUM | M | 20 | 1 | 연장 1개월 프리미엄 |
-| SSGC1 | PISTORE_SUBSCR | CREATE | GENERAL | ONCE | 0 | 0 | (구독자) 상품 생성 일반 |
-| SSPC2 | PISTORE_SUBSCR | CREATE | PREMIUM | ONCE | 0 | 0 | (구독자) 상품 생성 프리미엄 |
-| SSGDW | PISTORE_SUBSCR | EXPOSE | GENERAL | W | 0 | 1 | (구독자) 노출 1주 일반 |
-| SSPDW | PISTORE_SUBSCR | EXPOSE | PREMIUM | W | 0 | 1 | (구독자) 노출 1주 프리미엄 |
-| SSGDM | PISTORE_SUBSCR | EXPOSE | GENERAL | M | 10 | 1 | (구독자) 노출 1개월 일반 |
-| SSPDM | PISTORE_SUBSCR | EXPOSE | PREMIUM | M | 5 | 1 | (구독자) 노출 1개월 프리미엄 ⚠️(프리미엄<일반 역전) |
-| SSGEW | PISTORE_SUBSCR | EXTEND | GENERAL | W | 5 | 1 | (구독자) 연장 1주 일반 |
-| SSPEW | PISTORE_SUBSCR | EXTEND | PREMIUM | W | 5 | 1 | (구독자) 연장 1주 프리미엄 |
-| SSGEM | PISTORE_SUBSCR | EXTEND | GENERAL | M | 10 | 1 | (구독자) 연장 1개월 일반 |
-| SSPEM | PISTORE_SUBSCR | EXTEND | PREMIUM | M | 10 | 1 | (구독자) 연장 1개월 프리미엄 |
+| SGGC1 | PISHOP_GENERAL | CREATE | GENERAL | ONCE | 0 | 0 | 스토어 상품 생성 일반 (무제한) |
+| SGPC2 | PISHOP_GENERAL | CREATE | PREMIUM | ONCE | 10 | 0 | 스토어 상품 생성 프리미엄 |
+| SGGDW | PISHOP_GENERAL | EXPOSE | GENERAL | W | 5 | 1 | 노출 1주 일반 |
+| SGPDW | PISHOP_GENERAL | EXPOSE | PREMIUM | W | 10 | 1 | 노출 1주 프리미엄 |
+| SGGDM | PISHOP_GENERAL | EXPOSE | GENERAL | M | 10 | 1 | 노출 1개월 일반 |
+| SGPDM | PISHOP_GENERAL | EXPOSE | PREMIUM | M | 20 | 1 | 노출 1개월 프리미엄 |
+| SGGEW | PISHOP_GENERAL | EXTEND | GENERAL | W | 5 | 1 | 연장 1주 일반 |
+| SGPEW | PISHOP_GENERAL | EXTEND | PREMIUM | W | 10 | 1 | 연장 1주 프리미엄 |
+| SGGEM | PISHOP_GENERAL | EXTEND | GENERAL | M | 10 | 1 | 연장 1개월 일반 |
+| SGPEM | PISHOP_GENERAL | EXTEND | PREMIUM | M | 20 | 1 | 연장 1개월 프리미엄 |
+| SSGC1 | PISHOP_SUBSCR | CREATE | GENERAL | ONCE | 0 | 0 | (구독자) 상품 생성 일반 |
+| SSPC2 | PISHOP_SUBSCR | CREATE | PREMIUM | ONCE | 0 | 0 | (구독자) 상품 생성 프리미엄 |
+| SSGDW | PISHOP_SUBSCR | EXPOSE | GENERAL | W | 0 | 1 | (구독자) 노출 1주 일반 |
+| SSPDW | PISHOP_SUBSCR | EXPOSE | PREMIUM | W | 0 | 1 | (구독자) 노출 1주 프리미엄 |
+| SSGDM | PISHOP_SUBSCR | EXPOSE | GENERAL | M | 10 | 1 | (구독자) 노출 1개월 일반 |
+| SSPDM | PISHOP_SUBSCR | EXPOSE | PREMIUM | M | 5 | 1 | (구독자) 노출 1개월 프리미엄 ⚠️(프리미엄<일반 역전) |
+| SSGEW | PISHOP_SUBSCR | EXTEND | GENERAL | W | 5 | 1 | (구독자) 연장 1주 일반 |
+| SSPEW | PISHOP_SUBSCR | EXTEND | PREMIUM | W | 5 | 1 | (구독자) 연장 1주 프리미엄 |
+| SSGEM | PISHOP_SUBSCR | EXTEND | GENERAL | M | 10 | 1 | (구독자) 연장 1개월 일반 |
+| SSPEM | PISHOP_SUBSCR | EXTEND | PREMIUM | M | 10 | 1 | (구독자) 연장 1개월 프리미엄 |
 
 ---
 

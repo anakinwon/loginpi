@@ -51,14 +51,14 @@ function filterByTab(rows: FeePlanRow[], tab: TabValue): FeePlanRow[] {
   if (tab === 'CAFE')
     return rows.filter((r) => r.prod_ctgr_cd.startsWith('PICAFE'))
   if (tab === 'STORE')
-    return rows.filter((r) => r.prod_ctgr_cd.startsWith('PISTORE'))
+    return rows.filter((r) => r.prod_ctgr_cd.startsWith('PISHOP'))
   if (tab === 'PLATFORM')
     return rows.filter(
       (r) =>
         !r.prod_ctgr_cd.startsWith('PICAFE') &&
-        !r.prod_ctgr_cd.startsWith('PISTORE') &&
+        !r.prod_ctgr_cd.startsWith('PISHOP') &&
         r.prod_ctgr_cd !== 'PICAFE_SUBSCR' &&
-        r.prod_ctgr_cd !== 'PISTORE_SUBSCR' &&
+        r.prod_ctgr_cd !== 'PISHOP_SUBSCR' &&
         !r.prod_ctgr_cd.startsWith('TRANSLATE'),
     )
   return rows

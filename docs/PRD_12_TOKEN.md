@@ -857,7 +857,7 @@ Bean Token의 주요 소비 경로:
 
 | 사용처 | 통화 유형 | 플로우 |
 |--------|---------|-------|
-| **플랫폼 구독료** (PiCafe/PiStore) | Bean 정본 | 사용자 → 플랫폼 (Pi 충전 → Bean 결제) |
+| **플랫폼 구독료** (PiCafe/PiShop) | Bean 정본 | 사용자 → 플랫폼 (Pi 충전 → Bean 결제) |
 | **플랫폼 수수료** (마켓 거래) | Bean 정본 | 거래자 → 플랫폼 (Pi 기반) |
 | **보상 지급** (O2O, 이벤트) | Bean | 플랫폼 → 사용자 (리저브 소진) |
 | **소각(Burn)** | Bean | 플랫폼 → 싱크 (공급 감소) |
@@ -1185,8 +1185,8 @@ ADD COLUMN price_bean DECIMAL(10, 4) DEFAULT NULL COMMENT '정본 가격 (Bean T
 -- Step 2: 현행 데이터 (price_pi 기준)
 INSERT INTO msg_subscr_plan (plan_cd, plan_nm, plan_desc, plan_tp_cd, price_pi, mth_cnt, use_yn, del_yn, regr_id, reg_dtm)
 VALUES
-  ('PISTORE_SELLER_MONTHLY', 'PiShop Seller 월간', 'PiShop Seller 월간 — 전문가 판매자용', 'PISTORE', '0.5000', 1, 'Y', 'N', 'ADMIN', CURRENT_TIMESTAMP),
-  ('PISTORE_SELLER_ANNUAL', 'PiShop Seller 연간', 'PiShop Seller 연간 — 2개월 무료', 'PISTORE', '5.0000', 12, 'Y', 'N', 'ADMIN', CURRENT_TIMESTAMP);
+  ('PISHOP_SELLER_MONTHLY', 'PiShop Seller 월간', 'PiShop Seller 월간 — 전문가 판매자용', 'PISHOP', '0.5000', 1, 'Y', 'N', 'ADMIN', CURRENT_TIMESTAMP),
+  ('PISHOP_SELLER_ANNUAL', 'PiShop Seller 연간', 'PiShop Seller 연간 — 2개월 무료', 'PISHOP', '5.0000', 12, 'Y', 'N', 'ADMIN', CURRENT_TIMESTAMP);
 
 -- Step 3: Phase 17 이후 bean 가격 일괄 업데이트 (1 Pi = 100 BEAN)
 -- UPDATE msg_subscr_plan SET price_bean = price_pi * 100 WHERE price_bean IS NULL;

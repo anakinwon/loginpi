@@ -7,7 +7,7 @@ import PlotlyPlot from '@/components/charts/plotly-plot'
 //   ① 상품군별 구독 건수(도넛) ② 상품군별 Bean 매출(가로 막대) ③ 결제주기 분포(스택 막대)
 // 데이터량이 적어 별도 집계 API 없이 클라이언트에서 받은 행을 그대로 집계한다.
 
-type SubscrProduct = 'PICAFE' | 'PISTORE' | 'TRANSLATE'
+type SubscrProduct = 'PICAFE' | 'PISHOP' | 'TRANSLATE'
 type SubscrCycle = 'M' | 'Y'
 
 export interface SubscrChartRow {
@@ -17,16 +17,16 @@ export interface SubscrChartRow {
   start_dtm: string
 }
 
-const PRODUCTS: SubscrProduct[] = ['PICAFE', 'PISTORE', 'TRANSLATE']
+const PRODUCTS: SubscrProduct[] = ['PICAFE', 'PISHOP', 'TRANSLATE']
 const PRODUCT_LABEL: Record<SubscrProduct, string> = {
   PICAFE: 'PiCafe',
-  PISTORE: 'PiStore',
+  PISHOP: 'PiShop',
   TRANSLATE: '번역',
 }
 // Plotly는 hex 색이 필요(tailwind 클래스 불가). page.tsx 뱃지 색과 동일 계열.
 const PRODUCT_HEX: Record<SubscrProduct, string> = {
   PICAFE: '#f59e0b', // amber-500
-  PISTORE: '#3b82f6', // blue-500
+  PISHOP: '#3b82f6', // blue-500
   TRANSLATE: '#a855f7', // purple-500
 }
 const CYCLE_HEX: Record<SubscrCycle, string> = {
@@ -68,24 +68,24 @@ export default function SubscrStatsCharts({
   const { countByProduct, revByProduct, cycleByProduct, timeline } = useMemo(() => {
     const count: Record<SubscrProduct, number> = {
       PICAFE: 0,
-      PISTORE: 0,
+      PISHOP: 0,
       TRANSLATE: 0,
     }
     const rev: Record<SubscrProduct, number> = {
       PICAFE: 0,
-      PISTORE: 0,
+      PISHOP: 0,
       TRANSLATE: 0,
     }
     // [상품군][주기] 건수
     const cycle: Record<SubscrProduct, Record<SubscrCycle, number>> = {
       PICAFE: { M: 0, Y: 0 },
-      PISTORE: { M: 0, Y: 0 },
+      PISHOP: { M: 0, Y: 0 },
       TRANSLATE: { M: 0, Y: 0 },
     }
     // 시계열: [상품군][날짜(YYYY-MM-DD)] 신규 건수
     const dailyNew: Record<SubscrProduct, Record<string, number>> = {
       PICAFE: {},
-      PISTORE: {},
+      PISHOP: {},
       TRANSLATE: {},
     }
     const dateSet = new Set<string>()
@@ -109,7 +109,7 @@ export default function SubscrStatsCharts({
     const dates = [...dateSet].sort()
     const cumByProduct: Record<SubscrProduct, number[]> = {
       PICAFE: [],
-      PISTORE: [],
+      PISHOP: [],
       TRANSLATE: [],
     }
     for (const p of PRODUCTS) {

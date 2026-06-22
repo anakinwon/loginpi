@@ -36,10 +36,10 @@ const PRODUCT_META: Record<
   { emoji: string; grades: SubscrGrade[] }
 > = {
   PICAFE: { emoji: '☕', grades: ['GENERAL'] },
-  PISTORE: { emoji: '🏪', grades: ['S', 'M', 'L'] },
+  PISHOP: { emoji: '🏪', grades: ['S', 'M', 'L'] },
   TRANSLATE: { emoji: '🌐', grades: ['GENERAL'] },
 }
-const ORDER: SubscrProduct[] = ['PICAFE', 'PISTORE', 'TRANSLATE']
+const ORDER: SubscrProduct[] = ['PICAFE', 'PISHOP', 'TRANSLATE']
 
 export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
   const t = useTranslations('subscribe')
@@ -172,7 +172,7 @@ export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
       <div className="space-y-3">
         {ORDER.map((product) => {
           const meta = PRODUCT_META[product]
-          const grade = product === 'PISTORE' ? storeGrade : 'GENERAL'
+          const grade = product === 'PISHOP' ? storeGrade : 'GENERAL'
           const plan = findPlan(product, grade, cycle)
           if (!plan) return null
           const active = subMap.get(product)
@@ -248,15 +248,15 @@ export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
                 </Button>
               </div>
 
-              {/* PiStore 등급 선택 (상품 수 추천) */}
-              {product === 'PISTORE' && (
+              {/* PiShop 등급 선택 (상품 수 추천) */}
+              {product === 'PISHOP' && (
                 <div className="mt-3">
                   <p className="text-muted-foreground mb-1 text-xs">
                     {t('storeGradeHint', { count: resp?.itemCount ?? 0 })}
                   </p>
                   <div className="flex gap-2">
                     {(['S', 'M', 'L'] as SubscrGrade[]).map((g) => {
-                      const gp = findPlan('PISTORE', g, cycle)
+                      const gp = findPlan('PISHOP', g, cycle)
                       return (
                         <button
                           key={g}

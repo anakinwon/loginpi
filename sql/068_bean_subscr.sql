@@ -1,6 +1,6 @@
 -- DA-APPROVED: 'bean_' 도메인 기등록(067_bean_wallet, 2026-06-18 마스터 승인) 하위 테이블 추가
 -- Bean 토큰 이코노미 2단계 — 상품별 구독 (현행 msg_subscr_plan 3-tier 대체)
--- [PRD_14_SUBSC_REDESIGN] 상품군별 독립 구독(PiCafe·PiStore S/M/L·자동번역), 동시 다중.
+-- [PRD_14_SUBSC_REDESIGN] 상품군별 독립 구독(PiCafe·PiShop S/M/L·자동번역), 동시 다중.
 -- 구독료 = Bean 차감(SPEND). 금액 정본 = src/lib/bean-subscr-plan.ts (bean_fee_plan §4-1 미러, 서버 권위값).
 -- 차감(bean_wlt/bean_txn) + 구독부여(bean_subscr)를 단일 트랜잭션 원자 처리.
 -- 금액 컬럼은 bean_wlt/bean_txn과 동일하게 bean_amt(접미사 amt).
@@ -11,8 +11,8 @@
 CREATE TABLE IF NOT EXISTS public.bean_subscr (
   subscr_id     UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   usr_id        TEXT        NOT NULL,                     -- sys_user.id
-  prod_ctgr_cd  VARCHAR(16) NOT NULL,                     -- PICAFE / PISTORE / TRANSLATE
-  grade_cd      VARCHAR(10) NOT NULL DEFAULT 'GENERAL',   -- PiStore: S/M/L, 그 외 GENERAL
+  prod_ctgr_cd  VARCHAR(16) NOT NULL,                     -- PICAFE / PISHOP / TRANSLATE
+  grade_cd      VARCHAR(10) NOT NULL DEFAULT 'GENERAL',   -- PiShop: S/M/L, 그 외 GENERAL
   bill_cycle_cd VARCHAR(8)  NOT NULL,                      -- M / Y
   fee_plan_cd   VARCHAR(20) NOT NULL,                     -- 구독 시점 요금코드 스냅샷 (SM100 등)
   bean_amt      INT         NOT NULL,                     -- 결제한 구독료 Bean 스냅샷
@@ -27,9 +27,9 @@ CREATE TABLE IF NOT EXISTS public.bean_subscr (
   mod_dtm       TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-COMMENT ON TABLE  public.bean_subscr             IS '상품군별 구독 — PiCafe·PiStore(S/M/L)·자동번역, 동시 다중. 구독료 Bean 차감 (PRD_14_SUBSC_REDESIGN)';
-COMMENT ON COLUMN public.bean_subscr.prod_ctgr_cd IS 'PICAFE / PISTORE / TRANSLATE — 구독 대상 상품군';
-COMMENT ON COLUMN public.bean_subscr.grade_cd     IS 'PiStore 등급 S/M/L(상품 수 한도), 그 외 GENERAL';
+COMMENT ON TABLE  public.bean_subscr             IS '상품군별 구독 — PiCafe·PiShop(S/M/L)·자동번역, 동시 다중. 구독료 Bean 차감 (PRD_14_SUBSC_REDESIGN)';
+COMMENT ON COLUMN public.bean_subscr.prod_ctgr_cd IS 'PICAFE / PISHOP / TRANSLATE — 구독 대상 상품군';
+COMMENT ON COLUMN public.bean_subscr.grade_cd     IS 'PiShop 등급 S/M/L(상품 수 한도), 그 외 GENERAL';
 
 -- 상품군당 1활성 (등급·주기 변경/갱신은 덮어쓰기)
 CREATE UNIQUE INDEX IF NOT EXISTS uq_bean_subscr_active

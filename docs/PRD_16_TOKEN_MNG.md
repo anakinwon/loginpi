@@ -145,7 +145,7 @@ Cafe.pi의 Bean Token(☕ 카페빈 토큰) 경제를 통합 관리하는 어드
 | 카페 생성료(프리미엄) | 10 | `ref=ROOM_CREATE` | `api/chat/rooms/group` | ✅ 라이브(1건) | ✅ 일반 브라우저 |
 | 카페 입장료(프리미엄) | 10 | `ref=ROOM_ENTER` | `api/chat/rooms/[id]/join` | ✅ 라이브(5건+환불2) | ✅ 일반 브라우저 |
 | 이벤트방 입장료 | `entry_fee_pi`×100 (호스트 지정) | `ref=EVENT_ENTER` | `api/chat/rooms/[id]/join`(GUEST 한시입장) | ✅ 라이브 | ✅ 일반 브라우저 |
-| 상품 구독료(PiCafe·PiStore S/M/L·자동번역) | 1,000~50,000 | `bean_subscr` | `api/subscriptions/products/subscribe`→`fn_bean_subscribe_product` | ✅ 배포(실사용 0) | ✅ 잔액만 있으면 |
+| 상품 구독료(PiCafe·PiShop S/M/L·자동번역) | 1,000~50,000 | `bean_subscr` | `api/subscriptions/products/subscribe`→`fn_bean_subscribe_product` | ✅ 배포(실사용 0) | ✅ 잔액만 있으면 |
 
 **잔여 Pi 결제(⏳ Bean 전환 대기) / 미구현(🚧)** — 상세·로드맵은 [[PRD_15_FEE]] §1-5-2, §1-6
 
@@ -496,7 +496,7 @@ bean_reward_pool (보상 재원)
 ├─────────────────────────────────────────────┤
 │ SUBSCRIBE       450 Bean  (69.7%)            │
 │  ├─ PiCafe      200 Bean                     │
-│  └─ PiStore      250 Bean                    │
+│  └─ PiShop      250 Bean                    │
 │                                              │
 │ TIP              100 Bean  (15.5%)            │
 │                                              │
@@ -530,7 +530,7 @@ bean_reward_pool (보상 재원)
 | **구독료** | 450 | 45,000 | 450 Pi | ↑ 50 Pi (+12.5%) |
 | · PiCafe Basic | 200 | 20,000 | 200 Pi | ↑ 25 Pi |
 | · PiCafe Premium | 150 | 15,000 | 150 Pi | ↑ 20 Pi |
-| · PiStore Pro | 100 | 10,000 | 100 Pi | ↑ 5 Pi |
+| · PiShop Pro | 100 | 10,000 | 100 Pi | ↑ 5 Pi |
 | **팁** | 100 | 10,000 | 100 Pi | ↑ 15 Pi (+17.7%) |
 | **수수료** | 96 | 9,600 | 96 Pi | ↓ 5 Pi (-4.9%) |
 | · 플랫폼 수수료 | 60 | 6,000 | 60 Pi | ↓ 3 Pi |
@@ -561,7 +561,7 @@ bean_reward_pool (보상 재원)
 | 컬럼 | 설명 |
 |---|---|
 | 구독자 | 사용자 ID / 별명 |
-| 상품 | PiCafe Basic / Premium / PiStore Pro / ... |
+| 상품 | PiCafe Basic / Premium / PiShop Pro / ... |
 | 구독 상태 | ACTIVE / EXPIRING_SOON / EXPIRED / CANCELLED |
 | 시작일 | TIMESTAMPTZ |
 | 만료일 | TIMESTAMPTZ (남은 기간 배지) |
@@ -569,7 +569,7 @@ bean_reward_pool (보상 재원)
 | 마지막 갱신 | bean_txn의 최근 SUBSCRIBE 거래 |
 
 **필터**:
-- 상품별 (PiCafe/PiStore/Translate)
+- 상품별 (PiCafe/PiShop/Translate)
 - 상태별
 - 만료 예정 (7일/14일/30일 내)
 

@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS public.bean_fee_plan (
 COMMENT ON TABLE  public.bean_fee_plan IS 'Bean 경제 표준 요금 마스터 — PRD_15_FEE §3·§4 기준';
 COMMENT ON COLUMN public.bean_fee_plan.fee_plan_cd   IS '요금제코드 (SM100/CGGC1 등)';
 COMMENT ON COLUMN public.bean_fee_plan.subscr_div_cd IS 'SUBSCR=구독요금제 / GENERAL=일반요금제';
-COMMENT ON COLUMN public.bean_fee_plan.prod_ctgr_cd  IS 'PICAFE_SUBSCR / PISTORE_GENERAL / PLATFORM 등';
+COMMENT ON COLUMN public.bean_fee_plan.prod_ctgr_cd  IS 'PICAFE_SUBSCR / PISHOP_GENERAL / PLATFORM 등';
 COMMENT ON COLUMN public.bean_fee_plan.fee_knd_cd    IS 'SUBSCR/CREATE/ENTER/EXPOSE/EXTEND/BOOST/BADGE_UPGRADE/TRANSLATE/AI_EXTRA';
 COMMENT ON COLUMN public.bean_fee_plan.grade_cd      IS 'GENERAL/PREMIUM/EVENT — 카페등급 / S/M/L — 스토어구독등급';
 COMMENT ON COLUMN public.bean_fee_plan.bill_cycle_cd IS 'M=월 / Y=년 / W=주 / ONCE=건당';
@@ -58,12 +58,12 @@ VALUES
 -- §4-1. 구독요금제 (SUBSCR) — 10행
 ('SM100','SUBSCR','PICAFE_SUBSCR', 'SUBSCR','GENERAL','M',  3000, 0,'카페 구독 월', 10),
 ('SY100','SUBSCR','PICAFE_SUBSCR', 'SUBSCR','GENERAL','Y', 30000, 0,'카페 구독 년', 11),
-('SM200','SUBSCR','PISTORE_SUBSCR','SUBSCR','S',      'M',  3000,30,'스토어 구독 S 월 (상품 30개 이하)', 20),
-('SM300','SUBSCR','PISTORE_SUBSCR','SUBSCR','M',      'M',  4000,50,'스토어 구독 M 월 (상품 50개 이하)', 21),
-('SM400','SUBSCR','PISTORE_SUBSCR','SUBSCR','L',      'M',  5000, 0,'스토어 구독 L 월 (상품 50개 초과)', 22),
-('SY200','SUBSCR','PISTORE_SUBSCR','SUBSCR','S',      'Y', 30000,30,'스토어 구독 S 년 (상품 30개 이하)', 23),
-('SY300','SUBSCR','PISTORE_SUBSCR','SUBSCR','M',      'Y', 40000,50,'스토어 구독 M 년 (상품 50개 이하)', 24),
-('SY400','SUBSCR','PISTORE_SUBSCR','SUBSCR','L',      'Y', 50000, 0,'스토어 구독 L 년 (상품 50개 초과)', 25),
+('SM200','SUBSCR','PISHOP_SUBSCR','SUBSCR','S',      'M',  3000,30,'스토어 구독 S 월 (상품 30개 이하)', 20),
+('SM300','SUBSCR','PISHOP_SUBSCR','SUBSCR','M',      'M',  4000,50,'스토어 구독 M 월 (상품 50개 이하)', 21),
+('SM400','SUBSCR','PISHOP_SUBSCR','SUBSCR','L',      'M',  5000, 0,'스토어 구독 L 월 (상품 50개 초과)', 22),
+('SY200','SUBSCR','PISHOP_SUBSCR','SUBSCR','S',      'Y', 30000,30,'스토어 구독 S 년 (상품 30개 이하)', 23),
+('SY300','SUBSCR','PISHOP_SUBSCR','SUBSCR','M',      'Y', 40000,50,'스토어 구독 M 년 (상품 50개 이하)', 24),
+('SY400','SUBSCR','PISHOP_SUBSCR','SUBSCR','L',      'Y', 50000, 0,'스토어 구독 L 년 (상품 50개 초과)', 25),
 ('SM500','SUBSCR','TRANSLATE_SUBSCR','SUBSCR','GENERAL','M', 1000, 0,'자동번역 구독 월', 30),
 ('SY500','SUBSCR','TRANSLATE_SUBSCR','SUBSCR','GENERAL','Y',10000, 0,'자동번역 구독 년', 31),
 
@@ -84,28 +84,28 @@ VALUES
 ('CSEE3','SUBSCR','PICAFE_SUBSCR','ENTER', 'EVENT',  'ONCE',  5,1,'(구독자) 카페 입장 이벤트', 55),
 
 -- §4-3. 일반요금제 — 스토어 비구독자 (GENERAL) 10행
-('SGGC1','GENERAL','PISTORE_GENERAL','CREATE', 'GENERAL','ONCE',  0,0,'스토어 상품 생성 일반', 60),
-('SGPC2','GENERAL','PISTORE_GENERAL','CREATE', 'PREMIUM','ONCE', 10,0,'스토어 상품 생성 프리미엄', 61),
-('SGGDW','GENERAL','PISTORE_GENERAL','EXPOSE', 'GENERAL','W',     5,1,'노출 1주 일반', 62),
-('SGPDW','GENERAL','PISTORE_GENERAL','EXPOSE', 'PREMIUM','W',    10,1,'노출 1주 프리미엄', 63),
-('SGGDM','GENERAL','PISTORE_GENERAL','EXPOSE', 'GENERAL','M',    10,1,'노출 1개월 일반', 64),
-('SGPDM','GENERAL','PISTORE_GENERAL','EXPOSE', 'PREMIUM','M',    20,1,'노출 1개월 프리미엄', 65),
-('SGGEW','GENERAL','PISTORE_GENERAL','EXTEND', 'GENERAL','W',     5,1,'연장 1주 일반', 66),
-('SGPEW','GENERAL','PISTORE_GENERAL','EXTEND', 'PREMIUM','W',    10,1,'연장 1주 프리미엄', 67),
-('SGGEM','GENERAL','PISTORE_GENERAL','EXTEND', 'GENERAL','M',    10,1,'연장 1개월 일반', 68),
-('SGPEM','GENERAL','PISTORE_GENERAL','EXTEND', 'PREMIUM','M',    20,1,'연장 1개월 프리미엄', 69),
+('SGGC1','GENERAL','PISHOP_GENERAL','CREATE', 'GENERAL','ONCE',  0,0,'스토어 상품 생성 일반', 60),
+('SGPC2','GENERAL','PISHOP_GENERAL','CREATE', 'PREMIUM','ONCE', 10,0,'스토어 상품 생성 프리미엄', 61),
+('SGGDW','GENERAL','PISHOP_GENERAL','EXPOSE', 'GENERAL','W',     5,1,'노출 1주 일반', 62),
+('SGPDW','GENERAL','PISHOP_GENERAL','EXPOSE', 'PREMIUM','W',    10,1,'노출 1주 프리미엄', 63),
+('SGGDM','GENERAL','PISHOP_GENERAL','EXPOSE', 'GENERAL','M',    10,1,'노출 1개월 일반', 64),
+('SGPDM','GENERAL','PISHOP_GENERAL','EXPOSE', 'PREMIUM','M',    20,1,'노출 1개월 프리미엄', 65),
+('SGGEW','GENERAL','PISHOP_GENERAL','EXTEND', 'GENERAL','W',     5,1,'연장 1주 일반', 66),
+('SGPEW','GENERAL','PISHOP_GENERAL','EXTEND', 'PREMIUM','W',    10,1,'연장 1주 프리미엄', 67),
+('SGGEM','GENERAL','PISHOP_GENERAL','EXTEND', 'GENERAL','M',    10,1,'연장 1개월 일반', 68),
+('SGPEM','GENERAL','PISHOP_GENERAL','EXTEND', 'PREMIUM','M',    20,1,'연장 1개월 프리미엄', 69),
 
 -- §4-3. 스토어 구독자 할인 (SUBSCR) 10행 — ⚠️ SSPDM(5)<SSGDM(10) 역전은 엑셀 원본 그대로
-('SSGC1','SUBSCR','PISTORE_SUBSCR','CREATE', 'GENERAL','ONCE',  0,0,'(구독자) 상품 생성 일반', 70),
-('SSPC2','SUBSCR','PISTORE_SUBSCR','CREATE', 'PREMIUM','ONCE',  0,0,'(구독자) 상품 생성 프리미엄', 71),
-('SSGDW','SUBSCR','PISTORE_SUBSCR','EXPOSE', 'GENERAL','W',     0,1,'(구독자) 노출 1주 일반', 72),
-('SSPDW','SUBSCR','PISTORE_SUBSCR','EXPOSE', 'PREMIUM','W',     0,1,'(구독자) 노출 1주 프리미엄', 73),
-('SSGDM','SUBSCR','PISTORE_SUBSCR','EXPOSE', 'GENERAL','M',    10,1,'(구독자) 노출 1개월 일반', 74),
-('SSPDM','SUBSCR','PISTORE_SUBSCR','EXPOSE', 'PREMIUM','M',     5,1,'(구독자) 노출 1개월 프리미엄 ⚠️역전검토', 75),
-('SSGEW','SUBSCR','PISTORE_SUBSCR','EXTEND', 'GENERAL','W',     5,1,'(구독자) 연장 1주 일반', 76),
-('SSPEW','SUBSCR','PISTORE_SUBSCR','EXTEND', 'PREMIUM','W',     5,1,'(구독자) 연장 1주 프리미엄', 77),
-('SSGEM','SUBSCR','PISTORE_SUBSCR','EXTEND', 'GENERAL','M',    10,1,'(구독자) 연장 1개월 일반', 78),
-('SSPEM','SUBSCR','PISTORE_SUBSCR','EXTEND', 'PREMIUM','M',    10,1,'(구독자) 연장 1개월 프리미엄', 79),
+('SSGC1','SUBSCR','PISHOP_SUBSCR','CREATE', 'GENERAL','ONCE',  0,0,'(구독자) 상품 생성 일반', 70),
+('SSPC2','SUBSCR','PISHOP_SUBSCR','CREATE', 'PREMIUM','ONCE',  0,0,'(구독자) 상품 생성 프리미엄', 71),
+('SSGDW','SUBSCR','PISHOP_SUBSCR','EXPOSE', 'GENERAL','W',     0,1,'(구독자) 노출 1주 일반', 72),
+('SSPDW','SUBSCR','PISHOP_SUBSCR','EXPOSE', 'PREMIUM','W',     0,1,'(구독자) 노출 1주 프리미엄', 73),
+('SSGDM','SUBSCR','PISHOP_SUBSCR','EXPOSE', 'GENERAL','M',    10,1,'(구독자) 노출 1개월 일반', 74),
+('SSPDM','SUBSCR','PISHOP_SUBSCR','EXPOSE', 'PREMIUM','M',     5,1,'(구독자) 노출 1개월 프리미엄 ⚠️역전검토', 75),
+('SSGEW','SUBSCR','PISHOP_SUBSCR','EXTEND', 'GENERAL','W',     5,1,'(구독자) 연장 1주 일반', 76),
+('SSPEW','SUBSCR','PISHOP_SUBSCR','EXTEND', 'PREMIUM','W',     5,1,'(구독자) 연장 1주 프리미엄', 77),
+('SSGEM','SUBSCR','PISHOP_SUBSCR','EXTEND', 'GENERAL','M',    10,1,'(구독자) 연장 1개월 일반', 78),
+('SSPEM','SUBSCR','PISHOP_SUBSCR','EXTEND', 'PREMIUM','M',    10,1,'(구독자) 연장 1개월 프리미엄', 79),
 
 -- 플랫폼 기타 요금 — bean-fee.ts 상수 코드 미러 4행
 ('BADGE_UPG', 'GENERAL','PLATFORM','BADGE_UPGRADE','GENERAL','ONCE', 10,1,'배지 강화 1회 (=0.1 Pi)', 90),

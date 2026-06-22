@@ -1,4 +1,4 @@
-# PRD_14_SUBSC.md — Cafe.pi 구독 요금제: PiCafe·PiStore
+# PRD_14_SUBSC.md — Cafe.pi 구독 요금제: PiCafe·PiShop
 
 > **작성일**: 2026-06-18
 > **버전**: v1.0
@@ -13,7 +13,7 @@
 |------|------|-----------|--------|
 | **v1.2** | 2026-06-18 | **구독 요금제 구체화 + UX·진입 경로 추가** — ① 기능·한도 정밀화(테마·그룹방·AI·이벤트·분석·봇·매장 수·상품 수·우선노출 구체 수치) + 취소/자동갱신/만료강등/업그레이드 규칙 명확화. ② 구독 신청 페이지 신규 섹션(라우트·화면구성·상태) + 진입경로(6곳) + 결제흐름(과도기·정본) + API 계약(/api/subscriptions) + Pi Browser 제약(getSessionUser null게이트) + 와이어프레임(텍스트 ASCII). | asoká |
 | **v1.1** | 2026-06-18 | **거래 통화 라우팅 규칙(최상위 원칙) 확정** — ① 플랫폼↔사용자 거래(구독)는 Bean Token 정본(Pi는 과도기) ② P2P 중고장터 = Pi 결제 ③ O2O 매장주문 = Pi 결제 + Bean Token 보상. 모든 금액표기·결제흐름·기능매트릭스·레드라인 체크 반영. 시가연동(원화 단정 금지)·용어 통일(Pi Bean→Bean Token) 적용. | asoká |
-| **v1.0** | 2026-06-18 | 최초 작성 — PiCafe 3-tier 현행화 + Bean 환산(1 Pi=100 Bean) + PiStore 플랜 신설 + 연간 할인 근거 + 레드라인 체크 | asoká |
+| **v1.0** | 2026-06-18 | 최초 작성 — PiCafe 3-tier 현행화 + Bean 환산(1 Pi=100 Bean) + PiShop 플랜 신설 + 연간 할인 근거 + 레드라인 체크 | asoká |
 
 ---
 
@@ -24,7 +24,7 @@
 2. [Bean 토큰 이코노미 설계 전제](#2-bean-토큰-이코노미-설계-전제)
 3. [요금제 산정 공식](#3-요금제-산정-공식)
 4. [PiCafe 구독 요금제](#4-picate-구독-요금제)
-5. [PiStore 유료 구독 플랜](#5-pistore-유료-구독-플랜)
+5. [PiShop 유료 구독 플랜](#5-pishop-유료-구독-플랜)
 6. [연간 구독 할인 근거](#6-연간-구독-할인-근거)
 7. [기능·권한 매트릭스](#7-기능권한-매트릭스)
 8. [결제 연동 고려사항](#8-결제-연동-고려사항)
@@ -44,7 +44,7 @@
 
 #### **규칙 1: 플랫폼 ↔ 사용자 거래 = Bean Token (정본)**
 
-**범위**: 구독료(PiCafe·PiStore), 플랫폼 수수료, 플랫폼 내부 거래
+**범위**: 구독료(PiCafe·PiShop), 플랫폼 수수료, 플랫폼 내부 거래
 
 ```
 사용자 흐름:
@@ -61,7 +61,7 @@
 
 #### **규칙 2: P2P 중고장터 = Pi 결제 (보상 없음)**
 
-**범위**: PiStore의 사용자↔사용자 중고 직거래 (mps_order)
+**범위**: PiShop의 사용자↔사용자 중고 직거래 (mps_order)
 
 ```
 거래 흐름:
@@ -72,7 +72,7 @@
 
 #### **규칙 3: O2O 매장주문 = Pi 결제 + Bean Token 보상**
 
-**범위**: PiStore의 오프라인 매장 상품 구매 (mps_order + shop)
+**범위**: PiShop의 오프라인 매장 상품 구매 (mps_order + shop)
 
 ```
 결제: 구매자 Pi → 매장주인(판매자) Pi
@@ -100,14 +100,14 @@
 
 ### 1-1. 제품명 및 목표
 
-**Cafe.pi 구독 시스템** — PiCafe(채팅 커뮤니티)와 PiStore(P2P·O2O 마켓플레이스)의 월간·연간 구독 요금제
+**Cafe.pi 구독 시스템** — PiCafe(채팅 커뮤니티)와 PiShop(P2P·O2O 마켓플레이스)의 월간·연간 구독 요금제
 
 **핵심 목표**: Cafe.pi 생태계의 **활성 사용자 수 증가**를 직접 지원하는 구독 모델. 구독료는 수단이자 연료일 뿐, 판단 기준은 항상 **"이것이 활성 사용자를 늘리는가"**.
 
 ### 1-2. 범위
 
 - **PiCafe 구독**: Pi Explorer(FREE) / Pi Creator(PREMIUM) / Pi Host(BUSINESS) — 월간/연간
-- **PiStore 유료 구독**: PiShop Seller(PREMIUM) — 매장 운영자용 신설 플랜
+- **PiShop 유료 구독**: PiShop Seller(PREMIUM) — 매장 운영자용 신설 플랜
 - **Bean 토큰 표기**: 1 Pi = 100 Bean 환산, 사용자 노출용 3중 표기(원화 제외)
 - **현행 유지**: 기존 DB 가격(`price_pi`) 유지, 변경 아님
 
@@ -116,7 +116,7 @@
 Cafe.pi 플랫폼은 다음 두 가지 전략으로 활성 사용자를 확보·유지한다:
 
 1. **PiCafe(=PiChat)**: 무료→소액 수수료 전략 — 낮은 진입 장벽으로 신규 사용자 획득 후 구독(PREMIUM/BUSINESS)으로 수익화
-2. **PiStore(=MPS)**: 오프라인 교두보 전략 — 매장 등록(1 Pi 보증금 무료) 후 전문가용 유료 구독(PiShop Seller)으로 운영자 확보
+2. **PiShop(=MPS)**: 오프라인 교두보 전략 — 매장 등록(1 Pi 보증금 무료) 후 전문가용 유료 구독(PiShop Seller)으로 운영자 확보
 
 ---
 
@@ -309,11 +309,11 @@ Cafe.pi 플랫폼은 다음 두 가지 전략으로 활성 사용자를 확보·
 
 ---
 
-## 5. PiStore 유료 구독 플랜
+## 5. PiShop 유료 구독 플랜
 
 ### 5-1. 배경 및 설계
 
-**PiStore(MPS)** 현황:
+**PiShop(MPS)** 현황:
 - 상품 등록: 무료
 - 매장 등록: 무료 (1개)
 - 거래 수수료: Pi 차감 (0.01 Pi 네트워크 수수료)
@@ -463,7 +463,7 @@ Cafe.pi 플랫폼은 다음 두 가지 전략으로 활성 사용자를 확보·
 - `0` = 불가
 - 숫자 = 월 한도
 
-### 7-2. PiStore 판매자 기능 매트릭스 (§0 규칙 2·3: P2P·O2O 구분)
+### 7-2. PiShop 판매자 기능 매트릭스 (§0 규칙 2·3: P2P·O2O 구분)
 
 #### P2P 중고 직거래 (규칙 2: Pi 결제만)
 
@@ -536,7 +536,7 @@ msg_subscr 레코드 생성: plan_cd='PREMIUM_MONTHLY', expire_dtm=NOW+1month
 **결제 호출**:
 
 1. **1단계 (초기화)**: 클라이언트 → 서버 `/api/subscriptions/create` 요청
-   - 요금제 선택: `plan_cd` (PREMIUM_MONTHLY / PREMIUM_ANNUAL / ... / PISTORE_SELLER_MONTHLY 등)
+   - 요금제 선택: `plan_cd` (PREMIUM_MONTHLY / PREMIUM_ANNUAL / ... / PISHOP_SELLER_MONTHLY 등)
    - 서버: Pi 가격 조회 (`msg_subscr_plan.price_pi`)
 
 2. **2단계 (대기)**: 서버 → Pi Browser U2A 결제 API 호출
@@ -569,7 +569,7 @@ INSERT INTO pi_pymnt (
 
 -- 구독 레코드 생성 (결제 성공 후)
 INSERT INTO msg_subscr (
-  plan_cd,           -- PREMIUM_MONTHLY / BUSINESS_ANNUAL / PISTORE_SELLER_MONTHLY 등
+  plan_cd,           -- PREMIUM_MONTHLY / BUSINESS_ANNUAL / PISHOP_SELLER_MONTHLY 등
   usr_id,
   expire_dtm,        -- NOW() + INTERVAL '1 month' (월간) 또는 '1 year' (연간)
   auto_renew_yn,     -- 'Y' (기본)
@@ -602,7 +602,7 @@ INSERT INTO msg_subscr (
 | **2** | 헤더 (한정시 배너) | 미인증/FREE | 헤더 상단 프로모션 배너 | "구독 신청" CTA → 신청 페이지 |
 | **3** | PiCafe 그룹방 생성 | PREMIUM 필요 | 그룹방 생성 모달 (FREE 사용자) | "업그레이드 필요" → 신청 페이지 |
 | **4** | PiCafe 기능 게이트 | 한도 초과 시 | AI 호출/이벤트방/분석 사용 불가 | "구독 필요" 팝업 → 신청 페이지 |
-| **5** | PiStore 매장관리 | 판매자 | `/store/my/shops` → 매장 카드 | "PiShop Seller 구독" CTA → 신청 페이지 |
+| **5** | PiShop 매장관리 | 판매자 | `/store/my/shops` → 매장 카드 | "PiShop Seller 구독" CTA → 신청 페이지 |
 | **6** | 만료 알림 | 구독 만료 근처 | 24시간 전 푸시/이메일 | "갱신하기" 버튼 → 신청 페이지 |
 
 **동선 요약**:
@@ -630,10 +630,10 @@ INSERT INTO msg_subscr (
 | 상태 | 렌더 | 비고 |
 |---|---|---|
 | **1. 미인증** | 로그인 유도 (클라이언트 게이트) | `getSessionUser()` 호출 → null → 게이트 |
-| **2. FREE (기본)** | 3개 플랜 카드 (FREE/PREMIUM/BUSINESS 또는 PISTORE) | 현재 plankcd=FREE 표시 |
+| **2. FREE (기본)** | 3개 플랜 카드 (FREE/PREMIUM/BUSINESS 또는 PISHOP) | 현재 plankcd=FREE 표시 |
 | **3. PREMIUM 구독중** | BUSINESS로 업그레이드 추천 또는 다운그레이드 옵션 | 갱신 일정 표시 |
 | **4. BUSINESS 구독중** | 다운그레이드만 가능 (FREE/PREMIUM) | 상위 플랜이므로 업그레이드 없음 |
-| **5. 판매자 (PiStore)** | PiShop Seller 구독 카드 (O2O용) | P2P 판매자는 구독 불필요 표시 |
+| **5. 판매자 (PiShop)** | PiShop Seller 구독 카드 (O2O용) | P2P 판매자는 구독 불필요 표시 |
 | **6. 결제 대기중** | "결제 승인 대기..." 로딩 | `window.Pi.createPayment` 실행 중 |
 | **7. 결제 완료** | 성공 화면 → "/[locale]/chat" 또는 유입 페이지로 리다이렉트 | 2초 후 자동 이동 |
 
@@ -807,7 +807,7 @@ GET /api/subscriptions/plans
       },
       { ... PREMIUM ... },
       { ... BUSINESS ... },
-      { ... PISTORE_SELLER_MONTHLY ... }
+      { ... PISHOP_SELLER_MONTHLY ... }
     ]
   }
 
@@ -1034,14 +1034,14 @@ export async function getSessionUser() {
 
 ## 12. DB 시드 초안 (승인 대기)
 
-### 12-1. msg_subscr_plan 신규 데이터 (PiStore 플랜) & 구조 확장
+### 12-1. msg_subscr_plan 신규 데이터 (PiShop 플랜) & 구조 확장
 
 **⚠️ 본 섹션은 초안이며, 실제 DB 적용은 아나킨 마스터님 승인 후 진행합니다.**
 
 #### **12-1-1. 현행 데이터 (과도기: Pi 기준)**
 
 ```sql
--- PiStore 판매자 구독 플랜 추가 (신설) — 과도기(현재): Pi 가격 기준
+-- PiShop 판매자 구독 플랜 추가 (신설) — 과도기(현재): Pi 가격 기준
 
 INSERT INTO msg_subscr_plan (
   plan_cd,
@@ -1056,10 +1056,10 @@ INSERT INTO msg_subscr_plan (
   reg_dtm
 ) VALUES
 (
-  'PISTORE_SELLER_MONTHLY',
+  'PISHOP_SELLER_MONTHLY',
   'PiShop Seller 월간',
   '매장 통계·다중 매장·우선 노출 — 전문 판매자용',
-  'PISTORE',           -- 신규 plan_tp_cd (또는 'PREMIUM' 재사용)
+  'PISHOP',           -- 신규 plan_tp_cd (또는 'PREMIUM' 재사용)
   '0.5000',            -- 월간: 0.5 Pi (= 50 Bean Token)
   1,                   -- 월간
   'Y',                 -- 활성화
@@ -1068,10 +1068,10 @@ INSERT INTO msg_subscr_plan (
   CURRENT_TIMESTAMP
 ),
 (
-  'PISTORE_SELLER_ANNUAL',
+  'PISHOP_SELLER_ANNUAL',
   'PiShop Seller 연간',
   'PiShop Seller 연간 구독 — 2개월 무료',
-  'PISTORE',
+  'PISHOP',
   '5.0000',            -- 연간: 5 Pi (= 500 Bean Token, 2개월 할인)
   12,                  -- 연간
   'Y',
@@ -1096,7 +1096,7 @@ UPDATE msg_subscr_plan SET price_bean = price_pi * 100;
 -- 예시:
 -- PREMIUM_MONTHLY: price_pi=1.0 → price_bean=100
 -- BUSINESS_MONTHLY: price_pi=5.0 → price_bean=500
--- PISTORE_SELLER_MONTHLY: price_pi=0.5 → price_bean=50
+-- PISHOP_SELLER_MONTHLY: price_pi=0.5 → price_bean=50
 
 -- Step 3: 결제 로직 전환 (feature flag)
 
@@ -1113,7 +1113,7 @@ UPDATE msg_subscr_plan SET price_bean = price_pi * 100;
 
 **DA 표준 확인**:
 - ✅ `plan_cd`: 대문자 + 언더스코어 (DA 규칙)
-- ✅ `plan_tp_cd`: 기존 'FREE'/'PREMIUM'/'BUSINESS' 또는 새로운 'PISTORE' (결정 필요)
+- ✅ `plan_tp_cd`: 기존 'FREE'/'PREMIUM'/'BUSINESS' 또는 새로운 'PISHOP' (결정 필요)
 - ✅ `price_pi`: DECIMAL(10,4) 정밀도
 - ✅ `mth_cnt`: 1(월간) / 12(연간)
 - ✅ 시스템 컬럼 4개 (`regr_id`, `reg_dtm`, `modr_id`, `mod_dtm`) 포함
@@ -1123,16 +1123,16 @@ UPDATE msg_subscr_plan SET price_bean = price_pi * 100;
 
 | 항목 | 현재 제안 | 결정 필요 |
 |---|---|---|
-| plan_tp_cd | 신규 'PISTORE' 또는 'PREMIUM' 재사용 | ⚠️ 어느 것이 맞을까요? |
+| plan_tp_cd | 신규 'PISHOP' 또는 'PREMIUM' 재사용 | ⚠️ 어느 것이 맞을까요? |
 | 월간 가격 | 0.5 Pi (50 Bean) | ✅ 확인 또는 조정? |
 | 연간 가격 | 5 Pi (500 Bean, 2개월 무료) | ✅ 확인? |
 
 ### 12-3. 후속 작업
 
 1. **DA 승인**: `docs/da/데이터표준규칙.md` 기준 검증 (`da-ddl-guard` hook)
-2. **시드 적용**: `sql/seeding/msg_subscr_plan_pistore.sql` 작성 후 마이그레이션
-3. **PLAN_CAPS 확장**: `src/lib/chat-auth.ts`에 `PISTORE` 티어 추가 (필요 시)
-4. **API 확장**: `/api/subscriptions` 엔드포인트에 PiStore 플랜 선택 로직 추가
+2. **시드 적용**: `sql/seeding/msg_subscr_plan_pishop.sql` 작성 후 마이그레이션
+3. **PLAN_CAPS 확장**: `src/lib/chat-auth.ts`에 `PISHOP` 티어 추가 (필요 시)
+4. **API 확장**: `/api/subscriptions` 엔드포인트에 PiShop 플랜 선택 로직 추가
 5. **PRD 동기화**: `docs/PRD.md` (기술 상세), `docs/ROADMAP.md` (일정) 업데이트
 
 ---
@@ -1149,7 +1149,7 @@ UPDATE msg_subscr_plan SET price_bean = price_pi * 100;
 | **2단계 전환 계획** | ① 현재: Pi 결제 (msg_subscr_plan.price_pi) ② Phase 17 이후: Bean Token 직결제 (price_bean 컬럼 추가) |
 | **연간 할인** | 월간 × 10 = 연간 (2개월 무료, 16.7% 할인) |
 | **기간 표기** | 월간/연간 명시 (현행 구조 유지) |
-| **PiStore 신설** | PiShop Seller 월 0.5Pi(50Bean)/연 5Pi(500Bean) — O2O 매장용, Bean Token 보상 포함 |
+| **PiShop 신설** | PiShop Seller 월 0.5Pi(50Bean)/연 5Pi(500Bean) — O2O 매장용, Bean Token 보상 포함 |
 | **원화 정책** | 사용자 비노출, 내부 기준용만 "현재가 KRW/시가연동" 표기 (단정 금지) |
 | **레드라인 준수** | 투자성 배제, 거래타입 명확성, 시세 명확성, 결제 투명성 (§11-2 상세) |
 
@@ -1158,7 +1158,7 @@ UPDATE msg_subscr_plan SET price_bean = price_pi * 100;
 1. **PiRC2 반복 결제**: 스마트 컨트랙트 자동 갱신 (온체인)
 2. **Bean 토큰 직결제**: BEAN 발행 후 구독료 Pi 대신 BEAN으로도 결제 가능
 3. **Tier 추가**: 기업용 ENTERPRISE 플랜 (향후)
-4. **패키지 연결**: StarterKit 패키지와 PiCafe/PiStore 구독 번들링
+4. **패키지 연결**: StarterKit 패키지와 PiCafe/PiShop 구독 번들링
 
 ---
 
@@ -1191,4 +1191,4 @@ UPDATE msg_subscr_plan SET price_bean = price_pi * 100;
 ---
 
 **작성 완료**: 2026-06-18 v1.0
-**다음 단계**: ① PiStore plan_tp_cd 결정 ② 시드 SQL 작성 ③ src/lib/chat-auth.ts PLAN_CAPS 확장 ④ PRD.md / ROADMAP.md 동기화
+**다음 단계**: ① PiShop plan_tp_cd 결정 ② 시드 SQL 작성 ③ src/lib/chat-auth.ts PLAN_CAPS 확장 ④ PRD.md / ROADMAP.md 동기화

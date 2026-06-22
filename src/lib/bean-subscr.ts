@@ -33,7 +33,7 @@ export async function getMySubscriptions(
   return (data as ActiveSubscr[] | null) ?? []
 }
 
-// 내 판매 상품 수 (PiStore 등급 추천용)
+// 내 판매 상품 수 (PiShop 등급 추천용)
 export async function getMyItemCount(usrId: string): Promise<number> {
   const { count } = await getSupabaseAdmin()
     .from('mps_item')
