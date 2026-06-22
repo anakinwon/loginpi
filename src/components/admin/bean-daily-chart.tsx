@@ -81,7 +81,8 @@ export default function BeanRevenueTimeline({
       name: f.label,
       x,
       y: sliced.map((r) => Number(r[f.key]) || 0),
-      line: { color: f.hex, width: 2 },
+      // 활성 사용자 그래프와 동일한 spline 곡선으로 부드럽게 표현
+      line: { color: f.hex, width: 2, shape: 'spline' as const, smoothing: 1.3 },
       marker: { color: f.hex, size: 4 },
       hovertemplate: `${f.label}: %{y:,} Bean<extra></extra>`,
     }))
