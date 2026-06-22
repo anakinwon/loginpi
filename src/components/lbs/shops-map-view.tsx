@@ -3,6 +3,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { setOptions, importLibrary } from '@googlemaps/js-api-loader'
+import { MarkerClusterer } from '@googlemaps/markerclusterer'
 import { useRouter } from '@/i18n/navigation'
 import {
   ShopClaimDialog,
@@ -117,8 +118,10 @@ export function ShopsMapView({
 
     setOptions({ key: apiKey, v: 'weekly' })
 
-    let markers: google.maps.marker.AdvancedMarkerElement[] = []
+    const markers: google.maps.marker.AdvancedMarkerElement[] = []
     let infoWindow: google.maps.InfoWindow | null = null
+    // 마커 클러스터러 — 100+ 마커 환경에서 줌 레벨별로 마커를 묶어 렌더 부하를 줄인다 (PRD_18 MAP)
+    let clusterer: MarkerClusterer | null = null
     markerMapRef.current.clear()
     ;(async () => {
       try {
@@ -179,8 +182,8 @@ export function ShopsMapView({
             borderColor: cfg.border,
             glyphColor: '#ffffff',
           })
+          // map을 지정하지 않는다 — 클러스터러가 줌 레벨에 따라 표시/묶음을 제어한다
           const marker = new AdvancedMarkerElement({
-            map,
             position,
             content: pin.element,
             title,
@@ -471,6 +474,12 @@ export function ShopsMapView({
           }
         }
 
+        // 마커 클러스터링 — 가까운 마커를 묶어 100+ 마커에서도 부드럽게 렌더
+        // (사용자 위치 '나' 마커는 markers 배열에 없어 항상 개별 표시됨)
+        if (markers.length > 0) {
+          clusterer = new MarkerClusterer({ map, markers })
+        }
+
         // 모든 마커가 보이도록 범위 조정
         if (markers.length > 0) {
           map.fitBounds(bounds, 80)
@@ -513,6 +522,7 @@ export function ShopsMapView({
     })()
 
     return () => {
+      clusterer?.clearMarkers()
       markers.forEach((m) => (m.map = null))
       infoWindow?.close()
       mapInstanceRef.current = null

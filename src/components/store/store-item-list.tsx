@@ -1,6 +1,7 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { memo, useCallback, useEffect, useState } from 'react'
+import Image from 'next/image'
 import { useLocale, useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { Link } from '@/i18n/navigation'
@@ -193,8 +194,12 @@ export function StoreItemList({ mine = false }: StoreItemListProps) {
       const res = await piFetch(`/api/store/items?${sp}`)
       if (res.ok) {
         const data = (await res.json()) as { items: StoreItem[]; total: number }
-        // 무한 스크롤 — 첫 페이지는 교체, 이후 페이지는 누적 append
-        setItems((prev) => (page === 1 ? data.items : [...prev, ...data.items]))
+        // 무한 스크롤 — 첫 페이지는 교체, 이후 페이지는 중복 제거 후 append
+        setItems((prev) => {
+          if (page === 1) return data.items
+          const seen = new Set(prev.map((i) => i.item_id))
+          return [...prev, ...data.items.filter((i) => !seen.has(i.item_id))]
+        })
         setTotal(data.total)
         if (isDefaultView) writeCache(STORE_CACHE_KEY, data)
       }
@@ -424,16 +429,20 @@ export function StoreItemList({ mine = false }: StoreItemListProps) {
 
 type TFunc = ReturnType<typeof useTranslations<'store'>>
 
-function ItemCard({
+// memo로 감싸 검색어 입력·GPS 로딩 등 부모 리렌더 시 변하지 않은 카드의 재렌더를 차단.
+// item/locale/t/lbsConsent 참조가 안정적이라 기본 얕은 비교로 충분 (PRD_18 SHOP, 필터/정렬 리렌더 -30%)
+const ItemCard = memo(function ItemCard({
   item,
   locale,
   t,
   lbsConsent,
+  priority = false,
 }: {
   item: StoreItem
   locale: string
   t: TFunc
   lbsConsent: 'Y' | 'N' | null
+  priority?: boolean
 }) {
   const tradeSt = deriveTradeStatus(item)
   return (
@@ -443,11 +452,13 @@ function ItemCard({
     >
       <div className="bg-muted relative flex aspect-square items-center justify-center overflow-hidden">
         {item.thumbnail_url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={item.thumbnail_url}
             alt={item.item_nm}
-            className={`h-full w-full object-cover transition-transform group-hover:scale-105 ${tradeSt !== 'OPEN' ? 'opacity-60' : ''}`}
+            fill
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            priority={priority}
+            className={`object-cover transition-transform group-hover:scale-105 ${tradeSt !== 'OPEN' ? 'opacity-60' : ''}`}
           />
         ) : (
           <span className="text-4xl">🛒</span>
@@ -487,7 +498,7 @@ function ItemCard({
       </div>
     </Link>
   )
-}
+})
 
 // 스타벅스 Order 스타일 1열 리스트 행 (Pi Browser 전용) — 원형 썸네일 + 제목/가격.
 // href·ownerBadge를 받아 메인 목록·스토어프론트(소유자 수정) 양쪽에서 재사용.
@@ -498,6 +509,7 @@ export function ItemRow({
   href,
   lbsConsent = null,
   ownerBadge = false,
+  priority = false,
 }: {
   item: StoreItem
   locale: string
@@ -505,6 +517,7 @@ export function ItemRow({
   href: string
   lbsConsent?: 'Y' | 'N' | null
   ownerBadge?: boolean
+  priority?: boolean
 }) {
   const tradeSt = deriveTradeStatus(item)
   return (
@@ -514,13 +527,15 @@ export function ItemRow({
         className="hover:bg-muted/50 flex items-center gap-4 px-1 py-3 transition-colors"
       >
         {/* 원형 썸네일 */}
-        <div className="bg-muted flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-full">
+        <div className="bg-muted relative flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-full">
           {item.thumbnail_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Image
               src={item.thumbnail_url}
               alt={item.item_nm}
-              className={`h-full w-full object-cover ${tradeSt !== 'OPEN' ? 'opacity-60' : ''}`}
+              fill
+              sizes="64px"
+              priority={priority}
+              className={`object-cover ${tradeSt !== 'OPEN' ? 'opacity-60' : ''}`}
             />
           ) : (
             <span className="text-2xl">🛒</span>
@@ -609,7 +624,7 @@ function PublicItemGroups({
           </h3>
           {piMode ? (
             <ul className="divide-y rounded-lg border">
-              {shopItems.map((item) => (
+              {shopItems.map((item, idx) => (
                 <ItemRow
                   key={item.item_id}
                   item={item}
@@ -617,18 +632,20 @@ function PublicItemGroups({
                   t={t}
                   href={`/store/${item.item_id}`}
                   lbsConsent={lbsConsent}
+                  priority={idx < 2}
                 />
               ))}
             </ul>
           ) : (
             <div className={gridCls}>
-              {shopItems.map((item) => (
+              {shopItems.map((item, idx) => (
                 <ItemCard
                   key={item.item_id}
                   item={item}
                   locale={locale}
                   t={t}
                   lbsConsent={lbsConsent}
+                  priority={idx < 2}
                 />
               ))}
             </div>
@@ -647,7 +664,7 @@ function PublicItemGroups({
           </h3>
           {piMode ? (
             <ul className="divide-y rounded-lg border">
-              {directItems.map((item) => (
+              {directItems.map((item, idx) => (
                 <ItemRow
                   key={item.item_id}
                   item={item}
@@ -655,18 +672,20 @@ function PublicItemGroups({
                   t={t}
                   href={`/store/${item.item_id}`}
                   lbsConsent={lbsConsent}
+                  priority={shopItems.length === 0 && idx < 2}
                 />
               ))}
             </ul>
           ) : (
             <div className={gridCls}>
-              {directItems.map((item) => (
+              {directItems.map((item, idx) => (
                 <ItemCard
                   key={item.item_id}
                   item={item}
                   locale={locale}
                   t={t}
                   lbsConsent={lbsConsent}
+                  priority={shopItems.length === 0 && idx < 2}
                 />
               ))}
             </div>
@@ -727,25 +746,27 @@ function MyItemGroups({
               </div>
               {piMode ? (
                 <ul className="divide-y rounded-lg border">
-                  {group.items.map((item) => (
+                  {group.items.map((item, idx) => (
                     <ItemRow
                       key={item.item_id}
                       item={item}
                       locale={locale}
                       t={t}
                       href={`/store/${item.item_id}`}
+                      priority={idx < 2}
                     />
                   ))}
                 </ul>
               ) : (
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-                  {group.items.map((item) => (
+                  {group.items.map((item, idx) => (
                     <ItemCard
                       key={item.item_id}
                       item={item}
                       locale={locale}
                       t={t}
                       lbsConsent={null}
+                      priority={idx < 2}
                     />
                   ))}
                 </div>
@@ -766,25 +787,27 @@ function MyItemGroups({
           </h3>
           {piMode ? (
             <ul className="divide-y rounded-lg border">
-              {directItems.map((item) => (
+              {directItems.map((item, idx) => (
                 <ItemRow
                   key={item.item_id}
                   item={item}
                   locale={locale}
                   t={t}
                   href={`/store/${item.item_id}`}
+                  priority={shopMap.size === 0 && idx < 2}
                 />
               ))}
             </ul>
           ) : (
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-              {directItems.map((item) => (
+              {directItems.map((item, idx) => (
                 <ItemCard
                   key={item.item_id}
                   item={item}
                   locale={locale}
                   t={t}
                   lbsConsent={null}
+                  priority={shopMap.size === 0 && idx < 2}
                 />
               ))}
             </div>

@@ -100,13 +100,20 @@ export function ClientEventGate() {
   // 관리자 전용: 온디맨드 미션 재평가 → 완료 후 랭킹 재조회
   // cron(자정 1회) 사이 실시간 평가가 누락된 미션을 즉시 일괄 재평가한다.
   const handleReeval = async () => {
+    if (reevaluating) return // 중복 클릭 → 중복 재평가 가드 (미션 평가는 신뢰 직결, 멱등 보장)
     setReevaluating(true)
     try {
       const res = await piFetch('/api/admin/event/reeval', { method: 'POST' })
-      if (!res.ok) return
+      if (!res.ok) {
+        // 조용한 실패 금지 — 관리자가 재평가 미반영 원인을 알 수 있게 피드백
+        const data = await res.json().catch(() => ({}))
+        alert(data.error ?? '미션 재평가에 실패했습니다')
+        return
+      }
       await refetchRanking()
     } catch (err) {
       console.error('[reeval] 재평가 실패:', err)
+      alert('네트워크 오류가 발생했습니다')
     } finally {
       setReevaluating(false)
     }

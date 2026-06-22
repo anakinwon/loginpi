@@ -4,474 +4,462 @@
 
 - **버전**: v1.0
 - **작성일**: 2026-06-23
-- **작성자**: 아소카 (cafe.pi 성능진단 에이전트)
-- **검토자**: 아나킨 마스터님
-- **진단 범위**: cafe.pi Vercel 애플리케이션 6개 주요 탭 (home, event, cafe, shop, map, admin)
-- **진단 방법**: 탭별 독립 분석 (번들, 렌더링, 데이터 페칭, 클라이언트 성능, 네트워크 캐싱, Pi Browser 특수 이슈)
-- **검증 환경**: Pi Browser 실기기 (최우선)
+- **작성자**: 아소카 (성능 진단 에이전트)
+- **대상**: cafe.pi Vercel 애플리케이션 6개 주요 탭 (HOME, EVENT, CAFE, SHOP, MAP, ADMIN)
 
 ---
 
 ## 배경 및 목표
 
-### 배경
+cafe.pi는 Pi Network 기반 커뮤니티 플랫폼으로, 월간 활성 사용자 수(MAU) 증가에 따라 각 탭의 로딩 속도와 반응성이 점점 중요해지고 있습니다. 특히 Pi Browser WebView 환경에서는 네트워크 지연이 크므로, **쿼리 최적화 → 캐싱 전략 → 클라이언트 렌더링 효율화** 순서로 성능 개선이 필요합니다.
 
-cafe.pi는 Pi Network 기반 커뮤니티 플랫폼으로, 북극성 지표가 **활성 사용자 수(DAU)**입니다. HOME 탭의 StatsDashboard가 사용자 진입 첫 화면이므로, **각 탭의 성능 최적화는 사용자 체감도와 신뢰도에 직결**됩니다.
+### Core Web Vitals 목표
 
-2026-06-23 종합 성능 진단 결과, 다음 공통 패턴이 반복되었습니다:
-1. **메모이제이션 미흡** (리렌더링 과다)
-2. **캐싱 전략 부재** (매번 DB 조회)
-3. **중복 API 호출** (debounce/throttle 미적용)
-4. **클라이언트 상태 과다** (번들 크기 증가)
-5. **이미지 최적화 미흡** (next/Image 미사용)
-
-### 목표
-
-| 지표 | 목표 | 현재 | 개선율 |
-|------|------|------|--------|
-| **LCP** (Largest Contentful Paint) | < 2.5s | 1.2~5s | -50% |
-| **INP** (Interaction to Next Paint) | < 200ms | 200~500ms | -60% |
-| **CLS** (Cumulative Layout Shift) | < 0.1 | 0.05~0.15 | 안정화 |
-| **초기 로드 시간** | < 3s | 3~5s | -40% |
-| **번들 크기** | < 500KB | 600~800KB | -30% |
-
-### 성공 기준 (KPI)
-
-- ✅ 모든 탭 LCP < 2.5s (Pi Browser 기준)
-- ✅ 사용자 입력 응답 < 200ms
-- ✅ 중복 API 호출 0건 (debounce/캐싱)
-- ✅ Pi Browser 실기기 검증 완료
+| 지표 | 목표 |
+|---|---|
+| **LCP** (Largest Contentful Paint) | < 2.5s |
+| **CLS** (Cumulative Layout Shift) | < 0.1 |
+| **INP** (Interaction to Next Paint) | < 200ms |
 
 ---
 
-## 탭별 요구사항
+## 현황 분석
 
-### HOME 탭
+### 긍정적 사항
 
-#### 현재 문제
+1. **데이터 페칭 병렬화 활용** (`Promise.all`)
+   - `chat-room-list.ts`: 내 카페·공개 카페 병렬 조회 ✅
+   - `stats/activity`: DAU/WAU/MAU · 상위 사용자 병렬 조회 ✅
 
-| 등급 | 문제 | 위치 | 영향 |
-|------|------|------|------|
-| 🔴 HIGH | LazySection rootMargin 200px 과도 | stats-dashboard.tsx L154 | bean-revenue RPC 조기 호출 (모바일 20~40% 낭비) |
-| 🔴 HIGH | aggregate 오류 로깅 미흡 | stats-dashboard.tsx L157 | 오늘 데이터 반영 여부 감시 불가 |
-| 🔴 HIGH | BeanTopSpenders 캐싱 부재 | bean-top-spenders.tsx L24 | period 전환 시 재조회 (SWR 미지원) |
-| 🟠 MEDIUM | bean-daily-chart period 무시 | bean-daily-chart.tsx L56 | 데이터 낭비 (period=7 선택 시에도 30일 fetch) |
-| 🟠 MEDIUM | translate-stats-section 권한 게이트 미흡 | stats-dashboard.tsx | 비관리자 API 에러 무시 |
-| 🟠 MEDIUM | Plotly config 최적화 부재 | dau-wau-mau-chart.tsx L87 | 번들 크기 증가 |
+2. **클라이언트 게이트 패턴 정착**
+   - Pi Browser redirect 무한루프 방지 ✅
+   - X-Pi-Token 헤더 이중 경로 지원 ✅
 
-#### 요구사항
+3. **캐싱 기초 마련**
+   - `store-item-list.tsx`: localStorage SWR 캐시 구현 ✅
+   - `stats-dashboard.tsx`: `readCache/writeCache` 함수 사용 ✅
 
-1. **LazySection rootMargin → 50px**
-   - 모바일 사용자가 실제 뷰포트 진입 시에만 bean-revenue 호출
-   - RPC 비용 20~40% 감소 예상
-
-2. **aggregate 오류 로깅 추가**
-   - console.warn('[HOME 통계] 집계 실패')
-   - 관리자가 오늘 데이터 미반영 원인 추적 가능
-
-3. **BeanTopSpenders SWR 캐싱**
-   - readCache/writeCache (5분 TTL)
-   - period 재선택 시 즉시 캐시 표시
-
-4. **bean-daily-chart period 파라미터 전달**
-   - `/api/admin/token/stats?limit=${period}` (서버 API 수정 필요)
-
-#### 성공 기준 (KPI)
-
-- LCP < 1.8s (DATA 포함)
-- bean-revenue RPC 호출 5~10회/시간 (현재 20회/시간 감소)
-- period 전환 0.5s 이내
+### 성능 병목 (우선순위별)
 
 ---
 
-### EVENT 탭
+## 탭별 성능 요구사항
+
+### 1. HOME 탭 (StatsDashboard)
+
+**파일**: `src/app/[locale]/page.tsx`, `src/components/admin/stats/stats-dashboard.tsx`
 
 #### 현재 문제
 
-| 등급 | 문제 | 위치 | 영향 |
-|------|------|------|------|
-| 🔴 HIGH | 미션 평가 로딩 상태 미표시 | client-event-gate.tsx | 사용자 중복 클릭 → 중복 평가 위험 |
-| 🔴 HIGH | M2 kakao_id 검증 미흡 | check-mission API | 유효한 M2 거래도 미완료 판정 가능 |
-| 🔴 HIGH | 랭킹 조회 메모리 비효율 | ranking/route.ts L18~34 | 10,000행 메모리 로드 (사용자 1000명 × 미션 10개) |
-| 🟠 MEDIUM | 캠페인 목록 페이지네이션 부재 | campaign/page.tsx | 100개 상품 전체 로드 (초기 5초+) |
-| 🟠 MEDIUM | MissionCard 메모이제이션 미흡 | event/mission-card | 부모 리렌더 시 모두 재렌더 |
+🔴 **CRITICAL**
+- **N+1 쿼리 패턴**: `fn_bean_revenue_summary` RPC 호출 → 월별 매출 누적 조회 + 각 카테고리/상품별 세부 조회 가능성
+- **차트 번들 비대화**: Plotly 라이브러리 미지연 로드 → 초기 LCP 연장 (DauWauMauChart, BeanRevenueTimeline)
+- **Activity 폴링 미최적화**: `period` 변경 시 이전 응답 도착 경쟁 조건 → `periodRef.current` 가드는 했으나, 폴링 간격 미설정
+
+🟠 **HIGH**
+- **번역 문자열 직렬 조회**: `useTranslations('adminStats')` 초기화 비용 (사소하지만 반복)
+- **Bean 통계 섹션 지연 로드 미활용**: `revVisible` 상태 있으나 실제 Intersection Observer 연결 미확인
 
 #### 요구사항
 
-1. **미션 평가 로딩 상태 (P0 최우선)**
-   - CheckMissionButton 클릭 → Loader2 애니메이션 + disabled
-   - 완료/실패 토스트 메시지
+1. **Plotly 동적 임포트 최적화**
+   - `dynamic import` 이미 적용되었으나, `ssr: false` 선언 후 컴포넌트가 마운트되는 시점에 스크립트 로드 시작
+   - **LCP 개선 효과**: 약 0.5~1s
 
-2. **M2 kakao_id 필수 검증**
-   - check-mission API에서 M2 시 kakao_id 필수 확인
-   - 미연동 시 "카카오 연동 필요" 에러 반환
+2. **Activity API 응답 캐싱**
+   - 현재: 캐시 읽기는 있으나, **SWR(Stale-While-Revalidate) 만료 후 백그라운드 갱신 미적용**
+   - 개선: 5분 캐시 → 유저가 보는 동안 백그라운드 갱신 시작 (최대 10초 대기)
 
-3. **랭킹 쿼리 최적화**
-   - SQL RPC 또는 GROUP BY로 메모리 -90% (10,000행 → 100행)
+3. **Bean Revenue 쿼리 최적화**
+   - 현재: `fn_bean_revenue_summary` RPC + (선택적) 범주별 드릴다운
+   - 개선: RPC 내부에서 통화(ccy_cd)별 집계 → 프론트에서 그룹화 로직 제거
 
-4. **캠페인 목록 페이지네이션**
-   - limit=20, offset 기반 페이지네이션
-   - 초기 로드 5초 → 1초
+4. **IntersectionObserver 연결**
+   - `revVisible` 상태를 활용해 매출 섹션이 뷰포트에 진입한 뒤에만 API 호출
 
-#### 성공 기준 (KPI)
+#### 성공 기준
 
-- LCP < 2.0s (랭킹 포함)
-- 미션 평가 대기 시간 3초 이내 (UX 피드백)
-- 캠페인 목록 초기 로드 1초 이내
+- HOME 탭 LCP ≤ 2.0s (현재 추정 2.5~3.5s)
+- StatsDashboard 초기 렌더 → 데이터 표시까지 ≤ 1.5s
+- period 전환 시 stale 응답 필터링 100% (현재 `periodRef` 완료)
 
 ---
 
-### CAFE(채팅) 탭
+### 2. EVENT 탭 (ClientEventGate)
+
+**파일**: `src/app/[locale]/event/page.tsx`, `src/components/event/client-event-gate.tsx`
 
 #### 현재 문제
 
-| 등급 | 문제 | 위치 | 영향 |
-|------|------|------|------|
-| 🔴 CRITICAL | Pi Browser WebSocket 미지원 미검증 | use-chat-room.ts L50~80 | 메시지 실시간 수신 미작동 위험 (polling 폴백 없음) |
-| 🟠 HIGH | 메시지 메모이제이션 부재 | chat-message-list.tsx L120~150 | 500개 메시지 환경에서 1개 입력 → 전체 리렌더 (500ms 지연) |
-| 🟠 HIGH | 첫 방문 스켈레톤 UI 부재 | client-chat-list.tsx L35~50 | 초기 로딩 중 빈 화면 (UX 저하) |
-| 🟠 HIGH | Gemini 번역 크레딧 소진 | translate/route.ts | API 호출 실패 → 원문만 표시 (기능 하락) |
-| 🟠 MEDIUM | 멤버수 쿼리 중복 (비효율) | chat-room-list.ts L80~100 | 각 카페마다 별도 COUNT → 병렬화 가능 |
+🔴 **CRITICAL**
+- **미션 평가 폴링 미흡**: 미션 완료 후 화이트리스트 갱신 → `handleReeval` API 호출만 있고, 자동 폴링(cron) 1회/일 → 사용자 경험 저하
+- **O(n²) 마스킹 로직**: 100명 랭킹 × 미션 M1~M10 체크 → `Map<string, Set<string>>` 생성 시 매 렌더 재계산 가능
+
+🟠 **HIGH**
+- **제외 대상자 관리자 조회**: `fetchExcluded()` → 관리자 진입 시 403 응답 잠재성 (비관리자는 무시하지만 네트워크 지연)
+- **대용량 랭킹 렌더**: `limit=100` 기본값 → 리스트 가상화 미적용 → 100개 DOM 노드 한번에 그리기
+
+🟡 **MEDIUM**
+- **미션 이름 동적 로드**: `t.raw('missions')` → 번역 객체 매번 파싱
 
 #### 요구사항
 
-1. **Pi Browser WebSocket 검증 (P0 CRITICAL)**
-   - Pi 실기기에서 Network 탭 확인 (프로토콜 101 업그레이드)
-   - WebSocket 미지원 시 → 5초 간격 polling 폴백 구현
+1. **미션 평가 온디맨드 재평가**
+   - 현재: `handleReeval` 수동 호출만
+   - 개선: 미션 완료 후 자동 5초 지연 후 `refetchRanking()` 호출 (UX: 즉시 반영)
+   - 근거: 사용자 신뢰도 최우선 (MEMORY.md "미션평가최우선")
 
-2. **메시지 메모이제이션**
-   - MessageItem 컴포넌트 분리 + memo 처리
-   - useMemo로 메시지 배열 메모이제이션
+2. **제외 대상자 목록 캐싱**
+   - `fetchExcluded()` 결과 → 5분 localStorage 캐시 (관리자용)
+   - 관리자 제외 처리 후 로컬 업데이트 (낙관적 업데이트)
 
-3. **Suspense + 스켈레톤 UI**
-   - ClientChatList를 Suspense로 감싸기
-   - ChatListSkeleton (5개 행 애니메이션)
+3. **랭킹 리스트 가상화**
+   - `react-window` 또는 `@tanstack/react-virtual` 도입
+   - 표시 범위(viewport) 150명 기준 ≤ 50개 DOM 노드 유지
 
-4. **번역 API 폴백 (Gemini → Anthropic → 원문)**
-   - Gemini 실패 시 Anthropic 폴백
-   - 최악의 경우 원문 표시
+4. **미션 매트릭스 메모이제이션**
+   - `useMemo(() => missionMap, [userMissions])`
 
-5. **멤버수 쿼리 최적화**
-   - 한 번에 GROUP BY COUNT로 통합
+#### 성공 기준
 
-#### 성공 기준 (KPI)
-
-- WebSocket 또는 polling 동작 확인 (메시지 수신 지연 < 5초)
-- 메시지 입력 반응 < 500ms (메모이제이션)
-- 첫 방문 스켈레톤 UI 표시 즉시
+- EVENT 탭 미션 랭킹 로드 ≤ 1.8s
+- 미션 완료 → 화이트리스트 반영 ≤ 8s (온디맨드 재평가 자동화)
+- 100명 랭킹 스크롤 → INP ≤ 150ms (가상화)
 
 ---
 
-### SHOP(PiShop) 탭
+### 3. CAFE 탭 (Chat Room List)
+
+**파일**: `src/app/[locale]/chat/page.tsx`, `src/lib/chat-room-list.ts`
 
 #### 현재 문제
 
-| 등급 | 문제 | 위치 | 영향 |
-|------|------|------|------|
-| 🔴 CRITICAL | ItemCard 메모이제이션 미흡 | store-item-list.tsx L427~490 | 필터/정렬 변경 시 모든 카드 재렌더 (300ms) |
-| 🔴 CRITICAL | 중복 API 호출 (debounce 미흡) | store-item-list.tsx L206~225 | 검색 + 정렬 동시 변경 → 2회 이상 호출 |
-| 🔴 CRITICAL | Pi 결제 window.Pi 검증 미확인 | 상품 상세 페이지 | window.Pi 없을 시 결제 실패 (Pi Browser 외) |
-| 🟠 HIGH | GPS 권한 반복 요청 | store-item-list.tsx L100~121 | 주변순 버튼 클릭마다 권한 대화상자 (sessionStorage 캐시 부재) |
-| 🟠 HIGH | 이미지 최적화 미흡 | store-item-list.tsx L445~450 | 원본 1280px 로드 (모바일 500KB 낭비) |
-| 🟠 MEDIUM | 카테고리 캐시 헤더 미설정 | api/store/categories | 30초 불변 데이터 재조회 |
+🔴 **CRITICAL**
+- **FK 없는 PostgREST 임베디드 조인 위험**: `msg_room.select('...msg_theme(...)`) 패턴 → FK 미설정 시 PGRST200 → 500 에러 폭주
+- **멤버수 조회 병렬화는 있으나, 3단계 병렬 최적 아님**:
+  1. 내 멤버십 조회 (순차, 필수)
+  2. 내 카페 정보 + 멤버수 (병렬) ✅
+  3. 공개 카페 정보 + 멤버수 (병렬) ✅
+  → 단계 1 대기로 인한 초기 지연
+
+🟠 **HIGH**
+- **메시지 최신순 정렬 미최적화**: 각 room_id별 최신 메시지 1개 조회 → `msg_msg` 테이블 전문 인덱스 필요 (현재 미확인)
+- **종료 이벤트방 필터링 O(n)**: `isEndedEvent()` 호출 → 배열 순회, 대규모 카페 환경에서 비용 증가
 
 #### 요구사항
 
-1. **ItemCard memo 처리 (P0)**
-   - item_id 기반만 비교
-   - 필터 변경 시 -30% 리렌더
+1. **FK 재확인 및 RLS 정책 강화**
+   - `msg_theme` FK 존재 확인 → 부재 시 추가
+   - 임베디드 조인 대신 명시적 `.select()` + 클라이언트 병합 권고
 
-2. **debounce/중복 호출 방지**
-   - searchInput timeout 200ms
-   - keyword 실제 변경만 감지
+2. **멤버수 조회 쿼리 통합**
+   - 현재: 내 카페 멤버수 + 공개 카페 멤버수 → 2개 쿼리
+   - 개선: `msg_room_mbr` 단일 쿼리로 모든 room_id의 멤버수 집계
+   ```sql
+   SELECT room_id, COUNT(*) as cur_mbr_cnt
+   FROM msg_room_mbr
+   WHERE room_id = ANY($1::uuid[]) AND del_yn = 'N'
+   GROUP BY room_id
+   ```
 
-3. **Pi 결제 window.Pi 검증 (P0 CRITICAL)**
-   - 결제 버튼 클릭 → window.Pi 선검사
-   - Pi Browser 외 환경 진입 차단
+3. **메시지 최신순 인덱스 확인**
+   - `mps_msg` 테이블: `(room_id, msg_seq DESC)` 복합 인덱스 존재 확인
+   - 부재 시: 신규 인덱스 생성
 
-4. **GPS 권한 sessionStorage 캐싱**
-   - 첫 허용 → sessionStorage 저장
-   - 탭 닫힐 때까지 재요청 불필요
+4. **종료 이벤트 필터 조기 처리**
+   - 쿼리 단계에서 `AND (room_tp_cd != 'E' OR entry_expire_dtm > NOW())`
 
-5. **이미지 최적화**
-   - next/Image 사용 (또는 Cloudinary 리사이징)
-   - 500KB → 150KB (70% 감소)
+#### 성공 기준
 
-6. **카테고리 캐시 헤더**
-   - `Cache-Control: s-maxage=30, stale-while-revalidate=3600`
-
-#### 성공 기준 (KPI)
-
-- 필터/정렬 전환 500ms 이내
-- 초기 로드 3초 이내
-- 이미지 대역폭 -50%
+- CAFE 탭 로드 ≤ 1.5s (내 카페 10개 + 공개 10개)
+- 임베디드 조인 에러 0 (FK 재확인)
+- 멤버수 조회 병렬 → 단일 쿼리 전환으로 네트워크 왕복 1회 감소
 
 ---
 
-### MAP 탭
+### 4. SHOP 탭 (PiShop - StoreItemList)
+
+**파일**: `src/app/[locale]/store/page.tsx`, `src/components/store/store-item-list.tsx`
 
 #### 현재 문제
 
-| 등급 | 문제 | 위치 | 영향 |
-|------|------|------|------|
-| 🔴 CRITICAL | 마커 클러스터링 미구현 | shops-map-view.tsx L120~200 | 100+ 마커 시 지도 렉 (500ms 이상 지연) |
-| 🟠 HIGH | 마커 재렌더링 최소화 미흡 | shops-map-view.tsx useEffect | shops 변경 시마다 모든 마커 재생성 (깜빡임) |
-| 🟠 HIGH | Google Places API 중복 호출 | shops-map-view.tsx L150~170 | bizCategory != 'ALL' 시 불필요한 별도 조회 |
-| 🟠 MEDIUM | 뷰포트 마커 필터링 미적용 | nearby-explorer.tsx | 500+ 마커 환경 메모리 낭비 |
-| 🟢 ✅ | latd_crd/lngt_crd 마이그레이션 | sql/037 | 완벽히 완료 (인덱스 생성됨) |
-| 🟢 ✅ | Pi Browser Geolocation | geo.ts | 호환성 확인 (권한 처리 완비) |
+🔴 **CRITICAL**
+- **다중 의존 거리 계산**: 좌표 미제공 → 상품 이미지 로드 O(n) 최적화 미적용
+- **LBS 동의·현재위치 순차 조회**: 마운트 시 동의 → 그 후 위치 → 총 2번의 `piFetch` → 불필요한 워터폴
+- **이미지 최적화 미흡**: `thumbnail_url` 그대로 렌더 → `next/image` 미사용 가능성
+
+🟠 **HIGH**
+- **카테고리 트리 재로드**: `mine=1` 아닐 때만 조회하나, 페이지네이션 변경 시 불필요 재요청
+- **정렬 변경 시 state 초기화 누락**: `sort` 변경 → page=1로 리셋하나, `items` 배열 청소 미확인
+
+🟡 **MEDIUM**
+- **검색 디바운싱 미구현**: `searchInput` → `keyword` 변경 시 매번 API 호출 (Enter 키 또는 3글자 이상으로 제한 필요)
 
 #### 요구사항
 
-1. **마커 클러스터링 추가 (P0)**
-   - `@googlemaps/markerclusterer` 설치
-   - 마커 클릭 응답 -90% (500ms → 50ms)
+1. **LBS 권한·위치 병렬 조회**
+   ```javascript
+   const [consent, coords] = await Promise.all([
+     piFetch('/api/location/consent'),
+     lbsConsent === 'Y' ? getCurrentPosition() : null
+   ])
+   ```
 
-2. **마커 재렌더링 최소화**
-   - prevShopsRef로 실제 변경만 감지
-   - 동일 데이터 재조회 시 깜빡임 제거
+2. **이미지 최적화 (next/image)**
+   - `<img>` → `<Image>` 전환
+   - `sizes="(max-width: 768px) 100vw, 50vw"` 반응형 로드
+   - `placeholder="blur"` LQIP 적용
 
-3. **Google Places API 제거**
-   - 클라이언트에서 필터링만 (서버 호출 X)
-   - API 비용 -30%
+3. **검색 디바운싱**
+   ```typescript
+   const debouncedSearch = useCallback(
+     debounce((q: string) => {
+       setKeyword(q)
+       setPage(1)
+     }, 500),
+     []
+   )
+   ```
 
-4. **뷰포트 마커 필터링 (선택)**
-   - MAX 50개 표시
-   - 메모리 -50%
+4. **카테고리 캐싱**
+   - `/api/store/categories` 결과 → 30분 localStorage 캐시
 
-#### 성공 기준 (KPI)
+5. **정렬 변경 시 상태 정리**
+   - `setSort()` 호출 시 `setPage(1)` + `setItems([])` 명시적 실행
 
-- 100+ 마커 상황 마커 클릭 < 100ms
-- 초기 로드 2초 이내
+#### 성공 기준
+
+- SHOP 탭 초기 로드 (첫 페이지, 필터 없음) ≤ 1.8s
+- 이미지 로드 LCP 개선 ≥ 30% (next/image 적용 후)
+- 검색 입력 → API 호출 최대 1회/500ms (디바운싱)
+- 거리 정렬 + GPS 조회 병렬화로 ≤ 2.5s
 
 ---
 
-### ADMIN 탭
+### 5. MAP 탭 (NearbyExplorer - LBS)
+
+**파일**: `src/app/[locale]/map/page.tsx`, `src/components/lbs/nearby-explorer.tsx`
 
 #### 현재 문제
 
-| 등급 | 문제 | 위치 | 영향 |
-|------|------|------|------|
-| 🔴 HIGH | 결제 내역 클라이언트 페이지네이션 | api/payments L70~86 | 모든 거래 메모리 로드 (1000+ 시 15+ MB) |
-| 🟠 HIGH | 표준단어 캐싱 전략 부재 | api/std/words L14~30 | 매번 std_dic 전체 스캔 (관리자 100명 동시 시 DB CPU +40%) |
-| 🟠 HIGH | 다국어 통계 과도한 병렬 처리 | admin/i18n/page.tsx L87~100 | 203개 locale 병렬 쿼리 (DB 연결 풀 고갈 위험) |
-| 🟢 ✅ | approval_queue 비활성 상태 | std/approvals | 의도적 비활성 유지 (건드리지 않음) |
-| 🟢 ✅ | FK 없는 임베디드 조인 | std/audit | 안전 (감사 로그는 조인 미사용) |
-| 🟢 ✅ | 권한 검증 견고함 | auth-check.ts | 3중 인증 (Pi + Google + PIT) 완비 |
+🟠 **HIGH**
+- **좌표 갱신 시 폭주 API 호출**: `watchPosition` 콜백 → 30m 임계값 있으나, 30m 미만 지터 발생 시 매 콜백마다 상태 업데이트 → 렌더링 유발
+- **Map 라이브러리 번들 미공개**: Leaflet/Google Maps 미확인 → 렌더링 프레임 저하 가능성
+- **탭 전환 시 watchPosition 미정리**: `useEffect` cleanup 있으나, 언마운트 전 콜백 폭주 가능
+
+🟡 **MEDIUM**
+- **좌표 캐시 미활용**: 마운트 시 `getCurrentPosition()` 호출 → localStorage 위치 캐시 없음
+- **Radius 변경 시 신청/취소 보류**: 새 반경 요청 시 이전 요청 취소 로직 미확인
 
 #### 요구사항
 
-1. **결제 내역 서버 페이지네이션 (P0)**
-   - limit=50, range() API 적용
-   - 응답 크기: 15MB → 100KB (150배 감소)
+1. **좌표 상태 갱신 최소화**
+   ```typescript
+   setCoords((prev) =>
+     prev &&
+     haversineKm(prev.lat, prev.lng, next.lat, next.lng) < THRESHOLD
+       ? prev // 변경 없음 → 렌더 불필요
+       : next
+   )
+   ```
+   → 이미 구현됨 ✅, 지속 모니터
 
-2. **표준단어 캐싱 추가 (P1)**
-   - unstable_cache (5분 TTL)
-   - DB CPU -40%
+2. **위치 캐시 도입**
+   - `localStorage.setItem('lbs_last_coords', JSON.stringify({lat, lng, ts}))`
+   - 마운트 시 5분 이내 캐시 → 신청 버튼 자동 스킵
+   - FX: 재방문 ≤ 200ms 로딩
 
-3. **다국어 통계 동시성 제한 (P2)**
-   - 활성 locale 20개만 + pLimit(5)
-   - DB 연결: 203 → 20
+3. **맵 라이브러리 지연 로드**
+   ```typescript
+   const ShopsMapView = dynamic(() => import('@/components/lbs/shops-map-view'), {
+     ssr: false,
+     loading: () => <div>맵 로딩 중...</div>
+   })
+   ```
 
-#### 성공 기준 (KPI)
+4. **API 요청 취소**
+   ```typescript
+   const abortControllerRef = useRef<AbortController | null>(null)
+   useEffect(() => {
+     abortControllerRef.current?.abort()
+     abortControllerRef.current = new AbortController()
+     // fetch(..., { signal: abortControllerRef.current.signal })
+   }, [radius, tab])
+   ```
 
-- 결제 내역 초기 로드 5초 → 1.5초 (-70%)
-- 표준단어 검색 1.2초 → 0.4초 (-67%)
+5. **latd_crd/lngt_crd 인덱스 확인**
+   - `mps_shop`, `mps_item` 테이블: 공간 검색용 GiST 인덱스 (`GIST (latd_crd, lngt_crd)`)
+
+#### 성공 기준
+
+- MAP 탭 초기 로드 ≤ 2.2s
+- 위치 재갱신 시 API 폭주 0 (30m 임계값 유지)
+- 탭 전환 → 맵 언마운트 시간 ≤ 300ms (cleanup 정리)
+- 위치 캐시 활용 시 재방문 ≤ 500ms
+
+---
+
+### 6. ADMIN 탭 (Admin Dashboard)
+
+**파일**: `src/app/[locale]/(admin)/admin/page.tsx` (redirect → users)
+
+#### 현재 문제
+
+🟡 **MEDIUM**
+- **대용량 테이블 페이지네이션**: `/admin/users`, `/admin/payments`, `/admin/std/*` 등 → 무제한 데이터셋 표시 위험
+- **Bean 감사 로그 500 에러 (2026-06-22 해결됨)**: FK 없는 조인 제거 완료 ✅
+- **통계 탭 인메모리 집계**: `/admin/stats` → DAU/WAU/MAU 계산 RPC 호출 → 수백만 건 스캔 가능성
+
+#### 요구사항
+
+1. **대용량 테이블 페이지네이션**
+   - 모든 데이터그리드: 기본 limit=50, offset 기반 페이지네이션
+   - 총 행 수 별도 COUNT(*) 쿼리로 계산
+
+2. **감사 로그 성능 유지**
+   - 현재: FK 제거 후 500 에러 해결 ✅
+   - 모니터: `std_audit_log` 크기 월별 1M 건 이상 증가 시 아카이브 검토
+
+3. **통계 RPC 최적화**
+   - `fn_*` RPC 내부에서 필터링(del_yn='N') 추가 (이미 대부분 적용)
+   - 시간 범위 쿼리 → 파티셔닝 검토 (별도 PRD)
+
+#### 성공 기준
+
+- ADMIN 테이블 로드 ≤ 2.0s (첫 페이지, 50행)
+- 페이지네이션 전환 ≤ 1.0s (offset 이동)
+- 감사 로그 500 에러 0 (FK 재확인)
 
 ---
 
 ## 공통 요구사항
 
-### Pi Browser WebView 성능 최적화
+### 1. API 응답 캐싱 전략
 
-- **Cookie 비저장 → X-Pi-Token 헤더 경로 필수**
-  - piFetch 자동 사용 (모든 API 호출)
-  - getSessionUser() 쿠키 우선, 헤더 폴백
+#### 규칙
 
-- **무한 루프 방지 (redirect 금지)**
-  - getSessionUser() null 시 클라이언트 게이트 렌더
-  - 예: `if (!user) return <ClientChatRoom roomId={roomId} />`
+| 엔드포인트 | TTL | 전략 | 비고 |
+|---|---|---|---|
+| `/api/store/categories` | 30분 | localStorage SWR | 변경 빈도 낮음 |
+| `/api/admin/stats/activity` | 5분 | localStorage SWR + 백그라운드 갱신 | 일일 집계 기준 |
+| `/api/event/ranking` | 2분 | 메모리 캐시 (클라이언트) | 실시간 미션 순위 |
+| `/api/chat/rooms` | 3분 | 메모리 + localStorage | 내 카페 동적 변화 |
+| `/api/location/nearby/*` | 1분 | 메모리 (좌표 기반) | GPS 갱신 시 무효화 |
 
-- **Core Web Vitals 목표**
-  - LCP < 2.5s (Largest Contentful Paint)
-  - INP < 200ms (Interaction to Next Paint)
-  - CLS < 0.1 (Cumulative Layout Shift)
+#### 구현
 
-### 캐싱 표준화
-
-| 레이어 | 전략 | 예시 |
-|--------|------|------|
-| **API Route** | `Cache-Control: s-maxage=30, stale-while-revalidate=3600` | 카테고리, 고정 데이터 |
-| **Supabase 쿼리** | `unstable_cache()` (5~30분) | 표준단어, 도메인 |
-| **클라이언트** | localStorage SWR (5분) | period별 통계, 검색 결과 |
-| **sessionStorage** | 탭 수명 동안 (권한, GPS, 상태) | Pi 토큰, GPS 위치 |
-
-### 번들 크기 목표
-
-- **메인 번들**: < 500KB gzipped
-- **동적 import**: Plotly, 지도 라이브러리 분리
-- **이미지 최적화**: next/Image, CDN 캐시 (30+ 일)
-
-### 반복 성능 패턴 및 예방
-
-| 패턴 | 예방 책 |
-|------|---------|
-| **N+1 쿼리** | 배치 조회 (.in()), GROUP BY 사용 |
-| **메모이제이션 미흡** | memo + useMemo + useCallback (필수) |
-| **중복 API 호출** | debounce (200~300ms), 의존성 배열 엄격히 |
-| **상태 과다** | 상태 분해, useReducer 고려 |
-| **폴링 오버헤드** | WebSocket 우선, polling 폴백만 사용 |
-
----
-
-## 구현 우선순위 로드맵
-
-### Phase 1: CRITICAL 이슈 (1주일)
-
-| 탭 | 이슈 | 예상 시간 | 난이도 |
-|-----|------|----------|--------|
-| HOME | LazySection rootMargin → 50px | 30m | 낮 |
-| HOME | aggregate 오류 로깅 | 30m | 낮 |
-| EVENT | 미션 평가 로딩 상태 | 1h | 낮 |
-| CAFE | WebSocket 검증 (Pi 실기기) | 1h | 중 |
-| CAFE | WebSocket 폴백 (polling) | 2h | 중 |
-| SHOP | ItemCard memo | 1h | 낮 |
-| SHOP | debounce 강화 | 1h | 낮 |
-| SHOP | Pi 결제 window.Pi 검증 | 1.5h | 중 |
-| MAP | 마커 클러스터링 | 2h | 중 |
-
-**총 예상**: 10~11시간 (3~4일)
-
-### Phase 2: HIGH 이슈 (2주일)
-
-| 탭 | 이슈 | 예상 시간 |
-|-----|------|----------|
-| HOME | BeanTopSpenders SWR 캐싱 | 1.5h |
-| EVENT | M2 kakao_id 검증 강화 | 1.5h |
-| EVENT | 랭킹 쿼리 최적화 | 2h |
-| CAFE | 메시지 메모이제이션 | 2h |
-| CAFE | Suspense + 스켈레톤 | 1.5h |
-| CAFE | 번역 API 폴백 | 2h |
-| SHOP | GPS 권한 캐싱 | 1.5h |
-| SHOP | 이미지 최적화 | 2h |
-| ADMIN | 결제 내역 페이지네이션 | 2h |
-
-**총 예상**: 16시간 (5일)
-
-### Phase 3: MEDIUM 이슈 (3주일)
-
-| 탭 | 이슈 | 예상 시간 |
-|-----|------|----------|
-| HOME | bean-daily-chart period 전달 | 1.5h |
-| HOME | Plotly config 최적화 | 1h |
-| EVENT | 캠페인 목록 페이지네이션 | 2h |
-| SHOP | 카테고리 캐시 헤더 | 1h |
-| MAP | 마커 재렌더링 최소화 | 1.5h |
-| MAP | Google Places API 제거 | 1h |
-| ADMIN | 표준단어 캐싱 | 1.5h |
-| ADMIN | 다국어 통계 동시성 제한 | 1.5h |
-
-**총 예상**: 12시간 (4일)
-
-**전체 로드맵**: 3주 (Phase 1 → Phase 2 → Phase 3)
-
----
-
-## 비기능 요구사항
-
-### 보안
-
-- **Pi 결제는 Pi Browser 전용** (window.Pi 검증 필수)
-- **X-Pi-Token 헤더**: 모든 보호 API에 포함
-- **클라이언트 게이트**: redirect 절대 금지 (무한 루프 방지)
-- **논리삭제 유지**: 물리 DELETE 금지
-
-### 데이터 품질
-
-- **N+1 쿼리 Zero**: 배치 조회 필수
-- **마이그레이션 완성**: latd_crd/lngt_crd (sql/037) 완벽히 적용
-- **FK 없는 임베디드 조인 금지**: PostgREST PGRST200 방지
-
-### 운영 편의성
-
-- **에러 로깅**: console.warn으로 추적 가능하게
-- **성능 메트릭**: Vercel Analytics, DevTools Profiler 검증
-- **Pi Browser 실기기**: 모든 변경 후 필수 검증
-
----
-
-## 검증 방법
-
-### Local 개발 환경
-
-```bash
-# 1. 성능 측정 (Lighthouse)
-pnpm dev
-# Chrome DevTools → Lighthouse → Audit (LCP, INP, CLS 기준선)
-
-# 2. 번들 분석
-pnpm build
-# npm install -g webpack-bundle-analyzer
-# npx webpack-bundle-analyzer .next/static/chunks
-
-# 3. 메모리 프로파일링
-# Chrome DevTools → Memory → Heap Snapshot (각 탭별)
+```typescript
+// 기존 캐시 함수 유지 + 만료 시간 명시
+readCache<T>(key: string, maxAgeMs: number): T | null
+writeCache<T>(key: string, data: T): void
 ```
 
-### Pi Browser 실기기 검증 (필수)
+### 2. Image 최적화
 
-| 항목 | 검증 방법 |
-|------|----------|
-| **LCP** | Pi Browser DevTools Network → 초기 페인트 시간 |
-| **메시지 실시간 수신** | 채팅방 → 상대 메시지 전송 → 즉시 수신 확인 |
-| **GPS 권한** | MAP 탭 → 주변순 → 권한 대화상자 1회만 표시 |
-| **Pi 결제** | SHOP → 상품 구매 → createPayment 호출 및 승인 완료 |
-| **권한 검증** | X-Pi-Token 헤더 → Network 탭 확인 |
+#### 정책
 
-### Vercel Analytics
+1. **Product Thumbnails**: `next/image` + `priority` 속성 (LCP 대상)
+2. **Theme Emoji**: SVG 벡터 (이모지 그대로 → 비트맵 금지)
+3. **User Avatars**: Gravatar/Initials 기본값 + 지연 로드
 
-- **Core Web Vitals**: 실사용자 LCP, INP, CLS 추적
-- **API 지연**: 각 엔드포인트 응답 시간 모니터링
-- **에러율**: JavaScript 에러 콘솔 로그
+#### 구현
 
----
+```typescript
+<Image
+  src={item.thumbnail_url}
+  alt={item.item_nm}
+  width={280}
+  height={210}
+  placeholder="blur"
+  blurDataURL="data:image/..."
+  sizes="(max-width: 768px) 100vw, 50vw"
+/>
+```
 
-## 비용 추정
+### 3. Pi Browser WebView 최적화
 
-| 항목 | 예상 비용 |
-|------|----------|
-| **개발 시간** | 38시간 (1주 풀타임 + 2주 파트타임) |
-| **Supabase RPC** | 기존 쿼리로 충분 (신규 RPC 불필요) |
-| **이미지 CDN** | Vercel 기본 (추가 비용 0) |
-| **Gemini 번역 폴백** | Anthropic 비용 (크레딧 소진 시만) |
+#### 제약사항
 
----
+1. 쿠키 미저장 → X-Pi-Token 헤더 필수 (이미 `piFetch` 적용 ✅)
+2. localStorage 정상 동작 ✅
+3. watchPosition 정상 동작 ✅
 
-## 최종 요약
+#### 특수 고려
 
-cafe.pi 성능 진단 결과, **각 탭의 주요 병목은 메모이제이션·캐싱·쿼리 최적화 미흡**으로 수렴합니다. **CRITICAL 이슈 9개(Phase 1)**는 1주일 내 즉시 처리하여 사용자 체감 성능을 **50% 이상 향상**시킬 수 있습니다.
+- **getSessionUser() null → redirect 금지** (이미 준수 ✅)
+- **클라이언트 게이트 패턴** 필수 (ClientChatList, ClientEventGate, NearbyExplorer)
 
-**최우선**: Pi Browser 실기기 검증 (모든 변경 후)
+### 4. 쿼리 성능 표준
 
----
+#### 금지 패턴
 
-## 체크리스트
+- ❌ FK 없는 PostgREST 임베디드 조인
+- ❌ SELECT * (명시적 컬럼 선택 필수)
+- ❌ 클라이언트 N+1 (for 루프 내 await)
 
-### Phase 1 완료 기준
-- [ ] HOME: LazySection 50px + aggregate 오류 로깅
-- [ ] EVENT: 미션 평가 로딩 상태 추가
-- [ ] CAFE: WebSocket 검증 + polling 폴백
-- [ ] SHOP: ItemCard memo + debounce + Pi 결제 검증
-- [ ] MAP: 마커 클러스터링 추가
-- [ ] Pi Browser 실기기 전 탭 테스트
+#### 권장 패턴
 
-### 최종 검증
-- [ ] LCP < 2.5s (모든 탭)
-- [ ] INP < 200ms (모든 사용자 입력)
-- [ ] 번들 크기 < 500KB
-- [ ] Core Web Vitals 녹색 등급
+- ✅ Promise.all 병렬 조회
+- ✅ 단일 RPC 호출로 복잡한 집계
+- ✅ 인덱스 확인 후 정렬/필터 쿼리
 
 ---
 
-**작성**: 아소카 (cafe.pi 성능진단 에이전트)  
-**최종 검토**: 아나킨 마스터님
+## 구현 우선순위 및 체크리스트
+
+### Phase 1 (즉시 개선, 1~2주)
+
+- [ ] HOME: Plotly 동적 import + IntersectionObserver (매출 섹션)
+- [ ] EVENT: 미션 재평가 자동화 (5초 지연 폴링)
+- [ ] CAFE: FK 재확인 + 멤버수 쿼리 통합
+- [ ] SHOP: 이미지 next/image 전환 + 검색 디바운싱
+- [ ] MAP: 위치 캐시 도입 + API 요청 취소 (AbortController)
+
+### Phase 2 (중기 개선, 2~4주)
+
+- [ ] EVENT: 랭킹 리스트 가상화 (react-window)
+- [ ] SHOP: 카테고리 캐싱 + LBS 병렬 조회
+- [ ] MAP: 맵 라이브러리 지연 로드
+- [ ] ADMIN: 테이블 페이지네이션 일관성
+
+### Phase 3 (장기 최적화, 1개월+)
+
+- [ ] 모든 RPC 함수 실행 계획 검토 (PostgreSQL EXPLAIN)
+- [ ] 데이터베이스 파티셔닝 (월별·사용자별)
+- [ ] CDN 캐시 정책 재검토 (Vercel Edge)
+- [ ] 성능 모니터링 대시보드 구축 (Vercel Analytics)
+
+---
+
+## 성능 모니터링
+
+### 메트릭 추적 (매주)
+
+1. **Core Web Vitals**: Vercel Analytics 또는 PageSpeed Insights
+2. **API 응답 시간**: 각 탭별 평균 TTL 기록
+3. **자산 크기**: 번들 분석 도구 (bundlesize, source-map-explorer)
+
+### 임계값
+
+| 메트릭 | 경고 | 위험 |
+|---|---|---|
+| LCP | > 2.5s | > 3.5s |
+| INP | > 200ms | > 500ms |
+| Bundle (JS) | > 300KB | > 500KB |
+
+---
+
+## 참고 자료
+
+- **Next.js 성능**: https://nextjs.org/docs/app/building-your-application/optimizing
+- **Supabase 최적화**: https://supabase.com/docs/guides/database/query-optimization
+- **Pi Browser 특수성**: docs/pi-browser-constraint.md (별도 문서)
+
+---
+
+## 버전 이력
+
+| 버전 | 작성일 | 변경사항 |
+|---|---|---|
+| v1.0 | 2026-06-23 | 초판: 6개 탭 성능 분석 완료 |
+
