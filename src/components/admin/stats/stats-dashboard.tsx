@@ -14,7 +14,6 @@ import { TranslateStatsSection } from './translate-stats-section'
 import { BeanTopSpenders } from './bean-top-spenders'
 import type {
   ActivityStatsResponse,
-  RevenueStatsResponse,
   BeanRevenueResponse,
   TopUser,
 } from '@/types/stats'
@@ -104,13 +103,9 @@ export function StatsDashboard() {
   const [period, setPeriod] = useState(7)
   const [activityData, setActivityData] =
     useState<ActivityStatsResponse | null>(null)
-  const [revenueData, setRevenueData] = useState<RevenueStatsResponse | null>(
-    null,
-  )
-  // 매출 KPI는 Bean 회수매출 누적(fn_bean_revenue_summary) — period 무관. 차트는 revenueData 유지.
+  // 매출 KPI는 Bean 회수매출 누적(fn_bean_revenue_summary) — period 무관.
   const [beanRev, setBeanRev] = useState<BeanRevenueResponse | null>(null)
   const [loading, setLoading] = useState(true)
-  const [revLoading, setRevLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   // 매출 섹션이 뷰포트에 진입한 뒤에만 revenue API 호출 (스크롤 지연 로딩)
   const [revVisible, setRevVisible] = useState(false)
@@ -165,29 +160,6 @@ export function StatsDashboard() {
       .catch(() => {})
   }, [])
 
-  const fetchRevenue = useCallback(async (p: number) => {
-    const cacheKey = `stats_revenue_${p}`
-    const cached = readCache<RevenueStatsResponse>(cacheKey, 5 * 60_000)
-    if (cached) {
-      setRevenueData(cached)
-      setRevLoading(false)
-    } else {
-      setRevLoading(true)
-    }
-    try {
-      const revRes = await piFetch(`/api/admin/stats/revenue?period=${p}`)
-      if (!revRes.ok) throw new Error('데이터 조회 실패')
-      const data = (await revRes.json()) as RevenueStatsResponse
-      if (periodRef.current !== p) return
-      setRevenueData(data)
-      writeCache(cacheKey, data)
-    } catch (e) {
-      if (!cached) setError(e instanceof Error ? e.message : '오류 발생')
-    } finally {
-      setRevLoading(false)
-    }
-  }, [])
-
   // Bean 매출 KPI — 누적(period 무관)이라 캐시 키도 기간 없이 단일. 매출 섹션 진입 시 1회 로드.
   const fetchBeanRevenue = useCallback(async () => {
     const cacheKey = 'stats_bean_revenue'
@@ -208,12 +180,8 @@ export function StatsDashboard() {
     fetchActivity(period)
   }, [period, fetchActivity])
 
-  // 매출 데이터는 섹션이 화면에 보일 때 최초 로드, 이후 기간 변경 시 갱신
-  // (revenueData=차트용 period별 / beanRev=KPI용 누적 1회)
-  useEffect(() => {
-    if (revVisible) fetchRevenue(period)
-  }, [revVisible, period, fetchRevenue])
-
+  // 매출 KPI(beanRev)는 누적값(period 무관)이라 섹션 진입 시 1회만 로드.
+  // 매출 차트(BeanRevenueTimeline)는 자체적으로 period별 데이터를 조회·관리한다.
   useEffect(() => {
     if (revVisible) fetchBeanRevenue()
   }, [revVisible, fetchBeanRevenue])
@@ -238,10 +206,7 @@ export function StatsDashboard() {
         <button
           onClick={() => {
             fetchActivity(period)
-            if (revVisible) {
-              fetchRevenue(period)
-              fetchBeanRevenue()
-            }
+            if (revVisible) fetchBeanRevenue()
           }}
           className="text-muted-foreground mt-2 text-sm underline"
         >
@@ -366,11 +331,10 @@ export function StatsDashboard() {
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
               <div className="rounded-lg border p-4">
                 <p className="mb-2 text-sm font-medium">{t('themeDaily')}</p>
-                {revenueData && revenueData.series.length > 0 ? (
-                  <BeanRevenueTimeline period={period} />
-                ) : (
-                  <div className="bg-muted h-64 animate-pulse rounded-lg" />
-                )}
+                {/* BeanRevenueTimeline은 자체적으로 로딩·빈데이터·오류 상태를 처리하므로
+                    별도 게이트 없이 직접 렌더. (과거 stat_revenue_dly 기반 게이트는 Bean 전환으로
+                    공급원이 끊겨, 7일 등 단기 기간에서 차트가 영영 표시되지 않던 버그의 원인이었음) */}
+                <BeanRevenueTimeline period={period} />
               </div>
               <BeanRevenueDistribution period={period} />
             </div>
