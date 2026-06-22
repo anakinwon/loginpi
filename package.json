@@ -17,6 +17,7 @@
     "@anthropic-ai/sdk": "^0.101.0",
     "@base-ui/react": "^1.5.0",
     "@googlemaps/js-api-loader": "^2.1.1",
+    "@googlemaps/markerclusterer": "^2.6.2",
     "@supabase/supabase-js": "^2.107.0",
     "@t3-oss/env-nextjs": "^0.13.11",
     "@tabler/icons-react": "^3.44.0",

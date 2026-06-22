@@ -35,7 +35,8 @@ export async function GET(request: NextRequest, { params }: Params) {
 
   const { searchParams } = new URL(request.url)
   const limit = Math.min(Number(searchParams.get('limit') ?? '50'), 100)
-  const before = searchParams.get('before') // msg_id cursor
+  const before = searchParams.get('before') // msg_id cursor (scroll-up 과거 방향)
+  const after = searchParams.get('after') // msg_id cursor (신규 방향 — WebSocket 실패 시 polling 폴백)
   const locale = searchParams.get('locale')
 
   let query = getSupabaseAdmin()
@@ -57,6 +58,19 @@ export async function GET(request: NextRequest, { params }: Params) {
       .single()
     if (cursorMsg) {
       query = query.lt('reg_dtm', cursorMsg.reg_dtm)
+    }
+  }
+
+  // cursor 이후 신규 메시지만 조회 (polling 폴백 — Pi Browser에서 WebSocket이 막힌 경우)
+  // msg_id 동일 ms 충돌 시 일부 중복 가능하나 클라이언트가 msg_id로 dedup하므로 안전
+  if (after) {
+    const { data: cursorMsg } = await getSupabaseAdmin()
+      .from('msg_msg')
+      .select('reg_dtm')
+      .eq('msg_id', after)
+      .maybeSingle()
+    if (cursorMsg) {
+      query = query.gt('reg_dtm', cursorMsg.reg_dtm)
     }
   }
 

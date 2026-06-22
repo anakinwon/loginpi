@@ -201,6 +201,49 @@ export function useChatRoom(
     [roomId, userLocale, forceTranslate, applyTranslation, batchTranslate],
   )
 
+  // ─── WebSocket(broadcast) 실패 시 polling 폴백 ──────────────────────
+  // Pi Browser WebView는 환경에 따라 WebSocket을 차단할 수 있다. broadcast 구독이
+  // 실패/끊김 상태가 되면 5초 간격 polling으로 신규 메시지를 따라잡는다 (addMessage dedup).
+  const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  // polling 커서 — 마지막 수신 메시지 id (초기/broadcast/polling 모두 최신값 유지)
+  const lastMsgIdRef = useRef<string | null>(
+    initialMessages.at(-1)?.msg_id ?? null,
+  )
+  useEffect(() => {
+    const last = messages.at(-1)
+    if (last) lastMsgIdRef.current = last.msg_id
+  }, [messages])
+
+  const pollMessages = useCallback(async () => {
+    const params = new URLSearchParams({ limit: '100' })
+    if (lastMsgIdRef.current) params.set('after', lastMsgIdRef.current)
+    if (userLocale) params.set('locale', userLocale)
+    try {
+      const res = await piFetch(`/api/chat/rooms/${roomId}/messages?${params}`)
+      if (!res.ok) return
+      const { messages: newMsgs } = (await res.json()) as {
+        messages: ChatMessage[]
+      }
+      for (const m of newMsgs) {
+        addMessage(m)
+        requestTranslation(m) // 타인 메시지면 내 언어로 번역 요청 (dedup 내장)
+      }
+    } catch {} // polling 실패는 다음 주기에 재시도 — 카페 흐름을 막지 않음
+  }, [roomId, userLocale, addMessage, requestTranslation])
+
+  const startPolling = useCallback(() => {
+    if (pollIntervalRef.current) return // 이미 polling 중
+    void pollMessages() // 즉시 1회 — 끊긴 동안 쌓인 메시지 즉시 복구
+    pollIntervalRef.current = setInterval(() => void pollMessages(), 5000)
+  }, [pollMessages])
+
+  const stopPolling = useCallback(() => {
+    if (pollIntervalRef.current) {
+      clearInterval(pollIntervalRef.current)
+      pollIntervalRef.current = null
+    }
+  }, [])
+
   // 표시 언어 변경 시: 대상 언어와 다른 번역만 비움 — 이미 이 언어로 번역된 것은 캐시 유지
   const prevLocaleRef = useRef<string | undefined>(userLocale)
   useEffect(() => {
@@ -301,13 +344,23 @@ export function useChatRoom(
       })
       .subscribe(async (status) => {
         if (status === 'SUBSCRIBED') {
+          stopPolling() // WebSocket 정상 — polling 폴백 불필요(복구 시 자동 중지)
           await channel.track({ userId: currentUserId })
+        } else if (
+          status === 'CHANNEL_ERROR' ||
+          status === 'TIMED_OUT' ||
+          status === 'CLOSED'
+        ) {
+          // Pi Browser WebView가 WebSocket을 막거나 연결이 끊김 → polling 폴백 활성화
+          console.warn('[chat] Realtime 연결 실패 — polling 폴백 활성화:', status)
+          startPolling()
         }
       })
 
     channelRef.current = channel
 
     return () => {
+      stopPolling()
       supabase.removeChannel(channel)
       channelRef.current = null
     }
@@ -318,6 +371,8 @@ export function useChatRoom(
     addMessage,
     applyTranslation,
     requestTranslation,
+    startPolling,
+    stopPolling,
   ])
 
   const sendMessage = useCallback(

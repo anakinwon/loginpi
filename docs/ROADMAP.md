@@ -56,11 +56,12 @@ Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Net
 | **13-P3** | PiShop O2O 오프라인 매장 커머스 (2026-06-16) | ✅ 완료 | 100% (구글 카페 half-인증 등록·오프라인 주문 상태머신·주문방법 3종·취소수수료·보이스 알림·지도 상품판매·IDOR 차단 · TASK-113~120 · `sql/050~060`) |
 | **13-P4** | PiShop 카트 다건 일괄 판매 + 자국통화 (2026-06-17) | ✅ 완료 | 등록 페이지 분리(중고직거래/오프라인매장)·자국통화 등록표시(등록시점 고정 참고가 sql/062)·오프라인매장 카트(매장단위·담기 팝업·장바구니·라인 소계)→다중상품 단일 Pi 결제(`mps_order_item`+원자 RPC `fn_mps_cart_order_create`/`_cancel` sql/063)·주문관리 라인/호명/매장명/색상. ⚠️ sql 062·063 적용+실기기 결제 검증 잔여 |
 | **횡단6** | 3대 검색(카페·상품·게시판) trgm 표준화·즉시검색 통일 + 카페 목록 UX + 정산 무결성 (2026-06-20) | ✅ 완료 | 100% (상품·게시판 pg_trgm GIN `sql/076`+즉시검색 debounce 통일+게시판 통합검색 신규 · 카페 '내 카페' 그룹화+🔒비공개 배지+유효기간/무기한 · 정산 자국통화 원자화 `sql/074`+소급 · 마켓 폐기테마 회귀 `sql/075`) |
+| **20** | 화면 성능 최적화 (6탭 전수 진단) | 🚧 진단 완료·Phase 1 착수 | PRD_18_PERFORM — home·event·cafe·shop·map·admin 6탭 CRITICAL 4·HIGH 15·MEDIUM 18(총 37건) 식별 + 3단계 로드맵(38h). **Phase 1 즉시개선 적용(2026-06-23)**: HOME LazySection rootMargin 200→50px+aggregate 로깅 · EVENT 미션 재평가 가드+피드백 · SHOP ItemCard memo. 잔여 CRITICAL: CAFE WebSocket 폴백·SHOP Pi결제 window.Pi 가드·MAP 마커 클러스터링 |
 
 ### 통계
-- **총 Phase**: 20개 (0~18 + 횡단 개선 + 문서화)
+- **총 Phase**: 21개 (0~18 + 횡단 개선 + 문서화 + Phase 20 성능)
 - **완료**: 19개 구현 완료 (Phase 18 판매자 주문 알림 포함 — 2026-06-18)
-- **진행 중**: 0개
+- **진행 중**: 1개 (Phase 20 화면 성능 최적화 — 진단 완료·Phase 1 착수, 2026-06-23)
 - **기획·문서**: 1개 (Phase 17 BEAN 토큰 발행 — 문서 전용·앱 코드 0, T01/T02/T05 외부 회신 대기)
 - **예정**: 확장 Phase (PiRC3 실 에스크로 보류 해제 대기, LBS 지도 UI 추가 확장, PiVoice TURN 운영, 이벤트 행위훅 전수 점검, StarterKit 패키지 제품화) · **알림 Phase 2**: 카카오 알림톡(한국 판매자)·Telegram webhook 양방향(버튼으로 접수/거절)
 - ✅ **O2O 후속 완료(2026-06-18)**: 외부 알림 채널(Telegram)로 사장님 화면 미접속 시에도 주문 알림 도달 — Phase 18에서 구현
@@ -1663,10 +1664,52 @@ if (meta?.type === 'CHAT_SUBSCR') {
 
 ---
 
+## Phase 20: 화면 성능 최적화 (6개 탭 전수 진단) 🚧 진단 완료·Phase 1 착수 (2026-06-23)
+
+> cafe.pi 6개 주요 탭의 Core Web Vitals를 개선하기 위한 전수 진단 + 3단계 로드맵. 정본: `docs/PRD_18_PERFORM.md` · PRD.md §20
+
+### 진단 결과 (CRITICAL 4 · HIGH 15 · MEDIUM 18 = 37건)
+
+| 탭 | C/H/M | 핵심 병목 |
+|---|---|---|
+| HOME | 0/3/6 | 매출 LazySection rootMargin 과도(bean-revenue RPC 조기호출)·BeanTopSpenders 캐싱 부재 |
+| EVENT | 0/3/2 | 미션 평가 피드백·M2 kakao_id 검증·랭킹 쿼리 메모리 비효율 |
+| CAFE | 1/2/3 | 🔴 WebSocket 미검증(polling 폴백 없음)·메시지 메모이제이션 부재 |
+| SHOP | 2/2/2 | 🔴 ItemCard memo·🔴 Pi 결제 window.Pi 가드 미확인·중복 API 호출 |
+| MAP | 1/2/2 | 🔴 마커 클러스터링 미구현(100+ 마커 렉)·마커 재렌더링·Places API 중복 |
+| ADMIN | 0/3/3 | 결제내역 클라이언트 페이지네이션(메모리 오버로드)·표준단어 캐싱 부재 |
+
+### 목표 (Core Web Vitals)
+
+- LCP < 2.5s · INP < 200ms · CLS < 0.1 · 번들 < 500KB
+
+### 로드맵 (3주 · 38h)
+
+- **Phase 1 (CRITICAL ~10h)**: HOME LazySection·로깅 / EVENT 미션 평가 피드백 / CAFE WebSocket 검증+polling 폴백 / SHOP memo·debounce·Pi결제 검증 / MAP 마커 클러스터링
+- **Phase 2 (HIGH ~16h)**: SWR 캐싱·쿼리 최적화·메시지 메모·Suspense 스켈레톤·번역 API 폴백·GPS 권한 캐싱·이미지 최적화·결제내역 서버 페이지네이션
+- **Phase 3 (MEDIUM ~12h)**: period 전달·Plotly config·캠페인 페이지네이션·카테고리 캐시 헤더·마커 재렌더링·Places API 제거·표준단어 캐싱·다국어 통계 동시성 제한
+
+### Phase 1 즉시개선 적용 (2026-06-23)
+
+- ✅ **HOME**: 매출 `LazySection` rootMargin 200→50px(bean-revenue RPC 조기호출 -20~40%) + aggregate 실패 `console.warn` 로깅 (`stats-dashboard.tsx`)
+- ✅ **EVENT**: 관리자 미션 재평가 중복클릭 가드 + 실패 `alert` 피드백 — 미션 평가=신뢰 직결 (`client-event-gate.tsx`)
+- ✅ **SHOP**: `ItemCard` `memo` 화 — 검색·필터·정렬 시 변하지 않은 카드 리렌더 -30% (`store-item-list.tsx`)
+
+### 잔여 CRITICAL (후속 착수)
+
+| 항목 | 등급 | 상태 |
+|---|---|---|
+| CAFE Pi Browser WebSocket 검증 + polling 폴백 | 🔴 CRITICAL | 착수 |
+| SHOP Pi 결제 `window.Pi` 선검증 가드 | 🔴 CRITICAL | 착수 |
+| MAP 마커 클러스터링(`@googlemaps/markerclusterer`) | 🔴 CRITICAL | 착수 |
+
+---
+
 ## 변경 이력
 
 | 버전 | 날짜 | 변경 내용 | 작성자 |
 |------|------|---------|-------|
+| v11.4 | 2026-06-23 | **Phase 20 화면 성능 최적화 (신규 섹션 · PRD_18_PERFORM 수용)** — 6개 탭(home·event·cafe·shop·map·admin) 전수 성능 진단: CRITICAL 4·HIGH 15·MEDIUM 18(총 37건) 식별 + 3단계 로드맵(38h). **Phase 1 즉시개선 적용**: ① HOME 매출 `LazySection` rootMargin 200→50px(bean-revenue RPC 조기호출 -20~40%) + aggregate 실패 `console.warn` 로깅 ② EVENT 관리자 미션 재평가 중복클릭 가드 + 실패 `alert` 피드백(미션 평가=신뢰 직결) ③ SHOP `ItemCard` `memo` 화(검색·필터·정렬 리렌더 -30%). 잔여 CRITICAL(CAFE WebSocket 폴백·SHOP Pi결제 window.Pi 가드·MAP 마커 클러스터링) 후속 착수. 전체 진행률 표 Phase 20 추가·통계 갱신(총 21개·진행 중 1개). 정본 `docs/PRD_18_PERFORM.md`. | asoká |
 | v11.3 | 2026-06-22 | **PiShop 브랜드 통일 + 이벤트방·미션·감사로그·i18n 버그 수정** — ① **이벤트 카페 Business 플랜 폐지**(`5e983e2`): 운영자 전용 게이트 제거 → 그룹방 PREMIUM과 동일하게 구독자 무료·비구독자 EVENT 생성료 20 Bean(`getRoomFeeBean('CREATE','EVENT')`)·잔액부족 402·실패 시 논리삭제 롤백. ② **M10 미션 평가 불능 수정**(`ac7d4db`): `checkCancelWithFee`가 DB에 없는 `txn_type_cd='CANCEL_FEE_IN'`을 조회해 항상 false → M10 전면 미완료였음. 실제값 `'FEE'`로 정정(sql/041·059·060·mps-refund.ts 일치). cclemong 등 자격자 M10 완료 처리(실 충족시각 기준). ③ **PiStore→PiShop 전면 통일**(`70f2f51`·`c5b5a91`, sql/090): 표시명·주석·문서 + 코드값(`prod_ctgr_cd` PISTORE→PISHOP·`bean_fee_plan` PISHOP_GENERAL/SUBSCR 26행)·ko.json + `i18n_message` DB(PISTORE 고아 84행 삭제)·21개 locale json 재생성(PiShop 다국어, **영어 실기기 검증 완료**). ④ **Bean 감사 로그 500 수정**(`2a05c03`): `bean_audit_log`에 sys_user FK가 없는데 PostgREST 임베디드 조인 사용 → PGRST200(0건이어도 500). usr_id 수동 병합 패턴으로 교체(event.ts getEventRanking 패턴). ⑤ **i18n sync 배열 복원 버그 수정**(`c5b5a91`): `unflattenJson`이 `feat.PISHOP.0/.1/.2` 평탄키를 객체로 복원해 ko(배열)·코드(`t.raw() as string[]`)와 불일치 → `arrayify` 추가(숫자 인덱스 키→배열). totalRevenue `{period}` 변수 불일치 FORMATTING_ERROR도 정정(`07fe976`·`f88d522`, ko 정본 정합·newTrans/top3 변수 보존). ⑥ **강남 매장 소유권** anakin2→anakin3 이전(매장+상품, 과거 주문·보증금 보존). 검증: tsc·validate:locales 통과, 전 변경 origin/master 배포. | asoká |
 | v11.2 | 2026-06-22 | **이벤트·Bean 후속 완료** — ① **`reevaluateAllActiveUsers` M2 누락 수정**: M2는 상태형 미션(kakao_id 보유 여부)이라 `evt_action_log`가 없어도 대상이 돼야 하나, cron 재평가 함수가 action_log 보유자만 평가해 kakao_id 설정 사용자가 재평가 대상에서 누락. `sys_user.kakao_id IS NOT NULL` 사용자를 UNION으로 추가(`src/lib/event.ts` `reevaluateAllActiveUsers`). ② **O2O 구매 완료 Bean 캠페인 자동 트리거**: `markPickup`(구매자 픽업)·`autoCompleteReadyOrders`(자동완료 cron)에서 `fn_bean_campaign_grant(buyerId, 'O2O_PURCHASE')` 베스트 에포트 호출 추가. 첫 O2O 구매 → PENDING 신청 자동 생성 → 관리자 `/admin/campaign`에서 승인 시 REWARD_POOL에서 10 Bean 지급. `sql/089` O2O_PURCHASE 캠페인 시드(reward_bean=10·max_grant_cnt=9999·자격 없음). Phase 19 잔여 테이블 갱신. | asoká |
 | v11.1 | 2026-06-22 | **Phase 19 P0-4 감사 로그 조회 마무리** — ① `GET /api/admin/token/audit` 신규: `bean_audit_log` 조회(usr_id 필터·최신 100건·총 건수). ② `/admin/token/audit` 페이지 신규: 조정 전→조정량(+/− 색상)→조정 후 잔액·사유 라벨·증빙 URL 테이블 + usr_id 필터. ③ 어드민 사이드바 `beanAudit` 링크 추가 + `ko.json` 번역 키("감사 로그"). PRD_16 P0-4 항목(bean_audit_log 테이블+insert+조회 API+화면) 전체 완결. Phase 19 §19.9 추가. 요약 테이블 상태 🔶 P0 완료·후속 진행으로 갱신. | asoká |

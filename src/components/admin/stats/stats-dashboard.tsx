@@ -156,8 +156,17 @@ export function StatsDashboard() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ondemand: true }),
     })
-      .then((r) => (r.ok ? loadActivity() : undefined))
-      .catch(() => {})
+      .then((r) => {
+        // 집계 실패 시 오늘(UTC) 데이터가 화면에 반영되지 않는다 — 원인 추적을 위해 로깅
+        if (!r.ok) {
+          console.warn('[HOME 통계] 온디맨드 집계 실패 — 오늘 데이터 미반영', r.status)
+          return undefined
+        }
+        return loadActivity()
+      })
+      .catch((e) => {
+        console.warn('[HOME 통계] 온디맨드 집계 요청 오류', e)
+      })
   }, [])
 
   // Bean 매출 KPI — 누적(period 무관)이라 캐시 키도 기간 없이 단일. 매출 섹션 진입 시 1회 로드.
@@ -284,6 +293,9 @@ export function StatsDashboard() {
 
         <LazySection
           onVisible={() => setRevVisible(true)}
+          // 매출 KPI는 bean-revenue RPC를 호출하므로 화면 밖 200px 선행 로드를 피한다.
+          // 실제 뷰포트 진입 직전(50px)에만 호출 → 모바일 RPC 낭비 20~40% 절감 (PRD_18 HOME)
+          rootMargin="50px"
           fallback={
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
