@@ -535,7 +535,7 @@
     "top3Active": "Top 3 aktive Benutzer (letzte {period} Tage)",
     "top3Buyers": "Top 3 Käufer (letzte {period} Tage)",
     "top3Themes": "Top 3 Theme Umsatz (letzte {period} Tage)",
-    "totalRevenue": "Gesamtumsatz im Zeitraum ({period} Tage)",
+    "totalRevenue": "Gesamtumsatz im Zeitraum",
     "totalTrades": "Gesamtzahl der Transaktionen im Zeitraum",
     "translate": {
       "colChars": "Anzahl der übersetzten Zeichen",
@@ -549,7 +549,7 @@
       "fetchFail": "Übersetzungsstatistik Abruf fehlgeschlagen",
       "hitRate": "Cache Hit Rate",
       "modelDist": "Verteilung des Übersetzungsmodells",
-      "newTrans": "Neue Übersetzungen ({period} Tage, Nachrichten×Sprache)",
+      "newTrans": "Neue Übersetzungen",
       "noData": "Keine Übersetzungsdaten innerhalb des Zeitraums vorhanden."
     },
     "translateSection": "Übersetzung (PiTranslate™)",

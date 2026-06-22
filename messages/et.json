@@ -535,7 +535,7 @@
     "top3Active": "Top 3 aktiivset kasutajat (viimase {period} päeva jooksul)",
     "top3Buyers": "Top 3 ostjat (viimase {period} päeva jooksul)",
     "top3Themes": "Top 3 teema tulu (viimase {period} päeva jooksul)",
-    "totalRevenue": "Perioodi kogutulu ({period} päeva)",
+    "totalRevenue": "Perioodi kogutulu",
     "totalTrades": "Perioodi tehingute koguarv",
     "translate": {
       "colChars": "Tõlke märkide arv",
@@ -549,7 +549,7 @@
       "fetchFail": "Tõlke statistika hankimine ebaõnnestus",
       "hitRate": "Vahemälu tabamussagedus",
       "modelDist": "Tõlke Model jaotus",
-      "newTrans": "Uued tõlked ({period} päeva, sõnum × keel)",
+      "newTrans": "Uued tõlked",
       "noData": "Perioodi jooksul puudub tõlke Data."
     },
     "translateSection": "Tõlge (PiTranslate™)",

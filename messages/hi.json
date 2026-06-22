@@ -535,7 +535,7 @@
     "top3Active": "Top 3 Active Users (पिछले {period} दिन)",
     "top3Buyers": "Top 3 Buyers (पिछले {period} दिन)",
     "top3Themes": "Top 3 Themes Revenue (पिछले {period} दिन)",
-    "totalRevenue": "अवधि का कुल Revenue ({period} दिन)",
+    "totalRevenue": "अवधि का कुल Revenue",
     "totalTrades": "अवधि के कुल Trades",
     "translate": {
       "colChars": "अनुवाद वर्णों की संख्या",
@@ -549,7 +549,7 @@
       "fetchFail": "अनुवाद Statistics प्राप्त करने में विफल",
       "hitRate": "Cache Hit Rate",
       "modelDist": "अनुवाद Model वितरण",
-      "newTrans": "नया अनुवाद ({period} दिन, Message×भाषा)",
+      "newTrans": "नया अनुवाद",
       "noData": "इस अवधि में अनुवाद Data नहीं है"
     },
     "translateSection": "अनुवाद (PiTranslate™)",

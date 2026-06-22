@@ -535,7 +535,7 @@
     "top3Active": "Top 3 משתמשים פעילים (ב-{period} הימים האחרונים)",
     "top3Buyers": "Top 3 קונים (ב-{period} הימים האחרונים)",
     "top3Themes": "Top 3 הכנסות מ-Theme (ב-{period} הימים האחרונים)",
-    "totalRevenue": "סה\"כ הכנסות בתקופה ({period} ימים)",
+    "totalRevenue": "סה\"כ הכנסות בתקופה",
     "totalTrades": "סה\"כ עסקאות בתקופה",
     "translate": {
       "colChars": "מספר תווים מתורגמים",
@@ -549,7 +549,7 @@
       "fetchFail": "כשל באחזור סטטיסטיקות תרגום",
       "hitRate": "Cache Hit Rate",
       "modelDist": "התפלגות Translation Model",
-      "newTrans": "תרגומים חדשים ({period} ימים, הודעות×שפות)",
+      "newTrans": "תרגומים חדשים",
       "noData": "אין Data תרגום בתקופה זו"
     },
     "translateSection": "תרגום (PiTranslate™)",

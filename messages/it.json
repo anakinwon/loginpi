@@ -535,7 +535,7 @@
     "top3Active": "Top 3 Utenti attivi (ultimi {period} giorni)",
     "top3Buyers": "Top 3 Acquirenti (ultimi {period} giorni)",
     "top3Themes": "Top 3 Ricavi per tema (ultimi {period} giorni)",
-    "totalRevenue": "Ricavi totali del periodo ({period} giorni)",
+    "totalRevenue": "Ricavi totali del periodo",
     "totalTrades": "Transazioni totali del periodo",
     "translate": {
       "colChars": "Caratteri tradotti",
@@ -549,7 +549,7 @@
       "fetchFail": "Recupero statistiche di traduzione fallito",
       "hitRate": "Tasso di hit della cache",
       "modelDist": "Distribuzione del Model di traduzione",
-      "newTrans": "Nuove traduzioni ({period} giorni, messaggi×lingua)",
+      "newTrans": "Nuove traduzioni",
       "noData": "Nessun Data di traduzione per il periodo"
     },
     "translateSection": "Traduzione (PiTranslate™)",

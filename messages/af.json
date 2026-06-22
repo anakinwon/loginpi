@@ -535,7 +535,7 @@
     "top3Active": "Top 3 aktiewe gebruikers (afgelope {period} dae)",
     "top3Buyers": "Top 3 kopers (afgelope {period} dae)",
     "top3Themes": "Top 3 Tema-inkomste (afgelope {period} dae)",
-    "totalRevenue": "Totale inkomste vir die tydperk ({period} dae)",
+    "totalRevenue": "Totale inkomste vir die tydperk",
     "totalTrades": "Totale transaksies vir die tydperk",
     "translate": {
       "colChars": "Translation karaktertelling",
@@ -549,7 +549,7 @@
       "fetchFail": "Vertalingstatistieke-ophaal het misluk",
       "hitRate": "Kas-treffersyfer",
       "modelDist": "Translation Model verspreiding",
-      "newTrans": "Nuwe vertalings ({period} dae, boodskap×taal)",
+      "newTrans": "Nuwe vertalings",
       "noData": "Daar is geen Translation Data binne die tydperk nie"
     },
     "translateSection": "Vertaling (PiTranslate™)",

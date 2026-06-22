@@ -535,7 +535,7 @@
     "top3Active": "Top 3 活跃用户 (最近 {period}天)",
     "top3Buyers": "Top 3 购买者 (最近 {period}天)",
     "top3Themes": "Top 3 Theme 销售额 (最近 {period}天)",
-    "totalRevenue": "期间总销售额 ({period}天)",
+    "totalRevenue": "期间总销售额",
     "totalTrades": "期间总交易",
     "translate": {
       "colChars": "翻译字符数",
@@ -549,7 +549,7 @@
       "fetchFail": "翻译统计查询失败",
       "hitRate": "缓存命中率",
       "modelDist": "翻译 Model 分布",
-      "newTrans": "新翻译 ({period}天, 消息×语言)",
+      "newTrans": "新翻译",
       "noData": "期间内无翻译 Data"
     },
     "translateSection": "翻译 (PiTranslate™)",

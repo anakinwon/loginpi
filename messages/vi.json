@@ -535,7 +535,7 @@
     "top3Active": "Top 3 người dùng hoạt động (trong {period} ngày gần đây)",
     "top3Buyers": "Top 3 người mua nhiều nhất (trong {period} ngày gần đây)",
     "top3Themes": "Top 3 doanh thu Theme (trong {period} ngày gần đây)",
-    "totalRevenue": "Tổng doanh thu trong kỳ ({period} ngày)",
+    "totalRevenue": "Tổng doanh thu trong kỳ",
     "totalTrades": "Tổng giao dịch trong kỳ",
     "translate": {
       "colChars": "Số ký tự đã dịch",
@@ -549,7 +549,7 @@
       "fetchFail": "Truy vấn thống kê dịch thất bại",
       "hitRate": "Tỷ lệ Cache Hit",
       "modelDist": "Phân phối Translation Model",
-      "newTrans": "Bản dịch mới ({period} ngày, tin nhắn×ngôn ngữ)",
+      "newTrans": "Bản dịch mới",
       "noData": "Không có Translation Data trong khoảng thời gian này"
     },
     "translateSection": "Dịch (PiTranslate™)",

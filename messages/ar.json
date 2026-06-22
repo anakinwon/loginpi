@@ -535,7 +535,7 @@
     "top3Active": "Top 3 المستخدمون النشطون (آخر {period} يوم)",
     "top3Buyers": "Top 3 المشترون (آخر {period} يوم)",
     "top3Themes": "Top 3 إيرادات Theme (آخر {period} يوم)",
-    "totalRevenue": "إجمالي الإيرادات خلال الفترة ({period} يوم)",
+    "totalRevenue": "إجمالي الإيرادات خلال الفترة",
     "totalTrades": "إجمالي المعاملات خلال الفترة",
     "translate": {
       "colChars": "عدد حروف الترجمة",
@@ -549,7 +549,7 @@
       "fetchFail": "فشل جلب إحصائيات الترجمة",
       "hitRate": "معدل نجاح Cache",
       "modelDist": "توزيع Model الترجمة",
-      "newTrans": "ترجمات جديدة ({period} يوم، رسالة × لغة)",
+      "newTrans": "ترجمات جديدة",
       "noData": "لا يوجد Data ترجمة خلال هذه الفترة"
     },
     "translateSection": "الترجمة (PiTranslate™)",

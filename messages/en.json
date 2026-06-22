@@ -535,7 +535,7 @@
     "top3Active": "Top 3 Active Users (last {period} days)",
     "top3Buyers": "Top 3 Buyers (last {period} days)",
     "top3Themes": "Top 3 Theme Revenue (last {period} days)",
-    "totalRevenue": "Total Revenue ({period} days)",
+    "totalRevenue": "Total Revenue",
     "totalTrades": "Total Transactions",
     "translate": {
       "colChars": "Characters",
@@ -549,7 +549,7 @@
       "fetchFail": "Failed to load translation stats",
       "hitRate": "Cache Hit Rate",
       "modelDist": "Translation Model Distribution",
-      "newTrans": "New Translations ({period} days, message×language)",
+      "newTrans": "New Translations",
       "noData": "No translation data in this period"
     },
     "translateSection": "Translation (PiTranslate™)",

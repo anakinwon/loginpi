@@ -644,7 +644,7 @@
     "period365": "1년",
     "translate": {
       "fetchFail": "번역 통계 조회 실패",
-      "newTrans": "신규 번역 ({period}일, 메시지×언어)",
+      "newTrans": "신규 번역",
       "hitRate": "캐시 히트율",
       "estCost": "예상 비용 (Gemini 토큰 추정)",
       "feedback": "번역 피드백 👍 / 👎",

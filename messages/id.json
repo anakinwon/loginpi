@@ -535,7 +535,7 @@
     "top3Active": "Top 3 Pengguna Aktif (terakhir {period} hari)",
     "top3Buyers": "Top 3 Pembeli (terakhir {period} hari)",
     "top3Themes": "Top 3 Pendapatan Theme (terakhir {period} hari)",
-    "totalRevenue": "Total Pendapatan periode ({period} hari)",
+    "totalRevenue": "Total Pendapatan periode",
     "totalTrades": "Total Transaksi periode",
     "translate": {
       "colChars": "Jumlah Karakter Terjemahan",
@@ -549,7 +549,7 @@
       "fetchFail": "Gagal mengambil statistik terjemahan",
       "hitRate": "Tingkat Hit Cache",
       "modelDist": "Distribusi Model Terjemahan",
-      "newTrans": "Terjemahan Baru ({period} hari, pesan×bahasa)",
+      "newTrans": "Terjemahan Baru",
       "noData": "Tidak ada Data terjemahan dalam periode ini"
     },
     "translateSection": "Terjemahan (PiTranslate™)",

@@ -535,7 +535,7 @@
     "top3Active": "Top 3 ผู้ใช้งานที่ใช้งานอยู่ (ล่าสุด {period} วัน)",
     "top3Buyers": "Top 3 ผู้ซื้อสูงสุด (ล่าสุด {period} วัน)",
     "top3Themes": "Top 3 รายได้จาก Theme (ล่าสุด {period} วัน)",
-    "totalRevenue": "รายได้รวมในช่วงเวลา ({period} วัน)",
+    "totalRevenue": "รายได้รวมในช่วงเวลา",
     "totalTrades": "รวมการซื้อขายในช่วงเวลา",
     "translate": {
       "colChars": "จำนวนอักขระที่แปล",
@@ -549,7 +549,7 @@
       "fetchFail": "ดึงสถิติการแปลล้มเหลว",
       "hitRate": "Cache Hit Rate",
       "modelDist": "การกระจาย Model การแปล",
-      "newTrans": "การแปลใหม่ ({period} วัน, ข้อความ×ภาษา)",
+      "newTrans": "การแปลใหม่",
       "noData": "ไม่มี Data การแปลในช่วงเวลา"
     },
     "translateSection": "การแปล (PiTranslate™)",

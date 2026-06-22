@@ -535,7 +535,7 @@
     "top3Active": "Top 3 アクティブユーザー (最近 {period}日)",
     "top3Buyers": "Top 3 購入王 (最近 {period}日)",
     "top3Themes": "Top 3 テーマ売上 (最近 {period}日)",
-    "totalRevenue": "期間総売上 ({period}日)",
+    "totalRevenue": "期間総売上",
     "totalTrades": "期間総取引",
     "translate": {
       "colChars": "翻訳文字数",
@@ -549,7 +549,7 @@
       "fetchFail": "翻訳統計照会失敗",
       "hitRate": "キャッシュヒット率",
       "modelDist": "翻訳モデル分布",
-      "newTrans": "新規翻訳 ({period}日, メッセージ×言語)",
+      "newTrans": "新規翻訳",
       "noData": "期間内翻訳 Data がありません"
     },
     "translateSection": "翻訳 (PiTranslate™)",

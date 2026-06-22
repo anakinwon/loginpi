@@ -535,7 +535,7 @@
     "top3Active": "Top 3 Aktibong User (huling {period} araw)",
     "top3Buyers": "Top 3 Buyers (huling {period} araw)",
     "top3Themes": "Top 3 Theme Revenue (huling {period} araw)",
-    "totalRevenue": "Kabuuang Kita sa Panahon ({period} araw)",
+    "totalRevenue": "Kabuuang Kita sa Panahon",
     "totalTrades": "Kabuuang Transaksyon sa Panahon",
     "translate": {
       "colChars": "Bilang ng Character ng Translation",
@@ -549,7 +549,7 @@
       "fetchFail": "Nabigo ang pagkuha ng Translation Statistics",
       "hitRate": "Cache Hit Rate",
       "modelDist": "Distribution ng Translation Model",
-      "newTrans": "Bagong Translation ({period} araw, Mensahe×Wika)",
+      "newTrans": "Bagong Translation",
       "noData": "Walang Translation Data para sa panahon."
     },
     "translateSection": "Translation (PiTranslate™)",

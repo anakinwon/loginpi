@@ -535,7 +535,7 @@
     "top3Active": "Top 3 активных пользователей (за последние {period} дней)",
     "top3Buyers": "Top 3 покупателей (за последние {period} дней)",
     "top3Themes": "Top 3 выручки по темам (за последние {period} дней)",
-    "totalRevenue": "Общая выручка за период ({period} дней)",
+    "totalRevenue": "Общая выручка за период",
     "totalTrades": "Всего сделок за период",
     "translate": {
       "colChars": "Количество символов перевода",
@@ -549,7 +549,7 @@
       "fetchFail": "Не удалось получить статистику перевода",
       "hitRate": "Cache Hit Rate",
       "modelDist": "Распределение Translation Model",
-      "newTrans": "Новые переводы ({period} дней, сообщений × языков)",
+      "newTrans": "Новые переводы",
       "noData": "За этот период нет Translation Data"
     },
     "translateSection": "Перевод (PiTranslate™)",
