@@ -57,6 +57,11 @@ function formatDistance(km: number): string {
   return `${km.toFixed(1)}km`
 }
 
+// Supabase Storage URL만 Next.js Image Optimization 적용 — 외부 URL은 unoptimized fallback
+function isStorageUrl(url: string): boolean {
+  return url.includes('.supabase.co/storage/')
+}
+
 interface StoreItemListProps {
   mine?: boolean
 }
@@ -458,6 +463,7 @@ const ItemCard = memo(function ItemCard({
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             priority={priority}
+            unoptimized={!isStorageUrl(item.thumbnail_url)}
             className={`object-cover transition-transform group-hover:scale-105 ${tradeSt !== 'OPEN' ? 'opacity-60' : ''}`}
           />
         ) : (
@@ -535,6 +541,7 @@ export function ItemRow({
               fill
               sizes="64px"
               priority={priority}
+              unoptimized={!isStorageUrl(item.thumbnail_url)}
               className={`object-cover ${tradeSt !== 'OPEN' ? 'opacity-60' : ''}`}
             />
           ) : (
