@@ -5,34 +5,32 @@ import { useTranslations } from 'next-intl'
 import dynamic from 'next/dynamic'
 import { piFetch } from '@/lib/pi-fetch'
 import { readCache, writeCache } from '@/lib/client-cache'
-import { themeLabel } from '@/lib/stats-labels'
 import { LazySection } from '@/components/lazy-section'
-import RevenueTreemapChart from '@/components/charts/revenue-treemap-chart'
+import { BeanRevenueDistribution } from '@/components/admin/token-distribution'
+import { BeanIcon } from '@/components/ui/bean-icon'
 import { StatsCard } from './stats-card'
 import { StatsDateFilter } from './stats-date-filter'
 import { TranslateStatsSection } from './translate-stats-section'
+import { BeanTopSpenders } from './bean-top-spenders'
 import type {
   ActivityStatsResponse,
   RevenueStatsResponse,
+  BeanRevenueResponse,
   TopUser,
-  TopTheme,
-  TopSpender,
 } from '@/types/stats'
+
+// 매출 항목 중 '구독' 식별 코드 (fn_bean_revenue_summary ref_tp_cd)
+const SUBSCR_REF_CD = 'SUBSCR'
 
 // 차트는 Plotly(window 의존) 사용 — SSR 불가, dynamic + ssr:false 필수
 const DauWauMauChart = dynamic(
   () => import('@/components/charts/dau-wau-mau-chart'),
   { ssr: false },
 )
-const RevenueTimelineChart = dynamic(
-  () => import('@/components/charts/revenue-timeline-chart'),
+const BeanRevenueTimeline = dynamic(
+  () => import('@/components/admin/bean-daily-chart'),
   { ssr: false },
 )
-const RevenueDonutChart = dynamic(
-  () => import('@/components/charts/revenue-donut-chart'),
-  { ssr: false },
-)
-
 const MEDALS = ['🥇', '🥈', '🥉']
 
 function TopUsersList({
@@ -85,97 +83,6 @@ function TopUsersList({
   )
 }
 
-function TopThemesList({
-  themes,
-  loading,
-}: {
-  themes: TopTheme[]
-  loading: boolean
-}) {
-  const tr = useTranslations('adminStats')
-  if (loading) {
-    return (
-      <div className="space-y-2">
-        {[0, 1, 2].map((i) => (
-          <div key={i} className="flex items-center gap-3">
-            <div className="bg-muted h-5 w-5 animate-pulse rounded" />
-            <div className="bg-muted h-4 w-28 animate-pulse rounded" />
-            <div className="bg-muted ml-auto h-4 w-14 animate-pulse rounded" />
-          </div>
-        ))}
-      </div>
-    )
-  }
-  if (themes.length === 0)
-    return <p className="text-muted-foreground text-sm">{tr('noData')}</p>
-  return (
-    <ol className="space-y-2">
-      {themes.map((t, i) => (
-        <li key={t.theme_cd} className="flex items-center gap-2 text-sm">
-          <span className="text-base">{MEDALS[i] ?? `${i + 1}.`}</span>
-          {/* Bean(PI_TIP)은 이모지 대신 럭셔리 콩 이미지로 표시 */}
-          {t.theme_cd === 'PI_TIP' ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src="/bean-noti.png"
-              alt="Bean"
-              className="inline-block h-6 w-6 shrink-0"
-            />
-          ) : (
-            <span className="shrink-0">{t.theme_emoji ?? ''}</span>
-          )}
-          <span className="min-w-0 flex-1 truncate font-medium">
-            {t.theme_nm ?? themeLabel(t.theme_cd)}
-          </span>
-          <span className="text-muted-foreground shrink-0">
-            {t.total_pi.toFixed(2)} π
-          </span>
-        </li>
-      ))}
-    </ol>
-  )
-}
-
-function TopSpendersList({
-  spenders,
-  loading,
-}: {
-  spenders: TopSpender[]
-  loading: boolean
-}) {
-  const t = useTranslations('adminStats')
-  if (loading) {
-    return (
-      <div className="space-y-2">
-        {[0, 1, 2].map((i) => (
-          <div key={i} className="flex items-center gap-3">
-            <div className="bg-muted h-5 w-5 animate-pulse rounded" />
-            <div className="bg-muted h-4 w-32 animate-pulse rounded" />
-            <div className="bg-muted ml-auto h-4 w-14 animate-pulse rounded" />
-          </div>
-        ))}
-      </div>
-    )
-  }
-  if (spenders.length === 0)
-    return <p className="text-muted-foreground text-sm">{t('noData')}</p>
-  return (
-    <ol className="space-y-2">
-      {spenders.map((s, i) => (
-        <li key={s.usr_id || i} className="flex items-center gap-2 text-sm">
-          <span className="text-base">{MEDALS[i] ?? `${i + 1}.`}</span>
-          <span className="min-w-0 flex-1 truncate font-medium">
-            {s.display_nm}
-          </span>
-          <span className="text-muted-foreground shrink-0">
-            {s.total_pi.toFixed(2)} π
-          </span>
-        </li>
-      ))}
-    </ol>
-  )
-}
-
 function RankingCard({
   title,
   children,
@@ -200,6 +107,8 @@ export function StatsDashboard() {
   const [revenueData, setRevenueData] = useState<RevenueStatsResponse | null>(
     null,
   )
+  // 매출 KPI는 Bean 회수매출 누적(fn_bean_revenue_summary) — period 무관. 차트는 revenueData 유지.
+  const [beanRev, setBeanRev] = useState<BeanRevenueResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [revLoading, setRevLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -279,27 +188,48 @@ export function StatsDashboard() {
     }
   }, [])
 
+  // Bean 매출 KPI — 누적(period 무관)이라 캐시 키도 기간 없이 단일. 매출 섹션 진입 시 1회 로드.
+  const fetchBeanRevenue = useCallback(async () => {
+    const cacheKey = 'stats_bean_revenue'
+    const cached = readCache<BeanRevenueResponse>(cacheKey, 5 * 60_000)
+    if (cached) setBeanRev(cached)
+    try {
+      const res = await piFetch('/api/admin/stats/bean-revenue')
+      if (!res.ok) throw new Error('데이터 조회 실패')
+      const data = (await res.json()) as BeanRevenueResponse
+      setBeanRev(data)
+      writeCache(cacheKey, data)
+    } catch (e) {
+      if (!cached) setError(e instanceof Error ? e.message : '오류 발생')
+    }
+  }, [])
+
   useEffect(() => {
     fetchActivity(period)
   }, [period, fetchActivity])
 
   // 매출 데이터는 섹션이 화면에 보일 때 최초 로드, 이후 기간 변경 시 갱신
+  // (revenueData=차트용 period별 / beanRev=KPI용 누적 1회)
   useEffect(() => {
     if (revVisible) fetchRevenue(period)
   }, [revVisible, period, fetchRevenue])
 
+  useEffect(() => {
+    if (revVisible) fetchBeanRevenue()
+  }, [revVisible, fetchBeanRevenue])
+
   // 기간 내 가장 최신 데이터 포인트에서 DAU/WAU/MAU 추출
   const lastActivity = activityData?.series.at(-1)
-  const totalRevPi = revenueData?.series.reduce((s, r) => s + r.rev_pi, 0) ?? 0
-  const totalTxn = revenueData?.series.reduce((s, r) => s + r.txn_cnt, 0) ?? 0
-  const subscRevPi =
-    revenueData?.series
-      .filter((r) => r.theme_cd === 'SUBSCRIPTION')
-      .reduce((s, r) => s + r.rev_pi, 0) ?? 0
-  const genRevPi =
-    revenueData?.series
-      .filter((r) => r.theme_cd !== 'SUBSCRIPTION')
-      .reduce((s, r) => s + r.rev_pi, 0) ?? 0
+
+  // 매출 KPI — Bean 회수매출 누적(fn_bean_revenue_summary 기반)
+  const totalBean = beanRev?.bean_total ?? 0
+  const beanTxnCnt =
+    beanRev?.bean_by_item.reduce((s, it) => s + it.txn_cnt, 0) ?? 0
+  const subscBean =
+    beanRev?.bean_by_item
+      .filter((it) => it.ref_tp_cd === SUBSCR_REF_CD)
+      .reduce((s, it) => s + it.net_bean, 0) ?? 0
+  const genBean = totalBean - subscBean // 구독 외 전 항목(방생성·입장·스티커·뱃지 등)
 
   if (error) {
     return (
@@ -308,7 +238,10 @@ export function StatsDashboard() {
         <button
           onClick={() => {
             fetchActivity(period)
-            if (revVisible) fetchRevenue(period)
+            if (revVisible) {
+              fetchRevenue(period)
+              fetchBeanRevenue()
+            }
           }}
           className="text-muted-foreground mt-2 text-sm underline"
         >
@@ -401,31 +334,31 @@ export function StatsDashboard() {
           }
         >
           <div className="space-y-4">
-            {/* 매출 KPI 카드 — 총합 / 거래건수 / 구독 / 일반 */}
+            {/* 매출 KPI 카드 — 누적 Bean 회수매출: 총합 / 거래건수 / 구독 / 일반 */}
             <div className="grid grid-cols-2 gap-3">
               <StatsCard
-                label={t('totalRevenue', { period })}
-                value={totalRevPi.toFixed(4)}
-                unit="π"
-                loading={revLoading}
+                label={t('totalRevenue')}
+                value={totalBean}
+                unitNode={<BeanIcon className="h-4 w-4" />}
+                loading={beanRev === null}
               />
               <StatsCard
                 label={t('totalTrades')}
-                value={totalTxn}
+                value={beanTxnCnt}
                 unit={t('unitCase')}
-                loading={revLoading}
+                loading={beanRev === null}
               />
               <StatsCard
                 label={t('subscrRevenue')}
-                value={subscRevPi.toFixed(4)}
-                unit="π"
-                loading={revLoading}
+                value={subscBean}
+                unitNode={<BeanIcon className="h-4 w-4" />}
+                loading={beanRev === null}
               />
               <StatsCard
                 label={t('normalRevenue')}
-                value={genRevPi.toFixed(4)}
-                unit="π"
-                loading={revLoading}
+                value={genBean}
+                unitNode={<BeanIcon className="h-4 w-4" />}
+                loading={beanRev === null}
               />
             </div>
 
@@ -434,46 +367,17 @@ export function StatsDashboard() {
               <div className="rounded-lg border p-4">
                 <p className="mb-2 text-sm font-medium">{t('themeDaily')}</p>
                 {revenueData && revenueData.series.length > 0 ? (
-                  <RevenueTimelineChart data={revenueData.series} />
+                  <BeanRevenueTimeline period={period} />
                 ) : (
                   <div className="bg-muted h-64 animate-pulse rounded-lg" />
                 )}
               </div>
-              <div className="rounded-lg border p-4">
-                <p className="mb-2 text-sm font-medium">{t('themeShare')}</p>
-                {revenueData && revenueData.series.length > 0 ? (
-                  <RevenueDonutChart data={revenueData.series} />
-                ) : (
-                  <div className="bg-muted h-64 animate-pulse rounded-lg" />
-                )}
-              </div>
+              <BeanRevenueDistribution period={period} />
             </div>
 
-            {/* coin360 스타일 트리맵 — 면적 = 테마별 매출 비중 */}
-            <div className="rounded-lg border p-4">
-              <p className="mb-2 text-sm font-medium">{t('themeTreemap')}</p>
-              {revenueData && revenueData.series.length > 0 ? (
-                <RevenueTreemapChart data={revenueData.series} />
-              ) : (
-                <div className="bg-muted h-80 animate-pulse rounded-lg" />
-              )}
-            </div>
-
-            {/* Top-3 지출자 + Top-3 테마 */}
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <RankingCard title={t('top3Buyers', { period })}>
-                <TopSpendersList
-                  spenders={revenueData?.topSpenders ?? []}
-                  loading={revLoading}
-                />
-              </RankingCard>
-              <RankingCard title={t('top3Themes', { period })}>
-                <TopThemesList
-                  themes={revenueData?.topThemes ?? []}
-                  loading={revLoading}
-                />
-              </RankingCard>
-            </div>
+            {/* Top-3 지출자 — Pi 결제/테마 랭킹을 Bean 소비액 랭킹으로 교체
+                (currency-routing-rule: 플랫폼↔사용자 소비는 Bean이 정본) */}
+            <BeanTopSpenders period={period} />
           </div>
         </LazySection>
       </section>

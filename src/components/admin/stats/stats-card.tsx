@@ -12,6 +12,7 @@ interface StatsCardProps {
   label: string
   value: number | string
   unit?: string
+  unitNode?: React.ReactNode // 단위를 컴포넌트로 표시(예: <BeanIcon/>). unit보다 우선
   sub?: string
   className?: string
   loading?: boolean
@@ -21,6 +22,7 @@ export function StatsCard({
   label,
   value,
   unit,
+  unitNode,
   sub,
   className,
   loading,
@@ -42,10 +44,16 @@ export function StatsCard({
       <p className="text-muted-foreground text-sm">{label}</p>
       <p className="mt-1 text-2xl font-bold">
         {display}
-        {unit && (
+        {unitNode ? (
           <span className="text-muted-foreground ml-1 text-sm font-normal">
-            {unit}
+            {unitNode}
           </span>
+        ) : (
+          unit && (
+            <span className="text-muted-foreground ml-1 text-sm font-normal">
+              {unit}
+            </span>
+          )
         )}
       </p>
       {sub && <p className="text-muted-foreground mt-1 text-xs">{sub}</p>}

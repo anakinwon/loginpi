@@ -46,6 +46,21 @@ export interface TopSpender {
   txn_cnt: number
 }
 
+// ── Bean 매출 (fn_bean_revenue_summary 기반 — 매출 KPI 단일 소스) ──
+// 매출 2층위: ① Pi 현금매출(충전) ② Bean 회수매출(소비·구독 순액, ref_tp_cd 항목별)
+export interface BeanRevenueItem {
+  ref_tp_cd: string // SUBSCR / ROOM_CREATE / ROOM_ENTER / EVENT_ENTER / STICKER_PACK / BADGE_UPGRADE / ETC
+  txn_cnt: number
+  net_bean: number // 순매출 Bean (소비 양수)
+}
+
+export interface BeanRevenueResponse {
+  pi_revenue: { total_pi: number; total_bean: number; charge_cnt: number }
+  bean_by_item: BeanRevenueItem[]
+  bean_total: number // Bean 회수매출 총액 (전체 누적)
+  last_updated?: string
+}
+
 export interface RevenueStatsResponse {
   period: number
   from_dt: string
