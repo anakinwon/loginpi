@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
 import { BEAN_PER_PI, beanToPi } from '@/lib/bean'
+import type { ActivePymntType } from '@/lib/txn-div'
 
 // POST /api/bean/charge — 충전 준비: Pi SDK createPayment 파라미터 반환
 // 실제 적립은 /api/payments/complete의 BEAN_CHARGE 분기에서 fn_bean_apply로 처리
@@ -27,10 +28,15 @@ export async function POST(req: NextRequest) {
   }
 
   const amountPi = beanToPi(beanAmt)
+  // type을 ActivePymntType으로 고정 — 거래구분(txn-div) 단일 소스와 발행 측을 묶어,
+  // 결제 타입 변경 시 거래구분 매핑 누락을 컴파일 타임에 차단한다.
+  const metadata: { type: ActivePymntType; bean_amt: number } = {
+    type: 'BEAN_CHARGE',
+    bean_amt: beanAmt, // complete 분기에서 결제금액과 교차검증
+  }
   return NextResponse.json({
     amount: amountPi,
     memo: `Bean ${beanAmt.toLocaleString()} 충전 (${amountPi}π)`,
-    // bean_amt를 메타데이터에 박아 complete 분기에서 결제금액과 교차검증
-    metadata: { type: 'BEAN_CHARGE', bean_amt: beanAmt },
+    metadata,
   })
 }

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
 import { getBondStatus, BOND_DEPOSIT_PI } from '@/lib/mps-bond'
+import type { ActivePymntType } from '@/lib/txn-div'
 
 // GET /api/store/bond — 내 보증금 상태 (잔액·가용·취소 횟수)
 export async function GET() {
@@ -19,9 +20,10 @@ export async function POST() {
   if (!user)
     return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
+  const metadata: { type: ActivePymntType } = { type: 'MPS_BOND' }
   return NextResponse.json({
     amount: BOND_DEPOSIT_PI,
     memo: '🛡️ PiShop 판매자 보증금 예치 (1π = 취소수수료 9회분 + 지급준비금 0.1π)',
-    metadata: { type: 'MPS_BOND' },
+    metadata,
   })
 }

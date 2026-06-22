@@ -237,6 +237,7 @@
         "unknown": "기타"
       },
       "txnDiv": {
+        "BEAN_CHARGE": "Bean 충전",
         "PRODUCT_PAY": "상품 결제",
         "BOND_DEPOSIT": "보증금 예치",
         "SUBSCRIPTION": "구독",
