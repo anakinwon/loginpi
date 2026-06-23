@@ -12,7 +12,7 @@ export async function GET() {
 
   const db = getSupabaseAdmin()
 
-  const [campRes, shopsRes, itemRes, userRes, grantRes, cntRes] =
+  const [campRes, shopsRes, itemRes, userRes, userExtRes, grantRes, cntRes] =
     await Promise.all([
       db
         .from('bean_campaign')
@@ -32,10 +32,16 @@ export async function GET() {
         .select('item_id', { count: 'exact', head: true })
         .eq('seller_id', user.id)
         .eq('del_yn', 'N'),
-      // 텔레그램 연동(M3) + 알림확인(M4): seller 계정 단위
+      // M3 텔레그램 연동 (기존 컬럼 — 항상 존재)
       db
         .from('sys_user')
-        .select('tlgm_conn_yn, tlgm_alrt_cfm_yn')
+        .select('tlgm_conn_yn')
+        .eq('id', user.id)
+        .maybeSingle(),
+      // M4 알림확인 (SQL 100 신규 컬럼 — 미적용 시 에러 무시)
+      db
+        .from('sys_user')
+        .select('tlgm_alrt_cfm_yn')
         .eq('id', user.id)
         .maybeSingle(),
       // 본인 신청 기록 (1인 1회 — shop_id 포함)
@@ -69,9 +75,11 @@ export async function GET() {
   if (!camp) return NextResponse.json({ error: '캠페인 없음' }, { status: 404 })
 
   const hasItem = (itemRes.count ?? 0) > 0
-  const sysUser = userRes.data as { tlgm_conn_yn?: string; tlgm_alrt_cfm_yn?: string } | null
-  const hasTelegram = sysUser?.tlgm_conn_yn === 'Y'
-  const hasTlgmAlrt = sysUser?.tlgm_alrt_cfm_yn === 'Y'
+  const hasTelegram = (userRes.data as { tlgm_conn_yn?: string } | null)?.tlgm_conn_yn === 'Y'
+  // SQL 100 미적용 시 userExtRes.error → tlgm_alrt_cfm_yn null → false 안전 폴백
+  const hasTlgmAlrt =
+    !userExtRes.error &&
+    (userExtRes.data as { tlgm_alrt_cfm_yn?: string } | null)?.tlgm_alrt_cfm_yn === 'Y'
   const grant = grantRes.data as {
     grant_st_cd: string
     shop_id: string | null

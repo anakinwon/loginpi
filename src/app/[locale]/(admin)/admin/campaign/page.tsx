@@ -13,6 +13,7 @@ interface Campaign {
   require_shop_yn: string
   require_item_yn: string
   require_telegram_yn: string
+  require_tlgm_alrt_yn: string
   require_mission_cnt: number
   active_yn: string
   start_dtm: string
@@ -344,9 +345,10 @@ function CampaignCard({
   }
 
   const reqs = [
-    c.require_shop_yn === 'Y' && '매장',
-    c.require_item_yn === 'Y' && '상품',
-    c.require_telegram_yn === 'Y' && '텔레그램',
+    c.require_shop_yn === 'Y' && 'M1 매장',
+    c.require_item_yn === 'Y' && 'M2 상품',
+    c.require_telegram_yn === 'Y' && 'M3 텔레그램',
+    c.require_tlgm_alrt_yn === 'Y' && 'M4 알림확인',
     c.require_mission_cnt > 0 && `미션${c.require_mission_cnt}`,
   ].filter(Boolean) as string[]
 

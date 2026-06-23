@@ -12,28 +12,11 @@ interface ShopsResponse {
 }
 
 const COND_LABELS: { key: keyof ShopConditionRow['conditions']; label: string }[] = [
-  { key: 'shop', label: '매장 가입' },
-  { key: 'item', label: '상품 등록' },
-  { key: 'telegram', label: '텔레그램' },
+  { key: 'shop',      label: 'M1 매장' },
+  { key: 'item',      label: 'M2 상품' },
+  { key: 'telegram',  label: 'M3 연동' },
+  { key: 'tlgm_alrt', label: 'M4 알림' },
 ]
-
-const GRANT_BADGE: Record<
-  NonNullable<ShopConditionRow['grant_status']>,
-  { text: string; cls: string }
-> = {
-  PENDING: {
-    text: '⏳ 대기',
-    cls: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200',
-  },
-  APPROVED: {
-    text: '✅ 승인',
-    cls: 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-200',
-  },
-  REJECTED: {
-    text: '✗ 거절',
-    cls: 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-200',
-  },
-}
 
 export function CampaignShopBoard() {
   const [rows, setRows] = useState<ShopConditionRow[]>([])
@@ -67,7 +50,7 @@ export function CampaignShopBoard() {
     if (granting) return
     if (
       !window.confirm(
-        '3조건(매장·상품·텔레그램)을 완수한 매장 전원에게 보상을 지급합니다.\n이미 지급된 매장은 자동으로 제외됩니다. 진행할까요?',
+        `${totalConds}조건(매장·상품·텔레그램·알림확인)을 완수한 매장 전원에게 보상을 지급합니다.\n이미 지급된 매장은 자동으로 제외됩니다. 진행할까요?`,
       )
     )
       return
@@ -83,7 +66,7 @@ export function CampaignShopBoard() {
       }
       alert(
         `보상 지급 완료\n` +
-          `· 자격자(3조건 완수): ${data.eligible}명\n` +
+          `· 자격자(${totalConds}조건 완수): ${data.eligible}명\n` +
           `· 신규 지급: ${data.granted}명\n` +
           `· 이미 지급(건너뜀): ${data.already}명` +
           (data.failed ? `\n· 실패: ${data.failed}명` : ''),
@@ -122,25 +105,20 @@ export function CampaignShopBoard() {
         <h3 className="font-semibold">
           참여 매장주 현황{' '}
           <span className="text-muted-foreground text-sm font-normal">
-            ({rows.length}명 · 3조건 완료{' '}
+            ({rows.length}명 · {totalConds}조건 완료{' '}
             <span className="text-primary font-semibold">{fullCnt}</span>명)
           </span>
         </h3>
         {isAdmin && (
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={handleGrantAll}
-              disabled={granting}
-              title="3조건(매장·상품·텔레그램) 완수 매장 전원에게 보상 일괄 지급 (관리자 전용)"
-              className="rounded-md border border-amber-500 bg-amber-50 px-2 py-1 text-xs font-medium text-amber-900 transition-colors hover:bg-amber-100 disabled:opacity-50 dark:border-amber-600 dark:bg-amber-950 dark:text-amber-200 dark:hover:bg-amber-900"
-            >
-              {granting ? '지급 중…' : '🎁 완수자 일괄 지급'}
-            </button>
-            <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-800 dark:bg-blue-900/40 dark:text-blue-200">
-              관리자
-            </span>
-          </div>
+          <button
+            type="button"
+            onClick={handleGrantAll}
+            disabled={granting}
+            title={`${totalConds}조건(매장·상품·텔레그램·알림확인) 완수 매장 전원에게 보상 일괄 지급 (관리자 전용)`}
+            className="rounded-md border border-amber-500 bg-amber-50 px-2 py-1 text-xs font-medium text-amber-900 transition-colors hover:bg-amber-100 disabled:opacity-50 dark:border-amber-600 dark:bg-amber-950 dark:text-amber-200 dark:hover:bg-amber-900"
+          >
+            {granting ? '지급 중…' : '🎁 완수자 일괄 지급'}
+          </button>
         )}
       </div>
 
@@ -160,7 +138,7 @@ export function CampaignShopBoard() {
                 </th>
               ))}
               <th className="px-3 py-2.5 text-center font-semibold">완료</th>
-              <th className="px-3 py-2.5 text-center font-semibold">신청</th>
+              <th className="px-3 py-2.5 text-center font-semibold">보상</th>
             </tr>
           </thead>
           <tbody>
@@ -187,11 +165,9 @@ export function CampaignShopBoard() {
                         </span>
                       )}
                     </div>
-                    {r.pi_username && (
-                      <div className="text-muted-foreground text-xs">
-                        @{r.pi_username}
-                      </div>
-                    )}
+                    <div className="text-xs font-medium text-blue-600 dark:text-blue-400">
+                      {r.pi_username ? `@${r.pi_username}` : '—'}
+                    </div>
                     {r.shop_count > 1 && (
                       <div className="text-muted-foreground mt-0.5 text-xs">
                         대표 매장 · 총 {r.shop_count}개 보유
@@ -225,16 +201,41 @@ export function CampaignShopBoard() {
                     </span>
                   </td>
 
-                  {/* 신청 상태 */}
+                  {/* 보상 상태 — Event #1과 동일 3단계 (미션수행중 / 보상대기 / 보상완료) */}
                   <td className="px-3 py-2.5 text-center">
-                    {r.grant_status ? (
+                    {!allDone ? (
+                      // ① 미션수행중 — 조건 미완수
                       <span
-                        className={`rounded-full px-2 py-0.5 text-xs font-medium ${GRANT_BADGE[r.grant_status].cls}`}
+                        className="text-muted-foreground inline-flex flex-col items-center gap-0.5 text-base"
+                        title="미션수행중"
                       >
-                        {GRANT_BADGE[r.grant_status].text}
+                        🥺
+                        <span className="text-[10px] font-medium">
+                          미션수행중
+                        </span>
+                      </span>
+                    ) : r.grant_status === 'APPROVED' ? (
+                      // ③ 보상완료 — 조건 완수 + 지급됨
+                      <span
+                        className="inline-flex flex-col items-center gap-0.5 text-base"
+                        title="보상완료"
+                      >
+                        ✅
+                        <span className="text-[10px] font-semibold text-green-600 dark:text-green-400">
+                          보상완료
+                        </span>
                       </span>
                     ) : (
-                      <span className="text-muted-foreground text-xs">-</span>
+                      // ② 보상대기 — 조건 완수, 아직 미지급(PENDING/REJECTED/미신청)
+                      <span
+                        className="inline-flex flex-col items-center gap-0.5 text-base"
+                        title="보상대기"
+                      >
+                        🎁
+                        <span className="text-[10px] font-semibold text-amber-600 dark:text-amber-400">
+                          보상대기
+                        </span>
+                      </span>
                     )}
                   </td>
                 </tr>
