@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth-check'
 import { getCategory } from '@/lib/board'
+import { sanitizePlain } from '@/lib/sanitize'
 
 type Params = { params: Promise<{ category: string; postId: string }> }
 
@@ -61,7 +62,7 @@ export async function POST(request: NextRequest, { params }: Params) {
     .from('brd_cmnt')
     .insert({
       post_id: postId,
-      cmnt_cont: cmnt_cont.trim(),
+      cmnt_cont: sanitizePlain(cmnt_cont),
       rgst_usr_id: user.id,
       rgst_usr_nm: user.display_name,
       regr_id: user.display_name.slice(0, 20),

@@ -5,6 +5,7 @@ import { getRoomMember, getRoom, getRecentMsgCount } from '@/lib/chat'
 import { getAiQuota } from '@/lib/chat-auth'
 import { applyBean, getBalance } from '@/lib/bean'
 import { AI_EXTRA_BEAN } from '@/lib/bean-fee'
+import { sanitizePlain } from '@/lib/sanitize'
 import {
   getThemeSystemPrompt,
   extractAiQuestion,
@@ -307,7 +308,7 @@ export async function POST(request: NextRequest, { params }: Params) {
       room_id: roomId,
       snd_usr_id: user.id,
       snd_usr_nm: user.display_name,
-      msg_cont: msg_cont?.trim() ?? null,
+      msg_cont: msg_cont ? sanitizePlain(msg_cont) : null,
       msg_tp_cd,
       attch_url: resolvedAttchUrl,
       ref_msg_id: ref_msg_id ?? null,

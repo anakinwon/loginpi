@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
 import { BEAN_PER_PI, beanToPi } from '@/lib/bean'
 import type { ActivePymntType } from '@/lib/txn-div'
+import { withGuard } from '@/lib/api-guard'
 
 // POST /api/bean/charge — 충전 준비: Pi SDK createPayment 파라미터 반환
 // 실제 적립은 /api/payments/complete의 BEAN_CHARGE 분기에서 fn_bean_apply로 처리
-export async function POST(req: NextRequest) {
+async function handlePOST(req: NextRequest) {
   const user = await getSessionUser()
   if (!user)
     return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
@@ -40,3 +41,5 @@ export async function POST(req: NextRequest) {
     metadata,
   })
 }
+
+export const POST = withGuard(handlePOST)

@@ -5,12 +5,13 @@ import { transferBean } from '@/lib/bean'
 import { TIP_PRESETS_BEAN } from '@/lib/bean-shared'
 import { broadcastToRoom } from '@/lib/realtime-broadcast'
 import { recordUserAction } from '@/lib/event'
+import { withGuard } from '@/lib/api-guard'
 
 // 카페방 P2P Bean 선물 — Pi 결제가 아닌 Bean 실전송(USER→USER).
 // 보내는 사람 Bean 차감 + 받는 사람 적립을 fn_bean_transfer로 원자적 수행 후 TIP_NOTI 알림.
 const VALID_AMOUNTS = TIP_PRESETS_BEAN as readonly number[]
 
-export async function POST(request: NextRequest) {
+async function handlePOST(request: NextRequest) {
   const user = await getSessionUser()
   if (!user)
     return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
@@ -156,3 +157,5 @@ export async function POST(request: NextRequest) {
     from_balance: result.fromBalance,
   })
 }
+
+export const POST = withGuard(handlePOST)

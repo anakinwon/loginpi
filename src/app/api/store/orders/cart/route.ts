@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { createCartOrder } from '@/lib/mps-order'
+import { withGuard } from '@/lib/api-guard'
 
 // POST /api/store/orders/cart — 카트 다중상품 주문 생성 (FR-14)
 // 라인별 원자적 재고차감 후 PENDING 헤더 1건 + Pi 결제 파라미터 반환(합계 단일 결제).
@@ -18,7 +19,7 @@ const cartSchema = z.object({
   dlvr_addr: z.string().max(500).optional(),
 })
 
-export async function POST(req: NextRequest) {
+async function handlePOST(req: NextRequest) {
   const user = await getSessionUser()
   if (!user)
     return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
@@ -93,3 +94,5 @@ export async function POST(req: NextRequest) {
     { status: 201 },
   )
 }
+
+export const POST = withGuard(handlePOST)

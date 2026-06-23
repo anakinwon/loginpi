@@ -7,10 +7,11 @@ import { dispatchOrderNotis } from '@/lib/mps-noti'
 import { depositBond, BOND_DEPOSIT_PI } from '@/lib/mps-bond'
 import { applyBean, BEAN_PER_PI } from '@/lib/bean'
 import { recordUserAction } from '@/lib/event'
+import { withGuard } from '@/lib/api-guard'
 
 const PI_PAYMENTS_URL = 'https://api.minepi.com/v2/payments'
 
-export async function POST(request: NextRequest) {
+async function handlePOST(request: NextRequest) {
   const apiKey = process.env.PI_API_KEY
   if (!apiKey) {
     return NextResponse.json(
@@ -222,3 +223,5 @@ export async function POST(request: NextRequest) {
     )
   }
 }
+
+export const POST = withGuard(handlePOST)

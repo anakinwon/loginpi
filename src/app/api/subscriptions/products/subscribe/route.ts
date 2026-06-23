@@ -8,6 +8,7 @@ import {
   type SubscrGrade,
   type SubscrCycle,
 } from '@/lib/bean-subscr-plan'
+import { withGuard } from '@/lib/api-guard'
 
 const GRADES: SubscrGrade[] = ['GENERAL', 'S', 'M', 'L']
 const CYCLES: SubscrCycle[] = ['M', 'Y']
@@ -15,7 +16,7 @@ const CYCLES: SubscrCycle[] = ['M', 'Y']
 // POST /api/subscriptions/products/subscribe — 상품 구독 결제(Bean SPEND).
 // 금액은 서버(bean-subscr-plan.ts)가 결정 — 클라이언트는 {product, grade, cycle}만 전달.
 // 잔액 부족 시 402 → /bean 충전 유도. Pi 결제 아님 → window.Pi 불필요.
-export async function POST(request: NextRequest) {
+async function handlePOST(request: NextRequest) {
   const user = await getSessionUser()
   if (!user)
     return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
@@ -71,3 +72,5 @@ export async function POST(request: NextRequest) {
     expire_dtm: result.expire_dtm,
   })
 }
+
+export const POST = withGuard(handlePOST)

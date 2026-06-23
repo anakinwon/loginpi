@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth-check'
+import { withGuard } from '@/lib/api-guard'
 
 const PI_PAYMENTS_URL = 'https://api.minepi.com/v2/payments'
 
 // 결제 취소 처리: Pi SDK의 onCancel/onError 콜백에서 호출.
 // 잔액 부족·사용자 취소 등으로 결제가 중단되면 approve 단계에서 기록된
 // 'approved' row가 그대로 굳어 관리자 화면에 "승인"으로 남는 문제를 방지한다.
-export async function POST(request: NextRequest) {
+async function handlePOST(request: NextRequest) {
   // 인증 필수 — IDOR 방지. 본인 결제만 취소할 수 있어야 한다.
   const user = await getSessionUser()
   if (!user) {
@@ -73,3 +74,5 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({ success: true, updated: true })
 }
+
+export const POST = withGuard(handlePOST)

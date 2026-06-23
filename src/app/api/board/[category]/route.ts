@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth-check'
 import { getCategory, hasMinRole } from '@/lib/board'
+import { sanitizeTitle, sanitizeMarkdown } from '@/lib/sanitize'
 
 // GET /api/board/[category]?page=1&limit=20&q=검색어
 export async function GET(
@@ -129,8 +130,8 @@ export async function POST(
     .from('brd_post')
     .insert({
       ctgr_cd: ctgr.ctgr_cd,
-      post_ttl: post_ttl.trim(),
-      post_cont: post_cont?.trim() ?? null,
+      post_ttl: sanitizeTitle(post_ttl),
+      post_cont: post_cont ? sanitizeMarkdown(post_cont) : null,
       rgst_usr_id: user.id,
       rgst_usr_nm: user.display_name,
       regr_id: user.display_name.slice(0, 20),
