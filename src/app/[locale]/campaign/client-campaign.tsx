@@ -38,10 +38,10 @@ const COND_ROWS: {
   cta?: string
   hint?: string
 }[] = [
-  { key: 'shop',      label: 'M1 매장 가입',          href: '/store/my/shops', cta: '매장 등록' },
-  { key: 'item',      label: 'M2 상품 1개 이상 등록', href: '/store/my/items', cta: '상품 등록' },
-  { key: 'telegram',  label: 'M3 텔레그램 연동',       href: '/profile',        cta: '연동하기' },
-  { key: 'tlgm_alrt', label: 'M4 텔레그램 알림 확인', hint: 'M3 연동 완료 시 자동 확인' },
+  { key: 'shop',      label: 'M1 매장 가입',          href: '/store/my/shops',      cta: '매장 관리' },
+  { key: 'item',      label: 'M2 상품 1개 이상 등록', href: '/store/my/items',      cta: '상품 관리' },
+  { key: 'telegram',  label: 'M3 텔레그램 연동',       href: '/profile',             cta: '연동하기' },
+  { key: 'tlgm_alrt', label: 'M4 텔레그램 알림 확인', href: '/profile',             cta: '알림 확인' },
 ]
 
 export function ClientCampaign() {
@@ -139,7 +139,8 @@ export function ClientCampaign() {
                   <span className="text-muted-foreground text-xs">({c.hint})</span>
                 )}
               </span>
-              {!st.conditions[c.key] && c.href && c.cta && (
+              {/* 참여 링크 — 충족 여부와 무관하게 항상 노출(충족 후에도 매장·상품 추가/재확인 가능) */}
+              {c.href && c.cta && (
                 <Link href={c.href} className="text-primary text-xs hover:underline">
                   {c.cta} →
                 </Link>
