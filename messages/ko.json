@@ -1295,11 +1295,27 @@
     "errorOccurred": "오류가 발생했습니다"
   },
   "event": {
-    "title": "🎖️ 미션 이벤트",
-    "subtitle": "10개 미션을 완수하고, 🎁 카카오 선물 수령하자",
+    "title": "🎖️ 오픈베타 #1이벤트 - 10미션수행",
+    "subtitle": "10미션 완료 선착순 100명 5,000 Bean Token 받자!",
     "loginHint": "로그인하면 나의 미션 진행도와 요원 등급이 표시됩니다",
     "missionListTitle": "📋 미션 목록",
     "multiOrHint": "💡 힌트: 여러 방법 중 1가지만 완료하면 됩니다",
+    "missionGoLink": "🔗 계정 연동하러 가기",
+    "missionGoProfile": "👤 계정 연동·프로필 입력하러 가기",
+    "missionGoBean": "Bean 충전하러 가기",
+    "missionGoCafe": "💬 PiCafe 가기",
+    "missionGoSubscribe": "⭐ 구독 신청하러 가기",
+    "missionGoStore": "🛒 PiShop 가기",
+    "missionGoSales": "🛒 판매 관리로 가기",
+    "missionGoOrders": "🛒 주문 관리로 가기",
+    "missionGoItems": "🛒 내 상품으로 가기",
+    "missionGoLbs": "📍 위치 서비스 (내 프로필)",
+    "rankPrev": "이전",
+    "rankNext": "다음",
+    "rankSearchPlaceholder": "요원명 검색",
+    "rewardStInProgress": "미션수행중",
+    "rewardStPending": "보상대기",
+    "rewardStDone": "보상완료",
     "rankingTitle": "🏆 미션 랭킹",
     "excludePlaceholder": "요원명 입력 (콤마로 구분)",
     "processing": "처리 중…",
@@ -1330,12 +1346,12 @@
     "gradeMaster": "마스터",
     "missions": {
       "M1": {
-        "name": "계정 통합",
-        "desc": "Pi 브라우저 로그인 + Google 로그인 (둘 다 완료)"
+        "name": "계정 통합 + 프로필 완성",
+        "desc": "Pi·Google 로그인 연동 + 별명·카카오톡 ID 입력 (선물수령시 필요)"
       },
       "M2": {
-        "name": "프로필 완성",
-        "desc": "통합 계정에 별명 + 카카오톡 ID 입력(선물수령시 필요)"
+        "name": "Bean Token 충전하기",
+        "desc": "Bean 토큰을 충전해서 Cafe도 만들고, 참여하고, 자동번역도 사용"
       },
       "M3": {
         "name": "PREMIUM 카페 생성(PiRC1) + 자동번역",

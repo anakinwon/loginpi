@@ -1343,16 +1343,16 @@
     "missionListTitle": "📋 Mission List",
     "missions": {
       "M1": {
-        "desc": "Pi Browser Login + Google Login (Complete both)",
-        "name": "Account Integration"
+        "desc": "Link Pi & Google login + enter nickname & KakaoTalk ID (required for gift delivery)",
+        "name": "Account Integration + Profile"
       },
       "M10": {
         "desc": "(After M9) Repeat missions 7 and 8 — Experience cancellation fee in active deposit status",
         "name": "Active Deposit Transaction Cancellation Fee"
       },
       "M2": {
-        "desc": "Enter nickname + KakaoTalk ID in integrated account (required for gift delivery)",
-        "name": "Complete Profile"
+        "desc": "Charge Bean Token to create cafes, join, and use auto-translation",
+        "name": "Charge Bean Token"
       },
       "M3": {
         "desc": "Create PREMIUM Cafe in PiCafe + Use auto-translation feature",
@@ -1384,6 +1384,22 @@
       }
     },
     "multiOrHint": "💡 Hint: You only need to complete one of several methods",
+    "missionGoLink": "🔗 Go link accounts",
+    "missionGoProfile": "👤 Go link account & edit profile",
+    "missionGoBean": "Go charge Bean",
+    "missionGoCafe": "💬 Go to PiCafe",
+    "missionGoSubscribe": "⭐ Go subscribe",
+    "missionGoStore": "🛒 Go to PiShop",
+    "missionGoSales": "🛒 Go to sales management",
+    "missionGoOrders": "🛒 Go to order management",
+    "missionGoItems": "🛒 Go to my items",
+    "missionGoLbs": "📍 Location Service (My Profile)",
+    "rankPrev": "Prev",
+    "rankNext": "Next",
+    "rankSearchPlaceholder": "Search agent name",
+    "rewardStInProgress": "In progress",
+    "rewardStPending": "Reward pending",
+    "rewardStDone": "Reward done",
     "networkError": "Network Error",
     "noChange": "No Changes",
     "noName": "(No Name)",
@@ -1393,8 +1409,8 @@
     "rankingTitle": "🏆 Mission Ranking",
     "removeRank": "Remove Rank",
     "rewardCol": "Reward",
-    "subtitle": "Complete 10 missions and receive a 🎁 Kakao gift",
-    "title": "🎖️ Mission Event",
+    "subtitle": "Complete 10 missions — first 100 get 5,000 Bean Token!",
+    "title": "🎖️ Open Beta #1 Event - Complete 10 Missions",
     "totalCol": "Total"
   },
   "header": {

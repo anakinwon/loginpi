@@ -1,14 +1,17 @@
 import { NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
-import { grantBondReward } from '@/lib/mps-bond'
+import { grantBeanReward } from '@/lib/event'
+
+// 오픈베타#1 보상 금액 (Bean) — subtitle '선착순 100명 5,000 Bean Token'과 일치
+const EVENT_REWARD_BEAN = 5000
 
 // POST /api/admin/event/bond-reward
-// 10미션 완료자에게 판매보증금 1π를 지급한다 (관리자 전용).
+// 10미션 완료자에게 5,000 Bean을 지급한다 (관리자 전용).
 //
-// 중복 지급 방지: 실제 적립은 DB 함수 fn_evt_grant_bond_reward(sql/061)가
-// 단일 트랜잭션 + FOR UPDATE + reward_st_cd 게이트로 원자 처리한다.
-// 이미 지급(BONDED/PAID)된 사용자는 RPC가 'ALREADY'로 차단 → 미지급자만 1π 적립.
+// 중복 지급 방지: 실제 지급은 DB 함수 fn_evt_grant_bean_reward(sql/095)가
+// 단일 트랜잭션 + FOR UPDATE + reward_st_cd='PAID' 게이트로 원자 처리(mint+apply).
+// 이미 지급(PAID)된 사용자는 RPC가 'ALREADY'로 차단 → 미지급자만 5,000 Bean 지급.
 export async function POST(req: Request) {
   const user = await getSessionUser()
   if (!isAdmin(user))
@@ -85,7 +88,7 @@ export async function POST(req: Request) {
   let failed = 0
   const errors: string[] = []
   for (const uid of targets) {
-    const result = await grantBondReward(eventId, uid)
+    const result = await grantBeanReward(eventId, uid, EVENT_REWARD_BEAN)
     if (result === 'GRANTED') granted++
     else if (result === 'ALREADY') already++
     else {

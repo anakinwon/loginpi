@@ -4,7 +4,7 @@ import { ClientCampaign } from './client-campaign'
 export default function CampaignPage() {
   return (
     <div className="mx-auto max-w-lg px-4 py-6">
-      <h1 className="mb-4 text-xl font-bold">매장 온보딩 보상</h1>
+      <h1 className="mb-4 text-3xl font-bold">🏪 매장 선착순 온보딩 이벤트</h1>
       <ClientCampaign />
     </div>
   )

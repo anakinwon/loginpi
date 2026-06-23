@@ -174,6 +174,12 @@ export async function POST(request: NextRequest) {
             memo: `Bean ${beanAmt} 충전`,
             regrId: slug,
           })
+
+          // M2(Bean Token 충전) 미션 기록 (비블로킹) — 충전 완료 시 1회 기록
+          recordUserAction('bean_charge', ownerRow.id, { beanAmt }).catch(
+            (err) =>
+              console.error(`[M2] Bean 충전 미션 기록 실패: ${err.message}`),
+          )
         }
       }
     }

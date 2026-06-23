@@ -1,9 +1,38 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Loader2, ChevronDown } from 'lucide-react'
+import {
+  Loader2,
+  ChevronDown,
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { Link } from '@/i18n/navigation'
 import { piFetch } from '@/lib/pi-fetch'
+
+// 미션별 수행 페이지 바로가기 — 행동이 둘인 미션(M9 보증금+위치동의)은 링크를 여러 개 노출.
+// labelKey는 event 네임스페이스 i18n 키 (타겟별 라벨 재사용)
+const MISSION_LINKS: Record<string, Array<{ href: string; labelKey: string }>> =
+  {
+    M1: [{ href: '/profile', labelKey: 'missionGoProfile' }], // 계정 연동 + 별명·카톡ID (M2 통합)
+    M2: [{ href: '/bean', labelKey: 'missionGoBean' }], // Bean Token 충전
+    M3: [{ href: '/chat', labelKey: 'missionGoCafe' }], // PREMIUM 카페 생성 + 자동번역
+    M4: [{ href: '/chat', labelKey: 'missionGoCafe' }], // 채팅 내 Bean 전송
+    M5: [{ href: '/subscribe', labelKey: 'missionGoSubscribe' }], // 구독 신청 + 이벤트 방 생성
+    M6: [{ href: '/chat', labelKey: 'missionGoCafe' }], // 스티커/파일/음성
+    M7: [{ href: '/store/my/sales', labelKey: 'missionGoSales' }], // 판매자 거래 취소 (판매 관리)
+    M8: [{ href: '/store/my/orders', labelKey: 'missionGoOrders' }], // 구매자 거래 취소 (주문 관리)
+    M9: [
+      { href: '/store/my/items', labelKey: 'missionGoItems' }, // 보증금 예치 (내 상품)
+      { href: '/profile', labelKey: 'missionGoLbs' }, // 위치 동의 (내 프로필 - 위치 서비스)
+    ],
+    M10: [{ href: '/store', labelKey: 'missionGoStore' }], // 보증금 활성 취소수수료
+  }
+
+// 랭킹 보드 페이지당 표시 인원 — 미션 매트릭스(M1~M10 13컬럼)라 행이 커 모바일 기준 10명
+const RANK_PAGE_SIZE = 10
 
 interface Mission {
   mission_cd: string
@@ -34,6 +63,7 @@ interface Ranking {
   first_complete_dtm: string | null
   last_complete_dtm: string | null
   missions: Record<string, boolean>
+  reward_st_cd: string | null // 보상 지급 상태: null(미지급) | PENDING | PAID | FAILED
 }
 
 interface ExcludedAgent {
@@ -78,6 +108,8 @@ export function ClientEventGate() {
   const [excludedList, setExcludedList] = useState<ExcludedAgent[]>([])
   const [reevaluating, setReevaluating] = useState(false)
   const [granting, setGranting] = useState(false)
+  const [rankPage, setRankPage] = useState(1) // 랭킹 보드 페이지네이션
+  const [rankSearch, setRankSearch] = useState('') // 요원명 검색
 
   // 제외 목록 조회 (관리자 전용 API — 비관리자는 403이라 무시됨)
   const fetchExcluded = async () => {
@@ -125,7 +157,7 @@ export function ClientEventGate() {
     if (granting) return
     if (
       !window.confirm(
-        '10개 미션을 완료한 미지급자에게 판매보증금 1π를 지급합니다.\n이미 지급된 사용자는 자동으로 제외됩니다. 진행할까요?',
+        '10개 미션을 완료한 미지급자에게 5,000 Bean을 지급합니다.\n이미 지급된 사용자는 자동으로 제외됩니다. 진행할까요?',
       )
     )
       return
@@ -280,6 +312,28 @@ export function ClientEventGate() {
     Master: t('gradeMaster'),
   }
 
+  // 요원명 검색 필터 — 원본 이름(pi_username/nick_nm) 부분일치, 대소문자 무시
+  // (표시는 비관리자에게 마스킹되지만 검색은 실제 이름 기준)
+  const rankQuery = rankSearch.trim().toLowerCase()
+  const filteredRanking = rankQuery
+    ? ranking.filter((r) =>
+        (r.pi_username ?? r.nick_nm ?? '').toLowerCase().includes(rankQuery),
+      )
+    : ranking
+
+  // 랭킹 페이지네이션 — 최대 50명을 한 번에 렌더하지 않고 페이지 단위로 (INP 개선)
+  const rankingList = filteredRanking.slice(0, 50)
+  const totalRankPages = Math.max(
+    1,
+    Math.ceil(rankingList.length / RANK_PAGE_SIZE),
+  )
+  // ranking이 줄어 현재 페이지가 범위를 벗어나면 표시용으로 마지막 페이지로 보정 (렌더 중 setState 금지)
+  const currentRankPage = Math.min(rankPage, totalRankPages)
+  const pagedRanking = rankingList.slice(
+    (currentRankPage - 1) * RANK_PAGE_SIZE,
+    currentRankPage * RANK_PAGE_SIZE,
+  )
+
   return (
     <div className="space-y-8 pb-24">
       {/* 헤더: 요원 등급 + 미션 카운트 */}
@@ -357,6 +411,22 @@ export function ClientEventGate() {
                           {t('multiOrHint')}
                         </p>
                       )}
+                      {/* 미션 수행 페이지 바로가기 — 미완료 미션에만 노출 (완료는 ✓로 표시).
+                          행동이 둘인 미션(M9)은 링크를 여러 개 표시 */}
+                      {!completed && MISSION_LINKS[cd] && (
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {MISSION_LINKS[cd].map((lnk) => (
+                            <Link
+                              key={lnk.href}
+                              href={lnk.href}
+                              className="bg-primary/10 text-primary hover:bg-primary/20 inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium transition-colors"
+                            >
+                              {t(lnk.labelKey)}
+                              <ArrowRight className="size-3" />
+                            </Link>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -386,10 +456,10 @@ export function ClientEventGate() {
                   type="button"
                   onClick={handleBondReward}
                   disabled={granting}
-                  title="10개 미션 완료 미지급자에게 판매보증금 1π 지급 (관리자 전용)"
+                  title="10개 미션 완료 미지급자에게 5,000 Bean 지급 (관리자 전용)"
                   className="rounded-md border border-amber-500 bg-amber-50 px-2 py-1 text-xs font-medium text-amber-900 transition-colors hover:bg-amber-100 disabled:opacity-50 dark:border-amber-600 dark:bg-amber-950 dark:text-amber-200 dark:hover:bg-amber-900"
                 >
-                  {granting ? t('processing') : '💰 1Pi 판매보증금 지급'}
+                  {granting ? t('processing') : '🎁 5,000 Bean 지급'}
                 </button>
               </>
             )}
@@ -447,6 +517,19 @@ export function ClientEventGate() {
             </div>
           )}
         </div>
+        {/* 요원명 검색 — 모든 사용자, 입력 시 1페이지로 리셋 */}
+        <div className="mb-3">
+          <input
+            type="text"
+            value={rankSearch}
+            onChange={(e) => {
+              setRankSearch(e.target.value)
+              setRankPage(1)
+            }}
+            placeholder={t('rankSearchPlaceholder')}
+            className="border-input bg-background w-full max-w-xs rounded-md border px-3 py-1.5 text-sm"
+          />
+        </div>
         <div className="overflow-x-auto rounded-lg border">
           <table className="w-full border-collapse text-sm">
             <thead>
@@ -479,7 +562,7 @@ export function ClientEventGate() {
               </tr>
             </thead>
             <tbody>
-              {ranking.slice(0, 50).map((r) => (
+              {pagedRanking.map((r) => (
                 <tr
                   key={r.user_id}
                   className="hover:bg-muted/50 h-12 border-b transition-colors"
@@ -527,19 +610,45 @@ export function ClientEventGate() {
                       : '-'}
                   </td>
                   <td className="px-2 text-center">
-                    {r.mission_count === null ? null : r.mission_count ===
-                      10 ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src="https://img1.kakaocdn.net/thumb/C375x375@2x.fwebp.q82/?fname=https%3A%2F%2Fst.kakaocdn.net%2Fproduct%2Fgift%2Fproduct%2F20250203140848_135c92640a004b0682f214bd5b5a94f3.png"
-                        alt={t('giftAlt')}
-                        title={t('completionTitle')}
-                        loading="lazy"
-                        className="mx-auto h-12 w-20 rounded-md object-cover object-center"
-                      />
-                    ) : (
-                      <span className="text-lg" title={t('keepGoingTitle')}>
+                    {r.mission_count === null ? null : r.mission_count < 10 ? (
+                      // ① 미션수행중 — 10미션 미완료
+                      <span
+                        className="text-muted-foreground inline-flex flex-col items-center gap-0.5 text-lg"
+                        title={t('rewardStInProgress')}
+                      >
                         🥺
+                        <span className="text-[10px] font-medium">
+                          {t('rewardStInProgress')}
+                        </span>
+                      </span>
+                    ) : r.reward_st_cd === 'PAID' ? (
+                      // ③ 보상완료 — 10미션 완료 + 보상 지급됨
+                      <span
+                        className="inline-flex flex-col items-center gap-0.5"
+                        title={t('rewardStDone')}
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src="https://img1.kakaocdn.net/thumb/C375x375@2x.fwebp.q82/?fname=https%3A%2F%2Fst.kakaocdn.net%2Fproduct%2Fgift%2Fproduct%2F20250203140848_135c92640a004b0682f214bd5b5a94f3.png"
+                          alt={t('giftAlt')}
+                          title={t('rewardStDone')}
+                          loading="lazy"
+                          className="mx-auto h-12 w-20 rounded-md object-cover object-center"
+                        />
+                        <span className="text-[10px] font-semibold text-green-600 dark:text-green-400">
+                          ✓ {t('rewardStDone')}
+                        </span>
+                      </span>
+                    ) : (
+                      // ② 보상대기 — 10미션 완료, 아직 미지급(보상 로그 없음/PENDING/FAILED)
+                      <span
+                        className="inline-flex flex-col items-center gap-0.5 text-lg"
+                        title={t('rewardStPending')}
+                      >
+                        🎁
+                        <span className="text-[10px] font-semibold text-amber-600 dark:text-amber-400">
+                          {t('rewardStPending')}
+                        </span>
                       </span>
                     )}
                   </td>
@@ -548,6 +657,35 @@ export function ClientEventGate() {
             </tbody>
           </table>
         </div>
+
+        {/* 랭킹 페이지네이션 — 반응형 (모바일에서도 터치 영역 충분, 1페이지면 숨김) */}
+        {totalRankPages > 1 && (
+          <div className="mt-3 flex items-center justify-center gap-3">
+            <button
+              type="button"
+              onClick={() => setRankPage((p) => Math.max(1, p - 1))}
+              disabled={currentRankPage <= 1}
+              className="border-input bg-background hover:bg-muted inline-flex items-center gap-1 rounded-md border px-3 py-1.5 text-sm font-medium transition-colors disabled:opacity-40"
+            >
+              <ChevronLeft className="size-4" />
+              {t('rankPrev')}
+            </button>
+            <span className="text-muted-foreground text-sm tabular-nums">
+              {currentRankPage} / {totalRankPages}
+            </span>
+            <button
+              type="button"
+              onClick={() =>
+                setRankPage((p) => Math.min(totalRankPages, p + 1))
+              }
+              disabled={currentRankPage >= totalRankPages}
+              className="border-input bg-background hover:bg-muted inline-flex items-center gap-1 rounded-md border px-3 py-1.5 text-sm font-medium transition-colors disabled:opacity-40"
+            >
+              {t('rankNext')}
+              <ChevronRight className="size-4" />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )

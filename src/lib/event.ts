@@ -197,9 +197,9 @@ export async function reevaluateAllActiveUsers(): Promise<{ users: number }> {
     .select('user_id')
     .eq('del_yn', 'N')
 
-  // M2는 상태형 미션(kakao_id 존재 여부) — evt_action_log에 기록이 없어도
-  // kakao_id 보유자는 평가 대상에 포함해야 완료/취소가 정확히 반영된다.
-  const { data: m2Users } = await db
+  // M1(계정 통합+프로필)은 상태형 평가(kakao_id 존재 여부)를 포함 — evt_action_log에 기록이 없어도
+  // kakao_id 보유자는 평가 대상에 포함해야 완료/취소가 정확히 반영된다. (옛 M2 상태형을 M1로 통합)
+  const { data: stateUsers } = await db
     .from('sys_user')
     .select('id')
     .not('kakao_id', 'is', null)
@@ -207,7 +207,7 @@ export async function reevaluateAllActiveUsers(): Promise<{ users: number }> {
   const userIds = [
     ...new Set([
       ...(actionUsers ?? []).map((r) => (r as { user_id: string }).user_id),
-      ...(m2Users ?? []).map((r) => (r as { id: string }).id),
+      ...(stateUsers ?? []).map((r) => (r as { id: string }).id),
     ]),
   ]
 
@@ -242,14 +242,8 @@ async function evaluateMissionCompletion(
 
   switch (mission.complete_type_cd) {
     case 'SINGLE': {
-      // M2(프로필 완성)는 상태형 미션 — 카톡ID 존재 여부만으로 판정한다.
-      // 선물 전달 가능 상태가 본질이므로 profile_update 행위 로그·이벤트 기간과 무관하게
-      // 현재 kakao_id가 있으면 완료, 없으면 미완료. (kakao_id 삭제 시 즉시 미완료로 회수)
-      if (mission.mission_cd.trim() === 'M2') {
-        return await hasNickAndKakao(userId)
-      }
-
-      // 그 외 SINGLE: 이벤트 기간 내 1개 action_cd 발생 확인
+      // SINGLE: 이벤트 기간 내 1개 action_cd 발생 확인
+      // (M2는 'Bean Token 충전'으로 재정의됨 — bean_charge 행위형. 옛 프로필 상태형 평가는 M1로 통합)
       const { data } = await db
         .from('evt_action_log')
         .select('evt_action_log_id')
@@ -271,6 +265,11 @@ async function evaluateMissionCompletion(
           .gte('action_dtm', eventStartDtm)
           .limit(1)
         if (!data?.length) return false
+      }
+      // M1(계정 통합 + 프로필 완성): 로그인 연동 행위에 더해 별명·카톡ID 상태도 필수.
+      // (옛 M2 상태형 평가를 M1로 통합 — 선물 전달 가능 상태가 본질, kakao_id 삭제 시 즉시 회수)
+      if (mission.mission_cd.trim() === 'M1') {
+        return await hasNickAndKakao(userId)
       }
       return true
     }
@@ -347,8 +346,8 @@ async function evaluateMissionCompletion(
 }
 
 /**
- * M2(프로필 완성) 평가: 통합 계정에 별명(nick_nm) + 카톡ID(kakao_id)가 모두 있는지.
- * 상태형 미션 — 두 필드 유무만으로 판정(행위 로그 무관). 하나라도 비면 미완료.
+ * M1(계정 통합 + 프로필 완성) 상태 평가: 통합 계정에 별명(nick_nm) + 카톡ID(kakao_id)가 모두 있는지.
+ * 상태형 — 두 필드 유무만으로 판정(행위 로그 무관). 하나라도 비면 미완료(선물 전달 자격 회수).
  */
 async function hasNickAndKakao(userId: string): Promise<boolean> {
   const db = getSupabaseAdmin()
@@ -655,4 +654,47 @@ export async function getTop10ForGift(eventId: string) {
   }
 
   return top10
+}
+
+// 이벤트 Bean 보상 지급 결과 — DB 함수 fn_evt_grant_bean_reward(sql/095) 반환값
+export type BeanRewardResult =
+  | 'GRANTED' // 신규 지급 완료
+  | 'ALREADY' // 이미 지급(PAID) — 중복 차단
+  | 'NOT_ELIGIBLE' // 미션 미완료
+  | 'NO_EVENT' // 이벤트 없음
+  | 'INVALID_AMT' // 잘못된 금액
+  | 'ERROR' // RPC 오류
+
+/**
+ * 오픈베타#1 10미션 완주 보상 — 5,000 Bean 지급 (멱등).
+ *
+ * 이중지급 방지: DB 함수 fn_evt_grant_bean_reward(sql/095)에 위임 — 단일 트랜잭션 +
+ * FOR UPDATE 행 잠금 + reward_st_cd='PAID' 게이트. 지급은 mint+apply로 회계 항등식 보장
+ * (REWARD_POOL +amt(mint) -amt(apply) = 0, USER +amt 발행).
+ */
+export async function grantBeanReward(
+  eventId: string,
+  userId: string,
+  beanAmt = 5000,
+): Promise<BeanRewardResult> {
+  const { data, error } = await getSupabaseAdmin().rpc(
+    'fn_evt_grant_bean_reward',
+    { p_event_id: eventId, p_user_id: userId, p_bean_amt: beanAmt },
+  )
+
+  if (error) {
+    console.error(
+      `[이벤트 Bean보상] 지급 실패 event=${eventId} user=${userId}:`,
+      error.message,
+    )
+    return 'ERROR'
+  }
+
+  const result = (data as BeanRewardResult) ?? 'ERROR'
+  if (result === 'GRANTED') {
+    console.info(
+      `[이벤트 Bean보상] ${beanAmt} Bean 지급 완료 — event=${eventId} user=${userId}`,
+    )
+  }
+  return result
 }

@@ -33,6 +33,22 @@ export async function GET(request: NextRequest) {
       missionMap.get(key)!.add(um.mission_cd.trim())
     })
 
+    // 보상 지급 상태 조회 — 10미션 완료자의 보상대기/완료 구분용 (FK 없으니 user_id 별도 조회 후 병합)
+    const { data: rewardLogs } = await getSupabaseAdmin()
+      .from('evt_pi_reward_log')
+      .select('user_id, reward_st_cd')
+      .eq('event_id', 'evt-20260614-001')
+      .eq('del_yn', 'N')
+      .in('user_id', userIds)
+
+    const rewardMap = new Map<string, string>()
+    ;(rewardLogs ?? []).forEach((rl) => {
+      rewardMap.set(
+        (rl as { user_id: string }).user_id,
+        (rl as { reward_st_cd: string }).reward_st_cd,
+      )
+    })
+
     // 랭킹에 미션 체크리스트 추가
     const rankingWithMissions = ranking.map((r) => ({
       ...r,
@@ -48,6 +64,8 @@ export async function GET(request: NextRequest) {
         M9: missionMap.get(r.user_id)?.has('M9') ?? false,
         M10: missionMap.get(r.user_id)?.has('M10') ?? false,
       },
+      // 보상 지급 상태: null(보상 로그 없음=미지급) | PENDING | PAID | FAILED
+      reward_st_cd: rewardMap.get(r.user_id) ?? null,
     }))
 
     return NextResponse.json({
