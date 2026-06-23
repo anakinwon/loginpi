@@ -77,7 +77,7 @@ export function ClientEventTabs() {
       {active === 2 && (
         <div className="space-y-8">
           <h1 className="text-center text-3xl font-bold">
-            🏪 매장 선착순 온보딩 이벤트
+            🏪 {t('shopTitle')}
           </h1>
           {/* 본인 신청 카드 */}
           <div className="mx-auto max-w-lg">
