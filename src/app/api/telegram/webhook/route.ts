@@ -60,6 +60,7 @@ export async function POST(req: NextRequest) {
       tlgm_chat_id: chatId,
       tlgm_conn_yn: 'Y',
       tlgm_conn_dtm: new Date().toISOString(),
+      tlgm_alrt_cfm_yn: 'Y', // M4: 웰컴 메시지 발송으로 알림 확인 완료
       modr_id: 'TELEGRAM_BOT',
       mod_dtm: new Date().toISOString(),
     })

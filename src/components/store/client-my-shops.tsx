@@ -94,23 +94,44 @@ export function ClientMyShops({
   const [showAll, setShowAll] = useState(false)
 
   const [shops, setShops] = useState<Shop[]>([])
+  const [repShopId, setRepShopId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [editingId, setEditingId] = useState<string | null>(null) // null=닫힘, ''=신규, uuid=수정
   const [form, setForm] = useState<ShopForm>(EMPTY_FORM)
   const [saving, setSaving] = useState(false)
+  const [settingRepId, setSettingRepId] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     setLoading(true)
     try {
       const res = await piFetch(`/api/store/shops${showAll ? '?all=1' : ''}`)
       if (res.ok) {
-        const data = (await res.json()) as { shops: Shop[] }
+        const data = (await res.json()) as { shops: Shop[]; rep_shop_id: string | null }
         setShops(data.shops)
+        setRepShopId(data.rep_shop_id ?? null)
       }
     } finally {
       setLoading(false)
     }
   }, [showAll])
+
+  async function setRep(shopId: string) {
+    setSettingRepId(shopId)
+    try {
+      const res = await piFetch(`/api/store/shops/${shopId}/set-rep`, { method: 'POST' })
+      if (res.ok) {
+        setRepShopId(shopId)
+        toast.success('대표 매장으로 지정했습니다')
+      } else {
+        const { error } = (await res.json()) as { error?: string }
+        toast.error(error ?? '처리 실패')
+      }
+    } catch {
+      toast.error('네트워크 오류')
+    } finally {
+      setSettingRepId(null)
+    }
+  }
 
   useEffect(() => {
     if (authed) void load()
@@ -521,76 +542,94 @@ export function ClientMyShops({
         )
       ) : (
         <div className="space-y-2">
-          {shops.map((shop) => (
-            <div
-              key={shop.shop_id}
-              className="flex items-center gap-3 rounded-lg border p-3"
-            >
-              <div className="bg-muted flex size-12 shrink-0 items-center justify-center overflow-hidden rounded">
-                {shop.thumb_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={shop.thumb_url}
-                    alt=""
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <span className="text-lg">🏪</span>
-                )}
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="truncate text-base font-semibold text-amber-600 dark:text-amber-400">
-                    {shop.shop_nm}
-                  </span>
-                  <span className="bg-muted text-muted-foreground shrink-0 rounded-full px-2 py-0.5 text-xs">
-                    {t(`shop.type_${shop.shop_type_cd}`)}
-                  </span>
-                  {shop.owner_verified_yn === 'Y' && (
-                    <span className="shrink-0 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400">
-                      ✅ 인증
-                    </span>
+          {shops.map((shop) => {
+            const isRep = shop.shop_id === repShopId
+            return (
+              <div
+                key={shop.shop_id}
+                className={`flex items-center gap-3 rounded-lg border p-3 ${isRep ? 'border-amber-400 bg-amber-50/40 dark:border-amber-600 dark:bg-amber-950/20' : ''}`}
+              >
+                <div className="bg-muted flex size-12 shrink-0 items-center justify-center overflow-hidden rounded">
+                  {shop.thumb_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={shop.thumb_url}
+                      alt=""
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-lg">🏪</span>
                   )}
                 </div>
-                {shop.addr && (
-                  <p className="text-muted-foreground truncate text-xs">
-                    📍 {shop.addr}
-                  </p>
-                )}
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="truncate text-base font-semibold text-amber-600 dark:text-amber-400">
+                      {shop.shop_nm}
+                    </span>
+                    {isRep && (
+                      <span className="shrink-0 rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">
+                        ⭐ 대표
+                      </span>
+                    )}
+                    <span className="bg-muted text-muted-foreground shrink-0 rounded-full px-2 py-0.5 text-xs">
+                      {t(`shop.type_${shop.shop_type_cd}`)}
+                    </span>
+                    {shop.owner_verified_yn === 'Y' && (
+                      <span className="shrink-0 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400">
+                        ✅ 인증
+                      </span>
+                    )}
+                  </div>
+                  {shop.addr && (
+                    <p className="text-muted-foreground truncate text-xs">
+                      📍 {shop.addr}
+                    </p>
+                  )}
+                </div>
+                <div className="flex shrink-0 flex-wrap justify-end gap-1.5">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => router.push(`/store/shop/${shop.shop_id}`)}
+                  >
+                    🏪 매장 보기
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={() =>
+                      router.push(`/store/my/shop-items/new?shop=${shop.shop_id}`)
+                    }
+                  >
+                    + 메뉴 추가
+                  </Button>
+                  {!isRep && !showAll && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={settingRepId === shop.shop_id}
+                      onClick={() => setRep(shop.shop_id)}
+                    >
+                      {settingRepId === shop.shop_id ? '처리 중…' : '⭐ 대표 지정'}
+                    </Button>
+                  )}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => openEdit(shop)}
+                  >
+                    {t('shop.edit')}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => remove(shop.shop_id)}
+                  >
+                    {t('shop.delete')}
+                  </Button>
+                </div>
               </div>
-              <div className="flex shrink-0 flex-wrap justify-end gap-1.5">
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  onClick={() => router.push(`/store/shop/${shop.shop_id}`)}
-                >
-                  🏪 매장 보기
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={() =>
-                    router.push(`/store/my/shop-items/new?shop=${shop.shop_id}`)
-                  }
-                >
-                  + 메뉴 추가
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => openEdit(shop)}
-                >
-                  {t('shop.edit')}
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => remove(shop.shop_id)}
-                >
-                  {t('shop.delete')}
-                </Button>
-              </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
     </div>

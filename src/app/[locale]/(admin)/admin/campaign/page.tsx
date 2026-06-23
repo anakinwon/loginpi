@@ -32,6 +32,7 @@ interface PendingRow {
   usr_id: string
   bean_amt: number
   reg_dtm: string
+  shop_nm: string | null
   sys_user: {
     pi_username: string | null
     nick_nm: string | null
@@ -525,6 +526,11 @@ function PendingPanel({
                           ? `@${r.sys_user.pi_username}`
                           : r.usr_id.slice(0, 8)}
                       </p>
+                      {r.shop_nm && (
+                        <p className="mt-0.5 text-xs font-medium text-blue-600 dark:text-blue-400">
+                          🏪 {r.shop_nm}
+                        </p>
+                      )}
                     </td>
                     <td className="text-muted-foreground px-4 py-3 text-xs whitespace-nowrap">
                       {new Date(r.reg_dtm).toLocaleString('ko-KR')}

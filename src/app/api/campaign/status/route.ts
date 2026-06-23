@@ -4,48 +4,49 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 
 const CAMPAIGN_CD = 'SHOP_ONBOARD'
 
-// GET /api/campaign/status — 매장 온보딩 캠페인 자격 현황 + 선착순 잔여
+// GET /api/campaign/status — 온보딩 캠페인 현황 (1인 1회, 대표 매장 선택)
 export async function GET() {
   const user = await getSessionUser()
   if (!user)
     return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
   const db = getSupabaseAdmin()
-  const [campRes, shopRes, itemRes, userRes, missionRes, grantRes, cntRes] =
+
+  const [campRes, shopsRes, itemRes, userRes, grantRes, cntRes] =
     await Promise.all([
       db
         .from('bean_campaign')
         .select('*')
         .eq('campaign_cd', CAMPAIGN_CD)
         .maybeSingle(),
+      // 본인 매장 목록 (대표 매장 선택용)
       db
         .from('mps_shop')
-        .select('shop_id', { count: 'exact', head: true })
+        .select('shop_id, shop_nm')
         .eq('seller_id', user.id)
-        .eq('del_yn', 'N'),
+        .eq('del_yn', 'N')
+        .order('reg_dtm', { ascending: true }),
+      // 상품 등록: seller 계정 단위
       db
         .from('mps_item')
         .select('item_id', { count: 'exact', head: true })
         .eq('seller_id', user.id)
         .eq('del_yn', 'N'),
+      // 텔레그램 연동(M3) + 알림확인(M4): seller 계정 단위
       db
         .from('sys_user')
-        .select('tlgm_conn_yn')
+        .select('tlgm_conn_yn, tlgm_alrt_cfm_yn')
         .eq('id', user.id)
         .maybeSingle(),
-      db
-        .from('evt_user_mission')
-        .select('evt_user_mission_id', { count: 'exact', head: true })
-        .eq('usr_id', user.id)
-        .eq('del_yn', 'N'),
+      // 본인 신청 기록 (1인 1회 — shop_id 포함)
       db
         .from('bean_campaign_grant')
-        .select('grant_id, grant_st_cd')
+        .select('grant_st_cd, shop_id')
         .eq('campaign_cd', CAMPAIGN_CD)
         .eq('usr_id', user.id)
         .eq('del_yn', 'N')
         .maybeSingle(),
-      // 선착순은 '승인된' 수 기준
+      // 선착순: 승인 수 기준
       db
         .from('bean_campaign_grant')
         .select('grant_id', { count: 'exact', head: true })
@@ -61,29 +62,29 @@ export async function GET() {
     require_shop_yn: string
     require_item_yn: string
     require_telegram_yn: string
+    require_tlgm_alrt_yn: string
     require_mission_cnt: number
     active_yn: string
   } | null
   if (!camp) return NextResponse.json({ error: '캠페인 없음' }, { status: 404 })
 
-  const hasShop = (shopRes.count ?? 0) > 0
   const hasItem = (itemRes.count ?? 0) > 0
-  const hasTelegram =
-    (userRes.data as { tlgm_conn_yn?: string } | null)?.tlgm_conn_yn === 'Y'
-  const missionDone = missionRes.count ?? 0
-  const missionOk = missionDone >= camp.require_mission_cnt
+  const sysUser = userRes.data as { tlgm_conn_yn?: string; tlgm_alrt_cfm_yn?: string } | null
+  const hasTelegram = sysUser?.tlgm_conn_yn === 'Y'
+  const hasTlgmAlrt = sysUser?.tlgm_alrt_cfm_yn === 'Y'
+  const grant = grantRes.data as {
+    grant_st_cd: string
+    shop_id: string | null
+  } | null
+  const approvedCnt = cntRes.count ?? 0
 
-  // 조건별 충족 여부 (require가 'Y'/양수일 때만 요구)
   const conditions = {
-    shop: camp.require_shop_yn !== 'Y' || hasShop,
+    shop: camp.require_shop_yn !== 'Y' || (shopsRes.data ?? []).length > 0,
     item: camp.require_item_yn !== 'Y' || hasItem,
     telegram: camp.require_telegram_yn !== 'Y' || hasTelegram,
-    mission: camp.require_mission_cnt <= 0 || missionOk,
+    tlgm_alrt: camp.require_tlgm_alrt_yn !== 'Y' || hasTlgmAlrt,
+    mission: camp.require_mission_cnt <= 0,
   }
-  const eligible = Object.values(conditions).every(Boolean)
-  const grant = grantRes.data as { grant_st_cd: string } | null
-  const grantStatus = grant?.grant_st_cd ?? null // null | PENDING | APPROVED | REJECTED
-  const approvedCnt = cntRes.count ?? 0
 
   return NextResponse.json({
     campaign_nm: camp.campaign_nm,
@@ -91,10 +92,16 @@ export async function GET() {
     require_mission_cnt: camp.require_mission_cnt,
     active: camp.active_yn === 'Y',
     conditions,
-    eligible,
-    grant_status: grantStatus,
-    claimed: !!grant,
-    granted_cnt: approvedCnt, // 승인(지급)된 매장 수
+    eligible: Object.values(conditions).every(Boolean),
+    // 본인 매장 목록 (대표 매장 선택 드롭다운용)
+    my_shops: (shopsRes.data ?? []).map((s) => ({
+      shop_id: s.shop_id,
+      shop_nm: s.shop_nm,
+    })),
+    // 신청 기록 (1인 1회)
+    grant_status: grant?.grant_st_cd ?? null,
+    claimed_shop_id: grant?.shop_id ?? null,
+    granted_cnt: approvedCnt,
     max_cnt: camp.max_grant_cnt,
     sold_out: approvedCnt >= camp.max_grant_cnt,
   })

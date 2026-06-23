@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
     const [pendingRes, campRes, approvedRes] = await Promise.all([
       db
         .from('bean_campaign_grant')
-        .select('grant_id, usr_id, bean_amt, reg_dtm')
+        .select('grant_id, usr_id, bean_amt, reg_dtm, shop_id')
         .eq('campaign_cd', campaignCd)
         .eq('grant_st_cd', 'PENDING')
         .eq('del_yn', 'N')
@@ -56,17 +56,35 @@ export async function GET(req: NextRequest) {
     ])
 
     const rows = pendingRes.data ?? []
-    // 사용자 정보 병합 (FK 없음 → 별도 조회)
+    // 사용자·매장 정보 병합 (FK 없음 → 별도 조회)
     const userIds = [...new Set(rows.map((r) => r.usr_id))]
+    const shopIds = [...new Set(rows.map((r) => (r as { shop_id?: string }).shop_id).filter(Boolean))] as string[]
+
     const userMap = new Map<string, Record<string, unknown>>()
-    if (userIds.length > 0) {
-      const { data: users } = await db
-        .from('sys_user')
-        .select('id, pi_username, nick_nm, real_nm, display_name')
-        .in('id', userIds)
-      for (const u of users ?? [])
-        userMap.set((u as { id: string }).id, u as Record<string, unknown>)
-    }
+    const shopMap = new Map<string, string>()
+
+    await Promise.all([
+      userIds.length > 0
+        ? db
+            .from('sys_user')
+            .select('id, pi_username, nick_nm, real_nm, display_name')
+            .in('id', userIds)
+            .then(({ data }) => {
+              for (const u of data ?? [])
+                userMap.set((u as { id: string }).id, u as Record<string, unknown>)
+            })
+        : Promise.resolve(),
+      shopIds.length > 0
+        ? db
+            .from('mps_shop')
+            .select('shop_id, shop_nm')
+            .in('shop_id', shopIds)
+            .then(({ data }) => {
+              for (const s of data ?? [])
+                shopMap.set((s as { shop_id: string }).shop_id, (s as { shop_nm: string }).shop_nm)
+            })
+        : Promise.resolve(),
+    ])
 
     const camp = campRes.data as {
       campaign_nm: string
@@ -76,10 +94,14 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       campaign_cd: campaignCd,
       campaign_nm: camp?.campaign_nm ?? campaignCd,
-      pending: rows.map((r) => ({
-        ...r,
-        sys_user: userMap.get(r.usr_id) ?? null,
-      })),
+      pending: rows.map((r) => {
+        const shopId = (r as { shop_id?: string }).shop_id
+        return {
+          ...r,
+          sys_user: userMap.get(r.usr_id) ?? null,
+          shop_nm: shopId ? (shopMap.get(shopId) ?? null) : null,
+        }
+      }),
       approved_cnt: approvedRes.count ?? 0,
       max_cnt: camp?.max_grant_cnt ?? 0,
       reward_bean: camp?.reward_bean ?? 0,

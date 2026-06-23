@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
+import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { listMyShops, createShop } from '@/lib/mps-shop'
 
 // GET /api/store/shops — 내 매장 목록 (판매자 인증, FR-06)
@@ -11,8 +12,16 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
   const wantAll = req.nextUrl.searchParams.get('all') === '1' && isAdmin(user)
-  const shops = await listMyShops(wantAll ? null : user.id)
-  return NextResponse.json({ shops })
+  const [shops, userRes] = await Promise.all([
+    listMyShops(wantAll ? null : user.id),
+    getSupabaseAdmin()
+      .from('sys_user')
+      .select('rep_shop_id')
+      .eq('id', user.id)
+      .maybeSingle(),
+  ])
+  const repShopId = (userRes.data as { rep_shop_id?: string | null } | null)?.rep_shop_id ?? null
+  return NextResponse.json({ shops, rep_shop_id: repShopId })
 }
 
 // 매장 등록·수정 공용 스키마. 좌표는 OFFLINE/BOTH만 의미 있으나 입력 자체는 항상 허용(nullable)
