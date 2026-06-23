@@ -3,22 +3,29 @@
 -- 목적: 샘플성 카테고리(039 중고편중 6대분류 · 053 카페) 전면 폐기 → 국내 E커머스 표준 17대분류 3단계로 교체.
 --   정본 설계: docs/PRD_CATEGORY.md v1.0
 --
--- 안전 절차(한 트랜잭션, 신규/기존 동일 테이블 공존 문제를 임시테이블로 해결):
---   ① 시드 직전 '기존 활성 카테고리 ID' 임시 캡처(_old_ctgr) — 이후 이것만 폐기 대상.
---   ② 신규 표준 카테고리 시드(대분류 17 + 중분류, parent_ctgr_id 재귀). '기타(999)' 안전망 포함.
---   ③ 기존 상품(mps_item.ctgr_id)이 폐기 대상을 가리키면 NULL(미분류) — 판매자가 신규 분류 재지정(오분류 방지).
---   ④ 기존 카테고리만 논리삭제(del_yn='Y', use_yn='N'). 물리 DELETE 금지.
--- 소분류(Depth3)는 시드하지 않고 운영(/admin CRUD)·후속 시드로 확장 — PRD_CATEGORY §4.
+-- 안전 절차(한 트랜잭션) — TEMP TABLE 미사용(Supabase SQL Editor의 문장별 연결에서 TEMP 유실 방지):
+--   핵심: 시드 '이전'에는 활성 카테고리 = 기존(샘플)뿐 → 폐기를 시드보다 먼저 하면 기존만 정확히 폐기된다.
+--   ① 현재 활성 상품의 카테고리 참조 해제 → NULL(미분류). 판매자가 신규 분류 재지정(오분류 방지).
+--   ② 현재 활성 카테고리 전부 폐기(del_yn='Y'·use_yn='N'). 물리 DELETE 금지. (이전 부분 적용분도 함께 정리)
+--   ③ 신규 표준 시드(대분류 17 + 중분류, parent_ctgr_id 재귀). '기타(999)' 안전망 포함.
+-- 소분류(Depth3)는 운영(/admin CRUD)·후속 시드로 확장 — PRD_CATEGORY §4.
 --
--- ⚠️ Supabase 적용은 마스터가 수행(직접 적용 금지). 적용 후 PiShop 상품 목록 카테고리 필터 확인.
+-- ⚠️ Supabase 적용은 마스터가 수행. 적용 후 PiShop 상품 목록 카테고리 필터 확인.
 
 BEGIN;
 
--- ── ① 시드 직전 기존 활성 카테고리 ID 캡처 (이후 이 집합만 폐기) ──
-CREATE TEMP TABLE _old_ctgr ON COMMIT DROP AS
-  SELECT ctgr_id FROM public.mps_ctgr WHERE del_yn = 'N';
+-- ── ① 기존 상품의 카테고리 참조 해제 → 미분류(NULL) ──
+UPDATE public.mps_item
+   SET ctgr_id = NULL, modr_id = 'ADMIN', mod_dtm = CURRENT_TIMESTAMP
+ WHERE del_yn = 'N' AND ctgr_id IS NOT NULL;
 
--- ── ② 신규 표준 시드 (대분류 + 중분류) ──
+-- ── ② 현재 활성 카테고리 전부 폐기(시드 전이므로 곧 기존 샘플만 해당) ──
+UPDATE public.mps_ctgr
+   SET del_yn = 'Y', use_yn = 'N', del_dtm = CURRENT_TIMESTAMP,
+       modr_id = 'ADMIN', mod_dtm = CURRENT_TIMESTAMP
+ WHERE del_yn = 'N';
+
+-- ── ③ 신규 표준 시드 (대분류 + 중분류) ──
 DO $$
 DECLARE
   v_id UUID;
@@ -92,21 +99,9 @@ BEGIN
     (v_id,'분류 미지정',10);
 END $$;
 
--- ── ③ 기존 상품의 폐기 카테고리 참조 해제 → 미분류(NULL) ──
-UPDATE public.mps_item
-   SET ctgr_id = NULL, modr_id = 'ADMIN', mod_dtm = CURRENT_TIMESTAMP
- WHERE del_yn = 'N'
-   AND ctgr_id IN (SELECT ctgr_id FROM _old_ctgr);
-
--- ── ④ 기존 카테고리만 논리삭제 ──
-UPDATE public.mps_ctgr
-   SET del_yn = 'Y', use_yn = 'N', del_dtm = CURRENT_TIMESTAMP,
-       modr_id = 'ADMIN', mod_dtm = CURRENT_TIMESTAMP
- WHERE ctgr_id IN (SELECT ctgr_id FROM _old_ctgr);
-
 COMMIT;
 
 -- 검증:
 --   SELECT ctgr_nm, sort_ord FROM mps_ctgr WHERE parent_ctgr_id IS NULL AND del_yn='N' ORDER BY sort_ord;  -- 신규 대분류 17개
---   SELECT count(*) FROM mps_ctgr WHERE del_yn='Y';  -- 폐기된 기존 수
+--   SELECT count(*) FROM mps_ctgr WHERE del_yn='Y';   -- 폐기된 기존 수
 --   SELECT count(*) FROM mps_item WHERE del_yn='N' AND ctgr_id IS NULL;  -- 재지정 대기 상품 수
