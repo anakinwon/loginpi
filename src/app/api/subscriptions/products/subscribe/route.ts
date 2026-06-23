@@ -2,15 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
 import { subscribeProduct } from '@/lib/bean-subscr'
 import { recordUserAction } from '@/lib/event'
-import {
-  SUBSCR_PRODUCTS,
-  type SubscrProduct,
-  type SubscrGrade,
-  type SubscrCycle,
-} from '@/lib/bean-subscr-plan'
+import { getSubscrPlans } from '@/lib/bean-fee-db'
+import type { SubscrProduct, SubscrGrade, SubscrCycle } from '@/lib/bean-subscr-plan'
 import { withGuard } from '@/lib/api-guard'
 
-const GRADES: SubscrGrade[] = ['GENERAL', 'S', 'M', 'L']
 const CYCLES: SubscrCycle[] = ['M', 'Y']
 
 // POST /api/subscriptions/products/subscribe — 상품 구독 결제(Bean SPEND).
@@ -33,12 +28,18 @@ async function handlePOST(request: NextRequest) {
     cycle?: string
   }
 
-  if (
-    !SUBSCR_PRODUCTS.includes(product as SubscrProduct) ||
-    !GRADES.includes(grade as SubscrGrade) ||
-    !CYCLES.includes(cycle as SubscrCycle)
-  ) {
+  // 기본 형식 검증 후, DB 플랜 존재 여부는 subscribeProduct 내부에서 INVALID_PLAN으로 처리
+  if (!product || !grade || !CYCLES.includes(cycle as SubscrCycle)) {
     return NextResponse.json({ error: '잘못된 구독 요청' }, { status: 400 })
+  }
+
+  // DB에서 유효한 플랜인지 확인
+  const plans = await getSubscrPlans()
+  const validCombo = plans.some(
+    (p) => p.product === product && p.grade === grade && p.cycle === cycle,
+  )
+  if (!validCombo) {
+    return NextResponse.json({ error: '존재하지 않는 구독 상품' }, { status: 404 })
   }
 
   const slug = String(user.display_name ?? 'user').slice(0, 20)

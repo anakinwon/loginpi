@@ -2123,12 +2123,6 @@
       "TRANSLATE": "Langganan Terjemahan Otomatis"
     },
     "renewBtn": "Perbarui/Ubah",
-    "storeGrade": {
-      "L": "L (50 ke atas)",
-      "M": "M (50 ke bawah)",
-      "S": "S (30 ke bawah)"
-    },
-    "storeGradeHint": "{count} produk saya — pilih Grade",
     "subscribeBtn": "Berlangganan",
     "subscribeFail": "Gagal memproses langganan",
     "subscribeSuccess": "Langganan {product} Anda telah dimulai!",

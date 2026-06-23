@@ -2123,12 +2123,6 @@
       "TRANSLATE": "Suscripción a traducción automática"
     },
     "renewBtn": "Renovar/Cambiar",
-    "storeGrade": {
-      "L": "L (50 o más)",
-      "M": "M (50 o menos)",
-      "S": "S (30 o menos)"
-    },
-    "storeGradeHint": "Mis productos {count} — selecciona un grado",
     "subscribeBtn": "Suscribirse",
     "subscribeFail": "Error al procesar la suscripción",
     "subscribeSuccess": "¡Tu suscripción a {product} ha comenzado!",

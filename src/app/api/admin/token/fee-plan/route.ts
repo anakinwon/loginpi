@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidateTag } from 'next/cache'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 
@@ -90,6 +91,9 @@ export async function PATCH(req: NextRequest) {
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
+
+  // 구독요금제 캐시 즉시 무효화 → 다음 요청부터 DB 최신값 반영
+  revalidateTag('subscr-plans', {})
 
   return NextResponse.json({ ok: true })
 }

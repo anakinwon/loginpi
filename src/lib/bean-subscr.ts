@@ -1,5 +1,6 @@
 import 'server-only'
 import { getSupabaseAdmin } from './supabase-admin'
+import { getSubscrPlans } from './bean-fee-db'
 import {
   findPlan,
   cycleMonths,
@@ -47,7 +48,7 @@ export type SubscribeResult =
   | { ok: true; balance: number; expire_dtm: string }
   | { ok: false; error: 'INSUFFICIENT_BEAN' | 'INVALID_PLAN' | 'ERROR' }
 
-// 상품 구독 결제 — 금액·개월수는 서버(bean-subscr-plan.ts) 권위값. fn_bean_subscribe_product 원자 처리.
+// 상품 구독 결제 — 금액·개월수는 bean_fee_plan DB 권위값. fn_bean_subscribe_product 원자 처리.
 export async function subscribeProduct(args: {
   usrId: string
   product: SubscrProduct
@@ -55,7 +56,8 @@ export async function subscribeProduct(args: {
   cycle: SubscrCycle
   regrId?: string
 }): Promise<SubscribeResult> {
-  const plan = findPlan(args.product, args.grade, args.cycle)
+  const plans = await getSubscrPlans()
+  const plan = findPlan(plans, args.product, args.grade, args.cycle)
   if (!plan) return { ok: false, error: 'INVALID_PLAN' }
 
   const { data, error } = await getSupabaseAdmin().rpc(

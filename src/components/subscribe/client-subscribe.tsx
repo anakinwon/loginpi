@@ -8,36 +8,31 @@ import { piFetch } from '@/lib/pi-fetch'
 import { Button } from '@/components/ui/button'
 import { BeanIcon } from '@/components/ui/bean-icon'
 import {
-  SUBSCR_PLANS,
   findPlan,
   annualSaving,
-  recommendStoreGrade,
+  type SubscrPlan,
   type SubscrProduct,
-  type SubscrGrade,
   type SubscrCycle,
 } from '@/lib/bean-subscr-plan'
 
 interface ActiveSubscr {
   prod_ctgr_cd: SubscrProduct
-  grade_cd: SubscrGrade
+  grade_cd: string
   bill_cycle_cd: SubscrCycle
   expire_dtm: string
 }
 
 interface ProductsResp {
-  plans: typeof SUBSCR_PLANS
+  plans: SubscrPlan[]
   mySubs: ActiveSubscr[]
   balance: number
   itemCount: number
 }
 
-const PRODUCT_META: Record<
-  SubscrProduct,
-  { emoji: string; grades: SubscrGrade[] }
-> = {
-  PICAFE: { emoji: '☕', grades: ['GENERAL'] },
-  PISHOP: { emoji: '🏪', grades: ['S', 'M', 'L'] },
-  TRANSLATE: { emoji: '🌐', grades: ['GENERAL'] },
+const PRODUCT_META: Record<SubscrProduct, { emoji: string }> = {
+  PICAFE: { emoji: '☕' },
+  PISHOP: { emoji: '🏪' },
+  TRANSLATE: { emoji: '🌐' },
 }
 const ORDER: SubscrProduct[] = ['PICAFE', 'PISHOP', 'TRANSLATE']
 
@@ -47,7 +42,6 @@ export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
   const [authed, setAuthed] = useState(serverAuthed)
   const [loading, setLoading] = useState(true)
   const [cycle, setCycle] = useState<SubscrCycle>('M')
-  const [storeGrade, setStoreGrade] = useState<SubscrGrade>('M')
   const [busy, setBusy] = useState<string | null>(null)
 
   const load = useCallback(async () => {
@@ -56,7 +50,6 @@ export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
       setAuthed(true)
       const data = (await res.json()) as ProductsResp
       setResp(data)
-      setStoreGrade(recommendStoreGrade(data.itemCount)) // 상품 수 기반 등급 추천
     } else if (res.status === 401) {
       setAuthed(false)
     }
@@ -67,17 +60,13 @@ export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
     void load()
   }, [load])
 
-  async function subscribe(
-    product: SubscrProduct,
-    grade: SubscrGrade,
-    key: string,
-  ) {
+  async function subscribe(product: SubscrProduct, key: string) {
     setBusy(key)
     try {
       const res = await piFetch('/api/subscriptions/products/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ product, grade, cycle }),
+        body: JSON.stringify({ product, grade: 'GENERAL', cycle }),
       })
       if (res.status === 402) {
         toast.error(t('insufficient'))
@@ -106,6 +95,7 @@ export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
       </p>
     )
 
+  const plans = resp?.plans ?? []
   const subMap = new Map(resp?.mySubs.map((s) => [s.prod_ctgr_cd, s]))
 
   return (
@@ -130,7 +120,7 @@ export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
       {/* 사상 안내 */}
       <p className="text-muted-foreground text-xs">💡 {t('tagline')}</p>
 
-      {/* 결제 주기 선택 — 연간 강조(2개월 무료). 전폭 세그먼트 + 앰버 배지 + (미선택 시에도) primary 링 */}
+      {/* 결제 주기 선택 — 연간 강조(2개월 무료) */}
       <div className="space-y-1.5">
         <p className="text-muted-foreground text-xs font-medium">
           {t('cycleHeading')}
@@ -172,13 +162,13 @@ export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
       <div className="space-y-3">
         {ORDER.map((product) => {
           const meta = PRODUCT_META[product]
-          const grade = product === 'PISHOP' ? storeGrade : 'GENERAL'
-          const plan = findPlan(product, grade, cycle)
+          const plan = findPlan(plans, product, 'GENERAL', cycle)
           if (!plan) return null
           const active = subMap.get(product)
           const isActive = !!active
           const feats = t.raw(`feat.${product}`) as string[]
-          const busyKey = `${product}-${grade}`
+          const busyKey = `${product}-GENERAL`
+          const sv = annualSaving(plans, product, 'GENERAL')
 
           return (
             <div
@@ -208,11 +198,9 @@ export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
                       (= {plan.bean_amt / 100} π)
                     </span>
                   </p>
-                  {/* 연간 절약 안내 — 선택 시 절약액(초록), 월간일 때 연간 전환 넛지(앰버) */}
-                  {(() => {
-                    const sv = annualSaving(product, grade)
-                    if (!sv) return null
-                    return cycle === 'Y' ? (
+                  {/* 연간 절약 안내 */}
+                  {sv &&
+                    (cycle === 'Y' ? (
                       <p className="mt-0.5 text-xs font-semibold text-green-600 dark:text-green-400">
                         {t('annualSave', {
                           bean: sv.saveBean.toLocaleString(),
@@ -231,14 +219,13 @@ export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
                           pct: sv.pct,
                         })}
                       </button>
-                    )
-                  })()}
+                    ))}
                 </div>
                 <Button
                   size="sm"
                   className="shrink-0"
                   disabled={busy !== null}
-                  onClick={() => subscribe(product, grade, busyKey)}
+                  onClick={() => subscribe(product, busyKey)}
                 >
                   {busy === busyKey
                     ? t('processing')
@@ -247,37 +234,6 @@ export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
                       : t('subscribeBtn')}
                 </Button>
               </div>
-
-              {/* PiShop™ 등급 선택 (상품 수 추천) */}
-              {product === 'PISHOP' && (
-                <div className="mt-3">
-                  <p className="text-muted-foreground mb-1 text-xs">
-                    {t('storeGradeHint', { count: resp?.itemCount ?? 0 })}
-                  </p>
-                  <div className="flex gap-2">
-                    {(['S', 'M', 'L'] as SubscrGrade[]).map((g) => {
-                      const gp = findPlan('PISHOP', g, cycle)
-                      return (
-                        <button
-                          key={g}
-                          onClick={() => setStoreGrade(g)}
-                          className={`flex-1 rounded-lg border px-2 py-1.5 text-xs transition-colors ${
-                            storeGrade === g
-                              ? 'border-primary bg-primary/5 font-semibold'
-                              : 'text-muted-foreground'
-                          }`}
-                        >
-                          {t(`storeGrade.${g}`)}
-                          <span className="block tabular-nums">
-                            {gp?.bean_amt.toLocaleString()}{' '}
-                            <BeanIcon className="inline-block h-4 w-4 align-text-bottom" />
-                          </span>
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
-              )}
 
               <ul className="text-muted-foreground mt-3 space-y-1 text-sm">
                 {feats.map((f, i) => (

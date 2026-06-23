@@ -2123,12 +2123,6 @@
       "TRANSLATE": "מנוי תרגום אוטומטי"
     },
     "renewBtn": "חדש/שנה",
-    "storeGrade": {
-      "L": "L (מעל 50 פריטים)",
-      "M": "M (עד 50 פריטים)",
-      "S": "S (עד 30 פריטים)"
-    },
-    "storeGradeHint": "{count} מוצרים שלי — בחר דרגה",
     "subscribeBtn": "הירשם",
     "subscribeFail": "עיבוד המנוי נכשל",
     "subscribeSuccess": "המנוי ל-{product} החל בהצלחה!",

@@ -2123,12 +2123,6 @@
       "TRANSLATE": "Auto-Translate Subscription"
     },
     "renewBtn": "Renew/Change",
-    "storeGrade": {
-      "L": "L (50+ items)",
-      "M": "M (up to 50 items)",
-      "S": "S (up to 30 items)"
-    },
-    "storeGradeHint": "My products {count} — select a grade",
     "subscribeBtn": "Subscribe",
     "subscribeFail": "Subscription processing failed",
     "subscribeSuccess": "{product} subscription has started!",

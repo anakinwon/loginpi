@@ -2123,12 +2123,6 @@
       "TRANSLATE": "Automatic Translation Subscription"
     },
     "renewBtn": "I-renew/Baguhin",
-    "storeGrade": {
-      "L": "L (50 o higit pa)",
-      "M": "M (50 o mas kaunti)",
-      "S": "S (30 o mas kaunti)"
-    },
-    "storeGradeHint": "Aking {count} produkto — pumili ng grade",
     "subscribeBtn": "Mag-subscribe",
     "subscribeFail": "Nabigo ang pagproseso ng subscription",
     "subscribeSuccess": "Nagsimula na ang iyong {product} subscription!",

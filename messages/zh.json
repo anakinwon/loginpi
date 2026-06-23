@@ -2123,12 +2123,6 @@
       "TRANSLATE": "自动翻译订阅"
     },
     "renewBtn": "续订/更改",
-    "storeGrade": {
-      "L": "L (50个↑)",
-      "M": "M (50个↓)",
-      "S": "S (30个↓)"
-    },
-    "storeGradeHint": "我的商品 {count}个 — 请选择等级",
     "subscribeBtn": "订阅",
     "subscribeFail": "订阅处理失败",
     "subscribeSuccess": "{product} 订阅已开始！",

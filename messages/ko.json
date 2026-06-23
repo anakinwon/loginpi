@@ -1827,18 +1827,12 @@
     "subscribeSuccess": "{product} 구독이 시작되었습니다!",
     "subscribeFail": "구독 처리에 실패했습니다",
     "insufficient": "Bean 잔액이 부족합니다 — 먼저 충전해 주세요",
-    "storeGradeHint": "내 상품 {count}개 — 등급을 선택하세요",
     "expireAt": "만료일: {date}",
     "notice": "구독료는 충전한 Bean에서 차감됩니다. 연간은 2개월 무료. 환금 불가·플랫폼 사용 전용.",
     "product": {
       "PICAFE": "PiCafé™ 구독",
       "PISHOP": "PiShop™ 구독",
       "TRANSLATE": "자동번역 구독"
-    },
-    "storeGrade": {
-      "S": "S (30개↓)",
-      "M": "M (50개↓)",
-      "L": "L (50개↑)"
     },
     "feat": {
       "PICAFE": [
@@ -1848,7 +1842,7 @@
       "PISHOP": [
         "상품 노출 요금 면제",
         "프리미엄 상품 생성 요금 면제",
-        "등급별 상품 수 한도 제공"
+        "무제한 상품 등록"
       ],
       "TRANSLATE": [
         "메시지 자동번역 무제한",

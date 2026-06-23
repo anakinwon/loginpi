@@ -2123,12 +2123,6 @@
       "TRANSLATE": "Abonnement Traduction automatique"
     },
     "renewBtn": "Renouveler/Modifier",
-    "storeGrade": {
-      "L": "L (50↑)",
-      "M": "M (50↓)",
-      "S": "S (30↓)"
-    },
-    "storeGradeHint": "Mes produits : {count} — sélectionnez un grade",
     "subscribeBtn": "S'abonner",
     "subscribeFail": "Échec du traitement de l'abonnement",
     "subscribeSuccess": "Votre abonnement {product} a commencé !",

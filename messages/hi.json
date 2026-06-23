@@ -2123,12 +2123,6 @@
       "TRANSLATE": "स्वचालित अनुवाद सदस्यता"
     },
     "renewBtn": "नवीनीकृत/बदलें",
-    "storeGrade": {
-      "L": "L (50↑)",
-      "M": "M (50↓)",
-      "S": "S (30↓)"
-    },
-    "storeGradeHint": "मेरे {count} उत्पाद — ग्रेड चुनें",
     "subscribeBtn": "सदस्यता लें",
     "subscribeFail": "सदस्यता प्रक्रिया विफल रही",
     "subscribeSuccess": "{product} सदस्यता शुरू हो गई है!",

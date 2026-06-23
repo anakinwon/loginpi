@@ -2123,12 +2123,6 @@
       "TRANSLATE": "Đăng ký Dịch tự động"
     },
     "renewBtn": "Gia hạn/Thay đổi",
-    "storeGrade": {
-      "L": "L (trên 50)",
-      "M": "M (dưới 50)",
-      "S": "S (dưới 30)"
-    },
-    "storeGradeHint": "Sản phẩm của tôi {count} — Chọn cấp độ",
     "subscribeBtn": "Đăng ký",
     "subscribeFail": "Xử lý đăng ký thất bại",
     "subscribeSuccess": "Đăng ký {product} của bạn đã bắt đầu!",

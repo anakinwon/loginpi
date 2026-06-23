@@ -2123,12 +2123,6 @@
       "TRANSLATE": "Automaattõlke tellimus"
     },
     "renewBtn": "Uuenda/Muuda",
-    "storeGrade": {
-      "L": "L (üle 50)",
-      "M": "M (kuni 50)",
-      "S": "S (kuni 30)"
-    },
-    "storeGradeHint": "Minu {count} toodet — vali tase",
     "subscribeBtn": "Telli",
     "subscribeFail": "Tellimuse töötlemine ebaõnnestus",
     "subscribeSuccess": "{product} tellimus on alanud!",

@@ -2123,12 +2123,6 @@
       "TRANSLATE": "自動翻訳 購読"
     },
     "renewBtn": "更新/変更",
-    "storeGrade": {
-      "L": "L (50個↑)",
-      "M": "M (50個↓)",
-      "S": "S (30個↓)"
-    },
-    "storeGradeHint": "商品 {count}個 — グレードを選択してください",
     "subscribeBtn": "購読する",
     "subscribeFail": "購読処理に失敗しました",
     "subscribeSuccess": "{product} の購読が開始されました！",

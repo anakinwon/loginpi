@@ -2123,12 +2123,6 @@
       "TRANSLATE": "اشتراك الترجمة التلقائية"
     },
     "renewBtn": "تجديد/تغيير",
-    "storeGrade": {
-      "L": "L (أكثر من 50)",
-      "M": "M (أقل من 50)",
-      "S": "S (أقل من 30)"
-    },
-    "storeGradeHint": "{count} منتج خاص بي — اختر الفئة",
     "subscribeBtn": "اشترك الآن",
     "subscribeFail": "فشل في معالجة الاشتراك",
     "subscribeSuccess": "تم بدء اشتراك {product}!",

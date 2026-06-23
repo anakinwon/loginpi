@@ -87,7 +87,7 @@
 | 1 | **Bean 충전** | Pi→Bean (IN) | 1 Pi = 100 Bean | `payments/complete` `BEAN_CHARGE` · `api/bean/charge` | `txn=CHARGE` | ✅ **라이브** (충전 1건 확인) | ✅ **Pi Browser 필수** |
 | 2 | **카페 생성료** (프리미엄) | Bean (OUT) | 10 | `api/chat/rooms/group` | `ref=ROOM_CREATE` | ✅ **라이브** (1건 확인) | ✅ 일반 브라우저 가능 |
 | 3 | **카페 입장료** (프리미엄) | Bean (OUT) | 10 | `api/chat/rooms/[id]/join` · `[roomId]/page` · `room-entry-fee-gate` | `ref=ROOM_ENTER` | ✅ **라이브** (5건+환불2 확인) | ✅ 일반 브라우저 가능 |
-| 4 | **상품 구독료** (PiCafé™·PiShop™ S/M/L·자동번역) | Bean (OUT) | 1,000~50,000 (§4-1) | `api/subscriptions/products/subscribe` → `fn_bean_subscribe_product` | `bean_subscr` | ✅ **배포됨** (실사용 0건) | ✅ **테스트 가능** (잔액만 있으면) |
+| 4 | **상품 구독료** (PiCafé™·PiShop™·자동번역) | Bean (OUT) | 3,000~50,000 (§4-1) | `api/subscriptions/products/subscribe` → `fn_bean_subscribe_product` | `bean_subscr` | ✅ **배포됨** | ✅ **테스트 가능** |
 | 5 | ~~레거시 구독 (msg_subscr_plan 5종)~~ → #4 Bean 구독 흡수 | Bean (OUT) | §4-1 | `getChatPlan`(bean_subscr 기반) · `api/subscriptions` POST 410 · `payments/complete` `CHAT_SUBSCR` 분기 제거 | `bean_subscr` | ✅ **전환완료** (2026-06-20) | ✅ 일반 브라우저 가능 |
 | 6 | 이벤트방 입장료 | Bean (OUT) | `entry_fee_pi`×100 (호스트 지정 티켓가) | `api/chat/rooms/[id]/join` · `[roomId]/page` · `room-entry-fee-gate` | `ref=EVENT_ENTER` | ✅ **라이브** | ✅ 일반 브라우저 가능 |
 | 7 | 배지 강화 (BADGE_UPGRADE) | Bean (OUT) | 10 Bean (=0.1 Pi) | `api/badges/upgrade` | `refTp=BADGE_UPGRADE` | ✅ **라이브** | ✅ 일반 브라우저 가능 |
@@ -165,7 +165,29 @@ CREATE INDEX idx_bean_fee_plan_ctgr ON public.bean_fee_plan(prod_ctgr_cd, fee_kn
 CREATE INDEX idx_bean_fee_plan_use  ON public.bean_fee_plan(use_yn, del_yn);
 ```
 
-> Pi 환산은 컬럼 추가 없이 표시 시 `amt_bean/100`으로 계산(정본 = Bean 단일). 스토어 구독 S/M/L의 상품 수 한도(30/50/무제한)는 `fee_plan_desc`에 보존(또는 향후 별도 컬럼).
+> Pi 환산은 표시 시 `amt_bean/100`으로 계산(정본 = Bean 단일).
+
+### 3-1. DB화 런타임 아키텍처 (2026-06-24 완료)
+
+```
+bean_fee_plan DB  ←(PATCH)── /api/admin/token/fee-plan  ← 어드민 UI
+       │                              │
+       │                        revalidateTag('subscr-plans')
+       ↓                              ↓
+  bean-fee-db.ts: getSubscrPlans()  (unstable_cache, 60s TTL)
+       │
+  ┌────┴──────────────────┐
+  │                       │
+  ↓                       ↓
+GET /api/subscriptions/  POST /api/subscriptions/
+    products             products/subscribe
+  (plans from DB)        (findPlan from DB, fn_bean_subscribe_product)
+       │
+       ↓
+  client-subscribe.tsx  (resp.plans from API)
+```
+
+**핵심 규칙**: 요금 변경은 **어드민 `/admin/token/fee-plan`에서 `bean_fee_plan.amt_bean` 수정만**으로 완료된다. 코드 배포 불필요. PATCH 즉시 캐시 무효화 → 다음 요청부터 신요금 적용.
 
 ---
 
@@ -175,18 +197,18 @@ CREATE INDEX idx_bean_fee_plan_use  ON public.bean_fee_plan(use_yn, del_yn);
 
 ### 4-1. 구독요금제 (`subscr_div_cd = SUBSCR`, `fee_knd_cd = SUBSCR`)
 
+> **2026-06-24 개정**: PiShop S/M/L 3-tier → 단일 GENERAL 5,000/50,000 Bean 통합. PiTranslate 1,000→3,000/월, 10,000→30,000/년.
+
 | 코드 | 상품구분 | 주기 | Bean | Pi | 설명 |
 |---|---|---|---|---|---|
-| SM100 | PICAFE_SUBSCR | M | 3000 | 30 | 카페 구독 — 단일 품목 |
-| SY100 | PICAFE_SUBSCR | Y | 30000 | 300 | 카페 구독 — 년 |
-| SM200 | PISHOP_SUBSCR (S) | M | 3000 | 30 | 스토어 구독 S — 상품 30개 이하 |
-| SM300 | PISHOP_SUBSCR (M) | M | 4000 | 40 | 스토어 구독 M — 상품 50개 이하 |
-| SM400 | PISHOP_SUBSCR (L) | M | 5000 | 50 | 스토어 구독 L — 상품 50개 초과 |
-| SY200 | PISHOP_SUBSCR (S) | Y | 30000 | 300 | 스토어 구독 S — 년 |
-| SY300 | PISHOP_SUBSCR (M) | Y | 40000 | 400 | 스토어 구독 M — 년 ⚠️("년월단위" 오타) |
-| SY400 | PISHOP_SUBSCR (L) | Y | 50000 | 500 | 스토어 구독 L — 년 |
-| SM500 | TRANSLATE_SUBSCR | M | 1000 | 10 | 자동번역 구독 — 월 |
-| SY500 | TRANSLATE_SUBSCR | Y | 10000 | 100 | 자동번역 구독 — 년 |
+| SM100 | PICAFE_SUBSCR   | M | 3,000  | 30  | 카페 구독 — 월 |
+| SY100 | PICAFE_SUBSCR   | Y | 30,000 | 300 | 카페 구독 — 년 (2개월 무료) |
+| SM200 | PISHOP_SUBSCR   | M | **5,000**  | **50**  | 스토어 구독 — 월 (단일등급, 무제한 상품) |
+| SY200 | PISHOP_SUBSCR   | Y | **50,000** | **500** | 스토어 구독 — 년 (단일등급, 2개월 무료) |
+| SM500 | TRANSLATE_SUBSCR | M | **3,000**  | **30**  | 자동번역 구독 — 월 |
+| SY500 | TRANSLATE_SUBSCR | Y | **30,000** | **300** | 자동번역 구독 — 년 (2개월 무료) |
+
+> 폐기 코드(논리삭제): SM300, SM400, SY300, SY400 (PiShop S/M/L 구분 제거로 불필요)
 
 ### 4-2. 일반요금제 — 카페 (`PICAFE_GENERAL` = 카페일반, `PICAFE_SUBSCR` = 카페구독자 대상)
 
@@ -265,7 +287,7 @@ CREATE INDEX idx_bean_fee_plan_use  ON public.bean_fee_plan(use_yn, del_yn);
 | # | 코드 | 의심 | 확인 필요 |
 |---|---|---|---|
 | 1 | SSPDM vs SSGDM | 프리미엄(5) < 일반(10) — 역전 | 의도? 아니면 값 교정 |
-| 2 | SY300 | "년월단위" 오타 | "년단위"로 교정 |
+| 2 | SY300 | 폐기됨 — PiShop 단일등급 전환(2026-06-24) | 해결됨 |
 | 3 | (전반) | "월구독료(Bean)" 컬럼이 일반요금제선 "건당/노출 요금" 의미 — 컬럼 의미 이중성 | 컬럼명/해석 확정 |
 | 4 | SSGDM(10) vs SGGDM(10) / SSPDM(5) vs SGPDM(20) | 구독자 노출가가 일반보다 낮거나 역전 혼재 | 구독 할인 정책 일관성 확인 |
 
