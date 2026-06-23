@@ -141,7 +141,9 @@ export function isMaliciousAgent(ua: string | null): boolean {
 //   대신 rate limiting·input sanitize·withGuard 3중 방어로 XSS/인젝션 방어.
 export const SECURITY_HEADERS: Record<string, string> = {
   'X-Content-Type-Options': 'nosniff',
-  'X-Frame-Options': 'SAMEORIGIN',
+  // ⚠️ X-Frame-Options 제거: Pi Browser는 앱을 Pi 도메인 iframe으로 임베드하므로
+  //   SAMEORIGIN/DENY 설정 시 net::ERR_BLOCKED_BY_RESPONSE로 페이지 로드 차단(핵심 가치 위반).
+  //   clickjacking 방어는 향후 CSP frame-ancestors로 Pi 도메인만 허용하는 방식으로 복원.
   'X-XSS-Protection': '1; mode=block',
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'Permissions-Policy': 'camera=(self), microphone=(self), geolocation=(self)',
