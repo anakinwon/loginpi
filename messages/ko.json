@@ -21,6 +21,7 @@
       "i18nSection": "다국어",
       "i18n": "다국어 관리",
       "batch": "온디멘드 배치",
+      "logs": "로그 관리",
       "chatSection": "카페 관리",
       "themes": "테마 관리",
       "subscriptions": "구독 관리",
@@ -180,7 +181,19 @@
       "settledSummary": "정산 완료 {count}건",
       "settleColSettledAt": "정산일시",
       "settleColTxid": "송금 txid",
-      "settleTxidCopied": "송금 txid를 복사했습니다"
+      "settleTxidCopied": "송금 txid를 복사했습니다",
+      "schedEventBeanCronWhen": "매시간 정각 (Vercel Cron: 0 * * * *)",
+      "schedEventBeanCronDesc": "오픈베타 이벤트 10미션 완료자에게 5,000 Bean 자동 지급 — fn_evt_grant_bean_reward 멱등(중복 지급 없음)",
+      "schedEventReevalCronWhen": "매일 00:00 UTC (한국시간 09:00)",
+      "schedEventReevalCronDesc": "이벤트 미션 완료 여부 전체 재평가 — 미션 상태 불일치 교정",
+      "schedCampaignGrantCronWhen": "매시간 정각 (Vercel Cron: 0 * * * *)",
+      "schedCampaignGrantCronDesc": "관리자 승인된 캠페인 Bean 보상 미지급자에게 자동 지급",
+      "eventRewardTitle": "이벤트 Bean 보상 즉시 실행",
+      "eventRewardDesc": "오픈베타 이벤트 미션 완료자 중 아직 보상을 받지 못한 사용자에게 즉시 5,000 Bean을 지급합니다. 멱등 처리(중복 지급 없음).",
+      "eventRewardRun": "즉시 실행",
+      "eventRewardSuccess": "완료 — 신규 지급 {granted}명 / 이미 지급됨 {already}명",
+      "eventRewardResult": "대상 {eligible}명 — 신규 지급 {granted}명 / 이미 지급됨 {already}명 / 실패 {failed}건",
+      "eventRewardSkipped": "이벤트 비활성 ({reason})"
     },
     "dashboard": {
       "title": "대시보드",
@@ -275,6 +288,32 @@
         "linkStatus": "연동 상태",
         "role": "역할",
         "joinDate": "가입일시"
+      }
+    },
+    "logs": {
+      "title": "로그 관리",
+      "subtitle": "DB 로그성 테이블의 행수·용량을 점검하고, 운영 로그를 기간 기준으로 정리합니다.",
+      "vercelNote": "이 앱은 Vercel 서버리스에 배포되어 운영서버에 로그 '파일'이 쌓이지 않습니다(함수 로그는 Vercel 대시보드에서 조회). 아래는 실제로 용량이 증가하는 DB 로그성 테이블입니다.",
+      "totalSize": "전체 로그 용량",
+      "totalRows": "전체 로그 행수",
+      "purgeable": "정리 가능",
+      "readonly": "조회 전용",
+      "readonlyHint": "회계·감사 로그 — 삭제 불가",
+      "nothingToPurge": "정리할 데이터 없음",
+      "notCreated": "미생성",
+      "purge": "정리",
+      "daysAgo": "일 이전",
+      "confirmPurge": "{days}일 이전 데이터를 영구 삭제합니다. 되돌릴 수 없습니다.",
+      "confirmDelete": "영구 삭제",
+      "purgeDone": "{label}: {count}건을 삭제했습니다.",
+      "purgeFail": "{label} 정리 실패: {msg}",
+      "col": {
+        "kind": "로그 종류",
+        "category": "분류",
+        "rows": "행수",
+        "size": "용량",
+        "range": "기간(최오래 ~ 최신)",
+        "action": "정리"
       }
     },
     "board": {

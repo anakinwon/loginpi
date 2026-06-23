@@ -34,6 +34,14 @@ interface BackfillResult {
   failedDates: string[]
 }
 
+interface EventRewardResult {
+  granted: number
+  already: number
+  failed: number
+  eligible: number
+  skipped?: string
+}
+
 export function BatchRunner() {
   const t = useTranslations('admin.batch')
 
@@ -47,6 +55,10 @@ export function BatchRunner() {
   const [backfillResult, setBackfillResult] = useState<BackfillResult | null>(
     null,
   )
+
+  const [eventRewardRunning, setEventRewardRunning] = useState(false)
+  const [eventRewardResult, setEventRewardResult] =
+    useState<EventRewardResult | null>(null)
 
   async function runAggregate(date: string) {
     setRunning(true)
@@ -70,6 +82,25 @@ export function BatchRunner() {
       toast.error(t('error', { msg: 'network error' }))
     } finally {
       setRunning(false)
+    }
+  }
+
+  async function runEventReward() {
+    setEventRewardRunning(true)
+    setEventRewardResult(null)
+    try {
+      const res = await piFetch('/api/cron/event-bean-reward', { method: 'POST' })
+      const data = (await res.json()) as EventRewardResult & { error?: string }
+      if (res.ok) {
+        setEventRewardResult(data)
+        toast.success(t('eventRewardSuccess', { granted: data.granted, already: data.already }))
+      } else {
+        toast.error(t('error', { msg: data.error ?? res.status }))
+      }
+    } catch {
+      toast.error(t('error', { msg: 'network error' }))
+    } finally {
+      setEventRewardRunning(false)
     }
   }
 
@@ -212,6 +243,36 @@ export function BatchRunner() {
                 실패 날짜: {backfillResult.failedDates.join(', ')}
               </p>
             )}
+          </div>
+        )}
+      </div>
+      {/* 이벤트 Bean 보상 즉시 실행 */}
+      <div className="space-y-4 rounded-lg border p-5">
+        <div>
+          <p className="text-sm font-semibold">{t('eventRewardTitle')}</p>
+          <p className="text-muted-foreground mt-0.5 text-xs">
+            {t('eventRewardDesc')}
+          </p>
+        </div>
+        <Button
+          onClick={runEventReward}
+          disabled={eventRewardRunning}
+          variant="outline"
+        >
+          {eventRewardRunning ? t('running') : t('eventRewardRun')}
+        </Button>
+        {eventRewardResult && (
+          <div
+            className={`rounded-md px-4 py-2 text-sm ${eventRewardResult.failed === 0 ? 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400' : 'bg-destructive/10 text-destructive'}`}
+          >
+            {eventRewardResult.skipped
+              ? t('eventRewardSkipped', { reason: eventRewardResult.skipped })
+              : t('eventRewardResult', {
+                  eligible: eventRewardResult.eligible,
+                  granted: eventRewardResult.granted,
+                  already: eventRewardResult.already,
+                  failed: eventRewardResult.failed,
+                })}
           </div>
         )}
       </div>

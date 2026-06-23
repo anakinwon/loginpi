@@ -44,6 +44,24 @@ function ScheduleTable({
       when: t('schedOrderBackfillWhen'),
       desc: t('schedOrderBackfillDesc'),
     },
+    {
+      job: 'event_bean_reward',
+      trigger: t('triggerCron'),
+      when: t('schedEventBeanCronWhen'),
+      desc: t('schedEventBeanCronDesc'),
+    },
+    {
+      job: 'event_reeval',
+      trigger: t('triggerCron'),
+      when: t('schedEventReevalCronWhen'),
+      desc: t('schedEventReevalCronDesc'),
+    },
+    {
+      job: 'campaign_grant_all',
+      trigger: t('triggerCron'),
+      when: t('schedCampaignGrantCronWhen'),
+      desc: t('schedCampaignGrantCronDesc'),
+    },
   ]
 
   return (
