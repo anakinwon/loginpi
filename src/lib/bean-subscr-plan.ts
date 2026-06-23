@@ -41,7 +41,7 @@ export const SUBSCR_PLANS: SubscrPlan[] = [
     grade: 'S',
     cycle: 'M',
     bean_amt: 3000,
-    item_limit: 30,
+    item_limit: 10,
   },
   {
     fee_plan_cd: 'SM300',
@@ -49,7 +49,7 @@ export const SUBSCR_PLANS: SubscrPlan[] = [
     grade: 'M',
     cycle: 'M',
     bean_amt: 4000,
-    item_limit: 50,
+    item_limit: 30,
   },
   {
     fee_plan_cd: 'SM400',
@@ -65,7 +65,7 @@ export const SUBSCR_PLANS: SubscrPlan[] = [
     grade: 'S',
     cycle: 'Y',
     bean_amt: 30000,
-    item_limit: 30,
+    item_limit: 10,
   },
   {
     fee_plan_cd: 'SY300',
@@ -73,7 +73,7 @@ export const SUBSCR_PLANS: SubscrPlan[] = [
     grade: 'M',
     cycle: 'Y',
     bean_amt: 40000,
-    item_limit: 50,
+    item_limit: 30,
   },
   {
     fee_plan_cd: 'SY400',
@@ -140,9 +140,9 @@ export function annualSaving(
   }
 }
 
-// PiShop™ 등급 자동 추천 (현재 상품 수 기준): 30개↓ S · 50개↓ M · 초과 L
+// PiShop™ 등급 자동 추천 (현재 상품 수 기준): 10개↓ S · 30개↓ M · 초과 L
 export function recommendStoreGrade(itemCount: number): SubscrGrade {
-  if (itemCount <= 30) return 'S'
-  if (itemCount <= 50) return 'M'
+  if (itemCount <= 10) return 'S'
+  if (itemCount <= 30) return 'M'
   return 'L'
 }

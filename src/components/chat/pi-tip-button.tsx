@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
 import { TIP_PRESETS_BEAN } from '@/lib/bean-shared'
@@ -18,6 +18,21 @@ export function PiTipButton({
   const [open, setOpen] = useState(false)
   const [confirmAmt, setConfirmAmt] = useState<number | null>(null) // null=금액선택, 값=확인단계
   const [sending, setSending] = useState(false)
+  // 선물 프리셋 — 런타임(관리자 설정) 값. 로딩/실패 시 코드 상수로 폴백.
+  const [presets, setPresets] = useState<number[]>([...TIP_PRESETS_BEAN])
+
+  useEffect(() => {
+    let alive = true
+    piFetch('/api/tip-presets')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: { presets?: number[] } | null) => {
+        if (alive && d?.presets?.length === 3) setPresets(d.presets)
+      })
+      .catch(() => {}) // 실패 시 상수 유지
+    return () => {
+      alive = false
+    }
+  }, [])
 
   function close() {
     setOpen(false)
@@ -74,7 +89,7 @@ export function PiTipButton({
                 Bean 금액 선택
               </div>
               <div className="flex gap-1">
-                {TIP_PRESETS_BEAN.map((amt) => (
+                {presets.map((amt) => (
                   <button
                     key={amt}
                     onClick={() => setConfirmAmt(amt)}

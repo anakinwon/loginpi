@@ -1,5 +1,6 @@
 import 'server-only'
 import { getSupabaseAdmin } from './supabase-admin'
+import { TIP_PRESETS_BEAN } from './bean-shared'
 import type { BeanTxn, BeanTxnType } from './bean-shared'
 
 // Bean Token 경제 서버 전용 DB 접근 (PRD_16_TOKEN_MNG v1.2)
@@ -14,6 +15,49 @@ export {
   beanToPi,
 } from './bean-shared'
 export type { BeanTxn, BeanTxnType } from './bean-shared'
+
+interface TipCfgRow {
+  tip1_bean: number
+  tip2_bean: number
+  tip3_bean: number
+}
+
+// 카페방 P2P 선물(팁) 프리셋 — DB 최신행(bean_tip_cfg) 우선, 없거나 오류면 코드 상수 폴백.
+// graceful: sql/107 미적용 시에도 선물 기능이 깨지지 않도록 항상 유효한 3종을 반환한다.
+export async function getTipPresets(): Promise<number[]> {
+  try {
+    const { data, error } = await getSupabaseAdmin()
+      .from('bean_tip_cfg')
+      .select('tip1_bean, tip2_bean, tip3_bean')
+      .eq('del_yn', 'N')
+      .order('reg_dtm', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+    if (error || !data) return [...TIP_PRESETS_BEAN]
+    const row = data as TipCfgRow
+    return [Number(row.tip1_bean), Number(row.tip2_bean), Number(row.tip3_bean)]
+  } catch {
+    return [...TIP_PRESETS_BEAN]
+  }
+}
+
+// 선물 프리셋 변경 — 새 행 INSERT(이력 보존, bean_supply_config 패턴). 호출 전 검증 필수.
+export async function updateTipPresets(
+  presets: [number, number, number],
+  regrId: string,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const [a, b, c] = presets
+  const { error } = await getSupabaseAdmin().from('bean_tip_cfg').insert({
+    tip1_bean: a,
+    tip2_bean: b,
+    tip3_bean: c,
+    note_txt: '관리자 수정',
+    regr_id: regrId,
+    modr_id: regrId,
+  })
+  if (error) return { ok: false, error: error.message }
+  return { ok: true }
+}
 
 interface BeanWallet {
   bean_amt: number

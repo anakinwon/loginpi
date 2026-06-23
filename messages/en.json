@@ -240,6 +240,7 @@
       "batch": "On-demand Batch",
       "beanAudit": "Audit Log",
       "beanFeePlan": "Fee Plan Management",
+      "beanTipPresets": "Gift Presets",
       "beanSection": "☕ Bean Economy",
       "beanToken": "Bean Dashboard",
       "beanTopUsers": "Top Users",

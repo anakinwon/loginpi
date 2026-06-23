@@ -1,15 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
-import { transferBean } from '@/lib/bean'
-import { TIP_PRESETS_BEAN } from '@/lib/bean-shared'
+import { transferBean, getTipPresets } from '@/lib/bean'
 import { broadcastToRoom } from '@/lib/realtime-broadcast'
 import { recordUserAction } from '@/lib/event'
 import { withGuard } from '@/lib/api-guard'
 
 // 카페방 P2P Bean 선물 — Pi 결제가 아닌 Bean 실전송(USER→USER).
 // 보내는 사람 Bean 차감 + 받는 사람 적립을 fn_bean_transfer로 원자적 수행 후 TIP_NOTI 알림.
-const VALID_AMOUNTS = TIP_PRESETS_BEAN as readonly number[]
+// 허용 금액은 런타임 프리셋(getTipPresets)을 읽어 관리자 화면 변경과 즉시 일치 — UI/검증 단일 출처.
 
 async function handlePOST(request: NextRequest) {
   const user = await getSessionUser()
@@ -39,9 +38,10 @@ async function handlePOST(request: NextRequest) {
     )
   }
 
-  if (!VALID_AMOUNTS.includes(amount)) {
+  const validAmounts = await getTipPresets()
+  if (!validAmounts.includes(amount)) {
     return NextResponse.json(
-      { error: `유효한 금액: ${VALID_AMOUNTS.join(', ')} Bean` },
+      { error: `유효한 금액: ${validAmounts.join(', ')} Bean` },
       { status: 400 },
     )
   }

@@ -58,12 +58,12 @@ VALUES
 -- §4-1. 구독요금제 (SUBSCR) — 10행
 ('SM100','SUBSCR','PICAFE_SUBSCR', 'SUBSCR','GENERAL','M',  3000, 0,'카페 구독 월', 10),
 ('SY100','SUBSCR','PICAFE_SUBSCR', 'SUBSCR','GENERAL','Y', 30000, 0,'카페 구독 년', 11),
-('SM200','SUBSCR','PISHOP_SUBSCR','SUBSCR','S',      'M',  3000,30,'스토어 구독 S 월 (상품 30개 이하)', 20),
-('SM300','SUBSCR','PISHOP_SUBSCR','SUBSCR','M',      'M',  4000,50,'스토어 구독 M 월 (상품 50개 이하)', 21),
-('SM400','SUBSCR','PISHOP_SUBSCR','SUBSCR','L',      'M',  5000, 0,'스토어 구독 L 월 (상품 50개 초과)', 22),
-('SY200','SUBSCR','PISHOP_SUBSCR','SUBSCR','S',      'Y', 30000,30,'스토어 구독 S 년 (상품 30개 이하)', 23),
-('SY300','SUBSCR','PISHOP_SUBSCR','SUBSCR','M',      'Y', 40000,50,'스토어 구독 M 년 (상품 50개 이하)', 24),
-('SY400','SUBSCR','PISHOP_SUBSCR','SUBSCR','L',      'Y', 50000, 0,'스토어 구독 L 년 (상품 50개 초과)', 25),
+('SM200','SUBSCR','PISHOP_SUBSCR','SUBSCR','S',      'M',  3000,10,'스토어 구독 S 월 (상품 10개 이하)', 20),
+('SM300','SUBSCR','PISHOP_SUBSCR','SUBSCR','M',      'M',  4000,30,'스토어 구독 M 월 (상품 30개 이하)', 21),
+('SM400','SUBSCR','PISHOP_SUBSCR','SUBSCR','L',      'M',  5000, 0,'스토어 구독 L 월 (상품 30개 초과)', 22),
+('SY200','SUBSCR','PISHOP_SUBSCR','SUBSCR','S',      'Y', 30000,10,'스토어 구독 S 년 (상품 10개 이하)', 23),
+('SY300','SUBSCR','PISHOP_SUBSCR','SUBSCR','M',      'Y', 40000,30,'스토어 구독 M 년 (상품 30개 이하)', 24),
+('SY400','SUBSCR','PISHOP_SUBSCR','SUBSCR','L',      'Y', 50000, 0,'스토어 구독 L 년 (상품 30개 초과)', 25),
 ('SM500','SUBSCR','TRANSLATE_SUBSCR','SUBSCR','GENERAL','M', 1000, 0,'자동번역 구독 월', 30),
 ('SY500','SUBSCR','TRANSLATE_SUBSCR','SUBSCR','GENERAL','Y',10000, 0,'자동번역 구독 년', 31),
 

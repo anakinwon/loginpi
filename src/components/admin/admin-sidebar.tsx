@@ -47,6 +47,7 @@ const BEAN_NAV = [
   { href: '/admin/token/top-users', labelKey: 'beanTopUsers' },
   { href: '/admin/token/audit', labelKey: 'beanAudit' },
   { href: '/admin/token/fee-plan', labelKey: 'beanFeePlan' },
+  { href: '/admin/token/tip-presets', labelKey: 'beanTipPresets' },
   { href: '/admin/campaign', labelKey: 'campaign' },
 ] as const
 
