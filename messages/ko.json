@@ -214,7 +214,8 @@
       "title": "결제 내역",
       "totalCount": "전체 {count}건 · 완료 합계 {total} π",
       "noPayments": "결제 내역이 없습니다.",
-      "searchPiUsername": "Pi 사용자명 검색 (앞부분 일치)",
+      "searchPiUsername": "Pi 사용자명 검색 (2글자 이상)",
+      "searchResultCount": "검색결과 {count}건",
       "status": {
         "completed": "완료",
         "approved": "승인",
@@ -255,6 +256,8 @@
       "title": "계정 연동 현황",
       "totalCount": "전체 {count}명",
       "noUsers": "해당 사용자가 없습니다.",
+      "searchPiUsername": "Pi 사용자명 검색 (2글자 이상)",
+      "searchResultCount": "검색결과 {count}명",
       "status": {
         "linked": "연동 완료",
         "piOnly": "Pi 전용",

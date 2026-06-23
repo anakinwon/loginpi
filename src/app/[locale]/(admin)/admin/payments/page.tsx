@@ -53,11 +53,15 @@ const STATUS_STYLE: Record<TxnStatus, string> = {
 export default function PaymentsPage() {
   const t = useTranslations('admin.payments')
   const tc = useTranslations('common')
+
+  // allPayments: 통계·총매출·필터칩 카운트용(검색과 무관) / payments: 목록용(검색 결과 반영)
+  const [allPayments, setAllPayments] = useState<TxnRow[]>([])
   const [payments, setPayments] = useState<TxnRow[]>([])
   const [loading, setLoading] = useState(true)
+  const [searching, setSearching] = useState(false)
   const [filter, setFilter] = useState<TxnStatus | 'all'>('all')
   const [divFilter, setDivFilter] = useState<TxnDivCd | 'all'>('all')
-  const [search, setSearch] = useState('') // pi_username prefix 검색
+  const [search, setSearch] = useState('') // pi_username 부분일치(trigram) 검색
   const [page, setPage] = useState(1)
   const limit = useDynamicLimit(CHROME_PX)
 
@@ -66,26 +70,47 @@ export default function PaymentsPage() {
     setPage(1)
   }, [limit, filter, divFilter, search])
 
+  // 최초 전체 로드 (통계 + 목록 초기값)
   useEffect(() => {
     fetch('/api/admin/payments')
       .then((r) => r.json())
-      .then((d: { payments: TxnRow[] }) => setPayments(d.payments ?? []))
+      .then((d: { payments: TxnRow[] }) => {
+        setAllPayments(d.payments ?? [])
+        setPayments(d.payments ?? [])
+      })
       .finally(() => setLoading(false))
   }, [])
 
-  const q = search.trim().toLowerCase()
+  // username 검색 (debounce). 2글자 미만이면 서버 호출 없이 전체(allPayments) 표시.
+  // 서버에서 pi_username을 pg_trgm GIN(.ilike '%q%')으로 부분일치 검색한다.
+  useEffect(() => {
+    const term = search.trim()
+    if (term.length < 2) {
+      setPayments(allPayments)
+      setSearching(false)
+      return
+    }
+    setSearching(true)
+    const h = setTimeout(() => {
+      fetch(`/api/admin/payments?q=${encodeURIComponent(term)}`)
+        .then((r) => r.json())
+        .then((d: { payments: TxnRow[] }) => setPayments(d.payments ?? []))
+        .finally(() => setSearching(false))
+    }, 300)
+    return () => clearTimeout(h)
+  }, [search, allPayments])
+
+  // 목록은 검색 결과(payments)에 상태·거래구분 필터만 적용 (username 검색은 서버 처리)
   const filtered = payments.filter(
     (p) =>
       (filter === 'all' || p.status === filter) &&
-      (divFilter === 'all' || p.txn_div_cd === divFilter) &&
-      // pi_username LIKE 'q%' (대소문자 무시 prefix 검색)
-      (q === '' || (p.sys_user?.pi_username ?? '').toLowerCase().startsWith(q)),
+      (divFilter === 'all' || p.txn_div_cd === divFilter),
   )
   const totalPages = Math.ceil(filtered.length / limit)
   const displayedPayments = filtered.slice((page - 1) * limit, page * limit)
 
-  // 총매출 — 결제 계열(환불·수수료 제외) 완료 거래만 합산
-  const totalPi = payments
+  // 총매출 — 결제 계열(환불·수수료 제외) 완료 거래만 합산 (전체 기준)
+  const totalPi = allPayments
     .filter((p) => p.status === 'completed' && isPaymentDiv(p.txn_div_cd))
     .reduce((sum, p) => sum + p.amount, 0)
 
@@ -97,9 +122,9 @@ export default function PaymentsPage() {
     error: t('status.error'),
   }
 
-  // 화면에 실제로 존재하는 거래구분만 필터칩으로 노출 (빈 구분 숨김)
+  // 화면에 실제로 존재하는 거래구분만 필터칩으로 노출 (빈 구분 숨김, 전체 기준)
   const presentDivs = TXN_DIV_CODES.filter((cd) =>
-    payments.some((p) => p.txn_div_cd === cd),
+    allPayments.some((p) => p.txn_div_cd === cd),
   )
 
   return (
@@ -108,20 +133,32 @@ export default function PaymentsPage() {
         <h1 className="text-2xl font-bold">{t('title')}</h1>
         <p className="text-muted-foreground mt-1 text-sm">
           {t('totalCount', {
-            count: payments.length,
+            count: allPayments.length,
             total: totalPi.toFixed(4),
           })}
         </p>
       </div>
 
-      {/* Pi 사용자명 검색 (앞부분 일치) */}
-      <input
-        type="text"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        placeholder={t('searchPiUsername')}
-        className="border-input bg-background h-9 w-full max-w-xs rounded-md border px-3 text-sm"
-      />
+      {/* Pi 사용자명 검색 (부분일치 — 서버 pg_trgm GIN) */}
+      <div className="flex items-center gap-2">
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder={t('searchPiUsername')}
+          className="border-input bg-background h-9 w-full max-w-xs rounded-md border px-3 text-sm"
+        />
+        {searching && (
+          <span className="text-muted-foreground animate-pulse text-xs">
+            {tc('fetching')}
+          </span>
+        )}
+        {search.trim().length >= 2 && !searching && (
+          <span className="text-muted-foreground text-xs">
+            {t('searchResultCount', { count: payments.length })}
+          </span>
+        )}
+      </div>
 
       {/* 상태 필터 */}
       <div className="flex flex-wrap gap-2">
@@ -147,7 +184,7 @@ export default function PaymentsPage() {
             {s === 'all' ? tc('all') : STATUS_LABEL[s]}
             {s !== 'all' && (
               <span className="ml-1">
-                ({payments.filter((p) => p.status === s).length})
+                ({allPayments.filter((p) => p.status === s).length})
               </span>
             )}
           </button>
@@ -178,7 +215,7 @@ export default function PaymentsPage() {
           >
             {TXN_DIV_EMOJI[cd]} {t(`txnDiv.${cd}`)}
             <span className="ml-1">
-              ({payments.filter((p) => p.txn_div_cd === cd).length})
+              ({allPayments.filter((p) => p.txn_div_cd === cd).length})
             </span>
           </button>
         ))}

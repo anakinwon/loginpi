@@ -6,8 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useDynamicLimit } from '@/hooks/use-dynamic-limit'
 import { AdminPagination } from '@/components/admin/admin-pagination'
 
-// p-6(48) + 제목+설명(56) + gap(16) + 통계카드(100) + gap(16) + 필터칩(36) + gap(16) + 테이블헤더(33) + gap(16) + 페이지네이션(36)
-const CHROME_PX = 373
+// p-6(48) + 제목+설명(56) + gap(16) + 통계카드(100) + gap(16) + 검색(36) + gap(16) + 필터칩(36) + gap(16) + 테이블헤더(33) + gap(16) + 페이지네이션(36)
+const CHROME_PX = 425
 
 type LinkStatus = 'linked' | 'pi_only' | 'google_only'
 
@@ -41,23 +41,51 @@ const STATUS_STYLE: Record<LinkStatus, string> = {
 export default function LinksPage() {
   const t = useTranslations('admin.links')
   const tc = useTranslations('common')
+
+  // allUsers: 통계카드·필터칩 카운트용(검색과 무관) / users: 목록용(검색 결과 반영)
+  const [allUsers, setAllUsers] = useState<UserRow[]>([])
   const [users, setUsers] = useState<UserRow[]>([])
   const [loading, setLoading] = useState(true)
+  const [searching, setSearching] = useState(false)
   const [filter, setFilter] = useState<LinkStatus | 'all'>('all')
+  const [search, setSearch] = useState('') // pi_username 부분일치(trigram) 검색
   const [page, setPage] = useState(1)
   const limit = useDynamicLimit(CHROME_PX)
 
-  // limit 또는 필터 변경 시 첫 페이지로 리셋
+  // limit 또는 필터/검색 변경 시 첫 페이지로 리셋
   useEffect(() => {
     setPage(1)
-  }, [limit, filter])
+  }, [limit, filter, search])
 
+  // 최초 전체 로드 (통계 + 목록 초기값)
   useEffect(() => {
     fetch('/api/admin/links')
       .then((r) => r.json())
-      .then((d: { users: UserRow[] }) => setUsers(d.users ?? []))
+      .then((d: { users: UserRow[] }) => {
+        setAllUsers(d.users ?? [])
+        setUsers(d.users ?? [])
+      })
       .finally(() => setLoading(false))
   }, [])
+
+  // username 검색 (debounce). 2글자 미만이면 서버 호출 없이 전체(allUsers) 표시.
+  // 서버에서 pi_username을 pg_trgm GIN(.ilike '%q%')으로 부분일치 검색한다.
+  useEffect(() => {
+    const term = search.trim()
+    if (term.length < 2) {
+      setUsers(allUsers)
+      setSearching(false)
+      return
+    }
+    setSearching(true)
+    const h = setTimeout(() => {
+      fetch(`/api/admin/links?q=${encodeURIComponent(term)}`)
+        .then((r) => r.json())
+        .then((d: { users: UserRow[] }) => setUsers(d.users ?? []))
+        .finally(() => setSearching(false))
+    }, 300)
+    return () => clearTimeout(h)
+  }, [search, allUsers])
 
   const STATUS_LABEL: Record<LinkStatus, string> = {
     linked: t('status.linked'),
@@ -65,12 +93,15 @@ export default function LinksPage() {
     google_only: t('status.googleOnly'),
   }
 
+  // 통계·필터칩 카운트는 전체(allUsers) 기준 유지 (검색 무관)
   const counts = {
-    linked: users.filter((u) => getLinkStatus(u) === 'linked').length,
-    pi_only: users.filter((u) => getLinkStatus(u) === 'pi_only').length,
-    google_only: users.filter((u) => getLinkStatus(u) === 'google_only').length,
+    linked: allUsers.filter((u) => getLinkStatus(u) === 'linked').length,
+    pi_only: allUsers.filter((u) => getLinkStatus(u) === 'pi_only').length,
+    google_only: allUsers.filter((u) => getLinkStatus(u) === 'google_only')
+      .length,
   }
 
+  // 목록은 검색 결과(users)에 연동상태 필터만 적용 (username 검색은 서버 처리)
   const filtered =
     filter === 'all' ? users : users.filter((u) => getLinkStatus(u) === filter)
   const totalPages = Math.ceil(filtered.length / limit)
@@ -102,7 +133,7 @@ export default function LinksPage() {
       <div>
         <h1 className="text-2xl font-bold">{t('title')}</h1>
         <p className="text-muted-foreground mt-1 text-sm">
-          {t('totalCount', { count: users.length })}
+          {t('totalCount', { count: allUsers.length })}
         </p>
       </div>
 
@@ -130,6 +161,27 @@ export default function LinksPage() {
         ))}
       </div>
 
+      {/* Pi 사용자명 검색 (부분일치 — 서버 pg_trgm GIN) */}
+      <div className="flex items-center gap-2">
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder={t('searchPiUsername')}
+          className="border-input bg-background h-9 w-full max-w-xs rounded-md border px-3 text-sm"
+        />
+        {searching && (
+          <span className="text-muted-foreground animate-pulse text-xs">
+            {tc('fetching')}
+          </span>
+        )}
+        {search.trim().length >= 2 && !searching && (
+          <span className="text-muted-foreground text-xs">
+            {t('searchResultCount', { count: users.length })}
+          </span>
+        )}
+      </div>
+
       <div className="flex flex-wrap gap-2">
         {(['all', 'linked', 'pi_only', 'google_only'] as const).map((s) => (
           <button
@@ -142,7 +194,7 @@ export default function LinksPage() {
             }`}
           >
             {s === 'all'
-              ? `${tc('all')} (${users.length})`
+              ? `${tc('all')} (${allUsers.length})`
               : `${STATUS_LABEL[s]} (${counts[s]})`}
           </button>
         ))}

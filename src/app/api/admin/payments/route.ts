@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { type TxnDivCd, pymntTypeToDiv, mpsTxnToDiv } from '@/lib/txn-div'
@@ -6,6 +6,14 @@ import { type TxnDivCd, pymntTypeToDiv, mpsTxnToDiv } from '@/lib/txn-div'
 // 결제 내역 = pi_pymnt(U2A 결제) + mps_txn_hist(취소·환불·수수료·정산) 통합.
 // 각 거래에 거래구분코드(txn_div_cd)를 부여해 단일 목록으로 반환한다.
 // ESCROW_IN은 pi_pymnt MPS_ESCROW와 동일 입금이라 mps 쪽에서 제외(mpsTxnToDiv가 null).
+//
+// q(검색어)가 오면 sys_user.pi_username을 trigram GIN(.ilike '%q%')으로 먼저 좁혀
+// 매칭된 user_id 집합으로 pi_pymnt·mps_txn_hist를 한정한다(subscriptions와 동일 패턴).
+
+// LIKE 와일드카드(%, _, \) 이스케이프 — 사용자 입력이 패턴으로 오작동/주입되지 않게.
+function escapeLike(s: string): string {
+  return s.replace(/[\\%_]/g, '\\$&')
+}
 
 interface PymntMeta {
   type?: string
@@ -31,30 +39,50 @@ interface UnifiedTxn {
   sys_user: UserRef | null
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const requester = await getSessionUser()
   if (!isAdmin(requester)) {
     return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
   }
 
   const db = getSupabaseAdmin()
+  const q = (new URL(req.url).searchParams.get('q') ?? '').trim()
+
+  // 검색어가 있으면(2글자↑) pi_username 부분일치(trigram GIN)로 user_id 후보를 먼저 구한다.
+  // trigram은 3글자 단위라 2글자 미만은 의미가 적어 검색 자체를 생략(전체 반환).
+  let matchedIds: string[] | null = null
+  if (q.length >= 2) {
+    const { data: users } = await db
+      .from('sys_user')
+      .select('id')
+      .ilike('pi_username', `%${escapeLike(q)}%`)
+    matchedIds = (users ?? []).map((u) => u.id)
+    // 매칭 사용자가 없으면 결제도 없음 — 빈 결과 즉시 반환
+    if (matchedIds.length === 0) {
+      return NextResponse.json({ payments: [] })
+    }
+  }
 
   // 결제외 거래만(REFUND_IN·FEE·CANCEL_FEE_IN·RELEASE_OUT) — ESCROW_IN 제외
-  const [pymntRes, mpsRes] = await Promise.all([
-    db
-      .from('pi_pymnt')
-      .select(
-        `id, payment_id, txid, amount, memo, status, metadata, reg_dtm,
-         sys_user ( display_name, nick_nm, real_nm, pi_username, google_email )`,
-      )
-      .order('reg_dtm', { ascending: false }),
-    db
-      .from('mps_txn_hist')
-      .select('txn_id, user_id, txn_type_cd, pi_amt, pi_txid, memo, txn_dtm')
-      .eq('del_yn', 'N')
-      .in('txn_type_cd', ['REFUND_IN', 'FEE', 'CANCEL_FEE_IN', 'RELEASE_OUT'])
-      .order('txn_dtm', { ascending: false }),
-  ])
+  let pymntQuery = db
+    .from('pi_pymnt')
+    .select(
+      `id, payment_id, txid, amount, memo, status, metadata, reg_dtm,
+       sys_user ( display_name, nick_nm, real_nm, pi_username, google_email )`,
+    )
+    .order('reg_dtm', { ascending: false })
+  let mpsQuery = db
+    .from('mps_txn_hist')
+    .select('txn_id, user_id, txn_type_cd, pi_amt, pi_txid, memo, txn_dtm')
+    .eq('del_yn', 'N')
+    .in('txn_type_cd', ['REFUND_IN', 'FEE', 'CANCEL_FEE_IN', 'RELEASE_OUT'])
+    .order('txn_dtm', { ascending: false })
+  if (matchedIds) {
+    pymntQuery = pymntQuery.in('user_id', matchedIds)
+    mpsQuery = mpsQuery.in('user_id', matchedIds)
+  }
+
+  const [pymntRes, mpsRes] = await Promise.all([pymntQuery, mpsQuery])
 
   if (pymntRes.error) {
     return NextResponse.json({ error: '결제 내역 조회 실패' }, { status: 500 })
