@@ -10,8 +10,8 @@ export async function GET() {
 
   const db = getSupabaseAdmin()
 
-  // 병렬 집계: 발행(충전+프로모션)·유통·4종 거버넌스 지갑·일별 트렌드·보상 지급
-  const [chargeRes, mintRes, circulatingRes, govWalletsRes, dailyRes, rewardRes] =
+  // 병렬 집계: 발행(충전+프로모션)·유통·4종 거버넌스 지갑·일별 트렌드·보상 지급+출처별 분해
+  const [chargeRes, mintRes, circulatingRes, govWalletsRes, dailyRes, rewardRes, campaignRes] =
     await Promise.all([
       // 충전 발행 = CHARGE 거래 합계
       db
@@ -35,11 +35,16 @@ export async function GET() {
         .eq('del_yn', 'N'),
       // 최근 30일 일별 CHARGE 집계
       db.rpc('fn_bean_daily_stats').limit(30),
-      // 보상 지급 누계 = REWARD 거래 합계 (이벤트·캠페인으로 USER에게 지급된 Bean)
+      // 보상 지급 누계 = REWARD 거래 + 출처별 분해 (ref_tp_cd / ref_id)
       db
         .from('bean_txn')
-        .select('bean_amt')
+        .select('bean_amt, ref_tp_cd, ref_id')
         .eq('txn_tp_cd', 'REWARD')
+        .eq('del_yn', 'N'),
+      // 캠페인 이름 조회 (ref_id → 표시명 변환용)
+      db
+        .from('bean_campaign')
+        .select('campaign_cd, campaign_nm')
         .eq('del_yn', 'N'),
     ])
 
@@ -51,11 +56,50 @@ export async function GET() {
     (s, r) => s + Number(r.bean_amt),
     0,
   )
-  // 보상 지급 누계 (양수 합계) — 정보성 지표. 발행(mint)으로 재원 확보 후 지급되므로 항등식과 무관
-  const rewardGranted = (rewardRes.data ?? []).reduce(
-    (s, r) => s + Number(r.bean_amt),
-    0,
+
+  // 보상 지급 누계 + 출처별(이벤트/캠페인) 분해
+  const campaignNameMap = new Map(
+    (campaignRes.data ?? []).map((c) => [
+      c.campaign_cd as string,
+      c.campaign_nm as string,
+    ]),
   )
+
+  type RewardRow = { bean_amt: number; ref_tp_cd: string | null; ref_id: string | null }
+  const rewardRows = (rewardRes.data ?? []) as RewardRow[]
+  const rewardGranted = rewardRows.reduce((s, r) => s + Number(r.bean_amt), 0)
+
+  // ref_tp_cd + ref_id 조합별 합산 — 이벤트 #1 / 이벤트 #2 구분
+  const srcMap = new Map<string, { label: string; bean: number; order: number }>()
+  for (const r of rewardRows) {
+    const key = `${r.ref_tp_cd ?? ''}:${r.ref_id ?? ''}`
+    if (!srcMap.has(key)) {
+      let label: string
+      let order: number
+      if (r.ref_tp_cd === 'EVENT_REWARD') {
+        label = '이벤트 #1 · 오픈베타 미션 완주'
+        order = 1
+      } else if (r.ref_tp_cd === 'CAMPAIGN') {
+        const nm = campaignNameMap.get(r.ref_id ?? '') ?? r.ref_id ?? '알 수 없음'
+        // SHOP_ONBOARD = 이벤트 #2, 이후 캠페인은 이름 그대로 표시
+        label =
+          r.ref_id === 'SHOP_ONBOARD'
+            ? `이벤트 #2 · ${nm}`
+            : `캠페인 · ${nm}`
+        order = r.ref_id === 'SHOP_ONBOARD' ? 2 : 99
+      } else {
+        label = r.ref_tp_cd ?? '기타'
+        order = 100
+      }
+      srcMap.set(key, { label, bean: 0, order })
+    }
+    const cur = srcMap.get(key)!
+    cur.bean += Number(r.bean_amt)
+  }
+
+  const rewardBreakdown = [...srcMap.values()]
+    .sort((a, b) => a.order - b.order || b.bean - a.bean)
+    .map(({ label, bean }) => ({ label, bean }))
   // 총 발행 = 충전(현금) + 프로모션(보조금). 둘 다 유통/회수로 흘러가므로 항등식 좌변에 포함
   const totalIssued = chargeIssued + mintIssued
   const circulating = (circulatingRes.data ?? []).reduce(
@@ -89,6 +133,7 @@ export async function GET() {
       mint_issued_bean: mintIssued,
       // 보상 지급 누계 (REWARD 거래 — 이벤트·캠페인 지급액)
       reward_granted_bean: rewardGranted,
+      reward_breakdown: rewardBreakdown,
       circulating_bean: circulating,
       circulating_pi: circulating / 100,
       total_collected_bean: totalCollected,

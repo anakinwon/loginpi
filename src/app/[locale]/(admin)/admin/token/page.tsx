@@ -12,6 +12,7 @@ interface TokenKpi {
   charge_issued_bean: number
   mint_issued_bean: number
   reward_granted_bean: number
+  reward_breakdown: { label: string; bean: number }[]
   circulating_bean: number
   circulating_pi: number
   total_collected_bean: number
@@ -122,6 +123,46 @@ function BsRow({
   )
 }
 
+// 보상 지급 누계 박스 — 합계 + 이벤트/캠페인별 세부 분해
+function RewardBreakdownBox({ kpi }: { kpi: TokenKpi }) {
+  const breakdown = kpi.reward_breakdown ?? []
+  return (
+    <div className="mt-2 rounded-md bg-teal-50 px-2.5 py-1.5 dark:bg-teal-950/30">
+      <BsRow
+        label="🎁 보상 지급 누계 (이벤트·캠페인)"
+        bean={kpi.reward_granted_bean}
+        strong
+        dotColor="bg-teal-500"
+      />
+      {breakdown.length > 0 ? (
+        <div className="mt-1 border-t border-teal-200 pt-1 dark:border-teal-800">
+          {breakdown.map((item) => (
+            <div
+              key={item.label}
+              className="flex items-baseline justify-between gap-2 py-0.5 pl-3"
+            >
+              <span className="text-muted-foreground text-xs">{item.label}</span>
+              <span className="text-xs font-medium tabular-nums">
+                {item.bean.toLocaleString()}
+                <span className="text-muted-foreground ml-1">
+                  ≈ π{(item.bean / 100).toFixed(2)}
+                </span>
+              </span>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="text-muted-foreground mt-0.5 text-xs">
+          REWARD 거래 없음
+        </p>
+      )}
+      <p className="text-muted-foreground mt-1 text-xs">
+        mint로 재원 확보 후 사용자에게 지급된 Bean
+      </p>
+    </div>
+  )
+}
+
 // Bean 대차대조표 — 차변(발행) = 대변(유통 + 회수)
 function BalanceSheet({ kpi }: { kpi: TokenKpi }) {
   const debit = kpi.total_issued_bean // 차변: 발행 원천
@@ -177,18 +218,8 @@ function BalanceSheet({ kpi }: { kpi: TokenKpi }) {
             충전(Pi 결제) + 보상·프로모션(mint) 합계. 이 중 보상 지급 누계는 아래
             참조
           </p>
-          {/* 보상 지급 누계 (REWARD) — 이벤트·캠페인으로 USER에게 지급된 Bean */}
-          <div className="mt-2 rounded-md bg-teal-50 px-2.5 py-1.5 dark:bg-teal-950/30">
-            <BsRow
-              label="🎁 보상 지급 누계 (이벤트·캠페인)"
-              bean={kpi.reward_granted_bean}
-              strong
-              dotColor="bg-teal-500"
-            />
-            <p className="text-muted-foreground mt-0.5 text-xs">
-              REWARD 거래 합계 — mint로 재원 확보 후 사용자에게 지급된 Bean
-            </p>
-          </div>
+          {/* 보상 지급 누계 (REWARD) — 이벤트/캠페인별 세부 분해 */}
+          <RewardBreakdownBox kpi={kpi} />
         </div>
 
         {/* ── 대변 (우변) ── */}
