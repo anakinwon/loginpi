@@ -272,7 +272,8 @@
       "subscriptions": "Pengurusan Langganan",
       "themes": "Pengurusan Theme",
       "title": "Admin",
-      "users": "Pengurusan Pengguna"
+      "users": "Pengurusan Pengguna",
+      "subscrPricing": "구독요금제"
     },
     "payments": {
       "col": {

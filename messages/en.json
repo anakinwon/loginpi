@@ -273,7 +273,8 @@
       "subscriptions": "Subscription Management",
       "themes": "Theme Management",
       "title": "Admin",
-      "users": "User Management"
+      "users": "User Management",
+      "subscrPricing": "구독요금제"
     },
     "payments": {
       "col": {

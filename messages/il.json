@@ -272,7 +272,8 @@
       "subscriptions": "ניהול מנויים",
       "themes": "ניהול Theme",
       "title": "מנהל",
-      "users": "ניהול משתמשים"
+      "users": "ניהול משתמשים",
+      "subscrPricing": "구독요금제"
     },
     "payments": {
       "col": {

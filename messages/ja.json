@@ -272,7 +272,8 @@
       "subscriptions": "購読管理",
       "themes": "テーマ管理",
       "title": "Admin",
-      "users": "ユーザー管理"
+      "users": "ユーザー管理",
+      "subscrPricing": "구독요금제"
     },
     "payments": {
       "col": {

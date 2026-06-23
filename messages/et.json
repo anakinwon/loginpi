@@ -272,7 +272,8 @@
       "subscriptions": "Tellimuste haldus",
       "themes": "Teemade haldus",
       "title": "Admin",
-      "users": "Kasutajate haldus"
+      "users": "Kasutajate haldus",
+      "subscrPricing": "구독요금제"
     },
     "payments": {
       "col": {

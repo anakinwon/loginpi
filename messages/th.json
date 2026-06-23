@@ -272,7 +272,8 @@
       "subscriptions": "จัดการการสมัครสมาชิก",
       "themes": "จัดการ Theme",
       "title": "Admin",
-      "users": "การจัดการผู้ใช้"
+      "users": "การจัดการผู้ใช้",
+      "subscrPricing": "구독요금제"
     },
     "payments": {
       "col": {

@@ -272,7 +272,8 @@
       "subscriptions": "Gestion des abonnements",
       "themes": "Gestion des thèmes",
       "title": "Admin",
-      "users": "Gestion des utilisateurs"
+      "users": "Gestion des utilisateurs",
+      "subscrPricing": "구독요금제"
     },
     "payments": {
       "col": {

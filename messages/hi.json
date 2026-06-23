@@ -272,7 +272,8 @@
       "subscriptions": "सदस्यता प्रबंधन",
       "themes": "Theme प्रबंधन",
       "title": "Admin",
-      "users": "उपयोगकर्ता प्रबंधन"
+      "users": "उपयोगकर्ता प्रबंधन",
+      "subscrPricing": "구독요금제"
     },
     "payments": {
       "col": {

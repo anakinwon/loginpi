@@ -46,6 +46,7 @@ const BEAN_NAV = [
   { href: '/admin/token/wallets', labelKey: 'beanWallets' },
   { href: '/admin/token/top-users', labelKey: 'beanTopUsers' },
   { href: '/admin/token/audit', labelKey: 'beanAudit' },
+  { href: '/admin/token/subscr-pricing', labelKey: 'subscrPricing' },
   { href: '/admin/token/fee-plan', labelKey: 'beanFeePlan' },
   { href: '/admin/token/tip-presets', labelKey: 'beanTipPresets' },
   { href: '/admin/campaign', labelKey: 'campaign' },

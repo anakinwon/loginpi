@@ -272,7 +272,8 @@
       "subscriptions": "Subscription Management",
       "themes": "Theme Management",
       "title": "Admin",
-      "users": "Pamamahala ng User"
+      "users": "Pamamahala ng User",
+      "subscrPricing": "구독요금제"
     },
     "payments": {
       "col": {

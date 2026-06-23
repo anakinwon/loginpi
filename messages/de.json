@@ -272,7 +272,8 @@
       "subscriptions": "Abonnement-Verwaltung",
       "themes": "Theme-Verwaltung",
       "title": "Admin",
-      "users": "Benutzerverwaltung"
+      "users": "Benutzerverwaltung",
+      "subscrPricing": "구독요금제"
     },
     "payments": {
       "col": {

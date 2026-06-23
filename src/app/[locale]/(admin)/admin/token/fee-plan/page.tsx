@@ -117,8 +117,12 @@ export default function BeanFeePlanPage() {
           <BeanIcon className="inline-block h-6 w-6" /> Bean 요금제 관리
         </h1>
         <p className="text-muted-foreground mt-1 text-sm">
-          Bean 경제 표준 요금 마스터 — PRD_15_FEE §4 기준 · 현재 코드 권위 소스와 동기화
-          (bean-fee.ts·bean-subscr-plan.ts)
+          Bean 경제 표준 요금 마스터 — PRD_15_FEE §4 기준 (43행).
+          구독요금만 빠르게 수정하려면{' '}
+          <a href="/admin/token/subscr-pricing" className="text-primary underline-offset-2 hover:underline">
+            구독요금제 관리
+          </a>
+          를 사용하세요.
         </p>
       </div>
 
@@ -244,9 +248,7 @@ export default function BeanFeePlanPage() {
           </div>
 
           <p className="text-muted-foreground text-xs">
-            ⚠️ 코드 권위 소스는 bean-fee.ts · bean-subscr-plan.ts 입니다. 이 화면은 어드민
-            가시성 + 향후 DB 연동 준비용이며, use_yn 비활성화는 UI 표시에만 반영됩니다
-            (실제 과금은 코드 우선).
+            ✅ DB가 런타임 권위 소스입니다 (2026-06-24 DB화 완료). amt_bean 수정 즉시 구독 과금에 반영됩니다. use_yn 비활성화 시 해당 플랜은 구독 목록에서 제외됩니다.
           </p>
         </>
       )}

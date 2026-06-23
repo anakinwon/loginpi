@@ -272,7 +272,8 @@
       "subscriptions": "إدارة الاشتراكات",
       "themes": "إدارة Theme",
       "title": "Admin",
-      "users": "إدارة المستخدمين"
+      "users": "إدارة المستخدمين",
+      "subscrPricing": "구독요금제"
     },
     "payments": {
       "col": {

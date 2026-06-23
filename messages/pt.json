@@ -272,7 +272,8 @@
       "subscriptions": "Gerenciamento de Assinaturas",
       "themes": "Gerenciar Themes",
       "title": "Admin",
-      "users": "Gerenciamento de Usuários"
+      "users": "Gerenciamento de Usuários",
+      "subscrPricing": "구독요금제"
     },
     "payments": {
       "col": {

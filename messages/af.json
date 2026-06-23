@@ -272,7 +272,8 @@
       "subscriptions": "Intekening Bestuur",
       "themes": "Tema Bestuur",
       "title": "Admin",
-      "users": "Gebruikersbestuur"
+      "users": "Gebruikersbestuur",
+      "subscrPricing": "구독요금제"
     },
     "payments": {
       "col": {

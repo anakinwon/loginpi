@@ -272,7 +272,8 @@
       "subscriptions": "订阅管理",
       "themes": "Theme 管理",
       "title": "管理",
-      "users": "用户管理"
+      "users": "用户管理",
+      "subscrPricing": "구독요금제"
     },
     "payments": {
       "col": {

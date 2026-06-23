@@ -272,7 +272,8 @@
       "subscriptions": "Quản lý đăng ký",
       "themes": "Quản lý Theme",
       "title": "Admin",
-      "users": "Quản lý người dùng"
+      "users": "Quản lý người dùng",
+      "subscrPricing": "구독요금제"
     },
     "payments": {
       "col": {

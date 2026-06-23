@@ -272,7 +272,8 @@
       "subscriptions": "Управление подписками",
       "themes": "Управление Themes",
       "title": "Admin",
-      "users": "Управление пользователями"
+      "users": "Управление пользователями",
+      "subscrPricing": "구독요금제"
     },
     "payments": {
       "col": {

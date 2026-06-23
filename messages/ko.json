@@ -38,7 +38,8 @@
       "beanAudit": "감사 로그",
       "beanFeePlan": "요금제 관리",
       "beanTipPresets": "선물하기 프리셋",
-      "campaign": "캠페인 승인"
+      "campaign": "캠페인 승인",
+      "subscrPricing": "구독요금제"
     },
     "themes": {
       "title": "테마 관리",
@@ -1293,8 +1294,8 @@
       "confirmNotice": "안내 사항을 확인했습니다"
     },
     "localeSelect": {
-      "autoSubscribed": "🌐 구독특혜 자동번역",
-      "autoLocked": "🔒 구독특혜 자동번역",
+      "autoSubscribed": "🌐 구독특혜 PiTranslate™",
+      "autoLocked": "🔒 구독특혜 PiTranslate™",
       "desc": "이 방의 메시지를 선택한 언어로 번역해서 보여줍니다",
       "subscriberOnly": "구독 서비스를 신청한 회원만 사용할 수 있습니다",
       "label": "번역 언어 선택",
@@ -1441,11 +1442,11 @@
       },
       "M2": {
         "name": "Bean Token 충전하기",
-        "desc": "Bean 토큰을 충전해서 Cafe도 만들고, 참여하고, 자동번역도 사용"
+        "desc": "Bean 토큰을 충전해서 Cafe도 만들고, 참여하고, PiTranslate™도 사용"
       },
       "M3": {
-        "name": "PREMIUM 카페 생성(PiRC1) + 자동번역",
-        "desc": "PiCafé™에서 PREMIUM Cafe 생성 + 자동번역 기능 사용"
+        "name": "PREMIUM 카페 생성(PiRC1) + PiTranslate™",
+        "desc": "PiCafé™에서 PREMIUM Cafe 생성 + PiTranslate™ 기능 사용"
       },
       "M4": {
         "name": "Bean 전송 테스트(PiRC1)",
@@ -1827,12 +1828,18 @@
     "subscribeSuccess": "{product} 구독이 시작되었습니다!",
     "subscribeFail": "구독 처리에 실패했습니다",
     "insufficient": "Bean 잔액이 부족합니다 — 먼저 충전해 주세요",
+    "storeGradeHint": "내 상품 {count}개 — 등급을 선택하세요",
+    "storeGrade": {
+      "S": "S (10개↓)",
+      "M": "M (30개↓)",
+      "L": "L (30개↑)"
+    },
     "expireAt": "만료일: {date}",
     "notice": "구독료는 충전한 Bean에서 차감됩니다. 연간은 2개월 무료. 환금 불가·플랫폼 사용 전용.",
     "product": {
       "PICAFE": "PiCafé™ 구독",
       "PISHOP": "PiShop™ 구독",
-      "TRANSLATE": "자동번역 구독"
+      "TRANSLATE": "PiTranslate™ 구독"
     },
     "feat": {
       "PICAFE": [
@@ -1842,10 +1849,10 @@
       "PISHOP": [
         "상품 노출 요금 면제",
         "프리미엄 상품 생성 요금 면제",
-        "무제한 상품 등록"
+        "등급별 상품 수 한도 제공 (S:10 / M:30 / L:무제한)"
       ],
       "TRANSLATE": [
-        "메시지 자동번역 무제한",
+        "PiTranslate™ 메시지 번역 무제한",
         "비구독 1회 1 ☕ → 구독 무제한 무료"
       ]
     }
