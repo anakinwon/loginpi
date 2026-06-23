@@ -4,31 +4,46 @@ import { useEffect, useState } from 'react'
 import { Link } from '@/i18n/navigation'
 import { piFetch } from '@/lib/pi-fetch'
 
-interface SubscrCheck {
-  tier: string
-  plan_cd: string | null
-  plan_nm: string | null
-  expire_dtm: string | null
-  auto_renew_yn: 'Y' | 'N' | null
+interface Subscription {
+  subscr_id: string
+  prod_ctgr_cd: string
+  plan_nm: string
+  bean_amt: number
+  start_dtm: string
+  expire_dtm: string
+  auto_renew_yn: 'Y' | 'N'
 }
 
-const TIER_STYLE: Record<string, string> = {
-  FREE: 'bg-muted text-muted-foreground',
-  PREMIUM: 'bg-blue-100 text-blue-700',
-  BUSINESS: 'bg-purple-100 text-purple-700',
+// 상품군별 배지 색상
+const PROD_STYLE: Record<string, string> = {
+  PICAFE: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
+  TRANSLATE:
+    'bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300',
+  PISHOP:
+    'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300',
+  PISHOP_SUBSCR:
+    'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300',
+}
+
+// 만료일 — 현지 시간대 날짜 (메모리: 현지 형식 표시 규칙)
+function fmtDate(s: string): string {
+  const d = new Date(s)
+  return Number.isNaN(d.getTime()) ? '—' : d.toLocaleDateString()
 }
 
 export function SubscriptionStatus() {
-  const [subscr, setSubscr] = useState<SubscrCheck | null>(null)
+  const [subs, setSubs] = useState<Subscription[]>([])
   const [loading, setLoading] = useState(true)
   const [cancelling, setCancelling] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
   const [cancelModalOpen, setCancelModalOpen] = useState(false)
 
   useEffect(() => {
-    piFetch('/api/subscriptions/check')
+    piFetch('/api/subscriptions/list')
       .then((r) => r.json())
-      .then(setSubscr)
+      .then((d: { subscriptions?: Subscription[] }) =>
+        setSubs(d.subscriptions ?? []),
+      )
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [])
@@ -39,7 +54,8 @@ export function SubscriptionStatus() {
     const res = await piFetch('/api/subscriptions', { method: 'DELETE' })
     setCancelling(false)
     if (res.ok) {
-      setSubscr((prev) => (prev ? { ...prev, auto_renew_yn: 'N' } : prev))
+      // 전체 자동갱신 해제 — 모든 활성 구독을 N으로 반영
+      setSubs((prev) => prev.map((s) => ({ ...s, auto_renew_yn: 'N' })))
       setMessage('구독이 취소되었습니다. 만료일까지 이용할 수 있습니다.')
     } else {
       setMessage('취소에 실패했습니다. 다시 시도해 주세요.')
@@ -52,35 +68,64 @@ export function SubscriptionStatus() {
     )
   }
 
-  const tier = subscr?.tier ?? 'FREE'
-  const isActive = tier !== 'FREE' && subscr?.expire_dtm != null
-  const expireLabel = subscr?.expire_dtm
-    ? new Date(subscr.expire_dtm).toLocaleDateString('ko-KR')
-    : null
+  // 자동갱신 중인 구독이 하나라도 있으면 취소(전체 자동갱신 해제) 버튼 노출
+  const hasAutoRenew = subs.some((s) => s.auto_renew_yn === 'Y')
+  // 취소 모달 안내용 — 가장 늦은 만료일
+  const latestExpire = subs.reduce<string | null>(
+    (max, s) => (!max || s.expire_dtm > max ? s.expire_dtm : max),
+    null,
+  )
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-3">
-        <span className="text-sm font-medium">현재 플랜</span>
-        <span
-          className={[
-            'rounded-full px-3 py-0.5 text-xs font-semibold',
-            TIER_STYLE[tier] ?? TIER_STYLE.FREE,
-          ].join(' ')}
-        >
-          {subscr?.plan_nm ?? tier}
+      <div className="flex items-center justify-between">
+        <span className="text-sm font-medium">구독 현황</span>
+        <span className="text-muted-foreground text-xs">
+          {subs.length}건 구독 중
         </span>
       </div>
 
-      {isActive && expireLabel && (
-        <p className="text-muted-foreground text-sm">만료일: {expireLabel}</p>
+      {subs.length === 0 ? (
+        <p className="text-muted-foreground rounded-lg border border-dashed py-6 text-center text-sm">
+          현재 구독 중인 상품이 없습니다.
+        </p>
+      ) : (
+        <ul className="space-y-2">
+          {subs.map((s) => (
+            <li
+              key={s.subscr_id}
+              className="bg-card flex items-center justify-between gap-3 rounded-lg border p-3"
+            >
+              <div className="min-w-0">
+                <span
+                  className={[
+                    'inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold',
+                    PROD_STYLE[s.prod_ctgr_cd] ??
+                      'bg-muted text-muted-foreground',
+                  ].join(' ')}
+                >
+                  {s.plan_nm}
+                </span>
+                <p className="text-muted-foreground mt-1.5 text-xs">
+                  만료일 {fmtDate(s.expire_dtm)}
+                  {s.auto_renew_yn === 'Y' ? (
+                    <span className="ml-1.5 text-green-600 dark:text-green-400">
+                      · 자동 갱신
+                    </span>
+                  ) : (
+                    <span className="ml-1.5">· 자동 갱신 해제됨</span>
+                  )}
+                </p>
+              </div>
+              <span className="text-muted-foreground shrink-0 text-xs tabular-nums">
+                {s.bean_amt.toLocaleString()} Bean
+              </span>
+            </li>
+          ))}
+        </ul>
       )}
 
-      {isActive && subscr?.auto_renew_yn === 'Y' && (
-        <p className="text-muted-foreground text-xs">자동 갱신 활성화됨</p>
-      )}
-
-      {isActive && subscr?.auto_renew_yn === 'Y' && (
+      {hasAutoRenew && (
         <button
           onClick={() => setCancelModalOpen(true)}
           disabled={cancelling}
@@ -88,12 +133,6 @@ export function SubscriptionStatus() {
         >
           {cancelling ? '처리 중…' : '자동 갱신 취소'}
         </button>
-      )}
-
-      {isActive && subscr?.auto_renew_yn === 'N' && (
-        <p className="text-muted-foreground text-xs">
-          자동 갱신이 취소되어 있습니다.
-        </p>
       )}
 
       {message && <p className="text-muted-foreground text-sm">{message}</p>}
@@ -107,7 +146,7 @@ export function SubscriptionStatus() {
 
       {cancelModalOpen && (
         <CancelPolicyModal
-          expireLabel={expireLabel}
+          expireLabel={latestExpire ? fmtDate(latestExpire) : null}
           onConfirm={doCancel}
           onClose={() => setCancelModalOpen(false)}
         />
