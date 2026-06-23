@@ -2,10 +2,20 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
+import dynamic from 'next/dynamic'
 
 // 로그성 테이블 모니터·정리 화면.
 // Vercel 서버리스라 운영서버에 로그 '파일'은 없다 → DB 로그 테이블의 행수·용량을 보고,
 // 순수 운영 로그(PURGEABLE)만 기간 기준으로 물리 정리한다. 회계·감사 로그는 조회 전용.
+
+// 용량 사용량 그래프는 Plotly(window 의존) 사용 — SSR 불가, dynamic + ssr:false 필수
+const LogUsageChart = dynamic(
+  () => import('@/components/admin/log-usage-chart'),
+  {
+    ssr: false,
+    loading: () => <div className="bg-muted h-48 animate-pulse rounded-lg" />,
+  },
+)
 
 interface LogTable {
   tbl: string
@@ -46,6 +56,7 @@ export default function LogsPage() {
   const [busyTbl, setBusyTbl] = useState<string | null>(null) // 정리 진행 중
   const [notice, setNotice] = useState<string | null>(null)
   const [loadError, setLoadError] = useState<string | null>(null) // 조회 실패 사유
+  const [thresholdMB, setThresholdMB] = useState(50) // 용량 임계치(MB)
 
   // loading 초기값이 true라 첫 로드 시 별도 토글 불필요. 재조회는 busyTbl로 진행표시.
   const load = useCallback(() => {
@@ -53,8 +64,7 @@ export default function LogsPage() {
       .then(async (r) => {
         const d = await r.json()
         // GET 실패(예: RPC 미적용)를 조용히 삼키지 않고 화면에 노출
-        if (!r.ok)
-          throw new Error(d.detail || d.error || `HTTP ${r.status}`)
+        if (!r.ok) throw new Error(d.detail || d.error || `HTTP ${r.status}`)
         return d as { tables?: LogTable[] }
       })
       .then((d) => {
@@ -114,6 +124,11 @@ export default function LogsPage() {
   const totalRows = tables.reduce((s, r) => s + (r.row_cnt ?? 0), 0)
   const totalMB = (totalBytes / (1024 * 1024)).toFixed(2)
 
+  // 임계치(MB) 초과 테이블 수 — 그래프 위 경고 표시용
+  const overCount = tables.filter(
+    (r) => r.exists_yn && (r.total_bytes ?? 0) / (1024 * 1024) > thresholdMB,
+  ).length
+
   return (
     <div className="space-y-4">
       <div>
@@ -153,6 +168,40 @@ export default function LogsPage() {
           <p className="text-muted-foreground mt-1 text-xs">
             {t('loadFailedHint')}
           </p>
+        </div>
+      )}
+
+      {/* 용량 사용량 + 임계치 그래프 */}
+      {!loading && !loadError && tables.length > 0 && (
+        <div className="rounded-lg border p-4">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <p className="text-sm font-medium">{t('usageTitle')}</p>
+            <div className="flex items-center gap-2">
+              <label className="text-muted-foreground text-xs">
+                {t('thresholdLabel')}
+              </label>
+              <input
+                type="number"
+                min={1}
+                value={thresholdMB}
+                onChange={(e) =>
+                  setThresholdMB(Math.max(1, Number(e.target.value) || 1))
+                }
+                className="border-input bg-background h-8 w-20 rounded-md border px-2 text-sm tabular-nums"
+              />
+              <span className="text-muted-foreground text-xs">MB</span>
+            </div>
+          </div>
+          {overCount > 0 && (
+            <p className="mb-2 text-xs font-medium text-red-600 dark:text-red-400">
+              {t('overThreshold', { count: overCount })}
+            </p>
+          )}
+          <LogUsageChart
+            tables={tables}
+            thresholdMB={thresholdMB}
+            emptyText={t('usageEmpty')}
+          />
         </div>
       )}
 
