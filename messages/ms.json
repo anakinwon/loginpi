@@ -621,7 +621,20 @@
   "adminStats": {
     "activeUsers": "Pengguna Aktif",
     "adminTitle": "Dashboard Statistik",
+    "beanDistEmpty": "Tiada transaksi Bean untuk tempoh ini.",
+    "beanDistError": "Ralat distribusi: {error}",
+    "beanDistFootnote": "Panjang bar · Nisbah = Perkongsian jumlah transaksi (gross) mengikut jenis · Perubahan bersih (net) = Jumlah tanda berdasarkan dompet pengguna (Aliran masuk +, Aliran keluar −, Pergerakan 0)",
+    "beanDistNet": "Bersih {net}",
+    "beanDistRowMeta": "{cnt} transaksi · {users} pengguna · {share}%",
+    "beanDistTitle": "Distribusi Transaksi Bean",
+    "beanDistTotalPrefix": "Jumlah {cnt} transaksi · Jumlah transaksi {gross}",
+    "beanDistTotalSuffix": "(Jumlah nilai mutlak — semua jenis termasuk Caj, Penggunaan, Yuran Langganan, Tip, Yuran, Ganjaran, Bayaran Balik, Pindahan)",
     "fetchFail": "Gagal mengambil Data",
+    "flowBadge": {
+      "in": "Aliran Masuk",
+      "move": "Pergerakan",
+      "out": "Aliran Keluar"
+    },
     "homeTitle": "Dashboard",
     "noData": "Tiada Data",
     "normalRevenue": "Jualan Pelan Biasa",
@@ -658,6 +671,17 @@
       "noData": "Tiada Data terjemahan dalam tempoh ini"
     },
     "translateSection": "Terjemahan (PiTranslate™)",
+    "txnLabel": {
+      "CHARGE": "Caj",
+      "ETC": "Lain-lain",
+      "FEE": "Yuran",
+      "REFUND": "Bayaran Balik",
+      "REWARD": "Ganjaran",
+      "SPEND": "Penggunaan (Perbelanjaan)",
+      "SUBSCRIBE": "Yuran Langganan",
+      "TIP": "Tip",
+      "TRANSFER": "Pindahan P2P"
+    },
     "unitCase": "kes",
     "unitPerson": "orang",
     "userActivity": "Aktiviti {days} hari · Content {content} · Pembayaran {payments}"

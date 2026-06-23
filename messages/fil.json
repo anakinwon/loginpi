@@ -621,7 +621,20 @@
   "adminStats": {
     "activeUsers": "Mga Aktibong User",
     "adminTitle": "Statistics Dashboard",
+    "beanDistEmpty": "Walang transaksyon ng Bean para sa panahong ito.",
+    "beanDistError": "Error sa distribusyon: {error}",
+    "beanDistFootnote": "Haba ng bar · ratio = Bahagi ng kabuuang dami ng transaksyon (gross) ayon sa uri · Neto na pagbabago (net) = Kabuuang halaga ng mga sign batay sa wallet ng user (Inflow +, Pagbawi −, Paggalaw 0)",
+    "beanDistNet": "Neto {net}",
+    "beanDistRowMeta": "{cnt} transaksyon · {users} user · {share}%",
+    "beanDistTitle": "Distribusyon ng Transaksyon ng Bean",
+    "beanDistTotalPrefix": "Kabuuan {cnt} transaksyon · Kabuuang dami ng transaksyon {gross}",
+    "beanDistTotalSuffix": "(Kabuuang halaga ng absolute value — lahat ng uri kabilang ang Pag-charge, Paggamit, Bayad sa Subscription, Tip, Bayad, Gantimpala, Pagbabalik ng bayad, Paglipat, at iba pa)",
     "fetchFail": "Nabigo ang pagkuha ng Data",
+    "flowBadge": {
+      "in": "Inflow",
+      "move": "Paggalaw",
+      "out": "Pagbawi"
+    },
     "homeTitle": "Dashboard",
     "noData": "Walang Data",
     "normalRevenue": "Kita mula sa Normal Plan",
@@ -658,6 +671,17 @@
       "noData": "Walang Translation Data para sa panahon."
     },
     "translateSection": "Translation (PiTranslate™)",
+    "txnLabel": {
+      "CHARGE": "Pag-charge",
+      "ETC": "Iba pa",
+      "FEE": "Bayad",
+      "REFUND": "Pagbabalik ng bayad",
+      "REWARD": "Gantimpala",
+      "SPEND": "Paggamit (Pagkonsumo)",
+      "SUBSCRIBE": "Bayad sa Subscription",
+      "TIP": "Tip",
+      "TRANSFER": "P2P Regalo"
+    },
     "unitCase": "kaso",
     "unitPerson": "tao",
     "userActivity": "Aktibidad {days} araw · Content {content} · Pagbabayad {payments}"

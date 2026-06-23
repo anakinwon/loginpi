@@ -621,7 +621,20 @@
   "adminStats": {
     "activeUsers": "Người dùng hoạt động",
     "adminTitle": "Dashboard thống kê",
+    "beanDistEmpty": "Không có giao dịch Bean nào trong khoảng thời gian này.",
+    "beanDistError": "Lỗi phân phối: {error}",
+    "beanDistFootnote": "Độ dài/tỷ lệ thanh = tỷ lệ khối lượng giao dịch (gross) theo loại · thay đổi Net (net) = tổng dấu dựa trên ví người dùng (Dòng tiền vào +, Thu hồi −, Di chuyển 0)",
+    "beanDistNet": "Net {net}",
+    "beanDistRowMeta": "{cnt} giao dịch · {users} người dùng · {share}%",
+    "beanDistTitle": "Phân phối giao dịch Bean",
+    "beanDistTotalPrefix": "Tổng cộng {cnt} giao dịch · Tổng khối lượng giao dịch {gross}",
+    "beanDistTotalSuffix": "(Tổng giá trị tuyệt đối — tất cả các loại như Nạp tiền, Sử dụng, Phí đăng ký, Tip, Phí, Thưởng, Hoàn tiền, Chuyển khoản v.v.)",
     "fetchFail": "Truy vấn Data thất bại",
+    "flowBadge": {
+      "in": "Dòng tiền vào",
+      "move": "Di chuyển",
+      "out": "Thu hồi"
+    },
     "homeTitle": "Dashboard",
     "noData": "Không có Data",
     "normalRevenue": "Doanh thu gói thông thường",
@@ -658,6 +671,17 @@
       "noData": "Không có Translation Data trong khoảng thời gian này"
     },
     "translateSection": "Dịch (PiTranslate™)",
+    "txnLabel": {
+      "CHARGE": "Nạp tiền",
+      "ETC": "Khác",
+      "FEE": "Phí",
+      "REFUND": "Hoàn tiền",
+      "REWARD": "Thưởng",
+      "SPEND": "Sử dụng (Tiêu dùng)",
+      "SUBSCRIBE": "Phí đăng ký",
+      "TIP": "Tip",
+      "TRANSFER": "Quà tặng P2P"
+    },
     "unitCase": "trường hợp",
     "unitPerson": "người",
     "userActivity": "Hoạt động {days} ngày · Content {content} · Thanh toán {payments}"

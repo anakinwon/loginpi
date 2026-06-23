@@ -621,7 +621,20 @@
   "adminStats": {
     "activeUsers": "活跃用户",
     "adminTitle": "统计 Dashboard",
+    "beanDistEmpty": "该期间没有 Bean 交易。",
+    "beanDistError": "分布错误: {error}",
+    "beanDistFootnote": "柱状图长度·比例 = 按类型总交易量(gross)占比 · 净增减(net) = 以用户钱包为准的符号总和(流入 +, 回收 −, 移动 0)",
+    "beanDistNet": "净 {net}",
+    "beanDistRowMeta": "{cnt}笔 · {users}人 · {share}%",
+    "beanDistTitle": "Bean 交易分布",
+    "beanDistTotalPrefix": "总计 {cnt}笔 · 总交易量 {gross}",
+    "beanDistTotalSuffix": "(绝对值总和 — 充值·使用·订阅费·小费·手续费·奖励·退款·转账等所有类型)",
     "fetchFail": "Data 查询失败",
+    "flowBadge": {
+      "in": "流入",
+      "move": "移动",
+      "out": "回收"
+    },
     "homeTitle": "Dashboard",
     "noData": "无 Data",
     "normalRevenue": "普通套餐销售额",
@@ -658,6 +671,17 @@
       "noData": "期间内无翻译 Data"
     },
     "translateSection": "翻译 (PiTranslate™)",
+    "txnLabel": {
+      "CHARGE": "充值",
+      "ETC": "其他",
+      "FEE": "手续费",
+      "REFUND": "退款",
+      "REWARD": "奖励发放",
+      "SPEND": "使用 (消费)",
+      "SUBSCRIBE": "订阅费",
+      "TIP": "小费",
+      "TRANSFER": "P2P 转账"
+    },
     "unitCase": "次",
     "unitPerson": "名",
     "userActivity": "活跃 {days}天 · Content {content} · 支付 {payments}"

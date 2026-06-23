@@ -621,7 +621,20 @@
   "adminStats": {
     "activeUsers": "المستخدمون النشطون",
     "adminTitle": "Dashboard الإحصائيات",
+    "beanDistEmpty": "لا توجد معاملات Bean لهذه الفترة.",
+    "beanDistError": "خطأ في التوزيع: {error}",
+    "beanDistFootnote": "طول الشريط/النسبة = حصة إجمالي حجم المعاملات (gross) حسب النوع · صافي التغير (net) = مجموع الإشارات بناءً على محفظة المستخدم (تدفق للداخل +، تدفق للخارج −، نقل 0)",
+    "beanDistNet": "صافي {net}",
+    "beanDistRowMeta": "{cnt} معاملة · {users} مستخدم · {share}%",
+    "beanDistTitle": "توزيع معاملات Bean",
+    "beanDistTotalPrefix": "إجمالي {cnt} معاملة · إجمالي حجم المعاملات {gross}",
+    "beanDistTotalSuffix": "(مجموع القيم المطلقة — جميع الأنواع مثل الشحن والاستخدام ورسوم الاشتراك والإكرامية والرسوم والمكافآت والاسترداد والتحويل إلخ.)",
     "fetchFail": "فشل جلب Data",
+    "flowBadge": {
+      "in": "تدفق للداخل",
+      "move": "نقل",
+      "out": "تدفق للخارج"
+    },
     "homeTitle": "Dashboard",
     "noData": "لا يوجد Data",
     "normalRevenue": "إيرادات الخطة العادية",
@@ -658,6 +671,17 @@
       "noData": "لا يوجد Data ترجمة خلال هذه الفترة"
     },
     "translateSection": "الترجمة (PiTranslate™)",
+    "txnLabel": {
+      "CHARGE": "شحن",
+      "ETC": "أخرى",
+      "FEE": "رسوم",
+      "REFUND": "استرداد",
+      "REWARD": "دفع مكافأة",
+      "SPEND": "استخدام (إنفاق)",
+      "SUBSCRIBE": "رسوم الاشتراك",
+      "TIP": "إكرامية",
+      "TRANSFER": "هدية P2P"
+    },
     "unitCase": "حالة",
     "unitPerson": "شخص",
     "userActivity": "نشاط {days} يوم · Content {content} · مدفوعات {payments}"

@@ -621,7 +621,20 @@
   "adminStats": {
     "activeUsers": "Активные пользователи",
     "adminTitle": "Статистический Dashboard",
+    "beanDistEmpty": "За этот период нет транзакций Bean.",
+    "beanDistError": "Ошибка распределения: {error}",
+    "beanDistFootnote": "Длина/процент столбца = доля общего объема транзакций (gross) по типу · Чистое изменение (net) = сумма по знаку относительно кошелька пользователя (приток +, отток −, перемещение 0)",
+    "beanDistNet": "Чистый {net}",
+    "beanDistRowMeta": "{cnt} операций · {users} пользователей · {share}%",
+    "beanDistTitle": "Распределение транзакций Bean",
+    "beanDistTotalPrefix": "Всего {cnt} операций · Общий объем {gross}",
+    "beanDistTotalSuffix": "(Сумма абсолютных значений — все типы: пополнение, использование, подписка, чаевые, комиссия, вознаграждение, возврат, перевод и т.д.)",
     "fetchFail": "Ошибка получения Data",
+    "flowBadge": {
+      "in": "Приток",
+      "move": "Перемещение",
+      "out": "Отток"
+    },
     "homeTitle": "Dashboard",
     "noData": "Нет Data",
     "normalRevenue": "Выручка от обычных тарифов",
@@ -658,6 +671,17 @@
       "noData": "За этот период нет Translation Data"
     },
     "translateSection": "Перевод (PiTranslate™)",
+    "txnLabel": {
+      "CHARGE": "Пополнение",
+      "ETC": "Прочее",
+      "FEE": "Комиссия",
+      "REFUND": "Возврат",
+      "REWARD": "Выплата вознаграждения",
+      "SPEND": "Использование (расход)",
+      "SUBSCRIBE": "Подписка",
+      "TIP": "Чаевые",
+      "TRANSFER": "P2P подарок"
+    },
     "unitCase": "шт.",
     "unitPerson": "чел.",
     "userActivity": "Активность {days} дней · Content {content} · Платежи {payments}"

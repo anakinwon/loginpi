@@ -621,7 +621,20 @@
   "adminStats": {
     "activeUsers": "Usuarios activos",
     "adminTitle": "Dashboard de estadísticas",
+    "beanDistEmpty": "No Bean transactions for the period.",
+    "beanDistError": "Distribution error: {error}",
+    "beanDistFootnote": "Bar length/ratio = Share of gross transaction volume by type · Net change (net) = Sum of signs based on user wallet (Inflow +, Withdrawal −, Movement 0)",
+    "beanDistNet": "Net {net}",
+    "beanDistRowMeta": "{cnt} transactions · {users} users · {share}%",
+    "beanDistTitle": "Bean Transaction Distribution",
+    "beanDistTotalPrefix": "Total {cnt} transactions · Gross volume {gross}",
+    "beanDistTotalSuffix": "(Sum of absolute values — All types including Charge, Spend, Subscription fee, Tip, Fee, Reward, Refund, Transfer, etc.)",
     "fetchFail": "Fallo al recuperar Data",
+    "flowBadge": {
+      "in": "Inflow",
+      "move": "Movement",
+      "out": "Withdrawal"
+    },
     "homeTitle": "Dashboard",
     "noData": "No hay Data",
     "normalRevenue": "Ingresos por planes normales",
@@ -658,6 +671,17 @@
       "noData": "No hay Data de traducción para el período."
     },
     "translateSection": "Traducción (PiTranslate™)",
+    "txnLabel": {
+      "CHARGE": "Charge",
+      "ETC": "Etc.",
+      "FEE": "Fee",
+      "REFUND": "Refund",
+      "REWARD": "Reward",
+      "SPEND": "Spend",
+      "SUBSCRIBE": "Subscription fee",
+      "TIP": "Tip",
+      "TRANSFER": "P2P Transfer"
+    },
     "unitCase": "casos",
     "unitPerson": "personas",
     "userActivity": "Actividad {days} días · Content {content} · Pagos {payments}"

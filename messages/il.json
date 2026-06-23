@@ -621,7 +621,20 @@
   "adminStats": {
     "activeUsers": "משתמשים פעילים",
     "adminTitle": "Dashboard סטטיסטיקות",
+    "beanDistEmpty": "אין עסקאות Bean בתקופה זו.",
+    "beanDistError": "שגיאת התפלגות: {error}",
+    "beanDistFootnote": "אורך פס · יחס = נתח נפח עסקה כולל (gross) לפי סוג · שינוי נטו (net) = סכום סימנים לפי ארנק משתמש (כניסה +, משיכה −, תנועה 0)",
+    "beanDistNet": "נטו {net}",
+    "beanDistRowMeta": "{cnt} פריטים · {users} משתמשים · {share}%",
+    "beanDistTitle": "התפלגות עסקאות Bean",
+    "beanDistTotalPrefix": "סה\"כ {cnt} פריטים · נפח עסקה כולל {gross}",
+    "beanDistTotalSuffix": "(סכום ערכים מוחלטים — טעינה, שימוש, דמי מנוי, טיפ, עמלה, תגמול, החזר, העברה וכו' כל הסוגים)",
     "fetchFail": "כשל באחזור Data",
+    "flowBadge": {
+      "in": "כניסה",
+      "move": "תנועה",
+      "out": "משיכה"
+    },
     "homeTitle": "Dashboard",
     "noData": "אין Data",
     "normalRevenue": "הכנסות מתוכניות רגילות",
@@ -658,6 +671,17 @@
       "noData": "אין Data תרגום בתקופה זו"
     },
     "translateSection": "תרגום (PiTranslate™)",
+    "txnLabel": {
+      "CHARGE": "טעינה",
+      "ETC": "אחר",
+      "FEE": "עמלה",
+      "REFUND": "החזר",
+      "REWARD": "תשלום תגמול",
+      "SPEND": "שימוש (הוצאה)",
+      "SUBSCRIBE": "דמי מנוי",
+      "TIP": "טיפ",
+      "TRANSFER": "מתנת P2P"
+    },
     "unitCase": "מקרה",
     "unitPerson": "איש",
     "userActivity": "פעילות {days} ימים · Content {content} · תשלומים {payments}"

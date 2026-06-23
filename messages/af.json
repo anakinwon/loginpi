@@ -621,7 +621,20 @@
   "adminStats": {
     "activeUsers": "Aktiewe gebruikers",
     "adminTitle": "Statistiek Dashboard",
+    "beanDistEmpty": "Geen Bean transaksies vir hierdie tydperk nie.",
+    "beanDistError": "Distribusie fout: {error}",
+    "beanDistFootnote": "Staaf lengte · verhouding = aandeel van totale transaksievolume (gross) per tipe · Netto verandering (net) = som van tekens gebaseer op gebruikers se beursie (invloei +, onttrekking −, beweging 0)",
+    "beanDistNet": "Netto {net}",
+    "beanDistRowMeta": "{cnt} items · {users} gebruikers · {share}%",
+    "beanDistTitle": "Bean Transaksie Distribusie",
+    "beanDistTotalPrefix": "Totaal {cnt} items · Totale transaksievolume {gross}",
+    "beanDistTotalSuffix": "(Som van absolute waardes — alle tipes soos laai, gebruik, intekengeld, tip, fooi, beloning, terugbetaling, oordrag, ens.)",
     "fetchFail": "Data-ophaal het misluk",
+    "flowBadge": {
+      "in": "Invloei",
+      "move": "Beweging",
+      "out": "Onttrekking"
+    },
     "homeTitle": "Dashboard",
     "noData": "Geen Data",
     "normalRevenue": "Inkomste uit normale planne",
@@ -658,6 +671,17 @@
       "noData": "Daar is geen Translation Data binne die tydperk nie"
     },
     "translateSection": "Vertaling (PiTranslate™)",
+    "txnLabel": {
+      "CHARGE": "Laai",
+      "ETC": "Ander",
+      "FEE": "Fooi",
+      "REFUND": "Terugbetaling",
+      "REWARD": "Beloning",
+      "SPEND": "Gebruik",
+      "SUBSCRIBE": "Intekengeld",
+      "TIP": "Tip",
+      "TRANSFER": "P2P Geskenk"
+    },
     "unitCase": "geval",
     "unitPerson": "persoon",
     "userActivity": "Aktiwiteit {days} dae · Content {content} · Betalings {payments}"

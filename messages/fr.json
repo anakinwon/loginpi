@@ -621,7 +621,20 @@
   "adminStats": {
     "activeUsers": "Utilisateurs actifs",
     "adminTitle": "Dashboard de Statistiques",
+    "beanDistEmpty": "Aucune transaction Bean pour cette période.",
+    "beanDistError": "Erreur de distribution : {error}",
+    "beanDistFootnote": "Longueur/ratio de la barre = part du volume total des transactions (brut) par type · variation nette (net) = somme des signes basée sur le portefeuille de l'utilisateur (entrée +, retrait −, mouvement 0)",
+    "beanDistNet": "Net {net}",
+    "beanDistRowMeta": "{cnt} transactions · {users} utilisateurs · {share}%",
+    "beanDistTitle": "Distribution des transactions Bean",
+    "beanDistTotalPrefix": "Total {cnt} transactions · Volume total des transactions {gross}",
+    "beanDistTotalSuffix": "(Somme des valeurs absolues — tous types : recharge, dépense, frais d'abonnement, pourboire, frais, récompense, remboursement, transfert, etc.)",
     "fetchFail": "Échec de la récupération des Data",
+    "flowBadge": {
+      "in": "Entrée",
+      "move": "Mouvement",
+      "out": "Retrait"
+    },
     "homeTitle": "Dashboard",
     "noData": "Aucune Data",
     "normalRevenue": "Revenus des forfaits standards",
@@ -658,6 +671,17 @@
       "noData": "Aucune Data de traduction pour cette période"
     },
     "translateSection": "Traduction (PiTranslate™)",
+    "txnLabel": {
+      "CHARGE": "Recharge",
+      "ETC": "Autre",
+      "FEE": "Frais",
+      "REFUND": "Remboursement",
+      "REWARD": "Récompense",
+      "SPEND": "Dépense",
+      "SUBSCRIBE": "Abonnement",
+      "TIP": "Pourboire",
+      "TRANSFER": "Transfert P2P"
+    },
     "unitCase": "cas",
     "unitPerson": "personnes",
     "userActivity": "Activité {days} jours · Content {content} · Paiements {payments}"

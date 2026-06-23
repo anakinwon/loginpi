@@ -620,32 +620,21 @@
   },
   "adminStats": {
     "activeUsers": "Active Users",
-    "beanDistTitle": "Bean Transaction Distribution",
-    "beanDistTotalPrefix": "Total {cnt} txns · volume {gross}",
-    "beanDistTotalSuffix": "(sum of absolute values — charge·spend·subscription·tip·fee·reward·refund·transfer, all types)",
-    "beanDistRowMeta": "{cnt} txns · {users} users · {share}%",
-    "beanDistNet": "net {net}",
-    "beanDistFootnote": "Bar length·ratio = share of gross volume per type · net = signed sum on user wallet basis (inflow +, recovery −, move 0)",
+    "adminTitle": "Statistics Dashboard",
+    "beanDistEmpty": "No Bean transactions for the period.",
     "beanDistError": "Distribution error: {error}",
-    "beanDistEmpty": "No Bean transactions in this period.",
-    "txnLabel": {
-      "CHARGE": "Charge",
-      "REWARD": "Reward",
-      "REFUND": "Refund",
-      "SPEND": "Spend",
-      "SUBSCRIBE": "Subscription",
-      "TIP": "Tip",
-      "FEE": "Fee",
-      "TRANSFER": "P2P Gift",
-      "ETC": "Other"
-    },
+    "beanDistFootnote": "Bar length/ratio = Share of gross transaction volume by type · Net change (net) = Sum of signs based on user wallet (Inflow +, Outflow −, Movement 0)",
+    "beanDistNet": "Net {net}",
+    "beanDistRowMeta": "{cnt} transactions · {users} users · {share}%",
+    "beanDistTitle": "Bean Transaction Distribution",
+    "beanDistTotalPrefix": "Total {cnt} transactions · Gross volume {gross}",
+    "beanDistTotalSuffix": "(Sum of absolute values — All types including Charge, Spend, Subscription fee, Tip, Fee, Reward, Refund, Transfer, etc.)",
+    "fetchFail": "Failed to load data",
     "flowBadge": {
       "in": "Inflow",
-      "out": "Recovery",
-      "move": "Move"
+      "move": "Movement",
+      "out": "Outflow"
     },
-    "adminTitle": "Statistics Dashboard",
-    "fetchFail": "Failed to load data",
     "homeTitle": "Dashboard",
     "noData": "No data",
     "normalRevenue": "Standard Plan Revenue",
@@ -682,6 +671,17 @@
       "noData": "No translation data in this period"
     },
     "translateSection": "Translation (PiTranslate™)",
+    "txnLabel": {
+      "CHARGE": "Charge",
+      "ETC": "Other",
+      "FEE": "Fee",
+      "REFUND": "Refund",
+      "REWARD": "Reward Payment",
+      "SPEND": "Spend (Consumption)",
+      "SUBSCRIBE": "Subscription Fee",
+      "TIP": "Tip",
+      "TRANSFER": "P2P Gift"
+    },
     "unitCase": "txns",
     "unitPerson": "users",
     "userActivity": "Active {days}d · Content {content} · Payments {payments}"

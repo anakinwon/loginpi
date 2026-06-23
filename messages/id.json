@@ -621,7 +621,20 @@
   "adminStats": {
     "activeUsers": "Pengguna Aktif",
     "adminTitle": "Dashboard Statistik",
+    "beanDistEmpty": "Tidak ada transaksi Bean untuk periode ini.",
+    "beanDistError": "Error Distribusi: {error}",
+    "beanDistFootnote": "Panjang/rasio bar = pangsa volume transaksi total (gross) berdasarkan jenis · Perubahan net (net) = jumlah tanda berdasarkan dompet pengguna (Inflow +, Withdrawal −, Movement 0)",
+    "beanDistNet": "Net {net}",
+    "beanDistRowMeta": "{cnt} transaksi · {users} pengguna · {share}%",
+    "beanDistTitle": "Distribusi Transaksi Bean",
+    "beanDistTotalPrefix": "Total {cnt} transaksi · Volume Transaksi Total {gross}",
+    "beanDistTotalSuffix": "(Jumlah nilai absolut — semua jenis seperti Pengisian, Penggunaan, Biaya Langganan, Tip, Biaya, Hadiah, Pengembalian Dana, Transfer, dll.)",
     "fetchFail": "Gagal mengambil Data",
+    "flowBadge": {
+      "in": "Inflow",
+      "move": "Movement",
+      "out": "Withdrawal"
+    },
     "homeTitle": "Dashboard",
     "noData": "Tidak ada Data",
     "normalRevenue": "Pendapatan Paket Normal",
@@ -658,6 +671,17 @@
       "noData": "Tidak ada Data terjemahan dalam periode ini"
     },
     "translateSection": "Terjemahan (PiTranslate™)",
+    "txnLabel": {
+      "CHARGE": "Pengisian",
+      "ETC": "Lain-lain",
+      "FEE": "Biaya",
+      "REFUND": "Pengembalian Dana",
+      "REWARD": "Pembayaran Hadiah",
+      "SPEND": "Penggunaan (Pengeluaran)",
+      "SUBSCRIBE": "Biaya Langganan",
+      "TIP": "Tip",
+      "TRANSFER": "P2P Hadiah"
+    },
     "unitCase": "kasus",
     "unitPerson": "orang",
     "userActivity": "Aktivitas {days} hari · Content {content} · Pembayaran {payments}"

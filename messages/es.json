@@ -621,7 +621,20 @@
   "adminStats": {
     "activeUsers": "Usuarios activos",
     "adminTitle": "Dashboard de estadísticas",
+    "beanDistEmpty": "No hay transacciones de Bean para el período.",
+    "beanDistError": "Error de distribución: {error}",
+    "beanDistFootnote": "Longitud/proporción de la barra = cuota del volumen total de transacciones (gross) por tipo · Cambio neto (net) = suma de signos según la cartera del usuario (entrada +, recuperación −, movimiento 0)",
+    "beanDistNet": "Neto {net}",
+    "beanDistRowMeta": "{cnt} transacciones · {users} usuarios · {share}%",
+    "beanDistTitle": "Distribución de transacciones de Bean",
+    "beanDistTotalPrefix": "Total {cnt} transacciones · Volumen total {gross}",
+    "beanDistTotalSuffix": "(Suma de valores absolutos — todos los tipos: carga, uso, cuota de suscripción, propina, comisión, recompensa, reembolso, transferencia, etc.)",
     "fetchFail": "Fallo al recuperar Data",
+    "flowBadge": {
+      "in": "Entrada",
+      "move": "Movimiento",
+      "out": "Recuperación"
+    },
     "homeTitle": "Dashboard",
     "noData": "No hay Data",
     "normalRevenue": "Ingresos por planes normales",
@@ -658,6 +671,17 @@
       "noData": "No hay Data de traducción para el período."
     },
     "translateSection": "Traducción (PiTranslate™)",
+    "txnLabel": {
+      "CHARGE": "Carga",
+      "ETC": "Otro",
+      "FEE": "Comisión",
+      "REFUND": "Reembolso",
+      "REWARD": "Pago de recompensa",
+      "SPEND": "Uso (Gasto)",
+      "SUBSCRIBE": "Cuota de suscripción",
+      "TIP": "Propina",
+      "TRANSFER": "Regalo P2P"
+    },
     "unitCase": "casos",
     "unitPerson": "personas",
     "userActivity": "Actividad {days} días · Content {content} · Pagos {payments}"

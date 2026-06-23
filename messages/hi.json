@@ -621,7 +621,20 @@
   "adminStats": {
     "activeUsers": "Active Users",
     "adminTitle": "Statistics Dashboard",
+    "beanDistEmpty": "इस अवधि के लिए कोई Bean लेनदेन नहीं है।",
+    "beanDistError": "वितरण त्रुटि: {error}",
+    "beanDistFootnote": "बार की लंबाई·अनुपात = प्रकार के अनुसार कुल लेनदेन मात्रा (gross) का हिस्सा · शुद्ध वृद्धि/कमी (net) = उपयोगकर्ता वॉलेट के आधार पर संकेतों का योग (अंतर्वाह +, निकासी −, आवाजाही 0)",
+    "beanDistNet": "शुद्ध {net}",
+    "beanDistRowMeta": "{cnt} मामले · {users} उपयोगकर्ता · {share}%",
+    "beanDistTitle": "Bean लेनदेन वितरण",
+    "beanDistTotalPrefix": "कुल {cnt} मामले · कुल लेनदेन मात्रा {gross}",
+    "beanDistTotalSuffix": "(पूर्ण मानों का योग — चार्ज·उपयोग·सदस्यता शुल्क·Tip·शुल्क·इनाम·वापसी·स्थानांतरण आदि सभी प्रकार)",
     "fetchFail": "Data पुनः प्राप्त करना विफल",
+    "flowBadge": {
+      "in": "अंतर्वाह",
+      "move": "आवाजाही",
+      "out": "निकासी"
+    },
     "homeTitle": "Dashboard",
     "noData": "कोई Data नहीं",
     "normalRevenue": "सामान्य Plan Revenue",
@@ -658,6 +671,17 @@
       "noData": "इस अवधि में अनुवाद Data नहीं है"
     },
     "translateSection": "अनुवाद (PiTranslate™)",
+    "txnLabel": {
+      "CHARGE": "चार्ज",
+      "ETC": "आदि",
+      "FEE": "शुल्क",
+      "REFUND": "वापसी",
+      "REWARD": "इनाम",
+      "SPEND": "उपयोग (खर्च)",
+      "SUBSCRIBE": "सदस्यता शुल्क",
+      "TIP": "Tip",
+      "TRANSFER": "P2P उपहार"
+    },
     "unitCase": "मामले",
     "unitPerson": "व्यक्ति",
     "userActivity": "गतिविधि {days} दिन · Content {content} · भुगतान {payments}"

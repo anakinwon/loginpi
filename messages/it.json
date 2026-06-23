@@ -621,7 +621,20 @@
   "adminStats": {
     "activeUsers": "Utenti attivi",
     "adminTitle": "Dashboard Statistiche",
+    "beanDistEmpty": "Nessuna transazione Bean per il periodo specificato.",
+    "beanDistError": "Errore di distribuzione: {error}",
+    "beanDistFootnote": "Lunghezza/rapporto della barra = quota del volume totale di transazioni (gross) per tipo · Variazione netta (net) = somma dei segni in base al portafoglio dell'utente (afflusso +, prelievo −, spostamento 0)",
+    "beanDistNet": "Netto {net}",
+    "beanDistRowMeta": "{cnt} transazioni · {users} utenti · {share}%",
+    "beanDistTitle": "Distribuzione delle transazioni Bean",
+    "beanDistTotalPrefix": "Totale {cnt} transazioni · Volume totale {gross}",
+    "beanDistTotalSuffix": "(Somma dei valori assoluti — tutti i tipi inclusi: ricarica, utilizzo, abbonamento, Tip, commissione, ricompensa, rimborso, trasferimento, ecc.)",
     "fetchFail": "Recupero Data fallito",
+    "flowBadge": {
+      "in": "Afflusso",
+      "move": "Spostamento",
+      "out": "Prelievo"
+    },
     "homeTitle": "Dashboard",
     "noData": "Nessun Data",
     "normalRevenue": "Ricavi piani standard",
@@ -658,6 +671,17 @@
       "noData": "Nessun Data di traduzione per il periodo"
     },
     "translateSection": "Traduzione (PiTranslate™)",
+    "txnLabel": {
+      "CHARGE": "Ricarica",
+      "ETC": "Altro",
+      "FEE": "Commissione",
+      "REFUND": "Rimborso",
+      "REWARD": "Ricompensa",
+      "SPEND": "Spesa (Consumo)",
+      "SUBSCRIBE": "Abbonamento",
+      "TIP": "Tip",
+      "TRANSFER": "Regalo P2P"
+    },
     "unitCase": "caso/i",
     "unitPerson": "persona/e",
     "userActivity": "Attività {days} giorni · Content {content} · Pagamenti {payments}"

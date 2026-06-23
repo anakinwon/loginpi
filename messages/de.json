@@ -621,7 +621,20 @@
   "adminStats": {
     "activeUsers": "Aktive Benutzer",
     "adminTitle": "Statistik Dashboard",
+    "beanDistEmpty": "Für diesen Zeitraum gibt es keine Bean-Transaktionen.",
+    "beanDistError": "Verteilungsfehler: {error}",
+    "beanDistFootnote": "Balkenlänge·Anteil = Anteil am Gesamttransaktionsvolumen (gross) pro Typ · Nettoänderung (net) = Summe der Vorzeichen basierend auf der Nutzer-Wallet (Zufluss +, Abfluss −, Bewegung 0)",
+    "beanDistNet": "Netto {net}",
+    "beanDistRowMeta": "{cnt} Transaktionen · {users} Nutzer · {share}%",
+    "beanDistTitle": "Bean-Transaktionsverteilung",
+    "beanDistTotalPrefix": "Gesamt {cnt} Transaktionen · Gesamtvolumen {gross}",
+    "beanDistTotalSuffix": "(Summe der Absolutwerte — alle Typen wie Aufladung, Ausgabe, Abonnementgebühr, Tip, Gebühr, Belohnung, Rückerstattung, Übertragung)",
     "fetchFail": "Data Abruf fehlgeschlagen",
+    "flowBadge": {
+      "in": "Zufluss",
+      "move": "Bewegung",
+      "out": "Abfluss"
+    },
     "homeTitle": "Dashboard",
     "noData": "Keine Data",
     "normalRevenue": "Umsatz aus Standardplänen",
@@ -658,6 +671,17 @@
       "noData": "Keine Übersetzungsdaten innerhalb des Zeitraums vorhanden."
     },
     "translateSection": "Übersetzung (PiTranslate™)",
+    "txnLabel": {
+      "CHARGE": "Aufladung",
+      "ETC": "Sonstiges",
+      "FEE": "Gebühr",
+      "REFUND": "Rückerstattung",
+      "REWARD": "Belohnung",
+      "SPEND": "Ausgabe",
+      "SUBSCRIBE": "Abonnementgebühr",
+      "TIP": "Tip",
+      "TRANSFER": "P2P Übertragung"
+    },
     "unitCase": "Fall",
     "unitPerson": "Person",
     "userActivity": "Aktivität {days} Tage · Inhalt {content} · Zahlungen {payments}"

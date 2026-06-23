@@ -621,7 +621,20 @@
   "adminStats": {
     "activeUsers": "アクティブユーザー",
     "adminTitle": "統計 Dashboard",
+    "beanDistEmpty": "該当期間のBean取引はありません。",
+    "beanDistError": "分布エラー: {error}",
+    "beanDistFootnote": "棒の長さ・比率 = タイプ別総取引量(gross)シェア · 純増減(net) = ユーザーウォレット基準の符号合計(流入 +, 回収 −, 移動 0)",
+    "beanDistNet": "純 {net}",
+    "beanDistRowMeta": "{cnt}件 · {users}名 · {share}%",
+    "beanDistTitle": "Bean 取引分布",
+    "beanDistTotalPrefix": "合計 {cnt}件 · 総取引量 {gross}",
+    "beanDistTotalSuffix": "(絶対値の合計 — チャージ・使用・購読料・Tip・手数料・報酬・払い戻し・転送など全タイプ)",
     "fetchFail": "Data 照会失敗",
+    "flowBadge": {
+      "in": "流入",
+      "move": "移動",
+      "out": "回収"
+    },
     "homeTitle": "Dashboard",
     "noData": "Data なし",
     "normalRevenue": "一般プラン売上",
@@ -658,6 +671,17 @@
       "noData": "期間内翻訳 Data がありません"
     },
     "translateSection": "翻訳 (PiTranslate™)",
+    "txnLabel": {
+      "CHARGE": "チャージ",
+      "ETC": "その他",
+      "FEE": "手数料",
+      "REFUND": "払い戻し",
+      "REWARD": "報酬付与",
+      "SPEND": "使用 (消費)",
+      "SUBSCRIBE": "購読料",
+      "TIP": "Tip",
+      "TRANSFER": "P2P ギフト"
+    },
     "unitCase": "件",
     "unitPerson": "名",
     "userActivity": "活動 {days}日 · Content {content} · 決済 {payments}"

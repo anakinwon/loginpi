@@ -621,7 +621,20 @@
   "adminStats": {
     "activeUsers": "Aktiivsed kasutajad",
     "adminTitle": "Statistika Dashboard",
+    "beanDistEmpty": "Antud perioodil Bean tehinguid ei ole.",
+    "beanDistError": "Jaotuse viga: {error}",
+    "beanDistFootnote": "Tulpade pikkus/suhe = kogutehingute mahu (gross) osakaal tüübi järgi · Netomuutus (neto) = kasutaja rahakoti põhjal märkide summa (sissetulek +, väljavõtmine −, liikumine 0)",
+    "beanDistNet": "Neto {net}",
+    "beanDistRowMeta": "{cnt} tehingut · {users} kasutajat · {share}%",
+    "beanDistTitle": "Bean tehingute jaotus",
+    "beanDistTotalPrefix": "Kokku {cnt} tehingut · Kogutehingute maht {gross}",
+    "beanDistTotalSuffix": "(Absoluutväärtuste summa — kõik tüübid, sh laadimine, kasutamine, tellimistasu, jootraha, tasu, preemia, tagasimakse, ülekanne jne)",
     "fetchFail": "Data hankimine ebaõnnestus",
+    "flowBadge": {
+      "in": "Sissetulek",
+      "move": "Liikumine",
+      "out": "Väljavõtmine"
+    },
     "homeTitle": "Dashboard",
     "noData": "Data puudub",
     "normalRevenue": "Tavaplaani tulu",
@@ -658,6 +671,17 @@
       "noData": "Perioodi jooksul puudub tõlke Data."
     },
     "translateSection": "Tõlge (PiTranslate™)",
+    "txnLabel": {
+      "CHARGE": "Laadimine",
+      "ETC": "Muu",
+      "FEE": "Tasu",
+      "REFUND": "Tagasimakse",
+      "REWARD": "Preemia maksmine",
+      "SPEND": "Kasutamine (tarbimine)",
+      "SUBSCRIBE": "Tellimistasu",
+      "TIP": "Jootraha",
+      "TRANSFER": "P2P kingitus"
+    },
     "unitCase": "juhtumit",
     "unitPerson": "inimest",
     "userActivity": "Aktiivsus {days} päeva · Content {content} · maksed {payments}"

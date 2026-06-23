@@ -621,7 +621,20 @@
   "adminStats": {
     "activeUsers": "ผู้ใช้งานที่ใช้งานอยู่",
     "adminTitle": "Dashboard สถิติ",
+    "beanDistEmpty": "ไม่มีธุรกรรม Bean ในช่วงเวลาดังกล่าว",
+    "beanDistError": "ข้อผิดพลาดในการกระจาย: {error}",
+    "beanDistFootnote": "ความยาวแท่ง·อัตราส่วน = ส่วนแบ่งปริมาณธุรกรรมรวม (gross) ตามประเภท · การเปลี่ยนแปลงสุทธิ (net) = ผลรวมของเครื่องหมายตามกระเป๋าเงินผู้ใช้ (เงินเข้า +, เงินออก −, การเคลื่อนย้าย 0)",
+    "beanDistNet": "สุทธิ {net}",
+    "beanDistRowMeta": "{cnt} รายการ · {users} คน · {share}%",
+    "beanDistTitle": "การกระจายธุรกรรม Bean",
+    "beanDistTotalPrefix": "ทั้งหมด {cnt} รายการ · ปริมาณธุรกรรมรวม {gross}",
+    "beanDistTotalSuffix": "(ผลรวมของค่าสัมบูรณ์ — การเติมเงิน·การใช้งาน·ค่าสมัครสมาชิก·Tip·ค่าธรรมเนียม·รางวัล·การคืนเงิน·การโอน เป็นต้น ทุกประเภท)",
     "fetchFail": "ดึง Data ล้มเหลว",
+    "flowBadge": {
+      "in": "เงินเข้า",
+      "move": "การเคลื่อนย้าย",
+      "out": "เงินออก"
+    },
     "homeTitle": "Dashboard",
     "noData": "ไม่มี Data",
     "normalRevenue": "รายได้จากแพ็กเกจทั่วไป",
@@ -658,6 +671,17 @@
       "noData": "ไม่มี Data การแปลในช่วงเวลา"
     },
     "translateSection": "การแปล (PiTranslate™)",
+    "txnLabel": {
+      "CHARGE": "การเติมเงิน",
+      "ETC": "อื่น ๆ",
+      "FEE": "ค่าธรรมเนียม",
+      "REFUND": "การคืนเงิน",
+      "REWARD": "การจ่ายรางวัล",
+      "SPEND": "การใช้งาน (การบริโภค)",
+      "SUBSCRIBE": "ค่าสมัครสมาชิก",
+      "TIP": "Tip",
+      "TRANSFER": "P2P ของขวัญ"
+    },
     "unitCase": "รายการ",
     "unitPerson": "คน",
     "userActivity": "Activity {days} วัน · Content {content} · Payment {payments}"
