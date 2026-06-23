@@ -3,15 +3,15 @@ import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getEventRanking } from '@/lib/event'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 
-// GET /api/event/ranking?limit=100 — 미션 합계 내림차순 랭킹 + M1~M10 체크리스트 (제외 대상자 필터링됨)
+// GET /api/event/ranking?limit=100&q=검색어
+// missions(M1~M10) + reward_st_cd는 getEventRanking에서 함께 반환 — 중복 쿼리 없음
 export async function GET(request: NextRequest) {
-  // 비로그인도 랭킹 조회 가능 (Shop처럼 공개) — 마스킹/관리자 기능은 is_admin으로 분기
+  // 비로그인도 랭킹 조회 가능 — is_admin 여부만 세션으로 분기
   const user = await getSessionUser()
 
   const { searchParams } = new URL(request.url)
   const limit = Math.min(Number(searchParams.get('limit') ?? '100'), 200)
-  // 요원명 검색 — pi_username/nick_nm 부분일치(pg_trgm GIN 가속, sql/086·101)
-  // PostgREST .or 필터 인젝션 방지: 구조 문자(콤마·괄호·별표·역슬래시·퍼센트) 제거 + 길이 제한
+  // 요원명 검색 인젝션 방지: 구조 문자 제거 + 길이 제한
   const q = (searchParams.get('q')?.trim() ?? '')
     .replace(/[,()*\\%]/g, '')
     .slice(0, 40)
@@ -19,77 +19,21 @@ export async function GET(request: NextRequest) {
   try {
     let ranking = await getEventRanking('evt-20260614-001', limit)
 
-    // 검색어가 있으면 sys_user를 .ilike(trgm 인덱스)로 조회해 매칭 user만 후필터.
+    // 검색어 있으면 sys_user pg_trgm(.ilike)로 매칭 ID 조회 후 필터
     // (전체 순위 계산 후 필터 → 검색해도 순위 번호는 전체 기준 유지)
     if (q) {
       const { data: matched } = await getSupabaseAdmin()
         .from('sys_user')
         .select('id')
         .or(`pi_username.ilike.%${q}%,nick_nm.ilike.%${q}%`)
-      const matchedIds = new Set(
-        (matched ?? []).map((u) => (u as { id: string }).id),
-      )
+      const matchedIds = new Set((matched ?? []).map((u) => (u as { id: string }).id))
       ranking = ranking.filter((r) => matchedIds.has(r.user_id))
     }
 
-    // 각 사용자의 M1~M10 완료 상태 조회
-    const userIds = ranking.map((r) => r.user_id)
-    const { data: userMissions } = await getSupabaseAdmin()
-      .from('evt_user_mission')
-      .select('user_id, mission_cd, complete_dtm')
-      .eq('event_id', 'evt-20260614-001')
-      .eq('del_yn', 'N')
-      .in('user_id', userIds)
-
-    // 사용자별 미션 완료 매트릭스 구성 (mission_cd CHAR 패딩 제거)
-    const missionMap = new Map<string, Set<string>>()
-    ;(userMissions ?? []).forEach((um) => {
-      const key = um.user_id
-      if (!missionMap.has(key)) {
-        missionMap.set(key, new Set())
-      }
-      missionMap.get(key)!.add(um.mission_cd.trim())
-    })
-
-    // 보상 지급 상태 조회 — 10미션 완료자의 보상대기/완료 구분용 (FK 없으니 user_id 별도 조회 후 병합)
-    const { data: rewardLogs } = await getSupabaseAdmin()
-      .from('evt_pi_reward_log')
-      .select('user_id, reward_st_cd')
-      .eq('event_id', 'evt-20260614-001')
-      .eq('del_yn', 'N')
-      .in('user_id', userIds)
-
-    const rewardMap = new Map<string, string>()
-    ;(rewardLogs ?? []).forEach((rl) => {
-      rewardMap.set(
-        (rl as { user_id: string }).user_id,
-        (rl as { reward_st_cd: string }).reward_st_cd,
-      )
-    })
-
-    // 랭킹에 미션 체크리스트 추가
-    const rankingWithMissions = ranking.map((r) => ({
-      ...r,
-      missions: {
-        M1: missionMap.get(r.user_id)?.has('M1') ?? false,
-        M2: missionMap.get(r.user_id)?.has('M2') ?? false,
-        M3: missionMap.get(r.user_id)?.has('M3') ?? false,
-        M4: missionMap.get(r.user_id)?.has('M4') ?? false,
-        M5: missionMap.get(r.user_id)?.has('M5') ?? false,
-        M6: missionMap.get(r.user_id)?.has('M6') ?? false,
-        M7: missionMap.get(r.user_id)?.has('M7') ?? false,
-        M8: missionMap.get(r.user_id)?.has('M8') ?? false,
-        M9: missionMap.get(r.user_id)?.has('M9') ?? false,
-        M10: missionMap.get(r.user_id)?.has('M10') ?? false,
-      },
-      // 보상 지급 상태: null(보상 로그 없음=미지급) | PENDING | PAID | FAILED
-      reward_st_cd: rewardMap.get(r.user_id) ?? null,
-    }))
-
-    return NextResponse.json({
-      ranking: rankingWithMissions,
-      is_admin: user ? isAdmin(user) : false,
-    })
+    return NextResponse.json(
+      { ranking, is_admin: user ? isAdmin(user) : false },
+      { headers: { 'Cache-Control': 'private, max-age=15, stale-while-revalidate=30' } },
+    )
   } catch (err) {
     console.error('[event/ranking] 조회 실패:', err)
     return NextResponse.json({ error: '랭킹 조회 실패' }, { status: 500 })

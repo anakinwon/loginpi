@@ -453,91 +453,62 @@ export async function getEventProgress(userId: string, eventId: string) {
 }
 
 /**
- * 이벤트 랭킹 조회 (Stage 1 간이 버전)
- * Note: Stage 2에서 Supabase RPC 또는 raw query로 최적화 필요
+ * 이벤트 랭킹 조회
+ *
+ * 성능: 순차 6쿼리 → 2단계 병렬 4쿼리
+ *   1단계(병렬): evt_exclude + evt_user_mission 전체
+ *   2단계(병렬): sys_user .in(rankedIds) + evt_pi_reward_log .in(rankedIds)
+ *
+ * 제거: sys_user 전체 스캔(unranked 사용자 — 가입자 수에 비례하는 병목).
+ * 추가: missions(M1~M10) + reward_st_cd를 여기서 함께 반환 → route.ts 중복 쿼리 불필요.
  */
 export async function getEventRanking(eventId: string, limit: number = 100) {
   const db = getSupabaseAdmin()
 
-  // 제외 대상자 조회
-  const { data: excludedUsers } = await db
-    .from('evt_exclude')
-    .select('user_id')
-    .eq('event_id', eventId)
-    .eq('del_yn', 'N')
+  // 1단계: evt_exclude + evt_user_mission 병렬 조회
+  const [excludedResult, missionsResult] = await Promise.all([
+    db.from('evt_exclude').select('user_id').eq('event_id', eventId).eq('del_yn', 'N'),
+    db
+      .from('evt_user_mission')
+      .select('user_id, mission_cd, complete_dtm')
+      .eq('event_id', eventId)
+      .eq('del_yn', 'N'),
+  ])
 
-  const excludedUserIds = new Set(excludedUsers?.map((e) => e.user_id) ?? [])
+  const excludedUserIds = new Set(excludedResult.data?.map((e) => e.user_id) ?? [])
+  const allMissions = missionsResult.data ?? []
 
-  // 모든 완료 미션 조회 (FK 부재로 조인 불가 → user_id로 사용자 정보 별도 병합)
-  const { data: allMissions } = await db
-    .from('evt_user_mission')
-    .select('user_id, mission_cd, complete_dtm')
-    .eq('event_id', eventId)
-    .eq('del_yn', 'N')
-
-  type SuRow = {
-    id: string
-    nick_nm: string | null
-    display_name: string | null
-    pi_username: string | null
-  }
-  const amUserIds = [...new Set((allMissions ?? []).map((m) => m.user_id))]
-  const suMap = new Map<string, SuRow>()
-  if (amUserIds.length > 0) {
-    const { data: us } = await db
-      .from('sys_user')
-      .select('id, nick_nm, display_name, pi_username')
-      .in('id', amUserIds)
-    for (const u of (us ?? []) as SuRow[]) suMap.set(u.id, u)
-  }
-
-  // 사용자별 집계
+  // 사용자별 집계 + M1~M10 매트릭스 단일 루프로 동시 구성
   const userStats = new Map<
     string,
-    {
-      count: number
-      firstCompleteDtm: string
-      lastCompleteDtm: string
-      nick_nm: string | null
-      display_name: string | null
-      pi_username: string | null
-    }
+    { count: number; firstCompleteDtm: string; lastCompleteDtm: string }
   >()
+  const missionMatrix = new Map<string, Set<string>>()
 
-  if (allMissions) {
-    for (const mission of allMissions) {
-      if (excludedUserIds.has(mission.user_id)) continue
+  for (const mission of allMissions) {
+    if (excludedUserIds.has(mission.user_id)) continue
 
-      const sysUser: SuRow = suMap.get(mission.user_id) ?? {
-        id: mission.user_id,
-        nick_nm: null,
-        display_name: null,
-        pi_username: null,
-      }
+    const existing = userStats.get(mission.user_id)
+    const count = (existing?.count ?? 0) + 1
+    userStats.set(mission.user_id, {
+      count,
+      firstCompleteDtm: existing
+        ? existing.firstCompleteDtm < mission.complete_dtm
+          ? existing.firstCompleteDtm
+          : mission.complete_dtm
+        : mission.complete_dtm,
+      lastCompleteDtm: existing
+        ? existing.lastCompleteDtm > mission.complete_dtm
+          ? existing.lastCompleteDtm
+          : mission.complete_dtm
+        : mission.complete_dtm,
+    })
 
-      const existing = userStats.get(mission.user_id)
-      const count = (existing?.count ?? 0) + 1
-
-      userStats.set(mission.user_id, {
-        count,
-        firstCompleteDtm: existing
-          ? existing.firstCompleteDtm < mission.complete_dtm
-            ? existing.firstCompleteDtm
-            : mission.complete_dtm
-          : mission.complete_dtm,
-        lastCompleteDtm: existing
-          ? existing.lastCompleteDtm > mission.complete_dtm
-            ? existing.lastCompleteDtm
-            : mission.complete_dtm
-          : mission.complete_dtm,
-        nick_nm: sysUser.nick_nm,
-        display_name: sysUser.display_name,
-        pi_username: sysUser.pi_username,
-      })
-    }
+    if (!missionMatrix.has(mission.user_id)) missionMatrix.set(mission.user_id, new Set())
+    missionMatrix.get(mission.user_id)!.add((mission.mission_cd as string).trim())
   }
 
-  // 정렬 (count 내림차순, 동점 시 마지막 수행 일시 오름차순 — 먼저 끝낸 사람이 상위)
+  // count 내림차순, 동점 시 마지막 수행 일시 오름차순(먼저 끝낸 사람 상위)
   const sorted = Array.from(userStats.entries())
     .sort(([, a], [, b]) => {
       if (b.count !== a.count) return b.count - a.count
@@ -545,38 +516,46 @@ export async function getEventRanking(eventId: string, limit: number = 100) {
     })
     .slice(0, limit)
 
-  // 순위 계산 (정렬 순서대로 순차 부여 — 동점자도 마지막 수행 일시로 순위 구분)
-  const ranked = sorted.map(([userId, stats], i) => ({
-    rank: i + 1,
-    user_id: userId,
-    mission_count: stats.count,
-    first_complete_dtm: stats.firstCompleteDtm as string | null,
-    last_complete_dtm: stats.lastCompleteDtm as string | null,
-    nick_nm: stats.nick_nm ?? stats.display_name,
-    pi_username: stats.pi_username,
-  }))
+  if (!sorted.length) return []
 
-  // UNION ALL: 미션 완료 0개 사용자 — 제외 대상자·이미 랭킹된 사용자 제외 후 최근 가입순 하위 추가
-  const rankedUserIds = new Set(sorted.map(([userId]) => userId))
-  const { data: allUsers } = await db
-    .from('sys_user')
-    .select('id, nick_nm, display_name, pi_username, reg_dtm')
-    .order('reg_dtm', { ascending: false }) // 최근 가입순
+  // 2단계: sys_user + evt_pi_reward_log 병렬 조회 (ranked users only)
+  const rankedUserIds = sorted.map(([userId]) => userId)
+  const [usersResult, rewardResult] = await Promise.all([
+    db.from('sys_user').select('id, nick_nm, display_name, pi_username').in('id', rankedUserIds),
+    db
+      .from('evt_pi_reward_log')
+      .select('user_id, reward_st_cd')
+      .eq('event_id', eventId)
+      .eq('del_yn', 'N')
+      .in('user_id', rankedUserIds),
+  ])
 
-  const unranked = (allUsers ?? [])
-    .filter((u) => !rankedUserIds.has(u.id) && !excludedUserIds.has(u.id))
-    .map((u) => ({
-      rank: null as number | null, // 순위 미표시
-      user_id: u.id,
-      mission_count: null as number | null, // 합계 미표시
-      first_complete_dtm: null as string | null,
-      last_complete_dtm: null as string | null,
-      nick_nm:
-        (u.nick_nm as string | null) ?? (u.display_name as string | null),
-      pi_username: u.pi_username as string | null,
-    }))
+  type SuRow = { id: string; nick_nm: string | null; display_name: string | null; pi_username: string | null }
+  const suMap = new Map<string, SuRow>()
+  for (const u of (usersResult.data ?? []) as SuRow[]) suMap.set(u.id, u)
 
-  return [...ranked, ...unranked]
+  const rewardMap = new Map<string, string>()
+  for (const rl of (rewardResult.data ?? []) as { user_id: string; reward_st_cd: string }[]) {
+    rewardMap.set(rl.user_id, rl.reward_st_cd)
+  }
+
+  const MISSIONS = ['M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7', 'M8', 'M9', 'M10'] as const
+
+  return sorted.map(([userId, stats], i) => {
+    const su = suMap.get(userId)
+    const completed = missionMatrix.get(userId)
+    return {
+      rank: i + 1 as number | null,
+      user_id: userId,
+      mission_count: stats.count as number | null,
+      first_complete_dtm: stats.firstCompleteDtm as string | null,
+      last_complete_dtm: stats.lastCompleteDtm as string | null,
+      nick_nm: (su?.nick_nm ?? su?.display_name ?? null) as string | null,
+      pi_username: (su?.pi_username ?? null) as string | null,
+      missions: Object.fromEntries(MISSIONS.map((m) => [m, completed?.has(m) ?? false])) as Record<string, boolean>,
+      reward_st_cd: (rewardMap.get(userId) ?? null) as string | null,
+    }
+  })
 }
 
 /**
