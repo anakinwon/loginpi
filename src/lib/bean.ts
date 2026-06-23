@@ -1,6 +1,6 @@
 import 'server-only'
 import { getSupabaseAdmin } from './supabase-admin'
-import { TIP_PRESETS_BEAN } from './bean-shared'
+import { TIP_PRESETS_BEAN, TIP_CUSTOM_MAX_BEAN } from './bean-shared'
 import type { BeanTxn, BeanTxnType } from './bean-shared'
 
 // Bean Token 경제 서버 전용 DB 접근 (PRD_16_TOKEN_MNG v1.2)
@@ -20,30 +20,46 @@ interface TipCfgRow {
   tip1_bean: number
   tip2_bean: number
   tip3_bean: number
+  custom_max_bean: number
 }
 
-// 카페방 P2P 선물(팁) 프리셋 — DB 최신행(bean_tip_cfg) 우선, 없거나 오류면 코드 상수 폴백.
-// graceful: sql/109 미적용 시에도 선물 기능이 깨지지 않도록 항상 유효한 3종을 반환한다.
-export async function getTipPresets(): Promise<number[]> {
+// 선물 설정 = 고정 프리셋 3종 + 직접입력 상한(프리셋 4)
+export interface TipConfig {
+  presets: number[] // 고정 금액 버튼 3종
+  customMax: number // 직접입력 송금 상한 (1~customMax)
+}
+
+const TIP_FALLBACK: TipConfig = {
+  presets: [...TIP_PRESETS_BEAN],
+  customMax: TIP_CUSTOM_MAX_BEAN,
+}
+
+// 카페방 P2P 선물 설정 — DB 최신행(bean_tip_cfg) 우선, 없거나 오류면 코드 상수 폴백.
+// graceful: sql/109 미적용 시에도 선물 기능이 깨지지 않도록 항상 유효한 설정을 반환한다.
+export async function getTipPresets(): Promise<TipConfig> {
   try {
     const { data, error } = await getSupabaseAdmin()
       .from('bean_tip_cfg')
-      .select('tip1_bean, tip2_bean, tip3_bean')
+      .select('tip1_bean, tip2_bean, tip3_bean, custom_max_bean')
       .eq('del_yn', 'N')
       .order('reg_dtm', { ascending: false })
       .limit(1)
       .maybeSingle()
-    if (error || !data) return [...TIP_PRESETS_BEAN]
+    if (error || !data) return TIP_FALLBACK
     const row = data as TipCfgRow
-    return [Number(row.tip1_bean), Number(row.tip2_bean), Number(row.tip3_bean)]
+    return {
+      presets: [Number(row.tip1_bean), Number(row.tip2_bean), Number(row.tip3_bean)],
+      customMax: Number(row.custom_max_bean),
+    }
   } catch {
-    return [...TIP_PRESETS_BEAN]
+    return TIP_FALLBACK
   }
 }
 
-// 선물 프리셋 변경 — 새 행 INSERT(이력 보존, bean_supply_config 패턴). 호출 전 검증 필수.
+// 선물 설정 변경 — 새 행 INSERT(이력 보존, bean_supply_config 패턴). 호출 전 검증 필수.
 export async function updateTipPresets(
   presets: [number, number, number],
+  customMax: number,
   regrId: string,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   const [a, b, c] = presets
@@ -51,6 +67,7 @@ export async function updateTipPresets(
     tip1_bean: a,
     tip2_bean: b,
     tip3_bean: c,
+    custom_max_bean: customMax,
     note_txt: '관리자 수정',
     regr_id: regrId,
     modr_id: regrId,

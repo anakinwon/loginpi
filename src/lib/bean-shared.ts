@@ -9,6 +9,9 @@ export const CHARGE_PRESETS = [100, 500, 1000, 5000] as const
 // 카페방 P2P 선물 프리셋 (Bean 단위). 1 Pi = 100 Bean → 100/500/1000 Bean = 1/5/10 Pi.
 export const TIP_PRESETS_BEAN = [100, 500, 1000] as const
 
+// 프리셋 4 — 직접입력 송금 상한(Bean). 사용자는 1~이 값까지 임의 금액 전송. 기본 10,000 = 100 Pi.
+export const TIP_CUSTOM_MAX_BEAN = 10000
+
 // TRANSFER: 카페방 P2P 선물(USER↔USER 이전, 부호로 송수신 구분)
 export type BeanTxnType = 'CHARGE' | 'SPEND' | 'REWARD' | 'REFUND' | 'TRANSFER'
 

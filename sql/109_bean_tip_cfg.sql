@@ -3,11 +3,12 @@
 --   표준약어 'tip'(선물/팁, P2P 선물 거래) + 'cfg'(설정/config, bean_supply_config.cfg_id 선례) 사용.
 --   코드 식별자 TIP_PRESETS_BEAN(src/lib/bean-shared.ts) 이미 운영 중 — 표시명은 PiCafé™ 선물하기.
 --
--- 목적: 카페방 P2P 선물(팁) 금액 프리셋 3종을 코드 상수(빌드 고정)에서 DB로 이관 →
---   관리자가 런타임 수정. bean_supply_config 패턴 동일: 수정 시 새 행 INSERT, 최신행(reg_dtm DESC) 사용.
+-- 목적: 카페방 P2P 선물(팁) 금액 프리셋 3종 + 직접입력 상한(프리셋 4)을 코드 상수(빌드 고정)에서
+--   DB로 이관 → 관리자가 런타임 수정. bean_supply_config 패턴 동일: 수정 시 새 행 INSERT, 최신행 사용.
 --   변경 이력 보존(누가/언제 바꿨는지 감사). 물리 DELETE 금지·논리삭제만.
+--   프리셋 4 = 고정 버튼이 아니라 '직접입력' 모드의 상한값(custom_max_bean, 기본 10,000).
 --
--- 안전: 앱은 이 테이블이 없거나 비어도 코드 상수 [100,500,1000]으로 폴백(getTipPresets) →
+-- 안전: 앱은 이 테이블이 없거나 비어도 코드 상수(프리셋 [100,500,1000]·상한 10000)로 폴백(getTipPresets) →
 --   적용 전에도 선물 기능 정상. 적용 후부터 DB값 우선.
 
 CREATE TABLE IF NOT EXISTS public.bean_tip_cfg (
@@ -15,6 +16,7 @@ CREATE TABLE IF NOT EXISTS public.bean_tip_cfg (
   tip1_bean  BIGINT      NOT NULL CHECK (tip1_bean > 0),   -- 선물 프리셋 1 (작은 금액)
   tip2_bean  BIGINT      NOT NULL CHECK (tip2_bean > 0),   -- 선물 프리셋 2 (중간)
   tip3_bean  BIGINT      NOT NULL CHECK (tip3_bean > 0),   -- 선물 프리셋 3 (큰 금액)
+  custom_max_bean BIGINT NOT NULL DEFAULT 10000 CHECK (custom_max_bean > 0), -- 프리셋 4: 직접입력 상한
   note_txt   TEXT,
   del_yn     CHAR(1)     NOT NULL DEFAULT 'N',
   del_dtm    TIMESTAMPTZ,
@@ -29,13 +31,19 @@ CREATE TABLE IF NOT EXISTS public.bean_tip_cfg (
 COMMENT ON TABLE  public.bean_tip_cfg          IS '카페방 P2P 선물(팁) 금액 프리셋 설정 — 최신행(reg_dtm DESC)이 현행. 수정=새 행 INSERT(이력 보존)';
 COMMENT ON COLUMN public.bean_tip_cfg.tip1_bean IS '선물 프리셋 1 (Bean, 오름차순 최솟값). 1 Pi = 100 Bean';
 
+-- 멱등: 이미 테이블이 (프리셋 4 컬럼 없이) 적용된 경우를 위해 컬럼 보강. 기존 행은 DEFAULT 10000 적용.
+ALTER TABLE public.bean_tip_cfg
+  ADD COLUMN IF NOT EXISTS custom_max_bean BIGINT NOT NULL DEFAULT 10000;
+
+COMMENT ON COLUMN public.bean_tip_cfg.custom_max_bean IS '프리셋 4 — 직접입력 송금 상한(Bean). 사용자는 1~이 값까지 임의 금액 전송. 기본 10,000 = 100 Pi';
+
 CREATE INDEX IF NOT EXISTS idx_bean_tip_cfg_latest ON public.bean_tip_cfg(reg_dtm DESC) WHERE del_yn = 'N';
 
--- 현재 운영값 시드 (코드 상수와 동일: 100/500/1000 = 1/5/10 Pi)
-INSERT INTO public.bean_tip_cfg (tip1_bean, tip2_bean, tip3_bean, note_txt)
-SELECT 100, 500, 1000, '초기 시드 — 코드 상수 TIP_PRESETS_BEAN 이관'
+-- 현재 운영값 시드 (프리셋 100/500/1000 = 1/5/10 Pi, 직접입력 상한 10000 = 100 Pi)
+INSERT INTO public.bean_tip_cfg (tip1_bean, tip2_bean, tip3_bean, custom_max_bean, note_txt)
+SELECT 100, 500, 1000, 10000, '초기 시드 — 코드 상수 TIP_PRESETS_BEAN 이관 + 직접입력 상한'
  WHERE NOT EXISTS (SELECT 1 FROM public.bean_tip_cfg WHERE del_yn = 'N');
 
 -- 검증:
---   SELECT tip1_bean, tip2_bean, tip3_bean, reg_dtm FROM public.bean_tip_cfg
---    WHERE del_yn='N' ORDER BY reg_dtm DESC LIMIT 1;   -- 현행 프리셋
+--   SELECT tip1_bean, tip2_bean, tip3_bean, custom_max_bean, reg_dtm FROM public.bean_tip_cfg
+--    WHERE del_yn='N' ORDER BY reg_dtm DESC LIMIT 1;   -- 현행 프리셋 + 직접입력 상한

@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
-import { TIP_PRESETS_BEAN } from '@/lib/bean-shared'
+import { TIP_PRESETS_BEAN, TIP_CUSTOM_MAX_BEAN } from '@/lib/bean-shared'
 
 interface PiTipButtonProps {
   roomId: string
@@ -18,15 +18,22 @@ export function PiTipButton({
   const [open, setOpen] = useState(false)
   const [confirmAmt, setConfirmAmt] = useState<number | null>(null) // null=금액선택, 값=확인단계
   const [sending, setSending] = useState(false)
-  // 선물 프리셋 — 런타임(관리자 설정) 값. 로딩/실패 시 코드 상수로 폴백.
+  // 선물 설정 — 런타임(관리자) 값. 로딩/실패 시 코드 상수로 폴백.
   const [presets, setPresets] = useState<number[]>([...TIP_PRESETS_BEAN])
+  const [customMax, setCustomMax] = useState<number>(TIP_CUSTOM_MAX_BEAN)
+  // 직접 입력(프리셋 4) 상태
+  const [customOpen, setCustomOpen] = useState(false)
+  const [customVal, setCustomVal] = useState('')
 
   useEffect(() => {
     let alive = true
     piFetch('/api/tip-presets')
       .then((r) => (r.ok ? r.json() : null))
-      .then((d: { presets?: number[] } | null) => {
-        if (alive && d?.presets?.length === 3) setPresets(d.presets)
+      .then((d: { presets?: number[]; customMax?: number } | null) => {
+        if (!alive || !d) return
+        if (d.presets?.length === 3) setPresets(d.presets)
+        if (typeof d.customMax === 'number' && d.customMax > 0)
+          setCustomMax(d.customMax)
       })
       .catch(() => {}) // 실패 시 상수 유지
     return () => {
@@ -37,7 +44,16 @@ export function PiTipButton({
   function close() {
     setOpen(false)
     setConfirmAmt(null)
+    setCustomOpen(false)
+    setCustomVal('')
   }
+
+  const customNum = Number(customVal)
+  const customValid =
+    customVal !== '' &&
+    Number.isInteger(customNum) &&
+    customNum > 0 &&
+    customNum <= customMax
 
   async function sendTip(amount: number) {
     setSending(true)
@@ -81,30 +97,78 @@ export function PiTipButton({
         />
       </button>
       {open && (
-        <div className="bg-popover absolute bottom-full left-0 z-20 mb-1 min-w-[200px] rounded-xl border p-2 shadow-lg">
+        <div className="bg-popover absolute bottom-full left-0 z-20 mb-1 min-w-[230px] rounded-xl border p-2 shadow-lg">
           {confirmAmt === null ? (
             // ── 1단계: 금액 선택 ──
             <>
-              <div className="text-muted-foreground mb-1.5 px-1 text-xs">
-                Bean 금액 선택
-              </div>
-              <div className="flex gap-1">
-                {presets.map((amt) => (
-                  <button
-                    key={amt}
-                    onClick={() => setConfirmAmt(amt)}
-                    className="bg-primary/10 text-primary hover:bg-primary/20 flex-1 rounded-lg px-2 py-1.5 text-xs font-medium"
-                  >
-                    {amt} Bean
-                  </button>
-                ))}
+              <div className="text-muted-foreground mb-1.5 flex items-center justify-between px-1 text-xs">
+                <span>Bean 금액 선택</span>
                 <button
                   onClick={close}
-                  className="text-muted-foreground hover:text-foreground rounded-lg px-2 py-1.5 text-xs"
+                  className="hover:text-foreground"
+                  aria-label="닫기"
                 >
                   ✕
                 </button>
               </div>
+              <div className="grid grid-cols-3 gap-1">
+                {presets.map((amt) => (
+                  <button
+                    key={amt}
+                    onClick={() => setConfirmAmt(amt)}
+                    className="bg-primary/10 text-primary hover:bg-primary/20 rounded-lg px-2 py-1.5 text-xs font-medium"
+                  >
+                    {amt.toLocaleString()}
+                  </button>
+                ))}
+              </div>
+
+              {/* 프리셋 4 — 직접 입력 */}
+              {!customOpen ? (
+                <button
+                  onClick={() => setCustomOpen(true)}
+                  className="hover:bg-muted mt-1 w-full rounded-lg border border-dashed px-2 py-1.5 text-xs font-medium"
+                >
+                  ✏️ 직접 입력 (최대 {customMax.toLocaleString()} Bean)
+                </button>
+              ) : (
+                <div className="mt-1.5">
+                  <div className="flex gap-1">
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      autoFocus
+                      value={customVal}
+                      onChange={(e) =>
+                        setCustomVal(e.target.value.replace(/[^0-9]/g, ''))
+                      }
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && customValid)
+                          setConfirmAmt(customNum)
+                      }}
+                      placeholder={`1 ~ ${customMax.toLocaleString()}`}
+                      className="border-input bg-background min-w-0 flex-1 rounded-lg border px-2 py-1.5 text-right text-xs tabular-nums"
+                    />
+                    <button
+                      disabled={!customValid}
+                      onClick={() => setConfirmAmt(customNum)}
+                      className="bg-primary text-primary-foreground rounded-lg px-3 py-1.5 text-xs font-medium disabled:opacity-40"
+                    >
+                      확인
+                    </button>
+                  </div>
+                  {customVal !== '' && !customValid && (
+                    <p className="mt-1 px-1 text-[11px] text-amber-600 dark:text-amber-400">
+                      1 ~ {customMax.toLocaleString()} Bean 사이 정수만 가능
+                    </p>
+                  )}
+                  {customValid && (
+                    <p className="text-muted-foreground mt-1 px-1 text-[11px]">
+                      ≈ π{(customNum / 100).toFixed(2)}
+                    </p>
+                  )}
+                </div>
+              )}
             </>
           ) : (
             // ── 2단계: 선물 확인 ──
@@ -112,7 +176,7 @@ export function PiTipButton({
               <div className="mb-2 px-1 text-sm">
                 <span className="font-semibold">{recipientName}</span> 님께{' '}
                 <span className="text-primary font-semibold">
-                  {confirmAmt} Bean
+                  {confirmAmt.toLocaleString()} Bean
                 </span>
                 을 선물하시겠습니까?
               </div>

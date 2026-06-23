@@ -38,10 +38,11 @@ async function handlePOST(request: NextRequest) {
     )
   }
 
-  const validAmounts = await getTipPresets()
-  if (!validAmounts.includes(amount)) {
+  // 고정 프리셋 + 직접입력(1~상한)을 통합 검증 — 정수·양수·상한 이내. 프리셋은 상한 이하라 자동 포함.
+  const tipCfg = await getTipPresets()
+  if (!Number.isInteger(amount) || amount <= 0 || amount > tipCfg.customMax) {
     return NextResponse.json(
-      { error: `유효한 금액: ${validAmounts.join(', ')} Bean` },
+      { error: `1 ~ ${tipCfg.customMax.toLocaleString()} Bean 사이 정수만 가능합니다` },
       { status: 400 },
     )
   }
