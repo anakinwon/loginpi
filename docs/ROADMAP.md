@@ -2,7 +2,7 @@
 
 Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Network 앱 플랫폼
 
-> **기준일**: 2026-06-22
+> **기준일**: 2026-06-23
 > **현재 버전**: Phase 7~12 완료 (PiCafé MVP · Pi 수익화 · 생태계 확장 · 사용자 프로필 · 통계 대시보드 · PiTranslate™ TASK-090~099 ✅) · **Phase 13 PiShop(MPS) Phase 1+2+3 완료 — P1+P2(TASK-100~111 ✅) + 후속 개선(A2U 환불·이미지 업로드) + Phase 3 O2O 오프라인 매장 커머스 완료 (TASK-113~120 ✅ 2026-06-16: 구글 카페 half-인증 등록·오프라인 주문 상태머신(주문중→준비중→상품대기중→10분 자동완료)·주문방법 3종·취소수수료·보이스 주문알림·지도 상품판매·IDOR 차단, `sql/050~060`) · PiRC3만 보류** · **Phase 14 PiVoice™ v3.0 권한 시스템 구현 완료 (TASK-120~125 ✅, `docs/PRD_9_VOICE_CHAT.md` v3.0 — 방장 보장 슬롯 + 멤버 자동 2/승인 2, S0 실기기 검증·TURN env 잔여)** · **Phase 15 LBS P0+P1 완료 (TASK-130~140 ✅, 상품 개별 위치 등록 포함)** · 횡단 개선: 무한 스크롤·지연 로딩 + SWR 캐싱·병렬 호출 성능 튜닝, Pi Tip→Bean 리브랜딩, 스티커 노출 개선 (2026-06-12) · **횡단 3차 (2026-06-13): Pi Browser admin 다국어 전환 무반응 수정(_pit 티켓 선발급) + 헤더 다국어 콤보 3계층 캐시 성능 개선** · **횡단 4차 (2026-06-14): CafePi 헤더 로고 교체·Pi Bet UI 아코디언·다국어 선택기 기억·PiShop 브랜드 통일·admin open redirect 방어 + 어드민 대시보드 고도화(coin360 트리맵·사용자 관리 통합·KST 집계 교정·결제내역 개선)** · **Phase 16 평가 엔진 정밀화 (2026-06-15): M2 상태형 양방향 멱등·평가엔진 select후분기 복구·CHAR→VARCHAR(sql/046)·CRON_SECRET 프로덕션 필수·재평가 안전망 cron·관리자 재평가 버튼** · **횡단 5차 (2026-06-15): i18n 전체 자동번역 서버 after() 백그라운드화 + 번역률 반올림 버그·콤보 캐시 키 v2 무효화** · **GTM 문서화 (2026-06-16): 제품소개서(단기 4목표 13장) + 공개·라이선스 정책(오픈코어 3계층) + 성능 리스크 레지스터(7종 병목 분석) + 운영 이슈 기록(Vercel Hobby cron·GitHub Webhook)** · **이벤트 보상 전환 (2026-06-17, TASK-156): 10미션 완주 보상을 Pi A2U 송금 → mps_seller_bond 1π 직접 적립으로 전환, 자동→관리자 수동 지급 버튼, 원자적 RPC `fn_evt_grant_bond_reward`(FOR UPDATE+reward_st_cd 게이트)로 이중지급 차단, M3 유료테마 게이트 결함 수정** · **PiShop 카트 다건 일괄 판매 (2026-06-17, 13-P4): 등록 페이지 분리(중고직거래/오프라인매장)+자국통화 등록표시(등록시점 고정 참고가 sql/062)+오프라인매장 카트 다중상품 단일 Pi 결제(`mps_order_item`·원자 RPC `fn_mps_cart_order_create`/`_cancel` sql/063)+주문관리 라인/호명/픽업매장명/색상. ⚠️ sql 062·063 적용+실기기 결제 검증 잔여**
 > **배포 URL**: https://loginpi.vercel.app
 > **기술 스택**: Next.js 16 App Router · React 19 · TypeScript 6 · Tailwind CSS v4 · NextAuth.js · Supabase PostgreSQL
@@ -57,11 +57,12 @@ Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Net
 | **13-P4** | PiShop 카트 다건 일괄 판매 + 자국통화 (2026-06-17) | ✅ 완료 | 등록 페이지 분리(중고직거래/오프라인매장)·자국통화 등록표시(등록시점 고정 참고가 sql/062)·오프라인매장 카트(매장단위·담기 팝업·장바구니·라인 소계)→다중상품 단일 Pi 결제(`mps_order_item`+원자 RPC `fn_mps_cart_order_create`/`_cancel` sql/063)·주문관리 라인/호명/매장명/색상. ⚠️ sql 062·063 적용+실기기 결제 검증 잔여 |
 | **횡단6** | 3대 검색(카페·상품·게시판) trgm 표준화·즉시검색 통일 + 카페 목록 UX + 정산 무결성 (2026-06-20) | ✅ 완료 | 100% (상품·게시판 pg_trgm GIN `sql/076`+즉시검색 debounce 통일+게시판 통합검색 신규 · 카페 '내 카페' 그룹화+🔒비공개 배지+유효기간/무기한 · 정산 자국통화 원자화 `sql/074`+소급 · 마켓 폐기테마 회귀 `sql/075`) |
 | **20** | 화면 성능 최적화 (6탭 전수 진단) | 🚧 진단 완료·Phase 1 착수 | PRD_18_PERFORM — home·event·cafe·shop·map·admin 6탭 CRITICAL 4·HIGH 15·MEDIUM 18(총 37건) 식별 + 3단계 로드맵(38h). **Phase 1 즉시개선 적용(2026-06-23)**: HOME LazySection rootMargin 200→50px+aggregate 로깅 · EVENT 미션 재평가 가드+피드백 · SHOP ItemCard memo. 잔여 CRITICAL: CAFE WebSocket 폴백·SHOP Pi결제 window.Pi 가드·MAP 마커 클러스터링 |
+| **21** | 보안 강화 (KISA 21개 + DDoS 5계층) | 🔶 코드 구현 완료·Vercel 설정 잔여 | `docs/PRD_2_SECURITY.md` v1.0 + `docs/SECURITY_DDOS_POLICY.md` 수립 + 코드 구현(2026-06-23): `src/lib/ddos-guard.ts`·`src/lib/api-guard.ts`·middleware 통합·`vercel.json` 보안 헤더·`/api/auth/pi`·`/api/payments/approve` guard 적용. 잔여: Vercel Firewall/BotID 수동 설정(즉시)·Supabase timeout(7일)·추가확인 6항목·세션 블랙리스트(30일)·Upstash Redis(트래픽 증가 시) |
 
 ### 통계
-- **총 Phase**: 21개 (0~18 + 횡단 개선 + 문서화 + Phase 20 성능)
+- **총 Phase**: 22개 (0~18 + 횡단 개선 + 문서화 + Phase 20 성능 + Phase 21 보안)
 - **완료**: 19개 구현 완료 (Phase 18 판매자 주문 알림 포함 — 2026-06-18)
-- **진행 중**: 1개 (Phase 20 화면 성능 최적화 — 진단 완료·Phase 1 착수, 2026-06-23)
+- **진행 중**: 2개 (Phase 20 화면 성능 최적화 — 진단 완료·Phase 1 착수 · Phase 21 보안 강화 — 코드 구현 완료·Vercel 설정 잔여, 2026-06-23)
 - **기획·문서**: 1개 (Phase 17 BEAN 토큰 발행 — 문서 전용·앱 코드 0, T01/T02/T05 외부 회신 대기)
 - **예정**: 확장 Phase (PiRC3 실 에스크로 보류 해제 대기, LBS 지도 UI 추가 확장, PiVoice TURN 운영, 이벤트 행위훅 전수 점검, StarterKit 패키지 제품화) · **알림 Phase 2**: 카카오 알림톡(한국 판매자)·Telegram webhook 양방향(버튼으로 접수/거절)
 - ✅ **O2O 후속 완료(2026-06-18)**: 외부 알림 채널(Telegram)로 사장님 화면 미접속 시에도 주문 알림 도달 — Phase 18에서 구현
@@ -1705,10 +1706,100 @@ if (meta?.type === 'CHAT_SUBSCR') {
 
 ---
 
+## Phase 21: 보안 강화 (KISA 21개 + DDoS 5계층) 🔶 코드 완료·Vercel 설정 잔여 (2026-06-23)
+
+> **정본**: `docs/PRD_2_SECURITY.md` (v1.0) · `docs/SECURITY_DDOS_POLICY.md`  
+> **투입 에이전트**: kisa-web-security-auditor (PRD_2_SECURITY 수립) · 아소카 (DDoS 코드 구현)
+
+### 배경
+
+Pi Browser WebView + Vercel 서버리스 + Supabase 환경에 KISA 행정안전부 21개 웹 취약점 기준을 적용하고, DDoS 공격에 대한 5계층 방어 체계를 코드로 구현한다.
+
+### TASK-200 — KISA 21개 항목 기준 수립 ✅ 2026-06-23
+
+- `docs/PRD_2_SECURITY.md` v1.0 작성 — 21개 항목 전체 분석
+- 결과: ✅ 양호 13개 / 🔍 추가확인필요 6개 / ➖ 해당없음 2개
+- cafe.pi 특수 환경 반영: Pi Browser 이중 인증 경로·Supabase RLS 비활성화 근거·클라이언트 게이트 패턴
+
+### TASK-201 — DDoS 방어 인프라 코드 구현 ✅ 2026-06-23
+
+| 파일 | 내용 |
+|---|---|
+| `src/lib/ddos-guard.ts` | Sliding window rate limiting · 봇 UA 차단 · 보안 헤더 · IP 추출 |
+| `src/lib/api-guard.ts` | `withGuard()` / `withAuthGuard()` API 라우트 래퍼 |
+| `src/middleware.ts` | 봇 차단 + rate limiting 통합 (페이지 라우트) |
+| `vercel.json` | 전역 보안 헤더 추가 (HSTS·X-Frame·X-Content-Type·CSP) |
+| `/api/auth/pi/route.ts` | `withAuthGuard` 적용 (cross-origin 인증 차단) |
+| `/api/payments/approve/route.ts` | `withGuard` 적용 |
+
+**Rate Limiting 정책**:
+
+| 그룹 | 60초 허용 | 차단 유지 |
+|---|---|---|
+| `/api/auth/**` | 8건 | 5분 |
+| `/api/payments/**`, `/api/tips/**` | 12건 | 3분 |
+| `/api/admin/**` | 40건 | 1분 |
+| `/api/campaign/**` | 20건 | 2분 |
+| `/api/chat/**` | 30건 | 1분 |
+| 기타 API | 60건 | 30초 |
+| 페이지 라우트 | 120건 | 10초 |
+
+### TASK-202 — Vercel 보안 설정 (수동) 🔜 즉시 (아나킨 마스터 직접)
+
+- [ ] Vercel Dashboard → Security → Firewall → **WAF 활성화**
+- [ ] Vercel Dashboard → Security → Bot Protection → **BotID 활성화**
+- [ ] Firewall 규칙 추가: `/.env`, `/.git/**`, `/wp-admin/**`, `/phpMyAdmin/**` 경로 DENY
+- [ ] Rate limit auth 규칙: `/api/auth/*` + 1분 > 10회 → CHALLENGE
+
+### TASK-203 — Supabase Statement Timeout 🔜 7일 내
+
+```sql
+-- Supabase Dashboard → SQL Editor
+ALTER DATABASE postgres SET statement_timeout = '30s';
+ALTER DATABASE postgres SET idle_in_transaction_session_timeout = '10s';
+```
+
+### TASK-204 — 추가확인 6항목 개선 🔜 30일 내
+
+| 항목 | 대상 | 조치 |
+|---|---|---|
+| WP/FU 파일 업로드 | `/api/board/upload` · Supabase Storage | 확장자 화이트리스트 + MIME 검증 강화 |
+| WA/FD 파일 다운로드 | Supabase Storage 공개 URL | 경로 탐색 방지 + 서명 URL 검토 |
+| IE 정보 누출 | 프로덕션 500 응답 | 내부 스택트레이스 노출 차단 |
+| AE 에러 처리 | 전 API 라우트 catch 블록 | 메시지 일반화 (세부 오류→"서버 오류") |
+| PL 악성 콘텐츠 | 채팅(`msg_msg`) · 게시판(`brd_post`) | 콘텐츠 스캐닝 API 평가 (Perspective API 등) |
+
+### TASK-205 — 세션 블랙리스트 🔜 30일 내
+
+- `pi_session_revoked` 테이블: 토큰 해시 + `revoked_dtm` + 사유
+- `getSessionUser()` 블랙리스트 조회 추가 (강제 로그아웃 지원)
+- `/api/admin/users/[id]/revoke-session` 관리자 API
+
+### TASK-206 — 분산 Rate Limiting 업그레이드 🔜 트래픽 증가 시
+
+현재 구현(메모리 기반)은 단일 Vercel 인스턴스 내에서만 유효.  
+트래픽 급증 시 Upstash Redis 기반으로 교체:
+
+- `pnpm add @upstash/ratelimit @upstash/redis`
+- Vercel Marketplace → Upstash Redis 연동 (env 자동 주입)
+- `src/lib/ddos-guard.ts` → `Ratelimit.slidingWindow()` 교체
+- `src/env.ts`: `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` 추가
+
+### TASK-207 — 정기 보안 감사 (분기 1회)
+
+- [ ] KISA `docs/PRD_2_SECURITY.md` 상태 재검토 및 갱신
+- [ ] `pnpm audit` 취약 패키지 점검
+- [ ] `BOT_BLOCKLIST` 최신 공격 도구 추가 (`src/lib/ddos-guard.ts`)
+- [ ] Rate Limiting 임계값 실 트래픽 기반 재조정
+- [ ] Vercel Firewall 규칙 효과 검토
+
+---
+
 ## 변경 이력
 
 | 버전 | 날짜 | 변경 내용 | 작성자 |
 |------|------|---------|-------|
+| v11.5 | 2026-06-23 | **Phase 21 보안 강화 — KISA 21개 웹 취약점 기준 수립 + DDoS 5계층 방어 구현** — ① `docs/PRD_2_SECURITY.md` v1.0 신설: KISA 21개 항목 전체 적용 분석(✅13 양호·🔍6 추가확인·➖2 해당없음), cafe.pi 특수환경 반영(Pi Browser 이중 인증·Supabase RLS 비활성·클라이언트 게이트 패턴). ② `docs/SECURITY_DDOS_POLICY.md` 신설: 5계층 방어 아키텍처(Vercel Anycast→WAF→Middleware→API Guard→Supabase) + Rate Limiting 정책표 + Pi Browser NAT 특수 대응(시간제 차단·Retry-After 헤더) + 공격 감지·대응 절차(5단계) + 월/분기 점검 체크리스트. ③ DDoS 방어 코드 구현(TASK-201): `src/lib/ddos-guard.ts`(sliding window rate limiting·봇 UA 차단·보안 헤더·IP 추출) + `src/lib/api-guard.ts`(`withGuard`/`withAuthGuard` 래퍼) + `src/middleware.ts`(봇 차단+rate limiting 통합) + `vercel.json`(전역 보안 헤더). ④ `/api/auth/pi`(`withAuthGuard`) + `/api/payments/approve`(`withGuard`) 적용. 잔여: TASK-202 Vercel Firewall/BotID(즉시·수동)·TASK-203 Supabase timeout(7일)·TASK-204 추가확인 6항목(30일)·TASK-205 세션 블랙리스트(30일)·TASK-206 Upstash Redis(트래픽 증가 시). 전체 Phase 현황 Phase 21 추가·총 22개·진행 중 2개. 기준일 2026-06-23 갱신. `docs/PRD.md` v12.2 동기화. | asoká |
 | v11.4 | 2026-06-23 | **Phase 20 화면 성능 최적화 (신규 섹션 · PRD_18_PERFORM 수용)** — 6개 탭(home·event·cafe·shop·map·admin) 전수 성능 진단: CRITICAL 4·HIGH 15·MEDIUM 18(총 37건) 식별 + 3단계 로드맵(38h). **Phase 1 즉시개선 적용**: ① HOME 매출 `LazySection` rootMargin 200→50px(bean-revenue RPC 조기호출 -20~40%) + aggregate 실패 `console.warn` 로깅 ② EVENT 관리자 미션 재평가 중복클릭 가드 + 실패 `alert` 피드백(미션 평가=신뢰 직결) ③ SHOP `ItemCard` `memo` 화(검색·필터·정렬 리렌더 -30%). 잔여 CRITICAL(CAFE WebSocket 폴백·SHOP Pi결제 window.Pi 가드·MAP 마커 클러스터링) 후속 착수. 전체 진행률 표 Phase 20 추가·통계 갱신(총 21개·진행 중 1개). 정본 `docs/PRD_18_PERFORM.md`. | asoká |
 | v11.3 | 2026-06-22 | **PiShop 브랜드 통일 + 이벤트방·미션·감사로그·i18n 버그 수정** — ① **이벤트 카페 Business 플랜 폐지**(`5e983e2`): 운영자 전용 게이트 제거 → 그룹방 PREMIUM과 동일하게 구독자 무료·비구독자 EVENT 생성료 20 Bean(`getRoomFeeBean('CREATE','EVENT')`)·잔액부족 402·실패 시 논리삭제 롤백. ② **M10 미션 평가 불능 수정**(`ac7d4db`): `checkCancelWithFee`가 DB에 없는 `txn_type_cd='CANCEL_FEE_IN'`을 조회해 항상 false → M10 전면 미완료였음. 실제값 `'FEE'`로 정정(sql/041·059·060·mps-refund.ts 일치). cclemong 등 자격자 M10 완료 처리(실 충족시각 기준). ③ **PiStore→PiShop 전면 통일**(`70f2f51`·`c5b5a91`, sql/090): 표시명·주석·문서 + 코드값(`prod_ctgr_cd` PISTORE→PISHOP·`bean_fee_plan` PISHOP_GENERAL/SUBSCR 26행)·ko.json + `i18n_message` DB(PISTORE 고아 84행 삭제)·21개 locale json 재생성(PiShop 다국어, **영어 실기기 검증 완료**). ④ **Bean 감사 로그 500 수정**(`2a05c03`): `bean_audit_log`에 sys_user FK가 없는데 PostgREST 임베디드 조인 사용 → PGRST200(0건이어도 500). usr_id 수동 병합 패턴으로 교체(event.ts getEventRanking 패턴). ⑤ **i18n sync 배열 복원 버그 수정**(`c5b5a91`): `unflattenJson`이 `feat.PISHOP.0/.1/.2` 평탄키를 객체로 복원해 ko(배열)·코드(`t.raw() as string[]`)와 불일치 → `arrayify` 추가(숫자 인덱스 키→배열). totalRevenue `{period}` 변수 불일치 FORMATTING_ERROR도 정정(`07fe976`·`f88d522`, ko 정본 정합·newTrans/top3 변수 보존). ⑥ **강남 매장 소유권** anakin2→anakin3 이전(매장+상품, 과거 주문·보증금 보존). 검증: tsc·validate:locales 통과, 전 변경 origin/master 배포. | asoká |
 | v11.2 | 2026-06-22 | **이벤트·Bean 후속 완료** — ① **`reevaluateAllActiveUsers` M2 누락 수정**: M2는 상태형 미션(kakao_id 보유 여부)이라 `evt_action_log`가 없어도 대상이 돼야 하나, cron 재평가 함수가 action_log 보유자만 평가해 kakao_id 설정 사용자가 재평가 대상에서 누락. `sys_user.kakao_id IS NOT NULL` 사용자를 UNION으로 추가(`src/lib/event.ts` `reevaluateAllActiveUsers`). ② **O2O 구매 완료 Bean 캠페인 자동 트리거**: `markPickup`(구매자 픽업)·`autoCompleteReadyOrders`(자동완료 cron)에서 `fn_bean_campaign_grant(buyerId, 'O2O_PURCHASE')` 베스트 에포트 호출 추가. 첫 O2O 구매 → PENDING 신청 자동 생성 → 관리자 `/admin/campaign`에서 승인 시 REWARD_POOL에서 10 Bean 지급. `sql/089` O2O_PURCHASE 캠페인 시드(reward_bean=10·max_grant_cnt=9999·자격 없음). Phase 19 잔여 테이블 갱신. | asoká |

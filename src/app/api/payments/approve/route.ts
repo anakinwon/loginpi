@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { withGuard } from '@/lib/api-guard'
 
 const PI_PAYMENTS_URL = 'https://api.minepi.com/v2/payments'
 
-export async function POST(request: NextRequest) {
+export const POST = withGuard(async function (request: NextRequest) {
   const apiKey = process.env.PI_API_KEY
   if (!apiKey) {
     return NextResponse.json(
@@ -107,4 +108,4 @@ export async function POST(request: NextRequest) {
       { status: 502 },
     )
   }
-}
+})

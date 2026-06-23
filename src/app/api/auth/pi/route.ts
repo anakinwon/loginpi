@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { signPayload, verifyPayload } from '@/lib/pi-session-crypto'
 import { upsertPiUser } from '@/lib/users'
 import { recordActivity } from '@/lib/activity-log'
+import { withAuthGuard } from '@/lib/api-guard'
 import type { PiSessionUser } from '@/types/pi-session'
 
 const PI_API_URL = 'https://api.minepi.com/v2/me'
@@ -15,7 +16,7 @@ function getSecret(): string {
 }
 
 // 현재 세션 반환 (쿠키 서명 검증 + 만료 확인)
-export async function GET(request: NextRequest) {
+export const GET = withAuthGuard(async function (request: NextRequest) {
   const cookieValue = request.cookies.get('pi_session')?.value
   if (!cookieValue) return NextResponse.json({ user: null })
 
@@ -43,10 +44,10 @@ export async function GET(request: NextRequest) {
   // 세션 복원 성공 → 활동 기록 (fire-and-forget)
   if (user.userId) recordActivity(user.userId, 'LOGIN')
   return NextResponse.json({ user })
-}
+})
 
 // Pi accessToken 검증 → Supabase upsert → HMAC 서명 세션 쿠키 발급
-export async function POST(request: NextRequest) {
+export const POST = withAuthGuard(async function (request: NextRequest) {
   let body: unknown
   try {
     body = await request.json()
@@ -151,7 +152,7 @@ export async function POST(request: NextRequest) {
     path: '/',
   })
   return response
-}
+})
 
 export async function DELETE() {
   const response = NextResponse.json({ success: true })
