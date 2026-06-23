@@ -622,21 +622,14 @@ export function ClientEventGate() {
                         </span>
                       </span>
                     ) : r.reward_st_cd === 'PAID' ? (
-                      // ③ 보상완료 — 10미션 완료 + 보상 지급됨
+                      // ③ 보상완료 — 10미션 완료 + 보상 지급됨 (이미지 없이 텍스트만)
                       <span
-                        className="inline-flex flex-col items-center gap-0.5"
+                        className="inline-flex flex-col items-center gap-0.5 text-lg"
                         title={t('rewardStDone')}
                       >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src="https://img1.kakaocdn.net/thumb/C375x375@2x.fwebp.q82/?fname=https%3A%2F%2Fst.kakaocdn.net%2Fproduct%2Fgift%2Fproduct%2F20250203140848_135c92640a004b0682f214bd5b5a94f3.png"
-                          alt={t('giftAlt')}
-                          title={t('rewardStDone')}
-                          loading="lazy"
-                          className="mx-auto h-12 w-20 rounded-md object-cover object-center"
-                        />
+                        ✅
                         <span className="text-[10px] font-semibold text-green-600 dark:text-green-400">
-                          ✓ {t('rewardStDone')}
+                          {t('rewardStDone')}
                         </span>
                       </span>
                     ) : (

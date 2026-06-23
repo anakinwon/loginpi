@@ -9,6 +9,9 @@ import BeanRevenueTimeline from '@/components/admin/bean-daily-chart'
 interface TokenKpi {
   total_issued_bean: number
   total_issued_pi: number
+  charge_issued_bean: number
+  mint_issued_bean: number
+  reward_granted_bean: number
   circulating_bean: number
   circulating_pi: number
   total_collected_bean: number
@@ -156,9 +159,36 @@ function BalanceSheet({ kpi }: { kpi: TokenKpi }) {
             strong
             dotColor="bg-blue-500"
           />
-          <p className="text-muted-foreground mt-0.5 text-xs">
-            전체 CHARGE 합계 — Pi 충전으로 발행된 Bean 총량
+          <div className="mt-1.5 border-t pt-1.5">
+            <BsRow
+              label="충전 발행 (CHARGE)"
+              bean={kpi.charge_issued_bean}
+              indent
+              dotColor="bg-blue-400"
+            />
+            <BsRow
+              label="보상·프로모션 발행 (mint)"
+              bean={kpi.mint_issued_bean}
+              indent
+              dotColor="bg-teal-400"
+            />
+          </div>
+          <p className="text-muted-foreground mt-1.5 text-xs">
+            충전(Pi 결제) + 보상·프로모션(mint) 합계. 이 중 보상 지급 누계는 아래
+            참조
           </p>
+          {/* 보상 지급 누계 (REWARD) — 이벤트·캠페인으로 USER에게 지급된 Bean */}
+          <div className="mt-2 rounded-md bg-teal-50 px-2.5 py-1.5 dark:bg-teal-950/30">
+            <BsRow
+              label="🎁 보상 지급 누계 (이벤트·캠페인)"
+              bean={kpi.reward_granted_bean}
+              strong
+              dotColor="bg-teal-500"
+            />
+            <p className="text-muted-foreground mt-0.5 text-xs">
+              REWARD 거래 합계 — mint로 재원 확보 후 사용자에게 지급된 Bean
+            </p>
+          </div>
         </div>
 
         {/* ── 대변 (우변) ── */}

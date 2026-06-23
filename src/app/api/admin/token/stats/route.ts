@@ -10,8 +10,8 @@ export async function GET() {
 
   const db = getSupabaseAdmin()
 
-  // 병렬 집계: 발행(충전+프로모션)·유통·4종 거버넌스 지갑·일별 트렌드
-  const [chargeRes, mintRes, circulatingRes, govWalletsRes, dailyRes] =
+  // 병렬 집계: 발행(충전+프로모션)·유통·4종 거버넌스 지갑·일별 트렌드·보상 지급
+  const [chargeRes, mintRes, circulatingRes, govWalletsRes, dailyRes, rewardRes] =
     await Promise.all([
       // 충전 발행 = CHARGE 거래 합계
       db
@@ -35,6 +35,12 @@ export async function GET() {
         .eq('del_yn', 'N'),
       // 최근 30일 일별 CHARGE 집계
       db.rpc('fn_bean_daily_stats').limit(30),
+      // 보상 지급 누계 = REWARD 거래 합계 (이벤트·캠페인으로 USER에게 지급된 Bean)
+      db
+        .from('bean_txn')
+        .select('bean_amt')
+        .eq('txn_tp_cd', 'REWARD')
+        .eq('del_yn', 'N'),
     ])
 
   const chargeIssued = (chargeRes.data ?? []).reduce(
@@ -42,6 +48,11 @@ export async function GET() {
     0,
   )
   const mintIssued = (mintRes.data ?? []).reduce(
+    (s, r) => s + Number(r.bean_amt),
+    0,
+  )
+  // 보상 지급 누계 (양수 합계) — 정보성 지표. 발행(mint)으로 재원 확보 후 지급되므로 항등식과 무관
+  const rewardGranted = (rewardRes.data ?? []).reduce(
     (s, r) => s + Number(r.bean_amt),
     0,
   )
@@ -73,6 +84,11 @@ export async function GET() {
       // 공급량
       total_issued_bean: totalIssued,
       total_issued_pi: totalIssued / 100,
+      // 발행 분해: 충전(현금) vs 프로모션·보상(mint)
+      charge_issued_bean: chargeIssued,
+      mint_issued_bean: mintIssued,
+      // 보상 지급 누계 (REWARD 거래 — 이벤트·캠페인 지급액)
+      reward_granted_bean: rewardGranted,
       circulating_bean: circulating,
       circulating_pi: circulating / 100,
       total_collected_bean: totalCollected,

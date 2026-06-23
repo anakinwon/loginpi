@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { piFetch } from '@/lib/pi-fetch'
 import type { ShopConditionRow } from '@/app/api/campaign/shops/route'
@@ -41,19 +41,60 @@ export function CampaignShopBoard() {
   const [mySellerId, setMySellerId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [granting, setGranting] = useState(false) // 관리자 일괄 지급 진행
+
+  const loadShops = useCallback(async () => {
+    try {
+      const res = await piFetch('/api/campaign/shops')
+      if (!res.ok) throw new Error((await res.json()).error ?? '오류')
+      const data = (await res.json()) as ShopsResponse
+      setRows(data.shops ?? [])
+      setIsAdmin(!!data.is_admin)
+      setMySellerId(data.my_seller_id ?? null)
+    } catch (e) {
+      setError((e as Error).message)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
 
   useEffect(() => {
-    piFetch('/api/campaign/shops')
-      .then(async (res) => {
-        if (!res.ok) throw new Error((await res.json()).error ?? '오류')
-        const data = (await res.json()) as ShopsResponse
-        setRows(data.shops ?? [])
-        setIsAdmin(!!data.is_admin)
-        setMySellerId(data.my_seller_id ?? null)
+    void loadShops()
+  }, [loadShops])
+
+  // 관리자 전용: 3조건 완수 매장 전원에게 보상 일괄 지급 (Event #1 보상 버튼과 동일 패턴)
+  const handleGrantAll = async () => {
+    if (granting) return
+    if (
+      !window.confirm(
+        '3조건(매장·상품·텔레그램)을 완수한 매장 전원에게 보상을 지급합니다.\n이미 지급된 매장은 자동으로 제외됩니다. 진행할까요?',
+      )
+    )
+      return
+    setGranting(true)
+    try {
+      const res = await piFetch('/api/admin/campaign/grant-all', {
+        method: 'POST',
       })
-      .catch((e) => setError((e as Error).message))
-      .finally(() => setLoading(false))
-  }, [])
+      const data = await res.json()
+      if (!res.ok) {
+        alert(data.error ?? '보상 지급에 실패했습니다')
+        return
+      }
+      alert(
+        `보상 지급 완료\n` +
+          `· 자격자(3조건 완수): ${data.eligible}명\n` +
+          `· 신규 지급: ${data.granted}명\n` +
+          `· 이미 지급(건너뜀): ${data.already}명` +
+          (data.failed ? `\n· 실패: ${data.failed}명` : ''),
+      )
+      await loadShops()
+    } catch {
+      alert('네트워크 오류가 발생했습니다')
+    } finally {
+      setGranting(false)
+    }
+  }
 
   if (loading)
     return (
@@ -79,16 +120,27 @@ export function CampaignShopBoard() {
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <h3 className="font-semibold">
-          참여 매장 현황{' '}
+          참여 매장주 현황{' '}
           <span className="text-muted-foreground text-sm font-normal">
-            ({rows.length}개 · 3조건 완료{' '}
-            <span className="text-primary font-semibold">{fullCnt}</span>개)
+            ({rows.length}명 · 3조건 완료{' '}
+            <span className="text-primary font-semibold">{fullCnt}</span>명)
           </span>
         </h3>
         {isAdmin && (
-          <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-800 dark:bg-blue-900/40 dark:text-blue-200">
-            관리자
-          </span>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleGrantAll}
+              disabled={granting}
+              title="3조건(매장·상품·텔레그램) 완수 매장 전원에게 보상 일괄 지급 (관리자 전용)"
+              className="rounded-md border border-amber-500 bg-amber-50 px-2 py-1 text-xs font-medium text-amber-900 transition-colors hover:bg-amber-100 disabled:opacity-50 dark:border-amber-600 dark:bg-amber-950 dark:text-amber-200 dark:hover:bg-amber-900"
+            >
+              {granting ? '지급 중…' : '🎁 완수자 일괄 지급'}
+            </button>
+            <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-800 dark:bg-blue-900/40 dark:text-blue-200">
+              관리자
+            </span>
+          </div>
         )}
       </div>
 
@@ -125,7 +177,7 @@ export function CampaignShopBoard() {
                     isMe ? 'ring-primary/40 ring-inset ring-2' : '',
                   ].join(' ')}
                 >
-                  {/* 매장명 + 판매자 */}
+                  {/* 대표 매장명 + 판매자 */}
                   <td className="bg-card sticky left-0 z-10 px-3 py-2.5">
                     <div className="flex items-center gap-1.5">
                       <span className="font-medium">{r.shop_nm}</span>
@@ -138,6 +190,11 @@ export function CampaignShopBoard() {
                     {r.pi_username && (
                       <div className="text-muted-foreground text-xs">
                         @{r.pi_username}
+                      </div>
+                    )}
+                    {r.shop_count > 1 && (
+                      <div className="text-muted-foreground mt-0.5 text-xs">
+                        대표 매장 · 총 {r.shop_count}개 보유
                       </div>
                     )}
                   </td>
