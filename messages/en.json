@@ -850,7 +850,7 @@
     }
   },
   "bean": {
-    "backToStore": "Back to PiShop",
+    "backToStore": "Back to PiShop™",
     "buying": "Payment in progress…",
     "chargeBtn": "Charge",
     "chargeFail": "Charge processing failed",
@@ -1340,22 +1340,32 @@
     "lastPerformedCol": "Last Performed",
     "loadError": "Failed to load Data",
     "loginHint": "Log in to see your mission progress and agent grade",
+    "missionGoBean": "Go to Charge Bean",
+    "missionGoCafe": "💬 Go to PiCafé™",
+    "missionGoItems": "🛒 Go to My Items",
+    "missionGoLbs": "📍 Location Service (My Profile)",
+    "missionGoLink": "🔗 Go to Connect Account",
+    "missionGoOrders": "🛒 Go to Order Management",
+    "missionGoProfile": "👤 Go to Connect Account and Enter Profile",
+    "missionGoSales": "🛒 Go to Sales Management",
+    "missionGoStore": "🛒 Go to PiShop™",
+    "missionGoSubscribe": "⭐ Go to Subscribe",
     "missionListTitle": "📋 Mission List",
     "missions": {
       "M1": {
-        "desc": "Link Pi & Google login + enter nickname & KakaoTalk ID (required for gift delivery)",
-        "name": "Account Integration + Profile"
+        "desc": "Pi Browser Login + Google Login (Complete both)",
+        "name": "Account Integration"
       },
       "M10": {
         "desc": "(After M9) Repeat missions 7 and 8 — Experience cancellation fee in active deposit status",
         "name": "Active Deposit Transaction Cancellation Fee"
       },
       "M2": {
-        "desc": "Charge Bean Token to create cafes, join, and use auto-translation",
-        "name": "Charge Bean Token"
+        "desc": "Enter nickname + KakaoTalk ID in integrated account (required for gift delivery)",
+        "name": "Complete Profile"
       },
       "M3": {
-        "desc": "Create PREMIUM Cafe in PiCafe + Use auto-translation feature",
+        "desc": "Create PREMIUM Cafe in PiCafé™ + Use auto-translation feature",
         "name": "Create PREMIUM Cafe (PiRC1) + Auto-translation"
       },
       "M4": {
@@ -1371,35 +1381,19 @@
         "name": "Use Chat Multi-function"
       },
       "M7": {
-        "desc": "Register my product on PiShop, then cancel seller transaction during trade",
+        "desc": "Register my product on PiShop™, then cancel seller transaction during trade",
         "name": "Seller Transaction Cancellation (Escrow Service; PiRC3)"
       },
       "M8": {
-        "desc": "Buyer transaction cancellation after purchasing another person's product in PiShop",
+        "desc": "Buyer transaction cancellation after purchasing another person's product in PiShop™",
         "name": "Buyer Transaction Cancellation (Escrow Service; PiRC3)"
       },
       "M9": {
-        "desc": "Deposit 1Pi or more as PiShop Seller Deposit + Consent to location-based services",
+        "desc": "Deposit 1Pi or more as PiShop™ Seller Deposit + Consent to location-based services",
         "name": "Seller Deposit + Location Consent (Escrow Service; PiRC3)"
       }
     },
     "multiOrHint": "💡 Hint: You only need to complete one of several methods",
-    "missionGoLink": "🔗 Go link accounts",
-    "missionGoProfile": "👤 Go link account & edit profile",
-    "missionGoBean": "Go charge Bean",
-    "missionGoCafe": "💬 Go to PiCafe",
-    "missionGoSubscribe": "⭐ Go subscribe",
-    "missionGoStore": "🛒 Go to PiShop",
-    "missionGoSales": "🛒 Go to sales management",
-    "missionGoOrders": "🛒 Go to order management",
-    "missionGoItems": "🛒 Go to my items",
-    "missionGoLbs": "📍 Location Service (My Profile)",
-    "rankPrev": "Prev",
-    "rankNext": "Next",
-    "rankSearchPlaceholder": "Search agent name",
-    "rewardStInProgress": "In progress",
-    "rewardStPending": "Reward pending",
-    "rewardStDone": "Reward done",
     "networkError": "Network Error",
     "noChange": "No Changes",
     "noName": "(No Name)",
@@ -1407,10 +1401,18 @@
     "processing": "Processing...",
     "rankCol": "Rank",
     "rankingTitle": "🏆 Mission Ranking",
+    "rankNext": "Next",
+    "rankPrev": "Previous",
+    "rankSearchPlaceholder": "Search Agent Name",
     "removeRank": "Remove Rank",
     "rewardCol": "Reward",
-    "subtitle": "Complete 10 missions — first 100 get 5,000 Bean Token!",
-    "title": "🎖️ Open Beta #1 Event - Complete 10 Missions",
+    "rewardStDone": "Reward Completed",
+    "rewardStInProgress": "Mission in Progress",
+    "rewardStPending": "Reward Pending",
+    "subtitle": "Complete 10 missions and receive a 🎁 Kakao gift",
+    "tabMissionSub": "Mission Event",
+    "tabShopSub": "Store First-Come, First-Served Onboarding Event",
+    "title": "🎖️ Mission Event",
     "totalCol": "Total"
   },
   "header": {
@@ -1913,7 +1915,7 @@
     "statusChanged": "Status changed successfully.",
     "stockLeft": "Stock {count}",
     "subtitle": "Safely trade directly with Pi Coin — Escrow Protection",
-    "title": "PiShop",
+    "title": "PiShop™",
     "tradeSt": {
       "OPEN": "On Sale",
       "SOLD": "Sold",
@@ -1959,8 +1961,8 @@
     "perYear": "Year",
     "processing": "Processing…",
     "product": {
-      "PICAFE": "PiCafe Subscription",
-      "PISHOP": "PiShop Subscription",
+      "PICAFE": "PiCafé™ Subscription",
+      "PISHOP": "PiShop™ Subscription",
       "TRANSLATE": "Auto-Translate Subscription"
     },
     "renewBtn": "Renew/Change",

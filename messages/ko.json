@@ -1297,15 +1297,17 @@
   "event": {
     "title": "🎖️ 오픈베타 #1이벤트 - 10미션수행",
     "subtitle": "10미션 완료 선착순 100명 5,000 Bean Token 받자!",
+    "tabMissionSub": "미션 이벤트",
+    "tabShopSub": "매장 선착순 온보딩 이벤트",
     "loginHint": "로그인하면 나의 미션 진행도와 요원 등급이 표시됩니다",
     "missionListTitle": "📋 미션 목록",
     "multiOrHint": "💡 힌트: 여러 방법 중 1가지만 완료하면 됩니다",
     "missionGoLink": "🔗 계정 연동하러 가기",
     "missionGoProfile": "👤 계정 연동·프로필 입력하러 가기",
     "missionGoBean": "Bean 충전하러 가기",
-    "missionGoCafe": "💬 PiCafe 가기",
+    "missionGoCafe": "💬 PiCafé™ 가기",
     "missionGoSubscribe": "⭐ 구독 신청하러 가기",
-    "missionGoStore": "🛒 PiShop 가기",
+    "missionGoStore": "🛒 PiShop™ 가기",
     "missionGoSales": "🛒 판매 관리로 가기",
     "missionGoOrders": "🛒 주문 관리로 가기",
     "missionGoItems": "🛒 내 상품으로 가기",
@@ -1355,7 +1357,7 @@
       },
       "M3": {
         "name": "PREMIUM 카페 생성(PiRC1) + 자동번역",
-        "desc": "PiCafe에서 PREMIUM Cafe 생성 + 자동번역 기능 사용"
+        "desc": "PiCafé™에서 PREMIUM Cafe 생성 + 자동번역 기능 사용"
       },
       "M4": {
         "name": "Bean 전송 테스트(PiRC1)",
@@ -1371,15 +1373,15 @@
       },
       "M7": {
         "name": "판매자 거래 취소(에스크로서비스;PiRC3)",
-        "desc": "PiShop에 내 상품 등록 후 거래중 판매자 거래 취소"
+        "desc": "PiShop™에 내 상품 등록 후 거래중 판매자 거래 취소"
       },
       "M8": {
         "name": "구매자 거래 취소(에스크로서비스;PiRC3)",
-        "desc": "PiShop에서 타인 상품 구매 후 구매자 거래 취소"
+        "desc": "PiShop™에서 타인 상품 구매 후 구매자 거래 취소"
       },
       "M9": {
         "name": "판매자 보증금 + 위치동의(에스크로서비스;PiRC3)",
-        "desc": "PiShop 판매자 보증금 1Pi 이상 예치 + 위치 기반 서비스 동의"
+        "desc": "PiShop™ 판매자 보증금 1Pi 이상 예치 + 위치 기반 서비스 동의"
       },
       "M10": {
         "name": "보증금 활성 거래 취소 수수료",
@@ -1671,8 +1673,8 @@
     "expireAt": "만료일: {date}",
     "notice": "구독료는 충전한 Bean에서 차감됩니다. 연간은 2개월 무료. 환금 불가·플랫폼 사용 전용.",
     "product": {
-      "PICAFE": "PiCafe 구독",
-      "PISHOP": "PiShop 구독",
+      "PICAFE": "PiCafé™ 구독",
+      "PISHOP": "PiShop™ 구독",
       "TRANSLATE": "자동번역 구독"
     },
     "storeGrade": {
@@ -1698,7 +1700,7 @@
   },
   "bean": {
     "title": "Bean 지갑",
-    "backToStore": "PiShop으로",
+    "backToStore": "PiShop™으로",
     "loading": "불러오는 중…",
     "loginRequired": "로그인 후 이용할 수 있습니다",
     "myBalance": "내 Bean 잔액",
@@ -1723,7 +1725,7 @@
     }
   },
   "store": {
-    "title": "PiShop",
+    "title": "PiShop™",
     "subtitle": "Pi Coin으로 안전하게 직거래하세요 — 에스크로 보호",
     "navMyItems": "내 상품",
     "navMyShops": "내 매장",
