@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { ClientEventGate } from '@/components/event/client-event-gate'
 import { ClientCampaign } from '../campaign/client-campaign'
 import { CampaignShopBoard } from '../campaign/campaign-shop-board'
@@ -9,7 +10,7 @@ const TABS = [
   {
     id: 1,
     label: 'Event #1',
-    sub: '미션 이벤트',
+    subKey: 'tabMissionSub',
     icon: '🎯',
     activeCls:
       'border-violet-300 bg-gradient-to-b from-violet-50 to-violet-100 text-violet-800 shadow-[0_10px_24px_-10px_rgba(139,92,246,0.4)] dark:border-violet-700 dark:from-violet-950/70 dark:to-violet-900/40 dark:text-violet-200',
@@ -18,7 +19,7 @@ const TABS = [
   {
     id: 2,
     label: 'Event #2',
-    sub: '매장 선착순 온보딩 이벤트',
+    subKey: 'tabShopSub',
     icon: '🏪',
     activeCls:
       'border-emerald-300 bg-gradient-to-b from-emerald-50 to-emerald-100 text-emerald-800 shadow-[0_10px_24px_-10px_rgba(16,185,129,0.4)] dark:border-emerald-700 dark:from-emerald-950/70 dark:to-emerald-900/40 dark:text-emerald-200',
@@ -29,6 +30,7 @@ const TABS = [
 type TabId = (typeof TABS)[number]['id']
 
 export function ClientEventTabs() {
+  const t = useTranslations('event')
   const [active, setActive] = useState<TabId>(1)
 
   return (
@@ -57,7 +59,7 @@ export function ClientEventTabs() {
                 {tab.label}
               </span>
               <span className="text-[11px] leading-tight font-medium opacity-90">
-                {tab.sub}
+                {t(tab.subKey)}
               </span>
               {/* 활성 표시 막대 (떠오른 탭 하단) */}
               {on && (
