@@ -14,15 +14,20 @@ export interface ShopConditionRow {
   last_cond_dtm: string  // 마지막 조건 충족 시각 = 충족된 M1~M3 시각의 max (M4 알림은 시각 컬럼 부재로 제외)
 }
 
-// GET /api/campaign/shops
+// GET /api/campaign/shops?q=<요원명>
 // 판매자(seller_id) 기준 1행 — 대표 매장 = sys_user.rep_shop_id 우선, 없으면 첫 등록 매장
-export async function GET() {
+// q: 요원명 검색 — pi_username/nick_nm 부분일치(pg_trgm GIN 가속, sql/086·101)
+export async function GET(request: Request) {
   const user = await getSessionUser()
   if (!user)
     return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
   const db = getSupabaseAdmin()
   const admin = isAdmin(user)
+  // PostgREST .or 필터 인젝션 방지: 구조 문자(콤마·괄호·별표·역슬래시·퍼센트) 제거 + 길이 제한
+  const q = (new URL(request.url).searchParams.get('q')?.trim() ?? '')
+    .replace(/[,()*\\%]/g, '')
+    .slice(0, 40)
 
   const { data: shops, error } = await db
     .from('mps_shop')
@@ -147,5 +152,21 @@ export async function GET() {
     return cb - ca || a.reg_dtm.localeCompare(b.reg_dtm)
   })
 
-  return NextResponse.json({ shops: rows, is_admin: admin, my_seller_id: user.id })
+  // 요원명 검색 — sys_user를 .ilike(trgm 인덱스)로 조회해 매칭 seller만 후필터
+  let finalRows = rows
+  if (q) {
+    const { data: matched } = await db
+      .from('sys_user')
+      .select('id')
+      .in('id', sellerIds)
+      .or(`pi_username.ilike.%${q}%,nick_nm.ilike.%${q}%`)
+    const ids = new Set((matched ?? []).map((m) => (m as { id: string }).id))
+    finalRows = rows.filter((r) => ids.has(r.seller_id))
+  }
+
+  return NextResponse.json({
+    shops: finalRows,
+    is_admin: admin,
+    my_seller_id: user.id,
+  })
 }

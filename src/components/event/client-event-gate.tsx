@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   Loader2,
   ChevronDown,
@@ -119,15 +119,33 @@ export function ClientEventGate() {
     setExcludedList(data.excluded ?? [])
   }
 
-  // 랭킹 재조회 (제외 처리 후 갱신용) — is_admin 플래그 + 제외 목록도 함께 반영
-  const refetchRanking = async () => {
-    const res = await piFetch('/api/event/ranking?limit=100')
+  // 랭킹 재조회 (제외 처리 후 갱신용) — is_admin 플래그 + 제외 목록도 함께 반영.
+  // q: 요원명 검색어 — 서버에서 pg_trgm(.ilike)로 필터 (sql/086·101)
+  const refetchRanking = async (q = '') => {
+    const params = new URLSearchParams({ limit: '100' })
+    if (q.trim()) params.set('q', q.trim())
+    const res = await piFetch(`/api/event/ranking?${params}`)
     if (!res.ok) return
     const data = await res.json()
     setRanking(data.ranking ?? [])
     setIsAdmin(!!data.is_admin)
     if (data.is_admin) await fetchExcluded()
   }
+
+  // 요원명 검색 — 입력 즉시(300ms debounce) 서버 trgm 검색. 초기 로드는 fetchData가 담당하므로 첫 렌더 스킵
+  const firstSearchRef = useRef(true)
+  useEffect(() => {
+    if (firstSearchRef.current) {
+      firstSearchRef.current = false
+      return
+    }
+    const id = setTimeout(() => {
+      setRankPage(1)
+      void refetchRanking(rankSearch)
+    }, 300)
+    return () => clearTimeout(id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rankSearch])
 
   // 관리자 전용: 온디맨드 미션 재평가 → 완료 후 랭킹 재조회
   // cron(자정 1회) 사이 실시간 평가가 누락된 미션을 즉시 일괄 재평가한다.
@@ -312,17 +330,9 @@ export function ClientEventGate() {
     Master: t('gradeMaster'),
   }
 
-  // 요원명 검색 필터 — 원본 이름(pi_username/nick_nm) 부분일치, 대소문자 무시
-  // (표시는 비관리자에게 마스킹되지만 검색은 실제 이름 기준)
-  const rankQuery = rankSearch.trim().toLowerCase()
-  const filteredRanking = rankQuery
-    ? ranking.filter((r) =>
-        (r.pi_username ?? r.nick_nm ?? '').toLowerCase().includes(rankQuery),
-      )
-    : ranking
-
+  // 요원명 검색은 서버(pg_trgm .ilike)에서 필터됨 — ranking이 이미 검색 결과
   // 랭킹 페이지네이션 — 최대 50명을 한 번에 렌더하지 않고 페이지 단위로 (INP 개선)
-  const rankingList = filteredRanking.slice(0, 50)
+  const rankingList = ranking.slice(0, 50)
   const totalRankPages = Math.max(
     1,
     Math.ceil(rankingList.length / RANK_PAGE_SIZE),

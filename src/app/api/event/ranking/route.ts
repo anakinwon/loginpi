@@ -10,9 +10,27 @@ export async function GET(request: NextRequest) {
 
   const { searchParams } = new URL(request.url)
   const limit = Math.min(Number(searchParams.get('limit') ?? '100'), 200)
+  // 요원명 검색 — pi_username/nick_nm 부분일치(pg_trgm GIN 가속, sql/086·101)
+  // PostgREST .or 필터 인젝션 방지: 구조 문자(콤마·괄호·별표·역슬래시·퍼센트) 제거 + 길이 제한
+  const q = (searchParams.get('q')?.trim() ?? '')
+    .replace(/[,()*\\%]/g, '')
+    .slice(0, 40)
 
   try {
-    const ranking = await getEventRanking('evt-20260614-001', limit)
+    let ranking = await getEventRanking('evt-20260614-001', limit)
+
+    // 검색어가 있으면 sys_user를 .ilike(trgm 인덱스)로 조회해 매칭 user만 후필터.
+    // (전체 순위 계산 후 필터 → 검색해도 순위 번호는 전체 기준 유지)
+    if (q) {
+      const { data: matched } = await getSupabaseAdmin()
+        .from('sys_user')
+        .select('id')
+        .or(`pi_username.ilike.%${q}%,nick_nm.ilike.%${q}%`)
+      const matchedIds = new Set(
+        (matched ?? []).map((u) => (u as { id: string }).id),
+      )
+      ranking = ranking.filter((r) => matchedIds.has(r.user_id))
+    }
 
     // 각 사용자의 M1~M10 완료 상태 조회
     const userIds = ranking.map((r) => r.user_id)

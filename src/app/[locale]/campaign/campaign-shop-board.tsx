@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { piFetch } from '@/lib/pi-fetch'
 import type { ShopConditionRow } from '@/app/api/campaign/shops/route'
@@ -37,9 +37,13 @@ export function CampaignShopBoard() {
   const [search, setSearch] = useState('') // 요원명(username) 검색
   const [page, setPage] = useState(1) // 페이지네이션
 
-  const loadShops = useCallback(async () => {
+  // q: 요원명 검색 — 서버에서 pg_trgm(.ilike)로 필터 (sql/086·101)
+  const loadShops = useCallback(async (q = '') => {
     try {
-      const res = await piFetch('/api/campaign/shops')
+      const url = q.trim()
+        ? `/api/campaign/shops?q=${encodeURIComponent(q.trim())}`
+        : '/api/campaign/shops'
+      const res = await piFetch(url)
       if (!res.ok) throw new Error((await res.json()).error ?? '오류')
       const data = (await res.json()) as ShopsResponse
       setRows(data.shops ?? [])
@@ -55,6 +59,20 @@ export function CampaignShopBoard() {
   useEffect(() => {
     void loadShops()
   }, [loadShops])
+
+  // 요원명 검색 — 입력 즉시(300ms debounce) 서버 trgm 검색. 초기 로드는 위 useEffect가 담당(첫 렌더 스킵)
+  const firstSearchRef = useRef(true)
+  useEffect(() => {
+    if (firstSearchRef.current) {
+      firstSearchRef.current = false
+      return
+    }
+    const id = setTimeout(() => {
+      setPage(1)
+      void loadShops(search)
+    }, 300)
+    return () => clearTimeout(id)
+  }, [search, loadShops])
 
   // 관리자 전용: 3조건 완수 매장 전원에게 보상 일괄 지급 (Event #1 보상 버튼과 동일 패턴)
   const handleGrantAll = async () => {
@@ -110,16 +128,9 @@ export function CampaignShopBoard() {
     (r) => Object.values(r.conditions).every(Boolean),
   ).length
 
-  // 순위는 필터/페이징 전에 부여(전체 기준 1~N 유지). rows는 route에서 완료수 desc 정렬됨.
-  const ranked = rows.map((r, i) => ({ ...r, rank: i + 1 }))
-  const q = search.trim().toLowerCase()
-  const filtered = q
-    ? ranked.filter(
-        (r) =>
-          (r.pi_username ?? '').toLowerCase().includes(q) ||
-          r.shop_nm.toLowerCase().includes(q),
-      )
-    : ranked
+  // 순위는 페이징 전에 부여(1~N 유지). rows는 route에서 완료수 desc 정렬됨.
+  // 요원명 검색은 서버(pg_trgm .ilike)에서 필터됨 — rows가 이미 검색 결과
+  const filtered = rows.map((r, i) => ({ ...r, rank: i + 1 }))
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const curPage = Math.min(page, totalPages) // 범위 보정(렌더 중 setState 금지)
   const paged = filtered.slice((curPage - 1) * PAGE_SIZE, curPage * PAGE_SIZE)
