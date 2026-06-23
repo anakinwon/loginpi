@@ -15,11 +15,11 @@ export interface PlanCaps {
   canTip: boolean // Pi Bean 전송 가능
   canUsePremiumTheme: boolean // PREMIUM 테마 무료 사용
   canCreateEventRoom: boolean // 이벤트방(room_tp_cd='E') 개설
-  canAutoTranslate: boolean // 자동번역(PiTranslate) 사용 — 미구독(FREE)은 불가
+  canAutoTranslate: boolean // 자동번역(PiTranslateâ¢) 사용 — 미구독(FREE)은 불가
 }
 
 // 채팅 등급별 기능 한도 매핑.
-// FREE: Pi Explorer(미구독) / PREMIUM: PiCafe 구독자 / BUSINESS: 운영자(ADMIN/MASTER) 전용.
+// FREE: Pi Explorer(미구독) / PREMIUM: PiCafÃ©â¢ 구독자 / BUSINESS: 운영자(ADMIN/MASTER) 전용.
 // ※ canAutoTranslate는 PLAN_CAPS 값과 무관하게 getChatPlan에서 TRANSLATE 구독 유무로 재정의된다
 //    (PRD_15_FEE §1-6: 자동번역은 TRANSLATE 별도 구독 전용). 운영자(BUSINESS)만 항상 true.
 const PLAN_CAPS: Record<PlanTier, PlanCaps> = {
@@ -131,7 +131,7 @@ export async function getChatPlan(userId: string): Promise<ChatPlan> {
   const primary = picafe ?? translate!
   return {
     plan_cd: picafe ? 'PICAFE_SUBSCR' : 'TRANSLATE_SUBSCR',
-    plan_nm: picafe ? 'PiCafe 구독' : 'PiTranslate 구독',
+    plan_nm: picafe ? 'PiCafÃ©â¢ 구독' : 'PiTranslateâ¢ 구독',
     tier,
     expire_dtm: primary.expire_dtm,
     auto_renew_yn: (primary.auto_renew_yn as 'Y' | 'N' | null) ?? null,
@@ -196,7 +196,7 @@ export async function canSendTip(
   return p.caps.canTip
 }
 
-// 자동번역(PiTranslate) 사용 가능 여부 — 미구독(FREE)은 false.
+// 자동번역(PiTranslateâ¢) 사용 가능 여부 — 미구독(FREE)은 false.
 // (엑셀 요금표: 자동번역은 구독 또는 1회 1 Bean. 현재는 구독 게이트만.)
 export async function canAutoTranslate(
   userId: string,

@@ -23,7 +23,7 @@ type Params = { params: Promise<{ roomId: string }> }
 
 // GET /api/chat/rooms/[roomId]/messages?limit=50&before=<msg_id>&locale=<locale>
 // cursor 기반 페이지네이션 — scroll-up 무한로드
-// locale 전달 시 msg_trans 캐시된 번역을 trans_cont 필드로 pre-populate (PiTranslate™)
+// locale 전달 시 msg_trans 캐시된 번역을 trans_cont 필드로 pre-populate (PiTranslateâ¢™)
 export async function GET(request: NextRequest, { params }: Params) {
   const { roomId } = await params
   const user = await getSessionUser()
@@ -348,7 +348,7 @@ export async function POST(request: NextRequest, { params }: Params) {
     broadcastToRoom(roomId, 'new_msg', data),
   ])
 
-  // PiTranslate™ 번역 큐 (TASK-094) — 응답을 막지 않는 백그라운드 실행
+  // PiTranslateâ¢™ 번역 큐 (TASK-094) — 응답을 막지 않는 백그라운드 실행
   // after(): 응답 전송 후에도 서버리스 인스턴스가 종료되지 않고 작업을 완료함
   // 방 참가자들의 display_locale_cd 목록으로 자동 번역 → msg_trans 캐시 + broadcast
   if (data.msg_tp_cd === 'TEXT' && data.msg_cont) {

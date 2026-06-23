@@ -48,7 +48,7 @@ Cafe.pi is an **online community plus O2O marketplace** running on the Pi Networ
 | Component | Description |
 |---|---|
 | **PiChat (Cafés)** | Theme-based real-time communities for Pi users who share interests |
-| **PiShop (Marketplace)** | Pi-settled P2P trading plus O2O offline-store commerce |
+| **PiShop™ (Marketplace)** | Pi-settled P2P trading plus O2O offline-store commerce |
 | **PiVoice (Voice Chat)** | WebRTC-based N:N voice channels |
 | **Events & Missions** | Activity rewards and community engagement |
 
@@ -62,7 +62,7 @@ Cafe.pi already operates a **Pi Bean appreciation feature** — a culture in whi
 
 BEAN's **primary purpose is utility** — access and rewards within the Cafe.pi ecosystem, not financial return.
 
-- ✅ **Access**: use of and discounts on café/marketplace/voice features · **global real-time translation (PiTranslate)** · **payment of marketplace buy/sell fees**
+- ✅ **Access**: use of and discounts on café/marketplace/voice features · **global real-time translation (PiTranslate™)** · **payment of marketplace buy/sell fees**
 - ✅ **Support**: peer-to-peer Bean support (on-chain version of the existing Pi Bean) · **charitable giving via donations**
 - ✅ **Rewards**: rewards for missions/events/community contribution · **review (user feedback) rewards** · **sales coupon/stamp rewards**
 - ✅ **(Future) Governance**: ecosystem policy voting rights (**separate** from any economic right)
@@ -89,8 +89,8 @@ This alignment preserves the support experience users already know while simplif
 | 1 | **Support (Tip)** | Send BEAN to café/content contributors (on-chain Pi Bean) |
 | 2 | **Donation** | Channel BEAN donations into fundraising/charity campaigns — a community channel for social contribution |
 | 3 | **Feature access** | Unlock premium themes, stickers, AI assistant, and more |
-| 4 | **Global translation (PiTranslate)** | Pay for real-time translation usage |
-| 5 | **Marketplace fees** | Pay PiShop buy/sell fees in BEAN |
+| 4 | **Global translation (PiTranslate™)** | Pay for real-time translation usage |
+| 5 | **Marketplace fees** | Pay PiShop™ buy/sell fees in BEAN |
 | 6 | **Mission/event rewards** | BEAN distributed as activity rewards (funded by the Ecosystem Reserve) |
 | 7 | **Review rewards** | Reward café/store/product review contributions with BEAN |
 | 8 | **Sales coupon/stamp rewards** | Convert O2O offline-store purchase stamps/coupons into BEAN |

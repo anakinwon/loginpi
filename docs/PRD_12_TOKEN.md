@@ -13,7 +13,7 @@
 
 | 버전 | 날짜 | 변경 내용 | 작성자 |
 |------|------|-----------|--------|
-| **v1.9** | 2026-06-17 | **사용처 확장 동기화(§1-5)** — 백서 v0.2의 확장 사용처를 PRD §1-5 유틸리티 목록에 반영: 사용권에 동시통역(PiTranslate)·마켓 구매/판매 수수료, 보상에 이용후기(리뷰)·매출 쿠폰/스탬프, 후원에 도네이션 사회 기부 추가. 전체 9종 표는 백서 §4 참조(DRY). 분배 비율 영향 없음(리저브 지출 대상만 확대). | asoká |
+| **v1.9** | 2026-06-17 | **사용처 확장 동기화(§1-5)** — 백서 v0.2의 확장 사용처를 PRD §1-5 유틸리티 목록에 반영: 사용권에 동시통역(PiTranslate™)·마켓 구매/판매 수수료, 보상에 이용후기(리뷰)·매출 쿠폰/스탬프, 후원에 도네이션 사회 기부 추가. 전체 9종 표는 백서 §4 참조(DRY). 분배 비율 영향 없음(리저브 지출 대상만 확대). | asoká |
 | **v1.8** | 2026-06-17 | **T01·T02·T05 현황 갱신 + 웹 리서치 반영** — ① **T01**: 개인 KYC 완료 → '임시승인' 단계로 갱신(병목 완화). 임시 KYC의 Launchpad 인정 여부를 T02 문의에 포함. ② **T02**: 웹 확인 — Launchpad 공식 창구는 Pi Browser 내 'Pi Launchpad' 앱이며 **Mainnet 미출시**(Testnet SLICE ~Pi2Day 6/28/2026), issuer 신청양식 미게재. 이메일은 '공식 신청'이 아닌 '창구 확인 문의'로 성격 정정. ③ **T05**: 법무 자문은 Launchpad 절차상 필수 아님 → 현 단계 Skip 가능, 단 Mainnet 공개 세일 전 필수로 명시(P0→P1 조정). 법무 자문 의뢰서 단독 문서(`PRD_12_TOKEN_법무자문의뢰서.md`) 작성. | asoká |
 | **v1.7** | 2026-06-17 | **전 섹션 정합 정리(cleanup)** — 증분 편집으로 생긴 앞단 섹션의 옛 내용을 확정 결정과 동기화: ① §1-4 성공기준 비현실 수치(유동성 100M Pi·DAH 5만) → 확정 세일 기준 잠정목표로 교체. ② §5-1 종합표 T01(개인 KYC)·T04(✅확정)·T05(질의서 작성·회신대기) 상태 갱신. ③ §5-2 T04·T05 상세를 확정 내용으로 교체(옛 분배 예시 제거). ④ §9 PRD 버전·발행주체 행·T01 문구 정리. 내용 결정 변경 없음, 일관성만 정리. | asoká |
 | **v1.6** | 2026-06-17 | **발행 주체 = 개인(아나킨 마스터님) 확정** — T01을 개인 KYC 경로로 정리(법인 KYC 불필요), 세금·법무 자문 범위도 개인 발행 기준. §9-1·§9-4·§5-2 반영. ⚠️ 개인 발행은 증권성·특금법 책임이 개인 명의로 집중(유한책임 부재) → §8-1-1 법무 자문에서 법인 전환 필요성 재확인 권고 명시. | asoká |
@@ -74,7 +74,7 @@ Cafe.pi 플랫폼(카페·마켓플레이스·보이스챗·이벤트)의 사용
 > ⚠️ **본 항은 법률 자문이 아니며**, 최종 분류는 §8-1-1 법무 자문으로 확정해야 함. 아래는 증권성 리스크를 낮추기 위한 **권고 포지셔닝**.
 
 - **1차 목적 = 유틸리티 토큰(Utility Token)**: BEAN은 cafe.pi 생태계 내 **사용권·보상·후원·결제 수단**으로 규정. (전체 사용처 9종 표: `PRD_12_TOKEN_백서.md` §4)
-  - **사용권**: 카페/MPS/보이스챗 기능 이용·할인 · 글로벌 동시통역(PiTranslate) 이용 · 마켓 구매/판매 수수료 결제
+  - **사용권**: 카페/MPS/보이스챗 기능 이용·할인 · 글로벌 동시통역(PiTranslate™) 이용 · 마켓 구매/판매 수수료 결제
   - **후원**: 기존 인앱 "Pi Bean" 팁의 온체인화(사용자 간 후원) · 도네이션 기반 **사회 기부** 연계
   - **보상**: 미션·이벤트·커뮤니티 기여 보상 · 이용후기(리뷰) 보상 · 매출 쿠폰/스탬프 보상
   - **(향후) 거버넌스**: 투표권(수익권과 **분리**)
@@ -93,7 +93,7 @@ Cafe.pi 플랫폼(카페·마켓플레이스·보이스챗·이벤트)의 사용
 Cafe.pi는 **Pi Network 메인넷 기반의 온라인 커뮤니티 및 O2O 마켓플레이스**로:
 
 - **카페(PiChat)**: 사용자들이 실시간으로 소통·콘텐츠 공유
-- **마켓플레이스(PiShop/MPS)**: 판매자와 구매자가 Pi를 사용하여 거래
+- **마켓플레이스(PiShop™/MPS)**: 판매자와 구매자가 Pi를 사용하여 거래
 - **보이스챗(PiVoice)**: 음성 채팅을 통한 깊이 있는 커뮤니티 형성
 - **이벤트 및 미션**: 사용자 활동에 대한 보상·화이트리스트 관리
 - **구독 시스템(PiRC2)**: 반복 결제를 통한 프리미엄 서비스 제공
@@ -857,7 +857,7 @@ Bean Token의 주요 소비 경로:
 
 | 사용처 | 통화 유형 | 플로우 |
 |--------|---------|-------|
-| **플랫폼 구독료** (PiCafe/PiShop) | Bean 정본 | 사용자 → 플랫폼 (Pi 충전 → Bean 결제) |
+| **플랫폼 구독료** (PiCafé™/PiShop™) | Bean 정본 | 사용자 → 플랫폼 (Pi 충전 → Bean 결제) |
 | **플랫폼 수수료** (마켓 거래) | Bean 정본 | 거래자 → 플랫폼 (Pi 기반) |
 | **보상 지급** (O2O, 이벤트) | Bean | 플랫폼 → 사용자 (리저브 소진) |
 | **소각(Burn)** | Bean | 플랫폼 → 싱크 (공급 감소) |
@@ -1185,8 +1185,8 @@ ADD COLUMN price_bean DECIMAL(10, 4) DEFAULT NULL COMMENT '정본 가격 (Bean T
 -- Step 2: 현행 데이터 (price_pi 기준)
 INSERT INTO msg_subscr_plan (plan_cd, plan_nm, plan_desc, plan_tp_cd, price_pi, mth_cnt, use_yn, del_yn, regr_id, reg_dtm)
 VALUES
-  ('PISHOP_SELLER_MONTHLY', 'PiShop Seller 월간', 'PiShop Seller 월간 — 전문가 판매자용', 'PISHOP', '0.5000', 1, 'Y', 'N', 'ADMIN', CURRENT_TIMESTAMP),
-  ('PISHOP_SELLER_ANNUAL', 'PiShop Seller 연간', 'PiShop Seller 연간 — 2개월 무료', 'PISHOP', '5.0000', 12, 'Y', 'N', 'ADMIN', CURRENT_TIMESTAMP);
+  ('PISHOP_SELLER_MONTHLY', 'PiShop™ Seller 월간', 'PiShop™ Seller 월간 — 전문가 판매자용', 'PISHOP', '0.5000', 1, 'Y', 'N', 'ADMIN', CURRENT_TIMESTAMP),
+  ('PISHOP_SELLER_ANNUAL', 'PiShop™ Seller 연간', 'PiShop™ Seller 연간 — 2개월 무료', 'PISHOP', '5.0000', 12, 'Y', 'N', 'ADMIN', CURRENT_TIMESTAMP);
 
 -- Step 3: Phase 17 이후 bean 가격 일괄 업데이트 (1 Pi = 100 BEAN)
 -- UPDATE msg_subscr_plan SET price_bean = price_pi * 100 WHERE price_bean IS NULL;
@@ -1703,7 +1703,7 @@ WHERE use_yn = 'Y'  -- 현재는 항상 false
 
 - `PRD_0_INT.md` — 플랫폼 전략 및 비전
 - `PRD_4_CHAT.md` — 카페(PiChat) 요구사항
-- `PRD_8_MPS.md` — 마켓플레이스(PiShop) 요구사항
+- `PRD_8_MPS.md` — 마켓플레이스(PiShop™) 요구사항
 - `PRD_9_VOICE_CHAT.md` — 보이스챗 요구사항
 - `PRD_11_EVENT.md` — 이벤트 및 미션 시스템
 - `CLAUDE.md` — 프로젝트 기술 스택 및 규칙

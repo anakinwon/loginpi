@@ -24,7 +24,7 @@ export async function POST(request: NextRequest, { params }: Params) {
   if (!mbr)
     return NextResponse.json({ error: '카페 멤버가 아닙니다' }, { status: 403 })
 
-  // 자동번역 과금: 구독자(TRANSLATE/PiCafe)는 무료, 비구독자는 건당 Bean 과금(맛보기·전환 유도)
+  // 자동번역 과금: 구독자(TRANSLATE/PiCafé™)는 무료, 비구독자는 건당 Bean 과금(맛보기·전환 유도)
   const isSubscriber = await canAutoTranslate(user.id)
 
   let body: unknown

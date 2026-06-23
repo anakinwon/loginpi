@@ -5,7 +5,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getPlaceDetails, phoneMatches } from '@/lib/google-maps'
 import { findVerifiedShopByPlaceId, createVerifiedShop } from '@/lib/mps-shop'
 
-// POST /api/store/shops/claim — 구글 카페를 내 PiShop 매장으로 반자동 인증 등록
+// POST /api/store/shops/claim — 구글 카페를 내 PiShop™ 매장으로 반자동 인증 등록
 //
 // 설계 (무승인 탈중앙화 + 구글 정보 재입력 대조 half-인증):
 //   검증 2종 — place_id(서버 구글 조회 성공) + 전화번호(입력값 == 구글 전화번호)

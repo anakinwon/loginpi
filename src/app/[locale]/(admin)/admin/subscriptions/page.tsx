@@ -61,8 +61,8 @@ const PRODUCT_COLOR: Record<SubscrProduct, string> = {
 }
 
 const PRODUCT_LABEL: Record<SubscrProduct, string> = {
-  PICAFE: 'PiCafe',
-  PISHOP: 'PiShop',
+  PICAFE: 'PiCafé™',
+  PISHOP: 'PiShop™',
   TRANSLATE: '번역',
 }
 
@@ -145,8 +145,8 @@ export default function SubscriptionsPage() {
       <div>
         <h1 className="text-2xl font-bold">{t('title')}</h1>
         <p className="text-muted-foreground mt-1 text-sm">
-          전체 {allRows.length}건 · PiCafe{' '}
-          {allRows.filter((r) => r.prod_ctgr_cd === 'PICAFE').length}건 · PiShop{' '}
+          전체 {allRows.length}건 · PiCafé™{' '}
+          {allRows.filter((r) => r.prod_ctgr_cd === 'PICAFE').length}건 · PiShop™{' '}
           {allRows.filter((r) => r.prod_ctgr_cd === 'PISHOP').length}건 · 번역{' '}
           {allRows.filter((r) => r.prod_ctgr_cd === 'TRANSLATE').length}건
         </p>

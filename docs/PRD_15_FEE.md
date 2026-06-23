@@ -87,7 +87,7 @@
 | 1 | **Bean 충전** | Pi→Bean (IN) | 1 Pi = 100 Bean | `payments/complete` `BEAN_CHARGE` · `api/bean/charge` | `txn=CHARGE` | ✅ **라이브** (충전 1건 확인) | ✅ **Pi Browser 필수** |
 | 2 | **카페 생성료** (프리미엄) | Bean (OUT) | 10 | `api/chat/rooms/group` | `ref=ROOM_CREATE` | ✅ **라이브** (1건 확인) | ✅ 일반 브라우저 가능 |
 | 3 | **카페 입장료** (프리미엄) | Bean (OUT) | 10 | `api/chat/rooms/[id]/join` · `[roomId]/page` · `room-entry-fee-gate` | `ref=ROOM_ENTER` | ✅ **라이브** (5건+환불2 확인) | ✅ 일반 브라우저 가능 |
-| 4 | **상품 구독료** (PiCafe·PiShop S/M/L·자동번역) | Bean (OUT) | 1,000~50,000 (§4-1) | `api/subscriptions/products/subscribe` → `fn_bean_subscribe_product` | `bean_subscr` | ✅ **배포됨** (실사용 0건) | ✅ **테스트 가능** (잔액만 있으면) |
+| 4 | **상품 구독료** (PiCafé™·PiShop™ S/M/L·자동번역) | Bean (OUT) | 1,000~50,000 (§4-1) | `api/subscriptions/products/subscribe` → `fn_bean_subscribe_product` | `bean_subscr` | ✅ **배포됨** (실사용 0건) | ✅ **테스트 가능** (잔액만 있으면) |
 | 5 | ~~레거시 구독 (msg_subscr_plan 5종)~~ → #4 Bean 구독 흡수 | Bean (OUT) | §4-1 | `getChatPlan`(bean_subscr 기반) · `api/subscriptions` POST 410 · `payments/complete` `CHAT_SUBSCR` 분기 제거 | `bean_subscr` | ✅ **전환완료** (2026-06-20) | ✅ 일반 브라우저 가능 |
 | 6 | 이벤트방 입장료 | Bean (OUT) | `entry_fee_pi`×100 (호스트 지정 티켓가) | `api/chat/rooms/[id]/join` · `[roomId]/page` · `room-entry-fee-gate` | `ref=EVENT_ENTER` | ✅ **라이브** | ✅ 일반 브라우저 가능 |
 | 7 | 배지 강화 (BADGE_UPGRADE) | Bean (OUT) | 10 Bean (=0.1 Pi) | `api/badges/upgrade` | `refTp=BADGE_UPGRADE` | ✅ **라이브** | ✅ 일반 브라우저 가능 |
@@ -238,7 +238,7 @@ CREATE INDEX idx_bean_fee_plan_use  ON public.bean_fee_plan(use_yn, del_yn);
 
 | 테이블 | 역할 | 변경 |
 |---|---|---|
-| `msg_subscr_plan` (기존 5종) | PiCafe 구독 3-tier(Explorer/Creator/Host), PLAN_CAPS 기능 한도 | **유지·무변경** |
+| `msg_subscr_plan` (기존 5종) | PiCafé™ 구독 3-tier(Explorer/Creator/Host), PLAN_CAPS 기능 한도 | **유지·무변경** |
 | `bean_fee_plan` (신규) | 플랫폼 종합 요금 + **Bean 경제 표준** | 신규 추가 |
 
 - **PRD_12 연결**: `bean_ledger` SPEND/REWARD insert 시 금액은 `bean_fee_plan.amt_bean` 조회로 결정(하드코딩 금지). PRD_12 §11에 이 출처를 명시.

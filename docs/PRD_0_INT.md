@@ -29,8 +29,8 @@
 - Pi Coin 결제 → U2A 3단계 완전 구현 (미완료 결제 자동 복구)
 
 **차별화**:
-- **실시간 글로벌 동시통역** (PiTranslate™ — Gemini Flash + Claude Haiku 하이브리드)
-- **P2P 직거래 에스크로** (PiShop MPS — Pi Coin 자동 정산)
+- **실시간 글로벌 동시통역** (PiTranslateâ¢™ — Gemini Flash + Claude Haiku 하이브리드)
+- **P2P 직거래 에스크로** (PiShopâ¢ MPS — Pi Coin 자동 정산)
 - **N:N 음성채널** (PiVoice™ — WebRTC Full Mesh + TURN)
 - **위치기반 커머스** (LBS — 거리 기반 직거래 성사율 향상)
 - **검증된 데이터 표준** (DA 시스템 — 표준단어·도메인·용어·DDL 자동 감사)
@@ -168,7 +168,7 @@
 |---|---|---|---|
 | PL1 | **[프리미엄 포함]** | 위 12개 기능 모두 | — |
 | PL2 | **글로벌 서비스** | 203개 locale, 자동 통화·국가 매핑 | ★★★★★ |
-| PL3 | **PiTranslate™ — 글로벌 동시통역** | Gemini Flash + Claude Haiku 하이브리드, 실시간 채팅 번역 | ★★★★★ |
+| PL3 | **PiTranslateâ¢™ — 글로벌 동시통역** | Gemini Flash + Claude Haiku 하이브리드, 실시간 채팅 번역 | ★★★★★ |
 | PL4 | **카페 생태계 확장** | 마켓플레이스, Pi Bet, Webhook, 분석 대시보드 | ★★★★ |
 | PL5 | **사용자 프로필** | 마이페이지 (개인정보·결제내역·구독현황) | ★★★★ |
 | PL6 | **통계 대시보드** | DAU/WAU/MAU, 테마별 매출 (react-plotly.js) | ★★★ |
@@ -182,7 +182,7 @@
 | # | 기능 | 설명 | 전략 중요도 |
 |---|---|---|---|
 | I1 | **[플래티넘 포함]** | 위 18개 기능 모두 | — |
-| I2 | **PiShop(MPS) Phase 1 MVP** | P2P 직거래 마켓플레이스, 에스크로, 재고·매장 관리 | ★★★★★ |
+| I2 | **PiShopâ¢(MPS) Phase 1 MVP** | P2P 직거래 마켓플레이스, 에스크로, 재고·매장 관리 | ★★★★★ |
 | I3 | **P2P 에스크로 시스템** | Pi Coin 자동 정산, 분쟁 조정 | ★★★★★ |
 | I4 | **위치기반 서비스(LBS)** | 동의 기반 위치 수집, 주변 탐색, 거리 표시, 직거래 성사율 향상 | ★★★★★ |
 | I5 | **PiVoice™ — N:N 음성채널** | WebRTC Full Mesh, 1~4명, 방장 마이크 제어, TURN 지원 | ★★★★★ |
@@ -222,8 +222,8 @@
 | **9** | 카페 생태계 | ✅ 완료 | 마켓플레이스, Pi Bet, Webhook, 분석 | **프리미엄** |
 | **10** | 사용자 프로필 | ✅ 완료 | 마이페이지, 개인정보, 결제·구독 현황 | **플래티넘** |
 | **11** | 통계 대시보드 | ✅ 완료 | DAU/WAU/MAU, 테마별 매출 | **플래티넘** |
-| **12** | PiTranslate™ | ✅ 완료 | Gemini Flash + Claude Haiku 하이브리드 동시통역 | **플래티넘** |
-| **13** | PiShop(MPS) Phase 1 MVP | ✅ 완료 | P2P 직거래, 에스크로, 재고·매장 관리 | **인피니티** |
+| **12** | PiTranslateâ¢™ | ✅ 완료 | Gemini Flash + Claude Haiku 하이브리드 동시통역 | **플래티넘** |
+| **13** | PiShopâ¢(MPS) Phase 1 MVP | ✅ 완료 | P2P 직거래, 에스크로, 재고·매장 관리 | **인피니티** |
 | **14** | PiVoice™ v2.0 | ✅ 완료 | WebRTC N:N 음성채널, Full Mesh, TURN | **인피니티** |
 | **15** | LBS 위치기반서비스 | ✅ 완료 | 위치 수집, 주변 탐색, 거리 표시 | **인피니티** |
 | **16** | 횡단 개선 | ✅ 완료 | 무한 스크롤, 지연 로딩, Pi Tip→Bean 리브랜딩 | — |
@@ -234,7 +234,7 @@
 |---|---|---|
 | **베이직** | Phase 0~6 | Pi 인증·결제, Google 연동, 관리자, 게시판, DA 표준, 다국어 |
 | **프리미엄** | Phase 0~9 | +PiCafé MVP, 수익화, 생태계 확장 |
-| **플래티넘** | Phase 0~12 | +사용자 프로필, 통계 대시보드, PiTranslate™ 동시통역 |
+| **플래티넘** | Phase 0~12 | +사용자 프로필, 통계 대시보드, PiTranslateâ¢™ 동시통역 |
 | **인피니티** | Phase 0~15 | +MPS 에스크로, PiVoice™ 음성채널, LBS |
 
 ---
@@ -279,8 +279,8 @@
 | **Pi Browser** | Pi Network 공식 모바일 앱의 WebView 환경 |
 | **U2A** | User-to-App, Pi Network 공식 결제 프로토콜 |
 | **PiCafé** | 테마 기반 Pi Network 커뮤니티 카페 플랫폼 |
-| **PiTranslate™** | 글로벌 실시간 동시통역 (Gemini + Claude 하이브리드) |
-| **PiShop(MPS)** | Pi Coin P2P·O2O 마켓플레이스 |
+| **PiTranslateâ¢™** | 글로벌 실시간 동시통역 (Gemini + Claude 하이브리드) |
+| **PiShopâ¢(MPS)** | Pi Coin P2P·O2O 마켓플레이스 |
 | **PiVoice™** | WebRTC 기반 N:N 음성채널 |
 | **LBS** | Location-Based Service, 위치기반서비스 |
 | **DA** | Data Architecture, 데이터 표준화 관리 시스템 |
@@ -299,7 +299,7 @@ A: 예. PiVoice™ v2.0은 WebRTC Full Mesh, 1~4명, 방장 마이크 제어, TU
 A: `/api/payments/complete` 미구현. 한 번 빠지면 그 사용자 영구 차단됨.
 
 **Q4: 글로벌 배포의 핵심은?**
-A: 203개 locale 자동 매핑 + PiTranslate™ 실시간 동시통역 + Vercel Edge 글로벌 캐시.
+A: 203개 locale 자동 매핑 + PiTranslateâ¢™ 실시간 동시통역 + Vercel Edge 글로벌 캐시.
 
 **Q5: Pi Browser 로그인 실패 이유는?**
 A: 대부분 X-Pi-Token 헤더 누락 또는 `redirect` 오남용(쿠키 미저장 시 무한 루프).

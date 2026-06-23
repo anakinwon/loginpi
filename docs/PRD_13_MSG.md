@@ -1622,7 +1622,7 @@ console.log(data)
 
 **결정**: **`msg_noti_outbox`** (메시지 도메인, 범용)
 
-**근거**: 알림은 메시지(msg) 도메인에 속하며, 향후 PiChat·PiShop·이벤트 등 다양한 채널(KAKAO/SMS/Web Push) 알림을 한 큐로 통합 가능. PRD 번호(PRD_13_MSG)와도 일관.
+**근거**: 알림은 메시지(msg) 도메인에 속하며, 향후 PiChat·PiShop™·이벤트 등 다양한 채널(KAKAO/SMS/Web Push) 알림을 한 큐로 통합 가능. PRD 번호(PRD_13_MSG)와도 일관.
 
 **잔여 작업**: DA 표준단어 `NOTI`(알림)·`OUTBOX`(발송대기함)·`TLGM`(Telegram) 등록 + DDL `-- DA-APPROVED` 승인
 

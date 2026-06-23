@@ -19,7 +19,7 @@
 
 **cafe.pi**는 Pi Network 기반 온라인 카페 운영 플랫폼으로, 다음 핵심 기능을 제공한다:
 - **PiChat**: 다국어 실시간 채팅 (WebRTC 음성 통화 지원)
-- **PiShop**: P2P·O2O 마켓플레이스 (Bean Token 기반 거래)
+- **PiShop™**: P2P·O2O 마켓플레이스 (Bean Token 기반 거래)
 - **Event**: 미션 기반 보상 캠페인 시스템
 - **Admin**: 사용자·결제·표준데이터·감사로그 관리
 

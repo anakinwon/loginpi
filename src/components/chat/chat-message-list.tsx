@@ -14,7 +14,7 @@ interface ChatMessageListProps {
   currentUserId: string
   canTip: boolean
   canAutoTranslate?: boolean // 자동번역 자격(구독자). false면 비구독자 → 수동 번역 버튼(건당 과금) 노출
-  userLocale?: string // PiTranslate™ — scroll-up 로드 시 캐시된 번역 pre-populate
+  userLocale?: string // PiTranslateâ¢™ — scroll-up 로드 시 캐시된 번역 pre-populate
   prependMessages: (msgs: ChatMessage[]) => void
   onUpgradeForTip?: () => void
 }
@@ -424,7 +424,7 @@ function MessageBubble({
             : 'bg-muted rounded-bl-sm'
         }`}
       >
-        {/* PiTranslate™ — 번역본이 있고 원문과 다르면 번역 표시 + 원문 토글 + 👍/👎 피드백 */}
+        {/* PiTranslateâ¢™ — 번역본이 있고 원문과 다르면 번역 표시 + 원문 토글 + 👍/👎 피드백 */}
         {msg.trans_cont && msg.trans_cont !== msg.msg_cont ? (
           <TranslatedMessage
             original={msg.msg_cont ?? ''}

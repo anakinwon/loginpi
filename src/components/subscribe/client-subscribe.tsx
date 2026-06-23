@@ -248,7 +248,7 @@ export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
                 </Button>
               </div>
 
-              {/* PiShop 등급 선택 (상품 수 추천) */}
+              {/* PiShop™ 등급 선택 (상품 수 추천) */}
               {product === 'PISHOP' && (
                 <div className="mt-3">
                   <p className="text-muted-foreground mb-1 text-xs">
