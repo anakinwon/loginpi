@@ -312,6 +312,8 @@
       "confirmDelete": "영구 삭제",
       "purgeDone": "{label}: {count}건을 삭제했습니다.",
       "purgeFail": "{label} 정리 실패: {msg}",
+      "loadFailed": "로그 통계를 불러오지 못했습니다.",
+      "loadFailedHint": "sql/104_log_admin_monitor.sql이 Supabase에 적용되지 않았을 수 있습니다. SQL Editor에서 실행해 주세요.",
       "col": {
         "kind": "로그 종류",
         "category": "분류",
