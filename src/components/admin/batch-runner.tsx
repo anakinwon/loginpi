@@ -60,6 +60,10 @@ export function BatchRunner() {
   const [eventRewardResult, setEventRewardResult] =
     useState<EventRewardResult | null>(null)
 
+  const [campaignGrantRunning, setCampaignGrantRunning] = useState(false)
+  const [campaignGrantResult, setCampaignGrantResult] =
+    useState<EventRewardResult | null>(null)
+
   async function runAggregate(date: string) {
     setRunning(true)
     setLastResult(null)
@@ -101,6 +105,25 @@ export function BatchRunner() {
       toast.error(t('error', { msg: 'network error' }))
     } finally {
       setEventRewardRunning(false)
+    }
+  }
+
+  async function runCampaignGrant() {
+    setCampaignGrantRunning(true)
+    setCampaignGrantResult(null)
+    try {
+      const res = await piFetch('/api/admin/campaign/grant-all', { method: 'POST' })
+      const data = (await res.json()) as EventRewardResult & { error?: string }
+      if (res.ok) {
+        setCampaignGrantResult(data)
+        toast.success(t('campaignGrantSuccess', { granted: data.granted, already: data.already }))
+      } else {
+        toast.error(t('error', { msg: data.error ?? res.status }))
+      }
+    } catch {
+      toast.error(t('error', { msg: 'network error' }))
+    } finally {
+      setCampaignGrantRunning(false)
     }
   }
 
@@ -273,6 +296,34 @@ export function BatchRunner() {
                   already: eventRewardResult.already,
                   failed: eventRewardResult.failed,
                 })}
+          </div>
+        )}
+      </div>
+      {/* 이벤트 #2 — 매장 온보딩 캠페인 일괄 지급 */}
+      <div className="space-y-4 rounded-lg border p-5">
+        <div>
+          <p className="text-sm font-semibold">{t('campaignGrantTitle')}</p>
+          <p className="text-muted-foreground mt-0.5 text-xs">
+            {t('campaignGrantDesc')}
+          </p>
+        </div>
+        <Button
+          onClick={runCampaignGrant}
+          disabled={campaignGrantRunning}
+          variant="outline"
+        >
+          {campaignGrantRunning ? t('running') : t('campaignGrantRun')}
+        </Button>
+        {campaignGrantResult && (
+          <div
+            className={`rounded-md px-4 py-2 text-sm ${campaignGrantResult.failed === 0 ? 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400' : 'bg-destructive/10 text-destructive'}`}
+          >
+            {t('campaignGrantResult', {
+              eligible: campaignGrantResult.eligible,
+              granted: campaignGrantResult.granted,
+              already: campaignGrantResult.already,
+              failed: campaignGrantResult.failed,
+            })}
           </div>
         )}
       </div>

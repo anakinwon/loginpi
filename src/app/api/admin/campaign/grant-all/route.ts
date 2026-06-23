@@ -4,6 +4,35 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 
 const CAMPAIGN_CD = 'SHOP_ONBOARD'
 
+async function logBatchRun(
+  triggerCd: string,
+  start: Date,
+  sellers: number,
+  granted: number,
+  already: number,
+  failed: number,
+  regrId: string,
+): Promise<void> {
+  const today = new Date().toISOString().slice(0, 10)
+  const { error } = await getSupabaseAdmin()
+    .from('sys_batch_log')
+    .insert({
+      job_nm: 'campaign_grant_all',
+      trigger_cd: triggerCd,
+      from_dt: today,
+      to_dt: today,
+      start_dtm: start.toISOString(),
+      end_dtm: new Date().toISOString(),
+      success_yn: failed === 0 ? 'Y' : 'N',
+      total_cnt: sellers,
+      failed_cnt: failed,
+      result_msg: `granted=${granted} already=${already} failed=${failed}`,
+      regr_id: regrId,
+      modr_id: regrId,
+    })
+  if (error) console.error('[admin/campaign/grant-all] logBatchRun 실패:', error)
+}
+
 // POST /api/admin/campaign/grant-all
 // 매장 선착순 온보딩 이벤트(Event #2) — 3조건(매장·상품·텔레그램) 완수 판매자 전원에게
 // 보상을 일괄 지급한다 (관리자 전용). Event #1 보상 버튼과 동일한 패턴.
@@ -19,6 +48,7 @@ export async function POST() {
       { status: 403 },
     )
 
+  const start = new Date()
   const db = getSupabaseAdmin()
 
   // 1) 매장 보유 판매자 목록
@@ -97,6 +127,7 @@ export async function POST() {
     }
   }
 
+  await logBatchRun('MANUAL', start, targets.length, granted, already, failed, user!.id)
   return NextResponse.json({
     ok: true,
     eligible: targets.length, // 3조건 완수자(지급 대상)

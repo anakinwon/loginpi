@@ -1,6 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 
+async function logBatchRun(
+  triggerCd: string,
+  start: Date,
+  sellers: number,
+  granted: number,
+  already: number,
+  failed: number,
+  regrId: string,
+): Promise<void> {
+  const today = new Date().toISOString().slice(0, 10)
+  const { error } = await getSupabaseAdmin()
+    .from('sys_batch_log')
+    .insert({
+      job_nm: 'campaign_grant_all',
+      trigger_cd: triggerCd,
+      from_dt: today,
+      to_dt: today,
+      start_dtm: start.toISOString(),
+      end_dtm: new Date().toISOString(),
+      success_yn: failed === 0 ? 'Y' : 'N',
+      total_cnt: sellers,
+      failed_cnt: failed,
+      result_msg: `granted=${granted} already=${already} failed=${failed}`,
+      regr_id: regrId,
+      modr_id: regrId,
+    })
+  if (error) console.error('[campaign-grant-all] logBatchRun 실패:', error)
+}
+
 // GET /api/cron/campaign-grant-all  (1시간 주기)
 // 매장 선착순 온보딩 이벤트 #2 — 조건 완수 판매자에게 자동 신청·승인·지급.
 // 관리자 "🎁 완수자 일괄 지급" 버튼(/api/admin/campaign/grant-all)과 동일 효과.
@@ -23,6 +52,7 @@ export async function GET(request: NextRequest) {
   if (!isCronAuthorized(request))
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
 
+  const start = new Date()
   const db = getSupabaseAdmin()
 
   // 매장 보유 판매자 목록 (중복 제거)
@@ -35,8 +65,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ ok: false, error: shopErr.message }, { status: 500 })
   }
   const sellerIds = [...new Set((shops ?? []).map(s => s.seller_id))]
-  if (!sellerIds.length)
+  if (!sellerIds.length) {
+    await logBatchRun('CRON', start, 0, 0, 0, 0, 'SYSTEM')
     return NextResponse.json({ ok: true, campaign: CAMPAIGN_CD, eligible: 0, granted: 0, already: 0, failed: 0 })
+  }
 
   let granted = 0
   let already = 0
@@ -82,6 +114,7 @@ export async function GET(request: NextRequest) {
     }
   }
 
+  await logBatchRun('CRON', start, sellerIds.length, granted, already, failed, 'SYSTEM')
   console.log(
     `[cron/campaign-grant-all] sellers=${sellerIds.length} granted=${granted} already=${already} notEligible=${notEligible} failed=${failed}`,
   )
