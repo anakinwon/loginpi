@@ -11,6 +11,7 @@ export interface ShopConditionRow {
   conditions: { shop: true; item: boolean; telegram: boolean; tlgm_alrt: boolean }
   grant_status: 'PENDING' | 'APPROVED' | 'REJECTED' | null
   reg_dtm: string        // 판매자의 첫 매장 등록일
+  last_cond_dtm: string  // 마지막 조건 충족 시각 = 충족된 M1~M3 시각의 max (M4 알림은 시각 컬럼 부재로 제외)
 }
 
 // GET /api/campaign/shops
@@ -50,7 +51,7 @@ export async function GET() {
     // 기존 컬럼 — 항상 존재
     db
       .from('sys_user')
-      .select('id, pi_username, nick_nm, tlgm_conn_yn')
+      .select('id, pi_username, nick_nm, tlgm_conn_yn, tlgm_conn_dtm')
       .in('id', sellerIds),
     // 신규 컬럼 (SQL 099·100) — 미적용 시 에러 무시
     db
@@ -59,7 +60,7 @@ export async function GET() {
       .in('id', sellerIds),
     db
       .from('mps_item')
-      .select('seller_id')
+      .select('seller_id, reg_dtm')
       .eq('del_yn', 'N')
       .in('seller_id', sellerIds),
     db
@@ -70,7 +71,7 @@ export async function GET() {
       .in('usr_id', sellerIds),
   ])
 
-  type BaseUser = { id: string; pi_username: string | null; nick_nm: string | null; tlgm_conn_yn: string | null }
+  type BaseUser = { id: string; pi_username: string | null; nick_nm: string | null; tlgm_conn_yn: string | null; tlgm_conn_dtm: string | null }
   type ExtUser  = { id: string; tlgm_alrt_cfm_yn: string | null; rep_shop_id: string | null }
 
   const userMap = new Map<string, BaseUser>(
@@ -83,7 +84,13 @@ export async function GET() {
       u as ExtUser,
     ]),
   )
-  const itemSellerSet = new Set((itemsRes.data ?? []).map((i) => i.seller_id))
+  // seller별 상품 충족 여부 + 최근 상품 등록 시각(M2 조건 충족 시각)
+  const itemMaxMap = new Map<string, string>()
+  for (const i of itemsRes.data ?? []) {
+    const cur = itemMaxMap.get(i.seller_id)
+    if (!cur || i.reg_dtm > cur) itemMaxMap.set(i.seller_id, i.reg_dtm)
+  }
+  const itemSellerSet = new Set(itemMaxMap.keys())
   const grantMap = new Map(
     (grantsRes.data ?? []).map((g) => [
       g.usr_id,
@@ -106,6 +113,15 @@ export async function GET() {
       ? (sellerShops.find((s) => s.shop_id === repShopId) ?? sellerShops[0])
       : sellerShops[0]
 
+    // 마지막 조건 충족 시각 = 충족된 조건들의 시각 중 max (시각 컬럼이 있는 M1~M3만)
+    //   M1 매장: 첫 매장 등록일(항상 충족) · M2 상품: 최근 상품 등록일 · M3 텔레그램: 연동 일시
+    //   M4 알림은 충족 시각 컬럼(tlgm_alrt_cfm_dtm) 부재로 제외 — 추후 컬럼 추가 시 반영
+    const condTimes: string[] = [sellerShops[0].reg_dtm]
+    const itemMax = itemMaxMap.get(sellerId)
+    if (itemMax) condTimes.push(itemMax)
+    if (u?.tlgm_conn_yn === 'Y' && u?.tlgm_conn_dtm) condTimes.push(u.tlgm_conn_dtm)
+    const lastCondDtm = condTimes.reduce((a, b) => (b > a ? b : a))
+
     rows.push({
       shop_id:    repShop.shop_id,
       shop_nm:    repShop.shop_nm,
@@ -120,6 +136,7 @@ export async function GET() {
       },
       grant_status: grant?.grant_st_cd ?? null,
       reg_dtm:      sellerShops[0].reg_dtm,
+      last_cond_dtm: lastCondDtm,
     })
   }
 

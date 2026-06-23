@@ -18,6 +18,15 @@ const COND_LABELS: { key: keyof ShopConditionRow['conditions']; label: string }[
   { key: 'tlgm_alrt', label: 'M4 알림' },
 ]
 
+const PAGE_SIZE = 20 // 페이지당 매장 수
+
+// 마지막 수행일시 — 현지 시간대 날짜+시·분 (메모리: 현지 형식 표시 규칙)
+function fmtLastDtm(s: string | null): string {
+  if (!s) return '—'
+  const d = new Date(s)
+  return Number.isNaN(d.getTime()) ? '—' : d.toLocaleString()
+}
+
 export function CampaignShopBoard() {
   const [rows, setRows] = useState<ShopConditionRow[]>([])
   const [isAdmin, setIsAdmin] = useState(false)
@@ -25,6 +34,8 @@ export function CampaignShopBoard() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [granting, setGranting] = useState(false) // 관리자 일괄 지급 진행
+  const [search, setSearch] = useState('') // 요원명(username) 검색
+  const [page, setPage] = useState(1) // 페이지네이션
 
   const loadShops = useCallback(async () => {
     try {
@@ -99,6 +110,20 @@ export function CampaignShopBoard() {
     (r) => Object.values(r.conditions).every(Boolean),
   ).length
 
+  // 순위는 필터/페이징 전에 부여(전체 기준 1~N 유지). rows는 route에서 완료수 desc 정렬됨.
+  const ranked = rows.map((r, i) => ({ ...r, rank: i + 1 }))
+  const q = search.trim().toLowerCase()
+  const filtered = q
+    ? ranked.filter(
+        (r) =>
+          (r.pi_username ?? '').toLowerCase().includes(q) ||
+          r.shop_nm.toLowerCase().includes(q),
+      )
+    : ranked
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
+  const curPage = Math.min(page, totalPages) // 범위 보정(렌더 중 setState 금지)
+  const paged = filtered.slice((curPage - 1) * PAGE_SIZE, curPage * PAGE_SIZE)
+
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
@@ -122,13 +147,30 @@ export function CampaignShopBoard() {
         )}
       </div>
 
+      {/* 요원명(username) 검색 — 입력 시 1페이지로 리셋 */}
+      <input
+        type="text"
+        value={search}
+        onChange={(e) => {
+          setSearch(e.target.value)
+          setPage(1)
+        }}
+        placeholder="요원명(username)·매장명 검색"
+        className="border-input bg-background focus:ring-primary/30 w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:outline-none sm:max-w-xs"
+      />
+
       <div className="overflow-x-auto rounded-lg border">
         <table className="w-full border-collapse text-sm">
           <thead>
             <tr className="bg-muted border-b">
-              <th className="bg-muted sticky left-0 z-10 px-3 py-2.5 text-left font-semibold">
+              <th className="bg-muted sticky left-0 z-10 w-12 px-2 py-2.5 text-center font-semibold">
+                순위
+              </th>
+              <th className="bg-muted sticky left-12 z-10 px-3 py-2.5 text-left font-semibold">
                 매장명
               </th>
+              {/* 완료 — M1 매장 왼쪽으로 이동 */}
+              <th className="px-3 py-2.5 text-center font-semibold">완료</th>
               {COND_LABELS.map((c) => (
                 <th
                   key={c.key}
@@ -137,12 +179,14 @@ export function CampaignShopBoard() {
                   {c.label}
                 </th>
               ))}
-              <th className="px-3 py-2.5 text-center font-semibold">완료</th>
+              <th className="px-3 py-2.5 text-center font-semibold whitespace-nowrap">
+                마지막 수행일시
+              </th>
               <th className="px-3 py-2.5 text-center font-semibold">보상</th>
             </tr>
           </thead>
           <tbody>
-            {rows.map((r) => {
+            {paged.map((r) => {
               const doneCnt = Object.values(r.conditions).filter(Boolean).length
               const allDone = doneCnt === totalConds
               const isMe = !!mySellerId && r.seller_id === mySellerId
@@ -155,8 +199,13 @@ export function CampaignShopBoard() {
                     isMe ? 'ring-primary/40 ring-inset ring-2' : '',
                   ].join(' ')}
                 >
+                  {/* 순위 */}
+                  <td className="bg-card sticky left-0 z-10 w-12 px-2 py-2.5 text-center font-semibold tabular-nums">
+                    {r.rank}
+                  </td>
+
                   {/* 대표 매장명 + 판매자 */}
-                  <td className="bg-card sticky left-0 z-10 px-3 py-2.5">
+                  <td className="bg-card sticky left-12 z-10 px-3 py-2.5">
                     <div className="flex items-center gap-1.5">
                       <span className="font-medium">{r.shop_nm}</span>
                       {isMe && (
@@ -175,6 +224,19 @@ export function CampaignShopBoard() {
                     )}
                   </td>
 
+                  {/* 완료 카운트 — M1 매장 왼쪽으로 이동 */}
+                  <td className="px-3 py-2.5 text-center font-bold">
+                    <span
+                      className={
+                        allDone
+                          ? 'text-green-600 dark:text-green-400'
+                          : 'text-muted-foreground'
+                      }
+                    >
+                      {doneCnt}/{totalConds}
+                    </span>
+                  </td>
+
                   {/* 조건별 ✓ / ✗ */}
                   {COND_LABELS.map((c) => (
                     <td key={c.key} className="px-3 py-2.5 text-center">
@@ -188,17 +250,9 @@ export function CampaignShopBoard() {
                     </td>
                   ))}
 
-                  {/* 완료 카운트 */}
-                  <td className="px-3 py-2.5 text-center font-bold">
-                    <span
-                      className={
-                        allDone
-                          ? 'text-green-600 dark:text-green-400'
-                          : 'text-muted-foreground'
-                      }
-                    >
-                      {doneCnt}/{totalConds}
-                    </span>
+                  {/* 마지막 수행일시 — M1~M3 충족 시각의 max */}
+                  <td className="text-muted-foreground px-3 py-2.5 text-center text-xs whitespace-nowrap">
+                    {fmtLastDtm(r.last_cond_dtm)}
                   </td>
 
                   {/* 보상 상태 — Event #1과 동일 3단계 (미션수행중 / 보상대기 / 보상완료) */}
@@ -244,6 +298,44 @@ export function CampaignShopBoard() {
           </tbody>
         </table>
       </div>
+
+      {/* 검색 결과 없음 */}
+      {filtered.length === 0 && (
+        <p className="text-muted-foreground py-4 text-center text-sm">
+          검색 결과가 없습니다
+        </p>
+      )}
+
+      {/* 페이지네이션 — 반응형 (한 줄, 모바일·데스크탑 공통) */}
+      {filtered.length > PAGE_SIZE && (
+        <div className="flex items-center justify-between gap-2 text-sm">
+          <span className="text-muted-foreground">
+            {filtered.length}명 중 {(curPage - 1) * PAGE_SIZE + 1}–
+            {Math.min(curPage * PAGE_SIZE, filtered.length)}
+          </span>
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={curPage <= 1}
+              className="hover:bg-muted rounded-md border px-3 py-1.5 transition-colors disabled:opacity-40"
+            >
+              이전
+            </button>
+            <span className="px-2 tabular-nums">
+              {curPage} / {totalPages}
+            </span>
+            <button
+              type="button"
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={curPage >= totalPages}
+              className="hover:bg-muted rounded-md border px-3 py-1.5 transition-colors disabled:opacity-40"
+            >
+              다음
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

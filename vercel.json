@@ -11,6 +11,14 @@
     {
       "path": "/api/cron/order-autocomplete",
       "schedule": "*/3 * * * *"
+    },
+    {
+      "path": "/api/cron/event-bean-reward",
+      "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/campaign-grant-all",
+      "schedule": "0 * * * *"
     }
   ]
 }
