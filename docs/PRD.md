@@ -1,6 +1,6 @@
 # PRD: Pi Network 기반 풀스택 앱 플랫폼
 
-> **버전**: v12.2
+> **버전**: v12.3
 > **작성일**: 2026-06-05
 > **최종 업데이트**: 2026-06-23
 > **작성자**: anakin
@@ -15,7 +15,7 @@
 > **종합 요금 표준**: `docs/PRD_15_FEE.md` (v0.1) — ⭐Bean 경제 표준 요금 마스터(`bean_fee_plan`), 카페·스토어·자동번역 구독+일반요금 43행. 모든 SPEND/REWARD 금액 출처. ⚠️ xlsx 교정 후 시드 확정
 > **Bean Token 경제 관리**: `docs/PRD_16_TOKEN_MNG.md` (v1.2) — ☕빈토큰지갑(`bean_token_wallet`) 핵심 개념 확정 + 어드민 경제 관리 시스템. wallet_type PLATFORM(발행)/USER(보유) 이중구조. 소각 없음, 1Pi=100Bean 고정불변. Phase 19 구현 목표.
 > **토큰 발행 (기획)**: `docs/PRD_12_TOKEN.md` (v1.8) · `_백서.md` · `_법무자문의뢰서.md` — BEAN 생태계 토큰, Pi Launchpad. ⚠️ 발행 전 **앱 코드 미포함**(레드라인 #2 유지) — 단 문서는 git 커밋(파일럿 인큐베이팅, 2026-06-17 정책)
-> **보안 요구사항**: `docs/PRD_2_SECURITY.md` (v1.0) — KISA 행정안전부 21개 웹 취약점 적용 현황·우선 조치 계획 (✅ 13개 양호 · 🔍 6개 추가확인 · ➖ 2개 해당없음)
+> **보안 요구사항**: `docs/PRD_2_SECURITY.md` (v2.0) — KISA 23개 항목 전체 분석 + cafe.pi 특수환경(Pi Browser 이중인증·Supabase RLS 비활성) 반영 (✅ 18개 양호 · 🔍 3개 추가확인 · ➖ 2개 해당없음) · `docs/보안취약점점검결과표.pptx` (공식 점검결과표, 11슬라이드)
 > **DDoS 방어 정책**: `docs/SECURITY_DDOS_POLICY.md` — 5계층 방어 아키텍처·Rate Limiting 정책·Pi Browser NAT 특수 대응·공격 감지 절차
 
 ---
