@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { ProfileForm } from './profile-form'
@@ -35,6 +35,13 @@ interface Props {
 export function ProfileTabs({ initialUser, localeOptions }: Props) {
   const [activeTab, setActiveTab] = useState<TabId>('info')
   const [user, setUser] = useState(initialUser)
+
+  // URL ?tab=<id> 로 초기 탭 지정 (예: 캠페인 M3 텔레그램 연동 → /profile?tab=store)
+  // useSearchParams는 Suspense 경계가 필요해 window.location으로 마운트 후 1회 적용
+  useEffect(() => {
+    const tab = new URLSearchParams(window.location.search).get('tab')
+    if (tab && TABS.some((t) => t.id === tab)) setActiveTab(tab as TabId)
+  }, [])
 
   return (
     <div>
