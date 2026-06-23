@@ -1,4 +1,4 @@
--- sql/107_bean_tip_cfg.sql
+-- sql/109_bean_tip_cfg.sql
 -- DA-APPROVED: 신규 테이블 bean_tip_cfg — 'bean_' 도메인(승인됨, sql/067) 연장.
 --   표준약어 'tip'(선물/팁, P2P 선물 거래) + 'cfg'(설정/config, bean_supply_config.cfg_id 선례) 사용.
 --   코드 식별자 TIP_PRESETS_BEAN(src/lib/bean-shared.ts) 이미 운영 중 — 표시명은 PiCafé™ 선물하기.

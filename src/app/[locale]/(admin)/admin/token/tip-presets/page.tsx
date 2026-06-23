@@ -83,22 +83,20 @@ export default function TipPresetsPage() {
       <div className="space-y-3 rounded-xl border p-4">
         {([0, 1, 2] as const).map((i) => (
           <div key={i} className="flex items-center gap-3">
-            <label className="text-muted-foreground w-20 text-sm">
+            <label className="text-muted-foreground w-16 shrink-0 text-sm">
               프리셋 {i + 1}
             </label>
-            <div className="relative flex-1">
-              <input
-                type="text"
-                inputMode="numeric"
-                value={vals[i]}
-                onChange={(e) => setAt(i, e.target.value)}
-                placeholder="Bean"
-                className="border-input bg-background w-full rounded-lg border px-3 py-2 pr-24 text-right text-sm tabular-nums"
-              />
-              <span className="text-muted-foreground pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-xs">
-                Bean ≈ π{nums[i] ? (nums[i] / 100).toFixed(2) : '0'}
-              </span>
-            </div>
+            <input
+              type="text"
+              inputMode="numeric"
+              value={vals[i]}
+              onChange={(e) => setAt(i, e.target.value)}
+              placeholder="Bean"
+              className="border-input bg-background min-w-0 flex-1 rounded-lg border px-3 py-2 text-right text-sm tabular-nums"
+            />
+            <span className="text-muted-foreground w-28 shrink-0 text-right text-xs tabular-nums">
+              Bean ≈ π{nums[i] ? (nums[i] / 100).toFixed(2) : '0'}
+            </span>
           </div>
         ))}
 

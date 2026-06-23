@@ -23,7 +23,7 @@ interface TipCfgRow {
 }
 
 // 카페방 P2P 선물(팁) 프리셋 — DB 최신행(bean_tip_cfg) 우선, 없거나 오류면 코드 상수 폴백.
-// graceful: sql/107 미적용 시에도 선물 기능이 깨지지 않도록 항상 유효한 3종을 반환한다.
+// graceful: sql/109 미적용 시에도 선물 기능이 깨지지 않도록 항상 유효한 3종을 반환한다.
 export async function getTipPresets(): Promise<number[]> {
   try {
     const { data, error } = await getSupabaseAdmin()
