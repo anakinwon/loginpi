@@ -17,6 +17,15 @@ const LogUsageChart = dynamic(
   },
 )
 
+// 인프라 할당(Vercel·DB) 사용량 도넛 — 자체 fetch, Plotly 사용으로 동일하게 dynamic
+const UsageQuotaSection = dynamic(
+  () => import('@/components/admin/usage-quota-section'),
+  {
+    ssr: false,
+    loading: () => <div className="bg-muted h-48 animate-pulse rounded-lg" />,
+  },
+)
+
 interface LogTable {
   tbl: string
   label: string
@@ -140,6 +149,9 @@ export default function LogsPage() {
       <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm dark:border-blue-900/40 dark:bg-blue-900/20">
         <p className="text-blue-800 dark:text-blue-300">{t('vercelNote')}</p>
       </div>
+
+      {/* 인프라 할당(Vercel·Supabase DB) 사용량 도넛 */}
+      <UsageQuotaSection />
 
       {/* 요약 */}
       <div className="grid gap-4 sm:grid-cols-2">

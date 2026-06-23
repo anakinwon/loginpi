@@ -318,6 +318,16 @@
       "purgeFail": "{label} 정리 실패: {msg}",
       "loadFailed": "로그 통계를 불러오지 못했습니다.",
       "loadFailedHint": "sql/104_log_admin_monitor.sql이 Supabase에 적용되지 않았을 수 있습니다. SQL Editor에서 실행해 주세요.",
+      "quota": {
+        "title": "인프라 할당 사용량 (Vercel · DB)",
+        "hint": "수동 입력값 · DB는 자동 측정",
+        "auto": "자동",
+        "edit": "수정",
+        "limit": "한도",
+        "used": "사용량",
+        "loadFail": "사용량 데이터를 불러오지 못했습니다.",
+        "loadFailHint": "sql/106_usage_quota.sql이 Supabase에 적용되지 않았을 수 있습니다. SQL Editor에서 실행해 주세요."
+      },
       "col": {
         "kind": "로그 종류",
         "category": "분류",
