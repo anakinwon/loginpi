@@ -12,6 +12,7 @@ import {
   annualSaving,
   type SubscrPlan,
   type SubscrProduct,
+  type SubscrGrade,
   type SubscrCycle,
 } from '@/lib/bean-subscr-plan'
 
@@ -35,6 +36,7 @@ const PRODUCT_META: Record<SubscrProduct, { emoji: string }> = {
   TRANSLATE: { emoji: '🌐' },
 }
 const ORDER: SubscrProduct[] = ['PICAFE', 'PISHOP', 'TRANSLATE']
+const SHOP_GRADES: SubscrGrade[] = ['S', 'M', 'L']
 
 export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
   const t = useTranslations('subscribe')
@@ -42,6 +44,7 @@ export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
   const [authed, setAuthed] = useState(serverAuthed)
   const [loading, setLoading] = useState(true)
   const [cycle, setCycle] = useState<SubscrCycle>('M')
+  const [storeGrade, setStoreGrade] = useState<SubscrGrade>('S')
   const [busy, setBusy] = useState<string | null>(null)
 
   const load = useCallback(async () => {
@@ -60,13 +63,13 @@ export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
     void load()
   }, [load])
 
-  async function subscribe(product: SubscrProduct, key: string) {
+  async function subscribe(product: SubscrProduct, grade: SubscrGrade, key: string) {
     setBusy(key)
     try {
       const res = await piFetch('/api/subscriptions/products/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ product, grade: 'GENERAL', cycle }),
+        body: JSON.stringify({ product, grade, cycle }),
       })
       if (res.status === 402) {
         toast.error(t('insufficient'))
@@ -162,13 +165,15 @@ export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
       <div className="space-y-3">
         {ORDER.map((product) => {
           const meta = PRODUCT_META[product]
-          const plan = findPlan(plans, product, 'GENERAL', cycle)
+          const grade = product === 'PISHOP' ? storeGrade : 'GENERAL'
+          const plan = findPlan(plans, product, grade, cycle)
           if (!plan) return null
           const active = subMap.get(product)
           const isActive = !!active
-          const feats = t.raw(`feat.${product}`) as string[]
-          const busyKey = `${product}-GENERAL`
-          const sv = annualSaving(plans, product, 'GENERAL')
+          const featsRaw = t.raw(`feat.${product}`)
+          const feats = Array.isArray(featsRaw) ? (featsRaw as string[]) : []
+          const busyKey = `${product}-${grade}`
+          const sv = annualSaving(plans, product, grade)
 
           return (
             <div
@@ -225,7 +230,7 @@ export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
                   size="sm"
                   className="shrink-0"
                   disabled={busy !== null}
-                  onClick={() => subscribe(product, busyKey)}
+                  onClick={() => subscribe(product, grade, busyKey)}
                 >
                   {busy === busyKey
                     ? t('processing')
@@ -234,6 +239,37 @@ export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
                       : t('subscribeBtn')}
                 </Button>
               </div>
+
+              {/* PiShop™ S/M/L 등급 선택 */}
+              {product === 'PISHOP' && (
+                <div className="mt-3">
+                  <p className="text-muted-foreground mb-1.5 text-xs">
+                    {t('storeGradeHint', { count: resp?.itemCount ?? 0 })}
+                  </p>
+                  <div className="flex gap-2">
+                    {SHOP_GRADES.map((g) => {
+                      const gp = findPlan(plans, 'PISHOP', g, cycle)
+                      return (
+                        <button
+                          key={g}
+                          onClick={() => setStoreGrade(g)}
+                          className={`flex-1 rounded-lg border px-2 py-1.5 text-xs transition-colors ${
+                            storeGrade === g
+                              ? 'border-primary bg-primary/5 font-semibold'
+                              : 'text-muted-foreground hover:border-muted-foreground/40'
+                          }`}
+                        >
+                          {t(`storeGrade.${g}`)}
+                          <span className="mt-0.5 block tabular-nums">
+                            {gp?.bean_amt.toLocaleString()}{' '}
+                            <BeanIcon className="inline-block h-3.5 w-3.5 align-text-bottom" />
+                          </span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
 
               <ul className="text-muted-foreground mt-3 space-y-1 text-sm">
                 {feats.map((f, i) => (

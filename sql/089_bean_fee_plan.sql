@@ -55,13 +55,18 @@ INSERT INTO public.bean_fee_plan
    amt_bean, qty_limit, fee_plan_desc, sort_ord)
 VALUES
 
--- §4-1. 구독요금제 (SUBSCR) — 6행 (2026-06-24 개정: PiShop 단일등급, PiTranslate 인상)
-('SM100','SUBSCR','PICAFE_SUBSCR',   'SUBSCR','GENERAL','M',  3000, 0,'카페 구독 월', 10),
-('SY100','SUBSCR','PICAFE_SUBSCR',   'SUBSCR','GENERAL','Y', 30000, 0,'카페 구독 년', 11),
-('SM200','SUBSCR','PISHOP_SUBSCR',   'SUBSCR','GENERAL','M',  5000, 0,'스토어 구독 월 (단일등급)', 20),
-('SY200','SUBSCR','PISHOP_SUBSCR',   'SUBSCR','GENERAL','Y', 50000, 0,'스토어 구독 년 (단일등급)', 23),
-('SM500','SUBSCR','TRANSLATE_SUBSCR','SUBSCR','GENERAL','M',  3000, 0,'자동번역 구독 월', 30),
-('SY500','SUBSCR','TRANSLATE_SUBSCR','SUBSCR','GENERAL','Y', 30000, 0,'자동번역 구독 년', 31),
+-- §4-1. 구독요금제 (SUBSCR) — 10행 (2026-06-24 확정)
+-- PiCafé™: 월2,000/년20,000 | PiShop™ S/M/L 3단계 | PiTranslate™: 월1,000/년10,000
+('SM100','SUBSCR','PICAFE_SUBSCR',   'SUBSCR','GENERAL','M',  2000, 0,'PiCafé™ 구독 월', 10),
+('SY100','SUBSCR','PICAFE_SUBSCR',   'SUBSCR','GENERAL','Y', 20000, 0,'PiCafé™ 구독 년', 11),
+('SM200','SUBSCR','PISHOP_SUBSCR',   'SUBSCR','S',      'M',  3000,10,'스토어 구독 S 월 (상품 10개 이하)', 20),
+('SM300','SUBSCR','PISHOP_SUBSCR',   'SUBSCR','M',      'M',  4000,30,'스토어 구독 M 월 (상품 30개 이하)', 21),
+('SM400','SUBSCR','PISHOP_SUBSCR',   'SUBSCR','L',      'M',  5000, 0,'스토어 구독 L 월 (상품 무제한)', 22),
+('SY200','SUBSCR','PISHOP_SUBSCR',   'SUBSCR','S',      'Y', 30000,10,'스토어 구독 S 년 (상품 10개 이하)', 23),
+('SY300','SUBSCR','PISHOP_SUBSCR',   'SUBSCR','M',      'Y', 40000,30,'스토어 구독 M 년 (상품 30개 이하)', 24),
+('SY400','SUBSCR','PISHOP_SUBSCR',   'SUBSCR','L',      'Y', 50000, 0,'스토어 구독 L 년 (상품 무제한)', 25),
+('SM500','SUBSCR','TRANSLATE_SUBSCR','SUBSCR','GENERAL','M',  1000, 0,'PiTranslate™ 구독 월', 30),
+('SY500','SUBSCR','TRANSLATE_SUBSCR','SUBSCR','GENERAL','Y', 10000, 0,'PiTranslate™ 구독 년', 31),
 
 -- §4-2. 일반요금제 — 카페 비구독자 (GENERAL) 6행
 ('CGGC1','GENERAL','PICAFE_GENERAL','CREATE','GENERAL','ONCE',  0,1,'카페 생성 일반', 40),

@@ -86,7 +86,7 @@ export async function POST(request: NextRequest, { params }: Params) {
       // 자동 번역 경로: 비구독자는 번역하지 않고 건당 과금 안내만 반환 → 클라이언트는 원문 유지
       return NextResponse.json(
         {
-          error: '자동번역은 구독자 전용입니다',
+          error: 'PiTranslate™는 구독자 전용입니다',
           requiresBean: true,
           requiresConfirm: true,
           feeBean: TRANSLATE_ONCE_BEAN,
@@ -100,7 +100,7 @@ export async function POST(request: NextRequest, { params }: Params) {
     if (bal < TRANSLATE_ONCE_BEAN) {
       return NextResponse.json(
         {
-          error: `번역 1회에 ${TRANSLATE_ONCE_BEAN} Bean이 필요합니다. Bean을 충전하거나 자동번역을 구독하세요.`,
+          error: `번역 1회에 ${TRANSLATE_ONCE_BEAN} Bean이 필요합니다. Bean을 충전하거나 PiTranslate™를 구독하세요.`,
           requiresBean: true,
           feeBean: TRANSLATE_ONCE_BEAN,
           requiresSubscription: true,
@@ -127,7 +127,7 @@ export async function POST(request: NextRequest, { params }: Params) {
         beanAmt: -TRANSLATE_ONCE_BEAN,
         refTp: 'TRANSLATE_ONCE',
         refId: msgId,
-        memo: '자동번역 건당',
+        memo: 'PiTranslate™ 건당',
         regrId: user.display_name.slice(0, 20),
       })
       if (!charge.ok)

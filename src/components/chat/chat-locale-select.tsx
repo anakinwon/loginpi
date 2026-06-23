@@ -95,8 +95,8 @@ export function ChatLocaleSelect({
     : null
 
   const autoLabel = isSubscribed
-    ? '🌐 구독특혜 자동번역'
-    : '🔒 구독특혜 자동번역'
+    ? '🌐 구독특혜 PiTranslate™'
+    : '🔒 구독특혜 PiTranslate™'
 
   return (
     <div className="relative shrink-0" ref={containerRef}>
@@ -145,7 +145,7 @@ export function ChatLocaleSelect({
           aria-label="번역 언어 목록"
           className="border-border bg-background absolute top-full right-0 z-50 mt-1 max-h-72 w-56 overflow-y-auto rounded-lg border shadow-xl"
         >
-          {/* 선택 해제 — 구독특혜 자동번역 */}
+          {/* 선택 해제 — 구독특혜 PiTranslate™ */}
           <button
             role="option"
             aria-selected={!value}

@@ -30,7 +30,7 @@ export async function POST(request: NextRequest, { params }: Params) {
   if (!(await canAutoTranslate(user.id))) {
     return NextResponse.json(
       {
-        error: '자동번역은 구독 후 이용할 수 있습니다',
+        error: 'PiTranslate™는 구독 후 이용할 수 있습니다',
         requiresSubscription: true,
         feature: 'AUTO_TRANSLATE',
       },

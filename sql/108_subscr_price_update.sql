@@ -1,63 +1,118 @@
--- DA-APPROVED: 구독요금제 가격 변경 + PiShop™ 단일등급 전환 (2026-06-24)
--- ① PiShop S/M/L 3-tier → GENERAL 단일 5,000 Bean/월 / 50,000 Bean/년
--- ② PiTranslate 1,000→3,000/월, 10,000→30,000/년
--- ③ PiShop M/L 행(SM300,SM400,SY300,SY400) 논리 삭제
+-- DA-APPROVED: 구독요금제 확정 (2026-06-24 마스터 결정)
+-- ① PiCafé™  SM100: 3,000→2,000 Bean / SY100: 30,000→20,000 Bean
+-- ② PiShop™  S/M/L 3단계 유지 (이전 단일등급 전환 취소·복구 포함)
+--    S 월3,000·년30,000 / M 월4,000·년40,000 / L 월5,000·년50,000
+-- ③ PiTranslate™ SM500: 1,000 Bean / SY500: 10,000 Bean (기존 확정값 유지)
+-- ④ 상품명 설명 "자동번역" → "PiTranslate™"
 
--- ─── PiShop 월간 S → GENERAL, 5,000 Bean ────────────────────────────────
+-- ─── PiCafé™ 구독 가격 변경 ──────────────────────────────────────────────
 UPDATE public.bean_fee_plan
-   SET grade_cd      = 'GENERAL',
-       amt_bean      = 5000,
-       fee_plan_desc = '스토어 구독 월 (단일등급)',
+   SET amt_bean      = 2000,
+       fee_plan_desc = 'PiCafé™ 구독 월',
+       modr_id       = 'SYSTEM',
+       mod_dtm       = CURRENT_TIMESTAMP
+ WHERE fee_plan_cd = 'SM100';
+
+UPDATE public.bean_fee_plan
+   SET amt_bean      = 20000,
+       fee_plan_desc = 'PiCafé™ 구독 년',
+       modr_id       = 'SYSTEM',
+       mod_dtm       = CURRENT_TIMESTAMP
+ WHERE fee_plan_cd = 'SY100';
+
+-- ─── PiShop™ S — 복구 및 확정 (월 3,000 / 상품 10개 한도) ──────────────
+UPDATE public.bean_fee_plan
+   SET grade_cd      = 'S',
+       amt_bean      = 3000,
+       qty_limit     = 10,
+       use_yn        = 'Y',
+       del_yn        = 'N',
+       del_dtm       = NULL,
+       fee_plan_desc = '스토어 구독 S 월 (상품 10개 이하)',
        modr_id       = 'SYSTEM',
        mod_dtm       = CURRENT_TIMESTAMP
  WHERE fee_plan_cd = 'SM200';
 
--- PiShop 월간 M / L → 논리 삭제
 UPDATE public.bean_fee_plan
-   SET use_yn  = 'N',
-       del_yn  = 'Y',
-       del_dtm = CURRENT_TIMESTAMP,
-       modr_id = 'SYSTEM',
-       mod_dtm = CURRENT_TIMESTAMP
- WHERE fee_plan_cd IN ('SM300','SM400');
-
--- ─── PiShop 년간 S → GENERAL, 50,000 Bean ───────────────────────────────
-UPDATE public.bean_fee_plan
-   SET grade_cd      = 'GENERAL',
-       amt_bean      = 50000,
-       fee_plan_desc = '스토어 구독 년 (단일등급)',
+   SET grade_cd      = 'S',
+       amt_bean      = 30000,
+       qty_limit     = 10,
+       use_yn        = 'Y',
+       del_yn        = 'N',
+       del_dtm       = NULL,
+       fee_plan_desc = '스토어 구독 S 년 (상품 10개 이하)',
        modr_id       = 'SYSTEM',
        mod_dtm       = CURRENT_TIMESTAMP
  WHERE fee_plan_cd = 'SY200';
 
--- PiShop 년간 M / L → 논리 삭제
+-- ─── PiShop™ M — 복구 및 확정 (월 4,000 / 상품 30개 한도) ─────────────
 UPDATE public.bean_fee_plan
-   SET use_yn  = 'N',
-       del_yn  = 'Y',
-       del_dtm = CURRENT_TIMESTAMP,
-       modr_id = 'SYSTEM',
-       mod_dtm = CURRENT_TIMESTAMP
- WHERE fee_plan_cd IN ('SY300','SY400');
+   SET grade_cd      = 'M',
+       amt_bean      = 4000,
+       qty_limit     = 30,
+       use_yn        = 'Y',
+       del_yn        = 'N',
+       del_dtm       = NULL,
+       fee_plan_desc = '스토어 구독 M 월 (상품 30개 이하)',
+       modr_id       = 'SYSTEM',
+       mod_dtm       = CURRENT_TIMESTAMP
+ WHERE fee_plan_cd = 'SM300';
 
--- ─── PiTranslate 월간 1,000 → 3,000 Bean ────────────────────────────────
 UPDATE public.bean_fee_plan
-   SET amt_bean      = 3000,
-       fee_plan_desc = '자동번역 구독 월',
+   SET grade_cd      = 'M',
+       amt_bean      = 40000,
+       qty_limit     = 30,
+       use_yn        = 'Y',
+       del_yn        = 'N',
+       del_dtm       = NULL,
+       fee_plan_desc = '스토어 구독 M 년 (상품 30개 이하)',
+       modr_id       = 'SYSTEM',
+       mod_dtm       = CURRENT_TIMESTAMP
+ WHERE fee_plan_cd = 'SY300';
+
+-- ─── PiShop™ L — 복구 및 확정 (월 5,000 / 무제한) ──────────────────────
+UPDATE public.bean_fee_plan
+   SET grade_cd      = 'L',
+       amt_bean      = 5000,
+       qty_limit     = 0,
+       use_yn        = 'Y',
+       del_yn        = 'N',
+       del_dtm       = NULL,
+       fee_plan_desc = '스토어 구독 L 월 (상품 무제한)',
+       modr_id       = 'SYSTEM',
+       mod_dtm       = CURRENT_TIMESTAMP
+ WHERE fee_plan_cd = 'SM400';
+
+UPDATE public.bean_fee_plan
+   SET grade_cd      = 'L',
+       amt_bean      = 50000,
+       qty_limit     = 0,
+       use_yn        = 'Y',
+       del_yn        = 'N',
+       del_dtm       = NULL,
+       fee_plan_desc = '스토어 구독 L 년 (상품 무제한)',
+       modr_id       = 'SYSTEM',
+       mod_dtm       = CURRENT_TIMESTAMP
+ WHERE fee_plan_cd = 'SY400';
+
+-- ─── PiTranslate™ 구독료 확정 (월 1,000 / 년 10,000) ────────────────────
+UPDATE public.bean_fee_plan
+   SET amt_bean      = 1000,
+       fee_plan_desc = 'PiTranslate™ 구독 월',
        modr_id       = 'SYSTEM',
        mod_dtm       = CURRENT_TIMESTAMP
  WHERE fee_plan_cd = 'SM500';
 
--- ─── PiTranslate 년간 10,000 → 30,000 Bean ───────────────────────────────
 UPDATE public.bean_fee_plan
-   SET amt_bean      = 30000,
-       fee_plan_desc = '자동번역 구독 년',
+   SET amt_bean      = 10000,
+       fee_plan_desc = 'PiTranslate™ 구독 년',
        modr_id       = 'SYSTEM',
        mod_dtm       = CURRENT_TIMESTAMP
  WHERE fee_plan_cd = 'SY500';
 
--- ─── qty_limit 정리 (단일등급이므로 0=무제한) ──────────────────────────
+-- ─── PiTranslate™ 건당 요금 설명 업데이트 ────────────────────────────────
 UPDATE public.bean_fee_plan
-   SET qty_limit = 0,
-       modr_id   = 'SYSTEM',
-       mod_dtm   = CURRENT_TIMESTAMP
- WHERE fee_plan_cd IN ('SM200','SY200');
+   SET fee_plan_desc = 'PiTranslate™ 건당 (=0.01 Pi)',
+       modr_id       = 'SYSTEM',
+       mod_dtm       = CURRENT_TIMESTAMP
+ WHERE fee_plan_cd = 'TRANS_ONCE';

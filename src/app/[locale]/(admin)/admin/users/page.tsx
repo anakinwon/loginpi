@@ -151,6 +151,7 @@ export default function UsersPage() {
                       day: '2-digit',
                       hour: '2-digit',
                       minute: '2-digit',
+                      hour12: false,
                     })}
                   </td>
                   <td className="text-muted-foreground px-4 py-3 text-xs">
@@ -161,6 +162,7 @@ export default function UsersPage() {
                           day: '2-digit',
                           hour: '2-digit',
                           minute: '2-digit',
+                          hour12: false,
                         })
                       : '—'}
                   </td>

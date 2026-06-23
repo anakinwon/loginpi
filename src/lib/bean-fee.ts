@@ -10,7 +10,7 @@
 // 배지 강화 요금 — 0.1 Pi × 100 = 10 Bean (PRD_15_FEE §1-6 #7)
 export const BADGE_UPGRADE_BEAN = 10
 
-// 자동번역 건당 요금 — 비구독자 맛보기/소량 이용용 (구독자는 무료, TRANSLATE 구독 월 1000 Bean).
+// PiTranslate™ 건당 요금 — 비구독자 맛보기/소량 이용용 (구독자는 무료, PiTranslate™ 구독 월 1000 Bean).
 //   신규 번역 1회 = 1 Bean(=0.01 Pi). 구독 손익분기 ≈ 1000회/월 → 가벼운 사용자는 건당, 헤비는 구독.
 //   캐시(이미 번역된 것) 재사용·동일언어는 과금 없음(실제 번역 비용 발생 시에만 과금).
 export const TRANSLATE_ONCE_BEAN = 1
