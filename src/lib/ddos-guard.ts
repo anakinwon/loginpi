@@ -82,13 +82,26 @@ export function checkRateLimit(
 }
 
 // ── IP 추출 (Vercel edge 환경) ───────────────────────────────────────────────
+// 우선순위: req.ip(Edge) > x-real-ip(Vercel이 override) > x-forwarded-for 마지막 항목
+// x-forwarded-for 첫 번째 항목은 클라이언트가 위조 가능 (rate limit bypass 위험)
+// → Vercel은 실제 클라이언트 IP를 맨 뒤에 append하므로 마지막 항목이 신뢰 가능
 export function getClientIp(req: NextRequest): string {
-  return (
-    req.headers.get('x-real-ip') ??
-    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
-    (req as NextRequest & { ip?: string }).ip ??
-    'unknown'
-  )
+  // 1) Edge runtime: Vercel이 주입한 값
+  const edgeIp = (req as NextRequest & { ip?: string }).ip
+  if (edgeIp) return edgeIp
+
+  // 2) x-real-ip: Vercel Serverless가 클라이언트 원래 IP로 설정 (위조 불가)
+  const realIp = req.headers.get('x-real-ip')
+  if (realIp) return realIp.trim()
+
+  // 3) x-forwarded-for: Vercel이 끝에 append — 마지막 항목이 실제 IP
+  const forwarded = req.headers.get('x-forwarded-for')
+  if (forwarded) {
+    const last = forwarded.split(',').at(-1)?.trim()
+    if (last) return last
+  }
+
+  return 'unknown'
 }
 
 // ── 경로 → 정책 매핑 ────────────────────────────────────────────────────────

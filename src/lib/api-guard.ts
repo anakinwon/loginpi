@@ -82,13 +82,27 @@ export function withGuard(handler: Handler): Handler {
 // 인증 엔드포인트 전용 — 더 엄격한 검사 추가
 export function withAuthGuard(handler: Handler): Handler {
   return withGuard(async (req: NextRequest, ctx?: unknown) => {
-    // 빈 Origin 헤더 = 직접 HTTP 요청(브라우저 외) 가능성 → 허용하되 로그
     const origin = req.headers.get('origin')
-    const host = req.headers.get('host')
-    if (origin && host && !origin.includes(host.split(':')[0])) {
-      // Cross-origin 인증 시도 — 차단
-      return forbiddenResponse('cross_origin_auth')
+    if (origin) {
+      // Origin이 있을 때 정확한 hostname 비교
+      // ⚠️ origin.includes(host) 방식은 substring bypass 가능:
+      //    evil-cafe.pi.attacker.com 이 cafe.pi를 포함하므로 통과됨
+      const host = req.headers.get('host')
+      try {
+        const originHostname = new URL(origin).hostname
+        // NEXT_PUBLIC_APP_URL 우선, 없으면 host 헤더 fallback
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL
+        const trustedHostname = appUrl ? new URL(appUrl).hostname : host?.split(':')[0] ?? ''
+        if (!trustedHostname || originHostname !== trustedHostname) {
+          return forbiddenResponse('cross_origin_auth')
+        }
+      } catch {
+        // URL 파싱 실패 = 비정상 Origin → 차단
+        return forbiddenResponse('cross_origin_auth')
+      }
     }
+    // Origin 없음: Pi Browser 직접 API 호출·서버-투-서버 → 허용
+    // (X-Pi-Token 유효성 검증은 핸들러 내부 getSessionUser()에서 수행)
     return handler(req, ctx)
   })
 }
