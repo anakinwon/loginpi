@@ -48,9 +48,16 @@ function getOnce(options: PositionOptions): Promise<GeoPoint> {
 // fresh: true — 캐시 무시하고 새로 측위 ('위치 갱신' 버튼용)
 export async function getCurrentPosition(opts?: {
   fresh?: boolean
+  quick?: boolean
 }): Promise<GeoPoint> {
   if (typeof navigator === 'undefined' || !navigator.geolocation) {
     throw new GeoError(0, messageFor(0))
+  }
+  // quick: 거리 배지 등 부가 기능용 — 캐시(5분) 우선·짧은 timeout·고정밀 재시도 없음.
+  //   첫 로딩을 막지 않도록 빠르게 반환하고, 실패 시 호출부가 거리 없이 진행한다.
+  //   (정밀 측위가 필요한 '주변순' 버튼 등은 quick 없이 호출 — 기존 8s→12s 고정밀 경로)
+  if (opts?.quick) {
+    return getOnce({ timeout: 4000, maximumAge: 300_000 })
   }
   try {
     return await getOnce({

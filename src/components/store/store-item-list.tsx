@@ -118,9 +118,11 @@ export function StoreItemList({ mine = false }: StoreItemListProps) {
 
   // 동의자는 마운트 시 자동으로 현재 위치 수집 → 모든 상품 카드에 거리 배지 표시.
   // 정렬은 바꾸지 않는다 (📍 주변순 버튼과 별개 — 거리 표시 전용) — 내 상품 모드에서는 불필요
+  // quick 모드: 거리 배지는 부가 기능이라 캐시 우선·저정밀·짧은 timeout으로 첫 로딩 지연을 막는다.
+  // (고정밀 8~20s 측위는 '주변순' 버튼 등 명시적 액션에서만)
   useEffect(() => {
     if (mine || lbsConsent !== 'Y' || userLat !== null) return
-    getCurrentPosition()
+    getCurrentPosition({ quick: true })
       .then((p) => {
         setUserLat(p.lat)
         setUserLng(p.lng)
