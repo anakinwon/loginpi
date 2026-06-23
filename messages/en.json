@@ -620,6 +620,30 @@
   },
   "adminStats": {
     "activeUsers": "Active Users",
+    "beanDistTitle": "Bean Transaction Distribution",
+    "beanDistTotalPrefix": "Total {cnt} txns · volume {gross}",
+    "beanDistTotalSuffix": "(sum of absolute values — charge·spend·subscription·tip·fee·reward·refund·transfer, all types)",
+    "beanDistRowMeta": "{cnt} txns · {users} users · {share}%",
+    "beanDistNet": "net {net}",
+    "beanDistFootnote": "Bar length·ratio = share of gross volume per type · net = signed sum on user wallet basis (inflow +, recovery −, move 0)",
+    "beanDistError": "Distribution error: {error}",
+    "beanDistEmpty": "No Bean transactions in this period.",
+    "txnLabel": {
+      "CHARGE": "Charge",
+      "REWARD": "Reward",
+      "REFUND": "Refund",
+      "SPEND": "Spend",
+      "SUBSCRIBE": "Subscription",
+      "TIP": "Tip",
+      "FEE": "Fee",
+      "TRANSFER": "P2P Gift",
+      "ETC": "Other"
+    },
+    "flowBadge": {
+      "in": "Inflow",
+      "out": "Recovery",
+      "move": "Move"
+    },
     "adminTitle": "Statistics Dashboard",
     "fetchFail": "Failed to load data",
     "homeTitle": "Dashboard",
@@ -850,7 +874,7 @@
     }
   },
   "bean": {
-    "backToStore": "Back to PiShop™",
+    "backToStore": "Back to PiShop",
     "buying": "Payment in progress…",
     "chargeBtn": "Charge",
     "chargeFail": "Charge processing failed",
@@ -1341,14 +1365,14 @@
     "loadError": "Failed to load Data",
     "loginHint": "Log in to see your mission progress and agent grade",
     "missionGoBean": "Go to Charge Bean",
-    "missionGoCafe": "💬 Go to PiCafé™",
+    "missionGoCafe": "💬 Go to PiCafe",
     "missionGoItems": "🛒 Go to My Items",
     "missionGoLbs": "📍 Location Service (My Profile)",
     "missionGoLink": "🔗 Go to Connect Account",
     "missionGoOrders": "🛒 Go to Order Management",
     "missionGoProfile": "👤 Go to Connect Account and Enter Profile",
     "missionGoSales": "🛒 Go to Sales Management",
-    "missionGoStore": "🛒 Go to PiShop™",
+    "missionGoStore": "🛒 Go to PiShop",
     "missionGoSubscribe": "⭐ Go to Subscribe",
     "missionListTitle": "📋 Mission List",
     "missions": {
@@ -1365,7 +1389,7 @@
         "name": "Complete Profile"
       },
       "M3": {
-        "desc": "Create PREMIUM Cafe in PiCafé™ + Use auto-translation feature",
+        "desc": "Create PREMIUM Cafe in PiCafe + Use auto-translation feature",
         "name": "Create PREMIUM Cafe (PiRC1) + Auto-translation"
       },
       "M4": {
@@ -1381,15 +1405,15 @@
         "name": "Use Chat Multi-function"
       },
       "M7": {
-        "desc": "Register my product on PiShop™, then cancel seller transaction during trade",
+        "desc": "Register my product on PiShop, then cancel seller transaction during trade",
         "name": "Seller Transaction Cancellation (Escrow Service; PiRC3)"
       },
       "M8": {
-        "desc": "Buyer transaction cancellation after purchasing another person's product in PiShop™",
+        "desc": "Buyer transaction cancellation after purchasing another person's product in PiShop",
         "name": "Buyer Transaction Cancellation (Escrow Service; PiRC3)"
       },
       "M9": {
-        "desc": "Deposit 1Pi or more as PiShop™ Seller Deposit + Consent to location-based services",
+        "desc": "Deposit 1Pi or more as PiShop Seller Deposit + Consent to location-based services",
         "name": "Seller Deposit + Location Consent (Escrow Service; PiRC3)"
       }
     },
@@ -1915,7 +1939,7 @@
     "statusChanged": "Status changed successfully.",
     "stockLeft": "Stock {count}",
     "subtitle": "Safely trade directly with Pi Coin — Escrow Protection",
-    "title": "PiShop™",
+    "title": "PiShop",
     "tradeSt": {
       "OPEN": "On Sale",
       "SOLD": "Sold",
@@ -1961,8 +1985,8 @@
     "perYear": "Year",
     "processing": "Processing…",
     "product": {
-      "PICAFE": "PiCafé™ Subscription",
-      "PISHOP": "PiShop™ Subscription",
+      "PICAFE": "PiCafe Subscription",
+      "PISHOP": "PiShop Subscription",
       "TRANSLATE": "Auto-Translate Subscription"
     },
     "renewBtn": "Renew/Change",

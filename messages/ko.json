@@ -620,6 +620,30 @@
   },
   "adminStats": {
     "homeTitle": "대시보드",
+    "beanDistTitle": "Bean 거래 분포",
+    "beanDistTotalPrefix": "전체 {cnt}건 · 총거래량 {gross}",
+    "beanDistTotalSuffix": "(절댓값 합 — 충전·사용·구독료·팁·수수료·보상·환불·전송 등 전 유형)",
+    "beanDistRowMeta": "{cnt}건 · {users}명 · {share}%",
+    "beanDistNet": "순 {net}",
+    "beanDistFootnote": "막대 길이·비율 = 유형별 총거래량(gross) 점유율 · 순증감(net) = 사용자 지갑 기준 부호 합(유입 +, 회수 −, 이동 0)",
+    "beanDistError": "분포 오류: {error}",
+    "beanDistEmpty": "해당 기간 Bean 거래가 없습니다.",
+    "txnLabel": {
+      "CHARGE": "충전",
+      "REWARD": "보상 지급",
+      "REFUND": "환불",
+      "SPEND": "사용 (소비)",
+      "SUBSCRIBE": "구독료",
+      "TIP": "팁",
+      "FEE": "수수료",
+      "TRANSFER": "P2P 선물",
+      "ETC": "기타"
+    },
+    "flowBadge": {
+      "in": "유입",
+      "out": "회수",
+      "move": "이동"
+    },
     "adminTitle": "통계 대시보드",
     "subtitle": "활성 사용자 · 매출 통계 (일별 집계 기반)",
     "fetchFail": "데이터 조회 실패",
