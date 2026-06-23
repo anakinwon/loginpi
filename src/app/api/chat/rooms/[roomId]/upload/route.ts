@@ -88,13 +88,22 @@ export async function POST(request: NextRequest, { params }: Params) {
   const isMedia =
     file.type.startsWith('image/') || file.type.startsWith('audio/')
 
-  const { error } = await getSupabaseAdmin()
+  const db = getSupabaseAdmin()
+  const { error } = await db
     .storage.from(BUCKET)
     .upload(path, buffer, { contentType: file.type, upsert: false })
 
   if (error) {
+    // KISA IL 완화: 에러 메시지 정제 (내부 정보 노출 금지)
+    console.error('[api/chat/rooms/upload/post] 파일 업로드 실패:', {
+      roomId,
+      userId: user.id,
+      fileType: file.type,
+      fileSize: file.size,
+      error: error.message,
+    })
     return NextResponse.json(
-      { error: `업로드 실패: ${error.message}` },
+      { error: '파일 업로드에 실패했습니다. 잠시 후 다시 시도해주세요' },
       { status: 500 },
     )
   }
@@ -103,7 +112,7 @@ export async function POST(request: NextRequest, { params }: Params) {
   // — 브라우저 인라인 렌더(콘텐츠 스니핑 XSS) 차단. 파일명은 정제 후 사용
   const safeName =
     file.name.replace(/[^\w.\-가-힣 ]/g, '_').slice(0, 80) || `file.${ext}`
-  const { data: urlData } = getSupabaseAdmin()
+  const { data: urlData } = db
     .storage.from(BUCKET)
     .getPublicUrl(path, isMedia ? undefined : { download: safeName })
 

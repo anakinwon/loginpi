@@ -60,8 +60,15 @@ export async function POST(req: NextRequest) {
     .upload(path, buffer, { contentType: file.type, upsert: false })
 
   if (error) {
+    // KISA IL 완화: 에러 메시지 정제 (내부 정보 노출 금지)
+    console.error('[api/store/items/images/post] 파일 업로드 실패:', {
+      userId: user.id,
+      fileType: file.type,
+      fileSize: file.size,
+      error: error.message,
+    })
     return NextResponse.json(
-      { error: `업로드 실패: ${error.message}` },
+      { error: '이미지 업로드에 실패했습니다. 잠시 후 다시 시도해주세요' },
       { status: 500 },
     )
   }

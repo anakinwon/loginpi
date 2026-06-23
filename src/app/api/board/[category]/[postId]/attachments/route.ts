@@ -8,6 +8,59 @@ const BUCKET = 'board-attachments'
 const MAX_FILES = 5
 const MAX_SIZE = 20 * 1024 * 1024 // 20MB
 
+// MIME 타입 화이트리스트 — 클라이언트 파일명 신뢰 금지, 확장자는 이 맵에서만 결정
+// (KISA FU — 파일 업로드 항목: 확장자/MIME 검증 필수)
+// 카테고리별 정책: 공지/뉴스=이미지+PDF만, 자유게시판=광범위, 거래=보안제한
+const ALLOWED_MIME_BY_CATEGORY: Record<string, Map<string, string>> = {
+  // 공지사항·뉴스·업체소식 — 이미지 + PDF만 (악성 파일 차단)
+  notice: new Map([
+    ['image/jpeg', 'jpg'],
+    ['image/png', 'png'],
+    ['image/gif', 'gif'],
+    ['image/webp', 'webp'],
+    ['application/pdf', 'pdf'],
+  ]),
+  news: new Map([
+    ['image/jpeg', 'jpg'],
+    ['image/png', 'png'],
+    ['image/gif', 'gif'],
+    ['image/webp', 'webp'],
+    ['application/pdf', 'pdf'],
+  ]),
+  shop: new Map([
+    ['image/jpeg', 'jpg'],
+    ['image/png', 'png'],
+    ['image/gif', 'gif'],
+    ['image/webp', 'webp'],
+    ['application/pdf', 'pdf'],
+  ]),
+  // 자유게시판 — 문서 및 압축 파일 추가 (가장 개방적)
+  free: new Map([
+    ['image/jpeg', 'jpg'],
+    ['image/png', 'png'],
+    ['image/gif', 'gif'],
+    ['image/webp', 'webp'],
+    ['application/pdf', 'pdf'],
+    ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'docx'],
+    ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'xlsx'],
+    ['text/plain', 'txt'],
+    ['application/zip', 'zip'],
+  ]),
+  // 거래게시판 — 이미지 + 영수증 PDF만 (보안 강화)
+  trade: new Map([
+    ['image/jpeg', 'jpg'],
+    ['image/png', 'png'],
+    ['application/pdf', 'pdf'],
+  ]),
+}
+
+// 기본 화이트리스트 (카테고리별 정책 없을 때 fallback)
+const ALLOWED_MIME_DEFAULT = new Map<string, string>([
+  ['image/jpeg', 'jpg'],
+  ['image/png', 'png'],
+  ['application/pdf', 'pdf'],
+])
+
 type Params = { params: Promise<{ category: string; postId: string }> }
 
 // GET /api/board/[category]/[postId]/attachments — 첨부파일 목록 조회
@@ -130,8 +183,17 @@ export async function POST(request: NextRequest, { params }: Params) {
       )
     }
 
-    const ext = file.name.includes('.') ? file.name.split('.').pop() : ''
-    const storagePath = `${postId}/${randomUUID()}${ext ? `.${ext}` : ''}`
+    // KISA FU 검증: 카테고리별 MIME 화이트리스트 적용
+    const mimeMap = ALLOWED_MIME_BY_CATEGORY[ctgr.ctgr_cd] ?? ALLOWED_MIME_DEFAULT
+    const ext = mimeMap.get(file.type)
+    if (!ext) {
+      return NextResponse.json(
+        { error: '허용되지 않은 파일 형식입니다' },
+        { status: 415 },
+      )
+    }
+
+    const storagePath = `${postId}/${randomUUID()}.${ext}`
 
     const { error: uploadErr } = await db.storage
       .from(BUCKET)
@@ -141,8 +203,15 @@ export async function POST(request: NextRequest, { params }: Params) {
       })
 
     if (uploadErr) {
+      // KISA IL 완화: 에러 메시지 정제 (내부 정보 노출 금지)
+      console.error('[api/board/attachments/post] 파일 업로드 실패:', {
+        postId,
+        userId: user.id,
+        fileType: file.type,
+        error: uploadErr.message,
+      })
       return NextResponse.json(
-        { error: `업로드 실패: ${file.name}` },
+        { error: '파일 업로드에 실패했습니다. 잠시 후 다시 시도해주세요' },
         { status: 500 },
       )
     }
@@ -171,8 +240,14 @@ export async function POST(request: NextRequest, { params }: Params) {
     if (dbErr) {
       // DB 저장 실패 시 Storage 파일 롤백
       await db.storage.from(BUCKET).remove([storagePath])
+      console.error('[api/board/attachments/post] DB 저장 실패:', {
+        postId,
+        userId: user.id,
+        storagePath,
+        error: dbErr.message,
+      })
       return NextResponse.json(
-        { error: `DB 저장 실패: ${file.name}` },
+        { error: '파일 업로드에 실패했습니다. 잠시 후 다시 시도해주세요' },
         { status: 500 },
       )
     }

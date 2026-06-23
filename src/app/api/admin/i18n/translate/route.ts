@@ -68,8 +68,21 @@ async function callGemini(prompt: string, apiKey: string): Promise<string> {
     }),
   })
   if (!res.ok) {
-    const body = await res.text()
-    throw new Error(`${res.status}: ${body.slice(0, 300)}`)
+    // KISA IL 완화: 에러 응답 크기 제한 후 로깅 (민감한 정보 노출 금지)
+    let bodySlice = ''
+    try {
+      const contentLength = res.headers.get('content-length')
+      const maxLen = contentLength ? Math.min(parseInt(contentLength), 500) : 500
+      bodySlice = (await res.text()).slice(0, maxLen)
+    } catch {
+      bodySlice = '(읽기 실패)'
+    }
+    console.error('[api/admin/i18n/translate/post] Gemini API 오류:', {
+      status: res.status,
+      statusText: res.statusText,
+      bodySlice,
+    })
+    throw new Error('API 응답 처리 중 오류가 발생했습니다')
   }
   const data = (await res.json()) as {
     candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>
@@ -184,15 +197,23 @@ ${JSON.stringify(batch, null, 2)}`
     try {
       text = await callGemini(prompt, apiKey)
     } catch (apiErr) {
-      const msg = apiErr instanceof Error ? apiErr.message : 'Gemini API 오류'
+      // KISA IL 완화: 에러 메시지 정제 (Error 객체 직렬화 금지)
+      console.error('[api/admin/i18n/translate/post] Gemini 호출 실패:', {
+        locale,
+        batchIndex: Math.floor(i / BATCH),
+        error: apiErr instanceof Error ? apiErr.message : String(apiErr),
+      })
       // 이미 번역된 데이터가 있으면 부분 성공 반환, 없으면 오류
+      const msg = totalUpserted > 0
+        ? '일부 번역 후 중단되었습니다. 관리자에게 문의하세요'
+        : '번역 작업이 실패했습니다. 잠시 후 다시 시도해주세요'
       if (totalUpserted > 0) {
         return NextResponse.json({
           translated: totalUpserted,
-          message: `${totalUpserted}개 번역 후 중단: ${msg}`,
+          message: msg,
         })
       }
-      return NextResponse.json({ error: `번역 실패: ${msg}` }, { status: 502 })
+      return NextResponse.json({ error: msg }, { status: 502 })
     }
 
     let translated: Record<string, string> = {}
