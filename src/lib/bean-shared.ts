@@ -6,8 +6,8 @@ export const BEAN_PER_PI = 100
 // 충전 프리셋 (Bean 단위 → Pi = bean / 100). 정수만.
 export const CHARGE_PRESETS = [100, 500, 1000, 5000] as const
 
-// 카페방 P2P 선물 프리셋 (Bean 단위). 1 Pi = 100 Bean → 10/50/100 Bean = 0.1/0.5/1 Pi.
-export const TIP_PRESETS_BEAN = [10, 50, 100] as const
+// 카페방 P2P 선물 프리셋 (Bean 단위). 1 Pi = 100 Bean → 100/500/1000 Bean = 1/5/10 Pi.
+export const TIP_PRESETS_BEAN = [100, 500, 1000] as const
 
 // TRANSFER: 카페방 P2P 선물(USER↔USER 이전, 부호로 송수신 구분)
 export type BeanTxnType = 'CHARGE' | 'SPEND' | 'REWARD' | 'REFUND' | 'TRANSFER'
