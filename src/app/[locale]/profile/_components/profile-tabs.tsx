@@ -21,7 +21,7 @@ const TABS = [
   { id: 'bean', label: 'Bean 지갑' },
   { id: 'payment', label: '결제 내역' },
   { id: 'subscr', label: '구독 현황' },
-  { id: 'store', label: '🛍️ 스토어' },
+  { id: 'store', label: '🛍️ 내 PiShop' },
   { id: 'lbs', label: '📍 위치 서비스' },
 ] as const
 

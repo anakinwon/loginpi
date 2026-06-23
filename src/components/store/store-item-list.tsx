@@ -57,9 +57,12 @@ function formatDistance(km: number): string {
   return `${km.toFixed(1)}km`
 }
 
-// Supabase Storage URL만 Next.js Image Optimization 적용 — 외부 URL은 unoptimized fallback
+// next.config.ts의 remotePatterns와 동일한 기준으로 최적화 여부 결정
+// NEXT_PUBLIC_SUPABASE_URL 미설정 시 → 최적화 skip (unoptimized fallback)
+const SUPABASE_ORIGIN = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
+
 function isStorageUrl(url: string): boolean {
-  return url.includes('.supabase.co/storage/')
+  return SUPABASE_ORIGIN !== '' && url.startsWith(SUPABASE_ORIGIN)
 }
 
 interface StoreItemListProps {
