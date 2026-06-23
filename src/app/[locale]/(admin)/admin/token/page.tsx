@@ -167,8 +167,8 @@ function RewardBreakdownBox({ kpi }: { kpi: TokenKpi }) {
 function BalanceSheet({ kpi }: { kpi: TokenKpi }) {
   const debit = kpi.total_issued_bean // 차변: 발행 원천
   const credit = kpi.circulating_bean + kpi.total_collected_bean // 대변: 현재 소재
-  const diff = debit - credit // 0이면 균형
-  const balanced = Math.abs(diff) <= 1
+  const diff = debit - credit // Bean 정수 항등식 — 정상이면 반드시 정확히 0
+  const balanced = diff === 0 // 무관용원칙: ±1도 허용 안 함 (1 Bean 누수도 누수)
 
   return (
     <div className="border-border overflow-hidden rounded-lg border">

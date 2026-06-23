@@ -120,8 +120,10 @@ export async function GET() {
 
   // 총 회수 = 운영(PLATFORM) + 재단(FOUNDATION) + 생태계기금(REWARD_POOL)
   const totalCollected = platformBalance + foundationBalance + rewardPoolBalance
-  // 항등식: 발행 = 유통 + 총회수 (±1 오차 허용, 정수 반올림)
-  const identityOk = Math.abs(totalIssued - circulating - totalCollected) <= 1
+  // 항등식: 발행 = 유통 + 총회수. Bean은 정수(BIGINT)이고 거버넌스 분배는 잔차를 FOUNDATION에
+  // 귀속(fn_bean_governance_apply)하므로 반올림 손실이 0 → diff는 반드시 정확히 0이어야 한다.
+  // 무관용원칙: 1 Bean이라도 어긋나면 누수로 간주(허용 오차 없음).
+  const identityOk = totalIssued - circulating - totalCollected === 0
 
   return NextResponse.json({
     kpi: {
