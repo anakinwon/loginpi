@@ -134,23 +134,18 @@ export function isMaliciousAgent(ua: string | null): boolean {
 }
 
 // ── 공통 보안 헤더 ─────────────────────────────────────────────────────────
+// ⚠️ CSP 제거 이유:
+//   Pi Browser WebView는 네이티브 SDK 브릿지 + Google OAuth CDN 등 다양한 외부 출처를 사용.
+//   CSP를 페이지 레벨에 적용하면 Pi SDK 로딩·connect-src 미등록 엔드포인트가 차단되어
+//   Pi Browser에서 로그인 불가(핵심 제약 위반) — vercel.json에서도 CSP 미설정.
+//   대신 rate limiting·input sanitize·withGuard 3중 방어로 XSS/인젝션 방어.
 export const SECURITY_HEADERS: Record<string, string> = {
   'X-Content-Type-Options': 'nosniff',
   'X-Frame-Options': 'SAMEORIGIN',
   'X-XSS-Protection': '1; mode=block',
   'Referrer-Policy': 'strict-origin-when-cross-origin',
-  'Permissions-Policy': 'camera=(), microphone=(self), geolocation=(self)',
+  'Permissions-Policy': 'camera=(self), microphone=(self), geolocation=(self)',
   'Strict-Transport-Security': 'max-age=63072000; includeSubDomains; preload',
-  // CSP: Pi Browser는 *.minepi.com SDK를 로드하므로 허용 필수
-  'Content-Security-Policy': [
-    "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' *.minepi.com cdn.jsdelivr.net",
-    "connect-src 'self' *.minepi.com *.supabase.co wss://*.supabase.co",
-    "img-src 'self' data: blob: *.supabase.co",
-    "frame-src 'self' *.minepi.com",
-    "font-src 'self' data:",
-    "style-src 'self' 'unsafe-inline'",
-  ].join('; '),
 }
 
 // ── DDoS 차단 응답 생성 ─────────────────────────────────────────────────────
