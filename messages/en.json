@@ -707,7 +707,7 @@
       "expand": "Learn more",
       "collapse": "Collapse",
       "intro": "Cafe.pi resolves Pi Browser's demanding constraints through structural and cryptographic design, and upholds fund integrity and data standards from day one.",
-      "highlight1Title": "🔐 Pi + Google unified login",
+      "highlight1Title": "🤝 Pi + Google unified login",
       "highlight1Desc": "Pi and Google accounts supported. Kakao, LINE, WeChat and more unified logins planned.",
       "highlight2Title": "💳 Pi payment services",
       "highlight2Desc": "Implements PiRC1 (token economy) · PiRC2 (subscriptions) · PiRC3 (escrow safe trade).",

@@ -692,7 +692,7 @@
       "expand": "자세히 보기",
       "collapse": "접기",
       "intro": "Cafe.pi는 Pi Browser의 까다로운 제약을 구조적·암호학적으로 해결하고, 자금 무결성과 데이터 표준을 출범 단계부터 지킵니다.",
-      "highlight1Title": "🔐 Pi · Google 통합 로그인",
+      "highlight1Title": "🤝 Pi · Google 통합 로그인",
       "highlight1Desc": "Pi 계정 + 구글 계정 지원. 추후 카카오·라인·위챗 등 통합 로그인 추가 예정.",
       "highlight2Title": "💳 Pi 결제 서비스 구축",
       "highlight2Desc": "PiRC1(토큰 경제) · PiRC2(구독 서비스) · PiRC3(에스크로 안전거래) 구현.",
