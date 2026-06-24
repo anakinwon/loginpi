@@ -11,6 +11,7 @@ import {
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { piFetch } from '@/lib/pi-fetch'
+import { maskUsername } from '@/lib/mask-username'
 
 // 미션별 수행 페이지 바로가기 — 행동이 둘인 미션(M9 보증금+위치동의)은 링크를 여러 개 노출.
 // labelKey는 event 네임스페이스 i18n 키 (타겟별 라벨 재사용)
@@ -79,12 +80,11 @@ interface ExcludedAgent {
   reg_dtm: string
 }
 
-// 요원명 표시: 관리자는 실명 그대로, 일반 회원은 앞 4글자만 노출하고 나머지 *** 처리
-// (예: 일반 회원 → anak***, 관리자 → anakin2)
+// 요원명 표시: 관리자는 실명 그대로, 일반 회원은 표준 마스킹(maskUsername — 단일 출처)
 function maskAgentName(r: Ranking, isAdmin: boolean, noName: string): string {
   const name = r.pi_username ?? r.nick_nm
   if (!name) return noName
-  return isAdmin ? name : name.slice(0, 4) + '***'
+  return isAdmin ? name : maskUsername(name)
 }
 
 type MissionTranslation = { name?: string; desc?: string }

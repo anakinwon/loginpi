@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Loader2 } from 'lucide-react'
 import { piFetch } from '@/lib/pi-fetch'
+import { maskUsername } from '@/lib/mask-username'
 import type { ShopConditionRow } from '@/app/api/campaign/shops/route'
 
 interface ShopsResponse {
@@ -216,7 +217,9 @@ export function CampaignShopBoard() {
                       )}
                     </div>
                     <div className="text-xs font-medium text-blue-600 dark:text-blue-400">
-                      {r.pi_username ? `@${r.pi_username}` : '—'}
+                      {r.pi_username
+                        ? `@${isAdmin ? r.pi_username : maskUsername(r.pi_username)}`
+                        : '—'}
                     </div>
                     {r.shop_count > 1 && (
                       <div className="text-muted-foreground mt-0.5 text-xs">
