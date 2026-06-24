@@ -13,11 +13,15 @@ function deepMerge(
 ): MessageRecord {
   const result: MessageRecord = { ...base }
   for (const [key, val] of Object.entries(override)) {
+    // 배열은 재귀 병합 금지 — 통째로 교체. (배열도 typeof === 'object'이므로
+    // 재귀하면 {0:…,1:…} 평범한 객체가 되어 .map 등이 깨진다. 예: adminStats.manual.topics)
     if (
       typeof val === 'object' &&
       val !== null &&
+      !Array.isArray(val) &&
       typeof base[key] === 'object' &&
-      base[key] !== null
+      base[key] !== null &&
+      !Array.isArray(base[key])
     ) {
       result[key] = deepMerge(base[key] as MessageRecord, val as MessageRecord)
     } else {

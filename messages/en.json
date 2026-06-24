@@ -737,6 +737,15 @@
           ]
         },
         {
+          "icon": "🎁",
+          "title": "Events — join now",
+          "steps": [
+            "EVENT #1: Top up with Test-Pi and complete 10 missions → 5,000 Bean for the first 100 people",
+            "EVENT #2: Register your store, add menus, and finish a test trade → 10,000 Bean for the first 100 stores",
+            "Follow the per-mission links on the Event tab to complete them easily"
+          ]
+        },
+        {
           "icon": "🔑",
           "title": "Login & account linking",
           "steps": [
@@ -744,15 +753,6 @@
             "Copy the code (or link) and move to a regular browser",
             "In the regular browser, sign in with Google, paste it, and tap 'Link' — Pi + Google connected",
             "Pi Browser cannot store credentials, so the 6-digit code safely bridges the two browsers"
-          ]
-        },
-        {
-          "icon": "🎁",
-          "title": "Events — join now",
-          "steps": [
-            "EVENT #1: Top up with Test-Pi and complete 10 missions → 5,000 Bean for the first 100 people",
-            "EVENT #2: Register your store, add menus, and finish a test trade → 10,000 Bean for the first 100 stores",
-            "Follow the per-mission links on the Event tab to complete them easily"
           ]
         },
         {

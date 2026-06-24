@@ -13,7 +13,9 @@ interface Topic {
 
 export function UserManual() {
   const t = useTranslations('adminStats.manual')
-  const topics = t.raw('topics') as Topic[]
+  // 배열 가드 — 번역 병합 이상 등으로 배열이 아니면 빈 배열로(크래시 방지)
+  const rawTopics = t.raw('topics')
+  const topics: Topic[] = Array.isArray(rawTopics) ? (rawTopics as Topic[]) : []
   const [open, setOpen] = useState(false)
   const [expanded, setExpanded] = useState<Set<number>>(new Set())
 
