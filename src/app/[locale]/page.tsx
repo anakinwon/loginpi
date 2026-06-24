@@ -13,8 +13,10 @@ export default async function HomePage() {
 
   return (
     <div className="mx-auto max-w-5xl space-y-8 px-4 py-8">
-      <TechWhitepaper />
-      <UserManual />
+      <div className="space-y-2">
+        <TechWhitepaper />
+        <UserManual />
+      </div>
 
       <div>
         <h1 className="text-2xl font-bold">{t('homeTitle')}</h1>

@@ -703,7 +703,7 @@
     "homeTitle": "Dashboard",
     "whitepaper": {
       "badge": "Whitepaper",
-      "title": "PiCafé™ Technical Strengths",
+      "title": "Cafe.pi Technical Strengths",
       "expand": "Learn more",
       "collapse": "Collapse",
       "intro": "PiCafé™ resolves Pi Browser's demanding constraints through structural and cryptographic design, and upholds fund integrity and data standards from day one.",
@@ -723,7 +723,7 @@
     },
     "manual": {
       "badge": "User Guide",
-      "title": "Easy User Guide",
+      "title": "Cafe.pi Easy User Guide",
       "expand": "Learn more",
       "collapse": "Collapse",
       "intro": "No tech skills needed — just follow the steps 😊. Remember just 3 things: ① Log in ② Explore ③ Buy & sell",

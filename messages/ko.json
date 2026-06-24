@@ -687,7 +687,7 @@
     "homeTitle": "대시보드",
     "whitepaper": {
       "badge": "기술 백서",
-      "title": "PiCafé™ 기술적 강점",
+      "title": "Cafe.pi의 기술적 강점",
       "expand": "자세히 보기",
       "collapse": "접기",
       "intro": "PiCafé™는 Pi Browser의 까다로운 제약을 구조적·암호학적으로 해결하고, 자금 무결성과 데이터 표준을 출범 단계부터 지킵니다.",
@@ -707,7 +707,7 @@
     },
     "manual": {
       "badge": "사용 설명서",
-      "title": "쉬운 사용 설명서",
+      "title": "Cafe.pi의 쉬운 사용 설명서",
       "expand": "자세히 보기",
       "collapse": "접기",
       "intro": "컴퓨터를 잘 몰라도 괜찮아요. 순서대로 따라만 하세요 😊 — 딱 3가지만 기억하세요: ① 로그인 ② 둘러보기 ③ 사고팔기",
