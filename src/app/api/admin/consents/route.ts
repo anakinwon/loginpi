@@ -2,16 +2,15 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 
-// 약관/동의 내역 조회 (관리자 전용) — sys_user_consent 이력.
-// FK 미설계 → 임베디드 조인 금지. 사용자명은 user_str_id로 sys_user 별도 .in() 조회 후 Map 병합.
+// 약관/동의 내역 (관리자 전용) — sys_user_consent 이력을 "사용자별 1행"으로 집계.
+// 유형별 최신 상태만 투영(reg_dtm DESC 첫 등장=최신). FK 미설계 → sys_user 별도 .in() 병합.
+const TYPES = ['TERMS', 'PRIVACY', 'LBS', 'MKT', 'AGE14', 'GUARDIAN'] as const
+const SCAN_LIMIT = 5000 // 집계 대상 최근 이력 상한(Open Beta 규모 충분)
 
 interface ConsentRow {
-  consent_id: string
   user_str_id: string
   consent_tp_cd: string
   consent_yn: string
-  consent_ver: string | null
-  client_ip: string | null
   reg_dtm: string
 }
 interface UserRow {
@@ -28,16 +27,13 @@ export async function GET(req: NextRequest) {
   }
 
   const sp = req.nextUrl.searchParams
-  const type = sp.get('type') ?? '' // TERMS/PRIVACY/LBS/MKT/AGE14/GUARDIAN
   const q = (sp.get('q')?.trim() ?? '').replace(/[,()*\\%]/g, '').slice(0, 40)
   const page = Math.max(1, Number(sp.get('page') ?? 1))
   const limit = 30
-  const from = (page - 1) * limit
-  const to = from + limit - 1
 
   const db = getSupabaseAdmin()
 
-  // 요원명 검색 → 매칭 user id 집합 선조회(pg_trgm .ilike)
+  // 요원명 검색 → 매칭 user id 선조회
   let userIds: string[] | null = null
   if (q) {
     const { data: us } = await db
@@ -53,41 +49,65 @@ export async function GET(req: NextRequest) {
 
   let query = db
     .from('sys_user_consent')
-    .select(
-      'consent_id, user_str_id, consent_tp_cd, consent_yn, consent_ver, client_ip, reg_dtm',
-      { count: 'exact' },
-    )
+    .select('user_str_id, consent_tp_cd, consent_yn, reg_dtm')
     .eq('del_yn', 'N')
-  if (type) query = query.eq('consent_tp_cd', type)
   if (userIds) query = query.in('user_str_id', userIds)
-  query = query.order('reg_dtm', { ascending: false }).range(from, to)
+  query = query.order('reg_dtm', { ascending: false }).limit(SCAN_LIMIT)
 
-  const { data, count, error } = await query
+  const { data, error } = await query
   if (error) {
     return NextResponse.json({ error: '조회 실패' }, { status: 500 })
   }
   const rows = (data ?? []) as ConsentRow[]
 
-  // 사용자명 병합 (FK 없는 별도 조회)
-  const ids = [...new Set(rows.map((r) => r.user_str_id))]
+  // 사용자별 유형 최신 상태 집계 (DESC 정렬이라 첫 등장=최신)
+  interface Agg {
+    user_str_id: string
+    status: Record<string, string> // type → 'Y'|'N'
+    latest_dtm: string
+  }
+  const map = new Map<string, Agg>()
+  for (const r of rows) {
+    let a = map.get(r.user_str_id)
+    if (!a) {
+      a = { user_str_id: r.user_str_id, status: {}, latest_dtm: r.reg_dtm }
+      map.set(r.user_str_id, a)
+    }
+    if (!(r.consent_tp_cd in a.status)) a.status[r.consent_tp_cd] = r.consent_yn
+    if (r.reg_dtm > a.latest_dtm) a.latest_dtm = r.reg_dtm
+  }
+
+  // 최근 동의순 정렬 후 사용자 단위 페이지네이션
+  const users = [...map.values()].sort((x, y) =>
+    y.latest_dtm.localeCompare(x.latest_dtm),
+  )
+  const total = users.length
+  const pageUsers = users.slice((page - 1) * limit, (page - 1) * limit + limit)
+
+  // 사용자명 병합
+  const ids = pageUsers.map((u) => u.user_str_id)
   const nameMap = new Map<string, UserRow>()
   if (ids.length > 0) {
-    const { data: users } = await db
+    const { data: su } = await db
       .from('sys_user')
       .select('id, pi_username, nick_nm, display_name')
       .in('id', ids)
-    for (const u of (users ?? []) as UserRow[]) nameMap.set(u.id, u)
+    for (const u of (su ?? []) as UserRow[]) nameMap.set(u.id, u)
   }
 
-  const merged = rows.map((r) => {
-    const u = nameMap.get(r.user_str_id)
+  const result = pageUsers.map((u) => {
+    const n = nameMap.get(u.user_str_id)
+    const status: Record<string, string | null> = {}
+    for (const t of TYPES) status[t] = u.status[t] ?? null
     return {
-      ...r,
+      user_str_id: u.user_str_id,
       user_nm:
-        u?.nick_nm || u?.display_name || u?.pi_username || r.user_str_id.slice(0, 8),
-      pi_username: u?.pi_username ?? null,
+        n?.nick_nm || n?.display_name || n?.pi_username || u.user_str_id.slice(0, 8),
+      pi_username: n?.pi_username ?? null,
+      status,
+      latest_dtm: u.latest_dtm,
     }
   })
 
-  return NextResponse.json({ rows: merged, total: count ?? 0, page, limit })
+  return NextResponse.json({ rows: result, total, page, limit })
 }
