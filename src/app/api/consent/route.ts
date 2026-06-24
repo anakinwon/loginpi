@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
+import { recordUserAction } from '@/lib/event'
 import {
   getUserConsents,
   recordConsents,
+  syncLbsConsent,
   calcAge,
   REQUIRED_CONSENTS,
   CONSENT_VER,
+  LBS_CONSENT_VER,
   MIN_AGE,
 } from '@/lib/consent'
 
@@ -40,18 +43,21 @@ export async function POST(req: NextRequest) {
   } catch {
     return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
   }
-  const { terms, privacy, marketing, birth, guardian } = body as {
+  const { terms, privacy, marketing, lbs, birth, guardian } = body as {
     terms?: boolean
     privacy?: boolean
     marketing?: boolean
+    lbs?: boolean
     birth?: string
     guardian?: boolean
   }
 
   // 필수 동의 검증 (서버 강제 — 클라이언트 우회 차단)
-  if (terms !== true || privacy !== true) {
+  if (terms !== true || privacy !== true || lbs !== true) {
     return NextResponse.json(
-      { error: '이용약관과 개인정보 수집·이용 동의는 필수입니다' },
+      {
+        error: '이용약관·개인정보 수집·이용·위치정보 수집·이용 동의는 필수입니다',
+      },
       { status: 400 },
     )
   }
@@ -95,5 +101,16 @@ export async function POST(req: NextRequest) {
   if (!result.ok) {
     return NextResponse.json({ error: '저장 실패' }, { status: 500 })
   }
+
+  // 위치(LBS) 동의 즉시 동기화 — sys_user 캐시 세팅으로 가까운 카페/지도 즉시 활성, 별도 다이얼로그 미표시
+  const lbsSync = await syncLbsConsent(user.id, { ip, ua })
+  if (!lbsSync.ok) {
+    return NextResponse.json({ error: '위치 동의 저장 실패' }, { status: 500 })
+  }
+  // M9: 위치기반서비스 동의 미션 기록 (비블로킹 — 기존 LBS 라우트와 동일 동작)
+  recordUserAction('lbs_consent', user.id, { consent_ver: LBS_CONSENT_VER }).catch(
+    (err) => console.error(`[M9] 미션 기록 실패: ${err.message}`),
+  )
+
   return NextResponse.json({ ok: true })
 }

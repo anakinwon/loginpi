@@ -6,9 +6,12 @@ import { getSupabaseAdmin } from './supabase-admin'
 export const CONSENT_VER = '2026-06-24'
 
 // AGE14 = 만 14세 이상(또는 법정대리인 동의로 통과) · GUARDIAN = 만 14세 미만 법정대리인 동의
-export type ConsentType = 'TERMS' | 'PRIVACY' | 'MKT' | 'AGE14' | 'GUARDIAN'
-export const REQUIRED_CONSENTS: ConsentType[] = ['TERMS', 'PRIVACY', 'AGE14']
+// LBS = 위치기반서비스 이용·위치정보 수집·이용 동의(가까운 카페/매장/거리순에 필수)
+export type ConsentType = 'TERMS' | 'PRIVACY' | 'MKT' | 'AGE14' | 'GUARDIAN' | 'LBS'
+export const REQUIRED_CONSENTS: ConsentType[] = ['TERMS', 'PRIVACY', 'AGE14', 'LBS']
 export const MIN_AGE = 14
+// 위치 동의 약관 버전 — 기존 LBS 라우트(/api/location/consent)와 동일해야 캐시·재동의 판단 일치
+export const LBS_CONSENT_VER = 'v1.0'
 
 // 만 나이 계산(생년월일 'YYYY-MM-DD' 기준). 데이터 최소수집: 원본 생년월일은 저장하지 않고 검증만.
 export function calcAge(birth: string, now: Date = new Date()): number | null {
@@ -62,4 +65,36 @@ export async function recordConsents(
   const { error } = await getSupabaseAdmin().from('sys_user_consent').insert(rows)
   if (error) return { ok: false, error: error.message }
   return { ok: true }
+}
+
+// 위치(LBS) 동의 즉시 동기화 — 기존 LBS 라우트와 동일하게 sys_user 캐시 + 이력 기록.
+// 이 캐시(lbs_consent_yn='Y')를 가까운 카페/지도가 공유하므로 별도 LBS 다이얼로그가 다시 안 뜬다.
+export async function syncLbsConsent(
+  userId: string,
+  meta: { ip?: string | null; ua?: string | null },
+): Promise<{ ok: boolean }> {
+  const db = getSupabaseAdmin()
+  const now = new Date().toISOString()
+  const [u, c] = await Promise.all([
+    db
+      .from('sys_user')
+      .update({
+        lbs_consent_yn: 'Y',
+        lbs_consent_dtm: now,
+        lbs_consent_ver: LBS_CONSENT_VER,
+        mod_dtm: now,
+      })
+      .eq('id', userId),
+    db.from('sys_user_consent').insert({
+      user_str_id: userId,
+      consent_tp_cd: 'LBS',
+      consent_yn: 'Y',
+      consent_ver: LBS_CONSENT_VER,
+      client_ip: meta.ip ?? null,
+      user_agent: meta.ua ?? null,
+      regr_id: userId,
+      modr_id: userId,
+    }),
+  ])
+  return { ok: !u.error && !c.error }
 }

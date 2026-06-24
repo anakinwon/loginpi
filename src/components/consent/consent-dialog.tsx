@@ -26,6 +26,7 @@ function clientAge(birth: string): number | null {
 export function ConsentDialog({ onAgreed }: Props) {
   const [terms, setTerms] = useState(false)
   const [privacy, setPrivacy] = useState(false)
+  const [lbs, setLbs] = useState(false)
   const [marketing, setMarketing] = useState(false)
   const [birth, setBirth] = useState('')
   const [guardian, setGuardian] = useState(false)
@@ -36,13 +37,14 @@ export function ConsentDialog({ onAgreed }: Props) {
   const birthValid = age !== null
   const isMinor = age !== null && age < 14
 
-  const allChecked = terms && privacy && marketing
-  const requiredOk = terms && privacy && birthValid && (!isMinor || guardian)
+  const allChecked = terms && privacy && lbs && marketing
+  const requiredOk = terms && privacy && lbs && birthValid && (!isMinor || guardian)
 
   function toggleAll() {
     const next = !allChecked
     setTerms(next)
     setPrivacy(next)
+    setLbs(next)
     setMarketing(next)
   }
 
@@ -53,7 +55,7 @@ export function ConsentDialog({ onAgreed }: Props) {
       const res = await piFetch('/api/consent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ terms, privacy, marketing, birth, guardian }),
+        body: JSON.stringify({ terms, privacy, lbs, marketing, birth, guardian }),
       })
       if (!res.ok) {
         const d = (await res.json().catch(() => ({}))) as { error?: string }
@@ -134,6 +136,13 @@ export function ConsentDialog({ onAgreed }: Props) {
             href="/docs/legal/privacy-consent"
           />
           <Row
+            checked={lbs}
+            onToggle={() => setLbs((v) => !v)}
+            required
+            label="위치정보 수집·이용 동의"
+            href="/docs/agreement/lbs"
+          />
+          <Row
             checked={marketing}
             onToggle={() => setMarketing((v) => !v)}
             label="마케팅 정보 수신 동의"
@@ -150,7 +159,7 @@ export function ConsentDialog({ onAgreed }: Props) {
           {saving ? '처리 중…' : '동의하고 계속'}
         </button>
         <p className="text-muted-foreground mt-2 text-center text-[11px]">
-          필수 항목(이용약관·개인정보)에 동의해야 서비스를 이용할 수 있습니다.
+          필수 항목(이용약관·개인정보·위치정보)에 동의해야 서비스를 이용할 수 있습니다.
         </p>
       </div>
     </div>
