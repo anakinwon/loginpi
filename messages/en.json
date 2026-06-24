@@ -275,6 +275,7 @@
       "themes": "Theme Management",
       "title": "Admin",
       "users": "User Management",
+      "consents": "Consent Records",
       "subscrPricing": "구독요금제"
     },
     "payments": {
