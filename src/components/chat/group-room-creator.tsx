@@ -191,18 +191,18 @@ export function GroupRoomCreator() {
       })
       if (!res.ok) {
         const d = (await res.json()) as { error?: string }
-        throw new Error(d.error ?? '방 생성 실패')
+        throw new Error(d.error ?? t('createFail'))
       }
       const data = (await res.json()) as { room?: { room_id: string } }
       setPayStatus('done')
       setOpen(false)
-      toast.success('카페가 생성되었습니다!')
+      toast.success(t('created'))
       if (data.room?.room_id) {
         router.push(`/chat/${data.room.room_id}`)
       }
     } catch (e) {
       setPayStatus('error')
-      setPayError(e instanceof Error ? e.message : '방 생성 오류')
+      setPayError(e instanceof Error ? e.message : t('createError'))
     }
   }, [
     selectedTheme,
@@ -213,6 +213,7 @@ export function GroupRoomCreator() {
     exprDays,
     gpsCoords,
     router,
+    t,
   ])
 
   // TASK-063: 이벤트방 생성 — BUSINESS 전용, 생성 결제 없음 (참가자가 입장료 결제)
@@ -238,18 +239,18 @@ export function GroupRoomCreator() {
       })
       if (!res.ok) {
         const d = (await res.json()) as { error?: string }
-        throw new Error(d.error ?? '이벤트방 생성 실패')
+        throw new Error(d.error ?? t('eventCreateFail'))
       }
       const data = (await res.json()) as { room?: { room_id: string } }
       setPayStatus('done')
       setOpen(false)
-      toast.success('이벤트방이 생성되었습니다!')
+      toast.success(t('eventCreated'))
       if (data.room?.room_id) {
         router.push(`/chat/${data.room.room_id}`)
       }
     } catch (e) {
       setPayStatus('error')
-      setPayError(e instanceof Error ? e.message : '이벤트방 생성 오류')
+      setPayError(e instanceof Error ? e.message : t('eventCreateError'))
     }
   }, [
     selectedTheme,
@@ -261,6 +262,7 @@ export function GroupRoomCreator() {
     eventEndDtm,
     gpsCoords,
     router,
+    t,
   ])
 
   // 카페 만들기는 Pi Browser에서 로그인한 사용자만 가능 (비로그인·일반 브라우저는 버튼 숨김)
@@ -281,7 +283,7 @@ export function GroupRoomCreator() {
         <DialogContent className="sm:max-w-lg" showCloseButton={!isBusy}>
           <DialogHeader>
             <DialogTitle>
-              {roomType === 'E' ? '이벤트 카페 만들기' : '그룹 카페 만들기'}
+              {roomType === 'E' ? t('eventTitle') : t('groupTitle')}
             </DialogTitle>
           </DialogHeader>
 
@@ -301,7 +303,7 @@ export function GroupRoomCreator() {
                         : 'hover:bg-muted'
                     }`}
                   >
-                    💬 그룹방
+                    {t('groupTab')}
                   </button>
                   <button
                     onClick={() => setRoomType('E')}
@@ -311,19 +313,21 @@ export function GroupRoomCreator() {
                         : 'hover:bg-muted'
                     }`}
                   >
-                    🎟️ 이벤트방
+                    {t('eventTab')}
                   </button>
                 </div>
                 {roomType === 'E' && (
                   <p className="mb-2 rounded-xl bg-violet-500/10 px-3 py-2 text-xs text-violet-700 dark:text-violet-300">
-                    참가자가 입장료(Bean)를 소진하고 입장하는 기간 한정 방입니다.
+                    {t('eventDesc')}
                     {eventCreateCostBean > 0
-                      ? ` 생성료 ${eventCreateCostBean} Bean이 차감됩니다.`
-                      : ' 구독 혜택으로 생성료가 무료입니다.'}
+                      ? t('eventCreateCostDeduct', {
+                          amount: eventCreateCostBean,
+                        })
+                      : t('eventCreateCostFree')}
                   </p>
                 )}
                 <p className="text-muted-foreground mb-3 text-sm">
-                  카페의 테마를 선택하세요
+                  {t('themeStep')}
                 </p>
                 <div className="max-h-72 overflow-y-auto pr-1">
                   <ThemeSelector
@@ -341,7 +345,7 @@ export function GroupRoomCreator() {
                 <div className="flex items-center gap-2 text-sm">
                   <span className="text-2xl">{selectedTheme.theme_emoji}</span>
                   <span className="font-medium">
-                    {selectedTheme.theme_nm} 테마
+                    {selectedTheme.theme_nm} {t('theme')}
                   </span>
                   {isPremium && (
                     <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
@@ -352,13 +356,16 @@ export function GroupRoomCreator() {
 
                 <div>
                   <label className="mb-1 block text-sm font-medium">
-                    카페 이름 *
+                    {t('nameLabel')}
                   </label>
                   <input
                     type="text"
                     value={roomNm}
                     onChange={(e) => setRoomNm(e.target.value)}
-                    placeholder={`${selectedTheme.theme_emoji} ${selectedTheme.theme_nm} 모임`}
+                    placeholder={t('defaultRoomName', {
+                      emoji: selectedTheme.theme_emoji,
+                      theme: selectedTheme.theme_nm,
+                    })}
                     maxLength={50}
                     className="bg-background focus:ring-ring w-full rounded-xl border px-3 py-2 text-sm outline-none focus:ring-2"
                   />
@@ -366,12 +373,12 @@ export function GroupRoomCreator() {
 
                 <div>
                   <label className="mb-1 block text-sm font-medium">
-                    카페 소개 (선택)
+                    {t('descLabel')}
                   </label>
                   <textarea
                     value={roomDesc}
                     onChange={(e) => setRoomDesc(e.target.value)}
-                    placeholder="카페에 대해 소개해 주세요"
+                    placeholder={t('descPlaceholder')}
                     rows={3}
                     maxLength={200}
                     className="bg-background focus:ring-ring w-full resize-none rounded-xl border px-3 py-2 text-sm outline-none focus:ring-2"
@@ -383,7 +390,7 @@ export function GroupRoomCreator() {
                     onClick={() => setStep(1)}
                     className="hover:bg-muted flex-1 rounded-xl border px-4 py-2 text-sm"
                   >
-                    이전
+                    {t('back')}
                   </button>
                   <button
                     onClick={() => {
@@ -392,7 +399,7 @@ export function GroupRoomCreator() {
                     disabled={!roomNm.trim()}
                     className="bg-primary text-primary-foreground flex-1 rounded-xl px-4 py-2 text-sm font-medium disabled:opacity-40"
                   >
-                    다음
+                    {t('next')}
                   </button>
                 </div>
               </div>
@@ -402,14 +409,14 @@ export function GroupRoomCreator() {
             {step === 3 && (
               <div className="space-y-4">
                 <div>
-                  <p className="mb-2 text-sm font-medium">공개 여부</p>
+                  <p className="mb-2 text-sm font-medium">{t('visibility')}</p>
                   {restrictFreeRoom ? (
                     <>
                       <div className="border-primary bg-primary/10 text-primary rounded-xl border px-4 py-2 text-center text-sm font-medium">
-                        🌐 공개
+                        {t('publicEmoji')}
                       </div>
                       <p className="text-muted-foreground mt-1 text-xs">
-                        무료로 만드는 카페는 공개로만 개설할 수 있어요.
+                        {t('freeRoomPublicOnly')}
                       </p>
                     </>
                   ) : (
@@ -424,7 +431,7 @@ export function GroupRoomCreator() {
                               : 'hover:bg-muted'
                           }`}
                         >
-                          {v === 'Y' ? '🌐 공개' : '🔒 비공개'}
+                          {v === 'Y' ? t('publicEmoji') : t('privateEmoji')}
                         </button>
                       ))}
                     </div>
@@ -432,7 +439,7 @@ export function GroupRoomCreator() {
                 </div>
 
                 <div>
-                  <p className="mb-2 text-sm font-medium">최대 정원</p>
+                  <p className="mb-2 text-sm font-medium">{t('maxMembers')}</p>
                   <div className="grid grid-cols-4 gap-2">
                     {([10, 30, 50, 100] as Capacity[]).map((n) => {
                       const locked = restrictFreeRoom && n !== FREE_ROOM_MAX
@@ -451,14 +458,14 @@ export function GroupRoomCreator() {
                                 : 'hover:bg-muted'
                           }`}
                         >
-                          {n}명
+                          {t('capacityN', { n })}
                         </button>
                       )
                     })}
                   </div>
                   {restrictFreeRoom && (
                     <p className="text-muted-foreground mt-1 text-xs">
-                      무료로 만드는 카페는 최대 10명까지 가능해요.
+                      {t('freeRoomCapacityLimit')}
                     </p>
                   )}
                 </div>
@@ -466,23 +473,38 @@ export function GroupRoomCreator() {
                 {roomType === 'G' ? (
                   isFreeRoom7d ? (
                     <div className="bg-muted/40 rounded-xl border p-3 text-sm">
-                      <p className="font-medium">유효기간 7일 (무료 개설)</p>
+                      <p className="font-medium">{t('freeRoom7dValidity')}</p>
                       <p className="text-muted-foreground mt-1 text-xs">
-                        무료로 개설하는 카페는 무조건 7일간만 유지되며 연장할 수
-                        없습니다. 기간을 직접 지정하려면 Bean 결제로 개설하세요.
+                        {t('freeRoom7dHint')}
                       </p>
                     </div>
                   ) : (
                     <div>
-                      <p className="mb-2 text-sm font-medium">유효기간</p>
+                      <p className="mb-2 text-sm font-medium">
+                        {t('validity')}
+                      </p>
                       <div className="grid grid-cols-5 gap-2">
-                        {[
-                          { days: 0 as ExprDays, label: '무기한' },
-                          { days: 1 as ExprDays, label: '1일' },
-                          { days: 3 as ExprDays, label: '3일' },
-                          { days: 7 as ExprDays, label: '7일' },
-                          { days: 30 as ExprDays, label: '30일' },
-                        ].map(({ days, label }) => (
+                        {(
+                          [
+                            { days: 0 as ExprDays, label: t('unlimited') },
+                            {
+                              days: 1 as ExprDays,
+                              label: t('validityDays', { n: 1 }),
+                            },
+                            {
+                              days: 3 as ExprDays,
+                              label: t('validityDays', { n: 3 }),
+                            },
+                            {
+                              days: 7 as ExprDays,
+                              label: t('validityDays', { n: 7 }),
+                            },
+                            {
+                              days: 30 as ExprDays,
+                              label: t('validityDays', { n: 30 }),
+                            },
+                          ] as { days: ExprDays; label: string }[]
+                        ).map(({ days, label }) => (
                           <button
                             key={days}
                             onClick={() => setExprDays(days)}
@@ -503,7 +525,7 @@ export function GroupRoomCreator() {
                     {/* TASK-063: 이벤트방 — 입장료 + 종료 시각 */}
                     <div>
                       <p className="mb-2 text-sm font-medium">
-                        입장료 (참가자 Bean 소진)
+                        {t('entryFee')}
                       </p>
                       <div className="grid grid-cols-4 gap-2">
                         {([0, 0.1, 0.5, 1] as EntryFee[]).map((fee) => (
@@ -516,7 +538,9 @@ export function GroupRoomCreator() {
                                 : 'hover:bg-muted'
                             }`}
                           >
-                            {fee === 0 ? '무료' : `${fee * 100} Bean`}
+                            {fee === 0
+                              ? t('freeEntry')
+                              : t('entryFeeBean', { amount: fee * 100 })}
                           </button>
                         ))}
                       </div>
@@ -524,7 +548,7 @@ export function GroupRoomCreator() {
 
                     <div>
                       <label className="mb-1 block text-sm font-medium">
-                        이벤트 종료 시각 *
+                        {t('endTimeLabel')}
                       </label>
                       <input
                         type="datetime-local"
@@ -534,8 +558,7 @@ export function GroupRoomCreator() {
                         className="bg-background focus:ring-ring w-full rounded-xl border px-3 py-2 text-sm outline-none focus:ring-2"
                       />
                       <p className="text-muted-foreground mt-1 text-xs">
-                        종료 시각이 지나면 참가자(GUEST) 멤버십이 자동
-                        만료됩니다
+                        {t('endTimeHint')}
                       </p>
                     </div>
                   </>
@@ -546,7 +569,7 @@ export function GroupRoomCreator() {
                     onClick={() => setStep(2)}
                     className="hover:bg-muted flex-1 rounded-xl border px-4 py-2 text-sm"
                   >
-                    이전
+                    {t('back')}
                   </button>
                   {roomType === 'E' ? (
                     <button
@@ -559,15 +582,15 @@ export function GroupRoomCreator() {
                       className="bg-primary text-primary-foreground flex-1 rounded-xl px-4 py-2 text-sm font-medium disabled:opacity-40"
                     >
                       {isBusy ? (
-                        '생성 중…'
+                        t('creating')
                       ) : eventCreateCostBean > 0 ? (
                         <>
                           {eventCreateCostBean}{' '}
                           <BeanIcon className="inline-block h-4 w-4 align-text-bottom" />{' '}
-                          결제하고 이벤트방 만들기
+                          {t('payAndCreateEvent')}
                         </>
                       ) : (
-                        '🎟️ 이벤트방 만들기'
+                        t('createEventFree')
                       )}
                     </button>
                   ) : (
@@ -577,33 +600,35 @@ export function GroupRoomCreator() {
                       className="bg-primary text-primary-foreground flex-1 rounded-xl px-4 py-2 text-sm font-medium disabled:opacity-40"
                     >
                       {isBusy ? (
-                        '생성 중…'
+                        t('creating')
                       ) : createCostBean > 0 ? (
                         <>
                           {createCostBean}{' '}
                           <BeanIcon className="inline-block h-4 w-4 align-text-bottom" />{' '}
-                          결제하고 방 만들기
+                          {t('payAndCreateGroup')}
                         </>
                       ) : canCreateRoomFree && isPremium ? (
-                        '구독 혜택으로 방 만들기'
+                        t('createWithBenefit')
                       ) : (
-                        '무료로 방 만들기'
+                        t('createFree')
                       )}
                     </button>
                   )}
                 </div>
                 {roomType === 'G' && createCostBean > 0 && (
                   <p className="text-muted-foreground text-center text-xs">
-                    PREMIUM 카페 생성료 {createCostBean}{' '}
+                    {t('premiumCreateCostMemo', { amount: createCostBean })}{' '}
                     <BeanIcon className="inline-block h-3.5 w-3.5 align-text-bottom" />{' '}
-                    Bean이 차감됩니다 (잔액 부족 시 충전 안내)
+                    {t('createCostSuffix')}
                   </p>
                 )}
                 {roomType === 'E' && eventCreateCostBean > 0 && (
                   <p className="text-muted-foreground text-center text-xs">
-                    이벤트 카페 생성료 {eventCreateCostBean}{' '}
+                    {t('eventCreateCostMemo', {
+                      amount: eventCreateCostBean,
+                    })}{' '}
                     <BeanIcon className="inline-block h-3.5 w-3.5 align-text-bottom" />{' '}
-                    Bean이 차감됩니다 (잔액 부족 시 충전 안내)
+                    {t('createCostSuffix')}
                   </p>
                 )}
                 {payError && (
@@ -616,7 +641,7 @@ export function GroupRoomCreator() {
                         className="text-primary inline-block text-xs font-medium hover:underline"
                       >
                         <BeanIcon className="mr-1 inline-block h-3.5 w-3.5 align-text-bottom" />
-                        Bean 충전하러 가기 →
+                        {t('goChargingBean')}
                       </Link>
                     )}
                   </div>
