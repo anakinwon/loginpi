@@ -685,6 +685,14 @@
     "statusChangeFail": "Failed to change status",
     "translatingEta": "Translating {locale} ({keys} keys · {batches} batches · est. {eta})"
   },
+  "errorPage": {
+    "errTitle": "Something went wrong",
+    "errDesc": "This may be a temporary error. Please try again or come back shortly.",
+    "retry": "Try again",
+    "home": "Home",
+    "nfTitle": "Page not found",
+    "nfDesc": "The page you requested doesn't exist or has moved."
+  },
   "consent": {
     "title": "Service Agreement",
     "desc": "Please agree to the terms below to use Cafe.pi. (Available after agreeing to the required items.)",
