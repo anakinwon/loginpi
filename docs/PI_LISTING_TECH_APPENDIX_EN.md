@@ -207,7 +207,54 @@ All four K-DATA data-management domains are implemented.
 
 ---
 
-## 7. Infrastructure & Operational Stability
+## 7. Performance Engineering
+
+Under Core Web Vitals targets (LCP < 2.5s · CLS < 0.1 · INP < 200ms), multiple optimization layers are
+applied. (For security, exact thresholds, cache lifetimes, index structures, execution schedules, and
+secrets are intentionally omitted from this document.)
+
+### 7.1 Server-first rendering + parallel data fetching
+- React Server Components (RSC) preload data on the server, eliminating client-side waterfalls.
+- `Promise.all` parallel queries and a single consolidated member-count query remove N+1 queries.
+- After the response is returned, non-critical work (e.g., mission evaluation) runs in the background via `after()`.
+- Evidence: `src/lib/chat-room-list.ts`, `src/lib/event.ts`
+
+### 7.2 Stale-While-Revalidate client caching
+- Displays cached data instantly, then revalidates in the background — an SWR pattern implemented on
+  localStorage (Pi Browser cannot rely on HTTP caching, so app-level caching is adopted).
+- Concurrent identical requests are collapsed into one via in-memory dedup, preventing duplicate calls.
+- Evidence: `src/lib/client-cache.ts`, `src/lib/chat-translate-dedup.ts`
+
+### 7.3 Location (GPS) optimization
+- Distance badges use a "quick mode" (cache-first, short timeout, no high-accuracy retry) so the list
+  is never blocked by positioning.
+- Live tracking ignores micro-movements below a meaningful threshold, avoiding unnecessary re-queries.
+- Evidence: `src/lib/geo.ts`
+
+### 7.4 Database optimization
+- Adopts trigram (pg_trgm) GIN indexes as the standard for substring search, accelerating
+  leading/middle/trailing wildcards.
+- Partial indexes on active rows (excluding logical-deleted) improve index size and cache efficiency.
+- Single-row lookups use `.maybeSingle()` to avoid fetching extra rows; a lazily-initialized server-only
+  client and connection pooling improve cold-start and concurrency.
+
+### 7.5 Bundle & rendering optimization
+- Next.js 16 Turbopack and `dynamic` imports (`ssr: false`) for heavy chart libraries shrink the initial bundle.
+- `next/image` optimization with restricted allowed origins, viewport-triggered loading
+  (IntersectionObserver), and input debouncing are applied.
+- Build-time validation (environment variables and locale cross-validation) prevents post-deploy runtime
+  failures (500s).
+- Evidence: `scripts/validate-locales.mjs`
+
+### 7.6 Load & abuse protection (security-integrated)
+- Applies path-differentiated rate limiting (sliding window), request body-size caps, and a `Retry-After`
+  response on blocks.
+- Heavy aggregations run as scheduled batches (cron) outside the user request path.
+- *Exact thresholds, schedules, and secrets are not disclosed in this document for security reasons.*
+
+---
+
+## 8. Infrastructure & Operational Stability
 
 - **Type-safe environment variables**: `src/env.ts` (t3-env) blocks missing/typed errors at build time.
 - **Internationalization**: 22 active locales managed from a single source
@@ -222,7 +269,7 @@ All four K-DATA data-management domains are implemented.
 
 ---
 
-## 8. Conclusion
+## 9. Conclusion
 
 PiCafé™ resolves Pi Network's demanding constraints (cookie-less storage, asynchronous payment
 callbacks, mobile NAT) through structural and cryptographic design; guarantees fund integrity with a
@@ -246,4 +293,5 @@ automation, demonstrating a platform built for **long-term operational, audit, a
 | Idempotent reward/transfer | `sql/095_fn_evt_grant_bean_reward.sql` · `sql/078_bean_p2p_transfer.sql` |
 | Security assessment | `docs/PRD_2_SECURITY.md` |
 | K-DATA DA standard | `docs/da/README.md` · `docs/da/데이터표준규칙.md` · `docs/da/품질점검기준서.md` |
+| Performance engineering | `src/lib/client-cache.ts` · `src/lib/geo.ts` · `src/lib/chat-room-list.ts` · `scripts/validate-locales.mjs` |
 | Env / i18n validation | `src/env.ts` · `scripts/validate-locales.mjs` |
