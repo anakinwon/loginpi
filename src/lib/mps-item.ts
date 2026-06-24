@@ -43,6 +43,8 @@ export interface ItemListFilter {
   userLat?: number
   userLng?: number
   radiusKm?: number
+  // 전역 거리 컷오프 (mps_dist_cfg 최신값 — 0=무제한, undefined=미적용)
+  maxDistKm?: number
 }
 
 export interface CreateItemInput {
@@ -200,7 +202,10 @@ export async function listOpenItems(filter: ItemListFilter) {
 
     const uLat = filter.userLat!
     const uLng = filter.userLng!
-    const radius = filter.radiusKm ?? 10
+    // 전역 컷오프와 주변순 반경 중 더 좁은 값 적용 (0=무제한)
+    const globalCap = filter.maxDistKm ?? 0
+    const userRadius = filter.radiusKm ?? 10
+    const radius = globalCap > 0 ? Math.min(userRadius, globalCap) : userRadius
 
     const withDist = (data as unknown as ItemWithShop[])
       .map((r) => {
@@ -234,18 +239,29 @@ export async function listOpenItems(filter: ItemListFilter) {
 
   const rows = (data ?? []) as unknown as ItemWithShop[]
   const tradingCounts = await getTradingCounts(rows.map((r) => r.item_id))
-  const items = rows.map((r) => {
-    const distance_km = hasLoc
-      ? calcDistanceKm(r, filter.userLat!, filter.userLng!)
-      : undefined
-    const { mps_shop, ...item } = r
-    return {
-      ...item,
-      shop_nm: mps_shop?.shop_nm ?? null,
-      ...(distance_km !== undefined && { distance_km }),
-      trading_cnt: tradingCounts.get(r.item_id) ?? 0,
-    }
-  })
+  const globalCap = filter.maxDistKm ?? 0
+  const items = rows
+    .map((r) => {
+      const distance_km = hasLoc
+        ? calcDistanceKm(r, filter.userLat!, filter.userLng!)
+        : undefined
+      const { mps_shop, ...item } = r
+      return {
+        ...item,
+        shop_nm: mps_shop?.shop_nm ?? null,
+        ...(distance_km !== undefined && { distance_km }),
+        trading_cnt: tradingCounts.get(r.item_id) ?? 0,
+      }
+    })
+    // 전역 거리 컷오프: 좌표 있는 상품만 필터, 좌표 없는 상품은 항상 포함
+    // 사용자 좌표 없으면 필터 불가 → 전체 포함 (distance_km === undefined)
+    .filter(
+      (r) =>
+        globalCap === 0 ||
+        r.distance_km === undefined ||
+        r.distance_km === null ||
+        r.distance_km <= globalCap,
+    )
   return { items, total: count ?? 0, page, limit }
 }
 

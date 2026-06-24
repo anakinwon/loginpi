@@ -33,6 +33,7 @@ const CHAT_NAV = [
 
 const STORE_NAV = [
   { href: '/admin/store/categories', labelKey: 'storeCategories' },
+  { href: '/admin/store/distance-cfg', labelKey: 'storeDistCfg' },
 ] as const
 
 const EVENT_NAV = [

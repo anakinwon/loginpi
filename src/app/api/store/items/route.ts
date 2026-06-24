@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { listOpenItems, listMyItems, createItem } from '@/lib/mps-item'
+import { getDistCfg } from '@/lib/mps-dist-cfg'
 
 // GET /api/store/items — 공개 목록 (Guest 허용) | ?mine=1 — 내 상품 (인증)
 export async function GET(req: NextRequest) {
@@ -37,6 +38,7 @@ export async function GET(req: NextRequest) {
     }
   }
 
+  const { max_dist_km } = await getDistCfg()
   const result = await listOpenItems({
     ctgrId: sp.get('ctgr') ?? undefined,
     keyword: sp.get('q') ?? undefined,
@@ -50,6 +52,7 @@ export async function GET(req: NextRequest) {
     userLat,
     userLng,
     radiusKm: sp.get('radius') ? Number(sp.get('radius')) : undefined,
+    maxDistKm: max_dist_km,
   })
   return NextResponse.json(result)
 }
