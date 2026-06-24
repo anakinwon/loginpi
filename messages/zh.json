@@ -241,6 +241,7 @@
       "beanAudit": "审计 Log",
       "beanFeePlan": "资费计划管理",
       "beanSection": "☕ Bean 经济",
+      "beanTipPresets": "赠送 Preset",
       "beanToken": "Bean Dashboard",
       "beanTopUsers": "顶级用户",
       "beanTxn": "交易明细",
@@ -248,6 +249,8 @@
       "board": "公告板管理",
       "campaign": "Campaign 审批",
       "chatSection": "咖啡厅管理",
+      "checklist": "Open Beta Checklist",
+      "consents": "条款同意记录",
       "dashboard": "仪表盘",
       "eventExclude": "排除管理",
       "eventGifts": "发送礼物",
@@ -257,6 +260,7 @@
       "links": "账户关联状态",
       "logs": "Log 管理",
       "payments": "支付记录",
+      "reports": "举报处理",
       "settle": "结算管理",
       "stats": "统计",
       "stdApprovals": "审批工作流",
@@ -268,12 +272,13 @@
       "stdWords": "标准词汇",
       "stickers": "Sticker 管理",
       "storeCategories": "商品 Category",
+      "storeDistCfg": "距离限制",
       "storeSection": "Store 管理",
       "subscriptions": "订阅管理",
+      "subscrPricing": "订阅套餐",
       "themes": "Theme 管理",
       "title": "管理",
-      "users": "用户管理",
-      "subscrPricing": "구독요금제"
+      "users": "用户管理"
     },
     "payments": {
       "col": {
@@ -575,6 +580,7 @@
       "col": {
         "cd": "Code",
         "desc": "说明",
+        "nmEn": "英文名",
         "sortOrd": "顺序",
         "theme": "Theme",
         "tp": "Group",
@@ -595,6 +601,7 @@
         "desc": "说明·Tag",
         "emoji": "Emoji",
         "nm": "Theme 名称",
+        "nmEn": "Theme名称(英文)",
         "sortOrd": "排序顺序",
         "tp": "Group",
         "useYn": "显示"
@@ -605,7 +612,8 @@
       "placeholder": {
         "cd": "ESPORTS",
         "desc": "#Tag #Keyword",
-        "nm": "eSports"
+        "nm": "eSports",
+        "nmEn": "eSports"
       },
       "saveFail": "保存失败",
       "saveSuccess": "Theme 已注册",
@@ -700,6 +708,89 @@
       "out": "回收"
     },
     "homeTitle": "Dashboard",
+    "manual": {
+      "badge": "使用说明书",
+      "collapse": "收起",
+      "expand": "查看详情",
+      "intro": "即使您不熟悉电脑也没关系。只需按顺序操作即可 😊 — 只需记住三点：① 登录 ② 浏览 ③ 买卖",
+      "title": "Cafe.pi的简易使用说明书",
+      "topics": [
+        {
+          "icon": "⭐",
+          "steps": [
+            "全球版‘当根’：200+ 种语言自动翻译 · Pi 快捷支付 · 聊天·二手·店铺集于一App · 按距离连接",
+            "不限行业的‘Siren Order’：人人皆可当老板 · 菜单自由 · 即时通知 · O2O Pickup"
+          ],
+          "title": "为什么选择 Cafe.pi？"
+        },
+        {
+          "icon": "🎁",
+          "steps": [
+            "EVENT #1: 使用 TestPi 充值并完成 10 项 Mission 后，前 100 名可获得 5,000 Bean",
+            "EVENT #2: 注册我的店铺并完成 Menu 注册 + 交易 Test 后，前 100 家店铺可获得 10,000 Bean",
+            "在 Event Tab 中，按照 Mission 参与链接操作即可轻松完成"
+          ],
+          "title": "Event — 立即参与"
+        },
+        {
+          "icon": "🔑",
+          "steps": [
+            "在 Pi Browser 中点击‘生成联动 Code’后，会生成 6 位数 Code (10 分钟内使用)",
+            "复制 Code (或 Link) 并将其粘贴到普通 Browser 中",
+            "在普通 Browser 中 Google Login 后，粘贴并点击‘联动’后，Pi + Google 连接完成",
+            "Pi Browser 出于安全原因不存储信息，通过 6 位数 Code 安全连接两个 Browser"
+          ],
+          "title": "Login & 账户连接"
+        },
+        {
+          "icon": "🎫",
+          "steps": [
+            "1 Pi = 100 Bean (平台专用积分) — 您可以立即开始使用免费 Plan",
+            "选择您需要的订阅：PiCafé™(Premium Café) · PiShop™(商品注册) · PiTranslate™(无限翻译)",
+            "订阅费使用充值的 Bean 支付，年度支付可享 2 个月免费"
+          ],
+          "title": "Bean & 订阅"
+        },
+        {
+          "icon": "💬",
+          "steps": [
+            "进入您感兴趣的 Café 房间，免费开始 Chat",
+            "开启‘附近 Café’后，会按距离显示附近的 Café 和邻居",
+            "通过自动同声翻译，您可以与 200+ 种语言的任何人用您的语言进行对话"
+          ],
+          "title": "Café & 自动翻译"
+        },
+        {
+          "icon": "📦",
+          "steps": [
+            "上传商品照片和价格 (Pi) 后，会连同您的位置一起显示给附近的人",
+            "按距离查看附近商品，如果喜欢，则用 Pi 下单",
+            "支付的 Pi 将由平台暂时安全保管 (Escrow)，交易完成后再转交给 Seller"
+          ],
+          "title": "二手市场 (安全交易)"
+        },
+        {
+          "icon": "🏪",
+          "steps": [
+            "在‘店铺注册’中设置店铺名称和位置后，顾客会找到附近的店铺",
+            "注册 Menu 照片 · 价格 · 数量",
+            "顾客下单后，会立即通过 Telegram 收到通知 (Menu · 数量 · 金额)",
+            "按照准备中 → 准备完成 → Pickup 的顺序在店铺交付"
+          ],
+          "title": "我的店铺 (O2O)"
+        },
+        {
+          "icon": "🪙",
+          "steps": [
+            "现在通过 Testnet Event 获得的 Bean 是 cafe.pi 的承诺",
+            "当平台在 Mainnet 正式 Launch 后，Bean Token 正式发行时，",
+            "在 Testnet 中积累的 Event Token 将以 1:1 的比例原样支付为 Mainnet Bean",
+            "这是 cafe.pi 确保早期参与者努力不会白费的原则"
+          ],
+          "title": "Testnet 奖励，在 Mainnet 中保持不变 (承诺)"
+        }
+      ]
+    },
     "noData": "无 Data",
     "normalRevenue": "普通套餐销售额",
     "period30": "30天",
@@ -748,7 +839,31 @@
     },
     "unitCase": "次",
     "unitPerson": "名",
-    "userActivity": "活跃 {days}天 · Content {content} · 支付 {payments}"
+    "userActivity": "活跃 {days}天 · Content {content} · 支付 {payments}",
+    "whitepaper": {
+      "badge": "技术白皮书",
+      "collapse": "折叠",
+      "expand": "查看详情",
+      "footer": "符合Pi Network收录标准（Login·支付·Security·Data标准）。",
+      "highlight1Desc": "支持Pi账户 + Google账户。未来计划增加Kakao·LINE·WeChat等统一Login。",
+      "highlight1Title": "🤝 Pi · Google 统一Login",
+      "highlight2Desc": "实现PiRC1 (Token经济) · PiRC2 (订阅服务) · PiRC3 (Escrow安全交易)。",
+      "highlight2Title": "💳 Pi 支付服务构建",
+      "intro": "Cafe.pi通过结构和密码学方法解决了Pi Browser的严格限制，并从启动阶段就维护资金完整性和Data标准。",
+      "pillar1Desc": "支持Pi账户Login·Pi支付作为主要途径。支付仅通过Pi进行，Bean是1 Pi = 100 Bean的固定内部储备金。",
+      "pillar1Title": "🟣 Pi 优先设计",
+      "pillar2Desc": "即使在不存储Cookie的Pi Browser中，也能通过基于Token的双重认证安全地Login·支付。Client Gate设计无无限循环。",
+      "pillar2Title": "📱 Pi Browser 完美兼容",
+      "pillar3Desc": "所有交易都记录在追加专用(append-only)账本中，并持续验证会计保存恒等式（发行 = 流通 + 回收）。结构上不可能出现超发·双重支付。",
+      "pillar3Title": "💰 资金完整性零容忍",
+      "pillar4Desc": "符合KISA 21项Web漏洞标准，通过HMAC-SHA256签名Token和常数时间比较防御伪造、篡改和Timing Attack。",
+      "pillar4Title": "🔒 经验证的Security",
+      "pillar5Desc": "从第一个Table开始应用韩国Data产业振兴院(K-DATA)的Data标准，并通过自动验证强制执行，确保长期运营·审计的可靠性。",
+      "pillar5Title": "📊 政府公认Data标准",
+      "pillar6Desc": "通过Server优先Rendering和并行Data Fetching、stale-while-revalidate Caching、位置·搜索·Bundle优化，提供快速的首屏和流畅的用户体验。",
+      "pillar6Title": "⚡ 性能优化",
+      "title": "Cafe.pi的技术优势"
+    }
   },
   "adminStd": {
     "domainTypeCode": "Code",
@@ -1111,10 +1226,14 @@
       "approveError": "批准错误",
       "approveFail": "服务器批准失败",
       "approveInWallet": "请在Pi钱包界面批准付款。",
+      "back": "上一步",
+      "capacityN": "{n}人",
       "completeError": "完成错误",
       "completeFail": "完成处理失败",
+      "createCostSuffix": "将扣除Bean (余额不足时提示充值)",
       "created": "Cafe 已创建！",
       "createError": "Room 创建错误",
+      "createEventFree": "🎟️ 创建Event Room",
       "createFail": "Room 创建失败",
       "createFree": "免费创建 Room",
       "createMemo": "Cafe 创建: {roomNm}",
@@ -1126,21 +1245,35 @@
       "endTimeHint": "结束时间过后，参与者 (GUEST) Membership 将自动到期",
       "endTimeLabel": "Event 结束时间 *",
       "entryFee": "入场费 (参与者支付)",
+      "entryFeeBean": "{amount} Bean",
       "eventBusinessOnly": "Event Cafe 仅限 Business Plan",
+      "eventCreateCostDeduct": "创建费 {amount} Bean 将被扣除。",
+      "eventCreateCostFree": "作为订阅福利，创建费免费。",
+      "eventCreateCostMemo": "Event 聊天室创建费用 {amount}",
       "eventCreated": "Event Room 已创建！",
       "eventCreateError": "Event Room 创建错误",
       "eventCreateFail": "Event Room 创建失败",
       "eventDesc": "这是一个限时 Room，参与者需支付入场费 (π) 才能进入。创建无需费用。",
       "eventTab": "🎟️ 创建 Event Room",
       "eventTitle": "创建 Event Cafe",
+      "freeEntry": "免费",
+      "freeRoom7dHint": "免费创建的聊天室只能维持7天且无法延长。如需自定义有效期，请使用Bean支付创建。",
+      "freeRoom7dValidity": "有效期7天 (免费创建)",
+      "freeRoomCapacityLimit": "免费创建的聊天室最多可容纳10人。",
+      "freeRoomPublicOnly": "免费创建的 Café 只能以公开形式开设。",
+      "goChargingBean": "前往充值Bean →",
       "groupTab": "💬 Group Room",
       "groupTitle": "创建 Group Cafe",
       "maxMembers": "最大成员数",
       "name": "Cafe 名称",
       "nameLabel": "Cafe 名称 *",
+      "next": "下一步",
       "openBtn": "+ 创建 Cafe",
       "payAndCreate": "支付 {amount} π 并创建 Room",
+      "payAndCreateEvent": "支付并创建Event Room",
+      "payAndCreateGroup": "支付并创建聊天室",
       "piBrowserOnly": "仅限在 Pi Browser 中支付",
+      "premiumCreateCostMemo": "PREMIUM 聊天室创建费用 {amount}",
       "premiumTheme": "PREMIUM Theme",
       "premiumThemeOnce": "PREMIUM Theme 单次",
       "privateEmoji": "🔒 私密",
@@ -1153,6 +1286,7 @@
       "total": "总计",
       "unlimited": "无限期",
       "validity": "有效期",
+      "validityDays": "{n}天",
       "visibility": "公开性"
     },
     "customSticker": {
@@ -1408,6 +1542,34 @@
     "upgrade": "Upgrade",
     "yes": "是"
   },
+  "consent": {
+    "agreeAll": "全部同意",
+    "birthInvalid": "请正确输入出生日期。",
+    "birthLabel": "出生日期",
+    "desc": "请同意以下条款以使用Cafe.pi。（同意必填项后方可使用）",
+    "errNetwork": "网络错误，未能保存同意",
+    "errSave": "同意保存失败",
+    "guardian": "未满14周岁 — 已获得法定代理人（监护人）的同意。",
+    "lbs": "同意收集和使用位置信息",
+    "marketing": "同意接收营销信息",
+    "note": "您必须同意必填项（服务条款、个人信息、位置信息）才能使用服务。",
+    "optional": "(可选)",
+    "privacy": "同意收集和使用个人信息",
+    "processing": "处理中…",
+    "required": "(必填)",
+    "submit": "同意并继续",
+    "terms": "同意服务条款",
+    "title": "服务使用同意",
+    "view": "查看"
+  },
+  "errorPage": {
+    "errDesc": "这可能是一个临时错误。请重试或稍后访问。",
+    "errTitle": "出现问题",
+    "home": "返回首页",
+    "nfDesc": "您请求的页面不存在或已移动。",
+    "nfTitle": "找不到页面",
+    "retry": "重试"
+  },
   "event": {
     "agentCol": "特工名",
     "alreadyExcluded": "已排除: {names}",
@@ -1572,6 +1734,50 @@
     "tabShopSub": "商店先到先得商家入驻活动",
     "title": "🎖️ Mission Event",
     "totalCol": "总计"
+  },
+  "faq": {
+    "community": "Community运营政策",
+    "email": "Email咨询",
+    "items": [
+      {
+        "a": "在Pi Browser中点击“生成关联代码”，在普通浏览器中Google Login后粘贴该代码进行关联。",
+        "q": "如何Login？"
+      },
+      {
+        "a": "平台专用储备金。1 Pi = 100 Bean，可充值用于订阅、赠送等，不支持外部兑换。",
+        "q": "什么是Bean？"
+      },
+      {
+        "a": "在Pi Browser中使用Pi支付。商品交易受Escrow（安全保管）保护。",
+        "q": "如何支付？"
+      },
+      {
+        "a": "Mainnet正式上线、Bean Token官方发行时，通过Testnet活动获得的Bean将按1:1比例原样发放。",
+        "q": "在Testnet中获得的Bean会怎样？"
+      },
+      {
+        "a": "遵循退款及撤销订阅政策。详情请参考下方退款政策文档。",
+        "q": "可以退款吗？"
+      },
+      {
+        "a": "可通过帖子、商店等的“举报”按钮附带理由进行提交。运营团队将审核后处理。",
+        "q": "如何举报？"
+      },
+      {
+        "a": "用于按距离显示附近的Cafe、商店、商品。同意可在My Page中撤回。",
+        "q": "为什么需要位置信息？"
+      }
+    ],
+    "lbs": "Location Based Service条款",
+    "legalTitle": "条款·政策",
+    "privacy": "隐私政策",
+    "refund": "退款政策",
+    "subtitle": "快速查看您的问题",
+    "supportTitle": "客户支持",
+    "telegram": "Telegram",
+    "terms": "使用条款",
+    "title": "常见问题",
+    "youth": "青少年保护政策"
   },
   "header": {
     "admin": "管理员",
@@ -1829,6 +2035,25 @@
       "store": "🛍️ Store"
     },
     "title": "我的个人资料"
+  },
+  "report": {
+    "ABUSE": "辱骂·骚扰",
+    "button": "举报",
+    "cancel": "取消",
+    "COPYRIGHT": "版权侵犯",
+    "detailLabel": "详细说明 (可选)",
+    "detailPlaceholder": "请详细填写举报内容",
+    "duplicate": "您已举报过此项",
+    "error": "举报失败",
+    "ETC": "其他",
+    "FRAUD": "欺诈·交易",
+    "PRIVACY": "个人信息泄露",
+    "reasonLabel": "举报理由",
+    "SEXUAL": "淫秽·煽情",
+    "SPAM": "SPAM·广告",
+    "submit": "提交举报",
+    "success": "举报已提交",
+    "title": "举报"
   },
   "store": {
     "actionBuyerDone": "物品已收货",
@@ -2124,6 +2349,12 @@
       "TRANSLATE": "自动翻译订阅"
     },
     "renewBtn": "续订/更改",
+    "storeGrade": {
+      "L": "L (50个↑)",
+      "M": "M (50个↓)",
+      "S": "S (30个↓)"
+    },
+    "storeGradeHint": "我的商品 {count}个 — 请选择等级",
     "subscribeBtn": "订阅",
     "subscribeFail": "订阅处理失败",
     "subscribeSuccess": "{product} 订阅已开始！",

@@ -241,6 +241,7 @@
       "beanAudit": "Log kiểm toán",
       "beanFeePlan": "Quản lý gói Plan",
       "beanSection": "☕ Kinh tế Bean",
+      "beanTipPresets": "Preset quà tặng",
       "beanToken": "Bean Dashboard",
       "beanTopUsers": "Người dùng hàng đầu",
       "beanTxn": "Lịch sử giao dịch",
@@ -248,6 +249,8 @@
       "board": "Quản lý Board",
       "campaign": "Phê duyệt Campaign",
       "chatSection": "Quản lý Cafe",
+      "checklist": "Open Beta Checklist",
+      "consents": "Lịch sử đồng ý điều khoản",
       "dashboard": "Dashboard",
       "eventExclude": "Quản lý loại trừ",
       "eventGifts": "Gửi quà",
@@ -257,6 +260,7 @@
       "links": "Trạng thái liên kết tài khoản",
       "logs": "Quản lý Log",
       "payments": "Lịch sử thanh toán",
+      "reports": "Xử lý báo cáo",
       "settle": "Quản lý thanh toán",
       "stats": "Thống kê",
       "stdApprovals": "Workflow phê duyệt",
@@ -268,12 +272,13 @@
       "stdWords": "Từ tiêu chuẩn",
       "stickers": "Quản lý Sticker",
       "storeCategories": "Category Sản phẩm",
+      "storeDistCfg": "Giới hạn khoảng cách",
       "storeSection": "Quản lý Store",
       "subscriptions": "Quản lý đăng ký",
+      "subscrPricing": "Gói đăng ký",
       "themes": "Quản lý Theme",
       "title": "Admin",
-      "users": "Quản lý người dùng",
-      "subscrPricing": "구독요금제"
+      "users": "Quản lý người dùng"
     },
     "payments": {
       "col": {
@@ -575,6 +580,7 @@
       "col": {
         "cd": "Mã",
         "desc": "Mô tả",
+        "nmEn": "Tên tiếng Anh",
         "sortOrd": "Thứ tự",
         "theme": "Theme",
         "tp": "Group",
@@ -595,6 +601,7 @@
         "desc": "Mô tả·Tag",
         "emoji": "Emoji",
         "nm": "Tên Theme",
+        "nmEn": "Tên Theme (tiếng Anh)",
         "sortOrd": "Thứ tự sắp xếp",
         "tp": "Group",
         "useYn": "Hiển thị"
@@ -605,7 +612,8 @@
       "placeholder": {
         "cd": "ESPORTS",
         "desc": "#Tag #Keyword",
-        "nm": "e-sports"
+        "nm": "e-sports",
+        "nmEn": "eSports"
       },
       "saveFail": "Lưu thất bại",
       "saveSuccess": "Theme đã được đăng ký thành công",
@@ -700,6 +708,89 @@
       "out": "Thu hồi"
     },
     "homeTitle": "Dashboard",
+    "manual": {
+      "badge": "Hướng dẫn sử dụng",
+      "collapse": "Thu gọn",
+      "expand": "Xem chi tiết",
+      "intro": "Không sao nếu bạn không rành về máy tính. Chỉ cần làm theo thứ tự 😊 — Chỉ cần nhớ 3 điều: ① Đăng nhập ② Khám phá ③ Mua bán",
+      "title": "Hướng dẫn sử dụng dễ dàng của Cafe.pi",
+      "topics": [
+        {
+          "icon": "⭐",
+          "steps": [
+            "Nền tảng chợ địa phương toàn cầu: Phiên dịch tự động hơn 200 ngôn ngữ · Thanh toán dễ dàng bằng Pi · Chat, đồ cũ, cửa hàng trong một ứng dụng · Kết nối theo khoảng cách",
+            "'Siren Order' không giới hạn ngành nghề: Ai cũng có thể làm chủ · Menu tự do · Thông báo tức thì · O2O Pickup"
+          ],
+          "title": "Tại sao lại là Cafe.pi?"
+        },
+        {
+          "icon": "🎁",
+          "steps": [
+            "EVENT #1: Nạp bằng TestPi và hoàn thành 10 nhiệm vụ, 5.000 Bean cho 100 người đầu tiên",
+            "EVENT #2: Đăng ký cửa hàng của bạn và hoàn tất đăng ký Menu + kiểm tra giao dịch, 10.000 Bean cho 100 địa điểm đầu tiên",
+            "Trong tab Event, nếu bạn theo dõi liên kết tham gia cho từng nhiệm vụ, bạn có thể dễ dàng hoàn thành."
+          ],
+          "title": "Event — Tham gia ngay bây giờ"
+        },
+        {
+          "icon": "🔑",
+          "steps": [
+            "Trong Pi Browser, khi bạn nhấn 'Tạo mã liên kết', một mã 6 chữ số sẽ xuất hiện (Sử dụng trong vòng 10 phút)",
+            "Sao chép mã (hoặc liên kết) và chuyển sang trình duyệt thông thường.",
+            "Trong trình duyệt thông thường, sau khi Login Google, dán và nhấn 'Liên kết', kết nối Pi + Google hoàn tất.",
+            "Pi Browser không lưu trữ thông tin vì lý do bảo mật, nên mã 6 chữ số sẽ kết nối an toàn hai trình duyệt."
+          ],
+          "title": "Login & Kết nối tài khoản"
+        },
+        {
+          "icon": "🎫",
+          "steps": [
+            "1 Pi = 100 Bean (Điểm tích lũy dành riêng cho nền tảng) — Bạn có thể bắt đầu ngay với gói miễn phí.",
+            "Chọn và đăng ký những gì bạn cần: PiCafé™(Premium Cafe) · PiShop™(Đăng ký sản phẩm) · PiTranslate™(Dịch không giới hạn)",
+            "Phí đăng ký được thanh toán bằng Bean đã nạp, và thanh toán hàng năm được miễn phí 2 tháng."
+          ],
+          "title": "Bean & Đăng ký"
+        },
+        {
+          "icon": "💬",
+          "steps": [
+            "Vào phòng Cafe với chủ đề bạn quan tâm và bắt đầu Chat miễn phí.",
+            "Khi bật 'Cafe gần đây', nó sẽ hiển thị các Cafe và hàng xóm xung quanh theo khoảng cách.",
+            "Với phiên dịch đồng thời tự động, bạn có thể trò chuyện với bất kỳ ai từ hơn 200 ngôn ngữ bằng ngôn ngữ của bạn."
+          ],
+          "title": "Cafe & Phiên dịch tự động"
+        },
+        {
+          "icon": "📦",
+          "steps": [
+            "Khi bạn đăng ảnh sản phẩm và giá (Pi), nó sẽ hiển thị cho những người gần bạn cùng với vị trí của bạn.",
+            "Xem các mặt hàng có sẵn xung quanh theo khoảng cách và nếu thích, hãy đặt hàng bằng Pi.",
+            "Pi đã thanh toán sẽ được nền tảng giữ an toàn tạm thời (ký quỹ), và sẽ được chuyển cho người bán sau khi giao dịch hoàn tất."
+          ],
+          "title": "Chợ đồ cũ (Giao dịch an toàn)"
+        },
+        {
+          "icon": "🏪",
+          "steps": [
+            "Trong 'Đăng ký cửa hàng', khi bạn đặt tên và vị trí cửa hàng, khách hàng sẽ tìm đến cửa hàng gần đó.",
+            "Đăng ký ảnh Menu · giá · số lượng.",
+            "Khi khách hàng đặt hàng, bạn sẽ nhận được thông báo ngay lập tức qua Telegram (Menu · Số lượng · Số tiền)",
+            "Theo thứ tự Đang chuẩn bị → Đã chuẩn bị xong → Pickup, hãy giao tại cửa hàng."
+          ],
+          "title": "Cửa hàng của tôi (O2O)"
+        },
+        {
+          "icon": "🪙",
+          "steps": [
+            "Bean bạn nhận được từ Event Testnet hiện tại là lời hứa của cafe.pi.",
+            "Khi nền tảng chính thức ra mắt trên Mainnet và Bean Token được phát hành chính thức,",
+            "Token Event đã tích lũy trên Testnet sẽ được trả 1:1 tương ứng dưới dạng Bean Mainnet.",
+            "Đây là nguyên tắc của cafe.pi nhằm đảm bảo rằng nỗ lực của những người tham gia ban đầu sẽ không bị mất đi."
+          ],
+          "title": "Phần thưởng Testnet, giữ nguyên trên Mainnet (Lời hứa)"
+        }
+      ]
+    },
     "noData": "Không có Data",
     "normalRevenue": "Doanh thu gói thông thường",
     "period30": "30 ngày",
@@ -748,7 +839,31 @@
     },
     "unitCase": "trường hợp",
     "unitPerson": "người",
-    "userActivity": "Hoạt động {days} ngày · Content {content} · Thanh toán {payments}"
+    "userActivity": "Hoạt động {days} ngày · Content {content} · Thanh toán {payments}",
+    "whitepaper": {
+      "badge": "Whitepaper kỹ thuật",
+      "collapse": "Thu gọn",
+      "expand": "Xem chi tiết",
+      "footer": "Đáp ứng các tiêu chí niêm yết của Pi Network (Login, thanh toán, bảo mật, tiêu chuẩn Data).",
+      "highlight1Desc": "Hỗ trợ tài khoản Pi + tài khoản Google. Sẽ bổ sung Đăng nhập tích hợp như Kakao, Line, WeChat trong tương lai.",
+      "highlight1Title": "🤝 Đăng nhập tích hợp Pi · Google",
+      "highlight2Desc": "Triển khai PiRC1 (Kinh tế Token) · PiRC2 (Dịch vụ Đăng ký) · PiRC3 (Giao dịch an toàn Escrow).",
+      "highlight2Title": "💳 Xây dựng Dịch vụ Thanh toán Pi",
+      "intro": "Cafe.pi giải quyết các hạn chế nghiêm ngặt của Pi Browser về mặt cấu trúc và mật mã, đồng thời duy trì tính toàn vẹn của quỹ và tiêu chuẩn Data ngay từ giai đoạn ra mắt.",
+      "pillar1Desc": "Hỗ trợ Đăng nhập tài khoản Pi và thanh toán Pi là đường dẫn chính. Thanh toán chỉ được thực hiện bằng Pi, và Bean là khoản dự trữ nội bộ cố định 1 Pi = 100 Bean.",
+      "pillar1Title": "🟣 Thiết kế ưu tiên Pi",
+      "pillar2Desc": "Ngay cả trong Pi Browser không lưu trữ Cookie, Đăng nhập và thanh toán vẫn được xử lý an toàn bằng xác thực hai yếu tố dựa trên Token. Thiết kế cổng Client không có vòng lặp vô hạn.",
+      "pillar2Title": "📱 Tương thích hoàn hảo với Pi Browser",
+      "pillar3Desc": "Tất cả các giao dịch được ghi vào sổ cái chỉ ghi thêm (append-only), và định danh bảo toàn kế toán (phát hành = lưu thông + thu hồi) được xác minh liên tục. Việc phát hành quá mức và chi tiêu kép là không thể về mặt cấu trúc.",
+      "pillar3Title": "💰 Không khoan nhượng về tính toàn vẹn của quỹ",
+      "pillar4Desc": "Đáp ứng 21 tiêu chuẩn lỗ hổng web của KISA, và phòng thủ chống lại giả mạo, thay đổi và tấn công thời gian bằng Token ký HMAC-SHA256 và so sánh thời gian hằng số.",
+      "pillar4Title": "🔒 Bảo mật đã được xác minh",
+      "pillar5Desc": "Áp dụng tiêu chuẩn Data của K-DATA (Cơ quan Công nghiệp Data Hàn Quốc) ngay từ bảng đầu tiên và bắt buộc bằng xác minh tự động, đảm bảo độ tin cậy trong vận hành và kiểm toán dài hạn.",
+      "pillar5Title": "📊 Tiêu chuẩn Data được chính phủ công nhận",
+      "pillar6Desc": "Cung cấp màn hình khởi tạo nhanh và trải nghiệm người dùng mượt mà thông qua kết xuất ưu tiên Server, tìm nạp Data song song, bộ nhớ đệm stale-while-revalidate, và tối ưu hóa vị trí/tìm kiếm/bundle.",
+      "pillar6Title": "⚡ Tối ưu hóa hiệu suất",
+      "title": "Điểm mạnh kỹ thuật của Cafe.pi"
+    }
   },
   "adminStd": {
     "domainTypeCode": "Code",
@@ -1111,10 +1226,14 @@
       "approveError": "Lỗi phê duyệt",
       "approveFail": "Phê duyệt Server thất bại",
       "approveInWallet": "Vui lòng phê duyệt thanh toán trên màn hình ví Pi.",
+      "back": "Quay lại",
+      "capacityN": "{n} người",
       "completeError": "Lỗi hoàn tất",
       "completeFail": "Xử lý hoàn tất thất bại",
+      "createCostSuffix": "Bean sẽ bị trừ (hướng dẫn nạp tiền nếu số dư không đủ)",
       "created": "Cafe đã được tạo!",
       "createError": "Lỗi tạo phòng",
+      "createEventFree": "🎟️ Tạo phòng Event",
       "createFail": "Tạo phòng thất bại",
       "createFree": "Tạo phòng miễn phí",
       "createMemo": "Tạo Cafe: {roomNm}",
@@ -1126,21 +1245,35 @@
       "endTimeHint": "Sau khi thời gian kết thúc, tư cách thành viên của người tham gia (GUEST) sẽ tự động hết hạn",
       "endTimeLabel": "Thời gian kết thúc Event *",
       "entryFee": "Phí vào cửa (Người tham gia thanh toán)",
+      "entryFeeBean": "{amount} Bean",
       "eventBusinessOnly": "Cafe Event chỉ dành cho gói Business Plan",
+      "eventCreateCostDeduct": "Phí tạo {amount} Bean sẽ bị trừ.",
+      "eventCreateCostFree": "Với lợi ích đăng ký, phí tạo là miễn phí.",
+      "eventCreateCostMemo": "Phí tạo Cafe Event {amount}",
       "eventCreated": "Phòng Event đã được tạo!",
       "eventCreateError": "Lỗi tạo phòng Event",
       "eventCreateFail": "Tạo phòng Event thất bại",
       "eventDesc": "Đây là phòng giới hạn thời gian mà người tham gia thanh toán phí vào cửa (π) để vào. Không có phí tạo.",
       "eventTab": "🎟️ Tạo phòng Event",
       "eventTitle": "Tạo Cafe Event",
+      "freeEntry": "Miễn phí",
+      "freeRoom7dHint": "Cafe tạo miễn phí chỉ được duy trì trong 7 ngày và không thể gia hạn. Để tự chỉ định thời gian, hãy tạo bằng cách thanh toán Bean.",
+      "freeRoom7dValidity": "Thời hạn hiệu lực 7 ngày (tạo miễn phí)",
+      "freeRoomCapacityLimit": "Cafe tạo miễn phí có thể chứa tối đa 10 người.",
+      "freeRoomPublicOnly": "Cafe được tạo miễn phí chỉ có thể được mở công khai.",
+      "goChargingBean": "Đi nạp Bean →",
       "groupTab": "💬 Phòng Group",
       "groupTitle": "Tạo Cafe Group",
       "maxMembers": "Số lượng thành viên tối đa",
       "name": "Tên Cafe",
       "nameLabel": "Tên Cafe *",
+      "next": "Tiếp theo",
       "openBtn": "+ Tạo Cafe",
       "payAndCreate": "Thanh toán {amount} π và tạo phòng",
+      "payAndCreateEvent": "Thanh toán và tạo phòng Event",
+      "payAndCreateGroup": "Thanh toán và tạo phòng",
       "piBrowserOnly": "Chỉ có thể thanh toán trong Pi Browser",
+      "premiumCreateCostMemo": "Phí tạo Cafe PREMIUM {amount}",
       "premiumTheme": "PREMIUM Theme",
       "premiumThemeOnce": "PREMIUM Theme một lần",
       "privateEmoji": "🔒 Riêng tư",
@@ -1153,6 +1286,7 @@
       "total": "Tổng cộng",
       "unlimited": "Vô thời hạn",
       "validity": "Thời hạn hiệu lực",
+      "validityDays": "{n} ngày",
       "visibility": "Chế độ hiển thị"
     },
     "customSticker": {
@@ -1408,6 +1542,34 @@
     "upgrade": "Upgrade",
     "yes": "Có"
   },
+  "consent": {
+    "agreeAll": "Đồng ý tất cả",
+    "birthInvalid": "Vui lòng nhập đúng ngày sinh của bạn.",
+    "birthLabel": "Ngày sinh",
+    "desc": "Vui lòng đồng ý với các điều khoản dưới đây để sử dụng Cafe.pi. (Có thể sử dụng sau khi đồng ý với các mục bắt buộc)",
+    "errNetwork": "Không thể lưu đồng ý do lỗi mạng",
+    "errSave": "Lưu đồng ý không thành công",
+    "guardian": "Dưới 14 tuổi — Đã nhận được sự đồng ý của người giám hộ hợp pháp (phụ huynh).",
+    "lbs": "Đồng ý thu thập và sử dụng thông tin vị trí",
+    "marketing": "Đồng ý nhận thông tin Marketing",
+    "note": "Bạn phải đồng ý với các mục bắt buộc (Điều khoản dịch vụ, Thông tin cá nhân, Thông tin vị trí) để sử dụng dịch vụ.",
+    "optional": "(Tùy chọn)",
+    "privacy": "Đồng ý thu thập và sử dụng thông tin cá nhân",
+    "processing": "Đang xử lý…",
+    "required": "(Bắt buộc)",
+    "submit": "Đồng ý và tiếp tục",
+    "terms": "Đồng ý Điều khoản dịch vụ",
+    "title": "Đồng ý sử dụng dịch vụ",
+    "view": "Xem"
+  },
+  "errorPage": {
+    "errDesc": "Đây có thể là lỗi tạm thời. Vui lòng thử lại hoặc truy cập sau một lát.",
+    "errTitle": "Đã xảy ra sự cố.",
+    "home": "Về trang chủ",
+    "nfDesc": "Trang bạn yêu cầu không tồn tại hoặc đã được di chuyển.",
+    "nfTitle": "Không tìm thấy trang",
+    "retry": "Thử lại"
+  },
   "event": {
     "agentCol": "Tên đặc vụ",
     "alreadyExcluded": "Đã loại trừ: {names}",
@@ -1572,6 +1734,50 @@
     "tabShopSub": "Onboarding Event đầu tiên đến trước của cửa hàng",
     "title": "🎖️ Mission Event",
     "totalCol": "Tổng cộng"
+  },
+  "faq": {
+    "community": "Chính sách vận hành Community",
+    "email": "Liên hệ qua Email",
+    "items": [
+      {
+        "a": "Trong Pi Browser, nhấn 'Tạo mã liên kết', sau đó đăng nhập Google trong trình duyệt thông thường và dán mã đó để liên kết.",
+        "q": "Làm cách nào để Đăng nhập?"
+      },
+      {
+        "a": "Đây là số tiền tích lũy dành riêng cho nền tảng. Bạn có thể nạp 1 Pi = 100 Bean để sử dụng cho việc đăng ký, tặng quà, v.v. Không thể đổi ra tiền mặt bên ngoài.",
+        "q": "Bean là gì?"
+      },
+      {
+        "a": "Thanh toán bằng Pi trong Pi Browser. Giao dịch sản phẩm được bảo vệ bằng Escrow (lưu giữ an toàn).",
+        "q": "Làm cách nào để thanh toán?"
+      },
+      {
+        "a": "Khi Mainnet chính thức ra mắt và Bean Token được phát hành chính thức, Bean nhận được từ sự kiện Testnet sẽ được trả 1:1.",
+        "q": "Bean nhận được từ Testnet sẽ như thế nào?"
+      },
+      {
+        "a": "Tuân thủ chính sách hoàn tiền và hủy đăng ký. Vui lòng tham khảo tài liệu chính sách hoàn tiền dưới đây để biết chi tiết.",
+        "q": "Có được hoàn tiền không?"
+      },
+      {
+        "a": "Bạn có thể gửi báo cáo kèm lý do bằng nút 'Báo cáo' trên bài đăng, cửa hàng, v.v. Đội ngũ vận hành sẽ xem xét và xử lý.",
+        "q": "Làm cách nào để báo cáo?"
+      },
+      {
+        "a": "Được sử dụng để hiển thị các quán cà phê, cửa hàng, sản phẩm gần nhất theo khoảng cách. Bạn có thể rút lại sự đồng ý trên Trang của tôi.",
+        "q": "Tại sao cần thông tin vị trí?"
+      }
+    ],
+    "lbs": "Điều khoản dịch vụ dựa trên vị trí",
+    "legalTitle": "Điều khoản & Chính sách",
+    "privacy": "Chính sách quyền riêng tư",
+    "refund": "Chính sách hoàn tiền",
+    "subtitle": "Nhanh chóng tìm câu trả lời cho thắc mắc của bạn",
+    "supportTitle": "Hỗ trợ khách hàng",
+    "telegram": "Telegram",
+    "terms": "Điều khoản sử dụng",
+    "title": "Câu hỏi thường gặp",
+    "youth": "Chính sách bảo vệ thanh thiếu niên"
   },
   "header": {
     "admin": "Admin",
@@ -1829,6 +2035,25 @@
       "store": "🛍️ Store"
     },
     "title": "Hồ sơ của tôi"
+  },
+  "report": {
+    "ABUSE": "Lăng mạ / Quấy rối",
+    "button": "Báo cáo",
+    "cancel": "Hủy",
+    "COPYRIGHT": "Vi phạm Copyright",
+    "detailLabel": "Mô tả chi tiết (tùy chọn)",
+    "detailPlaceholder": "Vui lòng mô tả chi tiết nội dung báo cáo",
+    "duplicate": "Mục này đã được báo cáo.",
+    "error": "Gửi báo cáo không thành công.",
+    "ETC": "Khác",
+    "FRAUD": "Lừa đảo / Giao dịch",
+    "PRIVACY": "Lộ thông tin cá nhân",
+    "reasonLabel": "Lý do báo cáo",
+    "SEXUAL": "Khiêu dâm / Gợi dục",
+    "SPAM": "SPAM / Quảng cáo",
+    "submit": "Gửi báo cáo",
+    "success": "Báo cáo đã được gửi",
+    "title": "Báo cáo"
   },
   "store": {
     "actionBuyerDone": "Đã nhận hàng",
@@ -2124,6 +2349,12 @@
       "TRANSLATE": "Đăng ký Dịch tự động"
     },
     "renewBtn": "Gia hạn/Thay đổi",
+    "storeGrade": {
+      "L": "L (trên 50)",
+      "M": "M (dưới 50)",
+      "S": "S (dưới 30)"
+    },
+    "storeGradeHint": "Sản phẩm của tôi {count} — Chọn cấp độ",
     "subscribeBtn": "Đăng ký",
     "subscribeFail": "Xử lý đăng ký thất bại",
     "subscribeSuccess": "Đăng ký {product} của bạn đã bắt đầu!",

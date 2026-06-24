@@ -240,8 +240,8 @@
       "batch": "On-demand Batch",
       "beanAudit": "Audit Log",
       "beanFeePlan": "Fee Plan Management",
-      "beanTipPresets": "Gift Presets",
       "beanSection": "☕ Bean Economy",
+      "beanTipPresets": "Gifting Presets",
       "beanToken": "Bean Dashboard",
       "beanTopUsers": "Top Users",
       "beanTxn": "Transaction History",
@@ -249,6 +249,8 @@
       "board": "Board Management",
       "campaign": "Campaign Approval",
       "chatSection": "Cafe Management",
+      "checklist": "Open Beta Checklist",
+      "consents": "Consent History",
       "dashboard": "Dashboard",
       "eventExclude": "Manage Exclusions",
       "eventGifts": "Send Gifts",
@@ -257,8 +259,8 @@
       "i18nSection": "Multilingual",
       "links": "Account Link Status",
       "logs": "Log Management",
-      "checklist": "Open Beta Checklist",
       "payments": "Payment History",
+      "reports": "Report Processing",
       "settle": "Settlement Management",
       "stats": "Statistics",
       "stdApprovals": "Approval Workflow",
@@ -270,14 +272,13 @@
       "stdWords": "Standard Words",
       "stickers": "Sticker Management",
       "storeCategories": "Product Categories",
+      "storeDistCfg": "Distance Limit",
       "storeSection": "Store Management",
       "subscriptions": "Subscription Management",
+      "subscrPricing": "Subscription Plans",
       "themes": "Theme Management",
       "title": "Admin",
-      "users": "User Management",
-      "consents": "Consent Records",
-      "reports": "Reports",
-      "subscrPricing": "구독요금제"
+      "users": "User Management"
     },
     "payments": {
       "col": {
@@ -599,7 +600,7 @@
         "cd": "Theme Code",
         "desc": "Description·Tags",
         "emoji": "Emoji",
-        "nm": "Theme Name (Korean)",
+        "nm": "Theme Name",
         "nmEn": "Theme Name (English)",
         "sortOrd": "Sort Order",
         "tp": "Group",
@@ -611,7 +612,7 @@
       "placeholder": {
         "cd": "ESPORTS",
         "desc": "#Tags #Keywords",
-        "nm": "e스포츠",
+        "nm": "eSports",
         "nmEn": "eSports"
       },
       "saveFail": "Failed to save",
@@ -689,76 +690,6 @@
     "statusChangeFail": "Failed to change status",
     "translatingEta": "Translating {locale} ({keys} keys · {batches} batches · est. {eta})"
   },
-  "faq": {
-    "title": "Frequently Asked Questions",
-    "subtitle": "Find quick answers to common questions",
-    "items": [
-      { "q": "How do I log in?", "a": "In Pi Browser tap 'Generate link code', then sign in with Google in a regular browser and paste the code to link your accounts." },
-      { "q": "What is Bean?", "a": "A platform-only credit. You top it up at 1 Pi = 100 Bean and use it for subscriptions, gifts, etc. It cannot be exchanged externally." },
-      { "q": "How do payments work?", "a": "You pay with Pi in Pi Browser. Product trades are protected by escrow (safe holding)." },
-      { "q": "What happens to Bean earned on testnet?", "a": "When the platform officially launches on mainnet and Bean Token is issued, testnet event Bean is granted 1:1 as mainnet Bean." },
-      { "q": "Can I get a refund?", "a": "Refunds follow our Refund & Withdrawal Policy. See the refund policy document below for details." },
-      { "q": "How do I report something?", "a": "Use the 'Report' button on posts, shops, etc. to submit with a reason. Our team reviews and acts on it." },
-      { "q": "Why is location needed?", "a": "To show nearby cafés, stores, and items by distance. You can withdraw consent anytime from My Page." }
-    ],
-    "supportTitle": "Customer Support",
-    "email": "Email inquiry",
-    "telegram": "Telegram",
-    "legalTitle": "Terms & Policies",
-    "terms": "Terms of Service",
-    "privacy": "Privacy Policy",
-    "refund": "Refund Policy",
-    "youth": "Youth Protection Policy",
-    "community": "Community Operating Policy",
-    "lbs": "Location-Based Service Terms"
-  },
-  "report": {
-    "button": "Report",
-    "title": "Report",
-    "reasonLabel": "Reason",
-    "SPAM": "Spam / ads",
-    "ABUSE": "Abuse / harassment",
-    "SEXUAL": "Sexual / explicit",
-    "PRIVACY": "Privacy exposure",
-    "COPYRIGHT": "Copyright infringement",
-    "FRAUD": "Fraud / transaction",
-    "ETC": "Other",
-    "detailLabel": "Details (optional)",
-    "detailPlaceholder": "Please describe the issue",
-    "submit": "Submit report",
-    "cancel": "Cancel",
-    "success": "Your report has been submitted",
-    "duplicate": "You already reported this",
-    "error": "Failed to submit the report"
-  },
-  "errorPage": {
-    "errTitle": "Something went wrong",
-    "errDesc": "This may be a temporary error. Please try again or come back shortly.",
-    "retry": "Try again",
-    "home": "Home",
-    "nfTitle": "Page not found",
-    "nfDesc": "The page you requested doesn't exist or has moved."
-  },
-  "consent": {
-    "title": "Service Agreement",
-    "desc": "Please agree to the terms below to use Cafe.pi. (Available after agreeing to the required items.)",
-    "birthLabel": "Date of birth",
-    "required": "(Required)",
-    "optional": "(Optional)",
-    "birthInvalid": "Please enter a valid date of birth.",
-    "guardian": "Under 14 — I have obtained my legal guardian's consent.",
-    "agreeAll": "Agree to all",
-    "terms": "Agree to the Terms of Service",
-    "privacy": "Agree to the collection and use of personal information",
-    "lbs": "Agree to the collection and use of location information",
-    "marketing": "Agree to receive marketing information",
-    "view": "View",
-    "submit": "Agree and continue",
-    "processing": "Processing…",
-    "note": "You must agree to the required items (Terms, Personal info, Location) to use the service.",
-    "errSave": "Failed to save your consent",
-    "errNetwork": "Could not save your consent due to a network error"
-  },
   "adminStats": {
     "activeUsers": "Active Users",
     "adminTitle": "Statistics Dashboard",
@@ -777,110 +708,86 @@
       "out": "Outflow"
     },
     "homeTitle": "Dashboard",
-    "whitepaper": {
-      "badge": "Whitepaper",
-      "title": "Cafe.pi Technical Strengths",
-      "expand": "Learn more",
-      "collapse": "Collapse",
-      "intro": "Cafe.pi resolves Pi Browser's demanding constraints through structural and cryptographic design, and upholds fund integrity and data standards from day one.",
-      "highlight1Title": "🤝 Pi + Google unified login",
-      "highlight1Desc": "Pi and Google accounts supported. Kakao, LINE, WeChat and more unified logins planned.",
-      "highlight2Title": "💳 Pi payment services",
-      "highlight2Desc": "Implements PiRC1 (token economy) · PiRC2 (subscriptions) · PiRC3 (escrow safe trade).",
-      "pillar1Title": "🟣 Pi-first design",
-      "pillar1Desc": "Pi account login and Pi payment are the primary path. Payments are made only in Pi, and Bean is an internal store credit fixed at 1 Pi = 100 Bean.",
-      "pillar2Title": "📱 Full Pi Browser compatibility",
-      "pillar2Desc": "Even in Pi Browser, which does not persist cookies, login and payment work safely via token-based dual authentication, with a client-gate design that avoids infinite loops.",
-      "pillar3Title": "💰 Zero-tolerance fund integrity",
-      "pillar3Desc": "Every transaction is recorded in an append-only ledger, and the accounting conservation identity (issued = circulating + collected) is continuously verified. Over-issuance and double-payment are structurally impossible.",
-      "pillar4Title": "🔒 Proven security",
-      "pillar4Desc": "Addresses the KISA 21 web-vulnerability criteria and defends against tampering and timing attacks with HMAC-SHA256 signed tokens and constant-time comparison.",
-      "pillar5Title": "📊 Government-recognized data standard",
-      "pillar5Desc": "Adopts the Korea Data Agency (K-DATA) data standard from the very first table and enforces it with automated validation, securing long-term operational and audit trust.",
-      "pillar6Title": "⚡ Performance optimization",
-      "pillar6Desc": "Server-first rendering with parallel data fetching, stale-while-revalidate caching, and location/search/bundle optimizations deliver a fast first paint and smooth experience.",
-      "footer": "Meets Pi Network listing criteria (login, payment, security, data standard)."
-    },
     "manual": {
-      "badge": "User Guide",
-      "title": "Cafe.pi Easy User Guide",
-      "expand": "Learn more",
+      "badge": "User Manual",
       "collapse": "Collapse",
-      "intro": "No tech skills needed — just follow the steps 😊. Remember just 3 things: ① Log in ② Explore ③ Buy & sell",
+      "expand": "View Details",
+      "intro": "It's okay if you're not good with computers. Just follow the steps 😊 — Remember only 3 things: ① Log in ② Explore ③ Buy and Sell",
+      "title": "Cafe.pi's Easy User Manual",
       "topics": [
         {
           "icon": "⭐",
-          "title": "Why Cafe.pi?",
           "steps": [
-            "A powerful global 'Karrot': 200+ language auto-translation · easy Pi payments · chat, marketplace & stores in one app · distance-based connections",
-            "A 'Siren Order' for any business: anyone can be an owner · free menu setup · instant alerts · O2O pickup"
-          ]
+            "Global 'Carrot Market': 200+ languages auto-translation · Pi simple payment · Chat, used goods, and stores in one app · Connect by distance",
+            "'Siren Order' for all industries: Anyone can be a boss · Free menu · Instant notifications · O2O pickup"
+          ],
+          "title": "Why Cafe.pi?"
         },
         {
           "icon": "🎁",
-          "title": "Events — join now",
           "steps": [
-            "EVENT #1: Top up with Test-Pi and complete 10 missions → 5,000 Bean for the first 100 people",
-            "EVENT #2: Register your store, add menus, and finish a test trade → 10,000 Bean for the first 100 stores",
-            "Follow the per-mission links on the Event tab to complete them easily"
-          ]
+            "EVENT #1: Top 100 participants who charge with Test Pi and complete 10 missions will receive 5,000 Bean",
+            "EVENT #2: Top 100 stores that register their store, add menus, and complete a transaction test will receive 10,000 Bean",
+            "You can easily complete missions by following the participation links in the Event tab"
+          ],
+          "title": "Event — Participate Now"
         },
         {
           "icon": "🔑",
-          "title": "Login & account linking",
           "steps": [
-            "In Pi Browser, tap 'Generate link code' to get a 6-digit code (use within 10 minutes)",
-            "Copy the code (or link) and move to a regular browser",
-            "In the regular browser, sign in with Google, paste it, and tap 'Link' — Pi + Google connected",
-            "Pi Browser cannot store credentials, so the 6-digit code safely bridges the two browsers"
-          ]
+            "In Pi Browser, press 'Generate Connection Code' to get a 6-digit code (use within 10 minutes)",
+            "Copy the code (or link) and move it to a regular browser",
+            "In a regular browser, log in with Google, paste the code, and press 'Connect' to complete Pi + Google connection",
+            "For security, Pi Browser does not store information, so the 6-digit code securely links the two browsers"
+          ],
+          "title": "Login & Account Connection"
         },
         {
           "icon": "🎫",
-          "title": "Bean & subscriptions",
           "steps": [
-            "1 Pi = 100 Bean (platform-only credit) — start right away on the free plan",
-            "Subscribe only to what you need: PiCafé™ (premium cafés) · PiShop™ (product listings) · PiTranslate™ (unlimited translation)",
-            "Subscriptions are paid with topped-up Bean; annual billing gives 2 months free"
-          ]
+            "1 Pi = 100 Bean (platform-exclusive reward points) — You can start immediately with a free plan",
+            "Subscribe only to what you need: PiCafé™ (Premium Cafe) · PiShop™ (Product Registration) · PiTranslate™ (Unlimited Translation)",
+            "Subscription fees are paid with charged Bean, and annual payments get 2 months free"
+          ],
+          "title": "Bean & Subscription"
         },
         {
           "icon": "💬",
-          "title": "Cafés & auto-translation",
           "steps": [
-            "Join a café room on a topic you like and start chatting for free",
-            "Turn on 'Nearby cafés' to see nearby cafés and neighbors by distance",
-            "Auto real-time translation lets you talk in your own language with anyone across 200+ languages"
-          ]
+            "Enter a cafe room of your interest and start chatting for free",
+            "Turn on 'Nearby Cafes' to see nearby cafes and neighbors by distance",
+            "With automatic simultaneous interpretation, you can chat with anyone in 200+ languages in your own language"
+          ],
+          "title": "Cafe & Auto-Translation"
         },
         {
           "icon": "📦",
-          "title": "Marketplace (safe trade)",
           "steps": [
-            "Post a photo and price (Pi); your item shows to nearby people along with your location",
-            "Browse nearby items by distance and order with Pi when you find one you like",
-            "Your Pi is held safely by the platform (escrow) and released to the seller once the trade completes"
-          ]
+            "Upload product photos and price (Pi), and they will be shown to people nearby along with your location",
+            "View items available nearby by distance, and if you like something, order it with Pi",
+            "The paid Pi is securely held by the platform (escrow) temporarily and then transferred to the seller once the transaction is complete"
+          ],
+          "title": "Used Marketplace (Secure Transaction)"
         },
         {
           "icon": "🏪",
-          "title": "My store (O2O)",
           "steps": [
-            "In 'Register store', set your store name and location so customers find you nearby",
-            "Add menu photos, prices, and quantities",
-            "When a customer orders, you get an instant Telegram alert (menu · quantity · amount)",
-            "Flow: preparing → ready → pickup, handed over at your store"
-          ]
+            "In 'Store Registration', set your store name and location, and customers will find your nearby store",
+            "Register menu photos, prices, and quantities",
+            "When a customer places an order, you'll receive an instant notification via Telegram (menu, quantity, amount)",
+            "Hand over items at the store in the order of Preparing → Ready → Pickup"
+          ],
+          "title": "My Store (O2O)"
         },
         {
           "icon": "🪙",
-          "title": "Testnet rewards, honored on mainnet (pledge)",
           "steps": [
-            "The Bean you earn now from testnet events is a promise from cafe.pi",
-            "Once the platform officially launches on mainnet and Bean Token is officially issued,",
-            "we will grant your testnet event tokens 1:1 as mainnet Bean, exactly as earned",
-            "This is our principle to ensure early participants' efforts are never lost"
-          ]
+            "The Bean received from the current Testnet event is a promise from cafe.pi",
+            "Once the platform officially launches on Mainnet and Bean Token is officially issued,",
+            "The event tokens earned on Testnet will be paid out identically, 1:1, as Mainnet Bean",
+            "This is cafe.pi's principle to ensure that the efforts of early participants are not lost"
+          ],
+          "title": "Testnet Rewards, unchanged on Mainnet (Promise)"
         }
       ]
     },
@@ -932,7 +839,31 @@
     },
     "unitCase": "txns",
     "unitPerson": "users",
-    "userActivity": "Active {days}d · Content {content} · Payments {payments}"
+    "userActivity": "Active {days}d · Content {content} · Payments {payments}",
+    "whitepaper": {
+      "badge": "Technical Whitepaper",
+      "collapse": "Collapse",
+      "expand": "View Details",
+      "footer": "Meets Pi Network listing criteria (Login, Payment, Security, Data Standard).",
+      "highlight1Desc": "Supports Pi Account + Google Account. Integrated logins for Kakao, Line, WeChat, etc., will be added later.",
+      "highlight1Title": "🤝 Pi · Google Integrated Login",
+      "highlight2Desc": "Implements PiRC1 (Token Economy) · PiRC2 (Subscription Service) · PiRC3 (Escrow Secure Transactions).",
+      "highlight2Title": "💳 Building Pi Payment Service",
+      "intro": "Cafe.pi structurally and cryptographically resolves the stringent constraints of Pi Browser, ensuring financial integrity and data standards from its inception.",
+      "pillar1Desc": "Supports Pi account login and Pi payment as primary methods. Payments are made only with Pi, and Bean is a fixed internal reserve of 1 Pi = 100 Bean.",
+      "pillar1Title": "🟣 Pi-First Design",
+      "pillar2Desc": "Even in Pi Browser, which does not store cookies, secure login and payment are ensured with token-based two-factor authentication. Client gate design without infinite loops.",
+      "pillar2Title": "📱 Pi Browser Full Compatibility",
+      "pillar3Desc": "All transactions are recorded in an append-only ledger, and the accounting conservation identity (Issuance = Circulation + Retrieval) is constantly verified. Over-issuance and double-spending are structurally impossible.",
+      "pillar3Title": "💰 Zero Tolerance for Financial Integrity Issues",
+      "pillar4Desc": "Responds to KISA's 21 web vulnerability standards and defends against forgery, alteration, and timing attacks with HMAC-SHA256 signed tokens and constant-time comparison.",
+      "pillar4Title": "🔒 Verified Security",
+      "pillar5Desc": "Applies Korea Data Agency (K-DATA) data standards from the first table and enforces them with automatic verification, ensuring long-term operational and audit reliability.",
+      "pillar5Title": "📊 Government-Certified Data Standard",
+      "pillar6Desc": "Provides fast initial screen and smooth usability through server-first rendering, parallel data fetching, stale-while-revalidate caching, and location, search, and bundle optimization.",
+      "pillar6Title": "⚡ Performance Optimization",
+      "title": "Cafe.pi's Technical Strengths"
+    }
   },
   "adminStd": {
     "domainTypeCode": "Code",
@@ -1295,10 +1226,14 @@
       "approveError": "Approval error",
       "approveFail": "Server approval failed",
       "approveInWallet": "Please approve the payment in your Pi Wallet.",
+      "back": "Back",
+      "capacityN": "{n} people",
       "completeError": "Completion error",
       "completeFail": "Completion failed",
+      "createCostSuffix": "Bean will be deducted (Guide to recharge if balance is insufficient)",
       "created": "Café created!",
       "createError": "Room creation error",
+      "createEventFree": "🎟️ Create event room",
       "createFail": "Failed to create room",
       "createFree": "Create Free Room",
       "createMemo": "Café creation: {roomNm}",
@@ -1309,22 +1244,36 @@
       "descPlaceholder": "Tell us about your café",
       "endTimeHint": "Participant (GUEST) memberships expire automatically after the end time",
       "endTimeLabel": "Event End Time *",
-      "entryFee": "Entry Fee (participants spend Bean)",
+      "entryFee": "Entry Fee (paid by participants)",
+      "entryFeeBean": "{amount} Bean",
       "eventBusinessOnly": "Event cafés are exclusive to the Business plan",
+      "eventCreateCostDeduct": "A creation fee of {amount} Bean will be deducted.",
+      "eventCreateCostFree": "The creation fee is free with your subscription.",
+      "eventCreateCostMemo": "Event Cafe creation fee {amount}",
       "eventCreated": "Event room created!",
       "eventCreateError": "Event room creation error",
       "eventCreateFail": "Failed to create event room",
-      "eventDesc": "A time-limited room where participants spend Beans to enter.",
-      "eventTab": "🎟️ Event Room",
+      "eventDesc": "A time-limited room where participants pay an entry fee (π) to join. No creation cost.",
+      "eventTab": "🎟️ Create Event Room",
       "eventTitle": "Create Event Café",
+      "freeEntry": "Free",
+      "freeRoom7dHint": "Cafes created for free are maintained for only 7 days and cannot be extended. To specify the period yourself, create it with Bean payment.",
+      "freeRoom7dValidity": "7-day validity period (Free creation)",
+      "freeRoomCapacityLimit": "Free cafes can accommodate up to 10 people.",
+      "freeRoomPublicOnly": "Cafes created for free can only be opened as public.",
+      "goChargingBean": "Go to recharge Bean →",
       "groupTab": "💬 Group Room",
       "groupTitle": "Create Group Café",
       "maxMembers": "Max Capacity",
       "name": "Café Name",
       "nameLabel": "Café Name *",
+      "next": "Next",
       "openBtn": "+ Create Café",
       "payAndCreate": "Pay {amount} π and Create",
+      "payAndCreateEvent": "Pay and create event room",
+      "payAndCreateGroup": "Pay and create room",
       "piBrowserOnly": "Payments are only available in Pi Browser",
+      "premiumCreateCostMemo": "PREMIUM Cafe creation fee {amount}",
       "premiumTheme": "PREMIUM theme",
       "premiumThemeOnce": "PREMIUM theme (one-time)",
       "privateEmoji": "🔒 Private",
@@ -1337,26 +1286,8 @@
       "total": "Total",
       "unlimited": "Unlimited",
       "validity": "Validity Period",
-      "visibility": "Visibility",
-      "back": "Back",
-      "next": "Next",
-      "eventCreateCostDeduct": " {amount} Bean creation fee will be deducted.",
-      "eventCreateCostFree": " Creation fee is free with your subscription benefit.",
-      "freeRoomPublicOnly": "Free cafés can only be created as public rooms.",
-      "capacityN": "{n}",
-      "freeRoomCapacityLimit": "Free cafés are limited to 10 members.",
-      "freeRoom7dValidity": "7-Day Validity (Free Creation)",
-      "freeRoom7dHint": "Free cafés are maintained for exactly 7 days and cannot be extended. To set a custom duration, create with Bean payment.",
-      "validityDays": "{n}d",
-      "freeEntry": "Free",
-      "entryFeeBean": "{amount} Bean",
-      "payAndCreateEvent": "Pay and Create Event Room",
-      "createEventFree": "🎟️ Create Event Room",
-      "payAndCreateGroup": "Pay and Create Room",
-      "premiumCreateCostMemo": "PREMIUM café creation fee: {amount}",
-      "eventCreateCostMemo": "Event café creation fee: {amount}",
-      "createCostSuffix": "Bean will be deducted (top-up prompt on low balance)",
-      "goChargingBean": "Go charge Beans →"
+      "validityDays": "{n} days",
+      "visibility": "Visibility"
     },
     "customSticker": {
       "businessOnly": "This feature is exclusive to the Business plan (Pi Host)",
@@ -1611,6 +1542,34 @@
     "upgrade": "Upgrade",
     "yes": "Yes"
   },
+  "consent": {
+    "agreeAll": "Agree to All",
+    "birthInvalid": "Please enter your date of birth correctly.",
+    "birthLabel": "Date of Birth",
+    "desc": "Please agree to the terms below to use Cafe.pi. (Available after agreeing to required items)",
+    "errNetwork": "Failed to save agreement due to network error.",
+    "errSave": "Failed to save agreement.",
+    "guardian": "Under 14 years old — Consent from legal guardian (parent) has been obtained.",
+    "lbs": "Agree to Collection and Use of Location Information",
+    "marketing": "Agree to Receive Marketing Information",
+    "note": "You must agree to the required items (Terms of Service, Personal Information, Location Information) to use the service.",
+    "optional": "(Optional)",
+    "privacy": "Agree to Collection and Use of Personal Information",
+    "processing": "Processing...",
+    "required": "(Required)",
+    "submit": "Agree and Continue",
+    "terms": "Agree to Terms of Service",
+    "title": "Service Terms Agreement",
+    "view": "View"
+  },
+  "errorPage": {
+    "errDesc": "This might be a temporary error. Please try again or connect later.",
+    "errTitle": "An error occurred.",
+    "home": "To Home",
+    "nfDesc": "The page you requested does not exist or has been moved.",
+    "nfTitle": "Page not found.",
+    "retry": "Try again"
+  },
   "event": {
     "agentCol": "Agent Name",
     "alreadyExcluded": "Already Excluded: {names}",
@@ -1775,6 +1734,50 @@
     "tabShopSub": "Store First-Come, First-Served Onboarding Event",
     "title": "🎖️ Mission Event",
     "totalCol": "Total"
+  },
+  "faq": {
+    "community": "Community Operating Policy",
+    "email": "Email Inquiry",
+    "items": [
+      {
+        "a": "In Pi Browser, tap 'Generate Link Code', then log in with Google in a regular browser and paste the code to link.",
+        "q": "How do I log in?"
+      },
+      {
+        "a": "It is a platform-exclusive reserve. You can charge 1 Pi = 100 Bean to use for subscriptions, gifts, etc., and it cannot be exchanged externally.",
+        "q": "What is Bean?"
+      },
+      {
+        "a": "Payments are made with Pi in the Pi Browser. Product transactions are protected by escrow (secure storage).",
+        "q": "How do I make a payment?"
+      },
+      {
+        "a": "Upon official launch of the Mainnet and official issuance of Bean Tokens, Beans received from Testnet events will be paid out 1:1 as is.",
+        "q": "What happens to Beans received on the Testnet?"
+      },
+      {
+        "a": "It follows the refund and subscription withdrawal policy. For more details, please refer to the refund policy document below.",
+        "q": "Is a refund possible?"
+      },
+      {
+        "a": "You can submit a report with the reason using the 'Report' button on posts, stores, etc. The operations team will review and take action.",
+        "q": "How do I report something?"
+      },
+      {
+        "a": "It is used to show nearby cafes, stores, and products by distance. Consent can be withdrawn on My Page.",
+        "q": "Why is location information needed?"
+      }
+    ],
+    "lbs": "Location-Based Service Terms",
+    "legalTitle": "Terms & Policies",
+    "privacy": "Privacy Policy",
+    "refund": "Refund Policy",
+    "subtitle": "Quickly find answers to your questions",
+    "supportTitle": "Customer Support",
+    "telegram": "Telegram",
+    "terms": "Terms of Service",
+    "title": "Frequently Asked Questions",
+    "youth": "Youth Protection Policy"
   },
   "header": {
     "admin": "Admin",
@@ -2033,6 +2036,25 @@
     },
     "title": "My Profile"
   },
+  "report": {
+    "ABUSE": "Abuse / Harassment",
+    "button": "Report",
+    "cancel": "Cancel",
+    "COPYRIGHT": "Copyright Infringement",
+    "detailLabel": "Detailed Description (Optional)",
+    "detailPlaceholder": "Please provide details of the report",
+    "duplicate": "This item has already been reported.",
+    "error": "Failed to submit report.",
+    "ETC": "Other",
+    "FRAUD": "Fraud / Transaction",
+    "PRIVACY": "Personal Information Exposure",
+    "reasonLabel": "Reason for Report",
+    "SEXUAL": "Obscenity / Indecency",
+    "SPAM": "Spam / Advertisement",
+    "submit": "Submit Report",
+    "success": "Your report has been submitted",
+    "title": "Report"
+  },
   "store": {
     "actionBuyerDone": "Item received",
     "actionCancel": "Cancel order",
@@ -2192,8 +2214,8 @@
     "nearbyNav": "📍 Nearby",
     "nearbySort": "📍 Nearby",
     "newItem": "+ Register Item",
-    "newItemP2P": "+ List Direct Deal Item",
-    "newItemShop": "+ List My Store Item",
+    "newItemP2P": "+ Used Item Direct Deal",
+    "newItemShop": "+ Offline Store Item",
     "newItemTitle": "Register New Item",
     "newP2PTitle": "Register Used Item for Direct Deal",
     "newShopHint": "Select a store and register the price in your local currency. Payment will be made in Pi.",
@@ -2327,6 +2349,12 @@
       "TRANSLATE": "Auto-Translate Subscription"
     },
     "renewBtn": "Renew/Change",
+    "storeGrade": {
+      "L": "L (50+ items)",
+      "M": "M (up to 50 items)",
+      "S": "S (up to 30 items)"
+    },
+    "storeGradeHint": "My products {count} — select a grade",
     "subscribeBtn": "Subscribe",
     "subscribeFail": "Subscription processing failed",
     "subscribeSuccess": "{product} subscription has started!",

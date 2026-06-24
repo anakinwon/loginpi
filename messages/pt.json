@@ -241,6 +241,7 @@
       "beanAudit": "Log de Auditoria",
       "beanFeePlan": "Gerenciamento de Plano de Taxas",
       "beanSection": "☕ Economia Bean",
+      "beanTipPresets": "Presets de gorjetas Bean",
       "beanToken": "Bean Dashboard",
       "beanTopUsers": "Usuários Principais",
       "beanTxn": "Histórico de Transações",
@@ -248,6 +249,8 @@
       "board": "Gerenciamento de Board",
       "campaign": "Aprovação de Campaign",
       "chatSection": "Gerenciamento de Café",
+      "checklist": "Checklist da Open Beta",
+      "consents": "Histórico de consentimento dos termos",
       "dashboard": "Dashboard",
       "eventExclude": "Gerenciar exclusão",
       "eventGifts": "Enviar presentes",
@@ -257,6 +260,7 @@
       "links": "Status da Vinculação de Conta",
       "logs": "Gerenciar Logs",
       "payments": "Histórico de Pagamentos",
+      "reports": "Processamento de denúncias",
       "settle": "Gerenciar Acertos",
       "stats": "Estatísticas",
       "stdApprovals": "Fluxo de Trabalho de Aprovação",
@@ -268,12 +272,13 @@
       "stdWords": "Palavras Padrão",
       "stickers": "Gerenciamento de Stickers",
       "storeCategories": "Category de Produto",
+      "storeDistCfg": "Restrição de distância",
       "storeSection": "Gerenciamento de Store",
       "subscriptions": "Gerenciamento de Assinaturas",
+      "subscrPricing": "Planos de assinatura",
       "themes": "Gerenciar Themes",
       "title": "Admin",
-      "users": "Gerenciamento de Usuários",
-      "subscrPricing": "구독요금제"
+      "users": "Gerenciamento de Usuários"
     },
     "payments": {
       "col": {
@@ -575,6 +580,7 @@
       "col": {
         "cd": "Code",
         "desc": "Descrição",
+        "nmEn": "Nome em Inglês",
         "sortOrd": "Ordem",
         "theme": "Theme",
         "tp": "Group",
@@ -595,6 +601,7 @@
         "desc": "Descrição·Tag",
         "emoji": "Emoji",
         "nm": "Nome do Theme",
+        "nmEn": "Nome do Tema (Inglês)",
         "sortOrd": "Ordem de Classificação",
         "tp": "Group",
         "useYn": "Exposição"
@@ -605,7 +612,8 @@
       "placeholder": {
         "cd": "ESPORTS",
         "desc": "#Tag #Keyword",
-        "nm": "e-sports"
+        "nm": "e-sports",
+        "nmEn": "eSports"
       },
       "saveFail": "Falha ao salvar",
       "saveSuccess": "Theme registrado com sucesso",
@@ -700,6 +708,89 @@
       "out": "Saída"
     },
     "homeTitle": "Dashboard",
+    "manual": {
+      "badge": "Manual do Usuário",
+      "collapse": "Recolher",
+      "expand": "Expandir",
+      "intro": "Não se preocupe se você não entende muito de computadores. Basta seguir os passos 😊 — Lembre-se de apenas 3 coisas: ① Login ② Navegar ③ Comprar e Vender",
+      "title": "Manual de Uso Fácil do Cafe.pi",
+      "topics": [
+        {
+          "icon": "⭐",
+          "steps": [
+            "Mercado local global: Tradução automática para mais de 200 idiomas · Pagamento fácil com Pi · Chat, usados e lojas em um único aplicativo · Conexão por distância",
+            "Sistema de pedidos 'Siren Order' para todos os tipos de negócios: Qualquer um pode ser um proprietário · Menu flexível · Notificações instantâneas · Retirada O2O"
+          ],
+          "title": "Por que Cafe.pi?"
+        },
+        {
+          "icon": "🎁",
+          "steps": [
+            "EVENT #1: Recarregue com TestPi e complete 10 missões, e os primeiros 100 receberão 5.000 Bean",
+            "EVENT #2: Registre sua loja e conclua o registro do menu + teste de transação, e as primeiras 100 lojas receberão 10.000 Bean",
+            "Na aba Event, siga os links de participação para cada missão e você poderá concluí-las facilmente"
+          ],
+          "title": "Event — Participe agora"
+        },
+        {
+          "icon": "🔑",
+          "steps": [
+            "No Pi Browser, clique em 'Gerar código de vinculação' e um código de 6 dígitos aparecerá (use em 10 minutos)",
+            "Copie o código (ou link) e transfira para um navegador comum",
+            "No navegador comum, faça login no Google, cole e clique em 'Vincular' para completar a conexão Pi + Google",
+            "O Pi Browser não armazena informações por segurança, então o código de 6 dígitos conecta os dois navegadores com segurança"
+          ],
+          "title": "Login & Conexão de conta"
+        },
+        {
+          "icon": "🎫",
+          "steps": [
+            "1 Pi = 100 Bean (crédito exclusivo da plataforma) — Você pode começar imediatamente com o plano gratuito",
+            "Assine apenas o que você precisa: PiCafé™ (Cafe Premium) · PiShop™ (Registro de Produtos) · PiTranslate™ (Tradução Ilimitada)",
+            "As taxas de assinatura são pagas com Bean recarregado, e o pagamento anual oferece 2 meses grátis"
+          ],
+          "title": "Bean & Assinatura"
+        },
+        {
+          "icon": "💬",
+          "steps": [
+            "Entre em uma sala de Cafe sobre um tópico de interesse e comece a conversar gratuitamente",
+            "Ao ativar 'Cafes Próximos', ele mostra Cafes e vizinhos próximos por distância",
+            "Com tradução simultânea automática, você pode conversar com qualquer pessoa em mais de 200 idiomas no seu próprio idioma"
+          ],
+          "title": "Cafe & Tradução automática"
+        },
+        {
+          "icon": "📦",
+          "steps": [
+            "Ao carregar fotos do produto e o preço (Pi), juntamente com sua localização, ele será mostrado a pessoas próximas",
+            "Veja os itens disponíveis nas proximidades por distância e se gostar, peça com Pi",
+            "O Pi pago é mantido em segurança pela plataforma (escrow) temporariamente, e entregue ao vendedor após a conclusão da transação"
+          ],
+          "title": "Mercado de usados (Transação segura)"
+        },
+        {
+          "icon": "🏪",
+          "steps": [
+            "Em 'Registro de Loja', defina o nome e a localização da loja e os clientes virão até a loja mais próxima",
+            "Registre fotos do menu · preço · quantidade",
+            "Quando um cliente faz um pedido, você recebe uma notificação instantânea via Telegram (Menu · Quantidade · Valor)",
+            "Entregue na loja na seguinte ordem: Em preparação → Pronto → Retirada"
+          ],
+          "title": "Minha Loja (O2O)"
+        },
+        {
+          "icon": "🪙",
+          "steps": [
+            "Os Beans recebidos no Event da Testnet agora são uma promessa da cafe.pi",
+            "Quando a plataforma for oficialmente lançada na Mainnet e o Bean Token for oficialmente emitido,",
+            "os tokens de Event acumulados na Testnet serão pagos na mesma proporção de 1:1 como Bean da Mainnet",
+            "Este é o princípio da cafe.pi para garantir que o esforço dos participantes iniciais não seja perdido"
+          ],
+          "title": "Recompensas da Testnet, as mesmas na Mainnet (Promessa)"
+        }
+      ]
+    },
     "noData": "Sem Data",
     "normalRevenue": "Receita de planos normais",
     "period30": "30 dias",
@@ -748,7 +839,31 @@
     },
     "unitCase": "casos",
     "unitPerson": "pessoas",
-    "userActivity": "Atividade {days} dias · Content {content} · Pagamentos {payments}"
+    "userActivity": "Atividade {days} dias · Content {content} · Pagamentos {payments}",
+    "whitepaper": {
+      "badge": "Whitepaper Técnico",
+      "collapse": "Recolher",
+      "expand": "Ver detalhes",
+      "footer": "Atende aos critérios de listagem da Pi Network (Login, pagamento, segurança, padrão de Data).",
+      "highlight1Desc": "Suporte para conta Pi + conta Google. Login integrado com Kakao, LINE, WeChat, etc., será adicionado futuramente.",
+      "highlight1Title": "🤝 Login Integrado Pi · Google",
+      "highlight2Desc": "Implementação de PiRC1 (economia de Token) · PiRC2 (serviço de assinatura) · PiRC3 (transação segura com Escrow).",
+      "highlight2Title": "💳 Construção do Serviço de Pagamento Pi",
+      "intro": "Cafe.pi resolve as rigorosas restrições do Pi Browser de forma estrutural e criptográfica, e mantém a integridade financeira e os padrões de Data desde o lançamento.",
+      "pillar1Desc": "Suporta Login de conta Pi e pagamento Pi como caminho principal. Os pagamentos são feitos apenas com Pi, e Bean é uma reserva interna fixa de 1 Pi = 100 Bean.",
+      "pillar1Title": "🟣 Design Prioritário Pi",
+      "pillar2Desc": "Mesmo no Pi Browser que não armazena Cookies, o Login e o pagamento são seguros com autenticação de dois fatores baseada em Token. Design de Client Gate sem loop infinito.",
+      "pillar2Title": "📱 Compatibilidade Total com Pi Browser",
+      "pillar3Desc": "Todas as transações são registradas em um livro-razão somente de adição (append-only) e a identidade de conservação contábil (emissão = circulação + recuperação) é verificada constantemente. A superemissão e o pagamento duplo são estruturalmente impossíveis.",
+      "pillar3Title": "💰 Tolerância Zero à Integridade Financeira",
+      "pillar4Desc": "Responde aos 21 critérios de vulnerabilidade Web da KISA e defende contra falsificação, adulteração e ataques de temporização com Token de assinatura HMAC-SHA256 e comparação de tempo constante.",
+      "pillar4Title": "🔒 Segurança Verificada",
+      "pillar5Desc": "Aplica o padrão de Data da Korea Data Agency (K-DATA) desde a primeira Table e o impõe com verificação automática, garantindo a confiabilidade da operação e auditoria a longo prazo.",
+      "pillar5Title": "📊 Padrão de Data Aprovado pelo Governo",
+      "pillar6Desc": "Oferece uma tela inicial rápida e usabilidade suave com Server-Side Rendering, Data Fetching paralelo, Caching stale-while-revalidate, e otimização de localização, pesquisa e Bundle.",
+      "pillar6Title": "⚡ Otimização de Desempenho",
+      "title": "Pontos Fortes Técnicos do Cafe.pi"
+    }
   },
   "adminStd": {
     "domainTypeCode": "Código",
@@ -1111,10 +1226,14 @@
       "approveError": "Erro de aprovação",
       "approveFail": "Falha na aprovação do servidor",
       "approveInWallet": "Por favor, aprove o pagamento na tela da carteira Pi.",
+      "back": "Anterior",
+      "capacityN": "{n} pessoas",
       "completeError": "Erro de conclusão",
       "completeFail": "Falha ao concluir",
+      "createCostSuffix": "Bean será deduzido (Instruções para recarga em caso de saldo insuficiente)",
       "created": "Café criado!",
       "createError": "Erro ao criar sala",
+      "createEventFree": "🎟️ Criar sala de Event",
       "createFail": "Falha ao criar sala",
       "createFree": "Criar sala gratuita",
       "createMemo": "Criação de Café: {roomNm}",
@@ -1126,21 +1245,35 @@
       "endTimeHint": "Após a hora de término, a Membership de participante (GUEST) expira automaticamente",
       "endTimeLabel": "Hora de término do Event *",
       "entryFee": "Taxa de entrada (pagamento do participante)",
+      "entryFeeBean": "{amount} Bean",
       "eventBusinessOnly": "Cafés de Event são exclusivos para o Plan Business",
+      "eventCreateCostDeduct": "Uma taxa de criação de {amount} Bean será deduzida.",
+      "eventCreateCostFree": "A taxa de criação é gratuita como benefício da assinatura.",
+      "eventCreateCostMemo": "Custo de criação de Café de Event {amount}",
       "eventCreated": "Sala de Event criada!",
       "eventCreateError": "Erro ao criar sala de Event",
       "eventCreateFail": "Falha ao criar sala de Event",
       "eventDesc": "É uma sala por tempo limitado onde os participantes pagam uma taxa de entrada (π) para entrar. Não há custo de criação.",
       "eventTab": "🎟️ Criar Sala de Event",
       "eventTitle": "Criar Café de Event",
+      "freeEntry": "Gratuito",
+      "freeRoom7dHint": "Cafés criados gratuitamente são mantidos por apenas 7 dias e não podem ser estendidos. Para especificar a duração diretamente, crie-o com pagamento em Bean.",
+      "freeRoom7dValidity": "Validade de 7 dias (Criação gratuita)",
+      "freeRoomCapacityLimit": "Cafés criados gratuitamente podem ter no máximo 10 pessoas.",
+      "freeRoomPublicOnly": "Os Cafes criados gratuitamente só podem ser abertos como públicos.",
+      "goChargingBean": "Ir para recarregar Bean →",
       "groupTab": "💬 Sala de Group",
       "groupTitle": "Criar Café de Group",
       "maxMembers": "Capacidade máxima",
       "name": "Nome do Café",
       "nameLabel": "Nome do Café *",
+      "next": "Próximo",
       "openBtn": "+ Criar Café",
       "payAndCreate": "Pagar {amount} π e criar sala",
+      "payAndCreateEvent": "Pagar e criar sala de Event",
+      "payAndCreateGroup": "Pagar e criar sala",
       "piBrowserOnly": "O pagamento só é possível no Pi Browser",
+      "premiumCreateCostMemo": "Custo de criação de Café PREMIUM {amount}",
       "premiumTheme": "Theme PREMIUM",
       "premiumThemeOnce": "Theme PREMIUM único",
       "privateEmoji": "🔒 Privado",
@@ -1153,6 +1286,7 @@
       "total": "Total",
       "unlimited": "Ilimitado",
       "validity": "Período de validade",
+      "validityDays": "{n} dias",
       "visibility": "Visibilidade"
     },
     "customSticker": {
@@ -1408,6 +1542,34 @@
     "upgrade": "Upgrade",
     "yes": "Sim"
   },
+  "consent": {
+    "agreeAll": "Concordar com todos",
+    "birthInvalid": "Por favor, insira uma data de nascimento válida.",
+    "birthLabel": "Data de nascimento",
+    "desc": "Para usar o Cafe.pi, concorde com os termos abaixo. (Disponível após concordar com os itens obrigatórios)",
+    "errNetwork": "Não foi possível salvar o consentimento devido a um erro de rede.",
+    "errSave": "Falha ao salvar o consentimento.",
+    "guardian": "Menores de 14 anos — Recebi o consentimento do responsável legal (tutor).",
+    "lbs": "Concordo com a coleta e uso de informações de localização",
+    "marketing": "Concordo em receber informações de marketing",
+    "note": "Você deve concordar com os itens obrigatórios (Termos de Serviço, informações pessoais, informações de localização) para usar o serviço.",
+    "optional": "(Opcional)",
+    "privacy": "Concordo com a coleta e uso de informações pessoais",
+    "processing": "Processando…",
+    "required": "(Obrigatório)",
+    "submit": "Concordar e continuar",
+    "terms": "Concordo com os Termos de Serviço",
+    "title": "Termos de Serviço",
+    "view": "Ver"
+  },
+  "errorPage": {
+    "errDesc": "Pode ser um erro temporário. Tente novamente ou acesse mais tarde.",
+    "errTitle": "Ocorreu um problema.",
+    "home": "Início",
+    "nfDesc": "A página solicitada não existe ou foi movida.",
+    "nfTitle": "Página não encontrada.",
+    "retry": "Tentar novamente"
+  },
   "event": {
     "agentCol": "Nome do Agente",
     "alreadyExcluded": "Já excluídos: {names}",
@@ -1572,6 +1734,50 @@
     "tabShopSub": "Evento de Onboarding da Loja por Ordem de Chegada",
     "title": "🎖️ Evento de Missão",
     "totalCol": "Total"
+  },
+  "faq": {
+    "community": "Política de Operação da Comunidade",
+    "email": "Consulta por E-mail",
+    "items": [
+      {
+        "a": "No Pi Browser, toque em 'Gerar Código de Vinculação', faça login com o Google em um navegador comum e cole o código para vincular.",
+        "q": "Como faço para fazer login?"
+      },
+      {
+        "a": "É um fundo de reserva exclusivo da plataforma. 1 Pi = 100 Bean, que pode ser usado para assinaturas, presentes, etc., e não pode ser trocado externamente.",
+        "q": "O que é Bean?"
+      },
+      {
+        "a": "Pague com Pi no Pi Browser. As transações de produtos são protegidas por escrow (custódia segura).",
+        "q": "Como faço para pagar?"
+      },
+      {
+        "a": "No lançamento oficial da Mainnet e na emissão oficial do Bean Token, os Beans recebidos em eventos da Testnet serão pagos na proporção de 1:1.",
+        "q": "O que acontece com os Beans recebidos na Testnet?"
+      },
+      {
+        "a": "Seguimos a política de reembolso e cancelamento de assinatura. Para mais detalhes, consulte o documento da política de reembolso abaixo.",
+        "q": "É possível obter um reembolso?"
+      },
+      {
+        "a": "Você pode enviar uma denúncia com o motivo usando o botão 'Denunciar' em posts, lojas, etc. A equipe de operações revisará e tomará as medidas cabíveis.",
+        "q": "Como faço para denunciar?"
+      },
+      {
+        "a": "São usadas para mostrar cafés, lojas e produtos próximos por ordem de distância. O consentimento pode ser retirado na Minha Página.",
+        "q": "Por que as informações de localização são necessárias?"
+      }
+    ],
+    "lbs": "Termos de Serviço Baseados em Localização",
+    "legalTitle": "Termos e Políticas",
+    "privacy": "Política de Privacidade",
+    "refund": "Política de Reembolso",
+    "subtitle": "Verifique rapidamente suas dúvidas",
+    "supportTitle": "Suporte ao Cliente",
+    "telegram": "Telegram",
+    "terms": "Termos de Serviço",
+    "title": "Perguntas Frequentes",
+    "youth": "Política de Proteção à Juventude"
   },
   "header": {
     "admin": "Admin",
@@ -1829,6 +2035,25 @@
       "store": "🛍️ Store"
     },
     "title": "Meu perfil"
+  },
+  "report": {
+    "ABUSE": "Abuso/Assédio",
+    "button": "Denunciar",
+    "cancel": "Cancelar",
+    "COPYRIGHT": "Violação de Direitos Autorais",
+    "detailLabel": "Descrição Detalhada (Opcional)",
+    "detailPlaceholder": "Por favor, descreva os detalhes da denúncia",
+    "duplicate": "Este item já foi denunciado.",
+    "error": "Falha ao enviar a denúncia.",
+    "ETC": "Outros",
+    "FRAUD": "Fraude/Transação",
+    "PRIVACY": "Exposição de Informações Pessoais",
+    "reasonLabel": "Motivo da Denúncia",
+    "SEXUAL": "Conteúdo Obsceno/Sensual",
+    "SPAM": "SPAM/Anúncio",
+    "submit": "Enviar Denúncia",
+    "success": "Denúncia enviada com sucesso",
+    "title": "Denunciar"
   },
   "store": {
     "actionBuyerDone": "Recebimento do item concluído",
@@ -2124,6 +2349,12 @@
       "TRANSLATE": "Assinatura de Tradução Automática"
     },
     "renewBtn": "Renovar/Alterar",
+    "storeGrade": {
+      "L": "L (50↑)",
+      "M": "M (50↓)",
+      "S": "S (30↓)"
+    },
+    "storeGradeHint": "{count} produtos — selecione um nível",
     "subscribeBtn": "Assinar",
     "subscribeFail": "Falha ao processar a assinatura",
     "subscribeSuccess": "Sua assinatura {product} foi iniciada!",

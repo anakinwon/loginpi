@@ -241,6 +241,7 @@
       "beanAudit": "ऑडिट लॉग",
       "beanFeePlan": "शुल्क योजना प्रबंधन",
       "beanSection": "☕ Bean अर्थव्यवस्था",
+      "beanTipPresets": "Gifting Presets",
       "beanToken": "Bean Dashboard",
       "beanTopUsers": "टॉप यूज़र्स",
       "beanTxn": "लेन-देन का इतिहास",
@@ -248,6 +249,8 @@
       "board": "Board प्रबंधन",
       "campaign": "Campaign स्वीकृति",
       "chatSection": "Cafe प्रबंधन",
+      "checklist": "Open Beta Checklist",
+      "consents": "सहमति का इतिहास",
       "dashboard": "Dashboard",
       "eventExclude": "बहिष्करण प्रबंधित करें",
       "eventGifts": "उपहार भेजें",
@@ -257,6 +260,7 @@
       "links": "खाता लिंकिंग स्थिति",
       "logs": "Log प्रबंधन",
       "payments": "भुगतान इतिहास",
+      "reports": "रिपोर्ट्स",
       "settle": "निपटान प्रबंधन",
       "stats": "आँकड़े",
       "stdApprovals": "अनुमोदन Workflow",
@@ -268,12 +272,13 @@
       "stdWords": "मानक शब्द",
       "stickers": "Sticker प्रबंधन",
       "storeCategories": "उत्पाद Category",
+      "storeDistCfg": "दूरी सीमा",
       "storeSection": "Store प्रबंधन",
       "subscriptions": "सदस्यता प्रबंधन",
+      "subscrPricing": "सदस्यता मूल्य निर्धारण",
       "themes": "Theme प्रबंधन",
       "title": "Admin",
-      "users": "उपयोगकर्ता प्रबंधन",
-      "subscrPricing": "구독요금제"
+      "users": "उपयोगकर्ता प्रबंधन"
     },
     "payments": {
       "col": {
@@ -575,6 +580,7 @@
       "col": {
         "cd": "Code",
         "desc": "विवरण",
+        "nmEn": "अंग्रेजी नाम",
         "sortOrd": "क्रम",
         "theme": "Theme",
         "tp": "Group",
@@ -595,6 +601,7 @@
         "desc": "विवरण·Tag",
         "emoji": "Emoji",
         "nm": "Theme नाम",
+        "nmEn": "Theme Name (English)",
         "sortOrd": "क्रमबद्धता क्रम",
         "tp": "Group",
         "useYn": "प्रदर्शित करें"
@@ -605,7 +612,8 @@
       "placeholder": {
         "cd": "ESPORTS",
         "desc": "#Tag #Keyword",
-        "nm": "e-sports"
+        "nm": "e-sports",
+        "nmEn": "eSports"
       },
       "saveFail": "सहेजने में विफल रहा",
       "saveSuccess": "Theme पंजीकृत हो गया है",
@@ -700,6 +708,89 @@
       "out": "निकासी"
     },
     "homeTitle": "Dashboard",
+    "manual": {
+      "badge": "उपयोगकर्ता Manual",
+      "collapse": "छोटा करें",
+      "expand": "और देखें",
+      "intro": "अगर आप कंप्यूटर के बारे में ज्यादा नहीं जानते हैं तो भी ठीक है। बस इन चरणों का पालन करें 😊 — बस 3 बातें याद रखें: ① Login ② Explore ③ Buy and Sell",
+      "title": "Cafe.pi के लिए आसान उपयोगकर्ता Manual",
+      "topics": [
+        {
+          "icon": "⭐",
+          "steps": [
+            "वैश्विक 'Danggeun': 200+ भाषाओं में स्वचालित अनुवाद · Pi आसान भुगतान · Chat, Second-hand, Store एक ही ऐप में · दूरी के अनुसार कनेक्शन",
+            "सभी उद्योगों के लिए 'Siren Order': कोई भी मालिक बन सकता है · Menu स्वतंत्रता · तत्काल सूचनाएं · O2O Pickup"
+          ],
+          "title": "Cafe.pi क्यों?"
+        },
+        {
+          "icon": "🎁",
+          "steps": [
+            "EVENT #1: TestPi से Recharge करें और 10 Mission पूरे करने पर पहले 100 लोगों को 5,000 Bean मिलेंगे",
+            "EVENT #2: अपनी दुकान Register करें और Menu Registration + Transaction Test पूरा करने पर पहले 100 स्थानों को 10,000 Bean मिलेंगे",
+            "Event Tab में, प्रत्येक Mission के लिए भागीदारी लिंक का पालन करके आप इसे आसानी से पूरा कर सकते हैं"
+          ],
+          "title": "Event — अभी भाग लें"
+        },
+        {
+          "icon": "🔑",
+          "steps": [
+            "Pi Browser में 'Link Code Generate करें' दबाने पर 6-अंकीय Code दिखाई देगा (10 मिनट के भीतर उपयोग करें)",
+            "Code (या Link) को Copy करें और इसे एक सामान्य Browser में ले जाएं",
+            "सामान्य Browser में Google Login के बाद, इसे Paste करें और 'Link करें' दबाएं, तो Pi + Google कनेक्शन पूरा हो जाएगा",
+            "Pi Browser सुरक्षा कारणों से जानकारी संग्रहीत नहीं करता है, इसलिए यह 6-अंकीय Code के साथ दोनों Browsers को सुरक्षित रूप से जोड़ता है"
+          ],
+          "title": "Login और Account कनेक्शन"
+        },
+        {
+          "icon": "🎫",
+          "steps": [
+            "1 Pi = 100 Bean (Platform-विशेष आरक्षित निधि) — आप एक Free Plan के साथ तुरंत शुरू कर सकते हैं",
+            "केवल वही Subscribe करें जिसकी आपको आवश्यकता है: PiCafé™ (Premium Cafe) · PiShop™ (Product Registration) · PiTranslate™ (Unlimited Translation)",
+            "Subscription शुल्क Recharge किए गए Bean से भुगतान किया जाता है, और वार्षिक भुगतान पर 2 महीने मुफ्त मिलते हैं"
+          ],
+          "title": "Bean और Subscription"
+        },
+        {
+          "icon": "💬",
+          "steps": [
+            "अपनी रुचि के Cafe Room में प्रवेश करें और मुफ्त में Chatting शुरू करें",
+            "'Nearby Cafe' चालू करने पर, यह आस-पास के Cafes और पड़ोसियों को दूरी के अनुसार दिखाता है",
+            "स्वचालित Simultaneous Translation के साथ, आप 200+ भाषाओं में किसी से भी अपनी भाषा में बात कर सकते हैं"
+          ],
+          "title": "Cafe और स्वचालित अनुवाद"
+        },
+        {
+          "icon": "📦",
+          "steps": [
+            "यदि आप Product Photos और Price (Pi) Upload करते हैं, तो यह आपकी Location के साथ आस-पास के लोगों को दिखाई देगा",
+            "आस-पास उपलब्ध वस्तुओं को दूरी के अनुसार देखें और यदि आपको पसंद है, तो Pi से Order करें",
+            "भुगतान किया गया Pi Platform द्वारा अस्थायी रूप से और सुरक्षित रूप से रखा जाता है (Escrow), और लेन-देन पूरा होने के बाद विक्रेता को हस्तांतरित कर दिया जाता है"
+          ],
+          "title": "Second-hand Market (सुरक्षित लेन-देन)"
+        },
+        {
+          "icon": "🏪",
+          "steps": [
+            "'Store Registration' में, यदि आप Store का नाम और Location निर्धारित करते हैं, तो ग्राहक आस-पास के Store पर आएंगे",
+            "Menu Photos, Price और Quantity Register करें",
+            "जब कोई ग्राहक Order करता है, तो आपको Telegram के माध्यम से तुरंत एक Notification प्राप्त होता है (Menu · Quantity · Amount)",
+            "Preparing → Ready → Pickup के क्रम में Store पर सौंप दें"
+          ],
+          "title": "My Store (O2O)"
+        },
+        {
+          "icon": "🪙",
+          "steps": [
+            "वर्तमान Testnet Event से प्राप्त Bean cafe.pi का Promise है",
+            "जब Platform आधिकारिक तौर पर Mainnet पर Launch होगा और Bean Token आधिकारिक तौर पर जारी किया जाएगा,",
+            "Testnet पर अर्जित Event Tokens को Mainnet Bean के रूप में 1:1 के अनुपात में समान रूप से भुगतान किया जाएगा",
+            "यह cafe.pi का सिद्धांत है कि शुरुआती प्रतिभागियों के प्रयासों को व्यर्थ न जाने दिया जाए"
+          ],
+          "title": "Testnet Rewards, Mainnet पर वैसे ही (Promise)"
+        }
+      ]
+    },
     "noData": "कोई Data नहीं",
     "normalRevenue": "सामान्य Plan Revenue",
     "period30": "30 दिन",
@@ -748,7 +839,31 @@
     },
     "unitCase": "मामले",
     "unitPerson": "व्यक्ति",
-    "userActivity": "गतिविधि {days} दिन · Content {content} · भुगतान {payments}"
+    "userActivity": "गतिविधि {days} दिन · Content {content} · भुगतान {payments}",
+    "whitepaper": {
+      "badge": "तकनीकी Whitepaper",
+      "collapse": "छोटा करें",
+      "expand": "और देखें",
+      "footer": "Pi Network लिस्टिंग मानदंडों (Login, Payment, सुरक्षा, Data मानक) को पूरा करता है।",
+      "highlight1Desc": "Pi खाता + Google खाता समर्थन। भविष्य में Kakao, Line, WeChat आदि के लिए एकीकृत Login जोड़ा जाएगा।",
+      "highlight1Title": "🤝 Pi · Google एकीकृत Login",
+      "highlight2Desc": "PiRC1 (Token अर्थव्यवस्था) · PiRC2 (Subscription सेवा) · PiRC3 (Escrow सुरक्षित लेनदेन) का कार्यान्वयन।",
+      "highlight2Title": "💳 Pi Payment सेवा का निर्माण",
+      "intro": "Cafe.pi Pi Browser की कठिन बाधाओं को संरचनात्मक और क्रिप्टोग्राफिक रूप से हल करता है, और लॉन्च के चरण से ही फंड की अखंडता और Data मानकों को बनाए रखता है।",
+      "pillar1Desc": "Pi खाता Login और Pi Payment को प्राथमिक मार्ग के रूप में समर्थित किया जाता है। Payment केवल Pi में किया जाता है, और Bean 1 Pi = 100 Bean का एक निश्चित आंतरिक आरक्षित है।",
+      "pillar1Title": "🟣 Pi प्राथमिकता Design",
+      "pillar2Desc": "Pi Browser में भी, जो Cookies को सहेजता नहीं है, Token-आधारित दो-कारक प्रमाणीकरण के साथ सुरक्षित रूप से Login और Payment किया जाता है। अनंत लूप के बिना Client Gate Design।",
+      "pillar2Title": "📱 Pi Browser पूर्ण संगतता",
+      "pillar3Desc": "सभी लेनदेन एक append-only Ledger में दर्ज किए जाते हैं, और लेखांकन संरक्षण पहचान (जारी = प्रचलन + पुनर्प्राप्ति) का लगातार सत्यापन किया जाता है। ओवर-इश्यू और डबल-पेमेंट संरचनात्मक रूप से असंभव हैं।",
+      "pillar3Title": "💰 फंड अखंडता के प्रति शून्य सहिष्णुता",
+      "pillar4Desc": "KISA के 21 Web भेद्यता मानकों का जवाब देता है, और HMAC-SHA256 हस्ताक्षरित Token और स्थिर-समय तुलना के साथ छेड़छाड़ और Timing हमलों से बचाता है।",
+      "pillar4Title": "🔒 सत्यापित सुरक्षा",
+      "pillar5Desc": "Korea Data Industry Promotion Agency (K-DATA) Data मानकों को पहली Table से लागू किया जाता है और स्वचालित सत्यापन द्वारा लागू किया जाता है, जिससे दीर्घकालिक संचालन और Audit विश्वसनीयता सुनिश्चित होती है।",
+      "pillar5Title": "📊 सरकार-प्रमाणित Data मानक",
+      "pillar6Desc": "Server-side Rendering और समानांतर Data Fetching, stale-while-revalidate Caching, स्थान, खोज और Bundle अनुकूलन के साथ एक तेज़ पहली स्क्रीन और सहज उपयोगिता प्रदान करता है।",
+      "pillar6Title": "⚡ Performance अनुकूलन",
+      "title": "Cafe.pi की तकनीकी ताकत"
+    }
   },
   "adminStd": {
     "domainTypeCode": "Code",
@@ -1111,10 +1226,14 @@
       "approveError": "स्वीकृति त्रुटि",
       "approveFail": "Server अनुमोदन विफल",
       "approveInWallet": "कृपया Pi Wallet स्क्रीन पर भुगतान स्वीकृत करें।",
+      "back": "पिछला",
+      "capacityN": "{n} लोग",
       "completeError": "पूर्णता त्रुटि",
       "completeFail": "पूरा करने में विफलता",
+      "createCostSuffix": "Bean काट लिए जाएंगे (शेष राशि अपर्याप्त होने पर रिचार्ज का मार्गदर्शन)",
       "created": "Cafe बनाया गया है!",
       "createError": "Room बनाने में त्रुटि",
+      "createEventFree": "🎟️ Event Room बनाएं",
       "createFail": "Room बनाने में विफल",
       "createFree": "मुफ़्त Room बनाएँ",
       "createMemo": "Cafe बनाना: {roomNm}",
@@ -1126,21 +1245,35 @@
       "endTimeHint": "समाप्ति समय के बाद, प्रतिभागी (GUEST) Membership स्वतः समाप्त हो जाएगी",
       "endTimeLabel": "Event समाप्त होने का समय *",
       "entryFee": "प्रवेश शुल्क (प्रतिभागी भुगतान)",
+      "entryFeeBean": "{amount} Bean",
       "eventBusinessOnly": "Event Cafe केवल Business Plan के लिए है",
+      "eventCreateCostDeduct": " Creation शुल्क {amount} Bean काटा जाएगा।",
+      "eventCreateCostFree": " Subscription लाभों के साथ Creation शुल्क मुफ्त है।",
+      "eventCreateCostMemo": "Event Cafe निर्माण शुल्क {amount}",
       "eventCreated": "Event Room बनाया गया है!",
       "eventCreateError": "Event Room बनाने में त्रुटि",
       "eventCreateFail": "Event Room बनाने में विफल",
       "eventDesc": "यह एक सीमित समय का Room है जहाँ प्रतिभागी प्रवेश शुल्क (π) का भुगतान करके प्रवेश करते हैं। बनाने का कोई शुल्क नहीं है।",
       "eventTab": "🎟️ Event Room बनाएँ",
       "eventTitle": "Event Cafe बनाएँ",
+      "freeEntry": "मुफ्त",
+      "freeRoom7dHint": "मुफ्त में बनाया गया Cafe केवल 7 दिनों के लिए ही रहेगा और इसे बढ़ाया नहीं जा सकता। यदि आप अवधि स्वयं निर्धारित करना चाहते हैं, तो Bean भुगतान के साथ बनाएं।",
+      "freeRoom7dValidity": "वैधता अवधि 7 दिन (मुफ्त निर्माण)",
+      "freeRoomCapacityLimit": "मुफ्त में बनाए गए Cafe में अधिकतम 10 लोग हो सकते हैं।",
+      "freeRoomPublicOnly": "मुफ्त में बनाए गए Cafes केवल Public के रूप में ही खोले जा सकते हैं।",
+      "goChargingBean": "Bean रिचार्ज करने जाएं →",
       "groupTab": "💬 Group Room",
       "groupTitle": "Group Cafe बनाएँ",
       "maxMembers": "अधिकतम Member",
       "name": "Cafe का नाम",
       "nameLabel": "Cafe का नाम *",
+      "next": "अगला",
       "openBtn": "+ Cafe बनाएँ",
       "payAndCreate": "{amount} π का भुगतान करें और Room बनाएँ",
+      "payAndCreateEvent": "भुगतान करें और Event Room बनाएं",
+      "payAndCreateGroup": "भुगतान करें और Room बनाएं",
       "piBrowserOnly": "भुगतान केवल Pi Browser में संभव है",
+      "premiumCreateCostMemo": "PREMIUM Cafe निर्माण शुल्क {amount}",
       "premiumTheme": "PREMIUM Theme",
       "premiumThemeOnce": "PREMIUM Theme एक बार",
       "privateEmoji": "🔒 Private",
@@ -1153,6 +1286,7 @@
       "total": "कुल",
       "unlimited": "असीमित",
       "validity": "वैधता अवधि",
+      "validityDays": "{n} दिन",
       "visibility": "दृश्यता"
     },
     "customSticker": {
@@ -1408,6 +1542,34 @@
     "upgrade": "Upgrade",
     "yes": "हाँ"
   },
+  "consent": {
+    "agreeAll": "सभी से सहमत",
+    "birthInvalid": "कृपया अपनी जन्म तिथि सही ढंग से दर्ज करें।",
+    "birthLabel": "जन्म तिथि",
+    "desc": "Cafe.pi का उपयोग करने के लिए, कृपया नीचे दिए गए नियमों और शर्तों से सहमत हों। (आवश्यक शर्तों से सहमत होने के बाद उपयोग किया जा सकता है)",
+    "errNetwork": "नेटवर्क त्रुटि के कारण सहमति सहेजी नहीं जा सकी",
+    "errSave": "सहमति सहेजने में विफल रहा",
+    "guardian": "14 वर्ष से कम आयु — कानूनी अभिभावक (संरक्षक) की सहमति प्राप्त हुई है।",
+    "lbs": "स्थान जानकारी के संग्रह और उपयोग से सहमत",
+    "marketing": "Marketing जानकारी प्राप्त करने से सहमत",
+    "note": "सेवा का उपयोग करने के लिए आपको आवश्यक शर्तों (सेवा की शर्तें, व्यक्तिगत जानकारी, स्थान जानकारी) से सहमत होना होगा।",
+    "optional": "(वैकल्पिक)",
+    "privacy": "व्यक्तिगत जानकारी के संग्रह और उपयोग से सहमत",
+    "processing": "प्रसंस्करण हो रहा है…",
+    "required": "(आवश्यक)",
+    "submit": "सहमत और जारी रखें",
+    "terms": "सेवा की शर्तों से सहमत",
+    "title": "सेवा की शर्तों से सहमत",
+    "view": "देखें"
+  },
+  "errorPage": {
+    "errDesc": "यह एक अस्थायी त्रुटि हो सकती है। कृपया पुनः प्रयास करें या थोड़ी देर बाद कनेक्ट करें।",
+    "errTitle": "एक समस्या उत्पन्न हुई",
+    "home": "होम पर",
+    "nfDesc": "आपके द्वारा अनुरोधित पृष्ठ मौजूद नहीं है या उसे स्थानांतरित कर दिया गया है।",
+    "nfTitle": "पृष्ठ नहीं मिला",
+    "retry": "पुनः प्रयास करें"
+  },
   "event": {
     "agentCol": "एजेंट का नाम",
     "alreadyExcluded": "पहले से बहिष्कृत: {names}",
@@ -1572,6 +1734,50 @@
     "tabShopSub": "स्टोर फर्स्ट-कम, फर्स्ट-सर्व्ड Onboarding Event",
     "title": "🎖️ Mission Event",
     "totalCol": "कुल"
+  },
+  "faq": {
+    "community": "Community संचालन नीति",
+    "email": "ईमेल पूछताछ",
+    "items": [
+      {
+        "a": "Pi Browser में 'लिंक कोड जनरेट करें' पर टैप करें, फिर सामान्य ब्राउज़र में Google से Login करें और लिंक करने के लिए उस कोड को पेस्ट करें।",
+        "q": "Login कैसे करें?"
+      },
+      {
+        "a": "यह एक प्लेटफॉर्म-विशेष आरक्षित निधि है। 1 Pi = 100 Bean के रूप में चार्ज किया जाता है और इसका उपयोग सदस्यता, उपहार आदि के लिए किया जाता है, और इसे बाहरी रूप से एक्सचेंज नहीं किया जा सकता है।",
+        "q": "Bean क्या है?"
+      },
+      {
+        "a": "Pi Browser में Pi से भुगतान करें। उत्पाद लेनदेन एस्क्रो (सुरक्षित हिरासत) द्वारा सुरक्षित हैं।",
+        "q": "भुगतान कैसे करें?"
+      },
+      {
+        "a": "Mainnet के आधिकारिक लॉन्च और Bean Token के आधिकारिक जारी होने पर, Testnet इवेंट्स से प्राप्त Bean को 1:1 के अनुपात में भुगतान किया जाएगा।",
+        "q": "Testnet में प्राप्त Bean का क्या होगा?"
+      },
+      {
+        "a": "वापसी और सदस्यता रद्द करने की नीतियों का पालन करता है। विस्तृत जानकारी के लिए, नीचे दिए गए वापसी नीति दस्तावेज़ देखें।",
+        "q": "क्या वापसी संभव है?"
+      },
+      {
+        "a": "आप पोस्ट, स्टोर आदि पर 'रिपोर्ट' बटन का उपयोग करके कारण सहित रिपोर्ट सबमिट कर सकते हैं। संचालन टीम समीक्षा करेगी और कार्रवाई करेगी।",
+        "q": "रिपोर्ट कैसे करें?"
+      },
+      {
+        "a": "इसका उपयोग आस-पास के कैफे, स्टोर और उत्पादों को दूरी के अनुसार दिखाने के लिए किया जाता है। सहमति My Page पर वापस ली जा सकती है।",
+        "q": "स्थान की जानकारी क्यों आवश्यक है?"
+      }
+    ],
+    "lbs": "स्थान-आधारित सेवा शर्तें",
+    "legalTitle": "शर्तें और नीतियां",
+    "privacy": "गोपनीयता नीति",
+    "refund": "वापसी नीति",
+    "subtitle": "अपने प्रश्नों के उत्तर तुरंत पाएं",
+    "supportTitle": "ग्राहक सहायता",
+    "telegram": "Telegram",
+    "terms": "उपयोग की शर्तें",
+    "title": "अक्सर पूछे जाने वाले प्रश्न",
+    "youth": "युवा संरक्षण नीति"
   },
   "header": {
     "admin": "Admin",
@@ -1829,6 +2035,25 @@
       "store": "🛍️ Store"
     },
     "title": "मेरी Profile"
+  },
+  "report": {
+    "ABUSE": "गाली/उत्पीड़न",
+    "button": "रिपोर्ट करें",
+    "cancel": "रद्द करें",
+    "COPYRIGHT": "कॉपीराइट उल्लंघन",
+    "detailLabel": "विस्तृत विवरण (वैकल्पिक)",
+    "detailPlaceholder": "कृपया रिपोर्ट का विवरण विस्तार से लिखें",
+    "duplicate": "यह आइटम पहले ही रिपोर्ट किया जा चुका है",
+    "error": "रिपोर्ट सबमिट करने में विफल रहा",
+    "ETC": "अन्य",
+    "FRAUD": "धोखाधड़ी/लेनदेन",
+    "PRIVACY": "व्यक्तिगत जानकारी का खुलासा",
+    "reasonLabel": "रिपोर्ट का कारण",
+    "SEXUAL": "अश्लीलता/उत्तेजना",
+    "SPAM": "Spam/विज्ञापन",
+    "submit": "रिपोर्ट सबमिट करें",
+    "success": "रिपोर्ट सबमिट कर दी गई है",
+    "title": "रिपोर्ट करें"
   },
   "store": {
     "actionBuyerDone": "सामान की प्राप्ति पूरी हुई",
@@ -2124,6 +2349,12 @@
       "TRANSLATE": "स्वचालित अनुवाद सदस्यता"
     },
     "renewBtn": "नवीनीकृत/बदलें",
+    "storeGrade": {
+      "L": "L (50↑)",
+      "M": "M (50↓)",
+      "S": "S (30↓)"
+    },
+    "storeGradeHint": "मेरे {count} उत्पाद — ग्रेड चुनें",
     "subscribeBtn": "सदस्यता लें",
     "subscribeFail": "सदस्यता प्रक्रिया विफल रही",
     "subscribeSuccess": "{product} सदस्यता शुरू हो गई है!",

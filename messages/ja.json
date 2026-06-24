@@ -241,6 +241,7 @@
       "beanAudit": "監査 Log",
       "beanFeePlan": "料金プラン管理",
       "beanSection": "☕ Bean 経済",
+      "beanTipPresets": "ギフトPreset",
       "beanToken": "Bean Dashboard",
       "beanTopUsers": "上位ユーザー",
       "beanTxn": "取引履歴",
@@ -248,6 +249,8 @@
       "board": "Board管理",
       "campaign": "キャンペーン承認",
       "chatSection": "Cafe 管理",
+      "checklist": "Open Beta Checklist",
+      "consents": "規約同意履歴",
       "dashboard": "Dashboard",
       "eventExclude": "除外管理",
       "eventGifts": "ギフト発送",
@@ -257,6 +260,7 @@
       "links": "アカウント連携状況",
       "logs": "Log管理",
       "payments": "支払い履歴",
+      "reports": "報告処理",
       "settle": "精算管理",
       "stats": "統計",
       "stdApprovals": "承認Workflow",
@@ -268,12 +272,13 @@
       "stdWords": "標準単語",
       "stickers": "Sticker 管理",
       "storeCategories": "商品 Category",
+      "storeDistCfg": "距離制限",
       "storeSection": "Store 管理",
       "subscriptions": "購読管理",
+      "subscrPricing": "購読料金プラン",
       "themes": "テーマ管理",
       "title": "Admin",
-      "users": "ユーザー管理",
-      "subscrPricing": "구독요금제"
+      "users": "ユーザー管理"
     },
     "payments": {
       "col": {
@@ -575,6 +580,7 @@
       "col": {
         "cd": "コード",
         "desc": "説明",
+        "nmEn": "英語名",
         "sortOrd": "順序",
         "theme": "テーマ",
         "tp": "グループ",
@@ -595,6 +601,7 @@
         "desc": "説明・タグ",
         "emoji": "絵文字",
         "nm": "テーマ名",
+        "nmEn": "Theme名(英語)",
         "sortOrd": "ソート順",
         "tp": "グループ",
         "useYn": "表示"
@@ -605,7 +612,8 @@
       "placeholder": {
         "cd": "ESPORTS",
         "desc": "#タグ #キーワード",
-        "nm": "eスポーツ"
+        "nm": "eスポーツ",
+        "nmEn": "eSports"
       },
       "saveFail": "保存に失敗しました",
       "saveSuccess": "テーマが登録されました",
@@ -700,6 +708,89 @@
       "out": "回収"
     },
     "homeTitle": "Dashboard",
+    "manual": {
+      "badge": "User Manual",
+      "collapse": "折りたたむ",
+      "expand": "詳細を見る",
+      "intro": "コンピューターに詳しくなくても大丈夫です。順番通りに進めてください😊 — 3つのことだけ覚えてください: ① Login ② 探索 ③ 売買",
+      "title": "Cafe.piの簡単な User Manual",
+      "topics": [
+        {
+          "icon": "⭐",
+          "steps": [
+            "グローバルな「Carrot Market」: 200以上の言語の自動通訳・Pi 簡単決済・Chat・中古品・店舗が1つのアプリに・距離順接続",
+            "業種を問わない「Siren Order」: 誰でもオーナー・Menu自由・即時通知・O2O Pickup"
+          ],
+          "title": "なぜCafe.piなのですか？"
+        },
+        {
+          "icon": "🎁",
+          "steps": [
+            "EVENT #1: TestPiでチャージして10種類のMissionを完了すると先着100名に5,000 Bean",
+            "EVENT #2: 自分の店舗を登録してMenu登録 + 取引Testまで完了すると先着100店舗に10,000 Bean",
+            "Event TabでMissionごとの参加Linkをたどると簡単に完了できます"
+          ],
+          "title": "Event — 今すぐ参加してください"
+        },
+        {
+          "icon": "🔑",
+          "steps": [
+            "Pi Browserで「連携Code生成」をタップすると6桁のCodeが表示されます (10分以内に使用)",
+            "Code (またはLink) をコピーして通常のBrowserに移動します",
+            "通常のBrowserでGoogle Login後、貼り付けて「連携する」をタップするとPi + Google 接続完了",
+            "Pi Browserはセキュリティ上、情報を保存しないため、6桁のCodeで2つのBrowserを安全に接続します"
+          ],
+          "title": "Login & アカウント接続"
+        },
+        {
+          "icon": "🎫",
+          "steps": [
+            "1 Pi = 100 Bean (Platform専用積立金) — 無料Planですぐに開始できます",
+            "必要なものだけ選んでサブスクリプション: PiCafé™(Premium Cafe) · PiShop™(商品登録) · PiTranslate™(無制限翻訳)",
+            "サブスクリプション料金はチャージしたBeanで決済し、年間決済は2ヶ月無料です"
+          ],
+          "title": "Bean & サブスクリプション"
+        },
+        {
+          "icon": "💬",
+          "steps": [
+            "興味のあるテーマのCafe Roomに入り無料でChatを開始します",
+            "「近くのCafe」をオンにすると周辺のCafeと近隣の人々を距離順に表示します",
+            "自動同時通訳で200以上の言語の誰とでも自分の言語で会話できます"
+          ],
+          "title": "Cafe & 自動通訳"
+        },
+        {
+          "icon": "📦",
+          "steps": [
+            "商品写真と価格(Pi)をアップロードすると自分の位置情報とともに近くの人に表示されます",
+            "周辺に出品された商品を距離順に見て気に入ったらPiで注文します",
+            "決済したPiはPlatformが一時的に安全に保管(Escrow)し、取引が完了すると販売者に渡されます"
+          ],
+          "title": "中古品Market (安全取引)"
+        },
+        {
+          "icon": "🏪",
+          "steps": [
+            "「店舗登録」で店舗名と位置を設定するとお客様が近くの店舗に来店します",
+            "Menu写真・価格・数量を登録します",
+            "お客様が注文するとTelegramで即座に通知が届きます (Menu・数量・金額)",
+            "準備中 → 準備完了 → Pickupの順で店舗で引き渡します"
+          ],
+          "title": "自分の店舗 (O2O)"
+        },
+        {
+          "icon": "🪙",
+          "steps": [
+            "現在Testnet Eventで受け取ったBeanはcafe.piの約束です",
+            "PlatformがMainnetに正式LaunchされBean Tokenが公式発行されると、",
+            "Testnetで獲得したEvent Tokenを同じく1:1でMainnet Beanとしてそのまま支給します",
+            "初期参加者の努力が失われないように保証するcafe.piの原則です"
+          ],
+          "title": "Testnet報酬、Mainnetでそのまま (約束)"
+        }
+      ]
+    },
     "noData": "Data なし",
     "normalRevenue": "一般プラン売上",
     "period30": "30日",
@@ -748,7 +839,31 @@
     },
     "unitCase": "件",
     "unitPerson": "名",
-    "userActivity": "活動 {days}日 · Content {content} · 決済 {payments}"
+    "userActivity": "活動 {days}日 · Content {content} · 決済 {payments}",
+    "whitepaper": {
+      "badge": "技術 Whitepaper",
+      "collapse": "折りたたむ",
+      "expand": "詳細を見る",
+      "footer": "Pi Network登録基準（Login・決済・Security・Data標準）を満たします。",
+      "highlight1Desc": "Pi Account + Google Accountをサポート。今後、カカオ・LINE・WeChatなどの統合 Loginを追加予定。",
+      "highlight1Title": "🤝 Pi · Google 統合 Login",
+      "highlight2Desc": "PiRC1（Token経済）· PiRC2（Subscription Service）· PiRC3（Escrow安全取引）を実装。",
+      "highlight2Title": "💳 Pi 決済 Service構築",
+      "intro": "Cafe.piは、Pi Browserの厳しい制約を構造的・暗号学的に解決し、資金の整合性とData標準を立ち上げ段階から遵守します。",
+      "pillar1Desc": "Pi Account Login・Pi決済を一次経路としてサポートします。決済はPiのみで行われ、Beanは1 Pi = 100 Beanの固定内部積立金です。",
+      "pillar1Title": "🟣 Pi 優先設計",
+      "pillar2Desc": "Cookieを保存しないPi Browserでも、Tokenベースの二重認証で安全にLogin・決済されます。無限LoopのないClient Gate設計。",
+      "pillar2Title": "📱 Pi Browser 完全互換",
+      "pillar3Desc": "全ての取引は追加専用（append-only）元帳に記録され、会計保存恒等式（発行 = 流通 + 回収）を常時検証します。過剰発行・二重支払いが構造的に不可能です。",
+      "pillar3Title": "💰 資金整合性無寛容",
+      "pillar4Desc": "KISA 21個のWeb脆弱性基準に対応し、HMAC-SHA256署名Tokenと定数時間比較で偽造・改ざんとTiming攻撃を防御します。",
+      "pillar4Title": "🔒 検証済みSecurity",
+      "pillar5Desc": "韓国Data産業振興院（K-DATA）のData標準を最初のTableから適用し、自動検証で強制することで、長期運用・監査の信頼性を確保します。",
+      "pillar5Title": "📊 政府公認 Data標準",
+      "pillar6Desc": "Server優先Renderingと並列Data Fetching、stale-while-revalidate Caching、位置・検索・Bundle最適化により、高速な初回画面とスムーズなUser Experienceを提供します。",
+      "pillar6Title": "⚡ Performance最適化",
+      "title": "Cafe.piの技術的強み"
+    }
   },
   "adminStd": {
     "domainTypeCode": "Code",
@@ -1111,10 +1226,14 @@
       "approveError": "承認エラー",
       "approveFail": "Server承認失敗",
       "approveInWallet": "Pi Wallet画面で決済を承認してください。",
+      "back": "戻る",
+      "capacityN": "{n}人",
       "completeError": "完了エラー",
       "completeFail": "完了処理失敗",
+      "createCostSuffix": "Beanが差し引かれます (残高不足の場合はチャージ案内)",
       "created": "Cafeが作成されました！",
       "createError": "Room作成エラー",
+      "createEventFree": "🎟️ Eventルームを作成",
       "createFail": "Room作成失敗",
       "createFree": "無料Room作成",
       "createMemo": "Cafe作成: {roomNm}",
@@ -1126,21 +1245,35 @@
       "endTimeHint": "終了時刻を過ぎると参加者(GUEST) Membershipが自動的に期限切れになります",
       "endTimeLabel": "Event終了時刻 *",
       "entryFee": "入場料 (参加者決済)",
+      "entryFeeBean": "{amount} Bean",
       "eventBusinessOnly": "Event CafeはBusiness Plan専用です",
+      "eventCreateCostDeduct": "生成料 {amount} Beanが差し引かれます。",
+      "eventCreateCostFree": "サブスクリプション特典で生成料が無料です。",
+      "eventCreateCostMemo": "Event Cafe作成料 {amount}",
       "eventCreated": "Event Roomが作成されました！",
       "eventCreateError": "Event Room作成エラー",
       "eventCreateFail": "Event Room作成失敗",
       "eventDesc": "参加者が入場料(π)を決済して入場する期間限定Roomです。作成費用はありません。",
       "eventTab": "🎟️ Event Room作成",
       "eventTitle": "Event Cafe作成",
+      "freeEntry": "無料",
+      "freeRoom7dHint": "無料で開設するCafeは無条件で7日間のみ維持され、延長できません。期間を直接指定するにはBean決済で開設してください。",
+      "freeRoom7dValidity": "有効期間7日 (無料開設)",
+      "freeRoomCapacityLimit": "無料で作成するCafeは最大10人まで可能です。",
+      "freeRoomPublicOnly": "無料で作成するCafeは公開のみで開設できます。",
+      "goChargingBean": "Beanをチャージしに行く →",
       "groupTab": "💬 Group Room",
       "groupTitle": "Group Cafe作成",
       "maxMembers": "最大定員",
       "name": "Cafe名前",
       "nameLabel": "Cafe名前 *",
+      "next": "次へ",
       "openBtn": "+ Cafe作成",
       "payAndCreate": "{amount} π決済およびRoom作成",
+      "payAndCreateEvent": "決済してEventルームを作成",
+      "payAndCreateGroup": "決済してルームを作成",
       "piBrowserOnly": "Pi Browserでのみ決済が可能です",
+      "premiumCreateCostMemo": "PREMIUM Cafe作成料 {amount}",
       "premiumTheme": "PREMIUM Theme",
       "premiumThemeOnce": "PREMIUM Theme単件",
       "privateEmoji": "🔒 非公開",
@@ -1153,6 +1286,7 @@
       "total": "合計",
       "unlimited": "無期限",
       "validity": "有効期間",
+      "validityDays": "{n}日",
       "visibility": "公開設定"
     },
     "customSticker": {
@@ -1408,6 +1542,34 @@
     "upgrade": "Upgrade",
     "yes": "はい"
   },
+  "consent": {
+    "agreeAll": "全てに同意",
+    "birthInvalid": "生年月日を正しく入力してください。",
+    "birthLabel": "生年月日",
+    "desc": "Cafe.piのご利用には、以下の規約に同意してください。（必須項目に同意後、利用可能）",
+    "errNetwork": "ネットワークエラーにより同意を保存できませんでした",
+    "errSave": "同意の保存に失敗しました",
+    "guardian": "14歳未満 — 法定代理人（保護者）の同意を得ました。",
+    "lbs": "位置情報収集・利用への同意",
+    "marketing": "Marketing情報受信への同意",
+    "note": "必須項目（利用規約・個人情報・位置情報）に同意することで、サービスを利用できます。",
+    "optional": "(任意)",
+    "privacy": "個人情報収集・利用への同意",
+    "processing": "処理中…",
+    "required": "(必須)",
+    "submit": "同意して続行",
+    "terms": "利用規約への同意",
+    "title": "サービス利用規約への同意",
+    "view": "表示"
+  },
+  "errorPage": {
+    "errDesc": "一時的なエラーの可能性があります。再度お試しいただくか、しばらくしてからアクセスしてください。",
+    "errTitle": "問題が発生しました",
+    "home": "ホームへ",
+    "nfDesc": "お探しのページは存在しないか、移動されました。",
+    "nfTitle": "ページが見つかりません",
+    "retry": "再試行"
+  },
   "event": {
     "agentCol": "エージェント名",
     "alreadyExcluded": "既に除外: {names}",
@@ -1572,6 +1734,50 @@
     "tabShopSub": "店舗先着順 Onboarding Event",
     "title": "🎖️ Mission Event",
     "totalCol": "合計"
+  },
+  "faq": {
+    "community": "Community運営ポリシー",
+    "email": "Eメールでのお問い合わせ",
+    "items": [
+      {
+        "a": "Pi Browserで「連携コード生成」をタップし、通常のブラウザでGoogleログイン後、そのコードを貼り付けて連携します。",
+        "q": "ログイン方法"
+      },
+      {
+        "a": "プラットフォーム専用の積立金です。1 Pi = 100 Beanでチャージし、購読やギフトなどに使用できますが、外部への換金はできません。",
+        "q": "Beanとは何ですか？"
+      },
+      {
+        "a": "Pi BrowserでPiで決済します。商品取引はエスクロー（安全保管）で保護されます。",
+        "q": "決済方法"
+      },
+      {
+        "a": "Mainnetの正式ローンチ・Bean Tokenの公式発行時に、Testnetイベントで受け取ったBeanを1:1でそのまま支給します。",
+        "q": "Testnetで受け取ったBeanはどうなりますか？"
+      },
+      {
+        "a": "払い戻しおよび契約解除ポリシーに従います。詳細については、以下の払い戻しポリシー文書をご参照ください。",
+        "q": "払い戻しは可能ですか？"
+      },
+      {
+        "a": "投稿・店舗などの「報告」ボタンから理由とともに提出できます。運営チームが確認後、対応します。",
+        "q": "報告方法"
+      },
+      {
+        "a": "近くのカフェ・店舗・商品を距離順に表示するために使用します。同意はマイページで撤回できます。",
+        "q": "位置情報が必要なのはなぜですか？"
+      }
+    ],
+    "lbs": "位置情報サービス規約",
+    "legalTitle": "規約・ポリシー",
+    "privacy": "プライバシーポリシー",
+    "refund": "払い戻しポリシー",
+    "subtitle": "疑問点を素早く確認してください",
+    "supportTitle": "カスタマーサポート",
+    "telegram": "Telegram",
+    "terms": "利用規約",
+    "title": "よくある質問",
+    "youth": "青少年保護ポリシー"
   },
   "header": {
     "admin": "Admin",
@@ -1829,6 +2035,25 @@
       "store": "🛍️ Store"
     },
     "title": "My Profile"
+  },
+  "report": {
+    "ABUSE": "誹謗中傷・嫌がらせ",
+    "button": "報告",
+    "cancel": "キャンセル",
+    "COPYRIGHT": "著作権侵害",
+    "detailLabel": "詳細説明 (任意)",
+    "detailPlaceholder": "報告内容を詳しくご記入ください",
+    "duplicate": "既に報告済みの項目です",
+    "error": "報告の受付に失敗しました",
+    "ETC": "その他",
+    "FRAUD": "詐欺・取引",
+    "PRIVACY": "個人情報漏洩",
+    "reasonLabel": "報告理由",
+    "SEXUAL": "わいせつ・扇情的",
+    "SPAM": "SPAM・広告",
+    "submit": "報告を提出",
+    "success": "報告が提出されました",
+    "title": "報告する"
   },
   "store": {
     "actionBuyerDone": "商品受領完了",
@@ -2124,6 +2349,12 @@
       "TRANSLATE": "自動翻訳 購読"
     },
     "renewBtn": "更新/変更",
+    "storeGrade": {
+      "L": "L (50個↑)",
+      "M": "M (50個↓)",
+      "S": "S (30個↓)"
+    },
+    "storeGradeHint": "商品 {count}個 — グレードを選択してください",
     "subscribeBtn": "購読する",
     "subscribeFail": "購読処理に失敗しました",
     "subscribeSuccess": "{product} の購読が開始されました！",

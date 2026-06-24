@@ -241,6 +241,7 @@
       "beanAudit": "Audit Log",
       "beanFeePlan": "Fee Plan Management",
       "beanSection": "☕ Bean Economy",
+      "beanTipPresets": "Gifting Presets",
       "beanToken": "Bean Dashboard",
       "beanTopUsers": "Top Users",
       "beanTxn": "Transaction History",
@@ -248,6 +249,8 @@
       "board": "Board Management",
       "campaign": "Campaign Approval",
       "chatSection": "Cafe Management",
+      "checklist": "Open Beta Checklist",
+      "consents": "Consent History",
       "dashboard": "Dashboard",
       "eventExclude": "Manage Exclusions",
       "eventGifts": "Send Gifts",
@@ -257,6 +260,7 @@
       "links": "Linked Accounts",
       "logs": "Log Management",
       "payments": "Payments",
+      "reports": "Report Management",
       "settle": "Settlement Management",
       "stats": "Stats",
       "stdApprovals": "Approval Workflow",
@@ -268,12 +272,13 @@
       "stdWords": "Standard Words",
       "stickers": "Sticker Management",
       "storeCategories": "Product Categories",
+      "storeDistCfg": "Distance Limit",
       "storeSection": "Store Management",
       "subscriptions": "Subscription Management",
+      "subscrPricing": "Subscription Plans",
       "themes": "Theme Management",
       "title": "Admin",
-      "users": "User Management",
-      "subscrPricing": "구독요금제"
+      "users": "User Management"
     },
     "payments": {
       "col": {
@@ -575,6 +580,7 @@
       "col": {
         "cd": "Code",
         "desc": "Description",
+        "nmEn": "English Name",
         "sortOrd": "Order",
         "theme": "Theme",
         "tp": "Group",
@@ -595,6 +601,7 @@
         "desc": "Description / Tags",
         "emoji": "Emoji",
         "nm": "Theme Name",
+        "nmEn": "Theme Name (English)",
         "sortOrd": "Sort Order",
         "tp": "Group",
         "useYn": "Visibility"
@@ -605,7 +612,8 @@
       "placeholder": {
         "cd": "ESPORTS",
         "desc": "#Tags #Keywords",
-        "nm": "eSports"
+        "nm": "eSports",
+        "nmEn": "eSports"
       },
       "saveFail": "Failed to save.",
       "saveSuccess": "Theme registered successfully.",
@@ -700,6 +708,89 @@
       "out": "Outflow"
     },
     "homeTitle": "Dashboard",
+    "manual": {
+      "badge": "User Manual",
+      "collapse": "Collapse",
+      "expand": "Expand",
+      "intro": "No worries if you're not a computer whiz. Just follow the steps 😊 — Only remember 3 things: ① Log in ② Explore ③ Buy and Sell",
+      "title": "Cafe.pi's Easy User Manual",
+      "topics": [
+        {
+          "icon": "⭐",
+          "steps": [
+            "Global Community Marketplace: 200+ languages auto-translation · Pi easy payment · Chat, second-hand, shops all in one app · Connect by distance",
+            "Siren Order for All Businesses: Anyone can be an owner · Flexible menu · Instant notifications · O2O pickup"
+          ],
+          "title": "Why Cafe.pi?"
+        },
+        {
+          "icon": "🎁",
+          "steps": [
+            "EVENT #1: Top up with TestPi and complete 10 missions to get 5,000 Bean for the first 100 participants.",
+            "EVENT #2: Register your shop, complete menu registration + transaction test, and the first 100 shops get 10,000 Bean.",
+            "You can easily complete these by following the participation links for each mission in the Events tab."
+          ],
+          "title": "Events — Join Now"
+        },
+        {
+          "icon": "🔑",
+          "steps": [
+            "In Pi Browser, press 'Generate Connection Code' to get a 6-digit code (use within 10 minutes).",
+            "Copy the code (or link) and paste it into a regular browser.",
+            "In the regular browser, after logging in with Google, paste it and press 'Connect' to complete the Pi + Google connection.",
+            "Pi Browser doesn't store information for security reasons, so the 6-digit code securely links the two browsers."
+          ],
+          "title": "Log in & Account Connection"
+        },
+        {
+          "icon": "🎫",
+          "steps": [
+            "1 Pi = 100 Bean (platform-exclusive credit) — You can start right away with a free plan.",
+            "Subscribe only to what you need: PiCafé™ (Premium Cafe) · PiShop™ (Product Registration) · PiTranslate™ (Unlimited Translation)",
+            "Subscription fees are paid with topped-up Bean, and annual payments get 2 months free."
+          ],
+          "title": "Bean & Subscriptions"
+        },
+        {
+          "icon": "💬",
+          "steps": [
+            "Enter a cafe room of your interest and start chatting for free.",
+            "If you turn on 'Nearby Cafes', it shows nearby cafes and neighbours by distance.",
+            "With automatic simultaneous interpretation, you can chat with anyone in 200+ languages in your own language."
+          ],
+          "title": "Cafe & Auto-translation"
+        },
+        {
+          "icon": "📦",
+          "steps": [
+            "If you upload product photos and prices (Pi), they will be shown to people nearby along with your location.",
+            "View items available nearby by distance, and if you like them, order with Pi.",
+            "The paid Pi is securely held by the platform (escrow) temporarily, and transferred to the seller once the transaction is complete."
+          ],
+          "title": "Second-hand Marketplace (Secure Transactions)"
+        },
+        {
+          "icon": "🏪",
+          "steps": [
+            "In 'Shop Registration', if you set your shop name and location, customers will find your nearby shop.",
+            "Register menu photos, prices, and quantities.",
+            "When a customer orders, you'll receive an instant notification via Telegram (menu · quantity · amount).",
+            "Hand over at the shop in the order of Preparing → Ready → Pickup."
+          ],
+          "title": "My Shop (O2O)"
+        },
+        {
+          "icon": "🪙",
+          "steps": [
+            "The Bean received from the current Testnet event is Cafe.pi's promise.",
+            "Once the platform officially launches on Mainnet and Bean Token is officially issued,",
+            "the event tokens earned on Testnet will be paid out identically, 1:1, as Mainnet Bean.",
+            "This is Cafe.pi's principle to ensure that the efforts of early participants are not lost."
+          ],
+          "title": "Testnet Rewards, As Is on Mainnet (Promise)"
+        }
+      ]
+    },
     "noData": "No Data",
     "normalRevenue": "Standard Plan Revenue",
     "period30": "30 days",
@@ -748,7 +839,31 @@
     },
     "unitCase": "cases",
     "unitPerson": "people",
-    "userActivity": "Activity {days} days · Content {content} · Payments {payments}"
+    "userActivity": "Activity {days} days · Content {content} · Payments {payments}",
+    "whitepaper": {
+      "badge": "Technical Whitepaper",
+      "collapse": "Collapse",
+      "expand": "Expand",
+      "footer": "Meets Pi Network listing criteria (Login, Payment, Security, Data Standards).",
+      "highlight1Desc": "Supports Pi Account + Google Account. Integrated logins for Kakao, LINE, WeChat, etc., to be added later.",
+      "highlight1Title": "🤝 Pi · Google Integrated Login",
+      "highlight2Desc": "Implementation of PiRC1 (Token Economy) · PiRC2 (Subscription Service) · PiRC3 (Escrow Secure Transactions).",
+      "highlight2Title": "💳 Pi Payment Service Establishment",
+      "intro": "Cafe.pi structurally and cryptographically addresses the stringent limitations of Pi Browser, ensuring financial integrity and data standards from its inception.",
+      "pillar1Desc": "Supports Pi account login and Pi payments as the primary method. Payments are made exclusively with Pi, and Bean is a fixed internal reserve where 1 Pi = 100 Bean.",
+      "pillar1Title": "🟣 Pi-First Design",
+      "pillar2Desc": "Secure login and payments are enabled with token-based two-factor authentication even in Pi Browser, which does not store cookies. Client gate design without infinite loops.",
+      "pillar2Title": "📱 Full Pi Browser Compatibility",
+      "pillar3Desc": "All transactions are recorded in an append-only ledger, and the accounting conservation identity (Issuance = Circulation + Recovery) is constantly verified. Over-issuance and double-spending are structurally impossible.",
+      "pillar3Title": "💰 Uncompromising Financial Integrity",
+      "pillar4Desc": "Responds to KISA's 21 web vulnerability standards and defends against forgery, tampering, and timing attacks with HMAC-SHA256 signed tokens and constant-time comparisons.",
+      "pillar4Title": "🔒 Verified Security",
+      "pillar5Desc": "Applies Korea Data Agency (K-DATA) data standards from the first table and enforces them with automatic verification, ensuring long-term operational and audit reliability.",
+      "pillar5Title": "📊 Government-Certified Data Standards",
+      "pillar6Desc": "Provides fast initial screens and smooth usability through server-first rendering, parallel data fetching, stale-while-revalidate caching, and location, search, and bundle optimisation.",
+      "pillar6Title": "⚡ Performance Optimisation",
+      "title": "Cafe.pi's Technical Strengths"
+    }
   },
   "adminStd": {
     "domainTypeCode": "Code",
@@ -1111,10 +1226,14 @@
       "approveError": "Approval Error",
       "approveFail": "Server Approval Failed",
       "approveInWallet": "Please approve the payment on the Pi Wallet screen.",
+      "back": "Back",
+      "capacityN": "{n} people",
       "completeError": "Completion Error",
       "completeFail": "Completion Failed",
+      "createCostSuffix": "Bean will be deducted (Top-up guidance if balance is insufficient)",
       "created": "Cafe created!",
       "createError": "Room Creation Error",
+      "createEventFree": "🎟️ Create event room",
       "createFail": "Room Creation Failed",
       "createFree": "Create Free Room",
       "createMemo": "Cafe Creation: {roomNm}",
@@ -1126,21 +1245,35 @@
       "endTimeHint": "After the end time, participant (GUEST) memberships will automatically expire",
       "endTimeLabel": "Event End Time *",
       "entryFee": "Entry Fee (Participant Payment)",
+      "entryFeeBean": "{amount} Bean",
       "eventBusinessOnly": "Event Cafes are exclusive to Business plans",
+      "eventCreateCostDeduct": "{amount} Bean creation fee will be deducted.",
+      "eventCreateCostFree": "Creation fee is free with subscription benefits.",
+      "eventCreateCostMemo": "Event room creation fee {amount}",
       "eventCreated": "Event Room created!",
       "eventCreateError": "Event Room Creation Error",
       "eventCreateFail": "Event Room Creation Failed",
       "eventDesc": "A limited-time room where participants pay an entry fee (π) to enter. There is no creation fee.",
       "eventTab": "🎟️ Create Event Room",
       "eventTitle": "Create Event Cafe",
+      "freeEntry": "Free",
+      "freeRoom7dHint": "Free rooms are only valid for 7 days and cannot be extended. To specify a custom duration, create the room with a Bean payment.",
+      "freeRoom7dValidity": "7-day validity (Free creation)",
+      "freeRoomCapacityLimit": "Free rooms can accommodate up to 10 people.",
+      "freeRoomPublicOnly": "Cafes created for free can only be opened as public.",
+      "goChargingBean": "Go to top up Bean →",
       "groupTab": "💬 Group Room",
       "groupTitle": "Create Group Cafe",
       "maxMembers": "Max Members",
       "name": "Cafe Name",
       "nameLabel": "Cafe Name *",
+      "next": "Next",
       "openBtn": "+ Create Cafe",
       "payAndCreate": "Pay {amount} π and Create Room",
+      "payAndCreateEvent": "Pay and create event room",
+      "payAndCreateGroup": "Pay and create room",
       "piBrowserOnly": "Payment is only available in Pi Browser",
+      "premiumCreateCostMemo": "PREMIUM room creation fee {amount}",
       "premiumTheme": "PREMIUM Theme",
       "premiumThemeOnce": "PREMIUM Theme One-time",
       "privateEmoji": "🔒 Private",
@@ -1153,6 +1286,7 @@
       "total": "Total",
       "unlimited": "Unlimited",
       "validity": "Validity Period",
+      "validityDays": "{n} days",
       "visibility": "Visibility"
     },
     "customSticker": {
@@ -1408,6 +1542,34 @@
     "upgrade": "Upgrade",
     "yes": "Yes"
   },
+  "consent": {
+    "agreeAll": "Agree to All",
+    "birthInvalid": "Please enter a valid date of birth.",
+    "birthLabel": "Date of Birth",
+    "desc": "Please agree to the terms below to use Cafe.pi. (Service available after agreeing to required items)",
+    "errNetwork": "Failed to save consent due to a network error.",
+    "errSave": "Failed to save consent.",
+    "guardian": "Under 14 years old — Consent from legal guardian (parent/carer) obtained.",
+    "lbs": "Agree to Collection and Use of Location Information",
+    "marketing": "Agree to Receive Marketing Information",
+    "note": "You must agree to the required items (Terms of Service, Personal Information, Location Information) to use the service.",
+    "optional": "(Optional)",
+    "privacy": "Agree to Collection and Use of Personal Information",
+    "processing": "Processing...",
+    "required": "(Required)",
+    "submit": "Agree and Continue",
+    "terms": "Agree to Terms of Service",
+    "title": "Consent to Use Service",
+    "view": "View"
+  },
+  "errorPage": {
+    "errDesc": "This might be a temporary error. Please try again or come back later.",
+    "errTitle": "Something went wrong.",
+    "home": "Home",
+    "nfDesc": "The page you requested doesn't exist or has been moved.",
+    "nfTitle": "Page not found.",
+    "retry": "Try again"
+  },
   "event": {
     "agentCol": "Agent Name",
     "alreadyExcluded": "Already excluded: {names}",
@@ -1572,6 +1734,50 @@
     "tabShopSub": "First-Come, First-Served Shop Onboarding Event",
     "title": "🎖️ Mission Event",
     "totalCol": "Total"
+  },
+  "faq": {
+    "community": "Community Guidelines",
+    "email": "Email Enquiry",
+    "items": [
+      {
+        "a": "In the Pi Browser, tap 'Generate Link Code', then log in with Google in a regular browser and paste the code to link your accounts.",
+        "q": "How do I log in?"
+      },
+      {
+        "a": "It's a platform-exclusive credit. You can top up 1 Pi = 100 Bean to use for subscriptions, gifts, etc. It cannot be exchanged externally.",
+        "q": "What is Bean?"
+      },
+      {
+        "a": "Payments are made with Pi in the Pi Browser. Product transactions are protected by escrow (secure holding).",
+        "q": "How do I make a payment?"
+      },
+      {
+        "a": "Upon official Mainnet launch and official Bean Token issuance, Beans received from Testnet events will be issued 1:1.",
+        "q": "What happens to Beans received on the Testnet?"
+      },
+      {
+        "a": "Refunds and subscription cancellations follow our policy. Please refer to the refund policy document below for details.",
+        "q": "Can I get a refund?"
+      },
+      {
+        "a": "You can submit a report for posts, shops, etc., using the 'Report' button with a reason. Our operations team will review and take action.",
+        "q": "How do I report something?"
+      },
+      {
+        "a": "It's used to show nearby cafes, stores, and products by distance. Consent can be withdrawn on My Page.",
+        "q": "Why is location information needed?"
+      }
+    ],
+    "lbs": "Location-Based Service Terms",
+    "legalTitle": "Terms & Policies",
+    "privacy": "Privacy Policy",
+    "refund": "Refund Policy",
+    "subtitle": "Quickly find answers to your questions.",
+    "supportTitle": "Customer Support",
+    "telegram": "Telegram",
+    "terms": "Terms of Service",
+    "title": "Frequently Asked Questions",
+    "youth": "Youth Protection Policy"
   },
   "header": {
     "admin": "Admin",
@@ -1829,6 +2035,25 @@
       "store": "🛍️ Store"
     },
     "title": "My Profile"
+  },
+  "report": {
+    "ABUSE": "Abuse / Harassment",
+    "button": "Report",
+    "cancel": "Cancel",
+    "COPYRIGHT": "Copyright Infringement",
+    "detailLabel": "Detailed Description (Optional)",
+    "detailPlaceholder": "Please describe the report in detail.",
+    "duplicate": "You've already reported this item.",
+    "error": "Failed to submit report.",
+    "ETC": "Other",
+    "FRAUD": "Fraud / Transaction",
+    "PRIVACY": "Personal Information Exposure",
+    "reasonLabel": "Reason for Report",
+    "SEXUAL": "Obscenity / Indecency",
+    "SPAM": "Spam / Advertising",
+    "submit": "Submit Report",
+    "success": "Report submitted successfully.",
+    "title": "Report"
   },
   "store": {
     "actionBuyerDone": "Mark as Received",
@@ -2124,6 +2349,12 @@
       "TRANSLATE": "Auto-Translate Subscription"
     },
     "renewBtn": "Renew/Change",
+    "storeGrade": {
+      "L": "L (50+ items)",
+      "M": "M (up to 50 items)",
+      "S": "S (up to 30 items)"
+    },
+    "storeGradeHint": "My products {count} — select a grade",
     "subscribeBtn": "Subscribe",
     "subscribeFail": "Subscription processing failed",
     "subscribeSuccess": "{product} subscription has started!",

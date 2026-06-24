@@ -241,6 +241,7 @@
       "beanAudit": "Audit Log",
       "beanFeePlan": "Fooiplanbestuur",
       "beanSection": "☕ Bean Ekonomie",
+      "beanTipPresets": "Geskenk Voorafinstellings",
       "beanToken": "Bean Dashboard",
       "beanTopUsers": "Topgebruikers",
       "beanTxn": "Transaksiegeskiedenis",
@@ -248,6 +249,8 @@
       "board": "Board Bestuur",
       "campaign": "Veldtog Goedkeuring",
       "chatSection": "Kafee Bestuur",
+      "checklist": "Open Beta Checklist",
+      "consents": "Toestemmingsgeskiedenis",
       "dashboard": "Dashboard",
       "eventExclude": "Bestuur uitsluitings",
       "eventGifts": "Stuur geskenke",
@@ -257,6 +260,7 @@
       "links": "Rekeningkoppelingsstatus",
       "logs": "Log Bestuur",
       "payments": "Betalingsgeskiedenis",
+      "reports": "Rapporthantering",
       "settle": "Vereffening Bestuur",
       "stats": "Statistiek",
       "stdApprovals": "Goedkeurings Workflow",
@@ -268,12 +272,13 @@
       "stdWords": "Standaardwoorde",
       "stickers": "Sticker Bestuur",
       "storeCategories": "Produk Category",
+      "storeDistCfg": "Afstandsbeperking",
       "storeSection": "Store Bestuur",
       "subscriptions": "Intekening Bestuur",
+      "subscrPricing": "Intekeningpryse",
       "themes": "Tema Bestuur",
       "title": "Admin",
-      "users": "Gebruikersbestuur",
-      "subscrPricing": "구독요금제"
+      "users": "Gebruikersbestuur"
     },
     "payments": {
       "col": {
@@ -575,6 +580,7 @@
       "col": {
         "cd": "Kode",
         "desc": "Beskrywing",
+        "nmEn": "Engelse Naam",
         "sortOrd": "Volgorde",
         "theme": "Tema",
         "tp": "Groep",
@@ -595,6 +601,7 @@
         "desc": "Beskrywing·Tag",
         "emoji": "Emoji",
         "nm": "Tema Naam",
+        "nmEn": "Tema Naam (Engels)",
         "sortOrd": "Sorteervolgorde",
         "tp": "Groep",
         "useYn": "Blootstelling"
@@ -605,7 +612,8 @@
       "placeholder": {
         "cd": "ESPORTS",
         "desc": "#Tag #Sleutelwoord",
-        "nm": "e-sport"
+        "nm": "e-sport",
+        "nmEn": "eSports"
       },
       "saveFail": "Kon nie stoor nie",
       "saveSuccess": "Tema is geregistreer",
@@ -700,6 +708,89 @@
       "out": "Onttrekking"
     },
     "homeTitle": "Dashboard",
+    "manual": {
+      "badge": "Gebruikershandleiding",
+      "collapse": "Vou toe",
+      "expand": "Brei uit",
+      "intro": "Dis oukei as jy nie veel van rekenaars weet nie. Volg net die stappe in volgorde 😊 — Onthou net 3 dinge: ① Teken in ② Verken ③ Koop en verkoop",
+      "title": "Cafe.pi se Maklike Gebruikershandleiding",
+      "topics": [
+        {
+          "icon": "⭐",
+          "steps": [
+            "Globale 'Wortel': 200+ tale outomatiese vertaling · Pi maklike betaling · Chat·tweedehandse·winkel in een app · Verbind volgens afstand",
+            "'Siren Order' wat nie bedryf diskrimineer nie: Enigiemand kan 'n baas wees · Menu vryheid · Onmiddellike kennisgewing · O2O Pickup"
+          ],
+          "title": "Hoekom Cafe.pi?"
+        },
+        {
+          "icon": "🎁",
+          "steps": [
+            "EVENT #1: Laai met Test Pi en as jy 10 missies voltooi, 5,000 Bean aan die eerste 100 mense",
+            "EVENT #2: Registreer jou winkel en as jy Menu registrasie + transaksie toets voltooi, 10,000 Bean aan die eerste 100 plekke",
+            "In die Event tab, as jy die deelname skakel vir elke missie volg, kan jy dit maklik voltooi"
+          ],
+          "title": "Event — Neem nou deel"
+        },
+        {
+          "icon": "🔑",
+          "steps": [
+            "In Pi Browser, as jy 'Genereer verbindingskode' druk, verskyn 'n 6-syfer kode (Gebruik binne 10 minute)",
+            "Kopieer die kode (of skakel) en skuif dit na 'n gewone Browser",
+            "In 'n gewone Browser, na Google Login, plak dit en druk 'Verbind', dan Pi + Google verbinding voltooi",
+            "Pi Browser stoor nie inligting om veiligheidsredes nie, dit verbind die twee Browsers veilig met 'n 6-syfer kode"
+          ],
+          "title": "Login & Rekeningverbinding"
+        },
+        {
+          "icon": "🎫",
+          "steps": [
+            "1 Pi = 100 Bean (Platform-eksklusiewe reserwe) — Jy kan dadelik met 'n gratis Plan begin",
+            "Kies net wat jy nodig het om in te teken: PiCafé™(Premium Cafe) · PiShop™(Produk Registrasie) · PiTranslate™(Onbeperkte Vertaling)",
+            "Subskripsiefooie word met gelaaide Bean betaal, en jaarlikse betaling is 2 maande gratis"
+          ],
+          "title": "Bean & Subskripsie"
+        },
+        {
+          "icon": "💬",
+          "steps": [
+            "Gaan 'n Cafe kamer van jou belangstelling binne en begin gratis te Chat",
+            "As jy 'Naby Cafe' aanskakel, wys dit nabygeleë Cafes en bure volgens afstand",
+            "Met outomatiese gelyktydige vertaling kan jy met enigiemand in 200+ tale in jou eie taal gesels"
+          ],
+          "title": "Cafe & Outomatiese vertaling"
+        },
+        {
+          "icon": "📦",
+          "steps": [
+            "As jy produkfoto's en prys (Pi) oplaai, sal dit aan mense naby jou gewys word saam met jou ligging",
+            "Bekyk items wat naby beskikbaar is volgens afstand en as jy daarvan hou, bestel met Pi",
+            "Die betaalde Pi word tydelik en veilig deur die Platform gehou (eskrow), en aan die verkoper oorgedra wanneer die transaksie voltooi is"
+          ],
+          "title": "Tweedehandse mark (Veilige transaksie)"
+        },
+        {
+          "icon": "🏪",
+          "steps": [
+            "In 'Winkel Registrasie', as jy die winkelnaam en ligging instel, sal klante na die naaste winkel kom",
+            "Registreer Menu foto's · prys · hoeveelheid",
+            "Wanneer 'n klant bestel, ontvang jy onmiddellik 'n kennisgewing via Telegram (Menu · Hoeveelheid · Bedrag)",
+            "In die volgorde van Voorberei → Gereed → Pickup, gee dit by die winkel oor"
+          ],
+          "title": "My winkel (O2O)"
+        },
+        {
+          "icon": "🪙",
+          "steps": [
+            "Die Bean wat nou van die Testnet Event ontvang is, is cafe.pi se belofte",
+            "Wanneer die Platform amptelik op Mainnet launched word en Bean Token amptelik uitgereik word,",
+            "Die Event Tokens wat op Testnet verdien is, sal identies 1:1 as Mainnet Bean uitbetaal word",
+            "Dit is cafe.pi se beginsel om te verseker dat die pogings van vroeë deelnemers nie verdwyn nie"
+          ],
+          "title": "Testnet belonings, soos dit is op Mainnet (Beloof)"
+        }
+      ]
+    },
     "noData": "Geen Data",
     "normalRevenue": "Inkomste uit normale planne",
     "period30": "30 dae",
@@ -748,7 +839,31 @@
     },
     "unitCase": "geval",
     "unitPerson": "persoon",
-    "userActivity": "Aktiwiteit {days} dae · Content {content} · Betalings {payments}"
+    "userActivity": "Aktiwiteit {days} dae · Content {content} · Betalings {payments}",
+    "whitepaper": {
+      "badge": "Tegniese Whitepaper",
+      "collapse": "Vou toe",
+      "expand": "Sien meer",
+      "footer": "Voldoen aan Pi Network-noteringskriteria (Aanmelding, Betaling, Sekuriteit, Data Standaarde).",
+      "highlight1Desc": "Ondersteun Pi-rekening + Google-rekening. Geïntegreerde Aanmelding vir Kakao, Line, WeChat, ens. sal in die toekoms bygevoeg word.",
+      "highlight1Title": "🤝 Pi · Google Geïntegreerde Aanmelding",
+      "highlight2Desc": "Implementering van PiRC1 (Token Ekonomie) · PiRC2 (Subskripsiediens) · PiRC3 (Eskro Veilige Transaksie).",
+      "highlight2Title": "💳 Pi Betaaldiensontwikkeling",
+      "intro": "Cafe.pi los die uitdagende beperkings van Pi Browser struktureel en kriptografies op, en handhaaf finansiële integriteit en Data standaarde vanaf die bekendstellingsfase.",
+      "pillar1Desc": "Ondersteun Pi-rekening Aanmelding en Pi-betaling as die primêre roete. Betalings word slegs met Pi gemaak, en Bean is 'n vaste interne reserwe van 1 Pi = 100 Bean.",
+      "pillar1Title": "🟣 Pi Prioriteit Ontwerp",
+      "pillar2Desc": "Selfs in Pi Browser, wat nie Koekies stoor nie, word veilige Aanmelding en betaling met Token-gebaseerde tweefaktor-verifikasie gedoen. Kliëntpoortontwerp sonder oneindige lusse.",
+      "pillar2Title": "📱 Pi Browser Volledige Verenigbaarheid",
+      "pillar3Desc": "Alle transaksies word in 'n append-only grootboek aangeteken, en die rekeningkundige bewaring-identiteit (uitreiking = sirkulasie + herwinning) word voortdurend geverifieer. Ooruitreiking en dubbelbetaling is struktureel onmoontlik.",
+      "pillar3Title": "💰 Nul Toleransie vir Finansiële Integriteit",
+      "pillar4Desc": "Reageer op KISA se 21 webkwesbaarheidstandaarde, en verdedig teen vervalsing en tydsberekeningaanvalle met HMAC-SHA256 handtekening Token en konstante tyd vergelyking.",
+      "pillar4Title": "🔒 Geverifieerde Sekuriteit",
+      "pillar5Desc": "Pas K-DATA (Korea Data Industry Promotion Agency) Data standaarde vanaf die eerste Tabel toe en dwing dit af met outomatiese verifikasie, wat langtermyn bedryfs- en ouditbetroubaarheid verseker.",
+      "pillar5Title": "📊 Regeringsgesertifiseerde Data Standaarde",
+      "pillar6Desc": "Bied vinnige eerste skerm en gladde bruikbaarheid met bediener-eerste weergawe en parallelle Data-ophaling, stale-while-revalidate Caching, ligging-, soek- en bundeloptimalisering.",
+      "pillar6Title": "⚡ Prestasie-optimalisering",
+      "title": "Tegniese Sterkpunte van Cafe.pi"
+    }
   },
   "adminStd": {
     "domainTypeCode": "Kode",
@@ -1111,10 +1226,14 @@
       "approveError": "Goedkeuringsfout",
       "approveFail": "Server goedkeuring het misluk",
       "approveInWallet": "Keur die betaling op die Pi Wallet-skerm goed.",
+      "back": "Terug",
+      "capacityN": "{n} mense",
       "completeError": "Voltooiingsfout",
       "completeFail": "Voltooiing het misluk",
+      "createCostSuffix": "Bean sal afgetrek word (Leiding vir herlaai as balans onvoldoende is)",
       "created": "Kafee is geskep!",
       "createError": "Room skeppingsfout",
+      "createEventFree": "🎟️ Skep Event-kamer",
       "createFail": "Room skepping het misluk",
       "createFree": "Skep gratis Room",
       "createMemo": "Kafee Skepping: {roomNm}",
@@ -1126,21 +1245,35 @@
       "endTimeHint": "Na die eindtyd sal die deelnemer (GUEST) se Lidmaatskap outomaties verval",
       "endTimeLabel": "Event Eindtyd *",
       "entryFee": "Toegangsgeld (Deelnemer betaal)",
+      "entryFeeBean": "{amount} Bean",
       "eventBusinessOnly": "Event Kafees is slegs vir Business Plan",
+      "eventCreateCostDeduct": " Skeppingsfooi van {amount} Bean sal afgetrek word.",
+      "eventCreateCostFree": " As 'n subskripsievoordeel, is die skeppingsfooi gratis.",
+      "eventCreateCostMemo": "Event Kafee skeppingsfooi {amount}",
       "eventCreated": "Event Room is geskep!",
       "eventCreateError": "Event Room skeppingsfout",
       "eventCreateFail": "Event Room skepping het misluk",
       "eventDesc": "Dit is 'n tydsbeperkte Room waar deelnemers 'n toegangsgeld (π) betaal om in te gaan. Daar is geen skeppingskoste nie.",
       "eventTab": "🎟️ Skep Event Room",
       "eventTitle": "Skep Event Kafee",
+      "freeEntry": "Gratis",
+      "freeRoom7dHint": "Kafées wat gratis geskep word, word slegs vir 7 dae gehandhaaf en kan nie verleng word nie. Om die tydperk self te spesifiseer, skep dit met Bean-betaling.",
+      "freeRoom7dValidity": "Geldigheidsperiode 7 dae (Gratis skepping)",
+      "freeRoomCapacityLimit": "Gratis geskepte kafees kan tot 10 mense hê.",
+      "freeRoomPublicOnly": "Cafes wat gratis geskep word, kan slegs as publiek geopen word.",
+      "goChargingBean": "Gaan Bean herlaai →",
       "groupTab": "💬 Groep Room",
       "groupTitle": "Skep Groep Kafee",
       "maxMembers": "Maksimum Lede",
       "name": "Kafee Naam",
       "nameLabel": "Kafee Naam *",
+      "next": "Volgende",
       "openBtn": "+ Skep Kafee",
       "payAndCreate": "Betaal {amount} π en skep Room",
+      "payAndCreateEvent": "Betaal en skep Event-kamer",
+      "payAndCreateGroup": "Betaal en skep kamer",
       "piBrowserOnly": "Betaling is slegs moontlik in Pi Browser",
+      "premiumCreateCostMemo": "PREMIUM Kafee skeppingsfooi {amount}",
       "premiumTheme": "PREMIUM Tema",
       "premiumThemeOnce": "PREMIUM Tema eenmalig",
       "privateEmoji": "🔒 Privaat",
@@ -1153,6 +1286,7 @@
       "total": "Totaal",
       "unlimited": "Onbeperk",
       "validity": "Geldigheid",
+      "validityDays": "{n} dae",
       "visibility": "Sigbaarheid"
     },
     "customSticker": {
@@ -1408,6 +1542,34 @@
     "upgrade": "Upgrade",
     "yes": "Ja"
   },
+  "consent": {
+    "agreeAll": "Stem in tot alles",
+    "birthInvalid": "Voer asseblief 'n geldige geboortedatum in.",
+    "birthLabel": "Geboortedatum",
+    "desc": "Stem asseblief in tot die bepalings hieronder om Cafe.pi te gebruik. (Beskikbaar na instemming tot verpligte items)",
+    "errNetwork": "Kon nie toestemming stoor nie weens 'n netwerkfout",
+    "errSave": "Kon nie toestemming stoor nie",
+    "guardian": "Onder 14 jaar oud — Toestemming van wettige voog (ouer) is verkry.",
+    "lbs": "Stem in tot die versameling en gebruik van ligginginligting",
+    "marketing": "Stem in tot die ontvangs van bemarkingsinligting",
+    "note": "Jy moet instem tot die verpligte items (Gebruiksvoorwaardes, Persoonlike Inligting, Ligginginligting) om die diens te gebruik.",
+    "optional": "(Opsioneel)",
+    "privacy": "Stem in tot die versameling en gebruik van persoonlike inligting",
+    "processing": "Besig om te verwerk…",
+    "required": "(Verpligtend)",
+    "submit": "Stem in en gaan voort",
+    "terms": "Stem in tot Gebruiksvoorwaardes",
+    "title": "Diensgebruikstoestemming",
+    "view": "Bekyk"
+  },
+  "errorPage": {
+    "errDesc": "Dit kan 'n tydelike fout wees. Probeer asseblief weer of meld later aan.",
+    "errTitle": "’n Probleem het voorgekom",
+    "home": "Tuis",
+    "nfDesc": "Die bladsy wat jy aangevra het, bestaan nie of is geskuif.",
+    "nfTitle": "Bladsy nie gevind nie",
+    "retry": "Probeer weer"
+  },
   "event": {
     "agentCol": "Agentnaam",
     "alreadyExcluded": "Reeds uitgesluit: {names}",
@@ -1572,6 +1734,50 @@
     "tabShopSub": "Winkel Eerste-kom Onboarding Event",
     "title": "🎖️ Missie Event",
     "totalCol": "Totaal"
+  },
+  "faq": {
+    "community": "Gemeenskapsbedryfsbeleid",
+    "email": "E-pos Navraag",
+    "items": [
+      {
+        "a": "Druk 'Genereer Koppelkode' in die Pi Browser, meld aan by Google in 'n gewone Browser, en plak dan die kode om te koppel.",
+        "q": "Hoe meld ek aan?"
+      },
+      {
+        "a": "Dit is 'n platform-eksklusiewe reserwe. Laai op met 1 Pi = 100 Bean om te gebruik vir intekeninge, geskenke, ens., en eksterne omruiling is nie moontlik nie.",
+        "q": "Wat is Bean?"
+      },
+      {
+        "a": "Betaal met Pi in die Pi Browser. Produktransaksies word beskerm deur 'n Escrow (veilige bewaring).",
+        "q": "Hoe betaal ek?"
+      },
+      {
+        "a": "Wanneer Mainnet amptelik bekendgestel word en Bean Token amptelik uitgereik word, sal die Bean wat deur Testnet-geleenthede ontvang is, 1:1 uitbetaal word.",
+        "q": "Wat gebeur met die Bean wat ek op Testnet ontvang het?"
+      },
+      {
+        "a": "Ons volg die terugbetalings- en herroepingsbeleid. Vir meer besonderhede, verwys asseblief na die terugbetalingsbeleid-dokument hieronder.",
+        "q": "Is terugbetalings moontlik?"
+      },
+      {
+        "a": "U kan dit indien met die 'Rapporteer'-knoppie op plasings, winkels, ens., saam met die rede. Die bedryfspan sal dit hersien en aksie neem.",
+        "q": "Hoe rapporteer ek?"
+      },
+      {
+        "a": "Dit word gebruik om nabygeleë kafees, winkels en produkte volgens afstand te wys. Toestemming kan op My Page herroep word.",
+        "q": "Hoekom is ligginginligting nodig?"
+      }
+    ],
+    "lbs": "Ligginggebaseerde Diensbepalings",
+    "legalTitle": "Bepalings en Beleide",
+    "privacy": "Privaatheidsbeleid",
+    "refund": "Terugbetalingsbeleid",
+    "subtitle": "Vind vinnig antwoorde op jou vrae",
+    "supportTitle": "Kliëntediens",
+    "telegram": "Telegram",
+    "terms": "Gebruiksvoorwaardes",
+    "title": "Gereelde Vrae",
+    "youth": "Jeugbeskermingsbeleid"
   },
   "header": {
     "admin": "Admin",
@@ -1829,6 +2035,25 @@
       "store": "🛍️ Store"
     },
     "title": "My Profiel"
+  },
+  "report": {
+    "ABUSE": "Mishandeling/Teistering",
+    "button": "Rapporteer",
+    "cancel": "Kanselleer",
+    "COPYRIGHT": "Kopieregskending",
+    "detailLabel": "Besonderhede (opsioneel)",
+    "detailPlaceholder": "Beskryf asseblief die rapport in detail",
+    "duplicate": "Hierdie item is reeds aangemeld",
+    "error": "Aanmelding het misluk",
+    "ETC": "Ander",
+    "FRAUD": "Bedrog/Transaksie",
+    "PRIVACY": "Privaatheidsblootstelling",
+    "reasonLabel": "Rede vir Rapport",
+    "SEXUAL": "Obsenite/Suggestief",
+    "SPAM": "Spam/Advertensie",
+    "submit": "Dien Rapport In",
+    "success": "Rapport is ingedien",
+    "title": "Rapporteer"
   },
   "store": {
     "actionBuyerDone": "Item ontvangs voltooi",
@@ -2124,6 +2349,12 @@
       "TRANSLATE": "Outomatiese Vertaling Inskrywing"
     },
     "renewBtn": "Hernu/Verander",
+    "storeGrade": {
+      "L": "L (50↑)",
+      "M": "M (50↓)",
+      "S": "S (30↓)"
+    },
+    "storeGradeHint": "My produkte {count} — kies 'n graad",
     "subscribeBtn": "Teken in",
     "subscribeFail": "Inskrywing verwerking het misluk",
     "subscribeSuccess": "{product} inskrywing het begin!",

@@ -241,6 +241,7 @@
       "beanAudit": "مراجعة Log",
       "beanFeePlan": "إدارة Fee Plan",
       "beanSection": "اقتصاد Bean ☕",
+      "beanTipPresets": "Gift Presets",
       "beanToken": "Dashboard Bean",
       "beanTopUsers": "أعلى المستخدمين",
       "beanTxn": "سجل المعاملات",
@@ -248,6 +249,8 @@
       "board": "إدارة Board",
       "campaign": "الموافقة على Campaign",
       "chatSection": "إدارة الكافيه",
+      "checklist": "Open Beta Checklist",
+      "consents": "سجل الموافقات على الشروط والأحكام",
       "dashboard": "Dashboard",
       "eventExclude": "إدارة الاستثناءات",
       "eventGifts": "إرسال هدايا",
@@ -257,6 +260,7 @@
       "links": "حالة ربط الحسابات",
       "logs": "إدارة الـ Log",
       "payments": "سجل المدفوعات",
+      "reports": "معالجة البلاغات",
       "settle": "إدارة التسويات",
       "stats": "إحصائيات",
       "stdApprovals": "سير عمل الموافقات",
@@ -268,12 +272,13 @@
       "stdWords": "كلمات قياسية",
       "stickers": "إدارة الملصقات",
       "storeCategories": "Product Category",
+      "storeDistCfg": "تحديد المسافة",
       "storeSection": "إدارة Store",
       "subscriptions": "إدارة الاشتراكات",
+      "subscrPricing": "خطط الاشتراك",
       "themes": "إدارة Theme",
       "title": "Admin",
-      "users": "إدارة المستخدمين",
-      "subscrPricing": "구독요금제"
+      "users": "إدارة المستخدمين"
     },
     "payments": {
       "col": {
@@ -575,6 +580,7 @@
       "col": {
         "cd": "Code",
         "desc": "الوصف",
+        "nmEn": "الاسم الإنجليزي",
         "sortOrd": "الترتيب",
         "theme": "Theme",
         "tp": "Group",
@@ -595,6 +601,7 @@
         "desc": "وصف و Tag",
         "emoji": "Emoji",
         "nm": "اسم Theme",
+        "nmEn": "Theme Name (English)",
         "sortOrd": "ترتيب الفرز",
         "tp": "Group",
         "useYn": "عرض"
@@ -605,7 +612,8 @@
       "placeholder": {
         "cd": "ESPORTS",
         "desc": "#Tag #Keyword",
-        "nm": "e-sports"
+        "nm": "e-sports",
+        "nmEn": "eSports"
       },
       "saveFail": "فشل الحفظ",
       "saveSuccess": "تم تسجيل Theme بنجاح",
@@ -700,6 +708,89 @@
       "out": "تدفق للخارج"
     },
     "homeTitle": "Dashboard",
+    "manual": {
+      "badge": "دليل المستخدم",
+      "collapse": "إخفاء",
+      "expand": "عرض المزيد",
+      "intro": "مش مشكلة لو مش بتفهم في الكمبيوتر كويس. بس اتبع الخطوات بالترتيب 😊 — افتكر 3 حاجات بس: ① Login ② استكشف ③ بيع واشتري",
+      "title": "دليل استخدام Cafe.pi السهل",
+      "topics": [
+        {
+          "icon": "⭐",
+          "steps": [
+            "تطبيق 'جزر' العالمي: ترجمة فورية لأكثر من 200 لغة · دفع Pi سهل · شات، مستعمل، ومحلات في تطبيق واحد · تواصل حسب المسافة",
+            "'Siren Order' اللي يناسب أي نوع عمل: أي حد ممكن يكون صاحب عمل · قائمة طعام مرنة · إشعارات فورية · استلام O2O"
+          ],
+          "title": "ليه Cafe.pi؟"
+        },
+        {
+          "icon": "🎁",
+          "steps": [
+            "EVENT #1: اشحن بـ TestPi ولو كملت 10 مهمات، أول 100 شخص هياخدوا 5,000 Bean",
+            "EVENT #2: سجل محلك ولو كملت تسجيل القائمة + اختبار المعاملات، أول 100 محل هياخدوا 10,000 Bean",
+            "في تبويب الـ Event، لو تابعت رابط المشاركة لكل مهمة هتقدر تكملها بسهولة"
+          ],
+          "title": "Event — شارك دلوقتي"
+        },
+        {
+          "icon": "🔑",
+          "steps": [
+            "في Pi Browser، لو دوست على 'إنشاء كود الربط' هيظهرلك كود من 6 أرقام (استخدمه في خلال 10 دقايق)",
+            "انسخ الكود (أو الرابط) وانقله لمتصفح عادي",
+            "في المتصفح العادي، بعد ما تعمل Login بجوجل، اعمل Paste و دوس على 'ربط' يبقى ربط Pi + Google اكتمل",
+            "Pi Browser مش بيخزن معلومات لأسباب أمنية، عشان كده بيربط المتصفحين بأمان بكود من 6 أرقام"
+          ],
+          "title": "Login & ربط الحساب"
+        },
+        {
+          "icon": "🎫",
+          "steps": [
+            "1 Pi = 100 Bean (رصيد خاص بالمنصة) — ممكن تبدأ على طول بخطة مجانية",
+            "اشترك في اللي محتاجه بس: PiCafé™ (كافيه Premium) · PiShop™ (تسجيل منتجات) · PiTranslate™ (ترجمة غير محدودة)",
+            "رسوم الاشتراك بتدفعها بالـ Bean اللي شحنته، والدفع السنوي بتاخد عليه شهرين مجاناً"
+          ],
+          "title": "Bean & اشتراك"
+        },
+        {
+          "icon": "💬",
+          "steps": [
+            "ادخل أي غرفة Cafe تهمك وابدأ شات مجاني",
+            "لو شغلت 'كافيهات قريبة' هيعرضلك الكافيهات والجيران اللي حواليك حسب المسافة",
+            "بترجمة فورية تلقائية، هتقدر تتكلم بلغتك مع أي حد بأكثر من 200 لغة"
+          ],
+          "title": "Cafe & ترجمة فورية تلقائية"
+        },
+        {
+          "icon": "📦",
+          "steps": [
+            "لو رفعت صور المنتج والسعر (Pi) هتظهر للناس القريبة منك مع مكانك",
+            "شوف الحاجات المعروضة حواليك حسب المسافة، ولو عجبتك اطلبها بـ Pi",
+            "الـ Pi اللي دفعته المنصة بتحتفظ بيه بأمان (Escrow) مؤقتاً، وبيتسلم للبائع لما المعاملة تخلص"
+          ],
+          "title": "سوق المستعمل (معاملة آمنة)"
+        },
+        {
+          "icon": "🏪",
+          "steps": [
+            "في 'تسجيل المحل'، لو حددت اسم محلك ومكانه، الزباين هيلاقوا محلك القريب",
+            "سجل صور القائمة · السعر · الكمية",
+            "لما الزبون يطلب، هيجيلك إشعار فوري على Telegram (القائمة · الكمية · المبلغ)",
+            "بالترتيب: جاري التحضير → جاهز → استلام، سلم الطلب في المحل"
+          ],
+          "title": "محلي (O2O)"
+        },
+        {
+          "icon": "🪙",
+          "steps": [
+            "الـ Bean اللي استلمته من Testnet Event دلوقتي هو وعد من cafe.pi",
+            "لما المنصة تشتغل رسمي على Mainnet ويتم إصدار Bean Token رسميًا،",
+            "الـ Event Tokens اللي جمعتها في Testnet هتتصرف زي ما هي 1:1 كـ Mainnet Bean",
+            "ده مبدأ cafe.pi عشان نضمن إن مجهودات المشاركين الأوائل متضيعش"
+          ],
+          "title": "مكافآت Testnet، زي ما هي على Mainnet (وعد)"
+        }
+      ]
+    },
     "noData": "لا يوجد Data",
     "normalRevenue": "إيرادات الخطة العادية",
     "period30": "30 يوم",
@@ -748,7 +839,31 @@
     },
     "unitCase": "حالة",
     "unitPerson": "شخص",
-    "userActivity": "نشاط {days} يوم · Content {content} · مدفوعات {payments}"
+    "userActivity": "نشاط {days} يوم · Content {content} · مدفوعات {payments}",
+    "whitepaper": {
+      "badge": "الورقة البيضاء التقنية",
+      "collapse": "طي",
+      "expand": "عرض التفاصيل",
+      "footer": "يفي بمعايير إدراج Pi Network (Login، الدفع، الأمان، معيار Data).",
+      "highlight1Desc": "دعم حساب Pi + حساب Google. سيتم إضافة Login موحد لـ Kakao و Line و WeChat وغيرها لاحقًا.",
+      "highlight1Title": "🤝 تسجيل دخول موحد لـ Pi و Google",
+      "highlight2Desc": "تطبيق PiRC1 (اقتصاد Token) · PiRC2 (خدمة الاشتراك) · PiRC3 (معاملات الضمان الآمنة).",
+      "highlight2Title": "💳 بناء خدمة دفع Pi",
+      "intro": "Cafe.pi يحل القيود الصعبة لمتصفح Pi هيكليًا وتشفيريًا، ويحافظ على سلامة الأموال ومعايير Data منذ مرحلة الإطلاق.",
+      "pillar1Desc": "يدعم Login حساب Pi ودفع Pi كمسار أساسي. تتم المدفوعات فقط باستخدام Pi، و Bean هو رصيد داخلي ثابت 1 Pi = 100 Bean.",
+      "pillar1Title": "🟣 تصميم Pi ذو الأولوية",
+      "pillar2Desc": "حتى في Pi Browser الذي لا يحفظ Cookies، يتم Login والدفع بأمان باستخدام مصادقة ثنائية قائمة على Token. تصميم بوابة Client بدون حلقات لا نهائية.",
+      "pillar2Title": "📱 توافق كامل مع Pi Browser",
+      "pillar3Desc": "يتم تسجيل جميع المعاملات في دفتر أستاذ إضافي فقط (append-only)، ويتم التحقق باستمرار من معادلة حفظ المحاسبة (الإصدار = التداول + الاسترداد). الإصدار الزائد والدفع المزدوج مستحيلان هيكليًا.",
+      "pillar3Title": "💰 عدم التسامح مع سلامة الأموال",
+      "pillar4Desc": "يتوافق مع 21 معيارًا لضعف الويب لـ KISA، ويدافع ضد التزوير وهجمات التوقيت باستخدام Token توقيع HMAC-SHA256 ومقارنة الوقت الثابت.",
+      "pillar4Title": "🔒 أمان موثوق",
+      "pillar5Desc": "يطبق معيار Data الخاص بـ K-DATA (وكالة ترويج صناعة Data الكورية) من أول Table ويفرضه بالتحقق التلقائي، مما يضمن موثوقية التشغيل والتدقيق على المدى الطويل.",
+      "pillar5Title": "📊 معيار Data معتمد من الحكومة",
+      "pillar6Desc": "يوفر شاشة أولى سريعة وتجربة استخدام سلسة من خلال Server-side Rendering وجلب Data المتوازي، و Stale-while-revalidate Caching، وتحسين الموقع والبحث وال Bundle.",
+      "pillar6Title": "⚡ تحسين الأداء",
+      "title": "نقاط القوة التقنية لـ Cafe.pi"
+    }
   },
   "adminStd": {
     "domainTypeCode": "Code",
@@ -1111,10 +1226,14 @@
       "approveError": "خطأ في الموافقة",
       "approveFail": "فشل موافقة الـ Server",
       "approveInWallet": "يرجى الموافقة على الدفع في شاشة محفظة Pi.",
+      "back": "رجوع",
+      "capacityN": "{n} شخص",
       "completeError": "خطأ في الإتمام",
       "completeFail": "فشل إتمام المعالجة",
+      "createCostSuffix": "هيتم خصم Bean (إرشادات الشحن في حالة عدم كفاية الرصيد)",
       "created": "تم إنشاء الـ Cafe!",
       "createError": "خطأ في إنشاء الـ Room",
+      "createEventFree": "🎟️ اعمل غرفة Event",
       "createFail": "فشل إنشاء الـ Room",
       "createFree": "إنشاء Room مجانية",
       "createMemo": "إنشاء Cafe: {roomNm}",
@@ -1126,21 +1245,35 @@
       "endTimeHint": "بعد وقت الانتهاء، عضوية المشارك (GUEST) هتنتهي تلقائيًا",
       "endTimeLabel": "وقت انتهاء الـ Event *",
       "entryFee": "رسوم الدخول (يدفعها المشارك)",
+      "entryFeeBean": "{amount} Bean",
       "eventBusinessOnly": "الـ Event Cafe مخصصة لـ Business Plan فقط",
+      "eventCreateCostDeduct": "هيتم خصم رسوم إنشاء {amount} Bean.",
+      "eventCreateCostFree": "كميزة اشتراك، رسوم الإنشاء مجانية.",
+      "eventCreateCostMemo": "رسوم إنشاء Cafe Event {amount}",
       "eventCreated": "تم إنشاء الـ Event Room!",
       "eventCreateError": "خطأ في إنشاء الـ Event Room",
       "eventCreateFail": "فشل إنشاء الـ Event Room",
       "eventDesc": "دي Room محدودة المدة بيدفع فيها المشاركين رسوم دخول (π) عشان يدخلوا. مفيش تكلفة إنشاء.",
       "eventTab": "🎟️ إنشاء Event Room",
       "eventTitle": "إنشاء Event Cafe",
+      "freeEntry": "مجاني",
+      "freeRoom7dHint": "الكافيهات اللي بتتعمل ببلاش بتفضل شغالة لمدة 7 أيام بس ومش ممكن تتمدد. لو عايز تحدد المدة بنفسك، اعملها عن طريق دفع Bean.",
+      "freeRoom7dValidity": "صلاحية 7 أيام (إنشاء مجاني)",
+      "freeRoomCapacityLimit": "الكافيهات اللي بتتعمل ببلاش ممكن تستوعب لحد 10 أشخاص.",
+      "freeRoomPublicOnly": "الكافيهات اللي بتتعمل مجاناً ممكن تتفتح كـ Public بس.",
+      "goChargingBean": "روح اشحن Bean →",
       "groupTab": "💬 Group Room",
       "groupTitle": "إنشاء Group Cafe",
       "maxMembers": "أقصى عدد أعضاء",
       "name": "اسم الـ Cafe",
       "nameLabel": "اسم الـ Cafe *",
+      "next": "التالي",
       "openBtn": "+ إنشاء Cafe",
       "payAndCreate": "ادفع {amount} π وإنشاء Room",
+      "payAndCreateEvent": "ادفع واعمل غرفة Event",
+      "payAndCreateGroup": "ادفع واعمل غرفة",
       "piBrowserOnly": "يمكن الدفع فقط في Pi Browser",
+      "premiumCreateCostMemo": "رسوم إنشاء Cafe PREMIUM {amount}",
       "premiumTheme": "PREMIUM Theme",
       "premiumThemeOnce": "PREMIUM Theme مرة واحدة",
       "privateEmoji": "🔒 خاص",
@@ -1153,6 +1286,7 @@
       "total": "الإجمالي",
       "unlimited": "غير محدود",
       "validity": "مدة الصلاحية",
+      "validityDays": "{n} يوم",
       "visibility": "الرؤية"
     },
     "customSticker": {
@@ -1408,6 +1542,34 @@
     "upgrade": "Upgrade",
     "yes": "نعم"
   },
+  "consent": {
+    "agreeAll": "الموافقة على الكل",
+    "birthInvalid": "الرجاء إدخال تاريخ ميلاد صحيح.",
+    "birthLabel": "تاريخ الميلاد",
+    "desc": "للاستفادة من Cafe.pi، يرجى الموافقة على الشروط والأحكام أدناه. (يمكن الاستخدام بعد الموافقة على البنود الإلزامية)",
+    "errNetwork": "فشل حفظ الموافقة بسبب خطأ في الشبكة",
+    "errSave": "فشل حفظ الموافقة",
+    "guardian": "أقل من 14 عامًا — تم الحصول على موافقة الوصي القانوني (الولي).",
+    "lbs": "الموافقة على جمع واستخدام معلومات الموقع",
+    "marketing": "الموافقة على تلقي معلومات تسويقية",
+    "note": "يجب الموافقة على البنود الإلزامية (شروط الاستخدام، المعلومات الشخصية، معلومات الموقع) لاستخدام الخدمة.",
+    "optional": "(اختياري)",
+    "privacy": "الموافقة على جمع واستخدام المعلومات الشخصية",
+    "processing": "جاري المعالجة…",
+    "required": "(إلزامي)",
+    "submit": "موافق ومتابعة",
+    "terms": "الموافقة على شروط الاستخدام",
+    "title": "الموافقة على شروط الخدمة",
+    "view": "عرض"
+  },
+  "errorPage": {
+    "errDesc": "قد يكون هذا خطأ مؤقتًا. يرجى المحاولة مرة أخرى أو الاتصال لاحقًا.",
+    "errTitle": "حدثت مشكلة",
+    "home": "للصفحة الرئيسية",
+    "nfDesc": "الصفحة التي طلبتها غير موجودة أو تم نقلها.",
+    "nfTitle": "الصفحة غير موجودة",
+    "retry": "إعادة المحاولة"
+  },
   "event": {
     "agentCol": "اسم العميل",
     "alreadyExcluded": "مستبعد بالفعل: {names}",
@@ -1572,6 +1734,50 @@
     "tabShopSub": "Onboarding Event للمتجر بأسبقية الحجز",
     "title": "🎖️ Mission Event",
     "totalCol": "الإجمالي"
+  },
+  "faq": {
+    "community": "Community Operating Policy",
+    "email": "استفسار عبر البريد الإلكتروني",
+    "items": [
+      {
+        "a": "في متصفح Pi، اضغط على 'إنشاء رمز الربط'، ثم قم بتسجيل الدخول باستخدام Google في متصفح عادي والصق الرمز للربط.",
+        "q": "How to Log in?"
+      },
+      {
+        "a": "هي رصيد خاص بالمنصة. يمكنك شحنها بمعدل 1 Pi = 100 Bean لاستخدامها في الاشتراكات والهدايا وغيرها، ولا يمكن تحويلها لعملات خارجية.",
+        "q": "What is Bean?"
+      },
+      {
+        "a": "يتم الدفع باستخدام Pi في متصفح Pi. معاملات السلع محمية بنظام الضمان (الحفظ الآمن).",
+        "q": "How to Pay?"
+      },
+      {
+        "a": "عند الإطلاق الرسمي لـ Mainnet وإصدار Bean Token رسميًا، سيتم صرف Beans التي تم الحصول عليها من فعاليات Testnet بنسبة 1:1.",
+        "q": "What happens to Beans received in Testnet?"
+      },
+      {
+        "a": "نتبع سياسة الاسترداد وإلغاء الاشتراك. لمزيد من التفاصيل، يرجى الرجوع إلى وثيقة سياسة الاسترداد أدناه.",
+        "q": "Is a Refund possible?"
+      },
+      {
+        "a": "يمكنك تقديم بلاغ باستخدام زر 'الإبلاغ' في المنشورات أو المتاجر مع ذكر السبب. سيقوم فريق التشغيل بمراجعتها واتخاذ الإجراءات اللازمة.",
+        "q": "How to Report?"
+      },
+      {
+        "a": "تُستخدم لعرض المقاهي والمتاجر والمنتجات القريبة حسب المسافة. يمكن سحب الموافقة من صفحتي.",
+        "q": "Why is Location Information needed?"
+      }
+    ],
+    "lbs": "شروط خدمة تحديد الموقع",
+    "legalTitle": "الشروط والسياسات",
+    "privacy": "سياسة الخصوصية",
+    "refund": "سياسة الاسترداد",
+    "subtitle": "اعرف إجابات أسئلتك بسرعة",
+    "supportTitle": "دعم العملاء",
+    "telegram": "Telegram",
+    "terms": "شروط الاستخدام",
+    "title": "الأسئلة المتكررة",
+    "youth": "سياسة حماية الشباب"
   },
   "header": {
     "admin": "Admin",
@@ -1829,6 +2035,25 @@
       "store": "🛍️ Store"
     },
     "title": "ملفي الشخصي"
+  },
+  "report": {
+    "ABUSE": "إساءة / مضايقة",
+    "button": "إبلاغ",
+    "cancel": "إلغاء",
+    "COPYRIGHT": "انتهاك حقوق الطبع والنشر",
+    "detailLabel": "وصف تفصيلي (اختياري)",
+    "detailPlaceholder": "الرجاء كتابة تفاصيل البلاغ هنا",
+    "duplicate": "لقد أبلغت عن هذا العنصر بالفعل",
+    "error": "فشل في إرسال البلاغ",
+    "ETC": "أخرى",
+    "FRAUD": "احتيال / معاملات",
+    "PRIVACY": "كشف معلومات شخصية",
+    "reasonLabel": "سبب الإبلاغ",
+    "SEXUAL": "فحش / إثارة",
+    "SPAM": "Spam / Ads",
+    "submit": "إرسال البلاغ",
+    "success": "تم استلام البلاغ",
+    "title": "الإبلاغ عن"
   },
   "store": {
     "actionBuyerDone": "تم استلام السلعة",
@@ -2124,6 +2349,12 @@
       "TRANSLATE": "اشتراك الترجمة التلقائية"
     },
     "renewBtn": "تجديد/تغيير",
+    "storeGrade": {
+      "L": "L (أكثر من 50)",
+      "M": "M (أقل من 50)",
+      "S": "S (أقل من 30)"
+    },
+    "storeGradeHint": "{count} منتج خاص بي — اختر الفئة",
     "subscribeBtn": "اشترك الآن",
     "subscribeFail": "فشل في معالجة الاشتراك",
     "subscribeSuccess": "تم بدء اشتراك {product}!",

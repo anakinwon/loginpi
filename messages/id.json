@@ -241,6 +241,7 @@
       "beanAudit": "Log Audit",
       "beanFeePlan": "Manajemen Paket Biaya",
       "beanSection": "☕ Ekonomi Bean",
+      "beanTipPresets": "Preset Hadiah",
       "beanToken": "Dashboard Bean",
       "beanTopUsers": "Pengguna Teratas",
       "beanTxn": "Riwayat Transaksi",
@@ -248,6 +249,8 @@
       "board": "Manajemen Board",
       "campaign": "Persetujuan Campaign",
       "chatSection": "Manajemen Cafe",
+      "checklist": "Open Beta Checklist",
+      "consents": "Riwayat Persetujuan Syarat dan Ketentuan",
       "dashboard": "Dashboard",
       "eventExclude": "Kelola Pengecualian",
       "eventGifts": "Kirim Hadiah",
@@ -257,6 +260,7 @@
       "links": "Status Penautan Akun",
       "logs": "Manajemen Log",
       "payments": "Riwayat Pembayaran",
+      "reports": "Penanganan Laporan",
       "settle": "Manajemen Settlement",
       "stats": "Statistik",
       "stdApprovals": "Workflow Persetujuan",
@@ -268,12 +272,13 @@
       "stdWords": "Kata Standar",
       "stickers": "Manajemen Sticker",
       "storeCategories": "Category Produk",
+      "storeDistCfg": "Batasan Jarak",
       "storeSection": "Manajemen Store",
       "subscriptions": "Manajemen Langganan",
+      "subscrPricing": "Harga Langganan",
       "themes": "Manajemen Theme",
       "title": "Admin",
-      "users": "Manajemen Pengguna",
-      "subscrPricing": "구독요금제"
+      "users": "Manajemen Pengguna"
     },
     "payments": {
       "col": {
@@ -575,6 +580,7 @@
       "col": {
         "cd": "Code",
         "desc": "Deskripsi",
+        "nmEn": "Nama Inggris",
         "sortOrd": "Urutan",
         "theme": "Theme",
         "tp": "Group",
@@ -595,6 +601,7 @@
         "desc": "Deskripsi·Tag",
         "emoji": "Emoji",
         "nm": "Nama Theme",
+        "nmEn": "Nama Theme (Inggris)",
         "sortOrd": "Urutan Sortir",
         "tp": "Group",
         "useYn": "Tampilkan"
@@ -605,7 +612,8 @@
       "placeholder": {
         "cd": "ESPORTS",
         "desc": "#Tag #Keyword",
-        "nm": "e-sports"
+        "nm": "e-sports",
+        "nmEn": "eSports"
       },
       "saveFail": "Gagal menyimpan",
       "saveSuccess": "Theme berhasil didaftarkan",
@@ -700,6 +708,89 @@
       "out": "Withdrawal"
     },
     "homeTitle": "Dashboard",
+    "manual": {
+      "badge": "Panduan Pengguna",
+      "collapse": "Ciutkan",
+      "expand": "Perluas",
+      "intro": "Tidak masalah jika Anda tidak terlalu paham komputer. Cukup ikuti langkah-langkahnya 😊 — Ingat 3 hal ini saja: ① Login ② Jelajahi ③ Beli dan Jual",
+      "title": "Panduan Pengguna Cafe.pi yang Mudah",
+      "topics": [
+        {
+          "icon": "⭐",
+          "steps": [
+            "Pasar Lokal Global: Terjemahan Otomatis 200+ Bahasa · Pembayaran Mudah Pi · Chat, Barang Bekas, Toko dalam Satu Aplikasi · Terhubung berdasarkan Jarak",
+            "'Siren Order' untuk Semua Jenis Bisnis: Siapa Saja Bisa Menjadi Pemilik · Menu Fleksibel · Notifikasi Instan · Penjemputan O2O"
+          ],
+          "title": "Mengapa Cafe.pi?"
+        },
+        {
+          "icon": "🎁",
+          "steps": [
+            "EVENT #1: Isi ulang dengan TestPi dan selesaikan 10 Misi, maka 5.000 Bean untuk 100 orang pertama",
+            "EVENT #2: Daftarkan toko Anda dan selesaikan pendaftaran Menu + Uji Transaksi, maka 10.000 Bean untuk 100 toko pertama",
+            "Di tab Event, ikuti tautan partisipasi untuk setiap Misi, maka Anda dapat menyelesaikannya dengan mudah"
+          ],
+          "title": "Event — Bergabung Sekarang"
+        },
+        {
+          "icon": "🔑",
+          "steps": [
+            "Di Pi Browser, ketuk 'Buat Kode Tautan' untuk mendapatkan kode 6 digit (Gunakan dalam 10 menit)",
+            "Salin kode (atau tautan) dan pindahkan ke browser biasa",
+            "Di browser biasa, setelah login Google, tempel dan ketuk 'Tautkan' untuk menyelesaikan koneksi Pi + Google",
+            "Pi Browser tidak menyimpan informasi demi keamanan, jadi kode 6 digit menghubungkan kedua browser dengan aman"
+          ],
+          "title": "Login & Hubungkan Akun"
+        },
+        {
+          "icon": "🎫",
+          "steps": [
+            "1 Pi = 100 Bean (Poin hadiah khusus platform) — Anda bisa langsung memulai dengan paket gratis",
+            "Pilih langganan yang Anda butuhkan: PiCafé™ (Kafe Premium) · PiShop™ (Pendaftaran Produk) · PiTranslate™ (Terjemahan Tanpa Batas)",
+            "Biaya langganan dibayar dengan Bean yang diisi ulang, dan pembayaran tahunan gratis 2 bulan"
+          ],
+          "title": "Bean & Langganan"
+        },
+        {
+          "icon": "💬",
+          "steps": [
+            "Masuk ke ruang kafe dengan topik minat Anda dan mulai chat secara gratis",
+            "Jika Anda mengaktifkan 'Kafe Terdekat', kafe dan tetangga di sekitar akan ditampilkan berdasarkan jarak",
+            "Dengan terjemahan simultan otomatis, Anda dapat berbicara dengan siapa saja dalam 200+ bahasa dalam bahasa Anda sendiri"
+          ],
+          "title": "Kafe & Terjemahan Otomatis"
+        },
+        {
+          "icon": "📦",
+          "steps": [
+            "Jika Anda mengunggah foto produk dan harga (Pi), bersama dengan lokasi Anda, itu akan terlihat oleh orang-orang terdekat",
+            "Lihat barang-barang di sekitar berdasarkan jarak, dan jika Anda suka, pesan dengan Pi",
+            "Pi yang dibayarkan akan disimpan dengan aman (escrow) sementara oleh platform, dan akan diserahkan kepada penjual setelah transaksi selesai"
+          ],
+          "title": "Pasar Barang Bekas (Transaksi Aman)"
+        },
+        {
+          "icon": "🏪",
+          "steps": [
+            "Di 'Pendaftaran Toko', jika Anda menetapkan nama dan lokasi toko, pelanggan akan datang ke toko terdekat",
+            "Daftarkan foto menu · harga · jumlah",
+            "Ketika pelanggan memesan, notifikasi akan langsung datang melalui Telegram (Menu · Jumlah · Harga)",
+            "Serahkan di toko sesuai urutan: Sedang Disiapkan → Siap → Penjemputan"
+          ],
+          "title": "Toko Saya (O2O)"
+        },
+        {
+          "icon": "🪙",
+          "steps": [
+            "Bean yang diterima dari event Testnet sekarang adalah janji dari cafe.pi",
+            "Ketika platform diluncurkan secara resmi di Mainnet dan Bean Token diterbitkan secara resmi,",
+            "Token event yang terkumpul di Testnet akan dibayarkan 1:1 secara identik sebagai Bean Mainnet",
+            "Ini adalah prinsip cafe.pi untuk memastikan bahwa upaya peserta awal tidak hilang"
+          ],
+          "title": "Hadiah Testnet, sama di Mainnet (Janji)"
+        }
+      ]
+    },
     "noData": "Tidak ada Data",
     "normalRevenue": "Pendapatan Paket Normal",
     "period30": "30 hari",
@@ -748,7 +839,31 @@
     },
     "unitCase": "kasus",
     "unitPerson": "orang",
-    "userActivity": "Aktivitas {days} hari · Content {content} · Pembayaran {payments}"
+    "userActivity": "Aktivitas {days} hari · Content {content} · Pembayaran {payments}",
+    "whitepaper": {
+      "badge": "Whitepaper Teknis",
+      "collapse": "Tutup",
+      "expand": "Lihat Detail",
+      "footer": "Memenuhi standar pendaftaran Pi Network (Login, Pembayaran, Keamanan, Standar Data).",
+      "highlight1Desc": "Mendukung Akun Pi + Akun Google. Login terintegrasi seperti Kakao, Line, WeChat, dll. akan ditambahkan di kemudian hari.",
+      "highlight1Title": "🤝 Login Terintegrasi Pi · Google",
+      "highlight2Desc": "Implementasi PiRC1 (Ekonomi Token) · PiRC2 (Layanan Langganan) · PiRC3 (Transaksi Aman Escrow).",
+      "highlight2Title": "💳 Pembangunan Layanan Pembayaran Pi",
+      "intro": "Cafe.pi secara struktural dan kriptografis mengatasi batasan ketat Pi Browser, serta menjaga integritas dana dan standar Data sejak tahap peluncuran.",
+      "pillar1Desc": "Mendukung Login Akun Pi dan Pembayaran Pi sebagai jalur utama. Pembayaran hanya dilakukan dengan Pi, dan Bean adalah cadangan internal tetap 1 Pi = 100 Bean.",
+      "pillar1Title": "🟣 Desain Prioritas Pi",
+      "pillar2Desc": "Bahkan di Pi Browser yang tidak menyimpan Cookie, Login dan Pembayaran dilakukan dengan aman melalui autentikasi dua faktor berbasis Token. Desain gerbang klien tanpa loop tak terbatas.",
+      "pillar2Title": "📱 Kompatibilitas Penuh Pi Browser",
+      "pillar3Desc": "Semua transaksi dicatat dalam ledger append-only, dan identitas konservasi akuntansi (penerbitan = sirkulasi + penarikan) diverifikasi secara konstan. Penerbitan berlebih dan pembayaran ganda secara struktural tidak mungkin.",
+      "pillar3Title": "💰 Tanpa Toleransi Integritas Dana",
+      "pillar4Desc": "Menanggapi 21 standar kerentanan Web KISA, dan mempertahankan diri dari pemalsuan serta serangan waktu dengan Token tanda tangan HMAC-SHA256 dan perbandingan waktu konstan.",
+      "pillar4Title": "🔒 Keamanan Terverifikasi",
+      "pillar5Desc": "Menerapkan standar Data Korea Data Industry Promotion Agency (K-DATA) sejak tabel pertama dan memaksakannya dengan verifikasi otomatis, memastikan keandalan operasi dan audit jangka panjang.",
+      "pillar5Title": "📊 Standar Data Resmi Pemerintah",
+      "pillar6Desc": "Menyediakan layar pertama yang cepat dan pengalaman pengguna yang mulus dengan rendering prioritas Server, pengambilan Data paralel, caching stale-while-revalidate, serta optimasi lokasi, pencarian, dan bundle.",
+      "pillar6Title": "⚡ Optimasi Performa",
+      "title": "Kekuatan Teknis Cafe.pi"
+    }
   },
   "adminStd": {
     "domainTypeCode": "Code",
@@ -1111,10 +1226,14 @@
       "approveError": "Kesalahan persetujuan",
       "approveFail": "Gagal persetujuan Server",
       "approveInWallet": "Harap setujui pembayaran di layar dompet Pi Anda.",
+      "back": "Sebelumnya",
+      "capacityN": "{n} orang",
       "completeError": "Kesalahan penyelesaian",
       "completeFail": "Gagal memproses penyelesaian",
+      "createCostSuffix": "Bean akan dipotong (informasi pengisian jika saldo tidak mencukupi)",
       "created": "Cafe telah dibuat!",
       "createError": "Kesalahan pembuatan Ruang",
+      "createEventFree": "🎟️ Buat ruang Event",
       "createFail": "Gagal membuat Ruang",
       "createFree": "Buat Ruang Gratis",
       "createMemo": "Pembuatan Cafe: {roomNm}",
@@ -1126,21 +1245,35 @@
       "endTimeHint": "Setelah waktu berakhir, keanggotaan peserta (GUEST) akan otomatis kedaluwarsa",
       "endTimeLabel": "Waktu Berakhir Event *",
       "entryFee": "Biaya Masuk (Pembayaran Peserta)",
+      "entryFeeBean": "{amount} Bean",
       "eventBusinessOnly": "Cafe Event hanya untuk paket Business",
+      "eventCreateCostDeduct": "Biaya pembuatan {amount} Bean akan dipotong.",
+      "eventCreateCostFree": "Sebagai manfaat langganan, biaya pembuatan gratis.",
+      "eventCreateCostMemo": "Biaya pembuatan Kafe Event {amount}",
       "eventCreated": "Ruang Event telah dibuat!",
       "eventCreateError": "Kesalahan pembuatan Ruang Event",
       "eventCreateFail": "Gagal membuat Ruang Event",
       "eventDesc": "Ini adalah Ruang terbatas waktu di mana peserta membayar biaya masuk (π) dan masuk. Tidak ada biaya pembuatan.",
       "eventTab": "🎟️ Buat Ruang Event",
       "eventTitle": "Buat Cafe Event",
+      "freeEntry": "Gratis",
+      "freeRoom7dHint": "Kafe yang dibuat secara gratis hanya akan berlaku selama 7 hari dan tidak dapat diperpanjang. Jika Anda ingin menentukan periode sendiri, buatlah dengan pembayaran Bean.",
+      "freeRoom7dValidity": "Masa berlaku 7 hari (pembuatan gratis)",
+      "freeRoomCapacityLimit": "Kafe yang dibuat secara gratis dapat menampung hingga 10 orang.",
+      "freeRoomPublicOnly": "Kafe yang dibuat secara gratis hanya dapat dibuka sebagai publik.",
+      "goChargingBean": "Pergi untuk mengisi Bean →",
       "groupTab": "💬 Ruang Grup",
       "groupTitle": "Buat Cafe Grup",
       "maxMembers": "Anggota Maksimal",
       "name": "Nama Cafe",
       "nameLabel": "Nama Cafe *",
+      "next": "Berikutnya",
       "openBtn": "+ Buat Cafe",
       "payAndCreate": "Bayar {amount} π dan Buat Ruang",
+      "payAndCreateEvent": "Bayar dan buat ruang Event",
+      "payAndCreateGroup": "Bayar dan buat ruang",
       "piBrowserOnly": "Pembayaran hanya dapat dilakukan di Pi Browser",
+      "premiumCreateCostMemo": "Biaya pembuatan Kafe PREMIUM {amount}",
       "premiumTheme": "PREMIUM Tema",
       "premiumThemeOnce": "PREMIUM Tema Sekali Pakai",
       "privateEmoji": "🔒 Pribadi",
@@ -1153,6 +1286,7 @@
       "total": "Total",
       "unlimited": "Tidak Terbatas",
       "validity": "Masa Berlaku",
+      "validityDays": "{n} hari",
       "visibility": "Visibilitas"
     },
     "customSticker": {
@@ -1408,6 +1542,34 @@
     "upgrade": "Upgrade",
     "yes": "Ya"
   },
+  "consent": {
+    "agreeAll": "Setuju semua",
+    "birthInvalid": "Harap masukkan tanggal lahir dengan benar.",
+    "birthLabel": "Tanggal Lahir",
+    "desc": "Untuk menggunakan Cafe.pi, harap setujui syarat dan ketentuan di bawah ini. (Dapat digunakan setelah menyetujui item wajib)",
+    "errNetwork": "Gagal menyimpan persetujuan karena kesalahan jaringan",
+    "errSave": "Gagal menyimpan persetujuan",
+    "guardian": "Di bawah 14 tahun — Telah menerima persetujuan dari wali sah (orang tua/wali).",
+    "lbs": "Persetujuan Pengumpulan dan Penggunaan Informasi Lokasi",
+    "marketing": "Persetujuan Penerimaan Informasi Pemasaran",
+    "note": "Anda dapat menggunakan layanan ini hanya jika Anda menyetujui item wajib (Syarat Penggunaan, Informasi Pribadi, Informasi Lokasi).",
+    "optional": "(Opsional)",
+    "privacy": "Persetujuan Pengumpulan dan Penggunaan Informasi Pribadi",
+    "processing": "Memproses…",
+    "required": "(Wajib)",
+    "submit": "Setuju dan Lanjutkan",
+    "terms": "Persetujuan Syarat Penggunaan",
+    "title": "Persetujuan Penggunaan Layanan",
+    "view": "Lihat"
+  },
+  "errorPage": {
+    "errDesc": "Ini mungkin kesalahan sementara. Coba lagi atau akses setelah beberapa saat.",
+    "errTitle": "Terjadi masalah",
+    "home": "Ke Beranda",
+    "nfDesc": "Halaman yang Anda minta tidak ada atau telah dipindahkan.",
+    "nfTitle": "Halaman tidak ditemukan",
+    "retry": "Coba lagi"
+  },
   "event": {
     "agentCol": "Nama Agen",
     "alreadyExcluded": "Sudah dikecualikan: {names}",
@@ -1572,6 +1734,50 @@
     "tabShopSub": "Event Onboarding Toko Berbasis Siapa Cepat Dia Dapat",
     "title": "🎖️ Mission Event",
     "totalCol": "Total"
+  },
+  "faq": {
+    "community": "Kebijakan Operasional Community",
+    "email": "Pertanyaan Email",
+    "items": [
+      {
+        "a": "Tekan 'Buat Kode Tautan' di Pi Browser, lalu Login Google di browser biasa dan tempel kode tersebut untuk menautkan.",
+        "q": "Bagaimana cara Login?"
+      },
+      {
+        "a": "Ini adalah poin yang hanya dapat digunakan di platform. Dapat diisi ulang dengan 1 Pi = 100 Bean dan digunakan untuk langganan, hadiah, dll. Tidak dapat ditukar ke mata uang eksternal.",
+        "q": "Apa itu Bean?"
+      },
+      {
+        "a": "Pembayaran dilakukan dengan Pi di Pi Browser. Transaksi produk dilindungi oleh escrow (penyimpanan aman).",
+        "q": "Bagaimana cara melakukan pembayaran?"
+      },
+      {
+        "a": "Saat peluncuran resmi Mainnet dan penerbitan resmi Bean Token, Bean yang diterima dari event Testnet akan diberikan 1:1.",
+        "q": "Bagaimana dengan Bean yang diterima di Testnet?"
+      },
+      {
+        "a": "Mengikuti kebijakan pengembalian dana dan pembatalan langganan. Untuk detail lebih lanjut, silakan lihat dokumen kebijakan pengembalian dana di bawah.",
+        "q": "Apakah bisa mendapatkan pengembalian dana?"
+      },
+      {
+        "a": "Dapat diajukan dengan menekan tombol 'Lapor' pada postingan, toko, dll., bersama dengan alasannya. Tim operasional akan meninjau dan mengambil tindakan.",
+        "q": "Bagaimana cara melaporkan?"
+      },
+      {
+        "a": "Digunakan untuk menampilkan kafe, toko, dan produk terdekat berdasarkan jarak. Persetujuan dapat ditarik di Halaman Saya.",
+        "q": "Mengapa informasi lokasi diperlukan?"
+      }
+    ],
+    "lbs": "Syarat dan Ketentuan Layanan Berbasis Lokasi",
+    "legalTitle": "Syarat dan Ketentuan & Kebijakan",
+    "privacy": "Kebijakan Privasi",
+    "refund": "Kebijakan Pengembalian Dana",
+    "subtitle": "Temukan jawaban dengan cepat",
+    "supportTitle": "Dukungan Pelanggan",
+    "telegram": "Telegram",
+    "terms": "Syarat Penggunaan",
+    "title": "Pertanyaan yang Sering Diajukan",
+    "youth": "Kebijakan Perlindungan Remaja"
   },
   "header": {
     "admin": "Admin",
@@ -1829,6 +2035,25 @@
       "store": "🛍️ Store"
     },
     "title": "Profil Saya"
+  },
+  "report": {
+    "ABUSE": "Kata-kata Kasar/Pelecehan",
+    "button": "Lapor",
+    "cancel": "Batal",
+    "COPYRIGHT": "Pelanggaran Hak Cipta",
+    "detailLabel": "Deskripsi Detail (Opsional)",
+    "detailPlaceholder": "Mohon jelaskan detail laporan Anda",
+    "duplicate": "Item ini sudah dilaporkan",
+    "error": "Gagal mengirim laporan",
+    "ETC": "Lain-lain",
+    "FRAUD": "Penipuan/Transaksi",
+    "PRIVACY": "Terpapar Informasi Pribadi",
+    "reasonLabel": "Alasan Laporan",
+    "SEXUAL": "Cabul/Seksual",
+    "SPAM": "Spam/Iklan",
+    "submit": "Kirim Laporan",
+    "success": "Laporan telah diterima",
+    "title": "Laporkan"
   },
   "store": {
     "actionBuyerDone": "Penerimaan Barang Selesai",
@@ -2124,6 +2349,12 @@
       "TRANSLATE": "Langganan Terjemahan Otomatis"
     },
     "renewBtn": "Perbarui/Ubah",
+    "storeGrade": {
+      "L": "L (50 ke atas)",
+      "M": "M (50 ke bawah)",
+      "S": "S (30 ke bawah)"
+    },
+    "storeGradeHint": "{count} produk saya — pilih Grade",
     "subscribeBtn": "Berlangganan",
     "subscribeFail": "Gagal memproses langganan",
     "subscribeSuccess": "Langganan {product} Anda telah dimulai!",

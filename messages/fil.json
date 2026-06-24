@@ -241,6 +241,7 @@
       "beanAudit": "Audit Log",
       "beanFeePlan": "Pamamahala ng Fee Plan",
       "beanSection": "☕ Bean Economy",
+      "beanTipPresets": "Presets ng Regalo",
       "beanToken": "Bean Dashboard",
       "beanTopUsers": "Mga Top User",
       "beanTxn": "Transaction History",
@@ -248,6 +249,8 @@
       "board": "Board Management",
       "campaign": "Campaign Approval",
       "chatSection": "Cafe Management",
+      "checklist": "Open Beta Checklist",
+      "consents": "Kasaysayan ng Pagpayag sa Mga Tuntunin",
       "dashboard": "Dashboard",
       "eventExclude": "Manage Exclusion",
       "eventGifts": "Magpadala ng Regalo",
@@ -257,6 +260,7 @@
       "links": "Status ng Pag-link ng Account",
       "logs": "Pamamahala ng Log",
       "payments": "Kasaysayan ng Bayad",
+      "reports": "Pagproseso ng Ulat",
       "settle": "Settlement Management",
       "stats": "Stats",
       "stdApprovals": "Approval Workflow",
@@ -268,12 +272,13 @@
       "stdWords": "Standard na Salita",
       "stickers": "Sticker Management",
       "storeCategories": "Mga Category ng Produkto",
+      "storeDistCfg": "Limitasyon sa Distansya",
       "storeSection": "Pamamahala ng Store",
       "subscriptions": "Subscription Management",
+      "subscrPricing": "Plano ng Presyo ng Subscription",
       "themes": "Theme Management",
       "title": "Admin",
-      "users": "Pamamahala ng User",
-      "subscrPricing": "구독요금제"
+      "users": "Pamamahala ng User"
     },
     "payments": {
       "col": {
@@ -575,6 +580,7 @@
       "col": {
         "cd": "Code",
         "desc": "Description",
+        "nmEn": "Pangalan sa English",
         "sortOrd": "Order",
         "theme": "Theme",
         "tp": "Group",
@@ -595,6 +601,7 @@
         "desc": "Description · Tag",
         "emoji": "Emoji",
         "nm": "Theme Name",
+        "nmEn": "Pangalan ng Tema (English)",
         "sortOrd": "Sort Order",
         "tp": "Group",
         "useYn": "Display"
@@ -605,7 +612,8 @@
       "placeholder": {
         "cd": "ESPORTS",
         "desc": "#Tag #Keyword",
-        "nm": "eSports"
+        "nm": "eSports",
+        "nmEn": "eSports"
       },
       "saveFail": "Nabigo ang pag-save.",
       "saveSuccess": "Matagumpay na nairehistro ang Theme.",
@@ -700,6 +708,89 @@
       "out": "Pagbawi"
     },
     "homeTitle": "Dashboard",
+    "manual": {
+      "badge": "User Manual",
+      "collapse": "Tiklopin",
+      "expand": "Palawakin",
+      "intro": "Okay lang kahit hindi ka masyadong marunong sa computer. Sundin lang ang mga hakbang 😊 — Tatlong bagay lang ang tandaan: ① Mag-Login ② Mag-Explore ③ Bumili at Magbenta",
+      "title": "Madaling User Manual ng Cafe.pi",
+      "topics": [
+        {
+          "icon": "⭐",
+          "steps": [
+            "Global 'Karrot': Awtomatikong pagsasalin ng 200+ wika · Pi madaling pagbabayad · Chat, second-hand, tindahan sa isang App · Koneksyon ayon sa distansya",
+            "'Siren Order' na hindi pumipili ng industriya: Kahit sino ay pwedeng maging may-ari · Malayang Menu · Instant na abiso · O2O Pickup"
+          ],
+          "title": "Bakit Cafe.pi?"
+        },
+        {
+          "icon": "🎁",
+          "steps": [
+            "EVENT #1: Mag-top up gamit ang TestPi at kapag nakumpleto ang 10 Misyon, 5,000 Bean sa unang 100 tao.",
+            "EVENT #2: Irehistro ang iyong tindahan at kapag natapos ang pagpaparehistro ng Menu + Test ng transaksyon, 10,000 Bean sa unang 100 lokasyon.",
+            "Sa tab ng Event, kung susundin ang link ng paglahok para sa bawat Misyon, madali itong makukumpleto."
+          ],
+          "title": "Event — Sumali na ngayon"
+        },
+        {
+          "icon": "🔑",
+          "steps": [
+            "Sa Pi Browser, kapag pinindot ang 'Gumawa ng Integration Code', lalabas ang 6-digit na Code (Gamitin sa loob ng 10 minuto).",
+            "Kopyahin ang Code (o Link) at ilipat sa regular na Browser.",
+            "Sa regular na Browser, pagkatapos mag-Google Login, i-paste at pindutin ang 'I-integrate' para makumpleto ang koneksyon ng Pi + Google.",
+            "Ang Pi Browser ay hindi nagse-save ng impormasyon para sa seguridad, kaya ang 6-digit na Code ay ligtas na nagkokonekta sa dalawang Browser."
+          ],
+          "title": "Login & Pagkonekta ng Account"
+        },
+        {
+          "icon": "🎫",
+          "steps": [
+            "1 Pi = 100 Bean (Platform-exclusive na reward points) — Maaari kang magsimula kaagad sa libreng Plan.",
+            "Piliin lang ang kailangan mo at mag-subscribe: PiCafé™(Premium Cafe) · PiShop™(Pagpaparehistro ng Produkto) · PiTranslate™(Walang limitasyong Pagsasalin)",
+            "Ang bayad sa Subscription ay babayaran gamit ang na-top up na Bean, at ang taunang pagbabayad ay may 2 buwang libre."
+          ],
+          "title": "Bean & Subscription"
+        },
+        {
+          "icon": "💬",
+          "steps": [
+            "Pumasok sa Cafe Room ng iyong interes at simulan ang Chat nang libre.",
+            "Kapag binuksan ang 'Mga Kalapit na Cafe', ipapakita nito ang mga kalapit na Cafe at kapitbahay ayon sa distansya.",
+            "Sa awtomatikong sabay-sabay na pagsasalin, makakausap mo ang sinuman sa 200+ na wika sa sarili mong wika."
+          ],
+          "title": "Cafe & Awtomatikong Pagsasalin"
+        },
+        {
+          "icon": "📦",
+          "steps": [
+            "Kapag in-upload ang larawan ng produkto at presyo (Pi), ipapakita ito sa mga kalapit na tao kasama ang iyong lokasyon.",
+            "Tingnan ang mga item na available sa paligid ayon sa distansya at kung gusto mo, mag-order gamit ang Pi.",
+            "Ang binayarang Pi ay pansamantalang ligtas na iimbak ng Platform (Escrow), at ibibigay sa nagbebenta kapag natapos ang transaksyon."
+          ],
+          "title": "Second-hand Marketplace (Ligtas na Transaksyon)"
+        },
+        {
+          "icon": "🏪",
+          "steps": [
+            "Sa 'Pagpaparehistro ng Tindahan', kapag itinakda ang pangalan at lokasyon ng tindahan, pupunta ang mga customer sa kalapit na tindahan.",
+            "Irehistro ang larawan ng Menu · presyo · dami.",
+            "Kapag nag-order ang customer, agad na darating ang abiso sa Telegram (Menu · Dami · Halaga).",
+            "Ibigay sa tindahan sa pagkakasunod-sunod na Inihahanda → Handa na → Pickup."
+          ],
+          "title": "Aking Tindahan (O2O)"
+        },
+        {
+          "icon": "🪙",
+          "steps": [
+            "Ang Bean na natanggap sa Testnet Event ngayon ay isang pangako ng cafe.pi.",
+            "Kapag opisyal na inilunsad ang Platform sa Mainnet at opisyal na inilabas ang Bean Token,",
+            "Ang Event Token na naipon sa Testnet ay ibibigay nang pareho, 1:1, bilang Mainnet Bean.",
+            "Ito ang prinsipyo ng cafe.pi na tinitiyak na hindi mawawala ang pagsisikap ng mga unang lumahok."
+          ],
+          "title": "Testnet Reward, pareho sa Mainnet (Pangako)"
+        }
+      ]
+    },
     "noData": "Walang Data",
     "normalRevenue": "Kita mula sa Normal Plan",
     "period30": "30 araw",
@@ -748,7 +839,31 @@
     },
     "unitCase": "kaso",
     "unitPerson": "tao",
-    "userActivity": "Aktibidad {days} araw · Content {content} · Pagbabayad {payments}"
+    "userActivity": "Aktibidad {days} araw · Content {content} · Pagbabayad {payments}",
+    "whitepaper": {
+      "badge": "Technical Whitepaper",
+      "collapse": "I-collapse",
+      "expand": "Tingnan ang Detalye",
+      "footer": "Nakakatugon sa mga pamantayan ng listahan ng Pi Network (Login, Payment, Seguridad, Data Standard).",
+      "highlight1Desc": "Suporta sa Pi Account + Google Account. Plano na magdagdag ng pinagsamang Login tulad ng Kakao, Line, WeChat sa hinaharap.",
+      "highlight1Title": "🤝 Pinagsamang Login ng Pi · Google",
+      "highlight2Desc": "Pagpapatupad ng PiRC1 (Token Economy) · PiRC2 (Subscription Service) · PiRC3 (Escrow Safe Transaction).",
+      "highlight2Title": "💳 Pagbuo ng Pi Payment Service",
+      "intro": "Ang Cafe.pi ay sumusunod sa mga mahigpit na limitasyon ng Pi Browser sa istruktura at kriptograpiko, at pinapanatili ang integridad ng pondo at Data Standard mula sa simula.",
+      "pillar1Desc": "Sinusuportahan ang Pi Account Login at Pi Payment bilang pangunahing ruta. Ang Payment ay ginagawa lamang sa Pi, at ang Bean ay isang nakapirming panloob na reserba na 1 Pi = 100 Bean.",
+      "pillar1Title": "🟣 Disenyo na Priyoridad ang Pi",
+      "pillar2Desc": "Kahit sa Pi Browser na hindi nagse-save ng Cookie, ligtas na nagla-Login at nagbabayad gamit ang token-based na two-factor authentication. Disenyo ng Client Gate na walang infinite loop.",
+      "pillar2Title": "📱 Ganap na Tugma sa Pi Browser",
+      "pillar3Desc": "Ang lahat ng transaksyon ay naitatala sa isang append-only ledger, at patuloy na biniberipika ang accounting conservation identity (isyu = sirkulasyon + pagbawi). Imposible ang over-issuance at double-payment sa istruktura.",
+      "pillar3Title": "💰 Zero Tolerance sa Integridad ng Pondo",
+      "pillar4Desc": "Tumutugon sa 21 Web Vulnerability Standards ng KISA, at pinoprotektahan laban sa tampering at timing attacks gamit ang HMAC-SHA256 signature Token at constant-time comparison.",
+      "pillar4Title": "🔒 Napatunayang Seguridad",
+      "pillar5Desc": "Inilalapat ang Data Standard ng Korea Data Industry Promotion Agency (K-DATA) mula sa unang Table at ipinapatupad sa pamamagitan ng awtomatikong beripikasyon, na tinitiyak ang pangmatagalang operasyon at pagiging maaasahan ng Audit.",
+      "pillar5Title": "📊 Data Standard na Kinikilala ng Gobyerno",
+      "pillar6Desc": "Nagbibigay ng mabilis na unang screen at maayos na karanasan ng user sa pamamagitan ng server-first rendering at parallel Data fetching, stale-while-revalidate caching, at lokasyon, paghahanap, at Bundle Optimization.",
+      "pillar6Title": "⚡ Performance Optimization",
+      "title": "Mga Teknikal na Lakas ng Cafe.pi"
+    }
   },
   "adminStd": {
     "domainTypeCode": "Code",
@@ -1111,10 +1226,14 @@
       "approveError": "Error sa pag-apruba",
       "approveFail": "Nabigo ang pag-apruba ng server",
       "approveInWallet": "Sa screen ng Pi wallet, pakisang-ayunan ang pagbabayad.",
+      "back": "Bumalik",
+      "capacityN": "{n} katao",
       "completeError": "Error sa pagkumpleto",
       "completeFail": "Nabigo ang pagproseso ng pagkumpleto",
+      "createCostSuffix": "Mababawasan ng Bean (Gabay sa pag-top up kung kulang ang balanse)",
       "created": "Nagawa na ang Cafe!",
       "createError": "Error sa paggawa ng Room",
+      "createEventFree": "🎟️ Gumawa ng Event Room",
       "createFail": "Nabigo ang paggawa ng Room",
       "createFree": "Gumawa ng Libreng Room",
       "createMemo": "Paggawa ng Cafe: {roomNm}",
@@ -1126,21 +1245,35 @@
       "endTimeHint": "Pagkatapos ng oras ng pagtatapos, awtomatikong mag-e-expire ang membership ng kalahok (GUEST).",
       "endTimeLabel": "Oras ng Pagtatapos ng Event *",
       "entryFee": "Entry Fee (Babayaran ng Kalahok)",
+      "entryFeeBean": "{amount} Bean",
       "eventBusinessOnly": "Ang Event Cafe ay para lang sa Business Plan",
+      "eventCreateCostDeduct": "Ang bayad sa paggawa na {amount} Bean ay ibabawas.",
+      "eventCreateCostFree": "Bilang benepisyo ng Subscription, libre ang bayad sa paggawa.",
+      "eventCreateCostMemo": "Bayad sa paggawa ng Event Cafe {amount}",
       "eventCreated": "Nagawa na ang Event Room!",
       "eventCreateError": "Error sa paggawa ng Event Room",
       "eventCreateFail": "Nabigo ang paggawa ng Event Room",
       "eventDesc": "Ito ay isang limitadong-panahong Room kung saan ang mga kalahok ay nagbabayad ng entry fee (π) para makapasok. Walang bayad sa paggawa.",
       "eventTab": "🎟️ Gumawa ng Event Room",
       "eventTitle": "Gumawa ng Event Cafe",
+      "freeEntry": "Libre",
+      "freeRoom7dHint": "Ang Cafe na ginawa nang libre ay mananatili lamang sa loob ng 7 araw at hindi maaaring i-extend. Kung gusto mong magtakda ng sariling duration, gumawa gamit ang Bean payment.",
+      "freeRoom7dValidity": "Validity period: 7 araw (Libreng paggawa)",
+      "freeRoomCapacityLimit": "Ang Cafe na ginawa nang libre ay maaaring magkaroon ng hanggang 10 katao.",
+      "freeRoomPublicOnly": "Ang Cafe na ginawa nang libre ay maaari lamang buksan bilang Public.",
+      "goChargingBean": "Pumunta para mag-top up ng Bean →",
       "groupTab": "💬 Group Room",
       "groupTitle": "Gumawa ng Group Cafe",
       "maxMembers": "Maximum na Miyembro",
       "name": "Pangalan ng Cafe",
       "nameLabel": "Pangalan ng Cafe *",
+      "next": "Susunod",
       "openBtn": "+ Gumawa ng Cafe",
       "payAndCreate": "Magbayad ng {amount} π at Gumawa ng Room",
+      "payAndCreateEvent": "Magbayad at gumawa ng Event Room",
+      "payAndCreateGroup": "Magbayad at gumawa ng Room",
       "piBrowserOnly": "Sa Pi Browser lang posible ang pagbabayad",
+      "premiumCreateCostMemo": "Bayad sa paggawa ng PREMIUM Cafe {amount}",
       "premiumTheme": "PREMIUM Theme",
       "premiumThemeOnce": "PREMIUM Theme (Isang Beses)",
       "privateEmoji": "🔒 Private",
@@ -1153,6 +1286,7 @@
       "total": "Total",
       "unlimited": "Walang Hanggan",
       "validity": "Validity Period",
+      "validityDays": "{n} araw",
       "visibility": "Visibility"
     },
     "customSticker": {
@@ -1408,6 +1542,34 @@
     "upgrade": "Upgrade",
     "yes": "Oo"
   },
+  "consent": {
+    "agreeAll": "Sumang-ayon sa Lahat",
+    "birthInvalid": "Mangyaring ilagay nang tama ang Petsa ng Kapanganakan.",
+    "birthLabel": "Petsa ng Kapanganakan",
+    "desc": "Para magamit ang Cafe.pi, mangyaring sumang-ayon sa mga tuntunin sa ibaba. (Maaaring gamitin pagkatapos sumang-ayon sa mga kinakailangang item)",
+    "errNetwork": "Hindi na-save ang pahintulot dahil sa error sa Network.",
+    "errSave": "Nabigo ang pag-save ng pahintulot.",
+    "guardian": "Wala pang 14 taong gulang — Nakakuha ng pahintulot mula sa legal na tagapag-alaga (guardian).",
+    "lbs": "Pagsang-ayon sa Pagkolekta at Paggamit ng Impormasyon ng Lokasyon",
+    "marketing": "Pagsang-ayon sa Pagtanggap ng Impormasyon sa Marketing",
+    "note": "Maaaring gamitin ang serbisyo kung sumang-ayon sa mga kinakailangang item (Mga Tuntunin ng Paggamit, Personal na Impormasyon, Impormasyon ng Lokasyon).",
+    "optional": "(Opsyonal)",
+    "privacy": "Pagsang-ayon sa Pagkolekta at Paggamit ng Personal na Impormasyon",
+    "processing": "Pinoproseso…",
+    "required": "(Kinakailangan)",
+    "submit": "Sumang-ayon at Magpatuloy",
+    "terms": "Pagsang-ayon sa Mga Tuntunin ng Paggamit",
+    "title": "Pagsang-ayon sa Paggamit ng Serbisyo",
+    "view": "Tingnan"
+  },
+  "errorPage": {
+    "errDesc": "Maaaring pansamantalang error ito. Subukang muli o mag-log in pagkatapos ng ilang sandali.",
+    "errTitle": "May nangyaring problema.",
+    "home": "Home",
+    "nfDesc": "Ang Page na hiniling mo ay wala o nailipat na.",
+    "nfTitle": "Hindi mahanap ang Page.",
+    "retry": "Subukang muli"
+  },
   "event": {
     "agentCol": "Pangalan ng Agent",
     "alreadyExcluded": "Na-exclude na: {names}",
@@ -1572,6 +1734,50 @@
     "tabShopSub": "Onboarding Event ng Tindahan (First-come, First-served)",
     "title": "🎖️ Mission Event",
     "totalCol": "Total"
+  },
+  "faq": {
+    "community": "Patakaran sa Pagpapatakbo ng Komunidad",
+    "email": "Email Inquiry",
+    "items": [
+      {
+        "a": "Sa Pi Browser, pindutin ang 'Gumawa ng Link Code', at pagkatapos mag-log in sa Google sa isang regular na browser, i-paste ang code upang mag-link.",
+        "q": "Paano Mag-log in?"
+      },
+      {
+        "a": "Ito ay isang reserbang pondo na eksklusibo sa Platform. Maaari itong i-charge bilang 1 Pi = 100 Bean at gamitin para sa Subscription, Regalo, atbp., at hindi maaaring i-exchange sa labas.",
+        "q": "Ano ang Bean?"
+      },
+      {
+        "a": "Magbayad gamit ang Pi sa Pi Browser. Ang mga transaksyon sa produkto ay protektado ng Escrow (Ligtas na Pag-iingat).",
+        "q": "Paano Magbayad?"
+      },
+      {
+        "a": "Sa opisyal na paglulunsad ng Mainnet at opisyal na pagpapalabas ng Bean Token, ang Bean na natanggap mula sa Testnet event ay ibibigay nang 1:1.",
+        "q": "Ano ang mangyayari sa Bean na natanggap sa Testnet?"
+      },
+      {
+        "a": "Sumusunod ito sa patakaran sa Refund at Pagkansela ng Subscription. Para sa higit pang detalye, sumangguni sa dokumento ng Patakaran sa Refund sa ibaba.",
+        "q": "Mayroon bang Refund?"
+      },
+      {
+        "a": "Maaari itong isumite kasama ang dahilan sa pamamagitan ng button na 'Ulat' sa mga Post, Tindahan, atbp. Susuriin at gagawa ng aksyon ang operating team.",
+        "q": "Paano Mag-ulat?"
+      },
+      {
+        "a": "Ginagamit ito upang ipakita ang mga kalapit na Cafe, Tindahan, at Produkto ayon sa distansya. Maaaring bawiin ang pahintulot sa My Page.",
+        "q": "Bakit Kailangan ang Impormasyon sa Lokasyon?"
+      }
+    ],
+    "lbs": "Mga Tuntunin ng Location-Based Service",
+    "legalTitle": "Mga Tuntunin at Patakaran",
+    "privacy": "Patakaran sa Privacy",
+    "refund": "Patakaran sa Refund",
+    "subtitle": "Mabilis na Suriin ang Iyong Mga Tanong",
+    "supportTitle": "Suporta sa Customer",
+    "telegram": "Telegram",
+    "terms": "Mga Tuntunin ng Paggamit",
+    "title": "Mga Madalas Itanong",
+    "youth": "Patakaran sa Proteksyon ng Kabataan"
   },
   "header": {
     "admin": "Admin",
@@ -1829,6 +2035,25 @@
       "store": "🛍️ Store"
     },
     "title": "Aking Profile"
+  },
+  "report": {
+    "ABUSE": "Pang-aabuso / Harassment",
+    "button": "Ulat",
+    "cancel": "Kanselahin",
+    "COPYRIGHT": "Paglabag sa Copyright",
+    "detailLabel": "Detalyadong Paliwanag (Opsyonal)",
+    "detailPlaceholder": "Mangyaring isulat nang detalyado ang nilalaman ng ulat",
+    "duplicate": "Naireport na ang item na ito.",
+    "error": "Nabigo ang pagtanggap ng report.",
+    "ETC": "Iba Pa",
+    "FRAUD": "Panduraya / Transaksyon",
+    "PRIVACY": "Paglantad ng Personal na Impormasyon",
+    "reasonLabel": "Dahilan ng Ulat",
+    "SEXUAL": "Malaswa / Sekswal",
+    "SPAM": "SPAM / Advertisement",
+    "submit": "Isumite ang Ulat",
+    "success": "Matagumpay na Naisumite ang Ulat",
+    "title": "Mag-ulat"
   },
   "store": {
     "actionBuyerDone": "Kumpleto na ang Resibo ng Item",
@@ -2124,6 +2349,12 @@
       "TRANSLATE": "Automatic Translation Subscription"
     },
     "renewBtn": "I-renew/Baguhin",
+    "storeGrade": {
+      "L": "L (50 o higit pa)",
+      "M": "M (50 o mas kaunti)",
+      "S": "S (30 o mas kaunti)"
+    },
+    "storeGradeHint": "Aking {count} produkto — pumili ng grade",
     "subscribeBtn": "Mag-subscribe",
     "subscribeFail": "Nabigo ang pagproseso ng subscription",
     "subscribeSuccess": "Nagsimula na ang iyong {product} subscription!",

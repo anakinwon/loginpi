@@ -241,6 +241,7 @@
       "beanAudit": "יומן ביקורת",
       "beanFeePlan": "ניהול תוכנית עמלות",
       "beanSection": "כלכלת Bean ☕",
+      "beanTipPresets": "Gift Presets",
       "beanToken": "Dashboard Bean",
       "beanTopUsers": "משתמשים מובילים",
       "beanTxn": "היסטוריית עסקאות",
@@ -248,6 +249,8 @@
       "board": "ניהול Board",
       "campaign": "אישור Campaign",
       "chatSection": "ניהול Cafe",
+      "checklist": "Open Beta Checklist",
+      "consents": "היסטוריית הסכמה לתנאים",
       "dashboard": "Dashboard",
       "eventExclude": "ניהול החרגה",
       "eventGifts": "שליחת מתנות",
@@ -257,6 +260,7 @@
       "links": "סטטוס קישור חשבונות",
       "logs": "ניהול Log",
       "payments": "היסטוריית תשלומים",
+      "reports": "טיפול בדיווחים",
       "settle": "ניהול התחשבנות",
       "stats": "סטטיסטיקה",
       "stdApprovals": "תהליך אישור",
@@ -268,12 +272,13 @@
       "stdWords": "מילים סטנדרטיות",
       "stickers": "ניהול Sticker",
       "storeCategories": "Product Categories",
+      "storeDistCfg": "הגבלת מרחק",
       "storeSection": "ניהול Store",
       "subscriptions": "ניהול מנויים",
+      "subscrPricing": "תוכניות מנוי",
       "themes": "ניהול Theme",
       "title": "מנהל",
-      "users": "ניהול משתמשים",
-      "subscrPricing": "구독요금제"
+      "users": "ניהול משתמשים"
     },
     "payments": {
       "col": {
@@ -575,6 +580,7 @@
       "col": {
         "cd": "Code",
         "desc": "תיאור",
+        "nmEn": "שם באנגלית",
         "sortOrd": "סדר",
         "theme": "Theme",
         "tp": "Group",
@@ -595,6 +601,7 @@
         "desc": "תיאור·Tag",
         "emoji": "Emoji",
         "nm": "Theme Name",
+        "nmEn": "שם Theme (אנגלית)",
         "sortOrd": "סדר מיון",
         "tp": "Group",
         "useYn": "הצגה"
@@ -605,7 +612,8 @@
       "placeholder": {
         "cd": "ESPORTS",
         "desc": "#Tag #Keyword",
-        "nm": "e-sports"
+        "nm": "e-sports",
+        "nmEn": "eSports"
       },
       "saveFail": "השמירה נכשלה",
       "saveSuccess": "ה-Theme נרשם בהצלחה",
@@ -700,6 +708,89 @@
       "out": "משיכה"
     },
     "homeTitle": "Dashboard",
+    "manual": {
+      "badge": "מדריך למשתמש",
+      "collapse": "צמצם",
+      "expand": "הרחב",
+      "intro": "זה בסדר אם אינך מבין במחשבים. פשוט עקוב אחר ההוראות לפי הסדר 😊 — זכור רק 3 דברים: ① Login ② גלישה ③ קנייה ומכירה",
+      "title": "מדריך למשתמש קל ל-Cafe.pi",
+      "topics": [
+        {
+          "icon": "⭐",
+          "steps": [
+            "ה'שוק המקומי' הגלובלי: תרגום אוטומטי של 200+ שפות · תשלום קל עם Pi · צ'אט, יד שנייה, חנות באפליקציה אחת · חיבור לפי מרחק",
+            "Siren Order לכל ענף: כל אחד יכול להיות בעל עסק · תפריט גמיש · התראות מיידיות · איסוף O2O"
+          ],
+          "title": "למה Cafe.pi?"
+        },
+        {
+          "icon": "🎁",
+          "steps": [
+            "EVENT #1: טען עם TestPi והשלם 10 משימות כדי לקבל 5,000 Bean ל-100 המשתתפים הראשונים",
+            "EVENT #2: רשום את החנות שלך והשלם רישום תפריט + בדיקת עסקה כדי לקבל 10,000 Bean ל-100 המקומות הראשונים",
+            "בלשונית Event, אם תעקוב אחר קישור ההשתתפות לכל משימה, תוכל להשלים זאת בקלות"
+          ],
+          "title": "Event — השתתף עכשיו"
+        },
+        {
+          "icon": "🔑",
+          "steps": [
+            "ב-Pi Browser, אם תלחץ על 'צור קוד חיבור', יופיע קוד בן 6 ספרות (השתמש תוך 10 דקות)",
+            "העתק את הקוד (או הקישור) והעבר אותו לדפדפן רגיל",
+            "בדפדפן רגיל, לאחר Login עם Google, הדבק ולחץ על 'חבר' כדי להשלים את חיבור Pi + Google",
+            "Pi Browser אינו שומר מידע מסיבות אבטחה, לכן הוא מחבר בבטחה את שני הדפדפנים באמצעות קוד בן 6 ספרות"
+          ],
+          "title": "Login & חיבור חשבון"
+        },
+        {
+          "icon": "🎫",
+          "steps": [
+            "1 Pi = 100 Bean (נקודות בלעדיות לפלטפורמה) — תוכל להתחיל מיד עם תוכנית חינם",
+            "הירשם רק למה שאתה צריך: PiCafé™(Premium Cafe) · PiShop™(רישום מוצר) · PiTranslate™(תרגום ללא הגבלה)",
+            "דמי המנוי משולמים עם Bean שנטענו, ותשלום שנתי מקנה חודשיים חינם"
+          ],
+          "title": "Bean & מנוי"
+        },
+        {
+          "icon": "💬",
+          "steps": [
+            "היכנס לחדר Cafe בנושא עניין שלך והתחל צ'אט בחינם",
+            "אם תפעיל 'Cafe קרוב', זה יציג Cafes ושכנים קרובים לפי מרחק",
+            "עם תרגום סימולטני אוטומטי, תוכל לשוחח בשפה שלך עם כל אחד ב-200+ שפות"
+          ],
+          "title": "Cafe & תרגום אוטומטי"
+        },
+        {
+          "icon": "📦",
+          "steps": [
+            "אם תעלה תמונות מוצר ומחיר (Pi), זה יוצג לאנשים קרובים יחד עם המיקום שלך",
+            "ראה פריטים זמינים בקרבת מקום לפי סדר מרחק, ואם תאהב, הזמן עם Pi",
+            "ה-Pi ששולם נשמר בבטחה על ידי הפלטפורמה באופן זמני (נאמנות), ומועבר למוכר בסיום העסקה"
+          ],
+          "title": "שוק יד שנייה (עסקה בטוחה)"
+        },
+        {
+          "icon": "🏪",
+          "steps": [
+            "ב'רישום חנות', אם תקבע את שם החנות והמיקום, לקוחות ימצאו את החנות הקרובה שלך",
+            "רשום תמונות תפריט · מחיר · כמות",
+            "כאשר לקוח מזמין, תקבל התראה מיידית בטלגרם (תפריט · כמות · סכום)",
+            "בסדר של הכנה → מוכן → איסוף, מסור זאת בחנות"
+          ],
+          "title": "החנות שלי (O2O)"
+        },
+        {
+          "icon": "🪙",
+          "steps": [
+            "ה-Bean שהתקבל מאירוע Testnet הנוכחי הוא הבטחה של cafe.pi",
+            "כאשר הפלטפורמה תושק רשמית ב-Mainnet ו-Bean Token יונפק רשמית,",
+            "אסימוני ה-Event שנצברו ב-Testnet יוענקו באופן זהה 1:1 כ-Bean של Mainnet",
+            "זהו העיקרון של cafe.pi להבטיח שמאמצי המשתתפים המוקדמים לא ייעלמו"
+          ],
+          "title": "תגמולי Testnet, כפי שהם ב-Mainnet (הבטחה)"
+        }
+      ]
+    },
     "noData": "אין Data",
     "normalRevenue": "הכנסות מתוכניות רגילות",
     "period30": "30 ימים",
@@ -748,7 +839,31 @@
     },
     "unitCase": "מקרה",
     "unitPerson": "איש",
-    "userActivity": "פעילות {days} ימים · Content {content} · תשלומים {payments}"
+    "userActivity": "פעילות {days} ימים · Content {content} · תשלומים {payments}",
+    "whitepaper": {
+      "badge": "Whitepaper טכני",
+      "collapse": "צמצם",
+      "expand": "הצג פרטים",
+      "footer": "עומד בקריטריוני הרישום של Pi Network (Login, Payment, Security, Data Standard).",
+      "highlight1Desc": "תומך בחשבון Pi + חשבון Google. Integrated Login עבור Kakao, Line, WeChat וכו' יתווסף בהמשך.",
+      "highlight1Title": "🤝 Pi · Google Integrated Login",
+      "highlight2Desc": "יישום PiRC1 (Token Economy) · PiRC2 (Subscription Service) · PiRC3 (Escrow Secure Transaction).",
+      "highlight2Title": "💳 הקמת Pi Payment Service",
+      "intro": "Cafe.pi פותר באופן מבני וקריפטוגרפי את המגבלות המחמירות של Pi Browser, ושומר על שלמות פיננסית ותקני Data משלב ההשקה.",
+      "pillar1Desc": "תומך ב-Login של חשבון Pi ו-Payment של Pi כנתיב ראשי. תשלומים מתבצעים רק עם Pi, ו-Bean הוא עתודה פנימית קבועה של 1 Pi = 100 Bean.",
+      "pillar1Title": "🟣 Pi Priority Design",
+      "pillar2Desc": "גם ב-Pi Browser, שאינו שומר Cookies, Login ו-Payment מעובדים בצורה מאובטחת עם אימות דו-שלבי מבוסס Token. עיצוב Client gate ללא לולאות אינסופיות.",
+      "pillar2Title": "📱 Pi Browser Perfect Compatibility",
+      "pillar3Desc": "כל העסקאות נרשמות ב-ledger מסוג append-only, וזהות שימור החשבונאות (הנפקה = מחזור + איסוף) מאומתת באופן קבוע. הנפקת יתר ותשלום כפול בלתי אפשריים מבחינה מבנית.",
+      "pillar3Title": "💰 אפס סובלנות לשלמות פיננסית",
+      "pillar4Desc": "מגיב ל-21 תקני פגיעות אינטרנט של KISA, ומגן מפני זיוף, שינוי והתקפות תזמון באמצעות Tokens חתומים ב-HMAC-SHA256 והשוואת זמן קבוע.",
+      "pillar4Title": "🔒 אבטחה מאומתת",
+      "pillar5Desc": "מיישם את Data Standard של K-DATA (Korea Data Agency) מהטבלה הראשונה ואוכף אותו באמצעות אימות אוטומטי, מה שמבטיח אמינות תפעול וביקורת לטווח ארוך.",
+      "pillar5Title": "📊 Data Standard מאושר ממשלתית",
+      "pillar6Desc": "מספק מסך ראשוני מהיר וחווית משתמש חלקה באמצעות Server-first rendering, Data fetching מקבילי, stale-while-revalidate caching, ואופטימיזציית מיקום/חיפוש/bundle.",
+      "pillar6Title": "⚡ אופטימיזציית ביצועים",
+      "title": "החוזקות הטכניות של Cafe.pi"
+    }
   },
   "adminStd": {
     "domainTypeCode": "קוד",
@@ -1111,10 +1226,14 @@
       "approveError": "שגיאת אישור",
       "approveFail": "אישור Server נכשל",
       "approveInWallet": "אנא אשר/י את התשלום במסך Pi Wallet.",
+      "back": "קודם",
+      "capacityN": "{n} אנשים",
       "completeError": "שגיאת השלמה",
       "completeFail": "השלמה נכשלה",
+      "createCostSuffix": "Bean ינוכה (הנחיית טעינה אם היתרה אינה מספקת)",
       "created": "ה-Cafe נוצר בהצלחה!",
       "createError": "שגיאת יצירת חדר",
+      "createEventFree": "🎟️ צור חדר Event",
       "createFail": "יצירת חדר נכשלה",
       "createFree": "צור חדר חינם",
       "createMemo": "יצירת Cafe: {roomNm}",
@@ -1126,21 +1245,35 @@
       "endTimeHint": "לאחר שעת הסיום, חברות ה-GUEST של המשתתפים תפוג אוטומטית",
       "endTimeLabel": "שעת סיום ה-Event *",
       "entryFee": "דמי כניסה (תשלום משתתף)",
+      "entryFeeBean": "{amount} Bean",
       "eventBusinessOnly": "Cafe Event מיועד ל-Business Plan בלבד",
+      "eventCreateCostDeduct": "דמי יצירה בסך {amount} Bean ינוכו.",
+      "eventCreateCostFree": "כהטבת מנוי, דמי היצירה הם בחינם.",
+      "eventCreateCostMemo": "דמי יצירת Cafe Event {amount}",
       "eventCreated": "חדר ה-Event נוצר בהצלחה!",
       "eventCreateError": "שגיאת יצירת חדר Event",
       "eventCreateFail": "יצירת חדר Event נכשלה",
       "eventDesc": "זהו חדר לזמן מוגבל שבו משתתפים משלמים דמי כניסה (π) ונכנסים. אין עלות יצירה.",
       "eventTab": "🎟️ צור חדר Event",
       "eventTitle": "צור Cafe Event",
+      "freeEntry": "חינם",
+      "freeRoom7dHint": "Cafe שנוצר בחינם נשמר למשך 7 ימים בלבד ולא ניתן להאריך אותו. כדי לציין את התקופה בעצמך, צור אותו בתשלום Bean.",
+      "freeRoom7dValidity": "תקופת תוקף 7 ימים (יצירה חינם)",
+      "freeRoomCapacityLimit": "Cafe שנוצר בחינם יכול להכיל עד 10 אנשים.",
+      "freeRoomPublicOnly": "Cafes שנוצרים בחינם ניתן לפתוח רק כציבוריים.",
+      "goChargingBean": "עבור לטעון Bean ←",
       "groupTab": "💬 חדר Group",
       "groupTitle": "צור Cafe Group",
       "maxMembers": "Max Members",
       "name": "שם ה-Cafe",
       "nameLabel": "שם ה-Cafe *",
+      "next": "הבא",
       "openBtn": "+ צור Cafe",
       "payAndCreate": "שלם {amount} π וצור חדר",
+      "payAndCreateEvent": "שלם וצור חדר Event",
+      "payAndCreateGroup": "שלם וצור חדר",
       "piBrowserOnly": "ניתן לבצע תשלום רק ב-Pi Browser",
+      "premiumCreateCostMemo": "דמי יצירת Cafe PREMIUM {amount}",
       "premiumTheme": "PREMIUM Theme",
       "premiumThemeOnce": "PREMIUM Theme חד פעמי",
       "privateEmoji": "🔒 Private",
@@ -1153,6 +1286,7 @@
       "total": "סה\"כ",
       "unlimited": "ללא הגבלה",
       "validity": "תקופת תוקף",
+      "validityDays": "{n} ימים",
       "visibility": "Visibility"
     },
     "customSticker": {
@@ -1408,6 +1542,34 @@
     "upgrade": "Upgrade",
     "yes": "כן"
   },
+  "consent": {
+    "agreeAll": "אשר הכל",
+    "birthInvalid": "אנא הזן את תאריך הלידה שלך בצורה נכונה.",
+    "birthLabel": "תאריך לידה",
+    "desc": "אנא אשר את התנאים הבאים כדי להשתמש ב-Cafe.pi. (זמין לאחר אישור פריטי חובה)",
+    "errNetwork": "שמירת ההסכמה נכשלה עקב שגיאת רשת",
+    "errSave": "שמירת ההסכמה נכשלה",
+    "guardian": "מתחת לגיל 14 — התקבלה הסכמת אפוטרופוס חוקי (הורה).",
+    "lbs": "הסכמה לאיסוף ושימוש במידע מיקום",
+    "marketing": "הסכמה לקבלת מידע שיווקי",
+    "note": "עליך להסכים לפריטי החובה (תנאי שירות, מידע אישי, מידע מיקום) כדי להשתמש בשירות.",
+    "optional": "(אופציונלי)",
+    "privacy": "הסכמה לאיסוף ושימוש במידע אישי",
+    "processing": "מעבד...",
+    "required": "(חובה)",
+    "submit": "אשר והמשך",
+    "terms": "הסכמה לתנאי השירות",
+    "title": "הסכמה לשימוש בשירות",
+    "view": "הצג"
+  },
+  "errorPage": {
+    "errDesc": "זו עשויה להיות שגיאה זמנית. אנא נסה שוב או התחבר מאוחר יותר.",
+    "errTitle": "אירעה בעיה.",
+    "home": "לדף הבית",
+    "nfDesc": "הדף שביקשת אינו קיים או הועבר.",
+    "nfTitle": "הדף לא נמצא",
+    "retry": "נסה שוב"
+  },
   "event": {
     "agentCol": "שם סוכן",
     "alreadyExcluded": "כבר הוחרגו: {names}",
@@ -1572,6 +1734,50 @@
     "tabShopSub": "אירוע Onboarding בחנות כל הקודם זוכה",
     "title": "🎖️ Event Mission",
     "totalCol": "סך הכל"
+  },
+  "faq": {
+    "community": "מדיניות הפעלת Community",
+    "email": "פנייה במייל",
+    "items": [
+      {
+        "a": "ב-Pi Browser, לחץ על 'צור קוד קישור', ולאחר התחברות ל-Google בדפדפן רגיל, הדבק את הקוד כדי לקשר.",
+        "q": "כיצד אני מתחבר?"
+      },
+      {
+        "a": "זהו קרן צבירה ייעודית לפלטפורמה. ניתן לטעון 1 Pi = 100 Bean ולהשתמש בו למנויים, מתנות וכו', ולא ניתן להחליף אותו במטבע חוץ.",
+        "q": "מהו Bean?"
+      },
+      {
+        "a": "תשלום מתבצע באמצעות Pi ב-Pi Browser. עסקאות מוצרים מוגנות באמצעות Escrow (שמירה בטוחה).",
+        "q": "כיצד אני משלם?"
+      },
+      {
+        "a": "עם השקת ה-Mainnet הרשמית והנפקת ה-Bean Token הרשמית, ה-Bean שהתקבל מאירועי Testnet ישולם ביחס של 1:1.",
+        "q": "מה קורה ל-Bean שהתקבל ב-Testnet?"
+      },
+      {
+        "a": "אנו פועלים לפי מדיניות ההחזרים וביטול העסקה. לפרטים נוספים, עיין במסמך מדיניות ההחזרים למטה.",
+        "q": "האם ניתן לקבל החזר?"
+      },
+      {
+        "a": "ניתן להגיש דיווח עם סיבה באמצעות כפתור 'דיווח' בפוסטים, חנויות וכו'. צוות התפעול יבדוק וינקוט פעולה.",
+        "q": "כיצד אני מדווח?"
+      },
+      {
+        "a": "הוא משמש להצגת בתי קפה, חנויות ומוצרים קרובים לפי מרחק. ניתן לבטל הסכמה בדף 'החשבון שלי'.",
+        "q": "מדוע נדרש מידע מיקום?"
+      }
+    ],
+    "lbs": "תנאי שירות מבוססי מיקום",
+    "legalTitle": "תנאים ומדיניות",
+    "privacy": "מדיניות פרטיות",
+    "refund": "מדיניות החזרים",
+    "subtitle": "בדוק במהירות את מה שאתה סקרן לגביו",
+    "supportTitle": "תמיכת לקוחות",
+    "telegram": "Telegram",
+    "terms": "תנאי שימוש",
+    "title": "שאלות נפוצות",
+    "youth": "מדיניות הגנת נוער"
   },
   "header": {
     "admin": "Admin",
@@ -1829,6 +2035,25 @@
       "store": "🛍️ Store"
     },
     "title": "הפרופיל שלי"
+  },
+  "report": {
+    "ABUSE": "העלבה / הטרדה",
+    "button": "דיווח",
+    "cancel": "ביטול",
+    "COPYRIGHT": "הפרת זכויות יוצרים",
+    "detailLabel": "תיאור מפורט (אופציונלי)",
+    "detailPlaceholder": "אנא כתוב את פרטי הדיווח בפירוט",
+    "duplicate": "פריט זה כבר דווח.",
+    "error": "הגשת הדיווח נכשלה.",
+    "ETC": "אחר",
+    "FRAUD": "הונאה / עסקה",
+    "PRIVACY": "חשיפת מידע אישי",
+    "reasonLabel": "סיבת דיווח",
+    "SEXUAL": "פורנוגרפיה / תוכן מיני בוטה",
+    "SPAM": "Spam / פרסומת",
+    "submit": "שלח דיווח",
+    "success": "הדיווח נשלח בהצלחה",
+    "title": "דווח"
   },
   "store": {
     "actionBuyerDone": "קבלת פריט הושלמה",
@@ -2124,6 +2349,12 @@
       "TRANSLATE": "מנוי תרגום אוטומטי"
     },
     "renewBtn": "חדש/שנה",
+    "storeGrade": {
+      "L": "L (מעל 50 פריטים)",
+      "M": "M (עד 50 פריטים)",
+      "S": "S (עד 30 פריטים)"
+    },
+    "storeGradeHint": "{count} מוצרים שלי — בחר דרגה",
     "subscribeBtn": "הירשם",
     "subscribeFail": "עיבוד המנוי נכשל",
     "subscribeSuccess": "המנוי ל-{product} החל בהצלחה!",

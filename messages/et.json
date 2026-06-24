@@ -241,6 +241,7 @@
       "beanAudit": "Auditi Log",
       "beanFeePlan": "Tasuliste plaanide haldus",
       "beanSection": "☕ Beani majandus",
+      "beanTipPresets": "Kingituse Presets",
       "beanToken": "Bean Dashboard",
       "beanTopUsers": "Parimad kasutajad",
       "beanTxn": "Tehingute ajalugu",
@@ -248,6 +249,8 @@
       "board": "Board haldus",
       "campaign": "Campaigni kinnitus",
       "chatSection": "Kohviku haldus",
+      "checklist": "Open Beta Checklist",
+      "consents": "Nõusolekute ajalugu",
       "dashboard": "Dashboard",
       "eventExclude": "Väljaarvamise haldamine",
       "eventGifts": "Kingituste saatmine",
@@ -257,6 +260,7 @@
       "links": "Konto linkimise staatus",
       "logs": "Log haldus",
       "payments": "Maksete ajalugu",
+      "reports": "Aruannete haldamine",
       "settle": "Arvelduse haldus",
       "stats": "Statistika",
       "stdApprovals": "Kinnituse töövoog",
@@ -268,12 +272,13 @@
       "stdWords": "Standard Words",
       "stickers": "Stickerite haldus",
       "storeCategories": "Toote Category",
+      "storeDistCfg": "Kauguse piirang",
       "storeSection": "Store haldus",
       "subscriptions": "Tellimuste haldus",
+      "subscrPricing": "Tellimuse hinnakiri",
       "themes": "Teemade haldus",
       "title": "Admin",
-      "users": "Kasutajate haldus",
-      "subscrPricing": "구독요금제"
+      "users": "Kasutajate haldus"
     },
     "payments": {
       "col": {
@@ -575,6 +580,7 @@
       "col": {
         "cd": "Kood",
         "desc": "Kirjeldus",
+        "nmEn": "Ingliskeelne nimi",
         "sortOrd": "Järjekord",
         "theme": "Theme",
         "tp": "Group",
@@ -595,6 +601,7 @@
         "desc": "Kirjeldus·Tag",
         "emoji": "Emoji",
         "nm": "Theme'i nimi",
+        "nmEn": "Teema nimi (inglise keeles)",
         "sortOrd": "Sorteerimisjärjekord",
         "tp": "Group",
         "useYn": "Nähtavus"
@@ -605,7 +612,8 @@
       "placeholder": {
         "cd": "ESPORTS",
         "desc": "#Tag #Keyword",
-        "nm": "e-sports"
+        "nm": "e-sports",
+        "nmEn": "eSports"
       },
       "saveFail": "Salvestamine ebaõnnestus",
       "saveSuccess": "Theme on registreeritud",
@@ -700,6 +708,89 @@
       "out": "Väljavõtmine"
     },
     "homeTitle": "Dashboard",
+    "manual": {
+      "badge": "Kasutusjuhend",
+      "collapse": "Ahenda",
+      "expand": "Laienda",
+      "intro": "Pole hullu, kui sa arvutit hästi ei tunne. Lihtsalt järgi juhiseid 😊 — Pea meeles vaid 3 asja: ① Login ② Avasta ③ Osta ja müü",
+      "title": "Cafe.pi lihtne kasutusjuhend",
+      "topics": [
+        {
+          "icon": "⭐",
+          "steps": [
+            "Globaalne 'Danggeun': automaatne tõlge 200+ keeles · Pi lihtne makse · vestlus, kasutatud kaubad, poed ühes rakenduses · ühendus kauguse järgi",
+            "'Siren Order', mis ei vali tegevusala: igaüks saab olla omanik · vaba menüü · kohesed teavitused · O2O Pick-up"
+          ],
+          "title": "Miks Cafe.pi?"
+        },
+        {
+          "icon": "🎁",
+          "steps": [
+            "EVENT #1: Laadi TestPi-ga ja täida 10 missiooni, siis esimesele 100-le 5000 Bean'i",
+            "EVENT #2: Registreeri oma pood ja lõpeta menüü registreerimine + tehingu test, siis esimesele 100 kohale 10 000 Bean'i",
+            "Event-tabis missioonipõhiseid osalemislinke järgides saad need hõlpsasti täita"
+          ],
+          "title": "Event — Osale kohe"
+        },
+        {
+          "icon": "🔑",
+          "steps": [
+            "Pi Browseris vajutades 'Loo ühenduskood' ilmub 6-kohaline kood (kasuta 10 minuti jooksul)",
+            "Kopeeri kood (või link) ja vii see tavalisse Browserisse",
+            "Tavalises Browseris pärast Google Login'i kleebi ja vajuta 'Ühenda', siis Pi + Google ühendus on valmis",
+            "Pi Browser ei salvesta turvalisuse huvides infot, 6-kohaline kood ühendab kaks Browserit turvaliselt"
+          ],
+          "title": "Login & Konto ühendamine"
+        },
+        {
+          "icon": "🎫",
+          "steps": [
+            "1 Pi = 100 Bean (platvormi eksklusiivne boonus) — saad kohe alustada tasuta Plan'iga",
+            "Vali ja telli ainult see, mida vajad: PiCafé™(Premium Cafe) · PiShop™(Toote registreerimine) · PiTranslate™(Piiramatu tõlge)",
+            "Subscription'i tasu makstakse laetud Bean'idega ja aastane makse annab 2 kuud tasuta"
+          ],
+          "title": "Bean & Subscription"
+        },
+        {
+          "icon": "💬",
+          "steps": [
+            "Sisene huvipakkuva teema Cafe ruumi ja alusta tasuta Chat'i",
+            "Kui lülitad sisse 'Lähedal asuvad Cafe'd', näitab see lähedalasuvaid Cafe'sid ja naabreid kauguse järgi",
+            "Automaatse sünkroontõlkega saad suhelda kellegagi 200+ keeles oma keeles"
+          ],
+          "title": "Cafe & Automaatne tõlge"
+        },
+        {
+          "icon": "📦",
+          "steps": [
+            "Kui laed üles toote pildid ja hinna (Pi), näidatakse seda koos sinu asukohaga lähedalasuvale inimesele",
+            "Vaata lähedalasuvaid esemeid kauguse järgi ja kui meeldib, telli Pi-ga",
+            "Makstud Pi hoiab platvorm ajutiselt turvaliselt (Escrow) ja pärast tehingu lõppu edastatakse see müüjale"
+          ],
+          "title": "Kasutatud asjade turg (Turvaline tehing)"
+        },
+        {
+          "icon": "🏪",
+          "steps": [
+            "'Poe registreerimine' all, kui määrad poe nime ja asukoha, tulevad kliendid lähedalasuvasse poodi",
+            "Registreeri menüü pildid · hind · kogus",
+            "Kui klient tellib, saad kohe teavituse Telegrami (Menüü · Kogus · Summa)",
+            "Anna poest üle järjekorras: Valmistamisel → Valmis → Pick-up"
+          ],
+          "title": "Minu pood (O2O)"
+        },
+        {
+          "icon": "🪙",
+          "steps": [
+            "Praegu Testneti Event'iga saadud Bean'id on cafe.pi lubadus",
+            "Kui platvorm Mainnetis ametlikult käivitatakse ja Bean Token ametlikult väljastatakse,",
+            "Testnetis teenitud Event Token'id makstakse samamoodi 1:1 Mainneti Bean'idena välja",
+            "See on cafe.pi põhimõte, mis tagab, et varajaste osalejate pingutused ei lähe kaotsi"
+          ],
+          "title": "Testneti preemiad, Mainnetis samamoodi (Lubadus)"
+        }
+      ]
+    },
     "noData": "Data puudub",
     "normalRevenue": "Tavaplaani tulu",
     "period30": "30 päeva",
@@ -748,7 +839,31 @@
     },
     "unitCase": "juhtumit",
     "unitPerson": "inimest",
-    "userActivity": "Aktiivsus {days} päeva · Content {content} · maksed {payments}"
+    "userActivity": "Aktiivsus {days} päeva · Content {content} · maksed {payments}",
+    "whitepaper": {
+      "badge": "Tehniline Whitepaper",
+      "collapse": "Ahenda",
+      "expand": "Vaata lähemalt",
+      "footer": "Vastab Pi Networki noteerimiskriteeriumidele (Login, makse, turvalisus, Data standard).",
+      "highlight1Desc": "Toetab Pi kontot + Google'i kontot. Integreeritud Login Kakao, Line'i, WeChati jne jaoks lisatakse hiljem.",
+      "highlight1Title": "🤝 Pi · Google integreeritud Login",
+      "highlight2Desc": "PiRC1 (Token Economy) · PiRC2 (Tellimusteenus) · PiRC3 (Escrow turvaline tehing) rakendamine.",
+      "highlight2Title": "💳 Pi makseteenuse loomine",
+      "intro": "Cafe.pi lahendab Pi Browseri ranged piirangud struktuurselt ja krüptograafiliselt ning säilitab finantsilise terviklikkuse ja Data standardid alates käivitamise faasist.",
+      "pillar1Desc": "Toetab Pi konto Login'i ja Pi makseid esmase teena. Maksed tehakse ainult Pi-ga ja Bean on fikseeritud sisemine reserv 1 Pi = 100 Bean.",
+      "pillar1Title": "🟣 Pi esmane disain",
+      "pillar2Desc": "Isegi Pi Browseris, mis ei salvesta küpsiseid, toimub turvaline Login ja makse Token-põhise kaheastmelise autentimisega. Kliendi värava disain ilma lõputute tsükliteta.",
+      "pillar2Title": "📱 Pi Browser täielik ühilduvus",
+      "pillar3Desc": "Kõik tehingud salvestatakse ainult lisatavasse pearaamatusse ja raamatupidamise säilitamise identiteeti (väljaandmine = ringlus + tagastamine) kontrollitakse pidevalt. Üle-väljaandmine ja topeltkulutamine on struktuurselt võimatu.",
+      "pillar3Title": "💰 Nulltolerants finantsilise terviklikkuse suhtes",
+      "pillar4Desc": "Vastab KISA 21 veebinõrkuse standardile ja kaitseb võltsimise, muutmise ja ajastusrünnakute eest HMAC-SHA256 allkirjastatud Token'ite ja konstantse aja võrdlusega.",
+      "pillar4Title": "🔒 Kontrollitud turvalisus",
+      "pillar5Desc": "Rakendab K-DATA Data standardeid alates esimesest tabelist ja jõustab neid automaatse kontrolliga, tagades pikaajalise töö ja auditi usaldusväärsuse.",
+      "pillar5Title": "📊 Valitsuse sertifitseeritud Data Standard",
+      "pillar6Desc": "Pakub kiiret algkuva ja sujuvat kasutatavust serveripõhise renderdamise, paralleelse Data toomise, stale-while-revalidate vahemälu ja asukoha/otsingu/komplekti optimeerimise kaudu.",
+      "pillar6Title": "⚡ Jõudluse optimeerimine",
+      "title": "Cafe.pi tehnilised tugevused"
+    }
   },
   "adminStd": {
     "domainTypeCode": "Kood",
@@ -1111,10 +1226,14 @@
       "approveError": "Kinnituse viga",
       "approveFail": "Serveri kinnitamine ebaõnnestus",
       "approveInWallet": "Palun kinnita makse Pi walleti ekraanil.",
+      "back": "Eelmine",
+      "capacityN": "{n} inimest",
       "completeError": "Lõpetamise viga",
       "completeFail": "Lõpetamine ebaõnnestus",
+      "createCostSuffix": "Bean võetakse maha (teade laadimise kohta, kui saldo on ebapiisav)",
       "created": "Cafe on loodud!",
       "createError": "Ruumi loomise viga",
+      "createEventFree": "🎟️ Loo Event-ruum",
       "createFail": "Ruumi loomine ebaõnnestus",
       "createFree": "Loo tasuta ruum",
       "createMemo": "Cafe loomine: {roomNm}",
@@ -1126,21 +1245,35 @@
       "endTimeHint": "Pärast lõpuaega aegub osaleja (GUEST) Membership automaatselt",
       "endTimeLabel": "Event'i lõpuaeg *",
       "entryFee": "Sissepääsutasu (Osaleja makse)",
+      "entryFeeBean": "{amount} Bean",
       "eventBusinessOnly": "Event Cafe on ainult Business Plani jaoks",
+      "eventCreateCostDeduct": "Loomistasu {amount} Bean'i arvestatakse maha.",
+      "eventCreateCostFree": "Subscription'i eelise tõttu on loomistasu tasuta.",
+      "eventCreateCostMemo": "Event Cafe loomise tasu {amount}",
       "eventCreated": "Event-ruum on loodud!",
       "eventCreateError": "Event-ruumi loomise viga",
       "eventCreateFail": "Event-ruumi loomine ebaõnnestus",
       "eventDesc": "Ajalise piiranguga ruum, kuhu osalejad sisenevad, makstes sissepääsutasu (π). Loomiskulu puudub.",
       "eventTab": "🎟️ Loo Event-ruum",
       "eventTitle": "Loo Event Cafe",
+      "freeEntry": "Tasuta",
+      "freeRoom7dHint": "Tasuta loodud Cafe'd kehtivad ainult 7 päeva ja neid ei saa pikendada. Kui soovite määrata oma kehtivusaja, looge see Bean maksega.",
+      "freeRoom7dValidity": "Kehtivusaeg 7 päeva (tasuta loomine)",
+      "freeRoomCapacityLimit": "Tasuta loodud Cafe'd mahutavad kuni 10 inimest.",
+      "freeRoomPublicOnly": "Tasuta loodud Cafe'd saab avada ainult avalikuna.",
+      "goChargingBean": "Mine Bean'i laadima →",
       "groupTab": "💬 Group-ruum",
       "groupTitle": "Loo Group Cafe",
       "maxMembers": "Maksimaalne liikmete arv",
       "name": "Cafe nimi",
       "nameLabel": "Cafe nimi *",
+      "next": "Järgmine",
       "openBtn": "+ Loo Cafe",
       "payAndCreate": "{amount} π makse ja ruumi loomine",
+      "payAndCreateEvent": "Maksa ja loo Event-ruum",
+      "payAndCreateGroup": "Maksa ja loo ruum",
       "piBrowserOnly": "Makse on võimalik ainult Pi Browseris",
+      "premiumCreateCostMemo": "PREMIUM Cafe loomise tasu {amount}",
       "premiumTheme": "PREMIUM Theme",
       "premiumThemeOnce": "PREMIUM Theme ühekordne",
       "privateEmoji": "🔒 Privaatne",
@@ -1153,6 +1286,7 @@
       "total": "Kokku",
       "unlimited": "Piiramatu",
       "validity": "Kehtivusaeg",
+      "validityDays": "{n} päeva",
       "visibility": "Nähtavus"
     },
     "customSticker": {
@@ -1408,6 +1542,34 @@
     "upgrade": "Upgrade",
     "yes": "Jah"
   },
+  "consent": {
+    "agreeAll": "Nõustun kõigega",
+    "birthInvalid": "Palun sisestage sünnikuupäev õigesti.",
+    "birthLabel": "Sünnikuupäev",
+    "desc": "Cafe.pi kasutamiseks palun nõustuge alltoodud tingimustega. (Saadaval pärast kohustuslike punktidega nõustumist)",
+    "errNetwork": "Nõusoleku salvestamine ebaõnnestus võrguvea tõttu",
+    "errSave": "Nõusoleku salvestamine ebaõnnestus",
+    "guardian": "Alla 14-aastane — Seadusliku eestkostja (lapsevanema) nõusolek on saadud.",
+    "lbs": "Nõusolek asukohateabe kogumiseks ja kasutamiseks",
+    "marketing": "Nõusolek turundusteabe saamiseks",
+    "note": "Teenuse kasutamiseks peate nõustuma kohustuslike punktidega (kasutustingimused, isikuandmed, asukohateave).",
+    "optional": "(Valikuline)",
+    "privacy": "Nõusolek isikuandmete kogumiseks ja kasutamiseks",
+    "processing": "Töötlemine…",
+    "required": "(Kohustuslik)",
+    "submit": "Nõustu ja jätka",
+    "terms": "Nõustun kasutustingimustega",
+    "title": "Nõusolek teenuse kasutamiseks",
+    "view": "Vaata"
+  },
+  "errorPage": {
+    "errDesc": "See võib olla ajutine viga. Palun proovige uuesti või proovige hiljem uuesti.",
+    "errTitle": "Ilmnes probleem.",
+    "home": "Avalehele",
+    "nfDesc": "Teie soovitud lehte ei eksisteeri või see on teisaldatud.",
+    "nfTitle": "Lehte ei leitud",
+    "retry": "Proovi uuesti"
+  },
   "event": {
     "agentCol": "Agendi nimi",
     "alreadyExcluded": "Juba välja arvatud: {names}",
@@ -1572,6 +1734,50 @@
     "tabShopSub": "Poe esimesena teenindatud Onboarding Event",
     "title": "🎖️ Missiooni sündmus",
     "totalCol": "Kokku"
+  },
+  "faq": {
+    "community": "Community Operating Policy",
+    "email": "E-posti päring",
+    "items": [
+      {
+        "a": "Pi Browseris vajutage 'Loo linkimiskood', logige tavalises brauseris Google'iga sisse ja kleepige see kood linkimiseks.",
+        "q": "Kuidas sisse logida?"
+      },
+      {
+        "a": "See on platvormipõhine reserv. Laadige 1 Pi = 100 Beaniga ja kasutage seda tellimuste, kingituste jms jaoks. Välist vahetust ei toimu.",
+        "q": "Mis on Bean?"
+      },
+      {
+        "a": "Maksa Pi-ga Pi Browseris. Kaubatehingud on kaitstud tingdeponeerimisega (turvaline hoiustamine).",
+        "q": "Kuidas maksta?"
+      },
+      {
+        "a": "Mainneti ametliku käivitamise ja Bean Tokeni ametliku väljastamise korral makstakse Testneti sündmusest saadud Beanid välja 1:1 suhtes.",
+        "q": "Mis juhtub Testnetis saadud Beanidega?"
+      },
+      {
+        "a": "Järgime tagasimakse ja tellimuse tühistamise poliitikat. Lisateabe saamiseks vaadake allolevat tagasimakse poliitika dokumenti.",
+        "q": "Kas tagasimakse on võimalik?"
+      },
+      {
+        "a": "Saate esitada aruande koos põhjusega, kasutades postituste, poodide jms 'Teata' nuppu. Operatsioonimeeskond vaatab selle läbi ja võtab meetmeid.",
+        "q": "Kuidas teatada?"
+      },
+      {
+        "a": "Seda kasutatakse lähedalasuvate kohvikute, poodide ja toodete kuvamiseks kauguse järgi. Nõusoleku saab tagasi võtta Minu lehel.",
+        "q": "Miks on asukohateave vajalik?"
+      }
+    ],
+    "lbs": "Asukohapõhiste teenuste tingimused",
+    "legalTitle": "Tingimused ja poliitikad",
+    "privacy": "Privaatsuspoliitika",
+    "refund": "Tagasimakse poliitika",
+    "subtitle": "Leidke kiiresti vastused oma küsimustele",
+    "supportTitle": "Klienditugi",
+    "telegram": "Telegram",
+    "terms": "Kasutustingimused",
+    "title": "Korduma kippuvad küsimused",
+    "youth": "Noorte kaitse poliitika"
   },
   "header": {
     "admin": "Admin",
@@ -1829,6 +2035,25 @@
       "store": "🛍️ Store"
     },
     "title": "Minu profiil"
+  },
+  "report": {
+    "ABUSE": "Vägivald / Ahistamine",
+    "button": "Teata",
+    "cancel": "Tühista",
+    "COPYRIGHT": "Autoriõiguste rikkumine",
+    "detailLabel": "Detailne kirjeldus (valikuline)",
+    "detailPlaceholder": "Palun kirjeldage aruande sisu üksikasjalikult",
+    "duplicate": "See üksus on juba teatatud.",
+    "error": "Teate esitamine ebaõnnestus.",
+    "ETC": "Muu",
+    "FRAUD": "Pettus / Tehing",
+    "PRIVACY": "Isikuandmete avaldamine",
+    "reasonLabel": "Aruande põhjus",
+    "SEXUAL": "Rõvedus / Seksualiseerimine",
+    "SPAM": "SPAM / Reklaam",
+    "submit": "Esita aruanne",
+    "success": "Aruanne on esitatud",
+    "title": "Teata"
   },
   "store": {
     "actionBuyerDone": "Kaup vastu võetud",
@@ -2124,6 +2349,12 @@
       "TRANSLATE": "Automaattõlke tellimus"
     },
     "renewBtn": "Uuenda/Muuda",
+    "storeGrade": {
+      "L": "L (üle 50)",
+      "M": "M (kuni 50)",
+      "S": "S (kuni 30)"
+    },
+    "storeGradeHint": "Minu {count} toodet — vali tase",
     "subscribeBtn": "Telli",
     "subscribeFail": "Tellimuse töötlemine ebaõnnestus",
     "subscribeSuccess": "{product} tellimus on alanud!",
