@@ -721,6 +721,89 @@
       "pillar6Desc": "Server-first rendering with parallel data fetching, stale-while-revalidate caching, and location/search/bundle optimizations deliver a fast first paint and smooth experience.",
       "footer": "Meets Pi Network listing criteria (login, payment, security, data standard)."
     },
+    "manual": {
+      "badge": "User Guide",
+      "title": "Easy User Guide",
+      "expand": "Learn more",
+      "collapse": "Collapse",
+      "intro": "No tech skills needed — just follow the steps 😊. Remember just 3 things: ① Log in ② Explore ③ Buy & sell",
+      "topics": [
+        {
+          "icon": "🔑",
+          "title": "Login & account linking",
+          "steps": [
+            "In Pi Browser, tap 'Generate link code' to get a 6-digit code (use within 10 minutes)",
+            "Copy the code (or link) and move to a regular browser",
+            "In the regular browser, sign in with Google, paste it, and tap 'Link' — Pi + Google connected",
+            "Pi Browser cannot store credentials, so the 6-digit code safely bridges the two browsers"
+          ]
+        },
+        {
+          "icon": "🎁",
+          "title": "Events — join now",
+          "steps": [
+            "EVENT #1: Top up with Test-Pi and complete 10 missions → 5,000 Bean for the first 100 people",
+            "EVENT #2: Register your store, add menus, and finish a test trade → 10,000 Bean for the first 100 stores",
+            "Follow the per-mission links on the Event tab to complete them easily"
+          ]
+        },
+        {
+          "icon": "🎫",
+          "title": "Bean & subscriptions",
+          "steps": [
+            "1 Pi = 100 Bean (platform-only credit) — start right away on the free plan",
+            "Subscribe only to what you need: PiCafé™ (premium cafés) · PiShop™ (product listings) · PiTranslate™ (unlimited translation)",
+            "Subscriptions are paid with topped-up Bean; annual billing gives 2 months free"
+          ]
+        },
+        {
+          "icon": "💬",
+          "title": "Cafés & auto-translation",
+          "steps": [
+            "Join a café room on a topic you like and start chatting for free",
+            "Turn on 'Nearby cafés' to see nearby cafés and neighbors by distance",
+            "Auto real-time translation lets you talk in your own language with anyone across 200+ languages"
+          ]
+        },
+        {
+          "icon": "📦",
+          "title": "Marketplace (safe trade)",
+          "steps": [
+            "Post a photo and price (Pi); your item shows to nearby people along with your location",
+            "Browse nearby items by distance and order with Pi when you find one you like",
+            "Your Pi is held safely by the platform (escrow) and released to the seller once the trade completes"
+          ]
+        },
+        {
+          "icon": "🏪",
+          "title": "My store (O2O)",
+          "steps": [
+            "In 'Register store', set your store name and location so customers find you nearby",
+            "Add menu photos, prices, and quantities",
+            "When a customer orders, you get an instant Telegram alert (menu · quantity · amount)",
+            "Flow: preparing → ready → pickup, handed over at your store"
+          ]
+        },
+        {
+          "icon": "⭐",
+          "title": "Why Cafe.pi?",
+          "steps": [
+            "A powerful global 'Karrot': 200+ language auto-translation · easy Pi payments · chat, marketplace & stores in one app · distance-based connections",
+            "A 'Siren Order' for any business: anyone can be an owner · free menu setup · instant alerts · O2O pickup"
+          ]
+        },
+        {
+          "icon": "🪙",
+          "title": "Testnet rewards, honored on mainnet (pledge)",
+          "steps": [
+            "The Bean you earn now from testnet events is a promise from cafe.pi",
+            "Once the platform officially launches on mainnet and Bean Token is officially issued,",
+            "we will grant your testnet event tokens 1:1 as mainnet Bean, exactly as earned",
+            "This is our principle to ensure early participants' efforts are never lost"
+          ]
+        }
+      ]
+    },
     "noData": "No data",
     "normalRevenue": "Standard Plan Revenue",
     "period30": "30 days",
