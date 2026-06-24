@@ -9,6 +9,7 @@ import 'flag-icons/css/flag-icons.min.css'
 import { auth } from '@/auth'
 import { ThemeProvider } from '@/components/theme-provider'
 import { PiAuthProvider } from '@/components/pi-auth-provider'
+import { ConsentGate } from '@/components/consent/consent-gate'
 import { PiSdkScript } from '@/components/pi-sdk-script'
 import { Header } from '@/components/layout/header'
 import { BottomNav } from '@/components/layout/bottom-nav'
@@ -88,6 +89,8 @@ export default async function LocaleLayout({
                 {/* pb-16: 하단 고정 BottomNav(h-16)에 콘텐츠가 가려지지 않도록 여백 확보 */}
                 <main className="flex-1 pb-16">{children}</main>
                 <BottomNav />
+                {/* 가입/이용 동의 전역 게이트 — 로그인 후 필수 동의 미완료 시 차단 모달 */}
+                <ConsentGate />
                 <Toaster richColors />
               </PiAuthProvider>
             </ThemeProvider>

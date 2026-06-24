@@ -31,6 +31,7 @@ const nextConfig: NextConfig = {
   // 약관 페이지가 readFile로 읽는 docs/law 마크다운을 Vercel 서버 번들에 포함
   outputFileTracingIncludes: {
     '/[locale]/docs/agreement/lbs': ['./docs/law/agreement/**'],
+    '/[locale]/docs/legal/[doc]': ['./docs/law/**'],
   },
 }
 
