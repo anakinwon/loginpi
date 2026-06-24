@@ -729,6 +729,14 @@
       "intro": "No tech skills needed — just follow the steps 😊. Remember just 3 things: ① Log in ② Explore ③ Buy & sell",
       "topics": [
         {
+          "icon": "⭐",
+          "title": "Why Cafe.pi?",
+          "steps": [
+            "A powerful global 'Karrot': 200+ language auto-translation · easy Pi payments · chat, marketplace & stores in one app · distance-based connections",
+            "A 'Siren Order' for any business: anyone can be an owner · free menu setup · instant alerts · O2O pickup"
+          ]
+        },
+        {
           "icon": "🔑",
           "title": "Login & account linking",
           "steps": [
@@ -782,14 +790,6 @@
             "Add menu photos, prices, and quantities",
             "When a customer orders, you get an instant Telegram alert (menu · quantity · amount)",
             "Flow: preparing → ready → pickup, handed over at your store"
-          ]
-        },
-        {
-          "icon": "⭐",
-          "title": "Why Cafe.pi?",
-          "steps": [
-            "A powerful global 'Karrot': 200+ language auto-translation · easy Pi payments · chat, marketplace & stores in one app · distance-based connections",
-            "A 'Siren Order' for any business: anyone can be an owner · free menu setup · instant alerts · O2O pickup"
           ]
         },
         {
