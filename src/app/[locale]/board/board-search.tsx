@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { Input } from '@/components/ui/input'
+import { usePiAuth } from '@/components/pi-auth-provider'
+import { maskUsername } from '@/lib/mask-username'
 
 // /api/board/search 응답 형태 (server route와 동일 — server-only 의존성 유입 방지 위해 로컬 정의)
 interface BoardSearchResult {
@@ -17,6 +19,8 @@ interface BoardSearchResult {
 
 export function BoardSearch() {
   const t = useTranslations('board')
+  const { user } = usePiAuth()
+  const isAdmin = user?.role === 'ADMIN' || user?.role === 'MASTER'
   const [value, setValue] = useState('')
   const [results, setResults] = useState<BoardSearchResult[]>([])
   const [loading, setLoading] = useState(false)
@@ -76,7 +80,11 @@ export function BoardSearch() {
                     </span>
                     <span className="truncate text-sm">{r.post_ttl}</span>
                     <span className="text-muted-foreground ml-auto shrink-0 text-xs">
-                      {r.rgst_usr_nm ?? ''}
+                      {r.rgst_usr_nm
+                        ? isAdmin
+                          ? r.rgst_usr_nm
+                          : maskUsername(r.rgst_usr_nm)
+                        : ''}
                     </span>
                   </Link>
                 </li>

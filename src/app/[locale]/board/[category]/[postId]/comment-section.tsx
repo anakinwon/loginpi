@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { maskUsername } from '@/lib/mask-username'
 
 type Comment = {
   cmnt_id: string
@@ -148,7 +149,9 @@ export function CommentSection({
               <div className="mb-2 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium">
-                    {comment.rgst_usr_nm}
+                    {isModerator || isMyComment
+                      ? comment.rgst_usr_nm
+                      : maskUsername(comment.rgst_usr_nm)}
                   </span>
                   {isAccepted && (
                     <span className="rounded bg-green-100 px-1.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">

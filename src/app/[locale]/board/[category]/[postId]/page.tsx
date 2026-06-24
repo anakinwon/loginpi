@@ -6,6 +6,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth-check'
 import { PostDetailActions } from './post-detail-actions'
 import { ReportButton } from '@/components/report/report-button'
+import { maskUsername } from '@/lib/mask-username'
 import { CommentSection } from './comment-section'
 import { AttachmentSection } from './attachment-section'
 import { GalleryBodyRenderer } from '@/components/board/gallery-body-renderer'
@@ -111,7 +112,11 @@ export default async function PostDetailPage({ params }: Props) {
           )}
         </div>
         <div className="text-muted-foreground mt-3 flex flex-wrap gap-4 text-sm">
-          <span>{post.rgst_usr_nm}</span>
+          <span>
+            {isOwner || isModerator
+              ? post.rgst_usr_nm
+              : maskUsername(post.rgst_usr_nm)}
+          </span>
           <span>{t('viewCount', { count: post.vw_cnt + 1 })}</span>
           <time dateTime={post.reg_dtm}>
             {new Date(post.reg_dtm).toLocaleString('ko-KR', {

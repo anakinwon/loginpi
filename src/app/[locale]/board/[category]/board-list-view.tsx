@@ -6,6 +6,8 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
+import { usePiAuth } from '@/components/pi-auth-provider'
+import { maskUsername } from '@/lib/mask-username'
 import { PostSearch } from './post-search'
 
 // 게시글 1행 높이: py-3(24px) + 텍스트(20px) + border(1px) ≈ 45px
@@ -70,6 +72,10 @@ export function BoardListView({
   const t = useTranslations('board')
   const tc = useTranslations('common')
   const searchParams = useSearchParams()
+  // 작성자명 마스킹 — 비관리자 뷰어에게만(관리자는 전체). 목록엔 본인 식별자 부재 → isAdmin 기준
+  const { user } = usePiAuth()
+  const maskAuthor = (n: string) =>
+    user?.role === 'ADMIN' || user?.role === 'MASTER' ? n : maskUsername(n)
 
   const page = Math.max(1, Number(searchParams.get('page') ?? 1))
   const q = searchParams.get('q') ?? ''
@@ -210,9 +216,9 @@ export function BoardListView({
                   <div className="mt-2 flex items-center gap-2 text-xs text-white/80">
                     {/* 작성자 이니셜 아바타 */}
                     <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white/25 text-[10px] font-bold text-white backdrop-blur-sm">
-                      {post.rgst_usr_nm.charAt(0).toUpperCase()}
+                      {maskAuthor(post.rgst_usr_nm).charAt(0).toUpperCase()}
                     </span>
-                    <span className="truncate">{post.rgst_usr_nm}</span>
+                    <span className="truncate">{maskAuthor(post.rgst_usr_nm)}</span>
                     <span className="text-white/50">·</span>
                     <span className="shrink-0">
                       {new Date(post.reg_dtm).toLocaleDateString('ko-KR', {
@@ -286,7 +292,7 @@ export function BoardListView({
                 <span className="truncate">{post.post_ttl}</span>
               </span>
               <span className="text-muted-foreground text-center text-xs">
-                {post.rgst_usr_nm}
+                {maskAuthor(post.rgst_usr_nm)}
               </span>
               <span className="text-muted-foreground text-center text-xs">
                 {post.vw_cnt}
