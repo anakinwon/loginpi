@@ -14,6 +14,7 @@ const CHROME_PX = 257
 interface ThemeRow {
   theme_cd: string
   theme_nm: string
+  theme_nm_en: string | null
   theme_emoji: string
   theme_desc: string | null
   theme_tp_cd: 'BASIC' | 'PREMIUM'
@@ -80,6 +81,7 @@ const EMOJI_HINTS: { kw: RegExp; emoji: string }[] = [
 const EMPTY_FORM = {
   theme_cd: '',
   theme_nm: '',
+  theme_nm_en: '',
   theme_emoji: '',
   theme_tp_cd: 'BASIC',
   sort_ord: '',
@@ -142,6 +144,7 @@ export default function AdminThemesPage() {
     setForm({
       theme_cd: th.theme_cd,
       theme_nm: th.theme_nm,
+      theme_nm_en: th.theme_nm_en ?? '',
       theme_emoji: th.theme_emoji,
       theme_tp_cd: th.theme_tp_cd,
       sort_ord: th.sort_ord?.toString() ?? '',
@@ -164,6 +167,7 @@ export default function AdminThemesPage() {
     try {
       const payload = {
         theme_nm: form.theme_nm,
+        theme_nm_en: form.theme_nm_en || null,
         theme_emoji: form.theme_emoji,
         theme_tp_cd: form.theme_tp_cd,
         sort_ord: form.sort_ord ? parseInt(form.sort_ord) : 0,
@@ -294,6 +298,18 @@ export default function AdminThemesPage() {
                   setForm((f) => ({ ...f, theme_nm: e.target.value }))
                 }
                 placeholder={t('placeholder.nm')}
+              />
+            </label>
+            <label className="space-y-1">
+              <span className="text-muted-foreground text-xs">
+                {t('field.nmEn')}
+              </span>
+              <Input
+                value={form.theme_nm_en}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, theme_nm_en: e.target.value }))
+                }
+                placeholder={t('placeholder.nmEn')}
               />
             </label>
             <label className="space-y-1">
@@ -445,6 +461,9 @@ export default function AdminThemesPage() {
                   {t('col.theme')}
                 </th>
                 <th className="px-4 py-2 text-left font-medium">
+                  {t('col.nmEn')}
+                </th>
+                <th className="px-4 py-2 text-left font-medium">
                   {t('col.cd')}
                 </th>
                 <th className="px-4 py-2 text-left font-medium">
@@ -471,6 +490,9 @@ export default function AdminThemesPage() {
                   <td className="px-4 py-3 font-medium">
                     <span className="mr-1.5">{th.theme_emoji}</span>
                     {th.theme_nm}
+                  </td>
+                  <td className="text-muted-foreground px-4 py-3 text-xs">
+                    {th.theme_nm_en ?? '—'}
                   </td>
                   <td className="px-4 py-3 font-mono text-xs">{th.theme_cd}</td>
                   <td className="px-4 py-3">

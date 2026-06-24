@@ -15,6 +15,7 @@ export async function PATCH(
   const { themeCd } = await params
   const body = (await req.json()) as {
     theme_nm?: string
+    theme_nm_en?: string
     theme_emoji?: string
     theme_desc?: string
     theme_tp_cd?: string
@@ -24,6 +25,8 @@ export async function PATCH(
 
   const patch: Record<string, unknown> = {}
   if (body.theme_nm !== undefined) patch.theme_nm = body.theme_nm.trim()
+  if (body.theme_nm_en !== undefined)
+    patch.theme_nm_en = body.theme_nm_en?.trim() || null
   if (body.theme_emoji !== undefined)
     patch.theme_emoji = body.theme_emoji.trim()
   if (body.theme_desc !== undefined)

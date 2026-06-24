@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
   let query = getSupabaseAdmin()
     .from('msg_theme')
     .select(
-      'theme_cd, theme_nm, theme_emoji, theme_desc, theme_tp_cd, sort_ord, use_yn',
+      'theme_cd, theme_nm, theme_nm_en, theme_emoji, theme_desc, theme_tp_cd, sort_ord, use_yn',
     )
     .eq('del_yn', 'N')
     .order('theme_tp_cd', { ascending: true })
@@ -49,6 +49,7 @@ export async function POST(req: NextRequest) {
   const body = (await req.json()) as {
     theme_cd?: string
     theme_nm?: string
+    theme_nm_en?: string
     theme_emoji?: string
     theme_desc?: string
     theme_tp_cd?: string
@@ -76,6 +77,7 @@ export async function POST(req: NextRequest) {
     .insert({
       theme_cd: themeCd,
       theme_nm: body.theme_nm.trim(),
+      theme_nm_en: body.theme_nm_en?.trim() || null,
       theme_emoji: body.theme_emoji.trim(),
       theme_desc: body.theme_desc?.trim() || null,
       theme_tp_cd: tp,

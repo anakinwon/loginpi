@@ -579,6 +579,7 @@
       "col": {
         "cd": "Code",
         "desc": "Description",
+        "nmEn": "English Name",
         "sortOrd": "Order",
         "theme": "Theme",
         "tp": "Group",
@@ -598,7 +599,8 @@
         "cd": "Theme Code",
         "desc": "Description·Tags",
         "emoji": "Emoji",
-        "nm": "Theme Name",
+        "nm": "Theme Name (Korean)",
+        "nmEn": "Theme Name (English)",
         "sortOrd": "Sort Order",
         "tp": "Group",
         "useYn": "Visibility"
@@ -609,7 +611,8 @@
       "placeholder": {
         "cd": "ESPORTS",
         "desc": "#Tags #Keywords",
-        "nm": "eSports"
+        "nm": "e스포츠",
+        "nmEn": "eSports"
       },
       "saveFail": "Failed to save",
       "saveSuccess": "Theme has been registered",

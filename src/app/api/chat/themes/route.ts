@@ -4,6 +4,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 export interface ThemeRow {
   theme_cd: string
   theme_nm: string
+  theme_nm_en: string | null
   theme_emoji: string
   theme_desc: string | null
   theme_tp_cd: 'BASIC' | 'PREMIUM'
@@ -14,7 +15,7 @@ export async function GET() {
   const { data, error } = await getSupabaseAdmin()
     .from('msg_theme')
     .select(
-      'theme_cd, theme_nm, theme_emoji, theme_desc, theme_tp_cd, sort_ord',
+      'theme_cd, theme_nm, theme_nm_en, theme_emoji, theme_desc, theme_tp_cd, sort_ord',
     )
     .eq('use_yn', 'Y')
     .eq('del_yn', 'N')

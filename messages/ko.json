@@ -59,7 +59,8 @@
       "formTitleEdit": "테마 수정",
       "field": {
         "cd": "테마 코드",
-        "nm": "테마명",
+        "nm": "테마명(한국어)",
+        "nmEn": "테마명(영어)",
         "emoji": "이모지",
         "tp": "그룹",
         "sortOrd": "정렬순서",
@@ -69,6 +70,7 @@
       "placeholder": {
         "cd": "ESPORTS",
         "nm": "e스포츠",
+        "nmEn": "eSports",
         "desc": "#태그 #키워드"
       },
       "selectTp": {
@@ -85,6 +87,7 @@
       "useYnOff": "숨김",
       "col": {
         "theme": "테마",
+        "nmEn": "영문명",
         "cd": "코드",
         "tp": "그룹",
         "sortOrd": "순서",

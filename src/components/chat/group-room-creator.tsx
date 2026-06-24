@@ -1,6 +1,6 @@
 'use client'
 import { useState, useCallback, useEffect } from 'react'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { useRouter, Link } from '@/i18n/navigation'
 import { toast } from 'sonner'
 import { usePiAuth } from '@/components/pi-auth-provider'
@@ -13,7 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { ThemeSelector, type ThemeRow } from './theme-selector'
+import { ThemeSelector, type ThemeRow, getThemeName } from './theme-selector'
 import { getRoomFeeBean } from '@/lib/bean-fee'
 
 type Step = 1 | 2 | 3 | 4
@@ -52,6 +52,7 @@ function localDtmNow(): string {
 
 export function GroupRoomCreator() {
   const t = useTranslations('chat.creator')
+  const locale = useLocale()
   const router = useRouter()
   const { isInPiBrowser, user } = usePiAuth()
   const [open, setOpen] = useState(false)
@@ -345,7 +346,7 @@ export function GroupRoomCreator() {
                 <div className="flex items-center gap-2 text-sm">
                   <span className="text-2xl">{selectedTheme.theme_emoji}</span>
                   <span className="font-medium">
-                    {selectedTheme.theme_nm} {t('theme')}
+                    {getThemeName(selectedTheme, locale)} {t('theme')}
                   </span>
                   {isPremium && (
                     <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
@@ -364,7 +365,7 @@ export function GroupRoomCreator() {
                     onChange={(e) => setRoomNm(e.target.value)}
                     placeholder={t('defaultRoomName', {
                       emoji: selectedTheme.theme_emoji,
-                      theme: selectedTheme.theme_nm,
+                      theme: getThemeName(selectedTheme, locale),
                     })}
                     maxLength={50}
                     className="bg-background focus:ring-ring w-full rounded-xl border px-3 py-2 text-sm outline-none focus:ring-2"
