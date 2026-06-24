@@ -689,6 +689,29 @@
     "statusChangeFail": "Failed to change status",
     "translatingEta": "Translating {locale} ({keys} keys · {batches} batches · est. {eta})"
   },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Find quick answers to common questions",
+    "items": [
+      { "q": "How do I log in?", "a": "In Pi Browser tap 'Generate link code', then sign in with Google in a regular browser and paste the code to link your accounts." },
+      { "q": "What is Bean?", "a": "A platform-only credit. You top it up at 1 Pi = 100 Bean and use it for subscriptions, gifts, etc. It cannot be exchanged externally." },
+      { "q": "How do payments work?", "a": "You pay with Pi in Pi Browser. Product trades are protected by escrow (safe holding)." },
+      { "q": "What happens to Bean earned on testnet?", "a": "When the platform officially launches on mainnet and Bean Token is issued, testnet event Bean is granted 1:1 as mainnet Bean." },
+      { "q": "Can I get a refund?", "a": "Refunds follow our Refund & Withdrawal Policy. See the refund policy document below for details." },
+      { "q": "How do I report something?", "a": "Use the 'Report' button on posts, shops, etc. to submit with a reason. Our team reviews and acts on it." },
+      { "q": "Why is location needed?", "a": "To show nearby cafés, stores, and items by distance. You can withdraw consent anytime from My Page." }
+    ],
+    "supportTitle": "Customer Support",
+    "email": "Email inquiry",
+    "telegram": "Telegram",
+    "legalTitle": "Terms & Policies",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "refund": "Refund Policy",
+    "youth": "Youth Protection Policy",
+    "community": "Community Operating Policy",
+    "lbs": "Location-Based Service Terms"
+  },
   "report": {
     "button": "Report",
     "title": "Report",
