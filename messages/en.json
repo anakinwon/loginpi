@@ -708,7 +708,7 @@
       "collapse": "Collapse",
       "intro": "PiCafé™ resolves Pi Browser's demanding constraints through structural and cryptographic design, and upholds fund integrity and data standards from day one.",
       "pillar1Title": "🟣 Pi-first design",
-      "pillar1Desc": "Pi account login and Pi payment are the primary path. Payments are made only in Pi (Bean is an internal store credit fixed at 1 Pi = 100 Bean), with no gambling elements.",
+      "pillar1Desc": "Pi account login and Pi payment are the primary path. Payments are made only in Pi, and Bean is an internal store credit fixed at 1 Pi = 100 Bean.",
       "pillar2Title": "📱 Full Pi Browser compatibility",
       "pillar2Desc": "Even in Pi Browser, which does not persist cookies, login and payment work safely via token-based dual authentication, with a client-gate design that avoids infinite loops.",
       "pillar3Title": "💰 Zero-tolerance fund integrity",

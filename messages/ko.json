@@ -692,7 +692,7 @@
       "collapse": "접기",
       "intro": "PiCafé™는 Pi Browser의 까다로운 제약을 구조적·암호학적으로 해결하고, 자금 무결성과 데이터 표준을 출범 단계부터 지킵니다.",
       "pillar1Title": "🟣 Pi 우선 설계",
-      "pillar1Desc": "Pi 계정 로그인·Pi 결제를 1차 경로로 지원합니다. 결제는 Pi로만 이루어지며(Bean은 1 Pi = 100 Bean 고정 내부 적립금), 도박 요소가 없습니다.",
+      "pillar1Desc": "Pi 계정 로그인·Pi 결제를 1차 경로로 지원합니다. 결제는 Pi로만 이루어지며, Bean은 1 Pi = 100 Bean 고정 내부 적립금입니다.",
       "pillar2Title": "📱 Pi Browser 완벽 호환",
       "pillar2Desc": "쿠키를 저장하지 않는 Pi Browser에서도 토큰 기반 이중 인증으로 안전하게 로그인·결제됩니다. 무한 루프 없는 클라이언트 게이트 설계.",
       "pillar3Title": "💰 자금 무결성 무관용",
