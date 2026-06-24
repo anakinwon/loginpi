@@ -3,8 +3,10 @@ import { getSessionUser } from '@/lib/auth-check'
 import {
   getUserConsents,
   recordConsents,
+  calcAge,
   REQUIRED_CONSENTS,
   CONSENT_VER,
+  MIN_AGE,
 } from '@/lib/consent'
 
 // 가입/이용 동의 — 통합로그인·매장등록 등 전역에서 사용.
@@ -38,16 +40,38 @@ export async function POST(req: NextRequest) {
   } catch {
     return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
   }
-  const { terms, privacy, marketing } = body as {
+  const { terms, privacy, marketing, birth, guardian } = body as {
     terms?: boolean
     privacy?: boolean
     marketing?: boolean
+    birth?: string
+    guardian?: boolean
   }
 
   // 필수 동의 검증 (서버 강제 — 클라이언트 우회 차단)
   if (terms !== true || privacy !== true) {
     return NextResponse.json(
       { error: '이용약관과 개인정보 수집·이용 동의는 필수입니다' },
+      { status: 400 },
+    )
+  }
+
+  // 연령 게이트 — 생년월일로 만 나이 서버 재계산(클라이언트 신뢰 안 함)
+  const age = typeof birth === 'string' ? calcAge(birth) : null
+  if (age === null) {
+    return NextResponse.json(
+      { error: '생년월일을 올바르게 입력해 주세요' },
+      { status: 400 },
+    )
+  }
+  // 만 14세 미만은 법정대리인(보호자) 동의 필수
+  const isMinor = age < MIN_AGE
+  if (isMinor && guardian !== true) {
+    return NextResponse.json(
+      {
+        error: `만 ${MIN_AGE}세 미만은 법정대리인(보호자)의 동의가 필요합니다`,
+        requireGuardian: true,
+      },
       { status: 400 },
     )
   }
@@ -63,6 +87,8 @@ export async function POST(req: NextRequest) {
       { tp: 'TERMS', yn: true },
       { tp: 'PRIVACY', yn: true },
       { tp: 'MKT', yn: marketing === true },
+      { tp: 'AGE14', yn: true }, // 연령 게이트 통과(≥14 또는 보호자 동의)
+      { tp: 'GUARDIAN', yn: isMinor }, // 만 14세 미만 법정대리인 동의 여부
     ],
     { ip, ua },
   )

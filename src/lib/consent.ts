@@ -5,8 +5,25 @@ import { getSupabaseAdmin } from './supabase-admin'
 // 스키마 변경 없음. 약관 개정 시 CONSENT_VER 갱신 → 재동의 유도(최신 버전 미동의로 판단 가능).
 export const CONSENT_VER = '2026-06-24'
 
-export type ConsentType = 'TERMS' | 'PRIVACY' | 'MKT'
-export const REQUIRED_CONSENTS: ConsentType[] = ['TERMS', 'PRIVACY']
+// AGE14 = 만 14세 이상(또는 법정대리인 동의로 통과) · GUARDIAN = 만 14세 미만 법정대리인 동의
+export type ConsentType = 'TERMS' | 'PRIVACY' | 'MKT' | 'AGE14' | 'GUARDIAN'
+export const REQUIRED_CONSENTS: ConsentType[] = ['TERMS', 'PRIVACY', 'AGE14']
+export const MIN_AGE = 14
+
+// 만 나이 계산(생년월일 'YYYY-MM-DD' 기준). 데이터 최소수집: 원본 생년월일은 저장하지 않고 검증만.
+export function calcAge(birth: string, now: Date = new Date()): number | null {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(birth)
+  if (!m) return null
+  const [y, mo, d] = [Number(m[1]), Number(m[2]), Number(m[3])]
+  const bd = new Date(y, mo - 1, d)
+  if (bd.getFullYear() !== y || bd.getMonth() !== mo - 1 || bd.getDate() !== d) return null
+  if (bd.getTime() > now.getTime()) return null // 미래 생년월일 거부
+  let age = now.getFullYear() - y
+  const mDiff = now.getMonth() - (mo - 1)
+  if (mDiff < 0 || (mDiff === 0 && now.getDate() < d)) age--
+  if (age < 0 || age > 120) return null
+  return age
+}
 
 // 사용자별 최신 동의 상태 (유형 → 동의여부). 최신 reg_dtm 우선.
 export async function getUserConsents(

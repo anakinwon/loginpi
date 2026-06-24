@@ -11,14 +11,33 @@ interface Props {
   onAgreed: () => void
 }
 
+// 만 나이 계산(클라이언트 사전 판단용 — 최종 검증은 서버)
+function clientAge(birth: string): number | null {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(birth)
+  if (!m) return null
+  const [y, mo, d] = [Number(m[1]), Number(m[2]), Number(m[3])]
+  const now = new Date()
+  let age = now.getFullYear() - y
+  const md = now.getMonth() - (mo - 1)
+  if (md < 0 || (md === 0 && now.getDate() < d)) age--
+  return age >= 0 && age <= 120 ? age : null
+}
+
 export function ConsentDialog({ onAgreed }: Props) {
   const [terms, setTerms] = useState(false)
   const [privacy, setPrivacy] = useState(false)
   const [marketing, setMarketing] = useState(false)
+  const [birth, setBirth] = useState('')
+  const [guardian, setGuardian] = useState(false)
   const [saving, setSaving] = useState(false)
 
+  const today = new Date().toISOString().slice(0, 10)
+  const age = birth ? clientAge(birth) : null
+  const birthValid = age !== null
+  const isMinor = age !== null && age < 14
+
   const allChecked = terms && privacy && marketing
-  const requiredOk = terms && privacy
+  const requiredOk = terms && privacy && birthValid && (!isMinor || guardian)
 
   function toggleAll() {
     const next = !allChecked
@@ -34,7 +53,7 @@ export function ConsentDialog({ onAgreed }: Props) {
       const res = await piFetch('/api/consent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ terms, privacy, marketing }),
+        body: JSON.stringify({ terms, privacy, marketing, birth, guardian }),
       })
       if (!res.ok) {
         const d = (await res.json().catch(() => ({}))) as { error?: string }
@@ -56,6 +75,38 @@ export function ConsentDialog({ onAgreed }: Props) {
         <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
           Cafe.pi 이용을 위해 아래 약관에 동의해 주세요. (필수 항목 동의 후 이용 가능)
         </p>
+
+        {/* 생년월일 (연령 게이트) */}
+        <div className="mt-4">
+          <label className="text-sm font-medium">
+            생년월일 <span className="text-primary">(필수)</span>
+          </label>
+          <input
+            type="date"
+            value={birth}
+            max={today}
+            onChange={(e) => setBirth(e.target.value)}
+            className="border-input bg-background mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+          />
+          {birth && !birthValid && (
+            <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">
+              생년월일을 올바르게 입력해 주세요.
+            </p>
+          )}
+          {isMinor && (
+            <button
+              type="button"
+              onClick={() => setGuardian((v) => !v)}
+              className="border-primary/40 bg-primary/5 mt-2 flex w-full items-center gap-2 rounded-lg border px-3 py-2 text-left"
+            >
+              <Check checked={guardian} />
+              <span className="text-xs leading-relaxed">
+                <span className="text-primary font-medium">(필수)</span> 만 14세 미만 —
+                법정대리인(보호자)의 동의를 받았습니다.
+              </span>
+            </button>
+          )}
+        </div>
 
         {/* 전체 동의 */}
         <button
