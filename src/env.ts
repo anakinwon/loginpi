@@ -34,6 +34,8 @@ export const env = createEnv({
     TELEGRAM_BOT_USERNAME: z.string().optional(),
     // webhook 검증 시크릿 — setWebhook 시 등록, 요청 헤더와 대조해 위조 차단.
     TELEGRAM_WEBHOOK_SECRET: z.string().optional(),
+    // 운영 알림 수신 텔레그램 chat id(선택) — Bean 항등식 불일치 등 CRITICAL 경보 발송 대상.
+    ADMIN_TELEGRAM_CHAT_ID: z.string().optional(),
     TURN_HOST: z.string().optional(),
     TURN_SECRET: z.string().optional(),
     TURN_CREDENTIAL_TTL: z.coerce.number().optional(),
@@ -71,6 +73,7 @@ export const env = createEnv({
     TELEGRAM_BOT_TOKEN: process.env.TELEGRAM_BOT_TOKEN,
     TELEGRAM_BOT_USERNAME: process.env.TELEGRAM_BOT_USERNAME,
     TELEGRAM_WEBHOOK_SECRET: process.env.TELEGRAM_WEBHOOK_SECRET,
+    ADMIN_TELEGRAM_CHAT_ID: process.env.ADMIN_TELEGRAM_CHAT_ID,
     TURN_HOST: process.env.TURN_HOST,
     TURN_SECRET: process.env.TURN_SECRET,
     TURN_CREDENTIAL_TTL: process.env.TURN_CREDENTIAL_TTL,

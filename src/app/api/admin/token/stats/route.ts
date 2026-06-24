@@ -125,7 +125,29 @@ export async function GET() {
   // 무관용원칙: 1 Bean이라도 어긋나면 누수로 간주(허용 오차 없음).
   const identityOk = totalIssued - circulating - totalCollected === 0
 
+  // 최신 자동 점검(cron bean_balance_check) 결과 — D_BAL_CARD 모니터링 표시
+  const { data: lastCheck } = await db
+    .from('sys_batch_log')
+    .select('end_dtm, success_yn, result_msg')
+    .eq('job_nm', 'bean_balance_check')
+    .order('end_dtm', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+  let monitor: { checkedAt: string; ok: boolean; diff: number | null } | null = null
+  if (lastCheck) {
+    const lc = lastCheck as { end_dtm: string; success_yn: string; result_msg: string | null }
+    let diff: number | null = null
+    try {
+      diff = Number((JSON.parse(lc.result_msg ?? '{}') as { diff?: number }).diff ?? null)
+      if (Number.isNaN(diff)) diff = null
+    } catch {
+      diff = null
+    }
+    monitor = { checkedAt: lc.end_dtm, ok: lc.success_yn === 'Y', diff }
+  }
+
   return NextResponse.json({
+    monitor,
     kpi: {
       // 공급량
       total_issued_bean: totalIssued,

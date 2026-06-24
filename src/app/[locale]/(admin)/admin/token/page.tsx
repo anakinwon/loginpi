@@ -27,8 +27,14 @@ interface TokenKpi {
   identity_ok: boolean
 }
 
+interface MonitorInfo {
+  checkedAt: string
+  ok: boolean
+  diff: number | null
+}
 interface StatsResponse {
   kpi: TokenKpi
+  monitor: MonitorInfo | null
   last_updated: string
 }
 
@@ -164,7 +170,13 @@ function RewardBreakdownBox({ kpi }: { kpi: TokenKpi }) {
 }
 
 // Bean 대차대조표 — 차변(발행) = 대변(유통 + 회수)
-function BalanceSheet({ kpi }: { kpi: TokenKpi }) {
+function BalanceSheet({
+  kpi,
+  monitor,
+}: {
+  kpi: TokenKpi
+  monitor?: MonitorInfo | null
+}) {
   const debit = kpi.total_issued_bean // 차변: 발행 원천
   const credit = kpi.circulating_bean + kpi.total_collected_bean // 대변: 현재 소재
   const diff = debit - credit // Bean 정수 항등식 — 정상이면 반드시 정확히 0
@@ -281,6 +293,21 @@ function BalanceSheet({ kpi }: { kpi: TokenKpi }) {
           </span>
         </div>
       </div>
+      {monitor && (
+        <div className="text-muted-foreground border-t px-4 py-2 text-xs">
+          자동 점검(매일):{' '}
+          <span
+            className={
+              monitor.ok
+                ? 'text-green-600 dark:text-green-400'
+                : 'font-semibold text-red-600 dark:text-red-400'
+            }
+          >
+            {monitor.ok ? '✓ 정상' : `✗ 불일치 diff ${monitor.diff ?? '?'}`}
+          </span>{' '}
+          · {new Date(monitor.checkedAt).toLocaleString('ko-KR')}
+        </div>
+      )}
     </div>
   )
 }
@@ -338,7 +365,7 @@ export default function TokenAdminPage() {
           )}
 
           {/* Bean 대차대조표 (차변 = 대변) — 메인 */}
-          <BalanceSheet kpi={kpi} />
+          <BalanceSheet kpi={kpi} monitor={data?.monitor} />
 
           {/* 매출 분석 — Pi 현금 + Bean 회수 항목별 */}
           <TokenRevenue />
