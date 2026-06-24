@@ -1,7 +1,6 @@
 # BEAN — Cafe.pi Ecosystem Utility Token White Paper
 
 > **Version**: v0.2 (Draft) · **Date**: 2026-06-17 · **Source language**: Korean (ko) — this English (en) text is a translation
-> **Status**: Draft · ⚠️ **Pending legal review** (wording in §3, §6, §10 to be finalized after counsel) · Awaiting Mainnet Launchpad GA
 > **Related**: `docs/PRD_12_TOKEN.md` v1.9 (internal requirements) · `docs/PRD_12_TOKEN_법무자문의뢰서.md` (legal inquiry)
 > **Note**: The Korean edition (`docs/PRD_12_TOKEN_백서.md`) is authoritative; in case of discrepancy, the Korean text governs.
 
