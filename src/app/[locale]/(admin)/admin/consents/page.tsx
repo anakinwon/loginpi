@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
+import { AdminPagination } from '@/components/admin/admin-pagination'
 
 interface Row {
   user_str_id: string
@@ -137,28 +138,8 @@ export default function ConsentsPage() {
         </div>
       )}
 
-      {/* 페이지네이션 */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-3 text-sm">
-          <button
-            disabled={page <= 1}
-            onClick={() => setPage((p) => p - 1)}
-            className="rounded-lg border px-3 py-1 disabled:opacity-40"
-          >
-            이전
-          </button>
-          <span className="text-muted-foreground text-xs">
-            {page} / {totalPages}
-          </span>
-          <button
-            disabled={page >= totalPages}
-            onClick={() => setPage((p) => p + 1)}
-            className="rounded-lg border px-3 py-1 disabled:opacity-40"
-          >
-            다음
-          </button>
-        </div>
-      )}
+      {/* 반응형 페이지네이션 */}
+      <AdminPagination page={page} totalPages={totalPages} onPage={setPage} />
     </div>
   )
 }
