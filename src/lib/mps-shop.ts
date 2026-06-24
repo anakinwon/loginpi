@@ -17,6 +17,13 @@ function toDbCoord<T extends { lat?: number; lng?: number }>(input: T) {
   }
 }
 
+// 이용후기 동의 플래그가 명시 전달되면 동의/철회 일시를 함께 기록 (lbs_consent_dtm 패턴)
+function consentStamp(input: { fbck_consent_yn?: string }) {
+  return input.fbck_consent_yn !== undefined
+    ? { fbck_consent_dtm: new Date().toISOString() }
+    : {}
+}
+
 export interface MpsShop {
   shop_id: string
   seller_id: string
@@ -44,6 +51,9 @@ export interface MpsShop {
   rating_cnt: number | null
   google_place_json: unknown
   dlvr_yn: string | null
+  // 이용후기·Bean 보상 지급 동의 (opt-in) — Y인 매장의 상품만 후기 허용
+  fbck_consent_yn: string | null
+  fbck_consent_dtm: string | null
 }
 
 export interface ShopInput {
@@ -66,6 +76,8 @@ export interface ShopInput {
   biz_status_cd?: string
   rating_cnt?: number
   dlvr_yn?: string
+  // 이용후기·Bean 보상 지급 동의 (점주 설정) — 'Y' 전환 시 동의 일시 자동 기록
+  fbck_consent_yn?: string
 }
 
 // 내 매장 목록 — 한 사용자가 여러 매장 등록 가능(seller_id 유니크 제약 없음)
@@ -92,6 +104,7 @@ export async function createShop(
     .from('mps_shop')
     .insert({
       ...toDbCoord(input),
+      ...consentStamp(input),
       seller_id: sellerId,
       regr_id: regrId,
       modr_id: regrId,
@@ -112,6 +125,7 @@ export async function updateShop(
     .from('mps_shop')
     .update({
       ...toDbCoord(patch),
+      ...consentStamp(patch),
       modr_id: sellerId,
       mod_dtm: new Date().toISOString(),
     })

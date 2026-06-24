@@ -25,6 +25,8 @@ const patchSchema = z.object({
   rating_cnt: z.number().int().min(0).optional(),
   // 배달 가능 여부 (점주 설정) — 배달 주문방법 노출 게이트
   dlvr_yn: z.enum(['Y', 'N']).optional(),
+  // 이용후기·Bean 보상 지급 동의 (점주 설정) — Y인 매장의 상품만 후기 허용
+  fbck_consent_yn: z.enum(['Y', 'N']).optional(),
 })
 
 // PATCH /api/store/shops/[shopId] — 매장 수정 (본인 매장만, FR-06)

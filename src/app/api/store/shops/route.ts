@@ -38,6 +38,8 @@ const shopSchema = z.object({
   sns_url: z.url().max(500).optional(),
   thumb_url: z.url().max(1000).optional(),
   dlvr_yn: z.enum(['Y', 'N']).optional(),
+  // 이용후기·Bean 보상 지급 동의 (opt-in)
+  fbck_consent_yn: z.enum(['Y', 'N']).optional(),
 })
 
 // POST /api/store/shops — 매장 등록 (판매자 인증)

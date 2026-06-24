@@ -21,6 +21,8 @@ interface ShopInfo {
   latd_crd: number | null
   lngt_crd: number | null
   place_id: string | null
+  // 매장주 이용후기·Bean 보상 동의 여부 — 'Y'일 때만 후기 작성 버튼 노출
+  fbck_consent_yn: string | null
 }
 
 interface OrderRow {
@@ -500,10 +502,12 @@ export function ClientMyOrders({
           <p className="text-muted-foreground text-xs">{t('escrowReleased')}</p>
         )}
 
-        {/* 구매 완료 주문 — 후기 작성 버튼 또는 완료 배지 */}
+        {/* 구매 완료 주문 — 후기 작성 버튼 또는 완료 배지.
+            매장주가 이용후기·Bean 보상에 동의(fbck_consent_yn='Y')한 매장 상품만 노출 */}
         {role === 'buyer' &&
           (o.order_st_cd === 'DONE' || o.order_st_cd === 'BUYER_DONE') &&
-          o.mps_item?.ctgr_id && (
+          o.mps_item?.ctgr_id &&
+          o.mps_item?.mps_shop?.fbck_consent_yn === 'Y' && (
             <div className="flex justify-end pt-1">
               {o.has_feedback ? (
                 <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">

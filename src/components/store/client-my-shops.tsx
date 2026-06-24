@@ -35,6 +35,7 @@ interface Shop {
   rating_cnt: number | null
   google_place_json: unknown
   dlvr_yn: string | null
+  fbck_consent_yn: string | null
 }
 
 interface ShopForm {
@@ -55,6 +56,7 @@ interface ShopForm {
   biz_status_cd: string
   rating_cnt: string
   dlvr_yn: boolean
+  fbck_consent_yn: boolean
 }
 
 const EMPTY_FORM: ShopForm = {
@@ -74,6 +76,7 @@ const EMPTY_FORM: ShopForm = {
   biz_status_cd: '',
   rating_cnt: '',
   dlvr_yn: false,
+  fbck_consent_yn: false,
 }
 
 const SHOP_TYPES: ShopType[] = ['ONLINE', 'OFFLINE', 'BOTH']
@@ -175,6 +178,7 @@ export function ClientMyShops({
       biz_status_cd: shop.biz_status_cd ?? '',
       rating_cnt: shop.rating_cnt != null ? String(shop.rating_cnt) : '',
       dlvr_yn: shop.dlvr_yn === 'Y',
+      fbck_consent_yn: shop.fbck_consent_yn === 'Y',
     })
     setEditingId(shop.shop_id)
   }
@@ -214,6 +218,7 @@ export function ClientMyShops({
       biz_status_cd: form.biz_status_cd.trim() || undefined,
       rating_cnt: ratingCnt ? Number(ratingCnt) : undefined,
       dlvr_yn: form.dlvr_yn ? 'Y' : 'N',
+      fbck_consent_yn: form.fbck_consent_yn ? 'Y' : 'N',
     }
 
     setSaving(true)
@@ -336,6 +341,24 @@ export function ClientMyShops({
               checked={form.dlvr_yn}
               onChange={(e) => set('dlvr_yn', e.target.checked)}
               className="size-5"
+            />
+          </label>
+
+          {/* 이용후기·Bean 보상 동의 — 켜야 내 상품에 후기 작성 버튼이 노출되고 후기가 허용됨 */}
+          <label className="flex cursor-pointer items-center justify-between rounded-lg border p-3">
+            <div className="pr-3">
+              <p className="text-sm font-medium">⭐ 이용후기·Bean 보상 동의</p>
+              <p className="text-muted-foreground text-xs">
+                내 상품에 대해 고객이 이용후기를 남기고, 후기에 따라 Bean Token이
+                지급되는 것에 동의합니다. 동의한 매장의 상품에만 후기 작성 버튼이
+                노출됩니다.
+              </p>
+            </div>
+            <input
+              type="checkbox"
+              checked={form.fbck_consent_yn}
+              onChange={(e) => set('fbck_consent_yn', e.target.checked)}
+              className="size-5 shrink-0"
             />
           </label>
 

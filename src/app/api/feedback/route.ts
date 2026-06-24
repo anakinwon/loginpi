@@ -213,6 +213,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: '완료된 주문에 대해서만 후기를 작성할 수 있습니다' }, { status: 403 })
     }
     prodId = (ord as { order_st_cd: string; item_id: string }).item_id
+
+    // 매장주 동의 게이트 — 이용후기·Bean 보상에 동의(fbck_consent_yn='Y')한 매장의 상품만 후기 허용 (UI 게이트의 서버 측 이중 방어)
+    const { data: itemShop } = await db
+      .from('mps_item')
+      .select('mps_shop(fbck_consent_yn)')
+      .eq('item_id', prodId)
+      .maybeSingle()
+    const consentYn = (
+      itemShop as { mps_shop?: { fbck_consent_yn?: string } | null } | null
+    )?.mps_shop?.fbck_consent_yn
+    if (consentYn !== 'Y') {
+      return NextResponse.json(
+        { error: '이 매장은 이용후기·보상 프로그램에 참여하지 않습니다' },
+        { status: 403 },
+      )
+    }
   }
 
   const { data: inserted, error: insertErr } = await db

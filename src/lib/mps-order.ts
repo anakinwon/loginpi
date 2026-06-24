@@ -826,7 +826,7 @@ export async function listOrdersByRole(
     .from('mps_order')
     .select(
       // 대표 item + 카트 주문 라인 전체(lines: 상품명·수량) 임베드
-      '*, mps_item ( item_nm, thumbnail_url, ctgr_id, mps_shop ( shop_nm, addr, latd_crd, lngt_crd, place_id ) ), lines:mps_order_item ( ord_qty, price_pi, item:mps_item ( item_nm ) )',
+      '*, mps_item ( item_nm, thumbnail_url, ctgr_id, mps_shop ( shop_nm, addr, latd_crd, lngt_crd, place_id, fbck_consent_yn ) ), lines:mps_order_item ( ord_qty, price_pi, item:mps_item ( item_nm ) )',
     )
     .eq('del_yn', 'N')
     .order('reg_dtm', { ascending: false })
