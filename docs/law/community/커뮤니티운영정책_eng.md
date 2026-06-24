@@ -3,7 +3,6 @@
 **Version**: v1.0
 **Effective date**: 2026-06-12
 **Drafted**: 2026-06-12
-⚠️ **This document is an AI-generated draft. Have it reviewed by a qualified legal professional before actual use.**
 
 ---
 

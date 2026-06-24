@@ -685,6 +685,26 @@
     "statusChangeFail": "Failed to change status",
     "translatingEta": "Translating {locale} ({keys} keys · {batches} batches · est. {eta})"
   },
+  "consent": {
+    "title": "Service Agreement",
+    "desc": "Please agree to the terms below to use Cafe.pi. (Available after agreeing to the required items.)",
+    "birthLabel": "Date of birth",
+    "required": "(Required)",
+    "optional": "(Optional)",
+    "birthInvalid": "Please enter a valid date of birth.",
+    "guardian": "Under 14 — I have obtained my legal guardian's consent.",
+    "agreeAll": "Agree to all",
+    "terms": "Agree to the Terms of Service",
+    "privacy": "Agree to the collection and use of personal information",
+    "lbs": "Agree to the collection and use of location information",
+    "marketing": "Agree to receive marketing information",
+    "view": "View",
+    "submit": "Agree and continue",
+    "processing": "Processing…",
+    "note": "You must agree to the required items (Terms, Personal info, Location) to use the service.",
+    "errSave": "Failed to save your consent",
+    "errNetwork": "Could not save your consent due to a network error"
+  },
   "adminStats": {
     "activeUsers": "Active Users",
     "adminTitle": "Statistics Dashboard",

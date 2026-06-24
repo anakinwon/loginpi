@@ -4,7 +4,6 @@
 **Version**: v1.0  
 **Effective Date**: 2026-06-12  
 **Created**: 2026-06-12  
-⚠️ **This document is an AI-generated draft. Professional legal review is required before actual implementation.**
 
 ---
 

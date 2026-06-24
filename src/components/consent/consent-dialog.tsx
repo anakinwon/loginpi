@@ -1,12 +1,13 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { Link } from '@/i18n/navigation'
 import { piFetch } from '@/lib/pi-fetch'
 
 // 가입/이용 동의 모달 — 통합로그인·매장등록 등 공통 사용.
-// 필수(이용약관·개인정보)는 체크해야 진행, 마케팅은 선택. 동의 시 /api/consent 기록 후 onAgreed.
+// 필수(이용약관·개인정보·위치·연령)는 충족해야 진행, 마케팅은 선택. 동의 시 /api/consent 기록 후 onAgreed.
 interface Props {
   onAgreed: () => void
 }
@@ -24,6 +25,7 @@ function clientAge(birth: string): number | null {
 }
 
 export function ConsentDialog({ onAgreed }: Props) {
+  const t = useTranslations('consent')
   const [terms, setTerms] = useState(false)
   const [privacy, setPrivacy] = useState(false)
   const [lbs, setLbs] = useState(false)
@@ -59,12 +61,12 @@ export function ConsentDialog({ onAgreed }: Props) {
       })
       if (!res.ok) {
         const d = (await res.json().catch(() => ({}))) as { error?: string }
-        toast.error(d.error ?? '동의 저장에 실패했습니다')
+        toast.error(d.error ?? t('errSave'))
         return
       }
       onAgreed()
     } catch {
-      toast.error('네트워크 오류로 동의를 저장하지 못했습니다')
+      toast.error(t('errNetwork'))
     } finally {
       setSaving(false)
     }
@@ -73,15 +75,13 @@ export function ConsentDialog({ onAgreed }: Props) {
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-0 sm:items-center sm:p-4">
       <div className="bg-background w-full max-w-md rounded-t-2xl p-5 shadow-xl sm:rounded-2xl">
-        <h2 className="text-base font-bold">서비스 이용 동의</h2>
-        <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
-          Cafe.pi 이용을 위해 아래 약관에 동의해 주세요. (필수 항목 동의 후 이용 가능)
-        </p>
+        <h2 className="text-base font-bold">{t('title')}</h2>
+        <p className="text-muted-foreground mt-1 text-xs leading-relaxed">{t('desc')}</p>
 
         {/* 생년월일 (연령 게이트) */}
         <div className="mt-4">
           <label className="text-sm font-medium">
-            생년월일 <span className="text-primary">(필수)</span>
+            {t('birthLabel')} <span className="text-primary">{t('required')}</span>
           </label>
           <input
             type="date"
@@ -92,7 +92,7 @@ export function ConsentDialog({ onAgreed }: Props) {
           />
           {birth && !birthValid && (
             <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">
-              생년월일을 올바르게 입력해 주세요.
+              {t('birthInvalid')}
             </p>
           )}
           {isMinor && (
@@ -103,8 +103,8 @@ export function ConsentDialog({ onAgreed }: Props) {
             >
               <Check checked={guardian} />
               <span className="text-xs leading-relaxed">
-                <span className="text-primary font-medium">(필수)</span> 만 14세 미만 —
-                법정대리인(보호자)의 동의를 받았습니다.
+                <span className="text-primary font-medium">{t('required')}</span>{' '}
+                {t('guardian')}
               </span>
             </button>
           )}
@@ -117,35 +117,43 @@ export function ConsentDialog({ onAgreed }: Props) {
           className="mt-4 flex w-full items-center gap-2 rounded-lg border px-3 py-2.5 text-left"
         >
           <Check checked={allChecked} />
-          <span className="text-sm font-semibold">전체 동의</span>
+          <span className="text-sm font-semibold">{t('agreeAll')}</span>
         </button>
 
         <div className="mt-2 space-y-1.5">
           <Row
             checked={terms}
             onToggle={() => setTerms((v) => !v)}
+            tag={t('required')}
             required
-            label="이용약관 동의"
+            label={t('terms')}
+            viewText={t('view')}
             href="/docs/legal/terms"
           />
           <Row
             checked={privacy}
             onToggle={() => setPrivacy((v) => !v)}
+            tag={t('required')}
             required
-            label="개인정보 수집·이용 동의"
+            label={t('privacy')}
+            viewText={t('view')}
             href="/docs/legal/privacy-consent"
           />
           <Row
             checked={lbs}
             onToggle={() => setLbs((v) => !v)}
+            tag={t('required')}
             required
-            label="위치정보 수집·이용 동의"
+            label={t('lbs')}
+            viewText={t('view')}
             href="/docs/agreement/lbs"
           />
           <Row
             checked={marketing}
             onToggle={() => setMarketing((v) => !v)}
-            label="마케팅 정보 수신 동의"
+            tag={t('optional')}
+            label={t('marketing')}
+            viewText={t('view')}
             href="/docs/legal/privacy"
           />
         </div>
@@ -156,11 +164,9 @@ export function ConsentDialog({ onAgreed }: Props) {
           disabled={!requiredOk || saving}
           className="bg-primary text-primary-foreground mt-4 w-full rounded-xl py-3 text-sm font-semibold hover:opacity-90 disabled:opacity-50"
         >
-          {saving ? '처리 중…' : '동의하고 계속'}
+          {saving ? t('processing') : t('submit')}
         </button>
-        <p className="text-muted-foreground mt-2 text-center text-[11px]">
-          필수 항목(이용약관·개인정보·위치정보)에 동의해야 서비스를 이용할 수 있습니다.
-        </p>
+        <p className="text-muted-foreground mt-2 text-center text-[11px]">{t('note')}</p>
       </div>
     </div>
   )
@@ -170,13 +176,17 @@ function Row({
   checked,
   onToggle,
   label,
+  tag,
   href,
+  viewText,
   required,
 }: {
   checked: boolean
   onToggle: () => void
   label: string
+  tag: string
   href: string
+  viewText: string
   required?: boolean
 }) {
   return (
@@ -189,7 +199,7 @@ function Row({
         <Check checked={checked} />
         <span className="text-sm">
           <span className={required ? 'text-primary font-medium' : 'text-muted-foreground'}>
-            {required ? '(필수)' : '(선택)'}
+            {tag}
           </span>{' '}
           {label}
         </span>
@@ -199,7 +209,7 @@ function Row({
         target="_blank"
         className="text-muted-foreground shrink-0 text-xs underline"
       >
-        보기
+        {viewText}
       </Link>
     </div>
   )

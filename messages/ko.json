@@ -686,6 +686,26 @@
     "autoBgStarted": "{count}개 언어 백그라운드 번역 시작 — 페이지를 떠나도 서버가 계속 진행합니다",
     "autoStopPolling": "진행 표시를 멈췄습니다 (백그라운드 번역은 서버에서 계속됩니다)"
   },
+  "consent": {
+    "title": "서비스 이용 동의",
+    "desc": "Cafe.pi 이용을 위해 아래 약관에 동의해 주세요. (필수 항목 동의 후 이용 가능)",
+    "birthLabel": "생년월일",
+    "required": "(필수)",
+    "optional": "(선택)",
+    "birthInvalid": "생년월일을 올바르게 입력해 주세요.",
+    "guardian": "만 14세 미만 — 법정대리인(보호자)의 동의를 받았습니다.",
+    "agreeAll": "전체 동의",
+    "terms": "이용약관 동의",
+    "privacy": "개인정보 수집·이용 동의",
+    "lbs": "위치정보 수집·이용 동의",
+    "marketing": "마케팅 정보 수신 동의",
+    "view": "보기",
+    "submit": "동의하고 계속",
+    "processing": "처리 중…",
+    "note": "필수 항목(이용약관·개인정보·위치정보)에 동의해야 서비스를 이용할 수 있습니다.",
+    "errSave": "동의 저장에 실패했습니다",
+    "errNetwork": "네트워크 오류로 동의를 저장하지 못했습니다"
+  },
   "adminStats": {
     "homeTitle": "대시보드",
     "whitepaper": {
