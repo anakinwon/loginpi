@@ -4,7 +4,10 @@ import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 
 // 홈 상단 기술 백서 — 접이식(기본 접힘). 내용은 i18n(adminStats.whitepaper) 기준.
+// 핵심 구축 현황 2개(통합 로그인·Pi 결제) + 강점 6개 = 2열 그리드 4행(동일 카드)
 const PILLARS = [
+  'highlight1',
+  'highlight2',
   'pillar1',
   'pillar2',
   'pillar3',
@@ -51,6 +54,7 @@ export function TechWhitepaper() {
       {open && (
         <div className="space-y-4 border-t px-5 py-4">
           <p className="text-muted-foreground text-sm leading-relaxed">{t('intro')}</p>
+
           <ul className="grid gap-3 sm:grid-cols-2">
             {PILLARS.map((p) => (
               <li key={p} className="bg-muted/30 rounded-xl border p-3">

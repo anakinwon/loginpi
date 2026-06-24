@@ -12,7 +12,7 @@ export default async function HomePage() {
   const t = await getTranslations('adminStats')
 
   return (
-    <div className="mx-auto max-w-5xl space-y-8 px-4 py-8">
+    <div className="mx-auto max-w-5xl space-y-8 px-4 pt-3 pb-8">
       <div className="space-y-2">
         <TechWhitepaper />
         <UserManual />
