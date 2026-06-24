@@ -2,6 +2,8 @@
 import { useEffect, useRef, useCallback, useState } from 'react'
 import { piFetch } from '@/lib/pi-fetch'
 import type { ChatMessage } from '@/hooks/use-chat-room'
+import { usePiAuth } from '@/components/pi-auth-provider'
+import { maskUsername } from '@/lib/mask-username'
 import { PiTipButton } from './pi-tip-button'
 import { StickerImg } from './sticker-img'
 import { TranslatedMessage } from './translated-message'
@@ -29,6 +31,8 @@ export function ChatMessageList({
   prependMessages,
   onUpgradeForTip,
 }: ChatMessageListProps) {
+  const { user } = usePiAuth()
+  const isAdmin = user?.role === 'ADMIN' || user?.role === 'MASTER'
   const [hasMore, setHasMore] = useState(messages.length >= 50)
   const [isLoading, setIsLoading] = useState(false)
   const [oldestMsgId, setOldestMsgId] = useState<string | null>(
@@ -161,6 +165,7 @@ export function ChatMessageList({
             <MessageBubble
               msg={msg}
               isMe={msg.snd_usr_id === currentUserId}
+              isAdmin={isAdmin}
               canTip={canTip}
               canAutoTranslate={canAutoTranslate}
               userLocale={userLocale}
@@ -219,6 +224,7 @@ function formatKoreanTime(dtm: string): string {
 function MessageBubble({
   msg,
   isMe,
+  isAdmin,
   canTip,
   canAutoTranslate,
   userLocale,
@@ -228,6 +234,7 @@ function MessageBubble({
 }: {
   msg: ChatMessage
   isMe: boolean
+  isAdmin: boolean
   canTip: boolean
   canAutoTranslate?: boolean
   userLocale?: string
@@ -237,6 +244,8 @@ function MessageBubble({
 }) {
   // 메시지 탭 시 선물 버튼 노출 (hover 없는 모바일 대응)
   const [showActions, setShowActions] = useState(false)
+  // 발신자명 — 비관리자 뷰어에겐 마스킹(username 마스킹 규칙)
+  const senderName = isAdmin ? msg.snd_usr_nm : maskUsername(msg.snd_usr_nm)
 
   // 시스템·Bean(팁) 알림은 중앙 정렬 알림 스타일
   if (msg.msg_tp_cd === 'SYSTEM' || msg.msg_tp_cd === 'TIP_NOTI') {
@@ -275,7 +284,7 @@ function MessageBubble({
       >
         {!isMe && (
           <span className="text-muted-foreground text-xs">
-            {msg.snd_usr_nm}
+            {senderName}
           </span>
         )}
         {msg.attch_url ? (
@@ -306,7 +315,7 @@ function MessageBubble({
       >
         {!isMe && (
           <span className="text-muted-foreground text-xs">
-            {msg.snd_usr_nm}
+            {senderName}
           </span>
         )}
         {msg.attch_url ? (
@@ -339,7 +348,7 @@ function MessageBubble({
       >
         {!isMe && (
           <span className="text-muted-foreground text-xs">
-            {msg.snd_usr_nm}
+            {senderName}
           </span>
         )}
         {msg.attch_url && (
@@ -366,7 +375,7 @@ function MessageBubble({
       >
         {!isMe && (
           <span className="text-muted-foreground text-xs">
-            {msg.snd_usr_nm}
+            {senderName}
           </span>
         )}
         <a
@@ -415,7 +424,7 @@ function MessageBubble({
       className={`group flex flex-col gap-0.5 ${isMe ? 'items-end' : 'items-start'}`}
     >
       {!isMe && (
-        <span className="text-muted-foreground text-xs">{msg.snd_usr_nm}</span>
+        <span className="text-muted-foreground text-xs">{senderName}</span>
       )}
       <div
         className={`max-w-[70%] rounded-2xl px-3 py-2 text-sm ${
@@ -465,7 +474,7 @@ function MessageBubble({
             <PiTipButton
               roomId={roomId}
               recipientId={msg.snd_usr_id}
-              recipientName={msg.snd_usr_nm}
+              recipientName={senderName}
             />
           )}
         </div>

@@ -54,7 +54,8 @@ export function TranslateStatsSection({ period }: { period: number }) {
       }
       try {
         const res = await piFetch(`/api/admin/stats/translate?period=${period}`)
-        if (!res.ok) throw new Error('번역 통계 조회 실패')
+        if (res.status === 401) throw new Error('세션 만료 — 페이지를 새로고침하거나 다시 로그인하세요 (HTTP 401)')
+        if (!res.ok) throw new Error(`번역 통계 조회 실패 (HTTP ${res.status})`)
         const body = (await res.json()) as TranslateStatsResponse
         if (cancelled) return
         setData(body)

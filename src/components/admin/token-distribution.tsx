@@ -150,6 +150,7 @@ export function BeanRevenueDistribution({ period }: { period: number }) {
     setError(null)
     piFetch(`/api/admin/token/distribution?period=${period}`)
       .then((r) => {
+        if (r.status === 401) throw new Error('세션 만료 — 페이지를 새로고침하거나 다시 로그인하세요 (HTTP 401)')
         if (!r.ok) throw new Error(`HTTP ${r.status}`)
         return r.json() as Promise<DistributionData>
       })
