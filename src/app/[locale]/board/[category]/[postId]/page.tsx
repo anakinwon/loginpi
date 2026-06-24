@@ -5,6 +5,7 @@ import { getCategory } from '@/lib/board'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth-check'
 import { PostDetailActions } from './post-detail-actions'
+import { ReportButton } from '@/components/report/report-button'
 import { CommentSection } from './comment-section'
 import { AttachmentSection } from './attachment-section'
 import { GalleryBodyRenderer } from '@/components/board/gallery-body-renderer'
@@ -124,6 +125,7 @@ export default async function PostDetailPage({ params }: Props) {
           {post.reg_dtm !== post.mod_dtm && (
             <span className="text-xs">{t('modified')}</span>
           )}
+          {!isOwner && <ReportButton targetTp="POST" targetId={postId} />}
         </div>
       </div>
 

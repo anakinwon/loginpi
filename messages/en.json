@@ -276,6 +276,7 @@
       "title": "Admin",
       "users": "User Management",
       "consents": "Consent Records",
+      "reports": "Reports",
       "subscrPricing": "구독요금제"
     },
     "payments": {
@@ -684,6 +685,25 @@
     "routingNotFound": "'{locale}' is not in src/i18n/routing.ts.",
     "statusChangeFail": "Failed to change status",
     "translatingEta": "Translating {locale} ({keys} keys · {batches} batches · est. {eta})"
+  },
+  "report": {
+    "button": "Report",
+    "title": "Report",
+    "reasonLabel": "Reason",
+    "SPAM": "Spam / ads",
+    "ABUSE": "Abuse / harassment",
+    "SEXUAL": "Sexual / explicit",
+    "PRIVACY": "Privacy exposure",
+    "COPYRIGHT": "Copyright infringement",
+    "FRAUD": "Fraud / transaction",
+    "ETC": "Other",
+    "detailLabel": "Details (optional)",
+    "detailPlaceholder": "Please describe the issue",
+    "submit": "Submit report",
+    "cancel": "Cancel",
+    "success": "Your report has been submitted",
+    "duplicate": "You already reported this",
+    "error": "Failed to submit the report"
   },
   "errorPage": {
     "errTitle": "Something went wrong",

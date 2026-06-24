@@ -9,6 +9,7 @@ const NAV = [
   { href: '/admin/stats', labelKey: 'stats' },
   { href: '/admin/users', labelKey: 'users' },
   { href: '/admin/consents', labelKey: 'consents' },
+  { href: '/admin/reports', labelKey: 'reports' },
   { href: '/admin/payments', labelKey: 'payments' },
   { href: '/admin/links', labelKey: 'links' },
   { href: '/admin/board', labelKey: 'board' },
