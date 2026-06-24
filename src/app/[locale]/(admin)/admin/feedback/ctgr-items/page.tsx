@@ -4,11 +4,11 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
 
-interface Category {
+// /api/store/categories 와 동일한 트리 구조 (상품 등록 폼과 같은 소스)
+interface CtgrNode {
   ctgr_id: string
   ctgr_nm: string
-  label: string
-  is_leaf: boolean
+  children: CtgrNode[]
 }
 
 interface CtgrItem {
@@ -36,8 +36,19 @@ interface AddState {
 
 const EMPTY_ADD: AddState = { item_cd: '', item_nm: '', item_desc: '', sort_ord: '0' }
 
+// 트리에서 ctgr_id에 해당하는 노드를 찾아 표시 레이블 반환
+function findCtgrLabel(tree: CtgrNode[], ctgrId: string): string {
+  for (const p of tree) {
+    if (p.ctgr_id === ctgrId) return p.ctgr_nm
+    for (const c of p.children) {
+      if (c.ctgr_id === ctgrId) return `${p.ctgr_nm} > ${c.ctgr_nm}`
+    }
+  }
+  return ''
+}
+
 export default function FbckCtgrItemsPage() {
-  const [categories, setCategories] = useState<Category[]>([])
+  const [ctgrTree, setCtgrTree] = useState<CtgrNode[]>([])
   const [selectedCtgrId, setSelectedCtgrId] = useState('')
   const [items, setItems] = useState<CtgrItem[]>([])
   const [loadingCat, setLoadingCat] = useState(true)
@@ -49,15 +60,15 @@ export default function FbckCtgrItemsPage() {
   const [submittingAdd, setSubmittingAdd] = useState(false)
   const addCdRef = useRef<HTMLInputElement>(null)
 
-  // 카테고리 목록 로드
+  // 상품 등록 폼과 동일한 공개 카테고리 트리 로드
   useEffect(() => {
     void (async () => {
       setLoadingCat(true)
       try {
-        const res = await piFetch('/api/admin/feedback/ctgr-items?mode=categories')
+        const res = await fetch('/api/store/categories')
         if (!res.ok) throw new Error()
-        const d = (await res.json()) as { categories: Category[] }
-        setCategories(d.categories)
+        const d = (await res.json()) as { categories: CtgrNode[] }
+        setCtgrTree(d.categories)
       } catch {
         toast.error('카테고리 목록을 불러오지 못했습니다')
       } finally {
@@ -66,7 +77,7 @@ export default function FbckCtgrItemsPage() {
     })()
   }, [])
 
-  // 선택 카테고리의 항목 로드
+  // 선택 카테고리의 평가 항목 로드
   const loadItems = useCallback(async (ctgrId: string) => {
     if (!ctgrId) return
     setLoadingItems(true)
@@ -118,7 +129,7 @@ export default function FbckCtgrItemsPage() {
     }
   }
 
-  // 항목 삭제 (논리삭제)
+  // 항목 논리삭제
   async function deleteItem(item: CtgrItem) {
     if (!confirm(`"${item.item_nm}" 항목을 삭제하시겠습니까?\n(이미 작성된 후기의 항목별 점수 표시에 영향을 줄 수 있습니다)`)) return
     setSaving(item.item_id)
@@ -168,7 +179,7 @@ export default function FbckCtgrItemsPage() {
     }
   }
 
-  const selectedCategory = categories.find((c) => c.ctgr_id === selectedCtgrId)
+  const selectedLabel = selectedCtgrId ? findCtgrLabel(ctgrTree, selectedCtgrId) : ''
 
   return (
     <div className="mx-auto max-w-3xl space-y-5 p-4 sm:p-6">
@@ -181,7 +192,7 @@ export default function FbckCtgrItemsPage() {
         </p>
       </div>
 
-      {/* 카테고리 선택 */}
+      {/* 카테고리 선택 — 상품 등록 폼과 동일한 optgroup 구조 */}
       <div className="space-y-1.5">
         <label className="text-sm font-medium">카테고리 선택</label>
         {loadingCat ? (
@@ -193,26 +204,27 @@ export default function FbckCtgrItemsPage() {
             className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
           >
             <option value="">— 카테고리를 선택하세요 —</option>
-            {categories.map((c) => (
-              <option key={c.ctgr_id} value={c.ctgr_id}>
-                {c.label}
-              </option>
+            {ctgrTree.map((p) => (
+              <optgroup key={p.ctgr_id} label={p.ctgr_nm}>
+                <option value={p.ctgr_id}>{p.ctgr_nm} (전체)</option>
+                {p.children.map((c) => (
+                  <option key={c.ctgr_id} value={c.ctgr_id}>
+                    {c.ctgr_nm}
+                  </option>
+                ))}
+              </optgroup>
             ))}
           </select>
         )}
-        {selectedCategory && (
+        {selectedCtgrId && (
           <p className="text-muted-foreground text-xs">
+            {selectedLabel && <span className="mr-2 font-medium text-foreground">{selectedLabel}</span>}
             UUID: <code className="bg-muted rounded px-1">{selectedCtgrId}</code>
-            {selectedCategory.is_leaf && (
-              <span className="ml-2 rounded bg-green-100 px-1.5 py-0.5 text-[10px] text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                리프 카테고리
-              </span>
-            )}
           </p>
         )}
       </div>
 
-      {/* 항목 목록 */}
+      {/* 평가 항목 목록 */}
       {selectedCtgrId && (
         <div className="space-y-3">
           <div className="flex items-center justify-between">

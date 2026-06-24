@@ -68,19 +68,29 @@ CREATE INDEX IF NOT EXISTS idx_fbck_item_scr_fbck_id
   WHERE del_yn = 'N';
 
 -- ──────────────────────────────────────────────────────────────────────────────────
--- 3. 시드 — 커피음료(b0000000-0000-4000-8000-000000000601) 평가항목 5개
---    ctgr_id는 sql/053_mps_ctgr_cafe.sql에서 삽입된 UUID
+-- 3. 시드 — 커피음료 평가항목 5개
+--    ⚠️ ctgr_id 하드코딩 금지! mps_ctgr 재시드 시 UUID가 바뀌므로
+--       반드시 "카테고리 이름(ctgr_nm)" 기준으로 현재 활성 카테고리에 동적 연결한다.
+--    (활성 = del_yn='N' — 삭제된 옛 카테고리에는 붙지 않음)
 -- ──────────────────────────────────────────────────────────────────────────────────
 
 INSERT INTO public.fbck_ctgr_item
   (ctgr_id, item_cd, item_nm, item_desc, sort_ord, regr_id, modr_id)
-VALUES
-  ('b0000000-0000-4000-8000-000000000601', 'TASTE',   '맛',        '음료 맛의 만족도',         10, 'ADMIN', 'ADMIN'),
-  ('b0000000-0000-4000-8000-000000000601', 'AROMA',   '향',        '커피 향의 풍미와 강도',     20, 'ADMIN', 'ADMIN'),
-  ('b0000000-0000-4000-8000-000000000601', 'TEMP',    '온도',      '적정 온도 유지 여부',       30, 'ADMIN', 'ADMIN'),
-  ('b0000000-0000-4000-8000-000000000601', 'VALUE',   '양·가성비', '음료 양 대비 가격 만족도',  40, 'ADMIN', 'ADMIN'),
-  ('b0000000-0000-4000-8000-000000000601', 'SERVICE', '서비스',    '직원 친절도 및 응대 수준',  50, 'ADMIN', 'ADMIN')
-ON CONFLICT DO NOTHING;
+SELECT c.ctgr_id, v.item_cd, v.item_nm, v.item_desc, v.sort_ord, 'ADMIN', 'ADMIN'
+FROM public.mps_ctgr c
+CROSS JOIN (VALUES
+  ('TASTE',   '맛',        '음료 맛의 만족도',        10),
+  ('AROMA',   '향',        '커피 향의 풍미와 강도',    20),
+  ('TEMP',    '온도',      '적정 온도 유지 여부',      30),
+  ('VALUE',   '양·가성비', '음료 양 대비 가격 만족도', 40),
+  ('SERVICE', '서비스',    '직원 친절도 및 응대 수준', 50)
+) AS v(item_cd, item_nm, item_desc, sort_ord)
+WHERE c.ctgr_nm = '커피음료'
+  AND c.del_yn = 'N'
+  AND NOT EXISTS (
+    SELECT 1 FROM public.fbck_ctgr_item f
+    WHERE f.ctgr_id = c.ctgr_id AND f.item_cd = v.item_cd AND f.del_yn = 'N'
+  );
 
 -- ──────────────────────────────────────────────────────────────────────────────────
 -- 4. fbck_mst.prod_id 인덱스 — 상품 상세 페이지 후기 조회 성능
