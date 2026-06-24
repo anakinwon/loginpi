@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { piFetch } from '@/lib/pi-fetch'
+import { usePiAuth } from '@/components/pi-auth-provider'
 import { BeanIcon } from '@/components/ui/bean-icon'
 
 interface TypeRow {
@@ -140,33 +141,51 @@ function BeanDistList({ data }: { data: DistributionData }) {
 // 분류축 = txn_tp_cd(충전·사용·보상·환불·전송). 매출 회수 부분집합이 아닌 활동 전반.
 export function BeanRevenueDistribution({ period }: { period: number }) {
   const t = useTranslations('adminStats')
+  const { isLoading: authLoading, signIn } = usePiAuth()
   const [data, setData] = useState<DistributionData | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  // Pi Browser 레이스 컨디션 대응: 401 수신 후 signIn 완료 시 1회 자동 재시도
+  const retried = useRef(false)
 
-  useEffect(() => {
-    let alive = true
+  const doFetch = (alive: () => boolean) => {
     setLoading(true)
     setError(null)
     piFetch(`/api/admin/token/distribution?period=${period}`)
-      .then((r) => {
-        if (r.status === 401) throw new Error('세션 만료 — 페이지를 새로고침하거나 다시 로그인하세요 (HTTP 401)')
+      .then(async (r) => {
+        if (r.status === 401) {
+          // signIn 완료 전 마운트로 인한 레이스 컨디션 → 1회 재시도
+          if (!retried.current) {
+            retried.current = true
+            await signIn({ silent: true })
+            if (!alive()) return
+            return doFetch(alive)
+          }
+          throw new Error('세션 만료 — 다시 로그인하세요 (HTTP 401)')
+        }
         if (!r.ok) throw new Error(`HTTP ${r.status}`)
         return r.json() as Promise<DistributionData>
       })
       .then((d) => {
-        if (alive) setData(d)
+        if (d && alive()) setData(d)
       })
       .catch((e: Error) => {
-        if (alive) setError(e.message)
+        if (alive()) setError(e.message)
       })
       .finally(() => {
-        if (alive) setLoading(false)
+        if (alive()) setLoading(false)
       })
-    return () => {
-      alive = false
-    }
-  }, [period])
+  }
+
+  useEffect(() => {
+    // signIn 진행 중이면 완료를 기다렸다가 fetch (레이스 컨디션 방지)
+    if (authLoading) return
+    retried.current = false
+    let _alive = true
+    doFetch(() => _alive)
+    return () => { _alive = false }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [period, authLoading])
 
   return (
     <div className="rounded-lg border p-4">

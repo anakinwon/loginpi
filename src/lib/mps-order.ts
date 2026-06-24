@@ -801,7 +801,7 @@ export async function getOrderForUser(
 ) {
   const { data } = await getSupabaseAdmin()
     .from('mps_order')
-    .select('*, mps_item ( item_nm, thumbnail_url, price_pi )')
+    .select('*, mps_item ( item_nm, thumbnail_url, price_pi, ctgr_id )')
     .eq('order_id', orderId)
     .eq('del_yn', 'N')
     .maybeSingle()
@@ -826,7 +826,7 @@ export async function listOrdersByRole(
     .from('mps_order')
     .select(
       // 대표 item + 카트 주문 라인 전체(lines: 상품명·수량) 임베드
-      '*, mps_item ( item_nm, thumbnail_url, mps_shop ( shop_nm, addr, latd_crd, lngt_crd, place_id ) ), lines:mps_order_item ( ord_qty, price_pi, item:mps_item ( item_nm ) )',
+      '*, mps_item ( item_nm, thumbnail_url, ctgr_id, mps_shop ( shop_nm, addr, latd_crd, lngt_crd, place_id ) ), lines:mps_order_item ( ord_qty, price_pi, item:mps_item ( item_nm ) )',
     )
     .eq('del_yn', 'N')
     .order('reg_dtm', { ascending: false })
@@ -835,6 +835,27 @@ export async function listOrdersByRole(
 
   if (error) throw new Error(error.message)
   const orders = data ?? []
+
+  // 구매 완료 주문의 후기 작성 여부 — 버튼 상태 표시용 (구매자 뷰에만 의미 있음)
+  let feedbackOrderIds = new Set<string>()
+  if (role === 'buyer' && orders.length > 0) {
+    const doneOrderIds = orders
+      .filter((o) =>
+        ['DONE', 'BUYER_DONE'].includes((o as { order_st_cd: string }).order_st_cd),
+      )
+      .map((o) => (o as { order_id: string }).order_id)
+
+    if (doneOrderIds.length > 0) {
+      const { data: fbckRows } = await getSupabaseAdmin()
+        .from('fbck_mst')
+        .select('order_id')
+        .in('order_id', doneOrderIds)
+        .eq('del_yn', 'N')
+      feedbackOrderIds = new Set(
+        (fbckRows ?? []).map((r) => (r as { order_id: string }).order_id),
+      )
+    }
+  }
 
   // 판매 관리: 주문자(buyer) 별명/PI username 첨부 — 준비완료 시 호명용.
   // buyer_id는 FK 없는 TEXT(sys_user.id)라 임베드 불가 → 별도 조회 후 매핑.
@@ -852,9 +873,14 @@ export async function listOrdersByRole(
     return orders.map((o) => ({
       ...(o as object),
       buyer: byId.get((o as { buyer_id: string }).buyer_id) ?? null,
+      has_feedback: false,
     }))
   }
-  return orders
+
+  return orders.map((o) => ({
+    ...(o as object),
+    has_feedback: feedbackOrderIds.has((o as { order_id: string }).order_id),
+  }))
 }
 
 // 거래 이력 — FR-12

@@ -32,6 +32,8 @@ const CHAT_NAV = [
   { href: '/admin/subscriptions', labelKey: 'subscriptions' },
   { href: '/admin/stickers', labelKey: 'stickers' },
   { href: '/admin/store/settle', labelKey: 'settle' },
+  { href: '/admin/feedback', labelKey: 'feedback' },
+  { href: '/admin/feedback/ctgr-items', labelKey: 'feedbackCtgrItems' },
 ] as const
 
 const STORE_NAV = [

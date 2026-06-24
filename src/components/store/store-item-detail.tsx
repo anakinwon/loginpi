@@ -22,6 +22,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog'
+import { FeedbackList } from '@/components/feedback/FeedbackList'
 
 interface ItemImage {
   img_id: string
@@ -273,6 +274,7 @@ export function StoreItemDetail({ itemId }: { itemId: string }) {
   }
 
   return (
+    <div className="space-y-8">
     <div className="grid gap-6 md:grid-cols-2">
       {/* 이미지 갤러리 */}
       <div className="space-y-2">
@@ -533,6 +535,13 @@ export function StoreItemDetail({ itemId }: { itemId: string }) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    </div>
+
+    {/* 이용후기 섹션 — 상품 구매자 후기 목록 */}
+    <div className="border-t pt-6">
+      <h2 className="mb-4 text-base font-semibold">⭐ 이용후기</h2>
+      <FeedbackList itemId={item.item_id} />
+    </div>
     </div>
   )
 }

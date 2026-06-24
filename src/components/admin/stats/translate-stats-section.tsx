@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { piFetch } from '@/lib/pi-fetch'
+import { usePiAuth } from '@/components/pi-auth-provider'
 import { readCache, writeCache } from '@/lib/client-cache'
 import { StatsCard } from './stats-card'
 
@@ -35,11 +36,17 @@ export function TranslateStatsSection({ period }: { period: number }) {
   const tr = useTranslations('adminStats.translate')
   const ta = useTranslations('adminStats')
   const tc = useTranslations('common')
+  const { isLoading: authLoading, signIn } = usePiAuth()
   const [data, setData] = useState<TranslateStatsResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  // Pi Browser 레이스 컨디션 대응: 401 수신 후 signIn 완료 시 1회 자동 재시도
+  const retried = useRef(false)
 
   useEffect(() => {
+    // signIn 진행 중이면 완료를 기다렸다가 fetch (레이스 컨디션 방지)
+    if (authLoading) return
+    retried.current = false
     let cancelled = false
     const cacheKey = `stats_translate_${period}`
     void (async () => {
@@ -54,7 +61,21 @@ export function TranslateStatsSection({ period }: { period: number }) {
       }
       try {
         const res = await piFetch(`/api/admin/stats/translate?period=${period}`)
-        if (res.status === 401) throw new Error('세션 만료 — 페이지를 새로고침하거나 다시 로그인하세요 (HTTP 401)')
+        if (res.status === 401) {
+          // signIn 완료 전 마운트로 인한 레이스 컨디션 → 1회 재시도
+          if (!retried.current) {
+            retried.current = true
+            await signIn({ silent: true })
+            if (cancelled) return
+            const retry = await piFetch(`/api/admin/stats/translate?period=${period}`)
+            if (retry.status === 401) throw new Error('세션 만료 — 다시 로그인하세요 (HTTP 401)')
+            if (!retry.ok) throw new Error(`번역 통계 조회 실패 (HTTP ${retry.status})`)
+            const retryBody = (await retry.json()) as TranslateStatsResponse
+            if (!cancelled) { setData(retryBody); writeCache(cacheKey, retryBody) }
+            return
+          }
+          throw new Error('세션 만료 — 다시 로그인하세요 (HTTP 401)')
+        }
         if (!res.ok) throw new Error(`번역 통계 조회 실패 (HTTP ${res.status})`)
         const body = (await res.json()) as TranslateStatsResponse
         if (cancelled) return
@@ -70,7 +91,8 @@ export function TranslateStatsSection({ period }: { period: number }) {
     return () => {
       cancelled = true
     }
-  }, [period])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [period, authLoading])
 
   if (error) {
     return <p className="text-destructive text-sm">{error}</p>

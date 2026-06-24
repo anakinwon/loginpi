@@ -13,6 +13,7 @@ import {
   buildKakaoMapUrl,
 } from '@/lib/navigation'
 import type { ShopLocation } from '@/lib/navigation'
+import { WriteFeedbackButton } from '@/components/feedback/WriteFeedbackButton'
 
 interface ShopInfo {
   shop_nm: string | null
@@ -47,6 +48,7 @@ interface OrderRow {
   mps_item: {
     item_nm: string
     thumbnail_url: string | null
+    ctgr_id: string | null
     mps_shop: ShopInfo | null
   } | null
   // 카트 주문 라인(다중상품) — 단건 주문은 빈 배열/null
@@ -63,6 +65,7 @@ interface OrderRow {
     display_name: string | null
     pi_username: string | null
   } | null
+  has_feedback?: boolean
 }
 
 // 주문자 표시명 — 별명 우선, 없으면 Pi username, 없으면 display_name
@@ -247,12 +250,12 @@ export function ClientMyOrders({
     // 취소 진행 중 여부 — 동일 주문의 수령/완료 액션과 구분해 "취소중"만 정확히 표시
     const canceling = busy && acting?.action === 'cancel'
     const offline = isOffline(o)
-    // 상태 배지 라벨 — 오프라인 신규상태는 로컬 라벨, 오프라인 DONE은 '판매완료',
+    // 상태 배지 라벨 — 오프라인 신규상태는 로컬 라벨, 오프라인 DONE은 역할별 분기,
     // 그 외(직거래·레거시)는 i18n (ESCROW·SELLER_DONE은 거래중으로 통합)
     const stLabel =
       OFFLINE_LABEL[o.order_st_cd] ??
       (offline && o.order_st_cd === 'DONE'
-        ? '🎉 판매완료'
+        ? role === 'buyer' ? '🎉 구매완료' : '🎉 판매완료'
         : t(
             `orderSt.${IN_TRADE.includes(o.order_st_cd) ? 'TRADING' : o.order_st_cd}`,
           ))
@@ -496,6 +499,21 @@ export function ClientMyOrders({
         {o.order_st_cd === 'DONE' && (
           <p className="text-muted-foreground text-xs">{t('escrowReleased')}</p>
         )}
+
+        {/* 구매 완료 주문 — 후기 작성 버튼 또는 완료 배지 */}
+        {role === 'buyer' &&
+          (o.order_st_cd === 'DONE' || o.order_st_cd === 'BUYER_DONE') &&
+          o.mps_item?.ctgr_id && (
+            <div className="flex justify-end pt-1">
+              {o.has_feedback ? (
+                <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                  ✓ 후기 작성완료
+                </span>
+              ) : (
+                <WriteFeedbackButton orderId={o.order_id} />
+              )}
+            </div>
+          )}
       </div>
     )
   }
