@@ -701,6 +701,8 @@
       "pillar4Desc": "KISA 21개 웹 취약점 기준에 대응하고, HMAC-SHA256 서명 토큰과 상수시간 비교로 위·변조와 타이밍 공격을 방어합니다.",
       "pillar5Title": "📊 정부 공인 데이터 표준",
       "pillar5Desc": "한국데이터산업진흥원(K-DATA) 데이터 표준을 첫 테이블부터 적용하고 자동 검증으로 강제해, 장기 운영·감사 신뢰도를 확보합니다.",
+      "pillar6Title": "⚡ 성능 최적화",
+      "pillar6Desc": "서버 우선 렌더링과 병렬 데이터 페칭, stale-while-revalidate 캐싱, 위치·검색·번들 최적화로 빠른 첫 화면과 매끄러운 사용성을 제공합니다.",
       "footer": "Pi Network 등재 기준(로그인·결제·보안·데이터 표준)을 충족합니다."
     },
     "beanDistTitle": "Bean 거래 분포",

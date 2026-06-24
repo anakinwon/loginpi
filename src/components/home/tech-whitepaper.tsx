@@ -4,7 +4,14 @@ import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 
 // 홈 상단 기술 백서 — 접이식(기본 접힘). 내용은 i18n(adminStats.whitepaper) 기준.
-const PILLARS = ['pillar1', 'pillar2', 'pillar3', 'pillar4', 'pillar5'] as const
+const PILLARS = [
+  'pillar1',
+  'pillar2',
+  'pillar3',
+  'pillar4',
+  'pillar5',
+  'pillar6',
+] as const
 
 export function TechWhitepaper() {
   const t = useTranslations('adminStats.whitepaper')

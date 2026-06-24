@@ -717,6 +717,8 @@
       "pillar4Desc": "Addresses the KISA 21 web-vulnerability criteria and defends against tampering and timing attacks with HMAC-SHA256 signed tokens and constant-time comparison.",
       "pillar5Title": "📊 Government-recognized data standard",
       "pillar5Desc": "Adopts the Korea Data Agency (K-DATA) data standard from the very first table and enforces it with automated validation, securing long-term operational and audit trust.",
+      "pillar6Title": "⚡ Performance optimization",
+      "pillar6Desc": "Server-first rendering with parallel data fetching, stale-while-revalidate caching, and location/search/bundle optimizations deliver a fast first paint and smooth experience.",
       "footer": "Meets Pi Network listing criteria (login, payment, security, data standard)."
     },
     "noData": "No data",
