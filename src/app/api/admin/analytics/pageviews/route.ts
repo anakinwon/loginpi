@@ -104,20 +104,29 @@ export async function GET(req: NextRequest) {
       .sort((a, b) => b.cnt - a.cnt)
       .slice(0, 8)
 
-  return NextResponse.json({
-    period,
-    summary: {
-      totalPv,
-      sessions: sessionCnt,
-      pvPerSession,
-      avgDwellSec,
-      bounceRate,
+  return NextResponse.json(
+    {
+      period,
+      summary: {
+        totalPv,
+        sessions: sessionCnt,
+        pvPerSession,
+        avgDwellSec,
+        bounceRate,
+      },
+      pvTrend,
+      channels: [...channels.entries()]
+        .map(([cd, cnt]) => ({ cd, label: CHANNEL_LABEL[cd] ?? cd, cnt }))
+        .sort((a, b) => b.cnt - a.cnt),
+      topLanding: topN(landing),
+      topExit: topN(exit),
     },
-    pvTrend,
-    channels: [...channels.entries()]
-      .map(([cd, cnt]) => ({ cd, label: CHANNEL_LABEL[cd] ?? cd, cnt }))
-      .sort((a, b) => b.cnt - a.cnt),
-    topLanding: topN(landing),
-    topExit: topN(exit),
-  })
+    {
+      headers: {
+        // Vercel edge 캐싱 60분 (모든 visitor 공유)
+        'Cache-Control': 's-maxage=3600, max-age=0, stale-while-revalidate=3600',
+        'CDN-Cache-Control': 'max-age=3600, stale-while-revalidate=3600',
+      },
+    },
+  )
 }

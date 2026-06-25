@@ -114,19 +114,28 @@ export async function GET(req: NextRequest) {
     depth[idx].cnt++
   }
 
-  return NextResponse.json({
-    period,
-    funnel,
-    conversion: {
-      signupToActive: signupCnt > 0 ? (activeUsers.size / signupCnt) * 100 : 0,
-      activeToBuyer:
-        activeUsers.size > 0 ? (buyers / activeUsers.size) * 100 : 0,
-      buyerToRepeat: buyers > 0 ? (repeatBuyers / buyers) * 100 : 0,
+  return NextResponse.json(
+    {
+      period,
+      funnel,
+      conversion: {
+        signupToActive: signupCnt > 0 ? (activeUsers.size / signupCnt) * 100 : 0,
+        activeToBuyer:
+          activeUsers.size > 0 ? (buyers / activeUsers.size) * 100 : 0,
+        buyerToRepeat: buyers > 0 ? (repeatBuyers / buyers) * 100 : 0,
+      },
+      activityTypes,
+      engagementDepth: depth,
+      activeUsersPeriod: daysByUser.size,
+      // 세션/페이지뷰 추적층 미구축 → 페이지뷰·체류·반송률·이탈률·채널은 선결조건
+      sessionTrackingPending: true,
     },
-    activityTypes,
-    engagementDepth: depth,
-    activeUsersPeriod: daysByUser.size,
-    // 세션/페이지뷰 추적층 미구축 → 페이지뷰·체류·반송률·이탈률·채널은 선결조건
-    sessionTrackingPending: true,
-  })
+    {
+      headers: {
+        // Vercel edge 캐싱 60분 (모든 visitor 공유)
+        'Cache-Control': 's-maxage=3600, max-age=0, stale-while-revalidate=3600',
+        'CDN-Cache-Control': 'max-age=3600, stale-while-revalidate=3600',
+      },
+    },
+  )
 }

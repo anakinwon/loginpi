@@ -214,50 +214,59 @@ export async function GET(req: NextRequest) {
     ]),
   )
 
-  return NextResponse.json({
-    period,
-    summary: {
-      total,
-      completed,
-      cancelled,
-      cancelRate,
-      aovPi,
-      repeatRate,
-      avgIntervalDays,
-      buyers: buyerCnt,
+  return NextResponse.json(
+    {
+      period,
+      summary: {
+        total,
+        completed,
+        cancelled,
+        cancelRate,
+        aovPi,
+        repeatRate,
+        avgIntervalDays,
+        buyers: buyerCnt,
+      },
+      byMethod,
+      heatmap,
+      intervalBuckets: intervalCounts,
+      totalIntervals,
+      rfm: {
+        segments: [...segCount.entries()].map(([seg, v]) => ({
+          seg,
+          label: v.label,
+          cnt: v.cnt,
+        })),
+        points: scored.map((s) => ({
+          r: s.r,
+          f: s.f,
+          m: s.m,
+          seg: s.seg,
+          segLabel: s.segLabel,
+          recencyDays: s.recencyDays,
+          freq: s.freq,
+          monetaryPi: s.monetary,
+        })),
+        top: top.map((t) => ({
+          // 비관리자: usr_id 제거 + 표시명 마스킹 (개인 식별 차단, 지표는 공개)
+          usr_id: admin ? t.usr_id : '',
+          display_nm: admin
+            ? (nameById.get(t.usr_id) ?? '(이름 없음)')
+            : maskDisplayName(nameById.get(t.usr_id)),
+          recencyDays: t.recencyDays,
+          freq: t.freq,
+          monetaryPi: t.monetary,
+          seg: t.seg,
+          segLabel: t.segLabel,
+        })),
+      },
     },
-    byMethod,
-    heatmap,
-    intervalBuckets: intervalCounts,
-    totalIntervals,
-    rfm: {
-      segments: [...segCount.entries()].map(([seg, v]) => ({
-        seg,
-        label: v.label,
-        cnt: v.cnt,
-      })),
-      points: scored.map((s) => ({
-        r: s.r,
-        f: s.f,
-        m: s.m,
-        seg: s.seg,
-        segLabel: s.segLabel,
-        recencyDays: s.recencyDays,
-        freq: s.freq,
-        monetaryPi: s.monetary,
-      })),
-      top: top.map((t) => ({
-        // 비관리자: usr_id 제거 + 표시명 마스킹 (개인 식별 차단, 지표는 공개)
-        usr_id: admin ? t.usr_id : '',
-        display_nm: admin
-          ? (nameById.get(t.usr_id) ?? '(이름 없음)')
-          : maskDisplayName(nameById.get(t.usr_id)),
-        recencyDays: t.recencyDays,
-        freq: t.freq,
-        monetaryPi: t.monetary,
-        seg: t.seg,
-        segLabel: t.segLabel,
-      })),
+    {
+      headers: {
+        // Vercel edge 캐싱 60분 (모든 visitor 공유)
+        'Cache-Control': 's-maxage=3600, max-age=0, stale-while-revalidate=3600',
+        'CDN-Cache-Control': 'max-age=3600, stale-while-revalidate=3600',
+      },
     },
-  })
+  )
 }

@@ -154,11 +154,20 @@ export async function GET(req: NextRequest) {
     .sort((a, b) => b.cnt - a.cnt)
     .slice(0, 12)
 
-  return NextResponse.json({
-    period,
-    newReturning,
-    cohort,
-    regions,
-    locatedUsers: latestSido.size,
-  })
+  return NextResponse.json(
+    {
+      period,
+      newReturning,
+      cohort,
+      regions,
+      locatedUsers: latestSido.size,
+    },
+    {
+      headers: {
+        // Vercel edge 캐싱 60분 (모든 visitor 공유)
+        'Cache-Control': 's-maxage=3600, max-age=0, stale-while-revalidate=3600',
+        'CDN-Cache-Control': 'max-age=3600, stale-while-revalidate=3600',
+      },
+    },
+  )
 }
