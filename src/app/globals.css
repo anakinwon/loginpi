@@ -9,7 +9,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme inline {
-  --font-sans: var(--font-sans);
+  --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
   /* shadcn/ui base-nova 시맨틱 컬러 토큰 */
@@ -97,38 +97,43 @@
 }
 
 :root {
-  --radius: 0;
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.141 0.005 285.823);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.141 0.005 285.823);
-  --primary: oklch(0.841 0.238 128.85);
-  --primary-foreground: oklch(0.405 0.101 131.063);
-  --secondary: oklch(0.967 0.001 286.375);
-  --secondary-foreground: oklch(0.21 0.006 285.885);
-  --muted: oklch(0.967 0.001 286.375);
-  --muted-foreground: oklch(0.552 0.016 285.938);
-  --accent: oklch(0.967 0.001 286.375);
-  --accent-foreground: oklch(0.21 0.006 285.885);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.92 0.004 286.32);
-  --input: oklch(0.92 0.004 286.32);
-  --ring: oklch(0.705 0.015 286.067);
-  --chart-1: oklch(0.785 0.115 274.713);
-  --chart-2: oklch(0.585 0.233 277.117);
-  --chart-3: oklch(0.511 0.262 276.966);
-  --chart-4: oklch(0.457 0.24 277.023);
-  --chart-5: oklch(0.398 0.195 277.366);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.141 0.005 285.823);
-  --sidebar-primary: oklch(0.648 0.2 131.684);
-  --sidebar-primary-foreground: oklch(0.986 0.031 120.757);
-  --sidebar-accent: oklch(0.967 0.001 286.375);
-  --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
-  --sidebar-border: oklch(0.92 0.004 286.32);
-  --sidebar-ring: oklch(0.705 0.015 286.067);
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.141 0.005 285.823);
+  /* 따뜻한 카페 감성 — 둥근 모서리 + 크림·우드·에스프레소 팔레트 */
+  --radius: 0.875rem;
+  /* 부드러운 카페 그림자 (입체감) */
+  --shadow-soft: 0 1px 2px oklch(0.4 0.03 60 / 0.04), 0 4px 16px oklch(0.4 0.03 60 / 0.08);
+  --shadow-card: 0 1px 3px oklch(0.4 0.03 60 / 0.06), 0 8px 24px oklch(0.4 0.03 60 / 0.07);
+
+  --background: oklch(0.975 0.012 78); /* 크림/아이보리 */
+  --foreground: oklch(0.28 0.02 50); /* 다크 에스프레소 텍스트 */
+  --card: oklch(0.99 0.008 80); /* 거의 흰 크림 */
+  --card-foreground: oklch(0.28 0.02 50);
+  --popover: oklch(0.99 0.008 80);
+  --popover-foreground: oklch(0.28 0.02 50);
+  --primary: oklch(0.46 0.07 55); /* 에스프레소 브라운 */
+  --primary-foreground: oklch(0.98 0.01 80); /* 크림 */
+  --secondary: oklch(0.945 0.014 78); /* 연베이지 */
+  --secondary-foreground: oklch(0.32 0.025 52);
+  --muted: oklch(0.945 0.014 78);
+  --muted-foreground: oklch(0.52 0.025 58); /* 연한 브라운 */
+  --accent: oklch(0.62 0.07 150); /* 딥그린·세이지 */
+  --accent-foreground: oklch(0.98 0.01 80);
+  --destructive: oklch(0.577 0.2 27);
+  --border: oklch(0.88 0.02 72); /* 우드톤 베이지 */
+  --input: oklch(0.88 0.02 72);
+  --ring: oklch(0.55 0.06 60); /* 브라운 */
+  --chart-1: oklch(0.58 0.1 55); /* 카페 톤 차트 */
+  --chart-2: oklch(0.62 0.08 150);
+  --chart-3: oklch(0.7 0.1 80);
+  --chart-4: oklch(0.55 0.09 35);
+  --chart-5: oklch(0.5 0.06 120);
+  --sidebar: oklch(0.955 0.014 78);
+  --sidebar-foreground: oklch(0.28 0.02 50);
+  --sidebar-primary: oklch(0.46 0.07 55);
+  --sidebar-primary-foreground: oklch(0.98 0.01 80);
+  --sidebar-accent: oklch(0.945 0.014 78);
+  --sidebar-accent-foreground: oklch(0.32 0.025 52);
+  --sidebar-border: oklch(0.88 0.02 72);
+  --sidebar-ring: oklch(0.55 0.06 60);
   /* KPI 카드 파스텔 기본값 (라이트) — UI 테마 미적용 시 fallback */
   --kpi-1: #eef2ff;
   --kpi-2: #fff1e6;
@@ -138,37 +143,41 @@
 }
 
 .dark {
-  --background: oklch(0.141 0.005 285.823);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.21 0.006 285.885);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.21 0.006 285.885);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.768 0.233 130.85);
-  --primary-foreground: oklch(0.405 0.101 131.063);
-  --secondary: oklch(0.274 0.006 286.033);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.274 0.006 286.033);
-  --muted-foreground: oklch(0.705 0.015 286.067);
-  --accent: oklch(0.274 0.006 286.033);
-  --accent-foreground: oklch(0.985 0 0);
+  /* 다크 에스프레소 + 골드 포인트 */
+  --shadow-soft: 0 1px 2px oklch(0 0 0 / 0.3), 0 4px 16px oklch(0 0 0 / 0.35);
+  --shadow-card: 0 1px 3px oklch(0 0 0 / 0.35), 0 8px 24px oklch(0 0 0 / 0.4);
+
+  --background: oklch(0.2 0.015 50); /* 다크 에스프레소 */
+  --foreground: oklch(0.94 0.01 80); /* 크림 */
+  --card: oklch(0.25 0.018 52);
+  --card-foreground: oklch(0.94 0.01 80);
+  --popover: oklch(0.25 0.018 52);
+  --popover-foreground: oklch(0.94 0.01 80);
+  --primary: oklch(0.74 0.11 70); /* 골드/탠 */
+  --primary-foreground: oklch(0.24 0.03 55);
+  --secondary: oklch(0.3 0.02 52);
+  --secondary-foreground: oklch(0.94 0.01 80);
+  --muted: oklch(0.3 0.02 52);
+  --muted-foreground: oklch(0.72 0.025 72);
+  --accent: oklch(0.6 0.07 150); /* 세이지 */
+  --accent-foreground: oklch(0.16 0.02 150);
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.552 0.016 285.938);
-  --chart-1: oklch(0.785 0.115 274.713);
-  --chart-2: oklch(0.585 0.233 277.117);
-  --chart-3: oklch(0.511 0.262 276.966);
-  --chart-4: oklch(0.457 0.24 277.023);
-  --chart-5: oklch(0.398 0.195 277.366);
-  --sidebar: oklch(0.21 0.006 285.885);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.768 0.233 130.85);
-  --sidebar-primary-foreground: oklch(0.274 0.072 132.109);
-  --sidebar-accent: oklch(0.274 0.006 286.033);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.552 0.016 285.938);
+  --border: oklch(0.32 0.02 55);
+  --input: oklch(0.36 0.022 55);
+  --ring: oklch(0.74 0.11 70);
+  --chart-1: oklch(0.74 0.11 70);
+  --chart-2: oklch(0.65 0.09 150);
+  --chart-3: oklch(0.78 0.1 90);
+  --chart-4: oklch(0.62 0.1 35);
+  --chart-5: oklch(0.6 0.07 120);
+  --sidebar: oklch(0.23 0.017 52);
+  --sidebar-foreground: oklch(0.94 0.01 80);
+  --sidebar-primary: oklch(0.74 0.11 70);
+  --sidebar-primary-foreground: oklch(0.24 0.03 55);
+  --sidebar-accent: oklch(0.3 0.02 52);
+  --sidebar-accent-foreground: oklch(0.94 0.01 80);
+  --sidebar-border: oklch(0.32 0.02 55);
+  --sidebar-ring: oklch(0.74 0.11 70);
   /* KPI 카드 파스텔 기본값 (다크) — UI 테마 미적용 시 fallback */
   --kpi-1: #312e5b;
   --kpi-2: #3a2c20;
@@ -192,9 +201,19 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+  /* 본문 기본은 산세리프(Geist) — 웹앱다운 가독성.
+     제목에만 .font-heading(serif)을 선택 적용한다. */
   html {
-    @apply font-serif;
+    @apply font-sans;
   }
+}
+
+/* 부드러운 카페 그림자 유틸 */
+.shadow-soft {
+  box-shadow: var(--shadow-soft);
+}
+.shadow-card {
+  box-shadow: var(--shadow-card);
 }
 
 /* Google Maps InfoWindow 폭 강제 — 매장 팝업 2열 썸네일이 잘리지 않도록.

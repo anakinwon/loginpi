@@ -4,6 +4,16 @@
 // 토큰 키 화이트리스트 → CSS 변수명 매핑.
 // ⚠️ 이 맵에 없는 키는 무시한다 (임의 CSS 변수 주입 차단).
 export const THEME_TOKEN_MAP = {
+  // 배경 세트 — 무드 전환 시 배경·글자까지 통째로 바뀜 (라이트/다크 각각 정의)
+  background: '--background',
+  foreground: '--foreground',
+  card: '--card',
+  cardForeground: '--card-foreground',
+  muted: '--muted',
+  mutedForeground: '--muted-foreground',
+  secondary: '--secondary',
+  border: '--border',
+  // 포인트 색
   primary: '--primary',
   accent: '--accent',
   chart1: '--chart-1',
@@ -22,7 +32,15 @@ export type ThemeTokenKey = keyof typeof THEME_TOKEN_MAP
 export const THEME_TOKEN_KEYS = Object.keys(THEME_TOKEN_MAP) as ThemeTokenKey[]
 
 // 편집 UI용 라벨·그룹 메타
-export const THEME_TOKEN_META: { key: ThemeTokenKey; label: string; group: 'core' | 'chart' | 'kpi' }[] = [
+export const THEME_TOKEN_META: { key: ThemeTokenKey; label: string; group: 'surface' | 'core' | 'chart' | 'kpi' }[] = [
+  { key: 'background', label: '배경', group: 'surface' },
+  { key: 'foreground', label: '본문 글자', group: 'surface' },
+  { key: 'card', label: '카드 배경', group: 'surface' },
+  { key: 'cardForeground', label: '카드 글자', group: 'surface' },
+  { key: 'muted', label: '보조 배경', group: 'surface' },
+  { key: 'mutedForeground', label: '보조 글자', group: 'surface' },
+  { key: 'secondary', label: '세컨더리', group: 'surface' },
+  { key: 'border', label: '테두리', group: 'surface' },
   { key: 'primary', label: '주색 (primary)', group: 'core' },
   { key: 'accent', label: '강조 (accent)', group: 'core' },
   { key: 'chart1', label: '차트 1', group: 'chart' },
