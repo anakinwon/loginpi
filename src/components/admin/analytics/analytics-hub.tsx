@@ -101,17 +101,18 @@ export function AnalyticsHub() {
         </p>
       </div>
 
-      {/* 탭 네비 */}
-      <div className="flex gap-1 overflow-x-auto border-b">
+      {/* 탭 네비 — 활성 탭을 채운 pill로 강조(선택 구분 명확) */}
+      <div className="bg-muted/40 flex gap-1 overflow-x-auto rounded-xl p-1">
         {TABS.map((t) => (
           <button
             key={t.key}
             onClick={() => setTab(t.key)}
+            aria-current={tab === t.key ? 'page' : undefined}
             className={cn(
-              'shrink-0 border-b-2 px-4 py-2 text-sm font-medium transition-colors',
+              'shrink-0 rounded-lg px-4 py-2 text-sm transition-colors',
               tab === t.key
-                ? 'border-primary text-foreground'
-                : 'text-muted-foreground hover:text-foreground border-transparent',
+                ? 'bg-primary text-primary-foreground font-semibold shadow-sm'
+                : 'text-muted-foreground hover:bg-muted hover:text-foreground font-medium',
             )}
           >
             {t.label}
