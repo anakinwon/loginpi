@@ -12,7 +12,7 @@ import { BeanRevenueDistribution } from '@/components/admin/token-distribution'
 import { BeanIcon } from '@/components/ui/bean-icon'
 import RevenueTreemapChart from '@/components/charts/revenue-treemap-chart'
 import BubbleChart from '@/components/charts/bubble-chart'
-import { themeLabel, themeColorMap } from '@/lib/stats-labels'
+import { themeLabel, themeColorMap, THEME_LABEL } from '@/lib/stats-labels'
 import type { RevenueStatsResponse, BeanRevenueResponse } from '@/types/stats'
 
 // Plotly 차트는 window 의존 → dynamic + ssr:false
@@ -114,26 +114,32 @@ export function RevenueTab({ period }: { period: number }) {
   const beanTxnCnt =
     beanRev?.bean_by_item.reduce((s, it) => s + it.txn_cnt, 0) ?? 0
 
+  // 테마명 — 시스템 분류 코드(구독·기타 등)는 번역키, 카페 테마명(DB)은 theme_nm 그대로
+  const themeName = (cd: string, nm?: string | null) =>
+    cd in THEME_LABEL ? t(`theme.${cd}`) : (nm ?? themeLabel(cd))
+
   // ABC 분석 대상 — 테마별 Pi 매출 (topThemes)
   const abcItems = useMemo(
     () =>
-      (rev?.topThemes ?? []).map((t) => ({
-        label: t.theme_nm ?? themeLabel(t.theme_cd),
-        value: t.total_pi,
+      (rev?.topThemes ?? []).map((th) => ({
+        label: themeName(th.theme_cd, th.theme_nm),
+        value: th.total_pi,
       })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [rev],
   )
 
   // 테마별 매출 버블 (Bean 환산: 1 Pi = 100 Bean) — 비중은 단위 불변, 색은 트리맵과 동일 매핑
   const bubbleItems = useMemo(() => {
     const themes = rev?.topThemes ?? []
-    const colorOf = themeColorMap(themes.map((t) => t.theme_cd))
-    return themes.map((t) => ({
-      label: t.theme_nm ?? themeLabel(t.theme_cd),
-      value: t.total_pi * 100, // Bean 페그 환산 (비중 동일)
-      emoji: t.theme_emoji ?? undefined,
-      color: colorOf[t.theme_cd],
+    const colorOf = themeColorMap(themes.map((th) => th.theme_cd))
+    return themes.map((th) => ({
+      label: themeName(th.theme_cd, th.theme_nm),
+      value: th.total_pi * 100, // Bean 페그 환산 (비중 동일)
+      emoji: th.theme_emoji ?? undefined,
+      color: colorOf[th.theme_cd],
     }))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rev])
 
   if (error)

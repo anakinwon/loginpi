@@ -102,13 +102,17 @@ export async function GET(req: NextRequest) {
   for (const l of periodLogs)
     daysByUser.set(l.usr_id, (daysByUser.get(l.usr_id) ?? 0) + 1)
   const DEPTH_BUCKETS = [
-    { label: '1일', max: 1 },
-    { label: '2~3일', max: 3 },
-    { label: '4~7일', max: 7 },
-    { label: '8~14일', max: 14 },
-    { label: '15일+', max: Infinity },
+    { code: 'd1', label: '1일', max: 1 },
+    { code: 'd2_3', label: '2~3일', max: 3 },
+    { code: 'd4_7', label: '4~7일', max: 7 },
+    { code: 'd8_14', label: '8~14일', max: 14 },
+    { code: 'd15p', label: '15일+', max: Infinity },
   ]
-  const depth = DEPTH_BUCKETS.map((b) => ({ label: b.label, cnt: 0 }))
+  const depth = DEPTH_BUCKETS.map((b) => ({
+    code: b.code,
+    label: b.label,
+    cnt: 0,
+  }))
   for (const d of daysByUser.values()) {
     const idx = DEPTH_BUCKETS.findIndex((b) => d <= b.max)
     depth[idx].cnt++

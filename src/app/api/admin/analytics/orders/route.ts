@@ -121,14 +121,18 @@ export async function GET(req: NextRequest) {
 
   // 주문간격 히스토그램 (연속 주문 사이 일수)
   const INTERVAL_BUCKETS = [
-    { label: '0~1일', max: 1 },
-    { label: '2~3일', max: 3 },
-    { label: '4~7일', max: 7 },
-    { label: '8~14일', max: 14 },
-    { label: '15~30일', max: 30 },
-    { label: '30일+', max: Infinity },
+    { code: 'd0_1', label: '0~1일', max: 1 },
+    { code: 'd2_3', label: '2~3일', max: 3 },
+    { code: 'd4_7', label: '4~7일', max: 7 },
+    { code: 'd8_14', label: '8~14일', max: 14 },
+    { code: 'd15_30', label: '15~30일', max: 30 },
+    { code: 'd30p', label: '30일+', max: Infinity },
   ]
-  const intervalCounts = INTERVAL_BUCKETS.map((b) => ({ label: b.label, cnt: 0 }))
+  const intervalCounts = INTERVAL_BUCKETS.map((b) => ({
+    code: b.code,
+    label: b.label,
+    cnt: 0,
+  }))
   const now = Date.now()
   let repeatBuyers = 0
 

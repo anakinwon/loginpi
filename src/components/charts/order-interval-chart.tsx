@@ -20,7 +20,7 @@ const PLOT_STYLE = { width: '100%', height: '240px' }
 export default function OrderIntervalChart({
   buckets,
 }: {
-  buckets: { label: string; cnt: number }[]
+  buckets: { code?: string; label: string; cnt: number }[]
 }) {
   const colors = useThemeChartColors()
   const t = useTranslations('adminAnalytics.charts')
@@ -31,7 +31,7 @@ export default function OrderIntervalChart({
       traces: [
         {
           type: 'bar' as const,
-          x: buckets.map((b) => b.label),
+          x: buckets.map((b) => (b.code ? t(`interval.${b.code}`) : b.label)),
           y: buckets.map((b) => b.cnt),
           marker: { color: colors[1] },
           hovertemplate: '%{x}: %{y}<extra></extra>',
@@ -39,7 +39,7 @@ export default function OrderIntervalChart({
       ],
       isEmpty: total === 0,
     }
-  }, [buckets, colors])
+  }, [buckets, colors, t])
 
   if (isEmpty)
     return (

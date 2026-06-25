@@ -46,7 +46,7 @@ interface PerfResponse {
     buyerToRepeat: number
   }
   activityTypes: { cd: string; label: string; cnt: number }[]
-  engagementDepth: { label: string; cnt: number }[]
+  engagementDepth: { code: string; label: string; cnt: number }[]
   activeUsersPeriod: number
   sessionTrackingPending: boolean
 }
@@ -220,9 +220,9 @@ export function PerformanceTab({ period }: { period: number }) {
               {(data?.engagementDepth ?? []).map((d) => {
                 const pct = (d.cnt / depthMax) * 100
                 return (
-                  <div key={d.label} className="text-sm">
+                  <div key={d.code} className="text-sm">
                     <div className="mb-1 flex justify-between">
-                      <span>{d.label}</span>
+                      <span>{t(`perf.depthBucket.${d.code}`)}</span>
                       <span className="text-muted-foreground">
                         {d.cnt}
                         {t('common.uPerson')}

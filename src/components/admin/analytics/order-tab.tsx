@@ -35,7 +35,7 @@ interface OrdersResponse {
   }
   byMethod: { method: string; label: string; cnt: number }[]
   heatmap: number[][]
-  intervalBuckets: { label: string; cnt: number }[]
+  intervalBuckets: { code: string; label: string; cnt: number }[]
   rfm: {
     segments: { seg: string; label: string; cnt: number }[]
     points: {

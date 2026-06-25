@@ -2519,6 +2519,13 @@
         "MSG": "Message",
         "PAYMENT": "Payment"
       },
+      "depthBucket": {
+        "d1": "1 day",
+        "d2_3": "2–3 days",
+        "d4_7": "4–7 days",
+        "d8_14": "8–14 days",
+        "d15p": "15+ days"
+      },
       "channelCd": {
         "DIRECT": "Direct",
         "SEARCH": "Search",
@@ -2563,7 +2570,29 @@
       "funnelEmpty": "No data to draw the funnel.",
       "funnelStageLine": "{idx}. {label}",
       "dwellHover": "dwell",
-      "dow": "Sun,Mon,Tue,Wed,Thu,Fri,Sat"
+      "dow": "Sun,Mon,Tue,Wed,Thu,Fri,Sat",
+      "interval": {
+        "d0_1": "0–1d",
+        "d2_3": "2–3d",
+        "d4_7": "4–7d",
+        "d8_14": "8–14d",
+        "d15_30": "15–30d",
+        "d30p": "30d+"
+      },
+      "depthBucket": {
+        "d1": "1d",
+        "d2_3": "2–3d",
+        "d4_7": "4–7d",
+        "d8_14": "8–14d",
+        "d15p": "15d+"
+      }
+    },
+    "theme": {
+      "SUBSCRIPTION": "Subscription",
+      "PI_TIP": "Bean",
+      "DIRECT_PAY": "Direct send",
+      "PRODUCT_ORDER": "Product order",
+      "UNKNOWN": "Other"
     }
   }
 }
