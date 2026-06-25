@@ -4,12 +4,13 @@ import { signIn, useSession } from 'next-auth/react'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { Button } from '@/components/ui/button'
-import { usePiAuth } from '@/components/pi-auth-provider'
+import { usePiBrowserUI } from '@/hooks/use-pi-browser-ui'
 
 export function GoogleLoginButton() {
   const t = useTranslations('header')
   const { data: session, status } = useSession()
-  const { isInPiBrowser } = usePiAuth()
+  // Pi Browser 판정에 UA 폴백 포함 — 인증 완료 전에도 Pi Browser면 Google UI 숨김
+  const inPiBrowser = usePiBrowserUI()
 
   // 일반 브라우저(PC·모바일)는 Google 세션으로만 관리한다 → Pi Browser가 아니면
   // 계정 종류(통합/Google 전용)와 무관하게 항상 Google UI를 표시한다.
@@ -18,7 +19,7 @@ export function GoogleLoginButton() {
   //   - piLoading: 일반 브라우저도 Pi SDK가 window.Pi를 정의해 최대 20s true 유지 → 버튼 사라짐.
   //   - piUser: Pi 연동 통합 계정이 Google 로그인하면 uid가 채워져(=pi_uid) 헤더가 통째로 사라짐.
   //   Google UI 노출 여부는 오직 isInPiBrowser(Pi Browser 여부)로만 판정한다.
-  if (isInPiBrowser) return null
+  if (inPiBrowser) return null
   if (status === 'loading') return null
 
   if (session?.user) {

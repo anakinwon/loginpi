@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { Button } from '@/components/ui/button'
 import { usePiAuth } from './pi-auth-provider'
+import { usePiBrowserUI } from '@/hooks/use-pi-browser-ui'
 
 const isDev = process.env.NODE_ENV !== 'production'
 
@@ -11,9 +12,11 @@ export function PiLoginButton() {
   const t = useTranslations('header')
   const { user, isLoading, isInPiBrowser, signIn, devLogin, error } =
     usePiAuth()
+  // 표시 게이팅은 UA 폴백 포함(인증 전에도 Pi 로그인 버튼 노출). devLogin은 인증 신호 유지.
+  const inPiBrowser = usePiBrowserUI()
   const useDevLogin = isDev && !isInPiBrowser
 
-  if (!isInPiBrowser) return null
+  if (!inPiBrowser) return null
 
   if (user) {
     const isDevSession = user.uid.startsWith('dev_')

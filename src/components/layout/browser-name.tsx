@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { usePiAuth } from '@/components/pi-auth-provider'
+import { usePiBrowserUI } from '@/hooks/use-pi-browser-ui'
 
 function detectByUA(ua: string): string {
   if (/PiBrowser/.test(ua)) return 'Pi Browser'
@@ -15,15 +16,17 @@ function detectByUA(ua: string): string {
 }
 
 export function BrowserName() {
-  const { isInPiBrowser, isLoading } = usePiAuth()
+  const { isLoading } = usePiAuth()
+  // UA 폴백 포함 — 인증 완료 전에도 Pi Browser면 즉시 Pi 로고 표시
+  const inPiBrowser = usePiBrowserUI()
   const [uaName, setUaName] = useState('...')
 
   useEffect(() => {
     setUaName(detectByUA(navigator.userAgent))
   }, [])
 
-  // Pi 인증 완료 후 실제 Pi Browser로 확정된 경우에만 로고 이미지 표시
-  if (!isLoading && isInPiBrowser) {
+  // Pi Browser(인증 확정 OR UA)면 Pi 로고 이미지 표시
+  if (!isLoading && inPiBrowser) {
     return (
       <Image
         src="/pi-logo.png"
