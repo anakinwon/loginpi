@@ -22,6 +22,18 @@ const RevenueAbcChart = dynamic(
   () => import('@/components/charts/revenue-abc-chart'),
   { ssr: false },
 )
+const RevenueZChart = dynamic(
+  () => import('@/components/charts/revenue-zchart'),
+  { ssr: false },
+)
+const RevenueYoyChart = dynamic(
+  () => import('@/components/charts/revenue-yoy-chart'),
+  { ssr: false },
+)
+
+interface MonthlyRevenue {
+  months: { ym: string; revPi: number; txnCnt: number }[]
+}
 
 // 매출 분석 탭 (Phase 22 §12 ①)
 //   - 2층위 매출 분리: Pi 현금매출(충전, 외부 유입) vs Bean 회수매출(내부 순환) — 합산 금지
@@ -30,6 +42,7 @@ const RevenueAbcChart = dynamic(
 export function RevenueTab({ period }: { period: number }) {
   const [rev, setRev] = useState<RevenueStatsResponse | null>(null)
   const [beanRev, setBeanRev] = useState<BeanRevenueResponse | null>(null)
+  const [monthly, setMonthly] = useState<MonthlyRevenue | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   const fetchRevenue = useCallback(async (p: number) => {
@@ -70,6 +83,26 @@ export function RevenueTab({ period }: { period: number }) {
   useEffect(() => {
     fetchBeanRevenue()
   }, [fetchBeanRevenue])
+
+  // 월별 매출(25개월) — Z-차트·YoY용. 기간 무관 단일 조회.
+  const fetchMonthly = useCallback(async () => {
+    const cacheKey = 'analytics_revenue_monthly'
+    const cached = readCache<MonthlyRevenue>(cacheKey, 10 * 60_000)
+    if (cached) setMonthly(cached)
+    try {
+      const res = await piFetch('/api/admin/analytics/revenue-monthly')
+      if (!res.ok) throw new Error('월별 매출 조회 실패')
+      const json = (await res.json()) as MonthlyRevenue
+      setMonthly(json)
+      writeCache(cacheKey, json)
+    } catch {
+      // Z-차트·YoY는 보조 — 실패해도 본 매출 화면 유지
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchMonthly()
+  }, [fetchMonthly])
 
   // KPI — Pi 현금매출(충전)과 Bean 회수매출을 명확히 분리
   const piCash = beanRev?.pi_revenue.total_pi ?? 0
@@ -183,13 +216,34 @@ export function RevenueTab({ period }: { period: number }) {
 
       <BeanTopSpenders period={period} />
 
-      {/* 후속 안내 — Z차트·YoY는 월별 집계 엔드포인트 선결 (PRD_21 §6) */}
-      <div className="border-muted-foreground/20 bg-muted/30 rounded-lg border border-dashed p-4">
-        <p className="text-sm font-medium">📐 Z-차트 · 전년동기(YoY) 비교 — 후속</p>
-        <p className="text-muted-foreground mt-1 text-xs">
-          당월·누계·이동누계(Z-차트)와 YoY 비교는 24개월 월별 집계가 필요합니다.
-          월별 매출 집계 엔드포인트(PRD_21 §6) 추가 후 활성화됩니다.
-        </p>
+      {/* Z-차트 + YoY — 월별 Pi 매출 추세 (PRD_21 §12 ①) */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <div className="rounded-lg border p-4">
+          <p className="mb-2 text-sm font-medium">
+            Z-차트 (당월·누계·이동누계){' '}
+            <span className="text-muted-foreground text-xs">· Pi 매출</span>
+          </p>
+          <LazySection>
+            {monthly ? (
+              <RevenueZChart months={monthly.months} />
+            ) : (
+              <div className="bg-muted h-72 animate-pulse rounded-lg" />
+            )}
+          </LazySection>
+        </div>
+        <div className="rounded-lg border p-4">
+          <p className="mb-2 text-sm font-medium">
+            전년동기(YoY) 비교{' '}
+            <span className="text-muted-foreground text-xs">· 월별 Pi 매출</span>
+          </p>
+          <LazySection>
+            {monthly ? (
+              <RevenueYoyChart months={monthly.months} />
+            ) : (
+              <div className="bg-muted h-72 animate-pulse rounded-lg" />
+            )}
+          </LazySection>
+        </div>
       </div>
     </div>
   )
