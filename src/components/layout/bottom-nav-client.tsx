@@ -1,9 +1,11 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Coffee, House, MapPin, ShieldCheck, Store, Zap } from 'lucide-react'
 import { Link, usePathname } from '@/i18n/navigation'
 import { usePiAuth } from '@/components/pi-auth-provider'
+import { useAutoHideOnIdle } from '@/hooks/use-auto-hide-on-idle'
 import { cn } from '@/lib/utils'
 
 // 하단 고정 네비게이션 (Home · Event · Cafe · Shop · Map · 나의정보/관리자)
@@ -12,10 +14,22 @@ import { cn } from '@/lib/utils'
 export function BottomNavClient({ serverIsAdmin }: { serverIsAdmin: boolean }) {
   const t = useTranslations('nav')
   const pathname = usePathname()
-  const { user: piUser } = usePiAuth()
+  const { user: piUser, isInPiBrowser } = usePiAuth()
 
-  // 채팅방 내부는 전체 화면 고정 프레임(fixed top-14 bottom-0)이므로 네비를 숨긴다
-  if (/^\/chat\/.+/.test(pathname)) return null
+  // Pi Browser 판정: 인증 완료 신호(isInPiBrowser) OR UA 즉시 감지.
+  // UA 감지는 navigator 접근이라 마운트 후 effect에서 (SSR=초기 클라 렌더는 false로 일치).
+  const [uaPiBrowser, setUaPiBrowser] = useState(false)
+  useEffect(() => {
+    setUaPiBrowser(/PiBrowser/i.test(navigator.userAgent))
+  }, [])
+  const floating = isInPiBrowser || uaPiBrowser
+
+  // 채팅방 내부는 전체 화면 고정 프레임이라 네비를 숨긴다 → 그땐 자동숨김 리스너도 불필요
+  const inChatRoom = /^\/chat\/.+/.test(pathname)
+  // Pi Browser에서만: 멈추면 숨고, 스크롤·터치하면 나타났다가 1초 후 다시 숨김
+  const visible = useAutoHideOnIdle(floating && !inChatRoom)
+
+  if (inChatRoom) return null
 
   const isAdminUser =
     serverIsAdmin || piUser?.role === 'ADMIN' || piUser?.role === 'MASTER'
@@ -62,7 +76,24 @@ export function BottomNavClient({ serverIsAdmin }: { serverIsAdmin: boolean }) {
     : baseTabs
 
   return (
-    <nav className="bg-background/95 fixed inset-x-0 bottom-0 z-50 border-t pb-[env(safe-area-inset-bottom)] backdrop-blur-sm">
+    <nav
+      aria-hidden={floating && !visible}
+      className={cn(
+        'bg-background/95 fixed z-50 backdrop-blur-sm transition-[transform,opacity] duration-300 ease-out',
+        floating
+          ? // Pi Browser: 양옆·아래로 띄운 둥근 플로팅 바 (safe-area 위로 부유)
+            'inset-x-3 overflow-hidden rounded-2xl border shadow-lg'
+          : // 일반 브라우저: 기존 도킹 바 (하단 풀폭, safe-area 패딩)
+            'inset-x-0 bottom-0 border-t pb-[env(safe-area-inset-bottom)]',
+        // 숨김 상태: 아래로 밀어내고 투명 + 터치 차단
+        floating && !visible && 'pointer-events-none translate-y-[160%] opacity-0',
+      )}
+      style={
+        floating
+          ? { bottom: 'calc(env(safe-area-inset-bottom) + 0.5rem)' }
+          : undefined
+      }
+    >
       <div
         className={`mx-auto grid h-16 max-w-5xl ${isAdminUser ? 'grid-cols-6' : 'grid-cols-5'}`}
       >
