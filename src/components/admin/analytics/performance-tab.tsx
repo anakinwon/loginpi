@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
+import { useTranslations } from 'next-intl'
 import { piFetch } from '@/lib/pi-fetch'
 import { readCache, writeCache } from '@/lib/client-cache'
 import { LazySection } from '@/components/lazy-section'
@@ -55,6 +56,7 @@ const TYPE_COLORS = ['bg-[var(--kpi-1)]', 'bg-[var(--kpi-3)]', 'bg-[var(--kpi-5)
 // 퍼포먼스 분석 탭 (Phase 22 §12 ④) — 라이프사이클 퍼널·전환율·활동구성·참여깊이.
 //   페이지뷰·체류·반송/이탈·채널은 세션 추적층 선결(아래 안내 카드).
 export function PerformanceTab({ period }: { period: number }) {
+  const t = useTranslations('adminAnalytics')
   const [data, setData] = useState<PerfResponse | null>(null)
   const [pv, setPv] = useState<PvResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -104,7 +106,7 @@ export function PerformanceTab({ period }: { period: number }) {
           onClick={() => fetchPerf(period)}
           className="text-muted-foreground mt-2 text-sm underline"
         >
-          다시 시도
+          {t('common.retry')}
         </button>
       </div>
     )
@@ -119,7 +121,7 @@ export function PerformanceTab({ period }: { period: number }) {
       {/* Zone 1 — 전환율 KPI */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <StatsCard
-          label="가입 → 활동 전환"
+          label={t('perf.convSignupActive')}
           value={Number((c?.signupToActive ?? 0).toFixed(1))}
           unit="%"
           loading={loading}
@@ -127,7 +129,7 @@ export function PerformanceTab({ period }: { period: number }) {
           icon={<span aria-hidden>🔓</span>}
         />
         <StatsCard
-          label="활동 → 구매 전환"
+          label={t('perf.convActiveBuyer')}
           value={Number((c?.activeToBuyer ?? 0).toFixed(1))}
           unit="%"
           loading={loading}
@@ -135,7 +137,7 @@ export function PerformanceTab({ period }: { period: number }) {
           icon={<span aria-hidden>🛒</span>}
         />
         <StatsCard
-          label="구매 → 재구매 전환"
+          label={t('perf.convBuyerRepeat')}
           value={Number((c?.buyerToRepeat ?? 0).toFixed(1))}
           unit="%"
           loading={loading}
@@ -147,8 +149,10 @@ export function PerformanceTab({ period }: { period: number }) {
       {/* Zone 2 — 라이프사이클 전환 퍼널 */}
       <div className="rounded-lg border p-4">
         <p className="mb-3 text-sm font-medium">
-          라이프사이클 전환 퍼널{' '}
-          <span className="text-muted-foreground text-xs">· 누적(전체)</span>
+          {t('perf.funnelTitle')}{' '}
+          <span className="text-muted-foreground text-xs">
+            {t('perf.funnelUnit')}
+          </span>
         </p>
         <LazySection>
           {data ? (
@@ -163,21 +167,24 @@ export function PerformanceTab({ period }: { period: number }) {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div className="rounded-lg border p-4">
           <p className="mb-3 text-sm font-medium">
-            활동 유형 분포{' '}
-            <span className="text-muted-foreground text-xs">· 최근 {period}일</span>
+            {t('perf.activityType')}{' '}
+            <span className="text-muted-foreground text-xs">
+              {t('common.recentDays', { period })}
+            </span>
           </p>
           {loading ? (
             <div className="bg-muted h-24 animate-pulse rounded-lg" />
           ) : data && data.activityTypes.length > 0 ? (
             <div className="space-y-2">
-              {data.activityTypes.map((t, i) => {
-                const pct = (t.cnt / typeTotal) * 100
+              {data.activityTypes.map((at, i) => {
+                const pct = (at.cnt / typeTotal) * 100
                 return (
-                  <div key={t.cd} className="text-sm">
+                  <div key={at.cd} className="text-sm">
                     <div className="mb-1 flex justify-between">
-                      <span>{t.label}</span>
+                      <span>{t(`perf.actvty.${at.cd}`)}</span>
                       <span className="text-muted-foreground">
-                        {t.cnt}건 · {pct.toFixed(0)}%
+                        {at.cnt}
+                        {t('common.uCase')} · {pct.toFixed(0)}%
                       </span>
                     </div>
                     <div className="bg-muted h-2.5 overflow-hidden rounded-full">
@@ -192,17 +199,17 @@ export function PerformanceTab({ period }: { period: number }) {
             </div>
           ) : (
             <p className="text-muted-foreground py-8 text-center text-sm">
-              해당 기간 활동 데이터가 없습니다.
+              {t('charts.nrEmpty')}
             </p>
           )}
         </div>
 
         <div className="rounded-lg border p-4">
           <div className="mb-3 flex items-center justify-between">
-            <p className="text-sm font-medium">참여 깊이 (활동일수)</p>
+            <p className="text-sm font-medium">{t('perf.depth')}</p>
             {data && (
               <span className="text-muted-foreground text-xs">
-                활동자 {data.activeUsersPeriod}명
+                {t('perf.activeUsers', { n: data.activeUsersPeriod })}
               </span>
             )}
           </div>
@@ -216,7 +223,10 @@ export function PerformanceTab({ period }: { period: number }) {
                   <div key={d.label} className="text-sm">
                     <div className="mb-1 flex justify-between">
                       <span>{d.label}</span>
-                      <span className="text-muted-foreground">{d.cnt}명</span>
+                      <span className="text-muted-foreground">
+                        {d.cnt}
+                        {t('common.uPerson')}
+                      </span>
                     </div>
                     <div className="bg-muted h-2.5 overflow-hidden rounded-full">
                       <div
@@ -234,36 +244,36 @@ export function PerformanceTab({ period }: { period: number }) {
 
       {/* ── 웹 트래픽 (페이지뷰 추적층) ───────────────────────── */}
       <div className="border-t pt-5">
-        <p className="mb-3 text-sm font-semibold">🧭 웹 트래픽</p>
+        <p className="mb-3 text-sm font-semibold">{t('perf.webTraffic')}</p>
 
         {/* 트래픽 KPI */}
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           <StatsCard
-            label="페이지뷰"
+            label={t('perf.kpiPv')}
             value={pv?.summary.totalPv ?? 0}
-            unit="PV"
+            unit={t('common.uPv')}
             loading={pv === null}
             variant="kpi-1"
             icon={<span aria-hidden>👁️</span>}
           />
           <StatsCard
-            label="세션"
+            label={t('perf.kpiSessions')}
             value={pv?.summary.sessions ?? 0}
-            unit="개"
+            unit={t('common.uCount')}
             loading={pv === null}
             variant="kpi-3"
             icon={<span aria-hidden>🧩</span>}
           />
           <StatsCard
-            label="평균 체류"
+            label={t('perf.kpiDwell')}
             value={Number((pv?.summary.avgDwellSec ?? 0).toFixed(0))}
-            unit="초"
+            unit={t('common.uSec')}
             loading={pv === null}
             variant="kpi-4"
             icon={<span aria-hidden>⏱️</span>}
           />
           <StatsCard
-            label="반송률"
+            label={t('perf.kpiBounce')}
             value={Number((pv?.summary.bounceRate ?? 0).toFixed(1))}
             unit="%"
             loading={pv === null}
@@ -275,8 +285,10 @@ export function PerformanceTab({ period }: { period: number }) {
         {/* PV 추세 */}
         <div className="mt-4 rounded-lg border p-4">
           <p className="mb-2 text-sm font-medium">
-            페이지뷰 추세{' '}
-            <span className="text-muted-foreground text-xs">· 최근 {period}일</span>
+            {t('perf.pvTrend')}{' '}
+            <span className="text-muted-foreground text-xs">
+              {t('common.recentDays', { period })}
+            </span>
           </p>
           <LazySection>
             {pv ? (
@@ -290,7 +302,7 @@ export function PerformanceTab({ period }: { period: number }) {
         {/* 채널 기여 + 랜딩/이탈 페이지 */}
         <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
           <div className="rounded-lg border p-4">
-            <p className="mb-3 text-sm font-medium">유입 채널</p>
+            <p className="mb-3 text-sm font-medium">{t('perf.channel')}</p>
             {pv && pv.channels.length > 0 ? (
               <div className="space-y-2">
                 {(() => {
@@ -301,7 +313,7 @@ export function PerformanceTab({ period }: { period: number }) {
                     return (
                       <div key={c.cd} className="text-sm">
                         <div className="mb-1 flex justify-between">
-                          <span>{c.label}</span>
+                          <span>{t(`perf.channelCd.${c.cd}`)}</span>
                           <span className="text-muted-foreground">
                             {pct.toFixed(0)}%
                           </span>
@@ -319,19 +331,16 @@ export function PerformanceTab({ period }: { period: number }) {
               </div>
             ) : (
               <p className="text-muted-foreground py-6 text-center text-sm">
-                수집 데이터 없음
+                {t('common.noData')}
               </p>
             )}
           </div>
 
-          <PathList title="랜딩 페이지 Top" items={pv?.topLanding ?? null} />
-          <PathList title="이탈 페이지 Top" items={pv?.topExit ?? null} />
+          <PathList title={t('perf.landingTop')} items={pv?.topLanding ?? null} />
+          <PathList title={t('perf.exitTop')} items={pv?.topExit ?? null} />
         </div>
 
-        <p className="text-muted-foreground mt-3 text-xs">
-          ※ 페이지뷰는 라우트 전환 시 비차단 수집됩니다. 배포 직후엔 데이터가
-          비어 있으며 사용량이 쌓이면 채워집니다. (sql/122 적용 필요)
-        </p>
+        <p className="text-muted-foreground mt-3 text-xs">{t('perf.collectNote')}</p>
       </div>
     </div>
   )
@@ -352,6 +361,7 @@ function PathList({
   title: string
   items: { path: string; cnt: number }[] | null
 }) {
+  const t = useTranslations('adminAnalytics')
   return (
     <div className="rounded-lg border p-4">
       <p className="mb-3 text-sm font-medium">{title}</p>
@@ -368,7 +378,7 @@ function PathList({
         </ul>
       ) : (
         <p className="text-muted-foreground py-6 text-center text-sm">
-          수집 데이터 없음
+          {t('common.noData')}
         </p>
       )}
     </div>

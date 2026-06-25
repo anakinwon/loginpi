@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
+import { useTranslations } from 'next-intl'
 
 // cryptobubbles.net 영감 버블 차트 (Phase 22 §12 ①).
 //   원 면적(반지름 ∝ √value)으로 비중 표현 + 아르키메데스 나선 패킹(충돌 회피).
@@ -64,6 +65,7 @@ function packBubbles(items: BubbleItem[]): Placed[] {
 }
 
 export default function BubbleChart({ items }: { items: BubbleItem[] }) {
+  const t = useTranslations('adminAnalytics.charts')
   const { placed, viewBox } = useMemo(() => {
     const p = packBubbles(items)
     if (p.length === 0) return { placed: p, viewBox: '0 0 100 100' }
@@ -81,7 +83,7 @@ export default function BubbleChart({ items }: { items: BubbleItem[] }) {
   if (placed.length === 0)
     return (
       <p className="text-muted-foreground py-12 text-center text-sm">
-        표시할 매출 데이터가 없습니다.
+        {t('bubbleEmpty')}
       </p>
     )
 

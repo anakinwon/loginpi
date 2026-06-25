@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
+import { useTranslations } from 'next-intl'
 import { piFetch } from '@/lib/pi-fetch'
 import { readCache, writeCache } from '@/lib/client-cache'
 import { LazySection } from '@/components/lazy-section'
@@ -50,6 +51,7 @@ interface OrdersResponse {
       recencyDays: number
       freq: number
       monetaryPi: number
+      seg: string
       segLabel: string
     }[]
   }
@@ -59,6 +61,7 @@ const METHOD_COLORS = ['bg-[var(--kpi-1)]', 'bg-[var(--kpi-3)]', 'bg-[var(--kpi-
 
 // 주문 분석 탭 (Phase 22 §12 ②) — mps_order 직접 집계. 신규 SQL 의존 없음.
 export function OrderTab({ period }: { period: number }) {
+  const t = useTranslations('adminAnalytics')
   const [data, setData] = useState<OrdersResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -90,7 +93,7 @@ export function OrderTab({ period }: { period: number }) {
           onClick={() => fetchOrders(period)}
           className="text-muted-foreground mt-2 text-sm underline"
         >
-          다시 시도
+          {t('common.retry')}
         </button>
       </div>
     )
@@ -104,15 +107,15 @@ export function OrderTab({ period }: { period: number }) {
       {/* Zone 1 — KPI */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
         <StatsCard
-          label="총 주문수"
+          label={t('order.kpiOrders')}
           value={s?.total ?? 0}
-          unit="건"
+          unit={t('common.uCase')}
           loading={loading}
           variant="kpi-1"
           icon={<span aria-hidden>🧾</span>}
         />
         <StatsCard
-          label="객단가 (AOV)"
+          label={t('order.kpiAov')}
           value={Number((s?.aovPi ?? 0).toFixed(3))}
           unit="π"
           loading={loading}
@@ -120,7 +123,7 @@ export function OrderTab({ period }: { period: number }) {
           icon={<span aria-hidden>💵</span>}
         />
         <StatsCard
-          label="취소율"
+          label={t('order.kpiCancel')}
           value={Number((s?.cancelRate ?? 0).toFixed(1))}
           unit="%"
           loading={loading}
@@ -128,7 +131,7 @@ export function OrderTab({ period }: { period: number }) {
           icon={<span aria-hidden>↩️</span>}
         />
         <StatsCard
-          label="재구매율"
+          label={t('order.kpiRepeat')}
           value={Number((s?.repeatRate ?? 0).toFixed(1))}
           unit="%"
           loading={loading}
@@ -136,9 +139,9 @@ export function OrderTab({ period }: { period: number }) {
           icon={<span aria-hidden>🔁</span>}
         />
         <StatsCard
-          label="평균 주문간격"
+          label={t('order.kpiInterval')}
           value={Number((s?.avgIntervalDays ?? 0).toFixed(1))}
-          unit="일"
+          unit={t('common.uDay')}
           loading={loading}
           variant="kpi-4"
           icon={<span aria-hidden>📆</span>}
@@ -148,7 +151,7 @@ export function OrderTab({ period }: { period: number }) {
       {/* Zone 2 — 주문방법 분포 + 요일×시간 히트맵 */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div className="rounded-lg border p-4">
-          <p className="mb-3 text-sm font-medium">주문방법 분포</p>
+          <p className="mb-3 text-sm font-medium">{t('order.methodTitle')}</p>
           {loading ? (
             <div className="bg-muted h-24 animate-pulse rounded-lg" />
           ) : data && data.byMethod.length > 0 ? (
@@ -158,9 +161,10 @@ export function OrderTab({ period }: { period: number }) {
                 return (
                   <div key={m.method} className="text-sm">
                     <div className="mb-1 flex justify-between">
-                      <span>{m.label}</span>
+                      <span>{t(`order.method.${m.method}`)}</span>
                       <span className="text-muted-foreground">
-                        {m.cnt}건 · {pct.toFixed(0)}%
+                        {m.cnt}
+                        {t('common.uCase')} · {pct.toFixed(0)}%
                       </span>
                     </div>
                     <div className="bg-muted h-2.5 overflow-hidden rounded-full">
@@ -175,13 +179,13 @@ export function OrderTab({ period }: { period: number }) {
             </div>
           ) : (
             <p className="text-muted-foreground py-8 text-center text-sm">
-              주문 데이터가 없습니다.
+              {t('order.methodEmpty')}
             </p>
           )}
         </div>
 
         <div className="rounded-lg border p-4">
-          <p className="mb-3 text-sm font-medium">요일 × 시간 주문 밀도</p>
+          <p className="mb-3 text-sm font-medium">{t('order.heatmapTitle')}</p>
           {loading ? (
             <div className="bg-muted h-32 animate-pulse rounded-lg" />
           ) : (
@@ -193,8 +197,10 @@ export function OrderTab({ period }: { period: number }) {
       {/* Zone 3 — 재구매 간격 히스토그램 */}
       <div className="rounded-lg border p-4">
         <p className="mb-2 text-sm font-medium">
-          재구매 간격 분포{' '}
-          <span className="text-muted-foreground text-xs">· 최근 {period}일</span>
+          {t('order.intervalTitle')}{' '}
+          <span className="text-muted-foreground text-xs">
+            {t('common.recentDays', { period })}
+          </span>
         </p>
         <LazySection>
           {data ? (
@@ -208,7 +214,7 @@ export function OrderTab({ period }: { period: number }) {
       {/* Zone 4 — RFM 세그먼테이션 */}
       <div className="rounded-lg border p-4">
         <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-          <p className="text-sm font-medium">RFM 고객 세그먼테이션</p>
+          <p className="text-sm font-medium">{t('order.rfmTitle')}</p>
           {data && data.rfm.segments.length > 0 && (
             <div className="flex flex-wrap gap-2 text-xs">
               {data.rfm.segments
@@ -218,7 +224,7 @@ export function OrderTab({ period }: { period: number }) {
                     key={seg.seg}
                     className="bg-muted text-muted-foreground rounded-full px-2 py-0.5"
                   >
-                    {seg.label} {seg.cnt}
+                    {t(`order.seg.${seg.seg}`)} {seg.cnt}
                   </span>
                 ))}
             </div>
@@ -238,11 +244,11 @@ export function OrderTab({ period }: { period: number }) {
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-muted-foreground border-b text-left text-xs">
-                  <th className="py-2 pr-2">고객</th>
-                  <th className="py-2 pr-2">세그먼트</th>
-                  <th className="py-2 pr-2 text-right">구매</th>
-                  <th className="py-2 pr-2 text-right">최근(일)</th>
-                  <th className="py-2 text-right">누적(π)</th>
+                  <th className="py-2 pr-2">{t('order.thCustomer')}</th>
+                  <th className="py-2 pr-2">{t('order.thSegment')}</th>
+                  <th className="py-2 pr-2 text-right">{t('order.thBuy')}</th>
+                  <th className="py-2 pr-2 text-right">{t('order.thRecent')}</th>
+                  <th className="py-2 text-right">{t('order.thTotal')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -251,7 +257,7 @@ export function OrderTab({ period }: { period: number }) {
                     <td className="max-w-[10rem] truncate py-2 pr-2 font-medium">
                       {u.display_nm}
                     </td>
-                    <td className="py-2 pr-2">{u.segLabel}</td>
+                    <td className="py-2 pr-2">{t(`order.seg.${u.seg}`)}</td>
                     <td className="py-2 pr-2 text-right">{u.freq}</td>
                     <td className="py-2 pr-2 text-right">{u.recencyDays}</td>
                     <td className="py-2 text-right font-semibold">

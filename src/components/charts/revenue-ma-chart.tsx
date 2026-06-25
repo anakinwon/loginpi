@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
+import { useTranslations } from 'next-intl'
 import PlotlyPlot from '@/components/charts/plotly-plot'
 import { useThemeChartColors } from '@/components/charts/use-theme-chart-colors'
 import type { RevenueDataPoint } from '@/types/stats'
@@ -39,6 +40,7 @@ export default function RevenueMaChart({
   maWindow?: number
 }) {
   const colors = useThemeChartColors()
+  const t = useTranslations('adminAnalytics.charts')
 
   const { traces, isEmpty } = useMemo(() => {
     // 테마별 행 → 날짜별 Pi 매출 합산
@@ -54,30 +56,30 @@ export default function RevenueMaChart({
     const traces = [
       {
         type: 'bar' as const,
-        name: '일 매출(π)',
+        name: t('maDaily'),
         x,
         y,
         marker: { color: colors[1], opacity: 0.5 },
-        hovertemplate: '일 매출: %{y:.4f} π<extra></extra>',
+        hovertemplate: '%{y:.4f} π<extra></extra>',
       },
       {
         type: 'scatter' as const,
         mode: 'lines' as const,
-        name: `${maWindow}일 이동평균`,
+        name: t('maAvg', { n: maWindow }),
         x,
         y: ma,
         connectgaps: false,
         line: { color: colors[3], width: 2.5, shape: 'spline' as const },
-        hovertemplate: `${maWindow}일 평균: %{y:.4f} π<extra></extra>`,
+        hovertemplate: '%{y:.4f} π<extra></extra>',
       },
     ]
     return { traces, isEmpty: x.length === 0 || total === 0 }
-  }, [data, maWindow, colors])
+  }, [data, maWindow, colors, t])
 
   if (isEmpty)
     return (
       <p className="text-muted-foreground py-12 text-center text-sm">
-        해당 기간 집계할 Pi 매출이 없습니다.
+        {t('maEmpty')}
       </p>
     )
 

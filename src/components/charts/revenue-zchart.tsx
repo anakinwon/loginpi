@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
+import { useTranslations } from 'next-intl'
 import PlotlyPlot from '@/components/charts/plotly-plot'
 import { useThemeChartColors } from '@/components/charts/use-theme-chart-colors'
 
@@ -27,6 +28,7 @@ const PLOT_STYLE = { width: '100%', height: '300px' }
 
 export default function RevenueZChart({ months }: { months: M[] }) {
   const colors = useThemeChartColors()
+  const t = useTranslations('adminAnalytics.charts')
 
   const { traces, isEmpty } = useMemo(() => {
     if (months.length === 0) return { traces: [], isEmpty: true }
@@ -51,40 +53,40 @@ export default function RevenueZChart({ months }: { months: M[] }) {
     const traces = [
       {
         type: 'bar' as const,
-        name: '당월',
+        name: t('zMonth'),
         x,
         y: monthly,
         marker: { color: colors[1], opacity: 0.55 },
-        hovertemplate: '당월: %{y:.2f} π<extra></extra>',
+        hovertemplate: '%{y:.2f} π<extra></extra>',
       },
       {
         type: 'scatter' as const,
         mode: 'lines+markers' as const,
-        name: '누계(YTD)',
+        name: t('zYtd'),
         x,
         y: cumulative,
         line: { color: colors[2], width: 2 },
-        hovertemplate: '누계: %{y:.2f} π<extra></extra>',
+        hovertemplate: '%{y:.2f} π<extra></extra>',
       },
       {
         type: 'scatter' as const,
         mode: 'lines+markers' as const,
-        name: '이동누계(12개월)',
+        name: t('zMat'),
         x,
         y: movingAnnual,
         line: { color: colors[3], width: 2.5 },
-        hovertemplate: '이동누계: %{y:.2f} π<extra></extra>',
+        hovertemplate: '%{y:.2f} π<extra></extra>',
       },
     ]
     const allZero =
       monthly.every((v) => v === 0) && movingAnnual.every((v) => v === 0)
     return { traces, isEmpty: allZero }
-  }, [months, colors])
+  }, [months, colors, t])
 
   if (isEmpty)
     return (
       <p className="text-muted-foreground py-12 text-center text-sm">
-        Z-차트를 그릴 매출 데이터가 없습니다.
+        {t('zEmpty')}
       </p>
     )
 

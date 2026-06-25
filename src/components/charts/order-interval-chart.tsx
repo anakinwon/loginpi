@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
+import { useTranslations } from 'next-intl'
 import PlotlyPlot from '@/components/charts/plotly-plot'
 import { useThemeChartColors } from '@/components/charts/use-theme-chart-colors'
 
@@ -22,6 +23,7 @@ export default function OrderIntervalChart({
   buckets: { label: string; cnt: number }[]
 }) {
   const colors = useThemeChartColors()
+  const t = useTranslations('adminAnalytics.charts')
 
   const { traces, isEmpty } = useMemo(() => {
     const total = buckets.reduce((s, b) => s + b.cnt, 0)
@@ -32,7 +34,7 @@ export default function OrderIntervalChart({
           x: buckets.map((b) => b.label),
           y: buckets.map((b) => b.cnt),
           marker: { color: colors[1] },
-          hovertemplate: '%{x}: %{y}건<extra></extra>',
+          hovertemplate: '%{x}: %{y}<extra></extra>',
         },
       ],
       isEmpty: total === 0,
@@ -42,7 +44,7 @@ export default function OrderIntervalChart({
   if (isEmpty)
     return (
       <p className="text-muted-foreground py-12 text-center text-sm">
-        재구매 간격 데이터가 부족합니다 (재구매 2회 이상 필요).
+        {t('intervalEmpty')}
       </p>
     )
 

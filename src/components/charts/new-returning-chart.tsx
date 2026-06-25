@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
+import { useTranslations } from 'next-intl'
 import PlotlyPlot from '@/components/charts/plotly-plot'
 import { useThemeChartColors } from '@/components/charts/use-theme-chart-colors'
 
@@ -26,6 +27,7 @@ export default function NewReturningChart({
   data: { date: string; newCnt: number; returningCnt: number }[]
 }) {
   const colors = useThemeChartColors()
+  const t = useTranslations('adminAnalytics.charts')
 
   const { traces, isEmpty } = useMemo(() => {
     const x = data.map((d) => d.date)
@@ -34,29 +36,29 @@ export default function NewReturningChart({
       traces: [
         {
           type: 'bar' as const,
-          name: '재방문',
+          name: t('nrReturning'),
           x,
           y: data.map((d) => d.returningCnt),
           marker: { color: colors[1] },
-          hovertemplate: '재방문: %{y}명<extra></extra>',
+          hovertemplate: '%{y}<extra></extra>',
         },
         {
           type: 'bar' as const,
-          name: '신규',
+          name: t('nrNew'),
           x,
           y: data.map((d) => d.newCnt),
           marker: { color: colors[2] },
-          hovertemplate: '신규: %{y}명<extra></extra>',
+          hovertemplate: '%{y}<extra></extra>',
         },
       ],
       isEmpty: total === 0,
     }
-  }, [data, colors])
+  }, [data, colors, t])
 
   if (isEmpty)
     return (
       <p className="text-muted-foreground py-12 text-center text-sm">
-        해당 기간 활동 데이터가 없습니다.
+        {t('nrEmpty')}
       </p>
     )
 

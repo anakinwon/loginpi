@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
+import { useTranslations } from 'next-intl'
 import PlotlyPlot from '@/components/charts/plotly-plot'
 import { useThemeChartColors } from '@/components/charts/use-theme-chart-colors'
 
@@ -33,6 +34,7 @@ function gradeOf(cumPct: number): 'A' | 'B' | 'C' {
 
 export default function RevenueAbcChart({ items }: { items: AbcItem[] }) {
   const colors = useThemeChartColors()
+  const t = useTranslations('adminAnalytics.charts')
 
   const { traces, layout, isEmpty, summary } = useMemo(() => {
     const sorted = items
@@ -57,16 +59,16 @@ export default function RevenueAbcChart({ items }: { items: AbcItem[] }) {
     const traces = [
       {
         type: 'bar' as const,
-        name: '매출(π)',
+        name: t('abcRev'),
         x,
         y: sorted.map((i) => i.value),
         marker: { color: barColors },
-        hovertemplate: '매출: %{y:.4f} π<extra></extra>',
+        hovertemplate: '%{y:.4f} π<extra></extra>',
       },
       {
         type: 'scatter' as const,
         mode: 'lines+markers' as const,
-        name: '누적 비중',
+        name: t('abcCum'),
         x,
         y: cumPct,
         yaxis: 'y2',
@@ -99,12 +101,12 @@ export default function RevenueAbcChart({ items }: { items: AbcItem[] }) {
       isEmpty: sorted.length === 0 || total === 0,
       summary: counts,
     }
-  }, [items, colors])
+  }, [items, colors, t])
 
   if (isEmpty)
     return (
       <p className="text-muted-foreground py-12 text-center text-sm">
-        분석할 매출 데이터가 없습니다.
+        {t('abcEmpty')}
       </p>
     )
 
@@ -118,8 +120,7 @@ export default function RevenueAbcChart({ items }: { items: AbcItem[] }) {
         useResizeHandler
       />
       <p className="text-muted-foreground mt-1 text-center text-xs">
-        A 등급 {summary.A}개(매출 핵심) · B {summary.B}개 · C {summary.C}개 ·
-        누적 80%/95% 기준
+        {t('abcSummary', { a: summary.A, b: summary.B, c: summary.C })}
       </p>
     </div>
   )

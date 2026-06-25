@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
+import { useTranslations } from 'next-intl'
 import { piFetch } from '@/lib/pi-fetch'
 import { readCache, writeCache } from '@/lib/client-cache'
 import { LazySection } from '@/components/lazy-section'
@@ -31,6 +32,7 @@ interface UsageResponse {
 
 // 접속·사용 분석 탭 (Phase 22 §12 ③) — 활동 로그·가입일·위치를 온더플라이 집계.
 export function UsageTab({ period }: { period: number }) {
+  const t = useTranslations('adminAnalytics')
   const [activity, setActivity] = useState<ActivityStatsResponse | null>(null)
   const [usage, setUsage] = useState<UsageResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -72,7 +74,7 @@ export function UsageTab({ period }: { period: number }) {
           onClick={() => fetchAll(period)}
           className="text-muted-foreground mt-2 text-sm underline"
         >
-          다시 시도
+          {t('common.retry')}
         </button>
       </div>
     )
@@ -93,11 +95,11 @@ export function UsageTab({ period }: { period: number }) {
     <div className="space-y-5">
       {/* Zone 1 — KPI */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
-        <StatsCard label="DAU" value={dau} unit="명" loading={loading} variant="kpi-4" icon={<span aria-hidden>📅</span>} />
-        <StatsCard label="WAU" value={wau} unit="명" loading={loading} variant="kpi-1" icon={<span aria-hidden>📆</span>} />
-        <StatsCard label="MAU" value={mau} unit="명" loading={loading} variant="kpi-3" icon={<span aria-hidden>📈</span>} />
+        <StatsCard label={t('usage.kpiDau')} value={dau} unit={t('common.uPerson')} loading={loading} variant="kpi-4" icon={<span aria-hidden>📅</span>} />
+        <StatsCard label={t('usage.kpiWau')} value={wau} unit={t('common.uPerson')} loading={loading} variant="kpi-1" icon={<span aria-hidden>📆</span>} />
+        <StatsCard label={t('usage.kpiMau')} value={mau} unit={t('common.uPerson')} loading={loading} variant="kpi-3" icon={<span aria-hidden>📈</span>} />
         <StatsCard
-          label="고착도 (DAU/MAU)"
+          label={t('usage.kpiStickiness')}
           value={Number(stickiness.toFixed(1))}
           unit="%"
           loading={loading}
@@ -105,9 +107,9 @@ export function UsageTab({ period }: { period: number }) {
           icon={<span aria-hidden>🧲</span>}
         />
         <StatsCard
-          label={`신규 가입 (${period}일)`}
+          label={t('usage.kpiNewSignup', { period })}
           value={periodNew}
-          unit="명"
+          unit={t('common.uPerson')}
           loading={usage === null}
           variant="kpi-5"
           icon={<span aria-hidden>✨</span>}
@@ -117,8 +119,10 @@ export function UsageTab({ period }: { period: number }) {
       {/* Zone 2 — DAU/WAU/MAU 타임라인 */}
       <div className="rounded-lg border p-4">
         <p className="mb-2 text-sm font-medium">
-          DAU / WAU / MAU 추이{' '}
-          <span className="text-muted-foreground text-xs">· 최근 {period}일</span>
+          {t('usage.timeline')}{' '}
+          <span className="text-muted-foreground text-xs">
+            {t('common.recentDays', { period })}
+          </span>
         </p>
         <LazySection>
           {activity && activity.series.length > 0 ? (
@@ -132,7 +136,7 @@ export function UsageTab({ period }: { period: number }) {
       {/* Zone 3 — 신규 vs 재방문 + 지역 분포 */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div className="rounded-lg border p-4">
-          <p className="mb-2 text-sm font-medium">신규 vs 재방문 (일별)</p>
+          <p className="mb-2 text-sm font-medium">{t('usage.newReturning')}</p>
           <LazySection>
             {usage ? (
               <NewReturningChart data={usage.newReturning} />
@@ -144,10 +148,10 @@ export function UsageTab({ period }: { period: number }) {
 
         <div className="rounded-lg border p-4">
           <div className="mb-3 flex items-center justify-between">
-            <p className="text-sm font-medium">지역 분포 (시도별)</p>
+            <p className="text-sm font-medium">{t('usage.region')}</p>
             {usage && (
               <span className="text-muted-foreground text-xs">
-                위치 동의 {usage.locatedUsers}명
+                {t('usage.locatedUsers', { n: usage.locatedUsers })}
               </span>
             )}
           </div>
@@ -162,7 +166,8 @@ export function UsageTab({ period }: { period: number }) {
                     <div className="mb-1 flex justify-between">
                       <span>{r.sido}</span>
                       <span className="text-muted-foreground">
-                        {r.cnt}명 · {pct.toFixed(0)}%
+                        {r.cnt}
+                        {t('common.uPerson')} · {pct.toFixed(0)}%
                       </span>
                     </div>
                     <div className="bg-muted h-2.5 overflow-hidden rounded-full">
@@ -177,7 +182,7 @@ export function UsageTab({ period }: { period: number }) {
             </div>
           ) : (
             <p className="text-muted-foreground py-8 text-center text-sm">
-              위치 동의 데이터가 없습니다.
+              {t('usage.regionEmpty')}
             </p>
           )}
         </div>
@@ -186,8 +191,10 @@ export function UsageTab({ period }: { period: number }) {
       {/* Zone 4 — 가입 코호트 리텐션 */}
       <div className="rounded-lg border p-4">
         <p className="mb-3 text-sm font-medium">
-          가입 코호트 리텐션{' '}
-          <span className="text-muted-foreground text-xs">· 최근 8주</span>
+          {t('usage.cohort')}{' '}
+          <span className="text-muted-foreground text-xs">
+            {t('usage.cohortRecent')}
+          </span>
         </p>
         <LazySection>
           {usage ? (

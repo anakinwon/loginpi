@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import dynamic from 'next/dynamic'
+import { useTranslations } from 'next-intl'
 import { piFetch } from '@/lib/pi-fetch'
 import { readCache, writeCache } from '@/lib/client-cache'
 import { LazySection } from '@/components/lazy-section'
@@ -41,6 +42,7 @@ interface MonthlyRevenue {
 //   - 강화: 일별 매출 + 7일 이동평균, 테마 Treemap, 매출원 도넛, ABC(파레토) 분석
 //   - Z-차트·YoY는 월별 집계 엔드포인트 선결 → 후속(아래 안내 카드)
 export function RevenueTab({ period }: { period: number }) {
+  const t = useTranslations('adminAnalytics')
   const [rev, setRev] = useState<RevenueStatsResponse | null>(null)
   const [beanRev, setBeanRev] = useState<BeanRevenueResponse | null>(null)
   const [monthly, setMonthly] = useState<MonthlyRevenue | null>(null)
@@ -142,7 +144,7 @@ export function RevenueTab({ period }: { period: number }) {
           onClick={() => fetchRevenue(period)}
           className="text-muted-foreground mt-2 text-sm underline"
         >
-          다시 시도
+          {t('common.retry')}
         </button>
       </div>
     )
@@ -152,7 +154,7 @@ export function RevenueTab({ period }: { period: number }) {
       {/* Zone 1 — KPI 카드 (2층위 매출 분리) */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatsCard
-          label="Pi 현금매출 (충전)"
+          label={t('revenue.kpiPiCash')}
           value={Number(piCash.toFixed(2))}
           unit="π"
           loading={beanRev === null}
@@ -160,7 +162,7 @@ export function RevenueTab({ period }: { period: number }) {
           icon={<span aria-hidden>💰</span>}
         />
         <StatsCard
-          label="Bean 회수매출"
+          label={t('revenue.kpiBeanRecover')}
           value={beanRecover}
           unitNode={<BeanIcon className="h-4 w-4" />}
           loading={beanRev === null}
@@ -168,17 +170,17 @@ export function RevenueTab({ period }: { period: number }) {
           icon={<span aria-hidden>♻️</span>}
         />
         <StatsCard
-          label="충전 건수"
+          label={t('revenue.kpiChargeCnt')}
           value={chargeCnt}
-          unit="건"
+          unit={t('common.uCase')}
           loading={beanRev === null}
           variant="kpi-5"
           icon={<span aria-hidden>💳</span>}
         />
         <StatsCard
-          label="Bean 거래 건수"
+          label={t('revenue.kpiBeanTxn')}
           value={beanTxnCnt}
-          unit="건"
+          unit={t('common.uCase')}
           loading={beanRev === null}
           variant="kpi-2"
           icon={<span aria-hidden>🧾</span>}
@@ -188,8 +190,10 @@ export function RevenueTab({ period }: { period: number }) {
       {/* Zone 2 — 메인: 일별 Pi 매출 + 7일 이동평균 */}
       <div className="rounded-lg border p-4">
         <p className="mb-2 text-sm font-medium">
-          일별 Pi 현금매출 + 7일 이동평균{' '}
-          <span className="text-muted-foreground text-xs">· 최근 {period}일</span>
+          {t('revenue.maTitle')}{' '}
+          <span className="text-muted-foreground text-xs">
+            {t('common.recentDays', { period })}
+          </span>
         </p>
         <LazySection>
           {rev ? (
@@ -203,7 +207,7 @@ export function RevenueTab({ period }: { period: number }) {
       {/* Zone 3 — 보조 2-up: 테마 Treemap + 매출원 도넛(Bean) */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div className="rounded-lg border p-4">
-          <p className="mb-2 text-sm font-medium">테마별 매출 비중 (Pi)</p>
+          <p className="mb-2 text-sm font-medium">{t('revenue.treemapTitle')}</p>
           {rev && rev.series.length > 0 ? (
             <RevenueTreemapChart data={rev.series} />
           ) : (
@@ -216,9 +220,9 @@ export function RevenueTab({ period }: { period: number }) {
       {/* 테마별 매출 비중 (Bean) — cryptobubbles 스타일 버블 */}
       <div className="rounded-lg border p-4">
         <div className="mb-2 flex items-center justify-between">
-          <p className="text-sm font-medium">테마별 매출 비중 (Bean)</p>
+          <p className="text-sm font-medium">{t('revenue.bubbleTitle')}</p>
           <span className="text-muted-foreground text-xs">
-            버블 크기 = 매출 비중 · 1 Pi = 100 Bean 환산
+            {t('revenue.bubbleNote')}
           </span>
         </div>
         <LazySection>
@@ -232,9 +236,7 @@ export function RevenueTab({ period }: { period: number }) {
 
       {/* Zone 4 — 상세: ABC(파레토) 분석 + Top 소비자 */}
       <div className="rounded-lg border p-4">
-        <p className="mb-2 text-sm font-medium">
-          ABC 분석 (파레토) · 테마별 Pi 매출 기여
-        </p>
+        <p className="mb-2 text-sm font-medium">{t('revenue.abcTitle')}</p>
         <LazySection>
           {rev ? (
             <RevenueAbcChart items={abcItems} />
@@ -250,8 +252,10 @@ export function RevenueTab({ period }: { period: number }) {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div className="rounded-lg border p-4">
           <p className="mb-2 text-sm font-medium">
-            Z-차트 (당월·누계·이동누계){' '}
-            <span className="text-muted-foreground text-xs">· Pi 매출</span>
+            {t('revenue.zchartTitle')}{' '}
+            <span className="text-muted-foreground text-xs">
+              {t('revenue.zchartUnit')}
+            </span>
           </p>
           <LazySection>
             {monthly ? (
@@ -263,8 +267,10 @@ export function RevenueTab({ period }: { period: number }) {
         </div>
         <div className="rounded-lg border p-4">
           <p className="mb-2 text-sm font-medium">
-            전년동기(YoY) 비교{' '}
-            <span className="text-muted-foreground text-xs">· 월별 Pi 매출</span>
+            {t('revenue.yoyTitle')}{' '}
+            <span className="text-muted-foreground text-xs">
+              {t('revenue.yoyUnit')}
+            </span>
           </p>
           <LazySection>
             {monthly ? (

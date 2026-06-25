@@ -1,5 +1,7 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
+
 // 가입 코호트 리텐션 히트맵 (Phase 22 §12 ③) — CSS 그리드.
 //   행: 가입 코호트(주 단위), 열: 가입 후 경과 주차(0주차=가입주). 셀=잔존율%.
 //   색 농도 = 잔존율. plotly-basic heatmap 부재 → CSS 구현(treemap/order-heatmap 선례).
@@ -11,11 +13,12 @@ interface CohortRow {
 }
 
 export default function CohortHeatmapChart({ rows }: { rows: CohortRow[] }) {
+  const t = useTranslations('adminAnalytics.charts')
   const hasData = rows.some((r) => r.size > 0)
   if (!hasData)
     return (
       <p className="text-muted-foreground py-12 text-center text-sm">
-        최근 8주 내 가입 코호트가 없습니다.
+        {t('cohortEmpty')}
       </p>
     )
 
@@ -26,20 +29,20 @@ export default function CohortHeatmapChart({ rows }: { rows: CohortRow[] }) {
       <table className="w-full min-w-[560px] border-separate border-spacing-1 text-center text-xs">
         <thead>
           <tr className="text-muted-foreground">
-            <th className="text-left font-normal">코호트</th>
-            <th className="font-normal">규모</th>
+            <th className="text-left font-normal">{t('cohortHead')}</th>
+            <th className="font-normal">{t('cohortSize')}</th>
             {Array.from({ length: maxK + 1 }).map((_, k) => (
               <th key={k} className="font-normal">
-                {k}주차
+                {t('cohortWeek', { k })}
               </th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {rows.map((r) => (
+          {rows.map((r, i) => (
             <tr key={r.cohort}>
               <td className="text-muted-foreground text-left whitespace-nowrap">
-                {r.cohort}
+                {t('cohortAgo', { n: rows.length - 1 - i })}
               </td>
               <td className="text-muted-foreground">{r.size}</td>
               {Array.from({ length: maxK + 1 }).map((_, k) => {
@@ -68,7 +71,7 @@ export default function CohortHeatmapChart({ rows }: { rows: CohortRow[] }) {
         </tbody>
       </table>
       <p className="text-muted-foreground mt-2 text-[10px]">
-        가입 주차 기준 · 0주차=가입한 주의 활동률 · 색이 진할수록 높은 잔존율
+        {t('cohortNote')}
       </p>
     </div>
   )

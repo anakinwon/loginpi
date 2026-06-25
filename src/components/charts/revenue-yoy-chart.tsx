@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
+import { useTranslations } from 'next-intl'
 import PlotlyPlot from '@/components/charts/plotly-plot'
 import { useThemeChartColors } from '@/components/charts/use-theme-chart-colors'
 
@@ -27,6 +28,7 @@ const PLOT_STYLE = { width: '100%', height: '280px' }
 
 export default function RevenueYoyChart({ months }: { months: M[] }) {
   const colors = useThemeChartColors()
+  const t = useTranslations('adminAnalytics.charts')
 
   const { traces, isEmpty, hasPrev, curYear } = useMemo(() => {
     if (months.length === 0)
@@ -34,7 +36,7 @@ export default function RevenueYoyChart({ months }: { months: M[] }) {
     const byYm = new Map(months.map((m) => [m.ym, m.revPi]))
     const cy = Number(months[months.length - 1].ym.slice(0, 4))
     const disp = months.filter((m) => Number(m.ym.slice(0, 4)) === cy)
-    const x = disp.map((m) => `${Number(m.ym.slice(5, 7))}월`)
+    const x = disp.map((m) => m.ym.slice(5, 7)) // 월(MM) — 언어 중립
     const cur = disp.map((m) => m.revPi)
     const prev = disp.map((m) => byYm.get(`${cy - 1}-${m.ym.slice(5, 7)}`) ?? 0)
     const hasPrev = prev.some((v) => v > 0)
@@ -42,19 +44,19 @@ export default function RevenueYoyChart({ months }: { months: M[] }) {
     const traces = [
       {
         type: 'bar' as const,
-        name: `${cy - 1}년`,
+        name: `${cy - 1}`,
         x,
         y: prev,
         marker: { color: colors[4] },
-        hovertemplate: `${cy - 1}년: %{y:.2f} π<extra></extra>`,
+        hovertemplate: `${cy - 1}: %{y:.2f} π<extra></extra>`,
       },
       {
         type: 'bar' as const,
-        name: `${cy}년`,
+        name: `${cy}`,
         x,
         y: cur,
         marker: { color: colors[2] },
-        hovertemplate: `${cy}년: %{y:.2f} π<extra></extra>`,
+        hovertemplate: `${cy}: %{y:.2f} π<extra></extra>`,
       },
     ]
     return {
@@ -68,7 +70,7 @@ export default function RevenueYoyChart({ months }: { months: M[] }) {
   if (isEmpty)
     return (
       <p className="text-muted-foreground py-12 text-center text-sm">
-        YoY 비교할 매출 데이터가 없습니다.
+        {t('yoyEmpty')}
       </p>
     )
 
@@ -83,8 +85,7 @@ export default function RevenueYoyChart({ months }: { months: M[] }) {
       />
       {!hasPrev && (
         <p className="text-muted-foreground mt-1 text-center text-[11px]">
-          {curYear - 1}년 매출 데이터가 없어 비교 기준이 없습니다 ({curYear}년만
-          표시) — 데이터가 누적되면 자동 비교됩니다.
+          {t('yoyNote', { prev: curYear - 1, cur: curYear })}
         </p>
       )}
     </div>

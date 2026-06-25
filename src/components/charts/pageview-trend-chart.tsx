@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
+import { useTranslations } from 'next-intl'
 import PlotlyPlot from '@/components/charts/plotly-plot'
 import { useThemeChartColors } from '@/components/charts/use-theme-chart-colors'
 
@@ -22,6 +23,7 @@ export default function PageviewTrendChart({
   data: { date: string; cnt: number }[]
 }) {
   const colors = useThemeChartColors()
+  const t = useTranslations('adminAnalytics.charts')
 
   const { traces, isEmpty } = useMemo(() => {
     const total = data.reduce((s, d) => s + d.cnt, 0)
@@ -30,7 +32,7 @@ export default function PageviewTrendChart({
         {
           type: 'scatter' as const,
           mode: 'lines' as const,
-          name: '페이지뷰',
+          name: t('pvLegend'),
           x: data.map((d) => d.date),
           y: data.map((d) => d.cnt),
           fill: 'tozeroy' as const,
@@ -40,12 +42,12 @@ export default function PageviewTrendChart({
       ],
       isEmpty: total === 0,
     }
-  }, [data, colors])
+  }, [data, colors, t])
 
   if (isEmpty)
     return (
       <p className="text-muted-foreground py-12 text-center text-sm">
-        아직 수집된 페이지뷰가 없습니다.
+        {t('pvEmpty')}
       </p>
     )
 

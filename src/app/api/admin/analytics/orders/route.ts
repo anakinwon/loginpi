@@ -247,6 +247,7 @@ export async function GET(req: NextRequest) {
         recencyDays: t.recencyDays,
         freq: t.freq,
         monetaryPi: t.monetary,
+        seg: t.seg,
         segLabel: t.segLabel,
       })),
     },

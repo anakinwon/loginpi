@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { piFetch } from '@/lib/pi-fetch'
 import { readCache, writeCache } from '@/lib/client-cache'
 import { cn } from '@/lib/utils'
@@ -14,13 +15,8 @@ import type { ActivityStatsResponse } from '@/types/stats'
 // 통합 분석 허브 (Phase 22 §12) — 6개 분석 도메인을 4개 탭으로 재편(전 탭 구현 완료).
 //   북극성(활성 사용자) 지표를 전 탭 상단에 고정 — "판매는 수단, 활성 사용자가 목표".
 
-const TABS = [
-  { key: 'usage', label: '👥 접속·사용' },
-  { key: 'order', label: '🧾 주문' },
-  { key: 'revenue', label: '💰 매출' },
-  { key: 'perf', label: '⚡ 퍼포먼스' },
-] as const
-type TabKey = (typeof TABS)[number]['key']
+const TAB_KEYS = ['usage', 'order', 'revenue', 'perf'] as const
+type TabKey = (typeof TAB_KEYS)[number]
 
 function NorthStarMetric({
   label,
@@ -45,6 +41,7 @@ function NorthStarMetric({
 }
 
 export function AnalyticsHub() {
+  const t = useTranslations('adminAnalytics')
   const [tab, setTab] = useState<TabKey>('usage')
   const [period, setPeriod] = useState(30)
   const [activity, setActivity] = useState<ActivityStatsResponse | null>(null)
@@ -79,43 +76,41 @@ export function AnalyticsHub() {
       {/* ⭐ 북극성 배너 — 전 탭 고정 */}
       <div className="rounded-xl border bg-gradient-to-r from-amber-50 to-transparent p-4 dark:from-amber-950/20">
         <div className="flex flex-wrap items-center gap-x-8 gap-y-3">
-          <span className="text-sm font-semibold">⭐ 북극성 지표</span>
+          <span className="text-sm font-semibold">{t('northStar.label')}</span>
           <NorthStarMetric
-            label="활성 사용자 (MAU)"
-            value={mau.toLocaleString('ko-KR')}
-            unit="명"
+            label={t('northStar.mau')}
+            value={mau.toLocaleString()}
+            unit={t('common.uPerson')}
           />
           <NorthStarMetric
-            label="고착도 (DAU/MAU)"
+            label={t('northStar.stickiness')}
             value={stickiness.toFixed(1)}
             unit="%"
           />
           <NorthStarMetric
-            label="DAU"
-            value={dau.toLocaleString('ko-KR')}
-            unit="명"
+            label={t('northStar.dau')}
+            value={dau.toLocaleString()}
+            unit={t('common.uPerson')}
           />
         </div>
-        <p className="text-muted-foreground mt-2 text-xs">
-          판매·매출은 수단입니다. 활성 사용자 수가 최우선 목표입니다.
-        </p>
+        <p className="text-muted-foreground mt-2 text-xs">{t('northStar.note')}</p>
       </div>
 
       {/* 탭 네비 — 활성 탭을 채운 pill로 강조(선택 구분 명확) */}
       <div className="bg-muted/40 flex gap-1 overflow-x-auto rounded-xl p-1">
-        {TABS.map((t) => (
+        {TAB_KEYS.map((key) => (
           <button
-            key={t.key}
-            onClick={() => setTab(t.key)}
-            aria-current={tab === t.key ? 'page' : undefined}
+            key={key}
+            onClick={() => setTab(key)}
+            aria-current={tab === key ? 'page' : undefined}
             className={cn(
               'shrink-0 rounded-lg px-4 py-2 text-sm transition-colors',
-              tab === t.key
+              tab === key
                 ? 'bg-primary text-primary-foreground font-semibold shadow-sm'
                 : 'text-muted-foreground hover:bg-muted hover:text-foreground font-medium',
             )}
           >
-            {t.label}
+            {t(`tabs.${key}`)}
           </button>
         ))}
       </div>
