@@ -12,6 +12,7 @@ import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { piFetch } from '@/lib/pi-fetch'
 import { maskUsername } from '@/lib/mask-username'
+import { LazySection } from '@/components/lazy-section'
 
 // 미션별 수행 페이지 바로가기 — 행동이 둘인 미션(M9 보증금+위치동의)은 링크를 여러 개 노출.
 // labelKey는 event 네임스페이스 i18n 키 (타겟별 라벨 재사용)
@@ -422,19 +423,23 @@ export function ClientEventGate() {
       </div>
 
       {/* 미션 목록 (섹션 전체 아코디언) */}
-      <div>
-        <button
-          onClick={() => setExpandedMissions(!expandedMissions)}
-          className="hover:bg-muted/50 flex w-full items-center justify-between rounded-lg px-4 py-3 text-left transition-colors"
-        >
-          <h2 className="text-xl font-bold">{t('missionListTitle')}</h2>
-          <ChevronDown
-            className={`size-5 flex-shrink-0 transition-transform ${expandedMissions ? 'rotate-180' : ''}`}
-          />
-        </button>
+      <LazySection
+        fallback={<div className="bg-muted h-64 rounded-lg animate-pulse" />}
+        rootMargin="50px"
+      >
+        <div>
+          <button
+            onClick={() => setExpandedMissions(!expandedMissions)}
+            className="hover:bg-muted/50 flex w-full items-center justify-between rounded-lg px-4 py-3 text-left transition-colors"
+          >
+            <h2 className="text-xl font-bold">{t('missionListTitle')}</h2>
+            <ChevronDown
+              className={`size-5 flex-shrink-0 transition-transform ${expandedMissions ? 'rotate-180' : ''}`}
+            />
+          </button>
 
-        {expandedMissions && (
-          <div className="mt-3 space-y-2">
+          {expandedMissions && (
+            <div className="mt-3 space-y-2">
             {missions.map((m) => {
               const cd = m.mission_cd.trim()
               const mT = missionsT[cd]
@@ -510,12 +515,17 @@ export function ClientEventGate() {
                 )}
               </button>
             )}
-          </div>
-        )}
-      </div>
+            </div>
+          )}
+        </div>
+      </LazySection>
 
       {/* 랭킹 보드 (체크리스트 매트릭스) */}
-      <div>
+      <LazySection
+        fallback={<div className="bg-muted h-96 rounded-lg animate-pulse" />}
+        rootMargin="50px"
+      >
+        <div>
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <h2 className="text-xl font-bold">{t('rankingTitle')}</h2>
@@ -757,7 +767,8 @@ export function ClientEventGate() {
             </button>
           </div>
         )}
-      </div>
+        </div>
+      </LazySection>
     </div>
   )
 }

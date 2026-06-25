@@ -8,6 +8,7 @@ import { piFetch } from '@/lib/pi-fetch'
 import { getCurrentPosition } from '@/lib/geo'
 import { LbsConsentDialog } from '@/components/lbs/lbs-consent-dialog'
 import { ShopsMapView } from '@/components/lbs/shops-map-view'
+import { LazySection } from '@/components/lazy-section'
 
 // 주변 탐색 — 동의자에게만 GPS 기준 주변 매장·채팅방 노출 (Rule LBS-01)
 // nearby/shops·nearby/rooms API를 보여주는 화면. Pi Browser 클라이언트 게이트 패턴.
@@ -284,134 +285,146 @@ export function NearbyExplorer() {
           {t('searching')}
         </p>
       ) : tab === 'shops' ? (
-        <div className="space-y-3">
-          {/* 툴바: [🗺️ 지도] [☰ 등록매장목록] ... [카테고리 ▼] */}
-          <div className="flex items-center gap-1">
-            <button
-              onClick={() => setShopsViewMode('map')}
-              className={`rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${
-                shopsViewMode === 'map'
-                  ? 'border-primary bg-primary text-primary-foreground'
-                  : 'text-muted-foreground hover:bg-muted'
-              }`}
-            >
-              🗺️ 지도
-            </button>
-            <button
-              onClick={() => {
-                setShopsViewMode('list')
-                setBizCategory('ALL')
-              }}
-              className={`rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${
-                shopsViewMode === 'list'
-                  ? 'border-primary bg-primary text-primary-foreground'
-                  : 'text-muted-foreground hover:bg-muted'
-              }`}
-            >
-              ☰ 등록매장목록
-            </button>
-            <div className="flex-1" />
-            <select
-              value={bizCategory}
-              onChange={(e) => {
-                const val = e.target.value as BizCategory
-                setBizCategory(val)
-                if (val !== 'ALL') setShopsViewMode('map')
-              }}
-              className="text-foreground bg-background rounded-md border px-2 py-1.5 text-xs font-medium focus:outline-none"
-            >
-              {BIZ_CATEGORIES.map((cat) => (
-                <option key={cat.value} value={cat.value}>
-                  {cat.label}
-                </option>
-              ))}
-            </select>
-          </div>
+        <LazySection
+          fallback={<div className="bg-muted h-96 rounded-lg animate-pulse" />}
+          rootMargin="50px"
+        >
+          <div className="space-y-3">
+            {/* 툴바: [🗺️ 지도] [☰ 등록매장목록] ... [카테고리 ▼] */}
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setShopsViewMode('map')}
+                className={`rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${
+                  shopsViewMode === 'map'
+                    ? 'border-primary bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:bg-muted'
+                }`}
+              >
+                🗺️ 지도
+              </button>
+              <button
+                onClick={() => {
+                  setShopsViewMode('list')
+                  setBizCategory('ALL')
+                }}
+                className={`rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${
+                  shopsViewMode === 'list'
+                    ? 'border-primary bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:bg-muted'
+                }`}
+              >
+                ☰ 등록매장목록
+              </button>
+              <div className="flex-1" />
+              <select
+                value={bizCategory}
+                onChange={(e) => {
+                  const val = e.target.value as BizCategory
+                  setBizCategory(val)
+                  if (val !== 'ALL') setShopsViewMode('map')
+                }}
+                className="text-foreground bg-background rounded-md border px-2 py-1.5 text-xs font-medium focus:outline-none"
+              >
+                {BIZ_CATEGORIES.map((cat) => (
+                  <option key={cat.value} value={cat.value}>
+                    {cat.label}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          {/* 지도 뷰: ALL=Pi 매장, 나머지=Google Places */}
-          {shopsViewMode === 'map' ? (
-            <ShopsMapView
-              shops={shops}
-              userLat={coords.lat}
-              userLng={coords.lng}
-              apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
-              bizCategory={bizCategory}
-              radiusMeters={radius * 1000}
-              focusShopId={focusShopId}
-            />
-          ) : shops.length === 0 ? (
+            {/* 지도 뷰: ALL=Pi 매장, 나머지=Google Places */}
+            {shopsViewMode === 'map' ? (
+              <ShopsMapView
+                shops={shops}
+                userLat={coords.lat}
+                userLng={coords.lng}
+                apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
+                bizCategory={bizCategory}
+                radiusMeters={radius * 1000}
+                focusShopId={focusShopId}
+              />
+            ) : shops.length === 0 ? (
+              <p className="text-muted-foreground py-16 text-center text-sm">
+                {t('noShops', { radius })}
+              </p>
+            ) : (
+              <ul className="space-y-2">
+                {shops.map((s) => (
+                  <li
+                    key={s.shop_id}
+                    onClick={() => {
+                      setFocusShopId(s.shop_id)
+                      setShopsViewMode('map')
+                    }}
+                    className="hover:bg-muted/50 flex cursor-pointer items-center justify-between rounded-lg border p-3 transition-colors"
+                  >
+                    <div className="min-w-0">
+                      <p className="flex items-center gap-1.5 truncate font-semibold">
+                        <span className="truncate text-amber-600 dark:text-amber-400">
+                          {s.shop_nm}
+                        </span>
+                        {s.owner_verified_yn === 'Y' && (
+                          <span className="shrink-0 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400">
+                            ✅ 인증
+                          </span>
+                        )}
+                      </p>
+                      {s.addr && (
+                        <p className="text-muted-foreground truncate text-xs">
+                          {s.addr}
+                        </p>
+                      )}
+                      {s.biz_hour && (
+                        <p className="text-muted-foreground text-xs">
+                          🕒 {s.biz_hour}
+                        </p>
+                      )}
+                    </div>
+                    <span className="text-primary bg-muted shrink-0 rounded-full px-2 py-1 text-xs font-medium">
+                      📍 {formatDistance(s.distance_km)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </LazySection>
+      ) : (
+        <LazySection
+          fallback={<div className="bg-muted h-96 rounded-lg animate-pulse" />}
+          rootMargin="50px"
+        >
+          {rooms.length === 0 ? (
             <p className="text-muted-foreground py-16 text-center text-sm">
-              {t('noShops', { radius })}
+              {t('noRooms', { radius })}
             </p>
           ) : (
             <ul className="space-y-2">
-              {shops.map((s) => (
-                <li
-                  key={s.shop_id}
-                  onClick={() => {
-                    setFocusShopId(s.shop_id)
-                    setShopsViewMode('map')
-                  }}
-                  className="hover:bg-muted/50 flex cursor-pointer items-center justify-between rounded-lg border p-3 transition-colors"
+              {rooms.map((r) => (
+                <Link
+                  key={r.room_id}
+                  href={`/chat/${r.room_id}`}
+                  className="hover:bg-muted/50 flex items-center justify-between rounded-lg border p-3 transition-colors"
                 >
-                  <div className="min-w-0">
-                    <p className="flex items-center gap-1.5 truncate font-semibold">
-                      <span className="truncate text-amber-600 dark:text-amber-400">
-                        {s.shop_nm}
-                      </span>
-                      {s.owner_verified_yn === 'Y' && (
-                        <span className="shrink-0 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400">
-                          ✅ 인증
-                        </span>
-                      )}
-                    </p>
-                    {s.addr && (
+                  <div className="flex min-w-0 items-center gap-2">
+                    <span className="text-2xl">{r.theme_emoji}</span>
+                    <div className="min-w-0">
+                      <p className="truncate font-medium">{r.room_nm}</p>
                       <p className="text-muted-foreground truncate text-xs">
-                        {s.addr}
+                        {r.sigungu_nm ? `${r.sigungu_nm} · ` : ''}
+                        {r.theme_nm}
                       </p>
-                    )}
-                    {s.biz_hour && (
-                      <p className="text-muted-foreground text-xs">
-                        🕒 {s.biz_hour}
-                      </p>
-                    )}
+                    </div>
                   </div>
                   <span className="text-primary bg-muted shrink-0 rounded-full px-2 py-1 text-xs font-medium">
-                    📍 {formatDistance(s.distance_km)}
+                    📍 {formatDistance(r.distance_km)}
                   </span>
-                </li>
+                </Link>
               ))}
             </ul>
           )}
-        </div>
-      ) : rooms.length === 0 ? (
-        <p className="text-muted-foreground py-16 text-center text-sm">
-          {t('noRooms', { radius })}
-        </p>
-      ) : (
-        <ul className="space-y-2">
-          {rooms.map((r) => (
-            <Link
-              key={r.room_id}
-              href={`/chat/${r.room_id}`}
-              className="hover:bg-muted/50 flex items-center justify-between rounded-lg border p-3 transition-colors"
-            >
-              <div className="flex min-w-0 items-center gap-2">
-                <span className="text-2xl">{r.theme_emoji}</span>
-                <div className="min-w-0">
-                  <p className="truncate font-medium">{r.room_nm}</p>
-                  <p className="text-muted-foreground truncate text-xs">
-                    {r.sigungu_nm ? `${r.sigungu_nm} · ` : ''}
-                    {r.theme_nm}
-                  </p>
-                </div>
-              </div>
-              <span className="text-primary bg-muted shrink-0 rounded-full px-2 py-1 text-xs font-medium">
-                📍 {formatDistance(r.distance_km)}
-              </span>
-            </Link>
-          ))}
-        </ul>
+        </LazySection>
       )}
     </div>
   )
