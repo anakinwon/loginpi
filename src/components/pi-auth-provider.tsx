@@ -44,6 +44,14 @@ function detectSandbox(): boolean {
   return process.env.NEXT_PUBLIC_PI_SANDBOX === 'true'
 }
 
+// 진짜 Pi Browser 환경 판정 (Pi 인증은 Pi Browser 전용).
+// ⚠️ 일반 브라우저(PC·모바일)는 Pi SDK가 window.Pi를 정의하더라도 Pi 계정을 체크하면 안 된다.
+//    UA로 구분하되(browser-name.tsx와 동일 패턴, 프로덕션 검증됨), 개발(sandbox)은 허용한다.
+function isPiBrowserEnv(): boolean {
+  if (detectSandbox()) return true
+  return typeof navigator !== 'undefined' && /PiBrowser/.test(navigator.userAgent)
+}
+
 // 로그인 완료 시 위치 저장 side-effect (Rule LBS-02: 서버에서 동의 여부 재검증 → 미동의 시 403 무시)
 function saveLoginLocation() {
   if (typeof navigator === 'undefined' || !navigator.geolocation) return
@@ -140,7 +148,9 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = useCallback(
     async (opts?: { silent?: boolean }): Promise<PiSessionUser | null> => {
-      if (!window.Pi) {
+      // 일반 브라우저(PC·모바일)는 Pi 계정을 체크하지 않는다 — Pi 인증은 Pi Browser 전용.
+      // window.Pi가 존재해도(일반 브라우저에도 Pi SDK가 주입됨) UA가 Pi Browser가 아니면 스킵.
+      if (!window.Pi || !isPiBrowserEnv()) {
         setIsInPiBrowser(false)
         setIsLoading(false)
         return null
@@ -273,16 +283,15 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   // 마운트 즉시 기존 세션 복원 (Pi authenticate와 독립, window.Pi 유무 무관).
-  // ⚠️ 모바일 일반 브라우저 버그 수정: Pi SDK가 window.Pi를 정의하면 signIn()이
-  //    authenticate에서 막혀(최대 20s timeout) GET 폴백에 도달하지 못하고, 3초 fallback도
-  //    `if (!window.Pi)` 조건이라 실행되지 않아 Google 세션이 piUser로 복원되지 않았다.
-  //    → 헤더(useSession)는 로그인인데 본문 게이트(usePiAuth().user)는 "로그인 필요"로 불일치.
-  //    piFetch는 쿠키(credentials:include) + X-Pi-Token을 함께 보내고, 서버 GET은
-  //    getSessionUser()(Pi 쿠키/헤더 + Google 통합)로 응답하므로 Google 세션이 그대로 복원된다.
-  //    세션이 확정되면 isLoading도 내려 본문 게이트를 즉시 해제한다(authenticate 결과 대기 불필요).
+  // ⚠️ 일반 브라우저(PC·모바일) 본문 동기화: 헤더(useSession)는 로그인인데 본문 게이트
+  //    (usePiAuth().user)는 "로그인 필요"로 따로 노는 문제를 해소한다.
+  // ⚠️ Pi 계정 미체크: 일반 브라우저는 Pi 계정을 체크하면 안 되므로(Pi는 Pi Browser 전용)
+  //    piFetch(X-Pi-Token 첨부) 대신 순수 fetch로 쿠키(Google NextAuth)만 보낸다.
+  //    → 서버 getSessionUser()의 Pi 헤더 경로를 타지 않고 Google 세션만 복원된다.
+  //    (Pi Browser는 signIn()이 Pi 인증을 전담하므로 이 GET이 null이어도 무방)
   useEffect(() => {
     let cancelled = false
-    piFetch('/api/auth/pi')
+    fetch('/api/auth/pi', { credentials: 'include' })
       .then((r) => (r.ok ? r.json() : { user: null }))
       .then((data: { user: PiSessionUser | null }) => {
         if (cancelled || !data.user) return
