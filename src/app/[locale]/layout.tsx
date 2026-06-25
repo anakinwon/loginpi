@@ -14,6 +14,7 @@ import { PiSdkScript } from '@/components/pi-sdk-script'
 import { Header } from '@/components/layout/header'
 import { BottomNav } from '@/components/layout/bottom-nav'
 import { Toaster } from '@/components/ui/sonner'
+import { getActiveUiTheme, buildThemeStyleCss } from '@/lib/ui-theme'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -67,11 +68,21 @@ export default async function LocaleLayout({
   const session = await auth()
   const messages = await getMessages()
 
+  // 활성 UI 테마가 '전체 적용(GLOBAL)'이면 :root에 색상 주입 (전 페이지).
+  // 'ADMIN'이면 여기선 주입하지 않고 (admin)/layout이 스코프 주입한다.
+  const activeTheme = await getActiveUiTheme()
+  const globalThemeCss =
+    activeTheme?.apply_scope_cd === 'GLOBAL'
+      ? buildThemeStyleCss(activeTheme.theme_tokens, 'GLOBAL')
+      : ''
+
   return (
     <html lang={locale} suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col antialiased`}
       >
+        {/* 전체 적용 테마 색상 주입 (GLOBAL 범위) — 핵심 색만 바꿔 배경·글자는 유지 */}
+        {globalThemeCss && <style dangerouslySetInnerHTML={{ __html: globalThemeCss }} />}
         {/* onLoad는 이벤트 핸들러이므로 Client Component(PiSdkScript)로 분리.
             ※ <html> 직접 자식으로 두면 invalid DOM → hydration 불일치 → script 경고 발생 — 반드시 body 안에 배치 */}
         <PiSdkScript />

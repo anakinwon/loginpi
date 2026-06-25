@@ -246,24 +246,30 @@ export function StatsDashboard() {
         <h2 className="text-lg font-semibold">{t('activeUsers')}</h2>
 
         {/* DAU / WAU / MAU 카드 */}
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 gap-4">
           <StatsCard
             label="DAU"
             value={lastActivity?.dau_cnt ?? 0}
             unit={t('unitPerson')}
             loading={loading}
+            variant="kpi-4"
+            icon={<span aria-hidden>📅</span>}
           />
           <StatsCard
             label="WAU"
             value={lastActivity?.wau_cnt ?? 0}
             unit={t('unitPerson')}
             loading={loading}
+            variant="kpi-1"
+            icon={<span aria-hidden>📆</span>}
           />
           <StatsCard
             label="MAU"
             value={lastActivity?.mau_cnt ?? 0}
             unit={t('unitPerson')}
             loading={loading}
+            variant="kpi-3"
+            icon={<span aria-hidden>📈</span>}
           />
         </div>
 
@@ -312,30 +318,38 @@ export function StatsDashboard() {
         >
           <div className="space-y-4">
             {/* 매출 KPI 카드 — 누적 Bean 회수매출: 총합 / 거래건수 / 구독 / 일반 */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
               <StatsCard
                 label={t('totalRevenue')}
                 value={totalBean}
                 unitNode={<BeanIcon className="h-4 w-4" />}
                 loading={beanRev === null}
+                variant="kpi-3"
+                icon={<span aria-hidden>💰</span>}
               />
               <StatsCard
                 label={t('totalTrades')}
                 value={beanTxnCnt}
                 unit={t('unitCase')}
                 loading={beanRev === null}
+                variant="kpi-5"
+                icon={<span aria-hidden>🧾</span>}
               />
               <StatsCard
                 label={t('subscrRevenue')}
                 value={subscBean}
                 unitNode={<BeanIcon className="h-4 w-4" />}
                 loading={beanRev === null}
+                variant="kpi-1"
+                icon={<span aria-hidden>🔁</span>}
               />
               <StatsCard
                 label={t('normalRevenue')}
                 value={genBean}
                 unitNode={<BeanIcon className="h-4 w-4" />}
                 loading={beanRev === null}
+                variant="kpi-2"
+                icon={<span aria-hidden>🛒</span>}
               />
             </div>
 

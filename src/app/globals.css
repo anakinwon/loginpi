@@ -54,6 +54,13 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
   --font-serif: var(--font-serif);
+
+  /* KPI 카드 파스텔 배경 토큰 (UI 테마로 런타임 덮어쓰기 가능) */
+  --color-kpi-1: var(--kpi-1);
+  --color-kpi-2: var(--kpi-2);
+  --color-kpi-3: var(--kpi-3);
+  --color-kpi-4: var(--kpi-4);
+  --color-kpi-5: var(--kpi-5);
 }
 
 /* Pi Bet 당첨 스포트라이트 애니메이션 */
@@ -122,6 +129,12 @@
   --sidebar-ring: oklch(0.705 0.015 286.067);
   --background: oklch(1 0 0);
   --foreground: oklch(0.141 0.005 285.823);
+  /* KPI 카드 파스텔 기본값 (라이트) — UI 테마 미적용 시 fallback */
+  --kpi-1: #eef2ff;
+  --kpi-2: #fff1e6;
+  --kpi-3: #fefce8;
+  --kpi-4: #eff6ff;
+  --kpi-5: #fdf2f8;
 }
 
 .dark {
@@ -156,6 +169,12 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.552 0.016 285.938);
+  /* KPI 카드 파스텔 기본값 (다크) — UI 테마 미적용 시 fallback */
+  --kpi-1: #312e5b;
+  --kpi-2: #3a2c20;
+  --kpi-3: #3a3417;
+  --kpi-4: #1e2f48;
+  --kpi-5: #3a1f33;
 }
 
 * {

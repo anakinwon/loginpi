@@ -29,6 +29,7 @@ const STD_NAV = [
 
 const CHAT_NAV = [
   { href: '/admin/themes', labelKey: 'themes' },
+  { href: '/admin/ui-themes', labelKey: 'uiThemes' },
   { href: '/admin/subscriptions', labelKey: 'subscriptions' },
   { href: '/admin/stickers', labelKey: 'stickers' },
   { href: '/admin/store/settle', labelKey: 'settle' },
