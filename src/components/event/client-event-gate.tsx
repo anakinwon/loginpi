@@ -43,6 +43,14 @@ interface Mission {
   mission_ord?: number
 }
 
+interface MissionsApiResponse {
+  missions: Mission[]
+  total: number
+  page: number
+  limit: number
+  total_pages: number
+}
+
 interface EventProgress {
   user_id: string
   mission_count: number
@@ -110,6 +118,9 @@ export function ClientEventGate() {
   const [granting, setGranting] = useState(false)
   const [rankPage, setRankPage] = useState(1) // 랭킹 보드 페이지네이션
   const [rankSearch, setRankSearch] = useState('') // 요원명 검색
+  const [missionPage, setMissionPage] = useState(1) // 미션 목록 페이지
+  const [missionTotalPages, setMissionTotalPages] = useState(1) // 미션 전체 페이지 수
+  const [loadingMoreMissions, setLoadingMoreMissions] = useState(false) // "더 보기" 로딩 상태
 
   // 제외 목록 조회 (관리자 전용 API — 비관리자는 403이라 무시됨)
   const fetchExcluded = async () => {
@@ -205,6 +216,41 @@ export function ClientEventGate() {
     }
   }
 
+  // 미션 목록 페이지 로드 함수 (첫 로드 또는 "더 보기" 클릭)
+  const loadMissions = async (pageNum: number) => {
+    try {
+      setLoadingMoreMissions(pageNum > 1) // "더 보기"는 로딩 중 표시
+      const res = await piFetch(
+        `/api/event/missions?event_id=evt-20260614-001&page=${pageNum}&limit=10`,
+      )
+
+      if (!res.ok) {
+        console.error('[event-gate] 미션 로드 실패:', res.statusText)
+        return
+      }
+
+      const data: MissionsApiResponse = await res.json()
+      const trimmedMissions = data.missions.map((m) => ({
+        ...m,
+        mission_cd: m.mission_cd.trim(),
+      }))
+
+      // 첫 페이지면 초기화, 아니면 누적
+      if (pageNum === 1) {
+        setMissions(trimmedMissions)
+      } else {
+        setMissions((prev) => [...prev, ...trimmedMissions])
+      }
+
+      setMissionTotalPages(data.total_pages)
+      setMissionPage(data.page)
+    } catch (err) {
+      console.error('[event-gate] 미션 로드 오류:', err)
+    } finally {
+      setLoadingMoreMissions(false)
+    }
+  }
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -223,10 +269,14 @@ export function ClientEventGate() {
         const rankingData = await rankingRes.json()
 
         setProgress(progressData.progress)
-        setMissions(progressData.missions ?? [])
+        // my-progress의 missions 대신 API에서 페이지네이션으로 로드
+        // setMissions(progressData.missions ?? []) // 제거
         setRanking(rankingData.ranking ?? [])
         setIsAdmin(!!rankingData.is_admin)
         if (rankingData.is_admin) await fetchExcluded()
+
+        // 미션 첫 페이지 로드
+        await loadMissions(1)
       } catch (err) {
         console.error('[event-gate] fetch error:', err)
         setError(t('networkError'))
@@ -442,6 +492,24 @@ export function ClientEventGate() {
                 </div>
               )
             })}
+            {/* "더 보기" 버튼 — 다음 페이지 존재할 때만 표시 */}
+            {missionPage < missionTotalPages && (
+              <button
+                type="button"
+                onClick={() => loadMissions(missionPage + 1)}
+                disabled={loadingMoreMissions}
+                className="mt-4 w-full rounded-lg border border-primary bg-primary/5 px-4 py-2.5 text-sm font-medium text-primary transition-colors hover:bg-primary/10 disabled:opacity-50"
+              >
+                {loadingMoreMissions ? (
+                  <span className="inline-flex items-center gap-2">
+                    <Loader2 className="size-4 animate-spin" />
+                    로딩 중...
+                  </span>
+                ) : (
+                  '더 보기'
+                )}
+              </button>
+            )}
           </div>
         )}
       </div>
