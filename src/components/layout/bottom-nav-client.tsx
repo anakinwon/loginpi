@@ -26,8 +26,8 @@ export function BottomNavClient({ serverIsAdmin }: { serverIsAdmin: boolean }) {
 
   // 채팅방 내부는 전체 화면 고정 프레임이라 네비를 숨긴다 → 그땐 자동숨김 리스너도 불필요
   const inChatRoom = /^\/chat\/.+/.test(pathname)
-  // Pi Browser에서만: 멈추면 숨고, 스크롤·터치하면 나타났다가 1초 후 다시 숨김
-  const visible = useAutoHideOnIdle(floating && !inChatRoom)
+  // Pi Browser에서만: 멈추면 숨고, 스크롤·터치하면 나타났다가 3초 후 다시 숨김
+  const visible = useAutoHideOnIdle(floating && !inChatRoom, 3000)
 
   if (inChatRoom) return null
 
@@ -79,14 +79,17 @@ export function BottomNavClient({ serverIsAdmin }: { serverIsAdmin: boolean }) {
     <nav
       aria-hidden={floating && !visible}
       className={cn(
-        'bg-background/95 fixed z-50 backdrop-blur-sm transition-[transform,opacity] duration-300 ease-out',
+        'fixed z-50 backdrop-blur-sm transition-opacity ease-in-out',
         floating
-          ? // Pi Browser: 양옆·아래로 띄운 둥근 플로팅 바 (safe-area 위로 부유)
-            'inset-x-3 overflow-hidden rounded-2xl border shadow-lg'
+          ? // Pi Browser: 양옆·아래로 띄운 둥근 플로팅 바 (배경 solid → element opacity로 90% 제어)
+            'bg-background inset-x-3 overflow-hidden rounded-2xl border shadow-lg'
           : // 일반 브라우저: 기존 도킹 바 (하단 풀폭, safe-area 패딩)
-            'inset-x-0 bottom-0 border-t pb-[env(safe-area-inset-bottom)]',
-        // 숨김 상태: 아래로 밀어내고 투명 + 터치 차단
-        floating && !visible && 'pointer-events-none translate-y-[160%] opacity-0',
+            'bg-background/95 inset-x-0 bottom-0 border-t pb-[env(safe-area-inset-bottom)]',
+        // 가시: 90% 불투명 / 숨김: 투명+터치차단. 나타날 땐 빠르게(200ms), 사라질 땐 천천히(700ms) fade.
+        floating &&
+          (visible
+            ? 'opacity-90 duration-200'
+            : 'pointer-events-none opacity-0 duration-700'),
       )}
       style={
         floating
