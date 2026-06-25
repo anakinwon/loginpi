@@ -40,7 +40,8 @@ export async function GET(req: NextRequest) {
       .select('usr_id, actvty_dt')
       .eq('del_yn', 'N')
       .gte('actvty_dt', fromDt),
-    db.from('sys_user').select('id, reg_dtm').eq('del_yn', 'N'),
+    // sys_user 본 테이블엔 del_yn 컬럼이 없음(레거시 핵심 테이블) → 필터 미적용
+    db.from('sys_user').select('id, reg_dtm'),
     db
       .from('usr_loc_hist')
       .select('user_str_id, sido_nm, reg_dtm')
