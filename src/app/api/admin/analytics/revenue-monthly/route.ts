@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { viewerScopedCacheHeaders } from '@/lib/cache-headers'
 
 // GET /api/admin/analytics/revenue-monthly — 월별 Pi 매출(최근 25개월) (Phase 22 §12 ①)
 //   Z-차트(당월·누계·이동누계)·YoY 비교용. stat_revenue_dly 일별 → 월 단위 집계.
@@ -52,5 +53,8 @@ export async function GET() {
     months.push({ ym, revPi: v.revPi, txnCnt: v.txnCnt })
   }
 
-  return NextResponse.json({ months })
+  return NextResponse.json(
+    { months },
+    { headers: viewerScopedCacheHeaders(admin) },
+  )
 }

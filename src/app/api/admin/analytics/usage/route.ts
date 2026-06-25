@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
-import { publicCacheHeaders } from '@/lib/cache-headers'
+import { viewerScopedCacheHeaders } from '@/lib/cache-headers'
 
 // GET /api/admin/analytics/usage?period=7|30|90|365 — 접속·사용 분석 (Phase 22 §12 ③)
 //   sys_user_actvty_log(일별 활동, UNIQUE usr_id×actvty_dt) + sys_user(가입일) +
@@ -18,7 +19,9 @@ function dayEpoch(s: string): number {
 }
 
 export async function GET(req: NextRequest) {
-  // Home 공개 분석 — 집계 지표만 반환(개인 식별 정보 없음), 게스트 포함 전체 공개.
+  // 관리자 전용 분석 — 코호트·지역 데이터는 민감 정보(개인 추적 패턴) — viewerScoped 캐싱 필수
+  const admin = isAdmin(await getSessionUser())
+
   const raw = Number(req.nextUrl.searchParams.get('period') ?? '30')
   const period = VALID_PERIODS.includes(raw as (typeof VALID_PERIODS)[number])
     ? raw
@@ -163,6 +166,6 @@ export async function GET(req: NextRequest) {
       regions,
       locatedUsers: latestSido.size,
     },
-    { headers: publicCacheHeaders() },
+    { headers: viewerScopedCacheHeaders(admin) },
   )
 }

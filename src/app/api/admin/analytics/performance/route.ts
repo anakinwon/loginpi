@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
-import { publicCacheHeaders } from '@/lib/cache-headers'
+import { viewerScopedCacheHeaders } from '@/lib/cache-headers'
 
 // GET /api/admin/analytics/performance?period=7|30|90|365 — 퍼포먼스/행동 분석 (Phase 22 §12 ④)
 //   세션/페이지뷰 추적층이 없어 페이지뷰·체류·반송률·이탈률·채널은 불가(선결조건).
@@ -25,7 +26,9 @@ const TYPE_LABEL: Record<string, string> = {
 }
 
 export async function GET(req: NextRequest) {
-  // Home 공개 분석 — 집계 지표만 반환(개인 식별 정보 없음), 게스트 포함 전체 공개.
+  // 관리자 전용 분석 — 사용자 라이프사이클·행동 패턴 민감 정보 → viewerScoped 캐싱 필수
+  const admin = isAdmin(await getSessionUser())
+
   const raw = Number(req.nextUrl.searchParams.get('period') ?? '30')
   const period = VALID_PERIODS.includes(raw as (typeof VALID_PERIODS)[number])
     ? raw
@@ -131,6 +134,6 @@ export async function GET(req: NextRequest) {
       // 세션/페이지뷰 추적층 미구축 → 페이지뷰·체류·반송률·이탈률·채널은 선결조건
       sessionTrackingPending: true,
     },
-    { headers: publicCacheHeaders() },
+    { headers: viewerScopedCacheHeaders(admin) },
   )
 }

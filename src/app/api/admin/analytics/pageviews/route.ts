@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
-import { publicCacheHeaders } from '@/lib/cache-headers'
+import { viewerScopedCacheHeaders } from '@/lib/cache-headers'
 
 // GET /api/admin/analytics/pageviews?period=7|30|90|365 — 웹 트래픽 (Phase 22 §12 ④)
 //   stat_pageview를 세션별 시퀀스로 묶어 체류·반송·이탈·랜딩·채널을 파생.
@@ -27,7 +28,9 @@ interface PvRow {
 }
 
 export async function GET(req: NextRequest) {
-  // Home 공개 분석 — 집계 지표(페이지 경로·세션·채널)만 반환, 게스트 포함 전체 공개.
+  // 관리자 전용 분석 — 사용자 행동 경로(세션·체류) 민감 정보 → viewerScoped 캐싱 필수
+  const admin = isAdmin(await getSessionUser())
+
   const raw = Number(req.nextUrl.searchParams.get('period') ?? '30')
   const period = VALID_PERIODS.includes(raw as (typeof VALID_PERIODS)[number])
     ? raw
@@ -122,6 +125,6 @@ export async function GET(req: NextRequest) {
       topLanding: topN(landing),
       topExit: topN(exit),
     },
-    { headers: publicCacheHeaders() },
+    { headers: viewerScopedCacheHeaders(admin) },
   )
 }
