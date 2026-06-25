@@ -284,6 +284,24 @@ export function ClientMyShops({
         </div>
       </div>
 
+      {/* 매장 등록 방법 안내 — 목록 화면에서만(폼 열면 숨김) */}
+      {!formOpen && (
+        <div className="shadow-soft space-y-2 rounded-xl border bg-card p-4 text-sm">
+          <p className="font-semibold">🏪 매장 등록 방법 (구글맵 인증)</p>
+          <p className="text-muted-foreground text-xs">
+            매장은 구글맵에 등록된 <b>본인이 운영하는 매장</b>만 인증 등록할 수 있습니다.
+            구글맵에 없는 매장은 검증할 수 없어 등록이 불가합니다.
+          </p>
+          <ol className="text-muted-foreground list-inside list-decimal space-y-1 text-xs">
+            <li><b>[매장 추가]</b> → 지도로 이동</li>
+            <li>주변 구글 등록 매장에서 <b>내 매장 선택</b></li>
+            <li>place_id 직접 입력 + 전화번호 구글 대조 + 현재 위치(GPS) 확인</li>
+            <li>⚠️ 타인 매장 등록은 <b>불법</b>(민·형사상 처벌) — 본인 매장 보증 동의</li>
+            <li>인증 등록 완료 → 메뉴(상품) 추가</li>
+          </ol>
+        </div>
+      )}
+
       {/* 등록/수정 인라인 폼 */}
       {formOpen && (
         <div className="space-y-4 rounded-lg border p-4">
