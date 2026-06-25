@@ -11,6 +11,7 @@ import { ThemeProvider } from '@/components/theme-provider'
 import { PiAuthProvider } from '@/components/pi-auth-provider'
 import { ConsentGate } from '@/components/consent/consent-gate'
 import { PiSdkScript } from '@/components/pi-sdk-script'
+import { PageviewTracker } from '@/components/analytics/pageview-tracker'
 import { Header } from '@/components/layout/header'
 import { BottomNav } from '@/components/layout/bottom-nav'
 import { Toaster } from '@/components/ui/sonner'
@@ -102,6 +103,7 @@ export default async function LocaleLayout({
                 <BottomNav />
                 {/* 가입/이용 동의 전역 게이트 — 로그인 후 필수 동의 미완료 시 차단 모달 */}
                 <ConsentGate />
+                <PageviewTracker />
                 <Toaster richColors />
               </PiAuthProvider>
             </ThemeProvider>

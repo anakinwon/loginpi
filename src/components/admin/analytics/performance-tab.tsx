@@ -10,6 +10,25 @@ import { StatsCard } from '@/components/admin/stats/stats-card'
 const FunnelChart = dynamic(() => import('@/components/charts/funnel-chart'), {
   ssr: false,
 })
+const PageviewTrendChart = dynamic(
+  () => import('@/components/charts/pageview-trend-chart'),
+  { ssr: false },
+)
+
+interface PvResponse {
+  period: number
+  summary: {
+    totalPv: number
+    sessions: number
+    pvPerSession: number
+    avgDwellSec: number
+    bounceRate: number
+  }
+  pvTrend: { date: string; cnt: number }[]
+  channels: { cd: string; label: string; cnt: number }[]
+  topLanding: { path: string; cnt: number }[]
+  topExit: { path: string; cnt: number }[]
+}
 
 interface PerfResponse {
   period: number
@@ -37,6 +56,7 @@ const TYPE_COLORS = ['bg-[var(--kpi-1)]', 'bg-[var(--kpi-3)]', 'bg-[var(--kpi-5)
 //   페이지뷰·체류·반송/이탈·채널은 세션 추적층 선결(아래 안내 카드).
 export function PerformanceTab({ period }: { period: number }) {
   const [data, setData] = useState<PerfResponse | null>(null)
+  const [pv, setPv] = useState<PvResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   const fetchPerf = useCallback(async (p: number) => {
@@ -55,9 +75,26 @@ export function PerformanceTab({ period }: { period: number }) {
     }
   }, [])
 
+  // 웹 트래픽(페이지뷰) — 별도 조회. 실패해도 본 탭은 유지(수집 초기엔 빈 데이터).
+  const fetchPv = useCallback(async (p: number) => {
+    const cacheKey = `analytics_pv_${p}`
+    const cached = readCache<PvResponse>(cacheKey, 5 * 60_000)
+    if (cached) setPv(cached)
+    try {
+      const res = await piFetch(`/api/admin/analytics/pageviews?period=${p}`)
+      if (!res.ok) return
+      const json = (await res.json()) as PvResponse
+      setPv(json)
+      writeCache(cacheKey, json)
+    } catch {
+      // 무시
+    }
+  }, [])
+
   useEffect(() => {
     fetchPerf(period)
-  }, [period, fetchPerf])
+    fetchPv(period)
+  }, [period, fetchPerf, fetchPv])
 
   if (error)
     return (
@@ -195,19 +232,145 @@ export function PerformanceTab({ period }: { period: number }) {
         </div>
       </div>
 
-      {/* 세션 추적 선결 안내 */}
-      <div className="border-muted-foreground/20 bg-muted/30 rounded-lg border border-dashed p-4">
-        <p className="text-sm font-medium">
-          🧭 페이지뷰 · 체류시간 · 반송/이탈률 · 채널 기여 — 준비 중
-        </p>
-        <p className="text-muted-foreground mt-1 text-xs">
-          이 지표들은 <strong>세션·페이지뷰 추적층</strong>이 필요합니다. 현재 활동
-          로그는 “사용자×일자 1행”이라 페이지 단위·체류시간 데이터가 없습니다.
-          신규 추적(예: <code>stat_session_pageview</code> + 클라이언트 페이지뷰
-          수집) 도입 후 전환 퍼널을 방문 단계까지 확장하고 반송/이탈·채널 분석을
-          활성화합니다. (PRD_21 §3-5 · §6)
+      {/* ── 웹 트래픽 (페이지뷰 추적층) ───────────────────────── */}
+      <div className="border-t pt-5">
+        <p className="mb-3 text-sm font-semibold">🧭 웹 트래픽</p>
+
+        {/* 트래픽 KPI */}
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <StatsCard
+            label="페이지뷰"
+            value={pv?.summary.totalPv ?? 0}
+            unit="PV"
+            loading={pv === null}
+            variant="kpi-1"
+            icon={<span aria-hidden>👁️</span>}
+          />
+          <StatsCard
+            label="세션"
+            value={pv?.summary.sessions ?? 0}
+            unit="개"
+            loading={pv === null}
+            variant="kpi-3"
+            icon={<span aria-hidden>🧩</span>}
+          />
+          <StatsCard
+            label="평균 체류"
+            value={Number((pv?.summary.avgDwellSec ?? 0).toFixed(0))}
+            unit="초"
+            loading={pv === null}
+            variant="kpi-4"
+            icon={<span aria-hidden>⏱️</span>}
+          />
+          <StatsCard
+            label="반송률"
+            value={Number((pv?.summary.bounceRate ?? 0).toFixed(1))}
+            unit="%"
+            loading={pv === null}
+            variant="kpi-5"
+            icon={<span aria-hidden>↪️</span>}
+          />
+        </div>
+
+        {/* PV 추세 */}
+        <div className="mt-4 rounded-lg border p-4">
+          <p className="mb-2 text-sm font-medium">
+            페이지뷰 추세{' '}
+            <span className="text-muted-foreground text-xs">· 최근 {period}일</span>
+          </p>
+          <LazySection>
+            {pv ? (
+              <PageviewTrendChart data={pv.pvTrend} />
+            ) : (
+              <div className="bg-muted h-56 animate-pulse rounded-lg" />
+            )}
+          </LazySection>
+        </div>
+
+        {/* 채널 기여 + 랜딩/이탈 페이지 */}
+        <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
+          <div className="rounded-lg border p-4">
+            <p className="mb-3 text-sm font-medium">유입 채널</p>
+            {pv && pv.channels.length > 0 ? (
+              <div className="space-y-2">
+                {(() => {
+                  const tot =
+                    pv.channels.reduce((a, b) => a + b.cnt, 0) || 1
+                  return pv.channels.map((c, i) => {
+                    const pct = (c.cnt / tot) * 100
+                    return (
+                      <div key={c.cd} className="text-sm">
+                        <div className="mb-1 flex justify-between">
+                          <span>{c.label}</span>
+                          <span className="text-muted-foreground">
+                            {pct.toFixed(0)}%
+                          </span>
+                        </div>
+                        <div className="bg-muted h-2.5 overflow-hidden rounded-full">
+                          <div
+                            className={`h-full rounded-full ${PV_BAR[i % PV_BAR.length]}`}
+                            style={{ width: `${pct}%` }}
+                          />
+                        </div>
+                      </div>
+                    )
+                  })
+                })()}
+              </div>
+            ) : (
+              <p className="text-muted-foreground py-6 text-center text-sm">
+                수집 데이터 없음
+              </p>
+            )}
+          </div>
+
+          <PathList title="랜딩 페이지 Top" items={pv?.topLanding ?? null} />
+          <PathList title="이탈 페이지 Top" items={pv?.topExit ?? null} />
+        </div>
+
+        <p className="text-muted-foreground mt-3 text-xs">
+          ※ 페이지뷰는 라우트 전환 시 비차단 수집됩니다. 배포 직후엔 데이터가
+          비어 있으며 사용량이 쌓이면 채워집니다. (sql/122 적용 필요)
         </p>
       </div>
+    </div>
+  )
+}
+
+const PV_BAR = [
+  'bg-[var(--kpi-1)]',
+  'bg-[var(--kpi-3)]',
+  'bg-[var(--kpi-5)]',
+  'bg-[var(--kpi-2)]',
+  'bg-[var(--kpi-4)]',
+]
+
+function PathList({
+  title,
+  items,
+}: {
+  title: string
+  items: { path: string; cnt: number }[] | null
+}) {
+  return (
+    <div className="rounded-lg border p-4">
+      <p className="mb-3 text-sm font-medium">{title}</p>
+      {items === null ? (
+        <div className="bg-muted h-24 animate-pulse rounded-lg" />
+      ) : items.length > 0 ? (
+        <ul className="space-y-1.5 text-sm">
+          {items.map((it) => (
+            <li key={it.path} className="flex justify-between gap-2">
+              <span className="truncate font-mono text-xs">{it.path}</span>
+              <span className="text-muted-foreground shrink-0">{it.cnt}</span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-muted-foreground py-6 text-center text-sm">
+          수집 데이터 없음
+        </p>
+      )}
     </div>
   )
 }
