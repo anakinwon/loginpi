@@ -81,8 +81,10 @@ export function BottomNavClient({ serverIsAdmin }: { serverIsAdmin: boolean }) {
       className={cn(
         'fixed z-50 backdrop-blur-sm transition-opacity ease-in-out',
         floating
-          ? // Pi Browser: 양옆·아래로 띄운 둥근 플로팅 바 (배경 solid → element opacity로 90% 제어)
-            'bg-background inset-x-3 overflow-hidden rounded-2xl border shadow-lg'
+          ? // Pi Browser: 양옆·아래로 띄운 둥근 플로팅 바.
+            // 수직 그라데이션(아래로 갈수록 진한 톤)으로 색을 약간 더 진하게 + 3D 입체감.
+            // 드롭 섀도(부유감) + 상단 inset 하이라이트(윗면 베벨). 배경 불투명 → opacity-90(90%) 유지.
+            'inset-x-3 overflow-hidden rounded-2xl border bg-gradient-to-b from-background to-muted shadow-[0_8px_24px_-6px_rgba(0,0,0,0.25),inset_0_1px_0_0_rgba(255,255,255,0.15)]'
           : // 일반 브라우저: 기존 도킹 바 (하단 풀폭, safe-area 패딩)
             'bg-background/95 inset-x-0 bottom-0 border-t pb-[env(safe-area-inset-bottom)]',
         // 가시: 90% 불투명 / 숨김: 투명+터치차단. 나타날 땐 빠르게(200ms), 사라질 땐 천천히(700ms) fade.
