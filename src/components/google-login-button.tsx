@@ -9,9 +9,15 @@ import { usePiAuth } from '@/components/pi-auth-provider'
 export function GoogleLoginButton() {
   const t = useTranslations('header')
   const { data: session, status } = useSession()
-  const { isInPiBrowser, isLoading: piLoading, user: piUser } = usePiAuth()
+  const { isInPiBrowser, user: piUser } = usePiAuth()
 
-  if (piLoading || isInPiBrowser || !!piUser) return null
+  // Pi Browser 환경이거나 실제 Pi 세션 사용자(pi_uid 보유)면 Google 로그인 UI를 숨긴다.
+  // ⚠️ piLoading은 게이팅하지 않는다: 일반 브라우저에서도 Pi SDK가 window.Pi를 정의해
+  //    authenticate 타임아웃(최대 20s)까지 piLoading=true가 유지돼 버튼이 사라지기 때문.
+  //    Google 로그인은 Pi 인증과 독립이다.
+  // ⚠️ piUser는 Google 세션 폴백으로도 채워지므로(uid='') !!piUser 대신 uid 보유로 Pi 사용자 판정.
+  const isPiUser = !!piUser?.uid
+  if (isInPiBrowser || isPiUser) return null
   if (status === 'loading') return null
 
   if (session?.user) {
