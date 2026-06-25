@@ -30,9 +30,6 @@ export interface UserRow {
   lbs_consent_yn: string | null
   lbs_consent_dtm: string | null
   lbs_consent_ver: string | null
-  // 마이그레이션 127 — 논리삭제(비활성 계정). del_yn='Y'는 모든 인증·조회에서 차단
-  del_yn: string | null
-  del_dtm: string | null
   reg_dtm: string
   mod_dtm: string
 }
@@ -63,7 +60,7 @@ export async function upsertPiUser(piUser: {
 }
 
 // 연동 코드 입력 완료 시: Pi row에 Google 필드 UPDATE
-// Google 전용 고아 행이 있으면 먼저 비활성화 후 Pi row에 반영 (1인 1계정 원칙)
+// Google 전용 row를 별도 생성하지 않고 기존 Pi row에 직접 업데이트
 export async function updatePiUserWithGoogle(
   piUserId: string,
   googleUser: {
@@ -73,40 +70,7 @@ export async function updatePiUserWithGoogle(
     image: string | null
   },
 ): Promise<void> {
-  const db = getSupabaseAdmin()
-  const now = new Date().toISOString()
-
-  // Step 1: 동일 google_id 또는 google_email을 보유한 Google 전용 고아 행 비활성화.
-  //   google_id UNIQUE 제약이 있으므로 Pi row에 설정하기 전에 반드시 해제해야 한다.
-  //   (del_yn='Y'만으로는 UNIQUE 제약이 해제되지 않음 → google_id도 NULL로 초기화)
-  const softDelete = {
-    google_id: null, // UNIQUE 해제
-    del_yn: 'Y',
-    del_dtm: now,
-    modr_id: 'SYSTEM',
-    mod_dtm: now,
-  }
-
-  // google_id 기준 고아 비활성화
-  await db
-    .from('sys_user')
-    .update(softDelete)
-    .eq('del_yn', 'N')
-    .is('pi_uid', null)
-    .eq('google_id', googleUser.id)
-    .neq('id', piUserId)
-
-  // google_email 기준 고아 비활성화 (google_id가 아직 없는 경우 포함)
-  await db
-    .from('sys_user')
-    .update(softDelete)
-    .eq('del_yn', 'N')
-    .is('pi_uid', null)
-    .eq('google_email', googleUser.email)
-    .neq('id', piUserId)
-
-  // Step 2: Pi row에 Google 필드 설정 (이제 UNIQUE 충돌 없음)
-  const { error } = await db
+  const { error } = await getSupabaseAdmin()
     .from('sys_user')
     .update({
       google_id: googleUser.id,
@@ -120,13 +84,11 @@ export async function updatePiUserWithGoogle(
 }
 
 export async function getUserById(id: string): Promise<UserRow | null> {
-  // del_yn='N'(활성)만 조회 — 비활성 계정은 인증·단건 조회 전반에서 차단
   const { data } = await getSupabaseAdmin()
     .from('sys_user')
     .select()
     .eq('id', id)
-    .eq('del_yn', 'N')
-    .maybeSingle()
+    .single()
   return (data as UserRow) ?? null
 }
 
@@ -193,8 +155,7 @@ export async function getUserByPiUid(uid: string): Promise<UserRow | null> {
     .from('sys_user')
     .select()
     .eq('pi_uid', uid)
-    .eq('del_yn', 'N') // 활성 계정만 (비활성 차단)
-    .maybeSingle()
+    .single()
   return (data as UserRow) ?? null
 }
 
@@ -205,7 +166,6 @@ export async function getUserByGoogleId(
     .from('sys_user')
     .select()
     .eq('google_id', googleId)
-    .eq('del_yn', 'N') // 활성 계정만
     .maybeSingle()
   return (data as UserRow) ?? null
 }

@@ -2,6 +2,7 @@ import NextAuth from 'next-auth'
 import Google from 'next-auth/providers/google'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { recordActivity } from '@/lib/activity-log'
+import { upsertGoogleUser } from '@/lib/users'
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
@@ -12,24 +13,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ],
   session: { strategy: 'jwt' },
   callbacks: {
-    async jwt({ token, profile, account, trigger }) {
-      // ── 세션 갱신 (link-complete 후 hasPiAccount 동기화) ──────────────
-      if (trigger === 'update' && token.userId) {
-        try {
-          const db = getSupabaseAdmin()
-          const { data } = await db
-            .from('sys_user')
-            .select('pi_uid')
-            .eq('id', token.userId as string)
-            .eq('del_yn', 'N')
-            .maybeSingle()
-          token.hasPiAccount = !!(data as { pi_uid: string | null } | null)?.pi_uid
-        } catch {
-          // 갱신 실패 시 기존 값 유지
-        }
-        return token
-      }
-
+    async jwt({ token, profile, account }) {
       if (account?.provider === 'google' && profile?.sub) {
         try {
           const db = getSupabaseAdmin()
@@ -44,14 +28,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           //  2) 실패 시 google_id(sub)로 폴백.
           // ⚠️ 과거 버그: google_id에 sub가 아닌 UUID가 저장되면 1차(sub) 매칭 실패→빈 새 계정 생성→
           //    카페 등 데이터가 사라져 보임. 아래 이메일 우선 매칭 + sub 자가치유로 해소.
-          let matched: { id: string; google_id: string | null; pi_uid: string | null } | null = null
+          let matched: { id: string; google_id: string | null } | null = null
 
           if (email && emailVerified) {
             const { data: candidates } = await db
               .from('sys_user')
               .select('id, google_id, pi_uid, reg_dtm')
               .eq('google_email', email)
-              .eq('del_yn', 'N') // 활성 계정만 — 비활성(del_yn='Y') 고아 행 제외
               .order('reg_dtm', { ascending: true })
             const list = (candidates ?? []) as {
               id: string
@@ -75,16 +58,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           if (!matched) {
             const { data: byId } = await db
               .from('sys_user')
-              .select('id, google_id, pi_uid')
+              .select('id, google_id')
               .eq('google_id', sub)
-              .eq('del_yn', 'N') // 활성 계정만
               .maybeSingle()
-            matched = (byId as { id: string; google_id: string | null; pi_uid: string | null } | null) ?? null
+            matched = (byId as { id: string; google_id: string | null } | null) ?? null
           }
 
           if (matched) {
             token.userId = matched.id
-            token.hasPiAccount = !!matched.pi_uid
             recordActivity(matched.id, 'LOGIN')
             // 실제 sub로 google_id 정정(오염·NULL 자가 치유) + last_login 갱신
             const upd: Record<string, unknown> = {
@@ -92,17 +73,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             }
             if (matched.google_id !== sub) upd.google_id = sub
             await db.from('sys_user').update(upd).eq('id', matched.id)
+          } else if (email) {
+            // 진짜 신규 → Google 전용 계정 생성
+            const newUser = await upsertGoogleUser({
+              id: sub,
+              email,
+              name: (profile.name as string) ?? null,
+              image: (profile as { picture?: string }).picture ?? null,
+            })
+            token.userId = newUser.id
+            recordActivity(newUser.id, 'LOGIN')
           } else {
-            // 기존 계정 없는 신규 Google 사용자:
-            // ⭐ 1인 1계정 원칙 — Pi 계정 연동 전까지 DB 행 생성하지 않음.
-            //    token.sub(Google OAuth sub)는 JWT에 유지되므로 link-complete에서 사용 가능.
-            //    hasPiAccount=false → getSessionUser()가 null 반환 → Pi 연동 유도.
             token.userId = null
-            token.hasPiAccount = false
           }
         } catch {
           token.userId = null
-          token.hasPiAccount = false
         }
       }
       return token

@@ -13,7 +13,7 @@ function LinkCompleteInner() {
   const params = useSearchParams()
   const router = useRouter()
   const code = params.get('code')
-  const { status, update: updateSession } = useSession()
+  const { status } = useSession()
   const [result, setResult] = useState<'pending' | 'done' | 'error'>('pending')
   const [errorMsg, setErrorMsg] = useState('')
 
@@ -26,11 +26,9 @@ function LinkCompleteInner() {
       body: JSON.stringify({ code }),
     })
       .then((r) => r.json())
-      .then(async (d: { success?: boolean; error?: string }) => {
+      .then((d: { success?: boolean; error?: string }) => {
         if (d.success) {
           setResult('done')
-          // JWT의 hasPiAccount를 true로 갱신 — 갱신 후 홈으로 이동
-          await updateSession()
           setTimeout(() => router.push('/'), 2000)
         } else {
           setResult('error')

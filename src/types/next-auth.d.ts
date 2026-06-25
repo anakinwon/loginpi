@@ -11,8 +11,7 @@ declare module 'next-auth' {
 
 declare module 'next-auth/jwt' {
   interface JWT {
-    userId?: string | null // Supabase users.id (Pi 미연동 신규 Google 사용자는 null)
-    hasPiAccount?: boolean  // Pi 계정 연동 여부 — false면 /link로 유도
+    userId?: string // Supabase users.id
   }
 }
 

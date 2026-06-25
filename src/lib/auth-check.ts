@@ -71,9 +71,6 @@ export async function getSessionUser(): Promise<UserRow | null> {
   if (googleSession?.user?.id) {
     const user = await getUserById(googleSession.user.id)
     if (user) {
-      // ⭐ 1인 1계정 원칙: Pi 계정 미연동 Google 전용 사용자는 접근 차단.
-      //    link 페이지는 useSession()을 직접 사용하므로 이 차단과 무관하게 정상 동작한다.
-      if (!user.pi_uid) return null
       touchLastLogin(user.id) // 일반 브라우저 세션 유지 접속도 기록 (5분 스로틀)
       return user
     }
@@ -83,7 +80,6 @@ export async function getSessionUser(): Promise<UserRow | null> {
     if (sub) {
       const userBySub = await getUserByGoogleId(sub)
       if (userBySub) {
-        if (!userBySub.pi_uid) return null // Pi 미연동 차단
         touchLastLogin(userBySub.id)
         return userBySub
       }
