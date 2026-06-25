@@ -197,6 +197,11 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+    /* 모바일/Pi Browser 터치 반응 최적화:
+       - manipulation: 더블탭 줌 판정을 위한 ~300ms 클릭 지연 제거 (핀치 줌·스크롤은 유지)
+       - tap-highlight 투명: 탭 시 WebView 기본 회색 박스 깜빡임 제거 (active 피드백으로 대체) */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
   /* 본문 기본은 산세리프(Geist) — 웹앱다운 가독성.
      제목에만 .font-heading(serif)을 선택 적용한다. */

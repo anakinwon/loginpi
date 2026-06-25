@@ -77,7 +77,6 @@ export function BottomNavClient({ serverIsAdmin }: { serverIsAdmin: boolean }) {
 
   return (
     <nav
-      aria-hidden={floating && !visible}
       className={cn(
         'fixed z-50 backdrop-blur-sm transition-opacity ease-in-out',
         floating
@@ -88,11 +87,11 @@ export function BottomNavClient({ serverIsAdmin }: { serverIsAdmin: boolean }) {
             'inset-x-3 overflow-hidden rounded-2xl border bg-muted bg-gradient-to-b from-muted to-[var(--color-border)] shadow-[0_14px_34px_-8px_rgba(0,0,0,0.42),inset_0_1px_0_0_rgba(255,255,255,0.25),inset_0_-2px_3px_-1px_rgba(0,0,0,0.16)]'
           : // 일반 브라우저: 기존 도킹 바 (하단 풀폭, safe-area 패딩)
             'bg-background/95 inset-x-0 bottom-0 border-t pb-[env(safe-area-inset-bottom)]',
-        // 가시: 90% 불투명 / 숨김: 투명+터치차단. 나타날 땐 빠르게(200ms), 사라질 땐 천천히(700ms) fade.
+        // 움직임: 90% 선명 / 멈춤: 30%로 흐려지되 클릭은 계속 유지(pointer-events 살림).
+        // → 숨은 상태 첫 탭이 '깨우기'로 삼켜지지 않고 즉시 이동된다.
+        // 선명해질 땐 빠르게(200ms), 흐려질 땐 천천히(700ms) fade.
         floating &&
-          (visible
-            ? 'opacity-90 duration-200'
-            : 'pointer-events-none opacity-0 duration-700'),
+          (visible ? 'opacity-90 duration-200' : 'opacity-30 duration-700'),
       )}
       style={
         floating
@@ -110,7 +109,9 @@ export function BottomNavClient({ serverIsAdmin }: { serverIsAdmin: boolean }) {
               key={tab.href}
               href={tab.href}
               className={cn(
-                'flex flex-col items-center justify-center gap-1 text-xs transition-colors',
+                // transition-[color,transform] + active:scale-90 → 누르는 즉시 시각 피드백(체감 지연 제거)
+                // touch-manipulation: 전역 설정 보강(이 인터랙티브 요소에서도 더블탭 줌 지연 차단)
+                'flex touch-manipulation flex-col items-center justify-center gap-1 text-xs transition-[color,transform] duration-100 select-none active:scale-90',
                 tab.active
                   ? 'text-primary font-semibold'
                   : 'text-muted-foreground hover:text-foreground',
