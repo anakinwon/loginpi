@@ -272,6 +272,29 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
+  // 마운트 즉시 기존 세션 복원 (Pi authenticate와 독립, window.Pi 유무 무관).
+  // ⚠️ 모바일 일반 브라우저 버그 수정: Pi SDK가 window.Pi를 정의하면 signIn()이
+  //    authenticate에서 막혀(최대 20s timeout) GET 폴백에 도달하지 못하고, 3초 fallback도
+  //    `if (!window.Pi)` 조건이라 실행되지 않아 Google 세션이 piUser로 복원되지 않았다.
+  //    → 헤더(useSession)는 로그인인데 본문 게이트(usePiAuth().user)는 "로그인 필요"로 불일치.
+  //    piFetch는 쿠키(credentials:include) + X-Pi-Token을 함께 보내고, 서버 GET은
+  //    getSessionUser()(Pi 쿠키/헤더 + Google 통합)로 응답하므로 Google 세션이 그대로 복원된다.
+  //    세션이 확정되면 isLoading도 내려 본문 게이트를 즉시 해제한다(authenticate 결과 대기 불필요).
+  useEffect(() => {
+    let cancelled = false
+    piFetch('/api/auth/pi')
+      .then((r) => (r.ok ? r.json() : { user: null }))
+      .then((data: { user: PiSessionUser | null }) => {
+        if (cancelled || !data.user) return
+        setUser((prev) => prev ?? data.user) // signIn이 먼저 채웠으면 덮어쓰지 않음
+        setIsLoading(false)
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
   // Pi SDK 비동기 로드 감지.
   // locale layout의 afterInteractive Script onLoad → 'pi-sdk-loaded' 이벤트를 여기서 수신.
   // Pi Browser에서 SDK는 캐시되어 있어 거의 즉시 로드됨.
