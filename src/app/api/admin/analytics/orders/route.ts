@@ -262,11 +262,18 @@ export async function GET(req: NextRequest) {
       },
     },
     {
-      headers: {
-        // Vercel edge 캐싱 60분 (모든 visitor 공유)
-        'Cache-Control': 's-maxage=3600, max-age=0, stale-while-revalidate=3600',
-        'CDN-Cache-Control': 'max-age=3600, stale-while-revalidate=3600',
-      },
+      // ⚠️ orders는 뷰어별 응답이 다름(관리자=실명·usr_id / 게스트=마스킹).
+      // 관리자(실명) 응답을 공유 CDN 캐시에 저장하면 이후 익명 게스트에게 PII가 그대로 서빙됨.
+      // → 관리자: private/no-store(공유 캐시 금지). 게스트(마스킹) 응답만 edge 캐시 +
+      //   Vary로 토큰·쿠키 보유(관리자/로그인) 요청과 캐시 버킷을 분리한다.
+      headers: admin
+        ? { 'Cache-Control': 'private, no-store' }
+        : {
+            'Cache-Control':
+              'public, s-maxage=3600, max-age=0, stale-while-revalidate=3600',
+            'CDN-Cache-Control': 'public, max-age=3600, stale-while-revalidate=3600',
+            Vary: 'Cookie, X-Pi-Token',
+          },
     },
   )
 }
