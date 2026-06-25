@@ -12,7 +12,8 @@ const MONTHS = 25
 
 export async function GET() {
   const user = await getSessionUser()
-  if (!isAdmin(user))
+  const admin = isAdmin(user)
+  if (!admin)
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
 
   const now = new Date()

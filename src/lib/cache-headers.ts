@@ -1,26 +1,61 @@
-// 응답 캐시 헤더 빌더 — Vercel/CDN edge 캐싱.
-//
-// ⚠️ 보안 핵심: 공유 캐시(s-maxage / CDN-Cache-Control)는 응답이 **모든 뷰어에게 동일**할 때만
-//    안전하다. 뷰어별로 다른 응답(관리자=원본 / 게스트=마스킹)을 공유 캐시에 담으면, 먼저
-//    캐시된 관리자 PII가 이후 익명 게스트에게 그대로 서빙된다(공유 캐시 PII 유출).
-//    → 캐시 적용 전 반드시 자문: "이 응답이 모든 뷰어에게 동일한가?"
-//      YES → publicCacheHeaders / NO → viewerScopedCacheHeaders
+/**
+ * 응답 캐싱 헤더 헬퍼
+ * 마스터 지시(2026-06-25): 뷰어별 응답 분기 구조를 반영하여 안전한 캐싱 제공
+ *
+ * ⚠️ 주의: 뷰어마다 다른 응답(마스킹/admin 분기)은 publicCacheHeaders() 금지
+ * → viewerScopedCacheHeaders(admin)를 사용해 admin=private, guest=마스킹분만 캐시
+ */
 
-// 뷰어 불변 응답: 모든 visitor가 공유하는 edge 캐시 (최고 효율).
-export function publicCacheHeaders(maxAgeSec = 3600): Record<string, string> {
+/**
+ * 공개 응답 캐싱 — 모든 visitor에게 동일한 응답
+ *
+ * 사용처:
+ * - 개인 식별 정보 없는 집계(DAU/WAU/MAU·지역분포·활동유형 분포 등)
+ * - 공개 통계(총주문건수·평균 주문간격 등)
+ * - 개인별 분기 없는 응답
+ *
+ * @param maxAgeSec Vercel edge caching 초 단위 (기본 3600=60분)
+ * @returns Cache-Control + CDN-Cache-Control 헤더 객체
+ */
+export function publicCacheHeaders(maxAgeSec: number = 3600) {
   return {
-    'Cache-Control': `public, s-maxage=${maxAgeSec}, max-age=0, stale-while-revalidate=${maxAgeSec}`,
-    'CDN-Cache-Control': `public, max-age=${maxAgeSec}, stale-while-revalidate=${maxAgeSec}`,
+    'Cache-Control': `s-maxage=${maxAgeSec}, max-age=0, stale-while-revalidate=${maxAgeSec}`,
+    'CDN-Cache-Control': `max-age=${maxAgeSec}, stale-while-revalidate=${maxAgeSec}`,
   }
 }
 
-// 뷰어 의존 응답(관리자=원본 / 게스트=마스킹):
-//   - 관리자: private/no-store — 공유 캐시에 PII 저장 절대 금지
-//   - 게스트(마스킹): edge 캐시 + Vary로 토큰·쿠키 보유(관리자/로그인) 요청과 캐시 버킷 분리
+/**
+ * 뷰어 의존 캐싱 — 관리자/게스트별로 다른 응답
+ *
+ * 원리:
+ * - admin=true: private(관리자만 캐시, 다른 유저와 공유 금지)
+ * - admin=false: 뷰어 무관 부분만 public 캐시 + Vary 헤더로 분리
+ *
+ * 사용처:
+ * - RFM 세그먼트(관리자: 실명·usr_id | 게스트: 마스킹)
+ * - Top 고객(관리자: 전체 | 게스트: 비식별 지표만)
+ * - 개인 정보 포함 분석
+ *
+ * @param admin 관리자 여부
+ * @param maxAgeSec admin=false 시 게스트 캐시 초 (기본 600=10분, admin은 private)
+ * @returns Cache-Control + Vary 헤더 객체
+ */
 export function viewerScopedCacheHeaders(
   admin: boolean,
-  maxAgeSec = 3600,
+  maxAgeSec: number = 600,
 ): Record<string, string> {
-  if (admin) return { 'Cache-Control': 'private, no-store' }
-  return { ...publicCacheHeaders(maxAgeSec), Vary: 'Cookie, X-Pi-Token' }
+  if (admin) {
+    // 관리자: 비공유 캐시 (private) — 다른 사용자와 응답 공유 금지
+    return {
+      'Cache-Control': 'private, max-age=600',
+      'Vary': 'X-Admin-User',
+    }
+  }
+
+  // 게스트: 마스킹된 응답만 캐시 (10분 짧은 캐시)
+  return {
+    'Cache-Control': `s-maxage=${maxAgeSec}, max-age=0, stale-while-revalidate=${maxAgeSec}`,
+    'CDN-Cache-Control': `max-age=${maxAgeSec}, stale-while-revalidate=${maxAgeSec}`,
+    'Vary': 'X-Admin-User', // 뷰어에 따라 응답 다름 명시
+  }
 }

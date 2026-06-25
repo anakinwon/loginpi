@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { viewerScopedCacheHeaders } from '@/lib/cache-headers'
 
 // GET /api/admin/board?page=1&limit=30&ctgr=NOTICE
 export async function GET(request: NextRequest) {
   const user = await getSessionUser()
-  if (!isAdmin(user))
+  const admin = isAdmin(user)
+  if (!admin)
     return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
 
   const { searchParams } = request.nextUrl
@@ -33,10 +35,15 @@ export async function GET(request: NextRequest) {
   const { data: posts, count, error } = await query
   if (error) return NextResponse.json({ error: '조회 실패' }, { status: 500 })
 
-  return NextResponse.json({
-    posts: posts ?? [],
-    total: count ?? 0,
-    page,
-    limit,
-  })
+  const totalPages = Math.ceil((count ?? 0) / limit)
+  return NextResponse.json(
+    {
+      posts: posts ?? [],
+      total: count ?? 0,
+      page,
+      limit,
+      totalPages,
+    },
+    { headers: viewerScopedCacheHeaders(admin) },
+  )
 }

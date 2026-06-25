@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { viewerScopedCacheHeaders } from '@/lib/cache-headers'
 import { type TxnDivCd, pymntTypeToDiv, mpsTxnToDiv } from '@/lib/txn-div'
 
 // 결제 내역 = pi_pymnt(U2A 결제) + mps_txn_hist(취소·환불·수수료·정산) 통합.
@@ -39,14 +40,20 @@ interface UnifiedTxn {
   sys_user: UserRef | null
 }
 
+// GET /api/admin/payments?page=1&limit=30&q=username
 export async function GET(req: NextRequest) {
   const requester = await getSessionUser()
-  if (!isAdmin(requester)) {
+  const admin = isAdmin(requester)
+  if (!admin) {
     return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
   }
 
   const db = getSupabaseAdmin()
-  const q = (new URL(req.url).searchParams.get('q') ?? '').trim()
+  const sp = new URL(req.url).searchParams
+  const q = (sp.get('q') ?? '').trim()
+  const page = Math.max(1, Number(sp.get('page') ?? 1))
+  const limit = Math.min(100, Math.max(1, Number(sp.get('limit') ?? 30)))
+  const from = (page - 1) * limit
 
   // 검색어가 있으면(2글자↑) pi_username 부분일치(trigram GIN)로 user_id 후보를 먼저 구한다.
   // trigram은 3글자 단위라 2글자 미만은 의미가 적어 검색 자체를 생략(전체 반환).
@@ -157,9 +164,24 @@ export async function GET(req: NextRequest) {
   })
 
   // 통합 + 일시 내림차순 정렬
-  const txns = [...pymntTxns, ...mpsTxns].sort((a, b) =>
+  const allTxns = [...pymntTxns, ...mpsTxns].sort((a, b) =>
     a.reg_dtm < b.reg_dtm ? 1 : a.reg_dtm > b.reg_dtm ? -1 : 0,
   )
 
-  return NextResponse.json({ payments: txns })
+  // 페이지네이션
+  const totalPages = Math.ceil(allTxns.length / limit)
+  const txns = allTxns.slice(from, from + limit)
+
+  return NextResponse.json(
+    {
+      payments: txns,
+      pagination: {
+        page,
+        limit,
+        total: allTxns.length,
+        totalPages,
+      },
+    },
+    { headers: viewerScopedCacheHeaders(admin) },
+  )
 }
