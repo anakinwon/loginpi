@@ -60,11 +60,12 @@ Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Net
 | **21** | 보안 강화 (KISA 21개 + DDoS 5계층) | 🔶 코드 완료·Vercel 설정 잔여 | `docs/PRD_2_SECURITY.md` **v2.0**(✅18 양호·🔍3 추가확인·➖2 해당없음) + `docs/SECURITY_DDOS_POLICY.md` + DDoS 코드 구현(2026-06-23). **Pi Browser 제약 반영(2026-06-23)**: CSP·X-Frame-Options 제거(WebView SDK 차단·iframe 임베딩 문제 수정)·Google Maps 오류 수정. `docs/보안취약점점검결과표.pptx` 신규. 잔여: Vercel Firewall/BotID 수동 설정·Supabase timeout·세션 블랙리스트(30일) |
 | **횡단7** | DA 거버넌스 중간점검 + i18n·Bean 요금 정정 (2026-06-23) | ✅ 완료 | da-governance-expert 에이전트 — sql/001~101 전수 감사(70+ 테이블), 전체 준수율 95%→100% 달성. P1: `sql/102` i18n 3테이블 시스템 컬럼 4종+논리삭제 추가. P2: `sql/103` bean_fee_plan SSGDM↔SSPDM 가격 역전 swap 정정. `docs/da/reports/2026-06-23_DA중간점검보고서.md` 작성(21KB). Supabase 적용 완료. |
 | **22** | 데이터 분석 & 시각화 (4-탭 통합 분석 페이지) | 📝 기획 완료·구현 대기 | `docs/PRD_21_DATA_ANAL.md` v1.1 — 6개 분석 도메인→4탭(매출·주문·접속/사용·퍼포먼스, `/admin/analytics`) 구상. 기존 통계 인프라 확장·북극성 배너·Pi/Bean 2층위·Plotly 표준. 신규 sql/122(코호트)·123(RFM) 즉시 / 124(세션)·125(퍼널) 선결. 동반: 매장주 후기 동의(sql/117)·평가항목 전체 시드(sql/118) **구현 완료**. ⚠️ sql/117·118 Supabase 적용 대기 |
+| **23** | 실시간 시스템 모니터링 (관리자 헬스 대시보드) | 🚧 기획 완료·구현 착수 | `docs/PRD_22_MONITOR.md` v1.0 — 6대 영역 24메트릭(시스템·DB·트래픽보안·비즈니스실시간·기능별·알림)을 `/admin/monitor`에 실시간 시각화. ⭐Pi 결제 성공률 최우선(신호등 99/95% + 미완료 5분 자동복구). Vercel Fluid Compute OS레벨 측정 한계→Vercel Analytics+Supabase+앱계측 조합("실시간"=분단위). SSE·관리자전용(클라이언트 게이트). 신규 `metric_*` 4테이블+RPC 4종(DA표준). MVP(기존데이터·인프라0)→고도화→자동화. ⚠️ 미결정: 저장정책(전량vs샘플링10%)·보존(7/30일)·갱신주기(1/5초) |
 
 ### 통계
-- **총 Phase**: 22개 + 횡단7(DA) (0~18 + 횡단 개선·문서화 + Phase 20 성능 + Phase 21 보안 + 횡단7 DA 거버넌스)
+- **총 Phase**: 23개 + 횡단7(DA) (0~18 + 횡단 개선·문서화 + Phase 20 성능 + Phase 21 보안 + 횡단7 DA 거버넌스 + Phase 22 분석 + Phase 23 모니터링)
 - **완료**: 19개 구현 완료 (Phase 18 판매자 주문 알림 포함 — 2026-06-18) + 횡단7 DA 중간점검 ✅
-- **진행 중**: 2개 (Phase 20 화면 성능 최적화 — Phase 1 착수·getEventRanking 병렬화 완료 · Phase 21 보안 강화 — 코드 완료·PRD v2.0 갱신·Pi Browser 보안 조치 완료·Vercel 설정 잔여, 2026-06-23)
+- **진행 중**: 3개 (Phase 20 화면 성능 최적화 · Phase 21 보안 강화 · **Phase 23 실시간 모니터링 — 구현 착수 2026-06-25**)
 - **기획·문서**: 1개 (Phase 17 BEAN 토큰 발행 — 문서 전용·앱 코드 0, T01/T02/T05 외부 회신 대기)
 - **예정**: 확장 Phase (PiRC3 실 에스크로 보류 해제 대기, LBS 지도 UI 추가 확장, PiVoice TURN 운영, 이벤트 행위훅 전수 점검, StarterKit 패키지 제품화) · **알림 Phase 2**: 카카오 알림톡(한국 판매자)·Telegram webhook 양방향(버튼으로 접수/거절)
 - ✅ **O2O 후속 완료(2026-06-18)**: 외부 알림 채널(Telegram)로 사장님 화면 미접속 시에도 주문 알림 도달 — Phase 18에서 구현
