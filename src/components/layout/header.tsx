@@ -6,13 +6,15 @@ import { ThemeToggle } from '@/components/theme-toggle'
 import { BrowserName } from '@/components/layout/browser-name'
 import { LanguageSwitcher } from '@/components/layout/language-switcher'
 import { PiPriceChip } from '@/components/layout/pi-price-chip'
-// 상단 고정 헤더: 로고 · 계정명(로그인 버튼 내장) · 로그인/아웃 · 다국어 · Pi 시세.
+import { HeaderShell } from '@/components/layout/header-shell'
+// 상단 헤더: 로고 · 계정명(로그인 버튼 내장) · 로그인/아웃 · 다국어 · Pi 시세.
 // 메뉴 이동(Home·Cafe·Shop·나의정보/관리자)은 BottomNav가 담당한다.
+// 셸(HeaderShell, client)이 Pi Browser 전용 플로팅/자동숨김을 처리하고, 내용은 server에서 렌더.
 export async function Header() {
   const locale = await getLocale()
 
   return (
-    <header className="bg-background/80 sticky top-0 z-50 border-b backdrop-blur-sm">
+    <HeaderShell>
       <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
         <Link href="/" className="text-foreground font-semibold tracking-tight">
           <BrowserName />
@@ -28,6 +30,6 @@ export async function Header() {
           <PiPriceChip locale={locale} />
         </nav>
       </div>
-    </header>
+    </HeaderShell>
   )
 }
