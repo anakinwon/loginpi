@@ -15,10 +15,10 @@ import type { ActivityStatsResponse } from '@/types/stats'
 //   북극성(활성 사용자) 지표를 전 탭 상단에 고정 — "판매는 수단, 활성 사용자가 목표".
 
 const TABS = [
-  { key: 'revenue', label: '💰 매출 분석' },
-  { key: 'order', label: '🧾 주문 분석' },
-  { key: 'usage', label: '👥 접속·사용 분석' },
-  { key: 'perf', label: '⚡ 퍼포먼스 분석' },
+  { key: 'usage', label: '👥 접속·사용' },
+  { key: 'order', label: '🧾 주문' },
+  { key: 'revenue', label: '💰 매출' },
+  { key: 'perf', label: '⚡ 퍼포먼스' },
 ] as const
 type TabKey = (typeof TABS)[number]['key']
 
@@ -45,7 +45,7 @@ function NorthStarMetric({
 }
 
 export function AnalyticsHub() {
-  const [tab, setTab] = useState<TabKey>('revenue')
+  const [tab, setTab] = useState<TabKey>('usage')
   const [period, setPeriod] = useState(30)
   const [activity, setActivity] = useState<ActivityStatsResponse | null>(null)
 
