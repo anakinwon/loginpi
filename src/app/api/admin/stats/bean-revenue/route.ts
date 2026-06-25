@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { publicCacheHeaders } from '@/lib/cache-headers'
 import type { BeanRevenueResponse } from '@/types/stats'
 
 // GET /api/admin/stats/bean-revenue — Bean 매출 KPI(누적) 집계.
@@ -20,5 +21,6 @@ export async function GET() {
     ...(data as Omit<BeanRevenueResponse, 'last_updated'>),
     last_updated: new Date().toISOString(),
   }
-  return NextResponse.json(body)
+  // 뷰어 불변(순수 집계·PII 없음) → 모든 visitor 공유 edge 캐시
+  return NextResponse.json(body, { headers: publicCacheHeaders() })
 }

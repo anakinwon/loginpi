@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { maskDisplayName } from '@/lib/display-mask'
+import { viewerScopedCacheHeaders } from '@/lib/cache-headers'
 import type {
   ActivityStatsResponse,
   ActivityDataPoint,
@@ -67,5 +68,6 @@ export async function GET(req: NextRequest) {
     series,
     topUsers,
   }
-  return NextResponse.json(body)
+  // 뷰어 의존(topUsers 마스킹) → 관리자 private / 게스트 마스킹분만 공유 캐시
+  return NextResponse.json(body, { headers: viewerScopedCacheHeaders(admin) })
 }

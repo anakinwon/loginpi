@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { publicCacheHeaders } from '@/lib/cache-headers'
 
 // GET /api/admin/analytics/performance?period=7|30|90|365 — 퍼포먼스/행동 분석 (Phase 22 §12 ④)
 //   세션/페이지뷰 추적층이 없어 페이지뷰·체류·반송률·이탈률·채널은 불가(선결조건).
@@ -130,12 +131,6 @@ export async function GET(req: NextRequest) {
       // 세션/페이지뷰 추적층 미구축 → 페이지뷰·체류·반송률·이탈률·채널은 선결조건
       sessionTrackingPending: true,
     },
-    {
-      headers: {
-        // Vercel edge 캐싱 60분 (모든 visitor 공유)
-        'Cache-Control': 's-maxage=3600, max-age=0, stale-while-revalidate=3600',
-        'CDN-Cache-Control': 'max-age=3600, stale-while-revalidate=3600',
-      },
-    },
+    { headers: publicCacheHeaders() },
   )
 }

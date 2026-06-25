@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { maskDisplayName } from '@/lib/display-mask'
+import { viewerScopedCacheHeaders } from '@/lib/cache-headers'
 
 // Bean 기간별 상위 지출자 — 홈 대시보드 'Top-3 지출자'(Pi→Bean 전환) 데이터.
 // 매출 통계와 동일 정책: 게스트 포함 공개(집계만)·개인 식별 정보는 관리자에게만(비관리자 마스킹).
@@ -52,5 +53,9 @@ export async function GET(req: NextRequest) {
     txn_cnt: Number(row.txn_cnt),
   }))
 
-  return NextResponse.json({ period, from_dt: fromDt, spenders })
+  // 뷰어 의존(spenders 마스킹) → 관리자 private / 게스트 마스킹분만 공유 캐시
+  return NextResponse.json(
+    { period, from_dt: fromDt, spenders },
+    { headers: viewerScopedCacheHeaders(admin) },
+  )
 }

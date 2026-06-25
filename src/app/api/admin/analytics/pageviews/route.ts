@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { publicCacheHeaders } from '@/lib/cache-headers'
 
 // GET /api/admin/analytics/pageviews?period=7|30|90|365 — 웹 트래픽 (Phase 22 §12 ④)
 //   stat_pageview를 세션별 시퀀스로 묶어 체류·반송·이탈·랜딩·채널을 파생.
@@ -121,12 +122,6 @@ export async function GET(req: NextRequest) {
       topLanding: topN(landing),
       topExit: topN(exit),
     },
-    {
-      headers: {
-        // Vercel edge 캐싱 60분 (모든 visitor 공유)
-        'Cache-Control': 's-maxage=3600, max-age=0, stale-while-revalidate=3600',
-        'CDN-Cache-Control': 'max-age=3600, stale-while-revalidate=3600',
-      },
-    },
+    { headers: publicCacheHeaders() },
   )
 }

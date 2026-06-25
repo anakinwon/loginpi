@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { publicCacheHeaders } from '@/lib/cache-headers'
 
 // GET /api/admin/analytics/usage?period=7|30|90|365 — 접속·사용 분석 (Phase 22 §12 ③)
 //   sys_user_actvty_log(일별 활동, UNIQUE usr_id×actvty_dt) + sys_user(가입일) +
@@ -162,12 +163,6 @@ export async function GET(req: NextRequest) {
       regions,
       locatedUsers: latestSido.size,
     },
-    {
-      headers: {
-        // Vercel edge 캐싱 60분 (모든 visitor 공유)
-        'Cache-Control': 's-maxage=3600, max-age=0, stale-while-revalidate=3600',
-        'CDN-Cache-Control': 'max-age=3600, stale-while-revalidate=3600',
-      },
-    },
+    { headers: publicCacheHeaders() },
   )
 }

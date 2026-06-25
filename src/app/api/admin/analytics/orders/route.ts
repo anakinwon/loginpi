@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { maskDisplayName } from '@/lib/display-mask'
+import { viewerScopedCacheHeaders } from '@/lib/cache-headers'
 
 // GET /api/admin/analytics/orders?period=7|30|90|365 — 주문 분석 (Phase 22 §12 ②)
 //   mps_order 직접 조회 → 요약·주문방법·요일×시간 히트맵·주문간격·RFM을 온더플라이 집계.
@@ -262,18 +263,8 @@ export async function GET(req: NextRequest) {
       },
     },
     {
-      // ⚠️ orders는 뷰어별 응답이 다름(관리자=실명·usr_id / 게스트=마스킹).
-      // 관리자(실명) 응답을 공유 CDN 캐시에 저장하면 이후 익명 게스트에게 PII가 그대로 서빙됨.
-      // → 관리자: private/no-store(공유 캐시 금지). 게스트(마스킹) 응답만 edge 캐시 +
-      //   Vary로 토큰·쿠키 보유(관리자/로그인) 요청과 캐시 버킷을 분리한다.
-      headers: admin
-        ? { 'Cache-Control': 'private, no-store' }
-        : {
-            'Cache-Control':
-              'public, s-maxage=3600, max-age=0, stale-while-revalidate=3600',
-            'CDN-Cache-Control': 'public, max-age=3600, stale-while-revalidate=3600',
-            Vary: 'Cookie, X-Pi-Token',
-          },
+      // 뷰어 의존(관리자=실명·usr_id / 게스트=마스킹) → 관리자 private / 게스트 마스킹분만 공유 캐시
+      headers: viewerScopedCacheHeaders(admin),
     },
   )
 }
