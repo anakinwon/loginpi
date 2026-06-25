@@ -92,7 +92,7 @@ export function StoreItemList({ mine = false }: StoreItemListProps) {
   const [userLng, setUserLng] = useState<number | null>(null)
   const [locLoading, setLocLoading] = useState(false)
 
-  const limit = 5
+  const limit = 20
 
   // 카테고리 트리 로드 (공개 API) — 내 상품 모드에서는 불필요
   useEffect(() => {

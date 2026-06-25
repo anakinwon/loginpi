@@ -5,6 +5,8 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { listOpenItems, listMyItems, createItem } from '@/lib/mps-item'
 import { getDistCfg } from '@/lib/mps-dist-cfg'
 
+export const revalidate = 120 // 2분 캐시 (공개 상품 목록)
+
 // GET /api/store/items — 공개 목록 (Guest 허용) | ?mine=1 — 내 상품 (인증)
 export async function GET(req: NextRequest) {
   const sp = req.nextUrl.searchParams
