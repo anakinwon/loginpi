@@ -57,15 +57,23 @@ export interface UiTheme {
   sort_ord: number
 }
 
-// 색상 값 보안 검증 — hex/oklch/rgb/hsl 등 색상 문자열만 허용.
-// CSS 구문 탈출 문자({ } ; < > 등)를 차단해 스타일 주입 공격 방지.
-const COLOR_VALUE_RE = /^[#a-zA-Z0-9().%,/\s-]{1,64}$/
+// 색상 값 보안 검증 — "문자셋"이 아니라 "색상 형식"을 허용리스트로 검사.
+// (문자셋 검사는 url(//evil.com/x) 같은 프로토콜 상대 URL을 통과시켜
+//  외부 리소스 로딩·CSP 우회 위험 → 형식 허용리스트로 차단)
+// 허용: hex(#RGB/#RRGGBB/#RRGGBBAA) 또는 명시적 색상 함수(내부는 숫자·기호만).
+const HEX_RE = /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/
+const COLOR_FN_RE =
+  /^(?:rgb|rgba|hsl|hsla|oklch|oklab|lch|lab|color)\(\s*[0-9eE+\-.%,\s/]+\)$/
+// 색상 함수 내부에 침투할 수 있는 위험 토큰(이중 방어)
+const DANGER_RE = /url|image|expression|@|var\(|attr\(/
 
 export function sanitizeColor(value: unknown): string | null {
   if (typeof value !== 'string') return null
   const v = value.trim()
-  if (!v || !COLOR_VALUE_RE.test(v)) return null
-  return v
+  if (!v || v.length > 64) return null
+  if (DANGER_RE.test(v.toLowerCase())) return null
+  if (HEX_RE.test(v) || COLOR_FN_RE.test(v)) return v
+  return null
 }
 
 // 입력 토큰을 화이트리스트 + sanitize로 정제 (저장 전 검증)
