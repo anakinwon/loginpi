@@ -23,17 +23,25 @@ export async function GET(request: NextRequest) {
   // 통합 검색어 — 카페이름·소개 prefix 검색. 길이 제한(50)만, 와일드카드 이스케이프는 RPC가 처리.
   const q = (sp.get('q') ?? '').trim().slice(0, 50)
 
+  // 페이지네이션: page(0 기반), limit(기본 30, 최대 100)
+  const page = Math.max(0, Number(sp.get('page') ?? '0'))
+  const rawLimit = Number(sp.get('limit') ?? '30')
+  const limit = Math.min(100, Math.max(1, rawLimit))
+  const offset = page * limit
+
   const db = getSupabaseAdmin()
   // 검색어가 있으면 검색 RPC(이름·소개 UNION ALL prefix), 없으면 기존 인기 랭킹 RPC.
   const roomsRpc = q
     ? db.rpc('fn_chat_marketplace_search', {
         p_q: q,
         p_theme_cd: themeCd ?? null,
-        p_limit: 30,
+        p_limit: limit,
+        p_offset: offset,
       })
     : db.rpc('fn_chat_marketplace', {
         p_theme_cd: themeCd ?? null,
-        p_limit: 30,
+        p_limit: limit,
+        p_offset: offset,
       })
 
   const [{ data: rooms, error }, { data: themes }, { data: follows }] =
@@ -59,6 +67,11 @@ export async function GET(request: NextRequest) {
     )
 
   return NextResponse.json({
+    pagination: {
+      page,
+      limit,
+      offset,
+    },
     rooms: rooms ?? [],
     themes: themes ?? [],
     followedThemes: (follows ?? []).map(
