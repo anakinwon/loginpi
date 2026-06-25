@@ -77,6 +77,7 @@ export function BottomNavClient({ serverIsAdmin }: { serverIsAdmin: boolean }) {
 
   return (
     <nav
+      aria-hidden={floating && !visible}
       className={cn(
         'fixed z-50 backdrop-blur-sm transition-opacity ease-in-out',
         floating
@@ -87,11 +88,12 @@ export function BottomNavClient({ serverIsAdmin }: { serverIsAdmin: boolean }) {
             'inset-x-3 overflow-hidden rounded-2xl border bg-muted bg-gradient-to-b from-muted to-[var(--color-border)] shadow-[0_14px_34px_-8px_rgba(0,0,0,0.42),inset_0_1px_0_0_rgba(255,255,255,0.25),inset_0_-2px_3px_-1px_rgba(0,0,0,0.16)]'
           : // 일반 브라우저: 기존 도킹 바 (하단 풀폭, safe-area 패딩)
             'bg-background/95 inset-x-0 bottom-0 border-t pb-[env(safe-area-inset-bottom)]',
-        // 움직임: 90% 선명 / 멈춤: 30%로 흐려지되 클릭은 계속 유지(pointer-events 살림).
-        // → 숨은 상태 첫 탭이 '깨우기'로 삼켜지지 않고 즉시 이동된다.
+        // 가시: 90% 불투명 / 숨김: 투명(opacity-0) 완전 fade-out + 터치 차단.
         // 선명해질 땐 빠르게(200ms), 흐려질 땐 천천히(700ms) fade.
         floating &&
-          (visible ? 'opacity-90 duration-200' : 'opacity-30 duration-700'),
+          (visible
+            ? 'opacity-90 duration-200'
+            : 'pointer-events-none opacity-0 duration-700'),
       )}
       style={
         floating
