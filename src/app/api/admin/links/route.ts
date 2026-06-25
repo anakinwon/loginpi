@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
   let query = getSupabaseAdmin()
     .from('sys_user')
     .select(
-      'id, pi_uid, pi_username, google_id, google_email, google_name, display_name, role, reg_dtm',
+      'id, pi_uid, pi_username, google_id, google_email, google_name, display_name, role, reg_dtm, del_yn, del_dtm',
     )
     .order('reg_dtm', { ascending: false })
 
@@ -35,4 +35,54 @@ export async function GET(req: NextRequest) {
   }
 
   return NextResponse.json({ users: data })
+}
+
+// PATCH /api/admin/links — 계정 활성/비활성 토글 (del_yn).
+//   del_yn='Y'는 "앞으로 절대 사용하지 않는 계정" — 인증·단건 조회 전반에서 차단된다.
+//   (논리삭제: 물리 DELETE 금지, del_dtm 기록)
+export async function PATCH(req: NextRequest) {
+  const requester = await getSessionUser()
+  if (!isAdmin(requester)) {
+    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+  }
+
+  let body: { userId?: string; del_yn?: string }
+  try {
+    body = (await req.json()) as { userId?: string; del_yn?: string }
+  } catch {
+    return NextResponse.json({ error: '잘못된 요청' }, { status: 400 })
+  }
+
+  const { userId, del_yn } = body
+  if (!userId || (del_yn !== 'Y' && del_yn !== 'N')) {
+    return NextResponse.json(
+      { error: 'userId와 del_yn(Y|N)이 필요합니다' },
+      { status: 400 },
+    )
+  }
+
+  // 자기 자신은 비활성화 금지 (관리자 자기 계정 잠금 방지)
+  if (userId === requester!.id && del_yn === 'Y') {
+    return NextResponse.json(
+      { error: '본인 계정은 비활성화할 수 없습니다' },
+      { status: 400 },
+    )
+  }
+
+  const now = new Date().toISOString()
+  const { error } = await getSupabaseAdmin()
+    .from('sys_user')
+    .update({
+      del_yn,
+      del_dtm: del_yn === 'Y' ? now : null,
+      modr_id: requester!.id,
+      mod_dtm: now,
+    })
+    .eq('id', userId)
+
+  if (error) {
+    return NextResponse.json({ error: '상태 변경 실패' }, { status: 500 })
+  }
+
+  return NextResponse.json({ success: true, userId, del_yn })
 }

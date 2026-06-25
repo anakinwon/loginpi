@@ -21,6 +21,8 @@ interface UserRow {
   display_name: string
   role: string
   reg_dtm: string
+  del_yn: string | null // 'Y' = 비활성(앞으로 절대 사용하지 않는 계정)
+  del_dtm: string | null
 }
 
 function getLinkStatus(u: UserRow): LinkStatus {
@@ -50,7 +52,35 @@ export default function LinksPage() {
   const [filter, setFilter] = useState<LinkStatus | 'all'>('all')
   const [search, setSearch] = useState('') // pi_username 부분일치(trigram) 검색
   const [page, setPage] = useState(1)
+  const [toggling, setToggling] = useState<string | null>(null)
   const limit = useDynamicLimit(CHROME_PX)
+
+  // 계정 활성/비활성 토글 (del_yn). 'Y'=앞으로 절대 사용하지 않는 계정 → 모든 화면에서 차단.
+  async function toggleActive(u: UserRow) {
+    const next = u.del_yn === 'Y' ? 'N' : 'Y'
+    if (next === 'Y' && !window.confirm(t('confirmDisable', { name: u.display_name })))
+      return
+    setToggling(u.id)
+    try {
+      const res = await fetch('/api/admin/links', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: u.id, del_yn: next }),
+      })
+      if (!res.ok) {
+        const d = (await res.json().catch(() => ({}))) as { error?: string }
+        window.alert(d.error ?? t('toggleFailed'))
+        return
+      }
+      // optimistic 갱신 — 목록·통계 양쪽 반영
+      const apply = (arr: UserRow[]) =>
+        arr.map((x) => (x.id === u.id ? { ...x, del_yn: next } : x))
+      setUsers(apply)
+      setAllUsers(apply)
+    } finally {
+      setToggling(null)
+    }
+  }
 
   // limit 또는 필터/검색 변경 시 첫 페이지로 리셋
   useEffect(() => {
@@ -227,15 +257,19 @@ export default function LinksPage() {
                 <th className="px-4 py-2 text-left font-medium">
                   {t('col.joinDate')}
                 </th>
+                <th className="px-4 py-2 text-left font-medium">
+                  {t('col.status')}
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y">
               {displayedLinks.map((u) => {
                 const status = getLinkStatus(u)
+                const inactive = u.del_yn === 'Y'
                 return (
                   <tr
                     key={u.id}
-                    className="hover:bg-muted/30 transition-colors"
+                    className={`hover:bg-muted/30 transition-colors ${inactive ? 'opacity-45' : ''}`}
                   >
                     <td className="px-4 py-3 font-medium">{u.display_name}</td>
                     <td className="text-muted-foreground px-4 py-3">
@@ -267,6 +301,34 @@ export default function LinksPage() {
                             hour12: false,
                           })
                         : '—'}
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                            inactive
+                              ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                              : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                          }`}
+                        >
+                          {inactive ? t('inactive') : t('active')}
+                        </span>
+                        <button
+                          onClick={() => toggleActive(u)}
+                          disabled={toggling === u.id}
+                          className={`rounded-md border px-2 py-1 text-xs font-medium transition-colors disabled:opacity-50 ${
+                            inactive
+                              ? 'border-green-300 text-green-700 hover:bg-green-50 dark:border-green-800 dark:text-green-400 dark:hover:bg-green-900/20'
+                              : 'border-red-300 text-red-700 hover:bg-red-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/20'
+                          }`}
+                        >
+                          {toggling === u.id
+                            ? '…'
+                            : inactive
+                              ? t('enable')
+                              : t('disable')}
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 )

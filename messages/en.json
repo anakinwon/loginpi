@@ -175,7 +175,8 @@
         "linkStatus": "Linking Status",
         "piAccount": "Pi Account",
         "role": "Role",
-        "user": "User"
+        "user": "User",
+        "status": "Status"
       },
       "desc": {
         "googleOnly": "Pi not linked",
@@ -191,7 +192,13 @@
         "piOnly": "Pi Only"
       },
       "title": "Account Linking Status",
-      "totalCount": "Total {count} users"
+      "totalCount": "Total {count} users",
+      "active": "Active",
+      "inactive": "Disabled",
+      "disable": "Disable",
+      "enable": "Restore",
+      "confirmDisable": "Disable account '{name}'? This account will be blocked across all screens.",
+      "toggleFailed": "Failed to change status."
     },
     "logs": {
       "col": {

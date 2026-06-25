@@ -306,8 +306,15 @@
         "googleAccount": "Google 계정",
         "linkStatus": "연동 상태",
         "role": "역할",
-        "joinDate": "가입일시"
-      }
+        "joinDate": "가입일시",
+        "status": "상태"
+      },
+      "active": "사용중",
+      "inactive": "사용안함",
+      "disable": "비활성화",
+      "enable": "복구",
+      "confirmDisable": "'{name}' 계정을 비활성화하시겠습니까? 이 계정은 앞으로 모든 화면에서 차단됩니다.",
+      "toggleFailed": "상태 변경에 실패했습니다."
     },
     "logs": {
       "title": "로그 관리",
