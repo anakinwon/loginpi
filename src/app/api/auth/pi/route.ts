@@ -1,12 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { signPayload, verifyPayload } from '@/lib/pi-session-crypto'
 import { upsertPiUser } from '@/lib/users'
+import { getSessionUser } from '@/lib/auth-check'
 import { recordActivity } from '@/lib/activity-log'
 import { withAuthGuard } from '@/lib/api-guard'
 import type { PiSessionUser } from '@/types/pi-session'
+import type { UserRow } from '@/lib/users'
 
 const PI_API_URL = 'https://api.minepi.com/v2/me'
 const MAX_COOKIE_AGE_SEC = 7 * 24 * 60 * 60
+
+// 통합 세션(Google/Pi 헤더)으로 복원된 DB 사용자 → 클라이언트용 PiSessionUser 매핑.
+// Pi 전용 정보(walletAddress·scopes)는 Pi 쿠키 경로에서만 채워지며, 여기선 게이트 판정에 충분한 최소 필드만 채운다.
+function toPiSessionUser(u: UserRow): PiSessionUser {
+  return {
+    userId: u.id,
+    uid: u.pi_uid ?? '',
+    displayName: u.display_name,
+    username: u.pi_username,
+    walletAddress: null,
+    scopesGranted: [],
+    tokenValidUntil: new Date(Date.now() + MAX_COOKIE_AGE_SEC * 1000).toISOString(),
+    role: u.role,
+    nick_nm: u.nick_nm,
+  }
+}
 
 function getSecret(): string {
   const secret = process.env.PI_SESSION_SECRET
@@ -18,7 +36,17 @@ function getSecret(): string {
 // 현재 세션 반환 (쿠키 서명 검증 + 만료 확인)
 export const GET = withAuthGuard(async function (request: NextRequest) {
   const cookieValue = request.cookies.get('pi_session')?.value
-  if (!cookieValue) return NextResponse.json({ user: null })
+  if (!cookieValue) {
+    // Pi 세션 쿠키 없음 → 통합 세션(Google NextAuth, 또는 X-Pi-Token 헤더) 폴백.
+    // API route라 auth()가 정상 동작하므로, SSR(서버 컴포넌트)이 Google 세션을 못 읽는
+    // 환경(모바일 일반 브라우저 등)에서도 클라이언트 usePiAuth가 사용자를 인식하게 한다.
+    const sessionUser = await getSessionUser()
+    if (sessionUser) {
+      recordActivity(sessionUser.id, 'LOGIN')
+      return NextResponse.json({ user: toPiSessionUser(sessionUser) })
+    }
+    return NextResponse.json({ user: null })
+  }
 
   let secret: string
   try {
