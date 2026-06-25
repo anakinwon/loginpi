@@ -10,7 +10,8 @@ import { BeanTopSpenders } from '@/components/admin/stats/bean-top-spenders'
 import { BeanRevenueDistribution } from '@/components/admin/token-distribution'
 import { BeanIcon } from '@/components/ui/bean-icon'
 import RevenueTreemapChart from '@/components/charts/revenue-treemap-chart'
-import { themeLabel } from '@/lib/stats-labels'
+import BubbleChart from '@/components/charts/bubble-chart'
+import { themeLabel, themeColorMap } from '@/lib/stats-labels'
 import type { RevenueStatsResponse, BeanRevenueResponse } from '@/types/stats'
 
 // Plotly 차트는 window 의존 → dynamic + ssr:false
@@ -121,6 +122,18 @@ export function RevenueTab({ period }: { period: number }) {
     [rev],
   )
 
+  // 테마별 매출 버블 (Bean 환산: 1 Pi = 100 Bean) — 비중은 단위 불변, 색은 트리맵과 동일 매핑
+  const bubbleItems = useMemo(() => {
+    const themes = rev?.topThemes ?? []
+    const colorOf = themeColorMap(themes.map((t) => t.theme_cd))
+    return themes.map((t) => ({
+      label: t.theme_nm ?? themeLabel(t.theme_cd),
+      value: t.total_pi * 100, // Bean 페그 환산 (비중 동일)
+      emoji: t.theme_emoji ?? undefined,
+      color: colorOf[t.theme_cd],
+    }))
+  }, [rev])
+
   if (error)
     return (
       <div className="border-destructive/30 bg-destructive/5 rounded-lg border p-6 text-center">
@@ -198,6 +211,23 @@ export function RevenueTab({ period }: { period: number }) {
           )}
         </div>
         <BeanRevenueDistribution period={period} />
+      </div>
+
+      {/* 테마별 매출 비중 (Bean) — cryptobubbles 스타일 버블 */}
+      <div className="rounded-lg border p-4">
+        <div className="mb-2 flex items-center justify-between">
+          <p className="text-sm font-medium">테마별 매출 비중 (Bean)</p>
+          <span className="text-muted-foreground text-xs">
+            버블 크기 = 매출 비중 · 1 Pi = 100 Bean 환산
+          </span>
+        </div>
+        <LazySection>
+          {rev ? (
+            <BubbleChart items={bubbleItems} />
+          ) : (
+            <div className="bg-muted h-80 animate-pulse rounded-lg" />
+          )}
+        </LazySection>
       </div>
 
       {/* Zone 4 — 상세: ABC(파레토) 분석 + Top 소비자 */}
