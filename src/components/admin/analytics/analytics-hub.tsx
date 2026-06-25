@@ -8,17 +8,17 @@ import { StatsDateFilter } from '@/components/admin/stats/stats-date-filter'
 import { RevenueTab } from './revenue-tab'
 import { OrderTab } from './order-tab'
 import { UsageTab } from './usage-tab'
+import { PerformanceTab } from './performance-tab'
 import type { ActivityStatsResponse } from '@/types/stats'
 
-// 통합 분석 허브 (Phase 22 §12) — 6개 분석 도메인을 4개 탭으로 재편.
-//   Phase 2 범위: ① 매출 분석 탭 완성. ②~④는 후속(플레이스홀더).
+// 통합 분석 허브 (Phase 22 §12) — 6개 분석 도메인을 4개 탭으로 재편(전 탭 구현 완료).
 //   북극성(활성 사용자) 지표를 전 탭 상단에 고정 — "판매는 수단, 활성 사용자가 목표".
 
 const TABS = [
-  { key: 'revenue', label: '💰 매출 분석', phase: '' },
-  { key: 'order', label: '🧾 주문 분석', phase: '' },
-  { key: 'usage', label: '👥 접속·사용 분석', phase: '' },
-  { key: 'perf', label: '⚡ 퍼포먼스 분석', phase: 'Phase 5~6 (세션 추적 선결)' },
+  { key: 'revenue', label: '💰 매출 분석' },
+  { key: 'order', label: '🧾 주문 분석' },
+  { key: 'usage', label: '👥 접속·사용 분석' },
+  { key: 'perf', label: '⚡ 퍼포먼스 분석' },
 ] as const
 type TabKey = (typeof TABS)[number]['key']
 
@@ -39,18 +39,6 @@ function NorthStarMetric({
         <span className="text-muted-foreground ml-1 text-xs font-normal">
           {unit}
         </span>
-      </p>
-    </div>
-  )
-}
-
-function ComingSoon({ phase }: { phase: string }) {
-  return (
-    <div className="border-muted-foreground/20 bg-muted/30 flex flex-col items-center justify-center rounded-lg border border-dashed p-12 text-center">
-      <p className="text-2xl">🛠️</p>
-      <p className="mt-2 text-sm font-medium">구현 예정</p>
-      <p className="text-muted-foreground mt-1 text-xs">
-        {phase} 단계에서 제공됩니다. (정본: docs/PRD_21_DATA_ANAL.md §12)
       </p>
     </div>
   )
@@ -139,7 +127,7 @@ export function AnalyticsHub() {
       ) : tab === 'usage' ? (
         <UsageTab period={period} />
       ) : (
-        <ComingSoon phase={TABS.find((t) => t.key === tab)?.phase ?? ''} />
+        <PerformanceTab period={period} />
       )}
     </div>
   )
