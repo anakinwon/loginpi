@@ -93,6 +93,28 @@ export default function BubbleChart({ items }: { items: BubbleItem[] }) {
         className="h-[340px] w-full"
         preserveAspectRatio="xMidYMid meet"
       >
+        <defs>
+          {/* 색 무관 3D 구체 셰이딩 — 상단 하이라이트 + 가장자리 음영(objectBoundingBox 자동 스케일) */}
+          <radialGradient id="bubbleHi" cx="35%" cy="28%" r="68%">
+            <stop offset="0%" stopColor="#fff" stopOpacity="0.65" />
+            <stop offset="35%" stopColor="#fff" stopOpacity="0.14" />
+            <stop offset="100%" stopColor="#fff" stopOpacity="0" />
+          </radialGradient>
+          <radialGradient id="bubbleRim" cx="50%" cy="50%" r="50%">
+            <stop offset="55%" stopColor="#000" stopOpacity="0" />
+            <stop offset="100%" stopColor="#000" stopOpacity="0.28" />
+          </radialGradient>
+          {/* 부유 그림자 — 입체 분리감 */}
+          <filter id="bubbleShadow" x="-30%" y="-30%" width="160%" height="160%">
+            <feDropShadow
+              dx="0"
+              dy="1.2"
+              stdDeviation="1.6"
+              floodColor="#000"
+              floodOpacity="0.3"
+            />
+          </filter>
+        </defs>
         {placed.map((b, i) => {
           const fill = b.item.color ?? '#94a3b8'
           const showLabel = b.r > 34
@@ -107,15 +129,27 @@ export default function BubbleChart({ items }: { items: BubbleItem[] }) {
               }}
             >
               <title>{`${b.item.label} · ${b.pct.toFixed(1)}%`}</title>
+              {/* 1) 반투명 80% 베이스 색 구 + 그림자 */}
               <circle
                 cx={b.x}
                 cy={b.y}
                 r={b.r}
                 fill={fill}
-                fillOpacity={0.85}
-                stroke={fill}
-                strokeOpacity={0.95}
-                strokeWidth={1}
+                fillOpacity={0.8}
+                filter="url(#bubbleShadow)"
+              />
+              {/* 2) 가장자리 음영(구 볼륨) */}
+              <circle cx={b.x} cy={b.y} r={b.r} fill="url(#bubbleRim)" />
+              {/* 3) 상단 광택 하이라이트 */}
+              <circle cx={b.x} cy={b.y} r={b.r} fill="url(#bubbleHi)" />
+              {/* 4) 정반사 스페큘러 점 */}
+              <ellipse
+                cx={b.x - b.r * 0.32}
+                cy={b.y - b.r * 0.4}
+                rx={b.r * 0.22}
+                ry={b.r * 0.14}
+                fill="#fff"
+                fillOpacity={0.55}
               />
               {showEmoji && (
                 <text
