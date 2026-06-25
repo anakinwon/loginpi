@@ -32,6 +32,8 @@ interface MonitorData {
 
 const REFRESH_MS = 5000
 const HISTORY_MAX = 24 // 스파크라인 점 개수 (약 2분)
+// Vercel 함수 메모리 추정 한계(기본 1GB) — RSS 점유율 참고용(정확 limit는 런타임 미노출)
+const ASSUMED_LIMIT_MB = 1024
 
 // 경량 스파크라인 (최근 N점 → SVG polyline). Plotly보다 가벼워 실시간 폴링에 적합.
 function Sparkline({ data, stroke }: { data: number[]; stroke: string }) {
@@ -97,8 +99,8 @@ export function MonitorDashboard() {
         setData(d)
         setErr(false)
         setLastOk(new Date().toLocaleTimeString('ko-KR'))
-        // 메모리 시계열 누적
-        setMemHist((h) => [...h, d.system.heap_pct].slice(-HISTORY_MAX))
+        // 메모리 시계열 누적 — RSS(실제 점유) 추세 (heap%는 항상 높아 추세 무의미)
+        setMemHist((h) => [...h, d.system.rss_mb].slice(-HISTORY_MAX))
         // CPU 사용률 계산 (델타 기반)
         const now = Date.now()
         const prev = prevCpu.current
@@ -216,14 +218,19 @@ export function MonitorDashboard() {
 
       {/* 시스템 리소스 — 메모리·CPU 시계열 (현재 함수 인스턴스 기준) */}
       <div className="grid gap-4 sm:grid-cols-2">
-        <Card title="🧠 메모리 (heap 사용률)">
+        <Card title="🧠 메모리 (RSS 실점유)">
           <div className="flex items-end gap-3">
-            <span className="text-2xl font-bold">{data.system.heap_pct}%</span>
-            <span className="text-muted-foreground mb-1 text-xs">
-              {data.system.heap_used_mb} / {data.system.heap_total_mb} MB · RSS {data.system.rss_mb}MB
+            <span className="text-2xl font-bold">{data.system.rss_mb}MB</span>
+            <span
+              className={`mb-1 text-xs ${data.system.rss_mb / ASSUMED_LIMIT_MB > 0.85 ? 'text-red-600 dark:text-red-400' : 'text-muted-foreground'}`}
+            >
+              추정 1GB 대비 {Math.round((100 * data.system.rss_mb) / ASSUMED_LIMIT_MB)}%
             </span>
           </div>
           <Sparkline data={memHist} stroke="var(--chart-1)" />
+          <p className="text-muted-foreground mt-1 text-xs">
+            heap {data.system.heap_used_mb}/{data.system.heap_total_mb}MB ({data.system.heap_pct}% · 70~90% 정상)
+          </p>
         </Card>
 
         <Card title="🔥 CPU 사용률 (델타)">
