@@ -155,9 +155,10 @@ export function ClientMyShops({
     )
   }
 
+  // 매장 신규 등록 = 구글맵 인증(claim)으로만. 자유 등록 폐기 → 지도로 안내.
   function openNew() {
-    setForm(EMPTY_FORM)
-    setEditingId('')
+    toast.info('매장은 구글맵 인증으로 등록합니다. 지도에서 내 매장을 찾아 인증 등록해 주세요.')
+    router.push('/map')
   }
 
   function openEdit(shop: Shop) {
