@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils'
 import { StatsDateFilter } from '@/components/admin/stats/stats-date-filter'
 import { RevenueTab } from './revenue-tab'
 import { OrderTab } from './order-tab'
+import { UsageTab } from './usage-tab'
 import type { ActivityStatsResponse } from '@/types/stats'
 
 // 통합 분석 허브 (Phase 22 §12) — 6개 분석 도메인을 4개 탭으로 재편.
@@ -16,7 +17,7 @@ import type { ActivityStatsResponse } from '@/types/stats'
 const TABS = [
   { key: 'revenue', label: '💰 매출 분석', phase: '' },
   { key: 'order', label: '🧾 주문 분석', phase: '' },
-  { key: 'usage', label: '👥 접속·사용 분석', phase: 'Phase 4 (코호트·지리)' },
+  { key: 'usage', label: '👥 접속·사용 분석', phase: '' },
   { key: 'perf', label: '⚡ 퍼포먼스 분석', phase: 'Phase 5~6 (세션 추적 선결)' },
 ] as const
 type TabKey = (typeof TABS)[number]['key']
@@ -135,6 +136,8 @@ export function AnalyticsHub() {
         <RevenueTab period={period} />
       ) : tab === 'order' ? (
         <OrderTab period={period} />
+      ) : tab === 'usage' ? (
+        <UsageTab period={period} />
       ) : (
         <ComingSoon phase={TABS.find((t) => t.key === tab)?.phase ?? ''} />
       )}
