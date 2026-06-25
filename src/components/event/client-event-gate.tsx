@@ -622,10 +622,10 @@ export function ClientEventGate() {
           <table className="w-full border-collapse text-sm">
             <thead>
               <tr className="bg-muted border-b">
-                <th className="bg-muted sticky left-0 z-10 w-9 py-2 pr-0 pl-2 text-left font-semibold">
+                <th className="bg-muted sticky left-0 z-10 w-8 px-1 py-2 text-center font-semibold">
                   {t('rankCol')}
                 </th>
-                <th className="bg-muted sticky left-9 z-10 py-2 pr-2 pl-1 text-left font-semibold">
+                <th className="bg-muted sticky left-8 z-10 py-2 pr-2 pl-1 text-left font-semibold">
                   {t('agentCol')}
                 </th>
                 <th className="p-2 text-center font-semibold">
@@ -655,10 +655,10 @@ export function ClientEventGate() {
                   key={r.user_id}
                   className="hover:bg-muted/50 h-12 border-b transition-colors"
                 >
-                  <td className="sticky left-0 z-10 w-9 bg-white pr-0 pl-2 font-semibold dark:bg-slate-950">
+                  <td className="sticky left-0 z-10 w-8 bg-white px-1 text-center font-semibold dark:bg-slate-950">
                     {r.rank ?? '-'}
                   </td>
-                  <td className="sticky left-9 z-10 bg-white pr-2 pl-1 dark:bg-slate-950">
+                  <td className="sticky left-8 z-10 bg-white pr-2 pl-1 dark:bg-slate-950">
                     {maskAgentName(r, isAdmin, t('noName'))}
                   </td>
                   <td className="px-2 text-center font-bold">

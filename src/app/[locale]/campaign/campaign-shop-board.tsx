@@ -169,10 +169,10 @@ export function CampaignShopBoard() {
         <table className="w-full border-collapse text-sm">
           <thead>
             <tr className="bg-muted border-b">
-              <th className="bg-muted sticky left-0 z-10 w-12 px-2 py-2.5 text-center font-semibold">
+              <th className="bg-muted sticky left-0 z-10 w-8 px-1 py-2.5 text-center font-semibold">
                 {t('colRank')}
               </th>
-              <th className="bg-muted sticky left-12 z-10 px-3 py-2.5 text-left font-semibold">
+              <th className="bg-muted sticky left-8 z-10 py-2.5 pr-3 pl-1 text-left font-semibold">
                 {t('colShop')}
               </th>
               <th className="px-3 py-2.5 text-center font-semibold">{t('colDone')}</th>
@@ -204,10 +204,10 @@ export function CampaignShopBoard() {
                     isMe ? 'ring-primary/40 ring-inset ring-2' : '',
                   ].join(' ')}
                 >
-                  <td className="bg-card sticky left-0 z-10 w-12 px-2 py-2.5 text-center font-semibold tabular-nums">
+                  <td className="bg-card sticky left-0 z-10 w-8 px-1 py-2.5 text-center font-semibold tabular-nums">
                     {r.rank}
                   </td>
-                  <td className="bg-card sticky left-12 z-10 px-3 py-2.5">
+                  <td className="bg-card sticky left-8 z-10 py-2.5 pr-3 pl-1">
                     <div className="flex items-center gap-1.5">
                       <span className="font-medium">{r.shop_nm}</span>
                       {isMe && (
