@@ -262,6 +262,7 @@
       "payments": "Payment History",
       "reports": "Report Processing",
       "settle": "Settlement Management",
+      "analytics": "Analytics",
       "stats": "Statistics",
       "stdApprovals": "Approval Workflow",
       "stdAudit": "Change History",

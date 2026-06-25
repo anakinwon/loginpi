@@ -3,6 +3,7 @@
     "nav": {
       "title": "Admin",
       "dashboard": "대시보드",
+      "analytics": "통합 분석",
       "stats": "통계",
       "users": "사용자 관리",
       "consents": "약관 동의 내역",

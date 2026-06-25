@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 
 const NAV = [
+  { href: '/admin/analytics', labelKey: 'analytics' },
   { href: '/admin/stats', labelKey: 'stats' },
   { href: '/admin/users', labelKey: 'users' },
   { href: '/admin/consents', labelKey: 'consents' },

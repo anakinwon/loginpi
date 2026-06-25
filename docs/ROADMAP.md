@@ -59,6 +59,7 @@ Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Net
 | **20** | 화면 성능 최적화 (6탭 전수 진단) | 🚧 진단 완료·Phase 1 착수 | PRD_18_PERFORM — home·event·cafe·shop·map·admin 6탭 CRITICAL 4·HIGH 15·MEDIUM 18(총 37건) 식별 + 3단계 로드맵(38h). **Phase 1 즉시개선 적용(2026-06-23)**: HOME LazySection rootMargin 200→50px+aggregate 로깅 · EVENT 미션 재평가 가드+피드백 · SHOP ItemCard memo. **EVENT `getEventRanking` 6순차쿼리→2단계 병렬(Promise.all) — 왕복 ~40% 감소(2026-06-23)**. 잔여 CRITICAL: CAFE WebSocket 폴백·SHOP Pi결제 window.Pi 가드·MAP 마커 클러스터링 |
 | **21** | 보안 강화 (KISA 21개 + DDoS 5계층) | 🔶 코드 완료·Vercel 설정 잔여 | `docs/PRD_2_SECURITY.md` **v2.0**(✅18 양호·🔍3 추가확인·➖2 해당없음) + `docs/SECURITY_DDOS_POLICY.md` + DDoS 코드 구현(2026-06-23). **Pi Browser 제약 반영(2026-06-23)**: CSP·X-Frame-Options 제거(WebView SDK 차단·iframe 임베딩 문제 수정)·Google Maps 오류 수정. `docs/보안취약점점검결과표.pptx` 신규. 잔여: Vercel Firewall/BotID 수동 설정·Supabase timeout·세션 블랙리스트(30일) |
 | **횡단7** | DA 거버넌스 중간점검 + i18n·Bean 요금 정정 (2026-06-23) | ✅ 완료 | da-governance-expert 에이전트 — sql/001~101 전수 감사(70+ 테이블), 전체 준수율 95%→100% 달성. P1: `sql/102` i18n 3테이블 시스템 컬럼 4종+논리삭제 추가. P2: `sql/103` bean_fee_plan SSGDM↔SSPDM 가격 역전 swap 정정. `docs/da/reports/2026-06-23_DA중간점검보고서.md` 작성(21KB). Supabase 적용 완료. |
+| **22** | 데이터 분석 & 시각화 (4-탭 통합 분석 페이지) | 📝 기획 완료·구현 대기 | `docs/PRD_21_DATA_ANAL.md` v1.1 — 6개 분석 도메인→4탭(매출·주문·접속/사용·퍼포먼스, `/admin/analytics`) 구상. 기존 통계 인프라 확장·북극성 배너·Pi/Bean 2층위·Plotly 표준. 신규 sql/122(코호트)·123(RFM) 즉시 / 124(세션)·125(퍼널) 선결. 동반: 매장주 후기 동의(sql/117)·평가항목 전체 시드(sql/118) **구현 완료**. ⚠️ sql/117·118 Supabase 적용 대기 |
 
 ### 통계
 - **총 Phase**: 22개 + 횡단7(DA) (0~18 + 횡단 개선·문서화 + Phase 20 성능 + Phase 21 보안 + 횡단7 DA 거버넌스)
@@ -1844,10 +1845,48 @@ ALTER DATABASE postgres SET idle_in_transaction_session_timeout = '10s';
 
 ---
 
+## Phase 22: 데이터 분석 & 시각화 (4-탭 통합 분석 페이지) 📝 기획 (2026-06-25)
+
+> 정본: `docs/PRD_21_DATA_ANAL.md` v1.1. 기존 통계 인프라(`stat_actvty_dly`·`stat_revenue_dly`·`fn_build_daily_stats`·Plotly 차트 6종·stats API 7종)를 **확장**하는 분석 고도화.
+
+### 배경
+- as-is: `/admin/stats`에 DAU/WAU/MAU·테마 매출·Bean 2층위 매출이 이미 가동(중복 신설 금지 — 확장만).
+- 요청: 6개 분석 도메인을 **4개 대분류 탭**으로 재편한 "멋진" 단일 분석 허브 `/admin/analytics`.
+
+### 4-탭 구성 (6 도메인 → 4 탭 무손실 매핑)
+| 탭 | 흡수 도메인 | 핵심 |
+|---|---|---|
+| ① 매출 분석 | 매출 + Bean 매출 | Pi 현금/Bean 회수 2층위·일주월분기·Treemap·Z차트·YoY·ABC |
+| ② 주문 분석 | 주문 | AOV·취소/재구매율·주문간격 히스토그램·RFM·시간대×요일 히트맵 |
+| ③ 웹 접속·사용 | 웹 사용 + 지리 | DAU/WAU/MAU·고착도·신규/재방문·리텐션 코호트·지역 지도 |
+| ④ 웹 퍼포먼스 | 웹 성능/행동 | 전환 퍼널·채널 기여·반송/이탈·체류 ⚠️ 세션 추적층 선결 |
+
+### 공통 골격
+- 글로벌 컨트롤바(기간·비교·내보내기) + **북극성 배너(MAU·고착도) 전 탭 고정** + 4-Zone 레이아웃(KPI→메인→보조 2-up→상세 테이블).
+- Plotly `PlotlyPlot` 래퍼·`useThemeChartColors`(테마색·다크모드)·반응형·CSV/PNG·관리자 username 전체 표시.
+
+### 신규 제안 스키마 (DA 표준, git-only → 마스터 staging→운영)
+- `sql/122 stat_cohort_retention`(코호트), `sql/123 stat_rfm_segment`(RFM) — **선결조건 없음, 즉시 가능**
+- `sql/124 stat_session_pageview`(PV·체류·반송), `sql/125 stat_channel_funnel`(퍼널·채널) — **세션 추적 필드·채널 분류 선결**
+
+### 로드맵
+- Phase 2: 매출 탭 강화(Z차트·이동평균·YoY) — 즉시
+- Phase 3: 주문 분석 + 코호트·RFM(sql/122~123) — 즉시
+- Phase 4~6: 웹 퍼포먼스·채널·지리(Google Maps/PostGIS) — 데이터 추적층·외부 API 선결 조건부
+
+### 동반 반영
+- 매장주 후기·Bean 보상 동의(`mps_shop.fbck_consent_yn`, sql/117) — 동의 매장 상품만 후기 버튼 노출(2026-06-25 구현 완료).
+- 후기 평가항목 전체 카테고리 시드(sql/118) + 부모 카테고리 fallback(2026-06-25 구현 완료).
+
+⚠️ Supabase 적용 대기(마스터): sql/117·118(구현 완료) / sql/122~125(설계).
+
+---
+
 ## 변경 이력
 
 | 버전 | 날짜 | 변경 내용 | 작성자 |
 |------|------|---------|-------|
+| v12.0 | 2026-06-25 | **Phase 22 데이터 분석 & 시각화 기획 + 매장주 후기 동의·평가항목 시드 구현** — ① **4-탭 통합 분석 페이지 구상**(`docs/PRD_21_DATA_ANAL.md` v1.1 §12 신설): 6개 분석 도메인→4탭(매출·주문·접속/사용·퍼포먼스, `/admin/analytics` 허브). 북극성(활성 사용자) 배너 전 탭 고정·Pi/Bean 2층위 매출 분리·4-Zone 공통 레이아웃·Plotly 표준(`useThemeChartColors`). 기존 통계 인프라(stat_*_dly·차트 6종·API 7종) 확장. 신규 집계 제안 sql/122(코호트)·123(RFM) 즉시 / sql/124(세션 PV)·125(퍼널) 추적 선결. ② **매장주 후기·Bean 보상 동의(opt-in)**(`mps_shop.fbck_consent_yn` sql/117): 매장 등록/수정 동의 토글, 동의(Y) 매장 상품만 후기 버튼 노출(client-my-orders)+서버 거부(feedback POST 이중 방어). ③ **후기 평가항목 카테고리 전체 시드**(sql/118: mps_ctgr 93개 카테고리×5항목 멱등) + 이름기준 동적 시드(sql/116)·부모 카테고리 fallback(api/feedback/items). PRD.md 섹션 22 신설·기능현황 #33·섹션 재번호(22→26). 커밋 8a566d8·f1ad049. ⚠️ Supabase 적용 대기: sql/117·118(마스터). | asoka |
 | v11.9 | 2026-06-24 | **일반인 Open Beta 사전 준비 종합 (코드 블로킹/중요 항목 전부 닫음)** — ① **관리자 Open Beta 체크리스트 기능**(`/admin/checklist`, `ops_checklist` sql/111): 8섹션·40항목 상태(미착수/진행중/완료/NA)·메모·진척바·블로킹 잔여 집계. 환경 정책(Local→Staging→운영 3계층 분리·SQL 게이트). ② **가입/이용 동의 UI + 전역 게이트**(`ConsentGate` layout 마운트, `sys_user_consent` 재사용): 이용약관·개인정보·**위치(LBS 즉시 동기화)**·마케팅 + **연령 게이트(만14세·법정대리인, 서버 나이 재검증·생년월일 미저장)**. 동의 모달 i18n. ③ **약관 동의 내역 관리 화면**(`/admin/consents`, 사용자별 1행 집계). ④ **신고 기능**(`rpt_report` sql/113): 재사용 `ReportButton`(사유 7종)·접수 API·관리자 처리(`/admin/reports` 상태 추적)·게시물 연결. ⑤ **FAQ·고객지원**(`/support`: FAQ 아코디언·이메일·텔레그램·약관 링크) + 홈 푸터 노출. ⑥ **Bean 항등식 상시 모니터링 cron**(`/api/cron/bean-balance-check` 매일 01:00, `fn_bean_balance_check` diff≠0 시 CRITICAL+텔레그램 경보) + 어드민 자동점검 카드. ⑦ **글로벌 error/not-found 페이지**(global-error·루트·[locale] 2층, i18n). ⑧ **username 마스킹**(비관리자 뷰어: 채팅·이벤트 랭킹·상점 판매자·게시판 글/댓글/목록/검색, `maskUsername` 단일 출처·관리자/본인 전체). ⑨ **선물 프리셋 런타임 관리**(`bean_tip_cfg` sql/109, 직접입력 상한). ⑩ **홈 기술 백서(8카드)·쉬운 사용설명서(8주제) + Pi 등재 기술부록**(`docs/PI_등재_기술부록.md`·영문판, 성능·K-DATA 섹션). ⑪ **약관 영문판 완비**(커뮤니티·청소년) + 'AI 초안' 경고 전체 삭제. ⑫ **균형 판정 무관용**(±1→diff===0) · **반응형 페이지네이션**(AdminPagination ellipsis) · **username 검색 pg_trgm**(display_name sql/112) · **신규 키 22 locale 동기화**. ⚠️ Supabase 적용 대기(마스터): sql/109·112·113. 잔여 블로킹=[마스터]/[외부](법무 검수·환경 분리·프로덕션 env·실기기 검증). | asoká |
 | v11.8 | 2026-06-23 | **금일 PiShop·Event·브랜드 종합 현행화 (오후 마무리)** — ① **Event 미션 개편**: M1+M2 통합(계정통합+프로필)·M2 'Bean Token 충전' 신설(`bean_charge` 훅)·10미션 완주 보상 1π→**5,000 Bean**(`fn_evt_grant_bean_reward` sql/095·mint+apply 멱등)·과거 충전자 백필(sql/098)·랭킹 페이지네이션/요원명 검색/보상 3단계(미션수행중·보상대기·보상완료). ② **Event#2(매장 온보딩)**: 보상 상태 3단계 통일·완수자 일괄지급 버튼·항목별 참여링크(M1 맵 GPS100m·M2 상품등록·M3 내 PiShop™ 탭·M4 알림). ③ **요원명 검색 서버 pg_trgm 전환**(Event#1·#2, sql/101 nick_nm GIN + 인젝션 방어). ④ **공식 브랜드 표기 확정**: PiCafé™·PiShop™·PiTranslate™ 전면 적용(코드값·Pi 결제 memo 제외). ⑤ **Bean 거래분포 대시보드 i18n** + 보상 출처별 분해. ⑥ **구독현황 버그 수정**(2개 중 1개만 표시 → `/subscriptions/list`). ⑦ **PiShop 로딩 지연 해결**(거리배지 GPS quick 모드, 최대20s→4s/캐시). ⑧ **카테고리 17대분류 표준**(v11.7). ⑨ **X-Frame-Options 긴급 제거**(Pi Browser 접속 차단 복구). | asoká |
 | v11.7 | 2026-06-23 | **PiShop™ 상품 카테고리 표준 정립 (`docs/PRD_CATEGORY.md` 신설)** — 샘플성 6대분류(중고편중·식품/뷰티/유아/헬스 등 14도메인 누락·2단계) 폐기, 국내 E커머스 표준 **17대분류 3단계(대>중>소)** 체계 설계. 기존 `mps_ctgr` 재귀(parent_ctgr_id) 활용 — 스키마 변경 0. `sql/105`: 임시테이블(`_old_ctgr`)로 시드 직전 기존 ID 캡처 → 신규 시드(대분류17+중분류) → 기존 상품 미분류(NULL) 재지정 → 기존 카테고리만 논리삭제(물리 DELETE 금지). 소분류는 운영 CRUD/후속 시드 확장. PRD.md 기능현황 #32. ⚠️ `sql/105` Supabase 적용은 마스터. | asoká |
