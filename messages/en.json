@@ -864,7 +864,16 @@
       "pillar6Desc": "Provides fast initial screen and smooth usability through server-first rendering, parallel data fetching, stale-while-revalidate caching, and location, search, and bundle optimization.",
       "pillar6Title": "⚡ Performance Optimization",
       "title": "Cafe.pi's Technical Strengths"
-    }
+    },
+    "beanFlowCharge": "Top-up (mint)",
+    "beanFlowSpend": "Spend",
+    "beanFlowReward": "Reward",
+    "beanFlowRefund": "Refund",
+    "beanUnitPrefix": "Unit",
+    "beanUnitSuffix": "Bean · last {period}d",
+    "beanFlowsCaption": "Top-up · Spend · Reward · Refund",
+    "beanEmpty": "No Bean revenue for this period.",
+    "beanError": "Failed to load revenue data."
   },
   "adminStd": {
     "domainTypeCode": "Code",

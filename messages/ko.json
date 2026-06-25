@@ -958,7 +958,16 @@
     "unitPerson": "명",
     "unitCase": "건",
     "scorePoints": "{score}점",
-    "userActivity": "활동 {days}일 · 콘텐츠 {content} · 결제 {payments}"
+    "userActivity": "활동 {days}일 · 콘텐츠 {content} · 결제 {payments}",
+    "beanFlowCharge": "충전(발행)",
+    "beanFlowSpend": "소비",
+    "beanFlowReward": "보상",
+    "beanFlowRefund": "환불",
+    "beanUnitPrefix": "단위",
+    "beanUnitSuffix": "Bean · 최근 {period}일",
+    "beanFlowsCaption": "충전 · 소비 · 보상 · 환불",
+    "beanEmpty": "해당 기간 집계할 Bean 매출이 없습니다.",
+    "beanError": "매출 데이터를 불러오지 못했습니다."
   },
   "adminStd": {
     "domainTypeCode": "코드",

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import PlotlyPlot from '@/components/charts/plotly-plot'
 import { BeanIcon } from '@/components/ui/bean-icon'
 import { piFetch } from '@/lib/pi-fetch'
@@ -21,10 +22,10 @@ interface BeanDailyRow {
 
 // Plotly는 hex 색 필요(tailwind 클래스 불가). token 대시보드 KPI 색 계열과 통일.
 const FLOWS = [
-  { key: 'charge_bean', label: '충전(발행)', hex: '#22c55e' }, // green-500
-  { key: 'spend_bean', label: '소비', hex: '#f59e0b' }, // amber-500
-  { key: 'reward_bean', label: '보상', hex: '#14b8a6' }, // teal-500
-  { key: 'refund_bean', label: '환불', hex: '#f43f5e' }, // rose-500
+  { key: 'charge_bean', labelKey: 'beanFlowCharge', hex: '#22c55e' }, // green-500
+  { key: 'spend_bean', labelKey: 'beanFlowSpend', hex: '#f59e0b' }, // amber-500
+  { key: 'reward_bean', labelKey: 'beanFlowReward', hex: '#14b8a6' }, // teal-500
+  { key: 'refund_bean', labelKey: 'beanFlowRefund', hex: '#f43f5e' }, // rose-500
 ] as const
 
 // 라이트/다크 양쪽에서 보이는 중립 폰트색 (subscr-stats-charts와 동일 규약)
@@ -44,6 +45,7 @@ export default function BeanRevenueTimeline({
 }: {
   period?: number
 }) {
+  const t = useTranslations('adminStats')
   const [rows, setRows] = useState<BeanDailyRow[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
@@ -78,13 +80,13 @@ export default function BeanRevenueTimeline({
     const traces = FLOWS.map((f) => ({
       type: 'scatter' as const,
       mode: 'lines+markers' as const,
-      name: f.label,
+      name: t(f.labelKey),
       x,
       y: sliced.map((r) => Number(r[f.key]) || 0),
       // 활성 사용자 그래프와 동일한 spline 곡선으로 부드럽게 표현
       line: { color: f.hex, width: 2, shape: 'spline' as const, smoothing: 1.3 },
       marker: { color: f.hex, size: 4 },
-      hovertemplate: `${f.label}: %{y:,} Bean<extra></extra>`,
+      hovertemplate: `${t(f.labelKey)}: %{y:,} Bean<extra></extra>`,
     }))
     const total = sliced.reduce(
       (s, r) =>
@@ -92,28 +94,29 @@ export default function BeanRevenueTimeline({
       0,
     )
     return { data: traces, isEmpty: sliced.length === 0 || total === 0 }
-  }, [rows, period])
+  }, [rows, period, t])
 
   return (
     <div>
       <div className="mb-2 flex items-center justify-between">
         <span className="text-muted-foreground flex items-center gap-1 text-xs">
-          단위 <BeanIcon className="inline-block h-3.5 w-3.5" /> Bean · 최근{' '}
-          {period}일
+          {t('beanUnitPrefix')}{' '}
+          <BeanIcon className="inline-block h-3.5 w-3.5" />{' '}
+          {t('beanUnitSuffix', { period })}
         </span>
         <span className="text-muted-foreground text-xs">
-          충전 · 소비 · 보상 · 환불
+          {t('beanFlowsCaption')}
         </span>
       </div>
       {loading ? (
         <div className="bg-muted h-64 animate-pulse rounded-lg" />
       ) : error ? (
         <p className="text-muted-foreground py-12 text-center text-sm">
-          매출 데이터를 불러오지 못했습니다.
+          {t('beanError')}
         </p>
       ) : isEmpty ? (
         <p className="text-muted-foreground py-12 text-center text-sm">
-          해당 기간 집계할 Bean 매출이 없습니다.
+          {t('beanEmpty')}
         </p>
       ) : (
         <PlotlyPlot
