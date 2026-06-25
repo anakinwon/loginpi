@@ -41,7 +41,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               google_id: string | null
               pi_uid: string | null
             }[]
-            matched = list.find((c) => c.pi_uid) ?? list[0] ?? null
+            // 🔒 계정 탈취 방어: 이미 "유효한 다른 Google sub"가 박힌 행은 타인 계정일 수
+            //   있으므로 후보에서 제외한다. 정상 sub는 순수 숫자 문자열이고, 레거시 오염값은
+            //   UUID(하이픈 포함)라 유효 sub일 수 없다.
+            //   허용(claimable) = google_id가 NULL | 현재 sub와 동일 | 비-숫자(오염, 치유 대상).
+            //   → 타인의 유효 sub는 절대 덮어쓰지 않으면서 오염 UUID만 자가 치유.
+            const claimable = list.filter(
+              (c) =>
+                c.google_id === null ||
+                c.google_id === sub ||
+                !/^\d+$/.test(c.google_id),
+            )
+            matched = claimable.find((c) => c.pi_uid) ?? claimable[0] ?? null
           }
 
           if (!matched) {
