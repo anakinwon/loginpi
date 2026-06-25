@@ -32,6 +32,7 @@ export function ShopClaimDialog({
   const [ownerNm, setOwnerNm] = useState('')
   const [addr, setAddr] = useState(target.addr ?? '')
   const [email, setEmail] = useState('')
+  const [agreeWarn, setAgreeWarn] = useState(false) // 본인 매장 보증 동의 (타인 매장 무단 등록 차단)
   const [saving, setSaving] = useState(false)
 
   // place_id 전체 일치 여부 — 대소문자 구분 정확 비교 (복사 차단 → 직접 타이핑 강제)
@@ -52,6 +53,11 @@ export function ShopClaimDialog({
     // place_id 전체 일치 클라이언트 1차 검증 (대소문자 구분, 서버도 최종 강제)
     if (!placeIdMatches) {
       toast.error('place_id가 정확히 일치하지 않습니다 (대소문자 구분)')
+      return
+    }
+    // 본인 매장 보증 동의 필수 (타인 매장 무단 등록 = 불법)
+    if (!agreeWarn) {
+      toast.error('본인이 운영하는 매장임을 보증해주세요')
       return
     }
     setSaving(true)
@@ -227,9 +233,29 @@ export function ShopClaimDialog({
           </div>
         </div>
 
+        {/* 타인 매장 무단 등록 경고 — 본인 매장 보증 동의 강제 */}
+        <div className="mt-3 rounded-lg border border-red-300 bg-red-50 p-2.5 text-xs leading-relaxed text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-300">
+          <p className="font-semibold">⚠️ 본인이 운영하는 매장만 등록할 수 있습니다</p>
+          <p className="mt-1">
+            타인의 매장을 본인 명의로 등록하는 것은 <b>불법</b>이며, 개인정보 무단 이용에 따라{' '}
+            <b>민·형사상 처벌</b>을 받을 수 있습니다.
+          </p>
+          <label className="mt-2 flex cursor-pointer items-start gap-2">
+            <input
+              type="checkbox"
+              checked={agreeWarn}
+              onChange={(e) => setAgreeWarn(e.target.checked)}
+              className="mt-0.5 shrink-0"
+            />
+            <span>
+              위 내용을 확인했으며, 등록 매장이 <b>본인이 운영하는 매장</b>임을 보증합니다.
+            </span>
+          </label>
+        </div>
+
         <button
           onClick={submit}
-          disabled={saving}
+          disabled={saving || !agreeWarn || !placeIdMatches}
           className="bg-primary text-primary-foreground mt-3 w-full rounded-lg py-2 text-sm font-medium hover:opacity-90 disabled:opacity-50"
         >
           {saving ? '인증 확인 중…' : '인증 등록'}
