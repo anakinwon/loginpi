@@ -44,14 +44,6 @@ function detectSandbox(): boolean {
   return process.env.NEXT_PUBLIC_PI_SANDBOX === 'true'
 }
 
-// 진짜 Pi Browser 환경 판정 (Pi 인증은 Pi Browser 전용).
-// ⚠️ 일반 브라우저(PC·모바일)는 Pi SDK가 window.Pi를 정의하더라도 Pi 계정을 체크하면 안 된다.
-//    UA로 구분하되(browser-name.tsx와 동일 패턴, 프로덕션 검증됨), 개발(sandbox)은 허용한다.
-function isPiBrowserEnv(): boolean {
-  if (detectSandbox()) return true
-  return typeof navigator !== 'undefined' && /PiBrowser/.test(navigator.userAgent)
-}
-
 // 로그인 완료 시 위치 저장 side-effect (Rule LBS-02: 서버에서 동의 여부 재검증 → 미동의 시 403 무시)
 function saveLoginLocation() {
   if (typeof navigator === 'undefined' || !navigator.geolocation) return
@@ -148,9 +140,13 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = useCallback(
     async (opts?: { silent?: boolean }): Promise<PiSessionUser | null> => {
-      // 일반 브라우저(PC·모바일)는 Pi 계정을 체크하지 않는다 — Pi 인증은 Pi Browser 전용.
-      // window.Pi가 존재해도(일반 브라우저에도 Pi SDK가 주입됨) UA가 Pi Browser가 아니면 스킵.
-      if (!window.Pi || !isPiBrowserEnv()) {
+      // window.Pi가 없으면(일반 브라우저) Pi 인증 불가 → 스킵.
+      // ⚠️ UA(/PiBrowser/)로 사전 차단하지 않는다: 실기기 Pi Browser UA가 그 패턴과 달라
+      //    Pi 인증을 통째로 막는 systemic 로그인 실패 사고가 있었다(핵심 가치 위반).
+      //    신뢰할 수 있는 Pi Browser 신호는 authenticate() 성공뿐 — window.Pi 있으면 시도하고
+      //    성공 여부로 isInPiBrowser를 판정한다. 일반 브라우저의 Google 세션은 마운트 복원
+      //    useEffect(아래)가 독립적으로 처리하므로, 이 signIn이 실패해도 무방하다.
+      if (!window.Pi) {
         setIsInPiBrowser(false)
         setIsLoading(false)
         return null
