@@ -90,11 +90,28 @@ export async function GET() {
     95,
   )
 
+  // 시스템 — 현재 함수 인스턴스 스냅샷 (Vercel 서버리스: OS레벨 불가 → 인스턴스 기준)
+  const mem = process.memoryUsage()
+  const cpu = process.cpuUsage()
+  const MB = 1024 * 1024
+  const system = {
+    rss_mb: Math.round(mem.rss / MB),
+    heap_used_mb: Math.round(mem.heapUsed / MB),
+    heap_total_mb: Math.round(mem.heapTotal / MB),
+    heap_pct:
+      mem.heapTotal > 0
+        ? Math.round((1000 * mem.heapUsed) / mem.heapTotal) / 10
+        : 0,
+    cpu_total_ms: Math.round((cpu.user + cpu.system) / 1000), // 누적 — 클라이언트가 델타로 사용률 계산
+    uptime_s: Math.round(process.uptime()),
+  }
+
   return NextResponse.json({
     payment,
     orders,
     concurrent: { today_active: todayActive },
     api: { sample_cnt: apiSample, p95_ms: p95, error_rate: apiErrRate },
+    system,
     ts: new Date().toISOString(),
   })
 }

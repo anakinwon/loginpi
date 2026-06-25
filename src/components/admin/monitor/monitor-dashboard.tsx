@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { piFetch } from '@/lib/pi-fetch'
 
 interface MonitorData {
@@ -19,10 +19,39 @@ interface MonitorData {
   }
   concurrent: { today_active: number }
   api: { sample_cnt: number; p95_ms: number; error_rate: number }
+  system: {
+    rss_mb: number
+    heap_used_mb: number
+    heap_total_mb: number
+    heap_pct: number
+    cpu_total_ms: number
+    uptime_s: number
+  }
   ts: string
 }
 
 const REFRESH_MS = 5000
+const HISTORY_MAX = 24 // 스파크라인 점 개수 (약 2분)
+
+// 경량 스파크라인 (최근 N점 → SVG polyline). Plotly보다 가벼워 실시간 폴링에 적합.
+function Sparkline({ data, stroke }: { data: number[]; stroke: string }) {
+  if (data.length < 2) return <div className="h-8" />
+  const max = Math.max(...data)
+  const min = Math.min(...data)
+  const range = max - min || 1
+  const pts = data
+    .map((v, i) => {
+      const x = (i / (data.length - 1)) * 100
+      const y = 28 - ((v - min) / range) * 26
+      return `${x.toFixed(1)},${y.toFixed(1)}`
+    })
+    .join(' ')
+  return (
+    <svg viewBox="0 0 100 30" className="h-8 w-full" preserveAspectRatio="none">
+      <polyline points={pts} fill="none" stroke={stroke} strokeWidth="1.5" />
+    </svg>
+  )
+}
 
 // 결제 신호등: 미완료>5건 또는 성공률<95% = 위험, <99% = 경고, 그 외 정상
 function payLight(rate: number, stuck: number): { cls: string; label: string } {
@@ -54,14 +83,35 @@ export function MonitorDashboard() {
   const [data, setData] = useState<MonitorData | null>(null)
   const [err, setErr] = useState(false)
   const [lastOk, setLastOk] = useState<string>('')
+  // 클라이언트 누적 시계열 (스파크라인용)
+  const [memHist, setMemHist] = useState<number[]>([])
+  const [cpuHist, setCpuHist] = useState<number[]>([])
+  // CPU 사용률 = 누적 CPU시간 델타 / 실시간 델타 (인스턴스 변경 시 음수 → 0으로 clamp)
+  const prevCpu = useRef<{ totalMs: number; at: number } | null>(null)
 
   const load = useCallback(async () => {
     try {
       const r = await piFetch('/api/admin/monitor')
       if (r.ok) {
-        setData((await r.json()) as MonitorData)
+        const d = (await r.json()) as MonitorData
+        setData(d)
         setErr(false)
         setLastOk(new Date().toLocaleTimeString('ko-KR'))
+        // 메모리 시계열 누적
+        setMemHist((h) => [...h, d.system.heap_pct].slice(-HISTORY_MAX))
+        // CPU 사용률 계산 (델타 기반)
+        const now = Date.now()
+        const prev = prevCpu.current
+        if (prev) {
+          const cpuDelta = d.system.cpu_total_ms - prev.totalMs
+          const timeDelta = now - prev.at
+          const pct =
+            timeDelta > 0 && cpuDelta >= 0
+              ? Math.min(100, Math.round((1000 * cpuDelta) / timeDelta) / 10)
+              : 0
+          setCpuHist((h) => [...h, pct].slice(-HISTORY_MAX))
+        }
+        prevCpu.current = { totalMs: d.system.cpu_total_ms, at: now }
       } else {
         setErr(true)
       }
@@ -163,6 +213,35 @@ export function MonitorDashboard() {
           )}
         </Card>
       </div>
+
+      {/* 시스템 리소스 — 메모리·CPU 시계열 (현재 함수 인스턴스 기준) */}
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Card title="🧠 메모리 (heap 사용률)">
+          <div className="flex items-end gap-3">
+            <span className="text-2xl font-bold">{data.system.heap_pct}%</span>
+            <span className="text-muted-foreground mb-1 text-xs">
+              {data.system.heap_used_mb} / {data.system.heap_total_mb} MB · RSS {data.system.rss_mb}MB
+            </span>
+          </div>
+          <Sparkline data={memHist} stroke="var(--chart-1)" />
+        </Card>
+
+        <Card title="🔥 CPU 사용률 (델타)">
+          <div className="flex items-end gap-3">
+            <span className="text-2xl font-bold">
+              {cpuHist.length ? `${cpuHist[cpuHist.length - 1]}%` : '—'}
+            </span>
+            <span className="text-muted-foreground mb-1 text-xs">
+              인스턴스 가동 {Math.floor(data.system.uptime_s / 60)}분
+            </span>
+          </div>
+          <Sparkline data={cpuHist} stroke="var(--chart-4)" />
+        </Card>
+      </div>
+
+      <p className="text-muted-foreground text-center text-xs">
+        ⓘ 시스템 지표는 Vercel 서버리스 특성상 <b>현재 처리 인스턴스 기준</b>이며, 폴링마다 다른 인스턴스일 수 있어 값이 변동할 수 있습니다.
+      </p>
     </div>
   )
 }

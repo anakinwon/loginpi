@@ -8,6 +8,7 @@ import {
   rateLimitedResponse,
   SECURITY_HEADERS,
 } from './ddos-guard'
+import { recordApiMetric } from './monitor-metric'
 
 // ────────────────────────────────────────────────────────────────────────────
 // API 라우트 DDoS 가드 래퍼
@@ -66,8 +67,16 @@ export function withGuard(handler: Handler): Handler {
       return rateLimitedResponse(rl.retryAfter)
     }
 
-    // 4) 핸들러 실행
-    const res = await handler(req, ctx)
+    // 4) 핸들러 실행 + 응답 계측 (비블로킹 — 실패해도 요청에 영향 0)
+    const start = Date.now()
+    let res: NextResponse
+    try {
+      res = await handler(req, ctx)
+    } catch (e) {
+      recordApiMetric({ endpoint: pathname, method: req.method, status: 500, ms: Date.now() - start, ip })
+      throw e
+    }
+    recordApiMetric({ endpoint: pathname, method: req.method, status: res.status, ms: Date.now() - start, ip })
 
     // 5) 보안 헤더 부착
     for (const [k, v] of Object.entries(SECURITY_HEADERS)) {
