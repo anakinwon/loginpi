@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 
 // GET /api/admin/analytics/pageviews?period=7|30|90|365 — 웹 트래픽 (Phase 22 §12 ④)
@@ -27,10 +26,7 @@ interface PvRow {
 }
 
 export async function GET(req: NextRequest) {
-  const user = await getSessionUser()
-  if (!isAdmin(user))
-    return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
-
+  // Home 공개 분석 — 집계 지표(페이지 경로·세션·채널)만 반환, 게스트 포함 전체 공개.
   const raw = Number(req.nextUrl.searchParams.get('period') ?? '30')
   const period = VALID_PERIODS.includes(raw as (typeof VALID_PERIODS)[number])
     ? raw

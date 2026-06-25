@@ -236,6 +236,7 @@
       "vercelNote": "Aplikasi ini digunakan pada Vercel Serverless, jadi 'fail' Log tidak terkumpul pada pelayan operasi (Log fungsi boleh dilihat di Vercel Dashboard). Di bawah adalah jadual seperti Log DB yang kapasitinya sebenarnya meningkat."
     },
     "nav": {
+      "analytics": "Analisis Bersepadu",
       "backHome": "← Ke Laman Utama",
       "batch": "On-demand Batch",
       "beanAudit": "Log Audit",
@@ -255,6 +256,8 @@
       "eventExclude": "Urus Pengecualian",
       "eventGifts": "Hantar Hadiah",
       "eventSection": "Event",
+      "feedback": "Pengurusan Maklum Balas",
+      "feedbackCtgrItems": "Item Penilaian Maklum Balas",
       "i18n": "Pengurusan Pelbagai Bahasa",
       "i18nSection": "Pelbagai Bahasa",
       "links": "Status Pautan Akaun",
@@ -278,6 +281,7 @@
       "subscrPricing": "Pelan Harga Langganan",
       "themes": "Pengurusan Theme",
       "title": "Admin",
+      "uiThemes": "UI Theme",
       "users": "Pengurusan Pengguna"
     },
     "payments": {
@@ -651,6 +655,200 @@
       "totalCount": "Jumlah {count} orang"
     }
   },
+  "adminAnalytics": {
+    "charts": {
+      "abcCum": "Perkadaran Kumulatif",
+      "abcEmpty": "Tiada Data jualan untuk dianalisis.",
+      "abcRev": "Jualan (π)",
+      "abcSummary": "Gred A {a} (teras jualan) · B {b} · C {c} · Berdasarkan kumulatif 80%/95%",
+      "bubbleEmpty": "Tiada Data jualan untuk dipaparkan.",
+      "cohortAgo": "{n} minggu lalu",
+      "cohortEmpty": "Tiada Cohort pendaftaran dalam 8 minggu terakhir.",
+      "cohortHead": "Cohort",
+      "cohortNote": "Berdasarkan minggu pendaftaran · Minggu 0 = kadar aktiviti minggu pendaftaran · Warna lebih gelap menunjukkan kadar pengekalan yang lebih tinggi",
+      "cohortSize": "Saiz",
+      "cohortWeek": "Minggu ke-{k}",
+      "depthBucket": {
+        "d1": "1 hari",
+        "d15p": "15 hari+",
+        "d2_3": "2~3 hari",
+        "d4_7": "4~7 hari",
+        "d8_14": "8~14 hari"
+      },
+      "dow": "Ahad,Isnin,Selasa,Rabu,Khamis,Jumaat,Sabtu",
+      "dwellHover": "Dwell",
+      "funnelEmpty": "Tiada Data untuk melukis Funnel.",
+      "funnelStageLine": "{idx}. {label}",
+      "heatNote": "Berdasarkan KST · Warna lebih gelap menunjukkan tumpuan pesanan (maksimum {max} pesanan)",
+      "interval": {
+        "d0_1": "0~1 hari",
+        "d15_30": "15~30 hari",
+        "d2_3": "2~3 hari",
+        "d30p": "30 hari+",
+        "d4_7": "4~7 hari",
+        "d8_14": "8~14 hari"
+      },
+      "intervalEmpty": "Data selang pembelian berulang tidak mencukupi (memerlukan 2 atau lebih pembelian berulang).",
+      "maAvg": "Purata Bergerak {n} hari",
+      "maDaily": "Jualan Harian (π)",
+      "maEmpty": "Tiada jualan Pi untuk dikumpul dalam tempoh ini.",
+      "nrEmpty": "Tiada Data aktiviti untuk tempoh ini.",
+      "nrNew": "Baharu",
+      "nrReturning": "Pengunjung Kembali",
+      "pvEmpty": "Tiada Pageview yang dikumpul lagi.",
+      "pvLegend": "Pageview",
+      "rfmAxisX": "Masa berlalu sejak pembelian terakhir (hari) · Lebih ke kanan, lebih terkini",
+      "rfmAxisY": "Bilangan Pembelian",
+      "rfmEmpty": "Tiada pesanan yang lengkap untuk analisis RFM.",
+      "yoyEmpty": "Tiada Data jualan untuk perbandingan YoY.",
+      "yoyNote": "Tiada Data jualan untuk tahun {prev}, jadi tiada asas perbandingan (hanya tahun {cur} dipaparkan) — Perbandingan akan automatik apabila Data terkumpul.",
+      "zEmpty": "Tiada Data jualan untuk melukis Z-Chart.",
+      "zMat": "Kumulatif Bergerak (12 bulan)",
+      "zMonth": "Bulan Semasa",
+      "zYtd": "Kumulatif (YTD)"
+    },
+    "common": {
+      "noData": "Tiada Data Dikumpul",
+      "recentDays": "· {period} hari terakhir",
+      "retry": "Cuba Lagi",
+      "uCase": "kes",
+      "uCount": "unit",
+      "uDay": "hari",
+      "uPerson": "orang",
+      "uPv": "PV",
+      "uSec": "saat"
+    },
+    "northStar": {
+      "dau": "DAU",
+      "label": "⭐ Metrik North Star",
+      "mau": "Pengguna Aktif (MAU)",
+      "note": "Jualan · Hasil adalah cara. Bilangan pengguna aktif adalah matlamat utama.",
+      "stickiness": "Stickiness (DAU/MAU)"
+    },
+    "order": {
+      "heatmapTitle": "Ketumpatan Pesanan Hari × Masa",
+      "intervalTitle": "Taburan Selang Pembelian Semula",
+      "kpiAov": "Nilai Pesanan Purata (AOV)",
+      "kpiCancel": "Kadar Pembatalan",
+      "kpiInterval": "Selang Pesanan Purata",
+      "kpiOrders": "Jumlah Pesanan",
+      "kpiRepeat": "Kadar Pembelian Berulang",
+      "method": {
+        "DELIVERY": "Delivery",
+        "DINE_IN": "Dine-in",
+        "PICKUP": "Pickup",
+        "UNKNOWN": "Tidak Diketahui"
+      },
+      "methodEmpty": "Tiada Data Pesanan.",
+      "methodTitle": "Taburan Kaedah Pesanan",
+      "rfmTitle": "Segmentation Pelanggan RFM",
+      "seg": {
+        "at_risk": "Berisiko Churn",
+        "champion": "Champion",
+        "hibernating": "Hibernating",
+        "loyal": "Pelanggan Setia",
+        "potential": "Pelanggan Berpotensi",
+        "recent": "Baharu·Terbaru"
+      },
+      "thBuy": "Pembelian",
+      "thCustomer": "Pelanggan",
+      "thRecent": "Terbaru (Hari)",
+      "thSegment": "Segment",
+      "thTotal": "Terkumpul (π)"
+    },
+    "pageSubtitle": "Jualan · Pesanan · Akses/Penggunaan · Performance di satu tempat. Pengguna aktif (North Star) adalah keutamaan.",
+    "pageTitle": "📊 Analisis Bersepadu",
+    "perf": {
+      "activeUsers": "Pengguna Aktif {n} orang",
+      "activityType": "Taburan Jenis Aktiviti",
+      "actvty": {
+        "CHAT": "Aktiviti Sembang",
+        "LOGIN": "Login",
+        "MSG": "Message",
+        "PAYMENT": "Pembayaran"
+      },
+      "channel": "Saluran Trafik",
+      "channelCd": {
+        "DIRECT": "Trafik Langsung",
+        "INTERNAL": "Dalaman",
+        "PI": "Ekosistem Pi",
+        "REFERRAL": "Pautan Luar",
+        "SEARCH": "Carian",
+        "SOCIAL": "Social"
+      },
+      "collectNote": "※ Pageview dikumpul tanpa blok semasa pertukaran Route. Data kosong sejurus selepas penggunaan dan akan diisi apabila penggunaan terkumpul.",
+      "convActiveBuyer": "Penukaran Aktiviti → Pembelian",
+      "convBuyerRepeat": "Penukaran Pembelian → Pembelian Semula",
+      "convFromPrev": "↓ {pct}% penukaran berbanding peringkat sebelumnya",
+      "convSignupActive": "Penukaran Pendaftaran → Aktiviti",
+      "depth": "Kedalaman Penglibatan (Bilangan Hari Aktif)",
+      "depthBucket": {
+        "d1": "1 hari",
+        "d15p": "15 hari+",
+        "d2_3": "2~3 hari",
+        "d4_7": "4~7 hari",
+        "d8_14": "8~14 hari"
+      },
+      "exitTop": "Exit Page Top",
+      "funnelTitle": "Funnel Penukaran Lifecycle",
+      "funnelUnit": "· Terkumpul (Keseluruhan)",
+      "kpiBounce": "Kadar Lantunan",
+      "kpiDwell": "Purata Tempoh Tinggal",
+      "kpiPv": "Pageview",
+      "kpiSessions": "Session",
+      "landingTop": "Landing Page Top",
+      "pvTrend": "Trend Pageview",
+      "stage": {
+        "active": "Aktif (Login+)",
+        "buyer": "Pembelian Pertama",
+        "repeat": "Pembelian Berulang",
+        "signup": "Pendaftaran"
+      },
+      "webTraffic": "🧭 Web Traffic"
+    },
+    "revenue": {
+      "abcTitle": "Analisis ABC (Pareto) · Sumbangan Jualan Pi Mengikut Tema",
+      "bubbleNote": "Saiz Bubble = Peratusan Jualan · 1 Pi = 100 Bean ditukar",
+      "bubbleTitle": "Peratusan Jualan Mengikut Tema (Bean)",
+      "kpiBeanRecover": "Jualan Pemulihan Bean",
+      "kpiBeanTxn": "Bilangan Transaksi Bean",
+      "kpiChargeCnt": "Bilangan Caj Semula",
+      "kpiPiCash": "Jualan Tunai Pi (Caj Semula)",
+      "maTitle": "Jualan Tunai Pi Harian + Purata Bergerak 7 Hari",
+      "treemapTitle": "Peratusan Jualan Mengikut Tema (Pi)",
+      "yoyTitle": "Perbandingan Tahun ke Tahun (YoY)",
+      "yoyUnit": "· Jualan Pi Bulanan",
+      "zchartTitle": "Z-Chart (Bulan Semasa·Terkumpul·Terkumpul Bergerak)",
+      "zchartUnit": "· Jualan Pi"
+    },
+    "tabs": {
+      "order": "🧾 Pesanan",
+      "perf": "⚡ Performance",
+      "revenue": "💰 Hasil",
+      "usage": "👥 Akses · Penggunaan"
+    },
+    "theme": {
+      "DIRECT_PAY": "Pembayaran Terus",
+      "PI_TIP": "Bean",
+      "PRODUCT_ORDER": "Pesanan Produk",
+      "SUBSCRIPTION": "Langganan",
+      "UNKNOWN": "Lain-lain"
+    },
+    "usage": {
+      "cohort": "Retensi Cohort Pendaftaran",
+      "cohortRecent": "· 8 minggu terakhir",
+      "kpiDau": "DAU",
+      "kpiMau": "MAU",
+      "kpiNewSignup": "Pendaftaran Baharu ({period} hari)",
+      "kpiStickiness": "Stickiness (DAU/MAU)",
+      "kpiWau": "WAU",
+      "locatedUsers": "{n} orang bersetuju dengan lokasi",
+      "newReturning": "Baharu vs Kembali (Harian)",
+      "region": "Taburan Wilayah (Mengikut Bandar/Wilayah)",
+      "regionEmpty": "Tiada Data persetujuan lokasi.",
+      "timeline": "Trend DAU / WAU / MAU"
+    }
+  },
   "adminI18n": {
     "activate": "Aktifkan",
     "activated": "{locale} diaktifkan",
@@ -701,6 +899,15 @@
     "beanDistTitle": "Distribusi Transaksi Bean",
     "beanDistTotalPrefix": "Jumlah {cnt} transaksi · Jumlah transaksi {gross}",
     "beanDistTotalSuffix": "(Jumlah nilai mutlak — semua jenis termasuk Caj, Penggunaan, Yuran Langganan, Tip, Yuran, Ganjaran, Bayaran Balik, Pindahan)",
+    "beanEmpty": "Tiada jualan Bean untuk dikumpulkan dalam tempoh ini.",
+    "beanError": "Gagal memuatkan Data jualan.",
+    "beanFlowCharge": "Caj (Pengeluaran)",
+    "beanFlowRefund": "Bayaran Balik",
+    "beanFlowReward": "Ganjaran",
+    "beanFlowsCaption": "Caj · Perbelanjaan · Ganjaran · Bayaran Balik",
+    "beanFlowSpend": "Perbelanjaan",
+    "beanUnitPrefix": "Unit",
+    "beanUnitSuffix": "Bean · {period} hari terakhir",
     "fetchFail": "Gagal mengambil Data",
     "flowBadge": {
       "in": "Aliran Masuk",

@@ -236,6 +236,7 @@
       "vercelNote": "このアプリはVercel Serverlessにデプロイされており、運用サーバーにLog 'ファイル'は蓄積されません (関数LogはVercel Dashboardで参照)。以下は実際に容量が増加するDB Logテーブルです。"
     },
     "nav": {
+      "analytics": "統合分析",
       "backHome": "← ホームへ",
       "batch": "オンデマンド Batch",
       "beanAudit": "監査 Log",
@@ -255,6 +256,8 @@
       "eventExclude": "除外管理",
       "eventGifts": "ギフト発送",
       "eventSection": "Event",
+      "feedback": "利用レビュー管理",
+      "feedbackCtgrItems": "レビュー評価項目",
       "i18n": "多言語管理",
       "i18nSection": "多言語",
       "links": "アカウント連携状況",
@@ -278,6 +281,7 @@
       "subscrPricing": "購読料金プラン",
       "themes": "テーマ管理",
       "title": "Admin",
+      "uiThemes": "UI Theme",
       "users": "ユーザー管理"
     },
     "payments": {
@@ -651,6 +655,200 @@
       "totalCount": "全 {count}名"
     }
   },
+  "adminAnalytics": {
+    "charts": {
+      "abcCum": "累積比重",
+      "abcEmpty": "分析する売上Dataがありません。",
+      "abcRev": "売上(π)",
+      "abcSummary": "Aランク {a}個(売上核心) · B {b}個 · C {c}個 · 累積80%/95%基準",
+      "bubbleEmpty": "表示する売上Dataがありません。",
+      "cohortAgo": "{n}週前",
+      "cohortEmpty": "最近8週内にサインアップCohortがありません。",
+      "cohortHead": "Cohort",
+      "cohortNote": "サインアップ週目基準 · 0週目=サインアップした週のActivity率 · 色が濃いほど高い残存率",
+      "cohortSize": "規模",
+      "cohortWeek": "{k}週目",
+      "depthBucket": {
+        "d1": "1日",
+        "d15p": "15日+",
+        "d2_3": "2~3日",
+        "d4_7": "4~7日",
+        "d8_14": "8~14日"
+      },
+      "dow": "日,月,火,水,木,金,土",
+      "dwellHover": "Dwell",
+      "funnelEmpty": "Funnelを描画するDataがありません。",
+      "funnelStageLine": "{idx}. {label}",
+      "heatNote": "KST基準 · 色が濃いほど注文集中 (最大 {max}件)",
+      "interval": {
+        "d0_1": "0~1日",
+        "d15_30": "15~30日",
+        "d2_3": "2~3日",
+        "d30p": "30日+",
+        "d4_7": "4~7日",
+        "d8_14": "8~14日"
+      },
+      "intervalEmpty": "リピート購入間隔Dataが不足しています (リピート購入2回以上必要)。",
+      "maAvg": "{n}日移動平均",
+      "maDaily": "日売上(π)",
+      "maEmpty": "該当期間に集計するPi売上はありません。",
+      "nrEmpty": "該当期間のActivity Dataがありません。",
+      "nrNew": "新規",
+      "nrReturning": "再訪問",
+      "pvEmpty": "まだ収集されたPageviewがありません。",
+      "pvLegend": "Pageview",
+      "rfmAxisX": "最近購入経過(日) · 右側ほど最近",
+      "rfmAxisY": "購入回数",
+      "rfmEmpty": "RFM分析する完了注文がありません。",
+      "yoyEmpty": "YoY比較する売上Dataがありません。",
+      "yoyNote": "{prev}年の売上Dataがないため比較基準がありません ({cur}年のみ表示) — Dataが累積されると自動比較されます。",
+      "zEmpty": "Z-Chartを描画する売上Dataがありません。",
+      "zMat": "移動累計(12ヶ月)",
+      "zMonth": "当月",
+      "zYtd": "累計(YTD)"
+    },
+    "common": {
+      "noData": "収集データなし",
+      "recentDays": "· 過去 {period}日",
+      "retry": "再試行",
+      "uCase": "件",
+      "uCount": "個",
+      "uDay": "日",
+      "uPerson": "人",
+      "uPv": "PV",
+      "uSec": "秒"
+    },
+    "northStar": {
+      "dau": "DAU",
+      "label": "⭐ 北極星指標",
+      "mau": "アクティブユーザー (MAU)",
+      "note": "販売・売上は手段です。アクティブユーザー数が最優先目標です。",
+      "stickiness": "スティッキネス (DAU/MAU)"
+    },
+    "order": {
+      "heatmapTitle": "曜日 × 時間 注文密度",
+      "intervalTitle": "再購入間隔分布",
+      "kpiAov": "客単価 (AOV)",
+      "kpiCancel": "キャンセル率",
+      "kpiInterval": "平均注文間隔",
+      "kpiOrders": "総注文数",
+      "kpiRepeat": "再購入率",
+      "method": {
+        "DELIVERY": "配達",
+        "DINE_IN": "店内利用",
+        "PICKUP": "Pickup",
+        "UNKNOWN": "未指定"
+      },
+      "methodEmpty": "注文 Data がありません。",
+      "methodTitle": "注文方法分布",
+      "rfmTitle": "RFM 顧客 Segmentation",
+      "seg": {
+        "at_risk": "離反リスク",
+        "champion": "Champion",
+        "hibernating": "休眠",
+        "loyal": "ロイヤル顧客",
+        "potential": "潜在顧客",
+        "recent": "新規・最近"
+      },
+      "thBuy": "購入",
+      "thCustomer": "顧客",
+      "thRecent": "最近(日)",
+      "thSegment": "Segment",
+      "thTotal": "累積(π)"
+    },
+    "pageSubtitle": "売上・注文・アクセス/利用・Performanceを1か所で。アクティブユーザー（北極星）最優先。",
+    "pageTitle": "📊 統合分析",
+    "perf": {
+      "activeUsers": "活動者 {n}名",
+      "activityType": "活動タイプ分布",
+      "actvty": {
+        "CHAT": "Cafe Activity",
+        "LOGIN": "Login",
+        "MSG": "Message",
+        "PAYMENT": "決済"
+      },
+      "channel": "流入 Channel",
+      "channelCd": {
+        "DIRECT": "直接流入",
+        "INTERNAL": "内部",
+        "PI": "Pi Ecosystem",
+        "REFERRAL": "外部Link",
+        "SEARCH": "検索",
+        "SOCIAL": "Social"
+      },
+      "collectNote": "※ PageviewはRoute切り替え時に非ブロックで収集されます。デプロイ直後はDataが空ですが、使用量が蓄積されると埋められます。",
+      "convActiveBuyer": "活動 → 購入 転換",
+      "convBuyerRepeat": "購入 → 再購入 転換",
+      "convFromPrev": "↓ 直前段階比 {pct}% 転換",
+      "convSignupActive": "登録 → 活動 転換",
+      "depth": "参加深度 (活動日数)",
+      "depthBucket": {
+        "d1": "1日",
+        "d15p": "15日+",
+        "d2_3": "2～3日",
+        "d4_7": "4～7日",
+        "d8_14": "8～14日"
+      },
+      "exitTop": "離脱 Page Top",
+      "funnelTitle": "ライフサイクル転換 Funnel",
+      "funnelUnit": "· 累積(全体)",
+      "kpiBounce": "直帰率",
+      "kpiDwell": "平均滞在",
+      "kpiPv": "Pageview",
+      "kpiSessions": "Session",
+      "landingTop": "Landing Page Top",
+      "pvTrend": "Pageview トレンド",
+      "stage": {
+        "active": "Activity (Login+)",
+        "buyer": "初回購入",
+        "repeat": "リピート購入",
+        "signup": "サインアップ"
+      },
+      "webTraffic": "🧭 Web Traffic"
+    },
+    "revenue": {
+      "abcTitle": "ABC 分析 (パレート) · テーマ別 Pi 売上貢献",
+      "bubbleNote": "Bubble サイズ = 売上比率 · 1 Pi = 100 Bean 換算",
+      "bubbleTitle": "テーマ別 売上比率 (Bean)",
+      "kpiBeanRecover": "Bean 回収売上",
+      "kpiBeanTxn": "Bean 取引件数",
+      "kpiChargeCnt": "チャージ件数",
+      "kpiPiCash": "Pi 現金売上 (チャージ)",
+      "maTitle": "日別 Pi 現金売上 + 7日移動平均",
+      "treemapTitle": "テーマ別 売上比率 (Pi)",
+      "yoyTitle": "前年同期(YoY)比較",
+      "yoyUnit": "· 月別 Pi 売上",
+      "zchartTitle": "Z-Chart (当月・累計・移動累計)",
+      "zchartUnit": "· Pi 売上"
+    },
+    "tabs": {
+      "order": "🧾 注文",
+      "perf": "⚡ Performance",
+      "revenue": "💰 売上",
+      "usage": "👥 アクセス・利用"
+    },
+    "theme": {
+      "DIRECT_PAY": "直接送信",
+      "PI_TIP": "Bean",
+      "PRODUCT_ORDER": "商品購入",
+      "SUBSCRIPTION": "Subscription",
+      "UNKNOWN": "その他"
+    },
+    "usage": {
+      "cohort": "登録コホートRetention",
+      "cohortRecent": "· 過去 8週間",
+      "kpiDau": "DAU",
+      "kpiMau": "MAU",
+      "kpiNewSignup": "新規登録 ({period}日)",
+      "kpiStickiness": "スティッキネス (DAU/MAU)",
+      "kpiWau": "WAU",
+      "locatedUsers": "位置情報同意 {n}人",
+      "newReturning": "新規 vs 再訪問 (日別)",
+      "region": "地域分布 (都道府県別)",
+      "regionEmpty": "位置情報同意データがありません。",
+      "timeline": "DAU / WAU / MAU 推移"
+    }
+  },
   "adminI18n": {
     "activate": "アクティブ化",
     "activated": "{locale} がアクティブ化されました",
@@ -701,6 +899,15 @@
     "beanDistTitle": "Bean 取引分布",
     "beanDistTotalPrefix": "合計 {cnt}件 · 総取引量 {gross}",
     "beanDistTotalSuffix": "(絶対値の合計 — チャージ・使用・購読料・Tip・手数料・報酬・払い戻し・転送など全タイプ)",
+    "beanEmpty": "該当期間に集計するBeanの売上はありません。",
+    "beanError": "売上データを読み込めませんでした。",
+    "beanFlowCharge": "チャージ（発行）",
+    "beanFlowRefund": "払い戻し",
+    "beanFlowReward": "報酬",
+    "beanFlowsCaption": "チャージ · 消費 · 報酬 · 払い戻し",
+    "beanFlowSpend": "消費",
+    "beanUnitPrefix": "単位",
+    "beanUnitSuffix": "Bean · 過去 {period}日",
     "fetchFail": "Data 照会失敗",
     "flowBadge": {
       "in": "流入",

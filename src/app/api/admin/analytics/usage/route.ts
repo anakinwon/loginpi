@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 
 // GET /api/admin/analytics/usage?period=7|30|90|365 — 접속·사용 분석 (Phase 22 §12 ③)
@@ -18,10 +17,7 @@ function dayEpoch(s: string): number {
 }
 
 export async function GET(req: NextRequest) {
-  const user = await getSessionUser()
-  if (!isAdmin(user))
-    return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
-
+  // Home 공개 분석 — 집계 지표만 반환(개인 식별 정보 없음), 게스트 포함 전체 공개.
   const raw = Number(req.nextUrl.searchParams.get('period') ?? '30')
   const period = VALID_PERIODS.includes(raw as (typeof VALID_PERIODS)[number])
     ? raw

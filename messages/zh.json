@@ -236,6 +236,7 @@
       "vercelNote": "此应用部署在 Vercel Serverless 上，操作服务器不会累积 Log '文件'（函数 Log 可在 Vercel Dashboard 中查看）。以下是实际容量会增加的 DB Log 表。"
     },
     "nav": {
+      "analytics": "综合分析",
       "backHome": "← 返回首页",
       "batch": "按需 Batch",
       "beanAudit": "审计 Log",
@@ -255,6 +256,8 @@
       "eventExclude": "排除管理",
       "eventGifts": "发送礼物",
       "eventSection": "Event",
+      "feedback": "用户反馈管理",
+      "feedbackCtgrItems": "反馈评估项",
       "i18n": "多语言管理",
       "i18nSection": "多语言",
       "links": "账户关联状态",
@@ -278,6 +281,7 @@
       "subscrPricing": "订阅套餐",
       "themes": "Theme 管理",
       "title": "管理",
+      "uiThemes": "UI Theme",
       "users": "用户管理"
     },
     "payments": {
@@ -651,6 +655,200 @@
       "totalCount": "共 {count} 人"
     }
   },
+  "adminAnalytics": {
+    "charts": {
+      "abcCum": "累计占比",
+      "abcEmpty": "没有可分析的销售Data。",
+      "abcRev": "销售额(π)",
+      "abcSummary": "A级{a}个(销售核心) · B级{b}个 · C级{c}个 · 累计80%/95%标准",
+      "bubbleEmpty": "没有可显示的销售Data。",
+      "cohortAgo": "{n}周前",
+      "cohortEmpty": "最近8周内没有注册Cohort。",
+      "cohortHead": "Cohort",
+      "cohortNote": "以注册周为准 · 第0周=注册当周的活跃率 · 颜色越深留存率越高",
+      "cohortSize": "规模",
+      "cohortWeek": "第{k}周",
+      "depthBucket": {
+        "d1": "1天",
+        "d15p": "15天+",
+        "d2_3": "2~3天",
+        "d4_7": "4~7天",
+        "d8_14": "8~14天"
+      },
+      "dow": "日,一,二,三,四,五,六",
+      "dwellHover": "停留",
+      "funnelEmpty": "没有绘制 Funnel 的 Data。",
+      "funnelStageLine": "{idx}. {label}",
+      "heatNote": "KST标准 · 颜色越深订单越集中（最多{max}件）",
+      "interval": {
+        "d0_1": "0~1天",
+        "d15_30": "15~30天",
+        "d2_3": "2~3天",
+        "d30p": "30天+",
+        "d4_7": "4~7天",
+        "d8_14": "8~14天"
+      },
+      "intervalEmpty": "重复购买间隔Data不足（需重复购买2次以上）。",
+      "maAvg": "{n}日移动平均",
+      "maDaily": "日销售额(π)",
+      "maEmpty": "该期间没有可统计的Pi销售额。",
+      "nrEmpty": "该期间没有活动Data。",
+      "nrNew": "新增",
+      "nrReturning": "回访",
+      "pvEmpty": "还没有收集到 Pageview。",
+      "pvLegend": "Pageview",
+      "rfmAxisX": "最近购买天数 · 越靠右越近",
+      "rfmAxisY": "购买次数",
+      "rfmEmpty": "没有可进行RFM分析的已完成订单。",
+      "yoyEmpty": "没有可进行YoY比较的销售Data。",
+      "yoyNote": "{prev}年销售Data缺失，无比较基准（仅显示{cur}年）— Data积累后将自动比较。",
+      "zEmpty": "没有可绘制Z-Chart的销售Data。",
+      "zMat": "滚动累计(12个月)",
+      "zMonth": "当月",
+      "zYtd": "累计(YTD)"
+    },
+    "common": {
+      "noData": "无收集数据",
+      "recentDays": "· 最近 {period}天",
+      "retry": "重试",
+      "uCase": "件",
+      "uCount": "个",
+      "uDay": "天",
+      "uPerson": "人",
+      "uPv": "PV",
+      "uSec": "秒"
+    },
+    "northStar": {
+      "dau": "DAU",
+      "label": "⭐ 北极星指标",
+      "mau": "活跃用户 (MAU)",
+      "note": "销售·销售额是手段。活跃用户数是首要目标。",
+      "stickiness": "粘性 (DAU/MAU)"
+    },
+    "order": {
+      "heatmapTitle": "星期 × 时间订单密度",
+      "intervalTitle": "复购间隔分布",
+      "kpiAov": "客单价 (AOV)",
+      "kpiCancel": "取消率",
+      "kpiInterval": "平均订单间隔",
+      "kpiOrders": "总订单数",
+      "kpiRepeat": "复购率",
+      "method": {
+        "DELIVERY": "配送",
+        "DINE_IN": "堂食",
+        "PICKUP": "Pickup",
+        "UNKNOWN": "未指定"
+      },
+      "methodEmpty": "没有订单 Data。",
+      "methodTitle": "订单方式分布",
+      "rfmTitle": "RFM 客户 Segmentation",
+      "seg": {
+        "at_risk": "流失风险",
+        "champion": "Champion",
+        "hibernating": "休眠",
+        "loyal": "忠诚客户",
+        "potential": "潜在客户",
+        "recent": "新用户·最近"
+      },
+      "thBuy": "购买",
+      "thCustomer": "客户",
+      "thRecent": "最近(天)",
+      "thSegment": "Segment",
+      "thTotal": "累计(π)"
+    },
+    "pageSubtitle": "销售·订单·访问/使用·Performance 一站式管理。活跃用户（北极星）优先。",
+    "pageTitle": "📊 综合分析",
+    "perf": {
+      "activeUsers": "活跃用户 {n}名",
+      "activityType": "活跃类型分布",
+      "actvty": {
+        "CHAT": "Cafe 活动",
+        "LOGIN": "Login",
+        "MSG": "Message",
+        "PAYMENT": "支付"
+      },
+      "channel": "来源 Channel",
+      "channelCd": {
+        "DIRECT": "直接访问",
+        "INTERNAL": "内部",
+        "PI": "Pi生态系统",
+        "REFERRAL": "外部链接",
+        "SEARCH": "搜索",
+        "SOCIAL": "Social"
+      },
+      "collectNote": "※ Pageview在Route切换时非阻塞收集。部署后Data为空，随着使用量积累将填充。",
+      "convActiveBuyer": "活跃 → 购买转化",
+      "convBuyerRepeat": "购买 → 复购转化",
+      "convFromPrev": "↓ 相较上一阶段转化{pct}%",
+      "convSignupActive": "注册 → 活跃转化",
+      "depth": "参与深度 (活跃天数)",
+      "depthBucket": {
+        "d1": "1天",
+        "d15p": "15天+",
+        "d2_3": "2~3天",
+        "d4_7": "4~7天",
+        "d8_14": "8~14天"
+      },
+      "exitTop": "退出 Page Top",
+      "funnelTitle": "Lifecycle 转化 Funnel",
+      "funnelUnit": "· 累计(总计)",
+      "kpiBounce": "跳出率",
+      "kpiDwell": "平均停留",
+      "kpiPv": "Pageview",
+      "kpiSessions": "Session",
+      "landingTop": "Landing Page Top",
+      "pvTrend": "Pageview 趋势",
+      "stage": {
+        "active": "活跃(Login+)",
+        "buyer": "首次购买",
+        "repeat": "重复购买",
+        "signup": "注册"
+      },
+      "webTraffic": "🧭 Web Traffic"
+    },
+    "revenue": {
+      "abcTitle": "ABC 分析 (Pareto) · Theme Pi 销售额贡献",
+      "bubbleNote": "Bubble 大小 = 销售额占比 · 1 Pi = 100 Bean 折算",
+      "bubbleTitle": "Theme 销售额占比 (Bean)",
+      "kpiBeanRecover": "Bean 回收销售额",
+      "kpiBeanTxn": "Bean 交易次数",
+      "kpiChargeCnt": "充值次数",
+      "kpiPiCash": "Pi 现金销售额 (充值)",
+      "maTitle": "每日 Pi 现金销售额 + 7天移动平均",
+      "treemapTitle": "Theme 销售额占比 (Pi)",
+      "yoyTitle": "去年同期(YoY)比较",
+      "yoyUnit": "· 每月 Pi 销售额",
+      "zchartTitle": "Z-Chart (当月·累计·滚动累计)",
+      "zchartUnit": "· Pi 销售额"
+    },
+    "tabs": {
+      "order": "🧾 订单",
+      "perf": "⚡ Performance",
+      "revenue": "💰 销售额",
+      "usage": "👥 访问·使用"
+    },
+    "theme": {
+      "DIRECT_PAY": "直接支付",
+      "PI_TIP": "Bean",
+      "PRODUCT_ORDER": "商品购买",
+      "SUBSCRIPTION": "订阅",
+      "UNKNOWN": "其他"
+    },
+    "usage": {
+      "cohort": "注册 Cohort Retention",
+      "cohortRecent": "· 最近 8周",
+      "kpiDau": "DAU",
+      "kpiMau": "MAU",
+      "kpiNewSignup": "新注册 ({period}天)",
+      "kpiStickiness": "粘性 (DAU/MAU)",
+      "kpiWau": "WAU",
+      "locatedUsers": "位置同意 {n}人",
+      "newReturning": "新用户 vs 回访用户 (每日)",
+      "region": "区域分布 (按市/道)",
+      "regionEmpty": "无位置同意数据。",
+      "timeline": "DAU / WAU / MAU 趋势"
+    }
+  },
   "adminI18n": {
     "activate": "激活",
     "activated": "{locale} 已激活",
@@ -701,6 +899,15 @@
     "beanDistTitle": "Bean 交易分布",
     "beanDistTotalPrefix": "总计 {cnt}笔 · 总交易量 {gross}",
     "beanDistTotalSuffix": "(绝对值总和 — 充值·使用·订阅费·小费·手续费·奖励·退款·转账等所有类型)",
+    "beanEmpty": "该期间没有可统计的 Bean 销售额。",
+    "beanError": "未能加载销售数据。",
+    "beanFlowCharge": "充值(发行)",
+    "beanFlowRefund": "退款",
+    "beanFlowReward": "奖励",
+    "beanFlowsCaption": "充值 · 消费 · 奖励 · 退款",
+    "beanFlowSpend": "消费",
+    "beanUnitPrefix": "单位",
+    "beanUnitSuffix": "Bean · 最近 {period}天",
     "fetchFail": "Data 查询失败",
     "flowBadge": {
       "in": "流入",

@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 
 // GET /api/admin/analytics/performance?period=7|30|90|365 — 퍼포먼스/행동 분석 (Phase 22 §12 ④)
@@ -25,10 +24,7 @@ const TYPE_LABEL: Record<string, string> = {
 }
 
 export async function GET(req: NextRequest) {
-  const user = await getSessionUser()
-  if (!isAdmin(user))
-    return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
-
+  // Home 공개 분석 — 집계 지표만 반환(개인 식별 정보 없음), 게스트 포함 전체 공개.
   const raw = Number(req.nextUrl.searchParams.get('period') ?? '30')
   const period = VALID_PERIODS.includes(raw as (typeof VALID_PERIODS)[number])
     ? raw

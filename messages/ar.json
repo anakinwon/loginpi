@@ -236,6 +236,7 @@
       "vercelNote": "التطبيق ده معموله Deploy على Vercel Serverless، عشان كده مفيش 'ملفات' Log بتتراكم على السيرفر التشغيلي (الـ Logs بتاعة الـ Function ممكن تشوفها في الـ Vercel Dashboard). اللي تحت ده هو جداول الـ DB اللي شبه الـ Log واللي سعتها بتزيد فعلًا."
     },
     "nav": {
+      "analytics": "تحليلات متكاملة",
       "backHome": "← للرئيسية",
       "batch": "Batch عند الطلب",
       "beanAudit": "مراجعة Log",
@@ -255,6 +256,8 @@
       "eventExclude": "إدارة الاستثناءات",
       "eventGifts": "إرسال هدايا",
       "eventSection": "Event",
+      "feedback": "إدارة المراجعات",
+      "feedbackCtgrItems": "عناصر تقييم المراجعات",
       "i18n": "إدارة اللغات المتعددة",
       "i18nSection": "اللغات المتعددة",
       "links": "حالة ربط الحسابات",
@@ -278,6 +281,7 @@
       "subscrPricing": "خطط الاشتراك",
       "themes": "إدارة Theme",
       "title": "Admin",
+      "uiThemes": "UI Themes",
       "users": "إدارة المستخدمين"
     },
     "payments": {
@@ -651,6 +655,200 @@
       "totalCount": "إجمالي {count} مستخدم"
     }
   },
+  "adminAnalytics": {
+    "charts": {
+      "abcCum": "نسبة تراكمية",
+      "abcEmpty": "مفيش Data مبيعات تتحلل.",
+      "abcRev": "مبيعات (π)",
+      "abcSummary": "{a} عنصر من الفئة A (مبيعات أساسية) · {b} عنصر من الفئة B · {c} عنصر من الفئة C · بناءً على 80%/95% تراكمي",
+      "bubbleEmpty": "مفيش Data مبيعات تتعرض.",
+      "cohortAgo": "قبل {n} أسابيع",
+      "cohortEmpty": "مفيش Cohort تسجيل في آخر 8 أسابيع.",
+      "cohortHead": "Cohort",
+      "cohortNote": "بناءً على أسبوع التسجيل · الأسبوع 0 = معدل النشاط في أسبوع التسجيل · كل ما اللون كان أغمق، كل ما معدل الاحتفاظ زاد",
+      "cohortSize": "الحجم",
+      "cohortWeek": "الأسبوع {k}",
+      "depthBucket": {
+        "d1": "يوم واحد",
+        "d15p": "15 يوم+",
+        "d2_3": "2-3 أيام",
+        "d4_7": "4-7 أيام",
+        "d8_14": "8-14 يوم"
+      },
+      "dow": "الأحد,الاثنين,الثلاثاء,الأربعاء,الخميس,الجمعة,السبت",
+      "dwellHover": "مدة البقاء",
+      "funnelEmpty": "مفيش Data عشان نرسم الـFunnel.",
+      "funnelStageLine": "{idx}. {label}",
+      "heatNote": "بناءً على KST · كل ما اللون كان أغمق، كل ما تركيز الطلبات زاد (بحد أقصى {max} طلب)",
+      "interval": {
+        "d0_1": "0-1 يوم",
+        "d15_30": "15-30 يوم",
+        "d2_3": "2-3 أيام",
+        "d30p": "30 يوم+",
+        "d4_7": "4-7 أيام",
+        "d8_14": "8-14 يوم"
+      },
+      "intervalEmpty": "الـ Data بتاعة فترة إعادة الشراء مش كفاية (مطلوب إعادة شراء مرتين أو أكتر).",
+      "maAvg": "متوسط متحرك {n} يوم",
+      "maDaily": "المبيعات اليومية (π)",
+      "maEmpty": "مفيش مبيعات Pi تتجمع للفترة دي.",
+      "nrEmpty": "مفيش Data نشاط للفترة دي.",
+      "nrNew": "جديد",
+      "nrReturning": "عودة الزيارة",
+      "pvEmpty": "مفيش Pageviews اتجمعت لغاية دلوقتي.",
+      "pvLegend": "Pageview",
+      "rfmAxisX": "الوقت اللي فات من آخر شراء (أيام) · كل ما كان لليمين، كل ما كان أحدث",
+      "rfmAxisY": "عدد مرات الشراء",
+      "rfmEmpty": "مفيش طلبات مكتملة عشان تحليل RFM.",
+      "yoyEmpty": "مفيش Data مبيعات للمقارنة YoY.",
+      "yoyNote": "مفيش Data مبيعات لسنة {prev}، عشان كده مفيش أساس للمقارنة (معروض سنة {cur} بس) — المقارنة هتتم تلقائيًا لما الـ Data تتراكم.",
+      "zEmpty": "مفيش Data مبيعات لرسم Z-Chart.",
+      "zMat": "إجمالي متحرك (12 شهر)",
+      "zMonth": "الشهر الحالي",
+      "zYtd": "إجمالي (YTD)"
+    },
+    "common": {
+      "noData": "لا توجد بيانات مجمعة",
+      "recentDays": "· آخر {period} أيام",
+      "retry": "إعادة المحاولة",
+      "uCase": "حالة",
+      "uCount": "عنصر",
+      "uDay": "يوم",
+      "uPerson": "شخص",
+      "uPv": "PV",
+      "uSec": "ثانية"
+    },
+    "northStar": {
+      "dau": "DAU",
+      "label": "⭐ مؤشر نجم الشمال",
+      "mau": "المستخدمون النشطون (MAU)",
+      "note": "المبيعات والإيرادات هي وسائل. عدد المستخدمين النشطين هو الأولوية القصوى.",
+      "stickiness": "الالتصاق (DAU/MAU)"
+    },
+    "order": {
+      "heatmapTitle": "كثافة الطلبات حسب اليوم × الوقت",
+      "intervalTitle": "توزيع فترات إعادة الشراء",
+      "kpiAov": "متوسط قيمة الطلب (AOV)",
+      "kpiCancel": "معدل الإلغاء",
+      "kpiInterval": "متوسط فترة الطلب",
+      "kpiOrders": "إجمالي الطلبات",
+      "kpiRepeat": "معدل إعادة الشراء",
+      "method": {
+        "DELIVERY": "توصيل",
+        "DINE_IN": "تناول الطعام في المتجر",
+        "PICKUP": "Pickup",
+        "UNKNOWN": "غير محدد"
+      },
+      "methodEmpty": "لا يوجد Data للطلبات.",
+      "methodTitle": "توزيع طرق الطلب",
+      "rfmTitle": "RFM Customer Segmentation",
+      "seg": {
+        "at_risk": "معرض للخطر",
+        "champion": "Champion",
+        "hibernating": "خامل",
+        "loyal": "عميل مخلص",
+        "potential": "عميل محتمل",
+        "recent": "جديد · حديث"
+      },
+      "thBuy": "الشراء",
+      "thCustomer": "العميل",
+      "thRecent": "الأحدث (أيام)",
+      "thSegment": "Segment",
+      "thTotal": "الإجمالي (π)"
+    },
+    "pageSubtitle": "المبيعات · الطلبات · الوصول/الاستخدام · Performance في مكان واحد. المستخدمون النشطون (نجم الشمال) هم الأولوية القصوى.",
+    "pageTitle": "📊 تحليلات متكاملة",
+    "perf": {
+      "activeUsers": "{n} مستخدم نشط",
+      "activityType": "توزيع أنواع النشاط",
+      "actvty": {
+        "CHAT": "نشاط Chat",
+        "LOGIN": "Login",
+        "MSG": "Message",
+        "PAYMENT": "دفع"
+      },
+      "channel": "Channel المصدر",
+      "channelCd": {
+        "DIRECT": "وصول مباشر",
+        "INTERNAL": "داخلي",
+        "PI": "نظام Pi البيئي",
+        "REFERRAL": "رابط خارجي",
+        "SEARCH": "بحث",
+        "SOCIAL": "Social"
+      },
+      "collectNote": "ملحوظة: الـ Pageview بيتم جمعها بشكل غير محظور لما الـ Route يتغير. الـ Data بتكون فاضية بعد النشر مباشرة، وبتتملي لما الاستخدام يتراكم.",
+      "convActiveBuyer": "تحويل من نشاط → شراء",
+      "convBuyerRepeat": "تحويل من شراء → إعادة شراء",
+      "convFromPrev": "↓ تحويل {pct}% مقارنة بالمرحلة اللي فاتت",
+      "convSignupActive": "تحويل من تسجيل → نشاط",
+      "depth": "عمق المشاركة (أيام النشاط)",
+      "depthBucket": {
+        "d1": "يوم واحد",
+        "d15p": "15 يوم+",
+        "d2_3": "2-3 أيام",
+        "d4_7": "4-7 أيام",
+        "d8_14": "8-14 يوم"
+      },
+      "exitTop": "أعلى صفحات الخروج",
+      "funnelTitle": "Lifecycle Conversion Funnel",
+      "funnelUnit": "· تراكمي (إجمالي)",
+      "kpiBounce": "معدل الارتداد",
+      "kpiDwell": "متوسط مدة البقاء",
+      "kpiPv": "Pageview",
+      "kpiSessions": "Session",
+      "landingTop": "أعلى Landing Page",
+      "pvTrend": "اتجاه Pageview",
+      "stage": {
+        "active": "نشاط (Login+)",
+        "buyer": "أول شراء",
+        "repeat": "إعادة شراء",
+        "signup": "تسجيل"
+      },
+      "webTraffic": "🧭 Web Traffic"
+    },
+    "revenue": {
+      "abcTitle": "ABC Analysis (Pareto) · مساهمة مبيعات Pi حسب Theme",
+      "bubbleNote": "حجم Bubble = نسبة المبيعات · 1 Pi = 100 Bean مكافئ",
+      "bubbleTitle": "نسبة المبيعات حسب Theme (Bean)",
+      "kpiBeanRecover": "مبيعات Bean المستردة",
+      "kpiBeanTxn": "عدد معاملات Bean",
+      "kpiChargeCnt": "عدد مرات الشحن",
+      "kpiPiCash": "مبيعات Pi النقدية (شحن)",
+      "maTitle": "مبيعات Pi النقدية اليومية + متوسط متحرك لمدة 7 أيام",
+      "treemapTitle": "نسبة المبيعات حسب Theme (Pi)",
+      "yoyTitle": "مقارنة على أساس سنوي (YoY)",
+      "yoyUnit": "· مبيعات Pi الشهرية",
+      "zchartTitle": "Z-Chart (الشهر الحالي · تراكمي · تراكمي متحرك)",
+      "zchartUnit": "· مبيعات Pi"
+    },
+    "tabs": {
+      "order": "🧾 الطلبات",
+      "perf": "⚡ Performance",
+      "revenue": "💰 المبيعات",
+      "usage": "👥 الوصول · الاستخدام"
+    },
+    "theme": {
+      "DIRECT_PAY": "دفع مباشر",
+      "PI_TIP": "Bean",
+      "PRODUCT_ORDER": "طلب منتج",
+      "SUBSCRIPTION": "اشتراك",
+      "UNKNOWN": "أخرى"
+    },
+    "usage": {
+      "cohort": "Signup Cohort Retention",
+      "cohortRecent": "· آخر 8 أسابيع",
+      "kpiDau": "DAU",
+      "kpiMau": "MAU",
+      "kpiNewSignup": "تسجيلات جديدة ({period} أيام)",
+      "kpiStickiness": "الالتصاق (DAU/MAU)",
+      "kpiWau": "WAU",
+      "locatedUsers": "{n} مستخدم بموافقة الموقع",
+      "newReturning": "جديد مقابل عائد (يومي)",
+      "region": "التوزيع الإقليمي (حسب المدينة/المحافظة)",
+      "regionEmpty": "لا توجد بيانات موافقة الموقع.",
+      "timeline": "اتجاه DAU / WAU / MAU"
+    }
+  },
   "adminI18n": {
     "activate": "تفعيل",
     "activated": "تم تفعيل {locale}",
@@ -701,6 +899,15 @@
     "beanDistTitle": "توزيع معاملات Bean",
     "beanDistTotalPrefix": "إجمالي {cnt} معاملة · إجمالي حجم المعاملات {gross}",
     "beanDistTotalSuffix": "(مجموع القيم المطلقة — جميع الأنواع مثل الشحن والاستخدام ورسوم الاشتراك والإكرامية والرسوم والمكافآت والاسترداد والتحويل إلخ.)",
+    "beanEmpty": "لا توجد مبيعات Bean لتجميعها لهذه الفترة.",
+    "beanError": "فشل تحميل بيانات المبيعات.",
+    "beanFlowCharge": "شحن (إصدار)",
+    "beanFlowRefund": "استرداد",
+    "beanFlowReward": "مكافأة",
+    "beanFlowsCaption": "شحن · إنفاق · مكافأة · استرداد",
+    "beanFlowSpend": "إنفاق",
+    "beanUnitPrefix": "وحدة",
+    "beanUnitSuffix": "Bean · آخر {period} أيام",
     "fetchFail": "فشل جلب Data",
     "flowBadge": {
       "in": "تدفق للداخل",

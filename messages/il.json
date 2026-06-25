@@ -236,6 +236,7 @@
       "vercelNote": "אפליקציה זו פרוסה ב-Vercel serverless, וקובצי 'Log' אינם נצברים בשרת התפעולי (ניתן לצפות ב-Logs של פונקציות ב-Vercel Dashboard). להלן טבלאות Log של DB שנפחן גדל בפועל."
     },
     "nav": {
+      "analytics": "ניתוח משולב",
       "backHome": "← חזרה לדף הבית",
       "batch": "On-demand Batch",
       "beanAudit": "יומן ביקורת",
@@ -255,6 +256,8 @@
       "eventExclude": "ניהול החרגה",
       "eventGifts": "שליחת מתנות",
       "eventSection": "אירוע",
+      "feedback": "ניהול ביקורות",
+      "feedbackCtgrItems": "פריטי הערכת ביקורת",
       "i18n": "ניהול רב לשוני",
       "i18nSection": "רב לשוני",
       "links": "סטטוס קישור חשבונות",
@@ -278,6 +281,7 @@
       "subscrPricing": "תוכניות מנוי",
       "themes": "ניהול Theme",
       "title": "מנהל",
+      "uiThemes": "UI Theme",
       "users": "ניהול משתמשים"
     },
     "payments": {
@@ -651,6 +655,200 @@
       "totalCount": "סה\"כ {count} משתמשים"
     }
   },
+  "adminAnalytics": {
+    "charts": {
+      "abcCum": "שיעור מצטבר",
+      "abcEmpty": "אין Data מכירות לניתוח.",
+      "abcRev": "מכירות (π)",
+      "abcSummary": "{a} פריטים בדרגת A (מכירות ליבה) · {b} פריטים ב-B · {c} פריטים ב-C · תקן מצטבר 80%/95%",
+      "bubbleEmpty": "אין Data מכירות להצגה.",
+      "cohortAgo": "לפני {n} שבועות",
+      "cohortEmpty": "אין Cohort הרשמה ב-8 השבועות האחרונים.",
+      "cohortHead": "Cohort",
+      "cohortNote": "מבוסס על שבוע ההרשמה · שבוע 0 = שיעור פעילות של שבוע ההרשמה · צבע כהה יותר מצביע על שיעור שימור גבוה יותר",
+      "cohortSize": "גודל",
+      "cohortWeek": "שבוע {k}",
+      "depthBucket": {
+        "d1": "יום 1",
+        "d15p": "15 ימים+",
+        "d2_3": "2~3 ימים",
+        "d4_7": "4~7 ימים",
+        "d8_14": "8~14 ימים"
+      },
+      "dow": "א',ב',ג',ד',ה',ו',ש'",
+      "dwellHover": "שהייה",
+      "funnelEmpty": "אין Data כדי לצייר את ה-Funnel.",
+      "funnelStageLine": "{idx}. {label}",
+      "heatNote": "תקן KST · צבע כהה יותר מצביע על ריכוז הזמנות גבוה יותר (מקסימום {max} הזמנות)",
+      "interval": {
+        "d0_1": "0~1 יום",
+        "d15_30": "15~30 ימים",
+        "d2_3": "2~3 ימים",
+        "d30p": "30 ימים+",
+        "d4_7": "4~7 ימים",
+        "d8_14": "8~14 ימים"
+      },
+      "intervalEmpty": "אין מספיק Data של מרווחי רכישה חוזרת (נדרשות 2 רכישות חוזרות או יותר).",
+      "maAvg": "ממוצע נע של {n} ימים",
+      "maDaily": "מכירות יומיות (π)",
+      "maEmpty": "אין מכירות Pi לצבירה עבור תקופה זו.",
+      "nrEmpty": "אין Data פעילות עבור תקופה זו.",
+      "nrNew": "חדשים",
+      "nrReturning": "חוזרים",
+      "pvEmpty": "עדיין לא נאספו Pageviews.",
+      "pvLegend": "Pageview",
+      "rfmAxisX": "ימים מאז הרכישה האחרונה · ככל שימינה יותר, כך עדכני יותר",
+      "rfmAxisY": "מספר רכישות",
+      "rfmEmpty": "אין הזמנות שהושלמו לניתוח RFM.",
+      "yoyEmpty": "אין Data מכירות להשוואת YoY.",
+      "yoyNote": "אין Data מכירות לשנת {prev}, לכן אין בסיס השוואה (מוצגת רק שנת {cur}) — Data יושוו אוטומטית ככל שיצטברו.",
+      "zEmpty": "אין Data מכירות כדי לצייר את תרשים ה-Z.",
+      "zMat": "מצטבר נע (12 חודשים)",
+      "zMonth": "חודש נוכחי",
+      "zYtd": "מצטבר (YTD)"
+    },
+    "common": {
+      "noData": "אין נתונים שנאספו",
+      "recentDays": "· {period} ימים אחרונים",
+      "retry": "נסה שוב",
+      "uCase": "מקרים",
+      "uCount": "פריטים",
+      "uDay": "ימים",
+      "uPerson": "אנשים",
+      "uPv": "PV",
+      "uSec": "שניות"
+    },
+    "northStar": {
+      "dau": "DAU",
+      "label": "⭐ מדד כוכב הצפון",
+      "mau": "משתמשים פעילים (MAU)",
+      "note": "מכירות והכנסות הן אמצעי. מספר המשתמשים הפעילים הוא היעד העליון.",
+      "stickiness": "דביקות (DAU/MAU)"
+    },
+    "order": {
+      "heatmapTitle": "צפיפות הזמנות לפי יום בשבוע × שעה",
+      "intervalTitle": "התפלגות מרווח רכישה חוזרת",
+      "kpiAov": "ערך הזמנה ממוצע (AOV)",
+      "kpiCancel": "שיעור ביטולים",
+      "kpiInterval": "מרווח הזמנות ממוצע",
+      "kpiOrders": "סה\"כ הזמנות",
+      "kpiRepeat": "שיעור רכישה חוזרת",
+      "method": {
+        "DELIVERY": "משלוח",
+        "DINE_IN": "סעודה במקום",
+        "PICKUP": "Pickup",
+        "UNKNOWN": "לא מוגדר"
+      },
+      "methodEmpty": "אין Data הזמנה.",
+      "methodTitle": "התפלגות שיטת הזמנה",
+      "rfmTitle": "RFM Customer Segmentation",
+      "seg": {
+        "at_risk": "בסיכון נטישה",
+        "champion": "Champion",
+        "hibernating": "רדום",
+        "loyal": "לקוח נאמן",
+        "potential": "לקוח פוטנציאלי",
+        "recent": "חדש · אחרון"
+      },
+      "thBuy": "רכישה",
+      "thCustomer": "לקוח",
+      "thRecent": "אחרון (ימים)",
+      "thSegment": "Segment",
+      "thTotal": "מצטבר (π)"
+    },
+    "pageSubtitle": "מכירות · הזמנות · גישה/שימוש · ביצועים במקום אחד. משתמשים פעילים (כוכב הצפון) בראש סדר העדיפויות.",
+    "pageTitle": "📊 ניתוח משולב",
+    "perf": {
+      "activeUsers": "משתמשים פעילים {n}",
+      "activityType": "התפלגות סוגי פעילות",
+      "actvty": {
+        "CHAT": "פעילות Cafe",
+        "LOGIN": "התחברות",
+        "MSG": "הודעה",
+        "PAYMENT": "תשלום"
+      },
+      "channel": "ערוץ כניסה",
+      "channelCd": {
+        "DIRECT": "כניסה ישירה",
+        "INTERNAL": "פנימי",
+        "PI": "מערכת אקולוגית Pi",
+        "REFERRAL": "קישור חיצוני",
+        "SEARCH": "חיפוש",
+        "SOCIAL": "Social"
+      },
+      "collectNote": "※ Pageviews נאספים ללא חסימה בעת מעבר Route. Data ריקים מיד לאחר הפריסה ויתמלאו ככל שיצטבר שימוש.",
+      "convActiveBuyer": "המרת פעילות ← רכישה",
+      "convBuyerRepeat": "המרת רכישה ← רכישה חוזרת",
+      "convFromPrev": "↓ {pct}% המרה לעומת השלב הקודם",
+      "convSignupActive": "המרת הרשמה ← פעילות",
+      "depth": "עומק מעורבות (ימי פעילות)",
+      "depthBucket": {
+        "d1": "יום אחד",
+        "d15p": "15 ימים+",
+        "d2_3": "2-3 ימים",
+        "d4_7": "4-7 ימים",
+        "d8_14": "8-14 ימים"
+      },
+      "exitTop": "דף יציאה Top",
+      "funnelTitle": "Lifecycle Conversion Funnel",
+      "funnelUnit": "· מצטבר (סה\"כ)",
+      "kpiBounce": "שיעור נטישה",
+      "kpiDwell": "זמן שהייה ממוצע",
+      "kpiPv": "Pageview",
+      "kpiSessions": "Session",
+      "landingTop": "Landing Page Top",
+      "pvTrend": "מגמת Pageview",
+      "stage": {
+        "active": "פעיל (התחברות+)",
+        "buyer": "רכישה ראשונה",
+        "repeat": "רכישה חוזרת",
+        "signup": "הרשמה"
+      },
+      "webTraffic": "🧭 Web Traffic"
+    },
+    "revenue": {
+      "abcTitle": "ABC Analysis (Pareto) · תרומת מכירות Pi לפי Theme",
+      "bubbleNote": "Bubble size = שיעור מכירות · 1 Pi = המרה ל-100 Bean",
+      "bubbleTitle": "שיעור מכירות לפי Theme (Bean)",
+      "kpiBeanRecover": "מכירות שחזור Bean",
+      "kpiBeanTxn": "מספר עסקאות Bean",
+      "kpiChargeCnt": "מספר טעינות",
+      "kpiPiCash": "מכירות במזומן Pi (טעינה)",
+      "maTitle": "מכירות במזומן Pi יומי + ממוצע נע 7 ימים",
+      "treemapTitle": "שיעור מכירות לפי Theme (Pi)",
+      "yoyTitle": "השוואת שנה לשנה (YoY)",
+      "yoyUnit": "· מכירות Pi חודשיות",
+      "zchartTitle": "Z-Chart (חודש נוכחי · מצטבר · מצטבר נע)",
+      "zchartUnit": "· מכירות Pi"
+    },
+    "tabs": {
+      "order": "🧾 הזמנות",
+      "perf": "⚡ Performance",
+      "revenue": "💰 מכירות",
+      "usage": "👥 גישה · שימוש"
+    },
+    "theme": {
+      "DIRECT_PAY": "Direct Pay",
+      "PI_TIP": "Bean",
+      "PRODUCT_ORDER": "Product Order",
+      "SUBSCRIPTION": "Subscription",
+      "UNKNOWN": "Unknown"
+    },
+    "usage": {
+      "cohort": "שימור קבוצת הרשמה",
+      "cohortRecent": "· 8 שבועות אחרונים",
+      "kpiDau": "DAU",
+      "kpiMau": "MAU",
+      "kpiNewSignup": "הרשמות חדשות ({period} ימים)",
+      "kpiStickiness": "דביקות (DAU/MAU)",
+      "kpiWau": "WAU",
+      "locatedUsers": "{n} משתמשים עם הסכמה למיקום",
+      "newReturning": "חדשים לעומת חוזרים (יומי)",
+      "region": "התפלגות אזורית (לפי עיר/מחוז)",
+      "regionEmpty": "אין נתוני הסכמה למיקום.",
+      "timeline": "מגמת DAU / WAU / MAU"
+    }
+  },
   "adminI18n": {
     "activate": "הפעל",
     "activated": "{locale} הופעל",
@@ -701,6 +899,15 @@
     "beanDistTitle": "התפלגות עסקאות Bean",
     "beanDistTotalPrefix": "סה\"כ {cnt} פריטים · נפח עסקה כולל {gross}",
     "beanDistTotalSuffix": "(סכום ערכים מוחלטים — טעינה, שימוש, דמי מנוי, טיפ, עמלה, תגמול, החזר, העברה וכו' כל הסוגים)",
+    "beanEmpty": "אין מכירות Bean לצבירה עבור תקופה זו.",
+    "beanError": "טעינת נתוני מכירות נכשלה.",
+    "beanFlowCharge": "טעינה (הנפקה)",
+    "beanFlowRefund": "החזר כספי",
+    "beanFlowReward": "תגמול",
+    "beanFlowsCaption": "טעינה · הוצאה · תגמול · החזר כספי",
+    "beanFlowSpend": "הוצאה",
+    "beanUnitPrefix": "יחידה",
+    "beanUnitSuffix": "Bean · {period} ימים אחרונים",
     "fetchFail": "כשל באחזור Data",
     "flowBadge": {
       "in": "כניסה",

@@ -236,6 +236,7 @@
       "vercelNote": "See rakendus on juurutatud Vercel serverless keskkonda, seega Log 'File'id ei kogune operatsiooniserverisse (funktsioonilogisid saab vaadata Vercel Dashboardil). Allpool on DB Log Table'id, mille maht tegelikult suureneb."
     },
     "nav": {
+      "analytics": "Integreeritud Analytics",
       "backHome": "← Avalehele",
       "batch": "On-demand Batch",
       "beanAudit": "Auditi Log",
@@ -255,6 +256,8 @@
       "eventExclude": "Väljaarvamise haldamine",
       "eventGifts": "Kingituste saatmine",
       "eventSection": "Sündmus",
+      "feedback": "Tagasiside haldus",
+      "feedbackCtgrItems": "Tagasiside hindamise üksused",
       "i18n": "Mitmekeelsuse haldus",
       "i18nSection": "Mitmekeelsus",
       "links": "Konto linkimise staatus",
@@ -278,6 +281,7 @@
       "subscrPricing": "Tellimuse hinnakiri",
       "themes": "Teemade haldus",
       "title": "Admin",
+      "uiThemes": "UI Theme",
       "users": "Kasutajate haldus"
     },
     "payments": {
@@ -651,6 +655,200 @@
       "totalCount": "Kokku {count} inimest"
     }
   },
+  "adminAnalytics": {
+    "charts": {
+      "abcCum": "Kumulatiivne osakaal",
+      "abcEmpty": "Analüüsimiseks puudub müügi Data.",
+      "abcRev": "Müük (π)",
+      "abcSummary": "A-klass {a} tk (müügi tuum) · B {b} tk · C {c} tk · Kumulatiivne 80%/95% alusel",
+      "bubbleEmpty": "Kuvamiseks puudub müügi Data.",
+      "cohortAgo": "{n} nädalat tagasi",
+      "cohortEmpty": "Viimase 8 nädala jooksul puudub registreerunud Cohort.",
+      "cohortHead": "Cohort",
+      "cohortNote": "Registreerimisnädala alusel · 0. nädal = registreerimisnädala aktiivsusmäär · Mida tumedam värv, seda kõrgem säilitusmäär",
+      "cohortSize": "Suurus",
+      "cohortWeek": "{k}. nädal",
+      "depthBucket": {
+        "d1": "1 päev",
+        "d15p": "15+ päeva",
+        "d2_3": "2-3 päeva",
+        "d4_7": "4-7 päeva",
+        "d8_14": "8-14 päeva"
+      },
+      "dow": "P,E,T,K,N,R,L",
+      "dwellHover": "Viibimine",
+      "funnelEmpty": "Funnel'i joonistamiseks pole Data't.",
+      "funnelStageLine": "{idx}. {label}",
+      "heatNote": "KST alusel · Mida tumedam värv, seda suurem tellimuste kontsentratsioon (max {max} tk)",
+      "interval": {
+        "d0_1": "0-1 päev",
+        "d15_30": "15-30 päeva",
+        "d2_3": "2-3 päeva",
+        "d30p": "30+ päeva",
+        "d4_7": "4-7 päeva",
+        "d8_14": "8-14 päeva"
+      },
+      "intervalEmpty": "Korduvostu intervalli Data on ebapiisav (vajalik on vähemalt 2 korduvostu).",
+      "maAvg": "{n} päeva libisev keskmine",
+      "maDaily": "Päevane müük (π)",
+      "maEmpty": "Sellel perioodil puudub Pi müük, mida koondada.",
+      "nrEmpty": "Sellel perioodil puudub tegevuse Data.",
+      "nrNew": "Uus",
+      "nrReturning": "Tagasipöörduv",
+      "pvEmpty": "Pageview'sid pole veel kogutud.",
+      "pvLegend": "Pageview",
+      "rfmAxisX": "Viimase ostu möödumine (päevades) · Paremale poole liikudes hilisem",
+      "rfmAxisY": "Ostude arv",
+      "rfmEmpty": "RFM analüüsimiseks puuduvad lõpetatud tellimused.",
+      "yoyEmpty": "YoY võrdlemiseks puudub müügi Data.",
+      "yoyNote": "{prev}. aasta müügi Data puudub, seega võrdlusbaas puudub (kuvatakse ainult {cur}. aasta) — Data kogunedes võrreldakse automaatselt.",
+      "zEmpty": "Z-graafiku joonistamiseks puudub müügi Data.",
+      "zMat": "Libisev kumulatiivne (12 kuud)",
+      "zMonth": "Käesolev kuu",
+      "zYtd": "Kumulatiivne (YTD)"
+    },
+    "common": {
+      "noData": "Andmeid pole kogutud",
+      "recentDays": "· Viimased {period} päeva",
+      "retry": "Proovi uuesti",
+      "uCase": "juhtumit",
+      "uCount": "tk",
+      "uDay": "päeva",
+      "uPerson": "inimest",
+      "uPv": "PV",
+      "uSec": "sek"
+    },
+    "northStar": {
+      "dau": "DAU",
+      "label": "⭐ North Star mõõdik",
+      "mau": "Aktiivsed kasutajad (MAU)",
+      "note": "Müük·Tulu on vahendid. Aktiivsete kasutajate arv on esmatähtis eesmärk.",
+      "stickiness": "Püsivus (DAU/MAU)"
+    },
+    "order": {
+      "heatmapTitle": "Päeva × tunni tellimuste tihedus",
+      "intervalTitle": "Korduvostu intervalli jaotus",
+      "kpiAov": "Keskmine tellimuse väärtus (AOV)",
+      "kpiCancel": "Tühistamismäär",
+      "kpiInterval": "Keskmine tellimuste vahe",
+      "kpiOrders": "Tellimuste koguarv",
+      "kpiRepeat": "Korduvostu määr",
+      "method": {
+        "DELIVERY": "Kohaletoimetamine",
+        "DINE_IN": "Kohapeal söömine",
+        "PICKUP": "Pickup",
+        "UNKNOWN": "Määramata"
+      },
+      "methodEmpty": "Tellimuse Data puudub.",
+      "methodTitle": "Tellimismeetodi jaotus",
+      "rfmTitle": "RFM Kliendi Segmentation",
+      "seg": {
+        "at_risk": "Lahkumisrisk",
+        "champion": "Champion",
+        "hibernating": "Uinuv",
+        "loyal": "Lojaalne klient",
+        "potential": "Potentsiaalne klient",
+        "recent": "Uus·Hiljutine"
+      },
+      "thBuy": "Ost",
+      "thCustomer": "Klient",
+      "thRecent": "Hiljutine (päevad)",
+      "thSegment": "Segment",
+      "thTotal": "Kogusumma (π)"
+    },
+    "pageSubtitle": "Müük·Tellimused·Juurdepääs/Kasutus·Performance ühes kohas. Aktiivsed kasutajad (North Star) on esmatähtsad.",
+    "pageTitle": "📊 Integreeritud Analytics",
+    "perf": {
+      "activeUsers": "Aktiivseid kasutajaid {n}",
+      "activityType": "Aktiivsuse tüübi jaotus",
+      "actvty": {
+        "CHAT": "Vestlustegevus",
+        "LOGIN": "Login",
+        "MSG": "Message",
+        "PAYMENT": "Makse"
+      },
+      "channel": "Sissetuleku Channel",
+      "channelCd": {
+        "DIRECT": "Otsene sissevool",
+        "INTERNAL": "Sisemine",
+        "PI": "Pi ökosüsteem",
+        "REFERRAL": "Väline link",
+        "SEARCH": "Otsing",
+        "SOCIAL": "Social"
+      },
+      "collectNote": "※ Pageview'd kogutakse marsruudi vahetamisel mittetõkestavalt. Kohe pärast juurutamist on Data tühi ja täitub kasutuse kogunedes.",
+      "convActiveBuyer": "Aktiivsus → Ostja Conversion",
+      "convBuyerRepeat": "Ostja → Korduvostu Conversion",
+      "convFromPrev": "↓ {pct}% konversioon võrreldes eelmise etapiga",
+      "convSignupActive": "Registreerumine → Aktiivsuse Conversion",
+      "depth": "Kaasamise sügavus (aktiivsuse päevad)",
+      "depthBucket": {
+        "d1": "1 päev",
+        "d15p": "15+ päeva",
+        "d2_3": "2-3 päeva",
+        "d4_7": "4-7 päeva",
+        "d8_14": "8-14 päeva"
+      },
+      "exitTop": "Väljumise Page Top",
+      "funnelTitle": "Lifecycle Conversion Funnel",
+      "funnelUnit": "· Kumulatiivne (kokku)",
+      "kpiBounce": "Põrkemäär",
+      "kpiDwell": "Keskmine viibimisaeg",
+      "kpiPv": "Pageview",
+      "kpiSessions": "Session",
+      "landingTop": "Landing Page Top",
+      "pvTrend": "Pageview Trend",
+      "stage": {
+        "active": "Aktiivne (Login+)",
+        "buyer": "Esimene ost",
+        "repeat": "Korduv ost",
+        "signup": "Registreerumine"
+      },
+      "webTraffic": "🧭 Web Traffic"
+    },
+    "revenue": {
+      "abcTitle": "ABC Analüüs (Pareto) · Theme-põhine Pi müügi panus",
+      "bubbleNote": "Bubble suurus = müügi osakaal · 1 Pi = 100 Beani ekvivalent",
+      "bubbleTitle": "Theme-põhine müügi osakaal (Bean)",
+      "kpiBeanRecover": "Beani taastamismüük",
+      "kpiBeanTxn": "Beani tehingute arv",
+      "kpiChargeCnt": "Laadimiste arv",
+      "kpiPiCash": "Pi sularahamüük (laadimine)",
+      "maTitle": "Päevane Pi sularahamüük + 7 päeva libisev keskmine",
+      "treemapTitle": "Theme-põhine müügi osakaal (Pi)",
+      "yoyTitle": "Aastataguse perioodi (YoY) võrdlus",
+      "yoyUnit": "· Kuine Pi müük",
+      "zchartTitle": "Z-Chart (käesolev kuu·kumulatiivne·libisev kumulatiivne)",
+      "zchartUnit": "· Pi müük"
+    },
+    "tabs": {
+      "order": "🧾 Tellimused",
+      "perf": "⚡ Performance",
+      "revenue": "💰 Tulu",
+      "usage": "👥 Juurdepääs·Kasutus"
+    },
+    "theme": {
+      "DIRECT_PAY": "Otsemakse",
+      "PI_TIP": "Bean",
+      "PRODUCT_ORDER": "Toote tellimus",
+      "SUBSCRIPTION": "Tellimus",
+      "UNKNOWN": "Tundmatu"
+    },
+    "usage": {
+      "cohort": "Registreerumise Cohort Retention",
+      "cohortRecent": "· Viimased 8 nädalat",
+      "kpiDau": "DAU",
+      "kpiMau": "MAU",
+      "kpiNewSignup": "Uued registreerumised ({period} päeva)",
+      "kpiStickiness": "Püsivus (DAU/MAU)",
+      "kpiWau": "WAU",
+      "locatedUsers": "Asukohaga nõustunud {n} inimest",
+      "newReturning": "Uued vs tagasipöörduvad (päevas)",
+      "region": "Piirkondlik jaotus (linna/maakonna järgi)",
+      "regionEmpty": "Asukohaga nõustumise Data puudub.",
+      "timeline": "DAU / WAU / MAU Trend"
+    }
+  },
   "adminI18n": {
     "activate": "Aktiveeri",
     "activated": "{locale} on aktiveeritud",
@@ -701,6 +899,15 @@
     "beanDistTitle": "Bean tehingute jaotus",
     "beanDistTotalPrefix": "Kokku {cnt} tehingut · Kogutehingute maht {gross}",
     "beanDistTotalSuffix": "(Absoluutväärtuste summa — kõik tüübid, sh laadimine, kasutamine, tellimistasu, jootraha, tasu, preemia, tagasimakse, ülekanne jne)",
+    "beanEmpty": "Sellel perioodil puudub Bean-müük, mida koondada.",
+    "beanError": "Müügiandmete laadimine ebaõnnestus.",
+    "beanFlowCharge": "Laadimine (väljaandmine)",
+    "beanFlowRefund": "Tagasimakse",
+    "beanFlowReward": "Preemia",
+    "beanFlowsCaption": "Laadimine · Kulu · Preemia · Tagasimakse",
+    "beanFlowSpend": "Kulu",
+    "beanUnitPrefix": "Ühik",
+    "beanUnitSuffix": "Bean · Viimased {period} päeva",
     "fetchFail": "Data hankimine ebaõnnestus",
     "flowBadge": {
       "in": "Sissetulek",

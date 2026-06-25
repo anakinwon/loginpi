@@ -236,6 +236,7 @@
       "vercelNote": "This app is deployed on Vercel Serverless, so log 'files' do not accumulate on the operational server (function logs can be viewed on the Vercel Dashboard). Below are the DB log tables that actually increase in capacity."
     },
     "nav": {
+      "analytics": "Integrated Analytics",
       "backHome": "← Back to Home",
       "batch": "On-demand Batch",
       "beanAudit": "Audit Log",
@@ -255,6 +256,8 @@
       "eventExclude": "Manage Exclusions",
       "eventGifts": "Send Gifts",
       "eventSection": "Event",
+      "feedback": "Feedback Management",
+      "feedbackCtgrItems": "Feedback Evaluation Items",
       "i18n": "Internationalisation Management",
       "i18nSection": "Internationalisation",
       "links": "Linked Accounts",
@@ -278,6 +281,7 @@
       "subscrPricing": "Subscription Plans",
       "themes": "Theme Management",
       "title": "Admin",
+      "uiThemes": "UI Themes",
       "users": "User Management"
     },
     "payments": {
@@ -651,6 +655,200 @@
       "totalCount": "Total {count} users"
     }
   },
+  "adminAnalytics": {
+    "charts": {
+      "abcCum": "Cumulative Share",
+      "abcEmpty": "No sales data to analyse.",
+      "abcRev": "Sales (π)",
+      "abcSummary": "A-grade: {a} (Key Sales Drivers) · B-grade: {b} · C-grade: {c} · Based on cumulative 80%/95%.",
+      "bubbleEmpty": "No sales data to display.",
+      "cohortAgo": "{n} weeks ago",
+      "cohortEmpty": "No sign-up cohorts within the last 8 weeks.",
+      "cohortHead": "Cohort",
+      "cohortNote": "Based on sign-up week · Week 0 = activity rate of the sign-up week · Darker colours indicate higher retention rate.",
+      "cohortSize": "Size",
+      "cohortWeek": "Week {k}",
+      "depthBucket": {
+        "d1": "1 Day",
+        "d15p": "15+ Days",
+        "d2_3": "2-3 Days",
+        "d4_7": "4-7 Days",
+        "d8_14": "8-14 Days"
+      },
+      "dow": "Sun,Mon,Tue,Wed,Thu,Fri,Sat",
+      "dwellHover": "Dwell",
+      "funnelEmpty": "No data to draw the funnel.",
+      "funnelStageLine": "{idx}. {label}",
+      "heatNote": "Based on KST · Darker colours indicate higher order concentration (max {max} orders).",
+      "interval": {
+        "d0_1": "0-1 Day",
+        "d15_30": "15-30 Days",
+        "d2_3": "2-3 Days",
+        "d30p": "30+ Days",
+        "d4_7": "4-7 Days",
+        "d8_14": "8-14 Days"
+      },
+      "intervalEmpty": "Insufficient repeat purchase interval data (2 or more repeat purchases required).",
+      "maAvg": "{n}-day Moving Average",
+      "maDaily": "Daily Sales (π)",
+      "maEmpty": "No Pi sales to aggregate for this period.",
+      "nrEmpty": "No activity data for this period.",
+      "nrNew": "New",
+      "nrReturning": "Returning",
+      "pvEmpty": "No page views have been collected yet.",
+      "pvLegend": "Pageview",
+      "rfmAxisX": "Days since last purchase · More recent to the right",
+      "rfmAxisY": "Number of Purchases",
+      "rfmEmpty": "No completed orders to analyse RFM.",
+      "yoyEmpty": "No sales data to compare YoY.",
+      "yoyNote": "No sales data for {prev} year, so there's no basis for comparison (only {cur} year displayed) — data will be automatically compared once it accumulates.",
+      "zEmpty": "No sales data to draw the Z-chart.",
+      "zMat": "Moving Annual Total (12 Months)",
+      "zMonth": "Current Month",
+      "zYtd": "Cumulative (YTD)"
+    },
+    "common": {
+      "noData": "No Data Collected",
+      "recentDays": "· Last {period} Days",
+      "retry": "Retry",
+      "uCase": "Count",
+      "uCount": "Items",
+      "uDay": "Days",
+      "uPerson": "Users",
+      "uPv": "PV",
+      "uSec": "Seconds"
+    },
+    "northStar": {
+      "dau": "DAU",
+      "label": "⭐ North Star Metric",
+      "mau": "Active Users (MAU)",
+      "note": "Sales · Revenue are means. The number of active users is the top priority.",
+      "stickiness": "Stickiness (DAU/MAU)"
+    },
+    "order": {
+      "heatmapTitle": "Day of Week × Time Order Density",
+      "intervalTitle": "Repurchase Interval Distribution",
+      "kpiAov": "Average Order Value (AOV)",
+      "kpiCancel": "Cancellation Rate",
+      "kpiInterval": "Average Order Interval",
+      "kpiOrders": "Total Orders",
+      "kpiRepeat": "Repurchase Rate",
+      "method": {
+        "DELIVERY": "Delivery",
+        "DINE_IN": "Dine-in",
+        "PICKUP": "Pickup",
+        "UNKNOWN": "Unknown"
+      },
+      "methodEmpty": "No Order Data",
+      "methodTitle": "Order Method Distribution",
+      "rfmTitle": "RFM Customer Segmentation",
+      "seg": {
+        "at_risk": "At-Risk",
+        "champion": "Champion",
+        "hibernating": "Hibernating",
+        "loyal": "Loyal Customers",
+        "potential": "Potential Customers",
+        "recent": "New & Recent"
+      },
+      "thBuy": "Purchases",
+      "thCustomer": "Customer",
+      "thRecent": "Recent (Days)",
+      "thSegment": "Segment",
+      "thTotal": "Total (π)"
+    },
+    "pageSubtitle": "Revenue · Orders · Access/Usage · Performance in one place. Active users (North Star) are the top priority.",
+    "pageTitle": "📊 Integrated Analytics",
+    "perf": {
+      "activeUsers": "{n} Active Users",
+      "activityType": "Activity Type Distribution",
+      "actvty": {
+        "CHAT": "Cafe Activity",
+        "LOGIN": "Login",
+        "MSG": "Message",
+        "PAYMENT": "Payment"
+      },
+      "channel": "Acquisition Channel",
+      "channelCd": {
+        "DIRECT": "Direct Traffic",
+        "INTERNAL": "Internal",
+        "PI": "Pi Ecosystem",
+        "REFERRAL": "Referral",
+        "SEARCH": "Search",
+        "SOCIAL": "Social"
+      },
+      "collectNote": "※ Pageviews are collected without blocking during route transitions. Data will be empty immediately after deployment and will populate as usage accumulates.",
+      "convActiveBuyer": "Active → Buyer Conversion",
+      "convBuyerRepeat": "Buyer → Repeat Purchase Conversion",
+      "convFromPrev": "↓ {pct}% conversion from previous stage",
+      "convSignupActive": "Signup → Active Conversion",
+      "depth": "Engagement Depth (Active Days)",
+      "depthBucket": {
+        "d1": "1 Day",
+        "d15p": "15+ Days",
+        "d2_3": "2-3 Days",
+        "d4_7": "4-7 Days",
+        "d8_14": "8-14 Days"
+      },
+      "exitTop": "Top Exit Pages",
+      "funnelTitle": "Lifecycle Conversion Funnel",
+      "funnelUnit": "· Cumulative (Total)",
+      "kpiBounce": "Bounce Rate",
+      "kpiDwell": "Average Dwell",
+      "kpiPv": "Page Views",
+      "kpiSessions": "Sessions",
+      "landingTop": "Top Landing Pages",
+      "pvTrend": "Page Views Trend",
+      "stage": {
+        "active": "Active (Login+)",
+        "buyer": "First Purchase",
+        "repeat": "Repeat Purchase",
+        "signup": "Sign-up"
+      },
+      "webTraffic": "🧭 Web Traffic"
+    },
+    "revenue": {
+      "abcTitle": "ABC Analysis (Pareto) · Pi Sales Contribution by Theme",
+      "bubbleNote": "Bubble Size = Sales Share · 1 Pi = 100 Bean Equivalent",
+      "bubbleTitle": "Sales Share by Theme (Bean)",
+      "kpiBeanRecover": "Bean Recovery Sales",
+      "kpiBeanTxn": "Number of Bean Transactions",
+      "kpiChargeCnt": "Number of Charges",
+      "kpiPiCash": "Pi Cash Sales (Charge)",
+      "maTitle": "Daily Pi Cash Sales + 7-Day Moving Average",
+      "treemapTitle": "Sales Share by Theme (Pi)",
+      "yoyTitle": "Year-over-Year (YoY) Comparison",
+      "yoyUnit": "· Monthly Pi Sales",
+      "zchartTitle": "Z-Chart (Current Month · Cumulative · Moving Cumulative)",
+      "zchartUnit": "· Pi Sales"
+    },
+    "tabs": {
+      "order": "🧾 Orders",
+      "perf": "⚡ Performance",
+      "revenue": "💰 Revenue",
+      "usage": "👥 Access · Usage"
+    },
+    "theme": {
+      "DIRECT_PAY": "Direct Payment",
+      "PI_TIP": "Bean",
+      "PRODUCT_ORDER": "Product Order",
+      "SUBSCRIPTION": "Subscription",
+      "UNKNOWN": "Other"
+    },
+    "usage": {
+      "cohort": "Signup Cohort Retention",
+      "cohortRecent": "· Last 8 Weeks",
+      "kpiDau": "DAU",
+      "kpiMau": "MAU",
+      "kpiNewSignup": "New Signups ({period} Days)",
+      "kpiStickiness": "Stickiness (DAU/MAU)",
+      "kpiWau": "WAU",
+      "locatedUsers": "Location Consent {n} Users",
+      "newReturning": "New vs. Returning (Daily)",
+      "region": "Regional Distribution (By City/Province)",
+      "regionEmpty": "No location consent data available.",
+      "timeline": "DAU / WAU / MAU Trend"
+    }
+  },
   "adminI18n": {
     "activate": "Activate",
     "activated": "{locale} activated",
@@ -701,6 +899,15 @@
     "beanDistTitle": "Bean Transaction Distribution",
     "beanDistTotalPrefix": "Total {cnt} transactions · Gross volume {gross}",
     "beanDistTotalSuffix": "(Sum of absolute values — all types including charge, spend, subscription fee, tip, fee, reward, refund, transfer, etc.)",
+    "beanEmpty": "No Bean revenue to aggregate for this period.",
+    "beanError": "Failed to load revenue data.",
+    "beanFlowCharge": "Charge (Issue)",
+    "beanFlowRefund": "Refund",
+    "beanFlowReward": "Reward",
+    "beanFlowsCaption": "Charge · Spend · Reward · Refund",
+    "beanFlowSpend": "Spend",
+    "beanUnitPrefix": "Unit",
+    "beanUnitSuffix": "Bean · Last {period} Days",
     "fetchFail": "Data fetch failed",
     "flowBadge": {
       "in": "Inflow",

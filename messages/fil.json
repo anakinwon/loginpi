@@ -236,6 +236,7 @@
       "vercelNote": "Ang app na ito ay naka-deploy sa Vercel serverless, kaya hindi nag-iipon ng 'files' ng Log sa operational server (ang function Log ay maaaring tingnan sa Vercel Dashboard). Nasa ibaba ang mga log-like na Table ng DB na talagang tumataas ang kapasidad."
     },
     "nav": {
+      "analytics": "Integrated Analytics",
       "backHome": "← Bumalik sa Home",
       "batch": "On-demand Batch",
       "beanAudit": "Audit Log",
@@ -255,6 +256,8 @@
       "eventExclude": "Manage Exclusion",
       "eventGifts": "Magpadala ng Regalo",
       "eventSection": "Event",
+      "feedback": "Pamamahala ng Feedback",
+      "feedbackCtgrItems": "Mga Item sa Pagsusuri ng Feedback",
       "i18n": "Multilingual Management",
       "i18nSection": "Multilingual",
       "links": "Status ng Pag-link ng Account",
@@ -278,6 +281,7 @@
       "subscrPricing": "Plano ng Presyo ng Subscription",
       "themes": "Theme Management",
       "title": "Admin",
+      "uiThemes": "UI Theme",
       "users": "Pamamahala ng User"
     },
     "payments": {
@@ -651,6 +655,200 @@
       "totalCount": "Kabuuang {count} User"
     }
   },
+  "adminAnalytics": {
+    "charts": {
+      "abcCum": "Cumulative Proportion",
+      "abcEmpty": "Walang Sales Data na susuriin.",
+      "abcRev": "Sales (π)",
+      "abcSummary": "A Grade {a} (Sales Core) · B {b} · C {c} · Cumulative 80%/95% Standard",
+      "bubbleEmpty": "Walang Sales Data na ipapakita.",
+      "cohortAgo": "{n} Weeks Ago",
+      "cohortEmpty": "Walang Signup Cohort sa loob ng nakaraang 8 Weeks.",
+      "cohortHead": "Cohort",
+      "cohortNote": "Signup Week Standard · Week 0 = Activity Rate ng Signup Week · Mas matingkad ang kulay, mas mataas ang Retention Rate",
+      "cohortSize": "Size",
+      "cohortWeek": "{k}th Week",
+      "depthBucket": {
+        "d1": "1 araw",
+        "d15p": "15+ araw",
+        "d2_3": "2~3 araw",
+        "d4_7": "4~7 araw",
+        "d8_14": "8~14 araw"
+      },
+      "dow": "Lin, Lun, Mar, Miy, Huw, Biy, Sab",
+      "dwellHover": "Dwell",
+      "funnelEmpty": "Walang Data para iguhit ang Funnel.",
+      "funnelStageLine": "{idx}. {label}",
+      "heatNote": "KST Standard · Mas matingkad ang kulay, mas mataas ang Order Concentration (maximum {max} Orders)",
+      "interval": {
+        "d0_1": "0~1 araw",
+        "d15_30": "15~30 araw",
+        "d2_3": "2~3 araw",
+        "d30p": "30+ araw",
+        "d4_7": "4~7 araw",
+        "d8_14": "8~14 araw"
+      },
+      "intervalEmpty": "Kulang ang Repurchase Interval Data (kailangan ng 2 o higit pang Repurchase).",
+      "maAvg": "{n} Days Moving Average",
+      "maDaily": "Daily Sales (π)",
+      "maEmpty": "Walang Pi Sales na kokolektahin para sa panahong ito.",
+      "nrEmpty": "Walang Activity Data para sa panahong ito.",
+      "nrNew": "New",
+      "nrReturning": "Returning Visit",
+      "pvEmpty": "Wala pang nakolektang Pageview.",
+      "pvLegend": "Pageview",
+      "rfmAxisX": "Elapsed Purchase (Days) · Mas kanan, mas Recent",
+      "rfmAxisY": "Number of Purchases",
+      "rfmEmpty": "Walang Completed Orders para sa RFM Analysis.",
+      "yoyEmpty": "Walang Sales Data para sa paghahambing ng YoY.",
+      "yoyNote": "Walang Sales Data para sa taong {prev}, kaya walang Comparison Standard (ipinapakita lang ang taong {cur}) — Awtomatikong ihahambing kapag naipon ang Data.",
+      "zEmpty": "Walang Sales Data para iguhit ang Z-Chart.",
+      "zMat": "Moving Cumulative (12 Months)",
+      "zMonth": "Current Month",
+      "zYtd": "Cumulative (YTD)"
+    },
+    "common": {
+      "noData": "Walang nakolektang Data",
+      "recentDays": "· Huling {period} araw",
+      "retry": "Retry",
+      "uCase": "kaso",
+      "uCount": "piraso",
+      "uDay": "araw",
+      "uPerson": "katao",
+      "uPv": "PV",
+      "uSec": "segundo"
+    },
+    "northStar": {
+      "dau": "DAU",
+      "label": "⭐ North Star Metric",
+      "mau": "Active User (MAU)",
+      "note": "Ang Sales · Revenue ay paraan lamang. Ang bilang ng Active User ang pangunahing layunin.",
+      "stickiness": "Stickiness (DAU/MAU)"
+    },
+    "order": {
+      "heatmapTitle": "Density ng Order Ayon sa Araw ng Linggo × Oras",
+      "intervalTitle": "Distribution ng Interval ng Repurchase",
+      "kpiAov": "Average Order Value (AOV)",
+      "kpiCancel": "Cancellation Rate",
+      "kpiInterval": "Average Order Interval",
+      "kpiOrders": "Total Orders",
+      "kpiRepeat": "Repurchase Rate",
+      "method": {
+        "DELIVERY": "Delivery",
+        "DINE_IN": "Dine-in",
+        "PICKUP": "Pickup",
+        "UNKNOWN": "Unspecified"
+      },
+      "methodEmpty": "Walang Data ng Order.",
+      "methodTitle": "Distribution ng Paraan ng Order",
+      "rfmTitle": "RFM Customer Segmentation",
+      "seg": {
+        "at_risk": "At Risk",
+        "champion": "Champion",
+        "hibernating": "Hibernating",
+        "loyal": "Loyal Customer",
+        "potential": "Potential Customer",
+        "recent": "New·Recent"
+      },
+      "thBuy": "Purchase",
+      "thCustomer": "Customer",
+      "thRecent": "Recent (Day)",
+      "thSegment": "Segment",
+      "thTotal": "Total (π)"
+    },
+    "pageSubtitle": "Revenue · Order · Access/Usage · Performance sa isang lugar. Active User (North Star) ang pangunahing priyoridad.",
+    "pageTitle": "📊 Integrated Analytics",
+    "perf": {
+      "activeUsers": "Active Users {n}",
+      "activityType": "Activity Type Distribution",
+      "actvty": {
+        "CHAT": "Cafe Activity",
+        "LOGIN": "Login",
+        "MSG": "Message",
+        "PAYMENT": "Payment"
+      },
+      "channel": "Acquisition Channel",
+      "channelCd": {
+        "DIRECT": "Direct Inflow",
+        "INTERNAL": "Internal",
+        "PI": "Pi Ecosystem",
+        "REFERRAL": "External Link",
+        "SEARCH": "Search",
+        "SOCIAL": "Social"
+      },
+      "collectNote": "※ Ang Pageview ay kinokolekta nang hindi hinaharangan sa paglipat ng Route. Walang Data pagkatapos ng deployment at mapupuno ito kapag nagamit na.",
+      "convActiveBuyer": "Active → Buyer Conversion",
+      "convBuyerRepeat": "Buyer → Repurchase Conversion",
+      "convFromPrev": "↓ {pct}% Conversion kumpara sa Previous Stage",
+      "convSignupActive": "Signup → Active Conversion",
+      "depth": "Engagement Depth (Active Days)",
+      "depthBucket": {
+        "d1": "1 Day",
+        "d15p": "15 Days+",
+        "d2_3": "2~3 Days",
+        "d4_7": "4~7 Days",
+        "d8_14": "8~14 Days"
+      },
+      "exitTop": "Exit Page Top",
+      "funnelTitle": "Lifecycle Conversion Funnel",
+      "funnelUnit": "· Cumulative (Overall)",
+      "kpiBounce": "Bounce Rate",
+      "kpiDwell": "Average Dwell",
+      "kpiPv": "Pageview",
+      "kpiSessions": "Session",
+      "landingTop": "Landing Page Top",
+      "pvTrend": "Pageview Trend",
+      "stage": {
+        "active": "Activity (Login+)",
+        "buyer": "First Purchase",
+        "repeat": "Repurchase",
+        "signup": "Signup"
+      },
+      "webTraffic": "🧭 Web Traffic"
+    },
+    "revenue": {
+      "abcTitle": "ABC Analysis (Pareto) · Pi Sales Contribution by Theme",
+      "bubbleNote": "Bubble Size = Sales Proportion · 1 Pi = 100 Bean Conversion",
+      "bubbleTitle": "Sales Proportion by Theme (Bean)",
+      "kpiBeanRecover": "Bean Recovery Sales",
+      "kpiBeanTxn": "Bean Transaction Count",
+      "kpiChargeCnt": "Charge Count",
+      "kpiPiCash": "Pi Cash Sales (Charge)",
+      "maTitle": "Daily Pi Cash Sales + 7-day Moving Average",
+      "treemapTitle": "Sales Proportion by Theme (Pi)",
+      "yoyTitle": "Year-on-Year (YoY) Comparison",
+      "yoyUnit": "· Monthly Pi Sales",
+      "zchartTitle": "Z-Chart (Current Month·Cumulative·Moving Cumulative)",
+      "zchartUnit": "· Pi Sales"
+    },
+    "tabs": {
+      "order": "🧾 Order",
+      "perf": "⚡ Performance",
+      "revenue": "💰 Revenue",
+      "usage": "👥 Access · Usage"
+    },
+    "theme": {
+      "DIRECT_PAY": "Direct Pay",
+      "PI_TIP": "Bean",
+      "PRODUCT_ORDER": "Product Order",
+      "SUBSCRIPTION": "Subscription",
+      "UNKNOWN": "Other"
+    },
+    "usage": {
+      "cohort": "Signup Cohort Retention",
+      "cohortRecent": "· Huling 8 linggo",
+      "kpiDau": "DAU",
+      "kpiMau": "MAU",
+      "kpiNewSignup": "New Signup ({period} araw)",
+      "kpiStickiness": "Stickiness (DAU/MAU)",
+      "kpiWau": "WAU",
+      "locatedUsers": "Mga User na may Pahintulot sa Lokasyon {n} katao",
+      "newReturning": "New vs. Returning (Daily)",
+      "region": "Regional Distribution (By City/Province)",
+      "regionEmpty": "Walang Location Consent Data.",
+      "timeline": "DAU / WAU / MAU Trend"
+    }
+  },
   "adminI18n": {
     "activate": "I-activate",
     "activated": "Na-activate ang {locale}",
@@ -701,6 +899,15 @@
     "beanDistTitle": "Distribusyon ng Transaksyon ng Bean",
     "beanDistTotalPrefix": "Kabuuan {cnt} transaksyon · Kabuuang dami ng transaksyon {gross}",
     "beanDistTotalSuffix": "(Kabuuang halaga ng absolute value — lahat ng uri kabilang ang Pag-charge, Paggamit, Bayad sa Subscription, Tip, Bayad, Gantimpala, Pagbabalik ng bayad, Paglipat, at iba pa)",
+    "beanEmpty": "Walang Bean Revenue na kokolektahin para sa panahong ito.",
+    "beanError": "Hindi na-load ang Revenue Data.",
+    "beanFlowCharge": "Charge (Issue)",
+    "beanFlowRefund": "Refund",
+    "beanFlowReward": "Reward",
+    "beanFlowsCaption": "Charge · Spend · Reward · Refund",
+    "beanFlowSpend": "Spend",
+    "beanUnitPrefix": "Unit",
+    "beanUnitSuffix": "Bean · Huling {period} araw",
     "fetchFail": "Nabigo ang pagkuha ng Data",
     "flowBadge": {
       "in": "Inflow",

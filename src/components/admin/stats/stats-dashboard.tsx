@@ -10,8 +10,8 @@ import { BeanRevenueDistribution } from '@/components/admin/token-distribution'
 import { BeanIcon } from '@/components/ui/bean-icon'
 import { StatsCard } from './stats-card'
 import { StatsDateFilter } from './stats-date-filter'
-import { TranslateStatsSection } from './translate-stats-section'
 import { BeanTopSpenders } from './bean-top-spenders'
+import { AnalyticsHub } from '@/components/admin/analytics/analytics-hub'
 import type {
   ActivityStatsResponse,
   BeanRevenueResponse,
@@ -100,6 +100,7 @@ function RankingCard({
 export function StatsDashboard() {
   const t = useTranslations('adminStats')
   const tc = useTranslations('common')
+  const ta = useTranslations('adminAnalytics')
   const [period, setPeriod] = useState(7)
   const [activityData, setActivityData] =
     useState<ActivityStatsResponse | null>(null)
@@ -372,25 +373,20 @@ export function StatsDashboard() {
         </LazySection>
       </section>
 
-      {/* ─── 번역 섹션 (PiTranslate™) — 스크롤 진입 시 마운트·로드 ───── */}
+      {/* ─── 통합 분석 — (구)번역 섹션 자리에 이식. 공개 노출이므로 개인 식별은
+              서버사이드에서 마스킹된다(orders RFM 표시명 등). 스크롤 진입 시 마운트. ───── */}
       <section className="space-y-4">
-        <h2 className="text-lg font-semibold">{t('translateSection')}</h2>
+        <h2 className="text-lg font-semibold">{ta('pageTitle')}</h2>
         <LazySection
           fallback={
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-                {[0, 1, 2, 3].map((i) => (
-                  <div
-                    key={i}
-                    className="bg-muted h-20 animate-pulse rounded-lg"
-                  />
-                ))}
-              </div>
-              <div className="bg-muted h-40 animate-pulse rounded-lg" />
+              <div className="bg-muted h-20 animate-pulse rounded-xl" />
+              <div className="bg-muted h-10 animate-pulse rounded-xl" />
+              <div className="bg-muted h-64 animate-pulse rounded-lg" />
             </div>
           }
         >
-          <TranslateStatsSection period={period} />
+          <AnalyticsHub />
         </LazySection>
       </section>
     </div>

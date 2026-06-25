@@ -236,6 +236,7 @@
       "vercelNote": "Aplikasi ini di-deploy di Vercel Serverless, sehingga 'file' Log tidak menumpuk di server operasional (Log fungsi dapat dilihat di Dashboard Vercel). Di bawah ini adalah tabel Log DB yang kapasitasnya benar-benar meningkat."
     },
     "nav": {
+      "analytics": "Analisis Terpadu",
       "backHome": "← Ke Home",
       "batch": "On-demand Batch",
       "beanAudit": "Log Audit",
@@ -255,6 +256,8 @@
       "eventExclude": "Kelola Pengecualian",
       "eventGifts": "Kirim Hadiah",
       "eventSection": "Event",
+      "feedback": "Manajemen Feedback",
+      "feedbackCtgrItems": "Item Penilaian Feedback",
       "i18n": "Manajemen Multibahasa",
       "i18nSection": "Multibahasa",
       "links": "Status Penautan Akun",
@@ -278,6 +281,7 @@
       "subscrPricing": "Harga Langganan",
       "themes": "Manajemen Theme",
       "title": "Admin",
+      "uiThemes": "UI Theme",
       "users": "Manajemen Pengguna"
     },
     "payments": {
@@ -651,6 +655,200 @@
       "totalCount": "Total {count} orang"
     }
   },
+  "adminAnalytics": {
+    "charts": {
+      "abcCum": "Proporsi Kumulatif",
+      "abcEmpty": "Tidak ada Data Penjualan untuk dianalisis.",
+      "abcRev": "Penjualan (π)",
+      "abcSummary": "Grade A {a} (Inti Penjualan) · B {b} · C {c} · Berdasarkan kumulatif 80%/95%",
+      "bubbleEmpty": "Tidak ada Data Penjualan untuk ditampilkan.",
+      "cohortAgo": "{n} Minggu yang lalu",
+      "cohortEmpty": "Tidak ada Cohort Pendaftaran dalam 8 minggu terakhir.",
+      "cohortHead": "Cohort",
+      "cohortNote": "Berdasarkan minggu pendaftaran · Minggu 0 = Tingkat aktivitas pada minggu pendaftaran · Semakin gelap warnanya, semakin tinggi tingkat retensi",
+      "cohortSize": "Ukuran",
+      "cohortWeek": "{k} Minggu",
+      "depthBucket": {
+        "d1": "1 hari",
+        "d15p": "15+ hari",
+        "d2_3": "2~3 hari",
+        "d4_7": "4~7 hari",
+        "d8_14": "8~14 hari"
+      },
+      "dow": "Min,Sen,Sel,Rab,Kam,Jum,Sab",
+      "dwellHover": "Dwell",
+      "funnelEmpty": "Tidak ada Data untuk menggambar Funnel.",
+      "funnelStageLine": "{idx}. {label}",
+      "heatNote": "Berdasarkan KST · Semakin gelap warnanya, semakin tinggi konsentrasi pesanan (Maksimal {max} pesanan)",
+      "interval": {
+        "d0_1": "0~1 hari",
+        "d15_30": "15~30 hari",
+        "d2_3": "2~3 hari",
+        "d30p": "30+ hari",
+        "d4_7": "4~7 hari",
+        "d8_14": "8~14 hari"
+      },
+      "intervalEmpty": "Data Interval Pembelian Berulang tidak cukup (diperlukan 2 kali atau lebih pembelian berulang).",
+      "maAvg": "{n} hari Rata-rata Bergerak",
+      "maDaily": "Penjualan Harian (π)",
+      "maEmpty": "Tidak ada Penjualan Pi untuk diakumulasikan pada periode ini.",
+      "nrEmpty": "Tidak ada Data Aktivitas pada periode ini.",
+      "nrNew": "Baru",
+      "nrReturning": "Pengunjung Kembali",
+      "pvEmpty": "Belum ada Pageview yang terkumpul.",
+      "pvLegend": "Pageview",
+      "rfmAxisX": "Waktu Sejak Pembelian Terakhir (hari) · Semakin ke kanan, semakin baru",
+      "rfmAxisY": "Frekuensi Pembelian",
+      "rfmEmpty": "Tidak ada Pesanan Selesai untuk analisis RFM.",
+      "yoyEmpty": "Tidak ada Data Penjualan untuk perbandingan YoY.",
+      "yoyNote": "Tidak ada Data Penjualan untuk tahun {prev}, sehingga tidak ada kriteria perbandingan (hanya tahun {cur} yang ditampilkan) — Data akan dibandingkan secara otomatis setelah terakumulasi.",
+      "zEmpty": "Tidak ada Data Penjualan untuk menggambar Z-Chart.",
+      "zMat": "Kumulatif Bergerak (12 bulan)",
+      "zMonth": "Bulan Ini",
+      "zYtd": "Kumulatif (YTD)"
+    },
+    "common": {
+      "noData": "Tidak ada Data yang terkumpul",
+      "recentDays": "· {period} hari terakhir",
+      "retry": "Coba lagi",
+      "uCase": "kasus",
+      "uCount": "buah",
+      "uDay": "hari",
+      "uPerson": "orang",
+      "uPv": "PV",
+      "uSec": "detik"
+    },
+    "northStar": {
+      "dau": "DAU",
+      "label": "⭐ Metrik North Star",
+      "mau": "Pengguna Aktif (MAU)",
+      "note": "Penjualan·Pendapatan adalah sarana. Jumlah pengguna aktif adalah tujuan utama.",
+      "stickiness": "Stickiness (DAU/MAU)"
+    },
+    "order": {
+      "heatmapTitle": "Kepadatan Pesanan Hari × Waktu",
+      "intervalTitle": "Distribusi Interval Pembelian Ulang",
+      "kpiAov": "Nilai Pesanan Rata-rata (AOV)",
+      "kpiCancel": "Tingkat Pembatalan",
+      "kpiInterval": "Interval Pesanan Rata-rata",
+      "kpiOrders": "Total Pesanan",
+      "kpiRepeat": "Tingkat Pembelian Ulang",
+      "method": {
+        "DELIVERY": "Delivery",
+        "DINE_IN": "Makan di Tempat",
+        "PICKUP": "Pickup",
+        "UNKNOWN": "Tidak Ditentukan"
+      },
+      "methodEmpty": "Tidak ada Data Pesanan.",
+      "methodTitle": "Distribusi Metode Pesanan",
+      "rfmTitle": "RFM Pelanggan Segmentation",
+      "seg": {
+        "at_risk": "Risiko Churn",
+        "champion": "Champion",
+        "hibernating": "Tidak Aktif",
+        "loyal": "Pelanggan Setia",
+        "potential": "Pelanggan Potensial",
+        "recent": "Baru·Terbaru"
+      },
+      "thBuy": "Pembelian",
+      "thCustomer": "Pelanggan",
+      "thRecent": "Terbaru (Hari)",
+      "thSegment": "Segment",
+      "thTotal": "Total (π)"
+    },
+    "pageSubtitle": "Penjualan · Pesanan · Akses/Penggunaan · Performance di satu tempat. Pengguna Aktif (North Star) adalah prioritas utama.",
+    "pageTitle": "📊 Analisis Terpadu",
+    "perf": {
+      "activeUsers": "{n} Pengguna Aktif",
+      "activityType": "Distribusi Tipe Aktivitas",
+      "actvty": {
+        "CHAT": "Aktivitas Cafe",
+        "LOGIN": "Login",
+        "MSG": "Message",
+        "PAYMENT": "Pembayaran"
+      },
+      "channel": "Channel Sumber",
+      "channelCd": {
+        "DIRECT": "Lalu Lintas Langsung",
+        "INTERNAL": "Internal",
+        "PI": "Ekosistem Pi",
+        "REFERRAL": "Tautan Eksternal",
+        "SEARCH": "Search",
+        "SOCIAL": "Social"
+      },
+      "collectNote": "※ Pageview dikumpulkan tanpa blokir saat Route beralih. Data kosong segera setelah deployment dan akan terisi seiring penggunaan.",
+      "convActiveBuyer": "Konversi Aktivitas → Pembelian",
+      "convBuyerRepeat": "Konversi Pembelian → Pembelian Ulang",
+      "convFromPrev": "↓ Konversi {pct}% dibandingkan tahap sebelumnya",
+      "convSignupActive": "Konversi Pendaftaran → Aktivitas",
+      "depth": "Kedalaman Partisipasi (Jumlah Hari Aktif)",
+      "depthBucket": {
+        "d1": "1 hari",
+        "d15p": "15 hari+",
+        "d2_3": "2~3 hari",
+        "d4_7": "4~7 hari",
+        "d8_14": "8~14 hari"
+      },
+      "exitTop": "Top Exit Page",
+      "funnelTitle": "Funnel Konversi Lifecycle",
+      "funnelUnit": "· Akumulasi (Total)",
+      "kpiBounce": "Bounce Rate",
+      "kpiDwell": "Durasi Rata-rata",
+      "kpiPv": "Pageview",
+      "kpiSessions": "Session",
+      "landingTop": "Top Landing Page",
+      "pvTrend": "Tren Pageview",
+      "stage": {
+        "active": "Aktivitas (Login+)",
+        "buyer": "Pembelian Pertama",
+        "repeat": "Pembelian Berulang",
+        "signup": "Pendaftaran"
+      },
+      "webTraffic": "🧭 Web Traffic"
+    },
+    "revenue": {
+      "abcTitle": "Analisis ABC (Pareto) · Kontribusi Penjualan Pi Berdasarkan Tema",
+      "bubbleNote": "Ukuran Bubble = Proporsi Penjualan · 1 Pi = setara 100 Bean",
+      "bubbleTitle": "Proporsi Penjualan Berdasarkan Tema (Bean)",
+      "kpiBeanRecover": "Penjualan Pemulihan Bean",
+      "kpiBeanTxn": "Jumlah Transaksi Bean",
+      "kpiChargeCnt": "Jumlah Isi Ulang",
+      "kpiPiCash": "Penjualan Tunai Pi (Isi Ulang)",
+      "maTitle": "Penjualan Tunai Pi Harian + Rata-rata Bergerak 7 Hari",
+      "treemapTitle": "Proporsi Penjualan Berdasarkan Tema (Pi)",
+      "yoyTitle": "Perbandingan Tahun ke Tahun (YoY)",
+      "yoyUnit": "· Penjualan Pi Bulanan",
+      "zchartTitle": "Z-Chart (Bulan Ini·Akumulasi·Akumulasi Bergerak)",
+      "zchartUnit": "· Penjualan Pi"
+    },
+    "tabs": {
+      "order": "🧾 Pesanan",
+      "perf": "⚡ Performance",
+      "revenue": "💰 Pendapatan",
+      "usage": "👥 Akses·Penggunaan"
+    },
+    "theme": {
+      "DIRECT_PAY": "Direct Pay",
+      "PI_TIP": "Bean",
+      "PRODUCT_ORDER": "Product Order",
+      "SUBSCRIPTION": "Subscription",
+      "UNKNOWN": "Lainnya"
+    },
+    "usage": {
+      "cohort": "Retention Cohort Pendaftaran",
+      "cohortRecent": "· 8 minggu terakhir",
+      "kpiDau": "DAU",
+      "kpiMau": "MAU",
+      "kpiNewSignup": "Pendaftaran Baru ({period} hari)",
+      "kpiStickiness": "Stickiness (DAU/MAU)",
+      "kpiWau": "WAU",
+      "locatedUsers": "{n} orang menyetujui lokasi",
+      "newReturning": "Baru vs Kembali (Harian)",
+      "region": "Distribusi Wilayah (per Kota/Provinsi)",
+      "regionEmpty": "Tidak ada Data persetujuan lokasi.",
+      "timeline": "Tren DAU / WAU / MAU"
+    }
+  },
   "adminI18n": {
     "activate": "Aktifkan",
     "activated": "{locale} Diaktifkan",
@@ -701,6 +899,15 @@
     "beanDistTitle": "Distribusi Transaksi Bean",
     "beanDistTotalPrefix": "Total {cnt} transaksi · Volume Transaksi Total {gross}",
     "beanDistTotalSuffix": "(Jumlah nilai absolut — semua jenis seperti Pengisian, Penggunaan, Biaya Langganan, Tip, Biaya, Hadiah, Pengembalian Dana, Transfer, dll.)",
+    "beanEmpty": "Tidak ada penjualan Bean untuk periode ini.",
+    "beanError": "Gagal memuat Data penjualan.",
+    "beanFlowCharge": "Pengisian (Penerbitan)",
+    "beanFlowRefund": "Pengembalian Dana",
+    "beanFlowReward": "Hadiah",
+    "beanFlowsCaption": "Pengisian · Pengeluaran · Hadiah · Pengembalian Dana",
+    "beanFlowSpend": "Pengeluaran",
+    "beanUnitPrefix": "Unit",
+    "beanUnitSuffix": "Bean · {period} hari terakhir",
     "fetchFail": "Gagal mengambil Data",
     "flowBadge": {
       "in": "Inflow",

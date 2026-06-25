@@ -236,6 +236,7 @@
       "vercelNote": "แอปนี้ถูกปรับใช้บน Vercel Serverless ดังนั้นไฟล์ Log จะไม่สะสมบนเซิร์ฟเวอร์ปฏิบัติการ (สามารถดู Function Log ได้จาก Vercel Dashboard) ด้านล่างนี้คือตาราง Log DB ที่มีขนาดเพิ่มขึ้นจริง"
     },
     "nav": {
+      "analytics": "Analytics",
       "backHome": "← กลับหน้าแรก",
       "batch": "Batch On-Demand",
       "beanAudit": "บันทึกการตรวจสอบ",
@@ -255,6 +256,8 @@
       "eventExclude": "จัดการการยกเว้น",
       "eventGifts": "ส่งของขวัญ",
       "eventSection": "Event",
+      "feedback": "การจัดการ Feedback",
+      "feedbackCtgrItems": "รายการประเมิน Feedback",
       "i18n": "การจัดการหลายภาษา",
       "i18nSection": "หลายภาษา",
       "links": "สถานะการเชื่อมโยงบัญชี",
@@ -278,6 +281,7 @@
       "subscrPricing": "แผนราคาการสมัครสมาชิก",
       "themes": "จัดการ Theme",
       "title": "Admin",
+      "uiThemes": "UI Theme",
       "users": "การจัดการผู้ใช้"
     },
     "payments": {
@@ -651,6 +655,200 @@
       "totalCount": "ทั้งหมด {count} คน"
     }
   },
+  "adminAnalytics": {
+    "charts": {
+      "abcCum": "สัดส่วนสะสม",
+      "abcEmpty": "ไม่มี Data ยอดขายสำหรับวิเคราะห์",
+      "abcRev": "ยอดขาย (π)",
+      "abcSummary": "เกรด A {a} รายการ (ยอดขายหลัก) · B {b} รายการ · C {c} รายการ · อิงตามเกณฑ์สะสม 80%/95%",
+      "bubbleEmpty": "ไม่มี Data ยอดขายที่จะแสดง",
+      "cohortAgo": "{n} สัปดาห์ที่แล้ว",
+      "cohortEmpty": "ไม่มี Cohort การสมัครสมาชิกในช่วง 8 สัปดาห์ที่ผ่านมา",
+      "cohortHead": "Cohort",
+      "cohortNote": "อิงตามสัปดาห์ที่สมัครสมาชิก · สัปดาห์ที่ 0 = อัตรากิจกรรมในสัปดาห์ที่สมัคร · ยิ่งสีเข้ม ยิ่งมีอัตราการคงอยู่สูง",
+      "cohortSize": "ขนาด",
+      "cohortWeek": "สัปดาห์ที่ {k}",
+      "depthBucket": {
+        "d1": "1 วัน",
+        "d15p": "15 วัน+",
+        "d2_3": "2~3 วัน",
+        "d4_7": "4~7 วัน",
+        "d8_14": "8~14 วัน"
+      },
+      "dow": "อาทิตย์,จันทร์,อังคาร,พุธ,พฤหัสบดี,ศุกร์,เสาร์",
+      "dwellHover": "Dwell",
+      "funnelEmpty": "ไม่มี Data สำหรับสร้าง Funnel",
+      "funnelStageLine": "{idx}. {label}",
+      "heatNote": "อิงตาม KST · ยิ่งสีเข้ม ยิ่งมีการสั่งซื้อมาก (สูงสุด {max} รายการ)",
+      "interval": {
+        "d0_1": "0~1 วัน",
+        "d15_30": "15~30 วัน",
+        "d2_3": "2~3 วัน",
+        "d30p": "30 วัน+",
+        "d4_7": "4~7 วัน",
+        "d8_14": "8~14 วัน"
+      },
+      "intervalEmpty": "Data ช่วงเวลาการซื้อซ้ำไม่เพียงพอ (ต้องมีการซื้อซ้ำ 2 ครั้งขึ้นไป)",
+      "maAvg": "ค่าเฉลี่ยเคลื่อนที่ {n} วัน",
+      "maDaily": "ยอดขายรายวัน (π)",
+      "maEmpty": "ไม่มียอดขาย Pi ที่จะรวบรวมสำหรับช่วงเวลานี้",
+      "nrEmpty": "ไม่มี Data กิจกรรมสำหรับช่วงเวลานี้",
+      "nrNew": "ใหม่",
+      "nrReturning": "กลับมาเยี่ยมชม",
+      "pvEmpty": "ยังไม่มี Pageview ที่ถูกรวบรวม",
+      "pvLegend": "Pageview",
+      "rfmAxisX": "ระยะเวลาที่ผ่านไปนับตั้งแต่การซื้อล่าสุด (วัน) · ยิ่งไปทางขวา ยิ่งล่าสุด",
+      "rfmAxisY": "จำนวนครั้งที่ซื้อ",
+      "rfmEmpty": "ไม่มีคำสั่งซื้อที่เสร็จสมบูรณ์สำหรับวิเคราะห์ RFM",
+      "yoyEmpty": "ไม่มี Data ยอดขายสำหรับเปรียบเทียบ YoY",
+      "yoyNote": "ไม่มี Data ยอดขายสำหรับปี {prev} จึงไม่มีเกณฑ์การเปรียบเทียบ (แสดงเฉพาะปี {cur}) — จะถูกเปรียบเทียบโดยอัตโนมัติเมื่อ Data สะสม",
+      "zEmpty": "ไม่มี Data ยอดขายสำหรับสร้าง Z-Chart",
+      "zMat": "สะสมเคลื่อนที่ (12 เดือน)",
+      "zMonth": "เดือนปัจจุบัน",
+      "zYtd": "สะสม (YTD)"
+    },
+    "common": {
+      "noData": "ไม่มี Data ที่รวบรวม",
+      "recentDays": "· {period} วันล่าสุด",
+      "retry": "ลองอีกครั้ง",
+      "uCase": "รายการ",
+      "uCount": "จำนวน",
+      "uDay": "วัน",
+      "uPerson": "คน",
+      "uPv": "PV",
+      "uSec": "วินาที"
+    },
+    "northStar": {
+      "dau": "DAU",
+      "label": "⭐ North Star Metric",
+      "mau": "ผู้ใช้งานที่ใช้งานอยู่ (MAU)",
+      "note": "การขาย · รายได้เป็นเพียงวิธีการ จำนวนผู้ใช้งานที่ใช้งานอยู่คือเป้าหมายสูงสุด",
+      "stickiness": "Stickiness (DAU/MAU)"
+    },
+    "order": {
+      "heatmapTitle": "ความหนาแน่นของการสั่งซื้อตามวัน × เวลา",
+      "intervalTitle": "การกระจายของช่วงเวลาการซื้อซ้ำ",
+      "kpiAov": "มูลค่า Order เฉลี่ย (AOV)",
+      "kpiCancel": "อัตราการยกเลิก",
+      "kpiInterval": "ช่วงเวลา Order เฉลี่ย",
+      "kpiOrders": "จำนวน Order ทั้งหมด",
+      "kpiRepeat": "อัตราการซื้อซ้ำ",
+      "method": {
+        "DELIVERY": "Delivery",
+        "DINE_IN": "รับประทานที่ร้าน",
+        "PICKUP": "Pickup",
+        "UNKNOWN": "ไม่ระบุ"
+      },
+      "methodEmpty": "ไม่มี Data การสั่งซื้อ",
+      "methodTitle": "การกระจายของวิธีการสั่งซื้อ",
+      "rfmTitle": "RFM Customer Segmentation",
+      "seg": {
+        "at_risk": "ความเสี่ยงที่จะเลิกใช้",
+        "champion": "Champion",
+        "hibernating": "ไม่ใช้งาน",
+        "loyal": "ลูกค้าประจำ",
+        "potential": "ลูกค้าที่มีศักยภาพ",
+        "recent": "ใหม่·ล่าสุด"
+      },
+      "thBuy": "ซื้อ",
+      "thCustomer": "Customer",
+      "thRecent": "ล่าสุด (วัน)",
+      "thSegment": "Segment",
+      "thTotal": "รวม (π)"
+    },
+    "pageSubtitle": "ยอดขาย · คำสั่งซื้อ · การเข้าถึง/การใช้งาน · Performance ในที่เดียว ผู้ใช้งานที่ใช้งานอยู่ (North Star) คือสิ่งสำคัญที่สุด",
+    "pageTitle": "📊 Analytics",
+    "perf": {
+      "activeUsers": "ผู้ใช้งาน {n} คน",
+      "activityType": "การกระจายของประเภทกิจกรรม",
+      "actvty": {
+        "CHAT": "กิจกรรม Cafe",
+        "LOGIN": "Login",
+        "MSG": "Message",
+        "PAYMENT": "การชำระเงิน"
+      },
+      "channel": "ช่องทางการเข้าชม",
+      "channelCd": {
+        "DIRECT": "เข้าชมโดยตรง",
+        "INTERNAL": "ภายใน",
+        "PI": "Pi Ecosystem",
+        "REFERRAL": "ลิงก์ภายนอก",
+        "SEARCH": "Search",
+        "SOCIAL": "Social"
+      },
+      "collectNote": "※ Pageview ถูกรวบรวมโดยไม่บล็อกเมื่อมีการเปลี่ยน Route หลังจาก Deploy จะไม่มี Data และจะถูกเติมเมื่อมีการใช้งานสะสม",
+      "convActiveBuyer": "การแปลงจากการใช้งาน → การซื้อ",
+      "convBuyerRepeat": "การแปลงจากการซื้อ → การซื้อซ้ำ",
+      "convFromPrev": "↓ การเปลี่ยน {pct}% เมื่อเทียบกับขั้นตอนก่อนหน้า",
+      "convSignupActive": "การแปลงจากการสมัคร → การใช้งาน",
+      "depth": "ความลึกของการมีส่วนร่วม (จำนวนวันที่มีกิจกรรม)",
+      "depthBucket": {
+        "d1": "1 วัน",
+        "d15p": "15 วัน+",
+        "d2_3": "2~3 วัน",
+        "d4_7": "4~7 วัน",
+        "d8_14": "8~14 วัน"
+      },
+      "exitTop": "Exit Page ยอดนิยม",
+      "funnelTitle": "Lifecycle Conversion Funnel",
+      "funnelUnit": "· สะสม (ทั้งหมด)",
+      "kpiBounce": "อัตราตีกลับ",
+      "kpiDwell": "เวลาเฉลี่ยที่ใช้",
+      "kpiPv": "Pageview",
+      "kpiSessions": "Session",
+      "landingTop": "Landing Page ยอดนิยม",
+      "pvTrend": "แนวโน้ม Pageview",
+      "stage": {
+        "active": "กิจกรรม (Login+)",
+        "buyer": "การซื้อครั้งแรก",
+        "repeat": "การซื้อซ้ำ",
+        "signup": "สมัครสมาชิก"
+      },
+      "webTraffic": "🧭 Web Traffic"
+    },
+    "revenue": {
+      "abcTitle": "ABC Analysis (Pareto) · การมีส่วนร่วมของยอดขาย Pi ตาม Theme",
+      "bubbleNote": "ขนาด Bubble = สัดส่วนยอดขาย · 1 Pi = 100 Bean",
+      "bubbleTitle": "สัดส่วนยอดขายตาม Theme (Bean)",
+      "kpiBeanRecover": "ยอดขาย Bean ที่กู้คืน",
+      "kpiBeanTxn": "จำนวนครั้งของ Bean Transaction",
+      "kpiChargeCnt": "จำนวนครั้งที่เติมเงิน",
+      "kpiPiCash": "ยอดขายเงินสด Pi (การเติมเงิน)",
+      "maTitle": "ยอดขายเงินสด Pi รายวัน + ค่าเฉลี่ยเคลื่อนที่ 7 วัน",
+      "treemapTitle": "สัดส่วนยอดขายตาม Theme (Pi)",
+      "yoyTitle": "การเปรียบเทียบปีต่อปี (YoY)",
+      "yoyUnit": "· ยอดขาย Pi รายเดือน",
+      "zchartTitle": "Z-Chart (เดือนปัจจุบัน·สะสม·สะสมเคลื่อนที่)",
+      "zchartUnit": "· ยอดขาย Pi"
+    },
+    "tabs": {
+      "order": "🧾 Order",
+      "perf": "⚡ Performance",
+      "revenue": "💰 Revenue",
+      "usage": "👥 Usage"
+    },
+    "theme": {
+      "DIRECT_PAY": "Direct Pay",
+      "PI_TIP": "Bean",
+      "PRODUCT_ORDER": "Product Order",
+      "SUBSCRIPTION": "Subscription",
+      "UNKNOWN": "Unknown"
+    },
+    "usage": {
+      "cohort": "Signup Cohort Retention",
+      "cohortRecent": "· 8 สัปดาห์ล่าสุด",
+      "kpiDau": "DAU",
+      "kpiMau": "MAU",
+      "kpiNewSignup": "การลงทะเบียนใหม่ ({period} วัน)",
+      "kpiStickiness": "Stickiness (DAU/MAU)",
+      "kpiWau": "WAU",
+      "locatedUsers": "ผู้ใช้งานที่ยินยอมตำแหน่งที่ตั้ง {n} คน",
+      "newReturning": "ใหม่ vs กลับมาอีกครั้ง (รายวัน)",
+      "region": "การกระจายตามภูมิภาค (ตามจังหวัด/เมือง)",
+      "regionEmpty": "ไม่มี Data การยินยอมตำแหน่งที่ตั้ง",
+      "timeline": "แนวโน้ม DAU / WAU / MAU"
+    }
+  },
   "adminI18n": {
     "activate": "เปิดใช้งาน",
     "activated": "{locale} เปิดใช้งานแล้ว",
@@ -701,6 +899,15 @@
     "beanDistTitle": "การกระจายธุรกรรม Bean",
     "beanDistTotalPrefix": "ทั้งหมด {cnt} รายการ · ปริมาณธุรกรรมรวม {gross}",
     "beanDistTotalSuffix": "(ผลรวมของค่าสัมบูรณ์ — การเติมเงิน·การใช้งาน·ค่าสมัครสมาชิก·Tip·ค่าธรรมเนียม·รางวัล·การคืนเงิน·การโอน เป็นต้น ทุกประเภท)",
+    "beanEmpty": "ไม่มียอดขาย Bean ที่จะรวบรวมสำหรับช่วงเวลานั้น",
+    "beanError": "ไม่สามารถโหลด Data ยอดขายได้",
+    "beanFlowCharge": "เติม (ออก)",
+    "beanFlowRefund": "คืนเงิน",
+    "beanFlowReward": "รางวัล",
+    "beanFlowsCaption": "เติม · ใช้จ่าย · รางวัล · คืนเงิน",
+    "beanFlowSpend": "ใช้จ่าย",
+    "beanUnitPrefix": "หน่วย",
+    "beanUnitSuffix": "Bean · {period} วันล่าสุด",
     "fetchFail": "ดึง Data ล้มเหลว",
     "flowBadge": {
       "in": "เงินเข้า",

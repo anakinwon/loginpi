@@ -252,8 +252,8 @@ export function OrderTab({ period }: { period: number }) {
                 </tr>
               </thead>
               <tbody>
-                {data.rfm.top.map((u) => (
-                  <tr key={u.usr_id} className="border-b last:border-0">
+                {data.rfm.top.map((u, i) => (
+                  <tr key={u.usr_id || i} className="border-b last:border-0">
                     <td className="max-w-[10rem] truncate py-2 pr-2 font-medium">
                       {u.display_nm}
                     </td>

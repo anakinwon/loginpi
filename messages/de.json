@@ -236,6 +236,7 @@
       "vercelNote": "Diese App ist auf Vercel Serverless bereitgestellt, daher sammeln sich keine Log-'Dateien' auf dem Betriebsserver an (Funktions-Logs können im Vercel Dashboard eingesehen werden). Unten sind die DB Log-Tabellen aufgeführt, deren Größe tatsächlich zunimmt."
     },
     "nav": {
+      "analytics": "Integrierte Analysen",
       "backHome": "← Zur Startseite",
       "batch": "On-Demand Batch",
       "beanAudit": "Audit-Log",
@@ -255,6 +256,8 @@
       "eventExclude": "Ausschluss verwalten",
       "eventGifts": "Geschenk senden",
       "eventSection": "Event",
+      "feedback": "Feedback-Verwaltung",
+      "feedbackCtgrItems": "Feedback-Bewertungselemente",
       "i18n": "Internationalisierungsverwaltung",
       "i18nSection": "Internationalisierung",
       "links": "Kontoverknüpfungsstatus",
@@ -278,6 +281,7 @@
       "subscrPricing": "Abonnementpreise",
       "themes": "Theme-Verwaltung",
       "title": "Admin",
+      "uiThemes": "UI Themes",
       "users": "Benutzerverwaltung"
     },
     "payments": {
@@ -651,6 +655,200 @@
       "totalCount": "Insgesamt {count} Personen"
     }
   },
+  "adminAnalytics": {
+    "charts": {
+      "abcCum": "Kumulativer Anteil",
+      "abcEmpty": "Es sind keine Umsatz-Data zur Analyse vorhanden.",
+      "abcRev": "Umsatz (π)",
+      "abcSummary": "A-Kategorie {a} (Umsatzkern) · B {b} · C {c} · Kumulative 80%/95% Kriterien",
+      "bubbleEmpty": "Es sind keine Umsatz-Data zum Anzeigen vorhanden.",
+      "cohortAgo": "Vor {n} Wochen",
+      "cohortEmpty": "Innerhalb der letzten 8 Wochen sind keine Registrierungs-Cohorts vorhanden.",
+      "cohortHead": "Cohort",
+      "cohortNote": "Basierend auf der Registrierungswoche · Woche 0 = Aktivitätsrate der Registrierungswoche · Je dunkler die Farbe, desto höher die Retention Rate",
+      "cohortSize": "Größe",
+      "cohortWeek": "Woche {k}",
+      "depthBucket": {
+        "d1": "1 Tag",
+        "d15p": "15 Tage+",
+        "d2_3": "2~3 Tage",
+        "d4_7": "4~7 Tage",
+        "d8_14": "8~14 Tage"
+      },
+      "dow": "So,Mo,Di,Mi,Do,Fr,Sa",
+      "dwellHover": "Verweildauer",
+      "funnelEmpty": "Es sind keine Data vorhanden, um den Funnel zu zeichnen.",
+      "funnelStageLine": "{idx}. {label}",
+      "heatNote": "Basierend auf KST · Je dunkler die Farbe, desto höher die Bestellkonzentration (maximal {max} Bestellungen)",
+      "interval": {
+        "d0_1": "0~1 Tag",
+        "d15_30": "15~30 Tage",
+        "d2_3": "2~3 Tage",
+        "d30p": "30 Tage+",
+        "d4_7": "4~7 Tage",
+        "d8_14": "8~14 Tage"
+      },
+      "intervalEmpty": "Wiederkauf-Intervall-Data sind unzureichend (mindestens 2 Wiederkäufe erforderlich).",
+      "maAvg": "{n}-Tage gleitender Durchschnitt",
+      "maDaily": "Tagesumsatz (π)",
+      "maEmpty": "Für diesen Zeitraum sind keine Pi Umsätze verfügbar.",
+      "nrEmpty": "Für diesen Zeitraum sind keine Aktivitäts-Data vorhanden.",
+      "nrNew": "Neu",
+      "nrReturning": "Wiederkehrend",
+      "pvEmpty": "Es wurden noch keine Pageviews gesammelt.",
+      "pvLegend": "Pageviews",
+      "rfmAxisX": "Vergangene Tage seit letztem Kauf · Rechts ist neuer",
+      "rfmAxisY": "Anzahl der Käufe",
+      "rfmEmpty": "Es sind keine abgeschlossenen Bestellungen zur RFM-Analyse vorhanden.",
+      "yoyEmpty": "Es sind keine Umsatz-Data für den YoY-Vergleich vorhanden.",
+      "yoyNote": "Da keine Umsatz-Data für das Jahr {prev} vorhanden sind, gibt es keine Vergleichsbasis ({cur} Jahr wird nur angezeigt) — Data werden automatisch verglichen, sobald sie sich ansammeln.",
+      "zEmpty": "Es sind keine Umsatz-Data zum Zeichnen des Z-Charts vorhanden.",
+      "zMat": "Gleitende Summe (12 Monate)",
+      "zMonth": "Aktueller Monat",
+      "zYtd": "Kumuliert (YTD)"
+    },
+    "common": {
+      "noData": "Keine Daten gesammelt",
+      "recentDays": "· Letzte {period} Tage",
+      "retry": "Erneut versuchen",
+      "uCase": "Fälle",
+      "uCount": "Stück",
+      "uDay": "Tag",
+      "uPerson": "Person",
+      "uPv": "PV",
+      "uSec": "Sekunde"
+    },
+    "northStar": {
+      "dau": "DAU",
+      "label": "⭐ North Star Metrik",
+      "mau": "Aktive Benutzer (MAU)",
+      "note": "Verkäufe · Umsatz sind Mittel zum Zweck. Die Anzahl der aktiven Benutzer ist das oberste Ziel.",
+      "stickiness": "Bindungsrate (DAU/MAU)"
+    },
+    "order": {
+      "heatmapTitle": "Bestelldichte nach Wochentag × Uhrzeit",
+      "intervalTitle": "Verteilung des Wiederholungskaufintervalls",
+      "kpiAov": "Durchschnittlicher Bestellwert (AOV)",
+      "kpiCancel": "Stornierungsrate",
+      "kpiInterval": "Durchschnittliches Bestellintervall",
+      "kpiOrders": "Gesamtbestellungen",
+      "kpiRepeat": "Wiederkaufsrate",
+      "method": {
+        "DELIVERY": "Lieferung",
+        "DINE_IN": "Vor Ort",
+        "PICKUP": "Pickup",
+        "UNKNOWN": "Nicht spezifiziert"
+      },
+      "methodEmpty": "Keine Bestelldaten vorhanden.",
+      "methodTitle": "Verteilung der Bestellmethoden",
+      "rfmTitle": "RFM Kunden Segmentation",
+      "seg": {
+        "at_risk": "Abwanderungsgefährdet",
+        "champion": "Champion",
+        "hibernating": "Inaktiv",
+        "loyal": "Treue Kunden",
+        "potential": "Potenzielle Kunden",
+        "recent": "Neu·Aktuell"
+      },
+      "thBuy": "Kauf",
+      "thCustomer": "Kunde",
+      "thRecent": "Letzter (Tage)",
+      "thSegment": "Segment",
+      "thTotal": "Gesamt (π)"
+    },
+    "pageSubtitle": "Umsatz · Bestellungen · Zugriff/Nutzung · Performance an einem Ort. Aktive Benutzer (North Star) haben oberste Priorität.",
+    "pageTitle": "📊 Integrierte Analysen",
+    "perf": {
+      "activeUsers": "Aktive Nutzer {n} Personen",
+      "activityType": "Verteilung des Aktivitätstyps",
+      "actvty": {
+        "CHAT": "Chat-Aktivität",
+        "LOGIN": "Login",
+        "MSG": "Message",
+        "PAYMENT": "Zahlung"
+      },
+      "channel": "Traffic Kanal",
+      "channelCd": {
+        "DIRECT": "Direkter Traffic",
+        "INTERNAL": "Intern",
+        "PI": "Pi Ecosystem",
+        "REFERRAL": "Externer Link",
+        "SEARCH": "Suche",
+        "SOCIAL": "Social"
+      },
+      "collectNote": "※ Pageviews werden bei Route-Transition nicht blockierend erfasst. Direkt nach der Bereitstellung sind die Data leer und werden gefüllt, sobald sich die Nutzung ansammelt.",
+      "convActiveBuyer": "Aktivität → Kauf Konversion",
+      "convBuyerRepeat": "Kauf → Wiederholungskauf Konversion",
+      "convFromPrev": "↓ {pct}% Conversion im Vergleich zur vorherigen Phase",
+      "convSignupActive": "Registrierung → Aktivität Konversion",
+      "depth": "Engagement Tiefe (Aktivitätstage)",
+      "depthBucket": {
+        "d1": "1 Tag",
+        "d15p": "15 Tage+",
+        "d2_3": "2-3 Tage",
+        "d4_7": "4-7 Tage",
+        "d8_14": "8-14 Tage"
+      },
+      "exitTop": "Top Exit Pages",
+      "funnelTitle": "Lifecycle Konversion Funnel",
+      "funnelUnit": "· Kumuliert (Gesamt)",
+      "kpiBounce": "Absprungrate",
+      "kpiDwell": "Durchschnittliche Verweildauer",
+      "kpiPv": "Pageview",
+      "kpiSessions": "Session",
+      "landingTop": "Top Landing Pages",
+      "pvTrend": "Pageview Trend",
+      "stage": {
+        "active": "Aktivität (Login+)",
+        "buyer": "Erster Kauf",
+        "repeat": "Wiederholter Kauf",
+        "signup": "Registrierung"
+      },
+      "webTraffic": "🧭 Web Traffic"
+    },
+    "revenue": {
+      "abcTitle": "ABC Analyse (Pareto) · Pi Umsatzbeitrag nach Thema",
+      "bubbleNote": "Bubble Größe = Umsatzanteil · 1 Pi = 100 Bean Umrechnung",
+      "bubbleTitle": "Umsatzanteil nach Thema (Bean)",
+      "kpiBeanRecover": "Bean Rückgewinnungs-Umsatz",
+      "kpiBeanTxn": "Anzahl der Bean Transaktionen",
+      "kpiChargeCnt": "Anzahl der Aufladungen",
+      "kpiPiCash": "Pi Barumsatz (Aufladung)",
+      "maTitle": "Täglicher Pi Barumsatz + 7-Tage gleitender Durchschnitt",
+      "treemapTitle": "Umsatzanteil nach Thema (Pi)",
+      "yoyTitle": "Vorjahresvergleich (YoY)",
+      "yoyUnit": "· Monatlicher Pi Umsatz",
+      "zchartTitle": "Z-Chart (Aktueller Monat·Kumuliert·Gleitend Kumuliert)",
+      "zchartUnit": "· Pi Umsatz"
+    },
+    "tabs": {
+      "order": "🧾 Bestellungen",
+      "perf": "⚡ Performance",
+      "revenue": "💰 Umsatz",
+      "usage": "👥 Zugriff · Nutzung"
+    },
+    "theme": {
+      "DIRECT_PAY": "Direktzahlung",
+      "PI_TIP": "Bean",
+      "PRODUCT_ORDER": "Produktbestellung",
+      "SUBSCRIPTION": "Abonnement",
+      "UNKNOWN": "Sonstiges"
+    },
+    "usage": {
+      "cohort": "Anmelde-Kohorten-Retention",
+      "cohortRecent": "· Letzte 8 Wochen",
+      "kpiDau": "DAU",
+      "kpiMau": "MAU",
+      "kpiNewSignup": "Neue Anmeldungen ({period} Tage)",
+      "kpiStickiness": "Bindungsrate (DAU/MAU)",
+      "kpiWau": "WAU",
+      "locatedUsers": "{n} Benutzer mit Standortzustimmung",
+      "newReturning": "Neu vs. Wiederkehrend (Täglich)",
+      "region": "Regionale Verteilung (nach Stadt/Provinz)",
+      "regionEmpty": "Keine Standortzustimmungsdaten verfügbar.",
+      "timeline": "DAU / WAU / MAU Trend"
+    }
+  },
   "adminI18n": {
     "activate": "Aktivieren",
     "activated": "{locale} aktiviert",
@@ -701,6 +899,15 @@
     "beanDistTitle": "Bean-Transaktionsverteilung",
     "beanDistTotalPrefix": "Gesamt {cnt} Transaktionen · Gesamtvolumen {gross}",
     "beanDistTotalSuffix": "(Summe der Absolutwerte — alle Typen wie Aufladung, Ausgabe, Abonnementgebühr, Tip, Gebühr, Belohnung, Rückerstattung, Übertragung)",
+    "beanEmpty": "Für diesen Zeitraum gibt es keine Bean-Umsätze zum Aggregieren.",
+    "beanError": "Umsatzdaten konnten nicht geladen werden.",
+    "beanFlowCharge": "Aufladen (Ausgabe)",
+    "beanFlowRefund": "Rückerstattung",
+    "beanFlowReward": "Belohnung",
+    "beanFlowsCaption": "Aufladen · Ausgabe · Belohnung · Rückerstattung",
+    "beanFlowSpend": "Ausgabe",
+    "beanUnitPrefix": "Einheit",
+    "beanUnitSuffix": "Bean · Letzte {period} Tage",
     "fetchFail": "Data Abruf fehlgeschlagen",
     "flowBadge": {
       "in": "Zufluss",

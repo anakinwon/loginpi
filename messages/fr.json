@@ -236,6 +236,7 @@
       "vercelNote": "Cette application est déployée sur Vercel serverless, les 'fichiers' de Logs ne s'accumulent donc pas sur le serveur opérationnel (les Logs de fonction peuvent être consultés sur le Dashboard Vercel). Ci-dessous se trouvent les tables de Logs de la DB dont la capacité augmente réellement."
     },
     "nav": {
+      "analytics": "Analytics",
       "backHome": "← Retour à l'accueil",
       "batch": "Batch On-demand",
       "beanAudit": "Audit Log",
@@ -255,6 +256,8 @@
       "eventExclude": "Gérer les exclusions",
       "eventGifts": "Envoyer des cadeaux",
       "eventSection": "Event",
+      "feedback": "Gestion des avis",
+      "feedbackCtgrItems": "Éléments d'évaluation des avis",
       "i18n": "Gestion de l'internationalisation",
       "i18nSection": "Internationalisation",
       "links": "Statut de la liaison de compte",
@@ -278,6 +281,7 @@
       "subscrPricing": "Plans d'abonnement",
       "themes": "Gestion des thèmes",
       "title": "Admin",
+      "uiThemes": "UI Themes",
       "users": "Gestion des utilisateurs"
     },
     "payments": {
@@ -651,6 +655,200 @@
       "totalCount": "Total {count} utilisateurs"
     }
   },
+  "adminAnalytics": {
+    "charts": {
+      "abcCum": "Proportion cumulée",
+      "abcEmpty": "Aucune Data de ventes à analyser.",
+      "abcRev": "Ventes (π)",
+      "abcSummary": "Catégorie A : {a} (Ventes clés) · B : {b} · C : {c} · Basé sur 80%/95% cumulés",
+      "bubbleEmpty": "Aucune Data de ventes à afficher.",
+      "cohortAgo": "Il y a {n} semaines",
+      "cohortEmpty": "Aucune Cohort d'inscription au cours des 8 dernières semaines.",
+      "cohortHead": "Cohort",
+      "cohortNote": "Basé sur la semaine d'inscription · Semaine 0 = Taux d'activité de la semaine d'inscription · Plus la couleur est foncée, plus le taux de rétention est élevé",
+      "cohortSize": "Taille",
+      "cohortWeek": "Semaine {k}",
+      "depthBucket": {
+        "d1": "1 jour",
+        "d15p": "15 jours+",
+        "d2_3": "2~3 jours",
+        "d4_7": "4~7 jours",
+        "d8_14": "8~14 jours"
+      },
+      "dow": "Dim,Lun,Mar,Mer,Jeu,Ven,Sam",
+      "dwellHover": "Séjour",
+      "funnelEmpty": "Aucune Data pour dessiner le Funnel.",
+      "funnelStageLine": "{idx}. {label}",
+      "heatNote": "Basé sur KST · Plus la couleur est foncée, plus les commandes sont concentrées (max {max} commandes)",
+      "interval": {
+        "d0_1": "0~1 jour",
+        "d15_30": "15~30 jours",
+        "d2_3": "2~3 jours",
+        "d30p": "30 jours+",
+        "d4_7": "4~7 jours",
+        "d8_14": "8~14 jours"
+      },
+      "intervalEmpty": "Les Data d'intervalle de réachat sont insuffisantes (au moins 2 réachats sont nécessaires).",
+      "maAvg": "Moyenne mobile sur {n} jours",
+      "maDaily": "Ventes quotidiennes (π)",
+      "maEmpty": "Aucune vente Pi à agréger pour cette période.",
+      "nrEmpty": "Aucune Data d'activité pour cette période.",
+      "nrNew": "Nouveaux visiteurs",
+      "nrReturning": "Visiteurs récurrents",
+      "pvEmpty": "Aucune Pageview n'a encore été collectée.",
+      "pvLegend": "Pageview",
+      "rfmAxisX": "Temps écoulé depuis le dernier achat (jours) · Plus à droite = plus récent",
+      "rfmAxisY": "Nombre d'achats",
+      "rfmEmpty": "Aucune commande terminée pour l'analyse RFM.",
+      "yoyEmpty": "Aucune Data de ventes pour la comparaison YoY.",
+      "yoyNote": "Aucune Data de ventes pour {prev} pour la comparaison ({cur} seulement affiché) — La comparaison sera automatique lorsque les Data s'accumuleront.",
+      "zEmpty": "Aucune Data de ventes pour dessiner le Z-Chart.",
+      "zMat": "Cumul mobile (12 mois)",
+      "zMonth": "Mois actuel",
+      "zYtd": "Cumul annuel (YTD)"
+    },
+    "common": {
+      "noData": "Aucune donnée collectée",
+      "recentDays": "· Derniers {period} jours",
+      "retry": "Réessayer",
+      "uCase": "éléments",
+      "uCount": "unités",
+      "uDay": "jours",
+      "uPerson": "personnes",
+      "uPv": "PV",
+      "uSec": "secondes"
+    },
+    "northStar": {
+      "dau": "DAU",
+      "label": "⭐ Indicateur étoile polaire",
+      "mau": "Utilisateurs actifs (MAU)",
+      "note": "Les ventes et les revenus sont des moyens. Le nombre d'utilisateurs actifs est l'objectif principal.",
+      "stickiness": "Taux de rétention (DAU/MAU)"
+    },
+    "order": {
+      "heatmapTitle": "Densité de commande par jour de la semaine × heure",
+      "intervalTitle": "Distribution de l'intervalle de réachat",
+      "kpiAov": "Panier moyen (AOV)",
+      "kpiCancel": "Taux d'annulation",
+      "kpiInterval": "Intervalle moyen entre les commandes",
+      "kpiOrders": "Nombre total de commandes",
+      "kpiRepeat": "Taux de réachat",
+      "method": {
+        "DELIVERY": "Livraison",
+        "DINE_IN": "Sur place",
+        "PICKUP": "Pickup",
+        "UNKNOWN": "Inconnu"
+      },
+      "methodEmpty": "Aucune Data de commande.",
+      "methodTitle": "Distribution des méthodes de commande",
+      "rfmTitle": "Segmentation Client RFM",
+      "seg": {
+        "at_risk": "À risque",
+        "champion": "Champion",
+        "hibernating": "En hibernation",
+        "loyal": "Client fidèle",
+        "potential": "Client potentiel",
+        "recent": "Nouveau·Récent"
+      },
+      "thBuy": "Achat",
+      "thCustomer": "Client",
+      "thRecent": "Récent (jours)",
+      "thSegment": "Segment",
+      "thTotal": "Total (π)"
+    },
+    "pageSubtitle": "Ventes, commandes, accès/utilisation, Performance en un seul endroit. Les utilisateurs actifs (étoile polaire) sont la priorité absolue.",
+    "pageTitle": "📊 Analytics",
+    "perf": {
+      "activeUsers": "{n} Utilisateurs actifs",
+      "activityType": "Distribution des types d'activité",
+      "actvty": {
+        "CHAT": "Activité de Chat",
+        "LOGIN": "Login",
+        "MSG": "Message",
+        "PAYMENT": "Paiement"
+      },
+      "channel": "Canal d'acquisition",
+      "channelCd": {
+        "DIRECT": "Trafic direct",
+        "INTERNAL": "Interne",
+        "PI": "Écosystème Pi",
+        "REFERRAL": "Referral",
+        "SEARCH": "Recherche",
+        "SOCIAL": "Social"
+      },
+      "collectNote": "※ Les Pageviews sont collectées de manière non bloquante lors des changements de Route. Les Data sont vides juste après le déploiement et se remplissent à mesure que l'utilisation s'accumule.",
+      "convActiveBuyer": "Conversion Activité → Achat",
+      "convBuyerRepeat": "Conversion Achat → Réachat",
+      "convFromPrev": "↓ {pct}% de conversion par rapport à l'étape précédente",
+      "convSignupActive": "Conversion Inscription → Activité",
+      "depth": "Profondeur d'engagement (Jours d'activité)",
+      "depthBucket": {
+        "d1": "1 jour",
+        "d15p": "15 jours+",
+        "d2_3": "2-3 jours",
+        "d4_7": "4-7 jours",
+        "d8_14": "8-14 jours"
+      },
+      "exitTop": "Top Pages de sortie",
+      "funnelTitle": "Funnel de Conversion Lifecycle",
+      "funnelUnit": "· Cumulé (Total)",
+      "kpiBounce": "Taux de rebond",
+      "kpiDwell": "Durée moyenne",
+      "kpiPv": "Pageview",
+      "kpiSessions": "Session",
+      "landingTop": "Top Landing Page",
+      "pvTrend": "Tendance des Pageview",
+      "stage": {
+        "active": "Activité (Login+)",
+        "buyer": "Premier achat",
+        "repeat": "Réachat",
+        "signup": "Inscription"
+      },
+      "webTraffic": "🧭 Web Traffic"
+    },
+    "revenue": {
+      "abcTitle": "Analyse ABC (Pareto) · Contribution au chiffre d'affaires Pi par thème",
+      "bubbleNote": "Taille du Bubble = Proportion du chiffre d'affaires · 1 Pi = 100 Bean (équivalent)",
+      "bubbleTitle": "Proportion du chiffre d'affaires par thème (Bean)",
+      "kpiBeanRecover": "Chiffre d'affaires Bean récupéré",
+      "kpiBeanTxn": "Nombre de transactions Bean",
+      "kpiChargeCnt": "Nombre de recharges",
+      "kpiPiCash": "Chiffre d'affaires Pi en espèces (Recharge)",
+      "maTitle": "Chiffre d'affaires Pi en espèces quotidien + moyenne mobile sur 7 jours",
+      "treemapTitle": "Proportion du chiffre d'affaires par thème (Pi)",
+      "yoyTitle": "Comparaison Année sur année (YoY)",
+      "yoyUnit": "· Chiffre d'affaires Pi mensuel",
+      "zchartTitle": "Z-Chart (Mois en cours·Cumulé·Cumul glissant)",
+      "zchartUnit": "· Chiffre d'affaires Pi"
+    },
+    "tabs": {
+      "order": "🧾 Commandes",
+      "perf": "⚡ Performance",
+      "revenue": "💰 Revenus",
+      "usage": "👥 Utilisation"
+    },
+    "theme": {
+      "DIRECT_PAY": "Paiement direct",
+      "PI_TIP": "Bean",
+      "PRODUCT_ORDER": "Commande de produit",
+      "SUBSCRIPTION": "Abonnement",
+      "UNKNOWN": "Autre"
+    },
+    "usage": {
+      "cohort": "Rétention de la Cohort d'inscription",
+      "cohortRecent": "· Dernières 8 semaines",
+      "kpiDau": "DAU",
+      "kpiMau": "MAU",
+      "kpiNewSignup": "Nouvelles inscriptions ({period} jours)",
+      "kpiStickiness": "Taux de rétention (DAU/MAU)",
+      "kpiWau": "WAU",
+      "locatedUsers": "{n} utilisateurs ayant autorisé la localisation",
+      "newReturning": "Nouveaux vs. Visiteurs récurrents (quotidien)",
+      "region": "Répartition régionale (par ville/province)",
+      "regionEmpty": "Aucune donnée de consentement de localisation.",
+      "timeline": "Tendance DAU / WAU / MAU"
+    }
+  },
   "adminI18n": {
     "activate": "Activer",
     "activated": "{locale} activé",
@@ -701,6 +899,15 @@
     "beanDistTitle": "Distribution des transactions Bean",
     "beanDistTotalPrefix": "Total {cnt} transactions · Volume total des transactions {gross}",
     "beanDistTotalSuffix": "(Somme des valeurs absolues — tous types : recharge, dépense, frais d'abonnement, pourboire, frais, récompense, remboursement, transfert, etc.)",
+    "beanEmpty": "Aucune vente de Bean à agréger pour cette période.",
+    "beanError": "Impossible de charger les données de vente.",
+    "beanFlowCharge": "Recharge (émission)",
+    "beanFlowRefund": "Remboursement",
+    "beanFlowReward": "Récompense",
+    "beanFlowsCaption": "Recharge · Dépense · Récompense · Remboursement",
+    "beanFlowSpend": "Dépense",
+    "beanUnitPrefix": "Unité",
+    "beanUnitSuffix": "Bean · Derniers {period} jours",
     "fetchFail": "Échec de la récupération des Data",
     "flowBadge": {
       "in": "Entrée",

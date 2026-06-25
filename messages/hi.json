@@ -236,6 +236,7 @@
       "vercelNote": "यह App Vercel Serverless पर डिप्लॉय किया गया है, इसलिए परिचालन Server पर Log 'Files' जमा नहीं होते हैं (Function Logs Vercel Dashboard से देखे जा सकते हैं)। नीचे DB Log Tables दिए गए हैं जिनकी क्षमता वास्तव में बढ़ती है।"
     },
     "nav": {
+      "analytics": "एकीकृत विश्लेषण",
       "backHome": "← होम पर वापस",
       "batch": "On-demand Batch",
       "beanAudit": "ऑडिट लॉग",
@@ -255,6 +256,8 @@
       "eventExclude": "बहिष्करण प्रबंधित करें",
       "eventGifts": "उपहार भेजें",
       "eventSection": "Event",
+      "feedback": "समीक्षा प्रबंधन",
+      "feedbackCtgrItems": "समीक्षा मूल्यांकन आइटम",
       "i18n": "बहुभाषी प्रबंधन",
       "i18nSection": "बहुभाषी",
       "links": "खाता लिंकिंग स्थिति",
@@ -278,6 +281,7 @@
       "subscrPricing": "सदस्यता मूल्य निर्धारण",
       "themes": "Theme प्रबंधन",
       "title": "Admin",
+      "uiThemes": "UI Themes",
       "users": "उपयोगकर्ता प्रबंधन"
     },
     "payments": {
@@ -651,6 +655,200 @@
       "totalCount": "कुल {count} लोग"
     }
   },
+  "adminAnalytics": {
+    "charts": {
+      "abcCum": "संचयी अनुपात",
+      "abcEmpty": "विश्लेषण करने के लिए कोई बिक्री Data नहीं है।",
+      "abcRev": "बिक्री (π)",
+      "abcSummary": "A ग्रेड {a} आइटम (मुख्य बिक्री) · B {b} आइटम · C {c} आइटम · 80%/95% संचयी मानदंड",
+      "bubbleEmpty": "प्रदर्शित करने के लिए कोई बिक्री Data नहीं है।",
+      "cohortAgo": "{n} सप्ताह पहले",
+      "cohortEmpty": "पिछले 8 हफ्तों में कोई साइन-अप Cohort नहीं है।",
+      "cohortHead": "Cohort",
+      "cohortNote": "साइन-अप सप्ताह के आधार पर · 0वां सप्ताह = साइन-अप सप्ताह की गतिविधि दर · गहरा रंग उच्च प्रतिधारण दर को दर्शाता है",
+      "cohortSize": "आकार",
+      "cohortWeek": "{k}वां सप्ताह",
+      "depthBucket": {
+        "d1": "1 दिन",
+        "d15p": "15 दिन+",
+        "d2_3": "2~3 दिन",
+        "d4_7": "4~7 दिन",
+        "d8_14": "8~14 दिन"
+      },
+      "dow": "रवि,सोम,मंगल,बुध,गुरु,शुक्र,शनि",
+      "dwellHover": "ठहराव",
+      "funnelEmpty": "Funnel बनाने के लिए कोई Data नहीं है।",
+      "funnelStageLine": "{idx}. {label}",
+      "heatNote": "KST मानक · गहरा रंग ऑर्डर एकाग्रता को दर्शाता है (अधिकतम {max} मामले)",
+      "interval": {
+        "d0_1": "0~1 दिन",
+        "d15_30": "15~30 दिन",
+        "d2_3": "2~3 दिन",
+        "d30p": "30 दिन+",
+        "d4_7": "4~7 दिन",
+        "d8_14": "8~14 दिन"
+      },
+      "intervalEmpty": "दोबारा खरीद अंतराल Data अपर्याप्त है (कम से कम 2 दोबारा खरीद आवश्यक है)।",
+      "maAvg": "{n} दिन का मूविंग एवरेज",
+      "maDaily": "दैनिक बिक्री (π)",
+      "maEmpty": "इस अवधि के लिए कोई Pi बिक्री नहीं है जिसे संकलित किया जा सके।",
+      "nrEmpty": "इस अवधि के लिए कोई गतिविधि Data नहीं है।",
+      "nrNew": "नए",
+      "nrReturning": "दोबारा आने वाले",
+      "pvEmpty": "अभी तक कोई Pageview एकत्र नहीं हुआ है।",
+      "pvLegend": "Pageview",
+      "rfmAxisX": "हाल की खरीद का समय (दिन) · जितना दाहिना, उतना ही हाल का",
+      "rfmAxisY": "खरीद की संख्या",
+      "rfmEmpty": "RFM विश्लेषण के लिए कोई पूर्ण ऑर्डर नहीं हैं।",
+      "yoyEmpty": "YoY तुलना करने के लिए कोई बिक्री Data नहीं है।",
+      "yoyNote": "{prev} वर्ष का बिक्री Data उपलब्ध नहीं है, इसलिए तुलना के लिए कोई आधार नहीं है (केवल {cur} वर्ष प्रदर्शित) — Data जमा होने पर स्वचालित रूप से तुलना की जाएगी।",
+      "zEmpty": "Z-चार्ट बनाने के लिए कोई बिक्री Data नहीं है।",
+      "zMat": "मूविंग टोटल (12 महीने)",
+      "zMonth": "चालू माह",
+      "zYtd": "संचयी (YTD)"
+    },
+    "common": {
+      "noData": "कोई एकत्रित डेटा नहीं",
+      "recentDays": "· पिछले {period} दिन",
+      "retry": "पुनः प्रयास करें",
+      "uCase": "मामले",
+      "uCount": "आइटम",
+      "uDay": "दिन",
+      "uPerson": "लोग",
+      "uPv": "PV",
+      "uSec": "सेकंड"
+    },
+    "northStar": {
+      "dau": "DAU",
+      "label": "⭐ नॉर्थ स्टार मीट्रिक",
+      "mau": "सक्रिय उपयोगकर्ता (MAU)",
+      "note": "बिक्री और राजस्व साधन हैं। सक्रिय उपयोगकर्ताओं की संख्या सर्वोच्च प्राथमिकता है।",
+      "stickiness": "स्टिकनेस (DAU/MAU)"
+    },
+    "order": {
+      "heatmapTitle": "सप्ताह का दिन × समय Order Density",
+      "intervalTitle": "पुनर्खरीद अंतराल वितरण",
+      "kpiAov": "औसत ऑर्डर मूल्य (AOV)",
+      "kpiCancel": "रद्दीकरण दर",
+      "kpiInterval": "औसत ऑर्डर अंतराल",
+      "kpiOrders": "कुल ऑर्डर",
+      "kpiRepeat": "पुनर्खरीद दर",
+      "method": {
+        "DELIVERY": "Delivery",
+        "DINE_IN": "स्टोर में भोजन",
+        "PICKUP": "Pickup",
+        "UNKNOWN": "अनिर्दिष्ट"
+      },
+      "methodEmpty": "Order Data उपलब्ध नहीं है।",
+      "methodTitle": "ऑर्डर विधि वितरण",
+      "rfmTitle": "RFM Customer Segmentation",
+      "seg": {
+        "at_risk": "जोखिम में",
+        "champion": "Champion",
+        "hibernating": "निष्क्रिय",
+        "loyal": "वफादार Customer",
+        "potential": "संभावित Customer",
+        "recent": "नया·हाल ही का"
+      },
+      "thBuy": "खरीद",
+      "thCustomer": "Customer",
+      "thRecent": "हाल ही में (दिन)",
+      "thSegment": "Segment",
+      "thTotal": "कुल (π)"
+    },
+    "pageSubtitle": "बिक्री · ऑर्डर · एक्सेस/उपयोग · प्रदर्शन एक ही स्थान पर। सक्रिय उपयोगकर्ता (नॉर्थ स्टार) सर्वोच्च प्राथमिकता।",
+    "pageTitle": "📊 एकीकृत विश्लेषण",
+    "perf": {
+      "activeUsers": "{n} सक्रिय उपयोगकर्ता",
+      "activityType": "Activity Type वितरण",
+      "actvty": {
+        "CHAT": "Cafe गतिविधि",
+        "LOGIN": "Login",
+        "MSG": "Message",
+        "PAYMENT": "भुगतान"
+      },
+      "channel": "प्राप्ति Channel",
+      "channelCd": {
+        "DIRECT": "सीधा ट्रैफ़िक",
+        "INTERNAL": "आंतरिक",
+        "PI": "Pi इकोसिस्टम",
+        "REFERRAL": "बाहरी Link",
+        "SEARCH": "खोज",
+        "SOCIAL": "Social"
+      },
+      "collectNote": "※ Pageview को Route स्विच करते समय नॉन-ब्लॉकिंग तरीके से एकत्र किया जाता है। डिप्लॉयमेंट के तुरंत बाद Data खाली होता है और उपयोग बढ़ने पर भर जाता है।",
+      "convActiveBuyer": "सक्रिय → खरीदार रूपांतरण",
+      "convBuyerRepeat": "खरीदार → पुनर्खरीद रूपांतरण",
+      "convFromPrev": "↓ पिछली स्टेज की तुलना में {pct}% रूपांतरण",
+      "convSignupActive": "Signup → सक्रिय रूपांतरण",
+      "depth": "जुड़ाव की गहराई (सक्रिय दिन)",
+      "depthBucket": {
+        "d1": "1 दिन",
+        "d15p": "15 दिन+",
+        "d2_3": "2~3 दिन",
+        "d4_7": "4~7 दिन",
+        "d8_14": "8~14 दिन"
+      },
+      "exitTop": "Exit Page Top",
+      "funnelTitle": "Lifecycle Conversion Funnel",
+      "funnelUnit": "· संचयी (कुल)",
+      "kpiBounce": "Bounce Rate",
+      "kpiDwell": "औसत ठहराव",
+      "kpiPv": "Pageview",
+      "kpiSessions": "Session",
+      "landingTop": "Landing Page Top",
+      "pvTrend": "Pageview Trend",
+      "stage": {
+        "active": "सक्रिय (Login+)",
+        "buyer": "पहली खरीद",
+        "repeat": "दोबारा खरीद",
+        "signup": "साइन अप"
+      },
+      "webTraffic": "🧭 Web Traffic"
+    },
+    "revenue": {
+      "abcTitle": "ABC Analysis (Pareto) · Theme के अनुसार Pi बिक्री योगदान",
+      "bubbleNote": "Bubble Size = बिक्री का अनुपात · 1 Pi = 100 Bean रूपांतरण",
+      "bubbleTitle": "Theme के अनुसार बिक्री का अनुपात (Bean)",
+      "kpiBeanRecover": "Bean रिकवरी बिक्री",
+      "kpiBeanTxn": "Bean Transaction की संख्या",
+      "kpiChargeCnt": "चार्ज की संख्या",
+      "kpiPiCash": "Pi नकद बिक्री (चार्ज)",
+      "maTitle": "दैनिक Pi नकद बिक्री + 7-दिवसीय मूविंग एवरेज",
+      "treemapTitle": "Theme के अनुसार बिक्री का अनुपात (Pi)",
+      "yoyTitle": "वर्ष-दर-वर्ष (YoY) तुलना",
+      "yoyUnit": "· मासिक Pi बिक्री",
+      "zchartTitle": "Z-Chart (चालू माह·संचयी·मूविंग संचयी)",
+      "zchartUnit": "· Pi बिक्री"
+    },
+    "tabs": {
+      "order": "🧾 ऑर्डर",
+      "perf": "⚡ Performance",
+      "revenue": "💰 राजस्व",
+      "usage": "👥 एक्सेस · उपयोग"
+    },
+    "theme": {
+      "DIRECT_PAY": "सीधा भुगतान",
+      "PI_TIP": "Bean",
+      "PRODUCT_ORDER": "उत्पाद ऑर्डर",
+      "SUBSCRIPTION": "सदस्यता",
+      "UNKNOWN": "अज्ञात"
+    },
+    "usage": {
+      "cohort": "साइनअप कोहोर्ट रिटेंशन",
+      "cohortRecent": "· पिछले 8 सप्ताह",
+      "kpiDau": "DAU",
+      "kpiMau": "MAU",
+      "kpiNewSignup": "नए साइनअप ({period} दिन)",
+      "kpiStickiness": "स्टिकनेस (DAU/MAU)",
+      "kpiWau": "WAU",
+      "locatedUsers": "स्थान सहमत {n} लोग",
+      "newReturning": "नए बनाम लौटने वाले (दैनिक)",
+      "region": "क्षेत्रीय वितरण (शहर/प्रांत के अनुसार)",
+      "regionEmpty": "कोई स्थान सहमति डेटा नहीं है।",
+      "timeline": "DAU / WAU / MAU रुझान"
+    }
+  },
   "adminI18n": {
     "activate": "सक्रिय करें",
     "activated": "{locale} सक्रिय किया गया",
@@ -701,6 +899,15 @@
     "beanDistTitle": "Bean लेनदेन वितरण",
     "beanDistTotalPrefix": "कुल {cnt} मामले · कुल लेनदेन मात्रा {gross}",
     "beanDistTotalSuffix": "(पूर्ण मानों का योग — चार्ज·उपयोग·सदस्यता शुल्क·Tip·शुल्क·इनाम·वापसी·स्थानांतरण आदि सभी प्रकार)",
+    "beanEmpty": "इस अवधि के लिए एकत्रित करने हेतु कोई Bean बिक्री नहीं है।",
+    "beanError": "बिक्री डेटा लोड नहीं हो सका।",
+    "beanFlowCharge": "चार्ज (जारी करें)",
+    "beanFlowRefund": "रिफंड",
+    "beanFlowReward": "इनाम",
+    "beanFlowsCaption": "चार्ज · खर्च · इनाम · रिफंड",
+    "beanFlowSpend": "खर्च",
+    "beanUnitPrefix": "इकाई",
+    "beanUnitSuffix": "Bean · पिछले {period} दिन",
     "fetchFail": "Data पुनः प्राप्त करना विफल",
     "flowBadge": {
       "in": "अंतर्वाह",

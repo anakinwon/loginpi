@@ -236,6 +236,7 @@
       "vercelNote": "Ứng dụng này được triển khai trên Vercel Serverless, nên các 'file' Log không tích lũy trên máy chủ hoạt động (Log hàm có thể xem trên Vercel Dashboard). Dưới đây là các bảng Log DB thực sự tăng dung lượng."
     },
     "nav": {
+      "analytics": "Phân tích tổng hợp",
       "backHome": "← Về trang chủ",
       "batch": "On-demand Batch",
       "beanAudit": "Log kiểm toán",
@@ -255,6 +256,8 @@
       "eventExclude": "Quản lý loại trừ",
       "eventGifts": "Gửi quà",
       "eventSection": "Event",
+      "feedback": "Quản lý phản hồi người dùng",
+      "feedbackCtgrItems": "Mục đánh giá phản hồi",
       "i18n": "Quản lý đa ngôn ngữ",
       "i18nSection": "Đa ngôn ngữ",
       "links": "Trạng thái liên kết tài khoản",
@@ -278,6 +281,7 @@
       "subscrPricing": "Gói đăng ký",
       "themes": "Quản lý Theme",
       "title": "Admin",
+      "uiThemes": "UI Theme",
       "users": "Quản lý người dùng"
     },
     "payments": {
@@ -651,6 +655,200 @@
       "totalCount": "Tổng cộng {count} người"
     }
   },
+  "adminAnalytics": {
+    "charts": {
+      "abcCum": "Tỷ trọng tích lũy",
+      "abcEmpty": "Không có Data Doanh thu để phân tích.",
+      "abcRev": "Doanh thu (π)",
+      "abcSummary": "Hạng A {a} (Doanh thu chủ chốt) · B {b} · C {c} · Tiêu chuẩn tích lũy 80%/95%",
+      "bubbleEmpty": "Không có Data Doanh thu để hiển thị.",
+      "cohortAgo": "{n} tuần trước",
+      "cohortEmpty": "Không có Cohort đăng ký trong 8 tuần gần đây.",
+      "cohortHead": "Cohort",
+      "cohortNote": "Tiêu chuẩn tuần đăng ký · Tuần 0 = Tỷ lệ hoạt động trong tuần đăng ký · Màu càng đậm, tỷ lệ giữ chân càng cao",
+      "cohortSize": "Quy mô",
+      "cohortWeek": "Tuần thứ {k}",
+      "depthBucket": {
+        "d1": "1 ngày",
+        "d15p": "15 ngày+",
+        "d2_3": "2~3 ngày",
+        "d4_7": "4~7 ngày",
+        "d8_14": "8~14 ngày"
+      },
+      "dow": "CN,T2,T3,T4,T5,T6,T7",
+      "dwellHover": "Dwell",
+      "funnelEmpty": "Không có Data để vẽ Funnel.",
+      "funnelStageLine": "{idx}. {label}",
+      "heatNote": "Tiêu chuẩn KST · Màu càng đậm, đơn hàng càng tập trung (tối đa {max} đơn)",
+      "interval": {
+        "d0_1": "0~1 ngày",
+        "d15_30": "15~30 ngày",
+        "d2_3": "2~3 ngày",
+        "d30p": "30 ngày+",
+        "d4_7": "4~7 ngày",
+        "d8_14": "8~14 ngày"
+      },
+      "intervalEmpty": "Không đủ Data khoảng cách mua lại (cần mua lại từ 2 lần trở lên).",
+      "maAvg": "Trung bình động {n} ngày",
+      "maDaily": "Doanh thu hàng ngày (π)",
+      "maEmpty": "Không có Doanh thu Pi để tổng hợp trong giai đoạn này.",
+      "nrEmpty": "Không có Data hoạt động trong giai đoạn này.",
+      "nrNew": "Mới",
+      "nrReturning": "Quay lại",
+      "pvEmpty": "Chưa có Pageview nào được thu thập.",
+      "pvLegend": "Pageview",
+      "rfmAxisX": "Thời gian mua hàng gần đây (ngày) · Càng về bên phải càng gần đây",
+      "rfmAxisY": "Số lần mua hàng",
+      "rfmEmpty": "Không có đơn hàng hoàn tất để phân tích RFM.",
+      "yoyEmpty": "Không có Data Doanh thu để so sánh YoY.",
+      "yoyNote": "Không có Data Doanh thu năm {prev} nên không có tiêu chuẩn so sánh (chỉ hiển thị năm {cur}) — Data sẽ tự động được so sánh khi tích lũy.",
+      "zEmpty": "Không có Data Doanh thu để vẽ Z-Chart.",
+      "zMat": "Tích lũy di động (12 tháng)",
+      "zMonth": "Tháng hiện tại",
+      "zYtd": "Tích lũy (YTD)"
+    },
+    "common": {
+      "noData": "Không có Data thu thập",
+      "recentDays": "· {period} ngày gần đây",
+      "retry": "Thử lại",
+      "uCase": "trường hợp",
+      "uCount": "cái",
+      "uDay": "ngày",
+      "uPerson": "người",
+      "uPv": "PV",
+      "uSec": "giây"
+    },
+    "northStar": {
+      "dau": "DAU",
+      "label": "⭐ Chỉ số Sao Bắc Đẩu",
+      "mau": "Người dùng hoạt động (MAU)",
+      "note": "Bán hàng · Doanh thu là phương tiện. Số lượng người dùng hoạt động là mục tiêu ưu tiên hàng đầu.",
+      "stickiness": "Độ bám dính (DAU/MAU)"
+    },
+    "order": {
+      "heatmapTitle": "Mật độ đặt hàng theo Ngày trong tuần × Thời gian",
+      "intervalTitle": "Phân bố khoảng thời gian mua lại",
+      "kpiAov": "Giá trị đơn hàng trung bình (AOV)",
+      "kpiCancel": "Tỷ lệ hủy",
+      "kpiInterval": "Khoảng thời gian đặt hàng trung bình",
+      "kpiOrders": "Tổng số đơn hàng",
+      "kpiRepeat": "Tỷ lệ mua lại",
+      "method": {
+        "DELIVERY": "Giao hàng",
+        "DINE_IN": "Ăn tại cửa hàng",
+        "PICKUP": "Pickup",
+        "UNKNOWN": "Chưa xác định"
+      },
+      "methodEmpty": "Không có Data đặt hàng.",
+      "methodTitle": "Phân bố phương thức đặt hàng",
+      "rfmTitle": "RFM Khách hàng Segmentation",
+      "seg": {
+        "at_risk": "Nguy cơ rời đi",
+        "champion": "Champion",
+        "hibernating": "Ngủ đông",
+        "loyal": "Khách hàng trung thành",
+        "potential": "Khách hàng tiềm năng",
+        "recent": "Mới·Gần đây"
+      },
+      "thBuy": "Mua",
+      "thCustomer": "Khách hàng",
+      "thRecent": "Gần đây (ngày)",
+      "thSegment": "Segment",
+      "thTotal": "Tích lũy (π)"
+    },
+    "pageSubtitle": "Doanh thu · Đơn hàng · Truy cập/Sử dụng · Performance tại một nơi. Ưu tiên hàng đầu là người dùng hoạt động (Sao Bắc Đẩu).",
+    "pageTitle": "📊 Phân tích tổng hợp",
+    "perf": {
+      "activeUsers": "Người hoạt động {n} người",
+      "activityType": "Phân bố loại hoạt động",
+      "actvty": {
+        "CHAT": "Hoạt động Cafe",
+        "LOGIN": "Login",
+        "MSG": "Message",
+        "PAYMENT": "Thanh toán"
+      },
+      "channel": "Kênh truy cập",
+      "channelCd": {
+        "DIRECT": "Truy cập trực tiếp",
+        "INTERNAL": "Nội bộ",
+        "PI": "Hệ sinh thái Pi",
+        "REFERRAL": "Liên kết ngoài",
+        "SEARCH": "Tìm kiếm",
+        "SOCIAL": "Social"
+      },
+      "collectNote": "※ Pageview được thu thập không chặn khi chuyển đổi Route. Data sẽ trống ngay sau khi triển khai và sẽ được điền khi có đủ lượng sử dụng.",
+      "convActiveBuyer": "Hoạt động → Chuyển đổi mua",
+      "convBuyerRepeat": "Mua → Chuyển đổi mua lại",
+      "convFromPrev": "↓ Chuyển đổi {pct}% so với giai đoạn trước",
+      "convSignupActive": "Đăng ký → Chuyển đổi hoạt động",
+      "depth": "Độ sâu tham gia (số ngày hoạt động)",
+      "depthBucket": {
+        "d1": "1 ngày",
+        "d15p": "15 ngày+",
+        "d2_3": "2~3 ngày",
+        "d4_7": "4~7 ngày",
+        "d8_14": "8~14 ngày"
+      },
+      "exitTop": "Top Trang thoát",
+      "funnelTitle": "Funnel chuyển đổi Lifecycle",
+      "funnelUnit": "· Tích lũy (Tổng thể)",
+      "kpiBounce": "Tỷ lệ thoát",
+      "kpiDwell": "Thời gian lưu trú trung bình",
+      "kpiPv": "Pageview",
+      "kpiSessions": "Session",
+      "landingTop": "Top Landing Page",
+      "pvTrend": "Xu hướng Pageview",
+      "stage": {
+        "active": "Hoạt động (Login+)",
+        "buyer": "Mua hàng lần đầu",
+        "repeat": "Mua lại",
+        "signup": "Đăng ký"
+      },
+      "webTraffic": "🧭 Web Traffic"
+    },
+    "revenue": {
+      "abcTitle": "Phân tích ABC (Pareto) · Đóng góp doanh thu Pi theo Theme",
+      "bubbleNote": "Kích thước Bubble = Tỷ trọng doanh thu · 1 Pi = 100 Bean quy đổi",
+      "bubbleTitle": "Tỷ trọng doanh thu theo Theme (Bean)",
+      "kpiBeanRecover": "Doanh thu thu hồi Bean",
+      "kpiBeanTxn": "Số lượng giao dịch Bean",
+      "kpiChargeCnt": "Số lượng nạp tiền",
+      "kpiPiCash": "Doanh thu tiền mặt Pi (nạp tiền)",
+      "maTitle": "Doanh thu tiền mặt Pi hàng ngày + Trung bình động 7 ngày",
+      "treemapTitle": "Tỷ trọng doanh thu theo Theme (Pi)",
+      "yoyTitle": "So sánh cùng kỳ năm trước (YoY)",
+      "yoyUnit": "· Doanh thu Pi hàng tháng",
+      "zchartTitle": "Z-Chart (Tháng hiện tại·Tích lũy·Tích lũy di động)",
+      "zchartUnit": "· Doanh thu Pi"
+    },
+    "tabs": {
+      "order": "🧾 Đơn hàng",
+      "perf": "⚡ Performance",
+      "revenue": "💰 Doanh thu",
+      "usage": "👥 Truy cập · Sử dụng"
+    },
+    "theme": {
+      "DIRECT_PAY": "Direct Pay",
+      "PI_TIP": "Bean",
+      "PRODUCT_ORDER": "Product Order",
+      "SUBSCRIPTION": "Subscription",
+      "UNKNOWN": "Khác"
+    },
+    "usage": {
+      "cohort": "Retention Cohort đăng ký",
+      "cohortRecent": "· 8 tuần gần đây",
+      "kpiDau": "DAU",
+      "kpiMau": "MAU",
+      "kpiNewSignup": "Đăng ký mới ({period} ngày)",
+      "kpiStickiness": "Độ bám dính (DAU/MAU)",
+      "kpiWau": "WAU",
+      "locatedUsers": "{n} người dùng đồng ý vị trí",
+      "newReturning": "Mới vs Quay lại (Hàng ngày)",
+      "region": "Phân bố khu vực (Theo tỉnh/thành phố)",
+      "regionEmpty": "Không có Data đồng ý vị trí.",
+      "timeline": "Xu hướng DAU / WAU / MAU"
+    }
+  },
   "adminI18n": {
     "activate": "Kích hoạt",
     "activated": "{locale} đã được kích hoạt",
@@ -701,6 +899,15 @@
     "beanDistTitle": "Phân phối giao dịch Bean",
     "beanDistTotalPrefix": "Tổng cộng {cnt} giao dịch · Tổng khối lượng giao dịch {gross}",
     "beanDistTotalSuffix": "(Tổng giá trị tuyệt đối — tất cả các loại như Nạp tiền, Sử dụng, Phí đăng ký, Tip, Phí, Thưởng, Hoàn tiền, Chuyển khoản v.v.)",
+    "beanEmpty": "Không có doanh thu Bean để tổng hợp trong kỳ này.",
+    "beanError": "Không thể tải Data doanh thu.",
+    "beanFlowCharge": "Nạp (Phát hành)",
+    "beanFlowRefund": "Hoàn tiền",
+    "beanFlowReward": "Thưởng",
+    "beanFlowsCaption": "Nạp · Tiêu thụ · Thưởng · Hoàn tiền",
+    "beanFlowSpend": "Tiêu thụ",
+    "beanUnitPrefix": "Đơn vị",
+    "beanUnitSuffix": "Bean · {period} ngày gần đây",
     "fetchFail": "Truy vấn Data thất bại",
     "flowBadge": {
       "in": "Dòng tiền vào",

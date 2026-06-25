@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { maskDisplayName } from '@/lib/display-mask'
 
 // GET /api/admin/analytics/orders?period=7|30|90|365 — 주문 분석 (Phase 22 §12 ②)
 //   mps_order 직접 조회 → 요약·주문방법·요일×시간 히트맵·주문간격·RFM을 온더플라이 집계.
@@ -50,9 +51,9 @@ function segmentOf(r: number, f: number): { seg: string; label: string } {
 }
 
 export async function GET(req: NextRequest) {
-  const user = await getSessionUser()
-  if (!isAdmin(user))
-    return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+  // Home 공개 분석 — 게스트 포함 전체 공개. 집계는 공개하되 상위 고객의
+  // 개인 식별(표시명·usr_id)은 비관리자에게 마스킹/제거 (stats/activity와 동일 정책).
+  const admin = isAdmin(await getSessionUser())
 
   const raw = Number(req.nextUrl.searchParams.get('period') ?? '30')
   const period = VALID_PERIODS.includes(raw as (typeof VALID_PERIODS)[number])
@@ -246,8 +247,11 @@ export async function GET(req: NextRequest) {
         monetaryPi: s.monetary,
       })),
       top: top.map((t) => ({
-        usr_id: t.usr_id,
-        display_nm: nameById.get(t.usr_id) ?? '(이름 없음)',
+        // 비관리자: usr_id 제거 + 표시명 마스킹 (개인 식별 차단, 지표는 공개)
+        usr_id: admin ? t.usr_id : '',
+        display_nm: admin
+          ? (nameById.get(t.usr_id) ?? '(이름 없음)')
+          : maskDisplayName(nameById.get(t.usr_id)),
         recencyDays: t.recencyDays,
         freq: t.freq,
         monetaryPi: t.monetary,

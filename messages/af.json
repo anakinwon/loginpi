@@ -236,6 +236,7 @@
       "vercelNote": "Hierdie app is op Vercel serverless ontplooi, so Log 'File' versamel nie op die operasionele bediener nie (funksie Logs kan op die Vercel Dashboard besigtig word). Hieronder is DB Log Tables waarvan die kapasiteit werklik toeneem."
     },
     "nav": {
+      "analytics": "Analytics",
       "backHome": "← Na Tuis",
       "batch": "On-demand Batch",
       "beanAudit": "Audit Log",
@@ -255,6 +256,8 @@
       "eventExclude": "Bestuur uitsluitings",
       "eventGifts": "Stuur geskenke",
       "eventSection": "Event",
+      "feedback": "Bestuur Terugvoer",
+      "feedbackCtgrItems": "Terugvoer Kategorie Items",
       "i18n": "Meertalige Bestuur",
       "i18nSection": "Meertalig",
       "links": "Rekeningkoppelingsstatus",
@@ -278,6 +281,7 @@
       "subscrPricing": "Intekeningpryse",
       "themes": "Tema Bestuur",
       "title": "Admin",
+      "uiThemes": "UI Themes",
       "users": "Gebruikersbestuur"
     },
     "payments": {
@@ -651,6 +655,200 @@
       "totalCount": "Totaal {count} persone"
     }
   },
+  "adminAnalytics": {
+    "charts": {
+      "abcCum": "Kumulatiewe proporsie",
+      "abcEmpty": "Geen verkope Data om te analiseer nie.",
+      "abcRev": "Verkope (π)",
+      "abcSummary": "A-graad {a} (kernverkope) · B {b} · C {c} · Kumulatiewe 80%/95% basis",
+      "bubbleEmpty": "Geen verkope Data om te vertoon nie.",
+      "cohortAgo": "{n} weke gelede",
+      "cohortEmpty": "Geen aanmeld-Kohort in die afgelope 8 weke nie.",
+      "cohortHead": "Kohort",
+      "cohortNote": "Aanmeldweek basis · Week 0 = Aktiwiteitskoers van die aanmeldweek · Hoe donkerder die kleur, hoe hoër die retensiekoers",
+      "cohortSize": "Grootte",
+      "cohortWeek": "Week {k}",
+      "depthBucket": {
+        "d1": "1 dag",
+        "d15p": "15 dae+",
+        "d2_3": "2~3 dae",
+        "d4_7": "4~7 dae",
+        "d8_14": "8~14 dae"
+      },
+      "dow": "Son,Maan,Din,Woe,Don,Vry,Sat",
+      "dwellHover": "Verblyf",
+      "funnelEmpty": "Daar is geen Data om die Funnel te teken nie.",
+      "funnelStageLine": "{idx}. {label}",
+      "heatNote": "KST basis · Hoe donkerder die kleur, hoe hoër die bestellingkonsentrasie (maksimum {max} gevalle)",
+      "interval": {
+        "d0_1": "0~1 dag",
+        "d15_30": "15~30 dae",
+        "d2_3": "2~3 dae",
+        "d30p": "30 dae+",
+        "d4_7": "4~7 dae",
+        "d8_14": "8~14 dae"
+      },
+      "intervalEmpty": "Onvoldoende herhaalde aankoopinterval Data (minstens 2 herhaalde aankope benodig).",
+      "maAvg": "{n} dae bewegende gemiddelde",
+      "maDaily": "Daaglikse verkope (π)",
+      "maEmpty": "Geen Pi-verkope om vir hierdie tydperk te aggregeer nie.",
+      "nrEmpty": "Geen aktiwiteit Data vir hierdie tydperk nie.",
+      "nrNew": "Nuut",
+      "nrReturning": "Terugkerend",
+      "pvEmpty": "Nog geen bladsybesoeke is versamel nie.",
+      "pvLegend": "Pageview",
+      "rfmAxisX": "Verloop van onlangse aankoop (dae) · Hoe verder regs, hoe meer onlangs",
+      "rfmAxisY": "Aankoopfrewensie",
+      "rfmEmpty": "Geen voltooide bestellings om RFM te analiseer nie.",
+      "yoyEmpty": "Geen verkope Data om YoY te vergelyk nie.",
+      "yoyNote": "Geen verkope Data vir {prev} jaar, dus geen vergelykingsbasis nie (slegs {cur} jaar word vertoon) — Data sal outomaties vergelyk word soos dit ophoop.",
+      "zEmpty": "Geen verkope Data om 'n Z-Chart te teken nie.",
+      "zMat": "Rollende kumulatief (12 maande)",
+      "zMonth": "Huidige maand",
+      "zYtd": "Kumulatief (YTD)"
+    },
+    "common": {
+      "noData": "Geen versamelde Data",
+      "recentDays": "· Laaste {period} dae",
+      "retry": "Probeer weer",
+      "uCase": "geval",
+      "uCount": "telling",
+      "uDay": "dag",
+      "uPerson": "persoon",
+      "uPv": "PV",
+      "uSec": "sekonde"
+    },
+    "northStar": {
+      "dau": "DAU",
+      "label": "⭐ Noordster Metriek",
+      "mau": "Aktiewe Gebruikers (MAU)",
+      "note": "Verkope en inkomste is middele. Die aantal aktiewe gebruikers is die hoogste prioriteit.",
+      "stickiness": "Kleefbaarheid (DAU/MAU)"
+    },
+    "order": {
+      "heatmapTitle": "Dag van die week × Uur Bestel Digtheid",
+      "intervalTitle": "Herhaalaankoop interval verspreiding",
+      "kpiAov": "Gemiddelde Bestelwaarde (AOV)",
+      "kpiCancel": "Kansellasiekoers",
+      "kpiInterval": "Gemiddelde Bestelinterval",
+      "kpiOrders": "Totale Bestellings",
+      "kpiRepeat": "Herkoopkoers",
+      "method": {
+        "DELIVERY": "Aflewering",
+        "DINE_IN": "Eet in die winkel",
+        "PICKUP": "Pickup",
+        "UNKNOWN": "Onbekend"
+      },
+      "methodEmpty": "Geen Bestel Data",
+      "methodTitle": "Bestelmetode verspreiding",
+      "rfmTitle": "RFM Kliënt Segmentation",
+      "seg": {
+        "at_risk": "Risiko van verlies",
+        "champion": "Champion",
+        "hibernating": "Hibernating",
+        "loyal": "Lojale kliënt",
+        "potential": "Potensiële kliënt",
+        "recent": "Nuut·Onlangs"
+      },
+      "thBuy": "Aankoop",
+      "thCustomer": "Kliënt",
+      "thRecent": "Onlangs (dae)",
+      "thSegment": "Segment",
+      "thTotal": "Totaal (π)"
+    },
+    "pageSubtitle": "Verkope, bestellings, toegang/gebruik en Performance op een plek. Aktiewe gebruikers (Noordster) is die hoogste prioriteit.",
+    "pageTitle": "📊 Analytics",
+    "perf": {
+      "activeUsers": "Aktiewe gebruikers {n}",
+      "activityType": "Aktiwiteit tipe verspreiding",
+      "actvty": {
+        "CHAT": "Kafee Aktiwiteit",
+        "LOGIN": "Login",
+        "MSG": "Boodskap",
+        "PAYMENT": "Betaling"
+      },
+      "channel": "Inkomende kanaal",
+      "channelCd": {
+        "DIRECT": "Direkte verkeer",
+        "INTERNAL": "Intern",
+        "PI": "Pi Ekosisteem",
+        "REFERRAL": "Eksterne skakel",
+        "SEARCH": "Soek",
+        "SOCIAL": "Sosiaal"
+      },
+      "collectNote": "※ Pageviews word nie-blokkerend versamel tydens Route-oorgange. Data is leeg onmiddellik na ontplooiing en sal gevul word soos gebruik ophoop.",
+      "convActiveBuyer": "Aktiwiteit → Aankoop omskakeling",
+      "convBuyerRepeat": "Aankoop → Herhaalaankoop omskakeling",
+      "convFromPrev": "↓ {pct}% omskakeling vanaf vorige fase",
+      "convSignupActive": "Registrasie → Aktiwiteit omskakeling",
+      "depth": "Betrokkenheid diepte (aantal aktiewe dae)",
+      "depthBucket": {
+        "d1": "1 dag",
+        "d15p": "15 dae+",
+        "d2_3": "2~3 dae",
+        "d4_7": "4~7 dae",
+        "d8_14": "8~14 dae"
+      },
+      "exitTop": "Uitgang Page Top",
+      "funnelTitle": "Lifecycle omskakeling Funnel",
+      "funnelUnit": "· Kumulatief (totaal)",
+      "kpiBounce": "Bounce rate",
+      "kpiDwell": "Gemiddelde verblyf",
+      "kpiPv": "Pageview",
+      "kpiSessions": "Sessions",
+      "landingTop": "Landing Page Top",
+      "pvTrend": "Pageview tendens",
+      "stage": {
+        "active": "Aktiwiteit (Login+)",
+        "buyer": "Eerste aankoop",
+        "repeat": "Herhaalde aankoop",
+        "signup": "Aanmelding"
+      },
+      "webTraffic": "🧭 Web Traffic"
+    },
+    "revenue": {
+      "abcTitle": "ABC Analysis (Pareto) · Pi Verkope bydrae volgens tema",
+      "bubbleNote": "Borrel grootte = Verkope aandeel · 1 Pi = 100 Bean ekwivalent",
+      "bubbleTitle": "Verkope aandeel volgens tema (Bean)",
+      "kpiBeanRecover": "Bean Herwinningsverkope",
+      "kpiBeanTxn": "Aantal Bean transaksies",
+      "kpiChargeCnt": "Aantal herlaaie",
+      "kpiPiCash": "Pi Kontantverkope (herlaai)",
+      "maTitle": "Daaglikse Pi Kontantverkope + 7-dae bewegende gemiddelde",
+      "treemapTitle": "Verkope aandeel volgens tema (Pi)",
+      "yoyTitle": "Jaar-op-jaar (YoY) vergelyking",
+      "yoyUnit": "· Maandelikse Pi Verkope",
+      "zchartTitle": "Z-Chart (Huidige maand·Kumulatief·Rollende kumulatief)",
+      "zchartUnit": "· Pi Verkope"
+    },
+    "tabs": {
+      "order": "🧾 Bestelling",
+      "perf": "⚡ Performance",
+      "revenue": "💰 Inkomste",
+      "usage": "👥 Toegang·Gebruik"
+    },
+    "theme": {
+      "DIRECT_PAY": "Direkte Betaling",
+      "PI_TIP": "Bean",
+      "PRODUCT_ORDER": "Produkbestelling",
+      "SUBSCRIPTION": "Inskrywing",
+      "UNKNOWN": "Ander"
+    },
+    "usage": {
+      "cohort": "Registrasie Cohort Retention",
+      "cohortRecent": "· Laaste 8 weke",
+      "kpiDau": "DAU",
+      "kpiMau": "MAU",
+      "kpiNewSignup": "Nuwe Registrasies ({period} dae)",
+      "kpiStickiness": "Kleefbaarheid (DAU/MAU)",
+      "kpiWau": "WAU",
+      "locatedUsers": "Ligging goedgekeur {n} persone",
+      "newReturning": "Nuut vs Terugkerend (Daagliks)",
+      "region": "Streeksverspreiding (per Stad/Provinsie)",
+      "regionEmpty": "Geen liggingtoestemming Data nie.",
+      "timeline": "DAU / WAU / MAU Tendens"
+    }
+  },
   "adminI18n": {
     "activate": "Aktiveer",
     "activated": "{locale} geaktiveer",
@@ -701,6 +899,15 @@
     "beanDistTitle": "Bean Transaksie Distribusie",
     "beanDistTotalPrefix": "Totaal {cnt} items · Totale transaksievolume {gross}",
     "beanDistTotalSuffix": "(Som van absolute waardes — alle tipes soos laai, gebruik, intekengeld, tip, fooi, beloning, terugbetaling, oordrag, ens.)",
+    "beanEmpty": "Daar is geen Bean-verkope om vir hierdie tydperk saam te voeg nie.",
+    "beanError": "Kon nie verkope Data laai nie.",
+    "beanFlowCharge": "Laai (Uitgawe)",
+    "beanFlowRefund": "Terugbetaling",
+    "beanFlowReward": "Beloning",
+    "beanFlowsCaption": "Laai · Spandeer · Beloning · Terugbetaling",
+    "beanFlowSpend": "Spandeer",
+    "beanUnitPrefix": "Eenheid",
+    "beanUnitSuffix": "Bean · Laaste {period} dae",
     "fetchFail": "Data-ophaal het misluk",
     "flowBadge": {
       "in": "Invloei",
