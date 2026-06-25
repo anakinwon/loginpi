@@ -15,6 +15,10 @@
 → 인증이 필요한 페이지는 반드시 **쿠키 OR `X-Pi-Token` 헤더** 두 경로를 지원해야 한다.
 → `getSessionUser()`가 null일 때 **`redirect` 절대 금지** — Pi Browser 무한 루프 발생 → 클라이언트 게이트로 위임.
 
+**치명적 제약 — Pi Browser 판정에 UA(`navigator.userAgent`)를 절대 신뢰/사전 차단하지 말 것.**
+Pi SDK는 일반 브라우저에도 `window.Pi`를 주입하므로 `window.Pi` 존재 ≠ Pi Browser. 그러나 UA(`/PiBrowser/`)로 Pi 인증을 *사전 차단*하면 실기기 UA가 패턴과 달라 **모든 Pi 로그인이 systemic하게 깨진다**(2026-06-26 8bf8752 사고). **유일하게 신뢰 가능한 Pi Browser 신호는 `window.Pi.authenticate()` 성공뿐.**
+→ `signIn()` 가드는 `if (!window.Pi)`만. authenticate를 무조건 시도하고 **성공 여부로만** `isInPiBrowser`를 판정한다. UI 표시 게이팅엔 UA 폴백 가능하나 *인증 시도 자체*는 UA로 막지 말 것.
+
 ---
 
 ## 빌드 및 개발 명령어
