@@ -17,62 +17,63 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (account?.provider === 'google' && profile?.sub) {
         try {
           const db = getSupabaseAdmin()
+          const sub = profile.sub as string
+          const email = (profile.email as string | undefined) ?? undefined
+          const emailVerified =
+            (profile as { email_verified?: boolean }).email_verified === true
 
-          // 1차: google_id(OAuth sub)로 조회
-          const { data: byId } = await db
-            .from('sys_user')
-            .select('id')
-            .eq('google_id', profile.sub as string)
-            .maybeSingle()
+          // 본인 계정 식별:
+          //  1) 검증된 이메일로 매칭 — Pi 연동 원본(pi_uid 보유) 우선, 없으면 최古 행.
+          //     google_id가 과거 오염(UUID 등)·NULL·중복이어도 이메일 소유자(email_verified)로 본인 확정.
+          //  2) 실패 시 google_id(sub)로 폴백.
+          // ⚠️ 과거 버그: google_id에 sub가 아닌 UUID가 저장되면 1차(sub) 매칭 실패→빈 새 계정 생성→
+          //    카페 등 데이터가 사라져 보임. 아래 이메일 우선 매칭 + sub 자가치유로 해소.
+          let matched: { id: string; google_id: string | null } | null = null
 
-          if (byId) {
-            token.userId = byId.id
-            recordActivity(byId.id, 'LOGIN')
-            await db
+          if (email && emailVerified) {
+            const { data: candidates } = await db
               .from('sys_user')
-              .update({ last_login_dtm: new Date().toISOString() })
-              .eq('id', byId.id)
-          } else {
-            // 2차: google_email fallback
-            // 조건: email_verified=true + google_id가 아직 NULL인 행에만 허용
-            // google_id가 이미 다른 값으로 세팅된 행은 건드리지 않음 (계정 탈취 방지)
-            const emailVerified = (profile as { email_verified?: boolean })
-              .email_verified
-            if (profile.email && emailVerified === true) {
-              const { data: byEmail } = await db
-                .from('sys_user')
-                .select('id, google_id')
-                .eq('google_email', profile.email as string)
-                .is('google_id', null) // google_id가 NULL인 행만 매칭
-                .maybeSingle()
+              .select('id, google_id, pi_uid, reg_dtm')
+              .eq('google_email', email)
+              .order('reg_dtm', { ascending: true })
+            const list = (candidates ?? []) as {
+              id: string
+              google_id: string | null
+              pi_uid: string | null
+            }[]
+            matched = list.find((c) => c.pi_uid) ?? list[0] ?? null
+          }
 
-              if (byEmail) {
-                token.userId = byEmail.id
-                recordActivity(byEmail.id, 'LOGIN')
-                // google_id가 NULL이었던 행에 실제 sub 세팅 (1회성 데이터 복구)
-                await db
-                  .from('sys_user')
-                  .update({
-                    google_id: profile.sub as string,
-                    last_login_dtm: new Date().toISOString(),
-                  })
-                  .eq('id', byEmail.id)
-                  .is('google_id', null) // 경쟁 조건 방지: NULL 확인 후 업데이트
-              } else {
-                // DB에 일치하는 행 없음 → Google 전용 계정으로 자동 생성
-                // (Pi 미사용 PC 사용자가 Google로 처음 로그인하는 경우)
-                const newUser = await upsertGoogleUser({
-                  id: profile.sub as string,
-                  email: (profile.email as string) ?? null,
-                  name: (profile.name as string) ?? null,
-                  image: (profile as { picture?: string }).picture ?? null,
-                })
-                token.userId = newUser.id
-                recordActivity(newUser.id, 'LOGIN')
-              }
-            } else {
-              token.userId = null
+          if (!matched) {
+            const { data: byId } = await db
+              .from('sys_user')
+              .select('id, google_id')
+              .eq('google_id', sub)
+              .maybeSingle()
+            matched = (byId as { id: string; google_id: string | null } | null) ?? null
+          }
+
+          if (matched) {
+            token.userId = matched.id
+            recordActivity(matched.id, 'LOGIN')
+            // 실제 sub로 google_id 정정(오염·NULL 자가 치유) + last_login 갱신
+            const upd: Record<string, unknown> = {
+              last_login_dtm: new Date().toISOString(),
             }
+            if (matched.google_id !== sub) upd.google_id = sub
+            await db.from('sys_user').update(upd).eq('id', matched.id)
+          } else if (email) {
+            // 진짜 신규 → Google 전용 계정 생성
+            const newUser = await upsertGoogleUser({
+              id: sub,
+              email,
+              name: (profile.name as string) ?? null,
+              image: (profile as { picture?: string }).picture ?? null,
+            })
+            token.userId = newUser.id
+            recordActivity(newUser.id, 'LOGIN')
+          } else {
+            token.userId = null
           }
         } catch {
           token.userId = null
