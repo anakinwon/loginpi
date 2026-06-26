@@ -183,7 +183,50 @@ function chevron(s, x, y) {
   pageNum(s, 4)
 })()
 
-// ════════ 5. 승격 흐름 — 코드 + DB ════════
+// ════════ 5. 스키마↑ / 데이터↓ 동기화 ════════
+;(() => {
+  const s = pres.addSlide()
+  bg(s, C.bgLight)
+  header(s, 'Sync · 환경 간 동기화', '스키마 ↑ / 데이터 ↓ — 올바른 도구 선택')
+
+  // 개발 DB (좌)
+  s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 0.9, y: 2.75, w: 3.7, h: 1.75, rectRadius: 0.1, fill: { color: C.white }, line: { color: C.blue, width: 1.5 }, shadow: shadow() })
+  s.addText('🛠️  개발 DB', { x: 0.9, y: 3.05, w: 3.7, h: 0.45, margin: 0, fontFace: HF, fontSize: 16, bold: true, color: C.blue, align: 'center' })
+  s.addText('로컬 Supabase (CLI)', { x: 0.9, y: 3.55, w: 3.7, h: 0.4, margin: 0, fontFace: BF, fontSize: 11.5, color: C.ink, align: 'center' })
+
+  // 운영 DB (우)
+  s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 8.73, y: 2.75, w: 3.7, h: 1.75, rectRadius: 0.1, fill: { color: C.cardAlt }, line: { color: C.purple, width: 1.5 }, shadow: shadow() })
+  s.addText('🚀  운영 DB', { x: 8.73, y: 3.05, w: 3.7, h: 0.45, margin: 0, fontFace: HF, fontSize: 16, bold: true, color: C.purple, align: 'center' })
+  s.addText('Supabase Prod', { x: 8.73, y: 3.55, w: 3.7, h: 0.4, margin: 0, fontFace: BF, fontSize: 11.5, color: C.ink, align: 'center' })
+
+  // ① 스키마 ↑ (dev → prod) 상단 우향 화살표
+  s.addText('①  스키마 ↑  —  마이그레이션', { x: 4.55, y: 2.5, w: 4.15, h: 0.3, margin: 0, fontFace: HF, fontSize: 12, bold: true, color: C.green, align: 'center' })
+  s.addShape(pres.shapes.RIGHT_ARROW, { x: 4.72, y: 2.85, w: 3.8, h: 0.5, fill: { color: C.green }, line: { type: 'none' } })
+  s.addText('db diff → db push  /  Branching', { x: 4.6, y: 2.92, w: 4.04, h: 0.36, margin: 0, fontFace: BF, fontSize: 10, bold: true, color: C.white, align: 'center', valign: 'middle' })
+
+  // ② 데이터 ↓ (prod → dev) 하단 좌향 화살표
+  s.addShape(pres.shapes.LEFT_ARROW, { x: 4.72, y: 3.9, w: 3.8, h: 0.5, fill: { color: C.blue }, line: { type: 'none' } })
+  s.addText('🔒  마스킹 스냅샷 / seed', { x: 4.6, y: 3.97, w: 4.04, h: 0.36, margin: 0, fontFace: BF, fontSize: 10, bold: true, color: C.white, align: 'center', valign: 'middle' })
+  s.addText('②  데이터 ↓  —  운영 PII 원본 금지', { x: 4.55, y: 4.45, w: 4.15, h: 0.3, margin: 0, fontFace: HF, fontSize: 12, bold: true, color: C.blue, align: 'center' })
+
+  // 정보 칩 2개
+  const chip = (x, emoji, ttl, body, color) => {
+    s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y: 5.15, w: 5.85, h: 1.05, rectRadius: 0.08, fill: { color: C.white }, line: { color, width: 1.25 }, shadow: shadow() })
+    s.addText(`${emoji}  ${ttl}`, { x: x + 0.25, y: 5.27, w: 5.4, h: 0.35, margin: 0, fontFace: HF, fontSize: 12.5, bold: true, color })
+    s.addText(body, { x: x + 0.25, y: 5.62, w: 5.4, h: 0.5, margin: 0, fontFace: BF, fontSize: 10.5, color: C.ink })
+  }
+  chip(0.6, '✅', 'CDC가 진짜 필요한 곳', '분석 웨어하우스(ETL/Pipelines) · 라이브 UI(Realtime). dev-prod 미러링용 아님', C.green)
+  chip(6.88, '⛔', 'CDC ≠ dev-prod 동기화', '운영 PII 연속 복제 금지 · Kafka CDC는 과하고 부적합', C.red)
+
+  // 하단 핵심 바
+  s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 0.6, y: 6.4, w: 12.13, h: 0.5, rectRadius: 0.08, fill: { color: C.deep }, line: { type: 'none' } })
+  s.addText('스키마 = 마이그레이션(↑)   ·   데이터 = 마스킹 스냅샷(↓)   ·   Supabase Branching + CLI면 충분 (Kafka 불필요)', { x: 0.6, y: 6.4, w: 12.13, h: 0.5, margin: 0, fontFace: BF, fontSize: 11.5, bold: true, color: C.gold, align: 'center', valign: 'middle' })
+
+  s.addNotes('스키마는 CDC가 아니라 마이그레이션으로 개발→운영. 데이터는 연속 CDC가 아니라 마스킹 스냅샷으로 운영→개발(PII 원본 금지). CDC(ETL/Realtime)의 본래 용도는 분석·라이브이지 환경 미러링이 아니다.')
+  pageNum(s, 5)
+})()
+
+// ════════ 6. 승격 흐름 — 코드 + DB ════════
 ;(() => {
   const s = pres.addSlide()
   bg(s, C.bgLight)
@@ -208,7 +251,7 @@ function chevron(s, x, y) {
     { text: 'sql/NNN 번호·순서 유지 (DA 표준·da-ddl-guard) — 같은 마이그레이션을 각 환경에 순차 적용', options: { bullet: { code: '2022' }, breakLine: true, color: C.white, paraSpaceAfter: 6 } },
     { text: '롤백 = Vercel revert(코드) + 보상 마이그레이션(DB) · 물리 DELETE 금지(논리삭제)', options: { bullet: { code: '2022' }, breakLine: true, color: C.white } },
   ], { x: 1.0, y: 5.5, w: 11.4, h: 1.0, margin: 0, fontFace: BF, fontSize: 12 })
-  pageNum(s, 5)
+  pageNum(s, 6)
 })()
 
 // ════════ 5. 격리 원칙 — 데이터·시크릿 ════════
@@ -241,7 +284,7 @@ function chevron(s, x, y) {
   scope(0.95, 'Development', '로컬 Supabase · Testnet', C.blue)
   scope(4.79, 'Preview', 'Staging DB · Testnet', C.amber)
   scope(8.63, 'Production', 'Prod DB · Mainnet', C.purple)
-  pageNum(s, 6)
+  pageNum(s, 7)
 })()
 
 // ════════ 6. 비용·도구 현실 가이드 ════════
@@ -264,7 +307,7 @@ function chevron(s, x, y) {
     { text: 'Vercel:  환경 스코프(Development/Preview/Production)는 이미 쓰는 Pro에 포함 — 추가 비용 0', options: { bullet: { code: '2022' }, breakLine: true, paraSpaceAfter: 9 } },
     { text: '주의:  무료 티어는 프로젝트 수·용량 제한이 바뀔 수 있으니 도입 직전 현행 한도 확인', options: { bullet: { code: '2022' }, breakLine: true } },
   ], { x: 1.0, y: 4.45, w: 11.6, h: 2.0, margin: 0, fontFace: BF, fontSize: 12.5, color: C.ink })
-  pageNum(s, 7)
+  pageNum(s, 8)
 })()
 
 // ════════ 7. 단계적 도입 로드맵 ════════
@@ -289,7 +332,7 @@ function chevron(s, x, y) {
     s.addText(d, { x: 4.3, y: y - 0.05, w: 8.2, h: 0.72, margin: 0, fontFace: BF, fontSize: 11.5, color: C.ink, valign: 'middle' })
     y += 0.82
   })
-  pageNum(s, 8)
+  pageNum(s, 9)
 })()
 
 // ════════ 8. 거버넌스 원칙 요약 (마무리) ════════
