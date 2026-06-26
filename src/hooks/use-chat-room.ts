@@ -14,8 +14,8 @@ export interface ChatMessage {
   attch_url: string | null
   stkr_id: string | null
   ref_msg_id: string | null
-  src_lang_cd?: string | null // 원본 언어 코드 (PiTranslate™ 감지)
-  trans_cont?: string | null // 번역된 텍스트 (PiTranslate™)
+  src_lang_cd?: string | null // 원본 언어 코드 (PyTranslate™ 감지)
+  trans_cont?: string | null // 번역된 텍스트 (PyTranslate™)
   trans_locale?: string | null // trans_cont가 번역된 대상 언어 — 캐시 비교용
   del_yn: 'Y' | 'N'
   reg_dtm: string
@@ -106,7 +106,7 @@ export function useChatRoom(
     })
   }, [])
 
-  // 메시지 번역 텍스트 교체 — localeCd도 기록해 언어 전환 시 캐시 재사용 (PiTranslate™)
+  // 메시지 번역 텍스트 교체 — localeCd도 기록해 언어 전환 시 캐시 재사용 (PyTranslate™)
   const applyTranslation = useCallback(
     (msgId: string, transCont: string, localeCd: string) => {
       setMessages((prev) =>

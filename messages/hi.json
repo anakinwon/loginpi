@@ -961,7 +961,7 @@
           "icon": "🎫",
           "steps": [
             "1 Pi = 100 Bean (Platform-विशेष आरक्षित निधि) — आप एक Free Plan के साथ तुरंत शुरू कर सकते हैं",
-            "केवल वही Subscribe करें जिसकी आपको आवश्यकता है: PiCafé™ (Premium Cafe) · PiShop™ (Product Registration) · PiTranslate™ (Unlimited Translation)",
+            "केवल वही Subscribe करें जिसकी आपको आवश्यकता है: PyCafé™ (Premium Cafe) · PyShop™ (Product Registration) · PyTranslate™ (Unlimited Translation)",
             "Subscription शुल्क Recharge किए गए Bean से भुगतान किया जाता है, और वार्षिक भुगतान पर 2 महीने मुफ्त मिलते हैं"
           ],
           "title": "Bean और Subscription"
@@ -1040,7 +1040,7 @@
       "newTrans": "नया अनुवाद ({period} दिन, Message×भाषा)",
       "noData": "इस अवधि में अनुवाद Data नहीं है"
     },
-    "translateSection": "अनुवाद (PiTranslate™)",
+    "translateSection": "अनुवाद (PyTranslate™)",
     "txnLabel": {
       "CHARGE": "चार्ज",
       "ETC": "आदि",
@@ -1268,7 +1268,7 @@
     }
   },
   "bean": {
-    "backToStore": "PiShop पर वापस",
+    "backToStore": "PyShop पर वापस",
     "buying": "भुगतान प्रक्रिया जारी है…",
     "chargeBtn": "रिचार्ज करें",
     "chargeFail": "रिचार्ज प्रक्रिया विफल रही",
@@ -1809,14 +1809,14 @@
     "loadError": "Data लोड करने में विफल",
     "loginHint": "Login करने पर आपकी Mission प्रगति और एजेंट रैंक प्रदर्शित होगी",
     "missionGoBean": "Bean रिचार्ज करने जाएं",
-    "missionGoCafe": "💬 PiCafe पर जाएं",
+    "missionGoCafe": "💬 PyCafe पर जाएं",
     "missionGoItems": "🛒 मेरे Items पर जाएं",
     "missionGoLbs": "📍 Location Service (मेरा Profile)",
     "missionGoLink": "🔗 अकाउंट लिंक करने जाएं",
     "missionGoOrders": "🛒 Order Management पर जाएं",
     "missionGoProfile": "👤 अकाउंट लिंक करने और Profile दर्ज करने जाएं",
     "missionGoSales": "🛒 Sales Management पर जाएं",
-    "missionGoStore": "🛒 PiShop पर जाएं",
+    "missionGoStore": "🛒 PyShop पर जाएं",
     "missionGoSubscribe": "⭐ Subscription के लिए आवेदन करने जाएं",
     "missionListTitle": "📋 Mission सूची",
     "missions": {
@@ -1833,7 +1833,7 @@
         "name": "Profile पूरा करें"
       },
       "M3": {
-        "desc": "PiCafe में PREMIUM Cafe बनाएँ + स्वचालित अनुवाद फ़ंक्शन का उपयोग करें",
+        "desc": "PyCafe में PREMIUM Cafe बनाएँ + स्वचालित अनुवाद फ़ंक्शन का उपयोग करें",
         "name": "PREMIUM Cafe बनाएँ (PiRC1) + स्वचालित अनुवाद"
       },
       "M4": {
@@ -1849,15 +1849,15 @@
         "name": "Chat Multi-function का उपयोग करें"
       },
       "M7": {
-        "desc": "PiShop पर मेरा उत्पाद पंजीकृत करने के बाद लेनदेन के दौरान विक्रेता द्वारा लेनदेन रद्द करना",
+        "desc": "PyShop पर मेरा उत्पाद पंजीकृत करने के बाद लेनदेन के दौरान विक्रेता द्वारा लेनदेन रद्द करना",
         "name": "विक्रेता लेनदेन रद्द करना (Escrow Service; PiRC3)"
       },
       "M8": {
-        "desc": "PiShop पर किसी और का उत्पाद खरीदने के बाद क्रेता द्वारा लेनदेन रद्द करना",
+        "desc": "PyShop पर किसी और का उत्पाद खरीदने के बाद क्रेता द्वारा लेनदेन रद्द करना",
         "name": "क्रेता लेनदेन रद्द करना (Escrow Service; PiRC3)"
       },
       "M9": {
-        "desc": "PiShop विक्रेता जमा के रूप में 1Pi या अधिक जमा करें + स्थान-आधारित सेवा के लिए सहमति दें",
+        "desc": "PyShop विक्रेता जमा के रूप में 1Pi या अधिक जमा करें + स्थान-आधारित सेवा के लिए सहमति दें",
         "name": "विक्रेता जमा + स्थान सहमति (Escrow Service; PiRC3)"
       }
     },
@@ -1924,7 +1924,7 @@
       "condTitle": "भाग लेने के लिए शर्तें",
       "ctaM1": "Map पर पंजीकृत करें",
       "ctaM2": "Product पंजीकृत करें",
-      "ctaM3": "मेरे PiShop™ में लिंक करें",
+      "ctaM3": "मेरे PyShop™ में लिंक करें",
       "ctaM4": "Notification जांचें",
       "loadError": "Campaign जानकारी लोड नहीं की जा सकती।",
       "loading": "लोड हो रहा है…",
@@ -2255,7 +2255,7 @@
       "info": "व्यक्तिगत जानकारी",
       "lbs": "📍 Location Service",
       "payment": "भुगतान इतिहास",
-      "store": "🛍️ मेरा PiShop™",
+      "store": "🛍️ मेरा PyShop™",
       "subscr": "सदस्यता स्थिति"
     },
     "tabsExtra": {
@@ -2545,7 +2545,7 @@
     "statusChanged": "स्थिति बदल गई है",
     "stockLeft": "स्टॉक {count}",
     "subtitle": "Pi Coin से सुरक्षित रूप से सीधे लेन-देन करें — Escrow सुरक्षा",
-    "title": "PiShop",
+    "title": "PyShop",
     "tradeSt": {
       "OPEN": "बिक्री पर",
       "SOLD": "बिक गया",
@@ -2591,8 +2591,8 @@
     "perYear": "वार्षिक",
     "processing": "प्रक्रिया जारी है…",
     "product": {
-      "PICAFE": "PiCafe सदस्यता",
-      "PISHOP": "PiShop सदस्यता",
+      "PICAFE": "PyCafe सदस्यता",
+      "PISHOP": "PyShop सदस्यता",
       "TRANSLATE": "स्वचालित अनुवाद सदस्यता"
     },
     "renewBtn": "नवीनीकृत/बदलें",
@@ -2636,6 +2636,6 @@
     "running": "⏳ जाँच हो रही है…",
     "skipped": "उच्च-स्तरीय जाँच विफल होने के कारण छोड़ दिया गया",
     "subtitle": "Pi Browser वास्तविक डिवाइस पर WebRTC वॉयस कॉल समर्थन की जाँच करता है।",
-    "title": "🎙️ PiVoice™ S0 Spike"
+    "title": "🎙️ PyVoice™ S0 Spike"
   }
 }

@@ -961,7 +961,7 @@
           "icon": "🎫",
           "steps": [
             "1 Pi = 100 Bean (Poin hadiah khusus platform) — Anda bisa langsung memulai dengan paket gratis",
-            "Pilih langganan yang Anda butuhkan: PiCafé™ (Kafe Premium) · PiShop™ (Pendaftaran Produk) · PiTranslate™ (Terjemahan Tanpa Batas)",
+            "Pilih langganan yang Anda butuhkan: PyCafé™ (Kafe Premium) · PyShop™ (Pendaftaran Produk) · PyTranslate™ (Terjemahan Tanpa Batas)",
             "Biaya langganan dibayar dengan Bean yang diisi ulang, dan pembayaran tahunan gratis 2 bulan"
           ],
           "title": "Bean & Langganan"
@@ -1040,7 +1040,7 @@
       "newTrans": "Terjemahan Baru ({period} hari, pesan×bahasa)",
       "noData": "Tidak ada Data terjemahan dalam periode ini"
     },
-    "translateSection": "Terjemahan (PiTranslate™)",
+    "translateSection": "Terjemahan (PyTranslate™)",
     "txnLabel": {
       "CHARGE": "Pengisian",
       "ETC": "Lain-lain",
@@ -1268,7 +1268,7 @@
     }
   },
   "bean": {
-    "backToStore": "Kembali ke PiShop",
+    "backToStore": "Kembali ke PyShop",
     "buying": "Pembayaran sedang diproses…",
     "chargeBtn": "Isi Ulang",
     "chargeFail": "Gagal memproses isi ulang",
@@ -1809,14 +1809,14 @@
     "loadError": "Gagal Load Data",
     "loginHint": "Login untuk melihat progres Mission dan peringkat Agen Anda",
     "missionGoBean": "Pergi untuk Mengisi Bean",
-    "missionGoCafe": "💬 Pergi ke PiCafé™",
+    "missionGoCafe": "💬 Pergi ke PyCafé™",
     "missionGoItems": "🛒 Pergi ke Produk Saya",
     "missionGoLbs": "📍 Layanan Lokasi (Profil Saya)",
     "missionGoLink": "🔗 Pergi untuk Menautkan Akun",
     "missionGoOrders": "🛒 Pergi ke Manajemen Pesanan",
     "missionGoProfile": "👤 Pergi untuk Menautkan Akun dan Mengisi Profile",
     "missionGoSales": "🛒 Pergi ke Manajemen Penjualan",
-    "missionGoStore": "🛒 Pergi ke PiShop™",
+    "missionGoStore": "🛒 Pergi ke PyShop™",
     "missionGoSubscribe": "⭐ Pergi untuk Mendaftar Langganan",
     "missionListTitle": "📋 Daftar Mission",
     "missions": {
@@ -1833,7 +1833,7 @@
         "name": "Selesaikan Profile"
       },
       "M3": {
-        "desc": "Buat PREMIUM Cafe di PiCafe + Gunakan fitur terjemahan otomatis",
+        "desc": "Buat PREMIUM Cafe di PyCafe + Gunakan fitur terjemahan otomatis",
         "name": "Buat PREMIUM Cafe (PiRC1) + Terjemahan Otomatis"
       },
       "M4": {
@@ -1849,15 +1849,15 @@
         "name": "Gunakan Fitur Multi Chat"
       },
       "M7": {
-        "desc": "Penjual membatalkan transaksi setelah mendaftarkan produk saya di PiShop dan selama transaksi berlangsung.",
+        "desc": "Penjual membatalkan transaksi setelah mendaftarkan produk saya di PyShop dan selama transaksi berlangsung.",
         "name": "Pembatalan Transaksi Penjual (Layanan Escrow;PiRC3)"
       },
       "M8": {
-        "desc": "Pembeli membatalkan transaksi setelah membeli produk orang lain di PiShop.",
+        "desc": "Pembeli membatalkan transaksi setelah membeli produk orang lain di PyShop.",
         "name": "Pembatalan Transaksi Pembeli (Layanan Escrow;PiRC3)"
       },
       "M9": {
-        "desc": "Menyetorkan deposit penjual PiShop minimal 1Pi + menyetujui layanan berbasis lokasi",
+        "desc": "Menyetorkan deposit penjual PyShop minimal 1Pi + menyetujui layanan berbasis lokasi",
         "name": "Deposit Penjual + Persetujuan Lokasi (Layanan Escrow;PiRC3)"
       }
     },
@@ -1924,7 +1924,7 @@
       "condTitle": "Syarat Partisipasi",
       "ctaM1": "Daftar di Peta",
       "ctaM2": "Daftar Produk",
-      "ctaM3": "Integrasikan di PiShop™ Saya",
+      "ctaM3": "Integrasikan di PyShop™ Saya",
       "ctaM4": "Konfirmasi Notifikasi",
       "loadError": "Tidak dapat memuat informasi Campaign.",
       "loading": "Memuat…",
@@ -2255,7 +2255,7 @@
       "info": "Informasi Pribadi",
       "lbs": "📍 Lokasi Service",
       "payment": "Riwayat Pembayaran",
-      "store": "🛍️ PiShop™ Saya",
+      "store": "🛍️ PyShop™ Saya",
       "subscr": "Status Langganan"
     },
     "tabsExtra": {
@@ -2545,7 +2545,7 @@
     "statusChanged": "Status telah diubah",
     "stockLeft": "Stok {count}",
     "subtitle": "Lakukan transaksi langsung dengan aman menggunakan Pi Coin — Perlindungan Escrow",
-    "title": "PiShop",
+    "title": "PyShop",
     "tradeSt": {
       "OPEN": "Dijual",
       "SOLD": "Terjual",
@@ -2591,8 +2591,8 @@
     "perYear": "Per tahun",
     "processing": "Memproses…",
     "product": {
-      "PICAFE": "Langganan PiCafe",
-      "PISHOP": "Langganan PiShop",
+      "PICAFE": "Langganan PyCafe",
+      "PISHOP": "Langganan PyShop",
       "TRANSLATE": "Langganan Terjemahan Otomatis"
     },
     "renewBtn": "Perbarui/Ubah",
@@ -2636,6 +2636,6 @@
     "running": "⏳ Sedang memeriksa…",
     "skipped": "Dilewati karena pemeriksaan sebelumnya gagal",
     "subtitle": "Mendiagnosis apakah Pi Browser di perangkat fisik mendukung panggilan suara WebRTC.",
-    "title": "🎙️ PiVoice™ S0 Spike"
+    "title": "🎙️ PyVoice™ S0 Spike"
   }
 }

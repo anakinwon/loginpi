@@ -19,7 +19,7 @@ export interface UserRow {
   phone_no: string | null
   addr: string | null
   addr_dtl: string | null
-  // Phase 12 — 마이그레이션 020 추가 컬럼 (PiTranslate™ 표시 언어)
+  // Phase 12 — 마이그레이션 020 추가 컬럼 (PyTranslate™ 표시 언어)
   display_locale_cd: string | null
   // 마이그레이션 027 — 카카오톡 연동 ID + 자기소개
   kakao_id: string | null

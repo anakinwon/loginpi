@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { getSupabaseClient } from '@/lib/supabase-client'
 import { piFetch } from '@/lib/pi-fetch'
 
-// PiVoice™ v3.0 — N:N Full Mesh 음성채널 훅 (PRD_9_VOICE_CHAT v3.0)
+// PyVoice™ v3.0 — N:N Full Mesh 음성채널 훅 (PRD_9_VOICE_CHAT v3.0)
 // 1명도 입장 가능(혼자 대기), 신규 입장자가 기존 피어 전원에게 offer를 보내 glare 차단.
 // 권한 정책: 방장 보장 슬롯 + 멤버 자동 2/승인 2 — 본인 상태는 mic_st_change 수신으로 동기화.
 

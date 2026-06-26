@@ -961,7 +961,7 @@
           "icon": "🎫",
           "steps": [
             "1 Pi = 100 Bean (Điểm tích lũy dành riêng cho nền tảng) — Bạn có thể bắt đầu ngay với gói miễn phí.",
-            "Chọn và đăng ký những gì bạn cần: PiCafé™(Premium Cafe) · PiShop™(Đăng ký sản phẩm) · PiTranslate™(Dịch không giới hạn)",
+            "Chọn và đăng ký những gì bạn cần: PyCafé™(Premium Cafe) · PyShop™(Đăng ký sản phẩm) · PyTranslate™(Dịch không giới hạn)",
             "Phí đăng ký được thanh toán bằng Bean đã nạp, và thanh toán hàng năm được miễn phí 2 tháng."
           ],
           "title": "Bean & Đăng ký"
@@ -1040,7 +1040,7 @@
       "newTrans": "Bản dịch mới ({period} ngày, tin nhắn×ngôn ngữ)",
       "noData": "Không có Translation Data trong khoảng thời gian này"
     },
-    "translateSection": "Dịch (PiTranslate™)",
+    "translateSection": "Dịch (PyTranslate™)",
     "txnLabel": {
       "CHARGE": "Nạp tiền",
       "ETC": "Khác",
@@ -1268,7 +1268,7 @@
     }
   },
   "bean": {
-    "backToStore": "Về PiShop",
+    "backToStore": "Về PyShop",
     "buying": "Đang xử lý thanh toán…",
     "chargeBtn": "Nạp tiền",
     "chargeFail": "Xử lý nạp tiền thất bại",
@@ -1809,14 +1809,14 @@
     "loadError": "Tải Data thất bại",
     "loginHint": "Khi Login, tiến độ Mission và cấp độ đặc vụ của bạn sẽ được hiển thị",
     "missionGoBean": "Đi nạp Bean",
-    "missionGoCafe": "💬 Đi PiCafe",
+    "missionGoCafe": "💬 Đi PyCafe",
     "missionGoItems": "🛒 Đi đến Sản phẩm của tôi",
     "missionGoLbs": "📍 Vị trí Service (Profile của tôi)",
     "missionGoLink": "🔗 Đi liên kết tài khoản",
     "missionGoOrders": "🛒 Đi đến Quản lý đơn hàng",
     "missionGoProfile": "👤 Đi liên kết tài khoản và nhập Profile",
     "missionGoSales": "🛒 Đi đến Quản lý bán hàng",
-    "missionGoStore": "🛒 Đi PiShop",
+    "missionGoStore": "🛒 Đi PyShop",
     "missionGoSubscribe": "⭐ Đi đăng ký",
     "missionListTitle": "📋 Danh sách Mission",
     "missions": {
@@ -1833,7 +1833,7 @@
         "name": "Hoàn thành Profile"
       },
       "M3": {
-        "desc": "Tạo PREMIUM Cafe trong PiCafe + Sử dụng tính năng dịch tự động",
+        "desc": "Tạo PREMIUM Cafe trong PyCafe + Sử dụng tính năng dịch tự động",
         "name": "Tạo PREMIUM Cafe (PiRC1) + Dịch tự động"
       },
       "M4": {
@@ -1849,15 +1849,15 @@
         "name": "Sử dụng tính năng đa nhiệm Chat"
       },
       "M7": {
-        "desc": "Sau khi đăng ký sản phẩm của tôi trên PiShop, hủy giao dịch của người bán trong khi giao dịch",
+        "desc": "Sau khi đăng ký sản phẩm của tôi trên PyShop, hủy giao dịch của người bán trong khi giao dịch",
         "name": "Hủy giao dịch của người bán (Escrow Service;PiRC3)"
       },
       "M8": {
-        "desc": "Sau khi mua sản phẩm của người khác trên PiShop, hủy giao dịch của người mua",
+        "desc": "Sau khi mua sản phẩm của người khác trên PyShop, hủy giao dịch của người mua",
         "name": "Hủy giao dịch của người mua (Escrow Service;PiRC3)"
       },
       "M9": {
-        "desc": "Người bán PiShop đặt cọc ít nhất 1Pi + Đồng ý dịch vụ dựa trên vị trí",
+        "desc": "Người bán PyShop đặt cọc ít nhất 1Pi + Đồng ý dịch vụ dựa trên vị trí",
         "name": "Tiền đặt cọc của người bán + Đồng ý vị trí (Escrow Service;PiRC3)"
       }
     },
@@ -1924,7 +1924,7 @@
       "condTitle": "Điều kiện tham gia",
       "ctaM1": "Đăng ký trên Map",
       "ctaM2": "Đăng ký sản phẩm",
-      "ctaM3": "Liên kết trong PiShop™ của tôi",
+      "ctaM3": "Liên kết trong PyShop™ của tôi",
       "ctaM4": "Xác nhận thông báo",
       "loadError": "Không thể tải thông tin Campaign.",
       "loading": "Đang tải…",
@@ -2255,7 +2255,7 @@
       "info": "Thông tin cá nhân",
       "lbs": "📍 Dịch vụ vị trí",
       "payment": "Lịch sử thanh toán",
-      "store": "🛍️ PiShop™ của tôi",
+      "store": "🛍️ PyShop™ của tôi",
       "subscr": "Tình trạng đăng ký"
     },
     "tabsExtra": {
@@ -2545,7 +2545,7 @@
     "statusChanged": "Trạng thái đã thay đổi",
     "stockLeft": "Còn hàng {count}",
     "subtitle": "Giao dịch trực tiếp an toàn bằng Pi Coin — Bảo vệ Escrow",
-    "title": "PiShop",
+    "title": "PyShop",
     "tradeSt": {
       "OPEN": "Đang bán",
       "SOLD": "Đã bán",
@@ -2591,8 +2591,8 @@
     "perYear": "Năm",
     "processing": "Đang xử lý…",
     "product": {
-      "PICAFE": "Đăng ký PiCafe",
-      "PISHOP": "PiShop Subscribe",
+      "PICAFE": "Đăng ký PyCafe",
+      "PISHOP": "PyShop Subscribe",
       "TRANSLATE": "Đăng ký Dịch tự động"
     },
     "renewBtn": "Gia hạn/Thay đổi",
@@ -2636,6 +2636,6 @@
     "running": "⏳ Đang kiểm tra…",
     "skipped": "Đã bỏ qua do kiểm tra cấp trên thất bại",
     "subtitle": "Trên thiết bị thực của Pi Browser, chẩn đoán khả năng hỗ trợ cuộc gọi thoại WebRTC.",
-    "title": "🎙️ PiVoice™ S0 Spike"
+    "title": "🎙️ PyVoice™ S0 Spike"
   }
 }

@@ -4,7 +4,7 @@ export default function VoiceTestPage() {
   return (
     <div className="mx-auto max-w-xl px-4 py-8">
       <div className="mb-6">
-        <h1 className="text-xl font-bold">🎙️ PiVoice™ S0 스파이크</h1>
+        <h1 className="text-xl font-bold">🎙️ PyVoice™ S0 스파이크</h1>
         <p className="text-muted-foreground mt-1 text-sm">
           Pi Browser 실기기에서 WebRTC 음성통화 지원 여부를 진단합니다.
         </p>

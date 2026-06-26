@@ -14,7 +14,7 @@ const ProfileUpdateSchema = z.object({
   phone_no: z.string().max(20).optional(),
   addr: z.string().max(200).optional(),
   addr_dtl: z.string().max(100).optional(),
-  // PiTranslate™ 표시 언어 — locale 코드 화이트리스트 검증 (코드 인젝션 방지)
+  // PyTranslate™ 표시 언어 — locale 코드 화이트리스트 검증 (코드 인젝션 방지)
   display_locale_cd: z
     .string()
     .regex(/^[a-z]{2,3}(-[A-Z]{2,3})?$/)

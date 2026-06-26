@@ -84,7 +84,7 @@ async function handlePOST(req: NextRequest) {
     {
       order,
       amount: Number(order.order_price_pi),
-      memo: `🛒 PiShop 카트 결제 (${parsed.data.items.length}종)`,
+      memo: `🛒 PyShop 카트 결제 (${parsed.data.items.length}종)`,
       metadata: {
         type: 'MPS_ESCROW',
         order_id: order.order_id,

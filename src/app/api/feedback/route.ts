@@ -173,7 +173,7 @@ export async function POST(req: NextRequest) {
 
   const db = getSupabaseAdmin()
 
-  // shop_id = msg_room.room_id (PiCafé™ 카페 후기)
+  // shop_id = msg_room.room_id (PyCafé™ 카페 후기)
   if (shop_id) {
     // 해당 방의 실제 멤버인지 확인 (IDOR 방지 + 자신이 만든 방 후기 금지)
     const { data: mbr } = await db
@@ -192,7 +192,7 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // order_id = mps_order.order_id (PiShop™ 상품 후기)
+  // order_id = mps_order.order_id (PyShop™ 상품 후기)
   let prodId: string | null = null
   if (order_id) {
     // 해당 주문의 실제 구매자인지 확인 (IDOR 방지)

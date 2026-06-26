@@ -961,7 +961,7 @@
           "icon": "🎫",
           "steps": [
             "1 Pi = 100 Bean (Platform-eksklusiewe reserwe) — Jy kan dadelik met 'n gratis Plan begin",
-            "Kies net wat jy nodig het om in te teken: PiCafé™(Premium Cafe) · PiShop™(Produk Registrasie) · PiTranslate™(Onbeperkte Vertaling)",
+            "Kies net wat jy nodig het om in te teken: PyCafé™(Premium Cafe) · PyShop™(Produk Registrasie) · PyTranslate™(Onbeperkte Vertaling)",
             "Subskripsiefooie word met gelaaide Bean betaal, en jaarlikse betaling is 2 maande gratis"
           ],
           "title": "Bean & Subskripsie"
@@ -1040,7 +1040,7 @@
       "newTrans": "Nuwe vertalings ({period} dae, boodskap×taal)",
       "noData": "Daar is geen Translation Data binne die tydperk nie"
     },
-    "translateSection": "Vertaling (PiTranslate™)",
+    "translateSection": "Vertaling (PyTranslate™)",
     "txnLabel": {
       "CHARGE": "Laai",
       "ETC": "Ander",
@@ -1268,7 +1268,7 @@
     }
   },
   "bean": {
-    "backToStore": "Terug na PiShop",
+    "backToStore": "Terug na PyShop",
     "buying": "Betaling tans aan die gang…",
     "chargeBtn": "Laai op",
     "chargeFail": "Oplaai verwerking het misluk",
@@ -1809,14 +1809,14 @@
     "loadError": "Data laai fout",
     "loginHint": "Meld aan om jou missie vordering en agent graad te sien",
     "missionGoBean": "Gaan Bean herlaai",
-    "missionGoCafe": "💬 Gaan PiCafe",
+    "missionGoCafe": "💬 Gaan PyCafe",
     "missionGoItems": "🛒 Gaan na My Produkte",
     "missionGoLbs": "📍 Ligging Service (My Profile)",
     "missionGoLink": "🔗 Gaan koppel rekening",
     "missionGoOrders": "🛒 Gaan na Bestellings Bestuur",
     "missionGoProfile": "👤 Gaan koppel rekening en voer Profile in",
     "missionGoSales": "🛒 Gaan na Verkope Bestuur",
-    "missionGoStore": "🛒 Gaan PiShop",
+    "missionGoStore": "🛒 Gaan PyShop",
     "missionGoSubscribe": "⭐ Gaan inteken",
     "missionListTitle": "📋 Missie Lys",
     "missions": {
@@ -1833,7 +1833,7 @@
         "name": "Voltooi Profile"
       },
       "M3": {
-        "desc": "Skep PREMIUM Cafe in PiCafe + Gebruik outomatiese vertaal funksie",
+        "desc": "Skep PREMIUM Cafe in PyCafe + Gebruik outomatiese vertaal funksie",
         "name": "Skep PREMIUM Cafe (PiRC1) + Outomatiese vertaling"
       },
       "M4": {
@@ -1849,15 +1849,15 @@
         "name": "Gebruik Chat Multi Funksie"
       },
       "M7": {
-        "desc": "Verkoper Transaksie Kansellasie tydens 'n transaksie nadat my produk op PiShop geregistreer is",
+        "desc": "Verkoper Transaksie Kansellasie tydens 'n transaksie nadat my produk op PyShop geregistreer is",
         "name": "Verkoper Transaksie Kansellasie (Escrow Service;PiRC3)"
       },
       "M8": {
-        "desc": "Koper Transaksie Kansellasie nadat 'n ander se produk op PiShop gekoop is",
+        "desc": "Koper Transaksie Kansellasie nadat 'n ander se produk op PyShop gekoop is",
         "name": "Koper Transaksie Kansellasie (Escrow Service;PiRC3)"
       },
       "M9": {
-        "desc": "Deponeer 1Pi of meer as PiShop Verkoper Deposito + Stem in tot ligginggebaseerde diens",
+        "desc": "Deponeer 1Pi of meer as PyShop Verkoper Deposito + Stem in tot ligginggebaseerde diens",
         "name": "Verkoper Deposito + Liggingstoestemming (Escrow Service;PiRC3)"
       }
     },
@@ -1924,7 +1924,7 @@
       "condTitle": "Deelnamevoorwaardes",
       "ctaM1": "Registreer op die Kaart",
       "ctaM2": "Produk registrasie",
-      "ctaM3": "Integreer in My PiShop™",
+      "ctaM3": "Integreer in My PyShop™",
       "ctaM4": "Bevestig kennisgewing",
       "loadError": "Campaign inligting kon nie gelaai word nie.",
       "loading": "Besig om te laai…",
@@ -2255,7 +2255,7 @@
       "info": "Persoonlike Inligting",
       "lbs": "📍 Liggingdienste",
       "payment": "Betalingsgeskiedenis",
-      "store": "🛍️ My PiShop™",
+      "store": "🛍️ My PyShop™",
       "subscr": "Subskripsie Status"
     },
     "tabsExtra": {
@@ -2545,7 +2545,7 @@
     "statusChanged": "Status is verander",
     "stockLeft": "Voorraad {count}",
     "subtitle": "Handel veilig direk met Pi Coin — Escrow-beskerming",
-    "title": "PiShop",
+    "title": "PyShop",
     "tradeSt": {
       "OPEN": "Te koop",
       "SOLD": "Verkoop",
@@ -2591,8 +2591,8 @@
     "perYear": "per jaar",
     "processing": "Verwerk tans…",
     "product": {
-      "PICAFE": "PiCafe Inskrywing",
-      "PISHOP": "PiShop Subscription",
+      "PICAFE": "PyCafe Inskrywing",
+      "PISHOP": "PyShop Subscription",
       "TRANSLATE": "Outomatiese Vertaling Inskrywing"
     },
     "renewBtn": "Hernu/Verander",
@@ -2636,6 +2636,6 @@
     "running": "⏳ Besig om te toets…",
     "skipped": "Oorgeslaan weens mislukking van hoër vlak kontrole",
     "subtitle": "Diagnoseer of Pi Browser op 'n regte toestel WebRTC-stemoproepe ondersteun.",
-    "title": "🎙️ PiVoice™ S0 Spike"
+    "title": "🎙️ PyVoice™ S0 Spike"
   }
 }

@@ -1,7 +1,7 @@
 import 'server-only'
 import { getSupabaseAdmin } from './supabase-admin'
 
-// PiVoice™ v3.0 — 음성채널 서버 로직 단일 소스 (PRD_9_VOICE_CHAT v3.0)
+// PyVoice™ v3.0 — 음성채널 서버 로직 단일 소스 (PRD_9_VOICE_CHAT v3.0)
 // 활성 참여자 = leave_dtm IS NULL AND del_yn='N'
 //
 // 권한 정책 (R1~R7):

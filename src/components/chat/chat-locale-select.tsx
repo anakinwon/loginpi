@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 
-// PiTranslate™ 방 헤더 번역 언어 콤보 — 선택한 언어로 방 전체 메시지를 강제 번역
+// PyTranslate™ 방 헤더 번역 언어 콤보 — 선택한 언어로 방 전체 메시지를 강제 번역
 // i18n_cntry_mst 단일 소스: locale_cd 매핑된 국가만 노출 (컬러 국기 + 자국어 나라명)
 // '' = 구독자 특혜 (선택 해제 상태 — URL locale 기준 수신 번역만)
 // isSubscribed=false 시 disabled + 잠금 표시
@@ -95,8 +95,8 @@ export function ChatLocaleSelect({
     : null
 
   const autoLabel = isSubscribed
-    ? '🌐 구독특혜 PiTranslate™'
-    : '🔒 구독특혜 PiTranslate™'
+    ? '🌐 구독특혜 PyTranslate™'
+    : '🔒 구독특혜 PyTranslate™'
 
   return (
     <div className="relative shrink-0" ref={containerRef}>
@@ -145,7 +145,7 @@ export function ChatLocaleSelect({
           aria-label="번역 언어 목록"
           className="border-border bg-background absolute top-full right-0 z-50 mt-1 max-h-72 w-56 overflow-y-auto rounded-lg border shadow-xl"
         >
-          {/* 선택 해제 — 구독특혜 PiTranslate™ */}
+          {/* 선택 해제 — 구독특혜 PyTranslate™ */}
           <button
             role="option"
             aria-selected={!value}

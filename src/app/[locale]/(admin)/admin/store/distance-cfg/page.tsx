@@ -74,7 +74,7 @@ export default function DistanceCfgPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold">PiShop™ 거리 제한 설정</h1>
+        <h1 className="text-2xl font-bold">PyShop™ 거리 제한 설정</h1>
         <p className="text-muted-foreground mt-1 text-sm">
           사용자 위치 기준 이 거리를 초과한 상품은 목록에 노출되지 않습니다.
           <br />

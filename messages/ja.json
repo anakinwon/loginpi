@@ -961,7 +961,7 @@
           "icon": "🎫",
           "steps": [
             "1 Pi = 100 Bean (Platform専用積立金) — 無料Planですぐに開始できます",
-            "必要なものだけ選んでサブスクリプション: PiCafé™(Premium Cafe) · PiShop™(商品登録) · PiTranslate™(無制限翻訳)",
+            "必要なものだけ選んでサブスクリプション: PyCafé™(Premium Cafe) · PyShop™(商品登録) · PyTranslate™(無制限翻訳)",
             "サブスクリプション料金はチャージしたBeanで決済し、年間決済は2ヶ月無料です"
           ],
           "title": "Bean & サブスクリプション"
@@ -1040,7 +1040,7 @@
       "newTrans": "新規翻訳 ({period}日, メッセージ×言語)",
       "noData": "期間内翻訳 Data がありません"
     },
-    "translateSection": "翻訳 (PiTranslate™)",
+    "translateSection": "翻訳 (PyTranslate™)",
     "txnLabel": {
       "CHARGE": "チャージ",
       "ETC": "その他",
@@ -1268,7 +1268,7 @@
     }
   },
   "bean": {
-    "backToStore": "PiShopへ",
+    "backToStore": "PyShopへ",
     "buying": "決済進行中…",
     "chargeBtn": "チャージ",
     "chargeFail": "チャージ処理に失敗しました",
@@ -1809,14 +1809,14 @@
     "loadError": "Dataロード失敗",
     "loginHint": "Loginすると、私のMission進行度とエージェント等級が表示されます",
     "missionGoBean": "Beanチャージへ",
-    "missionGoCafe": "💬 PiCafeへ",
+    "missionGoCafe": "💬 PyCafeへ",
     "missionGoItems": "🛒 マイ商品へ",
     "missionGoLbs": "📍 位置 Service (マイ Profile)",
     "missionGoLink": "🔗 アカウント連携へ",
     "missionGoOrders": "🛒 注文管理へ",
     "missionGoProfile": "👤 アカウント連携・Profile入力へ",
     "missionGoSales": "🛒 販売管理へ",
-    "missionGoStore": "🛒 PiShopへ",
+    "missionGoStore": "🛒 PyShopへ",
     "missionGoSubscribe": "⭐ 購読申請へ",
     "missionListTitle": "📋 Mission List",
     "missions": {
@@ -1833,7 +1833,7 @@
         "name": "Profile完成"
       },
       "M3": {
-        "desc": "PiCafeでPREMIUM Cafe作成 + 自動翻訳機能使用",
+        "desc": "PyCafeでPREMIUM Cafe作成 + 自動翻訳機能使用",
         "name": "PREMIUM Cafe作成(PiRC1) + 自動翻訳"
       },
       "M4": {
@@ -1849,15 +1849,15 @@
         "name": "Chat Multi機能使用"
       },
       "M7": {
-        "desc": "PiShopに自分の商品を登録後、取引中に販売者 取引キャンセル",
+        "desc": "PyShopに自分の商品を登録後、取引中に販売者 取引キャンセル",
         "name": "販売者 取引キャンセル (Escrow Service;PiRC3)"
       },
       "M8": {
-        "desc": "PiShopで他人の商品を購入後、購入者 取引キャンセル",
+        "desc": "PyShopで他人の商品を購入後、購入者 取引キャンセル",
         "name": "購入者 取引キャンセル (Escrow Service;PiRC3)"
       },
       "M9": {
-        "desc": "PiShop 販売者 保証金 1Pi以上預け入れ + 位置情報サービス同意",
+        "desc": "PyShop 販売者 保証金 1Pi以上預け入れ + 位置情報サービス同意",
         "name": "販売者 保証金 + 位置情報同意 (Escrow Service;PiRC3)"
       }
     },
@@ -1924,7 +1924,7 @@
       "condTitle": "参加条件",
       "ctaM1": "Map で登録",
       "ctaM2": "商品登録",
-      "ctaM3": "My PiShop™ で連携",
+      "ctaM3": "My PyShop™ で連携",
       "ctaM4": "通知確認",
       "loadError": "Campaign 情報を読み込めません。",
       "loading": "読み込み中…",
@@ -2255,7 +2255,7 @@
       "info": "個人情報",
       "lbs": "📍 Location Service",
       "payment": "決済履歴",
-      "store": "🛍️ My PiShop™",
+      "store": "🛍️ My PyShop™",
       "subscr": "購読状況"
     },
     "tabsExtra": {
@@ -2545,7 +2545,7 @@
     "statusChanged": "Statusが変更されました",
     "stockLeft": "在庫 {count}",
     "subtitle": "Pi Coinで安全に直接取引してください — Escrow 保護",
-    "title": "PiShop",
+    "title": "PyShop",
     "tradeSt": {
       "OPEN": "販売中",
       "SOLD": "販売完了",
@@ -2591,8 +2591,8 @@
     "perYear": "年",
     "processing": "処理中…",
     "product": {
-      "PICAFE": "PiCafe 購読",
-      "PISHOP": "PiShop サブスクリプション",
+      "PICAFE": "PyCafe 購読",
+      "PISHOP": "PyShop サブスクリプション",
       "TRANSLATE": "自動翻訳 購読"
     },
     "renewBtn": "更新/変更",
@@ -2636,6 +2636,6 @@
     "running": "⏳ 検査中…",
     "skipped": "上位 Check 失敗のためスキップ",
     "subtitle": "Pi Browser 実機で WebRTC 音声通話のサポート状況を診断します。",
-    "title": "🎙️ PiVoice™ S0 Spike"
+    "title": "🎙️ PyVoice™ S0 Spike"
   }
 }

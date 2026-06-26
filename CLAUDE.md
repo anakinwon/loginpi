@@ -242,15 +242,15 @@ src/
 
 > ①은 행 단위(페이지네이션), ③은 섹션 단위(지연 fetch)로 층위가 다르며 둘 다 적용한다. 공개 집계 API는 캐시 헤더(`s-maxage`/`stale-while-revalidate`)와 병행하되 관리자 정확도(소프트게이트 admin 분기)는 유지한다.
 
-## 공식 브랜드 표기 (2026-06-23 확정)
+## 공식 브랜드 표기 (2026-06-27 PyCafé™ 개명 — 구 PiCafé, Pi 접두 상표 회피)
 
 모든 **사용자 표시 텍스트**(UI 라벨·제목·i18n 값·문서·메뉴얼·주석)는 다음 공식 표기를 사용한다:
 
 | 기능 | 공식 표기 |
 |---|---|
-| PiCafe / PiCafé | **PiCafé™** (é=U+00E9, ™=U+2122) |
-| PiShop | **PiShop™** |
-| 자동번역 | **PiTranslate™** |
+| PyCafe / PyCafé | **PyCafé™** (é=U+00E9, ™=U+2122) |
+| PyShop | **PyShop™** |
+| 자동번역 | **PyTranslate™** |
 
 - ⛔ **원형 유지(™·é 금지)**: DB 코드값 `prod_ctgr_cd='PICAFE'/'PISHOP'/'PISHOP_SUBSCR'/'TRANSLATE'`, 변수·함수·컴포넌트 식별자, **Pi 결제 memo**(™ 특수문자가 결제 호환을 깨뜨릴 수 있음).
-- ™ 중복 방지: 치환 시 `(?!™)` lookahead 사용. "자동번역" 한국어 서술은 맥락 보존, 명칭/제목/라벨만 PiTranslate™.
+- ™ 중복 방지: 치환 시 `(?!™)` lookahead 사용. "자동번역" 한국어 서술은 맥락 보존, 명칭/제목/라벨만 PyTranslate™.

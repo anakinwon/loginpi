@@ -961,7 +961,7 @@
           "icon": "🎫",
           "steps": [
             "1 Pi = 100 Bean (เงินสะสมเฉพาะแพลตฟอร์ม) — คุณสามารถเริ่มต้นได้ทันทีด้วยแผนฟรี",
-            "เลือก Subscription เฉพาะที่คุณต้องการ: PiCafé™ (Premium Cafe) · PiShop™ (Product Registration) · PiTranslate™ (Unlimited Translation)",
+            "เลือก Subscription เฉพาะที่คุณต้องการ: PyCafé™ (Premium Cafe) · PyShop™ (Product Registration) · PyTranslate™ (Unlimited Translation)",
             "ค่า Subscription ชำระด้วย Bean ที่เติมเงิน และการชำระเงินรายปีจะได้รับฟรี 2 เดือน"
           ],
           "title": "Bean & Subscription"
@@ -1040,7 +1040,7 @@
       "newTrans": "การแปลใหม่ ({period} วัน, ข้อความ×ภาษา)",
       "noData": "ไม่มี Data การแปลในช่วงเวลา"
     },
-    "translateSection": "การแปล (PiTranslate™)",
+    "translateSection": "การแปล (PyTranslate™)",
     "txnLabel": {
       "CHARGE": "การเติมเงิน",
       "ETC": "อื่น ๆ",
@@ -1268,7 +1268,7 @@
     }
   },
   "bean": {
-    "backToStore": "กลับไปที่ PiShop",
+    "backToStore": "กลับไปที่ PyShop",
     "buying": "กำลังดำเนินการชำระเงิน…",
     "chargeBtn": "เติมเงิน",
     "chargeFail": "ดำเนินการเติมเงินไม่สำเร็จ",
@@ -1809,14 +1809,14 @@
     "loadError": "โหลด Data ล้มเหลว",
     "loginHint": "หาก Login ความคืบหน้าของ Mission และระดับ Agent ของคุณจะแสดงขึ้น",
     "missionGoBean": "ไปเติม Bean",
-    "missionGoCafe": "💬 ไป PiCafé™",
+    "missionGoCafe": "💬 ไป PyCafé™",
     "missionGoItems": "🛒 ไปที่สินค้าของฉัน",
     "missionGoLbs": "📍 Location Service (Profile ของฉัน)",
     "missionGoLink": "🔗 ไปเชื่อมโยงบัญชี",
     "missionGoOrders": "🛒 ไปที่การจัดการคำสั่งซื้อ",
     "missionGoProfile": "👤 ไปเชื่อมโยงบัญชีและกรอก Profile",
     "missionGoSales": "🛒 ไปที่การจัดการการขาย",
-    "missionGoStore": "🛒 ไป PiShop™",
+    "missionGoStore": "🛒 ไป PyShop™",
     "missionGoSubscribe": "⭐ ไปสมัครสมาชิก",
     "missionListTitle": "📋 รายการ Mission",
     "missions": {
@@ -1833,7 +1833,7 @@
         "name": "กรอก Profile ให้สมบูรณ์"
       },
       "M3": {
-        "desc": "สร้าง PREMIUM Cafe ใน PiCafe + ใช้ฟังก์ชันการแปลอัตโนมัติ",
+        "desc": "สร้าง PREMIUM Cafe ใน PyCafe + ใช้ฟังก์ชันการแปลอัตโนมัติ",
         "name": "สร้าง PREMIUM Cafe (PiRC1) + การแปลอัตโนมัติ"
       },
       "M4": {
@@ -1849,15 +1849,15 @@
         "name": "ใช้ฟังก์ชัน Chat Multi"
       },
       "M7": {
-        "desc": "ผู้ขายยกเลิกธุรกรรมระหว่างการทำธุรกรรมหลังจากลงทะเบียนสินค้าของฉันใน PiShop",
+        "desc": "ผู้ขายยกเลิกธุรกรรมระหว่างการทำธุรกรรมหลังจากลงทะเบียนสินค้าของฉันใน PyShop",
         "name": "การยกเลิกธุรกรรมโดยผู้ขาย (Escrow Service;PiRC3)"
       },
       "M8": {
-        "desc": "ผู้ซื้อยกเลิกธุรกรรมหลังจากซื้อสินค้าของผู้อื่นใน PiShop",
+        "desc": "ผู้ซื้อยกเลิกธุรกรรมหลังจากซื้อสินค้าของผู้อื่นใน PyShop",
         "name": "การยกเลิกธุรกรรมโดยผู้ซื้อ (Escrow Service;PiRC3)"
       },
       "M9": {
-        "desc": "ฝากเงินประกันผู้ขายใน PiShop อย่างน้อย 1Pi + ยินยอมบริการตามตำแหน่ง",
+        "desc": "ฝากเงินประกันผู้ขายใน PyShop อย่างน้อย 1Pi + ยินยอมบริการตามตำแหน่ง",
         "name": "เงินประกันผู้ขาย + การยินยอมตำแหน่ง (Escrow Service;PiRC3)"
       }
     },
@@ -1924,7 +1924,7 @@
       "condTitle": "เงื่อนไขการเข้าร่วม",
       "ctaM1": "ลงทะเบียนบน Map",
       "ctaM2": "ลงทะเบียนสินค้า",
-      "ctaM3": "เชื่อมต่อใน PiShop™ ของฉัน",
+      "ctaM3": "เชื่อมต่อใน PyShop™ ของฉัน",
       "ctaM4": "ยืนยันการแจ้งเตือน",
       "loadError": "ไม่สามารถโหลดข้อมูล Campaign ได้",
       "loading": "กำลังโหลด…",
@@ -2255,7 +2255,7 @@
       "info": "ข้อมูลส่วนตัว",
       "lbs": "📍 Location Service",
       "payment": "ประวัติการชำระเงิน",
-      "store": "🛍️ PiShop™ ของฉัน",
+      "store": "🛍️ PyShop™ ของฉัน",
       "subscr": "สถานะการสมัครสมาชิก"
     },
     "tabsExtra": {
@@ -2545,7 +2545,7 @@
     "statusChanged": "สถานะถูกเปลี่ยนแล้ว",
     "stockLeft": "เหลือในสต็อก {count}",
     "subtitle": "ซื้อขายโดยตรงอย่างปลอดภัยด้วย Pi Coin — การคุ้มครอง Escrow",
-    "title": "PiShop",
+    "title": "PyShop",
     "tradeSt": {
       "OPEN": "กำลังขาย",
       "SOLD": "ขายแล้ว",
@@ -2591,8 +2591,8 @@
     "perYear": "ต่อปี",
     "processing": "กำลังดำเนินการ…",
     "product": {
-      "PICAFE": "สมัครสมาชิก PiCafe",
-      "PISHOP": "การสมัครสมาชิก PiShop",
+      "PICAFE": "สมัครสมาชิก PyCafe",
+      "PISHOP": "การสมัครสมาชิก PyShop",
       "TRANSLATE": "สมัครสมาชิกการแปลอัตโนมัติ"
     },
     "renewBtn": "ต่ออายุ/เปลี่ยน",
@@ -2636,6 +2636,6 @@
     "running": "⏳ กำลังตรวจสอบ...",
     "skipped": "ข้ามเนื่องจากการตรวจสอบระดับบนล้มเหลว",
     "subtitle": "วินิจฉัยว่า Pi Browser บนอุปกรณ์จริงรองรับการโทรด้วยเสียง WebRTC หรือไม่",
-    "title": "🎙️ PiVoice™ S0 Spike"
+    "title": "🎙️ PyVoice™ S0 Spike"
   }
 }

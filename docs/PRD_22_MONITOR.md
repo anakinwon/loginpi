@@ -513,7 +513,7 @@ $$ LANGUAGE plpgsql;
 
 #### 3.5.1 채팅 성능 (Chat Performance)
 
-**측정 대상**: PiChat 메시지 송수신
+**측정 대상**: PyChat 메시지 송수신
 
 **메트릭**:
 - **메시지 처리량**: msg/초

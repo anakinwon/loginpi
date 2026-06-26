@@ -25,7 +25,7 @@ const THEME_PROMPTS: Record<string, string> = {
 }
 
 const DEFAULT_PROMPT =
-  '당신은 PiCafé AI 비서입니다. 모든 질문에 친절하게 한국어로 3~5문장 이내로 답변하세요.'
+  '당신은 PyCafé AI 비서입니다. 모든 질문에 친절하게 한국어로 3~5문장 이내로 답변하세요.'
 
 export function getThemeSystemPrompt(themeCd: string): string {
   return THEME_PROMPTS[themeCd] ?? DEFAULT_PROMPT

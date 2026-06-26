@@ -961,7 +961,7 @@
           "icon": "🎫",
           "steps": [
             "1 Pi = 100 Bean (баллы только для платформы) — Вы можете начать сразу с бесплатного PLAN",
-            "Выберите только то, что вам нужно: PiCafé™ (Premium Cafe) · PiShop™ (Product Registration) · PiTranslate™ (Unlimited Translation)",
+            "Выберите только то, что вам нужно: PyCafé™ (Premium Cafe) · PyShop™ (Product Registration) · PyTranslate™ (Unlimited Translation)",
             "Плата за подписку оплачивается пополненными Bean, а при годовой оплате 2 месяца бесплатно"
           ],
           "title": "Bean & Подписка"
@@ -1040,7 +1040,7 @@
       "newTrans": "Новые переводы ({period} дней, сообщений × языков)",
       "noData": "За этот период нет Translation Data"
     },
-    "translateSection": "Перевод (PiTranslate™)",
+    "translateSection": "Перевод (PyTranslate™)",
     "txnLabel": {
       "CHARGE": "Пополнение",
       "ETC": "Прочее",
@@ -1268,7 +1268,7 @@
     }
   },
   "bean": {
-    "backToStore": "В PiShop",
+    "backToStore": "В PyShop",
     "buying": "Обработка платежа…",
     "chargeBtn": "Пополнить",
     "chargeFail": "Не удалось обработать пополнение",
@@ -1809,14 +1809,14 @@
     "loadError": "Ошибка загрузки Data",
     "loginHint": "Войдите в Login, чтобы увидеть свой прогресс Mission и ранг агента",
     "missionGoBean": "Перейти к пополнению Bean",
-    "missionGoCafe": "💬 Перейти в PiCafé™",
+    "missionGoCafe": "💬 Перейти в PyCafé™",
     "missionGoItems": "🛒 Перейти к моим товарам",
     "missionGoLbs": "📍 Location Service (Мой Profile)",
     "missionGoLink": "🔗 Перейти к привязке аккаунта",
     "missionGoOrders": "🛒 Перейти к управлению заказами",
     "missionGoProfile": "👤 Перейти к привязке аккаунта и вводу Profile",
     "missionGoSales": "🛒 Перейти к управлению продажами",
-    "missionGoStore": "🛒 Перейти в PiShop™",
+    "missionGoStore": "🛒 Перейти в PyShop™",
     "missionGoSubscribe": "⭐ Перейти к подписке",
     "missionListTitle": "📋 Список Mission",
     "missions": {
@@ -1833,7 +1833,7 @@
         "name": "Завершение Profile"
       },
       "M3": {
-        "desc": "Создайте PREMIUM Cafe в PiCafe + Используйте функцию автоматического перевода",
+        "desc": "Создайте PREMIUM Cafe в PyCafe + Используйте функцию автоматического перевода",
         "name": "Создание PREMIUM Cafe (PiRC1) + Автоматический перевод"
       },
       "M4": {
@@ -1849,15 +1849,15 @@
         "name": "Использование Multi-функции Chat"
       },
       "M7": {
-        "desc": "После регистрации моего товара в PiShop, отмена транзакции продавцом во время сделки",
+        "desc": "После регистрации моего товара в PyShop, отмена транзакции продавцом во время сделки",
         "name": "Отмена транзакции продавцом (Escrow Service;PiRC3)"
       },
       "M8": {
-        "desc": "После покупки чужого товара в PiShop, отмена транзакции покупателем",
+        "desc": "После покупки чужого товара в PyShop, отмена транзакции покупателем",
         "name": "Отмена транзакции покупателем (Escrow Service;PiRC3)"
       },
       "M9": {
-        "desc": "Внесение депозита продавца в PiShop от 1Pi + согласие на Location-based Service",
+        "desc": "Внесение депозита продавца в PyShop от 1Pi + согласие на Location-based Service",
         "name": "Депозит продавца + согласие на использование местоположения (Escrow Service;PiRC3)"
       }
     },
@@ -1924,7 +1924,7 @@
       "condTitle": "Условия участия",
       "ctaM1": "Зарегистрировать на карте",
       "ctaM2": "Зарегистрировать Product",
-      "ctaM3": "Интегрировать в моем PiShop™",
+      "ctaM3": "Интегрировать в моем PyShop™",
       "ctaM4": "Подтвердить уведомление",
       "loadError": "Не удалось загрузить информацию о Campaign.",
       "loading": "Загрузка…",
@@ -2255,7 +2255,7 @@
       "info": "Личная информация",
       "lbs": "📍 Location Service",
       "payment": "История платежей",
-      "store": "🛍️ Мой PiShop™",
+      "store": "🛍️ Мой PyShop™",
       "subscr": "Статус подписки"
     },
     "tabsExtra": {
@@ -2545,7 +2545,7 @@
     "statusChanged": "Статус изменен",
     "stockLeft": "В наличии {count}",
     "subtitle": "Безопасные прямые сделки с Pi Coin — защита Escrow",
-    "title": "PiShop",
+    "title": "PyShop",
     "tradeSt": {
       "OPEN": "В продаже",
       "SOLD": "Продано",
@@ -2591,8 +2591,8 @@
     "perYear": "В год",
     "processing": "Обработка…",
     "product": {
-      "PICAFE": "Подписка PiCafe",
-      "PISHOP": "Подписка PiShop",
+      "PICAFE": "Подписка PyCafe",
+      "PISHOP": "Подписка PyShop",
       "TRANSLATE": "Подписка на автоматический перевод"
     },
     "renewBtn": "Продлить/Изменить",
@@ -2636,6 +2636,6 @@
     "running": "⏳ Проверка…",
     "skipped": "Пропущено из-за сбоя предыдущей проверки",
     "subtitle": "Диагностика поддержки голосовых вызовов WebRTC на реальном устройстве Pi Browser.",
-    "title": "🎙️ PiVoice™ S0 Spike"
+    "title": "🎙️ PyVoice™ S0 Spike"
   }
 }

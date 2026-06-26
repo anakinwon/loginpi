@@ -1,6 +1,6 @@
 import { routing } from '@/i18n/routing'
 
-// PiTranslate™ 언어 선택 드롭다운 옵션 — routing.ts 203개 locale 단일 소스
+// PyTranslate™ 언어 선택 드롭다운 옵션 — routing.ts 203개 locale 단일 소스
 // Intl.DisplayNames로 언어명 자동 파생, 미인식 코드는 코드 그대로 표시
 // 서버·클라이언트 양쪽에서 사용 가능 (Intl은 양쪽 모두 내장)
 

@@ -1,7 +1,7 @@
 import 'server-only'
 import Anthropic from '@anthropic-ai/sdk'
 
-// PiTranslate™ 번역 엔진 (Phase 12 — TASK-091)
+// PyTranslate™ 번역 엔진 (Phase 12 — TASK-091)
 // 1차: Gemini 2.5 Flash (저비용·고속 — PRD의 2.0-flash는 2026-06 기준 단종되어 404 반환)
 // 2차: Claude Haiku fallback (Gemini API 장애 시 번역 단절 방지)
 

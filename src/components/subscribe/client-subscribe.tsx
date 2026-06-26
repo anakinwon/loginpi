@@ -240,7 +240,7 @@ export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
                 </Button>
               </div>
 
-              {/* PiShop™ S/M/L 등급 선택 */}
+              {/* PyShop™ S/M/L 등급 선택 */}
               {product === 'PISHOP' && (
                 <div className="mt-3">
                   <p className="text-muted-foreground mb-1.5 text-xs">

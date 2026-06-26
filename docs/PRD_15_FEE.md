@@ -87,7 +87,7 @@
 | 1 | **Bean 충전** | Pi→Bean (IN) | 1 Pi = 100 Bean | `payments/complete` `BEAN_CHARGE` · `api/bean/charge` | `txn=CHARGE` | ✅ **라이브** (충전 1건 확인) | ✅ **Pi Browser 필수** |
 | 2 | **카페 생성료** (프리미엄) | Bean (OUT) | 10 | `api/chat/rooms/group` | `ref=ROOM_CREATE` | ✅ **라이브** (1건 확인) | ✅ 일반 브라우저 가능 |
 | 3 | **카페 입장료** (프리미엄) | Bean (OUT) | 10 | `api/chat/rooms/[id]/join` · `[roomId]/page` · `room-entry-fee-gate` | `ref=ROOM_ENTER` | ✅ **라이브** (5건+환불2 확인) | ✅ 일반 브라우저 가능 |
-| 4 | **상품 구독료** (PiCafé™·PiShop™·자동번역) | Bean (OUT) | 3,000~50,000 (§4-1) | `api/subscriptions/products/subscribe` → `fn_bean_subscribe_product` | `bean_subscr` | ✅ **배포됨** | ✅ **테스트 가능** |
+| 4 | **상품 구독료** (PyCafé™·PyShop™·자동번역) | Bean (OUT) | 3,000~50,000 (§4-1) | `api/subscriptions/products/subscribe` → `fn_bean_subscribe_product` | `bean_subscr` | ✅ **배포됨** | ✅ **테스트 가능** |
 | 5 | ~~레거시 구독 (msg_subscr_plan 5종)~~ → #4 Bean 구독 흡수 | Bean (OUT) | §4-1 | `getChatPlan`(bean_subscr 기반) · `api/subscriptions` POST 410 · `payments/complete` `CHAT_SUBSCR` 분기 제거 | `bean_subscr` | ✅ **전환완료** (2026-06-20) | ✅ 일반 브라우저 가능 |
 | 6 | 이벤트방 입장료 | Bean (OUT) | `entry_fee_pi`×100 (호스트 지정 티켓가) | `api/chat/rooms/[id]/join` · `[roomId]/page` · `room-entry-fee-gate` | `ref=EVENT_ENTER` | ✅ **라이브** | ✅ 일반 브라우저 가능 |
 | 7 | 배지 강화 (BADGE_UPGRADE) | Bean (OUT) | 10 Bean (=0.1 Pi) | `api/badges/upgrade` | `refTp=BADGE_UPGRADE` | ✅ **라이브** | ✅ 일반 브라우저 가능 |
@@ -197,7 +197,7 @@ GET /api/subscriptions/  POST /api/subscriptions/
 
 ### 4-1. 구독요금제 (`subscr_div_cd = SUBSCR`, `fee_knd_cd = SUBSCR`)
 
-> **2026-06-24 개정**: PiShop S/M/L 3-tier → 단일 GENERAL 5,000/50,000 Bean 통합. PiTranslate 1,000→3,000/월, 10,000→30,000/년.
+> **2026-06-24 개정**: PyShop S/M/L 3-tier → 단일 GENERAL 5,000/50,000 Bean 통합. PyTranslate 1,000→3,000/월, 10,000→30,000/년.
 
 | 코드 | 상품구분 | 주기 | Bean | Pi | 설명 |
 |---|---|---|---|---|---|
@@ -208,7 +208,7 @@ GET /api/subscriptions/  POST /api/subscriptions/
 | SM500 | TRANSLATE_SUBSCR | M | **3,000**  | **30**  | 자동번역 구독 — 월 |
 | SY500 | TRANSLATE_SUBSCR | Y | **30,000** | **300** | 자동번역 구독 — 년 (2개월 무료) |
 
-> 폐기 코드(논리삭제): SM300, SM400, SY300, SY400 (PiShop S/M/L 구분 제거로 불필요)
+> 폐기 코드(논리삭제): SM300, SM400, SY300, SY400 (PyShop S/M/L 구분 제거로 불필요)
 
 ### 4-2. 일반요금제 — 카페 (`PICAFE_GENERAL` = 카페일반, `PICAFE_SUBSCR` = 카페구독자 대상)
 
@@ -260,7 +260,7 @@ GET /api/subscriptions/  POST /api/subscriptions/
 
 | 테이블 | 역할 | 변경 |
 |---|---|---|
-| `msg_subscr_plan` (기존 5종) | PiCafé™ 구독 3-tier(Explorer/Creator/Host), PLAN_CAPS 기능 한도 | **유지·무변경** |
+| `msg_subscr_plan` (기존 5종) | PyCafé™ 구독 3-tier(Explorer/Creator/Host), PLAN_CAPS 기능 한도 | **유지·무변경** |
 | `bean_fee_plan` (신규) | 플랫폼 종합 요금 + **Bean 경제 표준** | 신규 추가 |
 
 - **PRD_12 연결**: `bean_ledger` SPEND/REWARD insert 시 금액은 `bean_fee_plan.amt_bean` 조회로 결정(하드코딩 금지). PRD_12 §11에 이 출처를 명시.
@@ -287,7 +287,7 @@ GET /api/subscriptions/  POST /api/subscriptions/
 | # | 코드 | 의심 | 확인 필요 |
 |---|---|---|---|
 | 1 | SSPDM vs SSGDM | 프리미엄(5) < 일반(10) — 역전 | 의도? 아니면 값 교정 |
-| 2 | SY300 | 폐기됨 — PiShop 단일등급 전환(2026-06-24) | 해결됨 |
+| 2 | SY300 | 폐기됨 — PyShop 단일등급 전환(2026-06-24) | 해결됨 |
 | 3 | (전반) | "월구독료(Bean)" 컬럼이 일반요금제선 "건당/노출 요금" 의미 — 컬럼 의미 이중성 | 컬럼명/해석 확정 |
 | 4 | SSGDM(10) vs SGGDM(10) / SSPDM(5) vs SGPDM(20) | 구독자 노출가가 일반보다 낮거나 역전 혼재 | 구독 할인 정책 일관성 확인 |
 

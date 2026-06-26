@@ -28,9 +28,9 @@ const SHOP_GRADE_META: Record<ShopGrade, { label: string; limit: string }> = {
 }
 
 const PRODUCT_META: Record<Product, { label: string; emoji: string; color: string }> = {
-  PICAFE:    { label: 'PiCafé™',      emoji: '☕', color: 'border-blue-200 dark:border-blue-800' },
-  PISHOP:    { label: 'PiShop™',      emoji: '🏪', color: 'border-amber-200 dark:border-amber-800' },
-  TRANSLATE: { label: 'PiTranslate™', emoji: '🌐', color: 'border-green-200 dark:border-green-800' },
+  PICAFE:    { label: 'PyCafé™',      emoji: '☕', color: 'border-blue-200 dark:border-blue-800' },
+  PISHOP:    { label: 'PyShop™',      emoji: '🏪', color: 'border-amber-200 dark:border-amber-800' },
+  TRANSLATE: { label: 'PyTranslate™', emoji: '🌐', color: 'border-green-200 dark:border-green-800' },
 }
 
 const SIMPLE_PRODUCTS: Product[] = ['PICAFE', 'TRANSLATE']
@@ -119,7 +119,7 @@ export default function SubscrPricingPage() {
 
   // 단순 상품 그룹 (PICAFE, TRANSLATE): { M, Y }
   const simpleGroup: Partial<Record<Product, { M?: FeePlanRow; Y?: FeePlanRow }>> = {}
-  // PiShop 그룹: grade → { M, Y }
+  // PyShop 그룹: grade → { M, Y }
   const shopGroup: Partial<Record<ShopGrade, { M?: FeePlanRow; Y?: FeePlanRow }>> = {}
 
   rows.forEach((r) => {
@@ -134,7 +134,7 @@ export default function SubscrPricingPage() {
     }
   })
 
-  // 현재 선택된 PiShop 등급 그룹
+  // 현재 선택된 PyShop 등급 그룹
   const shopGradeGroup = shopGroup[shopGrade] ?? {}
   const shopMRow = shopGradeGroup.M
   const shopYRow = shopGradeGroup.Y
@@ -240,7 +240,7 @@ export default function SubscrPricingPage() {
             연간 요금을 수정할 때 이 정책이 유지되는지 우측 아이콘으로 확인하세요.
           </div>
 
-          {/* PiCafé™ · PiTranslate™ 단순 상품 카드 */}
+          {/* PyCafé™ · PyTranslate™ 단순 상품 카드 */}
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             {SIMPLE_PRODUCTS.map((prod) => {
               const meta = PRODUCT_META[prod]
@@ -281,7 +281,7 @@ export default function SubscrPricingPage() {
             })}
           </div>
 
-          {/* PiShop™ S / M / L 등급별 구독요금 */}
+          {/* PyShop™ S / M / L 등급별 구독요금 */}
           <div className={`rounded-2xl border-2 bg-card p-5 shadow-sm ${PRODUCT_META.PISHOP.color}`}>
             {/* 카드 헤더 */}
             <div className="mb-4 flex items-center gap-2">

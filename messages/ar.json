@@ -961,7 +961,7 @@
           "icon": "🎫",
           "steps": [
             "1 Pi = 100 Bean (رصيد خاص بالمنصة) — ممكن تبدأ على طول بخطة مجانية",
-            "اشترك في اللي محتاجه بس: PiCafé™ (كافيه Premium) · PiShop™ (تسجيل منتجات) · PiTranslate™ (ترجمة غير محدودة)",
+            "اشترك في اللي محتاجه بس: PyCafé™ (كافيه Premium) · PyShop™ (تسجيل منتجات) · PyTranslate™ (ترجمة غير محدودة)",
             "رسوم الاشتراك بتدفعها بالـ Bean اللي شحنته، والدفع السنوي بتاخد عليه شهرين مجاناً"
           ],
           "title": "Bean & اشتراك"
@@ -1040,7 +1040,7 @@
       "newTrans": "ترجمات جديدة ({period} يوم، رسالة × لغة)",
       "noData": "لا يوجد Data ترجمة خلال هذه الفترة"
     },
-    "translateSection": "الترجمة (PiTranslate™)",
+    "translateSection": "الترجمة (PyTranslate™)",
     "txnLabel": {
       "CHARGE": "شحن",
       "ETC": "أخرى",
@@ -1268,7 +1268,7 @@
     }
   },
   "bean": {
-    "backToStore": "العودة إلى PiShop",
+    "backToStore": "العودة إلى PyShop",
     "buying": "جاري عملية الدفع…",
     "chargeBtn": "شحن",
     "chargeFail": "فشل في معالجة الشحن",
@@ -1809,14 +1809,14 @@
     "loadError": "فشل تحميل الـData",
     "loginHint": "سجل الدخول لترى تقدمك في الـMission ورتبة العميل",
     "missionGoBean": "اذهب لشحن Bean",
-    "missionGoCafe": "💬 اذهب إلى PiCafé™",
+    "missionGoCafe": "💬 اذهب إلى PyCafé™",
     "missionGoItems": "🛒 اذهب إلى منتجاتي",
     "missionGoLbs": "📍 خدمة الموقع (Profile الخاص بي)",
     "missionGoLink": "🔗 اذهب لربط الحساب",
     "missionGoOrders": "🛒 اذهب إلى إدارة الطلبات",
     "missionGoProfile": "👤 اذهب لربط الحساب وإدخال Profile",
     "missionGoSales": "🛒 اذهب إلى إدارة المبيعات",
-    "missionGoStore": "🛒 اذهب إلى PiShop™",
+    "missionGoStore": "🛒 اذهب إلى PyShop™",
     "missionGoSubscribe": "⭐ اذهب للاشتراك",
     "missionListTitle": "📋 قائمة الـMissions",
     "missions": {
@@ -1833,7 +1833,7 @@
         "name": "إكمال الـProfile"
       },
       "M3": {
-        "desc": "إنشاء PREMIUM Cafe في PiCafe + استخدام خاصية الترجمة التلقائية",
+        "desc": "إنشاء PREMIUM Cafe في PyCafe + استخدام خاصية الترجمة التلقائية",
         "name": "إنشاء PREMIUM Cafe (PiRC1) + ترجمة تلقائية"
       },
       "M4": {
@@ -1849,15 +1849,15 @@
         "name": "استخدام Multi-function في الدردشة"
       },
       "M7": {
-        "desc": "بعد تسجيل منتجي في PiShop، إلغاء معاملة البائع أثناء المعاملة",
+        "desc": "بعد تسجيل منتجي في PyShop، إلغاء معاملة البائع أثناء المعاملة",
         "name": "إلغاء معاملة البائع (Escrow Service; PiRC3)"
       },
       "M8": {
-        "desc": "بعد شراء منتج شخص آخر من PiShop، إلغاء معاملة المشتري",
+        "desc": "بعد شراء منتج شخص آخر من PyShop، إلغاء معاملة المشتري",
         "name": "إلغاء معاملة المشتري (Escrow Service; PiRC3)"
       },
       "M9": {
-        "desc": "إيداع 1Pi أو أكثر كضمان للبائع في PiShop + الموافقة على خدمة الموقع",
+        "desc": "إيداع 1Pi أو أكثر كضمان للبائع في PyShop + الموافقة على خدمة الموقع",
         "name": "إيداع البائع + الموافقة على الموقع (Escrow Service; PiRC3)"
       }
     },
@@ -1924,7 +1924,7 @@
       "condTitle": "شروط المشاركة",
       "ctaM1": "التسجيل في الـ Map",
       "ctaM2": "تسجيل المنتج",
-      "ctaM3": "الربط في PiShop™ الخاص بي",
+      "ctaM3": "الربط في PyShop™ الخاص بي",
       "ctaM4": "تأكيد الإشعارات",
       "loadError": "مش قادرين نحمل معلومات الحملة.",
       "loading": "جاري التحميل…",
@@ -2255,7 +2255,7 @@
       "info": "المعلومات الشخصية",
       "lbs": "📍 خدمة الموقع",
       "payment": "سجل الدفع",
-      "store": "🛍️ الـ PiShop™ بتاعي",
+      "store": "🛍️ الـ PyShop™ بتاعي",
       "subscr": "حالة الاشتراك"
     },
     "tabsExtra": {
@@ -2545,7 +2545,7 @@
     "statusChanged": "تم تغيير الحالة",
     "stockLeft": "المخزون {count}",
     "subtitle": "تداول بأمان ومباشرة باستخدام Pi Coin — حماية الضمان",
-    "title": "PiShop",
+    "title": "PyShop",
     "tradeSt": {
       "OPEN": "للبيع",
       "SOLD": "تم البيع",
@@ -2591,8 +2591,8 @@
     "perYear": "سنويًا",
     "processing": "جاري المعالجة…",
     "product": {
-      "PICAFE": "اشتراك PiCafe",
-      "PISHOP": "اشتراك PiShop",
+      "PICAFE": "اشتراك PyCafe",
+      "PISHOP": "اشتراك PyShop",
       "TRANSLATE": "اشتراك الترجمة التلقائية"
     },
     "renewBtn": "تجديد/تغيير",
@@ -2636,6 +2636,6 @@
     "running": "⏳ جاري الفحص…",
     "skipped": "تم التخطي بسبب فشل الفحص السابق",
     "subtitle": "يقوم بتشخيص ما إذا كان Pi Browser يدعم مكالمات WebRTC الصوتية على جهاز حقيقي.",
-    "title": "🎙️ PiVoice™ S0 Spike"
+    "title": "🎙️ PyVoice™ S0 Spike"
   }
 }

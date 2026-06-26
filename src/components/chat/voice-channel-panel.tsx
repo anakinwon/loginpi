@@ -6,7 +6,7 @@ import type {
   MicState,
 } from '@/hooks/use-voice-channel'
 
-// PiVoice™ v3.0 — N:N 음성채널 패널 (PRD_9_VOICE_CHAT v3.0)
+// PyVoice™ v3.0 — N:N 음성채널 패널 (PRD_9_VOICE_CHAT v3.0)
 // 권한 정책: 방장 👑 보장 슬롯, 멤버 자동 2/승인 2.
 // 방장은 PENDING 승인/거절, CONNECTED 회수, LISTEN_ONLY 직접 허용 가능.
 

@@ -961,7 +961,7 @@
           "icon": "🎫",
           "steps": [
             "1 Pi = 100 Bean (נקודות בלעדיות לפלטפורמה) — תוכל להתחיל מיד עם תוכנית חינם",
-            "הירשם רק למה שאתה צריך: PiCafé™(Premium Cafe) · PiShop™(רישום מוצר) · PiTranslate™(תרגום ללא הגבלה)",
+            "הירשם רק למה שאתה צריך: PyCafé™(Premium Cafe) · PyShop™(רישום מוצר) · PyTranslate™(תרגום ללא הגבלה)",
             "דמי המנוי משולמים עם Bean שנטענו, ותשלום שנתי מקנה חודשיים חינם"
           ],
           "title": "Bean & מנוי"
@@ -1040,7 +1040,7 @@
       "newTrans": "תרגומים חדשים ({period} ימים, הודעות×שפות)",
       "noData": "אין Data תרגום בתקופה זו"
     },
-    "translateSection": "תרגום (PiTranslate™)",
+    "translateSection": "תרגום (PyTranslate™)",
     "txnLabel": {
       "CHARGE": "טעינה",
       "ETC": "אחר",
@@ -1268,7 +1268,7 @@
     }
   },
   "bean": {
-    "backToStore": "חזרה ל-PiShop",
+    "backToStore": "חזרה ל-PyShop",
     "buying": "התשלום מתבצע…",
     "chargeBtn": "טען",
     "chargeFail": "עיבוד הטעינה נכשל",
@@ -1809,14 +1809,14 @@
     "loadError": "נכשל בטעינת Data",
     "loginHint": "Login כדי לראות את התקדמות ה-Mission שלך ואת דרגת הסוכן",
     "missionGoBean": "עבור לטעינת Bean",
-    "missionGoCafe": "💬 עבור ל-PiCafé™",
+    "missionGoCafe": "💬 עבור ל-PyCafé™",
     "missionGoItems": "🛒 עבור אל הפריטים שלי",
     "missionGoLbs": "📍 Service מיקום (ה-Profile שלי)",
     "missionGoLink": "🔗 עבור לקישור חשבון",
     "missionGoOrders": "🛒 עבור אל ניהול הזמנות",
     "missionGoProfile": "👤 עבור לקישור חשבון והזנת Profile",
     "missionGoSales": "🛒 עבור אל ניהול מכירות",
-    "missionGoStore": "🛒 עבור ל-PiShop™",
+    "missionGoStore": "🛒 עבור ל-PyShop™",
     "missionGoSubscribe": "⭐ עבור להרשמה למינוי",
     "missionListTitle": "📋 רשימת Missions",
     "missions": {
@@ -1833,7 +1833,7 @@
         "name": "השלם Profile"
       },
       "M3": {
-        "desc": "צור PREMIUM Cafe ב-PiCafe + השתמש בתכונת התרגום האוטומטי",
+        "desc": "צור PREMIUM Cafe ב-PyCafe + השתמש בתכונת התרגום האוטומטי",
         "name": "צור PREMIUM Cafe (PiRC1) + תרגום אוטומטי"
       },
       "M4": {
@@ -1849,15 +1849,15 @@
         "name": "שימוש ב-Chat Multi-function"
       },
       "M7": {
-        "desc": "לאחר רישום המוצר שלי ב-PiShop, ביטול עסקה על ידי מוכר במהלך עסקה",
+        "desc": "לאחר רישום המוצר שלי ב-PyShop, ביטול עסקה על ידי מוכר במהלך עסקה",
         "name": "ביטול עסקה על ידי מוכר (Escrow Service;PiRC3)"
       },
       "M8": {
-        "desc": "לאחר רכישת מוצר של אחר ב-PiShop, ביטול עסקה על ידי קונה",
+        "desc": "לאחר רכישת מוצר של אחר ב-PyShop, ביטול עסקה על ידי קונה",
         "name": "ביטול עסקה על ידי קונה (Escrow Service;PiRC3)"
       },
       "M9": {
-        "desc": "הפקדת פיקדון מוכר של 1Pi או יותר ב-PiShop + הסכמה ל-Location Based Service",
+        "desc": "הפקדת פיקדון מוכר של 1Pi או יותר ב-PyShop + הסכמה ל-Location Based Service",
         "name": "פיקדון מוכר + הסכמה ל-Location (Escrow Service;PiRC3)"
       }
     },
@@ -1924,7 +1924,7 @@
       "condTitle": "תנאי השתתפות",
       "ctaM1": "הירשם ב-Map",
       "ctaM2": "רשום מוצר",
-      "ctaM3": "שלב ב-PiShop™ שלי",
+      "ctaM3": "שלב ב-PyShop™ שלי",
       "ctaM4": "אשר התראה",
       "loadError": "לא ניתן לטעון מידע על Campaign.",
       "loading": "טוען…",
@@ -2255,7 +2255,7 @@
       "info": "פרטים אישיים",
       "lbs": "📍 Location Service",
       "payment": "היסטוריית תשלומים",
-      "store": "🛍️ My PiShop™",
+      "store": "🛍️ My PyShop™",
       "subscr": "סטטוס מנוי"
     },
     "tabsExtra": {
@@ -2545,7 +2545,7 @@
     "statusChanged": "הסטטוס שונה",
     "stockLeft": "מלאי {count}",
     "subtitle": "סחרו בבטחה ישירות עם Pi Coin — הגנת נאמנות",
-    "title": "PiShop",
+    "title": "PyShop",
     "tradeSt": {
       "OPEN": "למכירה",
       "SOLD": "נמכר",
@@ -2591,8 +2591,8 @@
     "perYear": "לשנה",
     "processing": "בעיבוד…",
     "product": {
-      "PICAFE": "מנוי PiCafe",
-      "PISHOP": "מינוי PiShop",
+      "PICAFE": "מנוי PyCafe",
+      "PISHOP": "מינוי PyShop",
       "TRANSLATE": "מנוי תרגום אוטומטי"
     },
     "renewBtn": "חדש/שנה",
@@ -2636,6 +2636,6 @@
     "running": "⏳ בודק...",
     "skipped": "דילוג עקב כשל בבדיקה קודמת",
     "subtitle": "מאבחן אם Pi Browser תומך בשיחת קול WebRTC במכשיר אמיתי.",
-    "title": "🎙️ PiVoice™ S0 Spike"
+    "title": "🎙️ PyVoice™ S0 Spike"
   }
 }

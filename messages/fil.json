@@ -961,7 +961,7 @@
           "icon": "🎫",
           "steps": [
             "1 Pi = 100 Bean (Platform-exclusive na reward points) — Maaari kang magsimula kaagad sa libreng Plan.",
-            "Piliin lang ang kailangan mo at mag-subscribe: PiCafé™(Premium Cafe) · PiShop™(Pagpaparehistro ng Produkto) · PiTranslate™(Walang limitasyong Pagsasalin)",
+            "Piliin lang ang kailangan mo at mag-subscribe: PyCafé™(Premium Cafe) · PyShop™(Pagpaparehistro ng Produkto) · PyTranslate™(Walang limitasyong Pagsasalin)",
             "Ang bayad sa Subscription ay babayaran gamit ang na-top up na Bean, at ang taunang pagbabayad ay may 2 buwang libre."
           ],
           "title": "Bean & Subscription"
@@ -1040,7 +1040,7 @@
       "newTrans": "Bagong Translation ({period} araw, Mensahe×Wika)",
       "noData": "Walang Translation Data para sa panahon."
     },
-    "translateSection": "Translation (PiTranslate™)",
+    "translateSection": "Translation (PyTranslate™)",
     "txnLabel": {
       "CHARGE": "Pag-charge",
       "ETC": "Iba pa",
@@ -1268,7 +1268,7 @@
     }
   },
   "bean": {
-    "backToStore": "Pabalik sa PiShop",
+    "backToStore": "Pabalik sa PyShop",
     "buying": "Pinoproseso ang pagbabayad…",
     "chargeBtn": "Charge",
     "chargeFail": "Nabigo ang pagproseso ng Charge",
@@ -1809,14 +1809,14 @@
     "loadError": "Nabigo ang Pag-Load ng Data",
     "loginHint": "Kapag nag-Login, ipapakita ang iyong Mission Progress at Agent Rank",
     "missionGoBean": "Pumunta upang mag-charge ng Bean",
-    "missionGoCafe": "💬 Pumunta sa PiCafe",
+    "missionGoCafe": "💬 Pumunta sa PyCafe",
     "missionGoItems": "🛒 Pumunta sa Aking Items",
     "missionGoLbs": "📍 Location Service (Aking Profile)",
     "missionGoLink": "🔗 Pumunta upang i-link ang Account",
     "missionGoOrders": "🛒 Pumunta sa Orders Management",
     "missionGoProfile": "👤 Pumunta upang i-link ang Account · Ipasok ang Profile",
     "missionGoSales": "🛒 Pumunta sa Sales Management",
-    "missionGoStore": "🛒 Pumunta sa PiShop",
+    "missionGoStore": "🛒 Pumunta sa PyShop",
     "missionGoSubscribe": "⭐ Pumunta upang mag-apply para sa Subscription",
     "missionListTitle": "📋 Listahan ng Mission",
     "missions": {
@@ -1833,7 +1833,7 @@
         "name": "Pagkumpleto ng Profile"
       },
       "M3": {
-        "desc": "Gumawa ng PREMIUM Cafe sa PiCafe + Gamitin ang Awtomatikong Pagsasalin na Function",
+        "desc": "Gumawa ng PREMIUM Cafe sa PyCafe + Gamitin ang Awtomatikong Pagsasalin na Function",
         "name": "Gumawa ng PREMIUM Cafe (PiRC1) + Awtomatikong Pagsasalin"
       },
       "M4": {
@@ -1849,15 +1849,15 @@
         "name": "Use Chat Multi-Function"
       },
       "M7": {
-        "desc": "Pagkatapos magrehistro ng aking produkto sa PiShop, kanselahin ang transaksyon ng nagbebenta habang may transaksyon",
+        "desc": "Pagkatapos magrehistro ng aking produkto sa PyShop, kanselahin ang transaksyon ng nagbebenta habang may transaksyon",
         "name": "Pagkansela ng Transaksyon ng Nagbebenta (Escrow Service;PiRC3)"
       },
       "M8": {
-        "desc": "Pagkatapos bumili ng produkto ng iba sa PiShop, kanselahin ang transaksyon ng mamimili",
+        "desc": "Pagkatapos bumili ng produkto ng iba sa PyShop, kanselahin ang transaksyon ng mamimili",
         "name": "Pagkansela ng Transaksyon ng Mamimili (Escrow Service;PiRC3)"
       },
       "M9": {
-        "desc": "Magdeposito ng 1Pi o higit pa sa Deposit ng Nagbebenta sa PiShop + sumang-ayon sa serbisyo batay sa lokasyon",
+        "desc": "Magdeposito ng 1Pi o higit pa sa Deposit ng Nagbebenta sa PyShop + sumang-ayon sa serbisyo batay sa lokasyon",
         "name": "Deposit ng Nagbebenta + Pahintulot sa Lokasyon (Escrow Service;PiRC3)"
       }
     },
@@ -1924,7 +1924,7 @@
       "condTitle": "Kondisyon sa Paglahok",
       "ctaM1": "Irehistro sa Map",
       "ctaM2": "Irehistro ang Produkto",
-      "ctaM3": "Ikonekta sa Aking PiShop™",
+      "ctaM3": "Ikonekta sa Aking PyShop™",
       "ctaM4": "Kumpirmahin ang Notification",
       "loadError": "Hindi ma-load ang impormasyon ng Campaign.",
       "loading": "Naglo-load…",
@@ -2255,7 +2255,7 @@
       "info": "Personal na Impormasyon",
       "lbs": "📍 Location Service",
       "payment": "Kasaysayan ng Pagbabayad",
-      "store": "🛍️ Aking PiShop™",
+      "store": "🛍️ Aking PyShop™",
       "subscr": "Katayuan ng Subscription"
     },
     "tabsExtra": {
@@ -2545,7 +2545,7 @@
     "statusChanged": "Nabago na ang status",
     "stockLeft": "Natitirang Stock {count}",
     "subtitle": "Ligtas na direktang makipagtransaksyon gamit ang Pi Coin — Proteksyon ng Escrow",
-    "title": "PiShop",
+    "title": "PyShop",
     "tradeSt": {
       "OPEN": "For Sale",
       "SOLD": "Nabenta",
@@ -2591,8 +2591,8 @@
     "perYear": "Taon",
     "processing": "Pinoproseso…",
     "product": {
-      "PICAFE": "PiCafe Subscription",
-      "PISHOP": "Subscription sa PiShop",
+      "PICAFE": "PyCafe Subscription",
+      "PISHOP": "Subscription sa PyShop",
       "TRANSLATE": "Automatic Translation Subscription"
     },
     "renewBtn": "I-renew/Baguhin",
@@ -2636,6 +2636,6 @@
     "running": "⏳ Sinusuri…",
     "skipped": "Nilaktawan dahil sa pagkabigo ng nakaraang check",
     "subtitle": "Sinusuri kung sinusuportahan ang WebRTC voice call sa aktwal na device ng Pi Browser.",
-    "title": "🎙️ PiVoice™ S0 Spike"
+    "title": "🎙️ PyVoice™ S0 Spike"
   }
 }

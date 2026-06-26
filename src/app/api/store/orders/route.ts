@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
       order,
       // Pi SDK createPayment 파라미터 (O2O 에스크로 결제 — Pi 유지, 통화 라우팅 §0)
       amount: Number(order.order_price_pi),
-      memo: `🛒 PiShop 에스크로 결제`,
+      memo: `🛒 PyShop 에스크로 결제`,
       metadata: {
         type: 'MPS_ESCROW',
         order_id: order.order_id,

@@ -961,7 +961,7 @@
           "icon": "🎫",
           "steps": [
             "1 Pi = 100 Bean (platform-exclusive credit) — You can start right away with a free plan.",
-            "Subscribe only to what you need: PiCafé™ (Premium Cafe) · PiShop™ (Product Registration) · PiTranslate™ (Unlimited Translation)",
+            "Subscribe only to what you need: PyCafé™ (Premium Cafe) · PyShop™ (Product Registration) · PyTranslate™ (Unlimited Translation)",
             "Subscription fees are paid with topped-up Bean, and annual payments get 2 months free."
           ],
           "title": "Bean & Subscriptions"
@@ -1040,7 +1040,7 @@
       "newTrans": "New Translations ({period} days, messages × languages)",
       "noData": "No translation data for the period"
     },
-    "translateSection": "Translation (PiTranslate™)",
+    "translateSection": "Translation (PyTranslate™)",
     "txnLabel": {
       "CHARGE": "Charge",
       "ETC": "Other",
@@ -1268,7 +1268,7 @@
     }
   },
   "bean": {
-    "backToStore": "Back to PiShop",
+    "backToStore": "Back to PyShop",
     "buying": "Processing payment…",
     "chargeBtn": "Top Up",
     "chargeFail": "Top-up processing failed",
@@ -1809,14 +1809,14 @@
     "loadError": "Failed to load data",
     "loginHint": "Log in to see your mission progress and agent rank",
     "missionGoBean": "Go to Top Up Bean",
-    "missionGoCafe": "💬 Go to PiCafé™",
+    "missionGoCafe": "💬 Go to PyCafé™",
     "missionGoItems": "🛒 Go to My Items",
     "missionGoLbs": "📍 Location Service (My Profile)",
     "missionGoLink": "🔗 Go to Link Account",
     "missionGoOrders": "🛒 Go to Order Management",
     "missionGoProfile": "👤 Go to Link Account and Enter Profile",
     "missionGoSales": "🛒 Go to Sales Management",
-    "missionGoStore": "🛒 Go to PiShop™",
+    "missionGoStore": "🛒 Go to PyShop™",
     "missionGoSubscribe": "⭐ Go to Subscribe",
     "missionListTitle": "📋 Mission List",
     "missions": {
@@ -1833,7 +1833,7 @@
         "name": "Complete Profile"
       },
       "M3": {
-        "desc": "Create PREMIUM Cafe in PiCafe + Use auto-translate feature",
+        "desc": "Create PREMIUM Cafe in PyCafe + Use auto-translate feature",
         "name": "Create PREMIUM Cafe (PiRC1) + Auto-translate"
       },
       "M4": {
@@ -1849,15 +1849,15 @@
         "name": "Use Chat Multi-function"
       },
       "M7": {
-        "desc": "After registering my product on PiShop, cancel seller transaction during trade",
+        "desc": "After registering my product on PyShop, cancel seller transaction during trade",
         "name": "Seller Transaction Cancellation (Escrow Service;PiRC3)"
       },
       "M8": {
-        "desc": "After purchasing another person's product on PiShop, cancel buyer transaction",
+        "desc": "After purchasing another person's product on PyShop, cancel buyer transaction",
         "name": "Buyer Transaction Cancellation (Escrow Service;PiRC3)"
       },
       "M9": {
-        "desc": "Deposit 1Pi or more as PiShop seller deposit + consent to location-based service",
+        "desc": "Deposit 1Pi or more as PyShop seller deposit + consent to location-based service",
         "name": "Seller Deposit + Location Consent (Escrow Service;PiRC3)"
       }
     },
@@ -1924,7 +1924,7 @@
       "condTitle": "Participation Conditions",
       "ctaM1": "Register on Map",
       "ctaM2": "Register Product",
-      "ctaM3": "Integrate in My PiShop™",
+      "ctaM3": "Integrate in My PyShop™",
       "ctaM4": "Confirm Notification",
       "loadError": "Unable to load campaign information.",
       "loading": "Loading…",
@@ -2255,7 +2255,7 @@
       "info": "Personal Info",
       "lbs": "📍 Location Services",
       "payment": "Payment History",
-      "store": "🛍️ My PiShop™",
+      "store": "🛍️ My PyShop™",
       "subscr": "Subscription Status"
     },
     "tabsExtra": {
@@ -2545,7 +2545,7 @@
     "statusChanged": "Status updated",
     "stockLeft": "{count} in stock",
     "subtitle": "Trade securely with Pi Coin — Escrow protection",
-    "title": "PiShop",
+    "title": "PyShop",
     "tradeSt": {
       "OPEN": "For Sale",
       "SOLD": "Sold",
@@ -2591,8 +2591,8 @@
     "perYear": "per year",
     "processing": "Processing…",
     "product": {
-      "PICAFE": "PiCafe Subscription",
-      "PISHOP": "PiShop Subscription",
+      "PICAFE": "PyCafe Subscription",
+      "PISHOP": "PyShop Subscription",
       "TRANSLATE": "Auto-Translate Subscription"
     },
     "renewBtn": "Renew/Change",
@@ -2636,6 +2636,6 @@
     "running": "⏳ Checking...",
     "skipped": "Skipped due to upstream check failure",
     "subtitle": "Diagnoses whether WebRTC voice calls are supported on a real device with Pi Browser.",
-    "title": "🎙️ PiVoice™ S0 Spike"
+    "title": "🎙️ PyVoice™ S0 Spike"
   }
 }

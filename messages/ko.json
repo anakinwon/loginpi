@@ -859,7 +859,7 @@
           "title": "Bean & 구독",
           "steps": [
             "1 Pi = 100 Bean (플랫폼 전용 적립금) — 무료 플랜으로 바로 시작할 수 있어요",
-            "필요한 것만 골라 구독: PiCafé™(프리미엄 카페) · PiShop™(상품 등록) · PiTranslate™(무제한 번역)",
+            "필요한 것만 골라 구독: PyCafé™(프리미엄 카페) · PyShop™(상품 등록) · PyTranslate™(무제한 번역)",
             "구독료는 충전한 Bean으로 결제하고, 연간 결제는 2개월 무료예요"
           ]
         },
@@ -942,7 +942,7 @@
     "themeDaily": "테마별 일별 매출",
     "themeShare": "테마별 매출 비중",
     "themeTreemap": "테마별 매출 비중 (트리맵)",
-    "translateSection": "번역 (PiTranslate™)",
+    "translateSection": "번역 (PyTranslate™)",
     "noData": "데이터 없음",
     "scoreFormula": "점수 = 활동일수×0.2 + 콘텐츠(카페·게시글·댓글)×0.3 + 결제건수×0.5",
     "period7": "7일",
@@ -1540,8 +1540,8 @@
       "confirmNotice": "안내 사항을 확인했습니다"
     },
     "localeSelect": {
-      "autoSubscribed": "🌐 구독특혜 PiTranslate™",
-      "autoLocked": "🔒 구독특혜 PiTranslate™",
+      "autoSubscribed": "🌐 구독특혜 PyTranslate™",
+      "autoLocked": "🔒 구독특혜 PyTranslate™",
       "desc": "이 방의 메시지를 선택한 언어로 번역해서 보여줍니다",
       "subscriberOnly": "구독 서비스를 신청한 회원만 사용할 수 있습니다",
       "label": "번역 언어 선택",
@@ -1642,9 +1642,9 @@
     "missionGoLink": "🔗 계정 연동하러 가기",
     "missionGoProfile": "👤 계정 연동·프로필 입력하러 가기",
     "missionGoBean": "Bean 충전하러 가기",
-    "missionGoCafe": "💬 PiCafé™ 가기",
+    "missionGoCafe": "💬 PyCafé™ 가기",
     "missionGoSubscribe": "⭐ 구독 신청하러 가기",
-    "missionGoStore": "🛒 PiShop™ 가기",
+    "missionGoStore": "🛒 PyShop™ 가기",
     "missionGoSales": "🛒 판매 관리로 가기",
     "missionGoOrders": "🛒 주문 관리로 가기",
     "missionGoItems": "🛒 내 상품으로 가기",
@@ -1690,11 +1690,11 @@
       },
       "M2": {
         "name": "Bean Token 충전하기",
-        "desc": "Bean 토큰을 충전해서 Cafe도 만들고, 참여하고, PiTranslate™도 사용"
+        "desc": "Bean 토큰을 충전해서 Cafe도 만들고, 참여하고, PyTranslate™도 사용"
       },
       "M3": {
-        "name": "PREMIUM 카페 생성(PiRC1) + PiTranslate™",
-        "desc": "PiCafé™에서 PREMIUM Cafe 생성 + PiTranslate™ 기능 사용"
+        "name": "PREMIUM 카페 생성(PiRC1) + PyTranslate™",
+        "desc": "PyCafé™에서 PREMIUM Cafe 생성 + PyTranslate™ 기능 사용"
       },
       "M4": {
         "name": "Bean 전송 테스트(PiRC1)",
@@ -1710,15 +1710,15 @@
       },
       "M7": {
         "name": "판매자 거래 취소(에스크로서비스;PiRC3)",
-        "desc": "PiShop™에 내 상품 등록 후 거래중 판매자 거래 취소"
+        "desc": "PyShop™에 내 상품 등록 후 거래중 판매자 거래 취소"
       },
       "M8": {
         "name": "구매자 거래 취소(에스크로서비스;PiRC3)",
-        "desc": "PiShop™에서 타인 상품 구매 후 구매자 거래 취소"
+        "desc": "PyShop™에서 타인 상품 구매 후 구매자 거래 취소"
       },
       "M9": {
         "name": "판매자 보증금 + 위치동의(에스크로서비스;PiRC3)",
-        "desc": "PiShop™ 판매자 보증금 1Pi 이상 예치 + 위치 기반 서비스 동의"
+        "desc": "PyShop™ 판매자 보증금 1Pi 이상 예치 + 위치 기반 서비스 동의"
       },
       "M10": {
         "name": "보증금 활성 거래 취소 수수료",
@@ -1737,7 +1737,7 @@
       "condM4": "M4 텔레그램 알림 확인",
       "ctaM1": "맵에서 등록",
       "ctaM2": "상품 등록",
-      "ctaM3": "내 PiShop™에서 연동",
+      "ctaM3": "내 PyShop™에서 연동",
       "ctaM4": "알림 확인",
       "shopSelect": "대표 매장 선택",
       "shopSelectHint": "이벤트는 1인 1회, 대표 매장 1개로 참여합니다",
@@ -1975,7 +1975,7 @@
       "bean": "Bean 지갑",
       "payment": "결제 내역",
       "subscr": "구독 현황",
-      "store": "🛍️ 내 PiShop™",
+      "store": "🛍️ 내 PyShop™",
       "lbs": "📍 위치 서비스"
     },
     "info": {
@@ -2114,9 +2114,9 @@
     "expireAt": "만료일: {date}",
     "notice": "구독료는 충전한 Bean에서 차감됩니다. 연간은 2개월 무료. 환금 불가·플랫폼 사용 전용.",
     "product": {
-      "PICAFE": "PiCafé™ 구독",
-      "PISHOP": "PiShop™ 구독",
-      "TRANSLATE": "PiTranslate™ 구독"
+      "PICAFE": "PyCafé™ 구독",
+      "PISHOP": "PyShop™ 구독",
+      "TRANSLATE": "PyTranslate™ 구독"
     },
     "feat": {
       "PICAFE": [
@@ -2129,14 +2129,14 @@
         "등급별 상품 수 한도 제공 (S:10 / M:30 / L:무제한)"
       ],
       "TRANSLATE": [
-        "PiTranslate™ 메시지 번역 무제한",
+        "PyTranslate™ 메시지 번역 무제한",
         "비구독 1회 1 ☕ → 구독 무제한 무료"
       ]
     }
   },
   "bean": {
     "title": "Bean 지갑",
-    "backToStore": "PiShop™으로",
+    "backToStore": "PyShop™으로",
     "loading": "불러오는 중…",
     "loginRequired": "로그인 후 이용할 수 있습니다",
     "myBalance": "내 Bean 잔액",
@@ -2164,7 +2164,7 @@
     }
   },
   "store": {
-    "title": "PiShop™",
+    "title": "PyShop™",
     "subtitle": "Pi Coin으로 안전하게 직거래하세요 — 에스크로 보호",
     "navMyItems": "내 상품",
     "navMyShops": "내 매장",
@@ -2424,7 +2424,7 @@
     "system": "시스템"
   },
   "voiceTest": {
-    "title": "🎙️ PiVoice™ S0 스파이크",
+    "title": "🎙️ PyVoice™ S0 스파이크",
     "subtitle": "Pi Browser 실기기에서 WebRTC 음성통화 지원 여부를 진단합니다.",
     "deviceGuideTitle": "실기기 안내",
     "deviceGuide1": "Pi Browser에서 이 페이지를 열고 버튼을 누르면 마이크 권한 요청이 뜹니다.",

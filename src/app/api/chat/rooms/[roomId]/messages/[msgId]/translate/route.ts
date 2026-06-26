@@ -11,7 +11,7 @@ import { recordUserAction } from '@/lib/event'
 
 type Params = { params: Promise<{ roomId: string; msgId: string }> }
 
-// POST /api/chat/rooms/[roomId]/messages/[msgId]/translate — PiTranslate™ (TASK-093)
+// POST /api/chat/rooms/[roomId]/messages/[msgId]/translate — PyTranslate™ (TASK-093)
 // Body: { locale_cd: string }
 // 흐름: msg_trans DB 캐시 → in-memory pending map → Gemini Flash → UPSERT → broadcast
 export async function POST(request: NextRequest, { params }: Params) {
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest, { params }: Params) {
   if (!mbr)
     return NextResponse.json({ error: '카페 멤버가 아닙니다' }, { status: 403 })
 
-  // 자동번역 과금: 구독자(TRANSLATE/PiCafé™)는 무료, 비구독자는 건당 Bean 과금(맛보기·전환 유도)
+  // 자동번역 과금: 구독자(TRANSLATE/PyCafé™)는 무료, 비구독자는 건당 Bean 과금(맛보기·전환 유도)
   const isSubscriber = await canAutoTranslate(user.id)
 
   let body: unknown
@@ -86,7 +86,7 @@ export async function POST(request: NextRequest, { params }: Params) {
       // 자동 번역 경로: 비구독자는 번역하지 않고 건당 과금 안내만 반환 → 클라이언트는 원문 유지
       return NextResponse.json(
         {
-          error: 'PiTranslate™는 구독자 전용입니다',
+          error: 'PyTranslate™는 구독자 전용입니다',
           requiresBean: true,
           requiresConfirm: true,
           feeBean: TRANSLATE_ONCE_BEAN,
@@ -100,7 +100,7 @@ export async function POST(request: NextRequest, { params }: Params) {
     if (bal < TRANSLATE_ONCE_BEAN) {
       return NextResponse.json(
         {
-          error: `번역 1회에 ${TRANSLATE_ONCE_BEAN} Bean이 필요합니다. Bean을 충전하거나 PiTranslate™를 구독하세요.`,
+          error: `번역 1회에 ${TRANSLATE_ONCE_BEAN} Bean이 필요합니다. Bean을 충전하거나 PyTranslate™를 구독하세요.`,
           requiresBean: true,
           feeBean: TRANSLATE_ONCE_BEAN,
           requiresSubscription: true,
@@ -127,7 +127,7 @@ export async function POST(request: NextRequest, { params }: Params) {
         beanAmt: -TRANSLATE_ONCE_BEAN,
         refTp: 'TRANSLATE_ONCE',
         refId: msgId,
-        memo: 'PiTranslate™ 건당',
+        memo: 'PyTranslate™ 건당',
         regrId: user.display_name.slice(0, 20),
       })
       if (!charge.ok)

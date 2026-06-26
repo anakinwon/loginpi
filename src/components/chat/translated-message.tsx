@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { piFetch } from '@/lib/pi-fetch'
 
-// PiTranslate™ 번역/원문 전환 (TASK-097) + 번역 품질 피드백 👍/👎 (TASK-099)
+// PyTranslate™ 번역/원문 전환 (TASK-097) + 번역 품질 피드백 👍/👎 (TASK-099)
 // 기본은 번역 텍스트 표시 — [원문 보기] 토글로 번역 투명성 보장
 // roomId·msgId·localeCd가 모두 있을 때만 피드백 버튼 노출 (시스템 선번역 등 캐시 미보장 케이스 방어)
 export function TranslatedMessage({

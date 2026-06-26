@@ -19,8 +19,8 @@ export interface SubscrChartRow {
 
 const PRODUCTS: SubscrProduct[] = ['PICAFE', 'PISHOP', 'TRANSLATE']
 const PRODUCT_LABEL: Record<SubscrProduct, string> = {
-  PICAFE: 'PiCafé™',
-  PISHOP: 'PiShop™',
+  PICAFE: 'PyCafé™',
+  PISHOP: 'PyShop™',
   TRANSLATE: '번역',
 }
 // Plotly는 hex 색이 필요(tailwind 클래스 불가). page.tsx 뱃지 색과 동일 계열.

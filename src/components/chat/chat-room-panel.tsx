@@ -76,7 +76,7 @@ export function ChatRoomPanel({
   const [settingsOpen, setSettingsOpen] = useState(false)
   // 헤더 제목은 수정 결과를 즉시 반영 (서버 재조회 없이)
   const [displayRoomNm, setDisplayRoomNm] = useState(roomNm)
-  // PiVoice™ v2.0 — 음성채널 패널 표시 + 방장 마이크 제어 권한
+  // PyVoice™ v2.0 — 음성채널 패널 표시 + 방장 마이크 제어 권한
   const [voicePanelOpen, setVoicePanelOpen] = useState(false)
   // 카페 입장 멤버 목록(online/offline) 패널
   const [memberPanelOpen, setMemberPanelOpen] = useState(false)
@@ -125,7 +125,7 @@ export function ChatRoomPanel({
     checkSubscription()
   }, [checkSubscription])
 
-  // PiVoice™ v3.0 — N:N 음성채널 훅 (방장 보장 + 멤버 자동 2/승인 2)
+  // PyVoice™ v3.0 — N:N 음성채널 훅 (방장 보장 + 멤버 자동 2/승인 2)
   const {
     voiceState,
     participants: voiceParticipants,
@@ -328,7 +328,7 @@ export function ChatRoomPanel({
             </span>
           )}
         </button>
-        {/* PiVoice™ v2.0 음성채널 버튼 — 참여 인원 배지 표시 */}
+        {/* PyVoice™ v2.0 음성채널 버튼 — 참여 인원 배지 표시 */}
         <button
           onClick={() => setVoicePanelOpen((o) => !o)}
           className="relative shrink-0 text-2xl transition-transform hover:scale-110"
@@ -342,7 +342,7 @@ export function ChatRoomPanel({
             </span>
           )}
         </button>
-        {/* PiTranslate™ 방별 번역 언어 콤보 — 자동번역 구독(canAutoTranslate) 전용 특혜 */}
+        {/* PyTranslate™ 방별 번역 언어 콤보 — 자동번역 구독(canAutoTranslate) 전용 특혜 */}
         <ChatLocaleSelect
           value={viewLocale}
           onChange={handleLocaleChange}
@@ -476,7 +476,7 @@ export function ChatRoomPanel({
         />
       )}
 
-      {/* PiVoice™ v3.0 음성채널 패널 — 방장 보장 + 멤버 자동 2/승인 2 */}
+      {/* PyVoice™ v3.0 음성채널 패널 — 방장 보장 + 멤버 자동 2/승인 2 */}
       {voicePanelOpen && (
         <VoiceChannelPanel
           voiceState={voiceState}

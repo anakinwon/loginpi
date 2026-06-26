@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 
-// GET /api/admin/stats/translate?period=7|30|90|365 — PiTranslate™ 번역 통계 (TASK-098)
+// GET /api/admin/stats/translate?period=7|30|90|365 — PyTranslate™ 번역 통계 (TASK-098)
 // fn_translate_stats RPC: 일별 번역 건수·캐시 히트·문자수 + 모델별 분포 + 👍/👎 피드백 합계
 // 비용은 문자수 기반 추정 — 1 token ≈ 4 chars, 프롬프트 오버헤드 포함 출력≈입력 가정
 

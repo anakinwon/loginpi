@@ -7,7 +7,7 @@ import { usePiAuth } from '@/components/pi-auth-provider'
 import { readCache, writeCache } from '@/lib/client-cache'
 import { StatsCard } from './stats-card'
 
-// PiTranslate™ 번역 통계 섹션 (TASK-098)
+// PyTranslate™ 번역 통계 섹션 (TASK-098)
 // LazySection 안에서 마운트 — 보일 때 최초 fetch, 기간 변경 시 재조회
 // 일별 번역 건수 · 캐시 히트율 · 예상 비용 (Gemini 토큰 추정) · 👍/👎 피드백
 

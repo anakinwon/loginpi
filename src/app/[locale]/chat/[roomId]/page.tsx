@@ -117,7 +117,7 @@ export default async function ChatRoomPage({ params }: Params) {
 
   const initialMessages = ((rawMsgs ?? []) as ChatMessage[]).reverse()
 
-  // PiTranslate™ — 현재 locale의 캐시된 번역을 trans_cont로 pre-populate (조회만, 신규 번역 없음)
+  // PyTranslate™ — 현재 locale의 캐시된 번역을 trans_cont로 pre-populate (조회만, 신규 번역 없음)
   if (initialMessages.length > 0) {
     const { data: transRows } = await getSupabaseAdmin()
       .from('msg_trans')

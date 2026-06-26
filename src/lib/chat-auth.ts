@@ -1,7 +1,7 @@
 import 'server-only'
 import { getSupabaseAdmin } from './supabase-admin'
 
-// PiCafé 구독 권한 단일 소스.
+// PyCafé 구독 권한 단일 소스.
 // 플랜 등급별 기능 한도를 PLAN_CAPS 한 곳에서 정의하고, 모든 게이트·API가 이를 따른다.
 // (정책 변경 시 이 파일만 수정 — locale-currency 단일 소스와 동일한 원칙)
 
@@ -15,11 +15,11 @@ export interface PlanCaps {
   canTip: boolean // Pi Bean 전송 가능
   canUsePremiumTheme: boolean // PREMIUM 테마 무료 사용
   canCreateEventRoom: boolean // 이벤트방(room_tp_cd='E') 개설
-  canAutoTranslate: boolean // 자동번역(PiTranslateâ¢) 사용 — 미구독(FREE)은 불가
+  canAutoTranslate: boolean // 자동번역(PyTranslate™) 사용 — 미구독(FREE)은 불가
 }
 
 // 채팅 등급별 기능 한도 매핑.
-// FREE: Pi Explorer(미구독) / PREMIUM: PiCafÃ©â¢ 구독자 / BUSINESS: 운영자(ADMIN/MASTER) 전용.
+// FREE: Pi Explorer(미구독) / PREMIUM: PyCafé™ 구독자 / BUSINESS: 운영자(ADMIN/MASTER) 전용.
 // ※ canAutoTranslate는 PLAN_CAPS 값과 무관하게 getChatPlan에서 TRANSLATE 구독 유무로 재정의된다
 //    (PRD_15_FEE §1-6: 자동번역은 TRANSLATE 별도 구독 전용). 운영자(BUSINESS)만 항상 true.
 const PLAN_CAPS: Record<PlanTier, PlanCaps> = {
@@ -82,7 +82,7 @@ const OPERATOR_PLAN: ChatPlan = {
 
 // 사용자의 현재 채팅 권한 — Bean 상품 구독(bean_subscr) 기반.
 //   PICAFE 구독 → PREMIUM 캡(그룹방 무제한·AI 10회·팁·프리미엄 테마),
-//   TRANSLATE 구독 → 자동번역(canAutoTranslate)만 부여.
+//   TRANSLATE 구독 → 자동번역(PyTranslate™)만 부여.
 //   레거시 Pi 구독(msg_subscr)은 더 이상 참조하지 않는다 (PRD_15_FEE §1-6 — CHAT_SUBSCR Pi 경로 폐기).
 // 만료(expire_dtm <= now)·논리삭제(del_yn='Y')는 자동 제외 → 없으면 FREE.
 // 운영자(ADMIN/MASTER)는 구독과 무관하게 BUSINESS 캡 보장(전 기능 운영·검증).
@@ -131,7 +131,7 @@ export async function getChatPlan(userId: string): Promise<ChatPlan> {
   const primary = picafe ?? translate!
   return {
     plan_cd: picafe ? 'PICAFE_SUBSCR' : 'TRANSLATE_SUBSCR',
-    plan_nm: picafe ? 'PiCafÃ©â¢ 구독' : 'PiTranslateâ¢ 구독',
+    plan_nm: picafe ? 'PyCafé™ 구독' : 'PyTranslate™ 구독',
     tier,
     expire_dtm: primary.expire_dtm,
     auto_renew_yn: (primary.auto_renew_yn as 'Y' | 'N' | null) ?? null,
@@ -196,7 +196,7 @@ export async function canSendTip(
   return p.caps.canTip
 }
 
-// 자동번역(PiTranslateâ¢) 사용 가능 여부 — 미구독(FREE)은 false.
+// 자동번역(PyTranslate™) 사용 가능 여부 — 미구독(FREE)은 false.
 // (엑셀 요금표: 자동번역은 구독 또는 1회 1 Bean. 현재는 구독 게이트만.)
 export async function canAutoTranslate(
   userId: string,

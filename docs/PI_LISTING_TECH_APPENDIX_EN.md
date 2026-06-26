@@ -1,7 +1,7 @@
-# PiCafé™ Technical Appendix — for Pi Network Listing & Review
+# PyCafé™ Technical Appendix — for Pi Network Listing & Review
 
 > This document is a technical appendix submitted for the **Pi Network Mainnet listing / Launchpad review**
-> of cafe.pi (PiCafé™). It demonstrates, **with source-code evidence**, the app's
+> of cafe.pi (PyCafé™). It demonstrates, **with source-code evidence**, the app's
 > ① Pi policy compliance, ② Pi Browser compatibility, ③ payment & fund integrity,
 > ④ security (KISA criteria), and ⑤ adoption of the K-DATA data standard.
 >
@@ -13,13 +13,13 @@
 
 ## 1. Overview
 
-PiCafé™ is a global community & commerce platform whose **primary path is Pi account login and Pi payment**.
+PyCafé™ is a global community & commerce platform whose **primary path is Pi account login and Pi payment**.
 
 | Feature | Official name | Nature |
 |---|---|---|
-| Community (cafés · chat) | **PiCafé™** | Online community |
-| Marketplace | **PiShop™** | P2P · O2O trade |
-| Auto-translation | **PiTranslate™** | Multilingual communication |
+| Community (cafés · chat) | **PyCafé™** | Online community |
+| Marketplace | **PyShop™** | P2P · O2O trade |
+| Auto-translation | **PyTranslate™** | Multilingual communication |
 
 **Top-priority design values** (stated at the very top of the repository `CLAUDE.md`):
 1. Users must be able to **log in** with a Pi account inside Pi Browser.
@@ -52,7 +52,7 @@ The app satisfies all four prohibitions central to Pi Mainnet / Launchpad review
   currently contains no gambling logic.
 
 ### 2.4 Branding compliance
-- User-facing text consistently uses the official notation (PiCafé™ · PiShop™ · PiTranslate™).
+- User-facing text consistently uses the official notation (PyCafé™ · PyShop™ · PyTranslate™).
   (Database code values, identifiers, and **Pi payment memo** keep their plain form for payment
   compatibility.)
 - Evidence: the "Official brand notation" section of `CLAUDE.md`
@@ -67,7 +67,7 @@ The app satisfies all four prohibitions central to Pi Mainnet / Launchpad review
 ## 3. Pi Browser Compatibility (Technical Core)
 
 Pi Browser's WebView has a critical constraint: it **does not persist `Set-Cookie` in any form**.
-PiCafé™ works around this structurally and cryptographically.
+PyCafé™ works around this structurally and cryptographically.
 
 ### 3.1 Overcoming cookie-less storage — dual auth via cookie OR `X-Pi-Token` header
 - On token issuance, the server returns **both** a `pi_session` **cookie** and a **token field** in JSON.
@@ -165,7 +165,7 @@ MOIS/KISA 21 web-vulnerability items)
 
 ## 6. Adoption of the K-DATA (Korea Data Agency) Data Architecture Standard ⭐
 
-> **Government-recognized data standard compliance** — PiCafé™ adopts the official data-management
+> **Government-recognized data standard compliance** — PyCafé™ adopts the official data-management
 > methodology of the Korea Data Agency (K-DATA, 한국데이터산업진흥원) **from the outset** and enforces
 > it with automation. Data standardization is the hardest area to retrofit; honoring it from day one is
 > a decisive differentiator for long-term operations, auditability, and migration trust.
@@ -271,7 +271,7 @@ secrets are intentionally omitted from this document.)
 
 ## 9. Conclusion
 
-PiCafé™ resolves Pi Network's demanding constraints (cookie-less storage, asynchronous payment
+PyCafé™ resolves Pi Network's demanding constraints (cookie-less storage, asynchronous payment
 callbacks, mobile NAT) through structural and cryptographic design; guarantees fund integrity with a
 **triple defense of accounting conservation identity + CHECK constraints + idempotency**; and satisfies
 all four listing red lines (Pi login · Pi-only payment · no gambling · branding). Beyond the immediate

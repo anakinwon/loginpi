@@ -961,7 +961,7 @@
           "icon": "🎫",
           "steps": [
             "1 Pi = 100 Bean (crediti esclusivi della piattaforma) — Puoi iniziare subito con il Plan gratuito",
-            "Scegli solo ciò di cui hai bisogno per l'abbonamento: PiCafé™ (Cafe Premium) · PiShop™ (Registrazione prodotti) · PiTranslate™ (Traduzione illimitata)",
+            "Scegli solo ciò di cui hai bisogno per l'abbonamento: PyCafé™ (Cafe Premium) · PyShop™ (Registrazione prodotti) · PyTranslate™ (Traduzione illimitata)",
             "La quota di abbonamento si paga con i Bean ricaricati, e il pagamento annuale include 2 mesi gratuiti"
           ],
           "title": "Bean & Abbonamento"
@@ -1040,7 +1040,7 @@
       "newTrans": "Nuove traduzioni ({period} giorni, messaggi×lingua)",
       "noData": "Nessun Data di traduzione per il periodo"
     },
-    "translateSection": "Traduzione (PiTranslate™)",
+    "translateSection": "Traduzione (PyTranslate™)",
     "txnLabel": {
       "CHARGE": "Ricarica",
       "ETC": "Altro",
@@ -1268,7 +1268,7 @@
     }
   },
   "bean": {
-    "backToStore": "Torna a PiShop",
+    "backToStore": "Torna a PyShop",
     "buying": "Pagamento in corso…",
     "chargeBtn": "Ricarica",
     "chargeFail": "Impossibile elaborare la ricarica",
@@ -1809,14 +1809,14 @@
     "loadError": "Caricamento dati fallito",
     "loginHint": "Accedi per visualizzare i tuoi progressi Missione e il tuo grado Agente",
     "missionGoBean": "Vai a ricaricare Bean",
-    "missionGoCafe": "💬 Vai a PiCafé™",
+    "missionGoCafe": "💬 Vai a PyCafé™",
     "missionGoItems": "🛒 Vai ai Miei Articoli",
     "missionGoLbs": "📍 Servizio di Posizione (Mio Profilo)",
     "missionGoLink": "🔗 Vai a collegare l'Account",
     "missionGoOrders": "🛒 Vai a Gestione Ordini",
     "missionGoProfile": "👤 Vai a collegare l'Account e inserire il Profilo",
     "missionGoSales": "🛒 Vai a Gestione Vendite",
-    "missionGoStore": "🛒 Vai a PiShop™",
+    "missionGoStore": "🛒 Vai a PyShop™",
     "missionGoSubscribe": "⭐ Vai a richiedere la Sottoscrizione",
     "missionListTitle": "📋 Elenco Missioni",
     "missions": {
@@ -1833,7 +1833,7 @@
         "name": "Completamento Profilo"
       },
       "M3": {
-        "desc": "In PiCafe, crea un Cafe PREMIUM e usa la funzione di traduzione automatica",
+        "desc": "In PyCafe, crea un Cafe PREMIUM e usa la funzione di traduzione automatica",
         "name": "Crea Cafe PREMIUM (PiRC1) + Traduzione automatica"
       },
       "M4": {
@@ -1849,15 +1849,15 @@
         "name": "Usa la funzione multi-chat"
       },
       "M7": {
-        "desc": "Cancellazione della transazione da parte del venditore durante una transazione dopo aver registrato il proprio prodotto su PiShop.",
+        "desc": "Cancellazione della transazione da parte del venditore durante una transazione dopo aver registrato il proprio prodotto su PyShop.",
         "name": "Cancellazione della transazione del venditore (Servizio di deposito a garanzia; PiRC3)"
       },
       "M8": {
-        "desc": "Cancellazione della transazione da parte dell'acquirente dopo aver acquistato il prodotto di un altro utente su PiShop.",
+        "desc": "Cancellazione della transazione da parte dell'acquirente dopo aver acquistato il prodotto di un altro utente su PyShop.",
         "name": "Cancellazione della transazione dell'acquirente (Servizio di deposito a garanzia; PiRC3)"
       },
       "M9": {
-        "desc": "Deposita un minimo di 1Pi come deposito del venditore su PiShop e acconsenti ai servizi basati sulla posizione",
+        "desc": "Deposita un minimo di 1Pi come deposito del venditore su PyShop e acconsenti ai servizi basati sulla posizione",
         "name": "Deposito del venditore + Consenso alla posizione (Servizio di deposito a garanzia; PiRC3)"
       }
     },
@@ -1924,7 +1924,7 @@
       "condTitle": "Condizioni di partecipazione",
       "ctaM1": "Registra sulla Mappa",
       "ctaM2": "Registra Prodotto",
-      "ctaM3": "Integra nel mio PiShop™",
+      "ctaM3": "Integra nel mio PyShop™",
       "ctaM4": "Conferma Notifica",
       "loadError": "Impossibile caricare le informazioni della campagna.",
       "loading": "Caricamento in corso…",
@@ -2255,7 +2255,7 @@
       "info": "Informazioni personali",
       "lbs": "📍 Servizi di localizzazione",
       "payment": "Cronologia pagamenti",
-      "store": "🛍️ Mio PiShop™",
+      "store": "🛍️ Mio PyShop™",
       "subscr": "Stato abbonamento"
     },
     "tabsExtra": {
@@ -2545,7 +2545,7 @@
     "statusChanged": "Stato modificato",
     "stockLeft": "Disponibilità {count}",
     "subtitle": "Commercia in modo sicuro con Pi Coin — Protezione Escrow",
-    "title": "PiShop",
+    "title": "PyShop",
     "tradeSt": {
       "OPEN": "In vendita",
       "SOLD": "Venduto",
@@ -2591,8 +2591,8 @@
     "perYear": "all'anno",
     "processing": "Elaborazione in corso…",
     "product": {
-      "PICAFE": "Abbonamento PiCafe",
-      "PISHOP": "Abbonamento PiShop",
+      "PICAFE": "Abbonamento PyCafe",
+      "PISHOP": "Abbonamento PyShop",
       "TRANSLATE": "Abbonamento Traduzione Automatica"
     },
     "renewBtn": "Rinnova/Modifica",
@@ -2636,6 +2636,6 @@
     "running": "⏳ Verifica in corso...",
     "skipped": "Saltato a causa del fallimento del controllo precedente",
     "subtitle": "Diagnostica se le chiamate vocali WebRTC sono supportate su un dispositivo reale con Pi Browser.",
-    "title": "🎙️ PiVoice™ S0 Spike"
+    "title": "🎙️ PyVoice™ S0 Spike"
   }
 }

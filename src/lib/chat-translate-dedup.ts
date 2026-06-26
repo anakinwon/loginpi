@@ -3,7 +3,7 @@ import { getSupabaseAdmin } from './supabase-admin'
 import { broadcastToRoom } from './realtime-broadcast'
 import { translateMessage, baseLang, LOCALE_CD_RE } from './chat-translate'
 
-// PiTranslate™ 동시성 dedup (Phase 12 — TASK-092)
+// PyTranslate™ 동시성 dedup (Phase 12 — TASK-092)
 // 같은 (msgId, locale) 번역 요청이 동시에 여러 건 들어와도 번역 API는 1회만 호출된다.
 // in-memory pending map은 서버 재시작 시 소멸 — msg_trans DB 캐시 + UPSERT가 보완.
 

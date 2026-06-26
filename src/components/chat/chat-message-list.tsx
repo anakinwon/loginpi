@@ -16,7 +16,7 @@ interface ChatMessageListProps {
   currentUserId: string
   canTip: boolean
   canAutoTranslate?: boolean // 자동번역 자격(구독자). false면 비구독자 → 수동 번역 버튼(건당 과금) 노출
-  userLocale?: string // PiTranslateâ¢™ — scroll-up 로드 시 캐시된 번역 pre-populate
+  userLocale?: string // PyTranslateâ¢™ — scroll-up 로드 시 캐시된 번역 pre-populate
   prependMessages: (msgs: ChatMessage[]) => void
   onUpgradeForTip?: () => void
 }
@@ -404,7 +404,7 @@ function MessageBubble({
       <div className="group flex flex-col items-start gap-0.5">
         <span className="text-muted-foreground flex items-center gap-1 text-xs">
           <span>🤖</span>
-          <span>PiCafé AI</span>
+          <span>PyCafé AI</span>
         </span>
         <div className="max-w-[70%] rounded-2xl rounded-bl-sm bg-violet-100 px-3 py-2 text-sm dark:bg-violet-900/40">
           {msg.msg_cont}
@@ -433,7 +433,7 @@ function MessageBubble({
             : 'bg-muted rounded-bl-sm'
         }`}
       >
-        {/* PiTranslateâ¢™ — 번역본이 있고 원문과 다르면 번역 표시 + 원문 토글 + 👍/👎 피드백 */}
+        {/* PyTranslateâ¢™ — 번역본이 있고 원문과 다르면 번역 표시 + 원문 토글 + 👍/👎 피드백 */}
         {msg.trans_cont && msg.trans_cont !== msg.msg_cont ? (
           <TranslatedMessage
             original={msg.msg_cont ?? ''}

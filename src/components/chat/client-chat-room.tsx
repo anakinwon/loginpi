@@ -88,7 +88,7 @@ export function ClientChatRoom({ roomId }: { roomId: string }) {
         themeEmoji?: string
       }
 
-      // locale 전달 → 캐시된 번역(trans_cont) pre-populate (PiTranslate™)
+      // locale 전달 → 캐시된 번역(trans_cont) pre-populate (PyTranslate™)
       const msgRes = await piFetch(
         `/api/chat/rooms/${roomId}/messages?limit=50&locale=${encodeURIComponent(userLocale)}`,
       )

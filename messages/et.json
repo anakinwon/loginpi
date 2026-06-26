@@ -961,7 +961,7 @@
           "icon": "🎫",
           "steps": [
             "1 Pi = 100 Bean (platvormi eksklusiivne boonus) — saad kohe alustada tasuta Plan'iga",
-            "Vali ja telli ainult see, mida vajad: PiCafé™(Premium Cafe) · PiShop™(Toote registreerimine) · PiTranslate™(Piiramatu tõlge)",
+            "Vali ja telli ainult see, mida vajad: PyCafé™(Premium Cafe) · PyShop™(Toote registreerimine) · PyTranslate™(Piiramatu tõlge)",
             "Subscription'i tasu makstakse laetud Bean'idega ja aastane makse annab 2 kuud tasuta"
           ],
           "title": "Bean & Subscription"
@@ -1040,7 +1040,7 @@
       "newTrans": "Uued tõlked ({period} päeva, sõnum × keel)",
       "noData": "Perioodi jooksul puudub tõlke Data."
     },
-    "translateSection": "Tõlge (PiTranslate™)",
+    "translateSection": "Tõlge (PyTranslate™)",
     "txnLabel": {
       "CHARGE": "Laadimine",
       "ETC": "Muu",
@@ -1268,7 +1268,7 @@
     }
   },
   "bean": {
-    "backToStore": "Tagasi PiShop'i",
+    "backToStore": "Tagasi PyShop'i",
     "buying": "Makse töötlemine…",
     "chargeBtn": "Lae",
     "chargeFail": "Laadimise töötlemine ebaõnnestus",
@@ -1809,14 +1809,14 @@
     "loadError": "Data laadimine ebaõnnestus",
     "loginHint": "Logi sisse, et näha oma missiooni edenemist ja agendi auastet",
     "missionGoBean": "Mine Bean'i laadima",
-    "missionGoCafe": "💬 Mine PiCafé™'sse",
+    "missionGoCafe": "💬 Mine PyCafé™'sse",
     "missionGoItems": "🛒 Mine minu toodete juurde",
     "missionGoLbs": "📍 Asukohateenus (Minu Profile)",
     "missionGoLink": "🔗 Mine kontot ühendama",
     "missionGoOrders": "🛒 Mine tellimuste halduse juurde",
     "missionGoProfile": "👤 Mine kontot ühendama ja Profile'i sisestama",
     "missionGoSales": "🛒 Mine müügihalduse juurde",
-    "missionGoStore": "🛒 Mine PiShop™'i",
+    "missionGoStore": "🛒 Mine PyShop™'i",
     "missionGoSubscribe": "⭐ Mine tellima",
     "missionListTitle": "📋 Missioonide loend",
     "missions": {
@@ -1833,7 +1833,7 @@
         "name": "Profiili täitmine"
       },
       "M3": {
-        "desc": "Loo PiCafes PREMIUM Cafe + kasuta automaattõlke funktsiooni",
+        "desc": "Loo PyCafes PREMIUM Cafe + kasuta automaattõlke funktsiooni",
         "name": "PREMIUM Cafe loomine (PiRC1) + automaattõlge"
       },
       "M4": {
@@ -1849,15 +1849,15 @@
         "name": "Kasuta Chat Multi-function"
       },
       "M7": {
-        "desc": "Pärast minu toote registreerimist PiShop'is, Seller Transaction Cancellation tehingu ajal",
+        "desc": "Pärast minu toote registreerimist PyShop'is, Seller Transaction Cancellation tehingu ajal",
         "name": "Seller Transaction Cancellation (Escrow Service; PiRC3)"
       },
       "M8": {
-        "desc": "Pärast teise isiku toote ostmist PiShop'ist, Buyer Transaction Cancellation",
+        "desc": "Pärast teise isiku toote ostmist PyShop'ist, Buyer Transaction Cancellation",
         "name": "Buyer Transaction Cancellation (Escrow Service; PiRC3)"
       },
       "M9": {
-        "desc": "Deponeeri 1Pi või enam PiShop Seller Deposit'ina + Nõustu asukohapõhise Service'iga",
+        "desc": "Deponeeri 1Pi või enam PyShop Seller Deposit'ina + Nõustu asukohapõhise Service'iga",
         "name": "Seller Deposit + Location Consent (Escrow Service; PiRC3)"
       }
     },
@@ -1924,7 +1924,7 @@
       "condTitle": "Osalemise tingimused",
       "ctaM1": "Registreeri Mapis",
       "ctaM2": "Registreeri Product",
-      "ctaM3": "Ühenda Minu PiShop™is",
+      "ctaM3": "Ühenda Minu PyShop™is",
       "ctaM4": "Kinnita teavitus",
       "loadError": "Campaigni infot ei saa laadida.",
       "loading": "Laadimine…",
@@ -2255,7 +2255,7 @@
       "info": "Isiklik info",
       "lbs": "📍 Asukoha Service",
       "payment": "Makseajalugu",
-      "store": "🛍️ Minu PiShop™",
+      "store": "🛍️ Minu PyShop™",
       "subscr": "Tellimuse staatus"
     },
     "tabsExtra": {
@@ -2545,7 +2545,7 @@
     "statusChanged": "Staatus on muudetud",
     "stockLeft": "Laos {count}",
     "subtitle": "Tehke turvalisi otsetehinguid Pi Coiniga — Escrow kaitse",
-    "title": "PiShop",
+    "title": "PyShop",
     "tradeSt": {
       "OPEN": "Müügis",
       "SOLD": "Müüdud",
@@ -2591,8 +2591,8 @@
     "perYear": "Aasta",
     "processing": "Töötlemine…",
     "product": {
-      "PICAFE": "PiCafe tellimus",
-      "PISHOP": "PiShopi tellimus",
+      "PICAFE": "PyCafe tellimus",
+      "PISHOP": "PyShopi tellimus",
       "TRANSLATE": "Automaattõlke tellimus"
     },
     "renewBtn": "Uuenda/Muuda",
@@ -2636,6 +2636,6 @@
     "running": "⏳ Kontrollitakse…",
     "skipped": "Ülemise kontrolli ebaõnnestumise tõttu jäeti vahele",
     "subtitle": "Pi Browseri tegelikus seadmes diagnoositakse WebRTC kõnetoe olemasolu.",
-    "title": "🎙️ PiVoice™ S0 Spike"
+    "title": "🎙️ PyVoice™ S0 Spike"
   }
 }

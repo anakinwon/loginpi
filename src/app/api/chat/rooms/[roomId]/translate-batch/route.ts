@@ -13,7 +13,7 @@ const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 const MAX_BATCH = 50
 
-// POST /api/chat/rooms/[roomId]/translate-batch — 방 헤더 언어 콤보 강제 번역 (PiTranslate™)
+// POST /api/chat/rooms/[roomId]/translate-batch — 방 헤더 언어 콤보 강제 번역 (PyTranslate™)
 // Body: { locale_cd: string, msg_ids: string[] }
 // 캐시 히트는 즉시 수집, 미스는 최신순 순차 번역 — 각 fresh 번역은 broadcast로 점진 전달됨
 export async function POST(request: NextRequest, { params }: Params) {
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest, { params }: Params) {
   if (!(await canAutoTranslate(user.id))) {
     return NextResponse.json(
       {
-        error: 'PiTranslate™는 구독 후 이용할 수 있습니다',
+        error: 'PyTranslate™는 구독 후 이용할 수 있습니다',
         requiresSubscription: true,
         feature: 'AUTO_TRANSLATE',
       },
@@ -133,7 +133,7 @@ export async function POST(request: NextRequest, { params }: Params) {
     }
   }
 
-  // M3: 자동번역 사용 미션 기록 (방 언어 일괄 번역 = PiTranslate™ 자동번역 주력 경로)
+  // M3: 자동번역 사용 미션 기록 (방 언어 일괄 번역 = PyTranslate™ 자동번역 주력 경로)
   // 단건 번역(messages/[msgId]/translate)뿐 아니라 이 경로도 '자동번역 사용'으로 집계해야
   // M3(premium_cafe_create + cafe_translate_use) 누락이 발생하지 않는다.
   recordUserAction('cafe_translate_use', user.id, { roomId, localeCd })

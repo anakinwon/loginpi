@@ -55,7 +55,7 @@
 
 ### 1-3. 목표
 
-- **기능 인지·사용 활성화**: 카페(Chat), 음성채팅(Voice), PiShop™(MPS), 게시판(Board), 구독(Subscription) 등 플랫폼의 산재된 기능들을 통합된 미션으로 경험하게 함
+- **기능 인지·사용 활성화**: 카페(Chat), 음성채팅(Voice), PyShop™(MPS), 게시판(Board), 구독(Subscription) 등 플랫폼의 산재된 기능들을 통합된 미션으로 경험하게 함
 - **커뮤니티 참여 확대**: 미션 수행 시 자동으로 데이터가 기록되며, 랭킹 보드에서 공개적 경쟁·달성감 유발
 - **화이트리스트 신뢰 구축**: 미션 완료자만 화이트리스트 등록으로, 플랫폼에 진정성 있는 활성 사용자임을 증명
 
@@ -261,8 +261,8 @@ INSERT INTO evt_mission (event_id, mission_cd, ...) VALUES
 | **M4** | Pi Bet 생성 후 분배 | 카페 내 Pi Bet 생성 + 최소 1명 이상의 참여자에게 분배 | "예측 게임 주관" | `src/app/api/chat/rooms/[roomId]/bets` (POST) — `msg_bet` 레코드 생성 + `msg_bet_entry` 레코드 최소 1건 존재 | `msg_bet.crtr_usr_id=$user AND EXISTS (SELECT 1 FROM msg_bet_entry WHERE bet_id=$bet_id)` |
 | **M5** | Bean(팁) 전송 테스트 | 카페 채팅 내 메시지에 Pi Bean(팁) 최소 1회 전송 | "보상 전달 기술" | `src/app/api/tips` (POST) — 0.1/0.5/1 Pi 팁 전송 | `pi_pymnt.metadata.type='TIPS' AND buyer_id=$user` |
 | **M6** | 채팅 멀티 기능 사용 (Multi-Feature Mastery) | 음성채널(voice channel) 입장 + 파일 전송 + 스티커 사용 **(3가지 중 1개 이상)** | "채팅 기술 완성" | ① Voice: `src/app/api/voice/rooms/[roomId]/join` (POST) — `msg_call_participant` 레코드 생성 ② File: `src/app/api/chat/rooms/[roomId]/messages` (POST, file 포함) ③ Sticker: `src/app/api/stickers` 사용 | ① `msg_call_participant.usr_id=$user AND del_yn='N'` OR ② `msg_chat.file_url IS NOT NULL AND sender_id=$user` OR ③ `msg_chat.sticker_id IS NOT NULL AND sender_id=$user` (최소 1가지) |
-| **M7** | 판매자 거래 취소 (Seller Refund) | PiShop™에서 자신이 등록한 상품의 주문을 "판매자 거래 취소" 처리 | "거래 협상 스킬" | `src/app/api/store/orders/[orderId]/cancel` (POST) — `cancelOrder(orderId, userId, reason, isAdminUser)` 호출, 판매자가 요청할 때 | `mps_order.order_st_cd='CANCELLED' AND cancel_req_id=$user (판매자) AND escrow_txid IS NOT NULL` |
-| **M8** | 구매자 거래 취소 (Buyer Refund) | PiShop™에서 타인의 상품을 구매 후 "구매자 거래 취소" 처리 | "구매 결정 권리" | `src/app/api/store/orders/[orderId]/cancel` (POST) — 구매자가 요청할 때 | `mps_order.order_st_cd='CANCELLED' AND cancel_req_id=$user (구매자) AND escrow_txid IS NOT NULL` |
+| **M7** | 판매자 거래 취소 (Seller Refund) | PyShop™에서 자신이 등록한 상품의 주문을 "판매자 거래 취소" 처리 | "거래 협상 스킬" | `src/app/api/store/orders/[orderId]/cancel` (POST) — `cancelOrder(orderId, userId, reason, isAdminUser)` 호출, 판매자가 요청할 때 | `mps_order.order_st_cd='CANCELLED' AND cancel_req_id=$user (판매자) AND escrow_txid IS NOT NULL` |
+| **M8** | 구매자 거래 취소 (Buyer Refund) | PyShop™에서 타인의 상품을 구매 후 "구매자 거래 취소" 처리 | "구매 결정 권리" | `src/app/api/store/orders/[orderId]/cancel` (POST) — 구매자가 요청할 때 | `mps_order.order_st_cd='CANCELLED' AND cancel_req_id=$user (구매자) AND escrow_txid IS NOT NULL` |
 | **M9** | 판매자 보증금 + 위치동의 (Seller Bonding + Location Consent) | ① 판매자 보증금 1π 이상 예치 + ② 위치기반서비스 동의 (선행 조건) | "신뢰 자본 확보" | ① `src/app/api/store/bond` (POST → `/api/payments/complete` MPS_BOND) + `src/lib/mps-bond.ts` `depositBond()` ② `src/app/api/location/consent` (PATCH) — `lbs_consent_yn='Y'` 업데이트 | ① `mps_seller_bond.seller_id=$user AND bond_bal_pi ≥ 1.0 AND del_yn='N'` ② `sys_user.lbs_consent_yn='Y'` (둘 다 만족) |
 | **M10** | 보증금 활성 상태에서 거래 취소 수수료 경험 (Bonded Transaction Fee) | M9 완료 **이후** 발생한 판매자/구매자 거래 취소에서 **환불액에 취소수수료가 반영된 경험**(환불 = 원금±0.1π) | "신뢰 기반 거래" | `src/app/api/store/orders/[orderId]/cancel` (POST, M9 완료 후) — 취소 처리 시 환불 + FEE 동시 기록 | **환불(REFUND_IN) + 수수료(FEE)가 동일 order에 함께 존재** (근거: `src/lib/mps-refund.ts`, `sql/041`). 보증금 활성: 환불액 = 원금±0.1π(수수료 반영), 미활성: 원금만 반환. |
 
@@ -321,7 +321,7 @@ INSERT INTO evt_mission (event_id, mission_cd, ...) VALUES
   - ✓ 완료 (초록 배경, 체크 아이콘)
   - ○ 미완료 (회색 배경, 진행 단계 설명)
 - **설명 텍스트**: 각 미션의 "스킬 설명" (예: "두 세계를 연결하는 기술")
-- **클릭**: 각 카드 클릭 시 해당 미션의 상세 조건 모달 (예: "M7을 완료하려면 PiShop™에서 상품을 등록하고 판매자 거래 취소를 해야 합니다")
+- **클릭**: 각 카드 클릭 시 해당 미션의 상세 조건 모달 (예: "M7을 완료하려면 PyShop™에서 상품을 등록하고 판매자 거래 취소를 해야 합니다")
 
 #### **5-3-2. 요원 등급 배너**
 
@@ -1245,7 +1245,7 @@ CREATE INDEX idx_evt_exclude_user_id_del
 
 ### 14-4. 보상 현금화 제약 — A2U 폐기, 보증금 적립으로 전환 (2026-06-16~17 확정)
 
-Pi A2U(app wallet → user)는 시드 미설정 또는 송금 실패 시 PENDING을 반환해 **실 지급 신뢰도가 낮다**. 이 한계 때문에 10미션 완주 실 보상을 **A2U 직접 송금에서 `mps_seller_bond` 판매보증금 1π 직접 적립으로 전환**했다(블록체인 송금 없이 플랫폼 장부에 보증금 잔액 가산). 적립된 보증금은 PiShop™ 판매 활동의 신뢰 자본으로 즉시 활용되므로 "실 Pi 지급"과 동등한 가치를 가지면서도 송금 실패 리스크가 없다. 상세는 **§15-5**.
+Pi A2U(app wallet → user)는 시드 미설정 또는 송금 실패 시 PENDING을 반환해 **실 지급 신뢰도가 낮다**. 이 한계 때문에 10미션 완주 실 보상을 **A2U 직접 송금에서 `mps_seller_bond` 판매보증금 1π 직접 적립으로 전환**했다(블록체인 송금 없이 플랫폼 장부에 보증금 잔액 가산). 적립된 보증금은 PyShop™ 판매 활동의 신뢰 자본으로 즉시 활용되므로 "실 Pi 지급"과 동등한 가치를 가지면서도 송금 실패 리스크가 없다. 상세는 **§15-5**.
 
 ### 14-5. 랭킹 실시간성
 

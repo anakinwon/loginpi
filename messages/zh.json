@@ -961,7 +961,7 @@
           "icon": "🎫",
           "steps": [
             "1 Pi = 100 Bean (平台专用积分) — 您可以立即开始使用免费 Plan",
-            "选择您需要的订阅：PiCafé™(Premium Café) · PiShop™(商品注册) · PiTranslate™(无限翻译)",
+            "选择您需要的订阅：PyCafé™(Premium Café) · PyShop™(商品注册) · PyTranslate™(无限翻译)",
             "订阅费使用充值的 Bean 支付，年度支付可享 2 个月免费"
           ],
           "title": "Bean & 订阅"
@@ -1040,7 +1040,7 @@
       "newTrans": "新翻译 ({period}天, 消息×语言)",
       "noData": "期间内无翻译 Data"
     },
-    "translateSection": "翻译 (PiTranslate™)",
+    "translateSection": "翻译 (PyTranslate™)",
     "txnLabel": {
       "CHARGE": "充值",
       "ETC": "其他",
@@ -1268,7 +1268,7 @@
     }
   },
   "bean": {
-    "backToStore": "返回 PiShop",
+    "backToStore": "返回 PyShop",
     "buying": "支付进行中…",
     "chargeBtn": "充值",
     "chargeFail": "充值处理失败",
@@ -1809,14 +1809,14 @@
     "loadError": "Data 加载失败",
     "loginHint": "Login后将显示我的 Mission 进度和特工等级",
     "missionGoBean": "去充值 Bean",
-    "missionGoCafe": "💬 去 PiCafe",
+    "missionGoCafe": "💬 去 PyCafe",
     "missionGoItems": "🛒 去我的商品",
     "missionGoLbs": "📍 定位服务 (我的个人资料)",
     "missionGoLink": "🔗 去绑定账号",
     "missionGoOrders": "🛒 去订单管理",
     "missionGoProfile": "👤 去绑定账号·输入个人资料",
     "missionGoSales": "🛒 去销售管理",
-    "missionGoStore": "🛒 去 PiShop",
+    "missionGoStore": "🛒 去 PyShop",
     "missionGoSubscribe": "⭐ 去订阅",
     "missionListTitle": "📋 Mission 列表",
     "missions": {
@@ -1833,7 +1833,7 @@
         "name": "Profile 完善"
       },
       "M3": {
-        "desc": "在 PiCafe 中创建 PREMIUM Cafe + 使用自动翻译功能",
+        "desc": "在 PyCafe 中创建 PREMIUM Cafe + 使用自动翻译功能",
         "name": "创建 PREMIUM Cafe (PiRC1) + 自动翻译"
       },
       "M4": {
@@ -1849,15 +1849,15 @@
         "name": "Chatting Multi 功能使用"
       },
       "M7": {
-        "desc": "在PiShop注册我的商品后，交易中卖家取消交易",
+        "desc": "在PyShop注册我的商品后，交易中卖家取消交易",
         "name": "卖家取消交易(Escrow Service;PiRC3)"
       },
       "M8": {
-        "desc": "在PiShop购买他人商品后，买家取消交易",
+        "desc": "在PyShop购买他人商品后，买家取消交易",
         "name": "买家取消交易(Escrow Service;PiRC3)"
       },
       "M9": {
-        "desc": "PiShop卖家保证金存入1Pi以上 + 同意基于位置的服务",
+        "desc": "PyShop卖家保证金存入1Pi以上 + 同意基于位置的服务",
         "name": "卖家保证金 + 位置同意(Escrow Service;PiRC3)"
       }
     },
@@ -1924,7 +1924,7 @@
       "condTitle": "参与条件",
       "ctaM1": "在 Map 注册",
       "ctaM2": "发布 Product",
-      "ctaM3": "在我的 PiShop™ 关联",
+      "ctaM3": "在我的 PyShop™ 关联",
       "ctaM4": "确认通知",
       "loadError": "无法加载 Campaign 信息。",
       "loading": "加载中…",
@@ -2255,7 +2255,7 @@
       "info": "个人信息",
       "lbs": "📍 位置服务",
       "payment": "支付记录",
-      "store": "🛍️ 我的 PiShop™",
+      "store": "🛍️ 我的 PyShop™",
       "subscr": "订阅状态"
     },
     "tabsExtra": {
@@ -2545,7 +2545,7 @@
     "statusChanged": "状态已更改",
     "stockLeft": "库存 {count}",
     "subtitle": "使用 Pi Coin 安全地直接交易 — 托管保护",
-    "title": "PiShop",
+    "title": "PyShop",
     "tradeSt": {
       "OPEN": "销售中",
       "SOLD": "已售罄",
@@ -2591,8 +2591,8 @@
     "perYear": "年",
     "processing": "处理中…",
     "product": {
-      "PICAFE": "PiCafe 订阅",
-      "PISHOP": "PiShop 订阅",
+      "PICAFE": "PyCafe 订阅",
+      "PISHOP": "PyShop 订阅",
       "TRANSLATE": "自动翻译订阅"
     },
     "renewBtn": "续订/更改",
@@ -2636,6 +2636,6 @@
     "running": "⏳ 检查中…",
     "skipped": "因上级检查失败而跳过",
     "subtitle": "在 Pi Browser 真实设备上诊断 WebRTC 语音通话支持情况。",
-    "title": "🎙️ PiVoice™ S0 Spike"
+    "title": "🎙️ PyVoice™ S0 Spike"
   }
 }

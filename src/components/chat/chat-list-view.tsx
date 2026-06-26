@@ -240,7 +240,7 @@ export function ChatListView({
       {/* 헤더 */}
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">PiCafé</h1>
+          <h1 className="text-2xl font-bold">PyCafé</h1>
           <p className="text-muted-foreground text-sm">{t('subtitle')}</p>
         </div>
         <GroupRoomCreator />

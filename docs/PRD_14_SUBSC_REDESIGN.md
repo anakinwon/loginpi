@@ -13,7 +13,7 @@
 
 | 축 | 현행(파기) | 신규(본 설계) |
 |---|---|---|
-| 단위 | 사용자 등급 1개 (Explorer/Creator/Host) | **상품군별 독립 구독** (PiCafé™·PiShop™·자동번역), 동시 다중 |
+| 단위 | 사용자 등급 1개 (Explorer/Creator/Host) | **상품군별 독립 구독** (PyCafé™·PyShop™·자동번역), 동시 다중 |
 | 가치 제안 | "프리미엄 기능 잠금해제" | **"건당 요금을 면제·할인하는 패키지"** (PRD_15 §1-4) |
 | 요금 출처 | `msg_subscr_plan.price_pi` | **`bean_fee_plan.amt_bean`** (단일 정본, 하드코딩 금지) |
 | 결제 통화 | Pi 직접결제(CHAT_SUBSCR) | **Bean 차감(SPEND)** — Pi 접점은 충전 한 곳 |
@@ -28,10 +28,10 @@
 
 | 상품군 | 등급 | 월 | 년(2개월 무료) | 비고 |
 |---|---|---|---|---|
-| ☕ PiCafé™ 구독 | 단일 | 2,000 / 20π | 20,000 / 200π | 카페 생성·입장 건당요금 면제 |
-| 🏪 PiShop™ 구독 | S (상품 10개↓) | 3,000 / 30π | 30,000 | 노출·생성 건당요금 면제 |
-| 🏪 PiShop™ 구독 | M (상품 30개↓) | 4,000 / 40π | 40,000 | |
-| 🏪 PiShop™ 구독 | L (상품 30개↑) | 5,000 / 50π | 50,000 | |
+| ☕ PyCafé™ 구독 | 단일 | 2,000 / 20π | 20,000 / 200π | 카페 생성·입장 건당요금 면제 |
+| 🏪 PyShop™ 구독 | S (상품 10개↓) | 3,000 / 30π | 30,000 | 노출·생성 건당요금 면제 |
+| 🏪 PyShop™ 구독 | M (상품 30개↓) | 4,000 / 40π | 40,000 | |
+| 🏪 PyShop™ 구독 | L (상품 30개↑) | 5,000 / 50π | 50,000 | |
 | 🌐 자동번역 구독 | 단일 | 1,000 / 10π | 10,000 / 100π | 비구독 1회 1 Bean → 무제한 |
 
 > ⚠️ 위 금액은 PRD_15 §4 잠정값. **엑셀 §7 교정(프리미엄<일반 역전·"년월단위" 오타) 확정 전 시드 금지.**
@@ -48,7 +48,7 @@ CREATE TABLE public.bean_subscr (
   subscr_id     UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   usr_id        TEXT NOT NULL,                         -- sys_user.id
   prod_ctgr_cd  VARCHAR(16) NOT NULL,                  -- PICAFE / PISHOP / TRANSLATE (구독 대상 상품군)
-  grade_cd      VARCHAR(10) NOT NULL DEFAULT 'GENERAL',-- PiShop™: S/M/L, 그 외 단일
+  grade_cd      VARCHAR(10) NOT NULL DEFAULT 'GENERAL',-- PyShop™: S/M/L, 그 외 단일
   bill_cycle_cd VARCHAR(8)  NOT NULL,                  -- M / Y
   fee_plan_cd   VARCHAR(20) NOT NULL,                  -- 구독 시점 적용 bean_fee_plan 코드 스냅샷 (SM100 등)
   amt_bean      INT NOT NULL,                          -- 결제한 구독료 Bean 스냅샷
@@ -96,7 +96,7 @@ CREATE UNIQUE INDEX uq_bean_subscr_active ON public.bean_subscr(usr_id, prod_ctg
 |---|---|
 | 라우트 | `GET /[locale]/subscribe` (게이트 패턴, redirect 금지) |
 | 결제 | Bean 차감(내부) → **window.Pi 불필요**, 일반 브라우저 가능 |
-| 진입경로 | 프로필 구독현황 / PiShop™ 매장관리 / 카페·번역 기능 게이트 / 만료알림 |
+| 진입경로 | 프로필 구독현황 / PyShop™ 매장관리 / 카페·번역 기능 게이트 / 만료알림 |
 
 **와이어프레임 (상품별 카드 + 면제 증거):**
 ```
@@ -105,11 +105,11 @@ CREATE UNIQUE INDEX uq_bean_subscr_active ON public.bean_subscr(usr_id, prod_ctg
 │ 💡 구독 = '건당 요금 면제 패키지'. 많이 쓸수록 이득 │
 │                              [ 월간 ⇄ 연간 ]  │
 ├─────────────────────────────────────────────┤
-│ ☕ PiCafé™ 구독                 월 2,000 ☕      │
+│ ☕ PyCafé™ 구독                 월 2,000 ☕      │
 │   구독하면 면제: 프리미엄 생성 10→0 · 입장 10→0 │
 │                  이벤트 입장 20→5   [ 구독하기 ]│
 ├─────────────────────────────────────────────┤
-│ 🏪 PiShop™ 구독   (내 상품 23개 → M 추천)      │
+│ 🏪 PyShop™ 구독   (내 상품 23개 → M 추천)      │
 │   ●S 3,000  ○M 4,000  ○L 5,000               │
 │   면제: 노출 1주 5→0 · 프리미엄 생성 10→0       │
 │                                  [ 구독하기 ] │
@@ -121,7 +121,7 @@ CREATE UNIQUE INDEX uq_bean_subscr_active ON public.bean_subscr(usr_id, prod_ctg
 
 **상태:** ①미인증=클라이언트 게이트 ②상품군별 [미구독→구독하기 / 구독중→갱신·등급변경·해지] ③잔액부족=충전 유도 ④처리중 ⑤완료=토스트+잔액·구독상태 갱신.
 
-**차별 UX:** (a) 등급카드 아닌 **상품카드**, (b) 각 카드에 **before→after 면제 증거**, (c) PiShop™ **상품 수 기반 등급 자동추천**(`mps_item` 카운트), (d) 확장: "이번 달 낸 건당요금 X→구독 시 Y" **ROI 배너**.
+**차별 UX:** (a) 등급카드 아닌 **상품카드**, (b) 각 카드에 **before→after 면제 증거**, (c) PyShop™ **상품 수 기반 등급 자동추천**(`mps_item` 카운트), (d) 확장: "이번 달 낸 건당요금 X→구독 시 Y" **ROI 배너**.
 
 ---
 

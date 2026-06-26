@@ -4,10 +4,10 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 
 // 상품군 코드 → 표시명 (prod_ctgr_cd: PICAFE / PISHOP / PISHOP_SUBSCR / TRANSLATE)
 const PROD_NM: Record<string, string> = {
-  PICAFE: 'PiCafé™ 구독',
-  PISHOP: 'PiShop™ 구독',
-  PISHOP_SUBSCR: 'PiShop™ 구독',
-  TRANSLATE: 'PiTranslate™ 구독',
+  PICAFE: 'PyCafé™ 구독',
+  PISHOP: 'PyShop™ 구독',
+  PISHOP_SUBSCR: 'PyShop™ 구독',
+  TRANSLATE: 'PyTranslate™ 구독',
 }
 
 // GET /api/subscriptions/list — 사용자의 활성 구독 전체 목록 (프로필 구독현황 표시용).

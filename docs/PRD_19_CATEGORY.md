@@ -1,9 +1,9 @@
-# PRD_CATEGORY: PiShop™ 상품 카테고리 표준
+# PRD_CATEGORY: PyShop™ 상품 카테고리 표준
 
 - **버전**: v1.0 (2026-06-23)
 - **목적**: 기존 샘플성 카테고리(중고거래 위주 6대분류)를 폐기하고, 국내 E커머스 전 상품을 유연하게 수용하는 **3단계 표준 카테고리 체계**를 정립한다.
 - **대상 테이블**: `mps_ctgr` (재귀 `parent_ctgr_id`, 시스템 컬럼 4개 + 논리삭제 `del_yn`)
-- **적용 화면**: PiShop™ 상품 목록 필터(`/api/store/categories` → `listCategoryTree`), 상품 등록
+- **적용 화면**: PyShop™ 상품 목록 필터(`/api/store/categories` → `listCategoryTree`), 상품 등록
 
 ---
 
@@ -26,7 +26,7 @@
 3. **전 상품 커버 + 유연성**: 모든 대분류에 "기타 OO" 소분류를 두어 미분류 상품을 흡수. 최상위 "기타(미분류)" 대분류로 최종 안전망.
 4. **확장성**: `sort_ord` 10단위 부여(중간 삽입 여지). 신규 분류는 `/admin` 런타임 CRUD 또는 시드 추가.
 5. **DA 표준**: 시스템 컬럼 4개·`del_yn` 논리삭제·물리 DELETE 금지. 코드 식별자는 `ctgr_id`(UUID), 표시명은 `ctgr_nm`.
-6. **브랜드**: 화면 표기는 PiShop™.
+6. **브랜드**: 화면 표기는 PyShop™.
 
 ---
 

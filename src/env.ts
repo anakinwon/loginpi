@@ -44,7 +44,7 @@ export const env = createEnv({
     CLOUDFLARE_TURN_TOKEN_ID: z.string().optional(),
     CLOUDFLARE_TURN_API_TOKEN: z.string().optional(),
     GOOGLE_MAPS_API_KEY: z.string().optional(),
-    // PiVoice v3.0 권한 슬롯 (R7 — 향후 확대 가능, 기본 자동 2/멤버 4)
+    // PyVoice v3.0 권한 슬롯 (R7 — 향후 확대 가능, 기본 자동 2/멤버 4)
     VOICE_AUTO_SLOTS: z.coerce.number().int().positive().optional(),
     VOICE_MAX_MEMBER_SLOTS: z.coerce.number().int().positive().optional(),
   },
