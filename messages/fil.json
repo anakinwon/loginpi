@@ -169,19 +169,25 @@
       "translating": "Nagsasalin..."
     },
     "links": {
+      "active": "Active",
       "col": {
         "googleAccount": "Google Account",
         "joinDate": "Petsa ng Pag-join",
         "linkStatus": "Status ng Pag-link",
         "piAccount": "Pi Account",
         "role": "Role",
+        "status": "Status",
         "user": "User"
       },
+      "confirmDisable": "I-disable ang account na '{name}'? Ang account na ito ay maba-block sa lahat ng screen simula ngayon.",
       "desc": {
         "googleOnly": "Hindi Naka-link sa Pi",
         "linked": "Pi + Google Naka-link",
         "piOnly": "Hindi Naka-link sa Google"
       },
+      "disable": "Disable",
+      "enable": "Enable",
+      "inactive": "Inactive",
       "noUsers": "Walang User na Nahanap.",
       "searchPiUsername": "Hanapin ang Pi Username (2 karakter o higit pa)",
       "searchResultCount": "Resulta ng Paghahanap {count} tao",
@@ -191,6 +197,7 @@
         "piOnly": "Pi Lamang"
       },
       "title": "Status ng Pag-link ng Account",
+      "toggleFailed": "Nabigo ang pagbabago ng status.",
       "totalCount": "Kabuuan {count} User"
     },
     "logs": {
@@ -262,6 +269,7 @@
       "i18nSection": "Multilingual",
       "links": "Status ng Pag-link ng Account",
       "logs": "Pamamahala ng Log",
+      "monitor": "Real-time Monitoring",
       "payments": "Kasaysayan ng Bayad",
       "reports": "Pagproseso ng Ulat",
       "settle": "Settlement Management",
@@ -1267,7 +1275,9 @@
     "chargeSuccess": "{bean} Bean Charge Kumpleto!",
     "chargeTitle": "Bean Charge",
     "customLabel": "Manu-manong Input (Bean)",
+    "goCharge": "+ Mag-charge ng Bean",
     "loading": "Naglo-load…",
+    "loadMore": "Mag-load pa ({count}/{total})",
     "loginRequired": "Magagamit pagkatapos mag-login",
     "minCharge": "Maaaring mag-charge ng integer mula sa minimum na {min} Bean (1π)",
     "myBalance": "Aking Bean Balance",
@@ -1277,6 +1287,7 @@
     "title": "Bean Wallet",
     "txnEmpty": "Walang Transaction History",
     "txnTitle": "Transaction History",
+    "txnTotal": "Kabuuang {count}",
     "type": {
       "CHARGE": "Charge",
       "REFUND": "Refund",
@@ -2186,6 +2197,7 @@
     "lbs": {
       "agreeCta": "📍 Sumang-ayon sa Serbisyo ng Lokasyon",
       "agreed": "Sumang-ayon",
+      "consentedAt": "Petsa ng Pagpayag: {date}",
       "historyDesc": "Karapatan ng data subject na tingnan ayon sa Artikulo 16 ng Batas sa Impormasyon ng Lokasyon. Mga yunit lamang ng administratibong distrito ang ipinapakita.",
       "historyTitle": "Kasaysayan ng Pagkolekta ng Aking Lokasyon",
       "locTypeJoin": "Sumali",
@@ -2203,6 +2215,7 @@
     },
     "loginRequired": "Kailangan ang pag-login.",
     "payment": {
+      "defaultMemo": "Bayad",
       "empty": "Walang kasaysayan ng pagbabayad.",
       "status": {
         "approved": "Naaprubahan",
@@ -2212,13 +2225,18 @@
     },
     "subscr": {
       "autoRenewOff": "Nakansela ang Auto-renew.",
+      "autoRenewOffShort": "Naka-off ang Auto-renew",
       "autoRenewOn": "Naka-activate ang Auto-renew",
+      "autoRenewOnShort": "Automatic Renewal",
       "cancelAutoRenew": "Kanselahin ang Auto-renew",
       "cancelConfirm": "Kung kanselahin mo ang subscription, magagamit mo ito hanggang sa petsa ng pag-expire at hihinto ang auto-renew. Gusto mo bang magpatuloy?",
       "cancelError": "Nabigo ang pagkansela. Pakisubukang muli.",
       "cancelOk": "Kinansela ang subscription. Maaari mo itong gamitin hanggang sa petsa ng pag-expire.",
+      "countActive": "{count} naka-subscribe",
       "currentPlan": "Kasalukuyang Plan",
-      "expireDate": "Petsa ng Pag-expire: {date}"
+      "empty": "Wala kang kasalukuyang subscription.",
+      "expireDate": "Petsa ng Pag-expire: {date}",
+      "viewPlans": "Tingnan ang mga Subscription Plan →"
     },
     "subscrExtra": {
       "autoStopOnFail": "Kahit na mag-fail ang pagbabayad, awtomatikong titigil ang awtomatikong pag-renew.",
@@ -2226,20 +2244,42 @@
       "confirmCancel": "Nakumpirma ko ang impormasyon. Kinakansela ko ang subscription.",
       "goBack": "Bumalik",
       "noPartialRefund": "Hindi ibinibigay ang bahagyang refund at refund para sa natitirang panahon.",
+      "noRefundOnCancel": "Walang refund sa agarang pagkansela.",
       "noticeTitle": "Paunawa Bago Kanselahin ang Subscription",
       "policyRef": "Pi Network PiRC2 Cancellation/Refund Policy",
       "remainHint": "Ang natitirang panahon ay maaaring gamitin nang normal hanggang sa petsa ng pag-expire.",
       "usableUntil": "Maaaring gamitin nang normal hanggang {date}."
     },
     "tabs": {
+      "bean": "Bean Wallet",
       "info": "Personal na Impormasyon",
+      "lbs": "📍 Location Service",
       "payment": "Kasaysayan ng Pagbabayad",
+      "store": "🛍️ Aking PiShop™",
       "subscr": "Katayuan ng Subscription"
     },
     "tabsExtra": {
       "fullView": "Full Screen →",
       "lbs": "📍 Location Service",
       "store": "🛍️ Store"
+    },
+    "telegram": {
+      "botNotReady": "Kasalukuyan pang inihahanda ang notification bot. Pakisuri muli maya-maya.",
+      "confirm": "Kumpirmahin ang Koneksyon",
+      "confirming": "Kinukumpirma…",
+      "connected": "✅ Connected — Nakakatanggap ng order notifications",
+      "desc": "Dahil walang sariling notification ang Pi Browser, inirerekomenda ang Telegram notifications.",
+      "disconnect": "Disconnect",
+      "guideFooter": "Kapag nakakonekta, makakatanggap ka ng mga notification sa Telegram sa tuwing may bagong order. Makakatanggap ka ng mga notification sa telepono <b>kahit nakasara ang app</b>.",
+      "guideStep1": "Kung wala kang <b>Telegram</b> app sa iyong telepono, i-install muna ito. (Hanapin ang “Telegram” sa App Store/Play Store)",
+      "guideStep2": "Kapag pinindot mo ang button na <b>“📨 Buksan ang Telegram bot para kumonekta”</b> sa itaas, magbubukas ang Telegram.",
+      "guideStep3": "Sa ibaba ng screen ng Telegram, pindutin nang isang beses ang button na <b>“Start”</b>.",
+      "guideStep4": "Bumalik sa screen na ito at pindutin ang <b>“Kumpirmahin ang Koneksyon”</b> para matapos! ✅",
+      "guideSummary": "❓ Bago ka rito? Tingnan kung paano kumonekta",
+      "hint": "Pagkatapos pindutin ang \"Start\" sa Telegram, pindutin ang \"Kumpirmahin ang Koneksyon\" sa ibaba.",
+      "openBot": "📨 Buksan ang Telegram bot para kumonekta",
+      "recommended": "Recommended",
+      "title": "📨 Telegram Order Notifications"
     },
     "title": "Aking Profile"
   },

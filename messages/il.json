@@ -169,19 +169,25 @@
       "translating": "מתרגם..."
     },
     "links": {
+      "active": "פעיל",
       "col": {
         "googleAccount": "חשבון Google",
         "joinDate": "תאריך הצטרפות",
         "linkStatus": "סטטוס קישור",
         "piAccount": "חשבון Pi",
         "role": "תפקיד",
+        "status": "סטטוס",
         "user": "משתמש"
       },
+      "confirmDisable": "האם ברצונך להשבית את חשבון '{name}'? חשבון זה ייחסם מכל המסכים מעתה ואילך.",
       "desc": {
         "googleOnly": "Pi לא מקושר",
         "linked": "Pi + Google מחובר",
         "piOnly": "Google לא מקושר"
       },
+      "disable": "השבתה",
+      "enable": "הפעל",
+      "inactive": "לא פעיל",
       "noUsers": "אין משתמשים כאלה.",
       "searchPiUsername": "חיפוש Pi Username (2 תווים או יותר)",
       "searchResultCount": "{count} תוצאות חיפוש",
@@ -191,6 +197,7 @@
         "piOnly": "Pi בלבד"
       },
       "title": "סטטוס קישור חשבונות",
+      "toggleFailed": "שינוי הסטטוס נכשל.",
       "totalCount": "סה\"כ {count} משתמשים"
     },
     "logs": {
@@ -262,6 +269,7 @@
       "i18nSection": "רב לשוני",
       "links": "סטטוס קישור חשבונות",
       "logs": "ניהול Log",
+      "monitor": "ניטור בזמן אמת",
       "payments": "היסטוריית תשלומים",
       "reports": "טיפול בדיווחים",
       "settle": "ניהול התחשבנות",
@@ -1267,7 +1275,9 @@
     "chargeSuccess": "טעינת {bean} Bean הושלמה!",
     "chargeTitle": "טעינת Bean",
     "customLabel": "הזנה ידנית (Bean)",
+    "goCharge": "+ עבור לטעינת Bean",
     "loading": "בטעינה…",
+    "loadMore": "טען עוד ({count}/{total})",
     "loginRequired": "זמין לאחר התחברות",
     "minCharge": "ניתן לטעון מספרים שלמים החל ממינימום של {min} Bean (1π)",
     "myBalance": "יתרת ה-Bean שלי",
@@ -1277,6 +1287,7 @@
     "title": "ארנק Bean",
     "txnEmpty": "אין היסטוריית עסקאות",
     "txnTitle": "היסטוריית עסקאות",
+    "txnTotal": "סה\"כ {count} עסקאות",
     "type": {
       "CHARGE": "טעינה",
       "REFUND": "החזר כספי",
@@ -2186,6 +2197,7 @@
     "lbs": {
       "agreeCta": "📍 אשר שירות מיקום",
       "agreed": "מוסכם",
+      "consentedAt": "תאריך הסכמה: {date}",
       "historyDesc": "זכות נושא הנתונים לצפייה בהתאם לסעיף 16 לחוק פרטי המיקום. מוצגות רק יחידות מחוז אדמיניסטרטיביות.",
       "historyTitle": "היסטוריית איסוף המיקום שלי",
       "locTypeJoin": "הצטרפות",
@@ -2203,6 +2215,7 @@
     },
     "loginRequired": "נדרשת התחברות",
     "payment": {
+      "defaultMemo": "תשלום",
       "empty": "אין היסטוריית תשלומים.",
       "status": {
         "approved": "אושר",
@@ -2212,13 +2225,18 @@
     },
     "subscr": {
       "autoRenewOff": "החידוש האוטומטי בוטל.",
+      "autoRenewOffShort": "חידוש אוטומטי כבוי",
       "autoRenewOn": "חידוש אוטומטי פעיל",
+      "autoRenewOnShort": "חידוש אוטומטי",
       "cancelAutoRenew": "בטל חידוש אוטומטי",
       "cancelConfirm": "אם תבטל את המנוי שלך, תוכל להשתמש בו עד תאריך התפוגה, ולאחר מכן החידוש האוטומטי יופסק. האם ברצונך להמשיך?",
       "cancelError": "הביטול נכשל. אנא נסה שוב.",
       "cancelOk": "המינוי בוטל. ניתן להשתמש בו עד תאריך התפוגה.",
+      "countActive": "{count} מנויים פעילים",
       "currentPlan": "תוכנית נוכחית",
-      "expireDate": "תאריך תפוגה: {date}"
+      "empty": "אין מנויים פעילים כרגע.",
+      "expireDate": "תאריך תפוגה: {date}",
+      "viewPlans": "הצג תוכניות מנוי ←"
     },
     "subscrExtra": {
       "autoStopOnFail": "חידוש אוטומטי יופסק גם במקרה של כשל בתשלום.",
@@ -2226,20 +2244,42 @@
       "confirmCancel": "אישרתי את ההודעה. בטל מנוי",
       "goBack": "חזור",
       "noPartialRefund": "החזרים חלקיים והחזרים עבור תקופות שנותרו אינם ניתנים.",
+      "noRefundOnCancel": "אין החזר כספי מיידי עם הביטול.",
       "noticeTitle": "הודעה לפני ביטול מנוי",
       "policyRef": "Pi Network PiRC2 מדיניות ביטול והחזר כספי",
       "remainHint": "ניתן להשתמש בתקופה הנותרת כרגיל עד תאריך התפוגה.",
       "usableUntil": "ניתן להשתמש כרגיל עד ה-{date}."
     },
     "tabs": {
+      "bean": "ארנק Bean",
       "info": "פרטים אישיים",
+      "lbs": "📍 Location Service",
       "payment": "היסטוריית תשלומים",
+      "store": "🛍️ My PiShop™",
       "subscr": "סטטוס מנוי"
     },
     "tabsExtra": {
       "fullView": "מסך מלא →",
       "lbs": "📍 שירות מיקום",
       "store": "🛍️ Store"
+    },
+    "telegram": {
+      "botNotReady": "בוט ההתראות עדיין בהכנה. אנא בדוק שוב בעוד רגע.",
+      "confirm": "אשר חיבור",
+      "confirming": "מאשר...",
+      "connected": "✅ מחובר — מקבל התראות הזמנה",
+      "desc": "מכיוון שלדפדפן Pi אין התראות משלו, אנו ממליצים על התראות Telegram.",
+      "disconnect": "התנתק",
+      "guideFooter": "כאשר תתחבר, תקבל התראות Telegram בכל פעם שתתקבל הזמנה חדשה. תוכל לקבל התראות לטלפון <b>גם אם האפליקציה סגורה</b>.",
+      "guideStep1": "אם אין לך את אפליקציית <b>Telegram</b> בטלפון, התקן אותה תחילה. (חפש \"Telegram\" ב-App Store/Play Store)",
+      "guideStep2": "כאשר תלחץ על כפתור <b>\"📨 פתח את בוט Telegram כדי להתחבר\"</b> למעלה, Telegram ייפתח.",
+      "guideStep3": "לחץ פעם אחת על כפתור <b>\"התחל (START)\"</b> בתחתית מסך Telegram.",
+      "guideStep4": "חזור למסך זה ולחץ על <b>\"אשר חיבור\"</b> כדי לסיים! ✅",
+      "guideSummary": "❓ זו הפעם הראשונה שלך? הצג כיצד להתחבר",
+      "hint": "לאחר לחיצה על \"התחל\" ב-Telegram, אנא לחץ על \"אשר חיבור\" למטה.",
+      "openBot": "📨 פתח את בוט Telegram כדי להתחבר",
+      "recommended": "מומלץ",
+      "title": "📨 התראות הזמנה ב-Telegram"
     },
     "title": "הפרופיל שלי"
   },

@@ -169,19 +169,25 @@
       "translating": "अनुवाद हो रहा है…"
     },
     "links": {
+      "active": "Active",
       "col": {
         "googleAccount": "Google खाता",
         "joinDate": "शामिल होने की तिथि",
         "linkStatus": "लिंक स्थिति",
         "piAccount": "Pi खाता",
         "role": "भूमिका",
+        "status": "Status",
         "user": "उपयोगकर्ता"
       },
+      "confirmDisable": "'{name}' Account को Disable करना चाहते हैं? यह Account भविष्य में सभी स्क्रीन से Block कर दिया जाएगा।",
       "desc": {
         "googleOnly": "Pi लिंक नहीं किया गया",
         "linked": "Pi + Google लिंक किया गया",
         "piOnly": "Google लिंक नहीं किया गया"
       },
+      "disable": "Disable",
+      "enable": "Enable",
+      "inactive": "Inactive",
       "noUsers": "कोई उपयोगकर्ता उपलब्ध नहीं है।",
       "searchPiUsername": "Pi Username खोजें (2 अक्षर या अधिक)",
       "searchResultCount": "खोज परिणाम {count} लोग",
@@ -191,6 +197,7 @@
         "piOnly": "केवल Pi"
       },
       "title": "खाता लिंकिंग स्थिति",
+      "toggleFailed": "Status बदलने में विफल रहा।",
       "totalCount": "कुल {count} उपयोगकर्ता"
     },
     "logs": {
@@ -262,6 +269,7 @@
       "i18nSection": "बहुभाषी",
       "links": "खाता लिंकिंग स्थिति",
       "logs": "Log प्रबंधन",
+      "monitor": "रीयल-टाइम Monitoring",
       "payments": "भुगतान इतिहास",
       "reports": "रिपोर्ट्स",
       "settle": "निपटान प्रबंधन",
@@ -1267,7 +1275,9 @@
     "chargeSuccess": "{bean} Bean रिचार्ज सफल!",
     "chargeTitle": "Bean रिचार्ज करें",
     "customLabel": "मैन्युअल रूप से दर्ज करें (Bean)",
+    "goCharge": "+ Bean Charge करने जाएँ",
     "loading": "लोड हो रहा है…",
+    "loadMore": "और देखें ({count}/{total})",
     "loginRequired": "लॉगिन करने के बाद उपलब्ध है",
     "minCharge": "न्यूनतम {min} Bean (1π) से पूर्णांक में रिचार्ज किया जा सकता है",
     "myBalance": "मेरा Bean शेष",
@@ -1277,6 +1287,7 @@
     "title": "Bean वॉलेट",
     "txnEmpty": "कोई लेन-देन इतिहास नहीं है",
     "txnTitle": "लेन-देन इतिहास",
+    "txnTotal": "कुल {count} लेनदेन",
     "type": {
       "CHARGE": "रिचार्ज",
       "REFUND": "वापसी",
@@ -2186,6 +2197,7 @@
     "lbs": {
       "agreeCta": "📍 स्थान सेवाओं से सहमत हों",
       "agreed": "सहमत",
+      "consentedAt": "सहमति की तिथि: {date}",
       "historyDesc": "स्थान सूचना अधिनियम की धारा 16 के अनुसार डेटा विषय का देखने का अधिकार। केवल प्रशासनिक क्षेत्र इकाइयाँ प्रदर्शित की जाती हैं।",
       "historyTitle": "मेरे स्थान संग्रह का इतिहास",
       "locTypeJoin": "शामिल हों",
@@ -2203,6 +2215,7 @@
     },
     "loginRequired": "Login आवश्यक है",
     "payment": {
+      "defaultMemo": "भुगतान",
       "empty": "कोई भुगतान इतिहास नहीं है।",
       "status": {
         "approved": "अनुमोदित",
@@ -2212,13 +2225,18 @@
     },
     "subscr": {
       "autoRenewOff": "स्वचालित नवीनीकरण रद्द कर दिया गया है।",
+      "autoRenewOffShort": "Auto-renewal Off",
       "autoRenewOn": "स्वचालित नवीनीकरण सक्रिय है",
+      "autoRenewOnShort": "स्वचालित नवीनीकरण",
       "cancelAutoRenew": "स्वचालित नवीनीकरण रद्द करें",
       "cancelConfirm": "यदि आप सदस्यता रद्द करते हैं, तो समाप्ति तिथि तक उपयोग करने के बाद स्वचालित नवीनीकरण बंद हो जाएगा। क्या आप जारी रखना चाहते हैं?",
       "cancelError": "रद्द करने में विफल रहा। कृपया पुनः प्रयास करें।",
       "cancelOk": "सदस्यता रद्द कर दी गई है। आप समाप्ति तिथि तक इसका उपयोग कर सकते हैं।",
+      "countActive": "{count} सक्रिय सदस्यताएँ",
       "currentPlan": "वर्तमान Plan",
-      "expireDate": "समाप्ति तिथि: {date}"
+      "empty": "वर्तमान में कोई सदस्यता वाले उत्पाद नहीं हैं।",
+      "expireDate": "समाप्ति तिथि: {date}",
+      "viewPlans": "सदस्यता Plan देखें →"
     },
     "subscrExtra": {
       "autoStopOnFail": "भुगतान विफलता पर भी स्वचालित नवीनीकरण स्वतः बंद हो जाएगा।",
@@ -2226,20 +2244,42 @@
       "confirmCancel": "मैंने जानकारी की पुष्टि कर ली है। मैं सदस्यता रद्द करता हूँ।",
       "goBack": "वापस जाएँ",
       "noPartialRefund": "आंशिक वापसी और शेष अवधि के लिए वापसी प्रदान नहीं की जाती है।",
+      "noRefundOnCancel": "रद्द करने पर तुरंत कोई वापसी नहीं होगी।",
       "noticeTitle": "सदस्यता रद्द करने से पहले सूचना",
       "policyRef": "Pi Network PiRC2 रद्दकरण/वापसी नीति",
       "remainHint": "शेष अवधि का उपयोग समाप्ति तिथि तक सामान्य रूप से किया जा सकता है।",
       "usableUntil": "{date} तक सामान्य रूप से उपयोग किया जा सकता है।"
     },
     "tabs": {
+      "bean": "Bean Wallet",
       "info": "व्यक्तिगत जानकारी",
+      "lbs": "📍 Location Service",
       "payment": "भुगतान इतिहास",
+      "store": "🛍️ मेरा PiShop™",
       "subscr": "सदस्यता स्थिति"
     },
     "tabsExtra": {
       "fullView": "पूर्ण स्क्रीन →",
       "lbs": "📍 Location Service",
       "store": "🛍️ Store"
+    },
+    "telegram": {
+      "botNotReady": "Notification Bot अभी तैयार हो रहा है। कृपया कुछ देर बाद फिर से जांचें।",
+      "confirm": "Connection Confirm करें",
+      "confirming": "Confirming…",
+      "connected": "✅ Connected — Order Notification प्राप्त हो रही है",
+      "desc": "चूंकि Pi Browser में स्वयं की Notification नहीं है, इसलिए Telegram Notification की सलाह दी जाती है।",
+      "disconnect": "Disconnect",
+      "guideFooter": "Connect करने पर, हर बार जब कोई नया Order आता है, तो आपको Telegram पर Notification मिलेगी। <b>App बंद होने पर भी</b> आप उन्हें फ़ोन Notification के रूप में प्राप्त कर सकते हैं।",
+      "guideStep1": "यदि आपके फ़ोन में <b>Telegram</b> App नहीं है, तो पहले इसे Install करें। (App Store/Play Store में “Telegram” खोजें)",
+      "guideStep2": "जब आप ऊपर दिए गए <b>“📨 Telegram Bot खोलें और Connect करें”</b> बटन को दबाते हैं, तो Telegram खुल जाएगा।",
+      "guideStep3": "Telegram स्क्रीन के सबसे नीचे <b>“Start”</b> बटन को एक बार दबाएं।",
+      "guideStep4": "इस स्क्रीन पर वापस आएं और <b>“Connection Confirm करें”</b> दबाएं, फिर हो गया! ✅",
+      "guideSummary": "❓ पहली बार हैं? Connection कैसे करें देखें",
+      "hint": "Telegram में \"Start\" दबाने के बाद, नीचे \"Connection Confirm करें\" दबाएं।",
+      "openBot": "📨 Telegram Bot खोलें और Connect करें",
+      "recommended": "Recommended",
+      "title": "📨 Telegram Order Notification"
     },
     "title": "मेरी Profile"
   },

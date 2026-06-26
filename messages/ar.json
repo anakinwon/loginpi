@@ -169,19 +169,25 @@
       "translating": "جاري الترجمة…"
     },
     "links": {
+      "active": "مفعّل",
       "col": {
         "googleAccount": "حساب Google",
         "joinDate": "تاريخ الانضمام",
         "linkStatus": "حالة الربط",
         "piAccount": "حساب Pi",
         "role": "الدور",
+        "status": "الحالة",
         "user": "المستخدم"
       },
+      "confirmDisable": "هل تريد تعطيل حساب '{name}'؟ سيتم حظر هذا الحساب من جميع الشاشات في المستقبل.",
       "desc": {
         "googleOnly": "Pi غير مرتبط",
         "linked": "Pi + Google متصل",
         "piOnly": "Google غير مرتبط"
       },
+      "disable": "تعطيل",
+      "enable": "تفعيل",
+      "inactive": "غير مفعّل",
       "noUsers": "لا يوجد مستخدمون مطابقون.",
       "searchPiUsername": "ابحث عن اسم مستخدم Pi (حرفين أو أكثر)",
       "searchResultCount": "{count} نتيجة بحث",
@@ -191,6 +197,7 @@
         "piOnly": "Pi فقط"
       },
       "title": "حالة ربط الحساب",
+      "toggleFailed": "فشل تغيير الحالة.",
       "totalCount": "إجمالي {count} شخص"
     },
     "logs": {
@@ -262,6 +269,7 @@
       "i18nSection": "اللغات المتعددة",
       "links": "حالة ربط الحسابات",
       "logs": "إدارة الـ Log",
+      "monitor": "مراقبة في الوقت الفعلي",
       "payments": "سجل المدفوعات",
       "reports": "معالجة البلاغات",
       "settle": "إدارة التسويات",
@@ -1267,7 +1275,9 @@
     "chargeSuccess": "تم شحن {bean} Bean بنجاح!",
     "chargeTitle": "شحن Bean",
     "customLabel": "إدخال يدوي (Bean)",
+    "goCharge": "+ اشحن Bean",
     "loading": "جاري التحميل…",
+    "loadMore": "عرض المزيد ({count}/{total})",
     "loginRequired": "يمكنك استخدامه بعد تسجيل الدخول",
     "minCharge": "يمكنك شحن عدد صحيح من Bean بدءًا من {min} Bean (1π)",
     "myBalance": "رصيد Bean الخاص بي",
@@ -1277,6 +1287,7 @@
     "title": "محفظة Bean",
     "txnEmpty": "لا يوجد سجل معاملات",
     "txnTitle": "سجل المعاملات",
+    "txnTotal": "إجمالي {count} معاملات",
     "type": {
       "CHARGE": "شحن",
       "REFUND": "استرداد",
@@ -2186,6 +2197,7 @@
     "lbs": {
       "agreeCta": "📍 الموافقة على خدمة الموقع",
       "agreed": "موافق",
+      "consentedAt": "تاريخ الموافقة: {date}",
       "historyDesc": "حق صاحب البيانات في الاطلاع بموجب المادة 16 من قانون معلومات الموقع. يتم عرض الوحدات الإدارية فقط.",
       "historyTitle": "سجل جمع موقعي",
       "locTypeJoin": "تسجيل",
@@ -2203,6 +2215,7 @@
     },
     "loginRequired": "مطلوب Login",
     "payment": {
+      "defaultMemo": "دفع",
       "empty": "لا يوجد سجل دفع.",
       "status": {
         "approved": "موافق عليه",
@@ -2212,13 +2225,18 @@
     },
     "subscr": {
       "autoRenewOff": "التجديد التلقائي ملغي.",
+      "autoRenewOffShort": "التجديد التلقائي متوقف",
       "autoRenewOn": "التجديد التلقائي مفعل",
+      "autoRenewOnShort": "تجديد تلقائي",
       "cancelAutoRenew": "إلغاء التجديد التلقائي",
       "cancelConfirm": "إذا ألغيت اشتراكك، سيتوقف التجديد التلقائي بعد الاستخدام حتى تاريخ الانتهاء. هل تريد المتابعة؟",
       "cancelError": "فشل الإلغاء. من فضلك حاول تاني.",
       "cancelOk": "الاشتراك اتلغى. ممكن تستخدمه لحد تاريخ الانتهاء.",
+      "countActive": "{count} اشتراكات نشطة",
       "currentPlan": "الخطة الحالية",
-      "expireDate": "تاريخ الانتهاء: {date}"
+      "empty": "مفيش أي اشتراكات حاليًا.",
+      "expireDate": "تاريخ الانتهاء: {date}",
+      "viewPlans": "عرض خطط الاشتراك →"
     },
     "subscrExtra": {
       "autoStopOnFail": "سيتوقف التجديد التلقائي تلقائيًا أيضًا في حالة فشل الدفع.",
@@ -2226,20 +2244,42 @@
       "confirmCancel": "لقد أكدت الإشعار. إلغاء الاشتراك",
       "goBack": "الرجوع",
       "noPartialRefund": "لا يتم توفير استرداد جزئي أو استرداد للفترات المتبقية.",
+      "noRefundOnCancel": "لا يوجد استرداد فوري عند الإلغاء.",
       "noticeTitle": "إشعار قبل إلغاء الاشتراك",
       "policyRef": "سياسة إلغاء واسترداد Pi Network PiRC2",
       "remainHint": "الفترة المتبقية يمكن استخدامها بشكل طبيعي حتى تاريخ الانتهاء.",
       "usableUntil": "يمكن استخدامه بشكل طبيعي حتى {date}."
     },
     "tabs": {
+      "bean": "محفظة Bean",
       "info": "المعلومات الشخصية",
+      "lbs": "📍 خدمة الموقع",
       "payment": "سجل الدفع",
+      "store": "🛍️ الـ PiShop™ بتاعي",
       "subscr": "حالة الاشتراك"
     },
     "tabsExtra": {
       "fullView": "شاشة كاملة →",
       "lbs": "📍 خدمة الموقع",
       "store": "🛍️ Store"
+    },
+    "telegram": {
+      "botNotReady": "بوت الإشعارات لسه بيجهز. يرجى المحاولة مرة أخرى بعد قليل.",
+      "confirm": "تأكيد الاتصال",
+      "confirming": "جاري التأكيد…",
+      "connected": "✅ متصل — تستقبل إشعارات الطلبات",
+      "desc": "نظرًا لعدم وجود إشعارات خاصة بمتصفح Pi، نوصي بإشعارات Telegram.",
+      "disconnect": "قطع الاتصال",
+      "guideFooter": "لما توصل، هيجيلك إشعارات على Telegram كل ما يجيلك طلب جديد. هتقدر تستقبل إشعارات على موبايلك <b>حتى لو قفلت التطبيق</b>.",
+      "guideStep1": "لو معندكش تطبيق <b>Telegram</b> على موبايلك، نزّله الأول. (ابحث عن “Telegram” في App Store/Play Store)",
+      "guideStep2": "لما تدوس على زرار <b>“📨 افتح بوت Telegram للاتصال”</b> اللي فوق، Telegram هيفتح.",
+      "guideStep3": "دوس مرة واحدة على زرار <b>“ابدأ (START)”</b> اللي تحت خالص في شاشة Telegram.",
+      "guideStep4": "ارجع للشاشة دي ودوس على <b>“تأكيد الاتصال”</b> وكده يبقى خلصت! ✅",
+      "guideSummary": "❓ دي أول مرة ليك؟ شوف إزاي توصل",
+      "hint": "بعد الضغط على \"ابدأ\" في Telegram، يرجى الضغط على \"تأكيد الاتصال\" أدناه.",
+      "openBot": "افتح بوت Telegram للاتصال 📨",
+      "recommended": "موصى به",
+      "title": "إشعارات طلبات Telegram 📨"
     },
     "title": "ملفي الشخصي"
   },

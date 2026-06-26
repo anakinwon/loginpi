@@ -169,19 +169,25 @@
       "translating": "Tõlkimine…"
     },
     "links": {
+      "active": "Aktiivne",
       "col": {
         "googleAccount": "Google'i konto",
         "joinDate": "Liitumiskuupäev",
         "linkStatus": "Linkimise olek",
         "piAccount": "Pi konto",
         "role": "Roll",
+        "status": "Staatus",
         "user": "Kasutaja"
       },
+      "confirmDisable": "Kas soovite konto '{name}' keelata? See konto blokeeritakse edaspidi kõigil ekraanidel.",
       "desc": {
         "googleOnly": "Pi-ga linkimata",
         "linked": "Pi + Google ühendatud",
         "piOnly": "Google'iga linkimata"
       },
+      "disable": "Keela",
+      "enable": "Luba",
+      "inactive": "Mitteaktiivne",
       "noUsers": "Kasutajaid ei leitud.",
       "searchPiUsername": "Otsi Pi kasutajanime (vähemalt 2 tähemärki)",
       "searchResultCount": "Otsingutulemusi {count} inimest",
@@ -191,6 +197,7 @@
         "piOnly": "Ainult Pi"
       },
       "title": "Konto linkimise olek",
+      "toggleFailed": "Olekut ei õnnestunud muuta.",
       "totalCount": "Kokku {count} kasutajat"
     },
     "logs": {
@@ -262,6 +269,7 @@
       "i18nSection": "Mitmekeelsus",
       "links": "Konto linkimise staatus",
       "logs": "Log haldus",
+      "monitor": "Reaalajas jälgimine",
       "payments": "Maksete ajalugu",
       "reports": "Aruannete haldamine",
       "settle": "Arvelduse haldus",
@@ -1267,7 +1275,9 @@
     "chargeSuccess": "{bean} Bean'i laadimine edukas!",
     "chargeTitle": "Bean'i laadimine",
     "customLabel": "Sisesta käsitsi (Bean)",
+    "goCharge": "+ Lae Bean",
     "loading": "Laadimine…",
+    "loadMore": "Laadi rohkem ({count}/{total})",
     "loginRequired": "Saadaval pärast sisselogimist",
     "minCharge": "Saad laadida vähemalt {min} Bean'i (1π) täisarvudes",
     "myBalance": "Minu Bean'i saldo",
@@ -1277,6 +1287,7 @@
     "title": "Bean'i rahakott",
     "txnEmpty": "Tehingute ajalugu puudub",
     "txnTitle": "Tehingute ajalugu",
+    "txnTotal": "Kokku {count} tehingut",
     "type": {
       "CHARGE": "Laadimine",
       "REFUND": "tagasimakse",
@@ -2186,6 +2197,7 @@
     "lbs": {
       "agreeCta": "📍 Nõustu asukohateenusega",
       "agreed": "Nõustutud",
+      "consentedAt": "Nõusoleku aeg: {date}",
       "historyDesc": "Andmesubjekti õigus teavet vaadata vastavalt asukohateabe seaduse artiklile 16. Kuvatakse ainult haldusüksuste tasand.",
       "historyTitle": "Minu asukoha kogumise ajalugu",
       "locTypeJoin": "Liitumine",
@@ -2203,6 +2215,7 @@
     },
     "loginRequired": "Sisselogimine on vajalik.",
     "payment": {
+      "defaultMemo": "Makse",
       "empty": "Makseajalugu puudub.",
       "status": {
         "approved": "Kinnitatud",
@@ -2212,13 +2225,18 @@
     },
     "subscr": {
       "autoRenewOff": "Automaatne uuendamine on tühistatud.",
+      "autoRenewOffShort": "Automaatne uuendamine välja lülitatud",
       "autoRenewOn": "Automaatne uuendamine on aktiveeritud",
+      "autoRenewOnShort": "Automaatne uuendamine",
       "cancelAutoRenew": "Tühista automaatne uuendamine",
       "cancelConfirm": "Kui tühistate tellimuse, saate seda kasutada kuni aegumiskuupäevani ja automaatne uuendamine peatatakse. Kas soovite jätkata?",
       "cancelError": "Tühistamine ebaõnnestus. Palun proovige uuesti.",
       "cancelOk": "Tellimus on tühistatud. Saate seda kasutada kuni aegumiskuupäevani.",
+      "countActive": "{count} aktiivset tellimust",
       "currentPlan": "Praegune plaan",
-      "expireDate": "Aegumiskuupäev: {date}"
+      "empty": "Praegu pole ühtegi tellimust.",
+      "expireDate": "Aegumiskuupäev: {date}",
+      "viewPlans": "Vaata tellimusplaane →"
     },
     "subscrExtra": {
       "autoStopOnFail": "Isegi makse ebaõnnestumisel peatatakse automaatne uuendamine automaatselt.",
@@ -2226,20 +2244,42 @@
       "confirmCancel": "Olen teabe kinnitanud. Tühistan tellimuse.",
       "goBack": "Tagasi",
       "noPartialRefund": "Osalist tagasimakset ja tagasimakset järelejäänud perioodi eest ei pakuta.",
+      "noRefundOnCancel": "Tühistamisel kohest tagasimakset ei toimu.",
       "noticeTitle": "Teade enne tellimuse tühistamist",
       "policyRef": "Pi Network PiRC2 tühistamis- ja tagasimakse Policy",
       "remainHint": "Järelejäänud perioodi saab kasutada tavapäraselt kuni aegumiskuupäevani.",
       "usableUntil": "Saab kasutada tavapäraselt kuni {date}."
     },
     "tabs": {
+      "bean": "Beani rahakott",
       "info": "Isiklik info",
+      "lbs": "📍 Asukoha Service",
       "payment": "Makseajalugu",
+      "store": "🛍️ Minu PiShop™",
       "subscr": "Tellimuse staatus"
     },
     "tabsExtra": {
       "fullView": "Täisekraan →",
       "lbs": "📍 Location Service",
       "store": "🛍️ Store"
+    },
+    "telegram": {
+      "botNotReady": "Teavituste bot on veel ettevalmistamisel. Palun proovige hiljem uuesti.",
+      "confirm": "Kinnita ühendus",
+      "confirming": "Kinnitamine…",
+      "connected": "✅ Ühendatud — saate tellimuste teavitusi",
+      "desc": "Kuna Pi Browseril puuduvad oma teavitused, soovitame Telegrami teavitusi.",
+      "disconnect": "Ühenda lahti",
+      "guideFooter": "Pärast ühendamist saate Telegrami kaudu teavitusi iga kord, kui uus tellimus saabub. Saate teavitusi telefoni kaudu <b>isegi siis, kui rakendus on suletud</b>.",
+      "guideStep1": "Kui teil pole <b>Telegrami</b> rakendust telefonis, installige see esmalt. (Otsige \"Telegram\" App Store'ist/Play Store'ist)",
+      "guideStep2": "Kui vajutate ülalolevat nuppu <b>“📨 Ava Telegrami bot ja ühenda”</b>, avaneb Telegram.",
+      "guideStep3": "Vajutage üks kord Telegrami ekraani allosas nuppu <b>“Start”</b>.",
+      "guideStep4": "Tulge tagasi sellele ekraanile ja vajutage <b>“Kinnita ühendus”</b> – valmis! ✅",
+      "guideSummary": "❓ Kas olete uus? Vaadake, kuidas ühendada",
+      "hint": "Pärast nupu \"Start\" vajutamist Telegramis klõpsake allpool nuppu \"Kinnita ühendus\".",
+      "openBot": "📨 Ava Telegrami bot ja ühenda",
+      "recommended": "Soovitatav",
+      "title": "📨 Telegrami tellimuste teavitused"
     },
     "title": "Minu profiil"
   },

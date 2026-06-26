@@ -169,19 +169,25 @@
       "translating": "Translating…"
     },
     "links": {
+      "active": "Active",
       "col": {
         "googleAccount": "Google Account",
         "joinDate": "Join Date",
         "linkStatus": "Link Status",
         "piAccount": "Pi Account",
         "role": "Role",
+        "status": "Status",
         "user": "User"
       },
+      "confirmDisable": "Are you sure you want to disable the '{name}' account? This account will be blocked from all screens going forward.",
       "desc": {
         "googleOnly": "Pi Not Linked",
         "linked": "Pi + Google Connected",
         "piOnly": "Google Not Linked"
       },
+      "disable": "Disable",
+      "enable": "Enable",
+      "inactive": "Inactive",
       "noUsers": "No users found.",
       "searchPiUsername": "Search Pi Username (2 characters or more)",
       "searchResultCount": "Search results {count}",
@@ -191,6 +197,7 @@
         "piOnly": "Pi Only"
       },
       "title": "Account Link Status",
+      "toggleFailed": "Failed to change status.",
       "totalCount": "Total {count} Users"
     },
     "logs": {
@@ -262,6 +269,7 @@
       "i18nSection": "Internationalisation",
       "links": "Linked Accounts",
       "logs": "Log Management",
+      "monitor": "Real-time Monitoring",
       "payments": "Payments",
       "reports": "Report Management",
       "settle": "Settlement Management",
@@ -1267,7 +1275,9 @@
     "chargeSuccess": "{bean} Beans topped up successfully!",
     "chargeTitle": "Top Up Beans",
     "customLabel": "Enter custom amount (Beans)",
+    "goCharge": "+ Charge Bean",
     "loading": "Loading…",
+    "loadMore": "Load More ({count}/{total})",
     "loginRequired": "Login required to use",
     "minCharge": "You can top up a minimum of {min} Beans (1π) in whole numbers",
     "myBalance": "My Bean Balance",
@@ -1277,6 +1287,7 @@
     "title": "Bean Wallet",
     "txnEmpty": "No transaction history",
     "txnTitle": "Transaction History",
+    "txnTotal": "Total {count} Transactions",
     "type": {
       "CHARGE": "Top Up",
       "REFUND": "Refund",
@@ -2186,6 +2197,7 @@
     "lbs": {
       "agreeCta": "📍 Agree to Location Services",
       "agreed": "Agreed",
+      "consentedAt": "Consented At: {date}",
       "historyDesc": "Data subject's right to access under Article 16 of the Location Information Act. Only administrative district units are displayed.",
       "historyTitle": "My Location Collection History",
       "locTypeJoin": "Sign-up",
@@ -2203,6 +2215,7 @@
     },
     "loginRequired": "Login required",
     "payment": {
+      "defaultMemo": "Payment",
       "empty": "No payment history.",
       "status": {
         "approved": "Approved",
@@ -2212,13 +2225,18 @@
     },
     "subscr": {
       "autoRenewOff": "Auto-renewal is cancelled.",
+      "autoRenewOffShort": "Auto-renew off",
       "autoRenewOn": "Auto-renewal enabled",
+      "autoRenewOnShort": "Auto-renew",
       "cancelAutoRenew": "Cancel Auto-renewal",
       "cancelConfirm": "If you cancel your subscription, it will remain active until the expiry date, after which auto-renewal will stop. Do you wish to continue?",
       "cancelError": "Cancellation failed. Please try again.",
       "cancelOk": "Subscription cancelled. You can continue to use it until the expiry date.",
+      "countActive": "{count} Active Subscriptions",
       "currentPlan": "Current Plan",
-      "expireDate": "Expiry Date: {date}"
+      "empty": "No active subscriptions.",
+      "expireDate": "Expiry Date: {date}",
+      "viewPlans": "View Subscription Plans →"
     },
     "subscrExtra": {
       "autoStopOnFail": "Automatic renewal will automatically cease upon payment failure.",
@@ -2226,20 +2244,42 @@
       "confirmCancel": "I have confirmed the information. Cancel subscription.",
       "goBack": "Go back",
       "noPartialRefund": "Partial refunds and refunds for the remaining period are not available.",
+      "noRefundOnCancel": "No refund on cancellation.",
       "noticeTitle": "Notice before cancelling subscription",
       "policyRef": "Pi Network PiRC2 Cancellation and Refund Policy",
       "remainHint": "You can continue to use the service normally until the expiry date.",
       "usableUntil": "You can continue to use the service normally until {date}."
     },
     "tabs": {
+      "bean": "Bean Wallet",
       "info": "Personal Info",
+      "lbs": "📍 Location Services",
       "payment": "Payment History",
+      "store": "🛍️ My PiShop™",
       "subscr": "Subscription Status"
     },
     "tabsExtra": {
       "fullView": "Full Screen →",
       "lbs": "📍 Location Services",
       "store": "🛍️ Store"
+    },
+    "telegram": {
+      "botNotReady": "The notification bot isn't ready yet. Please check again shortly.",
+      "confirm": "Confirm Connection",
+      "confirming": "Confirming…",
+      "connected": "✅ Connected — Receiving order notifications",
+      "desc": "Since Pi Browser doesn't have its own notifications, we recommend Telegram notifications.",
+      "disconnect": "Disconnect",
+      "guideFooter": "Once connected, you'll receive Telegram notifications whenever a new order comes in. You'll receive phone notifications <b>even if the app is closed</b>.",
+      "guideStep1": "If you don't have the <b>Telegram</b> app on your phone, install it first. (Search for “Telegram” in the App Store/Play Store)",
+      "guideStep2": "When you press the <b>“📨 Open Telegram Bot to Connect”</b> button above, Telegram will open.",
+      "guideStep3": "At the bottom of the Telegram screen, press the <b>“Start”</b> button once.",
+      "guideStep4": "Return to this screen and press <b>“Confirm Connection”</b> to finish! ✅",
+      "guideSummary": "❓ First time? See how to connect",
+      "hint": "After pressing \"Start\" in Telegram, please press \"Confirm Connection\" below.",
+      "openBot": "📨 Open Telegram Bot to Connect",
+      "recommended": "Recommended",
+      "title": "📨 Telegram Order Notifications"
     },
     "title": "My Profile"
   },

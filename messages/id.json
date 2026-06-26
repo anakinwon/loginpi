@@ -169,19 +169,25 @@
       "translating": "Sedang Menerjemahkan…"
     },
     "links": {
+      "active": "Aktif",
       "col": {
         "googleAccount": "Akun Google",
         "joinDate": "Tanggal Bergabung",
         "linkStatus": "Status Tautan",
         "piAccount": "Akun Pi",
         "role": "Peran",
+        "status": "Status",
         "user": "Pengguna"
       },
+      "confirmDisable": "Apakah Anda ingin menonaktifkan akun '{name}'? Akun ini akan diblokir dari semua layar di masa mendatang.",
       "desc": {
         "googleOnly": "Pi tidak tertaut",
         "linked": "Pi + Google terhubung",
         "piOnly": "Google tidak tertaut"
       },
+      "disable": "Nonaktifkan",
+      "enable": "Aktifkan",
+      "inactive": "Tidak aktif",
       "noUsers": "Tidak ada pengguna yang sesuai.",
       "searchPiUsername": "Cari Nama pengguna Pi (2 karakter atau lebih)",
       "searchResultCount": "Hasil pencarian {count} orang",
@@ -191,6 +197,7 @@
         "piOnly": "Hanya Pi"
       },
       "title": "Status Tautan Akun",
+      "toggleFailed": "Gagal mengubah status.",
       "totalCount": "Total {count} pengguna"
     },
     "logs": {
@@ -262,6 +269,7 @@
       "i18nSection": "Multibahasa",
       "links": "Status Penautan Akun",
       "logs": "Manajemen Log",
+      "monitor": "Monitoring Real-time",
       "payments": "Riwayat Pembayaran",
       "reports": "Penanganan Laporan",
       "settle": "Manajemen Settlement",
@@ -1267,7 +1275,9 @@
     "chargeSuccess": "Isi ulang {bean} Bean selesai!",
     "chargeTitle": "Isi Ulang Bean",
     "customLabel": "Masukkan sendiri (Bean)",
+    "goCharge": "+ Isi Ulang Bean",
     "loading": "Memuat…",
+    "loadMore": "Muat Lebih Banyak ({count}/{total})",
     "loginRequired": "Tersedia setelah Login",
     "minCharge": "Dapat diisi ulang dalam bilangan bulat mulai dari minimal {min} Bean (1π)",
     "myBalance": "Saldo Bean saya",
@@ -1277,6 +1287,7 @@
     "title": "Dompet Bean",
     "txnEmpty": "Tidak ada riwayat transaksi",
     "txnTitle": "Riwayat Transaksi",
+    "txnTotal": "Total {count} transaksi",
     "type": {
       "CHARGE": "Isi Ulang",
       "REFUND": "Pengembalian Dana",
@@ -2186,6 +2197,7 @@
     "lbs": {
       "agreeCta": "📍 Setuju dengan Layanan Lokasi",
       "agreed": "Setuju",
+      "consentedAt": "Tanggal Persetujuan: {date}",
       "historyDesc": "Hak subjek data untuk melihat sesuai dengan Pasal 16 Undang-Undang Informasi Lokasi. Hanya unit wilayah administratif yang ditampilkan.",
       "historyTitle": "Riwayat Pengumpulan Lokasi Saya",
       "locTypeJoin": "Bergabung",
@@ -2203,6 +2215,7 @@
     },
     "loginRequired": "Login diperlukan.",
     "payment": {
+      "defaultMemo": "Pembayaran",
       "empty": "Tidak ada riwayat pembayaran.",
       "status": {
         "approved": "Disetujui",
@@ -2212,13 +2225,18 @@
     },
     "subscr": {
       "autoRenewOff": "Perpanjangan Otomatis Dibatalkan.",
+      "autoRenewOffShort": "Perpanjangan otomatis dinonaktifkan",
       "autoRenewOn": "Perpanjangan Otomatis Diaktifkan",
+      "autoRenewOnShort": "Perpanjangan Otomatis",
       "cancelAutoRenew": "Batalkan Perpanjangan Otomatis",
       "cancelConfirm": "Jika Anda membatalkan langganan, Anda dapat menggunakannya hingga tanggal kedaluwarsa dan perpanjangan otomatis akan dihentikan. Lanjutkan?",
       "cancelError": "Pembatalan gagal. Silakan coba lagi.",
       "cancelOk": "Langganan Anda telah dibatalkan. Anda dapat menggunakannya hingga tanggal kedaluwarsa.",
+      "countActive": "{count} langganan aktif",
       "currentPlan": "Paket Saat Ini",
-      "expireDate": "Tanggal Kedaluwarsa: {date}"
+      "empty": "Saat ini tidak ada produk yang dilanggan.",
+      "expireDate": "Tanggal Kedaluwarsa: {date}",
+      "viewPlans": "Lihat Paket Langganan →"
     },
     "subscrExtra": {
       "autoStopOnFail": "Pembaruan otomatis akan berhenti secara otomatis bahkan jika pembayaran gagal.",
@@ -2226,20 +2244,42 @@
       "confirmCancel": "Saya telah mengonfirmasi informasi. Batalkan langganan.",
       "goBack": "Kembali",
       "noPartialRefund": "Pengembalian dana sebagian dan pengembalian dana untuk sisa periode tidak disediakan.",
+      "noRefundOnCancel": "Tidak ada pengembalian dana saat pembatalan.",
       "noticeTitle": "Pemberitahuan Sebelum Pembatalan Langganan",
       "policyRef": "Kebijakan Pembatalan/Pengembalian Dana Pi Network PiRC2",
       "remainHint": "Sisa periode dapat digunakan secara normal hingga tanggal kedaluwarsa.",
       "usableUntil": "Dapat digunakan secara normal hingga {date}."
     },
     "tabs": {
+      "bean": "Dompet Bean",
       "info": "Informasi Pribadi",
+      "lbs": "📍 Lokasi Service",
       "payment": "Riwayat Pembayaran",
+      "store": "🛍️ PiShop™ Saya",
       "subscr": "Status Langganan"
     },
     "tabsExtra": {
       "fullView": "Layar Penuh →",
       "lbs": "📍 Layanan Lokasi",
       "store": "🛍️ Store"
+    },
+    "telegram": {
+      "botNotReady": "Bot notifikasi masih dalam persiapan. Mohon periksa kembali nanti.",
+      "confirm": "Konfirmasi koneksi",
+      "confirming": "Mengonfirmasi…",
+      "connected": "✅ Terhubung — Anda menerima notifikasi pesanan",
+      "desc": "Karena Pi Browser tidak memiliki notifikasi sendiri, kami merekomendasikan notifikasi Telegram.",
+      "disconnect": "Putuskan koneksi",
+      "guideFooter": "Setelah terhubung, Anda akan menerima notifikasi Telegram setiap kali ada pesanan baru. Anda dapat menerimanya sebagai notifikasi ponsel <b>bahkan jika aplikasi ditutup</b>.",
+      "guideStep1": "Jika Anda tidak memiliki aplikasi <b>Telegram</b> di ponsel Anda, instal terlebih dahulu. (Cari “Telegram” di App Store/Play Store)",
+      "guideStep2": "Saat Anda menekan tombol <b>“📨 Buka bot Telegram untuk menghubungkan”</b> di atas, Telegram akan terbuka.",
+      "guideStep3": "Di bagian bawah layar Telegram, tekan tombol <b>“Mulai (START)”</b> sekali.",
+      "guideStep4": "Kembali ke layar ini, dan tekan <b>“Konfirmasi koneksi”</b> untuk selesai! ✅",
+      "guideSummary": "❓ Baru pertama kali? Lihat cara menghubungkan",
+      "hint": "Setelah menekan \"Mulai\" di Telegram, silakan tekan \"Konfirmasi koneksi\" di bawah.",
+      "openBot": "📨 Buka bot Telegram untuk menghubungkan",
+      "recommended": "Direkomendasikan",
+      "title": "📨 Notifikasi Pesanan Telegram"
     },
     "title": "Profil Saya"
   },

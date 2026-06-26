@@ -169,19 +169,25 @@
       "translating": "Traduciendo…"
     },
     "links": {
+      "active": "Activo",
       "col": {
         "googleAccount": "Cuenta Google",
         "joinDate": "Fecha de registro",
         "linkStatus": "Estado de vinculación",
         "piAccount": "Cuenta Pi",
         "role": "Rol",
+        "status": "Estado",
         "user": "Usuario"
       },
+      "confirmDisable": "¿Desea desactivar la cuenta '{name}'? Esta cuenta será bloqueada de todas las pantallas en el futuro.",
       "desc": {
         "googleOnly": "Pi no vinculado",
         "linked": "Pi + Google conectados",
         "piOnly": "Google no vinculado"
       },
+      "disable": "Desactivar",
+      "enable": "Habilitar",
+      "inactive": "Inactivo",
       "noUsers": "No hay usuarios.",
       "searchPiUsername": "Buscar nombre de usuario Pi (2 caracteres o más)",
       "searchResultCount": "{count} resultados de búsqueda",
@@ -191,6 +197,7 @@
         "piOnly": "Solo Pi"
       },
       "title": "Estado de vinculación de cuenta",
+      "toggleFailed": "Error al cambiar el estado.",
       "totalCount": "Total {count} usuarios"
     },
     "logs": {
@@ -262,6 +269,7 @@
       "i18nSection": "Internacionalización",
       "links": "Estado de vinculación de cuentas",
       "logs": "Gestión de Logs",
+      "monitor": "Real-time Monitoring",
       "payments": "Historial de pagos",
       "reports": "Gestión de informes",
       "settle": "Gestión de Liquidaciones",
@@ -1267,7 +1275,9 @@
     "chargeSuccess": "¡Recarga de {bean} Bean completada!",
     "chargeTitle": "Recargar Bean",
     "customLabel": "Introducir manualmente (Bean)",
+    "goCharge": "+ Cargar Bean",
     "loading": "Cargando…",
+    "loadMore": "Cargar más ({count}/{total})",
     "loginRequired": "Disponible después de iniciar sesión",
     "minCharge": "Puedes recargar un mínimo de {min} Bean (1π) en números enteros",
     "myBalance": "Mi saldo de Bean",
@@ -1277,6 +1287,7 @@
     "title": "Billetera Bean",
     "txnEmpty": "No hay historial de transacciones",
     "txnTitle": "Historial de transacciones",
+    "txnTotal": "Total: {count} transacciones",
     "type": {
       "CHARGE": "Recarga",
       "REFUND": "Reembolso",
@@ -2186,6 +2197,7 @@
     "lbs": {
       "agreeCta": "📍 Aceptar servicios de ubicación",
       "agreed": "Aceptado",
+      "consentedAt": "Fecha de consentimiento: {date}",
       "historyDesc": "Derecho de acceso del interesado según el Artículo 16 de la Ley de Información de Ubicación. Solo se muestran las unidades administrativas.",
       "historyTitle": "Historial de recopilación de mi ubicación",
       "locTypeJoin": "Registro",
@@ -2203,6 +2215,7 @@
     },
     "loginRequired": "Se requiere iniciar sesión.",
     "payment": {
+      "defaultMemo": "Pago",
       "empty": "No hay historial de pagos.",
       "status": {
         "approved": "Aprobado",
@@ -2212,13 +2225,18 @@
     },
     "subscr": {
       "autoRenewOff": "La renovación automática ha sido cancelada.",
+      "autoRenewOffShort": "Renovación automática desactivada",
       "autoRenewOn": "Renovación automática activada",
+      "autoRenewOnShort": "Renovación automática",
       "cancelAutoRenew": "Cancelar renovación automática",
       "cancelConfirm": "Si cancela su suscripción, podrá usarla hasta la fecha de vencimiento y la renovación automática se detendrá. ¿Desea continuar?",
       "cancelError": "Error al cancelar. Por favor, inténtelo de nuevo.",
       "cancelOk": "La suscripción ha sido cancelada. Puede usarla hasta la fecha de vencimiento.",
+      "countActive": "{count} suscripciones activas",
       "currentPlan": "Plan actual",
-      "expireDate": "Fecha de vencimiento: {date}"
+      "empty": "Actualmente no hay productos suscritos.",
+      "expireDate": "Fecha de vencimiento: {date}",
+      "viewPlans": "Ver planes de suscripción →"
     },
     "subscrExtra": {
       "autoStopOnFail": "La renovación automática se detendrá automáticamente incluso en caso de fallo de pago.",
@@ -2226,20 +2244,42 @@
       "confirmCancel": "He confirmado la información. Cancelar suscripción",
       "goBack": "Volver",
       "noPartialRefund": "No se ofrecen reembolsos parciales ni reembolsos por el período restante.",
+      "noRefundOnCancel": "No hay reembolso inmediato al cancelar.",
       "noticeTitle": "Aviso antes de cancelar la suscripción",
       "policyRef": "Pi Network PiRC2 Política de cancelación y reembolso",
       "remainHint": "El período restante se puede utilizar normalmente hasta la fecha de vencimiento.",
       "usableUntil": "Se puede utilizar normalmente hasta {date}."
     },
     "tabs": {
+      "bean": "Bean Wallet",
       "info": "Información personal",
+      "lbs": "📍 Servicios de ubicación",
       "payment": "Historial de pagos",
+      "store": "🛍️ Mi PiShop™",
       "subscr": "Estado de la suscripción"
     },
     "tabsExtra": {
       "fullView": "Pantalla completa →",
       "lbs": "📍 Servicios de ubicación",
       "store": "🛍️ Store"
+    },
+    "telegram": {
+      "botNotReady": "El bot de notificaciones aún se está preparando. Por favor, inténtelo de nuevo más tarde.",
+      "confirm": "Confirmar conexión",
+      "confirming": "Confirmando…",
+      "connected": "✅ Conectado — está recibiendo notificaciones de pedidos",
+      "desc": "Dado que Pi Browser no tiene notificaciones propias, se recomiendan las notificaciones de Telegram.",
+      "disconnect": "Desconectar",
+      "guideFooter": "Una vez conectado, recibirá notificaciones en Telegram cada vez que llegue un nuevo pedido. <b>Incluso si cierra la aplicación</b>, las recibirá como notificaciones en su teléfono.",
+      "guideStep1": "Si no tiene la aplicación <b>Telegram</b> en su teléfono, instálela primero. (Busque “Telegram” en App Store/Play Store)",
+      "guideStep2": "Al presionar el botón de arriba <b>“📨 Abrir el bot de Telegram para conectar”</b>, Telegram se abrirá.",
+      "guideStep3": "Presione el botón <b>“Iniciar (START)”</b> una vez en la parte inferior de la pantalla de Telegram.",
+      "guideStep4": "Vuelva a esta pantalla y presione <b>“Confirmar conexión”</b> para finalizar. ✅",
+      "guideSummary": "❓ ¿Es la primera vez? Ver cómo conectar",
+      "hint": "Después de presionar \"Iniciar\" en Telegram, presione \"Confirmar conexión\" a continuación.",
+      "openBot": "📨 Abrir el bot de Telegram para conectar",
+      "recommended": "Recomendado",
+      "title": "📨 Notificaciones de pedidos de Telegram"
     },
     "title": "Mi perfil"
   },

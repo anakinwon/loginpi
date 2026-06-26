@@ -169,19 +169,25 @@
       "translating": "Menterjemah…"
     },
     "links": {
+      "active": "Aktif",
       "col": {
         "googleAccount": "Akaun Google",
         "joinDate": "Tarikh Sertai",
         "linkStatus": "Status Pautan",
         "piAccount": "Akaun Pi",
         "role": "Peranan",
+        "status": "Status",
         "user": "Pengguna"
       },
+      "confirmDisable": "Adakah anda pasti ingin menyahaktifkan akaun '{name}'? Akaun ini akan disekat daripada semua skrin pada masa hadapan.",
       "desc": {
         "googleOnly": "Pi tidak berpaut",
         "linked": "Pi + Google disambungkan",
         "piOnly": "Google tidak berpaut"
       },
+      "disable": "Nyahaktifkan",
+      "enable": "Aktifkan semula",
+      "inactive": "Tidak aktif",
       "noUsers": "Tiada pengguna yang sepadan.",
       "searchPiUsername": "Cari Nama Pengguna Pi (2 aksara atau lebih)",
       "searchResultCount": "Hasil carian {count} orang",
@@ -191,6 +197,7 @@
         "piOnly": "Pi Sahaja"
       },
       "title": "Status Pautan Akaun",
+      "toggleFailed": "Gagal menukar status.",
       "totalCount": "Jumlah {count} pengguna"
     },
     "logs": {
@@ -262,6 +269,7 @@
       "i18nSection": "Pelbagai Bahasa",
       "links": "Status Pautan Akaun",
       "logs": "Pengurusan Log",
+      "monitor": "Monitoring Masa Nyata",
       "payments": "Sejarah Pembayaran",
       "reports": "Pemprosesan Laporan",
       "settle": "Pengurusan Penyelesaian",
@@ -1267,7 +1275,9 @@
     "chargeSuccess": "Pengecasan semula {bean} Bean selesai!",
     "chargeTitle": "Cas semula Bean",
     "customLabel": "Masukkan sendiri (Bean)",
+    "goCharge": "+ Pergi Cas Bean",
     "loading": "Sedang memuatkan…",
+    "loadMore": "Muat Lagi ({count}/{total})",
     "loginRequired": "Boleh digunakan selepas log masuk",
     "minCharge": "Boleh dicas semula dalam nombor bulat bermula dari minimum {min} Bean (1π)",
     "myBalance": "Baki Bean saya",
@@ -1277,6 +1287,7 @@
     "title": "Dompet Bean",
     "txnEmpty": "Tiada sejarah transaksi",
     "txnTitle": "Sejarah Transaksi",
+    "txnTotal": "Jumlah {count} transaksi",
     "type": {
       "CHARGE": "Cas semula",
       "REFUND": "Pulangan",
@@ -2186,6 +2197,7 @@
     "lbs": {
       "agreeCta": "📍 Bersetuju dengan Perkhidmatan Lokasi",
       "agreed": "Bersetuju",
+      "consentedAt": "Tarikh Persetujuan: {date}",
       "historyDesc": "Hak subjek data untuk melihat mengikut Artikel 16 Akta Maklumat Lokasi. Hanya unit daerah pentadbiran yang dipaparkan.",
       "historyTitle": "Sejarah Pengumpulan Lokasi Saya",
       "locTypeJoin": "Daftar",
@@ -2203,6 +2215,7 @@
     },
     "loginRequired": "Login diperlukan.",
     "payment": {
+      "defaultMemo": "Pembayaran",
       "empty": "Tiada sejarah pembayaran.",
       "status": {
         "approved": "Diluluskan",
@@ -2212,13 +2225,18 @@
     },
     "subscr": {
       "autoRenewOff": "Pembaharuan auto telah dibatalkan.",
+      "autoRenewOffShort": "Pembaharuan automatik dimatikan",
       "autoRenewOn": "Pembaharuan Auto Diaktifkan",
+      "autoRenewOnShort": "Pembaharuan Auto",
       "cancelAutoRenew": "Batalkan Pembaharuan Auto",
       "cancelConfirm": "Jika anda membatalkan langganan, pembaharuan auto akan dihentikan selepas penggunaan sehingga tarikh tamat tempoh. Adakah anda ingin meneruskan?",
       "cancelError": "Pembatalan gagal. Sila cuba lagi.",
       "cancelOk": "Langganan telah dibatalkan. Anda boleh menggunakannya sehingga tarikh luput.",
+      "countActive": "{count} langganan aktif",
       "currentPlan": "Pelan Semasa",
-      "expireDate": "Tarikh Tamat Tempoh: {date}"
+      "empty": "Tiada langganan aktif pada masa ini.",
+      "expireDate": "Tarikh Tamat Tempoh: {date}",
+      "viewPlans": "Lihat Pelan Langganan →"
     },
     "subscrExtra": {
       "autoStopOnFail": "Pembaharuan automatik akan dihentikan secara automatik walaupun pembayaran gagal.",
@@ -2226,20 +2244,42 @@
       "confirmCancel": "Saya telah mengesahkan maklumat. Batalkan langganan.",
       "goBack": "Kembali",
       "noPartialRefund": "Bayaran balik separa dan bayaran balik tempoh baki tidak disediakan.",
+      "noRefundOnCancel": "Tiada bayaran balik serta-merta selepas pembatalan.",
       "noticeTitle": "Notis sebelum membatalkan langganan",
       "policyRef": "Dasar Pembatalan/Bayaran Balik Pi Network PiRC2",
       "remainHint": "Tempoh baki boleh digunakan seperti biasa sehingga tarikh luput.",
       "usableUntil": "Boleh digunakan seperti biasa sehingga {date}."
     },
     "tabs": {
+      "bean": "Dompet Bean",
       "info": "Maklumat Peribadi",
+      "lbs": "📍 Perkhidmatan Lokasi",
       "payment": "Sejarah Pembayaran",
+      "store": "🛍️ PiShop™ Saya",
       "subscr": "Status Langganan"
     },
     "tabsExtra": {
       "fullView": "Skrin Penuh →",
       "lbs": "📍 Perkhidmatan Lokasi",
       "store": "🛍️ Store"
+    },
+    "telegram": {
+      "botNotReady": "Bot pemberitahuan masih dalam persediaan. Sila cuba lagi sebentar lagi.",
+      "confirm": "Sahkan sambungan",
+      "confirming": "Mengesahkan…",
+      "connected": "✅ Bersambung — anda menerima pemberitahuan pesanan",
+      "desc": "Oleh kerana Pi Browser tidak mempunyai pemberitahuan sendiri, pemberitahuan Telegram disyorkan.",
+      "disconnect": "Putuskan sambungan",
+      "guideFooter": "Apabila disambungkan, anda akan menerima pemberitahuan Telegram setiap kali pesanan baharu masuk. Anda boleh menerimanya sebagai pemberitahuan telefon <b>walaupun aplikasi ditutup</b>.",
+      "guideStep1": "Jika anda tidak mempunyai aplikasi <b>Telegram</b> pada telefon anda, sila pasang dahulu. (Cari “Telegram” di App Store/Play Store)",
+      "guideStep2": "Apabila anda menekan butang <b>“📨 Buka bot Telegram untuk menyambung”</b> di atas, Telegram akan dibuka.",
+      "guideStep3": "Tekan butang <b>“Mula (START)”</b> sekali di bahagian bawah skrin Telegram.",
+      "guideStep4": "Kembali ke skrin ini dan tekan <b>“Sahkan sambungan”</b> untuk selesai! ✅",
+      "guideSummary": "❓ Baru pertama kali? Lihat cara menyambung",
+      "hint": "Selepas menekan \"Mula\" di Telegram, sila tekan \"Sahkan sambungan\" di bawah.",
+      "openBot": "📨 Buka bot Telegram untuk menyambung",
+      "recommended": "Disyorkan",
+      "title": "📨 Pemberitahuan Pesanan Telegram"
     },
     "title": "Profil Saya"
   },

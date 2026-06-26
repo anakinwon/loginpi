@@ -169,19 +169,25 @@
       "translating": "Übersetze…"
     },
     "links": {
+      "active": "Aktiv",
       "col": {
         "googleAccount": "Google-Konto",
         "joinDate": "Beitrittsdatum",
         "linkStatus": "Verknüpfungsstatus",
         "piAccount": "Pi-Konto",
         "role": "Rolle",
+        "status": "Status",
         "user": "Benutzer"
       },
+      "confirmDisable": "Möchten Sie das Konto '{name}' deaktivieren? Dieses Konto wird ab sofort auf allen Bildschirmen blockiert.",
       "desc": {
         "googleOnly": "Pi nicht verknüpft",
         "linked": "Pi + Google verbunden",
         "piOnly": "Google nicht verknüpft"
       },
+      "disable": "Deaktivieren",
+      "enable": "Aktivieren",
+      "inactive": "Inaktiv",
       "noUsers": "Keine Benutzer gefunden.",
       "searchPiUsername": "Pi Benutzername suchen (mind. 2 Zeichen)",
       "searchResultCount": "Suchergebnisse {count}",
@@ -191,6 +197,7 @@
         "piOnly": "Nur Pi"
       },
       "title": "Kontoverknüpfungsstatus",
+      "toggleFailed": "Statusänderung fehlgeschlagen.",
       "totalCount": "Insgesamt {count} Benutzer"
     },
     "logs": {
@@ -262,6 +269,7 @@
       "i18nSection": "Internationalisierung",
       "links": "Kontoverknüpfungsstatus",
       "logs": "Log-Verwaltung",
+      "monitor": "Echtzeit-Monitoring",
       "payments": "Zahlungsverlauf",
       "reports": "Meldungen bearbeiten",
       "settle": "Abrechnungsverwaltung",
@@ -1267,7 +1275,9 @@
     "chargeSuccess": "{bean} Bean erfolgreich aufgeladen!",
     "chargeTitle": "Bean aufladen",
     "customLabel": "Manuelle Eingabe (Bean)",
+    "goCharge": "+ Beans aufladen",
     "loading": "Wird geladen…",
+    "loadMore": "Mehr laden ({count}/{total})",
     "loginRequired": "Nach dem Login verfügbar",
     "minCharge": "Sie können mindestens {min} Bean (1π) in ganzen Zahlen aufladen",
     "myBalance": "Mein Bean-Guthaben",
@@ -1277,6 +1287,7 @@
     "title": "Bean Wallet",
     "txnEmpty": "Keine Transaktionen vorhanden",
     "txnTitle": "Transaktionsverlauf",
+    "txnTotal": "Insgesamt {count} Transaktionen",
     "type": {
       "CHARGE": "Aufladen",
       "REFUND": "Rückerstattung",
@@ -2186,6 +2197,7 @@
     "lbs": {
       "agreeCta": "📍 Standortdiensten zustimmen",
       "agreed": "Zugestimmt",
+      "consentedAt": "Zustimmungsdatum: {date}",
       "historyDesc": "Recht des Datensubjekts auf Einsichtnahme gemäß Artikel 16 des Gesetzes über Standortinformationen. Es werden nur Verwaltungseinheiten angezeigt.",
       "historyTitle": "Verlauf meiner Standortdatenerfassung",
       "locTypeJoin": "Registrierung",
@@ -2203,6 +2215,7 @@
     },
     "loginRequired": "Login erforderlich",
     "payment": {
+      "defaultMemo": "Zahlung",
       "empty": "Kein Zahlungsverlauf vorhanden.",
       "status": {
         "approved": "Genehmigt",
@@ -2212,13 +2225,18 @@
     },
     "subscr": {
       "autoRenewOff": "Automatische Verlängerung ist deaktiviert.",
+      "autoRenewOffShort": "Automatische Verlängerung deaktiviert",
       "autoRenewOn": "Automatische Verlängerung aktiviert",
+      "autoRenewOnShort": "Automatische Verlängerung",
       "cancelAutoRenew": "Automatische Verlängerung stornieren",
       "cancelConfirm": "Wenn Sie das Abonnement kündigen, wird die automatische Verlängerung nach Ablauf der Nutzungsdauer eingestellt. Möchten Sie fortfahren?",
       "cancelError": "Die Kündigung ist fehlgeschlagen. Bitte versuchen Sie es erneut.",
       "cancelOk": "Das Abonnement wurde gekündigt. Es kann bis zum Ablaufdatum genutzt werden.",
+      "countActive": "{count} Abonnements aktiv",
       "currentPlan": "Aktueller Plan",
-      "expireDate": "Ablaufdatum: {date}"
+      "empty": "Sie haben derzeit keine Abonnements.",
+      "expireDate": "Ablaufdatum: {date}",
+      "viewPlans": "Abonnement Plans ansehen →"
     },
     "subscrExtra": {
       "autoStopOnFail": "Auch bei fehlgeschlagener Zahlung wird die automatische Verlängerung automatisch gestoppt.",
@@ -2226,20 +2244,42 @@
       "confirmCancel": "Ich habe die Hinweise bestätigt. Ich kündige das Abonnement.",
       "goBack": "Zurück",
       "noPartialRefund": "Teilrückerstattungen und Rückerstattungen für die Restlaufzeit werden nicht angeboten.",
+      "noRefundOnCancel": "Keine sofortige Rückerstattung bei Stornierung.",
       "noticeTitle": "Hinweis vor der Abonnementkündigung",
       "policyRef": "Pi Network PiRC2 Stornierungs- und Rückerstattungsrichtlinie",
       "remainHint": "Die verbleibende Laufzeit kann bis zum Ablaufdatum normal genutzt werden.",
       "usableUntil": "Kann bis zum {date} normal genutzt werden."
     },
     "tabs": {
+      "bean": "Bean Wallet",
       "info": "Persönliche Informationen",
+      "lbs": "📍 Standort Service",
       "payment": "Zahlungsverlauf",
+      "store": "🛍️ Mein PiShop™",
       "subscr": "Abonnementstatus"
     },
     "tabsExtra": {
       "fullView": "Vollbild →",
       "lbs": "📍 Location Service",
       "store": "🛍️ Store"
+    },
+    "telegram": {
+      "botNotReady": "Der Benachrichtigungs-Bot wird noch vorbereitet. Bitte versuchen Sie es später erneut.",
+      "confirm": "Verbindung bestätigen",
+      "confirming": "Wird bestätigt…",
+      "connected": "✅ Verbunden — Sie erhalten Bestellbenachrichtigungen",
+      "desc": "Da der Pi Browser keine eigenen Benachrichtigungen hat, empfehlen wir Telegram-Benachrichtigungen.",
+      "disconnect": "Verbindung trennen",
+      "guideFooter": "Sobald die Verbindung hergestellt ist, erhalten Sie Telegram-Benachrichtigungen, sobald eine neue Bestellung eingeht. Sie können Benachrichtigungen auf Ihrem Telefon erhalten, <b>auch wenn die App geschlossen ist</b>.",
+      "guideStep1": "Wenn Sie die <b>Telegram</b>-App nicht auf Ihrem Telefon haben, installieren Sie sie zuerst. (Suchen Sie im App Store/Play Store nach „Telegram“)",
+      "guideStep2": "Wenn Sie oben auf die Schaltfläche <b>„📨 Telegram-Bot öffnen und verbinden“</b> tippen, wird Telegram geöffnet.",
+      "guideStep3": "Tippen Sie einmal auf die Schaltfläche <b>„Start“</b> ganz unten auf dem Telegram-Bildschirm.",
+      "guideStep4": "Kehren Sie zu diesem Bildschirm zurück und tippen Sie auf <b>„Verbindung bestätigen“</b>, um den Vorgang abzuschließen! ✅",
+      "guideSummary": "❓ Neu hier? Anleitung zur Verbindung anzeigen",
+      "hint": "Nachdem Sie in Telegram auf „Start“ getippt haben, tippen Sie bitte unten auf „Verbindung bestätigen“.",
+      "openBot": "📨 Telegram-Bot öffnen und verbinden",
+      "recommended": "Empfohlen",
+      "title": "📨 Telegram Bestellbenachrichtigungen"
     },
     "title": "Mein Profil"
   },

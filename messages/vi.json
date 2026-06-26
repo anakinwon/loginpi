@@ -169,19 +169,25 @@
       "translating": "Đang dịch…"
     },
     "links": {
+      "active": "Hoạt động",
       "col": {
         "googleAccount": "Tài khoản Google",
         "joinDate": "Ngày tham gia",
         "linkStatus": "Trạng thái liên kết",
         "piAccount": "Tài khoản Pi",
         "role": "Vai trò",
+        "status": "Trạng thái",
         "user": "Người dùng"
       },
+      "confirmDisable": "Bạn có muốn vô hiệu hóa tài khoản '{name}' không? Tài khoản này sẽ bị chặn khỏi tất cả các màn hình trong tương lai.",
       "desc": {
         "googleOnly": "Pi chưa liên kết",
         "linked": "Pi + Google đã kết nối",
         "piOnly": "Google chưa liên kết"
       },
+      "disable": "Vô hiệu hóa",
+      "enable": "Kích hoạt",
+      "inactive": "Không hoạt động",
       "noUsers": "Không có người dùng nào.",
       "searchPiUsername": "Tìm kiếm tên người dùng Pi (tối thiểu 2 ký tự)",
       "searchResultCount": "{count} kết quả tìm kiếm",
@@ -191,6 +197,7 @@
         "piOnly": "Chỉ Pi"
       },
       "title": "Trạng thái liên kết tài khoản",
+      "toggleFailed": "Thay đổi trạng thái thất bại.",
       "totalCount": "Tổng cộng {count} người"
     },
     "logs": {
@@ -262,6 +269,7 @@
       "i18nSection": "Đa ngôn ngữ",
       "links": "Trạng thái liên kết tài khoản",
       "logs": "Quản lý Log",
+      "monitor": "Monitoring thời gian thực",
       "payments": "Lịch sử thanh toán",
       "reports": "Xử lý báo cáo",
       "settle": "Quản lý thanh toán",
@@ -1267,7 +1275,9 @@
     "chargeSuccess": "Nạp {bean} Bean thành công!",
     "chargeTitle": "Nạp Bean",
     "customLabel": "Nhập thủ công (Bean)",
+    "goCharge": "+ Nạp Bean",
     "loading": "Đang tải…",
+    "loadMore": "Xem thêm ({count}/{total})",
     "loginRequired": "Bạn có thể sử dụng sau khi đăng nhập",
     "minCharge": "Bạn có thể nạp tối thiểu {min} Bean (1π) dưới dạng số nguyên",
     "myBalance": "Số dư Bean của tôi",
@@ -1277,6 +1287,7 @@
     "title": "Ví Bean",
     "txnEmpty": "Không có lịch sử giao dịch",
     "txnTitle": "Lịch sử giao dịch",
+    "txnTotal": "Tổng cộng {count} giao dịch",
     "type": {
       "CHARGE": "Nạp tiền",
       "REFUND": "Hoàn tiền",
@@ -2186,6 +2197,7 @@
     "lbs": {
       "agreeCta": "📍 Đồng ý dịch vụ vị trí",
       "agreed": "Đã đồng ý",
+      "consentedAt": "Thời gian đồng ý: {date}",
       "historyDesc": "Quyền truy cập của chủ thể thông tin theo Điều 16 của Luật Thông tin vị trí. Chỉ hiển thị đơn vị hành chính.",
       "historyTitle": "Lịch sử thu thập vị trí của tôi",
       "locTypeJoin": "Đăng ký",
@@ -2203,6 +2215,7 @@
     },
     "loginRequired": "Yêu cầu đăng nhập",
     "payment": {
+      "defaultMemo": "Thanh toán",
       "empty": "Không có lịch sử thanh toán.",
       "status": {
         "approved": "Đã duyệt",
@@ -2212,13 +2225,18 @@
     },
     "subscr": {
       "autoRenewOff": "Tự động gia hạn đã bị hủy.",
+      "autoRenewOffShort": "Tự động gia hạn đã tắt",
       "autoRenewOn": "Tự động gia hạn đã được bật",
+      "autoRenewOnShort": "Tự động gia hạn",
       "cancelAutoRenew": "Hủy tự động gia hạn",
       "cancelConfirm": "Nếu bạn hủy đăng ký, sau khi sử dụng đến ngày hết hạn, tự động gia hạn sẽ bị dừng. Bạn có muốn tiếp tục không?",
       "cancelError": "Hủy thất bại. Vui lòng thử lại.",
       "cancelOk": "Đăng ký đã bị hủy. Bạn có thể sử dụng đến ngày hết hạn.",
+      "countActive": "Đang đăng ký {count} sản phẩm",
       "currentPlan": "Plan hiện tại",
-      "expireDate": "Ngày hết hạn: {date}"
+      "empty": "Hiện không có sản phẩm đăng ký nào.",
+      "expireDate": "Ngày hết hạn: {date}",
+      "viewPlans": "Xem gói đăng ký →"
     },
     "subscrExtra": {
       "autoStopOnFail": "Ngay cả khi thanh toán thất bại, gia hạn tự động sẽ tự động dừng lại.",
@@ -2226,20 +2244,42 @@
       "confirmCancel": "Tôi đã xác nhận thông báo. Hủy đăng ký.",
       "goBack": "Quay lại",
       "noPartialRefund": "Không cung cấp hoàn tiền một phần và hoàn tiền cho thời gian còn lại.",
+      "noRefundOnCancel": "Không hoàn tiền ngay khi hủy.",
       "noticeTitle": "Thông báo trước khi hủy đăng ký",
       "policyRef": "Chính sách hủy và hoàn tiền của Pi Network PiRC2",
       "remainHint": "Thời gian còn lại có thể sử dụng bình thường cho đến ngày hết hạn.",
       "usableUntil": "Có thể sử dụng bình thường cho đến {date}."
     },
     "tabs": {
+      "bean": "Ví Bean",
       "info": "Thông tin cá nhân",
+      "lbs": "📍 Dịch vụ vị trí",
       "payment": "Lịch sử thanh toán",
+      "store": "🛍️ PiShop™ của tôi",
       "subscr": "Tình trạng đăng ký"
     },
     "tabsExtra": {
       "fullView": "Toàn màn hình →",
       "lbs": "📍 Dịch vụ vị trí",
       "store": "🛍️ Store"
+    },
+    "telegram": {
+      "botNotReady": "Bot thông báo vẫn đang được chuẩn bị. Vui lòng kiểm tra lại sau một lát.",
+      "confirm": "Xác nhận kết nối",
+      "confirming": "Đang xác nhận…",
+      "connected": "✅ Đã kết nối — đang nhận thông báo đơn hàng",
+      "desc": "Vì Pi Browser không có thông báo riêng, chúng tôi khuyên dùng thông báo Telegram.",
+      "disconnect": "Ngắt kết nối",
+      "guideFooter": "Khi kết nối, bạn sẽ nhận được thông báo qua Telegram mỗi khi có đơn hàng mới. Bạn có thể nhận thông báo trên điện thoại <b>ngay cả khi ứng dụng đã đóng</b>.",
+      "guideStep1": "Nếu bạn chưa có ứng dụng <b>Telegram</b> trên điện thoại, hãy cài đặt trước. (Tìm kiếm “Telegram” trên App Store/Play Store)",
+      "guideStep2": "Khi bạn nhấn nút <b>“📨 Mở Bot Telegram để kết nối”</b> ở trên, Telegram sẽ mở ra.",
+      "guideStep3": "Ở cuối màn hình Telegram, nhấn nút <b>“Bắt đầu (START)”</b> một lần.",
+      "guideStep4": "Quay lại màn hình này, nhấn <b>“Xác nhận kết nối”</b> là xong! ✅",
+      "guideSummary": "❓ Bạn là người mới? Xem cách kết nối",
+      "hint": "Sau khi nhấn \"Bắt đầu\" trong Telegram, vui lòng nhấn \"Xác nhận kết nối\" bên dưới.",
+      "openBot": "📨 Mở Bot Telegram để kết nối",
+      "recommended": "Khuyên dùng",
+      "title": "📨 Thông báo đơn hàng Telegram"
     },
     "title": "Hồ sơ của tôi"
   },

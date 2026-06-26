@@ -169,19 +169,25 @@
       "translating": "翻訳中…"
     },
     "links": {
+      "active": "使用中",
       "col": {
         "googleAccount": "Google アカウント",
         "joinDate": "登録日",
         "linkStatus": "連携ステータス",
         "piAccount": "Pi アカウント",
         "role": "ロール",
+        "status": "ステータス",
         "user": "ユーザー"
       },
+      "confirmDisable": "'{name}' アカウントを無効化しますか？このアカウントは今後すべての画面でブロックされます。",
       "desc": {
         "googleOnly": "Pi 未連携",
         "linked": "Pi + Google 接続済み",
         "piOnly": "Google 未連携"
       },
+      "disable": "無効化",
+      "enable": "有効化",
+      "inactive": "無効",
       "noUsers": "該当するユーザーがいません。",
       "searchPiUsername": "Piユーザー名検索 (2文字以上)",
       "searchResultCount": "検索結果 {count}名",
@@ -191,6 +197,7 @@
         "piOnly": "Pi 専用"
       },
       "title": "アカウント連携状況",
+      "toggleFailed": "ステータス変更に失敗しました。",
       "totalCount": "合計 {count}名"
     },
     "logs": {
@@ -262,6 +269,7 @@
       "i18nSection": "多言語",
       "links": "アカウント連携状況",
       "logs": "Log管理",
+      "monitor": "リアルタイム Monitoring",
       "payments": "支払い履歴",
       "reports": "報告処理",
       "settle": "精算管理",
@@ -1267,7 +1275,9 @@
     "chargeSuccess": "{bean} Bean チャージ完了！",
     "chargeTitle": "Bean チャージ",
     "customLabel": "直接入力 (Bean)",
+    "goCharge": "+ Beanを Charge する",
     "loading": "読み込み中…",
+    "loadMore": "もっと見る ({count}/{total})",
     "loginRequired": "Login 後に利用できます",
     "minCharge": "最小 {min} Bean (1π) から整数でチャージできます",
     "myBalance": "私のBean残高",
@@ -1277,6 +1287,7 @@
     "title": "Bean ウォレット",
     "txnEmpty": "取引履歴がありません",
     "txnTitle": "取引履歴",
+    "txnTotal": "合計 {count}件",
     "type": {
       "CHARGE": "チャージ",
       "REFUND": "返金",
@@ -2186,6 +2197,7 @@
     "lbs": {
       "agreeCta": "📍 位置 Service に同意する",
       "agreed": "同意済み",
+      "consentedAt": "同意日時: {date}",
       "historyDesc": "位置情報法第16条に基づく情報主体の閲覧権。行政区域単位のみ表示されます。",
       "historyTitle": "私の位置情報収集履歴",
       "locTypeJoin": "登録",
@@ -2203,6 +2215,7 @@
     },
     "loginRequired": "Login が必要です",
     "payment": {
+      "defaultMemo": "決済",
       "empty": "決済履歴がありません。",
       "status": {
         "approved": "承認済み",
@@ -2212,13 +2225,18 @@
     },
     "subscr": {
       "autoRenewOff": "自動更新はキャンセルされています。",
+      "autoRenewOffShort": "自動更新オフ",
       "autoRenewOn": "自動更新が有効です",
+      "autoRenewOnShort": "自動更新",
       "cancelAutoRenew": "自動更新をキャンセル",
       "cancelConfirm": "購読をキャンセルすると、有効期限までご利用後、自動更新が停止されます。続行しますか？",
       "cancelError": "キャンセルに失敗しました。再度お試しください。",
       "cancelOk": "購読がキャンセルされました。有効期限までご利用いただけます。",
+      "countActive": "{count}件購読中",
       "currentPlan": "現在の Plan",
-      "expireDate": "有効期限: {date}"
+      "empty": "現在、購読中の商品はありません。",
+      "expireDate": "有効期限: {date}",
+      "viewPlans": "購読 Plan を見る →"
     },
     "subscrExtra": {
       "autoStopOnFail": "支払い失敗時にも自動 Renewal が自動的に停止されます。",
@@ -2226,20 +2244,42 @@
       "confirmCancel": "案内を確認しました。購読をキャンセルします",
       "goBack": "戻る",
       "noPartialRefund": "部分的な払い戻しおよび残りの期間の返金は提供されません。",
+      "noRefundOnCancel": "Cancel してもすぐに返金されません。",
       "noticeTitle": "購読キャンセル前の案内",
       "policyRef": "Pi Network PiRC2 キャンセル・返金 Policy",
       "remainHint": "残りの期間は有効期限まで正常にご利用いただけます。",
       "usableUntil": "{date}まで正常にご利用いただけます。"
     },
     "tabs": {
+      "bean": "Bean Wallet",
       "info": "個人情報",
+      "lbs": "📍 Location Service",
       "payment": "決済履歴",
+      "store": "🛍️ My PiShop™",
       "subscr": "購読状況"
     },
     "tabsExtra": {
       "fullView": "全画面 →",
       "lbs": "📍 位置 Service",
       "store": "🛍️ Store"
+    },
+    "telegram": {
+      "botNotReady": "通知 Bot はまだ準備中です。しばらくしてからもう一度ご確認ください。",
+      "confirm": "連携確認",
+      "confirming": "確認中…",
+      "connected": "✅ 連携済み — 注文通知を受け取っています",
+      "desc": "Pi Browser 自体には通知がないため、Telegram 通知をおすすめします。",
+      "disconnect": "連携解除",
+      "guideFooter": "連携すると、新しい注文が入るたびに Telegram で通知が届きます。<b>アプリを閉じても</b>スマートフォンの通知で受け取ることができます。",
+      "guideStep1": "スマートフォンに <b>Telegram</b> アプリがない場合は、まずインストールしてください。（App Store/Play Store で「Telegram」を検索）",
+      "guideStep2": "上記の <b>「📨 Telegram Bot を開いて連携する」</b> ボタンをタップすると Telegram が開きます。",
+      "guideStep3": "Telegram 画面の一番下にある <b>「開始 (START)」</b> ボタンを一度タップしてください。",
+      "guideStep4": "この画面に戻り <b>「連携確認」</b> をタップすると完了です！ ✅",
+      "guideSummary": "❓ 初めてですか？連携方法を見る",
+      "hint": "Telegram で「開始」をタップした後、下の「連携確認」をタップしてください。",
+      "openBot": "📨 Telegram Bot を開いて連携する",
+      "recommended": "おすすめ",
+      "title": "📨 Telegram 注文通知"
     },
     "title": "My Profile"
   },

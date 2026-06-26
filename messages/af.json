@@ -169,19 +169,25 @@
       "translating": "Besig om te vertaal…"
     },
     "links": {
+      "active": "Aktief",
       "col": {
         "googleAccount": "Google Rekening",
         "joinDate": "Aansluitingsdatum",
         "linkStatus": "Koppeling Status",
         "piAccount": "Pi Rekening",
         "role": "Rol",
+        "status": "Status",
         "user": "Gebruiker"
       },
+      "confirmDisable": "Is jy seker jy wil die '{name}' rekening deaktiveer? Hierdie rekening sal voortaan van alle skerms geblokkeer word.",
       "desc": {
         "googleOnly": "Pi nie gekoppel nie",
         "linked": "Pi + Google gekoppel",
         "piOnly": "Google nie gekoppel nie"
       },
+      "disable": "Deaktiveer",
+      "enable": "Aktiveer",
+      "inactive": "Onaktief",
       "noUsers": "Geen gebruikers gevind nie.",
       "searchPiUsername": "Soek Pi gebruikersnaam (2 karakters of meer)",
       "searchResultCount": "Soekresultate {count} persone",
@@ -191,6 +197,7 @@
         "piOnly": "Slegs Pi"
       },
       "title": "Rekeningkoppeling Status",
+      "toggleFailed": "Kon nie status verander nie.",
       "totalCount": "Totaal {count} persone"
     },
     "logs": {
@@ -262,6 +269,7 @@
       "i18nSection": "Meertalig",
       "links": "Rekeningkoppelingsstatus",
       "logs": "Log Bestuur",
+      "monitor": "Intydse Monitoring",
       "payments": "Betalingsgeskiedenis",
       "reports": "Rapporthantering",
       "settle": "Vereffening Bestuur",
@@ -1267,7 +1275,9 @@
     "chargeSuccess": "{bean} Bean-oplaai voltooi!",
     "chargeTitle": "Laai Bean op",
     "customLabel": "Voer self in (Bean)",
+    "goCharge": "+ Gaan laai Bean",
     "loading": "Laai tans…",
+    "loadMore": "Laai meer ({count}/{total})",
     "loginRequired": "Beskikbaar na aanmelding",
     "minCharge": "Kan opgelaai word met 'n minimum van {min} Bean (1π) as 'n heelgetal",
     "myBalance": "My Bean-saldo",
@@ -1277,6 +1287,7 @@
     "title": "Bean Wallet",
     "txnEmpty": "Geen transaksiegeskiedenis nie",
     "txnTitle": "Transaksiegeskiedenis",
+    "txnTotal": "Totaal {count} transaksies",
     "type": {
       "CHARGE": "Oplaai",
       "REFUND": "terugbetaling",
@@ -2186,6 +2197,7 @@
     "lbs": {
       "agreeCta": "📍 Stem in tot liggingdienste",
       "agreed": "Ooreengekom",
+      "consentedAt": "Toestemming gegee op: {date}",
       "historyDesc": "Reg van die datasubjek om inligting te sien ingevolge Artikel 16 van die Wet op Ligginginligting. Slegs administratiewe eenhede word vertoon.",
       "historyTitle": "My liggingversamelingsgeskiedenis",
       "locTypeJoin": "Aansluit",
@@ -2203,6 +2215,7 @@
     },
     "loginRequired": "Aanmelding is nodig.",
     "payment": {
+      "defaultMemo": "Betaling",
       "empty": "Geen betalingsgeskiedenis nie.",
       "status": {
         "approved": "Goedgekeur",
@@ -2212,13 +2225,18 @@
     },
     "subscr": {
       "autoRenewOff": "Outo-hernuwing is gekanselleer.",
+      "autoRenewOffShort": "Outo-hernuwing af",
       "autoRenewOn": "Outo-hernuwing geaktiveer",
+      "autoRenewOnShort": "Outo-hernuwing",
       "cancelAutoRenew": "Kanselleer Outo-hernuwing",
       "cancelConfirm": "As jy jou subskripsie kanselleer, sal outo-hernuwing gestop word na gebruik tot die vervaldatum. Wil jy voortgaan?",
       "cancelError": "Kansellasie het misluk. Probeer asseblief weer.",
       "cancelOk": "Jou intekening is gekanselleer. Jy kan dit tot die vervaldatum gebruik.",
+      "countActive": "{count} aktiewe intekeninge",
       "currentPlan": "Huidige Plan",
-      "expireDate": "Vervaldatum: {date}"
+      "empty": "Geen aktiewe intekeninge nie.",
+      "expireDate": "Vervaldatum: {date}",
+      "viewPlans": "Sien intekeningplanne →"
     },
     "subscrExtra": {
       "autoStopOnFail": "Selfs met mislukte betaling sal outomatiese hernuwing outomaties gestop word.",
@@ -2226,20 +2244,42 @@
       "confirmCancel": "Ek het die inligting bevestig. Ek kanselleer die intekening.",
       "goBack": "Gaan terug",
       "noPartialRefund": "Gedeeltelike terugbetalings en terugbetalings vir die oorblywende tydperk word nie voorsien nie.",
+      "noRefundOnCancel": "Geen onmiddellike terugbetaling by kansellasie nie.",
       "noticeTitle": "Kennisgewing voor kansellasie van intekening",
       "policyRef": "Pi Network PiRC2 Kansellasie- en Terugbetalingsbeleid",
       "remainHint": "Die oorblywende tydperk kan normaalweg tot die vervaldatum gebruik word.",
       "usableUntil": "Kan normaalweg tot {date} gebruik word."
     },
     "tabs": {
+      "bean": "Bean Wallet",
       "info": "Persoonlike Inligting",
+      "lbs": "📍 Liggingdienste",
       "payment": "Betalingsgeskiedenis",
+      "store": "🛍️ My PiShop™",
       "subscr": "Subskripsie Status"
     },
     "tabsExtra": {
       "fullView": "Volskerm →",
       "lbs": "📍 Liggingdienste",
       "store": "🛍️ Store"
+    },
+    "telegram": {
+      "botNotReady": "Die kennisgewing-bot is nog besig om voor te berei. Kontroleer asseblief weer oor 'n rukkie.",
+      "confirm": "Bevestig koppeling",
+      "confirming": "Besig om te bevestig…",
+      "connected": "✅ Gekoppel — Ontvang bestelling kennisgewings",
+      "desc": "Aangesien Pi Browser nie sy eie kennisgewings het nie, beveel ons Telegram-kennisgewings aan.",
+      "disconnect": "Ontkoppel",
+      "guideFooter": "Sodra dit gekoppel is, sal jy Telegram-kennisgewings ontvang elke keer as 'n nuwe bestelling inkom. Jy kan foonkennisgewings ontvang <b>selfs al is die toepassing gesluit</b>.",
+      "guideStep1": "As jy nie die <b>Telegram</b>-toepassing op jou foon het nie, installeer dit eers. (Soek vir “Telegram” in die App Store/Play Store)",
+      "guideStep2": "Deur die <b>“📨 Maak Telegram Bot oop en koppel”</b>-knoppie hierbo te druk, sal Telegram oopmaak.",
+      "guideStep3": "Druk een keer die <b>“Begin”</b>-knoppie heel onderaan die Telegram-skerm.",
+      "guideStep4": "Keer terug na hierdie skerm en druk <b>“Bevestig koppeling”</b> om te voltooi! ✅",
+      "guideSummary": "❓ Eerste keer? Sien hoe om te koppel",
+      "hint": "Nadat jy \"Begin\" in Telegram gedruk het, druk asseblief \"Bevestig koppeling\" hieronder.",
+      "openBot": "📨 Maak Telegram Bot oop en koppel",
+      "recommended": "Aanbeveel",
+      "title": "📨 Telegram Bestelling Kennisgewings"
     },
     "title": "My Profiel"
   },

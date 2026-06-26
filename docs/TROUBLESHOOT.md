@@ -330,3 +330,87 @@ vercel env add TURN_SECRET production # → YOUR_RANDOM_SECRET_HERE
 
 - Cloudflare API 호출 실패(인증·쿼터·타임아웃) 시 **서버 로그를 남기고** 2~3순위로 폴백 (통화 가용성 우선)
 - `TURN_CREDENTIAL_TTL`: 기본 3600초, Cloudflare·HMAC 공통 적용. 운영 보안 강화 시 300~600으로 단축 권장
+
+---
+
+## [2026-06-26] 일반 브라우저 헤더-본문 세션 불일치 (Google 세션 동기화 누락)
+
+### 증상
+일반 브라우저(PC/모바일)에서 Google 로그인 후 헤더는 Google 사용자명을 표시했으나, 본문(페이지 콘텐츠)은 "로그인 필요" 상태 표시. 헤더와 본문이 다른 세션 상태를 보여 UX 혼란 발생.
+
+### 원인
+- 헤더 컴포넌트는 NextAuth `useSession()`으로 Google 세션을 정상 인식
+- 본문 일부 컴포넌트는 `usePiAuth()` 훅을 사용 → `usePiAuth`는 내부적으로 `/api/auth/pi GET`을 호출해 Pi 세션 상태를 가져옴
+- `/api/auth/pi GET`이 `pi_session` 쿠키만 확인하고 Google 세션(NextAuth JWT)을 무시 → `usePiAuth().user`가 null 반환
+
+### 해결 (커밋 961660e)
+`/api/auth/pi GET`에 `getSessionUser()` 폴백 추가 — Pi 쿠키/헤더 확인 후 없으면 Google 세션도 인식하도록 수정. `usePiAuth`가 Google 사용자도 정상 반환.
+
+### 확정 원칙
+| 환경 | 인증 수단 | 헤더 · 본문 세션 |
+|---|---|---|
+| PC/모바일 일반 브라우저 | Google OAuth (NextAuth) | 항상 Google 세션으로 동기화 |
+| Pi Browser | Pi Token (localStorage) | 항상 Pi 세션으로 동기화 |
+
+- 두 환경에서 헤더와 본문은 **동일한 단일 세션**만 사용해야 한다. 혼용 절대 금지.
+- `usePiAuth`는 Pi Browser 전용이 아님 — `getSessionUser()` 기반이므로 Pi 세션과 Google 세션 모두 처리.
+
+---
+
+## [2026-06-26] Pi+Google 계정 통합 시 1인 2계정 발생 — 중복 계정 비활성화 정책
+
+### 증상
+사용자가 PC에서 Google 로그인 → Pi Browser에서 Pi 로그인 → 연동(link-complete) 완료 후에도 `sys_user`에 두 행 존재. Google-only 고아 행이 남아 `updatePiUserWithGoogle()` 호출 시 `google_id UNIQUE` 충돌 발생.
+
+### 원인 패턴
+1. Google 로그인 시 `upsertGoogleUser()`로 Google-only 행(pi_uid=NULL) 생성
+2. Pi Browser에서 Pi 로그인 시 별개 행 생성(google_email=NULL)
+3. 연동 시 Pi 행의 `google_id`를 Google-only 행의 값으로 UPDATE 시도 → UNIQUE 충돌
+4. 연동 성공해도 Google-only 고아 행이 `del_yn='N'`으로 잔존 → 이중 세션 혼란
+
+### 해결 (2026-06-26 적용)
+1. **`sql/127_sys_user_del_yn.sql`**: `sys_user`에 `del_yn CHAR(1) DEFAULT 'N'`, `del_dtm TIMESTAMPTZ` 추가
+2. **`sql/128_one_account_policy.sql`**: 기존 중복 행 일괄 정리 — google_id NULL 초기화 후 `del_yn='Y'`
+3. **`src/lib/users.ts updatePiUserWithGoogle()`**: 연동 전 Google-only 고아 행의 `google_id=NULL` + `del_yn='Y'` 원자 처리 (UNIQUE 충돌 방지)
+4. **`src/auth.ts`**: 신규 Google-only 행 생성 중단 — `upsertGoogleUser()` 제거, 기존 Pi 행 없으면 `token.userId=null, hasPiAccount=false`
+5. **`src/lib/auth-check.ts`**: `getSessionUser()`에서 `pi_uid IS NULL`인 Google 사용자 차단 → `return null`
+
+### 확정 정책 (1인 1계정 원칙)
+- **유일한 활성 계정 조건**: `pi_username IS NOT NULL` AND `google_email IS NOT NULL`이 **같은 행에** 공존
+- `del_yn='Y'` 계정은 모든 화면·모든 세션에서 접근 불가 (getSessionUser null 반환)
+- Link 페이지는 `useSession()` 클라이언트 훅 직접 사용 → `getSessionUser()` 차단과 무관하게 연동 플로우 정상 동작
+
+### 주의: UNIQUE 제약 & soft-delete 순서
+`del_yn='Y'`만으로는 Postgres UNIQUE 제약이 해제되지 않음. 반드시 아래 순서 준수:
+```sql
+-- 1단계: UNIQUE 값 해제
+UPDATE sys_user SET google_id = NULL WHERE ...;
+-- 2단계: 논리 삭제
+UPDATE sys_user SET del_yn = 'Y', del_dtm = NOW() WHERE ...;
+```
+
+---
+
+## [2026-06-26] 헤더 UI — 브라우저 환경별 로그인 전/후 표시 정책 확정
+
+### 증상
+일반 브라우저(PC/모바일)에서 로그인 전 "Google 로그인" 버튼이 표시되지 않거나, Pi Browser에서 Google 로그인 관련 UI가 혼재되어 사용자 혼란 발생.
+
+### 원인
+환경별 헤더 UI 정책이 명시되지 않아 Google 로그인 버튼 표시 조건이 불명확했음.
+
+### 확정 정책
+
+| 환경 | 로그인 전 | 로그인 후 |
+|---|---|---|
+| PC/모바일 일반 브라우저 | **Google 로그인 버튼** | **Google 사용자명** |
+| Pi Browser | **로고 + Pi 로그인 버튼** | **로고 + 별명 (nick\_nm)** |
+
+### 구현 (커밋 961660e)
+- `components/google-login-button.tsx`: `isPiBrowser()` 판정으로 Pi Browser에서 컴포넌트 숨김(`return null`)
+- Pi Browser 진입점 판별: `window.Pi !== undefined` 또는 `User-Agent` 기반
+
+### 재발방지
+- 신규 헤더 UI 요소 추가 시 반드시 Pi Browser/일반 브라우저 분기 고려
+- Pi Browser에서는 Pi SDK(`window.Pi`) 외 OAuth 버튼 노출 금지
+- 헤더 세션 상태와 본문 세션 상태는 항상 같은 소스를 바라봐야 함 — 이 원칙 위반이 이번 이슈의 근본 원인
