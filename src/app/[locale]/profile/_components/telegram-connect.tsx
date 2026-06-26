@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { piFetch } from '@/lib/pi-fetch'
 
 interface Status {
@@ -9,8 +10,13 @@ interface Status {
   url: string | null
 }
 
+// 가이드 단계의 <b> 강조어를 실제 굵게 렌더 (t.rich 청크)
+const richB = { b: (chunks: React.ReactNode) => <b>{chunks}</b> }
+
 // 판매자 Telegram 알림 연동 — 주문 발생 시 Telegram으로 알림을 받기 위한 1회 연동.
 export function TelegramConnect() {
+  const t = useTranslations('profile')
+  const tc = useTranslations('common')
   const [status, setStatus] = useState<Status | null>(null)
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState(false)
@@ -30,7 +36,7 @@ export function TelegramConnect() {
   function openBot() {
     if (!status?.url) return
     window.open(status.url, '_blank', 'noopener,noreferrer')
-    setHint('Telegram에서 "시작"을 누른 뒤, 아래 "연동 확인"을 눌러 주세요.')
+    setHint(t('telegram.hint'))
   }
 
   async function confirm() {
@@ -50,33 +56,33 @@ export function TelegramConnect() {
   return (
     <section className="space-y-3 rounded-2xl border-2 border-amber-300/70 bg-amber-50/70 p-4 dark:border-amber-700/50 dark:bg-amber-950/20">
       <div className="flex items-center gap-2">
-        <h2 className="text-lg font-semibold">📨 Telegram 주문 알림</h2>
+        <h2 className="text-lg font-semibold">{t('telegram.title')}</h2>
         <span className="rounded-full bg-amber-400 px-2 py-0.5 text-xs font-bold text-amber-950">
-          추천
+          {t('telegram.recommended')}
         </span>
       </div>
       <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
-        Pi Browser 자체 알림이 없으므로, Telegram 알림을 추천합니다.
+        {t('telegram.desc')}
       </p>
 
       <div className="bg-card rounded-xl border p-4">
         {loading ? (
-          <p className="text-muted-foreground text-sm">로딩 중…</p>
+          <p className="text-muted-foreground text-sm">{tc('loading')}</p>
         ) : !status?.botConfigured ? (
           <p className="text-muted-foreground text-sm">
-            알림 봇이 아직 준비 중입니다. 잠시 후 다시 확인해 주세요.
+            {t('telegram.botNotReady')}
           </p>
         ) : status.connected ? (
           <div className="flex flex-wrap items-center justify-between gap-3">
             <span className="inline-flex items-center gap-2 text-sm font-medium text-green-600">
-              ✅ 연동됨 — 주문 알림을 받고 있습니다
+              {t('telegram.connected')}
             </span>
             <button
               onClick={disconnect}
               disabled={busy}
               className="text-destructive text-sm underline underline-offset-2 disabled:opacity-50"
             >
-              {busy ? '처리 중…' : '연동 해제'}
+              {busy ? tc('processing') : t('telegram.disconnect')}
             </button>
           </div>
         ) : (
@@ -85,7 +91,7 @@ export function TelegramConnect() {
               onClick={openBot}
               className="bg-primary text-primary-foreground inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-opacity hover:opacity-90"
             >
-              📨 Telegram 봇 열어 연동하기
+              {t('telegram.openBot')}
             </button>
             <div>
               <button
@@ -93,35 +99,23 @@ export function TelegramConnect() {
                 disabled={busy}
                 className="text-primary text-sm underline underline-offset-2 disabled:opacity-50"
               >
-                {busy ? '확인 중…' : '연동 확인'}
+                {busy ? t('telegram.confirming') : t('telegram.confirm')}
               </button>
             </div>
             {hint && <p className="text-muted-foreground text-xs">{hint}</p>}
 
             <details className="bg-muted/40 rounded-lg p-3 text-xs">
               <summary className="text-foreground cursor-pointer font-medium select-none">
-                ❓ 처음이세요? 연동 방법 보기
+                {t('telegram.guideSummary')}
               </summary>
               <ol className="text-muted-foreground mt-3 list-decimal space-y-2 pl-4">
-                <li>
-                  휴대폰에 <b>Telegram(텔레그램)</b> 앱이 없다면 먼저
-                  설치하세요. (앱스토어/플레이스토어에서 “Telegram” 검색)
-                </li>
-                <li>
-                  위 <b>“📨 Telegram 봇 열어 연동하기”</b> 버튼을 누르면
-                  텔레그램이 열립니다.
-                </li>
-                <li>
-                  텔레그램 화면 맨 아래 <b>“시작(START)”</b> 버튼을 한 번
-                  누르세요.
-                </li>
-                <li>
-                  이 화면으로 돌아와 <b>“연동 확인”</b>을 누르면 완료! ✅
-                </li>
+                <li>{t.rich('telegram.guideStep1', richB)}</li>
+                <li>{t.rich('telegram.guideStep2', richB)}</li>
+                <li>{t.rich('telegram.guideStep3', richB)}</li>
+                <li>{t.rich('telegram.guideStep4', richB)}</li>
               </ol>
               <p className="text-muted-foreground mt-3">
-                연동하면 새 주문이 들어올 때마다 텔레그램으로 알림이 와요.{' '}
-                <b>앱을 닫아도</b> 휴대폰 알림으로 받을 수 있습니다.
+                {t.rich('telegram.guideFooter', richB)}
               </p>
             </details>
           </div>

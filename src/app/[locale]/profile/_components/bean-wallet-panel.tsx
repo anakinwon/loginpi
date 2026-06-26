@@ -27,17 +27,19 @@ function formatLocal(dtm: string): string {
   return new Date(dtm).toLocaleString()
 }
 
-const FILTERS: { key: BeanTxnType | 'ALL'; label: string }[] = [
-  { key: 'ALL', label: '전체' },
-  { key: 'CHARGE', label: '충전' },
-  { key: 'SPEND', label: '사용' },
-  { key: 'TRANSFER', label: '선물' },
-  { key: 'REWARD', label: '보상' },
-  { key: 'REFUND', label: '환불' },
+// 라벨은 렌더 시 해석: 'ALL'→common.all, 그 외→bean.type.<key> (모듈 상수 X)
+const FILTER_KEYS: (BeanTxnType | 'ALL')[] = [
+  'ALL',
+  'CHARGE',
+  'SPEND',
+  'TRANSFER',
+  'REWARD',
+  'REFUND',
 ]
 
 export function BeanWalletPanel() {
   const t = useTranslations('bean')
+  const tc = useTranslations('common')
   const [balance, setBalance] = useState<number | null>(null)
   const [txns, setTxns] = useState<BeanTxn[]>([])
   const [total, setTotal] = useState(0)
@@ -116,24 +118,24 @@ export function BeanWalletPanel() {
           href="/store"
           className="text-primary mt-2 text-xs hover:underline"
         >
-          + Bean 충전하러 가기
+          {t('goCharge')}
         </Link>
       </div>
 
       {/* 유형 필터 칩 */}
       <div className="flex flex-wrap gap-1.5">
-        {FILTERS.map((f) => (
+        {FILTER_KEYS.map((key) => (
           <button
-            key={f.key}
-            onClick={() => setFilter(f.key)}
+            key={key}
+            onClick={() => setFilter(key)}
             className={[
               'rounded-full px-3 py-1 text-xs font-medium transition-colors',
-              filter === f.key
+              filter === key
                 ? 'bg-primary text-primary-foreground'
                 : 'bg-muted text-muted-foreground hover:text-foreground',
             ].join(' ')}
           >
-            {f.label}
+            {key === 'ALL' ? tc('all') : t(`type.${key}`)}
           </button>
         ))}
       </div>
@@ -143,7 +145,7 @@ export function BeanWalletPanel() {
         <div className="flex items-center justify-between">
           <p className="text-sm font-semibold">{t('txnTitle')}</p>
           <p className="text-muted-foreground text-xs tabular-nums">
-            총 {total.toLocaleString()}건
+            {t('txnTotal', { count: total.toLocaleString() })}
           </p>
         </div>
 
@@ -199,8 +201,8 @@ export function BeanWalletPanel() {
                 className="hover:bg-muted w-full rounded-lg border py-2 text-sm font-medium disabled:opacity-50"
               >
                 {loadingMore
-                  ? '불러오는 중…'
-                  : `더보기 (${txns.length}/${total})`}
+                  ? tc('fetching')
+                  : t('loadMore', { count: txns.length, total })}
               </button>
             )}
           </>

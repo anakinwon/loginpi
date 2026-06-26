@@ -1285,6 +1285,9 @@
     "title": "Bean Wallet",
     "txnEmpty": "No transaction history",
     "txnTitle": "Transaction History",
+    "goCharge": "+ Go charge Beans",
+    "txnTotal": "{count} total",
+    "loadMore": "Load more ({count}/{total})",
     "type": {
       "CHARGE": "Charge",
       "REFUND": "Refund",
@@ -2206,11 +2209,13 @@
       "revokeBtn": "Revoke consent (delete location data immediately)",
       "revokeConfirm": "Revoking consent will immediately delete your collected location data. Continue?",
       "revoking": "Revoking...",
+      "consentedAt": "Consented at: {date}",
       "subtitle": "Discover nearby items, shops, and chat rooms",
       "title": "Location-Based Services"
     },
     "loginRequired": "Login Required",
     "payment": {
+      "defaultMemo": "Payment",
       "empty": "No payment history.",
       "status": {
         "approved": "Approved",
@@ -2222,6 +2227,10 @@
       "autoRenewOff": "Auto-renewal is canceled.",
       "autoRenewOffShort": "Auto-renewal off",
       "autoRenewOn": "Auto-renewal enabled",
+      "autoRenewOnShort": "Auto-renewal",
+      "countActive": "{count} active",
+      "empty": "You have no active subscriptions.",
+      "viewPlans": "View subscription plans →",
       "cancelAutoRenew": "Cancel Auto-renewal",
       "cancelConfirm": "If you cancel your subscription, auto-renewal will stop after you use it until the expiration date. Do you want to continue?",
       "cancelError": "Failed to cancel. Please try again.",
@@ -2237,6 +2246,7 @@
       "noPartialRefund": "Partial refunds and prorated reimbursements are not provided.",
       "noticeTitle": "Before You Cancel",
       "policyRef": "Pi Network PiRC2 Cancellation & Refund Policy",
+      "noRefundOnCancel": "Refunds are not issued immediately upon cancellation.",
       "remainHint": "You can keep using the service until the expiry date.",
       "usableUntil": "Usable until {date}."
     },

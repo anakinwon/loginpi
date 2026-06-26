@@ -1989,6 +1989,7 @@
     },
     "payment": {
       "empty": "결제 내역이 없습니다.",
+      "defaultMemo": "결제",
       "status": {
         "pending": "대기",
         "approved": "승인",
@@ -2001,6 +2002,10 @@
       "autoRenewOn": "자동 갱신 활성화됨",
       "autoRenewOff": "자동 갱신이 취소되어 있습니다.",
       "autoRenewOffShort": "자동 갱신 해제됨",
+      "autoRenewOnShort": "자동 갱신",
+      "empty": "현재 구독 중인 상품이 없습니다.",
+      "countActive": "{count}건 구독 중",
+      "viewPlans": "구독 상품 보기 →",
       "cancelAutoRenew": "자동 갱신 취소",
       "cancelConfirm": "구독을 취소하면 만료일까지 이용 후 자동 갱신이 중단됩니다. 계속하시겠습니까?",
       "cancelOk": "구독이 취소되었습니다. 만료일까지 이용할 수 있습니다.",
@@ -2026,6 +2031,7 @@
     },
     "subscrExtra": {
       "remainHint": "남은 기간은 만료일까지 정상 이용할 수 있습니다.",
+      "noRefundOnCancel": "취소 즉시 환불되지 않습니다.",
       "noticeTitle": "구독 취소 전 안내",
       "policyRef": "Pi Network PiRC2 취소·환불 정책",
       "usableUntil": "{date}까지 정상 이용할 수 있습니다.",
@@ -2038,6 +2044,7 @@
     "lbs": {
       "title": "위치 기반 서비스",
       "subtitle": "주변 상품·매장·채팅방 탐색 기능",
+      "consentedAt": "동의일시: {date}",
       "agreed": "동의",
       "notAgreed": "미동의",
       "agreeCta": "📍 위치 서비스 동의하기",
@@ -2142,6 +2149,9 @@
     "chargeFail": "충전 처리에 실패했습니다",
     "txnTitle": "거래 내역",
     "txnEmpty": "거래 내역이 없습니다",
+    "goCharge": "+ Bean 충전하러 가기",
+    "txnTotal": "총 {count}건",
+    "loadMore": "더보기 ({count}/{total})",
     "type": {
       "CHARGE": "충전",
       "SPEND": "사용",

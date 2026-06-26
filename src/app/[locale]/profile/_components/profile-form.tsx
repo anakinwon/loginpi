@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { piFetch, setPiToken } from '@/lib/pi-fetch'
 import { usePiAuth } from '@/components/pi-auth-provider'
 import type { LocaleOption } from '@/lib/locale-options'
@@ -12,25 +13,21 @@ interface Props {
   onSaved: (user: UserRow) => void
 }
 
-const FIELDS: { name: keyof UserRow; label: string; placeholder: string }[] = [
-  {
-    name: 'display_name',
-    label: '표시 이름',
-    placeholder: '화면에 표시될 이름',
-  },
-  { name: 'real_nm', label: '실명', placeholder: '실제 성명' },
-  { name: 'nick_nm', label: '닉네임', placeholder: '닉네임' },
-  { name: 'phone_no', label: '연락처', placeholder: '010-0000-0000' },
-  { name: 'addr', label: '주소', placeholder: '기본 주소' },
-  { name: 'addr_dtl', label: '상세 주소', placeholder: '동·호수 등' },
-  {
-    name: 'kakao_id',
-    label: '카카오톡 ID',
-    placeholder: '카카오톡 아이디 입력',
-  },
+// 라벨/placeholder는 컴포넌트에서 t(`info.${key}`)·t(`infoExtra.${key}Ph`)로 해석한다.
+// (모듈 상수에선 useTranslations 사용 불가)
+const FIELDS: { name: keyof UserRow; key: string }[] = [
+  { name: 'display_name', key: 'displayName' },
+  { name: 'real_nm', key: 'realNm' },
+  { name: 'nick_nm', key: 'nickNm' },
+  { name: 'phone_no', key: 'phoneNo' },
+  { name: 'addr', key: 'addr' },
+  { name: 'addr_dtl', key: 'addrDtl' },
+  { name: 'kakao_id', key: 'kakaoId' },
 ]
 
 export function ProfileForm({ initialUser, localeOptions, onSaved }: Props) {
+  const t = useTranslations('profile')
+  const tc = useTranslations('common')
   const formRef = useRef<HTMLFormElement>(null)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState<{
@@ -69,7 +66,7 @@ export function ProfileForm({ initialUser, localeOptions, onSaved }: Props) {
     if (!res.ok) {
       setMessage({
         type: 'err',
-        text: '저장에 실패했습니다. 다시 시도해 주세요.',
+        text: t('info.saveError'),
       })
       return
     }
@@ -83,21 +80,21 @@ export function ProfileForm({ initialUser, localeOptions, onSaved }: Props) {
     // localStorage Pi 토큰도 갱신 → 새로고침 후에도 헤더 유지
     if (token) setPiToken(token)
     onSaved(user)
-    setMessage({ type: 'ok', text: '저장되었습니다.' })
+    setMessage({ type: 'ok', text: t('info.saved') })
   }
 
   return (
     <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
-      {FIELDS.map(({ name, label, placeholder }) => (
+      {FIELDS.map(({ name, key }) => (
         <div key={name} className="flex flex-col gap-1">
           <label className="text-sm font-medium" htmlFor={name}>
-            {label}
+            {t(`info.${key}`)}
           </label>
           <input
             id={name}
             name={name}
             defaultValue={(initialUser[name] as string | null) ?? ''}
-            placeholder={placeholder}
+            placeholder={t(`infoExtra.${key}Ph`)}
             className="focus:ring-primary/50 rounded-md border px-3 py-2 text-sm outline-none focus:ring-2"
           />
         </div>
@@ -106,7 +103,7 @@ export function ProfileForm({ initialUser, localeOptions, onSaved }: Props) {
       {/* PiTranslate™ 표시 언어 — 카페 메시지가 이 언어로 자동 번역됨 */}
       <div className="flex flex-col gap-1">
         <label className="text-sm font-medium" htmlFor="display_locale_cd">
-          표시 언어 (카페 자동 번역)
+          {t('infoExtra.displayLocale')}
         </label>
         <select
           id="display_locale_cd"
@@ -114,7 +111,7 @@ export function ProfileForm({ initialUser, localeOptions, onSaved }: Props) {
           defaultValue={initialUser.display_locale_cd ?? ''}
           className="bg-background focus:ring-primary/50 rounded-md border px-3 py-2 text-sm outline-none focus:ring-2"
         >
-          <option value="">미설정 (브라우저 언어 사용)</option>
+          <option value="">{t('infoExtra.displayLocaleNone')}</option>
           {localeOptions.map(({ value, label }) => (
             <option key={value} value={value}>
               {label}
@@ -126,13 +123,13 @@ export function ProfileForm({ initialUser, localeOptions, onSaved }: Props) {
       {/* 자기소개 — textarea (FIELDS 루프 밖에서 별도 렌더) */}
       <div className="flex flex-col gap-1">
         <label className="text-sm font-medium" htmlFor="self_intro">
-          자기소개
+          {t('info.selfIntro')}
         </label>
         <textarea
           id="self_intro"
           name="self_intro"
           defaultValue={(initialUser.self_intro as string | null) ?? ''}
-          placeholder="간단한 자기소개를 입력해 주세요 (최대 500자)"
+          placeholder={t('infoExtra.selfIntroPh')}
           maxLength={500}
           rows={4}
           className="focus:ring-primary/50 resize-none rounded-md border px-3 py-2 text-sm outline-none focus:ring-2"
@@ -152,7 +149,7 @@ export function ProfileForm({ initialUser, localeOptions, onSaved }: Props) {
         disabled={saving}
         className="bg-primary text-primary-foreground w-full rounded-md px-4 py-2 text-sm font-medium disabled:opacity-50"
       >
-        {saving ? '저장 중…' : '저장'}
+        {saving ? tc('saving') : tc('save')}
       </button>
     </form>
   )

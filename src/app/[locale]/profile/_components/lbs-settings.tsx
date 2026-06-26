@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import { useTranslations, useLocale } from 'next-intl'
 import { piFetch } from '@/lib/pi-fetch'
 import { Button } from '@/components/ui/button'
 import { LbsConsentDialog } from '@/components/lbs/lbs-consent-dialog'
@@ -20,14 +21,18 @@ interface LocHistItem {
   reg_dtm: string
 }
 
-const LOC_TP_LABEL: Record<string, string> = {
-  '01': '가입',
-  '02': '로그인',
-  '03': '매장 등록',
-  '04': '상품 거래',
+// 위치 수집 유형 코드 → lbs.<key> 번역키 (모듈 상수 X — useTranslations 불가)
+const LOC_TP_KEY: Record<string, string> = {
+  '01': 'locTypeJoin',
+  '02': 'locTypeLogin',
+  '03': 'locTypeShop',
+  '04': 'locTypeTrade',
 }
 
 export function LbsSettings() {
+  const t = useTranslations('profile')
+  const tc = useTranslations('common')
+  const locale = useLocale()
   const [status, setStatus] = useState<ConsentStatus | null>(null)
   const [history, setHistory] = useState<LocHistItem[]>([])
   const [consentOpen, setConsentOpen] = useState(false)
@@ -61,12 +66,7 @@ export function LbsSettings() {
   }, [status, loadHistory])
 
   async function handleRevoke() {
-    if (
-      !confirm(
-        '위치 서비스 동의를 철회하면 수집된 위치 정보가 즉시 삭제됩니다. 계속하시겠습니까?',
-      )
-    )
-      return
+    if (!confirm(t('lbs.revokeConfirm'))) return
     setRevoking(true)
     try {
       const res = await piFetch('/api/location/consent', { method: 'DELETE' })
@@ -80,7 +80,9 @@ export function LbsSettings() {
   }
 
   if (!status) {
-    return <p className="text-muted-foreground py-4 text-sm">불러오는 중...</p>
+    return (
+      <p className="text-muted-foreground py-4 text-sm">{tc('fetching')}</p>
+    )
   }
 
   return (
@@ -89,9 +91,9 @@ export function LbsSettings() {
       <div className="space-y-3 rounded-lg border p-4">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium">위치 기반 서비스</p>
+            <p className="text-sm font-medium">{t('lbs.title')}</p>
             <p className="text-muted-foreground mt-0.5 text-xs">
-              주변 상품·매장·채팅방 탐색 기능
+              {t('lbs.subtitle')}
             </p>
           </div>
           <span
@@ -101,13 +103,15 @@ export function LbsSettings() {
                 : 'bg-muted text-muted-foreground'
             }`}
           >
-            {status.consent_yn === 'Y' ? '동의' : '미동의'}
+            {status.consent_yn === 'Y' ? t('lbs.agreed') : t('lbs.notAgreed')}
           </span>
         </div>
 
         {status.consent_yn === 'Y' && status.consent_dtm && (
           <p className="text-muted-foreground text-xs">
-            동의일시: {new Date(status.consent_dtm).toLocaleString('ko-KR')}
+            {t('lbs.consentedAt', {
+              date: new Date(status.consent_dtm).toLocaleString(locale),
+            })}
             {status.consent_ver && ` (${status.consent_ver})`}
           </p>
         )}
@@ -120,7 +124,7 @@ export function LbsSettings() {
             disabled={revoking}
             className="text-destructive border-destructive/30 hover:bg-destructive/5 w-full"
           >
-            {revoking ? '철회 중...' : '동의 철회 (위치 정보 즉시 삭제)'}
+            {revoking ? t('lbs.revoking') : t('lbs.revokeBtn')}
           </Button>
         ) : (
           <Button
@@ -128,7 +132,7 @@ export function LbsSettings() {
             onClick={() => setConsentOpen(true)}
             className="w-full"
           >
-            📍 위치 서비스 동의하기
+            {t('lbs.agreeCta')}
           </Button>
         )}
       </div>
@@ -136,16 +140,15 @@ export function LbsSettings() {
       {/* 위치 이력 열람 — 정보주체 열람권 (위치정보법 제16조) */}
       {status.consent_yn === 'Y' && (
         <div className="space-y-2">
-          <p className="text-sm font-medium">내 위치 수집 이력</p>
-          <p className="text-muted-foreground text-xs">
-            위치정보법 제16조에 따른 정보주체 열람권. 행정구역 단위만
-            표시됩니다.
-          </p>
+          <p className="text-sm font-medium">{t('lbs.historyTitle')}</p>
+          <p className="text-muted-foreground text-xs">{t('lbs.historyDesc')}</p>
           {histLoading ? (
-            <p className="text-muted-foreground py-2 text-xs">불러오는 중...</p>
+            <p className="text-muted-foreground py-2 text-xs">
+              {tc('fetching')}
+            </p>
           ) : history.length === 0 ? (
             <p className="text-muted-foreground py-2 text-xs">
-              수집된 위치 이력이 없습니다.
+              {t('lbs.noHistory')}
             </p>
           ) : (
             <ul className="max-h-48 space-y-1.5 overflow-y-auto">
@@ -156,15 +159,17 @@ export function LbsSettings() {
                 >
                   <span className="text-muted-foreground">
                     <span className="text-foreground font-medium">
-                      {LOC_TP_LABEL[h.loc_tp_cd] ?? h.loc_tp_cd}
+                      {LOC_TP_KEY[h.loc_tp_cd]
+                        ? t(`lbs.${LOC_TP_KEY[h.loc_tp_cd]}`)
+                        : h.loc_tp_cd}
                     </span>{' '}
                     ·{' '}
                     {[h.sido_nm, h.sigungu_nm, h.dong_nm]
                       .filter(Boolean)
-                      .join(' ') || '위치 정보 없음'}
+                      .join(' ') || t('lbs.noLocation')}
                   </span>
                   <span className="text-muted-foreground ml-2 shrink-0">
-                    {new Date(h.reg_dtm).toLocaleDateString('ko-KR')}
+                    {new Date(h.reg_dtm).toLocaleDateString(locale)}
                   </span>
                 </li>
               ))}

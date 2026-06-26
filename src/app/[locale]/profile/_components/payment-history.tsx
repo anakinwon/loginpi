@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useTranslations, useLocale } from 'next-intl'
 import { piFetch } from '@/lib/pi-fetch'
 
 interface PaymentItem {
@@ -12,13 +13,13 @@ interface PaymentItem {
   metadata: Record<string, unknown>
 }
 
-const STATUS_LABEL: Record<string, string> = {
-  pending: '대기',
-  approved: '승인',
-  completed: '완료',
-}
+// 상태 라벨은 payment.status.<status> 번역키로 해석 (모듈 상수 X — useTranslations 불가)
+const STATUS_KEYS = new Set(['pending', 'approved', 'completed'])
 
 export function PaymentHistory() {
+  const t = useTranslations('profile')
+  const tc = useTranslations('common')
+  const locale = useLocale()
   const [payments, setPayments] = useState<PaymentItem[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -32,14 +33,16 @@ export function PaymentHistory() {
 
   if (loading) {
     return (
-      <p className="text-muted-foreground py-8 text-center text-sm">로딩 중…</p>
+      <p className="text-muted-foreground py-8 text-center text-sm">
+        {tc('loading')}
+      </p>
     )
   }
 
   if (payments.length === 0) {
     return (
       <p className="text-muted-foreground py-8 text-center text-sm">
-        결제 내역이 없습니다.
+        {t('payment.empty')}
       </p>
     )
   }
@@ -52,9 +55,11 @@ export function PaymentHistory() {
           className="flex items-center justify-between px-4 py-3"
         >
           <div>
-            <p className="text-sm font-medium">{p.memo || '결제'}</p>
+            <p className="text-sm font-medium">
+              {p.memo || t('payment.defaultMemo')}
+            </p>
             <p className="text-muted-foreground text-xs">
-              {new Date(p.reg_dtm).toLocaleDateString('ko-KR')}
+              {new Date(p.reg_dtm).toLocaleDateString(locale)}
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -66,7 +71,7 @@ export function PaymentHistory() {
                   : 'bg-yellow-100 text-yellow-700',
               ].join(' ')}
             >
-              {STATUS_LABEL[p.status] ?? p.status}
+              {STATUS_KEYS.has(p.status) ? t(`payment.status.${p.status}`) : p.status}
             </span>
             <span className="text-sm font-semibold">{p.amount} π</span>
           </div>
