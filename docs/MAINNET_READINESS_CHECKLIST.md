@@ -103,9 +103,9 @@
 |---|---|---|
 | A-2 KYC | 아나킨님 본인 Pi KYC 완료 여부 = 메인넷 지갑 슬롯 전제 | 🟡 **확인필요** |
 | A-3 상표 | 제품명 **PiCafé™·PiShop™·PiTranslate™ = "Pi"+이름 접두형** | 🔴 **위반 소지(공식 확정 규칙)** — 공식 상표 가이드 "You may not name your app in the form of 'Pi App_Name'". 라이선스 계약 또는 개명 필요. **Part C-1** 참조 |
-| A-4 Pi 인증만 | Pi Browser에서 Google 버튼 숨김(코드 확인). 일반 브라우저용 Google 로그인 경로는 존재 | 🟡 **확인필요** — 메인넷 앱은 Pi Browser·Pi Auth 전용이 안전 |
+| A-4 Pi 인증만 | Pi Browser에서 Google 버튼 미렌더(`google-login-button` 코드 검증) | 🟢 **충족(모더레이터 확인)** — 최종 빌드 재확인만. C-1-B 참조 |
 | A-5 Pi 전용거래 | Pi/Bean 거래만, 자국통화는 참고 표시값(거래 아님). 신용카드·법정화폐 직결제 코드 0건 | 🟢 부합 가능(검증 권장) |
-| A-6 외부 리다이렉트 | Telegram 주문알림 연동(외부 telegram.org 링크) 등 | 🟡 **확인필요** — 케이스별 심사 대상 |
+| A-6 외부 리다이렉트 | Telegram 주문알림(판매자 opt-in, 주문·결제는 인앱 완결) | 🟡 **확인필요(PCT)** — 안전조건 코드 충족, support.minepi.com 공식확인 잔여. C-1-C 참조 |
 | A-7 데이터 최소화 | 실명·전화·주소·카카오ID·위치정보 수집 | 🟡 **확인필요** — "essential" 기준 대비 필수성 정당화 필요 |
 | A-1 동작/UI | 앱 동작·UI 완성도 | 🟢 자체 점검 양호(Part D), Pi 심사 별도 |
 
@@ -138,19 +138,25 @@
   > "Our app brands its features as 'PiCafé', 'PiShop', 'PiTranslate' (Pi-prefixed). Per the Trademark Guidelines, app names may not be in the form 'Pi App_Name', and the permitted licensed forms are 'App_Name for/on Pi'. (a) Even with a Trademark Licensing Agreement, is the prefix form 'PiCafé' disallowed (i.e., must we use 'Café for Pi')? (b) Does this naming rule bind only the registered app name, or also in-app feature/sub-brand labels shown inside the app? (c) Where exactly in the Dev Portal is the licensing application, and what are the eligibility/fees/timeline?"
 - **채널**: Dev Portal in Pi Browser(라이선스 신청) · Pi Ecosystem Discord(Core Team 상주) · Pi App 내 Developer chat room.
 
-### 🟡 C-1-B. Pi 인증 외 로그인 (A-4)
+### 🟢 C-1-B. Pi 인증 외 로그인 (A-4) — 권장사항 충족
 
 - **공식 원문**: "Apps must integrate Pi's Authentication SDK for user logins. Other login methods ... are prohibited."
 - **cafe.pi 사실**: Pi Browser에서 Google 버튼 숨김. 단 일반 브라우저용 Google 로그인 경로 존재.
 - **질문**: "We use Pi Auth as primary. A Google login path exists only for non-Pi-Browser web access, and for optional account linking. For a Mainnet-listed app, must Google be fully removed, or is it acceptable if the listed (Pi Browser) experience uses Pi Auth exclusively?"
+- **✅ 모더레이터 답변(2026-06-27)**: *"Pi Auth should be the primary and required login inside Pi Browser. If Google login is only for non-Pi-Browser web access and is hidden/disabled in the Pi Browser version, it may be fine. But for Mainnet listing, I would avoid showing Google login inside Pi Browser to prevent any policy or review issue."*
+- **✅ 코드 검증**: `src/components/google-login-button.tsx` L22 `if (inPiBrowser) return null` — **Pi Browser에서 Google 버튼 미렌더**(헤더가 유일 진입점, 게이팅됨). → 권장사항 이미 충족.
+- **잔여**: 최종 메인넷 빌드에서 "Pi Browser 내 Google 미노출" 1회 육안 재확인.
 - **채널**: Discord · Developer chat room.
 
-### 🟡 C-1-C. 외부 리다이렉트 (A-6)
+### 🟡 C-1-C. 외부 리다이렉트 (A-6) — 코드 충족, PCT 확인 잔여
 
 - **공식 원문**: "Apps should not redirect users to external websites, apps or services." (필요성 기준 케이스별 심사)
 - **cafe.pi 사실**: Telegram 주문 알림 연동 시 외부 telegram.org/앱 실행.
 - **질문**: "We open Telegram (external app) only to deliver seller order notifications, since Pi Browser lacks native push. Is this an acceptable 'necessity' case under the no-external-redirect rule?"
-- **채널**: Discord · Developer chat room.
+- **⚠️ 모더레이터 답변(2026-06-27)**: *"Opening Telegram only for seller order notifications may still be considered an external redirect. It is safer if the core order flow stays fully inside the Pi app, and Telegram is only an optional notification method chosen by the seller. Do not force users or sellers to leave Pi Browser to complete orders, payments, login, or support. I'd recommend asking PCT/Support portal for confirmation before relying on it."*
+- **✅ 코드 검증**: `src/components/.../telegram-connect.tsx` = 판매자 **opt-in 알림** 연동, 주문·결제는 **인앱 완결** → 안전 3조건(①핵심 플로우 인앱 ②선택 알림 ③이탈 강제 금지) 부합.
+- **잔여(필수)**: **PCT/Support portal(support.minepi.com) 공식 확인.** 질의: *"Telegram is purely an optional seller-chosen notification; the entire order/payment/login/support flow stays inside the Pi app. Is this acceptable under the no-external-redirect policy for Mainnet listing?"*
+- **채널**: Pi Support portal(support.minepi.com) — PCT 권한 확인 / Discord · Developer chat room(보조).
 
 ### 🟡 C-1-D. 데이터 수집 최소화 (A-7)
 
