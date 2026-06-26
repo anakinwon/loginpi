@@ -622,10 +622,8 @@ export function ClientEventGate() {
           <table className="w-full border-collapse text-sm">
             <thead>
               <tr className="bg-muted border-b">
-                <th className="bg-muted sticky left-0 z-10 w-8 px-1 py-2 text-center font-semibold">
-                  {t('rankCol')}
-                </th>
-                <th className="bg-muted sticky left-8 z-10 py-2 pr-2 pl-1 text-left font-semibold">
+                <th className="bg-muted sticky left-0 z-10 py-2 pr-2 pl-2 text-left font-semibold">
+                  <span className="text-muted-foreground mr-1">{t('rankCol')}</span>
                   {t('agentCol')}
                 </th>
                 <th className="p-2 text-center font-semibold">
@@ -655,11 +653,13 @@ export function ClientEventGate() {
                   key={r.user_id}
                   className="hover:bg-muted/50 h-12 border-b transition-colors"
                 >
-                  <td className="sticky left-0 z-10 w-8 bg-white px-1 text-center font-semibold dark:bg-slate-950">
-                    {r.rank ?? '-'}
-                  </td>
-                  <td className="sticky left-8 z-10 bg-white pr-2 pl-1 dark:bg-slate-950">
-                    {maskAgentName(r, isAdmin, t('noName'))}
+                  <td className="sticky left-0 z-10 bg-white py-2 pr-2 pl-2 dark:bg-slate-950">
+                    <div className="flex items-center gap-2">
+                      <span className="shrink-0 font-semibold tabular-nums">
+                        {r.rank ?? '-'}
+                      </span>
+                      <span>{maskAgentName(r, isAdmin, t('noName'))}</span>
+                    </div>
                   </td>
                   <td className="px-2 text-center font-bold">
                     {r.mission_count !== null ? `${r.mission_count}/10` : ''}

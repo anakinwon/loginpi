@@ -169,10 +169,8 @@ export function CampaignShopBoard() {
         <table className="w-full border-collapse text-sm">
           <thead>
             <tr className="bg-muted border-b">
-              <th className="bg-muted sticky left-0 z-10 w-8 px-1 py-2.5 text-center font-semibold">
-                {t('colRank')}
-              </th>
-              <th className="bg-muted sticky left-8 z-10 py-2.5 pr-3 pl-1 text-left font-semibold">
+              <th className="bg-muted sticky left-0 z-10 py-2.5 pr-3 pl-2 text-left font-semibold">
+                <span className="text-muted-foreground mr-1">{t('colRank')}</span>
                 {t('colShop')}
               </th>
               <th className="px-3 py-2.5 text-center font-semibold">{t('colDone')}</th>
@@ -204,28 +202,32 @@ export function CampaignShopBoard() {
                     isMe ? 'ring-primary/40 ring-inset ring-2' : '',
                   ].join(' ')}
                 >
-                  <td className="bg-card sticky left-0 z-10 w-8 px-1 py-2.5 text-center font-semibold tabular-nums">
-                    {r.rank}
-                  </td>
-                  <td className="bg-card sticky left-8 z-10 py-2.5 pr-3 pl-1">
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-medium">{r.shop_nm}</span>
-                      {isMe && (
-                        <span className="bg-primary/10 text-primary rounded px-1 py-0.5 text-xs font-semibold">
-                          {t('myShopBadge')}
-                        </span>
-                      )}
-                    </div>
-                    <div className="text-xs font-medium text-blue-600 dark:text-blue-400">
-                      {r.pi_username
-                        ? `@${isAdmin ? r.pi_username : maskUsername(r.pi_username)}`
-                        : '—'}
-                    </div>
-                    {r.shop_count > 1 && (
-                      <div className="text-muted-foreground mt-0.5 text-xs">
-                        {t('shopCountHint', { count: r.shop_count })}
+                  <td className="bg-card sticky left-0 z-10 py-2.5 pr-3 pl-2">
+                    <div className="flex items-start gap-2">
+                      <span className="shrink-0 pt-0.5 font-semibold tabular-nums">
+                        {r.rank}
+                      </span>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-medium">{r.shop_nm}</span>
+                          {isMe && (
+                            <span className="bg-primary/10 text-primary rounded px-1 py-0.5 text-xs font-semibold">
+                              {t('myShopBadge')}
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-xs font-medium text-blue-600 dark:text-blue-400">
+                          {r.pi_username
+                            ? `@${isAdmin ? r.pi_username : maskUsername(r.pi_username)}`
+                            : '—'}
+                        </div>
+                        {r.shop_count > 1 && (
+                          <div className="text-muted-foreground mt-0.5 text-xs">
+                            {t('shopCountHint', { count: r.shop_count })}
+                          </div>
+                        )}
                       </div>
-                    )}
+                    </div>
                   </td>
                   <td className="px-3 py-2.5 text-center font-bold">
                     <span
