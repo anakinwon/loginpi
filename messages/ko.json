@@ -1971,7 +1971,9 @@
       "info": "개인정보",
       "bean": "Bean 지갑",
       "payment": "결제 내역",
-      "subscr": "구독 현황"
+      "subscr": "구독 현황",
+      "store": "🛍️ 내 PiShop™",
+      "lbs": "📍 위치 서비스"
     },
     "info": {
       "displayName": "표시 이름",

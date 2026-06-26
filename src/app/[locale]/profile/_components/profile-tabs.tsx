@@ -16,16 +16,10 @@ import { AccountIntegrationSection } from '@/components/account-integration-sect
 import type { UserRow } from '@/lib/users'
 import type { LocaleOption } from '@/lib/locale-options'
 
-const TABS = [
-  { id: 'info', label: '개인정보' },
-  { id: 'bean', label: 'Bean 지갑' },
-  { id: 'payment', label: '결제 내역' },
-  { id: 'subscr', label: '구독 현황' },
-  { id: 'store', label: '🛍️ 내 PiShop™' },
-  { id: 'lbs', label: '📍 위치 서비스' },
-] as const
+// 라벨은 컴포넌트에서 t('tabs.<id>')로 해석한다(모듈 상수는 useTranslations 불가).
+const TAB_IDS = ['info', 'bean', 'payment', 'subscr', 'store', 'lbs'] as const
 
-type TabId = (typeof TABS)[number]['id']
+type TabId = (typeof TAB_IDS)[number]
 
 interface Props {
   initialUser: UserRow
@@ -33,6 +27,7 @@ interface Props {
 }
 
 export function ProfileTabs({ initialUser, localeOptions }: Props) {
+  const t = useTranslations('profile')
   const [activeTab, setActiveTab] = useState<TabId>('info')
   const [user, setUser] = useState(initialUser)
 
@@ -40,30 +35,31 @@ export function ProfileTabs({ initialUser, localeOptions }: Props) {
   // useSearchParams는 Suspense 경계가 필요해 window.location으로 마운트 후 1회 적용
   useEffect(() => {
     const tab = new URLSearchParams(window.location.search).get('tab')
-    if (tab && TABS.some((t) => t.id === tab)) setActiveTab(tab as TabId)
+    if (tab && (TAB_IDS as readonly string[]).includes(tab))
+      setActiveTab(tab as TabId)
   }, [])
 
   return (
     <div>
       <div className="mb-6 flex gap-1 border-b">
-        {TABS.map((tab) => (
+        {TAB_IDS.map((id) => (
           <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
+            key={id}
+            onClick={() => setActiveTab(id)}
             className={[
               'px-4 py-2 text-sm font-medium transition-colors',
-              activeTab === tab.id
+              activeTab === id
                 ? 'border-primary text-primary border-b-2'
                 : 'text-muted-foreground hover:text-foreground',
             ].join(' ')}
           >
-            {tab.id === 'bean' ? (
+            {id === 'bean' ? (
               <span className="inline-flex items-center gap-1">
                 <BeanIcon className="h-5 w-5" />
-                {tab.label}
+                {t(`tabs.${id}`)}
               </span>
             ) : (
-              tab.label
+              t(`tabs.${id}`)
             )}
           </button>
         ))}
@@ -91,6 +87,7 @@ export function ProfileTabs({ initialUser, localeOptions }: Props) {
 // /store 페이지(SCR-01)와 동일 구성을 프로필 탭에 임베드 — 서브타이틀·내 상품/판매/구매 내비 + 상품 목록
 function StoreTab() {
   const t = useTranslations('store')
+  const tp = useTranslations('profile')
 
   return (
     <div className="space-y-4">
@@ -117,7 +114,7 @@ function StoreTab() {
             href="/store"
             className="text-muted-foreground hover:text-foreground hover:underline"
           >
-            전체 화면 →
+            {tp('tabsExtra.fullView')}
           </Link>
         </nav>
       </div>

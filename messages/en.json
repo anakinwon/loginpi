@@ -169,20 +169,25 @@
       "translating": "Translating…"
     },
     "links": {
+      "active": "Active",
       "col": {
         "googleAccount": "Google Account",
         "joinDate": "Join Date",
         "linkStatus": "Linking Status",
         "piAccount": "Pi Account",
         "role": "Role",
-        "user": "User",
-        "status": "Status"
+        "status": "Status",
+        "user": "User"
       },
+      "confirmDisable": "Are you sure you want to disable the '{name}' account? This account will be blocked from all screens going forward.",
       "desc": {
         "googleOnly": "Pi not linked",
         "linked": "Pi + Google connected",
         "piOnly": "Google not linked"
       },
+      "disable": "Disable",
+      "enable": "Enable",
+      "inactive": "Inactive",
       "noUsers": "No matching users.",
       "searchPiUsername": "Search Pi username (2 characters or more)",
       "searchResultCount": "Search results {count}",
@@ -192,13 +197,8 @@
         "piOnly": "Pi Only"
       },
       "title": "Account Linking Status",
-      "totalCount": "Total {count} users",
-      "active": "Active",
-      "inactive": "Disabled",
-      "disable": "Disable",
-      "enable": "Restore",
-      "confirmDisable": "Disable account '{name}'? This account will be blocked across all screens.",
-      "toggleFailed": "Failed to change status."
+      "toggleFailed": "Failed to change status.",
+      "totalCount": "Total {count} users"
     },
     "logs": {
       "col": {
@@ -269,6 +269,7 @@
       "i18nSection": "Multilingual",
       "links": "Account Link Status",
       "logs": "Log Management",
+      "monitor": "Real-time Monitoring",
       "payments": "Payment History",
       "reports": "Report Processing",
       "settle": "Settlement Management",
@@ -2219,7 +2220,7 @@
     },
     "subscr": {
       "autoRenewOff": "Auto-renewal is canceled.",
-      "autoRenewOffShort": "Auto-renew off",
+      "autoRenewOffShort": "Auto-renewal off",
       "autoRenewOn": "Auto-renewal enabled",
       "cancelAutoRenew": "Cancel Auto-renewal",
       "cancelConfirm": "If you cancel your subscription, auto-renewal will stop after you use it until the expiration date. Do you want to continue?",
@@ -2242,7 +2243,9 @@
     "tabs": {
       "bean": "Bean Wallet",
       "info": "Personal Information",
+      "lbs": "📍 Location Services",
       "payment": "Payment History",
+      "store": "🛍️ My PiShop™",
       "subscr": "Subscription Status"
     },
     "tabsExtra": {
@@ -2251,22 +2254,22 @@
       "store": "🛍️ Store"
     },
     "telegram": {
-      "title": "📨 Telegram Order Alerts",
-      "recommended": "Recommended",
-      "desc": "Pi Browser has no built-in notifications, so we recommend Telegram alerts.",
-      "botNotReady": "The alert bot isn't ready yet. Please check again shortly.",
-      "connected": "✅ Connected — receiving order alerts",
-      "disconnect": "Disconnect",
-      "openBot": "📨 Open Telegram bot to connect",
+      "botNotReady": "The notification bot is not ready yet. Please check again shortly.",
       "confirm": "Confirm Connection",
-      "confirming": "Checking…",
-      "hint": "Tap \"Start\" in Telegram, then tap \"Confirm Connection\" below.",
+      "confirming": "Confirming…",
+      "connected": "✅ Connected — Receiving order notifications",
+      "desc": "Since Pi Browser does not have its own notifications, Telegram notifications are recommended.",
+      "disconnect": "Disconnect",
+      "guideFooter": "Once connected, you will receive Telegram notifications whenever a new order comes in. You can receive phone notifications <b>even if the app is closed</b>.",
+      "guideStep1": "If you don't have the <b>Telegram</b> app on your phone, install it first. (Search for “Telegram” in the App Store/Play Store)",
+      "guideStep2": "Press the <b>“📨 Open Telegram Bot to Connect”</b> button above to open Telegram.",
+      "guideStep3": "Press the <b>“Start”</b> button at the bottom of the Telegram screen once.",
+      "guideStep4": "Return to this screen and press <b>“Confirm Connection”</b> to complete! ✅",
       "guideSummary": "❓ First time? See how to connect",
-      "guideStep1": "If you don't have <b>Telegram</b> on your phone, install it first. (Search \"Telegram\" in the App Store / Play Store)",
-      "guideStep2": "Tap the <b>“📨 Open Telegram bot to connect”</b> button above to open Telegram.",
-      "guideStep3": "Tap the <b>“START”</b> button at the bottom of the Telegram screen once.",
-      "guideStep4": "Return to this screen and tap <b>“Confirm Connection”</b> — done! ✅",
-      "guideFooter": "Once connected, you'll get a Telegram alert whenever a new order arrives. <b>Even if the app is closed</b>, you'll receive phone notifications."
+      "hint": "After pressing \"Start\" in Telegram, please press \"Confirm Connection\" below.",
+      "openBot": "📨 Open Telegram Bot to Connect",
+      "recommended": "Recommended",
+      "title": "📨 Telegram Order Notifications"
     },
     "title": "My Profile"
   },
