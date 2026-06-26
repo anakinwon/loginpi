@@ -35,7 +35,10 @@ export function HeaderShell({ children }: { children: React.ReactNode }) {
           'z-50 backdrop-blur-sm transition-opacity ease-in-out',
           floating
             ? // Pi Browser: 둥근 플로팅 바 (푸터와 동일 스타일: muted→border 그라데이션 + 3D 볼륨 섀도)
-              'fixed inset-x-3 overflow-hidden rounded-2xl border bg-muted bg-gradient-to-b from-muted to-[var(--color-border)] shadow-[0_14px_34px_-8px_rgba(0,0,0,0.42),inset_0_1px_0_0_rgba(255,255,255,0.25),inset_0_-2px_3px_-1px_rgba(0,0,0,0.16)]'
+              // ⚠️ overflow-hidden 금지: 헤더의 backdrop-blur가 fixed 자식의 컨테이닝 블록이 되어,
+              //    overflow-hidden을 켜면 LanguageSwitcher 드롭다운(fixed, 헤더 밑으로 열림)이
+              //    헤더 박스로 클립돼 사라진다. 둥근 모서리는 헤더 배경이 border-radius로 이미 클립됨.
+              'fixed inset-x-3 rounded-2xl border bg-muted bg-gradient-to-b from-muted to-[var(--color-border)] shadow-[0_14px_34px_-8px_rgba(0,0,0,0.42),inset_0_1px_0_0_rgba(255,255,255,0.25),inset_0_-2px_3px_-1px_rgba(0,0,0,0.16)]'
             : // 일반 브라우저·채팅방: 기존 도킹 sticky 헤더
               'bg-background/80 sticky top-0 border-b',
           // 가시: 90% 불투명 / 숨김: 투명+터치차단. 등장 200ms / 사라짐 700ms fade.
