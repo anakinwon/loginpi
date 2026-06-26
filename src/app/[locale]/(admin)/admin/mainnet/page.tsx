@@ -166,6 +166,31 @@ export default function MainnetChecklistPage() {
         </p>
       </div>
 
+      {/* ⚠️ 핵심 개념 — 관리자 필독: 테스트넷 ≠ 메인넷 자동 승계 */}
+      <div className="rounded-xl border-2 border-amber-400 bg-amber-50 p-4 text-sm dark:border-amber-600 dark:bg-amber-950/30">
+        <p className="font-bold text-amber-900 dark:text-amber-200">
+          ⚠️ 핵심 개념 — 테스트넷은 메인넷으로 자동 승계되지 않습니다
+        </p>
+        <ul className="mt-2 list-disc space-y-1 pl-5 text-amber-800 dark:text-amber-300">
+          <li>
+            테스트넷 = <b>연습·테스트 전용</b>(가짜 Pi). 메인넷을 위한 검증이
+            아닙니다.
+          </li>
+          <li>
+            테스트넷의 도메인·앱 검증은 <b>메인넷에 넘어가지 않습니다</b>(별개
+            프로젝트).
+          </li>
+          <li>
+            메인넷은 <b>별도로 세팅된 서버 환경</b>(새 프로젝트·새 도메인·새 API
+            Key·메인넷 지갑)이 준비된 뒤에야 검증·오픈이 결정됩니다.
+          </li>
+          <li>
+            순서: 테스트넷 연습 → <b>메인넷 환경 신규 구축</b> → 메인넷 검증 →
+            등재 심사 → 오픈
+          </li>
+        </ul>
+      </div>
+
       {!applied && (
         <div className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-700 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-400">
           ⚠️ <code>mainnet_checklist</code> 테이블 미적용 —{' '}
