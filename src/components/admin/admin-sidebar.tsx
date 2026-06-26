@@ -18,6 +18,7 @@ const NAV = [
   { href: '/admin/batch', labelKey: 'batch' },
   { href: '/admin/logs', labelKey: 'logs' },
   { href: '/admin/checklist', labelKey: 'checklist' },
+  { href: '/admin/mainnet', labelKey: 'mainnet' },
 ] as const
 
 const STD_NAV = [
