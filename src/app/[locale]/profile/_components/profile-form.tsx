@@ -88,7 +88,10 @@ export function ProfileForm({ initialUser, localeOptions, onSaved }: Props) {
       {FIELDS.map(({ name, key }) => (
         <div key={name} className="flex flex-col gap-1">
           <label className="text-sm font-medium" htmlFor={name}>
-            {t(`info.${key}`)}
+            {t(`info.${key}`)}{' '}
+            <span className="text-muted-foreground font-normal">
+              {name === 'display_name' ? tc('required') : tc('optional')}
+            </span>
           </label>
           <input
             id={name}
@@ -103,7 +106,10 @@ export function ProfileForm({ initialUser, localeOptions, onSaved }: Props) {
       {/* PiTranslate™ 표시 언어 — 카페 메시지가 이 언어로 자동 번역됨 */}
       <div className="flex flex-col gap-1">
         <label className="text-sm font-medium" htmlFor="display_locale_cd">
-          {t('infoExtra.displayLocale')}
+          {t('infoExtra.displayLocale')}{' '}
+          <span className="text-muted-foreground font-normal">
+            {tc('optional')}
+          </span>
         </label>
         <select
           id="display_locale_cd"
@@ -123,7 +129,10 @@ export function ProfileForm({ initialUser, localeOptions, onSaved }: Props) {
       {/* 자기소개 — textarea (FIELDS 루프 밖에서 별도 렌더) */}
       <div className="flex flex-col gap-1">
         <label className="text-sm font-medium" htmlFor="self_intro">
-          {t('info.selfIntro')}
+          {t('info.selfIntro')}{' '}
+          <span className="text-muted-foreground font-normal">
+            {tc('optional')}
+          </span>
         </label>
         <textarea
           id="self_intro"

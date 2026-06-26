@@ -1756,6 +1756,8 @@
     "retry": "Try Again",
     "save": "Save",
     "saving": "Saving...",
+    "optional": "(optional)",
+    "required": "(required)",
     "search": "Search",
     "send": "Send",
     "upgrade": "Upgrade",
