@@ -2219,6 +2219,7 @@
     },
     "subscr": {
       "autoRenewOff": "Auto-renewal is canceled.",
+      "autoRenewOffShort": "Auto-renew off",
       "autoRenewOn": "Auto-renewal enabled",
       "cancelAutoRenew": "Cancel Auto-renewal",
       "cancelConfirm": "If you cancel your subscription, auto-renewal will stop after you use it until the expiration date. Do you want to continue?",
@@ -2239,6 +2240,7 @@
       "usableUntil": "Usable until {date}."
     },
     "tabs": {
+      "bean": "Bean Wallet",
       "info": "Personal Information",
       "payment": "Payment History",
       "subscr": "Subscription Status"
@@ -2247,6 +2249,24 @@
       "fullView": "Full View →",
       "lbs": "📍 Location Services",
       "store": "🛍️ Store"
+    },
+    "telegram": {
+      "title": "📨 Telegram Order Alerts",
+      "recommended": "Recommended",
+      "desc": "Pi Browser has no built-in notifications, so we recommend Telegram alerts.",
+      "botNotReady": "The alert bot isn't ready yet. Please check again shortly.",
+      "connected": "✅ Connected — receiving order alerts",
+      "disconnect": "Disconnect",
+      "openBot": "📨 Open Telegram bot to connect",
+      "confirm": "Confirm Connection",
+      "confirming": "Checking…",
+      "hint": "Tap \"Start\" in Telegram, then tap \"Confirm Connection\" below.",
+      "guideSummary": "❓ First time? See how to connect",
+      "guideStep1": "If you don't have <b>Telegram</b> on your phone, install it first. (Search \"Telegram\" in the App Store / Play Store)",
+      "guideStep2": "Tap the <b>“📨 Open Telegram bot to connect”</b> button above to open Telegram.",
+      "guideStep3": "Tap the <b>“START”</b> button at the bottom of the Telegram screen once.",
+      "guideStep4": "Return to this screen and tap <b>“Confirm Connection”</b> — done! ✅",
+      "guideFooter": "Once connected, you'll get a Telegram alert whenever a new order arrives. <b>Even if the app is closed</b>, you'll receive phone notifications."
     },
     "title": "My Profile"
   },

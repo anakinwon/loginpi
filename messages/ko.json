@@ -1969,6 +1969,7 @@
     "title": "내 프로필",
     "tabs": {
       "info": "개인정보",
+      "bean": "Bean 지갑",
       "payment": "결제 내역",
       "subscr": "구독 현황"
     },
@@ -1997,6 +1998,7 @@
       "expireDate": "만료일: {date}",
       "autoRenewOn": "자동 갱신 활성화됨",
       "autoRenewOff": "자동 갱신이 취소되어 있습니다.",
+      "autoRenewOffShort": "자동 갱신 해제됨",
       "cancelAutoRenew": "자동 갱신 취소",
       "cancelConfirm": "구독을 취소하면 만료일까지 이용 후 자동 갱신이 중단됩니다. 계속하시겠습니까?",
       "cancelOk": "구독이 취소되었습니다. 만료일까지 이용할 수 있습니다.",
@@ -2048,6 +2050,24 @@
       "locTypeLogin": "로그인",
       "locTypeShop": "매장 등록",
       "locTypeTrade": "상품 거래"
+    },
+    "telegram": {
+      "title": "📨 Telegram 주문 알림",
+      "recommended": "추천",
+      "desc": "Pi Browser 자체 알림이 없으므로, Telegram 알림을 추천합니다.",
+      "botNotReady": "알림 봇이 아직 준비 중입니다. 잠시 후 다시 확인해 주세요.",
+      "connected": "✅ 연동됨 — 주문 알림을 받고 있습니다",
+      "disconnect": "연동 해제",
+      "openBot": "📨 Telegram 봇 열어 연동하기",
+      "confirm": "연동 확인",
+      "confirming": "확인 중…",
+      "hint": "Telegram에서 \"시작\"을 누른 뒤, 아래 \"연동 확인\"을 눌러 주세요.",
+      "guideSummary": "❓ 처음이세요? 연동 방법 보기",
+      "guideStep1": "휴대폰에 <b>Telegram(텔레그램)</b> 앱이 없다면 먼저 설치하세요. (앱스토어/플레이스토어에서 “Telegram” 검색)",
+      "guideStep2": "위 <b>“📨 Telegram 봇 열어 연동하기”</b> 버튼을 누르면 텔레그램이 열립니다.",
+      "guideStep3": "텔레그램 화면 맨 아래 <b>“시작(START)”</b> 버튼을 한 번 누르세요.",
+      "guideStep4": "이 화면으로 돌아와 <b>“연동 확인”</b>을 누르면 완료! ✅",
+      "guideFooter": "연동하면 새 주문이 들어올 때마다 텔레그램으로 알림이 와요. <b>앱을 닫아도</b> 휴대폰 알림으로 받을 수 있습니다."
     }
   },
   "subscribe": {
