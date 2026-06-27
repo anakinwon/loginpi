@@ -32,15 +32,22 @@ node scripts/promote-to-prod.mjs --yes  # 실제 승격(master→production)
 
 ## 지금 해야 할 일 (마스터, Vercel 대시보드)
 
-**0) 자가진단** — cafepi·loginpi가 프로젝트 2개인지 1개+별칭인지 확인:
-- `loginpi`엔 🧪 STAGING 배너가 뜸. **`cafepi.vercel.app`에도 🧪 배너가 뜨면 → 같은 프로젝트(별칭)**, 안 뜨면 → 별도 2개.
+> **확정 토폴로지: 1개 프로젝트 + 도메인 별칭 2개**(cafepi에도 🧪 배너 = 같은 프로젝트). → **프로젝트 분리 필요.** 방향: **새 프로젝트=운영, 기존=staging 유지.**
 
-**1) 파이프라인 게이팅 (Phase 1)**
-- **별도 2개였다면**: `cafepi` 프로젝트 → Settings → Git → **Production Branch = `production`**.
-- **1개+별칭이었다면**: 신규 운영 프로젝트 생성 → `cafepi.vercel.app` 도메인 이전 → Production Branch=`production`.
-- `loginpi`: Production Branch=`master` 유지 + `APP_TIER=staging`(적용됨).
+**순서 엄수(cafepi 무중단):**
 
-**2) 검증**: `master`에 빈 커밋 push → **loginpi만** 재배포·cafepi 불변이면 성공.
+1. **새 운영 프로젝트 생성** — Add New → Project → 같은 repo(loginpi) Import → 이름 예 `pycafe-prod`.
+2. **새 프로젝트 설정**:
+   - Settings → Git → **Production Branch = `production`**.
+   - Env(Production): 기존 프로젝트 env 복사하되 — **`APP_TIER` 제외**(prod 자동) · **`CRON_SECRET` 제외**(cron 휴면) · `NEXT_PUBLIC_PI_SANDBOX=true` · SUPABASE는 개발DB(그림자). 나머지(GOOGLE/TELEGRAM/GEMINI/TURN/AUTH_SECRET/PI_SESSION_SECRET) 복사.
+3. **production 브랜치 그린 빌드 확인** — 새 프로젝트 Deployments에서 production 빌드 성공 확인.
+4. **도메인 이전(그린 확인 후에만)**: 기존 프로젝트 Domains에서 `cafepi.vercel.app` **Remove** → 새 프로젝트 Domains에 **Add**.
+5. **기존 프로젝트는 staging 그대로** — Production Branch=`master` + `APP_TIER=staging` 유지. `loginpi.vercel.app`만 남김.
+
+**검증**:
+- `cafepi.vercel.app` → 🧪 배너 **없음**(운영 tier) · `loginpi.vercel.app` → 🧪 배너 **있음**.
+- `master`에 빈 커밋 push → **loginpi만** 재배포·cafepi 불변.
+- `node scripts/promote-to-prod.mjs --yes` → cafepi 재배포.
 
 ## 아직 안 바뀌는 것
 
