@@ -14,6 +14,7 @@ import { PiSdkScript } from '@/components/pi-sdk-script'
 import { PageviewTracker } from '@/components/analytics/pageview-tracker'
 import { Header } from '@/components/layout/header'
 import { BottomNav } from '@/components/layout/bottom-nav'
+import { StagingBanner } from '@/components/layout/staging-banner'
 import { Toaster } from '@/components/ui/sonner'
 import { getActiveUiTheme, buildThemeStyleCss } from '@/lib/ui-theme'
 
@@ -84,6 +85,8 @@ export default async function LocaleLayout({
       >
         {/* 전체 적용 테마 색상 주입 (GLOBAL 범위) — 핵심 색만 바꿔 배경·글자는 유지 */}
         {globalThemeCss && <style dangerouslySetInnerHTML={{ __html: globalThemeCss }} />}
+        {/* Staging 환경 표시 줄무늬 바 — tier=staging일 때만(운영선 null). 최상단 고정 노출 */}
+        <StagingBanner />
         {/* onLoad는 이벤트 핸들러이므로 Client Component(PiSdkScript)로 분리.
             ※ <html> 직접 자식으로 두면 invalid DOM → hydration 불일치 → script 경고 발생 — 반드시 body 안에 배치 */}
         <PiSdkScript />
