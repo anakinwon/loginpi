@@ -18,10 +18,67 @@
 | tier | staging (`APP_TIER=staging` ✅ 적용됨) | prod (VERCEL_ENV=production 자동) |
 | DB | 개발DB(현재 폴백) | 운영DB(신규 Supabase) |
 | Pi | Testnet | **Mainnet** |
-| 도메인 | loginpi.vercel.app | 신규 커스텀 도메인(E-4) |
+| 도메인 | **loginpi.vercel.app** | **cafepi.vercel.app**(+ 향후 커스텀 E-4) |
 | 배너 | 🧪 STAGING 노출 | 없음(운영) |
 
 > 같은 GitHub repo를 두 Vercel 프로젝트에 연결한다(Vercel은 repo 다중 연결 지원). 각자 다른 Production Branch를 본다.
+
+## 🩺 현재 상태 자가진단 — 프로젝트 1개? 2개?
+
+`cafepi`·`loginpi`가 **별도 프로젝트 2개**인지 **한 프로젝트에 도메인 별칭 2개**인지부터 확정해야 한다(분리 절차가 갈림).
+
+- **진단법 A (배너)**: `loginpi`에 `APP_TIER=staging`이 적용돼 🧪 배너가 뜬다. 이 상태에서 **`cafepi.vercel.app`에도 🧪 STAGING 배너가 뜨면 → 같은 프로젝트(별칭 2개)**. 안 뜨면 → 별도 프로젝트 2개.
+- **진단법 B (대시보드)**: Vercel 프로젝트 목록에서 두 도메인이 **같은 프로젝트의 Domains** 아래 있으면 1개, 서로 다른 프로젝트면 2개.
+
+| 진단 결과 | Phase 1에서 할 일 |
+|---|---|
+| **별도 2개** | 재설정만 — `cafepi` 프로젝트의 Production Branch를 `production`으로 변경. 생성 불필요. |
+| **1개 + 별칭** | 분리 필요 — 신규 프로젝트 생성 후 `cafepi.vercel.app` 도메인을 그쪽으로 이전. |
+
+## 🪜 단계별 전환 로드맵 (현재 "둘 다 동일" → 2단계 분리)
+
+**Phase 1 — 파이프라인 분리 (지금·안전·무중단)**
+> `production` 브랜치는 현재 `master`와 동일 커밋(`c508cea`)이라, 게이트를 걸어도 cafepi가 서빙하는 내용은 안 바뀐다.
+1. 자가진단으로 토폴로지 확정.
+2. `cafepi`(운영) 프로젝트: **Settings → Git → Production Branch = `production`** (master 아님). [1개+별칭이면: 먼저 신규 프로젝트 생성 → cafepi 도메인 이전]
+3. `loginpi`(staging) 프로젝트: Production Branch = `master` 유지 + `APP_TIER=staging`(적용됨).
+4. **검증**: `master`에 빈 커밋 push → loginpi만 재배포, cafepi 불변. `production` 머지 → cafepi 재배포. ✅ WIP가 운영에 새지 않음.
+
+**Phase 2 — 환경 마커 분리 (tier)**
+- loginpi: tier=staging → 🧪 배너 노출(완료). cafepi: tier=prod(`APP_TIER` 미설정) → 배너 없음.
+- `src/lib/db-env.ts` 라우팅 확인. 1개+별칭이었다면 분리 후 cafepi에서 `APP_TIER` 제거 필수(안 그러면 운영에 🧪 배너).
+
+**Phase 3 — 데이터/네트워크 컷오버 (운영DB·메인넷 준비 완료 시)**
+- cafepi env 스왑: 운영DB(`docs/PROD_DB_SETUP.md`) · `NEXT_PUBLIC_PI_SANDBOX=false` · 메인넷 `PI_API_KEY`/`PI_WALLET_PRIVATE_SEED` · `CRON_SECRET` 활성.
+- P0 실기기 재검증 → 등재. (아래 컷오버 시퀀스)
+
+### Pre-cutover env 스캐폴드 (DB 미정 시 — cafepi를 빌드 그린 유지)
+> 빌드가 `src/env.ts`(t3-env)로 필수 env를 검증 → SUPABASE 비우면 빌드 실패. 그래서 컷오버 전까지 **개발DB+sandbox**로 "운영 게이팅된 그림자"로 띄운다(메인넷 아님·공지 금지).
+
+| 변수 | Phase 1~2 (그림자) | Phase 3 (컷오버) |
+|---|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL`/`SUPABASE_SERVICE_ROLE_KEY` | 개발DB(임시) | **운영DB** |
+| `NEXT_PUBLIC_PI_SANDBOX` | `true` | **`false`** |
+| `PI_API_KEY`/`PI_WALLET_PRIVATE_SEED` | Testnet/생략 | **메인넷** |
+| `CRON_SECRET` | **미설정(cron 휴면)** | **설정(정산 활성)** |
+| `AUTH_SECRET`/`PI_SESSION_SECRET`/`GOOGLE_*`/`TELEGRAM_*`/`GEMINI_*`/`CLOUDFLARE_TURN_*` | 지금 설정 | 유지 |
+| `APP_TIER` | ⛔ 미설정(prod 자동) | ⛔ 미설정 |
+
+## 🚀 일상 승격(promote) 워크플로우
+
+```
+feature/* ─PR─▶ master ─(staging 검증 후)─▶ production
+                loginpi 자동배포            cafepi 배포
+```
+
+- **개발/머지는 평소처럼 `master`** (staging에 자동 반영 → loginpi에서 테스트).
+- **운영 배포는 의도적 승격으로만**: `master` → `production` 머지(=cafepi 배포).
+- 승격 명령(작업트리 안 건드림, fast-forward만 — production이 master 조상일 때만 통과 = 안전):
+  ```bash
+  node scripts/promote-to-prod.mjs        # 미리보기(무엇이 운영에 나갈지)
+  node scripts/promote-to-prod.mjs --yes  # 실제 승격(push origin master:production)
+  ```
+- ⛔ `production`에 **직접 WIP push 금지**. 승격은 검증된 master만.
 
 ## 브랜치 · 승격 흐름
 
