@@ -53,7 +53,10 @@ for (const f of files) {
     skipped++
     continue
   }
-  const sql = fs.readFileSync(path.join(SQL_DIR, f), 'utf8')
+  // fresh DB 셋업: CONCURRENTLY 제거(빈 DB라 불필요 + 멀티문장 암묵 트랜잭션과 충돌). 결과 인덱스 동일.
+  const sql = fs
+    .readFileSync(path.join(SQL_DIR, f), 'utf8')
+    .replace(/\bCONCURRENTLY\b/gi, '')
   try {
     await client.query(sql)
     await client.query('INSERT INTO _sql_migration_log(filename) VALUES($1)', [f])

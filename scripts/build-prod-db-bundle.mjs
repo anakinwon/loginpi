@@ -36,7 +36,12 @@ let out =
 
 for (const f of files) {
   out += `\n-- ═══════════════ ${f} ═══════════════\n`
-  out += fs.readFileSync(path.join(SQL_DIR, f), 'utf8').trimEnd() + '\n'
+  // fresh DB 셋업: CONCURRENTLY 제거(빈 DB라 불필요 + 트랜잭션 충돌 방지). 결과 동일.
+  out +=
+    fs
+      .readFileSync(path.join(SQL_DIR, f), 'utf8')
+      .replace(/\bCONCURRENTLY\b/gi, '')
+      .trimEnd() + '\n'
 }
 
 fs.writeFileSync(OUT, out, 'utf8')

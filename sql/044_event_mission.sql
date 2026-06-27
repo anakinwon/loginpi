@@ -74,9 +74,11 @@ CREATE TABLE IF NOT EXISTS evt_mission (
   modr_id TEXT NOT NULL DEFAULT 'ADMIN',
   mod_dtm TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
   del_yn CHAR(1) NOT NULL DEFAULT 'N',
-  del_dtm TIMESTAMPTZ,
-  UNIQUE (event_id, mission_cd) WHERE del_yn = 'N'
+  del_dtm TIMESTAMPTZ
 );
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_evt_mission_active
+  ON evt_mission(event_id, mission_cd) WHERE del_yn = 'N';
 
 CREATE INDEX idx_evt_mission_event_del
   ON evt_mission(event_id, del_yn);
@@ -98,9 +100,11 @@ CREATE TABLE IF NOT EXISTS evt_user_mission (
   modr_id TEXT NOT NULL DEFAULT 'SYSTEM',
   mod_dtm TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
   del_yn CHAR(1) NOT NULL DEFAULT 'N',
-  del_dtm TIMESTAMPTZ,
-  UNIQUE (event_id, user_id, mission_cd) WHERE del_yn = 'N'
+  del_dtm TIMESTAMPTZ
 );
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_evt_user_mission_active
+  ON evt_user_mission(event_id, user_id, mission_cd) WHERE del_yn = 'N';
 
 CREATE INDEX idx_evt_user_mission_event_user_del
   ON evt_user_mission(event_id, user_id, del_yn);
@@ -121,9 +125,11 @@ CREATE TABLE IF NOT EXISTS evt_exclude (
   modr_id TEXT NOT NULL DEFAULT 'ADMIN',
   mod_dtm TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
   del_yn CHAR(1) NOT NULL DEFAULT 'N',
-  del_dtm TIMESTAMPTZ,
-  UNIQUE (event_id, user_id) WHERE del_yn = 'N'
+  del_dtm TIMESTAMPTZ
 );
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_evt_exclude_active
+  ON evt_exclude(event_id, user_id) WHERE del_yn = 'N';
 
 CREATE INDEX idx_evt_exclude_event_user_del
   ON evt_exclude(event_id, user_id, del_yn);
@@ -146,9 +152,11 @@ CREATE TABLE IF NOT EXISTS evt_gift_log (
   modr_id TEXT NOT NULL DEFAULT 'ADMIN',
   mod_dtm TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
   del_yn CHAR(1) NOT NULL DEFAULT 'N',
-  del_dtm TIMESTAMPTZ,
-  UNIQUE (event_id, gift_rank_no) WHERE del_yn = 'N'
+  del_dtm TIMESTAMPTZ
 );
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_evt_gift_log_active
+  ON evt_gift_log(event_id, gift_rank_no) WHERE del_yn = 'N';
 
 CREATE INDEX idx_evt_gift_log_event_status
   ON evt_gift_log(event_id, gift_send_status_cd);
@@ -183,7 +191,7 @@ INSERT INTO evt_mission (
   'evt-20260614-001', 'M1', '계정 통합',
   '두 세계를 연결하는 기술',
   'MULTI_AND', '["account_link","google_link"]'::jsonb, 1
-) ON CONFLICT (event_id, mission_cd) DO UPDATE SET modr_id='ADMIN', mod_dtm=CURRENT_TIMESTAMP;
+) ON CONFLICT (event_id, mission_cd) WHERE del_yn = 'N' DO UPDATE SET modr_id='ADMIN', mod_dtm=CURRENT_TIMESTAMP;
 
 -- M2: 프로필 완성
 INSERT INTO evt_mission (
@@ -193,7 +201,7 @@ INSERT INTO evt_mission (
   'evt-20260614-001', 'M2', '프로필 완성',
   '요원 신원 확립',
   'SINGLE', '["profile_update"]'::jsonb, 2
-) ON CONFLICT (event_id, mission_cd) DO UPDATE SET modr_id='ADMIN', mod_dtm=CURRENT_TIMESTAMP;
+) ON CONFLICT (event_id, mission_cd) WHERE del_yn = 'N' DO UPDATE SET modr_id='ADMIN', mod_dtm=CURRENT_TIMESTAMP;
 
 -- M3: PREMIUM 카페 + 자동번역
 INSERT INTO evt_mission (
@@ -203,7 +211,7 @@ INSERT INTO evt_mission (
   'evt-20260614-001', 'M3', 'PREMIUM 카페 생성 + 자동번역',
   '프리미엄 공간 개설',
   'MULTI_AND', '["premium_cafe_create","cafe_translate_use"]'::jsonb, 3
-) ON CONFLICT (event_id, mission_cd) DO UPDATE SET modr_id='ADMIN', mod_dtm=CURRENT_TIMESTAMP;
+) ON CONFLICT (event_id, mission_cd) WHERE del_yn = 'N' DO UPDATE SET modr_id='ADMIN', mod_dtm=CURRENT_TIMESTAMP;
 
 -- M4: Bean 전송 (M5와 순서 교환됨 — 2026-06-15)
 INSERT INTO evt_mission (
@@ -213,7 +221,7 @@ INSERT INTO evt_mission (
   'evt-20260614-001', 'M4', 'Bean 전송 테스트(PiRC1)',
   '보상 전달 기술',
   'SINGLE', '["bean_send"]'::jsonb, 4
-) ON CONFLICT (event_id, mission_cd) DO UPDATE SET modr_id='ADMIN', mod_dtm=CURRENT_TIMESTAMP;
+) ON CONFLICT (event_id, mission_cd) WHERE del_yn = 'N' DO UPDATE SET modr_id='ADMIN', mod_dtm=CURRENT_TIMESTAMP;
 
 -- M5: Pi Bet 생성 + 분배 (M4와 순서 교환됨 — 2026-06-15)
 INSERT INTO evt_mission (
@@ -223,7 +231,7 @@ INSERT INTO evt_mission (
   'evt-20260614-001', 'M5', 'Pi Bet 생성 후 분배',
   '예측 게임 주관',
   'MULTI_AND', '["pibet_create","pibet_entry"]'::jsonb, 5
-) ON CONFLICT (event_id, mission_cd) DO UPDATE SET modr_id='ADMIN', mod_dtm=CURRENT_TIMESTAMP;
+) ON CONFLICT (event_id, mission_cd) WHERE del_yn = 'N' DO UPDATE SET modr_id='ADMIN', mod_dtm=CURRENT_TIMESTAMP;
 
 -- M6: 채팅 멀티 기능 (3종 중 1개)
 INSERT INTO evt_mission (
@@ -233,7 +241,7 @@ INSERT INTO evt_mission (
   'evt-20260614-001', 'M6', '채팅 멀티 기능 사용',
   '채팅 기술 완성',
   'MULTI_OR', '["voice_join","file_send","sticker_use"]'::jsonb, 6
-) ON CONFLICT (event_id, mission_cd) DO UPDATE SET modr_id='ADMIN', mod_dtm=CURRENT_TIMESTAMP;
+) ON CONFLICT (event_id, mission_cd) WHERE del_yn = 'N' DO UPDATE SET modr_id='ADMIN', mod_dtm=CURRENT_TIMESTAMP;
 
 -- M7: 판매자 거래 취소
 INSERT INTO evt_mission (
@@ -243,7 +251,7 @@ INSERT INTO evt_mission (
   'evt-20260614-001', 'M7', '판매자 거래 취소',
   '거래 협상 스킬',
   'SINGLE', '["seller_cancel"]'::jsonb, 7
-) ON CONFLICT (event_id, mission_cd) DO UPDATE SET modr_id='ADMIN', mod_dtm=CURRENT_TIMESTAMP;
+) ON CONFLICT (event_id, mission_cd) WHERE del_yn = 'N' DO UPDATE SET modr_id='ADMIN', mod_dtm=CURRENT_TIMESTAMP;
 
 -- M8: 구매자 거래 취소
 INSERT INTO evt_mission (
@@ -253,7 +261,7 @@ INSERT INTO evt_mission (
   'evt-20260614-001', 'M8', '구매자 거래 취소',
   '구매 결정 권리',
   'SINGLE', '["buyer_cancel"]'::jsonb, 8
-) ON CONFLICT (event_id, mission_cd) DO UPDATE SET modr_id='ADMIN', mod_dtm=CURRENT_TIMESTAMP;
+) ON CONFLICT (event_id, mission_cd) WHERE del_yn = 'N' DO UPDATE SET modr_id='ADMIN', mod_dtm=CURRENT_TIMESTAMP;
 
 -- M9: 판매자 보증금 + 위치동의
 INSERT INTO evt_mission (
@@ -263,7 +271,7 @@ INSERT INTO evt_mission (
   'evt-20260614-001', 'M9', '판매자 보증금 + 위치동의',
   '신뢰 자본 확보',
   'MULTI_AND', '["bond_deposit","lbs_consent"]'::jsonb, 9
-) ON CONFLICT (event_id, mission_cd) DO UPDATE SET modr_id='ADMIN', mod_dtm=CURRENT_TIMESTAMP;
+) ON CONFLICT (event_id, mission_cd) WHERE del_yn = 'N' DO UPDATE SET modr_id='ADMIN', mod_dtm=CURRENT_TIMESTAMP;
 
 -- M10: 보증금 활성 거래 취소 수수료 (M9 후)
 INSERT INTO evt_mission (
@@ -273,6 +281,6 @@ INSERT INTO evt_mission (
   'evt-20260614-001', 'M10', '보증금 활성 거래 취소 수수료',
   '신뢰 기반 거래',
   'SEQUENCE', '["cancel_with_fee"]'::jsonb, 'M9', 10
-) ON CONFLICT (event_id, mission_cd) DO UPDATE SET modr_id='ADMIN', mod_dtm=CURRENT_TIMESTAMP;
+) ON CONFLICT (event_id, mission_cd) WHERE del_yn = 'N' DO UPDATE SET modr_id='ADMIN', mod_dtm=CURRENT_TIMESTAMP;
 
 COMMIT;
