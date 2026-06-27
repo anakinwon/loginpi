@@ -18,12 +18,15 @@ node scripts/build-prod-db-bundle.mjs
 ```
 
 ### 3. 적용 (택1)
-- **psql (권장 — 대용량·오류중단)**:
+- **⭐ Node 러너 (권장 — 재개 가능·오류 추적·psql 불필요)**:
   ```bash
-  psql "<운영DB 연결문자열>" -v ON_ERROR_STOP=1 -f sql/_prod_db_bundle.sql
+  npm i pg
+  node scripts/apply-sql-bundle.mjs "<운영DB 연결문자열>"
   ```
-  (Supabase: Project Settings → Database → Connection string. `ON_ERROR_STOP=1`로 첫 오류 시 중단)
-- **Supabase SQL Editor**: 505KB라 한 번에 부담 → 구간별(예: 001~050 / 051~100 / 101~131) 분할 붙여넣기.
+  파일별 적용 + `_sql_migration_log` 기록 → **오류 시 그 지점부터 재실행**(적용분 자동 건너뜀). 번들 생성 불필요(sql/ 직접 적용).
+  (Supabase 연결문자열: Project Settings → Database → Connection string(URI), sslmode=require)
+- **psql (번들)**: `node scripts/build-prod-db-bundle.mjs` 후 `psql "<conn>" -v ON_ERROR_STOP=1 -f sql/_prod_db_bundle.sql`
+- **Supabase SQL Editor**: 번들 505KB → 구간별(001~050 / 051~100 / 101~) 분할 붙여넣기.
 
 ### 4. 검증
 ```sql
