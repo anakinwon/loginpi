@@ -57,11 +57,13 @@
 
 | 변수 | Phase 1~2 (그림자) | Phase 3 (컷오버) |
 |---|---|---|
+| **`NEXT_PUBLIC_APP_URL`** ⭐ | **`https://cafepi.vercel.app`**(도메인별 필수 — 틀리면 api-guard가 인증 403) | 유지 |
 | `NEXT_PUBLIC_SUPABASE_URL`/`SUPABASE_SERVICE_ROLE_KEY` | 개발DB(임시) | **운영DB** |
 | `NEXT_PUBLIC_PI_SANDBOX` | `true` | **`false`** |
 | `PI_API_KEY`/`PI_WALLET_PRIVATE_SEED` | Testnet/생략 | **메인넷** |
-| `CRON_SECRET` | **미설정(cron 휴면)** | **설정(정산 활성)** |
-| `AUTH_SECRET`/`PI_SESSION_SECRET`/`GOOGLE_*`/`TELEGRAM_*`/`GEMINI_*`/`CLOUDFLARE_TURN_*` | 지금 설정 | 유지 |
+| `CRON_SECRET` | **설정 필수**(VERCEL_ENV=production 빌드 강제 — 미설정 시 빌드 실패. cron은 그림자 단계엔 개발DB 대상이라 무해) | 유지(컷오버 후 운영DB 정산) |
+| `AUTH_SECRET`/`PI_SESSION_SECRET` | 설정(운영 신규 권장) | 유지 |
+| `GOOGLE_*`/`TELEGRAM_*`/`GEMINI_*`/`CLOUDFLARE_TURN_*` | 지금 설정(GOOGLE 콜백은 Console에 cafepi 도메인 등록 / TELEGRAM 봇은 운영 별도 토큰 권장) | 유지 |
 | `APP_TIER` | ⛔ 미설정(prod 자동) | ⛔ 미설정 |
 
 ## 🚀 일상 승격(promote) 워크플로우

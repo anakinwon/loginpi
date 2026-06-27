@@ -39,7 +39,11 @@ node scripts/promote-to-prod.mjs --yes  # 실제 승격(master→production)
 1. **새 운영 프로젝트 생성** — Add New → Project → 같은 repo(loginpi) Import → 이름 예 `pycafe-prod`.
 2. **새 프로젝트 설정**:
    - Settings → Git → **Production Branch = `production`**.
-   - Env(Production): 기존 프로젝트 env 복사하되 — **`APP_TIER` 제외**(prod 자동) · **`CRON_SECRET` 제외**(cron 휴면) · `NEXT_PUBLIC_PI_SANDBOX=true` · SUPABASE는 개발DB(그림자). 나머지(GOOGLE/TELEGRAM/GEMINI/TURN/AUTH_SECRET/PI_SESSION_SECRET) 복사.
+   - Env(Production): 기존 env 복사하되 **반드시 바꿀 것**:
+     - ⭐ **`NEXT_PUBLIC_APP_URL=https://cafepi.vercel.app`** (loginpi 그대로 두면 api-guard가 인증 요청을 403 `cross_origin_auth`로 막아 **Google·Pi 로그인 깨짐** — 운영 인증 장애의 원인)
+     - **`APP_TIER` 제외**(prod 자동) · `NEXT_PUBLIC_PI_SANDBOX=true`(그림자) · SUPABASE는 개발DB(그림자)
+     - **`CRON_SECRET` 설정**(VERCEL_ENV=production 빌드 필수 — 미설정 시 빌드 실패)
+     - 나머지(GOOGLE/TELEGRAM/GEMINI/TURN/AUTH_SECRET/PI_SESSION_SECRET) 복사. GOOGLE은 Console에 cafepi 콜백 등록, TELEGRAM은 운영 별도 봇 권장.
 3. **production 브랜치 그린 빌드 확인** — 새 프로젝트 Deployments에서 production 빌드 성공 확인.
 4. **도메인 이전(그린 확인 후에만)**: 기존 프로젝트 Domains에서 `cafepi.vercel.app` **Remove** → 새 프로젝트 Domains에 **Add**.
 5. **기존 프로젝트는 staging 그대로** — Production Branch=`master` + `APP_TIER=staging` 유지. `loginpi.vercel.app`만 남김.
