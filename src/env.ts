@@ -16,6 +16,18 @@ export const env = createEnv({
     // 미설정 시 환불은 PENDING 장부 기록만 하고 실송금은 스킵 (서버 전용 비밀, 절대 클라이언트 노출 금지)
     PI_WALLET_PRIVATE_SEED: z.string().optional(),
     SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
+    // ── 3-tier DB 라우팅(src/lib/db-env.ts) — 전부 optional, 미설정 시 현행 운영 DB 폴백(하위호환) ──
+    // tier 자동판정(VERCEL_ENV)을 덮어쓸 명시값. 보통 미설정.
+    APP_TIER: z.enum(['dev', 'staging', 'prod']).optional(),
+    // 스테이징 DB 스위치: 'staging'(자체 DB·RW, 기본) | 'prod-ro'(운영DB 읽기 전용)
+    STAGING_DB_TARGET: z.enum(['staging', 'prod-ro']).optional(),
+    DEV_SUPABASE_URL: z.string().url().optional(),
+    DEV_SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
+    STAGING_SUPABASE_URL: z.string().url().optional(),
+    STAGING_SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
+    // 운영DB 읽기 전용 접근용 — read-only 롤/Read Replica 자격증명(전권 service_role 금지)
+    PROD_RO_SUPABASE_URL: z.string().url().optional(),
+    PROD_RO_SUPABASE_KEY: z.string().optional(),
     ANTHROPIC_API_KEY: z.string().optional(),
     GEMINI_API_KEY: z.string().optional(),
     RESEND_API_KEY: z.string().optional(),
@@ -65,6 +77,15 @@ export const env = createEnv({
     PI_API_KEY: process.env.PI_API_KEY,
     PI_WALLET_PRIVATE_SEED: process.env.PI_WALLET_PRIVATE_SEED,
     SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
+    APP_TIER: process.env.APP_TIER,
+    STAGING_DB_TARGET: process.env.STAGING_DB_TARGET,
+    DEV_SUPABASE_URL: process.env.DEV_SUPABASE_URL,
+    DEV_SUPABASE_SERVICE_ROLE_KEY: process.env.DEV_SUPABASE_SERVICE_ROLE_KEY,
+    STAGING_SUPABASE_URL: process.env.STAGING_SUPABASE_URL,
+    STAGING_SUPABASE_SERVICE_ROLE_KEY:
+      process.env.STAGING_SUPABASE_SERVICE_ROLE_KEY,
+    PROD_RO_SUPABASE_URL: process.env.PROD_RO_SUPABASE_URL,
+    PROD_RO_SUPABASE_KEY: process.env.PROD_RO_SUPABASE_KEY,
     ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
     GEMINI_API_KEY: process.env.GEMINI_API_KEY,
     RESEND_API_KEY: process.env.RESEND_API_KEY,
