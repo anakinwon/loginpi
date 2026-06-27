@@ -70,3 +70,6 @@ docs/.pptx-build/qa*/
 
 # 환경변수 템플릿은 추적(실값 없는 placeholder만). 실값 파일(.env.local 등)은 위 .env* 규칙으로 제외 유지
 !.env.example
+
+# 운영DB 초기화 번들(파생물·505KB, scripts/build-prod-db-bundle.mjs로 재생성)
+sql/_prod_db_bundle.sql
