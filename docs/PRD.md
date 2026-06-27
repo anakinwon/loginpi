@@ -1,10 +1,11 @@
 # PRD: Pi Network 기반 풀스택 앱 플랫폼
 
-> **버전**: v12.3
+> **버전**: v12.4
 > **작성일**: 2026-06-05
-> **최종 업데이트**: 2026-06-23
+> **최종 업데이트**: 2026-06-28
 > **작성자**: anakin
-> **배포 URL**: https://loginpi.vercel.app
+> **배포 URL**: **staging** https://loginpi.vercel.app(Testnet) · **운영** https://cafepi.vercel.app(Mainnet 전환 중·production 브랜치)
+> **배포 전략**: `docs/DEPLOY_STRATEGY.md`·`docs/DEPLOY_NOTICE.md` — 2단계 배포(staging→운영) 분리, `production` 브랜치 게이팅, 3-tier DB 라우터(`src/lib/db-env.ts`). 메인넷 전환: `docs/MAINNET_READINESS_CHECKLIST.md`·`docs/PROD_DB_SETUP.md` (ROADMAP Phase 24)
 > **저장소**: https://github.com/anakinwon/loginpi
 > **카페 상세 스펙**: `docs/PRD_4_CHAT.md` (v1.6)
 > **GTM 문서**: `docs/제품설명서_202060615.pptx` (단기 4목표 13장 슬라이드) · `docs/공개_라이선스_정책.md` (오픈코어 3계층)
