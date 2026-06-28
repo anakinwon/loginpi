@@ -34,19 +34,13 @@
 `readonly_ro` 롤: `BYPASSRLS`(RLS 우회로 전체 행 읽기) + **SELECT만**(쓰기·DDL 전면 차단) + `authenticator` 멤버십(PostgREST가 SET ROLE). 검증: 읽기 성공·`UPDATE` 시 `permission denied`.
 
 ### ② 읽기전용 JWT 발급 → `PROD_RO_SUPABASE_KEY`
-`role=readonly_ro` 클레임 JWT를 **프로젝트 JWT secret**(운영 Supabase → Settings → API → **JWT Settings → JWT Secret**)으로 HS256 서명. 로컬에서(시크릿 채팅 금지):
+`role=readonly_ro` 클레임 JWT를 **프로젝트 JWT secret**(운영 Supabase → Settings → API → **JWT Settings → JWT Secret**)으로 HS256 서명. 전용 스크립트로 로컬에서(시크릿 채팅 금지):
 
-```js
-// node mint-ro-jwt.js   → 출력값이 PROD_RO_SUPABASE_KEY
-const crypto = require('crypto')
-const secret = 'PASTE_PROJECT_JWT_SECRET' // 운영 Supabase JWT Secret
-const b64 = (o) => Buffer.from(JSON.stringify(o)).toString('base64url')
-const now = Math.floor(Date.now() / 1000)
-const head = b64({ alg: 'HS256', typ: 'JWT' })
-const body = b64({ role: 'readonly_ro', iss: 'supabase', iat: now, exp: now + 60 * 60 * 24 * 3650 }) // 10년
-const sig = crypto.createHmac('sha256', secret).update(head + '.' + body).digest('base64url')
-console.log(head + '.' + body + '.' + sig)
+```bash
+node scripts/mint-ro-jwt.mjs "<운영 JWT Secret>"
+# → 출력된 JWT(eyJ…)를 Vercel env PROD_RO_SUPABASE_KEY 에 입력
 ```
+(role=readonly_ro·10년 만료·읽기전용. 셸 히스토리에 secret이 남을 수 있으니 작업 후 정리.)
 
 > ⚠️ 신형 API 키 체계(`sb_publishable_`/`sb_secret_`)를 쓰는 프로젝트라면, 이 커스텀-role JWT가
 > 동작하려면 **레거시 JWT(HS256) 인증이 활성**이어야 합니다. JWT Secret이 노출돼 있으면 보통 동작.
