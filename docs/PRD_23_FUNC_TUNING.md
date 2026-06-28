@@ -25,7 +25,7 @@
 | 구분 | 항목 |
 |---|---|
 | 🟢 즉시 통과 가능 | ①대시보드 ④이벤트(미션형) ⑥브랜딩(개명완료) ⑦개인정보(선택옵션) ⑧Google로그인(Pi Browser 미렌더) |
-| ✅ 적용 완료 | ③시세·각국통화칩 **기본 숨김** 연결(`NEXT_PUBLIC_FEATURE_PI_PRICE` 토글로 언제든 노출) |
+| ✅ 적용 완료 | ③시세칩+통화콤보 환율 **운영 숨김/staging 노출**(`NEXT_PUBLIC_FEATURE_PI_PRICE`, 언제든 노출 가능) |
 | 🟠 절제 필요(메인넷 전) | ⑤Bean "토큰" **노출 표현** |
 | 🟡 조건부(라벨 보강) | ②각국 통화 콤보 |
 | 🔵 Pi 직접확인 | Py 상표 유사성 · Bean "공식 발행" 계획의 A-5 저촉 여부 |
@@ -55,7 +55,7 @@
 - **코드 검증**: `src/components/layout/pi-price-chip.tsx`. `π {환산가} {통화코드}` 칩 렌더(L48-61), `title="1 π ≈ {usd} USD (CoinGecko)"`(L50). `/api/pi-price` + `/api/exchange-rates` 소비.
 - **⚠️ 게이트 실태(정정)**: `NEXT_PUBLIC_FEATURE_PI_PRICE` 플래그가 `env.ts` L82-83에 **정의는 되어 있으나**, `header.tsx` **L30에서 `<PiPriceChip>`를 조건 없이 무조건 렌더** → **플래그가 시세칩 렌더에 미연결**. (`fx-rates.ts`·`sql/062` 주석은 "플래그로 게이트"라 명시하나 헤더 시세칩은 누락됨.)
 - **현재 동작**: 환경 무관하게 헤더에 실시간 Pi 환산 시세 표시. 시세 로드 실패 시만 `null`(L35).
-- **방안(절제·P1) ✅구현완료**: `header.tsx`에 게이트 실제 연결 → **환경 무관 기본 숨김**. 마스터 지시(2026-06-29)대로 `NEXT_PUBLIC_FEATURE_PI_PRICE='true'` 한 줄로 언제든 노출. §8.6.
+- **방안(절제·P1) ✅구현완료**: `header.tsx`(시세칩) + `currency-combo.tsx`(환율 숫자) 게이트 연결 → **운영(cafepi) 숨김 / staging(loginpi) 노출**. `NEXT_PUBLIC_FEATURE_PI_PRICE='true'`로 언제든 노출. 통화 선택 기능은 유지. §8.6.
 
 ### ④ 이벤트 목록 표시 — 🟢 안전
 - **근거**: A(도박/베팅 레드라인). 확률형 추첨이면 위험, 조건부 미션 보상이면 허용.
@@ -103,7 +103,7 @@
 | 순위 | 항목 | 변경 대상 | 구체 작업 (운영에만 적용) |
 |---|---|---|---|
 | **P0** | ⑤ Bean 토큰 표현 | `messages/listing/{ko,en}.json` 오버레이 (원본 `ko.json`은 불변) | "Bean Token/토큰 충전/토큰 경제"→"Bean(포인트/크레딧)" 절제 문구를 **운영 오버레이로만** 정의. listing mode일 때 `request.ts`가 deepMerge. staging은 원본 유지. PiRC 명칭 보존. §8.5 |
-| **P1 ✅완료** | ③ 시세·각국통화 | `header.tsx` 게이트 연결(완료) | **환경 무관 기본 숨김** 연결 완료. `NEXT_PUBLIC_FEATURE_PI_PRICE='true'`로 언제든 노출. §8.6 |
+| **P1 ✅완료** | ③ 시세칩+통화환율 | `header.tsx` + `currency-combo.tsx` | **운영 숨김 / staging 노출** 연결 완료. `NEXT_PUBLIC_FEATURE_PI_PRICE='true'`로 언제든 노출. §8.6 |
 | **P2** | ② 통화 콤보 | `messages/listing/{ko,en}.json` 오버레이 `store.form.*` | "참고용 환산(결제는 Pi)" 문구를 운영 오버레이로. `currency-combo.tsx` 구조 변경 불필요(라벨만). §8.5 |
 | 확인후 | ⑤ "공식 발행" 문구 | `listing` 오버레이 L727·902 대응 키 | §4 Pi 질의 결과에 따라 운영 노출만 유지/수정/삭제. staging은 비전 표현 유지 가능. |
 
@@ -189,7 +189,7 @@ NEXT_PUBLIC_LISTING_MODE: z.enum(['true', 'false']).optional(),
 | loginpi(staging) | 미설정 | "Bean Token" 표현 · 기존 라벨 (유지) |
 | 로컬 | 미설정 | staging과 동일(개발 편의) |
 
-> ⚠️ **시세·각국통화칩(③)은 이 플래그가 아니라 별도 `NEXT_PUBLIC_FEATURE_PI_PRICE`로 제어**한다(§8.6). 마스터 지시(2026-06-29): 시세·각국통화는 **환경 무관 현재 전부 숨김**, 단일 토글로 언제든 노출. ⑤·②(i18n 문구)만 환경별 분기.
+> ⚠️ **시세·각국통화칩+환율(③)은 이 플래그가 아니라 별도 `NEXT_PUBLIC_FEATURE_PI_PRICE`로 제어**한다(§8.6). 마스터 지시(2026-06-29): **운영(cafepi)만 숨김 / staging(loginpi) 노출**, 언제든 노출 가능.
 
 - **왜 `NEXT_PUBLIC_`**: 서버(i18n)·클라이언트(시세칩) 양쪽이 단일 신호를 읽어 일관 분기.
 - **왜 tier 자동판정(`resolveDbTier()`)에 의존하지 않나**: `db-env.ts` L45는 **로컬·일반 빌드 기본값을 `prod`로 폴백** → tier 기반으로 하면 **로컬 개발에서도 절제가 켜져** 개발자가 "Bean Token"을 못 봄. 명시 플래그가 사고 위험 없이 안전.
@@ -200,9 +200,9 @@ NEXT_PUBLIC_LISTING_MODE: z.enum(['true', 'false']).optional(),
 |---|---|---|---|---|
 | ⑤ Bean 토큰 표현 | `NEXT_PUBLIC_LISTING_MODE` (서버 i18n) | `request.ts` 오버레이 deepMerge | "Bean Token" 유지 | "Bean(포인트)" |
 | ② 통화 라벨 | `NEXT_PUBLIC_LISTING_MODE` (서버 i18n) | 동일 오버레이(`store.form.*`) | 기존 유지 | "참고환산" |
-| ③ 시세·각국통화칩 | `NEXT_PUBLIC_FEATURE_PI_PRICE` (클라이언트) | `header.tsx` 게이트 ✅**구현완료** | 기본 숨김\* | 기본 숨김\* |
+| ③ 시세칩+통화환율 | `NEXT_PUBLIC_FEATURE_PI_PRICE` (클라이언트) | `header.tsx` + `currency-combo.tsx` ✅**구현완료** | 노출(`=true`) | **숨김**(미설정) |
 
-> \* ③은 **환경 무관 기본 숨김**(마스터 지시). 어느 환경이든 `NEXT_PUBLIC_FEATURE_PI_PRICE='true'` 한 줄로 즉시 노출. §8.6.
+> \* ③은 **운영(cafepi)만 숨김, staging(loginpi)은 노출 유지**(마스터 지시). 운영에서도 `=true` 한 줄로 즉시 노출. §8.6.
 > ②의 통화 라벨은 클라이언트 컴포넌트(`currency-combo.tsx`)가 표시하지만 **문구 자체는 i18n**이므로, request.ts 오버레이가 적용되면 클라이언트는 코드 변경 없이 자동 반영된다.
 
 ### 8.5 i18n 오버레이 구현 (`src/i18n/request.ts`)
@@ -223,34 +223,26 @@ if (process.env.NEXT_PUBLIC_LISTING_MODE === 'true') {
 - **22 locale 처리**: 심사 주 언어인 **en·ko 오버레이를 우선** 작성. "Bean"은 brand-neutral 단어라 대부분 언어에서 그대로 → en 폴백으로 충분. 통화 "참고환산" 문구만 주요 locale 보강(후속). **누락 시 silent하게 원문 노출되므로, 미커버 locale 목록을 로그/주석에 남길 것**(프론트 표준의 "no silent caps").
 - **DB i18n_message sync와 독립**: 오버레이는 메시지 로드 **후처리**라 DB 정본(`i18n-db-source-of-truth`)을 건드리지 않음. 원본 `ko.json`·DB는 staging 기준 그대로.
 
-### 8.6 시세·각국통화 노출 토글 (③) — "현재 감추되 언제든 쉽게 노출" ✅ 구현완료
+### 8.6 시세·각국통화 노출 토글 (③) — "운영만 숨김 / staging 노출, 언제든 노출 가능" ✅ 구현완료
 
-> **마스터 지시(2026-06-29)**: 시세 및 각국통화 표시는 **현재 전부 감추되**, **언제든 쉽게 노출**할 수 있게 정리.
+> **마스터 지시(2026-06-29)**: 시세·각국통화는 **운영 서버(cafepi)에만 적용(숨김)**. (1) 통화 콤보 환율 숫자도 같은 플래그로 숨김 (2) Pi 시세 숨김. loginpi(staging)는 노출 유지, 언제든 노출 가능.
 
-헤더 시세칩(`pi-price-chip.tsx`)은 `π {환산가} {각국통화}` 형태로 **시세와 각국통화를 한 칩에서 함께** 표시한다. 따라서 이 칩 하나의 노출/숨김이 곧 "시세 및 각국통화" 전체 토글이다.
+대상 2곳 모두 동일 플래그 `NEXT_PUBLIC_FEATURE_PI_PRICE`로 게이트(구현 완료):
+1. **헤더 Pi 시세칩** — `header.tsx`: `π {환산가} {각국통화}`를 한 칩에 표시. `{env.NEXT_PUBLIC_FEATURE_PI_PRICE === 'true' && <PiPriceChip/>}` (기존 L30 무조건 렌더를 정정).
+2. **통화 콤보 환율 숫자** — `currency-combo.tsx`: `const showRate = process.env.NEXT_PUBLIC_FEATURE_PI_PRICE === 'true'`, 활성통화(L296)·전체국가(L343)의 `{currency} {fmtRate(rate)}`에서 **환율 숫자만** `showRate` 조건부. **통화 선택·Pi 직접입력은 항상 유지**(P2P 핵심 기능 보존).
 
-**① 기본 숨김 (구현 완료)** — `header.tsx`:
-```tsx
-import { env } from '@/env'
-// …
-{env.NEXT_PUBLIC_FEATURE_PI_PRICE === 'true' && <PiPriceChip locale={locale} />}
-```
-- 플래그 미설정(전 환경 기본) → **숨김**. (기존엔 L30이 무조건 렌더라 항상 노출되던 것을 정정.)
-- `env.ts` L82-83 `NEXT_PUBLIC_FEATURE_PI_PRICE`는 "기본 비활성" 정의와 이제 **실제 동작이 일치**.
+**환경별 적용 (마스터 수동 — Vercel env)**:
+| 환경 | `NEXT_PUBLIC_FEATURE_PI_PRICE` | 결과 |
+|---|---|---|
+| **cafepi(운영)** | **미설정** | 🔒 시세·각국통화·환율 **숨김** (레드라인 안전 기본값) |
+| **loginpi(staging)** | `true` | 👁 노출 유지 |
+| 로컬 | `.env.local`에 `true`(원할 때) | 노출 |
 
-**② 언제든 쉽게 노출** — env 한 줄:
-| 노출 범위 | 방법 |
-|---|---|
-| 특정 환경만(예: loginpi에서 미리보기) | 그 Vercel 프로젝트에 `NEXT_PUBLIC_FEATURE_PI_PRICE=true` 추가 → 재배포(1~2분) |
-| 운영 포함 전체 | 각 프로젝트에 `=true` 설정 → 재배포 |
-| 끄기 | 변수 제거(또는 `=false`) → 재배포 |
+- **운영 안전**: cafepi는 미설정이 기본 → 자동 숨김. 의도적으로 `=true`를 넣어야만 노출되므로 실수로 레드라인에 노출될 위험 없음.
+- **언제든 노출**: 해당 프로젝트에 `=true` 추가 → 재배포(1~2분). 끄기는 변수 제거.
+- **빌드타임 플래그**(NEXT_PUBLIC은 빌드 시 인라인)라 재배포 필요. 무재배포 즉시 토글이 필요하면(후속) 서버 런타임 env→prop 전달 구조로 전환(현재는 보류).
 
-- **빌드타임 플래그라 재배포 필요**(NEXT_PUBLIC은 빌드 시 인라인). "env 토글 + 1~2분 재배포"가 현재 가장 단순한 노출 경로.
-- **무재배포 즉시 토글이 필요하면**(후속 옵션): 서버 런타임 env로 전환 → `Header`(server)에서 prop으로 `pi-price-chip`에 내려주는 구조. `db-env.ts` Phase 2(Edge Config)와 함께 검토. 현재는 과한 엔지니어링이라 보류.
-
-**③ 통화 콤보 환율 숫자(②와 연계)** — `currency-combo.tsx`의 `fmtRate` 환율 표시(L295·343)도 "각국통화 가치평가"에 해당. 단 통화 **선택 기능**(Pi 직접입력·자국통화 등록)은 P2P 핵심이라 유지. → **환율 숫자 표시만** 동일 플래그로 게이트하는 보강을 권고(마스터 확인 후). 콤보 자체 제거 아님.
-
-> 정리: **시세·각국통화 = `NEXT_PUBLIC_FEATURE_PI_PRICE` 단일 토글**(전 환경 기본 숨김). **메인넷 브랜딩 절제(⑤·②문구) = `NEXT_PUBLIC_LISTING_MODE`**(운영만). 두 축의 의미를 분리해 혼선을 막는다.
+> 정리: **시세·각국통화·환율 = `NEXT_PUBLIC_FEATURE_PI_PRICE`**(운영 숨김/staging 노출). **브랜딩 문구 절제(⑤·②라벨) = `NEXT_PUBLIC_LISTING_MODE`**(운영만, i18n). 두 축 분리.
 
 ### 8.7 안전 고려
 

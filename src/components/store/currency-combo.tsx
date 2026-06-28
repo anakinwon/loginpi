@@ -86,6 +86,10 @@ export function CurrencyCombo({
 }) {
   const t = useTranslations('langSwitcher')
   const ts = useTranslations('store')
+  // 환율 숫자(각국통화 가치평가) 노출 여부 — 헤더 시세칩과 동일 플래그.
+  // 운영(cafepi)은 미설정 → 숨김. staging(loginpi)은 'true' → 노출. 통화 '선택'은 항상 유지.
+  // Pi 등재 레드라인(A-5) 대응. docs/PRD_23_FUNC_TUNING.md §8.6
+  const showRate = process.env.NEXT_PUBLIC_FEATURE_PI_PRICE === 'true'
   const [open, setOpen] = useState(false)
   const [locales, setLocales] = useState<ActiveLocale[]>(
     () => readCache()?.locales ?? [],
@@ -293,7 +297,8 @@ export function CurrencyCombo({
                       {loc.locale_nm}
                     </span>
                     <span className="text-muted-foreground shrink-0 font-mono text-[11px]">
-                      {currency} {fmtRate(rate)}
+                      {currency}
+                      {showRate ? ` ${fmtRate(rate)}` : ''}
                     </span>
                   </button>
                 )
@@ -340,7 +345,8 @@ export function CurrencyCombo({
                       )}
                     </div>
                     <span className="text-muted-foreground/70 shrink-0 font-mono text-[11px]">
-                      {c.currency_cd} {fmtRate(rate)}
+                      {c.currency_cd}
+                      {showRate ? ` ${fmtRate(rate)}` : ''}
                     </span>
                   </button>
                 )
