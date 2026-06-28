@@ -14,14 +14,30 @@
  * 읽기 전용(SELECT만) — 운영DB 읽기전용 모드에서도 안전. 어떤 쓰기도 하지 않는다.
  */
 
+// .env.local의 DEV_DB_URL / PROD_DB_URL 자동 로드 (비밀번호 채팅/명령기록 노출 방지)
+try {
+  process.loadEnvFile('.env.local')
+} catch {
+  // .env.local 없으면 argv/기존 env 사용
+}
+
 const devConn = process.argv[2] || process.env.DEV_DB_URL
 const prodConn = process.argv[3] || process.env.PROD_DB_URL
 if (!devConn || !prodConn) {
   console.error(
     '사용법: node scripts/check-db-objects.mjs "<dev-conn>" "<prod-conn>"',
   )
-  console.error('  또는 환경변수 DEV_DB_URL / PROD_DB_URL 설정')
+  console.error('  또는 .env.local에 DEV_DB_URL / PROD_DB_URL 설정 후 인자 없이 실행')
   process.exit(1)
+}
+
+// Supabase pooler는 self-signed 인증서 체인 → uselibpqcompat=true로 libpq 표준 sslmode 의미 적용
+// (암호화는 유지, 체인 검증만 생략). rejectUnauthorized:false 하드코딩보다 표준적이고 안전.
+function withSslCompat(conn) {
+  let c = conn
+  if (!/[?&]sslmode=/.test(c)) c += (c.includes('?') ? '&' : '?') + 'sslmode=require'
+  if (!/[?&]uselibpqcompat=/.test(c)) c += '&uselibpqcompat=true'
+  return c
 }
 
 let pg
@@ -64,8 +80,7 @@ const QUERIES = {
 }
 
 async function inventory(conn, label) {
-  // SSL은 연결문자열의 sslmode=require에 위임(공인 CA 검증 유지). TLS 검증 비활성화 금지.
-  const client = new pg.Client({ connectionString: conn })
+  const client = new pg.Client({ connectionString: withSslCompat(conn) })
   await client.connect()
   const out = {}
   for (const [cat, q] of Object.entries(QUERIES)) {
