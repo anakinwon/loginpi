@@ -1,6 +1,7 @@
 import 'server-only'
 import { after } from 'next/server'
 import { getSupabaseAdmin } from './supabase-admin'
+import { isReadOnlyDb } from './db-env'
 
 export type ActivityType = 'LOGIN' | 'CHAT' | 'MSG' | 'PAYMENT'
 
@@ -10,6 +11,7 @@ export function recordActivity(
   userId: string,
   type: ActivityType = 'LOGIN',
 ): void {
+  if (isReadOnlyDb()) return // 읽기전용 모드: 활동기록 쓰기 스킵
   const run = async () => {
     const { error } = await getSupabaseAdmin().rpc('fn_record_activity', {
       p_usr_id: userId,

@@ -1,6 +1,7 @@
 import 'server-only'
 import { after } from 'next/server'
 import { getSupabaseAdmin } from './supabase-admin'
+import { isReadOnlyDb } from './db-env'
 
 export interface UserRow {
   id: string
@@ -40,6 +41,13 @@ export async function upsertPiUser(piUser: {
   username: string | null
   walletAddress: string | null
 }): Promise<UserRow> {
+  // 읽기전용(운영DB 프리뷰) 모드: 쓰기 불가 → 기존 사용자 read 반환(세션 정상 유지).
+  // 신규 가입만 불가(프리뷰 모드의 의도된 제약).
+  if (isReadOnlyDb()) {
+    const existing = await getUserByPiUid(piUser.uid)
+    if (existing) return existing
+    throw new Error('읽기전용 모드: 신규 Pi 사용자 생성 불가')
+  }
   const { data, error } = await getSupabaseAdmin()
     .from('sys_user')
     .upsert(
@@ -126,6 +134,7 @@ const TOUCH_INTERVAL_MS = 5 * 60 * 1000
 const lastTouchAt = new Map<string, number>() // 인스턴스 메모리 스로틀 (서버리스 재기동 시 초기화 — DB 조건이 2차 방어)
 
 export function touchLastLogin(userId: string): void {
+  if (isReadOnlyDb()) return // 읽기전용 모드: 접속기록 쓰기 스킵(세션 검증 read는 정상)
   const now = Date.now()
   const prev = lastTouchAt.get(userId)
   if (prev && now - prev < TOUCH_INTERVAL_MS) return
@@ -177,6 +186,12 @@ export async function upsertGoogleUser(googleUser: {
   name: string | null
   image: string | null
 }): Promise<UserRow> {
+  // 읽기전용 모드: 쓰기 불가 → 기존 사용자 read 반환. 신규는 생성 불가.
+  if (isReadOnlyDb()) {
+    const byId = await getUserByGoogleId(googleUser.id)
+    if (byId) return byId
+    throw new Error('읽기전용 모드: 신규 Google 사용자 생성 불가')
+  }
   const { data, error } = await getSupabaseAdmin()
     .from('sys_user')
     .upsert(

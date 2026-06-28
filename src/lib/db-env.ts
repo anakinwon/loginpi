@@ -94,3 +94,11 @@ export function resolveDbConfig(): DbConfig {
   // prod — 현행 운영 자격증명 그대로
   return { tier, url: prodUrl, key: prodKey, readOnly: false }
 }
+
+/**
+ * 현재 DB 연결이 읽기전용인지(staging의 '운영DB 읽기전용' 모드).
+ * 인증 등 쓰기 경로에서 비필수 쓰기를 스킵해 읽기전용 모드에서도 세션이 깨지지 않게 한다.
+ */
+export function isReadOnlyDb(): boolean {
+  return resolveDbConfig().readOnly
+}
