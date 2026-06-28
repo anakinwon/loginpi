@@ -25,7 +25,7 @@
 | 구분 | 항목 |
 |---|---|
 | 🟢 즉시 통과 가능 | ①대시보드 ④이벤트(미션형) ⑥브랜딩(개명완료) ⑦개인정보(선택옵션) ⑧Google로그인(Pi Browser 미렌더) |
-| ✅ 적용 완료 | ③시세칩+통화콤보 환율 **운영 숨김/staging 노출**(`NEXT_PUBLIC_FEATURE_PI_PRICE`, 언제든 노출 가능) |
+| ✅ 적용 완료 | ③시세칩+통화콤보 환율 **운영 숨김/staging 노출**(런타임 tier 자동 분기·같은 빌드, env 불필요) |
 | 🟠 절제 필요(메인넷 전) | ⑤Bean "토큰" **노출 표현** |
 | 🟡 조건부(라벨 보강) | ②각국 통화 콤보 |
 | 🔵 Pi 직접확인 | Py 상표 유사성 · Bean "공식 발행" 계획의 A-5 저촉 여부 |
@@ -165,14 +165,14 @@
 | Pi | Testnet | **Mainnet** |
 | 절제 적용 | ❌ **유지(풍부한 표현)** | ✅ **절제 ON** |
 
-### 8.2 게이트 2축 — 왜 단일 메커니즘으로 안 되나
+### 8.2 게이트 메커니즘 — server 런타임 판정 + client Context 주입 ✅구현완료(2026-06-29)
 
-| 축 | 대상 | 판정 수단 | 비고 |
+| 축 | 대상 | 판정 수단 | 구현 |
 |---|---|---|---|
-| 서버(RSC/SSR) | i18n 문구(⑤·②) | `resolveDbTier()` 또는 플래그 | `db-env.ts`는 `import 'server-only'` → 클라이언트 불가 |
-| 클라이언트(`'use client'`) | 시세칩(③) | `NEXT_PUBLIC_*` 플래그 | 빌드타임 주입, 클라이언트가 tier를 모름 |
+| 서버(RSC/SSR) | i18n 문구(⑤·②) · 헤더 시세칩(③) | `resolveDbTier()` 런타임 | `header.tsx`가 server라 직접 호출 |
+| 클라이언트(`'use client'`) | 통화콤보 환율(③) | server가 판정 → Context 주입 | `layout.tsx` → `FeatureFlagProvider` → `useFeatureFlags()` |
 
-→ 시세칩은 클라이언트 컴포넌트라 `NEXT_PUBLIC_` 플래그가 **불가피**. i18n은 서버라 tier로 가능. **둘을 하나의 신호로 묶으려면 `NEXT_PUBLIC_` 플래그 단일화가 가장 단순**.
+→ **"같은 빌드, 배포 환경별 다른 표시"**: client 컴포넌트는 런타임 env(`APP_TIER`)를 직접 못 읽지만, server(`layout.tsx`)가 `resolveDbTier()`로 판정한 boolean을 `FeatureFlagProvider` Context로 주입하면 client도 런타임 tier 분기를 따른다. `NEXT_PUBLIC_FEATURE_PI_PRICE`는 빌드타임 인라인이라 **기본 메커니즘에서 폐기**하고 긴급 override로만 남긴다(§8.6). → tier 신호 하나로 i18n·시세칩·환율 모두 일관 분기.
 
 ### 8.3 권장: 단일 플래그 `NEXT_PUBLIC_LISTING_MODE`
 
@@ -200,9 +200,9 @@ NEXT_PUBLIC_LISTING_MODE: z.enum(['true', 'false']).optional(),
 |---|---|---|---|---|
 | ⑤ Bean 토큰 표현 | `NEXT_PUBLIC_LISTING_MODE` (서버 i18n) | `request.ts` 오버레이 deepMerge | "Bean Token" 유지 | "Bean(포인트)" |
 | ② 통화 라벨 | `NEXT_PUBLIC_LISTING_MODE` (서버 i18n) | 동일 오버레이(`store.form.*`) | 기존 유지 | "참고환산" |
-| ③ 시세칩+통화환율 | `NEXT_PUBLIC_FEATURE_PI_PRICE` (클라이언트) | `header.tsx` + `currency-combo.tsx` ✅**구현완료** | 노출(`=true`) | **숨김**(미설정) |
+| ③ 시세칩+통화환율 | **런타임 tier**(`resolveDbTier`)→Context | `layout.tsx`+`header.tsx`+`currency-combo.tsx` ✅**구현완료** | 노출(tier=staging) | **숨김**(tier=prod) |
 
-> \* ③은 **운영(cafepi)만 숨김, staging(loginpi)은 노출 유지**(마스터 지시). 운영에서도 `=true` 한 줄로 즉시 노출. §8.6.
+> \* ③은 **런타임 자동 분기** — 운영(prod) 숨김 / staging 노출. 같은 빌드, env 설정 불필요. 긴급 override만 `NEXT_PUBLIC_FEATURE_PI_PRICE`. §8.6.
 > ②의 통화 라벨은 클라이언트 컴포넌트(`currency-combo.tsx`)가 표시하지만 **문구 자체는 i18n**이므로, request.ts 오버레이가 적용되면 클라이언트는 코드 변경 없이 자동 반영된다.
 
 ### 8.5 i18n 오버레이 구현 (`src/i18n/request.ts`)
@@ -223,26 +223,37 @@ if (process.env.NEXT_PUBLIC_LISTING_MODE === 'true') {
 - **22 locale 처리**: 심사 주 언어인 **en·ko 오버레이를 우선** 작성. "Bean"은 brand-neutral 단어라 대부분 언어에서 그대로 → en 폴백으로 충분. 통화 "참고환산" 문구만 주요 locale 보강(후속). **누락 시 silent하게 원문 노출되므로, 미커버 locale 목록을 로그/주석에 남길 것**(프론트 표준의 "no silent caps").
 - **DB i18n_message sync와 독립**: 오버레이는 메시지 로드 **후처리**라 DB 정본(`i18n-db-source-of-truth`)을 건드리지 않음. 원본 `ko.json`·DB는 staging 기준 그대로.
 
-### 8.6 시세·각국통화 노출 토글 (③) — "운영만 숨김 / staging 노출, 언제든 노출 가능" ✅ 구현완료
+### 8.6 시세·각국통화 노출 (③) — 런타임 tier 자동 분기 ✅ 구현완료(2026-06-29 재설계)
 
-> **마스터 지시(2026-06-29)**: 시세·각국통화는 **운영 서버(cafepi)에만 적용(숨김)**. (1) 통화 콤보 환율 숫자도 같은 플래그로 숨김 (2) Pi 시세 숨김. loginpi(staging)는 노출 유지, 언제든 노출 가능.
+> **마스터 지시(2026-06-29)**: "**같은 소스인데 환경에 따라 다르게 보여야 한다.**" → 빌드타임 `NEXT_PUBLIC` 토글(환경마다 다른 값을 박는 방식)을 폐기하고, **동일 빌드가 런타임에 tier를 감지해 분기**하도록 재설계. 운영(cafepi) 숨김 / staging(loginpi) 노출.
 
-대상 2곳 모두 동일 플래그 `NEXT_PUBLIC_FEATURE_PI_PRICE`로 게이트(구현 완료):
-1. **헤더 Pi 시세칩** — `header.tsx`: `π {환산가} {각국통화}`를 한 칩에 표시. `{env.NEXT_PUBLIC_FEATURE_PI_PRICE === 'true' && <PiPriceChip/>}` (기존 L30 무조건 렌더를 정정).
-2. **통화 콤보 환율 숫자** — `currency-combo.tsx`: `const showRate = process.env.NEXT_PUBLIC_FEATURE_PI_PRICE === 'true'`, 활성통화(L296)·전체국가(L343)의 `{currency} {fmtRate(rate)}`에서 **환율 숫자만** `showRate` 조건부. **통화 선택·Pi 직접입력은 항상 유지**(P2P 핵심 기능 보존).
+**핵심 헬퍼** `src/lib/feature-flags.ts`(client-safe 순수함수):
+```ts
+export function computeShowPiValuation(tier, override?) {
+  if (override === 'true') return true      // 긴급 강제 노출
+  if (override === 'false') return false    // 긴급 강제 숨김
+  return tier === 'staging' || tier === 'dev'  // 운영(prod)·미상은 숨김(안전 기본)
+}
+```
 
-**환경별 적용 (마스터 수동 — Vercel env)**:
-| 환경 | `NEXT_PUBLIC_FEATURE_PI_PRICE` | 결과 |
+**대상 2곳**:
+1. **헤더 Pi 시세칩** — `header.tsx`(server): `computeShowPiValuation(resolveDbTier(), …)` 직접 호출 → `{showPiValuation && <PiPriceChip/>}`.
+2. **통화 콤보 환율 숫자** — `currency-combo.tsx`(client): `const { showPiValuation: showRate } = useFeatureFlags()`. 활성통화·전체국가의 `{currency} {fmtRate(rate)}`에서 **환율 숫자만** 조건부, **통화 선택·Pi 직접입력은 항상 유지**(P2P 핵심 보존).
+
+**client 주입 경로**: `layout.tsx`(server)가 `computeShowPiValuation(resolveDbTier(), env.NEXT_PUBLIC_FEATURE_PI_PRICE)` 계산 → `<FeatureFlagProvider flags={{ showPiValuation }}>`로 `{children}` 래핑 → client는 `useFeatureFlags()`로 접근.
+
+**환경별 결과 (env 설정 불필요 — 런타임 자동 분기)**:
+| 환경 | tier (`resolveDbTier()`) | 결과 |
 |---|---|---|
-| **cafepi(운영)** | **미설정** | 🔒 시세·각국통화·환율 **숨김** (레드라인 안전 기본값) |
-| **loginpi(staging)** | `true` | 👁 노출 유지 |
-| 로컬 | `.env.local`에 `true`(원할 때) | 노출 |
+| **cafepi(운영)** | `prod` (APP_TIER 미설정→폴백) | 🔒 **숨김** (레드라인 안전 기본) |
+| **loginpi(staging)** | `staging` (APP_TIER=staging) | 👁 **노출** |
+| 로컬 개발 | `prod` 폴백 → 숨김 | 보려면 `.env.local`에 `APP_TIER=dev` 또는 `NEXT_PUBLIC_FEATURE_PI_PRICE=true` |
 
-- **운영 안전**: cafepi는 미설정이 기본 → 자동 숨김. 의도적으로 `=true`를 넣어야만 노출되므로 실수로 레드라인에 노출될 위험 없음.
-- **언제든 노출**: 해당 프로젝트에 `=true` 추가 → 재배포(1~2분). 끄기는 변수 제거.
-- **빌드타임 플래그**(NEXT_PUBLIC은 빌드 시 인라인)라 재배포 필요. 무재배포 즉시 토글이 필요하면(후속) 서버 런타임 env→prop 전달 구조로 전환(현재는 보류).
+- **같은 빌드**: staging·운영이 동일 번들을 써도 런타임 `APP_TIER`로 분기 → 환경별 빌드 불필요(마스터 요구 충족).
+- **운영 안전**: 운영은 APP_TIER 미설정→prod→자동 숨김(메모리 "APP_TIER 운영금지" 정책과 일치). 누락 사고로 노출될 위험 없음.
+- **긴급 override**: `NEXT_PUBLIC_FEATURE_PI_PRICE='true'/'false'`로 tier 무시 강제(재배포 필요). 평상시 미설정.
 
-> 정리: **시세·각국통화·환율 = `NEXT_PUBLIC_FEATURE_PI_PRICE`**(운영 숨김/staging 노출). **브랜딩 문구 절제(⑤·②라벨) = `NEXT_PUBLIC_LISTING_MODE`**(운영만, i18n). 두 축 분리.
+> 정리: **시세·각국통화·환율 = 런타임 tier 자동 분기**(server 판정 + client Context). **브랜딩 문구 절제(⑤·②라벨) = `NEXT_PUBLIC_LISTING_MODE`**(운영만, i18n). 두 축 분리.
 
 ### 8.7 안전 고려
 

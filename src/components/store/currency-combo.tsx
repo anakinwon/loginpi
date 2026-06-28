@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { LOCALE_CURRENCY } from '@/lib/locale-currency'
 import { ACTIVE_COUNTRY_CODES, getAlpha2 } from '@/lib/locale-country'
+import { useFeatureFlags } from '@/components/feature-flag-provider'
 
 // 상품 가격 통화 선택 콤보 — 헤더 LanguageSwitcher와 동일한 시각·데이터(국기·통화·환율)를 쓰되,
 // 로케일을 전환하지 않고 '이 상품의 통화'만 고르는 controlled 입력. value='PI'면 Pi 직접입력.
@@ -86,10 +87,11 @@ export function CurrencyCombo({
 }) {
   const t = useTranslations('langSwitcher')
   const ts = useTranslations('store')
-  // 환율 숫자(각국통화 가치평가) 노출 여부 — 헤더 시세칩과 동일 플래그.
-  // 운영(cafepi)은 미설정 → 숨김. staging(loginpi)은 'true' → 노출. 통화 '선택'은 항상 유지.
+  // 환율 숫자(각국통화 가치평가) 노출 여부 — 헤더 시세칩과 동일 판정(런타임 tier).
+  // server(layout)가 resolveDbTier()로 판정 → FeatureFlagProvider Context로 주입. 같은 빌드,
+  // 배포 환경별 표시: 운영(prod) 숨김 / staging·dev 노출. 통화 '선택'·Pi 직접입력은 항상 유지.
   // Pi 등재 레드라인(A-5) 대응. docs/PRD_23_FUNC_TUNING.md §8.6
-  const showRate = process.env.NEXT_PUBLIC_FEATURE_PI_PRICE === 'true'
+  const { showPiValuation: showRate } = useFeatureFlags()
   const [open, setOpen] = useState(false)
   const [locales, setLocales] = useState<ActiveLocale[]>(
     () => readCache()?.locales ?? [],

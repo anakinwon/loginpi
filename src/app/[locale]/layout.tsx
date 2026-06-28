@@ -17,6 +17,9 @@ import { BottomNav } from '@/components/layout/bottom-nav'
 import { StagingBanner } from '@/components/layout/staging-banner'
 import { Toaster } from '@/components/ui/sonner'
 import { getActiveUiTheme, buildThemeStyleCss } from '@/lib/ui-theme'
+import { resolveDbTier } from '@/lib/db-env'
+import { computeShowPiValuation } from '@/lib/feature-flags'
+import { FeatureFlagProvider } from '@/components/feature-flag-provider'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -78,13 +81,22 @@ export default async function LocaleLayout({
       ? buildThemeStyleCss(activeTheme.theme_tokens, 'GLOBAL')
       : ''
 
+  // 런타임 tier 판정 → Pi 가치평가(시세·환율) 노출 여부. 같은 빌드가 배포 환경별로 다르게 표시.
+  // server 판정값을 client(통화콤보 등)엔 FeatureFlagProvider Context로 주입한다.
+  const showPiValuation = computeShowPiValuation(
+    resolveDbTier(),
+    env.NEXT_PUBLIC_FEATURE_PI_PRICE,
+  )
+
   return (
     <html lang={locale} suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col antialiased`}
       >
         {/* 전체 적용 테마 색상 주입 (GLOBAL 범위) — 핵심 색만 바꿔 배경·글자는 유지 */}
-        {globalThemeCss && <style dangerouslySetInnerHTML={{ __html: globalThemeCss }} />}
+        {globalThemeCss && (
+          <style dangerouslySetInnerHTML={{ __html: globalThemeCss }} />
+        )}
         {/* Staging 환경 표시 줄무늬 바 — tier=staging일 때만(운영선 null). 최상단 고정 노출 */}
         <StagingBanner />
         {/* onLoad는 이벤트 핸들러이므로 Client Component(PiSdkScript)로 분리.
@@ -102,7 +114,11 @@ export default async function LocaleLayout({
               <PiAuthProvider>
                 <Header />
                 {/* pb-16: 하단 고정 BottomNav(h-16)에 콘텐츠가 가려지지 않도록 여백 확보 */}
-                <main className="flex-1 pb-16">{children}</main>
+                <main className="flex-1 pb-16">
+                  <FeatureFlagProvider flags={{ showPiValuation }}>
+                    {children}
+                  </FeatureFlagProvider>
+                </main>
                 <BottomNav />
                 {/* 가입/이용 동의 전역 게이트 — 로그인 후 필수 동의 미완료 시 차단 모달 */}
                 <ConsentGate />
