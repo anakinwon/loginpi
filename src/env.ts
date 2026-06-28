@@ -71,6 +71,7 @@ export const env = createEnv({
     VERCEL_API_TOKEN: z.string().optional(),
     VERCEL_TEAM_ID: z.string().optional(),
     VERCEL_STAGING_PROJECT_ID: z.string().optional(), // loginpi 프로젝트 id
+    VERCEL_PROD_PROJECT_ID: z.string().optional(), // cafepi 프로젝트 id(운영 배포 상태 조회)
   },
   client: {
     NEXT_PUBLIC_APP_URL: z.string().url(),
@@ -122,6 +123,7 @@ export const env = createEnv({
     VERCEL_API_TOKEN: process.env.VERCEL_API_TOKEN,
     VERCEL_TEAM_ID: process.env.VERCEL_TEAM_ID,
     VERCEL_STAGING_PROJECT_ID: process.env.VERCEL_STAGING_PROJECT_ID,
+    VERCEL_PROD_PROJECT_ID: process.env.VERCEL_PROD_PROJECT_ID,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_PI_SANDBOX: process.env.NEXT_PUBLIC_PI_SANDBOX,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,

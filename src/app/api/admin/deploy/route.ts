@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
 import {
-  getDeployState,
+  getDeployOverview,
   triggerStagingDeploy,
   promoteToProduction,
 } from '@/lib/ops-deploy'
@@ -16,7 +16,7 @@ async function requireMaster() {
 export async function GET() {
   if (!(await requireMaster()))
     return NextResponse.json({ error: '권한이 없습니다(MASTER 전용)' }, { status: 403 })
-  return NextResponse.json(await getDeployState())
+  return NextResponse.json(await getDeployOverview())
 }
 
 export async function POST(req: NextRequest) {
