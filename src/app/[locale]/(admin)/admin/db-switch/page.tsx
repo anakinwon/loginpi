@@ -10,6 +10,8 @@ interface SwitchState {
   currentTarget: 'staging' | 'prod-ro'
   prodRoConfigured: boolean
   apiConfigured: boolean
+  tierInfo?: { tier: string; readOnly: boolean }
+  connTest?: { ok: boolean; count?: number; error?: string }
 }
 
 export default function DbSwitchPage() {
@@ -110,6 +112,24 @@ export default function DbSwitchPage() {
             <p className="mt-1 text-lg font-semibold">
               {isProdRo ? '🔒 운영DB (읽기전용)' : '🧪 Stage DB (읽기·쓰기)'}
             </p>
+            {/* 라이브 진단 — RO 연결의 read가 실제로 되는지 */}
+            <div className="mt-2 space-y-0.5 text-xs">
+              <p className="text-muted-foreground">
+                tier=<b>{state.tierInfo?.tier ?? state.tier}</b> · readOnly=
+                <b>{String(state.tierInfo?.readOnly ?? false)}</b>
+              </p>
+              {state.connTest?.ok ? (
+                <p className="text-green-600 dark:text-green-400">
+                  ✅ DB read 정상 (sys_user {state.connTest.count}건) — 세션 검증 가능
+                </p>
+              ) : (
+                <p className="text-red-600 dark:text-red-400">
+                  ❌ DB read 실패: {state.connTest?.error ?? '—'}
+                  {isProdRo &&
+                    ' → RO 키(JWT)가 PostgREST에서 거부됨일 가능성. 세션 끊김의 원인.'}
+                </p>
+              )}
+            </div>
           </div>
 
           <div className="flex flex-wrap gap-3">

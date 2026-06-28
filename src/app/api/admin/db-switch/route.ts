@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
+import { getSupabaseAdmin, getDbTierInfo } from '@/lib/supabase-admin'
 import { getDbSwitchState, setStagingDbTarget, type DbTarget } from '@/lib/ops-deploy'
 
 // Staging DB 스위치 — MASTER 전용. ⛔ 스테이징 환경에서만 동작(운영 WAS 불변),
@@ -9,10 +10,27 @@ async function requireMaster() {
   return user?.role === 'MASTER' ? user : null
 }
 
+// 현재 DB(읽기전용 포함)에서 read가 실제로 되는지 라이브 진단 — RO JWT 거부 여부 판별용
+async function testRead(): Promise<{ ok: boolean; count?: number; error?: string }> {
+  try {
+    const { count, error } = await getSupabaseAdmin()
+      .from('sys_user')
+      .select('id', { count: 'exact', head: true })
+    return error ? { ok: false, error: error.message } : { ok: true, count: count ?? 0 }
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : 'unknown' }
+  }
+}
+
 export async function GET() {
   if (!(await requireMaster()))
     return NextResponse.json({ error: '권한이 없습니다(MASTER 전용)' }, { status: 403 })
-  return NextResponse.json(getDbSwitchState())
+  const connTest = await testRead()
+  return NextResponse.json({
+    ...getDbSwitchState(),
+    tierInfo: getDbTierInfo(),
+    connTest,
+  })
 }
 
 export async function POST(req: NextRequest) {

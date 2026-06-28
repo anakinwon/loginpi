@@ -1,6 +1,7 @@
 import 'server-only'
 import { NextRequest } from 'next/server'
 import { getSupabaseAdmin } from './supabase-admin'
+import { isReadOnlyDb } from './db-env'
 
 // 실시간 모니터링 — API 응답 계측 (PRD_22_MONITOR)
 // 원칙: fire-and-forget. 절대 throw하지 않고 요청 경로에 0 영향(비블로킹).
@@ -23,6 +24,7 @@ export function recordApiMetric(m: {
   ms: number
   ip?: string | null
 }): void {
+  if (isReadOnlyDb()) return // 읽기전용 모드: 계측 쓰기 스킵
   void getSupabaseAdmin()
     .from('sys_metric_req_perf')
     .insert({

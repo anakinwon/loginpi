@@ -3,6 +3,7 @@ import Google from 'next-auth/providers/google'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { recordActivity } from '@/lib/activity-log'
 import { upsertGoogleUser } from '@/lib/users'
+import { isReadOnlyDb } from '@/lib/db-env'
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
@@ -68,11 +69,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             token.userId = matched.id
             recordActivity(matched.id, 'LOGIN')
             // 실제 sub로 google_id 정정(오염·NULL 자가 치유) + last_login 갱신
-            const upd: Record<string, unknown> = {
-              last_login_dtm: new Date().toISOString(),
+            // 읽기전용 모드(운영DB 프리뷰)에선 비필수 쓰기 스킵 — 세션은 이미 userId 설정됨
+            if (!isReadOnlyDb()) {
+              const upd: Record<string, unknown> = {
+                last_login_dtm: new Date().toISOString(),
+              }
+              if (matched.google_id !== sub) upd.google_id = sub
+              await db.from('sys_user').update(upd).eq('id', matched.id)
             }
-            if (matched.google_id !== sub) upd.google_id = sub
-            await db.from('sys_user').update(upd).eq('id', matched.id)
           } else if (email) {
             // 진짜 신규 → Google 전용 계정 생성
             const newUser = await upsertGoogleUser({
