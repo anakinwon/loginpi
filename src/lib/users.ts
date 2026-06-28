@@ -31,6 +31,9 @@ export interface UserRow {
   lbs_consent_yn: string | null
   lbs_consent_dtm: string | null
   lbs_consent_ver: string | null
+  // 마이그레이션 127 — 논리삭제 (1인 1계정 원칙)
+  del_yn: string
+  del_dtm: string | null
   reg_dtm: string
   mod_dtm: string
 }
@@ -68,7 +71,8 @@ export async function upsertPiUser(piUser: {
 }
 
 // 연동 코드 입력 완료 시: Pi row에 Google 필드 UPDATE
-// Google 전용 row를 별도 생성하지 않고 기존 Pi row에 직접 업데이트
+// 1) Google-only 고아 행(pi_uid=NULL)을 먼저 비활성화(google_id NULL 초기화 → UNIQUE 충돌 방지)
+// 2) 이후 Pi row에 Google 필드 덮어쓰기
 export async function updatePiUserWithGoogle(
   piUserId: string,
   googleUser: {
@@ -78,7 +82,35 @@ export async function updatePiUserWithGoogle(
     image: string | null
   },
 ): Promise<void> {
-  const { error } = await getSupabaseAdmin()
+  const db = getSupabaseAdmin()
+  const now = new Date().toISOString()
+  const softDelete = {
+    google_id: null as string | null, // UNIQUE 제약 선해제 (del_yn='Y'만으론 충돌 잔존)
+    del_yn: 'Y',
+    del_dtm: now,
+    modr_id: 'SYSTEM',
+    mod_dtm: now,
+  }
+
+  // google_id(sub) 기준 고아 행 비활성화
+  await db
+    .from('sys_user')
+    .update(softDelete)
+    .eq('del_yn', 'N')
+    .is('pi_uid', null)
+    .eq('google_id', googleUser.id)
+    .neq('id', piUserId)
+
+  // google_email 기준 고아 행 비활성화 (google_id 미설정 중복 행 포함)
+  await db
+    .from('sys_user')
+    .update(softDelete)
+    .eq('del_yn', 'N')
+    .is('pi_uid', null)
+    .eq('google_email', googleUser.email)
+    .neq('id', piUserId)
+
+  const { error } = await db
     .from('sys_user')
     .update({
       google_id: googleUser.id,
@@ -175,6 +207,7 @@ export async function getUserByGoogleId(
     .from('sys_user')
     .select()
     .eq('google_id', googleId)
+    .eq('del_yn', 'N')
     .maybeSingle()
   return (data as UserRow) ?? null
 }

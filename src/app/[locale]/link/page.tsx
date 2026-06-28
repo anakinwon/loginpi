@@ -23,7 +23,7 @@ function LinkPageInner() {
     isLoading: piLoading,
     signIn: piSignIn,
   } = usePiAuth()
-  const { data: googleSession, status: googleStatus } = useSession()
+  const { data: googleSession, status: googleStatus, update: updateSession } = useSession()
   const params = useSearchParams()
   const router = useRouter()
 
@@ -99,6 +99,7 @@ function LinkPageInner() {
       const data = (await res.json()) as { success?: boolean; error?: string }
       if (!res.ok || !data.success) throw new Error(data.error ?? t('linkFail'))
       setLinkStatus('done')
+      await updateSession() // JWT hasPiAccount 즉시 갱신
       setTimeout(() => router.push('/'), 1500)
     } catch (err) {
       setLinkStatus('error')

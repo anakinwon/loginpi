@@ -71,15 +71,17 @@ export async function getSessionUser(): Promise<UserRow | null> {
   if (googleSession?.user?.id) {
     const user = await getUserById(googleSession.user.id)
     if (user) {
+      if (!user.pi_uid) return null // Pi 미연동 계정 — 1인 1계정 원칙 차단
       touchLastLogin(user.id) // 일반 브라우저 세션 유지 접속도 기록 (5분 스로틀)
       return user
     }
     // fallback: session.user.id가 Google sub(비-UUID)일 때 — token.userId가 null이었던 구버전 세션
-    // 새 로그인에서는 auth.ts JWT 콜백이 sys_user 행을 생성하므로 이 경로는 점차 사라진다
+    // 새 로그인에서는 auth.ts JWT 콜백이 Pi 미연동이면 userId=null을 반환하므로 이 경로는 점차 사라진다
     const sub = googleSession.user.sub
     if (sub) {
       const userBySub = await getUserByGoogleId(sub)
       if (userBySub) {
+        if (!userBySub.pi_uid) return null // Pi 미연동 계정 차단
         touchLastLogin(userBySub.id)
         return userBySub
       }
