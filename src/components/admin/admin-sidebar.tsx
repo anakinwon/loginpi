@@ -64,6 +64,11 @@ const BEAN_NAV = [
 
 const I18N_NAV = [{ href: '/admin/i18n', labelKey: 'i18n' }] as const
 
+const OPS_NAV = [
+  { href: '/admin/deploy', labelKey: 'deploy' },
+  { href: '/admin/db-switch', labelKey: 'dbSwitch' },
+] as const
+
 function NavItem({
   href,
   label,
@@ -171,6 +176,18 @@ export function AdminSidebar() {
           {t('i18nSection')}
         </p>
         {I18N_NAV.map(({ href, labelKey }) => (
+          <NavItem
+            key={href}
+            href={href}
+            label={t(labelKey)}
+            pathname={pathname}
+          />
+        ))}
+
+        <p className="text-muted-foreground px-3 pt-3 pb-1 text-xs font-semibold tracking-wide uppercase">
+          {t('opsSection')}
+        </p>
+        {OPS_NAV.map(({ href, labelKey }) => (
           <NavItem
             key={href}
             href={href}

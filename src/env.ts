@@ -59,6 +59,18 @@ export const env = createEnv({
     // PyVoice v3.0 권한 슬롯 (R7 — 향후 확대 가능, 기본 자동 2/멤버 4)
     VOICE_AUTO_SLOTS: z.coerce.number().int().positive().optional(),
     VOICE_MAX_MEMBER_SLOTS: z.coerce.number().int().positive().optional(),
+    // ── 운영 도구(/admin/deploy·/admin/db-switch) — 전부 optional, 미설정 시 기능 '미구성' 비활성 ──
+    // 운영 승격(master→production fast-forward)용 GitHub 토큰(repo contents:write). 서버 전용.
+    GITHUB_DEPLOY_TOKEN: z.string().optional(),
+    GITHUB_REPO: z.string().optional(), // 'owner/repo' (기본 anakinwon/loginpi)
+    // Stage 재배포 트리거(Vercel Deploy Hook URL — loginpi/master). 토큰 불필요(URL 자체가 시크릿)
+    VERCEL_STAGING_DEPLOY_HOOK: z.string().url().optional(),
+    // 운영 재배포 트리거(Vercel Deploy Hook URL — cafepi/production, 승격 후 보조). 선택
+    VERCEL_PROD_DEPLOY_HOOK: z.string().url().optional(),
+    // Staging DB 스위치(STAGING_DB_TARGET env 변경)용 Vercel API 토큰 + 대상 프로젝트
+    VERCEL_API_TOKEN: z.string().optional(),
+    VERCEL_TEAM_ID: z.string().optional(),
+    VERCEL_STAGING_PROJECT_ID: z.string().optional(), // loginpi 프로젝트 id
   },
   client: {
     NEXT_PUBLIC_APP_URL: z.string().url(),
@@ -103,6 +115,13 @@ export const env = createEnv({
     GOOGLE_MAPS_API_KEY: process.env.GOOGLE_MAPS_API_KEY,
     VOICE_AUTO_SLOTS: process.env.VOICE_AUTO_SLOTS,
     VOICE_MAX_MEMBER_SLOTS: process.env.VOICE_MAX_MEMBER_SLOTS,
+    GITHUB_DEPLOY_TOKEN: process.env.GITHUB_DEPLOY_TOKEN,
+    GITHUB_REPO: process.env.GITHUB_REPO,
+    VERCEL_STAGING_DEPLOY_HOOK: process.env.VERCEL_STAGING_DEPLOY_HOOK,
+    VERCEL_PROD_DEPLOY_HOOK: process.env.VERCEL_PROD_DEPLOY_HOOK,
+    VERCEL_API_TOKEN: process.env.VERCEL_API_TOKEN,
+    VERCEL_TEAM_ID: process.env.VERCEL_TEAM_ID,
+    VERCEL_STAGING_PROJECT_ID: process.env.VERCEL_STAGING_PROJECT_ID,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_PI_SANDBOX: process.env.NEXT_PUBLIC_PI_SANDBOX,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
