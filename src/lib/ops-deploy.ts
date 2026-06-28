@@ -101,6 +101,58 @@ export async function triggerStagingDeploy(): Promise<{ ok: boolean; error?: str
   }
 }
 
+export interface DeploymentStatus {
+  configured: boolean // VERCEL_API_TOKEN + PROJECT_ID 설정 시에만 조회 가능
+  state: string | null // QUEUED | INITIALIZING | BUILDING | READY | ERROR | CANCELED
+  url: string | null
+  inspectorUrl: string | null // Vercel 대시보드 해당 배포 링크
+  createdAt: number | null
+  error?: string
+}
+
+// staging(loginpi) 최신 배포 상태 — 진행/완료/실패 추적용. Vercel API.
+export async function getLatestStagingDeployment(): Promise<DeploymentStatus> {
+  const token = process.env.VERCEL_API_TOKEN
+  const projectId = process.env.VERCEL_STAGING_PROJECT_ID
+  const empty: DeploymentStatus = {
+    configured: !!(token && projectId),
+    state: null,
+    url: null,
+    inspectorUrl: null,
+    createdAt: null,
+  }
+  if (!token || !projectId) return empty
+  try {
+    const res = await fetch(
+      `${VERCEL}/v6/deployments${teamQs(`projectId=${projectId}&limit=1`)}`,
+      { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store' },
+    )
+    if (!res.ok) return { ...empty, error: `Vercel ${res.status}` }
+    const d = (await res.json()) as {
+      deployments?: {
+        uid: string
+        url?: string
+        state?: string
+        readyState?: string
+        created?: number
+        createdAt?: number
+        inspectorUrl?: string
+      }[]
+    }
+    const dep = d.deployments?.[0]
+    if (!dep) return empty
+    return {
+      configured: true,
+      state: dep.state ?? dep.readyState ?? null,
+      url: dep.url ? `https://${dep.url}` : null,
+      inspectorUrl: dep.inspectorUrl ?? null,
+      createdAt: dep.created ?? dep.createdAt ?? null,
+    }
+  } catch (e) {
+    return { ...empty, error: e instanceof Error ? e.message : 'unknown' }
+  }
+}
+
 // 운영 승격 — production ref를 master로 fast-forward(force:false). ff 아니면 GitHub 422 → 거부.
 // 승격 성공 시 cafepi(production 브랜치 감시)가 자동 배포. prod hook 있으면 보조 트리거.
 export async function promoteToProduction(): Promise<{

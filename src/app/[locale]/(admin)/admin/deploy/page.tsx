@@ -1,8 +1,9 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
+import { cn } from '@/lib/utils'
 
 interface CommitInfo {
   sha: string
@@ -18,13 +19,44 @@ interface DeployState {
   error?: string
 }
 
+interface DeploymentStatus {
+  configured: boolean
+  state: string | null
+  url: string | null
+  inspectorUrl: string | null
+  createdAt: number | null
+  error?: string
+}
+
 const short = (s?: string) => (s ? s.slice(0, 7) : '—')
+
+const TERMINAL = ['READY', 'ERROR', 'CANCELED']
+const STATE_UI: Record<string, { label: string; cls: string }> = {
+  QUEUED: { label: '⏳ 대기(QUEUED)', cls: 'bg-muted text-foreground' },
+  INITIALIZING: { label: '⏳ 준비(INITIALIZING)', cls: 'bg-muted text-foreground' },
+  BUILDING: {
+    label: '🔨 빌드 중(BUILDING)',
+    cls: 'bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300',
+  },
+  READY: {
+    label: '✅ 완료(READY)',
+    cls: 'bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-300',
+  },
+  ERROR: {
+    label: '❌ 실패(ERROR)',
+    cls: 'bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-300',
+  },
+  CANCELED: { label: '⛔ 취소(CANCELED)', cls: 'bg-muted text-muted-foreground' },
+}
 
 export default function DeployPage() {
   const [state, setState] = useState<DeployState | null>(null)
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState<'staging' | 'production' | null>(null)
   const [forbidden, setForbidden] = useState(false)
+  const [status, setStatus] = useState<DeploymentStatus | null>(null)
+  const [polling, setPolling] = useState(false)
+  const pollStart = useRef(0)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -42,9 +74,35 @@ export default function DeployPage() {
     }
   }, [])
 
+  const loadStatus = useCallback(async () => {
+    try {
+      const res = await piFetch('/api/admin/deploy/status')
+      if (!res.ok) return
+      const s = (await res.json()) as DeploymentStatus
+      setStatus(s)
+      if (s.state && TERMINAL.includes(s.state)) setPolling(false)
+    } catch {
+      /* 폴링 중 일시 오류는 무시 */
+    }
+  }, [])
+
   useEffect(() => {
     void load()
-  }, [load])
+    void loadStatus()
+  }, [load, loadStatus])
+
+  // 트리거 후 자동 폴링(3초) — 종료상태 도달 또는 4분 경과 시 중단
+  useEffect(() => {
+    if (!polling) return
+    const id = setInterval(() => {
+      if (Date.now() - pollStart.current > 4 * 60 * 1000) {
+        setPolling(false)
+        return
+      }
+      void loadStatus()
+    }, 3000)
+    return () => clearInterval(id)
+  }, [polling, loadStatus])
 
   const run = useCallback(
     async (target: 'staging' | 'production') => {
@@ -72,6 +130,12 @@ export default function DeployPage() {
               : `운영 승격 완료(${short(data.sha)}) — cafepi 배포가 시작됩니다`,
           )
           await load()
+          // 새 배포가 등록될 시간을 잠깐 준 뒤 진행상태 폴링 시작
+          pollStart.current = Date.now()
+          setTimeout(() => {
+            setPolling(true)
+            void loadStatus()
+          }, 2500)
         } else {
           toast.error(data.error || '실패')
         }
@@ -183,6 +247,56 @@ export default function DeployPage() {
               · 운영 승격 비활성: `GITHUB_DEPLOY_TOKEN` 미설정
             </p>
           )}
+
+          <div className="rounded-lg border p-4">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium">최근 Stage 배포 상태</p>
+              <button
+                onClick={() => void loadStatus()}
+                className="text-muted-foreground text-xs hover:underline"
+              >
+                새로고침
+              </button>
+            </div>
+            {!status?.configured ? (
+              <p className="text-muted-foreground mt-2 text-xs">
+                앱 내 진행상태 표시는 `VERCEL_API_TOKEN`·`VERCEL_STAGING_PROJECT_ID`
+                설정 시 활성화됩니다. 그 전엔 Vercel 대시보드 → loginpi →
+                Deployments에서 확인하세요.
+              </p>
+            ) : (
+              <div className="mt-2 space-y-2">
+                <div className="flex items-center gap-2">
+                  <span
+                    className={cn(
+                      'rounded px-2 py-0.5 text-xs font-medium',
+                      STATE_UI[status.state ?? '']?.cls ?? 'bg-muted',
+                    )}
+                  >
+                    {STATE_UI[status.state ?? '']?.label ?? status.state ?? '—'}
+                  </span>
+                  {polling && (
+                    <span className="text-muted-foreground text-xs">
+                      자동 갱신 중…
+                    </span>
+                  )}
+                </div>
+                {status.inspectorUrl && (
+                  <a
+                    href={status.inspectorUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-primary text-xs hover:underline"
+                  >
+                    Vercel에서 빌드 로그 보기 ↗
+                  </a>
+                )}
+                {status.error && (
+                  <p className="text-xs text-amber-600">조회 오류: {status.error}</p>
+                )}
+              </div>
+            )}
+          </div>
         </>
       )}
     </div>
