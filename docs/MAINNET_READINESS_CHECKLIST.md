@@ -2,7 +2,8 @@
 
 > **정본 원칙**: 메인넷 출시 절차·등재 요건은 **Pi Network 공식문서만**을 근거로 한다. 추측·비공식 출처 사용 금지(2026-06-26 마스터 지시).
 > **면책**: 본 문서의 cafe.pi 적합 여부는 **Pi 심사팀의 최종 판정 권한**이다. 아래 '확인필요' 항목은 단정하지 않으며, 신청 전 Pi에 직접 확인한다.
-> **최종 갱신**: 2026-06-26 · 대상: master
+> **최종 갱신**: 2026-06-29 · 대상: master
+> **운영 인프라 진척(2026-06-28~29)**: 운영DB 컷오버 완료(ajdwlcqoljkjamostutc·dev 100% 미러·센티넬 검증) + 읽기전용 보호 + 2단계 배포 분리. 상세는 Part D-4 · 오픈베타 체크리스트(`ops_checklist` sql/137).
 
 ---
 
@@ -207,6 +208,8 @@
 - 결제 멱등성·통화 라우팅(플랫폼↔Bean / P2P↔Pi / O2O↔Pi+Bean보상)·원자적 RPC(sql/074).
 - 다국어 22개 활성 locale `validate:locales` 통과 / username 마스킹 / 현지 시간 표시.
 - 모니터링 `/admin/monitor` / 롤백=Vercel revert·Supabase 백업.
+- **운영DB 컷오버 완료(2026-06-28~29)**: 운영DB(`ajdwlcqoljkjamostutc`) 신설·dev 100% 미러(96테이블·59,280행)·센티넬 검증. 읽기전용 보호(`SUPABASE_READONLY_MODE`+쓰기 가드+read-only 롤 sql/136). 외부 테이블 12종(sql/134)·i18n 레거시 2종(sql/135) 정리. 접속=aws-1-ap-northeast-2 Session pooler.
+- **2단계 배포 분리**: staging(loginpi·master·🧪배너) / 운영(cafepi·production 브랜치) 2-프로젝트 + `promote-to-prod.mjs`(ff-only 승격) + 배포 컨트롤 화면·진행상태 폴링. ⚠️ `NEXT_PUBLIC_APP_URL` 도메인별 필수(통짜 복사 시 api-guard Origin 검증으로 `/api/auth/pi` 403→로그인 깨짐).
 
 ---
 
@@ -217,12 +220,12 @@
 | 순서 | 액션 | 공식 근거 | 상태 |
 |---|---|---|---|
 | 1 | **본인 Pi KYC 완료 확인** (메인넷 지갑 슬롯 전제) | B-2-1 / A-2 | 🟡 확인필요 |
-| 2 | **A-3 상표 결정**: Trademark Licensing Agreement(Dev Portal) 체결 **또는** Pi 접두 개명. 공식 규칙상 'Pi App_Name' 형태 금지 | A-3 / C-1-A | 🔴 신청 전 필수 |
+| 2 | **A-3 상표 결정**: Trademark Licensing Agreement(Dev Portal) 체결 **또는** Pi 접두 개명. 공식 규칙상 'Pi App_Name' 형태 금지 | A-3 / C-1-A | ✅ **Py 개명 완료**(2026-06-27, PyCafé™/PyShop™/PyTranslate™ — C-A 공식답변 반영) |
 | 3 | **메인넷 Developer Portal 프로젝트 신규 생성** (testnet과 별도, App Network=Mainnet) | B-2-2, B-3 | 🚫 수동 |
-| 4 | **앱 URL 확보 + 도메인 검증** (`validation-key.txt`, 타 프로젝트와 URL 중복 불가) | B-1-12, B-2-3 | 🚫 수동 |
+| 4 | **앱 URL 확보 + 도메인 검증** (`validation-key.txt`, 타 프로젝트와 URL 중복 불가) | B-1-12, B-2-3 | 🟡 운영 URL(cafepi.vercel.app) 확보·메인넷 도메인검증은 E-3 후 |
 | 5 | **메인넷 API Key 발급** → Vercel `PI_API_KEY` 설정 | B-2-4 | 🚫 수동 |
 | 6 | **등록 지갑 = A2U 정산 지갑 일치** 확인 → `PI_WALLET_PRIVATE_SEED` | B-3 | 🚫 수동 |
-| 7 | Vercel 환경변수 전체 + Cron 등록 | D-2, D-4 | 🚫 수동 |
+| 7 | Vercel 환경변수 전체 + Cron 등록 | D-2, D-4 | 🟡 운영 env+운영DB 컷오버 완료·메인넷 Pi 키/지갑·SANDBOX=false 잔여 |
 | 8 | **Pi Browser 실기기 로그인·결제 검증** (P0 게이트) | D-1 | ⏳ |
 | 9 | U2A 트랜잭션 1건으로 생태계 연결 확인 | B-1-13 | ⏳ |
 | 10 | 등재 신청 제출 (요건 A-1~A-7 충족 상태) | A 전체 | 🚫 수동 |
@@ -235,7 +238,7 @@
 2. cafe.pi 적합성은 **Part C에 '확인필요'로만** 기록하고, Pi 직접 확인 결과로 갱신한다.
 3. 공식 출처 4개가 갱신되면 본 문서도 재대조한다.
 
-**근거 정본**: 위 공식 출처 4개 · **최종 갱신**: 2026-06-26
+**근거 정본**: 위 공식 출처 4개 · **최종 갱신**: 2026-06-29
 
 ---
 
