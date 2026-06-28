@@ -1,4 +1,5 @@
 import { getLocale } from 'next-intl/server'
+import { env } from '@/env'
 import { Link } from '@/i18n/navigation'
 import { GoogleLoginButton } from '@/components/google-login-button'
 import { PiLoginButton } from '@/components/pi-login-button'
@@ -27,7 +28,11 @@ export async function Header() {
             <ThemeToggle />
           </span>
           <LanguageSwitcher locale={locale} />
-          <PiPriceChip locale={locale} />
+          {/* 시세·각국통화 칩: Pi 가치평가 노출 = 등재 레드라인(A-5) 대응으로 기본 숨김.
+              노출하려면 NEXT_PUBLIC_FEATURE_PI_PRICE='true' 한 줄만 켜면 됨(재배포). docs/PRD_23_FUNC_TUNING.md §8.6 */}
+          {env.NEXT_PUBLIC_FEATURE_PI_PRICE === 'true' && (
+            <PiPriceChip locale={locale} />
+          )}
         </nav>
       </div>
     </HeaderShell>
