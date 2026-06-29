@@ -8,7 +8,7 @@ export function BeanIcon({ className }: { className?: string }) {
   return (
     <span
       role="img"
-      aria-label="Bean Token"
+      aria-label="Bean"
       className={cn(
         'inline-block bg-center bg-no-repeat align-text-bottom',
         className,

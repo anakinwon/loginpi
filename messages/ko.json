@@ -724,7 +724,7 @@
       },
       {
         "q": "테스트넷에서 받은 Bean은 어떻게 되나요?",
-        "a": "메인넷 정식 런칭·Bean Token 공식 발행 시, 테스트넷 이벤트로 받은 Bean을 1:1로 그대로 지급합니다."
+        "a": "메인넷 정식 런칭 시, 테스트넷 이벤트로 받은 Bean을 1:1로 그대로 지급합니다."
       },
       {
         "q": "환불이 되나요?",
@@ -808,7 +808,7 @@
       "highlight1Title": "🤝 Pi · Google 통합 로그인",
       "highlight1Desc": "Pi 계정 + 구글 계정 지원. 추후 카카오·라인·위챗 등 통합 로그인 추가 예정.",
       "highlight2Title": "💳 Pi 결제 서비스 구축",
-      "highlight2Desc": "PiRC1(토큰 경제) · PiRC2(구독 서비스) · PiRC3(에스크로 안전거래) 구현.",
+      "highlight2Desc": "PiRC1(Bean 경제) · PiRC2(구독 서비스) · PiRC3(에스크로 안전거래) 구현.",
       "pillar1Title": "🟣 Pi 우선 설계",
       "pillar1Desc": "Pi 계정 로그인·Pi 결제를 1차 경로로 지원합니다. 결제는 Pi로만 이루어지며, Bean은 1 Pi = 100 Bean 고정 내부 적립금입니다.",
       "pillar2Title": "📱 Pi Browser 완벽 호환",
@@ -899,8 +899,8 @@
           "title": "테스트넷 보상, 메인넷에서 그대로 (약속)",
           "steps": [
             "지금 테스트넷 이벤트로 받은 Bean은 cafe.pi의 약속입니다",
-            "플랫폼이 메인넷에 정식 런칭되고 Bean Token이 공식 발행되면,",
-            "테스트넷에서 적립한 이벤트 토큰을 동일하게 1:1로 메인넷 Bean으로 그대로 지급합니다",
+            "플랫폼이 메인넷에 정식 런칭되면,",
+            "테스트넷에서 적립한 이벤트 Bean을 동일하게 1:1로 메인넷 Bean으로 그대로 지급합니다",
             "초기 참여자의 노력이 사라지지 않도록 보장하는 cafe.pi의 원칙입니다"
           ]
         }
@@ -1636,7 +1636,7 @@
   },
   "event": {
     "title": "🎖️ 오픈베타 #1이벤트 - 10미션수행",
-    "subtitle": "10미션 완료 선착순 100명 5,000 Bean Token 받자!",
+    "subtitle": "10미션 완료 선착순 100명 5,000 Bean 받자!",
     "tabMissionSub": "미션 이벤트",
     "tabShopSub": "매장 선착순 온보딩 이벤트",
     "loginHint": "로그인하면 나의 미션 진행도와 요원 등급이 표시됩니다",
@@ -1692,8 +1692,8 @@
         "desc": "Pi·Google 로그인 연동 + 별명·카카오톡 ID 입력 (선물수령시 필요)"
       },
       "M2": {
-        "name": "Bean Token 충전하기",
-        "desc": "Bean 토큰을 충전해서 Cafe도 만들고, 참여하고, PyTranslate™도 사용"
+        "name": "Bean 충전하기",
+        "desc": "Bean을 충전해서 Cafe도 만들고, 참여하고, PyTranslate™도 사용"
       },
       "M3": {
         "name": "PREMIUM 카페 생성(PiRC1) + PyTranslate™",

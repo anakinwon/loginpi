@@ -109,7 +109,10 @@ export function ClientMyShops({
     try {
       const res = await piFetch(`/api/store/shops${showAll ? '?all=1' : ''}`)
       if (res.ok) {
-        const data = (await res.json()) as { shops: Shop[]; rep_shop_id: string | null }
+        const data = (await res.json()) as {
+          shops: Shop[]
+          rep_shop_id: string | null
+        }
         setShops(data.shops)
         setRepShopId(data.rep_shop_id ?? null)
       }
@@ -121,7 +124,9 @@ export function ClientMyShops({
   async function setRep(shopId: string) {
     setSettingRepId(shopId)
     try {
-      const res = await piFetch(`/api/store/shops/${shopId}/set-rep`, { method: 'POST' })
+      const res = await piFetch(`/api/store/shops/${shopId}/set-rep`, {
+        method: 'POST',
+      })
       if (res.ok) {
         setRepShopId(shopId)
         toast.success('대표 매장으로 지정했습니다')
@@ -157,7 +162,9 @@ export function ClientMyShops({
 
   // 매장 신규 등록 = 구글맵 인증(claim)으로만. 자유 등록 폐기 → 지도로 안내.
   function openNew() {
-    toast.info('매장은 구글맵 인증으로 등록합니다. 지도에서 내 매장을 찾아 인증 등록해 주세요.')
+    toast.info(
+      '매장은 구글맵 인증으로 등록합니다. 지도에서 내 매장을 찾아 인증 등록해 주세요.',
+    )
     router.push('/map')
   }
 
@@ -286,17 +293,26 @@ export function ClientMyShops({
 
       {/* 매장 등록 방법 안내 — 목록 화면에서만(폼 열면 숨김) */}
       {!formOpen && (
-        <div className="shadow-soft space-y-2 rounded-xl border bg-card p-4 text-sm">
+        <div className="shadow-soft bg-card space-y-2 rounded-xl border p-4 text-sm">
           <p className="font-semibold">🏪 매장 등록 방법 (구글맵 인증)</p>
           <p className="text-muted-foreground text-xs">
-            매장은 구글맵에 등록된 <b>본인이 운영하는 매장</b>만 인증 등록할 수 있습니다.
-            구글맵에 없는 매장은 검증할 수 없어 등록이 불가합니다.
+            매장은 구글맵에 등록된 <b>본인이 운영하는 매장</b>만 인증 등록할 수
+            있습니다. 구글맵에 없는 매장은 검증할 수 없어 등록이 불가합니다.
           </p>
           <ol className="text-muted-foreground list-inside list-decimal space-y-1 text-xs">
-            <li><b>[매장 추가]</b> → 지도로 이동</li>
-            <li>주변 구글 등록 매장에서 <b>내 매장 선택</b></li>
-            <li>place_id 직접 입력 + 전화번호 구글 대조 + 현재 위치(GPS) 확인</li>
-            <li>⚠️ 타인 매장 등록은 <b>불법</b>(민·형사상 처벌) — 본인 매장 보증 동의</li>
+            <li>
+              <b>[매장 추가]</b> → 지도로 이동
+            </li>
+            <li>
+              주변 구글 등록 매장에서 <b>내 매장 선택</b>
+            </li>
+            <li>
+              place_id 직접 입력 + 전화번호 구글 대조 + 현재 위치(GPS) 확인
+            </li>
+            <li>
+              ⚠️ 타인 매장 등록은 <b>불법</b>(민·형사상 처벌) — 본인 매장 보증
+              동의
+            </li>
             <li>인증 등록 완료 → 메뉴(상품) 추가</li>
           </ol>
         </div>
@@ -368,9 +384,9 @@ export function ClientMyShops({
             <div className="pr-3">
               <p className="text-sm font-medium">⭐ 이용후기·Bean 보상 동의</p>
               <p className="text-muted-foreground text-xs">
-                내 상품에 대해 고객이 이용후기를 남기고, 후기에 따라 Bean Token이
-                지급되는 것에 동의합니다. 동의한 매장의 상품에만 후기 작성 버튼이
-                노출됩니다.
+                내 상품에 대해 고객이 이용후기를 남기고, 후기에 따라 Bean이
+                지급되는 것에 동의합니다. 동의한 매장의 상품에만 후기 작성
+                버튼이 노출됩니다.
               </p>
             </div>
             <input
@@ -639,7 +655,9 @@ export function ClientMyShops({
                   <Button
                     size="sm"
                     onClick={() =>
-                      router.push(`/store/my/shop-items/new?shop=${shop.shop_id}`)
+                      router.push(
+                        `/store/my/shop-items/new?shop=${shop.shop_id}`,
+                      )
                     }
                   >
                     + 메뉴 추가
@@ -651,7 +669,9 @@ export function ClientMyShops({
                       disabled={settingRepId === shop.shop_id}
                       onClick={() => setRep(shop.shop_id)}
                     >
-                      {settingRepId === shop.shop_id ? '처리 중…' : '⭐ 대표 지정'}
+                      {settingRepId === shop.shop_id
+                        ? '처리 중…'
+                        : '⭐ 대표 지정'}
                     </Button>
                   )}
                   <Button

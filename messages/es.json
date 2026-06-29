@@ -998,7 +998,7 @@
           "icon": "🪙",
           "steps": [
             "Los Bean recibidos ahora por el Event de Testnet son una promesa de cafe.pi",
-            "Cuando la Platform se Launch oficialmente en Mainnet y el Bean Token sea emitido oficialmente,",
+            "Cuando la Platform se Launch oficialmente en Mainnet y el Bean sea emitido oficialmente,",
             "Los Token de Event acumulados en Testnet se pagarán exactamente 1:1 como Bean de Mainnet",
             "Este es el principio de cafe.pi para asegurar que el esfuerzo de los participantes iniciales no se pierda"
           ],
@@ -1970,7 +1970,7 @@
         "q": "¿Cómo realizo un pago?"
       },
       {
-        "a": "Cuando se lance oficialmente la Mainnet y se emita oficialmente el Bean Token, los Bean recibidos en el evento de la Testnet se pagarán 1:1.",
+        "a": "Cuando se lance oficialmente la Mainnet y se emita oficialmente el Bean, los Bean recibidos en el evento de la Testnet se pagarán 1:1.",
         "q": "¿Qué sucede con los Bean recibidos en la Testnet?"
       },
       {

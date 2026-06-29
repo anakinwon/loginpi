@@ -998,7 +998,7 @@
           "icon": "🪙",
           "steps": [
             "Les Bean reçus lors de l'événement Testnet actuel sont une promesse de cafe.pi.",
-            "Lorsque la plateforme sera officiellement lancée sur le Mainnet et que le Bean Token sera officiellement émis,",
+            "Lorsque la plateforme sera officiellement lancée sur le Mainnet et que le Bean sera officiellement émis,",
             "Les jetons d'événement accumulés sur le Testnet seront distribués à l'identique, en 1:1, en Bean Mainnet.",
             "C'est le principe de cafe.pi de garantir que les efforts des premiers participants ne soient pas perdus."
           ],
@@ -1970,7 +1970,7 @@
         "q": "Comment effectuer un paiement ?"
       },
       {
-        "a": "Lors du lancement officiel du Mainnet et de l'émission officielle du Bean Token, les Beans reçus lors des événements Testnet seront distribués au même taux de 1:1.",
+        "a": "Lors du lancement officiel du Mainnet et de l'émission officielle du Bean, les Beans reçus lors des événements Testnet seront distribués au même taux de 1:1.",
         "q": "Qu'advient-il des Beans reçus sur le Testnet ?"
       },
       {

@@ -998,7 +998,7 @@
           "icon": "🪙",
           "steps": [
             "Praegu Testneti Event'iga saadud Bean'id on cafe.pi lubadus",
-            "Kui platvorm Mainnetis ametlikult käivitatakse ja Bean Token ametlikult väljastatakse,",
+            "Kui platvorm Mainnetis ametlikult käivitatakse ja Bean ametlikult väljastatakse,",
             "Testnetis teenitud Event Token'id makstakse samamoodi 1:1 Mainneti Bean'idena välja",
             "See on cafe.pi põhimõte, mis tagab, et varajaste osalejate pingutused ei lähe kaotsi"
           ],
@@ -1970,7 +1970,7 @@
         "q": "Kuidas maksta?"
       },
       {
-        "a": "Mainneti ametliku käivitamise ja Bean Tokeni ametliku väljastamise korral makstakse Testneti sündmusest saadud Beanid välja 1:1 suhtes.",
+        "a": "Mainneti ametliku käivitamise ja Beani ametliku väljastamise korral makstakse Testneti sündmusest saadud Beanid välja 1:1 suhtes.",
         "q": "Mis juhtub Testnetis saadud Beanidega?"
       },
       {

@@ -998,7 +998,7 @@
           "icon": "🪙",
           "steps": [
             "現在Testnet Eventで受け取ったBeanはcafe.piの約束です",
-            "PlatformがMainnetに正式LaunchされBean Tokenが公式発行されると、",
+            "PlatformがMainnetに正式LaunchされBeanが公式発行されると、",
             "Testnetで獲得したEvent Tokenを同じく1:1でMainnet Beanとしてそのまま支給します",
             "初期参加者の努力が失われないように保証するcafe.piの原則です"
           ],
@@ -1970,7 +1970,7 @@
         "q": "決済方法"
       },
       {
-        "a": "Mainnetの正式ローンチ・Bean Tokenの公式発行時に、Testnetイベントで受け取ったBeanを1:1でそのまま支給します。",
+        "a": "Mainnetの正式ローンチ・Beanの公式発行時に、Testnetイベントで受け取ったBeanを1:1でそのまま支給します。",
         "q": "Testnetで受け取ったBeanはどうなりますか？"
       },
       {

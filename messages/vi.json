@@ -998,7 +998,7 @@
           "icon": "🪙",
           "steps": [
             "Bean bạn nhận được từ Event Testnet hiện tại là lời hứa của cafe.pi.",
-            "Khi nền tảng chính thức ra mắt trên Mainnet và Bean Token được phát hành chính thức,",
+            "Khi nền tảng chính thức ra mắt trên Mainnet và Bean được phát hành chính thức,",
             "Token Event đã tích lũy trên Testnet sẽ được trả 1:1 tương ứng dưới dạng Bean Mainnet.",
             "Đây là nguyên tắc của cafe.pi nhằm đảm bảo rằng nỗ lực của những người tham gia ban đầu sẽ không bị mất đi."
           ],
@@ -1970,7 +1970,7 @@
         "q": "Làm cách nào để thanh toán?"
       },
       {
-        "a": "Khi Mainnet chính thức ra mắt và Bean Token được phát hành chính thức, Bean nhận được từ sự kiện Testnet sẽ được trả 1:1.",
+        "a": "Khi Mainnet chính thức ra mắt và Bean được phát hành chính thức, Bean nhận được từ sự kiện Testnet sẽ được trả 1:1.",
         "q": "Bean nhận được từ Testnet sẽ như thế nào?"
       },
       {

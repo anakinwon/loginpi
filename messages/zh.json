@@ -998,7 +998,7 @@
           "icon": "🪙",
           "steps": [
             "现在通过 Testnet Event 获得的 Bean 是 cafe.pi 的承诺",
-            "当平台在 Mainnet 正式 Launch 后，Bean Token 正式发行时，",
+            "当平台在 Mainnet 正式 Launch 后，Bean 正式发行时，",
             "在 Testnet 中积累的 Event Token 将以 1:1 的比例原样支付为 Mainnet Bean",
             "这是 cafe.pi 确保早期参与者努力不会白费的原则"
           ],
@@ -1970,7 +1970,7 @@
         "q": "如何支付？"
       },
       {
-        "a": "Mainnet正式上线、Bean Token官方发行时，通过Testnet活动获得的Bean将按1:1比例原样发放。",
+        "a": "Mainnet正式上线、Bean官方发行时，通过Testnet活动获得的Bean将按1:1比例原样发放。",
         "q": "在Testnet中获得的Bean会怎样？"
       },
       {

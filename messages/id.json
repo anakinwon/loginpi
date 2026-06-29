@@ -998,7 +998,7 @@
           "icon": "🪙",
           "steps": [
             "Bean yang diterima dari event Testnet sekarang adalah janji dari cafe.pi",
-            "Ketika platform diluncurkan secara resmi di Mainnet dan Bean Token diterbitkan secara resmi,",
+            "Ketika platform diluncurkan secara resmi di Mainnet dan Bean diterbitkan secara resmi,",
             "Token event yang terkumpul di Testnet akan dibayarkan 1:1 secara identik sebagai Bean Mainnet",
             "Ini adalah prinsip cafe.pi untuk memastikan bahwa upaya peserta awal tidak hilang"
           ],
@@ -1970,7 +1970,7 @@
         "q": "Bagaimana cara melakukan pembayaran?"
       },
       {
-        "a": "Saat peluncuran resmi Mainnet dan penerbitan resmi Bean Token, Bean yang diterima dari event Testnet akan diberikan 1:1.",
+        "a": "Saat peluncuran resmi Mainnet dan penerbitan resmi Bean, Bean yang diterima dari event Testnet akan diberikan 1:1.",
         "q": "Bagaimana dengan Bean yang diterima di Testnet?"
       },
       {
