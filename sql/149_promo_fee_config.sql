@@ -106,11 +106,14 @@ BEGIN
   END IF;
 
   -- 현재 활성 행 조회
+  --   ⚠️ ORDER BY는 반드시 테이블명 한정(promo_fee_config.mod_dtm). RETURNS TABLE의 OUT
+  --   파라미터에도 mod_dtm이 있어, 비한정 mod_dtm은 variable_conflict('column reference
+  --   "mod_dtm" is ambiguous') 에러를 일으킨다.
   SELECT promo_fee_id, promo_active_yn, promo_start_dtm, promo_end_dtm
   INTO v_id, v_old_active_yn, v_old_start_dtm, v_old_end_dtm
   FROM public.promo_fee_config
   WHERE del_yn = 'N'
-  ORDER BY mod_dtm DESC
+  ORDER BY promo_fee_config.mod_dtm DESC
   LIMIT 1;
 
   -- 없으면 생성
