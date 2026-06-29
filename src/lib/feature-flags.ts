@@ -22,3 +22,15 @@ export function computeShowPiValuation(tier: Tier, override?: string): boolean {
   if (override === 'false') return false
   return tier === 'staging' || tier === 'dev'
 }
+
+/**
+ * 운영(메인넷) 환경 여부 — 홈 표시의 운영 전용 분기 단일 소스.
+ *   운영(prod): 기술백서·사용설명서 기본 펼침 / 대시보드·Event 탭 숨김.
+ *   staging·dev: 기존 그대로(접힘·대시보드·Event 노출).
+ * staging|운영 분기는 모두 이 함수(=resolveDbTier 결과) 하나로만 판정한다.
+ *
+ * @param tier 런타임 환경(resolveDbTier 결과).
+ */
+export function computeIsProd(tier: Tier): boolean {
+  return tier === 'prod'
+}

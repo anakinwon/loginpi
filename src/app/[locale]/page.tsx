@@ -1,5 +1,7 @@
 import { getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/navigation'
+import { resolveDbTier } from '@/lib/db-env'
+import { computeIsProd } from '@/lib/feature-flags'
 import { StatsDashboard } from '@/components/admin/stats/stats-dashboard'
 import { TechWhitepaper } from '@/components/home/tech-whitepaper'
 import { UserManual } from '@/components/home/user-manual'
@@ -12,6 +14,8 @@ export async function generateMetadata() {
 export default async function HomePage() {
   const t = await getTranslations('adminStats')
   const tf = await getTranslations('faq')
+  // 운영(메인넷)이면 대시보드(제목+통계) 전체 숨김 — staging·dev만 노출(단일 소스)
+  const isProd = computeIsProd(resolveDbTier())
 
   return (
     <div className="mx-auto max-w-5xl space-y-8 px-4 pt-3 pb-8">
@@ -20,12 +24,18 @@ export default async function HomePage() {
         <UserManual />
       </div>
 
-      <div>
-        <h1 className="text-2xl font-bold">{t('homeTitle')}</h1>
-        <p className="text-muted-foreground mt-1 text-sm">{t('subtitle')}</p>
-      </div>
+      {!isProd && (
+        <>
+          <div>
+            <h1 className="text-2xl font-bold">{t('homeTitle')}</h1>
+            <p className="text-muted-foreground mt-1 text-sm">
+              {t('subtitle')}
+            </p>
+          </div>
 
-      <StatsDashboard />
+          <StatsDashboard />
+        </>
+      )}
 
       {/* 푸터 — 고객지원·약관 노출 */}
       <footer className="text-muted-foreground flex flex-wrap items-center justify-center gap-x-3 gap-y-1 border-t pt-4 text-xs">

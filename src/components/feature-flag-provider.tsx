@@ -11,11 +11,14 @@ export interface FeatureFlags {
   showPiValuation: boolean
   /** 활성 요금제 모드(BEAN|PI) — PI 모드면 마이크로 요금은 "무료"로 표시 (PRD_24 §0) */
   feeMode: 'BEAN' | 'PI'
+  /** 운영(메인넷) 환경 여부 — 홈 백서·매뉴얼 기본 펼침, 대시보드·Event 숨김(computeIsProd) */
+  isProd: boolean
 }
 
 const FeatureFlagContext = createContext<FeatureFlags>({
   showPiValuation: false,
   feeMode: 'BEAN',
+  isProd: false,
 })
 
 export function FeatureFlagProvider({

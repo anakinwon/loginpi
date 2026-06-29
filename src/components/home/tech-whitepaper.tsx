@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
+import { useFeatureFlags } from '@/components/feature-flag-provider'
 
 // 홈 상단 기술 백서 — 접이식(기본 접힘). 내용은 i18n(adminStats.whitepaper) 기준.
 // 핵심 구축 현황 2개(통합 로그인·Pi 결제) + 강점 6개 = 2열 그리드 4행(동일 카드)
@@ -18,7 +19,9 @@ const PILLARS = [
 
 export function TechWhitepaper() {
   const t = useTranslations('adminStats.whitepaper')
-  const [open, setOpen] = useState(false)
+  // 운영(메인넷)에선 기본 펼침, staging·dev는 기본 접힘 (server 주입값 — hydration 일치)
+  const { isProd } = useFeatureFlags()
+  const [open, setOpen] = useState(isProd)
 
   return (
     <section className="dark:bg-card overflow-hidden rounded-2xl border bg-white shadow-sm">

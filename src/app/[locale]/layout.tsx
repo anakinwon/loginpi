@@ -18,7 +18,7 @@ import { StagingBanner } from '@/components/layout/staging-banner'
 import { Toaster } from '@/components/ui/sonner'
 import { getActiveUiTheme, buildThemeStyleCss } from '@/lib/ui-theme'
 import { resolveDbTier } from '@/lib/db-env'
-import { computeShowPiValuation } from '@/lib/feature-flags'
+import { computeShowPiValuation, computeIsProd } from '@/lib/feature-flags'
 import { FeatureFlagProvider } from '@/components/feature-flag-provider'
 import { getActiveFeeMode } from '@/lib/fee-resolver'
 
@@ -82,12 +82,15 @@ export default async function LocaleLayout({
       ? buildThemeStyleCss(activeTheme.theme_tokens, 'GLOBAL')
       : ''
 
-  // 런타임 tier 판정 → Pi 가치평가(시세·환율) 노출 여부. 같은 빌드가 배포 환경별로 다르게 표시.
-  // server 판정값을 client(통화콤보 등)엔 FeatureFlagProvider Context로 주입한다.
+  // 런타임 tier 판정(단일 소스) → 환경별 표시 분기. 같은 빌드가 배포 환경별로 다르게 표시.
+  // server 판정값을 client(통화콤보·홈 백서/매뉴얼 등)엔 FeatureFlagProvider Context로 주입한다.
+  const tier = resolveDbTier()
   const showPiValuation = computeShowPiValuation(
-    resolveDbTier(),
+    tier,
     env.NEXT_PUBLIC_FEATURE_PI_PRICE,
   )
+  // 운영(메인넷)이면 홈 백서·매뉴얼 기본 펼침 (대시보드·Event 숨김은 server에서 직접 분기)
+  const isProd = computeIsProd(tier)
 
   // 활성 요금제 모드 — PI 모드면 마이크로 요금을 client에서 "무료"로 표시(서버 microFeeBean과 일관)
   const feeMode = await getActiveFeeMode()
@@ -119,7 +122,9 @@ export default async function LocaleLayout({
                 <Header />
                 {/* pb-16: 하단 고정 BottomNav(h-16)에 콘텐츠가 가려지지 않도록 여백 확보 */}
                 <main className="flex-1 pb-16">
-                  <FeatureFlagProvider flags={{ showPiValuation, feeMode }}>
+                  <FeatureFlagProvider
+                    flags={{ showPiValuation, feeMode, isProd }}
+                  >
                     {children}
                   </FeatureFlagProvider>
                 </main>

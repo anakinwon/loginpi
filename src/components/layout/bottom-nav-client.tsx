@@ -11,7 +11,14 @@ import { cn } from '@/lib/utils'
 // 하단 고정 네비게이션 (Home · Event · Cafe · Shop · Map · 나의정보/관리자)
 // 관리자 여부는 서버 판정(쿠키·Google 세션) OR Pi Browser 클라이언트 세션(role)으로 보완한다.
 // Pi Browser는 Set-Cookie를 저장하지 않아 서버 판정만으로는 관리자 탭이 안 보이기 때문.
-export function BottomNavClient({ serverIsAdmin }: { serverIsAdmin: boolean }) {
+export function BottomNavClient({
+  serverIsAdmin,
+  hideEvent = false,
+}: {
+  serverIsAdmin: boolean
+  // 운영(메인넷)이면 Event 탭 숨김 (server에서 computeIsProd로 판정해 주입)
+  hideEvent?: boolean
+}) {
   const t = useTranslations('nav')
   const pathname = usePathname()
   const { user: piUser, isInPiBrowser } = usePiAuth()
@@ -36,12 +43,17 @@ export function BottomNavClient({ serverIsAdmin }: { serverIsAdmin: boolean }) {
 
   const baseTabs = [
     { href: '/', label: t('home'), icon: House, active: pathname === '/' },
-    {
-      href: '/event',
-      label: t('event'),
-      icon: Zap,
-      active: pathname.startsWith('/event'),
-    },
+    // 운영(메인넷)에선 Event 탭 제거 — staging·dev만 노출
+    ...(hideEvent
+      ? []
+      : [
+          {
+            href: '/event',
+            label: t('event'),
+            icon: Zap,
+            active: pathname.startsWith('/event'),
+          },
+        ]),
     {
       href: '/chat',
       label: t('cafe'),
@@ -102,7 +114,11 @@ export function BottomNavClient({ serverIsAdmin }: { serverIsAdmin: boolean }) {
       }
     >
       <div
-        className={`mx-auto grid h-16 max-w-5xl ${isAdminUser ? 'grid-cols-6' : 'grid-cols-5'}`}
+        className={cn(
+          'mx-auto grid h-16 max-w-5xl',
+          // Event 숨김·관리자 여부 조합으로 칸 수 4~6 가변 (Tailwind JIT용 정적 매핑)
+          { 4: 'grid-cols-4', 5: 'grid-cols-5', 6: 'grid-cols-6' }[tabs.length],
+        )}
       >
         {tabs.map((tab) => {
           const Icon = tab.icon
