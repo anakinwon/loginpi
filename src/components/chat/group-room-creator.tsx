@@ -26,10 +26,17 @@ type PayStatus =
   | 'done'
   | 'error'
   | 'cancelled'
-type Capacity = 10 | 30 | 50 | 100
-type ExprDays = 0 | 1 | 3 | 7 | 30
 type RoomType = 'G' | 'E'
-type EntryFee = 0 | 0.1 | 0.5 | 1
+
+// 모든 카페·이벤트방 생성 고정 정책 (마스터 지시):
+//   공개 · 정원 10 · 유효기간(카페)/종료(이벤트) 7일 · 이벤트 입장료 무료.
+// 사용자 선택 불가 — UI는 안내만, 전송값은 아래 상수로 강제.
+const FIXED_MAX_MBR = 10
+const FIXED_VALID_DAYS = 7
+// 생성 시점 +7일 ISO — 카페 만료(expr_dtm) · 이벤트 종료(entry_expire_dtm) 공통
+function plus7dIso(): string {
+  return new Date(Date.now() + FIXED_VALID_DAYS * 86400000).toISOString()
+}
 
 function StepBar({ current, total = 3 }: { current: Step; total?: number }) {
   return (
@@ -42,13 +49,6 @@ function StepBar({ current, total = 3 }: { current: Step; total?: number }) {
       ))}
     </div>
   )
-}
-
-// datetime-local input의 min 값 — 현재 로컬 시각 (YYYY-MM-DDTHH:mm)
-function localDtmNow(): string {
-  const d = new Date()
-  d.setMinutes(d.getMinutes() - d.getTimezoneOffset())
-  return d.toISOString().slice(0, 16)
 }
 
 export function GroupRoomCreator() {
@@ -64,17 +64,12 @@ export function GroupRoomCreator() {
   const [selectedTheme, setSelectedTheme] = useState<ThemeRow | null>(null)
   const [roomNm, setRoomNm] = useState('')
   const [roomDesc, setRoomDesc] = useState('')
-  const [isPublic, setIsPublic] = useState<'Y' | 'N'>('Y')
-  const [maxMbr, setMaxMbr] = useState<Capacity>(50)
-  const [exprDays, setExprDays] = useState<ExprDays>(0)
   const [payStatus, setPayStatus] = useState<PayStatus>('idle')
   const [payError, setPayError] = useState<string | null>(null)
   const [canUsePremiumTheme, setCanUsePremiumTheme] = useState(false)
   const [canCreateRoomFree, setCanCreateRoomFree] = useState(false)
   // TASK-063: 이벤트방 모드 (Business 폐지 — 구독자 무료·비구독자 Bean 생성료)
   const [roomType, setRoomType] = useState<RoomType>('G')
-  const [entryFee, setEntryFee] = useState<EntryFee>(0)
-  const [eventEndDtm, setEventEndDtm] = useState('')
   const [gpsCoords, setGpsCoords] = useState<{
     lat: number
     lng: number
@@ -88,14 +83,9 @@ export function GroupRoomCreator() {
     setSelectedTheme(null)
     setRoomNm('')
     setRoomDesc('')
-    setIsPublic('Y')
-    setMaxMbr(50)
-    setExprDays(0)
     setPayStatus('idle')
     setPayError(null)
     setRoomType('G')
-    setEntryFee(0)
-    setEventEndDtm('')
     setGpsCoords(null)
 
     // LBS 동의자이면 카페 위치 자동 수집 (서버가 동의 여부 재검증 후 저장)
@@ -133,11 +123,6 @@ export function GroupRoomCreator() {
   }, [open])
 
   const isPremium = selectedTheme?.theme_tp_cd === 'PREMIUM'
-  // 일반(BASIC) 테마 그룹 카페는 무료 생성. PREMIUM 테마만 유료(구독자는 구독 혜택으로 무료).
-  const isFree = !isPremium || canCreateRoomFree
-  // 무료로 개설되는 모든 방(무료 테마·구독 혜택 무료 생성 포함)은 서버에서 7일 고정·연장 불가
-  // → 유효기간 선택 불가. 결제로 만드는 방만 기간 선택 가능.
-  const isFreeRoom7d = isFree
   // PREMIUM 테마 비구독자 생성료 = 일반요금제 Bean(10). 구독자·BASIC은 0(무료).
   // 결제 통화 = Bean (Pi 직접결제 폐기). 서버가 권위 부과·차감.
   const createCostBean = isPremium
@@ -153,19 +138,6 @@ export function GroupRoomCreator() {
     payStatus === 'approving' ||
     payStatus === 'waiting' ||
     payStatus === 'completing'
-
-  // 무료로 개설되는 그룹방은 무조건 공개 + 최대 정원 10명 제한 (마스터 정책).
-  // Bean 결제로 만드는 방만 비공개·정원 확대 선택 가능.
-  const restrictFreeRoom = roomType === 'G' && isFree
-  const FREE_ROOM_MAX = 10
-
-  // 무료 방으로 확정되면 공개·정원 10명을 강제 (잘못된 이전 선택값 정정)
-  useEffect(() => {
-    if (restrictFreeRoom) {
-      setIsPublic('Y')
-      setMaxMbr(FREE_ROOM_MAX)
-    }
-  }, [restrictFreeRoom])
 
   const handleThemeSelect = useCallback((theme: ThemeRow) => {
     setSelectedTheme(theme)
@@ -246,12 +218,10 @@ export function GroupRoomCreator() {
           theme_cd: selectedTheme.theme_cd,
           room_nm: roomNm,
           room_desc: roomDesc || null,
-          is_public_yn: isPublic,
-          max_mbr_cnt: maxMbr,
-          expr_dtm:
-            exprDays === 0
-              ? null
-              : new Date(Date.now() + exprDays * 86400000).toISOString(),
+          // 고정 정책 — 공개 · 정원 10 · 유효기간 7일 (사용자 선택 불가)
+          is_public_yn: 'Y',
+          max_mbr_cnt: FIXED_MAX_MBR,
+          expr_dtm: plus7dIso(),
           lat: gpsCoords?.lat,
           lng: gpsCoords?.lng,
         }),
@@ -288,9 +258,6 @@ export function GroupRoomCreator() {
     selectedTheme,
     roomNm,
     roomDesc,
-    isPublic,
-    maxMbr,
-    exprDays,
     gpsCoords,
     router,
     t,
@@ -299,7 +266,7 @@ export function GroupRoomCreator() {
 
   // TASK-063: 이벤트방 생성 — BUSINESS 전용, 생성 결제 없음 (참가자가 입장료 결제)
   const createEventRoomUi = useCallback(async () => {
-    if (!selectedTheme || !eventEndDtm) return
+    if (!selectedTheme) return
     setPayStatus('completing')
     setPayError(null)
     try {
@@ -310,10 +277,11 @@ export function GroupRoomCreator() {
           theme_cd: selectedTheme.theme_cd,
           room_nm: roomNm,
           room_desc: roomDesc || null,
-          is_public_yn: isPublic,
-          max_mbr_cnt: maxMbr,
-          entry_fee_pi: entryFee,
-          entry_expire_dtm: new Date(eventEndDtm).toISOString(),
+          // 고정 정책 — 공개 · 정원 10 · 입장료 무료 · 종료 7일 후 (사용자 선택 불가)
+          is_public_yn: 'Y',
+          max_mbr_cnt: FIXED_MAX_MBR,
+          entry_fee_pi: 0,
+          entry_expire_dtm: plus7dIso(),
           lat: gpsCoords?.lat ?? null,
           lng: gpsCoords?.lng ?? null,
         }),
@@ -350,10 +318,6 @@ export function GroupRoomCreator() {
     selectedTheme,
     roomNm,
     roomDesc,
-    isPublic,
-    maxMbr,
-    entryFee,
-    eventEndDtm,
     gpsCoords,
     router,
     t,
@@ -505,163 +469,40 @@ export function GroupRoomCreator() {
             {/* Step 3: 공개 설정 + 정원 + 유효기간 */}
             {step === 3 && (
               <div className="space-y-4">
-                <div>
-                  <p className="mb-2 text-sm font-medium">{t('visibility')}</p>
-                  {restrictFreeRoom ? (
-                    <>
-                      <div className="border-primary bg-primary/10 text-primary rounded-xl border px-4 py-2 text-center text-sm font-medium">
-                        {t('publicEmoji')}
-                      </div>
-                      <p className="text-muted-foreground mt-1 text-xs">
-                        {t('freeRoomPublicOnly')}
-                      </p>
-                    </>
-                  ) : (
-                    <div className="flex gap-2">
-                      {(['Y', 'N'] as const).map((v) => (
-                        <button
-                          key={v}
-                          onClick={() => setIsPublic(v)}
-                          className={`flex-1 rounded-xl border px-4 py-2 text-sm font-medium transition-colors ${
-                            isPublic === v
-                              ? 'border-primary bg-primary/10 text-primary'
-                              : 'hover:bg-muted'
-                          }`}
-                        >
-                          {v === 'Y' ? t('publicEmoji') : t('privateEmoji')}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                <div>
-                  <p className="mb-2 text-sm font-medium">{t('maxMembers')}</p>
-                  <div className="grid grid-cols-4 gap-2">
-                    {([10, 30, 50, 100] as Capacity[]).map((n) => {
-                      const locked = restrictFreeRoom && n !== FREE_ROOM_MAX
-                      return (
-                        <button
-                          key={n}
-                          onClick={() => {
-                            if (!locked) setMaxMbr(n)
-                          }}
-                          disabled={locked}
-                          className={`rounded-xl border py-2 text-sm font-medium transition-colors ${
-                            maxMbr === n
-                              ? 'border-primary bg-primary/10 text-primary'
-                              : locked
-                                ? 'cursor-not-allowed opacity-40'
-                                : 'hover:bg-muted'
-                          }`}
-                        >
-                          {t('capacityN', { n })}
-                        </button>
-                      )
-                    })}
+                {/* 고정 정책 (마스터 지시) — 모든 카페·이벤트방: 공개 · 정원 10 · 7일.
+                    사용자 선택 불가, 안내만 표시(전송값은 상수로 강제). */}
+                <div className="bg-muted/40 space-y-2 rounded-xl border p-4 text-sm">
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">
+                      {t('visibility')}
+                    </span>
+                    <span className="font-medium">{t('publicEmoji')}</span>
                   </div>
-                  {restrictFreeRoom && (
-                    <p className="text-muted-foreground mt-1 text-xs">
-                      {t('freeRoomCapacityLimit')}
-                    </p>
-                  )}
-                </div>
-
-                {roomType === 'G' ? (
-                  isFreeRoom7d ? (
-                    <div className="bg-muted/40 rounded-xl border p-3 text-sm">
-                      <p className="font-medium">{t('freeRoom7dValidity')}</p>
-                      <p className="text-muted-foreground mt-1 text-xs">
-                        {t('freeRoom7dHint')}
-                      </p>
-                    </div>
-                  ) : (
-                    <div>
-                      <p className="mb-2 text-sm font-medium">
-                        {t('validity')}
-                      </p>
-                      <div className="grid grid-cols-5 gap-2">
-                        {(
-                          [
-                            { days: 0 as ExprDays, label: t('unlimited') },
-                            {
-                              days: 1 as ExprDays,
-                              label: t('validityDays', { n: 1 }),
-                            },
-                            {
-                              days: 3 as ExprDays,
-                              label: t('validityDays', { n: 3 }),
-                            },
-                            {
-                              days: 7 as ExprDays,
-                              label: t('validityDays', { n: 7 }),
-                            },
-                            {
-                              days: 30 as ExprDays,
-                              label: t('validityDays', { n: 30 }),
-                            },
-                          ] as { days: ExprDays; label: string }[]
-                        ).map(({ days, label }) => (
-                          <button
-                            key={days}
-                            onClick={() => setExprDays(days)}
-                            className={`rounded-xl border py-2 text-xs font-medium transition-colors ${
-                              exprDays === days
-                                ? 'border-primary bg-primary/10 text-primary'
-                                : 'hover:bg-muted'
-                            }`}
-                          >
-                            {label}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )
-                ) : (
-                  <>
-                    {/* TASK-063: 이벤트방 — 입장료 + 종료 시각 */}
-                    <div>
-                      <p className="mb-2 text-sm font-medium">
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">
+                      {t('maxMembers')}
+                    </span>
+                    <span className="font-medium">
+                      {t('capacityN', { n: FIXED_MAX_MBR })}
+                    </span>
+                  </div>
+                  {roomType === 'E' && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted-foreground">
                         {t('entryFee')}
-                      </p>
-                      <div className="grid grid-cols-4 gap-2">
-                        {([0, 0.1, 0.5, 1] as EntryFee[]).map((fee) => (
-                          <button
-                            key={fee}
-                            onClick={() => setEntryFee(fee)}
-                            className={`rounded-xl border py-2 text-sm font-medium transition-colors ${
-                              entryFee === fee
-                                ? 'border-primary bg-primary/10 text-primary'
-                                : 'hover:bg-muted'
-                            }`}
-                          >
-                            {fee === 0
-                              ? t('freeEntry')
-                              : isPi
-                                ? `${fee} π`
-                                : t('entryFeeBean', { amount: fee * 100 })}
-                          </button>
-                        ))}
-                      </div>
+                      </span>
+                      <span className="font-medium">{t('freeEntry')}</span>
                     </div>
-
-                    <div>
-                      <label className="mb-1 block text-sm font-medium">
-                        {t('endTimeLabel')}
-                      </label>
-                      <input
-                        type="datetime-local"
-                        value={eventEndDtm}
-                        min={localDtmNow()}
-                        onChange={(e) => setEventEndDtm(e.target.value)}
-                        className="bg-background focus:ring-ring w-full rounded-xl border px-3 py-2 text-sm outline-none focus:ring-2"
-                      />
-                      <p className="text-muted-foreground mt-1 text-xs">
-                        {t('endTimeHint')}
-                      </p>
-                    </div>
-                  </>
-                )}
+                  )}
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">
+                      {roomType === 'E' ? t('endTimeLabel') : t('validity')}
+                    </span>
+                    <span className="font-medium">
+                      {t('validityDays', { n: FIXED_VALID_DAYS })}
+                    </span>
+                  </div>
+                </div>
 
                 <div className="flex gap-2">
                   <button
@@ -673,11 +514,7 @@ export function GroupRoomCreator() {
                   {roomType === 'E' ? (
                     <button
                       onClick={createEventRoomUi}
-                      disabled={
-                        isBusy ||
-                        !eventEndDtm ||
-                        new Date(eventEndDtm) <= new Date()
-                      }
+                      disabled={isBusy}
                       className="bg-primary text-primary-foreground flex-1 rounded-xl px-4 py-2 text-sm font-medium disabled:opacity-40"
                     >
                       {isBusy ? (
