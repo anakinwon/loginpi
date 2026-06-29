@@ -6,7 +6,7 @@ import { recordUserAction } from '@/lib/event'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getRoomFeeBean } from '@/lib/bean-fee'
 import { applyBean, getBalance } from '@/lib/bean'
-import { getActiveFeeMode } from '@/lib/fee-resolver'
+import { getActiveFeeMode, applyPromoGate } from '@/lib/fee-resolver'
 
 // 무료 테마(FITNESS) = 일반카페(무료). 그 외 테마 = 프리미엄카페.
 // 프리미엄 생성료: 구독자는 패키지 할인으로 무료, 비구독자는 Bean으로 결제.
@@ -67,7 +67,9 @@ export async function POST(request: NextRequest) {
     const allowance = await canCreateRoom(user.id, plan)
     if (!allowance.allowed) {
       // 비구독자: 프리미엄 카페 생성료. BEAN 모드는 Bean 잔액 확인, PI 모드는 Pi 직결제(아래 분기).
-      createFeeBean = getRoomFeeBean('CREATE', 'PREMIUM', false)
+      let normalFeeBean = getRoomFeeBean('CREATE', 'PREMIUM', false)
+      // 오픈기념행사 무료화 게이트 — PRD_26
+      createFeeBean = await applyPromoGate(normalFeeBean)
       if (feeMode === 'BEAN') {
         const bal = await getBalance(user.id)
         if (bal < createFeeBean) {

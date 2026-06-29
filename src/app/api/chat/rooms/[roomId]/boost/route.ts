@@ -4,7 +4,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getRoomMember } from '@/lib/chat'
 import { applyBean } from '@/lib/bean'
 import { ROOM_BOOST_BEAN, ROOM_BOOST_DAYS } from '@/lib/bean-fee'
-import { microFeeBean } from '@/lib/fee-resolver'
+import { microFeeBean, applyPromoGate } from '@/lib/fee-resolver'
 
 type Params = { params: Promise<{ roomId: string }> }
 
@@ -38,7 +38,10 @@ export async function POST(_req: Request, { params }: Params) {
     )
 
   // Bean 차감 — PI 모드(메인넷 등재 기간)는 마이크로 무료화로 차감 스킵 (PRD_24 §0)
-  const feeBean = await microFeeBean(ROOM_BOOST_BEAN)
+  // 오픈기념행사 무료화 게이트 — PRD_26
+  let normalFeeBean = ROOM_BOOST_BEAN
+  let feeModeAdjusted = await microFeeBean(normalFeeBean)
+  const feeBean = await applyPromoGate(feeModeAdjusted)
   let balance: number | undefined
   if (feeBean > 0) {
     const charge = await applyBean({

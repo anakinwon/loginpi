@@ -4,6 +4,10 @@ import { getSupabaseAdmin } from './supabase-admin'
 // 이중 요금제(Bean/Pi) 런타임 해석 — PRD_24 §6·§10.
 // fee_mode_config(BEAN|PI) 플래그를 읽어 요금/보상의 차감·지급 단위를 결정한다.
 // ⚠️ 결제 시점은 캐시 대신 DB 직접 조회(전환 직후 Bean/Pi 혼재 방지 — PRD_24 v0.3).
+//
+// 오픈기념행사 무료요금 정책 — PRD_26.
+// promo_fee_config(활성플래그 + 시간범위)를 읽어 모든 9개 요금 품목 무료 여부를 판정한다.
+// 프로모 ON → 모든 청구 경로 요금 0으로 오버라이드. 정상요금 정의(bean_fee_plan) 비파괴.
 
 export type FeeMode = 'BEAN' | 'PI'
 
@@ -56,4 +60,42 @@ export async function microFeeBean(
 ): Promise<number> {
   const m = mode ?? (await getActiveFeeMode())
   return m === 'PI' ? 0 : beanAmt
+}
+
+// ── 오픈기념행사 무료요금 게이트 (PRD_26) ──────────────────────────────
+
+/**
+ * 오픈기념행사 프로모션 활성 여부. 모든 요금 청구 경로의 단일 게이트.
+ * true → 모든 9개 요금 품목 무료(0으로 오버라이드).
+ * false → 정상요금 적용.
+ *
+ * 활성 판정:
+ *   promo_active_yn = 'Y' AND
+ *   (promo_start_dtm IS NULL OR 현재 >= 시작시각) AND
+ *   (promo_end_dtm IS NULL OR 현재 < 종료시각)
+ *
+ * 결제 시점에 항상 DB 직접 조회(캐시 금지) — 종료 직후 혼재 방지.
+ */
+export async function isOpenPromoActive(): Promise<boolean> {
+  try {
+    const { data, error } = await getSupabaseAdmin().rpc(
+      'fn_is_open_promo_active',
+    )
+    if (error) return false
+    return data === true
+  } catch {
+    return false
+  }
+}
+
+/**
+ * 요금 적용 게이트 — 프로모션 무료화 오버라이드.
+ * @param normalFeeBean 정상요금(정본 bean_fee_plan)
+ * @returns 프로모 활성 시 0, 비활성 시 정상요금
+ */
+export async function applyPromoGate(normalFeeBean: number): Promise<number> {
+  if (await isOpenPromoActive()) {
+    return 0
+  }
+  return normalFeeBean
 }

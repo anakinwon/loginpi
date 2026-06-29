@@ -20,7 +20,7 @@ import { getActiveUiTheme, buildThemeStyleCss } from '@/lib/ui-theme'
 import { resolveDbTier } from '@/lib/db-env'
 import { computeShowPiValuation, computeIsProd } from '@/lib/feature-flags'
 import { FeatureFlagProvider } from '@/components/feature-flag-provider'
-import { getActiveFeeMode } from '@/lib/fee-resolver'
+import { getActiveFeeMode, isOpenPromoActive } from '@/lib/fee-resolver'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -94,6 +94,8 @@ export default async function LocaleLayout({
 
   // 활성 요금제 모드 — PI 모드면 마이크로 요금을 client에서 "무료"로 표시(서버 microFeeBean과 일관)
   const feeMode = await getActiveFeeMode()
+  // 오픈기념 무료요금 활성 여부 — 활성 시 client에서 전 품목 "무료(오픈기념)" 표시(서버 applyPromoGate와 일관)
+  const openPromoActive = await isOpenPromoActive()
 
   return (
     <html lang={locale} suppressHydrationWarning>
@@ -123,7 +125,12 @@ export default async function LocaleLayout({
                 {/* pb-16: 하단 고정 BottomNav(h-16)에 콘텐츠가 가려지지 않도록 여백 확보 */}
                 <main className="flex-1 pb-16">
                   <FeatureFlagProvider
-                    flags={{ showPiValuation, feeMode, isProd }}
+                    flags={{
+                      showPiValuation,
+                      feeMode,
+                      isProd,
+                      isOpenPromoActive: openPromoActive,
+                    }}
                   >
                     {children}
                   </FeatureFlagProvider>

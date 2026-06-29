@@ -202,6 +202,12 @@ export function AdminSidebar() {
           label="요금제 모드"
           pathname={pathname}
         />
+        {/* 오픈 프로모 무료요금(OneKey) — 임시 라벨 하드코딩(추후 admin.nav.openPromo). PRD_26 */}
+        <NavItem
+          href="/admin/open-promo"
+          label="오픈 프로모"
+          pathname={pathname}
+        />
       </nav>
       <div className="border-t p-3">
         <Link

@@ -3,7 +3,7 @@ import { getSessionUser } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { applyBean } from '@/lib/bean'
 import { BADGE_UPGRADE_BEAN } from '@/lib/bean-fee'
-import { microFeeBean } from '@/lib/fee-resolver'
+import { microFeeBean, applyPromoGate } from '@/lib/fee-resolver'
 
 // POST /api/badges/upgrade — 배지 강화 Bean 결제 (PRD_15_FEE §1-6 #7)
 // Pi 직접결제(FEATURE_ADDON) 폐기 → Bean SPEND 전환
@@ -49,7 +49,10 @@ export async function POST(request: NextRequest) {
     )
 
   // Bean 차감 — PI 모드(메인넷 등재 기간)는 마이크로 무료화로 차감 스킵 (PRD_24 §0)
-  const feeBean = await microFeeBean(BADGE_UPGRADE_BEAN)
+  // 오픈기념행사 무료화 게이트 — PRD_26
+  let normalFeeBean = BADGE_UPGRADE_BEAN
+  let feeModeAdjusted = await microFeeBean(normalFeeBean)
+  const feeBean = await applyPromoGate(feeModeAdjusted)
   let balance: number | undefined
   if (feeBean > 0) {
     const charge = await applyBean({

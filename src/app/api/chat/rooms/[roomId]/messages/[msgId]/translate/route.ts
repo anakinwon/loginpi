@@ -7,7 +7,7 @@ import { getOrTranslateMessage } from '@/lib/chat-translate-dedup'
 import { canAutoTranslate } from '@/lib/chat-auth'
 import { applyBean, getBalance } from '@/lib/bean'
 import { TRANSLATE_ONCE_BEAN } from '@/lib/bean-fee'
-import { microFeeBean } from '@/lib/fee-resolver'
+import { microFeeBean, applyPromoGate } from '@/lib/fee-resolver'
 import { recordUserAction } from '@/lib/event'
 
 type Params = { params: Promise<{ roomId: string; msgId: string }> }
@@ -83,7 +83,10 @@ export async function POST(request: NextRequest, { params }: Params) {
 
   // 비구독자 건당 과금 — 동의 없는 자동 호출은 과금 금지(원문 폴백), confirm=true(수동 번역 클릭)만 과금.
   // PI 모드(메인넷 등재 기간)는 마이크로 무료화로 feeBean=0 → 비구독자도 게이트 없이 무료 번역 (PRD_24 §0)
-  const feeBean = await microFeeBean(TRANSLATE_ONCE_BEAN)
+  // 오픈기념행사 무료화 게이트 — PRD_26
+  let normalFeeBean = TRANSLATE_ONCE_BEAN
+  let feeModeAdjusted = await microFeeBean(normalFeeBean)
+  const feeBean = await applyPromoGate(feeModeAdjusted)
   if (!isSubscriber && feeBean > 0) {
     if (confirm !== true) {
       // 자동 번역 경로: 비구독자는 번역하지 않고 건당 과금 안내만 반환 → 클라이언트는 원문 유지

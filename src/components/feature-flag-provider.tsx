@@ -13,12 +13,15 @@ export interface FeatureFlags {
   feeMode: 'BEAN' | 'PI'
   /** 운영(메인넷) 환경 여부 — 홈 백서·매뉴얼 기본 펼침, 대시보드·Event 숨김(computeIsProd) */
   isProd: boolean
+  /** 오픈기념 무료요금 활성 여부 — true면 전 요금 품목 "무료(오픈기념)" 표시 (PRD_26) */
+  isOpenPromoActive: boolean
 }
 
 const FeatureFlagContext = createContext<FeatureFlags>({
   showPiValuation: false,
   feeMode: 'BEAN',
   isProd: false,
+  isOpenPromoActive: false,
 })
 
 export function FeatureFlagProvider({
@@ -44,9 +47,15 @@ export function useFeeMode(): 'BEAN' | 'PI' {
   return useContext(FeatureFlagContext).feeMode
 }
 
-/** 마이크로 요금 라벨 — PI 모드면 '무료', 아니면 'N Bean'. (표시 전용, 실제 차감은 서버 microFeeBean) */
+/** 마이크로 요금 라벨 — 오픈프로모/PI 모드면 '무료', 아니면 'N Bean'. (표시 전용, 실제 차감은 서버 게이트) */
 export function useMicroFeeLabel(beanAmt: number): string {
-  return useContext(FeatureFlagContext).feeMode === 'PI'
-    ? '무료'
-    : `${beanAmt} Bean`
+  const f = useContext(FeatureFlagContext)
+  // 오픈 프로모 활성 시 전 품목 무료(서버 applyPromoGate와 일관). 그다음 PI 모드 무료.
+  if (f.isOpenPromoActive) return '무료'
+  return f.feeMode === 'PI' ? '무료' : `${beanAmt} Bean`
+}
+
+/** 오픈기념 무료요금 활성 여부 — 배너·라벨 분기용 단축 hook. */
+export function useOpenPromoActive(): boolean {
+  return useContext(FeatureFlagContext).isOpenPromoActive
 }

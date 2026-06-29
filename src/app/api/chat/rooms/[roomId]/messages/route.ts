@@ -5,7 +5,7 @@ import { getRoomMember, getRoom, getRecentMsgCount } from '@/lib/chat'
 import { getAiQuota } from '@/lib/chat-auth'
 import { applyBean, getBalance } from '@/lib/bean'
 import { AI_EXTRA_BEAN } from '@/lib/bean-fee'
-import { microFeeBean } from '@/lib/fee-resolver'
+import { microFeeBean, applyPromoGate } from '@/lib/fee-resolver'
 import { sanitizePlain } from '@/lib/sanitize'
 import {
   getThemeSystemPrompt,
@@ -212,8 +212,14 @@ export async function POST(request: NextRequest, { params }: Params) {
   let aiFeeBean = 0 // PI 모드(마이크로 무료화)면 0 → 과금 스킵
   if (isAiMention && process.env.ANTHROPIC_API_KEY) {
     const quota = await getAiQuota(user.id)
-    if (quota.remaining === 0) aiFeeBean = await microFeeBean(AI_EXTRA_BEAN)
-    // PI 모드(aiFeeBean=0, 메인넷 등재 기간)는 한도 초과분도 무료화 — 과금 게이트 스킵 (PRD_24 §0)
+    if (quota.remaining === 0) {
+      // PI 모드(메인넷 등재 기간) 마이크로 무료화 (PRD_24 §0)
+      let normalAiFee = AI_EXTRA_BEAN
+      let feeModeAdjusted = await microFeeBean(normalAiFee)
+      // 오픈기념행사 무료화 게이트 — PRD_26
+      aiFeeBean = await applyPromoGate(feeModeAdjusted)
+    }
+    // 프로모션(aiFeeBean=0, 오픈기념행사) 또는 PI 모드(aiFeeBean=0, 메인넷 등재 기간)는 한도 초과분도 무료화 — 과금 게이트 스킵
     if (quota.remaining === 0 && aiFeeBean > 0) {
       // 한도 초과 — 동의(confirm) 없으면 과금 안내만 반환(메시지 미삽입)
       if (confirm !== true) {

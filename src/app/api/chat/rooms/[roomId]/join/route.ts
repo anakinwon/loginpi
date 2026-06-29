@@ -11,7 +11,7 @@ import {
 } from '@/lib/chat'
 import { getChatPlan } from '@/lib/chat-auth'
 import { getRoomFeeBean, type RoomGrade } from '@/lib/bean-fee'
-import { microFeeBean } from '@/lib/fee-resolver'
+import { microFeeBean, applyPromoGate } from '@/lib/fee-resolver'
 import { eventEntryFeeBean } from '@/lib/bean-shared'
 import { applyBean, getBalance } from '@/lib/bean'
 
@@ -127,7 +127,9 @@ export async function POST(request: NextRequest, { params }: Params) {
     | undefined
 
   if (isEvent) {
-    enterFeeBean = eventEntryFeeBean(room.entry_fee_pi)
+    let normalFeeBean = eventEntryFeeBean(room.entry_fee_pi)
+    // 오픈기념행사 무료화 게이트 — PRD_26
+    enterFeeBean = await applyPromoGate(normalFeeBean)
     gradeForResp = 'EVENT'
     refTpCd = 'EVENT_ENTER'
     feeMemo = `이벤트방 입장료 (${room.room_nm})`
@@ -136,9 +138,11 @@ export async function POST(request: NextRequest, { params }: Params) {
   } else {
     const grade = await resolveRoomGrade(room)
     const plan = await getChatPlan(user.id)
-    enterFeeBean = getRoomFeeBean('ENTER', grade, plan.tier !== 'FREE')
+    let normalFeeBean = getRoomFeeBean('ENTER', grade, plan.tier !== 'FREE')
     // PI 모드(메인넷 등재 기간) 마이크로 무료화 — 카페 입장료 면제 (PRD_24 §0)
-    enterFeeBean = await microFeeBean(enterFeeBean)
+    let feeModeAdjusted = await microFeeBean(normalFeeBean)
+    // 오픈기념행사 무료화 게이트 — PRD_26
+    enterFeeBean = await applyPromoGate(feeModeAdjusted)
     gradeForResp = grade
     feeMemo = `${grade} 카페 입장료`
   }
