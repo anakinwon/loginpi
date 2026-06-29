@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { BeanIcon } from '@/components/ui/bean-icon'
+import { env } from '@/env'
 
 // Pi Browser 딥링크 브리지 — 외부 채널(텔레그램 등)에서 Pi Browser로 유도.
 //
@@ -20,8 +21,10 @@ function OpenBridge() {
   const to = /^\/[A-Za-z0-9/_-]*$/.test(raw) ? raw : '/ko/store/my/sales'
 
   useEffect(() => {
-    // pi://<host><path> 로 Pi Browser 앱 열기 시도
-    window.location.href = `pi://${window.location.host}${to}`
+    // pi://<host><path> 로 Pi Browser 앱 열기 시도.
+    // host = Pi 정식 도메인(*.pinet.com) — ⚠️ staging≠운영 다름(env). 미설정 시 현재 도메인 폴백.
+    const piHost = env.NEXT_PUBLIC_PI_APP_DOMAIN || window.location.host
+    window.location.href = `pi://${piHost}${to}`
     // 일정 시간 내 전환 안 되면(앱 미설치/스킴 미지원) 폴백 노출
     const timer = setTimeout(() => setFallback(true), 1800)
     return () => clearTimeout(timer)

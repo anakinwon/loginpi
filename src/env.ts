@@ -81,6 +81,9 @@ export const env = createEnv({
     NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: z.string().optional(),
     // Pi 시세 칩(법정화폐 환산) 노출 여부 — Pi 정책(가치평가 언급 최소화) 대응, 기본 비활성
     NEXT_PUBLIC_FEATURE_PI_PRICE: z.enum(['true', 'false']).optional(),
+    // Pi Browser 딥링크(pi://)용 Pi 정식 도메인 — ⚠️ staging≠운영 환경별 다름.
+    //   staging=apppilogintestbd3106.pinet.com / 운영=운영 pinet 도메인. 미설정 시 현재 도메인 폴백.
+    NEXT_PUBLIC_PI_APP_DOMAIN: z.string().optional(),
   },
   runtimeEnv: {
     PI_SESSION_SECRET: process.env.PI_SESSION_SECRET,
@@ -132,6 +135,7 @@ export const env = createEnv({
     NEXT_PUBLIC_GOOGLE_MAPS_API_KEY:
       process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
     NEXT_PUBLIC_FEATURE_PI_PRICE: process.env.NEXT_PUBLIC_FEATURE_PI_PRICE,
+    NEXT_PUBLIC_PI_APP_DOMAIN: process.env.NEXT_PUBLIC_PI_APP_DOMAIN,
   },
   emptyStringAsUndefined: true,
 })
