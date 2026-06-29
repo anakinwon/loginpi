@@ -55,10 +55,65 @@ export function PiTipButton({
     customNum > 0 &&
     customNum <= customMax
 
+  // PI 모드 선물 — 서버가 내려준 pay로 Pi 직결제(U2A). 받는 사람 A2U는 complete가 처리.
+  function startTipPiPayment(
+    pay: { amount: number; memo: string; metadata: Record<string, unknown> },
+  ) {
+    if (typeof window === 'undefined' || !window.Pi) {
+      toast.error('Pi Browser에서 선물할 수 있습니다')
+      setSending(false)
+      return
+    }
+    window.Pi.createPayment(
+      { amount: pay.amount, memo: pay.memo, metadata: pay.metadata },
+      {
+        onReadyForServerApproval: async (paymentId: string) => {
+          try {
+            const r = await piFetch('/api/payments/approve', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ paymentId }),
+            })
+            if (!r.ok) throw new Error()
+          } catch {
+            toast.error('선물 결제 승인 실패')
+            setSending(false)
+            close()
+          }
+        },
+        onReadyForServerCompletion: async (paymentId: string, txid: string) => {
+          try {
+            const r = await piFetch('/api/payments/complete', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ paymentId, txid }),
+            })
+            if (!r.ok) throw new Error()
+            toast.success(`${recipientName} 님께 Pi를 선물했습니다!`)
+          } catch {
+            toast.error('선물 처리 실패')
+          } finally {
+            setSending(false)
+            close()
+          }
+        },
+        onCancel: () => {
+          setSending(false)
+          close()
+        },
+        onError: (e: Error) => {
+          toast.error(e?.message ?? '선물 오류')
+          setSending(false)
+          close()
+        },
+      },
+    )
+  }
+
   async function sendTip(amount: number) {
     setSending(true)
+    let piHandoff = false
     try {
-      // Bean 실전송 — Pi 결제 없이 USER→USER 즉시 이전 (window.Pi 불필요)
       const res = await piFetch('/api/tips', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -68,8 +123,17 @@ export function PiTipButton({
           amount,
         }),
       })
-      const data = (await res.json()) as { error?: string }
-      setSending(false)
+      const data = (await res.json()) as {
+        error?: string
+        mode?: string
+        pay?: { amount: number; memo: string; metadata: Record<string, unknown> }
+      }
+      // PI 모드 — 서버가 Pi 직결제 요구(앱 경유 U2A→A2U). createPayment로 핸드오프.
+      if (data.mode === 'PI' && data.pay) {
+        piHandoff = true
+        startTipPiPayment(data.pay)
+        return
+      }
       close()
       if (res.ok) {
         toast.success(`${recipientName} 님께 ${amount} Bean을 선물했습니다!`)
@@ -77,8 +141,9 @@ export function PiTipButton({
         toast.error(data.error ?? 'Bean 전송에 실패했습니다')
       }
     } catch (e) {
-      setSending(false)
       toast.error(e instanceof Error ? e.message : 'Bean 오류')
+    } finally {
+      if (!piHandoff) setSending(false)
     }
   }
 

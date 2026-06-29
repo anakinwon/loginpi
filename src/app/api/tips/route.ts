@@ -4,6 +4,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { transferBean, getTipPresets } from '@/lib/bean'
 import { broadcastToRoom } from '@/lib/realtime-broadcast'
 import { recordUserAction } from '@/lib/event'
+import { getActiveFeeMode } from '@/lib/fee-resolver'
 import { withGuard } from '@/lib/api-guard'
 
 // 카페방 P2P Bean 선물 — Pi 결제가 아닌 Bean 실전송(USER→USER).
@@ -102,6 +103,25 @@ async function handlePOST(request: NextRequest) {
   const senderNm = user.display_name ?? 'user'
   const recipientNm = recipientRow.display_name ?? 'user'
   const slug = String(senderNm).slice(0, 20)
+
+  // PI 모드 — Bean 직접 전송(U2U) 불가 → 앱 경유: 보내는 사람 U2A 결제 후 앱이 받는 사람에 A2U.
+  //   여기선 결제 파라미터만 반환, 실제 선물 확정·송금은 complete의 PI_TIP 분기. PRD_24 §0.
+  const feeMode = await getActiveFeeMode()
+  if (feeMode === 'PI') {
+    return NextResponse.json({
+      mode: 'PI',
+      pay: {
+        amount: amount / 100, // 1 Pi = 100 Bean
+        memo: 'PICAFE tip',
+        metadata: {
+          type: 'PI_TIP',
+          recipient_id: recipientRow.id,
+          room_id,
+          bean_amount: amount,
+        },
+      },
+    })
+  }
 
   // Bean 실전송 (USER→USER 원자적 이전)
   const result = await transferBean({

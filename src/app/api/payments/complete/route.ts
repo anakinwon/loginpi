@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse, after } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { sendPaymentReceipt } from '@/lib/email'
-import { broadcastToSeller } from '@/lib/realtime-broadcast'
+import { broadcastToSeller, broadcastToRoom } from '@/lib/realtime-broadcast'
+import { payTipPiReward } from '@/lib/tip-pi-reward'
 import { markEscrow } from '@/lib/mps-order'
 import { createGroupRoom, createEventRoom } from '@/lib/chat'
 import { getRoomFeeBean } from '@/lib/bean-fee'
@@ -447,6 +448,79 @@ async function handlePOST(request: NextRequest) {
               regr_id: 'SYSTEM',
               modr_id: 'SYSTEM',
             })
+          }
+        }
+      }
+    } else if (meta?.type === 'PI_TIP' && payment.user_uid) {
+      // PI_TIP: 카페방 Pi 선물 — 보내는 사람 U2A 결제 완료 → 앱이 받는 사람에 A2U 송금. PRD_24 §0.
+      //   멱등: tip_pi_payout_log UNIQUE(payment_id). 송금은 after() 즉시 + cron 재시도.
+      const recipientId = String(meta.recipient_id ?? '')
+      const roomId = String(meta.room_id ?? '')
+      const beanAmount = Number(meta.bean_amount ?? 0)
+      const piAmt = beanAmount / 100
+
+      const { data: dup } = await db
+        .from('tip_pi_payout_log')
+        .select('tip_pi_log_id')
+        .eq('payment_id', paymentId)
+        .maybeSingle()
+
+      // 금액 검증 — metadata bean_amount로 환산한 Pi 이상 결제했는지(클라 금액 불신)
+      if (
+        !dup &&
+        recipientId &&
+        piAmt > 0 &&
+        Number(payment.amount) + 1e-6 >= piAmt
+      ) {
+        const { data: sender } = await db
+          .from('sys_user')
+          .select('id, display_name')
+          .eq('pi_uid', payment.user_uid)
+          .maybeSingle()
+        const { data: rcpt } = await db
+          .from('sys_user')
+          .select('id, display_name')
+          .eq('id', recipientId)
+          .maybeSingle()
+
+        if (sender && rcpt) {
+          const s = sender as { id: string; display_name: string | null }
+          const r = rcpt as { id: string; display_name: string | null }
+          // A2U 송금 멱등 로그(PENDING) + 즉시 송금 시도(실패 시 cron 재시도)
+          await db.from('tip_pi_payout_log').insert({
+            payment_id: paymentId,
+            sender_id: s.id,
+            recipient_id: r.id,
+            pi_amt: piAmt,
+            room_id: roomId,
+            reward_st_cd: 'PENDING',
+            regr_id: 'SYSTEM',
+            modr_id: 'SYSTEM',
+          })
+          after(() => payTipPiReward(paymentId))
+
+          // TIP_NOTI 알림 + 실시간 브로드캐스트
+          const senderNm = s.display_name ?? 'user'
+          const recipientNm = r.display_name ?? 'user'
+          const { data: tipMsg } = await db
+            .from('msg_msg')
+            .insert({
+              room_id: roomId,
+              snd_usr_id: s.id,
+              snd_usr_nm: senderNm,
+              msg_cont: `${senderNm} 님이 ${recipientNm} 님께 ${piAmt} Pi를 선물했습니다`,
+              msg_tp_cd: 'TIP_NOTI',
+              regr_id: 'SYSTEM',
+              modr_id: 'SYSTEM',
+            })
+            .select()
+            .single()
+          if (tipMsg) {
+            void broadcastToRoom(roomId, 'new_msg', tipMsg).catch(() => {})
+            recordUserAction('bean_send', s.id, {
+              room_id: roomId,
+              recipient_id: r.id,
+            }).catch(() => {})
           }
         }
       }
