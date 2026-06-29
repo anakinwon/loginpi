@@ -45,12 +45,14 @@ export function ClientMyHistory({
   const [from, setFrom] = useState('')
   const [to, setTo] = useState('')
 
-  const load = useCallback(async () => {
+  // 구간(from/to)은 인자로 받아 "내역조회" 버튼 클릭 시에만 적용 — 날짜 입력만으론 자동 조회 안 함.
+  // 빈 값(미입력)은 쿼리에서 제외 → 조건 무시하고 전체 조회.
+  const load = useCallback(async (fromV = '', toV = '') => {
     setLoading(true)
     try {
       const qs = new URLSearchParams()
-      if (from) qs.set('from', from)
-      if (to) qs.set('to', to)
+      if (fromV) qs.set('from', fromV)
+      if (toV) qs.set('to', toV)
       const res = await piFetch(`/api/store/txns?${qs.toString()}`)
       if (res.ok) {
         const data = (await res.json()) as { txns: Txn[] }
@@ -59,7 +61,7 @@ export function ClientMyHistory({
     } finally {
       setLoading(false)
     }
-  }, [from, to])
+  }, [])
 
   useEffect(() => {
     if (authed) void load()
@@ -133,13 +135,23 @@ export function ClientMyHistory({
             className="h-9 w-40"
           />
         </div>
+        {/* 구간 입력 후 이 버튼을 눌러야 조회 (미입력 시 조건 무시·전체). Pi Browser 자동조회 회피 */}
+        <Button
+          size="sm"
+          disabled={loading}
+          onClick={() => void load(from, to)}
+        >
+          {t.has('history.search') ? t('history.search') : '내역조회'}
+        </Button>
         {(from || to) && (
           <Button
             size="sm"
             variant="outline"
+            disabled={loading}
             onClick={() => {
               setFrom('')
               setTo('')
+              void load()
             }}
           >
             {t('history.clearFilter')}
