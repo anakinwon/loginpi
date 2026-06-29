@@ -1,7 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse, after } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getActiveFeeMode } from '@/lib/fee-resolver'
+import { payFbckPiReward } from '@/lib/fbck-pi-reward'
 import { maskUsername } from '@/lib/mask-username'
 
 interface FbckImgInput {
@@ -377,6 +378,20 @@ export async function POST(req: NextRequest) {
         modr_id: 'SYSTEM',
       })
       .eq('fbck_id', fbckId)
+
+    // PI 모드: 보증금 차감은 fn에서 완료(bean_txn FBCK_PI 대기). 실 A2U 송금 멱등 로그(PENDING) 기록
+    //   + after()로 즉시 송금 시도 — 실패해도 cron(/api/cron/fbck-pi-payout)이 재시도(안전망).
+    if (mode === 'PI' && rewardPi > 0) {
+      await db.from('fbck_pi_reward_log').insert({
+        fbck_id: fbckId,
+        usr_id: user.id,
+        pi_amt: rewardPi,
+        reward_st_cd: 'PENDING',
+        regr_id: 'SYSTEM',
+        modr_id: 'SYSTEM',
+      })
+      after(() => payFbckPiReward(fbckId, user.id, rewardPi))
+    }
   }
 
   const message =
