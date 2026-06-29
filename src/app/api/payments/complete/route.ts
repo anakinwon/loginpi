@@ -3,7 +3,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { sendPaymentReceipt } from '@/lib/email'
 import { broadcastToSeller } from '@/lib/realtime-broadcast'
 import { markEscrow } from '@/lib/mps-order'
-import { createGroupRoom } from '@/lib/chat'
+import { createGroupRoom, createEventRoom } from '@/lib/chat'
 import { getRoomFeeBean } from '@/lib/bean-fee'
 import { dispatchOrderNotis } from '@/lib/mps-noti'
 import { depositBond, BOND_DEPOSIT_PI } from '@/lib/mps-bond'
@@ -317,6 +317,75 @@ async function handlePOST(request: NextRequest) {
                 console.error(`[M3] 미션 기록 실패: ${err.message}`),
               )
             }
+          }
+        }
+      }
+    } else if (meta?.type === 'EVENT_ROOM_CREATE' && payment.user_uid) {
+      // EVENT_ROOM_CREATE: PI 모드 유료 이벤트방 생성 — 결제 완료 시 생성. PRD_24 §0.
+      //   멱등: bean_txn(ROOM_CREATE_PI, ref_id=paymentId) 마커(그룹 생성과 공유, paymentId 고유).
+      const { data: dup } = await db
+        .from('bean_txn')
+        .select('txn_id')
+        .eq('ref_tp_cd', 'ROOM_CREATE_PI')
+        .eq('ref_id', paymentId)
+        .maybeSingle()
+
+      if (!dup && meta.theme_cd && meta.entry_expire_dtm) {
+        const { data: creator } = await db
+          .from('sys_user')
+          .select('id, display_name')
+          .eq('pi_uid', payment.user_uid)
+          .maybeSingle()
+
+        if (creator) {
+          const cu = creator as { id: string; display_name: string | null }
+          // 금액 검증 — EVENT 생성료 재계산(클라 금액 불신)
+          const fee = getRoomFeeBean('CREATE', 'EVENT', false)
+          if (fee > 0 && Number(payment.amount) + 1e-6 >= fee / 100) {
+            const room = await createEventRoom({
+              userId: cu.id,
+              displayName: cu.display_name ?? 'user',
+              theme_cd: String(meta.theme_cd),
+              room_nm: String(meta.room_nm ?? '이벤트'),
+              room_desc: (meta.room_desc as string | null) ?? null,
+              is_public_yn: (meta.is_public_yn as 'Y' | 'N') ?? 'Y',
+              max_mbr_cnt: Number(meta.max_mbr_cnt ?? 100),
+              entry_fee_pi: Number(meta.entry_fee_pi ?? 0),
+              entry_expire_dtm: String(meta.entry_expire_dtm),
+            })
+            createdRoom = room as unknown as Record<string, unknown>
+
+            await db.from('bean_txn').insert({
+              usr_id: cu.id,
+              txn_tp_cd: 'SPEND',
+              bean_amt: 0,
+              bal_amt: 0,
+              pi_amt: fee / 100,
+              ref_tp_cd: 'ROOM_CREATE_PI',
+              ref_id: paymentId,
+              memo_txt: `Pi 이벤트방 생성료 (${String(meta.room_nm ?? '')})`,
+              regr_id: 'SYSTEM',
+              modr_id: 'SYSTEM',
+            })
+
+            const mlat = meta.lat
+            const mlng = meta.lng
+            if (typeof mlat === 'number' && typeof mlng === 'number') {
+              void db
+                .from('msg_room')
+                .update({ latd_crd: mlat, lngt_crd: mlng })
+                .eq('room_id', (room as { room_id: string }).room_id)
+                .then(
+                  () => {},
+                  () => {},
+                )
+            }
+            // M5: 이벤트방 생성 미션 기록 (비블로킹)
+            recordUserAction('event_cafe_create', cu.id, {
+              roomId: (room as { room_id: string }).room_id,
+            }).catch((err) =>
+              console.error(`[M5] 미션 기록 실패: ${err.message}`),
+            )
           }
         }
       }

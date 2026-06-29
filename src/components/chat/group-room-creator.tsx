@@ -170,7 +170,10 @@ export function GroupRoomCreator() {
 
   // PI 모드 유료 카페 — 서버가 내려준 pay 파라미터로 Pi 직결제. 방은 complete가 생성.
   const startRoomPiPayment = useCallback(
-    (pay: { amount: number; memo: string; metadata: Record<string, unknown> }) => {
+    (
+      pay: { amount: number; memo: string; metadata: Record<string, unknown> },
+      successMsg?: string,
+    ) => {
       if (typeof window === 'undefined' || !window.Pi) {
         setPayStatus('error')
         setPayError('Pi Browser에서 결제할 수 있습니다')
@@ -206,7 +209,7 @@ export function GroupRoomCreator() {
               const cd = (await r.json()) as { room?: { room_id: string } }
               setPayStatus('done')
               setOpen(false)
-              toast.success(t('created'))
+              toast.success(successMsg ?? t('created'))
               if (cd.room?.room_id) router.push(`/chat/${cd.room.room_id}`)
             } catch {
               setPayStatus('error')
@@ -308,7 +311,16 @@ export function GroupRoomCreator() {
         const d = (await res.json()) as { error?: string }
         throw new Error(d.error ?? t('eventCreateFail'))
       }
-      const data = (await res.json()) as { room?: { room_id: string } }
+      const data = (await res.json()) as {
+        room?: { room_id: string }
+        mode?: string
+        pay?: { amount: number; memo: string; metadata: Record<string, unknown> }
+      }
+      // PI 모드 유료 이벤트방 — Pi 직결제로 핸드오프(완료 시 complete가 방 생성).
+      if (data.mode === 'PI' && data.pay) {
+        startRoomPiPayment(data.pay, t('eventCreated'))
+        return
+      }
       setPayStatus('done')
       setOpen(false)
       toast.success(t('eventCreated'))
@@ -330,6 +342,7 @@ export function GroupRoomCreator() {
     gpsCoords,
     router,
     t,
+    startRoomPiPayment,
   ])
 
   // 카페 만들기는 Pi Browser에서 로그인한 사용자만 가능 (비로그인·일반 브라우저는 버튼 숨김)

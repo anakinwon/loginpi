@@ -6,6 +6,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { recordUserAction } from '@/lib/event'
 import { getRoomFeeBean } from '@/lib/bean-fee'
 import { applyBean, getBalance } from '@/lib/bean'
+import { getActiveFeeMode } from '@/lib/fee-resolver'
 
 // POST /api/chat/rooms/event — 이벤트 카페 생성
 // Business 플랜 폐지: 그룹방 PREMIUM과 동일하게 구독·Bean 요금만 체크한다.
@@ -21,20 +22,24 @@ export async function POST(request: NextRequest) {
   // false → 비구독자 → EVENT 카페 생성료를 Bean으로 결제.
   const plan = await getChatPlan(user.id)
   const allowance = await canCreateRoom(user.id, plan)
+  const feeMode = await getActiveFeeMode()
   let createFeeBean = 0
   if (!allowance.allowed) {
     createFeeBean = getRoomFeeBean('CREATE', 'EVENT', false)
-    const bal = await getBalance(user.id)
-    if (bal < createFeeBean) {
-      return NextResponse.json(
-        {
-          error: 'Bean 잔액이 부족합니다. 충전 후 다시 시도하세요.',
-          requiresBean: true,
-          feeBean: createFeeBean,
-          balance: bal,
-        },
-        { status: 402 },
-      )
+    // BEAN 모드만 Bean 잔액 확인. PI 모드는 Pi 직결제(아래 분기).
+    if (feeMode === 'BEAN') {
+      const bal = await getBalance(user.id)
+      if (bal < createFeeBean) {
+        return NextResponse.json(
+          {
+            error: 'Bean 잔액이 부족합니다. 충전 후 다시 시도하세요.',
+            requiresBean: true,
+            feeBean: createFeeBean,
+            balance: bal,
+          },
+          { status: 402 },
+        )
+      }
     }
   }
 
@@ -84,6 +89,29 @@ export async function POST(request: NextRequest) {
       { error: '이벤트 종료 시각은 현재 시각보다 이후여야 합니다' },
       { status: 400 },
     )
+  }
+
+  // PI 모드 유료 이벤트방 — Bean 차감 대신 Pi 직결제. 방은 결제 완료(complete) 시 생성한다.
+  if (createFeeBean > 0 && feeMode === 'PI') {
+    return NextResponse.json({
+      mode: 'PI',
+      pay: {
+        amount: createFeeBean / 100, // 1 Pi = 100 Bean
+        memo: 'PICAFE event room create',
+        metadata: {
+          type: 'EVENT_ROOM_CREATE',
+          theme_cd,
+          room_nm: room_nm.trim(),
+          room_desc: room_desc?.trim() || null,
+          is_public_yn: is_public_yn ?? 'Y',
+          max_mbr_cnt: typeof max_mbr_cnt === 'number' ? max_mbr_cnt : 100,
+          entry_fee_pi: typeof entry_fee_pi === 'number' ? entry_fee_pi : 0,
+          entry_expire_dtm,
+          lat: typeof lat === 'number' ? lat : null,
+          lng: typeof lng === 'number' ? lng : null,
+        },
+      },
+    })
   }
 
   try {
