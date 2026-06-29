@@ -77,6 +77,10 @@ COMMENT ON FUNCTION public.fn_is_open_promo_active()
   IS '오픈기념행사 프로모션 활성 여부 (활성플래그 + 시간범위 판정) — PRD_26. true=모든 요금 무료 / false=정상요금';
 
 -- ── 5. 프로모션 활성화·비활성화 (원자적 토글 + 감사 기록) ────────────────
+-- ⚠️ OUT 파라미터(RETURNS TABLE 컬럼)명이 바뀌면 CREATE OR REPLACE가
+--   "cannot change return type of existing function"으로 실패해 옛 함수가 남는다.
+--   재적용이 항상 성공하도록 먼저 DROP(IF EXISTS — 클린 환경에선 무해, 멱등).
+DROP FUNCTION IF EXISTS public.fn_toggle_open_promo(CHAR, TIMESTAMPTZ, TIMESTAMPTZ, TEXT, TEXT);
 CREATE OR REPLACE FUNCTION public.fn_toggle_open_promo(
   p_active_yn   CHAR(1),
   p_start_dtm   TIMESTAMPTZ DEFAULT NULL,
