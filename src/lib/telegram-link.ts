@@ -19,7 +19,14 @@ function sign(payload: string): string {
     .slice(0, 16)
 }
 
-// userId(UUID) → /start 페이로드
+// 연동 대상 종류 — 사용자(프로필) 또는 매장(매장별 1:1). PRD: 매장 등록/수정 화면 연동.
+export type LinkTarget = { kind: 'user' | 'shop'; id: string }
+
+function hexToUuid(u: string): string {
+  return `${u.slice(0, 8)}-${u.slice(8, 12)}-${u.slice(12, 16)}-${u.slice(16, 20)}-${u.slice(20)}`
+}
+
+// userId(UUID) → /start 페이로드 (사용자 연동, prefix 없음 — 하위호환)
 export function createLinkCode(userId: string): string {
   const uuidHex = userId.replace(/-/g, '')
   const exp = Math.floor(Date.now() / 1000) + TTL_SEC
@@ -27,23 +34,39 @@ export function createLinkCode(userId: string): string {
   return `${payload}_${sign(payload)}`
 }
 
-// /start 페이로드 → userId(UUID) | null (위조·만료·형식오류)
+// shopId(UUID) → /start 페이로드 (매장 연동, 's' prefix). 총 ~57자(Telegram 64자 한계 내).
+export function createShopLinkCode(shopId: string): string {
+  const uuidHex = shopId.replace(/-/g, '')
+  const exp = Math.floor(Date.now() / 1000) + TTL_SEC
+  const payload = `s${uuidHex}_${exp.toString(36)}`
+  return `${payload}_${sign(payload)}`
+}
+
+// /start 페이로드 → { kind, id } | null (위조·만료·형식오류)
+//   user 코드: <uuidHex32>_<exp>_<sig> / shop 코드: s<uuidHex32>_<exp>_<sig>
 //   단발성(single-use)은 바인딩 계층에서 강제 — webhook이 conn_yn='N' 원자 가드로
-//   이미 연동된 계정 재바인딩을 차단하므로, 코드 재생(replay)으로 알림을 탈취할 수 없다.
-export function verifyLinkCode(code: string): string | null {
+//   이미 연동된 대상 재바인딩을 차단하므로, 코드 재생(replay)으로 알림을 탈취할 수 없다.
+export function verifyLinkCode(code: string): LinkTarget | null {
   const parts = code.split('_')
   if (parts.length !== 3) return null
-  const [uuidHex, expB36, sig] = parts
+  const [head, expB36, sig] = parts
+
+  // 종류 판별: 's' prefix(33자) → shop, 32자 hex → user
+  let kind: 'user' | 'shop' = 'user'
+  let uuidHex = head
+  if (head.length === 33 && head[0] === 's') {
+    kind = 'shop'
+    uuidHex = head.slice(1)
+  }
   if (!/^[0-9a-f]{32}$/.test(uuidHex)) return null
 
-  const expected = sign(`${uuidHex}_${expB36}`)
+  // 서명은 prefix 포함 head 기준(코드 위조·종류 변조 동시 방지)
+  const expected = sign(`${head}_${expB36}`)
   if (sig.length !== expected.length) return null
   if (!timingSafeEqual(Buffer.from(sig), Buffer.from(expected))) return null
 
   const exp = parseInt(expB36, 36)
   if (!Number.isFinite(exp) || exp * 1000 < Date.now()) return null
 
-  // UUID 복원 (8-4-4-4-12)
-  const u = uuidHex
-  return `${u.slice(0, 8)}-${u.slice(8, 12)}-${u.slice(12, 16)}-${u.slice(16, 20)}-${u.slice(20)}`
+  return { kind, id: hexToUuid(uuidHex) }
 }

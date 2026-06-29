@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ShopBondCard } from '@/components/store/shop-bond-card'
+import { ShopTelegramConnect } from '@/components/store/shop-telegram-connect'
 
 type ShopType = 'ONLINE' | 'OFFLINE' | 'BOTH'
 
@@ -400,6 +401,9 @@ export function ClientMyShops({
               className="size-5 shrink-0"
             />
           </label>
+
+          {/* 매장별 Telegram 주문 알림 연동 (매장당 1:1) — 기존 매장 수정 시에만(신규는 저장 후 연동) */}
+          {editingShop && <ShopTelegramConnect shopId={editingShop.shop_id} />}
 
           {/* 주소 — OFFLINE/BOTH에서 의미. 좌표는 향후 지도 핀 UI로 보강(FR-06) */}
           {form.shop_type_cd !== 'ONLINE' && (

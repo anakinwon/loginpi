@@ -111,7 +111,71 @@ export async function dispatchOrderNotis(limit = 100): Promise<DispatchResult> {
     }> | null) ?? []
   if (rows.length === 0) return result
 
-  // 수신자 chat_id 일괄 조회 (N+1 방지)
+  // 본문 미리 파싱 (order_id 수집 — 매장 telegram 조회용). 파싱 실패 행은 즉시 큐 이탈.
+  const parsed: Array<{
+    row: (typeof rows)[number]
+    body: NotiBody | null
+  }> = rows.map((row) => {
+    try {
+      return { row, body: JSON.parse(row.noti_body) as NotiBody }
+    } catch {
+      return { row, body: null }
+    }
+  })
+
+  // ── 매장별 1:1 Telegram 우선 발송 (PRD: 매장 등록/수정 연동) ───────────────
+  // 주문 → 매장(shop) telegram 우선, 매장 미연동 시 판매자(sys_user) telegram 폴백.
+  // FK 무설계 → order_id→item_id→shop_id→mps_shop을 단계별 .in() 조회 후 Map 병합.
+  const orderIds = [
+    ...new Set(parsed.map((p) => p.body?.order_id).filter(Boolean) as string[]),
+  ]
+  const orderShop = new Map<string, string>() // order_id → shop_id
+  const shopTlgm = new Map<string, number>() // shop_id → chat_id (연동된 매장만)
+  if (orderIds.length > 0) {
+    const { data: ords } = await db
+      .from('mps_order')
+      .select('order_id, item_id')
+      .in('order_id', orderIds)
+    const orderItem = new Map(
+      (ords ?? []).map((o) => [
+        (o as { order_id: string }).order_id,
+        (o as { item_id: string }).item_id,
+      ]),
+    )
+    const itemIds = [...new Set([...orderItem.values()])]
+    if (itemIds.length > 0) {
+      const { data: items } = await db
+        .from('mps_item')
+        .select('item_id, shop_id')
+        .in('item_id', itemIds)
+      const itemShop = new Map(
+        (items ?? [])
+          .map((i) => [
+            (i as { item_id: string }).item_id,
+            (i as { shop_id: string | null }).shop_id,
+          ])
+          .filter((e) => e[1]) as [string, string][],
+      )
+      for (const [oid, iid] of orderItem) {
+        const sid = itemShop.get(iid)
+        if (sid) orderShop.set(oid, sid)
+      }
+      const shopIds = [...new Set([...orderShop.values()])]
+      if (shopIds.length > 0) {
+        const { data: shops } = await db
+          .from('mps_shop')
+          .select('shop_id, tlgm_chat_id, tlgm_conn_yn')
+          .in('shop_id', shopIds)
+          .eq('tlgm_conn_yn', 'Y')
+        for (const s of shops ?? []) {
+          const sr = s as { shop_id: string; tlgm_chat_id: number | null }
+          if (sr.tlgm_chat_id) shopTlgm.set(sr.shop_id, sr.tlgm_chat_id)
+        }
+      }
+    }
+  }
+
+  // 판매자(폴백) chat_id 일괄 조회 (N+1 방지)
   const recvIds = [...new Set(rows.map((r) => r.recv_usr_id))]
   const { data: users } = await db
     .from('sys_user')
@@ -124,23 +188,8 @@ export async function dispatchOrderNotis(limit = 100): Promise<DispatchResult> {
     ]),
   )
 
-  for (const row of rows) {
-    const u = byId.get(row.recv_usr_id)
-
-    // 미연동 판매자 — Telegram 발송 불가. 재시도 큐에서 제외(Pull 뱃지가 안전망).
-    if (!u || u.tlgm_conn_yn !== 'Y' || !u.tlgm_chat_id) {
-      await db
-        .from('msg_noti_outbox')
-        .update({ retry_cnt: MAX_RETRY, fail_reas: 'NO_TELEGRAM_CONN' })
-        .eq('noti_id', row.noti_id)
-      result.skipped++
-      continue
-    }
-
-    let body: NotiBody
-    try {
-      body = JSON.parse(row.noti_body) as NotiBody
-    } catch {
+  for (const { row, body } of parsed) {
+    if (!body) {
       await db
         .from('msg_noti_outbox')
         .update({ retry_cnt: MAX_RETRY, fail_reas: 'BAD_BODY' })
@@ -149,7 +198,25 @@ export async function dispatchOrderNotis(limit = 100): Promise<DispatchResult> {
       continue
     }
 
-    const res = await sendTelegramMessage(u.tlgm_chat_id, buildMessage(body), [
+    // 발송 대상: 매장(shop) telegram 우선 → 없으면 판매자(seller) telegram 폴백
+    const shopId = orderShop.get(body.order_id)
+    const shopChatId = shopId ? shopTlgm.get(shopId) : undefined
+    const u = byId.get(row.recv_usr_id)
+    const fallbackChatId =
+      u && u.tlgm_conn_yn === 'Y' && u.tlgm_chat_id ? u.tlgm_chat_id : undefined
+    const chatId = shopChatId ?? fallbackChatId
+
+    // 매장·판매자 모두 미연동 — Telegram 발송 불가. 재시도 큐에서 제외(Pull 뱃지가 안전망).
+    if (!chatId) {
+      await db
+        .from('msg_noti_outbox')
+        .update({ retry_cnt: MAX_RETRY, fail_reas: 'NO_TELEGRAM_CONN' })
+        .eq('noti_id', row.noti_id)
+      result.skipped++
+      continue
+    }
+
+    const res = await sendTelegramMessage(chatId, buildMessage(body), [
       { text: '📦 주문 확인하기', url: orderDeepLink() },
     ])
 
