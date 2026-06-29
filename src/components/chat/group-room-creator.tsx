@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dialog'
 import { ThemeSelector, type ThemeRow, getThemeName } from './theme-selector'
 import { getRoomFeeBean } from '@/lib/bean-fee'
+import { useFeeMode, beanToPi } from '@/hooks/use-fee-mode'
 
 type Step = 1 | 2 | 3 | 4
 type PayStatus =
@@ -55,6 +56,9 @@ export function GroupRoomCreator() {
   const locale = useLocale()
   const router = useRouter()
   const { isInPiBrowser, user } = usePiAuth()
+  // PI 모드: 실제 Pi 결제이므로 표시도 Pi(÷100, π). BEAN 모드: 기존 Bean 표기.
+  const feeMode = useFeeMode()
+  const isPi = feeMode === 'PI'
   const [open, setOpen] = useState(false)
   const [step, setStep] = useState<Step>(1)
   const [selectedTheme, setSelectedTheme] = useState<ThemeRow | null>(null)
@@ -197,7 +201,10 @@ export function GroupRoomCreator() {
               setPayError(t('createError'))
             }
           },
-          onReadyForServerCompletion: async (paymentId: string, txid: string) => {
+          onReadyForServerCompletion: async (
+            paymentId: string,
+            txid: string,
+          ) => {
             setPayStatus('completing')
             try {
               const r = await piFetch('/api/payments/complete', {
@@ -256,7 +263,11 @@ export function GroupRoomCreator() {
       const data = (await res.json()) as {
         room?: { room_id: string }
         mode?: string
-        pay?: { amount: number; memo: string; metadata: Record<string, unknown> }
+        pay?: {
+          amount: number
+          memo: string
+          metadata: Record<string, unknown>
+        }
       }
       // PI 모드 유료 카페 — 서버가 결제 요구. Pi 직결제로 핸드오프(완료 시 complete가 방 생성).
       if (data.mode === 'PI' && data.pay) {
@@ -314,7 +325,11 @@ export function GroupRoomCreator() {
       const data = (await res.json()) as {
         room?: { room_id: string }
         mode?: string
-        pay?: { amount: number; memo: string; metadata: Record<string, unknown> }
+        pay?: {
+          amount: number
+          memo: string
+          metadata: Record<string, unknown>
+        }
       }
       // PI 모드 유료 이벤트방 — Pi 직결제로 핸드오프(완료 시 complete가 방 생성).
       if (data.mode === 'PI' && data.pay) {
@@ -401,7 +416,9 @@ export function GroupRoomCreator() {
                     {t('eventDesc')}
                     {eventCreateCostBean > 0
                       ? t('eventCreateCostDeduct', {
-                          amount: eventCreateCostBean,
+                          amount: isPi
+                            ? `${beanToPi(eventCreateCostBean)} π`
+                            : `${eventCreateCostBean} Bean`,
                         })
                       : t('eventCreateCostFree')}
                   </p>
@@ -620,7 +637,9 @@ export function GroupRoomCreator() {
                           >
                             {fee === 0
                               ? t('freeEntry')
-                              : t('entryFeeBean', { amount: fee * 100 })}
+                              : isPi
+                                ? `${fee} π`
+                                : t('entryFeeBean', { amount: fee * 100 })}
                           </button>
                         ))}
                       </div>
@@ -664,11 +683,15 @@ export function GroupRoomCreator() {
                       {isBusy ? (
                         t('creating')
                       ) : eventCreateCostBean > 0 ? (
-                        <>
-                          {eventCreateCostBean}{' '}
-                          <BeanIcon className="inline-block h-4 w-4 align-text-bottom" />{' '}
-                          {t('payAndCreateEvent')}
-                        </>
+                        isPi ? (
+                          `${beanToPi(eventCreateCostBean)} π ${t('payAndCreateEvent')}`
+                        ) : (
+                          <>
+                            {eventCreateCostBean}{' '}
+                            <BeanIcon className="inline-block h-4 w-4 align-text-bottom" />{' '}
+                            {t('payAndCreateEvent')}
+                          </>
+                        )
                       ) : (
                         t('createEventFree')
                       )}
@@ -682,11 +705,15 @@ export function GroupRoomCreator() {
                       {isBusy ? (
                         t('creating')
                       ) : createCostBean > 0 ? (
-                        <>
-                          {createCostBean}{' '}
-                          <BeanIcon className="inline-block h-4 w-4 align-text-bottom" />{' '}
-                          {t('payAndCreateGroup')}
-                        </>
+                        isPi ? (
+                          `${beanToPi(createCostBean)} π ${t('payAndCreateGroup')}`
+                        ) : (
+                          <>
+                            {createCostBean}{' '}
+                            <BeanIcon className="inline-block h-4 w-4 align-text-bottom" />{' '}
+                            {t('payAndCreateGroup')}
+                          </>
+                        )
                       ) : canCreateRoomFree && isPremium ? (
                         t('createWithBenefit')
                       ) : (
@@ -697,17 +724,29 @@ export function GroupRoomCreator() {
                 </div>
                 {roomType === 'G' && createCostBean > 0 && (
                   <p className="text-muted-foreground text-center text-xs">
-                    {t('premiumCreateCostMemo', { amount: createCostBean })}{' '}
-                    <BeanIcon className="inline-block h-3.5 w-3.5 align-text-bottom" />{' '}
+                    {t('premiumCreateCostMemo', {
+                      amount: isPi ? beanToPi(createCostBean) : createCostBean,
+                    })}{' '}
+                    {isPi ? (
+                      'π'
+                    ) : (
+                      <BeanIcon className="inline-block h-3.5 w-3.5 align-text-bottom" />
+                    )}{' '}
                     {t('createCostSuffix')}
                   </p>
                 )}
                 {roomType === 'E' && eventCreateCostBean > 0 && (
                   <p className="text-muted-foreground text-center text-xs">
                     {t('eventCreateCostMemo', {
-                      amount: eventCreateCostBean,
+                      amount: isPi
+                        ? beanToPi(eventCreateCostBean)
+                        : eventCreateCostBean,
                     })}{' '}
-                    <BeanIcon className="inline-block h-3.5 w-3.5 align-text-bottom" />{' '}
+                    {isPi ? (
+                      'π'
+                    ) : (
+                      <BeanIcon className="inline-block h-3.5 w-3.5 align-text-bottom" />
+                    )}{' '}
                     {t('createCostSuffix')}
                   </p>
                 )}

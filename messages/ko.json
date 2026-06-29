@@ -1373,7 +1373,7 @@
       "approveInWallet": "Pi 지갑 화면에서 결제를 승인해 주세요.",
       "back": "이전",
       "next": "다음",
-      "eventCreateCostDeduct": " 생성료 {amount} Bean이 차감됩니다.",
+      "eventCreateCostDeduct": " 생성료 {amount} 차감됩니다.",
       "eventCreateCostFree": " 구독 혜택으로 생성료가 무료입니다.",
       "freeRoomPublicOnly": "무료로 만드는 카페는 공개로만 개설할 수 있어요.",
       "capacityN": "{n}명",
@@ -1388,7 +1388,7 @@
       "payAndCreateGroup": "결제하고 방 만들기",
       "premiumCreateCostMemo": "PREMIUM 카페 생성료 {amount}",
       "eventCreateCostMemo": "이벤트 카페 생성료 {amount}",
-      "createCostSuffix": "Bean이 차감됩니다 (잔액 부족 시 충전 안내)",
+      "createCostSuffix": "차감됩니다 (잔액 부족 시 충전 안내)",
       "goChargingBean": "Bean 충전하러 가기 →"
     },
     "settings": {
