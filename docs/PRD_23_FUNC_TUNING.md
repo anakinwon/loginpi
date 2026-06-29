@@ -236,9 +236,10 @@ export function computeShowPiValuation(tier, override?) {
 }
 ```
 
-**대상 2곳**:
+**대상 3곳** (모두 단일 소스 `computeShowPiValuation` — ⚠️ 한 곳이라도 누락하면 그 화면만 운영에 통화 노출됨):
 1. **헤더 Pi 시세칩** — `header.tsx`(server): `computeShowPiValuation(resolveDbTier(), …)` 직접 호출 → `{showPiValuation && <PiPriceChip/>}`.
-2. **통화 콤보 환율 숫자** — `currency-combo.tsx`(client): `const { showPiValuation: showRate } = useFeatureFlags()`. 활성통화·전체국가의 `{currency} {fmtRate(rate)}`에서 **환율 숫자만** 조건부, **통화 선택·Pi 직접입력은 항상 유지**(P2P 핵심 보존).
+2. **store 통화 콤보 환율 숫자** — `currency-combo.tsx`(client): `const { showPiValuation: showRate } = useFeatureFlags()`. 활성통화·전체국가의 `{currency} {fmtRate(rate)}`에서 **환율 숫자만** 조건부, **통화 선택·Pi 직접입력은 항상 유지**(P2P 핵심 보존).
+3. **헤더 다국어 콤보 통화·환율** — `language-switcher.tsx`(client): `header`가 `showPiValuation`을 **prop으로 전달**(provider 위치 비의존). 활성 언어·비활성 국가 두 섹션의 `{currency} {fmtRate(rate)}` 전체를 조건부 — 입력 기능이 아닌 단순 표시라 통화+환율 통째 숨김. (2026-06-29 누락 수정: 1·2만 게이팅돼 다국어 콤보가 운영에 노출되던 버그)
 
 **client 주입 경로**: `layout.tsx`(server)가 `computeShowPiValuation(resolveDbTier(), env.NEXT_PUBLIC_FEATURE_PI_PRICE)` 계산 → `<FeatureFlagProvider flags={{ showPiValuation }}>`로 `{children}` 래핑 → client는 `useFeatureFlags()`로 접근.
 
