@@ -4,6 +4,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getRoomMember } from '@/lib/chat'
 import { applyBean } from '@/lib/bean'
 import { ROOM_BOOST_BEAN, ROOM_BOOST_DAYS } from '@/lib/bean-fee'
+import { microFeeBean } from '@/lib/fee-resolver'
 
 type Params = { params: Promise<{ roomId: string }> }
 
@@ -36,28 +37,33 @@ export async function POST(_req: Request, { params }: Params) {
       { status: 404 },
     )
 
-  // Bean 차감 (잔액 부족 시 402)
-  const charge = await applyBean({
-    usrId: user.id,
-    txnTp: 'SPEND',
-    beanAmt: -ROOM_BOOST_BEAN,
-    refTp: 'ROOM_BOOST',
-    refId: roomId,
-    memo: `카페 부스트 ${ROOM_BOOST_DAYS}일`,
-    regrId: user.display_name.slice(0, 20),
-  })
-  if (!charge.ok) {
-    const insufficient = charge.error === 'INSUFFICIENT_BEAN'
-    return NextResponse.json(
-      {
-        error: insufficient
-          ? `부스트에 ${ROOM_BOOST_BEAN} Bean이 필요합니다. 충전 후 다시 시도하세요.`
-          : '부스트 처리에 실패했습니다',
-        requiresBean: insufficient,
-        feeBean: ROOM_BOOST_BEAN,
-      },
-      { status: insufficient ? 402 : 500 },
-    )
+  // Bean 차감 — PI 모드(메인넷 등재 기간)는 마이크로 무료화로 차감 스킵 (PRD_24 §0)
+  const feeBean = await microFeeBean(ROOM_BOOST_BEAN)
+  let balance: number | undefined
+  if (feeBean > 0) {
+    const charge = await applyBean({
+      usrId: user.id,
+      txnTp: 'SPEND',
+      beanAmt: -feeBean,
+      refTp: 'ROOM_BOOST',
+      refId: roomId,
+      memo: `카페 부스트 ${ROOM_BOOST_DAYS}일`,
+      regrId: user.display_name.slice(0, 20),
+    })
+    if (!charge.ok) {
+      const insufficient = charge.error === 'INSUFFICIENT_BEAN'
+      return NextResponse.json(
+        {
+          error: insufficient
+            ? `부스트에 ${feeBean} Bean이 필요합니다. 충전 후 다시 시도하세요.`
+            : '부스트 처리에 실패했습니다',
+          requiresBean: insufficient,
+          feeBean,
+        },
+        { status: insufficient ? 402 : 500 },
+      )
+    }
+    balance = charge.balance
   }
 
   // 만료 연장 — 기존 부스트가 유효하면 그 시점부터, 아니면 지금부터 N일
@@ -77,17 +83,19 @@ export async function POST(_req: Request, { params }: Params) {
     })
     .eq('room_id', roomId)
 
-  // 갱신 실패 시 차감 롤백(REFUND) — 돈만 빠지고 부스트 미적용 방지
+  // 갱신 실패 시 차감 롤백(REFUND) — 돈만 빠지고 부스트 미적용 방지. 무료(PI)였으면 환불 불필요
   if (updErr) {
-    await applyBean({
-      usrId: user.id,
-      txnTp: 'REFUND',
-      beanAmt: ROOM_BOOST_BEAN,
-      refTp: 'ROOM_BOOST',
-      refId: roomId,
-      memo: '카페 부스트 적용 실패 환불',
-      regrId: user.display_name.slice(0, 20),
-    })
+    if (feeBean > 0) {
+      await applyBean({
+        usrId: user.id,
+        txnTp: 'REFUND',
+        beanAmt: feeBean,
+        refTp: 'ROOM_BOOST',
+        refId: roomId,
+        memo: '카페 부스트 적용 실패 환불',
+        regrId: user.display_name.slice(0, 20),
+      })
+    }
     return NextResponse.json(
       { error: '부스트 적용에 실패했습니다 (환불 처리됨)' },
       { status: 500 },
@@ -97,6 +105,6 @@ export async function POST(_req: Request, { params }: Params) {
   return NextResponse.json({
     ok: true,
     boost_expire_dtm: newExpire,
-    balance: charge.balance,
+    balance,
   })
 }

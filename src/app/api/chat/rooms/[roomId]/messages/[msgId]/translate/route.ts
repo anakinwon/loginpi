@@ -7,6 +7,7 @@ import { getOrTranslateMessage } from '@/lib/chat-translate-dedup'
 import { canAutoTranslate } from '@/lib/chat-auth'
 import { applyBean, getBalance } from '@/lib/bean'
 import { TRANSLATE_ONCE_BEAN } from '@/lib/bean-fee'
+import { microFeeBean } from '@/lib/fee-resolver'
 import { recordUserAction } from '@/lib/event'
 
 type Params = { params: Promise<{ roomId: string; msgId: string }> }
@@ -80,8 +81,10 @@ export async function POST(request: NextRequest, { params }: Params) {
     })
   }
 
-  // 비구독자 건당 과금 — 동의 없는 자동 호출은 과금 금지(원문 폴백), confirm=true(수동 번역 클릭)만 과금
-  if (!isSubscriber) {
+  // 비구독자 건당 과금 — 동의 없는 자동 호출은 과금 금지(원문 폴백), confirm=true(수동 번역 클릭)만 과금.
+  // PI 모드(메인넷 등재 기간)는 마이크로 무료화로 feeBean=0 → 비구독자도 게이트 없이 무료 번역 (PRD_24 §0)
+  const feeBean = await microFeeBean(TRANSLATE_ONCE_BEAN)
+  if (!isSubscriber && feeBean > 0) {
     if (confirm !== true) {
       // 자동 번역 경로: 비구독자는 번역하지 않고 건당 과금 안내만 반환 → 클라이언트는 원문 유지
       return NextResponse.json(
@@ -89,7 +92,7 @@ export async function POST(request: NextRequest, { params }: Params) {
           error: 'PyTranslate™는 구독자 전용입니다',
           requiresBean: true,
           requiresConfirm: true,
-          feeBean: TRANSLATE_ONCE_BEAN,
+          feeBean,
           requiresSubscription: true,
           feature: 'AUTO_TRANSLATE',
         },
@@ -97,12 +100,12 @@ export async function POST(request: NextRequest, { params }: Params) {
       )
     }
     const bal = await getBalance(user.id)
-    if (bal < TRANSLATE_ONCE_BEAN) {
+    if (bal < feeBean) {
       return NextResponse.json(
         {
-          error: `번역 1회에 ${TRANSLATE_ONCE_BEAN} Bean이 필요합니다. Bean을 충전하거나 PyTranslate™를 구독하세요.`,
+          error: `번역 1회에 ${feeBean} Bean이 필요합니다. Bean을 충전하거나 PyTranslate™를 구독하세요.`,
           requiresBean: true,
-          feeBean: TRANSLATE_ONCE_BEAN,
+          feeBean,
           requiresSubscription: true,
           feature: 'AUTO_TRANSLATE',
         },
@@ -119,12 +122,12 @@ export async function POST(request: NextRequest, { params }: Params) {
       msgCont: msg.msg_cont,
     })
 
-    // 비구독자 + 신규 번역(캐시 미스)만 과금 — 캐시 재사용은 무료(실제 번역 비용 없음)
-    if (!isSubscriber && !cached) {
+    // 비구독자 + 신규 번역(캐시 미스)만 과금 — 캐시 재사용·PI 모드(feeBean=0)는 무료
+    if (!isSubscriber && feeBean > 0 && !cached) {
       const charge = await applyBean({
         usrId: user.id,
         txnTp: 'SPEND',
-        beanAmt: -TRANSLATE_ONCE_BEAN,
+        beanAmt: -feeBean,
         refTp: 'TRANSLATE_ONCE',
         refId: msgId,
         memo: 'PyTranslate™ 건당',

@@ -3,6 +3,7 @@ import { getSessionUser } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { applyBean } from '@/lib/bean'
 import { BADGE_UPGRADE_BEAN } from '@/lib/bean-fee'
+import { microFeeBean } from '@/lib/fee-resolver'
 
 // POST /api/badges/upgrade — 배지 강화 Bean 결제 (PRD_15_FEE §1-6 #7)
 // Pi 직접결제(FEATURE_ADDON) 폐기 → Bean SPEND 전환
@@ -35,29 +36,34 @@ export async function POST(request: NextRequest) {
   if (b.upgr_yn === 'Y')
     return NextResponse.json({ error: '이미 강화된 배지입니다' }, { status: 409 })
 
-  // Bean 차감
-  const charge = await applyBean({
-    usrId: user.id,
-    txnTp: 'SPEND',
-    beanAmt: -BADGE_UPGRADE_BEAN,
-    refTp: 'BADGE_UPGRADE',
-    refId: badge_id,
-    memo: '배지 강화',
-    regrId: user.display_name.slice(0, 20),
-  })
+  // Bean 차감 — PI 모드(메인넷 등재 기간)는 마이크로 무료화로 차감 스킵 (PRD_24 §0)
+  const feeBean = await microFeeBean(BADGE_UPGRADE_BEAN)
+  let balance: number | undefined
+  if (feeBean > 0) {
+    const charge = await applyBean({
+      usrId: user.id,
+      txnTp: 'SPEND',
+      beanAmt: -feeBean,
+      refTp: 'BADGE_UPGRADE',
+      refId: badge_id,
+      memo: '배지 강화',
+      regrId: user.display_name.slice(0, 20),
+    })
 
-  if (!charge.ok) {
-    if (charge.error === 'INSUFFICIENT_BEAN') {
-      return NextResponse.json(
-        {
-          error: 'Bean 잔액이 부족합니다. 충전 후 다시 시도하세요.',
-          requiresBean: true,
-          feeBean: BADGE_UPGRADE_BEAN,
-        },
-        { status: 402 },
-      )
+    if (!charge.ok) {
+      if (charge.error === 'INSUFFICIENT_BEAN') {
+        return NextResponse.json(
+          {
+            error: 'Bean 잔액이 부족합니다. 충전 후 다시 시도하세요.',
+            requiresBean: true,
+            feeBean,
+          },
+          { status: 402 },
+        )
+      }
+      return NextResponse.json({ error: '결제 처리에 실패했습니다' }, { status: 500 })
     }
-    return NextResponse.json({ error: '결제 처리에 실패했습니다' }, { status: 500 })
+    balance = charge.balance
   }
 
   // 배지 강화 적용
@@ -74,18 +80,20 @@ export async function POST(request: NextRequest) {
     .eq('del_yn', 'N')
 
   if (error) {
-    // 배지 업데이트 실패 시 Bean 환불 (원자성 보정)
-    await applyBean({
-      usrId: user.id,
-      txnTp: 'REFUND',
-      beanAmt: BADGE_UPGRADE_BEAN,
-      refTp: 'BADGE_UPGRADE',
-      refId: badge_id,
-      memo: '배지 강화 실패 환불',
-      regrId: user.display_name.slice(0, 20),
-    })
+    // 배지 업데이트 실패 시 Bean 환불 (원자성 보정) — 무료(PI 모드)였으면 환불 불필요
+    if (feeBean > 0) {
+      await applyBean({
+        usrId: user.id,
+        txnTp: 'REFUND',
+        beanAmt: feeBean,
+        refTp: 'BADGE_UPGRADE',
+        refId: badge_id,
+        memo: '배지 강화 실패 환불',
+        regrId: user.display_name.slice(0, 20),
+      })
+    }
     return NextResponse.json({ error: '배지 강화에 실패했습니다' }, { status: 500 })
   }
 
-  return NextResponse.json({ success: true, balance: charge.balance })
+  return NextResponse.json({ success: true, balance })
 }

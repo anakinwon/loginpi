@@ -5,6 +5,7 @@ import { getRoomMember, getRoom, getRecentMsgCount } from '@/lib/chat'
 import { getAiQuota } from '@/lib/chat-auth'
 import { applyBean, getBalance } from '@/lib/bean'
 import { AI_EXTRA_BEAN } from '@/lib/bean-fee'
+import { microFeeBean } from '@/lib/fee-resolver'
 import { sanitizePlain } from '@/lib/sanitize'
 import {
   getThemeSystemPrompt,
@@ -208,9 +209,12 @@ export async function POST(request: NextRequest, { params }: Params) {
   const isAiMention =
     msg_tp_cd === 'TEXT' && /^@ai\s/i.test(msg_cont?.trim() ?? '')
   let aiExtraCharge = false // 한도 초과 + 동의 → 추가 호출 건당 과금 대상
+  let aiFeeBean = 0 // PI 모드(마이크로 무료화)면 0 → 과금 스킵
   if (isAiMention && process.env.ANTHROPIC_API_KEY) {
     const quota = await getAiQuota(user.id)
-    if (quota.remaining === 0) {
+    if (quota.remaining === 0) aiFeeBean = await microFeeBean(AI_EXTRA_BEAN)
+    // PI 모드(aiFeeBean=0, 메인넷 등재 기간)는 한도 초과분도 무료화 — 과금 게이트 스킵 (PRD_24 §0)
+    if (quota.remaining === 0 && aiFeeBean > 0) {
       // 한도 초과 — 동의(confirm) 없으면 과금 안내만 반환(메시지 미삽입)
       if (confirm !== true) {
         return NextResponse.json(
@@ -218,20 +222,20 @@ export async function POST(request: NextRequest, { params }: Params) {
             error: 'AI 월 호출 한도를 초과했습니다',
             aiLimitExceeded: true,
             requiresBean: true,
-            feeBean: AI_EXTRA_BEAN,
+            feeBean: aiFeeBean,
           },
           { status: 402 },
         )
       }
       // 동의함 — 잔액 확인 후 과금 예약(메시지 삽입 성공 후 차감)
       const bal = await getBalance(user.id)
-      if (bal < AI_EXTRA_BEAN) {
+      if (bal < aiFeeBean) {
         return NextResponse.json(
           {
-            error: `추가 AI 호출 1회에 ${AI_EXTRA_BEAN} Bean이 필요합니다`,
+            error: `추가 AI 호출 1회에 ${aiFeeBean} Bean이 필요합니다`,
             aiLimitExceeded: true,
             requiresBean: true,
-            feeBean: AI_EXTRA_BEAN,
+            feeBean: aiFeeBean,
             insufficientBean: true,
           },
           { status: 402 },
@@ -327,7 +331,7 @@ export async function POST(request: NextRequest, { params }: Params) {
     const charge = await applyBean({
       usrId: user.id,
       txnTp: 'SPEND',
-      beanAmt: -AI_EXTRA_BEAN,
+      beanAmt: -aiFeeBean,
       refTp: 'AI_EXTRA',
       refId: data.msg_id,
       memo: 'AI 추가 호출(한도 초과)',

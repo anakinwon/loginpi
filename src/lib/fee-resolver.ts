@@ -42,3 +42,18 @@ export interface ResolvedFee {
 export function resolveFee(beanAmt: number, mode: FeeMode): ResolvedFee {
   return { mode, bean: beanAmt, pi: beanToPi(beanAmt) }
 }
+
+/**
+ * 마이크로 요금(입장·번역·AI·배지·부스팅)의 실제 차감액 — PRD_24 §0.
+ *   PI 모드(메인넷 등재 기간)에서는 무료화(0). 0.05 Pi를 Pi Browser 승인 왕복으로
+ *   결제하는 것이 비현실적이라 면제한다(구독만 Pi 직결제로 전환).
+ *   BEAN 모드에서는 원래 Bean 요금 그대로.
+ * @param mode 이미 조회한 모드가 있으면 전달(중복 DB 조회 회피)
+ */
+export async function microFeeBean(
+  beanAmt: number,
+  mode?: FeeMode,
+): Promise<number> {
+  const m = mode ?? (await getActiveFeeMode())
+  return m === 'PI' ? 0 : beanAmt
+}
