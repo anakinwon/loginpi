@@ -6,6 +6,7 @@ import { recordUserAction } from '@/lib/event'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getRoomFeeBean } from '@/lib/bean-fee'
 import { applyBean, getBalance } from '@/lib/bean'
+import { getActiveFeeMode } from '@/lib/fee-resolver'
 
 // 무료 테마(FITNESS) = 일반카페(무료). 그 외 테마 = 프리미엄카페.
 // 프리미엄 생성료: 구독자는 패키지 할인으로 무료, 비구독자는 Bean으로 결제.
@@ -60,23 +61,26 @@ export async function POST(request: NextRequest) {
     (themeRow as { theme_tp_cd?: string } | null)?.theme_tp_cd === 'PREMIUM'
 
   const plan = await getChatPlan(user.id)
+  const feeMode = await getActiveFeeMode()
   let createFeeBean = 0
   if (isPremiumTheme) {
     const allowance = await canCreateRoom(user.id, plan)
     if (!allowance.allowed) {
-      // 비구독자: 프리미엄 카페 생성료를 Bean으로 결제 (구독자는 allowance.allowed → 무료)
+      // 비구독자: 프리미엄 카페 생성료. BEAN 모드는 Bean 잔액 확인, PI 모드는 Pi 직결제(아래 분기).
       createFeeBean = getRoomFeeBean('CREATE', 'PREMIUM', false)
-      const bal = await getBalance(user.id)
-      if (bal < createFeeBean) {
-        return NextResponse.json(
-          {
-            error: 'Bean 잔액이 부족합니다. 충전 후 다시 시도하세요.',
-            requiresBean: true,
-            feeBean: createFeeBean,
-            balance: bal,
-          },
-          { status: 402 },
-        )
+      if (feeMode === 'BEAN') {
+        const bal = await getBalance(user.id)
+        if (bal < createFeeBean) {
+          return NextResponse.json(
+            {
+              error: 'Bean 잔액이 부족합니다. 충전 후 다시 시도하세요.',
+              requiresBean: true,
+              feeBean: createFeeBean,
+              balance: bal,
+            },
+            { status: 402 },
+          )
+        }
       }
     }
   }
@@ -103,6 +107,29 @@ export async function POST(request: NextRequest) {
   const finalMaxMbr = isFreeRoom
     ? Math.min(reqMaxMbr, FREE_ROOM_MAX_MBR)
     : reqMaxMbr
+
+  // PI 모드 유료 카페 — Bean 차감 대신 Pi 직결제. 방은 결제 완료(complete) 시 생성한다(미결제 무료 방 방지).
+  //   방 설정을 metadata로 운반 → /api/payments/complete의 CHAT_ROOM_CREATE 분기가 createGroupRoom 수행.
+  if (createFeeBean > 0 && feeMode === 'PI') {
+    return NextResponse.json({
+      mode: 'PI',
+      pay: {
+        amount: createFeeBean / 100, // 1 Pi = 100 Bean
+        memo: 'PICAFE room create',
+        metadata: {
+          type: 'CHAT_ROOM_CREATE',
+          theme_cd,
+          room_nm: room_nm.trim(),
+          room_desc: room_desc?.trim() || null,
+          is_public_yn: finalPublicYn,
+          max_mbr_cnt: finalMaxMbr,
+          expr_dtm: finalExprDtm,
+          lat: typeof lat === 'number' ? lat : null,
+          lng: typeof lng === 'number' ? lng : null,
+        },
+      },
+    })
+  }
 
   try {
     const room = await createGroupRoom({

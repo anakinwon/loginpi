@@ -3,6 +3,8 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { sendPaymentReceipt } from '@/lib/email'
 import { broadcastToSeller } from '@/lib/realtime-broadcast'
 import { markEscrow } from '@/lib/mps-order'
+import { createGroupRoom } from '@/lib/chat'
+import { getRoomFeeBean } from '@/lib/bean-fee'
 import { dispatchOrderNotis } from '@/lib/mps-noti'
 import { depositBond, BOND_DEPOSIT_PI } from '@/lib/mps-bond'
 import { applyBean, BEAN_PER_PI } from '@/lib/bean'
@@ -75,7 +77,7 @@ async function handlePOST(request: NextRequest) {
     // 레거시 Pi 결제 분기 제거(2026-06-21): CHAT_ROOM_CREATE·EVENT_ROOM_JOIN·STICKER_PACK·CHAT_SUBSCR·PI_TIP
     //   → 카페 생성/입장/스티커/구독/선물은 모두 Bean(SPEND·구독·전송)으로 전환 완료.
     //   현재 Pi 결제 경로는 BEAN_CHARGE·MPS_ESCROW·MPS_BOND 뿐. createdRoom/grantedSubscr는 응답 스키마 호환용 null.
-    const createdRoom: Record<string, unknown> | null = null
+    let createdRoom: Record<string, unknown> | null = null
     const grantedSubscr: Record<string, unknown> | null = null
     const meta = payment.metadata as Record<string, unknown> | null
     if (meta?.type === 'MPS_ESCROW' && payment.user_uid) {
@@ -232,6 +234,90 @@ async function handlePOST(request: NextRequest) {
           recordUserAction('subscr_apply', u.id, { product, grade, cycle }).catch(
             (err) => console.error(`[구독] 미션 기록 실패: ${err.message}`),
           )
+        }
+      }
+    } else if (meta?.type === 'CHAT_ROOM_CREATE' && payment.user_uid) {
+      // CHAT_ROOM_CREATE: PI 모드 유료 카페 생성 — Pi 결제 완료 시 방 생성. PRD_24 §0.
+      //   선결제 후 생성(미결제 무료 방 방지). 방 설정은 metadata로 운반됨.
+      //   ⭐멱등: bean_txn(ROOM_CREATE_PI, ref_id=paymentId) 마커로 중복 complete 시 재생성 차단.
+      const { data: dup } = await db
+        .from('bean_txn')
+        .select('txn_id')
+        .eq('ref_tp_cd', 'ROOM_CREATE_PI')
+        .eq('ref_id', paymentId)
+        .maybeSingle()
+
+      const themeCd = String(meta.theme_cd ?? '')
+      if (!dup && themeCd) {
+        const { data: creator } = await db
+          .from('sys_user')
+          .select('id, display_name')
+          .eq('pi_uid', payment.user_uid)
+          .maybeSingle()
+
+        if (creator) {
+          const cu = creator as { id: string; display_name: string | null }
+          // 금액 검증 — theme 등급으로 생성료 재계산(클라 금액 불신)
+          const { data: themeRow } = await db
+            .from('msg_theme')
+            .select('theme_tp_cd')
+            .eq('theme_cd', themeCd)
+            .eq('del_yn', 'N')
+            .maybeSingle()
+          const isPrem =
+            (themeRow as { theme_tp_cd?: string } | null)?.theme_tp_cd ===
+            'PREMIUM'
+          const fee = isPrem ? getRoomFeeBean('CREATE', 'PREMIUM', false) : 0
+
+          if (fee > 0 && Number(payment.amount) + 1e-6 >= fee / 100) {
+            const room = await createGroupRoom({
+              userId: cu.id,
+              displayName: cu.display_name ?? 'user',
+              theme_cd: themeCd,
+              room_nm: String(meta.room_nm ?? '카페'),
+              room_desc: (meta.room_desc as string | null) ?? null,
+              is_public_yn: (meta.is_public_yn as 'Y' | 'N') ?? 'Y',
+              max_mbr_cnt: Number(meta.max_mbr_cnt ?? 50),
+              expr_dtm: (meta.expr_dtm as string | null) ?? null,
+            })
+            createdRoom = room as unknown as Record<string, unknown>
+
+            // 멱등 마커 + 회계(Pi 결제 흔적). bean_amt=0(Bean 미차감), pi_amt=결제 Pi
+            await db.from('bean_txn').insert({
+              usr_id: cu.id,
+              txn_tp_cd: 'SPEND',
+              bean_amt: 0,
+              bal_amt: 0,
+              pi_amt: fee / 100,
+              ref_tp_cd: 'ROOM_CREATE_PI',
+              ref_id: paymentId,
+              memo_txt: `Pi 카페 생성료 (${String(meta.room_nm ?? '')})`,
+              regr_id: 'SYSTEM',
+              modr_id: 'SYSTEM',
+            })
+
+            // LBS 좌표 저장(비블로킹, best-effort) — 클라가 metadata로 보낸 위치
+            const mlat = meta.lat
+            const mlng = meta.lng
+            if (typeof mlat === 'number' && typeof mlng === 'number') {
+              void db
+                .from('msg_room')
+                .update({ latd_crd: mlat, lngt_crd: mlng })
+                .eq('room_id', (room as { room_id: string }).room_id)
+                .then(
+                  () => {},
+                  () => {},
+                )
+            }
+            // M3: PREMIUM Cafe 생성 미션 기록 (비블로킹)
+            if (isPrem) {
+              recordUserAction('premium_cafe_create', cu.id, {
+                theme_cd: themeCd,
+              }).catch((err) =>
+                console.error(`[M3] 미션 기록 실패: ${err.message}`),
+              )
+            }
+          }
         }
       }
     }

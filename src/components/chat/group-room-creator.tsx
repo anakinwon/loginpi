@@ -168,6 +168,62 @@ export function GroupRoomCreator() {
     setStep(2)
   }, [])
 
+  // PI 모드 유료 카페 — 서버가 내려준 pay 파라미터로 Pi 직결제. 방은 complete가 생성.
+  const startRoomPiPayment = useCallback(
+    (pay: { amount: number; memo: string; metadata: Record<string, unknown> }) => {
+      if (typeof window === 'undefined' || !window.Pi) {
+        setPayStatus('error')
+        setPayError('Pi Browser에서 결제할 수 있습니다')
+        return
+      }
+      setPayStatus('approving')
+      window.Pi.createPayment(
+        { amount: pay.amount, memo: pay.memo, metadata: pay.metadata },
+        {
+          onReadyForServerApproval: async (paymentId: string) => {
+            try {
+              const r = await piFetch('/api/payments/approve', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ paymentId }),
+              })
+              if (!r.ok) throw new Error()
+              setPayStatus('waiting')
+            } catch {
+              setPayStatus('error')
+              setPayError(t('createError'))
+            }
+          },
+          onReadyForServerCompletion: async (paymentId: string, txid: string) => {
+            setPayStatus('completing')
+            try {
+              const r = await piFetch('/api/payments/complete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ paymentId, txid }),
+              })
+              if (!r.ok) throw new Error()
+              const cd = (await r.json()) as { room?: { room_id: string } }
+              setPayStatus('done')
+              setOpen(false)
+              toast.success(t('created'))
+              if (cd.room?.room_id) router.push(`/chat/${cd.room.room_id}`)
+            } catch {
+              setPayStatus('error')
+              setPayError(t('createError'))
+            }
+          },
+          onCancel: () => setPayStatus('idle'),
+          onError: (e: Error) => {
+            setPayStatus('error')
+            setPayError(e?.message ?? t('createError'))
+          },
+        },
+      )
+    },
+    [router, t],
+  )
+
   const createFreeRoom = useCallback(async () => {
     if (!selectedTheme) return
     setPayStatus('completing')
@@ -194,7 +250,16 @@ export function GroupRoomCreator() {
         const d = (await res.json()) as { error?: string }
         throw new Error(d.error ?? t('createFail'))
       }
-      const data = (await res.json()) as { room?: { room_id: string } }
+      const data = (await res.json()) as {
+        room?: { room_id: string }
+        mode?: string
+        pay?: { amount: number; memo: string; metadata: Record<string, unknown> }
+      }
+      // PI 모드 유료 카페 — 서버가 결제 요구. Pi 직결제로 핸드오프(완료 시 complete가 방 생성).
+      if (data.mode === 'PI' && data.pay) {
+        startRoomPiPayment(data.pay)
+        return
+      }
       setPayStatus('done')
       setOpen(false)
       toast.success(t('created'))
@@ -215,6 +280,7 @@ export function GroupRoomCreator() {
     gpsCoords,
     router,
     t,
+    startRoomPiPayment,
   ])
 
   // TASK-063: 이벤트방 생성 — BUSINESS 전용, 생성 결제 없음 (참가자가 입장료 결제)
