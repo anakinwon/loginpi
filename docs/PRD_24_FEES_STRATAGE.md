@@ -46,6 +46,14 @@
 
 > 따라서 `fee_mode`는 "Bean↔Pi 환산표 토글"이 아니라 **"구독 결제 경로 + 마이크로 과금 정책"의 모드 스위치**다. 환산표(Bean÷100)는 *표시·회계 보조*일 뿐 실제 차감 단위가 아니다.
 
+### v0.3 추가 결정 (2026-06-29) — 롤백 보장·1:100 완벽 매핑·REWARD Pi화
+
+1. **언제든 현재 요금제로 복귀(롤백 보장)**: 모드 전환은 **양방향 무제한**(BEAN↔PI). `fee_mode_audit` 이력 완전 보존 + `fn_rollback_fee_mode()`(직전 모드 원자 복원). 모든 거래는 `bean_txn.pi_amt` 병기로 **모드 무관 회계 일관** → 복귀 후에도 이력 정합.
+2. **1:100 완벽 매핑 "관리"**: 단일출처(`bean_fee_plan.amt_bean`) 유지 + Pi = `amt_bean ÷ 100`. **Bean이 정수**라 ÷100은 항상 소수 2자리 이내로 떨어짐 → **수학적으로 완벽 매핑 보장**. "관리"는 별도 Pi 테이블이 아니라 **`v_fee_plan_dual` 뷰**(Bean·Pi 양쪽 동시 표시) + 무결성 검증으로 달성. ⛔ 별도 Pi 요금 테이블 금지(sync 버그).
+3. **REWARD도 Pi화(1:100)**: SPEND뿐 아니라 **보상 지급도 모드 적용**. BEAN 모드=`fn_bean_apply('REWARD')` Bean 지급 / PI 모드=**Pi A2U**(`triggerPiReward`) 1:100 지급(예: 후기 60 Bean → 0.6 Pi). 대상=후기(PRD_20)·캠페인 보상. **이벤트는 이미 `reward_pi_amt`(Pi A2U·sql/048)로 일관** → 후기·캠페인을 같은 패턴으로 확장.
+
+> §10 구현 영향 분석(추가/변경 테이블·데이터·화면)이 사전 정의로 명문화됨 — 구현은 그 범위 승인 후 착수.
+
 ---
 
 ## 1. 개요 & 전략적 배경
@@ -606,6 +614,66 @@ interface PreSwitchValidation {
 
 ---
 
+## §10. 구현 영향 분석 (사전 정의 — 마스터 요청 2026-06-29)
+
+> 구현 착수 전 **추가/변경 범위를 확정**한다. "추가 테이블 최소화" 원칙 — `bean_txn.pi_amt`(기존)·`reward_pi_amt`(이벤트 기존)를 재사용해 신규 테이블을 줄인다.
+
+### 10-1. 추가될 테이블 + 데이터
+
+| 테이블 | 위치 | 초기 데이터 | 비고 |
+|---|---|---|---|
+| `fee_mode_config` | sql/140 (작성됨) | 1행 `active_mode='BEAN'` | 활성 모드 단일 플래그 |
+| `fee_mode_audit` | sql/140 (작성됨) | 없음(전환 시 누적) | 전환 이력·롤백 추적 |
+
+→ **신규 테이블은 위 2개뿐.** REWARD Pi화는 기존 경로(`bean_txn`·`triggerPiReward`·`reward_pi_amt`) 재사용 → **보상용 신규 테이블 0**.
+
+### 10-2. 변경될 테이블 + 데이터
+
+| 테이블 | 변경 내용 | 데이터 영향 |
+|---|---|---|
+| `fee_mode_config` | **del_yn/del_dtm 추가**, 인덱스 중복(`idx_..._mode_mode`) 제거, FK 관례 검토 | 기존 1행 유지(무손실) |
+| `fee_mode_audit` | **del_yn/del_dtm 추가** | - |
+| `bean_txn` | `pi_amt` **의미 확장**(CHARGE 전용 → PI 모드 SPEND/REWARD도 Pi 금액 병기). 컬럼·타입 변경 없음, COMMENT만 갱신 | 신규 거래만, **기존 행 무영향** |
+| `bean_fee_plan` | **변경 없음**(`amt_bean÷100`로 충분). 1:100 무결성은 뷰·검증으로 | - |
+
+→ DDL은 sql/140 보강 1건 + `bean_txn` COMMENT 갱신뿐. **데이터 마이그레이션 없음**(기존 행 보존).
+
+### 10-3. 추가될 뷰·함수
+
+| 객체 | 역할 |
+|---|---|
+| `v_fee_plan_dual` (뷰) | `bean_fee_plan`에 Pi 환산(`amt_bean/100`) 컬럼 병기 — Bean·Pi 1:100 양쪽 동시 표시(관리 화면용) |
+| `fn_rollback_fee_mode()` | `fee_mode_audit` 최신 역추적 → 직전 모드 원자 복원(롤백 보장) |
+| (검증) 1:100 무결성 함수 | 모든 활성 요금 `amt_bean`의 ÷100 정합 확인(Bean 정수 → 항상 통과, 회귀 가드) |
+
+### 10-4. 추가될 화면
+
+| 화면 | 경로 | 내용 |
+|---|---|---|
+| **요금제 모드 관리** | `/admin/fee-mode` | ① 현재 모드(BEAN/PI) ② 전환 버튼(양방향)+사전검증(pending tx 0) ③ **1:100 매핑 요금표**(`v_fee_plan_dual`) ④ **롤백 버튼**(직전 모드) ⑤ 전환 이력(`fee_mode_audit`) |
+
+### 10-5. 변경될 화면
+
+| 화면 | 변경 내용 |
+|---|---|
+| 요금 표시(구독 `/subscribe`·카페 입장·배지·번역·부스팅) | 활성 모드에 따라 **Bean/Pi 표시 전환**(`resolveFee`). PI 모드 마이크로는 "무료"/구독은 Pi 결제 버튼 |
+| 후기 작성·보상 안내(PRD_20) | 보상 금액을 모드별 **Bean/Pi 표시**(60 Bean ↔ 0.6 Pi) |
+| Bean 지갑·충전 | PI 모드 시 안내(충전은 Pi, 마이크로 무료 고지) |
+| 관리자 요금 관리 `/admin/token/fee-plan` | Bean/Pi **이중 표시**(1:100 검증 가시화) |
+
+### 10-6. 코드 경로 변경(요약 — 화면 외)
+
+| 경로 | 변경 |
+|---|---|
+| `src/lib/fee-resolver.ts` (신규) | 모드 조회 + Bean/Pi 환산. **DB(`bean_fee_plan`)+코드상수(`bean-fee.ts`) 양쪽 커버** |
+| 구독 결제(`api/subscriptions/...`) | PI 모드 분기 → `window.Pi.createPayment`/`pi_pymnt` 경로 신설 |
+| 보상 지급(후기·캠페인 `fn_bean_apply('REWARD')` 호출부) | PI 모드 분기 → `triggerPiReward` A2U(÷100) |
+| 마이크로 과금(입장·번역·AI·배지·부스팅) | PI 모드 시 면제(무료) 분기 |
+
+> ⚠️ 관리자 화면 신규 i18n 키는 **옆 세션 `ko.json` 작업과 조율**(직접 수정 금지, 추가 키 목록만 명시).
+
+---
+
 ## 핵심 설계 결정
 
 | 항목 | 결정 | 근거 |
@@ -633,6 +701,7 @@ interface PreSwitchValidation {
 
 | 버전 | 날짜 | 변경 내용 |
 |---|---|---|
+| **v0.3** | 2026-06-29 | **롤백·1:100·REWARD Pi화 + 영향분석 사전정의(§10)** — ①양방향 롤백 보장(fn_rollback_fee_mode·bean_txn.pi_amt 병기) ②1:100 완벽매핑(단일출처+v_fee_plan_dual 뷰, 별도Pi테이블 금지) ③REWARD Pi화(후기·캠페인=triggerPiReward A2U ÷100, 이벤트는 기존 reward_pi_amt). §10에 추가/변경 테이블·데이터·화면 사전 정의. 신규테이블=fee_mode 2개뿐(bean_txn.pi_amt 재사용). |
 | **v0.2** | 2026-06-29 | **설계 검토 반영(§0 신설)** — 핵심 모순(Pi 모드 실거래 미정의) 해소. 마스터 결정: ①Pi 모드=진짜 Pi 직결제(`createPayment`/`pi_pymnt`) ②마이크로 무료화 ③구독만 Pi화. "코드 변경 0" 철회·`fn_bean_apply(Pi)` 모델 삭제·단일출처(코드상수)·캐시 일관성·del_yn 보강 정정. §0이 본문보다 우선. |
 | v0.1 | 2026-06-29 | 초안 — 전체 전략, 환산 규칙, 아키텍처, DB/API/UI 설계안 |
 
