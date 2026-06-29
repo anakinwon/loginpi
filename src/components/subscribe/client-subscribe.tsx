@@ -7,6 +7,7 @@ import { Link } from '@/i18n/navigation'
 import { piFetch } from '@/lib/pi-fetch'
 import { Button } from '@/components/ui/button'
 import { BeanIcon } from '@/components/ui/bean-icon'
+import { useFeeMode } from '@/components/feature-flag-provider'
 import {
   findPlan,
   annualSaving,
@@ -40,6 +41,7 @@ const SHOP_GRADES: SubscrGrade[] = ['S', 'M', 'L']
 
 export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
   const t = useTranslations('subscribe')
+  const feeMode = useFeeMode() // PI 모드면 Pi Browser 직결제, BEAN 모드면 Bean 차감
   const [resp, setResp] = useState<ProductsResp | null>(null)
   const [authed, setAuthed] = useState(serverAuthed)
   const [loading, setLoading] = useState(true)
@@ -64,6 +66,11 @@ export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
   }, [load])
 
   async function subscribe(product: SubscrProduct, grade: SubscrGrade, key: string) {
+    // PI 모드 — Pi Browser 직결제(U2A). BEAN 모드 — 기존 Bean 차감.
+    if (feeMode === 'PI') {
+      subscribeWithPi(product, grade, key)
+      return
+    }
     setBusy(key)
     try {
       const res = await piFetch('/api/subscriptions/products/subscribe', {
@@ -88,6 +95,71 @@ export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
     }
   }
 
+  // PI 모드 구독 — Pi Browser U2A 직결제(metadata.type='CHAT_SUBSCR').
+  //   금액·구독부여·검증은 모두 서버(/api/payments/complete)가 결정 — 클라 금액은 표시·요청용.
+  function subscribeWithPi(
+    product: SubscrProduct,
+    grade: SubscrGrade,
+    key: string,
+  ) {
+    if (typeof window === 'undefined' || !window.Pi) {
+      toast.error('Pi Browser에서 결제할 수 있습니다')
+      return
+    }
+    const plan = findPlan(resp?.plans ?? [], product, grade, cycle)
+    if (!plan) {
+      toast.error(t('subscribeFail'))
+      return
+    }
+    setBusy(key)
+    window.Pi.createPayment(
+      {
+        amount: plan.bean_amt / 100, // 1 Pi = 100 Bean
+        // memo는 Pi 결제 호환 위해 ASCII만 사용(™·é 등 특수문자 금지) — 코드값으로 구성
+        memo: `${product} ${grade}/${cycle} subscription`,
+        metadata: { type: 'CHAT_SUBSCR', product, grade, cycle },
+      },
+      {
+        onReadyForServerApproval: async (paymentId: string) => {
+          try {
+            const res = await piFetch('/api/payments/approve', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ paymentId }),
+            })
+            if (!res.ok) throw new Error()
+          } catch {
+            toast.error(t('subscribeFail'))
+            setBusy(null)
+          }
+        },
+        onReadyForServerCompletion: async (paymentId: string, txid: string) => {
+          try {
+            const res = await piFetch('/api/payments/complete', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ paymentId, txid }),
+            })
+            if (!res.ok) throw new Error()
+            toast.success(
+              t('subscribeSuccess', { product: t(`product.${product}`) }),
+            )
+            void load()
+          } catch {
+            toast.error(t('subscribeFail'))
+          } finally {
+            setBusy(null)
+          }
+        },
+        onCancel: () => setBusy(null),
+        onError: (e: Error) => {
+          toast.error(e?.message ?? t('subscribeFail'))
+          setBusy(null)
+        },
+      },
+    )
+  }
+
   if (loading)
     return <p className="text-muted-foreground text-sm">{t('loading')}</p>
 
@@ -103,22 +175,24 @@ export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
 
   return (
     <div className="space-y-5">
-      {/* Bean 잔액 + 충전 */}
-      <div className="bg-muted/50 flex items-center justify-between gap-3 rounded-xl px-4 py-3">
-        <span className="text-sm">
-          {t('myBalance')}{' '}
-          <span className="font-bold tabular-nums">
-            {(resp?.balance ?? 0).toLocaleString()}{' '}
-            <BeanIcon className="inline-block h-4 w-4 align-text-bottom" />
+      {/* Bean 잔액 + 충전 — PI 모드(Pi 직결제)에서는 Bean이 불필요하므로 숨김 */}
+      {feeMode !== 'PI' && (
+        <div className="bg-muted/50 flex items-center justify-between gap-3 rounded-xl px-4 py-3">
+          <span className="text-sm">
+            {t('myBalance')}{' '}
+            <span className="font-bold tabular-nums">
+              {(resp?.balance ?? 0).toLocaleString()}{' '}
+              <BeanIcon className="inline-block h-4 w-4 align-text-bottom" />
+            </span>
           </span>
-        </span>
-        <Link
-          href="/bean"
-          className="text-primary text-sm font-medium hover:underline"
-        >
-          + {t('charge')}
-        </Link>
-      </div>
+          <Link
+            href="/bean"
+            className="text-primary text-sm font-medium hover:underline"
+          >
+            + {t('charge')}
+          </Link>
+        </div>
+      )}
 
       {/* 사상 안내 */}
       <p className="text-muted-foreground text-xs">💡 {t('tagline')}</p>

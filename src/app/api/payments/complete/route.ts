@@ -7,6 +7,14 @@ import { dispatchOrderNotis } from '@/lib/mps-noti'
 import { depositBond, BOND_DEPOSIT_PI } from '@/lib/mps-bond'
 import { applyBean, BEAN_PER_PI } from '@/lib/bean'
 import { recordUserAction } from '@/lib/event'
+import { getSubscrPlans } from '@/lib/bean-fee-db'
+import {
+  findPlan,
+  cycleMonths,
+  type SubscrProduct,
+  type SubscrGrade,
+  type SubscrCycle,
+} from '@/lib/bean-subscr-plan'
 import { withGuard } from '@/lib/api-guard'
 
 const PI_PAYMENTS_URL = 'https://api.minepi.com/v2/payments'
@@ -180,6 +188,49 @@ async function handlePOST(request: NextRequest) {
           recordUserAction('bean_charge', ownerRow.id, { beanAmt }).catch(
             (err) =>
               console.error(`[M2] Bean 충전 미션 기록 실패: ${err.message}`),
+          )
+        }
+      }
+    } else if (meta?.type === 'CHAT_SUBSCR' && payment.user_uid) {
+      // CHAT_SUBSCR: PI 모드 구독 — Pi 직결제 완료 시 구독 부여(Bean 차감 없이). PRD_24 §0.
+      //   클라가 보낸 금액은 불신 — metadata(product/grade/cycle)로 plan 표에서 정가 재계산 후 검증.
+      //   fn_pi_subscribe_grant가 pymnt_id 멱등(중복 complete 시 재연장 차단).
+      const product = String(meta.product ?? '')
+      const grade = String(meta.grade ?? '')
+      const cycle = String(meta.cycle ?? '')
+      const { data: subUser } = await db
+        .from('sys_user')
+        .select('id, display_name')
+        .eq('pi_uid', payment.user_uid)
+        .maybeSingle()
+
+      if (subUser && product && grade && cycle) {
+        const u = subUser as { id: string; display_name: string | null }
+        const plans = await getSubscrPlans()
+        const plan = findPlan(
+          plans,
+          product as SubscrProduct,
+          grade as SubscrGrade,
+          cycle as SubscrCycle,
+        )
+        // 결제 금액(Pi)이 정가(bean_amt÷100) 이상인지 서버 재검증(부동소수 오차 허용)
+        if (plan && Number(payment.amount) + 1e-6 >= plan.bean_amt / 100) {
+          const slug = String(u.display_name ?? 'user').slice(0, 20)
+          await db.rpc('fn_pi_subscribe_grant', {
+            p_usr_id: u.id,
+            p_prod: product,
+            p_grade: grade,
+            p_cycle: cycle,
+            p_fee_plan_cd: plan.fee_plan_cd,
+            p_bean_amt: plan.bean_amt,
+            p_months: cycleMonths(cycle as SubscrCycle),
+            p_pymnt_id: paymentId,
+            p_regr_id: slug,
+          })
+
+          // 구독 신청 미션 기록 (비블로킹)
+          recordUserAction('subscr_apply', u.id, { product, grade, cycle }).catch(
+            (err) => console.error(`[구독] 미션 기록 실패: ${err.message}`),
           )
         }
       }
