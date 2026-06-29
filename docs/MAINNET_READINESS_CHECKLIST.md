@@ -105,7 +105,7 @@
 | A-2 KYC | 아나킨님 본인 Pi KYC 완료 여부 = 메인넷 지갑 슬롯 전제 | 🟡 **확인필요** |
 | A-3 상표 | 제품명 **PiCafé™·PiShop™·PiTranslate™ = "Pi"+이름 접두형** | 🟠 **개명으로 해소 결정** — 모더레이터 공식 "Not recommended"(Pi 접두). Py 개명 결정(E-2), 실행+새이름 확인 잔여. **C-1-A** 참조 |
 | A-4 Pi 인증만 | Pi Browser에서 Google 버튼 미렌더(`google-login-button` 코드 검증) | 🟢 **충족(모더레이터 확인)** — 최종 빌드 재확인만. C-1-B 참조 |
-| A-5 Pi 전용거래 | Pi/Bean 거래만, 자국통화는 참고 표시값(거래 아님). 신용카드·법정화폐 직결제 코드 0건 | 🟢 부합 가능(검증 권장) |
+| A-5 Pi 전용거래 | Pi/Bean 거래. 자국통화=참고 표시값(거래 아님)·법정화폐 직결제 0건. ⚠️ Bean '토큰' 표현·온체인 발행계획 노출 | 🟠 **메인넷 제거/순화 방침(C-1-F)** — 오프체인 포인트 자체는 공식 위반 근거 없음, 표현·계획·테스트데이터는 보수 제거 |
 | A-6 외부 리다이렉트 | Telegram 주문알림(판매자 opt-in, 주문·결제는 인앱 완결) | 🟡 **조건부 완료** — 코드 충족, PCT 미확인(추후 재조정). C-1-C 참조 |
 | A-7 데이터 최소화 | 수집항목 = O2O용 선택 옵션(강제 아님)·매핑표(부록2)·UI 선택표기 | 🟢 **완료** — C-1-D 참조 |
 | A-1 동작/UI | 앱 동작·UI 완성도 | 🟢 자체 점검 양호(Part D), Pi 심사 별도 |
@@ -173,6 +173,26 @@
 - **공식 원문**: "Developers must complete KYC ... before submitting an application to list." + 메인넷 지갑은 KYC + 초대 슬롯 전제.
 - **조치(질문 아님·선행 확인)**: 아나킨님 본인 Pi App에서 KYC 완료 상태 및 메인넷 지갑 슬롯 확보 여부 확인.
 - **채널**: Pi App > KYC / Mainnet Checklist.
+
+### 🟠 C-1-F. 임시 Bean 토큰 발행·테스트 (A-5) — 공식 침묵 회색지대 → 보수적 제거 방침
+
+- **공식 원문(A-5)**: *"All transactions must be conducted in Pi, with no support for non-Pi Tokens or fiat currencies."*
+- **공식 침묵(2026-06-29 공식문서 직접 확인)**: Pi 등재 요건 문서는 **인앱 포인트·크레딧·보상 시스템, 토큰 발행/민팅을 일절 다루지 않는다**(명시 금지도 허용도 없음). → A-5는 *거래(transactions)* 만 규율.
+- **cafe.pi 사실**:
+  - **현재 Bean = 오프체인 인앱 포인트**(`bean_wlt`·`bean_txn`·`fn_bean_mint`). 블록체인 토큰 아님 — `fn_bean_mint`는 `bean_token_wallet` DB 잔액 +amt + `bean_mint_log` 기록(현금·체인 무관 보조금성 발행). 외부 거래·환전 불가.
+  - 단 ⓐ 명칭이 **"Bean Token"·"토큰 발행/충전/경제"**(ko.json L727·902·1639·1695-6 등), ⓑ 일부 **플랫폼 거래(구독)를 Bean으로** 정산, ⓒ `PRD_12_TOKEN`이 **메인넷 시 Pi Launchpad 온체인 BEAN 토큰 공식 발행** 계획(미발행·Launchpad Mainnet 미출시).
+- **공식 기준 판단**:
+  - **오프체인 포인트로서의 Bean 자체** = 공식 명시 금지 없음 → **"위반"으로 단정 불가**(회색지대). 기술적으로 체인 토큰 발행이 아니므로 A-5 *"non-Pi Tokens"* 직접 해당 어려움.
+  - **그러나 A-5 저촉 *소지***: "Token" 명칭·"발행" 표현은 *"non-Pi Tokens"* 와 충돌하는 **인상**을 주고(심사관은 문구를 본다), Bean으로의 거래는 *"transactions in Pi"* 와 충돌 소지. 공식이 포인트를 안 다루므로 **명칭이 "Token"이면 토큰으로 판정될 위험**을 배제 못 함.
+- **🔵 Pi 직접 질의(보수)**: *"Bean is an off-chain in-app point (a DB balance, not tradable or withdrawable). (a) Does naming it 'Bean Token' or describing a future Launchpad issuance conflict with the no-non-Pi-Token rule? (b) Are in-app reward points that are only spent within the app acceptable if all real transactions settle in Pi?"*
+- **⭐ 마스터 방침(2026-06-29) — "조금의 소지라도 있으면 메인넷에서 제거"**:
+  - **유지**: Bean 포인트 *기능*(보상·적립)과 내부 `fn_bean_mint`(관리자 전용·사용자 미노출)는 유지 — 핵심 기능, 공식 위반 근거 없음.
+  - **메인넷 제거/순화(운영=cafepi에만, staging은 유지)**:
+    1. **표현(P0)**: "Bean Token / 토큰 발행 / 토큰 충전 / 토큰 경제" → "Bean(포인트·크레딧) / 지급 / 적립"으로 순화. 운영 i18n 오버레이(`NEXT_PUBLIC_LISTING_MODE`), 원본 `ko.json`·staging 불변. PRD_23 §3·§8.5.
+    2. **발행 계획 노출 제거**: ko.json L727·902의 "메인넷 시 Bean Token 공식 발행" 문구 비노출. `PRD_12_TOKEN` 계열은 내부 대외비 — 등재 제출물에서 제외.
+    3. **거래는 Pi로**: 플랫폼 거래(구독 등)는 메인넷에서 Pi 결제로 통일(Bean은 보상·적립 한정, 거래 수단 아님). 메모리 `currency-routing-rule` 의 "과도기 Pi" 유지와 일치.
+    4. **테스트 발행 데이터 초기화**: `fn_bean_mint` 테스트 발행분(`bean_mint_log` + 사용자 테스트 Bean 잔액)은 컷오버 직전 초기화(기존 방침 — 메모리 `prod-db-bootstrap-and-supabase-conn`).
+- **채널**: Pi Ecosystem Discord · Developer chat room. (Launchpad는 Pi Browser 'Pi Launchpad' 앱 — Mainnet 미출시라 현재 온체인 발행 불가)
 
 > **공식 문의 채널 요약**: ① **Dev Portal in Pi Browser**(상표 라이선스 신청) ② **Pi Ecosystem Discord**(Core Team 상주, 가장 빠름) ③ **Pi App 내 Developer chat room**(Chat > + 아이콘 > Developer room). *(검색 결과엔 `support.minepi.com` 포털도 있으나 공식 개발자 가이드 본문에는 미기재 — 보조 수단으로만 간주)*
 
