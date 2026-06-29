@@ -66,12 +66,10 @@ export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
   }, [load])
 
   async function subscribe(product: SubscrProduct, grade: SubscrGrade, key: string) {
-    // PI 모드 — Pi Browser 직결제(U2A). BEAN 모드 — 기존 Bean 차감.
-    if (feeMode === 'PI') {
-      subscribeWithPi(product, grade, key)
-      return
-    }
+    // ⭐결제 단위는 서버가 결정한다(클라 feeMode는 stale 가능 → 신뢰 금지).
+    //   서버가 BEAN이면 그 자리에서 Bean 차감, PI면 pay 파라미터를 받아 Pi 직결제로 핸드오프.
     setBusy(key)
+    let piHandoff = false
     try {
       const res = await piFetch('/api/subscriptions/products/subscribe', {
         method: 'POST',
@@ -86,48 +84,48 @@ export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
         const d = (await res.json()) as { error?: string }
         throw new Error(d.error ?? t('subscribeFail'))
       }
+      const data = (await res.json()) as {
+        mode?: string
+        pay?: { amount: number; memo: string; metadata: Record<string, unknown> }
+      }
+      // 서버가 PI 모드로 판정 → Pi 직결제(createPayment). 클라 feeMode와 무관(서버 권위).
+      if (data.mode === 'PI' && data.pay) {
+        piHandoff = true
+        startPiPayment(data.pay, product)
+        return
+      }
+      // BEAN 모드 — 서버에서 Bean 차감 완료
       toast.success(t('subscribeSuccess', { product: t(`product.${product}`) }))
       void load()
     } catch (e) {
       toast.error(e instanceof Error ? e.message : t('subscribeFail'))
     } finally {
-      setBusy(null)
+      if (!piHandoff) setBusy(null) // PI 결제는 createPayment 콜백에서 busy 해제
     }
   }
 
-  // PI 모드 구독 — Pi Browser U2A 직결제(metadata.type='CHAT_SUBSCR').
-  //   금액·구독부여·검증은 모두 서버(/api/payments/complete)가 결정 — 클라 금액은 표시·요청용.
-  function subscribeWithPi(
+  // PI 모드 Pi 직결제 — 서버가 내려준 결제 파라미터로 window.Pi.createPayment 진행.
+  //   금액·구독부여·검증은 모두 서버(/api/payments/complete)가 결정.
+  function startPiPayment(
+    pay: { amount: number; memo: string; metadata: Record<string, unknown> },
     product: SubscrProduct,
-    grade: SubscrGrade,
-    key: string,
   ) {
     if (typeof window === 'undefined' || !window.Pi) {
       toast.error('Pi Browser에서 결제할 수 있습니다')
+      setBusy(null)
       return
     }
-    const plan = findPlan(resp?.plans ?? [], product, grade, cycle)
-    if (!plan) {
-      toast.error(t('subscribeFail'))
-      return
-    }
-    setBusy(key)
     window.Pi.createPayment(
-      {
-        amount: plan.bean_amt / 100, // 1 Pi = 100 Bean
-        // memo는 Pi 결제 호환 위해 ASCII만 사용(™·é 등 특수문자 금지) — 코드값으로 구성
-        memo: `${product} ${grade}/${cycle} subscription`,
-        metadata: { type: 'CHAT_SUBSCR', product, grade, cycle },
-      },
+      { amount: pay.amount, memo: pay.memo, metadata: pay.metadata },
       {
         onReadyForServerApproval: async (paymentId: string) => {
           try {
-            const res = await piFetch('/api/payments/approve', {
+            const r = await piFetch('/api/payments/approve', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ paymentId }),
             })
-            if (!res.ok) throw new Error()
+            if (!r.ok) throw new Error()
           } catch {
             toast.error(t('subscribeFail'))
             setBusy(null)
@@ -135,12 +133,12 @@ export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
         },
         onReadyForServerCompletion: async (paymentId: string, txid: string) => {
           try {
-            const res = await piFetch('/api/payments/complete', {
+            const r = await piFetch('/api/payments/complete', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ paymentId, txid }),
             })
-            if (!res.ok) throw new Error()
+            if (!r.ok) throw new Error()
             toast.success(
               t('subscribeSuccess', { product: t(`product.${product}`) }),
             )
