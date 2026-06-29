@@ -21,14 +21,14 @@ function OpenBridge() {
   const to = /^\/[A-Za-z0-9/_-]*$/.test(raw) ? raw : '/ko/store/my/sales'
 
   useEffect(() => {
-    // pi://<host><path> 로 Pi Browser 앱 열기 시도.
-    // host = Pi 정식 도메인(*.pinet.com) — ⚠️ staging≠운영 다름(env). 미설정 시 현재 도메인 폴백.
-    // env 값에 https:// 나 끝 슬래시가 섞여 들어와도 정규화(pi:// 뒤엔 순수 host만 와야 함).
+    // https://<host><path> 로 Pi Browser 열기 — *.pinet.com은 Pi universal link라
+    // https로 열면 Pi Browser로 연결되고 window.Pi 주입됨(pi:// 스킴 불필요).
+    // host = Pi 정식 도메인 ⚠️ staging≠운영 다름(env). env에 https://·끝슬래시 섞여도 정규화. 미설정 시 현재 도메인 폴백.
     const rawDomain = env.NEXT_PUBLIC_PI_APP_DOMAIN
     const piHost = rawDomain
       ? rawDomain.replace(/^https?:\/\//, '').replace(/\/+$/, '')
       : window.location.host
-    window.location.href = `pi://${piHost}${to}`
+    window.location.href = `https://${piHost}${to}`
     // 일정 시간 내 전환 안 되면(앱 미설치/스킴 미지원) 폴백 노출
     const timer = setTimeout(() => setFallback(true), 1800)
     return () => clearTimeout(timer)
