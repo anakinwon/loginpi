@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
 import { getCurrentPosition } from '@/lib/geo'
 import { ROOM_BOOST_BEAN, ROOM_BOOST_DAYS } from '@/lib/bean-fee'
+import { useMicroFeeLabel } from '@/components/feature-flag-provider'
 
 // 카페 수정 다이얼로그 (방장 OWNER 전용)
 // 공개/비밀 전환 · 비밀방 비밀번호 설정/변경/제거 · 이름 · 설명 · 정원
@@ -36,6 +37,8 @@ export function RoomSettingsDialog({
   const [removePwd, setRemovePwd] = useState(false)
   const [saving, setSaving] = useState(false)
   const [boosting, setBoosting] = useState(false)
+  // PI 모드(메인넷 등재 기간)면 부스트 무료 표시 — 서버 microFeeBean과 일관
+  const boostFeeLabel = useMicroFeeLabel(ROOM_BOOST_BEAN)
   const [gpsCoords, setGpsCoords] = useState<{
     lat: number
     lng: number
@@ -283,7 +286,7 @@ export function RoomSettingsDialog({
             >
               {boosting
                 ? '처리 중…'
-                : `${ROOM_BOOST_DAYS}일 부스트 (${ROOM_BOOST_BEAN} Bean)`}
+                : `${ROOM_BOOST_DAYS}일 부스트 (${boostFeeLabel})`}
             </button>
           </div>
 

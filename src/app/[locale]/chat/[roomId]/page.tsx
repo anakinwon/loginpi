@@ -10,6 +10,7 @@ import {
 } from '@/lib/chat'
 import { getChatPlan } from '@/lib/chat-auth'
 import { getRoomFeeBean } from '@/lib/bean-fee'
+import { microFeeBean } from '@/lib/fee-resolver'
 import { eventEntryFeeBean } from '@/lib/bean-shared'
 import { getBalance } from '@/lib/bean'
 import { ChatRoomPanel } from '@/components/chat/chat-room-panel'
@@ -67,6 +68,8 @@ export default async function ChatRoomPage({ params }: Params) {
         const grade = await resolveRoomGrade(room)
         const plan = await getChatPlan(user.id)
         enterFeeBean = getRoomFeeBean('ENTER', grade, plan.tier !== 'FREE')
+        // PI 모드(메인넷 등재 기간) 마이크로 무료화 — 입장료 면제(서버 join route와 일관)
+        enterFeeBean = await microFeeBean(enterFeeBean)
       }
       if (enterFeeBean > 0) {
         const balance = await getBalance(user.id)

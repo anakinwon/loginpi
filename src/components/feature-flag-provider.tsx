@@ -9,10 +9,13 @@ import { createContext, useContext, type ReactNode } from 'react'
 export interface FeatureFlags {
   /** Pi 시세칩·통화콤보 환율 숫자 노출 여부 — 운영 숨김, staging/dev 노출 */
   showPiValuation: boolean
+  /** 활성 요금제 모드(BEAN|PI) — PI 모드면 마이크로 요금은 "무료"로 표시 (PRD_24 §0) */
+  feeMode: 'BEAN' | 'PI'
 }
 
 const FeatureFlagContext = createContext<FeatureFlags>({
   showPiValuation: false,
+  feeMode: 'BEAN',
 })
 
 export function FeatureFlagProvider({
@@ -31,4 +34,16 @@ export function FeatureFlagProvider({
 
 export function useFeatureFlags(): FeatureFlags {
   return useContext(FeatureFlagContext)
+}
+
+/** 활성 요금제 모드 — PI면 마이크로 요금 무료. 표시용 단축 hook. */
+export function useFeeMode(): 'BEAN' | 'PI' {
+  return useContext(FeatureFlagContext).feeMode
+}
+
+/** 마이크로 요금 라벨 — PI 모드면 '무료', 아니면 'N Bean'. (표시 전용, 실제 차감은 서버 microFeeBean) */
+export function useMicroFeeLabel(beanAmt: number): string {
+  return useContext(FeatureFlagContext).feeMode === 'PI'
+    ? '무료'
+    : `${beanAmt} Bean`
 }

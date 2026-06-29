@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
 import { BADGE_UPGRADE_BEAN } from '@/lib/bean-fee'
+import { useMicroFeeLabel } from '@/components/feature-flag-provider'
 
 // TASK-062 Trigger 7: 활동 배지 강화 팝업
 // 배지 자동 수여 시 축하 + "배지 강화 10 Bean" 단건 구매 유도
@@ -29,6 +30,8 @@ export function BadgeAwardPopup({
 }: BadgeAwardPopupProps) {
   const [paying, setPaying] = useState(false)
   const router = useRouter()
+  // PI 모드(메인넷 등재 기간)면 배지 강화 무료 — 서버 microFeeBean과 일관된 표시
+  const feeLabel = useMicroFeeLabel(BADGE_UPGRADE_BEAN)
 
   if (!badge) return null
 
@@ -98,13 +101,7 @@ export function BadgeAwardPopup({
             disabled={paying}
             className="bg-primary text-primary-foreground w-full rounded-xl px-4 py-2.5 text-sm font-medium transition-opacity hover:opacity-90 disabled:opacity-50"
           >
-            {paying ? (
-              '결제 진행 중…'
-            ) : (
-              <>
-                ☕ {BADGE_UPGRADE_BEAN} Bean 배지 강화
-              </>
-            )}
+            {paying ? '처리 중…' : <>☕ {feeLabel} 배지 강화</>}
           </button>
           <button
             onClick={onClose}
