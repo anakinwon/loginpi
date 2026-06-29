@@ -62,12 +62,22 @@ export async function GET(request: NextRequest) {
     .eq('del_yn', 'N')
   if (shopErr) {
     console.error('[cron/campaign-grant-all] 매장 조회 실패:', shopErr)
-    return NextResponse.json({ ok: false, error: shopErr.message }, { status: 500 })
+    return NextResponse.json(
+      { ok: false, error: shopErr.message },
+      { status: 500 },
+    )
   }
-  const sellerIds = [...new Set((shops ?? []).map(s => s.seller_id))]
+  const sellerIds = [...new Set((shops ?? []).map((s) => s.seller_id))]
   if (!sellerIds.length) {
     await logBatchRun('CRON', start, 0, 0, 0, 0, 'SYSTEM')
-    return NextResponse.json({ ok: true, campaign: CAMPAIGN_CD, eligible: 0, granted: 0, already: 0, failed: 0 })
+    return NextResponse.json({
+      ok: true,
+      campaign: CAMPAIGN_CD,
+      eligible: 0,
+      granted: 0,
+      already: 0,
+      failed: 0,
+    })
   }
 
   let granted = 0
@@ -90,11 +100,14 @@ export async function GET(request: NextRequest) {
       }
 
       // 2단계: 승인·지급 (REWARD_POOL → USER). 이미 APPROVED면 NOT_PENDING
-      const { data: approveData, error: approveErr } = await db.rpc('fn_bean_campaign_approve', {
-        p_usr_id: uid,
-        p_campaign_cd: CAMPAIGN_CD,
-        p_admin_id: 'CRON',
-      })
+      const { data: approveData, error: approveErr } = await db.rpc(
+        'fn_bean_campaign_approve',
+        {
+          p_usr_id: uid,
+          p_campaign_cd: CAMPAIGN_CD,
+          p_admin_id: 'CRON',
+        },
+      )
       if (approveErr) {
         failed++
         errors.push(`${uid}:${approveErr.message}`)
@@ -102,7 +115,8 @@ export async function GET(request: NextRequest) {
       }
       const approveStatus = (approveData as { status?: string } | null)?.status
       if (approveStatus === 'APPROVED') granted++
-      else if (approveStatus === 'NOT_PENDING') already++ // 이미 승인됨 — 이중지급 차단
+      else if (approveStatus === 'NOT_PENDING')
+        already++ // 이미 승인됨 — 이중지급 차단
       else {
         // SOLD_OUT / INSUFFICIENT_POOL → 재원·한도 문제, 오류로 기록
         failed++
@@ -114,7 +128,15 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  await logBatchRun('CRON', start, sellerIds.length, granted, already, failed, 'SYSTEM')
+  await logBatchRun(
+    'CRON',
+    start,
+    sellerIds.length,
+    granted,
+    already,
+    failed,
+    'SYSTEM',
+  )
   console.log(
     `[cron/campaign-grant-all] sellers=${sellerIds.length} granted=${granted} already=${already} notEligible=${notEligible} failed=${failed}`,
   )

@@ -41,7 +41,8 @@ let lastCleanup = Date.now()
 function cleanup(now: number) {
   if (now - lastCleanup < CLEANUP_INTERVAL_MS) return
   for (const [key, b] of buckets) {
-    if (now > b.blockedUntil && now - b.windowStart > 120_000) buckets.delete(key)
+    if (now > b.blockedUntil && now - b.windowStart > 120_000)
+      buckets.delete(key)
   }
   lastCleanup = now
 }
@@ -56,11 +57,19 @@ export function checkRateLimit(
 
   const p = RATE_POLICY[policy]
   const key = `${policy}:${ip}`
-  const bucket = buckets.get(key) ?? { count: 0, windowStart: now, blockedUntil: 0 }
+  const bucket = buckets.get(key) ?? {
+    count: 0,
+    windowStart: now,
+    blockedUntil: 0,
+  }
 
   // 차단 중
   if (now < bucket.blockedUntil) {
-    return { allowed: false, remaining: 0, retryAfter: Math.ceil((bucket.blockedUntil - now) / 1000) }
+    return {
+      allowed: false,
+      remaining: 0,
+      retryAfter: Math.ceil((bucket.blockedUntil - now) / 1000),
+    }
   }
 
   // 윈도우 만료 → 리셋
@@ -75,7 +84,11 @@ export function checkRateLimit(
 
   if (bucket.count > p.limit) {
     bucket.blockedUntil = now + p.blockMs
-    return { allowed: false, remaining: 0, retryAfter: Math.ceil(p.blockMs / 1000) }
+    return {
+      allowed: false,
+      remaining: 0,
+      retryAfter: Math.ceil(p.blockMs / 1000),
+    }
   }
 
   return { allowed: true, remaining: p.limit - bucket.count, retryAfter: 0 }
@@ -107,7 +120,11 @@ export function getClientIp(req: NextRequest): string {
 // ── 경로 → 정책 매핑 ────────────────────────────────────────────────────────
 export function getPolicyForPath(pathname: string): PolicyKey {
   if (pathname.startsWith('/api/auth/')) return 'AUTH'
-  if (pathname.startsWith('/api/payments/') || pathname.startsWith('/api/tips/')) return 'PAYMENT'
+  if (
+    pathname.startsWith('/api/payments/') ||
+    pathname.startsWith('/api/tips/')
+  )
+    return 'PAYMENT'
   if (pathname.startsWith('/api/admin/')) return 'ADMIN'
   if (pathname.startsWith('/api/campaign/')) return 'CAMPAIGN'
   if (pathname.startsWith('/api/chat/')) return 'CHAT'
@@ -168,11 +185,8 @@ export function rateLimitedResponse(retryAfter: number): NextResponse {
 }
 
 export function forbiddenResponse(reason: string): NextResponse {
-  return new NextResponse(
-    JSON.stringify({ error: 'forbidden', reason }),
-    {
-      status: 403,
-      headers: { 'Content-Type': 'application/json', ...SECURITY_HEADERS },
-    },
-  )
+  return new NextResponse(JSON.stringify({ error: 'forbidden', reason }), {
+    status: 403,
+    headers: { 'Content-Type': 'application/json', ...SECURITY_HEADERS },
+  })
 }

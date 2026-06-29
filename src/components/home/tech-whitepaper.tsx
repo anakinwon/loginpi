@@ -21,7 +21,7 @@ export function TechWhitepaper() {
   const [open, setOpen] = useState(false)
 
   return (
-    <section className="overflow-hidden rounded-2xl border bg-white shadow-sm dark:bg-card">
+    <section className="dark:bg-card overflow-hidden rounded-2xl border bg-white shadow-sm">
       {/* 헤더 (토글) */}
       <button
         type="button"
@@ -36,7 +36,9 @@ export function TechWhitepaper() {
           <span className="text-sm font-bold sm:text-base">{t('title')}</span>
         </span>
         <span className="text-muted-foreground flex shrink-0 items-center gap-1 text-xs">
-          <span className="hidden sm:inline">{open ? t('collapse') : t('expand')}</span>
+          <span className="hidden sm:inline">
+            {open ? t('collapse') : t('expand')}
+          </span>
           <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -45,7 +47,11 @@ export function TechWhitepaper() {
             className={`h-4 w-4 transition-transform ${open ? 'rotate-180' : ''}`}
             aria-hidden="true"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" d="m6 9 6 6 6-6" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="m6 9 6 6 6-6"
+            />
           </svg>
         </span>
       </button>
@@ -53,7 +59,9 @@ export function TechWhitepaper() {
       {/* 본문 (펼침 시) */}
       {open && (
         <div className="space-y-4 border-t px-5 py-4">
-          <p className="text-muted-foreground text-sm leading-relaxed">{t('intro')}</p>
+          <p className="text-muted-foreground text-sm leading-relaxed">
+            {t('intro')}
+          </p>
 
           <ul className="grid gap-3 sm:grid-cols-2">
             {PILLARS.map((p) => (

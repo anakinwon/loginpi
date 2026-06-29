@@ -24,7 +24,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             .eq('id', token.userId as string)
             .eq('del_yn', 'N')
             .maybeSingle()
-          token.hasPiAccount = !!(data as { pi_uid: string | null } | null)?.pi_uid
+          token.hasPiAccount = !!(data as { pi_uid: string | null } | null)
+            ?.pi_uid
         } catch {
           // 갱신 실패 시 기존 값 유지
         }
@@ -45,7 +46,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           //  2) 실패 시 google_id(sub)로 폴백.
           // ⚠️ 과거 버그: google_id에 sub가 아닌 UUID가 저장되면 1차(sub) 매칭 실패→빈 새 계정 생성→
           //    카페 등 데이터가 사라져 보임. 아래 이메일 우선 매칭 + sub 자가치유로 해소.
-          let matched: { id: string; google_id: string | null; pi_uid: string | null } | null = null
+          let matched: {
+            id: string
+            google_id: string | null
+            pi_uid: string | null
+          } | null = null
 
           if (email && emailVerified) {
             const { data: candidates } = await db
@@ -80,7 +85,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               .eq('google_id', sub)
               .eq('del_yn', 'N')
               .maybeSingle()
-            matched = (byId as { id: string; google_id: string | null; pi_uid: string | null } | null) ?? null
+            matched =
+              (byId as {
+                id: string
+                google_id: string | null
+                pi_uid: string | null
+              } | null) ?? null
           }
 
           if (matched) {

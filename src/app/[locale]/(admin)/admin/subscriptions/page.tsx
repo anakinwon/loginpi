@@ -146,9 +146,10 @@ export default function SubscriptionsPage() {
         <h1 className="text-2xl font-bold">{t('title')}</h1>
         <p className="text-muted-foreground mt-1 text-sm">
           전체 {allRows.length}건 · PyCafé™{' '}
-          {allRows.filter((r) => r.prod_ctgr_cd === 'PICAFE').length}건 · PyShop™{' '}
-          {allRows.filter((r) => r.prod_ctgr_cd === 'PISHOP').length}건 · 번역{' '}
-          {allRows.filter((r) => r.prod_ctgr_cd === 'TRANSLATE').length}건
+          {allRows.filter((r) => r.prod_ctgr_cd === 'PICAFE').length}건 ·
+          PyShop™ {allRows.filter((r) => r.prod_ctgr_cd === 'PISHOP').length}건
+          · 번역 {allRows.filter((r) => r.prod_ctgr_cd === 'TRANSLATE').length}
+          건
         </p>
       </div>
 

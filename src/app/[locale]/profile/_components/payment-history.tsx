@@ -71,7 +71,9 @@ export function PaymentHistory() {
                   : 'bg-yellow-100 text-yellow-700',
               ].join(' ')}
             >
-              {STATUS_KEYS.has(p.status) ? t(`payment.status.${p.status}`) : p.status}
+              {STATUS_KEYS.has(p.status)
+                ? t(`payment.status.${p.status}`)
+                : p.status}
             </span>
             <span className="text-sm font-semibold">{p.amount} π</span>
           </div>

@@ -24,7 +24,8 @@ const COLS: { key: string; label: string }[] = [
 ]
 
 function Cell({ v }: { v: string | null }) {
-  if (v === 'Y') return <span className="text-green-600 dark:text-green-400">✓</span>
+  if (v === 'Y')
+    return <span className="text-green-600 dark:text-green-400">✓</span>
   if (v === 'N') return <span className="text-red-500">✕</span>
   return <span className="text-muted-foreground">—</span>
 }

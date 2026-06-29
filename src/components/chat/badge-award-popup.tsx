@@ -42,7 +42,10 @@ export function BadgeAwardPopup({
       const res = await piFetch('/api/badges/upgrade', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ badge_id: badge.badge_id, theme_cd: badge.theme_cd }),
+        body: JSON.stringify({
+          badge_id: badge.badge_id,
+          theme_cd: badge.theme_cd,
+        }),
       })
 
       if (res.ok) {

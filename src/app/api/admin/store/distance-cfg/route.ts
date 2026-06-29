@@ -37,15 +37,19 @@ export async function POST(req: NextRequest) {
       { status: 400 },
     )
 
-  const { error } = await getSupabaseAdmin().from('mps_dist_cfg').insert({
-    max_dist_km: km,
-    note_txt: typeof note_txt === 'string' && note_txt.trim() ? note_txt.trim() : null,
-    modr_id: user.id,
-    regr_id: user.id,
-  })
+  const { error } = await getSupabaseAdmin()
+    .from('mps_dist_cfg')
+    .insert({
+      max_dist_km: km,
+      note_txt:
+        typeof note_txt === 'string' && note_txt.trim()
+          ? note_txt.trim()
+          : null,
+      modr_id: user.id,
+      regr_id: user.id,
+    })
 
-  if (error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   revalidateTag('mps-dist-cfg', {})
   return NextResponse.json({ ok: true, max_dist_km: km })

@@ -93,7 +93,9 @@ export function AnalyticsHub() {
             unit={t('common.uPerson')}
           />
         </div>
-        <p className="text-muted-foreground mt-2 text-xs">{t('northStar.note')}</p>
+        <p className="text-muted-foreground mt-2 text-xs">
+          {t('northStar.note')}
+        </p>
       </div>
 
       {/* 탭 네비 — 활성 탭을 채운 pill로 강조(선택 구분 명확) */}

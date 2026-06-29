@@ -107,7 +107,13 @@ export default function BubbleChart({ items }: { items: BubbleItem[] }) {
             <stop offset="100%" stopColor="#000" stopOpacity="0.28" />
           </radialGradient>
           {/* 부유 그림자 — 입체 분리감 */}
-          <filter id="bubbleShadow" x="-30%" y="-30%" width="160%" height="160%">
+          <filter
+            id="bubbleShadow"
+            x="-30%"
+            y="-30%"
+            width="160%"
+            height="160%"
+          >
             <feDropShadow
               dx="0"
               dy="1.2"

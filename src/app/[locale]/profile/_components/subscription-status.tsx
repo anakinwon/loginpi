@@ -18,8 +18,7 @@ interface Subscription {
 // 상품군별 배지 색상
 const PROD_STYLE: Record<string, string> = {
   PICAFE: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
-  TRANSLATE:
-    'bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300',
+  TRANSLATE: 'bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300',
   PISHOP:
     'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300',
   PISHOP_SUBSCR:

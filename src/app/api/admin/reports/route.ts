@@ -59,7 +59,10 @@ export async function GET(req: NextRequest) {
       nick_nm: string | null
       display_name: string | null
     }[]) {
-      nameMap.set(u.id, u.nick_nm || u.display_name || u.pi_username || u.id.slice(0, 8))
+      nameMap.set(
+        u.id,
+        u.nick_nm || u.display_name || u.pi_username || u.id.slice(0, 8),
+      )
     }
   }
 
@@ -87,9 +90,13 @@ export async function PATCH(req: NextRequest) {
     status_cd?: string
     admin_memo?: string
   }
-  if (!rpt_id) return NextResponse.json({ error: 'rpt_id 필요' }, { status: 400 })
+  if (!rpt_id)
+    return NextResponse.json({ error: 'rpt_id 필요' }, { status: 400 })
 
-  const patch: Record<string, unknown> = { modr_id: user!.id, mod_dtm: new Date().toISOString() }
+  const patch: Record<string, unknown> = {
+    modr_id: user!.id,
+    mod_dtm: new Date().toISOString(),
+  }
   if (status_cd !== undefined) {
     if (!STATUS.includes(status_cd)) {
       return NextResponse.json({ error: '유효하지 않은 상태' }, { status: 400 })
@@ -100,7 +107,8 @@ export async function PATCH(req: NextRequest) {
       patch.resolved_dtm = new Date().toISOString()
     }
   }
-  if (admin_memo !== undefined) patch.admin_memo = String(admin_memo).slice(0, 1000) || null
+  if (admin_memo !== undefined)
+    patch.admin_memo = String(admin_memo).slice(0, 1000) || null
 
   const { data, error } = await getSupabaseAdmin()
     .from('rpt_report')
@@ -109,6 +117,7 @@ export async function PATCH(req: NextRequest) {
     .eq('del_yn', 'N')
     .select('rpt_id, status_cd, admin_memo')
     .maybeSingle()
-  if (error || !data) return NextResponse.json({ error: '저장 실패' }, { status: 500 })
+  if (error || !data)
+    return NextResponse.json({ error: '저장 실패' }, { status: 500 })
   return NextResponse.json({ item: data })
 }

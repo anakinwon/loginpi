@@ -67,11 +67,18 @@ export function TranslateStatsSection({ period }: { period: number }) {
             retried.current = true
             await signIn({ silent: true })
             if (cancelled) return
-            const retry = await piFetch(`/api/admin/stats/translate?period=${period}`)
-            if (retry.status === 401) throw new Error('세션 만료 — 다시 로그인하세요 (HTTP 401)')
-            if (!retry.ok) throw new Error(`번역 통계 조회 실패 (HTTP ${retry.status})`)
+            const retry = await piFetch(
+              `/api/admin/stats/translate?period=${period}`,
+            )
+            if (retry.status === 401)
+              throw new Error('세션 만료 — 다시 로그인하세요 (HTTP 401)')
+            if (!retry.ok)
+              throw new Error(`번역 통계 조회 실패 (HTTP ${retry.status})`)
             const retryBody = (await retry.json()) as TranslateStatsResponse
-            if (!cancelled) { setData(retryBody); writeCache(cacheKey, retryBody) }
+            if (!cancelled) {
+              setData(retryBody)
+              writeCache(cacheKey, retryBody)
+            }
             return
           }
           throw new Error('세션 만료 — 다시 로그인하세요 (HTTP 401)')
@@ -91,7 +98,7 @@ export function TranslateStatsSection({ period }: { period: number }) {
     return () => {
       cancelled = true
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [period, authLoading])
 
   if (error) {

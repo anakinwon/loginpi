@@ -7,8 +7,19 @@ export const CONSENT_VER = '2026-06-24'
 
 // AGE14 = 만 14세 이상(또는 법정대리인 동의로 통과) · GUARDIAN = 만 14세 미만 법정대리인 동의
 // LBS = 위치기반서비스 이용·위치정보 수집·이용 동의(가까운 카페/매장/거리순에 필수)
-export type ConsentType = 'TERMS' | 'PRIVACY' | 'MKT' | 'AGE14' | 'GUARDIAN' | 'LBS'
-export const REQUIRED_CONSENTS: ConsentType[] = ['TERMS', 'PRIVACY', 'AGE14', 'LBS']
+export type ConsentType =
+  | 'TERMS'
+  | 'PRIVACY'
+  | 'MKT'
+  | 'AGE14'
+  | 'GUARDIAN'
+  | 'LBS'
+export const REQUIRED_CONSENTS: ConsentType[] = [
+  'TERMS',
+  'PRIVACY',
+  'AGE14',
+  'LBS',
+]
 export const MIN_AGE = 14
 // 위치 동의 약관 버전 — 기존 LBS 라우트(/api/location/consent)와 동일해야 캐시·재동의 판단 일치
 export const LBS_CONSENT_VER = 'v1.0'
@@ -19,7 +30,8 @@ export function calcAge(birth: string, now: Date = new Date()): number | null {
   if (!m) return null
   const [y, mo, d] = [Number(m[1]), Number(m[2]), Number(m[3])]
   const bd = new Date(y, mo - 1, d)
-  if (bd.getFullYear() !== y || bd.getMonth() !== mo - 1 || bd.getDate() !== d) return null
+  if (bd.getFullYear() !== y || bd.getMonth() !== mo - 1 || bd.getDate() !== d)
+    return null
   if (bd.getTime() > now.getTime()) return null // 미래 생년월일 거부
   let age = now.getFullYear() - y
   const mDiff = now.getMonth() - (mo - 1)
@@ -40,8 +52,12 @@ export async function getUserConsents(
     .order('reg_dtm', { ascending: false })
 
   const latest: Record<string, boolean> = {}
-  for (const r of (data ?? []) as { consent_tp_cd: string; consent_yn: string }[]) {
-    if (!(r.consent_tp_cd in latest)) latest[r.consent_tp_cd] = r.consent_yn === 'Y'
+  for (const r of (data ?? []) as {
+    consent_tp_cd: string
+    consent_yn: string
+  }[]) {
+    if (!(r.consent_tp_cd in latest))
+      latest[r.consent_tp_cd] = r.consent_yn === 'Y'
   }
   return latest
 }
@@ -62,7 +78,9 @@ export async function recordConsents(
     regr_id: userId,
     modr_id: userId,
   }))
-  const { error } = await getSupabaseAdmin().from('sys_user_consent').insert(rows)
+  const { error } = await getSupabaseAdmin()
+    .from('sys_user_consent')
+    .insert(rows)
   if (error) return { ok: false, error: error.message }
   return { ok: true }
 }

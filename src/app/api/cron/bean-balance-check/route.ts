@@ -77,7 +77,9 @@ export async function GET(request: NextRequest) {
           `diff = <b>${r.diff.toLocaleString()}</b>\n` +
           `발행 ${r.issued.toLocaleString()} = 유통 ${r.circulating.toLocaleString()} + 회수 ${r.collected.toLocaleString()} 위반\n` +
           `즉시 점검 필요 (/admin/token)`,
-      ).catch((e) => console.error('[bean-balance-check] 텔레그램 경보 실패:', e))
+      ).catch((e) =>
+        console.error('[bean-balance-check] 텔레그램 경보 실패:', e),
+      )
     }
   }
 

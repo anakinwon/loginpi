@@ -28,12 +28,21 @@ async function uploadFromUrl(srcUrl, itemId, label) {
   const res = await fetch(srcUrl, {
     headers: { 'User-Agent': 'Mozilla/5.0 (compatible; cafe-pi-bot/1.0)' },
   })
-  if (!res.ok) throw new Error(`이미지 fetch 실패: ${res.status} ${res.statusText}`)
+  if (!res.ok)
+    throw new Error(`이미지 fetch 실패: ${res.status} ${res.statusText}`)
 
   const ct = res.headers.get('content-type') ?? 'image/jpeg'
-  const ext = ct.includes('png') ? 'png' : ct.includes('gif') ? 'gif' : ct.includes('webp') ? 'webp' : 'jpg'
+  const ext = ct.includes('png')
+    ? 'png'
+    : ct.includes('gif')
+      ? 'gif'
+      : ct.includes('webp')
+        ? 'webp'
+        : 'jpg'
   const buf = await res.arrayBuffer()
-  console.log(`  [${label}] 업로드 중 (${Math.round(buf.byteLength / 1024)} KB, ${ext})`)
+  console.log(
+    `  [${label}] 업로드 중 (${Math.round(buf.byteLength / 1024)} KB, ${ext})`,
+  )
 
   const path = `admin-backfill/${itemId}_thumb.${ext}`
   const { error } = await supabase.storage.from(BUCKET).upload(path, buf, {
@@ -83,7 +92,8 @@ async function main() {
         img_url: publicUrl,
         sort_ord: 1,
       })
-      if (imgErr) console.warn(`  ⚠ mps_item_img 추가 실패 (무시): ${imgErr.message}`)
+      if (imgErr)
+        console.warn(`  ⚠ mps_item_img 추가 실패 (무시): ${imgErr.message}`)
 
       console.log(`  ✓ 완료`)
     } catch (e) {
@@ -93,4 +103,7 @@ async function main() {
   console.log('\n전체 완료')
 }
 
-main().catch((e) => { console.error(e); process.exit(1) })
+main().catch((e) => {
+  console.error(e)
+  process.exit(1)
+})

@@ -184,8 +184,8 @@ export function ClientChatRoom({ roomId }: { roomId: string }) {
           beanConfirm.balance >= beanConfirm.feeBean ? (
             <>
               <p>
-                <BeanIcon className="inline-block h-4 w-4 align-text-bottom" /> 이
-                카페 입장에는{' '}
+                <BeanIcon className="inline-block h-4 w-4 align-text-bottom" />{' '}
+                이 카페 입장에는{' '}
                 <b className="text-primary">{beanConfirm.feeBean} Bean</b>이
                 소진됩니다
               </p>

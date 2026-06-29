@@ -40,7 +40,8 @@ export function ConsentDialog({ onAgreed }: Props) {
   const isMinor = age !== null && age < 14
 
   const allChecked = terms && privacy && lbs && marketing
-  const requiredOk = terms && privacy && lbs && birthValid && (!isMinor || guardian)
+  const requiredOk =
+    terms && privacy && lbs && birthValid && (!isMinor || guardian)
 
   function toggleAll() {
     const next = !allChecked
@@ -57,7 +58,14 @@ export function ConsentDialog({ onAgreed }: Props) {
       const res = await piFetch('/api/consent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ terms, privacy, lbs, marketing, birth, guardian }),
+        body: JSON.stringify({
+          terms,
+          privacy,
+          lbs,
+          marketing,
+          birth,
+          guardian,
+        }),
       })
       if (!res.ok) {
         const d = (await res.json().catch(() => ({}))) as { error?: string }
@@ -76,12 +84,15 @@ export function ConsentDialog({ onAgreed }: Props) {
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-0 sm:items-center sm:p-4">
       <div className="bg-background w-full max-w-md rounded-t-2xl p-5 shadow-xl sm:rounded-2xl">
         <h2 className="text-base font-bold">{t('title')}</h2>
-        <p className="text-muted-foreground mt-1 text-xs leading-relaxed">{t('desc')}</p>
+        <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
+          {t('desc')}
+        </p>
 
         {/* 생년월일 (연령 게이트) */}
         <div className="mt-4">
           <label className="text-sm font-medium">
-            {t('birthLabel')} <span className="text-primary">{t('required')}</span>
+            {t('birthLabel')}{' '}
+            <span className="text-primary">{t('required')}</span>
           </label>
           <input
             type="date"
@@ -103,7 +114,9 @@ export function ConsentDialog({ onAgreed }: Props) {
             >
               <Check checked={guardian} />
               <span className="text-xs leading-relaxed">
-                <span className="text-primary font-medium">{t('required')}</span>{' '}
+                <span className="text-primary font-medium">
+                  {t('required')}
+                </span>{' '}
                 {t('guardian')}
               </span>
             </button>
@@ -166,7 +179,9 @@ export function ConsentDialog({ onAgreed }: Props) {
         >
           {saving ? t('processing') : t('submit')}
         </button>
-        <p className="text-muted-foreground mt-2 text-center text-[11px]">{t('note')}</p>
+        <p className="text-muted-foreground mt-2 text-center text-[11px]">
+          {t('note')}
+        </p>
       </div>
     </div>
   )
@@ -198,7 +213,11 @@ function Row({
       >
         <Check checked={checked} />
         <span className="text-sm">
-          <span className={required ? 'text-primary font-medium' : 'text-muted-foreground'}>
+          <span
+            className={
+              required ? 'text-primary font-medium' : 'text-muted-foreground'
+            }
+          >
             {tag}
           </span>{' '}
           {label}

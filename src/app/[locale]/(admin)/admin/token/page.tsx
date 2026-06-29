@@ -147,7 +147,9 @@ function RewardBreakdownBox({ kpi }: { kpi: TokenKpi }) {
               key={item.label}
               className="flex items-baseline justify-between gap-2 py-0.5 pl-3"
             >
-              <span className="text-muted-foreground text-xs">{item.label}</span>
+              <span className="text-muted-foreground text-xs">
+                {item.label}
+              </span>
               <span className="text-xs font-medium tabular-nums">
                 {item.bean.toLocaleString()}
                 <span className="text-muted-foreground ml-1">
@@ -158,9 +160,7 @@ function RewardBreakdownBox({ kpi }: { kpi: TokenKpi }) {
           ))}
         </div>
       ) : (
-        <p className="text-muted-foreground mt-0.5 text-xs">
-          REWARD 거래 없음
-        </p>
+        <p className="text-muted-foreground mt-0.5 text-xs">REWARD 거래 없음</p>
       )}
       <p className="text-muted-foreground mt-1 text-xs">
         mint로 재원 확보 후 사용자에게 지급된 Bean
@@ -227,8 +227,8 @@ function BalanceSheet({
             />
           </div>
           <p className="text-muted-foreground mt-1.5 text-xs">
-            충전(Pi 결제) + 보상·프로모션(mint) 합계. 이 중 보상 지급 누계는 아래
-            참조
+            충전(Pi 결제) + 보상·프로모션(mint) 합계. 이 중 보상 지급 누계는
+            아래 참조
           </p>
           {/* 보상 지급 누계 (REWARD) — 이벤트/캠페인별 세부 분해 */}
           <RewardBreakdownBox kpi={kpi} />

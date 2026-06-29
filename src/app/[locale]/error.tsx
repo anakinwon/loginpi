@@ -32,7 +32,10 @@ export default function LocaleError({
         >
           {t('retry')}
         </button>
-        <Link href="/" className="hover:bg-muted rounded-lg border px-4 py-2 text-sm">
+        <Link
+          href="/"
+          className="hover:bg-muted rounded-lg border px-4 py-2 text-sm"
+        >
           {t('home')}
         </Link>
       </div>

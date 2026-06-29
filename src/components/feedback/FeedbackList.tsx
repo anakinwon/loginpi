@@ -25,10 +25,19 @@ interface FeedbackListProps {
   currentUsrId?: string | null
 }
 
-export function FeedbackList({ shopId, orderId, itemId, currentUsrId }: FeedbackListProps) {
+export function FeedbackList({
+  shopId,
+  orderId,
+  itemId,
+  currentUsrId,
+}: FeedbackListProps) {
   const [items, setItems] = useState<FeedbackCardData[]>([])
   const [stats, setStats] = useState<Stats | null>(null)
-  const [pagination, setPagination] = useState<Pagination>({ page: 1, limit: 20, total: 0 })
+  const [pagination, setPagination] = useState<Pagination>({
+    page: 1,
+    limit: 20,
+    total: 0,
+  })
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [successMsg, setSuccessMsg] = useState('')
@@ -82,28 +91,37 @@ export function FeedbackList({ shopId, orderId, itemId, currentUsrId }: Feedback
     <div className="flex flex-col gap-4">
       {/* 별점 통계 헤더 */}
       {stats && (
-        <div className="rounded-lg bg-muted/50 p-4 flex flex-col gap-2">
+        <div className="bg-muted/50 flex flex-col gap-2 rounded-lg p-4">
           <div className="flex items-center gap-3">
-            <span className="text-3xl font-bold">{stats.avg_score.toFixed(1)}</span>
+            <span className="text-3xl font-bold">
+              {stats.avg_score.toFixed(1)}
+            </span>
             <div className="flex flex-col gap-0.5">
-              <StarRating value={Math.round(stats.avg_score)} readonly size="sm" />
-              <span className="text-xs text-muted-foreground">총 {stats.total_count}개 후기</span>
+              <StarRating
+                value={Math.round(stats.avg_score)}
+                readonly
+                size="sm"
+              />
+              <span className="text-muted-foreground text-xs">
+                총 {stats.total_count}개 후기
+              </span>
             </div>
           </div>
           <div className="flex flex-col gap-1">
             {[5, 4, 3, 2, 1].map((s) => {
               const cnt = stats.score_dist[s] ?? 0
-              const pct = stats.total_count > 0 ? (cnt / stats.total_count) * 100 : 0
+              const pct =
+                stats.total_count > 0 ? (cnt / stats.total_count) * 100 : 0
               return (
                 <div key={s} className="flex items-center gap-2 text-xs">
                   <span className="w-4 text-right">{s}★</span>
-                  <div className="flex-1 h-1.5 rounded-full bg-border overflow-hidden">
+                  <div className="bg-border h-1.5 flex-1 overflow-hidden rounded-full">
                     <div
                       className="h-full rounded-full bg-amber-400 transition-all"
                       style={{ width: `${pct}%` }}
                     />
                   </div>
-                  <span className="w-8 text-muted-foreground">{cnt}</span>
+                  <span className="text-muted-foreground w-8">{cnt}</span>
                 </div>
               )
             })}
@@ -116,14 +134,14 @@ export function FeedbackList({ shopId, orderId, itemId, currentUsrId }: Feedback
         <button
           type="button"
           onClick={() => setShowForm(true)}
-          className="rounded-md border border-dashed border-border py-3 text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+          className="border-border text-muted-foreground hover:bg-accent hover:text-foreground rounded-md border border-dashed py-3 text-sm transition-colors"
         >
           + 후기 작성하기
         </button>
       )}
 
       {showForm && (
-        <div className="rounded-lg border border-border bg-card">
+        <div className="border-border bg-card rounded-lg border">
           <FeedbackForm
             shopId={shopId}
             orderId={orderId}
@@ -141,9 +159,13 @@ export function FeedbackList({ shopId, orderId, itemId, currentUsrId }: Feedback
 
       {/* 목록 */}
       {loading ? (
-        <div className="text-center py-8 text-muted-foreground text-sm">로딩 중…</div>
+        <div className="text-muted-foreground py-8 text-center text-sm">
+          로딩 중…
+        </div>
       ) : items.length === 0 ? (
-        <div className="text-center py-8 text-muted-foreground text-sm">아직 후기가 없습니다.</div>
+        <div className="text-muted-foreground py-8 text-center text-sm">
+          아직 후기가 없습니다.
+        </div>
       ) : (
         <div className="flex flex-col gap-3">
           {items.map((item) => (
@@ -166,10 +188,10 @@ export function FeedbackList({ shopId, orderId, itemId, currentUsrId }: Feedback
               type="button"
               onClick={() => fetchList(p)}
               className={[
-                'px-3 py-1 rounded text-sm',
+                'rounded px-3 py-1 text-sm',
                 p === pagination.page
                   ? 'bg-primary text-primary-foreground'
-                  : 'border border-border hover:bg-accent',
+                  : 'border-border hover:bg-accent border',
               ].join(' ')}
             >
               {p}

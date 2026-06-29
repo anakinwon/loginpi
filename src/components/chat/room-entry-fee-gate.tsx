@@ -44,7 +44,11 @@ export function RoomEntryFeeGate({
         balance?: number
       }
       // 경합 등으로 잔액 부족 판정 → 최신 잔액 반영 후 충전 안내로 전환
-      if (res.status === 402 && d.requiresBean && typeof d.balance === 'number') {
+      if (
+        res.status === 402 &&
+        d.requiresBean &&
+        typeof d.balance === 'number'
+      ) {
         setBal(d.balance)
       }
       setJoining(false)
@@ -59,9 +63,9 @@ export function RoomEntryFeeGate({
       {insufficient ? (
         <>
           <p>
-            <BeanIcon className="inline-block h-4 w-4 align-text-bottom" /> 입장에{' '}
-            <b className="text-primary">{feeBean} Bean</b>이 필요하지만 잔액이
-            부족합니다
+            <BeanIcon className="inline-block h-4 w-4 align-text-bottom" />{' '}
+            입장에 <b className="text-primary">{feeBean} Bean</b>이 필요하지만
+            잔액이 부족합니다
           </p>
           <p className="text-xs">현재 잔액 {bal} Bean</p>
           <Link
@@ -74,8 +78,9 @@ export function RoomEntryFeeGate({
       ) : (
         <>
           <p>
-            <BeanIcon className="inline-block h-4 w-4 align-text-bottom" /> 이 카페
-            입장에는 <b className="text-primary">{feeBean} Bean</b>이 소진됩니다
+            <BeanIcon className="inline-block h-4 w-4 align-text-bottom" /> 이
+            카페 입장에는 <b className="text-primary">{feeBean} Bean</b>이
+            소진됩니다
           </p>
           <p className="text-xs">
             현재 잔액 {bal} Bean → 입장 후 {bal - feeBean} Bean

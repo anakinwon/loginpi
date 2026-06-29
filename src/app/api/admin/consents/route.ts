@@ -39,7 +39,9 @@ export async function GET(req: NextRequest) {
     const { data: us } = await db
       .from('sys_user')
       .select('id')
-      .or(`pi_username.ilike.%${q}%,nick_nm.ilike.%${q}%,display_name.ilike.%${q}%`)
+      .or(
+        `pi_username.ilike.%${q}%,nick_nm.ilike.%${q}%,display_name.ilike.%${q}%`,
+      )
       .limit(300)
     userIds = (us ?? []).map((u) => (u as { id: string }).id)
     if (userIds.length === 0) {
@@ -102,7 +104,10 @@ export async function GET(req: NextRequest) {
     return {
       user_str_id: u.user_str_id,
       user_nm:
-        n?.nick_nm || n?.display_name || n?.pi_username || u.user_str_id.slice(0, 8),
+        n?.nick_nm ||
+        n?.display_name ||
+        n?.pi_username ||
+        u.user_str_id.slice(0, 8),
       pi_username: n?.pi_username ?? null,
       status,
       latest_dtm: u.latest_dtm,

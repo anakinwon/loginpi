@@ -21,7 +21,11 @@ export default function TipPresetsPage() {
       .then((d: { presets?: number[]; customMax?: number } | null) => {
         if (!alive || !d) return
         if (d.presets?.length === 3) {
-          setVals([String(d.presets[0]), String(d.presets[1]), String(d.presets[2])])
+          setVals([
+            String(d.presets[0]),
+            String(d.presets[1]),
+            String(d.presets[2]),
+          ])
         }
         if (typeof d.customMax === 'number') setCustomMax(String(d.customMax))
       })
@@ -87,8 +91,8 @@ export default function TipPresetsPage() {
         </h1>
         <p className="text-muted-foreground mt-1 text-sm">
           카페방 선물(Bean 전송) 금액을 설정합니다. 고정 버튼 3종 + 직접입력
-          상한(프리셋 4). 저장 즉시 선물 버튼과 서버 검증에 함께 반영됩니다. (1 Pi
-          = 100 Bean)
+          상한(프리셋 4). 저장 즉시 선물 버튼과 서버 검증에 함께 반영됩니다. (1
+          Pi = 100 Bean)
         </p>
       </div>
 
@@ -132,7 +136,9 @@ export default function TipPresetsPage() {
               type="text"
               inputMode="numeric"
               value={customMax}
-              onChange={(e) => setCustomMax(e.target.value.replace(/[^0-9]/g, ''))}
+              onChange={(e) =>
+                setCustomMax(e.target.value.replace(/[^0-9]/g, ''))
+              }
               placeholder="Bean"
               className="border-input bg-background min-w-0 flex-1 rounded-lg border px-3 py-2 text-right text-sm tabular-nums"
             />

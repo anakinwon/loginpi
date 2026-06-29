@@ -30,7 +30,8 @@ async function logBatchRun(
       regr_id: regrId,
       modr_id: regrId,
     })
-  if (error) console.error('[admin/campaign/grant-all] logBatchRun 실패:', error)
+  if (error)
+    console.error('[admin/campaign/grant-all] logBatchRun 실패:', error)
 }
 
 // POST /api/admin/campaign/grant-all
@@ -87,9 +88,7 @@ export async function POST() {
   )
 
   // 3) 3조건 완수자 = 매장(보유) + 상품 + 텔레그램
-  const targets = sellerIds.filter(
-    (id) => itemSet.has(id) && tlgmSet.has(id),
-  )
+  const targets = sellerIds.filter((id) => itemSet.has(id) && tlgmSet.has(id))
 
   // 4) 각자 신청(grant) → 승인·지급(approve), 멱등 RPC에 위임
   let granted = 0
@@ -116,7 +115,8 @@ export async function POST() {
       }
       const status = (data as { status?: string } | null)?.status
       if (status === 'APPROVED') granted++
-      else if (status === 'NOT_PENDING') already++ // 이미 지급됨 — 이중지급 차단
+      else if (status === 'NOT_PENDING')
+        already++ // 이미 지급됨 — 이중지급 차단
       else {
         failed++
         errors.push(`${uid}:${status ?? 'UNKNOWN'}`) // SOLD_OUT / INSUFFICIENT_POOL 등
@@ -127,7 +127,15 @@ export async function POST() {
     }
   }
 
-  await logBatchRun('MANUAL', start, targets.length, granted, already, failed, user!.id)
+  await logBatchRun(
+    'MANUAL',
+    start,
+    targets.length,
+    granted,
+    already,
+    failed,
+    user!.id,
+  )
   return NextResponse.json({
     ok: true,
     eligible: targets.length, // 3조건 완수자(지급 대상)

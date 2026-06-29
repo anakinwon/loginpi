@@ -93,11 +93,18 @@ export function BatchRunner() {
     setEventRewardRunning(true)
     setEventRewardResult(null)
     try {
-      const res = await piFetch('/api/cron/event-bean-reward', { method: 'POST' })
+      const res = await piFetch('/api/cron/event-bean-reward', {
+        method: 'POST',
+      })
       const data = (await res.json()) as EventRewardResult & { error?: string }
       if (res.ok) {
         setEventRewardResult(data)
-        toast.success(t('eventRewardSuccess', { granted: data.granted, already: data.already }))
+        toast.success(
+          t('eventRewardSuccess', {
+            granted: data.granted,
+            already: data.already,
+          }),
+        )
       } else {
         toast.error(t('error', { msg: data.error ?? res.status }))
       }
@@ -112,11 +119,18 @@ export function BatchRunner() {
     setCampaignGrantRunning(true)
     setCampaignGrantResult(null)
     try {
-      const res = await piFetch('/api/admin/campaign/grant-all', { method: 'POST' })
+      const res = await piFetch('/api/admin/campaign/grant-all', {
+        method: 'POST',
+      })
       const data = (await res.json()) as EventRewardResult & { error?: string }
       if (res.ok) {
         setCampaignGrantResult(data)
-        toast.success(t('campaignGrantSuccess', { granted: data.granted, already: data.already }))
+        toast.success(
+          t('campaignGrantSuccess', {
+            granted: data.granted,
+            already: data.already,
+          }),
+        )
       } else {
         toast.error(t('error', { msg: data.error ?? res.status }))
       }

@@ -41,8 +41,14 @@ const ALLOWED_MIME_BY_CATEGORY: Record<string, Map<string, string>> = {
     ['image/gif', 'gif'],
     ['image/webp', 'webp'],
     ['application/pdf', 'pdf'],
-    ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'docx'],
-    ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'xlsx'],
+    [
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'docx',
+    ],
+    [
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'xlsx',
+    ],
     ['text/plain', 'txt'],
     ['application/zip', 'zip'],
   ]),
@@ -184,7 +190,8 @@ export async function POST(request: NextRequest, { params }: Params) {
     }
 
     // KISA FU 검증: 카테고리별 MIME 화이트리스트 적용
-    const mimeMap = ALLOWED_MIME_BY_CATEGORY[ctgr.ctgr_cd] ?? ALLOWED_MIME_DEFAULT
+    const mimeMap =
+      ALLOWED_MIME_BY_CATEGORY[ctgr.ctgr_cd] ?? ALLOWED_MIME_DEFAULT
     const ext = mimeMap.get(file.type)
     if (!ext) {
       return NextResponse.json(

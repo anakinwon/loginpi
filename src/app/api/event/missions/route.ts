@@ -31,11 +31,17 @@ export async function GET(request: NextRequest) {
 
   const eventId = searchParams.get('event_id')?.trim()
   const page = Math.max(1, Number(searchParams.get('page') ?? '1'))
-  const limit = Math.min(Math.max(1, Number(searchParams.get('limit') ?? '10')), 50)
+  const limit = Math.min(
+    Math.max(1, Number(searchParams.get('limit') ?? '10')),
+    50,
+  )
 
   // 입력값 검증
   if (!eventId) {
-    return NextResponse.json({ error: 'event_id는 필수 필드입니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: 'event_id는 필수 필드입니다' },
+      { status: 400 },
+    )
   }
 
   try {
@@ -58,7 +64,9 @@ export async function GET(request: NextRequest) {
     // 2단계: 페이지네이션 미션 조회
     const { data: missionsData, error } = await db
       .from('evt_mission')
-      .select('mission_cd, mission_nm, mission_guide_desc, complete_type_cd, mission_ord')
+      .select(
+        'mission_cd, mission_nm, mission_guide_desc, complete_type_cd, mission_ord',
+      )
       .eq('event_id', eventId)
       .eq('del_yn', 'N')
       .order('mission_ord', { ascending: true })

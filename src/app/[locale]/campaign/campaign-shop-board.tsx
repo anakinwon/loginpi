@@ -13,7 +13,12 @@ interface ShopsResponse {
   my_seller_id: string | null
 }
 
-const COND_KEYS: (keyof ShopConditionRow['conditions'])[] = ['shop', 'item', 'telegram', 'tlgm_alrt']
+const COND_KEYS: (keyof ShopConditionRow['conditions'])[] = [
+  'shop',
+  'item',
+  'telegram',
+  'tlgm_alrt',
+]
 
 const PAGE_SIZE = 20
 
@@ -37,9 +42,9 @@ export function CampaignShopBoard() {
 
   // 조건 컬럼 레이블 — t()가 필요해 컴포넌트 내부 정의
   const condLabelMap: Record<string, string> = {
-    shop:      t('colM1'),
-    item:      t('colM2'),
-    telegram:  t('colM3'),
+    shop: t('colM1'),
+    item: t('colM2'),
+    telegram: t('colM3'),
     tlgm_alrt: t('colM4'),
   }
 
@@ -86,7 +91,9 @@ export function CampaignShopBoard() {
     if (!window.confirm(t('boardGrantConfirm', { conds: totalConds }))) return
     setGranting(true)
     try {
-      const res = await piFetch('/api/admin/campaign/grant-all', { method: 'POST' })
+      const res = await piFetch('/api/admin/campaign/grant-all', {
+        method: 'POST',
+      })
       const data = await res.json()
       if (!res.ok) {
         alert(data.error ?? t('boardGrantError'))
@@ -94,10 +101,15 @@ export function CampaignShopBoard() {
       }
       const lines = [
         t('boardGrantResultTitle'),
-        t('boardGrantResultEligible', { conds: totalConds, eligible: data.eligible }),
+        t('boardGrantResultEligible', {
+          conds: totalConds,
+          eligible: data.eligible,
+        }),
         t('boardGrantResultGranted', { granted: data.granted }),
         t('boardGrantResultAlready', { already: data.already }),
-        ...(data.failed ? [t('boardGrantResultFailed', { failed: data.failed })] : []),
+        ...(data.failed
+          ? [t('boardGrantResultFailed', { failed: data.failed })]
+          : []),
       ]
       alert(lines.join('\n'))
       await loadShops()
@@ -118,12 +130,14 @@ export function CampaignShopBoard() {
     return <p className="text-muted-foreground text-center text-sm">{error}</p>
   if (!rows.length)
     return (
-      <p className="text-muted-foreground text-center text-sm">{t('boardEmpty')}</p>
+      <p className="text-muted-foreground text-center text-sm">
+        {t('boardEmpty')}
+      </p>
     )
 
   const totalConds = COND_KEYS.length
-  const fullCnt = rows.filter(
-    (r) => Object.values(r.conditions).every(Boolean),
+  const fullCnt = rows.filter((r) =>
+    Object.values(r.conditions).every(Boolean),
   ).length
 
   // 순위는 페이징 전에 부여(1~N 유지). rows는 route에서 완료수 desc 정렬됨.
@@ -138,7 +152,13 @@ export function CampaignShopBoard() {
         <h3 className="font-semibold">
           {t('boardTitle')}{' '}
           <span className="text-muted-foreground text-sm font-normal">
-            ({t('boardStats', { count: rows.length, conds: totalConds, full: fullCnt })})
+            (
+            {t('boardStats', {
+              count: rows.length,
+              conds: totalConds,
+              full: fullCnt,
+            })}
+            )
           </span>
         </h3>
         {isAdmin && (
@@ -170,10 +190,14 @@ export function CampaignShopBoard() {
           <thead>
             <tr className="bg-muted border-b">
               <th className="bg-muted sticky left-0 z-10 py-2.5 pr-3 pl-2 text-left font-semibold">
-                <span className="text-muted-foreground mr-1">{t('colRank')}</span>
+                <span className="text-muted-foreground mr-1">
+                  {t('colRank')}
+                </span>
                 {t('colShop')}
               </th>
-              <th className="px-3 py-2.5 text-center font-semibold">{t('colDone')}</th>
+              <th className="px-3 py-2.5 text-center font-semibold">
+                {t('colDone')}
+              </th>
               {COND_KEYS.map((k) => (
                 <th
                   key={k}
@@ -185,7 +209,9 @@ export function CampaignShopBoard() {
               <th className="px-3 py-2.5 text-center font-semibold whitespace-nowrap">
                 {t('colLastDtm')}
               </th>
-              <th className="px-3 py-2.5 text-center font-semibold">{t('colReward')}</th>
+              <th className="px-3 py-2.5 text-center font-semibold">
+                {t('colReward')}
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -199,7 +225,7 @@ export function CampaignShopBoard() {
                   className={[
                     'hover:bg-muted/50 border-b transition-colors',
                     allDone ? 'bg-green-50/60 dark:bg-green-950/20' : '',
-                    isMe ? 'ring-primary/40 ring-inset ring-2' : '',
+                    isMe ? 'ring-primary/40 ring-2 ring-inset' : '',
                   ].join(' ')}
                 >
                   <td className="bg-card sticky left-0 z-10 py-2.5 pr-3 pl-2">
@@ -243,7 +269,9 @@ export function CampaignShopBoard() {
                   {COND_KEYS.map((k) => (
                     <td key={k} className="px-3 py-2.5 text-center">
                       {r.conditions[k] ? (
-                        <span className="font-bold text-green-600 dark:text-green-400">✓</span>
+                        <span className="font-bold text-green-600 dark:text-green-400">
+                          ✓
+                        </span>
                       ) : (
                         <span className="text-muted-foreground">-</span>
                       )}
@@ -259,7 +287,9 @@ export function CampaignShopBoard() {
                         title={t('rewardInProgress')}
                       >
                         🥺
-                        <span className="text-[10px] font-medium">{t('rewardInProgress')}</span>
+                        <span className="text-[10px] font-medium">
+                          {t('rewardInProgress')}
+                        </span>
                       </span>
                     ) : r.grant_status === 'APPROVED' ? (
                       <span
@@ -291,7 +321,9 @@ export function CampaignShopBoard() {
       </div>
 
       {filtered.length === 0 && (
-        <p className="text-muted-foreground py-4 text-center text-sm">{t('boardSearchEmpty')}</p>
+        <p className="text-muted-foreground py-4 text-center text-sm">
+          {t('boardSearchEmpty')}
+        </p>
       )}
 
       {filtered.length > PAGE_SIZE && (

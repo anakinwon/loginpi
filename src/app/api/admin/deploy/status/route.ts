@@ -6,6 +6,9 @@ import { getBothStatuses } from '@/lib/ops-deploy'
 export async function GET() {
   const user = await getSessionUser()
   if (user?.role !== 'MASTER')
-    return NextResponse.json({ error: '권한이 없습니다(MASTER 전용)' }, { status: 403 })
+    return NextResponse.json(
+      { error: '권한이 없습니다(MASTER 전용)' },
+      { status: 403 },
+    )
   return NextResponse.json(await getBothStatuses())
 }

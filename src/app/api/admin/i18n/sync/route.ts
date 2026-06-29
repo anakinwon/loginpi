@@ -14,7 +14,8 @@ const supabase = createClient(
 // DB는 배열을 'feat.PISHOP.0/.1/.2' 평탄 키로 저장하므로, 복원 시 객체가 아닌
 // 배열로 돌려놔야 ko.json(source) 및 코드(t.raw(...) as string[])와 구조가 일치한다.
 function arrayify(node: unknown): unknown {
-  if (node === null || typeof node !== 'object' || Array.isArray(node)) return node
+  if (node === null || typeof node !== 'object' || Array.isArray(node))
+    return node
   const obj = node as Record<string, unknown>
   for (const k of Object.keys(obj)) obj[k] = arrayify(obj[k])
   const keys = Object.keys(obj)

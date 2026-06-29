@@ -26,13 +26,19 @@ export async function GET(request: NextRequest) {
         .from('sys_user')
         .select('id')
         .or(`pi_username.ilike.%${q}%,nick_nm.ilike.%${q}%`)
-      const matchedIds = new Set((matched ?? []).map((u) => (u as { id: string }).id))
+      const matchedIds = new Set(
+        (matched ?? []).map((u) => (u as { id: string }).id),
+      )
       ranking = ranking.filter((r) => matchedIds.has(r.user_id))
     }
 
     return NextResponse.json(
       { ranking, is_admin: user ? isAdmin(user) : false },
-      { headers: { 'Cache-Control': 'private, max-age=15, stale-while-revalidate=30' } },
+      {
+        headers: {
+          'Cache-Control': 'private, max-age=15, stale-while-revalidate=30',
+        },
+      },
     )
   } catch (err) {
     console.error('[event/ranking] 조회 실패:', err)

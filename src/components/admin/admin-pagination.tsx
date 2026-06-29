@@ -13,7 +13,9 @@ interface Props {
 // 페이지 수와 무관하게 버튼 최대 ~7개 → 모바일에서도 넘치지 않음. flex-wrap 이중 안전망.
 function buildPages(page: number, total: number): (number | 'gap')[] {
   const nums = new Set<number>([1, total, page, page - 1, page + 1])
-  const sorted = [...nums].filter((p) => p >= 1 && p <= total).sort((a, b) => a - b)
+  const sorted = [...nums]
+    .filter((p) => p >= 1 && p <= total)
+    .sort((a, b) => a - b)
   const out: (number | 'gap')[] = []
   let prev = 0
   for (const p of sorted) {

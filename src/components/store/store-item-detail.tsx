@@ -275,273 +275,284 @@ export function StoreItemDetail({ itemId }: { itemId: string }) {
 
   return (
     <div className="space-y-8">
-    <div className="grid gap-6 md:grid-cols-2">
-      {/* 이미지 갤러리 */}
-      <div className="space-y-2">
-        <div className="bg-muted flex aspect-square items-center justify-center overflow-hidden rounded-lg">
-          {activeImg ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={activeImg}
-              alt={item.item_nm}
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <span className="text-6xl">🛒</span>
-          )}
-        </div>
-        {gallery.length > 1 && (
-          <div className="flex gap-2 overflow-x-auto">
-            {gallery.map((url) => (
-              <button
-                key={url}
-                onClick={() => setActiveImg(url)}
-                className={`size-16 shrink-0 overflow-hidden rounded border-2 ${activeImg === url ? 'border-primary' : 'border-transparent'}`}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={url} alt="" className="h-full w-full object-cover" />
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* 상품 정보 */}
-      <div className="space-y-4">
-        <div>
-          <div className="flex items-center gap-2">
-            {/* 거래 상태 배지 — 판매중·거래중·판매완료 (CLOSED는 게시중단으로 표시) */}
-            <span
-              className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${TRADE_ST_STYLE[tradeSt]}`}
-            >
-              {item.item_st_cd === 'CLOSED'
-                ? t('itemSt.CLOSED')
-                : t(`tradeSt.${tradeSt}`)}
-            </span>
-            {item.trading_cnt > 0 && (
-              <span className="text-muted-foreground text-xs">
-                {t('tradingCount', { count: item.trading_cnt })}
-              </span>
+      <div className="grid gap-6 md:grid-cols-2">
+        {/* 이미지 갤러리 */}
+        <div className="space-y-2">
+          <div className="bg-muted flex aspect-square items-center justify-center overflow-hidden rounded-lg">
+            {activeImg ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={activeImg}
+                alt={item.item_nm}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <span className="text-6xl">🛒</span>
             )}
           </div>
-          <h1 className="mt-2 text-xl font-bold">{item.item_nm}</h1>
-          <p className="mt-2 text-2xl font-bold">{Number(item.price_pi)} π</p>
-          {/* 등록 당시 자국통화 참고가 — 등록시점 고정값(실시간 틱커 아님), 통화 등록 상품만 항상 표시 */}
-          {item.ccy_cd && item.ccy_amt != null && (
-            <p className="text-muted-foreground mt-1 text-sm">
-              ≈ {formatCcy(locale, item.ccy_cd, Number(item.ccy_amt))}
-              {item.fx_snap_dtm && (
-                <span className="ml-1 text-xs">
-                  ·{' '}
-                  {t('fiatRefAt', {
-                    date: new Date(item.fx_snap_dtm).toLocaleDateString(locale),
-                  })}
-                </span>
-              )}
-            </p>
-          )}
-        </div>
-
-        <div className="text-muted-foreground flex flex-wrap gap-2 text-sm">
-          <span className="bg-muted rounded-full px-2.5 py-0.5">
-            {t(`cnd.${item.item_cnd_cd}`)}
-          </span>
-          {item.reg_qty !== 9999 && (
-            <span className="bg-muted rounded-full px-2.5 py-0.5">
-              {t('stockLeft', { count: item.stock_qty })}
-            </span>
-          )}
-          <span className="bg-muted rounded-full px-2.5 py-0.5">
-            {t('viewCount', { count: item.view_cnt })}
-          </span>
-          {item.seller_bonded ? (
-            <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-green-700 dark:bg-green-900/30 dark:text-green-400">
-              🛡️ {t('bond.badgeBonded')}
-            </span>
-          ) : (
-            <span className="bg-muted rounded-full px-2.5 py-0.5">
-              {t('bond.badgeFree')}
-            </span>
-          )}
-        </div>
-
-        {/* 보증금 거래 공시 — 구매자가 취소수수료 발생 여부를 거래 전에 인지 (FR-10) */}
-        <p className="text-muted-foreground text-xs">
-          {item.seller_bonded
-            ? t('bond.buyerNoticeBonded')
-            : t('bond.buyerNoticeFree')}
-        </p>
-
-        {item.item_desc && (
-          <p className="text-sm whitespace-pre-wrap">{item.item_desc}</p>
-        )}
-
-        {item.shop && (
-          <div className="rounded-lg border p-3 text-sm">
-            <p className="font-medium">🏪 {item.shop.shop_nm}</p>
-            <p className="text-muted-foreground mt-0.5 text-xs">
-              {t(`shopType.${item.shop.shop_type_cd}`)}
-              {item.shop.addr && ` · ${item.shop.addr}`}
-            </p>
-          </div>
-        )}
-
-        {/* 주문방법 3종 — 매장이용·픽업·배달(배달가능 매장만). 배달 시 위치 입력 */}
-        {(!isMine || canSelfTest) && (
-          <div className="space-y-2">
-            <p className="text-sm font-medium">주문방법</p>
-            <div className="flex flex-wrap gap-1.5">
-              {(
-                [
-                  { cd: 'DINE_IN', label: '🍽️ 매장이용' },
-                  { cd: 'PICKUP', label: '🥡 픽업이용' },
-                  ...(item.shop?.dlvr_yn === 'Y'
-                    ? [{ cd: 'DELIVERY', label: '🛵 배달이용' }]
-                    : []),
-                ] as const
-              ).map((m) => (
+          {gallery.length > 1 && (
+            <div className="flex gap-2 overflow-x-auto">
+              {gallery.map((url) => (
                 <button
-                  key={m.cd}
-                  type="button"
-                  onClick={() =>
-                    setOrderMthd(m.cd as 'DINE_IN' | 'PICKUP' | 'DELIVERY')
-                  }
-                  className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
-                    orderMthd === m.cd
-                      ? 'border-primary bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:bg-muted'
-                  }`}
+                  key={url}
+                  onClick={() => setActiveImg(url)}
+                  className={`size-16 shrink-0 overflow-hidden rounded border-2 ${activeImg === url ? 'border-primary' : 'border-transparent'}`}
                 >
-                  {m.label}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={url}
+                    alt=""
+                    className="h-full w-full object-cover"
+                  />
                 </button>
               ))}
             </div>
-            {orderMthd === 'DELIVERY' && (
-              <div className="space-y-1">
-                <label className="text-muted-foreground text-xs">
-                  배달 위치 *
-                </label>
-                <input
-                  value={dlvrAddr}
-                  onChange={(e) => setDlvrAddr(e.target.value)}
-                  placeholder="배달받을 주소를 입력하세요"
-                  maxLength={500}
-                  className="w-full rounded-lg border bg-transparent px-2.5 py-1.5 text-sm"
-                />
-              </div>
+          )}
+        </div>
+
+        {/* 상품 정보 */}
+        <div className="space-y-4">
+          <div>
+            <div className="flex items-center gap-2">
+              {/* 거래 상태 배지 — 판매중·거래중·판매완료 (CLOSED는 게시중단으로 표시) */}
+              <span
+                className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${TRADE_ST_STYLE[tradeSt]}`}
+              >
+                {item.item_st_cd === 'CLOSED'
+                  ? t('itemSt.CLOSED')
+                  : t(`tradeSt.${tradeSt}`)}
+              </span>
+              {item.trading_cnt > 0 && (
+                <span className="text-muted-foreground text-xs">
+                  {t('tradingCount', { count: item.trading_cnt })}
+                </span>
+              )}
+            </div>
+            <h1 className="mt-2 text-xl font-bold">{item.item_nm}</h1>
+            <p className="mt-2 text-2xl font-bold">{Number(item.price_pi)} π</p>
+            {/* 등록 당시 자국통화 참고가 — 등록시점 고정값(실시간 틱커 아님), 통화 등록 상품만 항상 표시 */}
+            {item.ccy_cd && item.ccy_amt != null && (
+              <p className="text-muted-foreground mt-1 text-sm">
+                ≈ {formatCcy(locale, item.ccy_cd, Number(item.ccy_amt))}
+                {item.fx_snap_dtm && (
+                  <span className="ml-1 text-xs">
+                    ·{' '}
+                    {t('fiatRefAt', {
+                      date: new Date(item.fx_snap_dtm).toLocaleDateString(
+                        locale,
+                      ),
+                    })}
+                  </span>
+                )}
+              </p>
             )}
           </div>
-        )}
 
-        <div className="pt-2">
-          {canSelfTest && (
-            <p className="mb-2 rounded-md bg-amber-50 px-2.5 py-1.5 text-xs text-amber-700 dark:bg-amber-950 dark:text-amber-400">
-              ⚠️ 관리자 테스트 결제 — 본인 상품을 결제합니다
-            </p>
+          <div className="text-muted-foreground flex flex-wrap gap-2 text-sm">
+            <span className="bg-muted rounded-full px-2.5 py-0.5">
+              {t(`cnd.${item.item_cnd_cd}`)}
+            </span>
+            {item.reg_qty !== 9999 && (
+              <span className="bg-muted rounded-full px-2.5 py-0.5">
+                {t('stockLeft', { count: item.stock_qty })}
+              </span>
+            )}
+            <span className="bg-muted rounded-full px-2.5 py-0.5">
+              {t('viewCount', { count: item.view_cnt })}
+            </span>
+            {item.seller_bonded ? (
+              <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                🛡️ {t('bond.badgeBonded')}
+              </span>
+            ) : (
+              <span className="bg-muted rounded-full px-2.5 py-0.5">
+                {t('bond.badgeFree')}
+              </span>
+            )}
+          </div>
+
+          {/* 보증금 거래 공시 — 구매자가 취소수수료 발생 여부를 거래 전에 인지 (FR-10) */}
+          <p className="text-muted-foreground text-xs">
+            {item.seller_bonded
+              ? t('bond.buyerNoticeBonded')
+              : t('bond.buyerNoticeFree')}
+          </p>
+
+          {item.item_desc && (
+            <p className="text-sm whitespace-pre-wrap">{item.item_desc}</p>
           )}
-          {isMine && !canSelfTest ? (
-            <p className="text-muted-foreground text-sm">{t('myOwnItem')}</p>
-          ) : (
-            <div className="space-y-2">
-              {/* 오프라인매장: 수량 입력 + 카트 담기 (구매하기와 함께) */}
-              {offlineCart && (
-                <div className="flex items-stretch gap-2">
-                  <div className="flex items-center rounded-lg border">
-                    <button
-                      type="button"
-                      aria-label="−"
-                      onClick={() => setQty((q) => Math.max(1, q - 1))}
-                      className="hover:bg-muted px-3 py-2 text-lg leading-none"
-                    >
-                      −
-                    </button>
-                    <input
-                      type="number"
-                      min={1}
-                      max={maxQty}
-                      value={qty}
-                      onChange={(e) =>
-                        setQty(
-                          Math.min(
-                            maxQty,
-                            Math.max(1, Number(e.target.value) || 1),
-                          ),
-                        )
-                      }
-                      aria-label={t('cart.qty')}
-                      className="w-12 [appearance:textfield] bg-transparent text-center text-sm [&::-webkit-inner-spin-button]:appearance-none"
-                    />
-                    <button
-                      type="button"
-                      aria-label="+"
-                      onClick={() => setQty((q) => Math.min(maxQty, q + 1))}
-                      className="hover:bg-muted px-3 py-2 text-lg leading-none"
-                    >
-                      +
-                    </button>
-                  </div>
-                  <Button
-                    variant="outline"
-                    className="flex-1"
-                    onClick={addCart}
-                  >
-                    {t('cart.add')}
-                  </Button>
-                </div>
-              )}
-              <Button
-                onClick={buy}
-                disabled={!buyable || buying}
-                className="w-full"
-                size="lg"
-              >
-                {buying
-                  ? t('buying')
-                  : buyable
-                    ? t('buyEscrow')
-                    : tradeSt === 'TRADING'
-                      ? t('tradeSt.TRADING')
-                      : item.item_st_cd === 'CLOSED'
-                        ? t('notOnSale')
-                        : t('soldOut')}
-              </Button>
+
+          {item.shop && (
+            <div className="rounded-lg border p-3 text-sm">
+              <p className="font-medium">🏪 {item.shop.shop_nm}</p>
+              <p className="text-muted-foreground mt-0.5 text-xs">
+                {t(`shopType.${item.shop.shop_type_cd}`)}
+                {item.shop.addr && ` · ${item.shop.addr}`}
+              </p>
             </div>
           )}
-          <p className="text-muted-foreground mt-2 text-center text-xs">
-            {t('escrowNotice')}
-          </p>
+
+          {/* 주문방법 3종 — 매장이용·픽업·배달(배달가능 매장만). 배달 시 위치 입력 */}
+          {(!isMine || canSelfTest) && (
+            <div className="space-y-2">
+              <p className="text-sm font-medium">주문방법</p>
+              <div className="flex flex-wrap gap-1.5">
+                {(
+                  [
+                    { cd: 'DINE_IN', label: '🍽️ 매장이용' },
+                    { cd: 'PICKUP', label: '🥡 픽업이용' },
+                    ...(item.shop?.dlvr_yn === 'Y'
+                      ? [{ cd: 'DELIVERY', label: '🛵 배달이용' }]
+                      : []),
+                  ] as const
+                ).map((m) => (
+                  <button
+                    key={m.cd}
+                    type="button"
+                    onClick={() =>
+                      setOrderMthd(m.cd as 'DINE_IN' | 'PICKUP' | 'DELIVERY')
+                    }
+                    className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                      orderMthd === m.cd
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'text-muted-foreground hover:bg-muted'
+                    }`}
+                  >
+                    {m.label}
+                  </button>
+                ))}
+              </div>
+              {orderMthd === 'DELIVERY' && (
+                <div className="space-y-1">
+                  <label className="text-muted-foreground text-xs">
+                    배달 위치 *
+                  </label>
+                  <input
+                    value={dlvrAddr}
+                    onChange={(e) => setDlvrAddr(e.target.value)}
+                    placeholder="배달받을 주소를 입력하세요"
+                    maxLength={500}
+                    className="w-full rounded-lg border bg-transparent px-2.5 py-1.5 text-sm"
+                  />
+                </div>
+              )}
+            </div>
+          )}
+
+          <div className="pt-2">
+            {canSelfTest && (
+              <p className="mb-2 rounded-md bg-amber-50 px-2.5 py-1.5 text-xs text-amber-700 dark:bg-amber-950 dark:text-amber-400">
+                ⚠️ 관리자 테스트 결제 — 본인 상품을 결제합니다
+              </p>
+            )}
+            {isMine && !canSelfTest ? (
+              <p className="text-muted-foreground text-sm">{t('myOwnItem')}</p>
+            ) : (
+              <div className="space-y-2">
+                {/* 오프라인매장: 수량 입력 + 카트 담기 (구매하기와 함께) */}
+                {offlineCart && (
+                  <div className="flex items-stretch gap-2">
+                    <div className="flex items-center rounded-lg border">
+                      <button
+                        type="button"
+                        aria-label="−"
+                        onClick={() => setQty((q) => Math.max(1, q - 1))}
+                        className="hover:bg-muted px-3 py-2 text-lg leading-none"
+                      >
+                        −
+                      </button>
+                      <input
+                        type="number"
+                        min={1}
+                        max={maxQty}
+                        value={qty}
+                        onChange={(e) =>
+                          setQty(
+                            Math.min(
+                              maxQty,
+                              Math.max(1, Number(e.target.value) || 1),
+                            ),
+                          )
+                        }
+                        aria-label={t('cart.qty')}
+                        className="w-12 [appearance:textfield] bg-transparent text-center text-sm [&::-webkit-inner-spin-button]:appearance-none"
+                      />
+                      <button
+                        type="button"
+                        aria-label="+"
+                        onClick={() => setQty((q) => Math.min(maxQty, q + 1))}
+                        className="hover:bg-muted px-3 py-2 text-lg leading-none"
+                      >
+                        +
+                      </button>
+                    </div>
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={addCart}
+                    >
+                      {t('cart.add')}
+                    </Button>
+                  </div>
+                )}
+                <Button
+                  onClick={buy}
+                  disabled={!buyable || buying}
+                  className="w-full"
+                  size="lg"
+                >
+                  {buying
+                    ? t('buying')
+                    : buyable
+                      ? t('buyEscrow')
+                      : tradeSt === 'TRADING'
+                        ? t('tradeSt.TRADING')
+                        : item.item_st_cd === 'CLOSED'
+                          ? t('notOnSale')
+                          : t('soldOut')}
+                </Button>
+              </div>
+            )}
+            <p className="text-muted-foreground mt-2 text-center text-xs">
+              {t('escrowNotice')}
+            </p>
+          </div>
         </div>
+
+        {/* 카트 담기 완료 팝업 — 카트가기 / 쇼핑계속 */}
+        <Dialog open={cartDialogOpen} onOpenChange={setCartDialogOpen}>
+          <DialogContent className="max-w-sm">
+            <DialogHeader>
+              <DialogTitle>{t('cart.addedTitle')}</DialogTitle>
+              <DialogDescription>
+                {t('cart.added', { n: qty })}
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="gap-2 sm:gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setCartDialogOpen(false)}
+              >
+                {t('cart.continueShopping')}
+              </Button>
+              <Button
+                onClick={() => {
+                  setCartDialogOpen(false)
+                  router.push('/store/cart')
+                }}
+              >
+                {t('cart.goToCart')}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
 
-      {/* 카트 담기 완료 팝업 — 카트가기 / 쇼핑계속 */}
-      <Dialog open={cartDialogOpen} onOpenChange={setCartDialogOpen}>
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle>{t('cart.addedTitle')}</DialogTitle>
-            <DialogDescription>{t('cart.added', { n: qty })}</DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="gap-2 sm:gap-2">
-            <Button variant="outline" onClick={() => setCartDialogOpen(false)}>
-              {t('cart.continueShopping')}
-            </Button>
-            <Button
-              onClick={() => {
-                setCartDialogOpen(false)
-                router.push('/store/cart')
-              }}
-            >
-              {t('cart.goToCart')}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
-
-    {/* 이용후기 섹션 — 상품 구매자 후기 목록 */}
-    <div className="border-t pt-6">
-      <h2 className="mb-4 text-base font-semibold">⭐ 이용후기</h2>
-      <FeedbackList itemId={item.item_id} />
-    </div>
+      {/* 이용후기 섹션 — 상품 구매자 후기 목록 */}
+      <div className="border-t pt-6">
+        <h2 className="mb-4 text-base font-semibold">⭐ 이용후기</h2>
+        <FeedbackList itemId={item.item_id} />
+      </div>
     </div>
   )
 }

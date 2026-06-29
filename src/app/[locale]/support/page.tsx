@@ -40,7 +40,8 @@ export default async function SupportPage() {
             href={`mailto:${SUPPORT_EMAIL}`}
             className="hover:bg-muted flex items-center gap-2 rounded-lg border px-4 py-3 text-sm"
           >
-            ✉️ {t('email')} <span className="text-muted-foreground">— {SUPPORT_EMAIL}</span>
+            ✉️ {t('email')}{' '}
+            <span className="text-muted-foreground">— {SUPPORT_EMAIL}</span>
           </a>
           {tgUser && (
             <a
@@ -49,7 +50,8 @@ export default async function SupportPage() {
               rel="noopener noreferrer"
               className="hover:bg-muted flex items-center gap-2 rounded-lg border px-4 py-3 text-sm"
             >
-              💬 {t('telegram')} <span className="text-muted-foreground">— @{tgUser}</span>
+              💬 {t('telegram')}{' '}
+              <span className="text-muted-foreground">— @{tgUser}</span>
             </a>
           )}
         </div>

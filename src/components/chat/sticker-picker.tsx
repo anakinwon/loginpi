@@ -97,7 +97,10 @@ export function StickerPicker({
               setBuying(null)
             }
           },
-          onReadyForServerCompletion: async (paymentId: string, txid: string) => {
+          onReadyForServerCompletion: async (
+            paymentId: string,
+            txid: string,
+          ) => {
             try {
               const r = await piFetch('/api/payments/complete', {
                 method: 'POST',
@@ -144,7 +147,11 @@ export function StickerPicker({
           requiresBean?: boolean
           feeBean?: number
           mode?: string
-          pay?: { amount: number; memo: string; metadata: Record<string, unknown> }
+          pay?: {
+            amount: number
+            memo: string
+            metadata: Record<string, unknown>
+          }
         }
 
         // PI 모드 — 서버가 Pi 직결제 요구. createPayment로 핸드오프.

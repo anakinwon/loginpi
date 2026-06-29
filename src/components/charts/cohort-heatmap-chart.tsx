@@ -47,8 +47,7 @@ export default function CohortHeatmapChart({ rows }: { rows: CohortRow[] }) {
               <td className="text-muted-foreground">{r.size}</td>
               {Array.from({ length: maxK + 1 }).map((_, k) => {
                 const v = r.retention[k]
-                if (v === null || v === undefined)
-                  return <td key={k} />
+                if (v === null || v === undefined) return <td key={k} />
                 return (
                   <td key={k}>
                     <div

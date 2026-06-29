@@ -1,4 +1,5 @@
 import { getSessionUser } from '@/lib/auth-check'
+import { getActiveFeeMode } from '@/lib/fee-resolver'
 import { Link } from '@/i18n/navigation'
 import { StoreNav } from '@/components/store/store-nav'
 import { ClientFeedbackPage } from '@/components/feedback/ClientFeedbackPage'
@@ -15,6 +16,9 @@ export default async function OrderFeedbackPage({
 }) {
   const { orderId } = await params
   const user = await getSessionUser()
+  // BEAN 모드에선 후기(Bean 보상) 기능 비활성 — 버튼 숨김과 동일 정책, 직접 URL 접근도 차단.
+  //   redirect 금지(Pi Browser 무한루프) → 안내 문구로 조건부 렌더.
+  const feeMode = await getActiveFeeMode()
 
   return (
     <div className="mx-auto max-w-xl space-y-4 p-4 md:p-6">
@@ -26,7 +30,13 @@ export default async function OrderFeedbackPage({
         ← 구매 내역으로
       </Link>
       <h1 className="text-lg font-bold">⭐ 이용후기 작성</h1>
-      <ClientFeedbackPage orderId={orderId} serverAuthed={!!user} />
+      {feeMode === 'PI' ? (
+        <ClientFeedbackPage orderId={orderId} serverAuthed={!!user} />
+      ) : (
+        <p className="text-muted-foreground rounded-lg border p-6 text-center text-sm">
+          현재 이용후기 작성을 일시 중지했습니다.
+        </p>
+      )}
     </div>
   )
 }

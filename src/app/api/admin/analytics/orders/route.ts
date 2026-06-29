@@ -104,9 +104,7 @@ export async function GET(req: NextRequest) {
     .sort((a, b) => b.cnt - a.cnt)
 
   // ── 요일×시간 히트맵 (KST 기준, 전체 주문) ──
-  const heatmap: number[][] = Array.from({ length: 7 }, () =>
-    Array(24).fill(0),
-  )
+  const heatmap: number[][] = Array.from({ length: 7 }, () => Array(24).fill(0))
   for (const r of rows) {
     const kst = new Date(new Date(r.reg_dtm).getTime() + KST_OFFSET_MS)
     heatmap[kst.getUTCDay()][kst.getUTCHours()]++
@@ -156,7 +154,9 @@ export async function GET(req: NextRequest) {
         intervalCounts[idx].cnt++
       }
     }
-    const recencyDays = Math.floor((now - sorted[sorted.length - 1]) / 86_400_000)
+    const recencyDays = Math.floor(
+      (now - sorted[sorted.length - 1]) / 86_400_000,
+    )
     rfmRaw.push({
       usr_id: usrId,
       recencyDays,

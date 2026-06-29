@@ -31,7 +31,10 @@ const body = b64({
   iat: now,
   exp: now + 60 * 60 * 24 * 3650, // 10년
 })
-const sig = crypto.createHmac('sha256', secret).update(`${head}.${body}`).digest('base64url')
+const sig = crypto
+  .createHmac('sha256', secret)
+  .update(`${head}.${body}`)
+  .digest('base64url')
 
 console.log('\n=== PROD_RO_SUPABASE_KEY (아래 값을 Vercel env에 입력) ===\n')
 console.log(`${head}.${body}.${sig}`)

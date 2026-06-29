@@ -38,9 +38,7 @@ export default async function AdminLayout({
   return (
     <div data-admin-theme className="flex flex-1">
       {/* 활성 테마 색상 변수 주입 (관리자 영역 스코프) */}
-      {themeCss && (
-        <style dangerouslySetInnerHTML={{ __html: themeCss }} />
-      )}
+      {themeCss && <style dangerouslySetInnerHTML={{ __html: themeCss }} />}
       {/* _pit 파라미터가 URL에 남아있으면 제거 (Pi Browser 인증 성공 후 cleanup) */}
       <PitUrlCleaner />
       <AdminSidebar />

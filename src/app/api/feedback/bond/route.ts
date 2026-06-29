@@ -22,7 +22,7 @@ async function getMaxReward(db: Db): Promise<number> {
     .eq('del_yn', 'N')
   return Math.max(
     0,
-    ...((data ?? []).map((r) => Number((r as { amt_bean: number }).amt_bean))),
+    ...(data ?? []).map((r) => Number((r as { amt_bean: number }).amt_bean)),
   )
 }
 
@@ -53,7 +53,9 @@ export async function GET(req: NextRequest) {
     getMaxReward(db),
   ])
 
-  const balance = Number((bond as { bond_bal_bean: number } | null)?.bond_bal_bean ?? 0)
+  const balance = Number(
+    (bond as { bond_bal_bean: number } | null)?.bond_bal_bean ?? 0,
+  )
   const wallet = Number((wlt as { bean_amt: number } | null)?.bean_amt ?? 0)
 
   return NextResponse.json({
@@ -91,7 +93,9 @@ export async function POST(req: NextRequest) {
   const mode = await getActiveFeeMode()
   if (mode === 'PI')
     return NextResponse.json(
-      { error: 'Pi 모드 보증금 예치는 준비 중입니다 (Bean 모드에서 예치하세요)' },
+      {
+        error: 'Pi 모드 보증금 예치는 준비 중입니다 (Bean 모드에서 예치하세요)',
+      },
       { status: 501 },
     )
 
@@ -118,7 +122,10 @@ export async function POST(req: NextRequest) {
         { status: 400 },
       )
     console.error('[보증금 예치] 실패:', msg)
-    return NextResponse.json({ error: '예치 처리에 실패했습니다' }, { status: 500 })
+    return NextResponse.json(
+      { error: '예치 처리에 실패했습니다' },
+      { status: 500 },
+    )
   }
 
   const balance = Number(Array.isArray(data) ? data[0] : data)

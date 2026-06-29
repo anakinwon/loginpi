@@ -4,7 +4,11 @@ import { subscribeProduct } from '@/lib/bean-subscr'
 import { recordUserAction } from '@/lib/event'
 import { getSubscrPlans } from '@/lib/bean-fee-db'
 import { getActiveFeeMode } from '@/lib/fee-resolver'
-import type { SubscrProduct, SubscrGrade, SubscrCycle } from '@/lib/bean-subscr-plan'
+import type {
+  SubscrProduct,
+  SubscrGrade,
+  SubscrCycle,
+} from '@/lib/bean-subscr-plan'
 import { withGuard } from '@/lib/api-guard'
 
 const CYCLES: SubscrCycle[] = ['M', 'Y']
@@ -40,7 +44,10 @@ async function handlePOST(request: NextRequest) {
     (p) => p.product === product && p.grade === grade && p.cycle === cycle,
   )
   if (!plan) {
-    return NextResponse.json({ error: '존재하지 않는 구독 상품' }, { status: 404 })
+    return NextResponse.json(
+      { error: '존재하지 않는 구독 상품' },
+      { status: 404 },
+    )
   }
 
   // ⭐서버 권위 모드 판정 — 클라 feeMode가 stale이어도 여기서 결제 단위를 확정한다.

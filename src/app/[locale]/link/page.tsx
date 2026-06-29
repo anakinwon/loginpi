@@ -23,7 +23,11 @@ function LinkPageInner() {
     isLoading: piLoading,
     signIn: piSignIn,
   } = usePiAuth()
-  const { data: googleSession, status: googleStatus, update: updateSession } = useSession()
+  const {
+    data: googleSession,
+    status: googleStatus,
+    update: updateSession,
+  } = useSession()
   const params = useSearchParams()
   const router = useRouter()
 

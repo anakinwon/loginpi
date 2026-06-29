@@ -28,10 +28,30 @@ interface BeanDailyRow {
 
 // Plotly는 hex 색 필요(tailwind 클래스 불가). token 대시보드 KPI 색 계열과 통일.
 const FLOWS = [
-  { beanKey: 'charge_bean', piKey: 'charge_pi', labelKey: 'beanFlowCharge', hex: '#22c55e' },
-  { beanKey: 'spend_bean', piKey: 'spend_pi', labelKey: 'beanFlowSpend', hex: '#f59e0b' },
-  { beanKey: 'reward_bean', piKey: 'reward_pi', labelKey: 'beanFlowReward', hex: '#14b8a6' },
-  { beanKey: 'refund_bean', piKey: 'refund_pi', labelKey: 'beanFlowRefund', hex: '#f43f5e' },
+  {
+    beanKey: 'charge_bean',
+    piKey: 'charge_pi',
+    labelKey: 'beanFlowCharge',
+    hex: '#22c55e',
+  },
+  {
+    beanKey: 'spend_bean',
+    piKey: 'spend_pi',
+    labelKey: 'beanFlowSpend',
+    hex: '#f59e0b',
+  },
+  {
+    beanKey: 'reward_bean',
+    piKey: 'reward_pi',
+    labelKey: 'beanFlowReward',
+    hex: '#14b8a6',
+  },
+  {
+    beanKey: 'refund_bean',
+    piKey: 'refund_pi',
+    labelKey: 'beanFlowRefund',
+    hex: '#f43f5e',
+  },
 ] as const
 
 const BASE_LAYOUT = {

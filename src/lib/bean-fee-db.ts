@@ -1,7 +1,12 @@
 import 'server-only'
 import { unstable_cache } from 'next/cache'
 import { getSupabaseAdmin } from './supabase-admin'
-import type { SubscrPlan, SubscrProduct, SubscrGrade, SubscrCycle } from './bean-subscr-plan'
+import type {
+  SubscrPlan,
+  SubscrProduct,
+  SubscrGrade,
+  SubscrCycle,
+} from './bean-subscr-plan'
 
 // bean_fee_plan DB 행 → SubscrPlan 변환
 // prod_ctgr_cd 형식: 'PICAFE_SUBSCR' → 'PICAFE', 'PISHOP_SUBSCR' → 'PISHOP', 'TRANSLATE_SUBSCR' → 'TRANSLATE'

@@ -28,7 +28,10 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
   }
 
-  const { presets, customMax } = body as { presets?: unknown; customMax?: unknown }
+  const { presets, customMax } = body as {
+    presets?: unknown
+    customMax?: unknown
+  }
   if (!Array.isArray(presets) || presets.length !== 3) {
     return NextResponse.json(
       { error: '고정 프리셋 3개가 필요합니다' },
@@ -43,7 +46,9 @@ export async function PUT(req: NextRequest) {
   for (const v of all) {
     if (!Number.isInteger(v) || v <= 0 || v > HARD_MAX_BEAN) {
       return NextResponse.json(
-        { error: `각 값은 1~${HARD_MAX_BEAN.toLocaleString()} 사이 정수여야 합니다` },
+        {
+          error: `각 값은 1~${HARD_MAX_BEAN.toLocaleString()} 사이 정수여야 합니다`,
+        },
         { status: 400 },
       )
     }
@@ -52,7 +57,9 @@ export async function PUT(req: NextRequest) {
   // 고정 프리셋은 오름차순(중복 불가, DB CHECK와 동일)
   if (!(vals[0] < vals[1] && vals[1] < vals[2])) {
     return NextResponse.json(
-      { error: '고정 프리셋은 오름차순(작은 값 → 큰 값)으로 서로 달라야 합니다' },
+      {
+        error: '고정 프리셋은 오름차순(작은 값 → 큰 값)으로 서로 달라야 합니다',
+      },
       { status: 400 },
     )
   }

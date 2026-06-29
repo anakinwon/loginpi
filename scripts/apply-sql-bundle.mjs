@@ -16,7 +16,9 @@ import { fileURLToPath } from 'node:url'
 
 const conn = process.argv[2] || process.env.PROD_DB_URL
 if (!conn) {
-  console.error('연결문자열 필요: node scripts/apply-sql-bundle.mjs "<connection-string>"')
+  console.error(
+    '연결문자열 필요: node scripts/apply-sql-bundle.mjs "<connection-string>"',
+  )
   process.exit(1)
 }
 
@@ -43,7 +45,9 @@ await client.query(
   'CREATE TABLE IF NOT EXISTS _sql_migration_log (filename text PRIMARY KEY, applied_at timestamptz NOT NULL DEFAULT now())',
 )
 const done = new Set(
-  (await client.query('SELECT filename FROM _sql_migration_log')).rows.map((r) => r.filename),
+  (await client.query('SELECT filename FROM _sql_migration_log')).rows.map(
+    (r) => r.filename,
+  ),
 )
 
 let applied = 0,
@@ -59,16 +63,22 @@ for (const f of files) {
     .replace(/\bCONCURRENTLY\b/gi, '')
   try {
     await client.query(sql)
-    await client.query('INSERT INTO _sql_migration_log(filename) VALUES($1)', [f])
+    await client.query('INSERT INTO _sql_migration_log(filename) VALUES($1)', [
+      f,
+    ])
     applied++
     console.log(`✓ ${f}`)
   } catch (e) {
     console.error(`\n✗ 실패: ${f}\n   ${e.message}`)
-    console.error(`   → 해당 파일/순서 수정 후 재실행. 적용된 ${applied}건은 자동 건너뜀.`)
+    console.error(
+      `   → 해당 파일/순서 수정 후 재실행. 적용된 ${applied}건은 자동 건너뜀.`,
+    )
     await client.end()
     process.exit(1)
   }
 }
 
 await client.end()
-console.log(`\n✅ 완료 — 신규 적용 ${applied} · 기존 건너뜀 ${skipped} · 총 ${files.length}`)
+console.log(
+  `\n✅ 완료 — 신규 적용 ${applied} · 기존 건너뜀 ${skipped} · 총 ${files.length}`,
+)

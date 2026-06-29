@@ -117,9 +117,12 @@ export default function BeanFeePlanPage() {
           <BeanIcon className="inline-block h-6 w-6" /> Bean 요금제 관리
         </h1>
         <p className="text-muted-foreground mt-1 text-sm">
-          Bean 경제 표준 요금 마스터 — PRD_15_FEE §4 기준 (43행).
-          구독요금만 빠르게 수정하려면{' '}
-          <a href="/admin/token/subscr-pricing" className="text-primary underline-offset-2 hover:underline">
+          Bean 경제 표준 요금 마스터 — PRD_15_FEE §4 기준 (43행). 구독요금만
+          빠르게 수정하려면{' '}
+          <a
+            href="/admin/token/subscr-pricing"
+            className="text-primary underline-offset-2 hover:underline"
+          >
             구독요금제 관리
           </a>
           를 사용하세요.
@@ -248,7 +251,9 @@ export default function BeanFeePlanPage() {
           </div>
 
           <p className="text-muted-foreground text-xs">
-            ✅ DB가 런타임 권위 소스입니다 (2026-06-24 DB화 완료). amt_bean 수정 즉시 구독 과금에 반영됩니다. use_yn 비활성화 시 해당 플랜은 구독 목록에서 제외됩니다.
+            ✅ DB가 런타임 권위 소스입니다 (2026-06-24 DB화 완료). amt_bean 수정
+            즉시 구독 과금에 반영됩니다. use_yn 비활성화 시 해당 플랜은 구독
+            목록에서 제외됩니다.
           </p>
         </>
       )}

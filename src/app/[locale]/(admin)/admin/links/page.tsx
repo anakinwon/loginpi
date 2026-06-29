@@ -58,7 +58,10 @@ export default function LinksPage() {
   // 계정 활성/비활성 토글 (del_yn). 'Y'=앞으로 절대 사용하지 않는 계정 → 모든 화면에서 차단.
   async function toggleActive(u: UserRow) {
     const next = u.del_yn === 'Y' ? 'N' : 'Y'
-    if (next === 'Y' && !window.confirm(t('confirmDisable', { name: u.display_name })))
+    if (
+      next === 'Y' &&
+      !window.confirm(t('confirmDisable', { name: u.display_name }))
+    )
       return
     setToggling(u.id)
     try {

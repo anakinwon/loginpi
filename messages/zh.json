@@ -2567,10 +2567,7 @@
     "cycleHeading": "选择支付周期",
     "expireAt": "到期日: {date}",
     "feat": {
-      "PICAFE": [
-        "免除创建高级·活动 Cafe 费用",
-        "免除进入高级·活动 Cafe 费用"
-      ],
+      "PICAFE": ["免除创建高级·活动 Cafe 费用", "免除进入高级·活动 Cafe 费用"],
       "PISHOP": [
         "商品曝光费用免除",
         "Premium 商品创建费用免除",

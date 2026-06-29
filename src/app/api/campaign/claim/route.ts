@@ -11,14 +11,18 @@ export async function POST(req: NextRequest) {
   if (!user)
     return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
-  const body = await req.json().catch(() => ({})) as { shop_id?: string }
-  const shopId = typeof body.shop_id === 'string' && body.shop_id ? body.shop_id : null
+  const body = (await req.json().catch(() => ({}))) as { shop_id?: string }
+  const shopId =
+    typeof body.shop_id === 'string' && body.shop_id ? body.shop_id : null
 
-  const { data, error } = await getSupabaseAdmin().rpc('fn_bean_campaign_grant', {
-    p_usr_id: user.id,
-    p_campaign_cd: CAMPAIGN_CD,
-    p_shop_id: shopId,
-  })
+  const { data, error } = await getSupabaseAdmin().rpc(
+    'fn_bean_campaign_grant',
+    {
+      p_usr_id: user.id,
+      p_campaign_cd: CAMPAIGN_CD,
+      p_shop_id: shopId,
+    },
+  )
   if (error) {
     console.error('[campaign/claim] 실패:', error.message)
     return NextResponse.json({ error: '보상 처리 실패' }, { status: 500 })

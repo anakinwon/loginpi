@@ -35,7 +35,11 @@ export async function GET() {
 
   // 테이블 미적용(sql/111 전)이면 graceful — 빈 목록 + applied:false
   if (error) {
-    return NextResponse.json({ items: [], summary: emptySummary(), applied: false })
+    return NextResponse.json({
+      items: [],
+      summary: emptySummary(),
+      applied: false,
+    })
   }
 
   const items = (data ?? []) as ChkRow[]
@@ -95,7 +99,15 @@ export async function PATCH(req: NextRequest) {
 }
 
 function emptySummary() {
-  return { total: 0, done: 0, doing: 0, todo: 0, na: 0, blockingLeft: 0, percent: 0 }
+  return {
+    total: 0,
+    done: 0,
+    doing: 0,
+    todo: 0,
+    na: 0,
+    blockingLeft: 0,
+    percent: 0,
+  }
 }
 
 function summarize(items: ChkRow[]) {
@@ -105,7 +117,10 @@ function summarize(items: ChkRow[]) {
   const na = items.filter((i) => i.status_cd === 'NA').length
   const denom = items.length - na // NA 제외
   const blockingLeft = items.filter(
-    (i) => i.prio_cd === 'BLOCKING' && i.status_cd !== 'DONE' && i.status_cd !== 'NA',
+    (i) =>
+      i.prio_cd === 'BLOCKING' &&
+      i.status_cd !== 'DONE' &&
+      i.status_cd !== 'NA',
   ).length
   return {
     total: items.length,

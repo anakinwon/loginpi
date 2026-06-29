@@ -72,7 +72,9 @@ async function callGemini(prompt: string, apiKey: string): Promise<string> {
     let bodySlice = ''
     try {
       const contentLength = res.headers.get('content-length')
-      const maxLen = contentLength ? Math.min(parseInt(contentLength), 500) : 500
+      const maxLen = contentLength
+        ? Math.min(parseInt(contentLength), 500)
+        : 500
       bodySlice = (await res.text()).slice(0, maxLen)
     } catch {
       bodySlice = '(읽기 실패)'
@@ -204,9 +206,10 @@ ${JSON.stringify(batch, null, 2)}`
         error: apiErr instanceof Error ? apiErr.message : String(apiErr),
       })
       // 이미 번역된 데이터가 있으면 부분 성공 반환, 없으면 오류
-      const msg = totalUpserted > 0
-        ? '일부 번역 후 중단되었습니다. 관리자에게 문의하세요'
-        : '번역 작업이 실패했습니다. 잠시 후 다시 시도해주세요'
+      const msg =
+        totalUpserted > 0
+          ? '일부 번역 후 중단되었습니다. 관리자에게 문의하세요'
+          : '번역 작업이 실패했습니다. 잠시 후 다시 시도해주세요'
       if (totalUpserted > 0) {
         return NextResponse.json({
           translated: totalUpserted,

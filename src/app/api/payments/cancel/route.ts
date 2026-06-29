@@ -24,7 +24,10 @@ async function handlePOST(request: NextRequest) {
 
   const { paymentId } = body as { paymentId?: string }
   if (!paymentId) {
-    return NextResponse.json({ error: 'paymentId가 필요합니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: 'paymentId가 필요합니다' },
+      { status: 400 },
+    )
   }
 
   const db = getSupabaseAdmin()

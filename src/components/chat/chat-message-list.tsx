@@ -283,9 +283,7 @@ function MessageBubble({
         className={`group flex flex-col gap-0.5 ${isMe ? 'items-end' : 'items-start'}`}
       >
         {!isMe && (
-          <span className="text-muted-foreground text-xs">
-            {senderName}
-          </span>
+          <span className="text-muted-foreground text-xs">{senderName}</span>
         )}
         {msg.attch_url ? (
           <StickerImg
@@ -314,9 +312,7 @@ function MessageBubble({
         className={`group flex flex-col gap-0.5 ${isMe ? 'items-end' : 'items-start'}`}
       >
         {!isMe && (
-          <span className="text-muted-foreground text-xs">
-            {senderName}
-          </span>
+          <span className="text-muted-foreground text-xs">{senderName}</span>
         )}
         {msg.attch_url ? (
           <a href={msg.attch_url} target="_blank" rel="noopener noreferrer">
@@ -347,9 +343,7 @@ function MessageBubble({
         className={`group flex flex-col gap-0.5 ${isMe ? 'items-end' : 'items-start'}`}
       >
         {!isMe && (
-          <span className="text-muted-foreground text-xs">
-            {senderName}
-          </span>
+          <span className="text-muted-foreground text-xs">{senderName}</span>
         )}
         {msg.attch_url && (
           <audio
@@ -374,9 +368,7 @@ function MessageBubble({
         className={`group flex flex-col gap-0.5 ${isMe ? 'items-end' : 'items-start'}`}
       >
         {!isMe && (
-          <span className="text-muted-foreground text-xs">
-            {senderName}
-          </span>
+          <span className="text-muted-foreground text-xs">{senderName}</span>
         )}
         <a
           href={msg.attch_url ?? '#'}

@@ -20,7 +20,9 @@ function toPiSessionUser(u: UserRow): PiSessionUser {
     username: u.pi_username,
     walletAddress: null,
     scopesGranted: [],
-    tokenValidUntil: new Date(Date.now() + MAX_COOKIE_AGE_SEC * 1000).toISOString(),
+    tokenValidUntil: new Date(
+      Date.now() + MAX_COOKIE_AGE_SEC * 1000,
+    ).toISOString(),
     role: u.role,
     nick_nm: u.nick_nm,
   }

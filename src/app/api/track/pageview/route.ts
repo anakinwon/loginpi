@@ -6,7 +6,14 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 //   클라이언트 라우트 전환 시 fire-and-forget 호출. 게스트 포함, 인증 게이트 없음.
 //   ⚠️ 항상 204로 응답(실패해도 클라이언트 흐름 비차단). 핵심 가치(로그인·결제) 무간섭.
 
-const SEARCH_HOSTS = ['google.', 'bing.', 'yahoo.', 'naver.', 'daum.', 'duckduckgo.']
+const SEARCH_HOSTS = [
+  'google.',
+  'bing.',
+  'yahoo.',
+  'naver.',
+  'daum.',
+  'duckduckgo.',
+]
 const SOCIAL_HOSTS = [
   'facebook.',
   'instagram.',
@@ -38,7 +45,8 @@ export async function POST(req: NextRequest) {
       path?: string
       refr?: string
     } | null
-    if (!body?.sess_id || !body?.path) return new NextResponse(null, { status: 204 })
+    if (!body?.sess_id || !body?.path)
+      return new NextResponse(null, { status: 204 })
 
     const sessId = String(body.sess_id).slice(0, 64)
     const path = String(body.path).slice(0, 300)

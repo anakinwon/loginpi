@@ -19,9 +19,21 @@ interface Props {
   onCancel: () => void
 }
 
-const REWARD_HINT: Record<number, number> = { 1: 60, 2: 70, 3: 80, 4: 90, 5: 100 }
+const REWARD_HINT: Record<number, number> = {
+  1: 60,
+  2: 70,
+  3: 80,
+  4: 90,
+  5: 100,
+}
 
-export function CategoryFeedbackForm({ orderId, ctgrId, itemNm, onSuccess, onCancel }: Props) {
+export function CategoryFeedbackForm({
+  orderId,
+  ctgrId,
+  itemNm,
+  onSuccess,
+  onCancel,
+}: Props) {
   const [ctgrItems, setCtgrItems] = useState<CtgrItem[]>([])
   const [itemScores, setItemScores] = useState<Record<string, number>>({})
   const [overallScore, setOverallScore] = useState(0)
@@ -56,7 +68,9 @@ export function CategoryFeedbackForm({ orderId, ctgrId, itemNm, onSuccess, onCan
       return
     }
 
-    const scoredItems = ctgrItems.filter((it) => (itemScores[it.item_cd] ?? 0) > 0)
+    const scoredItems = ctgrItems.filter(
+      (it) => (itemScores[it.item_cd] ?? 0) > 0,
+    )
 
     setSubmitting(true)
     try {
@@ -75,7 +89,10 @@ export function CategoryFeedbackForm({ orderId, ctgrId, itemNm, onSuccess, onCan
       })
 
       if (res.ok) {
-        const d = (await res.json()) as { bean_rwrd_qty: number; message: string }
+        const d = (await res.json()) as {
+          bean_rwrd_qty: number
+          message: string
+        }
         toast.success(d.message)
         onSuccess()
       } else {
@@ -92,7 +109,7 @@ export function CategoryFeedbackForm({ orderId, ctgrId, itemNm, onSuccess, onCan
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       {/* 상품명 헤더 */}
-      <div className="rounded-lg bg-muted/50 px-3 py-2 text-sm font-medium">
+      <div className="bg-muted/50 rounded-lg px-3 py-2 text-sm font-medium">
         ☕ {itemNm}
       </div>
 
@@ -103,16 +120,23 @@ export function CategoryFeedbackForm({ orderId, ctgrId, itemNm, onSuccess, onCan
         <div className="space-y-3">
           <p className="text-sm font-medium">항목별 평가</p>
           {ctgrItems.map((it) => (
-            <div key={it.item_cd} className="flex items-center justify-between gap-3">
+            <div
+              key={it.item_cd}
+              className="flex items-center justify-between gap-3"
+            >
               <div className="min-w-0">
                 <span className="text-sm">{it.item_nm}</span>
                 {it.item_desc && (
-                  <span className="text-muted-foreground ml-1 text-xs">({it.item_desc})</span>
+                  <span className="text-muted-foreground ml-1 text-xs">
+                    ({it.item_desc})
+                  </span>
                 )}
               </div>
               <StarRating
                 value={itemScores[it.item_cd] ?? 0}
-                onChange={(v) => setItemScores((prev) => ({ ...prev, [it.item_cd]: v }))}
+                onChange={(v) =>
+                  setItemScores((prev) => ({ ...prev, [it.item_cd]: v }))
+                }
                 size="sm"
               />
             </div>
@@ -135,17 +159,20 @@ export function CategoryFeedbackForm({ orderId, ctgrId, itemNm, onSuccess, onCan
       {/* 후기 본문 */}
       <div className="space-y-1">
         <label className="text-sm font-medium">
-          후기 본문 * <span className="text-muted-foreground text-xs">(최소 10자)</span>
+          후기 본문 *{' '}
+          <span className="text-muted-foreground text-xs">(최소 10자)</span>
         </label>
         <textarea
           value={fbckCn}
           onChange={(e) => setFbckCn(e.target.value)}
           placeholder="음료 맛과 서비스는 어떠셨나요?"
           rows={4}
-          className="w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          className="border-input bg-background placeholder:text-muted-foreground focus:ring-ring w-full resize-none rounded-md border px-3 py-2 text-sm focus:ring-2 focus:outline-none"
           required
         />
-        <p className={`text-right text-xs ${fbckCn.trim().length < 10 ? 'text-muted-foreground' : 'text-green-600'}`}>
+        <p
+          className={`text-right text-xs ${fbckCn.trim().length < 10 ? 'text-muted-foreground' : 'text-green-600'}`}
+        >
           {fbckCn.trim().length}자
         </p>
       </div>
@@ -156,14 +183,16 @@ export function CategoryFeedbackForm({ orderId, ctgrId, itemNm, onSuccess, onCan
           type="button"
           onClick={onCancel}
           disabled={submitting}
-          className="rounded-md border border-input px-4 py-2 text-sm hover:bg-accent disabled:opacity-50"
+          className="border-input hover:bg-accent rounded-md border px-4 py-2 text-sm disabled:opacity-50"
         >
           취소
         </button>
         <button
           type="submit"
-          disabled={submitting || overallScore === 0 || fbckCn.trim().length < 10}
-          className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+          disabled={
+            submitting || overallScore === 0 || fbckCn.trim().length < 10
+          }
+          className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-medium disabled:opacity-50"
         >
           {submitting ? '저장 중…' : '후기 등록'}
         </button>

@@ -134,7 +134,12 @@ export function StoreItemForm({
         const consented = d?.consent_yn === 'Y'
         setLbsConsent(consented ? 'Y' : 'N')
         // 동의자 + 등록 모드 + P2P: 마운트 직후 GPS 자동 수집 (offline 모드는 매장 좌표 상속으로 GPS 불필요)
-        if (consented && !editMode && mode !== 'offline' && !autoLocTried.current) {
+        if (
+          consented &&
+          !editMode &&
+          mode !== 'offline' &&
+          !autoLocTried.current
+        ) {
           autoLocTried.current = true
           captureLocation()
         }
@@ -609,7 +614,9 @@ export function StoreItemForm({
           <>
             <Button
               onClick={() => submit('OPEN')}
-              disabled={saving || (mode !== 'offline' && (lat === null || lng === null))}
+              disabled={
+                saving || (mode !== 'offline' && (lat === null || lng === null))
+              }
               className="flex-1"
             >
               {saving ? t('saving') : t('form.publish')}

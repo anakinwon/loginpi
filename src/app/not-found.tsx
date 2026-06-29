@@ -17,10 +17,18 @@ export default function RootNotFound() {
       >
         <div>
           <p style={{ fontSize: '3rem', fontWeight: 700, margin: 0 }}>404</p>
-          <h1 style={{ fontSize: '1.125rem', fontWeight: 700, marginTop: '0.5rem' }}>
+          <h1
+            style={{
+              fontSize: '1.125rem',
+              fontWeight: 700,
+              marginTop: '0.5rem',
+            }}
+          >
             페이지를 찾을 수 없습니다
           </h1>
-          <p style={{ color: '#666', marginTop: '0.5rem', fontSize: '0.875rem' }}>
+          <p
+            style={{ color: '#666', marginTop: '0.5rem', fontSize: '0.875rem' }}
+          >
             요청하신 페이지가 없거나 이동되었어요. / Page not found.
           </p>
           <a

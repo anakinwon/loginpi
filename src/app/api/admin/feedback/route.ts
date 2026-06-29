@@ -6,11 +6,15 @@ import { maskUsername } from '@/lib/mask-username'
 // GET /api/admin/feedback?page=1&limit=20&shop_id=&hide_yn=&score=
 export async function GET(req: NextRequest) {
   const user = await getSessionUser()
-  if (!isAdmin(user)) return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+  if (!isAdmin(user))
+    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
 
   const { searchParams } = req.nextUrl
   const page = Math.max(1, Number(searchParams.get('page') ?? '1'))
-  const limit = Math.min(100, Math.max(1, Number(searchParams.get('limit') ?? '20')))
+  const limit = Math.min(
+    100,
+    Math.max(1, Number(searchParams.get('limit') ?? '20')),
+  )
   const offset = (page - 1) * limit
   const shopId = searchParams.get('shop_id')
   const hideYn = searchParams.get('hide_yn')
@@ -33,16 +37,30 @@ export async function GET(req: NextRequest) {
   const { data: rows, count, error } = await q
   if (error) return NextResponse.json({ error: '조회 실패' }, { status: 500 })
 
-  const usrIds = [...new Set((rows ?? []).map((r: { usr_id: string }) => r.usr_id))]
+  const usrIds = [
+    ...new Set((rows ?? []).map((r: { usr_id: string }) => r.usr_id)),
+  ]
   const { data: userRows } = usrIds.length
-    ? await db.from('sys_user').select('id, pi_username, nick_nm').in('id', usrIds)
+    ? await db
+        .from('sys_user')
+        .select('id, pi_username, nick_nm')
+        .in('id', usrIds)
     : { data: [] }
 
   const userMap = new Map(
-    (userRows ?? []).map((u: { id: string; pi_username: string | null; nick_nm: string | null }) => [
-      u.id,
-      { masked: maskUsername(u.pi_username ?? u.nick_nm), raw: u.pi_username ?? u.nick_nm },
-    ]),
+    (userRows ?? []).map(
+      (u: {
+        id: string
+        pi_username: string | null
+        nick_nm: string | null
+      }) => [
+        u.id,
+        {
+          masked: maskUsername(u.pi_username ?? u.nick_nm),
+          raw: u.pi_username ?? u.nick_nm,
+        },
+      ],
+    ),
   )
 
   const data = (rows ?? []).map((r: Record<string, unknown>) => ({
@@ -51,5 +69,8 @@ export async function GET(req: NextRequest) {
     raw_username: userMap.get(r.usr_id as string)?.raw,
   }))
 
-  return NextResponse.json({ data, pagination: { page, limit, total: count ?? 0 } })
+  return NextResponse.json({
+    data,
+    pagination: { page, limit, total: count ?? 0 },
+  })
 }

@@ -120,7 +120,8 @@ export default function DbSwitchPage() {
               </p>
               {state.connTest?.ok ? (
                 <p className="text-green-600 dark:text-green-400">
-                  ✅ DB read 정상 (sys_user {state.connTest.count}건) — 세션 검증 가능
+                  ✅ DB read 정상 (sys_user {state.connTest.count}건) — 세션
+                  검증 가능
                 </p>
               ) : (
                 <p className="text-red-600 dark:text-red-400">
@@ -135,8 +136,10 @@ export default function DbSwitchPage() {
           <div className="flex flex-wrap gap-3">
             <button
               onClick={() => switchTo('staging')}
-              disabled={busy || !state.switchable || state.currentTarget === 'staging'}
-              className="rounded-md border px-4 py-2 text-sm font-medium hover:bg-muted disabled:opacity-50"
+              disabled={
+                busy || !state.switchable || state.currentTarget === 'staging'
+              }
+              className="hover:bg-muted rounded-md border px-4 py-2 text-sm font-medium disabled:opacity-50"
             >
               🧪 Stage DB (RW)
             </button>
@@ -157,14 +160,16 @@ export default function DbSwitchPage() {
           <div className="space-y-1">
             {!state.apiConfigured && (
               <p className="text-muted-foreground text-xs">
-                · 비활성: `VERCEL_API_TOKEN`·`VERCEL_STAGING_PROJECT_ID`·`VERCEL_STAGING_DEPLOY_HOOK`
+                · 비활성:
+                `VERCEL_API_TOKEN`·`VERCEL_STAGING_PROJECT_ID`·`VERCEL_STAGING_DEPLOY_HOOK`
                 미설정
               </p>
             )}
             {!state.prodRoConfigured && (
               <p className="text-muted-foreground text-xs">
-                · 운영DB(읽기전용) 비활성: `PROD_RO_SUPABASE_URL`·`PROD_RO_SUPABASE_KEY`(읽기전용
-                롤) 미설정 — 운영 원장 쓰기 사고 방지
+                · 운영DB(읽기전용) 비활성:
+                `PROD_RO_SUPABASE_URL`·`PROD_RO_SUPABASE_KEY`(읽기전용 롤)
+                미설정 — 운영 원장 쓰기 사고 방지
               </p>
             )}
           </div>

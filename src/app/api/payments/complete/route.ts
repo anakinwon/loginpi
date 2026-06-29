@@ -232,8 +232,12 @@ async function handlePOST(request: NextRequest) {
           })
 
           // 구독 신청 미션 기록 (비블로킹)
-          recordUserAction('subscr_apply', u.id, { product, grade, cycle }).catch(
-            (err) => console.error(`[구독] 미션 기록 실패: ${err.message}`),
+          recordUserAction('subscr_apply', u.id, {
+            product,
+            grade,
+            cycle,
+          }).catch((err) =>
+            console.error(`[구독] 미션 기록 실패: ${err.message}`),
           )
         }
       }

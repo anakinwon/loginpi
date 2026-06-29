@@ -32,7 +32,11 @@ export type ThemeTokenKey = keyof typeof THEME_TOKEN_MAP
 export const THEME_TOKEN_KEYS = Object.keys(THEME_TOKEN_MAP) as ThemeTokenKey[]
 
 // 편집 UI용 라벨·그룹 메타
-export const THEME_TOKEN_META: { key: ThemeTokenKey; label: string; group: 'surface' | 'core' | 'chart' | 'kpi' }[] = [
+export const THEME_TOKEN_META: {
+  key: ThemeTokenKey
+  label: string
+  group: 'surface' | 'core' | 'chart' | 'kpi'
+}[] = [
   { key: 'background', label: '배경', group: 'surface' },
   { key: 'foreground', label: '본문 글자', group: 'surface' },
   { key: 'card', label: '카드 배경', group: 'surface' },

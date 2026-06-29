@@ -34,7 +34,12 @@ interface AddState {
   sort_ord: string
 }
 
-const EMPTY_ADD: AddState = { item_cd: '', item_nm: '', item_desc: '', sort_ord: '0' }
+const EMPTY_ADD: AddState = {
+  item_cd: '',
+  item_nm: '',
+  item_desc: '',
+  sort_ord: '0',
+}
 
 // 트리에서 ctgr_id에 해당하는 노드를 찾아 표시 레이블 반환
 function findCtgrLabel(tree: CtgrNode[], ctgrId: string): string {
@@ -84,7 +89,9 @@ export default function FbckCtgrItemsPage() {
     setEdit(null)
     setAdding(false)
     try {
-      const res = await piFetch(`/api/admin/feedback/ctgr-items?ctgr_id=${ctgrId}`)
+      const res = await piFetch(
+        `/api/admin/feedback/ctgr-items?ctgr_id=${ctgrId}`,
+      )
       if (!res.ok) throw new Error()
       const d = (await res.json()) as { items: CtgrItem[] }
       setItems(d.items)
@@ -131,12 +138,20 @@ export default function FbckCtgrItemsPage() {
 
   // 항목 논리삭제
   async function deleteItem(item: CtgrItem) {
-    if (!confirm(`"${item.item_nm}" 항목을 삭제하시겠습니까?\n(이미 작성된 후기의 항목별 점수 표시에 영향을 줄 수 있습니다)`)) return
+    if (
+      !confirm(
+        `"${item.item_nm}" 항목을 삭제하시겠습니까?\n(이미 작성된 후기의 항목별 점수 표시에 영향을 줄 수 있습니다)`,
+      )
+    )
+      return
     setSaving(item.item_id)
     try {
-      const res = await piFetch(`/api/admin/feedback/ctgr-items?item_id=${item.item_id}`, {
-        method: 'DELETE',
-      })
+      const res = await piFetch(
+        `/api/admin/feedback/ctgr-items?item_id=${item.item_id}`,
+        {
+          method: 'DELETE',
+        },
+      )
       if (!res.ok) throw new Error('삭제 실패')
       toast.success('항목이 삭제되었습니다')
       void loadItems(selectedCtgrId)
@@ -179,7 +194,9 @@ export default function FbckCtgrItemsPage() {
     }
   }
 
-  const selectedLabel = selectedCtgrId ? findCtgrLabel(ctgrTree, selectedCtgrId) : ''
+  const selectedLabel = selectedCtgrId
+    ? findCtgrLabel(ctgrTree, selectedCtgrId)
+    : ''
 
   return (
     <div className="mx-auto max-w-3xl space-y-5 p-4 sm:p-6">
@@ -187,8 +204,8 @@ export default function FbckCtgrItemsPage() {
       <div>
         <h1 className="text-lg font-bold">⭐ 후기 평가항목 관리</h1>
         <p className="text-muted-foreground mt-1 text-sm">
-          카테고리별 항목별 별점 평가 항목을 관리합니다.
-          항목은 후기 작성 폼에 표시됩니다.
+          카테고리별 항목별 별점 평가 항목을 관리합니다. 항목은 후기 작성 폼에
+          표시됩니다.
         </p>
       </div>
 
@@ -201,7 +218,7 @@ export default function FbckCtgrItemsPage() {
           <select
             value={selectedCtgrId}
             onChange={(e) => setSelectedCtgrId(e.target.value)}
-            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            className="border-input bg-background focus:ring-ring w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:outline-none"
           >
             <option value="">— 카테고리를 선택하세요 —</option>
             {ctgrTree.map((p) => (
@@ -218,8 +235,13 @@ export default function FbckCtgrItemsPage() {
         )}
         {selectedCtgrId && (
           <p className="text-muted-foreground text-xs">
-            {selectedLabel && <span className="mr-2 font-medium text-foreground">{selectedLabel}</span>}
-            UUID: <code className="bg-muted rounded px-1">{selectedCtgrId}</code>
+            {selectedLabel && (
+              <span className="text-foreground mr-2 font-medium">
+                {selectedLabel}
+              </span>
+            )}
+            UUID:{' '}
+            <code className="bg-muted rounded px-1">{selectedCtgrId}</code>
           </p>
         )}
       </div>
@@ -230,7 +252,9 @@ export default function FbckCtgrItemsPage() {
           <div className="flex items-center justify-between">
             <p className="text-sm font-medium">
               평가 항목{' '}
-              <span className="text-muted-foreground font-normal">({items.length}개)</span>
+              <span className="text-muted-foreground font-normal">
+                ({items.length}개)
+              </span>
             </p>
             {!adding && (
               <button
@@ -240,7 +264,7 @@ export default function FbckCtgrItemsPage() {
                   setEdit(null)
                   setTimeout(() => addCdRef.current?.focus(), 50)
                 }}
-                className="rounded-md border border-dashed border-border px-3 py-1 text-xs hover:bg-accent"
+                className="border-border hover:bg-accent rounded-md border border-dashed px-3 py-1 text-xs"
               >
                 + 항목 추가
               </button>
@@ -250,7 +274,10 @@ export default function FbckCtgrItemsPage() {
           {loadingItems ? (
             <div className="space-y-2">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-muted h-12 animate-pulse rounded-md" />
+                <div
+                  key={i}
+                  className="bg-muted h-12 animate-pulse rounded-md"
+                />
               ))}
             </div>
           ) : (
@@ -259,12 +286,16 @@ export default function FbckCtgrItemsPage() {
               {adding && (
                 <form
                   onSubmit={submitAdd}
-                  className="rounded-lg border border-dashed border-primary/50 bg-primary/5 p-3"
+                  className="border-primary/50 bg-primary/5 rounded-lg border border-dashed p-3"
                 >
-                  <p className="mb-2 text-xs font-semibold text-primary">새 항목 추가</p>
+                  <p className="text-primary mb-2 text-xs font-semibold">
+                    새 항목 추가
+                  </p>
                   <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                     <div className="space-y-1">
-                      <label className="text-xs text-muted-foreground">코드 *</label>
+                      <label className="text-muted-foreground text-xs">
+                        코드 *
+                      </label>
                       <input
                         ref={addCdRef}
                         required
@@ -272,13 +303,18 @@ export default function FbckCtgrItemsPage() {
                         placeholder="TASTE"
                         value={addForm.item_cd}
                         onChange={(e) =>
-                          setAddForm((p) => ({ ...p, item_cd: e.target.value.toUpperCase() }))
+                          setAddForm((p) => ({
+                            ...p,
+                            item_cd: e.target.value.toUpperCase(),
+                          }))
                         }
-                        className="w-full rounded-md border border-input bg-background px-2 py-1.5 font-mono text-xs uppercase focus:outline-none focus:ring-1 focus:ring-ring"
+                        className="border-input bg-background focus:ring-ring w-full rounded-md border px-2 py-1.5 font-mono text-xs uppercase focus:ring-1 focus:outline-none"
                       />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-xs text-muted-foreground">항목명 *</label>
+                      <label className="text-muted-foreground text-xs">
+                        항목명 *
+                      </label>
                       <input
                         required
                         maxLength={50}
@@ -287,48 +323,63 @@ export default function FbckCtgrItemsPage() {
                         onChange={(e) =>
                           setAddForm((p) => ({ ...p, item_nm: e.target.value }))
                         }
-                        className="w-full rounded-md border border-input bg-background px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-ring"
+                        className="border-input bg-background focus:ring-ring w-full rounded-md border px-2 py-1.5 text-xs focus:ring-1 focus:outline-none"
                       />
                     </div>
                     <div className="space-y-1 sm:col-span-1">
-                      <label className="text-xs text-muted-foreground">설명 (선택)</label>
+                      <label className="text-muted-foreground text-xs">
+                        설명 (선택)
+                      </label>
                       <input
                         maxLength={100}
                         placeholder="음료 맛의 만족도"
                         value={addForm.item_desc}
                         onChange={(e) =>
-                          setAddForm((p) => ({ ...p, item_desc: e.target.value }))
+                          setAddForm((p) => ({
+                            ...p,
+                            item_desc: e.target.value,
+                          }))
                         }
-                        className="w-full rounded-md border border-input bg-background px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-ring"
+                        className="border-input bg-background focus:ring-ring w-full rounded-md border px-2 py-1.5 text-xs focus:ring-1 focus:outline-none"
                       />
                     </div>
                     <div className="space-y-1">
-                      <label className="text-xs text-muted-foreground">순서</label>
+                      <label className="text-muted-foreground text-xs">
+                        순서
+                      </label>
                       <input
                         type="number"
                         min={0}
                         step={10}
                         value={addForm.sort_ord}
                         onChange={(e) =>
-                          setAddForm((p) => ({ ...p, sort_ord: e.target.value }))
+                          setAddForm((p) => ({
+                            ...p,
+                            sort_ord: e.target.value,
+                          }))
                         }
-                        className="w-full rounded-md border border-input bg-background px-2 py-1.5 text-xs tabular-nums focus:outline-none focus:ring-1 focus:ring-ring"
+                        className="border-input bg-background focus:ring-ring w-full rounded-md border px-2 py-1.5 text-xs tabular-nums focus:ring-1 focus:outline-none"
                       />
                     </div>
                   </div>
                   <div className="mt-2 flex justify-end gap-2">
                     <button
                       type="button"
-                      onClick={() => { setAdding(false); setAddForm(EMPTY_ADD) }}
+                      onClick={() => {
+                        setAdding(false)
+                        setAddForm(EMPTY_ADD)
+                      }}
                       disabled={submittingAdd}
-                      className="rounded-md border border-input px-3 py-1 text-xs hover:bg-accent disabled:opacity-50"
+                      className="border-input hover:bg-accent rounded-md border px-3 py-1 text-xs disabled:opacity-50"
                     >
                       취소
                     </button>
                     <button
                       type="submit"
-                      disabled={submittingAdd || !addForm.item_cd || !addForm.item_nm}
-                      className="rounded-md bg-primary px-3 py-1 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+                      disabled={
+                        submittingAdd || !addForm.item_cd || !addForm.item_nm
+                      }
+                      className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-3 py-1 text-xs font-medium disabled:opacity-50"
                     >
                       {submittingAdd ? '추가 중…' : '추가'}
                     </button>
@@ -355,49 +406,67 @@ export default function FbckCtgrItemsPage() {
                           <div className="space-y-2">
                             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                               <div className="space-y-1">
-                                <label className="text-xs text-muted-foreground">코드 (변경불가)</label>
+                                <label className="text-muted-foreground text-xs">
+                                  코드 (변경불가)
+                                </label>
                                 <p className="bg-muted rounded-md px-2 py-1.5 font-mono text-xs">
                                   {item.item_cd}
                                 </p>
                               </div>
                               <div className="space-y-1">
-                                <label className="text-xs text-muted-foreground">항목명 *</label>
+                                <label className="text-muted-foreground text-xs">
+                                  항목명 *
+                                </label>
                                 <input
                                   autoFocus
                                   maxLength={50}
                                   value={edit.item_nm}
                                   onChange={(e) =>
-                                    setEdit((p) => p ? { ...p, item_nm: e.target.value } : p)
+                                    setEdit((p) =>
+                                      p ? { ...p, item_nm: e.target.value } : p,
+                                    )
                                   }
-                                  className="w-full rounded-md border border-input bg-background px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-ring"
+                                  className="border-input bg-background focus:ring-ring w-full rounded-md border px-2 py-1.5 text-xs focus:ring-1 focus:outline-none"
                                 />
                               </div>
                               <div className="space-y-1 sm:col-span-1">
-                                <label className="text-xs text-muted-foreground">설명</label>
+                                <label className="text-muted-foreground text-xs">
+                                  설명
+                                </label>
                                 <input
                                   maxLength={100}
                                   value={edit.item_desc}
                                   onChange={(e) =>
-                                    setEdit((p) => p ? { ...p, item_desc: e.target.value } : p)
+                                    setEdit((p) =>
+                                      p
+                                        ? { ...p, item_desc: e.target.value }
+                                        : p,
+                                    )
                                   }
-                                  className="w-full rounded-md border border-input bg-background px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-ring"
+                                  className="border-input bg-background focus:ring-ring w-full rounded-md border px-2 py-1.5 text-xs focus:ring-1 focus:outline-none"
                                 />
                               </div>
                               <div className="space-y-1">
-                                <label className="text-xs text-muted-foreground">순서</label>
+                                <label className="text-muted-foreground text-xs">
+                                  순서
+                                </label>
                                 <input
                                   type="number"
                                   min={0}
                                   step={10}
                                   value={edit.sort_ord}
                                   onChange={(e) =>
-                                    setEdit((p) => p ? { ...p, sort_ord: e.target.value } : p)
+                                    setEdit((p) =>
+                                      p
+                                        ? { ...p, sort_ord: e.target.value }
+                                        : p,
+                                    )
                                   }
                                   onKeyDown={(e) => {
                                     if (e.key === 'Enter') void saveEdit(item)
                                     if (e.key === 'Escape') setEdit(null)
                                   }}
-                                  className="w-full rounded-md border border-input bg-background px-2 py-1.5 text-xs tabular-nums focus:outline-none focus:ring-1 focus:ring-ring"
+                                  className="border-input bg-background focus:ring-ring w-full rounded-md border px-2 py-1.5 text-xs tabular-nums focus:ring-1 focus:outline-none"
                                 />
                               </div>
                             </div>
@@ -406,7 +475,7 @@ export default function FbckCtgrItemsPage() {
                                 type="button"
                                 onClick={() => setEdit(null)}
                                 disabled={isBusy}
-                                className="rounded-md border border-input px-3 py-1 text-xs hover:bg-accent disabled:opacity-50"
+                                className="border-input hover:bg-accent rounded-md border px-3 py-1 text-xs disabled:opacity-50"
                               >
                                 취소
                               </button>
@@ -414,7 +483,7 @@ export default function FbckCtgrItemsPage() {
                                 type="button"
                                 onClick={() => void saveEdit(item)}
                                 disabled={isBusy || !edit.item_nm.trim()}
-                                className="rounded-md bg-primary px-3 py-1 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+                                className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-3 py-1 text-xs font-medium disabled:opacity-50"
                               >
                                 {isBusy ? '저장 중…' : '저장'}
                               </button>
@@ -428,7 +497,9 @@ export default function FbckCtgrItemsPage() {
                                 <code className="bg-muted rounded px-1.5 py-0.5 font-mono text-[10px]">
                                   {item.item_cd}
                                 </code>
-                                <span className="text-sm font-medium">{item.item_nm}</span>
+                                <span className="text-sm font-medium">
+                                  {item.item_nm}
+                                </span>
                                 {item.item_desc && (
                                   <span className="text-muted-foreground truncate text-xs">
                                     ({item.item_desc})
@@ -437,14 +508,17 @@ export default function FbckCtgrItemsPage() {
                               </div>
                               <p className="text-muted-foreground mt-0.5 text-[10px]">
                                 순서: {item.sort_ord} · 수정:{' '}
-                                {new Date(item.mod_dtm).toLocaleString('ko-KR', {
-                                  year: 'numeric',
-                                  month: '2-digit',
-                                  day: '2-digit',
-                                  hour: '2-digit',
-                                  minute: '2-digit',
-                                  hour12: false,
-                                })}
+                                {new Date(item.mod_dtm).toLocaleString(
+                                  'ko-KR',
+                                  {
+                                    year: 'numeric',
+                                    month: '2-digit',
+                                    day: '2-digit',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    hour12: false,
+                                  },
+                                )}
                               </p>
                             </div>
                             <div className="flex shrink-0 gap-1.5">
@@ -459,7 +533,7 @@ export default function FbckCtgrItemsPage() {
                                     sort_ord: String(item.sort_ord),
                                   })
                                 }
-                                className="rounded border border-input px-2 py-1 text-xs hover:bg-accent disabled:cursor-not-allowed disabled:opacity-40"
+                                className="border-input hover:bg-accent rounded border px-2 py-1 text-xs disabled:cursor-not-allowed disabled:opacity-40"
                               >
                                 수정
                               </button>
@@ -467,7 +541,7 @@ export default function FbckCtgrItemsPage() {
                                 type="button"
                                 disabled={isBusy}
                                 onClick={() => void deleteItem(item)}
-                                className="rounded border border-input px-2 py-1 text-xs text-destructive hover:bg-destructive/10 disabled:cursor-not-allowed disabled:opacity-40"
+                                className="border-input text-destructive hover:bg-destructive/10 rounded border px-2 py-1 text-xs disabled:cursor-not-allowed disabled:opacity-40"
                               >
                                 {isBusy ? '…' : '삭제'}
                               </button>
@@ -485,10 +559,18 @@ export default function FbckCtgrItemsPage() {
       )}
 
       {/* 도움말 */}
-      <div className="text-muted-foreground rounded-lg border p-3 text-xs space-y-1">
-        <p>• <strong>코드</strong>: 영문대문자·숫자·밑줄 1~16자 (예: TASTE, AROMA, TEMP)</p>
-        <p>• <strong>순서</strong>: 낮은 숫자가 먼저 표시됩니다 (10 단위 권장)</p>
-        <p>• 삭제 시 논리삭제(del_yn=Y) 처리되며, 이미 작성된 후기의 항목 점수는 유지됩니다</p>
+      <div className="text-muted-foreground space-y-1 rounded-lg border p-3 text-xs">
+        <p>
+          • <strong>코드</strong>: 영문대문자·숫자·밑줄 1~16자 (예: TASTE,
+          AROMA, TEMP)
+        </p>
+        <p>
+          • <strong>순서</strong>: 낮은 숫자가 먼저 표시됩니다 (10 단위 권장)
+        </p>
+        <p>
+          • 삭제 시 논리삭제(del_yn=Y) 처리되며, 이미 작성된 후기의 항목 점수는
+          유지됩니다
+        </p>
         <p>• 항목 코드는 수정이 불가하니 추가 시 신중히 입력하세요</p>
       </div>
     </div>

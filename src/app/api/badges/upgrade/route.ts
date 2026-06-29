@@ -13,9 +13,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
   const body = await request.json().catch(() => ({}))
-  const { badge_id, theme_cd } = body as { badge_id?: string; theme_cd?: string }
+  const { badge_id, theme_cd } = body as {
+    badge_id?: string
+    theme_cd?: string
+  }
   if (!badge_id || !theme_cd)
-    return NextResponse.json({ error: '배지 정보가 필요합니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: '배지 정보가 필요합니다' },
+      { status: 400 },
+    )
 
   const db = getSupabaseAdmin()
 
@@ -30,11 +36,17 @@ export async function POST(request: NextRequest) {
     .maybeSingle()
 
   if (!badge)
-    return NextResponse.json({ error: '배지를 찾을 수 없습니다' }, { status: 404 })
+    return NextResponse.json(
+      { error: '배지를 찾을 수 없습니다' },
+      { status: 404 },
+    )
 
   const b = badge as { badge_id: string; upgr_yn: string }
   if (b.upgr_yn === 'Y')
-    return NextResponse.json({ error: '이미 강화된 배지입니다' }, { status: 409 })
+    return NextResponse.json(
+      { error: '이미 강화된 배지입니다' },
+      { status: 409 },
+    )
 
   // Bean 차감 — PI 모드(메인넷 등재 기간)는 마이크로 무료화로 차감 스킵 (PRD_24 §0)
   const feeBean = await microFeeBean(BADGE_UPGRADE_BEAN)
@@ -61,7 +73,10 @@ export async function POST(request: NextRequest) {
           { status: 402 },
         )
       }
-      return NextResponse.json({ error: '결제 처리에 실패했습니다' }, { status: 500 })
+      return NextResponse.json(
+        { error: '결제 처리에 실패했습니다' },
+        { status: 500 },
+      )
     }
     balance = charge.balance
   }
@@ -92,7 +107,10 @@ export async function POST(request: NextRequest) {
         regrId: user.display_name.slice(0, 20),
       })
     }
-    return NextResponse.json({ error: '배지 강화에 실패했습니다' }, { status: 500 })
+    return NextResponse.json(
+      { error: '배지 강화에 실패했습니다' },
+      { status: 500 },
+    )
   }
 
   return NextResponse.json({ success: true, balance })

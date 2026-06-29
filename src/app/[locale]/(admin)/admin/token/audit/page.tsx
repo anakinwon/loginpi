@@ -101,14 +101,16 @@ export default function BeanAuditLogPage() {
               setFilterUsrId('')
               load()
             }}
-            className="text-muted-foreground h-9 rounded-md border px-3 text-sm hover:bg-muted"
+            className="text-muted-foreground hover:bg-muted h-9 rounded-md border px-3 text-sm"
           >
             초기화
           </button>
         )}
       </div>
 
-      {loading && <p className="text-muted-foreground text-sm">불러오는 중...</p>}
+      {loading && (
+        <p className="text-muted-foreground text-sm">불러오는 중...</p>
+      )}
       {error && <p className="text-sm text-red-500">오류: {error}</p>}
 
       {!loading && !error && (
@@ -118,17 +120,25 @@ export default function BeanAuditLogPage() {
           </p>
 
           {rows.length === 0 ? (
-            <p className="text-muted-foreground text-sm">조정 내역이 없습니다.</p>
+            <p className="text-muted-foreground text-sm">
+              조정 내역이 없습니다.
+            </p>
           ) : (
             <div className="overflow-hidden overflow-x-auto rounded-lg border">
               <table className="w-full text-sm">
                 <thead className="bg-muted/50 border-b">
                   <tr>
                     <th className="px-4 py-2 text-left font-medium">일시</th>
-                    <th className="px-4 py-2 text-left font-medium">대상 사용자</th>
-                    <th className="px-4 py-2 text-right font-medium">조정 전</th>
+                    <th className="px-4 py-2 text-left font-medium">
+                      대상 사용자
+                    </th>
+                    <th className="px-4 py-2 text-right font-medium">
+                      조정 전
+                    </th>
                     <th className="px-4 py-2 text-right font-medium">조정량</th>
-                    <th className="px-4 py-2 text-right font-medium">조정 후</th>
+                    <th className="px-4 py-2 text-right font-medium">
+                      조정 후
+                    </th>
                     <th className="px-4 py-2 text-left font-medium">사유</th>
                     <th className="px-4 py-2 text-left font-medium">증빙</th>
                   </tr>
@@ -153,7 +163,7 @@ export default function BeanAuditLogPage() {
                         key={row.audit_id}
                         className="hover:bg-muted/30 transition-colors"
                       >
-                        <td className="text-muted-foreground px-4 py-3 whitespace-nowrap text-xs">
+                        <td className="text-muted-foreground px-4 py-3 text-xs whitespace-nowrap">
                           {new Date(row.reg_dtm).toLocaleString('ko-KR')}
                         </td>
                         <td className="px-4 py-3">
@@ -183,7 +193,7 @@ export default function BeanAuditLogPage() {
                           {row.adj_after.toLocaleString()}
                         </td>
                         <td className="px-4 py-3">
-                          <span className="rounded bg-muted px-1.5 py-0.5 text-xs">
+                          <span className="bg-muted rounded px-1.5 py-0.5 text-xs">
                             {REASON_LABEL[row.reason_txt] ?? row.reason_txt}
                           </span>
                         </td>

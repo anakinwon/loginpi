@@ -85,7 +85,7 @@ export function BottomNavClient({ serverIsAdmin }: { serverIsAdmin: boolean }) {
             // 그라데이션 muted→border(한 단계 더 진한 톤) + bg-muted 폴백 베이스.
             // 3D 볼륨: 강한 드롭 섀도(부유) + 상단 하이라이트(윗면 빛) + 하단 inset 다크(아래 그늘).
             // 배경 불투명 → opacity-90(90%) 규칙 유지.
-            'inset-x-3 overflow-hidden rounded-2xl border bg-muted bg-gradient-to-b from-muted to-[var(--color-border)] shadow-[0_14px_34px_-8px_rgba(0,0,0,0.42),inset_0_1px_0_0_rgba(255,255,255,0.25),inset_0_-2px_3px_-1px_rgba(0,0,0,0.16)]'
+            'bg-muted from-muted inset-x-3 overflow-hidden rounded-2xl border bg-gradient-to-b to-[var(--color-border)] shadow-[0_14px_34px_-8px_rgba(0,0,0,0.42),inset_0_1px_0_0_rgba(255,255,255,0.25),inset_0_-2px_3px_-1px_rgba(0,0,0,0.16)]'
           : // 일반 브라우저: 기존 도킹 바 (하단 풀폭, safe-area 패딩)
             'bg-background/95 inset-x-0 bottom-0 border-t pb-[env(safe-area-inset-bottom)]',
         // 가시: 90% 불투명 / 숨김: 투명(opacity-0) 완전 fade-out + 터치 차단.

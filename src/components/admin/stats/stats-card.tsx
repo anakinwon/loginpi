@@ -51,7 +51,11 @@ export function StatsCard({
   const isKpi = variant !== 'default'
   // 파스텔 배경 위에서는 진한 슬레이트 텍스트로 가독성 확보(라이트/다크 공통)
   const base = isKpi
-    ? cn('rounded-xl p-5 shadow-sm', KPI_BG[variant], 'text-slate-900 dark:text-slate-50')
+    ? cn(
+        'rounded-xl p-5 shadow-sm',
+        KPI_BG[variant],
+        'text-slate-900 dark:text-slate-50',
+      )
     : 'rounded-lg border p-4'
 
   if (loading) {
@@ -70,15 +74,26 @@ export function StatsCard({
   return (
     <div className={cn(base, className)}>
       {icon && <div className="mb-2 flex justify-end opacity-60">{icon}</div>}
-      <p className={cn('text-sm', isKpi ? 'opacity-75' : 'text-muted-foreground')}>
+      <p
+        className={cn(
+          'text-sm',
+          isKpi ? 'opacity-75' : 'text-muted-foreground',
+        )}
+      >
         {label}
       </p>
       <p className={cn('mt-1 font-bold', isKpi ? 'text-3xl' : 'text-2xl')}>
         {display}
         {unitNode ? (
-          <span className={cn('ml-1 text-sm font-normal', subText)}>{unitNode}</span>
+          <span className={cn('ml-1 text-sm font-normal', subText)}>
+            {unitNode}
+          </span>
         ) : (
-          unit && <span className={cn('ml-1 text-sm font-normal', subText)}>{unit}</span>
+          unit && (
+            <span className={cn('ml-1 text-sm font-normal', subText)}>
+              {unit}
+            </span>
+          )
         )}
       </p>
       {sub && <p className={cn('mt-1 text-xs', subText)}>{sub}</p>}

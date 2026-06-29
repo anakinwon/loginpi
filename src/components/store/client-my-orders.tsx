@@ -137,9 +137,12 @@ const IN_TRADE: OrderRow['order_st_cd'][] = ['TRADING', 'ESCROW', 'SELLER_DONE']
 export function ClientMyOrders({
   role,
   serverAuthed = false,
+  feeMode = 'BEAN',
 }: {
   role: 'buyer' | 'seller'
   serverAuthed?: boolean
+  // 요금제 모드 — BEAN 모드에선 후기(Bean 보상) 영역 통째 숨김. 부모 server page가 getActiveFeeMode()로 주입.
+  feeMode?: 'BEAN' | 'PI'
 }) {
   const t = useTranslations('store')
   const { user, isLoading } = usePiAuth()
@@ -507,8 +510,10 @@ export function ClientMyOrders({
         )}
 
         {/* 구매 완료 주문 — 후기 작성 버튼 또는 완료 배지.
-            매장주가 이용후기·Bean 보상에 동의(fbck_consent_yn='Y')한 매장 상품만 노출 */}
-        {role === 'buyer' &&
+            매장주가 이용후기·Bean 보상에 동의(fbck_consent_yn='Y')한 매장 상품만 노출.
+            BEAN 모드에선 후기 보상 자체가 비활성이므로 영역 전체 숨김(PI 모드만 노출). */}
+        {feeMode === 'PI' &&
+          role === 'buyer' &&
           (o.order_st_cd === 'DONE' || o.order_st_cd === 'BUYER_DONE') &&
           o.mps_item?.ctgr_id &&
           o.mps_item?.mps_shop?.fbck_consent_yn === 'Y' && (

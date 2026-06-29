@@ -27,7 +27,10 @@ export async function GET(request: NextRequest) {
   const lng = Number(searchParams.get('lng'))
   const radius_m = Math.max(100, Number(searchParams.get('radius_m') ?? '5000'))
   const page = Math.max(1, Number(searchParams.get('page') ?? '1'))
-  const limit = Math.min(Math.max(1, Number(searchParams.get('limit') ?? '20')), 100)
+  const limit = Math.min(
+    Math.max(1, Number(searchParams.get('limit') ?? '20')),
+    100,
+  )
 
   // 입력값 검증
   if (!lat || !lng || isNaN(lat) || isNaN(lng)) {
@@ -38,7 +41,10 @@ export async function GET(request: NextRequest) {
   }
 
   if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
-    return NextResponse.json({ error: '좌표 범위를 벗어났습니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: '좌표 범위를 벗어났습니다' },
+      { status: 400 },
+    )
   }
 
   try {
@@ -129,7 +135,12 @@ export async function GET(request: NextRequest) {
 
     // 4단계: Client-side 거리 계산 및 정렬
     // 하버사인 공식 (정밀) 또는 대각선 근사 (빠름)
-    const calcDistance = (lat1: number, lng1: number, lat2: number, lng2: number): number => {
+    const calcDistance = (
+      lat1: number,
+      lng1: number,
+      lat2: number,
+      lng2: number,
+    ): number => {
       const dLat = ((lat2 - lat1) * Math.PI) / 180
       const dLng = ((lng2 - lng1) * Math.PI) / 180
       const a =
@@ -145,7 +156,9 @@ export async function GET(request: NextRequest) {
     const shopsWithDistance = (shops ?? [])
       .map((shop) => ({
         ...shop,
-        distance_m: Math.round(calcDistance(lat, lng, shop.latd_crd, shop.lngt_crd)),
+        distance_m: Math.round(
+          calcDistance(lat, lng, shop.latd_crd, shop.lngt_crd),
+        ),
       }))
       .filter((shop) => shop.distance_m <= radius_m) // 최종 거리 필터링
       .sort((a, b) => a.distance_m - b.distance_m) // 거리 가까운 순 정렬

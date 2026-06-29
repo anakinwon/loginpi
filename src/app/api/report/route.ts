@@ -5,7 +5,15 @@ import { withGuard } from '@/lib/api-guard'
 
 // 커뮤니티 신고 접수 — 로그인 사용자. 게시물/댓글/상점/사용자/채팅 신고.
 const TARGETS = ['POST', 'COMMENT', 'SHOP', 'USER', 'CHAT']
-const REASONS = ['SPAM', 'ABUSE', 'SEXUAL', 'PRIVACY', 'COPYRIGHT', 'FRAUD', 'ETC']
+const REASONS = [
+  'SPAM',
+  'ABUSE',
+  'SEXUAL',
+  'PRIVACY',
+  'COPYRIGHT',
+  'FRAUD',
+  'ETC',
+]
 
 async function handlePOST(req: NextRequest) {
   const user = await getSessionUser()
@@ -27,10 +35,16 @@ async function handlePOST(req: NextRequest) {
   }
 
   if (!target_tp || !TARGETS.includes(target_tp) || !target_id) {
-    return NextResponse.json({ error: '신고 대상이 올바르지 않습니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: '신고 대상이 올바르지 않습니다' },
+      { status: 400 },
+    )
   }
   if (!reason_cd || !REASONS.includes(reason_cd)) {
-    return NextResponse.json({ error: '신고 사유를 선택해 주세요' }, { status: 400 })
+    return NextResponse.json(
+      { error: '신고 사유를 선택해 주세요' },
+      { status: 400 },
+    )
   }
 
   const db = getSupabaseAdmin()

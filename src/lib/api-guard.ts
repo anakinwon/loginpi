@@ -20,7 +20,10 @@ import { recordApiMetric } from './monitor-metric'
 // 고위험 엔드포인트(인증·결제)에는 반드시 적용.
 // ────────────────────────────────────────────────────────────────────────────
 
-type Handler = (req: NextRequest, ctx?: unknown) => Promise<NextResponse> | NextResponse
+type Handler = (
+  req: NextRequest,
+  ctx?: unknown,
+) => Promise<NextResponse> | NextResponse
 
 // 요청 바디 최대 크기 (바이트). 대용량 페이로드 공격 차단
 const MAX_BODY_SIZE: Record<string, number> = {
@@ -55,7 +58,13 @@ export function withGuard(handler: Handler): Handler {
       if (Number(cl) > maxSize) {
         return new NextResponse(
           JSON.stringify({ error: 'payload_too_large' }),
-          { status: 413, headers: { 'Content-Type': 'application/json', ...SECURITY_HEADERS } },
+          {
+            status: 413,
+            headers: {
+              'Content-Type': 'application/json',
+              ...SECURITY_HEADERS,
+            },
+          },
         )
       }
     }
@@ -73,10 +82,22 @@ export function withGuard(handler: Handler): Handler {
     try {
       res = await handler(req, ctx)
     } catch (e) {
-      recordApiMetric({ endpoint: pathname, method: req.method, status: 500, ms: Date.now() - start, ip })
+      recordApiMetric({
+        endpoint: pathname,
+        method: req.method,
+        status: 500,
+        ms: Date.now() - start,
+        ip,
+      })
       throw e
     }
-    recordApiMetric({ endpoint: pathname, method: req.method, status: res.status, ms: Date.now() - start, ip })
+    recordApiMetric({
+      endpoint: pathname,
+      method: req.method,
+      status: res.status,
+      ms: Date.now() - start,
+      ip,
+    })
 
     // 5) 보안 헤더 부착
     for (const [k, v] of Object.entries(SECURITY_HEADERS)) {
@@ -101,7 +122,9 @@ export function withAuthGuard(handler: Handler): Handler {
         const originHostname = new URL(origin).hostname
         // NEXT_PUBLIC_APP_URL 우선, 없으면 host 헤더 fallback
         const appUrl = process.env.NEXT_PUBLIC_APP_URL
-        const trustedHostname = appUrl ? new URL(appUrl).hostname : host?.split(':')[0] ?? ''
+        const trustedHostname = appUrl
+          ? new URL(appUrl).hostname
+          : (host?.split(':')[0] ?? '')
         if (!trustedHostname || originHostname !== trustedHostname) {
           return forbiddenResponse('cross_origin_auth')
         }

@@ -12,11 +12,15 @@ export async function GET() {
     const [missionsResult, progress] = await Promise.all([
       getSupabaseAdmin()
         .from('evt_mission')
-        .select('mission_cd, mission_nm, mission_guide_desc, complete_type_cd, mission_ord')
+        .select(
+          'mission_cd, mission_nm, mission_guide_desc, complete_type_cd, mission_ord',
+        )
         .eq('event_id', 'evt-20260614-001')
         .eq('del_yn', 'N')
         .order('mission_ord', { ascending: true }),
-      user ? getEventProgress(user.id, 'evt-20260614-001') : Promise.resolve(null),
+      user
+        ? getEventProgress(user.id, 'evt-20260614-001')
+        : Promise.resolve(null),
     ])
 
     const trimmedMissions = (missionsResult.data ?? []).map((m) => ({
@@ -27,6 +31,9 @@ export async function GET() {
     return NextResponse.json({ progress, missions: trimmedMissions })
   } catch (err) {
     console.error('[event/my-progress] 조회 실패:', err)
-    return NextResponse.json({ error: '미션 진행도 조회 실패' }, { status: 500 })
+    return NextResponse.json(
+      { error: '미션 진행도 조회 실패' },
+      { status: 500 },
+    )
   }
 }

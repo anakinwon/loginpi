@@ -40,7 +40,13 @@ const TARGET_LABEL: Record<string, string> = {
   USER: '사용자',
   CHAT: '채팅',
 }
-const STATUS_FILTERS = ['', 'PENDING', 'REVIEWING', 'RESOLVED', 'REJECTED'] as const
+const STATUS_FILTERS = [
+  '',
+  'PENDING',
+  'REVIEWING',
+  'RESOLVED',
+  'REJECTED',
+] as const
 
 export default function ReportsPage() {
   const [rows, setRows] = useState<Row[]>([])
@@ -70,8 +76,13 @@ export default function ReportsPage() {
     void load()
   }, [load])
 
-  async function patch(rpt_id: string, body: { status_cd?: string; admin_memo?: string }) {
-    setRows((prev) => prev.map((r) => (r.rpt_id === rpt_id ? { ...r, ...body } : r)))
+  async function patch(
+    rpt_id: string,
+    body: { status_cd?: string; admin_memo?: string },
+  ) {
+    setRows((prev) =>
+      prev.map((r) => (r.rpt_id === rpt_id ? { ...r, ...body } : r)),
+    )
     try {
       const res = await piFetch('/api/admin/reports', {
         method: 'PATCH',
@@ -125,9 +136,12 @@ export default function ReportsPage() {
                 <span className="bg-muted rounded px-1.5 py-0.5 text-xs">
                   {TARGET_LABEL[r.target_tp_cd] ?? r.target_tp_cd}
                 </span>
-                <span className="font-medium">{REASON_LABEL[r.reason_cd] ?? r.reason_cd}</span>
+                <span className="font-medium">
+                  {REASON_LABEL[r.reason_cd] ?? r.reason_cd}
+                </span>
                 <span className="text-muted-foreground text-xs">
-                  신고자 {r.reporter_nm} · {new Date(r.reg_dtm).toLocaleString()}
+                  신고자 {r.reporter_nm} ·{' '}
+                  {new Date(r.reg_dtm).toLocaleString()}
                 </span>
               </div>
               {r.reason_txt && (
@@ -141,7 +155,9 @@ export default function ReportsPage() {
               <div className="flex flex-wrap items-center gap-2">
                 <select
                   value={r.status_cd}
-                  onChange={(e) => patch(r.rpt_id, { status_cd: e.target.value })}
+                  onChange={(e) =>
+                    patch(r.rpt_id, { status_cd: e.target.value })
+                  }
                   className="border-input bg-background rounded-md border px-2 py-1 text-xs"
                 >
                   {Object.entries(STATUS_LABEL).map(([v, l]) => (

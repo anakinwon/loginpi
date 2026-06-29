@@ -34,9 +34,19 @@ async function runReward(): Promise<RewardResult> {
     .select('reward_mission_count_no, reward_pi_yn')
     .eq('event_id', EVENT_ID)
     .maybeSingle()
-  const evt = evtRow as { reward_mission_count_no: number; reward_pi_yn: string } | null
+  const evt = evtRow as {
+    reward_mission_count_no: number
+    reward_pi_yn: string
+  } | null
   if (!evt || evt.reward_pi_yn !== 'Y') {
-    return { skipped: 'event_inactive', eligible: 0, granted: 0, already: 0, failed: 0, excludedCount: 0 }
+    return {
+      skipped: 'event_inactive',
+      eligible: 0,
+      granted: 0,
+      already: 0,
+      failed: 0,
+      excludedCount: 0,
+    }
   }
 
   const required = evt.reward_mission_count_no ?? 10
@@ -60,7 +70,7 @@ async function runReward(): Promise<RewardResult> {
     .eq('event_id', EVENT_ID)
     .eq('del_yn', 'N')
   const excluded = new Set(
-    (exRows ?? []).map(e => (e as { user_id: string }).user_id),
+    (exRows ?? []).map((e) => (e as { user_id: string }).user_id),
   )
 
   const targets = [...counts.entries()]
@@ -80,7 +90,13 @@ async function runReward(): Promise<RewardResult> {
     }
   }
 
-  return { eligible: targets.length, granted, already, failed, excludedCount: excluded.size }
+  return {
+    eligible: targets.length,
+    granted,
+    already,
+    failed,
+    excludedCount: excluded.size,
+  }
 }
 
 async function logBatchRun(
@@ -124,7 +140,12 @@ export async function GET(request: NextRequest) {
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e)
     console.error('[cron/event-bean-reward] 실행 실패:', msg)
-    await logBatchRun('CRON', start, { eligible: 0, granted: 0, already: 0, failed: 1, excludedCount: 0 }, 'SYSTEM')
+    await logBatchRun(
+      'CRON',
+      start,
+      { eligible: 0, granted: 0, already: 0, failed: 1, excludedCount: 0 },
+      'SYSTEM',
+    )
     return NextResponse.json({ ok: false, error: msg }, { status: 500 })
   }
 }

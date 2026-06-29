@@ -101,7 +101,15 @@ export async function PATCH(req: NextRequest) {
 }
 
 function emptySummary() {
-  return { total: 0, done: 0, doing: 0, todo: 0, na: 0, blockingLeft: 0, percent: 0 }
+  return {
+    total: 0,
+    done: 0,
+    doing: 0,
+    todo: 0,
+    na: 0,
+    blockingLeft: 0,
+    percent: 0,
+  }
 }
 
 function summarize(items: ChkRow[]) {

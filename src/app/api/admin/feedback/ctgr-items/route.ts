@@ -11,7 +11,8 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 
 export async function GET(req: NextRequest) {
   const user = await getSessionUser()
-  if (!isAdmin(user)) return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+  if (!isAdmin(user))
+    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
 
   const db = getSupabaseAdmin()
   const { searchParams } = req.nextUrl
@@ -26,21 +27,31 @@ export async function GET(req: NextRequest) {
       .eq('del_yn', 'N')
       .order('sort_ord', { ascending: true })
 
-    if (error) return NextResponse.json({ error: '카테고리 조회 실패' }, { status: 500 })
+    if (error)
+      return NextResponse.json({ error: '카테고리 조회 실패' }, { status: 500 })
 
     // 부모명 맵 구성
     const parentMap = new Map<string, string>(
-      (data ?? []).map((c: { ctgr_id: string; ctgr_nm: string }) => [c.ctgr_id, c.ctgr_nm]),
+      (data ?? []).map((c: { ctgr_id: string; ctgr_nm: string }) => [
+        c.ctgr_id,
+        c.ctgr_nm,
+      ]),
     )
     const categories = (data ?? []).map(
-      (c: { ctgr_id: string; parent_ctgr_id: string | null; ctgr_nm: string; sort_ord: number }) => ({
+      (c: {
+        ctgr_id: string
+        parent_ctgr_id: string | null
+        ctgr_nm: string
+        sort_ord: number
+      }) => ({
         ctgr_id: c.ctgr_id,
         ctgr_nm: c.ctgr_nm,
         label: c.parent_ctgr_id
           ? `${parentMap.get(c.parent_ctgr_id) ?? '?'} > ${c.ctgr_nm}`
           : c.ctgr_nm,
         is_leaf: !(data ?? []).some(
-          (ch: { parent_ctgr_id: string | null }) => ch.parent_ctgr_id === c.ctgr_id,
+          (ch: { parent_ctgr_id: string | null }) =>
+            ch.parent_ctgr_id === c.ctgr_id,
         ),
       }),
     )
@@ -57,16 +68,21 @@ export async function GET(req: NextRequest) {
       .eq('del_yn', 'N')
       .order('sort_ord', { ascending: true })
 
-    if (error) return NextResponse.json({ error: '항목 조회 실패' }, { status: 500 })
+    if (error)
+      return NextResponse.json({ error: '항목 조회 실패' }, { status: 500 })
     return NextResponse.json({ items: data ?? [] })
   }
 
-  return NextResponse.json({ error: 'mode=categories 또는 ctgr_id 필요' }, { status: 400 })
+  return NextResponse.json(
+    { error: 'mode=categories 또는 ctgr_id 필요' },
+    { status: 400 },
+  )
 }
 
 export async function POST(req: NextRequest) {
   const user = await getSessionUser()
-  if (!isAdmin(user)) return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+  if (!isAdmin(user))
+    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
 
   const body = (await req.json()) as {
     ctgr_id?: string
@@ -77,12 +93,18 @@ export async function POST(req: NextRequest) {
   }
 
   if (!body.ctgr_id || !body.item_cd?.trim() || !body.item_nm?.trim()) {
-    return NextResponse.json({ error: 'ctgr_id, item_cd, item_nm은 필수입니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: 'ctgr_id, item_cd, item_nm은 필수입니다' },
+      { status: 400 },
+    )
   }
 
   const itemCd = body.item_cd.trim().toUpperCase()
   if (!/^[A-Z0-9_]{1,16}$/.test(itemCd)) {
-    return NextResponse.json({ error: '항목 코드는 영문대문자·숫자·_ 1~16자' }, { status: 400 })
+    return NextResponse.json(
+      { error: '항목 코드는 영문대문자·숫자·_ 1~16자' },
+      { status: 400 },
+    )
   }
 
   const db = getSupabaseAdmin()
@@ -95,7 +117,11 @@ export async function POST(req: NextRequest) {
     .eq('del_yn', 'N')
     .maybeSingle()
 
-  if (!ctgr) return NextResponse.json({ error: '존재하지 않는 카테고리입니다' }, { status: 400 })
+  if (!ctgr)
+    return NextResponse.json(
+      { error: '존재하지 않는 카테고리입니다' },
+      { status: 400 },
+    )
 
   const { data, error } = await db
     .from('fbck_ctgr_item')
@@ -113,7 +139,10 @@ export async function POST(req: NextRequest) {
 
   if (error) {
     if (error.code === '23505') {
-      return NextResponse.json({ error: '이미 같은 코드의 항목이 있습니다' }, { status: 409 })
+      return NextResponse.json(
+        { error: '이미 같은 코드의 항목이 있습니다' },
+        { status: 409 },
+      )
     }
     return NextResponse.json({ error: '항목 추가 실패' }, { status: 500 })
   }
@@ -123,7 +152,8 @@ export async function POST(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   const user = await getSessionUser()
-  if (!isAdmin(user)) return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+  if (!isAdmin(user))
+    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
 
   const body = (await req.json()) as {
     item_id?: string
@@ -132,14 +162,16 @@ export async function PATCH(req: NextRequest) {
     sort_ord?: number
   }
 
-  if (!body.item_id) return NextResponse.json({ error: 'item_id 필요' }, { status: 400 })
+  if (!body.item_id)
+    return NextResponse.json({ error: 'item_id 필요' }, { status: 400 })
 
   const patch: Record<string, unknown> = {
     modr_id: user!.id,
     mod_dtm: new Date().toISOString(),
   }
   if (body.item_nm !== undefined) patch.item_nm = body.item_nm.trim()
-  if (body.item_desc !== undefined) patch.item_desc = body.item_desc?.trim() || null
+  if (body.item_desc !== undefined)
+    patch.item_desc = body.item_desc?.trim() || null
   if (body.sort_ord !== undefined) patch.sort_ord = body.sort_ord
 
   const { data, error } = await getSupabaseAdmin()
@@ -151,17 +183,23 @@ export async function PATCH(req: NextRequest) {
     .maybeSingle()
 
   if (error) return NextResponse.json({ error: '수정 실패' }, { status: 500 })
-  if (!data) return NextResponse.json({ error: '항목을 찾을 수 없습니다' }, { status: 404 })
+  if (!data)
+    return NextResponse.json(
+      { error: '항목을 찾을 수 없습니다' },
+      { status: 404 },
+    )
 
   return NextResponse.json({ item: data })
 }
 
 export async function DELETE(req: NextRequest) {
   const user = await getSessionUser()
-  if (!isAdmin(user)) return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+  if (!isAdmin(user))
+    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
 
   const itemId = req.nextUrl.searchParams.get('item_id')
-  if (!itemId) return NextResponse.json({ error: 'item_id 필요' }, { status: 400 })
+  if (!itemId)
+    return NextResponse.json({ error: 'item_id 필요' }, { status: 400 })
 
   const { error } = await getSupabaseAdmin()
     .from('fbck_ctgr_item')

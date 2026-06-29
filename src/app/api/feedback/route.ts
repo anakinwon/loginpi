@@ -18,7 +18,13 @@ interface FbckItemScrInput {
 // 점수→Bean 금액 (bean_fee_plan.prod_ctgr_cd='FBCK_REWARD')
 async function getRewardBean(score: number): Promise<number> {
   const db = getSupabaseAdmin()
-  const cdMap: Record<number, string> = { 1: 'FR_1', 2: 'FR_2', 3: 'FR_3', 4: 'FR_4', 5: 'FR_5' }
+  const cdMap: Record<number, string> = {
+    1: 'FR_1',
+    2: 'FR_2',
+    3: 'FR_3',
+    4: 'FR_4',
+    5: 'FR_5',
+  }
   const { data } = await db
     .from('bean_fee_plan')
     .select('amt_bean')
@@ -35,17 +41,25 @@ export async function GET(req: NextRequest) {
   const orderId = searchParams.get('order_id')
   const itemId = searchParams.get('item_id')
   const page = Math.max(1, Number(searchParams.get('page') ?? '1'))
-  const limit = Math.min(50, Math.max(1, Number(searchParams.get('limit') ?? '20')))
+  const limit = Math.min(
+    50,
+    Math.max(1, Number(searchParams.get('limit') ?? '20')),
+  )
   const offset = (page - 1) * limit
 
   if (!shopId && !orderId && !itemId) {
-    return NextResponse.json({ error: 'shop_id, order_id 또는 item_id가 필요합니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: 'shop_id, order_id 또는 item_id가 필요합니다' },
+      { status: 400 },
+    )
   }
 
   const db = getSupabaseAdmin()
   let q = db
     .from('fbck_mst')
-    .select('fbck_id, usr_id, fbck_scr, fbck_cn, bean_rwrd_qty, reg_dtm', { count: 'exact' })
+    .select('fbck_id, usr_id, fbck_scr, fbck_cn, bean_rwrd_qty, reg_dtm', {
+      count: 'exact',
+    })
     .eq('del_yn', 'N')
     .eq('hide_yn', 'N')
     .order('reg_dtm', { ascending: false })
@@ -71,7 +85,9 @@ export async function GET(req: NextRequest) {
     : { data: [] }
 
   // 작성자 표시명 조회
-  const usrIds = [...new Set((rows ?? []).map((r: { usr_id: string }) => r.usr_id))]
+  const usrIds = [
+    ...new Set((rows ?? []).map((r: { usr_id: string }) => r.usr_id)),
+  ]
   const { data: userRows } = usrIds.length
     ? await db
         .from('sys_user')
@@ -80,10 +96,13 @@ export async function GET(req: NextRequest) {
     : { data: [] }
 
   const userMap = new Map(
-    (userRows ?? []).map((u: { id: string; pi_username: string | null; nick_nm: string | null }) => [
-      u.id,
-      maskUsername(u.pi_username ?? u.nick_nm),
-    ]),
+    (userRows ?? []).map(
+      (u: {
+        id: string
+        pi_username: string | null
+        nick_nm: string | null
+      }) => [u.id, maskUsername(u.pi_username ?? u.nick_nm)],
+    ),
   )
 
   const imgMap = new Map<string, string[]>()
@@ -93,14 +112,23 @@ export async function GET(req: NextRequest) {
     imgMap.set(img.fbck_id, list)
   }
 
-  const data = (rows ?? []).map((r: { fbck_id: string; usr_id: string; fbck_scr: number; fbck_cn: string; bean_rwrd_qty: number; reg_dtm: string }) => ({
-    fbck_id: r.fbck_id,
-    display_name: userMap.get(r.usr_id) ?? '****',
-    fbck_scr: r.fbck_scr,
-    fbck_cn: r.fbck_cn,
-    fbck_img: imgMap.get(r.fbck_id) ?? [],
-    reg_dtm: r.reg_dtm,
-  }))
+  const data = (rows ?? []).map(
+    (r: {
+      fbck_id: string
+      usr_id: string
+      fbck_scr: number
+      fbck_cn: string
+      bean_rwrd_qty: number
+      reg_dtm: string
+    }) => ({
+      fbck_id: r.fbck_id,
+      display_name: userMap.get(r.usr_id) ?? '****',
+      fbck_scr: r.fbck_scr,
+      fbck_cn: r.fbck_cn,
+      fbck_img: imgMap.get(r.fbck_id) ?? [],
+      reg_dtm: r.reg_dtm,
+    }),
+  )
 
   // 별점 분포 통계 (shop_id 또는 item_id 기준)
   let stats = null
@@ -142,34 +170,54 @@ export async function GET(req: NextRequest) {
 // POST /api/feedback
 export async function POST(req: NextRequest) {
   const user = await getSessionUser()
-  if (!user) return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user)
+    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
 
   const body = await req.json().catch(() => null)
   if (!body) return NextResponse.json({ error: '잘못된 요청' }, { status: 400 })
 
-  const { shop_id, order_id, fbck_scr, fbck_cn, fbck_img, item_scores } = body as {
-    shop_id?: string
-    order_id?: string
-    fbck_scr: number
-    fbck_cn: string
-    fbck_img?: FbckImgInput[]
-    item_scores?: FbckItemScrInput[]
-  }
+  const { shop_id, order_id, fbck_scr, fbck_cn, fbck_img, item_scores } =
+    body as {
+      shop_id?: string
+      order_id?: string
+      fbck_scr: number
+      fbck_cn: string
+      fbck_img?: FbckImgInput[]
+      item_scores?: FbckItemScrInput[]
+    }
 
   if (!shop_id && !order_id) {
-    return NextResponse.json({ error: 'shop_id 또는 order_id가 필요합니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: 'shop_id 또는 order_id가 필요합니다' },
+      { status: 400 },
+    )
   }
   if (!fbck_scr || fbck_scr < 1 || fbck_scr > 5) {
-    return NextResponse.json({ error: '별점은 1~5점이어야 합니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: '별점은 1~5점이어야 합니다' },
+      { status: 400 },
+    )
   }
   if (!fbck_cn || fbck_cn.trim().length < 10) {
-    return NextResponse.json({ error: '후기 본문은 최소 10자 이상이어야 합니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: '후기 본문은 최소 10자 이상이어야 합니다' },
+      { status: 400 },
+    )
   }
   if (fbck_img && fbck_img.length > 5) {
-    return NextResponse.json({ error: '이미지는 최대 5개까지 첨부 가능합니다' }, { status: 400 })
+    return NextResponse.json(
+      { error: '이미지는 최대 5개까지 첨부 가능합니다' },
+      { status: 400 },
+    )
   }
-  if (item_scores && item_scores.some((s) => s.item_scr < 1 || s.item_scr > 5)) {
-    return NextResponse.json({ error: '항목 점수는 1~5점이어야 합니다' }, { status: 400 })
+  if (
+    item_scores &&
+    item_scores.some((s) => s.item_scr < 1 || s.item_scr > 5)
+  ) {
+    return NextResponse.json(
+      { error: '항목 점수는 1~5점이어야 합니다' },
+      { status: 400 },
+    )
   }
 
   const db = getSupabaseAdmin()
@@ -190,10 +238,16 @@ export async function POST(req: NextRequest) {
       .maybeSingle()
 
     if (!mbr) {
-      return NextResponse.json({ error: '해당 카페에 참여한 기록이 없습니다' }, { status: 403 })
+      return NextResponse.json(
+        { error: '해당 카페에 참여한 기록이 없습니다' },
+        { status: 403 },
+      )
     }
     if ((mbr as { mbr_role_cd: string }).mbr_role_cd === 'OWNER') {
-      return NextResponse.json({ error: '자신이 만든 카페에는 후기를 작성할 수 없습니다' }, { status: 403 })
+      return NextResponse.json(
+        { error: '자신이 만든 카페에는 후기를 작성할 수 없습니다' },
+        { status: 403 },
+      )
     }
 
     // 보증금 주체 = 카페 OWNER (보상 재원 차감 대상)
@@ -221,12 +275,18 @@ export async function POST(req: NextRequest) {
       .maybeSingle()
 
     if (!ord) {
-      return NextResponse.json({ error: '해당 주문의 구매자가 아닙니다' }, { status: 403 })
+      return NextResponse.json(
+        { error: '해당 주문의 구매자가 아닙니다' },
+        { status: 403 },
+      )
     }
     // COMPLETED/SETTLED 상태 주문만 후기 작성 가능 (PENDING/CANCELLED 제외)
     const st = (ord as { order_st_cd: string; item_id: string }).order_st_cd
     if (st === 'PENDING' || st === 'CANCELLED') {
-      return NextResponse.json({ error: '완료된 주문에 대해서만 후기를 작성할 수 있습니다' }, { status: 403 })
+      return NextResponse.json(
+        { error: '완료된 주문에 대해서만 후기를 작성할 수 있습니다' },
+        { status: 403 },
+      )
     }
     prodId = (ord as { order_st_cd: string; item_id: string }).item_id
 
@@ -236,9 +296,10 @@ export async function POST(req: NextRequest) {
       .select('seller_id, mps_shop(fbck_consent_yn)')
       .eq('item_id', prodId)
       .maybeSingle()
-    const itemShopRow = itemShop as
-      | { seller_id?: string; mps_shop?: { fbck_consent_yn?: string } | null }
-      | null
+    const itemShopRow = itemShop as {
+      seller_id?: string
+      mps_shop?: { fbck_consent_yn?: string } | null
+    } | null
     const consentYn = itemShopRow?.mps_shop?.fbck_consent_yn
     if (consentYn !== 'Y') {
       return NextResponse.json(
@@ -255,7 +316,10 @@ export async function POST(req: NextRequest) {
   //   보증금(잔액 ≥ 보상액)을 예치한 매장만 후기 작성·보상 가능. 1차 방어(친절 차단),
   //   실제 차감은 fn_fbck_reward_apply 내부 원자 조건부 UPDATE(2차 방어)가 보장.
   if (!ownerId || !bondKind) {
-    return NextResponse.json({ error: '매장 정보를 확인할 수 없습니다' }, { status: 500 })
+    return NextResponse.json(
+      { error: '매장 정보를 확인할 수 없습니다' },
+      { status: 500 },
+    )
   }
   const rewardBean = await getRewardBean(Number(fbck_scr))
   if (rewardBean > 0) {
@@ -266,10 +330,15 @@ export async function POST(req: NextRequest) {
       .eq('bond_kind', bondKind)
       .eq('del_yn', 'N')
       .maybeSingle()
-    const bondBal = Number((bond as { bond_bal_bean: number } | null)?.bond_bal_bean ?? 0)
+    const bondBal = Number(
+      (bond as { bond_bal_bean: number } | null)?.bond_bal_bean ?? 0,
+    )
     if (bondBal < rewardBean) {
       return NextResponse.json(
-        { error: '이 매장은 후기 보상 보증금이 부족해 현재 후기를 받지 않습니다' },
+        {
+          error:
+            '이 매장은 후기 보상 보증금이 부족해 현재 후기를 받지 않습니다',
+        },
         { status: 403 },
       )
     }
@@ -293,7 +362,10 @@ export async function POST(req: NextRequest) {
   if (insertErr) {
     // DB UNIQUE 제약 위반 = 중복 후기
     if (insertErr.code === '23505') {
-      return NextResponse.json({ error: '이미 후기를 작성했습니다' }, { status: 409 })
+      return NextResponse.json(
+        { error: '이미 후기를 작성했습니다' },
+        { status: 409 },
+      )
     }
     console.error('[Feedback] 후기 저장 실패:', insertErr.message)
     return NextResponse.json({ error: '후기 저장 실패' }, { status: 500 })
@@ -353,7 +425,11 @@ export async function POST(req: NextRequest) {
       // 게이트 통과 후 동시성 등으로 보증금 부족 → 방금 저장한 후기 논리삭제(보상 없는 후기 미게시)
       await db
         .from('fbck_mst')
-        .update({ del_yn: 'Y', del_dtm: new Date().toISOString(), modr_id: 'SYSTEM' })
+        .update({
+          del_yn: 'Y',
+          del_dtm: new Date().toISOString(),
+          modr_id: 'SYSTEM',
+        })
         .eq('fbck_id', fbckId)
       if (rwdErr) console.error('[Feedback] 보상 지급 실패:', rwdErr.message)
       return NextResponse.json(

@@ -149,7 +149,9 @@ export function CustomStickerCreator({
           </label>
           {mktYn && (
             <div className="flex items-center gap-2">
-              <label className="text-muted-foreground text-xs">판매가 ☕ Bean</label>
+              <label className="text-muted-foreground text-xs">
+                판매가 ☕ Bean
+              </label>
               <input
                 type="number"
                 value={priceBean}

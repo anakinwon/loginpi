@@ -11,7 +11,12 @@ interface StarRatingProps {
 
 const SIZE = { sm: 'text-lg', md: 'text-2xl', lg: 'text-4xl' }
 
-export function StarRating({ value, onChange, readonly = false, size = 'md' }: StarRatingProps) {
+export function StarRating({
+  value,
+  onChange,
+  readonly = false,
+  size = 'md',
+}: StarRatingProps) {
   const [hovered, setHovered] = useState(0)
   const display = hovered || value
 
@@ -27,7 +32,7 @@ export function StarRating({ value, onChange, readonly = false, size = 'md' }: S
           onMouseLeave={() => !readonly && setHovered(0)}
           className={[
             SIZE[size],
-            'transition-transform leading-none',
+            'leading-none transition-transform',
             !readonly && 'cursor-pointer hover:scale-110',
             readonly && 'cursor-default',
           ]

@@ -19,13 +19,20 @@ const EMPTY_TOKENS: ThemeTokens = { light: {}, dark: {} }
 
 // 색상 미리보기 점 (목록 카드용)
 function ColorDots({ set }: { set: ThemeColorSet }) {
-  const keys: ThemeTokenKey[] = ['primary', 'kpi1', 'kpi2', 'kpi3', 'kpi4', 'kpi5']
+  const keys: ThemeTokenKey[] = [
+    'primary',
+    'kpi1',
+    'kpi2',
+    'kpi3',
+    'kpi4',
+    'kpi5',
+  ]
   return (
     <div className="flex gap-1">
       {keys.map((k) => (
         <span
           key={k}
-          className="size-4 rounded-full border border-border/50"
+          className="border-border/50 size-4 rounded-full border"
           style={{ background: set[k] ?? 'transparent' }}
           title={k}
         />
@@ -47,7 +54,9 @@ function ColorRow({
   const isHex = /^#[0-9a-fA-F]{6}$/.test(value ?? '')
   return (
     <div className="flex items-center gap-2">
-      <span className="text-muted-foreground w-24 shrink-0 text-xs">{label}</span>
+      <span className="text-muted-foreground w-24 shrink-0 text-xs">
+        {label}
+      </span>
       <input
         type="color"
         value={isHex ? (value as string) : '#000000'}
@@ -152,7 +161,11 @@ export default function UiThemesPage() {
   }, [load])
 
   function startNew() {
-    setForm({ theme_nm: '', theme_desc: '', theme_tokens: { light: {}, dark: {} } })
+    setForm({
+      theme_nm: '',
+      theme_desc: '',
+      theme_tokens: { light: {}, dark: {} },
+    })
     setEditing('new')
   }
 
@@ -276,7 +289,8 @@ export default function UiThemesPage() {
         <div>
           <h1 className="text-lg font-bold">🎨 UI 테마 관리</h1>
           <p className="text-muted-foreground text-sm">
-            관리자 대시보드 색상 테마를 저장·전환합니다 (일반 사용자 화면은 영향 없음)
+            관리자 대시보드 색상 테마를 저장·전환합니다 (일반 사용자 화면은 영향
+            없음)
           </p>
         </div>
         {!editing && <Button onClick={startNew}>+ 새 테마</Button>}
@@ -290,7 +304,9 @@ export default function UiThemesPage() {
               <label className="text-xs font-medium">테마명 *</label>
               <Input
                 value={form.theme_nm}
-                onChange={(e) => setForm((f) => ({ ...f, theme_nm: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, theme_nm: e.target.value }))
+                }
                 placeholder="예: 파스텔 대시보드"
                 maxLength={50}
               />
@@ -299,7 +315,9 @@ export default function UiThemesPage() {
               <label className="text-xs font-medium">설명</label>
               <Input
                 value={form.theme_desc}
-                onChange={(e) => setForm((f) => ({ ...f, theme_desc: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, theme_desc: e.target.value }))
+                }
                 placeholder="테마 설명 (선택)"
               />
             </div>
@@ -320,7 +338,11 @@ export default function UiThemesPage() {
           </div>
 
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setEditing(null)} disabled={saving}>
+            <Button
+              variant="outline"
+              onClick={() => setEditing(null)}
+              disabled={saving}
+            >
               취소
             </Button>
             <Button onClick={save} disabled={saving}>
@@ -332,9 +354,13 @@ export default function UiThemesPage() {
 
       {/* 목록 */}
       {loading ? (
-        <p className="text-muted-foreground py-8 text-center text-sm">로딩 중…</p>
+        <p className="text-muted-foreground py-8 text-center text-sm">
+          로딩 중…
+        </p>
       ) : themes.length === 0 ? (
-        <p className="text-muted-foreground py-8 text-center text-sm">테마가 없습니다.</p>
+        <p className="text-muted-foreground py-8 text-center text-sm">
+          테마가 없습니다.
+        </p>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {themes.map((t) => (
@@ -348,12 +374,17 @@ export default function UiThemesPage() {
                     <span className="truncate">{t.theme_nm}</span>
                     {t.actv_yn === 'Y' && (
                       <span className="bg-primary text-primary-foreground shrink-0 rounded-full px-2 py-0.5 text-xs">
-                        ✓ {t.apply_scope_cd === 'GLOBAL' ? '전체 적용중' : '관리자 적용중'}
+                        ✓{' '}
+                        {t.apply_scope_cd === 'GLOBAL'
+                          ? '전체 적용중'
+                          : '관리자 적용중'}
                       </span>
                     )}
                   </p>
                   {t.theme_desc && (
-                    <p className="text-muted-foreground truncate text-xs">{t.theme_desc}</p>
+                    <p className="text-muted-foreground truncate text-xs">
+                      {t.theme_desc}
+                    </p>
                   )}
                 </div>
               </div>
@@ -386,17 +417,30 @@ export default function UiThemesPage() {
                     size="sm"
                     variant="outline"
                     onClick={() =>
-                      activate(t, t.apply_scope_cd === 'GLOBAL' ? 'ADMIN' : 'GLOBAL')
+                      activate(
+                        t,
+                        t.apply_scope_cd === 'GLOBAL' ? 'ADMIN' : 'GLOBAL',
+                      )
                     }
                     disabled={busyId === t.theme_id}
                   >
-                    {t.apply_scope_cd === 'GLOBAL' ? '관리자만으로 전환' : '전체로 전환'}
+                    {t.apply_scope_cd === 'GLOBAL'
+                      ? '관리자만으로 전환'
+                      : '전체로 전환'}
                   </Button>
                 )}
-                <Button size="sm" variant="outline" onClick={() => startEdit(t)}>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => startEdit(t)}
+                >
                   편집
                 </Button>
-                <Button size="sm" variant="outline" onClick={() => startDuplicate(t)}>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => startDuplicate(t)}
+                >
                   복제
                 </Button>
                 {t.actv_yn !== 'Y' && t.lock_yn !== 'Y' && (

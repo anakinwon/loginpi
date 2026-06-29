@@ -95,9 +95,30 @@ export function UsageTab({ period }: { period: number }) {
     <div className="space-y-5">
       {/* Zone 1 — KPI */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
-        <StatsCard label={t('usage.kpiDau')} value={dau} unit={t('common.uPerson')} loading={loading} variant="kpi-4" icon={<span aria-hidden>📅</span>} />
-        <StatsCard label={t('usage.kpiWau')} value={wau} unit={t('common.uPerson')} loading={loading} variant="kpi-1" icon={<span aria-hidden>📆</span>} />
-        <StatsCard label={t('usage.kpiMau')} value={mau} unit={t('common.uPerson')} loading={loading} variant="kpi-3" icon={<span aria-hidden>📈</span>} />
+        <StatsCard
+          label={t('usage.kpiDau')}
+          value={dau}
+          unit={t('common.uPerson')}
+          loading={loading}
+          variant="kpi-4"
+          icon={<span aria-hidden>📅</span>}
+        />
+        <StatsCard
+          label={t('usage.kpiWau')}
+          value={wau}
+          unit={t('common.uPerson')}
+          loading={loading}
+          variant="kpi-1"
+          icon={<span aria-hidden>📆</span>}
+        />
+        <StatsCard
+          label={t('usage.kpiMau')}
+          value={mau}
+          unit={t('common.uPerson')}
+          loading={loading}
+          variant="kpi-3"
+          icon={<span aria-hidden>📈</span>}
+        />
         <StatsCard
           label={t('usage.kpiStickiness')}
           value={Number(stickiness.toFixed(1))}
@@ -172,7 +193,7 @@ export function UsageTab({ period }: { period: number }) {
                     </div>
                     <div className="bg-muted h-2.5 overflow-hidden rounded-full">
                       <div
-                        className="bg-[var(--kpi-3)] h-full rounded-full"
+                        className="h-full rounded-full bg-[var(--kpi-3)]"
                         style={{ width: `${pct}%` }}
                       />
                     </div>

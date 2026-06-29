@@ -286,7 +286,7 @@ export function NearbyExplorer() {
         </p>
       ) : tab === 'shops' ? (
         <LazySection
-          fallback={<div className="bg-muted h-96 rounded-lg animate-pulse" />}
+          fallback={<div className="bg-muted h-96 animate-pulse rounded-lg" />}
           rootMargin="50px"
         >
           <div className="space-y-3">
@@ -392,7 +392,7 @@ export function NearbyExplorer() {
         </LazySection>
       ) : (
         <LazySection
-          fallback={<div className="bg-muted h-96 rounded-lg animate-pulse" />}
+          fallback={<div className="bg-muted h-96 animate-pulse rounded-lg" />}
           rootMargin="50px"
         >
           {rooms.length === 0 ? (

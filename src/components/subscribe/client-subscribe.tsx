@@ -65,7 +65,11 @@ export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
     void load()
   }, [load])
 
-  async function subscribe(product: SubscrProduct, grade: SubscrGrade, key: string) {
+  async function subscribe(
+    product: SubscrProduct,
+    grade: SubscrGrade,
+    key: string,
+  ) {
     // ⭐결제 단위는 서버가 결정한다(클라 feeMode는 stale 가능 → 신뢰 금지).
     //   서버가 BEAN이면 그 자리에서 Bean 차감, PI면 pay 파라미터를 받아 Pi 직결제로 핸드오프.
     setBusy(key)
@@ -86,7 +90,11 @@ export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
       }
       const data = (await res.json()) as {
         mode?: string
-        pay?: { amount: number; memo: string; metadata: Record<string, unknown> }
+        pay?: {
+          amount: number
+          memo: string
+          metadata: Record<string, unknown>
+        }
       }
       // 서버가 PI 모드로 판정 → Pi 직결제(createPayment). 클라 feeMode와 무관(서버 권위).
       if (data.mode === 'PI' && data.pay) {

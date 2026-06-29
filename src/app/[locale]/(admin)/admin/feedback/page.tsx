@@ -38,7 +38,10 @@ export default function AdminFeedbackPage() {
   const [scoreFilter, setScoreFilter] = useState('')
   const [hideFilter, setHideFilter] = useState('')
   const [loading, setLoading] = useState(true)
-  const [hideModal, setHideModal] = useState<{ fbck_id: string; current: string } | null>(null)
+  const [hideModal, setHideModal] = useState<{
+    fbck_id: string
+    current: string
+  } | null>(null)
   const [hideReason, setHideReason] = useState('')
   const [saving, setSaving] = useState(false)
 
@@ -50,7 +53,10 @@ export default function AdminFeedbackPage() {
       if (hideFilter) params.set('hide_yn', hideFilter)
       const res = await piFetch(`/api/admin/feedback?${params}`)
       if (!res.ok) throw new Error()
-      const d = (await res.json()) as { data: FbckRow[]; pagination: { total: number } }
+      const d = (await res.json()) as {
+        data: FbckRow[]
+        pagination: { total: number }
+      }
       setRows(d.data)
       setTotal(d.pagination.total)
     } catch {
@@ -107,7 +113,9 @@ export default function AdminFeedbackPage() {
       {/* 헤더 */}
       <div>
         <h1 className="text-lg font-bold">⭐ 이용후기 관리</h1>
-        <p className="text-muted-foreground mt-1 text-sm">총 {total.toLocaleString()}건</p>
+        <p className="text-muted-foreground mt-1 text-sm">
+          총 {total.toLocaleString()}건
+        </p>
       </div>
 
       {/* 필터 */}
@@ -159,9 +167,15 @@ export default function AdminFeedbackPage() {
               {/* 상단: 사용자 + 별점 + 날짜 */}
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2 text-sm">
-                  <span className="text-amber-500 font-medium">{STAR[r.fbck_scr]}</span>
-                  <span className="font-medium">{r.raw_username ?? r.display_name}</span>
-                  <span className="text-muted-foreground text-xs">({r.display_name})</span>
+                  <span className="font-medium text-amber-500">
+                    {STAR[r.fbck_scr]}
+                  </span>
+                  <span className="font-medium">
+                    {r.raw_username ?? r.display_name}
+                  </span>
+                  <span className="text-muted-foreground text-xs">
+                    ({r.display_name})
+                  </span>
                   {r.rwrd_yn === 'Y' && (
                     <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] text-amber-700 dark:bg-amber-900 dark:text-amber-300">
                       ☕ {r.bean_rwrd_qty} Bean 지급
@@ -182,19 +196,27 @@ export default function AdminFeedbackPage() {
               <p className="text-sm leading-relaxed">{r.fbck_cn}</p>
 
               {/* 메타 정보 */}
-              <div className="flex flex-wrap gap-x-4 gap-y-0.5 text-[11px] text-muted-foreground">
+              <div className="text-muted-foreground flex flex-wrap gap-x-4 gap-y-0.5 text-[11px]">
                 {r.shop_id && (
                   <span>
-                    카페 <code className="bg-muted rounded px-1">{r.shop_id.slice(0, 8)}…</code>
+                    카페{' '}
+                    <code className="bg-muted rounded px-1">
+                      {r.shop_id.slice(0, 8)}…
+                    </code>
                   </span>
                 )}
                 {r.order_id && (
                   <span>
-                    주문 <code className="bg-muted rounded px-1">{r.order_id.slice(0, 8)}…</code>
+                    주문{' '}
+                    <code className="bg-muted rounded px-1">
+                      {r.order_id.slice(0, 8)}…
+                    </code>
                   </span>
                 )}
                 {r.hide_reason_txt && (
-                  <span className="text-red-500">사유: {r.hide_reason_txt}</span>
+                  <span className="text-red-500">
+                    사유: {r.hide_reason_txt}
+                  </span>
                 )}
               </div>
 
@@ -220,18 +242,20 @@ export default function AdminFeedbackPage() {
       {/* 숨김 처리 모달 */}
       {hideModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-card w-full max-w-sm rounded-xl border p-5 shadow-xl space-y-4">
+          <div className="bg-card w-full max-w-sm space-y-4 rounded-xl border p-5 shadow-xl">
             <h2 className="font-semibold">
               {hideModal.current === 'N' ? '후기 숨김 처리' : '후기 공개 복원'}
             </h2>
 
             {hideModal.current === 'N' && (
               <div className="space-y-1">
-                <label className="text-sm text-muted-foreground">숨김 사유 (필수)</label>
+                <label className="text-muted-foreground text-sm">
+                  숨김 사유 (필수)
+                </label>
                 <select
                   value={hideReason}
                   onChange={(e) => setHideReason(e.target.value)}
-                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
                 >
                   <option value="">선택하세요</option>
                   <option value="욕설·비방">욕설·비방</option>
@@ -244,7 +268,7 @@ export default function AdminFeedbackPage() {
             )}
 
             {hideModal.current === 'Y' && (
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 이 후기를 다시 공개하시겠습니까?
               </p>
             )}
@@ -254,7 +278,7 @@ export default function AdminFeedbackPage() {
                 type="button"
                 onClick={() => setHideModal(null)}
                 disabled={saving}
-                className="rounded-md border border-input px-4 py-2 text-sm hover:bg-accent disabled:opacity-50"
+                className="border-input hover:bg-accent rounded-md border px-4 py-2 text-sm disabled:opacity-50"
               >
                 취소
               </button>
@@ -264,7 +288,11 @@ export default function AdminFeedbackPage() {
                 disabled={saving}
                 className={`rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-50 ${hideModal.current === 'N' ? 'bg-destructive hover:bg-destructive/90' : 'bg-green-600 hover:bg-green-700'}`}
               >
-                {saving ? '처리 중…' : hideModal.current === 'N' ? '숨김 처리' : '공개 복원'}
+                {saving
+                  ? '처리 중…'
+                  : hideModal.current === 'N'
+                    ? '숨김 처리'
+                    : '공개 복원'}
               </button>
             </div>
           </div>

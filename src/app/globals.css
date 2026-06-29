@@ -97,8 +97,10 @@
   /* 따뜻한 카페 감성 — 둥근 모서리 + 크림·우드·에스프레소 팔레트 */
   --radius: 0.875rem;
   /* 부드러운 카페 그림자 (입체감) */
-  --shadow-soft: 0 1px 2px oklch(0.4 0.03 60 / 0.04), 0 4px 16px oklch(0.4 0.03 60 / 0.08);
-  --shadow-card: 0 1px 3px oklch(0.4 0.03 60 / 0.06), 0 8px 24px oklch(0.4 0.03 60 / 0.07);
+  --shadow-soft:
+    0 1px 2px oklch(0.4 0.03 60 / 0.04), 0 4px 16px oklch(0.4 0.03 60 / 0.08);
+  --shadow-card:
+    0 1px 3px oklch(0.4 0.03 60 / 0.06), 0 8px 24px oklch(0.4 0.03 60 / 0.07);
 
   --background: oklch(0.975 0.012 78); /* 크림/아이보리 */
   --foreground: oklch(0.28 0.02 50); /* 다크 에스프레소 텍스트 */

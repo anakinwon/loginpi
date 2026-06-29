@@ -3,15 +3,20 @@ import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 
 export interface ShopConditionRow {
-  shop_id: string        // 대표 매장 ID
-  shop_nm: string        // 대표 매장명
+  shop_id: string // 대표 매장 ID
+  shop_nm: string // 대표 매장명
   seller_id: string
   pi_username: string | null
-  shop_count: number     // 판매자가 보유한 총 매장 수
-  conditions: { shop: true; item: boolean; telegram: boolean; tlgm_alrt: boolean }
+  shop_count: number // 판매자가 보유한 총 매장 수
+  conditions: {
+    shop: true
+    item: boolean
+    telegram: boolean
+    tlgm_alrt: boolean
+  }
   grant_status: 'PENDING' | 'APPROVED' | 'REJECTED' | null
-  reg_dtm: string        // 판매자의 첫 매장 등록일
-  last_cond_dtm: string  // 마지막 조건 충족 시각 = 충족된 M1~M3 시각의 max (M4 알림은 시각 컬럼 부재로 제외)
+  reg_dtm: string // 판매자의 첫 매장 등록일
+  last_cond_dtm: string // 마지막 조건 충족 시각 = 충족된 M1~M3 시각의 max (M4 알림은 시각 컬럼 부재로 제외)
 }
 
 // GET /api/campaign/shops?q=<요원명>
@@ -37,7 +42,11 @@ export async function GET(request: Request) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   if (!shops?.length)
-    return NextResponse.json({ shops: [], is_admin: admin, my_seller_id: user.id })
+    return NextResponse.json({
+      shops: [],
+      is_admin: admin,
+      my_seller_id: user.id,
+    })
 
   // seller_id 기준 그룹핑 (shops는 reg_dtm ASC 정렬이므로 list[0] = 최초 등록 매장)
   const sellerShopsMap = new Map<string, typeof shops>()
@@ -76,8 +85,18 @@ export async function GET(request: Request) {
       .in('usr_id', sellerIds),
   ])
 
-  type BaseUser = { id: string; pi_username: string | null; nick_nm: string | null; tlgm_conn_yn: string | null; tlgm_conn_dtm: string | null }
-  type ExtUser  = { id: string; tlgm_alrt_cfm_yn: string | null; rep_shop_id: string | null }
+  type BaseUser = {
+    id: string
+    pi_username: string | null
+    nick_nm: string | null
+    tlgm_conn_yn: string | null
+    tlgm_conn_dtm: string | null
+  }
+  type ExtUser = {
+    id: string
+    tlgm_alrt_cfm_yn: string | null
+    rep_shop_id: string | null
+  }
 
   const userMap = new Map<string, BaseUser>(
     (usersRes.data ?? []).map((u) => [u.id, u as BaseUser]),
@@ -108,13 +127,13 @@ export async function GET(request: Request) {
 
   const rows: ShopConditionRow[] = []
   for (const [sellerId, sellerShops] of sellerShopsMap) {
-    const u   = userMap.get(sellerId)
+    const u = userMap.get(sellerId)
     const ext = extMap.get(sellerId)
     const grant = grantMap.get(sellerId)
 
     // 대표 매장 우선순위: sys_user.rep_shop_id > grant.shop_id > 첫 등록 매장
     const repShopId = ext?.rep_shop_id ?? grant?.shop_id ?? null
-    const repShop   = repShopId
+    const repShop = repShopId
       ? (sellerShops.find((s) => s.shop_id === repShopId) ?? sellerShops[0])
       : sellerShops[0]
 
@@ -124,23 +143,24 @@ export async function GET(request: Request) {
     const condTimes: string[] = [sellerShops[0].reg_dtm]
     const itemMax = itemMaxMap.get(sellerId)
     if (itemMax) condTimes.push(itemMax)
-    if (u?.tlgm_conn_yn === 'Y' && u?.tlgm_conn_dtm) condTimes.push(u.tlgm_conn_dtm)
+    if (u?.tlgm_conn_yn === 'Y' && u?.tlgm_conn_dtm)
+      condTimes.push(u.tlgm_conn_dtm)
     const lastCondDtm = condTimes.reduce((a, b) => (b > a ? b : a))
 
     rows.push({
-      shop_id:    repShop.shop_id,
-      shop_nm:    repShop.shop_nm,
-      seller_id:  sellerId,
+      shop_id: repShop.shop_id,
+      shop_nm: repShop.shop_nm,
+      seller_id: sellerId,
       pi_username: u?.pi_username ?? u?.nick_nm ?? null,
-      shop_count:  sellerShops.length,
+      shop_count: sellerShops.length,
       conditions: {
-        shop:      true,
-        item:      itemSellerSet.has(sellerId),
-        telegram:  u?.tlgm_conn_yn === 'Y',
+        shop: true,
+        item: itemSellerSet.has(sellerId),
+        telegram: u?.tlgm_conn_yn === 'Y',
         tlgm_alrt: ext?.tlgm_alrt_cfm_yn === 'Y',
       },
       grant_status: grant?.grant_st_cd ?? null,
-      reg_dtm:      sellerShops[0].reg_dtm,
+      reg_dtm: sellerShops[0].reg_dtm,
       last_cond_dtm: lastCondDtm,
     })
   }

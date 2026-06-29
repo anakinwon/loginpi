@@ -218,7 +218,9 @@ export function BoardListView({
                     <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white/25 text-[10px] font-bold text-white backdrop-blur-sm">
                       {maskAuthor(post.rgst_usr_nm).charAt(0).toUpperCase()}
                     </span>
-                    <span className="truncate">{maskAuthor(post.rgst_usr_nm)}</span>
+                    <span className="truncate">
+                      {maskAuthor(post.rgst_usr_nm)}
+                    </span>
                     <span className="text-white/50">·</span>
                     <span className="shrink-0">
                       {new Date(post.reg_dtm).toLocaleDateString('ko-KR', {

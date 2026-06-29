@@ -29,7 +29,7 @@ export function UserManual() {
   }
 
   return (
-    <section className="overflow-hidden rounded-2xl border bg-white shadow-sm dark:bg-card">
+    <section className="dark:bg-card overflow-hidden rounded-2xl border bg-white shadow-sm">
       {/* 바깥 토글 */}
       <button
         type="button"
@@ -44,7 +44,9 @@ export function UserManual() {
           <span className="text-sm font-bold sm:text-base">{t('title')}</span>
         </span>
         <span className="text-muted-foreground flex shrink-0 items-center gap-1 text-xs">
-          <span className="hidden sm:inline">{open ? t('collapse') : t('expand')}</span>
+          <span className="hidden sm:inline">
+            {open ? t('collapse') : t('expand')}
+          </span>
           <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -53,7 +55,11 @@ export function UserManual() {
             className={`h-4 w-4 transition-transform ${open ? 'rotate-180' : ''}`}
             aria-hidden="true"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" d="m6 9 6 6 6-6" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="m6 9 6 6 6-6"
+            />
           </svg>
         </span>
       </button>
@@ -61,7 +67,9 @@ export function UserManual() {
       {/* 본문 (펼침 시) — 주제별 아코디언 */}
       {open && (
         <div className="space-y-3 border-t px-5 py-4">
-          <p className="text-muted-foreground text-sm leading-relaxed">{t('intro')}</p>
+          <p className="text-muted-foreground text-sm leading-relaxed">
+            {t('intro')}
+          </p>
           <ul className="space-y-2">
             {topics.map((topic, i) => {
               const isOpen = expanded.has(i)
@@ -85,7 +93,11 @@ export function UserManual() {
                       className={`text-muted-foreground h-4 w-4 shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`}
                       aria-hidden="true"
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="m6 9 6 6 6-6" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="m6 9 6 6 6-6"
+                      />
                     </svg>
                   </button>
                   {isOpen && (
@@ -95,7 +107,9 @@ export function UserManual() {
                           key={j}
                           className="text-muted-foreground flex gap-2 text-xs leading-relaxed"
                         >
-                          <span className="text-primary mt-0.5 shrink-0">•</span>
+                          <span className="text-primary mt-0.5 shrink-0">
+                            •
+                          </span>
                           <span>{s}</span>
                         </li>
                       ))}

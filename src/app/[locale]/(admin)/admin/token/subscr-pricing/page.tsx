@@ -27,10 +27,25 @@ const SHOP_GRADE_META: Record<ShopGrade, { label: string; limit: string }> = {
   L: { label: 'L', limit: '무제한' },
 }
 
-const PRODUCT_META: Record<Product, { label: string; emoji: string; color: string }> = {
-  PICAFE:    { label: 'PyCafé™',      emoji: '☕', color: 'border-blue-200 dark:border-blue-800' },
-  PISHOP:    { label: 'PyShop™',      emoji: '🏪', color: 'border-amber-200 dark:border-amber-800' },
-  TRANSLATE: { label: 'PyTranslate™', emoji: '🌐', color: 'border-green-200 dark:border-green-800' },
+const PRODUCT_META: Record<
+  Product,
+  { label: string; emoji: string; color: string }
+> = {
+  PICAFE: {
+    label: 'PyCafé™',
+    emoji: '☕',
+    color: 'border-blue-200 dark:border-blue-800',
+  },
+  PISHOP: {
+    label: 'PyShop™',
+    emoji: '🏪',
+    color: 'border-amber-200 dark:border-amber-800',
+  },
+  TRANSLATE: {
+    label: 'PyTranslate™',
+    emoji: '🌐',
+    color: 'border-green-200 dark:border-green-800',
+  },
 }
 
 const SIMPLE_PRODUCTS: Product[] = ['PICAFE', 'TRANSLATE']
@@ -78,8 +93,12 @@ export default function SubscrPricingPage() {
       .finally(() => setLoading(false))
   }
 
-  useEffect(() => { load() }, [])
-  useEffect(() => { if (edit) inputRef.current?.focus() }, [edit])
+  useEffect(() => {
+    load()
+  }, [])
+  useEffect(() => {
+    if (edit) inputRef.current?.focus()
+  }, [edit])
 
   const startEdit = (row: FeePlanRow) => {
     setSaved(null)
@@ -90,14 +109,23 @@ export default function SubscrPricingPage() {
 
   const saveEdit = async (row: FeePlanRow) => {
     const newAmt = parseInt(edit?.value ?? '', 10)
-    if (isNaN(newAmt) || newAmt < 0) { alert('0 이상의 정수를 입력하세요'); return }
-    if (newAmt === row.amt_bean) { setEdit(null); return }
+    if (isNaN(newAmt) || newAmt < 0) {
+      alert('0 이상의 정수를 입력하세요')
+      return
+    }
+    if (newAmt === row.amt_bean) {
+      setEdit(null)
+      return
+    }
     setSaving(row.fee_plan_id)
     try {
       const res = await fetch('/api/admin/token/fee-plan', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fee_plan_id: row.fee_plan_id, amt_bean: newAmt }),
+        body: JSON.stringify({
+          fee_plan_id: row.fee_plan_id,
+          amt_bean: newAmt,
+        }),
       })
       if (!res.ok) throw new Error(`저장 실패 HTTP ${res.status}`)
       setRows((prev) =>
@@ -118,9 +146,13 @@ export default function SubscrPricingPage() {
   }
 
   // 단순 상품 그룹 (PICAFE, TRANSLATE): { M, Y }
-  const simpleGroup: Partial<Record<Product, { M?: FeePlanRow; Y?: FeePlanRow }>> = {}
+  const simpleGroup: Partial<
+    Record<Product, { M?: FeePlanRow; Y?: FeePlanRow }>
+  > = {}
   // PyShop 그룹: grade → { M, Y }
-  const shopGroup: Partial<Record<ShopGrade, { M?: FeePlanRow; Y?: FeePlanRow }>> = {}
+  const shopGroup: Partial<
+    Record<ShopGrade, { M?: FeePlanRow; Y?: FeePlanRow }>
+  > = {}
 
   rows.forEach((r) => {
     const p = prodKey(r)
@@ -138,9 +170,14 @@ export default function SubscrPricingPage() {
   const shopGradeGroup = shopGroup[shopGrade] ?? {}
   const shopMRow = shopGradeGroup.M
   const shopYRow = shopGradeGroup.Y
-  const shopPolicyOk = shopMRow && shopYRow ? annualOk(shopMRow.amt_bean, shopYRow.amt_bean) : null
+  const shopPolicyOk =
+    shopMRow && shopYRow ? annualOk(shopMRow.amt_bean, shopYRow.amt_bean) : null
 
-  const renderCycleRow = (row: FeePlanRow | undefined, cycleLabel: string, cycleNote: string) => {
+  const renderCycleRow = (
+    row: FeePlanRow | undefined,
+    cycleLabel: string,
+    cycleNote: string,
+  ) => {
     if (!row) return null
     const isEditing = edit?.fee_plan_id === row.fee_plan_id
     const isSaving = saving === row.fee_plan_id
@@ -152,10 +189,14 @@ export default function SubscrPricingPage() {
           <span className="text-xs font-semibold">
             {cycleLabel}
             {cycleNote && (
-              <span className="text-muted-foreground ml-1 font-normal">{cycleNote}</span>
+              <span className="text-muted-foreground ml-1 font-normal">
+                {cycleNote}
+              </span>
             )}
           </span>
-          <span className="text-muted-foreground text-[10px]">{row.fee_plan_cd}</span>
+          <span className="text-muted-foreground text-[10px]">
+            {row.fee_plan_cd}
+          </span>
         </div>
 
         {isEditing ? (
@@ -168,13 +209,15 @@ export default function SubscrPricingPage() {
                 step={100}
                 value={edit.value}
                 onChange={(e) =>
-                  setEdit((prev) => prev ? { ...prev, value: e.target.value } : prev)
+                  setEdit((prev) =>
+                    prev ? { ...prev, value: e.target.value } : prev,
+                  )
                 }
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') void saveEdit(row)
                   if (e.key === 'Escape') cancelEdit()
                 }}
-                className="border-primary w-full rounded-lg border bg-background px-3 py-1.5 text-right text-base font-bold tabular-nums focus:outline-none focus:ring-2 focus:ring-offset-1"
+                className="border-primary bg-background w-full rounded-lg border px-3 py-1.5 text-right text-base font-bold tabular-nums focus:ring-2 focus:ring-offset-1 focus:outline-none"
               />
               <BeanIcon className="h-5 w-5 shrink-0" />
             </div>
@@ -182,10 +225,21 @@ export default function SubscrPricingPage() {
               = {(parseInt(edit.value || '0', 10) / 100).toFixed(2)} π
             </p>
             <div className="flex gap-2">
-              <Button size="sm" className="flex-1 text-xs" disabled={isSaving} onClick={() => void saveEdit(row)}>
+              <Button
+                size="sm"
+                className="flex-1 text-xs"
+                disabled={isSaving}
+                onClick={() => void saveEdit(row)}
+              >
                 {isSaving ? '저장 중…' : '저장'}
               </Button>
-              <Button size="sm" variant="outline" className="flex-1 text-xs" disabled={isSaving} onClick={cancelEdit}>
+              <Button
+                size="sm"
+                variant="outline"
+                className="flex-1 text-xs"
+                disabled={isSaving}
+                onClick={cancelEdit}
+              >
                 취소
               </Button>
             </div>
@@ -203,12 +257,14 @@ export default function SubscrPricingPage() {
             </div>
             <div className="flex items-center gap-2">
               {wasSaved && saved!.ok && (
-                <span className="text-xs font-medium text-green-600 dark:text-green-400">✓ 저장됨</span>
+                <span className="text-xs font-medium text-green-600 dark:text-green-400">
+                  ✓ 저장됨
+                </span>
               )}
               <button
                 onClick={() => startEdit(row)}
                 disabled={edit !== null}
-                className="text-primary rounded-lg border px-3 py-1 text-xs font-medium transition-colors hover:bg-primary/5 disabled:cursor-not-allowed disabled:opacity-40"
+                className="text-primary hover:bg-primary/5 rounded-lg border px-3 py-1 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40"
               >
                 수정
               </button>
@@ -226,7 +282,8 @@ export default function SubscrPricingPage() {
           <BeanIcon className="inline-block h-6 w-6" /> 구독요금제 관리
         </h1>
         <p className="text-muted-foreground mt-1 text-sm">
-          상품별 월·년 구독료를 수정합니다. 저장 즉시 서비스에 반영됩니다(캐시 자동 무효화).
+          상품별 월·년 구독료를 수정합니다. 저장 즉시 서비스에 반영됩니다(캐시
+          자동 무효화).
         </p>
       </div>
 
@@ -236,8 +293,11 @@ export default function SubscrPricingPage() {
       {!loading && !err && (
         <>
           <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-300">
-            💡 <strong>연간 할인 정책:</strong> 년 요금 = 월 요금 × 10 (2개월 무료, 약 17% 절약).<br />
-            연간 요금을 수정할 때 이 정책이 유지되는지 우측 아이콘으로 확인하세요.
+            💡 <strong>연간 할인 정책:</strong> 년 요금 = 월 요금 × 10 (2개월
+            무료, 약 17% 절약).
+            <br />
+            연간 요금을 수정할 때 이 정책이 유지되는지 우측 아이콘으로
+            확인하세요.
           </div>
 
           {/* PyCafé™ · PyTranslate™ 단순 상품 카드 */}
@@ -247,10 +307,14 @@ export default function SubscrPricingPage() {
               const g = simpleGroup[prod] ?? {}
               const mRow = g.M
               const yRow = g.Y
-              const policyOk = mRow && yRow ? annualOk(mRow.amt_bean, yRow.amt_bean) : null
+              const policyOk =
+                mRow && yRow ? annualOk(mRow.amt_bean, yRow.amt_bean) : null
 
               return (
-                <div key={prod} className={`rounded-2xl border-2 bg-card p-5 shadow-sm ${meta.color}`}>
+                <div
+                  key={prod}
+                  className={`bg-card rounded-2xl border-2 p-5 shadow-sm ${meta.color}`}
+                >
                   <div className="mb-4 flex items-center gap-2">
                     <span className="text-2xl">{meta.emoji}</span>
                     <div>
@@ -258,7 +322,9 @@ export default function SubscrPricingPage() {
                       <p className="text-muted-foreground text-xs">구독</p>
                     </div>
                     {policyOk !== null && (
-                      <span className={`ml-auto rounded-full px-2 py-0.5 text-xs font-semibold ${policyOk ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}`}>
+                      <span
+                        className={`ml-auto rounded-full px-2 py-0.5 text-xs font-semibold ${policyOk ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}`}
+                      >
                         {policyOk ? '✓ 정책 준수' : '⚠ 정책 불일치'}
                       </span>
                     )}
@@ -271,8 +337,12 @@ export default function SubscrPricingPage() {
                     <p className="text-muted-foreground mt-3 text-right text-[10px]">
                       최근 수정:{' '}
                       {new Date(mRow.mod_dtm).toLocaleString('ko-KR', {
-                        year: 'numeric', month: '2-digit', day: '2-digit',
-                        hour: '2-digit', minute: '2-digit', hour12: false,
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false,
                       })}
                     </p>
                   )}
@@ -282,16 +352,22 @@ export default function SubscrPricingPage() {
           </div>
 
           {/* PyShop™ S / M / L 등급별 구독요금 */}
-          <div className={`rounded-2xl border-2 bg-card p-5 shadow-sm ${PRODUCT_META.PISHOP.color}`}>
+          <div
+            className={`bg-card rounded-2xl border-2 p-5 shadow-sm ${PRODUCT_META.PISHOP.color}`}
+          >
             {/* 카드 헤더 */}
             <div className="mb-4 flex items-center gap-2">
               <span className="text-2xl">{PRODUCT_META.PISHOP.emoji}</span>
               <div>
                 <p className="font-bold">{PRODUCT_META.PISHOP.label}</p>
-                <p className="text-muted-foreground text-xs">S / M / L 등급별 구독</p>
+                <p className="text-muted-foreground text-xs">
+                  S / M / L 등급별 구독
+                </p>
               </div>
               {shopPolicyOk !== null && (
-                <span className={`ml-auto rounded-full px-2 py-0.5 text-xs font-semibold ${shopPolicyOk ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}`}>
+                <span
+                  className={`ml-auto rounded-full px-2 py-0.5 text-xs font-semibold ${shopPolicyOk ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}`}
+                >
                   {shopPolicyOk ? '✓ 정책 준수' : '⚠ 정책 불일치'}
                 </span>
               )}
@@ -305,17 +381,24 @@ export default function SubscrPricingPage() {
                 return (
                   <button
                     key={g}
-                    onClick={() => { setShopGrade(g); cancelEdit() }}
+                    onClick={() => {
+                      setShopGrade(g)
+                      cancelEdit()
+                    }}
                     className={`flex flex-1 flex-col items-center rounded-lg px-3 py-2 text-xs transition-colors ${
                       shopGrade === g
                         ? 'bg-primary text-primary-foreground font-semibold shadow-sm'
                         : 'text-muted-foreground hover:bg-muted'
                     }`}
                   >
-                    <span className="text-sm font-bold">{SHOP_GRADE_META[g].label}</span>
-                    <span className="mt-0.5 text-[10px] opacity-80">{SHOP_GRADE_META[g].limit}</span>
+                    <span className="text-sm font-bold">
+                      {SHOP_GRADE_META[g].label}
+                    </span>
+                    <span className="mt-0.5 text-[10px] opacity-80">
+                      {SHOP_GRADE_META[g].limit}
+                    </span>
                     {mAmt !== undefined && (
-                      <span className="mt-0.5 tabular-nums text-[10px] opacity-70">
+                      <span className="mt-0.5 text-[10px] tabular-nums opacity-70">
                         {mAmt.toLocaleString()} ☕/월
                       </span>
                     )}
@@ -334,8 +417,12 @@ export default function SubscrPricingPage() {
               <p className="text-muted-foreground mt-3 text-right text-[10px]">
                 최근 수정:{' '}
                 {new Date(shopMRow.mod_dtm).toLocaleString('ko-KR', {
-                  year: 'numeric', month: '2-digit', day: '2-digit',
-                  hour: '2-digit', minute: '2-digit', hour12: false,
+                  year: 'numeric',
+                  month: '2-digit',
+                  day: '2-digit',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  hour12: false,
                 })}
               </p>
             )}
@@ -344,7 +431,10 @@ export default function SubscrPricingPage() {
           <div className="border-t pt-4">
             <p className="text-muted-foreground text-xs">
               구독요금제 외 카페·스토어·플랫폼 전체 요금은{' '}
-              <a href="/admin/token/fee-plan" className="text-primary underline-offset-2 hover:underline">
+              <a
+                href="/admin/token/fee-plan"
+                className="text-primary underline-offset-2 hover:underline"
+              >
                 Bean 요금제 관리
               </a>
               에서 확인할 수 있습니다.

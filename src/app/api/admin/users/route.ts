@@ -18,7 +18,11 @@ export async function GET(request: NextRequest) {
   const from = (page - 1) * limit
 
   const db = getSupabaseAdmin()
-  const { data: users, count, error } = await db
+  const {
+    data: users,
+    count,
+    error,
+  } = await db
     .from('sys_user')
     .select(
       'id, pi_uid, pi_username, google_email, google_name, display_name, role, reg_dtm, last_login_dtm',

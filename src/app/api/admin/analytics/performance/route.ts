@@ -120,7 +120,8 @@ export async function GET(req: NextRequest) {
       period,
       funnel,
       conversion: {
-        signupToActive: signupCnt > 0 ? (activeUsers.size / signupCnt) * 100 : 0,
+        signupToActive:
+          signupCnt > 0 ? (activeUsers.size / signupCnt) * 100 : 0,
         activeToBuyer:
           activeUsers.size > 0 ? (buyers / activeUsers.size) * 100 : 0,
         buyerToRepeat: buyers > 0 ? (repeatBuyers / buyers) * 100 : 0,

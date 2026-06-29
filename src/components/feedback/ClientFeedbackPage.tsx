@@ -22,7 +22,13 @@ interface OrderInfo {
   } | null
 }
 
-const REWARD_HINT: Record<number, number> = { 1: 60, 2: 70, 3: 80, 4: 90, 5: 100 }
+const REWARD_HINT: Record<number, number> = {
+  1: 60,
+  2: 70,
+  3: 80,
+  4: 90,
+  5: 100,
+}
 
 const COMPLETED_STATES = ['DONE', 'BUYER_DONE']
 
@@ -87,10 +93,18 @@ export function ClientFeedbackPage({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (overallScore === 0) { toast.error('전체 별점을 선택해주세요'); return }
-    if (fbckCn.trim().length < 10) { toast.error('후기 본문을 10자 이상 입력해주세요'); return }
+    if (overallScore === 0) {
+      toast.error('전체 별점을 선택해주세요')
+      return
+    }
+    if (fbckCn.trim().length < 10) {
+      toast.error('후기 본문을 10자 이상 입력해주세요')
+      return
+    }
 
-    const scoredItems = ctgrItems.filter((it) => (itemScores[it.item_cd] ?? 0) > 0)
+    const scoredItems = ctgrItems.filter(
+      (it) => (itemScores[it.item_cd] ?? 0) > 0,
+    )
 
     setSubmitting(true)
     try {
@@ -109,7 +123,10 @@ export function ClientFeedbackPage({
       })
 
       if (res.ok) {
-        const d = (await res.json()) as { bean_rwrd_qty: number; message: string }
+        const d = (await res.json()) as {
+          bean_rwrd_qty: number
+          message: string
+        }
         toast.success(d.message)
         setSubmitted(true)
       } else {
@@ -125,7 +142,11 @@ export function ClientFeedbackPage({
 
   // 미인증 로딩
   if (!authed && authLoading) {
-    return <p className="text-muted-foreground py-16 text-center text-sm">로그인 확인 중…</p>
+    return (
+      <p className="text-muted-foreground py-16 text-center text-sm">
+        로그인 확인 중…
+      </p>
+    )
   }
   // 비인증 → 로그인 안내 (redirect 금지 — Pi Browser 무한루프)
   if (!authed) {
@@ -137,7 +158,11 @@ export function ClientFeedbackPage({
   }
 
   if (orderLoading) {
-    return <p className="text-muted-foreground py-16 text-center text-sm">주문 정보 불러오는 중…</p>
+    return (
+      <p className="text-muted-foreground py-16 text-center text-sm">
+        주문 정보 불러오는 중…
+      </p>
+    )
   }
   if (error) {
     return (
@@ -156,10 +181,12 @@ export function ClientFeedbackPage({
   // 제출 완료 화면
   if (submitted) {
     return (
-      <div className="py-16 text-center space-y-4">
+      <div className="space-y-4 py-16 text-center">
         <p className="text-2xl">✅</p>
         <p className="font-semibold">후기가 등록되었습니다!</p>
-        <p className="text-muted-foreground text-sm">소중한 후기 감사합니다 ☕</p>
+        <p className="text-muted-foreground text-sm">
+          소중한 후기 감사합니다 ☕
+        </p>
         <button
           onClick={() => router.push('/store/my/orders')}
           className="text-primary text-sm hover:underline"
@@ -175,16 +202,19 @@ export function ClientFeedbackPage({
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* 상품 헤더 */}
-      <div className="rounded-xl bg-muted/50 px-4 py-3">
-        <p className="text-xs text-muted-foreground mb-0.5">구매 상품</p>
+      <div className="bg-muted/50 rounded-xl px-4 py-3">
+        <p className="text-muted-foreground mb-0.5 text-xs">구매 상품</p>
         <p className="font-semibold">☕ {itemNm}</p>
       </div>
 
       {/* 항목별 평가 */}
       {ctgrItems.length > 0 && (
         <div className="space-y-4">
-          <h2 className="text-sm font-semibold">항목별 평가 <span className="text-muted-foreground font-normal">(선택)</span></h2>
-          <div className="divide-y divide-border rounded-xl border">
+          <h2 className="text-sm font-semibold">
+            항목별 평가{' '}
+            <span className="text-muted-foreground font-normal">(선택)</span>
+          </h2>
+          <div className="divide-border divide-y rounded-xl border">
             {ctgrItems.map((it, i) => (
               <div
                 key={it.item_cd}
@@ -193,12 +223,16 @@ export function ClientFeedbackPage({
                 <div>
                   <span className="text-sm font-medium">{it.item_nm}</span>
                   {it.item_desc && (
-                    <p className="text-muted-foreground text-xs">{it.item_desc}</p>
+                    <p className="text-muted-foreground text-xs">
+                      {it.item_desc}
+                    </p>
                   )}
                 </div>
                 <StarRating
                   value={itemScores[it.item_cd] ?? 0}
-                  onChange={(v) => setItemScores((prev) => ({ ...prev, [it.item_cd]: v }))}
+                  onChange={(v) =>
+                    setItemScores((prev) => ({ ...prev, [it.item_cd]: v }))
+                  }
                   size="sm"
                 />
               </div>
@@ -215,7 +249,11 @@ export function ClientFeedbackPage({
         <StarRating value={overallScore} onChange={setOverallScore} size="lg" />
         {overallScore > 0 && (
           <p className="text-muted-foreground text-xs">
-            후기 등록 시 ☕ <span className="font-medium text-amber-600">{REWARD_HINT[overallScore]} Bean</span> 보상 지급
+            후기 등록 시 ☕{' '}
+            <span className="font-medium text-amber-600">
+              {REWARD_HINT[overallScore]} Bean
+            </span>{' '}
+            보상 지급
           </p>
         )}
       </div>
@@ -224,17 +262,22 @@ export function ClientFeedbackPage({
       <div className="space-y-2">
         <h2 className="text-sm font-semibold">
           후기 본문 <span className="text-destructive text-xs">*</span>
-          <span className="text-muted-foreground font-normal"> (최소 10자)</span>
+          <span className="text-muted-foreground font-normal">
+            {' '}
+            (최소 10자)
+          </span>
         </h2>
         <textarea
           value={fbckCn}
           onChange={(e) => setFbckCn(e.target.value)}
           placeholder="음료 맛과 서비스는 어떠셨나요?"
           rows={5}
-          className="w-full resize-none rounded-xl border border-input bg-background px-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          className="border-input bg-background placeholder:text-muted-foreground focus:ring-ring w-full resize-none rounded-xl border px-4 py-3 text-sm focus:ring-2 focus:outline-none"
           required
         />
-        <p className={`text-right text-xs ${fbckCn.trim().length < 10 ? 'text-muted-foreground' : 'text-green-600 dark:text-green-400'}`}>
+        <p
+          className={`text-right text-xs ${fbckCn.trim().length < 10 ? 'text-muted-foreground' : 'text-green-600 dark:text-green-400'}`}
+        >
           {fbckCn.trim().length}자
         </p>
       </div>
@@ -243,7 +286,7 @@ export function ClientFeedbackPage({
       <button
         type="submit"
         disabled={submitting || overallScore === 0 || fbckCn.trim().length < 10}
-        className="w-full rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-opacity"
+        className="bg-primary text-primary-foreground hover:bg-primary/90 w-full rounded-xl py-3 text-sm font-semibold transition-opacity disabled:opacity-50"
       >
         {submitting ? '저장 중…' : '후기 등록하기'}
       </button>

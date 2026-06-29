@@ -17,7 +17,11 @@ interface FeedbackCardProps {
   isOwner?: boolean
 }
 
-export function FeedbackCard({ feedback, onDelete, isOwner }: FeedbackCardProps) {
+export function FeedbackCard({
+  feedback,
+  onDelete,
+  isOwner,
+}: FeedbackCardProps) {
   const dateStr = new Date(feedback.reg_dtm).toLocaleString('ko-KR', {
     year: 'numeric',
     month: '2-digit',
@@ -27,16 +31,16 @@ export function FeedbackCard({ feedback, onDelete, isOwner }: FeedbackCardProps)
   })
 
   return (
-    <div className="flex flex-col gap-2 rounded-lg border border-border p-4">
+    <div className="border-border flex flex-col gap-2 rounded-lg border p-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium">{feedback.display_name}</span>
           <StarRating value={feedback.fbck_scr} readonly size="sm" />
         </div>
-        <span className="text-xs text-muted-foreground">{dateStr}</span>
+        <span className="text-muted-foreground text-xs">{dateStr}</span>
       </div>
 
-      <p className="text-sm leading-relaxed text-foreground whitespace-pre-wrap">
+      <p className="text-foreground text-sm leading-relaxed whitespace-pre-wrap">
         {feedback.fbck_cn}
       </p>
 
@@ -59,7 +63,7 @@ export function FeedbackCard({ feedback, onDelete, isOwner }: FeedbackCardProps)
           <button
             type="button"
             onClick={() => onDelete(feedback.fbck_id)}
-            className="text-xs text-destructive hover:underline"
+            className="text-destructive text-xs hover:underline"
           >
             삭제
           </button>

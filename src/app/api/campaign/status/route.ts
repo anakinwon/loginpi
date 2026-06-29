@@ -75,11 +75,13 @@ export async function GET() {
   if (!camp) return NextResponse.json({ error: '캠페인 없음' }, { status: 404 })
 
   const hasItem = (itemRes.count ?? 0) > 0
-  const hasTelegram = (userRes.data as { tlgm_conn_yn?: string } | null)?.tlgm_conn_yn === 'Y'
+  const hasTelegram =
+    (userRes.data as { tlgm_conn_yn?: string } | null)?.tlgm_conn_yn === 'Y'
   // SQL 100 미적용 시 userExtRes.error → tlgm_alrt_cfm_yn null → false 안전 폴백
   const hasTlgmAlrt =
     !userExtRes.error &&
-    (userExtRes.data as { tlgm_alrt_cfm_yn?: string } | null)?.tlgm_alrt_cfm_yn === 'Y'
+    (userExtRes.data as { tlgm_alrt_cfm_yn?: string } | null)
+      ?.tlgm_alrt_cfm_yn === 'Y'
   const grant = grantRes.data as {
     grant_st_cd: string
     shop_id: string | null

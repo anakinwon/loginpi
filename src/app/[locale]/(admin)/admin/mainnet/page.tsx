@@ -54,8 +54,7 @@ const OWNER_CLS: Record<ChkItem['owner_cd'], string> = {
   CODE: 'bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400',
   MASTER:
     'bg-purple-100 text-purple-700 dark:bg-purple-950/40 dark:text-purple-400',
-  EXTERNAL:
-    'bg-teal-100 text-teal-700 dark:bg-teal-950/40 dark:text-teal-400',
+  EXTERNAL: 'bg-teal-100 text-teal-700 dark:bg-teal-950/40 dark:text-teal-400',
 }
 // 정본 문서의 섹션 코드 → 화면 표기
 const SECT_ORDER = ['ACTION', 'CONFIRM', 'PROC']
@@ -193,9 +192,8 @@ export default function MainnetChecklistPage() {
 
       {!applied && (
         <div className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-700 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-400">
-          ⚠️ <code>mainnet_checklist</code> 테이블 미적용 —{' '}
-          <code>sql/129</code>를 staging→운영에 적용하세요. (적용 전까지 빈
-          목록으로 표시)
+          ⚠️ <code>mainnet_checklist</code> 테이블 미적용 — <code>sql/129</code>
+          를 staging→운영에 적용하세요. (적용 전까지 빈 목록으로 표시)
         </div>
       )}
 

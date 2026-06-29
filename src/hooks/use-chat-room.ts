@@ -352,7 +352,10 @@ export function useChatRoom(
           status === 'CLOSED'
         ) {
           // Pi Browser WebView가 WebSocket을 막거나 연결이 끊김 → polling 폴백 활성화
-          console.warn('[chat] Realtime 연결 실패 — polling 폴백 활성화:', status)
+          console.warn(
+            '[chat] Realtime 연결 실패 — polling 폴백 활성화:',
+            status,
+          )
           startPolling()
         }
       })

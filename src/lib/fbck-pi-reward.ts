@@ -102,10 +102,13 @@ export async function payFbckPiReward(
       )
 
     // Step 3: 완료
-    const completeRes = await fetch(`${PI_PAYMENTS_URL}/${paymentId}/complete`, {
-      method: 'POST',
-      headers: { Authorization: `Key ${apiKey}` },
-    })
+    const completeRes = await fetch(
+      `${PI_PAYMENTS_URL}/${paymentId}/complete`,
+      {
+        method: 'POST',
+        headers: { Authorization: `Key ${apiKey}` },
+      },
+    )
     if (!completeRes.ok)
       throw new Error(
         `결제 완료 실패 (${completeRes.status}): ${await completeRes.text()}`,
@@ -142,9 +145,8 @@ export async function payPendingFbckPiRewards(limit = 50): Promise<{
     .order('reg_dtm', { ascending: true })
     .limit(limit)
 
-  const rows = (data as
-    | { fbck_id: string; usr_id: string; pi_amt: number }[]
-    | null) ?? []
+  const rows =
+    (data as { fbck_id: string; usr_id: string; pi_amt: number }[] | null) ?? []
   for (const r of rows) {
     await payFbckPiReward(r.fbck_id, r.usr_id, Number(r.pi_amt))
   }

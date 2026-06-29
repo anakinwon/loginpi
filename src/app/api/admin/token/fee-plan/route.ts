@@ -59,10 +59,7 @@ export async function PATCH(req: NextRequest) {
 
   if (body.use_yn !== undefined) {
     if (body.use_yn !== 'Y' && body.use_yn !== 'N') {
-      return NextResponse.json(
-        { error: 'use_yn은 Y 또는 N' },
-        { status: 400 },
-      )
+      return NextResponse.json({ error: 'use_yn은 Y 또는 N' }, { status: 400 })
     }
     updates.use_yn = body.use_yn
   }

@@ -19,7 +19,9 @@ export async function GET(req: NextRequest) {
       .eq('id', user.id)
       .maybeSingle(),
   ])
-  const repShopId = (userRes.data as { rep_shop_id?: string | null } | null)?.rep_shop_id ?? null
+  const repShopId =
+    (userRes.data as { rep_shop_id?: string | null } | null)?.rep_shop_id ??
+    null
   return NextResponse.json({ shops, rep_shop_id: repShopId })
 }
 

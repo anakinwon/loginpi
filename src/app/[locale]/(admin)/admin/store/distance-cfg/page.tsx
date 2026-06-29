@@ -40,7 +40,9 @@ export default function DistanceCfgPage() {
       .finally(() => setLoading(false))
   }
 
-  useEffect(() => { load() }, [])
+  useEffect(() => {
+    load()
+  }, [])
 
   const handleSave = async () => {
     setSaving(true)
@@ -78,7 +80,8 @@ export default function DistanceCfgPage() {
         <p className="text-muted-foreground mt-1 text-sm">
           사용자 위치 기준 이 거리를 초과한 상품은 목록에 노출되지 않습니다.
           <br />
-          좌표가 없는 상품(LBS 미동의 판매자)과 사용자 위치 미확인 시에는 항상 전체 노출됩니다.
+          좌표가 없는 상품(LBS 미동의 판매자)과 사용자 위치 미확인 시에는 항상
+          전체 노출됩니다.
         </p>
       </div>
 
@@ -97,7 +100,7 @@ export default function DistanceCfgPage() {
       {err && <p className="text-sm text-red-500">⚠ {err}</p>}
 
       {/* 설정 카드 */}
-      <div className="rounded-2xl border bg-card p-6 shadow-sm">
+      <div className="bg-card rounded-2xl border p-6 shadow-sm">
         <p className="mb-4 text-sm font-semibold">새 거리 제한 설정</p>
 
         {/* 프리셋 버튼 */}
@@ -151,7 +154,7 @@ export default function DistanceCfgPage() {
               const v = Math.max(0, Math.min(200, Number(e.target.value)))
               setKm(isNaN(v) ? 0 : v)
             }}
-            className="border-input w-28 rounded-lg border bg-background px-3 py-1.5 text-right text-sm tabular-nums focus:outline-none focus:ring-2"
+            className="border-input bg-background w-28 rounded-lg border px-3 py-1.5 text-right text-sm tabular-nums focus:ring-2 focus:outline-none"
           />
           <span className="text-sm">km</span>
           {km === 0 && (
@@ -172,7 +175,7 @@ export default function DistanceCfgPage() {
             placeholder="예: 신규 도시 진출, 상품 공급 부족 등"
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            className="border-input w-full rounded-lg border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2"
+            className="border-input bg-background w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:outline-none"
           />
         </div>
 
@@ -200,8 +203,10 @@ export default function DistanceCfgPage() {
 
       {/* 안내 */}
       <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-300">
-        💡 <strong>적용 조건:</strong> 거리 제한은 <strong>사용자가 위치 동의(LBS)를 허용</strong>하고 좌표가 수집된 경우에만 작동합니다.
-        미동의 사용자에게는 전국 상품이 계속 표시됩니다. 좌표 없는 상품(P2P 미동의 판매자)도 항상 포함됩니다.
+        💡 <strong>적용 조건:</strong> 거리 제한은{' '}
+        <strong>사용자가 위치 동의(LBS)를 허용</strong>하고 좌표가 수집된
+        경우에만 작동합니다. 미동의 사용자에게는 전국 상품이 계속 표시됩니다.
+        좌표 없는 상품(P2P 미동의 판매자)도 항상 포함됩니다.
       </div>
 
       {/* 변경 이력 */}
@@ -243,10 +248,10 @@ export default function DistanceCfgPage() {
                     <td className="text-muted-foreground max-w-xs truncate px-4 py-3 text-xs">
                       {row.note_txt ?? '—'}
                     </td>
-                    <td className="text-muted-foreground px-4 py-3 text-xs font-mono">
+                    <td className="text-muted-foreground px-4 py-3 font-mono text-xs">
                       {row.modr_id.slice(0, 8)}…
                     </td>
-                    <td className="text-muted-foreground whitespace-nowrap px-4 py-3 text-xs">
+                    <td className="text-muted-foreground px-4 py-3 text-xs whitespace-nowrap">
                       {new Date(row.reg_dtm).toLocaleString('ko-KR', {
                         year: 'numeric',
                         month: '2-digit',

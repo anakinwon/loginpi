@@ -144,8 +144,7 @@ export async function GET(req: NextRequest) {
   for (const l of locs) {
     const e = Date.parse(l.reg_dtm)
     const cur = latestSido.get(l.user_str_id)
-    if (!cur || e > cur.e)
-      latestSido.set(l.user_str_id, { sido: l.sido_nm, e })
+    if (!cur || e > cur.e) latestSido.set(l.user_str_id, { sido: l.sido_nm, e })
   }
   const sidoCount = new Map<string, number>()
   for (const { sido } of latestSido.values())

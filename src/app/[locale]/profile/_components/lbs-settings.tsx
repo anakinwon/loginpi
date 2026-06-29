@@ -141,7 +141,9 @@ export function LbsSettings() {
       {status.consent_yn === 'Y' && (
         <div className="space-y-2">
           <p className="text-sm font-medium">{t('lbs.historyTitle')}</p>
-          <p className="text-muted-foreground text-xs">{t('lbs.historyDesc')}</p>
+          <p className="text-muted-foreground text-xs">
+            {t('lbs.historyDesc')}
+          </p>
           {histLoading ? (
             <p className="text-muted-foreground py-2 text-xs">
               {tc('fetching')}

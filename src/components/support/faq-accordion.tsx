@@ -43,7 +43,11 @@ export function FaqAccordion() {
                 className={`text-muted-foreground h-4 w-4 shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`}
                 aria-hidden="true"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d="m6 9 6 6 6-6" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="m6 9 6 6 6-6"
+                />
               </svg>
             </button>
             {isOpen && (

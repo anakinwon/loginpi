@@ -48,7 +48,11 @@ export async function getTipPresets(): Promise<TipConfig> {
     if (error || !data) return TIP_FALLBACK
     const row = data as TipCfgRow
     return {
-      presets: [Number(row.tip1_bean), Number(row.tip2_bean), Number(row.tip3_bean)],
+      presets: [
+        Number(row.tip1_bean),
+        Number(row.tip2_bean),
+        Number(row.tip3_bean),
+      ],
       customMax: Number(row.custom_max_bean),
     }
   } catch {

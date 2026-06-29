@@ -20,6 +20,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ ok: true, ...result })
   } catch (err) {
     console.error('[cron/tip-pi-payout] 송금 재시도 실패:', err)
-    return NextResponse.json({ ok: false, error: 'payout_failed' }, { status: 500 })
+    return NextResponse.json(
+      { ok: false, error: 'payout_failed' },
+      { status: 500 },
+    )
   }
 }

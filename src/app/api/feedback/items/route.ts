@@ -45,7 +45,8 @@ export async function GET(req: NextRequest) {
     .eq('del_yn', 'N')
     .maybeSingle()
 
-  const parentId = (ctgr as { parent_ctgr_id: string | null } | null)?.parent_ctgr_id
+  const parentId = (ctgr as { parent_ctgr_id: string | null } | null)
+    ?.parent_ctgr_id
   if (parentId) {
     const { data: parent } = await db
       .from('fbck_ctgr_item')
@@ -55,7 +56,10 @@ export async function GET(req: NextRequest) {
       .order('sort_ord', { ascending: true })
 
     if (parent && parent.length > 0) {
-      return NextResponse.json({ items: parent as CtgrItemRow[], source: 'parent' })
+      return NextResponse.json({
+        items: parent as CtgrItemRow[],
+        source: 'parent',
+      })
     }
   }
 

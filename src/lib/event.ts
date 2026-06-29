@@ -467,7 +467,11 @@ export async function getEventRanking(eventId: string, limit: number = 100) {
 
   // 1단계: evt_exclude + evt_user_mission 병렬 조회
   const [excludedResult, missionsResult] = await Promise.all([
-    db.from('evt_exclude').select('user_id').eq('event_id', eventId).eq('del_yn', 'N'),
+    db
+      .from('evt_exclude')
+      .select('user_id')
+      .eq('event_id', eventId)
+      .eq('del_yn', 'N'),
     db
       .from('evt_user_mission')
       .select('user_id, mission_cd, complete_dtm')
@@ -475,7 +479,9 @@ export async function getEventRanking(eventId: string, limit: number = 100) {
       .eq('del_yn', 'N'),
   ])
 
-  const excludedUserIds = new Set(excludedResult.data?.map((e) => e.user_id) ?? [])
+  const excludedUserIds = new Set(
+    excludedResult.data?.map((e) => e.user_id) ?? [],
+  )
   const allMissions = missionsResult.data ?? []
 
   // 사용자별 집계 + M1~M10 매트릭스 단일 루프로 동시 구성
@@ -504,8 +510,11 @@ export async function getEventRanking(eventId: string, limit: number = 100) {
         : mission.complete_dtm,
     })
 
-    if (!missionMatrix.has(mission.user_id)) missionMatrix.set(mission.user_id, new Set())
-    missionMatrix.get(mission.user_id)!.add((mission.mission_cd as string).trim())
+    if (!missionMatrix.has(mission.user_id))
+      missionMatrix.set(mission.user_id, new Set())
+    missionMatrix
+      .get(mission.user_id)!
+      .add((mission.mission_cd as string).trim())
   }
 
   // count 내림차순, 동점 시 마지막 수행 일시 오름차순(먼저 끝낸 사람 상위)
@@ -521,7 +530,10 @@ export async function getEventRanking(eventId: string, limit: number = 100) {
   // 2단계: sys_user + evt_pi_reward_log 병렬 조회 (ranked users only)
   const rankedUserIds = sorted.map(([userId]) => userId)
   const [usersResult, rewardResult] = await Promise.all([
-    db.from('sys_user').select('id, nick_nm, display_name, pi_username').in('id', rankedUserIds),
+    db
+      .from('sys_user')
+      .select('id, nick_nm, display_name, pi_username')
+      .in('id', rankedUserIds),
     db
       .from('evt_pi_reward_log')
       .select('user_id, reward_st_cd')
@@ -530,29 +542,50 @@ export async function getEventRanking(eventId: string, limit: number = 100) {
       .in('user_id', rankedUserIds),
   ])
 
-  type SuRow = { id: string; nick_nm: string | null; display_name: string | null; pi_username: string | null }
+  type SuRow = {
+    id: string
+    nick_nm: string | null
+    display_name: string | null
+    pi_username: string | null
+  }
   const suMap = new Map<string, SuRow>()
   for (const u of (usersResult.data ?? []) as SuRow[]) suMap.set(u.id, u)
 
   const rewardMap = new Map<string, string>()
-  for (const rl of (rewardResult.data ?? []) as { user_id: string; reward_st_cd: string }[]) {
+  for (const rl of (rewardResult.data ?? []) as {
+    user_id: string
+    reward_st_cd: string
+  }[]) {
     rewardMap.set(rl.user_id, rl.reward_st_cd)
   }
 
-  const MISSIONS = ['M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7', 'M8', 'M9', 'M10'] as const
+  const MISSIONS = [
+    'M1',
+    'M2',
+    'M3',
+    'M4',
+    'M5',
+    'M6',
+    'M7',
+    'M8',
+    'M9',
+    'M10',
+  ] as const
 
   return sorted.map(([userId, stats], i) => {
     const su = suMap.get(userId)
     const completed = missionMatrix.get(userId)
     return {
-      rank: i + 1 as number | null,
+      rank: (i + 1) as number | null,
       user_id: userId,
       mission_count: stats.count as number | null,
       first_complete_dtm: stats.firstCompleteDtm as string | null,
       last_complete_dtm: stats.lastCompleteDtm as string | null,
       nick_nm: (su?.nick_nm ?? su?.display_name ?? null) as string | null,
       pi_username: (su?.pi_username ?? null) as string | null,
-      missions: Object.fromEntries(MISSIONS.map((m) => [m, completed?.has(m) ?? false])) as Record<string, boolean>,
+      missions: Object.fromEntries(
+        MISSIONS.map((m) => [m, completed?.has(m) ?? false]),
+      ) as Record<string, boolean>,
       reward_st_cd: (rewardMap.get(userId) ?? null) as string | null,
     }
   })

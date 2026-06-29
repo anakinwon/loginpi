@@ -9,15 +9,27 @@ import remarkGfm from 'remark-gfm'
 // Vercel 번들 포함은 next.config.ts outputFileTracingIncludes 설정 필요(아래 plan 참고).
 const DOCS: Record<string, { dir: string; base: string; title: string }> = {
   terms: { dir: 'terms', base: '서비스이용약관', title: '서비스 이용약관' },
-  privacy: { dir: 'privacy', base: '개인정보처리방침', title: '개인정보처리방침' },
+  privacy: {
+    dir: 'privacy',
+    base: '개인정보처리방침',
+    title: '개인정보처리방침',
+  },
   'privacy-consent': {
     dir: 'agreement',
     base: '개인정보수집이용동의서',
     title: '개인정보 수집·이용 동의',
   },
-  refund: { dir: 'refund', base: '환불및청약철회정책', title: '환불 및 청약철회 정책' },
+  refund: {
+    dir: 'refund',
+    base: '환불및청약철회정책',
+    title: '환불 및 청약철회 정책',
+  },
   youth: { dir: 'youth', base: '청소년보호정책', title: '청소년 보호정책' },
-  community: { dir: 'community', base: '커뮤니티운영정책', title: '커뮤니티 운영정책' },
+  community: {
+    dir: 'community',
+    base: '커뮤니티운영정책',
+    title: '커뮤니티 운영정책',
+  },
 }
 
 export async function generateMetadata({
@@ -29,7 +41,11 @@ export async function generateMetadata({
   return { title: DOCS[doc]?.title ?? '약관' }
 }
 
-async function readDoc(dir: string, base: string, locale: string): Promise<string> {
+async function readDoc(
+  dir: string,
+  base: string,
+  locale: string,
+): Promise<string> {
   const root = path.join(process.cwd(), 'docs', 'law', dir)
   const suffix = locale === 'ko' ? 'kor' : 'eng'
   try {
@@ -57,14 +73,18 @@ export default async function LegalDocPage({
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
           components={{
-            h1: ({ children }) => <h1 className="text-2xl font-bold">{children}</h1>,
+            h1: ({ children }) => (
+              <h1 className="text-2xl font-bold">{children}</h1>
+            ),
             h2: ({ children }) => (
               <h2 className="mt-8 text-lg font-semibold">{children}</h2>
             ),
             h3: ({ children }) => (
               <h3 className="mt-6 text-base font-semibold">{children}</h3>
             ),
-            p: ({ children }) => <p className="text-foreground/90">{children}</p>,
+            p: ({ children }) => (
+              <p className="text-foreground/90">{children}</p>
+            ),
             ul: ({ children }) => (
               <ul className="list-disc space-y-1 pl-5">{children}</ul>
             ),
@@ -79,7 +99,9 @@ export default async function LegalDocPage({
             hr: () => <hr className="my-6" />,
             table: ({ children }) => (
               <div className="overflow-x-auto">
-                <table className="w-full border-collapse text-xs">{children}</table>
+                <table className="w-full border-collapse text-xs">
+                  {children}
+                </table>
               </div>
             ),
             th: ({ children }) => (

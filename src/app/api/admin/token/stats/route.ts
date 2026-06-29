@@ -11,42 +11,49 @@ export async function GET() {
   const db = getSupabaseAdmin()
 
   // 병렬 집계: 발행(충전+프로모션)·유통·4종 거버넌스 지갑·일별 트렌드·보상 지급+출처별 분해
-  const [chargeRes, mintRes, circulatingRes, govWalletsRes, dailyRes, rewardRes, campaignRes] =
-    await Promise.all([
-      // 충전 발행 = CHARGE 거래 합계
-      db
-        .from('bean_txn')
-        .select('bean_amt')
-        .eq('txn_tp_cd', 'CHARGE')
-        .eq('del_yn', 'N'),
-      // 프로모션 발행 = bean_mint_log 합계 (거버넌스 지갑 충전분 — 항등식 유지 위해 발행에 포함)
-      db.from('bean_mint_log').select('bean_amt').eq('del_yn', 'N'),
-      // 유통량 = USER 지갑 합계
-      db
-        .from('bean_token_wallet')
-        .select('bean_amt')
-        .eq('wallet_type', 'USER')
-        .eq('del_yn', 'N'),
-      // 거버넌스 지갑 3종 (PLATFORM / FOUNDATION / REWARD_POOL)
-      db
-        .from('bean_token_wallet')
-        .select('wallet_type, bean_amt')
-        .in('wallet_type', ['PLATFORM', 'FOUNDATION', 'REWARD_POOL'])
-        .eq('del_yn', 'N'),
-      // 최근 30일 일별 CHARGE 집계
-      db.rpc('fn_bean_daily_stats').limit(30),
-      // 보상 지급 누계 = REWARD 거래 + 출처별 분해 (ref_tp_cd / ref_id)
-      db
-        .from('bean_txn')
-        .select('bean_amt, ref_tp_cd, ref_id')
-        .eq('txn_tp_cd', 'REWARD')
-        .eq('del_yn', 'N'),
-      // 캠페인 이름 조회 (ref_id → 표시명 변환용)
-      db
-        .from('bean_campaign')
-        .select('campaign_cd, campaign_nm')
-        .eq('del_yn', 'N'),
-    ])
+  const [
+    chargeRes,
+    mintRes,
+    circulatingRes,
+    govWalletsRes,
+    dailyRes,
+    rewardRes,
+    campaignRes,
+  ] = await Promise.all([
+    // 충전 발행 = CHARGE 거래 합계
+    db
+      .from('bean_txn')
+      .select('bean_amt')
+      .eq('txn_tp_cd', 'CHARGE')
+      .eq('del_yn', 'N'),
+    // 프로모션 발행 = bean_mint_log 합계 (거버넌스 지갑 충전분 — 항등식 유지 위해 발행에 포함)
+    db.from('bean_mint_log').select('bean_amt').eq('del_yn', 'N'),
+    // 유통량 = USER 지갑 합계
+    db
+      .from('bean_token_wallet')
+      .select('bean_amt')
+      .eq('wallet_type', 'USER')
+      .eq('del_yn', 'N'),
+    // 거버넌스 지갑 3종 (PLATFORM / FOUNDATION / REWARD_POOL)
+    db
+      .from('bean_token_wallet')
+      .select('wallet_type, bean_amt')
+      .in('wallet_type', ['PLATFORM', 'FOUNDATION', 'REWARD_POOL'])
+      .eq('del_yn', 'N'),
+    // 최근 30일 일별 CHARGE 집계
+    db.rpc('fn_bean_daily_stats').limit(30),
+    // 보상 지급 누계 = REWARD 거래 + 출처별 분해 (ref_tp_cd / ref_id)
+    db
+      .from('bean_txn')
+      .select('bean_amt, ref_tp_cd, ref_id')
+      .eq('txn_tp_cd', 'REWARD')
+      .eq('del_yn', 'N'),
+    // 캠페인 이름 조회 (ref_id → 표시명 변환용)
+    db
+      .from('bean_campaign')
+      .select('campaign_cd, campaign_nm')
+      .eq('del_yn', 'N'),
+  ])
 
   const chargeIssued = (chargeRes.data ?? []).reduce(
     (s, r) => s + Number(r.bean_amt),
@@ -65,12 +72,19 @@ export async function GET() {
     ]),
   )
 
-  type RewardRow = { bean_amt: number; ref_tp_cd: string | null; ref_id: string | null }
+  type RewardRow = {
+    bean_amt: number
+    ref_tp_cd: string | null
+    ref_id: string | null
+  }
   const rewardRows = (rewardRes.data ?? []) as RewardRow[]
   const rewardGranted = rewardRows.reduce((s, r) => s + Number(r.bean_amt), 0)
 
   // ref_tp_cd + ref_id 조합별 합산 — 이벤트 #1 / 이벤트 #2 구분
-  const srcMap = new Map<string, { label: string; bean: number; order: number }>()
+  const srcMap = new Map<
+    string,
+    { label: string; bean: number; order: number }
+  >()
   for (const r of rewardRows) {
     const key = `${r.ref_tp_cd ?? ''}:${r.ref_id ?? ''}`
     if (!srcMap.has(key)) {
@@ -80,12 +94,11 @@ export async function GET() {
         label = '이벤트 #1 · 오픈베타 미션 완주'
         order = 1
       } else if (r.ref_tp_cd === 'CAMPAIGN') {
-        const nm = campaignNameMap.get(r.ref_id ?? '') ?? r.ref_id ?? '알 수 없음'
+        const nm =
+          campaignNameMap.get(r.ref_id ?? '') ?? r.ref_id ?? '알 수 없음'
         // SHOP_ONBOARD = 이벤트 #2, 이후 캠페인은 이름 그대로 표시
         label =
-          r.ref_id === 'SHOP_ONBOARD'
-            ? `이벤트 #2 · ${nm}`
-            : `캠페인 · ${nm}`
+          r.ref_id === 'SHOP_ONBOARD' ? `이벤트 #2 · ${nm}` : `캠페인 · ${nm}`
         order = r.ref_id === 'SHOP_ONBOARD' ? 2 : 99
       } else {
         label = r.ref_tp_cd ?? '기타'
@@ -133,12 +146,19 @@ export async function GET() {
     .order('end_dtm', { ascending: false })
     .limit(1)
     .maybeSingle()
-  let monitor: { checkedAt: string; ok: boolean; diff: number | null } | null = null
+  let monitor: { checkedAt: string; ok: boolean; diff: number | null } | null =
+    null
   if (lastCheck) {
-    const lc = lastCheck as { end_dtm: string; success_yn: string; result_msg: string | null }
+    const lc = lastCheck as {
+      end_dtm: string
+      success_yn: string
+      result_msg: string | null
+    }
     let diff: number | null = null
     try {
-      diff = Number((JSON.parse(lc.result_msg ?? '{}') as { diff?: number }).diff ?? null)
+      diff = Number(
+        (JSON.parse(lc.result_msg ?? '{}') as { diff?: number }).diff ?? null,
+      )
       if (Number.isNaN(diff)) diff = null
     } catch {
       diff = null

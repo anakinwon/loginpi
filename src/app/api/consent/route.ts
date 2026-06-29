@@ -56,7 +56,8 @@ export async function POST(req: NextRequest) {
   if (terms !== true || privacy !== true || lbs !== true) {
     return NextResponse.json(
       {
-        error: '이용약관·개인정보 수집·이용·위치정보 수집·이용 동의는 필수입니다',
+        error:
+          '이용약관·개인정보 수집·이용·위치정보 수집·이용 동의는 필수입니다',
       },
       { status: 400 },
     )
@@ -108,9 +109,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: '위치 동의 저장 실패' }, { status: 500 })
   }
   // M9: 위치기반서비스 동의 미션 기록 (비블로킹 — 기존 LBS 라우트와 동일 동작)
-  recordUserAction('lbs_consent', user.id, { consent_ver: LBS_CONSENT_VER }).catch(
-    (err) => console.error(`[M9] 미션 기록 실패: ${err.message}`),
-  )
+  recordUserAction('lbs_consent', user.id, {
+    consent_ver: LBS_CONSENT_VER,
+  }).catch((err) => console.error(`[M9] 미션 기록 실패: ${err.message}`))
 
   return NextResponse.json({ ok: true })
 }

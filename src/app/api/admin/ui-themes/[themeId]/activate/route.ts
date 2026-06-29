@@ -30,7 +30,11 @@ export async function POST(
     .eq('del_yn', 'N')
     .maybeSingle()
 
-  if (!target) return NextResponse.json({ error: '테마를 찾을 수 없습니다' }, { status: 404 })
+  if (!target)
+    return NextResponse.json(
+      { error: '테마를 찾을 수 없습니다' },
+      { status: 404 },
+    )
 
   // 1) 현재 활성 테마 모두 비활성 (부분 유니크 충돌 방지 — 먼저 비워야 함)
   const { error: clearErr } = await db
@@ -39,15 +43,22 @@ export async function POST(
     .eq('actv_yn', 'Y')
     .eq('del_yn', 'N')
 
-  if (clearErr) return NextResponse.json({ error: '활성화 실패' }, { status: 500 })
+  if (clearErr)
+    return NextResponse.json({ error: '활성화 실패' }, { status: 500 })
 
   // 2) 대상 테마 활성화 + 적용 범위 설정
   const { error: setErr } = await db
     .from('ui_theme')
-    .update({ actv_yn: 'Y', apply_scope_cd: scope, modr_id: modrId, mod_dtm: now })
+    .update({
+      actv_yn: 'Y',
+      apply_scope_cd: scope,
+      modr_id: modrId,
+      mod_dtm: now,
+    })
     .eq('theme_id', themeId)
     .eq('del_yn', 'N')
 
-  if (setErr) return NextResponse.json({ error: '활성화 실패' }, { status: 500 })
+  if (setErr)
+    return NextResponse.json({ error: '활성화 실패' }, { status: 500 })
   return NextResponse.json({ ok: true, scope })
 }

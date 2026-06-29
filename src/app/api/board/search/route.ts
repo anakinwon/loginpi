@@ -16,7 +16,10 @@ export interface BoardSearchResult {
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl
   const q = searchParams.get('q')?.trim() ?? ''
-  const limit = Math.min(30, Math.max(1, Number(searchParams.get('limit') ?? 20)))
+  const limit = Math.min(
+    30,
+    Math.max(1, Number(searchParams.get('limit') ?? 20)),
+  )
 
   if (!q) return NextResponse.json({ results: [] })
 
@@ -39,8 +42,7 @@ export async function GET(request: NextRequest) {
     .order('reg_dtm', { ascending: false })
     .limit(limit)
 
-  if (error)
-    return NextResponse.json({ error: '검색 실패' }, { status: 500 })
+  if (error) return NextResponse.json({ error: '검색 실패' }, { status: 500 })
 
   type Row = {
     post_id: string

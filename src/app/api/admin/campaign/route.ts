@@ -58,7 +58,11 @@ export async function GET(req: NextRequest) {
     const rows = pendingRes.data ?? []
     // 사용자·매장 정보 병합 (FK 없음 → 별도 조회)
     const userIds = [...new Set(rows.map((r) => r.usr_id))]
-    const shopIds = [...new Set(rows.map((r) => (r as { shop_id?: string }).shop_id).filter(Boolean))] as string[]
+    const shopIds = [
+      ...new Set(
+        rows.map((r) => (r as { shop_id?: string }).shop_id).filter(Boolean),
+      ),
+    ] as string[]
 
     const userMap = new Map<string, Record<string, unknown>>()
     const shopMap = new Map<string, string>()
@@ -71,7 +75,10 @@ export async function GET(req: NextRequest) {
             .in('id', userIds)
             .then(({ data }) => {
               for (const u of data ?? [])
-                userMap.set((u as { id: string }).id, u as Record<string, unknown>)
+                userMap.set(
+                  (u as { id: string }).id,
+                  u as Record<string, unknown>,
+                )
             })
         : Promise.resolve(),
       shopIds.length > 0
@@ -81,7 +88,10 @@ export async function GET(req: NextRequest) {
             .in('shop_id', shopIds)
             .then(({ data }) => {
               for (const s of data ?? [])
-                shopMap.set((s as { shop_id: string }).shop_id, (s as { shop_nm: string }).shop_nm)
+                shopMap.set(
+                  (s as { shop_id: string }).shop_id,
+                  (s as { shop_nm: string }).shop_nm,
+                )
             })
         : Promise.resolve(),
     ])

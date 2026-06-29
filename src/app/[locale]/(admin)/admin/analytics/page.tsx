@@ -13,7 +13,9 @@ export default async function AnalyticsPage() {
     <div className="space-y-4">
       <div>
         <h1 className="text-2xl font-bold">{t('pageTitle')}</h1>
-        <p className="text-muted-foreground mt-1 text-sm">{t('pageSubtitle')}</p>
+        <p className="text-muted-foreground mt-1 text-sm">
+          {t('pageSubtitle')}
+        </p>
       </div>
       <AnalyticsHub />
     </div>

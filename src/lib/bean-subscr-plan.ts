@@ -15,7 +15,11 @@ export interface SubscrPlan {
   item_limit: number // 0 = 무제한/해당없음
 }
 
-export const SUBSCR_PRODUCTS: SubscrProduct[] = ['PICAFE', 'PISHOP', 'TRANSLATE']
+export const SUBSCR_PRODUCTS: SubscrProduct[] = [
+  'PICAFE',
+  'PISHOP',
+  'TRANSLATE',
+]
 
 // 주기 → 개월 수. 연간(Y)은 월×10 요금 = 2개월 무료.
 export const cycleMonths = (cycle: SubscrCycle): number =>

@@ -5,20 +5,20 @@ import { applyBean } from '@/lib/bean'
 
 // 수동 조정 사유 화이트리스트 — 어뷰징 방지
 const ALLOWED_REASONS = [
-  'REFUND_PI_PAYMENT',    // Pi 결제 환불 보상
-  'REWARD_EVENT',         // 이벤트 보상
-  'REWARD_PROMOTION',     // 프로모션 보상
-  'CORRECTION_OVERPAY',   // 과충전 정정
-  'CORRECTION_UNDERPAY',  // 미충전 정정
-  'PENALTY_ABUSE',        // 어뷰징 패널티
-  'TEST_ADMIN',           // 관리자 테스트
+  'REFUND_PI_PAYMENT', // Pi 결제 환불 보상
+  'REWARD_EVENT', // 이벤트 보상
+  'REWARD_PROMOTION', // 프로모션 보상
+  'CORRECTION_OVERPAY', // 과충전 정정
+  'CORRECTION_UNDERPAY', // 미충전 정정
+  'PENALTY_ABUSE', // 어뷰징 패널티
+  'TEST_ADMIN', // 관리자 테스트
 ] as const
 
 type AdjustReason = (typeof ALLOWED_REASONS)[number]
 
 interface AdjustBody {
   usr_id: string
-  adj_bean: number        // 양수=지급, 음수=차감
+  adj_bean: number // 양수=지급, 음수=차감
   reason: AdjustReason
   evidence_url?: string
 }
@@ -31,7 +31,11 @@ export async function POST(req: NextRequest) {
 
   const body = (await req.json()) as Partial<AdjustBody>
 
-  if (!body.usr_id || typeof body.adj_bean !== 'number' || body.adj_bean === 0) {
+  if (
+    !body.usr_id ||
+    typeof body.adj_bean !== 'number' ||
+    body.adj_bean === 0
+  ) {
     return NextResponse.json(
       { error: 'usr_id와 adj_bean(0 제외)은 필수입니다' },
       { status: 400 },
@@ -39,22 +43,33 @@ export async function POST(req: NextRequest) {
   }
   if (!body.reason || !ALLOWED_REASONS.includes(body.reason as AdjustReason)) {
     return NextResponse.json(
-      { error: `reason은 다음 중 하나여야 합니다: ${ALLOWED_REASONS.join(', ')}` },
+      {
+        error: `reason은 다음 중 하나여야 합니다: ${ALLOWED_REASONS.join(', ')}`,
+      },
       { status: 400 },
     )
   }
   // evidence_url — javascript:/data: Stored XSS 차단: http(s)만 허용, 길이 상한
   if (body.evidence_url !== undefined && body.evidence_url !== null) {
     if (body.evidence_url.length > 2048) {
-      return NextResponse.json({ error: 'evidence_url이 너무 깁니다 (최대 2048자)' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'evidence_url이 너무 깁니다 (최대 2048자)' },
+        { status: 400 },
+      )
     }
     try {
       const u = new URL(body.evidence_url)
       if (u.protocol !== 'https:' && u.protocol !== 'http:') {
-        return NextResponse.json({ error: 'evidence_url은 http(s) URL만 허용합니다' }, { status: 400 })
+        return NextResponse.json(
+          { error: 'evidence_url은 http(s) URL만 허용합니다' },
+          { status: 400 },
+        )
       }
     } catch {
-      return NextResponse.json({ error: 'evidence_url이 유효한 URL이 아닙니다' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'evidence_url이 유효한 URL이 아닙니다' },
+        { status: 400 },
+      )
     }
   }
 

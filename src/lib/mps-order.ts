@@ -841,7 +841,9 @@ export async function listOrdersByRole(
   if (role === 'buyer' && orders.length > 0) {
     const doneOrderIds = orders
       .filter((o) =>
-        ['DONE', 'BUYER_DONE'].includes((o as { order_st_cd: string }).order_st_cd),
+        ['DONE', 'BUYER_DONE'].includes(
+          (o as { order_st_cd: string }).order_st_cd,
+        ),
       )
       .map((o) => (o as { order_id: string }).order_id)
 
@@ -881,7 +883,9 @@ export async function listOrdersByRole(
         .eq('del_yn', 'N')
       const maxReward = Math.max(
         0,
-        ...(feeRows ?? []).map((r) => Number((r as { amt_bean: number }).amt_bean)),
+        ...(feeRows ?? []).map((r) =>
+          Number((r as { amt_bean: number }).amt_bean),
+        ),
       )
       if (maxReward > 0) {
         const { data: bondRows } = await getSupabaseAdmin()

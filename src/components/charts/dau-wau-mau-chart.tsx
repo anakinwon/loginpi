@@ -32,9 +32,27 @@ const BASE_LAYOUT = {
 // legendrank로 범례 표시 순서만 별도 제어: DAU(1) → WAU(2) → MAU(3)
 // 색은 활성 UI 테마의 차트 색(--chart-1~3)을 따름: DAU=chart1, WAU=chart2, MAU=chart3
 const SERIES = [
-  { key: 'mau_cnt' as const, name: 'MAU', ci: 2, fill: 'rgba(74,222,128,0.10)', legendrank: 3 },
-  { key: 'wau_cnt' as const, name: 'WAU', ci: 1, fill: 'rgba(232,121,249,0.12)', legendrank: 2 },
-  { key: 'dau_cnt' as const, name: 'DAU', ci: 0, fill: 'rgba(56,189,248,0.15)', legendrank: 1 },
+  {
+    key: 'mau_cnt' as const,
+    name: 'MAU',
+    ci: 2,
+    fill: 'rgba(74,222,128,0.10)',
+    legendrank: 3,
+  },
+  {
+    key: 'wau_cnt' as const,
+    name: 'WAU',
+    ci: 1,
+    fill: 'rgba(232,121,249,0.12)',
+    legendrank: 2,
+  },
+  {
+    key: 'dau_cnt' as const,
+    name: 'DAU',
+    ci: 0,
+    fill: 'rgba(56,189,248,0.15)',
+    legendrank: 1,
+  },
 ]
 
 interface Props {

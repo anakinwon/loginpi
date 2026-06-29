@@ -16,22 +16,24 @@ import { LazySection } from '@/components/lazy-section'
 
 // 미션별 수행 페이지 바로가기 — 행동이 둘인 미션(M9 보증금+위치동의)은 링크를 여러 개 노출.
 // labelKey는 event 네임스페이스 i18n 키 (타겟별 라벨 재사용)
-const MISSION_LINKS: Record<string, Array<{ href: string; labelKey: string }>> =
-  {
-    M1: [{ href: '/profile', labelKey: 'missionGoProfile' }], // 계정 연동 + 별명·카톡ID (M2 통합)
-    M2: [{ href: '/bean', labelKey: 'missionGoBean' }], // Bean Token 충전
-    M3: [{ href: '/chat', labelKey: 'missionGoCafe' }], // PREMIUM 카페 생성 + 자동번역
-    M4: [{ href: '/chat', labelKey: 'missionGoCafe' }], // 채팅 내 Bean 전송
-    M5: [{ href: '/subscribe', labelKey: 'missionGoSubscribe' }], // 구독 신청 + 이벤트 방 생성
-    M6: [{ href: '/chat', labelKey: 'missionGoCafe' }], // 스티커/파일/음성
-    M7: [{ href: '/store/my/sales', labelKey: 'missionGoSales' }], // 판매자 거래 취소 (판매 관리)
-    M8: [{ href: '/store/my/orders', labelKey: 'missionGoOrders' }], // 구매자 거래 취소 (주문 관리)
-    M9: [
-      { href: '/store/my/items', labelKey: 'missionGoItems' }, // 보증금 예치 (내 상품)
-      { href: '/profile', labelKey: 'missionGoLbs' }, // 위치 동의 (내 프로필 - 위치 서비스)
-    ],
-    M10: [{ href: '/store', labelKey: 'missionGoStore' }], // 보증금 활성 취소수수료
-  }
+const MISSION_LINKS: Record<
+  string,
+  Array<{ href: string; labelKey: string }>
+> = {
+  M1: [{ href: '/profile', labelKey: 'missionGoProfile' }], // 계정 연동 + 별명·카톡ID (M2 통합)
+  M2: [{ href: '/bean', labelKey: 'missionGoBean' }], // Bean Token 충전
+  M3: [{ href: '/chat', labelKey: 'missionGoCafe' }], // PREMIUM 카페 생성 + 자동번역
+  M4: [{ href: '/chat', labelKey: 'missionGoCafe' }], // 채팅 내 Bean 전송
+  M5: [{ href: '/subscribe', labelKey: 'missionGoSubscribe' }], // 구독 신청 + 이벤트 방 생성
+  M6: [{ href: '/chat', labelKey: 'missionGoCafe' }], // 스티커/파일/음성
+  M7: [{ href: '/store/my/sales', labelKey: 'missionGoSales' }], // 판매자 거래 취소 (판매 관리)
+  M8: [{ href: '/store/my/orders', labelKey: 'missionGoOrders' }], // 구매자 거래 취소 (주문 관리)
+  M9: [
+    { href: '/store/my/items', labelKey: 'missionGoItems' }, // 보증금 예치 (내 상품)
+    { href: '/profile', labelKey: 'missionGoLbs' }, // 위치 동의 (내 프로필 - 위치 서비스)
+  ],
+  M10: [{ href: '/store', labelKey: 'missionGoStore' }], // 보증금 활성 취소수수료
+}
 
 // 랭킹 보드 페이지당 표시 인원 — 미션 매트릭스(M1~M10 13컬럼)라 행이 커 모바일 기준 10명
 const RANK_PAGE_SIZE = 10
@@ -424,7 +426,7 @@ export function ClientEventGate() {
 
       {/* 미션 목록 (섹션 전체 아코디언) */}
       <LazySection
-        fallback={<div className="bg-muted h-64 rounded-lg animate-pulse" />}
+        fallback={<div className="bg-muted h-64 animate-pulse rounded-lg" />}
         rootMargin="50px"
       >
         <div>
@@ -440,81 +442,81 @@ export function ClientEventGate() {
 
           {expandedMissions && (
             <div className="mt-3 space-y-2">
-            {missions.map((m) => {
-              const cd = m.mission_cd.trim()
-              const mT = missionsT[cd]
-              const displayName = mT?.name ?? m.mission_nm
-              const displayDesc = mT?.desc ?? m.mission_guide_desc
-              const completed = progress?.missions.find(
-                (pm) => pm.mission_cd === m.mission_cd,
-              )?.is_completed
-              return (
-                <div
-                  key={cd}
-                  className={`rounded-lg border p-3 transition-colors ${completed ? 'border-green-300 bg-green-50 dark:border-green-700 dark:bg-green-950' : 'bg-card'}`}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="mb-2 flex items-center gap-2">
-                        <span className="text-sm font-bold">{cd}</span>
-                        <span className="text-sm font-medium">
-                          {displayName}
-                        </span>
-                        {completed && (
-                          <span className="ml-auto text-sm font-bold text-green-600 dark:text-green-400">
-                            ✓
+              {missions.map((m) => {
+                const cd = m.mission_cd.trim()
+                const mT = missionsT[cd]
+                const displayName = mT?.name ?? m.mission_nm
+                const displayDesc = mT?.desc ?? m.mission_guide_desc
+                const completed = progress?.missions.find(
+                  (pm) => pm.mission_cd === m.mission_cd,
+                )?.is_completed
+                return (
+                  <div
+                    key={cd}
+                    className={`rounded-lg border p-3 transition-colors ${completed ? 'border-green-300 bg-green-50 dark:border-green-700 dark:bg-green-950' : 'bg-card'}`}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="mb-2 flex items-center gap-2">
+                          <span className="text-sm font-bold">{cd}</span>
+                          <span className="text-sm font-medium">
+                            {displayName}
                           </span>
+                          {completed && (
+                            <span className="ml-auto text-sm font-bold text-green-600 dark:text-green-400">
+                              ✓
+                            </span>
+                          )}
+                        </div>
+                        {displayDesc && (
+                          <p className="text-muted-foreground text-xs">
+                            {displayDesc}
+                          </p>
+                        )}
+                        {m.complete_type_cd === 'MULTI_OR' && (
+                          <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">
+                            {t('multiOrHint')}
+                          </p>
+                        )}
+                        {/* 미션 수행 페이지 바로가기 — 미완료 미션에만 노출 (완료는 ✓로 표시).
+                          행동이 둘인 미션(M9)은 링크를 여러 개 표시 */}
+                        {!completed && MISSION_LINKS[cd] && (
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            {MISSION_LINKS[cd].map((lnk) => (
+                              <Link
+                                key={lnk.href}
+                                href={lnk.href}
+                                className="bg-primary/10 text-primary hover:bg-primary/20 inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium transition-colors"
+                              >
+                                {t(lnk.labelKey)}
+                                <ArrowRight className="size-3" />
+                              </Link>
+                            ))}
+                          </div>
                         )}
                       </div>
-                      {displayDesc && (
-                        <p className="text-muted-foreground text-xs">
-                          {displayDesc}
-                        </p>
-                      )}
-                      {m.complete_type_cd === 'MULTI_OR' && (
-                        <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">
-                          {t('multiOrHint')}
-                        </p>
-                      )}
-                      {/* 미션 수행 페이지 바로가기 — 미완료 미션에만 노출 (완료는 ✓로 표시).
-                          행동이 둘인 미션(M9)은 링크를 여러 개 표시 */}
-                      {!completed && MISSION_LINKS[cd] && (
-                        <div className="mt-2 flex flex-wrap gap-2">
-                          {MISSION_LINKS[cd].map((lnk) => (
-                            <Link
-                              key={lnk.href}
-                              href={lnk.href}
-                              className="bg-primary/10 text-primary hover:bg-primary/20 inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium transition-colors"
-                            >
-                              {t(lnk.labelKey)}
-                              <ArrowRight className="size-3" />
-                            </Link>
-                          ))}
-                        </div>
-                      )}
                     </div>
                   </div>
-                </div>
-              )
-            })}
-            {/* "더 보기" 버튼 — 다음 페이지 존재할 때만 표시 */}
-            {missionPage < missionTotalPages && (
-              <button
-                type="button"
-                onClick={() => loadMissions(missionPage + 1)}
-                disabled={loadingMoreMissions}
-                className="mt-4 w-full rounded-lg border border-primary bg-primary/5 px-4 py-2.5 text-sm font-medium text-primary transition-colors hover:bg-primary/10 disabled:opacity-50"
-              >
-                {loadingMoreMissions ? (
-                  <span className="inline-flex items-center gap-2">
-                    <Loader2 className="size-4 animate-spin" />
-                    로딩 중...
-                  </span>
-                ) : (
-                  '더 보기'
-                )}
-              </button>
-            )}
+                )
+              })}
+              {/* "더 보기" 버튼 — 다음 페이지 존재할 때만 표시 */}
+              {missionPage < missionTotalPages && (
+                <button
+                  type="button"
+                  onClick={() => loadMissions(missionPage + 1)}
+                  disabled={loadingMoreMissions}
+                  className="border-primary bg-primary/5 text-primary hover:bg-primary/10 mt-4 w-full rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors disabled:opacity-50"
+                >
+                  {loadingMoreMissions ? (
+                    <span className="inline-flex items-center gap-2">
+                      <Loader2 className="size-4 animate-spin" />
+                      로딩 중...
+                    </span>
+                  ) : (
+                    '더 보기'
+                  )}
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -522,251 +524,257 @@ export function ClientEventGate() {
 
       {/* 랭킹 보드 (체크리스트 매트릭스) */}
       <LazySection
-        fallback={<div className="bg-muted h-96 rounded-lg animate-pulse" />}
+        fallback={<div className="bg-muted h-96 animate-pulse rounded-lg" />}
         rootMargin="50px"
       >
         <div>
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <h2 className="text-xl font-bold">{t('rankingTitle')}</h2>
-            {isAdmin && (
-              <>
-                <button
-                  type="button"
-                  onClick={handleReeval}
-                  disabled={reevaluating}
-                  title="미션 재평가 후 랭킹 재조회 (관리자 전용)"
-                  className="border-input bg-background hover:bg-muted rounded-md border px-2 py-1 text-xs font-medium transition-colors disabled:opacity-50"
-                >
-                  {reevaluating ? t('processing') : '🔄 미션 재평가'}
-                </button>
-                <button
-                  type="button"
-                  onClick={handleBondReward}
-                  disabled={granting}
-                  title="10개 미션 완료 미지급자에게 5,000 Bean 지급 (관리자 전용)"
-                  className="rounded-md border border-amber-500 bg-amber-50 px-2 py-1 text-xs font-medium text-amber-900 transition-colors hover:bg-amber-100 disabled:opacity-50 dark:border-amber-600 dark:bg-amber-950 dark:text-amber-200 dark:hover:bg-amber-900"
-                >
-                  {granting ? t('processing') : '🎁 5,000 Bean 지급'}
-                </button>
-              </>
-            )}
-          </div>
-          {isAdmin && (
-            <div className="flex flex-col items-end gap-1">
-              <div className="flex items-center gap-2">
-                <input
-                  type="text"
-                  value={excludeInput}
-                  onChange={(e) => setExcludeInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleExclude()
-                  }}
-                  placeholder={t('excludePlaceholder')}
-                  className="border-input bg-background w-56 rounded-md border px-2 py-1 text-sm"
-                />
-                <button
-                  type="button"
-                  onClick={handleExclude}
-                  disabled={excluding || !excludeInput.trim()}
-                  className="rounded-md bg-red-600 px-3 py-1 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50"
-                >
-                  {excluding ? t('processing') : t('removeRank')}
-                </button>
-              </div>
-              {excludeMsg && (
-                <p className="text-muted-foreground text-xs">{excludeMsg}</p>
-              )}
-              {excludedList.length > 0 && (
-                <div className="flex flex-wrap items-center justify-end gap-1">
-                  <span className="text-muted-foreground text-xs">
-                    {t('excludedAgents')}
-                  </span>
-                  {excludedList.map((e) => (
-                    <span
-                      key={e.user_id}
-                      className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-xs text-red-800 dark:bg-red-900/40 dark:text-red-200"
-                    >
-                      {e.sys_user?.pi_username ??
-                        e.sys_user?.nick_nm ??
-                        t('noName')}
-                      <button
-                        type="button"
-                        onClick={() => handleInclude(e.user_id)}
-                        title={t('includeTitle')}
-                        className="font-bold hover:text-red-600"
-                      >
-                        ×
-                      </button>
-                    </span>
-                  ))}
-                </div>
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <h2 className="text-xl font-bold">{t('rankingTitle')}</h2>
+              {isAdmin && (
+                <>
+                  <button
+                    type="button"
+                    onClick={handleReeval}
+                    disabled={reevaluating}
+                    title="미션 재평가 후 랭킹 재조회 (관리자 전용)"
+                    className="border-input bg-background hover:bg-muted rounded-md border px-2 py-1 text-xs font-medium transition-colors disabled:opacity-50"
+                  >
+                    {reevaluating ? t('processing') : '🔄 미션 재평가'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleBondReward}
+                    disabled={granting}
+                    title="10개 미션 완료 미지급자에게 5,000 Bean 지급 (관리자 전용)"
+                    className="rounded-md border border-amber-500 bg-amber-50 px-2 py-1 text-xs font-medium text-amber-900 transition-colors hover:bg-amber-100 disabled:opacity-50 dark:border-amber-600 dark:bg-amber-950 dark:text-amber-200 dark:hover:bg-amber-900"
+                  >
+                    {granting ? t('processing') : '🎁 5,000 Bean 지급'}
+                  </button>
+                </>
               )}
             </div>
-          )}
-        </div>
-        {/* 요원명 검색 — 모든 사용자, 입력 시 1페이지로 리셋 */}
-        <div className="mb-3">
-          <input
-            type="text"
-            value={rankSearch}
-            onChange={(e) => {
-              setRankSearch(e.target.value)
-              setRankPage(1)
-            }}
-            placeholder={t('rankSearchPlaceholder')}
-            className="border-input bg-background w-full max-w-xs rounded-md border px-3 py-1.5 text-sm"
-          />
-        </div>
-        <div className="overflow-x-auto rounded-lg border">
-          <table className="w-full border-collapse text-sm">
-            <thead>
-              <tr className="bg-muted border-b">
-                <th className="bg-muted sticky left-0 z-10 py-2 pr-2 pl-2 text-left font-semibold">
-                  <span className="text-muted-foreground mr-1">{t('rankCol')}</span>
-                  {t('agentCol')}
-                </th>
-                <th className="p-2 text-center font-semibold">
-                  {t('totalCol')}
-                </th>
-                <th className="p-2 text-center font-semibold">M1</th>
-                <th className="p-2 text-center font-semibold">M2</th>
-                <th className="p-2 text-center font-semibold">M3</th>
-                <th className="p-2 text-center font-semibold">M4</th>
-                <th className="p-2 text-center font-semibold">M5</th>
-                <th className="p-2 text-center font-semibold">M6</th>
-                <th className="p-2 text-center font-semibold">M7</th>
-                <th className="p-2 text-center font-semibold">M8</th>
-                <th className="p-2 text-center font-semibold">M9</th>
-                <th className="p-2 text-center font-semibold">M10</th>
-                <th className="p-2 text-center font-semibold whitespace-nowrap">
-                  {t('lastPerformedCol')}
-                </th>
-                <th className="p-2 text-center font-semibold">
-                  {t('rewardCol')}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {pagedRanking.map((r) => (
-                <tr
-                  key={r.user_id}
-                  className="hover:bg-muted/50 h-12 border-b transition-colors"
-                >
-                  <td className="sticky left-0 z-10 bg-white py-2 pr-2 pl-2 dark:bg-slate-950">
-                    <div className="flex items-center gap-2">
-                      <span className="shrink-0 font-semibold tabular-nums">
-                        {r.rank ?? '-'}
+            {isAdmin && (
+              <div className="flex flex-col items-end gap-1">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={excludeInput}
+                    onChange={(e) => setExcludeInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleExclude()
+                    }}
+                    placeholder={t('excludePlaceholder')}
+                    className="border-input bg-background w-56 rounded-md border px-2 py-1 text-sm"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleExclude}
+                    disabled={excluding || !excludeInput.trim()}
+                    className="rounded-md bg-red-600 px-3 py-1 text-sm font-semibold text-white hover:bg-red-700 disabled:opacity-50"
+                  >
+                    {excluding ? t('processing') : t('removeRank')}
+                  </button>
+                </div>
+                {excludeMsg && (
+                  <p className="text-muted-foreground text-xs">{excludeMsg}</p>
+                )}
+                {excludedList.length > 0 && (
+                  <div className="flex flex-wrap items-center justify-end gap-1">
+                    <span className="text-muted-foreground text-xs">
+                      {t('excludedAgents')}
+                    </span>
+                    {excludedList.map((e) => (
+                      <span
+                        key={e.user_id}
+                        className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-xs text-red-800 dark:bg-red-900/40 dark:text-red-200"
+                      >
+                        {e.sys_user?.pi_username ??
+                          e.sys_user?.nick_nm ??
+                          t('noName')}
+                        <button
+                          type="button"
+                          onClick={() => handleInclude(e.user_id)}
+                          title={t('includeTitle')}
+                          className="font-bold hover:text-red-600"
+                        >
+                          ×
+                        </button>
                       </span>
-                      <span>{maskAgentName(r, isAdmin, t('noName'))}</span>
-                    </div>
-                  </td>
-                  <td className="px-2 text-center font-bold">
-                    {r.mission_count !== null ? `${r.mission_count}/10` : ''}
-                  </td>
-                  {[
-                    'M1',
-                    'M2',
-                    'M3',
-                    'M4',
-                    'M5',
-                    'M6',
-                    'M7',
-                    'M8',
-                    'M9',
-                    'M10',
-                  ].map((m) => (
-                    <td key={m} className="px-2 text-center">
-                      {r.missions[m] ? (
-                        <span className="font-bold text-green-600 dark:text-green-400">
-                          ✓
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+          {/* 요원명 검색 — 모든 사용자, 입력 시 1페이지로 리셋 */}
+          <div className="mb-3">
+            <input
+              type="text"
+              value={rankSearch}
+              onChange={(e) => {
+                setRankSearch(e.target.value)
+                setRankPage(1)
+              }}
+              placeholder={t('rankSearchPlaceholder')}
+              className="border-input bg-background w-full max-w-xs rounded-md border px-3 py-1.5 text-sm"
+            />
+          </div>
+          <div className="overflow-x-auto rounded-lg border">
+            <table className="w-full border-collapse text-sm">
+              <thead>
+                <tr className="bg-muted border-b">
+                  <th className="bg-muted sticky left-0 z-10 py-2 pr-2 pl-2 text-left font-semibold">
+                    <span className="text-muted-foreground mr-1">
+                      {t('rankCol')}
+                    </span>
+                    {t('agentCol')}
+                  </th>
+                  <th className="p-2 text-center font-semibold">
+                    {t('totalCol')}
+                  </th>
+                  <th className="p-2 text-center font-semibold">M1</th>
+                  <th className="p-2 text-center font-semibold">M2</th>
+                  <th className="p-2 text-center font-semibold">M3</th>
+                  <th className="p-2 text-center font-semibold">M4</th>
+                  <th className="p-2 text-center font-semibold">M5</th>
+                  <th className="p-2 text-center font-semibold">M6</th>
+                  <th className="p-2 text-center font-semibold">M7</th>
+                  <th className="p-2 text-center font-semibold">M8</th>
+                  <th className="p-2 text-center font-semibold">M9</th>
+                  <th className="p-2 text-center font-semibold">M10</th>
+                  <th className="p-2 text-center font-semibold whitespace-nowrap">
+                    {t('lastPerformedCol')}
+                  </th>
+                  <th className="p-2 text-center font-semibold">
+                    {t('rewardCol')}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {pagedRanking.map((r) => (
+                  <tr
+                    key={r.user_id}
+                    className="hover:bg-muted/50 h-12 border-b transition-colors"
+                  >
+                    <td className="sticky left-0 z-10 bg-white py-2 pr-2 pl-2 dark:bg-slate-950">
+                      <div className="flex items-center gap-2">
+                        <span className="shrink-0 font-semibold tabular-nums">
+                          {r.rank ?? '-'}
+                        </span>
+                        <span>{maskAgentName(r, isAdmin, t('noName'))}</span>
+                      </div>
+                    </td>
+                    <td className="px-2 text-center font-bold">
+                      {r.mission_count !== null ? `${r.mission_count}/10` : ''}
+                    </td>
+                    {[
+                      'M1',
+                      'M2',
+                      'M3',
+                      'M4',
+                      'M5',
+                      'M6',
+                      'M7',
+                      'M8',
+                      'M9',
+                      'M10',
+                    ].map((m) => (
+                      <td key={m} className="px-2 text-center">
+                        {r.missions[m] ? (
+                          <span className="font-bold text-green-600 dark:text-green-400">
+                            ✓
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground">-</span>
+                        )}
+                      </td>
+                    ))}
+                    <td className="text-muted-foreground px-2 text-center text-xs whitespace-nowrap">
+                      {r.last_complete_dtm
+                        ? new Date(r.last_complete_dtm).toLocaleString(
+                            'ko-KR',
+                            {
+                              timeZone: 'Asia/Seoul',
+                              month: '2-digit',
+                              day: '2-digit',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            },
+                          )
+                        : '-'}
+                    </td>
+                    <td className="px-2 text-center">
+                      {r.mission_count === null ? null : r.mission_count <
+                        10 ? (
+                        // ① 미션수행중 — 10미션 미완료
+                        <span
+                          className="text-muted-foreground inline-flex flex-col items-center gap-0.5 text-lg"
+                          title={t('rewardStInProgress')}
+                        >
+                          🥺
+                          <span className="text-[10px] font-medium">
+                            {t('rewardStInProgress')}
+                          </span>
+                        </span>
+                      ) : r.reward_st_cd === 'PAID' ? (
+                        // ③ 보상완료 — 10미션 완료 + 보상 지급됨 (이미지 없이 텍스트만)
+                        <span
+                          className="inline-flex flex-col items-center gap-0.5 text-lg"
+                          title={t('rewardStDone')}
+                        >
+                          ✅
+                          <span className="text-[10px] font-semibold text-green-600 dark:text-green-400">
+                            {t('rewardStDone')}
+                          </span>
                         </span>
                       ) : (
-                        <span className="text-muted-foreground">-</span>
+                        // ② 보상대기 — 10미션 완료, 아직 미지급(보상 로그 없음/PENDING/FAILED)
+                        <span
+                          className="inline-flex flex-col items-center gap-0.5 text-lg"
+                          title={t('rewardStPending')}
+                        >
+                          🎁
+                          <span className="text-[10px] font-semibold text-amber-600 dark:text-amber-400">
+                            {t('rewardStPending')}
+                          </span>
+                        </span>
                       )}
                     </td>
-                  ))}
-                  <td className="text-muted-foreground px-2 text-center text-xs whitespace-nowrap">
-                    {r.last_complete_dtm
-                      ? new Date(r.last_complete_dtm).toLocaleString('ko-KR', {
-                          timeZone: 'Asia/Seoul',
-                          month: '2-digit',
-                          day: '2-digit',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })
-                      : '-'}
-                  </td>
-                  <td className="px-2 text-center">
-                    {r.mission_count === null ? null : r.mission_count < 10 ? (
-                      // ① 미션수행중 — 10미션 미완료
-                      <span
-                        className="text-muted-foreground inline-flex flex-col items-center gap-0.5 text-lg"
-                        title={t('rewardStInProgress')}
-                      >
-                        🥺
-                        <span className="text-[10px] font-medium">
-                          {t('rewardStInProgress')}
-                        </span>
-                      </span>
-                    ) : r.reward_st_cd === 'PAID' ? (
-                      // ③ 보상완료 — 10미션 완료 + 보상 지급됨 (이미지 없이 텍스트만)
-                      <span
-                        className="inline-flex flex-col items-center gap-0.5 text-lg"
-                        title={t('rewardStDone')}
-                      >
-                        ✅
-                        <span className="text-[10px] font-semibold text-green-600 dark:text-green-400">
-                          {t('rewardStDone')}
-                        </span>
-                      </span>
-                    ) : (
-                      // ② 보상대기 — 10미션 완료, 아직 미지급(보상 로그 없음/PENDING/FAILED)
-                      <span
-                        className="inline-flex flex-col items-center gap-0.5 text-lg"
-                        title={t('rewardStPending')}
-                      >
-                        🎁
-                        <span className="text-[10px] font-semibold text-amber-600 dark:text-amber-400">
-                          {t('rewardStPending')}
-                        </span>
-                      </span>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* 랭킹 페이지네이션 — 반응형 (모바일에서도 터치 영역 충분, 1페이지면 숨김) */}
-        {totalRankPages > 1 && (
-          <div className="mt-3 flex items-center justify-center gap-3">
-            <button
-              type="button"
-              onClick={() => setRankPage((p) => Math.max(1, p - 1))}
-              disabled={currentRankPage <= 1}
-              className="border-input bg-background hover:bg-muted inline-flex items-center gap-1 rounded-md border px-3 py-1.5 text-sm font-medium transition-colors disabled:opacity-40"
-            >
-              <ChevronLeft className="size-4" />
-              {t('rankPrev')}
-            </button>
-            <span className="text-muted-foreground text-sm tabular-nums">
-              {currentRankPage} / {totalRankPages}
-            </span>
-            <button
-              type="button"
-              onClick={() =>
-                setRankPage((p) => Math.min(totalRankPages, p + 1))
-              }
-              disabled={currentRankPage >= totalRankPages}
-              className="border-input bg-background hover:bg-muted inline-flex items-center gap-1 rounded-md border px-3 py-1.5 text-sm font-medium transition-colors disabled:opacity-40"
-            >
-              {t('rankNext')}
-              <ChevronRight className="size-4" />
-            </button>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        )}
+
+          {/* 랭킹 페이지네이션 — 반응형 (모바일에서도 터치 영역 충분, 1페이지면 숨김) */}
+          {totalRankPages > 1 && (
+            <div className="mt-3 flex items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => setRankPage((p) => Math.max(1, p - 1))}
+                disabled={currentRankPage <= 1}
+                className="border-input bg-background hover:bg-muted inline-flex items-center gap-1 rounded-md border px-3 py-1.5 text-sm font-medium transition-colors disabled:opacity-40"
+              >
+                <ChevronLeft className="size-4" />
+                {t('rankPrev')}
+              </button>
+              <span className="text-muted-foreground text-sm tabular-nums">
+                {currentRankPage} / {totalRankPages}
+              </span>
+              <button
+                type="button"
+                onClick={() =>
+                  setRankPage((p) => Math.min(totalRankPages, p + 1))
+                }
+                disabled={currentRankPage >= totalRankPages}
+                className="border-input bg-background hover:bg-muted inline-flex items-center gap-1 rounded-md border px-3 py-1.5 text-sm font-medium transition-colors disabled:opacity-40"
+              >
+                {t('rankNext')}
+                <ChevronRight className="size-4" />
+              </button>
+            </div>
+          )}
         </div>
       </LazySection>
     </div>

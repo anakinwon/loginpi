@@ -44,12 +44,14 @@ const OWNER_LABEL: Record<ChkItem['owner_cd'], string> = {
 }
 const PRIO_CLS: Record<ChkItem['prio_cd'], string> = {
   BLOCKING: 'bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400',
-  IMPORTANT: 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400',
+  IMPORTANT:
+    'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400',
   RECOMMEND: 'bg-muted text-muted-foreground',
 }
 const OWNER_CLS: Record<ChkItem['owner_cd'], string> = {
   CODE: 'bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400',
-  MASTER: 'bg-purple-100 text-purple-700 dark:bg-purple-950/40 dark:text-purple-400',
+  MASTER:
+    'bg-purple-100 text-purple-700 dark:bg-purple-950/40 dark:text-purple-400',
   EXTERNAL: 'bg-muted text-muted-foreground',
 }
 
@@ -92,7 +94,10 @@ export default function ChecklistPage() {
     const na = items.filter((i) => i.status_cd === 'NA').length
     const denom = items.length - na
     const blockingLeft = items.filter(
-      (i) => i.prio_cd === 'BLOCKING' && i.status_cd !== 'DONE' && i.status_cd !== 'NA',
+      (i) =>
+        i.prio_cd === 'BLOCKING' &&
+        i.status_cd !== 'DONE' &&
+        i.status_cd !== 'NA',
     ).length
     return {
       total: items.length,
@@ -105,7 +110,10 @@ export default function ChecklistPage() {
     }
   }, [items, summary])
 
-  async function patch(chk_id: string, body: Partial<Pick<ChkItem, 'status_cd' | 'note_txt'>>) {
+  async function patch(
+    chk_id: string,
+    body: Partial<Pick<ChkItem, 'status_cd' | 'note_txt'>>,
+  ) {
     // 낙관적 갱신
     setItems((prev) =>
       prev.map((i) => (i.chk_id === chk_id ? { ...i, ...body } : i)),
@@ -128,7 +136,9 @@ export default function ChecklistPage() {
   }
 
   // 섹션 그룹 (정렬 유지)
-  const filtered = fStatus ? items.filter((i) => i.status_cd === fStatus) : items
+  const filtered = fStatus
+    ? items.filter((i) => i.status_cd === fStatus)
+    : items
   const sections: { cd: string; nm: string; items: ChkItem[] }[] = []
   for (const it of filtered) {
     let s = sections.find((x) => x.cd === it.sect_cd)
@@ -144,13 +154,15 @@ export default function ChecklistPage() {
       <div>
         <h1 className="text-lg font-bold">✅ Open Beta 준비 체크리스트</h1>
         <p className="text-muted-foreground mt-1 text-sm">
-          일반인 공개 전 준비 항목을 상태별로 관리합니다. (담당: 코드=개발 · 마스터=수동 · 외부=전문가/기관)
+          일반인 공개 전 준비 항목을 상태별로 관리합니다. (담당: 코드=개발 ·
+          마스터=수동 · 외부=전문가/기관)
         </p>
       </div>
 
       {!applied && (
         <div className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-700 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-400">
-          ⚠️ <code>ops_checklist</code> 테이블 미적용 — <code>sql/111</code>을 staging→운영에 적용하세요.
+          ⚠️ <code>ops_checklist</code> 테이블 미적용 — <code>sql/111</code>을
+          staging→운영에 적용하세요.
         </div>
       )}
 
@@ -161,7 +173,8 @@ export default function ChecklistPage() {
             <span className="font-semibold">
               진척률 {liveSummary.percent}%{' '}
               <span className="text-muted-foreground font-normal">
-                ({liveSummary.done}/{liveSummary.total - liveSummary.na} · 해당없음 {liveSummary.na} 제외)
+                ({liveSummary.done}/{liveSummary.total - liveSummary.na} ·
+                해당없음 {liveSummary.na} 제외)
               </span>
             </span>
             {liveSummary.blockingLeft > 0 ? (
@@ -225,7 +238,11 @@ export default function ChecklistPage() {
                   </span>
                   <select
                     value={it.status_cd}
-                    onChange={(e) => patch(it.chk_id, { status_cd: e.target.value as ChkItem['status_cd'] })}
+                    onChange={(e) =>
+                      patch(it.chk_id, {
+                        status_cd: e.target.value as ChkItem['status_cd'],
+                      })
+                    }
                     className="border-input bg-background shrink-0 rounded-md border px-2 py-1 text-xs"
                   >
                     {(['TODO', 'DOING', 'DONE', 'NA'] as const).map((s) => (
@@ -236,10 +253,14 @@ export default function ChecklistPage() {
                   </select>
                 </div>
                 <div className="flex flex-wrap items-center gap-1.5">
-                  <span className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${PRIO_CLS[it.prio_cd]}`}>
+                  <span
+                    className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${PRIO_CLS[it.prio_cd]}`}
+                  >
                     {PRIO_LABEL[it.prio_cd]}
                   </span>
-                  <span className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${OWNER_CLS[it.owner_cd]}`}>
+                  <span
+                    className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${OWNER_CLS[it.owner_cd]}`}
+                  >
                     {OWNER_LABEL[it.owner_cd]}
                   </span>
                   <input
@@ -248,7 +269,8 @@ export default function ChecklistPage() {
                     placeholder="메모…"
                     onBlur={(e) => {
                       const v = e.target.value
-                      if (v !== (it.note_txt ?? '')) patch(it.chk_id, { note_txt: v })
+                      if (v !== (it.note_txt ?? ''))
+                        patch(it.chk_id, { note_txt: v })
                     }}
                     className="border-input bg-background min-w-0 flex-1 rounded-md border px-2 py-1 text-xs"
                   />

@@ -8,7 +8,15 @@ import { piFetch } from '@/lib/pi-fetch'
 // 재사용 신고 버튼 — 게시물·댓글·상점·사용자·채팅 공통.
 // 사유 선택 + 상세 → POST /api/report. i18n(report 네임스페이스).
 type TargetType = 'POST' | 'COMMENT' | 'SHOP' | 'USER' | 'CHAT'
-const REASONS = ['SPAM', 'ABUSE', 'SEXUAL', 'PRIVACY', 'COPYRIGHT', 'FRAUD', 'ETC'] as const
+const REASONS = [
+  'SPAM',
+  'ABUSE',
+  'SEXUAL',
+  'PRIVACY',
+  'COPYRIGHT',
+  'FRAUD',
+  'ETC',
+] as const
 
 interface Props {
   targetTp: TargetType
@@ -43,7 +51,10 @@ export function ReportButton({ targetTp, targetId, className }: Props) {
           reason_txt: detail,
         }),
       })
-      const d = (await res.json().catch(() => ({}))) as { error?: string; duplicate?: boolean }
+      const d = (await res.json().catch(() => ({}))) as {
+        error?: string
+        duplicate?: boolean
+      }
       if (res.ok) {
         toast.success(d.duplicate ? t('duplicate') : t('success'))
         close()

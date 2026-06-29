@@ -34,8 +34,7 @@ export async function PATCH(
   if (body.theme_tp_cd !== undefined)
     patch.theme_tp_cd = body.theme_tp_cd === 'PREMIUM' ? 'PREMIUM' : 'BASIC'
   if (body.sort_ord !== undefined) patch.sort_ord = body.sort_ord ?? 0
-  if (body.use_yn !== undefined)
-    patch.use_yn = body.use_yn === 'N' ? 'N' : 'Y'
+  if (body.use_yn !== undefined) patch.use_yn = body.use_yn === 'N' ? 'N' : 'Y'
   patch.modr_id = requester?.id ?? 'ADMIN'
   patch.mod_dtm = new Date().toISOString()
 

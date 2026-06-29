@@ -1,5 +1,6 @@
 import { getTranslations } from 'next-intl/server'
 import { getSessionUser } from '@/lib/auth-check'
+import { getActiveFeeMode } from '@/lib/fee-resolver'
 import { StoreNav } from '@/components/store/store-nav'
 import { ClientMyOrders } from '@/components/store/client-my-orders'
 
@@ -12,12 +13,13 @@ export async function generateMetadata() {
 export default async function MySalesPage() {
   const t = await getTranslations('store')
   const user = await getSessionUser()
+  const feeMode = await getActiveFeeMode()
 
   return (
     <div className="mx-auto max-w-3xl space-y-4 p-4 md:p-6">
       <StoreNav active="sales" />
       <h1 className="text-xl font-bold">{t('navSales')}</h1>
-      <ClientMyOrders role="seller" serverAuthed={!!user} />
+      <ClientMyOrders role="seller" serverAuthed={!!user} feeMode={feeMode} />
     </div>
   )
 }

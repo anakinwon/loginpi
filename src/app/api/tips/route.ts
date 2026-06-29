@@ -43,7 +43,9 @@ async function handlePOST(request: NextRequest) {
   const tipCfg = await getTipPresets()
   if (!Number.isInteger(amount) || amount <= 0 || amount > tipCfg.customMax) {
     return NextResponse.json(
-      { error: `1 ~ ${tipCfg.customMax.toLocaleString()} Bean 사이 정수만 가능합니다` },
+      {
+        error: `1 ~ ${tipCfg.customMax.toLocaleString()} Bean 사이 정수만 가능합니다`,
+      },
       { status: 400 },
     )
   }

@@ -74,7 +74,9 @@ export async function payTipPiReward(paymentId: string): Promise<void> {
       }),
     })
     if (!createRes.ok)
-      throw new Error(`생성 실패 (${createRes.status}): ${await createRes.text()}`)
+      throw new Error(
+        `생성 실패 (${createRes.status}): ${await createRes.text()}`,
+      )
     const created = (await createRes.json()) as { identifier: string }
     const payoutId = created.identifier
 
@@ -83,14 +85,18 @@ export async function payTipPiReward(paymentId: string): Promise<void> {
       headers: { Authorization: `Key ${apiKey}` },
     })
     if (!approveRes.ok)
-      throw new Error(`승인 실패 (${approveRes.status}): ${await approveRes.text()}`)
+      throw new Error(
+        `승인 실패 (${approveRes.status}): ${await approveRes.text()}`,
+      )
 
     const completeRes = await fetch(`${PI_PAYMENTS_URL}/${payoutId}/complete`, {
       method: 'POST',
       headers: { Authorization: `Key ${apiKey}` },
     })
     if (!completeRes.ok)
-      throw new Error(`완료 실패 (${completeRes.status}): ${await completeRes.text()}`)
+      throw new Error(
+        `완료 실패 (${completeRes.status}): ${await completeRes.text()}`,
+      )
 
     await update(db, paymentId, {
       payout_payment_id: payoutId,
@@ -127,7 +133,11 @@ export async function payPendingTipPiRewards(limit = 50): Promise<{
   return { processed: rows.length }
 }
 
-async function update(db: Db, paymentId: string, fields: Record<string, unknown>) {
+async function update(
+  db: Db,
+  paymentId: string,
+  fields: Record<string, unknown>,
+) {
   await db
     .from('tip_pi_payout_log')
     .update({ modr_id: 'SYSTEM', mod_dtm: new Date().toISOString(), ...fields })

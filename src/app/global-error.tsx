@@ -27,7 +27,9 @@ export default function GlobalError({
           <h1 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>
             문제가 발생했습니다
           </h1>
-          <p style={{ color: '#666', marginTop: '0.5rem', fontSize: '0.875rem' }}>
+          <p
+            style={{ color: '#666', marginTop: '0.5rem', fontSize: '0.875rem' }}
+          >
             일시적인 오류일 수 있어요. 잠시 후 다시 시도해 주세요.
             <br />
             Something went wrong. Please try again shortly.
