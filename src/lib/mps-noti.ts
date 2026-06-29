@@ -35,9 +35,13 @@ interface NotiBody {
 const round7 = (n: number) => Math.round(n * 1e7) / 1e7
 
 // 판매자 주문 관리 화면 딥링크 — 인증된 앱 내에서 상세 확인(외부 채널엔 PII 미노출)
+//   텔레그램 inline 버튼 url은 http(s)만 허용하므로 pi:// 직접 사용 불가 →
+//   https 브리지(/ko/open)로 보내고, 브리지가 pi:// 스킴으로 Pi Browser를 연다
+//   (주문 확인엔 window.Pi 필요). Pi Browser 미설치 시 브리지가 폴백 링크 제공.
 function orderDeepLink(): string {
   const base = process.env.NEXT_PUBLIC_APP_URL ?? 'https://cafe.pi'
-  return `${base}/ko/store/my/sales`
+  const target = '/ko/store/my/sales'
+  return `${base}/ko/open?to=${encodeURIComponent(target)}`
 }
 
 // HTML 메시지 본문 — 동적 값은 escapeHtml로 안전 처리
