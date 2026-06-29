@@ -109,7 +109,15 @@ function FlagIcon({
   return <span className={`fi fi-${code.toLowerCase()} ${className}`} />
 }
 
-export function LanguageSwitcher({ locale }: { locale: string }) {
+export function LanguageSwitcher({
+  locale,
+  showPiValuation,
+}: {
+  locale: string
+  // Pi 가치평가(통화·환율) 노출 — server(header)가 런타임 tier로 판정해 전달.
+  // 운영 숨김 / staging·dev 노출. 단일 소스: computeShowPiValuation.
+  showPiValuation: boolean
+}) {
   const t = useTranslations('langSwitcher')
   const tc = useTranslations('common')
   const router = useRouter()
@@ -357,9 +365,12 @@ export function LanguageSwitcher({ locale }: { locale: string }) {
                     <span className="flex-1 truncate text-xs font-medium">
                       {loc.locale_nm}
                     </span>
-                    <span className="text-muted-foreground shrink-0 font-mono text-[11px]">
-                      {currency ? `${currency} ${fmtRate(rate)}` : ''}
-                    </span>
+                    {/* 통화·환율(법정화폐 가치평가): 운영 숨김 / staging·dev 노출 */}
+                    {showPiValuation && currency && (
+                      <span className="text-muted-foreground shrink-0 font-mono text-[11px]">
+                        {currency} {fmtRate(rate)}
+                      </span>
+                    )}
                     {isCurrent && (
                       <svg
                         className="text-primary h-3.5 w-3.5 shrink-0"
@@ -413,10 +424,12 @@ export function LanguageSwitcher({ locale }: { locale: string }) {
                         </span>
                       )}
                     </div>
-                    {/* 통화 + 환율 */}
-                    <span className="text-muted-foreground/70 shrink-0 font-mono text-[11px]">
-                      {c.currency_cd} {fmtRate(rate)}
-                    </span>
+                    {/* 통화 + 환율(가치평가): 운영 숨김 / staging·dev 노출 */}
+                    {showPiValuation && (
+                      <span className="text-muted-foreground/70 shrink-0 font-mono text-[11px]">
+                        {c.currency_cd} {fmtRate(rate)}
+                      </span>
+                    )}
                   </div>
                 )
               })}

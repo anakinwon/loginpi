@@ -34,7 +34,7 @@ export async function Header() {
           <span className="hidden md:inline-flex">
             <ThemeToggle />
           </span>
-          <LanguageSwitcher locale={locale} />
+          <LanguageSwitcher locale={locale} showPiValuation={showPiValuation} />
           {/* 시세칩: Pi 가치평가 노출 = 등재 레드라인(A-5) 대응. 런타임 tier로 분기 —
               운영(prod) 숨김 / staging·dev 노출. 같은 빌드가 배포 환경별로 다르게 표시.
               긴급 override는 NEXT_PUBLIC_FEATURE_PI_PRICE='true'/'false'. docs/PRD_23_FUNC_TUNING.md §8.6 */}
