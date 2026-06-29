@@ -63,7 +63,7 @@
 - **Bean/Pi 일관**: BEAN 모드=매장 Bean 보증금 예치→Bean 보상 차감 / PI 모드=Pi 보증금 예치→Pi A2U 보상 차감. **1:100 동일**(보증금 1π=100 Bean).
 - **보상액 단일출처**: 후기 보상은 이미 `bean_fee_plan`(`prod_ctgr_cd='FBCK_REWARD'`·`FR_1~FR_5` 점수별) → ÷100 Pi 자동 환산.
 - **후기 대상 2종 모두 적용**: PyCafé™ 카페 후기(`shop_id=msg_room`)·PyShop™ 상품 후기(`order_id=mps_order`) 양쪽의 매장 주체가 보증금 예치.
-- ⏳ **보증금 구조**(신규 `fbck_reward_bond` 테이블 vs `mps_shop`/`msg_room` 컬럼 vs `mps_seller_bond` 통합)는 §10 영향분석에서 **옵션 승인 후 확정**.
+- ✅ **보증금 구조 확정**(2026-06-29): **신규 `fbck_reward_bond` 테이블** + **보증금에서 직접 차감**(보증금=보상 재원, 매장 부담·플랫폼 부담 0, 소진 시 후기 보상 자동 중단). 상세 §10-7.
 
 ---
 
@@ -682,6 +682,34 @@ interface PreSwitchValidation {
 | 마이크로 과금(입장·번역·AI·배지·부스팅) | PI 모드 시 면제(무료) 분기 |
 
 > ⚠️ 관리자 화면 신규 i18n 키는 **옆 세션 `ko.json` 작업과 조율**(직접 수정 금지, 추가 키 목록만 명시).
+
+### 10-7. 후기 보상 보증금 게이트 (v0.4 — 구조 확정 2026-06-29)
+
+**확정**: 신규 전용 테이블 `fbck_reward_bond` + 보증금에서 **직접 차감**(보증금=재원, 매장 부담·플랫폼 0).
+
+**추가 테이블** `fbck_reward_bond` (매장 주체당 1행):
+| 컬럼 | 설명 |
+|---|---|
+| `bond_id` | UUID PK |
+| `owner_id` | 매장 주체 — 카페 `msg_room` owner(usr_id) / 상점 `mps_shop` seller(usr_id) |
+| `bond_kind` | `CAFE` \| `SHOP` (후기 대상 2종) |
+| `bond_bal_bean` | BIGINT 보증금 잔액 **Bean 기준**(Pi 표시=÷100). 예치 +, 보상 −. ≥0 |
+| (+ 시스템 4 + `del_yn`/`del_dtm`) | DA 표준 |
+- UNIQUE(`owner_id`,`bond_kind`) — 예치 시 누적. 초기 데이터: 없음(매장 예치 시 생성)
+
+**추가 함수**:
+- `fn_fbck_bond_deposit(owner_id, kind, bean_amt, pymnt_id)` — 예치(+잔액). BEAN 모드=매장 `bean_wlt` 차감 / PI 모드=`pi_pymnt`(MPS_BOND류 콜백)로 입금 후 ×100 Bean 환산 누적.
+- `fn_fbck_reward_apply(usr_id, owner_id, kind, score, mode)` — 후기 보상 지급 **+ 보증금 차감 원자적**(잔액 부족 시 전체 롤백). 보상액=`bean_fee_plan` FBCK_REWARD(FR_1~5). PI 모드=÷100 Pi A2U(`triggerPiReward`) + 보증금 ÷100 차감.
+
+**게이트** (`api/feedback` POST에 ③ 추가):
+1. (기존) 거래/멤버 확인 — IDOR 방어
+2. (기존) 매장 동의 `fbck_consent_yn='Y'`
+3. **(신규) 보증금 활성** — `fbck_reward_bond.bond_bal_bean ≥ 보상액(점수별)` → 부족 시 후기 작성 **차단**("매장 보상 재원이 소진되었습니다")
+
+**추가 화면**: 매장 보증금 예치·관리(잔액·충전·차감 이력) — `/admin` 또는 매장주 화면
+**변경 화면**: 후기 작성(보증금 부족 시 안내), 매장 관리(보증금 잔액 위젯)
+
+**Bean/Pi 일관**: `bond_bal_bean`을 **Bean 기준 단일 저장** → 모드 전환 시 잔액 불변, 예치·차감·표시만 ÷100/×100. 두 모드 동일 규칙.
 
 ---
 
