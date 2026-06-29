@@ -195,6 +195,13 @@ export function AdminSidebar() {
             pathname={pathname}
           />
         ))}
+        {/* 요금제 모드(Bean↔Pi) — i18n 키는 옆 세션 ko.json 작업과 충돌 회피 위해
+            임시 라벨 하드코딩(추후 admin.nav.feeMode 키로 정식화). PRD_24 */}
+        <NavItem
+          href="/admin/fee-mode"
+          label="요금제 모드"
+          pathname={pathname}
+        />
       </nav>
       <div className="border-t p-3">
         <Link
