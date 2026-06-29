@@ -259,7 +259,9 @@ export function ClientMyOrders({
     const stLabel =
       OFFLINE_LABEL[o.order_st_cd] ??
       (offline && o.order_st_cd === 'DONE'
-        ? role === 'buyer' ? '🎉 구매완료' : '🎉 판매완료'
+        ? role === 'buyer'
+          ? '🎉 구매완료'
+          : '🎉 판매완료'
         : t(
             `orderSt.${IN_TRADE.includes(o.order_st_cd) ? 'TRADING' : o.order_st_cd}`,
           ))
@@ -534,8 +536,8 @@ export function ClientMyOrders({
 
   return (
     <div className="space-y-3">
-      {isAdminUser && (
-        <div className="flex justify-end">
+      <div className="flex items-center justify-end gap-2">
+        {isAdminUser && (
           <button
             onClick={() => setShowAll((v) => !v)}
             className={`rounded-full border px-3 py-1 text-xs font-medium ${showAll ? 'border-primary bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted'}`}
@@ -546,8 +548,20 @@ export function ClientMyOrders({
                 : '🛡️ 전체 구매주문'
               : '🛡️ 내 주문만'}
           </button>
-        </div>
-      )}
+        )}
+        {/* Pi Browser는 당겨서 새로고침이 없어 명시적 버튼 필수 — load() 재조회 */}
+        <button
+          onClick={() => void load()}
+          disabled={loading}
+          aria-label="새로고침"
+          className="text-muted-foreground hover:bg-muted flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-medium disabled:opacity-50"
+        >
+          <span className={`inline-block ${loading ? 'animate-spin' : ''}`}>
+            🔄
+          </span>
+          {loading ? '새로고침 중…' : '새로고침'}
+        </button>
+      </div>
       {loading ? (
         <p className="text-muted-foreground py-16 text-center text-sm">
           {t('loading')}
