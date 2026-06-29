@@ -34,20 +34,13 @@ interface NotiBody {
 // 소수 7자리 반올림 (Pi 정밀도 정합)
 const round7 = (n: number) => Math.round(n * 1e7) / 1e7
 
-// 판매자 주문 관리 화면 링크 — 텔레그램 버튼을 Pi 정식 도메인(*.pinet.com) https로 "직접" 보낸다.
-//   pinet.com은 Pi universal link라 OS가 클릭을 가로채 Pi Browser를 직접 연다(window.Pi 주입).
-//   ⚠️ 브리지(/ko/open) 경유 금지: 일반 브라우저로 열린 뒤 JS 리다이렉트는 universal link를
-//   우회해 브라우저 안에 갇힌다 → Pi Browser로 못 넘어감. 그래서 버튼 url에 pinet 도메인 직접.
-//   도메인은 환경별(staging≠운영): NEXT_PUBLIC_PI_APP_DOMAIN, env의 https://·끝슬래시 정규화.
+// 판매자 주문 관리 화면 링크 — 텔레그램 버튼(https)이 /ko/open 브리지로 보낸다.
+//   직접 https://pinet.com은 OS가 일반 브라우저(Chrome)로 열어 Pi Browser로 안 넘어감(App Link 미작동).
+//   브리지(Chrome)에서 pi:// 스킴으로 리다이렉트하면 Pi Browser가 열린다(실기기 확인).
+//   pi:// 정확한 형식은 브리지에서 처리(공식 문서 미기재 → 폴백 다중 시도).
 function orderDeepLink(): string {
-  const piDomain = process.env.NEXT_PUBLIC_PI_APP_DOMAIN?.replace(
-    /^https?:\/\//,
-    '',
-  ).replace(/\/+$/, '')
-  const base = piDomain
-    ? `https://${piDomain}`
-    : (process.env.NEXT_PUBLIC_APP_URL ?? 'https://cafe.pi')
-  return `${base}/ko/store/my/sales`
+  const base = process.env.NEXT_PUBLIC_APP_URL ?? 'https://cafe.pi'
+  return `${base}/ko/open?to=${encodeURIComponent('/ko/store/my/sales')}`
 }
 
 // HTML 메시지 본문 — 동적 값은 escapeHtml로 안전 처리
