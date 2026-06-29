@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth-check'
 import { applyBean } from '@/lib/bean'
+import { getActiveFeeMode } from '@/lib/fee-resolver'
 
 type Params = { params: Promise<{ packId: string }> }
 
@@ -63,6 +64,19 @@ export async function POST(_req: NextRequest, { params }: Params) {
 
   const feeBean = Number(packRow.price_bean)
   const slug = String(user.display_name ?? 'user').slice(0, 20)
+
+  // PI 모드 — Bean 차감 대신 Pi 직결제. 소유권은 결제 완료(complete) 시 부여.
+  const feeMode = await getActiveFeeMode()
+  if (feeMode === 'PI') {
+    return NextResponse.json({
+      mode: 'PI',
+      pay: {
+        amount: feeBean / 100, // 1 Pi = 100 Bean
+        memo: `sticker pack ${packRow.pack_id}`,
+        metadata: { type: 'STICKER_PACK', pack_id: packRow.pack_id },
+      },
+    })
+  }
 
   // Bean 차감 (잔액 부족 시 402)
   const charge = await applyBean({

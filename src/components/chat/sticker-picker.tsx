@@ -69,9 +69,71 @@ export function StickerPicker({
       .finally(() => setLoading(false))
   }, [loadPacks])
 
+  // PI 모드 스티커팩 — 서버가 내려준 pay로 Pi 직결제. 소유권은 complete가 부여.
+  const startStickerPiPayment = useCallback(
+    (
+      pay: { amount: number; memo: string; metadata: Record<string, unknown> },
+      packId: string,
+      packNm: string,
+    ) => {
+      if (typeof window === 'undefined' || !window.Pi) {
+        toast.error('Pi Browser에서 결제할 수 있습니다')
+        setBuying(null)
+        return
+      }
+      window.Pi.createPayment(
+        { amount: pay.amount, memo: pay.memo, metadata: pay.metadata },
+        {
+          onReadyForServerApproval: async (paymentId: string) => {
+            try {
+              const r = await piFetch('/api/payments/approve', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ paymentId }),
+              })
+              if (!r.ok) throw new Error()
+            } catch {
+              toast.error('구매 실패')
+              setBuying(null)
+            }
+          },
+          onReadyForServerCompletion: async (paymentId: string, txid: string) => {
+            try {
+              const r = await piFetch('/api/payments/complete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ paymentId, txid }),
+              })
+              if (!r.ok) throw new Error()
+              toast.success(`${packNm} 구매 완료!`)
+              const updated = await loadPacks().catch(() => null)
+              if (updated) {
+                setOwnedPacks(updated.ownedPacks)
+                setStorePacks(updated.storePacks)
+                setActivePackId(packId)
+                setShowStore(false)
+              }
+            } catch {
+              toast.error('구매 처리 실패')
+            } finally {
+              setBuying(null)
+            }
+          },
+          onCancel: () => setBuying(null),
+          onError: (e: Error) => {
+            toast.error(e?.message ?? '구매 오류')
+            setBuying(null)
+          },
+        },
+      )
+    },
+    [loadPacks],
+  )
+
   const buyPack = useCallback(
     async (packId: string, packNm: string) => {
       setBuying(packId)
+      let piHandoff = false
       try {
         const res = await piFetch(`/api/stickers/packs/${packId}/buy`, {
           method: 'POST',
@@ -81,6 +143,15 @@ export function StickerPicker({
           error?: string
           requiresBean?: boolean
           feeBean?: number
+          mode?: string
+          pay?: { amount: number; memo: string; metadata: Record<string, unknown> }
+        }
+
+        // PI 모드 — 서버가 Pi 직결제 요구. createPayment로 핸드오프.
+        if (data.mode === 'PI' && data.pay) {
+          piHandoff = true
+          startStickerPiPayment(data.pay, packId, packNm)
+          return
         }
 
         if (!res.ok) {
@@ -105,10 +176,10 @@ export function StickerPicker({
       } catch (e) {
         toast.error(e instanceof Error ? e.message : '구매 오류')
       } finally {
-        setBuying(null)
+        if (!piHandoff) setBuying(null)
       }
     },
-    [loadPacks],
+    [loadPacks, startStickerPiPayment],
   )
 
   const activePack = ownedPacks.find((p) => p.pack_id === activePackId)

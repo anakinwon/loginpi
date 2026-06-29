@@ -389,6 +389,67 @@ async function handlePOST(request: NextRequest) {
           }
         }
       }
+    } else if (meta?.type === 'STICKER_PACK' && payment.user_uid) {
+      // STICKER_PACK: PI 모드 스티커팩 구매 — 결제 완료 시 소유권 부여. PRD_24 §0.
+      //   소유권은 msg_usr_stkr UNIQUE(usr_id,pack_id) upsert로 멱등 / 회계 중복은 STICKER_PACK_PI 마커로 차단.
+      const packId = String(meta.pack_id ?? '')
+      const { data: dup } = await db
+        .from('bean_txn')
+        .select('txn_id')
+        .eq('ref_tp_cd', 'STICKER_PACK_PI')
+        .eq('ref_id', paymentId)
+        .maybeSingle()
+
+      if (!dup && packId) {
+        const { data: buyer } = await db
+          .from('sys_user')
+          .select('id, display_name')
+          .eq('pi_uid', payment.user_uid)
+          .maybeSingle()
+        const { data: pack } = await db
+          .from('msg_stkr_pack')
+          .select('pack_id, price_bean, is_dflt_yn')
+          .eq('pack_id', packId)
+          .eq('use_yn', 'Y')
+          .eq('del_yn', 'N')
+          .maybeSingle()
+
+        if (buyer && pack) {
+          const b = buyer as { id: string; display_name: string | null }
+          const p = pack as { price_bean: number; is_dflt_yn: string }
+          const fee = Number(p.price_bean)
+          const isFree = p.is_dflt_yn === 'Y' || fee === 0
+          // 금액 검증 — 팩 가격 재계산(클라 금액 불신)
+          if (!isFree && Number(payment.amount) + 1e-6 >= fee / 100) {
+            const slug = String(b.display_name ?? 'user').slice(0, 20)
+            const nowIso = new Date().toISOString()
+            await db.from('msg_usr_stkr').upsert(
+              {
+                usr_id: b.id,
+                pack_id: packId,
+                del_yn: 'N',
+                del_dtm: null,
+                regr_id: slug,
+                modr_id: slug,
+                mod_dtm: nowIso,
+              },
+              { onConflict: 'usr_id,pack_id' },
+            )
+            await db.from('bean_txn').insert({
+              usr_id: b.id,
+              txn_tp_cd: 'SPEND',
+              bean_amt: 0,
+              bal_amt: 0,
+              pi_amt: fee / 100,
+              ref_tp_cd: 'STICKER_PACK_PI',
+              ref_id: paymentId,
+              memo_txt: 'Pi 스티커팩 구매',
+              regr_id: 'SYSTEM',
+              modr_id: 'SYSTEM',
+            })
+          }
+        }
+      }
     }
 
     // 구글 계정 연동 사용자에게 결제 영수증 이메일 발송 (비동기 — 실패해도 결제 응답에 영향 없음)
