@@ -68,6 +68,8 @@ interface OrderRow {
     pi_username: string | null
   } | null
   has_feedback?: boolean
+  // 매장주(seller) 보증금 충분 여부 — 'Y'/true일 때만 후기 작성 버튼 활성 (PRD_24 §10-7)
+  bond_ok?: boolean
 }
 
 // 주문자 표시명 — 별명 우선, 없으면 Pi username, 없으면 display_name
@@ -513,8 +515,16 @@ export function ClientMyOrders({
                 <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
                   ✓ 후기 작성완료
                 </span>
-              ) : (
+              ) : o.bond_ok ? (
                 <WriteFeedbackButton orderId={o.order_id} />
+              ) : (
+                // 매장주 보증금 미충족 — 버튼 비활성(보상 재원 준비 시 자동 활성)
+                <span
+                  className="text-muted-foreground inline-flex cursor-not-allowed items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium opacity-60"
+                  title="이 매장은 현재 후기 보상을 지급할 수 없어 후기 작성이 일시 중지되었습니다"
+                >
+                  ⭐ 후기 작성 (보상 준비중)
+                </span>
               )}
             </div>
           )}

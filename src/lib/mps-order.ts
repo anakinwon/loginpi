@@ -857,6 +857,52 @@ export async function listOrdersByRole(
     }
   }
 
+  // 후기 작성 게이트 — 매장주(seller) 보증금이 최대 보상액 이상이어야 버튼 활성 (PRD_24 §10-7).
+  //   잔액 ≥ 최대 보상액(FR_1~5 중 최대)이어야 어떤 점수 후기든 보상 지급이 보장된다
+  //   (잔액 부족 매장에서 버튼만 활성화되면 작성 시 서버 게이트가 막아 모순 발생).
+  let bondOkSellers = new Set<string>()
+  if (role === 'buyer' && orders.length > 0) {
+    const doneSellers = [
+      ...new Set(
+        orders
+          .filter((o) =>
+            ['DONE', 'BUYER_DONE'].includes(
+              (o as { order_st_cd: string }).order_st_cd,
+            ),
+          )
+          .map((o) => (o as { seller_id: string }).seller_id),
+      ),
+    ]
+    if (doneSellers.length > 0) {
+      const { data: feeRows } = await getSupabaseAdmin()
+        .from('bean_fee_plan')
+        .select('amt_bean')
+        .in('fee_plan_cd', ['FR_1', 'FR_2', 'FR_3', 'FR_4', 'FR_5'])
+        .eq('del_yn', 'N')
+      const maxReward = Math.max(
+        0,
+        ...(feeRows ?? []).map((r) => Number((r as { amt_bean: number }).amt_bean)),
+      )
+      if (maxReward > 0) {
+        const { data: bondRows } = await getSupabaseAdmin()
+          .from('fbck_reward_bond')
+          .select('owner_id, bond_bal_bean')
+          .eq('bond_kind', 'SHOP')
+          .eq('del_yn', 'N')
+          .in('owner_id', doneSellers)
+        bondOkSellers = new Set(
+          (bondRows ?? [])
+            .filter(
+              (r) =>
+                Number((r as { bond_bal_bean: number }).bond_bal_bean) >=
+                maxReward,
+            )
+            .map((r) => (r as { owner_id: string }).owner_id),
+        )
+      }
+    }
+  }
+
   // 판매 관리: 주문자(buyer) 별명/PI username 첨부 — 준비완료 시 호명용.
   // buyer_id는 FK 없는 TEXT(sys_user.id)라 임베드 불가 → 별도 조회 후 매핑.
   if (role === 'seller' && orders.length > 0) {
@@ -880,6 +926,8 @@ export async function listOrdersByRole(
   return orders.map((o) => ({
     ...(o as object),
     has_feedback: feedbackOrderIds.has((o as { order_id: string }).order_id),
+    // 매장주 보증금이 충분(≥최대 보상액)할 때만 후기 작성 버튼 활성
+    bond_ok: bondOkSellers.has((o as { seller_id: string }).seller_id),
   }))
 }
 
