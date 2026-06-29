@@ -5,12 +5,15 @@ import { useTranslations } from 'next-intl'
 import { piFetch } from '@/lib/pi-fetch'
 import { usePiAuth } from '@/components/pi-auth-provider'
 import { BeanIcon } from '@/components/ui/bean-icon'
+import { useFeeMode } from '@/components/feature-flag-provider'
 
 interface TypeRow {
   txn_tp_cd: string
   txn_cnt: number
   gross_bean: number
   net_bean: number
+  gross_pi: number
+  net_pi: number
   usr_cnt: number
 }
 
@@ -18,6 +21,7 @@ interface DistributionData {
   by_type: TypeRow[]
   total_cnt: number
   total_gross_bean: number
+  total_gross_pi: number
 }
 
 // 거래 유형별 메타 (콩 이모지 금지 — Bean 표시는 BeanIcon만)
@@ -46,20 +50,36 @@ const FLOW_BADGE_CLS: Record<Flow, string> = {
 // 분포 막대 리스트 — 데이터 확정 후에만 렌더(정렬·비율 계산 분리)
 function BeanDistList({ data }: { data: DistributionData }) {
   const t = useTranslations('adminStats')
+  const isPi = useFeeMode() === 'PI' // PI 모드면 Pi 가치(*_pi, PI 거래 포함) 표시
+  const grossOf = (it: TypeRow) => Number(isPi ? it.gross_pi : it.gross_bean)
+  const netOf = (it: TypeRow) => Number(isPi ? it.net_pi : it.net_bean)
+  const fmt = (n: number) =>
+    isPi
+      ? n.toLocaleString(undefined, { maximumFractionDigits: 2 })
+      : n.toLocaleString()
   // gross(움직인 총량) 내림차순 — 분포 비율의 기준
-  const items = [...data.by_type].sort((a, b) => b.gross_bean - a.gross_bean)
-  const maxGross = Math.max(...items.map((i) => Number(i.gross_bean)), 1)
-  const totalGross = Number(data.total_gross_bean)
+  const items = [...data.by_type].sort((a, b) => grossOf(b) - grossOf(a))
+  const maxGross = Math.max(...items.map(grossOf), isPi ? 0.0001 : 1)
+  const totalGross = Number(isPi ? data.total_gross_pi : data.total_gross_bean)
 
   return (
     <div className="space-y-3">
       <p className="text-muted-foreground text-xs">
-        {t('beanDistTotalPrefix', {
-          cnt: data.total_cnt.toLocaleString(),
-          gross: totalGross.toLocaleString(),
-        })}{' '}
-        <BeanIcon className="inline-block h-3.5 w-3.5 align-text-bottom" />{' '}
-        {t('beanDistTotalSuffix')}
+        {isPi ? (
+          // PI 모드 — Pi 단위
+          <>
+            거래 {data.total_cnt.toLocaleString()}건 · 총 {fmt(totalGross)} π
+          </>
+        ) : (
+          <>
+            {t('beanDistTotalPrefix', {
+              cnt: data.total_cnt.toLocaleString(),
+              gross: totalGross.toLocaleString(),
+            })}{' '}
+            <BeanIcon className="inline-block h-3.5 w-3.5 align-text-bottom" />{' '}
+            {t('beanDistTotalSuffix')}
+          </>
+        )}
       </p>
 
       <ul className="space-y-2.5">
@@ -70,8 +90,8 @@ function BeanDistList({ data }: { data: DistributionData }) {
           const label = known
             ? t(`txnLabel.${it.txn_tp_cd}`)
             : `${t('txnLabel.ETC')} (${it.txn_tp_cd})`
-          const gross = Number(it.gross_bean)
-          const net = Number(it.net_bean)
+          const gross = grossOf(it)
+          const net = netOf(it)
           const pct = Math.max(2, (gross / maxGross) * 100)
           const share =
             totalGross > 0 ? ((gross / totalGross) * 100).toFixed(1) : '0.0'
@@ -99,8 +119,12 @@ function BeanDistList({ data }: { data: DistributionData }) {
                 </span>
                 <span className="shrink-0 text-right">
                   <span className="font-semibold tabular-nums">
-                    {gross.toLocaleString()}{' '}
-                    <BeanIcon className="inline-block h-4 w-4 align-text-bottom" />
+                    {fmt(gross)}{' '}
+                    {isPi ? (
+                      'π'
+                    ) : (
+                      <BeanIcon className="inline-block h-4 w-4 align-text-bottom" />
+                    )}
                   </span>
                   {/* 순증감(net): 유입 +초록 / 회수 -보라 / 이동 0 회색 */}
                   <span
@@ -113,7 +137,7 @@ function BeanDistList({ data }: { data: DistributionData }) {
                     }`}
                   >
                     {t('beanDistNet', {
-                      net: `${net > 0 ? '+' : ''}${net.toLocaleString()}`,
+                      net: `${net > 0 ? '+' : ''}${fmt(net)}`,
                     })}
                   </span>
                 </span>
@@ -141,6 +165,7 @@ function BeanDistList({ data }: { data: DistributionData }) {
 // 분류축 = txn_tp_cd(충전·사용·보상·환불·전송). 매출 회수 부분집합이 아닌 활동 전반.
 export function BeanRevenueDistribution({ period }: { period: number }) {
   const t = useTranslations('adminStats')
+  const isPi = useFeeMode() === 'PI'
   const { isLoading: authLoading, signIn } = usePiAuth()
   const [data, setData] = useState<DistributionData | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -183,13 +208,17 @@ export function BeanRevenueDistribution({ period }: { period: number }) {
     retried.current = false
     let _alive = true
     doFetch(() => _alive)
-    return () => { _alive = false }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    return () => {
+      _alive = false
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [period, authLoading])
 
   return (
     <div className="rounded-lg border p-4">
-      <p className="mb-2 text-sm font-medium">{t('beanDistTitle')}</p>
+      <p className="mb-2 text-sm font-medium">
+        {isPi ? 'Pi 거래 분포' : t('beanDistTitle')}
+      </p>
       {loading ? (
         <div className="bg-muted h-64 animate-pulse rounded-lg" />
       ) : error ? (

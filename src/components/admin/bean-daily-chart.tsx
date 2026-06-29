@@ -5,10 +5,12 @@ import { useTranslations } from 'next-intl'
 import PlotlyPlot from '@/components/charts/plotly-plot'
 import { BeanIcon } from '@/components/ui/bean-icon'
 import { piFetch } from '@/lib/pi-fetch'
+import { useFeeMode } from '@/components/feature-flag-provider'
 
-// Bean 매출 일별 시계열 (self-contained) — 메인 대시보드 매출 시계열 슬롯 교체용.
+// Bean/Pi 매출 일별 시계열 (self-contained) — 메인 대시보드 매출 시계열 슬롯 교체용.
 //   period prop만 받고 자체적으로 /api/admin/token/stats(=fn_bean_daily_stats)를 조회.
-//   충전(발행)·소비·보상·환불 4개 흐름을 일자별 선으로. 단위는 π가 아닌 Bean.
+//   충전(발행)·소비·보상·환불 4개 흐름을 일자별 선으로.
+//   ⭐활성 요금제 모드(PI/BEAN)에 따라 단위 전환 — PI 모드면 *_pi(Pi 가치, PI 거래 포함) 표시. PRD_24 §0.
 //   ⚠️ Bean 시각 표기는 BeanIcon(/bean.png)만 사용 — 콩 이모지 금지(프로젝트 규칙).
 
 interface BeanDailyRow {
@@ -17,18 +19,21 @@ interface BeanDailyRow {
   spend_bean: number
   reward_bean: number
   refund_bean: number
+  charge_pi: number
+  spend_pi: number
+  reward_pi: number
+  refund_pi: number
   txn_cnt: number
 }
 
 // Plotly는 hex 색 필요(tailwind 클래스 불가). token 대시보드 KPI 색 계열과 통일.
 const FLOWS = [
-  { key: 'charge_bean', labelKey: 'beanFlowCharge', hex: '#22c55e' }, // green-500
-  { key: 'spend_bean', labelKey: 'beanFlowSpend', hex: '#f59e0b' }, // amber-500
-  { key: 'reward_bean', labelKey: 'beanFlowReward', hex: '#14b8a6' }, // teal-500
-  { key: 'refund_bean', labelKey: 'beanFlowRefund', hex: '#f43f5e' }, // rose-500
+  { beanKey: 'charge_bean', piKey: 'charge_pi', labelKey: 'beanFlowCharge', hex: '#22c55e' },
+  { beanKey: 'spend_bean', piKey: 'spend_pi', labelKey: 'beanFlowSpend', hex: '#f59e0b' },
+  { beanKey: 'reward_bean', piKey: 'reward_pi', labelKey: 'beanFlowReward', hex: '#14b8a6' },
+  { beanKey: 'refund_bean', piKey: 'refund_pi', labelKey: 'beanFlowRefund', hex: '#f43f5e' },
 ] as const
 
-// 라이트/다크 양쪽에서 보이는 중립 폰트색 (subscr-stats-charts와 동일 규약)
 const BASE_LAYOUT = {
   paper_bgcolor: 'transparent',
   plot_bgcolor: 'transparent',
@@ -46,11 +51,11 @@ export default function BeanRevenueTimeline({
   period?: number
 }) {
   const t = useTranslations('adminStats')
+  const isPi = useFeeMode() === 'PI' // PI 모드면 Pi 단위(*_pi) 표시
   const [rows, setRows] = useState<BeanDailyRow[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
 
-  // period 변경 시 재조회. endpoint는 최근 30일 고정 반환 → 아래 useMemo에서 period일만 슬라이스.
   useEffect(() => {
     let alive = true
     setLoading(true)
@@ -74,35 +79,50 @@ export default function BeanRevenueTimeline({
   }, [period])
 
   const { data, isEmpty } = useMemo(() => {
-    // 선택 기간(period일)만 — endpoint가 제공하는 최대 30일 내에서 뒤에서 슬라이스
     const sliced = period > 0 ? rows.slice(-period) : rows
     const x = sliced.map((r) => r.stat_dt)
+    const unit = isPi ? 'Pi' : 'Bean'
+    const fmt = isPi ? '.4f' : '' // Pi는 소수, Bean은 정수
     const traces = FLOWS.map((f) => ({
       type: 'scatter' as const,
       mode: 'lines+markers' as const,
       name: t(f.labelKey),
       x,
-      y: sliced.map((r) => Number(r[f.key]) || 0),
-      // 활성 사용자 그래프와 동일한 spline 곡선으로 부드럽게 표현
-      line: { color: f.hex, width: 2, shape: 'spline' as const, smoothing: 1.3 },
+      y: sliced.map((r) => Number(r[isPi ? f.piKey : f.beanKey]) || 0),
+      line: {
+        color: f.hex,
+        width: 2,
+        shape: 'spline' as const,
+        smoothing: 1.3,
+      },
       marker: { color: f.hex, size: 4 },
-      hovertemplate: `${t(f.labelKey)}: %{y:,} Bean<extra></extra>`,
+      hovertemplate: `${t(f.labelKey)}: %{y:,${fmt}} ${unit}<extra></extra>`,
     }))
     const total = sliced.reduce(
       (s, r) =>
-        s + r.charge_bean + r.spend_bean + r.reward_bean + r.refund_bean,
+        s +
+        (isPi
+          ? r.charge_pi + r.spend_pi + r.reward_pi + r.refund_pi
+          : r.charge_bean + r.spend_bean + r.reward_bean + r.refund_bean),
       0,
     )
     return { data: traces, isEmpty: sliced.length === 0 || total === 0 }
-  }, [rows, period, t])
+  }, [rows, period, t, isPi])
 
   return (
     <div>
       <div className="mb-2 flex items-center justify-between">
         <span className="text-muted-foreground flex items-center gap-1 text-xs">
-          {t('beanUnitPrefix')}{' '}
-          <BeanIcon className="inline-block h-3.5 w-3.5" />{' '}
-          {t('beanUnitSuffix', { period })}
+          {isPi ? (
+            // PI 모드 — Pi 단위 표시
+            <span>단위: π · 최근 {period}일</span>
+          ) : (
+            <>
+              {t('beanUnitPrefix')}{' '}
+              <BeanIcon className="inline-block h-3.5 w-3.5" />{' '}
+              {t('beanUnitSuffix', { period })}
+            </>
+          )}
         </span>
         <span className="text-muted-foreground text-xs">
           {t('beanFlowsCaption')}
