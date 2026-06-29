@@ -7,6 +7,7 @@ import { piFetch } from '@/lib/pi-fetch'
 import { readCache, writeCache } from '@/lib/client-cache'
 import { LazySection } from '@/components/lazy-section'
 import { StatsCard } from '@/components/admin/stats/stats-card'
+import { useFeeMode } from '@/components/feature-flag-provider'
 
 const OrderHeatmapChart = dynamic(
   () => import('@/components/charts/order-heatmap-chart'),
@@ -57,11 +58,18 @@ interface OrdersResponse {
   }
 }
 
-const METHOD_COLORS = ['bg-[var(--kpi-1)]', 'bg-[var(--kpi-3)]', 'bg-[var(--kpi-5)]', 'bg-[var(--kpi-2)]']
+const METHOD_COLORS = [
+  'bg-[var(--kpi-1)]',
+  'bg-[var(--kpi-3)]',
+  'bg-[var(--kpi-5)]',
+  'bg-[var(--kpi-2)]',
+]
 
 // 주문 분석 탭 (Phase 22 §12 ②) — mps_order 직접 집계. 신규 SQL 의존 없음.
+// mps_order.order_price_pi 기반이므로 PI/BEAN 모드 무관하게 항상 Pi 단위 데이터.
 export function OrderTab({ period }: { period: number }) {
   const t = useTranslations('adminAnalytics')
+  const feeMode = useFeeMode()
   const [data, setData] = useState<OrdersResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -104,6 +112,13 @@ export function OrderTab({ period }: { period: number }) {
 
   return (
     <div className="space-y-5">
+      {feeMode === 'PI' && (
+        <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 dark:border-amber-800 dark:bg-amber-950/20">
+          <span className="text-sm font-medium text-amber-700 dark:text-amber-400">
+            π Pi 결제 기준 — 주문 금액(mps_order · order_price_pi) 집계
+          </span>
+        </div>
+      )}
       {/* Zone 1 — KPI */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
         <StatsCard
@@ -247,7 +262,9 @@ export function OrderTab({ period }: { period: number }) {
                   <th className="py-2 pr-2">{t('order.thCustomer')}</th>
                   <th className="py-2 pr-2">{t('order.thSegment')}</th>
                   <th className="py-2 pr-2 text-right">{t('order.thBuy')}</th>
-                  <th className="py-2 pr-2 text-right">{t('order.thRecent')}</th>
+                  <th className="py-2 pr-2 text-right">
+                    {t('order.thRecent')}
+                  </th>
                   <th className="py-2 text-right">{t('order.thTotal')}</th>
                 </tr>
               </thead>

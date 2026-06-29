@@ -8,7 +8,9 @@ import { readCache, writeCache } from '@/lib/client-cache'
 import { LazySection } from '@/components/lazy-section'
 import { StatsCard } from '@/components/admin/stats/stats-card'
 import { BeanTopSpenders } from '@/components/admin/stats/bean-top-spenders'
+import { PiTopSpenders } from '@/components/admin/stats/pi-top-spenders'
 import { BeanRevenueDistribution } from '@/components/admin/token-distribution'
+import { useFeeMode } from '@/components/feature-flag-provider'
 import { BeanIcon } from '@/components/ui/bean-icon'
 import RevenueTreemapChart from '@/components/charts/revenue-treemap-chart'
 import BubbleChart from '@/components/charts/bubble-chart'
@@ -39,10 +41,11 @@ interface MonthlyRevenue {
 
 // 매출 분석 탭 (Phase 22 §12 ①)
 //   - 2층위 매출 분리: Pi 현금매출(충전, 외부 유입) vs Bean 회수매출(내부 순환) — 합산 금지
-//   - 강화: 일별 매출 + 7일 이동평균, 테마 Treemap, 매출원 도넛, ABC(파레토) 분석
+//   - PI 모드: Pi 직결제 기준 KPI로 전환 (rev.series 재활용, 추가 API 없음)
 //   - Z-차트·YoY는 월별 집계 엔드포인트 선결 → 후속(아래 안내 카드)
 export function RevenueTab({ period }: { period: number }) {
   const t = useTranslations('adminAnalytics')
+  const feeMode = useFeeMode()
   const [rev, setRev] = useState<RevenueStatsResponse | null>(null)
   const [beanRev, setBeanRev] = useState<BeanRevenueResponse | null>(null)
   const [monthly, setMonthly] = useState<MonthlyRevenue | null>(null)
@@ -114,6 +117,18 @@ export function RevenueTab({ period }: { period: number }) {
   const beanTxnCnt =
     beanRev?.bean_by_item.reduce((s, it) => s + it.txn_cnt, 0) ?? 0
 
+  // PI 모드 KPI — rev.series(stat_revenue_dly) 재활용, 추가 API 없음
+  const piModeTotal = useMemo(
+    () => (rev?.series ?? []).reduce((s, r) => s + r.rev_pi, 0),
+    [rev],
+  )
+  const piModeTxnCnt = useMemo(
+    () => (rev?.series ?? []).reduce((s, r) => s + r.txn_cnt, 0),
+    [rev],
+  )
+  const piModeAov = piModeTxnCnt > 0 ? piModeTotal / piModeTxnCnt : 0
+  const piModeTopTheme = rev?.topThemes[0]
+
   // 테마명 — 시스템 분류 코드(구독·기타 등)는 번역키, 카페 테마명(DB)은 theme_nm 그대로
   const themeName = (cd: string, nm?: string | null) =>
     cd in THEME_LABEL ? t(`theme.${cd}`) : (nm ?? themeLabel(cd))
@@ -157,41 +172,84 @@ export function RevenueTab({ period }: { period: number }) {
 
   return (
     <div className="space-y-5">
-      {/* Zone 1 — KPI 카드 (2층위 매출 분리) */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatsCard
-          label={t('revenue.kpiPiCash')}
-          value={Number(piCash.toFixed(2))}
-          unit="π"
-          loading={beanRev === null}
-          variant="kpi-3"
-          icon={<span aria-hidden>💰</span>}
-        />
-        <StatsCard
-          label={t('revenue.kpiBeanRecover')}
-          value={beanRecover}
-          unitNode={<BeanIcon className="h-4 w-4" />}
-          loading={beanRev === null}
-          variant="kpi-1"
-          icon={<span aria-hidden>♻️</span>}
-        />
-        <StatsCard
-          label={t('revenue.kpiChargeCnt')}
-          value={chargeCnt}
-          unit={t('common.uCase')}
-          loading={beanRev === null}
-          variant="kpi-5"
-          icon={<span aria-hidden>💳</span>}
-        />
-        <StatsCard
-          label={t('revenue.kpiBeanTxn')}
-          value={beanTxnCnt}
-          unit={t('common.uCase')}
-          loading={beanRev === null}
-          variant="kpi-2"
-          icon={<span aria-hidden>🧾</span>}
-        />
-      </div>
+      {/* Zone 1 — KPI 카드: PI 모드는 Pi 직결제 기준, BEAN 모드는 2층위 분리 */}
+      {feeMode === 'PI' ? (
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <StatsCard
+            label="Pi 총 매출"
+            value={Number(piModeTotal.toFixed(2))}
+            unit="π"
+            loading={rev === null}
+            variant="kpi-3"
+            icon={<span aria-hidden>💰</span>}
+          />
+          <StatsCard
+            label="Pi 결제 건수"
+            value={piModeTxnCnt}
+            unit={t('common.uCase')}
+            loading={rev === null}
+            variant="kpi-1"
+            icon={<span aria-hidden>🧾</span>}
+          />
+          <StatsCard
+            label="평균 결제 (AOV)"
+            value={Number(piModeAov.toFixed(3))}
+            unit="π"
+            loading={rev === null}
+            variant="kpi-5"
+            icon={<span aria-hidden>📊</span>}
+          />
+          <StatsCard
+            label={
+              piModeTopTheme
+                ? `1위: ${piModeTopTheme.theme_nm ?? piModeTopTheme.theme_cd}`
+                : '상위 테마'
+            }
+            value={
+              piModeTopTheme ? Number(piModeTopTheme.total_pi.toFixed(2)) : 0
+            }
+            unit="π"
+            loading={rev === null}
+            variant="kpi-2"
+            icon={<span aria-hidden>🏆</span>}
+          />
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <StatsCard
+            label={t('revenue.kpiPiCash')}
+            value={Number(piCash.toFixed(2))}
+            unit="π"
+            loading={beanRev === null}
+            variant="kpi-3"
+            icon={<span aria-hidden>💰</span>}
+          />
+          <StatsCard
+            label={t('revenue.kpiBeanRecover')}
+            value={beanRecover}
+            unitNode={<BeanIcon className="h-4 w-4" />}
+            loading={beanRev === null}
+            variant="kpi-1"
+            icon={<span aria-hidden>♻️</span>}
+          />
+          <StatsCard
+            label={t('revenue.kpiChargeCnt')}
+            value={chargeCnt}
+            unit={t('common.uCase')}
+            loading={beanRev === null}
+            variant="kpi-5"
+            icon={<span aria-hidden>💳</span>}
+          />
+          <StatsCard
+            label={t('revenue.kpiBeanTxn')}
+            value={beanTxnCnt}
+            unit={t('common.uCase')}
+            loading={beanRev === null}
+            variant="kpi-2"
+            icon={<span aria-hidden>🧾</span>}
+          />
+        </div>
+      )}
 
       {/* Zone 2 — 메인: 일별 Pi 매출 + 7일 이동평균 */}
       <div className="rounded-lg border p-4">
@@ -213,14 +271,42 @@ export function RevenueTab({ period }: { period: number }) {
       {/* Zone 3 — 보조 2-up: 테마 Treemap + 매출원 도넛(Bean) */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div className="rounded-lg border p-4">
-          <p className="mb-2 text-sm font-medium">{t('revenue.treemapTitle')}</p>
+          <p className="mb-2 text-sm font-medium">
+            {t('revenue.treemapTitle')}
+          </p>
           {rev && rev.series.length > 0 ? (
             <RevenueTreemapChart data={rev.series} />
           ) : (
             <div className="bg-muted h-80 animate-pulse rounded-lg" />
           )}
         </div>
-        <BeanRevenueDistribution period={period} />
+        {feeMode === 'PI' ? (
+          <div className="rounded-lg border p-4">
+            <p className="mb-2 text-sm font-medium">테마별 Pi 매출 순위</p>
+            {rev && rev.topThemes.length > 0 ? (
+              <ol className="space-y-2 text-sm">
+                {rev.topThemes.slice(0, 5).map((th, i) => (
+                  <li key={th.theme_cd} className="flex items-center gap-2">
+                    <span className="text-muted-foreground w-4 shrink-0 text-xs">
+                      {i + 1}
+                    </span>
+                    <span className="min-w-0 flex-1 truncate">
+                      {th.theme_emoji ? `${th.theme_emoji} ` : ''}
+                      {th.theme_nm ?? th.theme_cd}
+                    </span>
+                    <span className="text-muted-foreground shrink-0 tabular-nums">
+                      {th.total_pi.toFixed(2)} π
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            ) : (
+              <div className="bg-muted h-36 animate-pulse rounded-lg" />
+            )}
+          </div>
+        ) : (
+          <BeanRevenueDistribution period={period} />
+        )}
       </div>
 
       {/* 테마별 매출 비중 (Bean) — cryptobubbles 스타일 버블 */}
@@ -252,7 +338,11 @@ export function RevenueTab({ period }: { period: number }) {
         </LazySection>
       </div>
 
-      <BeanTopSpenders period={period} />
+      {feeMode === 'PI' ? (
+        <PiTopSpenders period={period} />
+      ) : (
+        <BeanTopSpenders period={period} />
+      )}
 
       {/* Z-차트 + YoY — 월별 Pi 매출 추세 (PRD_21 §12 ①) */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">

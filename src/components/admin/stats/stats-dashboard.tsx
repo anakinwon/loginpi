@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback, useRef } from 'react'
+import { useEffect, useState, useCallback, useRef, useMemo } from 'react'
 import { useTranslations } from 'next-intl'
 import dynamic from 'next/dynamic'
 import { piFetch } from '@/lib/pi-fetch'
@@ -11,10 +11,13 @@ import { BeanIcon } from '@/components/ui/bean-icon'
 import { StatsCard } from './stats-card'
 import { StatsDateFilter } from './stats-date-filter'
 import { BeanTopSpenders } from './bean-top-spenders'
+import { PiTopSpenders } from './pi-top-spenders'
 import { AnalyticsHub } from '@/components/admin/analytics/analytics-hub'
+import { useFeeMode } from '@/components/feature-flag-provider'
 import type {
   ActivityStatsResponse,
   BeanRevenueResponse,
+  RevenueStatsResponse,
   TopUser,
 } from '@/types/stats'
 
@@ -28,6 +31,14 @@ const DauWauMauChart = dynamic(
 )
 const BeanRevenueTimeline = dynamic(
   () => import('@/components/admin/bean-daily-chart'),
+  { ssr: false },
+)
+const RevenueMaChart = dynamic(
+  () => import('@/components/charts/revenue-ma-chart'),
+  { ssr: false },
+)
+const RevenueTreemapChart = dynamic(
+  () => import('@/components/charts/revenue-treemap-chart'),
   { ssr: false },
 )
 const MEDALS = ['🥇', '🥈', '🥉']
@@ -110,6 +121,9 @@ export function StatsDashboard() {
   const [error, setError] = useState<string | null>(null)
   // 매출 섹션이 뷰포트에 진입한 뒤에만 revenue API 호출 (스크롤 지연 로딩)
   const [revVisible, setRevVisible] = useState(false)
+  const feeMode = useFeeMode()
+  // PI 모드 전용: stat_revenue_dly 기반 Pi 매출 집계 (period 의존)
+  const [piRevData, setPiRevData] = useState<RevenueStatsResponse | null>(null)
 
   // period 전환 시 늦게 도착한 이전 기간 응답이 화면을 덮어쓰지 않도록 가드
   // (fetch effect보다 먼저 선언 — 같은 렌더 사이클에서 ref가 먼저 동기화된다)
@@ -160,7 +174,10 @@ export function StatsDashboard() {
       .then((r) => {
         // 집계 실패 시 오늘(UTC) 데이터가 화면에 반영되지 않는다 — 원인 추적을 위해 로깅
         if (!r.ok) {
-          console.warn('[HOME 통계] 온디맨드 집계 실패 — 오늘 데이터 미반영', r.status)
+          console.warn(
+            '[HOME 통계] 온디맨드 집계 실패 — 오늘 데이터 미반영',
+            r.status,
+          )
           return undefined
         }
         return loadActivity()
@@ -186,6 +203,21 @@ export function StatsDashboard() {
     }
   }, [])
 
+  const fetchPiRevenue = useCallback(async (p: number) => {
+    const cacheKey = `stats_pi_revenue_${p}`
+    const cached = readCache<RevenueStatsResponse>(cacheKey, 5 * 60_000)
+    if (cached) setPiRevData(cached)
+    try {
+      const res = await piFetch(`/api/admin/stats/revenue?period=${p}`)
+      if (!res.ok) return
+      const data = (await res.json()) as RevenueStatsResponse
+      setPiRevData(data)
+      writeCache(cacheKey, data)
+    } catch {
+      // Pi 매출은 보조 — 실패해도 Bean 화면은 유지
+    }
+  }, [])
+
   useEffect(() => {
     fetchActivity(period)
   }, [period, fetchActivity])
@@ -195,6 +227,11 @@ export function StatsDashboard() {
   useEffect(() => {
     if (revVisible) fetchBeanRevenue()
   }, [revVisible, fetchBeanRevenue])
+
+  // PI 모드: 섹션 진입 또는 period 변경 시 Pi 매출 재조회
+  useEffect(() => {
+    if (revVisible && feeMode === 'PI') fetchPiRevenue(period)
+  }, [revVisible, feeMode, period, fetchPiRevenue])
 
   // 기간 내 가장 최신 데이터 포인트에서 DAU/WAU/MAU 추출
   const lastActivity = activityData?.series.at(-1)
@@ -208,6 +245,18 @@ export function StatsDashboard() {
       .filter((it) => it.ref_tp_cd === SUBSCR_REF_CD)
       .reduce((s, it) => s + it.net_bean, 0) ?? 0
   const genBean = totalBean - subscBean // 구독 외 전 항목(방생성·입장·스티커·뱃지 등)
+
+  // PI 모드 KPI — stat_revenue_dly 직접 집계 (Pi 직결제 기반, period 의존)
+  const piTotal = useMemo(
+    () => (piRevData?.series ?? []).reduce((s, r) => s + r.rev_pi, 0),
+    [piRevData],
+  )
+  const piTxnCnt = useMemo(
+    () => (piRevData?.series ?? []).reduce((s, r) => s + r.txn_cnt, 0),
+    [piRevData],
+  )
+  const piAov = piTxnCnt > 0 ? piTotal / piTxnCnt : 0
+  const piTopTheme = piRevData?.topThemes[0]
 
   if (error) {
     return (
@@ -318,57 +367,125 @@ export function StatsDashboard() {
           }
         >
           <div className="space-y-4">
-            {/* 매출 KPI 카드 — 누적 Bean 회수매출: 총합 / 거래건수 / 구독 / 일반 */}
-            <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-              <StatsCard
-                label={t('totalRevenue')}
-                value={totalBean}
-                unitNode={<BeanIcon className="h-4 w-4" />}
-                loading={beanRev === null}
-                variant="kpi-3"
-                icon={<span aria-hidden>💰</span>}
-              />
-              <StatsCard
-                label={t('totalTrades')}
-                value={beanTxnCnt}
-                unit={t('unitCase')}
-                loading={beanRev === null}
-                variant="kpi-5"
-                icon={<span aria-hidden>🧾</span>}
-              />
-              <StatsCard
-                label={t('subscrRevenue')}
-                value={subscBean}
-                unitNode={<BeanIcon className="h-4 w-4" />}
-                loading={beanRev === null}
-                variant="kpi-1"
-                icon={<span aria-hidden>🔁</span>}
-              />
-              <StatsCard
-                label={t('normalRevenue')}
-                value={genBean}
-                unitNode={<BeanIcon className="h-4 w-4" />}
-                loading={beanRev === null}
-                variant="kpi-2"
-                icon={<span aria-hidden>🛒</span>}
-              />
-            </div>
-
-            {/* 매출 시계열 + 도넛 */}
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-              <div className="rounded-lg border p-4">
-                <p className="mb-2 text-sm font-medium">{t('themeDaily')}</p>
-                {/* BeanRevenueTimeline은 자체적으로 로딩·빈데이터·오류 상태를 처리하므로
-                    별도 게이트 없이 직접 렌더. (과거 stat_revenue_dly 기반 게이트는 Bean 전환으로
-                    공급원이 끊겨, 7일 등 단기 기간에서 차트가 영영 표시되지 않던 버그의 원인이었음) */}
-                <BeanRevenueTimeline period={period} />
-              </div>
-              <BeanRevenueDistribution period={period} />
-            </div>
-
-            {/* Top-3 지출자 — Pi 결제/테마 랭킹을 Bean 소비액 랭킹으로 교체
-                (currency-routing-rule: 플랫폼↔사용자 소비는 Bean이 정본) */}
-            <BeanTopSpenders period={period} />
+            {feeMode === 'PI' ? (
+              <>
+                {/* PI 모드 — Pi 직결제 기준 KPI (stat_revenue_dly 집계) */}
+                <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+                  <StatsCard
+                    label="Pi 총 매출"
+                    value={Number(piTotal.toFixed(2))}
+                    unit="π"
+                    loading={piRevData === null}
+                    variant="kpi-3"
+                    icon={<span aria-hidden>💰</span>}
+                  />
+                  <StatsCard
+                    label="Pi 결제 건수"
+                    value={piTxnCnt}
+                    unit={t('unitCase')}
+                    loading={piRevData === null}
+                    variant="kpi-1"
+                    icon={<span aria-hidden>🧾</span>}
+                  />
+                  <StatsCard
+                    label="평균 결제 (AOV)"
+                    value={Number(piAov.toFixed(3))}
+                    unit="π"
+                    loading={piRevData === null}
+                    variant="kpi-5"
+                    icon={<span aria-hidden>📊</span>}
+                  />
+                  <StatsCard
+                    label={
+                      piTopTheme
+                        ? `1위: ${piTopTheme.theme_nm ?? piTopTheme.theme_cd}`
+                        : '상위 테마'
+                    }
+                    value={
+                      piTopTheme ? Number(piTopTheme.total_pi.toFixed(2)) : 0
+                    }
+                    unit="π"
+                    loading={piRevData === null}
+                    variant="kpi-2"
+                    icon={<span aria-hidden>🏆</span>}
+                  />
+                </div>
+                {/* Pi 일별 매출 추이 + 테마별 분포 */}
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                  <div className="rounded-lg border p-4">
+                    <p className="mb-2 text-sm font-medium">
+                      Pi 일별 매출 추이{' '}
+                      <span className="text-muted-foreground text-xs">
+                        (7일 이동평균)
+                      </span>
+                    </p>
+                    {piRevData ? (
+                      <RevenueMaChart data={piRevData.series} maWindow={7} />
+                    ) : (
+                      <div className="bg-muted h-64 animate-pulse rounded-lg" />
+                    )}
+                  </div>
+                  <div className="rounded-lg border p-4">
+                    <p className="mb-2 text-sm font-medium">테마별 Pi 매출</p>
+                    {piRevData && piRevData.series.length > 0 ? (
+                      <RevenueTreemapChart data={piRevData.series} />
+                    ) : (
+                      <div className="bg-muted h-64 animate-pulse rounded-lg" />
+                    )}
+                  </div>
+                </div>
+                <PiTopSpenders period={period} />
+              </>
+            ) : (
+              <>
+                {/* BEAN 모드 — 누적 Bean 회수매출: 총합 / 거래건수 / 구독 / 일반 */}
+                <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+                  <StatsCard
+                    label={t('totalRevenue')}
+                    value={totalBean}
+                    unitNode={<BeanIcon className="h-4 w-4" />}
+                    loading={beanRev === null}
+                    variant="kpi-3"
+                    icon={<span aria-hidden>💰</span>}
+                  />
+                  <StatsCard
+                    label={t('totalTrades')}
+                    value={beanTxnCnt}
+                    unit={t('unitCase')}
+                    loading={beanRev === null}
+                    variant="kpi-5"
+                    icon={<span aria-hidden>🧾</span>}
+                  />
+                  <StatsCard
+                    label={t('subscrRevenue')}
+                    value={subscBean}
+                    unitNode={<BeanIcon className="h-4 w-4" />}
+                    loading={beanRev === null}
+                    variant="kpi-1"
+                    icon={<span aria-hidden>🔁</span>}
+                  />
+                  <StatsCard
+                    label={t('normalRevenue')}
+                    value={genBean}
+                    unitNode={<BeanIcon className="h-4 w-4" />}
+                    loading={beanRev === null}
+                    variant="kpi-2"
+                    icon={<span aria-hidden>🛒</span>}
+                  />
+                </div>
+                {/* 매출 시계열 + 도넛 */}
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                  <div className="rounded-lg border p-4">
+                    <p className="mb-2 text-sm font-medium">
+                      {t('themeDaily')}
+                    </p>
+                    <BeanRevenueTimeline period={period} />
+                  </div>
+                  <BeanRevenueDistribution period={period} />
+                </div>
+                <BeanTopSpenders period={period} />
+              </>
+            )}
           </div>
         </LazySection>
       </section>

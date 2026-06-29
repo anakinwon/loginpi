@@ -7,6 +7,7 @@ import { piFetch } from '@/lib/pi-fetch'
 import { readCache, writeCache } from '@/lib/client-cache'
 import { LazySection } from '@/components/lazy-section'
 import { StatsCard } from '@/components/admin/stats/stats-card'
+import { useFeeMode } from '@/components/feature-flag-provider'
 
 const FunnelChart = dynamic(() => import('@/components/charts/funnel-chart'), {
   ssr: false,
@@ -51,12 +52,19 @@ interface PerfResponse {
   sessionTrackingPending: boolean
 }
 
-const TYPE_COLORS = ['bg-[var(--kpi-1)]', 'bg-[var(--kpi-3)]', 'bg-[var(--kpi-5)]', 'bg-[var(--kpi-2)]', 'bg-[var(--kpi-4)]']
+const TYPE_COLORS = [
+  'bg-[var(--kpi-1)]',
+  'bg-[var(--kpi-3)]',
+  'bg-[var(--kpi-5)]',
+  'bg-[var(--kpi-2)]',
+  'bg-[var(--kpi-4)]',
+]
 
 // 퍼포먼스 분석 탭 (Phase 22 §12 ④) — 라이프사이클 퍼널·전환율·활동구성·참여깊이.
-//   페이지뷰·체류·반송/이탈·채널은 세션 추적층 선결(아래 안내 카드).
+//   PI 모드: 구매자 전환율 = Pi 결제 완료 기준 (mps_order 소스 동일).
 export function PerformanceTab({ period }: { period: number }) {
   const t = useTranslations('adminAnalytics')
+  const feeMode = useFeeMode()
   const [data, setData] = useState<PerfResponse | null>(null)
   const [pv, setPv] = useState<PvResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -113,11 +121,22 @@ export function PerformanceTab({ period }: { period: number }) {
 
   const c = data?.conversion
   const loading = data === null
-  const typeTotal = (data?.activityTypes ?? []).reduce((a, b) => a + b.cnt, 0) || 1
-  const depthMax = Math.max(1, ...(data?.engagementDepth ?? []).map((d) => d.cnt))
+  const typeTotal =
+    (data?.activityTypes ?? []).reduce((a, b) => a + b.cnt, 0) || 1
+  const depthMax = Math.max(
+    1,
+    ...(data?.engagementDepth ?? []).map((d) => d.cnt),
+  )
 
   return (
     <div className="space-y-5">
+      {feeMode === 'PI' && (
+        <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 dark:border-amber-800 dark:bg-amber-950/20">
+          <span className="text-sm font-medium text-amber-700 dark:text-amber-400">
+            π Pi 결제 기준 — 구매자 전환율은 Pi 결제 완료(mps_order) 기준
+          </span>
+        </div>
+      )}
       {/* Zone 1 — 전환율 KPI */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <StatsCard
@@ -230,7 +249,7 @@ export function PerformanceTab({ period }: { period: number }) {
                     </div>
                     <div className="bg-muted h-2.5 overflow-hidden rounded-full">
                       <div
-                        className="bg-[var(--kpi-4)] h-full rounded-full"
+                        className="h-full rounded-full bg-[var(--kpi-4)]"
                         style={{ width: `${pct}%` }}
                       />
                     </div>
@@ -306,8 +325,7 @@ export function PerformanceTab({ period }: { period: number }) {
             {pv && pv.channels.length > 0 ? (
               <div className="space-y-2">
                 {(() => {
-                  const tot =
-                    pv.channels.reduce((a, b) => a + b.cnt, 0) || 1
+                  const tot = pv.channels.reduce((a, b) => a + b.cnt, 0) || 1
                   return pv.channels.map((c, i) => {
                     const pct = (c.cnt / tot) * 100
                     return (
@@ -336,11 +354,16 @@ export function PerformanceTab({ period }: { period: number }) {
             )}
           </div>
 
-          <PathList title={t('perf.landingTop')} items={pv?.topLanding ?? null} />
+          <PathList
+            title={t('perf.landingTop')}
+            items={pv?.topLanding ?? null}
+          />
           <PathList title={t('perf.exitTop')} items={pv?.topExit ?? null} />
         </div>
 
-        <p className="text-muted-foreground mt-3 text-xs">{t('perf.collectNote')}</p>
+        <p className="text-muted-foreground mt-3 text-xs">
+          {t('perf.collectNote')}
+        </p>
       </div>
     </div>
   )
