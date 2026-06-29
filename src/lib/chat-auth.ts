@@ -80,21 +80,21 @@ const OPERATOR_PLAN: ChatPlan = {
   caps: PLAN_CAPS.BUSINESS,
 }
 
-// 사용자의 현재 채팅 권한 — Bean 상품 구독(bean_subscr) 기반.
+// 사용자의 현재 채팅 권한 — 통합 구독 뷰(v_active_subscr: Bean+Pi 결제 활성 구독) 기반.
 //   PICAFE 구독 → PREMIUM 캡(그룹방 무제한·AI 10회·팁·프리미엄 테마),
 //   TRANSLATE 구독 → 자동번역(PyTranslate™)만 부여.
-//   레거시 Pi 구독(msg_subscr)은 더 이상 참조하지 않는다 (PRD_15_FEE §1-6 — CHAT_SUBSCR Pi 경로 폐기).
+//   ⭐레거시 Pi 구독(msg_subscr PREMIUM_MONTHLY)도 PICAFE로 정규화해 유효성 동시 체크 —
+//     Bean으로 결제한 구독·Pi로 결제한 구독을 함께 인정(활성 Pi 구독자 누락 버그 수정 2026-06-29).
 // 만료(expire_dtm <= now)·논리삭제(del_yn='Y')는 자동 제외 → 없으면 FREE.
 // 운영자(ADMIN/MASTER)는 구독과 무관하게 BUSINESS 캡 보장(전 기능 운영·검증).
 export async function getChatPlan(userId: string): Promise<ChatPlan> {
   const [{ data: subs }, { data: userRow }] = await Promise.all([
     getSupabaseAdmin()
-      .from('bean_subscr')
+      // 통합 구독 뷰(Bean+Pi 결제 활성 구독). 뷰가 del_yn='N'·expire_dtm>now 내장.
+      .from('v_active_subscr')
       .select('prod_ctgr_cd, expire_dtm, auto_renew_yn')
       .eq('usr_id', userId)
-      .eq('del_yn', 'N')
-      .in('prod_ctgr_cd', ['PICAFE', 'TRANSLATE'])
-      .gt('expire_dtm', new Date().toISOString()),
+      .in('prod_ctgr_cd', ['PICAFE', 'TRANSLATE']),
     getSupabaseAdmin()
       .from('sys_user')
       .select('role')

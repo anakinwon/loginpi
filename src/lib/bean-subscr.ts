@@ -17,20 +17,21 @@ export interface ActiveSubscr {
   fee_plan_cd: string
   expire_dtm: string
   auto_renew_yn: string
+  pay_src?: 'BEAN' | 'PI' // 결제 수단(통합 뷰) — Bean 차감 / Pi 직결제
 }
 
-// 내 활성 구독 목록 (만료 전 + 미삭제)
+// 내 활성 구독 목록 — 통합 뷰(v_active_subscr) 기반.
+//   Bean 결제(bean_subscr) + Pi 결제(msg_subscr) 활성 구독을 함께 인정.
+//   뷰가 활성 필터(del_yn='N' AND expire_dtm > now()) 내장 → usr_id만 조회.
 export async function getMySubscriptions(
   usrId: string,
 ): Promise<ActiveSubscr[]> {
   const { data } = await getSupabaseAdmin()
-    .from('bean_subscr')
+    .from('v_active_subscr')
     .select(
-      'prod_ctgr_cd, grade_cd, bill_cycle_cd, fee_plan_cd, expire_dtm, auto_renew_yn',
+      'prod_ctgr_cd, grade_cd, bill_cycle_cd, fee_plan_cd, expire_dtm, auto_renew_yn, pay_src',
     )
     .eq('usr_id', usrId)
-    .eq('del_yn', 'N')
-    .gt('expire_dtm', new Date().toISOString())
   return (data as ActiveSubscr[] | null) ?? []
 }
 
