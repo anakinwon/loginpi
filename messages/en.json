@@ -1764,7 +1764,8 @@
     "search": "Search",
     "send": "Send",
     "upgrade": "Upgrade",
-    "yes": "Yes"
+    "yes": "Yes",
+    "stagingBanner": "🧪 STAGING environment · Dev DB — Not real data"
   },
   "consent": {
     "agreeAll": "Agree to All",

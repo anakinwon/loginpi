@@ -1632,7 +1632,8 @@
     "private": "비공개",
     "countItem": "{count}개",
     "days": "{count}일",
-    "errorOccurred": "오류가 발생했습니다"
+    "errorOccurred": "오류가 발생했습니다",
+    "stagingBanner": "🧪 STAGING 환경 · 개발DB — 실데이터 아님"
   },
   "event": {
     "title": "🎖️ 오픈베타 #1이벤트 - 10미션수행",
