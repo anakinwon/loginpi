@@ -24,25 +24,36 @@ type TabId = (typeof TAB_IDS)[number]
 interface Props {
   initialUser: UserRow
   localeOptions: LocaleOption[]
+  // 요금제 모드 — PI(Pi Coin)면 Bean 지갑 탭 숨김, BEAN이면 노출(A-5 레드라인 대응)
+  feeMode?: 'BEAN' | 'PI'
 }
 
-export function ProfileTabs({ initialUser, localeOptions }: Props) {
+export function ProfileTabs({
+  initialUser,
+  localeOptions,
+  feeMode = 'BEAN',
+}: Props) {
   const t = useTranslations('profile')
   const [activeTab, setActiveTab] = useState<TabId>('info')
   const [user, setUser] = useState(initialUser)
 
+  // PI 요금제에선 Bean 지갑 탭 제거 — BEAN 요금제일 때만 노출
+  const visibleTabs =
+    feeMode === 'PI' ? TAB_IDS.filter((id) => id !== 'bean') : TAB_IDS
+
   // URL ?tab=<id> 로 초기 탭 지정 (예: 캠페인 M3 텔레그램 연동 → /profile?tab=store)
   // useSearchParams는 Suspense 경계가 필요해 window.location으로 마운트 후 1회 적용
+  // PI 모드에선 ?tab=bean 직접 진입도 무시(숨긴 탭으로 우회 차단)
   useEffect(() => {
     const tab = new URLSearchParams(window.location.search).get('tab')
-    if (tab && (TAB_IDS as readonly string[]).includes(tab))
+    if (tab && (visibleTabs as readonly string[]).includes(tab))
       setActiveTab(tab as TabId)
-  }, [])
+  }, [feeMode])
 
   return (
     <div>
       <div className="mb-6 flex gap-1 border-b">
-        {TAB_IDS.map((id) => (
+        {visibleTabs.map((id) => (
           <button
             key={id}
             onClick={() => setActiveTab(id)}
@@ -75,7 +86,7 @@ export function ProfileTabs({ initialUser, localeOptions }: Props) {
           />
         </div>
       )}
-      {activeTab === 'bean' && <BeanWalletPanel />}
+      {activeTab === 'bean' && feeMode !== 'PI' && <BeanWalletPanel />}
       {activeTab === 'payment' && <PaymentHistory />}
       {activeTab === 'subscr' && <SubscriptionStatus />}
       {activeTab === 'store' && <StoreTab />}

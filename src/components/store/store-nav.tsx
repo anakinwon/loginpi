@@ -1,5 +1,6 @@
 import { getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/navigation'
+import { getActiveFeeMode } from '@/lib/fee-resolver'
 import { SalesNotiBadge } from './sales-noti-badge'
 import { BeanIcon } from '@/components/ui/bean-icon'
 
@@ -9,13 +10,17 @@ type StoreNavKey = 'nearby' | 'items' | 'sales' | 'orders' | 'history' | 'bean'
 
 export async function StoreNav({ active }: { active?: StoreNavKey }) {
   const t = await getTranslations('store')
+  // PI(Pi Coin) 요금제에선 Bean 지갑 진입 숨김 — BEAN 요금제일 때만 노출(A-5 레드라인 대응)
+  const feeMode = await getActiveFeeMode()
   const links: { key: StoreNavKey; href: string; label: string }[] = [
     { key: 'nearby', href: '/map', label: t('nearbyNav') },
     { key: 'items', href: '/store/my/items', label: t('navMyItems') },
     { key: 'sales', href: '/store/my/sales', label: t('navSales') },
     { key: 'orders', href: '/store/my/orders', label: t('navOrders') },
     { key: 'history', href: '/store/my/history', label: t('navHistory') },
-    { key: 'bean', href: '/bean', label: t('navBean') },
+    ...(feeMode === 'PI'
+      ? []
+      : [{ key: 'bean' as const, href: '/bean', label: t('navBean') }]),
   ]
   return (
     <nav className="flex flex-wrap gap-3 text-sm">
