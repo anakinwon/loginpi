@@ -7,7 +7,6 @@ import { piFetch } from '@/lib/pi-fetch'
 import { readCache, writeCache } from '@/lib/client-cache'
 import { LazySection } from '@/components/lazy-section'
 import { StatsCard } from '@/components/admin/stats/stats-card'
-import { useFeeMode } from '@/components/feature-flag-provider'
 
 const FunnelChart = dynamic(() => import('@/components/charts/funnel-chart'), {
   ssr: false,
@@ -64,7 +63,6 @@ const TYPE_COLORS = [
 //   PI 모드: 구매자 전환율 = Pi 결제 완료 기준 (mps_order 소스 동일).
 export function PerformanceTab({ period }: { period: number }) {
   const t = useTranslations('adminAnalytics')
-  const feeMode = useFeeMode()
   const [data, setData] = useState<PerfResponse | null>(null)
   const [pv, setPv] = useState<PvResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -130,13 +128,6 @@ export function PerformanceTab({ period }: { period: number }) {
 
   return (
     <div className="space-y-5">
-      {feeMode === 'PI' && (
-        <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 dark:border-amber-800 dark:bg-amber-950/20">
-          <span className="text-sm font-medium text-amber-700 dark:text-amber-400">
-            π Pi 결제 기준 — 구매자 전환율은 Pi 결제 완료(mps_order) 기준
-          </span>
-        </div>
-      )}
       {/* Zone 1 — 전환율 KPI */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <StatsCard
