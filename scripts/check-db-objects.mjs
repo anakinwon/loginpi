@@ -21,13 +21,19 @@ try {
   // .env.local 없으면 argv/기존 env 사용
 }
 
-const devConn = process.argv[2] || process.env.DEV_DB_URL
-const prodConn = process.argv[3] || process.env.PROD_DB_URL
+const flags = process.argv.slice(2).filter((a) => a.startsWith('--'))
+const positional = process.argv.slice(2).filter((a) => !a.startsWith('--'))
+const DETAIL = flags.includes('--detail') || process.env.DETAIL === '1'
+const devConn = positional[0] || process.env.DEV_DB_URL
+const prodConn = positional[1] || process.env.PROD_DB_URL
 if (!devConn || !prodConn) {
   console.error(
-    '사용법: node scripts/check-db-objects.mjs "<dev-conn>" "<prod-conn>"',
+    '사용법: node scripts/check-db-objects.mjs [--detail] "<dev-conn>" "<prod-conn>"',
   )
-  console.error('  또는 .env.local에 DEV_DB_URL / PROD_DB_URL 설정 후 인자 없이 실행')
+  console.error(
+    '  또는 .env.local에 DEV_DB_URL / PROD_DB_URL 설정 후 인자 없이 실행',
+  )
+  console.error('  --detail : FUNCTION 본문 차이를 줄바꿈/공백/로직으로 분류')
   process.exit(1)
 }
 
@@ -35,7 +41,8 @@ if (!devConn || !prodConn) {
 // (암호화는 유지, 체인 검증만 생략). rejectUnauthorized:false 하드코딩보다 표준적이고 안전.
 function withSslCompat(conn) {
   let c = conn
-  if (!/[?&]sslmode=/.test(c)) c += (c.includes('?') ? '&' : '?') + 'sslmode=require'
+  if (!/[?&]sslmode=/.test(c))
+    c += (c.includes('?') ? '&' : '?') + 'sslmode=require'
   if (!/[?&]uselibpqcompat=/.test(c)) c += '&uselibpqcompat=true'
   return c
 }
@@ -50,9 +57,11 @@ try {
 
 // 각 오브젝트 카테고리: sig(식별자) + hash(본문 md5). hash=null이면 존재만 비교.
 const QUERIES = {
+  // 본문 해시는 CR 제거 후 계산 — dev(CRLF 적용) vs 운영(git LF replay)의 줄바꿈 차이를
+  // 무시하고 "실제 로직"만 비교(거짓 불일치 노이즈 제거). 줄바꿈 차이는 --detail로 별도 확인.
   FUNCTION: `
     SELECT p.proname || '(' || pg_get_function_identity_arguments(p.oid) || ')' AS sig,
-           md5(pg_get_functiondef(p.oid)) AS hash
+           md5(replace(pg_get_functiondef(p.oid), E'\\r', '')) AS hash
     FROM pg_proc p JOIN pg_namespace n ON p.pronamespace = n.oid
     WHERE n.nspname = 'public' AND p.prokind IN ('f','p')
     ORDER BY 1`,
@@ -146,7 +155,66 @@ if (totalIssues === 0) {
   )
 } else {
   console.log(
-    `⚠️  총 ${totalIssues}건 불일치 — 위 목록을 sql/ 마이그레이션으로 양쪽 재정렬 필요.`,
+    `⚠️  총 ${totalIssues}건 불일치.` +
+      (DETAIL ? '' : ' 본문 차이 성격 판별은 --detail 플래그로 재실행하세요.'),
   )
-  process.exit(2)
 }
+
+// ── 상세 분석 (--detail): FUNCTION 본문 차이를 줄바꿈/공백/로직으로 분류 ──
+if (DETAIL) {
+  console.log('\n' + '='.repeat(64))
+  console.log('🔬 FUNCTION 본문 차이 상세 분석 — 차이의 "성격"을 판별합니다\n')
+  const defQ = `
+    SELECT p.proname || '(' || pg_get_function_identity_arguments(p.oid) || ')' AS sig,
+           pg_get_functiondef(p.oid) AS def
+    FROM pg_proc p JOIN pg_namespace n ON p.pronamespace = n.oid
+    WHERE n.nspname = 'public' AND p.prokind IN ('f','p')`
+  const getDefs = async (conn) => {
+    const c = new pg.Client({ connectionString: withSslCompat(conn) })
+    await c.connect()
+    const { rows } = await c.query(defQ)
+    await c.end()
+    return new Map(rows.map((r) => [r.sig, r.def]))
+  }
+  const [dDefs, pDefs] = await Promise.all([
+    getDefs(devConn),
+    getDefs(prodConn),
+  ])
+  const eol = (s) => s.replace(/\r\n/g, '\n') // CRLF → LF 통일
+  const ws = (s) =>
+    eol(s)
+      .replace(/[ \t]+/g, ' ')
+      .replace(/ *\n */g, '\n')
+      .trim()
+  const eolOnly = [],
+    wsOnly = [],
+    logic = []
+  for (const [sig, dDef] of dDefs) {
+    const pDef = pDefs.get(sig)
+    if (pDef === undefined || dDef === pDef) continue
+    if (eol(dDef) === eol(pDef)) eolOnly.push(sig)
+    else if (ws(dDef) === ws(pDef)) wsOnly.push(sig)
+    else logic.push({ sig, dDef, pDef })
+  }
+  console.log(
+    `  ① CRLF/LF 줄바꿈만 다름: ${eolOnly.length}건 (기능 100% 동일·안전)`,
+  )
+  console.log(`  ② 공백/들여쓰기만 다름: ${wsOnly.length}건 (기능 동일)`)
+  console.log(`  ③ 로직(의미) 차이: ${logic.length}건`)
+  for (const { sig, dDef, pDef } of logic) {
+    const dL = ws(dDef).split('\n'),
+      pL = ws(pDef).split('\n')
+    let i = 0
+    while (i < dL.length && i < pL.length && dL[i] === pL[i]) i++
+    console.log(`\n   ⚠️  ${sig}`)
+    console.log(`      DEV  L${i + 1}: ${(dL[i] ?? '(끝)').slice(0, 110)}`)
+    console.log(`      PROD L${i + 1}: ${(pL[i] ?? '(끝)').slice(0, 110)}`)
+  }
+  if (logic.length === 0) {
+    console.log(
+      '\n  ✅ 로직 차이 0 — 모든 본문 불일치가 줄바꿈·공백뿐. 운영 함수는 dev와 기능적으로 동일합니다.',
+    )
+  }
+}
+
+process.exit(totalIssues === 0 ? 0 : 2)
