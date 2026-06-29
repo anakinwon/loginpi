@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
       promo_active_yn: row?.new_active_yn,
       start_dtm: row?.new_start_dtm,
       end_dtm: row?.new_end_dtm,
-      mod_dtm: row?.mod_dtm,
+      mod_dtm: row?.new_mod_dtm,
     })
   }
 
@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
       ok: row?.ok ?? false,
       message: row?.message,
       promo_active_yn: row?.new_active_yn,
-      mod_dtm: row?.mod_dtm,
+      mod_dtm: row?.new_mod_dtm,
     })
   }
 
@@ -152,7 +152,7 @@ export async function POST(req: NextRequest) {
       promo_active_yn: row?.new_active_yn,
       start_dtm: row?.new_start_dtm,
       end_dtm: row?.new_end_dtm,
-      mod_dtm: row?.mod_dtm,
+      mod_dtm: row?.new_mod_dtm,
     })
   }
 

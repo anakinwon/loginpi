@@ -90,7 +90,9 @@ RETURNS TABLE (
   new_active_yn  CHAR(1),
   new_start_dtm  TIMESTAMPTZ,
   new_end_dtm    TIMESTAMPTZ,
-  mod_dtm        TIMESTAMPTZ
+  -- ⚠️ OUT 파라미터명을 테이블 컬럼(mod_dtm)과 다르게(new_mod_dtm). 동명이면 함수 본문의
+  --   비한정 mod_dtm 참조가 variable_conflict('ambiguous')를 일으킨다(원천 차단).
+  new_mod_dtm    TIMESTAMPTZ
 )
 LANGUAGE plpgsql AS $$
 DECLARE
