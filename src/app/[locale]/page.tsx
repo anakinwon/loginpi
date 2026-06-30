@@ -3,6 +3,7 @@ import { Link } from '@/i18n/navigation'
 import { resolveDbTier } from '@/lib/db-env'
 import { computeIsProd } from '@/lib/feature-flags'
 import { StatsDashboard } from '@/components/admin/stats/stats-dashboard'
+import { GrandOpenBanner } from '@/components/home/grand-open-banner'
 import { TechWhitepaper } from '@/components/home/tech-whitepaper'
 import { UserManual } from '@/components/home/user-manual'
 
@@ -19,6 +20,9 @@ export default async function HomePage() {
 
   return (
     <div className="mx-auto max-w-5xl space-y-8 px-4 pt-3 pb-8">
+      {/* 그랜드 오픈 이벤트 환영 배너 — 오픈 프로모 활성 시에만 노출(전액 무료 사실일 때) */}
+      <GrandOpenBanner />
+
       <div className="space-y-2">
         <TechWhitepaper />
         <UserManual />
