@@ -2137,6 +2137,17 @@
     "navigateGo": "Mine",
     "shop": "Shop"
   },
+  "openPromo": {
+    "benefitLabel": "Eelis",
+    "benefitValue": "Cafe tasuta loomine · tasuta osalemine · tasuta automaattõlge",
+    "desc": "Pi ökosüsteemi Cafe, nautige seda nüüd täiel rinnal. ☕",
+    "periodLabel": "Periood",
+    "periodValue": "~ kuni klient on rahul",
+    "subtitle": "Platformi tasu täiesti tasuta",
+    "targetLabel": "Sihtrühm",
+    "targetValue": "Pioneer",
+    "title": "🎉 Grand Open Event"
+  },
   "pay": {
     "amountInvalid": "Sisesta summa, mis on suurem kui 0.",
     "amountLabel": "Maksesumma",

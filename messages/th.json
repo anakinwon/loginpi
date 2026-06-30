@@ -2137,6 +2137,17 @@
     "navigateGo": "ไป",
     "shop": "Shop"
   },
+  "openPromo": {
+    "benefitLabel": "สิทธิประโยชน์",
+    "benefitValue": "สร้าง Cafe ฟรี · เข้าร่วมฟรี · แปลอัตโนมัติฟรี",
+    "desc": "Cafe ใน Pi Ecosystem เพลิดเพลินได้เลยตอนนี้ ☕",
+    "periodLabel": "ระยะเวลา",
+    "periodValue": "~ จนกว่าลูกค้าจะพึงพอใจ",
+    "subtitle": "ฟรีค่าธรรมเนียม Platform ทั้งหมด",
+    "targetLabel": "เป้าหมาย",
+    "targetValue": "Pioneer",
+    "title": "🎉 Grand Open Event"
+  },
   "pay": {
     "amountInvalid": "โปรดป้อนจำนวนเงินที่มากกว่า 0",
     "amountLabel": "จำนวนเงินที่ชำระ",

@@ -2137,6 +2137,17 @@
     "navigateGo": "Los",
     "shop": "Shop"
   },
+  "openPromo": {
+    "benefitLabel": "Vorteil",
+    "benefitValue": "Kostenlose Cafe Erstellung · Kostenlose Teilnahme · Kostenlose automatische Übersetzung",
+    "desc": "Das Cafe des Pi-Ökosystems, genießen Sie es jetzt in vollen Zügen. ☕",
+    "periodLabel": "Zeitraum",
+    "periodValue": "~ Bis der Kunde zufrieden ist",
+    "subtitle": "Platform Gebühren vollständig kostenlos",
+    "targetLabel": "Zielgruppe",
+    "targetValue": "Pioneer",
+    "title": "🎉 Grand Open Event"
+  },
   "pay": {
     "amountInvalid": "Geben Sie einen Betrag größer als 0 ein.",
     "amountLabel": "Zahlungsbetrag",

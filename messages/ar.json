@@ -2137,6 +2137,17 @@
     "navigateGo": "انطلق",
     "shop": "Shop"
   },
+  "openPromo": {
+    "benefitLabel": "المزايا",
+    "benefitValue": "إنشاء Cafe مجاني • مشاركة مجانية • ترجمة تلقائية مجانية",
+    "desc": "كافيه نظام Pi البيئي، استمتع بيه دلوقتي براحتك. ☕",
+    "periodLabel": "المدة",
+    "periodValue": "~ لحد ما العملاء يبقوا راضيين",
+    "subtitle": "رسوم الـPlatform مجانية بالكامل",
+    "targetLabel": "الجمهور المستهدف",
+    "targetValue": "Pioneer",
+    "title": "🎉 حدث الافتتاح الكبير"
+  },
   "pay": {
     "amountInvalid": "أدخل مبلغًا أكبر من 0.",
     "amountLabel": "مبلغ الدفع",

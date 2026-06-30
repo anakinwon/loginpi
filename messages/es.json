@@ -2137,6 +2137,17 @@
     "navigateGo": "Ir",
     "shop": "Shop"
   },
+  "openPromo": {
+    "benefitLabel": "Beneficio",
+    "benefitValue": "Creación gratuita de Café · Participación gratuita · Traducción automática gratuita",
+    "desc": "El Café del ecosistema Pi, disfrútalo ahora sin límites. ☕",
+    "periodLabel": "Período",
+    "periodValue": "~ hasta que el Cliente esté satisfecho",
+    "subtitle": "Tarifas de la Plataforma totalmente gratuitas",
+    "targetLabel": "Dirigido a",
+    "targetValue": "Pionero",
+    "title": "🎉 Evento de Gran Apertura"
+  },
   "pay": {
     "amountInvalid": "Introduce una cantidad mayor que 0.",
     "amountLabel": "Monto de pago",

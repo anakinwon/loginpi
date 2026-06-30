@@ -2137,6 +2137,17 @@
     "navigateGo": "Pumunta",
     "shop": "Shop"
   },
+  "openPromo": {
+    "benefitLabel": "Benefit",
+    "benefitValue": "Libreng paggawa ng Cafe · Libreng pagsali · Libreng awtomatikong pagsasalin",
+    "desc": "Ang Cafe ng Pi Ecosystem, tangkilikin ngayon nang lubusan. ☕",
+    "periodLabel": "Period",
+    "periodValue": "~ Hanggang sa masiyahan ang mga customer",
+    "subtitle": "Ganap na Libreng Bayad sa Platform",
+    "targetLabel": "Target",
+    "targetValue": "Pioneer",
+    "title": "🎉 Grand Open Event"
+  },
   "pay": {
     "amountInvalid": "Maglagay ng halaga na mas malaki sa 0.",
     "amountLabel": "Halaga ng Bayad",

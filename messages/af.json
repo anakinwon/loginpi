@@ -2137,6 +2137,17 @@
     "navigateGo": "Gaan",
     "shop": "Shop"
   },
+  "openPromo": {
+    "benefitLabel": "Voordeel",
+    "benefitValue": "Gratis Cafe skepping · Gratis deelname · Gratis outomatiese vertaling",
+    "desc": "Die Cafe van die Pi-ekosisteem, geniet dit nou ten volle. ☕",
+    "periodLabel": "Tydperk",
+    "periodValue": "~ totdat klante tevrede is",
+    "subtitle": "Platform fooie heeltemal gratis",
+    "targetLabel": "Teiken",
+    "targetValue": "Pioneer",
+    "title": "🎉 Grand Opening Event"
+  },
   "pay": {
     "amountInvalid": "Voer 'n bedrag groter as 0 in.",
     "amountLabel": "Betaalbedrag",

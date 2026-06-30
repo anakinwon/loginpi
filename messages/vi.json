@@ -2137,6 +2137,17 @@
     "navigateGo": "Đi",
     "shop": "Shop"
   },
+  "openPromo": {
+    "benefitLabel": "Lợi ích",
+    "benefitValue": "Tạo Cafe miễn phí · Tham gia miễn phí · Dịch tự động miễn phí",
+    "desc": "Cafe của hệ sinh thái Pi, hãy tận hưởng ngay bây giờ. ☕",
+    "periodLabel": "Thời gian",
+    "periodValue": "~ cho đến khi khách hàng hài lòng",
+    "subtitle": "Miễn phí hoàn toàn phí Platform",
+    "targetLabel": "Đối tượng",
+    "targetValue": "Pioneer",
+    "title": "🎉 Grand Open Event"
+  },
   "pay": {
     "amountInvalid": "Vui lòng nhập số tiền lớn hơn 0.",
     "amountLabel": "Số tiền thanh toán",

@@ -2137,6 +2137,17 @@
     "navigateGo": "צא לדרך",
     "shop": "Shop"
   },
+  "openPromo": {
+    "benefitLabel": "הטבה",
+    "benefitValue": "יצירת קפה חינם • השתתפות חינם • תרגום אוטומטי חינם",
+    "desc": "הקפה של מערכת האקולוגית של Pi, תיהנו ממנו עכשיו ככל שתרצו. ☕",
+    "periodLabel": "תקופה",
+    "periodValue": "~ עד שביעות רצון הלקוחות",
+    "subtitle": "כל דמי הפלטפורמה חינם",
+    "targetLabel": "קהל יעד",
+    "targetValue": "פיוניר",
+    "title": "אירוע פתיחה גדולה 🎉"
+  },
   "pay": {
     "amountInvalid": "הזן סכום גדול מ-0.",
     "amountLabel": "סכום תשלום",

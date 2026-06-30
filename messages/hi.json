@@ -2137,6 +2137,17 @@
     "navigateGo": "जाएँ",
     "shop": "Shop"
   },
+  "openPromo": {
+    "benefitLabel": "लाभ",
+    "benefitValue": "Cafe निःशुल्क निर्माण · निःशुल्क भागीदारी · निःशुल्क स्वचालित अनुवाद",
+    "desc": "Pi ecosystem का Cafe, अब जी भर कर आनंद लें। ☕",
+    "periodLabel": "अवधि",
+    "periodValue": "~ जब तक ग्राहक संतुष्ट न हों",
+    "subtitle": "Platform शुल्क पूरी तरह से मुफ़्त",
+    "targetLabel": "लक्ष्य",
+    "targetValue": "Pioneer",
+    "title": "🎉 Grand Open Event"
+  },
   "pay": {
     "amountInvalid": "0 से अधिक राशि दर्ज करें।",
     "amountLabel": "भुगतान राशि",

@@ -2137,6 +2137,17 @@
     "navigateGo": "出発",
     "shop": "Shop"
   },
+  "openPromo": {
+    "benefitLabel": "特典",
+    "benefitValue": "Cafe無料作成 · 無料参加 · 無料自動翻訳",
+    "desc": "PiエコシステムのCafeを、今すぐ心ゆくまでお楽しみください。☕",
+    "periodLabel": "期間",
+    "periodValue": "~ お客様が満足するまで",
+    "subtitle": "Platform料金 全額無料",
+    "targetLabel": "対象",
+    "targetValue": "Pioneer",
+    "title": "🎉 Grand Open Event"
+  },
   "pay": {
     "amountInvalid": "0より大きい金額を入力してください。",
     "amountLabel": "決済金額",

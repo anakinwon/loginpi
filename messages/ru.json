@@ -2137,6 +2137,17 @@
     "navigateGo": "Начать",
     "shop": "Shop"
   },
+  "openPromo": {
+    "benefitLabel": "Преимущества",
+    "benefitValue": "бесплатное создание Cafe · бесплатное участие · бесплатный автоматический перевод",
+    "desc": "Cafe экосистемы Pi, наслаждайтесь сейчас в полной мере. ☕",
+    "periodLabel": "Период",
+    "periodValue": "~ пока клиенты не будут удовлетворены",
+    "subtitle": "Platform плата полностью бесплатна",
+    "targetLabel": "Для кого",
+    "targetValue": "Pioneer",
+    "title": "🎉 Grand Open Event"
+  },
   "pay": {
     "amountInvalid": "Введите сумму больше 0.",
     "amountLabel": "Сумма платежа",

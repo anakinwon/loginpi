@@ -2137,6 +2137,17 @@
     "navigateGo": "Mulai",
     "shop": "Shop"
   },
+  "openPromo": {
+    "benefitLabel": "Manfaat",
+    "benefitValue": "Pembuatan Cafe gratis · Partisipasi gratis · Terjemahan otomatis gratis",
+    "desc": "Cafe di ekosistem Pi, nikmati sepuasnya sekarang. ☕",
+    "periodLabel": "Periode",
+    "periodValue": "~ Sampai pelanggan puas",
+    "subtitle": "Platform Fee Sepenuhnya Gratis",
+    "targetLabel": "Target",
+    "targetValue": "Pioneer",
+    "title": "🎉 Grand Open Event"
+  },
   "pay": {
     "amountInvalid": "Masukkan jumlah yang lebih besar dari 0.",
     "amountLabel": "Jumlah pembayaran",

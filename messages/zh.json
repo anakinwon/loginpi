@@ -2137,6 +2137,17 @@
     "navigateGo": "出发",
     "shop": "Shop"
   },
+  "openPromo": {
+    "benefitLabel": "福利",
+    "benefitValue": "免费创建 Cafe · 免费参与 · 免费自动翻译",
+    "desc": "Pi 生态系统中的 Cafe，现在尽情享受吧。☕",
+    "periodLabel": "期间",
+    "periodValue": "~ 直到客户满意为止",
+    "subtitle": "Platform 费用全额免费",
+    "targetLabel": "对象",
+    "targetValue": "Pioneer",
+    "title": "🎉 Grand Open Event"
+  },
   "pay": {
     "amountInvalid": "请输入大于 0 的金额。",
     "amountLabel": "支付金额",
