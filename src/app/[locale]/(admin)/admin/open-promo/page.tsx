@@ -304,9 +304,11 @@ export default function OpenPromoPage() {
                   <thead className="bg-muted/50 text-muted-foreground text-xs">
                     <tr>
                       <th className="px-3 py-2 text-left">변경</th>
+                      <th className="px-3 py-2 text-left">시작일시</th>
+                      <th className="px-3 py-2 text-left">종료일시</th>
                       <th className="px-3 py-2 text-left">수행자</th>
                       <th className="px-3 py-2 text-left">사유</th>
-                      <th className="px-3 py-2 text-left">시각</th>
+                      <th className="px-3 py-2 text-left">변경시각</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -319,6 +321,16 @@ export default function OpenPromoPage() {
                               ? '정상'
                               : '—'}{' '}
                           → {h.new_active_yn === 'Y' ? '무료' : '정상'}
+                        </td>
+                        <td className="text-muted-foreground px-3 py-2 whitespace-nowrap">
+                          {h.new_start_dtm
+                            ? new Date(h.new_start_dtm).toLocaleString()
+                            : '— (즉시)'}
+                        </td>
+                        <td className="text-muted-foreground px-3 py-2 whitespace-nowrap">
+                          {h.new_end_dtm
+                            ? new Date(h.new_end_dtm).toLocaleString()
+                            : '— (무제한)'}
                         </td>
                         <td className="px-3 py-2">{h.changed_by}</td>
                         <td className="text-muted-foreground px-3 py-2">
