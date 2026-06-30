@@ -25,7 +25,6 @@ interface CurrentRow {
   promo_start_dtm: string | null
   promo_end_dtm: string | null
   reason_memo: string | null
-  mod_dtm: string
   status_label: string
   is_active_now: boolean
 }

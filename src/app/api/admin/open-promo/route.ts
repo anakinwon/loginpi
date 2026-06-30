@@ -24,13 +24,17 @@ export async function GET() {
   // 현재 프로모션 상태
   const { data: current } = await db
     .from('v_promo_fee_current')
-    .select('promo_fee_id, promo_active_yn, promo_start_dtm, promo_end_dtm, reason_memo, mod_dtm, status_label, is_active_now')
+    .select(
+      'promo_fee_id, promo_active_yn, promo_start_dtm, promo_end_dtm, reason_memo, status_label, is_active_now',
+    )
     .single()
 
   // 최근 변경 이력 (20건)
   const { data: history } = await db
     .from('v_promo_fee_recent_history')
-    .select('audit_id, old_active_yn, new_active_yn, old_start_dtm, new_start_dtm, old_end_dtm, new_end_dtm, changed_by, changed_at, reason_memo')
+    .select(
+      'audit_id, old_active_yn, new_active_yn, old_start_dtm, new_start_dtm, old_end_dtm, new_end_dtm, changed_by, changed_at, reason_memo',
+    )
     .limit(20)
 
   return NextResponse.json({
@@ -49,8 +53,8 @@ export async function POST(req: NextRequest) {
 
   let body: {
     action?: string
-    start_dtm?: string  // ISO 8601, TIMESTAMPTZ 변환
-    end_dtm?: string    // ISO 8601, TIMESTAMPTZ 변환
+    start_dtm?: string // ISO 8601, TIMESTAMPTZ 변환
+    end_dtm?: string // ISO 8601, TIMESTAMPTZ 변환
     reason?: string
   }
   try {
@@ -64,7 +68,9 @@ export async function POST(req: NextRequest) {
 
   // 활성화 (프로모 ON)
   if (body.action === 'activate') {
-    const startDtm = body.start_dtm ? new Date(body.start_dtm).toISOString() : null
+    const startDtm = body.start_dtm
+      ? new Date(body.start_dtm).toISOString()
+      : null
     const endDtm = body.end_dtm ? new Date(body.end_dtm).toISOString() : null
 
     const { data, error } = await db.rpc('fn_toggle_open_promo', {
@@ -85,7 +91,6 @@ export async function POST(req: NextRequest) {
       promo_active_yn: row?.new_active_yn,
       start_dtm: row?.new_start_dtm,
       end_dtm: row?.new_end_dtm,
-      mod_dtm: row?.new_mod_dtm,
     })
   }
 
@@ -107,7 +112,6 @@ export async function POST(req: NextRequest) {
       ok: row?.ok ?? false,
       message: row?.message,
       promo_active_yn: row?.new_active_yn,
-      mod_dtm: row?.new_mod_dtm,
     })
   }
 
@@ -120,15 +124,18 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const startDtm = body.start_dtm ? new Date(body.start_dtm).toISOString() : undefined
-    const endDtm = body.end_dtm ? new Date(body.end_dtm).toISOString() : undefined
+    const startDtm = body.start_dtm
+      ? new Date(body.start_dtm).toISOString()
+      : undefined
+    const endDtm = body.end_dtm
+      ? new Date(body.end_dtm).toISOString()
+      : undefined
 
-    // 현재 활성 상태 조회
+    // 현재 활성 상태 조회 (싱글톤 단건 — 시스템 컬럼 정렬 없음)
     const { data: current } = await db
       .from('promo_fee_config')
       .select('promo_active_yn, promo_start_dtm, promo_end_dtm')
       .eq('del_yn', 'N')
-      .order('mod_dtm', { ascending: false })
       .limit(1)
       .single()
 
@@ -152,7 +159,6 @@ export async function POST(req: NextRequest) {
       promo_active_yn: row?.new_active_yn,
       start_dtm: row?.new_start_dtm,
       end_dtm: row?.new_end_dtm,
-      mod_dtm: row?.new_mod_dtm,
     })
   }
 
