@@ -42,6 +42,7 @@ const SHOP_GRADES: SubscrGrade[] = ['S', 'M', 'L']
 export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
   const t = useTranslations('subscribe')
   const feeMode = useFeeMode() // PI 모드면 Pi Browser 직결제, BEAN 모드면 Bean 차감
+  const isPi = feeMode === 'PI' // PI 모드면 요금 표시도 Pi(π, ÷100), BEAN 모드면 Bean
   const [resp, setResp] = useState<ProductsResp | null>(null)
   const [authed, setAuthed] = useState(serverAuthed)
   const [loading, setLoading] = useState(true)
@@ -272,25 +273,37 @@ export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
                   </p>
                   <p className="mt-1">
                     <span className="text-lg font-bold tabular-nums">
-                      {plan.bean_amt.toLocaleString()}{' '}
-                      <BeanIcon className="inline-block h-4 w-4 align-text-bottom" />
+                      {isPi ? (
+                        <>{plan.bean_amt / 100} π</>
+                      ) : (
+                        <>
+                          {plan.bean_amt.toLocaleString()}{' '}
+                          <BeanIcon className="inline-block h-4 w-4 align-text-bottom" />
+                        </>
+                      )}
                     </span>
                     <span className="text-muted-foreground text-sm">
                       {' '}
                       / {cycle === 'Y' ? t('perYear') : t('perMonth')}
                     </span>
-                    <span className="text-muted-foreground ml-1 text-xs">
-                      (= {plan.bean_amt / 100} π)
-                    </span>
+                    {/* BEAN 모드에서만 Pi 환산 보조 표시. PI 모드는 주 표시가 이미 π. */}
+                    {!isPi && (
+                      <span className="text-muted-foreground ml-1 text-xs">
+                        (= {plan.bean_amt / 100} π)
+                      </span>
+                    )}
                   </p>
                   {/* 연간 절약 안내 */}
                   {sv &&
                     (cycle === 'Y' ? (
                       <p className="mt-0.5 text-xs font-semibold text-green-600 dark:text-green-400">
-                        {t('annualSave', {
-                          bean: sv.saveBean.toLocaleString(),
-                          months: sv.monthsFree,
-                        })}
+                        {/* PI 모드는 Pi(π) 환산 인라인(단위 일관). BEAN 모드는 기존 i18n(☕). */}
+                        {isPi
+                          ? `연간 결제로 ${sv.saveBean / 100}π 절약 — ${sv.monthsFree}개월 무료! 🎉`
+                          : t('annualSave', {
+                              bean: sv.saveBean.toLocaleString(),
+                              months: sv.monthsFree,
+                            })}
                       </p>
                     ) : (
                       <button
@@ -341,8 +354,14 @@ export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
                         >
                           {t(`storeGrade.${g}`)}
                           <span className="mt-0.5 block tabular-nums">
-                            {gp?.bean_amt.toLocaleString()}{' '}
-                            <BeanIcon className="inline-block h-3.5 w-3.5 align-text-bottom" />
+                            {isPi ? (
+                              <>{(gp?.bean_amt ?? 0) / 100} π</>
+                            ) : (
+                              <>
+                                {gp?.bean_amt.toLocaleString()}{' '}
+                                <BeanIcon className="inline-block h-3.5 w-3.5 align-text-bottom" />
+                              </>
+                            )}
                           </span>
                         </button>
                       )
