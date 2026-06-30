@@ -120,12 +120,20 @@ export function withAuthGuard(handler: Handler): Handler {
       const host = req.headers.get('host')
       try {
         const originHostname = new URL(origin).hostname
-        // NEXT_PUBLIC_APP_URL 우선, 없으면 host 헤더 fallback
+        // ① same-origin 우선: 요청이 실제 도달한 Host와 Origin의 hostname이 같으면 허용.
+        //    도메인이 무엇이든(운영 cafepi.vercel.app·Pi 포워딩 cafe7092.pinet.com·스테이징)
+        //    동일 소스/동일 env로 동작한다. NEXT_PUBLIC_APP_URL은 빌드타임 인라인 값이라
+        //    환경마다 달라야 하므로, 인증 게이트를 여기에 묶으면 통짜 배포 시 일반 브라우저가
+        //    403 cross_origin_auth로 막힌다(Origin≠NEXT_PUBLIC_APP_URL 사고).
+        // ② 추가 허용: 명시적으로 신뢰하는 앱 도메인(의도된 cross-origin 대비).
+        //    CSRF 방어는 유지된다 — 외부 사이트는 피해자 브라우저의 Origin을 위조할 수 없다.
+        const hostHostname = host?.split(':')[0] ?? ''
         const appUrl = process.env.NEXT_PUBLIC_APP_URL
-        const trustedHostname = appUrl
-          ? new URL(appUrl).hostname
-          : (host?.split(':')[0] ?? '')
-        if (!trustedHostname || originHostname !== trustedHostname) {
+        const appHostname = appUrl ? new URL(appUrl).hostname : ''
+        const allowed =
+          (!!hostHostname && originHostname === hostHostname) ||
+          (!!appHostname && originHostname === appHostname)
+        if (!allowed) {
           return forbiddenResponse('cross_origin_auth')
         }
       } catch {
