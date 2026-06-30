@@ -388,7 +388,10 @@ export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
         })}
       </div>
 
-      <p className="text-muted-foreground text-xs">ℹ️ {t('notice')}</p>
+      {/* PI 모드는 Pi 직결제 — Bean 차감/환금불가 안내는 부적합하므로 Pi 전용 문구로 대체 */}
+      <p className="text-muted-foreground text-xs">
+        ℹ️ {isPi ? '구독료는 Pi로 결제됩니다. 연간은 2개월 무료.' : t('notice')}
+      </p>
     </div>
   )
 }
