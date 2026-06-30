@@ -141,10 +141,17 @@ export function useChatRoom(
             },
           )
           if (!res.ok) continue
-          const { translations } = (await res.json()) as {
+          const { translations, quotaExhausted } = (await res.json()) as {
             translations: Record<string, string>
+            quotaExhausted?: boolean
           }
           totalApplied += Object.keys(translations).length
+          // 일일 무료 번역 한도 소진 — 일부만 번역됨(나머지 원문). 1회 안내.
+          if (quotaExhausted) {
+            toast.info(
+              '오늘 무료 번역 한도를 모두 사용했어요. 내일 다시 이용할 수 있습니다.',
+            )
+          }
           // trans_locale 기록: 언어 재전환 시 이 번역을 캐시로 재사용
           setMessages((prev) =>
             prev.map((m) =>

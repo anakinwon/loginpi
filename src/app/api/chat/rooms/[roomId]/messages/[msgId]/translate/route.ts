@@ -8,6 +8,7 @@ import { canAutoTranslate } from '@/lib/chat-auth'
 import { applyBean, getBalance } from '@/lib/bean'
 import { TRANSLATE_ONCE_BEAN } from '@/lib/bean-fee'
 import { applyPromoGate } from '@/lib/fee-resolver'
+import { consumeTransQuota } from '@/lib/chat-translate-quota'
 import { recordUserAction } from '@/lib/event'
 
 type Params = { params: Promise<{ roomId: string; msgId: string }> }
@@ -124,6 +125,12 @@ export async function POST(request: NextRequest, { params }: Params) {
       localeCd,
       msgCont: msg.msg_cont,
     })
+
+    // 비구독자 + 무료(프로모) 신규 번역은 일일 무료 한도 카운터에 합산(캐시·구독자 제외).
+    //   batch 경로와 같은 카운터를 공유해 합산 정확. 차단은 batch가 주도(개별은 수동 소량).
+    if (!isSubscriber && feeBean === 0 && !cached) {
+      await consumeTransQuota(user.id, 1)
+    }
 
     // 비구독자 + 신규 번역(캐시 미스)만 과금 — 캐시 재사용·PI 모드(feeBean=0)는 무료
     if (!isSubscriber && feeBean > 0 && !cached) {

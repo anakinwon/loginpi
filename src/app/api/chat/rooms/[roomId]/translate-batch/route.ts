@@ -7,6 +7,10 @@ import { getOrTranslateMessage } from '@/lib/chat-translate-dedup'
 import { canAutoTranslate } from '@/lib/chat-auth'
 import { recordUserAction } from '@/lib/event'
 import { isOpenPromoActive } from '@/lib/fee-resolver'
+import {
+  consumeTransQuota,
+  TRANSLATE_DAILY_FREE,
+} from '@/lib/chat-translate-quota'
 
 type Params = { params: Promise<{ roomId: string }> }
 
@@ -30,7 +34,8 @@ export async function POST(request: NextRequest, { params }: Params) {
   // 자동번역은 구독 기능 — 미구독(FREE)은 차단. 단 오픈프로모 기간엔 누구나 무료 허용.
   //   프로모 종료 시 다시 구독자 전용으로 복귀(유료 전환). 서버 권위 판정(매 요청 DB 조회).
   const promoActive = await isOpenPromoActive()
-  if (!promoActive && !(await canAutoTranslate(user.id))) {
+  const subscribed = await canAutoTranslate(user.id)
+  if (!promoActive && !subscribed) {
     return NextResponse.json(
       {
         error: 'PyTranslate™는 구독 후 이용할 수 있습니다',
@@ -111,14 +116,32 @@ export async function POST(request: NextRequest, { params }: Params) {
     translations[row.msg_id as string] = row.trans_cont as string
   }
 
-  // 2. 캐시 미스 순차 번역 (Gemini rate limit 고려 — 병렬 금지)
+  // 원본 언어가 대상과 같으면 번역 생략 — 원문 그대로(한도 미차감)
   for (const msg of msgs) {
     if (translations[msg.msg_id]) continue
-    // 원본 언어가 대상과 같으면 번역 생략 — 원문 그대로 반환
     if (msg.src_lang_cd && baseLang(msg.src_lang_cd) === baseLang(localeCd)) {
       translations[msg.msg_id] = msg.msg_cont as string
-      continue
     }
+  }
+
+  // 캐시 미스(신규 번역 필요) 목록 — 최신순(reg_dtm desc) 유지
+  const toTranslate = msgs.filter((m) => !translations[m.msg_id])
+
+  // 비구독자(오픈프로모 무료)는 일일 무료 한도 적용 — 신규 건수만큼 소비, granted건만 번역.
+  //   캐시 히트·원문(위에서 처리)은 미차감. 구독자는 무제한(한도 미적용).
+  //   초과분은 번역하지 않고 원문 표시 + quotaExhausted 안내.
+  let allowed = toTranslate
+  let quotaExhausted = false
+  let quotaUsed: number | null = null
+  if (!subscribed && toTranslate.length > 0) {
+    const q = await consumeTransQuota(user.id, toTranslate.length)
+    allowed = toTranslate.slice(0, q.granted) // 최신 메시지 우선 번역
+    quotaExhausted = q.granted < toTranslate.length
+    quotaUsed = q.used
+  }
+
+  // 2. 캐시 미스 순차 번역 (Gemini rate limit 고려 — 병렬 금지)
+  for (const msg of allowed) {
     try {
       const { transCont } = await getOrTranslateMessage({
         msgId: msg.msg_id,
@@ -141,5 +164,11 @@ export async function POST(request: NextRequest, { params }: Params) {
   // M3(premium_cafe_create + cafe_translate_use) 누락이 발생하지 않는다.
   recordUserAction('cafe_translate_use', user.id, { roomId, localeCd })
 
-  return NextResponse.json({ translations })
+  // quotaExhausted: 일일 무료 한도 소진으로 일부만 번역됨(클라이언트 안내용)
+  return NextResponse.json({
+    translations,
+    quotaExhausted,
+    quotaUsed,
+    quota: TRANSLATE_DAILY_FREE,
+  })
 }
