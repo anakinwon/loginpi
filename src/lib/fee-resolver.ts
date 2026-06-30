@@ -89,6 +89,30 @@ export async function isOpenPromoActive(): Promise<boolean> {
 }
 
 /**
+ * 오픈 프로모 상태(활성 여부 + 종료시각). 홈 배너의 client 실시간 자동 숨김용.
+ *   active = is_active_now(시작·종료 시각 반영). endDtm = 종료시각(NULL=무제한).
+ *   client는 endDtm까지 타이머를 걸어 종료시각 도달 시 즉시 배너를 내린다(재로드 불필요).
+ */
+export async function getOpenPromoState(): Promise<{
+  active: boolean
+  endDtm: string | null
+}> {
+  try {
+    const { data, error } = await getSupabaseAdmin()
+      .from('v_promo_fee_current')
+      .select('is_active_now, promo_end_dtm')
+      .maybeSingle()
+    if (error || !data) return { active: false, endDtm: null }
+    return {
+      active: data.is_active_now === true,
+      endDtm: data.promo_end_dtm ?? null,
+    }
+  } catch {
+    return { active: false, endDtm: null }
+  }
+}
+
+/**
  * 요금 적용 게이트 — 프로모션 무료화 오버라이드.
  * @param normalFeeBean 정상요금(정본 bean_fee_plan)
  * @returns 프로모 활성 시 0, 비활성 시 정상요금

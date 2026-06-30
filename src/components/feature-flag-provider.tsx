@@ -15,6 +15,8 @@ export interface FeatureFlags {
   isProd: boolean
   /** 오픈기념 무료요금 활성 여부 — true면 전 요금 품목 "무료(오픈기념)" 표시 (PRD_26) */
   isOpenPromoActive: boolean
+  /** 오픈 프로모 종료시각(ISO, NULL=무제한) — 홈 배너가 이 시각에 맞춰 자동으로 사라진다 */
+  openPromoEndDtm: string | null
 }
 
 const FeatureFlagContext = createContext<FeatureFlags>({
@@ -22,6 +24,7 @@ const FeatureFlagContext = createContext<FeatureFlags>({
   feeMode: 'BEAN',
   isProd: false,
   isOpenPromoActive: false,
+  openPromoEndDtm: null,
 })
 
 export function FeatureFlagProvider({
@@ -58,4 +61,9 @@ export function useMicroFeeLabel(beanAmt: number): string {
 /** 오픈기념 무료요금 활성 여부 — 배너·라벨 분기용 단축 hook. */
 export function useOpenPromoActive(): boolean {
   return useContext(FeatureFlagContext).isOpenPromoActive
+}
+
+/** 오픈 프로모 종료시각(ISO, NULL=무제한) — 배너 client 자동 숨김 타이머용. */
+export function useOpenPromoEndDtm(): string | null {
+  return useContext(FeatureFlagContext).openPromoEndDtm
 }

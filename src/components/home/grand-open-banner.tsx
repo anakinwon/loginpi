@@ -1,13 +1,47 @@
 'use client'
 
-import { useOpenPromoActive } from '@/components/feature-flag-provider'
+import { useEffect, useState } from 'react'
+import {
+  useOpenPromoActive,
+  useOpenPromoEndDtm,
+} from '@/components/feature-flag-provider'
 
 // 홈 상단 그랜드 오픈 이벤트 환영 배너 — 오픈 프로모(전액 무료, PRD_26) 활성 시에만 노출.
 //   "플랫폼 요금 전액 무료"는 프로모 ON일 때만 사실이므로, OFF면 자동으로 사라진다
 //   ("~ 고객이 만족할 때까지" = 프로모 기간). 서버 applyPromoGate와 단일 소스(isOpenPromoActive) 연동.
+//
+// 종료시각(openPromoEndDtm) 도달 시 재로드 없이 즉시 사라지도록 client 타이머를 건다.
+//   SSR active는 페이지 로드 시점 스냅샷이라, 페이지를 열어둔 채 종료시각을 넘기면
+//   타이머가 그 순간 배너를 내린다(예: 종료시각 2026-06-30 10:11:00 도달 → 자동 해제).
 export function GrandOpenBanner() {
   const active = useOpenPromoActive()
-  if (!active) return null
+  const endDtm = useOpenPromoEndDtm()
+  // 초기 가시성 = SSR 판정(active). 하이드레이션 일치 위해 동일 초기값 사용.
+  const [visible, setVisible] = useState(active)
+
+  useEffect(() => {
+    if (!active) {
+      setVisible(false)
+      return
+    }
+    if (!endDtm) {
+      setVisible(true) // 무제한 프로모
+      return
+    }
+    const remain = new Date(endDtm).getTime() - Date.now()
+    if (remain <= 0) {
+      setVisible(false) // 이미 종료시각 경과
+      return
+    }
+    setVisible(true)
+    // setTimeout 32비트 한계(~24.8일) 초과분은 다음 재로드의 SSR 판정에 위임
+    if (remain < 2_147_483_647) {
+      const timer = setTimeout(() => setVisible(false), remain)
+      return () => clearTimeout(timer)
+    }
+  }, [active, endDtm])
+
+  if (!visible) return null
 
   const items = [
     { label: '기간', value: '~ 고객이 만족할 때까지' },
