@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import {
   useOpenPromoActive,
   useOpenPromoEndDtm,
@@ -16,6 +17,7 @@ import {
 export function GrandOpenBanner() {
   const active = useOpenPromoActive()
   const endDtm = useOpenPromoEndDtm()
+  const t = useTranslations('openPromo')
   // 초기 가시성 = SSR 판정(active). 하이드레이션 일치 위해 동일 초기값 사용.
   const [visible, setVisible] = useState(active)
 
@@ -44,9 +46,9 @@ export function GrandOpenBanner() {
   if (!visible) return null
 
   const items = [
-    { label: '기간', value: '~ 고객이 만족할 때까지' },
-    { label: '대상', value: '파이오니어' },
-    { label: '혜택', value: '카페 무료 생성 · 무료 참여 · 무료 자동번역' },
+    { label: t('periodLabel'), value: t('periodValue') },
+    { label: t('targetLabel'), value: t('targetValue') },
+    { label: t('benefitLabel'), value: t('benefitValue') },
   ]
 
   return (
@@ -58,20 +60,15 @@ export function GrandOpenBanner() {
       <div className="relative space-y-4">
         {/* 이벤트 배지 */}
         <span className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-3 py-1 text-xs font-bold text-white shadow-sm">
-          <span className="animate-pulse">🎉</span> 그랜드 오픈 이벤트
+          {t('title')}
         </span>
 
         {/* 메인 카피 */}
         <div className="space-y-1">
-          <h2 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
-            플랫폼 요금{' '}
-            <span className="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 bg-clip-text text-transparent">
-              전액 무료
-            </span>
+          <h2 className="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 bg-clip-text text-2xl font-extrabold tracking-tight text-transparent sm:text-3xl">
+            {t('subtitle')}
           </h2>
-          <p className="text-muted-foreground text-sm">
-            파이 생태계의 카페, 지금 마음껏 누리세요. ☕
-          </p>
+          <p className="text-muted-foreground text-sm">{t('desc')}</p>
         </div>
 
         {/* 상세 정보 */}
