@@ -16,6 +16,7 @@ import {
 import { ThemeSelector, type ThemeRow, getThemeName } from './theme-selector'
 import { getRoomFeeBean } from '@/lib/bean-fee'
 import { useFeeMode, beanToPi } from '@/hooks/use-fee-mode'
+import { useOpenPromoActive } from '@/components/feature-flag-provider'
 
 type Step = 1 | 2 | 3 | 4
 type PayStatus =
@@ -59,6 +60,8 @@ export function GroupRoomCreator() {
   // PI 모드: 실제 Pi 결제이므로 표시도 Pi(÷100, π). BEAN 모드: 기존 Bean 표기.
   const feeMode = useFeeMode()
   const isPi = feeMode === 'PI'
+  // 오픈 프로모(이벤트기간) 활성 시 모든 생성료 면제 표시 — 서버 applyPromoGate와 일관
+  const openPromo = useOpenPromoActive()
   const [open, setOpen] = useState(false)
   const [step, setStep] = useState<Step>(1)
   const [selectedTheme, setSelectedTheme] = useState<ThemeRow | null>(null)
@@ -125,15 +128,15 @@ export function GroupRoomCreator() {
   const isPremium = selectedTheme?.theme_tp_cd === 'PREMIUM'
   // PREMIUM 테마 비구독자 생성료 = 일반요금제 Bean(10). 구독자·BASIC은 0(무료).
   // 결제 통화 = Bean (Pi 직접결제 폐기). 서버가 권위 부과·차감.
-  const createCostBean = isPremium
-    ? getRoomFeeBean('CREATE', 'PREMIUM', canCreateRoomFree)
-    : 0
-  // 이벤트 카페 생성료 — 구독자는 무료(0), 비구독자는 EVENT 요금(Bean). 서버가 권위 부과·차감.
-  const eventCreateCostBean = getRoomFeeBean(
-    'CREATE',
-    'EVENT',
-    canCreateRoomFree,
-  )
+  // ⭐ 오픈 프로모 중엔 0(무료) — 서버 applyPromoGate가 실제 차감을 면제하는 것과 표시 일관.
+  const createCostBean =
+    openPromo || !isPremium
+      ? 0
+      : getRoomFeeBean('CREATE', 'PREMIUM', canCreateRoomFree)
+  // 이벤트 카페 생성료 — 구독자는 무료(0), 비구독자는 EVENT 요금(Bean). 프로모 중 0.
+  const eventCreateCostBean = openPromo
+    ? 0
+    : getRoomFeeBean('CREATE', 'EVENT', canCreateRoomFree)
   const isBusy =
     payStatus === 'approving' ||
     payStatus === 'waiting' ||
@@ -559,6 +562,12 @@ export function GroupRoomCreator() {
                     </button>
                   )}
                 </div>
+                {/* 오픈 프로모(이벤트기간) 중 생성료 면제 안내 — 카페방·이벤트방 공통 */}
+                {openPromo && (
+                  <p className="text-center text-xs font-medium text-emerald-600 dark:text-emerald-400">
+                    🎉 이벤트기간 동안 무료
+                  </p>
+                )}
                 {roomType === 'G' && createCostBean > 0 && (
                   <p className="text-muted-foreground text-center text-xs">
                     {t('premiumCreateCostMemo', {

@@ -6,7 +6,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { recordUserAction } from '@/lib/event'
 import { getRoomFeeBean } from '@/lib/bean-fee'
 import { applyBean, getBalance } from '@/lib/bean'
-import { getActiveFeeMode } from '@/lib/fee-resolver'
+import { getActiveFeeMode, applyPromoGate } from '@/lib/fee-resolver'
 
 // POST /api/chat/rooms/event — 이벤트 카페 생성
 // Business 플랜 폐지: 그룹방 PREMIUM과 동일하게 구독·Bean 요금만 체크한다.
@@ -25,7 +25,10 @@ export async function POST(request: NextRequest) {
   const feeMode = await getActiveFeeMode()
   let createFeeBean = 0
   if (!allowance.allowed) {
-    createFeeBean = getRoomFeeBean('CREATE', 'EVENT', false)
+    // 오픈 프로모(이벤트기간) 활성 시 0으로 면제 — group route와 동일 게이트(누락 보강)
+    createFeeBean = await applyPromoGate(
+      getRoomFeeBean('CREATE', 'EVENT', false),
+    )
     // BEAN 모드만 Bean 잔액 확인. PI 모드는 Pi 직결제(아래 분기).
     if (feeMode === 'BEAN') {
       const bal = await getBalance(user.id)
