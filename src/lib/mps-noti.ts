@@ -29,6 +29,8 @@ interface NotiBody {
   order_mthd_cd: string | null
   reg_dtm: string
   lines?: NotiLine[]
+  // 주문 발생 환경 base URL(enqueue 시점 고정). 없으면 발송 서버 env로 폴백(구버전 알림 하위호환)
+  app_url?: string | null
 }
 
 // 소수 7자리 반올림 (Pi 정밀도 정합)
@@ -38,8 +40,11 @@ const round7 = (n: number) => Math.round(n * 1e7) / 1e7
 //   직접 https://pinet.com은 OS가 일반 브라우저(Chrome)로 열어 Pi Browser로 안 넘어감(App Link 미작동).
 //   브리지(Chrome)에서 pi:// 스킴으로 리다이렉트하면 Pi Browser가 열린다(실기기 확인).
 //   pi:// 정확한 형식은 브리지에서 처리(공식 문서 미기재 → 폴백 다중 시도).
-function orderDeepLink(): string {
-  const base = process.env.NEXT_PUBLIC_APP_URL ?? 'https://cafe.pi'
+function orderDeepLink(body: NotiBody): string {
+  // 주문 발생 환경 base 우선(발송 주체 무관) → 없으면 발송 서버 env → 최종 폴백.
+  //   운영(cafepi) 주문이 staging cron으로 발송돼도 cafepi 링크가 유지된다.
+  const base =
+    body.app_url ?? process.env.NEXT_PUBLIC_APP_URL ?? 'https://cafe.pi'
   return `${base}/ko/open?to=${encodeURIComponent('/ko/store/my/sales')}`
 }
 
@@ -217,7 +222,7 @@ export async function dispatchOrderNotis(limit = 100): Promise<DispatchResult> {
     }
 
     const res = await sendTelegramMessage(chatId, buildMessage(body), [
-      { text: '📦 주문 확인하기', url: orderDeepLink() },
+      { text: '📦 주문 확인하기', url: orderDeepLink(body) },
     ])
 
     if (res.ok) {

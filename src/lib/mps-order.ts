@@ -346,6 +346,10 @@ async function enqueueOrderNoti(
     order_mthd_cd: orderMthdCd,
     reg_dtm: order.reg_dtm,
     lines, // 메뉴별 명칭·수량·단가 (없으면 빈 배열 → 빌더가 item_nm 폴백)
+    // 주문 발생 환경의 base URL을 고정 저장 — 발송 주체(어느 환경 cron이 큐를 비우든)와
+    //   무관하게 알림 딥링크가 항상 주문 발생 도메인(운영=cafepi / staging=loginpi)을 가리키게 한다.
+    //   (발송 시점 env를 쓰면 staging cron이 운영 주문을 발송할 때 loginpi로 새는 문제 발생)
+    app_url: process.env.NEXT_PUBLIC_APP_URL ?? null,
   })
 
   await db.from('msg_noti_outbox').insert({
