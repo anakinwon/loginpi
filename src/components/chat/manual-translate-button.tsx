@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
 import { TranslatedMessage } from './translated-message'
-import { useMicroFeeLabel } from '@/components/feature-flag-provider'
+import { useOpenPromoActive } from '@/components/feature-flag-provider'
 
 // 비구독자 수동 번역 버튼 — 건당 Bean 과금(confirm:true). 구독자는 자동번역되므로 노출되지 않음.
 // 번역 성공 시 컴포넌트 로컬 상태로 번역문을 표시(메시지 목록 상태는 건드리지 않음).
@@ -22,8 +22,10 @@ export function ManualTranslateButton({
 }) {
   const [translated, setTranslated] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
-  // PI 모드(메인넷 등재 기간)면 번역 무료 표시 — 서버 microFeeBean과 일관
-  const feeLabel = useMicroFeeLabel(feeBean)
+  // 번역 요금은 오픈프로모로만 통제(서버 applyPromoGate와 일관) — 프로모 ON 무료, OFF 정상요금.
+  //   번역은 PI 마이크로 무료화 대상이 아니므로 PI 모드여도 프로모 OFF면 Bean 과금.
+  const promoActive = useOpenPromoActive()
+  const feeLabel = promoActive ? '무료' : `${feeBean} Bean`
 
   // 이미 번역됨 → 번역/원문 토글 UI 재사용
   if (translated !== null) {
