@@ -175,11 +175,24 @@ export function StoreItemDetail({ itemId }: { itemId: string }) {
         { amount: prep.amount, memo: prep.memo, metadata: prep.metadata },
         {
           onReadyForServerApproval: async (paymentId) => {
-            await fetch('/api/payments/approve', {
+            // approve 응답을 반드시 검사 — 실패(예: PI_API_KEY 미설정/오류) 시 조용히 넘어가면
+            //   Pi가 승인을 못 받아 "승인 프로세스 시간 초과"로 만료된다. 즉시 안내·롤백.
+            const r = await fetch('/api/payments/approve', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ paymentId }),
             })
+            if (!r.ok) {
+              const d = (await r.json().catch(() => null)) as {
+                error?: string
+              } | null
+              rollback()
+              setBuying(false)
+              toast.error(
+                d?.error ??
+                  '결제 승인에 실패했습니다. 잠시 후 다시 시도해 주세요',
+              )
+            }
           },
           onReadyForServerCompletion: async (paymentId, txid) => {
             const r = await fetch('/api/payments/complete', {
