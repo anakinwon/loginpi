@@ -20,6 +20,7 @@ function LinkPageInner() {
   const {
     user: piUser,
     piAccessToken,
+    isInPiBrowser,
     isLoading: piLoading,
     signIn: piSignIn,
   } = usePiAuth()
@@ -31,10 +32,17 @@ function LinkPageInner() {
   const params = useSearchParams()
   const router = useRouter()
 
-  const forceGenerate = params.get('generate') === '1'
-  const showGenerate = forceGenerate || !!piUser
-
   const codeFromUrl = (params.get('code') ?? '').replace(/\D/g, '').slice(0, 6)
+
+  // 코드 생성 UI(Pi Browser 측) 분기 — "진짜 Pi 세션"일 때만.
+  //   ⚠️ piUser(=usePiAuth().user)는 일반 브라우저의 Google 세션도 포함하므로(2026-06-26 본문
+  //      게이트 동기화) 분기 기준으로 쓰면 안 된다. Google 로그인된 일반 브라우저가 코드 생성 UI로
+  //      오분류돼 "코드를 입력"하지 못하고 "다시 생성하라"는 화면이 떴다.
+  //   → Pi authenticate() 성공 신호(piAccessToken/isInPiBrowser)로만 판정한다.
+  //   ⚠️ URL에 code가 있으면(붙여넣기 링크) 명백히 입력 측이므로 생성 UI를 막는다.
+  const forceGenerate = params.get('generate') === '1'
+  const hasPiSession = !!piAccessToken || isInPiBrowser
+  const showGenerate = forceGenerate || (hasPiSession && !codeFromUrl)
 
   const [genStatus, setGenStatus] = useState<
     'idle' | 'loading' | 'done' | 'error'
