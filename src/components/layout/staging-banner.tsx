@@ -18,7 +18,7 @@ export async function StagingBanner() {
     <div
       role="status"
       aria-label={label}
-      className="w-full border-b-2 border-dashed border-amber-700 bg-amber-300 py-1 text-center text-xs font-bold tracking-wide text-amber-950 dark:border-amber-500 dark:bg-amber-400"
+      className="flex h-7 w-full items-center justify-center border-b-2 border-dashed border-amber-700 bg-amber-300 px-2 text-center text-xs font-bold tracking-wide text-amber-950 dark:border-amber-500 dark:bg-amber-400"
     >
       {label}
     </div>

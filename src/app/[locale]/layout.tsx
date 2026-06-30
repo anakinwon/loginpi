@@ -101,6 +101,14 @@ export default async function LocaleLayout({
     <html lang={locale} suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col antialiased`}
+        // 채팅방 고정 프레임(fixed top)의 상단 오프셋 = 헤더(h-14=3.5rem) + STAGING 배너(h-7=1.75rem).
+        //   staging은 배너가 flow에 끼어 헤더를 밀어내므로 배너 높이를 더하고, 운영(배너 없음)은 헤더 높이만.
+        //   채팅방은 top-[var(--chat-top,3.5rem)]로 이 값을 참조해 배너 유무에 따라 자동 정렬된다.
+        style={
+          {
+            '--chat-top': tier === 'staging' ? '5.25rem' : '3.5rem',
+          } as React.CSSProperties
+        }
       >
         {/* 전체 적용 테마 색상 주입 (GLOBAL 범위) — 핵심 색만 바꿔 배경·글자는 유지 */}
         {globalThemeCss && (

@@ -58,7 +58,7 @@ export function RoomEntryFeeGate({
   }
 
   return (
-    <div className="bg-background text-muted-foreground fixed inset-x-0 top-14 bottom-0 z-40 mx-auto flex w-full max-w-2xl flex-col items-center justify-center gap-2 text-center text-sm">
+    <div className="bg-background text-muted-foreground fixed inset-x-0 top-[var(--chat-top,3.5rem)] bottom-0 z-40 mx-auto flex w-full max-w-2xl flex-col items-center justify-center gap-2 text-center text-sm">
       {roomNm && <p className="font-semibold">{roomNm}</p>}
       {insufficient ? (
         <>
