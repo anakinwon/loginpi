@@ -182,6 +182,30 @@ export default function OpenPromoPage() {
                 <span>정상요금 적용 중</span>
               )}
             </p>
+            {/* 종료시각 강조 — KST 명시 + 남은 일수(D-day). 영어 locale에서도 동일 KST 기준 */}
+            {active &&
+              (cur?.promo_end_dtm ? (
+                <p className="mt-1.5 text-sm font-medium text-amber-700 dark:text-amber-400">
+                  ⏰ 종료:{' '}
+                  {new Date(cur.promo_end_dtm).toLocaleString('ko-KR', {
+                    timeZone: 'Asia/Seoul',
+                    dateStyle: 'medium',
+                    timeStyle: 'short',
+                  })}{' '}
+                  (KST)
+                  {(() => {
+                    const days = Math.ceil(
+                      (new Date(cur.promo_end_dtm).getTime() - Date.now()) /
+                        86_400_000,
+                    )
+                    return days > 0 ? ` · D-${days}` : ' · 곧 종료'
+                  })()}
+                </p>
+              ) : (
+                <p className="mt-1.5 text-sm font-medium text-amber-700 dark:text-amber-400">
+                  ⏰ 종료: 무제한 (수동 종료까지)
+                </p>
+              ))}
             {cur && (
               <dl className="text-muted-foreground mt-2 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-xs">
                 <dt>판정 상태</dt>
