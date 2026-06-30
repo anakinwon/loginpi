@@ -13,6 +13,7 @@ import { RoomSettingsDialog, type RoomSettings } from './room-settings-dialog'
 import { VoiceChannelPanel, RemoteAudio } from './voice-channel-panel'
 import { MemberListPanel } from './member-list-panel'
 import { useVoiceChannel } from '@/hooks/use-voice-channel'
+import { useOpenPromoActive } from '@/components/feature-flag-provider'
 
 interface ChatRoomPanelProps {
   roomId: string
@@ -56,6 +57,10 @@ export function ChatRoomPanel({
   )
   // 구독 확인 전까지 false(fail-closed) — 비구독자가 짧은 틈에 강제 번역 사용하는 것 방지
   const [isSubscribed, setIsSubscribed] = useState(false)
+  // 오픈프로모 기간엔 비구독자도 자동번역을 구독자처럼 무료 사용 — 종료 시 구독자 전용 복귀.
+  //   서버 applyPromoGate가 실제 요금 0 보장. 콤보 활성·강제번역·메시지 자동번역 단일 게이트.
+  const promoActive = useOpenPromoActive()
+  const effectiveCanAuto = !!canAutoTranslate || promoActive
   const [tipPromptOpen, setTipPromptOpen] = useState(false)
   const [expirePromptOpen, setExpirePromptOpen] = useState(false)
   const [aiLimitPromptOpen, setAiLimitPromptOpen] = useState(false)
@@ -247,8 +252,8 @@ export function ChatRoomPanel({
     currentUserId,
     currentUserDisplayName,
     userLocale: effectiveLocale,
-    // 자동번역 강제는 canAutoTranslate(TRANSLATE 구독) 기준 — TRANSLATE 단독 구독자(tier=FREE)도 사용 가능
-    forceTranslate: !!canAutoTranslate && !!viewLocale,
+    // 자동번역 강제 — 구독자(canAutoTranslate) 또는 오픈프로모 기간(누구나 무료)
+    forceTranslate: effectiveCanAuto && !!viewLocale,
     // TASK-064 Trigger 3: @ai 멘션 한도 초과 → 업그레이드 모달
     onAiLimitExceeded,
     // TASK-062 Trigger 7: 배지 수여 broadcast → 축하 팝업
@@ -393,7 +398,7 @@ export function ChatRoomPanel({
         messages={messages}
         currentUserId={currentUserId}
         canTip={canTip}
-        canAutoTranslate={canAutoTranslate}
+        canAutoTranslate={effectiveCanAuto}
         userLocale={effectiveLocale}
         prependMessages={prependMessages}
         onUpgradeForTip={onUpgradeForTip}

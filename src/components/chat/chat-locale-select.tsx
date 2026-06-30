@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { useOpenPromoActive } from '@/components/feature-flag-provider'
 
 // PyTranslate™ 방 헤더 번역 언어 콤보 — 선택한 언어로 방 전체 메시지를 강제 번역
 // i18n_cntry_mst 단일 소스: locale_cd 매핑된 국가만 노출 (컬러 국기 + 자국어 나라명)
@@ -54,6 +55,10 @@ export function ChatLocaleSelect({
   isSubscribed: boolean
 }) {
   const [open, setOpen] = useState(false)
+  // 오픈프로모 기간엔 누구나 자동번역 콤보 사용 가능(서버 applyPromoGate가 요금 0).
+  //   프로모 종료 시 다시 구독자 전용으로 복귀(유료 전환). 단일 소스 useOpenPromoActive.
+  const promoActive = useOpenPromoActive()
+  const enabled = isSubscribed || promoActive
   const [countries, setCountries] = useState<Country[]>([])
   // 같은 locale_cd를 여러 국가가 공유(en: 미국·영국 등 6개국)하므로
   // 사용자가 클릭한 국가를 별도 기억해 트리거·체크 표시에 사용한다
@@ -96,21 +101,23 @@ export function ChatLocaleSelect({
 
   const autoLabel = isSubscribed
     ? '🌐 구독특혜 PyTranslate™'
-    : '🔒 구독특혜 PyTranslate™'
+    : promoActive
+      ? '🌐 이벤트 무료 PyTranslate™'
+      : '🔒 구독특혜 PyTranslate™'
 
   return (
     <div className="relative shrink-0" ref={containerRef}>
       {/* ── 트리거 ── */}
       <button
         onClick={() => setOpen((o) => !o)}
-        disabled={!isSubscribed}
+        disabled={!enabled}
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label="번역 언어 선택"
         title={
-          isSubscribed
+          enabled
             ? '이 방의 메시지를 선택한 언어로 번역해서 보여줍니다'
-            : '구독 서비스를 신청한 회원만 사용할 수 있습니다'
+            : '구독 회원만 사용할 수 있습니다 (오픈 이벤트 기간엔 누구나 무료)'
         }
         className="bg-background focus:ring-primary/50 flex max-w-[10rem] items-center gap-1 rounded-md border px-2 py-1 text-[9px] outline-none focus:ring-2 disabled:cursor-not-allowed disabled:opacity-50"
       >
@@ -139,7 +146,7 @@ export function ChatLocaleSelect({
       </button>
 
       {/* ── 드롭다운 ── */}
-      {open && isSubscribed && (
+      {open && enabled && (
         <div
           role="listbox"
           aria-label="번역 언어 목록"
