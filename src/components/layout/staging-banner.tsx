@@ -1,3 +1,4 @@
+import { getTranslations } from 'next-intl/server'
 import { resolveDbConfig } from '@/lib/db-env'
 
 /**
@@ -6,20 +7,20 @@ import { resolveDbConfig } from '@/lib/db-env'
  * Pi Testnet의 흑황 줄무늬처럼 "여긴 실서비스가 아니다"를 한눈에 알린다.
  * prod에선 null → 운영 화면엔 절대 노출 안 됨.
  */
-export function StagingBanner() {
+export async function StagingBanner() {
   const { tier, readOnly } = resolveDbConfig()
   if (tier !== 'staging') return null
 
-  const dbLabel = readOnly ? '운영DB 읽기전용 🔒' : '개발DB'
+  const t = await getTranslations('common')
+  const label = readOnly ? t('stagingBannerReadOnly') : t('stagingBanner')
 
   return (
     <div
       role="status"
-      aria-label={`Staging 환경 · ${dbLabel}`}
+      aria-label={label}
       className="w-full border-b-2 border-dashed border-amber-700 bg-amber-300 py-1 text-center text-xs font-bold tracking-wide text-amber-950 dark:border-amber-500 dark:bg-amber-400"
     >
-      🧪 STAGING 환경 · {dbLabel}{' '}
-      <span className="font-normal opacity-80">— 실데이터 아님</span>
+      {label}
     </div>
   )
 }
