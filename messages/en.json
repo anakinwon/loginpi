@@ -2644,5 +2644,16 @@
     "skipped": "Skipped due to earlier check failure",
     "subtitle": "Diagnoses WebRTC voice call support on a real Pi Browser device.",
     "title": "🎙️ PyVoice™ S0 Spike"
+  },
+  "openPromo": {
+    "title": "🎉 Grand Open Event",
+    "subtitle": "All Platform Fees — Completely Free",
+    "desc": "Enjoy PyCafé™ in the Pi ecosystem to your heart's content. ☕",
+    "periodLabel": "Duration",
+    "periodValue": "~ Until our users are fully satisfied",
+    "targetLabel": "Eligible",
+    "targetValue": "Pioneers",
+    "benefitLabel": "Benefits",
+    "benefitValue": "Free cafe creation · Free entry · Free auto-translation"
   }
 }

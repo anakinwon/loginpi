@@ -2644,5 +2644,16 @@
       "PRODUCT_ORDER": "상품 구매",
       "UNKNOWN": "기타"
     }
+  },
+  "openPromo": {
+    "title": "🎉 그랜드 오픈 이벤트",
+    "subtitle": "플랫폼 요금 전액 무료",
+    "desc": "파이 생태계의 카페, 지금 마음껏 누리세요. ☕",
+    "periodLabel": "기간",
+    "periodValue": "~ 고객이 만족할 때까지",
+    "targetLabel": "대상",
+    "targetValue": "파이오니어",
+    "benefitLabel": "혜택",
+    "benefitValue": "카페 무료 생성 · 무료 참여 · 무료 자동번역"
   }
 }
