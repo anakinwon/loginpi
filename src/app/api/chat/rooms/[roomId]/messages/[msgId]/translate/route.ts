@@ -118,6 +118,31 @@ export async function POST(request: NextRequest, { params }: Params) {
     }
   }
 
+  // 비구독자 무료(프로모) 신규 번역은 일일 한도 사전 차단 — 캐시 히트는 무차감·허용(이미 번역됨).
+  //   ⚠️ 사후 카운팅이면 granted=0이어도 이미 번역돼 차단 불가(무제한 번역 버그) → 반드시 번역 전 확인.
+  if (!isSubscriber && feeBean === 0) {
+    const { data: cacheHit } = await getSupabaseAdmin()
+      .from('msg_trans')
+      .select('msg_id')
+      .eq('msg_id', msgId)
+      .eq('locale_cd', localeCd)
+      .eq('del_yn', 'N')
+      .maybeSingle()
+    if (!cacheHit) {
+      const q = await consumeTransQuota(user.id, 1)
+      if (q.granted < 1) {
+        return NextResponse.json(
+          {
+            error:
+              '오늘 무료 번역 한도(10건)를 모두 사용했습니다. 내일 다시 이용해 주세요.',
+            quotaExhausted: true,
+          },
+          { status: 429 },
+        )
+      }
+    }
+  }
+
   try {
     const { transCont, cached } = await getOrTranslateMessage({
       msgId,
@@ -125,12 +150,6 @@ export async function POST(request: NextRequest, { params }: Params) {
       localeCd,
       msgCont: msg.msg_cont,
     })
-
-    // 비구독자 + 무료(프로모) 신규 번역은 일일 무료 한도 카운터에 합산(캐시·구독자 제외).
-    //   batch 경로와 같은 카운터를 공유해 합산 정확. 차단은 batch가 주도(개별은 수동 소량).
-    if (!isSubscriber && feeBean === 0 && !cached) {
-      await consumeTransQuota(user.id, 1)
-    }
 
     // 비구독자 + 신규 번역(캐시 미스)만 과금 — 캐시 재사용·PI 모드(feeBean=0)는 무료
     if (!isSubscriber && feeBean > 0 && !cached) {
