@@ -12,11 +12,21 @@ interface Topic {
   steps: string[]
 }
 
+// 임시 숨김 주제 — i18n 데이터(adminStats.manual.topics)는 보존하고 렌더만 제외한다(삭제 아님).
+//   나중에 되살리려면 이 집합에서 해당 icon을 빼면 됨 (2026-07-01 마스터 요청).
+//   🎁 이벤트 · 🪙 테스트넷 보상. icon은 모든 locale 공통이라 다국어 안전.
+//   (🎫는 'Pi 구독(PiRC2)'로 개편해 유지 — 숨김 대상 아님)
+const HIDDEN_TOPIC_ICONS = new Set(['🎁', '🪙'])
+
 export function UserManual() {
   const t = useTranslations('adminStats.manual')
   // 배열 가드 — 번역 병합 이상 등으로 배열이 아니면 빈 배열로(크래시 방지)
   const rawTopics = t.raw('topics')
-  const topics: Topic[] = Array.isArray(rawTopics) ? (rawTopics as Topic[]) : []
+  const allTopics: Topic[] = Array.isArray(rawTopics)
+    ? (rawTopics as Topic[])
+    : []
+  // 숨김 주제 제외(데이터는 보존) — icon 기준이라 모든 locale에서 동일하게 숨겨진다
+  const topics = allTopics.filter((tp) => !HIDDEN_TOPIC_ICONS.has(tp.icon))
   // 운영(메인넷)에선 바깥 카드 기본 펼침, staging·dev는 기본 접힘 (server 주입값 — hydration 일치)
   const { isProd } = useFeatureFlags()
   const [open, setOpen] = useState(isProd)
