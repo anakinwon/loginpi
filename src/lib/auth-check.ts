@@ -7,6 +7,7 @@ import {
   getUserById,
   getUserByPiUid,
   getUserByGoogleId,
+  getUserByGoogleEmail,
   touchLastLogin,
 } from './users'
 import type { PiSessionUser } from '@/types/pi-session'
@@ -66,25 +67,26 @@ export async function getSessionUser(): Promise<UserRow | null> {
     }
   }
 
-  // 2. Google(NextAuth) 세션 확인
+  // 2. Google(NextAuth) 세션 확인 — stale JWT 대비 3단 폴백으로 사용자 복원.
+  //    JWT의 userId(UUID)는 운영 DB 재적재 시 orphan이 될 수 있는 가변 키다.
+  //    → userId(UUID) → google_id(sub) → google_email(불변 키) 순으로 조회해
+  //    id가 바뀌어도 재로그인 없이 세션을 복원한다.
   const googleSession = await auth()
   if (googleSession?.user?.id) {
-    const user = await getUserById(googleSession.user.id)
+    let user = await getUserById(googleSession.user.id)
+    // fallback①: userId가 orphan/Google sub(비-UUID)일 때 google_id로 조회
+    if (!user && googleSession.user.sub) {
+      user = await getUserByGoogleId(googleSession.user.sub)
+    }
+    // fallback②: 그래도 없으면 불변 키인 google_email로 조회
+    //   (DB 재적재로 id·google_id가 모두 어긋난 경우의 최종 안전망)
+    if (!user && googleSession.user.email) {
+      user = await getUserByGoogleEmail(googleSession.user.email)
+    }
     if (user) {
       if (!user.pi_uid) return null // Pi 미연동 계정 — 1인 1계정 원칙 차단
       touchLastLogin(user.id) // 일반 브라우저 세션 유지 접속도 기록 (5분 스로틀)
       return user
-    }
-    // fallback: session.user.id가 Google sub(비-UUID)일 때 — token.userId가 null이었던 구버전 세션
-    // 새 로그인에서는 auth.ts JWT 콜백이 Pi 미연동이면 userId=null을 반환하므로 이 경로는 점차 사라진다
-    const sub = googleSession.user.sub
-    if (sub) {
-      const userBySub = await getUserByGoogleId(sub)
-      if (userBySub) {
-        if (!userBySub.pi_uid) return null // Pi 미연동 계정 차단
-        touchLastLogin(userBySub.id)
-        return userBySub
-      }
     }
   }
 

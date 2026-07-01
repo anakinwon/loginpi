@@ -124,11 +124,12 @@ export async function updatePiUserWithGoogle(
 }
 
 export async function getUserById(id: string): Promise<UserRow | null> {
+  // .single()은 0행일 때 에러를 던진다(CLAUDE.md 규칙) → orphan id 대비 .maybeSingle()
   const { data } = await getSupabaseAdmin()
     .from('sys_user')
     .select()
     .eq('id', id)
-    .single()
+    .maybeSingle()
   return (data as UserRow) ?? null
 }
 
@@ -208,6 +209,24 @@ export async function getUserByGoogleId(
     .select()
     .eq('google_id', googleId)
     .eq('del_yn', 'N')
+    .maybeSingle()
+  return (data as UserRow) ?? null
+}
+
+// google_email로 조회 — stale JWT(orphan userId)·google_id 불일치 시 최종 폴백.
+// 이메일은 불변 키라 DB 재적재로 sys_user.id가 재생성돼도 본인을 찾는다.
+// Pi 연동(pi_uid 보유) 활성 행만, 최古 1건. (getSessionUser가 pi_uid 없으면 차단하므로 보유 행 우선)
+export async function getUserByGoogleEmail(
+  email: string,
+): Promise<UserRow | null> {
+  const { data } = await getSupabaseAdmin()
+    .from('sys_user')
+    .select()
+    .eq('google_email', email)
+    .eq('del_yn', 'N')
+    .not('pi_uid', 'is', null)
+    .order('reg_dtm', { ascending: true })
+    .limit(1)
     .maybeSingle()
   return (data as UserRow) ?? null
 }
