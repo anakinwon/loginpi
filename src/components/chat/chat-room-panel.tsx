@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
 import { useLocale } from 'next-intl'
-import { Link } from '@/i18n/navigation'
+import { Link, useRouter } from '@/i18n/navigation'
 import { useChatRoom, type ChatMessage } from '@/hooks/use-chat-room'
 import { piFetch } from '@/lib/pi-fetch'
 import { ChatMessageList } from './chat-message-list'
@@ -47,8 +47,11 @@ export function ChatRoomPanel({
   capacityAlert = false,
 }: ChatRoomPanelProps) {
   const urlLocale = useLocale()
+  const router = useRouter()
   // '' = 자동 (URL locale 기준 수신 번역만) / locale 코드 = 이 방 전체 강제 번역
   const [viewLocale, setViewLocale] = useState('')
+  // 직거래 문의방 수동 만기 진행 상태
+  const [expiring, setExpiring] = useState(false)
   // Bean 선물은 모든 사용자 허용 — 항상 활성(잔액 부족은 전송 시 차단)
   const [canTip] = useState(true)
   // 자동번역 자격 — undefined(확인 전)면 수동 번역 버튼 미노출(깜빡임 방지)
@@ -182,6 +185,26 @@ export function ChatRoomPanel({
       .catch(() => {})
   }, [roomId])
 
+  // 직거래 문의방 수동 만기 — 당사자가 거래 종료 시 즉시 목록에서 제거(expr_dtm=now)
+  async function expireDirectRoom() {
+    if (
+      !confirm(
+        '이 직거래 문의를 지금 만기할까요?\n만기하면 목록에서 사라집니다.',
+      )
+    )
+      return
+    setExpiring(true)
+    try {
+      const r = await piFetch(`/api/chat/rooms/${roomId}/expire`, {
+        method: 'POST',
+      })
+      if (r.ok) router.push('/chat')
+      else setExpiring(false)
+    } catch {
+      setExpiring(false)
+    }
+  }
+
   const onUpgradeForTip = useCallback(() => setTipPromptOpen(true), [])
   const onAiLimitExceeded = useCallback(
     (info?: {
@@ -299,6 +322,18 @@ export function ChatRoomPanel({
             </p>
           )}
         </div>
+        {/* 직거래 문의방 수동 만기 — 당사자가 거래 종료 시 즉시 목록에서 제거 */}
+        {themeCd === 'DIRECT' && (
+          <button
+            onClick={expireDirectRoom}
+            disabled={expiring}
+            className="shrink-0 text-2xl transition-transform hover:scale-110 disabled:opacity-50"
+            aria-label="문의 만기"
+            title="직거래 문의 만기 (목록에서 제거)"
+          >
+            🗑️
+          </button>
+        )}
         {/* 방장 전용 카페 수정 버튼 */}
         {isOwner && roomSettings && (
           <button

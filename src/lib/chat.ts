@@ -202,20 +202,38 @@ export async function getOrCreateDirectRoom(
         .eq('del_yn', 'N')
         .single()
 
-      if (otherMbr) return room as MsgRoom
+      if (otherMbr) {
+        // 재문의 = 재활성: 만료 12시간 연장 + 직거래 규격으로 정규화(과거 'Direct'/'CODING' 방 포함).
+        //   만료돼 목록에서 사라졌던 방도 다시 문의하면 되살아난다(대화 이력 보존).
+        const exp = new Date(Date.now() + 12 * 3600 * 1000).toISOString()
+        const { data: reactivated } = await supabase
+          .from('msg_room')
+          .update({
+            expr_dtm: exp,
+            room_nm: '직거래 문의',
+            theme_cd: 'DIRECT',
+            modr_id: displayName1.slice(0, 20),
+          })
+          .eq('room_id', room.room_id)
+          .select()
+          .single()
+        return (reactivated ?? room) as MsgRoom
+      }
     }
   }
 
-  // 신규 Direct Room 생성
+  // 신규 직거래 문의방 생성 — 당사자 2명 전용·비공개·12시간 후 자동 만료(expr_dtm)
   const slug = displayName1.slice(0, 20)
+  const exp = new Date(Date.now() + 12 * 3600 * 1000).toISOString()
   const { data: room, error } = await supabase
     .from('msg_room')
     .insert({
-      room_nm: 'Direct',
-      theme_cd: 'CODING', // Direct Room은 테마 무관 — BASIC 기본값
+      room_nm: '직거래 문의',
+      theme_cd: 'DIRECT', // 직거래 전용 시스템 테마 (use_yn='N', sql/158)
       room_tp_cd: 'D',
       max_mbr_cnt: 2,
       is_public_yn: 'N',
+      expr_dtm: exp,
       regr_id: slug,
       modr_id: slug,
     })

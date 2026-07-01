@@ -37,6 +37,11 @@ export default async function ChatRoomPage({ params }: Params) {
 
   if (!room) redirect(`/${locale}/chat`)
 
+  // 직거래 문의방(Direct): 12시간 만료 시 당사자도 접근 차단 (목록에서 사라진 것과 일관)
+  if (room.room_tp_cd === 'D' && isRoomExpired(room)) {
+    redirect(`/${locale}/chat`)
+  }
+
   // 비멤버: 공개 그룹방·공개 이벤트방만 입장 허용 (비공개·1:1은 목록으로)
   if (!mbr) {
     const isEvent = room.room_tp_cd === 'E'
