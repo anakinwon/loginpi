@@ -102,6 +102,7 @@ pnpm dlx shadcn@latest add <컴포넌트명>
 
 - **시스템 컬럼 4개** 전 테이블 필수: `regr_id TEXT NOT NULL DEFAULT 'ADMIN'`, `reg_dtm TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP`, `modr_id TEXT NOT NULL DEFAULT 'ADMIN'`, `mod_dtm TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP`
 - **논리삭제**: `del_yn CHAR(1) DEFAULT 'N'` + `del_dtm TIMESTAMPTZ` — **물리 DELETE 절대 금지**
+- **FK(외래키) 제약 절대 금지**: `FOREIGN KEY`/`REFERENCES` 절대 사용 금지 (2026-07-01 마스터 지시, 무FK 원칙). 참조 무결성은 **애플리케이션 레벨**(논리삭제 `del_yn` + 별도 조회·Map 병합)에서 보장한다. 이유: ①FK의 쓰기 성능 저하 방지 ②PostgREST 임베디드 조인 미사용 관례(`.select('t:fk(...)')` 금지, `usr_id`로 별도 `.in()` 조회 후 병합)와 정합. 기존 62개 FK는 `sql/155`로 일괄 제거. **신규 DDL에 FK 절대 추가 금지** — 대신 앱에서 고아 참조를 방지·정리할 것.
 - 복합어: REGR(등록자), MODR(변경자), PYMNT(결제), CTGR(카테고리)
 - 도메인 약어: `_id`(식별자), `_nm`(이름), `_cd`(코드), `_yn`(여부), `_dtm`(일시), `_dt`(날짜)
 - `sql/*.sql` 작성 시 `da-ddl-guard` Hook 자동 검사 → 위반 차단, DA 승인(`-- DA-APPROVED:` 주석) 필요
