@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
-import { Link } from '@/i18n/navigation'
+import { Link, useRouter } from '@/i18n/navigation'
 import { usePiAuth } from '@/components/pi-auth-provider'
 import { piFetch } from '@/lib/pi-fetch'
 import { Button } from '@/components/ui/button'
@@ -145,6 +145,7 @@ export function ClientMyOrders({
   feeMode?: 'BEAN' | 'PI'
 }) {
   const t = useTranslations('store')
+  const router = useRouter()
   const { user, isLoading } = usePiAuth()
   const authed = serverAuthed || !!user
   // 관리자(ADMIN/MASTER)만 전체 주문 보기 토글 노출 (서버도 isAdmin 재검증)
@@ -156,6 +157,29 @@ export function ClientMyOrders({
     id: string
     action: OrderAction
   } | null>(null)
+  const [contactingId, setContactingId] = useState<string | null>(null)
+
+  // 상대방(판매자↔구매자)에게 1:1 문의 — 기존 Direct Room API 재사용(멱등) → 채팅방 이동.
+  //   P2P 직거래엔 연락 수단이 없어(당근 앱 푸시 부재) 거래 당사자 소통의 핵심 경로.
+  async function contactPeer(targetUsrId: string, orderId: string) {
+    setContactingId(orderId)
+    try {
+      const res = await piFetch('/api/chat/rooms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ target_usr_id: targetUsrId }),
+      })
+      if (!res.ok) {
+        const { error } = (await res.json()) as { error?: string }
+        throw new Error(error ?? t('contactFail'))
+      }
+      const { room } = (await res.json()) as { room: { room_id: string } }
+      router.push(`/chat/${room.room_id}`)
+    } catch (e) {
+      setContactingId(null)
+      toast.error(e instanceof Error ? e.message : t('contactFail'))
+    }
+  }
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -535,6 +559,30 @@ export function ClientMyOrders({
               )}
             </div>
           )}
+
+        {/* 판매자↔구매자 1:1 문의 — P2P 직거래(매장 없음)만·취소 주문 제외 */}
+        {o.mps_item?.mps_shop == null && o.order_st_cd !== 'CANCELLED' && (
+          <div className="flex justify-end pt-1">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={contactingId === o.order_id}
+              onClick={() =>
+                contactPeer(
+                  role === 'seller' ? o.buyer_id : o.seller_id,
+                  o.order_id,
+                )
+              }
+            >
+              💬{' '}
+              {contactingId === o.order_id
+                ? t('contactStarting')
+                : role === 'seller'
+                  ? t('contactBuyer')
+                  : t('contactSeller')}
+            </Button>
+          </div>
+        )}
       </div>
     )
   }

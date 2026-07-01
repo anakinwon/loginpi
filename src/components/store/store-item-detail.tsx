@@ -74,6 +74,7 @@ export function StoreItemDetail({ itemId }: { itemId: string }) {
   )
   const [activeImg, setActiveImg] = useState<string | null>(null)
   const [buying, setBuying] = useState(false)
+  const [contacting, setContacting] = useState(false)
   // 주문방법 3종 (기본 매장이용) + 배달주소
   const [orderMthd, setOrderMthd] = useState<'DINE_IN' | 'PICKUP' | 'DELIVERY'>(
     'DINE_IN',
@@ -222,6 +223,33 @@ export function StoreItemDetail({ itemId }: { itemId: string }) {
     } catch (e) {
       setBuying(false)
       toast.error(e instanceof Error ? e.message : t('buyFail'))
+    }
+  }
+
+  // 판매자에게 1:1 문의 — 기존 Direct Room API 재사용(멱등). 생성/조회 후 채팅방 이동.
+  //   P2P 직거래엔 연락 수단이 없어(당근 앱 푸시 부재) 이 진입점이 채팅 시작의 유일 경로.
+  async function contactSeller() {
+    const activeUser = user ?? (await signIn({ silent: true }))
+    if (!activeUser) {
+      toast.error(t('loginRequired'))
+      return
+    }
+    setContacting(true)
+    try {
+      const res = await piFetch('/api/chat/rooms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ target_usr_id: item!.seller_id }),
+      })
+      if (!res.ok) {
+        const { error } = (await res.json()) as { error?: string }
+        throw new Error(error ?? t('contactFail'))
+      }
+      const { room } = (await res.json()) as { room: { room_id: string } }
+      router.push(`/chat/${room.room_id}`)
+    } catch (e) {
+      setContacting(false)
+      toast.error(e instanceof Error ? e.message : t('contactFail'))
     }
   }
 
@@ -524,6 +552,18 @@ export function StoreItemDetail({ itemId }: { itemId: string }) {
                           ? t('notOnSale')
                           : t('soldOut')}
                 </Button>
+                {/* 판매자에게 문의 — P2P 직거래(매장 없음)만: 연락 수단이 없어 채팅이 유일 소통 경로 */}
+                {!item.shop && (
+                  <Button
+                    variant="outline"
+                    onClick={contactSeller}
+                    disabled={contacting}
+                    className="w-full"
+                    size="lg"
+                  >
+                    💬 {contacting ? t('contactStarting') : t('contactSeller')}
+                  </Button>
+                )}
               </div>
             )}
             <p className="text-muted-foreground mt-2 text-center text-xs">

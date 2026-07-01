@@ -2224,6 +2224,10 @@
     "buyEscrow": "🛒 구매하기 (에스크로 결제)",
     "buySuccess": "에스크로 결제 완료! 판매자와 거래를 진행하세요",
     "buyFail": "구매 처리에 실패했습니다",
+    "contactSeller": "판매자에게 문의",
+    "contactBuyer": "구매자에게 문의",
+    "contactStarting": "대화방 여는 중…",
+    "contactFail": "문의를 시작하지 못했습니다",
     "escrowNotice": "결제한 Pi는 에스크로에 안전하게 보관되며, 양측 거래 확인 후 판매자에게 전달됩니다",
     "cnd": {
       "NEW": "새상품",
