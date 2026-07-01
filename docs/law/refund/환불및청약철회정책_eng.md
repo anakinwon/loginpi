@@ -349,5 +349,5 @@ Step 1: Consumer application → Step 2: Preliminary investigation → Step 3: M
 
 **Contact Information**
 - Email: anakin.won@gmail.com
-- Address: [Company Registration Address]
+- Address: Seoul, Jung-gu, Jungnim-ro 21, The Place Chungjeongro
 - Business Registration Number: (In Preparation)

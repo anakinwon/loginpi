@@ -258,5 +258,5 @@ In interpreting these Terms, the interpretation most favorable to the Member app
 ---
 
 **Contact**: anakin.won@gmail.com  
-**Address**: (Company Registration Address)  
+**Address**: Seoul, Jung-gu, Jungnim-ro 21, The Place Chungjeongro  
 **Business Registration Number**: (In Preparation)

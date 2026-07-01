@@ -100,9 +100,9 @@ Rights may be exercised through the in-app settings menu or the contact informat
 
 | Item | Details |
 |------|---------|
-| Name | [Name] |
-| Title | [Title] |
-| Contact | [Email / Phone] |
+| Name | Anakin Won |
+| Title | CTO |
+| Contact | anakin.won@gmail.com |
 
 ---
 

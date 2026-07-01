@@ -14,10 +14,10 @@ Cafe.pi (hereinafter "Company") establishes and operates this Privacy Policy to 
 
 ### Article 2: Personal Information Protection Officer and Department
 **Personal Information Protection Officer**
-- Name: [To be designated]
-- Title: CEO
+- Name: Anakin Won
+- Title: CTO
 - Email: anakin.won@gmail.com
-- Address: [Company Registration Address]
+- Address: Seoul, Jung-gu, Jungnim-ro 21, The Place Chungjeongro
 
 Members experiencing issues with personal information can immediately contact the officer above.
 
@@ -319,5 +319,5 @@ See Article 4
 
 **Contact Information**
 - Email: anakin.won@gmail.com
-- Address: [Company Registration Address]
+- Address: Seoul, Jung-gu, Jungnim-ro 21, The Place Chungjeongro
 - Business Registration Number: (In Preparation)

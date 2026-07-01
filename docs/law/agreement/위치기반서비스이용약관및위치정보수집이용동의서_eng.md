@@ -1,123 +1,122 @@
-# Location-Based Service Terms and Consent to Collection and Use of Location Information
+# Location-Based Service Terms and Location Information Collection and Use Agreement
 
-> **[App Name]** (the "Company" or the "Service")
-> Effective Date: ____ __, 20__
+> **Cafe.pi** (hereinafter "Company" or "Service")
+> Effective Date: June 12, 2026
 
 ---
 
 ## Article 1 (Purpose)
 
-These Terms set forth the rights, obligations, and responsibilities between the Company and the subject of personal location information (the "User") in connection with the use of the location-based services provided by the Company (the "Service").
+These Terms govern the rights and obligations of the Company and location information subjects (hereinafter "Users") regarding the use of location-based services (hereinafter "Service") provided by the Company, and establish other necessary provisions.
 
-## Article 2 (Effect and Amendment of the Terms)
+## Article 2 (Force and Amendment of Terms)
 
-1. These Terms take effect upon the User's consent.
-2. The Company may amend these Terms within the scope permitted by the Act on the Protection and Use of Location Information (the "Location Information Act"), the Personal Information Protection Act, and other applicable laws of the Republic of Korea.
-3. When amending these Terms, the Company will announce the effective date and reasons for the amendment via in-app notice at least 7 days prior to the effective date, or at least 30 days prior if the amendment materially affects the User's rights or obligations.
+1. These Terms take effect upon User consent.
+2. The Company may amend these Terms within the scope not violating the Location Information Protection Act (hereinafter "Location Information Act"), Personal Information Protection Act, and other applicable laws.
+3. When amending these Terms, the Company specifies the effective date and reason for amendment and notifies Users through service announcements at least 7 days before the effective date. However, amendments that materially affect Users' rights and obligations require notification at least 30 days in advance.
 
-## Article 3 (Location Information Collected and Collection Methods)
+## Article 3 (Items and Method of Location Information Collection)
 
 The Company collects the following location information:
 
-| Item | Details |
-|------|---------|
-| Items collected | Device location information (latitude/longitude) via GPS, Wi-Fi, and cell tower data |
-| Collection method | Collected through the device's location features (e.g., browser Geolocation API) |
-| When collected | Only when the User activates a location-based feature and grants location permission on the device |
+| Category | Content |
+|---|---|
+| Collection Items | Location information (latitude and longitude) via GPS, Wi-Fi, and mobile base station information from user devices |
+| Collection Method | Collected through the device's location information provision feature (browser Geolocation API, etc.) |
+| Collection Timing | Only when User activates location-based features and grants location permission on the device |
 
-## Article 4 (Purposes of Use of Location Information)
+## Article 4 (Purpose of Location Information Use)
 
-The Company uses collected location information solely for the following purposes:
+The Company uses collected location information only for the following purposes:
 
-1. Discovering and matching nearby users
-2. Providing location-based content (nearby chat rooms, regional recommendations, etc.)
-3. Preventing fraudulent use and maintaining service stability
-4. Statistical analysis and service improvement (processed in a form that cannot identify individuals)
+1. Provision of nearby user discovery and matching services
+2. Provision of location-based content (nearby chat rooms, region-based recommendations, etc.)
+3. Prevention of fraudulent use and service stability assurance
+4. Compilation of statistics and service improvement (in which case information is processed in a form that does not identify individuals)
 
-## Article 5 (Retention and Use Period)
+## Article 5 (Retention and Use Period of Location Information)
 
-1. As a rule, the Company **destroys location information immediately after the purpose of collection has been fulfilled** and does not store it except for temporary processing necessary to provide the Service.
-2. However, pursuant to Article 16(2) of the Location Information Act, records confirming the collection, use, and provision of location information are **automatically recorded and retained in the location information system for at least 6 months**.
-3. If the User requests account deletion or withdraws consent, the Company will destroy the information without delay, except for records that must be retained under applicable laws.
+1. The Company **destroys location information immediately after achieving the collection purpose**, and as a principle does not store it except for temporary processing necessary to provide the Service.
+2. However, in accordance with Article 16, Section 2 of the Location Information Act, **location information collection, use, and provision verification records are automatically recorded and retained in the location information system for 6 months or longer**.
+3. When a User requests withdrawal or consent revocation, the Company destroys all information except those required to be retained under applicable law without delay.
 
-## Article 6 (Provision to Third Parties)
+## Article 6 (Third-Party Disclosure of Location Information)
 
-1. The Company does not provide personal location information to third parties without the User's prior consent.
-2. Where the Company provides personal location information to a third party designated by the User, it will **immediately notify the User of the recipient, the date and time of provision, and the purpose of provision**.
-3. Exceptions apply in the following cases:
-   - Where records confirming the collection, use, and provision of location information are requested by investigative or other authorities pursuant to applicable laws
-   - Where otherwise required by law
+1. The Company does not disclose personal location information to third parties without prior User consent.
+2. When disclosing personal location information to a third party designated by the User, the Company **immediately notifies the User of the recipient, date of disclosure, and purpose of disclosure**.
+3. Exceptions to the above:
+   - When location information collection, use, and provision verification materials are required and a request is made by investigation authorities in accordance with applicable law
+   - When required by other applicable laws
 
-## Article 7 (Rights of the Subject of Personal Location Information)
+## Article 7 (Rights of Location Information Subjects)
 
-1. The User may at any time **withdraw all or part of their consent** to the collection, use, or provision of location information.
-2. The User may at any time request a **temporary suspension** of the collection, use, or provision of their personal location information, and the Company may not refuse such request.
-3. The User may request access to or notification of the following records, and may request correction of any errors:
-   - Records confirming the collection, use, and provision of the User's location information
-   - The reasons and details of any provision of the User's personal location information to third parties under the Location Information Act or other laws
-4. Consent may be withdrawn, and suspension requested, through the following means:
-   - In-app menu: [Settings > Location Settings]
-   - Disabling location permission in the device settings
-   - Customer support email: [Email Address]
+1. Users may **withdraw consent for location information collection, use, and disclosure in whole or in part** at any time.
+2. Users may request **suspension of location information collection, use, and disclosure** at any time, and the Company cannot refuse such requests.
+3. Users may request inspection or notification of the following materials, and request corrections if errors exist:
+   - Verification materials regarding their location information collection, use, and disclosure facts
+   - The reason and content of third-party disclosure of personal location information under the Location Information Act or other laws
+4. Consent withdrawal and suspension may be made by:
+   - [Settings > Location Information Settings] menu within the app
+   - Location permission revocation in device (smartphone) settings
+   - Customer support email: anakin.won@gmail.com
 
-## Article 8 (Rights of Guardians of Children Aged 8 or Younger, etc.)
+## Article 8 (Rights of Guardians of Children Aged 8 or Under)
 
-1. Where a guardian consents to the collection, use, or provision of location information for the protection of the life or physical safety of any of the following persons ("Children Aged 8 or Younger, etc."), such consent is deemed to be the consent of the person concerned:
-   - A child aged 8 or younger
-   - A person under adult guardianship
-   - A person with a severe mental disability as defined under the Welfare of Persons with Disabilities Act of Korea
-2. A guardian giving such consent must submit a written consent form to the Company together with documentation proving guardian status.
-3. The guardian may exercise all rights of the User with respect to the personal location information of Children Aged 8 or Younger, etc.
+1. When a guardian provides consent for location information collection, use, and disclosure for the protection of the life or body of those falling under one of the following (hereinafter "children aged 8 or under"), the Company deems it as consent from the individual:
+   - Children aged 8 or under
+   - Legally assisted persons
+   - Persons with severe mental disabilities under the Welfare of Persons with Disabilities Act
+2. When a guardian provides consent, a written document proving guardianship must be attached to the written consent form and submitted to the Company.
+3. Guardians may exercise all Users' rights regarding personal location information of children aged 8 or under.
 
 ## Article 9 (Location Information Manager)
 
-The Company designates and operates a Location Information Manager to properly manage and protect location information and to handle User complaints.
+The Company designates and operates a location information manager to appropriately manage and protect location information and smoothly handle User complaints.
 
-| Item | Details |
-|------|---------|
-| Name | [Name] |
-| Title | [Title] |
-| Contact | [Email / Phone] |
+| Category | Content |
+|---|---|
+| Name | Anakin Won |
+| Title | CTO |
+| Contact | anakin.won@gmail.com |
 
 ## Article 10 (Damages)
 
-1. If the User suffers damage due to the Company's violation of Articles 15 through 26 of the Location Information Act, the User may claim damages from the Company. The Company shall not be exempt from liability unless it proves the absence of intent or negligence.
-2. If the Company suffers damage due to the User's violation of these Terms, the Company may claim damages from the User.
+1. If a User suffers damages as a result of the Company's violation of Articles 15-26 of the Location Information Act, the User may claim damages from the Company. In such case, the Company cannot be exempted from liability unless it proves the absence of intention or negligence.
+2. If a User violates these Terms and damages result to the Company, the Company may claim damages from the User.
 
-## Article 11 (Dispute Resolution)
+## Article 11 (Dispute Mediation)
 
-1. If a dispute concerning location information cannot be resolved through consultation with the User, the Company may apply to the Korea Communications Commission for adjudication.
-2. Either the Company or the User may apply to the Personal Information Dispute Mediation Committee for mediation of disputes concerning personal location information.
+1. If the Company and User cannot reach an agreement regarding disputes related to location information or agreement is impossible, the Company may apply for arbitration by the Ministry of Science and ICT.
+2. The Company or User may apply for mediation regarding disputes related to personal location information to the Personal Information Dispute Mediation Committee.
 
 ## Article 12 (Company Contact Information)
 
-| Item | Details |
-|------|---------|
-| Company name | [Company / Business Name] |
-| Representative | [Representative Name] |
-| Address | [Business Address] |
-| Email | [Email Address] |
+| Category | Content |
+|---|---|
+| Business Name | Cafe.pi |
+| Address | Seoul, Jung-gu, Jungnim-ro 21, The Place Chungjeongro |
+| Email | anakin.won@gmail.com |
 
 ---
 
-## Addendum
+## Supplementary Provisions
 
-1. These Terms take effect as of ____ __, 20__.
+1. These Terms take effect on June 12, 2026.
 
 ---
 
-# Consent to Collection and Use of Location Information (Summary Form)
+# Location Information Collection and Use Consent (Summary Agreement)
 
-Summary version displayed upon registration or first use of a location feature.
+This is a summary consent form displayed when accessing the service or when location features are first executed.
 
-> **[Required/Optional] Consent to Collection and Use of Location Information**
+> **[Required/Optional] Location Information Collection and Use Consent**
 >
-> | Item | Details |
-> |------|---------|
-> | Items collected | Device location information (latitude/longitude) |
-> | Purpose | Discovering nearby users, providing location-based content |
-> | Retention period | Destroyed immediately after the purpose is fulfilled (records under the Location Information Act retained for 6 months) |
+> | Item | Content |
+> |---|---|
+> | Collection Items | Device location information (latitude and longitude) |
+> | Purpose of Use | Discovery of nearby users, provision of location-based content |
+> | Retention Period | Immediately destroyed after achieving purpose (however, verification materials under the Location Information Act are retained for 6 months) |
 >
-> ※ You have the right to refuse consent. If you refuse, location-based features may be restricted. You may withdraw consent at any time via the [Settings] menu.
+> ※ You have the right to refuse consent, and if you refuse, use of location-based features may be restricted. You may withdraw consent at any time via the [Settings] menu even after providing consent.
 >
 > ☐ I agree  ☐ I do not agree
