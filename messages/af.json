@@ -936,77 +936,77 @@
       "topics": [
         {
           "icon": "⭐",
+          "title": "Hoekom Cafe.pi?",
           "steps": [
-            "Globale 'Wortel': 200+ tale outomatiese vertaling · Pi maklike betaling · Chat·tweedehandse·winkel in een app · Verbind volgens afstand",
-            "'Siren Order' wat nie bedryf diskrimineer nie: Enigiemand kan 'n baas wees · Menu vryheid · Onmiddellike kennisgewing · O2O Pickup"
-          ],
-          "title": "Hoekom Cafe.pi?"
+            "Globale 'Wortel': 200+ tale outomatiese vertaling · Pi maklike betaling · Klets·Tweedehandse·Winkel in een app · Verbinding volgens afstand",
+            "'Sirene Bestelling' wat nie bedryf diskrimineer nie: Enigiemand kan 'n eienaar wees · Vrye spyskaart · Onmiddellike kennisgewings · O2O afhaal"
+          ]
         },
         {
           "icon": "🎁",
+          "title": "Event — Neem nou deel",
           "steps": [
-            "EVENT #1: Laai met Test Pi en as jy 10 missies voltooi, 5,000 Bean aan die eerste 100 mense",
-            "EVENT #2: Registreer jou winkel en as jy Menu registrasie + transaksie toets voltooi, 10,000 Bean aan die eerste 100 plekke",
-            "In die Event tab, as jy die deelname skakel vir elke missie volg, kan jy dit maklik voltooi"
-          ],
-          "title": "Event — Neem nou deel"
+            "EVENT #1: Laai op met Test Pi en voltooi 10 Missions om 5,000 Bean te ontvang vir die eerste 100 mense",
+            "EVENT #2: Registreer jou winkel en voltooi spyskaartregistrasie + transaksie toets om 10,000 Bean te ontvang vir die eerste 100 plekke",
+            "Jy kan maklik voltooi deur die deelname Link vir elke Mission in die Event-tab te volg"
+          ]
         },
         {
           "icon": "🔑",
+          "title": "Login & Rekeningkoppeling",
           "steps": [
-            "In Pi Browser, as jy 'Genereer verbindingskode' druk, verskyn 'n 6-syfer kode (Gebruik binne 10 minute)",
-            "Kopieer die kode (of skakel) en skuif dit na 'n gewone Browser",
-            "In 'n gewone Browser, na Google Login, plak dit en druk 'Verbind', dan Pi + Google verbinding voltooi",
-            "Pi Browser stoor nie inligting om veiligheidsredes nie, dit verbind die twee Browsers veilig met 'n 6-syfer kode"
-          ],
-          "title": "Login & Rekeningverbinding"
-        },
-        {
-          "icon": "🎫",
-          "steps": [
-            "1 Pi = 100 Bean (Platform-eksklusiewe reserwe) — Jy kan dadelik met 'n gratis Plan begin",
-            "Kies net wat jy nodig het om in te teken: PyCafé™(Premium Cafe) · PyShop™(Produk Registrasie) · PyTranslate™(Onbeperkte Vertaling)",
-            "Subskripsiefooie word met gelaaide Bean betaal, en jaarlikse betaling is 2 maande gratis"
-          ],
-          "title": "Bean & Subskripsie"
+            "Druk 'Genereer koppelings Code' in Pi Browser om 'n 6-syfer Code te kry (gebruik binne 10 minute)",
+            "Kopieer die Code (of Link) en skuif dit na 'n gewone Browser",
+            "Nadat jy by Google in 'n gewone Browser aangemeld het, plak dit en druk 'Koppel' om die Pi + Google-verbinding te voltooi",
+            "Pi Browser stoor nie inligting vir sekuriteitsredes nie, en verbind die twee Browsers veilig met 'n 6-syfer Code"
+          ]
         },
         {
           "icon": "💬",
+          "title": "Kafee & Outomatiese Vertaling (PiRC1)",
           "steps": [
-            "Gaan 'n Cafe kamer van jou belangstelling binne en begin gratis te Chat",
-            "As jy 'Naby Cafe' aanskakel, wys dit nabygeleë Cafes en bure volgens afstand",
+            "Gaan in 'n Kafee-kamer van jou belangstelling en begin gratis klets",
+            "Skakel 'Nabygeleë Kafees' aan om Kafees en bure in die omgewing volgens afstand te sien",
             "Met outomatiese gelyktydige vertaling kan jy met enigiemand in 200+ tale in jou eie taal gesels"
-          ],
-          "title": "Cafe & Outomatiese vertaling"
+          ]
+        },
+        {
+          "icon": "🎫",
+          "title": "Pi Subskripsie (PiRC2)",
+          "steps": [
+            "Kies slegs die funksies wat jy benodig en teken in met Pi — jy kan dadelik met 'n gratis Plan begin",
+            "Teken in op slegs wat jy benodig: PyCafé™ (Premium Kafee) · PyShop™ (Produkregistrasie) · PyTranslate™ (Onbeperkte vertaling)",
+            "Subskripsiefooie word met Pi betaal (PiRC2 herhalende betaling), en jaarlikse betalings is 2 maande gratis"
+          ]
         },
         {
           "icon": "📦",
+          "title": "P2P Tweedehandse Transaksie (PiRC3, Escrow-veilige transaksie)",
           "steps": [
-            "As jy produkfoto's en prys (Pi) oplaai, sal dit aan mense naby jou gewys word saam met jou ligging",
-            "Bekyk items wat naby beskikbaar is volgens afstand en as jy daarvan hou, bestel met Pi",
-            "Die betaalde Pi word tydelik en veilig deur die Platform gehou (eskrow), en aan die verkoper oorgedra wanneer die transaksie voltooi is"
-          ],
-          "title": "Tweedehandse mark (Veilige transaksie)"
+            "Laai produkfoto's en prys (Pi) op, en dit sal aan mense naby jou met jou ligging gewys word",
+            "Kyk na items in die omgewing volgens afstand, en as jy daarvan hou, bestel met Pi",
+            "Die betaalde Pi word tydelik veilig deur die Platform gehou (Escrow), en na die transaksie voltooi is, word dit aan die verkoper oorhandig"
+          ]
         },
         {
           "icon": "🏪",
+          "title": "O2O My Winkelregistrasie, Produkregistrasie (PiRC3, Escrow-veilige transaksie)",
           "steps": [
-            "In 'Winkel Registrasie', as jy die winkelnaam en ligging instel, sal klante na die naaste winkel kom",
-            "Registreer Menu foto's · prys · hoeveelheid",
-            "Wanneer 'n klant bestel, ontvang jy onmiddellik 'n kennisgewing via Telegram (Menu · Hoeveelheid · Bedrag)",
-            "In die volgorde van Voorberei → Gereed → Pickup, gee dit by die winkel oor"
-          ],
-          "title": "My winkel (O2O)"
+            "As jy die winkelnaam en ligging in 'Winkelregistrasie' instel, sal klante na die nabygeleë winkel kom",
+            "Registreer spyskaartfoto's · prys · hoeveelheid",
+            "Wanneer 'n klant bestel, sal jy onmiddellik 'n kennisgewing via Telegram ontvang (spyskaart · hoeveelheid · bedrag)",
+            "Gee dit by die winkel oor in die volgorde: Besig om voor te berei → Voorbereiding voltooi → Afhaal"
+          ]
         },
         {
           "icon": "🪙",
+          "title": "Testnet Beloning, dieselfde op Mainnet (Belofte)",
           "steps": [
-            "Die Bean wat nou van die Testnet Event ontvang is, is cafe.pi se belofte",
-            "Wanneer die Platform amptelik op Mainnet launched word en Bean amptelik uitgereik word,",
-            "Die Event Tokens wat op Testnet verdien is, sal identies 1:1 as Mainnet Bean uitbetaal word",
-            "Dit is cafe.pi se beginsel om te verseker dat die pogings van vroeë deelnemers nie verdwyn nie"
-          ],
-          "title": "Testnet belonings, soos dit is op Mainnet (Beloof)"
+            "Die Bean wat jy nou deur die Testnet Event ontvang het, is 'n belofte van Cafe.pi",
+            "Wanneer die Platform amptelik op Mainnet bekendgestel word,",
+            "Die Event Bean wat op Testnet verdien is, sal dieselfde 1:1 as Mainnet Bean uitbetaal word",
+            "Dit is Cafe.pi se beginsel om te verseker dat die pogings van vroeë deelnemers nie verlore gaan nie"
+          ]
         }
       ]
     },
@@ -1549,6 +1549,7 @@
     "list": {
       "authenticating": "Besig om Pi Account te verifieer...",
       "direct": "Direk",
+      "directCafes": "Direkte transaksie Cafe",
       "discover": "Verken Cafes",
       "expired": "Verval",
       "expiresToday": "Verval vandag",

@@ -936,77 +936,77 @@
       "topics": [
         {
           "icon": "⭐",
+          "title": "Mengapa Cafe.pi?",
           "steps": [
-            "'Danggeun' Global: Terjemahan automatik 200+ bahasa · Pembayaran mudah Pi · Chat, barangan terpakai, kedai dalam satu aplikasi · Sambungan mengikut jarak",
-            "'Siren Order' untuk semua jenis perniagaan: Sesiapa sahaja boleh menjadi pemilik · Menu bebas · Pemberitahuan segera · Pengambilan O2O"
-          ],
-          "title": "Mengapa Cafe.pi?"
+            "Pasaran Tempatan Global: Terjemahan automatik 200+ bahasa · Pembayaran mudah Pi · Sembang, barangan terpakai, kedai dalam satu aplikasi · Sambungan mengikut jarak",
+            "'Siren Order' yang tidak memilih industri: Sesiapa sahaja boleh menjadi pemilik · Menu bebas · Pemberitahuan segera · O2O Pickup"
+          ]
         },
         {
           "icon": "🎁",
+          "title": "Event — Sertai Sekarang",
           "steps": [
-            "EVENT #1: Caj dengan TestPi dan selesaikan 10 misi, 5,000 Bean untuk 100 orang pertama",
-            "EVENT #2: Daftar kedai anda dan selesaikan pendaftaran menu + ujian transaksi, 10,000 Bean untuk 100 kedai pertama",
-            "Di tab Event, ikuti pautan penyertaan untuk setiap misi, anda boleh menyelesaikannya dengan mudah"
-          ],
-          "title": "Event — Sertai sekarang"
+            "EVENT #1: Caj dengan TestPi dan selesaikan 10 Misi, 5,000 Bean untuk 100 orang pertama",
+            "EVENT #2: Daftar kedai anda dan selesaikan pendaftaran Menu + Ujian Transaksi, 10,000 Bean untuk 100 kedai pertama",
+            "Di tab Event, ikuti pautan penyertaan untuk setiap Misi dan anda boleh menyelesaikannya dengan mudah"
+          ]
         },
         {
           "icon": "🔑",
+          "title": "Log Masuk & Sambungan Akaun",
           "steps": [
-            "Dalam Pi Browser, apabila anda menekan 'Jana Kod Sambungan', kod 6 digit akan muncul (Gunakan dalam 10 minit)",
-            "Salin kod (atau pautan) dan pindahkannya ke pelayar biasa",
-            "Dalam pelayar biasa, selepas log masuk Google, tampal dan tekan 'Sambungkan', sambungan Pi + Google selesai",
-            "Pi Browser tidak menyimpan maklumat atas sebab keselamatan, jadi kod 6 digit menyambungkan kedua-dua pelayar dengan selamat"
-          ],
-          "title": "Log Masuk & Sambungan Akaun"
-        },
-        {
-          "icon": "🎫",
-          "steps": [
-            "1 Pi = 100 Bean (Mata ganjaran eksklusif platform) — Anda boleh bermula segera dengan pelan percuma",
-            "Pilih dan langgan apa yang anda perlukan sahaja: PyCafé™ (Kafe Premium) · PyShop™ (Pendaftaran Produk) · PyTranslate™ (Terjemahan Tanpa Had)",
-            "Yuran langganan dibayar dengan Bean yang dicaj, dan pembayaran tahunan mendapat 2 bulan percuma"
-          ],
-          "title": "Bean & Langganan"
+            "Di Pi Browser, apabila anda menekan 'Jana Kod Sambungan', kod 6 digit akan muncul (Gunakan dalam 10 minit)",
+            "Salin kod (atau pautan) dan pindahkan ke pelayar biasa",
+            "Di pelayar biasa, selepas Log Masuk Google, tampal dan tekan 'Sambungkan', sambungan Pi + Google selesai",
+            "Pi Browser tidak menyimpan maklumat atas sebab keselamatan, ia menyambungkan dua pelayar dengan selamat menggunakan kod 6 digit"
+          ]
         },
         {
           "icon": "💬",
+          "title": "Cafe & Terjemahan Automatik (PiRC1)",
           "steps": [
-            "Masuk ke bilik kafe topik minat anda dan mulakan chat secara percuma",
-            "Apabila anda menghidupkan 'Kafe Berdekatan', ia akan menunjukkan kafe dan jiran berdekatan mengikut jarak",
-            "Dengan terjemahan serentak automatik, anda boleh berbual dengan sesiapa sahaja dalam 200+ bahasa dalam bahasa anda sendiri"
-          ],
-          "title": "Kafe & Terjemahan Automatik"
+            "Masuk ke bilik Cafe topik minat anda dan mulakan Sembang secara percuma",
+            "Apabila anda menghidupkan 'Cafe Berdekatan', ia menunjukkan Cafe dan jiran berdekatan mengikut jarak",
+            "Dengan terjemahan serentak automatik, anda boleh berbual dalam bahasa anda sendiri dengan sesiapa sahaja dalam 200+ bahasa"
+          ]
+        },
+        {
+          "icon": "🎫",
+          "title": "Langganan Pi (PiRC2)",
+          "steps": [
+            "Pilih hanya ciri yang anda perlukan dan langgan dengan Pi — anda boleh bermula segera dengan Pelan percuma",
+            "Langgan hanya yang anda perlukan: PyCafé™ (Cafe Premium) · PyShop™ (Pendaftaran Produk) · PyTranslate™ (Terjemahan Tanpa Had)",
+            "Bayar yuran langganan dengan Pi (Pembayaran berulang PiRC2), dan pembayaran tahunan adalah percuma selama 2 bulan"
+          ]
         },
         {
           "icon": "📦",
+          "title": "Transaksi Barangan Terpakai P2P (PiRC3, Escrow - Transaksi Selamat)",
           "steps": [
             "Apabila anda memuat naik gambar produk dan harga (Pi), ia akan ditunjukkan kepada orang berdekatan bersama lokasi anda",
             "Lihat barangan yang tersedia di sekeliling anda mengikut jarak dan jika anda suka, pesan dengan Pi",
-            "Pi yang dibayar akan disimpan dengan selamat (escrow) oleh platform buat sementara waktu, dan akan diserahkan kepada penjual setelah transaksi selesai"
-          ],
-          "title": "Pasar Barangan Terpakai (Transaksi Selamat)"
+            "Pi yang dibayar akan disimpan dengan selamat oleh platform buat sementara waktu (Escrow), dan akan diserahkan kepada penjual apabila transaksi selesai"
+          ]
         },
         {
           "icon": "🏪",
+          "title": "Pendaftaran Kedai O2O, Pendaftaran Produk (PiRC3, Escrow - Transaksi Selamat)",
           "steps": [
             "Dalam 'Pendaftaran Kedai', apabila anda menetapkan nama dan lokasi kedai, pelanggan akan datang ke kedai berdekatan",
-            "Daftar gambar menu · harga · kuantiti",
+            "Daftar gambar Menu · harga · kuantiti",
             "Apabila pelanggan membuat pesanan, pemberitahuan akan datang terus melalui Telegram (Menu · Kuantiti · Jumlah)",
-            "Serahkan di kedai mengikut urutan Sedang Disediakan → Sedia → Pengambilan"
-          ],
-          "title": "Kedai Saya (O2O)"
+            "Serahkan di kedai dalam urutan Sedang Disediakan → Sedia → Pickup"
+          ]
         },
         {
           "icon": "🪙",
+          "title": "Ganjaran Testnet, Sama di Mainnet (Janji)",
           "steps": [
-            "Bean yang diterima melalui Event Testnet sekarang adalah janji cafe.pi",
-            "Apabila platform dilancarkan secara rasmi di Mainnet dan Bean dikeluarkan secara rasmi,",
-            "Token Event yang terkumpul di Testnet akan dibayar sama 1:1 sebagai Bean Mainnet",
-            "Ini adalah prinsip cafe.pi untuk memastikan usaha peserta awal tidak hilang"
-          ],
-          "title": "Ganjaran Testnet, sama di Mainnet (Janji)"
+            "Bean yang diterima dari acara Testnet sekarang adalah janji Cafe.pi",
+            "Apabila platform dilancarkan secara rasmi di Mainnet,",
+            "Event Bean yang terkumpul di Testnet akan dibayar sama 1:1 sebagai Mainnet Bean",
+            "Ini adalah prinsip Cafe.pi yang menjamin usaha peserta awal tidak akan hilang"
+          ]
         }
       ]
     },
@@ -1549,6 +1549,7 @@
     "list": {
       "authenticating": "Sedang mengesahkan akaun Pi…",
       "direct": "1:1",
+      "directCafes": "Kafe Transaksi Langsung",
       "discover": "Teroka Kafe",
       "expired": "Tamat tempoh",
       "expiresToday": "Tamat tempoh hari ini",

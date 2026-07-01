@@ -936,77 +936,77 @@
       "topics": [
         {
           "icon": "⭐",
+          "title": "Miks Cafe.pi?",
           "steps": [
-            "Globaalne 'Danggeun': automaatne tõlge 200+ keeles · Pi lihtne makse · vestlus, kasutatud kaubad, poed ühes rakenduses · ühendus kauguse järgi",
-            "'Siren Order', mis ei vali tegevusala: igaüks saab olla omanik · vaba menüü · kohesed teavitused · O2O Pick-up"
-          ],
-          "title": "Miks Cafe.pi?"
+            "Globaalne 'Danggeun': 200+ keele automaatne tõlge · Pi lihtne makse · vestlus, kasutatud kaubad ja poed ühes rakenduses · ühendus kauguse järgi",
+            "Tegevusala mittepiirav 'Siren Order': igaüks saab olla omanik · vaba menüü · kohesed teavitused · O2O järeletulemine"
+          ]
         },
         {
           "icon": "🎁",
+          "title": "Sündmused — osalege kohe",
           "steps": [
-            "EVENT #1: Laadi TestPi-ga ja täida 10 missiooni, siis esimesele 100-le 5000 Bean'i",
-            "EVENT #2: Registreeri oma pood ja lõpeta menüü registreerimine + tehingu test, siis esimesele 100 kohale 10 000 Bean'i",
-            "Event-tabis missioonipõhiseid osalemislinke järgides saad need hõlpsasti täita"
-          ],
-          "title": "Event — Osale kohe"
+            "EVENT #1: Laadige TestPi-ga ja täitke 10 missiooni, et saada esimese 100 inimese seas 5,000 Bean",
+            "EVENT #2: Registreerige oma pood ja lõpetage menüü registreerimine + tehingu test, et saada esimese 100 koha seas 10,000 Bean",
+            "Sündmuste vahekaardil missioonipõhiseid osalemislinke järgides saate need hõlpsasti täita"
+          ]
         },
         {
           "icon": "🔑",
+          "title": "Logi sisse ja konto ühendamine",
           "steps": [
-            "Pi Browseris vajutades 'Loo ühenduskood' ilmub 6-kohaline kood (kasuta 10 minuti jooksul)",
-            "Kopeeri kood (või link) ja vii see tavalisse Browserisse",
-            "Tavalises Browseris pärast Google Login'i kleebi ja vajuta 'Ühenda', siis Pi + Google ühendus on valmis",
-            "Pi Browser ei salvesta turvalisuse huvides infot, 6-kohaline kood ühendab kaks Browserit turvaliselt"
-          ],
-          "title": "Login & Konto ühendamine"
-        },
-        {
-          "icon": "🎫",
-          "steps": [
-            "1 Pi = 100 Bean (platvormi eksklusiivne boonus) — saad kohe alustada tasuta Plan'iga",
-            "Vali ja telli ainult see, mida vajad: PyCafé™(Premium Cafe) · PyShop™(Toote registreerimine) · PyTranslate™(Piiramatu tõlge)",
-            "Subscription'i tasu makstakse laetud Bean'idega ja aastane makse annab 2 kuud tasuta"
-          ],
-          "title": "Bean & Subscription"
+            "Pi Browseris vajutades 'Loo ühenduskood' ilmub 6-kohaline kood (kasutada 10 minuti jooksul)",
+            "Kopeerige kood (või link) ja teisaldage see tavalisse brauserisse",
+            "Tavalises brauseris pärast Google'i sisselogimist kleepige see ja vajutage 'Ühenda', et Pi + Google ühendus oleks valmis",
+            "Pi Browser ei salvesta turvalisuse huvides teavet, nii et 6-kohaline kood ühendab kaks brauserit turvaliselt"
+          ]
         },
         {
           "icon": "💬",
+          "title": "Cafe & automaatne tõlge (PiRC1)",
           "steps": [
-            "Sisene huvipakkuva teema Cafe ruumi ja alusta tasuta Chat'i",
-            "Kui lülitad sisse 'Lähedal asuvad Cafe'd', näitab see lähedalasuvaid Cafe'sid ja naabreid kauguse järgi",
-            "Automaatse sünkroontõlkega saad suhelda kellegagi 200+ keeles oma keeles"
-          ],
-          "title": "Cafe & Automaatne tõlge"
+            "Sisenege huvipakkuva teema Cafe tuppa ja alustage tasuta vestlust",
+            "Kui lülitate sisse 'Lähedal asuvad Cafed', näitab see lähedal asuvaid Cafesid ja naabreid kauguse järgi",
+            "Automaatse sünkroontõlkega saate vestelda kellegagi 200+ keeles oma keeles"
+          ]
+        },
+        {
+          "icon": "🎫",
+          "title": "Pi tellimus (PiRC2)",
+          "steps": [
+            "Valige ainult vajalikud funktsioonid ja tellige Pi-ga — saate kohe alustada tasuta plaaniga",
+            "Tellige ainult vajalikud: PyCafé™ (Premium Cafe) · PyShop™ (toote registreerimine) · PyTranslate™ (piiramatu tõlge)",
+            "Tellimistasu makstakse Pi-ga (PiRC2 korduvmakse), aastane makse on 2 kuud tasuta"
+          ]
         },
         {
           "icon": "📦",
+          "title": "P2P kasutatud kaupade tehingud (PiRC3, Escrow-turvaline tehing)",
           "steps": [
-            "Kui laed üles toote pildid ja hinna (Pi), näidatakse seda koos sinu asukohaga lähedalasuvale inimesele",
-            "Vaata lähedalasuvaid esemeid kauguse järgi ja kui meeldib, telli Pi-ga",
-            "Makstud Pi hoiab platvorm ajutiselt turvaliselt (Escrow) ja pärast tehingu lõppu edastatakse see müüjale"
-          ],
-          "title": "Kasutatud asjade turg (Turvaline tehing)"
+            "Kui laadite üles toote pildid ja hinna (Pi), näidatakse seda koos teie asukohaga lähedal asuvatele inimestele",
+            "Vaadake lähedal olevaid esemeid kauguse järgi ja kui meeldib, tellige Pi-ga",
+            "Makstud Pi hoitakse platvormi poolt ajutiselt turvaliselt (Escrow) ja antakse müüjale üle pärast tehingu lõppemist"
+          ]
         },
         {
           "icon": "🏪",
+          "title": "O2O minu poe registreerimine, toote registreerimine (PiRC3, Escrow-turvaline tehing)",
           "steps": [
-            "'Poe registreerimine' all, kui määrad poe nime ja asukoha, tulevad kliendid lähedalasuvasse poodi",
-            "Registreeri menüü pildid · hind · kogus",
-            "Kui klient tellib, saad kohe teavituse Telegrami (Menüü · Kogus · Summa)",
-            "Anna poest üle järjekorras: Valmistamisel → Valmis → Pick-up"
-          ],
-          "title": "Minu pood (O2O)"
+            "Jaotises 'Poe registreerimine' kui määrate poe nime ja asukoha, tulevad kliendid lähedal asuvasse poodi",
+            "Registreerige menüü pildid · hind · kogus",
+            "Kui klient tellib, saate kohe teavituse Telegrami kaudu (menüü · kogus · summa)",
+            "Andke poest üle järjekorras: Valmistamisel → Valmis → Järeletulemine"
+          ]
         },
         {
           "icon": "🪙",
+          "title": "Testneti preemiad, samamoodi Mainnetis (lubadus)",
           "steps": [
-            "Praegu Testneti Event'iga saadud Bean'id on cafe.pi lubadus",
-            "Kui platvorm Mainnetis ametlikult käivitatakse ja Bean ametlikult väljastatakse,",
-            "Testnetis teenitud Event Token'id makstakse samamoodi 1:1 Mainneti Bean'idena välja",
+            "Beanid, mis on saadud praeguse Testneti sündmuse kaudu, on cafe.pi lubadus",
+            "Kui platvorm ametlikult Mainnetis käivitatakse,",
+            "Testnetis teenitud sündmuse Beanid makstakse samamoodi 1:1 Mainneti Beanidena",
             "See on cafe.pi põhimõte, mis tagab, et varajaste osalejate pingutused ei lähe kaotsi"
-          ],
-          "title": "Testneti preemiad, Mainnetis samamoodi (Lubadus)"
+          ]
         }
       ]
     },
@@ -1549,6 +1549,7 @@
     "list": {
       "authenticating": "Pi konto autentimine...",
       "direct": "1:1",
+      "directCafes": "Otsetehingu Cafe",
       "discover": "Avasta kohvikuid",
       "expired": "Aegunud",
       "expiresToday": "Aegub täna",

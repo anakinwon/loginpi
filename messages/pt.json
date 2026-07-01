@@ -936,77 +936,77 @@
       "topics": [
         {
           "icon": "⭐",
+          "title": "Por que Cafe.pi?",
           "steps": [
-            "Mercado local global: Tradução automática para mais de 200 idiomas · Pagamento fácil com Pi · Chat, usados e lojas em um único aplicativo · Conexão por distância",
-            "Sistema de pedidos 'Siren Order' para todos os tipos de negócios: Qualquer um pode ser um proprietário · Menu flexível · Notificações instantâneas · Retirada O2O"
-          ],
-          "title": "Por que Cafe.pi?"
+            "O 'Mercado de Pulgas' global: Tradução automática para mais de 200 idiomas · Pagamento fácil com Pi · Chat, itens usados, lojas em um único aplicativo · Conexão por distância",
+            "'Siren Order' para todos os setores: Qualquer um pode ser o chefe · Liberdade de menu · Notificações instantâneas · Retirada O2O"
+          ]
         },
         {
           "icon": "🎁",
+          "title": "Evento — Participe agora",
           "steps": [
-            "EVENT #1: Recarregue com TestPi e complete 10 missões, e os primeiros 100 receberão 5.000 Bean",
-            "EVENT #2: Registre sua loja e conclua o registro do menu + teste de transação, e as primeiras 100 lojas receberão 10.000 Bean",
-            "Na aba Event, siga os links de participação para cada missão e você poderá concluí-las facilmente"
-          ],
-          "title": "Event — Participe agora"
+            "EVENT #1: Recarregue com TestPi e complete 10 missões para os primeiros 100 participantes ganharem 5.000 Bean",
+            "EVENT #2: Registre sua loja, cadastre o menu + complete o teste de transação para as primeiras 100 lojas ganharem 10.000 Bean",
+            "Você pode completar facilmente seguindo os links de participação para cada missão na aba Eventos"
+          ]
         },
         {
           "icon": "🔑",
+          "title": "Login & Conexão de Conta",
           "steps": [
-            "No Pi Browser, clique em 'Gerar código de vinculação' e um código de 6 dígitos aparecerá (use em 10 minutos)",
+            "No Pi Browser, clique em 'Gerar Código de Conexão' para obter um código de 6 dígitos (use em 10 minutos)",
             "Copie o código (ou link) e transfira para um navegador comum",
-            "No navegador comum, faça login no Google, cole e clique em 'Vincular' para completar a conexão Pi + Google",
-            "O Pi Browser não armazena informações por segurança, então o código de 6 dígitos conecta os dois navegadores com segurança"
-          ],
-          "title": "Login & Conexão de conta"
-        },
-        {
-          "icon": "🎫",
-          "steps": [
-            "1 Pi = 100 Bean (crédito exclusivo da plataforma) — Você pode começar imediatamente com o plano gratuito",
-            "Assine apenas o que você precisa: PyCafé™ (Cafe Premium) · PyShop™ (Registro de Produtos) · PyTranslate™ (Tradução Ilimitada)",
-            "As taxas de assinatura são pagas com Bean recarregado, e o pagamento anual oferece 2 meses grátis"
-          ],
-          "title": "Bean & Assinatura"
+            "No navegador comum, faça login no Google, cole e clique em 'Conectar' para completar a conexão Pi + Google",
+            "O Pi Browser não armazena informações por segurança, conectando os dois navegadores de forma segura com um código de 6 dígitos"
+          ]
         },
         {
           "icon": "💬",
+          "title": "Café & Tradução Automática (PiRC1)",
           "steps": [
-            "Entre em uma sala de Cafe sobre um tópico de interesse e comece a conversar gratuitamente",
-            "Ao ativar 'Cafes Próximos', ele mostra Cafes e vizinhos próximos por distância",
-            "Com tradução simultânea automática, você pode conversar com qualquer pessoa em mais de 200 idiomas no seu próprio idioma"
-          ],
-          "title": "Cafe & Tradução automática"
+            "Entre em uma sala de Café sobre um tópico de interesse e comece a conversar gratuitamente",
+            "Ative 'Cafés Próximos' para ver cafés e vizinhos ao redor por ordem de distância",
+            "Com a tradução simultânea automática, você pode conversar com qualquer pessoa em mais de 200 idiomas na sua própria língua"
+          ]
+        },
+        {
+          "icon": "🎫",
+          "title": "Assinatura Pi (PiRC2)",
+          "steps": [
+            "Escolha apenas os recursos de que precisa e assine com Pi — você pode começar imediatamente com o plano gratuito",
+            "Assine apenas o que você precisa: PyCafé™ (Café Premium) · PyShop™ (Registro de Produtos) · PyTranslate™ (Tradução Ilimitada)",
+            "Pague a assinatura com Pi (pagamento recorrente PiRC2), e o pagamento anual oferece 2 meses grátis"
+          ]
         },
         {
           "icon": "📦",
+          "title": "Comércio de itens usados P2P (PiRC3, Escrow - Transação Segura)",
           "steps": [
-            "Ao carregar fotos do produto e o preço (Pi), juntamente com sua localização, ele será mostrado a pessoas próximas",
-            "Veja os itens disponíveis nas proximidades por distância e se gostar, peça com Pi",
-            "O Pi pago é mantido em segurança pela plataforma (escrow) temporariamente, e entregue ao vendedor após a conclusão da transação"
-          ],
-          "title": "Mercado de usados (Transação segura)"
+            "Ao carregar fotos do produto e o preço (Pi), ele será mostrado às pessoas próximas junto com sua localização",
+            "Veja os itens disponíveis ao redor por ordem de distância e, se gostar, faça o pedido com Pi",
+            "O Pi pago é mantido em segurança pela plataforma (Escrow) e, após a conclusão da transação, é entregue ao vendedor"
+          ]
         },
         {
           "icon": "🏪",
+          "title": "Registro de loja O2O, Registro de produtos (PiRC3, Escrow - Transação Segura)",
           "steps": [
-            "Em 'Registro de Loja', defina o nome e a localização da loja e os clientes virão até a loja mais próxima",
-            "Registre fotos do menu · preço · quantidade",
-            "Quando um cliente faz um pedido, você recebe uma notificação instantânea via Telegram (Menu · Quantidade · Valor)",
+            "Ao definir o nome e a localização da sua loja em 'Registro de Loja', os clientes encontrarão sua loja próxima",
+            "Registre fotos do menu, preço e quantidade",
+            "Quando um cliente faz um pedido, você recebe uma notificação instantânea via Telegram (menu · quantidade · valor)",
             "Entregue na loja na seguinte ordem: Em preparação → Pronto → Retirada"
-          ],
-          "title": "Minha Loja (O2O)"
+          ]
         },
         {
           "icon": "🪙",
+          "title": "Recompensas da Testnet, mantidas na Mainnet (Promessa)",
           "steps": [
-            "Os Beans recebidos no Event da Testnet agora são uma promessa da cafe.pi",
-            "Quando a plataforma for oficialmente lançada na Mainnet e o Bean for oficialmente emitido,",
-            "os tokens de Event acumulados na Testnet serão pagos na mesma proporção de 1:1 como Bean da Mainnet",
-            "Este é o princípio da cafe.pi para garantir que o esforço dos participantes iniciais não seja perdido"
-          ],
-          "title": "Recompensas da Testnet, as mesmas na Mainnet (Promessa)"
+            "Os Beans recebidos no evento da Testnet agora são uma promessa da Cafe.pi",
+            "Quando a plataforma for oficialmente lançada na Mainnet,",
+            "Os Beans de evento acumulados na Testnet serão pagos na Mainnet na mesma proporção de 1:1 como Beans da Mainnet",
+            "Este é o princípio da Cafe.pi para garantir que o esforço dos participantes iniciais não seja em vão"
+          ]
         }
       ]
     },
@@ -1549,6 +1549,7 @@
     "list": {
       "authenticating": "Autenticando conta Pi…",
       "direct": "1:1",
+      "directCafes": "Cafe de Transação Direta",
       "discover": "Descobrir Cafes",
       "expired": "Expirado",
       "expiresToday": "Expira hoje",

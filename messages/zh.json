@@ -936,77 +936,77 @@
       "topics": [
         {
           "icon": "⭐",
+          "title": "为什么选择 Cafe.pi？",
           "steps": [
-            "全球版‘当根’：200+ 种语言自动翻译 · Pi 快捷支付 · 聊天·二手·店铺集于一App · 按距离连接",
-            "不限行业的‘Siren Order’：人人皆可当老板 · 菜单自由 · 即时通知 · O2O Pickup"
-          ],
-          "title": "为什么选择 Cafe.pi？"
+            "全球本地市场：200多种语言自动翻译 · Pi 快捷支付 · 聊天·二手·商店集于一应用 · 按距离连接",
+            "不限行业的 'Siren Order'：人人皆可当老板 · 菜单自由 · 即时通知 · O2O 提货"
+          ]
         },
         {
           "icon": "🎁",
+          "title": "EVENT — 立即参与",
           "steps": [
-            "EVENT #1: 使用 TestPi 充值并完成 10 项 Mission 后，前 100 名可获得 5,000 Bean",
-            "EVENT #2: 注册我的店铺并完成 Menu 注册 + 交易 Test 后，前 100 家店铺可获得 10,000 Bean",
-            "在 Event Tab 中，按照 Mission 参与链接操作即可轻松完成"
-          ],
-          "title": "Event — 立即参与"
+            "EVENT #1: 用 Test Pi 充值并完成10项任务，前100名参与者将获得 5,000 Bean",
+            "EVENT #2: 注册我的商店并完成菜单注册 + 交易测试，前100家商店将获得 10,000 Bean",
+            "在 EVENT 标签页中按照任务参与链接操作，即可轻松完成"
+          ]
         },
         {
           "icon": "🔑",
+          "title": "LOGIN & 账户连接",
           "steps": [
-            "在 Pi Browser 中点击‘生成联动 Code’后，会生成 6 位数 Code (10 分钟内使用)",
-            "复制 Code (或 Link) 并将其粘贴到普通 Browser 中",
-            "在普通 Browser 中 Google Login 后，粘贴并点击‘联动’后，Pi + Google 连接完成",
-            "Pi Browser 出于安全原因不存储信息，通过 6 位数 Code 安全连接两个 Browser"
-          ],
-          "title": "Login & 账户连接"
-        },
-        {
-          "icon": "🎫",
-          "steps": [
-            "1 Pi = 100 Bean (平台专用积分) — 您可以立即开始使用免费 Plan",
-            "选择您需要的订阅：PyCafé™(Premium Café) · PyShop™(商品注册) · PyTranslate™(无限翻译)",
-            "订阅费使用充值的 Bean 支付，年度支付可享 2 个月免费"
-          ],
-          "title": "Bean & 订阅"
+            "在 Pi Browser 中点击 '生成关联代码'，将显示一个6位代码 (10分钟内使用)",
+            "复制代码（或链接）并将其粘贴到普通浏览器中",
+            "在普通浏览器中登录 Google 后粘贴并点击 '关联'，即可完成 Pi + Google 连接",
+            "Pi Browser 出于安全原因不存储信息，通过6位代码安全连接两个浏览器"
+          ]
         },
         {
           "icon": "💬",
+          "title": "CAFÉ & 自动翻译(PiRC1)",
           "steps": [
-            "进入您感兴趣的 Café 房间，免费开始 Chat",
-            "开启‘附近 Café’后，会按距离显示附近的 Café 和邻居",
-            "通过自动同声翻译，您可以与 200+ 种语言的任何人用您的语言进行对话"
-          ],
-          "title": "Café & 自动翻译"
+            "进入您感兴趣主题的 CAFÉ 房间，免费开始聊天",
+            "开启 '附近 CAFÉ'，将按距离显示附近的 CAFÉ 和邻居",
+            "通过自动同声传译，您可以与200多种语言的任何人用您的语言交流"
+          ]
+        },
+        {
+          "icon": "🎫",
+          "title": "Pi 订阅 (PiRC2)",
+          "steps": [
+            "只选择所需功能，用 Pi 订阅 — 您可以立即开始使用免费 PLAN",
+            "只选择所需订阅：PyCafé™(高级 CAFÉ) · PyShop™(商品注册) · PyTranslate™(无限翻译)",
+            "订阅费通过 Pi 支付(PiRC2 循环支付)，年度支付可享2个月免费"
+          ]
         },
         {
           "icon": "📦",
+          "title": "P2P 二手交易 (PiRC3, ESCROW - 安全交易)",
           "steps": [
-            "上传商品照片和价格 (Pi) 后，会连同您的位置一起显示给附近的人",
-            "按距离查看附近商品，如果喜欢，则用 Pi 下单",
-            "支付的 Pi 将由平台暂时安全保管 (Escrow)，交易完成后再转交给 Seller"
-          ],
-          "title": "二手市场 (安全交易)"
+            "上传商品图片和价格(Pi)，将与您的位置一起显示给附近的人",
+            "查看附近出现的商品，按距离排序，如果喜欢，用 Pi 订购",
+            "支付的 Pi 将由平台暂时安全保管(ESCROW)，交易完成后再转交给卖家"
+          ]
         },
         {
           "icon": "🏪",
+          "title": "O2O 我的商店注册, 商品注册 (PiRC3, ESCROW - 安全交易)",
           "steps": [
-            "在‘店铺注册’中设置店铺名称和位置后，顾客会找到附近的店铺",
-            "注册 Menu 照片 · 价格 · 数量",
-            "顾客下单后，会立即通过 Telegram 收到通知 (Menu · 数量 · 金额)",
-            "按照准备中 → 准备完成 → Pickup 的顺序在店铺交付"
-          ],
-          "title": "我的店铺 (O2O)"
+            "在 '商店注册' 中设置商店名称和位置，顾客就会找到附近的商店",
+            "注册菜单图片 · 价格 · 数量",
+            "顾客下单后，会立即通过 Telegram 收到通知 (菜单 · 数量 · 金额)",
+            "按照 准备中 → 准备完成 → 提货 的顺序在商店交付"
+          ]
         },
         {
           "icon": "🪙",
+          "title": "TESTNET 奖励，在 MAINNET 中保持不变 (承诺)",
           "steps": [
-            "现在通过 Testnet Event 获得的 Bean 是 cafe.pi 的承诺",
-            "当平台在 Mainnet 正式 Launch 后，Bean 正式发行时，",
-            "在 Testnet 中积累的 Event Token 将以 1:1 的比例原样支付为 Mainnet Bean",
-            "这是 cafe.pi 确保早期参与者努力不会白费的原则"
-          ],
-          "title": "Testnet 奖励，在 Mainnet 中保持不变 (承诺)"
+            "现在通过 TESTNET EVENT 获得的 Bean 是 cafe.pi 的承诺",
+            "当平台在 MAINNET 正式上线时，",
+            "在 TESTNET 累积的 EVENT Bean 将以1:1的比例原样支付为 MAINNET Bean",
+            "这是 cafe.pi 确保早期参与者的努力不会白费的原则"
+          ]
         }
       ]
     },
@@ -1549,6 +1549,7 @@
     "list": {
       "authenticating": "Pi 账户认证中…",
       "direct": "1:1",
+      "directCafes": "直交易 Cafe",
       "discover": "探索 Cafe",
       "expired": "已过期",
       "expiresToday": "今日过期",
@@ -2590,10 +2591,7 @@
     "cycleHeading": "选择支付周期",
     "expireAt": "到期日: {date}",
     "feat": {
-      "PICAFE": [
-        "免除创建高级·活动 Cafe 费用",
-        "免除进入高级·活动 Cafe 费用"
-      ],
+      "PICAFE": ["免除创建高级·活动 Cafe 费用", "免除进入高级·活动 Cafe 费用"],
       "PISHOP": [
         "商品曝光费用免除",
         "Premium 商品创建费用免除",

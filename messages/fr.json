@@ -936,77 +936,77 @@
       "topics": [
         {
           "icon": "⭐",
+          "title": "Pourquoi Cafe.pi ?",
           "steps": [
-            "Le 'Danggeun' mondial : Traduction automatique de plus de 200 langues · Paiement facile Pi · Chat, seconde main, magasins dans une seule application · Connexion par distance",
-            "Le 'Siren Order' pour tous les secteurs : Tout le monde peut être propriétaire · Liberté de menu · Notifications instantanées · Retrait O2O"
-          ],
-          "title": "Pourquoi Cafe.pi ?"
+            "Le 'marché local' mondial : Traduction automatique de plus de 200 langues · Paiement facile avec Pi · CHAT, seconde main et magasins dans une seule APP · Connexion par distance",
+            "Le 'Siren Order' toutes industries : Tout le monde peut être un propriétaire · Liberté de MENU · Notifications instantanées · PICKUP O2O"
+          ]
         },
         {
           "icon": "🎁",
+          "title": "EVENT — Participez maintenant",
           "steps": [
-            "EVENT #1 : Rechargez avec TestPi et complétez 10 missions pour recevoir 5 000 Bean pour les 100 premiers participants.",
-            "EVENT #2 : Enregistrez votre magasin, ajoutez des menus et effectuez un test de transaction pour recevoir 10 000 Bean pour les 100 premiers établissements.",
-            "Vous pouvez facilement les compléter en suivant les liens de participation pour chaque mission dans l'onglet Événements."
-          ],
-          "title": "Événements — Participez maintenant"
+            "EVENT #1 : Rechargez avec TestPi et complétez 10 MISSIONS pour que les 100 premiers reçoivent 5 000 Bean",
+            "EVENT #2 : Enregistrez votre magasin et, une fois que vous avez enregistré votre MENU + effectué un TEST de transaction, les 100 premiers établissements recevront 10 000 Bean",
+            "Dans l'onglet EVENT, suivez les liens de participation pour chaque MISSION afin de les compléter facilement"
+          ]
         },
         {
           "icon": "🔑",
+          "title": "LOGIN & Connexion de compte",
           "steps": [
-            "Dans le Pi Browser, appuyez sur 'Générer un code de liaison' pour obtenir un code à 6 chiffres (à utiliser dans les 10 minutes).",
-            "Copiez le code (ou le lien) et transférez-le vers un navigateur normal.",
-            "Dans le navigateur normal, après vous être connecté à Google, collez le code et appuyez sur 'Lier' pour finaliser la connexion Pi + Google.",
-            "Le Pi Browser ne stocke pas d'informations pour des raisons de sécurité, le code à 6 chiffres connecte les deux navigateurs en toute sécurité."
-          ],
-          "title": "Login & Liaison de compte"
-        },
-        {
-          "icon": "🎫",
-          "steps": [
-            "1 Pi = 100 Bean (crédits exclusifs à la plateforme) — Vous pouvez commencer immédiatement avec le plan gratuit.",
-            "Abonnez-vous uniquement à ce dont vous avez besoin : PyCafé™ (Café Premium) · PyShop™ (Enregistrement de produits) · PyTranslate™ (Traduction illimitée).",
-            "Les frais d'abonnement sont payés avec les Bean rechargés, et le paiement annuel offre 2 mois gratuits."
-          ],
-          "title": "Bean & Abonnement"
+            "Dans le Pi Browser, appuyez sur 'Générer un code de liaison' pour obtenir un code à 6 chiffres (à utiliser dans les 10 minutes)",
+            "Copiez le code (ou le lien) et transférez-le vers un navigateur normal",
+            "Dans le navigateur normal, après vous être connecté à Google, collez-le et appuyez sur 'Lier' pour finaliser la connexion Pi + Google",
+            "Le Pi Browser ne stocke pas d'informations pour des raisons de sécurité, le code à 6 chiffres connecte les deux navigateurs en toute sécurité"
+          ]
         },
         {
           "icon": "💬",
+          "title": "CAFE & Traduction automatique (PiRC1)",
           "steps": [
-            "Rejoignez une salle de café sur un sujet d'intérêt et commencez à discuter gratuitement.",
-            "Activez 'Cafés à proximité' pour voir les cafés et voisins autour de vous par distance.",
-            "Grâce à l'interprétation simultanée automatique, vous pouvez converser avec n'importe qui dans plus de 200 langues, dans votre propre langue."
-          ],
-          "title": "Café & Traduction automatique"
+            "Entrez dans une salle de CAFE sur un sujet d'intérêt et commencez à CHATTER gratuitement",
+            "Activez 'CAFEs à proximité' pour voir les CAFEs et voisins autour de vous par distance",
+            "Avec la traduction simultanée automatique, vous pouvez converser avec n'importe qui dans plus de 200 langues, dans votre propre langue"
+          ]
+        },
+        {
+          "icon": "🎫",
+          "title": "Abonnement Pi (PiRC2)",
+          "steps": [
+            "Choisissez uniquement les fonctionnalités dont vous avez besoin et abonnez-vous avec Pi — vous pouvez commencer immédiatement avec le PLAN gratuit",
+            "Abonnez-vous uniquement à ce dont vous avez besoin : PyCafé™ (PREMIUM CAFE) · PyShop™ (Enregistrement de produit) · PyTranslate™ (Traduction illimitée)",
+            "Les frais d'abonnement sont payés avec Pi (paiement récurrent PiRC2), et le paiement annuel offre 2 mois gratuits"
+          ]
         },
         {
           "icon": "📦",
+          "title": "Transactions P2P de seconde main (PiRC3, ESCROW - transaction sécurisée)",
           "steps": [
-            "Téléchargez des photos de produits et des prix (Pi), et ils seront visibles aux personnes proches de vous, avec votre emplacement.",
-            "Visualisez les articles disponibles autour de vous par distance et commandez avec Pi si vous êtes intéressé.",
-            "Les Pi payés sont temporairement conservés en toute sécurité par la plateforme (escrow), puis transférés au vendeur une fois la transaction terminée."
-          ],
-          "title": "Marché d'occasion (Transaction sécurisée)"
+            "Lorsque vous téléchargez des photos de produits et le prix (Pi), ils sont visibles par les personnes proches de votre emplacement",
+            "Visualisez les articles disponibles autour de vous par distance et si vous aimez quelque chose, commandez-le avec Pi",
+            "Le Pi payé est temporairement conservé en toute sécurité par la plateforme (ESCROW), puis transféré au vendeur une fois la transaction terminée"
+          ]
         },
         {
           "icon": "🏪",
+          "title": "O2O Enregistrement de magasin, Enregistrement de produit (PiRC3, ESCROW - transaction sécurisée)",
           "steps": [
-            "Dans 'Enregistrer un magasin', définissez le nom et l'emplacement de votre magasin, et les clients viendront au magasin le plus proche.",
-            "Enregistrez les photos, prix et quantités des menus.",
-            "Lorsqu'un client commande, vous recevez une notification immédiate via Telegram (Menu · Quantité · Montant).",
-            "Remettez la commande au magasin dans l'ordre : En préparation → Prêt → Retrait."
-          ],
-          "title": "Mon Magasin (O2O)"
+            "Dans 'Enregistrement de magasin', définissez le nom et l'emplacement de votre magasin, et les clients viendront à votre magasin le plus proche",
+            "Enregistrez les photos, les prix et les quantités de votre MENU",
+            "Lorsqu'un client commande, vous recevez une notification immédiate via Telegram (MENU · Quantité · Montant)",
+            "Remettez la commande au magasin dans l'ordre : En préparation → Prêt → PICKUP"
+          ]
         },
         {
           "icon": "🪙",
+          "title": "Récompenses TESTNET, telles quelles sur le MAINNET (Promesse)",
           "steps": [
-            "Les Bean reçus lors de l'événement Testnet actuel sont une promesse de cafe.pi.",
-            "Lorsque la plateforme sera officiellement lancée sur le Mainnet et que le Bean sera officiellement émis,",
-            "Les jetons d'événement accumulés sur le Testnet seront distribués à l'identique, en 1:1, en Bean Mainnet.",
-            "C'est le principe de cafe.pi de garantir que les efforts des premiers participants ne soient pas perdus."
-          ],
-          "title": "Récompenses Testnet, inchangées sur Mainnet (Promesse)"
+            "Les Bean reçus lors de l'EVENT TESTNET actuel sont une promesse de Cafe.pi",
+            "Lorsque la plateforme sera officiellement lancée sur le MAINNET,",
+            "les Bean d'EVENT accumulés sur le TESTNET seront versés tels quels, en 1:1, en Bean du MAINNET",
+            "C'est le principe de Cafe.pi de garantir que les efforts des premiers participants ne soient pas perdus"
+          ]
         }
       ]
     },
@@ -1549,6 +1549,7 @@
     "list": {
       "authenticating": "Authentification du compte Pi en cours…",
       "direct": "1:1",
+      "directCafes": "Cafes de transaction directe",
       "discover": "Découvrir les cafés",
       "expired": "Expiré",
       "expiresToday": "Expire aujourd'hui",

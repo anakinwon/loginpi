@@ -936,77 +936,77 @@
       "topics": [
         {
           "icon": "⭐",
+          "title": "Bakit Cafe.pi?",
           "steps": [
-            "Global 'Karrot': Awtomatikong pagsasalin ng 200+ wika · Pi madaling pagbabayad · Chat, second-hand, tindahan sa isang App · Koneksyon ayon sa distansya",
-            "'Siren Order' na hindi pumipili ng industriya: Kahit sino ay pwedeng maging may-ari · Malayang Menu · Instant na abiso · O2O Pickup"
-          ],
-          "title": "Bakit Cafe.pi?"
+            "Global 'Karot': 200+ wika awtomatikong interpretasyon · Pi madaling pagbabayad · chat·second-hand·tindahan sa isang app · koneksyon ayon sa distansya",
+            "Para sa lahat ng uri ng negosyo 'Siren Order': Kahit sino ay may-ari · Malayang menu · Agarang abiso · O2O pickup"
+          ]
         },
         {
           "icon": "🎁",
+          "title": "EVENT — Sumali na ngayon",
           "steps": [
-            "EVENT #1: Mag-top up gamit ang TestPi at kapag nakumpleto ang 10 Misyon, 5,000 Bean sa unang 100 tao.",
-            "EVENT #2: Irehistro ang iyong tindahan at kapag natapos ang pagpaparehistro ng Menu + Test ng transaksyon, 10,000 Bean sa unang 100 lokasyon.",
-            "Sa tab ng Event, kung susundin ang link ng paglahok para sa bawat Misyon, madali itong makukumpleto."
-          ],
-          "title": "Event — Sumali na ngayon"
+            "EVENT #1: Mag-top up gamit ang Test Pi at kumpletuhin ang 10 misyon, 5,000 Bean sa unang 100 tao",
+            "EVENT #2: Irehistro ang iyong tindahan at kumpletuhin ang pagpaparehistro ng menu + pagsubok sa transaksyon, 10,000 Bean sa unang 100 lokasyon",
+            "Sa tab ng EVENT, madali mo itong makukumpleto kung susundin mo ang link ng partisipasyon para sa bawat misyon"
+          ]
         },
         {
           "icon": "🔑",
+          "title": "LOGIN & Pagkonekta ng Account",
           "steps": [
-            "Sa Pi Browser, kapag pinindot ang 'Gumawa ng Integration Code', lalabas ang 6-digit na Code (Gamitin sa loob ng 10 minuto).",
-            "Kopyahin ang Code (o Link) at ilipat sa regular na Browser.",
-            "Sa regular na Browser, pagkatapos mag-Google Login, i-paste at pindutin ang 'I-integrate' para makumpleto ang koneksyon ng Pi + Google.",
-            "Ang Pi Browser ay hindi nagse-save ng impormasyon para sa seguridad, kaya ang 6-digit na Code ay ligtas na nagkokonekta sa dalawang Browser."
-          ],
-          "title": "Login & Pagkonekta ng Account"
-        },
-        {
-          "icon": "🎫",
-          "steps": [
-            "1 Pi = 100 Bean (Platform-exclusive na reward points) — Maaari kang magsimula kaagad sa libreng Plan.",
-            "Piliin lang ang kailangan mo at mag-subscribe: PyCafé™(Premium Cafe) · PyShop™(Pagpaparehistro ng Produkto) · PyTranslate™(Walang limitasyong Pagsasalin)",
-            "Ang bayad sa Subscription ay babayaran gamit ang na-top up na Bean, at ang taunang pagbabayad ay may 2 buwang libre."
-          ],
-          "title": "Bean & Subscription"
+            "Sa Pi Browser, kapag pinindot mo ang 'Gumawa ng Integration Code', lalabas ang 6-digit na code (Gamitin sa loob ng 10 minuto)",
+            "Kopyahin ang code (o link) at ilipat sa isang regular na browser",
+            "Sa regular na browser, pagkatapos mag-LOGIN sa Google, i-paste at pindutin ang 'I-integrate', Kumpleto na ang koneksyon ng Pi + Google",
+            "Ang Pi Browser ay hindi nagse-save ng impormasyon para sa seguridad, kaya ligtas nitong pinag-uugnay ang dalawang browser gamit ang 6-digit na code"
+          ]
         },
         {
           "icon": "💬",
+          "title": "Cafe & Awtomatikong Interpretasyon (PiRC1)",
           "steps": [
-            "Pumasok sa Cafe Room ng iyong interes at simulan ang Chat nang libre.",
-            "Kapag binuksan ang 'Mga Kalapit na Cafe', ipapakita nito ang mga kalapit na Cafe at kapitbahay ayon sa distansya.",
-            "Sa awtomatikong sabay-sabay na pagsasalin, makakausap mo ang sinuman sa 200+ na wika sa sarili mong wika."
-          ],
-          "title": "Cafe & Awtomatikong Pagsasalin"
+            "Pumasok sa Cafe room ng iyong interes at magsimulang mag-chat nang libre",
+            "Kapag binuksan mo ang 'Mga Kalapit na Cafe', ipapakita nito ang mga kalapit na Cafe at kapitbahay ayon sa distansya",
+            "Sa awtomatikong sabay-sabay na interpretasyon, makakausap mo ang sinuman sa 200+ wika sa iyong sariling wika"
+          ]
+        },
+        {
+          "icon": "🎫",
+          "title": "Pi Subscription (PiRC2)",
+          "steps": [
+            "Piliin lamang ang mga feature na kailangan mo at mag-subscribe gamit ang Pi — Maaari kang magsimula kaagad sa libreng plan",
+            "Mag-subscribe sa kung ano lang ang kailangan mo: PyCafé™ (Premium Cafe) · PyShop™ (Pagpaparehistro ng Produkto) · PyTranslate™ (Walang limitasyong Pagsasalin)",
+            "Bayaran ang subscription fee gamit ang Pi (PiRC2 paulit-ulit na pagbabayad), at ang taunang pagbabayad ay may 2 buwang libre"
+          ]
         },
         {
           "icon": "📦",
+          "title": "P2P Second-hand Transaction (PiRC3, Escrow - Ligtas na Transaksyon)",
           "steps": [
-            "Kapag in-upload ang larawan ng produkto at presyo (Pi), ipapakita ito sa mga kalapit na tao kasama ang iyong lokasyon.",
-            "Tingnan ang mga item na available sa paligid ayon sa distansya at kung gusto mo, mag-order gamit ang Pi.",
-            "Ang binayarang Pi ay pansamantalang ligtas na iimbak ng Platform (Escrow), at ibibigay sa nagbebenta kapag natapos ang transaksyon."
-          ],
-          "title": "Second-hand Marketplace (Ligtas na Transaksyon)"
+            "Kapag nag-upload ka ng larawan ng produkto at presyo (Pi), ipapakita ito sa mga kalapit na tao kasama ang iyong lokasyon",
+            "Tingnan ang mga item na lumabas sa paligid ayon sa distansya at kung gusto mo, mag-order gamit ang Pi",
+            "Ang Pi na binayaran ay pansamantalang ligtas na iimbak ng platform (Escrow), at ibibigay sa nagbebenta kapag natapos ang transaksyon"
+          ]
         },
         {
           "icon": "🏪",
+          "title": "O2O Pagpaparehistro ng Tindahan, Pagpaparehistro ng Produkto (PiRC3, Escrow - Ligtas na Transaksyon)",
           "steps": [
-            "Sa 'Pagpaparehistro ng Tindahan', kapag itinakda ang pangalan at lokasyon ng tindahan, pupunta ang mga customer sa kalapit na tindahan.",
-            "Irehistro ang larawan ng Menu · presyo · dami.",
-            "Kapag nag-order ang customer, agad na darating ang abiso sa Telegram (Menu · Dami · Halaga).",
-            "Ibigay sa tindahan sa pagkakasunod-sunod na Inihahanda → Handa na → Pickup."
-          ],
-          "title": "Aking Tindahan (O2O)"
+            "Sa 'Pagpaparehistro ng Tindahan', kapag itinakda mo ang pangalan at lokasyon ng tindahan, pupunta ang mga customer sa kalapit na tindahan",
+            "Irehistro ang larawan ng menu · presyo · dami",
+            "Kapag nag-order ang customer, agad na darating ang abiso sa Telegram (Menu · Dami · Halaga)",
+            "Sa pagkakasunod-sunod ng Inihahanda → Handa na → Pickup, ibibigay ito sa tindahan"
+          ]
         },
         {
           "icon": "🪙",
+          "title": "Testnet Reward, Pareho sa Mainnet (Pangako)",
           "steps": [
-            "Ang Bean na natanggap sa Testnet Event ngayon ay isang pangako ng cafe.pi.",
-            "Kapag opisyal na inilunsad ang Platform sa Mainnet at opisyal na inilabas ang Bean,",
-            "Ang Event Token na naipon sa Testnet ay ibibigay nang pareho, 1:1, bilang Mainnet Bean.",
-            "Ito ang prinsipyo ng cafe.pi na tinitiyak na hindi mawawala ang pagsisikap ng mga unang lumahok."
-          ],
-          "title": "Testnet Reward, pareho sa Mainnet (Pangako)"
+            "Ang Bean na natanggap mo mula sa Testnet EVENT ngayon ay pangako ng Cafe.pi",
+            "Kapag opisyal na inilunsad ang platform sa Mainnet,",
+            "Ang EVENT Bean na naipon sa Testnet ay ibibigay nang pareho, 1:1, bilang Mainnet Bean",
+            "Ito ang prinsipyo ng Cafe.pi na tinitiyak na ang pagsisikap ng mga unang kalahok ay hindi mawawala"
+          ]
         }
       ]
     },
@@ -1549,6 +1549,7 @@
     "list": {
       "authenticating": "Ina-authenticate ang Pi Account…",
       "direct": "1:1",
+      "directCafes": "Direktang Transaksyon Cafe",
       "discover": "Maghanap ng Cafe",
       "expired": "Nag-expire",
       "expiresToday": "Mag-e-expire Ngayon",

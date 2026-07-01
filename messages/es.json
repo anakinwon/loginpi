@@ -936,77 +936,77 @@
       "topics": [
         {
           "icon": "⭐",
+          "title": "¿Por qué Cafe.pi?",
           "steps": [
-            "El 'Karrot' global: Traducción automática de más de 200 idiomas · Pago fácil con Pi · Chat, segunda mano y tiendas en una sola aplicación · Conexión por distancia",
-            "El 'Siren Order' para todos los negocios: Cualquiera puede ser dueño · Menu libre · Notificaciones instantáneas · Recogida O2O"
-          ],
-          "title": "¿Por qué Cafe.pi?"
+            "El '당근' global: Interpretación automática de más de 200 idiomas · Pago fácil con Pi · Chat, artículos de segunda mano y tiendas en una sola aplicación · Conexión por distancia",
+            "El '싸이렌오더' que no discrimina por industria: Cualquiera puede ser jefe · Menú libre · Notificaciones instantáneas · O2O PICKUP"
+          ]
         },
         {
           "icon": "🎁",
+          "title": "EVENTOS — Participe ahora",
           "steps": [
-            "EVENT #1: Recarga con Test Pi y completa 10 Missions para ser uno de los primeros 100 en recibir 5,000 Bean",
-            "EVENT #2: Registra tu tienda y completa el registro de Menu + la prueba de transacción para ser uno de los primeros 100 lugares en recibir 10,000 Bean",
-            "Puedes completarlo fácilmente siguiendo los enlaces de participación por Mission en la Event Tab"
-          ],
-          "title": "Event — Participa ahora"
+            "EVENT #1: Recargue con TestPi y complete 10 misiones para recibir 5,000 Bean para los primeros 100 participantes.",
+            "EVENT #2: Registre su tienda y complete el registro de menú + el TEST de transacción para recibir 10,000 Bean para las primeras 100 tiendas.",
+            "Puede completarlo fácilmente siguiendo los enlaces de participación para cada misión en la pestaña EVENTOS."
+          ]
         },
         {
           "icon": "🔑",
+          "title": "LOGIN & Conexión de cuenta",
           "steps": [
-            "En Pi Browser, pulsa 'Generar código de vinculación' para obtener un código de 6 dígitos (usar en 10 minutos)",
-            "Copia el código (o enlace) y muévelo a un navegador normal",
-            "En un navegador normal, después de Google Login, pégalo y pulsa 'Vincular' para completar la conexión Pi + Google",
-            "Pi Browser no guarda información por seguridad, por lo que el código de 6 dígitos conecta de forma segura ambos navegadores"
-          ],
-          "title": "Login y conexión de cuenta"
-        },
-        {
-          "icon": "🎫",
-          "steps": [
-            "1 Pi = 100 Bean (reserva exclusiva de la Platform) — Puedes empezar directamente con el Plan gratuito",
-            "Elige solo lo que necesitas para suscribirte: PyCafé™ (Cafe Premium) · PyShop™ (Registro de Producto) · PyTranslate™ (Traducción ilimitada)",
-            "La tarifa de suscripción se paga con los Bean recargados, y el pago anual incluye 2 meses gratis"
-          ],
-          "title": "Bean y suscripción"
+            "En Pi Browser, presione 'Generar código de vinculación' para obtener un código de 6 dígitos (úsese en 10 minutos).",
+            "Copie el código (o enlace) y muévalo a un navegador normal.",
+            "En un navegador normal, después de iniciar sesión con Google, péguelo y presione 'Vincular' para completar la conexión Pi + Google.",
+            "Pi Browser no guarda información por seguridad, por lo que el código de 6 dígitos conecta de forma segura ambos navegadores."
+          ]
         },
         {
           "icon": "💬",
+          "title": "CAFÉ & Interpretación automática (PiRC1)",
           "steps": [
-            "Entra en una Sala de Cafe de tu interés y empieza a Chat gratis",
-            "Si activas 'Cafe cercanos', te mostrará los Cafe y vecinos de alrededor por distancia",
-            "Con la traducción simultánea automática, puedes hablar con cualquiera en más de 200 idiomas en tu propio idioma"
-          ],
-          "title": "Cafe y traducción automática"
+            "Ingrese a una sala de CAFÉ sobre un tema de interés y comience a chatear gratis.",
+            "Active 'CAFÉ cercano' para ver los CAFÉs y vecinos cercanos ordenados por distancia.",
+            "Con la interpretación simultánea automática, puede conversar con cualquier persona en más de 200 idiomas en su propio idioma."
+          ]
+        },
+        {
+          "icon": "🎫",
+          "title": "Suscripción Pi (PiRC2)",
+          "steps": [
+            "Elija solo las funciones que necesita y suscríbase con Pi — puede comenzar de inmediato con un PLAN gratuito.",
+            "Suscríbase solo a lo que necesita: PyCafé™ (CAFÉ premium) · PyShop™ (Registro de PRODUCTOS) · PyTranslate™ (Traducción ilimitada)",
+            "La tarifa de suscripción se paga con Pi (pago recurrente PiRC2), y el pago anual incluye 2 meses gratis."
+          ]
         },
         {
           "icon": "📦",
+          "title": "Comercio de segunda mano P2P (PiRC3, ESCROW - transacción segura)",
           "steps": [
-            "Si subes fotos del Producto y el precio (Pi), se mostrará a las personas cercanas junto con tu ubicación",
-            "Mira los artículos disponibles cerca por distancia y, si te gustan, pídelos con Pi",
-            "Los Pi pagados son guardados de forma segura temporalmente por la Platform (Escrow) y se entregan al vendedor una vez finalizada la transacción"
-          ],
-          "title": "Mercado de segunda mano (transacción segura)"
+            "Suba fotos del PRODUCTO y el precio (Pi), y se mostrará a las personas cercanas junto con su ubicación.",
+            "Vea los artículos disponibles cerca, ordenados por distancia, y si le gusta, pídalo con Pi.",
+            "El Pi pagado es guardado de forma segura por la plataforma (ESCROW) temporalmente y se entrega al vendedor una vez finalizada la transacción."
+          ]
         },
         {
           "icon": "🏪",
+          "title": "Registro de mi tienda O2O, registro de PRODUCTOS (PiRC3, ESCROW - transacción segura)",
           "steps": [
-            "En 'Registro de tienda', si estableces el nombre y la ubicación de tu tienda, los clientes encontrarán las tiendas cercanas",
-            "Registra fotos del Menu · precio · cantidad",
-            "Cuando un cliente hace un pedido, recibes una notificación instantánea por Telegram (Menu · cantidad · importe)",
-            "Entrega en la tienda en el orden: En preparación → Preparado → Pickup"
-          ],
-          "title": "Mi tienda (O2O)"
+            "En 'Registro de tienda', establezca el nombre y la ubicación de su tienda para que los clientes la encuentren cerca.",
+            "Registre fotos del menú, precio y cantidad.",
+            "Cuando un cliente hace un pedido, recibirá una notificación instantánea por Telegram (menú · cantidad · importe).",
+            "Entréguelo en la tienda en el orden: En preparación → Listo → PICKUP."
+          ]
         },
         {
           "icon": "🪙",
+          "title": "Recompensa de TESTNET, igual en MAINNET (promesa)",
           "steps": [
-            "Los Bean recibidos ahora por el Event de Testnet son una promesa de cafe.pi",
-            "Cuando la Platform se Launch oficialmente en Mainnet y el Bean sea emitido oficialmente,",
-            "Los Token de Event acumulados en Testnet se pagarán exactamente 1:1 como Bean de Mainnet",
-            "Este es el principio de cafe.pi para asegurar que el esfuerzo de los participantes iniciales no se pierda"
-          ],
-          "title": "Recompensas de Testnet, tal cual en Mainnet (promesa)"
+            "Los Bean recibidos ahora en el EVENTO de TESTNET son una promesa de cafe.pi.",
+            "Cuando la plataforma se lance oficialmente en MAINNET,",
+            "Los Bean de EVENTO acumulados en TESTNET se pagarán exactamente 1:1 como Bean de MAINNET.",
+            "Este es el principio de cafe.pi para garantizar que el esfuerzo de los primeros participantes no se pierda."
+          ]
         }
       ]
     },
@@ -1549,6 +1549,7 @@
     "list": {
       "authenticating": "Autenticando cuenta Pi…",
       "direct": "1:1",
+      "directCafes": "Cafes de trato directo",
       "discover": "Explorar Cafés",
       "expired": "Expirado",
       "expiresToday": "Expira hoy",
