@@ -227,11 +227,19 @@ export function ChatListView({
 }) {
   const t = useTranslations('chat.list')
   // 내 카페를 구독/일반 두 섹션으로 분리 (discover와 완전히 별도) — 각 섹션 내 최신 생성순
+  // 직거래(DIRECT)는 일반·프리미엄과 별개 분류 — 항상 최상단. 구독(PREMIUM) 그 다음, 일반은 나머지.
+  const directRooms = sortByNewest(
+    myRooms.filter((r) => r.msg_theme?.theme_tp_cd === 'DIRECT'),
+  )
   const subscriptionRooms = sortByNewest(
     myRooms.filter((r) => r.msg_theme?.theme_tp_cd === 'PREMIUM'),
   )
   const regularRooms = sortByNewest(
-    myRooms.filter((r) => r.msg_theme?.theme_tp_cd !== 'PREMIUM'),
+    myRooms.filter(
+      (r) =>
+        r.msg_theme?.theme_tp_cd !== 'PREMIUM' &&
+        r.msg_theme?.theme_tp_cd !== 'DIRECT',
+    ),
   )
   const sortedDiscover = sortByNewest(discoverRooms)
 
@@ -259,6 +267,14 @@ export function ChatListView({
       {!roomsLoading && (
         <section className="bg-muted/30 mb-6 rounded-2xl p-4 sm:p-5">
           <SectionHeader label={t('myCafes')} />
+
+          {/* 직거래 서브섹션 — 일반·프리미엄과 별개 분류, 항상 최상단 */}
+          {directRooms.length > 0 && (
+            <div className="mb-5">
+              <SubSectionHeader label={t('directCafes')} badge="🤝" />
+              <PagedRoomList rooms={directRooms} />
+            </div>
+          )}
 
           {/* 구독 서브섹션 — PREMIUM 테마 방만 */}
           {subscriptionRooms.length > 0 && (

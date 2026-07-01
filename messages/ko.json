@@ -1244,6 +1244,7 @@
     "list": {
       "subtitle": "Pi 커뮤니티 테마 카페",
       "myCafes": "내 카페",
+      "directCafes": "직거래 카페",
       "subscriptionCafes": "구독 카페",
       "regularCafes": "일반 카페",
       "discover": "카페 탐색",
