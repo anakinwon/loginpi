@@ -19,6 +19,7 @@ import { LOCALE_CD_RE } from '@/lib/chat-translate'
 import { queueRoomTranslations } from '@/lib/chat-translate-dedup'
 import { pushRoomWebhooks } from '@/lib/chat-webhook'
 import { recordUserAction } from '@/lib/event'
+import { enqueueChatNoti } from '@/lib/chat-noti'
 
 type Params = { params: Promise<{ roomId: string }> }
 
@@ -376,6 +377,19 @@ export async function POST(request: NextRequest, { params }: Params) {
     pushRoomWebhooks(roomId, data).catch((err) =>
       console.error('[chat-webhook] push 오류', err),
     ),
+  )
+
+  // PRD_13 §18: 1:1 DM 새 메시지를 상대 Telegram으로 미러 (당근마켓 앱 푸시 대체)
+  //   내부에서 room_tp_cd='D'만 처리 — 그룹·이벤트방은 무시. 발송은 cron(chat-noti)이 지연·미읽음 게이트로.
+  after(() =>
+    enqueueChatNoti({
+      msg_id: data.msg_id,
+      room_id: roomId,
+      snd_usr_id: user.id,
+      snd_usr_nm: data.snd_usr_nm,
+      msg_cont: data.msg_cont,
+      msg_tp_cd: data.msg_tp_cd,
+    }).catch((err) => console.error('[chat-noti] enqueue 오류', err)),
   )
 
   // M6: 스티커 이용 미션 기록 (비블로킹) — MULTI_OR 중 1개

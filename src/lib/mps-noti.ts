@@ -107,6 +107,8 @@ export async function dispatchOrderNotis(limit = 100): Promise<DispatchResult> {
   const { data } = await db
     .from('msg_noti_outbox')
     .select('noti_id, recv_usr_id, noti_body, retry_cnt')
+    // 주문(ORDER) 알림만 이 디스패처가 처리 — CHAT 등 타 유형 혼입 차단 (PRD_13 §18)
+    .eq('noti_tp_cd', 'ORDER')
     .eq('noti_chnl_cd', 'TELEGRAM')
     .eq('sent_yn', 'N')
     .eq('del_yn', 'N')

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { verifyLinkCode } from '@/lib/telegram-link'
 import { sendTelegramMessage } from '@/lib/telegram'
+import { relayTelegramReply } from '@/lib/chat-relay'
 
 // Telegram webhook — 봇이 받은 업데이트를 처리. 현재는 /start <code> 연동만.
 //   보안: setWebhook 시 등록한 secret_token을 헤더로 대조(위조 차단).
@@ -24,14 +25,26 @@ export async function POST(req: NextRequest) {
   }
 
   const msg = (
-    update as { message?: { text?: string; chat?: { id?: number } } }
+    update as {
+      message?: {
+        text?: string
+        chat?: { id?: number }
+        reply_to_message?: { message_id?: number }
+      }
+    }
   )?.message
   const text = msg?.text
   const chatId = msg?.chat?.id
+  const replyToMsgId = msg?.reply_to_message?.message_id
   if (!text || chatId == null) return NextResponse.json({ ok: true })
 
   const m = text.match(/^\/start(?:\s+(\S+))?/)
-  if (!m) return NextResponse.json({ ok: true })
+  if (!m) {
+    // /start가 아닌 일반 텍스트 → P2P 릴레이 중계 (PRD_13 §18-6 인용답장 라우팅)
+    //   실패해도 항상 200 — Telegram 재시도 폭주 방지(사용자 안내는 relay 내부에서 발송)
+    await relayTelegramReply({ chatId, text, replyToMsgId })
+    return NextResponse.json({ ok: true })
+  }
 
   const code = m[1]
   if (!code) {

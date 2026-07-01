@@ -1,8 +1,8 @@
-# PRD_13_MSG.md — 판매자 주문 알림 (Telegram)
+# PRD_13_MSG.md — 판매자 주문 알림 + P2P 채팅 알림·릴레이 (Telegram)
 
 > **작성일**: 2026-06-18
-> **버전**: v1.1
-> **상태**: ✅ Phase 1 구현 완료·실기기 연동 확인 (2026-06-18), Phase 2 기획
+> **버전**: v1.2
+> **상태**: ✅ Phase 1 구현 완료·실기기 연동 확인 (2026-06-18), Phase 2 기획, 📝 Phase 3 P2P 채팅 알림·봇 릴레이 설계 (2026-07-01 — 당근마켓 앱 푸시 대체)
 > **작성자**: 아소카 (Telegram Order Notifier Design Specialist)
 > **검토**: 아나킨 마스터님
 
@@ -12,6 +12,7 @@
 
 | 버전 | 날짜 | 변경 내용 | 작성자 |
 |------|------|-----------|--------|
+| v1.2 | 2026-07-01 | **Phase 3 설계 — P2P 채팅 알림 & 봇 릴레이 (당근마켓 앱 푸시 대체)** — 섹션 18 신설. 핵심 요건 재정의: 당근마켓의 "채팅+앱 푸시" 고리를 Pi Browser(WebView·푸시 부재)에서 **텔레그램으로 대체**. **하이브리드 아키텍처**(앱 내 DM `msg_room(D)`=채팅 본체 + 텔레그램=오프라인 푸시·인용답장 릴레이), 기존 3계층(Realtime→Telegram→Pull) 골격 재사용. `msg_noti_outbox.noti_tp_cd` 확장(ORDER/CHAT/TXN_ST/FBCK 통합)·`msg_tlgm_out` 매핑(인용답장 라우팅)·`sys_user.cur_relay_room_id`(폴백)·미읽음 지연발송. FR-MSG-11~15·`sql/150`. ⚠️ 설계 단계(구현 착수 전). | 아소카 |
 | v1.1 | 2026-06-18 | **Phase 1 구현 완료·실기기 연동 확인** — `sql/064`(Outbox+sys_user Telegram 컬럼, DA 승인)·`markEscrow` enqueue·`telegram.ts`/`mps-noti.ts` 디스패처·온보딩(딥링크+webhook)·안읽은 뱃지·**결제완료 즉시 발송**(cron 의존 제거)·인앱 Realtime 토스트 제스처 분리·보안 하드닝(webhook fail-closed·재바인딩 차단). 설계 대비: webhook을 Phase 1로 앞당김, cron 주기발송→즉시발송+cron 안전망. (ROADMAP Phase 18) | 아소카 |
 | v1.0 | 2026-06-18 | **Phase 1 설계 완료** — Outbox 패턴 + HTML parse_mode sendMessage/sendPhoto 템플릿 + url 딥링크 버튼 + Realtime Webhook 준비(Phase 2) | 아소카 |
 
@@ -36,6 +37,7 @@
 15. [테스트 및 검증](#15-테스트-및-검증)
 16. [마일스톤 및 로드맵](#16-마일스톤-및-로드맵)
 17. [미해결 이슈](#17-미해결-이슈)
+18. [P2P 채팅 알림 & 봇 릴레이 (Phase 3 — 당근마켓 알림 대체)](#18-p2p-채팅-알림--봇-릴레이-phase-3--당근마켓-알림-대체)
 
 ---
 
@@ -1695,6 +1697,181 @@ const template = messages[locale].ORDER_NOTIFICATION
 - [ ] 17-4: i18n Phase (1 vs 2)
 - [ ] 17-5: 이미지 정책 (필수 vs 선택)
 - [ ] 17-6: 파티셔닝 로드맵
+
+---
+
+## 18. P2P 채팅 알림 & 봇 릴레이 (Phase 3 — 당근마켓 알림 대체)
+
+> **작성**: 2026-07-01 · **상태**: 설계(구현 착수 전) · 결정: 하이브리드 아키텍처 · 인용답장 라우팅
+
+### 18-1. 배경 및 목적 (핵심 요건)
+
+우리 P2P 서비스의 모태는 **당근마켓**이다. 당근마켓의 거래 성립 고리는 **"채팅 + 앱 푸시 알림"**이다 — 관심 상품에 문의를 남기고, 상대가 앱을 안 보고 있어도 **푸시로 즉시 도달**해 대화가 이어진다.
+
+그런데 **Pi Browser는 WebView라 푸시 알림이 없다**(쿠키 미저장·Web Push 불확실 — 이 PRD의 존재 이유와 동일한 제약). 앱 내 실시간 채팅은 앱이 열려 있을 때만 도달하고, 닫으면 상대는 새 메시지를 **영영 모른다**. 이 끊긴 고리가 P2P 거래 성립률을 직접 떨어뜨린다.
+
+**따라서 이 기능의 진짜 목적은 "채팅 기능"이 아니라 "당근마켓의 앱 푸시를 텔레그램으로 대체"하는 것이다.** 채팅 UI 자체는 이미 앱에 있다(`msg_room` `room_tp_cd='D'` 1:1 DM). 없는 것은 **오프라인 도달 채널**이며, 그것은 O2O 주문 알림이 이미 검증한 `msg_noti_outbox`→Telegram 파이프의 확장으로 해결한다.
+
+### 18-2. 아키텍처: 하이브리드 (결정)
+
+| 구성 | 역할 | 기반 |
+|---|---|---|
+| **앱 내 DM** (채팅 본체) | 대화 UI·리치 콘텐츠(이미지)·다중 대화 목록·이력 | 기존 `msg_room(D)`·`msg_msg`·`getOrCreateDirectRoom` |
+| **텔레그램** (알림 + 릴레이) | ① 오프라인 **푸시**(당근 알림 대체) ② 앱 안 열고 **인용답장** | 기존 `telegram.ts`·webhook·`msg_noti_outbox` 확장 |
+
+**하이브리드를 택한 이유**: 봇 릴레이 단독은 **구매자도 텔레그램 연동을 강제**해 진입장벽이 크다(P2P 문의는 즉흥적 — 온보딩 관문에서 이탈). 앱 내 DM을 1차 채널로 두면 **로그인만으로 즉시 문의 가능**(진입장벽 0), 텔레그램은 연동한 사람에게 **오프라인 도달·빠른 답장**을 얹는 선택적 증폭 채널이 된다. 미연동 사용자는 앱 DM만으로도 온전히 동작한다.
+
+### 18-3. 3계층 재사용 (섹션 10 골격 그대로)
+
+채팅 메시지를 주문 알림과 **동일한 3계층**에 태운다:
+
+```
+Layer 1  Realtime broadcast   → 상대 앱 열림 시 즉시 (기존 채팅 실시간)
+Layer 2  Telegram sendMessage → 상대 앱 닫힘·미읽음 시 오프라인 푸시  ← Phase 3 확장
+Layer 3  Pull 안읽은 뱃지      → 최종 안전망 (기존 채팅 unread)
+```
+
+주문 알림에서 이미 완성된 Layer 2를 **채팅 도메인으로 일반화**하는 것이 작업의 전부다.
+
+### 18-4. 메시지 흐름 (앱 ↔ 텔레그램 양방향 미러링)
+
+**A. 앱에서 발신 (구매자·판매자가 앱 DM에 작성)**
+```
+msg_msg INSERT (기존 채팅 send)
+ ├─ Layer 1: Realtime broadcast (상대 앱 열림 시 즉시)
+ └─ Layer 2: 지연 큐 enqueue → 상대 '미읽음'이면 텔레그램 발송
+              "💬 [아이폰 케이스] 상대방: <원문>   [답장하기]"
+              발송된 tlgm message_id를 msg_tlgm_out에 저장 (인용답장 라우팅 재료)
+```
+
+**B. 텔레그램에서 인용답장 (앱 안 열고 즉시)**
+```
+webhook 텍스트 수신 (from.chat_id, text, reply_to_message)
+ → reply_to.message_id + from.chat_id 로 msg_tlgm_out 역조회 → room_id 확정
+ → 그 room에 msg_msg INSERT (발신자 = 이 텔레그램 사용자)
+ → 다시 Layer 1(상대 앱) + Layer 2(상대 텔레그램) 전파
+```
+
+핵심은 **앱 DM과 텔레그램이 같은 `msg_room`을 공유**한다는 점이다. 어디서 입력하든 `msg_msg`에 한 줄로 쌓이고 양쪽으로 미러링되므로, 대화 이력은 항상 단일 소스에 일관되게 보존된다.
+
+### 18-5. 미읽음 지연 발송 (푸시 스팸 방지)
+
+앱을 보고 있는 사용자에게까지 텔레그램이 울리면 스팸이다. 당근도 인앱이면 푸시를 억제한다. 동일하게:
+
+```
+메시지 도착 → outbox enqueue(가시 지연 T=30~60초)
+ → 디스패치 시점에 상대의 msg_room_mbr.lst_read_msg_id 확인
+     읽음(그 메시지 이상) → skip (fail_reas='READ_SKIP')
+     미읽음               → Telegram 발송
+```
+
+`after()` 백그라운드 + 기존 cron 디스패처(섹션 10-3)에 지연·읽음 게이트만 추가한다.
+
+### 18-6. 인용답장 라우팅 (다중 대화 문제 해결 — 결정)
+
+봇 창은 하나인데 사용자는 여러 거래를 동시에 진행한다("이 텍스트가 어느 방으로?"). **텔레그램 native reply(인용답장) 기반**으로 확정:
+
+```
+1) reply_to 있음  → msg_tlgm_out(recv_chat_id, tlgm_msg_id) 역조회 → 정확한 room  (주 경로)
+2) reply_to 없음  → sys_user.cur_relay_room_id (마지막 상호작용 방)                (폴백)
+3) 여전히 모호    → inline keyboard "어느 거래에 답장?" 선택 → cur_room 갱신        (최종)
+```
+
+봇이 보내는 **모든 중계 메시지에 상품명 라벨**을 붙여 사용자가 맥락을 항상 인지하게 한다. 명령어 `/rooms`(활성 대화 전환)·`/end`(대화 종료) 보조.
+
+### 18-7. 데이터 모델 (최소 추가 — DA 표준 초안)
+
+**재사용(변경 없음)**: `msg_room(D)`·`msg_room_mbr`·`msg_msg`·`msg_noti_outbox`·`sys_user.tlgm_*`
+
+```sql
+-- (1) 아웃박스에 알림 유형 추가 — 주문/채팅/거래상태/후기를 단일 파이프로 통합
+ALTER TABLE public.msg_noti_outbox
+  ADD COLUMN IF NOT EXISTS noti_tp_cd VARCHAR(10) NOT NULL DEFAULT 'ORDER'
+    CHECK (noti_tp_cd IN ('ORDER','CHAT','TXN_ST','FBCK'));
+--   CHAT 유형 noti_body: { room_id, item_id, item_nm, sndr_alias, msg_preview }
+
+-- (2) 인용답장 라우팅 매핑 — 봇이 발송한 텔레그램 메시지 ↔ room 역조회
+CREATE TABLE public.msg_tlgm_out (
+  tlgm_out_id  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  room_id      UUID   NOT NULL REFERENCES public.msg_room(room_id),
+  recv_usr_id  TEXT   NOT NULL,          -- 이 텔레그램 메시지를 받은 사용자(sys_user.id)
+  recv_chat_id BIGINT NOT NULL,          -- 수신자 텔레그램 chat_id
+  tlgm_msg_id  BIGINT NOT NULL,          -- 봇이 발송한 message_id (인용답장 키)
+  src_msg_id   UUID,                     -- 미러링 원천 msg_msg
+  regr_id TEXT NOT NULL DEFAULT 'ADMIN', reg_dtm TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  modr_id TEXT NOT NULL DEFAULT 'ADMIN', mod_dtm TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  del_yn CHAR(1) NOT NULL DEFAULT 'N' CHECK (del_yn IN ('Y','N')), del_dtm TIMESTAMPTZ
+);
+CREATE INDEX idx_msg_tlgm_out_route ON public.msg_tlgm_out(recv_chat_id, tlgm_msg_id) WHERE del_yn='N';
+CREATE INDEX idx_msg_tlgm_out_room  ON public.msg_tlgm_out(room_id) WHERE del_yn='N';
+
+-- (3) 봇 창 활성 방 포인터(라우팅 폴백)
+ALTER TABLE public.sys_user ADD COLUMN IF NOT EXISTS cur_relay_room_id UUID;
+```
+
+> 별도 채팅방 테이블을 만들지 않고 **기존 `msg_room(D)`를 그대로 공유**하는 것이 이 설계의 요점(단일 이력·앱 UI 재사용). `da-ddl-guard` Hook 검토 후 `sql/150`으로 반영.
+
+### 18-8. 세션 시작 — "판매자에게 문의" (진입)
+
+```
+[상품 상세 / 주문관리]  "판매자에게 문의" 버튼  (현재 없음 → 신규)
+   │ POST /api/store/chat/start { item_id 또는 order_id }   (piFetch·getSessionUser)
+   ▼
+서버: getOrCreateDirectRoom(buyer, seller) → 앱 내 DM 방 확보(멱등)
+   ├─ 앱: 구매자를 해당 DM으로 이동(로그인만으로 즉시 — 진입장벽 0)
+   └─ 판매자: 미읽음 지연 게이트 → 텔레그램 "🆕 [상품명] 새 문의가 도착했습니다 [답장하기]"
+             (판매자 미연동 시 앱 DM·Pull 뱃지로 폴백)
+```
+
+### 18-9. 당근마켓식 통합 알림 허브 (확장)
+
+`noti_tp_cd` 하나로 "Pi Browser 푸시 부재"를 메우는 알림을 **통합**한다 — 당근의 알림 목록과 대응:
+
+| 당근마켓 알림 | 우리 트리거 | noti_tp_cd |
+|---|---|---|
+| 채팅 새 메시지 | `msg_msg` INSERT (미읽음) | `CHAT` |
+| 새 문의(관심) | 문의 방 최초 생성 | `CHAT` |
+| 거래 상태 변경(예약→완료) | `mps_order.order_st_cd` 변경 | `TXN_ST` |
+| 후기 도착 | `fbck_mst` INSERT | `FBCK` |
+| 주문 접수(O2O) | `markEscrow`(기존) | `ORDER` |
+
+### 18-10. 기능 요건 (FR)
+
+- **FR-MSG-11** 앱 DM ↔ 텔레그램 양방향 미러링(같은 `msg_room` 공유·발신 출처 무관 단일 이력)
+- **FR-MSG-12** 미읽음 지연 발송(가시 지연 T초 후 `lst_read_msg_id` 게이트로 읽음 시 skip)
+- **FR-MSG-13** 인용답장 라우팅(`msg_tlgm_out` 역조회 주 경로 + `cur_relay_room_id` 폴백 + 선택 UI)
+- **FR-MSG-14** "판매자에게 문의" 진입(상품상세·주문관리 버튼 → `getOrCreateDirectRoom` → 판매자 텔레그램 알림)
+- **FR-MSG-15** 통합 알림 유형(`noti_tp_cd` ORDER/CHAT/TXN_ST/FBCK 단일 아웃박스)
+
+### 18-11. 보안·PII (섹션 14 재사용)
+
+- **익명**: chat_id·실명·텔레그램 username 상호 비노출(라벨은 "구매자/판매자" + 상품명). username은 저장조차 안 함 → 구조적으로 안전.
+- **연동 원자 가드**: 기존 `tlgm_conn_yn='N'` 재바인딩 차단 패턴 재사용.
+- **Rate limiting**: 방·발신자별 분당 상한(`ddos-guard` 재사용) — 스팸·괴롭힘 차단.
+- **신고·차단**: 기존 `rpt_report`(`ReportButton`) 연계 + 방 상태 차단.
+- **봇 차단 대응**: 상대가 봇 block → 403 → 앱 Pull 뱃지가 안전망(O2O와 동일 철학).
+- **감사**: 미러링 메시지는 `msg_msg`에 원본이 남으므로 별도 로그 불필요.
+
+### 18-12. 구현 로드맵 (독립 배포 가능한 순서)
+
+1. **DB**: `msg_noti_outbox.noti_tp_cd` 확장 + `msg_tlgm_out` + `sys_user.cur_relay_room_id` (`sql/150`, DA Hook)
+2. **미러 발송**: 앱 DM `msg_msg` INSERT 시 지연 큐 enqueue(미읽음 게이트) → 디스패처 CHAT 분기
+3. **인용답장 라우팅**: webhook 텍스트 수신 → `msg_tlgm_out` 역조회 → `msg_msg` INSERT → 재전파 + `/rooms`·`/end`
+4. **진입 UI**: 상품상세·주문관리 "판매자에게 문의" 버튼 + 미연동 텔레그램 유도 모달
+5. **통합 알림 확장**: 거래 상태 변경(`TXN_ST`)·후기(`FBCK`) 트리거 추가
+6. **보안**: rate limit·신고·차단·(선택) 외부 연락처 마스킹 정책
+
+### 18-13. 트레이드오프 노트
+
+| 기준 | 봇 릴레이(텔레그램) | 앱 내 DM(기존) | **하이브리드(채택)** |
+|---|---|---|---|
+| 오프라인 도달 | ✅ | ❌ | ✅ (텔레그램 푸시) |
+| 구매자 진입장벽 | ❌ 연동 강제 | ✅ 로그인만 | ✅ 앱 DM 1차 |
+| 다중 대화 UX | ❌ 봇 창 하나 | ✅ 방 목록 | ✅ 앱 목록 + 인용답장 |
+| 리치 콘텐츠(이미지) | △ | ✅ | ✅ |
+| 구현 비용 | 중 | 저 | 중(단계적) |
+
+> 미연동 구매자·판매자도 **앱 DM만으로 완전 동작**하고, 텔레그램은 연동한 사람에게 도달성을 더한다 — 이것이 "알림 부재 대체"라는 핵심 요건에 가장 잘 맞는 형태다.
 
 ---
 
