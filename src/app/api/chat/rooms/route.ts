@@ -43,7 +43,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
   }
 
-  const { target_usr_id } = body as { target_usr_id?: string }
+  const { target_usr_id, item_id } = body as {
+    target_usr_id?: string
+    item_id?: string
+  }
   if (!target_usr_id) {
     return NextResponse.json(
       { error: 'target_usr_id가 필요합니다' },
@@ -70,11 +73,37 @@ export async function POST(request: NextRequest) {
       { status: 404 },
     )
 
+  // 상품별 방 분리 — item_id 있으면 상품명 조회 + 판매자 검증(당사자 중 하나가 판매자여야 변조 차단)
+  let itemNm: string | null = null
+  if (item_id) {
+    const { data: item } = await getSupabaseAdmin()
+      .from('mps_item')
+      .select('item_nm, seller_id')
+      .eq('item_id', item_id)
+      .maybeSingle()
+    const it = item as { item_nm: string; seller_id: string } | null
+    if (!it) {
+      return NextResponse.json(
+        { error: '상품을 찾을 수 없습니다' },
+        { status: 404 },
+      )
+    }
+    if (it.seller_id !== target_usr_id && it.seller_id !== user.id) {
+      return NextResponse.json(
+        { error: '상품 판매자가 대화 당사자가 아닙니다' },
+        { status: 400 },
+      )
+    }
+    itemNm = it.item_nm
+  }
+
   try {
     const room = await getOrCreateDirectRoom(
       user.id,
       target_usr_id,
       user.display_name,
+      item_id ?? null,
+      itemNm,
     )
     return NextResponse.json({ room }, { status: 201 })
   } catch {

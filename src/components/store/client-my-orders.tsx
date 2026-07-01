@@ -161,13 +161,17 @@ export function ClientMyOrders({
 
   // 상대방(판매자↔구매자)에게 1:1 문의 — 기존 Direct Room API 재사용(멱등) → 채팅방 이동.
   //   P2P 직거래엔 연락 수단이 없어(당근 앱 푸시 부재) 거래 당사자 소통의 핵심 경로.
-  async function contactPeer(targetUsrId: string, orderId: string) {
+  async function contactPeer(
+    targetUsrId: string,
+    itemId: string,
+    orderId: string,
+  ) {
     setContactingId(orderId)
     try {
       const res = await piFetch('/api/chat/rooms', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ target_usr_id: targetUsrId }),
+        body: JSON.stringify({ target_usr_id: targetUsrId, item_id: itemId }),
       })
       if (!res.ok) {
         const { error } = (await res.json()) as { error?: string }
@@ -570,6 +574,7 @@ export function ClientMyOrders({
               onClick={() =>
                 contactPeer(
                   role === 'seller' ? o.buyer_id : o.seller_id,
+                  o.item_id,
                   o.order_id,
                 )
               }

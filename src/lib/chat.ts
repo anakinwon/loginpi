@@ -8,6 +8,7 @@ export interface MsgRoom {
   room_nm: string
   room_desc: string | null
   theme_cd: string
+  item_id: string | null // 직거래방 문의 상품 (상품별 방 분리, mps_item.item_id)
   room_tp_cd: 'D' | 'G' | 'E'
   max_mbr_cnt: number
   is_public_yn: 'Y' | 'N'
@@ -172,6 +173,8 @@ export async function getOrCreateDirectRoom(
   userId1: string,
   userId2: string,
   displayName1: string,
+  itemId?: string | null,
+  itemNm?: string | null,
 ): Promise<MsgRoom> {
   const supabase = getSupabaseAdmin()
 
@@ -185,13 +188,15 @@ export async function getOrCreateDirectRoom(
   if (myMbrs && myMbrs.length > 0) {
     const roomIds = myMbrs.map((r: { room_id: string }) => r.room_id)
 
-    // 그 중 D타입 방 목록
-    const { data: directRooms } = await supabase
+    // 그 중 D타입 방 목록 — 상품별 분리: itemId 있으면 같은 상품 문의방만 재사용(다른 상품은 별도 방)
+    let dq = supabase
       .from('msg_room')
       .select()
       .in('room_id', roomIds)
       .eq('room_tp_cd', 'D')
       .eq('del_yn', 'N')
+    if (itemId) dq = dq.eq('item_id', itemId)
+    const { data: directRooms } = await dq
 
     for (const room of directRooms ?? []) {
       const { data: otherMbr } = await supabase
@@ -212,6 +217,7 @@ export async function getOrCreateDirectRoom(
             expr_dtm: exp,
             room_nm: '직거래 문의',
             theme_cd: 'DIRECT',
+            ...(itemNm != null ? { room_desc: itemNm } : {}),
             modr_id: displayName1.slice(0, 20),
           })
           .eq('room_id', room.room_id)
@@ -229,8 +235,10 @@ export async function getOrCreateDirectRoom(
     .from('msg_room')
     .insert({
       room_nm: '직거래 문의',
+      room_desc: itemNm ?? null, // 문의 상품명 (목록·헤더에서 상품별 구분)
       theme_cd: 'DIRECT', // 직거래 전용 시스템 테마 (use_yn='N', sql/158)
       room_tp_cd: 'D',
+      item_id: itemId ?? null, // 문의 상품 (상품별 방 분리, sql/160)
       max_mbr_cnt: 2,
       is_public_yn: 'N',
       expr_dtm: exp,

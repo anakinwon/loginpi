@@ -15,6 +15,7 @@ const PAGE_SIZE = 6
 export type RoomWithTheme = {
   room_id: string
   room_nm: string
+  room_desc?: string | null // 직거래방=문의 상품명(목록에서 상품별 구분)
   theme_cd: string
   room_tp_cd: string
   is_public_yn: string
@@ -121,7 +122,7 @@ function RoomCard({ room, href }: { room: RoomWithTheme; href: string }) {
           )}
           {room.room_tp_cd === 'D' && (
             <span className="text-muted-foreground/70 ml-1">
-              · {t('direct')}
+              · {room.room_desc || t('direct')}
             </span>
           )}
         </p>
