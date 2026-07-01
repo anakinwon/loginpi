@@ -414,3 +414,49 @@ UPDATE sys_user SET del_yn = 'Y', del_dtm = NOW() WHERE ...;
 - 신규 헤더 UI 요소 추가 시 반드시 Pi Browser/일반 브라우저 분기 고려
 - Pi Browser에서는 Pi SDK(`window.Pi`) 외 OAuth 버튼 노출 금지
 - 헤더 세션 상태와 본문 세션 상태는 항상 같은 소스를 바라봐야 함 — 이 원칙 위반이 이번 이슈의 근본 원인
+
+---
+
+## [2026-07-02] Pi Browser 재동의·계정 무한 재생성 — `NEXT_PUBLIC_PI_SANDBOX` 전환 사고 ⭐
+
+> 핵심가치(Pi Browser 로그인) 직결 사고. 관련 메모리: `pi-sandbox-flag-uid-rebinding`.
+
+### 증상
+- 이미 가입된 계정(anakin2)인데 **Pi Browser로 접근하면 이용동의(약관·개인정보·위치)를 다시 요구**.
+- **일반 브라우저(Google 세션)에서는 정상** — 재동의 안 뜸.
+- 계정을 지워도 로그인할 때마다 **또 새 계정이 생성**됨("자꾸 다시 생김").
+
+### 원인 (근본)
+Pi의 uid는 **(앱, Testnet/Mainnet 환경) 쌍마다 다른 scoped 값**이다. `detectSandbox()`(`pi-auth-provider.tsx`)는 localhost를 제외하면 **오직 `NEXT_PUBLIC_PI_SANDBOX==='true'`** 로 sandbox를 판정하는데, 이 값이 배포 사이에 흔들리자 anakin2의 pi_uid가 `3c1484c4`(7/1)→`6789d9c1`(7/2)로 재발급됐다. `upsertPiUser`는 `onConflict:'pi_uid'`라 **uid가 다르면 무조건 신규 `sys_user` row 생성** → 그 계정은 consent 0 → 재동의. consent는 `sys_user_consent.user_str_id = sys_user.id` 기준이라 정본(consent 4/4)과 완전히 분리된다.
+
+### 왜 일반 브라우저만 정상이었나
+`getSessionUser`의 Google 경로는 `userId → google_id → google_email(불변키)` **3단 폴백**으로 정본을 복원한다. 반면 Pi 경로는 `userId`(=`sys_user.id`, 가변키)로만 조회하고 `pi_uid` 폴백이 `else if`라 **작동하지 않는다**(구조적 비대칭). 그래서 일반 브라우저만 정본을 찾았다.
+
+### 해결 (2026-07-02)
+- **근본 해결 = `NEXT_PUBLIC_PI_SANDBOX`를 환경마다 하나의 값으로 고정 + 재배포.** 계정 삭제·재테스트로는 절대 안 멈춘다(다음 로그인에 또 다른 uid).
+- 운영 방향 확정 = **메인넷(`false`)** — 운영 DB 클린 초기화(`334e52d` 단일 TRUNCATE)와 함께 컷오버.
+- 결과: **결제 → 텔레그램 알림 → 딥링크로 Pi Browser 복귀 → 조치까지 전 흐름 실기기 성공 검증.**
+
+### SANDBOX_FLAG (`NEXT_PUBLIC_PI_SANDBOX`) 정의 — 환경별 고정값
+
+| 값 | Pi 환경 | 로그인 uid | 결제 |
+|---|---|---|---|
+| `true` | Pi Testnet(샌드박스) | 테스트넷 scoped | 테스트 Pi(가짜) |
+| `false` / 미설정 | Pi Mainnet | 메인넷 scoped | 실제 Pi |
+| (localhost) | 항상 Testnet (코드가 hostname으로 강제) | — | — |
+
+| 환경 | 값 | 비고 |
+|---|---|---|
+| 로컬(dev) | 자동 `true` | 설정 불필요(hostname 강제) |
+| **staging** | **`true`** | Testnet — 실제 돈 없이 검증 |
+| **운영(cafepi)** | **`false`** | Mainnet 확정(2026-07-02) |
+
+### 재발방지 (철칙)
+1. **환경 내 플래그 고정** — 바꾸면 전 사용자 uid 재발급 → systemic 재동의·계정 분리(anakin2뿐 아니라 전원).
+2. **변경 시 재배포 필수** — `NEXT_PUBLIC_*`는 빌드 인라인이라 env만 바꾸면 미반영.
+3. **메인넷 전환은 세트 작업** — 클린 초기화 + 계정 마이그레이션 계획과 동반.
+4. **삭제로 해결 불가** — 원인이 플래그면 계정을 지워도 재생성된다. 먼저 플래그를 고정하라.
+5. (개선 권장) `getSessionUser` Pi 경로에 `pi_uid`(불변키) 순차 폴백 추가 — Google email 폴백과 대칭화(재적재 orphan 견고성). 단 이번 uid 변경 자체는 폴백으로 못 고침.
+
+### ⛔ 절대 금지 (동반 확정 원칙)
+- **실 환경(운영·staging)에 테스트/더미 사용자·거래를 생성하지 말 것.** Pi Network에서 **가짜 인간(다중·허위 계정)으로 대신 테스트하면 KYC·1인1계정 위반 → Pi 계정 영구제명** 위험(2026-07-02 마스터 "매우 매우 위험" 재강조). 검증은 실사용자 행위로만. 메모리 `no-test-dummy-data-in-real-env` 참조.
