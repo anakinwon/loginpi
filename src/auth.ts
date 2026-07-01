@@ -5,6 +5,12 @@ import { recordActivity } from '@/lib/activity-log'
 import { isReadOnlyDb } from '@/lib/db-env'
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  // 프록시(Vercel·Pi 포워딩 cafe7092.pinet.com) 뒤에서 auth() 헬퍼가 X-Forwarded-Host를
+  // 신뢰해 세션을 읽도록 강제. 미설정 시 프로덕션에서 auth()가 세션을 못 읽어(useSession/헤더는 OK)
+  // 본문(getSessionUser)만 로그인 실패하는 "헤더 O·본문 X" 증상이 발생한다(NextAuth v5 known issue).
+  // ⚠️ 운영에 AUTH_URL/NEXTAUTH_URL을 실제 접속 도메인과 다르게 두면 이 값이 무시될 수 있으니
+  //    운영엔 AUTH_URL/NEXTAUTH_URL을 설정하지 말 것(요청 host 자동 감지에 위임).
+  trustHost: true,
   providers: [
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID,
