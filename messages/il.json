@@ -1764,6 +1764,7 @@
     "search": "חפש",
     "send": "שלח",
     "stagingBanner": "🧪 סביבת STAGING · DB פיתוח — לא נתונים אמיתיים",
+    "stagingBannerReadOnly": "🧪 STAGING · DB קריאה בלבד 🔒 — לא נתונים אמיתיים",
     "upgrade": "Upgrade",
     "yes": "כן"
   },
@@ -2388,6 +2389,10 @@
       "NEW": "חדש",
       "USED": "משומש"
     },
+    "contactBuyer": "צור קשר עם הקונה",
+    "contactFail": "התחלת יצירת הקשר נכשלה",
+    "contactSeller": "צור קשר עם המוכר",
+    "contactStarting": "פותח שיחה…",
     "deleteConfirm": "למחוק את הפריט?",
     "deleteSuccess": "נמחק בהצלחה",
     "draftSuccess": "נשמר כטיוטה",

@@ -1764,6 +1764,7 @@
     "search": "खोजें",
     "send": "भेजें",
     "stagingBanner": "🧪 STAGING एनवायरनमेंट · डेवलपमेंट DB — वास्तविक डेटा नहीं",
+    "stagingBannerReadOnly": "🧪 STAGING पर्यावरण · Production DB केवल पढ़ने के लिए 🔒 — यह वास्तविक Data नहीं है",
     "upgrade": "Upgrade",
     "yes": "हाँ"
   },
@@ -2388,6 +2389,10 @@
       "NEW": "नया Item",
       "USED": "इस्तेमाल किया हुआ"
     },
+    "contactBuyer": "खरीददार से संपर्क करें",
+    "contactFail": "संपर्क शुरू नहीं हो सका",
+    "contactSeller": "विक्रेता से संपर्क करें",
+    "contactStarting": "चैट रूम खुल रहा है…",
     "deleteConfirm": "क्या आप उत्पाद हटाना चाहते हैं?",
     "deleteSuccess": "हटा दिया गया है",
     "draftSuccess": "ड्राफ्ट सहेज लिया गया है",

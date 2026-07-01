@@ -1764,6 +1764,7 @@
     "search": "検索",
     "send": "送信",
     "stagingBanner": "🧪 STAGING 環境 · 開発DB — 実Data ではありません",
+    "stagingBannerReadOnly": "🧪 STAGING 環境 · 運用DB 読み取り専用 🔒 — 実際のDataではありません",
     "upgrade": "Upgrade",
     "yes": "はい"
   },
@@ -2388,6 +2389,10 @@
       "NEW": "新品",
       "USED": "中古"
     },
+    "contactBuyer": "購入者に問い合わせる",
+    "contactFail": "問い合わせを開始できませんでした",
+    "contactSeller": "販売者に問い合わせる",
+    "contactStarting": "チャットルームを開いています…",
     "deleteConfirm": "Itemを削除しますか？",
     "deleteSuccess": "削除されました",
     "draftSuccess": "一時保存されました",

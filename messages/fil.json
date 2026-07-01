@@ -1764,6 +1764,7 @@
     "search": "Search",
     "send": "Ipadala",
     "stagingBanner": "🧪 STAGING Environment · Development DB — Hindi totoong Data",
+    "stagingBannerReadOnly": "🧪 STAGING Environment · Production DB Read-only 🔒 — Hindi totoong Data",
     "upgrade": "Upgrade",
     "yes": "Oo"
   },
@@ -2388,6 +2389,10 @@
       "NEW": "Bagong Item",
       "USED": "Used"
     },
+    "contactBuyer": "Makipag-ugnayan sa Buyer",
+    "contactFail": "Hindi masimulan ang pakikipag-ugnayan",
+    "contactSeller": "Makipag-ugnayan sa Seller",
+    "contactStarting": "Binubuksan ang chat...",
     "deleteConfirm": "Burahin ang item?",
     "deleteSuccess": "Nabura na",
     "draftSuccess": "Na-save bilang draft",

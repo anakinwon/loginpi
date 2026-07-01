@@ -1764,6 +1764,7 @@
     "search": "Search",
     "send": "Enviar",
     "stagingBanner": "🧪 STAGING Environment · Development DB — Not live data",
+    "stagingBannerReadOnly": "🧪 STAGING Environment · Production DB Read-only 🔒 — Not real data",
     "upgrade": "Upgrade",
     "yes": "Yes"
   },
@@ -2388,6 +2389,10 @@
       "NEW": "New",
       "USED": "Used"
     },
+    "contactBuyer": "Contact Buyer",
+    "contactFail": "Could not start contact",
+    "contactSeller": "Contact Seller",
+    "contactStarting": "Starting chat...",
     "deleteConfirm": "Delete item?",
     "deleteSuccess": "Deleted",
     "draftSuccess": "Saved as draft",

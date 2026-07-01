@@ -1764,6 +1764,7 @@
     "search": "Cari",
     "send": "Kirim",
     "stagingBanner": "🧪 STAGING Environment · Development DB — Bukan Data Asli",
+    "stagingBannerReadOnly": "🧪 LINGKUNGAN STAGING · DB Operasional Hanya-Baca 🔒 — Bukan Data Nyata",
     "upgrade": "Upgrade",
     "yes": "Ya"
   },
@@ -2388,6 +2389,10 @@
       "NEW": "Baru",
       "USED": "Bekas"
     },
+    "contactBuyer": "Hubungi Pembeli",
+    "contactFail": "Tidak dapat memulai kontak",
+    "contactSeller": "Hubungi Penjual",
+    "contactStarting": "Sedang membuka ruang obrolan…",
     "deleteConfirm": "Hapus produk?",
     "deleteSuccess": "Telah dihapus",
     "draftSuccess": "Telah disimpan sebagai draf",

@@ -1764,6 +1764,7 @@
     "search": "搜索",
     "send": "发送",
     "stagingBanner": "🧪 STAGING 环境 · 开发DB — 非真实数据",
+    "stagingBannerReadOnly": "🧪 STAGING 环境 · 生产DB 只读 🔒 — 非真实 Data",
     "upgrade": "Upgrade",
     "yes": "是"
   },
@@ -2388,6 +2389,10 @@
       "NEW": "新商品",
       "USED": "二手"
     },
+    "contactBuyer": "联系买家",
+    "contactFail": "未能开始联系",
+    "contactSeller": "联系卖家",
+    "contactStarting": "正在开启对话…",
     "deleteConfirm": "确定要删除商品吗？",
     "deleteSuccess": "已删除",
     "draftSuccess": "已保存草稿",

@@ -1764,6 +1764,7 @@
     "search": "Soek",
     "send": "Stuur",
     "stagingBanner": "🧪 STAGING omgewing · Ontwikkeling DB — nie regte Data nie",
+    "stagingBannerReadOnly": "🧪 STAGING omgewing · produksie DB leesalleen 🔒 — nie regte Data nie",
     "upgrade": "Upgrade",
     "yes": "Ja"
   },
@@ -2388,6 +2389,10 @@
       "NEW": "Nuwe Item",
       "USED": "Gebruik"
     },
+    "contactBuyer": "Kontak koper",
+    "contactFail": "Kon nie kontak begin nie",
+    "contactSeller": "Kontak verkoper",
+    "contactStarting": "Begin tans gesprek...",
     "deleteConfirm": "Wil jy die item uitvee?",
     "deleteSuccess": "Uitgevee",
     "draftSuccess": "Konsep is gestoor",

@@ -1764,6 +1764,7 @@
     "search": "Rechercher",
     "send": "Envoyer",
     "stagingBanner": "🧪 STAGING Environnement · Développement DB — Pas de Real Data",
+    "stagingBannerReadOnly": "🧪 Environnement STAGING · DB de production en lecture seule 🔒 — Pas de Data réelles",
     "upgrade": "Mettre à niveau",
     "yes": "Oui"
   },
@@ -2388,6 +2389,10 @@
       "NEW": "Neuf",
       "USED": "Occasion"
     },
+    "contactBuyer": "Contacter l'acheteur",
+    "contactFail": "Impossible de démarrer la conversation",
+    "contactSeller": "Contacter le vendeur",
+    "contactStarting": "Démarrage de la conversation...",
     "deleteConfirm": "Voulez-vous supprimer l'article ?",
     "deleteSuccess": "Supprimé",
     "draftSuccess": "Enregistré comme brouillon",

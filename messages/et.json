@@ -1764,6 +1764,7 @@
     "search": "Otsi",
     "send": "Saada",
     "stagingBanner": "🧪 STAGING keskkond · Arendus-DB — Pole reaalne andmestik",
+    "stagingBannerReadOnly": "🧪 STAGING keskkond · tootmis-DB ainult lugemiseks 🔒 — mitte tegelikud andmed",
     "upgrade": "Upgrade",
     "yes": "Jah"
   },
@@ -2388,6 +2389,10 @@
       "NEW": "Uus",
       "USED": "Kasutatud"
     },
+    "contactBuyer": "Võta ühendust ostjaga",
+    "contactFail": "Päringut ei õnnestunud alustada",
+    "contactSeller": "Võta ühendust müüjaga",
+    "contactStarting": "Vestlust alustatakse…",
     "deleteConfirm": "Kas kustutada toode?",
     "deleteSuccess": "Kustutatud",
     "draftSuccess": "Salvestatud mustandina",

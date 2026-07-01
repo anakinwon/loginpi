@@ -1764,6 +1764,7 @@
     "search": "Поиск",
     "send": "Отправить",
     "stagingBanner": "🧪 STAGING среда · DB разработки — не реальные данные",
+    "stagingBannerReadOnly": "🧪 STAGING среда · Рабочая DB только для чтения 🔒 — не реальные данные",
     "upgrade": "Upgrade",
     "yes": "Да"
   },
@@ -2388,6 +2389,10 @@
       "NEW": "Новый товар",
       "USED": "Б/у"
     },
+    "contactBuyer": "Связаться с покупателем",
+    "contactFail": "Не удалось начать диалог",
+    "contactSeller": "Связаться с продавцом",
+    "contactStarting": "Открытие диалога…",
     "deleteConfirm": "Удалить товар?",
     "deleteSuccess": "Удалено",
     "draftSuccess": "Черновик сохранен",

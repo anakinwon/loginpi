@@ -1764,6 +1764,7 @@
     "search": "Cerca",
     "send": "Invia",
     "stagingBanner": "🧪 AMBIENTE STAGING · Development DB — Non sono Real Data",
+    "stagingBannerReadOnly": "🧪 Ambiente STAGING · DB di produzione in sola lettura 🔒 — non dati reali",
     "upgrade": "Upgrade",
     "yes": "Sì"
   },
@@ -2388,6 +2389,10 @@
       "NEW": "Nuovo",
       "USED": "Usato"
     },
+    "contactBuyer": "Contatta l'acquirente",
+    "contactFail": "Impossibile avviare la richiesta",
+    "contactSeller": "Contatta il venditore",
+    "contactStarting": "Avvio della conversazione in corso…",
     "deleteConfirm": "Eliminare l'articolo?",
     "deleteSuccess": "Eliminato con successo",
     "draftSuccess": "Bozza salvata con successo",

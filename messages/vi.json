@@ -1764,6 +1764,7 @@
     "search": "Tìm kiếm",
     "send": "Gửi",
     "stagingBanner": "🧪 Môi trường STAGING · Development DB — Không phải dữ liệu thật",
+    "stagingBannerReadOnly": "🧪 Môi trường STAGING · DB Sản xuất Chỉ đọc 🔒 — Không phải Data thật",
     "upgrade": "Upgrade",
     "yes": "Có"
   },
@@ -2388,6 +2389,10 @@
       "NEW": "Mới",
       "USED": "Đã qua sử dụng"
     },
+    "contactBuyer": "Liên hệ Người mua",
+    "contactFail": "Không thể bắt đầu liên hệ",
+    "contactSeller": "Liên hệ Người bán",
+    "contactStarting": "Đang mở phòng trò chuyện...",
     "deleteConfirm": "Xóa sản phẩm này?",
     "deleteSuccess": "Đã xóa",
     "draftSuccess": "Đã lưu nháp",

@@ -1763,8 +1763,8 @@
     "saving": "Saving...",
     "search": "Search",
     "send": "Send",
-    "stagingBanner": "🧪 STAGING environment · Dev DB — Not real data",
-    "stagingBannerReadOnly": "🧪 STAGING environment · Prod DB read-only 🔒 — Not real data",
+    "stagingBanner": "🧪 STAGING Environment · Development DB — Not real data",
+    "stagingBannerReadOnly": "🧪 STAGING Environment · Operational DB Read-only 🔒 — Not real data",
     "upgrade": "Upgrade",
     "yes": "Yes"
   },
@@ -2389,6 +2389,10 @@
       "NEW": "New Item",
       "USED": "Used"
     },
+    "contactBuyer": "Contact Buyer",
+    "contactFail": "Failed to start contact",
+    "contactSeller": "Contact Seller",
+    "contactStarting": "Starting conversation...",
     "deleteConfirm": "Are you sure you want to delete this item?",
     "deleteSuccess": "Item deleted successfully.",
     "draftSuccess": "Draft saved",

@@ -1764,6 +1764,7 @@
     "search": "ค้นหา",
     "send": "ส่ง",
     "stagingBanner": "🧪 สภาพแวดล้อม STAGING · การพัฒนา DB — ไม่ใช่ข้อมูลจริง",
+    "stagingBannerReadOnly": "🧪 STAGING สภาพแวดล้อม · DB สำหรับใช้งานจริง อ่านอย่างเดียว 🔒 — ไม่ใช่ Data จริง",
     "upgrade": "Upgrade",
     "yes": "ใช่"
   },
@@ -2388,6 +2389,10 @@
       "NEW": "สินค้าใหม่",
       "USED": "มือสอง"
     },
+    "contactBuyer": "ติดต่อผู้ซื้อ",
+    "contactFail": "ไม่สามารถเริ่มการติดต่อได้",
+    "contactSeller": "ติดต่อผู้ขาย",
+    "contactStarting": "กำลังเริ่มการสนทนา…",
     "deleteConfirm": "คุณต้องการลบสินค้าหรือไม่?",
     "deleteSuccess": "ลบแล้ว",
     "draftSuccess": "บันทึกฉบับร่างแล้ว",

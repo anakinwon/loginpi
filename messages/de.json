@@ -1764,6 +1764,7 @@
     "search": "Suchen",
     "send": "Senden",
     "stagingBanner": "🧪 STAGING Environment · Development DB — Not real Data",
+    "stagingBannerReadOnly": "🧪 STAGING-Umgebung · Produktions-DB schreibgeschützt 🔒 — keine Echtdaten",
     "upgrade": "Upgrade",
     "yes": "Ja"
   },
@@ -2388,6 +2389,10 @@
       "NEW": "Neuware",
       "USED": "Gebraucht"
     },
+    "contactBuyer": "Käufer kontaktieren",
+    "contactFail": "Kontakt konnte nicht gestartet werden",
+    "contactSeller": "Verkäufer kontaktieren",
+    "contactStarting": "Chat wird gestartet…",
     "deleteConfirm": "Artikel löschen?",
     "deleteSuccess": "Gelöscht",
     "draftSuccess": "Als Entwurf gespeichert",

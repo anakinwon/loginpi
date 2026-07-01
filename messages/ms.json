@@ -1764,6 +1764,7 @@
     "search": "Cari",
     "send": "Hantar",
     "stagingBanner": "🧪 Persekitaran STAGING · DB Pembangunan — Bukan data sebenar",
+    "stagingBannerReadOnly": "🧪 Persekitaran STAGING · DB Pengeluaran Baca Sahaja 🔒 — Bukan data sebenar",
     "upgrade": "Upgrade",
     "yes": "Ya"
   },
@@ -2388,6 +2389,10 @@
       "NEW": "Barangan baharu",
       "USED": "Terpakai"
     },
+    "contactBuyer": "Hubungi Pembeli",
+    "contactFail": "Gagal memulakan perbualan",
+    "contactSeller": "Hubungi Penjual",
+    "contactStarting": "Memulakan perbualan…",
     "deleteConfirm": "Padam item?",
     "deleteSuccess": "Telah dipadam",
     "draftSuccess": "Telah disimpan sebagai draf",

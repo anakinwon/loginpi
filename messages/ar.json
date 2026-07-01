@@ -1764,6 +1764,7 @@
     "search": "بحث",
     "send": "إرسال",
     "stagingBanner": "🧪 بيئة STAGING · DB تطوير — مش بيانات حقيقية",
+    "stagingBannerReadOnly": "🧪 بيئة STAGING · DB الإنتاج للقراءة فقط 🔒 — ليست بيانات حقيقية",
     "upgrade": "Upgrade",
     "yes": "نعم"
   },
@@ -2388,6 +2389,10 @@
       "NEW": "جديد",
       "USED": "مستعمل"
     },
+    "contactBuyer": "تواصل مع المشتري",
+    "contactFail": "فشل بدء التواصل",
+    "contactSeller": "تواصل مع البائع",
+    "contactStarting": "جاري فتح المحادثة…",
     "deleteConfirm": "هل تريد حذف السلعة؟",
     "deleteSuccess": "تم الحذف",
     "draftSuccess": "تم الحفظ كمسودة",
