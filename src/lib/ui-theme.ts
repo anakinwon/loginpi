@@ -12,7 +12,7 @@ export const getActiveUiTheme = cache(async (): Promise<UiTheme | null> => {
   const { data, error } = await getSupabaseAdmin()
     .from('ui_theme')
     .select(
-      'theme_id, theme_nm, theme_desc, theme_tokens, actv_yn, lock_yn, apply_scope_cd, sort_ord',
+      'theme_id, theme_nm, theme_desc, theme_tokens, actv_yn, lock_yn, apply_scope_cd, theme_fx_cd, sort_ord',
     )
     .eq('actv_yn', 'Y')
     .eq('del_yn', 'N')

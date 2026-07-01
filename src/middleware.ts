@@ -32,9 +32,12 @@ export default function middleware(req: NextRequest) {
 
   // ── 2단계: Rate limiting (페이지 라우트) ──────────────────────────────────
   // API 라우트는 matcher 제외 → src/lib/api-guard.ts에서 처리
+  // 개발 환경(localhost)에서는 차단을 우회한다. HMR·반복 새로고침으로 단일 IP에
+  // 요청이 몰려 개발이 막히는 것을 방지 — 운영(production) 빌드엔 영향 없음.
+  const isDev = process.env.NODE_ENV === 'development'
   const policy = getPolicyForPath(pathname)
   const rl = checkRateLimit(ip, policy)
-  if (!rl.allowed) {
+  if (!isDev && !rl.allowed) {
     return rateLimitedResponse(rl.retryAfter)
   }
 

@@ -370,8 +370,13 @@ export default function UiThemesPage() {
             >
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
-                  <p className="flex items-center gap-2 font-semibold">
+                  <p className="flex flex-wrap items-center gap-2 font-semibold">
                     <span className="truncate">{t.theme_nm}</span>
+                    {t.theme_fx_cd && (
+                      <span className="bg-muted text-muted-foreground shrink-0 rounded-full px-2 py-0.5 text-xs">
+                        {t.theme_fx_cd === 'GLASS' ? '✨ 유리' : '🟢 클레이'}
+                      </span>
+                    )}
                     {t.actv_yn === 'Y' && (
                       <span className="bg-primary text-primary-foreground shrink-0 rounded-full px-2 py-0.5 text-xs">
                         ✓{' '}

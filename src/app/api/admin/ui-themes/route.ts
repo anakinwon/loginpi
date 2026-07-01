@@ -13,7 +13,7 @@ export async function GET() {
   const { data, error } = await getSupabaseAdmin()
     .from('ui_theme')
     .select(
-      'theme_id, theme_nm, theme_desc, theme_tokens, actv_yn, lock_yn, sort_ord',
+      'theme_id, theme_nm, theme_desc, theme_tokens, actv_yn, lock_yn, apply_scope_cd, theme_fx_cd, sort_ord',
     )
     .eq('del_yn', 'N')
     .order('sort_ord', { ascending: true })

@@ -68,6 +68,21 @@ export interface ThemeTokens {
 // 테마 적용 범위 — ADMIN(관리자 화면만) / GLOBAL(전체 페이지)
 export type ApplyScope = 'ADMIN' | 'GLOBAL'
 
+// 테마 효과(fx) — 색상과 별개로 '질감'을 입히는 레이어. 관리자 화면 스코프 전용.
+//  GLASS: 글래스모피즘(반투명 유리 + 무지개 테두리) | CLAY: 뉴모피즘(이중 그림자 입체)
+//  ⚠️ globals.css의 [data-admin-fx="..."] 스코프 CSS와 값이 1:1 대응한다(소문자 매핑).
+export const THEME_FX_CODES = ['GLASS', 'CLAY'] as const
+export type ThemeFxCode = (typeof THEME_FX_CODES)[number]
+
+// fx 값 화이트리스트 검증 — 허용 코드만 통과(임의 값 → null = 효과 없음)
+export function sanitizeFxCode(value: unknown): ThemeFxCode | null {
+  if (typeof value !== 'string') return null
+  const v = value.trim().toUpperCase()
+  return (THEME_FX_CODES as readonly string[]).includes(v)
+    ? (v as ThemeFxCode)
+    : null
+}
+
 export interface UiTheme {
   theme_id: string
   theme_nm: string
@@ -76,6 +91,7 @@ export interface UiTheme {
   actv_yn: 'Y' | 'N'
   lock_yn: 'Y' | 'N'
   apply_scope_cd: ApplyScope
+  theme_fx_cd: ThemeFxCode | null
   sort_ord: number
 }
 

@@ -35,8 +35,12 @@ export default async function AdminLayout({
       ? ''
       : buildThemeStyleCss(activeTheme?.theme_tokens, 'ADMIN')
 
+  // 효과(fx) 레이어 — 색상과 별개로 질감(유리/클레이)을 관리자 화면에만 적용.
+  // globals.css의 [data-admin-fx="glass"|"clay"] 스코프 CSS와 소문자로 매핑.
+  const adminFx = activeTheme?.theme_fx_cd?.toLowerCase() || undefined
+
   return (
-    <div data-admin-theme className="flex flex-1">
+    <div data-admin-theme data-admin-fx={adminFx} className="flex flex-1">
       {/* 활성 테마 색상 변수 주입 (관리자 영역 스코프) */}
       {themeCss && <style dangerouslySetInnerHTML={{ __html: themeCss }} />}
       {/* _pit 파라미터가 URL에 남아있으면 제거 (Pi Browser 인증 성공 후 cleanup) */}
