@@ -208,6 +208,12 @@ export function AdminSidebar() {
           label="오픈 프로모"
           pathname={pathname}
         />
+        {/* 하단 플로팅 팝업 메뉴 선별 설정 */}
+        <NavItem
+          href="/admin/quick-menu"
+          label="팝업 메뉴 설정"
+          pathname={pathname}
+        />
       </nav>
       <div className="border-t p-3">
         <Link

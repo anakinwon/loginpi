@@ -1,10 +1,12 @@
 import { redirect } from 'next/navigation'
 import { getLocale } from 'next-intl/server'
 import { AdminSidebar } from '@/components/admin/admin-sidebar'
+import { AdminQuickMenu } from '@/components/admin/admin-quick-menu'
 import { ClientAdminGate } from '@/components/admin/client-admin-gate'
 import { PitUrlCleaner } from '@/components/admin/pit-url-cleaner'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getActiveUiTheme, buildThemeStyleCss } from '@/lib/ui-theme'
+import { getQuickMenuItems } from '@/lib/quick-menu'
 
 export const metadata = { title: 'Admin — Next.js Starter Kit' }
 
@@ -39,6 +41,9 @@ export default async function AdminLayout({
   // globals.css의 [data-admin-fx="glass"|"clay"] 스코프 CSS와 소문자로 매핑.
   const adminFx = activeTheme?.theme_fx_cd?.toLowerCase() || undefined
 
+  // 하단 플로팅 팝업에 노출할 관리자 메뉴 (/admin/quick-menu에서 선별)
+  const quickMenuItems = await getQuickMenuItems()
+
   return (
     <div data-admin-theme data-admin-fx={adminFx} className="flex flex-1">
       {/* 활성 테마 색상 변수 주입 (관리자 영역 스코프) */}
@@ -47,6 +52,8 @@ export default async function AdminLayout({
       <PitUrlCleaner />
       <AdminSidebar />
       <main className="flex-1 overflow-auto p-6">{children}</main>
+      {/* 하단 네비(Admin 탭) 위 플로팅 팝업 — 사이드바가 md:hidden인 Pi Browser 접근성 */}
+      {quickMenuItems.length > 0 && <AdminQuickMenu items={quickMenuItems} />}
     </div>
   )
 }
