@@ -101,6 +101,20 @@ async function handlePOST(request: NextRequest) {
     )
   }
 
+  // 직거래 문의방(Direct)에서는 Bean/Pi 선물 금지 — 거래 당사자 간 금전 선물 차단(요건).
+  //   Bean 실전송·PI 선물 파라미터 발급 모두 이 진입점을 거치므로 여기서 두 경로를 함께 막는다.
+  const { data: giftRoom } = await db
+    .from('msg_room')
+    .select('theme_cd')
+    .eq('room_id', room_id)
+    .maybeSingle()
+  if ((giftRoom as { theme_cd?: string } | null)?.theme_cd === 'DIRECT') {
+    return NextResponse.json(
+      { error: '직거래 문의방에서는 선물을 보낼 수 없습니다' },
+      { status: 403 },
+    )
+  }
+
   const recipientRow = recipient as { id: string; display_name: string | null }
   const senderNm = user.display_name ?? 'user'
   const recipientNm = recipientRow.display_name ?? 'user'

@@ -52,8 +52,9 @@ export function ChatRoomPanel({
   const [viewLocale, setViewLocale] = useState('')
   // 직거래 문의방 수동 만기 진행 상태
   const [expiring, setExpiring] = useState(false)
-  // Bean 선물은 모든 사용자 허용 — 항상 활성(잔액 부족은 전송 시 차단)
-  const [canTip] = useState(true)
+  // Bean/Pi 선물 — 직거래 문의방(DIRECT)에서는 금지(거래 당사자 간 금전 선물 차단, 요건).
+  //   서버(/api/tips·complete PI_TIP)도 동일 차단 — 여기선 선물 버튼 노출만 제어.
+  const canTip = themeCd !== 'DIRECT'
   // 자동번역 자격 — undefined(확인 전)면 수동 번역 버튼 미노출(깜빡임 방지)
   const [canAutoTranslate, setCanAutoTranslate] = useState<boolean | undefined>(
     undefined,

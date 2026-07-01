@@ -463,6 +463,17 @@ async function handlePOST(request: NextRequest) {
       const beanAmount = Number(meta.bean_amount ?? 0)
       const piAmt = beanAmount / 100
 
+      // 직거래 문의방 선물은 /api/tips에서 차단됨 — 여기 도달 시 변조. A2U 송금 거부(요건).
+      const { data: tipRoom } = await db
+        .from('msg_room')
+        .select('theme_cd')
+        .eq('room_id', roomId)
+        .maybeSingle()
+      const isDirectGift =
+        (tipRoom as { theme_cd?: string } | null)?.theme_cd === 'DIRECT'
+      if (isDirectGift)
+        console.warn(`[PI_TIP] 직거래방 선물 시도 차단 payment:${paymentId}`)
+
       const { data: dup } = await db
         .from('tip_pi_payout_log')
         .select('tip_pi_log_id')
@@ -472,6 +483,7 @@ async function handlePOST(request: NextRequest) {
       // 금액 검증 — metadata bean_amount로 환산한 Pi 이상 결제했는지(클라 금액 불신)
       if (
         !dup &&
+        !isDirectGift &&
         recipientId &&
         piAmt > 0 &&
         Number(payment.amount) + 1e-6 >= piAmt
