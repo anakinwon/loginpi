@@ -62,6 +62,24 @@ export interface A2UResult {
   paymentId: string
 }
 
+// axios 계열 오류에서 실패 단계·HTTP 응답 본문(진짜 사유)을 살려 재던진다.
+// "Request failed with status code 400"만으로는 uid 무효/잔액/서명 불일치를 구분할 수 없다.
+async function step<T>(name: string, run: () => Promise<T>): Promise<T> {
+  try {
+    return await run()
+  } catch (e) {
+    const ax = e as {
+      message?: string
+      response?: { status?: number; data?: unknown }
+    }
+    const body = ax.response
+      ? ` [HTTP ${ax.response.status}] ${JSON.stringify(ax.response.data).slice(0, 400)}`
+      : ''
+    console.error(`[A2U] ${name} 실패:`, ax.message, ax.response?.data ?? '')
+    throw new Error(`${name}: ${ax.message ?? String(e)}${body}`)
+  }
+}
+
 // A2U 송금: create → submit(앱 지갑 서명·블록체인 제출) → complete. 성공 시 blockchain txid 반환.
 // 실패 시 throw — 호출부가 PENDING 처리하도록.
 export async function sendA2U(args: {
@@ -75,13 +93,15 @@ export async function sendA2U(args: {
 
   await recoverIncomplete(pi)
 
-  const paymentId = await pi.createPayment({
-    amount: args.amount,
-    memo: args.memo.slice(0, 28),
-    metadata: args.metadata,
-    uid: args.uid,
-  })
-  const txid = await pi.submitPayment(paymentId)
-  await pi.completePayment(paymentId, txid)
+  const paymentId = await step('createPayment', () =>
+    pi.createPayment({
+      amount: args.amount,
+      memo: args.memo.slice(0, 28),
+      metadata: args.metadata,
+      uid: args.uid,
+    }),
+  )
+  const txid = await step('submitPayment', () => pi.submitPayment(paymentId))
+  await step('completePayment', () => pi.completePayment(paymentId, txid))
   return { txid, paymentId }
 }
