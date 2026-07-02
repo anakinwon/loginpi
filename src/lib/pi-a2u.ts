@@ -62,21 +62,39 @@ export interface A2UResult {
   paymentId: string
 }
 
-// axios 계열 오류에서 실패 단계·HTTP 응답 본문(진짜 사유)을 살려 재던진다.
-// "Request failed with status code 400"만으로는 uid 무효/잔액/서명 불일치를 구분할 수 없다.
+// axios 계열 오류에서 실패 단계·진짜 사유를 살려 재던진다.
+// Horizon transaction_failed는 extras.result_codes(tx_*/op_*)가 핵심이라 이를 최우선 추출한다.
+// (예: op_no_destination=수신 지갑 미생성, tx_bad_auth=서명 지갑 불일치, op_underfunded=잔액부족)
+interface HorizonErrorData {
+  title?: string
+  detail?: string
+  extras?: {
+    result_codes?: {
+      transaction?: string
+      operation?: string
+      operations?: string[]
+    }
+  }
+}
 async function step<T>(name: string, run: () => Promise<T>): Promise<T> {
   try {
     return await run()
   } catch (e) {
     const ax = e as {
       message?: string
-      response?: { status?: number; data?: unknown }
+      response?: { status?: number; data?: HorizonErrorData }
     }
-    const body = ax.response
-      ? ` [HTTP ${ax.response.status}] ${JSON.stringify(ax.response.data).slice(0, 400)}`
-      : ''
-    console.error(`[A2U] ${name} 실패:`, ax.message, ax.response?.data ?? '')
-    throw new Error(`${name}: ${ax.message ?? String(e)}${body}`)
+    const data = ax.response?.data
+    const rc = data?.extras?.result_codes
+    // result_codes가 있으면 그것만 간결히, 없으면 본문 요약
+    const detail = rc
+      ? `result_codes=${JSON.stringify(rc)}`
+      : data
+        ? JSON.stringify(data).slice(0, 300)
+        : ''
+    const httpTag = ax.response ? `[HTTP ${ax.response.status}] ` : ''
+    console.error(`[A2U] ${name} 실패:`, ax.message, data ?? '')
+    throw new Error(`${name}: ${httpTag}${detail || ax.message || String(e)}`)
   }
 }
 
