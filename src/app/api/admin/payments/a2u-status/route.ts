@@ -43,15 +43,24 @@ export async function GET() {
     accountExists('api.mainnet.minepi.com'),
   ])
 
+  // 새 운영 앱 지갑 = GD3W3DGC (유통자, weight 1 — 2026-07-02 GDOCI7 잠금 사고로 교체)
+  // GDOCI7·GA2WF2MW는 토큰 발행 후 잠긴(master weight 0) 발행자 계정 — A2U 절대 불가.
+  const EXPECTED = 'GD3W3DGCYSNGXJJSE4L4224MY5DXCZJ2PQTKOLENJA7N5UGXPHMFCDLG'
+  const LOCKED_ISSUERS = new Set([
+    'GDOCI7AZIH4ORRUFPE6J5HWJ2P2XP54TTBAJ6TDJ3TGEDXNJBR4J57RC',
+    'GA2WF2MWQ3ODDYIH3PFKF723Z6AXCDZTH6E77CSDBFX5W5H2CYZFCENA',
+  ])
+
   return NextResponse.json({
     a2uEnabled: isA2UEnabled(),
     apiKeySet,
     seedSet,
-    appWallet, // 이 값이 U2A 결제를 받은 앱 지갑과 같아야 A2U 서명이 유효
+    appWallet, // 이 값이 포털에 등록된 앱 지갑과 같아야 A2U 서명이 유효
     deriveError,
     accountExists: { testnet: onTestnet, mainnet: onMainnet },
-    expectedWallet: 'GDOCI7AZIH4ORRUFPE6J5HWJ2P2XP54TTBAJ6TDJ3TGEDXNJBR4J57RC',
-    match:
-      appWallet === 'GDOCI7AZIH4ORRUFPE6J5HWJ2P2XP54TTBAJ6TDJ3TGEDXNJBR4J57RC',
+    expectedWallet: EXPECTED,
+    match: appWallet === EXPECTED,
+    // 잠긴 발행자 시드가 설정돼 있으면 즉시 경고 — A2U 전부 tx_bad_auth로 실패한다
+    lockedIssuerWarning: appWallet !== null && LOCKED_ISSUERS.has(appWallet),
   })
 }
