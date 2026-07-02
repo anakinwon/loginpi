@@ -121,6 +121,7 @@ Pi Browser는 쿠키를 저장하지 않으므로 **쿠키(일반 브라우저) 
 - **클라이언트 저장**: `pi-auth-provider`가 `localStorage`(`pi_token`)에 저장
 - **요청**: `fetch` 대신 **`piFetch`**(`src/lib/pi-fetch.ts`) 사용 → `X-Pi-Token` 헤더 자동 첨부 + `credentials: 'include'`
 - **서버 검증**: `getSessionUser()`가 쿠키 우선 → `X-Pi-Token` 헤더 폴백 + `tokenValidUntil` 만료 검증
+- **⭐사용자 매칭 철칙 (2026-07-02 uid 재발급 사고)**: `pi_uid`는 (포털 앱 × Testnet/Mainnet) **scoped 값**이라 sandbox 플립·메인넷 전환·포털 앱 변경 시 전원 재발급된다 → **영구 식별자로 쓰지 말 것**. 사람의 불변 키는 `pi_username`(전역 유일·`/v2/me` 검증). `upsertPiUser`가 `uid → username` 재바인딩 폴백 + 재가입 부활(`rejoin_dtm`·`del_rsn_cd`)을 수행하며, 활성 `pi_username`은 UNIQUE 인덱스(sql/162)로 강제 — 위반 에러 시 인덱스가 아니라 코드를 고칠 것. 계정 중복 발견 시 자산(seller_id 등) 이관 금지, 세션을 원본으로 복원(정본: `docs/TROUBLESHOOT.md` 2026-07-02 근본수정편).
 
 ### 클라이언트 게이트 패턴 (Pi Browser 필수 — 위반 시 무한 루프)
 
