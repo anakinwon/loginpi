@@ -1,3 +1,4 @@
+import { createHash } from 'crypto'
 import { NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { isA2UEnabled } from '@/lib/pi-a2u'
@@ -62,5 +63,15 @@ export async function GET() {
     match: appWallet === EXPECTED,
     // 잠긴 발행자 시드가 설정돼 있으면 즉시 경고 — A2U 전부 tx_bad_auth로 실패한다
     lockedIssuerWarning: appWallet !== null && LOCKED_ISSUERS.has(appWallet),
+    // ── 배포·시드 식별 (환경설정 논쟁 종결용) ──
+    // seedFingerprint: SHA256(시드) 앞 8자 — 시드 미노출, 어떤 시드가 실렸는지 지문 대조
+    //   732b3c40=SARNFV(GDOCI7·잠김) / 57a45fb5=SBVXUJVU(GD3W3DGC·정답) / 502e582b=SCTZN(GDTH5·스테이징)
+    seedFingerprint: seed
+      ? createHash('sha256').update(seed).digest('hex').slice(0, 8)
+      : null,
+    deployment: {
+      commit: process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? null,
+      vercelEnv: process.env.VERCEL_ENV ?? null,
+    },
   })
 }

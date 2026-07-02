@@ -1,5 +1,6 @@
 import 'server-only'
 import PiNetwork from 'pi-backend'
+import { publicKeyFromSeed } from './stellar-strkey'
 
 // App→User(A2U) 실 Pi 송금 래퍼 — 환불·정산에 사용.
 // 앱 지갑이 중계(에스크로) 지갑 역할: 구매자 U2A 결제로 받은 Pi를 취소 시 A2U로 되돌려준다.
@@ -76,6 +77,16 @@ interface HorizonErrorData {
     }
   }
 }
+// 지금 이 서버 인스턴스가 실제로 쥔 시드의 공개키 — 에러 메시지 자체 판독용(시드 미노출)
+function serverWalletTag(): string {
+  try {
+    const seed = process.env.PI_WALLET_PRIVATE_SEED
+    return seed ? ` | serverWallet=${publicKeyFromSeed(seed).slice(0, 8)}…` : ''
+  } catch {
+    return ' | serverWallet=derive_error'
+  }
+}
+
 async function step<T>(name: string, run: () => Promise<T>): Promise<T> {
   try {
     return await run()
@@ -94,7 +105,9 @@ async function step<T>(name: string, run: () => Promise<T>): Promise<T> {
         : ''
     const httpTag = ax.response ? `[HTTP ${ax.response.status}] ` : ''
     console.error(`[A2U] ${name} 실패:`, ax.message, data ?? '')
-    throw new Error(`${name}: ${httpTag}${detail || ax.message || String(e)}`)
+    throw new Error(
+      `${name}: ${httpTag}${detail || ax.message || String(e)}${serverWalletTag()}`,
+    )
   }
 }
 
