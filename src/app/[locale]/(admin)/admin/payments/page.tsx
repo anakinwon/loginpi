@@ -279,6 +279,9 @@ export default function PaymentsPage() {
                   {t('col.user')}
                 </th>
                 <th className="px-4 py-2 text-left font-medium">
+                  {t('col.refund')}
+                </th>
+                <th className="px-4 py-2 text-left font-medium">
                   {t('col.amount')}
                 </th>
                 <th className="px-4 py-2 text-left font-medium">
@@ -296,9 +299,6 @@ export default function PaymentsPage() {
                 <th className="px-4 py-2 text-left font-medium">
                   {t('col.date')}
                 </th>
-                <th className="px-4 py-2 text-left font-medium">
-                  {t('col.refund')}
-                </th>
               </tr>
             </thead>
             <tbody className="divide-y">
@@ -311,6 +311,27 @@ export default function PaymentsPage() {
                         ? `@${p.sys_user.pi_username}`
                         : (p.sys_user?.google_email ?? '')}
                     </p>
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    {p.refund?.status === 'completed' ? (
+                      <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                        ↩️ {t('refund.done')}
+                      </span>
+                    ) : canRefund(p) ? (
+                      <button
+                        onClick={() => doRefund(p)}
+                        disabled={refundingId !== null}
+                        className="border-border hover:bg-muted rounded-md border px-2 py-1 text-xs font-medium transition-colors disabled:opacity-50"
+                      >
+                        {refundingId === p.id
+                          ? t('refund.processing')
+                          : p.refund?.status === 'error'
+                            ? `↩️ ${t('refund.retry')}`
+                            : `↩️ ${t('refund.btn')}`}
+                      </button>
+                    ) : (
+                      <span className="text-muted-foreground text-xs">—</span>
+                    )}
                   </td>
                   <td
                     className={`px-4 py-3 font-semibold tabular-nums ${
@@ -340,27 +361,6 @@ export default function PaymentsPage() {
                   </td>
                   <td className="text-muted-foreground px-4 py-3 text-xs whitespace-nowrap">
                     {new Date(p.reg_dtm).toLocaleString('ko-KR')}
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap">
-                    {p.refund?.status === 'completed' ? (
-                      <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                        ↩️ {t('refund.done')}
-                      </span>
-                    ) : canRefund(p) ? (
-                      <button
-                        onClick={() => doRefund(p)}
-                        disabled={refundingId !== null}
-                        className="border-border hover:bg-muted rounded-md border px-2 py-1 text-xs font-medium transition-colors disabled:opacity-50"
-                      >
-                        {refundingId === p.id
-                          ? t('refund.processing')
-                          : p.refund?.status === 'error'
-                            ? `↩️ ${t('refund.retry')}`
-                            : `↩️ ${t('refund.btn')}`}
-                      </button>
-                    ) : (
-                      <span className="text-muted-foreground text-xs">—</span>
-                    )}
                   </td>
                 </tr>
               ))}
