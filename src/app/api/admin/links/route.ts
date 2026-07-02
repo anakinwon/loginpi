@@ -75,6 +75,8 @@ export async function PATCH(req: NextRequest) {
     .update({
       del_yn,
       del_dtm: del_yn === 'Y' ? now : null,
+      // 관리자 차단은 재가입 부활 불가 사유로 스탬프 — 재활성화 시 사유 해제 (sql/163)
+      del_rsn_cd: del_yn === 'Y' ? 'ADMIN_BLCK' : null,
       modr_id: requester!.id,
       mod_dtm: now,
     })
