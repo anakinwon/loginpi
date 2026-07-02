@@ -15,6 +15,9 @@ export const env = createEnv({
     // A2U(App→User) 환불·정산 송금용 앱 지갑 시드 (Pi Developer Portal, 'S'로 시작).
     // 미설정 시 환불은 PENDING 장부 기록만 하고 실송금은 스킵 (서버 전용 비밀, 절대 클라이언트 노출 금지)
     PI_WALLET_PRIVATE_SEED: z.string().optional(),
+    // 앱 지갑 주소 선언('G'로 시작, 선택) — a2u-status 진단이 시드 도출 지갑과 대조.
+    // ⛔ 코드에 지갑 주소 하드코딩 금지 — 기대값은 반드시 이 env로만 선언 (2026-07-02)
+    PI_WALLET_AGGRESS: z.string().optional(),
     SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
     // ── 3-tier DB 라우팅(src/lib/db-env.ts) — 전부 optional, 미설정 시 현행 운영 DB 폴백(하위호환) ──
     // tier 자동판정(VERCEL_ENV)을 덮어쓸 명시값. 보통 미설정.
@@ -92,6 +95,7 @@ export const env = createEnv({
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     PI_API_KEY: process.env.PI_API_KEY,
     PI_WALLET_PRIVATE_SEED: process.env.PI_WALLET_PRIVATE_SEED,
+    PI_WALLET_AGGRESS: process.env.PI_WALLET_AGGRESS,
     SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
     APP_TIER: process.env.APP_TIER,
     STAGING_DB_TARGET: process.env.STAGING_DB_TARGET,
