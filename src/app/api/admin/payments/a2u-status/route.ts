@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { isA2UEnabled } from '@/lib/pi-a2u'
+import { publicKeyFromSeed } from '@/lib/stellar-strkey'
 
 // GET /api/admin/payments/a2u-status — A2U 진단 (관리자)
 // tx_bad_auth 원인 규명용. 운영 env의 PI_WALLET_PRIVATE_SEED가 실제로 어떤 앱 지갑(공개키)을
@@ -14,13 +15,12 @@ export async function GET() {
   const seed = process.env.PI_WALLET_PRIVATE_SEED
   const seedSet = !!seed
 
-  // 시드 → 공개키 도출 (pi-backend가 쓰는 것과 동일한 stellar 키페어)
+  // 시드 → 공개키 도출 (순수 Node strkey — 알려진 쌍으로 검증됨)
   let appWallet: string | null = null
   let deriveError: string | null = null
   if (seed) {
     try {
-      const { Keypair } = await import('stellar-sdk')
-      appWallet = Keypair.fromSecret(seed).publicKey()
+      appWallet = publicKeyFromSeed(seed)
     } catch (e) {
       deriveError = e instanceof Error ? e.message : String(e)
     }
