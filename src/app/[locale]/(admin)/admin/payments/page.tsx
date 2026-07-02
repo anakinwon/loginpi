@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
+import { piFetch } from '@/lib/pi-fetch'
 import { useDynamicLimit } from '@/hooks/use-dynamic-limit'
 import { AdminPagination } from '@/components/admin/admin-pagination'
 import {
@@ -72,8 +73,9 @@ export default function PaymentsPage() {
   }, [limit, filter, divFilter, search])
 
   // 최초 전체 로드 (통계 + 목록 초기값) — 환불 후 재사용
+  // ⚠️ piFetch 필수 — Pi Browser는 쿠키가 없어 X-Pi-Token 헤더로만 세션 인증된다
   const loadAll = () =>
-    fetch('/api/admin/payments')
+    piFetch('/api/admin/payments')
       .then((r) => r.json())
       .then((d: { payments: TxnRow[] }) => {
         setAllPayments(d.payments ?? [])
@@ -98,7 +100,7 @@ export default function PaymentsPage() {
     if (!ok) return
     setRefundingId(p.id)
     try {
-      const res = await fetch(`/api/admin/payments/${p.id}/refund`, {
+      const res = await piFetch(`/api/admin/payments/${p.id}/refund`, {
         method: 'POST',
       })
       const d = (await res.json()) as {
@@ -135,7 +137,7 @@ export default function PaymentsPage() {
     }
     setSearching(true)
     const h = setTimeout(() => {
-      fetch(`/api/admin/payments?q=${encodeURIComponent(term)}`)
+      piFetch(`/api/admin/payments?q=${encodeURIComponent(term)}`)
         .then((r) => r.json())
         .then((d: { payments: TxnRow[] }) => setPayments(d.payments ?? []))
         .finally(() => setSearching(false))
