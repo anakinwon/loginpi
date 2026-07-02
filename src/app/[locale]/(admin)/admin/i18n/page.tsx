@@ -681,7 +681,6 @@ export default function I18nPage() {
                   const rate = rates[c.currency_cd]
                   const piPrice =
                     piUsd !== null && rate ? piUsd * rate : undefined
-                  const isToggling = toggling === c.locale_cd
                   // locale_cd 없는 국가: country_cd 기반으로 고유 locale_cd 파생
                   // (이미 활성인 코드와 충돌 시 "xx-XX" 형식으로 보완)
                   const derivedLocale =
@@ -689,6 +688,10 @@ export default function I18nPage() {
                     (activeLocaleCds.has(c.country_cd.toLowerCase())
                       ? `${c.country_cd.toLowerCase()}-${c.country_cd.toUpperCase()}`
                       : c.country_cd.toLowerCase())
+                  // 토글 진행 판정은 실제 토글 키(derivedLocale) 기준으로 한다.
+                  // c.locale_cd(null 가능) 기준이면 toggling 초기값 null과 null===null이
+                  // 성립해 locale_cd 없는 국가가 항상 "처리 중…"으로 오표시되는 버그가 생긴다.
+                  const isToggling = toggling === derivedLocale
                   const canActivate = !activeLocaleCds.has(derivedLocale)
                   return (
                     <tr key={c.country_cd} className="hover:bg-muted/10">
