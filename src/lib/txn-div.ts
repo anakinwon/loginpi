@@ -87,11 +87,16 @@ const LEGACY_PYMNT_DIV: Record<string, TxnDivCd> = {
   PI_TIP: 'TIP',
 }
 
+// A2U(앱→사용자) 기록 타입 → 거래구분. U2A 발행 타입(ActivePymntType)과 분리 관리.
+const A2U_PYMNT_DIV: Record<string, TxnDivCd> = {
+  ADMIN_REFUND: 'REFUND', // 관리자 수동 환불 (admin/payments)
+}
+
 export function pymntTypeToDiv(type: string | null | undefined): TxnDivCd {
   if (type && type in ACTIVE_PYMNT_DIV) {
     return ACTIVE_PYMNT_DIV[type as ActivePymntType]
   }
-  return LEGACY_PYMNT_DIV[type ?? ''] ?? 'ETC'
+  return A2U_PYMNT_DIV[type ?? ''] ?? LEGACY_PYMNT_DIV[type ?? ''] ?? 'ETC'
 }
 
 // mps_txn_hist txn_type_cd → 거래구분 (ESCROW_IN은 pi_pymnt와 중복이라 null=제외)

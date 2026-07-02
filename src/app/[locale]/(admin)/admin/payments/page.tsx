@@ -33,6 +33,7 @@ interface TxnRow {
     pi_username: string | null
     google_email: string | null
   } | null
+  refund: { status: 'processing' | 'completed' | 'error'; txid?: string } | null
 }
 
 // 사용자 표시명 우선순위 — 별명 → 실명 → display_name
@@ -70,8 +71,8 @@ export default function PaymentsPage() {
     setPage(1)
   }, [limit, filter, divFilter, search])
 
-  // 최초 전체 로드 (통계 + 목록 초기값)
-  useEffect(() => {
+  // 최초 전체 로드 (통계 + 목록 초기값) — 환불 후 재사용
+  const loadAll = () =>
     fetch('/api/admin/payments')
       .then((r) => r.json())
       .then((d: { payments: TxnRow[] }) => {
@@ -79,7 +80,49 @@ export default function PaymentsPage() {
         setPayments(d.payments ?? [])
       })
       .finally(() => setLoading(false))
+
+  useEffect(() => {
+    loadAll()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // 관리자 A2U 환불 — 확인 후 POST, 완료 시 목록 갱신 (이중클릭은 서버 claim이 차단)
+  const [refundingId, setRefundingId] = useState<string | null>(null)
+  const doRefund = async (p: TxnRow) => {
+    const ok = window.confirm(
+      t('refund.confirm', {
+        user: userLabel(p.sys_user),
+        amount: p.amount.toFixed(4),
+      }),
+    )
+    if (!ok) return
+    setRefundingId(p.id)
+    try {
+      const res = await fetch(`/api/admin/payments/${p.id}/refund`, {
+        method: 'POST',
+      })
+      const d = (await res.json()) as {
+        error?: string
+        refund?: { txid?: string }
+      }
+      if (!res.ok) {
+        alert(t('refund.fail', { error: d.error ?? res.statusText }))
+      } else {
+        alert(t('refund.success', { txid: d.refund?.txid ?? '—' }))
+      }
+      await loadAll()
+    } finally {
+      setRefundingId(null)
+    }
+  }
+
+  // 환불 버튼 노출 조건 — 완료된 결제 계열(U2A)이면서 Pi 계정 결제자(A2U 수신 가능)만
+  const canRefund = (p: TxnRow): boolean =>
+    p.source === 'pymnt' &&
+    p.status === 'completed' &&
+    p.amount > 0 &&
+    isPaymentDiv(p.txn_div_cd) &&
+    !!p.sys_user?.pi_username
 
   // username 검색 (debounce). 2글자 미만이면 서버 호출 없이 전체(allPayments) 표시.
   // 서버에서 pi_username을 pg_trgm GIN(.ilike '%q%')으로 부분일치 검색한다.
@@ -251,6 +294,9 @@ export default function PaymentsPage() {
                 <th className="px-4 py-2 text-left font-medium">
                   {t('col.date')}
                 </th>
+                <th className="px-4 py-2 text-left font-medium">
+                  {t('col.refund')}
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y">
@@ -292,6 +338,27 @@ export default function PaymentsPage() {
                   </td>
                   <td className="text-muted-foreground px-4 py-3 text-xs whitespace-nowrap">
                     {new Date(p.reg_dtm).toLocaleString('ko-KR')}
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    {p.refund?.status === 'completed' ? (
+                      <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                        ↩️ {t('refund.done')}
+                      </span>
+                    ) : canRefund(p) ? (
+                      <button
+                        onClick={() => doRefund(p)}
+                        disabled={refundingId !== null}
+                        className="border-border hover:bg-muted rounded-md border px-2 py-1 text-xs font-medium transition-colors disabled:opacity-50"
+                      >
+                        {refundingId === p.id
+                          ? t('refund.processing')
+                          : p.refund?.status === 'error'
+                            ? `↩️ ${t('refund.retry')}`
+                            : `↩️ ${t('refund.btn')}`}
+                      </button>
+                    ) : (
+                      <span className="text-muted-foreground text-xs">—</span>
+                    )}
                   </td>
                 </tr>
               ))}

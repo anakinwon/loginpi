@@ -267,7 +267,17 @@
         "status": "상태",
         "paymentId": "결제 ID",
         "date": "일시",
-        "theme": "테마"
+        "theme": "테마",
+        "refund": "환불"
+      },
+      "refund": {
+        "btn": "환불",
+        "retry": "환불 재시도",
+        "done": "환불됨",
+        "processing": "처리 중…",
+        "confirm": "{user}님에게 {amount} π를 A2U로 전액 환불합니다. 진행할까요?",
+        "success": "환불 완료 (txid: {txid})",
+        "fail": "환불 실패: {error}"
       },
       "theme": {
         "subscription": "구독",

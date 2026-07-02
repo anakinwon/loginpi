@@ -18,6 +18,7 @@ function escapeLike(s: string): string {
 
 interface PymntMeta {
   type?: string
+  refund?: { status: 'processing' | 'completed' | 'error'; txid?: string }
 }
 
 interface UserRef {
@@ -38,6 +39,8 @@ interface UnifiedTxn {
   payment_id: string | null
   reg_dtm: string
   sys_user: UserRef | null
+  // 관리자 환불 상태 (pi_pymnt.metadata.refund) — U2A 완료 결제에만 존재 가능
+  refund: { status: 'processing' | 'completed' | 'error'; txid?: string } | null
 }
 
 // GET /api/admin/payments?page=1&limit=30&q=username
@@ -116,6 +119,7 @@ export async function GET(req: NextRequest) {
     payment_id: p.payment_id,
     reg_dtm: p.reg_dtm,
     sys_user: p.sys_user,
+    refund: p.metadata?.refund ?? null,
   }))
 
   // mps_txn_hist → 통합 행 (user_id로 sys_user 수동 조인)
@@ -159,6 +163,7 @@ export async function GET(req: NextRequest) {
         payment_id: r.pi_txid,
         reg_dtm: r.txn_dtm,
         sys_user: userMap.get(r.user_id) ?? null,
+        refund: null, // mps 거래는 주문 단위 환불(mps-refund) 경로 사용
       },
     ]
   })
