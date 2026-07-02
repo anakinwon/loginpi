@@ -7,7 +7,7 @@ import { refundCancelledOrder } from '@/lib/mps-refund'
 // 주기적으로 자동 재시도한다. 사람이 환불 버튼을 누르는 개입 자체를 없애는 것이 목적.
 // 멱등: refundCancelledOrder가 REFUND_IN 존재 시 ALREADY_REFUNDED skip → 중복 송금 없음.
 
-const SWEEP_WINDOW_DAYS = 14 // 최근 취소분만 (과거 소급은 관리자 화면으로)
+const SWEEP_WINDOW_HOURS = 48 // 최근 취소분만 — 과거 잔재 소급은 관리자가 명시적으로(환불 버튼)
 const SWEEP_LIMIT = 20 // 실행당 A2U 상한 — cron 주기당 부하 제한
 
 function isCronAuthorized(req: NextRequest): boolean {
@@ -21,9 +21,16 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
   }
 
+  // ⛔ 명시적 옵트인 게이트 (2026-07-02 스테이징 소급 환불 사고 재발방지):
+  // 돈이 나가는 자동화는 마스터가 환경별로 직접 켠 곳에서만 돈다.
+  // 운영(cafepi)에만 REFUND_SWEEP_ENABLED=true 설정 — 스테이징·프리뷰는 미설정=비활성.
+  if (process.env.REFUND_SWEEP_ENABLED !== 'true') {
+    return NextResponse.json({ ok: true, disabled: true, refunded: 0 })
+  }
+
   const db = getSupabaseAdmin()
   const since = new Date(
-    Date.now() - SWEEP_WINDOW_DAYS * 24 * 60 * 60 * 1000,
+    Date.now() - SWEEP_WINDOW_HOURS * 60 * 60 * 1000,
   ).toISOString()
 
   // 환불 후보 — 결제 완료(escrow_txid 보유)된 취소 주문
