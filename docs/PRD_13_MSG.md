@@ -12,6 +12,7 @@
 
 | 버전 | 날짜 | 변경 내용 | 작성자 |
 |------|------|-----------|--------|
+| v1.3 | 2026-07-03 | **운영 텔레그램 "발송O/콜백X" 사고 근본수정 2건** — ① **webhook 자가치유**(§11-6 신설): 환경별 봇 분리(스테이징 `cafe_pi_not_bot`/운영 `cafe_pi_areal_bot`) 후 운영 봇 setWebhook 누락 → cron(chat-noti 1분)이 등록 URL을 기대값(`NEXT_PUBLIC_APP_URL`)과 대조해 자동 재등록(`telegram-webhook.ts`). 수동 setWebhook 절차 폐지. 진단/강제재등록 `/api/admin/telegram/webhook`. ② **딥링크 세션 오리진 원칙**(§8-2): `NEXT_PUBLIC_PI_APP_DOMAIN`은 반드시 "사용자 Pi 세션(localStorage)이 사는 오리진" — 운영을 cafe7092.pinet.com→**cafepi.vercel.app** 교정(오리진 불일치 시 딥링크가 로그아웃 화면). 실기기 검증 완료. 정본 사고기록=TROUBLESHOOT 2026-07-03편. | 아소카 |
 | v1.2 | 2026-07-01 | **Phase 3 설계 — P2P 채팅 알림 & 봇 릴레이 (당근마켓 앱 푸시 대체)** — 섹션 18 신설. 핵심 요건 재정의: 당근마켓의 "채팅+앱 푸시" 고리를 Pi Browser(WebView·푸시 부재)에서 **텔레그램으로 대체**. **하이브리드 아키텍처**(앱 내 DM `msg_room(D)`=채팅 본체 + 텔레그램=오프라인 푸시·인용답장 릴레이), 기존 3계층(Realtime→Telegram→Pull) 골격 재사용. `msg_noti_outbox.noti_tp_cd` 확장(ORDER/CHAT/TXN_ST/FBCK 통합)·`msg_tlgm_out` 매핑(인용답장 라우팅)·`sys_user.cur_relay_room_id`(폴백)·미읽음 지연발송. FR-MSG-11~15·`sql/150`. ⚠️ 설계 단계(구현 착수 전). | 아소카 |
 | v1.1 | 2026-06-18 | **Phase 1 구현 완료·실기기 연동 확인** — `sql/064`(Outbox+sys_user Telegram 컬럼, DA 승인)·`markEscrow` enqueue·`telegram.ts`/`mps-noti.ts` 디스패처·온보딩(딥링크+webhook)·안읽은 뱃지·**결제완료 즉시 발송**(cron 의존 제거)·인앱 Realtime 토스트 제스처 분리·보안 하드닝(webhook fail-closed·재바인딩 차단). 설계 대비: webhook을 Phase 1로 앞당김, cron 주기발송→즉시발송+cron 안전망. (ROADMAP Phase 18) | 아소카 |
 | v1.0 | 2026-06-18 | **Phase 1 설계 완료** — Outbox 패턴 + HTML parse_mode sendMessage/sendPhoto 템플릿 + url 딥링크 버튼 + Realtime Webhook 준비(Phase 2) | 아소카 |
@@ -707,6 +708,11 @@ https://cafe.pi/{locale}/orders/{orderId}
 
 **locale 결정**: 판매자 `sys_user.prfrrd_lcl` (기본값 'ko')
 
+**⭐ 딥링크 도메인 원칙 (2026-07-03 운영 사고로 확정)**: 버튼 URL의 base(`NEXT_PUBLIC_PI_APP_DOMAIN`)는 반드시 **사용자의 Pi 세션(localStorage `pi_token`)이 "사는 오리진"**과 일치해야 한다. localStorage는 오리진별 격리 — 다른 도메인으로 열면 Pi Browser가 열려도 무조건 로그아웃 상태("헤더 비플로팅+본문 세션 없음" 증상).
+- 스테이징 = `apppilogintestbd3106.pinet.com` (pinet이 세션 오리진)
+- 운영 = `cafepi.vercel.app` (vercel이 세션 오리진 — 구 설정 cafe7092.pinet.com은 오리진 불일치 사고로 폐기)
+- 판별 기준: Pi Browser에서 그 앱을 평소 여는 주소창 도메인 = env 값. 상세 = TROUBLESHOOT 2026-07-03편.
+
 ### 8-3. OrderDetail 페이지 요구사항
 
 - URL: `/app/[locale]/orders/[orderId]/page.tsx`
@@ -1245,6 +1251,19 @@ if (currentState === 'PREPARING') {
 }
 ```
 
+### 11-6. Webhook 자가치유 등록 (✅ 2026-07-03 구현 — 수동 setWebhook 절차 폐지)
+
+**배경 (운영 사고)**: 텔레그램 봇은 **토큰당 webhook URL이 전 세계에 단 1개**. 환경별 봇 분리(스테이징 `cafe_pi_not_bot` / 운영 `cafe_pi_areal_bot`) 후 운영 봇의 수동 setWebhook이 누락 → 발신(sendMessage)은 정상인데 수신 콜백(인용답장 릴레이·`/start` 연동)만 유실되는 비대칭 장애.
+
+**구현** (`src/lib/telegram-webhook.ts`):
+- `ensureTelegramWebhook()`: `getWebhookInfo` 현재 URL을 기대값 `{NEXT_PUBLIC_APP_URL}/api/telegram/webhook`과 대조 → 불일치 시 `setWebhook`(url+secret_token, §11-4 동일 형식) 자동 재등록. 성공 결과만 10분 스로틀 캐시(실패는 즉시 재시도).
+- **cron `chat-noti`(1분 주기)에 훅** — 배포 후 최대 1분 내 자동 복구. 발송 로직과 격리(실패해도 알림 발송 무영향).
+- **관리자 엔드포인트** `/api/admin/telegram/webhook`: GET=진단(봇 username·등록/기대 URL·matched·pending·최근 오류), POST=강제 재등록(시크릿 로테이트용).
+
+**⛔ 전제 (철칙)**: 환경별 봇 분리 유지. 봇 토큰을 두 환경이 공유하면 자가치유끼리 webhook을 뺏는 플립플롭 발생. 신규 환경 = 새 봇 + env 3종.
+
+**진단 공식**: "발송 O / 콜백 X" = 발신은 토큰만, 수신은 webhook 등록 필요 → 무조건 `getWebhookInfo`부터.
+
 ---
 
 ## 12. 환경변수 및 설정
@@ -1583,6 +1602,8 @@ console.log(data)
 | 판매자 온보딩 UI (봇 연동 딥링크 + webhook) | ✅ 완료 | 2026-06-18 |
 | 보안 하드닝 (webhook fail-closed · 재바인딩 차단) | ✅ 완료 | 2026-06-18 |
 | 운영 셋업 (BotFather 봇 · env 3종 · setWebhook) | ✅ 실기기 연동 확인 | 2026-06-18 |
+| **webhook 자가치유 등록** (수동 setWebhook 폐지 — §11-6) | ✅ 완료 (커밋 b3563c0) | 2026-07-03 |
+| **딥링크 세션 오리진 교정** (운영 env → cafepi.vercel.app — §8-2) | ✅ 실기기 검증 | 2026-07-03 |
 
 > **설계 대비 변경점**
 > - **Webhook을 Phase 1에 구현**: 판매자 연동(chat_id 저장)에 webhook이 필수라 Phase 2에서 앞당김(단, 양방향 버튼 콜백은 여전히 Phase 2).
