@@ -519,3 +519,15 @@ Pi의 uid는 **(앱, Testnet/Mainnet 환경) 쌍마다 다른 scoped 값**이다
 1. **환경별 봇 분리 유지** — 봇 토큰을 두 환경이 공유하면 자가치유끼리 webhook을 뺏는 플립플롭 발생. 신규 환경 추가 시 반드시 새 봇 + env 3종(`TELEGRAM_BOT_TOKEN`·`TELEGRAM_BOT_USERNAME`·`TELEGRAM_WEBHOOK_SECRET`) 세팅.
 2. **"발송 O / 콜백 X" 진단 공식**: 발신=토큰만 필요, 수신=webhook 등록 필요. 비대칭이면 무조건 `getWebhookInfo`부터 확인(관리자 GET 엔드포인트 활용).
 3. webhook 수동 등록 절차는 더 이상 필수 아님 — cron 자가치유가 담당. 단 `NEXT_PUBLIC_APP_URL`이 도메인별 정합이어야 함(오설정 시 webhook도 그리로 등록됨).
+
+### [속편 — 같은 날 2차 원인] 딥링크 세션 오리진 불일치 (진짜 "매끄럽지 않음"의 본체)
+
+webhook 자가치유 배포 후에도 증상 지속 → 마스터 실기기 확인으로 2차 원인 확정:
+- **증상 정밀화**: 버튼 → Pi Browser는 열리는데 ① 헤더가 Pi Browser 모드(플로팅)로 안 바뀜 ② 본문 세션 미인식(로그인 요구).
+- **원인**: 마스터의 운영 세션(localStorage `pi_token`)은 **cafepi.vercel.app** 오리진에 있는데, 운영 `NEXT_PUBLIC_PI_APP_DOMAIN=cafe7092.pinet.com`이라 딥링크가 **다른 오리진**으로 열림. **localStorage는 오리진별 완전 격리** → 무조건 로그아웃 상태. 스테이징이 매끄러운 건 평소 사용 주소=딥링크 주소(apppilogintestbd3106.pinet.com 동일)이기 때문.
+- **해결**: 운영 Vercel env `NEXT_PUBLIC_PI_APP_DOMAIN=cafepi.vercel.app`으로 변경(Vercel API PATCH) + 재배포. 코드 변경 없음(딥링크 base 우선순위 설계가 이미 지원). 채팅 알림(base=`NEXT_PUBLIC_APP_URL`)·주문 알림(base=이 env) 두 경로 모두 브리지가 이 env로 `pi://` host를 만들므로 단일 지점 수정으로 해결.
+- **주의**: 이미 발송된 텔레그램 메시지의 버튼 URL은 불변(구 URL 고정) — 재배포 이후 **새로 발송된 알림**부터 정상. enqueue 시점에 도장 찍힌 미발송 outbox 행도 구 도메인일 수 있음.
+
+### 재발방지 (철칙 추가)
+- **딥링크 도메인 = 세션이 사는 오리진** (pinet 도메인이 정답이 아니라 "사용자가 실제 로그인해 쓰는 오리진"이 정답). `NEXT_PUBLIC_PI_APP_DOMAIN` 변경 전 반드시 "그 도메인에서 로그인 세션이 사는가"를 확인할 것.
+- "Pi Browser는 열리는데 로그인만 풀려 있음" 증상 = 십중팔구 오리진 불일치. 주소창 도메인 vs 평소 사용 도메인부터 대조.
