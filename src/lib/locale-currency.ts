@@ -22,4 +22,5 @@ export const LOCALE_CURRENCY: Record<string, string> = {
   il: 'ILS', // 이스라엘 신 셰켈
   et: 'ETB', // 에티오피아 비르
   mx: 'MXN', // 멕시코 페소
+  ps: 'AFN', // 아프가니스탄 아프가니 (파슈토어)
 }

@@ -8,7 +8,24 @@ function calcLimit(chromeHeight: number): number {
     (document.querySelector('header') as HTMLElement | null)?.offsetHeight ?? 56
   const footerH =
     (document.querySelector('footer') as HTMLElement | null)?.offsetHeight ?? 68
-  const available = window.innerHeight - headerH - footerH - chromeHeight
+  // 관리자 하단 플로팅 퀵메뉴(AdminQuickMenu, data-admin-quick-menu)는 footer(BottomNav)
+  // 보다 더 위까지 차지한다(safe-area+5.25rem~). footerH만 빼면 마지막 행(페이지네이션)이
+  // 정확히 이 플로팅 버튼과 같은 화면 좌표에 배치돼 클릭이 가로채인다 — 렌더돼 있으면
+  // (모바일, md 미만) 그 상단 경계(뷰포트 바닥까지의 실측 거리)까지 여백을 예약한다.
+  // offsetParent는 position:fixed 요소면 실제로 보여도 항상 null이라(잘 알려진 함정)
+  // 가시성 판정에 쓸 수 없다 — getComputedStyle(display)로 md:hidden 여부를 직접 확인한다.
+  const quickMenuEl = document.querySelector(
+    '[data-admin-quick-menu]',
+  ) as HTMLElement | null
+  const quickMenuReserve =
+    quickMenuEl && getComputedStyle(quickMenuEl).display !== 'none'
+      ? window.innerHeight - quickMenuEl.getBoundingClientRect().top
+      : 0
+  const available =
+    window.innerHeight -
+    headerH -
+    Math.max(footerH, quickMenuReserve) -
+    chromeHeight
   return Math.max(5, Math.min(50, Math.floor(available / ROW_HEIGHT_PX)))
 }
 

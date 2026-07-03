@@ -24,6 +24,7 @@ export const LOCALE_COUNTRY: Record<string, string> = {
   il: 'il', // 이스라엘: 히브리어(Hebrew) locale
   et: 'et', // 에티오피아: 암하라어 locale, ETB 통화
   mx: 'mx', // 멕시코: 스페인어 공유, MXN 통화 분리를 위해 별도 locale
+  ps: 'af', // 아프가니스탄: 파슈토어 locale, AFN 통화
 }
 
 // locale_cd → alpha-2 (정적 맵 우선, 없으면 BCP 47 마지막 세그먼트)

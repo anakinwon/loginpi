@@ -225,6 +225,8 @@ export const routing = defineRouting({
     // ── 이스라엘 (국가코드 기반 특수 locale) ─────────────────────────────
     'il',
 
+    'sq',
+
     // ── 충돌 변형: 국가코드 = 기존 언어코드일 때 생성되는 xx-XX 형태 ─────
     // (Admin 활성화 로직이 activeLocaleCds에 이미 있는 코드를 감지해 생성)
     'af-AF',
