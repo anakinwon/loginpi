@@ -495,3 +495,27 @@ Pi의 uid는 **(앱, Testnet/Mainnet 환경) 쌍마다 다른 scoped 값**이다
 3. **"헤더 O / 본문 X" 진단 공식**: 헤더=클라이언트(SDK) / 본문=서버 세션. 갈라지면 무조건 `POST /api/auth/pi`(서버 세션 발급) 로그부터 확인.
 4. **pi_username 유일성은 DB가 강제** — UNIQUE 위반 에러가 나면 인덱스를 지우지 말고 코드를 고칠 것.
 5. 검증 신호: 재로그인 시 Vercel 로그 `[auth] pi_uid 재바인딩: @유저명 구uid → 신uid` 1줄 = 정상 동작.
+
+---
+
+## [2026-07-03] 운영 텔레그램 콜백 유실 — 환경별 봇 webhook 미등록 (자가치유 도입) ⭐
+
+### 증상
+- **스테이징(loginpi)**: 텔레그램 알림 발송 + 콜백(인용답장 릴레이·`/start` 연동) 모두 매끄러움.
+- **운영(cafepi)**: 알림 **발송은 정상**인데 콜백만 매끄럽지 않음 — 답장이 앱으로 안 돌아오고 연동 확인이 늦거나 무응답.
+
+### 원인 (실측으로 확정)
+- 두 환경은 **서로 다른 봇** 사용: 스테이징=`cafe_pi_not_bot`, 운영=`cafe_pi_areal_bot` (각 배포 `/ko/support` 페이지 t.me 링크로 실측).
+- 텔레그램 봇은 **토큰당 webhook URL이 전 세계에 단 1개**. 스테이징 봇은 `https://loginpi.vercel.app/api/telegram/webhook` 등록 완료(getWebhookInfo 실측), 운영 봇은 수동 setWebhook 절차(PRD_13 §11-4)가 누락/오등록.
+- 발신(sendMessage)은 webhook과 무관해서 정상 → **"알림은 오는데 콜백만 죽는" 비대칭**이 특징적 지문.
+- 배제된 용의자: 운영 env는 정상이었다 — `NEXT_PUBLIC_PI_APP_DOMAIN=cafe7092.pinet.com`·`NEXT_PUBLIC_APP_URL=cafepi.vercel.app` 모두 배포 번들 인라인 값으로 실측 확인(딥링크 브리지 무결).
+
+### 해결 (근본수정 — 수동 절차 폐지)
+1. **`src/lib/telegram-webhook.ts`**: `ensureTelegramWebhook()` — `getWebhookInfo`로 현재 URL을 기대값(`NEXT_PUBLIC_APP_URL + /api/telegram/webhook`)과 대조, 어긋나면 `setWebhook`(url+secret_token, PRD_13 §11-4 동일 형식) 자동 재등록. 성공 결과만 10분 스로틀 캐시(실패는 즉시 재시도).
+2. **cron `chat-noti`(1분 주기)에 훅 연결**: 배포 후 최대 1분 내 자동 복구. 발송 로직과 분리되어 실패해도 알림 발송엔 영향 없음.
+3. **`/api/admin/telegram/webhook`**: GET=진단(봇 username·등록 URL·기대 URL·pending·최근 오류), POST=강제 재등록(시크릿 로테이트용).
+
+### 재발방지 (철칙)
+1. **환경별 봇 분리 유지** — 봇 토큰을 두 환경이 공유하면 자가치유끼리 webhook을 뺏는 플립플롭 발생. 신규 환경 추가 시 반드시 새 봇 + env 3종(`TELEGRAM_BOT_TOKEN`·`TELEGRAM_BOT_USERNAME`·`TELEGRAM_WEBHOOK_SECRET`) 세팅.
+2. **"발송 O / 콜백 X" 진단 공식**: 발신=토큰만 필요, 수신=webhook 등록 필요. 비대칭이면 무조건 `getWebhookInfo`부터 확인(관리자 GET 엔드포인트 활용).
+3. webhook 수동 등록 절차는 더 이상 필수 아님 — cron 자가치유가 담당. 단 `NEXT_PUBLIC_APP_URL`이 도메인별 정합이어야 함(오설정 시 webhook도 그리로 등록됨).

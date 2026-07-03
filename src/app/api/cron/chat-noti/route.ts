@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { dispatchChatNotis } from '@/lib/chat-noti'
+import { ensureTelegramWebhook } from '@/lib/telegram-webhook'
 
 // P2P 채팅 알림 발송 cron (Vercel Pro — 1분 주기 * * * * *).
 // 앱 내 DM 새 메시지의 미러 알림(msg_noti_outbox noti_tp_cd='CHAT')을 Telegram으로 발송한다.
@@ -18,9 +19,12 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
   }
 
+  // webhook 자가치유 — 미등록/오등록이면 자기 도메인으로 재등록(내부 스로틀 10분, 실패해도 발송은 진행)
+  const webhook = await ensureTelegramWebhook()
+
   try {
     const notis = await dispatchChatNotis()
-    return NextResponse.json({ ok: true, notis })
+    return NextResponse.json({ ok: true, notis, webhook })
   } catch (err) {
     console.error('[cron/chat-noti] 채팅 알림 발송 실패:', err)
     return NextResponse.json(
