@@ -51,10 +51,14 @@ export default async function AdminLayout({
       {/* _pit 파라미터가 URL에 남아있으면 제거 (Pi Browser 인증 성공 후 cleanup) */}
       <PitUrlCleaner />
       <AdminSidebar />
-      {/* pb-32: 모바일(sub-md)에서 AdminQuickMenu 플로팅 트리거(safe-area+5.25rem~7.75rem
-          구간)가 짧은 목록의 페이지네이션과 같은 화면 좌표에 겹치지 않도록 여유 확보.
+      {/* 모바일(sub-md) 하단 패딩: AdminQuickMenu 플로팅 트리거의 점유 상단은
+          safe-area + 5.25rem(bottom) + 버튼 높이(≈2.9rem) ≈ safe-area + 130px.
+          구 pb-32(128px)는 safe-area 미반영 + 트리거 상단보다 2px 낮아 풀스크롤에도
+          마지막 행이 버튼 밑에 깔렸다 → safe-area 포함 + 여유(9.5rem=152px)로 확보.
           md+는 사이드바 노출로 플로팅 메뉴가 없으므로 기본 p-6로 복귀. */}
-      <main className="flex-1 overflow-auto p-6 pb-32 md:pb-6">{children}</main>
+      <main className="flex-1 overflow-auto p-6 pb-[calc(env(safe-area-inset-bottom)+9.5rem)] md:pb-6">
+        {children}
+      </main>
       {/* 하단 네비(Admin 탭) 위 플로팅 팝업 — 사이드바가 md:hidden인 Pi Browser 접근성.
           md:hidden(컴포넌트 내부)이므로 데스크톱에선 렌더되지 않는다. */}
       {quickMenuItems.length > 0 && <AdminQuickMenu items={quickMenuItems} />}

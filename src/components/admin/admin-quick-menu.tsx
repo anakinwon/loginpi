@@ -96,12 +96,19 @@ export function AdminQuickMenu({ items }: { items: QuickNavItem[] }) {
           </nav>
         )}
 
-        {/* 트리거 버튼 — 우측 정렬 플로팅 */}
+        {/* 트리거 버튼 — 우측 정렬 플로팅.
+            ⚠️ auto-hide로 opacity-0이 된 뒤에도 pointer-events-auto가 남으면
+            "안 보이는 버튼"이 그 좌표의 페이지네이션 탭을 계속 가로챈다(유령 클릭) —
+            숨김 상태에선 히트 테스팅도 함께 꺼서 아래 요소가 탭을 받게 한다. */}
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
-          className="pointer-events-auto flex touch-manipulation items-center gap-2 rounded-full border bg-background px-4 py-2.5 text-sm font-semibold shadow-lg backdrop-blur-md transition-transform select-none active:scale-95"
+          tabIndex={visible ? 0 : -1}
+          className={cn(
+            'flex touch-manipulation items-center gap-2 rounded-full border bg-background px-4 py-2.5 text-sm font-semibold shadow-lg backdrop-blur-md transition-transform select-none active:scale-95',
+            visible ? 'pointer-events-auto' : 'pointer-events-none',
+          )}
         >
           <ShieldCheck className="size-4" />
           관리 메뉴

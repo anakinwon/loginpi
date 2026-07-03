@@ -17,9 +17,11 @@ function calcLimit(chromeHeight: number): number {
   const quickMenuEl = document.querySelector(
     '[data-admin-quick-menu]',
   ) as HTMLElement | null
+  // +12px 안전 버퍼: chromeHeight는 페이지별 상수 근사치라 실측과 수 px 어긋날 수 있고,
+  // 여유 0이면 페이지네이션이 트리거 존에 정확히 물린다(겹침 재발의 원인).
   const quickMenuReserve =
     quickMenuEl && getComputedStyle(quickMenuEl).display !== 'none'
-      ? window.innerHeight - quickMenuEl.getBoundingClientRect().top
+      ? window.innerHeight - quickMenuEl.getBoundingClientRect().top + 12
       : 0
   const available =
     window.innerHeight -
