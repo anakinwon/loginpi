@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "Du kan kun forbedre merker i Pi Browser",
       "upgraded": "{emoji} {theme}-merket er forbedret!"
     },
+    "badgePopup": {
+      "acquiredDesc": "Du har vært aktiv i 30 dager i {theme}-temarommet",
+      "acquiredTitle": "{theme}-merke oppnådd!",
+      "alreadyUpgraded": "Merket er allerede oppgradert.",
+      "beanShort": "Ikke nok Bean. Gå til påfyllingssiden.",
+      "later": "Senere",
+      "networkError": "En nettverksfeil oppsto",
+      "processing": "Behandler…",
+      "upgradeBenefit": "✨ Når du oppgraderer merket, får det et spesielt design og vises alltid ved siden av kafénavnet.",
+      "upgradeBtn": "☕ {fee} Oppgrader merke",
+      "upgraded": "{emoji} {theme}-merket er oppgradert!",
+      "upgradeFail": "Oppgradering av merket mislyktes",
+      "upgradeTitle": "{theme} Oppgradert merke"
+    },
     "bean": {
       "amountSelect": "Velg Bean-beløp",
       "completeFail": "Behandling av fullført Bean-betaling mislyktes",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "Det er ingen offentlige kafeer med dette temaet ennå.",
+      "eventFee": "Arrangement {fee} Bean",
+      "eventFree": "Arrangement gratis",
       "followCta": "+ Følg dette temaet (varsler for eventrom)",
       "followed": "Du følger temaet — Du vil motta varsler for nye eventrom.",
       "followFail": "Kunne ikke endre følgestatus.",
       "followingOn": "✓ Følger — Varsler for eventrom PÅ",
-      "title": "Markedsplass — Populære kafeer"
+      "roomMeta": "{theme} · {count} medlemmer · {msgs} ukentlige meldinger",
+      "scrollMore": "Rull for å se mer…",
+      "searchPlaceholder": "Søk etter kafénavn og beskrivelse",
+      "title": "Markedsplass — Populære kafeer",
+      "weeklyBean": "Ukentlig Bean π{amt}"
     },
     "msgList": {
       "am": "AM",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "{product}-abonnementet har startet!",
     "tagline": "Abonnement = pakke med fritak for gebyr per transaksjon. Jo mer du bruker, jo mer sparer du!",
     "title": "Abonnement"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Pi-investering",
+    "DAILY_CHAT": "Hverdagssnakk",
+    "DIRECT": "Direktehandel",
+    "EPL": "Premier League",
+    "ESPORTS": "e-sport",
+    "F1": "Formel 1",
+    "FOOD_SPOTS": "Spisesteder",
+    "HOBBY_GROUP": "Hobby",
+    "INFO_SHARE": "Informasjonsdeling",
+    "K_LEAGUE": "K League",
+    "MLB": "MLB",
+    "MY_TOWN": "Mitt nabolag",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA Tour",
+    "SECONDHAND": "Gjenbruk",
+    "TENNIS_GRAND_SLAM": "Tennis",
+    "TRAVEL": "Reise",
+    "UCL": "Champions League",
+    "UFC_MMA": "Kampsport",
+    "WEATHER": "Vær",
+    "WORLD_CUP": "VM"
   },
   "themeToggle": {
     "dark": "Mørk",

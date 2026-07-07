@@ -1,6 +1,6 @@
 'use client'
 import { useState, useCallback, useEffect } from 'react'
-import { useTranslations, useLocale } from 'next-intl'
+import { useTranslations } from 'next-intl'
 import { useRouter, Link } from '@/i18n/navigation'
 import { toast } from 'sonner'
 import { usePiAuth } from '@/components/pi-auth-provider'
@@ -13,7 +13,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { ThemeSelector, type ThemeRow, getThemeName } from './theme-selector'
+import { ThemeSelector, type ThemeRow } from './theme-selector'
+import { useThemeName } from './use-theme-name'
 import { getRoomFeeBean } from '@/lib/bean-fee'
 import { useFeeMode, beanToPi } from '@/hooks/use-fee-mode'
 import { useOpenPromoActive } from '@/components/feature-flag-provider'
@@ -54,7 +55,7 @@ function StepBar({ current, total = 3 }: { current: Step; total?: number }) {
 
 export function GroupRoomCreator() {
   const t = useTranslations('chat.creator')
-  const locale = useLocale()
+  const themeName = useThemeName()
   const router = useRouter()
   const { isInPiBrowser, user } = usePiAuth()
   // PI 모드: 실제 Pi 결제이므로 표시도 Pi(÷100, π). BEAN 모드: 기존 Bean 표기.
@@ -409,7 +410,7 @@ export function GroupRoomCreator() {
                 <div className="flex items-center gap-2 text-sm">
                   <span className="text-2xl">{selectedTheme.theme_emoji}</span>
                   <span className="font-medium">
-                    {getThemeName(selectedTheme, locale)} {t('theme')}
+                    {themeName(selectedTheme.theme_cd, selectedTheme.theme_nm_en || selectedTheme.theme_nm)} {t('theme')}
                   </span>
                   {isPremium && (
                     <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
@@ -428,7 +429,7 @@ export function GroupRoomCreator() {
                     onChange={(e) => setRoomNm(e.target.value)}
                     placeholder={t('defaultRoomName', {
                       emoji: selectedTheme.theme_emoji,
-                      theme: getThemeName(selectedTheme, locale),
+                      theme: themeName(selectedTheme.theme_cd, selectedTheme.theme_nm_en || selectedTheme.theme_nm),
                     })}
                     maxLength={50}
                     className="bg-background focus:ring-ring w-full rounded-xl border px-3 py-2 text-sm outline-none focus:ring-2"

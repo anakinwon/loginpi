@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "Chỉ trong Pi Browser bạn mới có thể nâng cấp Badge",
       "upgraded": "{emoji} {theme} Badge đã được nâng cấp!"
     },
+    "badgePopup": {
+      "acquiredDesc": "Đã đạt được 30 ngày hoạt động trong phòng chủ đề {theme}",
+      "acquiredTitle": "Đã nhận được huy hiệu {theme}!",
+      "alreadyUpgraded": "Huy hiệu đã được nâng cấp",
+      "beanShort": "Không đủ Bean. Chuyển đến trang nạp tiền.",
+      "later": "Làm sau",
+      "networkError": "Đã xảy ra lỗi mạng",
+      "processing": "Đang xử lý…",
+      "upgradeBenefit": "✨ Khi nâng cấp huy hiệu, thiết kế đặc biệt sẽ được áp dụng và huy hiệu sẽ luôn hiển thị bên cạnh tên quán cà phê",
+      "upgradeBtn": "☕ Nâng cấp huy hiệu {fee}",
+      "upgraded": "{emoji} Huy hiệu {theme} đã được nâng cấp!",
+      "upgradeFail": "Nâng cấp huy hiệu thất bại",
+      "upgradeTitle": "Huy hiệu nâng cấp {theme}"
+    },
     "bean": {
       "amountSelect": "Chọn số lượng Bean",
       "completeFail": "Xử lý hoàn tất thanh toán Bean thất bại",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "Chưa có Cafe công khai nào cho Theme này",
+      "eventFee": "Sự kiện {fee} Bean",
+      "eventFree": "Sự kiện miễn phí",
       "followCta": "+ Theo dõi Theme này (Thông báo phòng Event)",
       "followed": "Đã theo dõi Theme — Bạn sẽ nhận được thông báo phòng Event mới",
       "followFail": "Thay đổi theo dõi thất bại",
       "followingOn": "✓ Đang theo dõi — Thông báo phòng Event BẬT",
-      "title": "Marketplace — Cafe phổ biến"
+      "roomMeta": "{theme} · {count} thành viên · {msgs} tin nhắn hàng tuần",
+      "scrollMore": "Cuộn để xem thêm…",
+      "searchPlaceholder": "Tìm kiếm tên/giới thiệu quán cà phê",
+      "title": "Marketplace — Cafe phổ biến",
+      "weeklyBean": "Bean hàng tuần π{amt}"
     },
     "msgList": {
       "am": "SA",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "Đăng ký {product} của bạn đã bắt đầu!",
     "tagline": "Đăng ký = gói miễn phí phí mỗi giao dịch. Càng dùng nhiều càng có lợi!",
     "title": "Đăng ký Cafe.pi"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Đầu tư Pi",
+    "DAILY_CHAT": "Trò chuyện hàng ngày",
+    "DIRECT": "Giao dịch trực tiếp",
+    "EPL": "Premier League",
+    "ESPORTS": "eSports",
+    "F1": "F1",
+    "FOOD_SPOTS": "Địa điểm ăn uống ngon",
+    "HOBBY_GROUP": "Sở thích",
+    "INFO_SHARE": "Chia sẻ thông tin",
+    "K_LEAGUE": "K League",
+    "MLB": "MLB",
+    "MY_TOWN": "Khu phố của tôi",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA Tour",
+    "SECONDHAND": "Chia sẻ đồ cũ",
+    "TENNIS_GRAND_SLAM": "Quần vợt",
+    "TRAVEL": "Du lịch",
+    "UCL": "Champions League",
+    "UFC_MMA": "MMA",
+    "WEATHER": "Thời tiết",
+    "WORLD_CUP": "World Cup"
   },
   "themeToggle": {
     "dark": "Dark",

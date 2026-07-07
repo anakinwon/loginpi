@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "เฉพาะใน Pi Browser เท่านั้นที่สามารถเสริมความแข็งแกร่งของ Badge ได้",
       "upgraded": "{emoji} {theme} Badge ได้รับการอัปเกรดแล้ว!"
     },
+    "badgePopup": {
+      "acquiredDesc": "คุณได้ทำกิจกรรมครบ 30 วันในห้องธีม {theme}",
+      "acquiredTitle": "ได้รับป้าย {theme}!",
+      "alreadyUpgraded": "ป้ายนี้ได้รับการอัปเกรดแล้ว",
+      "beanShort": "Bean ไม่เพียงพอ กำลังไปยังหน้าเติมเงิน",
+      "later": "ทำภายหลัง",
+      "networkError": "เกิดข้อผิดพลาดเครือข่าย",
+      "processing": "กำลังดำเนินการ…",
+      "upgradeBenefit": "✨ เมื่ออัปเกรดป้าย จะมีการออกแบบพิเศษและจะแสดงถาวรข้างชื่อคาเฟ่",
+      "upgradeBtn": "☕ อัปเกรดป้าย {fee}",
+      "upgraded": "{emoji} ป้าย {theme} ได้รับการอัปเกรดแล้ว!",
+      "upgradeFail": "อัปเกรดป้ายไม่สำเร็จ",
+      "upgradeTitle": "ป้ายอัปเกรด {theme}"
+    },
     "bean": {
       "amountSelect": "เลือกจำนวน Bean",
       "completeFail": "ดำเนินการชำระเงิน Bean เสร็จสิ้นไม่สำเร็จ",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "ยังไม่มี Cafe สาธารณะสำหรับ Theme นี้",
+      "eventFee": "กิจกรรม {fee} Bean",
+      "eventFree": "กิจกรรมฟรี",
       "followCta": "+ ติดตาม Theme นี้ (การแจ้งเตือน Event Room)",
       "followed": "ติดตาม Theme แล้ว — จะได้รับการแจ้งเตือน Event Room ใหม่",
       "followFail": "การเปลี่ยนแปลงการติดตามไม่สำเร็จ",
       "followingOn": "✓ กำลังติดตาม — เปิดการแจ้งเตือน Event Room",
-      "title": "Marketplace — Cafe ยอดนิยม"
+      "roomMeta": "{theme} · สมาชิก {count} คน · ข้อความรายสัปดาห์ {msgs} ข้อความ",
+      "scrollMore": "เลื่อนเพื่อดูเพิ่มเติม…",
+      "searchPlaceholder": "ค้นหาชื่อคาเฟ่และคำแนะนำ",
+      "title": "Marketplace — Cafe ยอดนิยม",
+      "weeklyBean": "Bean รายสัปดาห์ π{amt}"
     },
     "msgList": {
       "am": "AM",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "การสมัครสมาชิก {product} ของคุณได้เริ่มต้นขึ้นแล้ว!",
     "tagline": "สมัครสมาชิก = แพ็กเกจยกเว้นค่าธรรมเนียมต่อรายการ ยิ่งใช้มากยิ่งคุ้มค่า!",
     "title": "สมัครสมาชิก Cafe.pi"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "การลงทุน Pi",
+    "DAILY_CHAT": "พูดคุยทั่วไป",
+    "DIRECT": "ซื้อขายโดยตรง",
+    "EPL": "พรีเมียร์ลีก",
+    "ESPORTS": "อีสปอร์ต",
+    "F1": "ฟอร์มูล่าวัน",
+    "FOOD_SPOTS": "ร้านอาหารอร่อย",
+    "HOBBY_GROUP": "งานอดิเรก",
+    "INFO_SHARE": "แบ่งปันข้อมูล",
+    "K_LEAGUE": "เคลีก",
+    "MLB": "เมเจอร์ลีก",
+    "MY_TOWN": "ละแวกบ้านฉัน",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA ทัวร์",
+    "SECONDHAND": "ของมือสอง",
+    "TENNIS_GRAND_SLAM": "เทนนิส",
+    "TRAVEL": "ท่องเที่ยว",
+    "UCL": "แชมเปียนส์ลีก",
+    "UFC_MMA": "ศิลปะการต่อสู้",
+    "WEATHER": "สภาพอากาศ",
+    "WORLD_CUP": "ฟุตบอลโลก"
   },
   "themeToggle": {
     "dark": "Dark",

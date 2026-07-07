@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "Unaweza kuboresha beji yako tu katika Pi Browser.",
       "upgraded": "{emoji} Beji ya {theme} imeboreshwa!"
     },
+    "badgePopup": {
+      "acquiredDesc": "Umetimiza siku 30 za shughuli katika chumba cha mada ya {theme}",
+      "acquiredTitle": "Beji ya {theme} imepatikana!",
+      "alreadyUpgraded": "Hii tayari ni beji iliyoboreshwa",
+      "beanShort": "Bean haitoshi. Unaelekezwa kwenye ukurasa wa kujaza.",
+      "later": "Fanya baadaye",
+      "networkError": "Hitilafu ya mtandao imetokea",
+      "processing": "Inachakatwa…",
+      "upgradeBenefit": "✨ Kuboresha beji huwezesha muundo maalum na huonyeshwa kila wakati karibu na jina la kafe.",
+      "upgradeBtn": "☕ {fee} Boresha Beji",
+      "upgraded": "{emoji} Beji ya {theme} imeboreshwa!",
+      "upgradeFail": "Imeshindwa kuboresha beji",
+      "upgradeTitle": "Beji Iliyoboreshwa ya {theme}"
+    },
     "bean": {
       "amountSelect": "Chagua kiasi cha Bean",
       "completeFail": "Kukamilisha mchakato wa malipo ya Bean kumeshindwa",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "Bado hakuna Cafe za umma kwa mada hii",
+      "eventFee": "Tukio {fee} Bean",
+      "eventFree": "Tukio Bure",
       "followCta": "+ Fuata mada hii (arifa za chumba cha tukio)",
       "followed": "Umefuata mada — utapokea arifa za chumba kipya cha tukio",
       "followFail": "Imeshindwa kubadilisha hali ya kufuata",
       "followingOn": "✓ Unafuata — Arifa za chumba cha tukio ZIMEWASHWA",
-      "title": "Soko — Cafe Maarufu"
+      "roomMeta": "{theme} · Wanachama {count} · Ujumbe wa wiki {msgs}",
+      "scrollMore": "Sogeza chini kuona zaidi…",
+      "searchPlaceholder": "Tafuta jina la kafe·maelezo",
+      "title": "Soko — Cafe Maarufu",
+      "weeklyBean": "Bean ya Wiki π{amt}"
     },
     "msgList": {
       "am": "Asubuhi",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "Usajili wa {product} umeanza!",
     "tagline": "Usajili = Kifurushi cha msamaha wa ada kwa kila muamala. Kadiri unavyotumia zaidi, ndivyo unavyopata faida zaidi!",
     "title": "Usajili wa Cafe.pi"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Uwekezaji wa Pi",
+    "DAILY_CHAT": "Gumzo la Kila Siku",
+    "DIRECT": "Miamala ya Moja kwa Moja",
+    "EPL": "Premier League",
+    "ESPORTS": "eSports",
+    "F1": "Formula 1",
+    "FOOD_SPOTS": "Sehemu za Chakula",
+    "HOBBY_GROUP": "Burudani",
+    "INFO_SHARE": "Kushiriki Taarifa",
+    "K_LEAGUE": "K League",
+    "MLB": "Major League",
+    "MY_TOWN": "Mtaa Wangu",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA Tour",
+    "SECONDHAND": "Kushiriki Vitu Vilivyotumika",
+    "TENNIS_GRAND_SLAM": "Tenisi",
+    "TRAVEL": "Safari",
+    "UCL": "Champions League",
+    "UFC_MMA": "Michezo ya Mapigano",
+    "WEATHER": "Hali ya Hewa",
+    "WORLD_CUP": "World Cup"
   },
   "themeToggle": {
     "dark": "Giza",

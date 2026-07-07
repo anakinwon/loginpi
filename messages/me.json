@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "Značku možete pojačati samo u Pi Browseru",
       "upgraded": "{emoji} {theme} značka je pojačana!"
     },
+    "badgePopup": {
+      "acquiredDesc": "Postigli ste 30 dana aktivnosti u sobi sa temom {theme}.",
+      "acquiredTitle": "Osvojena {theme} značka!",
+      "alreadyUpgraded": "Značka je već poboljšana.",
+      "beanShort": "Nema dovoljno Bean-a. Preusmeravamo vas na stranicu za dopunu.",
+      "later": "Kasnije",
+      "networkError": "Došlo je do mrežne greške.",
+      "processing": "Obrađuje se…",
+      "upgradeBenefit": "✨ Kada poboljšate značku, primenjuje se poseban dizajn i stalno se prikazuje pored naziva kafića.",
+      "upgradeBtn": "☕ Poboljšajte značku za {fee}",
+      "upgraded": "{emoji} {theme} značka je poboljšana!",
+      "upgradeFail": "Poboljšanje značke nije uspelo.",
+      "upgradeTitle": "Poboljšana {theme} značka"
+    },
     "bean": {
       "amountSelect": "Izaberite iznos Beana",
       "completeFail": "Neuspešno dovršavanje obrade plaćanja Bean-a",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "Još uvek nema javnih kafića za ovu temu",
+      "eventFee": "Događaj {fee} Bean",
+      "eventFree": "Događaj besplatno",
       "followCta": "+ Pratite ovu temu (obaveštenja o sobama za događaje)",
       "followed": "Pratite temu — dobijaćete obaveštenja o novim sobama za događaje",
       "followFail": "Promena praćenja nije uspela",
       "followingOn": "✓ Pratite — Obaveštenja o sobama za događaje UKLJUČENA",
-      "title": "Tržište — Popularni kafići"
+      "roomMeta": "{theme} · članova {count} · nedeljnih poruka {msgs}",
+      "scrollMore": "Skrolujte za više…",
+      "searchPlaceholder": "Pretražite naziv kafića ili opis",
+      "title": "Tržište — Popularni kafići",
+      "weeklyBean": "Nedeljno Bean π{amt}"
     },
     "msgList": {
       "am": "pre podne",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "Pretplata na {product} je započeta!",
     "tagline": "Pretplata = paket za oslobađanje od naknade po transakciji. Što više koristite, više štedite!",
     "title": "Pretplata na Cafe.pi"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Pi investicije",
+    "DAILY_CHAT": "Svakodnevno ćaskanje",
+    "DIRECT": "Direktna trgovina",
+    "EPL": "Premijer liga",
+    "ESPORTS": "eSport",
+    "F1": "Formula 1",
+    "FOOD_SPOTS": "Mesta za hranu",
+    "HOBBY_GROUP": "Hobiji",
+    "INFO_SHARE": "Deljenje informacija",
+    "K_LEAGUE": "K liga",
+    "MLB": "MLB",
+    "MY_TOWN": "Moj grad",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA Tour",
+    "SECONDHAND": "Polovno",
+    "TENNIS_GRAND_SLAM": "Tenis",
+    "TRAVEL": "Putovanja",
+    "UCL": "Liga šampiona",
+    "UFC_MMA": "Borilački sportovi",
+    "WEATHER": "Vreme",
+    "WORLD_CUP": "Svetsko prvenstvo"
   },
   "themeToggle": {
     "dark": "Tamna",

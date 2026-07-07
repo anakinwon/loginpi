@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "Puoi potenziare il Badge solo su Pi Browser",
       "upgraded": "{emoji} Badge {theme} potenziato!"
     },
+    "badgePopup": {
+      "acquiredDesc": "Hai raggiunto 30 giorni di attività nella stanza a tema {theme}",
+      "acquiredTitle": "Badge {theme} ottenuto!",
+      "alreadyUpgraded": "Badge già potenziato",
+      "beanShort": "Bean insufficienti. Vai alla pagina di ricarica.",
+      "later": "Fallo dopo",
+      "networkError": "Si è verificato un errore di rete",
+      "processing": "Elaborazione in corso…",
+      "upgradeBenefit": "✨ Potenziando il badge, otterrai un design speciale e sarà sempre visibile accanto al nome del caffè",
+      "upgradeBtn": "☕ Potenzia badge {fee}",
+      "upgraded": "{emoji} Il badge {theme} è stato potenziato!",
+      "upgradeFail": "Potenziamento badge fallito",
+      "upgradeTitle": "Badge potenziato {theme}"
+    },
     "bean": {
       "amountSelect": "Seleziona importo Bean",
       "completeFail": "Impossibile completare il pagamento Bean",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "Non ci sono ancora Cafe pubblici per questo Theme",
+      "eventFee": "Evento {fee} Bean",
+      "eventFree": "Evento gratuito",
       "followCta": "+ Segui questo Theme (notifiche Event Room)",
       "followed": "Hai seguito il Theme — Riceverai notifiche per nuove Event Room",
       "followFail": "Impossibile modificare il follow",
       "followingOn": "✓ Stai seguendo — Notifiche Event Room ON",
-      "title": "Marketplace — Cafe Popolari"
+      "roomMeta": "{theme} · {count} membri · {msgs} messaggi settimanali",
+      "scrollMore": "Scorri per vedere altro…",
+      "searchPlaceholder": "Cerca nome/descrizione del caffè",
+      "title": "Marketplace — Cafe Popolari",
+      "weeklyBean": "Bean settimanali π{amt}"
     },
     "msgList": {
       "am": "AM",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "L'abbonamento a {product} è iniziato!",
     "tagline": "Abbonamento = pacchetto esente da costi per transazione. Più lo usi, più risparmi!",
     "title": "Abbonamento Cafe.pi"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Investimenti Pi",
+    "DAILY_CHAT": "Chiacchiere quotidiane",
+    "DIRECT": "Scambio diretto",
+    "EPL": "Premier League",
+    "ESPORTS": "eSports",
+    "F1": "Formula 1",
+    "FOOD_SPOTS": "Ristoranti",
+    "HOBBY_GROUP": "Hobby",
+    "INFO_SHARE": "Condivisione informazioni",
+    "K_LEAGUE": "K League",
+    "MLB": "MLB",
+    "MY_TOWN": "Il mio quartiere",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA Tour",
+    "SECONDHAND": "Mercatino dell'usato",
+    "TENNIS_GRAND_SLAM": "Tennis",
+    "TRAVEL": "Viaggi",
+    "UCL": "Champions League",
+    "UFC_MMA": "Sport da combattimento",
+    "WEATHER": "Meteo",
+    "WORLD_CUP": "Coppa del Mondo"
   },
   "themeToggle": {
     "dark": "Dark",

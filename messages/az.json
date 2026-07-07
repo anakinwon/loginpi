@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "Nişanı yalnız Pi Browser-də gücləndirmək olar.",
       "upgraded": "{emoji} {theme} nişanı gücləndirildi!"
     },
+    "badgePopup": {
+      "acquiredDesc": "{theme} temalı otaqda 30 günlük fəaliyyətə nail oldunuz",
+      "acquiredTitle": "{theme} nişanı əldə edildi!",
+      "alreadyUpgraded": "Bu nişan artıq gücləndirilib",
+      "beanShort": "Bean çatışmır. Yükləmə səhifəsinə keçid edilir.",
+      "later": "Sonra et",
+      "networkError": "Şəbəkə xətası baş verdi",
+      "processing": "Emal edilir…",
+      "upgradeBenefit": "✨ Nişanı gücləndirsəniz, xüsusi dizayn tətbiq olunacaq və kafe adının yanında daimi olaraq göstəriləcək",
+      "upgradeBtn": "☕ {fee} Nişanı gücləndir",
+      "upgraded": "{emoji} {theme} nişanı gücləndirildi!",
+      "upgradeFail": "Nişanı gücləndirmək alınmadı",
+      "upgradeTitle": "{theme} Gücləndirilmiş Nişan"
+    },
     "bean": {
       "amountSelect": "Bean məbləğini seç",
       "completeFail": "Bean ödənişini tamamlamaq uğursuz oldu",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "Bu mövzuda hələ açıq kafe yoxdur",
+      "eventFee": "Tədbir {fee} Bean",
+      "eventFree": "Tədbir pulsuz",
       "followCta": "+ Bu mövzunu izlə (tədbir otağı bildirişləri)",
       "followed": "Mövzunu izlədiniz — yeni tədbir otağı bildirişləri alacaqsınız",
       "followFail": "İzləmə statusunu dəyişmək uğursuz oldu",
       "followingOn": "✓ İzlənir — Tədbir otağı bildirişləri AÇIQ",
-      "title": "Marketpleys — Populyar Kafeler"
+      "roomMeta": "{theme} · Üzv {count} nəfər · Həftəlik mesaj {msgs} ədəd",
+      "scrollMore": "Daha çox görmək üçün sürüşdürün…",
+      "searchPlaceholder": "Kafe adı·təsviri axtar",
+      "title": "Marketpleys — Populyar Kafeler",
+      "weeklyBean": "Həftəlik Bean π{amt}"
     },
     "msgList": {
       "am": "Səhər",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "{product} abunəliyi başladı!",
     "tagline": "Abunəlik = hər əməliyyat üçün ödənişsiz paket. Nə qədər çox istifadə etsəniz, bir o qədər çox qazanc əldə edərsiniz!",
     "title": "Cafe.pi Abunəliyi"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Pi İnvestisiya",
+    "DAILY_CHAT": "Gündəlik Söhbət",
+    "DIRECT": "Birbaşa Ticarət",
+    "EPL": "Premyer Liqa",
+    "ESPORTS": "e-İdman",
+    "F1": "Formula 1",
+    "FOOD_SPOTS": "Yemək Məkanları",
+    "HOBBY_GROUP": "Hobi Qrupu",
+    "INFO_SHARE": "Məlumat Mübadiləsi",
+    "K_LEAGUE": "K Liqası",
+    "MLB": "MLB",
+    "MY_TOWN": "Bizim Məhəllə",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA Turu",
+    "SECONDHAND": "İkinci Əl Paylaşımı",
+    "TENNIS_GRAND_SLAM": "Tennis",
+    "TRAVEL": "Səyahət",
+    "UCL": "Çempionlar Liqası",
+    "UFC_MMA": "Döyüş İdmanları",
+    "WEATHER": "Hava",
+    "WORLD_CUP": "Dünya Kuboku"
   },
   "themeToggle": {
     "dark": "Tünd",

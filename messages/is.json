@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "Þú getur aðeins styrkt merki í Pi Browser.",
       "upgraded": "{emoji} {theme} merkið hefur verið styrkt!"
     },
+    "badgePopup": {
+      "acquiredDesc": "Þú hefur náð 30 daga virkni í {theme} þemaherberginu",
+      "acquiredTitle": "{theme} merki fengið!",
+      "alreadyUpgraded": "Merkið hefur þegar verið styrkt",
+      "beanShort": "Ekki nóg Bean. Fara á áfyllingarsíðu.",
+      "later": "Gera síðar",
+      "networkError": "Netvilla kom upp",
+      "processing": "Vinnur…",
+      "upgradeBenefit": "✨ Þegar merkið er styrkt fær það sérstaka hönnun og birtist alltaf við hliðina á nafni kaffihússins",
+      "upgradeBtn": "☕ {fee} Styrkja merki",
+      "upgraded": "{emoji} {theme} merkið hefur verið styrkt!",
+      "upgradeFail": "Styrking merkis mistókst",
+      "upgradeTitle": "{theme} Styrkt merki"
+    },
     "bean": {
       "amountSelect": "Velja Bean upphæð",
       "completeFail": "Mistókst að ljúka Bean greiðslu",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "Engin opinber kaffihús eru ennþá fyrir þetta þema",
+      "eventFee": "Viðburður {fee} Bean",
+      "eventFree": "Viðburður ókeypis",
       "followCta": "+ Fylgja þessu þema (tilkynningar um viðburðarherbergi)",
       "followed": "Þú hefur fylgt þemanu — þú færð tilkynningar um ný viðburðarherbergi",
       "followFail": "Tókst ekki að breyta fylgni",
       "followingOn": "✓ Fylgist með — Tilkynningar um viðburðarherbergi KVEIKT",
-      "title": "Markaðstorg — Vinsæl kaffihús"
+      "roomMeta": "{theme} · {count} meðlimir · {msgs} vikuleg skilaboð",
+      "scrollMore": "Skrunaðu til að sjá meira…",
+      "searchPlaceholder": "Leita að nafni kaffihúss eða lýsingu",
+      "title": "Markaðstorg — Vinsæl kaffihús",
+      "weeklyBean": "Vikuleg Bean π{amt}"
     },
     "msgList": {
       "am": "f.h.",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "Áskrift að {product} hefur hafist!",
     "tagline": "Áskrift = pakki með undanþágu frá gjöldum á hverja færslu. Því meira sem þú notar, því meiri ávinningur!",
     "title": "Cafe.pi áskrift"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Pi fjárfesting",
+    "DAILY_CHAT": "Daglegt spjall",
+    "DIRECT": "Bein viðskipti",
+    "EPL": "Enska úrvalsdeildin",
+    "ESPORTS": "Rafíþróttir",
+    "F1": "Formúla 1",
+    "FOOD_SPOTS": "Matarstaðir",
+    "HOBBY_GROUP": "Áhugamál",
+    "INFO_SHARE": "Upplýsingamiðlun",
+    "K_LEAGUE": "K-deildin",
+    "MLB": "Major League Baseball",
+    "MY_TOWN": "Mitt hverfi",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA mótaröðin",
+    "SECONDHAND": "Notuð vara",
+    "TENNIS_GRAND_SLAM": "Tennis",
+    "TRAVEL": "Ferðalög",
+    "UCL": "Meistaradeildin",
+    "UFC_MMA": "Bardagaíþróttir",
+    "WEATHER": "Veður",
+    "WORLD_CUP": "Heimsmeistarakeppnin"
   },
   "themeToggle": {
     "dark": "Dökkt",

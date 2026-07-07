@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "Solo en Pi Browser puedes mejorar la Badge",
       "upgraded": "{emoji} ¡La Badge {theme} ha sido mejorada!"
     },
+    "badgePopup": {
+      "acquiredDesc": "Has logrado 30 días de actividad en la sala temática de {theme}.",
+      "acquiredTitle": "¡Insignia de {theme} obtenida!",
+      "alreadyUpgraded": "Esta insignia ya ha sido mejorada.",
+      "beanShort": "Bean insuficiente. Ir a la página de recarga.",
+      "later": "Más tarde",
+      "networkError": "Se ha producido un error de red.",
+      "processing": "Procesando…",
+      "upgradeBenefit": "✨ Al mejorar la insignia, se aplicará un diseño especial y se mostrará permanentemente junto al nombre del café.",
+      "upgradeBtn": "☕ Mejorar insignia {fee}",
+      "upgraded": "{emoji} ¡La insignia de {theme} ha sido mejorada!",
+      "upgradeFail": "Error al mejorar la insignia.",
+      "upgradeTitle": "Insignia mejorada de {theme}"
+    },
     "bean": {
       "amountSelect": "Seleccionar cantidad de Bean",
       "completeFail": "Fallo al procesar la finalización del pago de Bean",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "No hay Cafe público para este Theme todavía",
+      "eventFee": "Evento {fee} Bean",
+      "eventFree": "Evento gratuito",
       "followCta": "+ Seguir este Theme (notificaciones de Event room)",
       "followed": "Has seguido el Theme — Recibirás notificaciones de nuevos Event rooms",
       "followFail": "Fallo al cambiar el seguimiento",
       "followingOn": "✓ Siguiendo — Notificaciones de Event room ON",
-      "title": "Marketplace — Cafes populares"
+      "roomMeta": "{theme} · {count} miembros · {msgs} mensajes semanales",
+      "scrollMore": "Desplázate para ver más…",
+      "searchPlaceholder": "Buscar nombre o descripción del café",
+      "title": "Marketplace — Cafes populares",
+      "weeklyBean": "Bean semanal π{amt}"
     },
     "msgList": {
       "am": "AM",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "{product} subscription has started!",
     "tagline": "Subscription = Per-item fee exemption package. The more you use, the more you benefit!",
     "title": "Cafe.pi Subscribe"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Criptomonedas Pi",
+    "DAILY_CHAT": "Charla diaria",
+    "DIRECT": "Transacción directa",
+    "EPL": "Premier League",
+    "ESPORTS": "eSports",
+    "F1": "Fórmula 1",
+    "FOOD_SPOTS": "Lugares de comida",
+    "HOBBY_GROUP": "Aficiones",
+    "INFO_SHARE": "Compartir información",
+    "K_LEAGUE": "K League",
+    "MLB": "Grandes Ligas",
+    "MY_TOWN": "Mi barrio",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA Tour",
+    "SECONDHAND": "Artículos de segunda mano",
+    "TENNIS_GRAND_SLAM": "Tenis",
+    "TRAVEL": "Viajes",
+    "UCL": "Champions League",
+    "UFC_MMA": "Deportes de combate",
+    "WEATHER": "Clima",
+    "WORLD_CUP": "Copa Mundial"
   },
   "themeToggle": {
     "dark": "Dark",

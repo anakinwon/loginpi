@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "Anda hanya dapat meningkatkan Badge di Pi Browser",
       "upgraded": "{emoji} Badge {theme} telah ditingkatkan!"
     },
+    "badgePopup": {
+      "acquiredDesc": "Telah mencapai 30 hari aktivitas di ruang tema {theme}",
+      "acquiredTitle": "Lencana {theme} didapatkan!",
+      "alreadyUpgraded": "Lencana ini sudah ditingkatkan",
+      "beanShort": "Bean tidak cukup. Pindah ke halaman pengisian.",
+      "later": "Nanti saja",
+      "networkError": "Terjadi kesalahan jaringan",
+      "processing": "Memproses…",
+      "upgradeBenefit": "✨ Tingkatkan lencana untuk mendapatkan desain khusus dan ditampilkan secara permanen di samping nama kafe",
+      "upgradeBtn": "☕ Tingkatkan Lencana {fee}",
+      "upgraded": "{emoji} Lencana {theme} telah ditingkatkan!",
+      "upgradeFail": "Gagal meningkatkan lencana",
+      "upgradeTitle": "Lencana {theme} yang Ditingkatkan"
+    },
     "bean": {
       "amountSelect": "Pilih Jumlah Bean",
       "completeFail": "Gagal memproses penyelesaian pembayaran Bean",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "Belum ada Cafe publik untuk tema ini",
+      "eventFee": "Acara {fee} Bean",
+      "eventFree": "Acara Gratis",
       "followCta": "+ Ikuti Tema ini (Notifikasi Ruang Event)",
       "followed": "Anda telah mengikuti Tema — Anda akan menerima notifikasi Ruang Event baru",
       "followFail": "Gagal mengubah status Follow",
       "followingOn": "✓ Mengikuti — Notifikasi Ruang Event AKTIF",
-      "title": "Marketplace — Cafe Populer"
+      "roomMeta": "{theme} · {count} anggota · {msgs} pesan mingguan",
+      "scrollMore": "Gulir untuk melihat lebih banyak…",
+      "searchPlaceholder": "Cari nama kafe atau deskripsi",
+      "title": "Marketplace — Cafe Populer",
+      "weeklyBean": "Bean Mingguan π{amt}"
     },
     "msgList": {
       "am": "AM",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "Langganan {product} Anda telah dimulai!",
     "tagline": "Langganan = Paket Bebas Biaya per Transaksi. Semakin banyak digunakan, semakin menguntungkan!",
     "title": "Langganan Cafe.pi"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Investasi Pi",
+    "DAILY_CHAT": "Obrolan Harian",
+    "DIRECT": "Transaksi Langsung",
+    "EPL": "Premier League",
+    "ESPORTS": "eSports",
+    "F1": "Formula 1",
+    "FOOD_SPOTS": "Kuliner",
+    "HOBBY_GROUP": "Hobi",
+    "INFO_SHARE": "Berbagi Informasi",
+    "K_LEAGUE": "K League",
+    "MLB": "MLB",
+    "MY_TOWN": "Lingkungan Saya",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA Tour",
+    "SECONDHAND": "Barang Bekas",
+    "TENNIS_GRAND_SLAM": "Tenis",
+    "TRAVEL": "Perjalanan",
+    "UCL": "Champions League",
+    "UFC_MMA": "MMA",
+    "WEATHER": "Cuaca",
+    "WORLD_CUP": "Piala Dunia"
   },
   "themeToggle": {
     "dark": "Dark",

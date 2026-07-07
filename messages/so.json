@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "Waxaad ku xoojin kartaa baajka Pi Browser oo kaliya.",
       "upgraded": "{emoji} Baajka {theme} waa la xoojiyay!"
     },
+    "badgePopup": {
+      "acquiredDesc": "Waxaad gaartay 30 maalmood oo firfircooni ah qolka mawduuca {theme}.",
+      "acquiredTitle": "Waxaad heshay baajka {theme}!",
+      "alreadyUpgraded": "Waa baaj horey loo xoojiyay.",
+      "beanShort": "Bean kuma filna. Waxaa lagu geynayaa bogga dib u buuxinta.",
+      "later": "Ka dib",
+      "networkError": "Cilad shabakad ayaa dhacday.",
+      "processing": "Waa la farsameynayaa…",
+      "upgradeBenefit": "✨ Marka baajka la xoojiyo, naqshad gaar ah ayaa lagu dabaqaa waxaana si joogto ah loogu soo bandhigaa agagaarka magaca kafeega.",
+      "upgradeBtn": "☕ Xooji Baajka {fee}",
+      "upgraded": "{emoji} Baajka {theme} waa la xoojiyay!",
+      "upgradeFail": "Ku guuldareystay xoojinta baajka.",
+      "upgradeTitle": "Baajka la xoojiyay ee {theme}"
+    },
     "bean": {
       "amountSelect": "Dooro xaddiga Bean",
       "completeFail": "Waa la fashilmay in la dhammaystiro habka lacag bixinta Bean",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "Wali ma jiraan kafeeyo furan oo mawduucan ah",
+      "eventFee": "Dhacdo {fee} Bean",
+      "eventFree": "Dhacdo Bilaash ah",
       "followCta": "+ Raac mawduucan (Ogeysiisyada qolka dhacdada)",
       "followed": "Waxaad raacday mawduuca — waxaad heli doontaa ogeysiisyada qolalka dhacdooyinka cusub",
       "followFail": "Wuu ku guuldareystay inuu beddelo raacitaanka",
       "followingOn": "✓ Waa la raacayaa — Ogeysiisyada qolka dhacdada ON",
-      "title": "Suuqa — Kafeeyada caanka ah"
+      "roomMeta": "{theme} · Xubnaha {count} · Fariimaha toddobaadlaha ah {msgs}",
+      "scrollMore": "Hoos u rog si aad u aragto wax badan…",
+      "searchPlaceholder": "Raadi magaca kafeega·sharaxaad",
+      "title": "Suuqa — Kafeeyada caanka ah",
+      "weeklyBean": "Bean Toddobaadle ah π{amt}"
     },
     "msgList": {
       "am": "Subax",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "Isdiiwaangelinta {product} ayaa bilowday!",
     "tagline": "Isdiiwaangelin = Xirmo ka reebis khidmadaha wax kasta. Inta badan ee aad isticmaasho, waa inta badan ee aad ka faa'iidaysato!",
     "title": "Isdiiwaangelinta Cafe.pi"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Maalgashiga Pi",
+    "DAILY_CHAT": "Sheekooyinka Maalinlaha ah",
+    "DIRECT": "Ganacsi Toos ah",
+    "EPL": "Premier League",
+    "ESPORTS": "eSports",
+    "F1": "Formula 1",
+    "FOOD_SPOTS": "Goobaha Cuntada Macaan",
+    "HOBBY_GROUP": "Hiwaayadaha",
+    "INFO_SHARE": "Wadaagista Macluumaadka",
+    "K_LEAGUE": "K League",
+    "MLB": "MLB",
+    "MY_TOWN": "Xaafadayda",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA Tour",
+    "SECONDHAND": "Alaabta Gacanta Labaad",
+    "TENNIS_GRAND_SLAM": "Tennis",
+    "TRAVEL": "Socdaalka",
+    "UCL": "Champions League",
+    "UFC_MMA": "Ciyaaraha Dagaalka",
+    "WEATHER": "Cimilada",
+    "WORLD_CUP": "World Cup"
   },
   "themeToggle": {
     "dark": "Madow",

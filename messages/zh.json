@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "仅在 Pi Browser 中可以强化 Badge",
       "upgraded": "{emoji} {theme} Badge 已强化！"
     },
+    "badgePopup": {
+      "acquiredDesc": "在 {theme} 主题房间已达成30天活跃",
+      "acquiredTitle": "获得 {theme} 徽章！",
+      "alreadyUpgraded": "已经是强化徽章",
+      "beanShort": "Bean不足。前往充值页面。",
+      "later": "稍后",
+      "networkError": "发生网络错误",
+      "processing": "处理中…",
+      "upgradeBenefit": "✨ 强化徽章后，将应用特殊设计并常驻显示在咖啡厅名称旁",
+      "upgradeBtn": "☕ {fee} 强化徽章",
+      "upgraded": "{emoji} {theme} 徽章已强化！",
+      "upgradeFail": "徽章强化失败",
+      "upgradeTitle": "{theme} 强化徽章"
+    },
     "bean": {
       "amountSelect": "选择Bean金额",
       "completeFail": "Bean支付完成处理失败",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "此 Theme 还没有公开的 Cafe",
+      "eventFee": "活动 {fee} Bean",
+      "eventFree": "活动免费",
       "followCta": "+ 关注此 Theme (Event Room 通知)",
       "followed": "已关注 Theme — 您将收到新的 Event Room 通知",
       "followFail": "关注更改失败",
       "followingOn": "✓ 正在关注 — Event Room 通知 ON",
-      "title": "Marketplace — 热门 Cafe"
+      "roomMeta": "{theme} ・ 成员 {count}人 ・ 每周消息 {msgs}条",
+      "scrollMore": "滚动查看更多…",
+      "searchPlaceholder": "搜索咖啡厅名称或介绍",
+      "title": "Marketplace — 热门 Cafe",
+      "weeklyBean": "每周 Bean π{amt}"
     },
     "msgList": {
       "am": "上午",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "{product} 订阅已开始！",
     "tagline": "订阅 = 按次计费免除套餐。用得越多越划算！",
     "title": "Cafe.pi 订阅"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Pi投资",
+    "DAILY_CHAT": "日常闲聊",
+    "DIRECT": "直接交易",
+    "EPL": "英超",
+    "ESPORTS": "电竞",
+    "F1": "F1",
+    "FOOD_SPOTS": "美食店",
+    "HOBBY_GROUP": "兴趣爱好",
+    "INFO_SHARE": "信息分享",
+    "K_LEAGUE": "K联赛",
+    "MLB": "MLB",
+    "MY_TOWN": "同城",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA巡回赛",
+    "SECONDHAND": "二手交易",
+    "TENNIS_GRAND_SLAM": "网球",
+    "TRAVEL": "旅行",
+    "UCL": "欧冠",
+    "UFC_MMA": "格斗",
+    "WEATHER": "天气",
+    "WORLD_CUP": "世界杯"
   },
   "themeToggle": {
     "dark": "Dark",

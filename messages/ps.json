@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "تاسو کولی شئ یوازې په Pi Browser کې Badge پیاوړی کړئ",
       "upgraded": "{emoji} {theme} Badge پیاوړی شو!"
     },
+    "badgePopup": {
+      "acquiredDesc": "د {theme} موضوع په خونه کې د 30 ورځو فعالیت بشپړ شو.",
+      "acquiredTitle": "د {theme} بیج ترلاسه شو!",
+      "alreadyUpgraded": "دا بیج لا دمخه پیاوړی شوی دی.",
+      "beanShort": "Bean کم دی. د چارج کولو پاڼې ته ځئ.",
+      "later": "وروسته یې وکړئ",
+      "networkError": "د شبکې تېروتنه رامنځته شوه.",
+      "processing": "په پروسس کې…",
+      "upgradeBenefit": "✨ کله چې بیج پیاوړی شي، یو ځانګړی ډیزاین پلي کیږي او د کافي نوم تر څنګ تل ښودل کیږي.",
+      "upgradeBtn": "☕ {fee} بیج پیاوړی کړئ",
+      "upgraded": "{emoji} د {theme} بیج پیاوړی شو!",
+      "upgradeFail": "د بیج پیاوړي کولو کې پاتې راغی.",
+      "upgradeTitle": "د {theme} پیاوړی شوی بیج"
+    },
     "bean": {
       "amountSelect": "د Bean اندازه وټاکئ",
       "completeFail": "د Bean تادیې بشپړولو پروسس کولو کې ناکامي",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "د دې Theme لپاره تر اوسه Public Rooms نشته",
+      "eventFee": "د پیښې فیس {fee} Bean",
+      "eventFree": "پیښه وړیا",
       "followCta": "+ دا Theme Follow کړئ (د Event Room Notifications)",
       "followed": "Theme Follow شو — د نوي Event Room Notifications ترلاسه کوئ",
       "followFail": "د Follow په بدلولو کې پاتې راغی",
       "followingOn": "✓ په Following کې — د Event Room Notifications ON",
-      "title": "Marketplace — Popular Rooms"
+      "roomMeta": "{theme} · {count} غړي · په اونۍ کې {msgs} پیغامونه",
+      "scrollMore": "د نورو لیدلو لپاره سکرول کړئ…",
+      "searchPlaceholder": "د کافي نوم او پېژندنې لټون",
+      "title": "Marketplace — Popular Rooms",
+      "weeklyBean": "اونیزه Bean π{amt}"
     },
     "msgList": {
       "am": "AM",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "ستاسو د {product} ګډون پیل شو!",
     "tagline": "ګډون = د هر توکي فیس معافیت کڅوړه. څومره چې ډیر کاروئ، هغومره ډیره ګټه!",
     "title": "د Cafe.pi ګډون"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "د Pi پانګه اچونه",
+    "DAILY_CHAT": "ورځنۍ خبرې اترې",
+    "DIRECT": "مستقیمه معامله",
+    "EPL": "پریمایر لیګ",
+    "ESPORTS": "ای-سپورټس",
+    "F1": "فارمولا 1",
+    "FOOD_SPOTS": "خوندور خواړه ځایونه",
+    "HOBBY_GROUP": "شوق",
+    "INFO_SHARE": "د معلوماتو شریکول",
+    "K_LEAGUE": "کې لیګ",
+    "MLB": "میجر لیګ",
+    "MY_TOWN": "زموږ ښارګوټی",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA ټور",
+    "SECONDHAND": "د دویم لاس شریکول",
+    "TENNIS_GRAND_SLAM": "ټینس",
+    "TRAVEL": "سفر",
+    "UCL": "چمپینز لیګ",
+    "UFC_MMA": "جنګي سپورتونه",
+    "WEATHER": "هوا",
+    "WORLD_CUP": "نړیوال جام"
   },
   "themeToggle": {
     "dark": "Dark",

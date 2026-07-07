@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "Mund të përmirësoni distinktivin vetëm në Pi Browser",
       "upgraded": "{emoji} Distinktivi {theme} është përmirësuar!"
     },
+    "badgePopup": {
+      "acquiredDesc": "Në dhomën me temë {theme} keni arritur 30 ditë aktivitet.",
+      "acquiredTitle": "Distinktivi {theme} i fituar!",
+      "alreadyUpgraded": "Ky është tashmë një distinktiv i përmirësuar.",
+      "beanShort": "Nuk keni mjaftueshëm Bean. Do të ridrejtoheni në faqen e rimbushjes.",
+      "later": "Më vonë",
+      "networkError": "Ndodhi një gabim në rrjet.",
+      "processing": "Duke u përpunuar…",
+      "upgradeBenefit": "✨ Kur përmirësoni distinktivin, aplikohet një dizajn special dhe shfaqet gjithmonë pranë emrit të kafenesë.",
+      "upgradeBtn": "☕ Përmirëso distinktivin {fee}",
+      "upgraded": "{emoji} Distinktivi {theme} është përmirësuar!",
+      "upgradeFail": "Përmirësimi i distinktivit dështoi.",
+      "upgradeTitle": "Distinktivi i përmirësuar {theme}"
+    },
     "bean": {
       "amountSelect": "Zgjidh sasinë e Bean-it",
       "completeFail": "Dështoi përpunimi i përfundimit të pagesës Bean",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "Nuk ka ende kafene publike për këtë temë",
+      "eventFee": "Ngjarje {fee} Bean",
+      "eventFree": "Ngjarje falas",
       "followCta": "+ Ndjek këtë temë (Njoftime për dhomën e eventit)",
       "followed": "Keni ndjekur temën — do të merrni njoftime për dhomat e reja të eventeve",
       "followFail": "Dështoi ndryshimi i ndjekjes",
       "followingOn": "✓ Po ndiqni — Njoftimet e dhomës së eventit ON",
-      "title": "Marketplace — Kafene Popullore"
+      "roomMeta": "{theme} · {count} anëtarë · {msgs} mesazhe javore",
+      "scrollMore": "Lëviz poshtë për të parë më shumë…",
+      "searchPlaceholder": "Kërko emrin ose përshkrimin e kafenesë",
+      "title": "Marketplace — Kafene Popullore",
+      "weeklyBean": "Bean javor π{amt}"
     },
     "msgList": {
       "am": "Paradite",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "Abonimi juaj {product} ka filluar!",
     "tagline": "Abonim = Paketë pa tarifa për transaksion. Sa më shumë të përdorni, aq më shumë përfitoni!",
     "title": "Abonim Cafe.pi"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Investimi në Pi",
+    "DAILY_CHAT": "Bisedë e përditshme",
+    "DIRECT": "Tregti direkte",
+    "EPL": "Premier League",
+    "ESPORTS": "eSports",
+    "F1": "Formula 1",
+    "FOOD_SPOTS": "Vende ushqimi",
+    "HOBBY_GROUP": "Hobi",
+    "INFO_SHARE": "Shkëmbim informacioni",
+    "K_LEAGUE": "K League",
+    "MLB": "MLB",
+    "MY_TOWN": "Qyteti im",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA Tour",
+    "SECONDHAND": "Artikuj të përdorur",
+    "TENNIS_GRAND_SLAM": "Tenis",
+    "TRAVEL": "Udhëtim",
+    "UCL": "Champions League",
+    "UFC_MMA": "Sportet luftarake",
+    "WEATHER": "Moti",
+    "WORLD_CUP": "Kupa e Botës"
   },
   "themeToggle": {
     "dark": "E errët",

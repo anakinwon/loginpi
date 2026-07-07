@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "Только в Pi Browser можно улучшить Badge",
       "upgraded": "{emoji} {theme} Badge улучшен!"
     },
+    "badgePopup": {
+      "acquiredDesc": "Вы достигли 30 дней активности в тематической комнате {theme}.",
+      "acquiredTitle": "Значок {theme} получен!",
+      "alreadyUpgraded": "Этот значок уже улучшен.",
+      "beanShort": "Недостаточно Bean. Переход на страницу пополнения.",
+      "later": "Позже",
+      "networkError": "Произошла ошибка сети.",
+      "processing": "Обработка…",
+      "upgradeBenefit": "✨ Улучшение значка придаст ему особый дизайн и позволит постоянно отображать его рядом с названием кафе.",
+      "upgradeBtn": "☕ Улучшить значок за {fee}",
+      "upgraded": "{emoji} Значок {theme} улучшен!",
+      "upgradeFail": "Не удалось улучшить значок.",
+      "upgradeTitle": "Улучшенный значок {theme}"
+    },
     "bean": {
       "amountSelect": "Выбрать сумму Bean",
       "completeFail": "Не удалось обработать завершение платежа Bean",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "Пока нет публичных Кафе для этой Theme",
+      "eventFee": "Событие {fee} Bean",
+      "eventFree": "Событие бесплатно",
       "followCta": "+ Подписаться на эту Theme (уведомления о Event-комнатах)",
       "followed": "Вы подписались на Theme — получайте уведомления о новых Event-комнатах",
       "followFail": "Не удалось изменить подписку",
       "followingOn": "✓ Вы подписаны — уведомления о Event-комнатах включены",
-      "title": "Marketplace — Популярные кафе"
+      "roomMeta": "{theme} · {count} участников · {msgs} сообщений в неделю",
+      "scrollMore": "Прокрутите, чтобы увидеть больше…",
+      "searchPlaceholder": "Поиск по названию/описанию кафе",
+      "title": "Marketplace — Популярные кафе",
+      "weeklyBean": "Еженедельно Bean π{amt}"
     },
     "msgList": {
       "am": "AM",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "Подписка на {product} активирована!",
     "tagline": "Подписка = пакет без комиссии за транзакцию. Чем больше используете, тем выгоднее!",
     "title": "Подписка на Cafe.pi"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Торговля Pi",
+    "DAILY_CHAT": "Ежедневные беседы",
+    "DIRECT": "Прямая сделка",
+    "EPL": "Премьер-лига",
+    "ESPORTS": "Киберспорт",
+    "F1": "Формула-1",
+    "FOOD_SPOTS": "Места для гурманов",
+    "HOBBY_GROUP": "Хобби",
+    "INFO_SHARE": "Обмен информацией",
+    "K_LEAGUE": "К-Лига",
+    "MLB": "МЛБ",
+    "MY_TOWN": "Мой район",
+    "NBA": "НБА",
+    "PGA_GOLF": "Тур PGA",
+    "SECONDHAND": "Подержанные вещи",
+    "TENNIS_GRAND_SLAM": "Теннис",
+    "TRAVEL": "Путешествия",
+    "UCL": "Лига чемпионов",
+    "UFC_MMA": "Единоборства",
+    "WEATHER": "Погода",
+    "WORLD_CUP": "Чемпионат мира"
   },
   "themeToggle": {
     "dark": "Dark",

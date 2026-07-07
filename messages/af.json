@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "Slegs in die Pi Browser kan jy die Badge versterk",
       "upgraded": "{emoji} Die {theme} Badge is versterk!"
     },
+    "badgePopup": {
+      "acquiredDesc": "Het 30 dae se aktiwiteit in die {theme} tema kamer bereik.",
+      "acquiredTitle": "{theme} kenteken verkry!",
+      "alreadyUpgraded": "Dit is reeds 'n opgegradeerde kenteken.",
+      "beanShort": "Bean is onvoldoende. Gaan na die herlaai bladsy.",
+      "later": "Later",
+      "networkError": "'n Netwerkfout het voorgekom.",
+      "processing": "Besig om te verwerk…",
+      "upgradeBenefit": "✨ As jy die kenteken opgradeer, word 'n spesiale ontwerp toegepas en dit word permanent langs die kafee naam vertoon.",
+      "upgradeBtn": "☕ {fee} Opgradeer kenteken",
+      "upgraded": "{emoji} Die {theme} kenteken is opgegradeer!",
+      "upgradeFail": "Opgradering van kenteken het misluk.",
+      "upgradeTitle": "{theme} Opgegradeerde kenteken"
+    },
     "bean": {
       "amountSelect": "Kies Bean bedrag",
       "completeFail": "Verwerking van Bean betaling voltooiing het misluk",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "Daar is nog geen openbare Kafee vir hierdie Tema nie",
+      "eventFee": "Gebeurtenis {fee} Bean",
+      "eventFree": "Gebeurtenis gratis",
       "followCta": "+ Volg hierdie Tema (Event Room-kennisgewings)",
       "followed": "U volg die Tema — U sal kennisgewings vir nuwe Event Rooms ontvang",
       "followFail": "Die verandering van volgstatus het misluk",
       "followingOn": "✓ Volg tans — Event Room-kennisgewings AAN",
-      "title": "Marketplace — Gewilde Cafe"
+      "roomMeta": "{theme} · Lede {count} · Weeklikse boodskappe {msgs}",
+      "scrollMore": "Rollees om meer te sien…",
+      "searchPlaceholder": "Soek kafee naam of beskrywing",
+      "title": "Marketplace — Gewilde Cafe",
+      "weeklyBean": "Weeklikse Bean π{amt}"
     },
     "msgList": {
       "am": "VM",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "{product} inskrywing het begin!",
     "tagline": "Subskripsie = pakket vir vrystelling van fooie per item. Hoe meer jy gebruik, hoe meer voordeel!",
     "title": "Cafe.pi Subskripsie"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Pi-belegging",
+    "DAILY_CHAT": "Daaglikse gesels",
+    "DIRECT": "Direkte transaksie",
+    "EPL": "Premier League",
+    "ESPORTS": "eSport",
+    "F1": "Formule 1",
+    "FOOD_SPOTS": "Eetplekke",
+    "HOBBY_GROUP": "Stokperdjie",
+    "INFO_SHARE": "Inligtingdeling",
+    "K_LEAGUE": "K-Liga",
+    "MLB": "Major League",
+    "MY_TOWN": "My dorp",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA Toer",
+    "SECONDHAND": "Tweedehandse deel",
+    "TENNIS_GRAND_SLAM": "Tennis",
+    "TRAVEL": "Reis",
+    "UCL": "Champions League",
+    "UFC_MMA": "Veesport",
+    "WEATHER": "Weer",
+    "WORLD_CUP": "Wêreldbeker"
   },
   "themeToggle": {
     "dark": "Dark",

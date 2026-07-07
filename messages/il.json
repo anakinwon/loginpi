@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "ניתן לשדרג Badge רק ב-Pi Browser",
       "upgraded": "{emoji} ה-Badge {theme} שודרג!"
     },
+    "badgePopup": {
+      "acquiredDesc": "השלמת 30 ימי פעילות בחדר הנושא {theme}",
+      "acquiredTitle": "תג {theme} הושג!",
+      "alreadyUpgraded": "התג כבר שודרג",
+      "beanShort": "אין מספיק Bean. עבור לדף הטעינה.",
+      "later": "אולי מאוחר יותר",
+      "networkError": "אירעה שגיאת רשת",
+      "processing": "בתהליך…",
+      "upgradeBenefit": "✨ שדרוג התג מעניק עיצוב מיוחד ומוצג באופן קבוע ליד שם בית הקפה",
+      "upgradeBtn": "☕ שדרג תג ב-{fee}",
+      "upgraded": "{emoji} תג ה-{theme} שודרג!",
+      "upgradeFail": "שדרוג התג נכשל",
+      "upgradeTitle": "תג {theme} משודרג"
+    },
     "bean": {
       "amountSelect": "בחר סכום Bean",
       "completeFail": "השלמת תשלום Bean נכשלה",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "אין עדיין Cafeים ציבוריים עבור Theme זה",
+      "eventFee": "אירוע {fee} Bean",
+      "eventFree": "אירוע חינם",
       "followCta": "+ Follow Theme זה (התראות חדר Event)",
       "followed": "עקבת אחרי ה-Theme — תקבל התראות על חדרי Event חדשים",
       "followFail": "שינוי ה-Follow נכשל",
       "followingOn": "✓ Following — התראות חדר Event ON",
-      "title": "Marketplace — Cafeים פופולריים"
+      "roomMeta": "{theme} · {count} חברים · {msgs} הודעות שבועיות",
+      "scrollMore": "גלול למטה כדי לראות עוד…",
+      "searchPlaceholder": "חיפוש שם בית קפה · תיאור",
+      "title": "Marketplace — Cafeים פופולריים",
+      "weeklyBean": "Bean שבועי π{amt}"
     },
     "msgList": {
       "am": "לפנה\"צ",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "המנוי ל-{product} החל בהצלחה!",
     "tagline": "מנוי = חבילת פטור מתשלום לפי שימוש. ככל שתשתמש יותר, כך תרוויח יותר!",
     "title": "מנוי ל-Cafe.pi"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "השקעות Pi",
+    "DAILY_CHAT": "פטפוט יומיומי",
+    "DIRECT": "עסקה ישירה",
+    "EPL": "פרמייר ליג",
+    "ESPORTS": "ספורט אלקטרוני",
+    "F1": "פורמולה 1",
+    "FOOD_SPOTS": "מקומות אוכל מומלצים",
+    "HOBBY_GROUP": "תחביבים",
+    "INFO_SHARE": "שיתוף מידע",
+    "K_LEAGUE": "K ליג",
+    "MLB": "MLB",
+    "MY_TOWN": "השכונה שלי",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA טור",
+    "SECONDHAND": "יד שנייה",
+    "TENNIS_GRAND_SLAM": "טניס",
+    "TRAVEL": "טיולים",
+    "UCL": "ליגת האלופות",
+    "UFC_MMA": "אמנויות לחימה משולבות",
+    "WEATHER": "מזג אוויר",
+    "WORLD_CUP": "מונדיאל"
   },
   "themeToggle": {
     "dark": "Dark",

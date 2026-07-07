@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "Badges kunnen alleen worden verbeterd in de Pi Browser",
       "upgraded": "{emoji} De {theme} badge is verbeterd!"
     },
+    "badgePopup": {
+      "acquiredDesc": "Je hebt 30 dagen activiteit bereikt in de {theme} themakamer.",
+      "acquiredTitle": "{theme} badge verdiend!",
+      "alreadyUpgraded": "Deze badge is al geüpgraded.",
+      "beanShort": "Onvoldoende Bean. Ga naar de oplaadpagina.",
+      "later": "Later doen",
+      "networkError": "Er is een netwerkfout opgetreden.",
+      "processing": "Bezig met verwerken…",
+      "upgradeBenefit": "✨ Upgrade de badge voor een speciaal ontwerp en permanente weergave naast de cafénaam.",
+      "upgradeBtn": "☕ {fee} Badge upgraden",
+      "upgraded": "{emoji} De {theme} badge is geüpgraded!",
+      "upgradeFail": "Upgraden van de badge mislukt.",
+      "upgradeTitle": "{theme} geüpgradede badge"
+    },
     "bean": {
       "amountSelect": "Selecteer Bean bedrag",
       "completeFail": "Verwerking van Bean-betaling mislukt",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "Er zijn nog geen openbare cafés voor dit thema",
+      "eventFee": "Evenement {fee} Bean",
+      "eventFree": "Evenement gratis",
       "followCta": "+ Volg dit thema (evenementkamer meldingen)",
       "followed": "U volgt het thema — U ontvangt meldingen voor nieuwe evenementkamers",
       "followFail": "Het wijzigen van de volgstatus is mislukt",
       "followingOn": "✓ Volgend — Evenementkamer meldingen AAN",
-      "title": "Marktplaats — Populaire cafés"
+      "roomMeta": "{theme} · {count} leden · {msgs} wekelijkse berichten",
+      "scrollMore": "Scroll voor meer…",
+      "searchPlaceholder": "Zoek op cafénaam of introductie",
+      "title": "Marktplaats — Populaire cafés",
+      "weeklyBean": "Wekelijkse Bean π{amt}"
     },
     "msgList": {
       "am": "VM",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "Uw {product}-abonnement is gestart!",
     "tagline": "Abonnement = pakket met vrijstelling van kosten per transactie. Hoe meer u gebruikt, hoe meer voordeel!",
     "title": "Cafe.pi Abonnement"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Pi-investeringen",
+    "DAILY_CHAT": "Dagelijkse chat",
+    "DIRECT": "Directe transacties",
+    "EPL": "Premier League",
+    "ESPORTS": "e-sport",
+    "F1": "Formule 1",
+    "FOOD_SPOTS": "Eetgelegenheden",
+    "HOBBY_GROUP": "Hobby's",
+    "INFO_SHARE": "Informatie-uitwisseling",
+    "K_LEAGUE": "K League",
+    "MLB": "MLB",
+    "MY_TOWN": "Mijn buurt",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA Tour",
+    "SECONDHAND": "Tweedehands",
+    "TENNIS_GRAND_SLAM": "Tennis",
+    "TRAVEL": "Reizen",
+    "UCL": "Champions League",
+    "UFC_MMA": "Vechtsport",
+    "WEATHER": "Weer",
+    "WORLD_CUP": "Wereldkampioenschap"
   },
   "themeToggle": {
     "dark": "Donker",

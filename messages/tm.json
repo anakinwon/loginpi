@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "Nyşanlary diňe Pi Browser-da güýçlendirip bilersiňiz",
       "upgraded": "{emoji} {theme} nyşany güýçlendirildi!"
     },
+    "badgePopup": {
+      "acquiredDesc": "{theme} temaly otagda 30 günlük işjeňlik gazanyldy.",
+      "acquiredTitle": "{theme} nyşany gazanyldy!",
+      "alreadyUpgraded": "Bu eýýäm güýçlendirilen nyşan.",
+      "beanShort": "Bean ýeterlik däl. Doldurmak sahypasyna geçiň.",
+      "later": "Soňra et",
+      "networkError": "Tor ýalňyşlygy ýüze çykdy.",
+      "processing": "Gaýtadan işlenýär…",
+      "upgradeBenefit": "✨ Nyşany güýçlendirseňiz, ýörite dizaýn ulanylar we kafe adynyň ýanynda hemişe görkeziler.",
+      "upgradeBtn": "☕ {fee} nyşany güýçlendir",
+      "upgraded": "{emoji} {theme} nyşany güýçlendirildi!",
+      "upgradeFail": "Nyşany güýçlendirmek şowsuz boldy.",
+      "upgradeTitle": "{theme} güýçlendirilen nyşan"
+    },
     "bean": {
       "amountSelect": "Bean mukdaryny saýlamak",
       "completeFail": "Bean tölegini tamamlamak şowsuz boldy",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "Bu tema boýunça heniz açyk kafeler ýok",
+      "eventFee": "Çäre {fee} Bean",
+      "eventFree": "Çäre mugt",
       "followCta": "+ Bu temany yzarla (Çäre otagy bildirişleri)",
       "followed": "Temany yzarladyňyz — täze çäre otagy bildirişlerini alarsyňyz",
       "followFail": "Yzarlaýyş ýagdaýyny üýtgetmek başa barmady",
       "followingOn": "✓ Yzarlaýar — Çäre otagy bildirişleri AÇYK",
-      "title": "Marketpleýs — Meşhur kafeler"
+      "roomMeta": "{theme} · {count} agza · hepdelik {msgs} habar",
+      "scrollMore": "Aşak süýşürip köpräk gör…",
+      "searchPlaceholder": "Kafe ady ýa-da tanyşdyryş gözlegi",
+      "title": "Marketpleýs — Meşhur kafeler",
+      "weeklyBean": "Hepdelik Bean π{amt}"
     },
     "msgList": {
       "am": "Irden",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "{product} abunalygyňyz başlandy!",
     "tagline": "Abuna = her bir ulanyş üçin tölegden boşadýan paket. Näçe köp ulandygyňyzça, şonça-da peýdaly!",
     "title": "Cafe.pi abunasy"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Pi maýa goýum",
+    "DAILY_CHAT": "Gündelik gürrüňdeşlik",
+    "DIRECT": "Göni söwda",
+    "EPL": "Premier Liga",
+    "ESPORTS": "e-sport",
+    "F1": "Formula 1",
+    "FOOD_SPOTS": "Tagamly ýerler",
+    "HOBBY_GROUP": "Höwes",
+    "INFO_SHARE": "Maglumat paýlaşmak",
+    "K_LEAGUE": "K Liga",
+    "MLB": "Meýjor Liga",
+    "MY_TOWN": "Meniň şäherçäm",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA Tour",
+    "SECONDHAND": "Ikinji el harytlar",
+    "TENNIS_GRAND_SLAM": "Tennis",
+    "TRAVEL": "Syýahat",
+    "UCL": "Çempionlar Ligasy",
+    "UFC_MMA": "Söweş sportlary",
+    "WEATHER": "Howa",
+    "WORLD_CUP": "Dünýä Kubogy"
   },
   "themeToggle": {
     "dark": "Garaňky",

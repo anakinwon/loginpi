@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "Nozīmītes var uzlabot tikai Pi pārlūkprogrammā",
       "upgraded": "{emoji} {theme} nozīmīte ir uzlabota!"
     },
+    "badgePopup": {
+      "acquiredDesc": "Jūs esat sasniedzis 30 dienu aktivitāti {theme} tēmas istabā.",
+      "acquiredTitle": "Iegūta {theme} emblēma!",
+      "alreadyUpgraded": "Šī emblēma jau ir uzlabota.",
+      "beanShort": "Nepietiek Bean. Jūs tiksiet novirzīts uz papildināšanas lapu.",
+      "later": "Vēlāk",
+      "networkError": "Radās tīkla kļūda.",
+      "processing": "Notiek apstrāde…",
+      "upgradeBenefit": "✨ Uzlabojot emblēmu, tiks piemērots īpašs dizains un tā vienmēr tiks rādīta blakus kafejnīcas nosaukumam.",
+      "upgradeBtn": "☕ {fee} Uzlabot emblēmu",
+      "upgraded": "{emoji} {theme} emblēma ir uzlabota!",
+      "upgradeFail": "Emblēmas uzlabošana neizdevās.",
+      "upgradeTitle": "{theme} Uzlabotā emblēma"
+    },
     "bean": {
       "amountSelect": "Izvēlēties Bean summu",
       "completeFail": "Bean maksājuma pabeigšanas apstrāde neizdevās",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "Šai tēmai vēl nav publisku kafejnīcu",
+      "eventFee": "Pasākums: {fee} Bean",
+      "eventFree": "Pasākums: Bez maksas",
       "followCta": "+ Sekot šai tēmai (pasākumu istabu paziņojumi)",
       "followed": "Esat sekojis tēmai — saņemsiet paziņojumus par jaunām pasākumu istabām",
       "followFail": "Neizdevās mainīt sekošanas statusu",
       "followingOn": "✓ Sekojat — Pasākumu istabu paziņojumi IESLĒGTI",
-      "title": "Tirgus — Populāras kafejnīcas"
+      "roomMeta": "{theme} · {count} dalībnieki · {msgs} ziņojumi nedēļā",
+      "scrollMore": "Ritiniet, lai redzētu vairāk…",
+      "searchPlaceholder": "Meklēt kafejnīcas nosaukumu vai aprakstu",
+      "title": "Tirgus — Populāras kafejnīcas",
+      "weeklyBean": "Nedēļas Bean π{amt}"
     },
     "msgList": {
       "am": "AM",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "{product} abonements ir sācies!",
     "tagline": "Abonements = pakete ar atbrīvojumu no maksas par katru darījumu. Jo vairāk izmantojat, jo lielāks ieguvums!",
     "title": "Cafe.pi abonements"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Pi investīcijas",
+    "DAILY_CHAT": "Ikdienas tērzēšana",
+    "DIRECT": "Tiešais darījums",
+    "EPL": "Premjerlīga",
+    "ESPORTS": "e-sports",
+    "F1": "Formula 1",
+    "FOOD_SPOTS": "Ēdināšanas vietas",
+    "HOBBY_GROUP": "Hobiji",
+    "INFO_SHARE": "Informācijas apmaiņa",
+    "K_LEAGUE": "K līga",
+    "MLB": "MLB",
+    "MY_TOWN": "Mans rajons",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA tūre",
+    "SECONDHAND": "Lietotu preču apmaiņa",
+    "TENNIS_GRAND_SLAM": "Teniss",
+    "TRAVEL": "Ceļojumi",
+    "UCL": "Čempionu līga",
+    "UFC_MMA": "Cīņas sports",
+    "WEATHER": "Laikapstākļi",
+    "WORLD_CUP": "Pasaules kauss"
   },
   "themeToggle": {
     "dark": "Tumšs",

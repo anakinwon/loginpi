@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "僅限在 Pi Browser 中強化徽章",
       "upgraded": "{emoji} {theme} 徽章已強化！"
     },
+    "badgePopup": {
+      "acquiredDesc": "您已在 {theme} 主題聊天室中活躍 30 天",
+      "acquiredTitle": "獲得 {theme} 徽章！",
+      "alreadyUpgraded": "此徽章已強化",
+      "beanShort": "Bean 不足。將前往儲值頁面。",
+      "later": "稍後再說",
+      "networkError": "發生網路錯誤",
+      "processing": "處理中…",
+      "upgradeBenefit": "✨ 強化徽章將套用特殊設計，並常駐顯示於咖啡廳名稱旁",
+      "upgradeBtn": "☕ {fee} 強化徽章",
+      "upgraded": "{emoji} {theme} 徽章已強化！",
+      "upgradeFail": "徽章強化失敗",
+      "upgradeTitle": "{theme} 強化徽章"
+    },
     "bean": {
       "amountSelect": "選擇 Bean 金額",
       "completeFail": "Bean 付款完成處理失敗",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "此主題目前沒有公開咖啡廳",
+      "eventFee": "活動 {fee} Bean",
+      "eventFree": "活動免費",
       "followCta": "+ 追蹤此主題 (活動聊天室通知)",
       "followed": "已追蹤此主題 — 您將收到新活動聊天室的通知",
       "followFail": "追蹤變更失敗",
       "followingOn": "✓ 正在追蹤 — 活動聊天室通知已開啟",
-      "title": "市集 — 熱門咖啡廳"
+      "roomMeta": "{theme} · 成員 {count} 名 · 每週訊息 {msgs} 則",
+      "scrollMore": "捲動以查看更多…",
+      "searchPlaceholder": "搜尋咖啡廳名稱或介紹",
+      "title": "市集 — 熱門咖啡廳",
+      "weeklyBean": "每週 Bean π{amt}"
     },
     "msgList": {
       "am": "上午",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "{product} 訂閱已開始！",
     "tagline": "訂閱 = 免除單次費用方案。用得越多，越划算！",
     "title": "Cafe.pi 訂閱"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Pi投資",
+    "DAILY_CHAT": "日常閒聊",
+    "DIRECT": "面交",
+    "EPL": "英超聯賽",
+    "ESPORTS": "電子競技",
+    "F1": "一級方程式",
+    "FOOD_SPOTS": "美食景點",
+    "HOBBY_GROUP": "興趣社團",
+    "INFO_SHARE": "資訊分享",
+    "K_LEAGUE": "K聯賽",
+    "MLB": "美國職棒大聯盟",
+    "MY_TOWN": "我的社區",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA巡迴賽",
+    "SECONDHAND": "二手交流",
+    "TENNIS_GRAND_SLAM": "網球",
+    "TRAVEL": "旅遊",
+    "UCL": "歐冠聯賽",
+    "UFC_MMA": "格鬥技",
+    "WEATHER": "天氣",
+    "WORLD_CUP": "世界盃"
   },
   "themeToggle": {
     "dark": "深色",

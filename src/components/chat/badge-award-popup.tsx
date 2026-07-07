@@ -1,5 +1,7 @@
 'use client'
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
+import { useThemeName } from './use-theme-name'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
@@ -30,6 +32,8 @@ export function BadgeAwardPopup({
 }: BadgeAwardPopupProps) {
   const [paying, setPaying] = useState(false)
   const router = useRouter()
+  const t = useTranslations('chat.badgePopup')
+  const tn = useThemeName()
   // PI 모드(메인넷 등재 기간)면 배지 강화 무료 — 서버 microFeeBean과 일관된 표시
   const feeLabel = useMicroFeeLabel(BADGE_UPGRADE_BEAN)
 
@@ -50,7 +54,7 @@ export function BadgeAwardPopup({
 
       if (res.ok) {
         toast.success(
-          `${badge.theme_emoji} ${badge.theme_nm} 배지가 강화되었습니다!`,
+          t('upgraded', { emoji: badge.theme_emoji, theme: tn(badge.theme_cd, badge.theme_nm) }),
         )
         onUpgraded()
         return
@@ -58,19 +62,19 @@ export function BadgeAwardPopup({
 
       const data = await res.json().catch(() => ({}))
       if (res.status === 402 && data.requiresBean) {
-        toast.error('Bean이 부족합니다. 충전 페이지로 이동합니다.')
+        toast.error(t('beanShort'))
         onClose()
         router.push('/bean')
         return
       }
       if (res.status === 409) {
-        toast.info('이미 강화된 배지입니다')
+        toast.info(t('alreadyUpgraded'))
         onClose()
         return
       }
-      toast.error(data.error ?? '배지 강화에 실패했습니다')
+      toast.error(data.error ?? t('upgradeFail'))
     } catch {
-      toast.error('네트워크 오류가 발생했습니다')
+      toast.error(t('networkError'))
     } finally {
       setPaying(false)
     }
@@ -87,15 +91,13 @@ export function BadgeAwardPopup({
       >
         <div className="mb-1 text-5xl">{badge.theme_emoji}</div>
         <div className="mb-2 text-2xl">🏅</div>
-        <h3 className="text-base font-semibold">{badge.theme_nm} 배지 획득!</h3>
+        <h3 className="text-base font-semibold">{t('acquiredTitle', { theme: tn(badge.theme_cd, badge.theme_nm) })}</h3>
         <p className="text-muted-foreground mt-1 text-sm">
-          {badge.theme_nm} 테마 방에서 30일 활동을 달성했습니다
+          {t('acquiredDesc', { theme: tn(badge.theme_cd, badge.theme_nm) })}
         </p>
 
         <div className="mt-4 rounded-xl bg-gradient-to-r from-amber-100 to-yellow-100 p-3 text-xs text-amber-800 dark:from-amber-900/40 dark:to-yellow-900/40 dark:text-amber-200">
-          ✨ 배지를 강화하면 특별 디자인이 적용되고
-          <br />
-          카페 이름 옆에 상시 표시됩니다
+          {t('upgradeBenefit')}
         </div>
 
         <div className="mt-4 space-y-2.5">
@@ -104,13 +106,13 @@ export function BadgeAwardPopup({
             disabled={paying}
             className="bg-primary text-primary-foreground w-full rounded-xl px-4 py-2.5 text-sm font-medium transition-opacity hover:opacity-90 disabled:opacity-50"
           >
-            {paying ? '처리 중…' : <>☕ {feeLabel} 배지 강화</>}
+            {paying ? t('processing') : t('upgradeBtn', { fee: feeLabel })}
           </button>
           <button
             onClick={onClose}
             className="text-muted-foreground hover:text-foreground w-full pt-1 text-sm"
           >
-            나중에 하기
+            {t('later')}
           </button>
         </div>
       </div>

@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { useTranslations, useLocale } from 'next-intl'
+import { useTranslations } from 'next-intl'
+import { useThemeName } from './use-theme-name'
 
 export interface ThemeRow {
   theme_cd: string
@@ -10,11 +11,6 @@ export interface ThemeRow {
   theme_desc: string | null
   theme_tp_cd: 'BASIC' | 'PREMIUM'
   sort_ord: number
-}
-
-export function getThemeName(theme: ThemeRow, locale: string): string {
-  if (locale.startsWith('ko')) return theme.theme_nm
-  return theme.theme_nm_en || theme.theme_nm
 }
 
 interface ThemeSelectorProps {
@@ -29,7 +25,7 @@ export function ThemeSelector({
   onSelect,
 }: ThemeSelectorProps) {
   const t = useTranslations('chat.themeSelector')
-  const locale = useLocale()
+  const themeName = useThemeName()
   const [themes, setThemes] = useState<ThemeRow[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
@@ -67,7 +63,7 @@ export function ThemeSelector({
           >
             <span className="text-2xl leading-none">{theme.theme_emoji}</span>
             <span className="text-xs leading-tight font-medium">
-              {getThemeName(theme, locale)}
+              {themeName(theme.theme_cd, theme.theme_nm_en || theme.theme_nm)}
             </span>
             {isPremium && (
               <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">

@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "Apenas no Pi Browser você pode aprimorar o Badge",
       "upgraded": "{emoji} O Badge {theme} foi aprimorado!"
     },
+    "badgePopup": {
+      "acquiredDesc": "Você atingiu 30 dias de atividade na sala com o tema {theme}.",
+      "acquiredTitle": "Emblema {theme} adquirido!",
+      "alreadyUpgraded": "Já é um emblema aprimorado.",
+      "beanShort": "Bean insuficiente. Ir para a página de recarga.",
+      "later": "Mais tarde",
+      "networkError": "Ocorreu um erro de rede.",
+      "processing": "Processando…",
+      "upgradeBenefit": "✨ Ao aprimorar o emblema, um design especial será aplicado e ele será exibido permanentemente ao lado do nome do café.",
+      "upgradeBtn": "☕ Aprimorar emblema por {fee}",
+      "upgraded": "{emoji} O emblema {theme} foi aprimorado!",
+      "upgradeFail": "Falha ao aprimorar o emblema.",
+      "upgradeTitle": "Emblema Aprimorado {theme}"
+    },
     "bean": {
       "amountSelect": "Selecionar valor do Bean",
       "completeFail": "Falha ao processar a conclusão do pagamento do Bean",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "Não há cafés públicos para este Theme ainda",
+      "eventFee": "Evento {fee} Bean",
+      "eventFree": "Evento Gratuito",
       "followCta": "+ Seguir este Theme (notificações de salas de Event)",
       "followed": "Theme seguido — Você receberá notificações de novas salas de Event",
       "followFail": "Falha ao alterar o seguimento",
       "followingOn": "✓ Seguindo — Notificações de salas de Event ON",
-      "title": "Marketplace — Cafés Populares"
+      "roomMeta": "{theme} · {count} membros · {msgs} mensagens semanais",
+      "scrollMore": "Role para ver mais…",
+      "searchPlaceholder": "Pesquisar nome ou descrição do café",
+      "title": "Marketplace — Cafés Populares",
+      "weeklyBean": "Bean Semanal π{amt}"
     },
     "msgList": {
       "am": "AM",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "Sua assinatura {product} foi iniciada!",
     "tagline": "Assinatura = Pacote de isenção de taxa por transação. Quanto mais você usa, mais você ganha!",
     "title": "Assinatura Cafe.pi"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Trading de Cripto Pi",
+    "DAILY_CHAT": "Bate-papo Diário",
+    "DIRECT": "Negociação Direta",
+    "EPL": "Premier League",
+    "ESPORTS": "eSports",
+    "F1": "Fórmula 1",
+    "FOOD_SPOTS": "Gastronomia",
+    "HOBBY_GROUP": "Hobbies",
+    "INFO_SHARE": "Compartilhamento de Informações",
+    "K_LEAGUE": "K League",
+    "MLB": "MLB",
+    "MY_TOWN": "Meu Bairro",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA Tour",
+    "SECONDHAND": "Mercado de Segunda Mão",
+    "TENNIS_GRAND_SLAM": "Tênis",
+    "TRAVEL": "Viagem",
+    "UCL": "Champions League",
+    "UFC_MMA": "MMA",
+    "WEATHER": "Tempo",
+    "WORLD_CUP": "Copa do Mundo"
   },
   "themeToggle": {
     "dark": "Dark",

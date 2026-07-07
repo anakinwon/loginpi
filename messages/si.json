@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "Značko lahko nadgradite samo v brskalniku Pi Browser",
       "upgraded": "{emoji} Značka {theme} je bila nadgrajena!"
     },
+    "badgePopup": {
+      "acquiredDesc": "Dosegli ste 30 dni aktivnosti v sobi s temo {theme}",
+      "acquiredTitle": "Pridobljena značka {theme}!",
+      "alreadyUpgraded": "Značka je že nadgrajena",
+      "beanShort": "Premalo Beanov. Preusmeritev na stran za polnjenje.",
+      "later": "Kasneje",
+      "networkError": "Prišlo je do omrežne napake",
+      "processing": "Obdelava v teku…",
+      "upgradeBenefit": "✨ Nadgradnja značke omogoča poseben dizajn in stalno prikazovanje ob imenu kavarne",
+      "upgradeBtn": "☕ {fee} Nadgradi značko",
+      "upgraded": "{emoji} Značka {theme} je bila nadgrajena!",
+      "upgradeFail": "Nadgradnja značke ni uspela",
+      "upgradeTitle": "Nadgrajena značka {theme}"
+    },
     "bean": {
       "amountSelect": "Izberi količino Beanov",
       "completeFail": "Neuspela obdelava dokončanja plačila Bean",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "Za to temo še ni javnih klepetalnic",
+      "eventFee": "Dogodek {fee} Bean",
+      "eventFree": "Brezplačen dogodek",
       "followCta": "+ Spremljaj to temo (obvestila o dogodkovnih sobah)",
       "followed": "Spremljate temo — prejemali boste obvestila o novih dogodkovnih sobah",
       "followFail": "Sprememba spremljanja ni uspela",
       "followingOn": "✓ Spremljate — Obvestila o dogodkovnih sobah VKLOPLJENA",
-      "title": "Tržnica — Priljubljene klepetalnice"
+      "roomMeta": "{theme} · {count} članov · {msgs} sporočil tedensko",
+      "scrollMore": "Pomaknite se za več…",
+      "searchPlaceholder": "Iskanje imena/opisa kavarne",
+      "title": "Tržnica — Priljubljene klepetalnice",
+      "weeklyBean": "Tedenski Bean π{amt}"
     },
     "msgList": {
       "am": "dop.",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "Naročnina na {product} je bila uspešno aktivirana!",
     "tagline": "Naročnina = paket oprostitve plačila na postavko. Več ko uporabljate, več pridobite!",
     "title": "Naročnina na Cafe.pi"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Pi naložbe",
+    "DAILY_CHAT": "Dnevni klepet",
+    "DIRECT": "Neposredna trgovina",
+    "EPL": "Premier League",
+    "ESPORTS": "eŠport",
+    "F1": "Formula 1",
+    "FOOD_SPOTS": "Kulinarične točke",
+    "HOBBY_GROUP": "Hobiji",
+    "INFO_SHARE": "Deljenje informacij",
+    "K_LEAGUE": "K League",
+    "MLB": "MLB",
+    "MY_TOWN": "Moj kraj",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA Tour",
+    "SECONDHAND": "Rabljeno",
+    "TENNIS_GRAND_SLAM": "Tenis",
+    "TRAVEL": "Potovanja",
+    "UCL": "Liga prvakov",
+    "UFC_MMA": "Borilni športi",
+    "WEATHER": "Vreme",
+    "WORLD_CUP": "Svetovno prvenstvo"
   },
   "themeToggle": {
     "dark": "Temna",

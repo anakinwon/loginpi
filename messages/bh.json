@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "ممكن تطور الشارات في Pi Browser بس",
       "upgraded": "{emoji} الـ {theme} Badge تم ترقيته!"
     },
+    "badgePopup": {
+      "acquiredDesc": "لقد حققت 30 يومًا من النشاط في غرفة {theme}.",
+      "acquiredTitle": "تم الحصول على شارة {theme}!",
+      "alreadyUpgraded": "هذه الشارة تمت ترقيتها بالفعل",
+      "beanShort": "لا يوجد ما يكفي من Bean. سيتم الانتقال إلى صفحة الشحن.",
+      "later": "القيام بذلك لاحقًا",
+      "networkError": "حدث خطأ في الشبكة",
+      "processing": "جاري المعالجة...",
+      "upgradeBenefit": "✨ ترقية الشارة تمنحها تصميمًا خاصًا وتجعلها تظهر دائمًا بجانب اسم المقهى",
+      "upgradeBtn": "☕ {fee} ترقية الشارة",
+      "upgraded": "{emoji} تمت ترقية شارة {theme}!",
+      "upgradeFail": "فشل ترقية الشارة",
+      "upgradeTitle": "شارة {theme} المرقاة"
+    },
     "bean": {
       "amountSelect": "اختار مبلغ الـ Bean",
       "completeFail": "فشل إتمام معالجة دفع الـ Bean",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "لسه مفيش Cafe عامة للـ Theme ده",
+      "eventFee": "حدث {fee} Bean",
+      "eventFree": "حدث مجاني",
       "followCta": "+ Follow الـ Theme ده (إشعارات الـ Event Room)",
       "followed": "عملت Follow للـ Theme — هتستقبل إشعارات Event Room جديدة",
       "followFail": "فشل تغيير الـ Follow",
       "followingOn": "✓ بتعمل Follow — إشعارات الـ Event Room شغالة",
-      "title": "Marketplace — Cafes شائعة"
+      "roomMeta": "{theme} · {count} أعضاء · {msgs} رسالة أسبوعية",
+      "scrollMore": "مرر لعرض المزيد...",
+      "searchPlaceholder": "البحث عن اسم أو وصف المقهى",
+      "title": "Marketplace — Cafes شائعة",
+      "weeklyBean": "Bean أسبوعي π{amt}"
     },
     "msgList": {
       "am": "صباحًا",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "تم بدء اشتراك {product}!",
     "tagline": "الاشتراك = باقة إعفاء من الرسوم لكل معاملة. كلما استخدمت أكثر، كلما ربحت أكثر!",
     "title": "اشتراك Cafe.pi"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "استثمار Pi",
+    "DAILY_CHAT": "دردشة يومية",
+    "DIRECT": "معاملة مباشرة",
+    "EPL": "الدوري الإنجليزي الممتاز",
+    "ESPORTS": "الرياضات الإلكترونية",
+    "F1": "فورمولا 1",
+    "FOOD_SPOTS": "أماكن الطعام",
+    "HOBBY_GROUP": "هوايات",
+    "INFO_SHARE": "مشاركة المعلومات",
+    "K_LEAGUE": "K League",
+    "MLB": "MLB",
+    "MY_TOWN": "مدينتي",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA Tour",
+    "SECONDHAND": "مستعمل",
+    "TENNIS_GRAND_SLAM": "تنس",
+    "TRAVEL": "سفر",
+    "UCL": "دوري أبطال أوروبا",
+    "UFC_MMA": "فنون القتال المختلطة (MMA)",
+    "WEATHER": "الطقس",
+    "WORLD_CUP": "كأس العالم"
   },
   "themeToggle": {
     "dark": "Dark",

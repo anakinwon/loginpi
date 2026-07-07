@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "Tanging sa Pi Browser maaaring palakasin ang Badge",
       "upgraded": "{emoji} Ang {theme} Badge ay pinalakas!"
     },
+    "badgePopup": {
+      "acquiredDesc": "Sa {theme} themed room, nakumpleto ang 30 araw ng aktibidad.",
+      "acquiredTitle": "{theme} Badge Nakuha!",
+      "alreadyUpgraded": "Na-upgrade na ang badge na ito.",
+      "beanShort": "Kuláng ang Bean. Pumunta sa pahina ng top-up.",
+      "later": "Mamaya na lang",
+      "networkError": "Nagkaroon ng error sa network.",
+      "processing": "Pinoproseso…",
+      "upgradeBenefit": "✨ Kapag na-upgrade ang badge, magkakaroon ito ng espesyal na disenyo at palaging ipapakita sa tabi ng pangalan ng cafe.",
+      "upgradeBtn": "☕ {fee} I-upgrade ang Badge",
+      "upgraded": "{emoji} Ang {theme} badge ay na-upgrade!",
+      "upgradeFail": "Nabigo ang pag-upgrade ng badge.",
+      "upgradeTitle": "{theme} Na-upgrade na Badge"
+    },
     "bean": {
       "amountSelect": "Piliin ang halaga ng Bean",
       "completeFail": "Nabigo ang pagproseso ng kumpletong pagbabayad ng Bean",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "Wala pang pampublikong Cafe para sa temang ito.",
+      "eventFee": "Event {fee} Bean",
+      "eventFree": "Event Libre",
       "followCta": "+ I-follow ang temang ito (Mga notification sa Event Room)",
       "followed": "Sinusundan mo na ang tema — Makakatanggap ka ng mga notification para sa mga bagong Event Room",
       "followFail": "Nabigo ang pagbabago ng follow",
       "followingOn": "✓ Sinusundan — Naka-ON ang mga notification sa Event Room",
-      "title": "Marketplace — Mga Sikat na Cafe"
+      "roomMeta": "{theme} · Mga Miyembro {count} · Lingguhang Mensahe {msgs}",
+      "scrollMore": "Mag-scroll para makakita pa…",
+      "searchPlaceholder": "Maghanap ng pangalan o paglalarawan ng cafe",
+      "title": "Marketplace — Mga Sikat na Cafe",
+      "weeklyBean": "Lingguhang Bean π{amt}"
     },
     "msgList": {
       "am": "AM",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "Nagsimula na ang iyong {product} subscription!",
     "tagline": "Subscription = Package na walang bayad per transaction. Mas marami ang gamit, mas malaki ang benepisyo!",
     "title": "Cafe.pi Subscription"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Pi Investment",
+    "DAILY_CHAT": "Pang-araw-araw na Usapan",
+    "DIRECT": "Direktang Transaksyon",
+    "EPL": "Premier League",
+    "ESPORTS": "eSports",
+    "F1": "Formula 1",
+    "FOOD_SPOTS": "Mga Kainang Masarap",
+    "HOBBY_GROUP": "Libangan",
+    "INFO_SHARE": "Pagbabahagi ng Impormasyon",
+    "K_LEAGUE": "K League",
+    "MLB": "MLB",
+    "MY_TOWN": "Ating Bayan",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA Tour",
+    "SECONDHAND": "Pagbabahagi ng Secondhand",
+    "TENNIS_GRAND_SLAM": "Tennis",
+    "TRAVEL": "Paglalakbay",
+    "UCL": "Champions League",
+    "UFC_MMA": "Mixed Martial Arts",
+    "WEATHER": "Panahon",
+    "WORLD_CUP": "World Cup"
   },
   "themeToggle": {
     "dark": "Dark",

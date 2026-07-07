@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "Du kan bara förstärka märket i Pi Browser",
       "upgraded": "{emoji} {theme} märket har förstärkts!"
     },
+    "badgePopup": {
+      "acquiredDesc": "Du har uppnått 30 dagars aktivitet i {theme}-temarummet",
+      "acquiredTitle": "{theme}-märke erhållet!",
+      "alreadyUpgraded": "Märket är redan uppgraderat",
+      "beanShort": "Otillräckligt med Bean. Gå till påfyllningssidan.",
+      "later": "Senare",
+      "networkError": "Ett nätverksfel uppstod",
+      "processing": "Bearbetar…",
+      "upgradeBenefit": "✨ Uppgradera märket för att få en speciell design och permanent visning bredvid kafénamnet.",
+      "upgradeBtn": "☕ {fee} Uppgradera märke",
+      "upgraded": "{emoji} {theme}-märket har uppgraderats!",
+      "upgradeFail": "Misslyckades med att uppgradera märket",
+      "upgradeTitle": "{theme} Uppgraderat märke"
+    },
     "bean": {
       "amountSelect": "Välj Bean-belopp",
       "completeFail": "Misslyckades med att slutföra Bean-betalningen",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "Det finns inga offentliga rum för detta tema ännu",
+      "eventFee": "Event {fee} Bean",
+      "eventFree": "Event gratis",
       "followCta": "+ Följ detta tema (aviseringar för evenemangsrum)",
       "followed": "Du följer temat — du kommer att få aviseringar om nya evenemangsrum",
       "followFail": "Misslyckades med att ändra följstatus",
       "followingOn": "✓ Följer — Aviseringar för evenemangsrum PÅ",
-      "title": "Marknadsplats — Populära rum"
+      "roomMeta": "{theme} · {count} medlemmar · {msgs} meddelanden per vecka",
+      "scrollMore": "Scrolla för att se mer…",
+      "searchPlaceholder": "Sök kafénamn/beskrivning",
+      "title": "Marknadsplats — Populära rum",
+      "weeklyBean": "Veckovis Bean π{amt}"
     },
     "msgList": {
       "am": "fm",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "Din prenumeration på {product} har startat!",
     "tagline": "Prenumeration = Paket med avgiftsbefrielse per transaktion. Ju mer du använder, desto mer tjänar du!",
     "title": "Cafe.pi Prenumeration"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Pi-investering",
+    "DAILY_CHAT": "Vardagsprat",
+    "DIRECT": "Direkthandel",
+    "EPL": "Premier League",
+    "ESPORTS": "e-sport",
+    "F1": "Formel 1",
+    "FOOD_SPOTS": "Matställen",
+    "HOBBY_GROUP": "Hobby",
+    "INFO_SHARE": "Informationsdelning",
+    "K_LEAGUE": "K League",
+    "MLB": "MLB",
+    "MY_TOWN": "Mitt område",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA Tour",
+    "SECONDHAND": "Begagnat",
+    "TENNIS_GRAND_SLAM": "Tennis",
+    "TRAVEL": "Resor",
+    "UCL": "Champions League",
+    "UFC_MMA": "Kampsport",
+    "WEATHER": "Väder",
+    "WORLD_CUP": "Världscupen"
   },
   "themeToggle": {
     "dark": "Mörkt",

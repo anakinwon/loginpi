@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "आप केवल Pi Browser में Badge को मजबूत कर सकते हैं",
       "upgraded": "{emoji} {theme} Badge अपग्रेड हो गया है!"
     },
+    "badgePopup": {
+      "acquiredDesc": "{theme} थीम वाले कमरे में 30 दिनों की गतिविधि पूरी की।",
+      "acquiredTitle": "{theme} बैज प्राप्त हुआ!",
+      "alreadyUpgraded": "यह बैज पहले से ही अपग्रेड किया हुआ है।",
+      "beanShort": "Bean कम हैं। रिचार्ज पेज पर जाएं।",
+      "later": "बाद में करें",
+      "networkError": "नेटवर्क त्रुटि हुई है।",
+      "processing": "प्रक्रिया जारी है…",
+      "upgradeBenefit": "✨ बैज को अपग्रेड करने पर एक विशेष डिज़ाइन लागू होता है और यह कैफे के नाम के बगल में हमेशा दिखाई देता है।",
+      "upgradeBtn": "☕ {fee} बैज अपग्रेड करें",
+      "upgraded": "{emoji} {theme} बैज अपग्रेड हो गया है!",
+      "upgradeFail": "बैज अपग्रेड करने में विफल।",
+      "upgradeTitle": "{theme} अपग्रेडेड बैज"
+    },
     "bean": {
       "amountSelect": "Bean राशि चुनें",
       "completeFail": "Bean भुगतान पूरा करने में विफलता।",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "इस Theme के लिए अभी तक कोई सार्वजनिक Cafe नहीं है",
+      "eventFee": "इवेंट {fee} Bean",
+      "eventFree": "इवेंट मुफ़्त",
       "followCta": "+ इस Theme को Follow करें (Event Room सूचनाएँ)",
       "followed": "Theme को Follow किया गया — नए Event Room की सूचनाएँ प्राप्त करें",
       "followFail": "Follow बदलने में विफल रहा",
       "followingOn": "✓ Following — Event Room सूचनाएँ ON",
-      "title": "Marketplace — लोकप्रिय Cafe"
+      "roomMeta": "{theme} · सदस्य {count} · साप्ताहिक संदेश {msgs}",
+      "scrollMore": "अधिक देखने के लिए स्क्रॉल करें…",
+      "searchPlaceholder": "कैफे का नाम/परिचय खोजें",
+      "title": "Marketplace — लोकप्रिय Cafe",
+      "weeklyBean": "साप्ताहिक Bean π{amt}"
     },
     "msgList": {
       "am": "AM",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "{product} सदस्यता शुरू हो गई है!",
     "tagline": "सदस्यता = प्रति-लेनदेन शुल्क छूट पैकेज। जितना अधिक उपयोग करेंगे, उतना अधिक लाभ!",
     "title": "Cafe.pi सदस्यता"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Pi निवेश",
+    "DAILY_CHAT": "रोज़ाना की बातें",
+    "DIRECT": "सीधा लेन-देन",
+    "EPL": "प्रीमियर लीग",
+    "ESPORTS": "ई-स्पोर्ट्स",
+    "F1": "फॉर्मूला 1",
+    "FOOD_SPOTS": "खाने की जगहें",
+    "HOBBY_GROUP": "शौक",
+    "INFO_SHARE": "जानकारी साझा करें",
+    "K_LEAGUE": "के-लीग",
+    "MLB": "मेजर लीग",
+    "MY_TOWN": "हमारा इलाका",
+    "NBA": "एनबीए",
+    "PGA_GOLF": "पीजीए टूर",
+    "SECONDHAND": "सेकंड हैंड",
+    "TENNIS_GRAND_SLAM": "टेनिस",
+    "TRAVEL": "यात्रा",
+    "UCL": "चैंपियंस लीग",
+    "UFC_MMA": "मार्शल आर्ट्स",
+    "WEATHER": "मौसम",
+    "WORLD_CUP": "वर्ल्ड कप"
   },
   "themeToggle": {
     "dark": "Dark",

@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "Odznak môžete vylepšiť iba v Pi Browseri",
       "upgraded": "{emoji} Odznak {theme} bol vylepšený!"
     },
+    "badgePopup": {
+      "acquiredDesc": "Dosiahli ste 30 dní aktivity v miestnosti s témou {theme}.",
+      "acquiredTitle": "Získaný odznak {theme}!",
+      "alreadyUpgraded": "Odznak je už vylepšený.",
+      "beanShort": "Nedostatok Bean. Prejdite na stránku dobíjania.",
+      "later": "Neskôr",
+      "networkError": "Vyskytla sa chyba siete.",
+      "processing": "Spracováva sa…",
+      "upgradeBenefit": "✨ Vylepšením odznaku získate špeciálny dizajn a bude sa trvalo zobrazovať vedľa názvu kaviarne.",
+      "upgradeBtn": "☕ {fee} Vylepšiť odznak",
+      "upgraded": "{emoji} Odznak {theme} bol vylepšený!",
+      "upgradeFail": "Vylepšenie odznaku zlyhalo.",
+      "upgradeTitle": "Vylepšený odznak {theme}"
+    },
     "bean": {
       "amountSelect": "Vybrať množstvo Bean",
       "completeFail": "Zlyhalo spracovanie dokončenia platby Bean",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "Pre túto tému zatiaľ nie sú žiadne verejné kaviarne",
+      "eventFee": "Udalosť {fee} Bean",
+      "eventFree": "Udalosť zadarmo",
       "followCta": "+ Sledovať túto tému (upozornenia na eventové miestnosti)",
       "followed": "Tému ste začali sledovať — budete dostávať upozornenia na nové eventové miestnosti",
       "followFail": "Nepodarilo sa zmeniť sledovanie",
       "followingOn": "✓ Sledujete — Upozornenia na eventové miestnosti ZAPNUTÉ",
-      "title": "Trhovisko — Populárne kaviarne"
+      "roomMeta": "{theme} · {count} členov · {msgs} správ týždenne",
+      "scrollMore": "Prejdite nadol pre viac…",
+      "searchPlaceholder": "Vyhľadať názov kaviarne/popis",
+      "title": "Trhovisko — Populárne kaviarne",
+      "weeklyBean": "Týždenne Bean π{amt}"
     },
     "msgList": {
       "am": "dopoludnia",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "Predplatné {product} bolo spustené!",
     "tagline": "Predplatné = balík s oslobodením od poplatkov za transakciu. Čím viac používate, tým viac ušetríte!",
     "title": "Predplatné Cafe.pi"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Pi investície",
+    "DAILY_CHAT": "Denný chat",
+    "DIRECT": "Priamy obchod",
+    "EPL": "Premier League",
+    "ESPORTS": "e-športy",
+    "F1": "Formula 1",
+    "FOOD_SPOTS": "Miesta s jedlom",
+    "HOBBY_GROUP": "Záľuby",
+    "INFO_SHARE": "Zdieľanie informácií",
+    "K_LEAGUE": "K-League",
+    "MLB": "MLB",
+    "MY_TOWN": "Moje mesto",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA Tour",
+    "SECONDHAND": "Secondhand",
+    "TENNIS_GRAND_SLAM": "Tenis",
+    "TRAVEL": "Cestovanie",
+    "UCL": "Liga majstrov",
+    "UFC_MMA": "MMA",
+    "WEATHER": "Počasie",
+    "WORLD_CUP": "Majstrovstvá sveta"
   },
   "themeToggle": {
     "dark": "Tmavá",

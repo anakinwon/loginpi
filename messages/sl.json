@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "Badge upgrades are only available in Pi Browser",
       "upgraded": "{emoji} {theme} badge upgraded!"
     },
+    "badgePopup": {
+      "acquiredDesc": "You completed 30 days of activity in the {theme} theme cafe",
+      "acquiredTitle": "{theme} Badge Earned!",
+      "alreadyUpgraded": "This badge is already upgraded",
+      "beanShort": "Not enough Bean. Redirecting to the top-up page.",
+      "later": "Maybe later",
+      "networkError": "A network error occurred",
+      "processing": "Processing…",
+      "upgradeBenefit": "✨ Upgrading applies a special design and shows the badge next to the cafe name at all times",
+      "upgradeBtn": "☕ Upgrade badge for {fee}",
+      "upgraded": "{emoji} {theme} badge upgraded!",
+      "upgradeFail": "Failed to upgrade badge",
+      "upgradeTitle": "{theme} Enhanced Badge"
+    },
     "bean": {
       "amountSelect": "Select Bean amount",
       "completeFail": "Failed to complete Bean payment",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "No public cafés in this theme yet",
+      "eventFee": "Event {fee} Bean",
+      "eventFree": "Event Free",
       "followCta": "+ Follow this theme (event room alerts)",
       "followed": "Theme followed — you'll receive alerts for new event rooms",
       "followFail": "Failed to update follow",
       "followingOn": "✓ Following — event room alerts ON",
-      "title": "Marketplace — Popular Cafés"
+      "roomMeta": "{theme} · {count} members · {msgs} weekly messages",
+      "scrollMore": "Scroll for more…",
+      "searchPlaceholder": "Search cafés by name or intro",
+      "title": "Marketplace — Popular Cafés",
+      "weeklyBean": "Weekly Bean π{amt}"
     },
     "msgList": {
       "am": "AM",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "{product} subscription has started!",
     "tagline": "Subscription = per-item fee exemption package. The more you use, the more you benefit!",
     "title": "Cafe.pi Subscription"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Pi Investing",
+    "DAILY_CHAT": "Daily Chat",
+    "DIRECT": "Direct Trade",
+    "EPL": "Premier League",
+    "ESPORTS": "E-Sports",
+    "F1": "Formula 1",
+    "FOOD_SPOTS": "Food & Restaurants",
+    "HOBBY_GROUP": "Hobbies & Clubs",
+    "INFO_SHARE": "Info Sharing",
+    "K_LEAGUE": "K-League",
+    "MLB": "Major League Baseball",
+    "MY_TOWN": "My Town",
+    "NBA": "NBA Basketball",
+    "PGA_GOLF": "PGA Tour Golf",
+    "SECONDHAND": "Second-Hand & Sharing",
+    "TENNIS_GRAND_SLAM": "Tennis Grand Slam",
+    "TRAVEL": "Travel",
+    "UCL": "Champions League",
+    "UFC_MMA": "UFC & MMA",
+    "WEATHER": "Weather",
+    "WORLD_CUP": "World Cup"
   },
   "themeToggle": {
     "dark": "Dark",

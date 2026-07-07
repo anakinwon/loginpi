@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "Ainult Pi Browseris saab Badge'i täiustada",
       "upgraded": "{emoji} {theme} Badge on täiustatud!"
     },
+    "badgePopup": {
+      "acquiredDesc": "{theme} teematoas on saavutatud 30 päeva aktiivsus.",
+      "acquiredTitle": "{theme} märk omandatud!",
+      "alreadyUpgraded": "See on juba täiustatud märk.",
+      "beanShort": "Beanist ei piisa. Suunatakse laadimislehele.",
+      "later": "Hiljem",
+      "networkError": "Ilmnes võrguviga.",
+      "processing": "Töötlemine…",
+      "upgradeBenefit": "✨ Märgi täiustamisel rakendatakse eridisain ja see kuvatakse alati kohviku nime kõrval.",
+      "upgradeBtn": "☕ {fee} märgi täiustamine",
+      "upgraded": "{emoji} {theme} märk on täiustatud!",
+      "upgradeFail": "Märgi täiustamine ebaõnnestus.",
+      "upgradeTitle": "{theme} täiustatud märk"
+    },
     "bean": {
       "amountSelect": "Vali Beani summa",
       "completeFail": "Beani makse lõpuleviimine ebaõnnestus",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "Selle teema avalikku Cafe'd veel ei ole",
+      "eventFee": "Sündmuse tasu {fee} Bean",
+      "eventFree": "Sündmus tasuta",
       "followCta": "+ Jälgi seda teemat (Event-ruumi teavitused)",
       "followed": "Teemat on jälgitud — saate uute Event-ruumide teavitusi",
       "followFail": "Jälgimise muutmine ebaõnnestus",
       "followingOn": "✓ Jälgitakse — Event-ruumi teavitused ON",
-      "title": "Marketplace — Populaarsed Cafe'd"
+      "roomMeta": "{theme} · {count} liiget · {msgs} nädalasõnumit",
+      "scrollMore": "Kerige rohkem nägemiseks…",
+      "searchPlaceholder": "Otsi kohviku nime või tutvustust",
+      "title": "Marketplace — Populaarsed Cafe'd",
+      "weeklyBean": "Nädala Bean π{amt}"
     },
     "msgList": {
       "am": "AM",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "{product} tellimus on alanud!",
     "tagline": "Tellimus = tasu-per-tehingu vabastuspakett. Mida rohkem kasutate, seda rohkem säästate!",
     "title": "Cafe.pi tellimus"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Pi krüptokauplemine",
+    "DAILY_CHAT": "Argivestlus",
+    "DIRECT": "Otsetehing",
+    "EPL": "Premier League",
+    "ESPORTS": "e-sport",
+    "F1": "Vormel 1",
+    "FOOD_SPOTS": "Söögikohad",
+    "HOBBY_GROUP": "Hobi",
+    "INFO_SHARE": "Infovahetus",
+    "K_LEAGUE": "K-League",
+    "MLB": "MLB",
+    "MY_TOWN": "Minu linn",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA Tour",
+    "SECONDHAND": "Taaskasutus",
+    "TENNIS_GRAND_SLAM": "Tennis",
+    "TRAVEL": "Reisimine",
+    "UCL": "Champions League",
+    "UFC_MMA": "Võitluskunstid",
+    "WEATHER": "Ilm",
+    "WORLD_CUP": "Maailmakarikas"
   },
   "themeToggle": {
     "dark": "Tume",

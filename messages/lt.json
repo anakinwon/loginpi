@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "Ženklelį galite patobulinti tik Pi naršyklėje",
       "upgraded": "{emoji} {theme} ženklelis buvo patobulintas!"
     },
+    "badgePopup": {
+      "acquiredDesc": "Pasiekėte 30 dienų aktyvumo {theme} tematikos kambaryje",
+      "acquiredTitle": "{theme} ženklelis gautas!",
+      "alreadyUpgraded": "Šis ženklelis jau patobulintas",
+      "beanShort": "Nepakanka Bean. Pereinama į papildymo puslapį.",
+      "later": "Vėliau",
+      "networkError": "Įvyko tinklo klaida",
+      "processing": "Apdorojama…",
+      "upgradeBenefit": "✨ Patobulinus ženklelį, jam suteikiamas specialus dizainas ir jis visada rodomas šalia kavinės pavadinimo",
+      "upgradeBtn": "☕ {fee} Patobulinti ženklelį",
+      "upgraded": "{emoji} {theme} ženklelis buvo patobulintas!",
+      "upgradeFail": "Nepavyko patobulinti ženklelio",
+      "upgradeTitle": "{theme} Patobulintas ženklelis"
+    },
     "bean": {
       "amountSelect": "Pasirinkti Bean sumą",
       "completeFail": "Nepavyko apdoroti Bean mokėjimo užbaigimo",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "Šia tema dar nėra viešų kavinių",
+      "eventFee": "Renginio {fee} Bean",
+      "eventFree": "Renginys nemokamas",
       "followCta": "+ Sekti šią temą (renginio kambario pranešimai)",
       "followed": "Sekate temą — Gausite pranešimus apie naujus renginių kambarius",
       "followFail": "Nepavyko pakeisti sekimo statuso",
       "followingOn": "✓ Sekama — Renginio kambario pranešimai ĮJ.",
-      "title": "Prekyvietė — Populiarios kavinės"
+      "roomMeta": "{theme} · Nariai {count} · Savaitės žinučių {msgs}",
+      "scrollMore": "Slinkite žemyn, kad pamatytumėte daugiau…",
+      "searchPlaceholder": "Ieškoti kavinės pavadinimo/aprašymo",
+      "title": "Prekyvietė — Populiarios kavinės",
+      "weeklyBean": "Savaitės Bean π{amt}"
     },
     "msgList": {
       "am": "rytas",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "{product} prenumerata prasidėjo!",
     "tagline": "Prenumerata = mokesčių už vienetą atleidimo paketas. Kuo daugiau naudojate, tuo daugiau naudos!",
     "title": "Cafe.pi prenumerata"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Pi investicijos",
+    "DAILY_CHAT": "Kasdieniai pokalbiai",
+    "DIRECT": "Tiesioginis sandoris",
+    "EPL": "Premier lyga",
+    "ESPORTS": "eSportas",
+    "F1": "Formulė 1",
+    "FOOD_SPOTS": "Geros valgymo vietos",
+    "HOBBY_GROUP": "Pomėgiai",
+    "INFO_SHARE": "Informacijos dalijimasis",
+    "K_LEAGUE": "K lyga",
+    "MLB": "MLB",
+    "MY_TOWN": "Mūsų rajonas",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA turas",
+    "SECONDHAND": "Dėvėtų daiktų dalijimasis",
+    "TENNIS_GRAND_SLAM": "Tenisas",
+    "TRAVEL": "Kelionės",
+    "UCL": "Čempionų lyga",
+    "UFC_MMA": "Kovos menai",
+    "WEATHER": "Orai",
+    "WORLD_CUP": "Pasaulio taurė"
   },
   "themeToggle": {
     "dark": "Tamsi",

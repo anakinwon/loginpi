@@ -110,6 +110,7 @@ function RankingCard({
 
 export function StatsDashboard() {
   const t = useTranslations('adminStats')
+  const tTheme = useTranslations('themes')
   const tc = useTranslations('common')
   const ta = useTranslations('adminAnalytics')
   const [period, setPeriod] = useState(7)
@@ -398,7 +399,7 @@ export function StatsDashboard() {
                   <StatsCard
                     label={
                       piTopTheme
-                        ? `1위: ${piTopTheme.theme_nm ?? piTopTheme.theme_cd}`
+                        ? `1위: ${tTheme.has(piTopTheme.theme_cd) ? tTheme(piTopTheme.theme_cd) : (piTopTheme.theme_nm ?? piTopTheme.theme_cd)}`
                         : '상위 테마'
                     }
                     value={

@@ -45,6 +45,7 @@ interface MonthlyRevenue {
 //   - Z-차트·YoY는 월별 집계 엔드포인트 선결 → 후속(아래 안내 카드)
 export function RevenueTab({ period }: { period: number }) {
   const t = useTranslations('adminAnalytics')
+  const tTheme = useTranslations('themes')
   const feeMode = useFeeMode()
   const [rev, setRev] = useState<RevenueStatsResponse | null>(null)
   const [beanRev, setBeanRev] = useState<BeanRevenueResponse | null>(null)
@@ -131,7 +132,11 @@ export function RevenueTab({ period }: { period: number }) {
 
   // 테마명 — 시스템 분류 코드(구독·기타 등)는 번역키, 카페 테마명(DB)은 theme_nm 그대로
   const themeName = (cd: string, nm?: string | null) =>
-    cd in THEME_LABEL ? t(`theme.${cd}`) : (nm ?? themeLabel(cd))
+    cd in THEME_LABEL
+      ? t(`theme.${cd}`)
+      : tTheme.has(cd)
+        ? tTheme(cd)
+        : (nm ?? themeLabel(cd))
 
   // ABC 분석 대상 — 테마별 Pi 매출 (topThemes)
   const abcItems = useMemo(
@@ -202,7 +207,7 @@ export function RevenueTab({ period }: { period: number }) {
           <StatsCard
             label={
               piModeTopTheme
-                ? `1위: ${piModeTopTheme.theme_nm ?? piModeTopTheme.theme_cd}`
+                ? `1위: ${themeName(piModeTopTheme.theme_cd, piModeTopTheme.theme_nm)}`
                 : '상위 테마'
             }
             value={
@@ -292,7 +297,7 @@ export function RevenueTab({ period }: { period: number }) {
                     </span>
                     <span className="min-w-0 flex-1 truncate">
                       {th.theme_emoji ? `${th.theme_emoji} ` : ''}
-                      {th.theme_nm ?? th.theme_cd}
+                      {themeName(th.theme_cd, th.theme_nm)}
                     </span>
                     <span className="text-muted-foreground shrink-0 tabular-nums">
                       {th.total_pi.toFixed(2)} π

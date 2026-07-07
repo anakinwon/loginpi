@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { Link, useRouter } from '@/i18n/navigation'
 import { useChatRoom, type ChatMessage } from '@/hooks/use-chat-room'
 import { piFetch } from '@/lib/pi-fetch'
@@ -9,6 +9,7 @@ import { ChatInput } from './chat-input'
 import { ChatLocaleSelect } from './chat-locale-select'
 import { InlinePurchasePrompt } from './inline-purchase-prompt'
 import { BadgeAwardPopup, type BadgeAwardInfo } from './badge-award-popup'
+import { useThemeName } from './use-theme-name'
 import { RoomSettingsDialog, type RoomSettings } from './room-settings-dialog'
 import { VoiceChannelPanel, RemoteAudio } from './voice-channel-panel'
 import { MemberListPanel } from './member-list-panel'
@@ -75,6 +76,8 @@ export function ChatRoomPanel({
   } | null>(null)
   const [expireBannerDismissed, setExpireBannerDismissed] = useState(false)
   // TASK-062 Trigger 7: 배지 수여 축하 팝업 + 강화 배지 헤더 상시 표시
+  const tBadge = useTranslations('chat.badgePopup')
+  const themeName = useThemeName()
   const [badgeAward, setBadgeAward] = useState<BadgeAwardInfo | null>(null)
   const [upgradedBadge, setUpgradedBadge] = useState<BadgeAwardInfo | null>(
     null,
@@ -311,7 +314,7 @@ export function ChatRoomPanel({
             {upgradedBadge && (
               <span
                 className="inline-flex shrink-0 items-center gap-0.5 rounded-full bg-gradient-to-r from-amber-200 to-yellow-300 px-1.5 py-0.5 text-[10px] font-bold text-amber-900 shadow-sm ring-1 ring-amber-400/60 dark:from-amber-700 dark:to-yellow-600 dark:text-amber-100"
-                title={`${upgradedBadge.theme_nm} 강화 배지`}
+                title={tBadge('upgradeTitle', { theme: themeName(upgradedBadge.theme_cd, upgradedBadge.theme_nm) })}
               >
                 {upgradedBadge.theme_emoji}🏅
               </span>

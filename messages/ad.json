@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "Només pots millorar la insígnia al Pi Browser",
       "upgraded": "La insígnia {emoji} {theme} ha estat millorada!"
     },
+    "badgePopup": {
+      "acquiredDesc": "Has assolit 30 dies d'activitat a la sala temàtica de {theme}",
+      "acquiredTitle": "Insígnia de {theme} obtinguda!",
+      "alreadyUpgraded": "Aquesta insígnia ja està millorada",
+      "beanShort": "No hi ha prou Bean. Anant a la pàgina de recàrrega.",
+      "later": "Més tard",
+      "networkError": "S'ha produït un error de xarxa",
+      "processing": "Processant…",
+      "upgradeBenefit": "✨ Millora la insígnia per obtenir un disseny especial i mostrar-la sempre al costat del nom del cafè.",
+      "upgradeBtn": "☕ Millorar insígnia {fee}",
+      "upgraded": "{emoji} La insígnia de {theme} s'ha millorat!",
+      "upgradeFail": "Ha fallat la millora de la insígnia",
+      "upgradeTitle": "Insígnia millorada de {theme}"
+    },
     "bean": {
       "amountSelect": "Seleccionar quantitat de Bean",
       "completeFail": "No s'ha pogut completar el processament del pagament de Bean",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "Encara no hi ha Cafès públics per a aquest tema",
+      "eventFee": "Esdeveniment {fee} Bean",
+      "eventFree": "Esdeveniment gratuït",
       "followCta": "+ Seguir aquest tema (notificacions de sales d'esdeveniments)",
       "followed": "Has seguit el tema — Rebràs notificacions de noves sales d'esdeveniments",
       "followFail": "No s'ha pogut canviar el seguiment",
       "followingOn": "✓ Seguint — Notificacions de sales d'esdeveniments ON",
-      "title": "Marketplace — Cafès populars"
+      "roomMeta": "{theme} · {count} membres · {msgs} missatges setmanals",
+      "scrollMore": "Desplaça't per veure'n més…",
+      "searchPlaceholder": "Cerca nom·descripció del cafè",
+      "title": "Marketplace — Cafès populars",
+      "weeklyBean": "Bean setmanal π{amt}"
     },
     "msgList": {
       "am": "AM",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "La subscripció a {product} ha començat!",
     "tagline": "Subscripció = paquet d'exempció de tarifes per transacció. Com més l'utilitzeu, més beneficis obtindreu!",
     "title": "Subscripció a PyCafé™"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Trading de Pi",
+    "DAILY_CHAT": "Xerrada diària",
+    "DIRECT": "Tracte directe",
+    "EPL": "Premier League",
+    "ESPORTS": "eSports",
+    "F1": "Fórmula 1",
+    "FOOD_SPOTS": "Llocs de menjar",
+    "HOBBY_GROUP": "Aficions",
+    "INFO_SHARE": "Compartir informació",
+    "K_LEAGUE": "K League",
+    "MLB": "MLB",
+    "MY_TOWN": "El meu barri",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA Tour",
+    "SECONDHAND": "Segona mà",
+    "TENNIS_GRAND_SLAM": "Tennis",
+    "TRAVEL": "Viatges",
+    "UCL": "Champions League",
+    "UFC_MMA": "MMA",
+    "WEATHER": "Temps",
+    "WORLD_CUP": "Copa del Món"
   },
   "themeToggle": {
     "dark": "Fosc",

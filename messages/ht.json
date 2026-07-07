@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "Vous ne pouvez améliorer le Badge que dans le Pi Browser",
       "upgraded": "{emoji} Le Badge {theme} a été amélioré !"
     },
+    "badgePopup": {
+      "acquiredDesc": "Vous avez atteint 30 jours d'activité dans la salle thématique {theme}",
+      "acquiredTitle": "Badge {theme} obtenu !",
+      "alreadyUpgraded": "Badge déjà amélioré",
+      "beanShort": "Pas assez de Bean. Accédez à la page de recharge.",
+      "later": "Plus tard",
+      "networkError": "Une erreur réseau est survenue",
+      "processing": "Traitement en cours…",
+      "upgradeBenefit": "✨ Lorsque vous améliorez le badge, un design spécial est appliqué et il est affiché en permanence à côté du nom du café.",
+      "upgradeBtn": "☕ Améliorer le badge {fee}",
+      "upgraded": "{emoji} Le badge {theme} a été amélioré !",
+      "upgradeFail": "L'amélioration du badge a échoué",
+      "upgradeTitle": "Badge amélioré {theme}"
+    },
     "bean": {
       "amountSelect": "Sélectionner le montant du Bean",
       "completeFail": "Échec du traitement de la finalisation du paiement du Bean",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "Il n'y a pas encore de cafés publics pour ce thème",
+      "eventFee": "Événement {fee} Bean",
+      "eventFree": "Événement gratuit",
       "followCta": "+ Suivre ce thème (notifications de salle d'événement)",
       "followed": "Vous suivez le thème — Recevez des notifications pour les nouvelles salles d'événement",
       "followFail": "Échec de la modification du suivi",
       "followingOn": "✓ Suivi — Notifications de salle d'événement ON",
-      "title": "Marketplace — Cafés populaires"
+      "roomMeta": "{theme} · {count} membres · {msgs} messages hebdomadaires",
+      "scrollMore": "Faites défiler pour en voir plus…",
+      "searchPlaceholder": "Rechercher un nom ou une description de café",
+      "title": "Marketplace — Cafés populaires",
+      "weeklyBean": "Bean hebdomadaire π{amt}"
     },
     "msgList": {
       "am": "AM",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "Votre abonnement {product} a commencé !",
     "tagline": "Abonnement = Forfait d'exemption de frais par transaction. Plus vous l'utilisez, plus vous économisez !",
     "title": "Abonnement Cafe.pi"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Investissement Pi",
+    "DAILY_CHAT": "Bavardage quotidien",
+    "DIRECT": "Transaction directe",
+    "EPL": "Premier League",
+    "ESPORTS": "Esport",
+    "F1": "Formule 1",
+    "FOOD_SPOTS": "Adresses gourmandes",
+    "HOBBY_GROUP": "Loisirs",
+    "INFO_SHARE": "Partage d'informations",
+    "K_LEAGUE": "K League",
+    "MLB": "MLB",
+    "MY_TOWN": "Mon quartier",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA Tour",
+    "SECONDHAND": "Seconde main",
+    "TENNIS_GRAND_SLAM": "Tennis",
+    "TRAVEL": "Voyage",
+    "UCL": "Ligue des Champions",
+    "UFC_MMA": "Sports de combat",
+    "WEATHER": "Météo",
+    "WORLD_CUP": "Coupe du Monde"
   },
   "themeToggle": {
     "dark": "Dark",

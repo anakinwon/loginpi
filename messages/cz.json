@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "Pouze v Pi Browseru můžete vylepšit odznak.",
       "upgraded": "{emoji} Odznak {theme} byl vylepšen!"
     },
+    "badgePopup": {
+      "acquiredDesc": "Dosáhli jste 30 dnů aktivity v místnosti s tématem {theme}",
+      "acquiredTitle": "Získán odznak {theme}!",
+      "alreadyUpgraded": "Tento odznak je již vylepšený",
+      "beanShort": "Nedostatek Beanů. Přejdete na stránku dobíjení.",
+      "later": "Později",
+      "networkError": "Došlo k chybě sítě",
+      "processing": "Zpracovává se…",
+      "upgradeBenefit": "✨ Vylepšením odznaku získáte speciální design a bude se trvale zobrazovat vedle názvu kavárny",
+      "upgradeBtn": "☕ Vylepšit odznak za {fee}",
+      "upgraded": "{emoji} Odznak {theme} byl vylepšen!",
+      "upgradeFail": "Vylepšení odznaku se nezdařilo",
+      "upgradeTitle": "Vylepšený odznak {theme}"
+    },
     "bean": {
       "amountSelect": "Vybrat množství Beanů",
       "completeFail": "Selhání dokončení platby Bean",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "Pro toto téma zatím nejsou žádné veřejné kavárny",
+      "eventFee": "Událost {fee} Bean",
+      "eventFree": "Událost zdarma",
       "followCta": "+ Sledovat toto téma (oznámení o událostních místnostech)",
       "followed": "Sledujete téma — budete dostávat oznámení o nových událostních místnostech",
       "followFail": "Nepodařilo se změnit sledování",
       "followingOn": "✓ Sledujete — Oznámení o událostních místnostech ZAPNUTA",
-      "title": "Tržiště — Populární kavárny"
+      "roomMeta": "{theme} · {count} členů · {msgs} zpráv týdně",
+      "scrollMore": "Procházejte pro více…",
+      "searchPlaceholder": "Vyhledat název kavárny nebo popis",
+      "title": "Tržiště — Populární kavárny",
+      "weeklyBean": "Týdenní Bean π{amt}"
     },
     "msgList": {
       "am": "dop.",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "Předplatné {product} bylo zahájeno!",
     "tagline": "Předplatné = balíček s osvobozením od poplatků za transakci. Čím více používáte, tím více ušetříte!",
     "title": "Předplatné Cafe.pi"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Krypto obchodování",
+    "DAILY_CHAT": "Denní povídání",
+    "DIRECT": "Přímý obchod",
+    "EPL": "Premier League",
+    "ESPORTS": "eSporty",
+    "F1": "Formule 1",
+    "FOOD_SPOTS": "Gastronomie",
+    "HOBBY_GROUP": "Koníčky",
+    "INFO_SHARE": "Sdílení informací",
+    "K_LEAGUE": "K League",
+    "MLB": "Major League",
+    "MY_TOWN": "Moje město",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA Tour",
+    "SECONDHAND": "Bazar",
+    "TENNIS_GRAND_SLAM": "Tenis",
+    "TRAVEL": "Cestování",
+    "UCL": "Liga mistrů",
+    "UFC_MMA": "Bojové sporty",
+    "WEATHER": "Počasí",
+    "WORLD_CUP": "Mistrovství světa"
   },
   "themeToggle": {
     "dark": "Tmavý",

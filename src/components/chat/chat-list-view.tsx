@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import { useTranslations } from 'next-intl'
+import { useThemeName } from './use-theme-name'
 import { Link } from '@/i18n/navigation'
 import { GroupRoomCreator } from '@/components/chat/group-room-creator'
 import { ChatMarketplace } from '@/components/chat/chat-marketplace'
@@ -68,7 +69,8 @@ function ThemeEmoji({ room }: { room: RoomWithTheme }) {
 
 function RoomCard({ room, href }: { room: RoomWithTheme; href: string }) {
   const t = useTranslations('chat.list')
-  const themeName = room.msg_theme?.theme_nm ?? room.theme_cd
+  const tn = useThemeName()
+  const themeName = tn(room.theme_cd, room.msg_theme?.theme_nm)
   const isPremium = room.msg_theme?.theme_tp_cd === 'PREMIUM'
   const isBoosted =
     !!room.boost_expire_dtm && new Date(room.boost_expire_dtm) > new Date()

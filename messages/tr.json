@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "Rozeti yalnızca Pi Browser'da güçlendirebilirsiniz",
       "upgraded": "{emoji} {theme} rozeti güçlendirildi!"
     },
+    "badgePopup": {
+      "acquiredDesc": "{theme} temalı odada 30 günlük aktiviteye ulaşıldı.",
+      "acquiredTitle": "{theme} rozeti kazanıldı!",
+      "alreadyUpgraded": "Bu rozet zaten güçlendirildi.",
+      "beanShort": "Bean yetersiz. Yükleme sayfasına gidin.",
+      "later": "Daha sonra",
+      "networkError": "Ağ hatası oluştu.",
+      "processing": "İşleniyor…",
+      "upgradeBenefit": "✨ Rozeti güçlendirdiğinizde özel bir tasarım uygulanır ve kafe adının yanında sürekli gösterilir.",
+      "upgradeBtn": "☕ {fee} Rozeti güçlendir",
+      "upgraded": "{emoji} {theme} rozeti güçlendirildi!",
+      "upgradeFail": "Rozet güçlendirme başarısız oldu.",
+      "upgradeTitle": "{theme} Güçlendirilmiş Rozet"
+    },
     "bean": {
       "amountSelect": "Bean miktarı seç",
       "completeFail": "Bean ödemesi tamamlama işlemi başarısız oldu",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "Bu temada henüz herkese açık kafe yok",
+      "eventFee": "Etkinlik {fee} Bean",
+      "eventFree": "Etkinlik ücretsiz",
       "followCta": "+ Bu temayı takip et (etkinlik odası bildirimleri)",
       "followed": "Temayı takip ettiniz — yeni etkinlik odası bildirimleri alacaksınız",
       "followFail": "Takip durumu değiştirilemedi",
       "followingOn": "✓ Takip ediliyor — Etkinlik odası bildirimleri AÇIK",
-      "title": "Pazar Yeri — Popüler Kafeler"
+      "roomMeta": "{theme} · {count} üye · Haftalık {msgs} mesaj",
+      "scrollMore": "Daha fazlasını görmek için kaydırın…",
+      "searchPlaceholder": "Kafe adı veya açıklaması ara",
+      "title": "Pazar Yeri — Popüler Kafeler",
+      "weeklyBean": "Haftalık Bean π{amt}"
     },
     "msgList": {
       "am": "ÖÖ",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "{product} aboneliğiniz başladı!",
     "tagline": "Abonelik = İşlem başına ücret muafiyeti paketi. Ne kadar çok kullanırsanız o kadar karlı!",
     "title": "Cafe.pi Aboneliği"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Pi Yatırım",
+    "DAILY_CHAT": "Günlük Sohbet",
+    "DIRECT": "Doğrudan Ticaret",
+    "EPL": "Premier Lig",
+    "ESPORTS": "E-spor",
+    "F1": "Formula 1",
+    "FOOD_SPOTS": "Lezzet Durakları",
+    "HOBBY_GROUP": "Hobi",
+    "INFO_SHARE": "Bilgi Paylaşımı",
+    "K_LEAGUE": "K-Lig",
+    "MLB": "Major Lig",
+    "MY_TOWN": "Mahallem",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA Turu",
+    "SECONDHAND": "İkinci El Paylaşım",
+    "TENNIS_GRAND_SLAM": "Tenis",
+    "TRAVEL": "Seyahat",
+    "UCL": "Şampiyonlar Ligi",
+    "UFC_MMA": "Dövüş Sporları",
+    "WEATHER": "Hava Durumu",
+    "WORLD_CUP": "Dünya Kupası"
   },
   "themeToggle": {
     "dark": "Koyu",

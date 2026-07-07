@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "Značku možete poboljšati samo u Pi Browseru",
       "upgraded": "{emoji} Značka {theme} je poboljšana!"
     },
+    "badgePopup": {
+      "acquiredDesc": "Postigli ste 30 dana aktivnosti u sobi s temom {theme}.",
+      "acquiredTitle": "Osvojena značka {theme}!",
+      "alreadyUpgraded": "Značka je već poboljšana",
+      "beanShort": "Nedostaje Bean. Idite na stranicu za nadoplatu.",
+      "later": "Kasnije",
+      "networkError": "Došlo je do mrežne pogreške",
+      "processing": "Obrađuje se…",
+      "upgradeBenefit": "✨ Poboljšanjem značke dobivate poseban dizajn i ona se trajno prikazuje pored naziva kafića.",
+      "upgradeBtn": "☕ {fee} Poboljšaj značku",
+      "upgraded": "{emoji} Značka {theme} je poboljšana!",
+      "upgradeFail": "Poboljšanje značke nije uspjelo",
+      "upgradeTitle": "Poboljšana značka {theme}"
+    },
     "bean": {
       "amountSelect": "Odaberite iznos Beana",
       "completeFail": "Neuspjeh obrade dovršetka plaćanja Beana",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "Još nema javnih soba za ovu temu",
+      "eventFee": "Događaj {fee} Bean",
+      "eventFree": "Besplatan događaj",
       "followCta": "+ Pratite ovu temu (Obavijesti o sobama događaja)",
       "followed": "Pratite temu — primit ćete obavijesti o novim sobama događaja",
       "followFail": "Nije uspjela promjena statusa praćenja",
       "followingOn": "✓ Pratite — Obavijesti o sobama događaja UKLJUČENE",
-      "title": "Tržnica — Popularne sobe"
+      "roomMeta": "{theme} · Članova {count} · Tjednih poruka {msgs}",
+      "scrollMore": "Skrolajte za više…",
+      "searchPlaceholder": "Pretražite naziv ili opis kafića",
+      "title": "Tržnica — Popularne sobe",
+      "weeklyBean": "Tjedni Bean π{amt}"
     },
     "msgList": {
       "am": "AM",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "Pretplata na {product} je započela!",
     "tagline": "Pretplata = paket bez naknade po transakciji. Što više koristite, to više štedite!",
     "title": "Pretplata na Cafe.pi"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Trgovanje Pi-jem",
+    "DAILY_CHAT": "Svakodnevno čavrljanje",
+    "DIRECT": "Izravna trgovina",
+    "EPL": "Premier liga",
+    "ESPORTS": "eSport",
+    "F1": "Formula 1",
+    "FOOD_SPOTS": "Mjesta za jelo",
+    "HOBBY_GROUP": "Hobiji",
+    "INFO_SHARE": "Dijeljenje informacija",
+    "K_LEAGUE": "K Liga",
+    "MLB": "MLB",
+    "MY_TOWN": "Moj kvart",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA Tour",
+    "SECONDHAND": "Rabljeno",
+    "TENNIS_GRAND_SLAM": "Tenis",
+    "TRAVEL": "Putovanja",
+    "UCL": "Liga prvaka",
+    "UFC_MMA": "Borilački sportovi",
+    "WEATHER": "Vrijeme",
+    "WORLD_CUP": "Svjetsko prvenstvo"
   },
   "themeToggle": {
     "dark": "Tamna",

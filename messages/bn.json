@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "Anda hanya boleh meningkatkan Badge di Pi Browser",
       "upgraded": "{emoji} Badge {theme} telah ditingkatkan!"
     },
+    "badgePopup": {
+      "acquiredDesc": "Anda telah mencapai 30 hari aktiviti dalam bilik tema {theme}",
+      "acquiredTitle": "Lencana {theme} diperoleh!",
+      "alreadyUpgraded": "Lencana ini sudah dipertingkatkan",
+      "beanShort": "Bean tidak mencukupi. Pergi ke halaman tambah nilai.",
+      "later": "Lakukan Nanti",
+      "networkError": "Ralat rangkaian telah berlaku",
+      "processing": "Memproses…",
+      "upgradeBenefit": "✨ Apabila lencana dipertingkatkan, reka bentuk istimewa akan digunakan dan sentiasa dipaparkan di sebelah nama kafe",
+      "upgradeBtn": "☕ {fee} Tingkatkan Lencana",
+      "upgraded": "{emoji} Lencana {theme} telah dipertingkatkan!",
+      "upgradeFail": "Gagal mempertingkatkan lencana",
+      "upgradeTitle": "Lencana Dipertingkatkan {theme}"
+    },
     "bean": {
       "amountSelect": "Pilih jumlah Bean",
       "completeFail": "Gagal memproses penyelesaian pembayaran Bean",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "Belum ada Cafe awam untuk tema ini",
+      "eventFee": "Acara {fee} Bean",
+      "eventFree": "Acara Percuma",
       "followCta": "+ Ikut Tema Ini (Pemberitahuan Bilik Acara)",
       "followed": "Anda telah mengikuti Tema — Anda akan menerima pemberitahuan Bilik Acara baharu",
       "followFail": "Gagal menukar status mengikuti",
       "followingOn": "✓ Sedang Mengikuti — Pemberitahuan Bilik Acara HIDUP",
-      "title": "Marketplace — Kafe Popular"
+      "roomMeta": "{theme} · {count} ahli · {msgs} mesej mingguan",
+      "scrollMore": "Tatal untuk melihat lebih banyak…",
+      "searchPlaceholder": "Cari nama kafe atau pengenalan",
+      "title": "Marketplace — Kafe Popular",
+      "weeklyBean": "Bean Mingguan π{amt}"
     },
     "msgList": {
       "am": "PG",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "Langganan {product} anda telah bermula!",
     "tagline": "Langganan = Pakej pengecualian yuran setiap transaksi. Lebih banyak anda gunakan, lebih banyak faedah!",
     "title": "Langganan Cafe.pi"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Pelaburan Pi",
+    "DAILY_CHAT": "Sembang Harian",
+    "DIRECT": "Urus Niaga Langsung",
+    "EPL": "Liga Perdana",
+    "ESPORTS": "e-Sukan",
+    "F1": "Formula 1",
+    "FOOD_SPOTS": "Tempat Makan Sedap",
+    "HOBBY_GROUP": "Hobi",
+    "INFO_SHARE": "Perkongsian Maklumat",
+    "K_LEAGUE": "K League",
+    "MLB": "Major League",
+    "MY_TOWN": "Kawasan Saya",
+    "NBA": "NBA",
+    "PGA_GOLF": "Jelajah PGA",
+    "SECONDHAND": "Barangan Terpakai",
+    "TENNIS_GRAND_SLAM": "Tenis",
+    "TRAVEL": "Perjalanan",
+    "UCL": "Liga Juara-Juara",
+    "UFC_MMA": "Sukan Tempur",
+    "WEATHER": "Cuaca",
+    "WORLD_CUP": "Piala Dunia"
   },
   "themeToggle": {
     "dark": "Dark",

@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "Pi BrowserでのみBadgeを強化できます",
       "upgraded": "{emoji} {theme} Badgeが強化されました!"
     },
+    "badgePopup": {
+      "acquiredDesc": "{theme} テーマの部屋で30日間の活動を達成しました",
+      "acquiredTitle": "{theme} バッジ獲得！",
+      "alreadyUpgraded": "すでに強化済みのバッジです",
+      "beanShort": "Beanが不足しています。チャージページに移動します。",
+      "later": "後で",
+      "networkError": "ネットワークエラーが発生しました",
+      "processing": "処理中…",
+      "upgradeBenefit": "✨ バッジを強化すると特別デザインが適用され、カフェ名の横に常に表示されます",
+      "upgradeBtn": "☕ {fee} バッジを強化",
+      "upgraded": "{emoji} {theme} バッジが強化されました！",
+      "upgradeFail": "バッジの強化に失敗しました",
+      "upgradeTitle": "{theme} 強化バッジ"
+    },
     "bean": {
       "amountSelect": "Bean 金額選択",
       "completeFail": "Bean決済の完了処理に失敗しました",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "該当のThemeの公開Cafeはまだありません",
+      "eventFee": "イベント {fee} Bean",
+      "eventFree": "イベント無料",
       "followCta": "+ このThemeをFollow (Event Room通知)",
       "followed": "ThemeをFollowしました — 新規Event Room通知を受け取ります",
       "followFail": "Follow変更に失敗しました",
       "followingOn": "✓ Follow中 — Event Room通知 ON",
-      "title": "Marketplace — 人気Cafe"
+      "roomMeta": "{theme}・メンバー {count}人・週間メッセージ {msgs}件",
+      "scrollMore": "スクロールしてさらに表示…",
+      "searchPlaceholder": "カフェ名・紹介を検索",
+      "title": "Marketplace — 人気Cafe",
+      "weeklyBean": "週間 Bean π{amt}"
     },
     "msgList": {
       "am": "午前",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "{product} の購読が開始されました！",
     "tagline": "購読 = 1件あたりの料金免除Package。多く使うほどお得！",
     "title": "Cafe.pi購読"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Pi投資",
+    "DAILY_CHAT": "日常雑談",
+    "DIRECT": "直接取引",
+    "EPL": "プレミアリーグ",
+    "ESPORTS": "eスポーツ",
+    "F1": "フォーミュラ1",
+    "FOOD_SPOTS": "グルメスポット",
+    "HOBBY_GROUP": "趣味",
+    "INFO_SHARE": "情報共有",
+    "K_LEAGUE": "Kリーグ",
+    "MLB": "メジャーリーグ",
+    "MY_TOWN": "地元",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGAツアー",
+    "SECONDHAND": "中古品交換",
+    "TENNIS_GRAND_SLAM": "テニス",
+    "TRAVEL": "旅行",
+    "UCL": "チャンピオンズリーグ",
+    "UFC_MMA": "格闘技",
+    "WEATHER": "天気",
+    "WORLD_CUP": "ワールドカップ"
   },
   "themeToggle": {
     "dark": "Dark",

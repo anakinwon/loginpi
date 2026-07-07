@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "Csak a Pi Browserben fejleszthetők a jelvények",
       "upgraded": "{emoji} {theme} jelvény fejlesztve lett!"
     },
+    "badgePopup": {
+      "acquiredDesc": "30 napos aktivitást ért el a(z) {theme} témájú szobában.",
+      "acquiredTitle": "{theme} jelvény megszerezve!",
+      "alreadyUpgraded": "Ez a jelvény már megerősített.",
+      "beanShort": "Nincs elég Bean. Átirányítás a feltöltési oldalra.",
+      "later": "Később",
+      "networkError": "Hálózati hiba történt.",
+      "processing": "Feldolgozás alatt…",
+      "upgradeBenefit": "✨ A jelvény megerősítése különleges dizájnt biztosít, és mindig megjelenik a kávézó neve mellett.",
+      "upgradeBtn": "☕ {fee} Jelvény megerősítése",
+      "upgraded": "{emoji} A(z) {theme} jelvény megerősítve!",
+      "upgradeFail": "A jelvény megerősítése sikertelen.",
+      "upgradeTitle": "{theme} megerősített jelvény"
+    },
     "bean": {
       "amountSelect": "Bean összeg kiválasztása",
       "completeFail": "A Bean kifizetésének feldolgozása sikertelen volt",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "Még nincsenek nyilvános közösségek ehhez a témához",
+      "eventFee": "Esemény {fee} Bean",
+      "eventFree": "Esemény ingyenes",
       "followCta": "+ Kövesse ezt a témát (eseményszoba értesítések)",
       "followed": "Követte a témát — értesítéseket kap az új eseményszobákról",
       "followFail": "Nem sikerült módosítani a követést",
       "followingOn": "✓ Követés — Eseményszoba értesítések BE",
-      "title": "Piactér — Népszerű közösségek"
+      "roomMeta": "{theme} · {count} tag · {msgs} heti üzenet",
+      "scrollMore": "Görgessen a továbbiakért…",
+      "searchPlaceholder": "Kávézó neve vagy leírása keresése",
+      "title": "Piactér — Népszerű közösségek",
+      "weeklyBean": "Heti Bean π{amt}"
     },
     "msgList": {
       "am": "de.",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "{product} előfizetése elindult!",
     "tagline": "Előfizetés = díjmentes csomag tranzakciónként. Minél többet használja, annál jobban megéri!",
     "title": "Cafe.pi előfizetés"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Pi befektetés",
+    "DAILY_CHAT": "Napi csevegés",
+    "DIRECT": "Közvetlen ügylet",
+    "EPL": "Premier League",
+    "ESPORTS": "eSport",
+    "F1": "Forma-1",
+    "FOOD_SPOTS": "Gasztrohelyek",
+    "HOBBY_GROUP": "Hobbi",
+    "INFO_SHARE": "Információmegosztás",
+    "K_LEAGUE": "K League",
+    "MLB": "MLB",
+    "MY_TOWN": "Lakóhelyem",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA Tour",
+    "SECONDHAND": "Használt cikkek",
+    "TENNIS_GRAND_SLAM": "Tenisz",
+    "TRAVEL": "Utazás",
+    "UCL": "Bajnokok Ligája",
+    "UFC_MMA": "Küzdősportok",
+    "WEATHER": "Időjárás",
+    "WORLD_CUP": "Világbajnokság"
   },
   "themeToggle": {
     "dark": "Sötét",

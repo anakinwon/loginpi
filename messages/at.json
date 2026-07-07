@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "Nur im Pi Browser können Badges verstärkt werden",
       "upgraded": "{emoji} {theme} Badge wurde verstärkt!"
     },
+    "badgePopup": {
+      "acquiredDesc": "Sie haben 30 Tage Aktivität im {theme}-Themenraum absolviert.",
+      "acquiredTitle": "{theme}-Abzeichen erhalten!",
+      "alreadyUpgraded": "Dieses Abzeichen ist bereits aufgewertet.",
+      "beanShort": "Nicht genug Bean. Weiter zur Aufladeseite.",
+      "later": "Später",
+      "networkError": "Ein Netzwerkfehler ist aufgetreten.",
+      "processing": "Wird verarbeitet…",
+      "upgradeBenefit": "✨ Wenn Sie das Abzeichen aufwerten, erhält es ein spezielles Design und wird dauerhaft neben dem Cafénamen angezeigt.",
+      "upgradeBtn": "☕ {fee} Abzeichen aufwerten",
+      "upgraded": "{emoji} Das {theme}-Abzeichen wurde aufgewertet!",
+      "upgradeFail": "Fehler beim Aufwerten des Abzeichens.",
+      "upgradeTitle": "Aufgewertetes {theme}-Abzeichen"
+    },
     "bean": {
       "amountSelect": "Bean-Betrag auswählen",
       "completeFail": "Fehler bei der Abwicklung der Bean-Zahlung",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "Es gibt noch keine öffentlichen Cafés für dieses Thema.",
+      "eventFee": "Event {fee} Bean",
+      "eventFree": "Event kostenlos",
       "followCta": "+ Diesem Thema folgen (Eventraum-Benachrichtigungen)",
       "followed": "Sie folgen dem Thema — Sie erhalten Benachrichtigungen über neue Eventräume",
       "followFail": "Die Änderung des Folgestatus ist fehlgeschlagen.",
       "followingOn": "✓ Sie folgen — Eventraum-Benachrichtigungen AN",
-      "title": "Marktplatz — Beliebte Cafés"
+      "roomMeta": "{theme} · {count} Mitglieder · {msgs} wöchentliche Nachrichten",
+      "scrollMore": "Scrolle für mehr...",
+      "searchPlaceholder": "Nach Caféname oder Beschreibung suchen",
+      "title": "Marktplatz — Beliebte Cafés",
+      "weeklyBean": "Wöchentliche Bean π{amt}"
     },
     "msgList": {
       "am": "AM",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "Ihr {product} Abonnement wurde gestartet!",
     "tagline": "Abonnement = Paket zur Befreiung von Gebühren pro Fall. Je mehr Sie nutzen, desto mehr profitieren Sie!",
     "title": "Cafe.pi Abonnement"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Pi-Investition",
+    "DAILY_CHAT": "Alltagsplausch",
+    "DIRECT": "Direkthandel",
+    "EPL": "Premier League",
+    "ESPORTS": "eSports",
+    "F1": "Formel 1",
+    "FOOD_SPOTS": "Gute Restaurants",
+    "HOBBY_GROUP": "Hobbys",
+    "INFO_SHARE": "Informationsaustausch",
+    "K_LEAGUE": "K League",
+    "MLB": "MLB",
+    "MY_TOWN": "Meine Nachbarschaft",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA Tour",
+    "SECONDHAND": "Secondhand",
+    "TENNIS_GRAND_SLAM": "Tennis",
+    "TRAVEL": "Reisen",
+    "UCL": "Champions League",
+    "UFC_MMA": "Kampfsport",
+    "WEATHER": "Wetter",
+    "WORLD_CUP": "Weltmeisterschaft"
   },
   "themeToggle": {
     "dark": "Dunkel",

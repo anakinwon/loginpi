@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "Puteți îmbunătăți insigna doar în Pi Browser",
       "upgraded": "{emoji} Insigna {theme} a fost îmbunătățită!"
     },
+    "badgePopup": {
+      "acquiredDesc": "Ați atins 30 de zile de activitate în camera tematică {theme}",
+      "acquiredTitle": "Insigna {theme} obținută!",
+      "alreadyUpgraded": "Această insignă este deja îmbunătățită",
+      "beanShort": "Nu aveți suficiente Bean. Veți fi redirecționat către pagina de reîncărcare.",
+      "later": "Mai târziu",
+      "networkError": "A apărut o eroare de rețea",
+      "processing": "Se procesează…",
+      "upgradeBenefit": "✨ Îmbunătățirea insignei aplică un design special și o afișează permanent lângă numele cafenelei",
+      "upgradeBtn": "☕ {fee} Îmbunătățiți insigna",
+      "upgraded": "{emoji} Insigna {theme} a fost îmbunătățită!",
+      "upgradeFail": "Îmbunătățirea insignei a eșuat",
+      "upgradeTitle": "Insigna îmbunătățită {theme}"
+    },
     "bean": {
       "amountSelect": "Selectează suma de Bean",
       "completeFail": "Eșec la finalizarea procesării plății Bean",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "Nu există încă cafenele publice pentru această temă",
+      "eventFee": "Eveniment {fee} Bean",
+      "eventFree": "Eveniment gratuit",
       "followCta": "+ Urmărește această temă (notificări cameră evenimente)",
       "followed": "Ai urmărit tema — vei primi notificări pentru camere de evenimente noi",
       "followFail": "Modificarea urmăririi a eșuat",
       "followingOn": "✓ Urmărești — Notificări cameră evenimente ACTIVATE",
-      "title": "Piață — Cafenele populare"
+      "roomMeta": "{theme} · Membri {count} · Mesaje săptămânale {msgs}",
+      "scrollMore": "Derulați pentru a vedea mai mult…",
+      "searchPlaceholder": "Căutați numele sau descrierea cafenelei",
+      "title": "Piață — Cafenele populare",
+      "weeklyBean": "Bean săptămânal π{amt}"
     },
     "msgList": {
       "am": "AM",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "Abonamentul {product} a început!",
     "tagline": "Abonament = Pachet de scutire de taxe per tranzacție. Cu cât utilizați mai mult, cu atât economisiți mai mult!",
     "title": "Abonament Cafe.pi"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Investiții Pi",
+    "DAILY_CHAT": "Discuții zilnice",
+    "DIRECT": "Tranzacții directe",
+    "EPL": "Premier League",
+    "ESPORTS": "eSports",
+    "F1": "Formula 1",
+    "FOOD_SPOTS": "Locuri de mâncat",
+    "HOBBY_GROUP": "Hobby-uri",
+    "INFO_SHARE": "Partajare informații",
+    "K_LEAGUE": "K League",
+    "MLB": "MLB",
+    "MY_TOWN": "Cartierul meu",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA Tour",
+    "SECONDHAND": "Second-hand",
+    "TENNIS_GRAND_SLAM": "Tenis",
+    "TRAVEL": "Călătorii",
+    "UCL": "Liga Campionilor",
+    "UFC_MMA": "Arte marțiale mixte",
+    "WEATHER": "Vremea",
+    "WORLD_CUP": "Cupa Mondială"
   },
   "themeToggle": {
     "dark": "Întunecat",

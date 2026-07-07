@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "Du kan kun opgradere badges i Pi Browser",
       "upgraded": "{emoji} {theme} badge er blevet opgraderet!"
     },
+    "badgePopup": {
+      "acquiredDesc": "Du har opnået 30 dages aktivitet i {theme}-temarummet",
+      "acquiredTitle": "{theme}-badge opnået!",
+      "alreadyUpgraded": "Badget er allerede opgraderet",
+      "beanShort": "Ikke nok Bean. Går til opladningssiden.",
+      "later": "Senere",
+      "networkError": "Der opstod en netværksfejl",
+      "processing": "Behandler…",
+      "upgradeBenefit": "✨ Opgradering af badget giver et specielt design og vises permanent ved siden af caféens navn",
+      "upgradeBtn": "☕ Opgrader badge for {fee}",
+      "upgraded": "{emoji} Dit {theme}-badge er blevet opgraderet!",
+      "upgradeFail": "Opgradering af badge mislykkedes",
+      "upgradeTitle": "Opgraderet {theme}-badge"
+    },
     "bean": {
       "amountSelect": "Vælg Bean-beløb",
       "completeFail": "Mislykkedes at fuldføre Bean-betalingen",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "Der er ingen offentlige caféer for dette tema endnu",
+      "eventFee": "Begivenhed {fee} Bean",
+      "eventFree": "Begivenhed gratis",
       "followCta": "+ Følg dette tema (notifikationer for eventrum)",
       "followed": "Du følger temaet — Du modtager notifikationer for nye eventrum",
       "followFail": "Kunne ikke ændre følg-status",
       "followingOn": "✓ Følger — Notifikationer for eventrum TIL",
-      "title": "Markedsplads — Populære caféer"
+      "roomMeta": "{theme} · {count} medlemmer · {msgs} ugentlige beskeder",
+      "scrollMore": "Rul for at se mere…",
+      "searchPlaceholder": "Søg efter caféens navn eller beskrivelse",
+      "title": "Markedsplads — Populære caféer",
+      "weeklyBean": "Ugentlig Bean π{amt}"
     },
     "msgList": {
       "am": "AM",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "{product} abonnement er startet!",
     "tagline": "Abonnement = Pakke med fritagelse for gebyr pr. transaktion. Jo mere du bruger, jo mere fordelagtigt!",
     "title": "Cafe.pi abonnement"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Pi-investering",
+    "DAILY_CHAT": "Hverdagssnak",
+    "DIRECT": "Direkte handel",
+    "EPL": "Premier League",
+    "ESPORTS": "e-sport",
+    "F1": "Formel 1",
+    "FOOD_SPOTS": "Spisesteder",
+    "HOBBY_GROUP": "Hobby",
+    "INFO_SHARE": "Informationsdeling",
+    "K_LEAGUE": "K League",
+    "MLB": "MLB",
+    "MY_TOWN": "Vores område",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA Tour",
+    "SECONDHAND": "Genbrug",
+    "TENNIS_GRAND_SLAM": "Tennis",
+    "TRAVEL": "Rejser",
+    "UCL": "Champions League",
+    "UFC_MMA": "Kampsport",
+    "WEATHER": "Vejr",
+    "WORLD_CUP": "VM"
   },
   "themeToggle": {
     "dark": "Mørk",

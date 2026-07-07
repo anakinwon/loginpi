@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
+import { useThemeName } from '@/components/chat/use-theme-name'
 import { Link } from '@/i18n/navigation'
 import { Button } from '@/components/ui/button'
 import { piFetch } from '@/lib/pi-fetch'
@@ -29,6 +30,7 @@ interface NearbyRoom {
   room_id: string
   room_nm: string
   room_desc: string | null
+  theme_cd: string
   theme_emoji: string
   theme_nm: string
   sigungu_nm: string | null
@@ -74,6 +76,7 @@ const LIVE_MOVE_THRESHOLD_KM = 0.03 // 30m
 
 export function NearbyExplorer() {
   const t = useTranslations('lbs')
+  const themeName = useThemeName()
   const [lbsConsent, setLbsConsent] = useState<'Y' | 'N' | null>(null)
   const [consentOpen, setConsentOpen] = useState(false)
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(
@@ -413,7 +416,7 @@ export function NearbyExplorer() {
                       <p className="truncate font-medium">{r.room_nm}</p>
                       <p className="text-muted-foreground truncate text-xs">
                         {r.sigungu_nm ? `${r.sigungu_nm} · ` : ''}
-                        {r.theme_nm}
+                        {themeName(r.theme_cd, r.theme_nm)}
                       </p>
                     </div>
                   </div>

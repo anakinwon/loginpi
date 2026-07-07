@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "Odznaki można ulepszać tylko w przeglądarce Pi Browser",
       "upgraded": "Odznaka {emoji} {theme} została ulepszona!"
     },
+    "badgePopup": {
+      "acquiredDesc": "Osiągnięto 30 dni aktywności w pokoju tematycznym {theme}",
+      "acquiredTitle": "Odznaka {theme} zdobyta!",
+      "alreadyUpgraded": "Ta odznaka jest już ulepszona",
+      "beanShort": "Za mało Bean. Przejdź do strony doładowania.",
+      "later": "Zrób później",
+      "networkError": "Wystąpił błąd sieci",
+      "processing": "Przetwarzanie…",
+      "upgradeBenefit": "✨ Ulepszenie odznaki nadaje jej specjalny wygląd i jest zawsze wyświetlane obok nazwy kawiarni",
+      "upgradeBtn": "☕ {fee} Ulepsz odznakę",
+      "upgraded": "{emoji} Odznaka {theme} została ulepszona!",
+      "upgradeFail": "Nie udało się ulepszyć odznaki",
+      "upgradeTitle": "Ulepszona odznaka {theme}"
+    },
     "bean": {
       "amountSelect": "Wybierz kwotę Bean",
       "completeFail": "Niepowodzenie przetwarzania ukończenia płatności Bean",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "Brak publicznych kawiarni w tym temacie",
+      "eventFee": "Wydarzenie {fee} Bean",
+      "eventFree": "Wydarzenie bezpłatne",
       "followCta": "+ Obserwuj ten temat (powiadomienia o pokojach wydarzeń)",
       "followed": "Obserwujesz temat — Otrzymasz powiadomienia o nowych pokojach wydarzeń",
       "followFail": "Nie udało się zmienić obserwowania",
       "followingOn": "✓ Obserwujesz — Powiadomienia o pokojach wydarzeń WŁ.",
-      "title": "Marketplace — Popularne kawiarnie"
+      "roomMeta": "{theme} · {count} członków · {msgs} wiadomości tygodniowo",
+      "scrollMore": "Przewiń, aby zobaczyć więcej…",
+      "searchPlaceholder": "Szukaj nazwy/opisu kawiarni",
+      "title": "Marketplace — Popularne kawiarnie",
+      "weeklyBean": "Tygodniowo Bean π{amt}"
     },
     "msgList": {
       "am": "AM",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "Subskrypcja {product} została aktywowana!",
     "tagline": "Subskrypcja = pakiet zwalniający z opłat za transakcję. Im więcej używasz, tym więcej zyskujesz!",
     "title": "Subskrypcja Cafe.pi"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Handel kryptowalutami",
+    "DAILY_CHAT": "Codzienne pogawędki",
+    "DIRECT": "Bezpośrednia transakcja",
+    "EPL": "Premier League",
+    "ESPORTS": "eSport",
+    "F1": "Formuła 1",
+    "FOOD_SPOTS": "Miejsca z jedzeniem",
+    "HOBBY_GROUP": "Hobby",
+    "INFO_SHARE": "Wymiana informacji",
+    "K_LEAGUE": "K League",
+    "MLB": "Major League",
+    "MY_TOWN": "Moje miasto",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA Tour",
+    "SECONDHAND": "Używane rzeczy",
+    "TENNIS_GRAND_SLAM": "Tenis",
+    "TRAVEL": "Podróże",
+    "UCL": "Liga Mistrzów",
+    "UFC_MMA": "Sporty walki",
+    "WEATHER": "Pogoda",
+    "WORLD_CUP": "Mistrzostwa Świata"
   },
   "themeToggle": {
     "dark": "Ciemny",

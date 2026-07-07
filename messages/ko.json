@@ -1333,7 +1333,13 @@
       "followCta": "+ 이 테마 팔로우 (이벤트방 알림)",
       "followingOn": "✓ 팔로우 중 — 이벤트방 알림 ON",
       "followed": "테마를 팔로우했습니다 — 신규 이벤트방 알림을 받습니다",
-      "followFail": "팔로우 변경에 실패했습니다"
+      "followFail": "팔로우 변경에 실패했습니다",
+      "searchPlaceholder": "카페 이름·소개 검색",
+      "eventFee": "이벤트 {fee} Bean",
+      "eventFree": "이벤트 무료",
+      "roomMeta": "{theme} · 멤버 {count}명 · 주간 메시지 {msgs}건",
+      "weeklyBean": "주간 Bean π{amt}",
+      "scrollMore": "스크롤하여 더 보기…"
     },
     "creator": {
       "openBtn": "+ 카페 만들기",
@@ -1581,6 +1587,20 @@
       "premiumLocked": "PREMIUM 테마는 단건 구매 또는 구독 후 이용할 수 있습니다",
       "themeSuffix": "{emoji} {theme} 테마",
       "loading": "테마 불러오는 중..."
+    },
+    "badgePopup": {
+      "upgraded": "{emoji} {theme} 배지가 강화되었습니다!",
+      "beanShort": "Bean이 부족합니다. 충전 페이지로 이동합니다.",
+      "alreadyUpgraded": "이미 강화된 배지입니다",
+      "upgradeFail": "배지 강화에 실패했습니다",
+      "networkError": "네트워크 오류가 발생했습니다",
+      "acquiredTitle": "{theme} 배지 획득!",
+      "acquiredDesc": "{theme} 테마 방에서 30일 활동을 달성했습니다",
+      "upgradeBenefit": "✨ 배지를 강화하면 특별 디자인이 적용되고 카페 이름 옆에 상시 표시됩니다",
+      "processing": "처리 중…",
+      "upgradeBtn": "☕ {fee} 배지 강화",
+      "later": "나중에 하기",
+      "upgradeTitle": "{theme} 강화 배지"
     }
   },
   "comment": {
@@ -2670,5 +2690,28 @@
     "targetValue": "파이오니어",
     "benefitLabel": "혜택",
     "benefitValue": "카페 무료 생성 · 무료 참여 · 무료 자동번역"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Pi투자",
+    "DAILY_CHAT": "일상수다",
+    "DIRECT": "직거래",
+    "EPL": "프리미어리그",
+    "ESPORTS": "e스포츠",
+    "F1": "포뮬러1",
+    "FOOD_SPOTS": "맛집",
+    "HOBBY_GROUP": "취미",
+    "INFO_SHARE": "정보공유",
+    "K_LEAGUE": "K리그",
+    "MLB": "메이저리그",
+    "MY_TOWN": "우리동네",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA투어",
+    "SECONDHAND": "중고나눔",
+    "TENNIS_GRAND_SLAM": "테니스",
+    "TRAVEL": "여행",
+    "UCL": "챔피언스리그",
+    "UFC_MMA": "격투기",
+    "WEATHER": "날씨",
+    "WORLD_CUP": "월드컵"
   }
 }

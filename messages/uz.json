@@ -1409,6 +1409,20 @@
       "piBrowserOnly": "Faqat Pi Browserda nishonni kuchaytirish mumkin",
       "upgraded": "{emoji} {theme} nishoni kuchaytirildi!"
     },
+    "badgePopup": {
+      "acquiredDesc": "{theme} mavzusidagi xonada 30 kunlik faoliyatga erishdingiz.",
+      "acquiredTitle": "{theme} nishoni qo'lga kiritildi!",
+      "alreadyUpgraded": "Bu nishon allaqachon kuchaytirilgan.",
+      "beanShort": "Bean yetarli emas. To'ldirish sahifasiga o'ting.",
+      "later": "Keyinroq",
+      "networkError": "Tarmoq xatosi yuz berdi.",
+      "processing": "Qayta ishlanmoqda...",
+      "upgradeBenefit": "✨ Nishonni kuchaytirsangiz, maxsus dizayn qo'llaniladi va kafe nomi yonida doimiy ravishda ko'rsatiladi.",
+      "upgradeBtn": "☕ {fee} nishonni kuchaytirish",
+      "upgraded": "{emoji} {theme} nishoni kuchaytirildi!",
+      "upgradeFail": "Nishonni kuchaytirish amalga oshmadi.",
+      "upgradeTitle": "{theme} kuchaytirilgan nishon"
+    },
     "bean": {
       "amountSelect": "Bean miqdorini tanlash",
       "completeFail": "Bean to'lovini yakunlash jarayoni muvaffaqiyatsiz tugadi",
@@ -1587,11 +1601,17 @@
     },
     "market": {
       "empty": "Bu mavzuda hali ommaviy kafelar yo'q",
+      "eventFee": "Tadbir {fee} Bean",
+      "eventFree": "Tadbir bepul",
       "followCta": "+ Bu mavzuni kuzatish (tadbir xonasi bildirishnomalari)",
       "followed": "Mavzuni kuzatdingiz — yangi tadbir xonasi bildirishnomalarini olasiz",
       "followFail": "Kuzatish holatini o'zgartirish muvaffaqiyatsiz tugadi",
       "followingOn": "✓ Kuzatilmoqda — Tadbir xonasi bildirishnomalari YOQIQ",
-      "title": "Marketpleys — Mashhur kafelar"
+      "roomMeta": "{theme} · a'zolar {count} ta · haftalik xabarlar {msgs} ta",
+      "scrollMore": "Ko'proq ko'rish uchun aylantiring...",
+      "searchPlaceholder": "Kafe nomi·tavsifi bo'yicha qidirish",
+      "title": "Marketpleys — Mashhur kafelar",
+      "weeklyBean": "Haftalik Bean π{amt}"
     },
     "msgList": {
       "am": "AM",
@@ -2640,6 +2660,29 @@
     "subscribeSuccess": "{product} obunasi boshlandi!",
     "tagline": "Obuna = har bir tranzaksiya uchun to'lovdan ozod qilish paketi. Qancha ko'p ishlatsangiz, shuncha foyda!",
     "title": "Cafe.pi obunasi"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Pi investitsiyasi",
+    "DAILY_CHAT": "Kundalik suhbat",
+    "DIRECT": "To'g'ridan-to'g'ri savdo",
+    "EPL": "Premer-liga",
+    "ESPORTS": "eSport",
+    "F1": "Formula 1",
+    "FOOD_SPOTS": "Mazali joylar",
+    "HOBBY_GROUP": "Hobbi",
+    "INFO_SHARE": "Ma'lumot almashish",
+    "K_LEAGUE": "K-Liga",
+    "MLB": "Major Liga",
+    "MY_TOWN": "Bizning mahalla",
+    "NBA": "NBA",
+    "PGA_GOLF": "PGA Turi",
+    "SECONDHAND": "Ikkinchi qo'l buyumlar",
+    "TENNIS_GRAND_SLAM": "Tennis",
+    "TRAVEL": "Sayohat",
+    "UCL": "Chempionlar Ligasi",
+    "UFC_MMA": "Jang san'atlari",
+    "WEATHER": "Ob-havo",
+    "WORLD_CUP": "Jahon Kubogi"
   },
   "themeToggle": {
     "dark": "Qorongʻu",

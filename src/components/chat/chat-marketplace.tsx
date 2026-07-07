@@ -1,6 +1,7 @@
 'use client'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslations } from 'next-intl'
+import { useThemeName } from './use-theme-name'
 import { Link } from '@/i18n/navigation'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
@@ -47,6 +48,7 @@ const RANK_BADGES = ['🥇', '🥈', '🥉'] as const
 
 export function ChatMarketplace() {
   const t = useTranslations('chat.market')
+  const themeName = useThemeName()
   const [rooms, setRooms] = useState<MarketRoom[]>([])
   const [themes, setThemes] = useState<MarketTheme[]>([])
   const [followed, setFollowed] = useState<Set<string>>(new Set())
@@ -177,7 +179,7 @@ export function ChatMarketplace() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           maxLength={50}
-          placeholder="카페 이름·소개 검색"
+          placeholder={t('searchPlaceholder')}
           className="bg-background focus:border-primary w-full rounded-xl border py-2 pr-9 pl-9 text-sm outline-none"
         />
         {search && (
@@ -214,7 +216,7 @@ export function ChatMarketplace() {
                 : 'hover:bg-muted'
             }`}
           >
-            {t.theme_emoji} {t.theme_nm}
+            {t.theme_emoji} {themeName(t.theme_cd, t.theme_nm)}
           </button>
         ))}
       </div>
@@ -277,16 +279,19 @@ export function ChatMarketplace() {
                     {room.room_tp_cd === 'E' && (
                       <span className="ml-1.5 rounded-full bg-violet-100 px-1.5 py-0.5 text-[10px] font-medium text-violet-700 dark:bg-violet-900/30 dark:text-violet-400">
                         {room.entry_fee_pi > 0
-                          ? `이벤트 ${eventEntryFeeBean(room.entry_fee_pi)} Bean`
-                          : '이벤트 무료'}
+                          ? t('eventFee', { fee: eventEntryFeeBean(room.entry_fee_pi) })
+                          : t('eventFree')}
                       </span>
                     )}
                   </p>
                   <p className="text-muted-foreground text-xs">
-                    {room.theme_nm} · 멤버 {room.mbr_cnt}명 · 주간 메시지{' '}
-                    {room.msg_cnt_7d}건
+                    {t('roomMeta', {
+                      theme: themeName(room.theme_cd, room.theme_nm),
+                      count: room.mbr_cnt,
+                      msgs: room.msg_cnt_7d,
+                    })}
                     {Number(room.tip_amt_7d) > 0 && (
-                      <span> · 주간 Bean π{room.tip_amt_7d}</span>
+                      <span> · {t('weeklyBean', { amt: room.tip_amt_7d })}</span>
                     )}
                   </p>
                 </div>
@@ -297,7 +302,7 @@ export function ChatMarketplace() {
           {hasMore && (
             <div ref={sentinelRef} className="flex justify-center py-3">
               <span className="text-muted-foreground animate-pulse text-xs">
-                스크롤하여 더 보기…
+                {t('scrollMore')}
               </span>
             </div>
           )}
