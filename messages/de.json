@@ -302,12 +302,22 @@
         "date": "Datum",
         "memo": "Memo",
         "paymentId": "Zahlungs-ID",
+        "refund": "Rückerstattung",
         "status": "Status",
         "theme": "Thema",
         "txnDiv": "Transaktionstyp",
         "user": "Benutzer"
       },
       "noPayments": "Keine Zahlungen vorhanden.",
+      "refund": {
+        "btn": "Rückerstatten",
+        "confirm": "Der volle Betrag von {amount} π wird per A2U an {user} zurückerstattet. Fortfahren?",
+        "done": "Rückerstattet",
+        "fail": "Rückerstattung fehlgeschlagen: {error}",
+        "processing": "Wird verarbeitet…",
+        "retry": "Rückerstattung erneut versuchen",
+        "success": "Rückerstattung abgeschlossen (txid: {txid})"
+      },
       "searchPiUsername": "Pi Benutzername suchen (Teilweise Übereinstimmung)",
       "searchResultCount": "Suchergebnisse {count}",
       "status": {
@@ -936,77 +946,77 @@
       "topics": [
         {
           "icon": "⭐",
-          "title": "Warum Cafe.pi?",
           "steps": [
             "Globaler 'Karottenmarkt': Automatische Übersetzung in über 200 Sprachen · Pi-Schnellzahlung · Chat·Gebrauchtwaren·Geschäfte in einer App · Verbindung nach Entfernung",
             "'Sirenenbestellung' für jede Branche: Jeder kann ein Chef sein · Menüfreiheit · Sofortige Benachrichtigungen · O2O Abholung"
-          ]
+          ],
+          "title": "Warum Cafe.pi?"
         },
         {
           "icon": "🎁",
-          "title": "Event — Jetzt teilnehmen",
           "steps": [
             "EVENT #1: Laden Sie mit TestPi auf und schließen Sie 10 Missionen ab, um als einer der ersten 100 Personen 5.000 Bean zu erhalten.",
             "EVENT #2: Registrieren Sie Ihr Geschäft und schließen Sie die Menüregistrierung + Transaktionstest ab, um als eines der ersten 100 Geschäfte 10.000 Bean zu erhalten.",
             "Sie können die Missionen einfach abschließen, indem Sie den Teilnahme-Links im Event-Tab folgen."
-          ]
+          ],
+          "title": "Event — Jetzt teilnehmen"
         },
         {
           "icon": "🔑",
-          "title": "Login & Kontoverbindung",
           "steps": [
             "Drücken Sie im Pi Browser auf 'Verbindungscode generieren', um einen 6-stelligen Code zu erhalten (innerhalb von 10 Minuten verwenden).",
             "Kopieren Sie den Code (oder Link) und übertragen Sie ihn in einen normalen Browser.",
             "Melden Sie sich im normalen Browser bei Google an, fügen Sie den Code ein und drücken Sie auf 'Verbinden', um die Pi + Google-Verbindung abzuschließen.",
             "Der Pi Browser speichert aus Sicherheitsgründen keine Informationen und verbindet die beiden Browser sicher mit einem 6-stelligen Code."
-          ]
+          ],
+          "title": "Login & Kontoverbindung"
         },
         {
           "icon": "💬",
-          "title": "Café & Automatische Übersetzung (PiRC1)",
           "steps": [
             "Treten Sie einem Café-Raum zu einem Thema bei, das Sie interessiert, und beginnen Sie kostenlos zu chatten.",
             "Wenn Sie 'Cafés in der Nähe' aktivieren, werden Ihnen Cafés und Nachbarn in Ihrer Umgebung nach Entfernung angezeigt.",
             "Mit automatischer Simultanübersetzung können Sie mit jedem in über 200 Sprachen in Ihrer eigenen Sprache kommunizieren."
-          ]
+          ],
+          "title": "Café & Automatische Übersetzung (PiRC1)"
         },
         {
           "icon": "🎫",
-          "title": "Pi Abonnement (PiRC2)",
           "steps": [
             "Abonnieren Sie nur die Funktionen, die Sie benötigen, mit Pi — Sie können sofort mit einem kostenlosen Plan beginnen.",
             "Abonnieren Sie nur das, was Sie brauchen: PyCafé™ (Premium Café) · PyShop™ (Produktregistrierung) · PyTranslate™ (Unbegrenzte Übersetzung)",
             "Die Abonnementgebühr wird mit Pi bezahlt (PiRC2 wiederkehrende Zahlung), und bei jährlicher Zahlung erhalten Sie 2 Monate kostenlos."
-          ]
+          ],
+          "title": "Pi Abonnement (PiRC2)"
         },
         {
           "icon": "📦",
-          "title": "P2P Gebrauchtwarenhandel (PiRC3, Escrow-Sicherheitstransaktion)",
           "steps": [
             "Laden Sie Produktfotos und Preise (Pi) hoch, und sie werden Personen in Ihrer Nähe zusammen mit Ihrem Standort angezeigt.",
             "Sehen Sie sich Artikel in Ihrer Nähe nach Entfernung an und bestellen Sie mit Pi, wenn sie Ihnen gefallen.",
             "Die bezahlten Pi werden von der Plattform vorübergehend sicher verwahrt (Escrow) und nach Abschluss der Transaktion an den Verkäufer übermittelt."
-          ]
+          ],
+          "title": "P2P Gebrauchtwarenhandel (PiRC3, Escrow-Sicherheitstransaktion)"
         },
         {
           "icon": "🏪",
-          "title": "O2O Geschäftsregistrierung, Produktregistrierung (PiRC3, Escrow-Sicherheitstransaktion)",
           "steps": [
             "Wenn Sie unter 'Geschäftsregistrierung' den Namen und den Standort Ihres Geschäfts festlegen, finden Kunden Ihr Geschäft in der Nähe.",
             "Registrieren Sie Menüfotos · Preise · Mengen.",
             "Wenn ein Kunde bestellt, erhalten Sie sofort eine Benachrichtigung über Telegram (Menü · Menge · Betrag).",
             "Geben Sie die Bestellung im Geschäft in der Reihenfolge 'In Vorbereitung' → 'Bereit' → 'Abholung' aus."
-          ]
+          ],
+          "title": "O2O Geschäftsregistrierung, Produktregistrierung (PiRC3, Escrow-Sicherheitstransaktion)"
         },
         {
           "icon": "🪙",
-          "title": "Testnet-Belohnungen, unverändert im Mainnet (Versprechen)",
           "steps": [
             "Die Bean, die Sie jetzt durch das Testnet-Event erhalten haben, sind ein Versprechen von Cafe.pi.",
             "Wenn die Plattform offiziell im Mainnet startet,",
             "werden die im Testnet gesammelten Event Bean im Verhältnis 1:1 als Mainnet Bean ausgezahlt.",
             "Dies ist das Prinzip von Cafe.pi, um sicherzustellen, dass die Bemühungen der frühen Teilnehmer nicht verloren gehen."
-          ]
+          ],
+          "title": "Testnet-Belohnungen, unverändert im Mainnet (Versprechen)"
         }
       ]
     },

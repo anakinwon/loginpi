@@ -302,12 +302,22 @@
         "date": "Date",
         "memo": "Mémo",
         "paymentId": "ID de paiement",
+        "refund": "Remboursement",
         "status": "Statut",
         "theme": "Thème",
         "txnDiv": "Type de transaction",
         "user": "Utilisateur"
       },
       "noPayments": "Aucun historique de paiement.",
+      "refund": {
+        "btn": "Rembourser",
+        "confirm": "Rembourser la totalité de {amount} π à {user} via A2U. Continuer ?",
+        "done": "Remboursé",
+        "fail": "Échec du remboursement : {error}",
+        "processing": "Traitement en cours…",
+        "retry": "Réessayer le remboursement",
+        "success": "Remboursement effectué (txid: {txid})"
+      },
       "searchPiUsername": "Rechercher un nom d'utilisateur Pi (correspondance partielle)",
       "searchResultCount": "{count} résultats de recherche",
       "status": {
@@ -936,77 +946,77 @@
       "topics": [
         {
           "icon": "⭐",
-          "title": "Pourquoi Cafe.pi ?",
           "steps": [
             "Le 'marché local' mondial : Traduction automatique de plus de 200 langues · Paiement facile avec Pi · CHAT, seconde main et magasins dans une seule APP · Connexion par distance",
             "Le 'Siren Order' toutes industries : Tout le monde peut être un propriétaire · Liberté de MENU · Notifications instantanées · PICKUP O2O"
-          ]
+          ],
+          "title": "Pourquoi Cafe.pi ?"
         },
         {
           "icon": "🎁",
-          "title": "EVENT — Participez maintenant",
           "steps": [
             "EVENT #1 : Rechargez avec TestPi et complétez 10 MISSIONS pour que les 100 premiers reçoivent 5 000 Bean",
             "EVENT #2 : Enregistrez votre magasin et, une fois que vous avez enregistré votre MENU + effectué un TEST de transaction, les 100 premiers établissements recevront 10 000 Bean",
             "Dans l'onglet EVENT, suivez les liens de participation pour chaque MISSION afin de les compléter facilement"
-          ]
+          ],
+          "title": "EVENT — Participez maintenant"
         },
         {
           "icon": "🔑",
-          "title": "LOGIN & Connexion de compte",
           "steps": [
             "Dans le Pi Browser, appuyez sur 'Générer un code de liaison' pour obtenir un code à 6 chiffres (à utiliser dans les 10 minutes)",
             "Copiez le code (ou le lien) et transférez-le vers un navigateur normal",
             "Dans le navigateur normal, après vous être connecté à Google, collez-le et appuyez sur 'Lier' pour finaliser la connexion Pi + Google",
             "Le Pi Browser ne stocke pas d'informations pour des raisons de sécurité, le code à 6 chiffres connecte les deux navigateurs en toute sécurité"
-          ]
+          ],
+          "title": "LOGIN & Connexion de compte"
         },
         {
           "icon": "💬",
-          "title": "CAFE & Traduction automatique (PiRC1)",
           "steps": [
             "Entrez dans une salle de CAFE sur un sujet d'intérêt et commencez à CHATTER gratuitement",
             "Activez 'CAFEs à proximité' pour voir les CAFEs et voisins autour de vous par distance",
             "Avec la traduction simultanée automatique, vous pouvez converser avec n'importe qui dans plus de 200 langues, dans votre propre langue"
-          ]
+          ],
+          "title": "CAFE & Traduction automatique (PiRC1)"
         },
         {
           "icon": "🎫",
-          "title": "Abonnement Pi (PiRC2)",
           "steps": [
             "Choisissez uniquement les fonctionnalités dont vous avez besoin et abonnez-vous avec Pi — vous pouvez commencer immédiatement avec le PLAN gratuit",
             "Abonnez-vous uniquement à ce dont vous avez besoin : PyCafé™ (PREMIUM CAFE) · PyShop™ (Enregistrement de produit) · PyTranslate™ (Traduction illimitée)",
             "Les frais d'abonnement sont payés avec Pi (paiement récurrent PiRC2), et le paiement annuel offre 2 mois gratuits"
-          ]
+          ],
+          "title": "Abonnement Pi (PiRC2)"
         },
         {
           "icon": "📦",
-          "title": "Transactions P2P de seconde main (PiRC3, ESCROW - transaction sécurisée)",
           "steps": [
             "Lorsque vous téléchargez des photos de produits et le prix (Pi), ils sont visibles par les personnes proches de votre emplacement",
             "Visualisez les articles disponibles autour de vous par distance et si vous aimez quelque chose, commandez-le avec Pi",
             "Le Pi payé est temporairement conservé en toute sécurité par la plateforme (ESCROW), puis transféré au vendeur une fois la transaction terminée"
-          ]
+          ],
+          "title": "Transactions P2P de seconde main (PiRC3, ESCROW - transaction sécurisée)"
         },
         {
           "icon": "🏪",
-          "title": "O2O Enregistrement de magasin, Enregistrement de produit (PiRC3, ESCROW - transaction sécurisée)",
           "steps": [
             "Dans 'Enregistrement de magasin', définissez le nom et l'emplacement de votre magasin, et les clients viendront à votre magasin le plus proche",
             "Enregistrez les photos, les prix et les quantités de votre MENU",
             "Lorsqu'un client commande, vous recevez une notification immédiate via Telegram (MENU · Quantité · Montant)",
             "Remettez la commande au magasin dans l'ordre : En préparation → Prêt → PICKUP"
-          ]
+          ],
+          "title": "O2O Enregistrement de magasin, Enregistrement de produit (PiRC3, ESCROW - transaction sécurisée)"
         },
         {
           "icon": "🪙",
-          "title": "Récompenses TESTNET, telles quelles sur le MAINNET (Promesse)",
           "steps": [
             "Les Bean reçus lors de l'EVENT TESTNET actuel sont une promesse de Cafe.pi",
             "Lorsque la plateforme sera officiellement lancée sur le MAINNET,",
             "les Bean d'EVENT accumulés sur le TESTNET seront versés tels quels, en 1:1, en Bean du MAINNET",
             "C'est le principe de Cafe.pi de garantir que les efforts des premiers participants ne soient pas perdus"
-          ]
+          ],
+          "title": "Récompenses TESTNET, telles quelles sur le MAINNET (Promesse)"
         }
       ]
     },
@@ -1461,7 +1471,7 @@
       "createMemo": "Création du café : {roomNm}",
       "createWithBenefit": "Créer une salle avec l'avantage de l'abonnement",
       "creating": "Création en cours…",
-      "defaultRoomName": "{emoji} Réunion {thème}",
+      "defaultRoomName": "{emoji} Réunion {theme}",
       "descLabel": "Description du café (facultatif)",
       "descPlaceholder": "Décrivez votre café",
       "endTimeHint": "L'adhésion des participants (GUEST) expirera automatiquement après l'heure de fin",

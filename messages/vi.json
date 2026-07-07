@@ -302,12 +302,22 @@
         "date": "Ngày",
         "memo": "Ghi chú",
         "paymentId": "ID thanh toán",
+        "refund": "Hoàn tiền",
         "status": "Trạng thái",
         "theme": "Theme",
         "txnDiv": "Loại giao dịch",
         "user": "Người dùng"
       },
       "noPayments": "Không có lịch sử thanh toán.",
+      "refund": {
+        "btn": "Hoàn tiền",
+        "confirm": "Hoàn lại toàn bộ {amount} π cho {user} qua A2U. Tiếp tục?",
+        "done": "Đã hoàn tiền",
+        "fail": "Hoàn tiền thất bại: {error}",
+        "processing": "Đang xử lý…",
+        "retry": "Thử hoàn tiền lại",
+        "success": "Hoàn tiền hoàn tất (txid: {txid})"
+      },
       "searchPiUsername": "Tìm kiếm tên người dùng Pi (khớp một phần)",
       "searchResultCount": "{count} kết quả tìm kiếm",
       "status": {
@@ -936,77 +946,77 @@
       "topics": [
         {
           "icon": "⭐",
-          "title": "Tại sao lại là Cafe.pi?",
           "steps": [
             "Ứng dụng chợ đồ cũ toàn cầu: phiên dịch tự động 200+ ngôn ngữ · thanh toán dễ dàng bằng Pi · trò chuyện, đồ cũ, cửa hàng trong một ứng dụng · kết nối theo khoảng cách",
             "Siren Order không giới hạn ngành nghề: ai cũng có thể làm chủ · menu tự do · thông báo tức thì · O2O nhận hàng"
-          ]
+          ],
+          "title": "Tại sao lại là Cafe.pi?"
         },
         {
           "icon": "🎁",
-          "title": "EVENT — Tham gia ngay bây giờ",
           "steps": [
             "EVENT #1: Nạp Test Pi và hoàn thành 10 nhiệm vụ, 100 người đầu tiên sẽ nhận 5,000 Bean",
             "EVENT #2: Đăng ký cửa hàng của bạn và hoàn tất đăng ký menu + kiểm tra giao dịch, 100 địa điểm đầu tiên sẽ nhận 10,000 Bean",
             "Trong tab EVENT, bạn có thể dễ dàng hoàn thành bằng cách theo dõi các liên kết tham gia theo nhiệm vụ"
-          ]
+          ],
+          "title": "EVENT — Tham gia ngay bây giờ"
         },
         {
           "icon": "🔑",
-          "title": "Login & Kết nối tài khoản",
           "steps": [
             "Trong Pi Browser, khi bạn nhấn 'Tạo mã liên kết', một mã 6 chữ số sẽ xuất hiện (sử dụng trong 10 phút)",
             "Sao chép mã (hoặc liên kết) và chuyển sang trình duyệt thông thường",
             "Trong trình duyệt thông thường, sau khi Login Google, dán và nhấn 'Liên kết' để hoàn tất kết nối Pi + Google",
             "Pi Browser không lưu trữ thông tin vì lý do bảo mật, mã 6 chữ số sẽ kết nối an toàn hai trình duyệt"
-          ]
+          ],
+          "title": "Login & Kết nối tài khoản"
         },
         {
           "icon": "💬",
-          "title": "Cafe & Phiên dịch tự động (PiRC1)",
           "steps": [
             "Vào phòng Cafe theo chủ đề quan tâm và bắt đầu trò chuyện miễn phí",
             "Khi bật 'Cafe gần đây', sẽ hiển thị các Cafe và hàng xóm xung quanh theo khoảng cách",
             "Với phiên dịch đồng thời tự động, bạn có thể nói chuyện với bất kỳ ai từ 200+ ngôn ngữ bằng ngôn ngữ của bạn"
-          ]
+          ],
+          "title": "Cafe & Phiên dịch tự động (PiRC1)"
         },
         {
           "icon": "🎫",
-          "title": "Đăng ký Pi (PiRC2)",
           "steps": [
             "Chọn chỉ các tính năng cần thiết và đăng ký bằng Pi — bạn có thể bắt đầu ngay với gói miễn phí",
             "Đăng ký chỉ những gì bạn cần: PyCafé™ (Cafe Premium) · PyShop™ (Đăng ký sản phẩm) · PyTranslate™ (Dịch không giới hạn)",
             "Phí đăng ký được thanh toán bằng Pi (PiRC2 thanh toán định kỳ), thanh toán hàng năm được miễn phí 2 tháng"
-          ]
+          ],
+          "title": "Đăng ký Pi (PiRC2)"
         },
         {
           "icon": "📦",
-          "title": "Giao dịch đồ cũ P2P (PiRC3, Escrow - giao dịch an toàn)",
           "steps": [
             "Khi bạn đăng ảnh sản phẩm và giá (Pi), sẽ hiển thị cho những người gần bạn cùng với vị trí của bạn",
             "Xem các mặt hàng có sẵn xung quanh theo khoảng cách và nếu thích, hãy đặt hàng bằng Pi",
             "Pi đã thanh toán sẽ được nền tảng giữ an toàn tạm thời (Escrow) và chuyển cho người bán khi giao dịch hoàn tất"
-          ]
+          ],
+          "title": "Giao dịch đồ cũ P2P (PiRC3, Escrow - giao dịch an toàn)"
         },
         {
           "icon": "🏪",
-          "title": "O2O Đăng ký cửa hàng của bạn, Đăng ký sản phẩm (PiRC3, Escrow - giao dịch an toàn)",
           "steps": [
             "Trong 'Đăng ký cửa hàng', khi bạn đặt tên và vị trí cửa hàng, khách hàng sẽ tìm đến cửa hàng gần đó",
             "Đăng ký ảnh menu · giá · số lượng",
             "Khi khách hàng đặt hàng, thông báo sẽ đến ngay lập tức qua Telegram (menu · số lượng · tổng tiền)",
             "Theo thứ tự Đang chuẩn bị → Đã chuẩn bị xong → Nhận hàng, hãy giao tại cửa hàng"
-          ]
+          ],
+          "title": "O2O Đăng ký cửa hàng của bạn, Đăng ký sản phẩm (PiRC3, Escrow - giao dịch an toàn)"
         },
         {
           "icon": "🪙",
-          "title": "Phần thưởng Testnet, giữ nguyên trên Mainnet (Lời hứa)",
           "steps": [
             "Bean nhận được từ EVENT Testnet hiện tại là lời hứa của cafe.pi",
             "Khi nền tảng chính thức ra mắt trên Mainnet,",
             "Bean EVENT đã tích lũy trên Testnet sẽ được trả 1:1 tương ứng thành Bean Mainnet",
             "Đây là nguyên tắc của cafe.pi để đảm bảo nỗ lực của những người tham gia ban đầu không bị mất đi"
-          ]
+          ],
+          "title": "Phần thưởng Testnet, giữ nguyên trên Mainnet (Lời hứa)"
         }
       ]
     },

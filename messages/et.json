@@ -302,12 +302,22 @@
         "date": "Kuupäev",
         "memo": "Memo",
         "paymentId": "Makse ID",
+        "refund": "Tagasimakse",
         "status": "Olek",
         "theme": "Teema",
         "txnDiv": "Tehingu tüüp",
         "user": "Kasutaja"
       },
       "noPayments": "Maksete ajalugu pole.",
+      "refund": {
+        "btn": "Tagasta",
+        "confirm": "Kogu summa {amount} π tagastatakse kasutajale {user} A2U kaudu. Kas jätkata?",
+        "done": "Tagastatud",
+        "fail": "Tagasimakse ebaõnnestus: {error}",
+        "processing": "Töötlemine…",
+        "retry": "Proovi tagasimakset uuesti",
+        "success": "Tagasimakse tehtud (txid: {txid})"
+      },
       "searchPiUsername": "Otsi Pi kasutajanime (osaline vaste)",
       "searchResultCount": "Otsingutulemusi {count}",
       "status": {
@@ -936,77 +946,77 @@
       "topics": [
         {
           "icon": "⭐",
-          "title": "Miks Cafe.pi?",
           "steps": [
             "Globaalne 'Danggeun': 200+ keele automaatne tõlge · Pi lihtne makse · vestlus, kasutatud kaubad ja poed ühes rakenduses · ühendus kauguse järgi",
             "Tegevusala mittepiirav 'Siren Order': igaüks saab olla omanik · vaba menüü · kohesed teavitused · O2O järeletulemine"
-          ]
+          ],
+          "title": "Miks Cafe.pi?"
         },
         {
           "icon": "🎁",
-          "title": "Sündmused — osalege kohe",
           "steps": [
             "EVENT #1: Laadige TestPi-ga ja täitke 10 missiooni, et saada esimese 100 inimese seas 5,000 Bean",
             "EVENT #2: Registreerige oma pood ja lõpetage menüü registreerimine + tehingu test, et saada esimese 100 koha seas 10,000 Bean",
             "Sündmuste vahekaardil missioonipõhiseid osalemislinke järgides saate need hõlpsasti täita"
-          ]
+          ],
+          "title": "Sündmused — osalege kohe"
         },
         {
           "icon": "🔑",
-          "title": "Logi sisse ja konto ühendamine",
           "steps": [
             "Pi Browseris vajutades 'Loo ühenduskood' ilmub 6-kohaline kood (kasutada 10 minuti jooksul)",
             "Kopeerige kood (või link) ja teisaldage see tavalisse brauserisse",
             "Tavalises brauseris pärast Google'i sisselogimist kleepige see ja vajutage 'Ühenda', et Pi + Google ühendus oleks valmis",
             "Pi Browser ei salvesta turvalisuse huvides teavet, nii et 6-kohaline kood ühendab kaks brauserit turvaliselt"
-          ]
+          ],
+          "title": "Logi sisse ja konto ühendamine"
         },
         {
           "icon": "💬",
-          "title": "Cafe & automaatne tõlge (PiRC1)",
           "steps": [
             "Sisenege huvipakkuva teema Cafe tuppa ja alustage tasuta vestlust",
             "Kui lülitate sisse 'Lähedal asuvad Cafed', näitab see lähedal asuvaid Cafesid ja naabreid kauguse järgi",
             "Automaatse sünkroontõlkega saate vestelda kellegagi 200+ keeles oma keeles"
-          ]
+          ],
+          "title": "Cafe & automaatne tõlge (PiRC1)"
         },
         {
           "icon": "🎫",
-          "title": "Pi tellimus (PiRC2)",
           "steps": [
             "Valige ainult vajalikud funktsioonid ja tellige Pi-ga — saate kohe alustada tasuta plaaniga",
             "Tellige ainult vajalikud: PyCafé™ (Premium Cafe) · PyShop™ (toote registreerimine) · PyTranslate™ (piiramatu tõlge)",
             "Tellimistasu makstakse Pi-ga (PiRC2 korduvmakse), aastane makse on 2 kuud tasuta"
-          ]
+          ],
+          "title": "Pi tellimus (PiRC2)"
         },
         {
           "icon": "📦",
-          "title": "P2P kasutatud kaupade tehingud (PiRC3, Escrow-turvaline tehing)",
           "steps": [
             "Kui laadite üles toote pildid ja hinna (Pi), näidatakse seda koos teie asukohaga lähedal asuvatele inimestele",
             "Vaadake lähedal olevaid esemeid kauguse järgi ja kui meeldib, tellige Pi-ga",
             "Makstud Pi hoitakse platvormi poolt ajutiselt turvaliselt (Escrow) ja antakse müüjale üle pärast tehingu lõppemist"
-          ]
+          ],
+          "title": "P2P kasutatud kaupade tehingud (PiRC3, Escrow-turvaline tehing)"
         },
         {
           "icon": "🏪",
-          "title": "O2O minu poe registreerimine, toote registreerimine (PiRC3, Escrow-turvaline tehing)",
           "steps": [
             "Jaotises 'Poe registreerimine' kui määrate poe nime ja asukoha, tulevad kliendid lähedal asuvasse poodi",
             "Registreerige menüü pildid · hind · kogus",
             "Kui klient tellib, saate kohe teavituse Telegrami kaudu (menüü · kogus · summa)",
             "Andke poest üle järjekorras: Valmistamisel → Valmis → Järeletulemine"
-          ]
+          ],
+          "title": "O2O minu poe registreerimine, toote registreerimine (PiRC3, Escrow-turvaline tehing)"
         },
         {
           "icon": "🪙",
-          "title": "Testneti preemiad, samamoodi Mainnetis (lubadus)",
           "steps": [
             "Beanid, mis on saadud praeguse Testneti sündmuse kaudu, on cafe.pi lubadus",
             "Kui platvorm ametlikult Mainnetis käivitatakse,",
             "Testnetis teenitud sündmuse Beanid makstakse samamoodi 1:1 Mainneti Beanidena",
             "See on cafe.pi põhimõte, mis tagab, et varajaste osalejate pingutused ei lähe kaotsi"
-          ]
+          ],
+          "title": "Testneti preemiad, samamoodi Mainnetis (lubadus)"
         }
       ]
     },

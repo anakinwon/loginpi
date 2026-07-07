@@ -141,6 +141,33 @@
       "totalUsers": "ټول کاروونکي",
       "totalUsersDesc": "د ټولو راجستر شویو حسابونو شمیر"
     },
+    "i18n": {
+      "col": {
+        "language": "ژبه",
+        "progress": "پرمختګ",
+        "translatedKeys": "ژباړل شوې کیلي"
+      },
+      "desc": "د ژباړې حالت ډشبورډ",
+      "footnote1": "* \"ژباړه + همغږي کول\": د Claude AI په مرسته ناژباړل شوې کیلي په اوتومات ډول ژباړي او بیا messages/*.json تازه کوي",
+      "footnote2": "* \"DB→JSON همغږي کول\": یوازې په DB کې زیرمه شوي د ژباړې معلومات JSON فایلونو ته انتقالوي",
+      "stats": {
+        "completed": "100% بشپړ شوي",
+        "completedOf": "د {count} ژبو څخه",
+        "supportedLocales": "ملاتړ شوې ژبې",
+        "totalKeys": "ټولې د ژباړې کیلي"
+      },
+      "syncAll": "DB→JSON همغږي کول",
+      "syncFail": "همغږي کول ناکام شول",
+      "syncing": "همغږي کیږي…",
+      "syncingLocale": "همغږي کیږي…",
+      "syncNoData": "په DB کې د همغږي کولو لپاره معلومات نشته. لومړی \"ژباړه + همغږي کول\" چل کړئ.",
+      "syncSuccess": "{count} ژبې همغږي شوې",
+      "title": "د ژبو مدیریت",
+      "translate": "ژباړه + همغږي کول",
+      "translateFail": "ژباړه ناکامه شوه",
+      "translateSuccess": "{count} ژباړې بشپړې شوې",
+      "translating": "ژباړل کیږي…"
+    },
     "links": {
       "active": "فعال",
       "col": {
@@ -275,12 +302,22 @@
         "date": "نیټه/وخت",
         "memo": "یادښت",
         "paymentId": "د تادیې ID",
+        "refund": "بیرته ورکړه",
         "status": "حالت",
         "theme": "Theme",
         "txnDiv": "د راکړې ورکړې ډول",
         "user": "کاروونکی"
       },
       "noPayments": "هیڅ تادیات نشته.",
+      "refund": {
+        "btn": "بیرته ورکړه",
+        "confirm": "{user} ته به د A2U له لارې ټوله {amount} π بیرته ورکړل شي. ادامه ورکړو؟",
+        "done": "بیرته ورکړل شوه",
+        "fail": "بیرته ورکړه ناکامه شوه: {error}",
+        "processing": "پروسس کیږي…",
+        "retry": "بیا هڅه وکړئ",
+        "success": "بیرته ورکړه بشپړه شوه (txid: {txid})"
+      },
       "searchPiUsername": "د Pi کاروونکي نوم لټون (2 یا ډیر توري)",
       "searchResultCount": "د لټون پایلې {count} توکي",
       "status": {
@@ -532,6 +569,37 @@
         "title": "د معیاري کلمو مدیریت",
         "totalCount": "ټول {count} توکي",
         "validationRequired": "منطقي نوم او فزیکي نوم اړین دي"
+      }
+    },
+    "store": {
+      "categories": {
+        "deleteConfirm": "ایا غواړئ د \"{name}\" کټګوري حذف کړئ؟",
+        "deleteFail": "حذف ناکام شو",
+        "deleteSuccess": "حذف شو",
+        "disabled": "غیر فعال",
+        "editSuccess": "سم شو",
+        "field": {
+          "desc": "تشریح",
+          "name": "د کټګورۍ نوم",
+          "parent": "پورتنۍ کټګوري",
+          "sortOrd": "د ترتیب لړۍ",
+          "useYn": "د کارونې حالت"
+        },
+        "formTitleEdit": "کټګوري سمول",
+        "formTitleNew": "کټګوري ثبتول",
+        "noData": "هیڅ کټګوري نده ثبت شوې",
+        "placeholder": {
+          "desc": "د کټګورۍ تشریح (اختیاري)",
+          "name": "بېلګه: ډیجیټل/الکترونیک"
+        },
+        "rootOption": "— د اصلي کټګورۍ په توګه ثبت —",
+        "saveFail": "ساتل ناکام شول",
+        "saveSuccess": "ثبت شو",
+        "title": "د محصولاتو کټګورۍ",
+        "totalCount": "ټول {count}",
+        "useN": "غیر فعال",
+        "useY": "فعال",
+        "validationRequired": "د کټګورۍ نوم اړین دی"
       }
     },
     "themes": {
@@ -808,7 +876,11 @@
     "activated": "{locale} فعال شو",
     "activatedDone": "{locale} فعالول بشپړ شو",
     "activateDerived": "{locale} فعالول",
+    "active": "فعال",
+    "activeLangs": "فعالې ژبې",
     "activeToggle": "فعال/غیر فعال",
+    "allCountriesInactive": "ټول هیوادونه (غیر فعال)",
+    "alreadyActive": "لا دمخه فعال",
     "autoAll": "ټول اتوماتیک ژباړه",
     "autoBgStarted": "د {count} ژبو شالید ژباړه پیل شوه — سرور به دوام ورکړي حتی که تاسو پاڼه پریږدئ",
     "autoDone": "ټول اتوماتیک ژباړه بشپړه شوه ({count} ژبې)",
@@ -819,12 +891,14 @@
     "autoStopPolling": "د پرمختګ ښودنه بنده شوه (د شالید ژباړه په سرور کې دوام لري)",
     "clickToDeactivate": "د غیر فعالولو لپاره کلیک وکړئ",
     "countItems": "{count} توکي",
+    "country": "هیواد",
     "deactivated": "{locale} غیر فعال شو",
     "default": "ډیفالټ",
     "done": "بشپړ شو",
     "etaMin": "نږدې {min} دقیقې",
     "etaSec": "نږدې {sec} ثانیې",
     "howToFix": "د حل لاره:",
+    "inactiveCountries": "غیر فعال هیوادونه",
     "planned": "پلان شوی",
     "price": "بیه",
     "priceLoading": "د تبادلې نرخ او بیې بارول...",
@@ -1688,7 +1762,7 @@
     "none": "هیڅ",
     "noneParen": "(هیڅ)",
     "optional": "(اختیاري)",
-    "pageOf": "{اوسنی} / {ټول}",
+    "pageOf": "{current} / {total}",
     "prev": "مخکینی",
     "private": "شخصي",
     "processing": "پروسس کیږي...",
@@ -2011,7 +2085,6 @@
     "later": "وروسته",
     "loading": "بارول کیږي...",
     "locating": "اوسنی موقعیت کتل کیږي...",
-    "nearbySubtitle": "",
     "nearbyTitle": "📍 پلورنځي ومومئ",
     "noRooms": "د {radius}km په شعاع کې هیڅ چټ خونه نشته",
     "noShops": "د {radius}km په شعاع کې هیڅ پلورنځي نشته",

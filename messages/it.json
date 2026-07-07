@@ -302,12 +302,22 @@
         "date": "Data",
         "memo": "Memo",
         "paymentId": "ID Pagamento",
+        "refund": "Rimborso",
         "status": "Stato",
         "theme": "Tema",
         "txnDiv": "Tipo di transazione",
         "user": "Utente"
       },
       "noPayments": "Nessun storico pagamenti.",
+      "refund": {
+        "btn": "Rimborsa",
+        "confirm": "Verrà rimborsato l'intero importo di {amount} π a {user} tramite A2U. Procedere?",
+        "done": "Rimborsato",
+        "fail": "Rimborso non riuscito: {error}",
+        "processing": "Elaborazione in corso…",
+        "retry": "Riprova rimborso",
+        "success": "Rimborso completato (txid: {txid})"
+      },
       "searchPiUsername": "Cerca nome utente Pi (corrispondenza prefisso)",
       "searchResultCount": "{count} risultati di ricerca",
       "status": {
@@ -417,7 +427,7 @@
         },
         "placeholder": {
           "tableNmEn": "Es: usr_info",
-          "tableNmKo": "Es: 사용자정보",
+          "tableNmKo": "Es.: Informazioni utente",
           "termSearch": "Cerca termine e aggiungi cliccando…"
         },
         "sectionColumn": "Aggiungi Column — Seleziona dal termine standard",
@@ -936,77 +946,77 @@
       "topics": [
         {
           "icon": "⭐",
-          "title": "Perché Cafe.pi?",
           "steps": [
             "Il 'Carota' globale: interpretazione automatica di oltre 200 lingue · Pagamento facile con Pi · CHAT, usato, negozi in un'unica app · Connessione per distanza",
             "Il 'Siren Order' che non discrimina i settori: chiunque può essere un capo · Libertà di MENU · NOTIFICATION istantanee · O2O PICKUP"
-          ]
+          ],
+          "title": "Perché Cafe.pi?"
         },
         {
           "icon": "🎁",
-          "title": "EVENT — Partecipa ora",
           "steps": [
             "EVENT #1: Ricarica con TestPi e completa 10 MISSION per ricevere 5.000 Bean ai primi 100 partecipanti.",
             "EVENT #2: Registra il tuo NEGOZIO e completa la registrazione del MENU + il test di transazione per ricevere 10.000 Bean ai primi 100 negozi.",
             "Puoi completare facilmente seguendo i link di partecipazione per ogni MISSION nella scheda EVENT."
-          ]
+          ],
+          "title": "EVENT — Partecipa ora"
         },
         {
           "icon": "🔑",
-          "title": "LOGIN & Connessione account",
           "steps": [
             "Nel Pi Browser, clicca su 'Genera codice di collegamento' per ottenere un codice di 6 cifre (da usare entro 10 minuti).",
             "Copia il codice (o il link) e trasferiscilo in un browser normale.",
             "Nel browser normale, dopo aver effettuato il LOGIN con Google, incollalo e clicca su 'Collega' per completare la connessione Pi + Google.",
             "Il Pi browser non salva le informazioni per motivi di sicurezza, quindi collega i due browser in modo sicuro con un codice di 6 cifre."
-          ]
+          ],
+          "title": "LOGIN & Connessione account"
         },
         {
           "icon": "💬",
-          "title": "CAFE & Interpretazione automatica (PiRC1)",
           "steps": [
             "Entra in una stanza CAFE di un argomento di interesse e inizia a CHATTARE gratuitamente.",
             "Attivando 'CAFE vicini', ti mostra i CAFE e i vicini nelle vicinanze in ordine di distanza.",
             "Con l'interpretazione simultanea automatica, puoi conversare con chiunque in oltre 200 lingue, nella tua lingua."
-          ]
+          ],
+          "title": "CAFE & Interpretazione automatica (PiRC1)"
         },
         {
           "icon": "🎫",
-          "title": "Abbonamento Pi (PiRC2)",
           "steps": [
             "Scegli solo le funzioni di cui hai bisogno e abbonati con Pi — puoi iniziare subito con il PLAN gratuito.",
             "Abbonati solo a ciò che ti serve: PyCafé™ (CAFE Premium) · PyShop™ (Registrazione PRODOTTI) · PyTranslate™ (Traduzione illimitata)",
             "L'abbonamento si paga con Pi (pagamento ricorrente PiRC2), e il pagamento annuale include 2 mesi gratuiti."
-          ]
+          ],
+          "title": "Abbonamento Pi (PiRC2)"
         },
         {
           "icon": "📦",
-          "title": "P2P Commercio di usato (PiRC3, Escrow - transazione sicura)",
           "steps": [
             "Carica le foto del PRODOTTO e il prezzo (Pi), e saranno visibili alle persone vicine insieme alla tua posizione.",
             "Guarda gli articoli disponibili nelle vicinanze in ordine di distanza e, se ti piacciono, ordinali con Pi.",
             "I Pi pagati vengono custoditi in modo sicuro dalla PLATFORM (Escrow) per un breve periodo, e poi consegnati al venditore una volta completata la transazione."
-          ]
+          ],
+          "title": "P2P Commercio di usato (PiRC3, Escrow - transazione sicura)"
         },
         {
           "icon": "🏪",
-          "title": "O2O Registrazione del mio NEGOZIO, Registrazione PRODOTTI (PiRC3, Escrow - transazione sicura)",
           "steps": [
             "In 'Registrazione NEGOZIO', imposta il nome e la posizione del negozio, e i clienti verranno al negozio più vicino.",
             "Registra le foto del MENU · prezzo · quantità.",
             "Quando un cliente ordina, riceverai immediatamente una NOTIFICATION su Telegram (MENU · quantità · importo).",
             "Consegna dal negozio nell'ordine: In preparazione → Pronto → PICKUP."
-          ]
+          ],
+          "title": "O2O Registrazione del mio NEGOZIO, Registrazione PRODOTTI (PiRC3, Escrow - transazione sicura)"
         },
         {
           "icon": "🪙",
-          "title": "Ricompense Testnet, invariate sulla Mainnet (Promessa)",
           "steps": [
             "I Bean ricevuti ora tramite l'EVENT Testnet sono una promessa di cafe.pi.",
             "Quando la PLATFORM verrà lanciata ufficialmente sulla Mainnet,",
             "i Bean dell'EVENT accumulati su Testnet verranno pagati esattamente 1:1 come Bean della Mainnet.",
             "Questo è il principio di cafe.pi per garantire che gli sforzi dei primi partecipanti non vadano persi."
-          ]
+          ],
+          "title": "Ricompense Testnet, invariate sulla Mainnet (Promessa)"
         }
       ]
     },

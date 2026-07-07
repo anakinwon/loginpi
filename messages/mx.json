@@ -302,12 +302,22 @@
         "date": "Date",
         "memo": "Memo",
         "paymentId": "Payment ID",
+        "refund": "Reembolso",
         "status": "Status",
         "theme": "Theme",
         "txnDiv": "Tipo de transacción",
         "user": "User"
       },
       "noPayments": "No payment history.",
+      "refund": {
+        "btn": "Reembolsar",
+        "confirm": "Se reembolsará el total de {amount} π a {user} vía A2U. ¿Continuar?",
+        "done": "Reembolsado",
+        "fail": "Error en el reembolso: {error}",
+        "processing": "Procesando…",
+        "retry": "Reintentar reembolso",
+        "success": "Reembolso completado (txid: {txid})"
+      },
       "searchPiUsername": "Buscar nombre de usuario Pi (coincidencia de prefijo)",
       "searchResultCount": "Search results {count}",
       "status": {
@@ -936,77 +946,77 @@
       "topics": [
         {
           "icon": "⭐",
-          "title": "Why Cafe.pi?",
           "steps": [
             "Global 'Local Marketplace': 200+ languages auto-translation · Pi easy payment · Chat, used goods, shops in one app · Connect by distance",
             "'Siren Order' for all businesses: Anyone can be an owner · Free menu · Instant notifications · O2O pickup"
-          ]
+          ],
+          "title": "Why Cafe.pi?"
         },
         {
           "icon": "🎁",
-          "title": "Events — Participate now",
           "steps": [
             "EVENT #1: Charge with Test Pi and complete 10 missions to get 5,000 Bean for the first 100 participants",
             "EVENT #2: Register your store, complete menu registration + transaction test to get 10,000 Bean for the first 100 stores",
             "You can easily complete it by following the participation link for each mission in the Events tab"
-          ]
+          ],
+          "title": "Events — Participate now"
         },
         {
           "icon": "🔑",
-          "title": "Login & Account Connection",
           "steps": [
             "In Pi Browser, press 'Generate Connection Code' to get a 6-digit code (use within 10 minutes)",
             "Copy the code (or link) and move it to a regular browser",
             "In the regular browser, after logging in with Google, paste it and press 'Connect' to complete Pi + Google connection",
             "Pi Browser does not store information for security reasons, it securely connects the two browsers with a 6-digit code"
-          ]
+          ],
+          "title": "Login & Account Connection"
         },
         {
           "icon": "💬",
-          "title": "Cafe & Auto-translation (PiRC1)",
           "steps": [
             "Enter a cafe room of your interest and start chatting for free",
             "If you turn on 'Nearby Cafes', it shows nearby cafes and neighbors by distance",
             "With automatic simultaneous translation, you can converse with anyone in 200+ languages in your own language"
-          ]
+          ],
+          "title": "Cafe & Auto-translation (PiRC1)"
         },
         {
           "icon": "🎫",
-          "title": "Pi Subscription (PiRC2)",
           "steps": [
             "Choose only the features you need and subscribe with Pi — you can start immediately with a free plan",
             "Subscribe only to what you need: PyCafé™ (Premium Cafe) · PyShop™ (Product Registration) · PyTranslate™ (Unlimited Translation)",
             "Subscription fees are paid with Pi (PiRC2 recurring payment), and annual payment gets 2 months free"
-          ]
+          ],
+          "title": "Pi Subscription (PiRC2)"
         },
         {
           "icon": "📦",
-          "title": "P2P Used Goods Trading (PiRC3, Escrow-Secure Transaction)",
           "steps": [
             "If you upload product photos and price (Pi), it will be shown to people nearby along with your location",
             "View items available nearby by distance, and if you like it, order with Pi",
             "The paid Pi is securely held (escrow) by the platform temporarily and delivered to the seller when the transaction is complete"
-          ]
+          ],
+          "title": "P2P Used Goods Trading (PiRC3, Escrow-Secure Transaction)"
         },
         {
           "icon": "🏪",
-          "title": "O2O My Store Registration, Product Registration (PiRC3, Escrow-Secure Transaction)",
           "steps": [
             "If you set your store name and location in 'Store Registration', customers will come to your nearby store",
             "Register menu photos · prices · quantities",
             "When a customer places an order, you receive an immediate notification via Telegram (Menu · Quantity · Amount)",
             "Hand it over at the store in the order of In Preparation → Ready → Pickup"
-          ]
+          ],
+          "title": "O2O My Store Registration, Product Registration (PiRC3, Escrow-Secure Transaction)"
         },
         {
           "icon": "🪙",
-          "title": "Testnet Rewards, as is in Mainnet (Promise)",
           "steps": [
             "The Bean received from the current Testnet event is Cafe.pi's promise",
             "When the platform officially launches on Mainnet,",
             "The event Bean earned on Testnet will be paid identically 1:1 as Mainnet Bean",
             "This is Cafe.pi's principle to ensure that the efforts of early participants do not disappear"
-          ]
+          ],
+          "title": "Testnet Rewards, as is in Mainnet (Promise)"
         }
       ]
     },
