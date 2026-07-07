@@ -27,9 +27,9 @@ INSERT INTO public.i18n_locale (locale_cd, locale_nm, flag_emoji, is_active, sor
   ('pt', 'Português', '🇵🇹', 'Y', 17),
   ('ar', 'العربية', '🇪🇬', 'Y', 18),
   ('au', 'Australia', '🇦🇺', 'Y', 19),
-  ('il', 'Israel', '🇨🇫', 'Y', 20),
-  ('et', 'Ethiopia', '🇤🇳', 'Y', 21),
-  ('ps', 'Afghanistan', '🇠🇥', 'Y', 22)
+  ('il', 'Israel', '🇮🇱', 'Y', 20),
+  ('et', 'Ethiopia', '🇪🇹', 'Y', 21),
+  ('ps', 'Afghanistan', '🇦🇫', 'Y', 22)
 ON CONFLICT (locale_cd) DO NOTHING;
 
 INSERT INTO public.i18n_message (locale_cd, msg_key, msg_val, is_auto) VALUES
@@ -272,3 +272,10 @@ DO UPDATE SET msg_val = EXCLUDED.msg_val, is_auto = EXCLUDED.is_auto, mod_dtm = 
 -- msg_theme '직거래' 테마 영문명 누락 보정
 UPDATE public.msg_theme SET theme_nm_en = 'Direct Trade', mod_dtm = NOW()
 WHERE theme_cd = 'DIRECT' AND del_yn = 'N' AND theme_nm_en IS NULL;
+
+-- ── 국기 이모지 보정 — il·et·ps·sq 4건이 영역 지시자 베이스 오계산(U+1F1E0, 정상 U+1F1E6)으로
+--    깨진 글자·오국기(il→중앙아프리카공화국)로 표시되던 버그. 기존 행 보유 DB도 함께 교정.
+UPDATE public.i18n_locale SET flag_emoji = '🇮🇱', mod_dtm = NOW() WHERE locale_cd = 'il' AND flag_emoji IS DISTINCT FROM '🇮🇱';
+UPDATE public.i18n_locale SET flag_emoji = '🇪🇹', mod_dtm = NOW() WHERE locale_cd = 'et' AND flag_emoji IS DISTINCT FROM '🇪🇹';
+UPDATE public.i18n_locale SET flag_emoji = '🇦🇫', mod_dtm = NOW() WHERE locale_cd = 'ps' AND flag_emoji IS DISTINCT FROM '🇦🇫';
+UPDATE public.i18n_locale SET flag_emoji = '🇦🇱', mod_dtm = NOW() WHERE locale_cd = 'sq' AND flag_emoji IS DISTINCT FROM '🇦🇱';
