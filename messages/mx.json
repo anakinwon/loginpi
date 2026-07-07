@@ -2085,7 +2085,6 @@
     "later": "Later",
     "loading": "Loading…",
     "locating": "Checking current location…",
-    "nearbySubtitle": "Find shops and chat rooms around me by distance.",
     "nearbyTitle": "📍 Explore Nearby",
     "noRooms": "No chat rooms within {radius}km",
     "noShops": "No shops within {radius}km",
