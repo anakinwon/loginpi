@@ -62,8 +62,19 @@ async function fetchLocaleMap(locale) {
 }
 async function upsertRows(rows) {
   for (let i = 0; i < rows.length; i += 500) {
-    const { error } = await sb.from('i18n_message').upsert(rows.slice(i, i + 500), { onConflict: 'locale_cd,msg_key' })
-    if (error) throw new Error(`upsert: ${error.message}`)
+    // 네트워크 순단 내성 — 3회 재시도 (예외·error 응답 모두)
+    let lastErr
+    for (let t = 0; t < 3; t++) {
+      try {
+        const { error } = await sb.from('i18n_message').upsert(rows.slice(i, i + 500), { onConflict: 'locale_cd,msg_key' })
+        if (!error) { lastErr = null; break }
+        lastErr = new Error(`upsert: ${error.message}`)
+      } catch (e) {
+        lastErr = new Error(`upsert: ${e.message}`)
+      }
+      await sleep(10_000 * (t + 1))
+    }
+    if (lastErr) throw lastErr
   }
 }
 
@@ -117,8 +128,11 @@ ${JSON.stringify(batch, null, 1)}`
       await sleep(wait)
       return translateBatch(langName, batch, attempt + 1)
     }
-    if (attempt >= 1) throw e
-    await sleep(5_000)
+    // 일반 오류(네트워크 순단 fetch failed 등) — 장시간 잡이므로 넉넉히 재시도
+    if (attempt >= 4) throw e
+    const wait = [5_000, 15_000, 30_000, 60_000][attempt]
+    console.log(`  오류(${e.message.slice(0, 60)}) — ${wait / 1000}s 후 재시도 (${attempt + 1}/4)`)
+    await sleep(wait)
     return translateBatch(langName, batch, attempt + 1)
   }
 }
