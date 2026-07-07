@@ -5,6 +5,33 @@
 -- ④ ICU 변수명 오번역 수정: fr {thème}→{theme}, ja {Theme}→{theme}, ms {locale} 제거, ps {اوسنی}→{current}
 -- 멱등: ON CONFLICT upsert. messages/*.json은 코드 커밋에 이미 반영됨(sync 불필요, DB 정본 일치 목적).
 
+-- ── 0. 선행 시드: i18n_locale — 대상 DB에 없는 locale 행 보충 (FK i18n_message_locale_cd_fkey 충족)
+--    기존 행은 절대 덮지 않음(DO NOTHING) — 환경별 is_active·정렬 설정 보존. dev 기준값(2026-07-07).
+INSERT INTO public.i18n_locale (locale_cd, locale_nm, flag_emoji, is_active, sort_ord) VALUES
+  ('en', 'English', '🇺🇸', 'Y', 2),
+  ('zh', '中文', '🇨🇳', 'Y', 3),
+  ('ja', '日本語', '🇯🇵', 'Y', 4),
+  ('hi', 'हिन्दी', '🇮🇳', 'Y', 5),
+  ('vi', 'Tiếng Việt', '🇻🇳', 'Y', 6),
+  ('af', 'Afrikaans', '🇿🇦', 'Y', 7),
+  ('fil', 'Filipino', '🇵🇭', 'Y', 8),
+  ('th', 'ภาษาไทย', '🇹🇭', 'Y', 9),
+  ('id', 'Bahasa Indonesia', '🇮🇩', 'Y', 10),
+  ('ms', 'Bahasa Melayu', '🇲🇾', 'Y', 11),
+  ('es', 'Español', '🇪🇸', 'Y', 12),
+  ('fr', 'Français', '🇫🇷', 'Y', 13),
+  ('mx', 'Español (México)', '🇲🇽', 'Y', 13),
+  ('de', 'Deutsch', '🇩🇪', 'Y', 14),
+  ('it', 'Italiano', '🇮🇹', 'Y', 15),
+  ('ru', 'Русский', '🇷🇺', 'Y', 16),
+  ('pt', 'Português', '🇵🇹', 'Y', 17),
+  ('ar', 'العربية', '🇪🇬', 'Y', 18),
+  ('au', 'Australia', '🇦🇺', 'Y', 19),
+  ('il', 'Israel', '🇨🇫', 'Y', 20),
+  ('et', 'Ethiopia', '🇤🇳', 'Y', 21),
+  ('ps', 'Afghanistan', '🇠🇥', 'Y', 22)
+ON CONFLICT (locale_cd) DO NOTHING;
+
 INSERT INTO public.i18n_message (locale_cd, msg_key, msg_val, is_auto) VALUES
   ('en', 'admin.payments.col.refund', 'Refund', 'Y'),
   ('en', 'admin.payments.refund.btn', 'Refund', 'Y'),
