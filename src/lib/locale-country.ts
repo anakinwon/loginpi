@@ -27,6 +27,13 @@ export const LOCALE_COUNTRY: Record<string, string> = {
   ps: 'af', // 아프가니스탄: 파슈토어 locale, AFN 통화
   'ar-AR': 'ar', // Argentina
   sq: 'al', // Albania
+  at: 'at', // Austria
+  ca: 'ca', // Canada
+  ie: 'ie', // Ireland
+  li: 'li', // Liechtenstein
+  nz: 'nz', // New Zealand
+  sg: 'sg', // Singapore
+  gb: 'gb', // United Kingdom
   // ── 2026-07-07 전체 국가 활성화 (157개국 일괄 등재) ──
   ad: 'ad', // Andorra
   ae: 'ae', // United Arab Emirates

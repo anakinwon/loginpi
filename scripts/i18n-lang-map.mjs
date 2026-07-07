@@ -102,5 +102,14 @@ export const LANG_MAP = {
   // ── 추가 보정 (2026-07-07 2차): 매핑 누락분 ──
   sq: { lang: 'Albanian', group: 'albanian' },              // 알바니아 — 과거 활성화됐으나 번역 0
   'ar-AR': { lang: 'Spanish', copy: 'es' },                 // 아르헨티나 — 'ar'(아랍어) 충돌로 xx-XX 파생
+  // ── 3차 보정 (2026-07-08): 공유 언어 연결로 전용 locale이 없던 8개국 중 7국 신설 ──
+  //    (AL은 기존 sq locale이 전용 — 신설 불필요). 통화 분리 목적(au·mx 선례).
+  at: { lang: 'German', copy: 'de' },   // 오스트리아 EUR
+  li: { lang: 'German', copy: 'de' },   // 리히텐슈타인 CHF
+  ca: { lang: 'English', copy: 'en' },  // 캐나다 CAD
+  ie: { lang: 'English', copy: 'en' },  // 아일랜드 EUR
+  nz: { lang: 'English', copy: 'en' },  // 뉴질랜드 NZD
+  sg: { lang: 'English', copy: 'en' },  // 싱가포르 SGD
+  gb: { lang: 'English', copy: 'en' },  // 영국 GBP
 }
 

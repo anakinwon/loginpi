@@ -25,6 +25,13 @@ export const LOCALE_CURRENCY: Record<string, string> = {
   ps: 'AFN', // 아프가니스탄 아프가니 (파슈토어)
   'ar-AR': 'ARS', // Argentina (ar=아랍어 충돌 파생)
   sq: 'ALL', // Albania (레크)
+  at: 'EUR', // Austria
+  ca: 'CAD', // Canada
+  ie: 'EUR', // Ireland
+  li: 'CHF', // Liechtenstein
+  nz: 'NZD', // New Zealand
+  sg: 'SGD', // Singapore
+  gb: 'GBP', // United Kingdom
   // ── 2026-07-07 전체 국가 활성화 (157개국 일괄 등재) ──
   ad: 'EUR', // Andorra
   ae: 'AED', // United Arab Emirates
