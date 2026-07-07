@@ -37,10 +37,10 @@ const countrySrc = readFileSync(
 const routingSrc = readFileSync(join(root, 'src/i18n/routing.ts'), 'utf-8')
 
 const currencyKeys = new Set(
-  [...currencySrc.matchAll(/(\w+):\s*'[A-Z]{3}'/g)].map((m) => m[1]),
+  [...currencySrc.matchAll(/'?([\w-]+)'?:\s*'[A-Z]{3}'/g)].map((m) => m[1]),
 )
 const countryKeys = new Set(
-  [...countrySrc.matchAll(/(\w+):\s*'[a-z]{2}'/g)].map((m) => m[1]),
+  [...countrySrc.matchAll(/'?([\w-]+)'?:\s*'[a-z]{2}'/g)].map((m) => m[1]),
 )
 
 // 3. 교차 검증

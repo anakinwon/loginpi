@@ -12,9 +12,10 @@ const supabase = createClient(
 )
 
 // alpha-2 코드 → 국기 이모지 (Regional Indicator Symbol 변환)
+// ⚠️ 베이스는 U+1F1E6('A'). 과거 0x1f1e0 오계산으로 il·et·ps·sq 국기가 깨졌음(sql/167 보정)
 function toFlagEmoji(cc: string): string {
   return [...cc.toUpperCase()]
-    .map((c) => String.fromCodePoint(0x1f1e0 + c.charCodeAt(0) - 65))
+    .map((c) => String.fromCodePoint(0x1f1e6 + c.charCodeAt(0) - 65))
     .join('')
 }
 
