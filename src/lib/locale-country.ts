@@ -25,6 +25,8 @@ export const LOCALE_COUNTRY: Record<string, string> = {
   et: 'et', // 에티오피아: 암하라어 locale, ETB 통화
   mx: 'mx', // 멕시코: 스페인어 공유, MXN 통화 분리를 위해 별도 locale
   ps: 'af', // 아프가니스탄: 파슈토어 locale, AFN 통화
+  'ar-AR': 'ar', // Argentina
+  sq: 'al', // Albania
   // ── 2026-07-07 전체 국가 활성화 (157개국 일괄 등재) ──
   ad: 'ad', // Andorra
   ae: 'ae', // United Arab Emirates

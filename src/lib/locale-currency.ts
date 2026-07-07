@@ -23,6 +23,8 @@ export const LOCALE_CURRENCY: Record<string, string> = {
   et: 'ETB', // 에티오피아 비르
   mx: 'MXN', // 멕시코 페소
   ps: 'AFN', // 아프가니스탄 아프가니 (파슈토어)
+  'ar-AR': 'ARS', // Argentina (ar=아랍어 충돌 파생)
+  sq: 'ALL', // Albania (레크)
   // ── 2026-07-07 전체 국가 활성화 (157개국 일괄 등재) ──
   ad: 'EUR', // Andorra
   ae: 'AED', // United Arab Emirates
