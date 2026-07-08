@@ -141,7 +141,8 @@ if (!user) return <ClientChatRoom roomId={roomId} />
 - `accounts.pinet.com/oauth/authorize` → 콜백 `/auth/pi/callback`(프래그먼트 토큰) → **기존 `/api/auth/pi` POST 재사용**
 - state는 **localStorage+10분 만료**(sessionStorage는 탭 단위라 오탐 — TROUBLESHOOT 2026-07-08편)
 - **Pi의 인가 페이지는 Pi Browser 내 미지원** → 버튼(`PiOAuthLoginButton`)은 클릭 시 SDK signIn() 선시도 후 실패 시에만 OAuth(시도 후 폴백 — UA 분기 금지 철칙)
-- env `NEXT_PUBLIC_PI_OAUTH_CLIENT_ID` 환경별 필수(미설정=버튼 미노출) + Developer Portal Redirect URI 정확 일치 등록
+- env `NEXT_PUBLIC_PI_OAUTH_CLIENT_ID` 환경별 필수(미설정=버튼 미노출) + Developer Portal Redirect URI 정확 일치 등록(호스트는 앱 도메인+루프백만 — staging 미지원, 운영·localhost만)
+- ✅2026-07-08 실사용 검증 완료. state는 **성공 시에만 소거**(재마운트 경합)·콜백 경로는 locale 자동 전환 제외. 사용자 QR 스캔 경로=**파이지갑→Pay→"QR 코드 스캔 및 표시"→스캔 탭**
 
 ### Google 세션 (NextAuth v5 beta)
 
