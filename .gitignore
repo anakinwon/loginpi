@@ -82,3 +82,7 @@ sql/_prod_db_bundle.sql
 # 운영DB 부트스트랩 일회성 산출물(실데이터 — 커밋 금지)
 prod_schema.sql
 prod_seed*.sql
+
+# MS Office 임시 잠금 파일
+~$*
+**/~$*
