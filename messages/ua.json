@@ -2092,7 +2092,9 @@
     "allCountries": "Усі країни",
     "inactiveCount": "{count} · Неактивні",
     "label": "Вибір мови",
-    "listLabel": "Список мов"
+    "listLabel": "Список мов",
+    "noResults": "Немає результатів пошуку",
+    "searchPlaceholder": "Пошук — країна, мова, валюта"
   },
   "lbs": {
     "agreeStart": "Погодитися та розпочати",

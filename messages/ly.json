@@ -2092,7 +2092,9 @@
     "allCountries": "كل الدول",
     "inactiveCount": "{count} عنصر · غير نشط",
     "label": "اختيار لغة",
-    "listLabel": "قائمة اللغات"
+    "listLabel": "قائمة اللغات",
+    "noResults": "لا توجد نتائج بحث",
+    "searchPlaceholder": "بحث — البلد واللغة والعملة"
   },
   "lbs": {
     "agreeStart": "موافق وابدأ",

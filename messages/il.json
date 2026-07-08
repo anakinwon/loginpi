@@ -2092,7 +2092,9 @@
     "allCountries": "כל המדינות",
     "inactiveCount": "{count} · לא פעילים",
     "label": "בחירת שפה",
-    "listLabel": "רשימת שפות"
+    "listLabel": "רשימת שפות",
+    "noResults": "אין תוצאות חיפוש",
+    "searchPlaceholder": "חיפוש — מדינה·שפה·מטבע"
   },
   "lbs": {
     "agreeStart": "אני מסכים ומתחיל",

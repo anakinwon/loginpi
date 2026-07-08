@@ -2092,7 +2092,9 @@
     "allCountries": "تمام ممالک",
     "inactiveCount": "{count} غیر فعال",
     "label": "زبان منتخب کریں",
-    "listLabel": "زبانوں کی فہرست"
+    "listLabel": "زبانوں کی فہرست",
+    "noResults": "کوئی تلاش کے نتائج نہیں",
+    "searchPlaceholder": "تلاش کریں — ملک، زبان، کرنسی"
   },
   "lbs": {
     "agreeStart": "متفق ہوں اور شروع کریں",

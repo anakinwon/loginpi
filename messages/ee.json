@@ -2092,7 +2092,9 @@
     "allCountries": "Kõik riigid",
     "inactiveCount": "{count} · mitteaktiivne",
     "label": "Keele valik",
-    "listLabel": "Keeleloend"
+    "listLabel": "Keeleloend",
+    "noResults": "Otsingutulemusi pole",
+    "searchPlaceholder": "Otsi — riik, keel, valuuta"
   },
   "lbs": {
     "agreeStart": "Nõustu ja alusta",

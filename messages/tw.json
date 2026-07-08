@@ -2092,7 +2092,9 @@
     "allCountries": "所有國家",
     "inactiveCount": "{count} 個 · 未啟用",
     "label": "選擇語言",
-    "listLabel": "語言列表"
+    "listLabel": "語言列表",
+    "noResults": "沒有搜尋結果",
+    "searchPlaceholder": "搜尋 — 國家・語言・貨幣"
   },
   "lbs": {
     "agreeStart": "同意並開始",

@@ -2092,7 +2092,9 @@
     "allCountries": "Alle lande",
     "inactiveCount": "{count} · Onaktief",
     "label": "Kies taal",
-    "listLabel": "Taallys"
+    "listLabel": "Taallys",
+    "noResults": "Geen resultate",
+    "searchPlaceholder": "Soek — Land · Taal · Geldeenheid"
   },
   "lbs": {
     "agreeStart": "Stem saam en begin",

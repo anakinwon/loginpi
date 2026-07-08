@@ -2092,7 +2092,9 @@
     "allCountries": "Vse države",
     "inactiveCount": "{count} · Neaktivno",
     "label": "Izbira jezika",
-    "listLabel": "Seznam jezikov"
+    "listLabel": "Seznam jezikov",
+    "noResults": "Ni rezultatov iskanja",
+    "searchPlaceholder": "Iskanje — država, jezik, valuta"
   },
   "lbs": {
     "agreeStart": "Strinjam se in začni",

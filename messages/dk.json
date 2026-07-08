@@ -2092,7 +2092,9 @@
     "allCountries": "Alle lande",
     "inactiveCount": "{count} inaktive",
     "label": "Vælg sprog",
-    "listLabel": "Sprogliste"
+    "listLabel": "Sprogliste",
+    "noResults": "Ingen søgeresultater",
+    "searchPlaceholder": "Søg — Land·Sprog·Valuta"
   },
   "lbs": {
     "agreeStart": "Accepter og start",

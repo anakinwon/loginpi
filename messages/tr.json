@@ -2092,7 +2092,9 @@
     "allCountries": "Tüm Ülkeler",
     "inactiveCount": "{count} adet · Devre Dışı",
     "label": "Dil Seçimi",
-    "listLabel": "Dil Listesi"
+    "listLabel": "Dil Listesi",
+    "noResults": "Arama sonucu bulunamadı",
+    "searchPlaceholder": "Ara — Ülke·Dil·Para Birimi"
   },
   "lbs": {
     "agreeStart": "Kabul Et ve Başla",

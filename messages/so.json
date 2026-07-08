@@ -2092,7 +2092,9 @@
     "allCountries": "Dhammaan waddamada",
     "inactiveCount": "{count} · aan firfircoonayn",
     "label": "Dooro luqadda",
-    "listLabel": "Liiska luqadaha"
+    "listLabel": "Liiska luqadaha",
+    "noResults": "Natiijooyin raadin ma jiraan",
+    "searchPlaceholder": "Raadi — Waddan, Luqad, Lacag"
   },
   "lbs": {
     "agreeStart": "Ogolaaw oo bilow",

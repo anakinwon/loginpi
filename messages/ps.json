@@ -2092,7 +2092,9 @@
     "allCountries": "ټول هیوادونه",
     "inactiveCount": "{count} · غیر فعال",
     "label": "د ژبې انتخاب",
-    "listLabel": "د ژبو لیست"
+    "listLabel": "د ژبو لیست",
+    "noResults": "د لټون پایلې نشته",
+    "searchPlaceholder": "لټون — هېواد·ژبه·اسعار"
   },
   "lbs": {
     "agreeStart": "موافقه وکړئ او پیل کړئ",

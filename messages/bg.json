@@ -2092,7 +2092,9 @@
     "allCountries": "Всички държави",
     "inactiveCount": "{count} броя · неактивни",
     "label": "Избор на език",
-    "listLabel": "Списък с езици"
+    "listLabel": "Списък с езици",
+    "noResults": "Няма резултати",
+    "searchPlaceholder": "Търсене — Държава · Език · Валута"
   },
   "lbs": {
     "agreeStart": "Съгласяване и стартиране",

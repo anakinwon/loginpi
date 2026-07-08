@@ -2092,7 +2092,9 @@
     "allCountries": "Tots els països",
     "inactiveCount": "{count} · Inactiu",
     "label": "Seleccionar idioma",
-    "listLabel": "Llista d'idiomes"
+    "listLabel": "Llista d'idiomes",
+    "noResults": "No hi ha resultats",
+    "searchPlaceholder": "Cerca — país, idioma, moneda"
   },
   "lbs": {
     "agreeStart": "Acceptar i començar",

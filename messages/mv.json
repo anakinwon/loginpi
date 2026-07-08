@@ -2092,7 +2092,9 @@
     "allCountries": "ހުރިހާ ގައުމުތައް",
     "inactiveCount": "{count} އަދަދު · ހީނުކުރެވިފައި",
     "label": "ބަސް ހޮވާ",
-    "listLabel": "ބަސްތަކުގެ ލިސްޓު"
+    "listLabel": "ބަސްތަކުގެ ލިސްޓު",
+    "noResults": "ހޯދުމުގެ ނަތީޖާއެއް ނެތް",
+    "searchPlaceholder": "ހޯދާ — ޤައުމު، ބަސް، ފައިސާ"
   },
   "lbs": {
     "agreeStart": "އެއްބަސްވެ ފަށާ",

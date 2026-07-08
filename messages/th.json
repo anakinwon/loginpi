@@ -2092,7 +2092,9 @@
     "allCountries": "ทุกประเทศ",
     "inactiveCount": "{count} รายการ · ไม่ใช้งาน",
     "label": "เลือกภาษา",
-    "listLabel": "รายการภาษา"
+    "listLabel": "รายการภาษา",
+    "noResults": "ไม่มีผลการค้นหา",
+    "searchPlaceholder": "ค้นหา — ประเทศ·ภาษา·สกุลเงิน"
   },
   "lbs": {
     "agreeStart": "ยอมรับและเริ่มต้น",

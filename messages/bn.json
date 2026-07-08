@@ -2092,7 +2092,9 @@
     "allCountries": "Semua Negara",
     "inactiveCount": "{count} · Tidak aktif",
     "label": "Pilih Bahasa",
-    "listLabel": "Senarai Bahasa"
+    "listLabel": "Senarai Bahasa",
+    "noResults": "Tiada hasil carian",
+    "searchPlaceholder": "Cari — Negara, Bahasa, Mata Wang"
   },
   "lbs": {
     "agreeStart": "Bersetuju dan mula",

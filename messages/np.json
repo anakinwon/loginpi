@@ -2092,7 +2092,9 @@
     "allCountries": "सबै देशहरू",
     "inactiveCount": "{count} वटा · निष्क्रिय",
     "label": "भाषा चयन गर्नुहोस्",
-    "listLabel": "भाषा सूची"
+    "listLabel": "भाषा सूची",
+    "noResults": "कुनै नतिजा फेला परेन",
+    "searchPlaceholder": "खोज — देश·भाषा·मुद्रा"
   },
   "lbs": {
     "agreeStart": "सहमति दिएर सुरु गर्नुहोस्",

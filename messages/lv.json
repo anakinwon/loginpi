@@ -2092,7 +2092,9 @@
     "allCountries": "Visas valstis",
     "inactiveCount": "{count} · neaktīvas",
     "label": "Valodas izvēle",
-    "listLabel": "Valodu saraksts"
+    "listLabel": "Valodu saraksts",
+    "noResults": "Nav meklēšanas rezultātu",
+    "searchPlaceholder": "Meklēt — Valsts, valoda, valūta"
   },
   "lbs": {
     "agreeStart": "Piekrītu un sākt",

@@ -2092,7 +2092,9 @@
     "allCountries": "គ្រប់ប្រទេស",
     "inactiveCount": "{count} ភាសា · មិនដំណើរការ",
     "label": "ជ្រើសរើសភាសា",
-    "listLabel": "បញ្ជីភាសា"
+    "listLabel": "បញ្ជីភាសា",
+    "noResults": "មិនមានលទ្ធផលស្វែងរក",
+    "searchPlaceholder": "ស្វែងរក — ប្រទេស • ភាសា • រូបិយប័ណ្ណ"
   },
   "lbs": {
     "agreeStart": "យល់ព្រមហើយចាប់ផ្តើម",

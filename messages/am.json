@@ -2092,7 +2092,9 @@
     "allCountries": "Բոլոր երկրները",
     "inactiveCount": "{count} հատ · Ոչ ակտիվ",
     "label": "Լեզվի ընտրություն",
-    "listLabel": "Լեզուների ցուցակ"
+    "listLabel": "Լեզուների ցուցակ",
+    "noResults": "Որոնման արդյունքներ չկան",
+    "searchPlaceholder": "Որոնել — Երկիր, Լեզու, Արժույթ"
   },
   "lbs": {
     "agreeStart": "Համաձայնվել և սկսել",

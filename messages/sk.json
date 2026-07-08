@@ -2092,7 +2092,9 @@
     "allCountries": "Všetky krajiny",
     "inactiveCount": "{count} · Neaktívne",
     "label": "Výber jazyka",
-    "listLabel": "Zoznam jazykov"
+    "listLabel": "Zoznam jazykov",
+    "noResults": "Žiadne výsledky vyhľadávania",
+    "searchPlaceholder": "Hľadať — krajina · jazyk · mena"
   },
   "lbs": {
     "agreeStart": "Súhlasiť a začať",

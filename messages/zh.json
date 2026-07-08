@@ -2092,7 +2092,9 @@
     "allCountries": "所有国家",
     "inactiveCount": "{count}个 · 非活跃",
     "label": "选择语言",
-    "listLabel": "语言列表"
+    "listLabel": "语言列表",
+    "noResults": "无搜索结果",
+    "searchPlaceholder": "搜索 — 国家·语言·货币"
   },
   "lbs": {
     "agreeStart": "同意并开始",

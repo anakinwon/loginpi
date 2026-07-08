@@ -2092,7 +2092,9 @@
     "allCountries": "Kaikki maat",
     "inactiveCount": "{count} kieltä · Ei aktiivinen",
     "label": "Valitse kieli",
-    "listLabel": "Kieliluettelo"
+    "listLabel": "Kieliluettelo",
+    "noResults": "Ei hakutuloksia",
+    "searchPlaceholder": "Hae — Maa, kieli, valuutta"
   },
   "lbs": {
     "agreeStart": "Hyväksy ja aloita",

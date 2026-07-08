@@ -2092,7 +2092,9 @@
     "allCountries": "ყველა ქვეყანა",
     "inactiveCount": "{count} ენა · არააქტიური",
     "label": "ენის არჩევა",
-    "listLabel": "ენების სია"
+    "listLabel": "ენების სია",
+    "noResults": "შედეგები არ მოიძებნა",
+    "searchPlaceholder": "ძიება — ქვეყანა, ენა, ვალუტა"
   },
   "lbs": {
     "agreeStart": "დათანხმება და დაწყება",

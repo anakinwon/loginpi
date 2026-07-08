@@ -2092,7 +2092,9 @@
     "allCountries": "Ähli ýurtlar",
     "inactiveCount": "{count} sany · Işjeň däl",
     "label": "Dil saýla",
-    "listLabel": "Diller sanawy"
+    "listLabel": "Diller sanawy",
+    "noResults": "Gözleg netijeleri ýok",
+    "searchPlaceholder": "Gözleg — Ýurt · Dil · Walýuta"
   },
   "lbs": {
     "agreeStart": "Razylaş we başla",

@@ -2092,7 +2092,9 @@
     "allCountries": "Sve zemlje",
     "inactiveCount": "{count} · neaktivnih",
     "label": "Odabir jezika",
-    "listLabel": "Lista jezika"
+    "listLabel": "Lista jezika",
+    "noResults": "Nema rezultata pretrage",
+    "searchPlaceholder": "Pretražite — Država, Jezik, Valuta"
   },
   "lbs": {
     "agreeStart": "Slažem se i započni",

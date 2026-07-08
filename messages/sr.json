@@ -2092,7 +2092,9 @@
     "allCountries": "Alle landen",
     "inactiveCount": "{count} · Inactief",
     "label": "Taal selecteren",
-    "listLabel": "Talenlijst"
+    "listLabel": "Talenlijst",
+    "noResults": "Geen zoekresultaten",
+    "searchPlaceholder": "Zoeken — Land, Taal, Valuta"
   },
   "lbs": {
     "agreeStart": "Akkoord en starten",

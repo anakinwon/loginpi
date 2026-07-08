@@ -302,7 +302,7 @@
         "date": "ቀን/ሰዓት",
         "memo": "ማስታወሻ",
         "paymentId": "የክፍያ መታወቂያ",
-        "refund": "ገንዘብ ተመላሽ",
+        "refund": "Tagasimakse",
         "status": "ሁኔታ",
         "theme": "ጭብጥ",
         "txnDiv": "የግብይት አይነት",
@@ -310,13 +310,13 @@
       },
       "noPayments": "የክፍያ ታሪክ የለም።",
       "refund": {
-        "btn": "ገንዘብ ተመላሽ አድርግ",
-        "confirm": "ለ{user} {amount} π ወደ A2U ሙሉ ገንዘብ ተመላሽ ይደረጋል። መቀጠል ይፈልጋሉ?",
-        "done": "ገንዘብ ተመላሽ ተደርጓል",
-        "fail": "ገንዘብ ተመላሽ አልተሳካም: {error}",
-        "processing": "በመስራት ላይ…",
-        "retry": "ገንዘብ ተመላሽ ለማድረግ እንደገና ሞክር",
-        "success": "ገንዘብ ተመላሽ ተጠናቋል (txid: {txid})"
+        "btn": "Tagasta",
+        "confirm": "Kogu summa {amount} π tagastatakse kasutajale {user} A2U kaudu. Kas jätkata?",
+        "done": "Tagastatud",
+        "fail": "Tagasimakse ebaõnnestus: {error}",
+        "processing": "Töötlemine…",
+        "retry": "Proovi tagasimakset uuesti",
+        "success": "Tagasimakse tehtud (txid: {txid})"
       },
       "searchPiUsername": "Pi የተጠቃሚ ስም ፈልግ (ከ2 ፊደላት በላይ)",
       "searchResultCount": "የፍለጋ ውጤት {count}",
@@ -2092,7 +2092,9 @@
     "allCountries": "ሁሉም አገሮች",
     "inactiveCount": "{count} · ንቁ ያልሆኑ",
     "label": "ቋንቋ ምረጥ",
-    "listLabel": "የቋንቋ ዝርዝር"
+    "listLabel": "የቋንቋ ዝርዝር",
+    "noResults": "የፍለጋ ውጤት የለም",
+    "searchPlaceholder": "ፍለጋ — ሀገር፣ ቋንቋ፣ ምንዛሪ"
   },
   "lbs": {
     "agreeStart": "ተስማምተው ጀምር",

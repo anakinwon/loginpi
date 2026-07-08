@@ -2092,7 +2092,9 @@
     "allCountries": "Барлық елдер",
     "inactiveCount": "{count} дана · белсенді емес",
     "label": "Тілді таңдау",
-    "listLabel": "Тілдер тізімі"
+    "listLabel": "Тілдер тізімі",
+    "noResults": "Ешқандай нәтиже табылмады",
+    "searchPlaceholder": "Іздеу — Ел · Тіл · Валюта"
   },
   "lbs": {
     "agreeStart": "Келісіп, бастау",

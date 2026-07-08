@@ -2092,7 +2092,9 @@
     "allCountries": "Ҳамаи кишварҳо",
     "inactiveCount": "{count} адад · Ғайрифаъол",
     "label": "Интихоби забон",
-    "listLabel": "Рӯйхати забонҳо"
+    "listLabel": "Рӯйхати забонҳо",
+    "noResults": "Натиҷаҳо ёфт нашуд",
+    "searchPlaceholder": "Ҷустуҷӯ — Кишвар, Забон, Асъор"
   },
   "lbs": {
     "agreeStart": "Розӣ шавед ва оғоз кунед",

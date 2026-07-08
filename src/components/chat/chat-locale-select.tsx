@@ -1,7 +1,9 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { useOpenPromoActive } from '@/components/feature-flag-provider'
+import { comboMatch } from '@/lib/combo-search'
 
 // PyTranslate™ 방 헤더 번역 언어 콤보 — 선택한 언어로 방 전체 메시지를 강제 번역
 // i18n_cntry_mst 단일 소스: locale_cd 매핑된 국가만 노출 (컬러 국기 + 자국어 나라명)
@@ -11,6 +13,7 @@ import { useOpenPromoActive } from '@/components/feature-flag-provider'
 interface Country {
   country_cd: string
   dis_ord_seq: number
+  country_eng_nm: string
   country_mot_nm: string
   locale_cd: string | null
   use_yn: string
@@ -54,7 +57,9 @@ export function ChatLocaleSelect({
   onChange: (locale: string) => void
   isSubscribed: boolean
 }) {
+  const t = useTranslations('langSwitcher')
   const [open, setOpen] = useState(false)
+  const [query, setQuery] = useState('')
   // 오픈프로모 기간엔 누구나 자동번역 콤보 사용 가능(서버 applyPromoGate가 요금 0).
   //   프로모 종료 시 다시 구독자 전용으로 복귀(유료 전환). 단일 소스 useOpenPromoActive.
   const promoActive = useOpenPromoActive()
@@ -109,7 +114,10 @@ export function ChatLocaleSelect({
     <div className="relative shrink-0" ref={containerRef}>
       {/* ── 트리거 ── */}
       <button
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => {
+          setQuery('')
+          setOpen((o) => !o)
+        }}
         disabled={!enabled}
         aria-haspopup="listbox"
         aria-expanded={open}
@@ -152,6 +160,18 @@ export function ChatLocaleSelect({
           aria-label="번역 언어 목록"
           className="border-border bg-background absolute top-full right-0 z-50 mt-1 max-h-72 w-56 overflow-y-auto rounded-lg border shadow-xl"
         >
+          {/* ── 키인 검색 ── */}
+          <div className="bg-background sticky top-0 z-10 border-b p-1.5">
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={`🔍 ${t('searchPlaceholder')}`}
+              aria-label={t('searchPlaceholder')}
+              className="bg-muted/40 focus:border-primary w-full rounded-md border px-2 py-1 text-[10px] outline-none"
+            />
+          </div>
+
           {/* 선택 해제 — 구독특혜 PyTranslate™ */}
           <button
             role="option"
@@ -167,44 +187,54 @@ export function ChatLocaleSelect({
             {autoLabel}
           </button>
 
-          {countries.map((c) => {
-            const isCurrent = selected?.country_cd === c.country_cd
-            return (
-              <button
-                key={c.country_cd}
-                role="option"
-                aria-selected={isCurrent}
-                onClick={() => select(c)}
-                className={[
-                  'flex w-full items-center gap-2 px-3 py-1.5 text-left transition-colors',
-                  isCurrent
-                    ? 'bg-primary/10 text-primary'
-                    : 'text-foreground hover:bg-muted/60',
-                ].join(' ')}
-              >
-                <FlagIcon code={c.country_cd} className="shrink-0" />
-                <span className="flex-1 truncate text-[9px]">
-                  {c.country_mot_nm}
-                </span>
-                {isCurrent && (
-                  <svg
-                    className="text-primary h-3.5 w-3.5 shrink-0"
-                    viewBox="0 0 14 14"
-                    fill="none"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M2 7l4 4 6-6"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                )}
-              </button>
+          {countries
+            .filter((c) =>
+              comboMatch(
+                query,
+                c.country_eng_nm,
+                c.country_mot_nm,
+                c.country_cd,
+                c.locale_cd,
+              ),
             )
-          })}
+            .map((c) => {
+              const isCurrent = selected?.country_cd === c.country_cd
+              return (
+                <button
+                  key={c.country_cd}
+                  role="option"
+                  aria-selected={isCurrent}
+                  onClick={() => select(c)}
+                  className={[
+                    'flex w-full items-center gap-2 px-3 py-1.5 text-left transition-colors',
+                    isCurrent
+                      ? 'bg-primary/10 text-primary'
+                      : 'text-foreground hover:bg-muted/60',
+                  ].join(' ')}
+                >
+                  <FlagIcon code={c.country_cd} className="shrink-0" />
+                  <span className="flex-1 truncate text-[9px]">
+                    {c.country_mot_nm}
+                  </span>
+                  {isCurrent && (
+                    <svg
+                      className="text-primary h-3.5 w-3.5 shrink-0"
+                      viewBox="0 0 14 14"
+                      fill="none"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M2 7l4 4 6-6"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  )}
+                </button>
+              )
+            })}
         </div>
       )}
     </div>

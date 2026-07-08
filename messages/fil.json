@@ -2092,7 +2092,9 @@
     "allCountries": "Lahat ng Bansa",
     "inactiveCount": "{count} · Hindi Aktibo",
     "label": "Pumili ng Wika",
-    "listLabel": "Listahan ng Wika"
+    "listLabel": "Listahan ng Wika",
+    "noResults": "Walang resulta ng paghahanap",
+    "searchPlaceholder": "Maghanap — Bansa, Wika, Pera"
   },
   "lbs": {
     "agreeStart": "Sumang-ayon at Magsimula",

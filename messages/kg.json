@@ -2092,7 +2092,9 @@
     "allCountries": "Бардык өлкөлөр",
     "inactiveCount": "{count} · Активдүү эмес",
     "label": "Тил тандоо",
-    "listLabel": "Тилдер тизмеси"
+    "listLabel": "Тилдер тизмеси",
+    "noResults": "Издөө натыйжалары жок",
+    "searchPlaceholder": "Издөө — Өлкө·Тил·Валюта"
   },
   "lbs": {
     "agreeStart": "Макул болуп баштоо",

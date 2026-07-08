@@ -2092,7 +2092,9 @@
     "allCountries": "Alla länder",
     "inactiveCount": "{count} st · Inaktiva",
     "label": "Välj språk",
-    "listLabel": "Språklista"
+    "listLabel": "Språklista",
+    "noResults": "Inga sökresultat",
+    "searchPlaceholder": "Sök — Land, språk, valuta"
   },
   "lbs": {
     "agreeStart": "Godkänn och starta",

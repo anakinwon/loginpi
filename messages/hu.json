@@ -2092,7 +2092,9 @@
     "allCountries": "Összes ország",
     "inactiveCount": "{count} db · Inaktív",
     "label": "Nyelv kiválasztása",
-    "listLabel": "Nyelvek listája"
+    "listLabel": "Nyelvek listája",
+    "noResults": "Nincs találat",
+    "searchPlaceholder": "Keresés — Ország·Nyelv·Pénznem"
   },
   "lbs": {
     "agreeStart": "Elfogadom és indítom",

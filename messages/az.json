@@ -2092,7 +2092,9 @@
     "allCountries": "Bütün ölkələr",
     "inactiveCount": "{count} ədəd · Qeyri-aktiv",
     "label": "Dil seçimi",
-    "listLabel": "Dillər siyahısı"
+    "listLabel": "Dillər siyahısı",
+    "noResults": "Axtarış nəticələri yoxdur",
+    "searchPlaceholder": "Axtarış — Ölkə, Dil, Valyuta"
   },
   "lbs": {
     "agreeStart": "Razılaş və başla",

@@ -2092,7 +2092,9 @@
     "allCountries": "Të gjitha vendet",
     "inactiveCount": "{count} · Joaktive",
     "label": "Zgjidh gjuhën",
-    "listLabel": "Lista e gjuhëve"
+    "listLabel": "Lista e gjuhëve",
+    "noResults": "Nuk ka rezultate kërkimi",
+    "searchPlaceholder": "Kërko — Shteti·Gjuha·Monedha"
   },
   "lbs": {
     "agreeStart": "Pajtohu dhe fillo",

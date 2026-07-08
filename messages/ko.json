@@ -1888,7 +1888,9 @@
     "activeLangs": "활성 언어",
     "allCountries": "전체 국가",
     "activeCount": "{count}개",
-    "inactiveCount": "{count}개 · 비활성"
+    "inactiveCount": "{count}개 · 비활성",
+    "searchPlaceholder": "검색 — 국가·언어·통화",
+    "noResults": "검색 결과가 없습니다"
   },
   "lbs": {
     "consentTitle": "📍 위치 기반 서비스 동의",

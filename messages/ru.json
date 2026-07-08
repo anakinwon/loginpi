@@ -2092,7 +2092,9 @@
     "allCountries": "Все страны",
     "inactiveCount": "{count} шт. · Неактивно",
     "label": "Выбрать язык",
-    "listLabel": "Список языков"
+    "listLabel": "Список языков",
+    "noResults": "Нет результатов",
+    "searchPlaceholder": "Поиск — страна, язык, валюта"
   },
   "lbs": {
     "agreeStart": "Согласиться и начать",

@@ -2092,7 +2092,9 @@
     "allCountries": "সমস্ত দেশ",
     "inactiveCount": "{count}টি · নিষ্ক্রিয়",
     "label": "ভাষা নির্বাচন করুন",
-    "listLabel": "ভাষার তালিকা"
+    "listLabel": "ভাষার তালিকা",
+    "noResults": "কোনো ফলাফল পাওয়া যায়নি",
+    "searchPlaceholder": "অনুসন্ধান — দেশ, ভাষা, মুদ্রা"
   },
   "lbs": {
     "agreeStart": "সম্মত হয়ে শুরু করুন",

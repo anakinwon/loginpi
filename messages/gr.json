@@ -2092,7 +2092,9 @@
     "allCountries": "Όλες οι χώρες",
     "inactiveCount": "{count} · Ανενεργά",
     "label": "Επιλογή γλώσσας",
-    "listLabel": "Λίστα γλωσσών"
+    "listLabel": "Λίστα γλωσσών",
+    "noResults": "Δεν υπάρχουν αποτελέσματα",
+    "searchPlaceholder": "Αναζήτηση — Χώρα, Γλώσσα, Νόμισμα"
   },
   "lbs": {
     "agreeStart": "Συμφωνώ και ξεκινώ",

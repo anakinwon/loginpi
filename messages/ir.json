@@ -2092,7 +2092,9 @@
     "allCountries": "همه کشورها",
     "inactiveCount": "{count} عدد · غیرفعال",
     "label": "انتخاب زبان",
-    "listLabel": "لیست زبان‌ها"
+    "listLabel": "لیست زبان‌ها",
+    "noResults": "نتیجه‌ای یافت نشد",
+    "searchPlaceholder": "جستجو — کشور، زبان، ارز"
   },
   "lbs": {
     "agreeStart": "موافقت و شروع",

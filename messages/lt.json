@@ -2092,7 +2092,9 @@
     "allCountries": "Visos šalys",
     "inactiveCount": "{count} · Neaktyvus",
     "label": "Pasirinkti kalbą",
-    "listLabel": "Kalbos sąrašas"
+    "listLabel": "Kalbos sąrašas",
+    "noResults": "Nėra rezultatų",
+    "searchPlaceholder": "Ieškoti — Šalis · Kalba · Valiuta"
   },
   "lbs": {
     "agreeStart": "Sutikti ir pradėti",

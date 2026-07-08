@@ -2092,7 +2092,9 @@
     "allCountries": "ທຸກປະເທດ",
     "inactiveCount": "{count} ອັນ · ບໍ່ໃຊ້ງານ",
     "label": "ເລືອກພາສາ",
-    "listLabel": "ລາຍການພາສາ"
+    "listLabel": "ລາຍການພາສາ",
+    "noResults": "ບໍ່ມີຜົນການຄົ້ນຫາ",
+    "searchPlaceholder": "ຄົ້ນຫາ — ປະເທດ, ພາສາ, ສະກຸນເງິນ"
   },
   "lbs": {
     "agreeStart": "ເຫັນດີ ແລະ ເລີ່ມຕົ້ນ",

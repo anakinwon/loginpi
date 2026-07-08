@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import { LOCALE_CURRENCY } from '@/lib/locale-currency'
 import { ACTIVE_COUNTRY_CODES, getAlpha2 } from '@/lib/locale-country'
 import { useFeatureFlags } from '@/components/feature-flag-provider'
+import { comboMatch } from '@/lib/combo-search'
 
 // 상품 가격 통화 선택 콤보 — 헤더 LanguageSwitcher와 동일한 시각·데이터(국기·통화·환율)를 쓰되,
 // 로케일을 전환하지 않고 '이 상품의 통화'만 고르는 controlled 입력. value='PI'면 Pi 직접입력.
@@ -93,6 +94,7 @@ export function CurrencyCombo({
   // Pi 등재 레드라인(A-5) 대응. docs/PRD_23_FUNC_TUNING.md §8.6
   const { showPiValuation: showRate } = useFeatureFlags()
   const [open, setOpen] = useState(false)
+  const [query, setQuery] = useState('')
   const [locales, setLocales] = useState<ActiveLocale[]>(
     () => readCache()?.locales ?? [],
   )
@@ -159,6 +161,7 @@ export function CurrencyCombo({
   }
 
   function toggle() {
+    setQuery('')
     setOpen((prev) => !prev)
     void loadData()
   }
@@ -179,6 +182,32 @@ export function CurrencyCombo({
     (c) =>
       !ACTIVE_COUNTRY_CODES.has(c.country_cd.toUpperCase()) &&
       !activeCountryCds.has(c.country_cd.toUpperCase()),
+  )
+
+  // 키인 검색 필터 — 이름·코드·통화·국가 영문/현지명 매칭
+  const countryByCc = new Map(
+    countries.map((c) => [c.country_cd.toUpperCase(), c]),
+  )
+  const filteredLocales = locales.filter((loc) => {
+    const cc = getAlpha2(loc.locale_cd).toUpperCase()
+    const ctry = countryByCc.get(cc)
+    return comboMatch(
+      query,
+      loc.locale_nm,
+      loc.locale_cd,
+      ctry?.country_eng_nm,
+      ctry?.country_mot_nm,
+      LOCALE_CURRENCY[loc.locale_cd] ?? countryCurrencyMap.get(cc),
+    )
+  })
+  const filteredCountries = inactiveCountries.filter((c) =>
+    comboMatch(
+      query,
+      c.country_eng_nm,
+      c.country_mot_nm,
+      c.country_cd,
+      c.currency_cd,
+    ),
   )
 
   // 트리거 국기 추정 — 활성 로케일(통화 일치) → 비활성 국가 순
@@ -235,6 +264,18 @@ export function CurrencyCombo({
           aria-label={t('listLabel')}
           className="border-border bg-background absolute top-full left-0 z-50 mt-1 max-h-[440px] w-72 overflow-y-auto rounded-lg border shadow-xl"
         >
+          {/* ── 키인 검색 ── */}
+          <div className="bg-background sticky top-0 z-10 border-b p-2">
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={`🔍 ${t('searchPlaceholder')}`}
+              aria-label={t('searchPlaceholder')}
+              className="bg-muted/40 focus:border-primary w-full rounded-md border px-2 py-1.5 text-xs outline-none"
+            />
+          </div>
+
           {/* Pi 직접입력 (환전 없음) */}
           <button
             type="button"
@@ -266,10 +307,10 @@ export function CurrencyCombo({
                   {t('activeLangs')}
                 </span>
                 <span className="text-muted-foreground ml-auto text-[11px]">
-                  {t('activeCount', { count: locales.length })}
+                  {t('activeCount', { count: filteredLocales.length })}
                 </span>
               </div>
-              {locales.map((loc) => {
+              {filteredLocales.map((loc) => {
                 const countryCode = getAlpha2(loc.locale_cd)
                 const currency =
                   LOCALE_CURRENCY[loc.locale_cd] ??
@@ -312,10 +353,17 @@ export function CurrencyCombo({
                   {t('allCountries')}
                 </span>
                 <span className="text-muted-foreground ml-auto text-[11px]">
-                  {t('inactiveCount', { count: inactiveCountries.length })}
+                  {t('inactiveCount', { count: filteredCountries.length })}
                 </span>
               </div>
-              {inactiveCountries.map((c) => {
+              {query.trim() !== '' &&
+                filteredLocales.length === 0 &&
+                filteredCountries.length === 0 && (
+                  <div className="text-muted-foreground px-3 py-6 text-center text-xs">
+                    {t('noResults')}
+                  </div>
+                )}
+              {filteredCountries.map((c) => {
                 const rate = rates[c.currency_cd]
                 const selected = c.currency_cd === value
                 return (

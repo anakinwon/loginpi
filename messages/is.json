@@ -2092,7 +2092,9 @@
     "allCountries": "Öll lönd",
     "inactiveCount": "{count} · óvirk",
     "label": "Veldu tungumál",
-    "listLabel": "Tungumálalisti"
+    "listLabel": "Tungumálalisti",
+    "noResults": "Engar leitarniðurstöður",
+    "searchPlaceholder": "Leit — Land·Tungumál·Gjaldmiðill"
   },
   "lbs": {
     "agreeStart": "Samþykkja og byrja",

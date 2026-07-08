@@ -2092,7 +2092,9 @@
     "allCountries": "සියලුම රටවල්",
     "inactiveCount": "{count}ක් · අක්‍රියයි",
     "label": "භාෂාව තෝරන්න",
-    "listLabel": "භාෂා ලැයිස්තුව"
+    "listLabel": "භාෂා ලැයිස්තුව",
+    "noResults": "සෙවුම් ප්‍රතිඵල නොමැත",
+    "searchPlaceholder": "සෙවීම — රට, භාෂාව, මුදල්"
   },
   "lbs": {
     "agreeStart": "එකඟ වී ආරම්භ කරන්න",

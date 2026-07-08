@@ -2092,7 +2092,9 @@
     "allCountries": "すべての国",
     "inactiveCount": "{count}個 · 非アクティブ",
     "label": "言語選択",
-    "listLabel": "言語リスト"
+    "listLabel": "言語リスト",
+    "noResults": "検索結果がありません",
+    "searchPlaceholder": "検索 — 国・言語・通貨"
   },
   "lbs": {
     "agreeStart": "同意して開始",

@@ -2092,7 +2092,9 @@
     "allCountries": "Бүх улс",
     "inactiveCount": "{count} ширхэг · Идэвхгүй",
     "label": "Хэл сонгох",
-    "listLabel": "Хэлний жагсаалт"
+    "listLabel": "Хэлний жагсаалт",
+    "noResults": "Хайлтын үр дүн байхгүй байна",
+    "searchPlaceholder": "Хайх — Улс·Хэл·Валют"
   },
   "lbs": {
     "agreeStart": "Зөвшөөрч эхлэх",

@@ -2092,7 +2092,9 @@
     "allCountries": "Nchi Zote",
     "inactiveCount": "{count} · Hazitumiki",
     "label": "Chagua Lugha",
-    "listLabel": "Orodha ya Lugha"
+    "listLabel": "Orodha ya Lugha",
+    "noResults": "Hakuna matokeo ya utafutaji",
+    "searchPlaceholder": "Tafuta — Nchi, Lugha, Sarafu"
   },
   "lbs": {
     "agreeStart": "Kubali na Anza",

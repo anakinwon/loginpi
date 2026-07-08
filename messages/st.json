@@ -2092,7 +2092,9 @@
     "allCountries": "Todos os países",
     "inactiveCount": "{count} · inativos",
     "label": "Selecionar idioma",
-    "listLabel": "Lista de idiomas"
+    "listLabel": "Lista de idiomas",
+    "noResults": "Nenhum resultado encontrado",
+    "searchPlaceholder": "Pesquisar — País, Idioma, Moeda"
   },
   "lbs": {
     "agreeStart": "Concordar e Começar",

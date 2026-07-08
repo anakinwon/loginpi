@@ -2092,7 +2092,9 @@
     "allCountries": "Barcha davlatlar",
     "inactiveCount": "{count} ta · Faol emas",
     "label": "Tilni tanlash",
-    "listLabel": "Tillar ro'yxati"
+    "listLabel": "Tillar ro'yxati",
+    "noResults": "Natijalar topilmadi",
+    "searchPlaceholder": "Qidiruv — Davlat · Til · Valyuta"
   },
   "lbs": {
     "agreeStart": "Rozilik berish va boshlash",

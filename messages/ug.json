@@ -2092,7 +2092,9 @@
     "allCountries": "All Countries",
     "inactiveCount": "{count} · inactive",
     "label": "Select Language",
-    "listLabel": "Language List"
+    "listLabel": "Language List",
+    "noResults": "No search results",
+    "searchPlaceholder": "Search — Country · Language · Currency"
   },
   "lbs": {
     "agreeStart": "Agree and Start",

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
+import { comboMatch } from '@/lib/combo-search'
 import { usePathname, useRouter } from '@/i18n/navigation'
 import { routing } from '@/i18n/routing'
 import { piFetch } from '@/lib/pi-fetch'
@@ -123,6 +124,7 @@ export function LanguageSwitcher({
   const router = useRouter()
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
+  const [query, setQuery] = useState('')
   // lazy initializer로 캐시를 첫 렌더에 바로 반영 → 캐시 적중 시 effect·재렌더 없이 즉시 표시.
   // (드롭다운 내용은 open=true일 때만 렌더되므로 SSR↔CSR 초기 DOM 차이 없음 → hydration 안전)
   const [activeLocales, setActiveLocales] = useState<ActiveLocale[]>(
@@ -227,6 +229,7 @@ export function LanguageSwitcher({
   }, [])
 
   function toggle() {
+    setQuery('')
     setOpen((prev) => !prev)
     // 캐시가 있으면 loadData가 즉시 반환, 없을 때만 fetch.
     // (닫을 때 loadedRef를 초기화하지 않아 재열기 시 재조회 없음)
@@ -283,6 +286,32 @@ export function LanguageSwitcher({
       !activeCountryCds.has(c.country_cd.toUpperCase()),
   )
 
+  // 키인 검색 필터 — 이름·코드·통화·국가 영문/현지명 매칭 (빈 검색어 = 전체)
+  const countryByCc = new Map(
+    countries.map((c) => [c.country_cd.toUpperCase(), c]),
+  )
+  const filteredLocales = activeLocales.filter((loc) => {
+    const cc = getAlpha2(loc.locale_cd).toUpperCase()
+    const ctry = countryByCc.get(cc)
+    return comboMatch(
+      query,
+      loc.locale_nm,
+      loc.locale_cd,
+      ctry?.country_eng_nm,
+      ctry?.country_mot_nm,
+      LOCALE_CURRENCY[loc.locale_cd] ?? countryCurrencyMap.get(cc),
+    )
+  })
+  const filteredCountries = inactiveCountries.filter((c) =>
+    comboMatch(
+      query,
+      c.country_eng_nm,
+      c.country_mot_nm,
+      c.country_cd,
+      c.currency_cd,
+    ),
+  )
+
   const currentCountry = getAlpha2(locale)
 
   return (
@@ -328,17 +357,29 @@ export function LanguageSwitcher({
             </div>
           ) : (
             <>
+              {/* ── 키인 검색 ── */}
+              <div className="bg-background sticky top-0 z-10 border-b p-2">
+                <input
+                  type="search"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder={`🔍 ${t('searchPlaceholder')}`}
+                  aria-label={t('searchPlaceholder')}
+                  className="bg-muted/40 focus:border-primary w-full rounded-md border px-2 py-1.5 text-xs outline-none"
+                />
+              </div>
+
               {/* ── 활성 언어 섹션 ── */}
               <div className="bg-muted/70 flex items-center gap-1.5 border-b px-3 py-1.5">
                 <span className="text-foreground text-[11px] font-semibold">
                   {t('activeLangs')}
                 </span>
                 <span className="text-muted-foreground ml-auto text-[11px]">
-                  {t('activeCount', { count: activeLocales.length })}
+                  {t('activeCount', { count: filteredLocales.length })}
                 </span>
               </div>
 
-              {activeLocales.map((loc) => {
+              {filteredLocales.map((loc) => {
                 const countryCode = getAlpha2(loc.locale_cd)
                 const currency =
                   LOCALE_CURRENCY[loc.locale_cd] ??
@@ -397,11 +438,18 @@ export function LanguageSwitcher({
                   {t('allCountries')}
                 </span>
                 <span className="text-muted-foreground ml-auto text-[11px]">
-                  {t('inactiveCount', { count: inactiveCountries.length })}
+                  {t('inactiveCount', { count: filteredCountries.length })}
                 </span>
               </div>
 
-              {inactiveCountries.map((c) => {
+              {query.trim() !== '' &&
+                filteredLocales.length === 0 &&
+                filteredCountries.length === 0 && (
+                  <div className="text-muted-foreground px-3 py-6 text-center text-xs">
+                    {t('noResults')}
+                  </div>
+                )}
+              {filteredCountries.map((c) => {
                 const rate = rates[c.currency_cd]
                 return (
                   <div

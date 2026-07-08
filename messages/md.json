@@ -2092,7 +2092,9 @@
     "allCountries": "Toate țările",
     "inactiveCount": "{count} · Inactive",
     "label": "Selectează limba",
-    "listLabel": "Lista de limbi"
+    "listLabel": "Lista de limbi",
+    "noResults": "Nu există rezultate",
+    "searchPlaceholder": "Căutare — Țară·Limbă·Monedă"
   },
   "lbs": {
     "agreeStart": "Sunt de acord și încep",

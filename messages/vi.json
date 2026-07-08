@@ -2092,7 +2092,9 @@
     "allCountries": "Tất cả các quốc gia",
     "inactiveCount": "{count} mục · không hoạt động",
     "label": "Chọn ngôn ngữ",
-    "listLabel": "Danh sách ngôn ngữ"
+    "listLabel": "Danh sách ngôn ngữ",
+    "noResults": "Không có kết quả tìm kiếm",
+    "searchPlaceholder": "Tìm kiếm — Quốc gia, Ngôn ngữ, Tiền tệ"
   },
   "lbs": {
     "agreeStart": "Đồng ý và bắt đầu",
