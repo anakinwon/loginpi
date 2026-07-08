@@ -1,10 +1,41 @@
 # PRD: 다국어(i18n) 처리 시스템
 
-> **버전**: v1.0  
+> **버전**: v2.0 (2026-07-08 글로벌 대확장 현행화)  
 > **작성일**: 2026-06-02  
 > **작성자**: anakin  
-> **상태**: 설계 완료 / 구현 대기  
+> **상태**: ✅ 운영 중 — 활성 locale 189개 · 66개 언어 완역  
 > **연관 PRD**: `docs/PRD.md` (표준데이터 관리 프로그램)
+
+
+---
+
+## 0. 현행 스냅샷 (v2.0 — 2026-07-08 글로벌 대확장)
+
+> 아래 1장 이후는 v1.0(2026-06-02) 설계 원문이다. 현재 운영 상태는 이 절이 정본.
+
+| 항목 | 현행 |
+|---|---|
+| 활성 locale | **189개** (i18n_locale) — 187개국 전체 + 충돌 파생(ar-AR 아르헨티나·en-ZA 남아공) + 언어 locale(sq 등) |
+| 번역 규모 | ko 기준 약 2,270키 × 188 locale ≈ **42만 행** (i18n_message) — 누락 0·혼입 0·ICU 불일치 0 전수 감사 통과 |
+| 번역 소스 | ko.json = source of truth → 신규 46개 언어 Gemini(유료) 번역 + 기존 완역 언어 복사(공유 언어 국가 110개국) |
+| fallback | `deepMerge(ko → en → locale)` 3단 (src/i18n/request.ts) — 키 누락 시 영어→한국어 순 |
+| DB 테이블 | i18n_locale(189) · **i18n_lang_mst(언어마스터 — cntry FK 대상)** · i18n_cntry_mst(187) · i18n_message |
+| 테마명 번역 | `themes.<theme_cd>` 키 21종(활성 테마) — useThemeName 훅, 폐기 테마는 DB명 폴백 (PRD_17 v2.1) |
+| 파이프라인 | `scripts/i18n-bulk-activate.mjs`(활성화) · `i18n-lang-map.mjs`(국가→언어 매핑 단일소스) · `i18n-bulk-translate.mjs`(COPY+Gemini 병렬·ICU 검증·멱등 재개) · `i18n-lang-master-seed.mjs`(언어마스터·연결 보정) |
+| 검증 | `pnpm validate:locales`(빌드 게이트: messages↔통화↔국가↔routing 189개 교차) |
+
+### 신규 locale 추가 체크리스트 (7곳 — 하나라도 빠지면 부분 장애)
+1. `i18n_lang_mst` 행 (⚠️ cntry FK가 **이 테이블**을 참조 — 없으면 국가 연결 사일런트 실패)
+2. `i18n_locale` 행 (국기는 베이스 **U+1F1E6** — 과거 0x1F1E0 오계산 사고)
+3. `i18n_cntry_mst.locale_cd` 연결
+4. `scripts/i18n-lang-map.mjs` LANG_MAP (국가코드≠언어코드 — **실제 주 언어 명시**, et=에스토니아어 오번역 사고 재발 방지)
+5. `src/lib/locale-currency.ts` + `locale-country.ts`
+6. `src/i18n/routing.ts` (빌드 시점 고정 — 재배포 필요)
+7. 번역 실행 → messages/<locale>.json 재생성(DB 정본)
+
+### 운영 반영 경로
+- **UI 번역**: messages json은 git 커밋 → 배포만으로 반영(런타임은 json 읽음)
+- **DB**: dev→운영 pg_dump 테이블 복사. ⚠️ 대형 단일 트랜잭션(69MB)은 운영 인스턴스가 연결 종료 → **5만 행 청크 + 재시도** (TROUBLESHOOT 2026-07-08편)
 
 ---
 
@@ -15,7 +46,7 @@
 | 기능명 | 다국어(i18n) 처리 시스템 |
 | 핵심 가치 | 전 세계 11개 언어권 사용자에게 동일한 UI를 자국어로 제공, 국가·통화 정보를 실시간 선택 |
 | 라이브러리 | `next-intl ^4.13.0` (Next.js 16 App Router 최적화) |
-| 지원 언어 | 11개 (ko · en · zh · ja · hi · vi · id · ms · en-ZA · fil · th) |
+| 지원 언어 | **활성 locale 189개** (전 세계 187개국 + 언어 변형 ar-AR·en-ZA 등) — 고유 언어 66종 완역 |
 | 기본 locale | `ko` (한국어, prefix 없음 — 기존 URL `/notice` 등 유지) |
 | DB 표준 | DA 표준 v2 준수 (2026-05-30 총괄DA 승인) |
 

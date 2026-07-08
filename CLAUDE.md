@@ -93,6 +93,8 @@ pnpm dlx shadcn@latest add <컴포넌트명>
 - `locale_cd` 형식: `/^[a-z]{2,3}(-[A-Z]{2,3})?$/` (Admin 신규 추가 시 필수 검증)
 - 번역 로딩: `import()` 대신 `readFile()` 사용 — Node.js 모듈캐시가 동기화 결과를 반영하지 않음
 - `pnpm build` 시 `scripts/validate-locales.mjs`가 messages ↔ 통화 ↔ 국가 ↔ routing.ts 교차 검증 (수동: `pnpm validate:locales`)
+- **활성 locale 189개** (2026-07-08 글로벌 대확장, 66개 언어 완역). 신규 locale 추가는 **7곳 체크리스트**(PRD_3_MUL_LAN v2.0 §0) — ⚠️ `i18n_cntry_mst` FK는 `i18n_lang_mst`(언어마스터) 참조, 국기 이모지 베이스 U+1F1E6, 국가코드≠언어코드(실제 주 언어는 `scripts/i18n-lang-map.mjs` 단일소스)
+- **카페 테마명은 번역키** `themes.<theme_cd>` + `useThemeName` 훅(폐기 테마는 DB명 폴백) — theme_nm_en 직접 표시 금지. 번역키 폐기는 **삭제**(빈 값 "" 금지 — 99% 통계 사고)
 
 ---
 
