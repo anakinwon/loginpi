@@ -18,6 +18,10 @@ export const env = createEnv({
     // 앱 지갑 주소 선언('G'로 시작, 선택) — a2u-status 진단이 시드 도출 지갑과 대조.
     // ⛔ 코드에 지갑 주소 하드코딩 금지 — 기대값은 반드시 이 env로만 선언 (2026-07-02)
     PI_WALLET_AGGRESS: z.string().optional(),
+    // Pi Developer Portal 도메인 소유 검증 키 — /validation-key.txt 라우트가 그대로 서빙.
+    // 포털 프로젝트별(staging≠운영·testnet≠mainnet) 키가 다르므로 파일 커밋 대신 env 주입.
+    // 미설정 시 해당 라우트는 404(검증 미진행 환경 정상).
+    PI_DOMAIN_VALIDATION_KEY: z.string().optional(),
     SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
     // ── 3-tier DB 라우팅(src/lib/db-env.ts) — 전부 optional, 미설정 시 현행 운영 DB 폴백(하위호환) ──
     // tier 자동판정(VERCEL_ENV)을 덮어쓸 명시값. 보통 미설정.
@@ -89,6 +93,9 @@ export const env = createEnv({
     NEXT_PUBLIC_PI_APP_DOMAIN: z.string().optional(),
     // Pi Sign-In(OAuth implicit) 클라이언트 ID — 일반 브라우저 'Pi로 로그인' 버튼 활성 조건
     NEXT_PUBLIC_PI_OAUTH_CLIENT_ID: z.string().optional(),
+    // 메인넷 등재 절제 모드(PRD_23 §8.3) — 'true'면 i18n 절제 오버레이(messages/listing/*) 적용.
+    // 운영(cafepi)에만 'true'. staging(loginpi)·로컬은 미설정(절제 OFF — "Bean Token" 등 원문 유지).
+    NEXT_PUBLIC_LISTING_MODE: z.enum(['true', 'false']).optional(),
   },
   runtimeEnv: {
     PI_SESSION_SECRET: process.env.PI_SESSION_SECRET,
@@ -98,6 +105,7 @@ export const env = createEnv({
     PI_API_KEY: process.env.PI_API_KEY,
     PI_WALLET_PRIVATE_SEED: process.env.PI_WALLET_PRIVATE_SEED,
     PI_WALLET_AGGRESS: process.env.PI_WALLET_AGGRESS,
+    PI_DOMAIN_VALIDATION_KEY: process.env.PI_DOMAIN_VALIDATION_KEY,
     SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
     APP_TIER: process.env.APP_TIER,
     STAGING_DB_TARGET: process.env.STAGING_DB_TARGET,
@@ -143,6 +151,7 @@ export const env = createEnv({
       process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
     NEXT_PUBLIC_FEATURE_PI_PRICE: process.env.NEXT_PUBLIC_FEATURE_PI_PRICE,
     NEXT_PUBLIC_PI_APP_DOMAIN: process.env.NEXT_PUBLIC_PI_APP_DOMAIN,
+    NEXT_PUBLIC_LISTING_MODE: process.env.NEXT_PUBLIC_LISTING_MODE,
   },
   emptyStringAsUndefined: true,
 })

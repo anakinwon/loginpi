@@ -1,0 +1,21 @@
+{
+  "_comment": "메인넷 등재 절제 오버레이(PRD_23 §8.5·MAINNET_READINESS C-1-F) — NEXT_PUBLIC_LISTING_MODE='true'인 환경(운영 cafepi)에서만 로드 후처리로 덮어씌움. 절제 대상 키만 최소로 유지하고, 원본 ko.json·DB i18n_message 정본은 절대 수정하지 않는다. 표현 원칙: 토큰/발행/경제 → 포인트/지급 순화(A-5 'non-Pi Tokens' 인상 제거).",
+  "admin": {
+    "nav": {
+      "beanSection": "☕ Bean 포인트"
+    }
+  },
+  "adminStats": {
+    "whitepaper": {
+      "highlight2Desc": "PiRC1(Bean 포인트) · PiRC2(구독 서비스) · PiRC3(에스크로 안전거래) 구현.",
+      "pillar3Desc": "모든 거래는 추가 전용(append-only) 원장에 기록되고, 회계 보존 항등식(지급 = 유통 + 회수)을 상시 검증합니다. 과지급·이중지급이 구조적으로 불가능합니다."
+    },
+    "beanFlowCharge": "충전(지급)"
+  },
+  "store": {
+    "fiatRefAt": "{date} 환율 참고",
+    "form": {
+      "priceConverted": "≈ {pi} π (등록시점 환율 참고 환산)"
+    }
+  }
+}

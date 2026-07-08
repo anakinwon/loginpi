@@ -1,0 +1,21 @@
+{
+  "_comment": "Mainnet listing restraint overlay (PRD_23 §8.5 · MAINNET_READINESS C-1-F). Applied only when NEXT_PUBLIC_LISTING_MODE='true' (production cafepi). English is the primary review language and also serves as the fallback overlay for all non-ko locales. Principle: token/issuance/economy wording -> points/grant (removes 'non-Pi Tokens' impression, requirement A-5).",
+  "admin": {
+    "nav": {
+      "beanSection": "☕ Bean Points"
+    }
+  },
+  "adminStats": {
+    "whitepaper": {
+      "highlight2Desc": "Implements PiRC1 (Bean Points) · PiRC2 (Subscription Service) · PiRC3 (Escrow Secure Transactions).",
+      "pillar3Desc": "All transactions are recorded in an append-only ledger, and the accounting conservation identity (Grants = Circulation + Retrieval) is constantly verified. Over-granting and double-spending are structurally impossible."
+    },
+    "beanFlowCharge": "Charge (Grant)"
+  },
+  "store": {
+    "fiatRefAt": "Reference rate as of {date}",
+    "form": {
+      "priceConverted": "≈ {pi} π (reference conversion at registration-time rate)"
+    }
+  }
+}
