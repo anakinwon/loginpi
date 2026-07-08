@@ -608,3 +608,8 @@ Pi Sign-In QR은 채굴 앱 스캐너·폰 카메라가 아니라 **파이지갑
 4. **"스캔" 탭** 클릭
 5. PC 화면의 QR 스캔 → 승인
 (QR 내용은 `https://accounts.pinet.com/swp-<세션ID>` 일반 URL — 실측 디코드 확인)
+
+**모바일 일반 브라우저는 QR이 아예 없음(실측)** — 인가 페이지가 모바일 UA에서는
+"Continue in the Pi Browser" + **[Open Pi Browser]** 딥링크(`pi://redirect.pi/pi-net/<swp URL>`)로
+렌더링되어 **같은 폰의 Pi Browser 앱에서 승인** → 원래 브라우저가 상태 폴링으로 자동 진행.
+기기 1대 완결 — "같은 폰으로 QR을 어떻게 찍나" 딜레마는 Pi가 기기별 렌더링으로 해결.
