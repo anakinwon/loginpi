@@ -136,6 +136,13 @@ if (!user) return <ClientChatRoom roomId={roomId} />
 예: `ClientChatList`, `ClientChatRoom`, `ClientAdminGate`
 데이터 API는 `getSessionUser()`만 쓰면 쿠키·헤더 양쪽 자동 지원.
 
+### Pi Sign-In — 일반 브라우저 Pi 로그인 (OAuth implicit, 2026-07-08)
+
+- `accounts.pinet.com/oauth/authorize` → 콜백 `/auth/pi/callback`(프래그먼트 토큰) → **기존 `/api/auth/pi` POST 재사용**
+- state는 **localStorage+10분 만료**(sessionStorage는 탭 단위라 오탐 — TROUBLESHOOT 2026-07-08편)
+- **Pi의 인가 페이지는 Pi Browser 내 미지원** → 버튼(`PiOAuthLoginButton`)은 클릭 시 SDK signIn() 선시도 후 실패 시에만 OAuth(시도 후 폴백 — UA 분기 금지 철칙)
+- env `NEXT_PUBLIC_PI_OAUTH_CLIENT_ID` 환경별 필수(미설정=버튼 미노출) + Developer Portal Redirect URI 정확 일치 등록
+
 ### Google 세션 (NextAuth v5 beta)
 
 - `session.user.sub` = Google OAuth raw sub | `session.user.id` = users row UUID

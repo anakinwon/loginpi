@@ -23,6 +23,9 @@
 | 테마명 번역 | `themes.<theme_cd>` 키 21종(활성 테마) — useThemeName 훅, 폐기 테마는 DB명 폴백 (PRD_17 v2.1) |
 | 파이프라인 | `scripts/i18n-bulk-activate.mjs`(활성화) · `i18n-lang-map.mjs`(국가→언어 매핑 단일소스) · `i18n-bulk-translate.mjs`(COPY+Gemini 병렬·ICU 검증·멱등 재개) · `i18n-lang-master-seed.mjs`(언어마스터·연결 보정) |
 | 검증 | `pnpm validate:locales`(빌드 게이트: messages↔통화↔국가↔routing 189개 교차) |
+| 콤보 정렬 | 우선 12개국(한·미·중·일·베트남·인도·나이지리아·인니·필리핀·독일·태국·말련) 고정 + 국가 영문명 알파벳순 — i18n_locale.sort_ord·i18n_cntry_mst.dis_ord_seq (sql/168, 2026-07-08 마스터 지시) |
+| 콤보 검색 | 언어 스위처·통화 콤보·번역 언어 선택에 키인 검색(`src/lib/combo-search.ts` comboMatch — 영문/현지명·코드·통화 다중 필드) |
+| 증분 번역 | ko.json 신규 키 추가 후 `node scripts/i18n-increment-translate.mjs` 원커맨드(66언어 × 189 locale, 재실행 재개 안전) + 운영 DB 델타(psql \copy) |
 
 ### 신규 locale 추가 체크리스트 (7곳 — 하나라도 빠지면 부분 장애)
 1. `i18n_lang_mst` 행 (⚠️ cntry FK가 **이 테이블**을 참조 — 없으면 국가 연결 사일런트 실패)
