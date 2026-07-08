@@ -147,6 +147,56 @@ export async function triggerPiReward(
   }
 }
 
+// 이벤트 Pi 보상 대기 기록 결과
+export type PendingRewardResult = 'RECORDED' | 'ALREADY' | 'NO_UID'
+
+/**
+ * PI모드 이벤트 보상 대기 기록 — 실송금 없이 evt_pi_reward_log에 PENDING만 남긴다.
+ *
+ * ⭐ 관리자 승인 게이트(PRD_24 §0, 마스터 결정 2026-07-08): 무인 cron은 이 함수로
+ *   대기 기록까지만. 실 A2U 송금은 관리자가 /api/admin/event/pi-reward POST로 실행.
+ * 멱등: UNIQUE(event_id, user_id) — PAID/PENDING 기존 행은 건드리지 않고 ALREADY 반환,
+ *   FAILED는 PENDING으로 재전환(재시도 대상 복귀).
+ */
+export async function recordPendingEvtPiReward(
+  eventId: string,
+  userId: string,
+  rewardAmt: number,
+): Promise<PendingRewardResult> {
+  const db = getSupabaseAdmin()
+
+  const { data: existing } = await db
+    .from('evt_pi_reward_log')
+    .select('reward_st_cd')
+    .eq('event_id', eventId)
+    .eq('user_id', userId)
+    .maybeSingle()
+  const st = (existing as { reward_st_cd: string } | null)?.reward_st_cd
+  if (st === 'PAID' || st === 'PENDING') return 'ALREADY'
+
+  // Pi UID 조회 — 없으면 FAILED 기록(Pi 로그인 후 관리자 재시도 가능)
+  const { data: userRow } = await db
+    .from('sys_user')
+    .select('pi_uid')
+    .eq('id', userId)
+    .maybeSingle()
+  const piUid = (userRow as { pi_uid: string | null } | null)?.pi_uid
+
+  if (!piUid) {
+    await upsertRewardLog(db, eventId, userId, 'UNKNOWN', rewardAmt, {
+      reward_st_cd: 'FAILED',
+      fail_reason_tx: 'Pi UID 없음 — Pi 계정으로 로그인 후 재시도 필요',
+    })
+    return 'NO_UID'
+  }
+
+  await upsertRewardLog(db, eventId, userId, piUid, rewardAmt, {
+    reward_st_cd: 'PENDING',
+    fail_reason_tx: null,
+  })
+  return 'RECORDED'
+}
+
 // ──────────────────────────────────────────────────────────────────────────────
 // 내부 헬퍼
 

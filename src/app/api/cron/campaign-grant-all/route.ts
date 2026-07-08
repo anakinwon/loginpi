@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { getActiveFeeMode } from '@/lib/fee-resolver'
 import { sanitizeError } from '@/lib/sanitize-error'
 
 async function logBatchRun(
@@ -34,6 +35,10 @@ async function logBatchRun(
 // GET /api/cron/campaign-grant-all  (1시간 주기)
 // 매장 선착순 온보딩 이벤트 #2 — 조건 완수 판매자에게 자동 신청·승인·지급.
 // 관리자 "🎁 완수자 일괄 지급" 버튼(/api/admin/campaign/grant-all)과 동일 효과.
+//
+// ⭐ PI모드(PRD_24 §0, 마스터 결정 2026-07-08 관리자 승인 게이트):
+//   무인 cron은 실 Pi 유출 금지 → 1단계 신청(PENDING)까지만 수행하고 승인·송금을 생략한다.
+//   지급은 관리자가 /admin/campaign 승인 버튼 또는 일괄 지급 버튼으로 실행.
 //
 // 자격 판정은 fn_bean_campaign_grant RPC에 완전 위임:
 //   - SQL 100 적용 전: M1~M3 검사 (req_tlgm_alrt_yn='N')
@@ -87,10 +92,14 @@ export async function GET(request: NextRequest) {
     })
   }
 
+  // PI모드: 무인 자동 승인·송금 금지(관리자 게이트) — 신청 단계까지만 수행
+  const mode = await getActiveFeeMode()
+
   let granted = 0
   let already = 0
   let notEligible = 0
   let failed = 0
+  let pendingOnly = 0
   const errors: string[] = []
 
   for (const uid of sellerIds) {
@@ -104,6 +113,12 @@ export async function GET(request: NextRequest) {
       if (grantStatus === 'NOT_ELIGIBLE') {
         notEligible++
         continue // 자격 미충족 — 다음 판매자로
+      }
+
+      // PI모드: 승인·송금은 관리자 몫 — 신청(PENDING)까지만 남기고 종료
+      if (mode === 'PI') {
+        pendingOnly++
+        continue
       }
 
       // 2단계: 승인·지급 (REWARD_POOL → USER). 이미 APPROVED면 NOT_PENDING
@@ -149,13 +164,15 @@ export async function GET(request: NextRequest) {
     'SYSTEM',
   )
   console.log(
-    `[cron/campaign-grant-all] sellers=${sellerIds.length} granted=${granted} already=${already} notEligible=${notEligible} failed=${failed}`,
+    `[cron/campaign-grant-all] mode=${mode} sellers=${sellerIds.length} granted=${granted} pendingOnly=${pendingOnly} already=${already} notEligible=${notEligible} failed=${failed}`,
   )
   return NextResponse.json({
     ok: true,
     campaign: CAMPAIGN_CD,
+    mode,
     sellers: sellerIds.length,
     granted,
+    pendingOnly, // PI모드: 신청만 생성 — 관리자 승인 대기
     already,
     notEligible,
     failed,

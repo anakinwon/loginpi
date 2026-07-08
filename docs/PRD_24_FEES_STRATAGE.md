@@ -740,6 +740,7 @@ interface PreSwitchValidation {
 
 | 버전 | 날짜 | 변경 내용 |
 |---|---|---|
+| **v0.5** | 2026-07-08 | **보상 A2U 잔여(이벤트·캠페인) 전환 완료 — ⭐관리자 승인 게이트(마스터 결정)** — 이벤트·캠페인 보상은 재원이 플랫폼 지갑(고액: 이벤트 인당 수십 Pi)이라 무인 자동송금 금지. PI모드: ①이벤트=cron·지급버튼이 `evt_pi_reward_log` PENDING 기록만(`recordPendingEvtPiReward`) → 실송금은 관리자 Pi 보상 화면(POST admin/event/pi-reward)에서 ②캠페인=무인 cron은 신청까지만, 관리자 승인(approve·grant-all 버튼)이 게이트 → `fn_bean_campaign_approve(p_mode)`(sql/171) 승인 전이 + `payCampaignPiReward` A2U(멱등 `bean_campaign_pi_reward_log`), 승인 완료분 실패 재시도는 fbck-pi-payout cron 공용. BEAN모드 경로 무변경. |
 | **v0.4** | 2026-06-29 | **후기 보상 보증금 선행 게이트** — 매장 보증금 예치 시에만 후기 작성·보상 허용(기존 fbck_consent_yn 동의 게이트 강화). Bean/Pi 모드 무관 동일 규칙(1:100). 보상액=bean_fee_plan FBCK_REWARD 단일출처. 보증금 구조는 옵션 승인 후 §10 확정. |
 | **v0.3** | 2026-06-29 | **롤백·1:100·REWARD Pi화 + 영향분석 사전정의(§10)** — ①양방향 롤백 보장(fn_rollback_fee_mode·bean_txn.pi_amt 병기) ②1:100 완벽매핑(단일출처+v_fee_plan_dual 뷰, 별도Pi테이블 금지) ③REWARD Pi화(후기·캠페인=triggerPiReward A2U ÷100, 이벤트는 기존 reward_pi_amt). §10에 추가/변경 테이블·데이터·화면 사전 정의. 신규테이블=fee_mode 2개뿐(bean_txn.pi_amt 재사용). |
 | **v0.2** | 2026-06-29 | **설계 검토 반영(§0 신설)** — 핵심 모순(Pi 모드 실거래 미정의) 해소. 마스터 결정: ①Pi 모드=진짜 Pi 직결제(`createPayment`/`pi_pymnt`) ②마이크로 무료화 ③구독만 Pi화. "코드 변경 0" 철회·`fn_bean_apply(Pi)` 모델 삭제·단일출처(코드상수)·캐시 일관성·del_yn 보강 정정. §0이 본문보다 우선. |

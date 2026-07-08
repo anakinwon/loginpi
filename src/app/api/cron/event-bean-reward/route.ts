@@ -2,12 +2,17 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { grantBeanReward } from '@/lib/event'
+import { recordPendingEvtPiReward } from '@/lib/pi-reward'
+import { getActiveFeeMode, beanToPi } from '@/lib/fee-resolver'
 import { sanitizeError } from '@/lib/sanitize-error'
 
 // GET /api/cron/event-bean-reward  (1시간 주기, Vercel Cron: 0 * * * *)
 // POST /api/cron/event-bean-reward  (관리자 수동 실행)
-// 오픈베타 이벤트 #1 — 10미션 완료자에게 5,000 Bean 자동 지급.
-// 멱등: fn_evt_grant_bean_reward 가 PAID 게이트 + FOR UPDATE로 중복 지급 원천 차단.
+// 오픈베타 이벤트 #1 — 10미션 완료자 보상 (PRD_24 §0 이중 요금모드):
+//   BEAN모드: 5,000 Bean 자동 지급 (기존 경로)
+//   PI모드:   evt_pi_reward_log PENDING 대기 기록만 — ⭐실송금은 관리자 승인 게이트
+//             (/api/admin/event/pi-reward POST, 마스터 결정 2026-07-08). 무인 자동 Pi 유출 없음.
+// 멱등: fn_evt_grant_bean_reward PAID 게이트 / evt_pi_reward_log UNIQUE(event,user).
 
 const EVENT_ID = 'evt-20260614-001'
 const EVENT_REWARD_BEAN = 5000
@@ -32,12 +37,13 @@ async function runReward(): Promise<RewardResult> {
 
   const { data: evtRow } = await db
     .from('evt_event')
-    .select('reward_mission_count_no, reward_pi_yn')
+    .select('reward_mission_count_no, reward_pi_yn, reward_pi_amt')
     .eq('event_id', EVENT_ID)
     .maybeSingle()
   const evt = evtRow as {
     reward_mission_count_no: number
     reward_pi_yn: string
+    reward_pi_amt: number | null
   } | null
   if (!evt || evt.reward_pi_yn !== 'Y') {
     return {
@@ -81,6 +87,30 @@ async function runReward(): Promise<RewardResult> {
   let granted = 0
   let already = 0
   let failed = 0
+
+  // PI모드: 대기 기록만(관리자 승인 게이트 — 자동 실송금 금지). 금액은 evt_event.reward_pi_amt
+  // 단일 출처(실지급 라우트도 동일 값 사용), 미설정 시 Bean÷100 환산 폴백.
+  const mode = await getActiveFeeMode()
+  if (mode === 'PI') {
+    const piAmt = Number(evt.reward_pi_amt) || beanToPi(EVENT_REWARD_BEAN)
+    for (const uid of targets) {
+      const result = await recordPendingEvtPiReward(EVENT_ID, uid, piAmt)
+      if (result === 'RECORDED') granted++
+      else if (result === 'ALREADY') already++
+      else {
+        failed++
+        console.warn(`[event-bean-reward] PI대기 uid=${uid} result=${result}`)
+      }
+    }
+    return {
+      eligible: targets.length,
+      granted, // PI모드에선 "대기 기록" 건수 — 실송금은 관리자 승인 시
+      already,
+      failed,
+      excludedCount: excluded.size,
+    }
+  }
+
   for (const uid of targets) {
     const result = await grantBeanReward(EVENT_ID, uid, EVENT_REWARD_BEAN)
     if (result === 'GRANTED') granted++

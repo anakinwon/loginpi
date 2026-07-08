@@ -1,6 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse, after } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { getActiveFeeMode, beanToPi } from '@/lib/fee-resolver'
+import { payCampaignPiReward } from '@/lib/campaign-pi-reward'
 
 // campaign_cd 형식: 대문자/숫자/언더스코어 (예: SHOP_ONBOARD, EVENT_M1)
 const CD_RE = /^[A-Z][A-Z0-9_]{1,31}$/
@@ -201,6 +203,8 @@ export async function POST(req: NextRequest) {
         { status: 400 },
       )
 
+    // 승인은 요금모드 전달 (PRD_24 §0) — PI모드면 RPC가 Bean 지급 생략·승인 전이만
+    const mode = action === 'approve' ? await getActiveFeeMode() : null
     const fn =
       action === 'approve'
         ? 'fn_bean_campaign_approve'
@@ -209,10 +213,19 @@ export async function POST(req: NextRequest) {
       p_usr_id: usrId,
       p_campaign_cd: campaignCd,
       p_admin_id: user!.id,
+      ...(mode ? { p_mode: mode } : {}),
     })
     if (error) {
       console.error(`[admin/campaign] ${action} 실패:`, error.message)
       return NextResponse.json({ error: '처리 실패' }, { status: 500 })
+    }
+
+    // PI모드 승인 = 관리자 게이트 통과 → 실 Pi A2U 송금(비블로킹, 멱등 로그).
+    // 실패 시 fbck-pi-payout cron이 승인 완료분(PENDING/FAILED)을 재시도.
+    const res = data as { status?: string; reward?: number } | null
+    if (mode === 'PI' && res?.status === 'APPROVED') {
+      const piAmt = beanToPi(Number(res.reward ?? 0))
+      after(() => payCampaignPiReward(campaignCd, usrId, piAmt))
     }
     return NextResponse.json(data)
   }

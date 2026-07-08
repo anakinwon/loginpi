@@ -1,6 +1,8 @@
-import { NextResponse } from 'next/server'
+import { NextResponse, after } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { getActiveFeeMode, beanToPi } from '@/lib/fee-resolver'
+import { payCampaignPiReward } from '@/lib/campaign-pi-reward'
 import { sanitizeError } from '@/lib/sanitize-error'
 
 const CAMPAIGN_CD = 'SHOP_ONBOARD'
@@ -101,6 +103,8 @@ export async function POST() {
   const targets = sellerIds.filter((id) => itemSet.has(id) && tlgmSet.has(id))
 
   // 4) 각자 신청(grant) → 승인·지급(approve), 멱등 RPC에 위임
+  //    PI모드(PRD_24 §0): 관리자 일괄 버튼 = 승인 게이트 통과 → 승인 전이 + 실 Pi A2U 송금
+  const mode = await getActiveFeeMode()
   let granted = 0
   let already = 0
   let failed = 0
@@ -112,11 +116,12 @@ export async function POST() {
         p_usr_id: uid,
         p_campaign_cd: CAMPAIGN_CD,
       })
-      // 승인 + 지급(REWARD_POOL → USER). 이미 APPROVED면 NOT_PENDING
+      // 승인 + 지급(BEAN: REWARD_POOL → USER / PI: 승인 전이 후 A2U). 이미 APPROVED면 NOT_PENDING
       const { data, error } = await db.rpc('fn_bean_campaign_approve', {
         p_usr_id: uid,
         p_campaign_cd: CAMPAIGN_CD,
         p_admin_id: user!.id,
+        p_mode: mode,
       })
       if (error) {
         failed++
@@ -125,9 +130,16 @@ export async function POST() {
         )
         continue
       }
-      const status = (data as { status?: string } | null)?.status
-      if (status === 'APPROVED') granted++
-      else if (status === 'NOT_PENDING')
+      const res = data as { status?: string; reward?: number } | null
+      const status = res?.status
+      if (status === 'APPROVED') {
+        granted++
+        // PI모드: 실송금(비블로킹·멱등). 실패분은 fbck-pi-payout cron 재시도.
+        if (mode === 'PI') {
+          const piAmt = beanToPi(Number(res?.reward ?? 0))
+          after(() => payCampaignPiReward(CAMPAIGN_CD, uid, piAmt))
+        }
+      } else if (status === 'NOT_PENDING')
         already++ // 이미 지급됨 — 이중지급 차단
       else {
         failed++

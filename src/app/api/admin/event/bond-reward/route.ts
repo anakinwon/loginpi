@@ -2,13 +2,19 @@ import { NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { grantBeanReward } from '@/lib/event'
+import { recordPendingEvtPiReward } from '@/lib/pi-reward'
+import { getActiveFeeMode, beanToPi } from '@/lib/fee-resolver'
 import { sanitizeError } from '@/lib/sanitize-error'
 
 // 오픈베타#1 보상 금액 (Bean) — subtitle '선착순 100명 5,000 Bean Token'과 일치
 const EVENT_REWARD_BEAN = 5000
 
 // POST /api/admin/event/bond-reward
-// 10미션 완료자에게 5,000 Bean을 지급한다 (관리자 전용).
+// 10미션 완료자 보상 지급 (관리자 전용, PRD_24 §0 이중 요금모드):
+//   BEAN모드: 5,000 Bean 지급 (기존 경로)
+//   PI모드:   evt_pi_reward_log PENDING 대기 기록 → 관리자가 Pi 보상 화면
+//             (/api/admin/event/pi-reward POST)에서 검토 후 실송금(2단계 승인 게이트 —
+//             고액(인당 수십 Pi) 유출 전 금액·대상 확인 기회 확보)
 //
 // 중복 지급 방지: 실제 지급은 DB 함수 fn_evt_grant_bean_reward(sql/095)가
 // 단일 트랜잭션 + FOR UPDATE + reward_st_cd='PAID' 게이트로 원자 처리(mint+apply).
@@ -34,12 +40,13 @@ export async function POST(req: Request) {
   // 보상 설정 확인
   const { data: evtRow } = await db
     .from('evt_event')
-    .select('reward_mission_count_no, reward_pi_yn')
+    .select('reward_mission_count_no, reward_pi_yn, reward_pi_amt')
     .eq('event_id', eventId)
     .maybeSingle()
   const evt = evtRow as {
     reward_mission_count_no: number
     reward_pi_yn: string
+    reward_pi_amt: number | null
   } | null
   if (!evt)
     return NextResponse.json(
@@ -98,6 +105,34 @@ export async function POST(req: Request) {
   let already = 0
   let failed = 0
   const errors: string[] = []
+
+  // PI모드: 대기 기록만 — 실송금은 Pi 보상 화면에서 검토 후 실행(2단계 승인 게이트)
+  const mode = await getActiveFeeMode()
+  if (mode === 'PI') {
+    const piAmt = Number(evt.reward_pi_amt) || beanToPi(EVENT_REWARD_BEAN)
+    for (const uid of targets) {
+      const result = await recordPendingEvtPiReward(eventId, uid, piAmt)
+      if (result === 'RECORDED') granted++
+      else if (result === 'ALREADY') already++
+      else {
+        failed++
+        errors.push(`${uid}:${result}`)
+      }
+    }
+    return NextResponse.json({
+      ok: true,
+      eventId,
+      mode: 'PI',
+      message: `PI모드 — ${granted}건 대기 기록. 실송금은 Pi 보상 관리에서 실행하세요.`,
+      eligible: targets.length,
+      granted,
+      already,
+      failed,
+      excludedCount: excluded.size,
+      ...(errors.length ? { errors } : {}),
+    })
+  }
+
   for (const uid of targets) {
     const result = await grantBeanReward(eventId, uid, EVENT_REWARD_BEAN)
     if (result === 'GRANTED') granted++
