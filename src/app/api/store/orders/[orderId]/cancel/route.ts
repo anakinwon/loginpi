@@ -4,6 +4,7 @@ import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { cancelOrder } from '@/lib/mps-order'
 import { refundCancelledOrder } from '@/lib/mps-refund'
 import { recordUserAction } from '@/lib/event'
+import { enqueueTxnStNoti } from '@/lib/trade-noti'
 
 const cancelSchema = z.object({
   reason: z.string().min(1).max(500), // 취소 사유 필수 (FR-10)
@@ -77,6 +78,11 @@ export async function POST(
       }
     },
   )
+
+  // 상대방에게 취소 통지 — 관리자 취소면 양측 통지 (PRD_13 §18-9 TXN_ST)
+  if (result.order) {
+    await enqueueTxnStNoti(result.order, 'CANCELLED', user.id)
+  }
 
   // M7/M8: 거래 취소 미션 기록 (판매자 vs 구매자 판별)
   // result.order는 MpsOrder 타입 — 실제 컬럼명 seller_id/buyer_id를 직접 구조분해(오타 방지)

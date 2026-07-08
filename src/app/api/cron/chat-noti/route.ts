@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { dispatchChatNotis } from '@/lib/chat-noti'
+import { dispatchTradeNotis } from '@/lib/trade-noti'
 import { ensureTelegramWebhook } from '@/lib/telegram-webhook'
 
 // P2P 채팅 알림 발송 cron (Vercel Pro — 1분 주기 * * * * *).
@@ -24,7 +25,9 @@ export async function GET(request: NextRequest) {
 
   try {
     const notis = await dispatchChatNotis()
-    return NextResponse.json({ ok: true, notis, webhook })
+    // 통합 알림(거래상태 TXN_ST·후기 FBCK)도 같은 1분 파이프로 발송 (PRD_13 §18-9)
+    const trade = await dispatchTradeNotis()
+    return NextResponse.json({ ok: true, notis, trade, webhook })
   } catch (err) {
     console.error('[cron/chat-noti] 채팅 알림 발송 실패:', err)
     return NextResponse.json(

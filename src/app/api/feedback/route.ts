@@ -3,6 +3,7 @@ import { getSessionUser } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getActiveFeeMode } from '@/lib/fee-resolver'
 import { payFbckPiReward } from '@/lib/fbck-pi-reward'
+import { enqueueFbckNoti } from '@/lib/trade-noti'
 import { maskUsername } from '@/lib/mask-username'
 
 interface FbckImgInput {
@@ -372,6 +373,20 @@ export async function POST(req: NextRequest) {
   }
 
   const fbckId = (inserted as { fbck_id: string }).fbck_id
+
+  // 매장주(카페 OWNER·상점 seller)에게 "후기 도착" 통지 — 본인 후기(self)는 제외.
+  // enqueue 실패는 내부에서 삼켜 후기 저장에 영향 없음 (PRD_13 §18-9 FBCK)
+  if (ownerId && ownerId !== user.id) {
+    await enqueueFbckNoti({
+      fbckId,
+      recvUsrId: ownerId,
+      kind: bondKind,
+      roomId: shop_id ?? null,
+      prodId,
+      fbckScr: Number(fbck_scr),
+      fbckCn: fbck_cn.trim(),
+    })
+  }
 
   // 이미지 삽입
   if (fbck_img?.length) {

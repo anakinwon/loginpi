@@ -1,6 +1,7 @@
 import 'server-only'
 import { getSupabaseAdmin } from './supabase-admin'
 import { sendA2U, isA2UEnabled } from './pi-a2u'
+import { enqueueTxnStNoti } from './trade-noti'
 
 // MPS 주문 — 상태 머신 (에스크로 결제 즉시 거래중):
 //   PENDING → TRADING(결제 완료 = 거래중) → BUYER_DONE(구매자 수령) → DONE(판매자 거래완료 → 정산)
@@ -296,10 +297,12 @@ async function enqueueOrderNoti(
   orderMthdCd: string | null,
 ) {
   // 멱등 — 이미 이 주문의 TELEGRAM 알림 행이 있으면 재INSERT 금지(백필·재시도 안전)
+  // noti_tp_cd 필터 필수 — 같은 주문의 TXN_ST/FBCK 행이 있어도 ORDER 알림을 오발 skip하지 않게
   const { data: existing } = await db
     .from('msg_noti_outbox')
     .select('noti_id')
     .eq('order_id', order.order_id)
+    .eq('noti_tp_cd', 'ORDER')
     .eq('noti_chnl_cd', 'TELEGRAM')
     .limit(1)
   if (existing && existing.length > 0) return
@@ -382,7 +385,10 @@ export async function markBuyerDone(orderId: string, buyerId: string) {
     .select()
     .maybeSingle()
 
-  return (data as MpsOrder | null) ?? null
+  const order = (data as MpsOrder | null) ?? null
+  // 판매자에게 "구매자 수령 확인" 통지 — 전이 가드가 멱등 보장 (PRD_13 §18-9 TXN_ST)
+  if (order) await enqueueTxnStNoti(order, 'BUYER_DONE', buyerId)
+  return order
 }
 
 // ② 판매자 "거래 완료" — BUYER_DONE → DONE + 판매자 A2U 자동 정산 (실패 시 정산대기 폴백)
@@ -405,6 +411,8 @@ export async function markComplete(orderId: string, sellerId: string) {
   if (!data) return null
   const order = data as MpsOrder
   await settleOrder(db, order, sellerId)
+  // 구매자에게 "거래 완료" 통지 (PRD_13 §18-9 TXN_ST)
+  await enqueueTxnStNoti(order, 'DONE', sellerId)
   return order
 }
 
@@ -427,7 +435,10 @@ export async function markPreparing(orderId: string, sellerId: string) {
     .eq('del_yn', 'N')
     .select()
     .maybeSingle()
-  return (data as MpsOrder | null) ?? null
+  const order = (data as MpsOrder | null) ?? null
+  // 구매자에게 "접수·준비중" 통지 (PRD_13 §18-9 TXN_ST)
+  if (order) await enqueueTxnStNoti(order, 'PREPARING', sellerId)
+  return order
 }
 
 // 판매자 "준비완료" — PREPARING → READY (상품준비완료, 5분 자동완료 타이머 시작)
@@ -447,7 +458,10 @@ export async function markReady(orderId: string, sellerId: string) {
     .eq('del_yn', 'N')
     .select()
     .maybeSingle()
-  return (data as MpsOrder | null) ?? null
+  const order = (data as MpsOrder | null) ?? null
+  // 구매자에게 "준비 완료 — 수령 요청" 통지 (PRD_13 §18-9 TXN_ST)
+  if (order) await enqueueTxnStNoti(order, 'READY', sellerId)
+  return order
 }
 
 // 정산 송금 단위 반올림 (1π = 10^7, Pi A2U 정밀도 정합)
@@ -763,6 +777,8 @@ export async function markPickup(orderId: string, buyerId: string) {
   }).then(({ error }) => {
     if (error) console.error('[O2O 캠페인] 픽업 신청 실패:', error.message)
   })
+  // 판매자에게 "구매자 수령 완료 — 거래 종료" 통지 (PRD_13 §18-9 TXN_ST)
+  await enqueueTxnStNoti(order, 'DONE', buyerId)
   return order
 }
 
