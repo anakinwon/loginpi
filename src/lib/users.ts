@@ -251,10 +251,12 @@ export async function updatePiUserWithGoogle(
 
 export async function getUserById(id: string): Promise<UserRow | null> {
   // .single()은 0행일 때 에러를 던진다(CLAUDE.md 규칙) → orphan id 대비 .maybeSingle()
+  // del_yn='N' 필수 — 세션 검증 경로(getSessionUser)의 계정 차단 단일지점 (KISA IE)
   const { data } = await getSupabaseAdmin()
     .from('sys_user')
     .select()
     .eq('id', id)
+    .eq('del_yn', 'N')
     .maybeSingle()
   return (data as UserRow) ?? null
 }
@@ -318,12 +320,15 @@ export function touchLastLogin(userId: string): void {
 }
 
 // pi_uid로 조회 — 구버전 쿠키(userId='')나 DB 오류 시 폴백용
+// del_yn='N' 필수 — 비활성 계정이 유효 토큰으로 인증을 통과하지 못하게 차단 (KISA IE)
+// 재가입 부활은 upsertPiUser가 del_yn='Y' 행을 별도 쿼리로 직접 찾으므로 영향 없음
 export async function getUserByPiUid(uid: string): Promise<UserRow | null> {
   const { data } = await getSupabaseAdmin()
     .from('sys_user')
     .select()
     .eq('pi_uid', uid)
-    .single()
+    .eq('del_yn', 'N')
+    .maybeSingle()
   return (data as UserRow) ?? null
 }
 

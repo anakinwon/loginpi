@@ -388,44 +388,23 @@ export default function AdminUsers() {
 |------|------|
 | **KISA 항목** | IE: 세션 만료 정책 미흡 |
 | **위험도** | Medium |
-| **판정** | 🔍 **추가확인필요** |
-| **근거** | |
+| **판정** | ✅ **양호 (완화 통제 확보 — 2026-07-08 시험 5.4 재점검)** |
+| **근거** | 계정 비활성=즉시 토큰 무효화 레버 복원 + 쿠키 7일 상한 |
 
-**현황:**
-- **Pi 토큰 만료:**
-  ```typescript
-  // src/lib/pi-session-crypto.ts
-  tokenValidUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)  // 30일
-  ```
+**현황 (2026-07-08 정정 — 이전 기술의 "30일 하드코딩"은 오기):**
+- **Pi 토큰 만료:** `tokenValidUntil` = Pi 플랫폼 `credentials.valid_until.iso8601` 값을 그대로 사용 (`/api/auth/pi` route). 쿠키는 `MAX_COOKIE_AGE_SEC = 7일` 상한. Pi Browser localStorage(`X-Pi-Token`) 경로는 `tokenValidUntil`까지 유효.
+- **토큰 무결성:** HMAC-SHA256 서명 + `timingSafeEqual` 상수시간 비교 (서명 위조 방어 양호). payload는 평문 base64url — 민감정보 미포함.
+- **세션 폐기:** 로그아웃 시 `clearPiToken()`(localStorage) + `DELETE /api/auth/pi`(쿠키 삭제) + NextAuth `signOut()`.
+- **✅ 서버 측 강제 무효화 레버 (2026-07-08 수정)**: `getUserById`·`getUserByPiUid`에 `del_yn='N'` 필터 적용 — **관리자가 계정을 비활성(`del_yn='Y'`) 처리하면 유효 토큰이라도 즉시 인증 차단**. 수정 전에는 이 두 함수에 필터가 없어 비활성 Pi 계정이 tokenValidUntil까지 인증을 통과하는 갭이 있었음(발견 즉시 수정, `src/lib/users.ts`).
 
-- **Google OAuth 세션:** NextAuth 기본값 (30일)
+**잔여 (수용 가능한 위험):**
+- 개별 토큰 단위 블랙리스트(`pi_session_revoked`)는 미도입 — 로그아웃 전 탈취된 토큰은 만료(쿠키 7일/tokenValidUntil)까지 이론상 재사용 가능. 단 ① 토큰 탈취 자체가 선행돼야 하고 ② 계정 단위 차단(del_yn)으로 즉시 대응 가능하므로 Medium 위험 수용. 필요 시 도입 설계는 아래 참고.
 
-- **세션 폐기:** 로그아웃 시 `clearPiToken()` + NextAuth `signOut()` 호출
-
-**미흡점:**
-- 세션 명시적 폐기 시(로그아웃) 서버 측 블랙리스트 없음 → 토큰 유효 시간 내 재사용 이론상 가능
-- 비활성 사용자에 대한 자동 세션 만료 미적용 (30일 절대 만료만)
-
-**조치 권고:**
+**참고 설계 (필요 시):**
 ```typescript
-// [옵션] 세션 폐기 테이블 (블랙리스트)
-// CREATE TABLE pi_session_revoked (
-//   token_hash TEXT PRIMARY KEY,
-//   revoked_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-// )
-
-// 로그아웃 시
-export async function signOutUser(token: string) {
-  const db = getSupabaseAdmin()
-  await db.from('pi_session_revoked').insert({
-    token_hash: sha256(token),  // 토큰 자체 저장 금지
-  })
-}
-
-// 세션 검증 시
-if (isRevokedSession(piSession)) {
-  return null  // 세션 무효
-}
+// 세션 폐기 테이블 (블랙리스트) — token_hash만 저장(토큰 원문 저장 금지)
+// CREATE TABLE pi_session_revoked (token_hash TEXT PRIMARY KEY, revoked_at TIMESTAMPTZ)
+// 로그아웃 시 sha256(token) INSERT → getSessionUser에서 조회 후 무효 처리
 ```
 
 ---
