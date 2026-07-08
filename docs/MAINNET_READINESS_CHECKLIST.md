@@ -2,8 +2,9 @@
 
 > **정본 원칙**: 메인넷 출시 절차·등재 요건은 **Pi Network 공식문서만**을 근거로 한다. 추측·비공식 출처 사용 금지(2026-06-26 마스터 지시).
 > **면책**: 본 문서의 cafe.pi 적합 여부는 **Pi 심사팀의 최종 판정 권한**이다. 아래 '확인필요' 항목은 단정하지 않으며, 신청 전 Pi에 직접 확인한다.
-> **최종 갱신**: 2026-06-29 · 대상: master
+> **최종 갱신**: 2026-07-08 · 대상: master
 > **운영 인프라 진척(2026-06-28~29)**: 운영DB 컷오버 완료(ajdwlcqoljkjamostutc·dev 100% 미러·센티넬 검증) + 읽기전용 보호 + 2단계 배포 분리. 상세는 Part D-4 · 오픈베타 체크리스트(`ops_checklist` sql/137).
+> **등재 준비 진척(2026-06-30~07-08)**: ① 운영 `fee_mode=PI` 전환(플랫폼 거래 Pi 통일 — C-1-F-③ 이행) ② 운영 sandbox=false 확정(WBS 6.3 완료) ③ **절제 오버레이 구현**(`NEXT_PUBLIC_LISTING_MODE`·`messages/listing/*` — C-1-F-① 코드 완료, 운영 env 설정 잔여) ④ **도메인 검증 라우트 구현**(`/validation-key.txt`·`PI_DOMAIN_VALIDATION_KEY` env 주입식 — E-4 기술 준비 완료) ⑤ Pi Sign-In(OAuth) 일반 브라우저 Pi 로그인 신설(A-4 강화).
 
 ---
 
@@ -105,7 +106,7 @@
 | A-2 KYC | 아나킨님 본인 Pi KYC 완료 여부 = 메인넷 지갑 슬롯 전제 | 🟡 **확인필요** |
 | A-3 상표 | 제품명 **PiCafé™·PiShop™·PiTranslate™ = "Pi"+이름 접두형** | 🟠 **개명으로 해소 결정** — 모더레이터 공식 "Not recommended"(Pi 접두). Py 개명 결정(E-2), 실행+새이름 확인 잔여. **C-1-A** 참조 |
 | A-4 Pi 인증만 | Pi Browser에서 Google 버튼 미렌더(`google-login-button` 코드 검증) | 🟢 **충족(모더레이터 확인)** — 최종 빌드 재확인만. C-1-B 참조 |
-| A-5 Pi 전용거래 | Pi/Bean 거래. 자국통화=참고 표시값(거래 아님)·법정화폐 직결제 0건. ⚠️ Bean '토큰' 표현·온체인 발행계획 노출 | 🟠 **메인넷 제거/순화 방침(C-1-F)** — 오프체인 포인트 자체는 공식 위반 근거 없음, 표현·계획·테스트데이터는 보수 제거 |
+| A-5 Pi 전용거래 | Pi/Bean 거래. 자국통화=참고 표시값(거래 아님)·법정화폐 직결제 0건. 플랫폼 거래=운영 fee_mode=PI로 Pi 통일(2026-06-30) | 🟢 **방침 이행 대부분 완료(C-1-F)** — 표현 순화 오버레이 코드 완료(운영 env `NEXT_PUBLIC_LISTING_MODE=true` 설정 잔여)·테스트 발행 데이터 초기화만 잔여 |
 | A-6 외부 리다이렉트 | Telegram 주문알림(판매자 opt-in, 주문·결제는 인앱 완결) | 🟡 **조건부 완료** — 코드 충족, PCT 미확인(추후 재조정). C-1-C 참조 |
 | A-7 데이터 최소화 | 수집항목 = O2O용 선택 옵션(강제 아님)·매핑표(부록2)·UI 선택표기 | 🟢 **완료** — C-1-D 참조 |
 | A-1 동작/UI | 앱 동작·UI 완성도 | 🟢 자체 점검 양호(Part D), Pi 심사 별도 |
@@ -148,7 +149,7 @@
 - **✅ 모더레이터 답변(2026-06-27)**: *"Pi Auth should be the primary and required login inside Pi Browser. If Google login is only for non-Pi-Browser web access and is hidden/disabled in the Pi Browser version, it may be fine. But for Mainnet listing, I would avoid showing Google login inside Pi Browser to prevent any policy or review issue."*
 - **✅ 코드 검증**: `src/components/google-login-button.tsx` L22 `if (inPiBrowser) return null` — **Pi Browser에서 Google 버튼 미렌더**(헤더가 유일 진입점, 게이팅됨). → 권장사항 이미 충족.
 - **잔여**: 최종 메인넷 빌드에서 "Pi Browser 내 Google 미노출" 1회 육안 재확인.
-- **채널**: Discord · Developer chat room.
+- **➕ 강화(2026-07-08)**: **Pi Sign-In(OAuth)** 신설 — 일반 브라우저에서도 Pi 계정 로그인 가능(`accounts.pinet.com` 인가 → 기존 `/api/auth/pi` 재사용, 실기기 3종 여정 검증 완결). Google 의존이 줄어 "Pi 인증이 주 경로"라는 A-4 취지에 더 부합. Pi Browser 내에서는 SDK `signIn()` 선시도(UA 분기 금지 철칙 준수).
 
 ### 🟡 C-1-C. 외부 리다이렉트 (A-6) — 조건부 완료(PCT 미확인)
 
@@ -193,6 +194,12 @@
     3. **거래는 Pi로**: 플랫폼 거래(구독 등)는 메인넷에서 Pi 결제로 통일(Bean은 보상·적립 한정, 거래 수단 아님). 메모리 `currency-routing-rule` 의 "과도기 Pi" 유지와 일치.
     4. **테스트 발행 데이터 초기화**: `fn_bean_mint` 테스트 발행분(`bean_mint_log` + 사용자 테스트 Bean 잔액)은 컷오버 직전 초기화(기존 방침 — 메모리 `prod-db-bootstrap-and-supabase-conn`).
 - **채널**: Pi Ecosystem Discord · Developer chat room. (Launchpad는 Pi Browser 'Pi Launchpad' 앱 — Mainnet 미출시라 현재 온체인 발행 불가)
+- **✅ 이행 현황(2026-07-08 현행화)**:
+  1. **표현 순화(P0)** = 🟢 **코드 완료**. `NEXT_PUBLIC_LISTING_MODE` env + `src/i18n/request.ts` 로드 후처리 오버레이 + `messages/listing/{ko,en}.json`(절제 키만). 오버레이도 ko→en→locale 폴백을 따라 189개 locale 전부 en 절제문으로 커버(silent 원문 노출 방지). 원본 ko.json·DB `i18n_message` 정본 불변. **잔여 = 운영(cafepi) Vercel env `NEXT_PUBLIC_LISTING_MODE=true` 설정+재배포(마스터)**. staging·로컬은 미설정(절제 OFF).
+     - 절제 대상 실측(2026-07-08): "Bean Token"·"토큰 발행/충전" 문자열은 ko.json에서 **이미 소멸**(검색 0건). 잔존 = `admin.nav.beanSection`("Bean 경제")·`adminStats.whitepaper.highlight2Desc`(en "Token Economy" ⚠️심사 주 언어)·`pillar3Desc`("발행")·`adminStats.beanFlowCharge`("충전(발행)") + 통화 참고 라벨(`store.fiatRefAt`·`store.form.priceConverted`) → 전부 오버레이 커버.
+  2. **발행 계획 노출 제거** = 🟢 ko.json 실측상 해당 문구 소멸(위 1 실측). `PRD_12_TOKEN` 계열 내부 대외비·등재 제출물 제외 방침 유지.
+  3. **거래는 Pi로** = 🟢 **완료(2026-06-30)** — 운영 `fee_mode=PI` 전환(PRD_24·sql/140~148). 구독 등 플랫폼 거래 Pi 직결제, 마이크로 요금 무료화, 후기 보상 실 A2U.
+  4. **테스트 발행 데이터 초기화** = 🟡 **잔여** — 메인넷 컷오버 직전 `bean_mint_log`+테스트 Bean 잔액 초기화(마스터 실행, 메모리 `prod-db-bootstrap` 방침).
 
 > **공식 문의 채널 요약**: ① **Dev Portal in Pi Browser**(상표 라이선스 신청) ② **Pi Ecosystem Discord**(Core Team 상주, 가장 빠름) ③ **Pi App 내 Developer chat room**(Chat > + 아이콘 > Developer room). *(검색 결과엔 `support.minepi.com` 포털도 있으나 공식 개발자 가이드 본문에는 미기재 — 보조 수단으로만 간주)*
 
@@ -213,6 +220,7 @@
 ## D-2. 환경변수 (Vercel 프로덕션 — 아나킨님 수동)
 
 `src/env.ts` 스키마 기준 필수: `PI_SESSION_SECRET`, `AUTH_SECRET`, `CRON_SECRET`(프로덕션 강제), `PI_API_KEY`(**메인넷용**), `PI_WALLET_PRIVATE_SEED`(**메인넷 프로젝트 등록 지갑과 동일해야 함** — Part B-3), `SUPABASE_SERVICE_ROLE_KEY`, `GOOGLE_CLIENT_ID/SECRET`. 선택: `TELEGRAM_BOT_TOKEN`, `GEMINI_API_KEY`, `ANTHROPIC_API_KEY`, `CLOUDFLARE_TURN_*`.
+**메인넷 등재 전용(2026-07-08 신설)**: `NEXT_PUBLIC_LISTING_MODE=true`(운영만 — 절제 오버레이 ON) · `PI_DOMAIN_VALIDATION_KEY`(메인넷 Dev Portal 도메인 검증 키 — `/validation-key.txt` 라우트가 서빙, E-3 후 발급값 입력).
 - ⛔ `.env.local` git 커밋 금지. Vercel UI/CLI로만 설정. `pnpm build`가 env 스키마 검증.
 
 ## D-3. 등재 레드라인 자체 코드체크 (Part A-3~A-6 보강)
@@ -226,7 +234,7 @@
 
 - Vercel Pro(2026-06-18) — Cron 다수·상업적 사용. Cron: settle(5분), bean-mint(일1회), 구독 처리.
 - 결제 멱등성·통화 라우팅(플랫폼↔Bean / P2P↔Pi / O2O↔Pi+Bean보상)·원자적 RPC(sql/074).
-- 다국어 22개 활성 locale `validate:locales` 통과 / username 마스킹 / 현지 시간 표시.
+- 다국어 **활성 189개 locale·66개 언어 완역**(2026-07-08 글로벌 대확장) `validate:locales` 통과 / username 마스킹 / 현지 시간 표시.
 - 모니터링 `/admin/monitor` / 롤백=Vercel revert·Supabase 백업.
 - **운영DB 컷오버 완료(2026-06-28~29)**: 운영DB(`ajdwlcqoljkjamostutc`) 신설·dev 100% 미러(96테이블·59,280행)·센티넬 검증. 읽기전용 보호(`SUPABASE_READONLY_MODE`+쓰기 가드+read-only 롤 sql/136). 외부 테이블 12종(sql/134)·i18n 레거시 2종(sql/135) 정리. 접속=aws-1-ap-northeast-2 Session pooler.
 - **2단계 배포 분리**: staging(loginpi·master·🧪배너) / 운영(cafepi·production 브랜치) 2-프로젝트 + `promote-to-prod.mjs`(ff-only 승격) + 배포 컨트롤 화면·진행상태 폴링. ⚠️ `NEXT_PUBLIC_APP_URL` 도메인별 필수(통짜 복사 시 api-guard Origin 검증으로 `/api/auth/pi` 403→로그인 깨짐).
@@ -242,10 +250,10 @@
 | 1 | **본인 Pi KYC 완료 확인** (메인넷 지갑 슬롯 전제) | B-2-1 / A-2 | 🟡 확인필요 |
 | 2 | **A-3 상표 결정**: Trademark Licensing Agreement(Dev Portal) 체결 **또는** Pi 접두 개명. 공식 규칙상 'Pi App_Name' 형태 금지 | A-3 / C-1-A | ✅ **Py 개명 완료**(2026-06-27, PyCafé™/PyShop™/PyTranslate™ — C-A 공식답변 반영) |
 | 3 | **메인넷 Developer Portal 프로젝트 신규 생성** (testnet과 별도, App Network=Mainnet) | B-2-2, B-3 | 🚫 수동 |
-| 4 | **앱 URL 확보 + 도메인 검증** (`validation-key.txt`, 타 프로젝트와 URL 중복 불가) | B-1-12, B-2-3 | 🟡 운영 URL(cafepi.vercel.app) 확보·메인넷 도메인검증은 E-3 후 |
+| 4 | **앱 URL 확보 + 도메인 검증** (`validation-key.txt`, 타 프로젝트와 URL 중복 불가) | B-1-12, B-2-3 | 🟡 운영 URL 확보 + **서빙 라우트 구현 완료(2026-07-08)** — E-3에서 키 발급되면 Vercel env `PI_DOMAIN_VALIDATION_KEY` 설정+재배포만 |
 | 5 | **메인넷 API Key 발급** → Vercel `PI_API_KEY` 설정 | B-2-4 | 🚫 수동 |
 | 6 | **등록 지갑 = A2U 정산 지갑 일치** 확인 → `PI_WALLET_PRIVATE_SEED` | B-3 | 🚫 수동 |
-| 7 | Vercel 환경변수 전체 + Cron 등록 | D-2, D-4 | 🟡 운영 env+운영DB 컷오버 완료·메인넷 Pi 키/지갑·SANDBOX=false 잔여 |
+| 7 | Vercel 환경변수 전체 + Cron 등록 | D-2, D-4 | 🟡 운영 env+운영DB 컷오버+**SANDBOX=false 확정(2026-07-02)**+fee_mode=PI 완료. 잔여=메인넷 `PI_API_KEY`·지갑 시드·시크릿 rotate·`NEXT_PUBLIC_LISTING_MODE=true` |
 | 8 | **Pi Browser 실기기 로그인·결제 검증** (P0 게이트) | D-1 | ⏳ |
 | 9 | U2A 트랜잭션 1건으로 생태계 연결 확인 | B-1-13 | ⏳ |
 | 10 | 등재 신청 제출 (요건 A-1~A-7 충족 상태) | A 전체 | 🚫 수동 |
@@ -258,7 +266,7 @@
 2. cafe.pi 적합성은 **Part C에 '확인필요'로만** 기록하고, Pi 직접 확인 결과로 갱신한다.
 3. 공식 출처 4개가 갱신되면 본 문서도 재대조한다.
 
-**근거 정본**: 위 공식 출처 4개 · **최종 갱신**: 2026-06-29
+**근거 정본**: 위 공식 출처 4개 · **최종 갱신**: 2026-07-08
 
 ---
 
