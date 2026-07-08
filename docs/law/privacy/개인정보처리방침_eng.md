@@ -1,9 +1,11 @@
 # Privacy Policy
 # プライバシーポリシー
 
-**Version**: v1.0  
-**Effective Date**: 2026-06-12  
-**Created**: 2026-06-12  
+**Version**: v1.1 (Revision Draft — effective upon completion of notification procedure)  
+**Planned Effective Date**: 2026-07-15 (notified at least 7 days in advance per Article 11)  
+**Revised**: 2026-07-08 · **Originally Created**: 2026-06-12  
+
+> **Key v1.1 Revisions**: ① New Telegram third-party disclosure and international transfer provisions ② Explicit Google (Gemini) translation entrustment ③ New collection items: KakaoTalk ID (event prizes) and Telegram linking information ④ Pi official account authentication (Pi Sign-In) path added
 
 ---
 
@@ -37,6 +39,8 @@ Members experiencing issues with personal information can immediately contact th
 | Pi wallet address* | Blockchain public address | Payment transaction records, settlement reference (unrelated to real name) | Terms of Use Agreement |
 
 *Note: The Company does not directly custody assets in the Pi wallet; only transaction records are stored.
+
+> **Authentication Paths**: Pi account authentication is performed either ① via the Pi SDK within Pi Browser, or ② via OAuth through the official Pi Network account page (accounts.pinet.com) in regular browsers (Pi Sign-In). The items collected are identical for both paths.
 
 #### 3-2. Google OAuth Integration (Optional)
 
@@ -82,6 +86,18 @@ Members experiencing issues with personal information can immediately contact th
 | Estimated location | IP-based location estimation | Content localization | Terms of Use Agreement |
 
 **Optional Consent Item**: Refer to Location-Based Service Terms and Location Information Collection and Use Agreement
+
+#### 3-7. Event Prize Delivery Information (Optional) *(New in v1.1)*
+
+| Item | Scope | Purpose of Collection | Legal Basis | Retention Period |
+|---|---|---|---|---|
+| KakaoTalk ID | KakaoTalk ID entered directly by the Member | Delivery of event prizes (mobile gifts) | Separate consent upon event participation | Destroyed without delay after event conclusion and prize delivery |
+
+#### 3-8. Telegram Notification Linking Information (Optional) *(New in v1.1)*
+
+| Item | Scope | Purpose of Collection | Legal Basis | Retention Period |
+|---|---|---|---|---|
+| Telegram chat ID | Chat identifier automatically confirmed when the Member links the notification bot | Identifying recipients of order/chat notifications | Separate consent expressed through the act of bot linking | Deleted immediately upon unlinking |
 
 ---
 
@@ -138,14 +154,26 @@ Upon Member withdrawal:
 |---|---|---|---|---|
 | **Supabase** (Singapore) | Pi UID, username, chat messages, transaction records, IP, device information | Cloud data storage, DB hosting | Terms of Use Agreement, data processor contract | Immediate |
 | **Vercel** (Global CDN) | Profile images, static content, access logs | Web hosting, CDN provision | Terms of Use Agreement, data processor contract | Immediate |
-| **Google Cloud** | Translated content requests (partial) | Multilingual translation API | Terms of Use Agreement, as needed | As needed |
-| **Anthropic** (Claude API) | Content analysis, recommendation engine learning | AI-based feature improvement | Terms of Use Agreement, de-identified processing | As needed |
+| **Google (Gemini API)** *(clarified in v1.1)* | Original text of chat messages and posted/UI text subject to translation | Automatic translation and language detection (PyTranslate™) | Terms of Use Agreement | Upon translation request |
+| **Anthropic** (Claude API) | AI bot conversation messages, text subject to translation (fallback) | AI cafe assistant response generation, translation support | Terms of Use Agreement, de-identified processing | When the feature is used |
+| **Telegram** (Telegram Messenger Inc.) *(New in v1.1)* | Notification message content — order information (product name, amount, buyer display name), chat mirror notifications (message body, sender display name), Telegram chat ID | Real-time order/chat notification delivery (**only for Members who have linked the notification bot**) | Separate consent expressed through the act of bot linking | When a notification occurs |
 
 #### 6-2. Prohibition of Disclosure Without Legal Basis
 The Company does not disclose personal information to third parties such as advertisers or marketers without explicit Member consent.
 
-#### 6-3. International Transfer
-International transfer occurs due to Supabase (Singapore), Vercel (Global), Google Cloud, etc. listed in the table above. Members are deemed to acknowledge and consent to such transfer.
+#### 6-3. International Transfer *(Updated in v1.1)*
+
+The following international transfers of personal information occur in the course of providing the Service.
+
+| Recipient | Country | Transferred Items | Transfer Method |
+|---|---|---|---|
+| Supabase | Singapore | Items listed in table 6-1 | Network transmission and storage during service use |
+| Vercel | USA / Global CDN | Items listed in table 6-1 | Network transmission during service use |
+| Google (Gemini API) | USA | Text subject to translation | Network transmission upon translation request |
+| Anthropic | USA | AI bot / translation text | Network transmission when the feature is used |
+| Telegram Messenger Inc. | UAE (Dubai) / globally distributed servers | Notification message content, chat ID | When notifications occur for Members who linked the bot |
+
+Members consent to the above international transfers through use of the Service (for Telegram, through the act of bot linking). Members who do not wish to consent may discontinue use of the relevant features (automatic translation, AI bot, Telegram notifications) or unlink them.
 
 ---
 
@@ -157,7 +185,9 @@ International transfer occurs due to Supabase (Singapore), Vercel (Global), Goog
 |---|---|---|
 | Supabase | Database hosting, backup, recovery | Data processing contract in place |
 | Vercel | Web application hosting, CDN | Data processing contract in place |
-| Anthropic | AI-based content analysis (optional) | Data processing contract in place |
+| Google (Gemini API) *(New in v1.1)* | Automatic translation and language detection of chat/UI text | Processed under service terms (Google API Terms) |
+| Anthropic | AI cafe assistant response generation, translation support (fallback) | Processed under service terms, de-identified |
+| Telegram Messenger Inc. *(New in v1.1)* | Delivery of order/chat notification messages (Bot API) | Processed under service terms (Telegram Bot API Terms) |
 
 **Company Responsibility**: The Company imposes contractual obligations on entrustees to handle personal information safely. Changes to entrustment will be notified.
 
@@ -313,7 +343,15 @@ See Article 4
 ---
 
 **Supplementary Provisions**
-- This Privacy Policy takes effect on June 12, 2026.
+- v1.0: Enacted and effective June 12, 2026.
+- v1.1: Revised July 8, 2026 (draft) — new Telegram third-party disclosure and international transfer provisions, explicit Google (Gemini) translation entrustment, new collection items KakaoTalk ID (3-7) and Telegram linking information (3-8), Pi Sign-In authentication path added. **Effective July 15, 2026 (planned), following notification at least 7 days in advance per Article 11.**
+
+**Revision History**
+
+| Version | Date | Description |
+|---|---|---|
+| v1.0 | 2026-06-12 | Initial enactment |
+| v1.1 | 2026-07-08 (draft) | Telegram/Gemini third-party disclosure, entrustment and international transfer; KakaoTalk ID and Telegram chat ID collection items; Pi Sign-In path |
 
 ---
 
