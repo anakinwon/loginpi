@@ -1,31 +1,8 @@
 {
   "mcpServers": {
-    "github": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-github@2025.4.8"]
-    },
-    "context7": {
-      "command": "npx",
-      "args": ["-y", "@upstash/context7-mcp@2.1.4"]
-    },
     "exa": {
       "type": "http",
       "url": "https://mcp.exa.ai/mcp"
-    },
-    "memory": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-memory@2026.1.26"]
-    },
-    "playwright": {
-      "command": "npx",
-      "args": ["-y", "@playwright/mcp@0.0.69", "--extension"]
-    },
-    "sequential-thinking": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-sequential-thinking@2025.12.18"
-      ]
     },
     "supabase": {
       "type": "http",
@@ -34,15 +11,6 @@
     "shadcn": {
       "command": "npx",
       "args": ["shadcn@latest", "mcp"]
-    },
-    "shrimp-task-manager": {
-      "command": "node",
-      "args": ["/Users/anaki/workspace/mcp-shrimp-task-manager/dist/index.js"],
-      "env": {
-        "DATA_DIR": "/Users/anaki/workspace/nextjs-supabase-app/shrimp_data",
-        "TEMPLATES_USE": "en",
-        "ENABLE_GUI": "true"
-      }
     }
   }
 }
