@@ -53,7 +53,6 @@ export default function AdminEventExcludePage() {
 
   useEffect(() => {
     fetchExcluded()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleAddExclude = async () => {

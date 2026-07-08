@@ -85,7 +85,6 @@ export default function PaymentsPage() {
 
   useEffect(() => {
     loadAll()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // 관리자 A2U 환불 — 확인 후 POST, 완료 시 목록 갱신 (이중클릭은 서버 claim이 차단)

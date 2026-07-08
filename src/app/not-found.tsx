@@ -31,6 +31,8 @@ export default function RootNotFound() {
           >
             요청하신 페이지가 없거나 이동되었어요. / Page not found.
           </p>
+          {/* 루트 폴백은 라우터 컨텍스트 밖(자체 html/body) — 풀 리로드 <a>가 의도된 동작 */}
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
           <a
             href="/"
             style={{

@@ -81,6 +81,9 @@ export function ShopsMapView({
   // 지도 인스턴스·마커를 ref에 보관 — 포커스 effect와 초기화 effect가 공유
   const mapInstanceRef = useRef<google.maps.Map | null>(null)
   const infoWindowRef = useRef<google.maps.InfoWindow | null>(null)
+  // 마커·클러스터러는 비동기 로드 완료 후 채워지므로 ref로 보관 (렌더 후 지역변수 변경 금지 — react-compiler)
+  const markersRef = useRef<google.maps.marker.AdvancedMarkerElement[]>([])
+  const clustererRef = useRef<MarkerClusterer | null>(null)
   const markerMapRef = useRef(new Map<string, MarkerEntry>())
   // 초기화 async 내부에서 최신 focusShopId를 읽기 위한 mirror ref
   const focusShopIdRef = useRef(focusShopId)
@@ -104,6 +107,9 @@ export function ShopsMapView({
     if (focusShopId && mapInstanceRef.current) applyFocus(focusShopId)
   }, [focusShopId, applyFocus])
 
+  // 명령형 Google Maps 통합 — 비동기 로드 산출물(마커·클러스터러)은 ref에 보관하고
+  // props(shops)는 읽기 전용. react-compiler 별칭 분석의 보수 판정(immutability)만 예외 처리.
+  // eslint-disable-next-line react-hooks/immutability
   useEffect(() => {
     if (!mapRef.current) return
     setLoadError(null)
@@ -118,13 +124,10 @@ export function ShopsMapView({
 
     setOptions({ key: apiKey, v: 'weekly' })
 
-    const markers: google.maps.marker.AdvancedMarkerElement[] = []
-    let infoWindow: google.maps.InfoWindow | null = null
-    // 마커 클러스터러 — 100+ 마커 환경에서 줌 레벨별로 마커를 묶어 렌더 부하를 줄인다 (PRD_18 MAP)
-    let clusterer: MarkerClusterer | null = null
     markerMapRef.current.clear()
     ;(async () => {
       try {
+        const markers: google.maps.marker.AdvancedMarkerElement[] = []
         const { Map, InfoWindow } = (await importLibrary(
           'maps',
         )) as google.maps.MapsLibrary
@@ -141,7 +144,7 @@ export function ShopsMapView({
         })
 
         // maxWidth 명시 + globals.css의 .gm-style-iw 폭 강제와 함께 2열 썸네일 표시
-        infoWindow = new InfoWindow({ maxWidth: 270 })
+        const infoWindow = new InfoWindow({ maxWidth: 270 })
         mapInstanceRef.current = map
         infoWindowRef.current = infoWindow
 
@@ -189,8 +192,8 @@ export function ShopsMapView({
             title,
           })
           marker.addListener('click', () => {
-            infoWindow!.setContent(infoContent)
-            infoWindow!.open(map, marker)
+            infoWindow.setContent(infoContent)
+            infoWindow.open(map, marker)
           })
           bounds.extend(position)
           markers.push(marker)
@@ -375,7 +378,8 @@ export function ShopsMapView({
         }
 
         if (bizCategory === 'ALL') {
-          // Pi 등록 매장 표시
+          // Pi 등록 매장 표시 — shops는 읽기 전용 순회(변조 없음), 컴파일러 보수 판정 예외
+          // eslint-disable-next-line react-hooks/immutability
           for (const shop of shops) {
             const dist =
               shop.distance_km < 1
@@ -474,11 +478,12 @@ export function ShopsMapView({
           }
         }
 
-        // 마커 클러스터링 — 가까운 마커를 묶어 100+ 마커에서도 부드럽게 렌더
+        // 마커 클러스터링 — 가까운 마커를 묶어 100+ 마커에서도 부드럽게 렌더 (PRD_18 MAP)
         // (사용자 위치 '나' 마커는 markers 배열에 없어 항상 개별 표시됨)
         if (markers.length > 0) {
-          clusterer = new MarkerClusterer({ map, markers })
+          clustererRef.current = new MarkerClusterer({ map, markers })
         }
+        markersRef.current = markers
 
         // 모든 마커가 보이도록 범위 조정
         if (markers.length > 0) {
@@ -498,7 +503,7 @@ export function ShopsMapView({
         const pendingId = focusShopIdRef.current
         if (pendingId && bizCategory === 'ALL') {
           const entry = markerMapRef.current.get(pendingId)
-          if (entry && infoWindow) {
+          if (entry) {
             map.panTo(entry.position)
             map.setZoom(17)
             infoWindow.setContent(entry.content)
@@ -522,9 +527,11 @@ export function ShopsMapView({
     })()
 
     return () => {
-      clusterer?.clearMarkers()
-      markers.forEach((m) => (m.map = null))
-      infoWindow?.close()
+      clustererRef.current?.clearMarkers()
+      clustererRef.current = null
+      markersRef.current.forEach((m) => (m.map = null))
+      markersRef.current = []
+      infoWindowRef.current?.close()
       mapInstanceRef.current = null
       infoWindowRef.current = null
     }

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { Link } from '@/i18n/navigation'
 import { BeanIcon } from '@/components/ui/bean-icon'
 
 interface FeePlanRow {
@@ -119,12 +120,12 @@ export default function BeanFeePlanPage() {
         <p className="text-muted-foreground mt-1 text-sm">
           Bean 경제 표준 요금 마스터 — PRD_15_FEE §4 기준 (43행). 구독요금만
           빠르게 수정하려면{' '}
-          <a
+          <Link
             href="/admin/token/subscr-pricing"
             className="text-primary underline-offset-2 hover:underline"
           >
             구독요금제 관리
-          </a>
+          </Link>
           를 사용하세요.
         </p>
       </div>

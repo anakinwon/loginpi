@@ -50,8 +50,8 @@ export async function POST(request: NextRequest) {
 
   // Bean 차감 — PI 모드(메인넷 등재 기간)는 마이크로 무료화로 차감 스킵 (PRD_24 §0)
   // 오픈기념행사 무료화 게이트 — PRD_26
-  let normalFeeBean = BADGE_UPGRADE_BEAN
-  let feeModeAdjusted = await microFeeBean(normalFeeBean)
+  const normalFeeBean = BADGE_UPGRADE_BEAN
+  const feeModeAdjusted = await microFeeBean(normalFeeBean)
   const feeBean = await applyPromoGate(feeModeAdjusted)
   let balance: number | undefined
   if (feeBean > 0) {

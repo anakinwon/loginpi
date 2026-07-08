@@ -3,6 +3,10 @@ import nextTS from 'eslint-config-next/typescript'
 import prettier from 'eslint-config-prettier'
 
 const eslintConfig = [
+  {
+    // 앱 코드 아님 — lint 제외: 에이전트 워크트리 잔재·문서 빌드 스크립트(require 사용)
+    ignores: ['.claude/**', '**/.pptx-build/**', '.whitepaper-build/**'],
+  },
   ...nextCWV,
   ...nextTS,
   prettier,

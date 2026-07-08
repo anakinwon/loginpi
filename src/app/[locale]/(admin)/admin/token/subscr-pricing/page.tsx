@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useRef } from 'react'
+import { Link } from '@/i18n/navigation'
 import { BeanIcon } from '@/components/ui/bean-icon'
 import { Button } from '@/components/ui/button'
 
@@ -431,12 +432,12 @@ export default function SubscrPricingPage() {
           <div className="border-t pt-4">
             <p className="text-muted-foreground text-xs">
               구독요금제 외 카페·스토어·플랫폼 전체 요금은{' '}
-              <a
+              <Link
                 href="/admin/token/fee-plan"
                 className="text-primary underline-offset-2 hover:underline"
               >
                 Bean 요금제 관리
-              </a>
+              </Link>
               에서 확인할 수 있습니다.
             </p>
           </div>

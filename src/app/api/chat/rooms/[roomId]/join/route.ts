@@ -127,7 +127,7 @@ export async function POST(request: NextRequest, { params }: Params) {
     | undefined
 
   if (isEvent) {
-    let normalFeeBean = eventEntryFeeBean(room.entry_fee_pi)
+    const normalFeeBean = eventEntryFeeBean(room.entry_fee_pi)
     // 오픈기념행사 무료화 게이트 — PRD_26
     enterFeeBean = await applyPromoGate(normalFeeBean)
     gradeForResp = 'EVENT'
@@ -138,9 +138,9 @@ export async function POST(request: NextRequest, { params }: Params) {
   } else {
     const grade = await resolveRoomGrade(room)
     const plan = await getChatPlan(user.id)
-    let normalFeeBean = getRoomFeeBean('ENTER', grade, plan.tier !== 'FREE')
+    const normalFeeBean = getRoomFeeBean('ENTER', grade, plan.tier !== 'FREE')
     // PI 모드(메인넷 등재 기간) 마이크로 무료화 — 카페 입장료 면제 (PRD_24 §0)
-    let feeModeAdjusted = await microFeeBean(normalFeeBean)
+    const feeModeAdjusted = await microFeeBean(normalFeeBean)
     // 오픈기념행사 무료화 게이트 — PRD_26
     enterFeeBean = await applyPromoGate(feeModeAdjusted)
     gradeForResp = grade

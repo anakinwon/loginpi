@@ -48,6 +48,8 @@ export default function OpenPromoPage() {
   const [forbidden, setForbidden] = useState(false)
   const [startInput, setStartInput] = useState('')
   const [endInput, setEndInput] = useState('')
+  // D-day 기준 시각 — 렌더 중 Date.now() 호출 금지(react-compiler) → 조회 시점 스냅샷
+  const [nowTs, setNowTs] = useState(0)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -59,6 +61,7 @@ export default function OpenPromoPage() {
       }
       const data = (await res.json()) as PromoState
       setState(data)
+      setNowTs(Date.now())
       // 현재 설정된 시작/종료 시각을 입력 폼에 반영
       setStartInput(isoToLocalInput(data.current?.promo_start_dtm ?? null))
       setEndInput(isoToLocalInput(data.current?.promo_end_dtm ?? null))
@@ -195,7 +198,7 @@ export default function OpenPromoPage() {
                   (KST)
                   {(() => {
                     const days = Math.ceil(
-                      (new Date(cur.promo_end_dtm).getTime() - Date.now()) /
+                      (new Date(cur.promo_end_dtm).getTime() - nowTs) /
                         86_400_000,
                     )
                     return days > 0 ? ` · D-${days}` : ' · 곧 종료'

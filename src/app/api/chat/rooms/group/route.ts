@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
     const allowance = await canCreateRoom(user.id, plan)
     if (!allowance.allowed) {
       // 비구독자: 프리미엄 카페 생성료. BEAN 모드는 Bean 잔액 확인, PI 모드는 Pi 직결제(아래 분기).
-      let normalFeeBean = getRoomFeeBean('CREATE', 'PREMIUM', false)
+      const normalFeeBean = getRoomFeeBean('CREATE', 'PREMIUM', false)
       // 오픈기념행사 무료화 게이트 — PRD_26
       createFeeBean = await applyPromoGate(normalFeeBean)
       if (feeMode === 'BEAN') {

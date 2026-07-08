@@ -107,6 +107,8 @@ export default function PiOAuthCallbackPage() {
             >
               {t('retry')}
             </button>
+            {/* OAuth 콜백은 풀 리로드로 복귀 — 새 세션 토큰이 앱 전체에 확실히 반영되게 (retry도 location.replace) */}
+            {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
             <a
               href="/"
               className="border-input hover:bg-muted rounded-md border px-4 py-2 text-sm"

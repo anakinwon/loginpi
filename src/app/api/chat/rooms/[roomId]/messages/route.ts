@@ -215,8 +215,8 @@ export async function POST(request: NextRequest, { params }: Params) {
     const quota = await getAiQuota(user.id)
     if (quota.remaining === 0) {
       // PI 모드(메인넷 등재 기간) 마이크로 무료화 (PRD_24 §0)
-      let normalAiFee = AI_EXTRA_BEAN
-      let feeModeAdjusted = await microFeeBean(normalAiFee)
+      const normalAiFee = AI_EXTRA_BEAN
+      const feeModeAdjusted = await microFeeBean(normalAiFee)
       // 오픈기념행사 무료화 게이트 — PRD_26
       aiFeeBean = await applyPromoGate(feeModeAdjusted)
     }
