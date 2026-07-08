@@ -166,31 +166,20 @@ import { Markdown } from 'react-markdown'
 |------|------|
 | **KISA 항목** | MC: 악성 콘텐츠 탐지 |
 | **위험도** | Medium |
-| **판정** | 🔍 **추가확인필요** |
-| **근거** | |
+| **판정** | ✅ **양호 (Magic Byte 검증 구현 — 2026-07-08 시험 5.4 재점검)** |
+| **근거** | 업로드 5개 경로 전부 시그니처 검증 + 화이트리스트 + 크기 제한 + UUID 파일명 |
 
-**현황:**
-- 파일 업로드: Magic Byte 검증 (MIME 타입 확인 + 확장자 화이트리스트)
-- 이미지 업로드: Supabase Storage에 저장 → CDN 배포 (스크립트 실행 불가)
-- 악성 스크립트 차단: `X-Content-Type-Options: nosniff` 헤더로 MIME 스니핑 방지
+**현황 (2026-07-08 정정·보강):**
+- ⚠️ 정정: 이전 판 문서가 Magic Byte 검증을 "현 상태"로 기술했으나 **실제로는 미구현 상태였음**(문서-코드 불일치). 2026-07-08 시험 5.4 재점검에서 발견 즉시 구현 완료.
+- **✅ Magic Byte(시그니처) 검증**: `src/lib/upload-validate.ts` `validateMagicBytes()` 공통 헬퍼 — 클라이언트 `file.type` 위조 시(예: exe에 `Content-Type: image/png`) 실제 선두 바이트 불일치로 415 거부. 업로드 5개 route 전부 적용: `store/items/images`·`chat/rooms/[roomId]/upload`·`board/attachments`·`stickers/custom`·`admin/stickers/[packId]/items`
+- MIME 화이트리스트 + 서버 결정 확장자 + UUID 파일명 + 크기 제한(1~20MB): 5/5 route 기존 적용
+- SVG는 Stored XSS 위험으로 전 경로 의도적 제외, 비미디어 파일은 `Content-Disposition: attachment` 강제(chat)
+- 이미지: Supabase Storage → CDN 배포(스크립트 실행 불가) + `X-Content-Type-Options: nosniff`
 
-**미흡점:**
-- 업로드된 파일의 **바이러스 스캔 미적용** (클라우드 백신 연동 없음)
-- 문서 파일(PDF, DOCX) 업로드 시 매크로 자동 삭제 안 함
-
-**조치 권고:**
-```typescript
-// 확장자 + Magic Byte 이중 검증 (현 상태)
-const allowedMimes = ['image/png', 'image/jpeg', 'image/webp']
-const detected = await fileTypeFromBuffer(buffer)
-if (!allowedMimes.includes(detected?.mime ?? '')) {
-  return error(400, '지원하지 않는 파일 형식')
-}
-
-// [옵션] 바이러스 스캔 추가 (ClamAV 또는 VirusTotal API)
-// const virusScan = await scanFile(buffer)
-// if (virusScan.infected) return error(400, '악성 파일 탐지됨')
-```
+**바이러스 스캔 API 평가 결론 (2026-07-08):**
+- **ClamAV**: 상주 데몬 필요 → Vercel 서버리스(Fluid Compute)에 부적합, 별도 인프라 비용 발생
+- **VirusTotal API**: 사용자 파일을 외부 제3자에 전송(개인정보 우려) + 무료 티어 분당 4건 제한 → 부적합
+- **판단**: 화이트리스트+시그니처 검증으로 실행형 위장 파일이 차단되고, 저장소가 실행 경로 없는 CDN이므로 클라우드 백신은 **도입 보류(수용 가능한 잔여 위험)**. 문서형 매크로(doc/docx)는 다운로드 후 사용자 단말 백신 영역 — 대량 문서 공유 기능 확장 시 재평가.
 
 ---
 

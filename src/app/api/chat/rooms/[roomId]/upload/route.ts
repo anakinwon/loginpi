@@ -3,6 +3,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth-check'
 import { getRoomMember } from '@/lib/chat'
 import { recordUserAction } from '@/lib/event'
+import { validateMagicBytes } from '@/lib/upload-validate'
 
 type Params = { params: Promise<{ roomId: string }> }
 
@@ -85,6 +86,15 @@ export async function POST(request: NextRequest, { params }: Params) {
   const uuid = crypto.randomUUID()
   const path = `${roomId}/${uuid}.${ext}`
   const buffer = await file.arrayBuffer()
+
+  // KISA MC: Magic Byte 검증 — 위조된 Content-Type 차단
+  if (!validateMagicBytes(buffer, file.type)) {
+    return NextResponse.json(
+      { error: '파일 내용이 선언된 형식과 일치하지 않습니다' },
+      { status: 415 },
+    )
+  }
+
   const isMedia =
     file.type.startsWith('image/') || file.type.startsWith('audio/')
 

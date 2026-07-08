@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { validateMagicBytes } from '@/lib/upload-validate'
 
 // 어드민 스티커 추가 — multipart files 업로드 → Storage 저장 → msg_stkr INSERT
 // 커스텀 스티커 제작(/api/stickers/custom)과 동일한 보안 정책: SVG 제외(Stored XSS)
@@ -68,6 +69,13 @@ export async function POST(request: NextRequest, { params }: Params) {
     if (!ALLOWED_MIME.has(f.type)) {
       return NextResponse.json(
         { error: '허용되지 않은 이미지 형식입니다 (png/jpg/gif/webp)' },
+        { status: 415 },
+      )
+    }
+    // KISA MC: Magic Byte 검증 — 위조된 Content-Type 차단
+    if (!validateMagicBytes(await f.arrayBuffer(), f.type)) {
+      return NextResponse.json(
+        { error: '파일 내용이 선언된 형식과 일치하지 않습니다' },
         { status: 415 },
       )
     }

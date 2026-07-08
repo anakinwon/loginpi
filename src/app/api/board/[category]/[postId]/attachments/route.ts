@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth-check'
 import { getCategory } from '@/lib/board'
+import { validateMagicBytes } from '@/lib/upload-validate'
 import { randomUUID } from 'crypto'
 
 const BUCKET = 'board-attachments'
@@ -200,11 +201,20 @@ export async function POST(request: NextRequest, { params }: Params) {
       )
     }
 
+    // KISA MC: Magic Byte 검증 — 위조된 Content-Type 차단
+    const buffer = await file.arrayBuffer()
+    if (!validateMagicBytes(buffer, file.type)) {
+      return NextResponse.json(
+        { error: `파일 내용이 선언된 형식과 일치하지 않습니다 (${file.name})` },
+        { status: 415 },
+      )
+    }
+
     const storagePath = `${postId}/${randomUUID()}.${ext}`
 
     const { error: uploadErr } = await db.storage
       .from(BUCKET)
-      .upload(storagePath, await file.arrayBuffer(), {
+      .upload(storagePath, buffer, {
         contentType: file.type || 'application/octet-stream',
         upsert: false,
       })

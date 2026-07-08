@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { validateMagicBytes } from '@/lib/upload-validate'
 
 // POST /api/store/items/images — 상품 이미지 1장을 Storage(mps-items)에 업로드 후 공개 URL 반환
 // 클라이언트가 canvas로 리사이즈·압축한 Blob을 보낸다(원본/썸네일 공용).
@@ -54,6 +55,14 @@ export async function POST(req: NextRequest) {
   // 업로더별 폴더 분리 + uuid 파일명 (경로 충돌·열거 방지)
   const path = `${user.id}/${crypto.randomUUID()}.${ext}`
   const buffer = await file.arrayBuffer()
+
+  // KISA MC: Magic Byte 검증 — 위조된 Content-Type 차단
+  if (!validateMagicBytes(buffer, file.type)) {
+    return NextResponse.json(
+      { error: '파일 내용이 선언된 형식과 일치하지 않습니다' },
+      { status: 415 },
+    )
+  }
 
   const { error } = await getSupabaseAdmin()
     .storage.from(BUCKET)
