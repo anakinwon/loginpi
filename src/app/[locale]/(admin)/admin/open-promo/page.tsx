@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { useTranslations } from 'next-intl'
 import { piFetch } from '@/lib/pi-fetch'
 
 // 오픈기념행사 무료요금 OneKey 토글 — PRD_26. MASTER 전용.
@@ -42,6 +43,7 @@ function isoToLocalInput(iso: string | null): string {
 }
 
 export default function OpenPromoPage() {
+  const t = useTranslations()
   const [state, setState] = useState<PromoState | null>(null)
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState(false)
@@ -66,11 +68,11 @@ export default function OpenPromoPage() {
       setStartInput(isoToLocalInput(data.current?.promo_start_dtm ?? null))
       setEndInput(isoToLocalInput(data.current?.promo_end_dtm ?? null))
     } catch {
-      toast.error('프로모션 상태 조회 실패')
+      toast.error(t('adminPromo.loadError'))
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [t])
 
   useEffect(() => {
     void load()
@@ -90,67 +92,72 @@ export default function OpenPromoPage() {
           toast.success(okMsg)
           setTimeout(() => void load(), 500)
         } else {
-          toast.error(data.error || '실패')
+          toast.error(data.error || t('adminPromo.fail'))
         }
       } catch {
-        toast.error('요청 실패')
+        toast.error(t('adminPromo.reqFail'))
       } finally {
         setBusy(false)
       }
     },
-    [load],
+    [load, t],
   )
 
   const activate = useCallback(() => {
     const start = startInput ? new Date(startInput).toISOString() : null
     const end = endInput ? new Date(endInput).toISOString() : null
     if (start && end && new Date(end) <= new Date(start)) {
-      toast.error('종료 시각은 시작 시각보다 뒤여야 합니다')
+      toast.error(t('adminPromo.endAfterStartError'))
       return
     }
-    if (
-      !window.confirm(
-        '오픈기념 무료요금을 활성화합니다.\n전 요금 품목이 무료가 됩니다(정상요금은 보존, 종료 시 자동 복귀). 계속하시겠습니까?',
-      )
-    )
-      return
-    const reason = window.prompt('활성화 사유(선택):', '오픈기념행사') ?? ''
+    if (!window.confirm(t('adminPromo.activateConfirm'))) return
+    const reason =
+      window.prompt(
+        t('adminPromo.activateReasonPrompt'),
+        t('adminPromo.activateReasonDefault'),
+      ) ?? ''
     void post(
       { action: 'activate', start_dtm: start, end_dtm: end, reason },
-      '오픈 프로모 활성화됨 — 전 품목 무료',
+      t('adminPromo.activateSuccess'),
     )
-  }, [startInput, endInput, post])
+  }, [startInput, endInput, post, t])
 
   const deactivate = useCallback(() => {
-    if (
-      !window.confirm(
-        '오픈 프로모를 종료합니다.\n즉시 정상요금으로 복귀합니다. 계속하시겠습니까?',
-      )
+    if (!window.confirm(t('adminPromo.deactivateConfirm'))) return
+    const reason =
+      window.prompt(
+        t('adminPromo.deactivateReasonPrompt'),
+        t('adminPromo.deactivateReasonDefault'),
+      ) ?? ''
+    void post(
+      { action: 'deactivate', reason },
+      t('adminPromo.deactivateSuccess'),
     )
-      return
-    const reason = window.prompt('종료 사유(선택):', '오픈기념행사 종료') ?? ''
-    void post({ action: 'deactivate', reason }, '프로모 종료 — 정상요금 복귀')
-  }, [post])
+  }, [post, t])
 
   const saveTimes = useCallback(() => {
     const start = startInput ? new Date(startInput).toISOString() : null
     const end = endInput ? new Date(endInput).toISOString() : null
     if (start && end && new Date(end) <= new Date(start)) {
-      toast.error('종료 시각은 시작 시각보다 뒤여야 합니다')
+      toast.error(t('adminPromo.endAfterStartError'))
       return
     }
     void post(
       { action: 'set-times', start_dtm: start, end_dtm: end },
-      '프로모 기간 변경됨',
+      t('adminPromo.setTimesSuccess'),
     )
-  }, [startInput, endInput, post])
+  }, [startInput, endInput, post, t])
 
   if (forbidden)
     return (
       <div className="p-6">
-        <h1 className="text-xl font-semibold">오픈 프로모 무료요금</h1>
+        <h1 className="text-xl font-semibold">
+          {t('adminPromo.forbiddenTitle')}
+        </h1>
         <p className="text-muted-foreground mt-3 text-sm">
-          이 화면은 <b>MASTER</b> 권한 전용입니다.
+          {t.rich('adminPromo.forbiddenBody', {
+            b: (chunks) => <b>{chunks}</b>,
+          })}
         </p>
       </div>
     )
@@ -161,73 +168,79 @@ export default function OpenPromoPage() {
   return (
     <div className="space-y-5 p-6">
       <div>
-        <h1 className="text-xl font-semibold">오픈 프로모 무료요금 (OneKey)</h1>
+        <h1 className="text-xl font-semibold">{t('adminPromo.title')}</h1>
         <p className="text-muted-foreground mt-1 text-sm">
-          오픈기념행사 기간 동안 <b>전 요금 품목 무료</b>.
-          정상요금(bean_fee_plan)은 보존되며, 종료 시 <b>즉시 자동 복귀</b>
-          합니다. — PRD_26
+          {t.rich('adminPromo.subtitle', {
+            b: (chunks) => <b>{chunks}</b>,
+          })}
         </p>
       </div>
 
-      {loading && <p className="text-muted-foreground text-sm">불러오는 중…</p>}
+      {loading && (
+        <p className="text-muted-foreground text-sm">{t('common.fetching')}</p>
+      )}
 
       {state && (
         <>
           {/* 현재 상태 */}
           <div className="rounded-lg border p-4">
-            <p className="text-muted-foreground text-xs">현재 상태</p>
+            <p className="text-muted-foreground text-xs">
+              {t('adminPromo.currentStatus')}
+            </p>
             <p className="mt-1 text-lg font-semibold">
               {active ? (
                 <span className="text-emerald-600 dark:text-emerald-400">
-                  🎉 오픈 프로모 진행중 — 전 품목 무료
+                  {t('adminPromo.activeStatus')}
                 </span>
               ) : (
-                <span>정상요금 적용 중</span>
+                <span>{t('adminPromo.normalStatus')}</span>
               )}
             </p>
             {/* 종료시각 강조 — KST 명시 + 남은 일수(D-day). 영어 locale에서도 동일 KST 기준 */}
             {active &&
               (cur?.promo_end_dtm ? (
                 <p className="mt-1.5 text-sm font-medium text-amber-700 dark:text-amber-400">
-                  ⏰ 종료:{' '}
-                  {new Date(cur.promo_end_dtm).toLocaleString('ko-KR', {
-                    timeZone: 'Asia/Seoul',
-                    dateStyle: 'medium',
-                    timeStyle: 'short',
-                  })}{' '}
-                  (KST)
+                  {t('adminPromo.endAt', {
+                    date: new Date(cur.promo_end_dtm).toLocaleString('ko-KR', {
+                      timeZone: 'Asia/Seoul',
+                      dateStyle: 'medium',
+                      timeStyle: 'short',
+                    }),
+                  })}
                   {(() => {
                     const days = Math.ceil(
                       (new Date(cur.promo_end_dtm).getTime() - nowTs) /
                         86_400_000,
                     )
-                    return days > 0 ? ` · D-${days}` : ' · 곧 종료'
+                    return days > 0
+                      ? t('adminPromo.dDay', { days })
+                      : t('adminPromo.endingSoon')
                   })()}
                 </p>
               ) : (
                 <p className="mt-1.5 text-sm font-medium text-amber-700 dark:text-amber-400">
-                  ⏰ 종료: 무제한 (수동 종료까지)
+                  {t('adminPromo.endUnlimited')}
                 </p>
               ))}
             {cur && (
               <dl className="text-muted-foreground mt-2 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-xs">
-                <dt>판정 상태</dt>
+                <dt>{t('adminPromo.judgeStatus')}</dt>
                 <dd className="text-foreground">{cur.status_label}</dd>
-                <dt>시작</dt>
+                <dt>{t('adminPromo.startLabel')}</dt>
                 <dd>
                   {cur.promo_start_dtm
                     ? new Date(cur.promo_start_dtm).toLocaleString()
-                    : '— (지정 안 됨, 즉시)'}
+                    : t('adminPromo.startNotSet')}
                 </dd>
-                <dt>종료</dt>
+                <dt>{t('adminPromo.endLabel')}</dt>
                 <dd>
                   {cur.promo_end_dtm
                     ? new Date(cur.promo_end_dtm).toLocaleString()
-                    : '— (무제한, 수동 종료까지)'}
+                    : t('adminPromo.endNotSet')}
                 </dd>
                 {cur.reason_memo && (
                   <>
-                    <dt>사유</dt>
+                    <dt>{t('adminPromo.reasonLabel')}</dt>
                     <dd>{cur.reason_memo}</dd>
                   </>
                 )}
@@ -237,13 +250,11 @@ export default function OpenPromoPage() {
 
           {/* 기간 설정 */}
           <div className="space-y-3 rounded-lg border p-4">
-            <p className="text-sm font-medium">
-              프로모 기간 (선택 — 비우면 무제한)
-            </p>
+            <p className="text-sm font-medium">{t('adminPromo.periodTitle')}</p>
             <div className="grid gap-3 sm:grid-cols-2">
               <label className="text-sm">
                 <span className="text-muted-foreground mb-1 block text-xs">
-                  시작 시각
+                  {t('adminPromo.startTime')}
                 </span>
                 <input
                   type="datetime-local"
@@ -254,7 +265,7 @@ export default function OpenPromoPage() {
               </label>
               <label className="text-sm">
                 <span className="text-muted-foreground mb-1 block text-xs">
-                  종료 시각 (도달 시 자동 정상요금 복귀)
+                  {t('adminPromo.endTime')}
                 </span>
                 <input
                   type="datetime-local"
@@ -271,7 +282,7 @@ export default function OpenPromoPage() {
                 disabled={busy}
                 className="hover:bg-muted rounded-md border px-3 py-1.5 text-xs font-medium disabled:opacity-50"
               >
-                기간만 저장 (활성 유지)
+                {t('adminPromo.saveTimesBtn')}
               </button>
             )}
           </div>
@@ -283,35 +294,49 @@ export default function OpenPromoPage() {
               disabled={busy || active}
               className="rounded-md border border-emerald-300 px-4 py-2 text-sm font-medium text-emerald-700 hover:bg-emerald-50 disabled:opacity-50 dark:text-emerald-400 dark:hover:bg-emerald-950/30"
             >
-              🎉 오픈 프로모 활성화 (전 품목 무료)
+              {t('adminPromo.activateBtn')}
             </button>
             <button
               onClick={deactivate}
               disabled={busy || !active}
               className="hover:bg-muted rounded-md border px-4 py-2 text-sm font-medium disabled:opacity-50"
             >
-              ↩ 종료 (정상요금 복귀)
+              {t('adminPromo.deactivateBtn')}
             </button>
           </div>
 
           {/* 변경 이력 */}
           <div>
-            <p className="mb-2 text-sm font-medium">변경 이력 (최근 20)</p>
+            <p className="mb-2 text-sm font-medium">
+              {t('adminPromo.historyTitle')}
+            </p>
             {state.history.length === 0 ? (
               <p className="text-muted-foreground text-sm">
-                변경 이력이 없습니다.
+                {t('adminPromo.noHistory')}
               </p>
             ) : (
               <div className="overflow-x-auto rounded-lg border">
                 <table className="w-full text-sm">
                   <thead className="bg-muted/50 text-muted-foreground text-xs">
                     <tr>
-                      <th className="px-3 py-2 text-left">변경</th>
-                      <th className="px-3 py-2 text-left">시작일시</th>
-                      <th className="px-3 py-2 text-left">종료일시</th>
-                      <th className="px-3 py-2 text-left">수행자</th>
-                      <th className="px-3 py-2 text-left">사유</th>
-                      <th className="px-3 py-2 text-left">변경시각</th>
+                      <th className="px-3 py-2 text-left">
+                        {t('adminPromo.colChange')}
+                      </th>
+                      <th className="px-3 py-2 text-left">
+                        {t('adminPromo.colStartDtm')}
+                      </th>
+                      <th className="px-3 py-2 text-left">
+                        {t('adminPromo.colEndDtm')}
+                      </th>
+                      <th className="px-3 py-2 text-left">
+                        {t('adminPromo.colActor')}
+                      </th>
+                      <th className="px-3 py-2 text-left">
+                        {t('adminPromo.colReason')}
+                      </th>
+                      <th className="px-3 py-2 text-left">
+                        {t('adminPromo.colChangeDtm')}
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -319,21 +344,24 @@ export default function OpenPromoPage() {
                       <tr key={h.audit_id} className="border-t">
                         <td className="px-3 py-2 font-mono">
                           {(h.old_active_yn ?? '—') === 'Y'
-                            ? '무료'
+                            ? t('adminPromo.free')
                             : (h.old_active_yn ?? '—') === 'N'
-                              ? '정상'
+                              ? t('adminPromo.normal')
                               : '—'}{' '}
-                          → {h.new_active_yn === 'Y' ? '무료' : '정상'}
+                          →{' '}
+                          {h.new_active_yn === 'Y'
+                            ? t('adminPromo.free')
+                            : t('adminPromo.normal')}
                         </td>
                         <td className="text-muted-foreground px-3 py-2 whitespace-nowrap">
                           {h.new_start_dtm
                             ? new Date(h.new_start_dtm).toLocaleString()
-                            : '— (즉시)'}
+                            : t('adminPromo.immediate')}
                         </td>
                         <td className="text-muted-foreground px-3 py-2 whitespace-nowrap">
                           {h.new_end_dtm
                             ? new Date(h.new_end_dtm).toLocaleString()
-                            : '— (무제한)'}
+                            : t('adminPromo.unlimited')}
                         </td>
                         <td className="px-3 py-2">{h.changed_by}</td>
                         <td className="text-muted-foreground px-3 py-2">

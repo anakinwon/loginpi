@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { AdminPagination } from '@/components/admin/admin-pagination'
 import { BeanIcon } from '@/components/ui/bean-icon'
 
@@ -32,19 +33,21 @@ interface AdjustForm {
   reason: string
 }
 
+// 조정 사유 코드값 — 표시 라벨은 i18n(adminToken.wallets.reason.*)
 const REASONS = [
-  { value: 'REFUND_PI_PAYMENT', label: 'Pi 결제 환불 보상' },
-  { value: 'REWARD_EVENT', label: '이벤트 보상' },
-  { value: 'REWARD_PROMOTION', label: '프로모션 보상' },
-  { value: 'CORRECTION_OVERPAY', label: '과충전 정정' },
-  { value: 'CORRECTION_UNDERPAY', label: '미충전 정정' },
-  { value: 'PENALTY_ABUSE', label: '어뷰징 패널티' },
-  { value: 'TEST_ADMIN', label: '관리자 테스트' },
-]
+  'REFUND_PI_PAYMENT',
+  'REWARD_EVENT',
+  'REWARD_PROMOTION',
+  'CORRECTION_OVERPAY',
+  'CORRECTION_UNDERPAY',
+  'PENALTY_ABUSE',
+  'TEST_ADMIN',
+] as const
 
 const PAGE_SIZE = 50
 
 export default function TokenWalletsPage() {
+  const t = useTranslations()
   const [platform, setPlatform] = useState<GovWallet | null>(null)
   const [foundation, setFoundation] = useState<GovWallet | null>(null)
   const [rewardPool, setRewardPool] = useState<GovWallet | null>(null)
@@ -55,9 +58,10 @@ export default function TokenWalletsPage() {
   const [form, setForm] = useState<AdjustForm>({
     usrId: '',
     adjBean: '',
-    reason: REASONS[0].value,
+    reason: REASONS[0],
   })
   const [adjustMsg, setAdjustMsg] = useState<string | null>(null)
+  const [adjustOk, setAdjustOk] = useState(false)
   // 프로모션 발행(거버넌스 지갑 충전)
   const [minting, setMinting] = useState(false)
   const [mintAmt, setMintAmt] = useState('')
@@ -93,7 +97,7 @@ export default function TokenWalletsPage() {
   const handleAdjust = async () => {
     const adjBean = parseInt(form.adjBean, 10)
     if (!form.usrId || isNaN(adjBean) || adjBean === 0) {
-      setAdjustMsg('usr_id와 조정량(0 제외)을 입력하세요.')
+      setAdjustMsg(t('adminToken.wallets.adjustInputError'))
       return
     }
     setAdjusting(true)
@@ -116,15 +120,24 @@ export default function TokenWalletsPage() {
         after?: number
       }
       if (!res.ok || !data.ok) {
-        setAdjustMsg(`오류: ${data.error ?? res.status}`)
-      } else {
+        setAdjustOk(false)
         setAdjustMsg(
-          `완료 — 조정 전 ${data.before} → 후 ${data.after} (${adjBean > 0 ? '+' : ''}${adjBean} Bean)`,
+          t('adminToken.errorMsg', { msg: String(data.error ?? res.status) }),
+        )
+      } else {
+        setAdjustOk(true)
+        setAdjustMsg(
+          t('adminToken.wallets.adjustSuccess', {
+            before: String(data.before),
+            after: String(data.after),
+            adj: `${adjBean > 0 ? '+' : ''}${adjBean}`,
+          }),
         )
         load()
       }
     } catch {
-      setAdjustMsg('네트워크 오류')
+      setAdjustOk(false)
+      setAdjustMsg(t('adminToken.networkError'))
     } finally {
       setAdjusting(false)
     }
@@ -133,11 +146,11 @@ export default function TokenWalletsPage() {
   async function mint() {
     const amt = Math.floor(Number(mintAmt))
     if (!Number.isInteger(amt) || amt <= 0) {
-      setMintMsg('발행액은 1 이상의 정수여야 합니다')
+      setMintMsg(t('adminToken.wallets.mintAmountError'))
       return
     }
     if (!mintReason.trim()) {
-      setMintMsg('발행 사유는 필수입니다')
+      setMintMsg(t('adminToken.wallets.mintReasonError'))
       return
     }
     setMinting(true)
@@ -154,17 +167,22 @@ export default function TokenWalletsPage() {
       })
       const d = (await res.json()) as { error?: string; balance?: number }
       if (!res.ok) {
-        setMintMsg(`오류: ${d.error ?? res.status}`)
+        setMintMsg(
+          t('adminToken.errorMsg', { msg: String(d.error ?? res.status) }),
+        )
       } else {
         setMintMsg(
-          `발행 완료 — ${mintDest} 잔액 ${d.balance?.toLocaleString()} Bean`,
+          t('adminToken.wallets.mintSuccess', {
+            dest: mintDest,
+            balance: d.balance?.toLocaleString() ?? '',
+          }),
         )
         setMintAmt('')
         setMintReason('')
         load()
       }
     } catch {
-      setMintMsg('네트워크 오류')
+      setMintMsg(t('adminToken.networkError'))
     } finally {
       setMinting(false)
     }
@@ -174,10 +192,13 @@ export default function TokenWalletsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="flex items-center gap-2 text-2xl font-bold">
-          <BeanIcon className="inline-block h-7 w-7" /> Bean 지갑 관리
+          <BeanIcon className="inline-block h-7 w-7" />{' '}
+          {t('adminToken.wallets.title')}
         </h1>
         <p className="text-muted-foreground mt-1 text-sm">
-          거버넌스 지갑 3종 + USER 지갑 {wallets.length.toLocaleString()}개
+          {t('adminToken.wallets.subtitle', {
+            count: wallets.length.toLocaleString(),
+          })}
         </p>
       </div>
 
@@ -186,7 +207,7 @@ export default function TokenWalletsPage() {
         {platform && (
           <div className="rounded-lg border border-purple-200 bg-purple-50 p-4 dark:border-purple-800 dark:bg-purple-950/30">
             <p className="text-xs font-semibold tracking-wide text-purple-600 uppercase dark:text-purple-400">
-              PLATFORM · 운영 수익 (70%)
+              {t('adminToken.wallets.platformLabel')}
             </p>
             <p className="mt-1 flex items-center gap-2 text-2xl font-bold tabular-nums">
               <BeanIcon className="inline-block h-6 w-6" />{' '}
@@ -201,30 +222,30 @@ export default function TokenWalletsPage() {
         {foundation && (
           <div className="rounded-lg border border-rose-200 bg-rose-50 p-4 dark:border-rose-800 dark:bg-rose-950/30">
             <p className="text-xs font-semibold tracking-wide text-rose-600 uppercase dark:text-rose-400">
-              FOUNDATION · 재단 적립금 (10%)
+              {t('adminToken.wallets.foundationLabel')}
             </p>
             <p className="mt-1 flex items-center gap-2 text-2xl font-bold tabular-nums">
               <BeanIcon className="inline-block h-6 w-6" />{' '}
               {foundation.bean_amt.toLocaleString()}
             </p>
             <p className="text-muted-foreground text-xs">
-              ≈ π {(foundation.bean_amt / 100).toFixed(2)} · Pi Network 재단
-              기준
+              ≈ π {(foundation.bean_amt / 100).toFixed(2)} ·{' '}
+              {t('adminToken.wallets.foundationSub')}
             </p>
           </div>
         )}
         {rewardPool && (
           <div className="rounded-lg border border-teal-200 bg-teal-50 p-4 dark:border-teal-800 dark:bg-teal-950/30">
             <p className="text-xs font-semibold tracking-wide text-teal-600 uppercase dark:text-teal-400">
-              REWARD_POOL · 생태계 기금 (20%)
+              {t('adminToken.wallets.rewardPoolLabel')}
             </p>
             <p className="mt-1 flex items-center gap-2 text-2xl font-bold tabular-nums">
               <BeanIcon className="inline-block h-6 w-6" />{' '}
               {rewardPool.bean_amt.toLocaleString()}
             </p>
             <p className="text-muted-foreground text-xs">
-              ≈ π {(rewardPool.bean_amt / 100).toFixed(2)} · Pi Network 생태계
-              기금 기준
+              ≈ π {(rewardPool.bean_amt / 100).toFixed(2)} ·{' '}
+              {t('adminToken.wallets.rewardPoolSub')}
             </p>
           </div>
         )}
@@ -232,15 +253,16 @@ export default function TokenWalletsPage() {
 
       {/* 프로모션 발행 — 거버넌스 지갑 충전(보상 캠페인 재원) */}
       <div className="border-border rounded-lg border p-4">
-        <p className="text-sm font-semibold">🆕 프로모션 Bean 발행</p>
+        <p className="text-sm font-semibold">
+          {t('adminToken.wallets.mintTitle')}
+        </p>
         <p className="text-muted-foreground mt-0.5 mb-3 text-xs">
-          현금(Pi) 없는 보조금성 발행 — 보상 캠페인 재원. 대차대조표 발행 총량에
-          포함됩니다(매출 아님).
+          {t('adminToken.wallets.mintDesc')}
         </p>
         <div className="flex flex-wrap items-end gap-2">
           <div>
             <label className="text-muted-foreground mb-1 block text-xs">
-              발행액 (Bean)
+              {t('adminToken.wallets.mintAmountLabel')}
             </label>
             <input
               type="number"
@@ -252,26 +274,32 @@ export default function TokenWalletsPage() {
           </div>
           <div>
             <label className="text-muted-foreground mb-1 block text-xs">
-              대상 지갑
+              {t('adminToken.wallets.mintDestLabel')}
             </label>
             <select
               value={mintDest}
               onChange={(e) => setMintDest(e.target.value)}
               className="rounded-lg border bg-transparent px-2.5 py-1.5 text-sm"
             >
-              <option value="REWARD_POOL">REWARD_POOL (보상 재원)</option>
-              <option value="PLATFORM">PLATFORM (운영)</option>
-              <option value="FOUNDATION">FOUNDATION (재단)</option>
+              <option value="REWARD_POOL">
+                {t('adminToken.wallets.mintDestRewardPool')}
+              </option>
+              <option value="PLATFORM">
+                {t('adminToken.wallets.mintDestPlatform')}
+              </option>
+              <option value="FOUNDATION">
+                {t('adminToken.wallets.mintDestFoundation')}
+              </option>
             </select>
           </div>
           <div className="min-w-[180px] flex-1">
             <label className="text-muted-foreground mb-1 block text-xs">
-              발행 사유
+              {t('adminToken.wallets.mintReasonLabel')}
             </label>
             <input
               value={mintReason}
               onChange={(e) => setMintReason(e.target.value)}
-              placeholder="예: 매장 선착순 보상 캠페인 재원"
+              placeholder={t('adminToken.wallets.mintReasonPlaceholder')}
               className="w-full rounded-lg border bg-transparent px-2.5 py-1.5 text-sm"
             />
           </div>
@@ -280,7 +308,9 @@ export default function TokenWalletsPage() {
             disabled={minting}
             className="bg-primary text-primary-foreground rounded-lg px-4 py-1.5 text-sm font-medium hover:opacity-90 disabled:opacity-50"
           >
-            {minting ? '발행 중…' : '발행'}
+            {minting
+              ? t('adminToken.wallets.minting')
+              : t('adminToken.wallets.mintBtn')}
           </button>
         </div>
         {mintMsg && <p className="mt-2 text-xs">{mintMsg}</p>}
@@ -288,18 +318,20 @@ export default function TokenWalletsPage() {
 
       {/* 수동 조정 패널 */}
       <div className="rounded-lg border p-4">
-        <p className="mb-3 font-semibold">수동 Bean 조정</p>
+        <p className="mb-3 font-semibold">
+          {t('adminToken.wallets.manualTitle')}
+        </p>
         <div className="flex flex-wrap gap-3">
           <input
             type="text"
-            placeholder="usr_id (UUID)"
+            placeholder={t('adminToken.wallets.usrIdPlaceholder')}
             value={form.usrId}
             onChange={(e) => setForm((f) => ({ ...f, usrId: e.target.value }))}
             className="border-input bg-background h-9 w-72 rounded-md border px-3 text-sm"
           />
           <input
             type="number"
-            placeholder="조정량 (양수=지급, 음수=차감)"
+            placeholder={t('adminToken.wallets.adjBeanPlaceholder')}
             value={form.adjBean}
             onChange={(e) =>
               setForm((f) => ({ ...f, adjBean: e.target.value }))
@@ -312,8 +344,8 @@ export default function TokenWalletsPage() {
             className="border-input bg-background h-9 rounded-md border px-3 text-sm"
           >
             {REASONS.map((r) => (
-              <option key={r.value} value={r.value}>
-                {r.label}
+              <option key={r} value={r}>
+                {t(`adminToken.wallets.reason.${r}`)}
               </option>
             ))}
           </select>
@@ -322,12 +354,14 @@ export default function TokenWalletsPage() {
             disabled={adjusting}
             className="bg-primary text-primary-foreground hover:bg-primary/90 h-9 rounded-md px-4 text-sm font-medium disabled:opacity-50"
           >
-            {adjusting ? '처리 중...' : '조정 실행'}
+            {adjusting
+              ? t('common.processing')
+              : t('adminToken.wallets.adjustRun')}
           </button>
         </div>
         {adjustMsg && (
           <p
-            className={`mt-2 text-sm ${adjustMsg.startsWith('완료') ? 'text-green-600 dark:text-green-400' : 'text-red-500'}`}
+            className={`mt-2 text-sm ${adjustOk ? 'text-green-600 dark:text-green-400' : 'text-red-500'}`}
           >
             {adjustMsg}
           </p>
@@ -336,17 +370,27 @@ export default function TokenWalletsPage() {
 
       {/* USER 지갑 목록 */}
       {loading ? (
-        <p className="text-muted-foreground text-sm">불러오는 중...</p>
+        <p className="text-muted-foreground text-sm">{t('common.fetching')}</p>
       ) : (
         <div className="overflow-hidden overflow-x-auto rounded-lg border">
           <table className="w-full text-sm">
             <thead className="bg-muted/50 border-b">
               <tr>
-                <th className="px-4 py-2 text-left font-medium">사용자</th>
-                <th className="px-4 py-2 text-right font-medium">Bean 잔액</th>
-                <th className="px-4 py-2 text-right font-medium">Pi 환산</th>
-                <th className="px-4 py-2 text-left font-medium">상태</th>
-                <th className="px-4 py-2 text-left font-medium">최종 갱신</th>
+                <th className="px-4 py-2 text-left font-medium">
+                  {t('adminToken.wallets.colUser')}
+                </th>
+                <th className="px-4 py-2 text-right font-medium">
+                  {t('adminToken.wallets.colBeanBalance')}
+                </th>
+                <th className="px-4 py-2 text-right font-medium">
+                  {t('adminToken.wallets.colPiConv')}
+                </th>
+                <th className="px-4 py-2 text-left font-medium">
+                  {t('adminToken.wallets.colStatus')}
+                </th>
+                <th className="px-4 py-2 text-left font-medium">
+                  {t('adminToken.wallets.colLastUpdate')}
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y">

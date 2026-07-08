@@ -106,7 +106,7 @@ export function GallerySection({ images }: Props) {
                 e.stopPropagation()
                 navigate(-1)
               }}
-              aria-label="이전 이미지"
+              aria-label={t('gallery.prevImage')}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -140,7 +140,7 @@ export function GallerySection({ images }: Props) {
                 e.stopPropagation()
                 navigate(1)
               }}
-              aria-label="다음 이미지"
+              aria-label={t('gallery.nextImage')}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

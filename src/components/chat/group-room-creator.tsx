@@ -156,7 +156,7 @@ export function GroupRoomCreator() {
     ) => {
       if (typeof window === 'undefined' || !window.Pi) {
         setPayStatus('error')
-        setPayError('Pi Browser에서 결제할 수 있습니다')
+        setPayError(t('piBrowserPay'))
         return
       }
       setPayStatus('approving')
@@ -410,7 +410,11 @@ export function GroupRoomCreator() {
                 <div className="flex items-center gap-2 text-sm">
                   <span className="text-2xl">{selectedTheme.theme_emoji}</span>
                   <span className="font-medium">
-                    {themeName(selectedTheme.theme_cd, selectedTheme.theme_nm_en || selectedTheme.theme_nm)} {t('theme')}
+                    {themeName(
+                      selectedTheme.theme_cd,
+                      selectedTheme.theme_nm_en || selectedTheme.theme_nm,
+                    )}{' '}
+                    {t('theme')}
                   </span>
                   {isPremium && (
                     <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
@@ -429,7 +433,10 @@ export function GroupRoomCreator() {
                     onChange={(e) => setRoomNm(e.target.value)}
                     placeholder={t('defaultRoomName', {
                       emoji: selectedTheme.theme_emoji,
-                      theme: themeName(selectedTheme.theme_cd, selectedTheme.theme_nm_en || selectedTheme.theme_nm),
+                      theme: themeName(
+                        selectedTheme.theme_cd,
+                        selectedTheme.theme_nm_en || selectedTheme.theme_nm,
+                      ),
                     })}
                     maxLength={50}
                     className="bg-background focus:ring-ring w-full rounded-xl border px-3 py-2 text-sm outline-none focus:ring-2"
@@ -566,7 +573,7 @@ export function GroupRoomCreator() {
                 {/* 오픈 프로모(이벤트기간) 중 생성료 면제 안내 — 카페방·이벤트방 공통 */}
                 {openPromo && (
                   <p className="text-center text-xs font-medium text-emerald-600 dark:text-emerald-400">
-                    🎉 이벤트기간 동안 무료
+                    {t('eventPeriodFree')}
                   </p>
                 )}
                 {roomType === 'G' && createCostBean > 0 && (

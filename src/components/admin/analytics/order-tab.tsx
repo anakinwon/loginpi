@@ -68,6 +68,7 @@ const METHOD_COLORS = [
 // mps_order.order_price_pi 기반이므로 PI/BEAN 모드 무관하게 항상 Pi 단위 데이터.
 export function OrderTab({ period }: { period: number }) {
   const t = useTranslations('adminAnalytics')
+  const tc = useTranslations('common')
   const [data, setData] = useState<OrdersResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -83,7 +84,7 @@ export function OrderTab({ period }: { period: number }) {
       setData(json)
       writeCache(cacheKey, json)
     } catch (e) {
-      if (!cached) setError(e instanceof Error ? e.message : '오류 발생')
+      if (!cached) setError(e instanceof Error ? e.message : tc('error'))
     }
   }, [])
 

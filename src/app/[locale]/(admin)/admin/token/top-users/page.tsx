@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { BeanIcon } from '@/components/ui/bean-icon'
 
 interface TopUserRow {
@@ -23,14 +24,14 @@ interface TopUserRow {
   } | null
 }
 
-// RPC p_metric과 일치하는 정렬 지표
+// RPC p_metric과 일치하는 정렬 지표 (라벨·설명은 i18n adminToken.topUsers.metric.*)
 const METRICS = [
-  { value: 'balance', label: '현재 잔액', desc: '지금 보유한 Bean' },
-  { value: 'charge', label: '누적 충전', desc: 'Pi를 투입한 페잉 사용자' },
-  { value: 'spend', label: '누적 사용', desc: '활동량(소비)' },
-  { value: 'reward', label: '누적 보상', desc: '캠페인·이벤트 수령' },
-  { value: 'tip_in', label: '선물 수신', desc: 'P2P로 받은 Bean' },
-  { value: 'txn_cnt', label: '거래 건수', desc: '전체 활동 빈도' },
+  { value: 'balance', key: 'balance' },
+  { value: 'charge', key: 'charge' },
+  { value: 'spend', key: 'spend' },
+  { value: 'reward', key: 'reward' },
+  { value: 'tip_in', key: 'tipIn' },
+  { value: 'txn_cnt', key: 'txnCnt' },
 ] as const
 
 type Metric = (typeof METRICS)[number]['value']
@@ -49,6 +50,7 @@ function rankBadge(rank: number): string {
 }
 
 export default function BeanTopUsersPage() {
+  const t = useTranslations()
   const [rows, setRows] = useState<TopUserRow[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -93,11 +95,11 @@ export default function BeanTopUsersPage() {
     <div className="space-y-6">
       <div>
         <h1 className="flex items-center gap-2 text-2xl font-bold">
-          <BeanIcon className="inline-block h-7 w-7" /> Bean 상위 사용자
+          <BeanIcon className="inline-block h-7 w-7" />{' '}
+          {t('adminToken.topUsers.title')}
         </h1>
         <p className="text-muted-foreground mt-1 text-sm">
-          Bean 경제를 이끄는 핵심 사용자 — 지표를 바꿔 상위 {PAGE_LIMIT}명을
-          분석합니다 (잔액=지갑 캐시 · 누적=거래 원장)
+          {t('adminToken.topUsers.subtitle', { count: PAGE_LIMIT })}
         </p>
       </div>
 
@@ -107,33 +109,41 @@ export default function BeanTopUsersPage() {
           <button
             key={m.value}
             onClick={() => setMetric(m.value)}
-            title={m.desc}
+            title={t(`adminToken.topUsers.metric.${m.key}Desc`)}
             className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors ${
               metric === m.value
                 ? 'border-primary bg-primary text-primary-foreground'
                 : 'border-border text-muted-foreground hover:bg-muted hover:text-foreground'
             }`}
           >
-            {m.label}
+            {t(`adminToken.topUsers.metric.${m.key}Label`)}
           </button>
         ))}
       </div>
 
       {loading && (
-        <p className="text-muted-foreground text-sm">불러오는 중...</p>
+        <p className="text-muted-foreground text-sm">{t('common.fetching')}</p>
       )}
-      {error && <p className="text-sm text-red-500">오류: {error}</p>}
+      {error && (
+        <p className="text-sm text-red-500">
+          {t('adminToken.errorMsg', { msg: error })}
+        </p>
+      )}
 
       {!loading && !error && (
         <>
           <p className="text-muted-foreground text-xs">
-            {METRICS.find((m) => m.value === metric)?.label} 기준 정렬 ·{' '}
-            {rows.length}명
+            {t('adminToken.topUsers.sortedBy', {
+              metric: t(
+                `adminToken.topUsers.metric.${METRICS.find((m) => m.value === metric)?.key ?? 'balance'}Label`,
+              ),
+              count: rows.length,
+            })}
           </p>
 
           {rows.length === 0 ? (
             <p className="text-muted-foreground text-sm">
-              집계할 Bean 활동이 없습니다.
+              {t('adminToken.topUsers.noActivity')}
             </p>
           ) : (
             <div className="overflow-hidden overflow-x-auto rounded-lg border">
@@ -141,21 +151,27 @@ export default function BeanTopUsersPage() {
                 <thead className="bg-muted/50 border-b">
                   <tr>
                     <th className="px-3 py-2 text-center font-medium">#</th>
-                    <th className="px-3 py-2 text-left font-medium">사용자</th>
-                    <th className="px-3 py-2 text-right font-medium">
-                      현재 잔액
+                    <th className="px-3 py-2 text-left font-medium">
+                      {t('adminToken.topUsers.colUser')}
                     </th>
                     <th className="px-3 py-2 text-right font-medium">
-                      누적 충전
+                      {t('adminToken.topUsers.colBalance')}
                     </th>
                     <th className="px-3 py-2 text-right font-medium">
-                      누적 사용
+                      {t('adminToken.topUsers.colCharge')}
                     </th>
-                    <th className="px-3 py-2 text-right font-medium">보상</th>
                     <th className="px-3 py-2 text-right font-medium">
-                      선물 수신
+                      {t('adminToken.topUsers.colSpend')}
                     </th>
-                    <th className="px-3 py-2 text-right font-medium">거래</th>
+                    <th className="px-3 py-2 text-right font-medium">
+                      {t('adminToken.topUsers.colReward')}
+                    </th>
+                    <th className="px-3 py-2 text-right font-medium">
+                      {t('adminToken.topUsers.colTipIn')}
+                    </th>
+                    <th className="px-3 py-2 text-right font-medium">
+                      {t('adminToken.topUsers.colTxn')}
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y">
@@ -229,11 +245,13 @@ export default function BeanTopUsersPage() {
           )}
 
           <p className="text-muted-foreground text-xs">
-            ※ 잔액은 지갑 캐시(bean_token_wallet), 누적 지표는 거래
-            원장(bean_txn) 기준입니다. 현재 정렬 지표 컬럼이{' '}
-            <span className="text-primary font-bold">강조</span> 표시됩니다.
+            {t('adminToken.topUsers.footnote')}{' '}
+            <span className="text-primary font-bold">
+              {t('adminToken.topUsers.footnoteHighlight')}
+            </span>{' '}
+            {t('adminToken.topUsers.footnoteHighlightSuffix')}
             {metricValue(rows[0] ?? ({} as TopUserRow)) === 0 &&
-              ' (해당 지표 활동이 아직 없습니다)'}
+              t('adminToken.topUsers.footnoteNoMetric')}
           </p>
         </>
       )}

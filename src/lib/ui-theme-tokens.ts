@@ -32,31 +32,40 @@ export type ThemeTokenKey = keyof typeof THEME_TOKEN_MAP
 export const THEME_TOKEN_KEYS = Object.keys(THEME_TOKEN_MAP) as ThemeTokenKey[]
 
 // 편집 UI용 라벨·그룹 메타
+// labelKey는 adminOps 네임스페이스 기준 i18n 키 — 소비 컴포넌트에서 t(labelKey)로 해석한다.
 export const THEME_TOKEN_META: {
   key: ThemeTokenKey
-  label: string
+  labelKey: string
   group: 'surface' | 'core' | 'chart' | 'kpi'
 }[] = [
-  { key: 'background', label: '배경', group: 'surface' },
-  { key: 'foreground', label: '본문 글자', group: 'surface' },
-  { key: 'card', label: '카드 배경', group: 'surface' },
-  { key: 'cardForeground', label: '카드 글자', group: 'surface' },
-  { key: 'muted', label: '보조 배경', group: 'surface' },
-  { key: 'mutedForeground', label: '보조 글자', group: 'surface' },
-  { key: 'secondary', label: '세컨더리', group: 'surface' },
-  { key: 'border', label: '테두리', group: 'surface' },
-  { key: 'primary', label: '주색 (primary)', group: 'core' },
-  { key: 'accent', label: '강조 (accent)', group: 'core' },
-  { key: 'chart1', label: '차트 1', group: 'chart' },
-  { key: 'chart2', label: '차트 2', group: 'chart' },
-  { key: 'chart3', label: '차트 3', group: 'chart' },
-  { key: 'chart4', label: '차트 4', group: 'chart' },
-  { key: 'chart5', label: '차트 5', group: 'chart' },
-  { key: 'kpi1', label: 'KPI 카드 1', group: 'kpi' },
-  { key: 'kpi2', label: 'KPI 카드 2', group: 'kpi' },
-  { key: 'kpi3', label: 'KPI 카드 3', group: 'kpi' },
-  { key: 'kpi4', label: 'KPI 카드 4', group: 'kpi' },
-  { key: 'kpi5', label: 'KPI 카드 5', group: 'kpi' },
+  { key: 'background', labelKey: 'uiThemes.tokBackground', group: 'surface' },
+  { key: 'foreground', labelKey: 'uiThemes.tokForeground', group: 'surface' },
+  { key: 'card', labelKey: 'uiThemes.tokCard', group: 'surface' },
+  {
+    key: 'cardForeground',
+    labelKey: 'uiThemes.tokCardForeground',
+    group: 'surface',
+  },
+  { key: 'muted', labelKey: 'uiThemes.tokMuted', group: 'surface' },
+  {
+    key: 'mutedForeground',
+    labelKey: 'uiThemes.tokMutedForeground',
+    group: 'surface',
+  },
+  { key: 'secondary', labelKey: 'uiThemes.tokSecondary', group: 'surface' },
+  { key: 'border', labelKey: 'uiThemes.tokBorder', group: 'surface' },
+  { key: 'primary', labelKey: 'uiThemes.tokPrimary', group: 'core' },
+  { key: 'accent', labelKey: 'uiThemes.tokAccent', group: 'core' },
+  { key: 'chart1', labelKey: 'uiThemes.tokChart1', group: 'chart' },
+  { key: 'chart2', labelKey: 'uiThemes.tokChart2', group: 'chart' },
+  { key: 'chart3', labelKey: 'uiThemes.tokChart3', group: 'chart' },
+  { key: 'chart4', labelKey: 'uiThemes.tokChart4', group: 'chart' },
+  { key: 'chart5', labelKey: 'uiThemes.tokChart5', group: 'chart' },
+  { key: 'kpi1', labelKey: 'uiThemes.tokKpi1', group: 'kpi' },
+  { key: 'kpi2', labelKey: 'uiThemes.tokKpi2', group: 'kpi' },
+  { key: 'kpi3', labelKey: 'uiThemes.tokKpi3', group: 'kpi' },
+  { key: 'kpi4', labelKey: 'uiThemes.tokKpi4', group: 'kpi' },
+  { key: 'kpi5', labelKey: 'uiThemes.tokKpi5', group: 'kpi' },
 ]
 
 export type ThemeColorSet = Partial<Record<ThemeTokenKey, string>>

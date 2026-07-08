@@ -48,6 +48,7 @@ const RANK_BADGES = ['🥇', '🥈', '🥉'] as const
 
 export function ChatMarketplace() {
   const t = useTranslations('chat.market')
+  const tc = useTranslations('common')
   const themeName = useThemeName()
   const [rooms, setRooms] = useState<MarketRoom[]>([])
   const [themes, setThemes] = useState<MarketTheme[]>([])
@@ -148,9 +149,9 @@ export function ChatMarketplace() {
         else next.delete(themeCd)
         return next
       })
-      toast.error('팔로우 변경에 실패했습니다')
+      toast.error(t('followFail'))
     } else if (!isFollowing) {
-      toast.success('테마를 팔로우했습니다 — 신규 이벤트방 알림을 받습니다')
+      toast.success(t('followed'))
     }
   }
 
@@ -186,7 +187,7 @@ export function ChatMarketplace() {
           <button
             type="button"
             onClick={() => setSearch('')}
-            aria-label="검색어 지우기"
+            aria-label={t('clearSearch')}
             className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 text-sm"
           >
             ✕
@@ -204,7 +205,7 @@ export function ChatMarketplace() {
               : 'hover:bg-muted'
           }`}
         >
-          전체
+          {tc('all')}
         </button>
         {themes.map((t) => (
           <button
@@ -231,9 +232,7 @@ export function ChatMarketplace() {
               : 'text-muted-foreground hover:bg-muted'
           }`}
         >
-          {followed.has(activeTheme)
-            ? '✓ 팔로우 중 — 이벤트방 알림 ON'
-            : '+ 이 테마 팔로우 (이벤트방 알림)'}
+          {followed.has(activeTheme) ? t('followingOn') : t('followCta')}
         </button>
       )}
 
@@ -250,7 +249,7 @@ export function ChatMarketplace() {
         <div className="rounded-xl border border-dashed py-8 text-center">
           <p className="text-muted-foreground text-sm">
             {debouncedSearch
-              ? `'${debouncedSearch}' 검색 결과가 없습니다`
+              ? t('searchEmpty', { query: debouncedSearch })
               : t('empty')}
           </p>
         </div>
@@ -279,7 +278,9 @@ export function ChatMarketplace() {
                     {room.room_tp_cd === 'E' && (
                       <span className="ml-1.5 rounded-full bg-violet-100 px-1.5 py-0.5 text-[10px] font-medium text-violet-700 dark:bg-violet-900/30 dark:text-violet-400">
                         {room.entry_fee_pi > 0
-                          ? t('eventFee', { fee: eventEntryFeeBean(room.entry_fee_pi) })
+                          ? t('eventFee', {
+                              fee: eventEntryFeeBean(room.entry_fee_pi),
+                            })
                           : t('eventFree')}
                       </span>
                     )}
@@ -291,7 +292,10 @@ export function ChatMarketplace() {
                       msgs: room.msg_cnt_7d,
                     })}
                     {Number(room.tip_amt_7d) > 0 && (
-                      <span> · {t('weeklyBean', { amt: room.tip_amt_7d })}</span>
+                      <span>
+                        {' '}
+                        · {t('weeklyBean', { amt: room.tip_amt_7d })}
+                      </span>
                     )}
                   </p>
                 </div>

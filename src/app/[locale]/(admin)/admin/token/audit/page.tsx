@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { BeanIcon } from '@/components/ui/bean-icon'
 
 interface AuditRow {
@@ -20,17 +21,19 @@ interface AuditRow {
   } | null
 }
 
-const REASON_LABEL: Record<string, string> = {
-  REFUND_PI_PAYMENT: 'Pi 결제 환불 보상',
-  REWARD_EVENT: '이벤트 보상',
-  REWARD_PROMOTION: '프로모션 보상',
-  CORRECTION_OVERPAY: '과충전 정정',
-  CORRECTION_UNDERPAY: '미충전 정정',
-  PENALTY_ABUSE: '어뷰징 패널티',
-  TEST_ADMIN: '관리자 테스트',
-}
+// 조정 사유 코드값 — 표시 라벨은 i18n(adminToken.wallets.reason.*) 공용
+const REASON_CODES = [
+  'REFUND_PI_PAYMENT',
+  'REWARD_EVENT',
+  'REWARD_PROMOTION',
+  'CORRECTION_OVERPAY',
+  'CORRECTION_UNDERPAY',
+  'PENALTY_ABUSE',
+  'TEST_ADMIN',
+]
 
 export default function BeanAuditLogPage() {
+  const t = useTranslations()
   const [rows, setRows] = useState<AuditRow[]>([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -67,10 +70,11 @@ export default function BeanAuditLogPage() {
     <div className="space-y-6">
       <div>
         <h1 className="flex items-center gap-2 text-2xl font-bold">
-          <BeanIcon className="inline-block h-6 w-6" /> Bean 수동 조정 감사 로그
+          <BeanIcon className="inline-block h-6 w-6" />{' '}
+          {t('adminToken.audit.title')}
         </h1>
         <p className="text-muted-foreground mt-1 text-sm">
-          어드민이 실행한 모든 Bean 수동 조정 내역 (P0-4 · PRD_16 §14)
+          {t('adminToken.audit.subtitle')}
         </p>
       </div>
 
@@ -78,13 +82,13 @@ export default function BeanAuditLogPage() {
       <div className="flex items-end gap-2">
         <div>
           <label className="text-muted-foreground mb-1 block text-xs">
-            usr_id 필터 (선택)
+            {t('adminToken.audit.usrIdFilterLabel')}
           </label>
           <input
             type="text"
             value={filterUsrId}
             onChange={(e) => setFilterUsrId(e.target.value)}
-            placeholder="UUID 입력 후 조회"
+            placeholder={t('adminToken.audit.usrIdFilterPlaceholder')}
             className="border-input bg-background h-9 w-72 rounded-md border px-3 text-sm"
             onKeyDown={(e) => e.key === 'Enter' && handleFilter()}
           />
@@ -93,7 +97,7 @@ export default function BeanAuditLogPage() {
           onClick={handleFilter}
           className="bg-primary text-primary-foreground h-9 rounded-md px-4 text-sm font-medium hover:opacity-90"
         >
-          조회
+          {t('adminToken.audit.query')}
         </button>
         {filterUsrId && (
           <button
@@ -103,44 +107,58 @@ export default function BeanAuditLogPage() {
             }}
             className="text-muted-foreground hover:bg-muted h-9 rounded-md border px-3 text-sm"
           >
-            초기화
+            {t('common.reset')}
           </button>
         )}
       </div>
 
       {loading && (
-        <p className="text-muted-foreground text-sm">불러오는 중...</p>
+        <p className="text-muted-foreground text-sm">{t('common.fetching')}</p>
       )}
-      {error && <p className="text-sm text-red-500">오류: {error}</p>}
+      {error && (
+        <p className="text-sm text-red-500">
+          {t('adminToken.errorMsg', { msg: error })}
+        </p>
+      )}
 
       {!loading && !error && (
         <>
           <p className="text-muted-foreground text-xs">
-            총 {total.toLocaleString()}건 (최근 100건 표시)
+            {t('adminToken.audit.totalCount', {
+              count: total.toLocaleString(),
+            })}
           </p>
 
           {rows.length === 0 ? (
             <p className="text-muted-foreground text-sm">
-              조정 내역이 없습니다.
+              {t('adminToken.audit.noRecord')}
             </p>
           ) : (
             <div className="overflow-hidden overflow-x-auto rounded-lg border">
               <table className="w-full text-sm">
                 <thead className="bg-muted/50 border-b">
                   <tr>
-                    <th className="px-4 py-2 text-left font-medium">일시</th>
                     <th className="px-4 py-2 text-left font-medium">
-                      대상 사용자
+                      {t('adminToken.audit.colDtm')}
+                    </th>
+                    <th className="px-4 py-2 text-left font-medium">
+                      {t('adminToken.audit.colTargetUser')}
                     </th>
                     <th className="px-4 py-2 text-right font-medium">
-                      조정 전
+                      {t('adminToken.audit.colBefore')}
                     </th>
-                    <th className="px-4 py-2 text-right font-medium">조정량</th>
                     <th className="px-4 py-2 text-right font-medium">
-                      조정 후
+                      {t('adminToken.audit.colAdj')}
                     </th>
-                    <th className="px-4 py-2 text-left font-medium">사유</th>
-                    <th className="px-4 py-2 text-left font-medium">증빙</th>
+                    <th className="px-4 py-2 text-right font-medium">
+                      {t('adminToken.audit.colAfter')}
+                    </th>
+                    <th className="px-4 py-2 text-left font-medium">
+                      {t('adminToken.audit.colReason')}
+                    </th>
+                    <th className="px-4 py-2 text-left font-medium">
+                      {t('adminToken.audit.colEvidence')}
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y">
@@ -194,7 +212,9 @@ export default function BeanAuditLogPage() {
                         </td>
                         <td className="px-4 py-3">
                           <span className="bg-muted rounded px-1.5 py-0.5 text-xs">
-                            {REASON_LABEL[row.reason_txt] ?? row.reason_txt}
+                            {REASON_CODES.includes(row.reason_txt)
+                              ? t(`adminToken.wallets.reason.${row.reason_txt}`)
+                              : row.reason_txt}
                           </span>
                         </td>
                         <td className="px-4 py-3 text-xs">
@@ -205,7 +225,7 @@ export default function BeanAuditLogPage() {
                               rel="noopener noreferrer"
                               className="text-blue-600 underline dark:text-blue-400"
                             >
-                              증빙 보기
+                              {t('adminToken.audit.viewEvidence')}
                             </a>
                           ) : (
                             <span className="text-muted-foreground">—</span>

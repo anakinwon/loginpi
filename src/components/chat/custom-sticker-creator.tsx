@@ -1,5 +1,6 @@
 'use client'
 import { useRef, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
 
@@ -13,6 +14,8 @@ export function CustomStickerCreator({
   onCreated: () => void
   onClose: () => void
 }) {
+  const t = useTranslations('chat')
+  const tc = useTranslations('common')
   const [packNm, setPackNm] = useState('')
   const [priceBean, setPriceBean] = useState('50')
   const [mktYn, setMktYn] = useState(false)
@@ -28,11 +31,11 @@ export function CustomStickerCreator({
 
   async function submit() {
     if (!packNm.trim()) {
-      toast.error('팩 이름을 입력해주세요')
+      toast.error(t('customSticker.packNameRequired'))
       return
     }
     if (files.length === 0) {
-      toast.error('스티커 이미지를 1장 이상 선택해주세요')
+      toast.error(t('customSticker.imagesRequired'))
       return
     }
 
@@ -56,15 +59,17 @@ export function CustomStickerCreator({
       if (!res.ok) {
         toast.error(
           data.businessRequired
-            ? 'Business 플랜(Pi Host) 전용 기능입니다'
-            : (data.error ?? '팩 생성 실패'),
+            ? t('customSticker.businessOnly')
+            : (data.error ?? t('customSticker.createFail')),
         )
         return
       }
-      toast.success(`커스텀 팩 생성 완료! (스티커 ${data.pack?.sticker_cnt}개)`)
+      toast.success(
+        t('customSticker.created', { count: data.pack?.sticker_cnt ?? 0 }),
+      )
       onCreated()
     } catch {
-      toast.error('팩 생성 중 오류가 발생했습니다')
+      toast.error(t('customSticker.createError'))
     } finally {
       setSubmitting(false)
     }
@@ -80,24 +85,26 @@ export function CustomStickerCreator({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-base font-semibold">🎨 커스텀 스티커팩 만들기</h3>
+          <h3 className="text-base font-semibold">
+            {t('customSticker.title')}
+          </h3>
           <button
             onClick={onClose}
             className="text-muted-foreground hover:text-foreground"
-            aria-label="닫기"
+            aria-label={tc('close')}
           >
             ✕
           </button>
         </div>
         <p className="text-muted-foreground mb-3 text-xs">
-          Business 전용 · 팩당 최대 10장 (png/jpg/gif/webp, 장당 2MB)
+          {t('customSticker.subtitle')}
         </p>
 
         <div className="space-y-3">
           <input
             value={packNm}
             onChange={(e) => setPackNm(e.target.value)}
-            placeholder="팩 이름"
+            placeholder={t('customSticker.packNameLabel')}
             maxLength={100}
             className="w-full rounded-lg border bg-transparent px-2.5 py-1.5 text-sm"
           />
@@ -115,7 +122,7 @@ export function CustomStickerCreator({
             onClick={() => fileInputRef.current?.click()}
             className="text-muted-foreground hover:bg-muted w-full rounded-lg border border-dashed py-3 text-xs"
           >
-            + 이미지 선택 ({files.length}/10)
+            {t('customSticker.selectImages', { count: files.length })}
           </button>
           {files.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
@@ -129,7 +136,7 @@ export function CustomStickerCreator({
                   <button
                     onClick={() => setFiles(files.filter((_, j) => j !== i))}
                     className="bg-destructive absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full text-[9px] text-white"
-                    aria-label="삭제"
+                    aria-label={tc('delete')}
                   >
                     ✕
                   </button>
@@ -145,12 +152,12 @@ export function CustomStickerCreator({
               checked={mktYn}
               onChange={(e) => setMktYn(e.target.checked)}
             />
-            마켓플레이스에 판매 (다른 사용자가 Bean으로 구매)
+            {t('customSticker.sellOptionBean')}
           </label>
           {mktYn && (
             <div className="flex items-center gap-2">
               <label className="text-muted-foreground text-xs">
-                판매가 ☕ Bean
+                {t('customSticker.priceLabelBean')}
               </label>
               <input
                 type="number"
@@ -169,7 +176,9 @@ export function CustomStickerCreator({
             disabled={submitting}
             className="bg-primary text-primary-foreground w-full rounded-lg py-2 text-sm font-medium hover:opacity-90 disabled:opacity-50"
           >
-            {submitting ? '생성 중…' : '팩 만들기'}
+            {submitting
+              ? t('customSticker.creating')
+              : t('customSticker.create')}
           </button>
         </div>
       </div>

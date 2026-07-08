@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState, useCallback, Fragment } from 'react'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
 import { InlinePurchasePrompt } from './inline-purchase-prompt'
@@ -38,6 +39,8 @@ export function StickerPicker({
   onClose,
   selectedId = null,
 }: StickerPickerProps) {
+  const t = useTranslations('chat')
+  const tc = useTranslations('common')
   const [ownedPacks, setOwnedPacks] = useState<OwnedPack[]>([])
   const [storePacks, setStorePacks] = useState<StorePack[]>([])
   const [activePackId, setActivePackId] = useState<string | null>(null)
@@ -65,7 +68,7 @@ export function StickerPicker({
         if (d.ownedPacks.length > 0) setActivePackId(d.ownedPacks[0].pack_id)
         else setShowStore(true)
       })
-      .catch(() => toast.error('스티커를 불러오지 못했습니다'))
+      .catch(() => toast.error(t('sticker.loadFail')))
       .finally(() => setLoading(false))
   }, [loadPacks])
 
@@ -77,7 +80,7 @@ export function StickerPicker({
       packNm: string,
     ) => {
       if (typeof window === 'undefined' || !window.Pi) {
-        toast.error('Pi Browser에서 결제할 수 있습니다')
+        toast.error(t('sticker.piBrowserPay'))
         setBuying(null)
         return
       }
@@ -93,7 +96,7 @@ export function StickerPicker({
               })
               if (!r.ok) throw new Error()
             } catch {
-              toast.error('구매 실패')
+              toast.error(t('sticker.buyFail'))
               setBuying(null)
             }
           },
@@ -108,7 +111,7 @@ export function StickerPicker({
                 body: JSON.stringify({ paymentId, txid }),
               })
               if (!r.ok) throw new Error()
-              toast.success(`${packNm} 구매 완료!`)
+              toast.success(t('sticker.boughtPlain', { pack: packNm }))
               const updated = await loadPacks().catch(() => null)
               if (updated) {
                 setOwnedPacks(updated.ownedPacks)
@@ -117,20 +120,20 @@ export function StickerPicker({
                 setShowStore(false)
               }
             } catch {
-              toast.error('구매 처리 실패')
+              toast.error(t('sticker.buyProcessFail'))
             } finally {
               setBuying(null)
             }
           },
           onCancel: () => setBuying(null),
           onError: (e: Error) => {
-            toast.error(e?.message ?? '구매 오류')
+            toast.error(e?.message ?? t('sticker.buyError'))
             setBuying(null)
           },
         },
       )
     },
-    [loadPacks],
+    [loadPacks, t],
   )
 
   const buyPack = useCallback(
@@ -164,15 +167,15 @@ export function StickerPicker({
         if (!res.ok) {
           if (data.requiresBean) {
             toast.error(
-              `Bean이 부족합니다 (${data.feeBean ?? 0} Bean 필요). /bean 에서 충전하세요.`,
+              t('sticker.insufficientBean', { fee: data.feeBean ?? 0 }),
             )
           } else {
-            toast.error(data.error ?? '구매 실패')
+            toast.error(data.error ?? t('sticker.buyFail'))
           }
           return
         }
 
-        toast.success(`${packNm} 구매 완료!`)
+        toast.success(t('sticker.boughtPlain', { pack: packNm }))
         const updated = await loadPacks().catch(() => null)
         if (updated) {
           setOwnedPacks(updated.ownedPacks)
@@ -181,12 +184,12 @@ export function StickerPicker({
           setShowStore(false)
         }
       } catch (e) {
-        toast.error(e instanceof Error ? e.message : '구매 오류')
+        toast.error(e instanceof Error ? e.message : t('sticker.buyError'))
       } finally {
         if (!piHandoff) setBuying(null)
       }
     },
-    [loadPacks, startStickerPiPayment],
+    [loadPacks, startStickerPiPayment, t],
   )
 
   const activePack = ownedPacks.find((p) => p.pack_id === activePackId)
@@ -213,7 +216,7 @@ export function StickerPicker({
                   setActivePackId(pack.pack_id)
                   setShowStore(false)
                 }}
-                title={pack.is_custom ? '내 커스텀 스티커팩' : undefined}
+                title={pack.is_custom ? t('sticker.myCustomPack') : undefined}
                 className={`shrink-0 rounded-t-lg px-2 py-1.5 text-xs font-medium transition-colors ${
                   active
                     ? 'bg-background text-foreground shadow-sm'
@@ -236,21 +239,21 @@ export function StickerPicker({
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            🛒 스토어
+            {t('sticker.store')}
           </button>
         )}
         <button
           onClick={() => setShowCreator(true)}
           className="text-muted-foreground hover:text-foreground shrink-0 px-1 py-1.5 text-xs"
-          aria-label="커스텀 스티커 만들기"
-          title="커스텀 스티커팩 만들기 (Business)"
+          aria-label={t('sticker.createCustom')}
+          title={t('sticker.createCustomBusiness')}
         >
           🎨
         </button>
         <button
           onClick={onClose}
           className="text-muted-foreground hover:text-foreground shrink-0 px-1 py-1 text-xs"
-          aria-label="닫기"
+          aria-label={tc('close')}
         >
           ✕
         </button>
@@ -260,7 +263,7 @@ export function StickerPicker({
       <div className="h-52 overflow-y-auto p-2">
         {loading ? (
           <div className="text-muted-foreground flex h-full items-center justify-center text-sm">
-            불러오는 중…
+            {tc('fetching')}
           </div>
         ) : showStore ? (
           <StoreView
@@ -273,7 +276,7 @@ export function StickerPicker({
           <>
             {selectedId && (
               <p className="text-primary mb-1 text-center text-[11px] font-medium">
-                같은 스티커를 한 번 더 누르면 전송됩니다
+                {t('sticker.pressAgainHint')}
               </p>
             )}
             <div className="grid grid-cols-4 gap-1">
@@ -288,7 +291,7 @@ export function StickerPicker({
                   }`}
                   title={
                     selectedId === s.stkr_id
-                      ? '한 번 더 누르면 전송'
+                      ? t('sticker.pressAgainToSend')
                       : s.stkr_nm
                   }
                 >
@@ -303,13 +306,13 @@ export function StickerPicker({
           </>
         ) : (
           <div className="text-muted-foreground flex h-full flex-col items-center justify-center gap-2 text-sm">
-            <span>보유한 스티커가 없습니다</span>
+            <span>{t('sticker.noOwned')}</span>
             {storePacks.length > 0 && (
               <button
                 onClick={() => setShowStore(true)}
                 className="text-primary text-xs underline"
               >
-                스토어 둘러보기
+                {t('sticker.browseStore')}
               </button>
             )}
           </div>
@@ -332,8 +335,8 @@ export function StickerPicker({
       )}
       <InlinePurchasePrompt
         isOpen={showSubscribePrompt}
-        featureName="스티커 팩 구독"
-        description="프리미엄 구독 시 매월 새 스티커 팩을 포함해 다양한 특혜를 누리세요."
+        featureName={t('sticker.subscrFeature')}
+        description={t('sticker.subscrDesc')}
         onClose={() => setShowSubscribePrompt(false)}
       />
     </div>
@@ -351,10 +354,11 @@ function StoreView({
   onBuy: (packId: string, packNm: string) => void
   onSubscribeBanner?: () => void
 }) {
+  const t = useTranslations('chat')
   if (storePacks.length === 0) {
     return (
       <p className="text-muted-foreground py-6 text-center text-sm">
-        구매 가능한 스티커팩이 없습니다
+        {t('sticker.storeEmpty')}
       </p>
     )
   }
@@ -369,7 +373,9 @@ function StoreView({
               disabled={buying === pack.pack_id}
               className="bg-primary text-primary-foreground rounded-lg px-2 py-1 text-xs font-medium disabled:opacity-50"
             >
-              {buying === pack.pack_id ? '구매 중…' : `${pack.price_bean} Bean`}
+              {buying === pack.pack_id
+                ? t('sticker.buyingShort')
+                : `${pack.price_bean} Bean`}
             </button>
           </div>
           {pack.preview_stickers.length > 0 && (
@@ -391,7 +397,7 @@ function StoreView({
           onClick={onSubscribeBanner}
           className="border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 mt-1 w-full rounded-xl border px-3 py-2 text-left text-xs transition-colors"
         >
-          ✨ 구독하면 스티커 팩이 매월 포함됩니다 →
+          {t('sticker.subscribeBanner')}
         </button>
       )}
     </div>

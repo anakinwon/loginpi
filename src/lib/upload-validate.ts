@@ -11,7 +11,8 @@ export function validateMagicBytes(buffer: ArrayBuffer, mime: string): boolean {
   const b = new Uint8Array(buffer)
   const matchAt = (sig: number[], offset = 0): boolean =>
     b.length >= offset + sig.length && sig.every((v, i) => b[offset + i] === v)
-  const matchAscii = (s: string, offset = 0): boolean => matchAt(ascii(s), offset)
+  const matchAscii = (s: string, offset = 0): boolean =>
+    matchAt(ascii(s), offset)
 
   switch (mime) {
     case 'image/png':
@@ -24,7 +25,10 @@ export function validateMagicBytes(buffer: ArrayBuffer, mime: string): boolean {
       return matchAscii('RIFF') && matchAscii('WEBP', 8)
     case 'audio/mpeg':
       // ID3 태그 또는 MPEG 프레임 싱크(0xFFEx/0xFFFx)
-      return matchAscii('ID3') || (b.length > 1 && b[0] === 0xff && (b[1] & 0xe0) === 0xe0)
+      return (
+        matchAscii('ID3') ||
+        (b.length > 1 && b[0] === 0xff && (b[1] & 0xe0) === 0xe0)
+      )
     case 'audio/mp4':
       return matchAscii('ftyp', 4)
     case 'audio/webm':

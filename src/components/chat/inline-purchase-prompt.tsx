@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 
 interface InlinePurchasePromptProps {
@@ -22,6 +23,8 @@ export function InlinePurchasePrompt({
   secondaryActionLabel,
   onSecondaryAction,
 }: InlinePurchasePromptProps) {
+  const t = useTranslations('chat')
+  const tc = useTranslations('common')
   if (!isOpen) return null
 
   return (
@@ -60,13 +63,13 @@ export function InlinePurchasePrompt({
                 : 'bg-primary text-primary-foreground'
             }`}
           >
-            구독하러 가기 →
+            {t('purchase.goSubscribe')}
           </Link>
           <button
             onClick={onClose}
             className="text-muted-foreground hover:text-foreground w-full pt-1 text-sm"
           >
-            취소
+            {tc('cancel')}
           </button>
         </div>
       </div>

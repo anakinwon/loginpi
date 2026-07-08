@@ -15,7 +15,13 @@ export async function GET() {
 
   if (error) {
     return NextResponse.json(
-      { error: sanitizeError('api/admin/logs/get', error, '로그 통계 조회 실패') },
+      {
+        error: sanitizeError(
+          'api/admin/logs/get',
+          error,
+          '로그 통계 조회 실패',
+        ),
+      },
       { status: 500 },
     )
   }

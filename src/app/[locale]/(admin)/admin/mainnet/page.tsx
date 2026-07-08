@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
 
@@ -28,22 +29,6 @@ interface Summary {
   percent: number
 }
 
-const STATUS_LABEL: Record<ChkItem['status_cd'], string> = {
-  TODO: '미착수',
-  DOING: '진행중',
-  DONE: '완료',
-  NA: '해당없음',
-}
-const PRIO_LABEL: Record<ChkItem['prio_cd'], string> = {
-  BLOCKING: '블로킹',
-  IMPORTANT: '중요',
-  RECOMMEND: '권장',
-}
-const OWNER_LABEL: Record<ChkItem['owner_cd'], string> = {
-  CODE: '코드',
-  MASTER: '마스터',
-  EXTERNAL: 'Pi 확인',
-}
 const PRIO_CLS: Record<ChkItem['prio_cd'], string> = {
   BLOCKING: 'bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400',
   IMPORTANT:
@@ -60,6 +45,24 @@ const OWNER_CLS: Record<ChkItem['owner_cd'], string> = {
 const SECT_ORDER = ['ACTION', 'CONFIRM', 'PROC']
 
 export default function MainnetChecklistPage() {
+  const t = useTranslations('adminOps')
+  const tc = useTranslations('common')
+  const statusLabels: Record<ChkItem['status_cd'], string> = {
+    TODO: t('checklist.statusTodo'),
+    DOING: t('checklist.statusDoing'),
+    DONE: t('checklist.statusDone'),
+    NA: t('checklist.statusNa'),
+  }
+  const prioLabels: Record<ChkItem['prio_cd'], string> = {
+    BLOCKING: t('checklist.prioBlocking'),
+    IMPORTANT: t('checklist.prioImportant'),
+    RECOMMEND: t('checklist.prioRecommend'),
+  }
+  const ownerLabels: Record<ChkItem['owner_cd'], string> = {
+    CODE: t('checklist.ownerCode'),
+    MASTER: t('checklist.ownerMaster'),
+    EXTERNAL: t('mainnet.ownerExternal'),
+  }
   const [items, setItems] = useState<ChkItem[]>([])
   const [summary, setSummary] = useState<Summary | null>(null)
   const [applied, setApplied] = useState(true)
@@ -79,11 +82,11 @@ export default function MainnetChecklistPage() {
       setSummary(d.summary)
       setApplied(d.applied)
     } catch {
-      toast.error('체크리스트를 불러오지 못했습니다')
+      toast.error(t('checklist.loadFail'))
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [t])
 
   useEffect(() => {
     void load()
@@ -130,13 +133,13 @@ export default function MainnetChecklistPage() {
       })
       if (!res.ok) throw new Error()
     } catch {
-      toast.error('저장 실패 — 새로고침 후 다시 시도')
+      toast.error(t('checklist.saveFail'))
       void load() // 롤백
     }
   }
 
   if (loading) {
-    return <p className="text-muted-foreground p-6 text-sm">불러오는 중…</p>
+    return <p className="text-muted-foreground p-6 text-sm">{tc('fetching')}</p>
   }
 
   // 섹션 그룹 (정본 문서 순서 유지)
@@ -157,43 +160,28 @@ export default function MainnetChecklistPage() {
   return (
     <div className="mx-auto max-w-4xl space-y-5 p-4 sm:p-6">
       <div>
-        <h1 className="text-lg font-bold">🚀 메인넷 출시 체크리스트</h1>
+        <h1 className="text-lg font-bold">{t('mainnet.title')}</h1>
         <p className="text-muted-foreground mt-1 text-sm">
-          Pi 공식문서 기반 출시 준비 항목을 상태별로 관리합니다. 정본:{' '}
-          <code>docs/MAINNET_READINESS_CHECKLIST.md</code> (담당: 코드=개발 ·
-          마스터=수동 · Pi 확인=등재팀 질의)
+          {t.rich('mainnet.subtitle', { code: (c) => <code>{c}</code> })}
         </p>
       </div>
 
       {/* ⚠️ 핵심 개념 — 관리자 필독: 테스트넷 ≠ 메인넷 자동 승계 */}
       <div className="rounded-xl border-2 border-amber-400 bg-amber-50 p-4 text-sm dark:border-amber-600 dark:bg-amber-950/30">
         <p className="font-bold text-amber-900 dark:text-amber-200">
-          ⚠️ 핵심 개념 — 테스트넷은 메인넷으로 자동 승계되지 않습니다
+          {t('mainnet.conceptTitle')}
         </p>
         <ul className="mt-2 list-disc space-y-1 pl-5 text-amber-800 dark:text-amber-300">
-          <li>
-            테스트넷 = <b>연습·테스트 전용</b>(가짜 Pi). 메인넷을 위한 검증이
-            아닙니다.
-          </li>
-          <li>
-            테스트넷의 도메인·앱 검증은 <b>메인넷에 넘어가지 않습니다</b>(별개
-            프로젝트).
-          </li>
-          <li>
-            메인넷은 <b>별도로 세팅된 서버 환경</b>(새 프로젝트·새 도메인·새 API
-            Key·메인넷 지갑)이 준비된 뒤에야 검증·오픈이 결정됩니다.
-          </li>
-          <li>
-            순서: 테스트넷 연습 → <b>메인넷 환경 신규 구축</b> → 메인넷 검증 →
-            등재 심사 → 오픈
-          </li>
+          <li>{t.rich('mainnet.concept1', { b: (c) => <b>{c}</b> })}</li>
+          <li>{t.rich('mainnet.concept2', { b: (c) => <b>{c}</b> })}</li>
+          <li>{t.rich('mainnet.concept3', { b: (c) => <b>{c}</b> })}</li>
+          <li>{t.rich('mainnet.concept4', { b: (c) => <b>{c}</b> })}</li>
         </ul>
       </div>
 
       {!applied && (
         <div className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-700 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-400">
-          ⚠️ <code>mainnet_checklist</code> 테이블 미적용 — <code>sql/129</code>
-          를 staging→운영에 적용하세요. (적용 전까지 빈 목록으로 표시)
+          {t.rich('mainnet.notApplied', { code: (c) => <code>{c}</code> })}
         </div>
       )}
 
@@ -202,19 +190,22 @@ export default function MainnetChecklistPage() {
         <div className="space-y-2 rounded-xl border p-4">
           <div className="flex items-center justify-between text-sm">
             <span className="font-semibold">
-              진척률 {liveSummary.percent}%{' '}
+              {t('checklist.progressLabel', { percent: liveSummary.percent })}{' '}
               <span className="text-muted-foreground font-normal">
-                ({liveSummary.done}/{liveSummary.total - liveSummary.na} ·
-                해당없음 {liveSummary.na} 제외)
+                {t('checklist.progressDetail', {
+                  done: liveSummary.done,
+                  denom: liveSummary.total - liveSummary.na,
+                  na: liveSummary.na,
+                })}
               </span>
             </span>
             {liveSummary.blockingLeft > 0 ? (
               <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700 dark:bg-red-950/40 dark:text-red-400">
-                🔴 블로킹 잔여 {liveSummary.blockingLeft}건
+                {t('checklist.blockingLeft', { n: liveSummary.blockingLeft })}
               </span>
             ) : (
               <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-700 dark:bg-green-950/40 dark:text-green-400">
-                ✓ 블로킹 0건
+                {t('checklist.blockingZero')}
               </span>
             )}
           </div>
@@ -225,10 +216,18 @@ export default function MainnetChecklistPage() {
             />
           </div>
           <div className="text-muted-foreground flex gap-3 text-xs">
-            <span>완료 {liveSummary.done}</span>
-            <span>진행중 {liveSummary.doing}</span>
-            <span>미착수 {liveSummary.todo}</span>
-            <span>해당없음 {liveSummary.na}</span>
+            <span>
+              {statusLabels.DONE} {liveSummary.done}
+            </span>
+            <span>
+              {statusLabels.DOING} {liveSummary.doing}
+            </span>
+            <span>
+              {statusLabels.TODO} {liveSummary.todo}
+            </span>
+            <span>
+              {statusLabels.NA} {liveSummary.na}
+            </span>
           </div>
         </div>
       )}
@@ -236,11 +235,11 @@ export default function MainnetChecklistPage() {
       {/* 상태 필터 */}
       <div className="flex flex-wrap gap-1.5">
         {[
-          { v: '', l: '전체' },
-          { v: 'TODO', l: '미착수' },
-          { v: 'DOING', l: '진행중' },
-          { v: 'DONE', l: '완료' },
-          { v: 'NA', l: '해당없음' },
+          { v: '', l: tc('all') },
+          { v: 'TODO', l: statusLabels.TODO },
+          { v: 'DOING', l: statusLabels.DOING },
+          { v: 'DONE', l: statusLabels.DONE },
+          { v: 'NA', l: statusLabels.NA },
         ].map((f) => (
           <button
             key={f.v}
@@ -286,7 +285,7 @@ export default function MainnetChecklistPage() {
                   >
                     {(['TODO', 'DOING', 'DONE', 'NA'] as const).map((s) => (
                       <option key={s} value={s}>
-                        {STATUS_LABEL[s]}
+                        {statusLabels[s]}
                       </option>
                     ))}
                   </select>
@@ -295,12 +294,12 @@ export default function MainnetChecklistPage() {
                   <span
                     className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${PRIO_CLS[it.prio_cd]}`}
                   >
-                    {PRIO_LABEL[it.prio_cd]}
+                    {prioLabels[it.prio_cd]}
                   </span>
                   <span
                     className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${OWNER_CLS[it.owner_cd]}`}
                   >
-                    {OWNER_LABEL[it.owner_cd]}
+                    {ownerLabels[it.owner_cd]}
                   </span>
                   {it.ref_txt && (
                     <span className="text-muted-foreground rounded border px-1.5 py-0.5 text-[11px]">
@@ -310,7 +309,7 @@ export default function MainnetChecklistPage() {
                   <input
                     type="text"
                     defaultValue={it.note_txt ?? ''}
-                    placeholder="메모…"
+                    placeholder={t('checklist.memoPlaceholder')}
                     onBlur={(e) => {
                       const v = e.target.value
                       if (v !== (it.note_txt ?? ''))
@@ -328,10 +327,10 @@ export default function MainnetChecklistPage() {
       {/* 공식 문의 채널 */}
       <div className="text-muted-foreground rounded-lg border border-dashed p-3 text-xs leading-relaxed">
         <p className="text-foreground mb-1 font-medium">
-          Pi 직접 확인 채널 (공식)
+          {t('mainnet.contactTitle')}
         </p>
         <p>
-          · 상표 라이선스: <b>Dev Portal in Pi Browser</b> ·{' '}
+          {t('mainnet.trademarkLabel')} <b>Dev Portal in Pi Browser</b> ·{' '}
           <a
             className="text-primary hover:underline"
             href="https://minepi.com/pi-trademark-guidelines/"
@@ -341,7 +340,7 @@ export default function MainnetChecklistPage() {
             Trademark Guidelines
           </a>
         </p>
-        <p>· 질의: Pi Ecosystem Discord · Pi App 내 Developer chat room</p>
+        <p>{t('mainnet.inquiry')}</p>
         <p>
           ·{' '}
           <a

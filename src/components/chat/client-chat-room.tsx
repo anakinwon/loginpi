@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { usePiAuth } from '@/components/pi-auth-provider'
 import { piFetch } from '@/lib/pi-fetch'
@@ -29,6 +29,8 @@ function Centered({ children }: { children: React.ReactNode }) {
 export function ClientChatRoom({ roomId }: { roomId: string }) {
   const { user, isLoading: authLoading } = usePiAuth()
   const userLocale = useLocale()
+  const t = useTranslations('chat')
+  const tc = useTranslations('common')
   const [room, setRoom] = useState<RoomInfo | null>(null)
   const [themeEmoji, setThemeEmoji] = useState('💬')
   const [initialMessages, setInitialMessages] = useState<ChatMessage[]>([])
@@ -161,18 +163,19 @@ export function ClientChatRoom({ roomId }: { roomId: string }) {
   // 이벤트방 입장료도 Bean으로 전환됨(PRD_15_FEE #6) — 별도 Pi 결제 핸들러 불필요.
   // 위 handleJoin이 /join 응답(requiresBeanConfirm)을 받아 동일 Bean 확인 흐름으로 처리한다.
 
-  if (authLoading) return <Centered>Pi 계정 인증 중…</Centered>
+  if (authLoading) return <Centered>{t('list.authenticating')}</Centered>
   if (!user) {
     return (
       <Centered>
-        카페는 로그인 후 이용할 수 있습니다
+        {t('list.loginRequired')}
         <Link href="/" className="text-primary underline">
-          홈으로 이동
+          {t('list.goHome')}
         </Link>
       </Centered>
     )
   }
-  if (state === 'loading') return <Centered>카페를 불러오는 중…</Centered>
+  if (state === 'loading')
+    return <Centered>{t('clientRoom.loadingRoom')}</Centered>
 
   if (state === 'joinable' || state === 'joining') {
     return (
@@ -185,13 +188,16 @@ export function ClientChatRoom({ roomId }: { roomId: string }) {
             <>
               <p>
                 <BeanIcon className="inline-block h-4 w-4 align-text-bottom" />{' '}
-                이 카페 입장에는{' '}
-                <b className="text-primary">{beanConfirm.feeBean} Bean</b>이
-                소진됩니다
+                {t.rich('clientRoom.beanEntryNotice', {
+                  fee: beanConfirm.feeBean,
+                  b: (chunks) => <b className="text-primary">{chunks}</b>,
+                })}
               </p>
               <p className="text-xs">
-                현재 잔액 {beanConfirm.balance} Bean → 입장 후{' '}
-                {beanConfirm.balance - beanConfirm.feeBean} Bean
+                {t('clientRoom.beanBalanceAfter', {
+                  balance: beanConfirm.balance,
+                  after: beanConfirm.balance - beanConfirm.feeBean,
+                })}
               </p>
               <button
                 type="button"
@@ -200,42 +206,51 @@ export function ClientChatRoom({ roomId }: { roomId: string }) {
                 className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-5 py-2.5 text-sm font-medium transition-colors disabled:opacity-50"
               >
                 {state === 'joining'
-                  ? '입장 중…'
-                  : `${beanConfirm.feeBean} Bean 쓰고 입장`}
+                  ? t('clientRoom.entering')
+                  : t('clientRoom.spendBeanEnter', {
+                      fee: beanConfirm.feeBean,
+                    })}
               </button>
             </>
           ) : (
             <>
               <p>
                 <BeanIcon className="inline-block h-4 w-4 align-text-bottom" />{' '}
-                입장에{' '}
-                <b className="text-primary">{beanConfirm.feeBean} Bean</b>이
-                필요하지만 잔액이 부족합니다
+                {t.rich('clientRoom.beanInsufficient', {
+                  fee: beanConfirm.feeBean,
+                  b: (chunks) => <b className="text-primary">{chunks}</b>,
+                })}
               </p>
-              <p className="text-xs">현재 잔액 {beanConfirm.balance} Bean</p>
+              <p className="text-xs">
+                {t('clientRoom.currentBalance', {
+                  balance: beanConfirm.balance,
+                })}
+              </p>
               <Link
                 href="/bean"
                 className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-5 py-2.5 text-sm font-medium transition-colors"
               >
-                Bean 충전하기
+                {t('clientRoom.chargeBean')}
               </Link>
             </>
           )
         ) : (
           <>
-            <p>공개 카페입니다. 입장하시겠습니까?</p>
+            <p>{t('clientRoom.publicJoinConfirm')}</p>
             <button
               type="button"
               disabled={state === 'joining'}
               onClick={() => handleJoin()}
               className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-5 py-2.5 text-sm font-medium transition-colors disabled:opacity-50"
             >
-              {state === 'joining' ? '입장 중…' : '입장하기'}
+              {state === 'joining'
+                ? t('clientRoom.entering')
+                : t('clientRoom.enter')}
             </button>
           </>
         )}
         <Link href="/chat" className="text-muted-foreground text-xs underline">
-          목록으로
+          {tc('backToList')}
         </Link>
       </Centered>
     )
@@ -244,12 +259,10 @@ export function ClientChatRoom({ roomId }: { roomId: string }) {
   if (state === 'expired') {
     return (
       <Centered>
-        <p className="font-semibold">⏰ 기간이 만료된 카페입니다</p>
-        <p className="text-xs">
-          무료로 개설된 카페는 7일간만 유지되며 연장할 수 없습니다.
-        </p>
+        <p className="font-semibold">{t('clientRoom.expiredTitle')}</p>
+        <p className="text-xs">{t('clientRoom.expiredDesc')}</p>
         <Link href="/chat" className="text-primary underline">
-          카페 목록으로
+          {t('room.backToList')}
         </Link>
       </Centered>
     )
@@ -257,9 +270,9 @@ export function ClientChatRoom({ roomId }: { roomId: string }) {
   if (state === 'forbidden') {
     return (
       <Centered>
-        카페 멤버가 아닙니다
+        {t('clientRoom.notMember')}
         <Link href="/chat" className="text-primary underline">
-          카페 목록으로
+          {t('room.backToList')}
         </Link>
       </Centered>
     )
@@ -267,9 +280,9 @@ export function ClientChatRoom({ roomId }: { roomId: string }) {
   if (state === 'error') {
     return (
       <Centered>
-        카페를 불러오지 못했습니다
+        {t('clientRoom.loadFailed')}
         <Link href="/chat" className="text-primary underline">
-          카페 목록으로
+          {t('room.backToList')}
         </Link>
       </Centered>
     )

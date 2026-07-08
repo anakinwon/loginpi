@@ -33,6 +33,7 @@ interface UsageResponse {
 // 접속·사용 분석 탭 (Phase 22 §12 ③) — 활동 로그·가입일·위치를 온더플라이 집계.
 export function UsageTab({ period }: { period: number }) {
   const t = useTranslations('adminAnalytics')
+  const tc = useTranslations('common')
   const [activity, setActivity] = useState<ActivityStatsResponse | null>(null)
   const [usage, setUsage] = useState<UsageResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -58,7 +59,7 @@ export function UsageTab({ period }: { period: number }) {
       writeCache(actKey, act)
       writeCache(useKey, use)
     } catch (e) {
-      if (!cachedAct) setError(e instanceof Error ? e.message : '오류 발생')
+      if (!cachedAct) setError(e instanceof Error ? e.message : tc('error'))
     }
   }, [])
 

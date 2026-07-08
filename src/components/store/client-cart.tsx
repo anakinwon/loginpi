@@ -69,7 +69,10 @@ export function ClientCart() {
         void piFetch('/api/store/orders/cart/cancel', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ order_id: orderId, reason: '결제 미완료' }),
+          body: JSON.stringify({
+            order_id: orderId,
+            reason: t('payIncomplete'),
+          }),
         })
       }
       window.Pi.createPayment(

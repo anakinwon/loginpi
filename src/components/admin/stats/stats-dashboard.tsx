@@ -113,6 +113,7 @@ export function StatsDashboard() {
   const tTheme = useTranslations('themes')
   const tc = useTranslations('common')
   const ta = useTranslations('adminAnalytics')
+  const tm = useTranslations('adminMgmt.analytics')
   const [period, setPeriod] = useState(7)
   const [activityData, setActivityData] =
     useState<ActivityStatsResponse | null>(null)
@@ -159,7 +160,7 @@ export function StatsDashboard() {
     try {
       await loadActivity()
     } catch (e) {
-      if (!cached) setError(e instanceof Error ? e.message : '오류 발생')
+      if (!cached) setError(e instanceof Error ? e.message : tc('error'))
     } finally {
       setLoading(false)
     }
@@ -200,7 +201,7 @@ export function StatsDashboard() {
       setBeanRev(data)
       writeCache(cacheKey, data)
     } catch (e) {
-      if (!cached) setError(e instanceof Error ? e.message : '오류 발생')
+      if (!cached) setError(e instanceof Error ? e.message : tc('error'))
     }
   }, [])
 
@@ -373,7 +374,7 @@ export function StatsDashboard() {
                 {/* PI 모드 — Pi 직결제 기준 KPI (stat_revenue_dly 집계) */}
                 <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
                   <StatsCard
-                    label="Pi 총 매출"
+                    label={tm('kpiTotalPi')}
                     value={Number(piTotal.toFixed(2))}
                     unit="π"
                     loading={piRevData === null}
@@ -381,7 +382,7 @@ export function StatsDashboard() {
                     icon={<span aria-hidden>💰</span>}
                   />
                   <StatsCard
-                    label="Pi 결제 건수"
+                    label={tm('kpiPiCount')}
                     value={piTxnCnt}
                     unit={t('unitCase')}
                     loading={piRevData === null}
@@ -389,7 +390,7 @@ export function StatsDashboard() {
                     icon={<span aria-hidden>🧾</span>}
                   />
                   <StatsCard
-                    label="평균 결제 (AOV)"
+                    label={tm('kpiAov')}
                     value={Number(piAov.toFixed(3))}
                     unit="π"
                     loading={piRevData === null}
@@ -399,8 +400,12 @@ export function StatsDashboard() {
                   <StatsCard
                     label={
                       piTopTheme
-                        ? `1위: ${tTheme.has(piTopTheme.theme_cd) ? tTheme(piTopTheme.theme_cd) : (piTopTheme.theme_nm ?? piTopTheme.theme_cd)}`
-                        : '상위 테마'
+                        ? tm('rankOne', {
+                            name: tTheme.has(piTopTheme.theme_cd)
+                              ? tTheme(piTopTheme.theme_cd)
+                              : (piTopTheme.theme_nm ?? piTopTheme.theme_cd),
+                          })
+                        : tm('topTheme')
                     }
                     value={
                       piTopTheme ? Number(piTopTheme.total_pi.toFixed(2)) : 0
@@ -415,9 +420,9 @@ export function StatsDashboard() {
                 <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                   <div className="rounded-lg border p-4">
                     <p className="mb-2 text-sm font-medium">
-                      Pi 일별 매출 추이{' '}
+                      {tm('piDailyTrend')}{' '}
                       <span className="text-muted-foreground text-xs">
-                        (7일 이동평균)
+                        {tm('movingAvg7')}
                       </span>
                     </p>
                     {piRevData ? (
@@ -427,7 +432,9 @@ export function StatsDashboard() {
                     )}
                   </div>
                   <div className="rounded-lg border p-4">
-                    <p className="mb-2 text-sm font-medium">테마별 Pi 매출</p>
+                    <p className="mb-2 text-sm font-medium">
+                      {tm('themePiRevenue')}
+                    </p>
                     {piRevData && piRevData.series.length > 0 ? (
                       <RevenueTreemapChart data={piRevData.series} />
                     ) : (

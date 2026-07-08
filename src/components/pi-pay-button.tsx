@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -23,6 +24,12 @@ interface PayResult {
 
 export function PiPayButton() {
   const { isInPiBrowser } = usePiAuth()
+  const t = useTranslations('pay')
+  const STATUS_MSG: Partial<Record<Status, string>> = {
+    approving: t('approving'),
+    waiting: t('walletChecking'),
+    completing: t('completing'),
+  }
   const [amount, setAmount] = useState('1')
   const [status, setStatus] = useState<Status>('idle')
   const [error, setError] = useState<string | null>(null)
@@ -39,14 +46,14 @@ export function PiPayButton() {
 
   function pay() {
     if (!window.Pi) {
-      setError('Pi SDK 없음 — Pi Browser에서 접속하세요.')
+      setError(t('sdkMissing'))
       setStatus('error')
       return
     }
 
     const pi = parseFloat(amount)
     if (isNaN(pi) || pi <= 0) {
-      setError('0보다 큰 수량을 입력하세요.')
+      setError(t('qtyInvalid'))
       setStatus('error')
       return
     }
@@ -75,7 +82,7 @@ export function PiPayButton() {
             setStatus('waiting')
           } catch (e) {
             setStatus('error')
-            setError(e instanceof Error ? e.message : '승인 오류')
+            setError(e instanceof Error ? e.message : t('approveError'))
           }
         },
 
@@ -95,7 +102,7 @@ export function PiPayButton() {
             setStatus('done')
           } catch (e) {
             setStatus('error')
-            setError(e instanceof Error ? e.message : '완료 오류')
+            setError(e instanceof Error ? e.message : t('completeError'))
           }
         },
 
@@ -112,7 +119,7 @@ export function PiPayButton() {
     <div className="space-y-4">
       {/* 수량 입력 */}
       <div className="space-y-1.5">
-        <Label htmlFor="pay-amount">Pi 코인 수량</Label>
+        <Label htmlFor="pay-amount">{t('qtyLabel')}</Label>
         <div className="flex items-center gap-2">
           <Input
             id="pay-amount"
@@ -150,16 +157,16 @@ export function PiPayButton() {
         {busy
           ? STATUS_MSG[status]
           : status === 'done'
-            ? '다시 결제하기'
+            ? t('retryPay')
             : status === 'cancelled'
-              ? '취소됨 — 다시 결제하기'
-              : `${amount || '?'} Pi 결제 요청`}
+              ? t('cancelledRetry')
+              : t('payRequest', { amount: amount || '?' })}
       </Button>
 
       {/* 대기 안내 */}
       {status === 'waiting' && (
         <p className="text-muted-foreground text-center text-xs">
-          Pi 지갑 화면에서 결제를 승인해 주세요.
+          {t('approveInWallet')}
         </p>
       )}
 
@@ -170,7 +177,7 @@ export function PiPayButton() {
       {status === 'done' && result && (
         <div className="space-y-2 rounded-xl border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-900/20">
           <p className="font-semibold text-green-700 dark:text-green-400">
-            ✓ {result.amount} π 결제 완료
+            {t('doneAmount', { amount: result.amount })}
           </p>
           <div className="space-y-1">
             <p className="text-muted-foreground text-xs">Payment ID</p>
@@ -190,15 +197,9 @@ export function PiPayButton() {
       {/* Pi Browser 아닐 때 안내 */}
       {!isInPiBrowser && (
         <p className="text-muted-foreground text-center text-xs">
-          Pi Browser에서만 결제가 동작합니다.
+          {t('piBrowserOnly')}
         </p>
       )}
     </div>
   )
-}
-
-const STATUS_MSG: Partial<Record<Status, string>> = {
-  approving: '승인 중…',
-  waiting: '지갑 확인 중…',
-  completing: '처리 중…',
 }

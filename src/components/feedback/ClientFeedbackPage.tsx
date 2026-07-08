@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
 import { usePiAuth } from '@/components/pi-auth-provider'
@@ -40,6 +41,8 @@ export function ClientFeedbackPage({
   serverAuthed: boolean
 }) {
   const router = useRouter()
+  const t = useTranslations('feedback')
+  const tc = useTranslations('common')
   const { user, isLoading: authLoading } = usePiAuth()
   const authed = serverAuthed || !!user
 
@@ -61,14 +64,14 @@ export function ClientFeedbackPage({
       try {
         const res = await piFetch(`/api/store/orders/${orderId}`)
         if (!res.ok) {
-          setError('주문을 찾을 수 없습니다')
+          setError(t('orderNotFound'))
           return
         }
         const d = (await res.json()) as { order: OrderInfo }
         const ord = d.order
 
         if (!COMPLETED_STATES.includes(ord.order_st_cd)) {
-          setError('구매 완료된 주문에만 후기를 작성할 수 있습니다')
+          setError(t('onlyCompletedOrder'))
           return
         }
 
@@ -83,22 +86,22 @@ export function ClientFeedbackPage({
           }
         }
       } catch {
-        setError('주문 정보를 불러오지 못했습니다')
+        setError(t('orderLoadFail'))
       } finally {
         setOrderLoading(false)
       }
     }
     void load()
-  }, [orderId, authed])
+  }, [orderId, authed, t])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (overallScore === 0) {
-      toast.error('전체 별점을 선택해주세요')
+      toast.error(t('selectOverallScore'))
       return
     }
     if (fbckCn.trim().length < 10) {
-      toast.error('후기 본문을 10자 이상 입력해주세요')
+      toast.error(t('contentMin10'))
       return
     }
 
@@ -131,10 +134,10 @@ export function ClientFeedbackPage({
         setSubmitted(true)
       } else {
         const d = (await res.json()) as { error?: string }
-        toast.error(d.error ?? '후기 저장에 실패했습니다')
+        toast.error(d.error ?? t('submitFail'))
       }
     } catch {
-      toast.error('네트워크 오류가 발생했습니다')
+      toast.error(t('networkError'))
     } finally {
       setSubmitting(false)
     }
@@ -144,7 +147,7 @@ export function ClientFeedbackPage({
   if (!authed && authLoading) {
     return (
       <p className="text-muted-foreground py-16 text-center text-sm">
-        로그인 확인 중…
+        {t('authChecking')}
       </p>
     )
   }
@@ -152,7 +155,7 @@ export function ClientFeedbackPage({
   if (!authed) {
     return (
       <p className="text-muted-foreground py-16 text-center text-sm">
-        로그인 후 이용할 수 있습니다
+        {t('loginRequired')}
       </p>
     )
   }
@@ -160,7 +163,7 @@ export function ClientFeedbackPage({
   if (orderLoading) {
     return (
       <p className="text-muted-foreground py-16 text-center text-sm">
-        주문 정보 불러오는 중…
+        {t('orderLoading')}
       </p>
     )
   }
@@ -172,7 +175,7 @@ export function ClientFeedbackPage({
           onClick={() => router.back()}
           className="text-primary mt-4 text-sm hover:underline"
         >
-          ← 돌아가기
+          {t('goBack')}
         </button>
       </div>
     )
@@ -183,27 +186,27 @@ export function ClientFeedbackPage({
     return (
       <div className="space-y-4 py-16 text-center">
         <p className="text-2xl">✅</p>
-        <p className="font-semibold">후기가 등록되었습니다!</p>
-        <p className="text-muted-foreground text-sm">
-          소중한 후기 감사합니다 ☕
-        </p>
+        <p className="font-semibold">{t('submittedTitle')}</p>
+        <p className="text-muted-foreground text-sm">{t('submittedThanks')}</p>
         <button
           onClick={() => router.push('/store/my/orders')}
           className="text-primary text-sm hover:underline"
         >
-          ← 구매 내역으로 돌아가기
+          {t('backToOrders')}
         </button>
       </div>
     )
   }
 
-  const itemNm = order?.mps_item?.item_nm ?? '상품'
+  const itemNm = order?.mps_item?.item_nm ?? t('defaultItem')
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* 상품 헤더 */}
       <div className="bg-muted/50 rounded-xl px-4 py-3">
-        <p className="text-muted-foreground mb-0.5 text-xs">구매 상품</p>
+        <p className="text-muted-foreground mb-0.5 text-xs">
+          {t('purchasedItem')}
+        </p>
         <p className="font-semibold">☕ {itemNm}</p>
       </div>
 
@@ -211,8 +214,10 @@ export function ClientFeedbackPage({
       {ctgrItems.length > 0 && (
         <div className="space-y-4">
           <h2 className="text-sm font-semibold">
-            항목별 평가{' '}
-            <span className="text-muted-foreground font-normal">(선택)</span>
+            {t('itemRating')}{' '}
+            <span className="text-muted-foreground font-normal">
+              {tc('optional')}
+            </span>
           </h2>
           <div className="divide-border divide-y rounded-xl border">
             {ctgrItems.map((it, i) => (
@@ -244,16 +249,16 @@ export function ClientFeedbackPage({
       {/* 전체 별점 */}
       <div className="space-y-2">
         <h2 className="text-sm font-semibold">
-          전체 별점 <span className="text-destructive text-xs">*</span>
+          {t('overallScore')}{' '}
+          <span className="text-destructive text-xs">*</span>
         </h2>
         <StarRating value={overallScore} onChange={setOverallScore} size="lg" />
         {overallScore > 0 && (
           <p className="text-muted-foreground text-xs">
-            후기 등록 시 ☕{' '}
-            <span className="font-medium text-amber-600">
-              {REWARD_HINT[overallScore]} Bean
-            </span>{' '}
-            보상 지급
+            {t.rich('rewardHint', {
+              bean: REWARD_HINT[overallScore],
+              b: (c) => <span className="font-medium text-amber-600">{c}</span>,
+            })}
           </p>
         )}
       </div>
@@ -261,16 +266,17 @@ export function ClientFeedbackPage({
       {/* 후기 본문 */}
       <div className="space-y-2">
         <h2 className="text-sm font-semibold">
-          후기 본문 <span className="text-destructive text-xs">*</span>
+          {t('contentLabel')}{' '}
+          <span className="text-destructive text-xs">*</span>
           <span className="text-muted-foreground font-normal">
             {' '}
-            (최소 10자)
+            {t('min10Chars')}
           </span>
         </h2>
         <textarea
           value={fbckCn}
           onChange={(e) => setFbckCn(e.target.value)}
-          placeholder="음료 맛과 서비스는 어떠셨나요?"
+          placeholder={t('contentPlaceholder')}
           rows={5}
           className="border-input bg-background placeholder:text-muted-foreground focus:ring-ring w-full resize-none rounded-xl border px-4 py-3 text-sm focus:ring-2 focus:outline-none"
           required
@@ -278,7 +284,7 @@ export function ClientFeedbackPage({
         <p
           className={`text-right text-xs ${fbckCn.trim().length < 10 ? 'text-muted-foreground' : 'text-green-600 dark:text-green-400'}`}
         >
-          {fbckCn.trim().length}자
+          {t('charCount', { count: fbckCn.trim().length })}
         </p>
       </div>
 
@@ -288,7 +294,7 @@ export function ClientFeedbackPage({
         disabled={submitting || overallScore === 0 || fbckCn.trim().length < 10}
         className="bg-primary text-primary-foreground hover:bg-primary/90 w-full rounded-xl py-3 text-sm font-semibold transition-opacity disabled:opacity-50"
       >
-        {submitting ? '저장 중…' : '후기 등록하기'}
+        {submitting ? tc('saving') : t('submit')}
       </button>
     </form>
   )

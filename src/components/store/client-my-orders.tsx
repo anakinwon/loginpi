@@ -72,9 +72,9 @@ interface OrderRow {
   bond_ok?: boolean
 }
 
-// 주문자 표시명 — 별명 우선, 없으면 Pi username, 없으면 display_name
-function buyerName(b: OrderRow['buyer']): string {
-  return b?.nick_nm || b?.pi_username || b?.display_name || '구매자'
+// 주문자 표시명 — 별명 우선, 없으면 Pi username, 없으면 display_name (fallback은 렌더 시 t()로 처리)
+function buyerName(b: OrderRow['buyer']): string | null {
+  return b?.nick_nm || b?.pi_username || b?.display_name || null
 }
 
 type OrderAction =
@@ -85,28 +85,11 @@ type OrderAction =
   | 'ready'
   | 'pickup'
 
-// 오프라인 상태 라벨 (i18n 키 누락 회피 — 로컬 한글 맵)
-// 주문중 → 준비중 → 상품대기중 → (5분 후) 판매완료
-// DONE은 오프라인일 때만 '판매완료'로 표시 (renderCard에서 분기, 직거래는 거래완료 유지)
-const OFFLINE_LABEL: Partial<Record<OrderRow['order_st_cd'], string>> = {
-  ORDERED: '🛒 주문중',
-  PREPARING: '👨‍🍳 준비중',
-  READY: '📦 상품대기중',
-}
+// 오프라인 상태 — 이 상태들만 오프라인 라벨(t('orderStOffline.*')) 사용
+const OFFLINE_ST: OrderRow['order_st_cd'][] = ['ORDERED', 'PREPARING', 'READY']
 
-// 주문방법 라벨
-const MTHD_LABEL: Record<string, string> = {
-  DINE_IN: '🍽️ 매장이용',
-  PICKUP: '🥡 픽업',
-  DELIVERY: '🛵 배달',
-}
-
-// 오프라인 액션 성공 메시지
-const OFFLINE_ACTION_MSG: Partial<Record<OrderAction, string>> = {
-  accept: '상품접수 완료 — 준비중',
-  ready: '상품완료 — 수령 대기중 (5분 후 자동 판매완료)',
-  pickup: '상품 수령 완료 — 거래가 완료되었습니다',
-}
+// 오프라인 액션 성공 메시지 대상(t('offlineActionMsg.*'))
+const OFFLINE_ACTIONS: OrderAction[] = ['accept', 'ready', 'pickup']
 
 // ESCROW·SELLER_DONE은 구버전 주문 레거시 상태 — 화면에는 거래중과 동일 계열로 표시
 const ST_STYLE: Record<OrderRow['order_st_cd'], string> = {
@@ -256,9 +239,9 @@ export function ClientMyOrders({
           } else {
             toast.success(t('actionDone.cancel'))
           }
-        } else if (OFFLINE_ACTION_MSG[action]) {
-          // 오프라인 액션(접수·준비완료·픽업)은 로컬 메시지
-          toast.success(OFFLINE_ACTION_MSG[action]!)
+        } else if (OFFLINE_ACTIONS.includes(action)) {
+          // 오프라인 액션(접수·준비완료·픽업) 성공 메시지
+          toast.success(t(`offlineActionMsg.${action}`))
         } else {
           toast.success(t(`actionDone.${action}`))
         }
@@ -277,8 +260,9 @@ export function ClientMyOrders({
   const offlineOrders = orders.filter(isOffline)
   const directOrders = orders.filter((o) => !isOffline(o))
   const offlineLabel =
-    role === 'seller' ? '🏪 오프라인 매장 판매' : '🏪 오프라인 매장 구매'
-  const directLabel = role === 'seller' ? '🔄 직거래 판매' : '🔄 직거래 구매'
+    role === 'seller' ? t('offlineSaleLabel') : t('offlineBuyLabel')
+  const directLabel =
+    role === 'seller' ? t('directSaleLabel') : t('directBuyLabel')
 
   const renderCard = (o: OrderRow) => {
     const busy = acting?.id === o.order_id
@@ -287,15 +271,15 @@ export function ClientMyOrders({
     const offline = isOffline(o)
     // 상태 배지 라벨 — 오프라인 신규상태는 로컬 라벨, 오프라인 DONE은 역할별 분기,
     // 그 외(직거래·레거시)는 i18n (ESCROW·SELLER_DONE은 거래중으로 통합)
-    const stLabel =
-      OFFLINE_LABEL[o.order_st_cd] ??
-      (offline && o.order_st_cd === 'DONE'
+    const stLabel = OFFLINE_ST.includes(o.order_st_cd)
+      ? t(`orderStOffline.${o.order_st_cd}`)
+      : offline && o.order_st_cd === 'DONE'
         ? role === 'buyer'
-          ? '🎉 구매완료'
-          : '🎉 판매완료'
+          ? t('offlineBuyerDone')
+          : t('offlineSellerDone')
         : t(
             `orderSt.${IN_TRADE.includes(o.order_st_cd) ? 'TRADING' : o.order_st_cd}`,
-          ))
+          )
     return (
       <div key={o.order_id} className="space-y-2 rounded-lg border p-4">
         <div className="flex items-center justify-between gap-2">
@@ -315,7 +299,9 @@ export function ClientMyOrders({
         {/* 판매자: 주문자(호명용) / 구매자: 픽업 매장명 */}
         {role === 'seller' && o.buyer && (
           <p className="text-sm font-semibold">
-            🙋 주문자: {buyerName(o.buyer)}
+            {t('buyerLabel', {
+              name: buyerName(o.buyer) ?? t('buyerFallback'),
+            })}
           </p>
         )}
         {role === 'buyer' && o.mps_item?.mps_shop?.shop_nm && (
@@ -326,9 +312,7 @@ export function ClientMyOrders({
 
         <p className="text-muted-foreground text-xs">
           {Number(o.order_price_pi)} π ·{' '}
-          {o.order_mthd_cd && MTHD_LABEL[o.order_mthd_cd]
-            ? `${MTHD_LABEL[o.order_mthd_cd]} · `
-            : ''}
+          {o.order_mthd_cd ? `${t(`orderMthd.${o.order_mthd_cd}`)} · ` : ''}
           {new Date(o.reg_dtm).toLocaleString()}
           {o.order_st_cd === 'CANCELLED' &&
             o.cancel_reason &&
@@ -336,7 +320,7 @@ export function ClientMyOrders({
         </p>
         {o.order_mthd_cd === 'DELIVERY' && o.dlvr_addr && (
           <p className="text-muted-foreground text-xs">
-            🛵 배달: {o.dlvr_addr}
+            {t('deliveryAddr', { addr: o.dlvr_addr })}
           </p>
         )}
 
@@ -444,7 +428,7 @@ export function ClientMyOrders({
               disabled={busy}
               onClick={() => act(o.order_id, 'accept')}
             >
-              📥 상품접수
+              {t('actionAccept')}
             </Button>
           )}
           {/* 오프라인 — 판매자 상품완료 (준비중 → 상품대기중) */}
@@ -454,7 +438,7 @@ export function ClientMyOrders({
               disabled={busy}
               onClick={() => act(o.order_id, 'ready')}
             >
-              📦 상품완료
+              {t('actionReady')}
             </Button>
           )}
           {/* 오프라인 — 구매자 상품수령 (상품대기중 → 거래완료 + 즉시 정산 송금).
@@ -465,7 +449,7 @@ export function ClientMyOrders({
               disabled={busy}
               onClick={() => act(o.order_id, 'pickup')}
             >
-              📦 상품수령
+              {t('actionPickup')}
             </Button>
           )}
           {(o.order_st_cd === 'PENDING' ||
@@ -508,29 +492,27 @@ export function ClientMyOrders({
         {/* 오프라인 상태 안내 */}
         {o.order_st_cd === 'ORDERED' && (
           <p className="text-muted-foreground text-xs">
-            {role === 'seller'
-              ? '👉 상품접수를 눌러 준비를 시작하세요'
-              : '사장님 접수 대기중입니다'}
+            {role === 'seller' ? t('orderedHintSeller') : t('orderedHintBuyer')}
           </p>
         )}
         {o.order_st_cd === 'PREPARING' && (
           <p className="text-muted-foreground text-xs">
             {role === 'seller'
-              ? '👉 준비가 끝나면 상품완료를 눌러주세요'
-              : '상품을 준비하고 있습니다'}
+              ? t('preparingHintSeller')
+              : t('preparingHintBuyer')}
           </p>
         )}
         {o.order_st_cd === 'READY' &&
           (role === 'buyer' ? (
             <p className="text-muted-foreground text-xs">
-              📦 상품이 준비됐어요! 받으셨으면 「상품수령」을 눌러 거래를
-              완료하세요 (미수령 시 5분 후 자동 판매완료)
+              {t('readyHintBuyer')}
             </p>
           ) : (
             // 준비완료 → 판매자가 주문자 호명 (요건)
             <p className="text-sm font-semibold text-amber-700 dark:text-amber-400">
-              📣 {buyerName(o.buyer)}님 호명 — 수령 대기중 (5분 후 자동
-              판매완료)
+              {t('readyCallSeller', {
+                name: buyerName(o.buyer) ?? t('buyerFallback'),
+              })}
             </p>
           ))}
         {o.order_st_cd === 'DONE' && (
@@ -548,7 +530,7 @@ export function ClientMyOrders({
             <div className="flex justify-end pt-1">
               {o.has_feedback ? (
                 <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                  ✓ 후기 작성완료
+                  {t('feedbackDone')}
                 </span>
               ) : o.bond_ok ? (
                 <WriteFeedbackButton orderId={o.order_id} />
@@ -556,9 +538,9 @@ export function ClientMyOrders({
                 // 매장주 보증금 미충족 — 버튼 비활성(보상 재원 준비 시 자동 활성)
                 <span
                   className="text-muted-foreground inline-flex cursor-not-allowed items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium opacity-60"
-                  title="이 매장은 현재 후기 보상을 지급할 수 없어 후기 작성이 일시 중지되었습니다"
+                  title={t('feedbackPausedTitle')}
                 >
-                  ⭐ 후기 작성 (보상 준비중)
+                  {t('feedbackPending')}
                 </span>
               )}
             </div>
@@ -602,22 +584,22 @@ export function ClientMyOrders({
           >
             {showAll
               ? role === 'seller'
-                ? '🛡️ 전체 판매주문'
-                : '🛡️ 전체 구매주문'
-              : '🛡️ 내 주문만'}
+                ? t('viewAllSaleOrders')
+                : t('viewAllBuyOrders')
+              : t('viewMyOrders')}
           </button>
         )}
         {/* Pi Browser는 당겨서 새로고침이 없어 명시적 버튼 필수 — load() 재조회 */}
         <button
           onClick={() => void load()}
           disabled={loading}
-          aria-label="새로고침"
+          aria-label={t('refresh')}
           className="text-muted-foreground hover:bg-muted flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-medium disabled:opacity-50"
         >
           <span className={`inline-block ${loading ? 'animate-spin' : ''}`}>
             🔄
           </span>
-          {loading ? '새로고침 중…' : '새로고침'}
+          {loading ? t('refreshing') : t('refresh')}
         </button>
       </div>
       {loading ? (

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { StarRating } from './StarRating'
 import { piFetch } from '@/lib/pi-fetch'
 
@@ -26,6 +27,8 @@ export function FeedbackForm({
   onSuccess,
   onCancel,
 }: FeedbackFormProps) {
+  const t = useTranslations('feedback')
+  const tc = useTranslations('common')
   const [score, setScore] = useState(0)
   const [text, setText] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -36,11 +39,11 @@ export function FeedbackForm({
     setError('')
 
     if (score === 0) {
-      setError('별점을 선택해 주세요.')
+      setError(t('selectScore'))
       return
     }
     if (text.trim().length < 10) {
-      setError('후기 본문은 최소 10자 이상 입력해 주세요.')
+      setError(t('contentMin10Alt'))
       return
     }
 
@@ -59,12 +62,12 @@ export function FeedbackForm({
 
       const json = await res.json()
       if (!res.ok) {
-        setError(json.error ?? '후기 저장에 실패했습니다.')
+        setError(json.error ?? t('submitFailDot'))
         return
       }
       onSuccess?.(json.bean_rwrd_qty ?? 0)
     } catch {
-      setError('네트워크 오류가 발생했습니다.')
+      setError(t('networkErrorDot'))
     } finally {
       setSubmitting(false)
     }
@@ -72,29 +75,35 @@ export function FeedbackForm({
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-4">
-      <h3 className="text-base font-semibold">이용 후기 작성</h3>
+      <h3 className="text-base font-semibold">{t('formTitle')}</h3>
 
       <div className="flex flex-col gap-1">
-        <label className="text-muted-foreground text-sm">별점</label>
+        <label className="text-muted-foreground text-sm">
+          {t('scoreLabel')}
+        </label>
         <StarRating value={score} onChange={setScore} size="lg" />
         {score > 0 && (
           <p className="text-xs text-amber-600">
-            후기 작성 시 <strong>{REWARD_HINT[score]} Bean</strong> 보상이
-            지급됩니다.
+            {t.rich('rewardHintFull', {
+              bean: REWARD_HINT[score],
+              b: (c) => <strong>{c}</strong>,
+            })}
           </p>
         )}
       </div>
 
       <div className="flex flex-col gap-1">
         <label htmlFor="fbck-text" className="text-muted-foreground text-sm">
-          후기 내용{' '}
-          <span className="text-xs">({text.trim().length}/500, 최소 10자)</span>
+          {t('contentLabel2')}{' '}
+          <span className="text-xs">
+            {t('charCountFull', { count: text.trim().length })}
+          </span>
         </label>
         <textarea
           id="fbck-text"
           value={text}
           onChange={(e) => setText(e.target.value.slice(0, 500))}
-          placeholder="이용 경험을 자유롭게 작성해 주세요."
+          placeholder={t('contentPlaceholderFree')}
           rows={4}
           className="border-input bg-background placeholder:text-muted-foreground focus:ring-ring resize-none rounded-md border px-3 py-2 text-sm focus:ring-2 focus:outline-none"
         />
@@ -110,7 +119,7 @@ export function FeedbackForm({
             disabled={submitting}
             className="border-input hover:bg-accent rounded-md border px-4 py-2 text-sm disabled:opacity-50"
           >
-            취소
+            {tc('cancel')}
           </button>
         )}
         <button
@@ -118,7 +127,7 @@ export function FeedbackForm({
           disabled={submitting || score === 0}
           className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-medium disabled:opacity-50"
         >
-          {submitting ? '저장 중…' : '후기 등록'}
+          {submitting ? tc('saving') : t('submitShort')}
         </button>
       </div>
     </form>

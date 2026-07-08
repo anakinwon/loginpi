@@ -44,7 +44,13 @@ export async function POST(req: NextRequest) {
     const denied =
       error.code === '42501' || error.message?.includes('정리 대상이 아닌')
     return NextResponse.json(
-      { error: sanitizeError('api/admin/logs/purge/post', error, '로그 정리 실패') },
+      {
+        error: sanitizeError(
+          'api/admin/logs/purge/post',
+          error,
+          '로그 정리 실패',
+        ),
+      },
       { status: denied ? 400 : 500 },
     )
   }

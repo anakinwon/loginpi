@@ -77,6 +77,8 @@ export function ChatRoomPanel({
   const [expireBannerDismissed, setExpireBannerDismissed] = useState(false)
   // TASK-062 Trigger 7: 배지 수여 축하 팝업 + 강화 배지 헤더 상시 표시
   const tBadge = useTranslations('chat.badgePopup')
+  const t = useTranslations('chat')
+  const tc = useTranslations('common')
   const themeName = useThemeName()
   const [badgeAward, setBadgeAward] = useState<BadgeAwardInfo | null>(null)
   const [upgradedBadge, setUpgradedBadge] = useState<BadgeAwardInfo | null>(
@@ -191,12 +193,7 @@ export function ChatRoomPanel({
 
   // 직거래 문의방 수동 만기 — 당사자가 거래 종료 시 즉시 목록에서 제거(expr_dtm=now)
   async function expireDirectRoom() {
-    if (
-      !confirm(
-        '이 직거래 문의를 지금 만기할까요?\n만기하면 목록에서 사라집니다.',
-      )
-    )
-      return
+    if (!confirm(t('room.expireConfirm'))) return
     setExpiring(true)
     try {
       const r = await piFetch(`/api/chat/rooms/${roomId}/expire`, {
@@ -294,7 +291,7 @@ export function ChatRoomPanel({
         <Link
           href="/chat"
           className="text-muted-foreground hover:text-foreground shrink-0 transition-colors"
-          aria-label="카페 목록으로"
+          aria-label={t('room.backToList')}
         >
           ⬅️
         </Link>
@@ -305,7 +302,11 @@ export function ChatRoomPanel({
             {roomSettings && (
               <span
                 className="shrink-0 text-xs"
-                title={roomSettings.is_public_yn === 'Y' ? '공개방' : '비밀방'}
+                title={
+                  roomSettings.is_public_yn === 'Y'
+                    ? t('room.publicRoom')
+                    : t('room.secretRoom')
+                }
               >
                 {roomSettings.is_public_yn === 'Y' ? '🌐' : '🔒'}
               </span>
@@ -314,7 +315,12 @@ export function ChatRoomPanel({
             {upgradedBadge && (
               <span
                 className="inline-flex shrink-0 items-center gap-0.5 rounded-full bg-gradient-to-r from-amber-200 to-yellow-300 px-1.5 py-0.5 text-[10px] font-bold text-amber-900 shadow-sm ring-1 ring-amber-400/60 dark:from-amber-700 dark:to-yellow-600 dark:text-amber-100"
-                title={tBadge('upgradeTitle', { theme: themeName(upgradedBadge.theme_cd, upgradedBadge.theme_nm) })}
+                title={tBadge('upgradeTitle', {
+                  theme: themeName(
+                    upgradedBadge.theme_cd,
+                    upgradedBadge.theme_nm,
+                  ),
+                })}
               >
                 {upgradedBadge.theme_emoji}🏅
               </span>
@@ -332,8 +338,8 @@ export function ChatRoomPanel({
             onClick={expireDirectRoom}
             disabled={expiring}
             className="shrink-0 text-2xl transition-transform hover:scale-110 disabled:opacity-50"
-            aria-label="문의 만기"
-            title="직거래 문의 만기 (목록에서 제거)"
+            aria-label={t('room.expireInquiry')}
+            title={t('room.expireInquiryTitle')}
           >
             🗑️
           </button>
@@ -343,8 +349,8 @@ export function ChatRoomPanel({
           <button
             onClick={() => setSettingsOpen(true)}
             className="shrink-0 text-2xl transition-transform hover:scale-110"
-            aria-label="카페 수정"
-            title="카페 수정 (방장)"
+            aria-label={t('room.edit')}
+            title={t('room.editOwner')}
           >
             ⚙️
           </button>
@@ -353,8 +359,8 @@ export function ChatRoomPanel({
         <Link
           href={`/chat/${roomId}/analytics`}
           className="shrink-0 text-2xl transition-transform hover:scale-110"
-          aria-label="카페 분석"
-          title="카페 분석 (Business)"
+          aria-label={t('room.analytics')}
+          title={t('room.analyticsBusiness')}
         >
           📊
         </Link>
@@ -362,8 +368,8 @@ export function ChatRoomPanel({
         <button
           onClick={() => setMemberPanelOpen((o) => !o)}
           className="relative shrink-0 text-2xl transition-transform hover:scale-110"
-          aria-label="카페 멤버"
-          title="카페 멤버 (접속 현황)"
+          aria-label={t('room.members')}
+          title={t('room.membersTitle')}
         >
           👥
           {onlineUserIds.length > 0 && (
@@ -376,8 +382,8 @@ export function ChatRoomPanel({
         <button
           onClick={() => setVoicePanelOpen((o) => !o)}
           className="relative shrink-0 text-2xl transition-transform hover:scale-110"
-          aria-label="음성채널"
-          title="음성채널"
+          aria-label={t('room.voiceChannel')}
+          title={t('room.voiceChannel')}
         >
           🎙️
           {voiceParticipants.length > 0 && (
@@ -397,14 +403,12 @@ export function ChatRoomPanel({
       {/* Trigger 5: 정원 초과 방장 알림 배너 */}
       {capacityAlert && (
         <div className="flex shrink-0 items-center justify-between gap-2 bg-amber-500/10 px-4 py-2 text-xs text-amber-700 dark:text-amber-400">
-          <span>
-            ⚠️ 카페 정원이 꽉 찼습니다. 구독 업그레이드로 정원을 늘리세요.
-          </span>
+          <span>{t('room.roomFullWarn')}</span>
           <button
             onClick={() => setExpirePromptOpen(true)}
             className="shrink-0 rounded-md bg-amber-500 px-2 py-0.5 text-white transition-colors hover:bg-amber-600"
           >
-            업그레이드
+            {tc('upgrade')}
           </button>
         </div>
       )}
@@ -412,18 +416,18 @@ export function ChatRoomPanel({
       {/* Trigger 4: 메시지 만료 경고 배너 (FREE 플랜 — 7일 보관) */}
       {!isSubscribed && !expireBannerDismissed && (
         <div className="flex shrink-0 items-center justify-between gap-2 bg-blue-500/10 px-4 py-2 text-xs text-blue-700 dark:text-blue-400">
-          <span>📦 무료 플랜은 메시지가 7일 후 만료됩니다.</span>
+          <span>{t('room.freeRetention')}</span>
           <div className="flex shrink-0 items-center gap-2">
             <button
               onClick={() => setExpirePromptOpen(true)}
               className="rounded-md bg-blue-500 px-2 py-0.5 text-white transition-colors hover:bg-blue-600"
             >
-              업그레이드
+              {tc('upgrade')}
             </button>
             <button
               onClick={() => setExpireBannerDismissed(true)}
               className="text-muted-foreground hover:text-foreground"
-              aria-label="닫기"
+              aria-label={tc('close')}
             >
               ✕
             </button>
@@ -453,16 +457,16 @@ export function ChatRoomPanel({
       {/* Trigger 2: Bean 업그레이드 모달 */}
       <InlinePurchasePrompt
         isOpen={tipPromptOpen}
-        featureName="Bean 보내기"
-        description="프리미엄 구독자는 다른 참가자에게 Bean을 보낼 수 있습니다."
+        featureName={t('room.sendBean')}
+        description={t('room.tipPromptDesc')}
         onClose={() => setTipPromptOpen(false)}
       />
 
       {/* Trigger 4·5: 메시지 보관 / 정원 확장 업그레이드 모달 */}
       <InlinePurchasePrompt
         isOpen={expirePromptOpen}
-        featureName="카페 보관 · 정원 확장"
-        description="프리미엄 구독으로 메시지를 무제한 보관하고 카페 정원을 늘리세요."
+        featureName={t('room.archiveTitle')}
+        description={t('room.archiveDesc')}
         onClose={() => setExpirePromptOpen(false)}
       />
 
@@ -491,15 +495,15 @@ export function ChatRoomPanel({
       {/* Trigger 3: AI 봇 한도 초과 업그레이드 모달 */}
       <InlinePurchasePrompt
         isOpen={aiLimitPromptOpen}
-        featureName="AI 카페 비서 한도 초과"
+        featureName={t('room.aiLimitTitle')}
         description={
           aiLimitInfo?.insufficientBean
-            ? 'Bean이 부족합니다. 충전 후 추가 호출하거나 구독으로 무제한 이용하세요.'
-            : '이번 달 @ai 멘션 한도를 초과했습니다. 추가 호출(건당 Bean) 또는 구독을 선택하세요.'
+            ? t('room.aiLimitInsufficientBean')
+            : t('room.aiLimitDescChoice')
         }
         secondaryActionLabel={
           aiLimitInfo && !aiLimitInfo.insufficientBean && aiLimitInfo.feeBean
-            ? `추가 ${aiLimitInfo.feeBean} Bean으로 보내기`
+            ? t('room.aiLimitExtraSend', { fee: aiLimitInfo.feeBean })
             : undefined
         }
         onSecondaryAction={

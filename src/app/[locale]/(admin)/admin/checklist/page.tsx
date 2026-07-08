@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
 
@@ -26,22 +27,6 @@ interface Summary {
   percent: number
 }
 
-const STATUS_LABEL: Record<ChkItem['status_cd'], string> = {
-  TODO: '미착수',
-  DOING: '진행중',
-  DONE: '완료',
-  NA: '해당없음',
-}
-const PRIO_LABEL: Record<ChkItem['prio_cd'], string> = {
-  BLOCKING: '블로킹',
-  IMPORTANT: '중요',
-  RECOMMEND: '권장',
-}
-const OWNER_LABEL: Record<ChkItem['owner_cd'], string> = {
-  CODE: '코드',
-  MASTER: '마스터',
-  EXTERNAL: '외부',
-}
 const PRIO_CLS: Record<ChkItem['prio_cd'], string> = {
   BLOCKING: 'bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400',
   IMPORTANT:
@@ -56,6 +41,24 @@ const OWNER_CLS: Record<ChkItem['owner_cd'], string> = {
 }
 
 export default function ChecklistPage() {
+  const t = useTranslations('adminOps')
+  const tc = useTranslations('common')
+  const statusLabels: Record<ChkItem['status_cd'], string> = {
+    TODO: t('checklist.statusTodo'),
+    DOING: t('checklist.statusDoing'),
+    DONE: t('checklist.statusDone'),
+    NA: t('checklist.statusNa'),
+  }
+  const prioLabels: Record<ChkItem['prio_cd'], string> = {
+    BLOCKING: t('checklist.prioBlocking'),
+    IMPORTANT: t('checklist.prioImportant'),
+    RECOMMEND: t('checklist.prioRecommend'),
+  }
+  const ownerLabels: Record<ChkItem['owner_cd'], string> = {
+    CODE: t('checklist.ownerCode'),
+    MASTER: t('checklist.ownerMaster'),
+    EXTERNAL: t('checklist.ownerExternal'),
+  }
   const [items, setItems] = useState<ChkItem[]>([])
   const [summary, setSummary] = useState<Summary | null>(null)
   const [applied, setApplied] = useState(true)
@@ -75,11 +78,11 @@ export default function ChecklistPage() {
       setSummary(d.summary)
       setApplied(d.applied)
     } catch {
-      toast.error('체크리스트를 불러오지 못했습니다')
+      toast.error(t('checklist.loadFail'))
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [t])
 
   useEffect(() => {
     void load()
@@ -126,13 +129,13 @@ export default function ChecklistPage() {
       })
       if (!res.ok) throw new Error()
     } catch {
-      toast.error('저장 실패 — 새로고침 후 다시 시도')
+      toast.error(t('checklist.saveFail'))
       void load() // 롤백
     }
   }
 
   if (loading) {
-    return <p className="text-muted-foreground p-6 text-sm">불러오는 중…</p>
+    return <p className="text-muted-foreground p-6 text-sm">{tc('fetching')}</p>
   }
 
   // 섹션 그룹 (정렬 유지)
@@ -152,17 +155,15 @@ export default function ChecklistPage() {
   return (
     <div className="mx-auto max-w-4xl space-y-5 p-4 sm:p-6">
       <div>
-        <h1 className="text-lg font-bold">✅ Open Beta 준비 체크리스트</h1>
+        <h1 className="text-lg font-bold">{t('checklist.title')}</h1>
         <p className="text-muted-foreground mt-1 text-sm">
-          일반인 공개 전 준비 항목을 상태별로 관리합니다. (담당: 코드=개발 ·
-          마스터=수동 · 외부=전문가/기관)
+          {t('checklist.subtitle')}
         </p>
       </div>
 
       {!applied && (
         <div className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-700 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-400">
-          ⚠️ <code>ops_checklist</code> 테이블 미적용 — <code>sql/111</code>을
-          staging→운영에 적용하세요.
+          {t.rich('checklist.notApplied', { code: (c) => <code>{c}</code> })}
         </div>
       )}
 
@@ -171,19 +172,22 @@ export default function ChecklistPage() {
         <div className="space-y-2 rounded-xl border p-4">
           <div className="flex items-center justify-between text-sm">
             <span className="font-semibold">
-              진척률 {liveSummary.percent}%{' '}
+              {t('checklist.progressLabel', { percent: liveSummary.percent })}{' '}
               <span className="text-muted-foreground font-normal">
-                ({liveSummary.done}/{liveSummary.total - liveSummary.na} ·
-                해당없음 {liveSummary.na} 제외)
+                {t('checklist.progressDetail', {
+                  done: liveSummary.done,
+                  denom: liveSummary.total - liveSummary.na,
+                  na: liveSummary.na,
+                })}
               </span>
             </span>
             {liveSummary.blockingLeft > 0 ? (
               <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700 dark:bg-red-950/40 dark:text-red-400">
-                🔴 블로킹 잔여 {liveSummary.blockingLeft}건
+                {t('checklist.blockingLeft', { n: liveSummary.blockingLeft })}
               </span>
             ) : (
               <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-700 dark:bg-green-950/40 dark:text-green-400">
-                ✓ 블로킹 0건
+                {t('checklist.blockingZero')}
               </span>
             )}
           </div>
@@ -194,10 +198,18 @@ export default function ChecklistPage() {
             />
           </div>
           <div className="text-muted-foreground flex gap-3 text-xs">
-            <span>완료 {liveSummary.done}</span>
-            <span>진행중 {liveSummary.doing}</span>
-            <span>미착수 {liveSummary.todo}</span>
-            <span>해당없음 {liveSummary.na}</span>
+            <span>
+              {statusLabels.DONE} {liveSummary.done}
+            </span>
+            <span>
+              {statusLabels.DOING} {liveSummary.doing}
+            </span>
+            <span>
+              {statusLabels.TODO} {liveSummary.todo}
+            </span>
+            <span>
+              {statusLabels.NA} {liveSummary.na}
+            </span>
           </div>
         </div>
       )}
@@ -205,11 +217,11 @@ export default function ChecklistPage() {
       {/* 상태 필터 */}
       <div className="flex flex-wrap gap-1.5">
         {[
-          { v: '', l: '전체' },
-          { v: 'TODO', l: '미착수' },
-          { v: 'DOING', l: '진행중' },
-          { v: 'DONE', l: '완료' },
-          { v: 'NA', l: '해당없음' },
+          { v: '', l: tc('all') },
+          { v: 'TODO', l: statusLabels.TODO },
+          { v: 'DOING', l: statusLabels.DOING },
+          { v: 'DONE', l: statusLabels.DONE },
+          { v: 'NA', l: statusLabels.NA },
         ].map((f) => (
           <button
             key={f.v}
@@ -247,7 +259,7 @@ export default function ChecklistPage() {
                   >
                     {(['TODO', 'DOING', 'DONE', 'NA'] as const).map((s) => (
                       <option key={s} value={s}>
-                        {STATUS_LABEL[s]}
+                        {statusLabels[s]}
                       </option>
                     ))}
                   </select>
@@ -256,17 +268,17 @@ export default function ChecklistPage() {
                   <span
                     className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${PRIO_CLS[it.prio_cd]}`}
                   >
-                    {PRIO_LABEL[it.prio_cd]}
+                    {prioLabels[it.prio_cd]}
                   </span>
                   <span
                     className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${OWNER_CLS[it.owner_cd]}`}
                   >
-                    {OWNER_LABEL[it.owner_cd]}
+                    {ownerLabels[it.owner_cd]}
                   </span>
                   <input
                     type="text"
                     defaultValue={it.note_txt ?? ''}
-                    placeholder="메모…"
+                    placeholder={t('checklist.memoPlaceholder')}
                     onBlur={(e) => {
                       const v = e.target.value
                       if (v !== (it.note_txt ?? ''))

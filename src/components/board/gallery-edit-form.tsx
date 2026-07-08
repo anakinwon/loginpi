@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
 import { Input } from '@/components/ui/input'
@@ -27,6 +28,8 @@ export function GalleryEditForm({
   initialTitle,
   initialContent,
 }: Props) {
+  const t = useTranslations('board')
+  const tc = useTranslations('common')
   const router = useRouter()
   const [title, setTitle] = useState(initialTitle)
   const [blocks, setBlocks] = useState<EditorBlock[]>(() =>
@@ -37,7 +40,7 @@ export function GalleryEditForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!title.trim()) {
-      toast.error('제목을 입력해주세요')
+      toast.error(t('gallery.titleRequired'))
       return
     }
     setSubmitting(true)
@@ -52,12 +55,12 @@ export function GalleryEditForm({
 
     if (!res.ok) {
       const { error } = (await res.json()) as { error?: string }
-      toast.error(error ?? '수정 실패')
+      toast.error(error ?? t('gallery.saveFail'))
       setSubmitting(false)
       return
     }
 
-    toast.success('수정되었습니다')
+    toast.success(t('gallery.saved'))
     router.push(`/board/${category}/${postId}`)
     router.refresh()
   }
@@ -65,19 +68,19 @@ export function GalleryEditForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div className="space-y-1.5">
-        <Label htmlFor="edit-title">제목</Label>
+        <Label htmlFor="edit-title">{t('gallery.titleLabel')}</Label>
         <Input
           id="edit-title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="제목을 입력하세요"
+          placeholder={t('gallery.titlePh')}
           required
           disabled={submitting}
         />
       </div>
 
       <div className="space-y-1.5">
-        <Label>본문</Label>
+        <Label>{t('gallery.bodyLabel')}</Label>
         <GalleryBodyEditor
           blocks={blocks}
           onChange={setBlocks}
@@ -89,7 +92,7 @@ export function GalleryEditForm({
 
       <div className="flex gap-2">
         <Button type="submit" disabled={submitting}>
-          {submitting ? '저장 중...' : '저장하기'}
+          {submitting ? t('gallery.saving') : t('gallery.save')}
         </Button>
         <Button
           type="button"
@@ -97,7 +100,7 @@ export function GalleryEditForm({
           onClick={() => router.back()}
           disabled={submitting}
         >
-          취소
+          {tc('cancel')}
         </Button>
       </div>
     </form>

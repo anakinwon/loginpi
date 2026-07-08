@@ -90,7 +90,7 @@ export function TranslateStatsSection({ period }: { period: number }) {
         writeCache(cacheKey, body)
       } catch (e) {
         if (!cancelled && !cached)
-          setError(e instanceof Error ? e.message : '오류 발생')
+          setError(e instanceof Error ? e.message : tc('error'))
       } finally {
         if (!cancelled) setLoading(false)
       }

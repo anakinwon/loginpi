@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { useTranslations } from 'next-intl'
 import { piFetch } from '@/lib/pi-fetch'
 
 interface HistoryRow {
@@ -18,6 +19,7 @@ interface FeeModeState {
 }
 
 export default function FeeModePage() {
+  const t = useTranslations()
   const [state, setState] = useState<FeeModeState | null>(null)
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState(false)
@@ -33,11 +35,11 @@ export default function FeeModePage() {
       }
       setState(await res.json())
     } catch {
-      toast.error('요금제 모드 조회 실패')
+      toast.error(t('adminFeeMode.loadError'))
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [t])
 
   useEffect(() => {
     void load()
@@ -57,55 +59,61 @@ export default function FeeModePage() {
           toast.success(okMsg)
           setTimeout(() => void load(), 500)
         } else {
-          toast.error(data.error || '실패')
+          toast.error(data.error || t('adminFeeMode.fail'))
         }
       } catch {
-        toast.error('요청 실패')
+        toast.error(t('adminFeeMode.reqFail'))
       } finally {
         setBusy(false)
       }
     },
-    [load],
+    [load, t],
   )
 
   const switchMode = useCallback(
     (newMode: 'BEAN' | 'PI') => {
       if (newMode === state?.active_mode) return
       if (newMode === 'PI') {
-        if (
-          !window.confirm(
-            'Pi Coin 요금제로 전환합니다.\n모든 플랫폼 거래가 Pi 직접결제로, 마이크로 요금은 무료화됩니다(메인넷 A-5 대응). 계속하시겠습니까?',
-          )
-        )
-          return
+        if (!window.confirm(t('adminFeeMode.switchPiConfirm'))) return
       }
       const reason =
         window.prompt(
-          '전환 사유(선택):',
-          newMode === 'PI' ? '메인넷 등재 준비' : 'Bean 요금제 복귀',
+          t('adminFeeMode.switchReasonPrompt'),
+          newMode === 'PI'
+            ? t('adminFeeMode.switchReasonPiDefault')
+            : t('adminFeeMode.switchReasonBeanDefault'),
         ) ?? ''
       void post(
         { action: 'switch', new_mode: newMode, reason },
-        `${newMode === 'PI' ? 'Pi Coin' : 'Bean Token'} 요금제로 전환됨`,
+        t('adminFeeMode.switchSuccess', {
+          mode:
+            newMode === 'PI'
+              ? t('adminFeeMode.piCoin')
+              : t('adminFeeMode.beanToken'),
+        }),
       )
     },
-    [state, post],
+    [state, post, t],
   )
 
   const rollback = useCallback(() => {
-    if (!window.confirm('직전 요금제로 되돌립니다. 계속하시겠습니까?')) return
+    if (!window.confirm(t('adminFeeMode.rollbackConfirm'))) return
     void post(
-      { action: 'rollback', reason: '직전 요금제 복귀' },
-      '직전 요금제로 복귀됨',
+      { action: 'rollback', reason: t('adminFeeMode.rollbackReason') },
+      t('adminFeeMode.rollbackSuccess'),
     )
-  }, [post])
+  }, [post, t])
 
   if (forbidden)
     return (
       <div className="p-6">
-        <h1 className="text-xl font-semibold">요금제 모드</h1>
+        <h1 className="text-xl font-semibold">
+          {t('adminFeeMode.forbiddenTitle')}
+        </h1>
         <p className="text-muted-foreground mt-3 text-sm">
-          이 화면은 <b>MASTER</b> 권한 전용입니다.
+          {t.rich('adminFeeMode.forbiddenBody', {
+            b: (chunks) => <b>{chunks}</b>,
+          })}
         </p>
       </div>
     )
@@ -115,23 +123,28 @@ export default function FeeModePage() {
   return (
     <div className="space-y-5 p-6">
       <div>
-        <h1 className="text-xl font-semibold">요금제 모드 (Bean ↔ Pi)</h1>
+        <h1 className="text-xl font-semibold">{t('adminFeeMode.title')}</h1>
         <p className="text-muted-foreground mt-1 text-sm">
-          플랫폼 요금·보상 결제 단위 전환: <b>Bean Token</b> ⇄ <b>Pi Coin</b>{' '}
-          (1:100). 메인넷 등재 A-5 대응 — 버튼 하나로 즉시 전환·복귀.
+          {t.rich('adminFeeMode.subtitle', {
+            b: (chunks) => <b>{chunks}</b>,
+          })}
         </p>
       </div>
 
-      {loading && <p className="text-muted-foreground text-sm">불러오는 중…</p>}
+      {loading && (
+        <p className="text-muted-foreground text-sm">{t('common.fetching')}</p>
+      )}
 
       {state && (
         <>
           <div className="rounded-lg border p-4">
-            <p className="text-muted-foreground text-xs">현재 활성 요금제</p>
+            <p className="text-muted-foreground text-xs">
+              {t('adminFeeMode.currentMode')}
+            </p>
             <p className="mt-1 text-lg font-semibold">
               {isPi
-                ? 'Pi Coin 요금제 (메인넷 모드 — Pi 직접결제·마이크로 무료)'
-                : 'Bean Token 요금제 (평상시 — Bean 차감)'}
+                ? t('adminFeeMode.piModeDesc')
+                : t('adminFeeMode.beanModeDesc')}
             </p>
           </div>
 
@@ -141,39 +154,49 @@ export default function FeeModePage() {
               disabled={busy || state.active_mode === 'BEAN'}
               className="hover:bg-muted rounded-md border px-4 py-2 text-sm font-medium disabled:opacity-50"
             >
-              Bean Token 요금제
+              {t('adminFeeMode.beanBtn')}
             </button>
             <button
               onClick={() => switchMode('PI')}
               disabled={busy || state.active_mode === 'PI'}
               className="rounded-md border border-amber-300 px-4 py-2 text-sm font-medium text-amber-700 hover:bg-amber-50 disabled:opacity-50 dark:text-amber-400 dark:hover:bg-amber-950/30"
             >
-              Pi Coin 요금제 (메인넷)
+              {t('adminFeeMode.piBtn')}
             </button>
             <button
               onClick={rollback}
               disabled={busy || !state.history.length}
               className="hover:bg-muted rounded-md border px-4 py-2 text-sm font-medium disabled:opacity-50"
             >
-              ↩ 직전 요금제 복귀
+              {t('adminFeeMode.rollbackBtn')}
             </button>
           </div>
 
           <div>
-            <p className="mb-2 text-sm font-medium">전환 이력 (최근 20)</p>
+            <p className="mb-2 text-sm font-medium">
+              {t('adminFeeMode.historyTitle')}
+            </p>
             {state.history.length === 0 ? (
               <p className="text-muted-foreground text-sm">
-                전환 이력이 없습니다.
+                {t('adminFeeMode.noHistory')}
               </p>
             ) : (
               <div className="overflow-x-auto rounded-lg border">
                 <table className="w-full text-sm">
                   <thead className="bg-muted/50 text-muted-foreground text-xs">
                     <tr>
-                      <th className="px-3 py-2 text-left">변경</th>
-                      <th className="px-3 py-2 text-left">수행자</th>
-                      <th className="px-3 py-2 text-left">사유</th>
-                      <th className="px-3 py-2 text-left">시각</th>
+                      <th className="px-3 py-2 text-left">
+                        {t('adminFeeMode.colChange')}
+                      </th>
+                      <th className="px-3 py-2 text-left">
+                        {t('adminFeeMode.colActor')}
+                      </th>
+                      <th className="px-3 py-2 text-left">
+                        {t('adminFeeMode.colReason')}
+                      </th>
+                      <th className="px-3 py-2 text-left">
+                        {t('adminFeeMode.colDtm')}
+                      </th>
                     </tr>
                   </thead>
                   <tbody>

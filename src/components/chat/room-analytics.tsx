@@ -1,5 +1,6 @@
 'use client'
 import { useCallback, useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import PlotlyPlot from '@/components/charts/plotly-plot'
 import { piFetch } from '@/lib/pi-fetch'
@@ -39,6 +40,8 @@ function SummaryCard({ label, value }: { label: string; value: string }) {
 }
 
 export function RoomAnalytics({ roomId }: { roomId: string }) {
+  const t = useTranslations('chat')
+  const tc = useTranslations('common')
   const [data, setData] = useState<AnalyticsData | null>(null)
   const [days, setDays] = useState<number>(30)
   const [error, setError] = useState<string | null>(null)
@@ -59,18 +62,18 @@ export function RoomAnalytics({ roomId }: { roomId: string }) {
         }
         if (!res.ok) {
           setBusinessRequired(!!json.businessRequired)
-          setError(json.error ?? '분석 조회 실패')
+          setError(json.error ?? t('analytics.fetchFail'))
           setData(null)
           return
         }
         setData(json)
       } catch {
-        setError('분석 조회 중 오류가 발생했습니다')
+        setError(t('analytics.fetchError'))
       } finally {
         setLoading(false)
       }
     },
-    [roomId],
+    [roomId, t],
   )
 
   useEffect(() => {
@@ -93,15 +96,14 @@ export function RoomAnalytics({ roomId }: { roomId: string }) {
         <p className="text-muted-foreground mt-3 text-sm">{error}</p>
         {businessRequired && (
           <p className="text-muted-foreground mt-2 text-xs">
-            Business 플랜(Pi Host)으로 업그레이드하면 카페 분석을 볼 수
-            있습니다.
+            {t('analytics.businessOnly')}
           </p>
         )}
         <Link
           href={`/chat/${roomId}`}
           className="text-primary mt-4 inline-block text-sm underline"
         >
-          카페로 돌아가기
+          {t('analytics.backToRoom')}
         </Link>
       </div>
     )
@@ -115,9 +117,9 @@ export function RoomAnalytics({ roomId }: { roomId: string }) {
     <div className="mx-auto max-w-3xl px-4 py-8">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold">📊 카페 분석</h1>
+          <h1 className="text-xl font-bold">{t('analytics.title')}</h1>
           <p className="text-muted-foreground text-xs">
-            Business 전용 — 최근 {data.days}일
+            {t('analytics.businessSubtitle', { days: data.days })}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -132,7 +134,7 @@ export function RoomAnalytics({ roomId }: { roomId: string }) {
                     : 'hover:bg-muted'
                 }`}
               >
-                {p}일
+                {tc('days', { count: p })}
               </button>
             ))}
           </div>
@@ -148,19 +150,19 @@ export function RoomAnalytics({ roomId }: { roomId: string }) {
       {/* 요약 카드 */}
       <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <SummaryCard
-          label={`MAU (${data.days}일 활성)`}
-          value={`${data.summary.mau}명`}
+          label={t('analytics.mau', { days: data.days })}
+          value={tc('countPerson', { count: data.summary.mau })}
         />
         <SummaryCard
-          label="현재 멤버"
-          value={`${data.summary.cur_mbr_cnt}명`}
+          label={t('analytics.curMembers')}
+          value={tc('countPerson', { count: data.summary.cur_mbr_cnt })}
         />
         <SummaryCard
-          label="총 메시지"
-          value={`${data.summary.total_msg_cnt}건`}
+          label={t('analytics.totalMessages')}
+          value={tc('count', { count: data.summary.total_msg_cnt })}
         />
         <SummaryCard
-          label="Pi Bean 수익"
+          label={t('analytics.beanRevenue')}
           value={`π${data.summary.total_tip_pi}`}
         />
       </div>
@@ -168,7 +170,7 @@ export function RoomAnalytics({ roomId }: { roomId: string }) {
       {/* 메시지·활성 사용자 추이 */}
       <div className="mb-6 rounded-xl border p-3">
         <h2 className="mb-2 text-sm font-semibold">
-          메시지 · 활성 사용자 추이
+          {t('analytics.trendTitle')}
         </h2>
         <PlotlyPlot
           data={[
@@ -177,7 +179,7 @@ export function RoomAnalytics({ roomId }: { roomId: string }) {
               y: data.daily.map((r) => r.msg_cnt),
               type: 'scatter',
               mode: 'lines+markers',
-              name: '메시지',
+              name: t('analytics.messages'),
               line: { color: '#6366f1' },
             },
             {
@@ -185,7 +187,7 @@ export function RoomAnalytics({ roomId }: { roomId: string }) {
               y: data.daily.map((r) => r.active_usr_cnt),
               type: 'scatter',
               mode: 'lines+markers',
-              name: '활성 사용자',
+              name: t('analytics.activeUsers'),
               line: { color: '#10b981' },
             },
           ]}
@@ -205,7 +207,9 @@ export function RoomAnalytics({ roomId }: { roomId: string }) {
 
       {/* Pi 수익 · 신규 멤버 */}
       <div className="rounded-xl border p-3">
-        <h2 className="mb-2 text-sm font-semibold">Pi Bean 수익 · 신규 멤버</h2>
+        <h2 className="mb-2 text-sm font-semibold">
+          {t('analytics.revenueTitle')}
+        </h2>
         <PlotlyPlot
           data={[
             {
@@ -219,7 +223,7 @@ export function RoomAnalytics({ roomId }: { roomId: string }) {
               x: dates,
               y: data.daily.map((r) => r.new_mbr_cnt),
               type: 'bar',
-              name: '신규 멤버',
+              name: t('analytics.newMembers'),
               marker: { color: '#3b82f6' },
             },
           ]}

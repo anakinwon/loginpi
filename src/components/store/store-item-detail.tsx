@@ -104,7 +104,7 @@ export function StoreItemDetail({ itemId }: { itemId: string }) {
     await piFetch(`/api/store/orders/${orderId}/cancel`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ reason: '결제 미완료 (사용자 취소 또는 오류)' }),
+      body: JSON.stringify({ reason: t('payIncomplete') }),
     })
   }
 
@@ -121,7 +121,7 @@ export function StoreItemDetail({ itemId }: { itemId: string }) {
       return
     }
     if (orderMthd === 'DELIVERY' && !dlvrAddr.trim()) {
-      toast.error('배달 위치를 입력해주세요')
+      toast.error(t('dlvrAddrRequired'))
       return
     }
     // 오프라인 매장 상품은 수량(qty) 반영을 위해 카트 주문 경로 재사용(단일 라인).
@@ -164,7 +164,7 @@ export function StoreItemDetail({ itemId }: { itemId: string }) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               order_id: orderId,
-              reason: '결제 미완료 (사용자 취소 또는 오류)',
+              reason: t('payIncomplete'),
             }),
           })
         } else {
@@ -189,10 +189,7 @@ export function StoreItemDetail({ itemId }: { itemId: string }) {
               } | null
               rollback()
               setBuying(false)
-              toast.error(
-                d?.error ??
-                  '결제 승인에 실패했습니다. 잠시 후 다시 시도해 주세요',
-              )
+              toast.error(d?.error ?? t('approveFail'))
             }
           },
           onReadyForServerCompletion: async (paymentId, txid) => {
@@ -439,14 +436,14 @@ export function StoreItemDetail({ itemId }: { itemId: string }) {
           {/* 주문방법 3종 — 매장이용·픽업·배달(배달가능 매장만). 배달 시 위치 입력 */}
           {(!isMine || canSelfTest) && (
             <div className="space-y-2">
-              <p className="text-sm font-medium">주문방법</p>
+              <p className="text-sm font-medium">{t('orderMthd.title')}</p>
               <div className="flex flex-wrap gap-1.5">
                 {(
                   [
-                    { cd: 'DINE_IN', label: '🍽️ 매장이용' },
-                    { cd: 'PICKUP', label: '🥡 픽업이용' },
+                    { cd: 'DINE_IN', label: t('orderMthd.DINE_IN') },
+                    { cd: 'PICKUP', label: t('orderMthd.PICKUP') },
                     ...(item.shop?.dlvr_yn === 'Y'
-                      ? [{ cd: 'DELIVERY', label: '🛵 배달이용' }]
+                      ? [{ cd: 'DELIVERY', label: t('orderMthd.DELIVERY') }]
                       : []),
                   ] as const
                 ).map((m) => (
@@ -469,12 +466,12 @@ export function StoreItemDetail({ itemId }: { itemId: string }) {
               {orderMthd === 'DELIVERY' && (
                 <div className="space-y-1">
                   <label className="text-muted-foreground text-xs">
-                    배달 위치 *
+                    {t('dlvrAddrLabel')} *
                   </label>
                   <input
                     value={dlvrAddr}
                     onChange={(e) => setDlvrAddr(e.target.value)}
-                    placeholder="배달받을 주소를 입력하세요"
+                    placeholder={t('dlvrAddrPlaceholder')}
                     maxLength={500}
                     className="w-full rounded-lg border bg-transparent px-2.5 py-1.5 text-sm"
                   />
@@ -486,7 +483,7 @@ export function StoreItemDetail({ itemId }: { itemId: string }) {
           <div className="pt-2">
             {canSelfTest && (
               <p className="mb-2 rounded-md bg-amber-50 px-2.5 py-1.5 text-xs text-amber-700 dark:bg-amber-950 dark:text-amber-400">
-                ⚠️ 관리자 테스트 결제 — 본인 상품을 결제합니다
+                {t('adminTestNotice')}
               </p>
             )}
             {isMine && !canSelfTest ? (
@@ -606,7 +603,7 @@ export function StoreItemDetail({ itemId }: { itemId: string }) {
 
       {/* 이용후기 섹션 — 상품 구매자 후기 목록 */}
       <div className="border-t pt-6">
-        <h2 className="mb-4 text-base font-semibold">⭐ 이용후기</h2>
+        <h2 className="mb-4 text-base font-semibold">{t('feedbackHeading')}</h2>
         <FeedbackList itemId={item.item_id} />
       </div>
     </div>

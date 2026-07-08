@@ -124,7 +124,7 @@ export function ClientMyItems({
             onClick={() => setShowAll((v) => !v)}
             className={`ml-auto rounded-full border px-3 py-1 text-xs font-medium ${showAll ? 'border-primary bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted'}`}
           >
-            {showAll ? '🛡️ 전체 판매자' : '🛡️ 내 상품만'}
+            {showAll ? t('viewAllSellers') : t('viewMineItems')}
           </button>
         )}
         <Link href="/store/my/shops" className={isAdminUser ? '' : 'ml-auto'}>

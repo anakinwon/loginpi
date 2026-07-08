@@ -2,6 +2,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { setOptions, importLibrary } from '@googlemaps/js-api-loader'
 import { MarkerClusterer } from '@googlemaps/markerclusterer'
 import { useRouter } from '@/i18n/navigation'
@@ -46,20 +47,19 @@ interface MarkerEntry {
   position: { lat: number; lng: number }
 }
 
-// 업종별 핀 색상 + Google Places 타입
+// 업종별 핀 색상 + Google Places 타입 (표시 라벨은 i18n lbs.bizCat.* — t()로 렌더)
 const CATEGORY_CONFIG: Record<
   BizCategory,
-  { bg: string; border: string; placeType: string; label: string }
+  { bg: string; border: string; placeType: string }
 > = {
-  ALL: { bg: '#f97316', border: '#c2410c', placeType: '', label: 'Pi 매장' },
-  CAFE: { bg: '#22c55e', border: '#15803d', placeType: 'cafe', label: '카페' },
+  ALL: { bg: '#f97316', border: '#c2410c', placeType: '' },
+  CAFE: { bg: '#22c55e', border: '#15803d', placeType: 'cafe' },
   RESTAURANT: {
     bg: '#ef4444',
     border: '#b91c1c',
     placeType: 'restaurant',
-    label: '식당',
   },
-  BAR: { bg: '#a855f7', border: '#7e22ce', placeType: 'bar', label: '술집' },
+  BAR: { bg: '#a855f7', border: '#7e22ce', placeType: 'bar' },
 }
 
 export function ShopsMapView({
@@ -71,6 +71,7 @@ export function ShopsMapView({
   radiusMeters,
   focusShopId,
 }: Props) {
+  const t = useTranslations('lbs')
   const router = useRouter() // next-intl 라우터 — locale 접두사 자동 처리
   const mapRef = useRef<HTMLDivElement>(null)
   const [loadError, setLoadError] = useState<string | null>(null)
@@ -116,9 +117,7 @@ export function ShopsMapView({
     setPlacesCount(null)
 
     if (!apiKey) {
-      setLoadError(
-        'Google Maps API 키가 설정되지 않았습니다 (NEXT_PUBLIC_GOOGLE_MAPS_API_KEY)',
-      )
+      setLoadError(t('map.noApiKey'))
       return
     }
 
@@ -160,14 +159,14 @@ export function ShopsMapView({
           background: '#3b82f6',
           borderColor: '#1d4ed8',
           glyphColor: '#ffffff',
-          glyph: '나',
+          glyph: t('map.meGlyph'),
           scale: 1.2,
         })
         new AdvancedMarkerElement({
           map,
           position: { lat: userLat, lng: userLng },
           content: userPin.element,
-          title: '내 위치',
+          title: t('map.myLocation'),
         })
 
         const cfg = CATEGORY_CONFIG[bizCategory]
@@ -221,10 +220,18 @@ export function ShopsMapView({
           const gRow = document.createElement('div')
           gRow.style.cssText = 'display:flex;gap:4px;flex-wrap:wrap'
           const gModes = [
-            { icon: '🚗', label: '자가용', travelmode: 'driving' },
-            { icon: '🚌', label: '대중교통', travelmode: 'transit' },
-            { icon: '🚶', label: '도보', travelmode: 'walking' },
-            { icon: '🚲', label: '자전거', travelmode: 'bicycling' },
+            { icon: '🚗', label: t('map.mode.driving'), travelmode: 'driving' },
+            {
+              icon: '🚌',
+              label: t('map.mode.transit'),
+              travelmode: 'transit',
+            },
+            { icon: '🚶', label: t('map.mode.walking'), travelmode: 'walking' },
+            {
+              icon: '🚲',
+              label: t('map.mode.bicycling'),
+              travelmode: 'bicycling',
+            },
           ]
           for (const m of gModes) {
             const a = document.createElement('a')
@@ -241,7 +248,7 @@ export function ShopsMapView({
           // ── 카카오맵 + 네이버지도 (국내 도보·자전거 완전 지원) ──
           const knLabel = document.createElement('p')
           knLabel.style.cssText = 'font-size:11px;color:#6b7280;margin:0'
-          knLabel.textContent = '🇰🇷 국내 지도 (도보·자전거 지원)'
+          knLabel.textContent = t('map.domesticMaps')
           wrap.appendChild(knLabel)
 
           const knRow = document.createElement('div')
@@ -251,7 +258,7 @@ export function ShopsMapView({
           kBtn.href = `https://map.kakao.com/link/to/${encodeURIComponent(name)},${lat},${lng}`
           kBtn.target = '_blank'
           kBtn.rel = 'noopener noreferrer'
-          kBtn.textContent = '카카오맵'
+          kBtn.textContent = t('map.kakaoMap')
           kBtn.style.cssText =
             'display:inline-block;padding:4px 12px;font-size:11px;border-radius:4px;background:#FEE500;color:#3C1E1E;text-decoration:none;font-weight:600'
           knRow.appendChild(kBtn)
@@ -261,7 +268,7 @@ export function ShopsMapView({
           nBtn.href = `https://map.naver.com/v5/directions/-/${lng},${lat},${encodeURIComponent(name)}/car`
           nBtn.target = '_blank'
           nBtn.rel = 'noopener noreferrer'
-          nBtn.textContent = '네이버지도'
+          nBtn.textContent = t('map.naverMap')
           nBtn.style.cssText =
             'display:inline-block;padding:4px 12px;font-size:11px;border-radius:4px;background:#03C75A;color:#ffffff;text-decoration:none;font-weight:600'
           knRow.appendChild(nBtn)
@@ -279,7 +286,7 @@ export function ShopsMapView({
           addr: string | null,
         ) => {
           const btn = document.createElement('button')
-          btn.textContent = '🏪 내 매장으로 등록'
+          btn.textContent = t('map.claimBtn')
           btn.style.cssText =
             'margin-top:8px;width:100%;padding:7px 10px;font-size:12px;border-radius:6px;background:#7c3aed;color:#fff;border:none;font-weight:700;cursor:pointer'
           btn.addEventListener('click', () => {
@@ -310,7 +317,7 @@ export function ShopsMapView({
           // 소유권 인증 매장 배지 (현장 GPS 검증 완료)
           if (verified) {
             const badge = document.createElement('span')
-            badge.textContent = '✅ 인증'
+            badge.textContent = t('verified')
             badge.style.cssText =
               'display:inline-block;margin-left:6px;padding:1px 6px;font-size:10px;font-weight:700;border-radius:9999px;background:#dcfce7;color:#15803d;vertical-align:middle'
             nameEl.appendChild(badge)
@@ -332,7 +339,7 @@ export function ShopsMapView({
             const head = document.createElement('p')
             head.style.cssText =
               'font-size:11px;font-weight:700;color:#374151;margin:6px 0 3px'
-            head.textContent = '🛒 판매 상품 (탭하여 에스크로 거래)'
+            head.textContent = t('map.sellingItems')
             wrap.appendChild(head)
 
             const grid = document.createElement('div')
@@ -438,7 +445,7 @@ export function ShopsMapView({
             const nameEl = document.createElement('p')
             nameEl.style.cssText =
               'font-weight:600;font-size:14px;margin:0 0 4px'
-            nameEl.textContent = place.displayName ?? '이름 없음'
+            nameEl.textContent = place.displayName ?? t('map.noName')
             wrap.appendChild(nameEl)
 
             if (place.rating) {
@@ -465,7 +472,7 @@ export function ShopsMapView({
               wrap.appendChild(
                 buildClaimButton(
                   place.id,
-                  place.displayName ?? '이름 미상 매장',
+                  place.displayName ?? t('map.unknownShop'),
                   place.formattedAddress ?? null,
                 ),
               )
@@ -511,15 +518,13 @@ export function ShopsMapView({
           }
         }
       } catch (e) {
-        const msg = e instanceof Error ? e.message : '지도 로드 실패'
+        const msg = e instanceof Error ? e.message : t('map.loadFail')
         // Places API (New) 미활성화 시 명확한 안내
         if (
           msg.includes('PERMISSION_DENIED') ||
           msg.includes('places.googleapis.com')
         ) {
-          setLoadError(
-            'Places API (New) 미활성화 — Google Cloud Console에서 "Places API (New)"를 활성화해 주세요',
-          )
+          setLoadError(t('map.placesApiDisabled'))
         } else {
           setLoadError(msg)
         }
@@ -553,8 +558,12 @@ export function ShopsMapView({
     <div className="space-y-1">
       {placesCount !== null && bizCategory !== 'ALL' && (
         <p className="text-muted-foreground text-xs">
-          <span style={{ color: cfg.bg }}>●</span> 반경{' '}
-          {(radiusMeters / 1000).toFixed(0)}km 내 {cfg.label} {placesCount}곳
+          <span style={{ color: cfg.bg }}>●</span>{' '}
+          {t('map.placesCount', {
+            radius: (radiusMeters / 1000).toFixed(0),
+            label: t(`bizCat.${bizCategory}`),
+            count: placesCount,
+          })}
         </p>
       )}
       <div

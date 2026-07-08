@@ -1,5 +1,6 @@
 'use client'
 import { useState, useRef, useCallback, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import { StickerPicker } from './sticker-picker'
 import { StickerImg } from './sticker-img'
 
@@ -26,6 +27,8 @@ export function ChatInput({
   onSendSticker,
   onSendFile,
 }: ChatInputProps) {
+  const t = useTranslations('chat')
+  const tc = useTranslations('common')
   const [text, setText] = useState('')
   const [isSending, setIsSending] = useState(false)
   const [showPicker, setShowPicker] = useState(false)
@@ -179,13 +182,13 @@ export function ChatInput({
             <div className="bg-background relative rounded-xl border p-1.5">
               <StickerImg
                 src={pendingSticker.url}
-                alt="전송할 스티커 미리보기"
+                alt={t('input.stickerPreviewAlt')}
                 className="h-21 w-21 object-contain"
               />
               <button
                 onClick={() => setPendingSticker(null)}
                 className="bg-foreground/70 text-background absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full text-[10px]"
-                aria-label="스티커 선택 취소"
+                aria-label={t('input.cancelSticker')}
               >
                 ✕
               </button>
@@ -197,7 +200,7 @@ export function ChatInput({
                 // eslint-disable-next-line @next/next/no-img-element -- objectURL 로컬 미리보기는 next/image 미지원
                 <img
                   src={filePreviewUrl}
-                  alt="전송할 사진 미리보기"
+                  alt={t('input.photoPreviewAlt')}
                   className="h-21 w-21 rounded-lg object-cover"
                 />
               ) : (
@@ -216,14 +219,14 @@ export function ChatInput({
               <button
                 onClick={clearPendingFile}
                 className="bg-foreground/70 text-background absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full text-[10px]"
-                aria-label="파일 선택 취소"
+                aria-label={t('input.cancelFile')}
               >
                 ✕
               </button>
             </div>
           )}
           <p className="text-muted-foreground text-[11px]">
-            전송 버튼을 누르면 보냅니다
+            {t('input.pressSendHint')}
           </p>
         </div>
       )}
@@ -232,8 +235,8 @@ export function ChatInput({
         <button
           onClick={() => setShowPicker((o) => !o)}
           className="text-muted-foreground hover:bg-muted shrink-0 rounded-xl p-2 text-lg transition-colors"
-          title="스티커"
-          aria-label="스티커 선택"
+          title={t('input.stickerBtn')}
+          aria-label={t('input.stickerSelect')}
         >
           😊
         </button>
@@ -250,8 +253,8 @@ export function ChatInput({
               onClick={() => fileInputRef.current?.click()}
               disabled={isSending}
               className="text-muted-foreground hover:bg-muted shrink-0 rounded-xl p-2 text-lg transition-colors disabled:opacity-40"
-              title="파일 첨부"
-              aria-label="파일 첨부"
+              title={t('input.attachBtn')}
+              aria-label={t('input.attachBtn')}
             >
               📎
             </button>
@@ -262,7 +265,7 @@ export function ChatInput({
           value={text}
           onChange={onInput}
           onKeyDown={onKeyDown}
-          placeholder="메시지를 입력하세요... (Enter 전송, Shift+Enter 줄바꿈)"
+          placeholder={t('input.placeholder')}
           rows={1}
           className="bg-background focus:ring-ring flex-1 resize-none rounded-xl border px-3 py-2 text-sm outline-none focus:ring-2"
           style={{ maxHeight: '120px' }}
@@ -274,7 +277,7 @@ export function ChatInput({
           disabled={(!text.trim() && !hasPending) || isSending}
           className="bg-primary text-primary-foreground shrink-0 rounded-xl px-4 py-2 text-sm font-medium disabled:opacity-40"
         >
-          {isSending ? '...' : '전송'}
+          {isSending ? '...' : tc('send')}
         </button>
       </div>
     </div>

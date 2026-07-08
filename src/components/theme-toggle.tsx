@@ -1,6 +1,7 @@
 'use client'
 
 import { useTheme } from 'next-themes'
+import { useTranslations } from 'next-intl'
 import { Monitor, Moon, Sun } from 'lucide-react'
 import { buttonVariants } from '@/components/ui/button'
 import {
@@ -13,11 +14,12 @@ import { cn } from '@/lib/utils'
 
 export function ThemeToggle() {
   const { setTheme } = useTheme()
+  const t = useTranslations('themeToggle')
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        aria-label="테마 변경"
+        aria-label={t('label')}
         className={cn(
           buttonVariants({ variant: 'ghost', size: 'icon' }),
           'relative',
@@ -29,15 +31,15 @@ export function ThemeToggle() {
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => setTheme('light')}>
           <Sun className="mr-2 h-4 w-4" />
-          라이트
+          {t('light')}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme('dark')}>
           <Moon className="mr-2 h-4 w-4" />
-          다크
+          {t('dark')}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme('system')}>
           <Monitor className="mr-2 h-4 w-4" />
-          시스템
+          {t('system')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -1,18 +1,21 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { AdminPagination } from '@/components/admin/admin-pagination'
 import { BeanIcon } from '@/components/ui/bean-icon'
 
-const TXN_TP_LABEL: Record<string, string> = {
-  CHARGE: '충전',
-  SPEND: '사용',
-  REWARD: '보상',
-  REFUND: '환불',
-  SUBSCRIBE: '구독',
-  TRANSFER: '팁', // 카페방 P2P Bean 선물(fn_bean_transfer) — 보낸이 −/받은이 + 2건
-  FEE: '수수료',
-}
+// 거래 유형 코드값 — 표시 라벨은 i18n(adminToken.transactions.type.*)
+// TRANSFER = 카페방 P2P Bean 선물(fn_bean_transfer) — 보낸이 −/받은이 + 2건
+const TXN_TP_CODES = [
+  'CHARGE',
+  'SPEND',
+  'REWARD',
+  'REFUND',
+  'SUBSCRIBE',
+  'TRANSFER',
+  'FEE',
+]
 
 const TXN_TP_COLOR: Record<string, string> = {
   CHARGE: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
@@ -50,6 +53,7 @@ interface TxnRow {
 const PAGE_SIZE = 50
 
 export default function TokenTransactionsPage() {
+  const t = useTranslations()
   const [txns, setTxns] = useState<TxnRow[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState<string>('all')
@@ -71,16 +75,23 @@ export default function TokenTransactionsPage() {
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
   const displayed = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
-  const types = ['all', ...Object.keys(TXN_TP_LABEL)]
+  const types = ['all', ...TXN_TP_CODES]
+  const txnLabel = (tp: string) =>
+    TXN_TP_CODES.includes(tp) ? t(`adminToken.transactions.type.${tp}`) : tp
+  // map 콜백 변수명이 t(행)라 내부에서 번역 t를 못 쓰므로 라벨을 미리 계산
+  const balanceLabel = t('adminToken.transactions.balanceLabel')
 
   return (
     <div className="space-y-4">
       <div>
         <h1 className="flex items-center gap-2 text-2xl font-bold">
-          <BeanIcon className="inline-block h-6 w-6" /> Bean 거래 내역
+          <BeanIcon className="inline-block h-6 w-6" />{' '}
+          {t('adminToken.transactions.title')}
         </h1>
         <p className="text-muted-foreground mt-1 text-sm">
-          총 {txns.length.toLocaleString()}건
+          {t('adminToken.transactions.subtitle', {
+            count: txns.length.toLocaleString(),
+          })}
         </p>
       </div>
 
@@ -96,7 +107,7 @@ export default function TokenTransactionsPage() {
                 : 'border-border text-muted-foreground hover:bg-muted'
             }`}
           >
-            {tp === 'all' ? '전체' : (TXN_TP_LABEL[tp] ?? tp)}
+            {tp === 'all' ? t('common.all') : txnLabel(tp)}
             {tp !== 'all' && (
               <span className="ml-1">
                 ({txns.filter((t) => t.txn_tp_cd === tp).length})
@@ -107,12 +118,12 @@ export default function TokenTransactionsPage() {
       </div>
 
       {loading ? (
-        <p className="text-muted-foreground text-sm">불러오는 중...</p>
+        <p className="text-muted-foreground text-sm">{t('common.fetching')}</p>
       ) : filtered.length === 0 ? (
         <p className="text-muted-foreground text-sm">
           {txns.length === 0
-            ? '거래 내역이 없습니다.'
-            : '해당 유형의 거래가 없습니다.'}
+            ? t('adminToken.transactions.noTxn')
+            : t('adminToken.transactions.noTypeTxn')}
         </p>
       ) : (
         <>
@@ -137,7 +148,7 @@ export default function TokenTransactionsPage() {
                   <span
                     className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${TXN_TP_COLOR[t.txn_tp_cd] ?? 'bg-muted'}`}
                   >
-                    {TXN_TP_LABEL[t.txn_tp_cd] ?? t.txn_tp_cd}
+                    {txnLabel(t.txn_tp_cd)}
                   </span>
                 </div>
                 <div className="mt-2 flex items-baseline justify-between gap-2">
@@ -153,7 +164,7 @@ export default function TokenTransactionsPage() {
                     <BeanIcon className="inline-block h-3.5 w-3.5 align-text-bottom" />
                   </span>
                   <span className="text-muted-foreground text-xs tabular-nums">
-                    잔액 {t.bal_amt.toLocaleString()}
+                    {balanceLabel} {t.bal_amt.toLocaleString()}
                     {t.pi_amt != null ? ` · π ${t.pi_amt}` : ''}
                   </span>
                 </div>
@@ -174,13 +185,27 @@ export default function TokenTransactionsPage() {
             <table className="w-full text-sm">
               <thead className="bg-muted/50 border-b">
                 <tr>
-                  <th className="px-4 py-2 text-left font-medium">사용자</th>
-                  <th className="px-4 py-2 text-left font-medium">유형</th>
-                  <th className="px-4 py-2 text-right font-medium">증감</th>
-                  <th className="px-4 py-2 text-right font-medium">잔액</th>
-                  <th className="px-4 py-2 text-left font-medium">Pi 금액</th>
-                  <th className="px-4 py-2 text-left font-medium">메모</th>
-                  <th className="px-4 py-2 text-left font-medium">일시</th>
+                  <th className="px-4 py-2 text-left font-medium">
+                    {t('adminToken.transactions.colUser')}
+                  </th>
+                  <th className="px-4 py-2 text-left font-medium">
+                    {t('adminToken.transactions.colType')}
+                  </th>
+                  <th className="px-4 py-2 text-right font-medium">
+                    {t('adminToken.transactions.colDelta')}
+                  </th>
+                  <th className="px-4 py-2 text-right font-medium">
+                    {t('adminToken.transactions.colBalance')}
+                  </th>
+                  <th className="px-4 py-2 text-left font-medium">
+                    {t('adminToken.transactions.colPiAmount')}
+                  </th>
+                  <th className="px-4 py-2 text-left font-medium">
+                    {t('adminToken.transactions.colMemo')}
+                  </th>
+                  <th className="px-4 py-2 text-left font-medium">
+                    {t('adminToken.transactions.colDtm')}
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y">
@@ -206,7 +231,7 @@ export default function TokenTransactionsPage() {
                       <span
                         className={`rounded-full px-2 py-0.5 text-xs font-medium ${TXN_TP_COLOR[t.txn_tp_cd] ?? 'bg-muted'}`}
                       >
-                        {TXN_TP_LABEL[t.txn_tp_cd] ?? t.txn_tp_cd}
+                        {txnLabel(t.txn_tp_cd)}
                       </span>
                     </td>
                     <td

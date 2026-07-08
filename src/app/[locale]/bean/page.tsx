@@ -15,6 +15,7 @@ export async function generateMetadata() {
 // 서버 세션 확인 결과를 클라이언트에 전달 → Pi 로그인과 OR 게이트
 export default async function BeanWalletPage() {
   const t = await getTranslations('bean')
+  const ts = await getTranslations('sysUi')
   const user = await getSessionUser()
   // PI 요금제에선 Bean 지갑 비노출 — 진입점(네비) 숨김과 동일 정책, 직접 URL 접근도 차단.
   //   redirect 금지(Pi Browser 무한루프) → 안내 문구로 조건부 렌더.
@@ -31,7 +32,7 @@ export default async function BeanWalletPage() {
       </Link>
       {feeMode === 'PI' ? (
         <p className="text-muted-foreground rounded-lg border p-6 text-center text-sm">
-          현재 이용할 수 없는 메뉴입니다.
+          {ts('menuUnavailable')}
         </p>
       ) : (
         <>

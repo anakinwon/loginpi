@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
 import { getCurrentPosition } from '@/lib/geo'
@@ -28,6 +29,8 @@ export function RoomSettingsDialog({
   onSaved: (next: RoomSettings) => void
   onClose: () => void
 }) {
+  const t = useTranslations('chat')
+  const tc = useTranslations('common')
   const [roomNm, setRoomNm] = useState(initial.room_nm)
   const [roomDesc, setRoomDesc] = useState(initial.room_desc ?? '')
   const [isPublic, setIsPublic] = useState(initial.is_public_yn === 'Y')
@@ -61,16 +64,16 @@ export function RoomSettingsDialog({
   async function save() {
     const nm = roomNm.trim()
     if (!nm) {
-      toast.error('방 이름을 입력해주세요')
+      toast.error(t('settings.nameRequired'))
       return
     }
     const cnt = Number(maxMbr)
     if (!Number.isInteger(cnt) || cnt < 2 || cnt > 1000) {
-      toast.error('정원은 2~1000명이어야 합니다')
+      toast.error(t('settings.capacityInvalid'))
       return
     }
     if (!isPublic && newPwd && (newPwd.length < 4 || newPwd.length > 64)) {
-      toast.error('비밀번호는 4~64자여야 합니다')
+      toast.error(t('settings.pwdInvalid'))
       return
     }
 
@@ -106,10 +109,10 @@ export function RoomSettingsDialog({
         room?: { has_join_pwd: boolean }
       }
       if (!res.ok) {
-        toast.error(data.error ?? '수정 실패')
+        toast.error(data.error ?? t('settings.saveFail'))
         return
       }
-      toast.success('카페 정보를 수정했습니다')
+      toast.success(t('settings.saved'))
       onSaved({
         room_nm: nm,
         room_desc: roomDesc.trim() || null,
@@ -118,7 +121,7 @@ export function RoomSettingsDialog({
         has_join_pwd: !!data.room?.has_join_pwd,
       })
     } catch {
-      toast.error('수정 중 오류가 발생했습니다')
+      toast.error(t('settings.saveError'))
     } finally {
       setSaving(false)
     }
@@ -132,10 +135,10 @@ export function RoomSettingsDialog({
       })
       const d = (await res.json()) as { error?: string }
       if (res.ok)
-        toast.success(`🚀 부스트 완료! ${ROOM_BOOST_DAYS}일간 상단 노출됩니다`)
-      else toast.error(d.error ?? '부스트에 실패했습니다')
+        toast.success(t('settings.boostDone', { days: ROOM_BOOST_DAYS }))
+      else toast.error(d.error ?? t('settings.boostFail'))
     } catch {
-      toast.error('부스트 중 오류가 발생했습니다')
+      toast.error(t('settings.boostError'))
     } finally {
       setBoosting(false)
     }
@@ -151,11 +154,11 @@ export function RoomSettingsDialog({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-base font-semibold">⚙️ 카페 수정</h3>
+          <h3 className="text-base font-semibold">{t('settings.title')}</h3>
           <button
             onClick={onClose}
             className="text-muted-foreground hover:text-foreground"
-            aria-label="닫기"
+            aria-label={tc('close')}
           >
             ✕
           </button>
@@ -165,7 +168,7 @@ export function RoomSettingsDialog({
           {/* 방 이름 */}
           <div>
             <label className="text-muted-foreground mb-1 block text-xs">
-              방 이름
+              {t('settings.nameLabel')}
             </label>
             <input
               value={roomNm}
@@ -178,7 +181,7 @@ export function RoomSettingsDialog({
           {/* 방 설명 */}
           <div>
             <label className="text-muted-foreground mb-1 block text-xs">
-              방 설명 (선택)
+              {t('settings.descLabel')}
             </label>
             <input
               value={roomDesc}
@@ -191,7 +194,7 @@ export function RoomSettingsDialog({
           {/* 정원 */}
           <div>
             <label className="text-muted-foreground mb-1 block text-xs">
-              정원 (2~1000명)
+              {t('settings.capacity')}
             </label>
             <input
               type="number"
@@ -208,12 +211,14 @@ export function RoomSettingsDialog({
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium">
-                  {isPublic ? '🌐 공개방' : '🔒 비밀방'}
+                  {isPublic
+                    ? t('settings.publicRoom')
+                    : t('settings.secretRoom')}
                 </p>
                 <p className="text-muted-foreground text-xs">
                   {isPublic
-                    ? '누구나 입장 가능 (마켓플레이스 노출)'
-                    : '비밀번호를 아는 사람만 입장'}
+                    ? t('settings.publicHint')
+                    : t('settings.secretHint')}
                 </p>
               </div>
               <button
@@ -221,7 +226,7 @@ export function RoomSettingsDialog({
                 className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${
                   isPublic ? 'bg-primary' : 'bg-muted-foreground/30'
                 }`}
-                aria-label="공개 여부 전환"
+                aria-label={t('settings.visibility')}
               >
                 <span
                   className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
@@ -236,7 +241,7 @@ export function RoomSettingsDialog({
               <div className="mt-3 space-y-2 border-t pt-3">
                 {initial.has_join_pwd && !removePwd && (
                   <p className="text-xs text-emerald-600 dark:text-emerald-400">
-                    🔑 비밀번호가 설정되어 있습니다 (비우면 유지)
+                    {t('settings.pwdSetHint')}
                   </p>
                 )}
                 <input
@@ -248,8 +253,8 @@ export function RoomSettingsDialog({
                   }}
                   placeholder={
                     initial.has_join_pwd
-                      ? '새 비밀번호 (변경 시에만 입력)'
-                      : '입장 비밀번호 (4~64자)'
+                      ? t('settings.pwdChangeLabel')
+                      : t('settings.pwdLabel')
                   }
                   disabled={removePwd}
                   maxLength={64}
@@ -265,7 +270,7 @@ export function RoomSettingsDialog({
                         if (e.target.checked) setNewPwd('')
                       }}
                     />
-                    비밀번호 제거 (초대/방장만 입장 가능)
+                    {t('settings.pwdRemove')}
                   </label>
                 )}
               </div>
@@ -274,10 +279,9 @@ export function RoomSettingsDialog({
 
           {/* 카페 부스트 — 공개 카페 목록 상단 노출(노출 우선) */}
           <div className="rounded-xl border border-orange-200 bg-orange-50 p-3 dark:border-orange-900 dark:bg-orange-950/20">
-            <p className="text-sm font-medium">🚀 카페 부스트</p>
+            <p className="text-sm font-medium">{t('settings.boostTitle')}</p>
             <p className="text-muted-foreground text-xs">
-              공개 카페 목록 상단에 {ROOM_BOOST_DAYS}일간 우선 노출됩니다. (기간
-              내 재구매 시 연장)
+              {t('settings.boostDesc', { days: ROOM_BOOST_DAYS })}
             </p>
             <button
               onClick={boost}
@@ -285,8 +289,11 @@ export function RoomSettingsDialog({
               className="mt-2 w-full rounded-lg bg-orange-500 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50"
             >
               {boosting
-                ? '처리 중…'
-                : `${ROOM_BOOST_DAYS}일 부스트 (${boostFeeLabel})`}
+                ? tc('processing')
+                : t('settings.boostBtn', {
+                    days: ROOM_BOOST_DAYS,
+                    fee: boostFeeLabel,
+                  })}
             </button>
           </div>
 
@@ -295,7 +302,7 @@ export function RoomSettingsDialog({
             disabled={saving}
             className="bg-primary text-primary-foreground w-full rounded-lg py-2 text-sm font-medium hover:opacity-90 disabled:opacity-50"
           >
-            {saving ? '저장 중…' : '저장'}
+            {saving ? tc('saving') : tc('save')}
           </button>
         </div>
       </div>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { Link } from '@/i18n/navigation'
 import { piFetch } from '@/lib/pi-fetch'
@@ -22,6 +23,8 @@ export function RoomEntryFeeGate({
   balance: number
 }) {
   const router = useRouter()
+  const t = useTranslations('chat')
+  const tc = useTranslations('common')
   const [joining, setJoining] = useState(false)
   const [bal, setBal] = useState(balance)
   const insufficient = bal < feeBean
@@ -64,26 +67,35 @@ export function RoomEntryFeeGate({
         <>
           <p>
             <BeanIcon className="inline-block h-4 w-4 align-text-bottom" />{' '}
-            입장에 <b className="text-primary">{feeBean} Bean</b>이 필요하지만
-            잔액이 부족합니다
+            {t.rich('clientRoom.beanInsufficient', {
+              fee: feeBean,
+              b: (chunks) => <b className="text-primary">{chunks}</b>,
+            })}
           </p>
-          <p className="text-xs">현재 잔액 {bal} Bean</p>
+          <p className="text-xs">
+            {t('clientRoom.currentBalance', { balance: bal })}
+          </p>
           <Link
             href="/bean"
             className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-5 py-2.5 text-sm font-medium transition-colors"
           >
-            Bean 충전하기
+            {t('clientRoom.chargeBean')}
           </Link>
         </>
       ) : (
         <>
           <p>
-            <BeanIcon className="inline-block h-4 w-4 align-text-bottom" /> 이
-            카페 입장에는 <b className="text-primary">{feeBean} Bean</b>이
-            소진됩니다
+            <BeanIcon className="inline-block h-4 w-4 align-text-bottom" />{' '}
+            {t.rich('clientRoom.beanEntryNotice', {
+              fee: feeBean,
+              b: (chunks) => <b className="text-primary">{chunks}</b>,
+            })}
           </p>
           <p className="text-xs">
-            현재 잔액 {bal} Bean → 입장 후 {bal - feeBean} Bean
+            {t('clientRoom.beanBalanceAfter', {
+              balance: bal,
+              after: bal - feeBean,
+            })}
           </p>
           <button
             type="button"
@@ -91,12 +103,14 @@ export function RoomEntryFeeGate({
             onClick={handleJoin}
             className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-xl px-5 py-2.5 text-sm font-medium transition-colors disabled:opacity-50"
           >
-            {joining ? '입장 중…' : `${feeBean} Bean 쓰고 입장`}
+            {joining
+              ? t('clientRoom.entering')
+              : t('clientRoom.spendBeanEnter', { fee: feeBean })}
           </button>
         </>
       )}
       <Link href="/chat" className="text-muted-foreground text-xs underline">
-        목록으로
+        {tc('backToList')}
       </Link>
     </div>
   )

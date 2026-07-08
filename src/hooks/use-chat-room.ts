@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useRef, useCallback, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { getSupabaseClient } from '@/lib/supabase-client'
 import { piFetch } from '@/lib/pi-fetch'
@@ -79,6 +80,7 @@ export function useChatRoom(
     onBadgeAward,
   }: UseChatRoomOptions,
 ): UseChatRoomReturn {
+  const t = useTranslations('sysUi')
   // 초기 메시지에 trans_locale 세팅 — 서버가 trans_cont를 미리 채운 경우 현재 locale로 표시
   const [messages, setMessages] = useState<ChatMessage[]>(() =>
     userLocale
@@ -148,9 +150,7 @@ export function useChatRoom(
           totalApplied += Object.keys(translations).length
           // 일일 무료 번역 한도 소진 — 일부만 번역됨(나머지 원문). 1회 안내.
           if (quotaExhausted) {
-            toast.info(
-              '오늘 무료 번역 한도를 모두 사용했어요. 내일 다시 이용할 수 있습니다.',
-            )
+            toast.info(t('transQuotaExhausted'))
           }
           // trans_locale 기록: 언어 재전환 시 이 번역을 캐시로 재사용
           setMessages((prev) =>
@@ -168,12 +168,10 @@ export function useChatRoom(
       }
       // 요청 전부가 실패하면 번역 엔진 장애(API 크레딧 소진 등) — 사용자에게 1회 안내
       if (attempted > 0 && totalApplied === 0) {
-        toast.error(
-          '번역 서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.',
-        )
+        toast.error(t('transServerError'))
       }
     },
-    [roomId, userLocale],
+    [roomId, userLocale, t],
   )
 
   // 수신 메시지 번역 요청 — 두 모드를 단일 함수로 통합.

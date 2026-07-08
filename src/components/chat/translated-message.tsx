@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { piFetch } from '@/lib/pi-fetch'
 
 // PyTranslate™ 번역/원문 전환 (TASK-097) + 번역 품질 피드백 👍/👎 (TASK-099)
@@ -18,6 +19,7 @@ export function TranslatedMessage({
   msgId?: string
   localeCd?: string | null
 }) {
+  const t = useTranslations('chat')
   const [showOriginal, setShowOriginal] = useState(false)
   const [feedback, setFeedback] = useState<'Y' | 'N' | null>(null)
   const [sending, setSending] = useState(false)
@@ -53,13 +55,15 @@ export function TranslatedMessage({
           onClick={() => setShowOriginal((v) => !v)}
           className="text-[10px] underline opacity-60 transition-opacity hover:opacity-100"
         >
-          {showOriginal ? '번역 보기' : '원문 보기'}
+          {showOriginal
+            ? t('translated.showTranslation')
+            : t('translated.showOriginal')}
         </button>
         {canFeedback && (
           <span className="flex items-center gap-1">
             <button
               type="button"
-              aria-label="번역 좋아요"
+              aria-label={t('translated.feedbackUp')}
               disabled={sending}
               onClick={() => sendFeedback('Y')}
               className={`text-[11px] transition-opacity ${feedback === 'Y' ? 'opacity-100' : 'opacity-40 hover:opacity-100'}`}
@@ -68,7 +72,7 @@ export function TranslatedMessage({
             </button>
             <button
               type="button"
-              aria-label="번역 별로예요"
+              aria-label={t('translated.feedbackDown')}
               disabled={sending}
               onClick={() => sendFeedback('N')}
               className={`text-[11px] transition-opacity ${feedback === 'N' ? 'opacity-100' : 'opacity-40 hover:opacity-100'}`}

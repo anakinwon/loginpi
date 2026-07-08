@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { useTranslations } from 'next-intl'
 import { BeanIcon } from '@/components/ui/bean-icon'
 
 interface Campaign {
@@ -51,16 +52,18 @@ interface PendingData {
   reward_bean: number
 }
 
-const RESULT_MSG: Record<string, { text: string; ok: boolean }> = {
-  APPROVED: { text: '승인·지급 완료', ok: true },
-  REJECTED: { text: '거절 처리됨', ok: true },
-  SOLD_OUT: { text: '선착순 한도 도달 — 더 승인할 수 없습니다', ok: false },
-  INSUFFICIENT_POOL: { text: '보상 재원(REWARD_POOL)이 부족합니다', ok: false },
-  NOT_PENDING: { text: '대기 중인 신청이 아닙니다', ok: false },
+// 처리 결과 성공 여부 — 메시지는 i18n(adminCampaign.result.*)
+const RESULT_OK: Record<string, boolean> = {
+  APPROVED: true,
+  REJECTED: true,
+  SOLD_OUT: false,
+  INSUFFICIENT_POOL: false,
+  NOT_PENDING: false,
 }
 
 // ── 재원(REWARD_POOL) 충전 박스 ──────────────────────────────
 function MintBox({ balance, onDone }: { balance: number; onDone: () => void }) {
+  const t = useTranslations()
   const [amt, setAmt] = useState('')
   const [reason, setReason] = useState('')
   const [busy, setBusy] = useState(false)
@@ -68,11 +71,11 @@ function MintBox({ balance, onDone }: { balance: number; onDone: () => void }) {
   async function mint() {
     const n = Math.floor(Number(amt))
     if (!Number.isInteger(n) || n <= 0) {
-      toast.error('발행액은 1 이상 정수여야 합니다')
+      toast.error(t('adminCampaign.mintAmountError'))
       return
     }
     if (!reason.trim()) {
-      toast.error('발행 사유는 필수입니다')
+      toast.error(t('adminCampaign.mintReasonError'))
       return
     }
     setBusy(true)
@@ -88,15 +91,15 @@ function MintBox({ balance, onDone }: { balance: number; onDone: () => void }) {
       })
       const d = (await res.json()) as { ok?: boolean; error?: string }
       if (res.ok && d.ok) {
-        toast.success('REWARD_POOL 재원 충전 완료')
+        toast.success(t('adminCampaign.mintSuccess'))
         setAmt('')
         setReason('')
         onDone()
       } else {
-        toast.error(d.error ?? '발행 실패')
+        toast.error(d.error ?? t('adminCampaign.mintFail'))
       }
     } catch {
-      toast.error('네트워크 오류')
+      toast.error(t('adminCampaign.networkError'))
     } finally {
       setBusy(false)
     }
@@ -106,10 +109,10 @@ function MintBox({ balance, onDone }: { balance: number; onDone: () => void }) {
     <div className="rounded-lg border border-teal-200 bg-teal-50 p-4 dark:border-teal-800 dark:bg-teal-950/30">
       <div className="flex items-center justify-between">
         <p className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-          REWARD_POOL 생태계 기금 (보상 재원)
+          {t('adminCampaign.mintTitle')}
         </p>
         <span className="rounded bg-black/10 px-1.5 py-0.5 text-xs font-semibold dark:bg-white/10">
-          충전=발행
+          {t('adminCampaign.mintBadge')}
         </span>
       </div>
       <p className="mt-1 flex items-center gap-1.5 text-2xl font-bold tabular-nums">
@@ -124,14 +127,14 @@ function MintBox({ balance, onDone }: { balance: number; onDone: () => void }) {
           min={1}
           value={amt}
           onChange={(e) => setAmt(e.target.value)}
-          placeholder="발행액(Bean)"
+          placeholder={t('adminCampaign.mintAmountPlaceholder')}
           className="bg-background w-32 rounded-md border px-2 py-1 text-sm tabular-nums"
         />
         <input
           type="text"
           value={reason}
           onChange={(e) => setReason(e.target.value)}
-          placeholder="발행 사유 (필수)"
+          placeholder={t('adminCampaign.mintReasonPlaceholder')}
           className="bg-background min-w-40 flex-1 rounded-md border px-2 py-1 text-sm"
         />
         <button
@@ -139,12 +142,11 @@ function MintBox({ balance, onDone }: { balance: number; onDone: () => void }) {
           disabled={busy}
           className="rounded-lg bg-teal-600 px-3 py-1.5 text-sm font-medium text-white hover:opacity-90 disabled:opacity-40"
         >
-          충전
+          {t('adminCampaign.mintBtn')}
         </button>
       </div>
       <p className="text-muted-foreground mt-1.5 text-xs">
-        현금(Pi) 없는 보조금성 발행 — bean_mint_log 기록 + 대차대조표 발행
-        총량에 합산
+        {t('adminCampaign.mintNote')}
       </p>
     </div>
   )
@@ -152,6 +154,7 @@ function MintBox({ balance, onDone }: { balance: number; onDone: () => void }) {
 
 // ── 새 캠페인 생성 폼 ────────────────────────────────────────
 function CreateForm({ onDone }: { onDone: () => void }) {
+  const t = useTranslations()
   const [open, setOpen] = useState(false)
   const [cd, setCd] = useState('')
   const [nm, setNm] = useState('')
@@ -184,7 +187,7 @@ function CreateForm({ onDone }: { onDone: () => void }) {
       })
       const d = (await res.json()) as { status?: string; error?: string }
       if (res.ok && d.status === 'CREATED') {
-        toast.success(`캠페인 생성: ${d.status}`)
+        toast.success(t('adminCampaign.createSuccess', { status: d.status }))
         setCd('')
         setNm('')
         setReward('')
@@ -195,10 +198,10 @@ function CreateForm({ onDone }: { onDone: () => void }) {
         setOpen(false)
         onDone()
       } else {
-        toast.error(d.error ?? '생성 실패')
+        toast.error(d.error ?? t('adminCampaign.createFail'))
       }
     } catch {
-      toast.error('네트워크 오류')
+      toast.error(t('adminCampaign.networkError'))
     } finally {
       setBusy(false)
     }
@@ -210,17 +213,19 @@ function CreateForm({ onDone }: { onDone: () => void }) {
         onClick={() => setOpen(true)}
         className="hover:bg-muted rounded-lg border border-dashed px-4 py-2 text-sm font-medium"
       >
-        + 새 캠페인 만들기
+        {t('adminCampaign.createOpen')}
       </button>
     )
   }
 
   return (
     <div className="space-y-3 rounded-lg border p-4">
-      <p className="text-sm font-semibold">새 캠페인</p>
+      <p className="text-sm font-semibold">{t('adminCampaign.createTitle')}</p>
       <div className="grid gap-3 sm:grid-cols-2">
         <label className="space-y-1 text-xs">
-          <span className="text-muted-foreground">캠페인 코드 (대문자_)</span>
+          <span className="text-muted-foreground">
+            {t('adminCampaign.codeLabel')}
+          </span>
           <input
             value={cd}
             onChange={(e) => setCd(e.target.value)}
@@ -229,16 +234,20 @@ function CreateForm({ onDone }: { onDone: () => void }) {
           />
         </label>
         <label className="space-y-1 text-xs">
-          <span className="text-muted-foreground">캠페인 이름</span>
+          <span className="text-muted-foreground">
+            {t('adminCampaign.nameLabel')}
+          </span>
           <input
             value={nm}
             onChange={(e) => setNm(e.target.value)}
-            placeholder="로그인 미션 보상"
+            placeholder={t('adminCampaign.namePlaceholder')}
             className="bg-background w-full rounded-md border px-2 py-1 text-sm"
           />
         </label>
         <label className="space-y-1 text-xs">
-          <span className="text-muted-foreground">건당 보상 (Bean)</span>
+          <span className="text-muted-foreground">
+            {t('adminCampaign.rewardLabel')}
+          </span>
           <input
             type="number"
             min={1}
@@ -249,7 +258,9 @@ function CreateForm({ onDone }: { onDone: () => void }) {
           />
         </label>
         <label className="space-y-1 text-xs">
-          <span className="text-muted-foreground">선착순 한도 (명)</span>
+          <span className="text-muted-foreground">
+            {t('adminCampaign.maxCntLabel')}
+          </span>
           <input
             type="number"
             min={1}
@@ -267,7 +278,7 @@ function CreateForm({ onDone }: { onDone: () => void }) {
             checked={reqShop}
             onChange={(e) => setReqShop(e.target.checked)}
           />
-          매장 가입 필요
+          {t('adminCampaign.reqShop')}
         </label>
         <label className="flex items-center gap-1.5">
           <input
@@ -275,7 +286,7 @@ function CreateForm({ onDone }: { onDone: () => void }) {
             checked={reqItem}
             onChange={(e) => setReqItem(e.target.checked)}
           />
-          상품 1개+ 필요
+          {t('adminCampaign.reqItem')}
         </label>
         <label className="flex items-center gap-1.5">
           <input
@@ -283,7 +294,7 @@ function CreateForm({ onDone }: { onDone: () => void }) {
             checked={reqTlgm}
             onChange={(e) => setReqTlgm(e.target.checked)}
           />
-          텔레그램 연동 필요
+          {t('adminCampaign.reqTelegram')}
         </label>
       </div>
       <div className="flex gap-2">
@@ -292,13 +303,13 @@ function CreateForm({ onDone }: { onDone: () => void }) {
           disabled={busy}
           className="bg-primary text-primary-foreground rounded-lg px-3 py-1.5 text-sm font-medium hover:opacity-90 disabled:opacity-40"
         >
-          생성
+          {t('adminCampaign.createBtn')}
         </button>
         <button
           onClick={() => setOpen(false)}
           className="hover:bg-muted rounded-lg border px-3 py-1.5 text-sm"
         >
-          취소
+          {t('common.cancel')}
         </button>
       </div>
     </div>
@@ -315,6 +326,7 @@ function CampaignCard({
   onSelect: () => void
   onChanged: () => void
 }) {
+  const t = useTranslations()
   const [busy, setBusy] = useState(false)
   const active = c.active_yn === 'Y'
 
@@ -331,25 +343,30 @@ function CampaignCard({
         }),
       })
       if (res.ok) {
-        toast.success(active ? '비활성화됨' : '활성화됨')
+        toast.success(
+          active
+            ? t('adminCampaign.deactivated')
+            : t('adminCampaign.activated'),
+        )
         onChanged()
       } else {
         const d = (await res.json()) as { error?: string }
-        toast.error(d.error ?? '수정 실패')
+        toast.error(d.error ?? t('adminCampaign.updateFail'))
       }
     } catch {
-      toast.error('네트워크 오류')
+      toast.error(t('adminCampaign.networkError'))
     } finally {
       setBusy(false)
     }
   }
 
   const reqs = [
-    c.require_shop_yn === 'Y' && 'M1 매장',
-    c.require_item_yn === 'Y' && 'M2 상품',
-    c.require_telegram_yn === 'Y' && 'M3 텔레그램',
-    c.require_tlgm_alrt_yn === 'Y' && 'M4 알림확인',
-    c.require_mission_cnt > 0 && `미션${c.require_mission_cnt}`,
+    c.require_shop_yn === 'Y' && t('adminCampaign.req.shop'),
+    c.require_item_yn === 'Y' && t('adminCampaign.req.item'),
+    c.require_telegram_yn === 'Y' && t('adminCampaign.req.telegram'),
+    c.require_tlgm_alrt_yn === 'Y' && t('adminCampaign.req.tlgmAlrt'),
+    c.require_mission_cnt > 0 &&
+      t('adminCampaign.req.mission', { count: c.require_mission_cnt }),
   ].filter(Boolean) as string[]
 
   return (
@@ -368,7 +385,7 @@ function CampaignCard({
               : 'bg-muted text-muted-foreground'
           }`}
         >
-          {active ? '활성' : '비활성'}
+          {active ? t('adminCampaign.active') : t('adminCampaign.inactive')}
         </span>
       </div>
 
@@ -377,25 +394,31 @@ function CampaignCard({
           <p className="font-bold tabular-nums">
             {c.reward_bean.toLocaleString()}
           </p>
-          <p className="text-muted-foreground text-xs">건당 보상</p>
+          <p className="text-muted-foreground text-xs">
+            {t('adminCampaign.rewardPerCase')}
+          </p>
         </div>
         <div className="bg-muted/40 rounded-md py-1.5">
           <p className="font-bold tabular-nums">
             {c.approved}/{c.max_grant_cnt}
           </p>
-          <p className="text-muted-foreground text-xs">승인/한도</p>
+          <p className="text-muted-foreground text-xs">
+            {t('adminCampaign.approvedLimit')}
+          </p>
         </div>
         <div className="bg-muted/40 rounded-md py-1.5">
           <p className="font-bold text-amber-600 tabular-nums dark:text-amber-400">
             {c.pending}
           </p>
-          <p className="text-muted-foreground text-xs">대기</p>
+          <p className="text-muted-foreground text-xs">
+            {t('adminCampaign.pending')}
+          </p>
         </div>
       </div>
 
       {reqs.length > 0 && (
         <p className="text-muted-foreground mt-2 text-xs">
-          자격: {reqs.join(' · ')}
+          {t('adminCampaign.eligibility', { reqs: reqs.join(' · ') })}
         </p>
       )}
 
@@ -404,14 +427,14 @@ function CampaignCard({
           onClick={onSelect}
           className="bg-primary text-primary-foreground flex-1 rounded-lg px-3 py-1.5 text-xs font-medium hover:opacity-90"
         >
-          신청 관리 {c.pending > 0 && `(${c.pending})`}
+          {t('adminCampaign.manageApply')} {c.pending > 0 && `(${c.pending})`}
         </button>
         <button
           onClick={toggle}
           disabled={busy}
           className="hover:bg-muted rounded-lg border px-3 py-1.5 text-xs font-medium disabled:opacity-40"
         >
-          {active ? '비활성화' : '활성화'}
+          {active ? t('adminCampaign.deactivate') : t('adminCampaign.activate')}
         </button>
       </div>
     </div>
@@ -428,6 +451,7 @@ function PendingPanel({
   onClose: () => void
   onActed: () => void
 }) {
+  const t = useTranslations()
   const [data, setData] = useState<PendingData | null>(null)
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState<string | null>(null)
@@ -458,13 +482,18 @@ function PendingPanel({
         }),
       })
       const d = (await res.json()) as { status?: string }
-      const m = RESULT_MSG[d.status ?? ''] ?? { text: '처리 완료', ok: true }
-      if (m.ok) toast.success(m.text)
-      else toast.error(m.text)
+      const status = d.status ?? ''
+      const ok = RESULT_OK[status] ?? true
+      const text =
+        status in RESULT_OK
+          ? t(`adminCampaign.result.${status}`)
+          : t('adminCampaign.result.DONE')
+      if (ok) toast.success(text)
+      else toast.error(text)
       await load()
       onActed()
     } catch {
-      toast.error('네트워크 오류')
+      toast.error(t('adminCampaign.networkError'))
     } finally {
       setBusy(null)
     }
@@ -475,14 +504,19 @@ function PendingPanel({
       <div className="flex items-center justify-between">
         <div>
           <p className="font-semibold">
-            {data?.campaign_nm ?? campaignCd} — 신청 승인
+            {t('adminCampaign.applyTitle', {
+              name: data?.campaign_nm ?? campaignCd,
+            })}
           </p>
           {data && (
             <p className="text-muted-foreground mt-0.5 text-sm">
-              승인 {data.approved_cnt}/{data.max_cnt} · 건당{' '}
-              {data.reward_bean.toLocaleString()}{' '}
+              {t('adminCampaign.applyStat', {
+                approved: data.approved_cnt,
+                max: data.max_cnt,
+                reward: data.reward_bean.toLocaleString(),
+              })}{' '}
               <BeanIcon className="inline-block h-3.5 w-3.5 align-text-bottom" />{' '}
-              · 대기 {data.pending.length}건
+              {t('adminCampaign.applyPending', { count: data.pending.length })}
             </p>
           )}
         </div>
@@ -490,25 +524,33 @@ function PendingPanel({
           onClick={onClose}
           className="hover:bg-muted rounded-lg border px-2.5 py-1 text-xs"
         >
-          닫기
+          {t('common.close')}
         </button>
       </div>
 
       {loading ? (
-        <p className="text-muted-foreground text-sm">불러오는 중...</p>
+        <p className="text-muted-foreground text-sm">{t('common.fetching')}</p>
       ) : !data || data.pending.length === 0 ? (
         <p className="text-muted-foreground rounded-lg border p-6 text-center text-sm">
-          승인 대기 중인 신청이 없습니다.
+          {t('adminCampaign.noPending')}
         </p>
       ) : (
         <div className="overflow-hidden rounded-lg border">
           <table className="w-full text-sm">
             <thead className="bg-muted/50 border-b">
               <tr>
-                <th className="px-4 py-2 text-left font-medium">신청자</th>
-                <th className="px-4 py-2 text-left font-medium">신청일</th>
-                <th className="px-4 py-2 text-right font-medium">보상</th>
-                <th className="px-4 py-2 text-center font-medium">처리</th>
+                <th className="px-4 py-2 text-left font-medium">
+                  {t('adminCampaign.colApplicant')}
+                </th>
+                <th className="px-4 py-2 text-left font-medium">
+                  {t('adminCampaign.colApplyDate')}
+                </th>
+                <th className="px-4 py-2 text-right font-medium">
+                  {t('adminCampaign.colReward')}
+                </th>
+                <th className="px-4 py-2 text-center font-medium">
+                  {t('adminCampaign.colAction')}
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y">
@@ -546,17 +588,21 @@ function PendingPanel({
                         <button
                           onClick={() => act(r.usr_id, 'approve')}
                           disabled={busy === r.usr_id || soldOut}
-                          title={soldOut ? '선착순 한도 도달' : undefined}
+                          title={
+                            soldOut
+                              ? t('adminCampaign.soldOutTitle')
+                              : undefined
+                          }
                           className="rounded-lg bg-green-600 px-3 py-1 text-xs font-medium text-white hover:opacity-90 disabled:opacity-40"
                         >
-                          승인
+                          {t('adminCampaign.approve')}
                         </button>
                         <button
                           onClick={() => act(r.usr_id, 'reject')}
                           disabled={busy === r.usr_id}
                           className="hover:bg-muted rounded-lg border px-3 py-1 text-xs font-medium disabled:opacity-40"
                         >
-                          거절
+                          {t('adminCampaign.reject')}
                         </button>
                       </div>
                     </td>
@@ -573,6 +619,7 @@ function PendingPanel({
 
 // ── 메인 페이지 ──────────────────────────────────────────────
 export default function AdminCampaignPage() {
+  const t = useTranslations()
   const [data, setData] = useState<ListData | null>(null)
   const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState<string | null>(null)
@@ -591,11 +638,11 @@ export default function AdminCampaignPage() {
     <div className="space-y-5">
       <div>
         <h1 className="flex items-center gap-2 text-2xl font-bold">
-          <BeanIcon className="inline-block h-6 w-6" /> 보상 캠페인 운영
+          <BeanIcon className="inline-block h-6 w-6" />{' '}
+          {t('adminCampaign.title')}
         </h1>
         <p className="text-muted-foreground mt-1 text-sm">
-          캠페인 생성·활성 관리 + REWARD_POOL 재원 충전 + 신청 승인. 지급은
-          REWARD_POOL에서 차감되어 사용자 지갑으로 입금됩니다.
+          {t('adminCampaign.subtitle')}
         </p>
       </div>
 
@@ -612,10 +659,10 @@ export default function AdminCampaignPage() {
       )}
 
       {loading ? (
-        <p className="text-muted-foreground text-sm">불러오는 중...</p>
+        <p className="text-muted-foreground text-sm">{t('common.fetching')}</p>
       ) : !data || data.campaigns.length === 0 ? (
         <p className="text-muted-foreground rounded-lg border p-6 text-center text-sm">
-          등록된 캠페인이 없습니다. 위에서 새 캠페인을 만들어 주세요.
+          {t('adminCampaign.noCampaign')}
         </p>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

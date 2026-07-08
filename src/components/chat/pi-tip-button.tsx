@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
 import { TIP_PRESETS_BEAN, TIP_CUSTOM_MAX_BEAN } from '@/lib/bean-shared'
@@ -16,6 +17,8 @@ export function PiTipButton({
   recipientId,
   recipientName,
 }: PiTipButtonProps) {
+  const t = useTranslations('chat')
+  const tc = useTranslations('common')
   // PI 모드: 실제 Pi 전송이므로 표시도 Pi(÷100, π). 내부 amount는 항상 Bean(서버 계약 유지).
   const feeMode = useFeeMode()
   const isPi = feeMode === 'PI'
@@ -76,7 +79,7 @@ export function PiTipButton({
     metadata: Record<string, unknown>
   }) {
     if (typeof window === 'undefined' || !window.Pi) {
-      toast.error('Pi Browser에서 선물할 수 있습니다')
+      toast.error(t('tip.piBrowserOnly'))
       setSending(false)
       return
     }
@@ -92,7 +95,7 @@ export function PiTipButton({
             })
             if (!r.ok) throw new Error()
           } catch {
-            toast.error('선물 결제 승인 실패')
+            toast.error(t('tip.approveFail'))
             setSending(false)
             close()
           }
@@ -105,9 +108,9 @@ export function PiTipButton({
               body: JSON.stringify({ paymentId, txid }),
             })
             if (!r.ok) throw new Error()
-            toast.success(`${recipientName} 님께 Pi를 선물했습니다!`)
+            toast.success(t('tip.sentPi', { name: recipientName }))
           } catch {
-            toast.error('선물 처리 실패')
+            toast.error(t('tip.processFail'))
           } finally {
             setSending(false)
             close()
@@ -118,7 +121,7 @@ export function PiTipButton({
           close()
         },
         onError: (e: Error) => {
-          toast.error(e?.message ?? '선물 오류')
+          toast.error(e?.message ?? t('tip.error'))
           setSending(false)
           close()
         },
@@ -157,12 +160,14 @@ export function PiTipButton({
       }
       close()
       if (res.ok) {
-        toast.success(`${recipientName} 님께 ${fmt(amount)}을 선물했습니다!`)
+        toast.success(
+          t('tip.sent', { name: recipientName, amount: fmt(amount) }),
+        )
       } else {
-        toast.error(data.error ?? '전송에 실패했습니다')
+        toast.error(data.error ?? t('tip.sendFail'))
       }
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : '전송 오류')
+      toast.error(e instanceof Error ? e.message : t('tip.sendError'))
     } finally {
       if (!piHandoff) setSending(false)
     }
@@ -173,12 +178,12 @@ export function PiTipButton({
       <button
         onClick={() => (open ? close() : setOpen(true))}
         className="hover:bg-muted rounded-full px-2 py-0.5 text-xs opacity-70 transition-opacity hover:opacity-100"
-        title={`${recipientName}님께 선물하기`}
+        title={t('tip.giveTo', { name: recipientName })}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/bean.png"
-          alt="선물"
+          alt={t('tip.giftAlt')}
           className="inline-block h-8 w-8 brightness-125"
         />
       </button>
@@ -188,11 +193,11 @@ export function PiTipButton({
             // ── 1단계: 금액 선택 ──
             <>
               <div className="text-muted-foreground mb-1.5 flex items-center justify-between px-1 text-xs">
-                <span>{unit} 금액 선택</span>
+                <span>{t('tip.amountSelect', { unit })}</span>
                 <button
                   onClick={close}
                   className="hover:text-foreground"
-                  aria-label="닫기"
+                  aria-label={tc('close')}
                 >
                   ✕
                 </button>
@@ -215,7 +220,10 @@ export function PiTipButton({
                   onClick={() => setCustomOpen(true)}
                   className="hover:bg-muted mt-1 w-full rounded-lg border border-dashed px-2 py-1.5 text-xs font-medium"
                 >
-                  ✏️ 직접 입력 (최대 {customMaxDisp.toLocaleString()} {unit})
+                  {t('tip.customInput', {
+                    max: customMaxDisp.toLocaleString(),
+                    unit,
+                  })}
                 </button>
               ) : (
                 <div className="mt-1.5">
@@ -245,13 +253,16 @@ export function PiTipButton({
                       onClick={() => setConfirmAmt(customBean)}
                       className="bg-primary text-primary-foreground rounded-lg px-3 py-1.5 text-xs font-medium disabled:opacity-40"
                     >
-                      확인
+                      {tc('confirm')}
                     </button>
                   </div>
                   {customVal !== '' && !customValid && (
                     <p className="mt-1 px-1 text-[11px] text-amber-600 dark:text-amber-400">
-                      {isPi ? '0.01' : '1'} ~ {customMaxDisp.toLocaleString()}{' '}
-                      {unit} 범위만 가능
+                      {t('tip.rangeOnly', {
+                        min: isPi ? '0.01' : '1',
+                        max: customMaxDisp.toLocaleString(),
+                        unit,
+                      })}
                     </p>
                   )}
                 </div>
@@ -261,11 +272,16 @@ export function PiTipButton({
             // ── 2단계: 선물 확인 ──
             <>
               <div className="mb-2 px-1 text-sm">
-                <span className="font-semibold">{recipientName}</span> 님께{' '}
-                <span className="text-primary font-semibold">
-                  {fmt(confirmAmt)}
-                </span>
-                을 선물하시겠습니까?
+                {t.rich('tip.confirmQuestion', {
+                  name: recipientName,
+                  amount: fmt(confirmAmt),
+                  b: (chunks) => (
+                    <span className="font-semibold">{chunks}</span>
+                  ),
+                  amt: (chunks) => (
+                    <span className="text-primary font-semibold">{chunks}</span>
+                  ),
+                })}
               </div>
               <div className="flex gap-1">
                 <button
@@ -273,14 +289,14 @@ export function PiTipButton({
                   onClick={() => sendTip(confirmAmt)}
                   className="bg-primary text-primary-foreground hover:bg-primary/90 flex-1 rounded-lg px-2 py-1.5 text-xs font-medium disabled:opacity-50"
                 >
-                  {sending ? '전송 중…' : '선물하기'}
+                  {sending ? t('tip.sending') : t('tip.give')}
                 </button>
                 <button
                   disabled={sending}
                   onClick={() => setConfirmAmt(null)}
                   className="hover:bg-muted text-muted-foreground rounded-lg border px-2 py-1.5 text-xs disabled:opacity-50"
                 >
-                  취소
+                  {tc('cancel')}
                 </button>
               </div>
             </>

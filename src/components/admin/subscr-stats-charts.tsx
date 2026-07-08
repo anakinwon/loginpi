@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
+import { useTranslations } from 'next-intl'
 import PlotlyPlot from '@/components/charts/plotly-plot'
 
 // 구독관리 통계 차트 — bean_subscr 데이터를 3개 차원으로 시각화.
@@ -18,11 +19,6 @@ export interface SubscrChartRow {
 }
 
 const PRODUCTS: SubscrProduct[] = ['PICAFE', 'PISHOP', 'TRANSLATE']
-const PRODUCT_LABEL: Record<SubscrProduct, string> = {
-  PICAFE: 'PyCafé™',
-  PISHOP: 'PyShop™',
-  TRANSLATE: '번역',
-}
 // Plotly는 hex 색이 필요(tailwind 클래스 불가). page.tsx 뱃지 색과 동일 계열.
 const PRODUCT_HEX: Record<SubscrProduct, string> = {
   PICAFE: '#f59e0b', // amber-500
@@ -64,6 +60,15 @@ export default function SubscrStatsCharts({
 }: {
   rows: SubscrChartRow[]
 }) {
+  const t = useTranslations('adminMgmt.subscrCharts')
+  const productLabel = (p: SubscrProduct): string => {
+    if (p === 'PICAFE') return 'PyCafé™'
+    if (p === 'PISHOP') return 'PyShop™'
+    return t('productTranslate')
+  }
+  const cycleName = (c: SubscrCycle): string =>
+    c === 'Y' ? t('cycleY') : t('cycleM')
+
   // 상품군별 건수·매출 합산 + 누적 시계열
   const { countByProduct, revByProduct, cycleByProduct, timeline } =
     useMemo(() => {
@@ -136,11 +141,14 @@ export default function SubscrStatsCharts({
     {
       type: 'pie' as const,
       hole: 0.55,
-      labels: PRODUCTS.map((p) => PRODUCT_LABEL[p]),
+      labels: PRODUCTS.map((p) => productLabel(p)),
       values: PRODUCTS.map((p) => countByProduct[p]),
       marker: { colors: PRODUCTS.map((p) => PRODUCT_HEX[p]) },
       textinfo: 'value+percent' as const,
-      hovertemplate: '%{label}<br>%{value}건<br>%{percent}<extra></extra>',
+      hovertemplate:
+        '%{label}<br>%{value}' +
+        t('unitCase') +
+        '<br>%{percent}<extra></extra>',
     },
   ]
 
@@ -153,7 +161,7 @@ export default function SubscrStatsCharts({
       type: 'bar' as const,
       orientation: 'h' as const,
       x: revSorted.map((p) => revByProduct[p]),
-      y: revSorted.map((p) => PRODUCT_LABEL[p]),
+      y: revSorted.map((p) => productLabel(p)),
       marker: { color: revSorted.map((p) => PRODUCT_HEX[p]) },
       text: revSorted.map((p) => revByProduct[p].toLocaleString()),
       textposition: 'auto' as const,
@@ -164,19 +172,19 @@ export default function SubscrStatsCharts({
   // ③ 결제주기 분포 — 스택 세로 막대 (상품군 x축, 월간/연간 누적)
   const cycleTraces = (['M', 'Y'] as SubscrCycle[]).map((c) => ({
     type: 'bar' as const,
-    name: c === 'M' ? '월간' : '연간',
-    x: PRODUCTS.map((p) => PRODUCT_LABEL[p]),
+    name: cycleName(c),
+    x: PRODUCTS.map((p) => productLabel(p)),
     y: PRODUCTS.map((p) => cycleByProduct[p][c]),
     marker: { color: CYCLE_HEX[c] },
     hovertemplate:
-      '%{x} ' + (c === 'M' ? '월간' : '연간') + '<br>%{y}건<extra></extra>',
+      '%{x} ' + cycleName(c) + '<br>%{y}' + t('unitCase') + '<extra></extra>',
   }))
 
   // ④ 상품군별 누적 구독 추이 — 다중 라인(시계열)
   const timelineTraces = PRODUCTS.map((p) => ({
     type: 'scatter' as const,
     mode: 'lines+markers' as const,
-    name: PRODUCT_LABEL[p],
+    name: productLabel(p),
     x: timeline.dates,
     y: timeline.cumByProduct[p],
     line: {
@@ -187,13 +195,19 @@ export default function SubscrStatsCharts({
     },
     marker: { size: 6, color: PRODUCT_HEX[p] },
     hovertemplate:
-      '%{x}<br>' + PRODUCT_LABEL[p] + ' 누적 %{y}건<extra></extra>',
+      '%{x}<br>' +
+      productLabel(p) +
+      ' ' +
+      t('cumulative') +
+      ' %{y}' +
+      t('unitCase') +
+      '<extra></extra>',
   }))
 
   return (
     <div className="space-y-4">
       {/* ④ 누적 구독 추이 — 풀폭 다중 라인 (성장세) */}
-      <ChartBox title="상품군별 누적 구독 추이">
+      <ChartBox title={t('titleTimeline')}>
         <PlotlyPlot
           data={timelineTraces}
           layout={{
@@ -221,7 +235,7 @@ export default function SubscrStatsCharts({
       </ChartBox>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <ChartBox title="상품군별 구독 건수">
+        <ChartBox title={t('titleCount')}>
           <PlotlyPlot
             data={donutTrace}
             layout={{
@@ -234,7 +248,7 @@ export default function SubscrStatsCharts({
           />
         </ChartBox>
 
-        <ChartBox title="상품군별 Bean 매출">
+        <ChartBox title={t('titleRevenue')}>
           <PlotlyPlot
             data={revBarTrace}
             layout={{
@@ -249,7 +263,7 @@ export default function SubscrStatsCharts({
           />
         </ChartBox>
 
-        <ChartBox title="결제주기 분포 (월간·연간)">
+        <ChartBox title={t('titleCycle')}>
           <PlotlyPlot
             data={cycleTraces}
             layout={{

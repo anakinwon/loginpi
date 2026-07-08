@@ -31,7 +31,9 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
   }
 
-  const body = (await req.json().catch(() => null)) as { hrefs?: unknown } | null
+  const body = (await req.json().catch(() => null)) as {
+    hrefs?: unknown
+  } | null
   const rawHrefs = Array.isArray(body?.hrefs) ? body!.hrefs : null
   if (!rawHrefs) {
     return NextResponse.json({ error: '잘못된 요청' }, { status: 400 })

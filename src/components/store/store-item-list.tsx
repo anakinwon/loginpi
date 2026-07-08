@@ -377,7 +377,7 @@ export function StoreItemList({ mine = false }: StoreItemListProps) {
       ) : items.length === 0 ? (
         <p className="text-muted-foreground py-16 text-center text-sm">
           {mine
-            ? '등록한 상품이 없습니다'
+            ? t('noMyItems')
             : sort === 'distance'
               ? t('noNearbyItems', { radius: 10 })
               : t('noItems')}
@@ -613,6 +613,7 @@ function PublicItemGroups({
   lbsConsent: 'Y' | 'N' | null
   piMode?: boolean
 }) {
+  const tc = useTranslations('common')
   // shop_id 유무로만 분리 — 매장별 세분화 없음
   const shopItems = items
     .filter((i) => i.shop_id)
@@ -629,9 +630,9 @@ function PublicItemGroups({
       {shopItems.length > 0 && (
         <div className="space-y-3">
           <h3 className="text-sm font-semibold">
-            🏪 오프라인 매장 상품
+            {t('groupOfflineShop')}
             <span className="text-muted-foreground ml-2 text-xs font-normal">
-              ({shopItems.length}개)
+              ({tc('countItem', { count: shopItems.length })})
             </span>
           </h3>
           {piMode ? (
@@ -669,9 +670,9 @@ function PublicItemGroups({
       {directItems.length > 0 && (
         <div className="space-y-3">
           <h3 className="text-sm font-semibold">
-            🤝 직거래 상품
+            {t('groupDirect')}
             <span className="text-muted-foreground ml-2 text-xs font-normal">
-              ({directItems.length}개)
+              ({tc('countItem', { count: directItems.length })})
             </span>
           </h3>
           {piMode ? (
@@ -720,6 +721,7 @@ function MyItemGroups({
   t: TFunc
   piMode?: boolean
 }) {
+  const tc = useTranslations('common')
   // 매장별 그룹핑: shop_id 기준으로 Map 구성, null → 직거래
   const shopMap = new Map<string, { shopNm: string; items: StoreItem[] }>()
   const directItems: StoreItem[] = []
@@ -731,7 +733,7 @@ function MyItemGroups({
         existing.items.push(item)
       } else {
         shopMap.set(item.shop_id, {
-          shopNm: item.shop_nm ?? '매장',
+          shopNm: item.shop_nm ?? t('shopFallback'),
           items: [item],
         })
       }
@@ -745,7 +747,7 @@ function MyItemGroups({
       {/* 매장 등록 상품 — 매장별 섹션 */}
       {shopMap.size > 0 && (
         <div className="space-y-6">
-          <h3 className="text-sm font-semibold">🏪 매장 등록 상품</h3>
+          <h3 className="text-sm font-semibold">{t('groupMyShopItems')}</h3>
           {Array.from(shopMap.entries()).map(([shopId, group]) => (
             <div key={shopId} className="space-y-3">
               <div className="flex items-center gap-2">
@@ -753,7 +755,7 @@ function MyItemGroups({
                   {group.shopNm}
                 </span>
                 <span className="text-muted-foreground text-xs">
-                  ({group.items.length}개)
+                  ({tc('countItem', { count: group.items.length })})
                 </span>
               </div>
               {piMode ? (
@@ -792,9 +794,9 @@ function MyItemGroups({
       {directItems.length > 0 && (
         <div className="space-y-3">
           <h3 className="text-sm font-semibold">
-            🤝 직거래 상품
+            {t('groupDirect')}
             <span className="text-muted-foreground ml-2 text-xs font-normal">
-              ({directItems.length}개)
+              ({tc('countItem', { count: directItems.length })})
             </span>
           </h3>
           {piMode ? (

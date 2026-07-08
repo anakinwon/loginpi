@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
 import { cn } from '@/lib/utils'
@@ -45,28 +46,14 @@ interface DeployOverview {
 const short = (s?: string | null) => (s ? s.slice(0, 7) : '—')
 const TERMINAL = ['READY', 'ERROR', 'CANCELED']
 const isActive = (s: string | null) => !!s && !TERMINAL.includes(s)
-const STATE_UI: Record<string, { label: string; cls: string }> = {
-  QUEUED: { label: '⏳ 대기(QUEUED)', cls: 'bg-muted text-foreground' },
-  INITIALIZING: {
-    label: '⏳ 준비(INITIALIZING)',
-    cls: 'bg-muted text-foreground',
-  },
-  BUILDING: {
-    label: '🔨 빌드 중(BUILDING)',
-    cls: 'bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300',
-  },
-  READY: {
-    label: '✅ 완료(READY)',
-    cls: 'bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-300',
-  },
-  ERROR: {
-    label: '❌ 실패(ERROR)',
-    cls: 'bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-300',
-  },
-  CANCELED: {
-    label: '⛔ 취소(CANCELED)',
-    cls: 'bg-muted text-muted-foreground',
-  },
+// CSS 클래스만 모듈 스코프 상수로 유지 — 한글 라벨은 StatusBlock 내부에서 t()로 구성
+const STATE_CLS: Record<string, string> = {
+  QUEUED: 'bg-muted text-foreground',
+  INITIALIZING: 'bg-muted text-foreground',
+  BUILDING: 'bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300',
+  READY: 'bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-300',
+  ERROR: 'bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-300',
+  CANCELED: 'bg-muted text-muted-foreground',
 }
 
 function StatusBlock({
@@ -78,6 +65,15 @@ function StatusBlock({
   polling: boolean
   fallbackHint: string
 }) {
+  const t = useTranslations('adminOps')
+  const stateLabels: Record<string, string> = {
+    QUEUED: t('deploy.stateQueued'),
+    INITIALIZING: t('deploy.stateInitializing'),
+    BUILDING: t('deploy.stateBuilding'),
+    READY: t('deploy.stateReady'),
+    ERROR: t('deploy.stateError'),
+    CANCELED: t('deploy.stateCanceled'),
+  }
   if (!status?.configured)
     return <p className="text-muted-foreground mt-1 text-xs">{fallbackHint}</p>
   return (
@@ -86,18 +82,20 @@ function StatusBlock({
         <span
           className={cn(
             'rounded px-2 py-0.5 text-xs font-medium',
-            STATE_UI[status.state ?? '']?.cls ?? 'bg-muted',
+            STATE_CLS[status.state ?? ''] ?? 'bg-muted',
           )}
         >
-          {STATE_UI[status.state ?? '']?.label ?? status.state ?? '—'}
+          {stateLabels[status.state ?? ''] ?? status.state ?? '—'}
         </span>
         {polling && isActive(status.state) && (
-          <span className="text-muted-foreground text-xs">자동 갱신 중…</span>
+          <span className="text-muted-foreground text-xs">
+            {t('deploy.autoRefreshing')}
+          </span>
         )}
       </div>
       {status.commitSha && (
         <p className="text-muted-foreground text-xs">
-          배포된 커밋{' '}
+          {t('deploy.deployedCommit')}{' '}
           <span className="font-mono">{short(status.commitSha)}</span>{' '}
           {status.commitMessage}
         </p>
@@ -109,11 +107,13 @@ function StatusBlock({
           rel="noreferrer"
           className="text-primary text-xs hover:underline"
         >
-          Vercel 빌드 로그 ↗
+          {t('deploy.vercelBuildLog')}
         </a>
       )}
       {status.error && (
-        <p className="text-xs text-amber-600">조회 오류: {status.error}</p>
+        <p className="text-xs text-amber-600">
+          {t('deploy.queryError', { error: status.error })}
+        </p>
       )}
     </div>
   )
@@ -140,6 +140,8 @@ function CommitList({
 }
 
 export default function DeployPage() {
+  const t = useTranslations('adminOps')
+  const tc = useTranslations('common')
   const [ov, setOv] = useState<DeployOverview | null>(null)
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState<'staging' | 'production' | null>(null)
@@ -166,11 +168,11 @@ export default function DeployPage() {
         production: data.production.status,
       })
     } catch {
-      toast.error('배포 상태 조회 실패')
+      toast.error(t('deploy.loadFail'))
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [t])
 
   const loadStatuses = useCallback(async () => {
     try {
@@ -211,12 +213,7 @@ export default function DeployPage() {
     async (target: 'staging' | 'production') => {
       if (target === 'production') {
         const n = ov?.production.ahead ?? 0
-        if (
-          !window.confirm(
-            `운영(cafepi)에 master ${n}개 커밋을 출시합니다.\nStaging에서 검증 완료됐습니까? 계속하려면 확인을 누르세요.`,
-          )
-        )
-          return
+        if (!window.confirm(t('deploy.confirmProd', { n }))) return
       }
       setBusy(target)
       try {
@@ -229,8 +226,8 @@ export default function DeployPage() {
         if (res.ok && data.ok) {
           toast.success(
             target === 'staging'
-              ? 'Stage 재배포를 트리거했습니다(loginpi)'
-              : `운영 승격 완료(${short(data.sha)}) — cafepi 배포가 시작됩니다`,
+              ? t('deploy.stageTriggered')
+              : t('deploy.prodPromoted', { sha: short(data.sha) }),
           )
           await load()
           pollStart.current = Date.now()
@@ -239,23 +236,23 @@ export default function DeployPage() {
             void loadStatuses()
           }, 2500)
         } else {
-          toast.error(data.error || '실패')
+          toast.error(data.error || t('deploy.fail'))
         }
       } catch {
-        toast.error('요청 실패')
+        toast.error(t('deploy.reqFail'))
       } finally {
         setBusy(null)
       }
     },
-    [ov, load, loadStatuses],
+    [ov, load, loadStatuses, t],
   )
 
   if (forbidden)
     return (
       <div className="p-6">
-        <h1 className="text-xl font-semibold">배포 컨트롤</h1>
+        <h1 className="text-xl font-semibold">{t('deploy.title')}</h1>
         <p className="text-muted-foreground mt-3 text-sm">
-          이 화면은 <b>MASTER</b> 권한 전용입니다.
+          {t.rich('masterOnly', { b: (c) => <b>{c}</b> })}
         </p>
       </div>
     )
@@ -264,10 +261,9 @@ export default function DeployPage() {
     <div className="space-y-5 p-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold">배포 컨트롤</h1>
+          <h1 className="text-xl font-semibold">{t('deploy.title')}</h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            Stage(loginpi·master) → 운영(cafepi·production) 2단계. 승격은
-            fast-forward만 허용.
+            {t('deploy.subtitle')}
           </p>
         </div>
         <button
@@ -277,15 +273,16 @@ export default function DeployPage() {
           }}
           className="text-muted-foreground text-xs hover:underline"
         >
-          새로고침
+          {t('deploy.refresh')}
         </button>
       </div>
 
-      {loading && <p className="text-muted-foreground text-sm">불러오는 중…</p>}
+      {loading && (
+        <p className="text-muted-foreground text-sm">{tc('fetching')}</p>
+      )}
       {ov?.ghError && (
         <p className="rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-700 dark:bg-amber-950/40 dark:text-amber-400">
-          GitHub 연동 미구성/오류: {ov.ghError} — `GITHUB_DEPLOY_TOKEN` 설정
-          필요
+          {t('deploy.ghError', { error: ov.ghError })}
         </p>
       )}
 
@@ -294,12 +291,12 @@ export default function DeployPage() {
           {/* ── 1단: Stage ─────────────────────────────── */}
           <section className="space-y-3 rounded-xl border p-4">
             <h2 className="text-lg font-semibold">
-              🧪 Stage 서버 (loginpi · master)
+              {t('deploy.stageHeading')}
             </h2>
 
             <div>
               <p className="text-muted-foreground text-xs">
-                재배포 대상 (master HEAD)
+                {t('deploy.redeployTarget')}
               </p>
               {ov.master ? (
                 <p className="mt-1 text-sm">
@@ -308,12 +305,12 @@ export default function DeployPage() {
                 </p>
               ) : (
                 <p className="text-muted-foreground mt-1 text-xs">
-                  GitHub 미구성
+                  {t('deploy.githubNotConfigured')}
                 </p>
               )}
               {ov.staging.deployed && (
                 <p className="text-muted-foreground mt-1 text-xs">
-                  현재 배포:{' '}
+                  {t('deploy.currentDeploy')}{' '}
                   <span className="font-mono">
                     {short(ov.staging.deployed.sha)}
                   </span>
@@ -322,8 +319,7 @@ export default function DeployPage() {
               {ov.staging.pending.length > 0 && (
                 <div className="mt-2">
                   <p className="text-xs text-amber-600">
-                    ⚠ stage가 master보다 {ov.staging.pending.length}커밋 뒤처짐
-                    — 재배포 필요
+                    {t('deploy.stageBehind', { n: ov.staging.pending.length })}
                   </p>
                   <CommitList commits={ov.staging.pending} empty="" />
                 </div>
@@ -332,7 +328,7 @@ export default function DeployPage() {
                 ov.master &&
                 ov.staging.deployed.sha === ov.master.sha && (
                   <p className="text-muted-foreground mt-1 text-xs">
-                    master 최신과 동기 (재배포 = 현 master 재빌드)
+                    {t('deploy.stageInSync')}
                   </p>
                 )}
             </div>
@@ -342,47 +338,49 @@ export default function DeployPage() {
               disabled={busy !== null || !ov.configured.stagingHook}
               className="hover:bg-muted w-full rounded-md border px-4 py-2 text-sm font-medium disabled:opacity-50"
             >
-              {busy === 'staging' ? '배포 중…' : '🧪 Stage 서버 재배포'}
+              {busy === 'staging'
+                ? t('deploy.deploying')
+                : t('deploy.stageRedeploy')}
             </button>
             {!ov.configured.stagingHook && (
               <p className="text-muted-foreground text-xs">
-                · 비활성: `VERCEL_STAGING_DEPLOY_HOOK` 미설정
+                {t('deploy.stageHookDisabled')}
               </p>
             )}
 
             <div>
-              <p className="text-sm font-medium">최근 Stage 배포 상태</p>
+              <p className="text-sm font-medium">
+                {t('deploy.stageStatusTitle')}
+              </p>
               <StatusBlock
                 status={statuses.staging}
                 polling={polling}
-                fallbackHint="앱 내 표시는 VERCEL_API_TOKEN·VERCEL_STAGING_PROJECT_ID 설정 시. 그 전엔 Vercel 대시보드 → loginpi → Deployments."
+                fallbackHint={t('deploy.stageFallbackHint')}
               />
             </div>
           </section>
 
           {/* ── 2단: 운영 ─────────────────────────────── */}
           <section className="border-primary/30 space-y-3 rounded-xl border p-4">
-            <h2 className="text-lg font-semibold">
-              🚀 운영 서버 (cafepi · production)
-            </h2>
+            <h2 className="text-lg font-semibold">{t('deploy.prodHeading')}</h2>
 
             <div>
               <p className="text-muted-foreground text-xs">
-                승격 대상 (production에 없는 master 커밋)
+                {t('deploy.promoteTarget')}
               </p>
               <p className="mt-1 text-sm">
                 <b className={ov.production.ahead > 0 ? 'text-primary' : ''}>
-                  {ov.production.ahead}개
+                  {t('deploy.aheadCount', { n: ov.production.ahead })}
                 </b>
                 {ov.production.behind > 0 && (
                   <span className="ml-2 text-red-600">
-                    ⚠ production이 {ov.production.behind}커밋 앞섬 — 승격 불가
+                    {t('deploy.prodAhead', { n: ov.production.behind })}
                   </span>
                 )}
               </p>
               {ov.production.head && (
                 <p className="text-muted-foreground mt-1 text-xs">
-                  현재 운영:{' '}
+                  {t('deploy.currentProd')}{' '}
                   <span className="font-mono">
                     {short(ov.production.head.sha)}
                   </span>{' '}
@@ -392,7 +390,7 @@ export default function DeployPage() {
               <div className="mt-2">
                 <CommitList
                   commits={ov.production.commits}
-                  empty="승격할 커밋 없음 (운영이 master 최신과 동기)"
+                  empty={t('deploy.noPromoteCommits')}
                 />
               </div>
             </div>
@@ -407,20 +405,24 @@ export default function DeployPage() {
               }
               className="bg-primary text-primary-foreground w-full rounded-md px-4 py-2 text-sm font-medium hover:opacity-90 disabled:opacity-50"
             >
-              {busy === 'production' ? '승격 중…' : '🚀 운영 서버 배포(승격)'}
+              {busy === 'production'
+                ? t('deploy.promoting')
+                : t('deploy.prodPromote')}
             </button>
             {!ov.configured.promote && (
               <p className="text-muted-foreground text-xs">
-                · 비활성: `GITHUB_DEPLOY_TOKEN` 미설정
+                {t('deploy.promoteDisabled')}
               </p>
             )}
 
             <div>
-              <p className="text-sm font-medium">최근 운영 배포 상태</p>
+              <p className="text-sm font-medium">
+                {t('deploy.prodStatusTitle')}
+              </p>
               <StatusBlock
                 status={statuses.production}
                 polling={polling}
-                fallbackHint="앱 내 표시는 VERCEL_API_TOKEN·VERCEL_PROD_PROJECT_ID 설정 시. 그 전엔 Vercel 대시보드 → cafepi → Deployments."
+                fallbackHint={t('deploy.prodFallbackHint')}
               />
             </div>
           </section>

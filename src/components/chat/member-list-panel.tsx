@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { piFetch } from '@/lib/pi-fetch'
 
 // 카페 입장 멤버 목록 + online/offline 상태 패널.
@@ -24,6 +25,8 @@ export function MemberListPanel({
   onlineUserIds: string[]
   onClose: () => void
 }) {
+  const t = useTranslations('chat')
+  const tc = useTranslations('common')
   const [members, setMembers] = useState<Member[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -60,15 +63,18 @@ export function MemberListPanel({
       <div className="bg-background/95 w-full max-w-sm rounded-2xl border p-5 shadow-xl backdrop-blur-sm">
         <div className="mb-3 flex items-center justify-between">
           <p className="text-sm font-semibold">
-            👥 카페 멤버{' '}
+            {t('members.title')}{' '}
             <span className="text-muted-foreground font-normal">
-              (접속 {onlineCount} / 전체 {members.length})
+              {t('members.countLabel', {
+                online: onlineCount,
+                total: members.length,
+              })}
             </span>
           </p>
           <button
             onClick={onClose}
             className="text-muted-foreground hover:text-foreground"
-            aria-label="닫기"
+            aria-label={tc('close')}
           >
             ✕
           </button>
@@ -76,11 +82,11 @@ export function MemberListPanel({
 
         {loading ? (
           <p className="text-muted-foreground py-6 text-center text-xs">
-            멤버를 불러오는 중…
+            {t('members.loading')}
           </p>
         ) : members.length === 0 ? (
           <p className="text-muted-foreground py-6 text-center text-xs">
-            아직 멤버가 없습니다.
+            {t('members.empty')}
           </p>
         ) : (
           <ul className="max-h-64 space-y-1 overflow-y-auto">
@@ -108,7 +114,7 @@ export function MemberListPanel({
                       {m.display_nm}
                       {isMe && (
                         <span className="text-muted-foreground ml-1 text-xs">
-                          (나)
+                          {t('voice.me')}
                         </span>
                       )}
                     </span>
@@ -120,7 +126,7 @@ export function MemberListPanel({
                         : 'text-muted-foreground'
                     }`}
                   >
-                    {isOnline ? '접속 중' : '오프라인'}
+                    {isOnline ? t('members.online') : t('members.offline')}
                   </span>
                 </li>
               )

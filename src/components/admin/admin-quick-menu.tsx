@@ -17,6 +17,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { ChevronUp, ShieldCheck } from 'lucide-react'
 import { usePiAuth } from '@/components/pi-auth-provider'
 import { useAutoHideOnIdle } from '@/hooks/use-auto-hide-on-idle'
@@ -25,6 +26,7 @@ import { cn } from '@/lib/utils'
 type QuickNavItem = { href: string; label: string }
 
 export function AdminQuickMenu({ items }: { items: QuickNavItem[] }) {
+  const t = useTranslations('admin.nav')
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const { isInPiBrowser } = usePiAuth()
@@ -77,7 +79,7 @@ export function AdminQuickMenu({ items }: { items: QuickNavItem[] }) {
       >
         {/* 팝업 패널 — 트리거 위로 펼침 */}
         {open && (
-          <nav className="pointer-events-auto mb-2 grid max-h-[60vh] w-full grid-cols-2 gap-1 overflow-auto rounded-2xl border bg-background p-2 shadow-[0_14px_34px_-8px_rgba(0,0,0,0.42)] backdrop-blur-md">
+          <nav className="bg-background pointer-events-auto mb-2 grid max-h-[60vh] w-full grid-cols-2 gap-1 overflow-auto rounded-2xl border p-2 shadow-[0_14px_34px_-8px_rgba(0,0,0,0.42)] backdrop-blur-md">
             {QUICK_NAV.map((n) => (
               <Link
                 key={n.href}
@@ -106,12 +108,12 @@ export function AdminQuickMenu({ items }: { items: QuickNavItem[] }) {
           aria-expanded={open}
           tabIndex={visible ? 0 : -1}
           className={cn(
-            'flex touch-manipulation items-center gap-2 rounded-full border bg-background px-4 py-2.5 text-sm font-semibold shadow-lg backdrop-blur-md transition-transform select-none active:scale-95',
+            'bg-background flex touch-manipulation items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-semibold shadow-lg backdrop-blur-md transition-transform select-none active:scale-95',
             visible ? 'pointer-events-auto' : 'pointer-events-none',
           )}
         >
           <ShieldCheck className="size-4" />
-          관리 메뉴
+          {t('quickMenuTrigger')}
           <ChevronUp
             className={cn(
               'size-4 shrink-0 transition-transform duration-200',

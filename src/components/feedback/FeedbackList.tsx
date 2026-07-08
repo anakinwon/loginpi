@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { FeedbackCard, type FeedbackCardData } from './FeedbackCard'
 import { FeedbackForm } from './FeedbackForm'
 import { StarRating } from './StarRating'
@@ -31,6 +32,8 @@ export function FeedbackList({
   itemId,
   currentUsrId,
 }: FeedbackListProps) {
+  const t = useTranslations('feedback')
+  const tc = useTranslations('common')
   const [items, setItems] = useState<FeedbackCardData[]>([])
   const [stats, setStats] = useState<Stats | null>(null)
   const [pagination, setPagination] = useState<Pagination>({
@@ -69,7 +72,7 @@ export function FeedbackList({
   }, [fetchList])
 
   async function handleDelete(fbckId: string) {
-    if (!confirm('후기를 삭제하시겠습니까?')) return
+    if (!confirm(t('deleteConfirm'))) return
     const res = await piFetch(`/api/feedback/${fbckId}`, { method: 'DELETE' })
     if (res.ok) fetchList(1)
   }
@@ -78,8 +81,8 @@ export function FeedbackList({
     setShowForm(false)
     setSuccessMsg(
       beanRwrd > 0
-        ? `후기가 등록되었습니다! ${beanRwrd} Bean을 받으셨습니다. ☕`
-        : '후기가 등록되었습니다!',
+        ? t('submittedWithReward', { bean: beanRwrd })
+        : t('submittedTitle'),
     )
     fetchList(1)
     setTimeout(() => setSuccessMsg(''), 4000)
@@ -103,7 +106,7 @@ export function FeedbackList({
                 size="sm"
               />
               <span className="text-muted-foreground text-xs">
-                총 {stats.total_count}개 후기
+                {t('totalCount', { count: stats.total_count })}
               </span>
             </div>
           </div>
@@ -136,7 +139,7 @@ export function FeedbackList({
           onClick={() => setShowForm(true)}
           className="border-border text-muted-foreground hover:bg-accent hover:text-foreground rounded-md border border-dashed py-3 text-sm transition-colors"
         >
-          + 후기 작성하기
+          {t('writeCta')}
         </button>
       )}
 
@@ -160,11 +163,11 @@ export function FeedbackList({
       {/* 목록 */}
       {loading ? (
         <div className="text-muted-foreground py-8 text-center text-sm">
-          로딩 중…
+          {tc('loading')}
         </div>
       ) : items.length === 0 ? (
         <div className="text-muted-foreground py-8 text-center text-sm">
-          아직 후기가 없습니다.
+          {t('empty')}
         </div>
       ) : (
         <div className="flex flex-col gap-3">

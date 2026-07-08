@@ -42,12 +42,8 @@ type ShopsViewMode = 'list' | 'map'
 export type BizCategory = 'ALL' | 'CAFE' | 'RESTAURANT' | 'BAR'
 const RADIUS_OPTIONS = [1, 5, 10] as const
 
-const BIZ_CATEGORIES: { value: BizCategory; label: string }[] = [
-  { value: 'ALL', label: '전체 (Pi 매장)' },
-  { value: 'CAFE', label: '☕ 카페' },
-  { value: 'RESTAURANT', label: '🍽️ 식당' },
-  { value: 'BAR', label: '🍺 술집' },
-]
+// 표시 라벨은 i18n lbs.bizCatOption.* — 렌더에서 t()로 처리
+const BIZ_CATEGORIES: BizCategory[] = ['ALL', 'CAFE', 'RESTAURANT', 'BAR']
 
 function formatDistance(km: number): string {
   if (km < 1) return `${Math.round(km * 1000)}m`
@@ -273,7 +269,7 @@ export function NearbyExplorer() {
           className={`ml-auto pb-2 text-xs font-medium transition-colors ${liveTracking ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
           aria-pressed={liveTracking}
         >
-          {liveTracking ? '🔴 실시간 ON' : '⚪ 실시간'}
+          {liveTracking ? t('liveOn') : t('liveOff')}
         </button>
         <button
           onClick={() => requestLocation(true)}
@@ -303,7 +299,7 @@ export function NearbyExplorer() {
                     : 'text-muted-foreground hover:bg-muted'
                 }`}
               >
-                🗺️ 지도
+                {t('mapView')}
               </button>
               <button
                 onClick={() => {
@@ -316,7 +312,7 @@ export function NearbyExplorer() {
                     : 'text-muted-foreground hover:bg-muted'
                 }`}
               >
-                ☰ 등록매장목록
+                {t('registeredShops')}
               </button>
               <div className="flex-1" />
               <select
@@ -329,8 +325,8 @@ export function NearbyExplorer() {
                 className="text-foreground bg-background rounded-md border px-2 py-1.5 text-xs font-medium focus:outline-none"
               >
                 {BIZ_CATEGORIES.map((cat) => (
-                  <option key={cat.value} value={cat.value}>
-                    {cat.label}
+                  <option key={cat} value={cat}>
+                    {t(`bizCatOption.${cat}`)}
                   </option>
                 ))}
               </select>
@@ -369,7 +365,7 @@ export function NearbyExplorer() {
                         </span>
                         {s.owner_verified_yn === 'Y' && (
                           <span className="shrink-0 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400">
-                            ✅ 인증
+                            {t('verified')}
                           </span>
                         )}
                       </p>

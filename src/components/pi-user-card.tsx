@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { usePiAuth } from './pi-auth-provider'
@@ -26,6 +27,8 @@ const isDev = process.env.NODE_ENV !== 'production'
 export function PiUserCard() {
   const { user, isLoading, isInPiBrowser, signIn, signOut, devLogin, error } =
     usePiAuth()
+  const t = useTranslations('userMisc')
+  const tc = useTranslations('common')
   const useDevLogin = isDev && !isInPiBrowser
 
   if (!user) {
@@ -45,26 +48,24 @@ export function PiUserCard() {
                 π
               </span>
               {isLoading
-                ? 'Pi 인증 중…'
+                ? t('piAuthenticating')
                 : useDevLogin
-                  ? 'Pi Network로 로그인 (개발 임시)'
-                  : 'Pi Network로 로그인'}
+                  ? t('piLoginDev')
+                  : t('piLogin')}
             </Button>
             {error && <p className="text-destructive text-xs">{error}</p>}
           </div>
           <p className="text-muted-foreground text-sm">
-            Pi Browser에서 접속하면 자동으로 인증됩니다.
+            {t('piAutoAuthDesc1')}
             <br />
-            다른 환경에서는 버튼을 눌러 수동으로 로그인하세요.
+            {t('piAutoAuthDesc2')}
           </p>
         </div>
 
         {/* 개발 환경 전용 안내 — 프로덕션 빌드에서는 렌더링 자체가 제거됨 */}
         {isDev && !isInPiBrowser && (
           <p className="text-muted-foreground border-dashed text-xs">
-            개발 환경: 위 버튼은 Pi Browser 없이도 mock admin 세션으로 즉시
-            로그인됩니다. 프로덕션 빌드에서는 자동으로 실제 Pi 인증으로
-            전환됩니다.
+            {t('piDevHint')}
           </p>
         )}
       </div>
@@ -78,36 +79,38 @@ export function PiUserCard() {
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <CardTitle className="text-sm">Pi Network 사용자 정보</CardTitle>
+            <CardTitle className="text-sm">{t('piUserInfo')}</CardTitle>
             {isDevSession && (
               <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
-                개발 임시 세션
+                {t('devSession')}
               </span>
             )}
           </div>
           <Button variant="outline" size="sm" onClick={signOut}>
-            로그아웃
+            {t('logout')}
           </Button>
         </div>
       </CardHeader>
       <CardContent className="space-y-2.5">
         <InfoRow
-          label="사용자명"
-          value={user.username ? `@${user.username}` : '(없음)'}
+          label={t('fieldUsername')}
+          value={user.username ? `@${user.username}` : tc('noneParen')}
         />
         <InfoRow label="UID" value={user.uid} mono />
         {user.walletAddress ? (
           <InfoRow
-            label="지갑 주소"
+            label={t('fieldWalletAddr')}
             value={truncateAddress(user.walletAddress)}
             fullValue={user.walletAddress}
             mono
           />
         ) : (
-          <InfoRow label="지갑 주소" value="(scope 미부여)" />
+          <InfoRow label={t('fieldWalletAddr')} value={t('walletNoScope')} />
         )}
         <div className="grid grid-cols-[6.5rem_1fr] items-start gap-2 text-sm">
-          <span className="text-muted-foreground shrink-0">부여된 권한</span>
+          <span className="text-muted-foreground shrink-0">
+            {t('grantedScopes')}
+          </span>
           <div className="flex flex-wrap gap-1">
             {user.scopesGranted.length > 0 ? (
               user.scopesGranted.map((s) => (
@@ -119,11 +122,16 @@ export function PiUserCard() {
                 </span>
               ))
             ) : (
-              <span className="text-muted-foreground text-xs">없음</span>
+              <span className="text-muted-foreground text-xs">
+                {tc('none')}
+              </span>
             )}
           </div>
         </div>
-        <InfoRow label="토큰 만료" value={formatDate(user.tokenValidUntil)} />
+        <InfoRow
+          label={t('tokenExpiry')}
+          value={formatDate(user.tokenValidUntil)}
+        />
       </CardContent>
     </Card>
   )

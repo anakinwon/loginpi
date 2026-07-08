@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
 import { AdminPagination } from '@/components/admin/admin-pagination'
@@ -23,15 +24,13 @@ interface FbckRow {
 }
 
 const SCORE_FILTERS = ['', '5', '4', '3', '2', '1'] as const
-const HIDE_FILTERS = [
-  { value: '', label: '전체' },
-  { value: 'N', label: '공개 중' },
-  { value: 'Y', label: '숨김 처리됨' },
-] as const
+const HIDE_FILTERS = ['', 'N', 'Y'] as const
 
 const STAR = ['', '★', '★★', '★★★', '★★★★', '★★★★★']
 
 export default function AdminFeedbackPage() {
+  const t = useTranslations('adminMgmt.feedback')
+  const tc = useTranslations('common')
   const [rows, setRows] = useState<FbckRow[]>([])
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
@@ -60,7 +59,7 @@ export default function AdminFeedbackPage() {
       setRows(d.data)
       setTotal(d.pagination.total)
     } catch {
-      toast.error('후기 목록을 불러오지 못했습니다')
+      toast.error(t('loadFail'))
     } finally {
       setLoading(false)
     }
@@ -80,7 +79,7 @@ export default function AdminFeedbackPage() {
     const toHide = hideModal.current === 'N'
 
     if (toHide && !hideReason.trim()) {
-      toast.error('숨김 사유를 입력해 주세요')
+      toast.error(t('enterHideReason'))
       return
     }
 
@@ -96,11 +95,11 @@ export default function AdminFeedbackPage() {
         }),
       })
       if (!res.ok) throw new Error()
-      toast.success(toHide ? '후기를 숨겼습니다' : '후기를 다시 공개했습니다')
+      toast.success(toHide ? t('hidden') : t('unhidden'))
       setHideModal(null)
       void load()
     } catch {
-      toast.error('처리 실패')
+      toast.error(t('processFail'))
     } finally {
       setSaving(false)
     }
@@ -112,9 +111,9 @@ export default function AdminFeedbackPage() {
     <div className="mx-auto max-w-5xl space-y-4 p-4 sm:p-6">
       {/* 헤더 */}
       <div>
-        <h1 className="text-lg font-bold">⭐ 이용후기 관리</h1>
+        <h1 className="text-lg font-bold">{t('title')}</h1>
         <p className="text-muted-foreground mt-1 text-sm">
-          총 {total.toLocaleString()}건
+          {t('total', { total: total.toLocaleString() })}
         </p>
       </div>
 
@@ -130,12 +129,12 @@ export default function AdminFeedbackPage() {
               }}
               className={`rounded-full border px-3 py-1 text-xs ${scoreFilter === s ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}
             >
-              {s === '' ? '전체 별점' : `${s}★`}
+              {s === '' ? t('scoreAll') : `${s}★`}
             </button>
           ))}
         </div>
         <div className="flex flex-wrap gap-1">
-          {HIDE_FILTERS.map(({ value, label }) => (
+          {HIDE_FILTERS.map((value) => (
             <button
               key={value}
               onClick={() => {
@@ -144,7 +143,7 @@ export default function AdminFeedbackPage() {
               }}
               className={`rounded-full border px-3 py-1 text-xs ${hideFilter === value ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'}`}
             >
-              {label}
+              {value === '' ? tc('all') : t(`hideFilter.${value}`)}
             </button>
           ))}
         </div>
@@ -152,10 +151,10 @@ export default function AdminFeedbackPage() {
 
       {/* 목록 */}
       {loading ? (
-        <p className="text-muted-foreground p-6 text-sm">불러오는 중…</p>
+        <p className="text-muted-foreground p-6 text-sm">{tc('fetching')}</p>
       ) : rows.length === 0 ? (
         <p className="text-muted-foreground rounded-lg border p-6 text-center text-sm">
-          후기가 없습니다.
+          {t('empty')}
         </p>
       ) : (
         <ul className="space-y-2">
@@ -178,12 +177,12 @@ export default function AdminFeedbackPage() {
                   </span>
                   {r.rwrd_yn === 'Y' && (
                     <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] text-amber-700 dark:bg-amber-900 dark:text-amber-300">
-                      ☕ {r.bean_rwrd_qty} Bean 지급
+                      {t('beanReward', { qty: r.bean_rwrd_qty })}
                     </span>
                   )}
                   {r.hide_yn === 'Y' && (
                     <span className="rounded bg-red-100 px-1.5 py-0.5 text-[10px] text-red-600 dark:bg-red-900 dark:text-red-300">
-                      숨김
+                      {t('badgeHidden')}
                     </span>
                   )}
                 </div>
@@ -199,7 +198,7 @@ export default function AdminFeedbackPage() {
               <div className="text-muted-foreground flex flex-wrap gap-x-4 gap-y-0.5 text-[11px]">
                 {r.shop_id && (
                   <span>
-                    카페{' '}
+                    {t('cafe')}{' '}
                     <code className="bg-muted rounded px-1">
                       {r.shop_id.slice(0, 8)}…
                     </code>
@@ -207,7 +206,7 @@ export default function AdminFeedbackPage() {
                 )}
                 {r.order_id && (
                   <span>
-                    주문{' '}
+                    {t('order')}{' '}
                     <code className="bg-muted rounded px-1">
                       {r.order_id.slice(0, 8)}…
                     </code>
@@ -215,7 +214,7 @@ export default function AdminFeedbackPage() {
                 )}
                 {r.hide_reason_txt && (
                   <span className="text-red-500">
-                    사유: {r.hide_reason_txt}
+                    {t('reasonPrefix', { reason: r.hide_reason_txt })}
                   </span>
                 )}
               </div>
@@ -228,7 +227,7 @@ export default function AdminFeedbackPage() {
                     onClick={() => openHideModal(r)}
                     className={`text-xs hover:underline ${r.hide_yn === 'Y' ? 'text-green-600' : 'text-destructive'}`}
                   >
-                    {r.hide_yn === 'Y' ? '공개 복원' : '숨김 처리'}
+                    {r.hide_yn === 'Y' ? t('restorePublic') : t('hideAction')}
                   </button>
                 </div>
               )}
@@ -244,32 +243,34 @@ export default function AdminFeedbackPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="bg-card w-full max-w-sm space-y-4 rounded-xl border p-5 shadow-xl">
             <h2 className="font-semibold">
-              {hideModal.current === 'N' ? '후기 숨김 처리' : '후기 공개 복원'}
+              {hideModal.current === 'N'
+                ? t('modalHideTitle')
+                : t('modalRestoreTitle')}
             </h2>
 
             {hideModal.current === 'N' && (
               <div className="space-y-1">
                 <label className="text-muted-foreground text-sm">
-                  숨김 사유 (필수)
+                  {t('hideReasonLabel')}
                 </label>
                 <select
                   value={hideReason}
                   onChange={(e) => setHideReason(e.target.value)}
                   className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
                 >
-                  <option value="">선택하세요</option>
-                  <option value="욕설·비방">욕설·비방</option>
-                  <option value="스팸·광고">스팸·광고</option>
-                  <option value="허위 정보">허위 정보</option>
-                  <option value="음란·선정성">음란·선정성</option>
-                  <option value="기타">기타</option>
+                  <option value="">{t('reasonSelect')}</option>
+                  <option value="욕설·비방">{t('reason.abuse')}</option>
+                  <option value="스팸·광고">{t('reason.spam')}</option>
+                  <option value="허위 정보">{t('reason.false')}</option>
+                  <option value="음란·선정성">{t('reason.sexual')}</option>
+                  <option value="기타">{t('reason.etc')}</option>
                 </select>
               </div>
             )}
 
             {hideModal.current === 'Y' && (
               <p className="text-muted-foreground text-sm">
-                이 후기를 다시 공개하시겠습니까?
+                {t('restoreConfirm')}
               </p>
             )}
 
@@ -280,7 +281,7 @@ export default function AdminFeedbackPage() {
                 disabled={saving}
                 className="border-input hover:bg-accent rounded-md border px-4 py-2 text-sm disabled:opacity-50"
               >
-                취소
+                {tc('cancel')}
               </button>
               <button
                 type="button"
@@ -289,10 +290,10 @@ export default function AdminFeedbackPage() {
                 className={`rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-50 ${hideModal.current === 'N' ? 'bg-destructive hover:bg-destructive/90' : 'bg-green-600 hover:bg-green-700'}`}
               >
                 {saving
-                  ? '처리 중…'
+                  ? tc('processing')
                   : hideModal.current === 'N'
-                    ? '숨김 처리'
-                    : '공개 복원'}
+                    ? t('hideAction')
+                    : t('restorePublic')}
               </button>
             </div>
           </div>

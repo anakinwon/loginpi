@@ -91,6 +91,7 @@ export function ClientMyShops({
   serverAuthed?: boolean
 }) {
   const t = useTranslations('store')
+  const tc = useTranslations('common')
   const router = useRouter()
   const { user, isLoading } = usePiAuth()
   const authed = serverAuthed || !!user
@@ -131,13 +132,13 @@ export function ClientMyShops({
       })
       if (res.ok) {
         setRepShopId(shopId)
-        toast.success('대표 매장으로 지정했습니다')
+        toast.success(t('repSetSuccess'))
       } else {
         const { error } = (await res.json()) as { error?: string }
-        toast.error(error ?? '처리 실패')
+        toast.error(error ?? t('processFail'))
       }
     } catch {
-      toast.error('네트워크 오류')
+      toast.error(tc('networkError'))
     } finally {
       setSettingRepId(null)
     }
@@ -164,9 +165,7 @@ export function ClientMyShops({
 
   // 매장 신규 등록 = 구글맵 인증(claim)으로만. 자유 등록 폐기 → 지도로 안내.
   function openNew() {
-    toast.info(
-      '매장은 구글맵 인증으로 등록합니다. 지도에서 내 매장을 찾아 인증 등록해 주세요.',
-    )
+    toast.info(t('shopClaimGuideToast'))
     router.push('/map')
   }
 
@@ -282,7 +281,7 @@ export function ClientMyShops({
               onClick={() => setShowAll((v) => !v)}
               className={`rounded-full border px-3 py-1 text-xs font-medium ${showAll ? 'border-primary bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted'}`}
             >
-              {showAll ? '🛡️ 전체 매장' : '🛡️ 내 매장만'}
+              {showAll ? t('shopViewAll') : t('shopViewMine')}
             </button>
           )}
           {!formOpen && (
@@ -296,26 +295,16 @@ export function ClientMyShops({
       {/* 매장 등록 방법 안내 — 목록 화면에서만(폼 열면 숨김) */}
       {!formOpen && (
         <div className="shadow-soft bg-card space-y-2 rounded-xl border p-4 text-sm">
-          <p className="font-semibold">🏪 매장 등록 방법 (구글맵 인증)</p>
+          <p className="font-semibold">{t('claimGuide.title')}</p>
           <p className="text-muted-foreground text-xs">
-            매장은 구글맵에 등록된 <b>본인이 운영하는 매장</b>만 인증 등록할 수
-            있습니다. 구글맵에 없는 매장은 검증할 수 없어 등록이 불가합니다.
+            {t.rich('claimGuide.desc', { b: (c) => <b>{c}</b> })}
           </p>
           <ol className="text-muted-foreground list-inside list-decimal space-y-1 text-xs">
-            <li>
-              <b>[매장 추가]</b> → 지도로 이동
-            </li>
-            <li>
-              주변 구글 등록 매장에서 <b>내 매장 선택</b>
-            </li>
-            <li>
-              place_id 직접 입력 + 전화번호 구글 대조 + 현재 위치(GPS) 확인
-            </li>
-            <li>
-              ⚠️ 타인 매장 등록은 <b>불법</b>(민·형사상 처벌) — 본인 매장 보증
-              동의
-            </li>
-            <li>인증 등록 완료 → 메뉴(상품) 추가</li>
+            <li>{t.rich('claimGuide.step1', { b: (c) => <b>{c}</b> })}</li>
+            <li>{t.rich('claimGuide.step2', { b: (c) => <b>{c}</b> })}</li>
+            <li>{t('claimGuide.step3')}</li>
+            <li>{t.rich('claimGuide.step4', { b: (c) => <b>{c}</b> })}</li>
+            <li>{t('claimGuide.step5')}</li>
           </ol>
         </div>
       )}
@@ -371,9 +360,9 @@ export function ClientMyShops({
           {/* 배달 가능 — 켜면 구매자에게 '배달' 주문방법이 노출됨 */}
           <label className="flex cursor-pointer items-center justify-between rounded-lg border p-3">
             <div>
-              <p className="text-sm font-medium">🛵 배달 가능</p>
+              <p className="text-sm font-medium">{t('shopDelivery')}</p>
               <p className="text-muted-foreground text-xs">
-                켜면 구매 시 &lsquo;배달&rsquo; 주문방법이 노출됩니다
+                {t('shopDeliveryHint')}
               </p>
             </div>
             <input
@@ -387,11 +376,9 @@ export function ClientMyShops({
           {/* 이용후기·Bean 보상 동의 — 켜야 내 상품에 후기 작성 버튼이 노출되고 후기가 허용됨 */}
           <label className="flex cursor-pointer items-center justify-between rounded-lg border p-3">
             <div className="pr-3">
-              <p className="text-sm font-medium">⭐ 이용후기·Bean 보상 동의</p>
+              <p className="text-sm font-medium">{t('shopFbckConsent')}</p>
               <p className="text-muted-foreground text-xs">
-                내 상품에 대해 고객이 이용후기를 남기고, 후기에 따라 Bean이
-                지급되는 것에 동의합니다. 동의한 매장의 상품에만 후기 작성
-                버튼이 노출됩니다.
+                {t('shopFbckConsentHint')}
               </p>
             </div>
             <input
@@ -479,23 +466,22 @@ export function ClientMyShops({
 
           {/* 🌍 구글 제공 정보 — 인증 등록 매장은 자동 채워짐, 직접 수정 가능 */}
           <div className="space-y-3 rounded-lg border border-dashed p-3">
-            <p className="text-sm font-semibold">
-              🌍 구글 제공 정보 (수정 가능)
-            </p>
+            <p className="text-sm font-semibold">{t('googleInfoTitle')}</p>
 
             {/* 읽기전용: place_id·인증상태 (식별·검증 앵커라 수정 불가) */}
             {editingShop?.place_id && (
               <div className="space-y-1.5">
                 <Label className="text-muted-foreground">
-                  place_id (읽기전용)
+                  {t('placeIdReadonly')}
                 </Label>
                 <p className="bg-muted/50 text-muted-foreground rounded-md border px-2.5 py-1.5 font-mono text-xs break-all">
                   {editingShop.place_id}
                 </p>
                 {editingShop.owner_verified_yn === 'Y' && (
                   <p className="text-xs text-emerald-600 dark:text-emerald-400">
-                    ✅ 인증 매장 (검증수단:{' '}
-                    {editingShop.verify_method_cd ?? '—'})
+                    {t('verifiedShop', {
+                      method: editingShop.verify_method_cd ?? '—',
+                    })}
                   </p>
                 )}
               </div>
@@ -503,7 +489,7 @@ export function ClientMyShops({
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
-                <Label htmlFor="shop-owner">대표자명</Label>
+                <Label htmlFor="shop-owner">{t('fieldOwnerNm')}</Label>
                 <Input
                   id="shop-owner"
                   value={form.owner_nm}
@@ -512,7 +498,7 @@ export function ClientMyShops({
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="shop-gnm">구글 매장명</Label>
+                <Label htmlFor="shop-gnm">{t('fieldGoogleNm')}</Label>
                 <Input
                   id="shop-gnm"
                   value={form.google_nm}
@@ -523,7 +509,7 @@ export function ClientMyShops({
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="shop-website">웹사이트</Label>
+              <Label htmlFor="shop-website">{t('fieldWebsite')}</Label>
               <Input
                 id="shop-website"
                 type="url"
@@ -534,7 +520,7 @@ export function ClientMyShops({
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="shop-gmap">구글지도 URL</Label>
+              <Label htmlFor="shop-gmap">{t('fieldGmapUrl')}</Label>
               <Input
                 id="shop-gmap"
                 type="url"
@@ -546,7 +532,7 @@ export function ClientMyShops({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="shop-bizstatus">영업상태</Label>
+                <Label htmlFor="shop-bizstatus">{t('fieldBizStatus')}</Label>
                 <Input
                   id="shop-bizstatus"
                   value={form.biz_status_cd}
@@ -556,7 +542,7 @@ export function ClientMyShops({
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="shop-ratingcnt">평점 수</Label>
+                <Label htmlFor="shop-ratingcnt">{t('fieldRatingCnt')}</Label>
                 <Input
                   id="shop-ratingcnt"
                   type="number"
@@ -571,7 +557,7 @@ export function ClientMyShops({
             {editingShop?.google_place_json != null && (
               <details className="text-xs">
                 <summary className="text-muted-foreground cursor-pointer select-none">
-                  구글 Place 원본 전체 보기 (JSON)
+                  {t('googleJsonView')}
                 </summary>
                 <pre className="bg-muted/50 mt-2 max-h-60 overflow-auto rounded-md border p-2 text-[10px] break-all whitespace-pre-wrap">
                   {JSON.stringify(editingShop.google_place_json, null, 2)}
@@ -634,7 +620,7 @@ export function ClientMyShops({
                     </span>
                     {isRep && (
                       <span className="shrink-0 rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">
-                        ⭐ 대표
+                        {t('repBadge')}
                       </span>
                     )}
                     <span className="bg-muted text-muted-foreground shrink-0 rounded-full px-2 py-0.5 text-xs">
@@ -642,7 +628,7 @@ export function ClientMyShops({
                     </span>
                     {shop.owner_verified_yn === 'Y' && (
                       <span className="shrink-0 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400">
-                        ✅ 인증
+                        {t('verifiedBadge')}
                       </span>
                     )}
                   </div>
@@ -658,7 +644,7 @@ export function ClientMyShops({
                     variant="secondary"
                     onClick={() => router.push(`/store/shop/${shop.shop_id}`)}
                   >
-                    🏪 매장 보기
+                    {t('viewShop')}
                   </Button>
                   <Button
                     size="sm"
@@ -668,7 +654,7 @@ export function ClientMyShops({
                       )
                     }
                   >
-                    + 메뉴 추가
+                    {t('shopfrontAddItem')}
                   </Button>
                   {!isRep && !showAll && (
                     <Button
@@ -678,8 +664,8 @@ export function ClientMyShops({
                       onClick={() => setRep(shop.shop_id)}
                     >
                       {settingRepId === shop.shop_id
-                        ? '처리 중…'
-                        : '⭐ 대표 지정'}
+                        ? tc('processing')
+                        : t('setRepBtn')}
                     </Button>
                   )}
                   <Button

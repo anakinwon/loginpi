@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
 
@@ -53,6 +54,8 @@ function findCtgrLabel(tree: CtgrNode[], ctgrId: string): string {
 }
 
 export default function FbckCtgrItemsPage() {
+  const t = useTranslations('adminMgmt.feedbackItems')
+  const tc = useTranslations('common')
   const [ctgrTree, setCtgrTree] = useState<CtgrNode[]>([])
   const [selectedCtgrId, setSelectedCtgrId] = useState('')
   const [items, setItems] = useState<CtgrItem[]>([])
@@ -75,7 +78,7 @@ export default function FbckCtgrItemsPage() {
         const d = (await res.json()) as { categories: CtgrNode[] }
         setCtgrTree(d.categories)
       } catch {
-        toast.error('카테고리 목록을 불러오지 못했습니다')
+        toast.error(t('loadCatFail'))
       } finally {
         setLoadingCat(false)
       }
@@ -96,7 +99,7 @@ export default function FbckCtgrItemsPage() {
       const d = (await res.json()) as { items: CtgrItem[] }
       setItems(d.items)
     } catch {
-      toast.error('항목 목록을 불러오지 못했습니다')
+      toast.error(t('loadItemsFail'))
     } finally {
       setLoadingItems(false)
     }
@@ -126,11 +129,11 @@ export default function FbckCtgrItemsPage() {
         const d = (await res.json()) as { error?: string }
         throw new Error(d.error ?? '수정 실패')
       }
-      toast.success('항목이 수정되었습니다')
+      toast.success(t('editSuccess'))
       setEdit(null)
       void loadItems(selectedCtgrId)
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : '수정 실패')
+      toast.error(e instanceof Error ? e.message : t('editFail'))
     } finally {
       setSaving(null)
     }
@@ -138,12 +141,7 @@ export default function FbckCtgrItemsPage() {
 
   // 항목 논리삭제
   async function deleteItem(item: CtgrItem) {
-    if (
-      !confirm(
-        `"${item.item_nm}" 항목을 삭제하시겠습니까?\n(이미 작성된 후기의 항목별 점수 표시에 영향을 줄 수 있습니다)`,
-      )
-    )
-      return
+    if (!confirm(t('deleteConfirm', { name: item.item_nm }))) return
     setSaving(item.item_id)
     try {
       const res = await piFetch(
@@ -153,10 +151,10 @@ export default function FbckCtgrItemsPage() {
         },
       )
       if (!res.ok) throw new Error('삭제 실패')
-      toast.success('항목이 삭제되었습니다')
+      toast.success(t('deleteSuccess'))
       void loadItems(selectedCtgrId)
     } catch {
-      toast.error('삭제 실패')
+      toast.error(t('deleteFail'))
     } finally {
       setSaving(null)
     }
@@ -183,12 +181,12 @@ export default function FbckCtgrItemsPage() {
         const d = (await res.json()) as { error?: string }
         throw new Error(d.error ?? '추가 실패')
       }
-      toast.success('항목이 추가되었습니다')
+      toast.success(t('addSuccess'))
       setAddForm(EMPTY_ADD)
       setAdding(false)
       void loadItems(selectedCtgrId)
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : '추가 실패')
+      toast.error(e instanceof Error ? e.message : t('addFail'))
     } finally {
       setSubmittingAdd(false)
     }
@@ -202,16 +200,13 @@ export default function FbckCtgrItemsPage() {
     <div className="mx-auto max-w-3xl space-y-5 p-4 sm:p-6">
       {/* 헤더 */}
       <div>
-        <h1 className="text-lg font-bold">⭐ 후기 평가항목 관리</h1>
-        <p className="text-muted-foreground mt-1 text-sm">
-          카테고리별 항목별 별점 평가 항목을 관리합니다. 항목은 후기 작성 폼에
-          표시됩니다.
-        </p>
+        <h1 className="text-lg font-bold">{t('title')}</h1>
+        <p className="text-muted-foreground mt-1 text-sm">{t('subtitle')}</p>
       </div>
 
       {/* 카테고리 선택 — 상품 등록 폼과 동일한 optgroup 구조 */}
       <div className="space-y-1.5">
-        <label className="text-sm font-medium">카테고리 선택</label>
+        <label className="text-sm font-medium">{t('selectCategory')}</label>
         {loadingCat ? (
           <div className="bg-muted h-10 animate-pulse rounded-md" />
         ) : (
@@ -220,10 +215,12 @@ export default function FbckCtgrItemsPage() {
             onChange={(e) => setSelectedCtgrId(e.target.value)}
             className="border-input bg-background focus:ring-ring w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:outline-none"
           >
-            <option value="">— 카테고리를 선택하세요 —</option>
+            <option value="">{t('selectCategoryPlaceholder')}</option>
             {ctgrTree.map((p) => (
               <optgroup key={p.ctgr_id} label={p.ctgr_nm}>
-                <option value={p.ctgr_id}>{p.ctgr_nm} (전체)</option>
+                <option value={p.ctgr_id}>
+                  {t('categoryAll', { name: p.ctgr_nm })}
+                </option>
                 {p.children.map((c) => (
                   <option key={c.ctgr_id} value={c.ctgr_id}>
                     {c.ctgr_nm}
@@ -240,7 +237,7 @@ export default function FbckCtgrItemsPage() {
                 {selectedLabel}
               </span>
             )}
-            UUID:{' '}
+            {t('uuidLabel')}{' '}
             <code className="bg-muted rounded px-1">{selectedCtgrId}</code>
           </p>
         )}
@@ -251,9 +248,9 @@ export default function FbckCtgrItemsPage() {
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <p className="text-sm font-medium">
-              평가 항목{' '}
+              {t('evalItems')}{' '}
               <span className="text-muted-foreground font-normal">
-                ({items.length}개)
+                ({tc('countItem', { count: items.length })})
               </span>
             </p>
             {!adding && (
@@ -266,7 +263,7 @@ export default function FbckCtgrItemsPage() {
                 }}
                 className="border-border hover:bg-accent rounded-md border border-dashed px-3 py-1 text-xs"
               >
-                + 항목 추가
+                {t('addItem')}
               </button>
             )}
           </div>
@@ -289,12 +286,12 @@ export default function FbckCtgrItemsPage() {
                   className="border-primary/50 bg-primary/5 rounded-lg border border-dashed p-3"
                 >
                   <p className="text-primary mb-2 text-xs font-semibold">
-                    새 항목 추가
+                    {t('newItem')}
                   </p>
                   <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                     <div className="space-y-1">
                       <label className="text-muted-foreground text-xs">
-                        코드 *
+                        {t('codeRequired')}
                       </label>
                       <input
                         ref={addCdRef}
@@ -313,12 +310,12 @@ export default function FbckCtgrItemsPage() {
                     </div>
                     <div className="space-y-1">
                       <label className="text-muted-foreground text-xs">
-                        항목명 *
+                        {t('itemNmRequired')}
                       </label>
                       <input
                         required
                         maxLength={50}
-                        placeholder="맛"
+                        placeholder={t('itemNmPlaceholder')}
                         value={addForm.item_nm}
                         onChange={(e) =>
                           setAddForm((p) => ({ ...p, item_nm: e.target.value }))
@@ -328,11 +325,11 @@ export default function FbckCtgrItemsPage() {
                     </div>
                     <div className="space-y-1 sm:col-span-1">
                       <label className="text-muted-foreground text-xs">
-                        설명 (선택)
+                        {t('descOptional')}
                       </label>
                       <input
                         maxLength={100}
-                        placeholder="음료 맛의 만족도"
+                        placeholder={t('descPlaceholder')}
                         value={addForm.item_desc}
                         onChange={(e) =>
                           setAddForm((p) => ({
@@ -345,7 +342,7 @@ export default function FbckCtgrItemsPage() {
                     </div>
                     <div className="space-y-1">
                       <label className="text-muted-foreground text-xs">
-                        순서
+                        {t('sortOrd')}
                       </label>
                       <input
                         type="number"
@@ -372,7 +369,7 @@ export default function FbckCtgrItemsPage() {
                       disabled={submittingAdd}
                       className="border-input hover:bg-accent rounded-md border px-3 py-1 text-xs disabled:opacity-50"
                     >
-                      취소
+                      {tc('cancel')}
                     </button>
                     <button
                       type="submit"
@@ -381,7 +378,7 @@ export default function FbckCtgrItemsPage() {
                       }
                       className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-3 py-1 text-xs font-medium disabled:opacity-50"
                     >
-                      {submittingAdd ? '추가 중…' : '추가'}
+                      {submittingAdd ? t('adding') : t('addBtn')}
                     </button>
                   </div>
                 </form>
@@ -390,9 +387,9 @@ export default function FbckCtgrItemsPage() {
               {/* 항목 목록 */}
               {items.length === 0 && !adding ? (
                 <p className="text-muted-foreground rounded-lg border border-dashed p-6 text-center text-sm">
-                  등록된 평가 항목이 없습니다.
+                  {t('noItems')}
                   <br />
-                  「+ 항목 추가」를 눌러 추가하세요.
+                  {t('noItemsHint')}
                 </p>
               ) : (
                 <ul className="space-y-1.5">
@@ -407,7 +404,7 @@ export default function FbckCtgrItemsPage() {
                             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                               <div className="space-y-1">
                                 <label className="text-muted-foreground text-xs">
-                                  코드 (변경불가)
+                                  {t('codeReadonly')}
                                 </label>
                                 <p className="bg-muted rounded-md px-2 py-1.5 font-mono text-xs">
                                   {item.item_cd}
@@ -415,7 +412,7 @@ export default function FbckCtgrItemsPage() {
                               </div>
                               <div className="space-y-1">
                                 <label className="text-muted-foreground text-xs">
-                                  항목명 *
+                                  {t('itemNmRequired')}
                                 </label>
                                 <input
                                   autoFocus
@@ -431,7 +428,7 @@ export default function FbckCtgrItemsPage() {
                               </div>
                               <div className="space-y-1 sm:col-span-1">
                                 <label className="text-muted-foreground text-xs">
-                                  설명
+                                  {t('desc')}
                                 </label>
                                 <input
                                   maxLength={100}
@@ -448,7 +445,7 @@ export default function FbckCtgrItemsPage() {
                               </div>
                               <div className="space-y-1">
                                 <label className="text-muted-foreground text-xs">
-                                  순서
+                                  {t('sortOrd')}
                                 </label>
                                 <input
                                   type="number"
@@ -477,7 +474,7 @@ export default function FbckCtgrItemsPage() {
                                 disabled={isBusy}
                                 className="border-input hover:bg-accent rounded-md border px-3 py-1 text-xs disabled:opacity-50"
                               >
-                                취소
+                                {tc('cancel')}
                               </button>
                               <button
                                 type="button"
@@ -485,7 +482,7 @@ export default function FbckCtgrItemsPage() {
                                 disabled={isBusy || !edit.item_nm.trim()}
                                 className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-3 py-1 text-xs font-medium disabled:opacity-50"
                               >
-                                {isBusy ? '저장 중…' : '저장'}
+                                {isBusy ? tc('saving') : tc('save')}
                               </button>
                             </div>
                           </div>
@@ -507,18 +504,20 @@ export default function FbckCtgrItemsPage() {
                                 )}
                               </div>
                               <p className="text-muted-foreground mt-0.5 text-[10px]">
-                                순서: {item.sort_ord} · 수정:{' '}
-                                {new Date(item.mod_dtm).toLocaleString(
-                                  'ko-KR',
-                                  {
-                                    year: 'numeric',
-                                    month: '2-digit',
-                                    day: '2-digit',
-                                    hour: '2-digit',
-                                    minute: '2-digit',
-                                    hour12: false,
-                                  },
-                                )}
+                                {t('metaLine', {
+                                  ord: item.sort_ord,
+                                  date: new Date(item.mod_dtm).toLocaleString(
+                                    'ko-KR',
+                                    {
+                                      year: 'numeric',
+                                      month: '2-digit',
+                                      day: '2-digit',
+                                      hour: '2-digit',
+                                      minute: '2-digit',
+                                      hour12: false,
+                                    },
+                                  ),
+                                })}
                               </p>
                             </div>
                             <div className="flex shrink-0 gap-1.5">
@@ -535,7 +534,7 @@ export default function FbckCtgrItemsPage() {
                                 }
                                 className="border-input hover:bg-accent rounded border px-2 py-1 text-xs disabled:cursor-not-allowed disabled:opacity-40"
                               >
-                                수정
+                                {tc('edit')}
                               </button>
                               <button
                                 type="button"
@@ -543,7 +542,7 @@ export default function FbckCtgrItemsPage() {
                                 onClick={() => void deleteItem(item)}
                                 className="border-input text-destructive hover:bg-destructive/10 rounded border px-2 py-1 text-xs disabled:cursor-not-allowed disabled:opacity-40"
                               >
-                                {isBusy ? '…' : '삭제'}
+                                {isBusy ? '…' : tc('delete')}
                               </button>
                             </div>
                           </div>
@@ -560,18 +559,10 @@ export default function FbckCtgrItemsPage() {
 
       {/* 도움말 */}
       <div className="text-muted-foreground space-y-1 rounded-lg border p-3 text-xs">
-        <p>
-          • <strong>코드</strong>: 영문대문자·숫자·밑줄 1~16자 (예: TASTE,
-          AROMA, TEMP)
-        </p>
-        <p>
-          • <strong>순서</strong>: 낮은 숫자가 먼저 표시됩니다 (10 단위 권장)
-        </p>
-        <p>
-          • 삭제 시 논리삭제(del_yn=Y) 처리되며, 이미 작성된 후기의 항목 점수는
-          유지됩니다
-        </p>
-        <p>• 항목 코드는 수정이 불가하니 추가 시 신중히 입력하세요</p>
+        <p>{t.rich('helpCode', { strong: (c) => <strong>{c}</strong> })}</p>
+        <p>{t.rich('helpSort', { strong: (c) => <strong>{c}</strong> })}</p>
+        <p>{t('helpDelete')}</p>
+        <p>{t('helpImmutable')}</p>
       </div>
     </div>
   )

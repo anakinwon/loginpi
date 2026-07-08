@@ -102,6 +102,7 @@ type MissionTranslation = { name?: string; desc?: string }
 
 export function ClientEventGate() {
   const t = useTranslations('event')
+  const tc = useTranslations('common')
   const missionsT = t.raw('missions') as Record<
     string,
     MissionTranslation | undefined
@@ -171,13 +172,13 @@ export function ClientEventGate() {
       if (!res.ok) {
         // 조용한 실패 금지 — 관리자가 재평가 미반영 원인을 알 수 있게 피드백
         const data = await res.json().catch(() => ({}))
-        alert(data.error ?? '미션 재평가에 실패했습니다')
+        alert(data.error ?? t('reevalFailed'))
         return
       }
       await refetchRanking()
     } catch (err) {
       console.error('[reeval] 재평가 실패:', err)
-      alert('네트워크 오류가 발생했습니다')
+      alert(t('shop.claimErrNetwork'))
     } finally {
       setReevaluating(false)
     }
@@ -187,12 +188,7 @@ export function ClientEventGate() {
   // 중복 지급은 서버 RPC(fn_evt_grant_bond_reward)가 원자적으로 차단 — 이미 받은 사람은 건너뜀
   const handleBondReward = async () => {
     if (granting) return
-    if (
-      !window.confirm(
-        '10개 미션을 완료한 미지급자에게 5,000 Bean을 지급합니다.\n이미 지급된 사용자는 자동으로 제외됩니다. 진행할까요?',
-      )
-    )
-      return
+    if (!window.confirm(t('bondRewardConfirm'))) return
     setGranting(true)
     try {
       const res = await piFetch('/api/admin/event/bond-reward', {
@@ -200,20 +196,25 @@ export function ClientEventGate() {
       })
       const data = await res.json()
       if (!res.ok) {
-        alert(data.error ?? '보상 지급에 실패했습니다')
+        alert(data.error ?? t('shop.boardGrantError'))
         return
       }
       alert(
-        `보상 지급 완료\n` +
-          `· 자격자: ${data.eligible}명\n` +
-          `· 신규 지급: ${data.granted}명\n` +
-          `· 이미 지급(건너뜀): ${data.already}명` +
-          (data.failed ? `\n· 실패: ${data.failed}명` : ''),
+        t('shop.boardGrantResultTitle') +
+          '\n' +
+          t('bondRewardResultEligible', { eligible: data.eligible }) +
+          '\n' +
+          t('shop.boardGrantResultGranted', { granted: data.granted }) +
+          '\n' +
+          t('shop.boardGrantResultAlready', { already: data.already }) +
+          (data.failed
+            ? '\n' + t('shop.boardGrantResultFailed', { failed: data.failed })
+            : ''),
       )
       await refetchRanking()
     } catch (err) {
       console.error('[bond-reward] 지급 실패:', err)
-      alert('네트워크 오류가 발생했습니다')
+      alert(t('shop.claimErrNetwork'))
     } finally {
       setGranting(false)
     }
@@ -320,7 +321,7 @@ export function ClientEventGate() {
       await refetchRanking()
     } catch (err) {
       console.error('[event-gate] exclude error:', err)
-      setExcludeMsg('네트워크 오류')
+      setExcludeMsg(t('networkError'))
     } finally {
       setExcluding(false)
     }
@@ -510,10 +511,10 @@ export function ClientEventGate() {
                   {loadingMoreMissions ? (
                     <span className="inline-flex items-center gap-2">
                       <Loader2 className="size-4 animate-spin" />
-                      로딩 중...
+                      {tc('loading')}
                     </span>
                   ) : (
-                    '더 보기'
+                    t('loadMore')
                   )}
                 </button>
               )}
@@ -537,19 +538,19 @@ export function ClientEventGate() {
                     type="button"
                     onClick={handleReeval}
                     disabled={reevaluating}
-                    title="미션 재평가 후 랭킹 재조회 (관리자 전용)"
+                    title={t('reevalTitle')}
                     className="border-input bg-background hover:bg-muted rounded-md border px-2 py-1 text-xs font-medium transition-colors disabled:opacity-50"
                   >
-                    {reevaluating ? t('processing') : '🔄 미션 재평가'}
+                    {reevaluating ? t('processing') : t('reevalBtn')}
                   </button>
                   <button
                     type="button"
                     onClick={handleBondReward}
                     disabled={granting}
-                    title="10개 미션 완료 미지급자에게 5,000 Bean 지급 (관리자 전용)"
+                    title={t('bondRewardTitle')}
                     className="rounded-md border border-amber-500 bg-amber-50 px-2 py-1 text-xs font-medium text-amber-900 transition-colors hover:bg-amber-100 disabled:opacity-50 dark:border-amber-600 dark:bg-amber-950 dark:text-amber-200 dark:hover:bg-amber-900"
                   >
-                    {granting ? t('processing') : '🎁 5,000 Bean 지급'}
+                    {granting ? t('processing') : t('bondRewardBtn')}
                   </button>
                 </>
               )}

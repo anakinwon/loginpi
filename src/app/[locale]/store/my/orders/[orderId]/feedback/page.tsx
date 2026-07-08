@@ -1,3 +1,4 @@
+import { getTranslations } from 'next-intl/server'
 import { getSessionUser } from '@/lib/auth-check'
 import { getActiveFeeMode } from '@/lib/fee-resolver'
 import { Link } from '@/i18n/navigation'
@@ -5,7 +6,8 @@ import { StoreNav } from '@/components/store/store-nav'
 import { ClientFeedbackPage } from '@/components/feedback/ClientFeedbackPage'
 
 export async function generateMetadata() {
-  return { title: '이용후기 작성' }
+  const t = await getTranslations('sysUi')
+  return { title: t('feedbackWriteTitle') }
 }
 
 // 이용후기 작성 페이지 — Pi Browser redirect 금지, 클라이언트 게이트 위임
@@ -14,6 +16,7 @@ export default async function OrderFeedbackPage({
 }: {
   params: Promise<{ orderId: string }>
 }) {
+  const t = await getTranslations('sysUi')
   const { orderId } = await params
   const user = await getSessionUser()
   // BEAN 모드에선 후기(Bean 보상) 기능 비활성 — 버튼 숨김과 동일 정책, 직접 URL 접근도 차단.
@@ -27,14 +30,14 @@ export default async function OrderFeedbackPage({
         href="/store/my/orders"
         className="text-muted-foreground text-sm hover:underline"
       >
-        ← 구매 내역으로
+        ← {t('backToOrders')}
       </Link>
-      <h1 className="text-lg font-bold">⭐ 이용후기 작성</h1>
+      <h1 className="text-lg font-bold">⭐ {t('feedbackWriteTitle')}</h1>
       {feeMode === 'PI' ? (
         <ClientFeedbackPage orderId={orderId} serverAuthed={!!user} />
       ) : (
         <p className="text-muted-foreground rounded-lg border p-6 text-center text-sm">
-          현재 이용후기 작성을 일시 중지했습니다.
+          {t('feedbackPaused')}
         </p>
       )}
     </div>

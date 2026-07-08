@@ -16,7 +16,9 @@ export async function GET() {
 
   if (error) {
     return NextResponse.json(
-      { error: sanitizeError('api/admin/usage/get', error, '사용량 조회 실패') },
+      {
+        error: sanitizeError('api/admin/usage/get', error, '사용량 조회 실패'),
+      },
       { status: 500 },
     )
   }
@@ -61,7 +63,9 @@ export async function PUT(req: NextRequest) {
   if (error) {
     const denied = error.code === '22023'
     return NextResponse.json(
-      { error: sanitizeError('api/admin/usage/put', error, '사용량 갱신 실패') },
+      {
+        error: sanitizeError('api/admin/usage/put', error, '사용량 갱신 실패'),
+      },
       { status: denied ? 400 : 500 },
     )
   }

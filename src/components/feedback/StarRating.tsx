@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 
 interface StarRatingProps {
   value: number
@@ -17,11 +18,16 @@ export function StarRating({
   readonly = false,
   size = 'md',
 }: StarRatingProps) {
+  const t = useTranslations('feedback')
   const [hovered, setHovered] = useState(0)
   const display = hovered || value
 
   return (
-    <div className="flex gap-0.5" role="group" aria-label={`별점 ${value}점`}>
+    <div
+      className="flex gap-0.5"
+      role="group"
+      aria-label={t('starGroupLabel', { score: value })}
+    >
       {[1, 2, 3, 4, 5].map((star) => (
         <button
           key={star}
@@ -38,7 +44,7 @@ export function StarRating({
           ]
             .filter(Boolean)
             .join(' ')}
-          aria-label={`${star}점`}
+          aria-label={t('starLabel', { score: star })}
         >
           {star <= display ? '★' : '☆'}
         </button>

@@ -339,15 +339,39 @@ body {
 [data-admin-fx='glass'] {
   position: relative;
   background:
-    radial-gradient(60rem 40rem at 8% -10%, rgba(255, 154, 77, 0.12), transparent),
-    radial-gradient(50rem 40rem at 100% 10%, rgba(61, 208, 255, 0.12), transparent),
-    radial-gradient(50rem 40rem at 40% 110%, rgba(157, 107, 255, 0.1), transparent);
+    radial-gradient(
+      60rem 40rem at 8% -10%,
+      rgba(255, 154, 77, 0.12),
+      transparent
+    ),
+    radial-gradient(
+      50rem 40rem at 100% 10%,
+      rgba(61, 208, 255, 0.12),
+      transparent
+    ),
+    radial-gradient(
+      50rem 40rem at 40% 110%,
+      rgba(157, 107, 255, 0.1),
+      transparent
+    );
 }
 .dark [data-admin-fx='glass'] {
   background:
-    radial-gradient(60rem 40rem at 8% -10%, rgba(255, 154, 77, 0.14), transparent),
-    radial-gradient(50rem 40rem at 100% 10%, rgba(61, 208, 255, 0.14), transparent),
-    radial-gradient(50rem 40rem at 40% 110%, rgba(157, 107, 255, 0.12), transparent);
+    radial-gradient(
+      60rem 40rem at 8% -10%,
+      rgba(255, 154, 77, 0.14),
+      transparent
+    ),
+    radial-gradient(
+      50rem 40rem at 100% 10%,
+      rgba(61, 208, 255, 0.14),
+      transparent
+    ),
+    radial-gradient(
+      50rem 40rem at 40% 110%,
+      rgba(157, 107, 255, 0.12),
+      transparent
+    );
 }
 [data-admin-fx='glass'] [data-slot='card'] {
   position: relative;

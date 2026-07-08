@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -16,16 +17,6 @@ type PayStatus =
   | 'cancelled'
   | 'error'
 
-const STATUS_LABEL: Record<PayStatus, string> = {
-  idle: '결제하기',
-  approving: '승인 중…',
-  waiting: 'Pi 지갑 확인 중…',
-  completing: '완료 처리 중…',
-  done: '다시 결제하기',
-  cancelled: '다시 결제하기',
-  error: '다시 시도',
-}
-
 interface PayResult {
   paymentId: string
   txid: string
@@ -33,6 +24,18 @@ interface PayResult {
 
 export function PiProductCard() {
   const { user, isInPiBrowser } = usePiAuth()
+  const t = useTranslations('pay')
+  const tc = useTranslations('common')
+
+  const STATUS_LABEL: Record<PayStatus, string> = {
+    idle: t('payBtn'),
+    approving: t('approving'),
+    waiting: t('walletChecking'),
+    completing: t('completing'),
+    done: t('retryPay'),
+    cancelled: t('retryPay'),
+    error: tc('retry'),
+  }
 
   // 입력 항목
   const [productName, setProductName] = useState('상품1')
@@ -58,12 +61,12 @@ export function PiProductCard() {
 
   function handlePayment() {
     if (!window.Pi) {
-      setErrorMsg('Pi SDK를 사용할 수 없습니다.')
+      setErrorMsg(t('sdkUnavailable'))
       setStatus('error')
       return
     }
     if (!productName.trim()) {
-      setErrorMsg('상품명을 입력하세요.')
+      setErrorMsg(t('product.nameRequired'))
       setStatus('error')
       return
     }
@@ -100,7 +103,7 @@ export function PiProductCard() {
           } catch (err) {
             setStatus('error')
             setErrorMsg(
-              err instanceof Error ? err.message : '승인 중 오류 발생',
+              err instanceof Error ? err.message : t('approveErrorMsg'),
             )
           }
         },
@@ -123,13 +126,13 @@ export function PiProductCard() {
           } catch (err) {
             setStatus('error')
             setErrorMsg(
-              err instanceof Error ? err.message : '완료 처리 중 오류 발생',
+              err instanceof Error ? err.message : t('completeErrorMsg'),
             )
           }
         },
 
         onCancel: (paymentId) => {
-          setCancelMsg(`결제가 취소됐습니다. (ID: ${paymentId.slice(0, 12)}…)`)
+          setCancelMsg(t('cancelled', { id: paymentId.slice(0, 12) }))
           setStatus('cancelled')
         },
 
@@ -146,11 +149,13 @@ export function PiProductCard() {
     return (
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-sm">테스트 상품 결제</CardTitle>
+          <CardTitle className="text-sm">{t('product.title')}</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground text-sm">
-            Pi 결제는 <strong>Pi Browser</strong>에서만 사용 가능합니다.
+            {t.rich('product.piBrowserOnly', {
+              strong: (c) => <strong>{c}</strong>,
+            })}
           </p>
         </CardContent>
       </Card>
@@ -161,7 +166,7 @@ export function PiProductCard() {
     <Card>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-sm">테스트 상품 결제</CardTitle>
+          <CardTitle className="text-sm">{t('product.title')}</CardTitle>
           {user && (
             <span className="text-muted-foreground text-xs">
               @{user.username ?? user.displayName}
@@ -174,7 +179,7 @@ export function PiProductCard() {
         {/* 입력 항목 */}
         <div className="space-y-3">
           <div className="space-y-1.5">
-            <Label htmlFor="product-name">상품명</Label>
+            <Label htmlFor="product-name">{t('product.nameLabel')}</Label>
             <Input
               id="product-name"
               value={productName}
@@ -183,12 +188,12 @@ export function PiProductCard() {
                 reset()
               }}
               disabled={isProcessing}
-              placeholder="상품1"
+              placeholder={t('product.defaultName')}
             />
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="product-qty">수량</Label>
+            <Label htmlFor="product-qty">{t('product.qty')}</Label>
             <div className="flex items-center gap-2">
               <Input
                 id="product-qty"
@@ -203,12 +208,14 @@ export function PiProductCard() {
                 disabled={isProcessing}
                 className="w-24"
               />
-              <span className="text-muted-foreground text-sm">개</span>
+              <span className="text-muted-foreground text-sm">
+                {t('product.unit')}
+              </span>
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <Label>단가</Label>
+            <Label>{t('product.unitPrice')}</Label>
             <p className="text-muted-foreground font-mono text-sm">
               <span className="font-serif italic">π</span> {unitPrice} Pi
             </p>
@@ -218,7 +225,7 @@ export function PiProductCard() {
         {/* 결제 금액 합계 */}
         <div className="border-t pt-3">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium">결제 금액</span>
+            <span className="text-sm font-medium">{t('amountLabel')}</span>
             <span className="text-lg font-semibold">
               <span className="mr-1 font-serif italic">π</span>
               {totalAmount} Pi
@@ -244,7 +251,7 @@ export function PiProductCard() {
         {/* 진행 중 안내 */}
         {status === 'waiting' && (
           <p className="text-muted-foreground text-center text-xs">
-            Pi Browser 지갑 화면에서 결제를 확인해 주세요.
+            {t('confirmInWallet')}
           </p>
         )}
 
@@ -260,7 +267,11 @@ export function PiProductCard() {
         {status === 'done' && result && (
           <div className="space-y-2 rounded-lg bg-green-50 p-3 dark:bg-green-900/20">
             <p className="text-sm font-semibold text-green-700 dark:text-green-400">
-              ✓ 결제 완료 — {productName} × {quantity}개 ({totalAmount} π)
+              {t('product.doneResult', {
+                name: productName,
+                qty: quantity,
+                amount: totalAmount,
+              })}
             </p>
             <div>
               <p className="text-muted-foreground text-xs">Payment ID</p>

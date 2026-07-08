@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
 import { TranslatedMessage } from './translated-message'
@@ -20,12 +21,16 @@ export function ManualTranslateButton({
   original: string
   feeBean: number
 }) {
+  const t = useTranslations('chat')
+  const tc = useTranslations('common')
   const [translated, setTranslated] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   // 번역 요금은 오픈프로모로만 통제(서버 applyPromoGate와 일관) — 프로모 ON 무료, OFF 정상요금.
   //   번역은 PI 마이크로 무료화 대상이 아니므로 PI 모드여도 프로모 OFF면 Bean 과금.
   const promoActive = useOpenPromoActive()
-  const feeLabel = promoActive ? '무료' : `${feeBean} Bean`
+  const feeLabel = promoActive
+    ? tc('free')
+    : t('manualTranslate.feeBean', { fee: feeBean })
 
   // 이미 번역됨 → 번역/원문 토글 UI 재사용
   if (translated !== null) {
@@ -58,12 +63,14 @@ export function ManualTranslateButton({
       if (res.ok) {
         setTranslated(data.trans_cont ?? original)
       } else if (res.status === 402) {
-        toast.error(data.error ?? `번역에 ${feeBean} Bean이 필요합니다`)
+        toast.error(
+          data.error ?? t('manualTranslate.needBean', { fee: feeBean }),
+        )
       } else {
-        toast.error(data.error ?? '번역에 실패했습니다')
+        toast.error(data.error ?? t('manualTranslate.failed'))
       }
     } catch {
-      toast.error('번역 오류가 발생했습니다')
+      toast.error(t('manualTranslate.error'))
     } finally {
       setLoading(false)
     }
@@ -78,7 +85,10 @@ export function ManualTranslateButton({
         disabled={loading}
         className="text-primary self-start text-[10px] underline opacity-70 transition-opacity hover:opacity-100 disabled:opacity-40"
       >
-        🌐 {loading ? '번역 중…' : `번역 (${feeLabel})`}
+        🌐{' '}
+        {loading
+          ? t('manualTranslate.translating')
+          : t('manualTranslate.translateWithFee', { fee: feeLabel })}
       </button>
     </div>
   )

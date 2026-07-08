@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
 import { resizeImage } from '@/lib/image-resize'
@@ -22,6 +23,7 @@ const ONE_MB = 1024 * 1024
 // 상품 이미지 업로더 — 갤러리 선택 또는 촬영. 클라이언트 압축(원본 1280px·썸네일 400px)
 // 후 1MB 이하로 업로드. 첫 장이 대표(목록 썸네일)로 사용된다.
 export function ProductImageUploader({ images, onChange, max = 3 }: Props) {
+  const t = useTranslations('store')
   const [busy, setBusy] = useState(false)
   const galleryRef = useRef<HTMLInputElement>(null)
   const cameraRef = useRef<HTMLInputElement>(null)
@@ -50,11 +52,11 @@ export function ProductImageUploader({ images, onChange, max = 3 }: Props) {
       const next = [...images]
       for (const file of Array.from(fileList)) {
         if (next.length >= max) {
-          toast.error(`이미지는 최대 ${max}장까지 등록할 수 있습니다`)
+          toast.error(t('imgMaxCount', { max }))
           break
         }
         if (!file.type.startsWith('image/')) {
-          toast.error('이미지 파일만 등록할 수 있습니다')
+          toast.error(t('imgOnlyImages'))
           continue
         }
         // 원본 압축(1280px, 1MB 이하 보장) + 목록용 썸네일(400px)
@@ -63,7 +65,7 @@ export function ProductImageUploader({ images, onChange, max = 3 }: Props) {
           maxBytes: ONE_MB,
         })
         if (origBlob.size > ONE_MB) {
-          toast.error('이미지를 1MB 이하로 줄일 수 없습니다')
+          toast.error(t('imgTooLarge'))
           continue
         }
         const thumbBlob = await resizeImage(file, 400, { quality: 0.7 })
@@ -75,7 +77,7 @@ export function ProductImageUploader({ images, onChange, max = 3 }: Props) {
       }
       onChange(next)
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : '업로드에 실패했습니다')
+      toast.error(e instanceof Error ? e.message : t('uploadFailed'))
     } finally {
       setBusy(false)
       // 같은 파일 재선택 가능하도록 input 초기화
@@ -101,19 +103,19 @@ export function ProductImageUploader({ images, onChange, max = 3 }: Props) {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={img.thumbUrl}
-              alt={`상품 이미지 ${i + 1}`}
+              alt={t('imgAlt', { n: i + 1 })}
               className="h-full w-full object-cover"
             />
             {i === 0 && (
               <span className="bg-primary text-primary-foreground absolute top-1 left-1 rounded px-1.5 py-0.5 text-[10px] font-medium">
-                대표
+                {t('imgRep')}
               </span>
             )}
             <button
               type="button"
               onClick={() => remove(i)}
               className="absolute top-1 right-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-xs text-white hover:bg-black/80"
-              aria-label="이미지 삭제"
+              aria-label={t('imgDelete')}
             >
               ×
             </button>
@@ -123,7 +125,9 @@ export function ProductImageUploader({ images, onChange, max = 3 }: Props) {
         {images.length < max && (
           <div className="flex aspect-square flex-col items-center justify-center gap-1 rounded-md border border-dashed">
             {busy ? (
-              <span className="text-muted-foreground text-xs">업로드 중…</span>
+              <span className="text-muted-foreground text-xs">
+                {t('uploading')}
+              </span>
             ) : (
               <span className="text-muted-foreground text-2xl">＋</span>
             )}
@@ -157,7 +161,7 @@ export function ProductImageUploader({ images, onChange, max = 3 }: Props) {
           disabled={!canAdd}
           onClick={() => galleryRef.current?.click()}
         >
-          🖼️ 사진 선택
+          {t('photoSelect')}
         </Button>
         <Button
           type="button"
@@ -166,13 +170,12 @@ export function ProductImageUploader({ images, onChange, max = 3 }: Props) {
           disabled={!canAdd}
           onClick={() => cameraRef.current?.click()}
         >
-          📷 촬영
+          {t('photoCapture')}
         </Button>
       </div>
 
       <p className="text-muted-foreground text-xs">
-        최대 {max}장 · 1MB 이하로 자동 압축 · 첫 번째 사진이 목록 대표(썸네일)로
-        사용됩니다.
+        {t('imgUploadHint', { max })}
       </p>
     </div>
   )

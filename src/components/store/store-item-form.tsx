@@ -306,7 +306,7 @@ export function StoreItemForm({
       mode !== 'offline' &&
       (lat === null || lng === null)
     ) {
-      toast.error('현재 위치를 등록해야 게시할 수 있습니다')
+      toast.error(t('locRequiredToPublish'))
       return
     }
 
@@ -556,18 +556,21 @@ export function StoreItemForm({
       </div>
 
       <div className="space-y-1.5">
-        <Label>상품 이미지</Label>
+        <Label>{t('form.images')}</Label>
         <ProductImageUploader images={images} onChange={setImages} max={3} />
       </div>
 
       {/* 판매 위치 — P2P 등록 모드 전용. offline 모드는 매장 좌표 자동 상속이므로 표시 안 함 */}
       {!editMode && mode !== 'offline' && (
         <div className="space-y-1.5">
-          <Label>📍 판매 위치</Label>
+          <Label>{t('location.title')}</Label>
           {lat !== null && lng !== null ? (
             <div className="flex items-center gap-2 text-sm">
               <span className="bg-muted rounded px-2 py-1 text-xs">
-                위치 등록됨 ({lat.toFixed(4)}, {lng.toFixed(4)})
+                {t('locRegisteredCoord', {
+                  lat: lat.toFixed(4),
+                  lng: lng.toFixed(4),
+                })}
               </span>
               <button
                 type="button"
@@ -577,7 +580,7 @@ export function StoreItemForm({
                 }}
                 className="text-destructive text-xs underline"
               >
-                해제
+                {t('location.clear')}
               </button>
             </div>
           ) : (
@@ -589,18 +592,12 @@ export function StoreItemForm({
                 lbsConsent === 'Y' ? captureLocation() : setConsentOpen(true)
               }
             >
-              {locLoading ? '📍 위치 확인 중…' : '📍 현재 위치 등록'}
+              {locLoading ? t('location.checking') : t('location.register')}
             </Button>
           )}
-          <p className="text-muted-foreground text-xs">
-            위치를 등록하면 구매자 목록에 거리로 표시되고 주변순 검색에
-            노출됩니다. (위치 서비스 동의자만)
-          </p>
+          <p className="text-muted-foreground text-xs">{t('location.hint')}</p>
           {lat === null && (
-            <p className="text-destructive text-xs">
-              게시하려면 현재 위치 등록이 필요합니다. (임시저장은 위치 없이
-              가능)
-            </p>
+            <p className="text-destructive text-xs">{t('locRequiredHint')}</p>
           )}
         </div>
       )}

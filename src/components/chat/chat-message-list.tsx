@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useRef, useCallback, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { piFetch } from '@/lib/pi-fetch'
 import type { ChatMessage } from '@/hooks/use-chat-room'
 import { usePiAuth } from '@/components/pi-auth-provider'
@@ -32,6 +33,8 @@ export function ChatMessageList({
   onUpgradeForTip,
 }: ChatMessageListProps) {
   const { user } = usePiAuth()
+  const t = useTranslations('chat')
+  const tc = useTranslations('common')
   const isAdmin = user?.role === 'ADMIN' || user?.role === 'MASTER'
   const [hasMore, setHasMore] = useState(messages.length >= 50)
   const [isLoading, setIsLoading] = useState(false)
@@ -140,12 +143,12 @@ export function ChatMessageList({
     >
       {isLoading && (
         <div className="text-muted-foreground py-2 text-center text-sm">
-          불러오는 중...
+          {tc('fetching')}
         </div>
       )}
       {!hasMore && messages.length > 0 && (
         <div className="text-muted-foreground py-2 text-center text-xs">
-          대화의 시작입니다
+          {t('msgList.conversationStart')}
         </div>
       )}
       {messages.map((msg, idx) => {
@@ -154,7 +157,8 @@ export function ChatMessageList({
         const hideTime =
           !!next &&
           next.snd_usr_id === msg.snd_usr_id &&
-          formatKoreanTime(next.reg_dtm) === formatKoreanTime(msg.reg_dtm) &&
+          formatKoreanTime(next.reg_dtm, t) ===
+            formatKoreanTime(msg.reg_dtm, t) &&
           isSameDay(next.reg_dtm, msg.reg_dtm)
         return (
           <div key={msg.msg_id}>
@@ -181,7 +185,7 @@ export function ChatMessageList({
   )
 }
 
-const DAY_NAMES = ['일', '월', '화', '수', '목', '금', '토']
+type ChatT = ReturnType<typeof useTranslations<'chat'>>
 
 function isSameDay(a: string, b: string): boolean {
   const da = new Date(a)
@@ -193,17 +197,24 @@ function isSameDay(a: string, b: string): boolean {
   )
 }
 
-function formatKoreanDate(dtm: string): string {
+function formatKoreanDate(dtm: string, t: ChatT): string {
   const d = new Date(dtm)
-  return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 ${DAY_NAMES[d.getDay()]}요일`
+  const weekday = t('msgList.weekdays').split(',')[d.getDay()]
+  return t('msgList.dateHeader', {
+    year: d.getFullYear(),
+    month: d.getMonth() + 1,
+    day: d.getDate(),
+    weekday,
+  })
 }
 
 function DateDivider({ dtm }: { dtm: string }) {
+  const t = useTranslations('chat')
   return (
     <div className="my-3 flex items-center gap-3">
       <div className="bg-border h-px flex-1" />
       <span className="text-muted-foreground text-xs">
-        {formatKoreanDate(dtm)}
+        {formatKoreanDate(dtm, t)}
       </span>
       <div className="bg-border h-px flex-1" />
     </div>
@@ -212,11 +223,11 @@ function DateDivider({ dtm }: { dtm: string }) {
 
 // Node.js는 ICU 없이 빌드되면 toLocaleTimeString('ko-KR')이 'PM HH:MM'을 반환해 hydration 불일치 발생.
 // 직접 구현으로 서버·클라이언트 동일 출력 보장.
-function formatKoreanTime(dtm: string): string {
+function formatKoreanTime(dtm: string, t: ChatT): string {
   const d = new Date(dtm)
   const h = d.getHours()
   const m = d.getMinutes().toString().padStart(2, '0')
-  const period = h < 12 ? '오전' : '오후'
+  const period = h < 12 ? t('msgList.am') : t('msgList.pm')
   const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h
   return `${period} ${h12.toString().padStart(2, '0')}:${m}`
 }
@@ -242,6 +253,7 @@ function MessageBubble({
   hideTime: boolean
   onUpgradeForTip?: () => void
 }) {
+  const t = useTranslations('chat')
   // 메시지 탭 시 선물 버튼 노출 (hover 없는 모바일 대응)
   const [showActions, setShowActions] = useState(false)
   // 발신자명 — 비관리자 뷰어에겐 마스킹(username 마스킹 규칙)
@@ -270,7 +282,7 @@ function MessageBubble({
             onClick={onUpgradeForTip}
             className="text-primary ml-1.5 underline"
           >
-            나도 Bean 보내기
+            {t('msgList.sendBeanToo')}
           </button>
         )}
       </div>
@@ -288,7 +300,7 @@ function MessageBubble({
         {msg.attch_url ? (
           <StickerImg
             src={msg.attch_url}
-            alt="스티커"
+            alt={t('msgList.sticker')}
             className="h-48 w-48 rounded-xl object-contain"
           />
         ) : (
@@ -298,7 +310,7 @@ function MessageBubble({
         )}
         {!hideTime && (
           <span className="text-muted-foreground text-[10px]">
-            {formatKoreanTime(msg.reg_dtm)}
+            {formatKoreanTime(msg.reg_dtm, t)}
           </span>
         )}
       </div>
@@ -318,18 +330,18 @@ function MessageBubble({
           <a href={msg.attch_url} target="_blank" rel="noopener noreferrer">
             <img
               src={msg.attch_url}
-              alt="이미지"
+              alt={t('msgList.image')}
               className="max-h-60 max-w-[280px] rounded-xl object-cover"
             />
           </a>
         ) : (
           <div className="bg-muted text-muted-foreground flex h-20 w-40 items-center justify-center rounded-xl text-sm">
-            이미지 없음
+            {t('msgList.noImage')}
           </div>
         )}
         {!hideTime && (
           <span className="text-muted-foreground text-[10px]">
-            {formatKoreanTime(msg.reg_dtm)}
+            {formatKoreanTime(msg.reg_dtm, t)}
           </span>
         )}
       </div>
@@ -354,7 +366,7 @@ function MessageBubble({
         )}
         {!hideTime && (
           <span className="text-muted-foreground text-[10px]">
-            {formatKoreanTime(msg.reg_dtm)}
+            {formatKoreanTime(msg.reg_dtm, t)}
           </span>
         )}
       </div>
@@ -378,12 +390,12 @@ function MessageBubble({
         >
           <span>📄</span>
           <span className="max-w-[200px] truncate">
-            {msg.msg_cont ?? '파일'}
+            {msg.msg_cont ?? t('msgList.file')}
           </span>
         </a>
         {!hideTime && (
           <span className="text-muted-foreground text-[10px]">
-            {formatKoreanTime(msg.reg_dtm)}
+            {formatKoreanTime(msg.reg_dtm, t)}
           </span>
         )}
       </div>
@@ -403,7 +415,7 @@ function MessageBubble({
         </div>
         {!hideTime && (
           <span className="text-muted-foreground text-[10px]">
-            {formatKoreanTime(msg.reg_dtm)}
+            {formatKoreanTime(msg.reg_dtm, t)}
           </span>
         )}
       </div>
@@ -459,7 +471,7 @@ function MessageBubble({
         >
           {!hideTime && (
             <span className="text-muted-foreground text-[10px]">
-              {formatKoreanTime(msg.reg_dtm)}
+              {formatKoreanTime(msg.reg_dtm, t)}
             </span>
           )}
           {showActions && !isMe && canTip && (

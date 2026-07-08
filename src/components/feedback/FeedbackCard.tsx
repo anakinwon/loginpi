@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { StarRating } from './StarRating'
 
 export interface FeedbackCardData {
@@ -22,6 +23,8 @@ export function FeedbackCard({
   onDelete,
   isOwner,
 }: FeedbackCardProps) {
+  const t = useTranslations('feedback')
+  const tc = useTranslations('common')
   const dateStr = new Date(feedback.reg_dtm).toLocaleString('ko-KR', {
     year: 'numeric',
     month: '2-digit',
@@ -51,7 +54,7 @@ export function FeedbackCard({
             <img
               key={i}
               src={url}
-              alt={`후기 이미지 ${i + 1}`}
+              alt={t('imageAlt', { n: i + 1 })}
               className="h-20 w-20 rounded-md object-cover"
             />
           ))}
@@ -65,7 +68,7 @@ export function FeedbackCard({
             onClick={() => onDelete(feedback.fbck_id)}
             className="text-destructive text-xs hover:underline"
           >
-            삭제
+            {tc('delete')}
           </button>
         </div>
       )}

@@ -120,7 +120,7 @@ export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
     product: SubscrProduct,
   ) {
     if (typeof window === 'undefined' || !window.Pi) {
-      toast.error('Pi Browser에서 결제할 수 있습니다')
+      toast.error(t('piBrowserOnly'))
       setBusy(null)
       return
     }
@@ -299,7 +299,10 @@ export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
                       <p className="mt-0.5 text-xs font-semibold text-green-600 dark:text-green-400">
                         {/* PI 모드는 Pi(π) 환산 인라인(단위 일관). BEAN 모드는 기존 i18n(☕). */}
                         {isPi
-                          ? `연간 결제로 ${sv.saveBean / 100}π 절약 — ${sv.monthsFree}개월 무료! 🎉`
+                          ? t('annualSavePi', {
+                              pi: sv.saveBean / 100,
+                              months: sv.monthsFree,
+                            })
                           : t('annualSave', {
                               bean: sv.saveBean.toLocaleString(),
                               months: sv.monthsFree,
@@ -390,7 +393,7 @@ export function ClientSubscribe({ serverAuthed }: { serverAuthed: boolean }) {
 
       {/* PI 모드는 Pi 직결제 — Bean 차감/환금불가 안내는 부적합하므로 Pi 전용 문구로 대체 */}
       <p className="text-muted-foreground text-xs">
-        ℹ️ {isPi ? '구독료는 Pi로 결제됩니다. 연간은 2개월 무료.' : t('notice')}
+        ℹ️ {isPi ? t('noticePi') : t('notice')}
       </p>
     </div>
   )

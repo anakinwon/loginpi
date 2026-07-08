@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { SessionProvider } from 'next-auth/react'
 import { NextIntlClientProvider } from 'next-intl'
-import { getMessages } from 'next-intl/server'
+import { getMessages, getTranslations } from 'next-intl/server'
 import { env } from '@/env'
 import '../globals.css'
 import 'flag-icons/css/flag-icons.min.css'
@@ -33,34 +33,34 @@ const geistMono = Geist_Mono({
 })
 
 const APP_NAME = 'CafePi'
-const APP_TITLE = 'CafePi — Pi 커뮤니티 카페 · 마켓플레이스'
-const APP_DESC =
-  'Pi Network 커뮤니티 카페에서 소통하고, 마켓플레이스에서 Pi로 거래하세요. Pi Browser에서 Pi 계정으로 로그인·결제할 수 있습니다.'
 
 // 공유 링크 미리보기(OG/Twitter) + 기본 메타데이터 위생.
 // 본문 다수가 인증·클라이언트 게이트라 SEO 색인 대상은 적지만, 링크 공유 시 미리보기 카드가 뜨도록 정비.
-// 다국어 메타데이터(203 locale)는 과투자 → 한국어 기본값 단일 유지.
-export const metadata: Metadata = {
-  metadataBase: new URL(env.NEXT_PUBLIC_APP_URL),
-  applicationName: APP_NAME,
-  title: { default: APP_TITLE, template: `%s · ${APP_NAME}` },
-  description: APP_DESC,
-  icons: { icon: '/cafe_bean003.png', apple: '/cafe_bean003.png' },
-  openGraph: {
-    type: 'website',
-    siteName: APP_NAME,
-    title: APP_TITLE,
-    description: APP_DESC,
-    url: '/',
-    locale: 'ko_KR',
-    images: [{ url: '/api/og', width: 1200, height: 630, alt: APP_TITLE }],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: APP_TITLE,
-    description: APP_DESC,
-    images: ['/api/og'],
-  },
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('sysUi.meta')
+  const title = t('title')
+  const description = t('description')
+  return {
+    metadataBase: new URL(env.NEXT_PUBLIC_APP_URL),
+    applicationName: APP_NAME,
+    title: { default: title, template: `%s · ${APP_NAME}` },
+    description,
+    icons: { icon: '/cafe_bean003.png', apple: '/cafe_bean003.png' },
+    openGraph: {
+      type: 'website',
+      siteName: APP_NAME,
+      title,
+      description,
+      url: '/',
+      images: [{ url: '/api/og', width: 1200, height: 630, alt: title }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: ['/api/og'],
+    },
+  }
 }
 
 export default async function LocaleLayout({

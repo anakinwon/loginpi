@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState, useCallback } from 'react'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
 
@@ -39,6 +40,8 @@ export function GalleryImageEditor({
   disabled,
   maxFiles = 5,
 }: Props) {
+  const t = useTranslations('board')
+  const tc = useTranslations('common')
   const [items, setItems] = useState<Item[]>(() =>
     [...initialImages]
       .sort((a, b) => a.sort_ord - b.sort_ord)
@@ -99,7 +102,7 @@ export function GalleryImageEditor({
     if (!imageFiles.length) return
 
     if (items.length + imageFiles.length > maxFiles) {
-      toast.error(`이미지는 최대 ${maxFiles}개까지 가능합니다`)
+      toast.error(t('gallery.maxImages', { max: maxFiles }))
       return
     }
 
@@ -172,7 +175,7 @@ export function GalleryImageEditor({
           ),
         )
       } else {
-        toast.error(`업로드 실패: ${file.name}`)
+        toast.error(t('gallery.uploadFailFile', { name: file.name }))
         URL.revokeObjectURL(previewUrl)
         setItems((prev) =>
           prev.filter(
@@ -191,7 +194,7 @@ export function GalleryImageEditor({
         { method: 'DELETE' },
       )
       if (!res.ok) {
-        toast.error('삭제 실패')
+        toast.error(t('gallery.deleteFail'))
         return
       }
     }
@@ -205,7 +208,10 @@ export function GalleryImageEditor({
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium">
-          이미지 ({items.length}/{maxFiles})
+          {t('gallery.imageCountLabel', {
+            current: items.length,
+            max: maxFiles,
+          })}
         </span>
         {items.length > 0 && items.length < maxFiles && !disabled && (
           <button
@@ -213,7 +219,7 @@ export function GalleryImageEditor({
             onClick={() => fileInputRef.current?.click()}
             className="text-primary text-xs hover:underline"
           >
-            + 이미지 추가
+            {t('gallery.addImageMore')}
           </button>
         )}
       </div>
@@ -252,9 +258,9 @@ export function GalleryImageEditor({
               d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
             />
           </svg>
-          <p className="text-sm">클릭하여 이미지 추가</p>
+          <p className="text-sm">{t('gallery.clickToAddImage')}</p>
           <p className="mt-1 text-xs opacity-60">
-            최대 {maxFiles}개, 20MB 이하
+            {t('gallery.maxImagesHint', { max: maxFiles })}
           </p>
         </button>
       ) : (
@@ -292,7 +298,7 @@ export function GalleryImageEditor({
                       type="button"
                       onClick={() => move(idx, -1)}
                       disabled={idx === 0}
-                      aria-label="앞으로 이동"
+                      aria-label={t('gallery.moveFront')}
                       className="rounded p-0.5 text-white hover:bg-white/20 disabled:opacity-30"
                     >
                       ←
@@ -300,7 +306,7 @@ export function GalleryImageEditor({
                     <button
                       type="button"
                       onClick={() => handleRemove(idx)}
-                      aria-label="삭제"
+                      aria-label={tc('delete')}
                       className="rounded p-0.5 text-white hover:bg-red-500/70"
                     >
                       ✕
@@ -309,7 +315,7 @@ export function GalleryImageEditor({
                       type="button"
                       onClick={() => move(idx, 1)}
                       disabled={idx === items.length - 1}
-                      aria-label="뒤로 이동"
+                      aria-label={t('gallery.moveBack')}
                       className="rounded p-0.5 text-white hover:bg-white/20 disabled:opacity-30"
                     >
                       →

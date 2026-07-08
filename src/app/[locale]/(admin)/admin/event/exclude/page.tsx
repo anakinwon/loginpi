@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Loader2, X } from 'lucide-react'
 import { piFetch } from '@/lib/pi-fetch'
 import { Button } from '@/components/ui/button'
@@ -20,12 +21,14 @@ interface ExcludedUser {
 }
 
 // 요원명 표시 — pi_username 우선(@표기), 없으면 별명/이름 폴백
-function agentLabel(u: ExcludedUser['sys_user']): string {
+function agentLabel(u: ExcludedUser['sys_user'], noName: string): string {
   if (u.pi_username) return `@${u.pi_username}`
-  return u.nick_nm || u.display_name || '(이름 없음)'
+  return u.nick_nm || u.display_name || noName
 }
 
 export default function AdminEventExcludePage() {
+  const t = useTranslations('adminMgmt.eventExclude')
+  const tc = useTranslations('common')
   const [loading, setLoading] = useState(true)
   const [excluded, setExcluded] = useState<ExcludedUser[]>([])
   const [piUsername, setPiUsername] = useState('')
@@ -38,14 +41,14 @@ export default function AdminEventExcludePage() {
     try {
       const res = await piFetch('/api/admin/event/exclude')
       if (!res.ok) {
-        setError('제외 대상자 목록 로드 실패')
+        setError(t('loadFail'))
         return
       }
       const data = await res.json()
       setExcluded(data.excluded ?? [])
     } catch (err) {
       console.error('Fetch error:', err)
-      setError('네트워크 오류')
+      setError(t('networkError'))
     } finally {
       setLoading(false)
     }
@@ -57,7 +60,7 @@ export default function AdminEventExcludePage() {
 
   const handleAddExclude = async () => {
     if (!piUsername.trim()) {
-      alert('Pi 사용자명을 입력하세요')
+      alert(t('enterPiUsername'))
       return
     }
 
@@ -73,18 +76,19 @@ export default function AdminEventExcludePage() {
 
       const data = await res.json()
       if (!res.ok) {
-        alert(data.error || '제외 추가 실패')
+        alert(data.error || t('addFail'))
         setAdding(false)
         return
       }
 
       // 새 응답 형식: { added, already, notFound } (콤마 다중 입력 지원)
       const msgs: string[] = []
-      if (data.added?.length) msgs.push(`제외 ${data.added.length}명`)
+      if (data.added?.length)
+        msgs.push(t('addedCount', { count: data.added.length }))
       if (data.already?.length)
-        msgs.push(`이미 제외: ${data.already.join(', ')}`)
+        msgs.push(t('alreadyExcluded', { list: data.already.join(', ') }))
       if (data.notFound?.length)
-        msgs.push(`미발견: ${data.notFound.join(', ')}`)
+        msgs.push(t('notFound', { list: data.notFound.join(', ') }))
       if (msgs.length) alert(msgs.join('\n'))
 
       await fetchExcluded()
@@ -92,7 +96,7 @@ export default function AdminEventExcludePage() {
       setReason('')
     } catch (err) {
       console.error('Add error:', err)
-      alert('오류 발생')
+      alert(tc('error'))
     } finally {
       setAdding(false)
     }
@@ -100,9 +104,7 @@ export default function AdminEventExcludePage() {
 
   // 제외 해제(다시 포함) — 논리삭제 해제
   const handleRemoveExclude = async (userId: string) => {
-    if (
-      !window.confirm('이 요원을 제외 목록에서 빼고 다시 랭킹에 포함할까요?')
-    ) {
+    if (!window.confirm(t('removeConfirm'))) {
       return
     }
 
@@ -114,7 +116,7 @@ export default function AdminEventExcludePage() {
       )
 
       if (!res.ok) {
-        alert('제외 해제 실패')
+        alert(t('removeFail'))
         setDeleting((prev) => ({ ...prev, [userId]: false }))
         return
       }
@@ -122,7 +124,7 @@ export default function AdminEventExcludePage() {
       setExcluded((prev) => prev.filter((e) => e.user_id !== userId))
     } catch (err) {
       console.error('Delete error:', err)
-      alert('오류 발생')
+      alert(tc('error'))
     } finally {
       setDeleting((prev) => ({ ...prev, [userId]: false }))
     }
@@ -143,23 +145,20 @@ export default function AdminEventExcludePage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">🚫 이벤트 제외 대상자 관리</h1>
-        <p className="text-muted-foreground mt-2">
-          제외된 요원은 이벤트 랭킹과 선물 대상에서 빠집니다. 해제하면 다시
-          포함됩니다.
-        </p>
+        <h1 className="text-3xl font-bold">{t('title')}</h1>
+        <p className="text-muted-foreground mt-2">{t('subtitle')}</p>
       </div>
 
       {/* 제외 추가 (Pi 사용자명 입력) */}
       <div className="bg-card space-y-4 rounded-lg border p-6">
-        <h2 className="text-lg font-semibold">제외 대상자 추가</h2>
+        <h2 className="text-lg font-semibold">{t('addSectionTitle')}</h2>
         <div className="space-y-3">
           <div>
             <label className="mb-1 block text-sm font-medium">
-              Pi 사용자명 (요원)
+              {t('piUsernameLabel')}
             </label>
             <Input
-              placeholder="제외할 요원의 Pi 사용자명 (예: anakin)"
+              placeholder={t('piUsernamePlaceholder')}
               value={piUsername}
               onChange={(e) => setPiUsername(e.target.value)}
               disabled={adding}
@@ -170,10 +169,10 @@ export default function AdminEventExcludePage() {
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium">
-              사유 (선택)
+              {t('reasonLabel')}
             </label>
             <Input
-              placeholder="제외 사유를 입력하세요"
+              placeholder={t('reasonPlaceholder')}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               disabled={adding}
@@ -183,10 +182,10 @@ export default function AdminEventExcludePage() {
             {adding ? (
               <>
                 <Loader2 className="mr-2 size-4 animate-spin" />
-                추가 중…
+                {t('adding')}
               </>
             ) : (
-              '제외 추가'
+              t('addBtn')
             )}
           </Button>
         </div>
@@ -195,11 +194,11 @@ export default function AdminEventExcludePage() {
       {/* 제외 목록 */}
       <div>
         <h2 className="mb-4 text-lg font-semibold">
-          제외된 요원 ({excluded.length}명)
+          {t('excludedTitle', { count: excluded.length })}
         </h2>
         {excluded.length === 0 ? (
           <div className="text-muted-foreground rounded-lg border py-10 text-center">
-            제외된 요원이 없습니다
+            {t('empty')}
           </div>
         ) : (
           <div className="space-y-2">
@@ -209,7 +208,9 @@ export default function AdminEventExcludePage() {
                 className="bg-muted/50 hover:bg-muted flex items-center justify-between rounded-lg border p-4 transition-colors"
               >
                 <div className="flex-1">
-                  <p className="font-medium">{agentLabel(e.sys_user)}</p>
+                  <p className="font-medium">
+                    {agentLabel(e.sys_user, t('noName'))}
+                  </p>
                   {(e.sys_user.nick_nm || e.sys_user.display_name) && (
                     <p className="text-muted-foreground text-xs">
                       {e.sys_user.nick_nm || e.sys_user.display_name}
@@ -217,7 +218,7 @@ export default function AdminEventExcludePage() {
                   )}
                   {e.reason && (
                     <p className="text-muted-foreground mt-1 text-sm">
-                      사유: {e.reason}
+                      {t('reasonPrefix', { reason: e.reason })}
                     </p>
                   )}
                   <p className="text-muted-foreground mt-1 text-xs">
@@ -227,7 +228,7 @@ export default function AdminEventExcludePage() {
                 <Button
                   size="sm"
                   variant="ghost"
-                  title="제외 해제 (다시 포함)"
+                  title={t('removeTitle')}
                   onClick={() => handleRemoveExclude(e.user_id)}
                   disabled={deleting[e.user_id] ?? false}
                 >

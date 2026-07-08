@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { piFetch } from '@/lib/pi-fetch'
 import {
   type EditorBlock,
@@ -27,6 +28,7 @@ export function GalleryBodyEditor({
   postId,
   disabled,
 }: Props) {
+  const t = useTranslations('board')
   const fileRef = useRef<HTMLInputElement>(null)
   const insertPosRef = useRef<number>(0)
   const [uploading, setUploading] = useState(false)
@@ -155,7 +157,9 @@ export function GalleryBodyEditor({
                   onChange={(v) => updateText(idx, v)}
                   disabled={disabled || uploading}
                   placeholder={
-                    idx === 0 ? '내용을 입력하세요...' : '계속 입력하세요...'
+                    idx === 0
+                      ? t('gallery.bodyPlaceholderFirst')
+                      : t('gallery.bodyPlaceholderMore')
                   }
                 />
               ) : (
@@ -181,7 +185,7 @@ export function GalleryBodyEditor({
 
       {uploading && (
         <p className="border-border text-muted-foreground animate-pulse border-t py-2 text-center text-xs">
-          이미지 업로드 중...
+          {t('gallery.imageUploading')}
         </p>
       )}
     </div>
@@ -233,6 +237,8 @@ function ImageBlockView({
   canMoveDown: boolean
   disabled?: boolean
 }) {
+  const t = useTranslations('board')
+  const tc = useTranslations('common')
   const src = block.kind === 'pending' ? block.blobUrl : block.url
 
   return (
@@ -254,7 +260,7 @@ function ImageBlockView({
             type="button"
             onClick={onMoveUp}
             disabled={disabled || !canMoveUp}
-            title="위로"
+            title={t('gallery.moveUp')}
             className="text-muted-foreground hover:bg-muted hover:text-foreground rounded px-1.5 py-0.5 text-sm disabled:opacity-30"
           >
             ↑
@@ -263,7 +269,7 @@ function ImageBlockView({
             type="button"
             onClick={onMoveDown}
             disabled={disabled || !canMoveDown}
-            title="아래로"
+            title={t('gallery.moveDown')}
             className="text-muted-foreground hover:bg-muted hover:text-foreground rounded px-1.5 py-0.5 text-sm disabled:opacity-30"
           >
             ↓
@@ -272,7 +278,7 @@ function ImageBlockView({
             type="button"
             onClick={onDelete}
             disabled={disabled}
-            title="삭제"
+            title={tc('delete')}
             className="text-destructive hover:bg-destructive/10 rounded px-1.5 py-0.5 text-sm disabled:opacity-30"
           >
             ×
@@ -290,6 +296,7 @@ function InsertImageButton({
   onClick: () => void
   disabled?: boolean
 }) {
+  const t = useTranslations('board')
   return (
     <div className="flex items-center gap-2 py-0.5">
       <div className="bg-border h-px flex-1" />
@@ -299,7 +306,7 @@ function InsertImageButton({
         disabled={disabled}
         className="border-border text-muted-foreground hover:border-primary hover:text-primary rounded-full border border-dashed px-2.5 py-0.5 text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-40"
       >
-        + 이미지
+        {t('gallery.addImage')}
       </button>
       <div className="bg-border h-px flex-1" />
     </div>

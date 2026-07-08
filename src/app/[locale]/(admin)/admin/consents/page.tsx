@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
 import { AdminPagination } from '@/components/admin/admin-pagination'
@@ -14,14 +15,14 @@ interface Row {
 }
 
 // 표시 유형 열 (약관·개인정보·위치=필수 / 마케팅·연령·보호자)
-const COLS: { key: string; label: string }[] = [
-  { key: 'TERMS', label: '약관' },
-  { key: 'PRIVACY', label: '개인정보' },
-  { key: 'LBS', label: '위치' },
-  { key: 'MKT', label: '마케팅' },
-  { key: 'AGE14', label: '연령' },
-  { key: 'GUARDIAN', label: '보호자' },
-]
+const CONSENT_TYPES = [
+  'TERMS',
+  'PRIVACY',
+  'LBS',
+  'MKT',
+  'AGE14',
+  'GUARDIAN',
+] as const
 
 function Cell({ v }: { v: string | null }) {
   if (v === 'Y')
@@ -31,6 +32,8 @@ function Cell({ v }: { v: string | null }) {
 }
 
 export default function ConsentsPage() {
+  const t = useTranslations('adminMgmt.consents')
+  const tc = useTranslations('common')
   const [rows, setRows] = useState<Row[]>([])
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
@@ -49,7 +52,7 @@ export default function ConsentsPage() {
       setRows(d.rows)
       setTotal(d.total)
     } catch {
-      toast.error('동의 내역을 불러오지 못했습니다')
+      toast.error(t('loadFail'))
     } finally {
       setLoading(false)
     }
@@ -64,9 +67,9 @@ export default function ConsentsPage() {
   return (
     <div className="mx-auto max-w-4xl space-y-4 p-4 sm:p-6">
       <div>
-        <h1 className="text-lg font-bold">📜 약관 동의 내역</h1>
+        <h1 className="text-lg font-bold">{t('title')}</h1>
         <p className="text-muted-foreground mt-1 text-sm">
-          사용자별 동의 현황 (유형별 최신 상태 · 총 {total.toLocaleString()}명)
+          {t('subtitle', { total: total.toLocaleString() })}
         </p>
       </div>
 
@@ -82,35 +85,39 @@ export default function ConsentsPage() {
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="요원명·닉네임 검색"
+          placeholder={t('searchPlaceholder')}
           className="border-input bg-background min-w-0 flex-1 rounded-lg border px-3 py-2 text-sm"
         />
         <button
           type="submit"
           className="bg-primary text-primary-foreground rounded-lg px-4 py-2 text-sm font-medium"
         >
-          검색
+          {tc('search')}
         </button>
       </form>
 
       {loading ? (
-        <p className="text-muted-foreground p-6 text-sm">불러오는 중…</p>
+        <p className="text-muted-foreground p-6 text-sm">{tc('fetching')}</p>
       ) : rows.length === 0 ? (
         <p className="text-muted-foreground rounded-lg border p-6 text-center text-sm">
-          동의 내역이 없습니다.
+          {t('empty')}
         </p>
       ) : (
         <div className="overflow-x-auto rounded-lg border">
           <table className="w-full text-sm">
             <thead className="bg-muted/40 text-muted-foreground text-xs">
               <tr>
-                <th className="px-3 py-2 text-left font-medium">사용자</th>
-                {COLS.map((c) => (
-                  <th key={c.key} className="px-2 py-2 text-center font-medium">
-                    {c.label}
+                <th className="px-3 py-2 text-left font-medium">
+                  {t('colUser')}
+                </th>
+                {CONSENT_TYPES.map((key) => (
+                  <th key={key} className="px-2 py-2 text-center font-medium">
+                    {t(`type.${key}`)}
                   </th>
                 ))}
-                <th className="px-3 py-2 text-left font-medium">최근 동의</th>
+                <th className="px-3 py-2 text-left font-medium">
+                  {t('colLatest')}
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y">
@@ -124,9 +131,9 @@ export default function ConsentsPage() {
                       </span>
                     )}
                   </td>
-                  {COLS.map((c) => (
-                    <td key={c.key} className="px-2 py-2 text-center">
-                      <Cell v={r.status[c.key] ?? null} />
+                  {CONSENT_TYPES.map((key) => (
+                    <td key={key} className="px-2 py-2 text-center">
+                      <Cell v={r.status[key] ?? null} />
                     </td>
                   ))}
                   <td className="text-muted-foreground px-3 py-2 text-xs whitespace-nowrap">

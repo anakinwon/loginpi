@@ -10,6 +10,7 @@
  */
 
 import * as React from 'react'
+import { useTranslations } from 'next-intl'
 import {
   Check,
   Plus,
@@ -107,7 +108,9 @@ export function GlassIconButton({
       )}
       {...props}
     >
-      <span className="relative z-[3]">{children ?? <Power className="size-6" />}</span>
+      <span className="relative z-[3]">
+        {children ?? <Power className="size-6" />}
+      </span>
     </button>
   )
 }
@@ -125,6 +128,7 @@ export function GlassSearch({
   className,
 }: GlassSearchProps) {
   const [value, setValue] = React.useState('')
+  const t = useTranslations('userMisc')
   return (
     <div className={cn('flex items-stretch gap-3', className)}>
       <GlassSurface
@@ -141,7 +145,7 @@ export function GlassSearch({
       </GlassSurface>
       <button
         onClick={onAdd}
-        aria-label="추가"
+        aria-label={t('add')}
         className="glass-surface glass-prism glass-gloss relative flex size-14 shrink-0 items-center justify-center rounded-full text-slate-600 transition-all active:scale-95 dark:text-slate-200"
       >
         <Plus className="relative z-[3] size-6" />
@@ -287,6 +291,7 @@ export function GlassToast({
   onClose?: () => void
   className?: string
 }) {
+  const tc = useTranslations('common')
   return (
     <GlassSurface
       gloss
@@ -308,7 +313,7 @@ export function GlassToast({
       </div>
       <button
         onClick={onClose}
-        aria-label="닫기"
+        aria-label={tc('close')}
         className="relative z-[3] flex size-9 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-white/40 dark:text-slate-300 dark:hover:bg-white/10"
       >
         <X className="size-4" />
@@ -336,27 +341,22 @@ export function GlassCard({
 }
 
 /* ── 알림 팝오버 (Pro plan) ───────────────────────────────────────────── */
-export function GlassPopover({
-  className,
-}: {
-  className?: string
-}) {
+export function GlassPopover({ className }: { className?: string }) {
   const [open, setOpen] = React.useState(true)
+  const t = useTranslations('userMisc')
+  const tc = useTranslations('common')
   if (!open) {
     return (
       <button
         onClick={() => setOpen(true)}
         className="glass-surface glass-prism relative flex h-14 items-center justify-center rounded-[1.6rem] px-6 text-slate-600 dark:text-slate-200"
       >
-        <span className="relative z-[3]">알림 다시 열기</span>
+        <span className="relative z-[3]">{t('reopenNotice')}</span>
       </button>
     )
   }
   return (
-    <GlassSurface
-      gloss
-      className={cn('rounded-[1.6rem] p-5', className)}
-    >
+    <GlassSurface gloss className={cn('rounded-[1.6rem] p-5', className)}>
       <div className="relative z-[3] flex flex-col gap-3">
         <div className="flex items-start justify-between">
           <div>
@@ -369,7 +369,7 @@ export function GlassPopover({
           </div>
           <button
             onClick={() => setOpen(false)}
-            aria-label="닫기"
+            aria-label={tc('close')}
             className="flex size-8 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-white/40 dark:text-slate-300 dark:hover:bg-white/10"
           >
             <X className="size-4" />

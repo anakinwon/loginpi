@@ -1,24 +1,19 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import type { DistCfgRow } from '@/lib/mps-dist-cfg'
 
-const PRESETS = [
-  { label: '5km', value: 5, desc: '도보·자전거권' },
-  { label: '10km', value: 10, desc: '대중교통 30분' },
-  { label: '20km', value: 20, desc: '차량 30분' },
-  { label: '30km', value: 30, desc: '수도권 내권' },
-  { label: '50km', value: 50, desc: '광역권 (기본값)' },
-  { label: '100km', value: 100, desc: '인접 도시권' },
-  { label: '무제한', value: 0, desc: '전국 노출' },
-] as const
+const PRESETS = [5, 10, 20, 30, 50, 100, 0] as const
 
 interface HistoryResp {
   history: DistCfgRow[]
 }
 
 export default function DistanceCfgPage() {
+  const t = useTranslations('adminMgmt.distanceCfg')
+  const tc = useTranslations('common')
   const [history, setHistory] = useState<DistCfgRow[]>([])
   const [loading, setLoading] = useState(true)
   const [km, setKm] = useState(50)
@@ -36,7 +31,7 @@ export default function DistanceCfgPage() {
         setHistory(d.history ?? [])
         if (d.history?.length) setKm(d.history[0].max_dist_km)
       })
-      .catch(() => setErr('설정을 불러오지 못했습니다'))
+      .catch(() => setErr(t('loadFail')))
       .finally(() => setLoading(false))
   }
 
@@ -62,7 +57,7 @@ export default function DistanceCfgPage() {
       setNote('')
       load()
     } catch (e) {
-      setErr(e instanceof Error ? e.message : '저장 오류')
+      setErr(e instanceof Error ? e.message : t('saveError'))
     } finally {
       setSaving(false)
     }
@@ -71,25 +66,28 @@ export default function DistanceCfgPage() {
   const current = history[0]
   const unchanged = current ? current.max_dist_km === km : false
 
-  const labelKm = (v: number) => (v === 0 ? '무제한' : `${v}km`)
+  const labelKm = (v: number) => (v === 0 ? t('unlimited') : `${v}km`)
 
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold">PyShop™ 거리 제한 설정</h1>
+        <h1 className="text-2xl font-bold">{t('title')}</h1>
         <p className="text-muted-foreground mt-1 text-sm">
-          사용자 위치 기준 이 거리를 초과한 상품은 목록에 노출되지 않습니다.
+          {t('subtitleLine1')}
           <br />
-          좌표가 없는 상품(LBS 미동의 판매자)과 사용자 위치 미확인 시에는 항상
-          전체 노출됩니다.
+          {t('subtitleLine2')}
         </p>
       </div>
 
       {/* 현재 설정 배지 */}
       <div className="flex items-center gap-3">
-        <span className="text-muted-foreground text-sm">현재 적용 중:</span>
+        <span className="text-muted-foreground text-sm">
+          {t('currentApplied')}
+        </span>
         {loading ? (
-          <span className="text-muted-foreground text-sm">불러오는 중…</span>
+          <span className="text-muted-foreground text-sm">
+            {tc('fetching')}
+          </span>
         ) : (
           <span className="rounded-full bg-blue-100 px-4 py-1 text-base font-bold text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
             {current ? labelKm(current.max_dist_km) : '—'}
@@ -101,22 +99,24 @@ export default function DistanceCfgPage() {
 
       {/* 설정 카드 */}
       <div className="bg-card rounded-2xl border p-6 shadow-sm">
-        <p className="mb-4 text-sm font-semibold">새 거리 제한 설정</p>
+        <p className="mb-4 text-sm font-semibold">{t('newLimitTitle')}</p>
 
         {/* 프리셋 버튼 */}
         <div className="mb-5 flex flex-wrap gap-2">
           {PRESETS.map((p) => (
             <button
-              key={p.value}
-              onClick={() => setKm(p.value)}
+              key={p}
+              onClick={() => setKm(p)}
               className={`flex flex-col items-center rounded-xl border px-4 py-2 text-xs transition-colors ${
-                km === p.value
+                km === p
                   ? 'border-primary bg-primary/10 text-primary font-semibold'
                   : 'text-muted-foreground hover:border-muted-foreground/40'
               }`}
             >
-              <span className="text-sm font-bold">{p.label}</span>
-              <span className="mt-0.5 text-[10px] opacity-70">{p.desc}</span>
+              <span className="text-sm font-bold">{labelKm(p)}</span>
+              <span className="mt-0.5 text-[10px] opacity-70">
+                {t(`preset.${p}`)}
+              </span>
             </button>
           ))}
         </div>
@@ -124,9 +124,9 @@ export default function DistanceCfgPage() {
         {/* 슬라이더 */}
         <div className="mb-2 space-y-1">
           <div className="flex items-center justify-between text-xs">
-            <span className="text-muted-foreground">무제한 (0)</span>
+            <span className="text-muted-foreground">{t('unlimitedZero')}</span>
             <span className="font-bold tabular-nums">
-              {km === 0 ? '무제한' : `${km} km`}
+              {km === 0 ? t('unlimited') : `${km} km`}
             </span>
             <span className="text-muted-foreground">200km</span>
           </div>
@@ -159,7 +159,7 @@ export default function DistanceCfgPage() {
           <span className="text-sm">km</span>
           {km === 0 && (
             <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
-              무제한 모드
+              {t('unlimitedMode')}
             </span>
           )}
         </div>
@@ -167,12 +167,12 @@ export default function DistanceCfgPage() {
         {/* 변경 사유 */}
         <div className="mb-5">
           <label className="text-muted-foreground mb-1.5 block text-xs font-medium">
-            변경 사유 (선택)
+            {t('changeReason')}
           </label>
           <input
             type="text"
             maxLength={200}
-            placeholder="예: 신규 도시 진출, 상품 공급 부족 등"
+            placeholder={t('changeReasonPlaceholder')}
             value={note}
             onChange={(e) => setNote(e.target.value)}
             className="border-input bg-background w-full rounded-lg border px-3 py-2 text-sm focus:ring-2 focus:outline-none"
@@ -186,16 +186,16 @@ export default function DistanceCfgPage() {
             onClick={handleSave}
             className="px-6"
           >
-            {saving ? '저장 중…' : '저장'}
+            {saving ? tc('saving') : tc('save')}
           </Button>
           {unchanged && (
             <span className="text-muted-foreground text-xs">
-              현재와 동일한 값입니다
+              {t('sameValue')}
             </span>
           )}
           {saved && !unchanged && (
             <span className="text-xs font-medium text-green-600 dark:text-green-400">
-              ✓ 저장됨 — 서비스에 즉시 반영됩니다
+              {t('savedApplied')}
             </span>
           )}
         </div>
@@ -203,24 +203,29 @@ export default function DistanceCfgPage() {
 
       {/* 안내 */}
       <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-300">
-        💡 <strong>적용 조건:</strong> 거리 제한은{' '}
-        <strong>사용자가 위치 동의(LBS)를 허용</strong>하고 좌표가 수집된
-        경우에만 작동합니다. 미동의 사용자에게는 전국 상품이 계속 표시됩니다.
-        좌표 없는 상품(P2P 미동의 판매자)도 항상 포함됩니다.
+        {t.rich('notice', { strong: (c) => <strong>{c}</strong> })}
       </div>
 
       {/* 변경 이력 */}
       {history.length > 0 && (
         <div>
-          <h2 className="mb-3 text-sm font-semibold">변경 이력 (최근 20건)</h2>
+          <h2 className="mb-3 text-sm font-semibold">{t('historyTitle')}</h2>
           <div className="overflow-hidden rounded-lg border">
             <table className="w-full text-sm">
               <thead className="bg-muted/50 border-b">
                 <tr>
-                  <th className="px-4 py-2 text-left font-medium">거리 제한</th>
-                  <th className="px-4 py-2 text-left font-medium">변경 사유</th>
-                  <th className="px-4 py-2 text-left font-medium">변경자</th>
-                  <th className="px-4 py-2 text-left font-medium">변경 일시</th>
+                  <th className="px-4 py-2 text-left font-medium">
+                    {t('colDistLimit')}
+                  </th>
+                  <th className="px-4 py-2 text-left font-medium">
+                    {t('colReason')}
+                  </th>
+                  <th className="px-4 py-2 text-left font-medium">
+                    {t('colChanger')}
+                  </th>
+                  <th className="px-4 py-2 text-left font-medium">
+                    {t('colChangedAt')}
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y">
@@ -241,7 +246,7 @@ export default function DistanceCfgPage() {
                       </span>
                       {i === 0 && (
                         <span className="ml-2 text-[10px] font-medium text-blue-600">
-                          현행
+                          {t('current')}
                         </span>
                       )}
                     </td>

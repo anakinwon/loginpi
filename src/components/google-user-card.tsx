@@ -2,17 +2,22 @@
 
 import Image from 'next/image'
 import { signIn, signOut, useSession } from 'next-auth/react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export function GoogleUserCard() {
   const { data: session, status } = useSession()
+  const t = useTranslations('userMisc')
+  const tc = useTranslations('common')
 
   if (status === 'loading') {
     return (
       <Card>
         <CardContent className="py-6">
-          <p className="text-muted-foreground text-center text-sm">로딩 중…</p>
+          <p className="text-muted-foreground text-center text-sm">
+            {tc('loading')}
+          </p>
         </CardContent>
       </Card>
     )
@@ -28,13 +33,13 @@ export function GoogleUserCard() {
             className="gap-2"
           >
             <GoogleColorIcon />
-            Google 계정으로 로그인
+            {t('googleLogin')}
           </Button>
         </div>
         <p className="text-muted-foreground text-sm">
-          Google 계정으로 간편하게 로그인합니다.
+          {t('googleLoginDesc1')}
           <br />
-          Pi 계정과 별도로 독립적으로 동작합니다.
+          {t('googleLoginDesc2')}
         </p>
       </div>
     )
@@ -46,9 +51,9 @@ export function GoogleUserCard() {
     <Card>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-sm">Google 계정 정보</CardTitle>
+          <CardTitle className="text-sm">{t('googleAccountInfo')}</CardTitle>
           <Button variant="outline" size="sm" onClick={() => signOut()}>
-            로그아웃
+            {t('logout')}
           </Button>
         </div>
       </CardHeader>
@@ -58,7 +63,7 @@ export function GoogleUserCard() {
           {user.image ? (
             <Image
               src={user.image}
-              alt={user.name ?? 'Google 사용자'}
+              alt={user.name ?? t('googleUser')}
               width={40}
               height={40}
               className="rounded-full"

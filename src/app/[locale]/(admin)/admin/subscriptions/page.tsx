@@ -60,13 +60,6 @@ const PRODUCT_COLOR: Record<SubscrProduct, string> = {
     'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
 }
 
-const PRODUCT_LABEL: Record<SubscrProduct, string> = {
-  PICAFE: 'PyCafé™',
-  PISHOP: 'PyShop™',
-  TRANSLATE: '번역',
-}
-
-const CYCLE_LABEL: Record<SubscrCycle, string> = { M: '월간', Y: '연간' }
 const GRADE_SUFFIX: Record<SubscrGrade, string> = {
   GENERAL: '',
   S: ' S',
@@ -85,7 +78,16 @@ function fmtDateTime(iso: string): string {
 
 export default function SubscriptionsPage() {
   const t = useTranslations('adminSubscriptions')
+  const tm = useTranslations('adminMgmt.subscriptions')
   const tc = useTranslations('common')
+
+  const productLabel = (p: SubscrProduct): string => {
+    if (p === 'PICAFE') return 'PyCafé™'
+    if (p === 'PISHOP') return 'PyShop™'
+    return tm('productTranslate')
+  }
+  const cycleLabel = (c: SubscrCycle): string =>
+    c === 'Y' ? tm('cycleY') : tm('cycleM')
 
   // allRows: 차트·전체 현황용(검색과 무관) / rows: 목록용(검색 결과 반영)
   const [allRows, setAllRows] = useState<SubscrRow[]>([])
@@ -145,11 +147,13 @@ export default function SubscriptionsPage() {
       <div>
         <h1 className="text-2xl font-bold">{t('title')}</h1>
         <p className="text-muted-foreground mt-1 text-sm">
-          전체 {allRows.length}건 · PyCafé™{' '}
-          {allRows.filter((r) => r.prod_ctgr_cd === 'PICAFE').length}건 ·
-          PyShop™ {allRows.filter((r) => r.prod_ctgr_cd === 'PISHOP').length}건
-          · 번역 {allRows.filter((r) => r.prod_ctgr_cd === 'TRANSLATE').length}
-          건
+          {tm('summary', {
+            total: allRows.length,
+            picafe: allRows.filter((r) => r.prod_ctgr_cd === 'PICAFE').length,
+            pishop: allRows.filter((r) => r.prod_ctgr_cd === 'PISHOP').length,
+            translate: allRows.filter((r) => r.prod_ctgr_cd === 'TRANSLATE')
+              .length,
+          })}
         </p>
       </div>
 
@@ -160,7 +164,7 @@ export default function SubscriptionsPage() {
       <div className="flex items-center gap-2">
         <input
           className="bg-background w-72 rounded-md border px-3 py-1.5 text-sm"
-          placeholder="Pi username으로 검색 (2글자 이상)"
+          placeholder={tm('searchPlaceholder')}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
@@ -171,7 +175,7 @@ export default function SubscriptionsPage() {
         )}
         {query.trim().length >= 2 && !searching && (
           <span className="text-muted-foreground text-xs">
-            검색결과 {rows.length}건
+            {tm('searchResult', { count: rows.length })}
           </span>
         )}
       </div>
@@ -188,7 +192,7 @@ export default function SubscriptionsPage() {
                 : 'border-border text-muted-foreground hover:bg-muted'
             }`}
           >
-            {prod === 'all' ? '전체' : PRODUCT_LABEL[prod]}
+            {prod === 'all' ? tc('all') : productLabel(prod)}
             {prod !== 'all' && <span className="ml-1">({countOf(prod)})</span>}
           </button>
         ))}
@@ -203,13 +207,25 @@ export default function SubscriptionsPage() {
           <table className="w-full text-sm">
             <thead className="bg-muted/50 border-b">
               <tr>
-                <th className="px-4 py-2 text-left font-medium">사용자</th>
-                <th className="px-4 py-2 text-left font-medium">상품</th>
-                <th className="px-4 py-2 text-left font-medium">주기</th>
+                <th className="px-4 py-2 text-left font-medium">
+                  {t('col.user')}
+                </th>
+                <th className="px-4 py-2 text-left font-medium">
+                  {tm('colProduct')}
+                </th>
+                <th className="px-4 py-2 text-left font-medium">
+                  {tm('colCycle')}
+                </th>
                 <th className="px-4 py-2 text-left font-medium">Bean</th>
-                <th className="px-4 py-2 text-left font-medium">시작일시</th>
-                <th className="px-4 py-2 text-left font-medium">만료일시</th>
-                <th className="px-4 py-2 text-left font-medium">자동갱신</th>
+                <th className="px-4 py-2 text-left font-medium">
+                  {tm('colStart')}
+                </th>
+                <th className="px-4 py-2 text-left font-medium">
+                  {tm('colExpire')}
+                </th>
+                <th className="px-4 py-2 text-left font-medium">
+                  {t('col.autoRenew')}
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y">
@@ -237,17 +253,17 @@ export default function SubscriptionsPage() {
                       <span
                         className={`rounded-full px-2 py-0.5 text-xs font-medium ${PRODUCT_COLOR[row.prod_ctgr_cd]}`}
                       >
-                        {PRODUCT_LABEL[row.prod_ctgr_cd]}
+                        {productLabel(row.prod_ctgr_cd)}
                         {GRADE_SUFFIX[row.grade_cd]}
                       </span>
                       {row.fee_plan_cd === 'ADMIN_GRANT' && (
                         <span className="text-muted-foreground ml-1 text-[10px]">
-                          관리자
+                          {tm('adminGrant')}
                         </span>
                       )}
                     </td>
                     <td className="text-muted-foreground px-4 py-3 text-xs">
-                      {CYCLE_LABEL[row.bill_cycle_cd]}
+                      {cycleLabel(row.bill_cycle_cd)}
                     </td>
                     <td className="text-muted-foreground px-4 py-3 text-xs">
                       {row.bean_amt > 0 ? row.bean_amt.toLocaleString() : '—'}

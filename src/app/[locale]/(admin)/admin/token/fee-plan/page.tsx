@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { BeanIcon } from '@/components/ui/bean-icon'
 
@@ -20,30 +21,29 @@ interface FeePlanRow {
   mod_dtm: string
 }
 
+// 탭 값과 i18n 키 (라벨은 렌더 시 t()로 조회)
 const TABS = [
-  { label: '전체', value: '' },
-  { label: '구독', value: 'SUBSCR' },
-  { label: '카페', value: 'CAFE' },
-  { label: '스토어', value: 'STORE' },
-  { label: '플랫폼', value: 'PLATFORM' },
+  { value: '', tKey: 'common.all' },
+  { value: 'SUBSCR', tKey: 'adminToken.feePlan.tab.subscr' },
+  { value: 'CAFE', tKey: 'adminToken.feePlan.tab.cafe' },
+  { value: 'STORE', tKey: 'adminToken.feePlan.tab.store' },
+  { value: 'PLATFORM', tKey: 'adminToken.feePlan.tab.platform' },
 ] as const
 
 type TabValue = (typeof TABS)[number]['value']
 
-const CYCLE_LABEL: Record<string, string> = {
-  M: '월',
-  Y: '년',
-  W: '주',
-  ONCE: '건당',
+// 주기·등급 라벨 i18n 키 (없는 코드는 원본 표시)
+const CYCLE_KEYS: Record<string, string> = {
+  M: 'adminToken.feePlan.cycle.M',
+  Y: 'adminToken.feePlan.cycle.Y',
+  W: 'adminToken.feePlan.cycle.W',
+  ONCE: 'adminToken.feePlan.cycle.ONCE',
 }
 
-const GRADE_LABEL: Record<string, string> = {
-  GENERAL: '일반',
-  PREMIUM: '프리미엄',
-  EVENT: '이벤트',
-  S: 'S',
-  M: 'M',
-  L: 'L',
+const GRADE_KEYS: Record<string, string> = {
+  GENERAL: 'adminToken.feePlan.grade.GENERAL',
+  PREMIUM: 'adminToken.feePlan.grade.PREMIUM',
+  EVENT: 'adminToken.feePlan.grade.EVENT',
 }
 
 function filterByTab(rows: FeePlanRow[], tab: TabValue): FeePlanRow[] {
@@ -66,6 +66,7 @@ function filterByTab(rows: FeePlanRow[], tab: TabValue): FeePlanRow[] {
 }
 
 export default function BeanFeePlanPage() {
+  const t = useTranslations()
   const [rows, setRows] = useState<FeePlanRow[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -105,7 +106,7 @@ export default function BeanFeePlanPage() {
           ),
         )
       })
-      .catch((e: Error) => alert(`오류: ${e.message}`))
+      .catch((e: Error) => alert(t('adminToken.errorMsg', { msg: e.message })))
       .finally(() => setToggling(null))
   }
 
@@ -115,24 +116,24 @@ export default function BeanFeePlanPage() {
     <div className="space-y-6">
       <div>
         <h1 className="flex items-center gap-2 text-2xl font-bold">
-          <BeanIcon className="inline-block h-6 w-6" /> Bean 요금제 관리
+          <BeanIcon className="inline-block h-6 w-6" />{' '}
+          {t('adminToken.feePlan.title')}
         </h1>
         <p className="text-muted-foreground mt-1 text-sm">
-          Bean 경제 표준 요금 마스터 — PRD_15_FEE §4 기준 (43행). 구독요금만
-          빠르게 수정하려면{' '}
+          {t('adminToken.feePlan.subtitlePrefix')}{' '}
           <Link
             href="/admin/token/subscr-pricing"
             className="text-primary underline-offset-2 hover:underline"
           >
-            구독요금제 관리
+            {t('adminToken.feePlan.subtitleLink')}
           </Link>
-          를 사용하세요.
+          {t('adminToken.feePlan.subtitleSuffix')}
         </p>
       </div>
 
       {/* 탭 */}
       <div className="flex gap-1 border-b">
-        {TABS.map(({ label, value }) => (
+        {TABS.map(({ tKey, value }) => (
           <button
             key={value}
             onClick={() => setTab(value)}
@@ -142,7 +143,7 @@ export default function BeanFeePlanPage() {
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            {label}
+            {t(tKey)}
             <span className="text-muted-foreground ml-1 text-xs">
               ({filterByTab(rows, value).length})
             </span>
@@ -151,29 +152,50 @@ export default function BeanFeePlanPage() {
       </div>
 
       {loading && (
-        <p className="text-muted-foreground text-sm">불러오는 중...</p>
+        <p className="text-muted-foreground text-sm">{t('common.fetching')}</p>
       )}
-      {error && <p className="text-sm text-red-500">오류: {error}</p>}
+      {error && (
+        <p className="text-sm text-red-500">
+          {t('adminToken.errorMsg', { msg: error })}
+        </p>
+      )}
 
       {!loading && !error && (
         <>
           <p className="text-muted-foreground text-xs">
-            {visible.length}개 요금제 표시 중 (전체 {rows.length}개)
+            {t('adminToken.feePlan.showing', {
+              visible: visible.length,
+              total: rows.length,
+            })}
           </p>
 
           <div className="overflow-hidden overflow-x-auto rounded-lg border">
             <table className="w-full text-sm">
               <thead className="bg-muted/50 border-b">
                 <tr>
-                  <th className="px-3 py-2 text-left font-medium">코드</th>
-                  <th className="px-3 py-2 text-left font-medium">상품 분류</th>
-                  <th className="px-3 py-2 text-left font-medium">요금종류</th>
-                  <th className="px-3 py-2 text-left font-medium">등급</th>
-                  <th className="px-3 py-2 text-left font-medium">주기</th>
+                  <th className="px-3 py-2 text-left font-medium">
+                    {t('adminToken.feePlan.colCode')}
+                  </th>
+                  <th className="px-3 py-2 text-left font-medium">
+                    {t('adminToken.feePlan.colProdCtgr')}
+                  </th>
+                  <th className="px-3 py-2 text-left font-medium">
+                    {t('adminToken.feePlan.colFeeKnd')}
+                  </th>
+                  <th className="px-3 py-2 text-left font-medium">
+                    {t('adminToken.feePlan.colGrade')}
+                  </th>
+                  <th className="px-3 py-2 text-left font-medium">
+                    {t('adminToken.feePlan.colCycle')}
+                  </th>
                   <th className="px-3 py-2 text-right font-medium">Bean</th>
                   <th className="px-3 py-2 text-right font-medium">Pi</th>
-                  <th className="px-3 py-2 text-left font-medium">설명</th>
-                  <th className="px-3 py-2 text-center font-medium">활성</th>
+                  <th className="px-3 py-2 text-left font-medium">
+                    {t('adminToken.feePlan.colDesc')}
+                  </th>
+                  <th className="px-3 py-2 text-center font-medium">
+                    {t('adminToken.feePlan.colActive')}
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y">
@@ -183,7 +205,7 @@ export default function BeanFeePlanPage() {
                       colSpan={9}
                       className="text-muted-foreground px-3 py-6 text-center text-sm"
                     >
-                      요금제가 없습니다
+                      {t('adminToken.feePlan.noPlan')}
                     </td>
                   </tr>
                 ) : (
@@ -203,15 +225,21 @@ export default function BeanFeePlanPage() {
                       </td>
                       <td className="px-3 py-2 text-xs">
                         <span className="bg-muted rounded px-1.5 py-0.5">
-                          {GRADE_LABEL[row.grade_cd] ?? row.grade_cd}
+                          {GRADE_KEYS[row.grade_cd]
+                            ? t(GRADE_KEYS[row.grade_cd])
+                            : row.grade_cd}
                         </span>
                       </td>
                       <td className="px-3 py-2 text-xs">
-                        {CYCLE_LABEL[row.bill_cycle_cd] ?? row.bill_cycle_cd}
+                        {CYCLE_KEYS[row.bill_cycle_cd]
+                          ? t(CYCLE_KEYS[row.bill_cycle_cd])
+                          : row.bill_cycle_cd}
                       </td>
                       <td className="px-3 py-2 text-right font-semibold tabular-nums">
                         {row.amt_bean === 0 ? (
-                          <span className="text-muted-foreground">무료</span>
+                          <span className="text-muted-foreground">
+                            {t('common.free')}
+                          </span>
                         ) : (
                           <>
                             <BeanIcon className="mr-0.5 inline h-3 w-3" />
@@ -240,8 +268,8 @@ export default function BeanFeePlanPage() {
                           {toggling === row.fee_plan_id
                             ? '...'
                             : row.use_yn === 'Y'
-                              ? '활성'
-                              : '비활성'}
+                              ? t('adminToken.feePlan.colActive')
+                              : t('adminToken.feePlan.inactive')}
                         </button>
                       </td>
                     </tr>
@@ -252,9 +280,7 @@ export default function BeanFeePlanPage() {
           </div>
 
           <p className="text-muted-foreground text-xs">
-            ✅ DB가 런타임 권위 소스입니다 (2026-06-24 DB화 완료). amt_bean 수정
-            즉시 구독 과금에 반영됩니다. use_yn 비활성화 시 해당 플랜은 구독
-            목록에서 제외됩니다.
+            {t('adminToken.feePlan.footnote')}
           </p>
         </>
       )}

@@ -26,10 +26,10 @@ export default function UiLabPage() {
     <div className="relative min-h-screen overflow-hidden bg-[#eef0f4] px-6 py-16 dark:bg-[#0d0f14]">
       {/* 배경 프리즘 컬러 블롭 — 유리 질감이 살아나도록 은은한 색을 깐다 */}
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-        <div className="absolute -top-20 left-[8%] size-72 rounded-full bg-[#ff9a4d]/30 blur-3xl [animation:glass-float_14s_ease-in-out_infinite]" />
-        <div className="absolute top-1/3 right-[6%] size-80 rounded-full bg-[#3dd0ff]/30 blur-3xl [animation:glass-float_18s_ease-in-out_infinite_reverse]" />
-        <div className="absolute bottom-0 left-1/3 size-72 rounded-full bg-[#9d6bff]/25 blur-3xl [animation:glass-float_16s_ease-in-out_infinite]" />
-        <div className="absolute top-1/2 left-1/2 size-64 rounded-full bg-[#3fe0a3]/20 blur-3xl [animation:glass-float_20s_ease-in-out_infinite]" />
+        <div className="absolute -top-20 left-[8%] size-72 [animation:glass-float_14s_ease-in-out_infinite] rounded-full bg-[#ff9a4d]/30 blur-3xl" />
+        <div className="absolute top-1/3 right-[6%] size-80 [animation:glass-float_18s_ease-in-out_infinite_reverse] rounded-full bg-[#3dd0ff]/30 blur-3xl" />
+        <div className="absolute bottom-0 left-1/3 size-72 [animation:glass-float_16s_ease-in-out_infinite] rounded-full bg-[#9d6bff]/25 blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 size-64 [animation:glass-float_20s_ease-in-out_infinite] rounded-full bg-[#3fe0a3]/20 blur-3xl" />
       </div>
 
       <div className="relative z-10 mx-auto max-w-2xl">

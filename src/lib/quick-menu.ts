@@ -1,21 +1,24 @@
 import 'server-only'
 import { cache } from 'react'
+import { getTranslations } from 'next-intl/server'
 import { getSupabaseAdmin } from './supabase-admin'
 import {
   ADMIN_NAV_BY_HREF,
   DEFAULT_QUICK_MENU_HREFS,
 } from './admin-nav-catalog'
 
-// 팝업에 렌더할 항목 — href + 한국어 label (카탈로그에서 해석, i18n 컨텍스트 비의존)
+// 팝업에 렌더할 항목 — href + 현재 locale로 해석된 label (서버에서 t() 완료 후 주입)
 export type QuickMenuItem = { href: string; label: string }
 
 // 활성 팝업 메뉴 조회 (use_yn='Y', sort_ord 순). DB 미설정 시 카탈로그 기본값 폴백.
 // React cache로 요청 단위 메모이즈 — layout이 매 렌더 호출해도 DB 1회.
+// (요청 단위라 locale도 고정 — 캐시가 locale을 섞을 일 없음)
 export const getQuickMenuItems = cache(async (): Promise<QuickMenuItem[]> => {
+  const t = await getTranslations('admin.nav')
   const toItem = (href: string): QuickMenuItem | null => {
     const cat = ADMIN_NAV_BY_HREF.get(href)
     if (!cat) return null // 카탈로그에서 사라진 메뉴는 제외
-    return { href: cat.href, label: cat.label }
+    return { href: cat.href, label: t(cat.labelKey) }
   }
 
   try {

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { BeanIcon } from '@/components/ui/bean-icon'
 import { TokenRevenue } from '@/components/admin/token-revenue'
 import { BeanRevenueDistribution } from '@/components/admin/token-distribution'
@@ -131,11 +132,12 @@ function BsRow({
 
 // 보상 지급 누계 박스 — 합계 + 이벤트/캠페인별 세부 분해
 function RewardBreakdownBox({ kpi }: { kpi: TokenKpi }) {
+  const t = useTranslations()
   const breakdown = kpi.reward_breakdown ?? []
   return (
     <div className="mt-2 rounded-md bg-teal-50 px-2.5 py-1.5 dark:bg-teal-950/30">
       <BsRow
-        label="🎁 보상 지급 누계 (이벤트·캠페인)"
+        label={t('adminToken.dashboard.rewardGranted')}
         bean={kpi.reward_granted_bean}
         strong
         dotColor="bg-teal-500"
@@ -160,10 +162,12 @@ function RewardBreakdownBox({ kpi }: { kpi: TokenKpi }) {
           ))}
         </div>
       ) : (
-        <p className="text-muted-foreground mt-0.5 text-xs">REWARD 거래 없음</p>
+        <p className="text-muted-foreground mt-0.5 text-xs">
+          {t('adminToken.dashboard.noRewardTxn')}
+        </p>
       )}
       <p className="text-muted-foreground mt-1 text-xs">
-        mint로 재원 확보 후 사용자에게 지급된 Bean
+        {t('adminToken.dashboard.rewardNote')}
       </p>
     </div>
   )
@@ -177,6 +181,7 @@ function BalanceSheet({
   kpi: TokenKpi
   monitor?: MonitorInfo | null
 }) {
+  const t = useTranslations()
   const debit = kpi.total_issued_bean // 차변: 발행 원천
   const credit = kpi.circulating_bean + kpi.total_collected_bean // 대변: 현재 소재
   const diff = debit - credit // Bean 정수 항등식 — 정상이면 반드시 정확히 0
@@ -186,15 +191,18 @@ function BalanceSheet({
     <div className="border-border overflow-hidden rounded-lg border">
       {/* 헤더 */}
       <div className="bg-muted/40 flex items-center justify-between border-b px-4 py-2.5">
-        <p className="text-sm font-semibold">Bean 대차대조표</p>
+        <p className="text-sm font-semibold">
+          {t('adminToken.dashboard.balanceSheet')}
+        </p>
         {balanced ? (
           <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-semibold text-green-700 dark:bg-green-950/40 dark:text-green-400">
-            ✓ 균형 (차변 = 대변)
+            {t('adminToken.dashboard.balanced')}
           </span>
         ) : (
           <span className="rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-700 dark:bg-red-950/40 dark:text-red-400">
-            ✗ 불일치 diff {diff > 0 ? '+' : ''}
-            {diff.toLocaleString()}
+            {t('adminToken.dashboard.unbalanced', {
+              diff: `${diff > 0 ? '+' : ''}${diff.toLocaleString()}`,
+            })}
           </span>
         )}
       </div>
@@ -204,31 +212,30 @@ function BalanceSheet({
         {/* ── 차변 (좌변) ── */}
         <div className="border-b px-4 py-3 md:border-b-0">
           <p className="text-muted-foreground mb-1 text-xs font-semibold tracking-wide uppercase">
-            차변 (발행 — 원천)
+            {t('adminToken.dashboard.debitHeader')}
           </p>
           <BsRow
-            label="총 발행량"
+            label={t('adminToken.dashboard.totalIssued')}
             bean={kpi.total_issued_bean}
             strong
             dotColor="bg-blue-500"
           />
           <div className="mt-1.5 border-t pt-1.5">
             <BsRow
-              label="충전 발행 (CHARGE)"
+              label={t('adminToken.dashboard.chargeIssued')}
               bean={kpi.charge_issued_bean}
               indent
               dotColor="bg-blue-400"
             />
             <BsRow
-              label="보상·프로모션 발행 (mint)"
+              label={t('adminToken.dashboard.mintIssued')}
               bean={kpi.mint_issued_bean}
               indent
               dotColor="bg-teal-400"
             />
           </div>
           <p className="text-muted-foreground mt-1.5 text-xs">
-            충전(Pi 결제) + 보상·프로모션(mint) 합계. 이 중 보상 지급 누계는
-            아래 참조
+            {t('adminToken.dashboard.debitNote')}
           </p>
           {/* 보상 지급 누계 (REWARD) — 이벤트/캠페인별 세부 분해 */}
           <RewardBreakdownBox kpi={kpi} />
@@ -237,35 +244,35 @@ function BalanceSheet({
         {/* ── 대변 (우변) ── */}
         <div className="px-4 py-3">
           <p className="text-muted-foreground mb-1 text-xs font-semibold tracking-wide uppercase">
-            대변 (소재 — 유통 + 회수)
+            {t('adminToken.dashboard.creditHeader')}
           </p>
           <BsRow
-            label="유통 (사용자 보유)"
+            label={t('adminToken.dashboard.circulating')}
             bean={kpi.circulating_bean}
             strong
             dotColor="bg-green-500"
           />
           <div className="mt-1.5 border-t pt-1.5">
             <BsRow
-              label="회수 소계 (거버넌스)"
+              label={t('adminToken.dashboard.collectedSubtotal')}
               bean={kpi.total_collected_bean}
               strong
               dotColor="bg-amber-500"
             />
             <BsRow
-              label="PLATFORM 운영"
+              label={t('adminToken.dashboard.platformOps')}
               bean={kpi.platform_balance_bean}
               indent
               dotColor="bg-purple-400"
             />
             <BsRow
-              label="REWARD_POOL 생태계"
+              label={t('adminToken.dashboard.rewardPoolEco')}
               bean={kpi.reward_pool_balance_bean}
               indent
               dotColor="bg-teal-400"
             />
             <BsRow
-              label="FOUNDATION 재단"
+              label={t('adminToken.dashboard.foundationOrg')}
               bean={kpi.foundation_balance_bean}
               indent
               dotColor="bg-rose-400"
@@ -277,7 +284,9 @@ function BalanceSheet({
       {/* 합계 행 (차변 합계 = 대변 합계) */}
       <div className="grid grid-cols-1 border-t md:grid-cols-2 md:divide-x">
         <div className="bg-muted/30 flex items-baseline justify-between border-b px-4 py-2.5 md:border-b-0">
-          <span className="text-sm font-bold">차변 합계</span>
+          <span className="text-sm font-bold">
+            {t('adminToken.dashboard.debitTotal')}
+          </span>
           <span className="text-base font-bold tabular-nums">
             {debit.toLocaleString()}
           </span>
@@ -285,7 +294,9 @@ function BalanceSheet({
         <div
           className={`flex items-baseline justify-between px-4 py-2.5 ${balanced ? 'bg-muted/30' : 'bg-red-50 dark:bg-red-950/20'}`}
         >
-          <span className="text-sm font-bold">대변 합계</span>
+          <span className="text-sm font-bold">
+            {t('adminToken.dashboard.creditTotal')}
+          </span>
           <span
             className={`text-base font-bold tabular-nums ${balanced ? '' : 'text-red-600 dark:text-red-400'}`}
           >
@@ -295,7 +306,7 @@ function BalanceSheet({
       </div>
       {monitor && (
         <div className="text-muted-foreground border-t px-4 py-2 text-xs">
-          자동 점검(매일):{' '}
+          {t('adminToken.dashboard.autoCheck')}{' '}
           <span
             className={
               monitor.ok
@@ -303,7 +314,11 @@ function BalanceSheet({
                 : 'font-semibold text-red-600 dark:text-red-400'
             }
           >
-            {monitor.ok ? '✓ 정상' : `✗ 불일치 diff ${monitor.diff ?? '?'}`}
+            {monitor.ok
+              ? t('adminToken.dashboard.checkOk')
+              : t('adminToken.dashboard.unbalanced', {
+                  diff: String(monitor.diff ?? '?'),
+                })}
           </span>{' '}
           · {new Date(monitor.checkedAt).toLocaleString('ko-KR')}
         </div>
@@ -313,6 +328,7 @@ function BalanceSheet({
 }
 
 export default function TokenAdminPage() {
+  const t = useTranslations()
   const [data, setData] = useState<StatsResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -335,32 +351,44 @@ export default function TokenAdminPage() {
       <div className="flex items-start justify-between">
         <div>
           <h1 className="flex items-center gap-2 text-2xl font-bold">
-            <BeanIcon className="inline-block h-6 w-6" /> Bean 경제 대시보드
+            <BeanIcon className="inline-block h-6 w-6" />{' '}
+            {t('adminToken.dashboard.title')}
           </h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            PRD_16_TOKEN_MNG v1.3 — Pi Network 기준 거버넌스 · 소각 없음 · 1π =
-            100{' '}
+            {t('adminToken.dashboard.subtitle')}{' '}
             <BeanIcon className="inline-block h-3.5 w-3.5 align-text-bottom" />
           </p>
         </div>
         {data && (
           <p className="text-muted-foreground text-xs">
-            갱신: {new Date(data.last_updated).toLocaleString('ko-KR')}
+            {t('adminToken.dashboard.updatedAt', {
+              date: new Date(data.last_updated).toLocaleString('ko-KR'),
+            })}
           </p>
         )}
       </div>
 
-      {loading && <p className="text-muted-foreground text-sm">집계 중...</p>}
-      {error && <p className="text-sm text-red-500">오류: {error}</p>}
+      {loading && (
+        <p className="text-muted-foreground text-sm">
+          {t('adminToken.dashboard.aggregating')}
+        </p>
+      )}
+      {error && (
+        <p className="text-sm text-red-500">
+          {t('adminToken.errorMsg', { msg: error })}
+        </p>
+      )}
 
       {kpi && (
         <>
           {/* 항등식 검증 배너 */}
           {!kpi.identity_ok && (
             <div className="rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700 dark:border-red-700 dark:bg-red-950/30 dark:text-red-400">
-              ⚠️ Bean 항등식 불일치 — 발행({kpi.total_issued_bean}) ≠ 유통(
-              {kpi.circulating_bean}) + 회수({kpi.total_collected_bean}). DB
-              점검 필요.
+              {t('adminToken.dashboard.identityMismatch', {
+                issued: kpi.total_issued_bean,
+                circulating: kpi.circulating_bean,
+                collected: kpi.total_collected_bean,
+              })}
             </div>
           )}
 
@@ -379,25 +407,27 @@ export default function TokenAdminPage() {
           {/* 공급량 KPI 3종 */}
           <div>
             <p className="text-muted-foreground mb-2 text-xs font-semibold tracking-wide uppercase">
-              공급량 현황
+              {t('adminToken.dashboard.supplyStatus')}
             </p>
             <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
               <KpiCard
-                label="총 발행량"
+                label={t('adminToken.dashboard.totalIssued')}
                 bean={kpi.total_issued_bean}
-                sub="전체 CHARGE 합계"
+                sub={t('adminToken.dashboard.chargeTotalSub')}
                 accent="blue"
               />
               <KpiCard
-                label="유통 중"
+                label={t('adminToken.dashboard.circulatingCard')}
                 bean={kpi.circulating_bean}
-                sub="USER 지갑 합계"
+                sub={t('adminToken.dashboard.circulatingCardSub')}
                 accent="green"
               />
               <KpiCard
-                label="총 회수"
+                label={t('adminToken.dashboard.totalCollected')}
                 bean={kpi.total_collected_bean}
-                sub={`회수율 ${kpi.collection_rate_percent.toFixed(1)}%`}
+                sub={t('adminToken.dashboard.collectionRateSub', {
+                  rate: kpi.collection_rate_percent.toFixed(1),
+                })}
                 accent="amber"
               />
             </div>
@@ -406,27 +436,27 @@ export default function TokenAdminPage() {
           {/* 거버넌스 지갑 3종 — Pi Network 공식 기준 */}
           <div>
             <p className="text-muted-foreground mb-2 text-xs font-semibold tracking-wide uppercase">
-              거버넌스 지갑 (Pi Network 공식 기준)
+              {t('adminToken.dashboard.govWallets')}
             </p>
             <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
               <KpiCard
-                label="PLATFORM 운영 수익"
+                label={t('adminToken.dashboard.platformRevenue')}
                 bean={kpi.platform_balance_bean}
-                sub="소비 회수분 70%"
+                sub={t('adminToken.dashboard.platformRevenueSub')}
                 accent="purple"
                 badge={`${kpi.platform_pct.toFixed(1)}%`}
               />
               <KpiCard
-                label="FOUNDATION 재단 적립금"
+                label={t('adminToken.dashboard.foundationReserve')}
                 bean={kpi.foundation_balance_bean}
-                sub="소비 회수분 10% · Pi Network 기준"
+                sub={t('adminToken.dashboard.foundationReserveSub')}
                 accent="rose"
                 badge={`${kpi.foundation_pct.toFixed(1)}%`}
               />
               <KpiCard
-                label="REWARD_POOL 생태계 기금"
+                label={t('adminToken.dashboard.rewardPoolFund')}
                 bean={kpi.reward_pool_balance_bean}
-                sub="소비 회수분 20% · Pi Network 기준"
+                sub={t('adminToken.dashboard.rewardPoolFundSub')}
                 accent="teal"
                 badge={`${kpi.reward_pool_pct.toFixed(1)}%`}
               />
@@ -435,9 +465,7 @@ export default function TokenAdminPage() {
 
           {/* 배분 정책 안내 */}
           <p className="text-muted-foreground text-xs">
-            소비(SPEND/SUBSCRIBE/TIP/FEE) 회수분 배분: 운영 70% → PLATFORM ·
-            생태계 20% → REWARD_POOL · 재단 10% → FOUNDATION · 환불(REFUND)은
-            동일 비율로 역차감
+            {t('adminToken.dashboard.distributionPolicy')}
           </p>
         </>
       )}

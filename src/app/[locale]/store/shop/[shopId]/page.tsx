@@ -30,7 +30,8 @@ export async function generateMetadata({
 }) {
   const { shopId } = await params
   const shop = await getShop(shopId)
-  return { title: shop?.shop_nm ?? '매장' }
+  const ts = await getTranslations('sysUi')
+  return { title: shop?.shop_nm ?? ts('shop') }
 }
 
 // SCR-10 매장 스토어프론트 — 한 매장의 상품 모아보기 (FR-15). 공개(게스트 포함), redirect 금지.
@@ -40,6 +41,7 @@ export default async function ShopfrontPage({
   params: Promise<{ shopId: string }>
 }) {
   const t = await getTranslations('store')
+  const ts = await getTranslations('sysUi')
   const { shopId } = await params
   const shop = await getShop(shopId)
 
@@ -54,7 +56,7 @@ export default async function ShopfrontPage({
 
       {!shop ? (
         <p className="text-muted-foreground py-16 text-center text-sm">
-          매장을 찾을 수 없습니다
+          {ts('shopNotFound')}
         </p>
       ) : (
         <>
@@ -66,7 +68,7 @@ export default async function ShopfrontPage({
               </h1>
               {shop.owner_verified_yn === 'Y' && (
                 <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                  ✅ 인증
+                  ✅ {ts('verified')}
                 </span>
               )}
             </div>
@@ -74,7 +76,7 @@ export default async function ShopfrontPage({
               {t(`shopType.${shop.shop_type_cd}`)}
               {shop.addr && ` · 📍 ${shop.addr}`}
               {shop.biz_hour && ` · 🕒 ${shop.biz_hour}`}
-              {shop.dlvr_yn === 'Y' && ' · 🛵 배달가능'}
+              {shop.dlvr_yn === 'Y' && ` · 🛵 ${ts('deliveryAvailable')}`}
             </p>
           </div>
 

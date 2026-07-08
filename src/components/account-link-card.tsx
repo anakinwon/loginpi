@@ -6,7 +6,7 @@ import {
   signOut as googleSignOut,
   useSession,
 } from 'next-auth/react'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { usePiAuth } from './pi-auth-provider'
@@ -25,6 +25,8 @@ export function AccountLinkCard() {
   } = usePiAuth()
   const { data: googleSession } = useSession()
   const locale = useLocale()
+  const t = useTranslations('link')
+  const tc = useTranslations('common')
 
   // 로그인된 세션(Pi·Google)만 로그아웃 버튼 노출 — 헤더에서 제거한 로그아웃을 여기로 이전.
   const isLoggedIn = !!piUser || !!googleSession?.user
@@ -96,7 +98,7 @@ export function AccountLinkCard() {
       setGenStatus('done')
     } catch (err) {
       setGenStatus('error')
-      setErrMsg(err instanceof Error ? err.message : '오류 발생')
+      setErrMsg(err instanceof Error ? err.message : tc('error'))
     }
   }
 
@@ -134,7 +136,7 @@ export function AccountLinkCard() {
         <CardContent>
           <div className="text-muted-foreground flex items-center gap-2 text-xs">
             <div className="border-muted-foreground h-3 w-3 animate-spin rounded-full border border-t-transparent" />
-            연동 상태 확인 중…
+            {t('checkingStatus')}
           </div>
         </CardContent>
       </Card>
@@ -149,7 +151,7 @@ export function AccountLinkCard() {
         <CardContent className="space-y-3 text-sm">
           <div className="space-y-3 rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-950/30">
             <p className="text-xs font-semibold text-green-700 dark:text-green-400">
-              ✓ Pi + Google 계정 연동 완료
+              {t('linkedBadge')}
             </p>
             {linkStatus.piUsername && (
               <div className="flex items-center justify-between text-xs">
@@ -175,7 +177,7 @@ export function AccountLinkCard() {
   return (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle className="text-sm">계정 연동</CardTitle>
+        <CardTitle className="text-sm">{t('sectionTitle')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3 text-sm">
         <StatusRow
@@ -198,9 +200,11 @@ export function AccountLinkCard() {
             /* Pi 세션 있음 → 코드 생성 UI */
             <div className="space-y-2">
               <p className="text-muted-foreground text-xs">
-                아래 버튼으로 코드를 생성하고, 일반 브라우저의{' '}
-                <span className="text-foreground font-mono">/link</span>{' '}
-                페이지에 입력하세요.
+                {t.rich('genInstructions', {
+                  code: (c) => (
+                    <span className="text-foreground font-mono">{c}</span>
+                  ),
+                })}
               </p>
               <Button
                 size="sm"
@@ -209,35 +213,34 @@ export function AccountLinkCard() {
                 onClick={() => generateCode()}
               >
                 {genStatus === 'loading'
-                  ? '코드 생성 중…'
+                  ? t('generating')
                   : genStatus === 'done'
-                    ? '새 코드 생성'
-                    : '연동 코드 생성'}
+                    ? t('regenerate')
+                    : t('generate')}
               </Button>
 
               {genStatus === 'done' && displayCode && (
                 <div className="border-primary/40 bg-primary/5 space-y-2 rounded-lg border-2 p-4 text-center">
                   <p className="text-muted-foreground text-xs">
-                    연동 코드 (일반 브라우저에서 입력)
+                    {t('codeLabel')}
                   </p>
                   <p className="text-primary font-mono text-4xl font-bold tracking-widest">
                     {displayCode}
                   </p>
-                  <p className="text-muted-foreground text-xs">10분 내 사용</p>
+                  <p className="text-muted-foreground text-xs">
+                    {t('codeExpiry')}
+                  </p>
                   <Button
                     variant="outline"
                     size="sm"
                     className="mt-1 w-full"
                     onClick={copyLinkUrl}
                   >
-                    {linkUrlCopied
-                      ? '✓ 복사됨! 일반 브라우저에서 붙여넣기 하세요'
-                      : '연동하러가기 → (URL 복사)'}
+                    {linkUrlCopied ? t('copiedPaste') : t('copyLinkUrl')}
                   </Button>
                   {linkUrlCopied && (
                     <p className="text-muted-foreground text-center text-xs">
-                      Chrome, Safari 등 일반 브라우저 주소창에 붙여넣어
-                      접속하세요
+                      {t('pasteHint')}
                     </p>
                   )}
                 </div>
@@ -257,7 +260,7 @@ export function AccountLinkCard() {
                   className="w-full gap-1.5"
                   onClick={() => googleSignIn('google')}
                 >
-                  Google로 먼저 로그인
+                  {t('googleFirst')}
                 </Button>
               )}
 
@@ -265,10 +268,10 @@ export function AccountLinkCard() {
               {isInPiBrowser && (
                 <div className="space-y-2 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-950/30">
                   <p className="text-xs font-semibold text-amber-700 dark:text-amber-400">
-                    Pi Browser에서 할 일
+                    {t('piBrowserTodo')}
                   </p>
                   <p className="text-muted-foreground text-xs">
-                    아래 링크를 복사해서 Pi Browser 주소창에 입력하세요.
+                    {t('piBrowserTodoDesc')}
                   </p>
                   <div className="flex gap-1.5">
                     <code className="bg-background flex-1 truncate rounded border px-2 py-1 font-mono text-xs">
@@ -280,7 +283,7 @@ export function AccountLinkCard() {
                       className="shrink-0 text-xs"
                       onClick={copyGenerateUrl}
                     >
-                      {copied ? '복사됨!' : '복사'}
+                      {copied ? t('copied') : t('copy')}
                     </Button>
                   </div>
                 </div>
@@ -295,7 +298,7 @@ export function AccountLinkCard() {
                     'w-full text-center',
                   )}
                 >
-                  연동 코드 입력하러 가기 →
+                  {t('goInputCode')}
                 </Link>
               )}
             </>
@@ -314,9 +317,10 @@ function LinkCardHeader({
   showLogout: boolean
   onLogout: () => void
 }) {
+  const t = useTranslations('link')
   return (
     <CardHeader className="flex flex-row items-center justify-between pb-3">
-      <CardTitle className="text-sm">계정 연동</CardTitle>
+      <CardTitle className="text-sm">{t('sectionTitle')}</CardTitle>
       {showLogout && (
         <Button
           variant="outline"
@@ -324,7 +328,7 @@ function LinkCardHeader({
           className="text-muted-foreground h-7 px-2 text-xs"
           onClick={onLogout}
         >
-          로그아웃
+          {t('logout')}
         </Button>
       )}
     </CardHeader>
@@ -340,11 +344,12 @@ function StatusRow({
   connected: boolean
   value?: string
 }) {
+  const t = useTranslations('link')
   return (
     <div className="flex items-center justify-between gap-2 text-sm">
       <span className="text-muted-foreground w-24 shrink-0">{label}</span>
       <span className="flex-1 truncate text-xs">
-        {connected ? (value ?? '연결됨') : '—'}
+        {connected ? (value ?? t('connected')) : '—'}
       </span>
       <span
         className={`shrink-0 text-xs ${
@@ -353,7 +358,7 @@ function StatusRow({
             : 'text-muted-foreground'
         }`}
       >
-        {connected ? '✓ 연결됨' : '미연결'}
+        {connected ? t('connectedBadge') : t('notConnected')}
       </span>
     </div>
   )

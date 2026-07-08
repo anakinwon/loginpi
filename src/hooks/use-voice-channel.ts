@@ -1,5 +1,6 @@
 'use client'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { getSupabaseClient } from '@/lib/supabase-client'
 import { piFetch } from '@/lib/pi-fetch'
 
@@ -35,6 +36,7 @@ export function useVoiceChannel({
   roomId,
   currentUserId,
 }: UseVoiceChannelOptions) {
+  const t = useTranslations('sysUi')
   const [voiceState, setVoiceState] = useState<VoiceState>('idle')
   const [participants, setParticipants] = useState<VoiceParticipant[]>([])
   const [remoteStreams, setRemoteStreams] = useState<Map<string, MediaStream>>(
@@ -118,20 +120,17 @@ export function useVoiceChannel({
           pc.restartIce()
         } else if (pc.connectionState === 'failed') {
           pc.restartIce()
-          setJoinError(
-            '상대와 음성 연결에 실패했습니다 — 네트워크(NAT) 통과 불가. TURN 릴레이 서버가 필요할 수 있습니다.',
-          )
+          setJoinError(t('voiceConnFailed'))
         } else if (pc.connectionState === 'connected') {
           // 재협상·복구로 연결 성공 시 직전 연결 오류 메시지 해제
-          setJoinError((prev) =>
-            prev?.startsWith('상대와 음성 연결에 실패') ? null : prev,
-          )
+          // (동일 t() 값끼리 비교 — i18n 후에도 안전, 문자열 프리픽스 매칭 금지)
+          setJoinError((prev) => (prev === t('voiceConnFailed') ? null : prev))
         }
       }
 
       return pc
     },
-    [sendSignal],
+    [sendSignal, t],
   )
 
   const closePeer = useCallback((peerUsrId: string) => {
@@ -210,7 +209,7 @@ export function useVoiceChannel({
       !navigator.mediaDevices?.getUserMedia ||
       typeof RTCPeerConnection === 'undefined'
     ) {
-      setJoinError('이 브라우저는 음성통화(WebRTC)를 지원하지 않습니다')
+      setJoinError(t('voiceNoWebRTC'))
       return
     }
 
@@ -226,7 +225,9 @@ export function useVoiceChannel({
         const d = (await joinRes.json().catch(() => null)) as {
           error?: string
         } | null
-        setJoinError(d?.error ?? `입장 실패 (HTTP ${joinRes.status})`)
+        setJoinError(
+          d?.error ?? t('voiceJoinFailedHttp', { status: joinRes.status }),
+        )
         setVoiceState('idle')
         return
       }
@@ -258,10 +259,10 @@ export function useVoiceChannel({
         const name = e instanceof DOMException ? e.name : ''
         const msg =
           name === 'NotAllowedError' || name === 'SecurityError'
-            ? '마이크 권한이 거부되었습니다 — 브라우저/앱 설정에서 마이크를 허용해 주세요'
+            ? t('voiceMicDenied')
             : name === 'NotFoundError'
-              ? '사용 가능한 마이크를 찾지 못했습니다'
-              : `마이크 접근 실패 (${name || '알 수 없음'})`
+              ? t('voiceMicNotFound')
+              : t('voiceMicAccessFail', { name: name || t('voiceUnknown') })
         setJoinError(msg)
         // 입장 등록은 됐으므로 퇴장 처리 후 원복
         await piFetch(`/api/voice/rooms/${roomId}/leave`, {
@@ -287,7 +288,11 @@ export function useVoiceChannel({
         }),
       )
     } catch (e) {
-      setJoinError(e instanceof Error ? `연결 오류: ${e.message}` : '연결 오류')
+      setJoinError(
+        e instanceof Error
+          ? t('voiceConnErrorDetail', { message: e.message })
+          : t('voiceConnError'),
+      )
       cleanup()
     }
   }, [
@@ -298,6 +303,7 @@ export function useVoiceChannel({
     sendSignal,
     syncLocalTrack,
     cleanup,
+    t,
   ])
 
   // ─── 퇴장 ──────────────────────────────────────────────────────────────────

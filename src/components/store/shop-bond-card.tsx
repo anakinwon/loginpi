@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
 import { Button } from '@/components/ui/button'
@@ -18,6 +19,8 @@ interface BondState {
 // 후기 보상 보증금 예치 카드 (판매자 SHOP 보증금) — PRD_24 §10-7.
 //   매장주가 Bean 지갑에서 보증금으로 예치 → 잔액 ≥ 최대 보상액일 때 상품 후기 작성 버튼 활성.
 export function ShopBondCard() {
+  const t = useTranslations('store')
+  const tc = useTranslations('common')
   const [state, setState] = useState<BondState | null>(null)
   const [amt, setAmt] = useState('')
   const [busy, setBusy] = useState(false)
@@ -38,7 +41,7 @@ export function ShopBondCard() {
   const deposit = useCallback(async () => {
     const v = Math.floor(Number(amt))
     if (!Number.isFinite(v) || v <= 0) {
-      toast.error('예치할 Bean 수량을 입력하세요')
+      toast.error(t('rewardBond.enterAmount'))
       return
     }
     setBusy(true)
@@ -50,14 +53,14 @@ export function ShopBondCard() {
       })
       const data = (await res.json()) as { ok?: boolean; error?: string }
       if (res.ok && data.ok) {
-        toast.success(`${v} Bean을 보증금으로 예치했습니다`)
+        toast.success(t('rewardBond.depositSuccess', { n: v }))
         setAmt('')
         void load()
       } else {
-        toast.error(data.error ?? '예치 실패')
+        toast.error(data.error ?? t('rewardBond.depositFail'))
       }
     } catch {
-      toast.error('네트워크 오류')
+      toast.error(tc('networkError'))
     } finally {
       setBusy(false)
     }
@@ -69,27 +72,30 @@ export function ShopBondCard() {
     <div className="shadow-soft bg-card space-y-3 rounded-xl border p-4">
       <div className="flex items-center justify-between gap-2">
         <p className="flex items-center gap-1.5 text-sm font-semibold">
-          <BeanIcon className="h-5 w-5" /> 후기 보상 보증금
+          <BeanIcon className="h-5 w-5" /> {t('rewardBond.title')}
         </p>
         {state.sufficient ? (
           <span className="shrink-0 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400">
-            ✓ 후기 활성
+            {t('rewardBond.badgeActive')}
           </span>
         ) : (
           <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">
-            ⚠ 충전 필요
+            {t('rewardBond.badgeNeedCharge')}
           </span>
         )}
       </div>
 
       <p className="text-muted-foreground text-xs">
-        고객 후기 보상은 이 보증금에서 지급됩니다. 잔액이{' '}
-        <b>{state.max_reward} Bean</b> 이상일 때만 내 상품에 후기 작성 버튼이
-        활성화됩니다.
+        {t.rich('rewardBond.desc', {
+          amount: state.max_reward,
+          b: (c) => <b>{c}</b>,
+        })}
       </p>
 
       <div className="flex items-center justify-between rounded-lg border px-3 py-2">
-        <span className="text-muted-foreground text-xs">현재 보증금 잔액</span>
+        <span className="text-muted-foreground text-xs">
+          {t('rewardBond.balanceLabel')}
+        </span>
         <span className="flex items-center gap-1 text-base font-bold">
           <BeanIcon className="h-4 w-4" /> {state.balance.toLocaleString()}
         </span>
@@ -98,7 +104,9 @@ export function ShopBondCard() {
       <div className="flex items-end gap-2">
         <div className="flex-1 space-y-1">
           <label className="text-muted-foreground text-xs">
-            예치할 Bean (내 지갑: {state.wallet.toLocaleString()})
+            {t('rewardBond.depositInputLabel', {
+              wallet: state.wallet.toLocaleString(),
+            })}
           </label>
           <Input
             type="number"
@@ -106,11 +114,13 @@ export function ShopBondCard() {
             inputMode="numeric"
             value={amt}
             onChange={(e) => setAmt(e.target.value)}
-            placeholder={`예: ${Math.max(state.max_reward, 100)}`}
+            placeholder={t('rewardBond.amountPlaceholder', {
+              n: Math.max(state.max_reward, 100),
+            })}
           />
         </div>
         <Button onClick={deposit} disabled={busy}>
-          {busy ? '예치 중…' : '보증금 예치'}
+          {busy ? t('rewardBond.depositing') : t('rewardBond.depositBtn')}
         </Button>
       </div>
     </div>

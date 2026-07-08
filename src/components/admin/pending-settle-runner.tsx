@@ -96,6 +96,7 @@ const ST_LABEL_KEY: Record<SettleSt, string> = {
 // 실제 돈은 사람 클릭 때만 이동. 미연동 판매자(송금 불가)는 선택 불가로 막는다.
 export function PendingSettleRunner() {
   const t = useTranslations('admin.batch')
+  const tm = useTranslations('adminMgmt.settle')
 
   const [preview, setPreview] = useState<Preview | null>(null)
   const [selected, setSelected] = useState<Set<string>>(new Set())
@@ -175,9 +176,15 @@ export function PendingSettleRunner() {
         )
         if (firstFail?.result) {
           const r = firstFail.result
-          toast.error(`정산 실패 (${r.reason ?? 'ERROR'}): ${r.detail ?? ''}`, {
-            duration: 15000,
-          })
+          toast.error(
+            tm('settleFail', {
+              reason: r.reason ?? 'ERROR',
+              detail: r.detail ?? '',
+            }),
+            {
+              duration: 15000,
+            },
+          )
         }
         await loadPreview() // 정산 후 잔여 목록 갱신
       } else {
@@ -410,7 +417,7 @@ export function PendingSettleRunner() {
                             <button
                               type="button"
                               onClick={() => copyTxid(s.release_txid!)}
-                              title={`${s.release_txid}\n(클릭하여 복사)`}
+                              title={`${s.release_txid}\n${tm('clickToCopy')}`}
                               className="hover:text-foreground cursor-pointer underline-offset-2 hover:underline"
                             >
                               {shortTxid(s.release_txid)}

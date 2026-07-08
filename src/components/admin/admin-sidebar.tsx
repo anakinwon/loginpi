@@ -195,23 +195,22 @@ export function AdminSidebar() {
             pathname={pathname}
           />
         ))}
-        {/* 요금제 모드(Bean↔Pi) — i18n 키는 옆 세션 ko.json 작업과 충돌 회피 위해
-            임시 라벨 하드코딩(추후 admin.nav.feeMode 키로 정식화). PRD_24 */}
+        {/* 요금제 모드(Bean↔Pi) PRD_24 */}
         <NavItem
           href="/admin/fee-mode"
-          label="요금제 모드"
+          label={t('feeMode')}
           pathname={pathname}
         />
-        {/* 오픈 프로모 무료요금(OneKey) — 임시 라벨 하드코딩(추후 admin.nav.openPromo). PRD_26 */}
+        {/* 오픈 프로모 무료요금(OneKey) PRD_26 */}
         <NavItem
           href="/admin/open-promo"
-          label="오픈 프로모"
+          label={t('openPromo')}
           pathname={pathname}
         />
         {/* 하단 플로팅 팝업 메뉴 선별 설정 */}
         <NavItem
           href="/admin/quick-menu"
-          label="팝업 메뉴 설정"
+          label={t('quickMenu')}
           pathname={pathname}
         />
       </nav>

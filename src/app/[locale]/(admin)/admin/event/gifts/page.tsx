@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Loader2 } from 'lucide-react'
 import { piFetch } from '@/lib/pi-fetch'
 import { Button } from '@/components/ui/button'
@@ -25,6 +26,8 @@ interface Completion {
 }
 
 export default function AdminEventGiftsPage() {
+  const t = useTranslations('adminMgmt.eventGifts')
+  const tc = useTranslations('common')
   const [loading, setLoading] = useState(true)
   const [gifts, setGifts] = useState<GiftRecord[]>([])
   const [completions, setCompletions] = useState<Completion[]>([])
@@ -39,7 +42,7 @@ export default function AdminEventGiftsPage() {
           piFetch('/api/admin/event/completions'),
         ])
         if (!giftsRes.ok || !completionsRes.ok) {
-          setError('데이터 로드 실패')
+          setError(t('loadFail'))
           return
         }
         const giftsData = await giftsRes.json()
@@ -48,7 +51,7 @@ export default function AdminEventGiftsPage() {
         setCompletions(completionsData.completions ?? [])
       } catch (err) {
         console.error('Fetch error:', err)
-        setError('네트워크 오류')
+        setError(t('networkError'))
       } finally {
         setLoading(false)
       }
@@ -71,7 +74,7 @@ export default function AdminEventGiftsPage() {
       })
 
       if (!res.ok) {
-        alert('업데이트 실패')
+        alert(t('updateFail'))
         setUpdating((prev) => ({ ...prev, [userId]: false }))
         return
       }
@@ -86,7 +89,7 @@ export default function AdminEventGiftsPage() {
       )
     } catch (err) {
       console.error('Update error:', err)
-      alert('오류 발생')
+      alert(tc('error'))
     } finally {
       setUpdating((prev) => ({ ...prev, [userId]: false }))
     }
@@ -107,32 +110,36 @@ export default function AdminEventGiftsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">🎁 선착순 10명 선물 발송</h1>
-        <p className="text-muted-foreground mt-2">
-          미션 10/10 완료자 중 선착순 10명에게 카카오 선물을 발송합니다
-        </p>
+        <h1 className="text-3xl font-bold">{t('title')}</h1>
+        <p className="text-muted-foreground mt-2">{t('subtitle')}</p>
       </div>
 
       <div className="overflow-x-auto rounded-lg border">
         <table className="w-full text-sm">
           <thead className="bg-muted border-b">
             <tr>
-              <th className="p-3 text-left font-semibold">순위</th>
-              <th className="p-3 text-left font-semibold">요원명</th>
-              <th className="p-3 text-left font-semibold">카카오톡 ID</th>
-              <th className="p-3 text-left font-semibold">선물</th>
-              <th className="p-3 text-center font-semibold">발송 상태</th>
-              <th className="p-3 text-center font-semibold">발송 시간</th>
-              <th className="p-3 text-center font-semibold">작업</th>
+              <th className="p-3 text-left font-semibold">{t('colRank')}</th>
+              <th className="p-3 text-left font-semibold">{t('colAgent')}</th>
+              <th className="p-3 text-left font-semibold">{t('colKakao')}</th>
+              <th className="p-3 text-left font-semibold">{t('colGift')}</th>
+              <th className="p-3 text-center font-semibold">
+                {t('colSentStatus')}
+              </th>
+              <th className="p-3 text-center font-semibold">
+                {t('colSentTime')}
+              </th>
+              <th className="p-3 text-center font-semibold">
+                {t('colAction')}
+              </th>
             </tr>
           </thead>
           <tbody>
             {gifts.map((g) => (
               <tr key={g.user_id} className="hover:bg-muted/50 border-b">
                 <td className="p-3 font-semibold">#{g.rank}</td>
-                <td className="p-3">{g.nick_nm ?? '(이름 없음)'}</td>
+                <td className="p-3">{g.nick_nm ?? t('noName')}</td>
                 <td className="p-3 font-mono text-xs">
-                  {g.kakao_id ?? '미입력'}
+                  {g.kakao_id ?? t('notEntered')}
                 </td>
                 <td className="p-3">{g.gift_nm}</td>
                 <td className="p-3 text-center">
@@ -143,7 +150,7 @@ export default function AdminEventGiftsPage() {
                         : 'bg-yellow-200 text-yellow-900 dark:bg-yellow-700 dark:text-yellow-100'
                     }`}
                   >
-                    {g.sent_yn === 'Y' ? '발송됨' : '미발송'}
+                    {g.sent_yn === 'Y' ? t('sent') : t('notSent')}
                   </span>
                 </td>
                 <td className="text-muted-foreground p-3 text-center text-xs">
@@ -162,9 +169,9 @@ export default function AdminEventGiftsPage() {
                     {updating[g.user_id] ? (
                       <Loader2 className="size-3 animate-spin" />
                     ) : g.sent_yn === 'Y' ? (
-                      '미발송으로 변경'
+                      t('changeToNotSent')
                     ) : (
-                      '발송 완료'
+                      t('markSent')
                     )}
                   </Button>
                 </td>
@@ -176,7 +183,7 @@ export default function AdminEventGiftsPage() {
 
       {gifts.length === 0 && (
         <div className="text-muted-foreground py-10 text-center">
-          아직 미션 10/10을 완료한 사용자가 없습니다
+          {t('emptyCompleters')}
         </div>
       )}
 
@@ -184,14 +191,13 @@ export default function AdminEventGiftsPage() {
       <div>
         <div className="mb-3">
           <h2 className="text-xl font-bold">
-            🏅 미션 10/10 전체 완료자{' '}
+            {t('allCompletersTitle')}{' '}
             <span className="text-muted-foreground text-base font-normal">
-              ({completions.length}명)
+              ({tc('countPerson', { count: completions.length })})
             </span>
           </h2>
           <p className="text-muted-foreground mt-1 text-sm">
-            선착순 정렬 · 제외 대상자 제외 · Pi 계정명 / 최종성공일시 / 카카오톡
-            ID
+            {t('completersNote')}
           </p>
         </div>
 
@@ -199,12 +205,16 @@ export default function AdminEventGiftsPage() {
           <table className="w-full text-sm">
             <thead className="bg-muted border-b">
               <tr>
-                <th className="w-12 p-3 text-left font-semibold">순위</th>
-                <th className="p-3 text-left font-semibold">Pi 계정명</th>
-                <th className="p-3 text-left font-semibold">닉네임</th>
-                <th className="p-3 text-left font-semibold">카카오톡 ID</th>
+                <th className="w-12 p-3 text-left font-semibold">
+                  {t('colRank')}
+                </th>
+                <th className="p-3 text-left font-semibold">
+                  {t('colPiUsername')}
+                </th>
+                <th className="p-3 text-left font-semibold">{t('colNick')}</th>
+                <th className="p-3 text-left font-semibold">{t('colKakao')}</th>
                 <th className="p-3 text-left font-semibold whitespace-nowrap">
-                  최종 성공 일시
+                  {t('colLastSuccess')}
                 </th>
               </tr>
             </thead>
@@ -233,7 +243,7 @@ export default function AdminEventGiftsPage() {
                         {c.kakao_id}
                       </span>
                     ) : (
-                      <span className="text-red-500">미입력</span>
+                      <span className="text-red-500">{t('notEntered')}</span>
                     )}
                   </td>
                   <td className="text-muted-foreground p-3 text-xs whitespace-nowrap">
@@ -256,7 +266,7 @@ export default function AdminEventGiftsPage() {
 
         {completions.length === 0 && (
           <div className="text-muted-foreground py-10 text-center">
-            아직 미션 10/10을 완료한 사용자가 없습니다
+            {t('emptyCompleters')}
           </div>
         )}
       </div>

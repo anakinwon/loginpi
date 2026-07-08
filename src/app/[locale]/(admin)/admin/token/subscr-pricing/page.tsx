@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useRef } from 'react'
+import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { BeanIcon } from '@/components/ui/bean-icon'
 import { Button } from '@/components/ui/button'
@@ -22,10 +23,11 @@ type ShopGrade = 'S' | 'M' | 'L'
 
 const SHOP_GRADES: ShopGrade[] = ['S', 'M', 'L']
 
-const SHOP_GRADE_META: Record<ShopGrade, { label: string; limit: string }> = {
-  S: { label: 'S', limit: '10개 이하' },
-  M: { label: 'M', limit: '30개 이하' },
-  L: { label: 'L', limit: '무제한' },
+// 등급 라벨은 코드값(S/M/L), 한도 표기는 i18n(adminToken.subscrPricing.shopLimit.*)
+const SHOP_GRADE_LABEL: Record<ShopGrade, string> = {
+  S: 'S',
+  M: 'M',
+  L: 'L',
 }
 
 const PRODUCT_META: Record<
@@ -72,6 +74,7 @@ interface SaveResult {
 }
 
 export default function SubscrPricingPage() {
+  const t = useTranslations()
   const [rows, setRows] = useState<FeePlanRow[]>([])
   const [loading, setLoading] = useState(true)
   const [err, setErr] = useState<string | null>(null)
@@ -111,7 +114,7 @@ export default function SubscrPricingPage() {
   const saveEdit = async (row: FeePlanRow) => {
     const newAmt = parseInt(edit?.value ?? '', 10)
     if (isNaN(newAmt) || newAmt < 0) {
-      alert('0 이상의 정수를 입력하세요')
+      alert(t('adminToken.subscrPricing.amountError'))
       return
     }
     if (newAmt === row.amt_bean) {
@@ -140,7 +143,9 @@ export default function SubscrPricingPage() {
       setEdit(null)
     } catch (e) {
       setSaved({ fee_plan_id: row.fee_plan_id, ok: false })
-      alert(e instanceof Error ? e.message : '저장 오류')
+      alert(
+        e instanceof Error ? e.message : t('adminToken.subscrPricing.saveFail'),
+      )
     } finally {
       setSaving(null)
     }
@@ -232,7 +237,7 @@ export default function SubscrPricingPage() {
                 disabled={isSaving}
                 onClick={() => void saveEdit(row)}
               >
-                {isSaving ? '저장 중…' : '저장'}
+                {isSaving ? t('common.saving') : t('common.save')}
               </Button>
               <Button
                 size="sm"
@@ -241,7 +246,7 @@ export default function SubscrPricingPage() {
                 disabled={isSaving}
                 onClick={cancelEdit}
               >
-                취소
+                {t('common.cancel')}
               </Button>
             </div>
           </div>
@@ -259,7 +264,7 @@ export default function SubscrPricingPage() {
             <div className="flex items-center gap-2">
               {wasSaved && saved!.ok && (
                 <span className="text-xs font-medium text-green-600 dark:text-green-400">
-                  ✓ 저장됨
+                  {t('adminToken.subscrPricing.saved')}
                 </span>
               )}
               <button
@@ -267,7 +272,7 @@ export default function SubscrPricingPage() {
                 disabled={edit !== null}
                 className="text-primary hover:bg-primary/5 rounded-lg border px-3 py-1 text-xs font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40"
               >
-                수정
+                {t('common.edit')}
               </button>
             </div>
           </div>
@@ -280,25 +285,31 @@ export default function SubscrPricingPage() {
     <div className="space-y-6">
       <div>
         <h1 className="flex items-center gap-2 text-2xl font-bold">
-          <BeanIcon className="inline-block h-6 w-6" /> 구독요금제 관리
+          <BeanIcon className="inline-block h-6 w-6" />{' '}
+          {t('adminToken.subscrPricing.title')}
         </h1>
         <p className="text-muted-foreground mt-1 text-sm">
-          상품별 월·년 구독료를 수정합니다. 저장 즉시 서비스에 반영됩니다(캐시
-          자동 무효화).
+          {t('adminToken.subscrPricing.subtitle')}
         </p>
       </div>
 
-      {loading && <p className="text-muted-foreground text-sm">불러오는 중…</p>}
-      {err && <p className="text-sm text-red-500">오류: {err}</p>}
+      {loading && (
+        <p className="text-muted-foreground text-sm">{t('common.fetching')}</p>
+      )}
+      {err && (
+        <p className="text-sm text-red-500">
+          {t('adminToken.errorMsg', { msg: err })}
+        </p>
+      )}
 
       {!loading && !err && (
         <>
           <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-300">
-            💡 <strong>연간 할인 정책:</strong> 년 요금 = 월 요금 × 10 (2개월
-            무료, 약 17% 절약).
-            <br />
-            연간 요금을 수정할 때 이 정책이 유지되는지 우측 아이콘으로
-            확인하세요.
+            💡{' '}
+            <strong>
+              {t('adminToken.subscrPricing.discountNoticePrefix')}
+            </strong>{' '}
+            {t('adminToken.subscrPricing.discountNoticeBody')}
           </div>
 
           {/* PyCafé™ · PyTranslate™ 단순 상품 카드 */}
@@ -320,30 +331,43 @@ export default function SubscrPricingPage() {
                     <span className="text-2xl">{meta.emoji}</span>
                     <div>
                       <p className="font-bold">{meta.label}</p>
-                      <p className="text-muted-foreground text-xs">구독</p>
+                      <p className="text-muted-foreground text-xs">
+                        {t('adminToken.subscrPricing.subscrLabel')}
+                      </p>
                     </div>
                     {policyOk !== null && (
                       <span
                         className={`ml-auto rounded-full px-2 py-0.5 text-xs font-semibold ${policyOk ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}`}
                       >
-                        {policyOk ? '✓ 정책 준수' : '⚠ 정책 불일치'}
+                        {policyOk
+                          ? t('adminToken.subscrPricing.policyOk')
+                          : t('adminToken.subscrPricing.policyMismatch')}
                       </span>
                     )}
                   </div>
                   <div className="space-y-3">
-                    {renderCycleRow(mRow, '월간', '')}
-                    {renderCycleRow(yRow, '연간', '(2개월 무료)')}
+                    {renderCycleRow(
+                      mRow,
+                      t('adminToken.subscrPricing.monthly'),
+                      '',
+                    )}
+                    {renderCycleRow(
+                      yRow,
+                      t('adminToken.subscrPricing.annual'),
+                      t('adminToken.subscrPricing.annualNote'),
+                    )}
                   </div>
                   {mRow && (
                     <p className="text-muted-foreground mt-3 text-right text-[10px]">
-                      최근 수정:{' '}
-                      {new Date(mRow.mod_dtm).toLocaleString('ko-KR', {
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        hour12: false,
+                      {t('adminToken.subscrPricing.lastModified', {
+                        date: new Date(mRow.mod_dtm).toLocaleString('ko-KR', {
+                          year: 'numeric',
+                          month: '2-digit',
+                          day: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          hour12: false,
+                        }),
                       })}
                     </p>
                   )}
@@ -362,14 +386,16 @@ export default function SubscrPricingPage() {
               <div>
                 <p className="font-bold">{PRODUCT_META.PISHOP.label}</p>
                 <p className="text-muted-foreground text-xs">
-                  S / M / L 등급별 구독
+                  {t('adminToken.subscrPricing.shopGradeSubtitle')}
                 </p>
               </div>
               {shopPolicyOk !== null && (
                 <span
                   className={`ml-auto rounded-full px-2 py-0.5 text-xs font-semibold ${shopPolicyOk ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}`}
                 >
-                  {shopPolicyOk ? '✓ 정책 준수' : '⚠ 정책 불일치'}
+                  {shopPolicyOk
+                    ? t('adminToken.subscrPricing.policyOk')
+                    : t('adminToken.subscrPricing.policyMismatch')}
                 </span>
               )}
             </div>
@@ -393,14 +419,16 @@ export default function SubscrPricingPage() {
                     }`}
                   >
                     <span className="text-sm font-bold">
-                      {SHOP_GRADE_META[g].label}
+                      {SHOP_GRADE_LABEL[g]}
                     </span>
                     <span className="mt-0.5 text-[10px] opacity-80">
-                      {SHOP_GRADE_META[g].limit}
+                      {t(`adminToken.subscrPricing.shopLimit.${g}`)}
                     </span>
                     {mAmt !== undefined && (
                       <span className="mt-0.5 text-[10px] tabular-nums opacity-70">
-                        {mAmt.toLocaleString()} ☕/월
+                        {t('adminToken.subscrPricing.shopPerMonth', {
+                          amount: mAmt.toLocaleString(),
+                        })}
                       </span>
                     )}
                   </button>
@@ -410,20 +438,29 @@ export default function SubscrPricingPage() {
 
             {/* 선택된 등급의 월간 / 연간 */}
             <div className="space-y-3">
-              {renderCycleRow(shopMRow, '월간', '')}
-              {renderCycleRow(shopYRow, '연간', '(2개월 무료)')}
+              {renderCycleRow(
+                shopMRow,
+                t('adminToken.subscrPricing.monthly'),
+                '',
+              )}
+              {renderCycleRow(
+                shopYRow,
+                t('adminToken.subscrPricing.annual'),
+                t('adminToken.subscrPricing.annualNote'),
+              )}
             </div>
 
             {shopMRow && (
               <p className="text-muted-foreground mt-3 text-right text-[10px]">
-                최근 수정:{' '}
-                {new Date(shopMRow.mod_dtm).toLocaleString('ko-KR', {
-                  year: 'numeric',
-                  month: '2-digit',
-                  day: '2-digit',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  hour12: false,
+                {t('adminToken.subscrPricing.lastModified', {
+                  date: new Date(shopMRow.mod_dtm).toLocaleString('ko-KR', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false,
+                  }),
                 })}
               </p>
             )}
@@ -431,14 +468,14 @@ export default function SubscrPricingPage() {
 
           <div className="border-t pt-4">
             <p className="text-muted-foreground text-xs">
-              구독요금제 외 카페·스토어·플랫폼 전체 요금은{' '}
+              {t('adminToken.subscrPricing.footerPrefix')}{' '}
               <Link
                 href="/admin/token/fee-plan"
                 className="text-primary underline-offset-2 hover:underline"
               >
-                Bean 요금제 관리
+                {t('adminToken.subscrPricing.footerLink')}
               </Link>
-              에서 확인할 수 있습니다.
+              {t('adminToken.subscrPricing.footerSuffix')}
             </p>
           </div>
         </>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { piFetch } from '@/lib/pi-fetch'
 
 interface MonitorData {
@@ -56,10 +57,14 @@ function Sparkline({ data, stroke }: { data: number[]; stroke: string }) {
 }
 
 // 결제 신호등: 미완료>5건 또는 성공률<95% = 위험, <99% = 경고, 그 외 정상
-function payLight(rate: number, stuck: number): { cls: string; label: string } {
-  if (stuck > 5 || rate < 95) return { cls: 'bg-red-500', label: '🔴 위험' }
-  if (rate < 99) return { cls: 'bg-amber-500', label: '🟡 주의' }
-  return { cls: 'bg-green-500', label: '🟢 정상' }
+// 한글 라벨은 컴포넌트 내부에서 t()로 매핑 (여기선 상태 키만 반환)
+function payLight(
+  rate: number,
+  stuck: number,
+): { cls: string; key: 'danger' | 'warn' | 'ok' } {
+  if (stuck > 5 || rate < 95) return { cls: 'bg-red-500', key: 'danger' }
+  if (rate < 99) return { cls: 'bg-amber-500', key: 'warn' }
+  return { cls: 'bg-green-500', key: 'ok' }
 }
 
 function Card({
@@ -82,6 +87,7 @@ function Card({
 }
 
 export function MonitorDashboard() {
+  const t = useTranslations('adminOps')
   const [data, setData] = useState<MonitorData | null>(null)
   const [err, setErr] = useState(false)
   const [lastOk, setLastOk] = useState<string>('')
@@ -131,7 +137,7 @@ export function MonitorDashboard() {
   if (!data) {
     return (
       <p className="text-muted-foreground py-12 text-center text-sm">
-        {err ? '데이터를 불러오지 못했습니다' : '불러오는 중…'}
+        {err ? t('monitor.loadFail') : t('monitor.fetching')}
       </p>
     )
   }
@@ -139,99 +145,112 @@ export function MonitorDashboard() {
   const rate = Number(data.payment.success_rate)
   const avgDur = Number(data.payment.avg_dur_sec)
   const light = payLight(rate, data.payment.stuck_cnt)
+  const lightLabels: Record<typeof light.key, string> = {
+    danger: t('monitor.lightDanger'),
+    warn: t('monitor.lightWarn'),
+    ok: t('monitor.lightOk'),
+  }
 
   return (
     <div className="space-y-4">
       {/* 상태 바 */}
       <div className="text-muted-foreground flex items-center justify-between text-xs">
         <span>
-          {err ? '⚠️ 갱신 실패 — 재시도 중' : `최근 갱신 ${lastOk}`} ·{' '}
-          {REFRESH_MS / 1000}초 자동
+          {err
+            ? t('monitor.refreshFail')
+            : t('monitor.refreshedAt', { time: lastOk })}{' '}
+          · {t('monitor.autoInterval', { sec: REFRESH_MS / 1000 })}
         </span>
-        <span>활동 사용자(오늘) {data.concurrent.today_active}명</span>
+        <span>
+          {t('monitor.activeToday', { n: data.concurrent.today_active })}
+        </span>
       </div>
 
       {/* Pi 결제 — 최우선 강조 카드 */}
-      <Card title="⭐ Pi 결제 성공률 (최근 24h)" accent>
+      <Card title={t('monitor.paySuccessTitle')} accent>
         <div className="flex items-end gap-3">
           <span className="text-3xl font-bold">{rate.toFixed(1)}%</span>
           <span
             className={`mb-1 rounded-full px-2 py-0.5 text-xs font-medium text-white ${light.cls}`}
           >
-            {light.label}
+            {lightLabels[light.key]}
           </span>
         </div>
         <div className="text-muted-foreground mt-2 grid grid-cols-3 gap-2 text-xs">
-          <span>완료 {data.payment.completed_cnt}</span>
-          <span>진행 {data.payment.pending_cnt}</span>
+          <span>
+            {t('monitor.payCompleted', { n: data.payment.completed_cnt })}
+          </span>
+          <span>
+            {t('monitor.payPending', { n: data.payment.pending_cnt })}
+          </span>
           <span
             className={
               data.payment.stuck_cnt > 0 ? 'text-red-600 dark:text-red-400' : ''
             }
           >
-            미완료 {data.payment.stuck_cnt}
+            {t('monitor.payStuck', { n: data.payment.stuck_cnt })}
           </span>
         </div>
         <p className="text-muted-foreground mt-1 text-xs">
-          평균 처리 {avgDur}초
+          {t('monitor.avgProcess', { sec: avgDur })}
         </p>
         {data.payment.stuck_cnt > 5 && (
           <p className="mt-2 rounded-md bg-red-50 px-2 py-1 text-xs text-red-700 dark:bg-red-950 dark:text-red-300">
-            ⚠️ 미완료 결제 {data.payment.stuck_cnt}건 — 확인 필요
+            {t('monitor.stuckWarn', { n: data.payment.stuck_cnt })}
           </p>
         )}
       </Card>
 
       {/* 나머지 메트릭 */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <Card title="🛒 진행 중 주문 (MPS)">
+        <Card title={t('monitor.ordersTitle')}>
           <div className="grid grid-cols-2 gap-y-1 text-sm">
-            <span>대기</span>
+            <span>{t('monitor.ordersWaiting')}</span>
             <span className="text-right font-semibold">
               {data.orders.waiting_cnt}
             </span>
-            <span>처리 중</span>
+            <span>{t('monitor.ordersProcessing')}</span>
             <span className="text-right font-semibold">
               {data.orders.processing_cnt}
             </span>
-            <span>완료(1h)</span>
+            <span>{t('monitor.ordersDone1h')}</span>
             <span className="text-right font-semibold">
               {data.orders.done_1h_cnt}
             </span>
-            <span>취소(24h)</span>
+            <span>{t('monitor.ordersCancelled24h')}</span>
             <span className="text-right font-semibold">
               {data.orders.cancelled_cnt}
             </span>
           </div>
         </Card>
 
-        <Card title="👥 동시 접속(근사)">
+        <Card title={t('monitor.concurrentTitle')}>
           <p className="text-3xl font-bold">{data.concurrent.today_active}</p>
           <p className="text-muted-foreground mt-1 text-xs">
-            오늘 활동 사용자 수
+            {t('monitor.concurrentDesc')}
           </p>
         </Card>
 
-        <Card title="⚡ API 성능 (최근 1h)">
+        <Card title={t('monitor.apiTitle')}>
           {data.api.sample_cnt > 0 ? (
             <div className="space-y-1 text-sm">
               <p>
-                p95 응답{' '}
+                {t('monitor.apiP95')}{' '}
                 <span className="font-semibold">{data.api.p95_ms}ms</span>
               </p>
               <p>
-                에러율{' '}
+                {t('monitor.apiErrorRate')}{' '}
                 <span className="font-semibold">{data.api.error_rate}%</span>
               </p>
               <p className="text-muted-foreground text-xs">
-                표본 {data.api.sample_cnt}건
+                {t('monitor.apiSample', { n: data.api.sample_cnt })}
               </p>
             </div>
           ) : (
             <p className="text-muted-foreground text-sm">
-              계측 수집 대기 중
+              {t('monitor.apiWaiting')}
               <br />
-              <span className="text-xs">(요청 계측 연결 후 표시)</span>
+              <span className="text-xs">{t('monitor.apiWaitingHint')}</span>
             </p>
           )}
         </Card>
@@ -239,30 +258,36 @@ export function MonitorDashboard() {
 
       {/* 시스템 리소스 — 메모리·CPU 시계열 (현재 함수 인스턴스 기준) */}
       <div className="grid gap-4 sm:grid-cols-2">
-        <Card title="🧠 메모리 (RSS 실점유)">
+        <Card title={t('monitor.memTitle')}>
           <div className="flex items-end gap-3">
             <span className="text-2xl font-bold">{data.system.rss_mb}MB</span>
             <span
               className={`mb-1 text-xs ${data.system.rss_mb / ASSUMED_LIMIT_MB > 0.85 ? 'text-red-600 dark:text-red-400' : 'text-muted-foreground'}`}
             >
-              추정 1GB 대비{' '}
-              {Math.round((100 * data.system.rss_mb) / ASSUMED_LIMIT_MB)}%
+              {t('monitor.memVsLimit', {
+                pct: Math.round((100 * data.system.rss_mb) / ASSUMED_LIMIT_MB),
+              })}
             </span>
           </div>
           <Sparkline data={memHist} stroke="var(--chart-1)" />
           <p className="text-muted-foreground mt-1 text-xs">
-            heap {data.system.heap_used_mb}/{data.system.heap_total_mb}MB (
-            {data.system.heap_pct}% · 70~90% 정상)
+            {t('monitor.heapInfo', {
+              used: data.system.heap_used_mb,
+              total: data.system.heap_total_mb,
+              pct: data.system.heap_pct,
+            })}
           </p>
         </Card>
 
-        <Card title="🔥 CPU 사용률 (델타)">
+        <Card title={t('monitor.cpuTitle')}>
           <div className="flex items-end gap-3">
             <span className="text-2xl font-bold">
               {cpuHist.length ? `${cpuHist[cpuHist.length - 1]}%` : '—'}
             </span>
             <span className="text-muted-foreground mb-1 text-xs">
-              인스턴스 가동 {Math.floor(data.system.uptime_s / 60)}분
+              {t('monitor.instanceUptime', {
+                min: Math.floor(data.system.uptime_s / 60),
+              })}
             </span>
           </div>
           <Sparkline data={cpuHist} stroke="var(--chart-4)" />
@@ -270,8 +295,7 @@ export function MonitorDashboard() {
       </div>
 
       <p className="text-muted-foreground text-center text-xs">
-        ⓘ 시스템 지표는 Vercel 서버리스 특성상 <b>현재 처리 인스턴스 기준</b>
-        이며, 폴링마다 다른 인스턴스일 수 있어 값이 변동할 수 있습니다.
+        {t.rich('monitor.footerNote', { b: (c) => <b>{c}</b> })}
       </p>
     </div>
   )

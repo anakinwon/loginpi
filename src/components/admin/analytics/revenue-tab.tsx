@@ -46,6 +46,8 @@ interface MonthlyRevenue {
 export function RevenueTab({ period }: { period: number }) {
   const t = useTranslations('adminAnalytics')
   const tTheme = useTranslations('themes')
+  const tm = useTranslations('adminMgmt.analytics')
+  const tc = useTranslations('common')
   const feeMode = useFeeMode()
   const [rev, setRev] = useState<RevenueStatsResponse | null>(null)
   const [beanRev, setBeanRev] = useState<BeanRevenueResponse | null>(null)
@@ -64,7 +66,7 @@ export function RevenueTab({ period }: { period: number }) {
       setRev(data)
       writeCache(cacheKey, data)
     } catch (e) {
-      if (!cached) setError(e instanceof Error ? e.message : '오류 발생')
+      if (!cached) setError(e instanceof Error ? e.message : tc('error'))
     }
   }, [])
 
@@ -144,7 +146,10 @@ export function RevenueTab({ period }: { period: number }) {
   const aovTrend = deltaPct(piModeAov, prevAov)
   // 오늘 실시간 매출 (pi_pymnt 직접 집계 — 일배치 시계열에 없는 당일분)
   const todaySub = rev?.today
-    ? `오늘 ${rev.today.total_pi.toFixed(2)} π · ${rev.today.txn_cnt}건`
+    ? tm('todayStat', {
+        amount: rev.today.total_pi.toFixed(2),
+        count: rev.today.txn_cnt,
+      })
     : undefined
 
   // 테마명 — 시스템 분류 코드(구독·기타 등)는 번역키, 카페 테마명(DB)은 theme_nm 그대로
@@ -198,7 +203,7 @@ export function RevenueTab({ period }: { period: number }) {
       {feeMode === 'PI' ? (
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           <StatsCard
-            label="Pi 총 매출"
+            label={tm('kpiTotalPi')}
             value={Number(piModeTotal.toFixed(2))}
             unit="π"
             sub={todaySub}
@@ -208,7 +213,7 @@ export function RevenueTab({ period }: { period: number }) {
             icon={<span aria-hidden>💰</span>}
           />
           <StatsCard
-            label="Pi 결제 건수"
+            label={tm('kpiPiCount')}
             value={piModeTxnCnt}
             unit={t('common.uCase')}
             trend={txnTrend}
@@ -217,7 +222,7 @@ export function RevenueTab({ period }: { period: number }) {
             icon={<span aria-hidden>🧾</span>}
           />
           <StatsCard
-            label="평균 결제 (AOV)"
+            label={tm('kpiAov')}
             value={Number(piModeAov.toFixed(3))}
             unit="π"
             trend={aovTrend}
@@ -228,8 +233,13 @@ export function RevenueTab({ period }: { period: number }) {
           <StatsCard
             label={
               piModeTopTheme
-                ? `1위: ${themeName(piModeTopTheme.theme_cd, piModeTopTheme.theme_nm)}`
-                : '상위 테마'
+                ? tm('rankOne', {
+                    name: themeName(
+                      piModeTopTheme.theme_cd,
+                      piModeTopTheme.theme_nm,
+                    ),
+                  })
+                : tm('topTheme')
             }
             value={
               piModeTopTheme ? Number(piModeTopTheme.total_pi.toFixed(2)) : 0
@@ -308,7 +318,7 @@ export function RevenueTab({ period }: { period: number }) {
         </div>
         {feeMode === 'PI' ? (
           <div className="rounded-lg border p-4">
-            <p className="mb-2 text-sm font-medium">테마별 Pi 매출 순위</p>
+            <p className="mb-2 text-sm font-medium">{tm('themePiRank')}</p>
             {rev && rev.topThemes.length > 0 ? (
               <ol className="space-y-2 text-sm">
                 {rev.topThemes.slice(0, 5).map((th, i) => (

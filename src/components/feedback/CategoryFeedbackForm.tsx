@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
 import { StarRating } from './StarRating'
@@ -34,6 +35,8 @@ export function CategoryFeedbackForm({
   onSuccess,
   onCancel,
 }: Props) {
+  const t = useTranslations('feedback')
+  const tc = useTranslations('common')
   const [ctgrItems, setCtgrItems] = useState<CtgrItem[]>([])
   const [itemScores, setItemScores] = useState<Record<string, number>>({})
   const [overallScore, setOverallScore] = useState(0)
@@ -49,22 +52,22 @@ export function CategoryFeedbackForm({
         const d = (await res.json()) as { items: CtgrItem[] }
         setCtgrItems(d.items)
       } catch {
-        toast.error('평가 항목을 불러오지 못했습니다')
+        toast.error(t('itemLoadFail'))
       } finally {
         setLoading(false)
       }
     }
     void fetchItems()
-  }, [ctgrId])
+  }, [ctgrId, t])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (overallScore === 0) {
-      toast.error('전체 별점을 선택해주세요')
+      toast.error(t('selectOverallScore'))
       return
     }
     if (fbckCn.trim().length < 10) {
-      toast.error('후기 본문을 10자 이상 입력해주세요')
+      toast.error(t('contentMin10'))
       return
     }
 
@@ -97,10 +100,10 @@ export function CategoryFeedbackForm({
         onSuccess()
       } else {
         const d = (await res.json()) as { error?: string }
-        toast.error(d.error ?? '후기 저장에 실패했습니다')
+        toast.error(d.error ?? t('submitFail'))
       }
     } catch {
-      toast.error('네트워크 오류가 발생했습니다')
+      toast.error(t('networkError'))
     } finally {
       setSubmitting(false)
     }
@@ -115,10 +118,10 @@ export function CategoryFeedbackForm({
 
       {/* 항목별 점수 */}
       {loading ? (
-        <p className="text-muted-foreground text-sm">평가 항목 불러오는 중…</p>
+        <p className="text-muted-foreground text-sm">{t('itemLoading')}</p>
       ) : ctgrItems.length > 0 ? (
         <div className="space-y-3">
-          <p className="text-sm font-medium">항목별 평가</p>
+          <p className="text-sm font-medium">{t('itemRating')}</p>
           {ctgrItems.map((it) => (
             <div
               key={it.item_cd}
@@ -147,11 +150,11 @@ export function CategoryFeedbackForm({
 
       {/* 전체 별점 */}
       <div className="space-y-1">
-        <p className="text-sm font-medium">전체 별점 *</p>
+        <p className="text-sm font-medium">{t('overallScore')} *</p>
         <StarRating value={overallScore} onChange={setOverallScore} size="lg" />
         {overallScore > 0 && (
           <p className="text-muted-foreground text-xs">
-            후기 작성 시 ☕ {REWARD_HINT[overallScore]} Bean 보상 지급
+            {t('rewardHintPlain', { bean: REWARD_HINT[overallScore] })}
           </p>
         )}
       </div>
@@ -159,13 +162,15 @@ export function CategoryFeedbackForm({
       {/* 후기 본문 */}
       <div className="space-y-1">
         <label className="text-sm font-medium">
-          후기 본문 *{' '}
-          <span className="text-muted-foreground text-xs">(최소 10자)</span>
+          {t('contentLabel')} *{' '}
+          <span className="text-muted-foreground text-xs">
+            {t('min10Chars')}
+          </span>
         </label>
         <textarea
           value={fbckCn}
           onChange={(e) => setFbckCn(e.target.value)}
-          placeholder="음료 맛과 서비스는 어떠셨나요?"
+          placeholder={t('contentPlaceholder')}
           rows={4}
           className="border-input bg-background placeholder:text-muted-foreground focus:ring-ring w-full resize-none rounded-md border px-3 py-2 text-sm focus:ring-2 focus:outline-none"
           required
@@ -173,7 +178,7 @@ export function CategoryFeedbackForm({
         <p
           className={`text-right text-xs ${fbckCn.trim().length < 10 ? 'text-muted-foreground' : 'text-green-600'}`}
         >
-          {fbckCn.trim().length}자
+          {t('charCount', { count: fbckCn.trim().length })}
         </p>
       </div>
 
@@ -185,7 +190,7 @@ export function CategoryFeedbackForm({
           disabled={submitting}
           className="border-input hover:bg-accent rounded-md border px-4 py-2 text-sm disabled:opacity-50"
         >
-          취소
+          {tc('cancel')}
         </button>
         <button
           type="submit"
@@ -194,7 +199,7 @@ export function CategoryFeedbackForm({
           }
           className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-medium disabled:opacity-50"
         >
-          {submitting ? '저장 중…' : '후기 등록'}
+          {submitting ? tc('saving') : t('submitShort')}
         </button>
       </div>
     </form>

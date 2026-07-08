@@ -58,6 +58,7 @@ export function ChatLocaleSelect({
   isSubscribed: boolean
 }) {
   const t = useTranslations('langSwitcher')
+  const tChat = useTranslations('chat')
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
   // 오픈프로모 기간엔 누구나 자동번역 콤보 사용 가능(서버 applyPromoGate가 요금 0).
@@ -105,10 +106,10 @@ export function ChatLocaleSelect({
     : null
 
   const autoLabel = isSubscribed
-    ? '🌐 구독특혜 PyTranslate™'
+    ? tChat('localeSelect.autoSubscribed')
     : promoActive
-      ? '🌐 이벤트 무료 PyTranslate™'
-      : '🔒 구독특혜 PyTranslate™'
+      ? tChat('localeSelect.autoPromo')
+      : tChat('localeSelect.autoLocked')
 
   return (
     <div className="relative shrink-0" ref={containerRef}>
@@ -121,11 +122,11 @@ export function ChatLocaleSelect({
         disabled={!enabled}
         aria-haspopup="listbox"
         aria-expanded={open}
-        aria-label="번역 언어 선택"
+        aria-label={tChat('localeSelect.label')}
         title={
           enabled
-            ? '이 방의 메시지를 선택한 언어로 번역해서 보여줍니다'
-            : '구독 회원만 사용할 수 있습니다 (오픈 이벤트 기간엔 누구나 무료)'
+            ? tChat('localeSelect.desc')
+            : tChat('localeSelect.subscriberOrPromo')
         }
         className="bg-background focus:ring-primary/50 flex max-w-[10rem] items-center gap-1 rounded-md border px-2 py-1 text-[9px] outline-none focus:ring-2 disabled:cursor-not-allowed disabled:opacity-50"
       >
@@ -157,7 +158,7 @@ export function ChatLocaleSelect({
       {open && enabled && (
         <div
           role="listbox"
-          aria-label="번역 언어 목록"
+          aria-label={tChat('localeSelect.listLabel')}
           className="border-border bg-background absolute top-full right-0 z-50 mt-1 max-h-72 w-56 overflow-y-auto rounded-lg border shadow-xl"
         >
           {/* ── 키인 검색 ── */}

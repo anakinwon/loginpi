@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { BeanIcon } from '@/components/ui/bean-icon'
 import { env } from '@/env'
 
@@ -15,6 +16,7 @@ function normalizeHost(raw: string | undefined, fallbackHost: string): string {
 }
 
 function OpenBridge() {
+  const t = useTranslations('userMisc')
   const params = useSearchParams()
   const [fallback, setFallback] = useState(false)
 
@@ -42,23 +44,23 @@ function OpenBridge() {
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-6 text-center">
       <BeanIcon className="h-14 w-14" />
-      <p className="text-sm font-medium">Pi Browser로 이동 중…</p>
+      <p className="text-sm font-medium">{t('openMovingToPiBrowser')}</p>
       {fallback && (
         <div className="flex w-full max-w-xs flex-col gap-2">
           <p className="text-muted-foreground text-xs">
-            자동 전환이 안 되면 눌러주세요:
+            {t('openAutoRedirectFail')}
           </p>
           <a
             href={`pi://${host}${to}`}
             className="bg-primary text-primary-foreground rounded-lg px-3 py-2 text-sm font-medium"
           >
-            Pi Browser로 열기
+            {t('openInPiBrowser')}
           </a>
           <a
             href={httpsUrl}
             className="text-muted-foreground rounded-lg border px-3 py-2 text-xs"
           >
-            브라우저에서 열기
+            {t('openInBrowser')}
           </a>
         </div>
       )}
@@ -66,9 +68,14 @@ function OpenBridge() {
   )
 }
 
+function OpenFallback() {
+  const t = useTranslations('userMisc')
+  return <p className="py-20 text-center text-sm">{t('openMoving')}</p>
+}
+
 export default function OpenPage() {
   return (
-    <Suspense fallback={<p className="py-20 text-center text-sm">이동 중…</p>}>
+    <Suspense fallback={<OpenFallback />}>
       <OpenBridge />
     </Suspense>
   )

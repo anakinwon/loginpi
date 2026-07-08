@@ -141,7 +141,7 @@ export function ClientMyHistory({
           disabled={loading}
           onClick={() => void load(from, to)}
         >
-          {t.has('history.search') ? t('history.search') : '내역조회'}
+          {t('history.search')}
         </Button>
         {(from || to) && (
           <Button

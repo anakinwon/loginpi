@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -16,16 +17,6 @@ type PayStatus =
   | 'cancelled'
   | 'error'
 
-const STATUS_LABEL: Record<PayStatus, string> = {
-  idle: '결제하기',
-  approving: '승인 중…',
-  waiting: 'Pi 지갑에서 확인 중…',
-  completing: '완료 처리 중…',
-  done: '다시 결제하기',
-  cancelled: '다시 결제하기',
-  error: '다시 시도',
-}
-
 interface PayResult {
   paymentId: string
   txid: string
@@ -33,6 +24,17 @@ interface PayResult {
 
 export function PiPaymentDemo() {
   const { user, isInPiBrowser } = usePiAuth()
+  const t = useTranslations('pay')
+  const tc = useTranslations('common')
+  const STATUS_LABEL: Record<PayStatus, string> = {
+    idle: t('payBtn'),
+    approving: t('approving'),
+    waiting: t('walletChecking'),
+    completing: t('completing'),
+    done: t('retryPay'),
+    cancelled: t('retryPay'),
+    error: tc('retry'),
+  }
   const [amount, setAmount] = useState('1')
   const [status, setStatus] = useState<PayStatus>('idle')
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
@@ -44,14 +46,14 @@ export function PiPaymentDemo() {
 
   const handlePayment = () => {
     if (!window.Pi) {
-      setErrorMsg('Pi SDK를 사용할 수 없습니다.')
+      setErrorMsg(t('sdkUnavailable'))
       setStatus('error')
       return
     }
 
     const parsed = parseFloat(amount)
     if (isNaN(parsed) || parsed <= 0) {
-      setErrorMsg('0보다 큰 금액을 입력하세요.')
+      setErrorMsg(t('amountInvalid'))
       setStatus('error')
       return
     }
@@ -84,7 +86,7 @@ export function PiPaymentDemo() {
           } catch (err) {
             setStatus('error')
             setErrorMsg(
-              err instanceof Error ? err.message : '승인 중 오류 발생',
+              err instanceof Error ? err.message : t('approveErrorMsg'),
             )
           }
         },
@@ -107,13 +109,13 @@ export function PiPaymentDemo() {
           } catch (err) {
             setStatus('error')
             setErrorMsg(
-              err instanceof Error ? err.message : '완료 처리 중 오류 발생',
+              err instanceof Error ? err.message : t('completeErrorMsg'),
             )
           }
         },
 
         onCancel: (paymentId) => {
-          setCancelMsg(`결제가 취소됐습니다. (ID: ${paymentId.slice(0, 12)}…)`)
+          setCancelMsg(t('cancelled', { id: paymentId.slice(0, 12) }))
           setStatus('cancelled')
         },
 
@@ -130,7 +132,9 @@ export function PiPaymentDemo() {
     return (
       <div className="bg-muted rounded-xl p-6">
         <p className="text-muted-foreground text-sm">
-          Pi 결제는 <strong>Pi Browser</strong>에서만 사용할 수 있습니다.
+          {t.rich('demo.piBrowserOnly', {
+            strong: (c) => <strong>{c}</strong>,
+          })}
         </p>
       </div>
     )
@@ -139,12 +143,12 @@ export function PiPaymentDemo() {
   return (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle className="text-sm">Pi Coin 결제 데모</CardTitle>
+        <CardTitle className="text-sm">{t('demo.title')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* 금액 입력 */}
         <div className="space-y-1.5">
-          <Label htmlFor="pi-amount">결제 금액</Label>
+          <Label htmlFor="pi-amount">{t('amountLabel')}</Label>
           <div className="flex items-center gap-2">
             <Input
               id="pi-amount"
@@ -192,7 +196,7 @@ export function PiPaymentDemo() {
         {/* 진행 중 안내 */}
         {status === 'waiting' && (
           <p className="text-muted-foreground text-xs">
-            Pi Browser 지갑 화면에서 결제를 확인해 주세요.
+            {t('confirmInWallet')}
           </p>
         )}
 
@@ -208,7 +212,7 @@ export function PiPaymentDemo() {
         {status === 'done' && result && (
           <div className="space-y-1.5 rounded-lg bg-green-50 p-3 dark:bg-green-900/20">
             <p className="text-sm font-semibold text-green-700 dark:text-green-400">
-              결제 완료! {parseFloat(amount)} π
+              {t('demo.doneAmount', { amount: parseFloat(amount) })}
             </p>
             <div className="space-y-0.5">
               <p className="text-muted-foreground text-xs">Payment ID</p>
@@ -226,7 +230,7 @@ export function PiPaymentDemo() {
             </div>
             {user && (
               <p className="text-muted-foreground text-xs">
-                결제자: @{user.username ?? user.displayName}
+                {t('demo.payer', { name: user.username ?? user.displayName })}
               </p>
             )}
           </div>

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { ChevronDown, ChevronUp, Plus, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -9,20 +10,29 @@ import { piFetch } from '@/lib/pi-fetch'
 import {
   ADMIN_NAV_CATALOG,
   ADMIN_NAV_BY_HREF,
-  ADMIN_NAV_SECTIONS,
+  ADMIN_NAV_SECTION_KEYS,
 } from '@/lib/admin-nav-catalog'
 
 export default function QuickMenuAdminPage() {
+  const t = useTranslations('admin.quickMenuPage')
+  const tNav = useTranslations('admin.nav')
+  const tc = useTranslations('common')
   const router = useRouter()
   const [selected, setSelected] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
 
   const labelOf = useCallback(
-    (href: string) => ADMIN_NAV_BY_HREF.get(href)?.label ?? href,
-    [],
+    (href: string) => {
+      const key = ADMIN_NAV_BY_HREF.get(href)?.labelKey
+      return key ? tNav(key) : href
+    },
+    [tNav],
   )
-  const secLabel = (sec: string) => ADMIN_NAV_SECTIONS[sec] ?? sec
+  const secLabel = (sec: string) => {
+    const key = ADMIN_NAV_SECTION_KEYS[sec]
+    return key ? tNav(key) : sec
+  }
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -33,11 +43,11 @@ export default function QuickMenuAdminPage() {
       // 카탈로그에 남아있는 것만
       setSelected((d.hrefs ?? []).filter((h) => ADMIN_NAV_BY_HREF.has(h)))
     } catch {
-      toast.error('설정을 불러오지 못했습니다')
+      toast.error(t('loadFail'))
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [t])
 
   useEffect(() => {
     void load()
@@ -78,12 +88,12 @@ export default function QuickMenuAdminPage() {
       })
       if (!res.ok) {
         const d = (await res.json()) as { error?: string }
-        throw new Error(d.error ?? '저장 실패')
+        throw new Error(d.error ?? t('saveFail'))
       }
-      toast.success('팝업 메뉴가 저장되었습니다')
+      toast.success(t('saved'))
       router.refresh() // 레이아웃의 팝업 즉시 반영
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : '저장 실패')
+      toast.error(e instanceof Error ? e.message : t('saveFail'))
     } finally {
       setSaving(false)
     }
@@ -93,30 +103,29 @@ export default function QuickMenuAdminPage() {
     <div className="max-w-3xl space-y-6">
       <div className="flex items-center justify-between gap-2">
         <div>
-          <h1 className="text-lg font-bold">🧭 팝업 메뉴 설정</h1>
-          <p className="text-muted-foreground text-sm">
-            하단 플로팅 팝업(관리 메뉴)에 노출할 항목을 선택하고 순서를
-            조정합니다.
-          </p>
+          <h1 className="text-lg font-bold">🧭 {t('title')}</h1>
+          <p className="text-muted-foreground text-sm">{t('desc')}</p>
         </div>
         <Button onClick={save} disabled={saving || loading}>
-          {saving ? '저장 중…' : '저장'}
+          {saving ? tc('saving') : tc('save')}
         </Button>
       </div>
 
       {loading ? (
-        <p className="text-muted-foreground py-8 text-center text-sm">로딩 중…</p>
+        <p className="text-muted-foreground py-8 text-center text-sm">
+          {tc('loading')}
+        </p>
       ) : (
         <>
           {/* 선택된 항목 — 순서 조정 */}
           <section className="space-y-2 rounded-xl border p-4">
             <p className="text-sm font-semibold">
-              노출 항목{' '}
+              {t('selectedItems')}{' '}
               <span className="text-muted-foreground">({selected.length})</span>
             </p>
             {selected.length === 0 ? (
               <p className="text-muted-foreground py-4 text-center text-xs">
-                선택된 메뉴가 없습니다. 아래에서 추가하세요.
+                {t('emptySelected')}
               </p>
             ) : (
               <ul className="space-y-1">
@@ -134,7 +143,7 @@ export default function QuickMenuAdminPage() {
                     <button
                       onClick={() => move(i, -1)}
                       disabled={i === 0}
-                      aria-label="위로"
+                      aria-label={t('moveUp')}
                       className="text-muted-foreground hover:text-foreground disabled:opacity-30"
                     >
                       <ChevronUp className="size-4" />
@@ -142,14 +151,14 @@ export default function QuickMenuAdminPage() {
                     <button
                       onClick={() => move(i, 1)}
                       disabled={i === selected.length - 1}
-                      aria-label="아래로"
+                      aria-label={t('moveDown')}
                       className="text-muted-foreground hover:text-foreground disabled:opacity-30"
                     >
                       <ChevronDown className="size-4" />
                     </button>
                     <button
                       onClick={() => remove(href)}
-                      aria-label="제거"
+                      aria-label={t('remove')}
                       className="text-muted-foreground hover:text-destructive"
                     >
                       <X className="size-4" />
@@ -162,10 +171,10 @@ export default function QuickMenuAdminPage() {
 
           {/* 추가 가능한 메뉴 — 섹션별 */}
           <section className="space-y-4 rounded-xl border p-4">
-            <p className="text-sm font-semibold">추가 가능한 메뉴</p>
+            <p className="text-sm font-semibold">{t('available')}</p>
             {availableBySection.length === 0 ? (
               <p className="text-muted-foreground py-2 text-center text-xs">
-                모든 메뉴가 추가되었습니다.
+                {t('allAdded')}
               </p>
             ) : (
               availableBySection.map(([section, items]) => (

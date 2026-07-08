@@ -54,7 +54,10 @@ export function BadgeAwardPopup({
 
       if (res.ok) {
         toast.success(
-          t('upgraded', { emoji: badge.theme_emoji, theme: tn(badge.theme_cd, badge.theme_nm) }),
+          t('upgraded', {
+            emoji: badge.theme_emoji,
+            theme: tn(badge.theme_cd, badge.theme_nm),
+          }),
         )
         onUpgraded()
         return
@@ -91,7 +94,9 @@ export function BadgeAwardPopup({
       >
         <div className="mb-1 text-5xl">{badge.theme_emoji}</div>
         <div className="mb-2 text-2xl">🏅</div>
-        <h3 className="text-base font-semibold">{t('acquiredTitle', { theme: tn(badge.theme_cd, badge.theme_nm) })}</h3>
+        <h3 className="text-base font-semibold">
+          {t('acquiredTitle', { theme: tn(badge.theme_cd, badge.theme_nm) })}
+        </h3>
         <p className="text-muted-foreground mt-1 text-sm">
           {t('acquiredDesc', { theme: tn(badge.theme_cd, badge.theme_nm) })}
         </p>

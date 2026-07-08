@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
 import { Input } from '@/components/ui/input'
@@ -18,6 +19,8 @@ import {
 type Props = { category: string }
 
 export function GalleryPostForm({ category }: Props) {
+  const t = useTranslations('board')
+  const tc = useTranslations('common')
   const router = useRouter()
   const [title, setTitle] = useState('')
   const [blocks, setBlocks] = useState<EditorBlock[]>(() => parseBlocks(null))
@@ -26,7 +29,7 @@ export function GalleryPostForm({ category }: Props) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!title.trim()) {
-      toast.error('제목을 입력해주세요')
+      toast.error(t('gallery.titleRequired'))
       return
     }
     setSubmitting(true)
@@ -40,7 +43,7 @@ export function GalleryPostForm({ category }: Props) {
 
     if (!res.ok) {
       const { error } = (await res.json()) as { error?: string }
-      toast.error(error ?? '게시글 작성 실패')
+      toast.error(error ?? t('gallery.submitFail'))
       setSubmitting(false)
       return
     }
@@ -79,7 +82,7 @@ export function GalleryPostForm({ category }: Props) {
         }
         finalBlocks.push(saved)
       } else {
-        toast.error(`이미지 업로드 실패: ${block.nm}`)
+        toast.error(t('gallery.imageUploadFail', { name: block.nm }))
       }
     }
 
@@ -93,7 +96,7 @@ export function GalleryPostForm({ category }: Props) {
       })
     }
 
-    toast.success('게시글이 작성되었습니다')
+    toast.success(t('gallery.submitted'))
     router.push(`/board/${category}/${post_id}`)
     router.refresh()
   }
@@ -101,19 +104,19 @@ export function GalleryPostForm({ category }: Props) {
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div className="space-y-1.5">
-        <Label htmlFor="post-title">제목</Label>
+        <Label htmlFor="post-title">{t('gallery.titleLabel')}</Label>
         <Input
           id="post-title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="제목을 입력하세요"
+          placeholder={t('gallery.titlePh')}
           required
           disabled={submitting}
         />
       </div>
 
       <div className="space-y-1.5">
-        <Label>본문</Label>
+        <Label>{t('gallery.bodyLabel')}</Label>
         <GalleryBodyEditor
           blocks={blocks}
           onChange={setBlocks}
@@ -123,7 +126,7 @@ export function GalleryPostForm({ category }: Props) {
 
       <div className="flex gap-2">
         <Button type="submit" disabled={submitting}>
-          {submitting ? '작성 중...' : '작성하기'}
+          {submitting ? t('gallery.submitting') : t('gallery.submit')}
         </Button>
         <Button
           type="button"
@@ -131,7 +134,7 @@ export function GalleryPostForm({ category }: Props) {
           onClick={() => router.back()}
           disabled={submitting}
         >
-          취소
+          {tc('cancel')}
         </Button>
       </div>
     </form>

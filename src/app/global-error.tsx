@@ -25,7 +25,7 @@ export default function GlobalError({
       >
         <div>
           <h1 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>
-            문제가 발생했습니다
+            문제가 발생했습니다 / Something went wrong
           </h1>
           <p
             style={{ color: '#666', marginTop: '0.5rem', fontSize: '0.875rem' }}

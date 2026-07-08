@@ -63,6 +63,7 @@ const TYPE_COLORS = [
 //   PI 모드: 구매자 전환율 = Pi 결제 완료 기준 (mps_order 소스 동일).
 export function PerformanceTab({ period }: { period: number }) {
   const t = useTranslations('adminAnalytics')
+  const tc = useTranslations('common')
   const [data, setData] = useState<PerfResponse | null>(null)
   const [pv, setPv] = useState<PvResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -79,7 +80,7 @@ export function PerformanceTab({ period }: { period: number }) {
       setData(json)
       writeCache(cacheKey, json)
     } catch (e) {
-      if (!cached) setError(e instanceof Error ? e.message : '오류 발생')
+      if (!cached) setError(e instanceof Error ? e.message : tc('error'))
     }
   }, [])
 

@@ -1,9 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
-import {
-  ensureTelegramWebhook,
-  getWebhookStatus,
-} from '@/lib/telegram-webhook'
+import { ensureTelegramWebhook, getWebhookStatus } from '@/lib/telegram-webhook'
 import { sanitizeError } from '@/lib/sanitize-error'
 
 // 관리자용 텔레그램 webhook 진단·재등록 (환경별 봇 분리 전제 — telegram-webhook.ts 참조)

@@ -24,7 +24,7 @@ export default function RootNotFound() {
               marginTop: '0.5rem',
             }}
           >
-            페이지를 찾을 수 없습니다
+            페이지를 찾을 수 없습니다 / Page not found
           </h1>
           <p
             style={{ color: '#666', marginTop: '0.5rem', fontSize: '0.875rem' }}

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { piFetch } from '@/lib/pi-fetch'
 import { InlinePurchasePrompt } from './inline-purchase-prompt'
 
@@ -18,13 +19,6 @@ interface CheckResult {
   canUsePremiumTheme: boolean
   canCreateEventRoom: boolean
   aiQuota: { remaining: number }
-}
-
-const FEATURE_LABEL: Record<Feature, string> = {
-  tip: 'Pi Bean 보내기',
-  premiumTheme: 'PREMIUM 테마',
-  eventRoom: '이벤트 카페',
-  ai: 'AI 봇',
 }
 
 function isAllowed(feature: Feature, c: CheckResult): boolean {
@@ -52,6 +46,13 @@ export function SubscriptionGate({
   children,
   loadingFallback,
 }: SubscriptionGateProps) {
+  const t = useTranslations('chat')
+  const featureLabel: Record<Feature, string> = {
+    tip: t('gate.sendBean'),
+    premiumTheme: t('gate.premiumTheme'),
+    eventRoom: t('gate.eventCafe'),
+    ai: t('gate.aiBot'),
+  }
   const [check, setCheck] = useState<CheckResult | null>(null)
   const [loading, setLoading] = useState(true)
   const [promptOpen, setPromptOpen] = useState(false)
@@ -84,7 +85,7 @@ export function SubscriptionGate({
       loadingFallback ?? (
         <div
           className="bg-muted h-9 w-full animate-pulse rounded-xl"
-          aria-label="권한 확인 중"
+          aria-label={t('gate.checking')}
         />
       )
     )
@@ -102,13 +103,13 @@ export function SubscriptionGate({
         onClick={() => setPromptOpen(true)}
         className="text-muted-foreground hover:bg-muted inline-flex items-center gap-1.5 rounded-xl border border-dashed px-4 py-2 text-sm transition-colors"
       >
-        🔒 {FEATURE_LABEL[feature]} 잠금 해제
+        🔒 {t('gate.unlockLabel', { label: featureLabel[feature] })}
       </button>
 
       <InlinePurchasePrompt
         isOpen={promptOpen}
-        featureName={`🔒 ${FEATURE_LABEL[feature]}`}
-        description="Bean 구독으로 모든 유료 기능을 이용하세요"
+        featureName={`🔒 ${featureLabel[feature]}`}
+        description={t('gate.unlockDesc')}
         onClose={() => setPromptOpen(false)}
       />
     </>
