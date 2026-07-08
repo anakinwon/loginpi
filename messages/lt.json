@@ -2220,6 +2220,13 @@
     "sdkUnavailable": "Pi SDK nepasiekiamas.",
     "walletChecking": "Tikrinama piniginė…"
   },
+  "piOAuth": {
+    "backHome": "Grįžti į pagrindinį puslapį",
+    "failed": "Nepavyko prisijungti prie Pi",
+    "retry": "Bandyti dar kartą",
+    "signingIn": "Prisijungiama naudojant Pi paskyrą…",
+    "stateMismatch": "Saugumo patvirtinimas nepavyko. Bandykite dar kartą."
+  },
   "profile": {
     "info": {
       "addr": "Adresas",

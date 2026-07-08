@@ -2220,6 +2220,13 @@
     "sdkUnavailable": "Pi SDK kullanılamıyor.",
     "walletChecking": "Cüzdan kontrol ediliyor..."
   },
+  "piOAuth": {
+    "backHome": "Ana Sayfaya Dön",
+    "failed": "Pi girişi başarısız oldu",
+    "retry": "Tekrar Dene",
+    "signingIn": "Pi hesabıyla giriş yapılıyor...",
+    "stateMismatch": "Güvenlik doğrulaması başarısız oldu. Lütfen tekrar deneyin."
+  },
   "profile": {
     "info": {
       "addr": "Adres",

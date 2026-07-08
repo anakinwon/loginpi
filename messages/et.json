@@ -2220,6 +2220,13 @@
     "sdkUnavailable": "Pi SDK መጠቀም አይቻልም።",
     "walletChecking": "የኪስ ቦርሳ በመፈተሽ ላይ…"
   },
+  "piOAuth": {
+    "backHome": "ወደ መነሻ",
+    "failed": "የPi መግባት አልተሳካም",
+    "retry": "እንደገና ይሞክሩ",
+    "signingIn": "በPi አካውንት በመግባት ላይ ነው…",
+    "stateMismatch": "የደህንነት ማረጋገጫ አልተሳካም። እባክዎ እንደገና ይሞክሩ።"
+  },
   "profile": {
     "info": {
       "addr": "አድራሻ",

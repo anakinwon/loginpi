@@ -2220,6 +2220,13 @@
     "sdkUnavailable": "Pi SDK er ikke tilgængelig.",
     "walletChecking": "Kontrollerer tegnebog..."
   },
+  "piOAuth": {
+    "backHome": "Tilbage til hjem",
+    "failed": "Pi-login mislykkedes",
+    "retry": "Prøv igen",
+    "signingIn": "Logger ind med Pi-konto...",
+    "stateMismatch": "Sikkerhedsverifikation mislykkedes. Prøv venligst igen."
+  },
   "profile": {
     "info": {
       "addr": "Adresse",

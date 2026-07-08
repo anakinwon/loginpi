@@ -2220,6 +2220,13 @@
     "sdkUnavailable": "Pi SDK شتون نلري.",
     "walletChecking": "بټوه کتل کیږي..."
   },
+  "piOAuth": {
+    "backHome": "کور ته",
+    "failed": "د Pi ننوتل ناکامه شول",
+    "retry": "بیا هڅه وکړئ",
+    "signingIn": "د Pi حساب سره ننوتل...",
+    "stateMismatch": "د امنیتي تایید ناکامه شوه. مهرباني وکړئ بیا هڅه وکړئ."
+  },
   "profile": {
     "info": {
       "addr": "پته",

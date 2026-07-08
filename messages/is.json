@@ -2220,6 +2220,13 @@
     "sdkUnavailable": "Pi SDK er ekki tiltækt.",
     "walletChecking": "Staðfesti veski..."
   },
+  "piOAuth": {
+    "backHome": "Aftur á forsíðu",
+    "failed": "Innskráning með Pi mistókst",
+    "retry": "Reyna aftur",
+    "signingIn": "Skrái mig inn með Pi reikningi…",
+    "stateMismatch": "Öryggisstaðfesting mistókst. Vinsamlegast reyndu aftur."
+  },
   "profile": {
     "info": {
       "addr": "Heimilisfang",

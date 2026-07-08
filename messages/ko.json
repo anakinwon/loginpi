@@ -2715,5 +2715,12 @@
     "UFC_MMA": "격투기",
     "WEATHER": "날씨",
     "WORLD_CUP": "월드컵"
+  },
+  "piOAuth": {
+    "signingIn": "Pi 계정으로 로그인하는 중…",
+    "failed": "Pi 로그인에 실패했습니다",
+    "stateMismatch": "보안 검증에 실패했습니다. 다시 시도해 주세요.",
+    "retry": "다시 시도",
+    "backHome": "홈으로"
   }
 }

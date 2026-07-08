@@ -2220,6 +2220,13 @@
     "sdkUnavailable": "Pi SDK mövcud deyil.",
     "walletChecking": "Cüzdan yoxlanılır…"
   },
+  "piOAuth": {
+    "backHome": "Ana səhifəyə",
+    "failed": "Pi girişinə uğursuz oldu",
+    "retry": "Yenidən cəhd edin",
+    "signingIn": "Pi hesabı ilə daxil olunur...",
+    "stateMismatch": "Təhlükəsizlik yoxlaması uğursuz oldu. Zəhmət olmasa, yenidən cəhd edin."
+  },
   "profile": {
     "info": {
       "addr": "Ünvan",

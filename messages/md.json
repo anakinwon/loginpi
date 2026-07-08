@@ -2220,6 +2220,13 @@
     "sdkUnavailable": "Pi SDK nu este disponibil.",
     "walletChecking": "Se verifică portofelul..."
   },
+  "piOAuth": {
+    "backHome": "Înapoi la Acasă",
+    "failed": "Autentificarea Pi a eșuat.",
+    "retry": "Reîncercați",
+    "signingIn": "Se conectează cu contul Pi…",
+    "stateMismatch": "Verificarea de securitate a eșuat. Vă rugăm să încercați din nou."
+  },
   "profile": {
     "info": {
       "addr": "Adresă",

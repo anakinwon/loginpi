@@ -2220,6 +2220,13 @@
     "sdkUnavailable": "Pi SDK is nie beskikbaar nie.",
     "walletChecking": "Kontroleer beursie tans…"
   },
+  "piOAuth": {
+    "backHome": "Terug huis toe",
+    "failed": "Pi-aanmelding het misluk",
+    "retry": "Probeer weer",
+    "signingIn": "Besig om met Pi-rekening aan te meld...",
+    "stateMismatch": "Sekuriteitsverifikasie het misluk. Probeer asseblief weer."
+  },
   "profile": {
     "info": {
       "addr": "Adres",

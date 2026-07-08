@@ -2220,6 +2220,13 @@
     "sdkUnavailable": "Pi SDK nije dostupan.",
     "walletChecking": "Provjeravam novčanik..."
   },
+  "piOAuth": {
+    "backHome": "Natrag na početnu",
+    "failed": "Prijava na Pi nije uspjela.",
+    "retry": "Pokušaj ponovno",
+    "signingIn": "Prijavljivanje s Pi računom...",
+    "stateMismatch": "Sigurnosna provjera nije uspjela. Pokušajte ponovno."
+  },
   "profile": {
     "info": {
       "addr": "Adresa",

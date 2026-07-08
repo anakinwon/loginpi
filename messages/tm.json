@@ -2220,6 +2220,13 @@
     "sdkUnavailable": "Pi SDK elýeterli däl.",
     "walletChecking": "Gapjyk barlanylýar..."
   },
+  "piOAuth": {
+    "backHome": "Baş sahypa",
+    "failed": "Pi giriş şowsuz boldy",
+    "retry": "Täzeden synanyş",
+    "signingIn": "Pi hasaby bilen giriş edilýär…",
+    "stateMismatch": "Howpsuzlyk barlagy şowsuz boldy. Täzeden synanyşyň."
+  },
   "profile": {
     "info": {
       "addr": "Salgy",

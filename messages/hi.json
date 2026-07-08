@@ -2220,6 +2220,13 @@
     "sdkUnavailable": "Pi SDK उपलब्ध नहीं है।",
     "walletChecking": "Wallet की जाँच हो रही है…"
   },
+  "piOAuth": {
+    "backHome": "होम पर वापस जाएँ",
+    "failed": "Pi लॉगिन असफल रहा",
+    "retry": "पुनः प्रयास करें",
+    "signingIn": "Pi खाते से साइन इन किया जा रहा है…",
+    "stateMismatch": "सुरक्षा सत्यापन विफल रहा। कृपया पुनः प्रयास करें।"
+  },
   "profile": {
     "info": {
       "addr": "पता",

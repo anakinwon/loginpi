@@ -2220,6 +2220,13 @@
     "sdkUnavailable": "Pi SDK در دسترس نیست.",
     "walletChecking": "در حال بررسی کیف پول…"
   },
+  "piOAuth": {
+    "backHome": "بازگشت به صفحه اصلی",
+    "failed": "ورود به Pi ناموفق بود.",
+    "retry": "تلاش مجدد",
+    "signingIn": "در حال ورود با حساب Pi...",
+    "stateMismatch": "تأیید امنیتی ناموفق بود. لطفاً دوباره تلاش کنید."
+  },
   "profile": {
     "info": {
       "addr": "آدرس",

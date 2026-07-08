@@ -2220,6 +2220,13 @@
     "sdkUnavailable": "Pi SDK nuk është i disponueshëm.",
     "walletChecking": "Po kontrollohet portofoli..."
   },
+  "piOAuth": {
+    "backHome": "Kthehu në shtëpi",
+    "failed": "Kyçja në Pi dështoi",
+    "retry": "Provo përsëri",
+    "signingIn": "Po kyçeni me llogarinë Pi...",
+    "stateMismatch": "Verifikimi i sigurisë dështoi. Ju lutemi provoni përsëri."
+  },
   "profile": {
     "info": {
       "addr": "Adresa",

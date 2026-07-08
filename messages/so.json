@@ -2220,6 +2220,13 @@
     "sdkUnavailable": "Pi SDK lama heli karo.",
     "walletChecking": "Waxaa la hubinayaa boorsada…"
   },
+  "piOAuth": {
+    "backHome": "Ku noqo bogga hore",
+    "failed": "Soo gelitaanka Pi wuu fashilmay.",
+    "retry": "Mar kale isku day",
+    "signingIn": "Gudaha u galaya xisaabta Pi...",
+    "stateMismatch": "Xaqiijinta amniga ayaa fashilantay. Fadlan mar kale isku day."
+  },
   "profile": {
     "info": {
       "addr": "Cinwaanka",

@@ -2220,6 +2220,13 @@
     "sdkUnavailable": "Pi SDK jest niedostępne.",
     "walletChecking": "Sprawdzanie portfela…"
   },
+  "piOAuth": {
+    "backHome": "Wróć do strony głównej",
+    "failed": "Logowanie Pi nie powiodło się",
+    "retry": "Spróbuj ponownie",
+    "signingIn": "Logowanie za pomocą konta Pi…",
+    "stateMismatch": "Weryfikacja bezpieczeństwa nie powiodła się. Spróbuj ponownie."
+  },
   "profile": {
     "info": {
       "addr": "Adres",

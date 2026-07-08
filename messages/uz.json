@@ -2220,6 +2220,13 @@
     "sdkUnavailable": "Pi SDK mavjud emas.",
     "walletChecking": "Hamyon tekshirilmoqda…"
   },
+  "piOAuth": {
+    "backHome": "Bosh sahifaga",
+    "failed": "Pi tizimiga kirish muvaffaqiyatsiz tugadi",
+    "retry": "Qayta urinish",
+    "signingIn": "Pi hisobi bilan tizimga kirilmoqda...",
+    "stateMismatch": "Xavfsizlikni tekshirish muvaffaqiyatsiz tugadi. Qayta urinib ko'ring."
+  },
   "profile": {
     "info": {
       "addr": "Manzil",

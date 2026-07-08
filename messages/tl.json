@@ -2220,6 +2220,13 @@
     "sdkUnavailable": "Pi SDK não está disponível.",
     "walletChecking": "Verificando carteira..."
   },
+  "piOAuth": {
+    "backHome": "Voltar ao início",
+    "failed": "Falha no login Pi",
+    "retry": "Tentar novamente",
+    "signingIn": "A iniciar sessão com a conta Pi…",
+    "stateMismatch": "A verificação de segurança falhou. Por favor, tente novamente."
+  },
   "profile": {
     "info": {
       "addr": "Endereço",

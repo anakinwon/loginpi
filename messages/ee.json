@@ -2220,6 +2220,13 @@
     "sdkUnavailable": "Pi SDK pole saadaval.",
     "walletChecking": "Rahakoti kontrollimine…"
   },
+  "piOAuth": {
+    "backHome": "Avalehele",
+    "failed": "Pi sisselogimine ebaõnnestus",
+    "retry": "Proovi uuesti",
+    "signingIn": "Logitakse sisse Pi kontoga...",
+    "stateMismatch": "Turvalisuse kontroll ebaõnnestus. Palun proovige uuesti."
+  },
   "profile": {
     "info": {
       "addr": "Aadress",

@@ -3,6 +3,7 @@ import { env } from '@/env'
 import { Link } from '@/i18n/navigation'
 import { GoogleLoginButton } from '@/components/google-login-button'
 import { PiLoginButton } from '@/components/pi-login-button'
+import { PiOAuthLoginButton } from '@/components/pi-oauth-login-button'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { BrowserName } from '@/components/layout/browser-name'
 import { LanguageSwitcher } from '@/components/layout/language-switcher'
@@ -30,6 +31,8 @@ export async function Header() {
         <nav className="flex items-center gap-3">
           {/* 계정명·로그아웃 버튼은 각 로그인 버튼 컴포넌트가 세션 상태에 따라 렌더 */}
           <GoogleLoginButton />
+          {/* Pi Sign-In(OAuth) — 일반 브라우저 전용. Pi Browser에서는 PiLoginButton(SDK)이 담당 */}
+          <PiOAuthLoginButton />
           <PiLoginButton />
           <span className="hidden md:inline-flex">
             <ThemeToggle />

@@ -2220,6 +2220,13 @@
     "sdkUnavailable": "Pi SDK tidak tersedia.",
     "walletChecking": "Sedang menyemak dompet…"
   },
+  "piOAuth": {
+    "backHome": "Kembali ke Laman Utama",
+    "failed": "Log masuk Pi gagal",
+    "retry": "Cuba lagi",
+    "signingIn": "Sedang log masuk dengan akaun Pi...",
+    "stateMismatch": "Pengesahan keselamatan gagal. Sila cuba lagi."
+  },
   "profile": {
     "info": {
       "addr": "Alamat",

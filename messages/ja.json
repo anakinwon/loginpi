@@ -2220,6 +2220,13 @@
     "sdkUnavailable": "Pi SDKは利用できません。",
     "walletChecking": "ウォレットを確認中…"
   },
+  "piOAuth": {
+    "backHome": "ホームへ",
+    "failed": "Piログインに失敗しました",
+    "retry": "再試行",
+    "signingIn": "Piアカウントでログイン中…",
+    "stateMismatch": "セキュリティ検証に失敗しました。もう一度お試しください。"
+  },
   "profile": {
     "info": {
       "addr": "住所",

@@ -2220,6 +2220,13 @@
     "sdkUnavailable": "Pi SDK недоступен.",
     "walletChecking": "Проверка кошелька..."
   },
+  "piOAuth": {
+    "backHome": "На главную",
+    "failed": "Не удалось войти в Pi",
+    "retry": "Повторить попытку",
+    "signingIn": "Вход в аккаунт Pi…",
+    "stateMismatch": "Сбой проверки безопасности. Повторите попытку."
+  },
   "profile": {
     "info": {
       "addr": "Адрес",

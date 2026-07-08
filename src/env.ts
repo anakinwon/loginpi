@@ -87,6 +87,8 @@ export const env = createEnv({
     // Pi Browser 딥링크(pi://)용 Pi 정식 도메인 — ⚠️ staging≠운영 환경별 다름.
     //   staging=apppilogintestbd3106.pinet.com / 운영=운영 pinet 도메인. 미설정 시 현재 도메인 폴백.
     NEXT_PUBLIC_PI_APP_DOMAIN: z.string().optional(),
+    // Pi Sign-In(OAuth implicit) 클라이언트 ID — 일반 브라우저 'Pi로 로그인' 버튼 활성 조건
+    NEXT_PUBLIC_PI_OAUTH_CLIENT_ID: z.string().optional(),
   },
   runtimeEnv: {
     PI_SESSION_SECRET: process.env.PI_SESSION_SECRET,
@@ -132,6 +134,7 @@ export const env = createEnv({
     VERCEL_STAGING_PROJECT_ID: process.env.VERCEL_STAGING_PROJECT_ID,
     VERCEL_PROD_PROJECT_ID: process.env.VERCEL_PROD_PROJECT_ID,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+    NEXT_PUBLIC_PI_OAUTH_CLIENT_ID: process.env.NEXT_PUBLIC_PI_OAUTH_CLIENT_ID,
     NEXT_PUBLIC_PI_SANDBOX: process.env.NEXT_PUBLIC_PI_SANDBOX,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:

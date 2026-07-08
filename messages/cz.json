@@ -2220,6 +2220,13 @@
     "sdkUnavailable": "Pi SDK není k dispozici.",
     "walletChecking": "Kontrola peněženky…"
   },
+  "piOAuth": {
+    "backHome": "Zpět na domovskou stránku",
+    "failed": "Přihlášení k Pi se nezdařilo",
+    "retry": "Zkusit znovu",
+    "signingIn": "Přihlašování k účtu Pi…",
+    "stateMismatch": "Ověření zabezpečení se nezdařilo. Zkuste to prosím znovu."
+  },
   "profile": {
     "info": {
       "addr": "Adresa",

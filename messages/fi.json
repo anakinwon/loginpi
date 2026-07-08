@@ -2220,6 +2220,13 @@
     "sdkUnavailable": "Pi SDK ei ole käytettävissä.",
     "walletChecking": "Tarkistetaan lompakkoa…"
   },
+  "piOAuth": {
+    "backHome": "Takaisin etusivulle",
+    "failed": "Pi-kirjautuminen epäonnistui",
+    "retry": "Yritä uudelleen",
+    "signingIn": "Kirjaudutaan sisään Pi-tilillä…",
+    "stateMismatch": "Turvallisuustarkistus epäonnistui. Yritä uudelleen."
+  },
   "profile": {
     "info": {
       "addr": "Osoite",

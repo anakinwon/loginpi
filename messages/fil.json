@@ -2220,6 +2220,13 @@
     "sdkUnavailable": "Hindi magagamit ang Pi SDK.",
     "walletChecking": "Sinusuri ang Wallet…"
   },
+  "piOAuth": {
+    "backHome": "Bumalik sa Home",
+    "failed": "Nabigo ang pag-log in sa Pi.",
+    "retry": "Subukang Muli",
+    "signingIn": "Nagla-log in gamit ang Pi account…",
+    "stateMismatch": "Nabigo ang pag-verify ng seguridad. Pakisubukang muli."
+  },
   "profile": {
     "info": {
       "addr": "Address",

@@ -2220,6 +2220,13 @@
     "sdkUnavailable": "Pi SDK אינו זמין.",
     "walletChecking": "בודק ארנק…"
   },
+  "piOAuth": {
+    "backHome": "חזרה לדף הבית",
+    "failed": "התחברות ל-Pi נכשלה",
+    "retry": "נסה שוב",
+    "signingIn": "מתחבר/ת לחשבון Pi...",
+    "stateMismatch": "אימות האבטחה נכשל. אנא נסה/י שוב."
+  },
   "profile": {
     "info": {
       "addr": "כתובת",

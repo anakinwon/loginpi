@@ -2220,6 +2220,13 @@
     "sdkUnavailable": "El Pi SDK no està disponible.",
     "walletChecking": "Verificant cartera..."
   },
+  "piOAuth": {
+    "backHome": "Tornar a l'inici",
+    "failed": "L'inici de sessió amb Pi ha fallat",
+    "retry": "Torna-ho a provar",
+    "signingIn": "Iniciant sessió amb el compte Pi…",
+    "stateMismatch": "La verificació de seguretat ha fallat. Torna-ho a provar."
+  },
   "profile": {
     "info": {
       "addr": "Adreça",

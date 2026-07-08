@@ -2220,6 +2220,13 @@
     "sdkUnavailable": "Pi SDK haipatikani.",
     "walletChecking": "Inathibitisha pochi…"
   },
+  "piOAuth": {
+    "backHome": "Rudi nyumbani",
+    "failed": "Kuingia kwa Pi kumefeli",
+    "retry": "Jaribu tena",
+    "signingIn": "Kuingia na akaunti ya Pi…",
+    "stateMismatch": "Uthibitishaji wa usalama umefeli. Tafadhali jaribu tena."
+  },
   "profile": {
     "info": {
       "addr": "Anwani",

@@ -2220,6 +2220,13 @@
     "sdkUnavailable": "Pi SDK nav pieejams.",
     "walletChecking": "Notiek maka pārbaude…"
   },
+  "piOAuth": {
+    "backHome": "Uz sākumlapu",
+    "failed": "Pi pieteikšanās neizdevās",
+    "retry": "Mēģināt vēlreiz",
+    "signingIn": "Piesakās ar Pi kontu…",
+    "stateMismatch": "Drošības pārbaude neizdevās. Lūdzu, mēģiniet vēlreiz."
+  },
   "profile": {
     "info": {
       "addr": "Adrese",

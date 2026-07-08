@@ -2220,6 +2220,13 @@
     "sdkUnavailable": "Pi SDK không khả dụng.",
     "walletChecking": "Đang kiểm tra ví..."
   },
+  "piOAuth": {
+    "backHome": "Về trang chủ",
+    "failed": "Đăng nhập Pi thất bại",
+    "retry": "Thử lại",
+    "signingIn": "Đang đăng nhập bằng tài khoản Pi…",
+    "stateMismatch": "Xác minh bảo mật thất bại. Vui lòng thử lại."
+  },
   "profile": {
     "info": {
       "addr": "Địa chỉ",

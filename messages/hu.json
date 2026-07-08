@@ -2220,6 +2220,13 @@
     "sdkUnavailable": "A Pi SDK nem érhető el.",
     "walletChecking": "Pénztárca ellenőrzése folyamatban…"
   },
+  "piOAuth": {
+    "backHome": "Vissza a főoldalra",
+    "failed": "Sikertelen Pi bejelentkezés.",
+    "retry": "Újrapróbálkozás",
+    "signingIn": "Bejelentkezés Pi fiókkal…",
+    "stateMismatch": "A biztonsági ellenőrzés sikertelen. Kérjük, próbálja újra."
+  },
   "profile": {
     "info": {
       "addr": "Cím",
