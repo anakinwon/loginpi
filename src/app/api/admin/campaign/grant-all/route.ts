@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { sanitizeError } from '@/lib/sanitize-error'
 
 const CAMPAIGN_CD = 'SHOP_ONBOARD'
 
@@ -58,7 +59,16 @@ export async function POST() {
     .select('seller_id')
     .eq('del_yn', 'N')
   if (shopErr)
-    return NextResponse.json({ error: shopErr.message }, { status: 500 })
+    return NextResponse.json(
+      {
+        error: sanitizeError(
+          'api/admin/campaign/grant-all/post',
+          shopErr,
+          '매장 조회 중 오류가 발생했습니다',
+        ),
+      },
+      { status: 500 },
+    )
   const sellerIds = [...new Set((shops ?? []).map((s) => s.seller_id))]
   if (!sellerIds.length)
     return NextResponse.json({
@@ -110,7 +120,9 @@ export async function POST() {
       })
       if (error) {
         failed++
-        errors.push(`${uid}:${error.message}`)
+        errors.push(
+          `${uid}:${sanitizeError('api/admin/campaign/grant-all/post', error, '지급 처리 오류')}`,
+        )
         continue
       }
       const status = (data as { status?: string } | null)?.status
@@ -123,7 +135,9 @@ export async function POST() {
       }
     } catch (e) {
       failed++
-      errors.push(`${uid}:${(e as Error).message}`)
+      errors.push(
+        `${uid}:${sanitizeError('api/admin/campaign/grant-all/post', e, '지급 처리 오류')}`,
+      )
     }
   }
 

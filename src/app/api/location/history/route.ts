@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { sanitizeError } from '@/lib/sanitize-error'
 
 // GET /api/location/history — 내 위치 수집 이력 열람 (위치정보법 제16조 정보주체 열람권)
 export async function GET() {
@@ -23,7 +24,17 @@ export async function GET() {
     .order('reg_dtm', { ascending: false })
     .limit(50)
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error)
+    return NextResponse.json(
+      {
+        error: sanitizeError(
+          'api/location/history/get',
+          error,
+          '위치 이력 조회 중 오류가 발생했습니다',
+        ),
+      },
+      { status: 500 },
+    )
 
   return NextResponse.json({ items: data ?? [] })
 }

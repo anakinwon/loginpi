@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { sanitizeError } from '@/lib/sanitize-error'
 
 export async function GET(req: NextRequest) {
   const user = await getSessionUser()
@@ -46,7 +47,16 @@ export async function GET(req: NextRequest) {
   const { data, error, count } = await query
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json(
+      {
+        error: sanitizeError(
+          'api/admin/token/audit/get',
+          error,
+          '감사 로그 조회 실패',
+        ),
+      },
+      { status: 500 },
+    )
   }
 
   // 대상 사용자 정보 병합 — usr_id 집합으로 sys_user 일괄 조회 후 매핑

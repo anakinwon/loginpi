@@ -4,6 +4,7 @@ import { writeFile } from 'fs/promises'
 import { join, resolve, sep } from 'path'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { routing } from '@/i18n/routing'
+import { sanitizeError } from '@/lib/sanitize-error'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -126,7 +127,11 @@ export async function POST(req: NextRequest) {
         .order('msg_key')
         .range(from, from + PAGE - 1)
       if (error) {
-        pageError = error.message
+        pageError = sanitizeError(
+          'api/admin/i18n/sync/post',
+          error,
+          '메시지 조회 실패',
+        )
         break
       }
       for (const { msg_key, msg_val } of msgs ?? []) {

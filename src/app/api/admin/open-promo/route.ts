@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { sanitizeError } from '@/lib/sanitize-error'
 
 // 오픈기념행사 무료요금 정책 관리 (OneKey 토글) — PRD_26 요금전문 매니저 마스터 전용.
 //   GET: 현재 프로모션 상태 + 최근 변경 이력
@@ -82,7 +83,16 @@ export async function POST(req: NextRequest) {
     })
 
     if (error)
-      return NextResponse.json({ error: error.message }, { status: 400 })
+      return NextResponse.json(
+        {
+          error: sanitizeError(
+            'api/admin/open-promo/post',
+            error,
+            '프로모션 설정 처리 중 오류가 발생했습니다',
+          ),
+        },
+        { status: 400 },
+      )
 
     const row = Array.isArray(data) ? data[0] : data
     return NextResponse.json({
@@ -105,7 +115,16 @@ export async function POST(req: NextRequest) {
     })
 
     if (error)
-      return NextResponse.json({ error: error.message }, { status: 400 })
+      return NextResponse.json(
+        {
+          error: sanitizeError(
+            'api/admin/open-promo/post',
+            error,
+            '프로모션 설정 처리 중 오류가 발생했습니다',
+          ),
+        },
+        { status: 400 },
+      )
 
     const row = Array.isArray(data) ? data[0] : data
     return NextResponse.json({
@@ -150,7 +169,16 @@ export async function POST(req: NextRequest) {
     })
 
     if (error)
-      return NextResponse.json({ error: error.message }, { status: 400 })
+      return NextResponse.json(
+        {
+          error: sanitizeError(
+            'api/admin/open-promo/post',
+            error,
+            '프로모션 설정 처리 중 오류가 발생했습니다',
+          ),
+        },
+        { status: 400 },
+      )
 
     const row = Array.isArray(data) ? data[0] : data
     return NextResponse.json({

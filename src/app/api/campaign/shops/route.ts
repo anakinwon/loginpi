@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { sanitizeError } from '@/lib/sanitize-error'
 
 export interface ShopConditionRow {
   shop_id: string // 대표 매장 ID
@@ -40,7 +41,17 @@ export async function GET(request: Request) {
     .eq('del_yn', 'N')
     .order('reg_dtm', { ascending: true }) // 첫 등록 매장이 앞에 오도록
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error)
+    return NextResponse.json(
+      {
+        error: sanitizeError(
+          'api/campaign/shops/get',
+          error,
+          '조회 중 오류가 발생했습니다',
+        ),
+      },
+      { status: 500 },
+    )
   if (!shops?.length)
     return NextResponse.json({
       shops: [],

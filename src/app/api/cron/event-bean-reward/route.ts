@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { grantBeanReward } from '@/lib/event'
+import { sanitizeError } from '@/lib/sanitize-error'
 
 // GET /api/cron/event-bean-reward  (1시간 주기, Vercel Cron: 0 * * * *)
 // POST /api/cron/event-bean-reward  (관리자 수동 실행)
@@ -138,15 +139,18 @@ export async function GET(request: NextRequest) {
     console.log(`[cron/event-bean-reward] ${JSON.stringify(result)}`)
     return NextResponse.json({ ok: true, eventId: EVENT_ID, ...result })
   } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e)
-    console.error('[cron/event-bean-reward] 실행 실패:', msg)
+    const error = sanitizeError(
+      'api/cron/event-bean-reward/get',
+      e,
+      '보상 지급 처리 중 오류가 발생했습니다',
+    )
     await logBatchRun(
       'CRON',
       start,
       { eligible: 0, granted: 0, already: 0, failed: 1, excludedCount: 0 },
       'SYSTEM',
     )
-    return NextResponse.json({ ok: false, error: msg }, { status: 500 })
+    return NextResponse.json({ ok: false, error }, { status: 500 })
   }
 }
 
@@ -161,7 +165,16 @@ export async function POST(_request: NextRequest) {
     await logBatchRun('MANUAL', start, result, user?.id ?? 'ADMIN')
     return NextResponse.json({ ok: true, eventId: EVENT_ID, ...result })
   } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e)
-    return NextResponse.json({ ok: false, error: msg }, { status: 500 })
+    return NextResponse.json(
+      {
+        ok: false,
+        error: sanitizeError(
+          'api/cron/event-bean-reward/post',
+          e,
+          '보상 지급 처리 중 오류가 발생했습니다',
+        ),
+      },
+      { status: 500 },
+    )
   }
 }

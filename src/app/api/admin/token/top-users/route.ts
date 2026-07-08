@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { sanitizeError } from '@/lib/sanitize-error'
 
 // 정렬 지표 화이트리스트 — RPC p_metric과 일치
 const METRICS = [
@@ -48,7 +49,16 @@ export async function GET(req: NextRequest) {
   })
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json(
+      {
+        error: sanitizeError(
+          'api/admin/token/top-users/get',
+          error,
+          '상위 사용자 조회 실패',
+        ),
+      },
+      { status: 500 },
+    )
   }
 
   const rows = (data ?? []) as TopUserRow[]

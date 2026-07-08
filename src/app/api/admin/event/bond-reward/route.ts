@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { grantBeanReward } from '@/lib/event'
+import { sanitizeError } from '@/lib/sanitize-error'
 
 // 오픈베타#1 보상 금액 (Bean) — subtitle '선착순 100명 5,000 Bean Token'과 일치
 const EVENT_REWARD_BEAN = 5000
@@ -59,7 +60,17 @@ export async function POST(req: Request) {
     .select('user_id')
     .eq('event_id', eventId)
     .eq('del_yn', 'N')
-  if (mErr) return NextResponse.json({ error: mErr.message }, { status: 500 })
+  if (mErr)
+    return NextResponse.json(
+      {
+        error: sanitizeError(
+          'api/admin/event/bond-reward/post',
+          mErr,
+          '미션 집계 조회 실패',
+        ),
+      },
+      { status: 500 },
+    )
 
   const counts = new Map<string, number>()
   for (const r of missionRows ?? []) {

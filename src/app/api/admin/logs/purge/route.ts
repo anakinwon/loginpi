@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { sanitizeError } from '@/lib/sanitize-error'
 
 // 로그성 테이블 기간 기준 물리 정리 — fn_log_table_purge RPC 호출.
 // 안전장치는 DB 함수에 내장(PURGEABLE 화이트리스트 + 최소 보존일 7일).
@@ -43,7 +44,7 @@ export async function POST(req: NextRequest) {
     const denied =
       error.code === '42501' || error.message?.includes('정리 대상이 아닌')
     return NextResponse.json(
-      { error: '로그 정리 실패', detail: error.message },
+      { error: sanitizeError('api/admin/logs/purge/post', error, '로그 정리 실패') },
       { status: denied ? 400 : 500 },
     )
   }

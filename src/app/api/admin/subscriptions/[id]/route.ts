@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { sanitizeError } from '@/lib/sanitize-error'
 
 type Params = { params: Promise<{ id: string }> }
 
@@ -47,7 +48,13 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 
   if (error) {
     return NextResponse.json(
-      { error: '수정 실패: ' + error.message },
+      {
+        error: sanitizeError(
+          'api/admin/subscriptions/[id]/patch',
+          error,
+          '수정 실패',
+        ),
+      },
       { status: 500 },
     )
   }
@@ -76,7 +83,13 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
 
   if (error) {
     return NextResponse.json(
-      { error: '취소 실패: ' + error.message },
+      {
+        error: sanitizeError(
+          'api/admin/subscriptions/[id]/delete',
+          error,
+          '취소 실패',
+        ),
+      },
       { status: 500 },
     )
   }

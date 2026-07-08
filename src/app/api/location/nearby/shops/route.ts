@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { sanitizeError } from '@/lib/sanitize-error'
 
 // GET /api/location/nearby/shops?lat=&lng=&radius= — 주변 MPS 매장 탐색 (Rule LBS-01)
 export async function GET(request: NextRequest) {
@@ -43,7 +44,17 @@ export async function GET(request: NextRequest) {
     .not('latd_crd', 'is', null)
     .not('lngt_crd', 'is', null)
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error)
+    return NextResponse.json(
+      {
+        error: sanitizeError(
+          'api/location/nearby/shops/get',
+          error,
+          '주변 매장 조회 중 오류가 발생했습니다',
+        ),
+      },
+      { status: 500 },
+    )
 
   type ShopRow = {
     shop_id: string

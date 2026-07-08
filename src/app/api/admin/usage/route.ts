@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { sanitizeError } from '@/lib/sanitize-error'
 
 // 인프라 사용량 할당(quota) — Vercel(수동)·Supabase DB(자동) 한도 대비 사용량.
 // GET: fn_usage_quota(자동 리소스는 사용량 실시간 측정) · PUT: fn_usage_quota_set(수동 갱신)
@@ -15,7 +16,7 @@ export async function GET() {
 
   if (error) {
     return NextResponse.json(
-      { error: '사용량 조회 실패', detail: error.message },
+      { error: sanitizeError('api/admin/usage/get', error, '사용량 조회 실패') },
       { status: 500 },
     )
   }
@@ -60,7 +61,7 @@ export async function PUT(req: NextRequest) {
   if (error) {
     const denied = error.code === '22023'
     return NextResponse.json(
-      { error: '사용량 갱신 실패', detail: error.message },
+      { error: sanitizeError('api/admin/usage/put', error, '사용량 갱신 실패') },
       { status: denied ? 400 : 500 },
     )
   }

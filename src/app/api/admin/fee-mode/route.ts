@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { sanitizeError } from '@/lib/sanitize-error'
 
 // 요금제 모드(Bean ↔ Pi) 전환 — MASTER 전용. PRD_24 §6·§10.
 //   GET: 현재 활성 모드 + 전환 이력
@@ -56,7 +57,16 @@ export async function POST(req: NextRequest) {
       p_reason_memo: body.reason || '직전 요금제 복귀',
     })
     if (error)
-      return NextResponse.json({ error: error.message }, { status: 400 })
+      return NextResponse.json(
+        {
+          error: sanitizeError(
+            'api/admin/fee-mode/post',
+            error,
+            '요금제 모드 처리 중 오류가 발생했습니다',
+          ),
+        },
+        { status: 400 },
+      )
     const row = Array.isArray(data) ? data[0] : data
     return NextResponse.json({ ok: row?.ok ?? false, result: row })
   }
@@ -73,7 +83,17 @@ export async function POST(req: NextRequest) {
     p_changed_by: changedBy,
     p_reason_memo: body.reason || '',
   })
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+  if (error)
+    return NextResponse.json(
+      {
+        error: sanitizeError(
+          'api/admin/fee-mode/post',
+          error,
+          '요금제 모드 처리 중 오류가 발생했습니다',
+        ),
+      },
+      { status: 400 },
+    )
   const row = Array.isArray(data) ? data[0] : data
   return NextResponse.json({ ok: row?.ok ?? false, result: row })
 }

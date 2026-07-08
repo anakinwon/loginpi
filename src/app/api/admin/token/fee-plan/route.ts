@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { revalidateTag } from 'next/cache'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { sanitizeError } from '@/lib/sanitize-error'
 
 export async function GET(req: NextRequest) {
   const user = await getSessionUser()
@@ -30,7 +31,16 @@ export async function GET(req: NextRequest) {
   const { data, error } = await query
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json(
+      {
+        error: sanitizeError(
+          'api/admin/token/fee-plan/get',
+          error,
+          '요금제 조회 실패',
+        ),
+      },
+      { status: 500 },
+    )
   }
 
   return NextResponse.json({ data: data ?? [] })
@@ -86,7 +96,16 @@ export async function PATCH(req: NextRequest) {
     .eq('del_yn', 'N')
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json(
+      {
+        error: sanitizeError(
+          'api/admin/token/fee-plan/patch',
+          error,
+          '요금제 수정 실패',
+        ),
+      },
+      { status: 500 },
+    )
   }
 
   // 구독요금제 캐시 즉시 무효화 → 다음 요청부터 DB 최신값 반영

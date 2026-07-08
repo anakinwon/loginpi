@@ -4,6 +4,7 @@ import {
   ensureTelegramWebhook,
   getWebhookStatus,
 } from '@/lib/telegram-webhook'
+import { sanitizeError } from '@/lib/sanitize-error'
 
 // 관리자용 텔레그램 webhook 진단·재등록 (환경별 봇 분리 전제 — telegram-webhook.ts 참조)
 //   GET : 현재 등록 URL vs 기대 URL 대조 + 봇 식별 + 최근 수신 오류
@@ -19,7 +20,13 @@ export async function GET() {
     return NextResponse.json(status)
   } catch (e) {
     return NextResponse.json(
-      { error: e instanceof Error ? e.message : String(e) },
+      {
+        error: sanitizeError(
+          'api/admin/telegram/webhook/get',
+          e,
+          '텔레그램 webhook 상태 조회 실패',
+        ),
+      },
       { status: 502 },
     )
   }

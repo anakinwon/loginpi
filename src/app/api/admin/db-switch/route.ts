@@ -6,6 +6,7 @@ import {
   setStagingDbTarget,
   type DbTarget,
 } from '@/lib/ops-deploy'
+import { sanitizeError } from '@/lib/sanitize-error'
 
 // Staging DB 스위치 — MASTER 전용. ⛔ 스테이징 환경에서만 동작(운영 WAS 불변),
 // 운영DB(prod-ro)는 읽기전용 자격증명 있을 때만(쓰기 사고 차단).
@@ -25,10 +26,24 @@ async function testRead(): Promise<{
       .from('sys_user')
       .select('id', { count: 'exact', head: true })
     return error
-      ? { ok: false, error: error.message }
+      ? {
+          ok: false,
+          error: sanitizeError(
+            'api/admin/db-switch/get:testRead',
+            error,
+            'DB 읽기 진단 실패(상세는 서버 로그 확인)',
+          ),
+        }
       : { ok: true, count: count ?? 0 }
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : 'unknown' }
+    return {
+      ok: false,
+      error: sanitizeError(
+        'api/admin/db-switch/get:testRead',
+        e,
+        'DB 읽기 진단 실패(상세는 서버 로그 확인)',
+      ),
+    }
   }
 }
 

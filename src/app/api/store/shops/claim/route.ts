@@ -4,6 +4,7 @@ import { getSessionUser } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getPlaceDetails, phoneMatches } from '@/lib/google-maps'
 import { findVerifiedShopByPlaceId, createVerifiedShop } from '@/lib/mps-shop'
+import { sanitizeError } from '@/lib/sanitize-error'
 
 // POST /api/store/shops/claim — 구글 카페를 내 PyShop™ 매장으로 반자동 인증 등록
 //
@@ -101,9 +102,14 @@ export async function POST(req: NextRequest) {
   try {
     place = await getPlaceDetails(c.place_id)
   } catch (e) {
-    const msg = e instanceof Error ? e.message : '구글 매장 조회 실패'
     return NextResponse.json(
-      { error: `매장 정보 조회 실패: ${msg}` },
+      {
+        error: sanitizeError(
+          'api/store/shops/claim/post',
+          e,
+          '구글 매장 정보 조회에 실패했습니다',
+        ),
+      },
       { status: 502 },
     )
   }
@@ -235,7 +241,15 @@ export async function POST(req: NextRequest) {
         { status: 409 },
       )
     }
-    const msg = e instanceof Error ? e.message : '매장 등록 실패'
-    return NextResponse.json({ error: msg }, { status: 500 })
+    return NextResponse.json(
+      {
+        error: sanitizeError(
+          'api/store/shops/claim/post',
+          e,
+          '매장 등록 중 오류가 발생했습니다',
+        ),
+      },
+      { status: 500 },
+    )
   }
 }

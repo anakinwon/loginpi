@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { sanitizeError } from '@/lib/sanitize-error'
 
 export async function GET(req: NextRequest) {
   const user = await getSessionUser()
@@ -35,8 +36,16 @@ export async function GET(req: NextRequest) {
 
   const { data, error } = await q
   if (error) {
-    console.error('[token/transactions] 쿼리 실패:', error.message)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json(
+      {
+        error: sanitizeError(
+          'api/admin/token/transactions/get',
+          error,
+          '거래 내역 조회 실패',
+        ),
+      },
+      { status: 500 },
+    )
   }
 
   const rows = data ?? []

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { sanitizeError } from '@/lib/sanitize-error'
 
 async function logBatchRun(
   triggerCd: string,
@@ -61,9 +62,15 @@ export async function GET(request: NextRequest) {
     .select('seller_id')
     .eq('del_yn', 'N')
   if (shopErr) {
-    console.error('[cron/campaign-grant-all] 매장 조회 실패:', shopErr)
     return NextResponse.json(
-      { ok: false, error: shopErr.message },
+      {
+        ok: false,
+        error: sanitizeError(
+          'api/cron/campaign-grant-all/get',
+          shopErr,
+          '매장 조회 중 오류가 발생했습니다',
+        ),
+      },
       { status: 500 },
     )
   }
@@ -110,7 +117,9 @@ export async function GET(request: NextRequest) {
       )
       if (approveErr) {
         failed++
-        errors.push(`${uid}:${approveErr.message}`)
+        errors.push(
+          `${uid}:${sanitizeError('api/cron/campaign-grant-all/get', approveErr, '지급 처리 오류')}`,
+        )
         continue
       }
       const approveStatus = (approveData as { status?: string } | null)?.status
@@ -124,7 +133,9 @@ export async function GET(request: NextRequest) {
       }
     } catch (e) {
       failed++
-      errors.push(`${uid}:${(e as Error).message}`)
+      errors.push(
+        `${uid}:${sanitizeError('api/cron/campaign-grant-all/get', e, '지급 처리 오류')}`,
+      )
     }
   }
 

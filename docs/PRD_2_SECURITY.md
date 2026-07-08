@@ -4,7 +4,7 @@
 
 | 항목 | 내용 |
 |------|------|
-| 작성일 | 2026-06-23 (현행화) |
+| 작성일 | 2026-06-23 (현행화) · 2026-07-08 시험 5.4 재점검 (IE·IL·MC 추가확인 3항목 완결 → 21항목 전체 양호) |
 | 참조 기준 | KISA 「주요정보통신기반시설 기술적 취약점 분석·평가 방법 상세가이드」(2021.03) + 행정안전부 웹 취약점 점검 21개 항목 |
 | 프로젝트 | cafe.pi (Pi Network 카페 운영 플랫폼) |
 | 기술 스택 | Next.js 16.2.7 + React 19 + TypeScript 6 + Tailwind CSS v4 + Supabase + Pi Network |
@@ -545,26 +545,24 @@ if (!allowedMimes.includes(detected?.mime ?? '')) {
 |------|------|
 | **KISA 항목** | IL: 불필요한 정보 노출 방지 |
 | **위험도** | Medium |
-| **판정** | 🔍 **추가확인필요** |
-| **근거** | |
+| **판정** | ✅ **양호 (전수 검사·정제 완료 — 2026-07-08 시험 5.4 재점검)** |
+| **근거** | API 220개 route 전수 검사 → 위반 25개 파일 39개 지점 전량 정제 |
 
-**현황:**
-- **오류 메시지:** Supabase 오류 → 일반화된 메시지로 변환 (상세는 서버 로그만)
+**현황 (2026-07-08 전수 검사·조치):**
+- **전수 검사 결과**: `src/app/api/` 220개 route 중 25개 파일 39개 지점에서 원시 Supabase/Postgres 에러(`error.message` 등)가 응답 본문에 노출되던 것을 확인 — DB 테이블·컬럼·제약조건명 노출 가능 상태였음
+- **✅ 조치 완료**: `src/lib/sanitize-error.ts` `sanitizeError(context, err, publicMsg?)` 공통 헬퍼 신설 — 원문은 서버 로그(console.error)에만 남기고 클라이언트에는 일반화 메시지 반환. 39개 지점 전량 치환 (무인증 공개 API 4곳 최우선: `location/nearby/*`·`location/history`·`campaign/shops`)
 - **응답 헤더:** `X-Content-Type-Options: nosniff` 설정 완료
 - **GraphQL/API 스키마 노출:** REST API만 사용 (GraphQL 미사용) → 스키마 열거 공격 낮음
+- **번역 API**: 응답은 이미 일반화 메시지 반환 중(검토 완료, 위반 아님)
 
-**미흡점:**
-- 에러 응답에서 DB 테이블명·컬럼명 노출 가능성 (검사 필요)
-- 번역 API 응답에서 내부 경로 노출 검토
-
-**조치:**
+**유지 규칙 (신규 코드 필수):**
 ```typescript
-// 오류 메시지 일반화
+// 원시 에러를 응답에 직접 싣지 말 것 — sanitizeError 경유
+import { sanitizeError } from '@/lib/sanitize-error'
 if (error) {
-  console.error('[DB Error]', error.message)  // 서버 로그만
   return NextResponse.json(
-    { error: '데이터 처리 중 오류가 발생했습니다' },  // 클라이언트
-    { status: 500 }
+    { error: sanitizeError('api/<경로>/<메서드>', error, '조회 중 오류가 발생했습니다') },
+    { status: 500 },
   )
 }
 ```
@@ -827,14 +825,14 @@ mod_dtm TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP   -- 변경 일시
 | FU | 파일 업로드 | ✅ 완료 | — |
 | DT | 데이터 암호화 전송 | ✅ 완료 | — |
 
-### 6.3 30일 이내 (Medium)
+### 6.3 30일 이내 (Medium) — ✅ 전 항목 완료 (2026-07-08 시험 5.4)
 
 | ID | 항목 | 현황 | 조치 |
 |----|------|------|------|
-| IE | 세션 만료 | 🔍 추가확인 | 세션 블랙리스트 테이블 검토 |
-| IL | 정보 누출 | 🔍 추가확인 | 오류 메시지 감시 |
+| IE | 세션 만료 | ✅ 완료 | del_yn 세션 차단 레버 복원 (getUserById·getUserByPiUid 필터) — 블랙리스트는 수용 가능 잔여 위험으로 보류 |
+| IL | 정보 누출 | ✅ 완료 | 220개 route 전수 검사 → 25파일 39지점 sanitizeError 정제 |
 | AA | 자동화 공격 | ✅ 완료 | 민감 엔드포인트 rate limit 확인 |
-| MC | 악성 콘텐츠 | 🔍 추가확인 | 바이러스 스캔 API 평가 |
+| MC | 악성 콘텐츠 | ✅ 완료 | Magic Byte 검증 5개 경로 구현 — 클라우드 백신은 평가 후 보류(서버리스 부적합·외부 전송 우려) |
 
 ### 6.4 90일 이내 (Low)
 

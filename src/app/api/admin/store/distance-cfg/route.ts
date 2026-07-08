@@ -3,6 +3,7 @@ import { revalidateTag } from 'next/cache'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getDistCfgHistory } from '@/lib/mps-dist-cfg'
+import { sanitizeError } from '@/lib/sanitize-error'
 
 export async function GET() {
   const user = await getSessionUser()
@@ -49,7 +50,17 @@ export async function POST(req: NextRequest) {
       regr_id: user.id,
     })
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error)
+    return NextResponse.json(
+      {
+        error: sanitizeError(
+          'api/admin/store/distance-cfg/post',
+          error,
+          '거리 설정 저장 실패',
+        ),
+      },
+      { status: 500 },
+    )
 
   revalidateTag('mps-dist-cfg', {})
   return NextResponse.json({ ok: true, max_dist_km: km })

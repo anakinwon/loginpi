@@ -5,6 +5,7 @@ import { join } from 'path'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { LOCALE_CURRENCY } from '@/lib/locale-currency'
 import { LOCALE_COUNTRY } from '@/lib/locale-country'
+import { sanitizeError } from '@/lib/sanitize-error'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -107,7 +108,16 @@ export async function PATCH(req: NextRequest) {
     )
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json(
+      {
+        error: sanitizeError(
+          'api/admin/i18n/locale/patch',
+          error,
+          'locale 저장 실패',
+        ),
+      },
+      { status: 500 },
+    )
   }
 
   // locale_cd가 null이었던 국가를 활성화할 때 i18n_cntry_mst.locale_cd 연결

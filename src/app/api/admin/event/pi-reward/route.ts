@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { triggerPiReward } from '@/lib/pi-reward'
+import { sanitizeError } from '@/lib/sanitize-error'
 
 // GET /api/admin/event/pi-reward?event_id=...
 // Pi 보상 지급 현황 목록 (관리자 전용)
@@ -22,7 +23,17 @@ export async function GET(req: Request) {
     .eq('event_id', eventId)
     .order('reg_dtm', { ascending: false })
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error)
+    return NextResponse.json(
+      {
+        error: sanitizeError(
+          'api/admin/event/pi-reward/get',
+          error,
+          '보상 현황 조회 실패',
+        ),
+      },
+      { status: 500 },
+    )
 
   // FK 부재로 조인 불가 → user_id로 사용자 정보 별도 병합
   const rows = (data ?? []) as { user_id: string }[]
@@ -80,7 +91,17 @@ export async function POST(req: Request) {
   // target === 'all': PENDING + FAILED 전체
 
   const { data: targets, error } = await query
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error)
+    return NextResponse.json(
+      {
+        error: sanitizeError(
+          'api/admin/event/pi-reward/post',
+          error,
+          '재시도 대상 조회 실패',
+        ),
+      },
+      { status: 500 },
+    )
 
   if (!targets?.length)
     return NextResponse.json({ message: '재시도 대상 없음', count: 0 })

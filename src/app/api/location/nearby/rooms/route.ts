@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { sanitizeError } from '@/lib/sanitize-error'
 
 // GET /api/location/nearby/rooms?lat=&lng=&radius=
 // msg_room.latd_crd/lngt_crd 직접 사용 — LBS 동의자 카페 생성 위치 기준 (loc_tp_cd='05')
@@ -52,7 +53,16 @@ export async function GET(request: NextRequest) {
     .limit(200)
 
   if (roomErr)
-    return NextResponse.json({ error: roomErr.message }, { status: 500 })
+    return NextResponse.json(
+      {
+        error: sanitizeError(
+          'api/location/nearby/rooms/get',
+          roomErr,
+          '주변 카페 조회 중 오류가 발생했습니다',
+        ),
+      },
+      { status: 500 },
+    )
   if (!rooms || rooms.length === 0)
     return NextResponse.json({ rooms: [], total: 0 })
 
