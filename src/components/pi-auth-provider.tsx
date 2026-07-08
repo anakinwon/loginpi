@@ -290,11 +290,16 @@ export function PiAuthProvider({ children }: { children: React.ReactNode }) {
     fetch('/api/auth/pi', { credentials: 'include' })
       .then((r) => (r.ok ? r.json() : { user: null }))
       .then((data: { user: PiSessionUser | null }) => {
-        if (cancelled || !data.user) return
-        setUser((prev) => prev ?? data.user) // signIn이 먼저 채웠으면 덮어쓰지 않음
+        if (cancelled) return
+        if (data.user) setUser((prev) => prev ?? data.user) // signIn이 먼저 채웠으면 덮어쓰지 않음
+        // ⚠️ user 유무와 무관하게 해제 — 비로그인+SDK 정상 로드 조합에서 isLoading이
+        //    영원히 true로 남아 OAuth 버튼이 disabled로 굳던 잠복 버그(2026-07-08 실기기).
+        //    (Pi Browser 자동 인증은 signIn()이 시작 시 다시 true로 올리므로 무영향)
         setIsLoading(false)
       })
-      .catch(() => {})
+      .catch(() => {
+        if (!cancelled) setIsLoading(false)
+      })
     return () => {
       cancelled = true
     }

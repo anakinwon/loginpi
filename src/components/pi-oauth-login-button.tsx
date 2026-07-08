@@ -20,7 +20,7 @@ export function PiOAuthLoginButton() {
   const t = useTranslations('header')
   const locale = useLocale()
   const pathname = usePathname()
-  const { user, isLoading, signIn } = usePiAuth()
+  const { user, signIn } = usePiAuth()
   const inPiBrowser = usePiBrowserUI()
   const [busy, setBusy] = useState(false)
   const clientId = env.NEXT_PUBLIC_PI_OAUTH_CLIENT_ID
@@ -49,7 +49,7 @@ export function PiOAuthLoginButton() {
   return (
     <Button
       onClick={handleClick}
-      disabled={isLoading || busy}
+      disabled={busy}
       size="sm"
       variant="outline"
       className="gap-1.5"
