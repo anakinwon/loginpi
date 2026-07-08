@@ -60,7 +60,7 @@ export function PiOAuthLoginButton() {
       >
         π
       </span>
-      {t('piLogin')}
+      {busy ? t('piAuthenticating') : t('piLogin')}
     </Button>
   )
 }
