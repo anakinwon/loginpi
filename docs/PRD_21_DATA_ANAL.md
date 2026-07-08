@@ -1,7 +1,7 @@
 # PRD_21_DATA_ANAL — 데이터 분석 및 시각화 시스템
 
-**마지막 수정:** 2026-06-25  
-**상태:** 기획 (as-is 정본화 + to-be 설계)  
+**마지막 수정:** 2026-07-08  
+**상태:** 구현 완료 — 4탭 통합 페이지(/admin/analytics) 운영 중. 잔여: 지리 지도(선결 대기)·채널별 전환 퍼널·내보내기(§7-0 현행화 참조)  
 **작성자:** Claude Code (data-analytics-visualizer)  
 **북극성 정합:** ✅ 활성 사용자 수 최상단 강조, 매출은 보조 지표
 
@@ -753,6 +753,11 @@ $$;
 
 ## 6. 신규 제안 스키마 및 RPC
 
+> **📌 2026-07-08 현행화 — 실제 구현은 제안과 다르게 확정됨**
+> - 사전집계 테이블 4종 중 실제 생성은 **페이지뷰 수집층 1종뿐**: `sql/122_stat_pageview.sql`(본 절 제안 번호 124에 해당). 수집은 `pageview-tracker.tsx` + `POST /api/track/pageview`(sessionStorage sess_id)로 실가동 중.
+> - **코호트 리텐션·RFM은 사전집계 테이블 없이 API 온더플라이 계산**으로 구현(`/api/admin/analytics/usage`·`orders`) — 현재 데이터 규모에서 배치 불요, 규모 증가 시 본 절 설계로 전환.
+> - 채널별 전환 퍼널(제안 125)은 미구현(채널 기여 집계까지는 performance 탭 구현). 아래 원문은 향후 전환 시 설계 참조용으로 보존.
+
 ### 6-1. 신규 테이블 제안 (sql/122~125)
 
 #### sql/122_stat_cohort_retention.sql (리텐션 분석)
@@ -792,6 +797,20 @@ $$;
 ---
 
 ## 7. 구현 로드맵
+
+### 7-0. 구현 현행화 (2026-07-08 실사 — 아래 원 체크리스트는 설계 이력으로 보존)
+
+| Phase | 실제 상태 | 비고 |
+|---|---|---|
+| 1 기획 | ✅ 완료 | |
+| 2 대시보드 강화 | ✅ 완료 (형태 변경) | 별도 /admin/stats 개선 대신 **4탭 통합 페이지(/admin/analytics)**로 구현 — 북극성 배너·2층위 KPI·고착도·Treemap 포함. 잔여: 내보내기(CSV/PNG)·KPI 델타배지 |
+| 3 주문 분석 | ✅ 완료 (설계 변경) | order-tab — 간격 히스토그램·RFM 버블·AOV·주문방법 분포. sql/122·123 사전집계 대신 온더플라이(§6 현행화) |
+| 4 웹 성능 | ✅ 완료 (기대 초과) | sql/122_stat_pageview + pageview-tracker 수집층 구축 — PV·체류·반송·랜딩/이탈 실데이터 구동 |
+| 5 채널 분석 | ⚠️ 부분 | 채널 기여(막대)까지 구현, **채널별 전환 퍼널 미구현** |
+| 6 지리 분석 | ❌ 미착수 (정당) | 선결(LBS 별도 설계) 대기 — PRD 명시대로 |
+| 7 QA·최적화 | ⚠️ 부분 | 통합 테스트·실기기 검증 잔여 |
+
+**전체 구현률: §12 4탭 설계 기준 약 85% / §3 6도메인 상세 기준 약 68%** (2026-07-08 갭 실사)
 
 ### Phase 1: 기획 및 as-is 정본화 (현재, ~2026-06-25)
 - [x] PRD_21_DATA_ANAL.md 작성 (기존 인프라 정본화)
@@ -1100,15 +1119,15 @@ KPI:  DAU │ WAU │ MAU │ 고착도(DAU/MAU) │ 신규 vs 재방문
 - 재사용: `dau-wau-mau-chart` (이미 구현)
 - 신규: 고착도 게이지·코호트 히트맵·지역 지도(Google Maps/PostGIS, 선결 §6-2)
 
-#### ④ 웹 퍼포먼스 분석 (Web Performance) — ⚠️ 데이터 추적 선결 필요
+#### ④ 웹 퍼포먼스 분석 (Web Performance) — ✅ 수집층 구축 완료·실가동 (2026-07-08 격상)
 ```
 KPI:  페이지뷰 │ 평균 체류시간 │ 반송률(bounce) │ 이탈률(exit) │ 전환율
 메인: 전환 퍼널 (방문→가입→첫주문→재구매, 세션수 기반, 단계별 이탈% 라벨)
 보조: [좌] 채널 기여 Sankey/막대(utm/referrer) [우] 세션 길이 분포
 상세: 랜딩/이탈 페이지 Top-N + 채널별 퍼널 비교 테이블
 ```
-- 데이터: 신규 `stat_session_pageview`(§6, sql/124), `stat_channel_funnel`(§6, sql/125)
-- ⚠️ **선결조건**: `sys_user_actvty_log`에 `session_id`·`page_url`·`entry_dtm`·`exit_dtm` 추적 필드 신설 + 채널 분류(utm_source/metadata.channel). 미충족 시 본 탭은 "데이터 수집 중" 플레이스홀더로 노출하고 Phase 4~6에서 활성화.
+- 데이터: ✅ **`stat_pageview`(sql/122) 별도 테이블 + `pageview-tracker.tsx`(sessionStorage sess_id) + `POST /api/track/pageview`로 구현 완료** — sys_user_actvty_log 확장 대신 독립 수집층 채택. PV·체류·반송·채널기여·랜딩/이탈이 실데이터로 구동 중.
+- 잔여: 채널별 전환 퍼널(§6 제안 125)·순PV·페이지별 이탈률%.
 
 ### 12-4. 구현 매핑 요약 (재사용 vs 신규)
 
@@ -1121,13 +1140,12 @@ KPI:  페이지뷰 │ 평균 체류시간 │ 반송률(bounce) │ 이탈률(e
 
 ### 12-5. 라우트·내비 배치
 
-- 신규: `src/app/[locale]/(admin)/admin/analytics/page.tsx` (탭 컨테이너) + 탭별 클라이언트 컴포넌트 4종 (`analytics/RevenueTab.tsx` 등).
-- 기존 `/admin/stats`는 신규 허브로 흡수(리다이렉트) 또는 "구 통계"로 유지 후 단계적 폐기.
-- `admin-sidebar.tsx` NAV: `/admin/stats` → `/admin/analytics`로 교체(라벨 `analytics`).
+- ✅ 구현: `src/app/[locale]/(admin)/admin/analytics/page.tsx` + `src/components/admin/analytics/` 4탭(`revenue/order/usage/performance-tab.tsx`) + API 5종(`/api/admin/analytics/*`).
+- 기존 `/admin/stats`: **현재 사이드바에 analytics(신규)·stats(구) 병존 노출**(2026-07-08 실사) — 흡수/폐기는 미결정. 구 화면 이용 패턴 확인 후 단계적 폐기 여부 결정 필요.
 - Pi Browser admin 호환: `piFetch` 사용, 클라이언트 게이트(`ClientAdminGate`) 패턴 — `redirect` 금지.
 
 ---
 
-**문서 버전:** 1.1 (2026-06-25 — §12 4-탭 통합 분석 페이지 구상 추가)  
+**문서 버전:** 1.2 (2026-07-08 — 구현 현행화: §7-0 실사 표 신설, §6 온더플라이 설계변경 명문화, §12-3 ④ 퍼포먼스 탭 실가동 격상, §12-5 stats 병존 기록. v1.1: 2026-06-25 §12 4-탭 구상 추가)  
 **승인 대상:** da-governance-expert, dashboard-stats-builder, data-analytics-visualizer  
-**다음 검토:** 2026-07-31 (Phase 2 완료 후)
+**다음 검토:** 잔여 3건(지리 지도·채널 전환 퍼널·내보내기) 착수 시

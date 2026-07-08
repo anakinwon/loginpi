@@ -33,7 +33,11 @@ export async function GET(req: NextRequest) {
 
   const db = getSupabaseAdmin()
   const [signupRes, logRes, orderRes] = await Promise.all([
-    db.from('sys_user').select('id', { count: 'exact', head: true }),
+    // sql/127로 del_yn 도입 — 비활성 계정은 전환율 분모(가입자 수)에서 제외
+    db
+      .from('sys_user')
+      .select('id', { count: 'exact', head: true })
+      .eq('del_yn', 'N'),
     db
       .from('sys_user_actvty_log')
       .select('usr_id, actvty_dt, actvty_tp_cd')

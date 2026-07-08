@@ -37,8 +37,8 @@ export async function GET(req: NextRequest) {
       .select('usr_id, actvty_dt')
       .eq('del_yn', 'N')
       .gte('actvty_dt', fromDt),
-    // sys_user 본 테이블엔 del_yn 컬럼이 없음(레거시 핵심 테이블) → 필터 미적용
-    db.from('sys_user').select('id, reg_dtm'),
+    // sql/127로 del_yn 도입 — 비활성 계정은 가입자·코호트 모수에서 제외(지표 부풀림 방지)
+    db.from('sys_user').select('id, reg_dtm').eq('del_yn', 'N'),
     db
       .from('usr_loc_hist')
       .select('user_str_id, sido_nm, reg_dtm')
