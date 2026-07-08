@@ -67,4 +67,8 @@ export interface RevenueStatsResponse {
   series: RevenueDataPoint[]
   topThemes: TopTheme[]
   topSpenders: TopSpender[]
+  // 직전 동일 길이 기간 합계 — KPI 델타배지용 (구 캐시 응답엔 부재 → optional)
+  prev?: { total_pi: number; total_txn: number }
+  // 오늘 실시간 매출 — pi_pymnt 직접 집계 (stat_revenue_dly는 일배치라 당일 미포함)
+  today?: { total_pi: number; txn_cnt: number }
 }

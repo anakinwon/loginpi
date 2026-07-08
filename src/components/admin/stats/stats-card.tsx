@@ -35,6 +35,25 @@ interface StatsCardProps {
   loading?: boolean
   variant?: StatsCardVariant // KPI 파스텔 배경 (UI 테마 색 따름)
   icon?: React.ReactNode // 카드 우상단 아이콘 슬롯
+  // 직전 기간 대비 변화율(%) — ▲/▼ 델타배지. null/undefined = 비교 기준 없음(미표시)
+  trend?: number | null
+}
+
+// 델타배지 — 상승 초록 ▲ / 하락 빨강 ▼ / 보합 회색 —. 파스텔 KPI 배경 위 가독 색 고정
+function TrendBadge({ pct }: { pct: number }) {
+  const up = pct > 0
+  const flat = pct === 0
+  const cls = flat
+    ? 'text-slate-500'
+    : up
+      ? 'text-emerald-700 dark:text-emerald-500'
+      : 'text-red-700 dark:text-red-500'
+  const arrow = flat ? '—' : up ? '▲' : '▼'
+  return (
+    <span className={cn('ml-2 align-middle text-xs font-semibold', cls)}>
+      {arrow} {Math.abs(pct).toFixed(1)}%
+    </span>
+  )
 }
 
 export function StatsCard({
@@ -47,6 +66,7 @@ export function StatsCard({
   loading,
   variant = 'default',
   icon,
+  trend,
 }: StatsCardProps) {
   const isKpi = variant !== 'default'
   // 파스텔 배경 위에서는 진한 슬레이트 텍스트로 가독성 확보(라이트/다크 공통)
@@ -95,6 +115,7 @@ export function StatsCard({
             </span>
           )
         )}
+        {trend !== null && trend !== undefined && <TrendBadge pct={trend} />}
       </p>
       {sub && <p className={cn('mt-1 text-xs', subText)}>{sub}</p>}
     </div>

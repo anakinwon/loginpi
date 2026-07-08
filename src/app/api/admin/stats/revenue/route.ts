@@ -29,10 +29,19 @@ export async function GET(req: NextRequest) {
     ? raw
     : 30
   const fromDt = calcFromDate(period)
+  // 직전 동일 길이 기간 [prevFromDt, fromDt) — KPI 델타배지 비교 기준
+  const prevFromDt = calcFromDate(period * 2)
+  const todayStart = new Date().toISOString().slice(0, 10)
 
   const db = getSupabaseAdmin()
 
-  const [seriesResult, topThemesResult, topSpendersResult] = await Promise.all([
+  const [
+    seriesResult,
+    topThemesResult,
+    topSpendersResult,
+    prevResult,
+    todayResult,
+  ] = await Promise.all([
     db
       .from('stat_revenue_dly')
       .select('stat_dt,theme_cd,rev_pi,txn_cnt')
@@ -40,6 +49,18 @@ export async function GET(req: NextRequest) {
       .order('stat_dt', { ascending: true }),
     db.rpc('fn_top_revenue_themes', { p_from: fromDt }),
     db.rpc('fn_top_spenders', { p_from: fromDt }),
+    // 직전 기간 합계용 (행 수 = 기간×테마 수준 — 소량)
+    db
+      .from('stat_revenue_dly')
+      .select('rev_pi,txn_cnt')
+      .gte('stat_dt', prevFromDt)
+      .lt('stat_dt', fromDt),
+    // 오늘 실시간 매출 — 일배치(stat_revenue_dly)에 아직 없는 당일분을 결제 원장에서 직접
+    db
+      .from('pi_pymnt')
+      .select('amount')
+      .eq('status', 'completed')
+      .gte('reg_dtm', todayStart),
   ])
 
   const series: RevenueDataPoint[] = (seriesResult.data ?? []).map((row) => ({
@@ -71,12 +92,29 @@ export async function GET(req: NextRequest) {
     txn_cnt: Number(row.txn_cnt),
   }))
 
+  const prevRows = (prevResult.data ?? []) as {
+    rev_pi: number
+    txn_cnt: number
+  }[]
+  const prev = {
+    total_pi: prevRows.reduce((s, r) => s + Number(r.rev_pi), 0),
+    total_txn: prevRows.reduce((s, r) => s + Number(r.txn_cnt), 0),
+  }
+
+  const todayRows = (todayResult.data ?? []) as { amount: number }[]
+  const today = {
+    total_pi: todayRows.reduce((s, r) => s + Number(r.amount), 0),
+    txn_cnt: todayRows.length,
+  }
+
   const body: RevenueStatsResponse = {
     period,
     from_dt: fromDt,
     series,
     topThemes,
     topSpenders,
+    prev,
+    today,
   }
   // 뷰어 의존(topSpenders 마스킹) → 관리자 private / 게스트 마스킹분만 공유 캐시
   return NextResponse.json(body, { headers: viewerScopedCacheHeaders(admin) })

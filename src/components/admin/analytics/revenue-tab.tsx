@@ -130,6 +130,23 @@ export function RevenueTab({ period }: { period: number }) {
   const piModeAov = piModeTxnCnt > 0 ? piModeTotal / piModeTxnCnt : 0
   const piModeTopTheme = rev?.topThemes[0]
 
+  // 직전 동일 기간 대비 델타(%) — 비교 기준(prev>0) 없으면 null(배지 미표시)
+  const deltaPct = (cur: number, prevVal?: number): number | null =>
+    prevVal !== undefined && prevVal > 0
+      ? Math.round(((cur - prevVal) / prevVal) * 1000) / 10
+      : null
+  const totalTrend = deltaPct(piModeTotal, rev?.prev?.total_pi)
+  const txnTrend = deltaPct(piModeTxnCnt, rev?.prev?.total_txn)
+  const prevAov =
+    rev?.prev && rev.prev.total_txn > 0
+      ? rev.prev.total_pi / rev.prev.total_txn
+      : undefined
+  const aovTrend = deltaPct(piModeAov, prevAov)
+  // 오늘 실시간 매출 (pi_pymnt 직접 집계 — 일배치 시계열에 없는 당일분)
+  const todaySub = rev?.today
+    ? `오늘 ${rev.today.total_pi.toFixed(2)} π · ${rev.today.txn_cnt}건`
+    : undefined
+
   // 테마명 — 시스템 분류 코드(구독·기타 등)는 번역키, 카페 테마명(DB)은 theme_nm 그대로
   const themeName = (cd: string, nm?: string | null) =>
     cd in THEME_LABEL
@@ -184,6 +201,8 @@ export function RevenueTab({ period }: { period: number }) {
             label="Pi 총 매출"
             value={Number(piModeTotal.toFixed(2))}
             unit="π"
+            sub={todaySub}
+            trend={totalTrend}
             loading={rev === null}
             variant="kpi-3"
             icon={<span aria-hidden>💰</span>}
@@ -192,6 +211,7 @@ export function RevenueTab({ period }: { period: number }) {
             label="Pi 결제 건수"
             value={piModeTxnCnt}
             unit={t('common.uCase')}
+            trend={txnTrend}
             loading={rev === null}
             variant="kpi-1"
             icon={<span aria-hidden>🧾</span>}
@@ -200,6 +220,7 @@ export function RevenueTab({ period }: { period: number }) {
             label="평균 결제 (AOV)"
             value={Number(piModeAov.toFixed(3))}
             unit="π"
+            trend={aovTrend}
             loading={rev === null}
             variant="kpi-5"
             icon={<span aria-hidden>📊</span>}
