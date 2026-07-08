@@ -6,7 +6,7 @@
 
 | 문서 | 역할 |
 |---|---|
-| `PRD.md` | 마스터 PRD — 전체 기술 상세 + 하위 PRD 인덱스 |
+| `PRD.md` | 마스터 PRD **라이트버전** — 개요·핵심가치·기능현황 요약 (구현 상세 원문: `archive/PRD_FULL_v12.8_2026-07-08.md`) |
 | `ROADMAP.md` | 개발 마일스톤 정본 (Phase 단위) |
 | `TROUBLESHOOT.md` | 운영 리스크 레지스터 + 사고·근본수정 기록 정본 |
 | `MAINNET_READINESS_CHECKLIST.md` | 메인넷 전환 준비 체크리스트 |
@@ -52,7 +52,7 @@
 - `GAOPEN/` — 그랜드오픈 행사
 - `frameworks/` — 프레임워크 자료
 - `troubleshoot/` — 성능 진단 등 시점성 리포트 모음
-- `archive/` — 완료된 일회성 점검 결과 보관
+- `archive/` — 완료된 일회성 점검 결과 + `PRD_FULL_v12.8_2026-07-08.md`(구 PRD.md 전문 — Phase 0~22 구현 상세·디렉토리 구조·전체 변경이력) 보관
 - `dist/` — 백서 PDF 산출물 / `.pptx-build/` — PPTX 빌드 도구
 
 ## 🖥️ 발표·매뉴얼 (pptx)
