@@ -2,7 +2,9 @@
 
 import { useState } from 'react'
 import { usePathname } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 import { useTranslations, useLocale } from 'next-intl'
+import { Link } from '@/i18n/navigation'
 import { Button } from '@/components/ui/button'
 import { usePiAuth } from './pi-auth-provider'
 import { usePiBrowserUI } from '@/hooks/use-pi-browser-ui'
@@ -16,17 +18,43 @@ import { env } from '@/env'
 //    실패한 경우에만 OAuth로 진행한다 — Pi Browser에서 눌러도 SDK 로그인으로 자기교정.
 //    (Pi의 OAuth 인가 페이지는 Pi Browser 내 접속을 미지원 — 안내만 뜨고 막힘)
 // NEXT_PUBLIC_PI_OAUTH_CLIENT_ID 미설정 환경(redirect URI 미등록)에서는 미노출.
+//
+// 세션 표시 소유권(2026-07-08): 일반 브라우저의 Pi Sign-In 세션은 NextAuth가 아니므로
+// Google 버튼이 모른다 → 여기서 계정명(프로필 링크)을 표시한다.
+// 단 Google 세션이 함께 있으면(통합계정 Google 로그인) Google UI가 표시를 담당하므로 양보.
 export function PiOAuthLoginButton() {
   const t = useTranslations('header')
   const locale = useLocale()
   const pathname = usePathname()
-  const { user, signIn } = usePiAuth()
+  const { user, signIn, error } = usePiAuth()
+  const { status: googleStatus } = useSession()
   const inPiBrowser = usePiBrowserUI()
   const [busy, setBusy] = useState(false)
   const clientId = env.NEXT_PUBLIC_PI_OAUTH_CLIENT_ID
 
-  // Pi Browser(SDK 경로 존재)·세션 보유·클라이언트 ID 부재 시 미노출
-  if (inPiBrowser || user || !clientId) return null
+  // Pi Browser는 SDK 경로(PiLoginButton)가 전담
+  if (inPiBrowser) return null
+
+  // 세션 보유 — Pi Sign-In 세션의 계정명 표시 (Google 세션 존재 시 Google UI에 양보)
+  if (user) {
+    if (googleStatus !== 'unauthenticated') return null
+    const displayLabel =
+      user.nick_nm ?? (user.username ? `@${user.username}` : user.displayName)
+    return (
+      <div className="flex items-center gap-2">
+        {/* 별명 클릭 → /profile(로그아웃 기능 포함) — PiLoginButton 로그인 UI와 동일 규칙 */}
+        <Link
+          href="/profile"
+          className="inline-block max-w-[45vw] truncate align-middle text-sm font-medium whitespace-nowrap text-[navy] hover:underline dark:text-blue-300"
+        >
+          {displayLabel}
+        </Link>
+        {error && <span className="text-destructive text-xs">{error}</span>}
+      </div>
+    )
+  }
+
+  if (!clientId) return null
 
   async function handleClick() {
     if (!clientId) return

@@ -5,12 +5,14 @@ import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { Button } from '@/components/ui/button'
 import { usePiBrowserUI } from '@/hooks/use-pi-browser-ui'
+import { usePiAuth } from '@/components/pi-auth-provider'
 
 export function GoogleLoginButton() {
   const t = useTranslations('header')
   const { data: session, status } = useSession()
   // Pi Browser 판정에 UA 폴백 포함 — 인증 완료 전에도 Pi Browser면 Google UI 숨김
   const inPiBrowser = usePiBrowserUI()
+  const { user: piUser } = usePiAuth()
 
   // 일반 브라우저(PC·모바일)는 Google 세션으로만 관리한다 → Pi Browser가 아니면
   // 계정 종류(통합/Google 전용)와 무관하게 항상 Google UI를 표시한다.
@@ -21,6 +23,12 @@ export function GoogleLoginButton() {
   //   Google UI 노출 여부는 오직 isInPiBrowser(Pi Browser 여부)로만 판정한다.
   if (inPiBrowser) return null
   if (status === 'loading') return null
+
+  // Pi Sign-In(OAuth) 세션만 있는 경우(NextAuth 세션 없음) — 계정명 표시는
+  // PiOAuthLoginButton이 담당하므로 Google 로그인 버튼을 숨긴다 (2026-07-08).
+  // ⚠️ 통합계정이 Google로 로그인한 케이스는 session.user가 존재해 이 분기를 타지 않음
+  //    (아래 기존 주의사항의 'piUser 게이팅 금지'는 그 케이스에 한정된 경고).
+  if (!session?.user && piUser) return null
 
   if (session?.user) {
     return (
