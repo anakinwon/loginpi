@@ -2,7 +2,11 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
-import { consumePiOAuthState, startPiOAuth } from '@/lib/pi-oauth'
+import {
+  peekPiOAuthState,
+  clearPiOAuthState,
+  startPiOAuth,
+} from '@/lib/pi-oauth'
 import { env } from '@/env'
 
 // Pi Sign-In(OAuth implicit) 콜백 — accounts.pinet.com 인가 후 도착 지점.
@@ -10,16 +14,21 @@ import { env } from '@/env'
 // 검증·세션 발급은 기존 /api/auth/pi POST(/v2/me 검증 → HMAC 세션)를 그대로 재사용.
 // 일반 브라우저는 쿠키 세션이 동작하지만, 기존 인프라와의 일관성을 위해
 // 응답 token을 localStorage(pi_token)에도 저장한다(piFetch X-Pi-Token 경로 공용).
+//
+// ⚠️ 재마운트 내성 (2026-07-08 실기기): locale 자동 전환 등으로 이 페이지가 다시 마운트될 수
+//    있다 → ① 1회 실행 가드는 컴포넌트 ref가 아닌 모듈 변수, ② state는 peek(비소거)로
+//    검증하고 세션 발급 성공 후에만 clear.
+let oauthHandled = false
+
 export default function PiOAuthCallbackPage() {
   const t = useTranslations('piOAuth')
   const locale = useLocale()
   const [error, setError] = useState<string | null>(null)
   const nextRef = useRef('/')
-  const ranRef = useRef(false)
 
   useEffect(() => {
-    if (ranRef.current) return
-    ranRef.current = true
+    if (oauthHandled) return
+    oauthHandled = true
 
     async function run() {
       // 1. 프래그먼트 파싱 (# 이후를 쿼리 형식으로)
@@ -28,12 +37,13 @@ export default function PiOAuthCallbackPage() {
       const accessToken = frag.get('access_token')
       const state = frag.get('state')
 
-      // 2. CSRF state 검증 — 시작 시 저장한 값과 정확히 일치해야 함 (1회성·10분 만료)
-      const pending = consumePiOAuthState()
+      // 2. CSRF state 검증 — 시작 시 저장한 값과 정확히 일치해야 함 (10분 만료)
+      const pending = peekPiOAuthState()
       if (pending?.next) nextRef.current = pending.next
 
       if (oauthError) {
         console.warn('[pi-oauth] 인가 서버 오류:', oauthError)
+        oauthHandled = false // 재시도 허용
         setError(t('failed'))
         return
       }
@@ -43,7 +53,9 @@ export default function PiOAuthCallbackPage() {
           hasToken: !!accessToken,
           hasPending: !!pending,
           stateEchoed: !!state,
+          stateMatches: !!pending && state === pending.state,
         })
+        oauthHandled = false
         setError(t('stateMismatch'))
         return
       }
@@ -65,9 +77,11 @@ export default function PiOAuthCallbackPage() {
             // 쿠키 세션만으로도 동작 (일반 브라우저)
           }
         }
-        // 4. 원래 경로로 복귀 — 전체 리로드로 프로바이더 세션 재초기화
+        // 4. 성공 — 이제야 state 소거 후 원래 경로로 복귀 (전체 리로드로 세션 재초기화)
+        clearPiOAuthState()
         window.location.replace(nextRef.current)
       } catch {
+        oauthHandled = false
         setError(t('failed'))
       }
     }

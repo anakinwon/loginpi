@@ -39,16 +39,25 @@ export function startPiOAuth(clientId: string, nextPath: string): void {
   window.location.href = `${PI_OAUTH_AUTHORIZE_URL}?${params.toString()}`
 }
 
-// 저장된 state·복귀 경로 회수(1회성 소거 + 만료 검증). 없거나 만료면 null.
-export function consumePiOAuthState(): PendingOAuth | null {
+// 저장된 state 조회(소거 없음·만료 검증). 없거나 만료면 null.
+// ⚠️ 읽기 시점에 소거하면 콜백 페이지 재마운트(locale 자동 전환 등) 시 두 번째 실행이
+//    state를 못 찾아 "보안 검증 실패" 오탐(2026-07-08 실기기) → 성공 시에만 clear.
+export function peekPiOAuthState(): PendingOAuth | null {
   try {
     const raw = localStorage.getItem(PI_OAUTH_STORE_KEY)
-    localStorage.removeItem(PI_OAUTH_STORE_KEY)
     if (!raw) return null
     const pending = JSON.parse(raw) as PendingOAuth
     if (!pending.state || Date.now() - pending.ts > PI_OAUTH_TTL_MS) return null
     return pending
   } catch {
     return null
+  }
+}
+
+export function clearPiOAuthState(): void {
+  try {
+    localStorage.removeItem(PI_OAUTH_STORE_KEY)
+  } catch {
+    // 무시 — TTL이 재사용 창을 제한
   }
 }

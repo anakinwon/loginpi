@@ -160,6 +160,9 @@ export function LanguageSwitcher({
   // 자동 전환이 인증 흐름과 충돌할 수 있다(수동 전환은 switchLocale이 안전 처리).
   useEffect(() => {
     if (pathname.startsWith('/admin')) return
+    // Pi Sign-In 콜백은 1회용 state 검증 중 — 자동 전환 네비게이션이 재마운트를 일으켜
+    // state 소거 경합을 만들므로 제외 (2026-07-08)
+    if (pathname.includes('/auth/pi/callback')) return
     let pref: string | null = null
     try {
       pref = localStorage.getItem(PREF_LOCALE_KEY)
