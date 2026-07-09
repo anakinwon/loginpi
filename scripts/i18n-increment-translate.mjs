@@ -57,6 +57,8 @@ async function gemini(prompt, attempt = 0) {
     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI}`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.2 } }),
+      // Node fetch는 기본 무한 대기 — 소켓 유실 시 파이프라인 전체가 hang(2026-07-09 실측). 3분 컷.
+      signal: AbortSignal.timeout(180_000),
     })
     if (!res.ok) throw new Error(`Gemini ${res.status}`)
     const j = await res.json()
@@ -64,8 +66,11 @@ async function gemini(prompt, attempt = 0) {
     const m = text.match(/\{[\s\S]*\}/)
     return m ? JSON.parse(m[0]) : {}
   } catch (e) {
-    if (attempt >= 3) throw e
-    await sleep(10_000 * (attempt + 1))
+    // 429(분당 토큰 쿼터)는 대형 프롬프트 특성상 짧은 백오프로 안 풀림 — 60초 단위 장기 대기
+    const is429 = /429/.test(e.message ?? '')
+    const max = is429 ? 5 : 3
+    if (attempt >= max) throw e
+    await sleep((is429 ? 60_000 : 10_000) * (attempt + 1))
     return gemini(prompt, attempt + 1)
   }
 }
@@ -97,12 +102,14 @@ const enMap = await fetchMap('en')
   }
 }
 
-// ── 그룹별 누락 감지·번역·upsert (병렬 6, 실패 시 exit 2 → 재실행 재개) ──
+// ── 그룹별 누락 감지·번역·upsert (병렬 I18N_WORKERS·기본 6, 실패 그룹은 건너뛰고 계속 → 재실행 재개) ──
+// 429 빈발 시 I18N_WORKERS=1 권장 — 그룹당 프롬프트가 커서 동시 진입이 분당 토큰 쿼터를 초과한다.
+const WORKERS = Math.max(1, Number(process.env.I18N_WORKERS) || 6)
 const queue = [...groups.entries()]
 let done = 0
-let fatal = null
+let failed = 0
 async function worker() {
-  while (queue.length && !fatal) {
+  while (queue.length) {
     const [lang, lcs] = queue.shift()
     try {
       const repMap = lang === 'English' ? enMap : await fetchMap(lcs[0])
@@ -137,14 +144,12 @@ async function worker() {
       if (rows.length) process.stdout.write(`[${done}/${groups.size}] ${lang} +${rows.length}행\n`)
     } catch (e) {
       console.error(`[${lang}] 실패(재실행 시 이어짐): ${e.message}`)
-      fatal = e
+      failed++
     }
   }
 }
-await Promise.all(Array.from({ length: 6 }, worker))
-if (fatal) process.exit(2)
-
-// ── 전 json 재생성 (DB 정본) ──
+await Promise.all(Array.from({ length: WORKERS }, worker))
+// ── 전 json 재생성 (DB 정본) — 실패 그룹이 있어도 성공분은 반영해 배포 가능하게 한다 ──
 function arrayify(n){if(n===null||typeof n!=='object'||Array.isArray(n))return n;for(const k of Object.keys(n))n[k]=arrayify(n[k]);const ks=Object.keys(n);if(ks.length>0&&ks.every((k,i)=>k===String(i)))return ks.map(k=>n[k]);return n}
 function unflatten(f){const r={};for(const[key,val]of Object.entries(f)){const p=key.split('.');let c=r;for(let i=0;i<p.length-1;i++){if(typeof c[p[i]]!=='object'||c[p[i]]===null)c[p[i]]={};c=c[p[i]]}c[p[p.length-1]]=val}return arrayify(r)}
 for (const lc of locales) {
@@ -152,3 +157,8 @@ for (const lc of locales) {
   writeFileSync(`messages/${lc}.json`, JSON.stringify(unflatten(flat), null, 2), 'utf8')
 }
 console.log(`json 재생성 ${locales.length}개 — 완료. 운영 DB 델타 반영 잊지 말 것.`)
+
+if (failed) {
+  console.error(`실패 ${failed}그룹 — 재실행하면 실패분만 재시도됩니다`)
+  process.exit(2)
+}
