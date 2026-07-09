@@ -42,6 +42,7 @@
 | `PRD_23_FUNC_TUNING.md` | 메인넷 기능 절제/부각 |
 | `PRD_24_FEES_STRATAGE.md` | 이중 요금제(Bean/Pi) 모드 스위치 |
 | `PRD_26_OPEN_PROMO_FEE.md` | 오픈기념 무료 프로모(OneKey) |
+| `PRD_27_PI_FACTORY.md` | Pi 앱 팩토리 — .pi 도메인 멀티테넌트 인큐베이팅 |
 
 ## 📂 하위 디렉토리
 
