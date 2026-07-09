@@ -5,7 +5,7 @@
 **Effective Date**: 2026-07-16 (service notice posted 2026-07-09 — satisfies the 7-day advance notice under Article 19)  
 **Revised**: 2026-07-09 · **Originally Effective**: 2026-06-12  
 
-> **Key v1.1 Revisions**: ① New Bean point (rechargeable in-app points) refund provisions (Article 16-2) ② Automatic A2U refund for direct Pi payments specified (Article 16-3) ③ Marketplace cancellation fees specified (Article 18) ④ Corrections of clerical errors (return shipping currency unit, etc.)
+> **Key v1.1 Revisions**: ① New Bean point (rechargeable in-app points) refund provisions (Article 16-2) ② Automatic A2U refund for direct Pi payments specified (Article 16-3) ③ Marketplace cancellation fees specified (Article 18) ④ Corrections of clerical errors (return shipping currency unit, etc.) ⑤ New refund standards for per-use micro services — automatic translation, AI calls, boosting, badges (Article 16-4)
 **Created**: 2026-06-12  
 
 ---
@@ -48,6 +48,8 @@ Members may request withdrawal in the following cases:
 | **Marketplace Products (Physical)** | Within 7 days of product receipt | Return shipping cost borne by customer |
 | **Tips (Gifts)** | Not possible immediately upon transaction | Excluded from withdrawal scope as one-time transaction |
 | **Cafe Entry Ticket·Special Features** | Within 7 days before use | Not possible after use |
+| **Per-use micro services (automatic translation, AI calls)** *(v1.1)* | Consumed immediately upon provision — no withdrawal | Refund only for errors/duplicate charges (Article 16-4) |
+| **Boosting·Badges (period/status type)** *(v1.1)* | Within 7 days before application starts | Not possible after application (Article 16-4) |
 
 #### 4-2. Cases Where Withdrawal Is Not Possible (E-Commerce Act Article 17 Proviso)
 
@@ -317,6 +319,28 @@ Direct Pi payments to the Company such as cafe creation and subscriptions, and m
 2. **Other direct Pi payments**: Where withdrawal requirements (Article 4) are met, Pi is transferred from the Company wallet to the Member's Pi wallet via A2U (within 3-5 days).
 3. A2U refunds are sent only to the **same Pi wallet** used for payment and may be delayed depending on blockchain network conditions.
 
+### Article 16-4: Per-Use Micro Service Refunds (Automatic Translation, AI Calls, Boosting, Badges) *(New in v1.1)*
+
+#### 16-4-1. Instantly Consumed Services — Automatic Translation (PyTranslate™) and AI Calls
+
+| Item | Rule |
+|---|---|
+| **Nature** | Digital services provided and consumed immediately upon request (E-Commerce Act Article 17(2) — service provision already commenced) |
+| **Refundability** | No withdrawal after the result has been provided |
+| **Exceptions (full refund or credit)** | ① System error resulting in no result or a clearly erroneous result ② Duplicate charge for the same request — request within 7 days of occurrence |
+| **Refund Method** | Same as the payment method (Bean deductions restored as Bean; Pi charges refunded via A2U) |
+
+- **Flat-rate translation subscriptions** are governed by the subscription refund rules of Article 8.
+- Free usage (promotional free periods, daily free quotas, subscription-included usage) involves no charge and is not subject to refund.
+
+#### 16-4-2. Period/Status-Type Services — Cafe Boosting and Badge Upgrades
+
+| Item | Rule |
+|---|---|
+| **Boosting (period exposure)** | Withdrawal possible within 7 days **before** exposure starts · not possible after application starts (regardless of remaining period) |
+| **Badge upgrade (status grant)** | Withdrawal possible within 7 days **before** the upgrade is applied · not possible after application |
+| **Exception** | If not applied due to system error: full refund or re-application, at the Member's choice |
+
 ---
 
 ## Part 8: Non-Refundable Items
@@ -366,7 +390,7 @@ Direct Pi payments to the Company such as cafe creation and subscriptions, and m
 
 **Supplementary Provisions**
 - v1.0: Enacted and effective June 12, 2026. Prior transactions governed by prior policy (if unchanged).
-- v1.1: Revised July 9, 2026 (draft) — new Bean point recharge refund (Article 16-2) and automatic A2U refund (Article 16-3), marketplace cancellation fees specified (Article 18), clerical corrections. **Effective following at least 7 days' notice per Article 19.**
+- v1.1: Revised July 9, 2026 — new Bean point recharge refund (Article 16-2), automatic A2U refund (Article 16-3), per-use micro service refund standards (Article 16-4: translation, AI, boosting, badges), marketplace cancellation fees specified (Article 18), clerical corrections. **Notice posted 2026-07-09; effective 2026-07-16.**
 
 **Revision History**
 
@@ -386,6 +410,8 @@ Direct Pi payments to the Company such as cafe creation and subscriptions, and m
 | Tips | Not possible | Duplicate payments only |
 | Voice Chat (unused) | Within 7 days | Full |
 | Bean Points recharged (unused) | Within 7 days | Balance converted to Pi via A2U (free grants excluded) |
+| Translation·AI calls (per-use) | Not after provision | Errors/duplicate charges only (within 7 days) |
+| Boosting·Badges (before application) | Within 7 days | Full (not possible after application) |
 | Pi Virtual Asset Price Change | - | Not possible (asset special nature) |
 
 ---
