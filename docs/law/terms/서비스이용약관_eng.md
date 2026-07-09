@@ -1,9 +1,11 @@
 # Service Terms of Use
 # サービス利用規約
 
-**Version**: v1.0  
-**Effective Date**: 2026-06-12  
-**Created**: 2026-06-12  
+**Version**: v1.1 (Notice posted — v1.0 remains in effect until the effective date)  
+**Effective Date**: 2026-07-16 (service notice posted 2026-07-09 — satisfies the 7-day notice under Article 3)  
+**Revised**: 2026-07-09 · **Originally Created**: 2026-06-12  
+
+> **Key v1.1 Revisions**: ① New review and reward provisions (Article 14-2 — verified-transaction authorship, opt-in shop rewards, one per transaction, recovery upon fraud) ② New seller deposit provisions (Article 14-3 — deposit, purpose, set-off, return)
 
 ---
 
@@ -135,6 +137,24 @@ These Terms of Use govern the conditions and procedures for using the Cafe.pi se
 1. The Marketplace is a venue for Member-to-member trading of goods and services. The Company serves as an intermediary only and does not warrant the legality or quality of transactions.
 2. If actual goods differ from descriptions, transaction parties must resolve the issue through negotiation, and the Company will not intervene.
 3. Upon discovery of illegal goods trading (counterfeits, drugs, weapons, etc.), the Company may delete the related Content and suspend the Member's account.
+
+### Article 14-2: Reviews and Rewards *(New in v1.1)*
+1. **Authorship**: Reviews may be written only by the buyer of a **transaction actually completed** within the Service. Reviews without a verified transaction may be restricted.
+2. **Reward conditions**: Review rewards are paid only where ① the transaction belongs to a shop whose owner has **opted in** to the review/reward program, ② the review meets the standards set by the Company (evaluation items, scores, good-faith requirements), and ③ **once per transaction**.
+3. **Payment method**: Rewards are paid in in-app points (Bean) or Pi according to Company policy; Pi rewards require the shop owner's **prior deposit (Article 14-3)**. The type, amount, and funding of rewards may change or the program may be discontinued, with prior notice.
+4. **Recovery of rewards**: Where rewards are obtained by improper means as below, the Company may recover the paid rewards (point deduction, claim for Pi restitution), hide or delete the review, and sanction the account:
+   - False or exaggerated reviews, or reviews without actual use
+   - Self-dealing reviews by the Member, family, employees, or other related parties
+   - Repetitive transactions or collusive ("mutual-aid") reviews aimed at obtaining rewards
+   - Any other review-related conduct prohibited by the Community Operating Policy
+5. **Delegation**: Detailed standards for writing, display, hiding, and violation determination are governed by the **Community Operating Policy** (Article 10-2).
+
+### Article 14-3: Seller Deposit *(New in v1.1)*
+1. **Deposit requirement**: Sellers may use selling features and the review reward program only after depositing the amount set by the Company. Deposit rates and covered features are disclosed in the Service.
+2. **Purpose**: The deposit secures transaction safety and serves as security for review reward funding.
+3. **Set-off**: Where a seller's violation of the Terms or policies, or non-performance of a transaction, causes damage to the Company or other Members, the Company may set off the amount against the deposit and will notify the seller of the details.
+4. **Return**: A seller who ends selling activity with no pending transactions, disputes, or unsettled amounts may request return of the deposit; after verification, the Company returns it by the same method as deposited.
+5. This Article applies equally to deposits accumulated through event rewards or similar programs.
 
 ---
 

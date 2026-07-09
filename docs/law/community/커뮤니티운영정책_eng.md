@@ -1,8 +1,10 @@
 # Community Operating Policy
 
-**Version**: v1.0
-**Effective date**: 2026-06-12
-**Drafted**: 2026-06-12
+**Version**: v1.1 (Notice posted — v1.0 remains in effect until the effective date)
+**Effective date**: 2026-07-16 (service notice posted 2026-07-09)
+**Revised**: 2026-07-09 · **Originally drafted**: 2026-06-12
+
+> **Key v1.1 Revision**: New review operating rules (Article 10-2 — writing principles; prohibited conduct: false/self-dealing/reward abuse/purchase·coercion/defamation; hiding, reward recovery, and sanctions)
 
 ---
 
@@ -152,6 +154,25 @@ This policy applies to all of the following platform spaces:
 ### Article 10 (Marketplace Dispute Resolution)
 - **10-1. Seller–buyer disputes**: use the in-service "Dispute" feature → the Company reviews both parties' evidence (messages, photos, delivery proof) → decides refund or rejection → if unsatisfied, a party may apply to the Korea Consumer Agency for mediation.
 - **10-2. Company's mediating role**: the Company is an intermediary and is not responsible for product quality; where parties fail to agree, it may only mediate based on evidence.
+
+### Article 10-2 (Review Operating Rules) *(New in v1.1)*
+
+**10-2-1. Writing principles**
+1. Reviews must describe only the writer's direct experience of a **transaction they actually completed**.
+2. Reviews must be written in good faith based on facts and meet the minimum length requirement (10+ characters).
+3. Scores must reflect actual satisfaction.
+
+**10-2-2. Prohibited conduct (review abuse — treated as a severe violation)**
+1. **False/exaggerated reviews**: reviews without actual use or contrary to fact
+2. **Self-dealing reviews**: reviews of transactions between the Member and family, employees, or other related parties (including affiliated/related shops)
+3. **Reward abuse**: perfunctory repetitive transactions or collusive ("mutual-aid") reviews aimed at obtaining rewards
+4. **Review purchase/coercion**: buying reviews in exchange for consideration; shop owners coercing favorable reviews or pressuring deletion of unfavorable ones
+5. **Defamation/irrelevant content**: reviews aimed at defaming competing shops; reviews containing unrelated ads, promotion, or abusive language
+
+**10-2-3. Measures**
+1. Violating reviews may be **hidden or deleted** without prior notice.
+2. Improperly obtained rewards are **recovered** (Terms of Use Article 14-2(4)); the sanctions framework in Chapter 5 applies by severity (reward abuse and collusion are treated as **severe violations**).
+3. Shop owners' review coercion or retaliation is equally subject to sanctions.
 
 ---
 
