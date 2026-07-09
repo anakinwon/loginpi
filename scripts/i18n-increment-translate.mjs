@@ -57,8 +57,9 @@ async function gemini(prompt, attempt = 0) {
     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI}`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.2 } }),
-      // Node fetch는 기본 무한 대기 — 소켓 유실 시 파이프라인 전체가 hang(2026-07-09 실측). 3분 컷.
-      signal: AbortSignal.timeout(180_000),
+      // Node fetch는 기본 무한 대기 — 소켓 유실 시 파이프라인 전체가 hang(2026-07-09 실측).
+      // 대형 프롬프트(1,000키+)의 JSON 출력 생성은 언어당 3분을 넘기기도 함 → 7분 컷.
+      signal: AbortSignal.timeout(420_000),
     })
     if (!res.ok) throw new Error(`Gemini ${res.status}`)
     const j = await res.json()
@@ -119,7 +120,13 @@ async function worker() {
       if (lang === 'English') {
         vals = enMap
       } else {
-        const out = await gemini(mkPrompt(lang, Object.fromEntries(todo.map(k => [k, ko[k]]))))
+        // 배치 분할(250키) — 단일 초대형 요청은 타임아웃·소켓 끊김·출력 truncate에 취약(2026-07-09 실측 3종).
+        // 배치 단위로 실패해도 재시도가 그 배치만 다시 하므로 낭비가 적다.
+        const out = {}
+        for (let i = 0; i < todo.length; i += 250) {
+          const slice = todo.slice(i, i + 250)
+          Object.assign(out, await gemini(mkPrompt(lang, Object.fromEntries(slice.map(k => [k, ko[k]])))))
+        }
         vals = {}
         for (const k of todo) {
           const v = out[k]
