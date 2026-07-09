@@ -1,8 +1,8 @@
 # Privacy Policy
 # プライバシーポリシー
 
-**Version**: v1.1 (Revision Draft — effective upon completion of notification procedure)  
-**Planned Effective Date**: 2026-07-15 (notified at least 7 days in advance per Article 11)  
+**Version**: v1.1 (Notice posted — v1.0 remains in effect until the effective date)  
+**Effective Date**: 2026-07-16 (service notice posted 2026-07-09 — satisfies the 7-day advance notice under Article 11)  
 **Revised**: 2026-07-08 · **Originally Created**: 2026-06-12  
 
 > **Key v1.1 Revisions**: ① New Telegram third-party disclosure and international transfer provisions ② Explicit Google (Gemini) translation entrustment ③ New collection items: KakaoTalk ID (event prizes) and Telegram linking information ④ Pi official account authentication (Pi Sign-In) path added ⑤ Additional profile information (real name, phone number, address, etc. — all optional) specified with items, purposes, and optionality
