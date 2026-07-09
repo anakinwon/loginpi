@@ -5,6 +5,15 @@
 > 권장 전략: 파일별 t() 전환이 아니라 **공유 에러코드 카탈로그(ko/en) 신설 → API `{ error, code }` 반환 → 클라이언트 `t(code)` 해석**.
 > 추가 보류 2건: `payError.includes('충전')` 조건분기(group-room-creator.tsx:602)·`chat-auth.ts` plan_nm — 에러코드화 단계에서 함께 처리.
 
+> ## ✅ P1-C 완결 (2026-07-09 오후, 커밋 124edb4·cdb832d9·8771de21·7fe339fa·9f43bb4d)
+> 사용자 API 에러 **107개 route / 약 487지점 전량** 에러코드 체계로 전환 완료.
+> - 아키텍처: `src/lib/api-errors/`(공통 23 + 도메인 287 = **310코드**, 도메인별 파일로 분리) + `apiError(code, status, params?)` → `{ error: 한국어 폴백, code, params }` 반환 + 클라이언트 `useApiErrorMessage()` 훅(`src/hooks/use-api-error.ts`) — code 없으면 error 폴백이라 **미전환 소비처 하위호환**
+> - 번역키: `messages/ko.json`·`en.json` `apiErrors` 네임스페이스 310키(카탈로그와 3중 정합 검증 0불일치). **비 ko/en 187개 locale은 증분 번역 파이프라인 대상**(차기 배치)
+> - 소비 컴포넌트 전환 6곳: group-room-creator(충전 분기 code화 — 보류건 ① 해소)·custom-sticker-creator·shop-claim-dialog·shop-bond-card·FeedbackForm·client-bean-wallet. 나머지 `d.error ?? fallback` 소비처는 폴백으로 동작하며 점진 전환
+> - 부수 개선: 'PI_SESSION_SECRET 미설정' 등 서버 변수명 노출 → SERVER_CONFIG 일반화(KISA IL)
+> - **신규 규칙: 사용자 API 에러 응답은 반드시 `apiError()`로 반환** (한국어 리터럴 직접 반환 금지)
+> - 잔여: P1-A/B(15파일 ~40줄, 개별 t()) · P2-A/B(admin 86파일 — 동일 코드맵 확장) · 성공 message 필드(각 도메인 보고 목록 참조) · chat-auth.ts plan_nm(보류건 ②)
+
 # 회색지대(gray) 한글 재분류 감사 결과
 
 **대상**: `hangul-scan.json`의 gray 분류 2,218줄 / 340파일 중, 제외 필터(타 에이전트 담당분) 적용 후 **239파일**을 코드 문맥으로 판정.
