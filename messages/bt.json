@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "སྐར་ཆ།"
     },
+    "labels": {
+      "noName": "(མིང་མེད་)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ བྱང་སྐར་གྱི་མཚོན་རྟགས།",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "དབྱེ་བ་ཆུང་བ་ཡོད་པའི་དོན་ལུ་བསུབ་མི་ཚུགས།",
     "ADM_CTGR_NAME_REQUIRED": "དབྱེ་བ་གི་མིང་དེ་ངེས་པར་དུ་དགོ།",
     "ADM_CTGR_NOT_FOUND": "དབྱེ་བ་འཚོལ་མ་ཐོབ་པ།",
+    "ADM_DB_API_MISSING": "Vercel API བརྡ་རྟགས་/ལས་འཆར་ཨང་/Deploy Hook གཞི་བཙུགས་མ་འབད་བར་",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "ཁོར་ཡུག་གི་ འགྱུར་བཅོས་འབད་ཡོད་རུང་ བསྐྱར་བཀྲམ་འབད་མ་ཚུགས། བཀྲམ་སྟོན་གྱི་ ངོ་གདོང་ནང་ལས་ གནས་སྟངས་ཞིབ་དཔྱད་འབད་གནང་།",
+    "ADM_DB_ENV_UPDATE_FAILED": "གནས་སྟངས་བསྒྱུར་བཅོས་མ་འགྲུབ་ Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "སྟེགས་གཞི་གནས་སྟངས་ནང་ལས་རྐྱངམ་གཅིག་ བསྒྱུར་བཅོས་འབད་ཚུགས་ (ལས་འགུལ་ WAS མ་བསྒྱུར་བཅོས་)",
+    "ADM_DB_PROD_RO_MISSING": "ལས་འགུལ་DB (prod-ro) ལྷག་བཀོད་རྐྱངམ་གཅིག་གི་ དབང་ཚད་ (PROD_RO_SUPABASE_URL/KEY) གཞི་བཙུགས་མ་འབད་བར་ — འབྲི་བཀོད་ཀྱི་ ཉེན་ཁ་སེལ་ནི་གི་དོན་ལུ་ བཀག་དམ་འབད་ཡོདཔ་",
     "ADM_DB_TARGET_INVALID": "དམིགས་ཡུལ་དེ་ 'staging' ཡང་ན་ 'prod-ro' ཨིན།",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN གཞི་བཙུགས་མ་འབད་བར་",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "མ་སྟར་ SHA འཚོལ་ཞིབ་མ་འགྲུབ་",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "གོང་འཕེལ་གཏང་ནི་མེད་ (ད་ལྟོ་ཡང་ གསར་ཤོས་)",
+    "ADM_DEPLOY_PROD_DIVERGED": "ཐོན་སྐྱེད་འདི་ མ་སྟར་ལས་ {n} བརྩིས་ཐོ་གོང་འགྲིམས་ (ཁ་འཕྱལ་) — མགྱོགས་འགྱུར་འབད་མི་ཚུགས་",
+    "ADM_DEPLOY_PROMOTE_FAILED": "གོང་འཕེལ་མ་འགྲུབ་ GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK གཞི་བཙུགས་མ་འབད་བར་",
     "ADM_DEPLOY_TARGET_INVALID": "དམིགས་ཡུལ་དེ་ 'staging' ཡང་ན་ 'production' ཨིན།",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km དེ་ ༠ ལས་ ༢༠༠ ཚུན་གྱི་ཨང་གྲངས་ཅིག་ཨིན་དགོ།",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url དེ་ནུས་མེད་ཀྱི་ URL ཅིག་ཨིན།",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url དེ་ http(s) URL ཁོ་ན་ལུ་བཀོལ་སྤྱོད་འབད་ཆོག།",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "འགྲེམས་སྤེལ་ལས་སྒྲུབ་མ་འགྲུབ་པ།",
     "ADM_MINT_REASON_REQUIRED": "འགྲེམས་སྤེལ་གྱི་རྒྱུ་མཚན་ (reason) དེ་ངེས་པར་དུ་དགོ།",
     "ADM_NO_FIELDS_TO_UPDATE": "གསར་བསྒྱུར་འབད་ནིའི་ས་སྒོ་མེདཔ།",
+    "ADM_OPS_UNKNOWN": "མ་ཤེས་པའི་ འཛོལ་བ་ ({detail})",
     "ADM_ORDERS_FAILED": "བཀའ་རྒྱ་འཚོལ་ཞིབ་མ་འགྲུབ་པ།",
     "ADM_PAGEVIEWS_FAILED": "ཝེབ་འགྲུལ་བཞུར་འགྲོ་འཚོལ་ཞིབ་མ་འགྲུབ་པ།",
     "ADM_PAYMENT_NOT_FOUND": "དངུལ་སྤྲོད་འཚོལ་མ་ཐོབ་པ།",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "PyCafé™ དངུལ་སྤྲོད་ཞབས་ཏོག",
       "PISHOP": "PyShop™ དངུལ་སྤྲོད་ཞབས་ཏོག",
+      "PISHOP_SUBSCR": "PyShop™ གདམ་ཁ་",
       "TRANSLATE": "PyTranslate™ དངུལ་སྤྲོད་ཞབས་ཏོག"
     },
     "renewBtn": "གསར་བསྒྱུར་/བསྒྱུར་བཅོས།",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "{product} དངུལ་སྤྲོད་ཞབས་ཏོག་འགོ་བཙུགས་ཚར།",
     "tagline": "དངུལ་སྤྲོད་ཞབས་ཏོག = ཐེངས་རེ་བཞིན་གྱི་གླ་ཆ་ཆག་ཡང་གི་ཐུམ་སྒྲིལ། ལག་ལེན་མང་སུ་འཐབ་ཚུགས་པ་ཅིན་ ཁེ་ཕན་མང་སུ་ཐོབ།",
     "title": "Cafe.pi དངུལ་སྤྲོད་ཞབས་ཏོག"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi འཚོལ་ཞིབ་པ་",
+      "OPERATOR": "Pi Host (ལས་འགུལ་པ་)",
+      "PICAFE_SUBSCR": "PyCafé™ གདམ་ཁ་",
+      "TRANSLATE_SUBSCR": "PyTranslate™ གདམ་ཁ་"
+    }
   },
   "sysUi": {
     "backToOrders": "ཉོ་བའི་ལོ་རྒྱུས་ལུ་ལོག་འགྱོ།",

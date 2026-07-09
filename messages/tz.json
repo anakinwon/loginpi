@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "sekunde"
     },
+    "labels": {
+      "noName": "(Hakuna Jina)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ Kiashiria cha Nyota ya Kaskazini",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "Haiwezi kufutwa kwa sababu ina kategoria ndogo",
     "ADM_CTGR_NAME_REQUIRED": "Jina la kategoria ni lazima",
     "ADM_CTGR_NOT_FOUND": "Kategoria haikupatikana",
+    "ADM_DB_API_MISSING": "Vercel API Token/Project ID/Deploy Hook Haijawekwa",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "Vigezo vya mazingira vimebadilishwa, lakini usambazaji upya umefeli. Angalia hali kwenye skrini ya usambazaji.",
+    "ADM_DB_ENV_UPDATE_FAILED": "Mabadiliko ya env yamefeli Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "Inaweza kubadilishwa tu katika mazingira ya staging (WAS ya uzalishaji haiwezi kubadilishwa)",
+    "ADM_DB_PROD_RO_MISSING": "Vitambulisho vya kusoma tu vya DB ya uzalishaji (prod-ro) (PROD_RO_SUPABASE_URL/KEY) havijawekwa — Imefungwa ili kuzuia makosa ya kuandika",
     "ADM_DB_TARGET_INVALID": "Lengo ni 'staging' au 'prod-ro'",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN Haijawekwa",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "master SHA kutafuta kumefeli",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "Hakuna commit za kupandisha (tayari ni ya hivi karibuni)",
+    "ADM_DEPLOY_PROD_DIVERGED": "production iko mbele ya master kwa commit {n} (imetengana) — fast-forward haiwezekani",
+    "ADM_DEPLOY_PROMOTE_FAILED": "Kupandisha kumefeli GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK Haijawekwa",
     "ADM_DEPLOY_TARGET_INVALID": "Lengo ni 'staging' au 'production'",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km lazima iwe nambari kamili kati ya 0 na 200",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url si URL halali",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url inaruhusu URL za http(s) pekee",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "Kushindwa kuchakata utoaji",
     "ADM_MINT_REASON_REQUIRED": "Sababu ya kutolewa (reason) ni lazima",
     "ADM_NO_FIELDS_TO_UPDATE": "Hakuna sehemu za kusasisha",
+    "ADM_OPS_UNKNOWN": "Hitilafu isiyojulikana ({detail})",
     "ADM_ORDERS_FAILED": "Kushindwa kupata maagizo",
     "ADM_PAGEVIEWS_FAILED": "Kushindwa kupata trafiki ya wavuti",
     "ADM_PAYMENT_NOT_FOUND": "Malipo hayakupatikana",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "Usajili wa PyCafé™",
       "PISHOP": "Usajili wa PyShop™",
+      "PISHOP_SUBSCR": "PyShop™ Usajili",
       "TRANSLATE": "Usajili wa PyTranslate™"
     },
     "renewBtn": "Fanya upya/Badilisha",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "Usajili wa {product} umeanza!",
     "tagline": "Usajili = Kifurushi cha msamaha wa ada kwa kila muamala. Kadiri unavyotumia zaidi, ndivyo unavyopata faida zaidi!",
     "title": "Usajili wa Cafe.pi"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (Mwendeshaji)",
+      "PICAFE_SUBSCR": "PyCafé™ Usajili",
+      "TRANSLATE_SUBSCR": "PyTranslate™ Usajili"
+    }
   },
   "sysUi": {
     "backToOrders": "Rudi kwenye Maagizo",

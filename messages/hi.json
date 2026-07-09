@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "सेकंड"
     },
+    "labels": {
+      "noName": "(कोई नाम नहीं)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ नॉर्थ स्टार मीट्रिक",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "उप-श्रेणियाँ हैं, इसलिए हटाया नहीं जा सकता",
     "ADM_CTGR_NAME_REQUIRED": "श्रेणी नाम आवश्यक है",
     "ADM_CTGR_NOT_FOUND": "श्रेणी नहीं मिली",
+    "ADM_DB_API_MISSING": "Vercel API टोकन/प्रोजेक्ट ID/डिप्लॉय हुक सेट नहीं है",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "पर्यावरण चर बदल दिए गए हैं, लेकिन पुनः-डिप्लॉयमेंट विफल रहा। डिप्लॉयमेंट स्क्रीन पर स्थिति जांचें।",
+    "ADM_DB_ENV_UPDATE_FAILED": "env परिवर्तन विफल Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "केवल स्टेजिंग वातावरण में स्विच किया जा सकता है (प्रोडक्शन WAS अपरिवर्तनीय है)",
+    "ADM_DB_PROD_RO_MISSING": "प्रोडक्शन DB (prod-ro) रीड-ओनली क्रेडेंशियल (PROD_RO_SUPABASE_URL/KEY) सेट नहीं हैं — राइट दुर्घटनाओं को रोकने के लिए ब्लॉक किया गया",
     "ADM_DB_TARGET_INVALID": "लक्ष्य 'staging' या 'prod-ro' होना चाहिए",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN सेट नहीं है",
+    "ADM_DEPLOY_HOOK_STATUS": "डिप्लॉय हुक {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "मास्टर SHA प्राप्त करने में विफल",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "प्रमोट करने के लिए कोई कमिट नहीं (पहले से ही नवीनतम)",
+    "ADM_DEPLOY_PROD_DIVERGED": "production मास्टर से {n} कमिट आगे है (अलग हो गया है) — फास्ट-फॉरवर्ड संभव नहीं",
+    "ADM_DEPLOY_PROMOTE_FAILED": "प्रमोशन विफल GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK सेट नहीं है",
     "ADM_DEPLOY_TARGET_INVALID": "लक्ष्य 'staging' या 'production' होना चाहिए",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km 0 से 200 के बीच एक पूर्णांक होना चाहिए",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url एक वैध URL नहीं है",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url केवल http(s) URL की अनुमति देता है",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "जारी करने की प्रक्रिया विफल",
     "ADM_MINT_REASON_REQUIRED": "जारी करने का कारण (reason) आवश्यक है",
     "ADM_NO_FIELDS_TO_UPDATE": "अद्यतन करने के लिए कोई फ़ील्ड नहीं",
+    "ADM_OPS_UNKNOWN": "अज्ञात त्रुटि ({detail})",
     "ADM_ORDERS_FAILED": "ऑर्डर पुनः प्राप्त करने में विफल",
     "ADM_PAGEVIEWS_FAILED": "वेब ट्रैफ़िक पुनः प्राप्त करने में विफल",
     "ADM_PAYMENT_NOT_FOUND": "भुगतान नहीं मिला",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "PyCafe सदस्यता",
       "PISHOP": "PyShop सदस्यता",
+      "PISHOP_SUBSCR": "PyShop™ सदस्यता",
       "TRANSLATE": "स्वचालित अनुवाद सदस्यता"
     },
     "renewBtn": "नवीनीकृत/बदलें",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "{product} सदस्यता शुरू हो गई है!",
     "tagline": "सदस्यता = प्रति-लेनदेन शुल्क छूट पैकेज। जितना अधिक उपयोग करेंगे, उतना अधिक लाभ!",
     "title": "Cafe.pi सदस्यता"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (ऑपरेटर)",
+      "PICAFE_SUBSCR": "PyCafé™ सदस्यता",
+      "TRANSLATE_SUBSCR": "PyTranslate™ सदस्यता"
+    }
   },
   "sysUi": {
     "backToOrders": "खरीद इतिहास पर वापस जाएँ",

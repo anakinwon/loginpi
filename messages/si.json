@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "sekund"
     },
+    "labels": {
+      "noName": "(Brez imena)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ Kazalnik Severnice",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "Kategorije ni mogoče izbrisati, ker ima podkategorije",
     "ADM_CTGR_NAME_REQUIRED": "Ime kategorije je obvezno",
     "ADM_CTGR_NOT_FOUND": "Kategorija ni najdena",
+    "ADM_DB_API_MISSING": "Vercel API žeton/ID projekta/Deploy Hook ni nastavljen",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "Spremenljivke okolja so bile spremenjene, vendar ponovna namestitev ni uspela. Preverite stanje na zaslonu za namestitev.",
+    "ADM_DB_ENV_UPDATE_FAILED": "Sprememba okolja ni uspela Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "Preklop je možen samo v testnem okolju (produkcijski WAS je nespremenljiv)",
+    "ADM_DB_PROD_RO_MISSING": "Poverilnice samo za branje za produkcijsko bazo podatkov (prod-ro) (PROD_RO_SUPABASE_URL/KEY) niso nastavljene — blokirano za preprečitev napak pri pisanju",
     "ADM_DB_TARGET_INVALID": "Cilj mora biti 'staging' ali 'prod-ro'",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN ni nastavljen",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "Pridobivanje SHA masterja ni uspelo",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "Ni potrditev za promocijo (že najnovejše)",
+    "ADM_DEPLOY_PROD_DIVERGED": "production je {n} potrditev pred masterjem (razhajanje) — hitro naprej ni možno",
+    "ADM_DEPLOY_PROMOTE_FAILED": "Promocija ni uspela GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK ni nastavljen",
     "ADM_DEPLOY_TARGET_INVALID": "Cilj mora biti 'staging' ali 'production'",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km mora biti celo število med 0 in 200",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url ni veljaven URL",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url dovoljuje samo http(s) URL-je",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "Obdelava izdaje ni uspela",
     "ADM_MINT_REASON_REQUIRED": "Razlog za izdajo (reason) je obvezen",
     "ADM_NO_FIELDS_TO_UPDATE": "Ni polj za posodobitev",
+    "ADM_OPS_UNKNOWN": "Neznana napaka ({detail})",
     "ADM_ORDERS_FAILED": "Pridobivanje naročil ni uspelo",
     "ADM_PAGEVIEWS_FAILED": "Pridobivanje spletnega prometa ni uspelo",
     "ADM_PAYMENT_NOT_FOUND": "Plačilo ni najdeno",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "Naročnina na PyCafé™",
       "PISHOP": "Naročnina na PyShop™",
+      "PISHOP_SUBSCR": "Naročnina na PyShop™",
       "TRANSLATE": "Naročnina na PyTranslate™"
     },
     "renewBtn": "Podaljšaj/Spremeni",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "Naročnina na {product} je bila uspešno aktivirana!",
     "tagline": "Naročnina = paket oprostitve plačila na postavko. Več ko uporabljate, več pridobite!",
     "title": "Naročnina na Cafe.pi"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (operater)",
+      "PICAFE_SUBSCR": "Naročnina na PyCafé™",
+      "TRANSLATE_SUBSCR": "Naročnina na PyTranslate™"
+    }
   },
   "sysUi": {
     "backToOrders": "Nazaj na naročila",

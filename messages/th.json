@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "วินาที"
     },
+    "labels": {
+      "noName": "(ไม่มีชื่อ)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ North Star Metric",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "ไม่สามารถลบได้เนื่องจากมีหมวดหมู่ย่อย",
     "ADM_CTGR_NAME_REQUIRED": "ชื่อหมวดหมู่เป็นสิ่งจำเป็น",
     "ADM_CTGR_NOT_FOUND": "ไม่พบหมวดหมู่",
+    "ADM_DB_API_MISSING": "Vercel API Token/Project ID/Deploy Hook ไม่ได้ตั้งค่า",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "ตัวแปรสภาพแวดล้อมถูกเปลี่ยนแล้ว แต่การปรับใช้ใหม่ล้มเหลว โปรดตรวจสอบสถานะในหน้าจอการปรับใช้",
+    "ADM_DB_ENV_UPDATE_FAILED": "เปลี่ยน env ไม่สำเร็จ Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "สามารถสลับได้เฉพาะในสภาพแวดล้อม staging เท่านั้น (WAS สำหรับ production ไม่เปลี่ยนแปลง)",
+    "ADM_DB_PROD_RO_MISSING": "DB สำหรับ production (prod-ro) ข้อมูลรับรองแบบอ่านอย่างเดียว (PROD_RO_SUPABASE_URL/KEY) ไม่ได้ตั้งค่า — ถูกบล็อกเพื่อป้องกันข้อผิดพลาดในการเขียน",
     "ADM_DB_TARGET_INVALID": "target ต้องเป็น 'staging' หรือ 'prod-ro'",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN ไม่ได้ตั้งค่า",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "เรียกดู master SHA ไม่สำเร็จ",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "ไม่มีคอมมิตที่จะโปรโมต (เป็นเวอร์ชันล่าสุดอยู่แล้ว)",
+    "ADM_DEPLOY_PROD_DIVERGED": "production ล้ำหน้า master ไป {n} คอมมิต (แยก) — ไม่สามารถ fast-forward ได้",
+    "ADM_DEPLOY_PROMOTE_FAILED": "โปรโมตไม่สำเร็จ GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK ไม่ได้ตั้งค่า",
     "ADM_DEPLOY_TARGET_INVALID": "target ต้องเป็น 'staging' หรือ 'production'",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km ต้องเป็นจำนวนเต็มระหว่าง 0-200",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url ไม่ใช่ URL ที่ถูกต้อง",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url อนุญาตเฉพาะ URL ที่เป็น http(s) เท่านั้น",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "การดำเนินการออกล้มเหลว",
     "ADM_MINT_REASON_REQUIRED": "เหตุผลในการออก (reason) เป็นสิ่งจำเป็น",
     "ADM_NO_FIELDS_TO_UPDATE": "ไม่มีฟิลด์ที่จะอัปเดต",
+    "ADM_OPS_UNKNOWN": "ข้อผิดพลาดที่ไม่รู้จัก ({detail})",
     "ADM_ORDERS_FAILED": "ไม่สามารถเรียกดูคำสั่งซื้อได้",
     "ADM_PAGEVIEWS_FAILED": "ไม่สามารถเรียกดูปริมาณการเข้าชมเว็บได้",
     "ADM_PAYMENT_NOT_FOUND": "ไม่พบการชำระเงิน",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "สมัครสมาชิก PyCafe",
       "PISHOP": "การสมัครสมาชิก PyShop",
+      "PISHOP_SUBSCR": "PyShop™ การสมัครสมาชิก",
       "TRANSLATE": "สมัครสมาชิกการแปลอัตโนมัติ"
     },
     "renewBtn": "ต่ออายุ/เปลี่ยน",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "การสมัครสมาชิก {product} ของคุณได้เริ่มต้นขึ้นแล้ว!",
     "tagline": "สมัครสมาชิก = แพ็กเกจยกเว้นค่าธรรมเนียมต่อรายการ ยิ่งใช้มากยิ่งคุ้มค่า!",
     "title": "สมัครสมาชิก Cafe.pi"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (ผู้ดูแล)",
+      "PICAFE_SUBSCR": "PyCafé™ การสมัครสมาชิก",
+      "TRANSLATE_SUBSCR": "PyTranslate™ การสมัครสมาชิก"
+    }
   },
   "sysUi": {
     "backToOrders": "กลับไปที่ประวัติการซื้อ",

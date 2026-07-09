@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "Sekunde"
     },
+    "labels": {
+      "noName": "(Kein Name)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ North Star Metrik",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "Kann nicht gelöscht werden, da Unterkategorien vorhanden sind",
     "ADM_CTGR_NAME_REQUIRED": "Kategoriename ist erforderlich",
     "ADM_CTGR_NOT_FOUND": "Kategorie nicht gefunden",
+    "ADM_DB_API_MISSING": "Vercel API Token/Projekt-ID/Deploy Hook nicht konfiguriert",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "Umgebungsvariablen wurden geändert, aber die erneute Bereitstellung ist fehlgeschlagen. Überprüfen Sie den Status auf dem Bereitstellungsbildschirm.",
+    "ADM_DB_ENV_UPDATE_FAILED": "Änderung der Umgebungsvariablen fehlgeschlagen Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "Nur in Staging-Umgebung umschaltbar (Produktions-WAS unveränderlich)",
+    "ADM_DB_PROD_RO_MISSING": "Produktions-DB (prod-ro) schreibgeschützte Anmeldeinformationen (PROD_RO_SUPABASE_URL/KEY) nicht konfiguriert — Blockiert, um Schreibfehler zu verhindern",
     "ADM_DB_TARGET_INVALID": "Das Ziel muss 'staging' oder 'prod-ro' sein",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN nicht konfiguriert",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "Abrufen des Master-SHA fehlgeschlagen",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "Keine Commits zum Promoten (bereits aktuell)",
+    "ADM_DEPLOY_PROD_DIVERGED": "Production ist {n} Commits vor Master (divergiert) — Fast-Forward nicht möglich",
+    "ADM_DEPLOY_PROMOTE_FAILED": "Promotion fehlgeschlagen GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK nicht konfiguriert",
     "ADM_DEPLOY_TARGET_INVALID": "Das Ziel muss 'staging' oder 'production' sein",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km muss eine ganze Zahl zwischen 0 und 200 sein",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url ist keine gültige URL",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url erlaubt nur http(s) URLs",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "Ausgabeverarbeitung fehlgeschlagen",
     "ADM_MINT_REASON_REQUIRED": "Der Grund für die Ausgabe (reason) ist erforderlich",
     "ADM_NO_FIELDS_TO_UPDATE": "Keine Felder zum Aktualisieren",
+    "ADM_OPS_UNKNOWN": "Unbekannter Fehler ({detail})",
     "ADM_ORDERS_FAILED": "Abruf der Bestellungen fehlgeschlagen",
     "ADM_PAGEVIEWS_FAILED": "Abruf des Web-Traffics fehlgeschlagen",
     "ADM_PAYMENT_NOT_FOUND": "Zahlung nicht gefunden",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "PyCafe Abonnement",
       "PISHOP": "PyShop-Abonnement",
+      "PISHOP_SUBSCR": "PyShop™ Abonnement",
       "TRANSLATE": "Automatisches Übersetzungs-Abonnement"
     },
     "renewBtn": "Erneuern/Ändern",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "Ihr {product} Abonnement wurde gestartet!",
     "tagline": "Abonnement = Paket zur Befreiung von Gebühren pro Fall. Je mehr Sie nutzen, desto mehr profitieren Sie!",
     "title": "Cafe.pi Abonnement"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (Betreiber)",
+      "PICAFE_SUBSCR": "PyCafé™ Abonnement",
+      "TRANSLATE_SUBSCR": "PyTranslate™ Abonnement"
+    }
   },
   "sysUi": {
     "backToOrders": "Zurück zu den Bestellungen",

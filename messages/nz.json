@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "seconds"
     },
+    "labels": {
+      "noName": "(no name)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ North Star Metric",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "Cannot delete because subcategories exist",
     "ADM_CTGR_NAME_REQUIRED": "Category name is required",
     "ADM_CTGR_NOT_FOUND": "Category not found",
+    "ADM_DB_API_MISSING": "Vercel API token / project ID / Deploy Hook not set",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "The environment variable was changed but the redeploy failed. Check the status on the deploy screen.",
+    "ADM_DB_ENV_UPDATE_FAILED": "env update failed Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "Switching is only allowed in the staging environment (production WAS is immutable)",
+    "ADM_DB_PROD_RO_MISSING": "Production DB (prod-ro) read-only credentials (PROD_RO_SUPABASE_URL/KEY) not set — blocked to prevent write accidents",
     "ADM_DB_TARGET_INVALID": "target must be 'staging' or 'prod-ro'",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN not set",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "Failed to fetch master SHA",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "No commits to promote (already up to date)",
+    "ADM_DEPLOY_PROD_DIVERGED": "production is {n} commit(s) ahead of master (diverged) — fast-forward not possible",
+    "ADM_DEPLOY_PROMOTE_FAILED": "Promotion failed GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK not set",
     "ADM_DEPLOY_TARGET_INVALID": "target must be 'staging' or 'production'",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km must be an integer between 0 and 200",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url is not a valid URL",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url only allows http(s) URLs",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "Mint processing failed",
     "ADM_MINT_REASON_REQUIRED": "Mint reason (reason) is required",
     "ADM_NO_FIELDS_TO_UPDATE": "No fields to update",
+    "ADM_OPS_UNKNOWN": "Unknown error ({detail})",
     "ADM_ORDERS_FAILED": "Failed to load orders",
     "ADM_PAGEVIEWS_FAILED": "Failed to load web traffic",
     "ADM_PAYMENT_NOT_FOUND": "Payment not found",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "PyCafe Subscription",
       "PISHOP": "PyShop Subscription",
+      "PISHOP_SUBSCR": "PyShop Subscription",
       "TRANSLATE": "Auto-Translate Subscription"
     },
     "renewBtn": "Renew/Change",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "{product} subscription has started!",
     "tagline": "Subscription = per-item fee exemption package. The more you use, the more you benefit!",
     "title": "Cafe.pi Subscription"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (Operator)",
+      "PICAFE_SUBSCR": "PyCafé™ Subscription",
+      "TRANSLATE_SUBSCR": "PyTranslate™ Subscription"
+    }
   },
   "sysUi": {
     "backToOrders": "To purchase history",

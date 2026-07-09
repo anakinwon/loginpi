@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "δευτ."
     },
+    "labels": {
+      "noName": "(Χωρίς όνομα)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ Δείκτης Βόρειου Αστέρα",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "Δεν είναι δυνατή η διαγραφή επειδή έχει υποκατηγορίες",
     "ADM_CTGR_NAME_REQUIRED": "Το όνομα κατηγορίας είναι υποχρεωτικό",
     "ADM_CTGR_NOT_FOUND": "Δεν βρέθηκε κατηγορία",
+    "ADM_DB_API_MISSING": "Το Vercel API token/Project ID/Deploy Hook δεν έχει ρυθμιστεί",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "Οι μεταβλητές περιβάλλοντος άλλαξαν, αλλά η επανατοποθέτηση απέτυχε. Ελέγξτε την κατάσταση στην οθόνη ανάπτυξης.",
+    "ADM_DB_ENV_UPDATE_FAILED": "Αποτυχία αλλαγής περιβάλλοντος Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "Μόνο δυνατή η μετάβαση σε περιβάλλον staging (ο παραγωγικός WAS είναι αμετάβλητος)",
+    "ADM_DB_PROD_RO_MISSING": "Τα διαπιστευτήρια μόνο για ανάγνωση της παραγωγικής βάσης δεδομένων (prod-ro) (PROD_RO_SUPABASE_URL/KEY) δεν έχουν ρυθμιστεί — αποκλείστηκε για την αποφυγή ατυχημάτων εγγραφής",
     "ADM_DB_TARGET_INVALID": "Ο στόχος είναι 'staging' ή 'prod-ro'",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "Το GITHUB_DEPLOY_TOKEN δεν έχει ρυθμιστεί",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "Αποτυχία ανάκτησης master SHA",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "Δεν υπάρχουν commits για προώθηση (ήδη ενημερωμένο)",
+    "ADM_DEPLOY_PROD_DIVERGED": "Το production είναι {n} commits μπροστά από το master (αποκλίνει) — αδύνατο fast-forward",
+    "ADM_DEPLOY_PROMOTE_FAILED": "Αποτυχία προώθησης GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "Το VERCEL_STAGING_DEPLOY_HOOK δεν έχει ρυθμιστεί",
     "ADM_DEPLOY_TARGET_INVALID": "Ο στόχος είναι 'staging' ή 'production'",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "Το max_dist_km πρέπει να είναι ακέραιος αριθμός μεταξύ 0 και 200",
     "ADM_EVIDENCE_URL_INVALID": "Το evidence_url δεν είναι έγκυρο URL",
     "ADM_EVIDENCE_URL_PROTOCOL": "Το evidence_url επιτρέπει μόνο URL http(s)",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "Αποτυχία επεξεργασίας έκδοσης",
     "ADM_MINT_REASON_REQUIRED": "Ο λόγος έκδοσης (reason) είναι υποχρεωτικός",
     "ADM_NO_FIELDS_TO_UPDATE": "Δεν υπάρχουν πεδία για ενημέρωση",
+    "ADM_OPS_UNKNOWN": "Άγνωστο σφάλμα ({detail})",
     "ADM_ORDERS_FAILED": "Αποτυχία ανάκτησης παραγγελιών",
     "ADM_PAGEVIEWS_FAILED": "Αποτυχία ανάκτησης επισκεψιμότητας ιστού",
     "ADM_PAYMENT_NOT_FOUND": "Δεν βρέθηκε πληρωμή",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "Συνδρομή PyCafé™",
       "PISHOP": "Συνδρομή PyShop™",
+      "PISHOP_SUBSCR": "PyShop™ Συνδρομή",
       "TRANSLATE": "Συνδρομή PyTranslate™"
     },
     "renewBtn": "Ανανέωση/Αλλαγή",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "Η συνδρομή {product} ξεκίνησε!",
     "tagline": "Συνδρομή = Πακέτο απαλλαγής από χρεώσεις ανά συναλλαγή. Όσο περισσότερο χρησιμοποιείτε, τόσο περισσότερο κερδίζετε!",
     "title": "Συνδρομή Cafe.pi"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (Χειριστής)",
+      "PICAFE_SUBSCR": "PyCafé™ Συνδρομή",
+      "TRANSLATE_SUBSCR": "PyTranslate™ Συνδρομή"
+    }
   },
   "sysUi": {
     "backToOrders": "Πίσω στις παραγγελίες μου",

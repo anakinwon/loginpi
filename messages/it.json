@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "secondi"
     },
+    "labels": {
+      "noName": "(Senza nome)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ Indicatore Stella Polare",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "Impossibile eliminare, la categoria ha sottocategorie",
     "ADM_CTGR_NAME_REQUIRED": "Il nome della categoria è obbligatorio",
     "ADM_CTGR_NOT_FOUND": "Categoria non trovata",
+    "ADM_DB_API_MISSING": "Token API Vercel/ID progetto/Deploy Hook non configurato",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "Le variabili d'ambiente sono state modificate, ma il ridistribuzione è fallita. Controlla lo stato nella schermata di distribuzione.",
+    "ADM_DB_ENV_UPDATE_FAILED": "Modifica env fallita Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "Passaggio possibile solo nell'ambiente di staging (WAS di produzione immutabile)",
+    "ADM_DB_PROD_RO_MISSING": "Credenziali di sola lettura del DB di produzione (prod-ro) (PROD_RO_SUPABASE_URL/KEY) non configurate — bloccato per prevenire incidenti di scrittura",
     "ADM_DB_TARGET_INVALID": "target deve essere 'staging' o 'prod-ro'",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN non configurato",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "Recupero SHA master fallito",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "Nessun commit da promuovere (già aggiornato)",
+    "ADM_DEPLOY_PROD_DIVERGED": "La produzione è {n} commit avanti rispetto a master (divergenza) — impossibile fast-forward",
+    "ADM_DEPLOY_PROMOTE_FAILED": "Promozione fallita GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK non configurato",
     "ADM_DEPLOY_TARGET_INVALID": "target deve essere 'staging' o 'production'",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km deve essere un numero intero tra 0 e 200",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url non è un URL valido",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url accetta solo URL http(s)",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "Elaborazione emissione fallita",
     "ADM_MINT_REASON_REQUIRED": "Il motivo dell'emissione (reason) è obbligatorio",
     "ADM_NO_FIELDS_TO_UPDATE": "Nessun campo da aggiornare",
+    "ADM_OPS_UNKNOWN": "Errore sconosciuto ({detail})",
     "ADM_ORDERS_FAILED": "Recupero ordini fallito",
     "ADM_PAGEVIEWS_FAILED": "Recupero traffico web fallito",
     "ADM_PAYMENT_NOT_FOUND": "Pagamento non trovato",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "Abbonamento PyCafe",
       "PISHOP": "Abbonamento PyShop",
+      "PISHOP_SUBSCR": "Abbonamento PyShop™",
       "TRANSLATE": "Abbonamento Traduzione Automatica"
     },
     "renewBtn": "Rinnova/Modifica",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "L'abbonamento a {product} è iniziato!",
     "tagline": "Abbonamento = pacchetto esente da costi per transazione. Più lo usi, più risparmi!",
     "title": "Abbonamento Cafe.pi"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (Operatore)",
+      "PICAFE_SUBSCR": "Abbonamento PyCafé™",
+      "TRANSLATE_SUBSCR": "Abbonamento PyTranslate™"
+    }
   },
   "sysUi": {
     "backToOrders": "Torna agli ordini",

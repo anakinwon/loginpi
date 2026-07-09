@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "سیکنڈ"
     },
+    "labels": {
+      "noName": "(کوئی نام نہیں)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ نارتھ اسٹار میٹرک",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "حذف نہیں کیا جا سکتا کیونکہ اس میں ذیلی زمرے ہیں",
     "ADM_CTGR_NAME_REQUIRED": "زمرہ کا نام درکار ہے",
     "ADM_CTGR_NOT_FOUND": "زمرہ نہیں ملا",
+    "ADM_DB_API_MISSING": "Vercel API ٹوکن/پروجیکٹ ID/ڈپلائے ہک سیٹ نہیں کیا گیا",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "ماحولیاتی متغیرات تبدیل ہو گئے ہیں لیکن دوبارہ تعیناتی ناکام ہو گئی ہے۔ ڈپلائے اسکرین پر اسٹیٹس چیک کریں۔",
+    "ADM_DB_ENV_UPDATE_FAILED": "env تبدیلی ناکام Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "صرف اسٹیجنگ ماحول میں تبدیل کیا جا سکتا ہے (پروڈکشن WAS ناقابل تغیر)",
+    "ADM_DB_PROD_RO_MISSING": "پروڈکشن DB (prod-ro) صرف پڑھنے کی اسناد (PROD_RO_SUPABASE_URL/KEY) سیٹ نہیں کیا گیا — لکھنے کے حادثات سے بچنے کے لیے بلاک کر دیا گیا",
     "ADM_DB_TARGET_INVALID": "ہدف 'staging' یا 'prod-ro' ہے",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN سیٹ نہیں کیا گیا",
+    "ADM_DEPLOY_HOOK_STATUS": "ڈپلائے ہک {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "ماسٹر SHA تلاش ناکام",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "ترقی دینے کے لیے کوئی کمٹ نہیں (پہلے ہی تازہ ترین ہے)",
+    "ADM_DEPLOY_PROD_DIVERGED": "پروڈکشن ماسٹر سے {n} کمٹ آگے ہے (منحرف) — فاسٹ فارورڈ ممکن نہیں",
+    "ADM_DEPLOY_PROMOTE_FAILED": "ترقی ناکام GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK سیٹ نہیں کیا گیا",
     "ADM_DEPLOY_TARGET_INVALID": "ہدف 'staging' یا 'production' ہے",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km 0 اور 200 کے درمیان ایک صحیح عدد ہونا چاہیے",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url ایک درست URL نہیں ہے",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url صرف http(s) URLs کی اجازت دیتا ہے",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "جاری کرنے کی کارروائی ناکام ہو گئی",
     "ADM_MINT_REASON_REQUIRED": "جاری کرنے کی وجہ (reason) درکار ہے",
     "ADM_NO_FIELDS_TO_UPDATE": "تازہ کاری کے لیے کوئی فیلڈ نہیں",
+    "ADM_OPS_UNKNOWN": "نامعلوم خرابی ({detail})",
     "ADM_ORDERS_FAILED": "آرڈرز کی بازیافت ناکام ہو گئی",
     "ADM_PAGEVIEWS_FAILED": "ویب ٹریفک کی بازیافت ناکام ہو گئی",
     "ADM_PAYMENT_NOT_FOUND": "ادائیگی نہیں ملی",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "PyCafé™ سبسکرپشن",
       "PISHOP": "PyShop™ سبسکرپشن",
+      "PISHOP_SUBSCR": "PyShop™ سبسکرپشن",
       "TRANSLATE": "PyTranslate™ سبسکرپشن"
     },
     "renewBtn": "تجدید/تبدیل کریں",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "{product} سبسکرپشن شروع ہو گئی ہے!",
     "tagline": "سبسکرپشن = فی ٹرانزیکشن فیس سے استثنیٰ کا پیکج۔ جتنا زیادہ استعمال کریں گے، اتنا ہی زیادہ فائدہ!",
     "title": "Cafe.pi سبسکرپشن"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (آپریٹر)",
+      "PICAFE_SUBSCR": "PyCafé™ سبسکرپشن",
+      "TRANSLATE_SUBSCR": "PyTranslate™ سبسکرپشن"
+    }
   },
   "sysUi": {
     "backToOrders": "خریداری کی تاریخ پر واپس جائیں",

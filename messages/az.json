@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "saniyə"
     },
+    "labels": {
+      "noName": "(Ad yoxdur)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ Şimal Ulduzu göstəricisi",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "Alt kateqoriyaları olduğu üçün silinə bilməz",
     "ADM_CTGR_NAME_REQUIRED": "Kateqoriya adı tələb olunur",
     "ADM_CTGR_NOT_FOUND": "Kateqoriya tapılmadı",
+    "ADM_DB_API_MISSING": "Vercel API token/Layihə ID/Deploy Hook təyin edilməyib",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "Ətraf mühit dəyişənləri dəyişdirildi, lakin yenidən yerləşdirmə uğursuz oldu. Yerləşdirmə ekranında statusu yoxlayın.",
+    "ADM_DB_ENV_UPDATE_FAILED": "env dəyişikliyi uğursuz oldu Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "Yalnız staging mühitində keçid etmək mümkündür (istehsal WAS dəyişməzdir)",
+    "ADM_DB_PROD_RO_MISSING": "İstehsal DB (prod-ro) yalnız oxumaq üçün etimadnamələr (PROD_RO_SUPABASE_URL/KEY) təyin edilməyib — yazma qəzalarının qarşısını almaq üçün bloklanıb",
     "ADM_DB_TARGET_INVALID": "target 'staging' və ya 'prod-ro' olmalıdır",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN təyin edilməyib",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "master SHA alınmadı",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "Yüksəltmək üçün kommit yoxdur (artıq ən son versiyadır)",
+    "ADM_DEPLOY_PROD_DIVERGED": "production master-dən {n} kommit irəlidədir (ayrılıb) — fast-forward mümkün deyil",
+    "ADM_DEPLOY_PROMOTE_FAILED": "Yüksəltmə uğursuz oldu GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK təyin edilməyib",
     "ADM_DEPLOY_TARGET_INVALID": "target 'staging' və ya 'production' olmalıdır",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km 0-200 arasında tam ədəd olmalıdır",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url etibarlı URL deyil",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url yalnız http(s) URL-lərini qəbul edir",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "Buraxılış emalı uğursuz oldu",
     "ADM_MINT_REASON_REQUIRED": "Buraxılış səbəbi (reason) tələb olunur",
     "ADM_NO_FIELDS_TO_UPDATE": "Yeniləmək üçün sahə yoxdur",
+    "ADM_OPS_UNKNOWN": "Naməlum xəta ({detail})",
     "ADM_ORDERS_FAILED": "Sifarişlər sorğusu uğursuz oldu",
     "ADM_PAGEVIEWS_FAILED": "Veb trafik sorğusu uğursuz oldu",
     "ADM_PAYMENT_NOT_FOUND": "Ödəniş tapılmadı",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "PyCafé™ Abunəliyi",
       "PISHOP": "PyShop™ Abunəliyi",
+      "PISHOP_SUBSCR": "PyShop™ abunə",
       "TRANSLATE": "PyTranslate™ Abunəliyi"
     },
     "renewBtn": "Yenilə/Dəyiş",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "{product} abunəliyi başladı!",
     "tagline": "Abunəlik = hər əməliyyat üçün ödənişsiz paket. Nə qədər çox istifadə etsəniz, bir o qədər çox qazanc əldə edərsiniz!",
     "title": "Cafe.pi Abunəliyi"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (operator)",
+      "PICAFE_SUBSCR": "PyCafé™ abunə",
+      "TRANSLATE_SUBSCR": "PyTranslate™ abunə"
+    }
   },
   "sysUi": {
     "backToOrders": "Alış-veriş tarixinə qayıt",

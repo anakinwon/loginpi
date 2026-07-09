@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "sekonda"
     },
+    "labels": {
+      "noName": "(Pa emër)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ Treguesi i Yllit Polar",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "Nuk mund të fshihet sepse ka nënkategori",
     "ADM_CTGR_NAME_REQUIRED": "Emri i kategorisë është i detyrueshëm",
     "ADM_CTGR_NOT_FOUND": "Kategoria nuk u gjet",
+    "ADM_DB_API_MISSING": "Vercel API token/ID projekti/Deploy Hook i pa vendosur",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "Variablat e mjedisit u ndryshuan, por ridistribuimi dështoi. Kontrolloni statusin në ekranin e vendosjes.",
+    "ADM_DB_ENV_UPDATE_FAILED": "Ndryshimi i env dështoi Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "Mund të ndërrohet vetëm në mjedisin e staging-ut (WAS i prodhimit i pandryshueshëm)",
+    "ADM_DB_PROD_RO_MISSING": "Kredencialet vetëm për lexim të DB-së së prodhimit (prod-ro) (PROD_RO_SUPABASE_URL/KEY) i pa vendosur — bllokuar për të parandaluar aksidentet e shkrimit",
     "ADM_DB_TARGET_INVALID": "target është 'staging' ose 'prod-ro'",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN i pa vendosur",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "Kërkimi i master SHA dështoi",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "Nuk ka komite për të promovuar (tashmë më i fundit)",
+    "ADM_DEPLOY_PROD_DIVERGED": "production është {n} komite përpara masterit (i ndarë) — fast-forward i pamundur",
+    "ADM_DEPLOY_PROMOTE_FAILED": "Promovimi dështoi GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK i pa vendosur",
     "ADM_DEPLOY_TARGET_INVALID": "target është 'staging' ose 'production'",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km duhet të jetë një numër i plotë midis 0 dhe 200",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url nuk është një URL e vlefshme",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url lejon vetëm URL-të http(s)",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "Dështoi përpunimi i emetimit",
     "ADM_MINT_REASON_REQUIRED": "Arsyeja e emetimit (reason) është e detyrueshme",
     "ADM_NO_FIELDS_TO_UPDATE": "Nuk ka fusha për të përditësuar",
+    "ADM_OPS_UNKNOWN": "Gabim i panjohur ({detail})",
     "ADM_ORDERS_FAILED": "Dështoi marrja e porosive",
     "ADM_PAGEVIEWS_FAILED": "Dështoi marrja e trafikut të uebit",
     "ADM_PAYMENT_NOT_FOUND": "Pagesa nuk u gjet",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "Abonim PyCafé™",
       "PISHOP": "Abonim PyShop™",
+      "PISHOP_SUBSCR": "PyShop™ abonim",
       "TRANSLATE": "Abonim PyTranslate™"
     },
     "renewBtn": "Rinovo/Ndrysho",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "Abonimi juaj {product} ka filluar!",
     "tagline": "Abonim = Paketë pa tarifa për transaksion. Sa më shumë të përdorni, aq më shumë përfitoni!",
     "title": "Abonim Cafe.pi"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (operator)",
+      "PICAFE_SUBSCR": "PyCafé™ abonim",
+      "TRANSLATE_SUBSCR": "PyTranslate™ abonim"
+    }
   },
   "sysUi": {
     "backToOrders": "Kthehu te porositë",

@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "sec"
     },
+    "labels": {
+      "noName": "(Fără nume)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ Indicator Steaua Polară",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "Nu se poate șterge deoarece are subcategorii",
     "ADM_CTGR_NAME_REQUIRED": "Numele categoriei este obligatoriu",
     "ADM_CTGR_NOT_FOUND": "Categoria nu a fost găsită",
+    "ADM_DB_API_MISSING": "Token API Vercel/ID proiect/Deploy Hook nesetat",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "Variabilele de mediu au fost modificate, dar redistribuirea a eșuat. Verificați starea în ecranul de implementare.",
+    "ADM_DB_ENV_UPDATE_FAILED": "Eșec la modificarea env Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "Se poate comuta doar în mediul de staging (WAS de producție imuabil)",
+    "ADM_DB_PROD_RO_MISSING": "Credențialele de citire (PROD_RO_SUPABASE_URL/KEY) pentru DB de producție (prod-ro) nesetate — blocat pentru a preveni accidente de scriere",
     "ADM_DB_TARGET_INVALID": "Ținta trebuie să fie 'staging' sau 'prod-ro'",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN nesetat",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "Eșec la preluarea SHA-ului master",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "Nu există commit-uri de promovat (deja la zi)",
+    "ADM_DEPLOY_PROD_DIVERGED": "production este cu {n} commit-uri înaintea master (divergent) — nu se poate face fast-forward",
+    "ADM_DEPLOY_PROMOTE_FAILED": "Eșec la promovare GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK nesetat",
     "ADM_DEPLOY_TARGET_INVALID": "Ținta trebuie să fie 'staging' sau 'production'",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km trebuie să fie un număr întreg între 0 și 200",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url nu este un URL valid",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url permite doar URL-uri http(s)",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "Eșec la procesarea emiterii",
     "ADM_MINT_REASON_REQUIRED": "Motivul emiterii (reason) este obligatoriu",
     "ADM_NO_FIELDS_TO_UPDATE": "Niciun câmp de actualizat",
+    "ADM_OPS_UNKNOWN": "Eroare necunoscută ({detail})",
     "ADM_ORDERS_FAILED": "Eșec la recuperarea comenzilor",
     "ADM_PAGEVIEWS_FAILED": "Eșec la recuperarea traficului web",
     "ADM_PAYMENT_NOT_FOUND": "Plata nu a fost găsită",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "Abonament PyCafé™",
       "PISHOP": "Abonament PyShop™",
+      "PISHOP_SUBSCR": "Abonament PyShop™",
       "TRANSLATE": "Abonament PyTranslate™"
     },
     "renewBtn": "Reînnoire/Modificare",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "Abonamentul {product} a început!",
     "tagline": "Abonament = Pachet de scutire de taxe per tranzacție. Cu cât utilizați mai mult, cu atât economisiți mai mult!",
     "title": "Abonament Cafe.pi"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (Operator)",
+      "PICAFE_SUBSCR": "Abonament PyCafé™",
+      "TRANSLATE_SUBSCR": "Abonament PyTranslate™"
+    }
   },
   "sysUi": {
     "backToOrders": "Înapoi la comenzi",

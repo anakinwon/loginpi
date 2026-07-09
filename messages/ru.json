@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "сек."
     },
+    "labels": {
+      "noName": "(Без имени)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ Показатель полярной звезды",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "Невозможно удалить, так как существуют дочерние категории",
     "ADM_CTGR_NAME_REQUIRED": "Название категории обязательно",
     "ADM_CTGR_NOT_FOUND": "Категория не найдена",
+    "ADM_DB_API_MISSING": "Токен API Vercel/ID проекта/Deploy Hook не настроен",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "Переменные среды были изменены, но повторное развертывание не удалось. Проверьте статус на экране развертывания.",
+    "ADM_DB_ENV_UPDATE_FAILED": "Сбой изменения env Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "Переключение возможно только в промежуточной среде (рабочий WAS неизменен)",
+    "ADM_DB_PROD_RO_MISSING": "Рабочая БД (prod-ro) учетные данные только для чтения (PROD_RO_SUPABASE_URL/KEY) не настроены — заблокировано для предотвращения ошибок записи",
     "ADM_DB_TARGET_INVALID": "target должен быть 'staging' или 'prod-ro'",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN не настроен",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "Не удалось получить master SHA",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "Нет коммитов для продвижения (уже актуально)",
+    "ADM_DEPLOY_PROD_DIVERGED": "production опережает master на {n} коммитов (расхождение) — быстрое продвижение невозможно",
+    "ADM_DEPLOY_PROMOTE_FAILED": "Сбой продвижения GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK не настроен",
     "ADM_DEPLOY_TARGET_INVALID": "target должен быть 'staging' или 'production'",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km должно быть целым числом от 0 до 200",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url не является действительным URL-адресом",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url допускает только URL-адреса http(s)",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "Не удалось обработать выпуск",
     "ADM_MINT_REASON_REQUIRED": "Причина выпуска (reason) обязательна",
     "ADM_NO_FIELDS_TO_UPDATE": "Нет полей для обновления",
+    "ADM_OPS_UNKNOWN": "Неизвестная ошибка ({detail})",
     "ADM_ORDERS_FAILED": "Не удалось получить заказы",
     "ADM_PAGEVIEWS_FAILED": "Не удалось получить веб-трафик",
     "ADM_PAYMENT_NOT_FOUND": "Платеж не найден",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "Подписка PyCafe",
       "PISHOP": "Подписка PyShop",
+      "PISHOP_SUBSCR": "PyShop™ подписка",
       "TRANSLATE": "Подписка на автоматический перевод"
     },
     "renewBtn": "Продлить/Изменить",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "Подписка на {product} активирована!",
     "tagline": "Подписка = пакет без комиссии за транзакцию. Чем больше используете, тем выгоднее!",
     "title": "Подписка на Cafe.pi"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (Оператор)",
+      "PICAFE_SUBSCR": "PyCafé™ подписка",
+      "TRANSLATE_SUBSCR": "PyTranslate™ подписка"
+    }
   },
   "sysUi": {
     "backToOrders": "К истории покупок",

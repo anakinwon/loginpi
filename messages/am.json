@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "վրկ"
     },
+    "labels": {
+      "noName": "(Անուն չկա)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ Բևեռային աստղի ցուցանիշ",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "Հնարավոր չէ ջնջել, քանի որ ունի ենթակատեգորիաներ",
     "ADM_CTGR_NAME_REQUIRED": "Կատեգորիայի անունը պարտադիր է",
     "ADM_CTGR_NOT_FOUND": "Կատեգորիան չի գտնվել",
+    "ADM_DB_API_MISSING": "Vercel API թոքենը/նախագծի ID-ն/Deploy Hook-ը սահմանված չէ",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "Միջավայրի փոփոխությունները կատարվել են, սակայն վերատեղակայումը ձախողվել է։ Ստուգեք կարգավիճակը տեղակայման էկրանին։",
+    "ADM_DB_ENV_UPDATE_FAILED": "Միջավայրի փոփոխությունը ձախողվեց Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "Փոխարկումը հնարավոր է միայն staging միջավայրում (արտադրական WAS-ը անփոփոխ է)",
+    "ADM_DB_PROD_RO_MISSING": "Արտադրական DB-ի (prod-ro) միայն ընթերցման հավատարմագրերը (PROD_RO_SUPABASE_URL/KEY) սահմանված չեն — արգելափակված է գրելու դեպքերը կանխելու համար",
     "ADM_DB_TARGET_INVALID": "target-ը 'staging' կամ 'prod-ro' է",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN-ը սահմանված չէ",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "master SHA-ի որոնումը ձախողվեց",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "Առաջխաղացման ենթակա կոմիտ չկա (արդեն վերջինն է)",
+    "ADM_DEPLOY_PROD_DIVERGED": "production-ը master-ից {n} կոմիտով առաջ է (տարբերվում է) — fast-forward հնարավոր չէ",
+    "ADM_DEPLOY_PROMOTE_FAILED": "Առաջխաղացումը ձախողվեց GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK-ը սահմանված չէ",
     "ADM_DEPLOY_TARGET_INVALID": "target-ը 'staging' կամ 'production' է",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km-ը պետք է լինի 0-ից 200 միջակայքի ամբողջ թիվ",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url-ը վավեր URL չէ",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url-ը թույլատրում է միայն http(s) URL-ներ",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "Թողարկման մշակումը ձախողվեց",
     "ADM_MINT_REASON_REQUIRED": "Թողարկման պատճառը (reason) պարտադիր է",
     "ADM_NO_FIELDS_TO_UPDATE": "Թարմացնելու դաշտեր չկան",
+    "ADM_OPS_UNKNOWN": "Անհայտ սխալ ({detail})",
     "ADM_ORDERS_FAILED": "Պատվերների ստացումը ձախողվեց",
     "ADM_PAGEVIEWS_FAILED": "Վեբ տրաֆիկի ստացումը ձախողվեց",
     "ADM_PAYMENT_NOT_FOUND": "Վճարումը չի գտնվել",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "PyCafé™ բաժանորդագրություն",
       "PISHOP": "PyShop™ բաժանորդագրություն",
+      "PISHOP_SUBSCR": "PyShop™ բաժանորդագրություն",
       "TRANSLATE": "PyTranslate™ բաժանորդագրություն"
     },
     "renewBtn": "Երկարաձգել/Փոխել",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "{product} բաժանորդագրությունը սկսվել է:",
     "tagline": "Բաժանորդագրություն = Փաթեթ՝ առանց մեկանգամյա վճարների: Որքան շատ օգտագործեք, այնքան շատ կշահեք:",
     "title": "Cafe.pi բաժանորդագրություն"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (Օպերատոր)",
+      "PICAFE_SUBSCR": "PyCafé™ բաժանորդագրություն",
+      "TRANSLATE_SUBSCR": "PyTranslate™ բաժանորդագրություն"
+    }
   },
   "sysUi": {
     "backToOrders": "Վերադառնալ պատվերներին",

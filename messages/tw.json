@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "秒"
     },
+    "labels": {
+      "noName": "(無名稱)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ 北極星指標",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "有子類別，無法刪除",
     "ADM_CTGR_NAME_REQUIRED": "類別名稱為必填",
     "ADM_CTGR_NOT_FOUND": "找不到類別",
+    "ADM_DB_API_MISSING": "Vercel API 權杖/專案 ID/Deploy Hook 未設定",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "環境變數已變更，但重新部署失敗。請在部署畫面中確認狀態。",
+    "ADM_DB_ENV_UPDATE_FAILED": "環境變數變更失敗 Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "僅能在預備環境中切換 (生產 WAS 不變)",
+    "ADM_DB_PROD_RO_MISSING": "生產資料庫 (prod-ro) 唯讀憑證 (PROD_RO_SUPABASE_URL/KEY) 未設定 — 為防止寫入事故而阻擋",
     "ADM_DB_TARGET_INVALID": "target 必須是 'staging' 或 'prod-ro'",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN 未設定",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "master SHA 查詢失敗",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "無可晉升的提交 (已是最新版本)",
+    "ADM_DEPLOY_PROD_DIVERGED": "production 比 master 超前 {n} 個提交 (已分歧) — 無法快進",
+    "ADM_DEPLOY_PROMOTE_FAILED": "晉升失敗 GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK 未設定",
     "ADM_DEPLOY_TARGET_INVALID": "target 必須是 'staging' 或 'production'",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km 必須是 0 到 200 之間的整數",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url 不是有效的 URL",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url 僅允許 http(s) URL",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "發行處理失敗",
     "ADM_MINT_REASON_REQUIRED": "發行原因 (reason) 為必填",
     "ADM_NO_FIELDS_TO_UPDATE": "沒有可更新的欄位",
+    "ADM_OPS_UNKNOWN": "未知錯誤 ({detail})",
     "ADM_ORDERS_FAILED": "訂單查詢失敗",
     "ADM_PAGEVIEWS_FAILED": "網站流量查詢失敗",
     "ADM_PAYMENT_NOT_FOUND": "找不到付款",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "PyCafé™ 訂閱",
       "PISHOP": "PyShop™ 訂閱",
+      "PISHOP_SUBSCR": "PyShop™ 訂閱",
       "TRANSLATE": "PyTranslate™ 訂閱"
     },
     "renewBtn": "續訂/變更",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "{product} 訂閱已開始！",
     "tagline": "訂閱 = 免除單次費用方案。用得越多，越划算！",
     "title": "Cafe.pi 訂閱"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (營運者)",
+      "PICAFE_SUBSCR": "PyCafé™ 訂閱",
+      "TRANSLATE_SUBSCR": "PyTranslate™ 訂閱"
+    }
   },
   "sysUi": {
     "backToOrders": "返回購買記錄",

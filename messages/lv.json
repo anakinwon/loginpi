@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "sek."
     },
+    "labels": {
+      "noName": "(Bez nosaukuma)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ Ziemeļzvaigznes rādītājs",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "Nevar dzēst, jo ir apakškategorijas",
     "ADM_CTGR_NAME_REQUIRED": "Kategorijas nosaukums ir obligāts",
     "ADM_CTGR_NOT_FOUND": "Kategorija nav atrasta",
+    "ADM_DB_API_MISSING": "Vercel API marķieris/projekta ID/Deploy Hook nav iestatīts",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "Vides mainīgie ir mainīti, taču atkārtota izvietošana neizdevās. Pārbaudiet statusu izvietošanas ekrānā.",
+    "ADM_DB_ENV_UPDATE_FAILED": "Vides mainīgo maiņa neizdevās Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "Var pārslēgt tikai staging vidē (production WAS nemainīgs)",
+    "ADM_DB_PROD_RO_MISSING": "Production DB (prod-ro) tikai lasīšanas akreditācijas dati (PROD_RO_SUPABASE_URL/KEY) nav iestatīti — bloķēts, lai novērstu rakstīšanas negadījumus",
     "ADM_DB_TARGET_INVALID": "Mērķim jābūt 'staging' vai 'prod-ro'",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN nav iestatīts",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "Neizdevās iegūt master SHA",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "Nav komitu, ko paaugstināt (jau jaunākais)",
+    "ADM_DEPLOY_PROD_DIVERGED": "Production ir {n} komitus priekšā master (atšķīries) — nevar veikt fast-forward",
+    "ADM_DEPLOY_PROMOTE_FAILED": "Paaugstināšana neizdevās GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK nav iestatīts",
     "ADM_DEPLOY_TARGET_INVALID": "Mērķim jābūt 'staging' vai 'production'",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km jābūt veselam skaitlim no 0 līdz 200",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url nav derīgs URL",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url atļauj tikai http(s) URL",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "Izsniegšanas apstrāde neizdevās",
     "ADM_MINT_REASON_REQUIRED": "Izsniegšanas iemesls (reason) ir obligāts",
     "ADM_NO_FIELDS_TO_UPDATE": "Nav lauku, ko atjaunināt",
+    "ADM_OPS_UNKNOWN": "Nezināma kļūda ({detail})",
     "ADM_ORDERS_FAILED": "Pasūtījumu izgūšana neizdevās",
     "ADM_PAGEVIEWS_FAILED": "Tīmekļa trafika izgūšana neizdevās",
     "ADM_PAYMENT_NOT_FOUND": "Maksājums nav atrasts",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "PyCafé™ abonements",
       "PISHOP": "PyShop™ abonements",
+      "PISHOP_SUBSCR": "PyShop™ abonements",
       "TRANSLATE": "PyTranslate™ abonements"
     },
     "renewBtn": "Atjaunot/Mainīt",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "{product} abonements ir sācies!",
     "tagline": "Abonements = pakete ar atbrīvojumu no maksas par katru darījumu. Jo vairāk izmantojat, jo lielāks ieguvums!",
     "title": "Cafe.pi abonements"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (Operators)",
+      "PICAFE_SUBSCR": "PyCafé™ abonements",
+      "TRANSLATE_SUBSCR": "PyTranslate™ abonements"
+    }
   },
   "sysUi": {
     "backToOrders": "Atpakaļ uz pasūtījumiem",

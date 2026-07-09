@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "saat"
     },
+    "labels": {
+      "noName": "(Tiada Nama)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ Metrik North Star",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "Tidak boleh dipadam kerana mempunyai sub-kategori",
     "ADM_CTGR_NAME_REQUIRED": "Nama kategori adalah wajib",
     "ADM_CTGR_NOT_FOUND": "Kategori tidak ditemui",
+    "ADM_DB_API_MISSING": "Token API Vercel/ID Projek/Deploy Hook Tidak Ditetapkan",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "Pemboleh ubah persekitaran telah diubah, tetapi gagal untuk menyebarkan semula. Sila semak status pada skrin penyebaran.",
+    "ADM_DB_ENV_UPDATE_FAILED": "Gagal mengubah env Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "Hanya boleh beralih dalam persekitaran staging (WAS produksi kekal)",
+    "ADM_DB_PROD_RO_MISSING": "Kredensial baca-sahaja DB produksi (prod-ro) (PROD_RO_SUPABASE_URL/KEY) tidak ditetapkan — Disekat untuk mengelakkan insiden penulisan",
     "ADM_DB_TARGET_INVALID": "Sasaran mestilah 'staging' atau 'prod-ro'",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN Tidak Ditetapkan",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "Gagal mendapatkan master SHA",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "Tiada komit untuk dipromosikan (sudah terkini)",
+    "ADM_DEPLOY_PROD_DIVERGED": "production mendahului master sebanyak {n} komit (bercabang) — fast-forward tidak mungkin",
+    "ADM_DEPLOY_PROMOTE_FAILED": "Promosi gagal GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK Tidak Ditetapkan",
     "ADM_DEPLOY_TARGET_INVALID": "Sasaran mestilah 'staging' atau 'production'",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km mestilah integer antara 0 hingga 200",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url bukan URL yang sah",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url hanya membenarkan URL http(s)",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "Gagal memproses terbitan",
     "ADM_MINT_REASON_REQUIRED": "Sebab terbitan (reason) adalah wajib",
     "ADM_NO_FIELDS_TO_UPDATE": "Tiada medan untuk dikemas kini",
+    "ADM_OPS_UNKNOWN": "Ralat tidak diketahui ({detail})",
     "ADM_ORDERS_FAILED": "Gagal mendapatkan pesanan",
     "ADM_PAGEVIEWS_FAILED": "Gagal mendapatkan trafik web",
     "ADM_PAYMENT_NOT_FOUND": "Pembayaran tidak ditemui",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "Langganan PyCafe",
       "PISHOP": "Langganan PyShop",
+      "PISHOP_SUBSCR": "Langganan PyShop™",
       "TRANSLATE": "Langganan Terjemahan Automatik"
     },
     "renewBtn": "Perbaharui/Tukar",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "Langganan {product} anda telah bermula!",
     "tagline": "Langganan = Pakej pengecualian yuran setiap transaksi. Lebih banyak anda gunakan, lebih banyak faedah!",
     "title": "Langganan Cafe.pi"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (Pengendali)",
+      "PICAFE_SUBSCR": "Langganan PyCafé™",
+      "TRANSLATE_SUBSCR": "Langganan PyTranslate™"
+    }
   },
   "sysUi": {
     "backToOrders": "Ke Sejarah Pembelian",

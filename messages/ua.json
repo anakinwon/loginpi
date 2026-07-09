@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "сек"
     },
+    "labels": {
+      "noName": "(Без назви)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ Показник Полярної зірки",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "Не вдалося видалити, оскільки існують підкатегорії",
     "ADM_CTGR_NAME_REQUIRED": "Назва категорії є обов'язковою",
     "ADM_CTGR_NOT_FOUND": "Категорію не знайдено",
+    "ADM_DB_API_MISSING": "Vercel API токен/ID проекту/Deploy Hook не налаштовано",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "Змінні середовища змінено, але повторне розгортання не вдалося. Перевірте статус на екрані розгортання.",
+    "ADM_DB_ENV_UPDATE_FAILED": "Не вдалося змінити env Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "Перемикання можливе лише в середовищі staging (production WAS незмінний)",
+    "ADM_DB_PROD_RO_MISSING": "Облікові дані лише для читання для production DB (prod-ro) (PROD_RO_SUPABASE_URL/KEY) не налаштовано — заблоковано для запобігання інцидентам запису",
     "ADM_DB_TARGET_INVALID": "target має бути 'staging' або 'prod-ro'",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN не налаштовано",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "Не вдалося отримати master SHA",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "Немає комітів для підвищення (вже актуально)",
+    "ADM_DEPLOY_PROD_DIVERGED": "production випереджає master на {n} комітів (розбіжність) — fast-forward неможливий",
+    "ADM_DEPLOY_PROMOTE_FAILED": "Помилка підвищення GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK не налаштовано",
     "ADM_DEPLOY_TARGET_INVALID": "target має бути 'staging' або 'production'",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km має бути цілим числом від 0 до 200",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url не є дійсною URL-адресою",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url дозволяє лише URL-адреси http(s)",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "Не вдалося обробити випуск",
     "ADM_MINT_REASON_REQUIRED": "Причина випуску (reason) є обов'язковою",
     "ADM_NO_FIELDS_TO_UPDATE": "Немає полів для оновлення",
+    "ADM_OPS_UNKNOWN": "Невідома помилка ({detail})",
     "ADM_ORDERS_FAILED": "Не вдалося отримати замовлення",
     "ADM_PAGEVIEWS_FAILED": "Не вдалося отримати веб-трафік",
     "ADM_PAYMENT_NOT_FOUND": "Платіж не знайдено",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "Підписка на PyCafé™",
       "PISHOP": "Підписка на PyShop™",
+      "PISHOP_SUBSCR": "Підписка PyShop™",
       "TRANSLATE": "Підписка на PyTranslate™"
     },
     "renewBtn": "Поновити/Змінити",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "Підписку на {product} активовано!",
     "tagline": "Підписка = пакет без комісії за транзакцію. Чим більше ви використовуєте, тим більше вигода!",
     "title": "Підписка на Cafe.pi"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (Оператор)",
+      "PICAFE_SUBSCR": "Підписка PyCafé™",
+      "TRANSLATE_SUBSCR": "Підписка PyTranslate™"
+    }
   },
   "sysUi": {
     "backToOrders": "До історії покупок",

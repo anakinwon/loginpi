@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "segundo"
     },
+    "labels": {
+      "noName": "(Walang Pangalan)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ North Star Metric",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "Hindi maaaring burahin dahil mayroon itong sub-kategorya",
     "ADM_CTGR_NAME_REQUIRED": "Kailangan ang pangalan ng kategorya",
     "ADM_CTGR_NOT_FOUND": "Hindi mahanap ang kategorya",
+    "ADM_DB_API_MISSING": "Hindi Naitakda ang Vercel API Token/Project ID/Deploy Hook",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "Nabago ang mga environment variable ngunit nabigo ang muling pag-deploy. Suriin ang status sa screen ng deployment.",
+    "ADM_DB_ENV_UPDATE_FAILED": "Nabigo ang pag-update ng env Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "Maaari lamang lumipat sa staging environment (hindi nababago ang production WAS)",
+    "ADM_DB_PROD_RO_MISSING": "Hindi Naitakda ang read-only credentials (PROD_RO_SUPABASE_URL/KEY) ng production DB (prod-ro) — Hinarangan upang maiwasan ang aksidente sa pagsulat",
     "ADM_DB_TARGET_INVALID": "Ang target ay 'staging' o 'prod-ro'",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "Hindi Naitakda ang GITHUB_DEPLOY_TOKEN",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "Nabigo ang pagkuha ng master SHA",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "Walang commit na isusulong (nasa pinakabago na)",
+    "ADM_DEPLOY_PROD_DIVERGED": "Ang production ay {n} commit na nauuna sa master (nagkahiwalay) — hindi maaaring mag-fast-forward",
+    "ADM_DEPLOY_PROMOTE_FAILED": "Nabigo ang pagsusulong GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "Hindi Naitakda ang VERCEL_STAGING_DEPLOY_HOOK",
     "ADM_DEPLOY_TARGET_INVALID": "Ang target ay 'staging' o 'production'",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "Ang max_dist_km ay dapat na integer sa pagitan ng 0 at 200",
     "ADM_EVIDENCE_URL_INVALID": "Hindi balidong URL ang evidence_url",
     "ADM_EVIDENCE_URL_PROTOCOL": "Tanging http(s) URL lang ang pinapayagan para sa evidence_url",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "Nabigo ang pagproseso ng issue",
     "ADM_MINT_REASON_REQUIRED": "Kailangan ang dahilan ng issue (reason)",
     "ADM_NO_FIELDS_TO_UPDATE": "Walang field na babaguhin",
+    "ADM_OPS_UNKNOWN": "Hindi Kilalang Error ({detail})",
     "ADM_ORDERS_FAILED": "Nabigo ang pagkuha ng mga order",
     "ADM_PAGEVIEWS_FAILED": "Nabigo ang pagkuha ng web traffic",
     "ADM_PAYMENT_NOT_FOUND": "Hindi mahanap ang bayad",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "PyCafe Subscription",
       "PISHOP": "Subscription sa PyShop",
+      "PISHOP_SUBSCR": "Subscription sa PyShop™",
       "TRANSLATE": "Automatic Translation Subscription"
     },
     "renewBtn": "I-renew/Baguhin",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "Nagsimula na ang iyong {product} subscription!",
     "tagline": "Subscription = Package na walang bayad per transaction. Mas marami ang gamit, mas malaki ang benepisyo!",
     "title": "Cafe.pi Subscription"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (Operator)",
+      "PICAFE_SUBSCR": "Subscription sa PyCafé™",
+      "TRANSLATE_SUBSCR": "Subscription sa PyTranslate™"
+    }
   },
   "sysUi": {
     "backToOrders": "Bumalik sa Aking Mga Order",

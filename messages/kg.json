@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "секунд"
     },
+    "labels": {
+      "noName": "(Аты жок)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ Түндүк жылдызы метрикасы",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "Төмөнкү категориялары бар болгондуктан, жок кылууга болбойт",
     "ADM_CTGR_NAME_REQUIRED": "Категория аты милдеттүү",
     "ADM_CTGR_NOT_FOUND": "Категория табылган жок",
+    "ADM_DB_API_MISSING": "Vercel API токен/долбоор ID/Deploy Hook орнотулган эмес",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "Чөйрө өзгөрмөлөрү өзгөртүлдү, бирок кайра жайгаштыруу ишке ашкан жок. Жайгаштыруу экранынан абалын текшериңиз.",
+    "ADM_DB_ENV_UPDATE_FAILED": "env өзгөртүү ишке ашкан жок Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "Өткөрүү гана staging чөйрөсүндө мүмкүн (production WAS өзгөрүлбөйт)",
+    "ADM_DB_PROD_RO_MISSING": "Production DB (prod-ro) окуу үчүн гана уруксат маалыматтары (PROD_RO_SUPABASE_URL/KEY) орнотулган эмес — жазуу каталарын алдын алуу үчүн бөгөттөлгөн",
     "ADM_DB_TARGET_INVALID": "target 'staging' же 'prod-ro' болушу керек",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN орнотулган эмес",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "master SHA алуу ишке ашкан жок",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "Көтөрүлө турган коммит жок (буга чейин эң акыркы)",
+    "ADM_DEPLOY_PROD_DIVERGED": "production master'дан {n} коммит алдыда (айырмаланган) — fast-forward мүмкүн эмес",
+    "ADM_DEPLOY_PROMOTE_FAILED": "Көтөрүү ишке ашкан жок GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK орнотулган эмес",
     "ADM_DEPLOY_TARGET_INVALID": "target 'staging' же 'production' болушу керек",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km 0дөн 200гө чейинки бүтүн сан болушу керек",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url жарактуу URL эмес",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url http(s) URL гана уруксат берет",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "Чыгаруу иштетүү ишке ашпады",
     "ADM_MINT_REASON_REQUIRED": "Чыгаруу себеби (reason) милдеттүү",
     "ADM_NO_FIELDS_TO_UPDATE": "Өзгөртүү үчүн талаалар жок",
+    "ADM_OPS_UNKNOWN": "Белгисиз ката ({detail})",
     "ADM_ORDERS_FAILED": "Буйрутмаларды алуу ишке ашпады",
     "ADM_PAGEVIEWS_FAILED": "Веб-трафикти алуу ишке ашпады",
     "ADM_PAYMENT_NOT_FOUND": "Төлөм табылган жок",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "PyCafé™ жазылуу",
       "PISHOP": "PyShop™ жазылуу",
+      "PISHOP_SUBSCR": "PyShop™ жазылуу",
       "TRANSLATE": "PyTranslate™ жазылуу"
     },
     "renewBtn": "Жаңыртуу/Өзгөртүү",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "{product} жазылуусу башталды!",
     "tagline": "Жазылуу = ар бир транзакция үчүн төлөмдөн бошотуу пакети. Канчалык көп колдонсоңуз, ошончолук пайдалуу!",
     "title": "Cafe.pi жазылуу"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (оператор)",
+      "PICAFE_SUBSCR": "PyCafé™ жазылуу",
+      "TRANSLATE_SUBSCR": "PyTranslate™ жазылуу"
+    }
   },
   "sysUi": {
     "backToOrders": "Сатып алуу тарыхына кайтуу",

@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "שניות"
     },
+    "labels": {
+      "noName": "(ללא שם)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ מדד כוכב הצפון",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "לא ניתן למחוק מכיוון שיש קטגוריות משנה",
     "ADM_CTGR_NAME_REQUIRED": "שם הקטגוריה נדרש",
     "ADM_CTGR_NOT_FOUND": "הקטגוריה לא נמצאה",
+    "ADM_DB_API_MISSING": "Vercel API Token/Project ID/Deploy Hook לא מוגדר",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "משתני הסביבה עודכנו, אך הפריסה מחדש נכשלה. אנא בדוק את הסטטוס במסך הפריסה.",
+    "ADM_DB_ENV_UPDATE_FAILED": "כשל בעדכון env Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "ניתן לעבור רק בסביבת staging (WAS של production קבוע)",
+    "ADM_DB_PROD_RO_MISSING": "אישורי קריאה בלבד עבור DB של production (prod-ro) (PROD_RO_SUPABASE_URL/KEY) לא מוגדרים — נחסם כדי למנוע תקלות כתיבה",
     "ADM_DB_TARGET_INVALID": "היעד חייב להיות 'staging' או 'prod-ro'",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN לא מוגדר",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "כשל באחזור master SHA",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "אין קומיטים לקידום (כבר מעודכן)",
+    "ADM_DEPLOY_PROD_DIVERGED": "production מקדים את master ב-{n} קומיטים (התפצלות) — לא ניתן לבצע fast-forward",
+    "ADM_DEPLOY_PROMOTE_FAILED": "כשל בקידום GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK לא מוגדר",
     "ADM_DEPLOY_TARGET_INVALID": "היעד חייב להיות 'staging' או 'production'",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km חייב להיות מספר שלם בין 0 ל-200",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url אינו כתובת URL חוקית",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url מאפשר רק כתובות URL מסוג http(s)",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "עיבוד ההנפקה נכשל",
     "ADM_MINT_REASON_REQUIRED": "סיבת ההנפקה (reason) נדרשת",
     "ADM_NO_FIELDS_TO_UPDATE": "אין שדות לעדכון",
+    "ADM_OPS_UNKNOWN": "שגיאה לא ידועה ({detail})",
     "ADM_ORDERS_FAILED": "אחזור הזמנות נכשל",
     "ADM_PAGEVIEWS_FAILED": "אחזור תנועת אתר נכשל",
     "ADM_PAYMENT_NOT_FOUND": "התשלום לא נמצא",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "מנוי PyCafe",
       "PISHOP": "מינוי PyShop",
+      "PISHOP_SUBSCR": "מנוי PyShop™",
       "TRANSLATE": "מנוי תרגום אוטומטי"
     },
     "renewBtn": "חדש/שנה",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "המנוי ל-{product} החל בהצלחה!",
     "tagline": "מנוי = חבילת פטור מתשלום לפי שימוש. ככל שתשתמש יותר, כך תרוויח יותר!",
     "title": "מנוי ל-Cafe.pi"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (מפעיל)",
+      "PICAFE_SUBSCR": "מנוי PyCafé™",
+      "TRANSLATE_SUBSCR": "מנוי PyTranslate™"
+    }
   },
   "sysUi": {
     "backToOrders": "חזור להזמנות",

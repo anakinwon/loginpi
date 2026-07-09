@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "秒"
     },
+    "labels": {
+      "noName": "(无名称)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ 北极星指标",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "存在子类别，无法删除",
     "ADM_CTGR_NAME_REQUIRED": "类别名称是必填项",
     "ADM_CTGR_NOT_FOUND": "找不到类别",
+    "ADM_DB_API_MISSING": "Vercel API 令牌/项目ID/部署 Hook 未设置",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "环境变量已更改，但重新部署失败。请在部署页面查看状态。",
+    "ADM_DB_ENV_UPDATE_FAILED": "env 更改失败 Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "只能在暂存环境切换（生产 WAS 不变）",
+    "ADM_DB_PROD_RO_MISSING": "生产DB(prod-ro) 只读凭证(PROD_RO_SUPABASE_URL/KEY) 未设置 — 为防止写入事故已阻止",
     "ADM_DB_TARGET_INVALID": "target 必须是 'staging' 或 'prod-ro'",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN 未设置",
+    "ADM_DEPLOY_HOOK_STATUS": "部署 Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "master SHA 查询失败",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "没有可提升的提交（已是最新）",
+    "ADM_DEPLOY_PROD_DIVERGED": "production 比 master 超前 {n} 次提交（已分叉）— 无法快进",
+    "ADM_DEPLOY_PROMOTE_FAILED": "提升失败 GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK 未设置",
     "ADM_DEPLOY_TARGET_INVALID": "target 必须是 'staging' 或 'production'",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km 必须是 0 到 200 之间的整数",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url 不是有效的 URL",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url 仅允许 http(s) URL",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "发行处理失败",
     "ADM_MINT_REASON_REQUIRED": "发行理由 (reason) 是必填项",
     "ADM_NO_FIELDS_TO_UPDATE": "没有要更新的字段",
+    "ADM_OPS_UNKNOWN": "未知错误 ({detail})",
     "ADM_ORDERS_FAILED": "订单查询失败",
     "ADM_PAGEVIEWS_FAILED": "网页流量查询失败",
     "ADM_PAYMENT_NOT_FOUND": "找不到支付",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "PyCafe 订阅",
       "PISHOP": "PyShop 订阅",
+      "PISHOP_SUBSCR": "PyShop™ 订阅",
       "TRANSLATE": "自动翻译订阅"
     },
     "renewBtn": "续订/更改",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "{product} 订阅已开始！",
     "tagline": "订阅 = 按次计费免除套餐。用得越多越划算！",
     "title": "Cafe.pi 订阅"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (运营者)",
+      "PICAFE_SUBSCR": "PyCafé™ 订阅",
+      "TRANSLATE_SUBSCR": "PyTranslate™ 订阅"
+    }
   },
   "sysUi": {
     "backToOrders": "返回购买记录",

@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "စက္ကန့်"
     },
+    "labels": {
+      "noName": "(အမည်မရှိ)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ North Star Metric",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "အောက်ခံအမျိုးအစားများ ရှိနေသောကြောင့် ဖျက်၍မရပါ",
     "ADM_CTGR_NAME_REQUIRED": "အမျိုးအစားအမည်သည် မဖြစ်မနေလိုအပ်သည်",
     "ADM_CTGR_NOT_FOUND": "အမျိုးအစားကို ရှာမတွေ့ပါ",
+    "ADM_DB_API_MISSING": "Vercel API Token/Project ID/Deploy Hook သတ်မှတ်မထားပါ",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "ပတ်ဝန်းကျင် variable များ ပြောင်းလဲပြီးသော်လည်း ပြန်လည် deploy လုပ်ခြင်း မအောင်မြင်ပါ။ deploy မျက်နှာပြင်တွင် အခြေအနေကို စစ်ဆေးပါ။",
+    "ADM_DB_ENV_UPDATE_FAILED": "env ပြောင်းလဲမှု မအောင်မြင်ပါ Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "staging ပတ်ဝန်းကျင်တွင်သာ ပြောင်းလဲနိုင်သည် (production WAS မပြောင်းလဲနိုင်ပါ)",
+    "ADM_DB_PROD_RO_MISSING": "production DB (prod-ro) ဖတ်ရန်သာ အထောက်အထားများ (PROD_RO_SUPABASE_URL/KEY) သတ်မှတ်မထားပါ — ရေးသားမှု အမှားအယွင်းများ ကာကွယ်ရန် ပိတ်ဆို့ထားသည်",
     "ADM_DB_TARGET_INVALID": "ပစ်မှတ်သည် 'staging' သို့မဟုတ် 'prod-ro' ဖြစ်ရပါမည်",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN ပျောက်ဆုံးနေသည်",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "master SHA ရှာဖွေမှု မအောင်မြင်ပါ",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "မြှင့်တင်ရန် commit မရှိပါ (နောက်ဆုံးပေါ်ဖြစ်နေပါပြီ)",
+    "ADM_DEPLOY_PROD_DIVERGED": "production သည် master ထက် {n} commit ရှေ့ရောက်နေသည် (ကွဲထွက်နေသည်) — fast-forward မဖြစ်နိုင်ပါ",
+    "ADM_DEPLOY_PROMOTE_FAILED": "မြှင့်တင်မှု မအောင်မြင်ပါ GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK ပျောက်ဆုံးနေသည်",
     "ADM_DEPLOY_TARGET_INVALID": "ပစ်မှတ်သည် 'staging' သို့မဟုတ် 'production' ဖြစ်ရပါမည်",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km သည် 0 မှ 200 အတွင်း ဂဏန်းပြည့် ဖြစ်ရပါမည်",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url သည် ခွင့်မပြုသော URL ဖြစ်သည်",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url သည် http(s) URL ကိုသာ ခွင့်ပြုသည်",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "ထုတ်ပေးခြင်း လုပ်ဆောင်ချက် မအောင်မြင်ပါ",
     "ADM_MINT_REASON_REQUIRED": "ထုတ်ပေးရခြင်းအကြောင်းရင်း (reason) သည် မဖြစ်မနေလိုအပ်သည်",
     "ADM_NO_FIELDS_TO_UPDATE": "ပြောင်းလဲရန် အကွက်မရှိပါ",
+    "ADM_OPS_UNKNOWN": "မသိရှိရသော အမှား ({detail})",
     "ADM_ORDERS_FAILED": "အော်ဒါများကို ရယူရန် မအောင်မြင်ပါ",
     "ADM_PAGEVIEWS_FAILED": "ဝဘ်အသွားအလာကို ရယူရန် မအောင်မြင်ပါ",
     "ADM_PAYMENT_NOT_FOUND": "ငွေပေးချေမှုကို ရှာမတွေ့ပါ",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "PyCafé™ စာရင်းသွင်းခြင်း",
       "PISHOP": "PyShop™ စာရင်းသွင်းခြင်း",
+      "PISHOP_SUBSCR": "PyShop™ စာရင်းသွင်းခြင်း",
       "TRANSLATE": "PyTranslate™ စာရင်းသွင်းခြင်း"
     },
     "renewBtn": "သက်တမ်းတိုးရန်/ပြောင်းလဲရန်",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "{product} စာရင်းသွင်းခြင်း စတင်ပါပြီ!",
     "tagline": "စာရင်းသွင်းခြင်း = တစ်ကြိမ်ချင်းစီအတွက် အခကြေးငွေ ကင်းလွတ်ခွင့် ပက်ကေ့ချ်။ ပိုမိုအသုံးပြုလေ ပိုမိုအကျိုးရှိလေ!",
     "title": "Cafe.pi စာရင်းသွင်းခြင်း"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (အော်ပရေတာ)",
+      "PICAFE_SUBSCR": "PyCafé™ စာရင်းသွင်းခြင်း",
+      "TRANSLATE_SUBSCR": "PyTranslate™ စာရင်းသွင်းခြင်း"
+    }
   },
   "sysUi": {
     "backToOrders": "ဝယ်ယူမှုမှတ်တမ်းသို့",

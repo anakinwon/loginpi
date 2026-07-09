@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "វិនាទី"
     },
+    "labels": {
+      "noName": "(គ្មានឈ្មោះ)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ សូចនាករ North Star",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "មិនអាចលុបបានទេ ដោយសារមានប្រភេទរង",
     "ADM_CTGR_NAME_REQUIRED": "ឈ្មោះប្រភេទគឺចាំបាច់",
     "ADM_CTGR_NOT_FOUND": "រកមិនឃើញប្រភេទទេ",
+    "ADM_DB_API_MISSING": "Vercel API Token/Project ID/Deploy Hook មិនបានកំណត់",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "អថេរបរិស្ថានត្រូវបានផ្លាស់ប្តូរហើយ ប៉ុន្តែការដាក់ពង្រាយឡើងវិញបានបរាជ័យ។ សូមពិនិត្យមើលស្ថានភាពនៅលើអេក្រង់ដាក់ពង្រាយ។",
+    "ADM_DB_ENV_UPDATE_FAILED": "បរាជ័យក្នុងការផ្លាស់ប្តូរ env Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "អាចប្តូរបានតែនៅក្នុងបរិស្ថាន staging ប៉ុណ្ណោះ (WAS ផលិតកម្មមិនអាចផ្លាស់ប្តូរបាន)",
+    "ADM_DB_PROD_RO_MISSING": "DB ផលិតកម្ម (prod-ro) ព័ត៌មានសម្គាល់អានតែប៉ុណ្ណោះ (PROD_RO_SUPABASE_URL/KEY) មិនបានកំណត់ — រារាំងដើម្បីការពារកំហុសក្នុងការសរសេរ",
     "ADM_DB_TARGET_INVALID": "target គឺ 'staging' ឬ 'prod-ro'",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN មិនបានកំណត់",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "បរាជ័យក្នុងការស្វែងរក master SHA",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "គ្មាន commit សម្រាប់ promote (ថ្មីបំផុតរួចហើយ)",
+    "ADM_DEPLOY_PROD_DIVERGED": "production នាំមុខ master {n} commit (បែកចេញ) — មិនអាច fast-forward បាន",
+    "ADM_DEPLOY_PROMOTE_FAILED": "បរាជ័យក្នុងការ promote GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK មិនបានកំណត់",
     "ADM_DEPLOY_TARGET_INVALID": "target គឺ 'staging' ឬ 'production'",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km ត្រូវតែជាចំនួនគត់ចន្លោះពី 0 ដល់ 200",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url មិនមែនជា URL ត្រឹមត្រូវទេ",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url អនុញ្ញាតតែ URL http(s) ប៉ុណ្ណោះ",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "បរាជ័យក្នុងការដំណើរការចេញ",
     "ADM_MINT_REASON_REQUIRED": "មូលហេតុនៃការចេញ (reason) គឺចាំបាច់",
     "ADM_NO_FIELDS_TO_UPDATE": "គ្មានវាលសម្រាប់អាប់ដេតទេ",
+    "ADM_OPS_UNKNOWN": "កំហុសមិនស្គាល់ ({detail})",
     "ADM_ORDERS_FAILED": "បរាជ័យក្នុងការទាញយកការបញ្ជាទិញ",
     "ADM_PAGEVIEWS_FAILED": "បរាជ័យក្នុងការទាញយកចរាចរណ៍គេហទំព័រ",
     "ADM_PAYMENT_NOT_FOUND": "រកមិនឃើញការទូទាត់ទេ",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "ជាវ PyCafé™",
       "PISHOP": "ជាវ PyShop™",
+      "PISHOP_SUBSCR": "PyShop™ ការជាវ",
       "TRANSLATE": "ជាវ PyTranslate™"
     },
     "renewBtn": "បន្ត/ផ្លាស់ប្តូរ",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "ការជាវ {product} បានចាប់ផ្តើមហើយ!",
     "tagline": "ការជាវ = កញ្ចប់លើកលែងថ្លៃសេវាប្រចាំប្រតិបត្តិការ។ កាន់តែប្រើច្រើន កាន់តែចំណេញ!",
     "title": "ជាវ Cafe.pi"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (ប្រតិបត្តិករ)",
+      "PICAFE_SUBSCR": "PyCafé™ ការជាវ",
+      "TRANSLATE_SUBSCR": "PyTranslate™ ការជាវ"
+    }
   },
   "sysUi": {
     "backToOrders": "ត្រឡប់ទៅប្រវត្តិទិញ",

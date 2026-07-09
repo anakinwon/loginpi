@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "mp"
     },
+    "labels": {
+      "noName": "(Nincs név)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ Északi csillag mutató",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "Nem törölhető, mert alkategóriái vannak",
     "ADM_CTGR_NAME_REQUIRED": "A kategória neve kötelező",
     "ADM_CTGR_NOT_FOUND": "A kategória nem található",
+    "ADM_DB_API_MISSING": "Vercel API token/projektazonosító/Deploy Hook nincs beállítva",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "A környezeti változók megváltoztak, de az újratelepítés sikertelen volt. Ellenőrizze az állapotot a telepítési képernyőn.",
+    "ADM_DB_ENV_UPDATE_FAILED": "Környezeti változó módosítása sikertelen Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "Csak staging környezetben váltható (a production WAS változatlan)",
+    "ADM_DB_PROD_RO_MISSING": "Production DB (prod-ro) csak olvasható hitelesítő adatok (PROD_RO_SUPABASE_URL/KEY) nincsenek beállítva — írási hibák megelőzése érdekében blokkolva",
     "ADM_DB_TARGET_INVALID": "A target 'staging' vagy 'prod-ro'",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN nincs beállítva",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "Master SHA lekérdezés sikertelen",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "Nincs előléptethető commit (már a legfrissebb)",
+    "ADM_DEPLOY_PROD_DIVERGED": "A production {n} commit-tel előrébb van a masterhez képest (elágazott) — fast-forward nem lehetséges",
+    "ADM_DEPLOY_PROMOTE_FAILED": "Előléptetés sikertelen GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK nincs beállítva",
     "ADM_DEPLOY_TARGET_INVALID": "A target 'staging' vagy 'production'",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "A max_dist_km-nek 0 és 200 közötti egész számnak kell lennie",
     "ADM_EVIDENCE_URL_INVALID": "Az evidence_url nem érvényes URL",
     "ADM_EVIDENCE_URL_PROTOCOL": "Az evidence_url csak http(s) URL-eket engedélyez",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "Kibocsátás feldolgozása sikertelen",
     "ADM_MINT_REASON_REQUIRED": "A kibocsátás oka (reason) kötelező",
     "ADM_NO_FIELDS_TO_UPDATE": "Nincs frissíthető mező",
+    "ADM_OPS_UNKNOWN": "Ismeretlen hiba ({detail})",
     "ADM_ORDERS_FAILED": "Rendelések lekérése sikertelen",
     "ADM_PAGEVIEWS_FAILED": "Webes forgalom lekérése sikertelen",
     "ADM_PAYMENT_NOT_FOUND": "A fizetés nem található",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "PyCafé™ előfizetés",
       "PISHOP": "PyShop™ előfizetés",
+      "PISHOP_SUBSCR": "PyShop™ előfizetés",
       "TRANSLATE": "PyTranslate™ előfizetés"
     },
     "renewBtn": "Megújítás/Módosítás",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "{product} előfizetése elindult!",
     "tagline": "Előfizetés = díjmentes csomag tranzakciónként. Minél többet használja, annál jobban megéri!",
     "title": "Cafe.pi előfizetés"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (operátor)",
+      "PICAFE_SUBSCR": "PyCafé™ előfizetés",
+      "TRANSLATE_SUBSCR": "PyTranslate™ előfizetés"
+    }
   },
   "sysUi": {
     "backToOrders": "Vissza a rendelésekhez",

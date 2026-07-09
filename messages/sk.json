@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "sekúnd"
     },
+    "labels": {
+      "noName": "(bez mena)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ Metrika Severnej hviezdy",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "Kategóriu nemožno odstrániť, pretože má podkategórie",
     "ADM_CTGR_NAME_REQUIRED": "Názov kategórie je povinný",
     "ADM_CTGR_NOT_FOUND": "Kategória nebola nájdená",
+    "ADM_DB_API_MISSING": "Vercel API token/ID projektu/Deploy Hook nenastavený",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "Premenné prostredia boli zmenené, ale opätovné nasadenie zlyhalo. Skontrolujte stav na obrazovke nasadenia.",
+    "ADM_DB_ENV_UPDATE_FAILED": "Zlyhala zmena env Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "Prepnutie je možné iba v staging prostredí (produkčný WAS je nemenný)",
+    "ADM_DB_PROD_RO_MISSING": "Poverenia pre databázu len na čítanie (prod-ro) (PROD_RO_SUPABASE_URL/KEY) pre produkčnú DB nie sú nastavené — zablokované, aby sa predišlo nehodám pri zápise",
     "ADM_DB_TARGET_INVALID": "Cieľ musí byť 'staging' alebo 'prod-ro'",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN nenastavený",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "Zlyhalo získanie master SHA",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "Žiadne commity na povýšenie (už je najnovšie)",
+    "ADM_DEPLOY_PROD_DIVERGED": "production je o {n} commitov pred masterom (rozvetvené) — fast-forward nie je možné",
+    "ADM_DEPLOY_PROMOTE_FAILED": "Povýšenie zlyhalo GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK nenastavený",
     "ADM_DEPLOY_TARGET_INVALID": "Cieľ musí byť 'staging' alebo 'production'",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km musí byť celé číslo medzi 0 a 200",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url nie je platná URL",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url povoľuje iba http(s) URL",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "Zlyhalo spracovanie vydania",
     "ADM_MINT_REASON_REQUIRED": "Dôvod vydania (reason) je povinný",
     "ADM_NO_FIELDS_TO_UPDATE": "Žiadne polia na aktualizáciu",
+    "ADM_OPS_UNKNOWN": "Neznáma chyba ({detail})",
     "ADM_ORDERS_FAILED": "Zlyhalo načítanie objednávok",
     "ADM_PAGEVIEWS_FAILED": "Zlyhalo načítanie webovej návštevnosti",
     "ADM_PAYMENT_NOT_FOUND": "Platba nebola nájdená",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "Predplatné PyCafé™",
       "PISHOP": "Predplatné PyShop™",
+      "PISHOP_SUBSCR": "PyShop™ predplatné",
       "TRANSLATE": "Predplatné PyTranslate™"
     },
     "renewBtn": "Obnoviť/Zmeniť",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "Predplatné {product} bolo spustené!",
     "tagline": "Predplatné = balík s oslobodením od poplatkov za transakciu. Čím viac používate, tým viac ušetríte!",
     "title": "Predplatné Cafe.pi"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (operátor)",
+      "PICAFE_SUBSCR": "PyCafé™ predplatné",
+      "TRANSLATE_SUBSCR": "PyTranslate™ predplatné"
+    }
   },
   "sysUi": {
     "backToOrders": "Späť na objednávky",

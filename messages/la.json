@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "ວິນາທີ"
     },
+    "labels": {
+      "noName": "(ບໍ່ມີຊື່)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ ຕົວຊີ້ວັດດາວເໜືອ",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "ບໍ່ສາມາດລຶບໄດ້ເນື່ອງຈາກມີໝວດໝູ່ຍ່ອຍ",
     "ADM_CTGR_NAME_REQUIRED": "ຊື່ໝວດໝູ່ແມ່ນຈຳເປັນ",
     "ADM_CTGR_NOT_FOUND": "ບໍ່ພົບໝວດໝູ່",
+    "ADM_DB_API_MISSING": "Vercel API Token/Project ID/Deploy Hook ບໍ່ໄດ້ຕັ້ງຄ່າ",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "ຕົວແປສະພາບແວດລ້ອມໄດ້ຖືກປ່ຽນແປງແລ້ວ, ແຕ່ການນຳໃຊ້ຄືນໃໝ່ລົ້ມເຫຼວ. ກະລຸນາກວດສອບສະຖານະໃນໜ້າຈໍການນຳໃຊ້.",
+    "ADM_DB_ENV_UPDATE_FAILED": "ການປ່ຽນແປງ env ລົ້ມເຫຼວ Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "ສາມາດປ່ຽນໄດ້ສະເພາະໃນສະພາບແວດລ້ອມ staging ເທົ່ານັ້ນ (WAS ຂອງການຜະລິດບໍ່ປ່ຽນແປງ)",
+    "ADM_DB_PROD_RO_MISSING": "ຂໍ້ມູນປະຈຳຕົວແບບອ່ານຢ່າງດຽວຂອງຖານຂໍ້ມູນການຜະລິດ (prod-ro) (PROD_RO_SUPABASE_URL/KEY) ບໍ່ໄດ້ຕັ້ງຄ່າ — ຖືກບລັອກເພື່ອປ້ອງກັນການຂຽນຜິດພາດ",
     "ADM_DB_TARGET_INVALID": "target ຕ້ອງເປັນ 'staging' ຫຼື 'prod-ro'",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN ບໍ່ໄດ້ຕັ້ງຄ່າ",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "ລົ້ມເຫຼວໃນການດຶງຂໍ້ມູນ master SHA",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "ບໍ່ມີຄອມມິດທີ່ຈະເລື່ອນຂັ້ນ (ລ່າສຸດແລ້ວ)",
+    "ADM_DEPLOY_PROD_DIVERGED": "production ລໍ້າໜ້າ master {n} ຄອມມິດ (ແຍກອອກ) — ບໍ່ສາມາດ fast-forward ໄດ້",
+    "ADM_DEPLOY_PROMOTE_FAILED": "ການເລື່ອນຂັ້ນລົ້ມເຫຼວ GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK ບໍ່ໄດ້ຕັ້ງຄ່າ",
     "ADM_DEPLOY_TARGET_INVALID": "target ຕ້ອງເປັນ 'staging' ຫຼື 'production'",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km ຕ້ອງເປັນຈຳນວນເຕັມລະຫວ່າງ 0 ຫາ 200",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url ບໍ່ແມ່ນ URL ທີ່ຖືກຕ້ອງ",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url ອະນຸຍາດສະເພາະ URL http(s) ເທົ່ານັ້ນ",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "ການດຳເນີນການອອກລົ້ມເຫຼວ",
     "ADM_MINT_REASON_REQUIRED": "ເຫດຜົນການອອກ (reason) ແມ່ນຈຳເປັນ",
     "ADM_NO_FIELDS_TO_UPDATE": "ບໍ່ມີຊ່ອງຂໍ້ມູນທີ່ຈະປ່ຽນແປງ",
+    "ADM_OPS_UNKNOWN": "ຂໍ້ຜິດພາດທີ່ບໍ່ຮູ້ຈັກ ({detail})",
     "ADM_ORDERS_FAILED": "ການດຶງຂໍ້ມູນຄຳສັ່ງຊື້ລົ້ມເຫຼວ",
     "ADM_PAGEVIEWS_FAILED": "ການດຶງຂໍ້ມູນການເຂົ້າຊົມເວັບໄຊຕ໌ລົ້ມເຫຼວ",
     "ADM_PAYMENT_NOT_FOUND": "ບໍ່ພົບການຊຳລະເງິນ",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "ການສະໝັກໃຊ້ PyCafé™",
       "PISHOP": "ການສະໝັກໃຊ້ PyShop™",
+      "PISHOP_SUBSCR": "PyShop™ ສະໝັກສະມາຊິກ",
       "TRANSLATE": "ການສະໝັກໃຊ້ PyTranslate™"
     },
     "renewBtn": "ຕໍ່ອາຍຸ/ປ່ຽນແປງ",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "ການສະໝັກໃຊ້ {product} ໄດ້ເລີ່ມຕົ້ນແລ້ວ!",
     "tagline": "ການສະໝັກໃຊ້ = ແພັກເກັດຍົກເວັ້ນຄ່າທຳນຽມຕໍ່ລາຍການ. ຍິ່ງໃຊ້ຫຼາຍຍິ່ງໄດ້ປະໂຫຍດ!",
     "title": "ການສະໝັກໃຊ້ Cafe.pi"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (ຜູ້ດຳເນີນການ)",
+      "PICAFE_SUBSCR": "PyCafé™ ສະໝັກສະມາຊິກ",
+      "TRANSLATE_SUBSCR": "PyTranslate™ ສະໝັກສະມາຊິກ"
+    }
   },
   "sysUi": {
     "backToOrders": "ກັບໄປທີ່ປະຫວັດການຊື້",

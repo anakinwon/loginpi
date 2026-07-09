@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "sekuntia"
     },
+    "labels": {
+      "noName": "(Nimetön)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ Pohjantähti-mittari",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "Alikategorioita on olemassa, joten sitä ei voi poistaa",
     "ADM_CTGR_NAME_REQUIRED": "Kategorian nimi on pakollinen",
     "ADM_CTGR_NOT_FOUND": "Kategoriaa ei löydy",
+    "ADM_DB_API_MISSING": "Vercel API -tunnus/projektitunnus/Deploy Hook määrittämättä",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "Ympäristömuuttujat on muutettu, mutta uudelleenkäyttöönotto epäonnistui. Tarkista tila käyttöönottonäytöltä.",
+    "ADM_DB_ENV_UPDATE_FAILED": "Ympäristömuuttujan muutos epäonnistui Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "Vain siirto staging-ympäristössä mahdollinen (tuotannon WAS muuttumaton)",
+    "ADM_DB_PROD_RO_MISSING": "Tuotanto-DB:n (prod-ro) vain luku -tunnukset (PROD_RO_SUPABASE_URL/KEY) määrittämättä — estetty kirjoitusvirheiden estämiseksi",
     "ADM_DB_TARGET_INVALID": "Kohde on 'staging' tai 'prod-ro'",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN määrittämättä",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "master SHA:n haku epäonnistui",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "Ei committeja ylennettäväksi (jo uusin)",
+    "ADM_DEPLOY_PROD_DIVERGED": "production on {n} commitia edellä masterista (haarautunut) — fast-forward ei mahdollinen",
+    "ADM_DEPLOY_PROMOTE_FAILED": "Ylentäminen epäonnistui GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK määrittämättä",
     "ADM_DEPLOY_TARGET_INVALID": "Kohde on 'staging' tai 'production'",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km:n on oltava kokonaisluku välillä 0–200",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url ei ole kelvollinen URL-osoite",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url sallii vain http(s)-URL-osoitteet",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "Myöntämisen käsittely epäonnistui",
     "ADM_MINT_REASON_REQUIRED": "Myöntämisen syy (reason) on pakollinen",
     "ADM_NO_FIELDS_TO_UPDATE": "Ei päivitettäviä kenttiä",
+    "ADM_OPS_UNKNOWN": "Tuntematon virhe ({detail})",
     "ADM_ORDERS_FAILED": "Tilausten haku epäonnistui",
     "ADM_PAGEVIEWS_FAILED": "Verkkoliikenteen haku epäonnistui",
     "ADM_PAYMENT_NOT_FOUND": "Maksua ei löydy",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "PyCafé™-tilaus",
       "PISHOP": "PyShop™-tilaus",
+      "PISHOP_SUBSCR": "PyShop™ tilaus",
       "TRANSLATE": "PyTranslate™-tilaus"
     },
     "renewBtn": "Uusi/Muuta",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "{product}-tilaus on alkanut!",
     "tagline": "Tilaus = paketti, joka vapauttaa maksusta per tapahtuma. Mitä enemmän käytät, sitä enemmän säästät!",
     "title": "Cafe.pi-tilaus"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (operaattori)",
+      "PICAFE_SUBSCR": "PyCafé™ tilaus",
+      "TRANSLATE_SUBSCR": "PyTranslate™ tilaus"
+    }
   },
   "sysUi": {
     "backToOrders": "Takaisin tilauksiin",

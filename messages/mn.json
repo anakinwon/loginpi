@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "сек"
     },
+    "labels": {
+      "noName": "(нэр байхгүй)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ Туйлын одны үзүүлэлт",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "Дэд ангилал байгаа тул устгах боломжгүй",
     "ADM_CTGR_NAME_REQUIRED": "Ангиллын нэр заавал байх ёстой",
     "ADM_CTGR_NOT_FOUND": "Ангилал олдсонгүй",
+    "ADM_DB_API_MISSING": "Vercel API токен/төслийн ID/Deploy Hook тохируулагдаагүй",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "Орчны хувьсагчид өөрчлөгдсөн боловч дахин байршуулах амжилтгүй боллоо. Байршуулах дэлгэцээс төлвийг шалгана уу.",
+    "ADM_DB_ENV_UPDATE_FAILED": "env өөрчлөлт амжилтгүй боллоо Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "Зөвхөн staging орчинд шилжүүлэх боломжтой (үйлдвэрлэлийн WAS өөрчлөгдөхгүй)",
+    "ADM_DB_PROD_RO_MISSING": "Үйлдвэрлэлийн DB (prod-ro) зөвхөн унших эрхийн үнэмлэх (PROD_RO_SUPABASE_URL/KEY) тохируулагдаагүй — бичих алдаанаас урьдчилан сэргийлэхийн тулд хаасан",
     "ADM_DB_TARGET_INVALID": "target нь 'staging' эсвэл 'prod-ro' байх ёстой",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN тохируулагдаагүй",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "master SHA шалгах амжилтгүй боллоо",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "дэвшүүлэх коммит байхгүй (аль хэдийн хамгийн сүүлийн үеийн)",
+    "ADM_DEPLOY_PROD_DIVERGED": "production нь master-аас {n} коммитоор түрүүлж байна (салсан) — fast-forward боломжгүй",
+    "ADM_DEPLOY_PROMOTE_FAILED": "Дэвшүүлэлт амжилтгүй боллоо GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK тохируулагдаагүй",
     "ADM_DEPLOY_TARGET_INVALID": "target нь 'staging' эсвэл 'production' байх ёстой",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km нь 0-200 хоорондох бүхэл тоо байх ёстой",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url хүчинтэй URL биш байна",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url нь зөвхөн http(s) URL-ийг зөвшөөрнө",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "Гаргах үйл явц амжилтгүй боллоо",
     "ADM_MINT_REASON_REQUIRED": "Гаргах шалтгаан (reason) заавал байх ёстой",
     "ADM_NO_FIELDS_TO_UPDATE": "Шинэчлэх талбар байхгүй",
+    "ADM_OPS_UNKNOWN": "Үл мэдэгдэх алдаа ({detail})",
     "ADM_ORDERS_FAILED": "Захиалгыг хайх амжилтгүй боллоо",
     "ADM_PAGEVIEWS_FAILED": "Вэб траффикийг хайх амжилтгүй боллоо",
     "ADM_PAYMENT_NOT_FOUND": "Төлбөр олдсонгүй",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "PyCafé™ захиалга",
       "PISHOP": "PyShop™ захиалга",
+      "PISHOP_SUBSCR": "PyShop™ захиалга",
       "TRANSLATE": "PyTranslate™ захиалга"
     },
     "renewBtn": "Шинэчлэх/Өөрчлөх",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "{product} захиалга эхэллээ!",
     "tagline": "Захиалга = Нэг удаагийн төлбөрөөс чөлөөлөх багц. Их ашиглах тусам ашигтай!",
     "title": "Cafe.pi захиалга"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (оператор)",
+      "PICAFE_SUBSCR": "PyCafé™ захиалга",
+      "TRANSLATE_SUBSCR": "PyTranslate™ захиалга"
+    }
   },
   "sysUi": {
     "backToOrders": "Худалдан авалтын түүх рүү буцах",

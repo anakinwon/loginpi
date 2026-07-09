@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "ސިކުންތު"
     },
+    "labels": {
+      "noName": "(ނަމެއް ނެތް)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ ނޯތް ސްޓާރ މެޓްރިކް",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "ދަށު ކެޓަގަރީތައް ހުރުމުން ޑިލީޓް ނުކުރެވޭނެ",
     "ADM_CTGR_NAME_REQUIRED": "ކެޓަގަރީ ނަން މަޖުބޫރު",
     "ADM_CTGR_NOT_FOUND": "ކެޓަގަރީއެއް ފެނުނު",
+    "ADM_DB_API_MISSING": "Vercel API ޓޯކަން/ޕްރޮޖެކްޓް އައިޑީ/Deploy Hook ސެޓްކުރެވިފައެއް ނެތް",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "އެންވަޔަރަންމަންޓް ވެރިއަބަލްސް ބަދަލުކުރެވިފައިވީނަމަވެސް، ރީޑިޕްލޯއި ކުރުމަށް ނާކާމިޔާބުވެއްޖެއެވެ. ޑިޕްލޯއިމަންޓް ސްކްރީނުން ސްޓޭޓަސް ޗެކްކުރައްވާ.",
+    "ADM_DB_ENV_UPDATE_FAILED": "env ބަދަލުކުރުމަށް ނާކާމިޔާބުވެއްޖެ Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "ސްޓޭޖިންގ އެންވަޔަރަންމަންޓްގައި އެކަނި ބަދަލުކުރެވޭނެ (ޕްރޮޑަކްޝަން WAS ބަދަލުނުވާނެ)",
+    "ADM_DB_PROD_RO_MISSING": "ޕްރޮޑަކްޝަން DB (prod-ro) ރީޑް-އޮންލީ ކްރެޑެންޝަލްސް (PROD_RO_SUPABASE_URL/KEY) ސެޓްކުރެވިފައެއް ނެތް — ލިޔެވުމުގެ ހާދިސާއެއް ހިނގިޔަ ނުދިނުމަށް ބްލޮކްކޮށްފައި",
     "ADM_DB_TARGET_INVALID": "ޓާގެޓަކީ 'staging' ނުވަތަ 'prod-ro'",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN ސެޓްކުރެވިފައެއް ނެތް",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "master SHA ހޯދުމަށް ނާކާމިޔާބުވެއްޖެ",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "ޕްރޮމޯޓް ކުރާނެ ކޮމިޓެއް ނެތް (މިހާރުވެސް އެންމެ ފަހުގެ)",
+    "ADM_DEPLOY_PROD_DIVERGED": "production އަކީ master އަށްވުރެ {n} ކޮމިޓް ކުރިއަށް (ޑައިވަރޖްވެފައި) — fast-forward ނުކުރެވޭނެ",
+    "ADM_DEPLOY_PROMOTE_FAILED": "ޕްރޮމޯޓް ކުރުމަށް ނާކާމިޔާބުވެއްޖެ GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK ސެޓްކުރެވިފައެއް ނެތް",
     "ADM_DEPLOY_TARGET_INVALID": "ޓާގެޓަކީ 'staging' ނުވަތަ 'production'",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km އަކީ 0 އާއި 200 އާ ދެމެދުގެ ފުރިހަމަ އަދަދެއް ކަމުގައި ވާންވާނެއެވެ",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url އަކީ ސައްހަ URL އެއް ނޫން",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url އަށް ހުއްދަ ދެނީ http(s) URL ތަކަށް އެކަނި",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "ނެރުމުގެ މަސައްކަތް ނާކާމިޔާބުވެއްޖެ",
     "ADM_MINT_REASON_REQUIRED": "ނެރޭ ސަބަބު (reason) މަޖުބޫރު",
     "ADM_NO_FIELDS_TO_UPDATE": "ބަދަލުކުރާނެ ފީލްޑެއް ނެތް",
+    "ADM_OPS_UNKNOWN": "ނޭނގޭ ގޯހެއް ({detail})",
     "ADM_ORDERS_FAILED": "އޯޑަރުތައް ނެގުމަށް ނާކާމިޔާބުވެއްޖެ",
     "ADM_PAGEVIEWS_FAILED": "ވެބް ޓްރެފިކް ނެގުމަށް ނާކާމިޔާބުވެއްޖެ",
     "ADM_PAYMENT_NOT_FOUND": "ޕޭމަންޓެއް ފެނުނު",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "PyCafé™ ސަބްސްކްރައިބް",
       "PISHOP": "PyShop™ ސަބްސްކްރައިބް",
+      "PISHOP_SUBSCR": "PyShop™ ސަބްސްކްރިޕްޝަން",
       "TRANSLATE": "PyTranslate™ ސަބްސްކްރައިބް"
     },
     "renewBtn": "ރިނިއު/ބަދަލުކުރާ",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "{product} ސަބްސްކްރިޕްޝަން ފެށިއްޖެ!",
     "tagline": "ސަބްސްކްރައިބް = ކޮންމެ ފަހަރަކު ދައްކަންޖެހޭ ފީ އުނިކުރެވޭ ޕެކޭޖް. ގިނައިން ބޭނުންކުރާ ވަރަކަށް ފައިދާ!",
     "title": "Cafe.pi ސަބްސްކްރައިބް"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (އޮޕަރޭޓަރ)",
+      "PICAFE_SUBSCR": "PyCafé™ ސަބްސްކްރިޕްޝަން",
+      "TRANSLATE_SUBSCR": "PyTranslate™ ސަބްސްކްރިޕްޝަން"
+    }
   },
   "sysUi": {
     "backToOrders": "ގަތް ތަކެތީގެ ތާރީޚަށް",

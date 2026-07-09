@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "sek."
     },
+    "labels": {
+      "noName": "(Intet navn)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ Nordstjerne-metrik",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "Kan ikke slette, da der er underkategorier",
     "ADM_CTGR_NAME_REQUIRED": "Kategorinavn er påkrævet",
     "ADM_CTGR_NOT_FOUND": "Kategori ikke fundet",
+    "ADM_DB_API_MISSING": "Vercel API-token/projekt-ID/Deploy Hook ikke indstillet",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "Miljøvariabler er blevet ændret, men genudrulning mislykkedes. Tjek venligst status på udrulningsskærmen.",
+    "ADM_DB_ENV_UPDATE_FAILED": "Miljøændring mislykkedes Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "Kan kun skiftes i staging-miljø (produktions-WAS uforanderlig)",
+    "ADM_DB_PROD_RO_MISSING": "Produktions-DB (prod-ro) skrivebeskyttede legitimationsoplysninger (PROD_RO_SUPABASE_URL/KEY) ikke indstillet — blokeret for at forhindre skriveuheld",
     "ADM_DB_TARGET_INVALID": "target skal være 'staging' eller 'prod-ro'",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN ikke indstillet",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "Kunne ikke hente master SHA",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "Ingen commits at promovere (allerede opdateret)",
+    "ADM_DEPLOY_PROD_DIVERGED": "Production er {n} commits foran master (divergeret) — fast-forward ikke muligt",
+    "ADM_DEPLOY_PROMOTE_FAILED": "Promovering mislykkedes GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK ikke indstillet",
     "ADM_DEPLOY_TARGET_INVALID": "target skal være 'staging' eller 'production'",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km skal være et heltal mellem 0 og 200",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url er ikke en gyldig URL",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url tillader kun http(s) URL'er",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "Fejl ved udstedelsesbehandling",
     "ADM_MINT_REASON_REQUIRED": "Årsag til udstedelse (reason) er påkrævet",
     "ADM_NO_FIELDS_TO_UPDATE": "Ingen felter at opdatere",
+    "ADM_OPS_UNKNOWN": "Ukendt fejl ({detail})",
     "ADM_ORDERS_FAILED": "Fejl ved hentning af ordrer",
     "ADM_PAGEVIEWS_FAILED": "Fejl ved hentning af webtrafik",
     "ADM_PAYMENT_NOT_FOUND": "Betaling ikke fundet",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "PyCafé™ abonnement",
       "PISHOP": "PyShop™ abonnement",
+      "PISHOP_SUBSCR": "PyShop™ abonnement",
       "TRANSLATE": "PyTranslate™ abonnement"
     },
     "renewBtn": "Forny/ændre",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "{product} abonnement er startet!",
     "tagline": "Abonnement = Pakke med fritagelse for gebyr pr. transaktion. Jo mere du bruger, jo mere fordelagtigt!",
     "title": "Cafe.pi abonnement"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (operatør)",
+      "PICAFE_SUBSCR": "PyCafé™ abonnement",
+      "TRANSLATE_SUBSCR": "PyTranslate™ abonnement"
+    }
   },
   "sysUi": {
     "backToOrders": "Tilbage til ordrer",

@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "sek"
     },
+    "labels": {
+      "noName": "(Inget namn)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ Polstjärneindikator",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "Kan inte radera eftersom det finns underkategorier",
     "ADM_CTGR_NAME_REQUIRED": "Kategorinamn är obligatoriskt",
     "ADM_CTGR_NOT_FOUND": "Kategori hittades inte",
+    "ADM_DB_API_MISSING": "Vercel API-token/projekt-ID/Deploy Hook saknas",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "Miljövariablerna har ändrats, men omdistribution misslyckades. Kontrollera statusen på distributionsskärmen.",
+    "ADM_DB_ENV_UPDATE_FAILED": "Miljövariabeländring misslyckades Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "Kan endast växlas i staging-miljö (produktions-WAS är oföränderlig)",
+    "ADM_DB_PROD_RO_MISSING": "Produktions-DB (prod-ro) skrivskyddade autentiseringsuppgifter (PROD_RO_SUPABASE_URL/KEY) saknas — blockerad för att förhindra skrivfel",
     "ADM_DB_TARGET_INVALID": "target är 'staging' eller 'prod-ro'",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN saknas",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "master SHA kunde inte hämtas",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "Inga commits att befordra (redan senaste)",
+    "ADM_DEPLOY_PROD_DIVERGED": "production ligger {n} commits före master (divergerat) — fast-forward ej möjligt",
+    "ADM_DEPLOY_PROMOTE_FAILED": "Befordran misslyckades GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK saknas",
     "ADM_DEPLOY_TARGET_INVALID": "target är 'staging' eller 'production'",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km måste vara ett heltal mellan 0 och 200",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url är inte en giltig URL",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url tillåter endast http(s) URL:er",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "Misslyckades med att behandla utgivning",
     "ADM_MINT_REASON_REQUIRED": "Anledning till utgivning (reason) är obligatorisk",
     "ADM_NO_FIELDS_TO_UPDATE": "Inga fält att uppdatera",
+    "ADM_OPS_UNKNOWN": "Okänt fel ({detail})",
     "ADM_ORDERS_FAILED": "Misslyckades med att hämta beställningar",
     "ADM_PAGEVIEWS_FAILED": "Misslyckades med att hämta webbtrafik",
     "ADM_PAYMENT_NOT_FOUND": "Betalning hittades inte",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "PyCafé™ Prenumeration",
       "PISHOP": "PyShop™ Prenumeration",
+      "PISHOP_SUBSCR": "PyShop™ prenumeration",
       "TRANSLATE": "PyTranslate™ Prenumeration"
     },
     "renewBtn": "Förnya/Ändra",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "Din prenumeration på {product} har startat!",
     "tagline": "Prenumeration = Paket med avgiftsbefrielse per transaktion. Ju mer du använder, desto mer tjänar du!",
     "title": "Cafe.pi Prenumeration"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (Operatör)",
+      "PICAFE_SUBSCR": "PyCafé™ prenumeration",
+      "TRANSLATE_SUBSCR": "PyTranslate™ prenumeration"
+    }
   },
   "sysUi": {
     "backToOrders": "Till köphistorik",

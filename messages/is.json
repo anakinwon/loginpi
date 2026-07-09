@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "sek."
     },
+    "labels": {
+      "noName": "(Nafnlaust)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ Pólstjörnuvísir",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "Ekki er hægt að eyða þar sem undirflokkar eru til",
     "ADM_CTGR_NAME_REQUIRED": "Flokksheiti er nauðsynlegt",
     "ADM_CTGR_NOT_FOUND": "Flokkur fannst ekki",
+    "ADM_DB_API_MISSING": "Vercel API token/verkefnisauðkenni/Deploy Hook ekki stillt",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "Umhverfisbreytur hafa verið uppfærðar en endurútgáfa mistókst. Vinsamlegast athugaðu stöðu á útgáfuskjánum.",
+    "ADM_DB_ENV_UPDATE_FAILED": "Mistókst að breyta env Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "Aðeins hægt að skipta um í staging umhverfi (framleiðslu WAS óbreytanlegt)",
+    "ADM_DB_PROD_RO_MISSING": "Framleiðslugagnagrunnur (prod-ro) leseiginleikar (PROD_RO_SUPABASE_URL/KEY) ekki stilltir — lokað til að koma í veg fyrir skrifvillur",
     "ADM_DB_TARGET_INVALID": "target verður að vera 'staging' eða 'prod-ro'",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN ekki stillt",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "Mistókst að sækja master SHA",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "Engin commit til að kynna (þegar nýjast)",
+    "ADM_DEPLOY_PROD_DIVERGED": "production er {n} commits á undan master (greinst) — ekki hægt að fast-forwarda",
+    "ADM_DEPLOY_PROMOTE_FAILED": "Kynning mistókst GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK ekki stillt",
     "ADM_DEPLOY_TARGET_INVALID": "target verður að vera 'staging' eða 'production'",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km verður að vera heiltala á bilinu 0-200",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url er ekki gild URL",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url leyfir aðeins http(s) URL",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "Útgáfuvinnsla mistókst",
     "ADM_MINT_REASON_REQUIRED": "Ástæða útgáfu (reason) er nauðsynleg",
     "ADM_NO_FIELDS_TO_UPDATE": "Engir reitir til að uppfæra",
+    "ADM_OPS_UNKNOWN": "Óþekkt villa ({detail})",
     "ADM_ORDERS_FAILED": "Mistókst að sækja pantanir",
     "ADM_PAGEVIEWS_FAILED": "Mistókst að sækja vefumferð",
     "ADM_PAYMENT_NOT_FOUND": "Greiðsla fannst ekki",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "PyCafé™ áskrift",
       "PISHOP": "PyShop™ áskrift",
+      "PISHOP_SUBSCR": "PyShop™ áskrift",
       "TRANSLATE": "PyTranslate™ áskrift"
     },
     "renewBtn": "Endurnýja/breyta",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "Áskrift að {product} hefur hafist!",
     "tagline": "Áskrift = pakki með undanþágu frá gjöldum á hverja færslu. Því meira sem þú notar, því meiri ávinningur!",
     "title": "Cafe.pi áskrift"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (rekstraraðili)",
+      "PICAFE_SUBSCR": "PyCafé™ áskrift",
+      "TRANSLATE_SUBSCR": "PyTranslate™ áskrift"
+    }
   },
   "sysUi": {
     "backToOrders": "Til baka í pantanir",

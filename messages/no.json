@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "sekunder"
     },
+    "labels": {
+      "noName": "(Uten navn)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ Nordstjerne-indikator",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "Kan ikke slette da det finnes underkategorier",
     "ADM_CTGR_NAME_REQUIRED": "Kategorinavn er påkrevd",
     "ADM_CTGR_NOT_FOUND": "Kategori ikke funnet",
+    "ADM_DB_API_MISSING": "Vercel API-token/prosjekt-ID/Deploy Hook mangler",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "Miljøvariablene ble endret, men redeploy mislyktes. Sjekk statusen på deploy-skjermen.",
+    "ADM_DB_ENV_UPDATE_FAILED": "Oppdatering av miljøvariabler mislyktes Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "Kan kun bytte i staging-miljø (produksjons-WAS er uforanderlig)",
+    "ADM_DB_PROD_RO_MISSING": "Skrivebeskyttede legitimasjoner for produksjons-DB (prod-ro) (PROD_RO_SUPABASE_URL/KEY) mangler — blokkert for å forhindre skriveuhell",
     "ADM_DB_TARGET_INVALID": "Mål må være 'staging' eller 'prod-ro'",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN mangler",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "Feil ved henting av master SHA",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "Ingen commits å promotere (allerede nyeste)",
+    "ADM_DEPLOY_PROD_DIVERGED": "production er {n} commits foran master (divergert) — kan ikke fast-forwardes",
+    "ADM_DEPLOY_PROMOTE_FAILED": "Promotering mislyktes GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK mangler",
     "ADM_DEPLOY_TARGET_INVALID": "Mål må være 'staging' eller 'production'",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km må være et heltall mellom 0 og 200",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url er ikke en gyldig URL",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url tillater kun http(s) URL-er",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "Utstedelse mislyktes",
     "ADM_MINT_REASON_REQUIRED": "Årsak for utstedelse (reason) er påkrevd",
     "ADM_NO_FIELDS_TO_UPDATE": "Ingen felt å oppdatere",
+    "ADM_OPS_UNKNOWN": "Ukjent feil ({detail})",
     "ADM_ORDERS_FAILED": "Kunne ikke hente bestillinger",
     "ADM_PAGEVIEWS_FAILED": "Kunne ikke hente nettrafikk",
     "ADM_PAYMENT_NOT_FOUND": "Betaling ikke funnet",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "PyCafé™-abonnement",
       "PISHOP": "PyShop™-abonnement",
+      "PISHOP_SUBSCR": "PyShop™ abonnement",
       "TRANSLATE": "PyTranslate™-abonnement"
     },
     "renewBtn": "Forny/Endre",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "{product}-abonnementet har startet!",
     "tagline": "Abonnement = pakke med fritak for gebyr per transaksjon. Jo mer du bruker, jo mer sparer du!",
     "title": "Abonnement"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (Operatør)",
+      "PICAFE_SUBSCR": "PyCafé™ abonnement",
+      "TRANSLATE_SUBSCR": "PyTranslate™ abonnement"
+    }
   },
   "sysUi": {
     "backToOrders": "Tilbake til bestillinger",

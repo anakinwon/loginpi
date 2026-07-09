@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "ثانیه"
     },
+    "labels": {
+      "noName": "(بدون نام)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ شاخص ستاره قطبی",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "این دسته‌بندی دارای زیرمجموعه است و نمی‌توان آن را حذف کرد",
     "ADM_CTGR_NAME_REQUIRED": "نام دسته‌بندی الزامی است",
     "ADM_CTGR_NOT_FOUND": "دسته‌بندی یافت نشد",
+    "ADM_DB_API_MISSING": "Vercel API Token/Project ID/Deploy Hook تنظیم نشده است",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "متغیرهای محیطی تغییر کرده‌اند اما استقرار مجدد ناموفق بود. وضعیت را در صفحه استقرار بررسی کنید.",
+    "ADM_DB_ENV_UPDATE_FAILED": "تغییر env ناموفق Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "فقط در محیط staging قابل تغییر است (WAS تولید غیرقابل تغییر است)",
+    "ADM_DB_PROD_RO_MISSING": "پایگاه داده تولید (prod-ro) اعتبارنامه فقط خواندنی (PROD_RO_SUPABASE_URL/KEY) تنظیم نشده است — برای جلوگیری از حوادث نوشتن مسدود شده است",
     "ADM_DB_TARGET_INVALID": "target باید 'staging' یا 'prod-ro' باشد",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN تنظیم نشده است",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "بازیابی master SHA ناموفق",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "کامیتی برای ارتقا وجود ندارد (از قبل به‌روز است)",
+    "ADM_DEPLOY_PROD_DIVERGED": "production از master به اندازه {n} کامیت جلوتر است (منشعب شده است) — امکان fast-forward وجود ندارد",
+    "ADM_DEPLOY_PROMOTE_FAILED": "ارتقا ناموفق GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK تنظیم نشده است",
     "ADM_DEPLOY_TARGET_INVALID": "target باید 'staging' یا 'production' باشد",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km باید یک عدد صحیح بین 0 تا 200 باشد",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url یک URL معتبر نیست",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url فقط URLهای http(s) را می‌پذیرد",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "پردازش صدور ناموفق بود",
     "ADM_MINT_REASON_REQUIRED": "دلیل صدور (reason) الزامی است",
     "ADM_NO_FIELDS_TO_UPDATE": "هیچ فیلدی برای به‌روزرسانی وجود ندارد",
+    "ADM_OPS_UNKNOWN": "خطای ناشناخته ({detail})",
     "ADM_ORDERS_FAILED": "دریافت سفارشات ناموفق بود",
     "ADM_PAGEVIEWS_FAILED": "دریافت ترافیک وب ناموفق بود",
     "ADM_PAYMENT_NOT_FOUND": "پرداخت یافت نشد",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "اشتراک PyCafé™",
       "PISHOP": "اشتراک PyShop™",
+      "PISHOP_SUBSCR": "PyShop™ اشتراک",
       "TRANSLATE": "اشتراک PyTranslate™"
     },
     "renewBtn": "تمدید/تغییر",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "اشتراک {product} شما آغاز شد!",
     "tagline": "اشتراک = بسته‌ای برای معافیت از هزینه به ازای هر تراکنش. هرچه بیشتر استفاده کنید، سود بیشتری می‌برید!",
     "title": "اشتراک Cafe.pi"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (اپراتور)",
+      "PICAFE_SUBSCR": "PyCafé™ اشتراک",
+      "TRANSLATE_SUBSCR": "PyTranslate™ اشتراک"
+    }
   },
   "sysUi": {
     "backToOrders": "بازگشت به سفارشات",

@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "sekonde"
     },
+    "labels": {
+      "noName": "(Geen naam)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ Noordster Metriek",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "Kan nie skrap nie, want dit het subkategorieë",
     "ADM_CTGR_NAME_REQUIRED": "Kategorienaam is verpligtend",
     "ADM_CTGR_NOT_FOUND": "Kategorie nie gevind nie",
+    "ADM_DB_API_MISSING": "Vercel API-token/Projek-ID/Deploy Hook nie ingestel nie",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "Omgewingsveranderlikes is verander, maar herontplooiing het misluk. Kontroleer die status op die ontplooiingskerm.",
+    "ADM_DB_ENV_UPDATE_FAILED": "Omgewingsverandering het misluk Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "Slegs moontlik om in die staging-omgewing te wissel (produksie WAS onveranderlik)",
+    "ADM_DB_PROD_RO_MISSING": "Produksie DB (prod-ro) slegs-lees-bewyse (PROD_RO_SUPABASE_URL/KEY) nie ingestel nie — geblokkeer om skryfongelukke te voorkom",
     "ADM_DB_TARGET_INVALID": "Teiken is 'staging' of 'prod-ro'",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN nie ingestel nie",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "Misluk om master SHA te herwin",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "Geen commits om te bevorder nie (reeds op datum)",
+    "ADM_DEPLOY_PROD_DIVERGED": "Produksie is {n} commits voor master (gedivergeer) — vinnig-vorentoe nie moontlik nie",
+    "ADM_DEPLOY_PROMOTE_FAILED": "Bevordering het misluk GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK nie ingestel nie",
     "ADM_DEPLOY_TARGET_INVALID": "Teiken is 'staging' of 'production'",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km moet 'n heelgetal tussen 0 en 200 wees",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url is nie 'n geldige URL nie",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url laat slegs http(s) URL's toe",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "Uitreiking verwerking het misluk",
     "ADM_MINT_REASON_REQUIRED": "Rede vir uitreiking (reason) is verpligtend",
     "ADM_NO_FIELDS_TO_UPDATE": "Geen velde om op te dateer nie",
+    "ADM_OPS_UNKNOWN": "Onbekende fout ({detail})",
     "ADM_ORDERS_FAILED": "Bestelling-navraag het misluk",
     "ADM_PAGEVIEWS_FAILED": "Webverkeer-navraag het misluk",
     "ADM_PAYMENT_NOT_FOUND": "Betaling nie gevind nie",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "PyCafe Inskrywing",
       "PISHOP": "PyShop Subscription",
+      "PISHOP_SUBSCR": "PyShop™ intekening",
       "TRANSLATE": "Outomatiese Vertaling Inskrywing"
     },
     "renewBtn": "Hernu/Verander",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "{product} inskrywing het begin!",
     "tagline": "Subskripsie = pakket vir vrystelling van fooie per item. Hoe meer jy gebruik, hoe meer voordeel!",
     "title": "Cafe.pi Subskripsie"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (Operateur)",
+      "PICAFE_SUBSCR": "PyCafé™ intekening",
+      "TRANSLATE_SUBSCR": "PyTranslate™ intekening"
+    }
   },
   "sysUi": {
     "backToOrders": "Terug na bestellingsgeskiedenis",

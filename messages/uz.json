@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "soniya"
     },
+    "labels": {
+      "noName": "(Ismsiz)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ Qutb yulduzi koʻrsatkichi",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "Pastki kategoriyalar mavjudligi sababli o'chirib bo'lmaydi",
     "ADM_CTGR_NAME_REQUIRED": "Kategoriya nomi majburiy",
     "ADM_CTGR_NOT_FOUND": "Kategoriya topilmadi",
+    "ADM_DB_API_MISSING": "Vercel API tokeni/Project ID/Deploy Hook o'rnatilmagan",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "Atrof-muhit o'zgaruvchilari o'zgartirildi, ammo qayta joylashtirish muvaffaqiyatsiz tugadi. Joylashtirish ekranida holatni tekshiring.",
+    "ADM_DB_ENV_UPDATE_FAILED": "env o'zgarishi muvaffaqiyatsiz Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "Faqat staging muhitida o'zgartirish mumkin (ishlab chiqarish WAS o'zgarmas)",
+    "ADM_DB_PROD_RO_MISSING": "Ishlab chiqarish DB (prod-ro) faqat o'qish uchun hisob ma'lumotlari (PROD_RO_SUPABASE_URL/KEY) o'rnatilmagan — yozish xatolarini oldini olish uchun bloklangan",
     "ADM_DB_TARGET_INVALID": "target 'staging' yoki 'prod-ro' bo'lishi kerak",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN o'rnatilmagan",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "master SHA olish muvaffaqiyatsiz",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "Ko'tariladigan kommit yo'q (allaqachon eng so'nggi)",
+    "ADM_DEPLOY_PROD_DIVERGED": "production masterdan {n} ta kommit oldinda (farqlangan) — fast-forward imkonsiz",
+    "ADM_DEPLOY_PROMOTE_FAILED": "Ko'tarish muvaffaqiyatsiz GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK o'rnatilmagan",
     "ADM_DEPLOY_TARGET_INVALID": "target 'staging' yoki 'production' bo'lishi kerak",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km 0 dan 200 gacha butun son bo'lishi kerak",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url noto'g'ri URL",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url faqat http(s) URL manzilini qabul qiladi",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "Chiqarishni qayta ishlashda xatolik",
     "ADM_MINT_REASON_REQUIRED": "Chiqarish sababi (reason) majburiy",
     "ADM_NO_FIELDS_TO_UPDATE": "Yangilash uchun maydonlar yo'q",
+    "ADM_OPS_UNKNOWN": "Noma'lum xato ({detail})",
     "ADM_ORDERS_FAILED": "Buyurtmalarni yuklab bo'lmadi",
     "ADM_PAGEVIEWS_FAILED": "Veb-trafikni yuklab bo'lmadi",
     "ADM_PAYMENT_NOT_FOUND": "To'lov topilmadi",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "PyCafé™ obunasi",
       "PISHOP": "PyShop™ obunasi",
+      "PISHOP_SUBSCR": "PyShop™ obuna",
       "TRANSLATE": "PyTranslate™ obunasi"
     },
     "renewBtn": "Yangilash/O'zgartirish",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "{product} obunasi boshlandi!",
     "tagline": "Obuna = har bir tranzaksiya uchun to'lovdan ozod qilish paketi. Qancha ko'p ishlatsangiz, shuncha foyda!",
     "title": "Cafe.pi obunasi"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (Operator)",
+      "PICAFE_SUBSCR": "PyCafé™ obuna",
+      "TRANSLATE_SUBSCR": "PyTranslate™ obuna"
+    }
   },
   "sysUi": {
     "backToOrders": "Xaridlar tarixiga qaytish",

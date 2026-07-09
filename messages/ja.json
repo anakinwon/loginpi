@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "秒"
     },
+    "labels": {
+      "noName": "(名前なし)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ 北極星指標",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "サブカテゴリがあるため削除できません",
     "ADM_CTGR_NAME_REQUIRED": "カテゴリ名は必須です",
     "ADM_CTGR_NOT_FOUND": "カテゴリが見つかりません",
+    "ADM_DB_API_MISSING": "Vercel APIトークン/プロジェクトID/Deploy Hook 未設定",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "環境変数は変更されましたが、再デプロイに失敗しました。デプロイ画面で状態を確認してください。",
+    "ADM_DB_ENV_UPDATE_FAILED": "env 変更失敗 Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "ステージング環境でのみ切り替え可能(本番WASは不変)",
+    "ADM_DB_PROD_RO_MISSING": "本番DB(prod-ro) 読み取り専用認証情報(PROD_RO_SUPABASE_URL/KEY) 未設定 — 書き込み事故防止のためブロック",
     "ADM_DB_TARGET_INVALID": "targetは'staging'または'prod-ro'",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN 未設定",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "master SHA 取得失敗",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "昇格するコミットなし(すでに最新)",
+    "ADM_DEPLOY_PROD_DIVERGED": "productionがmasterより{n}コミット先行(分岐) — fast-forward不可",
+    "ADM_DEPLOY_PROMOTE_FAILED": "昇格失敗 GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK 未設定",
     "ADM_DEPLOY_TARGET_INVALID": "targetは'staging'または'production'",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_kmは0〜200の間の整数である必要があります",
     "ADM_EVIDENCE_URL_INVALID": "evidence_urlが無効なURLです",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_urlはhttp(s) URLのみ許可します",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "発行処理に失敗しました",
     "ADM_MINT_REASON_REQUIRED": "発行理由(reason)は必須です",
     "ADM_NO_FIELDS_TO_UPDATE": "変更するフィールドがありません",
+    "ADM_OPS_UNKNOWN": "不明なエラー ({detail})",
     "ADM_ORDERS_FAILED": "注文の取得に失敗しました",
     "ADM_PAGEVIEWS_FAILED": "ウェブトラフィックの取得に失敗しました",
     "ADM_PAYMENT_NOT_FOUND": "支払いが見つかりません",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "PyCafe 購読",
       "PISHOP": "PyShop サブスクリプション",
+      "PISHOP_SUBSCR": "PyShop™ サブスクリプション",
       "TRANSLATE": "自動翻訳 購読"
     },
     "renewBtn": "更新/変更",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "{product} の購読が開始されました！",
     "tagline": "購読 = 1件あたりの料金免除Package。多く使うほどお得！",
     "title": "Cafe.pi購読"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (オペレーター)",
+      "PICAFE_SUBSCR": "PyCafé™ サブスクリプション",
+      "TRANSLATE_SUBSCR": "PyTranslate™ サブスクリプション"
+    }
   },
   "sysUi": {
     "backToOrders": "購入履歴へ",

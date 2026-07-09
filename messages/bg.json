@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "сек."
     },
+    "labels": {
+      "noName": "(Без име)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ Индикатор Полярна звезда",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "Не може да бъде изтрита, тъй като има подкатегории",
     "ADM_CTGR_NAME_REQUIRED": "Името на категорията е задължително",
     "ADM_CTGR_NOT_FOUND": "Категорията не е намерена",
+    "ADM_DB_API_MISSING": "Vercel API токен/ID на проект/Deploy Hook не е зададен",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "Променливите на средата са променени, но повторното разполагане е неуспешно. Проверете състоянието на екрана за разполагане.",
+    "ADM_DB_ENV_UPDATE_FAILED": "Промяната на env е неуспешна Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "Може да се превключва само в staging среда (production WAS е неизменна)",
+    "ADM_DB_PROD_RO_MISSING": "Удостоверения за самоличност само за четене на производствена база данни (prod-ro) (PROD_RO_SUPABASE_URL/KEY) не са зададени — блокирано за предотвратяване на инциденти с писане",
     "ADM_DB_TARGET_INVALID": "target е 'staging' или 'prod-ro'",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN не е зададен",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "Неуспешно извличане на master SHA",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "Няма къмити за повишаване (вече е най-новият)",
+    "ADM_DEPLOY_PROD_DIVERGED": "production е с {n} къмита пред master (разклонен) — fast-forward невъзможен",
+    "ADM_DEPLOY_PROMOTE_FAILED": "Повишаването е неуспешно GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK не е зададен",
     "ADM_DEPLOY_TARGET_INVALID": "target е 'staging' или 'production'",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km трябва да е цяло число между 0 и 200",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url не е валиден URL адрес",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url позволява само http(s) URL адреси",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "Неуспешна обработка на издаване",
     "ADM_MINT_REASON_REQUIRED": "Причината за издаване (reason) е задължителна",
     "ADM_NO_FIELDS_TO_UPDATE": "Няма полета за актуализация",
+    "ADM_OPS_UNKNOWN": "Неизвестна грешка ({detail})",
     "ADM_ORDERS_FAILED": "Неуспешно извличане на поръчки",
     "ADM_PAGEVIEWS_FAILED": "Неуспешно извличане на уеб трафик",
     "ADM_PAYMENT_NOT_FOUND": "Плащането не е намерено",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "Абонамент за PyCafé™",
       "PISHOP": "Абонамент за PyShop™",
+      "PISHOP_SUBSCR": "PyShop™ абонамент",
       "TRANSLATE": "Абонамент за PyTranslate™"
     },
     "renewBtn": "Подновяване/Промяна",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "Абонаментът за {product} е стартиран!",
     "tagline": "Абонамент = пакет за освобождаване от такси на транзакция. Колкото повече използвате, толкова повече печелите!",
     "title": "Абонамент за Cafe.pi"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (Оператор)",
+      "PICAFE_SUBSCR": "PyCafé™ абонамент",
+      "TRANSLATE_SUBSCR": "PyTranslate™ абонамент"
+    }
   },
   "sysUi": {
     "backToOrders": "Към историята на покупките",

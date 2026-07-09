@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "තත්පර"
     },
+    "labels": {
+      "noName": "(නමක් නැත)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ උතුරු තරුව දර්ශකය",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "උප ප්‍රවර්ග ඇති බැවින් මකා දැමිය නොහැක",
     "ADM_CTGR_NAME_REQUIRED": "ප්‍රවර්ග නාමය අනිවාර්ය වේ",
     "ADM_CTGR_NOT_FOUND": "ප්‍රවර්ගය සොයාගත නොහැක",
+    "ADM_DB_API_MISSING": "Vercel API ටෝකනය/ව්‍යාපෘති හැඳුනුම්පත/Deploy Hook සකසා නැත",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "පරිසර විචල්‍යයන් වෙනස් කර ඇතත් නැවත යෙදවීම අසාර්ථක විය. යෙදවීමේ තිරයෙන් තත්ත්වය පරීක්ෂා කරන්න.",
+    "ADM_DB_ENV_UPDATE_FAILED": "env වෙනස් කිරීම අසාර්ථකයි Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "පරිවර්තනය කළ හැක්කේ staging පරිසරයකදී පමණි (නිෂ්පාදන WAS වෙනස් කළ නොහැක)",
+    "ADM_DB_PROD_RO_MISSING": "නිෂ්පාදන DB (prod-ro) කියවීමට පමණක් වන අක්තපත්‍ර (PROD_RO_SUPABASE_URL/KEY) සකසා නැත — ලිවීමේ දෝෂ වැළැක්වීම සඳහා අවහිර කර ඇත",
     "ADM_DB_TARGET_INVALID": "ඉලක්කය 'staging' හෝ 'prod-ro' විය යුතුය",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN සකසා නැත",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "master SHA සොයාගැනීම අසාර්ථකයි",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "උසස් කිරීමට commit නොමැත (දැනටමත් නවතමයි)",
+    "ADM_DEPLOY_PROD_DIVERGED": "production master ට වඩා {n} commit ඉදිරියෙන් (වෙන් වී ඇත) — fast-forward කළ නොහැක",
+    "ADM_DEPLOY_PROMOTE_FAILED": "උසස් කිරීම අසාර්ථකයි GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK සකසා නැත",
     "ADM_DEPLOY_TARGET_INVALID": "ඉලක්කය 'staging' හෝ 'production' විය යුතුය",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km 0-200 අතර පූර්ණ සංඛ්‍යාවක් විය යුතුය",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url වලංගු URL එකක් නොවේ",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url සඳහා http(s) URL පමණක් අවසර ඇත",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "නිකුත් කිරීමේ ක්‍රියාවලිය අසාර්ථකයි",
     "ADM_MINT_REASON_REQUIRED": "නිකුත් කිරීමට හේතුව (reason) අනිවාර්ය වේ",
     "ADM_NO_FIELDS_TO_UPDATE": "යාවත්කාලීන කිරීමට ක්ෂේත්‍ර නොමැත",
+    "ADM_OPS_UNKNOWN": "නොදන්නා දෝෂයක් ({detail})",
     "ADM_ORDERS_FAILED": "ඇණවුම් ලබාගැනීම අසාර්ථකයි",
     "ADM_PAGEVIEWS_FAILED": "වෙබ් ගමනාගමනය ලබාගැනීම අසාර්ථකයි",
     "ADM_PAYMENT_NOT_FOUND": "ගෙවීම සොයාගත නොහැක",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "PyCafé™ දායකත්වය",
       "PISHOP": "PyShop™ දායකත්වය",
+      "PISHOP_SUBSCR": "PyShop™ දායකත්වය",
       "TRANSLATE": "PyTranslate™ දායකත්වය"
     },
     "renewBtn": "අලුත් කරන්න/වෙනස් කරන්න",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "{product} දායකත්වය ආරම්භ කර ඇත!",
     "tagline": "දායකත්වය = එක් ගනුදෙනුවකට ගාස්තු නිදහස් පැකේජය. ඔබ වැඩි වැඩියෙන් භාවිතා කරන තරමට, ඔබට වැඩි වාසියක්!",
     "title": "Cafe.pi දායකත්වය"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (ක්‍රියාකරු)",
+      "PICAFE_SUBSCR": "PyCafé™ දායකත්වය",
+      "TRANSLATE_SUBSCR": "PyTranslate™ දායකත්වය"
+    }
   },
   "sysUi": {
     "backToOrders": "මිලදී ගැනීමේ ඉතිහාසයට",

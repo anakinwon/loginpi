@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "წამი"
     },
+    "labels": {
+      "noName": "(სახელი არ არის)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ ჩრდილოეთის ვარსკვლავის ინდიკატორი",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "წაშლა შეუძლებელია, რადგან მას აქვს ქვეკატეგორიები",
     "ADM_CTGR_NAME_REQUIRED": "კატეგორიის სახელი სავალდებულოა",
     "ADM_CTGR_NOT_FOUND": "კატეგორია ვერ მოიძებნა",
+    "ADM_DB_API_MISSING": "Vercel API ტოკენი/პროექტის ID/Deploy Hook არ არის დაყენებული",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "გარემოს ცვლადები შეიცვალა, მაგრამ ხელახალი განთავსება ვერ მოხერხდა. შეამოწმეთ სტატუსი განთავსების ეკრანზე.",
+    "ADM_DB_ENV_UPDATE_FAILED": "გარემოს ცვლილება ვერ მოხერხდა Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "გარდაქმნა შესაძლებელია მხოლოდ სტეიჯინგ გარემოში (ოპერაციული WAS უცვლელია)",
+    "ADM_DB_PROD_RO_MISSING": "ოპერაციული DB-ს (prod-ro) მხოლოდ წაკითხვის სერთიფიკატები (PROD_RO_SUPABASE_URL/KEY) არ არის დაყენებული — დაბლოკილია ჩაწერის შეცდომის თავიდან ასაცილებლად",
     "ADM_DB_TARGET_INVALID": "target არის 'staging' ან 'prod-ro'",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN არ არის დაყენებული",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "master SHA-ს მოძიება ვერ მოხერხდა",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "არ არის კომიტი დასაწინაურებლად (უკვე უახლესი)",
+    "ADM_DEPLOY_PROD_DIVERGED": "production {n} კომიტით უსწრებს master-ს (განშტოებულია) — fast-forward შეუძლებელია",
+    "ADM_DEPLOY_PROMOTE_FAILED": "დაწინაურება ვერ მოხერხდა GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK არ არის დაყენებული",
     "ADM_DEPLOY_TARGET_INVALID": "target არის 'staging' ან 'production'",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km უნდა იყოს 0-დან 200-მდე მთელი რიცხვი",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url არ არის სწორი URL",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url მხოლოდ http(s) URL-ებს უშვებს",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "გამოშვების დამუშავება ვერ მოხერხდა",
     "ADM_MINT_REASON_REQUIRED": "გამოშვების მიზეზი (reason) სავალდებულოა",
     "ADM_NO_FIELDS_TO_UPDATE": "განახლებისთვის ველები არ არის",
+    "ADM_OPS_UNKNOWN": "უცნობი შეცდომა ({detail})",
     "ADM_ORDERS_FAILED": "შეკვეთების მოძიება ვერ მოხერხდა",
     "ADM_PAGEVIEWS_FAILED": "ვებ ტრაფიკის მოძიება ვერ მოხერხდა",
     "ADM_PAYMENT_NOT_FOUND": "გადახდა ვერ მოიძებნა",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "PyCafé™ გამოწერა",
       "PISHOP": "PyShop™ გამოწერა",
+      "PISHOP_SUBSCR": "PyShop™ გამოწერა",
       "TRANSLATE": "PyTranslate™ გამოწერა"
     },
     "renewBtn": "განახლება/შეცვლა",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "{product} გამოწერა დაიწყო!",
     "tagline": "გამოწერა = პაკეტი თითო ტრანზაქციის საკომისიოს გარეშე. რაც მეტს გამოიყენებთ, მით მეტ სარგებელს მიიღებთ!",
     "title": "Cafe.pi გამოწერა"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (ოპერატორი)",
+      "PICAFE_SUBSCR": "PyCafé™ გამოწერა",
+      "TRANSLATE_SUBSCR": "PyTranslate™ გამოწერა"
+    }
   },
   "sysUi": {
     "backToOrders": "შეკვეთების ისტორიაში დაბრუნება",

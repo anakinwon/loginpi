@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "sekunt"
     },
+    "labels": {
+      "noName": "(Atsyz)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ Demirgazyk ýyldyzy görkezijisi",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "Kiçi kategoriýalary bar bolany üçin pozup bolmaz",
     "ADM_CTGR_NAME_REQUIRED": "Kategoriýa ady hökmany",
     "ADM_CTGR_NOT_FOUND": "Kategoriýa tapylmady",
+    "ADM_DB_API_MISSING": "Vercel API token/Proýekt ID/Deploy Hook gurnalmadyk",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "Gurşaw üýtgeýjileri üýtgedildi, ýöne gaýtadan ýaýratmak şowsuz boldy. Ýaýratmak ekranynda ýagdaýy barlaň.",
+    "ADM_DB_ENV_UPDATE_FAILED": "env üýtgetmek şowsuz boldy Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "Diňe staging gurşawynda üýtgedip bolýar (önümçilik WAS üýtgewsiz)",
+    "ADM_DB_PROD_RO_MISSING": "Önümçilik DB (prod-ro) diňe okamak üçin ygtyýarnamalar (PROD_RO_SUPABASE_URL/KEY) gurnalmadyk — ýazmak ýalňyşlyklarynyň öňüni almak üçin blokirlendi",
     "ADM_DB_TARGET_INVALID": "maksat 'staging' ýa-da 'prod-ro' bolmaly",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN gurnalmadyk",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "master SHA gözlemek şowsuz boldy",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "Ýokary götermek üçin kommit ýok (eýýäm iň soňky)",
+    "ADM_DEPLOY_PROD_DIVERGED": "production master-den {n} sany kommit öňde (aýryldy) — çalt öňe geçmek mümkin däl",
+    "ADM_DEPLOY_PROMOTE_FAILED": "Ýokary götermek şowsuz boldy GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK gurnalmadyk",
     "ADM_DEPLOY_TARGET_INVALID": "maksat 'staging' ýa-da 'production' bolmaly",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km 0-dan 200-e çenli bitin san bolmaly",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url dogry URL däl",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url diňe http(s) URL-leri kabul edýär",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "Çykarmak işi şowsuz boldy",
     "ADM_MINT_REASON_REQUIRED": "Çykarmagyň sebäbi (reason) hökmany",
     "ADM_NO_FIELDS_TO_UPDATE": "Täzelenmeli meýdanlar ýok",
+    "ADM_OPS_UNKNOWN": "Näbelli ýalňyşlyk ({detail})",
     "ADM_ORDERS_FAILED": "Sargytlary gözlemek şowsuz boldy",
     "ADM_PAGEVIEWS_FAILED": "Web trafigini gözlemek şowsuz boldy",
     "ADM_PAYMENT_NOT_FOUND": "Töleg tapylmady",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "PyCafé™ abunasy",
       "PISHOP": "PyShop™ abunasy",
+      "PISHOP_SUBSCR": "PyShop™ abunalyk",
       "TRANSLATE": "PyTranslate™ abunasy"
     },
     "renewBtn": "Täzelemek/Üýtgetmek",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "{product} abunalygyňyz başlandy!",
     "tagline": "Abuna = her bir ulanyş üçin tölegden boşadýan paket. Näçe köp ulandygyňyzça, şonça-da peýdaly!",
     "title": "Cafe.pi abunasy"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (Operator)",
+      "PICAFE_SUBSCR": "PyCafé™ abunalyk",
+      "TRANSLATE_SUBSCR": "PyTranslate™ abunalyk"
+    }
   },
   "sysUi": {
     "backToOrders": "Sargyt taryhyna gaýt",

@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "সেকেন্ড"
     },
+    "labels": {
+      "noName": "(নাম নেই)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ পোলারিস মেট্রিক",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "সাব-ক্যাটাগরি থাকায় মুছে ফেলা যাবে না",
     "ADM_CTGR_NAME_REQUIRED": "ক্যাটাগরির নাম আবশ্যক",
     "ADM_CTGR_NOT_FOUND": "ক্যাটাগরি পাওয়া যায়নি",
+    "ADM_DB_API_MISSING": "Vercel API টোকেন/প্রজেক্ট আইডি/ডিপ্লয় হুক সেট করা হয়নি",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "পরিবেশ ভেরিয়েবল পরিবর্তন করা হয়েছে, কিন্তু পুনরায় স্থাপন ব্যর্থ হয়েছে। ডিপ্লয়মেন্ট স্ক্রিনে স্ট্যাটাস চেক করুন।",
+    "ADM_DB_ENV_UPDATE_FAILED": "env পরিবর্তন ব্যর্থ হয়েছে Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "শুধুমাত্র স্টেজিং পরিবেশে পরিবর্তন করা যাবে (প্রোডাকশন WAS অপরিবর্তনীয়)",
+    "ADM_DB_PROD_RO_MISSING": "প্রোডাকশন DB (prod-ro) শুধুমাত্র পঠনযোগ্য প্রমাণপত্র (PROD_RO_SUPABASE_URL/KEY) সেট করা হয়নি — লেখার দুর্ঘটনা রোধে ব্লক করা হয়েছে",
     "ADM_DB_TARGET_INVALID": "লক্ষ্য অবশ্যই 'staging' অথবা 'prod-ro' হতে হবে",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN সেট করা হয়নি",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "master SHA পুনরুদ্ধার ব্যর্থ হয়েছে",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "প্রচার করার মতো কোনো কমিট নেই (ইতিমধ্যে আপ-টু-ডেট)",
+    "ADM_DEPLOY_PROD_DIVERGED": "production master থেকে {n}টি কমিট এগিয়ে আছে (বিভক্ত) — দ্রুত-ফরওয়ার্ড করা যাবে না",
+    "ADM_DEPLOY_PROMOTE_FAILED": "প্রচার ব্যর্থ হয়েছে GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK সেট করা হয়নি",
     "ADM_DEPLOY_TARGET_INVALID": "লক্ষ্য অবশ্যই 'staging' অথবা 'production' হতে হবে",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km অবশ্যই 0 থেকে 200 এর মধ্যে একটি পূর্ণসংখ্যা হতে হবে",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url একটি বৈধ URL নয়",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url শুধুমাত্র http(s) URL অনুমতি দেয়",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "ইস্যু প্রক্রিয়া ব্যর্থ",
     "ADM_MINT_REASON_REQUIRED": "ইস্যু করার কারণ (reason) আবশ্যক",
     "ADM_NO_FIELDS_TO_UPDATE": "আপডেট করার জন্য কোনো ক্ষেত্র নেই",
+    "ADM_OPS_UNKNOWN": "অজানা ত্রুটি ({detail})",
     "ADM_ORDERS_FAILED": "অর্ডার পুনরুদ্ধার ব্যর্থ",
     "ADM_PAGEVIEWS_FAILED": "ওয়েব ট্র্যাফিক পুনরুদ্ধার ব্যর্থ",
     "ADM_PAYMENT_NOT_FOUND": "পেমেন্ট পাওয়া যায়নি",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "PyCafé™ সাবস্ক্রিপশন",
       "PISHOP": "PyShop™ সাবস্ক্রিপশন",
+      "PISHOP_SUBSCR": "PyShop™ সাবস্ক্রিপশন",
       "TRANSLATE": "PyTranslate™ সাবস্ক্রিপশন"
     },
     "renewBtn": "নবায়ন/পরিবর্তন করুন",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "{product} সাবস্ক্রিপশন শুরু হয়েছে!",
     "tagline": "সাবস্ক্রিপশন = প্রতি লেনদেনে ফি মওকুফ প্যাকেজ। যত বেশি ব্যবহার করবেন, তত বেশি লাভ!",
     "title": "Cafe.pi সাবস্ক্রিপশন"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (অপারেটর)",
+      "PICAFE_SUBSCR": "PyCafé™ সাবস্ক্রিপশন",
+      "TRANSLATE_SUBSCR": "PyTranslate™ সাবস্ক্রিপশন"
+    }
   },
   "sysUi": {
     "backToOrders": "ক্রয় ইতিহাসে ফিরে যান",

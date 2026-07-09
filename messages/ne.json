@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "secondes"
     },
+    "labels": {
+      "noName": "(Sans nom)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ Indicateur étoile polaire",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "Impossible de supprimer car il y a des sous-catégories",
     "ADM_CTGR_NAME_REQUIRED": "Le nom de la catégorie est obligatoire",
     "ADM_CTGR_NOT_FOUND": "Catégorie introuvable",
+    "ADM_DB_API_MISSING": "Token API Vercel/ID de projet/Deploy Hook non configuré",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "Les variables d'environnement ont été modifiées, mais le redéploiement a échoué. Veuillez vérifier l'état sur l'écran de déploiement.",
+    "ADM_DB_ENV_UPDATE_FAILED": "Échec de la modification de l'environnement Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "Commutation possible uniquement en environnement de staging (WAS de production immuable)",
+    "ADM_DB_PROD_RO_MISSING": "Identifiants en lecture seule de la base de données de production (prod-ro) (PROD_RO_SUPABASE_URL/KEY) non configurés — bloqué pour éviter les accidents d'écriture",
     "ADM_DB_TARGET_INVALID": "La cible doit être 'staging' ou 'prod-ro'",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN non configuré",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "Échec de la récupération du SHA de master",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "Aucun commit à promouvoir (déjà à jour)",
+    "ADM_DEPLOY_PROD_DIVERGED": "La production est en avance de {n} commits sur master (divergence) — fast-forward impossible",
+    "ADM_DEPLOY_PROMOTE_FAILED": "Échec de la promotion GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK non configuré",
     "ADM_DEPLOY_TARGET_INVALID": "La cible doit être 'staging' ou 'production'",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km doit être un entier entre 0 et 200",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url n'est pas une URL valide",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url n'accepte que les URL http(s)",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "Échec du traitement de l'émission",
     "ADM_MINT_REASON_REQUIRED": "Le motif d'émission (reason) est obligatoire",
     "ADM_NO_FIELDS_TO_UPDATE": "Aucun champ à mettre à jour",
+    "ADM_OPS_UNKNOWN": "Erreur inconnue ({detail})",
     "ADM_ORDERS_FAILED": "Échec de la récupération des commandes",
     "ADM_PAGEVIEWS_FAILED": "Échec de la récupération du trafic web",
     "ADM_PAYMENT_NOT_FOUND": "Paiement introuvable",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "Abonnement PyCafe",
       "PISHOP": "Abonnement PyShop",
+      "PISHOP_SUBSCR": "Abonnement PyShop™",
       "TRANSLATE": "Abonnement Traduction automatique"
     },
     "renewBtn": "Renouveler/Modifier",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "Votre abonnement {product} a commencé !",
     "tagline": "Abonnement = Forfait d'exemption de frais par transaction. Plus vous l'utilisez, plus vous économisez !",
     "title": "Abonnement Cafe.pi"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (Opérateur)",
+      "PICAFE_SUBSCR": "Abonnement PyCafé™",
+      "TRANSLATE_SUBSCR": "Abonnement PyTranslate™"
+    }
   },
   "sysUi": {
     "backToOrders": "Retour aux commandes",

@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "сония"
     },
+    "labels": {
+      "noName": "(Ном надорад)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ Нишондиҳандаи ситораи қутбӣ",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "Нест кардан мумкин нест, зеро он категорияҳои фаръӣ дорад",
     "ADM_CTGR_NAME_REQUIRED": "Номи категория ҳатмӣ аст",
     "ADM_CTGR_NOT_FOUND": "Категория ёфт нашуд",
+    "ADM_DB_API_MISSING": "Vercel API токен/ID лоиҳа/Deploy Hook муқаррар нашудааст",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "Тағйирёбандаҳои муҳит тағйир дода шуданд, аммо аз нав ҷойгиркунӣ ноком шуд. Лутфан ҳолатро дар экрани ҷойгиркунӣ тафтиш кунед.",
+    "ADM_DB_ENV_UPDATE_FAILED": "Тағйири env ноком шуд Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "Танҳо дар муҳити staging иваз кардан мумкин аст (WAS-и истеҳсолӣ тағйирнопазир аст)",
+    "ADM_DB_PROD_RO_MISSING": "Маълумоти эътимоднокии танҳо барои хондан (PROD_RO_SUPABASE_URL/KEY) барои DB-и истеҳсолӣ (prod-ro) муқаррар нашудааст — барои пешгирии хатогиҳои навиштан баста шудааст",
     "ADM_DB_TARGET_INVALID": "target 'staging' ё 'prod-ro' аст",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN муқаррар нашудааст",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "Дарёфти master SHA ноком шуд",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "Коммит барои пешбарӣ вуҷуд надорад (аллакай навтарин аст)",
+    "ADM_DEPLOY_PROD_DIVERGED": "production аз master {n} коммит пеш аст (фарқ мекунад) — fast-forward имконнопазир аст",
+    "ADM_DEPLOY_PROMOTE_FAILED": "Пешбарӣ ноком шуд GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK муқаррар нашудааст",
     "ADM_DEPLOY_TARGET_INVALID": "target 'staging' ё 'production' аст",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km бояд адади бутуни аз 0 то 200 бошад",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url URL-и эътиборнок нест",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url танҳо URL-ҳои http(s)-ро иҷозат медиҳад",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "Коркарди барориш ноком шуд",
     "ADM_MINT_REASON_REQUIRED": "Сабаби барориш (reason) ҳатмӣ аст",
     "ADM_NO_FIELDS_TO_UPDATE": "Майдонҳо барои навсозӣ мавҷуд нестанд",
+    "ADM_OPS_UNKNOWN": "Хатои номаълум ({detail})",
     "ADM_ORDERS_FAILED": "Ҷустуҷӯи фармоишҳо ноком шуд",
     "ADM_PAGEVIEWS_FAILED": "Ҷустуҷӯи трафики веб ноком шуд",
     "ADM_PAYMENT_NOT_FOUND": "Пардохт ёфт нашуд",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "Обунаи PyCafé™",
       "PISHOP": "Обунаи PyShop™",
+      "PISHOP_SUBSCR": "PyShop™ обуна",
       "TRANSLATE": "Обунаи PyTranslate™"
     },
     "renewBtn": "Таҷдид/Тағйир додан",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "Обунаи {product} оғоз шуд!",
     "tagline": "Обуна = бастаи озодкунӣ аз пардохти ҳар як транзаксия. Чӣ қадаре ки бештар истифода баред, ҳамон қадар фоидаовар аст!",
     "title": "Обунаи Cafe.pi"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (Оператор)",
+      "PICAFE_SUBSCR": "PyCafé™ обуна",
+      "TRANSLATE_SUBSCR": "PyTranslate™ обуна"
+    }
   },
   "sysUi": {
     "backToOrders": "Ба таърихи харид",

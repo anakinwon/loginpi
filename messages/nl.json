@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "sec"
     },
+    "labels": {
+      "noName": "(geen naam)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ Poolster-indicator",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "Kan niet verwijderen omdat er subcategorieën zijn",
     "ADM_CTGR_NAME_REQUIRED": "Categorienaam is verplicht",
     "ADM_CTGR_NOT_FOUND": "Categorie niet gevonden",
+    "ADM_DB_API_MISSING": "Vercel API-token/project-ID/Deploy Hook niet ingesteld",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "De omgevingsvariabelen zijn gewijzigd, maar de herimplementatie is mislukt. Controleer de status op het implementatiescherm.",
+    "ADM_DB_ENV_UPDATE_FAILED": "omgevingsvariabele wijzigen mislukt Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "alleen mogelijk in staging-omgeving (productie WAS onveranderlijk)",
+    "ADM_DB_PROD_RO_MISSING": "alleen-lezen referenties voor productie-DB (prod-ro) (PROD_RO_SUPABASE_URL/KEY) niet ingesteld — geblokkeerd om schrijfincidenten te voorkomen",
     "ADM_DB_TARGET_INVALID": "target is 'staging' of 'prod-ro'",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN niet ingesteld",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "master SHA ophalen mislukt",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "geen commits om te promoten (al up-to-date)",
+    "ADM_DEPLOY_PROD_DIVERGED": "productie loopt {n} commits voor op master (divergentie) — fast-forward niet mogelijk",
+    "ADM_DEPLOY_PROMOTE_FAILED": "promotie mislukt GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK niet ingesteld",
     "ADM_DEPLOY_TARGET_INVALID": "target is 'staging' of 'production'",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km moet een geheel getal zijn tussen 0 en 200",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url is geen geldige URL",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url staat alleen http(s) URL's toe",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "Verwerking van uitgifte mislukt",
     "ADM_MINT_REASON_REQUIRED": "Reden voor uitgifte (reason) is verplicht",
     "ADM_NO_FIELDS_TO_UPDATE": "Geen velden om bij te werken",
+    "ADM_OPS_UNKNOWN": "onbekende fout ({detail})",
     "ADM_ORDERS_FAILED": "Ophalen van bestellingen mislukt",
     "ADM_PAGEVIEWS_FAILED": "Ophalen van webverkeer mislukt",
     "ADM_PAYMENT_NOT_FOUND": "Betaling niet gevonden",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "PyCafé™ Abonnement",
       "PISHOP": "PyShop™ Abonnement",
+      "PISHOP_SUBSCR": "PyShop™ abonnement",
       "TRANSLATE": "PyTranslate™ Abonnement"
     },
     "renewBtn": "Verlengen/Wijzigen",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "Uw {product}-abonnement is gestart!",
     "tagline": "Abonnement = pakket met vrijstelling van kosten per transactie. Hoe meer u gebruikt, hoe meer voordeel!",
     "title": "Cafe.pi Abonnement"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (operator)",
+      "PICAFE_SUBSCR": "PyCafé™ abonnement",
+      "TRANSLATE_SUBSCR": "PyTranslate™ abonnement"
+    }
   },
   "sysUi": {
     "backToOrders": "Terug naar bestellingen",

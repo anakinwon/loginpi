@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "ثانیه"
     },
+    "labels": {
+      "noName": "(نوم نشته)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ North Star Metric",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "د فرعي کټګوریو شتون له امله حذف کیدی نشي",
     "ADM_CTGR_NAME_REQUIRED": "د کټګورۍ نوم اړین دی",
     "ADM_CTGR_NOT_FOUND": "کټګوري ونه موندل شوه",
+    "ADM_DB_API_MISSING": "Vercel API ټوکن/پروژې ID/Deploy Hook نه دی تنظیم شوی",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "چاپیریال متغیرات بدل شوي، مګر بیا ځای پرځای کول ناکام شول. مهرباني وکړئ د ځای پرځای کولو سکرین کې حالت وګورئ.",
+    "ADM_DB_ENV_UPDATE_FAILED": "د چاپیریال بدلولو کې پاتې راغی Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "یوازې په سټیجینګ چاپیریال کې بدلیدلی شي (د تولید WAS ثابت دی)",
+    "ADM_DB_PROD_RO_MISSING": "د تولید ډیټابیس (prod-ro) یوازې لوستلو اعتبارونه (PROD_RO_SUPABASE_URL/KEY) نه دي تنظیم شوي — د لیکلو پیښو مخنیوي لپاره بند شوي",
     "ADM_DB_TARGET_INVALID": "هدف 'staging' یا 'prod-ro' دی",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN نه دی تنظیم شوی",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "د ماسټر SHA په ترلاسه کولو کې پاتې راغی",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "د ترفیع لپاره هیڅ کمېټ نشته (دمخه تازه دی)",
+    "ADM_DEPLOY_PROD_DIVERGED": "پروډکشن د ماسټر څخه {n} کمېټونه مخکې دی (جلا شوی) — چټک پرمختګ ممکن نه دی",
+    "ADM_DEPLOY_PROMOTE_FAILED": "د ترفیع ناکامي GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK نه دی تنظیم شوی",
     "ADM_DEPLOY_TARGET_INVALID": "هدف 'staging' یا 'production' دی",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km باید د 0 او 200 ترمنځ یو بشپړ شمیر وي",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url یو معتبر URL نه دی",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url یوازې http(s) URL ته اجازه ورکوي",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "د خپرولو پروسس کولو کې پاتې راغی",
     "ADM_MINT_REASON_REQUIRED": "د خپرولو دلیل (reason) اړین دی",
     "ADM_NO_FIELDS_TO_UPDATE": "د تازه کولو لپاره هیڅ ساحه نشته",
+    "ADM_OPS_UNKNOWN": "نامعلومه تېروتنه ({detail})",
     "ADM_ORDERS_FAILED": "د فرمایشونو ترلاسه کولو کې پاتې راغی",
     "ADM_PAGEVIEWS_FAILED": "د ویب ترافیک ترلاسه کولو کې پاتې راغی",
     "ADM_PAYMENT_NOT_FOUND": "تادیه ونه موندل شوه",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "د PyCafé™ ګډون",
       "PISHOP": "د PyShop™ ګډون",
+      "PISHOP_SUBSCR": "PyShop™ ګډون",
       "TRANSLATE": "د PyTranslate™ ګډون"
     },
     "renewBtn": "نوي کول/بدلول",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "ستاسو د {product} ګډون پیل شو!",
     "tagline": "ګډون = د هر توکي فیس معافیت کڅوړه. څومره چې ډیر کاروئ، هغومره ډیره ګټه!",
     "title": "د Cafe.pi ګډون"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (چلوونکی)",
+      "PICAFE_SUBSCR": "PyCafé™ ګډون",
+      "TRANSLATE_SUBSCR": "PyTranslate™ ګډون"
+    }
   },
   "sysUi": {
     "backToOrders": "د پیرود تاریخ ته بیرته",

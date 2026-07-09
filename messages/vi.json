@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "giây"
     },
+    "labels": {
+      "noName": "(Không có tên)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ Chỉ số Sao Bắc Đẩu",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "Không thể xóa vì có danh mục con",
     "ADM_CTGR_NAME_REQUIRED": "Tên danh mục là bắt buộc",
     "ADM_CTGR_NOT_FOUND": "Không tìm thấy danh mục",
+    "ADM_DB_API_MISSING": "Vercel API token/Project ID/Deploy Hook chưa được cấu hình",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "Các biến môi trường đã được thay đổi nhưng việc triển khai lại thất bại. Vui lòng kiểm tra trạng thái trên màn hình triển khai.",
+    "ADM_DB_ENV_UPDATE_FAILED": "Thay đổi env thất bại Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "Chỉ có thể chuyển đổi trong môi trường staging (WAS sản xuất không đổi)",
+    "ADM_DB_PROD_RO_MISSING": "DB sản xuất (prod-ro) thông tin xác thực chỉ đọc (PROD_RO_SUPABASE_URL/KEY) chưa được cấu hình — bị chặn để ngăn chặn sự cố ghi",
     "ADM_DB_TARGET_INVALID": "target là 'staging' hoặc 'prod-ro'",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN chưa được cấu hình",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "Truy vấn master SHA thất bại",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "Không có commit nào để thăng cấp (đã là phiên bản mới nhất)",
+    "ADM_DEPLOY_PROD_DIVERGED": "production đang đi trước master {n} commit (phân nhánh) — không thể fast-forward",
+    "ADM_DEPLOY_PROMOTE_FAILED": "Thăng cấp thất bại GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK chưa được cấu hình",
     "ADM_DEPLOY_TARGET_INVALID": "target là 'staging' hoặc 'production'",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km phải là số nguyên từ 0 đến 200",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url không phải là URL hợp lệ",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url chỉ cho phép URL http(s)",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "Xử lý phát hành thất bại",
     "ADM_MINT_REASON_REQUIRED": "Lý do phát hành (reason) là bắt buộc",
     "ADM_NO_FIELDS_TO_UPDATE": "Không có trường để cập nhật",
+    "ADM_OPS_UNKNOWN": "Lỗi không xác định ({detail})",
     "ADM_ORDERS_FAILED": "Không thể truy vấn đơn hàng",
     "ADM_PAGEVIEWS_FAILED": "Không thể truy vấn lưu lượng truy cập web",
     "ADM_PAYMENT_NOT_FOUND": "Không tìm thấy thanh toán",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "Đăng ký PyCafe",
       "PISHOP": "PyShop Subscribe",
+      "PISHOP_SUBSCR": "Đăng ký PyShop™",
       "TRANSLATE": "Đăng ký Dịch tự động"
     },
     "renewBtn": "Gia hạn/Thay đổi",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "Đăng ký {product} của bạn đã bắt đầu!",
     "tagline": "Đăng ký = gói miễn phí phí mỗi giao dịch. Càng dùng nhiều càng có lợi!",
     "title": "Đăng ký Cafe.pi"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (Người điều hành)",
+      "PICAFE_SUBSCR": "Đăng ký PyCafé™",
+      "TRANSLATE_SUBSCR": "Đăng ký PyTranslate™"
+    }
   },
   "sysUi": {
     "backToOrders": "Về lịch sử mua hàng",

@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "ثانية"
     },
+    "labels": {
+      "noName": "(لا يوجد اسم)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ مؤشر نجم الشمال",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "لا يمكن حذفها لوجود فئات فرعية",
     "ADM_CTGR_NAME_REQUIRED": "اسم الفئة مطلوب",
     "ADM_CTGR_NOT_FOUND": "لا يمكن العثور على الفئة",
+    "ADM_DB_API_MISSING": "رمز API لـ Vercel / معرف المشروع / Deploy Hook غير مضبوط",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "تم تغيير متغيرات البيئة ولكن فشل إعادة النشر. يرجى التحقق من الحالة في شاشة النشر.",
+    "ADM_DB_ENV_UPDATE_FAILED": "فشل تغيير env Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "يمكن التبديل فقط في بيئة staging (WAS الإنتاج غير قابل للتغيير)",
+    "ADM_DB_PROD_RO_MISSING": "بيانات اعتماد قاعدة بيانات الإنتاج (prod-ro) للقراءة فقط (PROD_RO_SUPABASE_URL/KEY) غير مضبوطة — محظور لمنع حوادث الكتابة",
     "ADM_DB_TARGET_INVALID": "يجب أن يكون الهدف (target) إما 'staging' أو 'prod-ro'",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN غير مضبوط",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "فشل البحث عن master SHA",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "لا توجد commit للترقية (هو الأحدث بالفعل)",
+    "ADM_DEPLOY_PROD_DIVERGED": "production متقدم على master بـ {n} commit (متشعب) — لا يمكن التقديم السريع",
+    "ADM_DEPLOY_PROMOTE_FAILED": "فشل الترقية GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK غير مضبوط",
     "ADM_DEPLOY_TARGET_INVALID": "يجب أن يكون الهدف (target) إما 'staging' أو 'production'",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "يجب أن يكون max_dist_km عددًا صحيحًا بين 0 و 200",
     "ADM_EVIDENCE_URL_INVALID": "عنوان URL للدليل (evidence_url) غير صالح",
     "ADM_EVIDENCE_URL_PROTOCOL": "عنوان URL للدليل (evidence_url) يسمح فقط بعناوين URL من نوع http(s)",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "فشل معالجة الإصدار",
     "ADM_MINT_REASON_REQUIRED": "سبب الإصدار (reason) مطلوب",
     "ADM_NO_FIELDS_TO_UPDATE": "لا توجد حقول للتحديث",
+    "ADM_OPS_UNKNOWN": "خطأ غير معروف ({detail})",
     "ADM_ORDERS_FAILED": "فشل الاستعلام عن الطلبات",
     "ADM_PAGEVIEWS_FAILED": "فشل الاستعلام عن حركة مرور الويب",
     "ADM_PAYMENT_NOT_FOUND": "لا يمكن العثور على الدفعة",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "اشتراك PyCafe",
       "PISHOP": "اشتراك PyShop",
+      "PISHOP_SUBSCR": "اشتراك PyShop™",
       "TRANSLATE": "اشتراك الترجمة التلقائية"
     },
     "renewBtn": "تجديد/تغيير",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "تم بدء اشتراك {product}!",
     "tagline": "الاشتراك = باقة إعفاء من الرسوم لكل معاملة. كلما استخدمت أكثر، كلما ربحت أكثر!",
     "title": "اشتراك Cafe.pi"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (مشغل)",
+      "PICAFE_SUBSCR": "اشتراك PyCafé™",
+      "TRANSLATE_SUBSCR": "اشتراك PyTranslate™"
+    }
   },
   "sysUi": {
     "backToOrders": "العودة إلى الطلبات",

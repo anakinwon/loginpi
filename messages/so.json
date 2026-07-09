@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "ilbiriqsi"
     },
+    "labels": {
+      "noName": "(Magac la'aan)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ Cabirka Xiddigta Waqooyi",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "Ma tirtiri kartid sababtoo ah waxay leedahay qaybo hoose",
     "ADM_CTGR_NAME_REQUIRED": "Magaca qaybta waa qasab",
     "ADM_CTGR_NOT_FOUND": "Qaybta lama helin",
+    "ADM_DB_API_MISSING": "Vercel API Token/Project ID/Deploy Hook lama dejin",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "Isbeddelada deegaanka waa la beddelay, laakiin dib-u-dejintu way fashilantay. Fadlan ka eeg xaaladda shaashadda dejinta.",
+    "ADM_DB_ENV_UPDATE_FAILED": "Beddelka env-ku wuu fashilmay Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "Kaliya waxaa lagu beddeli karaa deegaanka tijaabada (staging) (WAS-ka wax-soo-saarka (production) waa mid aan isbeddelin)",
+    "ADM_DB_PROD_RO_MISSING": "Aqoonsiga akhriska-kaliya ee DB-ga wax-soo-saarka (prod-ro) (PROD_RO_SUPABASE_URL/KEY) lama dejin — Waa la xannibay si looga hortago shilalka qoraalka",
     "ADM_DB_TARGET_INVALID": "Bartilmaameedku waa 'staging' ama 'prod-ro'",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN lama dejin",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "Ku guuldareystay in la helo master SHA",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "Ma jiraan wax commit ah oo la dallacsiiyo (horey ayuu u cusboonaysan yahay)",
+    "ADM_DEPLOY_PROD_DIVERGED": "production-ku wuxuu {n} commit ka horreeyaa master (kala fogaaday) — fast-forward suurtagal maaha",
+    "ADM_DEPLOY_PROMOTE_FAILED": "Dallacsiintu way fashilantay GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK lama dejin",
     "ADM_DEPLOY_TARGET_INVALID": "Bartilmaameedku waa 'staging' ama 'production'",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km waa inuu noqdaa tiro dhan oo u dhexeysa 0 ilaa 200",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url maaha URL ansax ah",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url kaliya wuxuu ogolaanayaa URL-yada http(s)",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "Farsamaynta soo-saarista ayaa ku guuldareysatay",
     "ADM_MINT_REASON_REQUIRED": "Sababta soo-saarista (reason) waa qasab",
     "ADM_NO_FIELDS_TO_UPDATE": "Ma jiraan goobo la cusboonaysiiyo",
+    "ADM_OPS_UNKNOWN": "Khalad aan la garanayn ({detail})",
     "ADM_ORDERS_FAILED": "Dalabyada ayaa ku guuldareystay",
     "ADM_PAGEVIEWS_FAILED": "Tirada booqashooyinka bogga ayaa ku guuldareystay",
     "ADM_PAYMENT_NOT_FOUND": "Lacag-bixinta lama helin",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "Isdiiwaangelinta PyCafé™",
       "PISHOP": "Isdiiwaangelinta PyShop™",
+      "PISHOP_SUBSCR": "PyShop™ Rukun",
       "TRANSLATE": "Isdiiwaangelinta PyTranslate™"
     },
     "renewBtn": "Cusboonaysii/Beddel",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "Isdiiwaangelinta {product} ayaa bilowday!",
     "tagline": "Isdiiwaangelin = Xirmo ka reebis khidmadaha wax kasta. Inta badan ee aad isticmaasho, waa inta badan ee aad ka faa'iidaysato!",
     "title": "Isdiiwaangelinta Cafe.pi"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (Hawl-wadeen)",
+      "PICAFE_SUBSCR": "PyCafé™ Rukun",
+      "TRANSLATE_SUBSCR": "PyTranslate™ Rukun"
+    }
   },
   "sysUi": {
     "backToOrders": "Ku noqo taariikhda iibka",

@@ -760,6 +760,9 @@
       "uPv": "PV",
       "uSec": "segons"
     },
+    "labels": {
+      "noName": "(Sense nom)"
+    },
     "northStar": {
       "dau": "DAU",
       "label": "⭐ Mètrica de l'estrella polar",
@@ -2111,8 +2114,22 @@
     "ADM_CTGR_HAS_CHILDREN": "No es pot eliminar perquè té subcategories",
     "ADM_CTGR_NAME_REQUIRED": "El nom de la categoria és obligatori",
     "ADM_CTGR_NOT_FOUND": "No s'ha trobat la categoria",
+    "ADM_DB_API_MISSING": "Token d'API de Vercel/ID de projecte/Deploy Hook no configurat",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "Les variables d'entorn s'han canviat, però la redistribució ha fallat. Comproveu l'estat a la pantalla de desplegament.",
+    "ADM_DB_ENV_UPDATE_FAILED": "Error en canviar l'entorn Vercel {status} {detail}",
+    "ADM_DB_NOT_STAGING": "Només es pot canviar en l'entorn de staging (WAS de producció immutable)",
+    "ADM_DB_PROD_RO_MISSING": "Credencials de només lectura de la BD de producció (prod-ro) (PROD_RO_SUPABASE_URL/KEY) no configurades — bloquejat per evitar accidents d'escriptura",
     "ADM_DB_TARGET_INVALID": "target ha de ser 'staging' o 'prod-ro'",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN no configurat",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "Error en recuperar el SHA de master",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "No hi ha commits per promocionar (ja és la versió més recent)",
+    "ADM_DEPLOY_PROD_DIVERGED": "production està {n} commits per davant de master (divergit) — no es pot fer fast-forward",
+    "ADM_DEPLOY_PROMOTE_FAILED": "Error en la promoció GitHub {status} {detail}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK no configurat",
     "ADM_DEPLOY_TARGET_INVALID": "target ha de ser 'staging' o 'production'",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
     "ADM_DIST_KM_RANGE": "max_dist_km ha de ser un enter entre 0 i 200",
     "ADM_EVIDENCE_URL_INVALID": "evidence_url no és una URL vàlida",
     "ADM_EVIDENCE_URL_PROTOCOL": "evidence_url només permet URL http(s)",
@@ -2161,6 +2178,7 @@
     "ADM_MINT_FAILED": "Error en el processament de l'emissió",
     "ADM_MINT_REASON_REQUIRED": "El motiu d'emissió (reason) és obligatori",
     "ADM_NO_FIELDS_TO_UPDATE": "No hi ha camps per actualitzar",
+    "ADM_OPS_UNKNOWN": "Error desconegut ({detail})",
     "ADM_ORDERS_FAILED": "No s'han pogut recuperar les comandes",
     "ADM_PAGEVIEWS_FAILED": "No s'ha pogut recuperar el trànsit web",
     "ADM_PAYMENT_NOT_FOUND": "No s'ha trobat el pagament",
@@ -4358,6 +4376,7 @@
     "product": {
       "PICAFE": "Subscripció a PyCafé™",
       "PISHOP": "Subscripció a PyShop™",
+      "PISHOP_SUBSCR": "PyShop™ subscripció",
       "TRANSLATE": "Subscripció a PyTranslate™"
     },
     "renewBtn": "Renovar/Canviar",
@@ -4372,6 +4391,14 @@
     "subscribeSuccess": "La subscripció a {product} ha començat!",
     "tagline": "Subscripció = paquet d'exempció de tarifes per transacció. Com més l'utilitzeu, més beneficis obtindreu!",
     "title": "Subscripció a PyCafé™"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (Operador)",
+      "PICAFE_SUBSCR": "PyCafé™ subscripció",
+      "TRANSLATE_SUBSCR": "PyTranslate™ subscripció"
+    }
   },
   "sysUi": {
     "backToOrders": "Tornar a les comandes",
