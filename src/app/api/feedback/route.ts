@@ -5,6 +5,7 @@ import { getActiveFeeMode } from '@/lib/fee-resolver'
 import { payFbckPiReward } from '@/lib/fbck-pi-reward'
 import { enqueueFbckNoti } from '@/lib/trade-noti'
 import { maskUsername } from '@/lib/mask-username'
+import { apiError } from '@/lib/api-errors'
 
 interface FbckImgInput {
   img_ord: number
@@ -49,10 +50,7 @@ export async function GET(req: NextRequest) {
   const offset = (page - 1) * limit
 
   if (!shopId && !orderId && !itemId) {
-    return NextResponse.json(
-      { error: 'shop_id, order_id 또는 item_id가 필요합니다' },
-      { status: 400 },
-    )
+    return apiError('FBCK_TARGET_REQUIRED_GET', 400)
   }
 
   const db = getSupabaseAdmin()
@@ -71,7 +69,7 @@ export async function GET(req: NextRequest) {
   if (itemId) q = q.eq('prod_id', itemId)
 
   const { data: rows, count, error } = await q
-  if (error) return NextResponse.json({ error: '조회 실패' }, { status: 500 })
+  if (error) return apiError('QUERY_FAILED', 500)
 
   const fbckIds = (rows ?? []).map((r: { fbck_id: string }) => r.fbck_id)
 
@@ -171,11 +169,10 @@ export async function GET(req: NextRequest) {
 // POST /api/feedback
 export async function POST(req: NextRequest) {
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   const body = await req.json().catch(() => null)
-  if (!body) return NextResponse.json({ error: '잘못된 요청' }, { status: 400 })
+  if (!body) return apiError('BAD_REQUEST', 400)
 
   const { shop_id, order_id, fbck_scr, fbck_cn, fbck_img, item_scores } =
     body as {
@@ -188,37 +185,22 @@ export async function POST(req: NextRequest) {
     }
 
   if (!shop_id && !order_id) {
-    return NextResponse.json(
-      { error: 'shop_id 또는 order_id가 필요합니다' },
-      { status: 400 },
-    )
+    return apiError('FBCK_TARGET_REQUIRED', 400)
   }
   if (!fbck_scr || fbck_scr < 1 || fbck_scr > 5) {
-    return NextResponse.json(
-      { error: '별점은 1~5점이어야 합니다' },
-      { status: 400 },
-    )
+    return apiError('FBCK_SCORE_RANGE', 400)
   }
   if (!fbck_cn || fbck_cn.trim().length < 10) {
-    return NextResponse.json(
-      { error: '후기 본문은 최소 10자 이상이어야 합니다' },
-      { status: 400 },
-    )
+    return apiError('FBCK_CONTENT_MIN', 400)
   }
   if (fbck_img && fbck_img.length > 5) {
-    return NextResponse.json(
-      { error: '이미지는 최대 5개까지 첨부 가능합니다' },
-      { status: 400 },
-    )
+    return apiError('FBCK_IMG_MAX', 400)
   }
   if (
     item_scores &&
     item_scores.some((s) => s.item_scr < 1 || s.item_scr > 5)
   ) {
-    return NextResponse.json(
-      { error: '항목 점수는 1~5점이어야 합니다' },
-      { status: 400 },
-    )
+    return apiError('FBCK_ITEM_SCORE_RANGE', 400)
   }
 
   const db = getSupabaseAdmin()
@@ -239,16 +221,10 @@ export async function POST(req: NextRequest) {
       .maybeSingle()
 
     if (!mbr) {
-      return NextResponse.json(
-        { error: '해당 카페에 참여한 기록이 없습니다' },
-        { status: 403 },
-      )
+      return apiError('FBCK_NOT_CAFE_MEMBER', 403)
     }
     if ((mbr as { mbr_role_cd: string }).mbr_role_cd === 'OWNER') {
-      return NextResponse.json(
-        { error: '자신이 만든 카페에는 후기를 작성할 수 없습니다' },
-        { status: 403 },
-      )
+      return apiError('FBCK_OWN_CAFE', 403)
     }
 
     // 보증금 주체 = 카페 OWNER (보상 재원 차감 대상)
@@ -276,18 +252,12 @@ export async function POST(req: NextRequest) {
       .maybeSingle()
 
     if (!ord) {
-      return NextResponse.json(
-        { error: '해당 주문의 구매자가 아닙니다' },
-        { status: 403 },
-      )
+      return apiError('FBCK_NOT_BUYER', 403)
     }
     // COMPLETED/SETTLED 상태 주문만 후기 작성 가능 (PENDING/CANCELLED 제외)
     const st = (ord as { order_st_cd: string; item_id: string }).order_st_cd
     if (st === 'PENDING' || st === 'CANCELLED') {
-      return NextResponse.json(
-        { error: '완료된 주문에 대해서만 후기를 작성할 수 있습니다' },
-        { status: 403 },
-      )
+      return apiError('FBCK_ORDER_NOT_COMPLETE', 403)
     }
     prodId = (ord as { order_st_cd: string; item_id: string }).item_id
 
@@ -303,10 +273,7 @@ export async function POST(req: NextRequest) {
     } | null
     const consentYn = itemShopRow?.mps_shop?.fbck_consent_yn
     if (consentYn !== 'Y') {
-      return NextResponse.json(
-        { error: '이 매장은 이용후기·보상 프로그램에 참여하지 않습니다' },
-        { status: 403 },
-      )
+      return apiError('FBCK_SHOP_NOT_PARTICIPATING', 403)
     }
     // 보증금 주체 = 상점 seller (보상 재원 차감 대상)
     ownerId = itemShopRow?.seller_id ?? null
@@ -317,10 +284,7 @@ export async function POST(req: NextRequest) {
   //   보증금(잔액 ≥ 보상액)을 예치한 매장만 후기 작성·보상 가능. 1차 방어(친절 차단),
   //   실제 차감은 fn_fbck_reward_apply 내부 원자 조건부 UPDATE(2차 방어)가 보장.
   if (!ownerId || !bondKind) {
-    return NextResponse.json(
-      { error: '매장 정보를 확인할 수 없습니다' },
-      { status: 500 },
-    )
+    return apiError('FBCK_SHOP_INFO_MISSING', 500)
   }
   const rewardBean = await getRewardBean(Number(fbck_scr))
   if (rewardBean > 0) {
@@ -335,13 +299,7 @@ export async function POST(req: NextRequest) {
       (bond as { bond_bal_bean: number } | null)?.bond_bal_bean ?? 0,
     )
     if (bondBal < rewardBean) {
-      return NextResponse.json(
-        {
-          error:
-            '이 매장은 후기 보상 보증금이 부족해 현재 후기를 받지 않습니다',
-        },
-        { status: 403 },
-      )
+      return apiError('FBCK_BOND_INSUFFICIENT_SHOP', 403)
     }
   }
 
@@ -363,13 +321,10 @@ export async function POST(req: NextRequest) {
   if (insertErr) {
     // DB UNIQUE 제약 위반 = 중복 후기
     if (insertErr.code === '23505') {
-      return NextResponse.json(
-        { error: '이미 후기를 작성했습니다' },
-        { status: 409 },
-      )
+      return apiError('FBCK_DUPLICATE', 409)
     }
     console.error('[Feedback] 후기 저장 실패:', insertErr.message)
-    return NextResponse.json({ error: '후기 저장 실패' }, { status: 500 })
+    return apiError('FBCK_SAVE_FAILED', 500)
   }
 
   const fbckId = (inserted as { fbck_id: string }).fbck_id
@@ -447,14 +402,11 @@ export async function POST(req: NextRequest) {
         })
         .eq('fbck_id', fbckId)
       if (rwdErr) console.error('[Feedback] 보상 지급 실패:', rwdErr.message)
-      return NextResponse.json(
-        {
-          error:
-            row?.message === 'INSUFFICIENT_BOND'
-              ? '매장 보증금이 부족해 후기 보상을 지급할 수 없습니다'
-              : '후기 보상 처리에 실패했습니다',
-        },
-        { status: 409 },
+      return apiError(
+        row?.message === 'INSUFFICIENT_BOND'
+          ? 'FBCK_BOND_INSUFFICIENT_PAY'
+          : 'FBCK_REWARD_FAILED',
+        409,
       )
     }
 

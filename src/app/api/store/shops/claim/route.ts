@@ -5,6 +5,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getPlaceDetails, phoneMatches } from '@/lib/google-maps'
 import { findVerifiedShopByPlaceId, createVerifiedShop } from '@/lib/mps-shop'
 import { sanitizeError } from '@/lib/sanitize-error'
+import { apiError } from '@/lib/api-errors'
 
 // POST /api/store/shops/claim — 구글 카페를 내 PyShop™ 매장으로 반자동 인증 등록
 //
@@ -55,22 +56,18 @@ function haversineMeters(
 
 export async function POST(req: NextRequest) {
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   // 현장 GPS가 전제 — LBS 미동의자는 현장 검증 불가
   if (user.lbs_consent_yn !== 'Y') {
-    return NextResponse.json(
-      { error: '위치기반서비스 동의가 필요합니다 (현장 위치 확인)' },
-      { status: 403 },
-    )
+    return apiError('STORE_LBS_CONSENT_REQUIRED', 403)
   }
 
   let body: unknown
   try {
     body = await req.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
 
   const parsed = claimSchema.safeParse(body)
@@ -78,6 +75,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         error: '매장명·전화번호·대표자명·주소·이메일을 모두 입력해주세요',
+        code: 'STORE_CLAIM_FIELDS_REQUIRED',
         detail: parsed.error.issues,
       },
       { status: 400 },
@@ -88,13 +86,7 @@ export async function POST(req: NextRequest) {
   // ⓪ place_id 전체 일치 — 입력값이 place_id와 대소문자까지 정확히 일치해야 함
   //    (복사 차단 + 직접 타이핑. 구글 조회 비용 발생 전 무성의 선점 1차 차단)
   if (c.place_id_confirm !== c.place_id) {
-    return NextResponse.json(
-      {
-        error: 'place_id가 정확히 일치하지 않습니다 (대소문자 구분)',
-        code: 'PLACE_ID_MISMATCH',
-      },
-      { status: 422 },
-    )
+    return apiError('STORE_PLACE_ID_MISMATCH', 422)
   }
 
   // ① 서버가 place_id로 구글 Place Details 직접 조회 (권위 기준값)
@@ -114,24 +106,12 @@ export async function POST(req: NextRequest) {
     )
   }
   if (!place) {
-    return NextResponse.json(
-      {
-        error: '구글에서 해당 매장을 찾을 수 없습니다',
-        code: 'PLACE_NOT_FOUND',
-      },
-      { status: 404 },
-    )
+    return apiError('STORE_PLACE_NOT_FOUND', 404)
   }
 
   // ② 현장 검증 — 구글 좌표 기준 사용자 현재 위치 ≤ 100m (클라이언트 place 좌표 불신뢰)
   if (place.lat === null || place.lng === null) {
-    return NextResponse.json(
-      {
-        error: '구글에 매장 좌표가 없어 현장 인증할 수 없습니다',
-        code: 'NO_PLACE_COORD',
-      },
-      { status: 422 },
-    )
+    return apiError('STORE_NO_PLACE_COORD', 422)
   }
   const distanceM = haversineMeters(
     c.user_lat,
@@ -140,11 +120,13 @@ export async function POST(req: NextRequest) {
     place.lng,
   )
   if (distanceM > CLAIM_RADIUS_M) {
+    const distance = Math.round(distanceM)
     return NextResponse.json(
       {
-        error: `매장에서 ${Math.round(distanceM)}m 떨어져 있습니다. 매장 ${CLAIM_RADIUS_M}m 이내에서 다시 시도해주세요.`,
-        code: 'TOO_FAR',
-        distance_m: Math.round(distanceM),
+        error: `매장에서 ${distance}m 떨어져 있습니다. 매장 ${CLAIM_RADIUS_M}m 이내에서 다시 시도해주세요.`,
+        code: 'STORE_CLAIM_TOO_FAR',
+        params: { m: distance, radius: CLAIM_RADIUS_M },
+        distance_m: distance,
       },
       { status: 422 },
     )
@@ -153,22 +135,10 @@ export async function POST(req: NextRequest) {
   // ③ 전화번호 대조 — 입력값 == 구글 전화번호 (검증 가능한 핵심 항목)
   const googlePhone = place.national_phone ?? place.international_phone
   if (!googlePhone) {
-    return NextResponse.json(
-      {
-        error: '구글에 전화번호가 없어 자동 인증할 수 없습니다',
-        code: 'NO_PLACE_PHONE',
-      },
-      { status: 422 },
-    )
+    return apiError('STORE_NO_PLACE_PHONE', 422)
   }
   if (!phoneMatches(c.contact_tel, googlePhone)) {
-    return NextResponse.json(
-      {
-        error: '입력한 전화번호가 구글에 등록된 매장 전화번호와 다릅니다',
-        code: 'PHONE_MISMATCH',
-      },
-      { status: 422 },
-    )
+    return apiError('STORE_PHONE_MISMATCH', 422)
   }
 
   // ④ place_id 중복 사전 검사 (DB 유니크 인덱스가 최종 강제, 친절한 안내)
@@ -180,7 +150,7 @@ export async function POST(req: NextRequest) {
         error: mine
           ? '이미 내가 등록한 매장입니다'
           : '이미 다른 사용자가 등록·인증한 매장입니다',
-        code: mine ? 'ALREADY_MINE' : 'ALREADY_CLAIMED',
+        code: mine ? 'STORE_SHOP_ALREADY_MINE' : 'STORE_SHOP_ALREADY_CLAIMED',
         shop_id: mine ? existing.shop_id : undefined,
       },
       { status: 409 },
@@ -233,13 +203,7 @@ export async function POST(req: NextRequest) {
     // place_id 부분 유니크 위반 — 동시 등록 race condition 최종 방어
     const code = (e as { code?: string })?.code
     if (code === '23505') {
-      return NextResponse.json(
-        {
-          error: '이미 다른 사용자가 등록·인증한 매장입니다',
-          code: 'ALREADY_CLAIMED',
-        },
-        { status: 409 },
-      )
+      return apiError('STORE_SHOP_ALREADY_CLAIMED', 409)
     }
     return NextResponse.json(
       {

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { StarRating } from './StarRating'
 import { piFetch } from '@/lib/pi-fetch'
+import { useApiErrorMessage, type ApiErrorPayload } from '@/hooks/use-api-error'
 
 interface FeedbackFormProps {
   shopId?: string
@@ -29,6 +30,7 @@ export function FeedbackForm({
 }: FeedbackFormProps) {
   const t = useTranslations('feedback')
   const tc = useTranslations('common')
+  const apiErr = useApiErrorMessage()
   const [score, setScore] = useState(0)
   const [text, setText] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -60,9 +62,11 @@ export function FeedbackForm({
         }),
       })
 
-      const json = await res.json()
+      const json = (await res.json()) as ApiErrorPayload & {
+        bean_rwrd_qty?: number
+      }
       if (!res.ok) {
-        setError(json.error ?? t('submitFailDot'))
+        setError(apiErr(json, t('submitFailDot')))
         return
       }
       onSuccess?.(json.bean_rwrd_qty ?? 0)

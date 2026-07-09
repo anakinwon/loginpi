@@ -10,6 +10,7 @@ import type {
   SubscrCycle,
 } from '@/lib/bean-subscr-plan'
 import { withGuard } from '@/lib/api-guard'
+import { apiError } from '@/lib/api-errors'
 
 const CYCLES: SubscrCycle[] = ['M', 'Y']
 
@@ -18,14 +19,13 @@ const CYCLES: SubscrCycle[] = ['M', 'Y']
 // 잔액 부족 시 402 → /bean 충전 유도. Pi 결제 아님 → window.Pi 불필요.
 async function handlePOST(request: NextRequest) {
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
   const { product, grade, cycle } = body as {
     product?: string
@@ -35,7 +35,7 @@ async function handlePOST(request: NextRequest) {
 
   // 기본 형식 검증 후, DB 플랜 존재 여부는 subscribeProduct 내부에서 INVALID_PLAN으로 처리
   if (!product || !grade || !CYCLES.includes(cycle as SubscrCycle)) {
-    return NextResponse.json({ error: '잘못된 구독 요청' }, { status: 400 })
+    return apiError('SUBSCR_INVALID_REQUEST', 400)
   }
 
   // DB에서 유효한 플랜인지 확인
@@ -44,10 +44,7 @@ async function handlePOST(request: NextRequest) {
     (p) => p.product === product && p.grade === grade && p.cycle === cycle,
   )
   if (!plan) {
-    return NextResponse.json(
-      { error: '존재하지 않는 구독 상품' },
-      { status: 404 },
-    )
+    return apiError('SUBSCR_PRODUCT_NOT_FOUND', 404)
   }
 
   // ⭐서버 권위 모드 판정 — 클라 feeMode가 stale이어도 여기서 결제 단위를 확정한다.
@@ -77,13 +74,10 @@ async function handlePOST(request: NextRequest) {
 
   if (!result.ok) {
     if (result.error === 'INSUFFICIENT_BEAN')
-      return NextResponse.json({ error: 'INSUFFICIENT_BEAN' }, { status: 402 })
+      return apiError('SUBSCR_INSUFFICIENT_BEAN', 402)
     if (result.error === 'INVALID_PLAN')
-      return NextResponse.json(
-        { error: '존재하지 않는 구독 상품' },
-        { status: 404 },
-      )
-    return NextResponse.json({ error: '구독 처리 실패' }, { status: 500 })
+      return apiError('SUBSCR_PRODUCT_NOT_FOUND', 404)
+    return apiError('SUBSCR_PROCESS_FAILED', 500)
   }
 
   // 구독 신청 미션 기록 (비블로킹)

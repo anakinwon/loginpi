@@ -2,13 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { listMyShops } from '@/lib/mps-shop'
+import { apiError } from '@/lib/api-errors'
 
 // GET /api/store/shops — 내 매장 목록 (판매자 인증, FR-06)
 //   ?all=1 — 관리자 전체 매장 (그 외 본인 매장만)
 export async function GET(req: NextRequest) {
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   const wantAll = req.nextUrl.searchParams.get('all') === '1' && isAdmin(user)
   const [shops, userRes] = await Promise.all([
@@ -30,11 +30,5 @@ export async function GET(req: NextRequest) {
 //   → 구글맵 미등록 매장은 검증 불가, 타인 매장 무단 등록은 불법.
 //   정식 등록 경로: 지도(/map)에서 내 매장 찾기 → POST /api/store/shops/claim
 export async function POST() {
-  return NextResponse.json(
-    {
-      error:
-        '매장은 구글맵 인증 등록으로만 가능합니다. 지도에서 내 매장을 찾아 인증 등록해 주세요.',
-    },
-    { status: 403 },
-  )
+  return apiError('STORE_SHOP_CLAIM_ONLY', 403)
 }

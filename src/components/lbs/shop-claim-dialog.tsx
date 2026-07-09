@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
+import { useApiErrorMessage, type ApiErrorPayload } from '@/hooks/use-api-error'
 
 // 구글 카페 → 내 매장 반자동 인증 등록 폼 (무승인 + 구글 정보 재입력 대조)
 // 검증 2종: place_id(자동) + 전화번호(구글 대조) | 필수 입력: 대표자명·주소·이메일
@@ -37,6 +38,7 @@ export function ShopClaimDialog({
   const [saving, setSaving] = useState(false)
   const t = useTranslations('lbs')
   const tc = useTranslations('common')
+  const apiErr = useApiErrorMessage()
 
   // place_id 전체 일치 여부 — 대소문자 구분 정확 비교 (복사 차단 → 직접 타이핑 강제)
   const placeIdMatches = placeIdConfirm === target.place_id
@@ -80,13 +82,13 @@ export function ShopClaimDialog({
           contact_email: email.trim(),
         }),
       })
-      const data = (await res.json().catch(() => ({}))) as { error?: string }
+      const data = (await res.json().catch(() => ({}))) as ApiErrorPayload
       if (res.ok) {
         toast.success(t('claim.success'))
         onSuccess?.()
         onClose()
       } else {
-        toast.error(data.error ?? t('claim.registerFail'))
+        toast.error(apiErr(data, t('claim.registerFail')))
       }
     } catch {
       toast.error(t('claim.registerError'))

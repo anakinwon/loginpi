@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth-check'
 import { getChatPlan } from '@/lib/chat-auth'
+import { apiError } from '@/lib/api-errors'
 
 export interface SubscrPlanRow {
   plan_cd: string
@@ -22,8 +23,7 @@ export async function GET() {
     .eq('del_yn', 'N')
     .order('price_pi', { ascending: true })
 
-  if (error)
-    return NextResponse.json({ error: '플랜 목록 조회 실패' }, { status: 500 })
+  if (error) return apiError('SUBSCR_PLANS_QUERY_FAILED', 500)
 
   let current: {
     plan_cd: string

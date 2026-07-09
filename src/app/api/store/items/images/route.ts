@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { validateMagicBytes } from '@/lib/upload-validate'
+import { apiError } from '@/lib/api-errors'
 
 // POST /api/store/items/images — 상품 이미지 1장을 Storage(mps-items)에 업로드 후 공개 URL 반환
 // 클라이언트가 canvas로 리사이즈·압축한 Blob을 보낸다(원본/썸네일 공용).
@@ -18,38 +19,25 @@ const ALLOWED_MIME = new Map<string, string>([
 
 export async function POST(req: NextRequest) {
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   let formData: FormData
   try {
     formData = await req.formData()
   } catch {
-    return NextResponse.json(
-      { error: '잘못된 요청 형식입니다' },
-      { status: 400 },
-    )
+    return apiError('BAD_REQUEST_FORMAT', 400)
   }
 
   const file = formData.get('file')
   if (!(file instanceof File)) {
-    return NextResponse.json(
-      { error: 'file 필드가 필요합니다' },
-      { status: 400 },
-    )
+    return apiError('FILE_FIELD_REQUIRED', 400)
   }
   if (file.size > MAX_BYTES) {
-    return NextResponse.json(
-      { error: '이미지 크기는 1MB 이하여야 합니다' },
-      { status: 413 },
-    )
+    return apiError('STORE_IMAGE_TOO_LARGE', 413)
   }
   const ext = ALLOWED_MIME.get(file.type)
   if (!ext) {
-    return NextResponse.json(
-      { error: '허용되지 않은 이미지 형식입니다 (JPEG/PNG/WebP/GIF)' },
-      { status: 415 },
-    )
+    return apiError('STORE_IMAGE_TYPE_NOT_ALLOWED', 415)
   }
 
   // 업로더별 폴더 분리 + uuid 파일명 (경로 충돌·열거 방지)
@@ -58,10 +46,7 @@ export async function POST(req: NextRequest) {
 
   // KISA MC: Magic Byte 검증 — 위조된 Content-Type 차단
   if (!validateMagicBytes(buffer, file.type)) {
-    return NextResponse.json(
-      { error: '파일 내용이 선언된 형식과 일치하지 않습니다' },
-      { status: 415 },
-    )
+    return apiError('FILE_CONTENT_MISMATCH', 415)
   }
 
   const { error } = await getSupabaseAdmin()
@@ -76,10 +61,7 @@ export async function POST(req: NextRequest) {
       fileSize: file.size,
       error: error.message,
     })
-    return NextResponse.json(
-      { error: '이미지 업로드에 실패했습니다. 잠시 후 다시 시도해주세요' },
-      { status: 500 },
-    )
+    return apiError('UPLOAD_FAILED', 500)
   }
 
   const { data } = getSupabaseAdmin().storage.from(BUCKET).getPublicUrl(path)

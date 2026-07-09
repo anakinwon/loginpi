@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { apiError } from '@/lib/api-errors'
 
 // POST /api/store/shops/[shopId]/set-rep — 대표 매장 지정
 // 소유권 확인 후 sys_user.rep_shop_id 업데이트
@@ -9,8 +10,7 @@ export async function POST(
   { params }: { params: Promise<{ shopId: string }> },
 ) {
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   const { shopId } = await params
   const db = getSupabaseAdmin()
@@ -24,11 +24,7 @@ export async function POST(
     .eq('del_yn', 'N')
     .maybeSingle()
 
-  if (!shop)
-    return NextResponse.json(
-      { error: '본인 매장이 아니거나 존재하지 않습니다' },
-      { status: 404 },
-    )
+  if (!shop) return apiError('STORE_SHOP_NOT_OWNED', 404)
 
   const { error } = await db
     .from('sys_user')
@@ -41,7 +37,7 @@ export async function POST(
 
   if (error) {
     console.error('[set-rep] 실패:', error.message)
-    return NextResponse.json({ error: '처리 실패' }, { status: 500 })
+    return apiError('STORE_SET_REP_FAILED', 500)
   }
 
   return NextResponse.json({ ok: true, rep_shop_id: shopId })

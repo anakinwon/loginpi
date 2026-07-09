@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { listTxns } from '@/lib/mps-txn'
+import { apiError } from '@/lib/api-errors'
 
 // GET /api/store/txns — 내 거래 내역 (FR-12, 판매자·구매자 통합)
 //   ?from=YYYY-MM-DD&to=YYYY-MM-DD 날짜 범위 필터
 //   ?all=1 — 관리자 전체 사용자 거래 내역 (FR-12 관리자 요건)
 export async function GET(req: NextRequest) {
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   const sp = req.nextUrl.searchParams
   const wantAll = sp.get('all') === '1' && isAdmin(user)

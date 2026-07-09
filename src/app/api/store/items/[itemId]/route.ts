@@ -8,6 +8,7 @@ import {
   updateItem,
   softDeleteItem,
 } from '@/lib/mps-item'
+import { apiError } from '@/lib/api-errors'
 
 // GET /api/store/items/[itemId] — 상세 (Guest 허용, 이미지·매장 포함)
 export async function GET(
@@ -17,11 +18,7 @@ export async function GET(
   const { itemId } = await params
   const user = await getSessionUser()
   const item = await getItemDetail(itemId, user?.id)
-  if (!item)
-    return NextResponse.json(
-      { error: '상품을 찾을 수 없습니다' },
-      { status: 404 },
-    )
+  if (!item) return apiError('STORE_ITEM_NOT_FOUND', 404)
 
   // 조회수 증가 — 응답 차단 없이 비동기 (판매자 본인 조회는 제외)
   if (item.seller_id !== user?.id) void incrementViewCnt(itemId, item.view_cnt)
@@ -55,21 +52,24 @@ export async function PATCH(
   { params }: { params: Promise<{ itemId: string }> },
 ) {
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   const { itemId } = await params
   let body: unknown
   try {
     body = await req.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
 
   const parsed = patchSchema.safeParse(body)
   if (!parsed.success) {
     return NextResponse.json(
-      { error: '입력값이 올바르지 않습니다', detail: parsed.error.issues },
+      {
+        error: '입력값이 올바르지 않습니다',
+        code: 'INVALID_INPUT',
+        detail: parsed.error.issues,
+      },
       { status: 400 },
     )
   }
@@ -84,26 +84,20 @@ export async function PATCH(
       .eq('del_yn', 'N')
       .maybeSingle()
     if (!ownShop) {
-      return NextResponse.json(
-        { error: '본인 매장이 아니거나 존재하지 않는 매장입니다' },
-        { status: 403 },
-      )
+      return apiError('STORE_SHOP_NOT_OWNED_OR_MISSING', 403)
     }
   }
 
   const result = await updateItem(itemId, user.id, parsed.data)
   if ('error' in result) {
     const map = {
-      NOT_FOUND: { msg: '상품을 찾을 수 없습니다', status: 404 },
-      FORBIDDEN: { msg: '본인 상품만 수정할 수 있습니다', status: 403 },
-      INVALID_STATUS: { msg: '유효하지 않은 상태입니다', status: 400 },
-      QTY_BELOW_ORDERED: {
-        msg: '등록수량은 누적 주문수량보다 작을 수 없습니다',
-        status: 400,
-      },
+      NOT_FOUND: { code: 'STORE_ITEM_NOT_FOUND', status: 404 },
+      FORBIDDEN: { code: 'STORE_ITEM_UPDATE_FORBIDDEN', status: 403 },
+      INVALID_STATUS: { code: 'STORE_INVALID_STATUS', status: 400 },
+      QTY_BELOW_ORDERED: { code: 'STORE_QTY_BELOW_ORDERED', status: 400 },
     } as const
-    const { msg, status } = map[result.error]
-    return NextResponse.json({ error: msg }, { status })
+    const { code, status } = map[result.error]
+    return apiError(code, status)
   }
 
   return NextResponse.json({ item: result.item })
@@ -115,16 +109,12 @@ export async function DELETE(
   { params }: { params: Promise<{ itemId: string }> },
 ) {
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   const { itemId } = await params
   const deleted = await softDeleteItem(itemId, user.id, isAdmin(user))
   if (!deleted) {
-    return NextResponse.json(
-      { error: '상품이 없거나 삭제 권한이 없습니다' },
-      { status: 404 },
-    )
+    return apiError('STORE_ITEM_DELETE_FORBIDDEN', 404)
   }
   return NextResponse.json({ success: true })
 }

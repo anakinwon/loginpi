@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { apiError } from '@/lib/api-errors'
 
 interface CtgrItemRow {
   item_cd: string
@@ -17,7 +18,7 @@ interface CtgrItemRow {
 export async function GET(req: NextRequest) {
   const ctgrId = req.nextUrl.searchParams.get('ctgr_id')
   if (!ctgrId) {
-    return NextResponse.json({ error: 'ctgr_id가 필요합니다' }, { status: 400 })
+    return apiError('FBCK_CTGR_ID_REQUIRED', 400)
   }
 
   const db = getSupabaseAdmin()
@@ -31,7 +32,7 @@ export async function GET(req: NextRequest) {
     .order('sort_ord', { ascending: true })
 
   if (directErr) {
-    return NextResponse.json({ error: '항목 조회 실패' }, { status: 500 })
+    return apiError('FBCK_ITEMS_QUERY_FAILED', 500)
   }
   if (direct && direct.length > 0) {
     return NextResponse.json({ items: direct as CtgrItemRow[], source: 'self' })

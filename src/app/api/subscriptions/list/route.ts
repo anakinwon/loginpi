@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { apiError } from '@/lib/api-errors'
 
 // 상품군 코드 → 표시명 (prod_ctgr_cd: PICAFE / PISHOP / PISHOP_SUBSCR / TRANSLATE)
 const PROD_NM: Record<string, string> = {
@@ -16,8 +17,7 @@ const PROD_NM: Record<string, string> = {
 // (버그: 구독현황이 getChatPlan을 재사용해 2개 구독 중 1개만 보이던 문제 해결)
 export async function GET() {
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   const { data, error } = await getSupabaseAdmin()
     .from('bean_subscr')
@@ -29,8 +29,7 @@ export async function GET() {
     .gt('expire_dtm', new Date().toISOString()) // 만료 구독 제외
     .order('expire_dtm', { ascending: false })
 
-  if (error)
-    return NextResponse.json({ error: '구독 조회 실패' }, { status: 500 })
+  if (error) return apiError('SUBSCR_LIST_QUERY_FAILED', 500)
 
   type Row = {
     subscr_id: string

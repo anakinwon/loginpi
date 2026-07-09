@@ -5,6 +5,7 @@ import { cancelOrder } from '@/lib/mps-order'
 import { refundCancelledOrder } from '@/lib/mps-refund'
 import { recordUserAction } from '@/lib/event'
 import { enqueueTxnStNoti } from '@/lib/trade-noti'
+import { apiError } from '@/lib/api-errors'
 
 const cancelSchema = z.object({
   reason: z.string().min(1).max(500), // 취소 사유 필수 (FR-10)
@@ -21,23 +22,19 @@ export async function POST(
   { params }: { params: Promise<{ orderId: string }> },
 ) {
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   const { orderId } = await params
   let body: unknown
   try {
     body = await req.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
 
   const parsed = cancelSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: '취소 사유를 입력해주세요' },
-      { status: 400 },
-    )
+    return apiError('STORE_CANCEL_REASON_REQUIRED', 400)
   }
 
   const cancelRole =
@@ -55,15 +52,9 @@ export async function POST(
   )
   if ('error' in result) {
     if (result.error === 'ORDER_NOT_FOUND') {
-      return NextResponse.json(
-        { error: '주문을 찾을 수 없습니다' },
-        { status: 404 },
-      )
+      return apiError('STORE_ORDER_NOT_FOUND', 404)
     }
-    return NextResponse.json(
-      { error: '취소할 수 없는 주문입니다' },
-      { status: 403 },
-    )
+    return apiError('STORE_ORDER_NOT_CANCELABLE', 403)
   }
 
   // 결제 완료 주문을 구매자가 취소한 경우 자동 환불(A2U). 환불 실패·시드 미설정은

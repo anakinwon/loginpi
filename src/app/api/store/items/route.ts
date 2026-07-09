@@ -4,6 +4,7 @@ import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { listOpenItems, listMyItems, createItem } from '@/lib/mps-item'
 import { getDistCfg } from '@/lib/mps-dist-cfg'
+import { apiError } from '@/lib/api-errors'
 
 export const revalidate = 120 // 2분 캐시 (공개 상품 목록)
 
@@ -13,11 +14,7 @@ export async function GET(req: NextRequest) {
 
   if (sp.get('mine') === '1') {
     const user = await getSessionUser()
-    if (!user)
-      return NextResponse.json(
-        { error: '로그인이 필요합니다' },
-        { status: 401 },
-      )
+    if (!user) return apiError('AUTH_REQUIRED', 401)
     // 관리자 전체보기 — ?all=1 + isAdmin일 때만 전체 판매자 상품(null), 그 외 본인만
     const wantAll = sp.get('all') === '1' && isAdmin(user)
     const items = await listMyItems(wantAll ? null : user.id)
@@ -84,20 +81,23 @@ const createSchema = z.object({
 // POST /api/store/items — 상품 등록 (판매자 인증)
 export async function POST(req: NextRequest) {
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   let body: unknown
   try {
     body = await req.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
 
   const parsed = createSchema.safeParse(body)
   if (!parsed.success) {
     return NextResponse.json(
-      { error: '입력값이 올바르지 않습니다', detail: parsed.error.issues },
+      {
+        error: '입력값이 올바르지 않습니다',
+        code: 'INVALID_INPUT',
+        detail: parsed.error.issues,
+      },
       { status: 400 },
     )
   }
@@ -117,10 +117,7 @@ export async function POST(req: NextRequest) {
       .eq('del_yn', 'N')
       .maybeSingle()
     if (!ownShop) {
-      return NextResponse.json(
-        { error: '본인 매장이 아니거나 존재하지 않는 매장입니다' },
-        { status: 403 },
-      )
+      return apiError('STORE_SHOP_NOT_OWNED_OR_MISSING', 403)
     }
     shopCoords = ownShop as { latd_crd: number | null; lngt_crd: number | null }
   }

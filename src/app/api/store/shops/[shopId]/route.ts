@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getSessionUser } from '@/lib/auth-check'
 import { updateShop, softDeleteShop } from '@/lib/mps-shop'
+import { apiError } from '@/lib/api-errors'
 
 // 수정 스키마 — 모든 필드 선택적(부분 수정). 좌표·연락처는 빈 문자열 허용 안 함(미전송이면 미변경)
 const patchSchema = z.object({
@@ -35,8 +36,7 @@ export async function PATCH(
   { params }: { params: Promise<{ shopId: string }> },
 ) {
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   const { shopId } = await params
 
@@ -44,24 +44,24 @@ export async function PATCH(
   try {
     body = await req.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
 
   const parsed = patchSchema.safeParse(body)
   if (!parsed.success) {
     return NextResponse.json(
-      { error: '입력값이 올바르지 않습니다', detail: parsed.error.issues },
+      {
+        error: '입력값이 올바르지 않습니다',
+        code: 'INVALID_INPUT',
+        detail: parsed.error.issues,
+      },
       { status: 400 },
     )
   }
 
   // updateShop은 seller_id 일치 조건으로 본인 매장만 수정 → 타인 매장은 null 반환
   const shop = await updateShop(shopId, user.id, parsed.data)
-  if (!shop)
-    return NextResponse.json(
-      { error: '매장을 찾을 수 없거나 권한이 없습니다' },
-      { status: 404 },
-    )
+  if (!shop) return apiError('STORE_SHOP_NOT_FOUND_OR_FORBIDDEN', 404)
 
   return NextResponse.json({ shop })
 }
@@ -72,16 +72,11 @@ export async function DELETE(
   { params }: { params: Promise<{ shopId: string }> },
 ) {
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   const { shopId } = await params
   const ok = await softDeleteShop(shopId, user.id)
-  if (!ok)
-    return NextResponse.json(
-      { error: '매장을 찾을 수 없거나 권한이 없습니다' },
-      { status: 404 },
-    )
+  if (!ok) return apiError('STORE_SHOP_NOT_FOUND_OR_FORBIDDEN', 404)
 
   return NextResponse.json({ ok: true })
 }

@@ -3,12 +3,12 @@ import { z } from 'zod'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { createOrder, listOrdersByRole } from '@/lib/mps-order'
+import { apiError } from '@/lib/api-errors'
 
 // GET /api/store/orders?role=buyer|seller — 내 주문 목록
 export async function GET(req: NextRequest) {
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   // 자동완료·정산은 3분 주기 cron(/api/cron/order-autocomplete)이 단독 담당 — A2U 실송금을
   // fire-and-forget으로 돌리면 응답 후 함수 종료로 송금이 잘릴 수 있어 온디맨드 sweep 제거.
@@ -32,22 +32,18 @@ const createSchema = z.object({
 // 응답: Pi SDK createPayment 파라미터 — 클라이언트가 결제 진행, 완료 시 MPS_ESCROW 분기 처리
 export async function POST(req: NextRequest) {
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   let body: unknown
   try {
     body = await req.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
 
   const parsed = createSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: '입력값이 올바르지 않습니다' },
-      { status: 400 },
-    )
+    return apiError('INVALID_INPUT', 400)
   }
 
   const orderMthd = parsed.data.order_mthd_cd ?? 'DINE_IN'
@@ -55,10 +51,7 @@ export async function POST(req: NextRequest) {
   // 배달(DELIVERY) 검증 — 배달주소 필수 + 해당 상품 매장이 배달가능(dlvr_yn='Y')해야 함
   if (orderMthd === 'DELIVERY') {
     if (!parsed.data.dlvr_addr?.trim()) {
-      return NextResponse.json(
-        { error: '배달 위치를 입력해주세요' },
-        { status: 400 },
-      )
+      return apiError('STORE_DELIVERY_ADDR_REQUIRED', 400)
     }
     const { data: item } = await getSupabaseAdmin()
       .from('mps_item')
@@ -68,10 +61,7 @@ export async function POST(req: NextRequest) {
     const dlvrYn = (item as { mps_shop?: { dlvr_yn?: string } | null } | null)
       ?.mps_shop?.dlvr_yn
     if (dlvrYn !== 'Y') {
-      return NextResponse.json(
-        { error: '이 매장은 배달을 지원하지 않습니다' },
-        { status: 400 },
-      )
+      return apiError('STORE_DELIVERY_NOT_SUPPORTED', 400)
     }
   }
 
@@ -88,20 +78,17 @@ export async function POST(req: NextRequest) {
 
   if ('error' in result) {
     const map = {
-      OUT_OF_STOCK: {
-        msg: '재고가 없거나 판매 중인 상품이 아닙니다',
-        status: 409,
-      },
-      SELF_PURCHASE: { msg: '본인 상품은 구매할 수 없습니다', status: 400 },
-      ORDER_NOT_FOUND: { msg: '주문을 찾을 수 없습니다', status: 404 },
-      NOT_ALLOWED: { msg: '허용되지 않은 요청입니다', status: 403 },
-      EMPTY_CART: { msg: '주문 항목이 없습니다', status: 400 },
-      SHOP_NOT_FOUND: { msg: '매장을 찾을 수 없습니다', status: 404 },
-      BAD_QTY: { msg: '수량이 올바르지 않습니다', status: 400 },
-      UNKNOWN: { msg: '주문 생성에 실패했습니다', status: 500 },
+      OUT_OF_STOCK: { code: 'STORE_OUT_OF_STOCK', status: 409 },
+      SELF_PURCHASE: { code: 'STORE_SELF_PURCHASE', status: 400 },
+      ORDER_NOT_FOUND: { code: 'STORE_ORDER_NOT_FOUND', status: 404 },
+      NOT_ALLOWED: { code: 'STORE_NOT_ALLOWED', status: 403 },
+      EMPTY_CART: { code: 'STORE_EMPTY_ORDER', status: 400 },
+      SHOP_NOT_FOUND: { code: 'STORE_SHOP_NOT_FOUND', status: 404 },
+      BAD_QTY: { code: 'STORE_BAD_QTY', status: 400 },
+      UNKNOWN: { code: 'STORE_ORDER_CREATE_FAILED', status: 500 },
     } as const
-    const { msg, status } = map[result.error]
-    return NextResponse.json({ error: msg }, { status })
+    const { code, status } = map[result.error]
+    return apiError(code, status)
   }
 
   const { order } = result

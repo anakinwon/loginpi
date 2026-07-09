@@ -7,6 +7,7 @@ import { piFetch } from '@/lib/pi-fetch'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { BeanIcon } from '@/components/ui/bean-icon'
+import { useApiErrorMessage, type ApiErrorPayload } from '@/hooks/use-api-error'
 
 interface BondState {
   kind: string
@@ -21,6 +22,7 @@ interface BondState {
 export function ShopBondCard() {
   const t = useTranslations('store')
   const tc = useTranslations('common')
+  const apiErr = useApiErrorMessage()
   const [state, setState] = useState<BondState | null>(null)
   const [amt, setAmt] = useState('')
   const [busy, setBusy] = useState(false)
@@ -51,13 +53,13 @@ export function ShopBondCard() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ kind: 'SHOP', bean_amt: v }),
       })
-      const data = (await res.json()) as { ok?: boolean; error?: string }
+      const data = (await res.json()) as ApiErrorPayload & { ok?: boolean }
       if (res.ok && data.ok) {
         toast.success(t('rewardBond.depositSuccess', { n: v }))
         setAmt('')
         void load()
       } else {
-        toast.error(data.error ?? t('rewardBond.depositFail'))
+        toast.error(apiErr(data, t('rewardBond.depositFail')))
       }
     } catch {
       toast.error(tc('networkError'))
