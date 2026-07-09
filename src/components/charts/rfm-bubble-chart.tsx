@@ -13,7 +13,6 @@ interface Pt {
   freq: number
   monetaryPi: number
   seg: string
-  segLabel: string
 }
 
 const SEG_COLOR: Record<string, string> = {

@@ -18,6 +18,7 @@ const MEDALS = ['🥇', '🥈', '🥉']
 
 export function BeanTopSpenders({ period }: { period: number }) {
   const t = useTranslations('adminStats')
+  const tl = useTranslations('adminAnalytics')
   const [spenders, setSpenders] = useState<BeanSpender[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -67,7 +68,7 @@ export function BeanTopSpenders({ period }: { period: number }) {
             <li key={s.usr_id || i} className="flex items-center gap-2 text-sm">
               <span className="text-base">{MEDALS[i] ?? `${i + 1}.`}</span>
               <span className="min-w-0 flex-1 truncate font-medium">
-                {s.display_nm}
+                {s.display_nm || tl('labels.noName')}
               </span>
               <span className="text-muted-foreground inline-flex shrink-0 items-center gap-1 tabular-nums">
                 {s.total_bean.toLocaleString()}

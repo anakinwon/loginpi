@@ -11,6 +11,7 @@ const MEDALS = ['🥇', '🥈', '🥉']
 // Bean 모드의 BeanTopSpenders와 쌍을 이루며 feeMode에 따라 교체된다.
 export function PiTopSpenders({ period }: { period: number }) {
   const t = useTranslations('adminStats')
+  const tl = useTranslations('adminAnalytics')
   const [spenders, setSpenders] = useState<RevenueStatsResponse['topSpenders']>(
     [],
   )
@@ -63,7 +64,7 @@ export function PiTopSpenders({ period }: { period: number }) {
             <li key={s.usr_id || i} className="flex items-center gap-2 text-sm">
               <span className="text-base">{MEDALS[i] ?? `${i + 1}.`}</span>
               <span className="min-w-0 flex-1 truncate font-medium">
-                {s.display_nm}
+                {s.display_nm || tl('labels.noName')}
               </span>
               <span className="text-muted-foreground shrink-0 tabular-nums">
                 {s.total_pi.toFixed(2)}{' '}

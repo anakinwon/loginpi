@@ -136,7 +136,9 @@ export async function GET(req: NextRequest) {
       }
       row.push(Math.round((active / size) * 100))
     }
-    cohort.push({ cohort: `${c}주 전`, size, retention: row })
+    // cohort는 소비측(CohortHeatmapChart) React key 용도 — 표시 라벨은 인덱스 기반
+    // t('cohortAgo')로 해석하므로 코드값(주차 번호)만 내려보낸다
+    cohort.push({ cohort: String(c), size, retention: row })
   }
 
   // ── 지역 분포 (시도별 고유 사용자, 최신 위치 기준) ──

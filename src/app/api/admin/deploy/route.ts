@@ -33,11 +33,13 @@ export async function POST(req: NextRequest) {
 
   if (body.target === 'staging') {
     const r = await triggerStagingDeploy()
-    return NextResponse.json(r, { status: r.ok ? 200 : 400 })
+    if (!r.ok) return apiError(r.code!, 400, r.params)
+    return NextResponse.json({ ok: true })
   }
   if (body.target === 'production') {
     const r = await promoteToProduction()
-    return NextResponse.json(r, { status: r.ok ? 200 : 400 })
+    if (!r.ok) return apiError(r.code!, 400, r.params)
+    return NextResponse.json({ ok: true, sha: r.sha })
   }
   return apiError('ADM_DEPLOY_TARGET_INVALID', 400)
 }

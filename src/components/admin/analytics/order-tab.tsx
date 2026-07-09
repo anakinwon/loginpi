@@ -33,17 +33,16 @@ interface OrdersResponse {
     avgIntervalDays: number
     buyers: number
   }
-  byMethod: { method: string; label: string; cnt: number }[]
+  byMethod: { method: string; cnt: number }[]
   heatmap: number[][]
-  intervalBuckets: { code: string; label: string; cnt: number }[]
+  intervalBuckets: { code: string; cnt: number }[]
   rfm: {
-    segments: { seg: string; label: string; cnt: number }[]
+    segments: { seg: string; cnt: number }[]
     points: {
       recencyDays: number
       freq: number
       monetaryPi: number
       seg: string
-      segLabel: string
     }[]
     top: {
       usr_id: string
@@ -52,7 +51,6 @@ interface OrdersResponse {
       freq: number
       monetaryPi: number
       seg: string
-      segLabel: string
     }[]
   }
 }
@@ -264,7 +262,7 @@ export function OrderTab({ period }: { period: number }) {
                 {data.rfm.top.map((u, i) => (
                   <tr key={u.usr_id || i} className="border-b last:border-0">
                     <td className="max-w-[10rem] truncate py-2 pr-2 font-medium">
-                      {u.display_nm}
+                      {u.display_nm || t('labels.noName')}
                     </td>
                     <td className="py-2 pr-2">{t(`order.seg.${u.seg}`)}</td>
                     <td className="py-2 pr-2 text-right">{u.freq}</td>

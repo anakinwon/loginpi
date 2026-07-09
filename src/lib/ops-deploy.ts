@@ -1,11 +1,26 @@
 import 'server-only'
 import { resolveDbTier } from './db-env'
+import type { ApiErrorCode, ApiErrorParams } from './api-errors'
 
 // 운영 도구 백엔드 — 배포(2환경: Stage/운영)·Staging DB 스위치.
 // 외부 토큰은 서버 env 전용. 미설정 시 각 기능 '미구성' 비활성(graceful).
+// 에러는 i18n 코드 디스크립터(OpsErr)로 반환 — route가 apiError()로 조립, 클라이언트가 뷰어 언어로 해석.
 
 const GH = 'https://api.github.com'
 const VERCEL = 'https://api.vercel.com'
+
+// i18n 에러 디스크립터 — 문자열 대신 코드+보간값. 소비처(route)에서 apiError로 조립.
+export interface OpsErr {
+  code: ApiErrorCode
+  params?: ApiErrorParams
+}
+// 예외(네트워크·런타임) 폴백 — 상세 메시지는 진단용 보간값으로 보존.
+function unknownErr(e: unknown): OpsErr {
+  return {
+    code: 'ADM_OPS_UNKNOWN',
+    params: { detail: e instanceof Error ? e.message : 'unknown' },
+  }
+}
 
 function repo(): string {
   return process.env.GITHUB_REPO || 'anakinwon/loginpi'
@@ -59,7 +74,7 @@ async function ghCompare(
   ahead: number
   behind: number
   commits: CommitInfo[]
-  error?: string
+  error?: OpsErr
 }> {
   const token = process.env.GITHUB_DEPLOY_TOKEN
   if (!token)
@@ -67,7 +82,7 @@ async function ghCompare(
       ahead: 0,
       behind: 0,
       commits: [],
-      error: 'GITHUB_DEPLOY_TOKEN 미설정',
+      error: { code: 'ADM_DEPLOY_GH_TOKEN_MISSING' },
     }
   try {
     const res = await fetch(`${GH}/repos/${repo()}/compare/${base}...${head}`, {
@@ -75,7 +90,12 @@ async function ghCompare(
       cache: 'no-store',
     })
     if (!res.ok)
-      return { ahead: 0, behind: 0, commits: [], error: `GitHub ${res.status}` }
+      return {
+        ahead: 0,
+        behind: 0,
+        commits: [],
+        error: { code: 'ADM_DEPLOY_GH_STATUS', params: { status: res.status } },
+      }
     const d = (await res.json()) as {
       ahead_by: number
       behind_by: number
@@ -86,12 +106,7 @@ async function ghCompare(
       .reverse() // 최신 먼저
     return { ahead: d.ahead_by ?? 0, behind: d.behind_by ?? 0, commits }
   } catch (e) {
-    return {
-      ahead: 0,
-      behind: 0,
-      commits: [],
-      error: e instanceof Error ? e.message : 'unknown',
-    }
+    return { ahead: 0, behind: 0, commits: [], error: unknownErr(e) }
   }
 }
 
@@ -104,7 +119,7 @@ export interface DeploymentStatus {
   createdAt: number | null
   commitSha: string | null // 현재 배포된 커밋
   commitMessage: string | null
-  error?: string
+  error?: OpsErr
 }
 
 export async function getLatestDeployment(
@@ -126,7 +141,11 @@ export async function getLatestDeployment(
       `${VERCEL}/v6/deployments${teamQs(`projectId=${projectId}&limit=1`)}`,
       { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store' },
     )
-    if (!res.ok) return { ...empty, error: `Vercel ${res.status}` }
+    if (!res.ok)
+      return {
+        ...empty,
+        error: { code: 'ADM_DEPLOY_VERCEL_STATUS', params: { status: res.status } },
+      }
     const d = (await res.json()) as {
       deployments?: {
         url?: string
@@ -152,7 +171,7 @@ export async function getLatestDeployment(
         : null,
     }
   } catch (e) {
-    return { ...empty, error: e instanceof Error ? e.message : 'unknown' }
+    return { ...empty, error: unknownErr(e) }
   }
 }
 
@@ -189,7 +208,7 @@ export interface DeployOverview {
     commits: CommitInfo[] // production...master (승격 대상)
     status: DeploymentStatus
   }
-  ghError?: string
+  ghError?: OpsErr
 }
 
 export async function getDeployOverview(): Promise<DeployOverview> {
@@ -242,17 +261,22 @@ export async function getDeployOverview(): Promise<DeployOverview> {
 // ── 액션 ────────────────────────────────────────────────────────
 export async function triggerStagingDeploy(): Promise<{
   ok: boolean
-  error?: string
+  code?: ApiErrorCode
+  params?: ApiErrorParams
 }> {
   const hook = process.env.VERCEL_STAGING_DEPLOY_HOOK
-  if (!hook) return { ok: false, error: 'VERCEL_STAGING_DEPLOY_HOOK 미설정' }
+  if (!hook) return { ok: false, code: 'ADM_DEPLOY_STAGING_HOOK_MISSING' }
   try {
     const res = await fetch(hook, { method: 'POST', cache: 'no-store' })
     return res.ok
       ? { ok: true }
-      : { ok: false, error: `Deploy Hook ${res.status}` }
+      : {
+          ok: false,
+          code: 'ADM_DEPLOY_HOOK_STATUS',
+          params: { status: res.status },
+        }
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : 'unknown' }
+    return { ok: false, ...unknownErr(e) }
   }
 }
 
@@ -260,23 +284,25 @@ export async function triggerStagingDeploy(): Promise<{
 export async function promoteToProduction(): Promise<{
   ok: boolean
   sha?: string
-  error?: string
+  code?: ApiErrorCode
+  params?: ApiErrorParams
 }> {
   const token = process.env.GITHUB_DEPLOY_TOKEN
-  if (!token) return { ok: false, error: 'GITHUB_DEPLOY_TOKEN 미설정' }
+  if (!token) return { ok: false, code: 'ADM_DEPLOY_GH_TOKEN_MISSING' }
   const [master, cmp] = await Promise.all([
     ghCommit('master'),
     ghCompare('production', 'master'),
   ])
-  if (cmp.error) return { ok: false, error: cmp.error }
+  if (cmp.error) return { ok: false, ...cmp.error }
   if (cmp.behind > 0)
     return {
       ok: false,
-      error: `production이 master보다 ${cmp.behind}커밋 앞섬(갈라짐) — fast-forward 불가`,
+      code: 'ADM_DEPLOY_PROD_DIVERGED',
+      params: { n: cmp.behind },
     }
   if (cmp.ahead === 0)
-    return { ok: false, error: '승격할 커밋 없음(이미 최신)' }
-  if (!master?.sha) return { ok: false, error: 'master SHA 조회 실패' }
+    return { ok: false, code: 'ADM_DEPLOY_NOTHING_TO_PROMOTE' }
+  if (!master?.sha) return { ok: false, code: 'ADM_DEPLOY_MASTER_SHA_FAIL' }
   try {
     const res = await fetch(`${GH}/repos/${repo()}/git/refs/heads/production`, {
       method: 'PATCH',
@@ -288,7 +314,8 @@ export async function promoteToProduction(): Promise<{
       const txt = await res.text().catch(() => '')
       return {
         ok: false,
-        error: `승격 실패 GitHub ${res.status} ${txt.slice(0, 160)}`,
+        code: 'ADM_DEPLOY_PROMOTE_FAILED',
+        params: { status: res.status, detail: txt.slice(0, 160) },
       }
     }
     if (process.env.VERCEL_PROD_DEPLOY_HOOK) {
@@ -299,7 +326,7 @@ export async function promoteToProduction(): Promise<{
     }
     return { ok: true, sha: master.sha }
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : 'unknown' }
+    return { ok: false, ...unknownErr(e) }
   }
 }
 
@@ -333,18 +360,12 @@ export function getDbSwitchState(): DbSwitchState {
 
 export async function setStagingDbTarget(
   target: DbTarget,
-): Promise<{ ok: boolean; error?: string }> {
+): Promise<{ ok: boolean; code?: ApiErrorCode; params?: ApiErrorParams }> {
   const st = getDbSwitchState()
-  if (st.tier !== 'staging')
-    return { ok: false, error: '스테이징 환경에서만 전환 가능(운영 WAS 불변)' }
-  if (!st.apiConfigured)
-    return { ok: false, error: 'Vercel API 토큰/프로젝트ID/Deploy Hook 미설정' }
+  if (st.tier !== 'staging') return { ok: false, code: 'ADM_DB_NOT_STAGING' }
+  if (!st.apiConfigured) return { ok: false, code: 'ADM_DB_API_MISSING' }
   if (target === 'prod-ro' && !st.prodRoConfigured)
-    return {
-      ok: false,
-      error:
-        '운영DB(prod-ro) 읽기전용 자격증명(PROD_RO_SUPABASE_URL/KEY) 미설정 — 쓰기 사고 방지로 차단',
-    }
+    return { ok: false, code: 'ADM_DB_PROD_RO_MISSING' }
   const projectId = process.env.VERCEL_STAGING_PROJECT_ID!
   try {
     const res = await fetch(
@@ -368,14 +389,14 @@ export async function setStagingDbTarget(
       const txt = await res.text().catch(() => '')
       return {
         ok: false,
-        error: `env 변경 실패 Vercel ${res.status} ${txt.slice(0, 120)}`,
+        code: 'ADM_DB_ENV_UPDATE_FAILED',
+        params: { status: res.status, detail: txt.slice(0, 120) },
       }
     }
     const dep = await triggerStagingDeploy()
-    if (!dep.ok)
-      return { ok: false, error: `env는 변경됐으나 재배포 실패: ${dep.error}` }
+    if (!dep.ok) return { ok: false, code: 'ADM_DB_ENV_OK_REDEPLOY_FAILED' }
     return { ok: true }
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : 'unknown' }
+    return { ok: false, ...unknownErr(e) }
   }
 }

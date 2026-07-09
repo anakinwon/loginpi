@@ -11,14 +11,8 @@ import { apiError } from '@/lib/api-errors'
 
 const VALID_PERIODS = [7, 30, 90, 365] as const
 const DAY_MS = 86_400_000
-const CHANNEL_LABEL: Record<string, string> = {
-  DIRECT: '직접 유입',
-  SEARCH: '검색',
-  SOCIAL: '소셜',
-  REFERRAL: '외부 링크',
-  PI: 'Pi 생태계',
-  INTERNAL: '내부',
-}
+// 채널 라벨은 API가 코드값(chnl_cd)만 반환하고 소비 컴포넌트가 t()로 해석한다
+// (perf.channelCd.* i18n 키).
 
 interface PvRow {
   sess_id: string
@@ -117,7 +111,7 @@ export async function GET(req: NextRequest) {
       },
       pvTrend,
       channels: [...channels.entries()]
-        .map(([cd, cnt]) => ({ cd, label: CHANNEL_LABEL[cd] ?? cd, cnt }))
+        .map(([cd, cnt]) => ({ cd, cnt }))
         .sort((a, b) => b.cnt - a.cnt),
       topLanding: topN(landing),
       topExit: topN(exit),

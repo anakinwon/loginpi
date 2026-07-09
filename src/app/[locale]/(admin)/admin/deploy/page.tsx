@@ -5,11 +5,17 @@ import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
 import { cn } from '@/lib/utils'
+import {
+  useApiErrorMessage,
+  type ApiErrorPayload,
+} from '@/hooks/use-api-error'
 
 interface CommitInfo {
   sha: string
   message: string
 }
+// 서버 ops-deploy의 i18n 에러 디스크립터 — 코드+보간값을 뷰어 언어로 해석
+type OpsErr = ApiErrorPayload
 interface DeploymentStatus {
   configured: boolean
   state: string | null
@@ -18,7 +24,7 @@ interface DeploymentStatus {
   createdAt: number | null
   commitSha: string | null
   commitMessage: string | null
-  error?: string
+  error?: OpsErr
 }
 interface DeployOverview {
   configured: {
@@ -40,7 +46,7 @@ interface DeployOverview {
     commits: CommitInfo[]
     status: DeploymentStatus
   }
-  ghError?: string
+  ghError?: OpsErr
 }
 
 const short = (s?: string | null) => (s ? s.slice(0, 7) : '—')
@@ -66,6 +72,7 @@ function StatusBlock({
   fallbackHint: string
 }) {
   const t = useTranslations('adminOps')
+  const apiErr = useApiErrorMessage()
   const stateLabels: Record<string, string> = {
     QUEUED: t('deploy.stateQueued'),
     INITIALIZING: t('deploy.stateInitializing'),
@@ -112,7 +119,7 @@ function StatusBlock({
       )}
       {status.error && (
         <p className="text-xs text-amber-600">
-          {t('deploy.queryError', { error: status.error })}
+          {t('deploy.queryError', { error: apiErr(status.error, '') })}
         </p>
       )}
     </div>
@@ -142,6 +149,7 @@ function CommitList({
 export default function DeployPage() {
   const t = useTranslations('adminOps')
   const tc = useTranslations('common')
+  const apiErr = useApiErrorMessage()
   const [ov, setOv] = useState<DeployOverview | null>(null)
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState<'staging' | 'production' | null>(null)
@@ -236,7 +244,7 @@ export default function DeployPage() {
             void loadStatuses()
           }, 2500)
         } else {
-          toast.error(data.error || t('deploy.fail'))
+          toast.error(apiErr(data as ApiErrorPayload, t('deploy.fail')))
         }
       } catch {
         toast.error(t('deploy.reqFail'))
@@ -282,7 +290,7 @@ export default function DeployPage() {
       )}
       {ov?.ghError && (
         <p className="rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-700 dark:bg-amber-950/40 dark:text-amber-400">
-          {t('deploy.ghError', { error: ov.ghError })}
+          {t('deploy.ghError', { error: apiErr(ov.ghError, '') })}
         </p>
       )}
 

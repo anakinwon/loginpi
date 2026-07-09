@@ -18,12 +18,8 @@ function dayEpoch(s: string): number {
   return Date.parse(s.slice(0, 10) + 'T00:00:00Z')
 }
 
-const TYPE_LABEL: Record<string, string> = {
-  LOGIN: '로그인',
-  CHAT: '카페 활동',
-  MSG: '메시지',
-  PAYMENT: '결제',
-}
+// 라벨 문자열은 API가 코드값만 반환하고 소비 컴포넌트가 t()로 해석한다
+// (perf.stage.*/perf.actvty.*/perf.depthBucket.* i18n 키).
 
 export async function GET(req: NextRequest) {
   // 뷰어 불변 집계(퍼널·전환·참여깊이 — 개인 식별 정보 없음) → 모든 visitor 공유 edge 캐시
@@ -70,10 +66,10 @@ export async function GET(req: NextRequest) {
   const repeatBuyers = [...buyerOrderCnt.values()].filter((c) => c >= 2).length
 
   const stageDefs = [
-    { key: 'signup', label: '가입', cnt: signupCnt },
-    { key: 'active', label: '활동(로그인+)', cnt: activeUsers.size },
-    { key: 'buyer', label: '첫 구매', cnt: buyers },
-    { key: 'repeat', label: '재구매', cnt: repeatBuyers },
+    { key: 'signup', cnt: signupCnt },
+    { key: 'active', cnt: activeUsers.size },
+    { key: 'buyer', cnt: buyers },
+    { key: 'repeat', cnt: repeatBuyers },
   ]
   const top = signupCnt || 1
   const funnel = stageDefs.map((s, i) => ({
@@ -95,7 +91,7 @@ export async function GET(req: NextRequest) {
   for (const l of periodLogs)
     typeMap.set(l.actvty_tp_cd, (typeMap.get(l.actvty_tp_cd) ?? 0) + 1)
   const activityTypes = [...typeMap.entries()]
-    .map(([cd, cnt]) => ({ cd, label: TYPE_LABEL[cd] ?? cd, cnt }))
+    .map(([cd, cnt]) => ({ cd, cnt }))
     .sort((a, b) => b.cnt - a.cnt)
 
   // 참여 깊이 — 사용자별 활동일수 분포
@@ -103,15 +99,14 @@ export async function GET(req: NextRequest) {
   for (const l of periodLogs)
     daysByUser.set(l.usr_id, (daysByUser.get(l.usr_id) ?? 0) + 1)
   const DEPTH_BUCKETS = [
-    { code: 'd1', label: '1일', max: 1 },
-    { code: 'd2_3', label: '2~3일', max: 3 },
-    { code: 'd4_7', label: '4~7일', max: 7 },
-    { code: 'd8_14', label: '8~14일', max: 14 },
-    { code: 'd15p', label: '15일+', max: Infinity },
+    { code: 'd1', max: 1 },
+    { code: 'd2_3', max: 3 },
+    { code: 'd4_7', max: 7 },
+    { code: 'd8_14', max: 14 },
+    { code: 'd15p', max: Infinity },
   ]
   const depth = DEPTH_BUCKETS.map((b) => ({
     code: b.code,
-    label: b.label,
     cnt: 0,
   }))
   for (const d of daysByUser.values()) {

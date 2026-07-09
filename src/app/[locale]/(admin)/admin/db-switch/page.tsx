@@ -4,6 +4,10 @@ import { useCallback, useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
+import {
+  useApiErrorMessage,
+  type ApiErrorPayload,
+} from '@/hooks/use-api-error'
 
 interface SwitchState {
   tier: string
@@ -18,6 +22,7 @@ interface SwitchState {
 export default function DbSwitchPage() {
   const t = useTranslations('adminOps')
   const tc = useTranslations('common')
+  const apiErr = useApiErrorMessage()
   const [state, setState] = useState<SwitchState | null>(null)
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState(false)
@@ -61,7 +66,7 @@ export default function DbSwitchPage() {
           toast.success(t('dbSwitch.switchRequested'))
           setTimeout(() => void load(), 1500)
         } else {
-          toast.error(data.error || t('dbSwitch.fail'))
+          toast.error(apiErr(data as ApiErrorPayload, t('dbSwitch.fail')))
         }
       } catch {
         toast.error(t('dbSwitch.reqFail'))

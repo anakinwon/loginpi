@@ -8,7 +8,6 @@ import { useTranslations } from 'next-intl'
 
 interface Stage {
   key: string
-  label: string
   cnt: number
   pctOfTop: number
   convFromPrev: number

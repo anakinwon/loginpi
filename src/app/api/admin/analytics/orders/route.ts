@@ -22,12 +22,8 @@ interface OrderRow {
   reg_dtm: string
 }
 
-const METHOD_LABEL: Record<string, string> = {
-  DINE_IN: '매장 이용',
-  PICKUP: '픽업',
-  DELIVERY: '배달',
-  UNKNOWN: '미지정',
-}
+// 라벨 문자열은 API가 코드값만 반환하고 소비 컴포넌트가 t()로 해석한다
+// (order.method.*/order.seg.*/charts.interval.* i18n 키).
 
 // 정렬된 값 배열에서 value의 5분위 점수(1~5) — 동률·소표본 안전
 function quintileScorer(values: number[]) {
@@ -43,13 +39,13 @@ function quintileScorer(values: number[]) {
   }
 }
 
-function segmentOf(r: number, f: number): { seg: string; label: string } {
-  if (r >= 4 && f >= 4) return { seg: 'champion', label: '챔피언' }
-  if (f >= 4) return { seg: 'loyal', label: '충성 고객' }
-  if (r >= 4) return { seg: 'recent', label: '신규·최근' }
-  if (r >= 3) return { seg: 'potential', label: '잠재 고객' }
-  if (f >= 3) return { seg: 'at_risk', label: '이탈 위험' }
-  return { seg: 'hibernating', label: '휴면' }
+function segmentOf(r: number, f: number): string {
+  if (r >= 4 && f >= 4) return 'champion'
+  if (f >= 4) return 'loyal'
+  if (r >= 4) return 'recent'
+  if (r >= 3) return 'potential'
+  if (f >= 3) return 'at_risk'
+  return 'hibernating'
 }
 
 export async function GET(req: NextRequest) {
@@ -96,11 +92,7 @@ export async function GET(req: NextRequest) {
     methodMap.set(m, (methodMap.get(m) ?? 0) + 1)
   }
   const byMethod = [...methodMap.entries()]
-    .map(([method, cnt]) => ({
-      method,
-      label: METHOD_LABEL[method] ?? method,
-      cnt,
-    }))
+    .map(([method, cnt]) => ({ method, cnt }))
     .sort((a, b) => b.cnt - a.cnt)
 
   // ── 요일×시간 히트맵 (KST 기준, 전체 주문) ──
@@ -121,16 +113,15 @@ export async function GET(req: NextRequest) {
 
   // 주문간격 히스토그램 (연속 주문 사이 일수)
   const INTERVAL_BUCKETS = [
-    { code: 'd0_1', label: '0~1일', max: 1 },
-    { code: 'd2_3', label: '2~3일', max: 3 },
-    { code: 'd4_7', label: '4~7일', max: 7 },
-    { code: 'd8_14', label: '8~14일', max: 14 },
-    { code: 'd15_30', label: '15~30일', max: 30 },
-    { code: 'd30p', label: '30일+', max: Infinity },
+    { code: 'd0_1', max: 1 },
+    { code: 'd2_3', max: 3 },
+    { code: 'd4_7', max: 7 },
+    { code: 'd8_14', max: 14 },
+    { code: 'd15_30', max: 30 },
+    { code: 'd30p', max: Infinity },
   ]
   const intervalCounts = INTERVAL_BUCKETS.map((b) => ({
     code: b.code,
-    label: b.label,
     cnt: 0,
   }))
   const now = Date.now()
@@ -187,16 +178,14 @@ export async function GET(req: NextRequest) {
   const fScorer = quintileScorer(rfmRaw.map((x) => x.freq))
   const mScorer = quintileScorer(rfmRaw.map((x) => x.monetary))
 
-  const segCount = new Map<string, { label: string; cnt: number }>()
+  const segCount = new Map<string, number>()
   const scored = rfmRaw.map((x) => {
     const r = rScorer(-x.recencyDays)
     const f = fScorer(x.freq)
     const m = mScorer(x.monetary)
-    const { seg, label } = segmentOf(r, f)
-    const cur = segCount.get(seg) ?? { label, cnt: 0 }
-    cur.cnt++
-    segCount.set(seg, cur)
-    return { ...x, r, f, m, seg, segLabel: label }
+    const seg = segmentOf(r, f)
+    segCount.set(seg, (segCount.get(seg) ?? 0) + 1)
+    return { ...x, r, f, m, seg }
   })
 
   // 상위 고객(매출순) 표시명 — FK 없으므로 sys_user 별도 조회 후 Map 병합
@@ -211,7 +200,7 @@ export async function GET(req: NextRequest) {
   const nameById = new Map(
     (users ?? []).map((u: Record<string, string | null>) => [
       u.id,
-      u.display_name || u.nick_nm || u.pi_username || '(이름 없음)',
+      u.display_name || u.nick_nm || u.pi_username || '',
     ]),
   )
 
@@ -233,32 +222,30 @@ export async function GET(req: NextRequest) {
       intervalBuckets: intervalCounts,
       totalIntervals,
       rfm: {
-        segments: [...segCount.entries()].map(([seg, v]) => ({
+        segments: [...segCount.entries()].map(([seg, cnt]) => ({
           seg,
-          label: v.label,
-          cnt: v.cnt,
+          cnt,
         })),
         points: scored.map((s) => ({
           r: s.r,
           f: s.f,
           m: s.m,
           seg: s.seg,
-          segLabel: s.segLabel,
           recencyDays: s.recencyDays,
           freq: s.freq,
           monetaryPi: s.monetary,
         })),
         top: top.map((t) => ({
           // 비관리자: usr_id 제거 + 표시명 마스킹 (개인 식별 차단, 지표는 공개)
+          // display_nm은 빈 값으로 내려보내고 소비측이 labels.noName으로 표시
           usr_id: admin ? t.usr_id : '',
           display_nm: admin
-            ? (nameById.get(t.usr_id) ?? '(이름 없음)')
+            ? (nameById.get(t.usr_id) ?? '')
             : maskDisplayName(nameById.get(t.usr_id)),
           recencyDays: t.recencyDays,
           freq: t.freq,
           monetaryPi: t.monetary,
           seg: t.seg,
-          segLabel: t.segLabel,
         })),
       },
     },

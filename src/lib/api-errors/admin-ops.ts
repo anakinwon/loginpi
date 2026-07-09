@@ -52,6 +52,27 @@ export const ADMIN_OPS_ERRORS = {
   // DB 스위치·배포 (db-switch·deploy)
   ADM_DB_TARGET_INVALID: "target은 'staging' 또는 'prod-ro'",
   ADM_DEPLOY_TARGET_INVALID: "target은 'staging' 또는 'production'",
+  // 배포 승격·상태 조회 (ops-deploy 동적 문구)
+  ADM_DEPLOY_GH_TOKEN_MISSING: 'GITHUB_DEPLOY_TOKEN 미설정',
+  ADM_DEPLOY_GH_STATUS: 'GitHub {status}',
+  ADM_DEPLOY_VERCEL_STATUS: 'Vercel {status}',
+  ADM_DEPLOY_STAGING_HOOK_MISSING: 'VERCEL_STAGING_DEPLOY_HOOK 미설정',
+  ADM_DEPLOY_HOOK_STATUS: 'Deploy Hook {status}',
+  ADM_DEPLOY_PROD_DIVERGED:
+    'production이 master보다 {n}커밋 앞섬(갈라짐) — fast-forward 불가',
+  ADM_DEPLOY_NOTHING_TO_PROMOTE: '승격할 커밋 없음(이미 최신)',
+  ADM_DEPLOY_MASTER_SHA_FAIL: 'master SHA 조회 실패',
+  ADM_DEPLOY_PROMOTE_FAILED: '승격 실패 GitHub {status} {detail}',
+  // Staging DB 스위치 동적 문구 (ops-deploy)
+  ADM_DB_NOT_STAGING: '스테이징 환경에서만 전환 가능(운영 WAS 불변)',
+  ADM_DB_API_MISSING: 'Vercel API 토큰/프로젝트ID/Deploy Hook 미설정',
+  ADM_DB_PROD_RO_MISSING:
+    '운영DB(prod-ro) 읽기전용 자격증명(PROD_RO_SUPABASE_URL/KEY) 미설정 — 쓰기 사고 방지로 차단',
+  ADM_DB_ENV_UPDATE_FAILED: 'env 변경 실패 Vercel {status} {detail}',
+  ADM_DB_ENV_OK_REDEPLOY_FAILED:
+    '환경변수는 변경됐으나 재배포에 실패했습니다. 배포 화면에서 상태를 확인하세요.',
+  // 배포·DB 스위치 공통 예외 폴백
+  ADM_OPS_UNKNOWN: '알 수 없는 오류 ({detail})',
 
   // 배치 이력 (batch/logs)
   ADM_BATCH_LOG_FAILED: '배치 이력 조회 실패',

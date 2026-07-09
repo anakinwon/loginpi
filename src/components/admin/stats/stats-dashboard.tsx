@@ -51,6 +51,7 @@ function TopUsersList({
   loading: boolean
 }) {
   const t = useTranslations('adminStats')
+  const tl = useTranslations('adminAnalytics')
   if (loading) {
     return (
       <div className="space-y-2">
@@ -73,7 +74,9 @@ function TopUsersList({
           <li key={u.usr_id || i} className="flex items-center gap-2 text-sm">
             <span className="text-base">{MEDALS[i] ?? `${i + 1}.`}</span>
             <div className="min-w-0 flex-1">
-              <p className="truncate font-medium">{u.display_nm}</p>
+              <p className="truncate font-medium">
+                {u.display_nm || tl('labels.noName')}
+              </p>
               <p className="text-muted-foreground text-xs">
                 {t('userActivity', {
                   days: u.activity_days,

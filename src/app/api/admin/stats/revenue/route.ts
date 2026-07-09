@@ -85,8 +85,9 @@ export async function GET(req: NextRequest) {
   ).map((row) => ({
     // 비관리자: UID 제거 + 이름 마스킹 (개인 결제 식별 차단, 금액 순위는 공개)
     usr_id: admin ? row.usr_id : '',
+    // 빈 값으로 내려보내고 소비측이 labels.noName으로 표시
     display_nm: admin
-      ? (row.display_nm ?? '(이름 없음)')
+      ? (row.display_nm ?? '')
       : maskDisplayName(row.display_nm),
     total_pi: Number(row.total_pi),
     txn_cnt: Number(row.txn_cnt),

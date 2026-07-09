@@ -26,7 +26,7 @@ interface PvResponse {
     bounceRate: number
   }
   pvTrend: { date: string; cnt: number }[]
-  channels: { cd: string; label: string; cnt: number }[]
+  channels: { cd: string; cnt: number }[]
   topLanding: { path: string; cnt: number }[]
   topExit: { path: string; cnt: number }[]
 }
@@ -35,7 +35,6 @@ interface PerfResponse {
   period: number
   funnel: {
     key: string
-    label: string
     cnt: number
     pctOfTop: number
     convFromPrev: number
@@ -45,8 +44,8 @@ interface PerfResponse {
     activeToBuyer: number
     buyerToRepeat: number
   }
-  activityTypes: { cd: string; label: string; cnt: number }[]
-  engagementDepth: { code: string; label: string; cnt: number }[]
+  activityTypes: { cd: string; cnt: number }[]
+  engagementDepth: { code: string; cnt: number }[]
   activeUsersPeriod: number
   sessionTrackingPending: boolean
 }

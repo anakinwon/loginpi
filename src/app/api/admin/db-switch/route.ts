@@ -73,5 +73,6 @@ export async function POST(req: NextRequest) {
     return apiError('ADM_DB_TARGET_INVALID', 400)
 
   const r = await setStagingDbTarget(body.target as DbTarget)
-  return NextResponse.json(r, { status: r.ok ? 200 : 400 })
+  if (!r.ok) return apiError(r.code!, 400, r.params)
+  return NextResponse.json({ ok: true })
 }

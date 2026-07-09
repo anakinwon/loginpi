@@ -34,6 +34,8 @@ function fmtDate(s: string): string {
 export function SubscriptionStatus() {
   const t = useTranslations('profile')
   const tc = useTranslations('common')
+  // 플랜 표시명 — 번역키(subscribe.product.<prod_ctgr_cd>) 우선, 없으면 API plan_nm 폴백
+  const tp = useTranslations('subscribe.product')
   const [subs, setSubs] = useState<Subscription[]>([])
   const [loading, setLoading] = useState(true)
   const [cancelling, setCancelling] = useState(false)
@@ -108,7 +110,7 @@ export function SubscriptionStatus() {
                       'bg-muted text-muted-foreground',
                   ].join(' ')}
                 >
-                  {s.plan_nm}
+                  {tp.has(s.prod_ctgr_cd) ? tp(s.prod_ctgr_cd) : s.plan_nm}
                 </span>
                 <p className="text-muted-foreground mt-1.5 text-xs">
                   {t('subscr.expireDate', { date: fmtDate(s.expire_dtm) })}

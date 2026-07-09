@@ -2358,7 +2358,8 @@
     "product": {
       "PICAFE": "PyCafé™ 구독",
       "PISHOP": "PyShop™ 구독",
-      "TRANSLATE": "PyTranslate™ 구독"
+      "TRANSLATE": "PyTranslate™ 구독",
+      "PISHOP_SUBSCR": "PyShop™ 구독"
     },
     "feat": {
       "PICAFE": [
@@ -3017,6 +3018,9 @@
       "DIRECT_PAY": "직접 전송",
       "PRODUCT_ORDER": "상품 구매",
       "UNKNOWN": "기타"
+    },
+    "labels": {
+      "noName": "(이름 없음)"
     }
   },
   "openPromo": {
@@ -4493,7 +4497,22 @@
     "ADM_CHK_ID_REQUIRED": "chk_id가 필요합니다",
     "ADM_DB_TARGET_INVALID": "target은 'staging' 또는 'prod-ro'",
     "ADM_DEPLOY_TARGET_INVALID": "target은 'staging' 또는 'production'",
-    "ADM_BATCH_LOG_FAILED": "배치 이력 조회 실패"
+    "ADM_BATCH_LOG_FAILED": "배치 이력 조회 실패",
+    "ADM_DEPLOY_GH_TOKEN_MISSING": "GITHUB_DEPLOY_TOKEN 미설정",
+    "ADM_DEPLOY_GH_STATUS": "GitHub {status}",
+    "ADM_DEPLOY_VERCEL_STATUS": "Vercel {status}",
+    "ADM_DEPLOY_STAGING_HOOK_MISSING": "VERCEL_STAGING_DEPLOY_HOOK 미설정",
+    "ADM_DEPLOY_HOOK_STATUS": "Deploy Hook {status}",
+    "ADM_DEPLOY_PROD_DIVERGED": "production이 master보다 {n}커밋 앞섬(갈라짐) — fast-forward 불가",
+    "ADM_DEPLOY_NOTHING_TO_PROMOTE": "승격할 커밋 없음(이미 최신)",
+    "ADM_DEPLOY_MASTER_SHA_FAIL": "master SHA 조회 실패",
+    "ADM_DEPLOY_PROMOTE_FAILED": "승격 실패 GitHub {status} {detail}",
+    "ADM_DB_NOT_STAGING": "스테이징 환경에서만 전환 가능(운영 WAS 불변)",
+    "ADM_DB_API_MISSING": "Vercel API 토큰/프로젝트ID/Deploy Hook 미설정",
+    "ADM_DB_PROD_RO_MISSING": "운영DB(prod-ro) 읽기전용 자격증명(PROD_RO_SUPABASE_URL/KEY) 미설정 — 쓰기 사고 방지로 차단",
+    "ADM_DB_ENV_UPDATE_FAILED": "env 변경 실패 Vercel {status} {detail}",
+    "ADM_DB_ENV_OK_REDEPLOY_FAILED": "환경변수는 변경됐으나 재배포에 실패했습니다. 배포 화면에서 상태를 확인하세요.",
+    "ADM_OPS_UNKNOWN": "알 수 없는 오류 ({detail})"
   },
   "apiMsgs": {
     "FBCK_SAVED": "후기가 저장되었습니다.",
@@ -4501,5 +4520,13 @@
     "FBCK_SAVED_PI_PENDING": "후기가 저장되었습니다. Pi 보상(약 {pi} Pi)은 곧 지급됩니다.",
     "I18N_NO_KEYS": "번역할 키가 없습니다",
     "I18N_PARTIAL_STOP": "일부 번역 후 중단되었습니다. 관리자에게 문의하세요"
+  },
+  "subscription": {
+    "planNames": {
+      "FREE": "Pi Explorer",
+      "OPERATOR": "Pi Host (운영자)",
+      "PICAFE_SUBSCR": "PyCafé™ 구독",
+      "TRANSLATE_SUBSCR": "PyTranslate™ 구독"
+    }
   }
 }
