@@ -5,6 +5,10 @@
 > 권장 전략: 파일별 t() 전환이 아니라 **공유 에러코드 카탈로그(ko/en) 신설 → API `{ error, code }` 반환 → 클라이언트 `t(code)` 해석**.
 > 추가 보류 2건: `payError.includes('충전')` 조건분기(group-room-creator.tsx:602)·`chat-auth.ts` plan_nm — 에러코드화 단계에서 함께 처리.
 
+> ## 🏁 전체 종결 (2026-07-09 야간, 커밋 411eac68·f009a5b8)
+> 최종 잔여 4건 완결: ① analytics 차트 라벨맵(API 코드 반환+소비 탭 t() — order.method/seg·charts.interval·perf.actvty/depthBucket/channelCd) ② ops-deploy MASTER 동적 문구 15종(ADM_DEPLOY_*/ADM_DB_* + params) ③ chat-auth plan_cd 병행+프로필 subscribe.product.* 배선 ④ payError.includes('충전') → 에러 code 분기.
+> 신규 21키 × 66언어 확산·운영DB 델타 3,948행 반영(운영 총 739,968행·188/188). **본 감사 문서의 모든 항목이 종결됨** — 이후 신규 문자열은 재발 방지 규칙(apiError()/ko+en 동반)으로 관리.
+>
 > ## ✅ P2-A/B·성공 message 완결 (2026-07-09 저녁, 커밋 09bc3f4c·74c195f8)
 > - admin API 82파일/233지점 → apiError 전환(기존 재사용 + 신규 ADM_ 141코드, 카탈로그 4파일: admin-stats·admin-std·admin-content·admin-ops)
 > - 성공 message → apiMessage()/useApiMessage (apiMsgs 5코드) · admin lib: stats-labels(adminAnalytics.theme 재사용)·ABC차트 전환, telegram-webhook은 비노출 확인
