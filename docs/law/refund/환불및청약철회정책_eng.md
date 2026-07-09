@@ -1,8 +1,11 @@
 # Refund and Withdrawal Policy
 # 返金・申込撤回ポリシー
 
-**Version**: v1.0  
-**Effective Date**: 2026-06-12  
+**Version**: v1.1 (Revision Draft — effective upon completion of notification procedure)  
+**Planned Effective Date**: Notice date + 7 days (Article 19)  
+**Revised**: 2026-07-09 · **Originally Effective**: 2026-06-12  
+
+> **Key v1.1 Revisions**: ① New Bean point (rechargeable in-app points) refund provisions (Article 16-2) ② Automatic A2U refund for direct Pi payments specified (Article 16-3) ③ Marketplace cancellation fees specified (Article 18) ④ Corrections of clerical errors (return shipping currency unit, etc.)
 **Created**: 2026-06-12  
 
 ---
@@ -19,6 +22,8 @@ This Policy governs refunds and withdrawal of offers related to services provide
 4. **Marketplace Products**: Digital or physical goods or services traded between Members
 5. **Transaction Completion**: State recorded on Pi blockchain from which no reversal is possible
 6. **Refund**: Restoration of paid virtual assets (except where technically impossible)
+7. **Bean Points** *(New in v1.1)*: In-app points that Members recharge with Pi for use within the Service (fixed recharge rate: 1 Pi = 100 Bean). Bean points are not a virtual asset and cannot be transferred or traded outside the Service.
+8. **A2U Refund** *(New in v1.1)*: A refund made by transferring Pi from the Company wallet to the Member's Pi wallet (App-to-User). This is the standard refund method where the original transaction cannot be reversed due to blockchain irreversibility.
 
 ### Article 3: Scope of Legal Application
 - This Policy applies the E-Commerce Act Article 17 (Right of Withdrawal) by analogy.
@@ -103,9 +108,11 @@ The following information must be provided when requesting a refund:
 | Case | Refund Method | Period |
 |---|---|---|
 | **Pi Payment Refund Possible** (transaction not confirmed) | Recovery to Pi wallet | 3-5 days |
-| **Pi Payment Refund Not Possible** (transaction confirmed) | Alternative Pi transfer or service credit | Within 7 days |
+| **Pi Payment Refund Not Possible** (transaction confirmed) | **A2U refund** (Company → Member Pi transfer) or service credit | Within 7 days |
 | **Marketplace Return** (physical goods) | Refund after shipping confirmation | Within 14 days |
 | **Subscription Fee Refund** (unused) | Pi wallet recovery | 3-5 days |
+| **Bean Point Recharge Refund** *(v1.1)* | Unused balance converted to Pi (100 Bean = 1 Pi) and refunded via A2U — Article 16-2 | 3-5 days |
+| **Marketplace Order Cancellation** *(v1.1)* | Automatic A2U refund by the system (cancellation fee deducted — Article 18) | Usually immediate to 3 days |
 
 #### 6-3. Refund Denial Notification
 In case the Company denies a refund request:
@@ -132,7 +139,7 @@ In case the Company denies a refund request:
 
 - **Member's Responsibility (Member bears cost)**
    - Simple return, color/size change of mind
-   - Shipping cost: Standard parcel delivery basis approximately 3,000-5,000 Pi
+   - Shipping cost: Actual courier rates (disclosed on the return request screen) *(corrected in v1.1 — the previous "3,000-5,000 Pi" was a currency unit error)*
 
 ---
 
@@ -283,6 +290,33 @@ Step 1: Consumer application → Step 2: Preliminary investigation → Step 3: M
 - **Unused Status**: No chat room access after subscription start → Full refund within 7 days
 - **Used Status**: After chat room access → Refund not possible
 
+### Article 16-2: Bean Point Recharge Refund *(New in v1.1)*
+
+#### 16-2-1. Eligible for Refund
+- Only the **unused balance of Bean points directly recharged with Pi** by the Member.
+- Bean granted free of charge through events, rewards, or promotions is not eligible for refund.
+
+#### 16-2-2. Refund Standards
+| Status | Refund |
+|---|---|
+| Within 7 days of recharge + **entirely unused** | Full recharged Pi refunded via A2U |
+| Within 7 days of recharge + **partially used** | Unused balance converted at 100 Bean = 1 Pi and refunded via A2U (fractions below 1 Pi are truncated) |
+| More than 7 days after recharge | No refund (usable within the Service only) |
+
+#### 16-2-3. Notes
+- Where free-granted and recharged Bean are mixed, usage is deemed to **deduct free-granted Bean first** when calculating the unused recharged balance.
+- Remaining Bean expires upon membership withdrawal; a refund under the above standards may be requested before withdrawal.
+
+### Article 16-3: Automatic Refund of Direct Pi Payments (A2U) *(New in v1.1)*
+
+#### 16-3-1. Scope
+Direct Pi payments to the Company such as cafe creation and subscriptions, and marketplace order payments.
+
+#### 16-3-2. Processing
+1. **Marketplace order cancellation**: Upon confirmed cancellation, the system executes an **automatic A2U refund** (cancellation fee deducted per Article 18).
+2. **Other direct Pi payments**: Where withdrawal requirements (Article 4) are met, Pi is transferred from the Company wallet to the Member's Pi wallet via A2U (within 3-5 days).
+3. A2U refunds are sent only to the **same Pi wallet** used for payment and may be delayed depending on blockchain network conditions.
+
 ---
 
 ## Part 8: Non-Refundable Items
@@ -315,6 +349,7 @@ Step 1: Consumer application → Step 2: Preliminary investigation → Step 3: M
 ### Article 18: Refund Fees
 - **Basic Principle**: No fees for legitimate refund reasons
 - **Exception**: Return shipping costs may be deducted for returns due to Member responsibility
+- **Marketplace cancellation fees** *(New in v1.1)*: For cancellations attributable to the Member (e.g., change of mind), role-based cancellation fees are deducted — buyer cancellation 0.9 Pi · seller cancellation 1.1 Pi (disclosed in advance on the cancellation screen). No fee applies when the Company or the counterparty is at fault.
 
 ### Article 19: Disclosure and Changes
 - This Policy is always accessible via "Customer Support > Refund Policy" menu in Service
@@ -330,8 +365,15 @@ Step 1: Consumer application → Step 2: Preliminary investigation → Step 3: M
 ---
 
 **Supplementary Provisions**
-- This Refund Policy takes effect on June 12, 2026.
-- Prior transactions governed by prior policy (if unchanged)
+- v1.0: Enacted and effective June 12, 2026. Prior transactions governed by prior policy (if unchanged).
+- v1.1: Revised July 9, 2026 (draft) — new Bean point recharge refund (Article 16-2) and automatic A2U refund (Article 16-3), marketplace cancellation fees specified (Article 18), clerical corrections. **Effective following at least 7 days' notice per Article 19.**
+
+**Revision History**
+
+| Version | Date | Description |
+|---|---|---|
+| v1.0 | 2026-06-12 | Initial enactment |
+| v1.1 | 2026-07-09 (draft) | Bean point refund, automatic A2U refund, cancellation fees, corrections |
 
 ---
 
@@ -340,9 +382,10 @@ Step 1: Consumer application → Step 2: Preliminary investigation → Step 3: M
 | Item | Deadline | Refund Possibility |
 |---|---|---|
 | Subscription (unused) | Within 7 days | Full or pro rata |
-| Marketplace (unused) | Within 7 days | Full |
+| Marketplace (unused) | Within 7 days | Full (fee deducted for Member-attributable cancellation) |
 | Tips | Not possible | Duplicate payments only |
 | Voice Chat (unused) | Within 7 days | Full |
+| Bean Points recharged (unused) | Within 7 days | Balance converted to Pi via A2U (free grants excluded) |
 | Pi Virtual Asset Price Change | - | Not possible (asset special nature) |
 
 ---
