@@ -58,6 +58,11 @@ CREATE INDEX IF NOT EXISTS idx_sys_site_usr_map_usr
   ON public.sys_site_usr_map (usr_id)
   WHERE del_yn = 'N';
 
+-- 2-1) 기적용 환경 대비 멱등 보강 (FR-P1 페르소나 컬럼 — 2026-07-09 마스터 확정 요구)
+ALTER TABLE public.sys_site_usr_map ADD COLUMN IF NOT EXISTS site_nick_nm    TEXT;
+ALTER TABLE public.sys_site_usr_map ADD COLUMN IF NOT EXISTS site_avatar_url TEXT;
+COMMENT ON COLUMN public.sys_site_usr_map.site_nick_nm IS '사이트별 페르소나 표시명 (FR-P1). NULL=미설정 — 전역 닉네임 자동 노출 금지, 첫 진입 시 설정 유도';
+
 -- 3) 시드 — 모선(CAFE=활성) + 파일럿 1호(YEA=대기, Pi 포털 등록·실기기 검증 후 Y 전환)
 INSERT INTO public.sys_site_mst (site_cd, site_domain_nm, site_nm, preset_cd, use_yn, regr_id)
 VALUES
