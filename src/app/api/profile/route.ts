@@ -5,6 +5,7 @@ import { getSessionUser } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { signPayload, verifyPayload } from '@/lib/pi-session-crypto'
 import { recordUserAction } from '@/lib/event'
+import { apiError } from '@/lib/api-errors'
 import type { PiSessionUser } from '@/types/pi-session'
 
 const ProfileUpdateSchema = z.object({
@@ -25,8 +26,7 @@ const ProfileUpdateSchema = z.object({
 
 export async function GET() {
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   const { data, error } = await getSupabaseAdmin()
     .from('sys_user')
@@ -40,7 +40,7 @@ export async function GET() {
   // (실제 사례: 027 마이그레이션 미적용으로 kakao_id 컬럼 부재 → 인증 정상인데 로그인 오류로 표시)
   if (error || !data) {
     console.error('[profile] 조회 실패:', error?.message ?? 'row 없음')
-    return NextResponse.json({ error: '프로필 조회 실패' }, { status: 500 })
+    return apiError('PROFILE_QUERY_FAILED', 500)
   }
 
   return NextResponse.json({ user: data })
@@ -48,19 +48,22 @@ export async function GET() {
 
 export async function PATCH(req: Request) {
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   let body: unknown
   try {
     body = await req.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
 
   const parsed = ProfileUpdateSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 })
+    // zod 필드 오류 상세는 error 필드로 유지 + i18n용 code 첨부
+    return NextResponse.json(
+      { error: parsed.error.flatten(), code: 'INVALID_INPUT' },
+      { status: 400 },
+    )
   }
 
   // 빈 문자열은 null로 정규화 — '지우기'(빈값 전송) 시 DB에 빈 문자열 대신 null 저장.
@@ -82,8 +85,7 @@ export async function PATCH(req: Request) {
     )
     .maybeSingle()
 
-  if (error)
-    return NextResponse.json({ error: '프로필 저장 실패' }, { status: 500 })
+  if (error) return apiError('PROFILE_SAVE_FAILED', 500)
 
   // Pi 세션인 경우 nick_nm을 반영한 새 토큰 재발급 — 새로고침 후에도 헤더에 즉시 반영됨
   const secret = process.env.PI_SESSION_SECRET

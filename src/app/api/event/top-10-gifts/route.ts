@@ -1,14 +1,13 @@
 import { NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { apiError } from '@/lib/api-errors'
 
 // GET /api/event/top-10-gifts — 미션 10/10 선착순 상위 10명 + 선물 발송 상태 (관리자 전용)
 export async function GET() {
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
-  if (!isAdmin(user))
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
+  if (!isAdmin(user)) return apiError('FORBIDDEN', 403)
 
   try {
     const db = getSupabaseAdmin()
@@ -107,6 +106,6 @@ export async function GET() {
     return NextResponse.json({ gifts: result })
   } catch (err) {
     console.error('[event/top-10-gifts] 조회 실패:', err)
-    return NextResponse.json({ error: '선물 조회 실패' }, { status: 500 })
+    return apiError('EVENT_GIFT_QUERY_FAILED', 500)
   }
 }

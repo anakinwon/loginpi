@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { publicCacheHeaders } from '@/lib/cache-headers'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { apiError } from '@/lib/api-errors'
 
 interface Mission {
   mission_cd: string
@@ -38,10 +39,7 @@ export async function GET(request: NextRequest) {
 
   // 입력값 검증
   if (!eventId) {
-    return NextResponse.json(
-      { error: 'event_id는 필수 필드입니다' },
-      { status: 400 },
-    )
+    return apiError('EVENT_ID_REQUIRED', 400)
   }
 
   try {
@@ -94,6 +92,6 @@ export async function GET(request: NextRequest) {
     )
   } catch (err) {
     console.error('[event/missions] 조회 실패:', err)
-    return NextResponse.json({ error: '미션 조회 실패' }, { status: 500 })
+    return apiError('EVENT_MISSION_QUERY_FAILED', 500)
   }
 }

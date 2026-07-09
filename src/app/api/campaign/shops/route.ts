@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { sanitizeError } from '@/lib/sanitize-error'
+import { apiError } from '@/lib/api-errors'
 
 export interface ShopConditionRow {
   shop_id: string // 대표 매장 ID
@@ -25,8 +26,7 @@ export interface ShopConditionRow {
 // q: 요원명 검색 — pi_username/nick_nm 부분일치(pg_trgm GIN 가속, sql/086·101)
 export async function GET(request: Request) {
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   const db = getSupabaseAdmin()
   const admin = isAdmin(user)

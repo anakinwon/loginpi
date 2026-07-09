@@ -4,24 +4,20 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { applyBean } from '@/lib/bean'
 import { BADGE_UPGRADE_BEAN } from '@/lib/bean-fee'
 import { microFeeBean, applyPromoGate } from '@/lib/fee-resolver'
+import { apiError, API_ERRORS } from '@/lib/api-errors'
 
 // POST /api/badges/upgrade — 배지 강화 Bean 결제 (PRD_15_FEE §1-6 #7)
 // Pi 직접결제(FEATURE_ADDON) 폐기 → Bean SPEND 전환
 export async function POST(request: NextRequest) {
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   const body = await request.json().catch(() => ({}))
   const { badge_id, theme_cd } = body as {
     badge_id?: string
     theme_cd?: string
   }
-  if (!badge_id || !theme_cd)
-    return NextResponse.json(
-      { error: '배지 정보가 필요합니다' },
-      { status: 400 },
-    )
+  if (!badge_id || !theme_cd) return apiError('BADGE_INFO_REQUIRED', 400)
 
   const db = getSupabaseAdmin()
 
@@ -35,18 +31,10 @@ export async function POST(request: NextRequest) {
     .eq('del_yn', 'N')
     .maybeSingle()
 
-  if (!badge)
-    return NextResponse.json(
-      { error: '배지를 찾을 수 없습니다' },
-      { status: 404 },
-    )
+  if (!badge) return apiError('BADGE_NOT_FOUND', 404)
 
   const b = badge as { badge_id: string; upgr_yn: string }
-  if (b.upgr_yn === 'Y')
-    return NextResponse.json(
-      { error: '이미 강화된 배지입니다' },
-      { status: 409 },
-    )
+  if (b.upgr_yn === 'Y') return apiError('BADGE_ALREADY_UPGRADED', 409)
 
   // Bean 차감 — PI 모드(메인넷 등재 기간)는 마이크로 무료화로 차감 스킵 (PRD_24 §0)
   // 오픈기념행사 무료화 게이트 — PRD_26
@@ -67,19 +55,18 @@ export async function POST(request: NextRequest) {
 
     if (!charge.ok) {
       if (charge.error === 'INSUFFICIENT_BEAN') {
+        // 부가 필드(requiresBean·feeBean) 동반 → apiError 대신 수동 구성 + code 첨부
         return NextResponse.json(
           {
-            error: 'Bean 잔액이 부족합니다. 충전 후 다시 시도하세요.',
+            error: API_ERRORS.BEAN_INSUFFICIENT,
+            code: 'BEAN_INSUFFICIENT',
             requiresBean: true,
             feeBean,
           },
           { status: 402 },
         )
       }
-      return NextResponse.json(
-        { error: '결제 처리에 실패했습니다' },
-        { status: 500 },
-      )
+      return apiError('BEAN_PAYMENT_FAILED', 500)
     }
     balance = charge.balance
   }
@@ -110,10 +97,7 @@ export async function POST(request: NextRequest) {
         regrId: user.display_name.slice(0, 20),
       })
     }
-    return NextResponse.json(
-      { error: '배지 강화에 실패했습니다' },
-      { status: 500 },
-    )
+    return apiError('BADGE_UPGRADE_FAILED', 500)
   }
 
   return NextResponse.json({ success: true, balance })

@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { apiError } from '@/lib/api-errors'
 
 export async function GET() {
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   const { data } = await getSupabaseAdmin()
     .from('pi_pymnt')

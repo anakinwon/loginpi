@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
 import { listBeanTxns } from '@/lib/bean'
 import type { BeanTxnType } from '@/lib/bean-shared'
+import { apiError } from '@/lib/api-errors'
 
 const VALID_TYPES = ['CHARGE', 'SPEND', 'REWARD', 'REFUND', 'TRANSFER'] as const
 const MAX_LIMIT = 100
@@ -10,8 +11,7 @@ const MAX_LIMIT = 100
 // getSessionUser()만 사용 → Pi(쿠키/헤더)·Google 세션 양쪽 자동 지원
 export async function GET(req: NextRequest) {
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   const sp = req.nextUrl.searchParams
   const limit = Math.min(MAX_LIMIT, Math.max(1, Number(sp.get('limit') ?? 30)))

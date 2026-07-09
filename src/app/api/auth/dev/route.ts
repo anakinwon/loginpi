@@ -1,23 +1,19 @@
 import { createHmac } from 'crypto'
 import { NextResponse } from 'next/server'
+import { apiError } from '@/lib/api-errors'
 import type { PiSessionUser } from '@/types/pi-session'
 
 // 개발 환경 전용 mock 로그인 — 프로덕션에서는 404 반환
 // 일반 브라우저에서 Pi.authenticate()가 resolve되지 않는 문제 우회용
 export async function POST() {
   if (process.env.NODE_ENV === 'production') {
-    return NextResponse.json(
-      { error: '개발 환경에서만 사용 가능합니다' },
-      { status: 404 },
-    )
+    return apiError('AUTH_DEV_ONLY', 404)
   }
 
   const secret = process.env.PI_SESSION_SECRET
   if (!secret) {
-    return NextResponse.json(
-      { error: 'PI_SESSION_SECRET 미설정' },
-      { status: 500 },
-    )
+    console.error('[auth/dev] PI_SESSION_SECRET 미설정')
+    return apiError('SERVER_CONFIG', 500)
   }
 
   const mockUser: PiSessionUser = {

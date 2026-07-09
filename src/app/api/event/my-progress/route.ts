@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
 import { getEventProgress } from '@/lib/event'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { apiError } from '@/lib/api-errors'
 
 // GET /api/event/my-progress — 사용자 미션 진행도 + 요원 등급 + 안내문
 export async function GET() {
@@ -31,9 +32,6 @@ export async function GET() {
     return NextResponse.json({ progress, missions: trimmedMissions })
   } catch (err) {
     console.error('[event/my-progress] 조회 실패:', err)
-    return NextResponse.json(
-      { error: '미션 진행도 조회 실패' },
-      { status: 500 },
-    )
+    return apiError('EVENT_PROGRESS_QUERY_FAILED', 500)
   }
 }

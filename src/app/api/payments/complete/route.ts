@@ -19,34 +19,29 @@ import {
   type SubscrCycle,
 } from '@/lib/bean-subscr-plan'
 import { withGuard } from '@/lib/api-guard'
+import { apiError } from '@/lib/api-errors'
 
 const PI_PAYMENTS_URL = 'https://api.minepi.com/v2/payments'
 
 async function handlePOST(request: NextRequest) {
   const apiKey = process.env.PI_API_KEY
   if (!apiKey) {
-    return NextResponse.json(
-      {
-        error:
-          'PI_API_KEY 미설정 — Pi Developer Portal에서 발급 후 환경변수에 추가하세요',
-      },
-      { status: 500 },
+    console.error(
+      '[payments/complete] PI_API_KEY 미설정 — Pi Developer Portal에서 발급 후 환경변수에 추가하세요',
     )
+    return apiError('SERVER_CONFIG', 500)
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
 
   const { paymentId, txid } = body as { paymentId?: string; txid?: string }
   if (!paymentId || !txid) {
-    return NextResponse.json(
-      { error: 'paymentId와 txid가 필요합니다' },
-      { status: 400 },
-    )
+    return apiError('PAY_PAYMENT_ID_TXID_REQUIRED', 400)
   }
 
   try {
@@ -60,10 +55,10 @@ async function handlePOST(request: NextRequest) {
     })
     if (!res.ok) {
       const text = await res.text()
-      return NextResponse.json(
-        { error: `Pi 완료 처리 실패 (${res.status}): ${text}` },
-        { status: res.status },
-      )
+      return apiError('PAY_PI_COMPLETE_FAILED', res.status, {
+        status: res.status,
+        detail: text,
+      })
     }
     const payment = (await res.json()) as PaymentDTO
 
@@ -574,10 +569,7 @@ async function handlePOST(request: NextRequest) {
       subscription: grantedSubscr,
     })
   } catch {
-    return NextResponse.json(
-      { error: 'Pi Network API 연결 실패' },
-      { status: 502 },
-    )
+    return apiError('PI_API_CONNECT_FAILED', 502)
   }
 }
 

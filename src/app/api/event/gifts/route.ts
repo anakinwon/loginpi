@@ -1,23 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { apiError } from '@/lib/api-errors'
 
 // PATCH /api/event/gifts — 선물 발송 상태 업데이트 (관리자 전용)
 export async function PATCH(request: NextRequest) {
   const user = await getSessionUser()
   if (!user) {
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+    return apiError('AUTH_REQUIRED', 401)
   }
 
   if (!isAdmin(user)) {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+    return apiError('FORBIDDEN', 403)
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
 
   const { user_id, sent_yn, gift_nm } = body as {
@@ -27,14 +28,11 @@ export async function PATCH(request: NextRequest) {
   }
 
   if (!user_id) {
-    return NextResponse.json({ error: 'user_id가 필요합니다' }, { status: 400 })
+    return apiError('EVENT_USER_ID_REQUIRED', 400)
   }
 
   if (!['Y', 'N'].includes(sent_yn ?? '')) {
-    return NextResponse.json(
-      { error: '발송 여부는 Y 또는 N이어야 합니다' },
-      { status: 400 },
-    )
+    return apiError('EVENT_SENT_YN_INVALID', 400)
   }
 
   try {
@@ -68,6 +66,6 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ gift: data })
   } catch (err) {
     console.error('[event/gifts] 업데이트 실패:', err)
-    return NextResponse.json({ error: '선물 업데이트 실패' }, { status: 500 })
+    return apiError('EVENT_GIFT_UPDATE_FAILED', 500)
   }
 }

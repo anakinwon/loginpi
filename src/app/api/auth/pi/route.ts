@@ -4,6 +4,7 @@ import { upsertPiUser } from '@/lib/users'
 import { getSessionUser } from '@/lib/auth-check'
 import { recordActivity } from '@/lib/activity-log'
 import { withAuthGuard } from '@/lib/api-guard'
+import { apiError } from '@/lib/api-errors'
 import type { PiSessionUser } from '@/types/pi-session'
 import type { UserRow } from '@/lib/users'
 
@@ -54,10 +55,8 @@ export const GET = withAuthGuard(async function (request: NextRequest) {
   try {
     secret = getSecret()
   } catch {
-    return NextResponse.json(
-      { error: 'PI_SESSION_SECRET 미설정' },
-      { status: 500 },
-    )
+    console.error('[auth/pi] PI_SESSION_SECRET 미설정')
+    return apiError('SERVER_CONFIG', 500)
   }
 
   const user = verifyPayload<PiSessionUser>(cookieValue, secret)
@@ -82,10 +81,7 @@ export const POST = withAuthGuard(async function (request: NextRequest) {
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json(
-      { error: '잘못된 요청 본문입니다' },
-      { status: 400 },
-    )
+    return apiError('BAD_REQUEST_BODY', 400)
   }
 
   const { accessToken, walletAddress } = body as {
@@ -93,20 +89,15 @@ export const POST = withAuthGuard(async function (request: NextRequest) {
     walletAddress?: string | null
   }
   if (!accessToken || typeof accessToken !== 'string') {
-    return NextResponse.json(
-      { error: 'accessToken이 필요합니다' },
-      { status: 400 },
-    )
+    return apiError('AUTH_ACCESS_TOKEN_REQUIRED', 400)
   }
 
   let secret: string
   try {
     secret = getSecret()
   } catch {
-    return NextResponse.json(
-      { error: 'PI_SESSION_SECRET 미설정' },
-      { status: 500 },
-    )
+    console.error('[auth/pi] PI_SESSION_SECRET 미설정')
+    return apiError('SERVER_CONFIG', 500)
   }
 
   // Pi Network API로 토큰 검증
@@ -116,14 +107,11 @@ export const POST = withAuthGuard(async function (request: NextRequest) {
       headers: { Authorization: `Bearer ${accessToken}` },
     })
     if (!piRes.ok) {
-      return NextResponse.json({ error: 'Pi 토큰 검증 실패' }, { status: 401 })
+      return apiError('AUTH_PI_TOKEN_INVALID', 401)
     }
     piUser = (await piRes.json()) as PiUserDTO
   } catch {
-    return NextResponse.json(
-      { error: 'Pi Network API 연결 실패' },
-      { status: 502 },
-    )
+    return apiError('PI_API_CONNECT_FAILED', 502)
   }
 
   // Supabase users 테이블에 upsert → userId·role·nick_nm 획득

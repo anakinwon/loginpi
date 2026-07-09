@@ -1,14 +1,14 @@
 import { NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { apiError } from '@/lib/api-errors'
 
 const CAMPAIGN_CD = 'SHOP_ONBOARD'
 
 // GET /api/campaign/status — 온보딩 캠페인 현황 (1인 1회, 대표 매장 선택)
 export async function GET() {
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   const db = getSupabaseAdmin()
 
@@ -72,7 +72,7 @@ export async function GET() {
     require_mission_cnt: number
     active_yn: string
   } | null
-  if (!camp) return NextResponse.json({ error: '캠페인 없음' }, { status: 404 })
+  if (!camp) return apiError('CAMP_NOT_FOUND', 404)
 
   const hasItem = (itemRes.count ?? 0) > 0
   const hasTelegram =

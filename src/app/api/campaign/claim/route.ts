@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { apiError } from '@/lib/api-errors'
 
 const CAMPAIGN_CD = 'SHOP_ONBOARD'
 
@@ -8,8 +9,7 @@ const CAMPAIGN_CD = 'SHOP_ONBOARD'
 // body: { shop_id?: string }
 export async function POST(req: NextRequest) {
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   const body = (await req.json().catch(() => ({}))) as { shop_id?: string }
   const shopId =
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
   )
   if (error) {
     console.error('[campaign/claim] 실패:', error.message)
-    return NextResponse.json({ error: '보상 처리 실패' }, { status: 500 })
+    return apiError('CAMP_CLAIM_FAILED', 500)
   }
 
   return NextResponse.json(data)

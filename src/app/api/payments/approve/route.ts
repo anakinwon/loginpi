@@ -1,34 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { withGuard } from '@/lib/api-guard'
+import { apiError } from '@/lib/api-errors'
 
 const PI_PAYMENTS_URL = 'https://api.minepi.com/v2/payments'
 
 export const POST = withGuard(async function (request: NextRequest) {
   const apiKey = process.env.PI_API_KEY
   if (!apiKey) {
-    return NextResponse.json(
-      {
-        error:
-          'PI_API_KEY 미설정 — Pi Developer Portal에서 발급 후 환경변수에 추가하세요',
-      },
-      { status: 500 },
+    console.error(
+      '[payments/approve] PI_API_KEY 미설정 — Pi Developer Portal에서 발급 후 환경변수에 추가하세요',
     )
+    return apiError('SERVER_CONFIG', 500)
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
 
   const { paymentId } = body as { paymentId?: string }
   if (!paymentId) {
-    return NextResponse.json(
-      { error: 'paymentId가 필요합니다' },
-      { status: 400 },
-    )
+    return apiError('PAY_PAYMENT_ID_REQUIRED', 400)
   }
 
   try {
@@ -71,10 +66,10 @@ export const POST = withGuard(async function (request: NextRequest) {
       } catch {
         /* JSON 파싱 실패 시 아래 오류 반환으로 진행 */
       }
-      return NextResponse.json(
-        { error: `Pi 승인 실패 (${res.status}): ${text}` },
-        { status: res.status },
-      )
+      return apiError('PAY_PI_APPROVE_FAILED', res.status, {
+        status: res.status,
+        detail: text,
+      })
     }
     const payment = (await res.json()) as PaymentDTO
 
@@ -103,9 +98,6 @@ export const POST = withGuard(async function (request: NextRequest) {
 
     return NextResponse.json({ success: true, payment })
   } catch {
-    return NextResponse.json(
-      { error: 'Pi Network API 연결 실패' },
-      { status: 502 },
-    )
+    return apiError('PI_API_CONNECT_FAILED', 502)
   }
 })

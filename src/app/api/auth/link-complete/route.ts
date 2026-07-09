@@ -3,6 +3,7 @@ import { auth } from '@/auth'
 import { updatePiUserWithGoogle } from '@/lib/users'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { recordUserAction } from '@/lib/event'
+import { apiError } from '@/lib/api-errors'
 
 // POST /api/auth/link-complete
 // Body: { code: string }
@@ -12,15 +13,12 @@ export async function POST(request: NextRequest) {
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청' }, { status: 400 })
+    return apiError('BAD_REQUEST', 400)
   }
 
   const { code } = body as { code?: string }
   if (!code || !/^\d{6}$/.test(code)) {
-    return NextResponse.json(
-      { error: '유효한 6자리 코드를 입력해주세요' },
-      { status: 400 },
-    )
+    return apiError('AUTH_LINK_CODE_FORMAT', 400)
   }
 
   const supabase = getSupabaseAdmin()
@@ -32,31 +30,16 @@ export async function POST(request: NextRequest) {
     .single()
 
   if (fetchErr || !linkCode) {
-    return NextResponse.json(
-      { error: '유효하지 않은 코드입니다' },
-      { status: 400 },
-    )
+    return apiError('AUTH_LINK_CODE_INVALID', 400)
   }
   if (linkCode.used_at) {
-    return NextResponse.json(
-      { error: '이미 사용된 코드입니다' },
-      { status: 400 },
-    )
+    return apiError('AUTH_LINK_CODE_USED', 400)
   }
   if (new Date(linkCode.expires_at) < new Date()) {
-    return NextResponse.json(
-      { error: '코드가 만료됐습니다 (10분 초과)' },
-      { status: 400 },
-    )
+    return apiError('AUTH_LINK_CODE_EXPIRED', 400)
   }
   if (linkCode.attempt_count >= 5) {
-    return NextResponse.json(
-      {
-        error:
-          '시도 횟수 초과로 코드가 무효화됐습니다. Pi Browser에서 새 코드를 생성하세요.',
-      },
-      { status: 400 },
-    )
+    return apiError('AUTH_LINK_CODE_ATTEMPTS_EXCEEDED', 400)
   }
 
   // 시도 횟수 즉시 증가 (브루트포스 방지)
@@ -67,25 +50,16 @@ export async function POST(request: NextRequest) {
 
   const googleSession = await auth()
   if (!googleSession?.user) {
-    return NextResponse.json(
-      { error: 'Google 로그인이 필요합니다' },
-      { status: 401 },
-    )
+    return apiError('GOOGLE_AUTH_REQUIRED', 401)
   }
 
   // Google OAuth sub를 google_id로 사용 (JWT token.sub = Google raw sub)
   const googleSub = googleSession.user.sub
   if (!googleSub) {
-    return NextResponse.json(
-      { error: 'Google 인증 정보가 없습니다' },
-      { status: 400 },
-    )
+    return apiError('AUTH_GOOGLE_CREDENTIALS_MISSING', 400)
   }
   if (!googleSession.user.email) {
-    return NextResponse.json(
-      { error: 'Google 이메일 정보가 없습니다' },
-      { status: 400 },
-    )
+    return apiError('GOOGLE_EMAIL_MISSING', 400)
   }
 
   try {
@@ -113,8 +87,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true })
   } catch (err) {
-    const message = err instanceof Error ? err.message : '계정 연동 실패'
-    console.error('[link-complete]', message, err)
-    return NextResponse.json({ error: message }, { status: 500 })
+    console.error('[link-complete]', err)
+    return apiError('AUTH_LINK_FAILED', 500)
   }
 }

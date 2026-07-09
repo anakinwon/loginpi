@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth-check'
 import { withGuard } from '@/lib/api-guard'
+import { apiError } from '@/lib/api-errors'
 
 const PI_PAYMENTS_URL = 'https://api.minepi.com/v2/payments'
 
@@ -19,15 +20,12 @@ async function handlePOST(request: NextRequest) {
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
 
   const { paymentId } = body as { paymentId?: string }
   if (!paymentId) {
-    return NextResponse.json(
-      { error: 'paymentId가 필요합니다' },
-      { status: 400 },
-    )
+    return apiError('PAY_PAYMENT_ID_REQUIRED', 400)
   }
 
   const db = getSupabaseAdmin()
@@ -72,7 +70,7 @@ async function handlePOST(request: NextRequest) {
       .eq('user_id', user.id)
       .in('status', ['pending', 'approved'])
   } catch {
-    return NextResponse.json({ error: '결제 상태 갱신 실패' }, { status: 500 })
+    return apiError('PAY_STATUS_UPDATE_FAILED', 500)
   }
 
   return NextResponse.json({ success: true, updated: true })

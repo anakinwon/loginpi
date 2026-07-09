@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
 import { recordUserAction } from '@/lib/event'
+import { apiError, API_ERRORS } from '@/lib/api-errors'
 import {
   getUserConsents,
   recordConsents,
@@ -34,14 +35,14 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const user = await getSessionUser()
   if (!user) {
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+    return apiError('AUTH_REQUIRED', 401)
   }
 
   let body: unknown
   try {
     body = await req.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
   const { terms, privacy, marketing, lbs, birth, guardian } = body as {
     terms?: boolean
@@ -54,29 +55,26 @@ export async function POST(req: NextRequest) {
 
   // 필수 동의 검증 (서버 강제 — 클라이언트 우회 차단)
   if (terms !== true || privacy !== true || lbs !== true) {
-    return NextResponse.json(
-      {
-        error:
-          '이용약관·개인정보 수집·이용·위치정보 수집·이용 동의는 필수입니다',
-      },
-      { status: 400 },
-    )
+    return apiError('CONSENT_REQUIRED_MISSING', 400)
   }
 
   // 연령 게이트 — 생년월일로 만 나이 서버 재계산(클라이언트 신뢰 안 함)
   const age = typeof birth === 'string' ? calcAge(birth) : null
   if (age === null) {
-    return NextResponse.json(
-      { error: '생년월일을 올바르게 입력해 주세요' },
-      { status: 400 },
-    )
+    return apiError('CONSENT_BIRTH_INVALID', 400)
   }
   // 만 14세 미만은 법정대리인(보호자) 동의 필수
   const isMinor = age < MIN_AGE
   if (isMinor && guardian !== true) {
+    // 부가 필드(requireGuardian) 동반 → apiError 대신 수동 구성 + code·params 첨부
     return NextResponse.json(
       {
-        error: `만 ${MIN_AGE}세 미만은 법정대리인(보호자)의 동의가 필요합니다`,
+        error: API_ERRORS.CONSENT_GUARDIAN_REQUIRED.replaceAll(
+          '{age}',
+          String(MIN_AGE),
+        ),
+        code: 'CONSENT_GUARDIAN_REQUIRED',
+        params: { age: MIN_AGE },
         requireGuardian: true,
       },
       { status: 400 },
@@ -100,13 +98,13 @@ export async function POST(req: NextRequest) {
     { ip, ua },
   )
   if (!result.ok) {
-    return NextResponse.json({ error: '저장 실패' }, { status: 500 })
+    return apiError('SAVE_FAILED', 500)
   }
 
   // 위치(LBS) 동의 즉시 동기화 — sys_user 캐시 세팅으로 가까운 카페/지도 즉시 활성, 별도 다이얼로그 미표시
   const lbsSync = await syncLbsConsent(user.id, { ip, ua })
   if (!lbsSync.ok) {
-    return NextResponse.json({ error: '위치 동의 저장 실패' }, { status: 500 })
+    return apiError('CONSENT_LBS_SAVE_FAILED', 500)
   }
   // M9: 위치기반서비스 동의 미션 기록 (비블로킹 — 기존 LBS 라우트와 동일 동작)
   recordUserAction('lbs_consent', user.id, {

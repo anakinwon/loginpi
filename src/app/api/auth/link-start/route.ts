@@ -3,6 +3,7 @@ import { randomInt } from 'crypto'
 import { verifyPayload } from '@/lib/pi-session-crypto'
 import { upsertPiUser } from '@/lib/users'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { apiError } from '@/lib/api-errors'
 import type { PiSessionUser } from '@/types/pi-session'
 
 function getSecret() {
@@ -45,10 +46,8 @@ export async function POST(request: NextRequest) {
   try {
     secret = getSecret()
   } catch {
-    return NextResponse.json(
-      { error: 'PI_SESSION_SECRET 미설정' },
-      { status: 500 },
-    )
+    console.error('[auth/link-start] PI_SESSION_SECRET 미설정')
+    return apiError('SERVER_CONFIG', 500)
   }
 
   // ── 경로 1: pi_session 쿠키 검증 ──────────────────────────────
@@ -85,13 +84,7 @@ export async function POST(request: NextRequest) {
   }
 
   if (!userId) {
-    return NextResponse.json(
-      {
-        error:
-          'Pi 로그인이 필요합니다. 페이지를 새로고침 후 다시 시도해주세요.',
-      },
-      { status: 401 },
-    )
+    return apiError('AUTH_PI_REQUIRED_REFRESH', 401)
   }
 
   // 6자리 코드 생성 — 충돌 시 최대 3회 재시도
@@ -106,10 +99,7 @@ export async function POST(request: NextRequest) {
     })
     if (!error) break
     if (attempt === 2) {
-      return NextResponse.json(
-        { error: '코드 생성 실패. 다시 시도해주세요.' },
-        { status: 500 },
-      )
+      return apiError('AUTH_LINK_CODE_GEN_FAILED', 500)
     }
   }
 

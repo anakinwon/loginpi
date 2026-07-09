@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { withGuard } from '@/lib/api-guard'
+import { apiError } from '@/lib/api-errors'
 
 // 커뮤니티 신고 접수 — 로그인 사용자. 게시물/댓글/상점/사용자/채팅 신고.
 const TARGETS = ['POST', 'COMMENT', 'SHOP', 'USER', 'CHAT']
@@ -18,14 +19,14 @@ const REASONS = [
 async function handlePOST(req: NextRequest) {
   const user = await getSessionUser()
   if (!user) {
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+    return apiError('AUTH_REQUIRED', 401)
   }
 
   let body: unknown
   try {
     body = await req.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
   const { target_tp, target_id, reason_cd, reason_txt } = body as {
     target_tp?: string
@@ -35,16 +36,10 @@ async function handlePOST(req: NextRequest) {
   }
 
   if (!target_tp || !TARGETS.includes(target_tp) || !target_id) {
-    return NextResponse.json(
-      { error: '신고 대상이 올바르지 않습니다' },
-      { status: 400 },
-    )
+    return apiError('REPORT_TARGET_INVALID', 400)
   }
   if (!reason_cd || !REASONS.includes(reason_cd)) {
-    return NextResponse.json(
-      { error: '신고 사유를 선택해 주세요' },
-      { status: 400 },
-    )
+    return apiError('REPORT_REASON_REQUIRED', 400)
   }
 
   const db = getSupabaseAdmin()
@@ -73,7 +68,7 @@ async function handlePOST(req: NextRequest) {
     modr_id: user.id,
   })
   if (error) {
-    return NextResponse.json({ error: '신고 접수 실패' }, { status: 500 })
+    return apiError('REPORT_SUBMIT_FAILED', 500)
   }
   return NextResponse.json({ ok: true })
 }

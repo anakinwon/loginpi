@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getEventRanking } from '@/lib/event'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { apiError } from '@/lib/api-errors'
 
 // GET /api/event/ranking?limit=100&q=검색어
 // missions(M1~M10) + reward_st_cd는 getEventRanking에서 함께 반환 — 중복 쿼리 없음
@@ -42,6 +43,6 @@ export async function GET(request: NextRequest) {
     )
   } catch (err) {
     console.error('[event/ranking] 조회 실패:', err)
-    return NextResponse.json({ error: '랭킹 조회 실패' }, { status: 500 })
+    return apiError('EVENT_RANKING_QUERY_FAILED', 500)
   }
 }

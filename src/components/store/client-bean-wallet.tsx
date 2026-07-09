@@ -7,6 +7,10 @@ import { piFetch } from '@/lib/pi-fetch'
 import { Button } from '@/components/ui/button'
 import { BeanIcon } from '@/components/ui/bean-icon'
 import { CHARGE_PRESETS, BEAN_PER_PI, type BeanTxn } from '@/lib/bean-shared'
+import {
+  useApiErrorMessage,
+  type ApiErrorPayload,
+} from '@/hooks/use-api-error'
 
 interface WalletData {
   balance: number
@@ -43,6 +47,7 @@ const TXN_STYLE: Record<string, { color: string }> = {
 
 export function ClientBeanWallet({ serverAuthed }: { serverAuthed: boolean }) {
   const t = useTranslations('bean')
+  const apiErrMsg = useApiErrorMessage()
   const [wallet, setWallet] = useState<WalletData | null>(null)
   const [authed, setAuthed] = useState(serverAuthed)
   const [loading, setLoading] = useState(true)
@@ -81,8 +86,8 @@ export function ClientBeanWallet({ serverAuthed }: { serverAuthed: boolean }) {
         body: JSON.stringify({ bean_amt: beanAmt }),
       })
       if (!res.ok) {
-        const d = (await res.json()) as { error?: string }
-        throw new Error(d.error ?? t('chargeFail'))
+        const d = (await res.json()) as ApiErrorPayload
+        throw new Error(apiErrMsg(d, t('chargeFail')))
       }
       const prep = (await res.json()) as {
         amount: number
