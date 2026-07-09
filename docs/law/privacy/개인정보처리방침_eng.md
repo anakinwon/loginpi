@@ -5,7 +5,7 @@
 **Planned Effective Date**: 2026-07-15 (notified at least 7 days in advance per Article 11)  
 **Revised**: 2026-07-08 · **Originally Created**: 2026-06-12  
 
-> **Key v1.1 Revisions**: ① New Telegram third-party disclosure and international transfer provisions ② Explicit Google (Gemini) translation entrustment ③ New collection items: KakaoTalk ID (event prizes) and Telegram linking information ④ Pi official account authentication (Pi Sign-In) path added
+> **Key v1.1 Revisions**: ① New Telegram third-party disclosure and international transfer provisions ② Explicit Google (Gemini) translation entrustment ③ New collection items: KakaoTalk ID (event prizes) and Telegram linking information ④ Pi official account authentication (Pi Sign-In) path added ⑤ Additional profile information (real name, phone number, address, etc. — all optional) specified with items, purposes, and optionality
 
 ---
 
@@ -98,6 +98,17 @@ Members experiencing issues with personal information can immediately contact th
 | Item | Scope | Purpose of Collection | Legal Basis | Retention Period |
 |---|---|---|---|---|
 | Telegram chat ID | Chat identifier automatically confirmed when the Member links the notification bot | Identifying recipients of order/chat notifications | Separate consent expressed through the act of bot linking | Deleted immediately upon unlinking |
+
+#### 3-9. Additional Profile Information (Optional, entered directly by the Member) *(New in v1.1)*
+
+All items below are **optional** fields entered directly by the Member on the My Page screen; service use is not restricted if they are left blank. Members may modify or delete them at any time on My Page. (The profile display name is required but is automatically set from the Pi username, so no separate collection occurs.)
+
+| Item | Scope | Purpose of Collection | Legal Basis | Retention Period |
+|---|---|---|---|---|
+| Real name | Entered directly by the Member | Supplementary profile display (optional input) | Consent to Terms of Service | Until membership withdrawal or deletion by the Member |
+| Phone number | Entered directly by the Member | Contact method when a buyer does not pick up goods in an O2O transaction | Consent to Terms of Service | Until membership withdrawal or deletion by the Member |
+| Address / detailed address | Entered directly by the Member | Preparation for future delivery in O2O services | Consent to Terms of Service | Until membership withdrawal or deletion by the Member |
+| Nickname / self-introduction | Entered directly by the Member | Profile display, community introduction | Consent to Terms of Service | Until membership withdrawal or deletion by the Member |
 
 ---
 
