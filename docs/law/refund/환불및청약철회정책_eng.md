@@ -1,8 +1,8 @@
 # Refund and Withdrawal Policy
 # 返金・申込撤回ポリシー
 
-**Version**: v1.1 (Revision Draft — effective upon completion of notification procedure)  
-**Planned Effective Date**: Notice date + 7 days (Article 19)  
+**Version**: v1.1 (Notice posted — v1.0 remains in effect until the effective date)  
+**Effective Date**: 2026-07-16 (service notice posted 2026-07-09 — satisfies the 7-day advance notice under Article 19)  
 **Revised**: 2026-07-09 · **Originally Effective**: 2026-06-12  
 
 > **Key v1.1 Revisions**: ① New Bean point (rechargeable in-app points) refund provisions (Article 16-2) ② Automatic A2U refund for direct Pi payments specified (Article 16-3) ③ Marketplace cancellation fees specified (Article 18) ④ Corrections of clerical errors (return shipping currency unit, etc.)
