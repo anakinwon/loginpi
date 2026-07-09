@@ -2,13 +2,14 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { viewerScopedCacheHeaders } from '@/lib/cache-headers'
+import { apiError } from '@/lib/api-errors'
 
 // GET /api/admin/users?page=1&limit=30
 export async function GET(request: NextRequest) {
   const requester = await getSessionUser()
   const admin = isAdmin(requester)
   if (!admin) {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+    return apiError('FORBIDDEN', 403)
   }
 
   // 페이지네이션: page(1 기반), limit(기본 30, 최대 100)
@@ -32,10 +33,7 @@ export async function GET(request: NextRequest) {
     .range(from, from + limit - 1)
 
   if (error) {
-    return NextResponse.json(
-      { error: '사용자 목록 조회 실패' },
-      { status: 500 },
-    )
+    return apiError('ADM_USER_LIST_FAILED', 500)
   }
 
   const totalPages = Math.ceil((count ?? 0) / limit)

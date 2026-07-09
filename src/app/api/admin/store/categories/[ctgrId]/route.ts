@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { updateCategory, softDeleteCategory } from '@/lib/mps-ctgr'
+import { apiError } from '@/lib/api-errors'
 
 // PATCH /api/admin/store/categories/[ctgrId] — 카테고리 수정
 export async function PATCH(
@@ -9,7 +10,7 @@ export async function PATCH(
 ) {
   const requester = await getSessionUser()
   if (!isAdmin(requester)) {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+    return apiError('FORBIDDEN', 403)
   }
 
   const { ctgrId } = await params
@@ -28,14 +29,11 @@ export async function PATCH(
       body,
     )
     if (!category) {
-      return NextResponse.json(
-        { error: '카테고리를 찾을 수 없습니다' },
-        { status: 404 },
-      )
+      return apiError('ADM_CTGR_NOT_FOUND', 404)
     }
     return NextResponse.json({ category })
   } catch {
-    return NextResponse.json({ error: '수정 실패' }, { status: 500 })
+    return apiError('UPDATE_FAILED', 500)
   }
 }
 
@@ -46,7 +44,7 @@ export async function DELETE(
 ) {
   const requester = await getSessionUser()
   if (!isAdmin(requester)) {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+    return apiError('FORBIDDEN', 403)
   }
 
   const { ctgrId } = await params
@@ -55,18 +53,12 @@ export async function DELETE(
     const result = await softDeleteCategory(ctgrId, requester?.id ?? 'ADMIN')
     if (!result.ok) {
       if (result.reason === 'HAS_CHILDREN') {
-        return NextResponse.json(
-          { error: '하위 카테고리가 있어 삭제할 수 없습니다' },
-          { status: 409 },
-        )
+        return apiError('ADM_CTGR_HAS_CHILDREN', 409)
       }
-      return NextResponse.json(
-        { error: '카테고리를 찾을 수 없습니다' },
-        { status: 404 },
-      )
+      return apiError('ADM_CTGR_NOT_FOUND', 404)
     }
     return NextResponse.json({ success: true })
   } catch {
-    return NextResponse.json({ error: '삭제 실패' }, { status: 500 })
+    return apiError('DELETE_FAILED', 500)
   }
 }

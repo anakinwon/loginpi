@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { sanitizeError } from '@/lib/sanitize-error'
+import { apiError } from '@/lib/api-errors'
 
 // 요금제 모드(Bean ↔ Pi) 전환 — MASTER 전용. PRD_24 §6·§10.
 //   GET: 현재 활성 모드 + 전환 이력
@@ -13,11 +14,7 @@ async function requireMaster() {
 
 export async function GET() {
   const user = await requireMaster()
-  if (!user)
-    return NextResponse.json(
-      { error: '권한이 없습니다(MASTER 전용)' },
-      { status: 403 },
-    )
+  if (!user) return apiError('ADM_MASTER_ONLY', 403)
 
   const db = getSupabaseAdmin()
   const { data: mode } = await db.rpc('fn_get_active_fee_mode')
@@ -34,17 +31,13 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   const user = await requireMaster()
-  if (!user)
-    return NextResponse.json(
-      { error: '권한이 없습니다(MASTER 전용)' },
-      { status: 403 },
-    )
+  if (!user) return apiError('ADM_MASTER_ONLY', 403)
 
   let body: { action?: string; new_mode?: string; reason?: string }
   try {
     body = await req.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
 
   const db = getSupabaseAdmin()
@@ -73,10 +66,7 @@ export async function POST(req: NextRequest) {
 
   // 전환 — new_mode로
   if (body.new_mode !== 'BEAN' && body.new_mode !== 'PI')
-    return NextResponse.json(
-      { error: "new_mode는 'BEAN' 또는 'PI'" },
-      { status: 400 },
-    )
+    return apiError('ADM_FEE_MODE_INVALID', 400)
 
   const { data, error } = await db.rpc('fn_switch_fee_mode', {
     p_new_mode: body.new_mode,

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { apiError } from '@/lib/api-errors'
 
 // MASTER 전용: 승인(approve) / 반려(reject)
 export async function PATCH(
@@ -9,10 +10,7 @@ export async function PATCH(
 ) {
   const requester = await getSessionUser()
   if (requester?.role !== 'MASTER') {
-    return NextResponse.json(
-      { error: 'MASTER 권한이 필요합니다' },
-      { status: 403 },
-    )
+    return apiError('ADM_MASTER_REQUIRED', 403)
   }
 
   const { apvId } = await params
@@ -22,16 +20,10 @@ export async function PATCH(
   }
 
   if (!['approve', 'reject'].includes(body.action)) {
-    return NextResponse.json(
-      { error: 'action은 approve 또는 reject여야 합니다' },
-      { status: 400 },
-    )
+    return apiError('ADM_STD_APV_ACTION_INVALID', 400)
   }
   if (body.action === 'reject' && !body.reject_reason?.trim()) {
-    return NextResponse.json(
-      { error: '반려 사유를 입력해 주세요' },
-      { status: 400 },
-    )
+    return apiError('ADM_STD_APV_REJECT_REASON_REQUIRED', 400)
   }
 
   const db = getSupabaseAdmin()
@@ -43,16 +35,9 @@ export async function PATCH(
     .eq('apv_id', apvId)
     .single()
 
-  if (fetchErr || !apv)
-    return NextResponse.json(
-      { error: '요청을 찾을 수 없습니다' },
-      { status: 404 },
-    )
+  if (fetchErr || !apv) return apiError('ADM_STD_APV_NOT_FOUND', 404)
   if (apv.apv_status !== 'PENDING') {
-    return NextResponse.json(
-      { error: '이미 처리된 요청입니다' },
-      { status: 409 },
-    )
+    return apiError('ADM_STD_APV_ALREADY_PROCESSED', 409)
   }
 
   const newStatus = body.action === 'approve' ? 'APPROVED' : 'REJECTED'
@@ -72,8 +57,7 @@ export async function PATCH(
     })
     .eq('apv_id', apvId)
 
-  if (updErr)
-    return NextResponse.json({ error: '상태 업데이트 실패' }, { status: 500 })
+  if (updErr) return apiError('ADM_STD_APV_UPDATE_FAILED', 500)
 
   // 대상 엔터티의 apv_status 동기화 (std_dic, std_dom, std_term)
   if (apv.entity_id) {

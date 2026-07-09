@@ -5,6 +5,7 @@ import { grantBeanReward } from '@/lib/event'
 import { recordPendingEvtPiReward } from '@/lib/pi-reward'
 import { getActiveFeeMode, beanToPi } from '@/lib/fee-resolver'
 import { sanitizeError } from '@/lib/sanitize-error'
+import { apiError } from '@/lib/api-errors'
 
 // 오픈베타#1 보상 금액 (Bean) — subtitle '선착순 100명 5,000 Bean Token'과 일치
 const EVENT_REWARD_BEAN = 5000
@@ -21,11 +22,7 @@ const EVENT_REWARD_BEAN = 5000
 // 이미 지급(PAID)된 사용자는 RPC가 'ALREADY'로 차단 → 미지급자만 5,000 Bean 지급.
 export async function POST(req: Request) {
   const user = await getSessionUser()
-  if (!isAdmin(user))
-    return NextResponse.json(
-      { error: '관리자 권한이 필요합니다' },
-      { status: 403 },
-    )
+  if (!isAdmin(user)) return apiError('ADM_ADMIN_REQUIRED', 403)
 
   let body: { event_id?: string } = {}
   try {
@@ -48,16 +45,8 @@ export async function POST(req: Request) {
     reward_pi_yn: string
     reward_pi_amt: number | null
   } | null
-  if (!evt)
-    return NextResponse.json(
-      { error: '이벤트를 찾을 수 없습니다' },
-      { status: 404 },
-    )
-  if (evt.reward_pi_yn !== 'Y')
-    return NextResponse.json(
-      { error: '이 이벤트는 보상이 비활성 상태입니다' },
-      { status: 400 },
-    )
+  if (!evt) return apiError('ADM_EVT_NOT_FOUND', 404)
+  if (evt.reward_pi_yn !== 'Y') return apiError('ADM_EVT_REWARD_INACTIVE', 400)
 
   const required = evt.reward_mission_count_no ?? 10
 

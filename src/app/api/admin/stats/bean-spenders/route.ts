@@ -3,6 +3,7 @@ import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { maskDisplayName } from '@/lib/display-mask'
 import { viewerScopedCacheHeaders } from '@/lib/cache-headers'
+import { apiError } from '@/lib/api-errors'
 
 // Bean 기간별 상위 지출자 — 홈 대시보드 'Top-3 지출자'(Pi→Bean 전환) 데이터.
 // 매출 통계와 동일 정책: 게스트 포함 공개(집계만)·개인 식별 정보는 관리자에게만(비관리자 마스킹).
@@ -37,10 +38,7 @@ export async function GET(req: NextRequest) {
 
   if (error) {
     console.error('[Bean 지출자] 집계 실패:', error.message)
-    return NextResponse.json(
-      { error: 'Bean 지출자 집계 실패' },
-      { status: 500 },
-    )
+    return apiError('ADM_BEAN_SPENDERS_FAILED', 500)
   }
 
   const spenders = ((data as BeanSpenderRow[] | null) ?? []).map((row) => ({

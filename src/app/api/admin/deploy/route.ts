@@ -5,6 +5,7 @@ import {
   triggerStagingDeploy,
   promoteToProduction,
 } from '@/lib/ops-deploy'
+import { apiError } from '@/lib/api-errors'
 
 // 배포 컨트롤 — MASTER 전용(운영 승격은 핵심가치 직결, ADMIN보다 상위 권한 요구).
 async function requireMaster() {
@@ -15,25 +16,19 @@ async function requireMaster() {
 
 export async function GET() {
   if (!(await requireMaster()))
-    return NextResponse.json(
-      { error: '권한이 없습니다(MASTER 전용)' },
-      { status: 403 },
-    )
+    return apiError('ADM_MASTER_ONLY', 403)
   return NextResponse.json(await getDeployOverview())
 }
 
 export async function POST(req: NextRequest) {
   if (!(await requireMaster()))
-    return NextResponse.json(
-      { error: '권한이 없습니다(MASTER 전용)' },
-      { status: 403 },
-    )
+    return apiError('ADM_MASTER_ONLY', 403)
 
   let body: { target?: string }
   try {
     body = await req.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
 
   if (body.target === 'staging') {
@@ -44,8 +39,5 @@ export async function POST(req: NextRequest) {
     const r = await promoteToProduction()
     return NextResponse.json(r, { status: r.ok ? 200 : 400 })
   }
-  return NextResponse.json(
-    { error: "target은 'staging' 또는 'production'" },
-    { status: 400 },
-  )
+  return apiError('ADM_DEPLOY_TARGET_INVALID', 400)
 }

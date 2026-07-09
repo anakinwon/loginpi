@@ -3,6 +3,7 @@ import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getActiveFeeMode, beanToPi } from '@/lib/fee-resolver'
 import { payCampaignPiReward } from '@/lib/campaign-pi-reward'
+import { apiError } from '@/lib/api-errors'
 
 // campaign_cd 형식: 대문자/숫자/언더스코어 (예: SHOP_ONBOARD, EVENT_M1)
 const CD_RE = /^[A-Z][A-Z0-9_]{1,31}$/
@@ -28,8 +29,7 @@ type CampaignRow = {
 // GET /api/admin/campaign?campaign_cd=X → 해당 캠페인 PENDING 신청 목록 + 현황
 export async function GET(req: NextRequest) {
   const user = await getSessionUser()
-  if (!isAdmin(user))
-    return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+  if (!isAdmin(user)) return apiError('FORBIDDEN', 401)
 
   const db = getSupabaseAdmin()
   const campaignCd = req.nextUrl.searchParams.get('campaign_cd')
@@ -185,8 +185,7 @@ export async function GET(req: NextRequest) {
 //   { action: 'update', campaign_cd, patch: {...} }         — 보상·한도·활성 수정
 export async function POST(req: NextRequest) {
   const user = await getSessionUser()
-  if (!isAdmin(user))
-    return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+  if (!isAdmin(user)) return apiError('FORBIDDEN', 401)
 
   const body = (await req.json().catch(() => ({}))) as Record<string, unknown>
   const action = body.action as string | undefined
@@ -197,11 +196,7 @@ export async function POST(req: NextRequest) {
     const usrId = body.usr_id as string | undefined
     const campaignCd =
       (body.campaign_cd as string | undefined) ?? 'SHOP_ONBOARD'
-    if (!usrId)
-      return NextResponse.json(
-        { error: 'usr_id가 필요합니다' },
-        { status: 400 },
-      )
+    if (!usrId) return apiError('ADM_CAMP_USR_ID_REQUIRED', 400)
 
     // 승인은 요금모드 전달 (PRD_24 §0) — PI모드면 RPC가 Bean 지급 생략·승인 전이만
     const mode = action === 'approve' ? await getActiveFeeMode() : null
@@ -217,7 +212,7 @@ export async function POST(req: NextRequest) {
     })
     if (error) {
       console.error(`[admin/campaign] ${action} 실패:`, error.message)
-      return NextResponse.json({ error: '처리 실패' }, { status: 500 })
+      return apiError('ADM_PROCESS_FAILED', 500)
     }
 
     // PI모드 승인 = 관리자 게이트 통과 → 실 Pi A2U 송금(비블로킹, 멱등 로그).
@@ -238,28 +233,12 @@ export async function POST(req: NextRequest) {
     const rewardBean = Math.floor(Number(c.reward_bean))
     const maxCnt = Math.floor(Number(c.max_grant_cnt))
 
-    if (!CD_RE.test(cd))
-      return NextResponse.json(
-        {
-          error: '캠페인 코드는 대문자/숫자/_ 2~32자여야 합니다 (예: EVENT_M1)',
-        },
-        { status: 400 },
-      )
-    if (!nm)
-      return NextResponse.json(
-        { error: '캠페인 이름은 필수입니다' },
-        { status: 400 },
-      )
+    if (!CD_RE.test(cd)) return apiError('ADM_CAMP_CD_FORMAT', 400)
+    if (!nm) return apiError('ADM_CAMP_NAME_REQUIRED', 400)
     if (!Number.isInteger(rewardBean) || rewardBean <= 0)
-      return NextResponse.json(
-        { error: '건당 보상(reward_bean)은 1 이상 정수여야 합니다' },
-        { status: 400 },
-      )
+      return apiError('ADM_CAMP_REWARD_BEAN_POSITIVE', 400)
     if (!Number.isInteger(maxCnt) || maxCnt <= 0)
-      return NextResponse.json(
-        { error: '선착순 한도(max_grant_cnt)는 1 이상 정수여야 합니다' },
-        { status: 400 },
-      )
+      return apiError('ADM_CAMP_MAX_CNT_POSITIVE', 400)
 
     // 중복 코드 차단 (논리삭제 행 포함 — PK 충돌 방지)
     const { data: dup } = await db
@@ -267,11 +246,7 @@ export async function POST(req: NextRequest) {
       .select('campaign_cd')
       .eq('campaign_cd', cd)
       .maybeSingle()
-    if (dup)
-      return NextResponse.json(
-        { error: `이미 존재하는 캠페인 코드입니다: ${cd}` },
-        { status: 409 },
-      )
+    if (dup) return apiError('ADM_CAMP_CD_DUP', 409, { cd })
 
     const yn = (v: unknown) => (v === true || v === 'Y' ? 'Y' : 'N')
     const { error } = await db.from('bean_campaign').insert({
@@ -293,7 +268,7 @@ export async function POST(req: NextRequest) {
     })
     if (error) {
       console.error('[admin/campaign] create 실패:', error.message)
-      return NextResponse.json({ error: '캠페인 생성 실패' }, { status: 500 })
+      return apiError('ADM_CAMP_CREATE_FAILED', 500)
     }
     return NextResponse.json({ status: 'CREATED', campaign_cd: cd })
   }
@@ -302,11 +277,7 @@ export async function POST(req: NextRequest) {
   if (action === 'update') {
     const cd = String(body.campaign_cd ?? '').trim()
     const patch = (body.patch ?? {}) as Record<string, unknown>
-    if (!cd)
-      return NextResponse.json(
-        { error: 'campaign_cd가 필요합니다' },
-        { status: 400 },
-      )
+    if (!cd) return apiError('ADM_CAMP_CD_REQUIRED', 400)
 
     const upd: Record<string, unknown> = {
       modr_id: user!.id,
@@ -318,19 +289,13 @@ export async function POST(req: NextRequest) {
     if (patch.reward_bean !== undefined) {
       const v = Math.floor(Number(patch.reward_bean))
       if (!Number.isInteger(v) || v <= 0)
-        return NextResponse.json(
-          { error: 'reward_bean은 1 이상 정수여야 합니다' },
-          { status: 400 },
-        )
+        return apiError('ADM_CAMP_REWARD_BEAN_MIN', 400)
       upd.reward_bean = v
     }
     if (patch.max_grant_cnt !== undefined) {
       const v = Math.floor(Number(patch.max_grant_cnt))
       if (!Number.isInteger(v) || v <= 0)
-        return NextResponse.json(
-          { error: 'max_grant_cnt는 1 이상 정수여야 합니다' },
-          { status: 400 },
-        )
+        return apiError('ADM_CAMP_MAX_CNT_MIN', 400)
       upd.max_grant_cnt = v
     }
     if (patch.campaign_nm !== undefined) {
@@ -345,13 +310,10 @@ export async function POST(req: NextRequest) {
       .eq('del_yn', 'N')
     if (error) {
       console.error('[admin/campaign] update 실패:', error.message)
-      return NextResponse.json({ error: '캠페인 수정 실패' }, { status: 500 })
+      return apiError('ADM_CAMP_UPDATE_FAILED', 500)
     }
     return NextResponse.json({ status: 'UPDATED', campaign_cd: cd })
   }
 
-  return NextResponse.json(
-    { error: 'action은 approve|reject|create|update 중 하나여야 합니다' },
-    { status: 400 },
-  )
+  return apiError('ADM_CAMP_ACTION_INVALID', 400)
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { sanitizeError } from '@/lib/sanitize-error'
+import { apiError } from '@/lib/api-errors'
 
 // 오픈기념행사 무료요금 정책 관리 (OneKey 토글) — PRD_26 요금전문 매니저 마스터 전용.
 //   GET: 현재 프로모션 상태 + 최근 변경 이력
@@ -14,11 +15,7 @@ async function requireMaster() {
 
 export async function GET() {
   const user = await requireMaster()
-  if (!user)
-    return NextResponse.json(
-      { error: '권한이 없습니다(MASTER 전용)' },
-      { status: 403 },
-    )
+  if (!user) return apiError('ADM_MASTER_ONLY', 403)
 
   const db = getSupabaseAdmin()
 
@@ -46,11 +43,7 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   const user = await requireMaster()
-  if (!user)
-    return NextResponse.json(
-      { error: '권한이 없습니다(MASTER 전용)' },
-      { status: 403 },
-    )
+  if (!user) return apiError('ADM_MASTER_ONLY', 403)
 
   let body: {
     action?: string
@@ -61,7 +54,7 @@ export async function POST(req: NextRequest) {
   try {
     body = await req.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
 
   const db = getSupabaseAdmin()
@@ -137,10 +130,7 @@ export async function POST(req: NextRequest) {
   // 시간 설정 (프로모 ON 상태에서 시작/종료 시각 변경)
   if (body.action === 'set-times') {
     if (!body.start_dtm && !body.end_dtm) {
-      return NextResponse.json(
-        { error: 'start_dtm 또는 end_dtm 중 최소 하나 필요' },
-        { status: 400 },
-      )
+      return apiError('ADM_PROMO_TIMES_REQUIRED', 400)
     }
 
     const startDtm = body.start_dtm
@@ -190,10 +180,5 @@ export async function POST(req: NextRequest) {
     })
   }
 
-  return NextResponse.json(
-    {
-      error: "action은 'activate', 'deactivate', 'set-times' 중 하나",
-    },
-    { status: 400 },
-  )
+  return apiError('ADM_PROMO_ACTION_INVALID', 400)
 }

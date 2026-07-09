@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { apiError } from '@/lib/api-errors'
 
 export async function PATCH(
   req: NextRequest,
@@ -8,7 +9,7 @@ export async function PATCH(
 ) {
   const requester = await getSessionUser()
   if (!isAdmin(requester)) {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+    return apiError('FORBIDDEN', 403)
   }
 
   const { id } = await params
@@ -43,7 +44,7 @@ export async function PATCH(
     .select()
     .single()
 
-  if (error) return NextResponse.json({ error: '수정 실패' }, { status: 500 })
+  if (error) return apiError('UPDATE_FAILED', 500)
 
   return NextResponse.json({ domain: data })
 }
@@ -54,7 +55,7 @@ export async function DELETE(
 ) {
   const requester = await getSessionUser()
   if (!isAdmin(requester)) {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+    return apiError('FORBIDDEN', 403)
   }
 
   const { id } = await params
@@ -68,7 +69,7 @@ export async function DELETE(
     })
     .eq('dom_id', id)
 
-  if (error) return NextResponse.json({ error: '삭제 실패' }, { status: 500 })
+  if (error) return apiError('DELETE_FAILED', 500)
 
   return NextResponse.json({ success: true })
 }

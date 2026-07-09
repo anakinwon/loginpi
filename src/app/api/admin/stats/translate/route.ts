@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { apiError } from '@/lib/api-errors'
 
 // GET /api/admin/stats/translate?period=7|30|90|365 — PyTranslate™ 번역 통계 (TASK-098)
 // fn_translate_stats RPC: 일별 번역 건수·캐시 히트·문자수 + 모델별 분포 + 👍/👎 피드백 합계
@@ -32,7 +33,7 @@ interface TranslateStatsRpc {
 export async function GET(req: NextRequest) {
   const user = await getSessionUser()
   if (!isAdmin(user)) {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 401 })
+    return apiError('FORBIDDEN', 401)
   }
 
   const { searchParams } = new URL(req.url)
@@ -48,7 +49,7 @@ export async function GET(req: NextRequest) {
     p_to: toDt,
   })
   if (error) {
-    return NextResponse.json({ error: '통계 조회 실패' }, { status: 500 })
+    return apiError('ADM_TRANSLATE_STATS_FAILED', 500)
   }
 
   const stats = (data ?? {

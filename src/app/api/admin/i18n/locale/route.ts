@@ -6,6 +6,7 @@ import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { LOCALE_CURRENCY } from '@/lib/locale-currency'
 import { LOCALE_COUNTRY } from '@/lib/locale-country'
 import { sanitizeError } from '@/lib/sanitize-error'
+import { apiError } from '@/lib/api-errors'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -62,7 +63,7 @@ async function addLocaleToRouting(locale_cd: string): Promise<boolean> {
 export async function PATCH(req: NextRequest) {
   const user = await getSessionUser()
   if (!isAdmin(user)) {
-    return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+    return apiError('AUTH_REQUIRED', 401)
   }
 
   const body = (await req.json()) as {
@@ -74,15 +75,12 @@ export async function PATCH(req: NextRequest) {
   const { locale_cd, is_active, locale_nm, country_cd } = body
 
   if (!locale_cd) {
-    return NextResponse.json({ error: 'locale_cd required' }, { status: 400 })
+    return apiError('ADM_I18N_LOCALE_CD_REQUIRED', 400)
   }
 
   // 기본 언어(ko) 비활성화 방지
   if (locale_cd === 'ko' && is_active === 'N') {
-    return NextResponse.json(
-      { error: '기본 언어(ko)는 비활성화할 수 없습니다' },
-      { status: 400 },
-    )
+    return apiError('ADM_I18N_KO_DISABLE_FORBIDDEN', 400)
   }
 
   // 새 locale 활성화: sort_ord = 현재 최대값 + 1

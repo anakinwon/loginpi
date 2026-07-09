@@ -3,6 +3,7 @@ import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { viewerScopedCacheHeaders } from '@/lib/cache-headers'
 import { type TxnDivCd, pymntTypeToDiv, mpsTxnToDiv } from '@/lib/txn-div'
+import { apiError } from '@/lib/api-errors'
 
 // 결제 내역 = pi_pymnt(U2A 결제) + mps_txn_hist(취소·환불·수수료·정산) 통합.
 // 각 거래에 거래구분코드(txn_div_cd)를 부여해 단일 목록으로 반환한다.
@@ -48,7 +49,7 @@ export async function GET(req: NextRequest) {
   const requester = await getSessionUser()
   const admin = isAdmin(requester)
   if (!admin) {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+    return apiError('FORBIDDEN', 403)
   }
 
   const db = getSupabaseAdmin()
@@ -95,7 +96,7 @@ export async function GET(req: NextRequest) {
   const [pymntRes, mpsRes] = await Promise.all([pymntQuery, mpsQuery])
 
   if (pymntRes.error) {
-    return NextResponse.json({ error: '결제 내역 조회 실패' }, { status: 500 })
+    return apiError('ADM_PAYMENTS_LIST_FAILED', 500)
   }
 
   // pi_pymnt → 통합 행

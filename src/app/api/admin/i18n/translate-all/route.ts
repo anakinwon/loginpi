@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse, after } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { routing } from '@/i18n/routing'
+import { apiError } from '@/lib/api-errors'
 
 const ALLOWED = new Set<string>(routing.locales)
 
@@ -15,7 +16,7 @@ const ALLOWED = new Set<string>(routing.locales)
 export async function POST(req: NextRequest) {
   const user = await getSessionUser()
   if (!isAdmin(user)) {
-    return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+    return apiError('AUTH_REQUIRED', 401)
   }
 
   const { locales } = (await req.json().catch(() => ({}))) as {
@@ -30,13 +31,7 @@ export async function POST(req: NextRequest) {
 
   const secret = process.env.CRON_SECRET
   if (!secret) {
-    return NextResponse.json(
-      {
-        error:
-          'CRON_SECRET이 설정되지 않아 백그라운드 작업을 시작할 수 없습니다',
-      },
-      { status: 500 },
-    )
+    return apiError('ADM_I18N_CRON_SECRET_MISSING', 500)
   }
 
   const base = req.nextUrl.origin

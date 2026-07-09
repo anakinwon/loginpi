@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { sanitizeError } from '@/lib/sanitize-error'
+import { apiError } from '@/lib/api-errors'
 
 // 정렬 지표 화이트리스트 — RPC p_metric과 일치
 const METRICS = [
@@ -31,7 +32,7 @@ interface TopUserRow {
 export async function GET(req: NextRequest) {
   const user = await getSessionUser()
   if (!isAdmin(user)) {
-    return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+    return apiError('FORBIDDEN', 401)
   }
 
   const { searchParams } = req.nextUrl

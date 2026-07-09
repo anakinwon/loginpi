@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { apiError } from '@/lib/api-errors'
 
 // 어드민 스티커 관리 — 팩 목록(+스티커 수·보유자 수) 및 팩 생성
 
 export async function GET() {
   const requester = await getSessionUser()
   if (!isAdmin(requester)) {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+    return apiError('FORBIDDEN', 403)
   }
 
   const db = getSupabaseAdmin()
@@ -38,10 +39,7 @@ export async function GET() {
   ])
 
   if (error) {
-    return NextResponse.json(
-      { error: '스티커팩 목록 조회 실패' },
-      { status: 500 },
-    )
+    return apiError('ADM_STKR_PACK_LIST_FAILED', 500)
   }
 
   // 팩별 스티커 수·보유자 수 집계 (N+1 대신 IN 일괄 조회 후 Map 매핑)
@@ -64,14 +62,14 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const requester = await getSessionUser()
   if (!isAdmin(requester)) {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+    return apiError('FORBIDDEN', 403)
   }
 
   let body: unknown
   try {
     body = await req.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
 
   const { pack_nm, pack_desc, theme_cd, price_bean, is_dflt_yn } = body as {
@@ -84,17 +82,11 @@ export async function POST(req: NextRequest) {
 
   const name = pack_nm?.trim()
   if (!name || name.length > 100) {
-    return NextResponse.json(
-      { error: '팩 이름을 입력해주세요 (100자 이내)' },
-      { status: 400 },
-    )
+    return apiError('ADM_STKR_PACK_NAME_REQUIRED', 400)
   }
   const price = Number(price_bean ?? 0)
   if (!Number.isInteger(price) || price < 0 || price > 100000) {
-    return NextResponse.json(
-      { error: '가격은 0~100000 Bean 정수여야 합니다' },
-      { status: 400 },
-    )
+    return apiError('ADM_STKR_PRICE_RANGE', 400)
   }
 
   const db = getSupabaseAdmin()
@@ -107,11 +99,7 @@ export async function POST(req: NextRequest) {
       .eq('theme_cd', theme_cd)
       .eq('del_yn', 'N')
       .maybeSingle()
-    if (!theme)
-      return NextResponse.json(
-        { error: '존재하지 않는 테마입니다' },
-        { status: 400 },
-      )
+    if (!theme) return apiError('ADM_STKR_THEME_NOT_FOUND', 400)
   }
 
   const { data: pack, error } = await db
@@ -129,7 +117,7 @@ export async function POST(req: NextRequest) {
     .single()
 
   if (error || !pack) {
-    return NextResponse.json({ error: '팩 생성 실패' }, { status: 500 })
+    return apiError('ADM_STKR_PACK_CREATE_FAILED', 500)
   }
 
   // 기본팩 지정 시 테마 기본 스티커팩 매핑 등록

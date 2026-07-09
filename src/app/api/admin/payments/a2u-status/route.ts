@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { isA2UEnabled } from '@/lib/pi-a2u'
 import { publicKeyFromSeed } from '@/lib/stellar-strkey'
+import { apiError } from '@/lib/api-errors'
 
 // GET /api/admin/payments/a2u-status — A2U 진단 (관리자)
 // 운영 env의 PI_WALLET_PRIVATE_SEED가 실제로 어떤 앱 지갑(공개키)을 도출하는지 +
@@ -17,8 +18,7 @@ interface HorizonAccount {
 
 export async function GET() {
   const admin = await getSessionUser()
-  if (!isAdmin(admin))
-    return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+  if (!isAdmin(admin)) return apiError('FORBIDDEN', 401)
 
   const apiKeySet = !!process.env.PI_API_KEY
   const seed = process.env.PI_WALLET_PRIVATE_SEED

@@ -3,11 +3,12 @@ import { revalidateTag } from 'next/cache'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { sanitizeError } from '@/lib/sanitize-error'
+import { apiError } from '@/lib/api-errors'
 
 export async function GET(req: NextRequest) {
   const user = await getSessionUser()
   if (!isAdmin(user)) {
-    return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+    return apiError('FORBIDDEN', 401)
   }
 
   const { searchParams } = req.nextUrl
@@ -49,7 +50,7 @@ export async function GET(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   const user = await getSessionUser()
   if (!isAdmin(user)) {
-    return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+    return apiError('FORBIDDEN', 401)
   }
 
   const body = (await req.json()) as {
@@ -59,7 +60,7 @@ export async function PATCH(req: NextRequest) {
   }
 
   if (!body.fee_plan_id) {
-    return NextResponse.json({ error: 'fee_plan_id 필수' }, { status: 400 })
+    return apiError('ADM_FEE_PLAN_ID_REQUIRED', 400)
   }
 
   const updates: Record<string, unknown> = {
@@ -69,23 +70,20 @@ export async function PATCH(req: NextRequest) {
 
   if (body.use_yn !== undefined) {
     if (body.use_yn !== 'Y' && body.use_yn !== 'N') {
-      return NextResponse.json({ error: 'use_yn은 Y 또는 N' }, { status: 400 })
+      return apiError('ADM_USE_YN_INVALID', 400)
     }
     updates.use_yn = body.use_yn
   }
 
   if (body.amt_bean !== undefined) {
     if (!Number.isInteger(body.amt_bean) || body.amt_bean < 0) {
-      return NextResponse.json(
-        { error: 'amt_bean은 0 이상 정수' },
-        { status: 400 },
-      )
+      return apiError('ADM_AMT_BEAN_INVALID', 400)
     }
     updates.amt_bean = body.amt_bean
   }
 
   if (Object.keys(updates).length <= 2) {
-    return NextResponse.json({ error: '변경할 필드 없음' }, { status: 400 })
+    return apiError('ADM_NO_FIELDS_TO_UPDATE', 400)
   }
 
   const db = getSupabaseAdmin()

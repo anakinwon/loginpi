@@ -1,15 +1,14 @@
 import { NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { apiError } from '@/lib/api-errors'
 
 // GET /api/admin/event/completions — 미션 10/10 전체 완료자 목록 (관리자 전용)
 // pi_username, 최종성공일시(last_complete_dtm), kakao_id 반환, 선착순 정렬
 export async function GET() {
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
-  if (!isAdmin(user))
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
+  if (!isAdmin(user)) return apiError('FORBIDDEN', 403)
 
   const db = getSupabaseAdmin()
   const EVENT_ID = 'evt-20260614-001'
@@ -31,7 +30,7 @@ export async function GET() {
 
   if (error) {
     console.error('[admin/event/completions] 조회 실패:', error.message)
-    return NextResponse.json({ error: '조회 실패' }, { status: 500 })
+    return apiError('QUERY_FAILED', 500)
   }
 
   type Su = {

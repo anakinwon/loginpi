@@ -1,19 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { listAllCategories, createCategory } from '@/lib/mps-ctgr'
+import { apiError } from '@/lib/api-errors'
 
 // GET /api/admin/store/categories — 어드민 평면 목록 (미사용 포함, 부모명 부착)
 export async function GET() {
   const requester = await getSessionUser()
   if (!isAdmin(requester)) {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+    return apiError('FORBIDDEN', 403)
   }
 
   try {
     const categories = await listAllCategories()
     return NextResponse.json({ categories })
   } catch {
-    return NextResponse.json({ error: '조회 실패' }, { status: 500 })
+    return apiError('QUERY_FAILED', 500)
   }
 }
 
@@ -21,7 +22,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const requester = await getSessionUser()
   if (!isAdmin(requester)) {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+    return apiError('FORBIDDEN', 403)
   }
 
   const body = (await req.json()) as {
@@ -33,10 +34,7 @@ export async function POST(req: NextRequest) {
   }
 
   if (!body.ctgr_nm?.trim()) {
-    return NextResponse.json(
-      { error: '카테고리명은 필수입니다' },
-      { status: 400 },
-    )
+    return apiError('ADM_CTGR_NAME_REQUIRED', 400)
   }
 
   try {
@@ -49,6 +47,6 @@ export async function POST(req: NextRequest) {
     })
     return NextResponse.json({ category }, { status: 201 })
   } catch {
-    return NextResponse.json({ error: '등록 실패' }, { status: 500 })
+    return apiError('ADM_CTGR_CREATE_FAILED', 500)
   }
 }

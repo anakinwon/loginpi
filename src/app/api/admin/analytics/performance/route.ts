@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { publicCacheHeaders } from '@/lib/cache-headers'
+import { apiError } from '@/lib/api-errors'
 
 // GET /api/admin/analytics/performance?period=7|30|90|365 — 퍼포먼스/행동 분석 (Phase 22 §12 ④)
 //   세션/페이지뷰 추적층이 없어 페이지뷰·체류·반송률·이탈률·채널은 불가(선결조건).
@@ -45,8 +46,7 @@ export async function GET(req: NextRequest) {
     db.from('mps_order').select('buyer_id, order_st_cd').eq('del_yn', 'N'),
   ])
 
-  if (logRes.error || orderRes.error)
-    return NextResponse.json({ error: '퍼포먼스 조회 실패' }, { status: 500 })
+  if (logRes.error || orderRes.error) return apiError('ADM_PERFORMANCE_FAILED', 500)
 
   const signupCnt = signupRes.count ?? 0
   const logs = (logRes.data ?? []) as {

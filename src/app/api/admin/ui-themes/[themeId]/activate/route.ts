@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { apiError } from '@/lib/api-errors'
 
 // POST /api/admin/ui-themes/[themeId]/activate — 테마 활성화 + 적용 범위 설정
 // body: { scope?: 'ADMIN' | 'GLOBAL' } (기본 ADMIN)
@@ -11,7 +12,7 @@ export async function POST(
 ) {
   const requester = await getSessionUser()
   if (!isAdmin(requester)) {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+    return apiError('FORBIDDEN', 403)
   }
 
   const { themeId } = await params
@@ -30,11 +31,7 @@ export async function POST(
     .eq('del_yn', 'N')
     .maybeSingle()
 
-  if (!target)
-    return NextResponse.json(
-      { error: '테마를 찾을 수 없습니다' },
-      { status: 404 },
-    )
+  if (!target) return apiError('ADM_THEME_NOT_FOUND', 404)
 
   // 1) 현재 활성 테마 모두 비활성 (부분 유니크 충돌 방지 — 먼저 비워야 함)
   const { error: clearErr } = await db
@@ -43,8 +40,7 @@ export async function POST(
     .eq('actv_yn', 'Y')
     .eq('del_yn', 'N')
 
-  if (clearErr)
-    return NextResponse.json({ error: '활성화 실패' }, { status: 500 })
+  if (clearErr) return apiError('ADM_THEME_ACTIVATE_FAILED', 500)
 
   // 2) 대상 테마 활성화 + 적용 범위 설정
   const { error: setErr } = await db
@@ -58,7 +54,6 @@ export async function POST(
     .eq('theme_id', themeId)
     .eq('del_yn', 'N')
 
-  if (setErr)
-    return NextResponse.json({ error: '활성화 실패' }, { status: 500 })
+  if (setErr) return apiError('ADM_THEME_ACTIVATE_FAILED', 500)
   return NextResponse.json({ ok: true, scope })
 }

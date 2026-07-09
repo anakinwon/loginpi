@@ -23,3 +23,21 @@ export function useApiErrorMessage() {
     return data?.error ?? fallback
   }
 }
+
+// 성공 응답({ message, msgCode, params })을 뷰어 언어로 해석하는 훅 (apiMessage의 클라이언트 짝).
+// msgCode가 있고 apiMsgs 번역키가 존재하면 t(msgCode, params), 아니면 서버 한국어 폴백(message).
+export interface ApiMessagePayload {
+  message?: string
+  msgCode?: string
+  params?: Record<string, string | number>
+}
+
+export function useApiMessage() {
+  const t = useTranslations('apiMsgs')
+  return (data: ApiMessagePayload | null | undefined, fallback = ''): string => {
+    if (data?.msgCode && t.has(data.msgCode)) {
+      return t(data.msgCode, data.params)
+    }
+    return data?.message ?? fallback
+  }
+}

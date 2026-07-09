@@ -4,11 +4,11 @@ import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getDistCfgHistory } from '@/lib/mps-dist-cfg'
 import { sanitizeError } from '@/lib/sanitize-error'
+import { apiError } from '@/lib/api-errors'
 
 export async function GET() {
   const user = await getSessionUser()
-  if (!user || !isAdmin(user))
-    return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+  if (!user || !isAdmin(user)) return apiError('FORBIDDEN', 401)
 
   const history = await getDistCfgHistory()
   return NextResponse.json({ history })
@@ -16,14 +16,13 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   const user = await getSessionUser()
-  if (!user || !isAdmin(user))
-    return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+  if (!user || !isAdmin(user)) return apiError('FORBIDDEN', 401)
 
   let body: unknown
   try {
     body = await req.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
 
   const { max_dist_km, note_txt } = body as {
@@ -32,11 +31,7 @@ export async function POST(req: NextRequest) {
   }
 
   const km = Math.round(Number(max_dist_km))
-  if (isNaN(km) || km < 0 || km > 200)
-    return NextResponse.json(
-      { error: 'max_dist_km는 0~200 사이 정수여야 합니다' },
-      { status: 400 },
-    )
+  if (isNaN(km) || km < 0 || km > 200) return apiError('ADM_DIST_KM_RANGE', 400)
 
   const { error } = await getSupabaseAdmin()
     .from('mps_dist_cfg')

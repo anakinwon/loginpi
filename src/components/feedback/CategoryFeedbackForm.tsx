@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
+import { useApiMessage } from '@/hooks/use-api-error'
 import { StarRating } from './StarRating'
 
 interface CtgrItem {
@@ -37,6 +38,7 @@ export function CategoryFeedbackForm({
 }: Props) {
   const t = useTranslations('feedback')
   const tc = useTranslations('common')
+  const resolveMsg = useApiMessage()
   const [ctgrItems, setCtgrItems] = useState<CtgrItem[]>([])
   const [itemScores, setItemScores] = useState<Record<string, number>>({})
   const [overallScore, setOverallScore] = useState(0)
@@ -94,9 +96,11 @@ export function CategoryFeedbackForm({
       if (res.ok) {
         const d = (await res.json()) as {
           bean_rwrd_qty: number
-          message: string
+          message?: string
+          msgCode?: string
+          params?: Record<string, string | number>
         }
-        toast.success(d.message)
+        toast.success(resolveMsg(d, t('submittedThanks')))
         onSuccess()
       } else {
         const d = (await res.json()) as { error?: string }

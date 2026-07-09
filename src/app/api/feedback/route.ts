@@ -6,6 +6,7 @@ import { payFbckPiReward } from '@/lib/fbck-pi-reward'
 import { enqueueFbckNoti } from '@/lib/trade-noti'
 import { maskUsername } from '@/lib/mask-username'
 import { apiError } from '@/lib/api-errors'
+import { apiMessage } from '@/lib/api-errors/messages'
 
 interface FbckImgInput {
   img_ord: number
@@ -437,12 +438,12 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  const message =
+  const msg =
     rewardBean <= 0
-      ? '후기가 저장되었습니다.'
+      ? apiMessage('FBCK_SAVED')
       : finalReward > 0
-        ? `후기가 저장되었고, ${finalReward} Bean 보상을 받으셨습니다!`
-        : `후기가 저장되었습니다. Pi 보상(약 ${rewardPi} Pi)은 곧 지급됩니다.`
+        ? apiMessage('FBCK_SAVED_BEAN_REWARD', { qty: finalReward })
+        : apiMessage('FBCK_SAVED_PI_PENDING', { pi: rewardPi })
 
   return NextResponse.json(
     {
@@ -450,7 +451,7 @@ export async function POST(req: NextRequest) {
       fbck_scr: Number(fbck_scr),
       bean_rwrd_qty: finalReward,
       reward_pi: rewardPi,
-      message,
+      ...msg,
     },
     { status: 201 },
   )

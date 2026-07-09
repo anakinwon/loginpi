@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { apiError } from '@/lib/api-errors'
 
 // GET /api/admin/dashboard — 사용자 연동 통계 카드 (관리자 대시보드)
 // 클라이언트 fetch 전환: Pi Browser는 쿠키가 없어 SSR에서 통계가 0으로 표시되던 문제 해결
@@ -8,7 +9,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 export async function GET() {
   const user = await getSessionUser()
   if (!isAdmin(user)) {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 401 })
+    return apiError('FORBIDDEN', 401)
   }
 
   const db = getSupabaseAdmin()

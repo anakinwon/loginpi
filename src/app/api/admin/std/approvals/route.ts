@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { apiError } from '@/lib/api-errors'
 
 const PAGE_SIZE = 30
 
 export async function GET(req: NextRequest) {
   const requester = await getSessionUser()
-  if (!isAdmin(requester))
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+  if (!isAdmin(requester)) return apiError('FORBIDDEN', 403)
 
   const { searchParams } = new URL(req.url)
   const status = searchParams.get('status') ?? 'PENDING'
@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
   if (entity_type) query = query.eq('entity_type', entity_type)
 
   const { data, error, count } = await query
-  if (error) return NextResponse.json({ error: '조회 실패' }, { status: 500 })
+  if (error) return apiError('QUERY_FAILED', 500)
 
   return NextResponse.json({
     approvals: data ?? [],
@@ -36,8 +36,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const requester = await getSessionUser()
-  if (!isAdmin(requester))
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+  if (!isAdmin(requester)) return apiError('FORBIDDEN', 403)
 
   const body = (await req.json()) as {
     entity_type: string
@@ -47,10 +46,7 @@ export async function POST(req: NextRequest) {
   }
 
   if (!body.entity_type?.trim() || !body.entity_id?.trim()) {
-    return NextResponse.json(
-      { error: 'entity_type, entity_id는 필수입니다' },
-      { status: 400 },
-    )
+    return apiError('ADM_STD_APV_ENTITY_REQUIRED', 400)
   }
 
   const { data, error } = await getSupabaseAdmin()
@@ -67,7 +63,7 @@ export async function POST(req: NextRequest) {
     .select()
     .single()
 
-  if (error) return NextResponse.json({ error: '요청 실패' }, { status: 500 })
+  if (error) return apiError('ADM_REQUEST_FAILED', 500)
 
   return NextResponse.json({ approval: data }, { status: 201 })
 }

@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react'
 import { useTranslations } from 'next-intl'
-import { themeLabel, themeColorMap, THEME_LABEL } from '@/lib/stats-labels'
+import { themeColorMap, isSystemThemeCode } from '@/lib/stats-labels'
 import type { RevenueDataPoint } from '@/types/stats'
 
 // coin360 스타일 트리맵 — 면적 = 테마별 매출 비중. 색은 도넛 차트와 동일 팔레트로
@@ -132,8 +132,8 @@ export default function RevenueTreemapChart({ data }: Props) {
       .filter((cd) => map[cd] > 0)
       .map((cd) => ({
         cd,
-        // 시스템 분류 코드는 번역, 그 외(카페 테마 코드)는 themeLabel
-        label: cd in THEME_LABEL ? t(`theme.${cd}`) : themeLabel(cd),
+        // 시스템 분류 코드는 번역, 그 외(카페 테마 코드)는 코드 그대로
+        label: isSystemThemeCode(cd) ? t(`theme.${cd}`) : cd,
         value: map[cd],
         color: colorOf[cd],
       }))

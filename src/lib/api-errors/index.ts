@@ -14,6 +14,10 @@ import { LOCATION_ERRORS } from './location'
 import { MISC_ERRORS } from './misc'
 import { STORE_ERRORS } from './store'
 import { VOICE_ERRORS } from './voice'
+import { ADMIN_STATS_ERRORS } from './admin-stats'
+import { ADMIN_STD_ERRORS } from './admin-std'
+import { ADMIN_CONTENT_ERRORS } from './admin-content'
+import { ADMIN_OPS_ERRORS } from './admin-ops'
 
 export const API_ERRORS = {
   ...COMMON_ERRORS,
@@ -26,6 +30,10 @@ export const API_ERRORS = {
   ...MISC_ERRORS,
   ...STORE_ERRORS,
   ...VOICE_ERRORS,
+  ...ADMIN_STATS_ERRORS,
+  ...ADMIN_STD_ERRORS,
+  ...ADMIN_CONTENT_ERRORS,
+  ...ADMIN_OPS_ERRORS,
 } as const
 
 export type ApiErrorCode = keyof typeof API_ERRORS

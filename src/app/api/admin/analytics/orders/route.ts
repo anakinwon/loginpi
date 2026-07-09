@@ -3,6 +3,7 @@ import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { maskDisplayName } from '@/lib/display-mask'
 import { viewerScopedCacheHeaders } from '@/lib/cache-headers'
+import { apiError } from '@/lib/api-errors'
 
 // GET /api/admin/analytics/orders?period=7|30|90|365 — 주문 분석 (Phase 22 §12 ②)
 //   mps_order 직접 조회 → 요약·주문방법·요일×시간 히트맵·주문간격·RFM을 온더플라이 집계.
@@ -72,8 +73,7 @@ export async function GET(req: NextRequest) {
     .gte('reg_dtm', fromDt)
     .order('reg_dtm', { ascending: true })
 
-  if (error)
-    return NextResponse.json({ error: '주문 조회 실패' }, { status: 500 })
+  if (error) return apiError('ADM_ORDERS_FAILED', 500)
 
   const rows = (data ?? []) as OrderRow[]
 

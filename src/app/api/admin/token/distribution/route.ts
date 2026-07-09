@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { apiError } from '@/lib/api-errors'
 
 // GET /api/admin/token/distribution?period=N — Bean 거래 유형별 분포 (txn_tp_cd 전체)
 // 매출(회수) 집계와 달리 CHARGE·REWARD·TRANSFER 까지 포함한 활동 전반의 분포.
@@ -8,7 +9,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 export async function GET(request: NextRequest) {
   const user = await getSessionUser()
   if (!isAdmin(user)) {
-    return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+    return apiError('FORBIDDEN', 401)
   }
 
   const periodRaw = request.nextUrl.searchParams.get('period')
@@ -21,7 +22,7 @@ export async function GET(request: NextRequest) {
   )
   if (error) {
     console.error('[Bean 분포] 집계 실패:', error.message)
-    return NextResponse.json({ error: 'Bean 분포 집계 실패' }, { status: 500 })
+    return apiError('ADM_BEAN_DISTRIBUTION_FAILED', 500)
   }
 
   return NextResponse.json({ ...data, last_updated: new Date().toISOString() })

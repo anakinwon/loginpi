@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { refundCancelledOrder } from '@/lib/mps-refund'
+import { apiError } from '@/lib/api-errors'
 
 // POST /api/admin/store/orders/[orderId]/refund — 관리자 수동 환불 재시도 (멱등)
 // 용도: ① 환불 누락된 기존 취소 주문 정상화 ② A2U 실패·시드 설정 후 재실행 ③ 분쟁 정산
@@ -10,8 +11,7 @@ export async function POST(
   { params }: { params: Promise<{ orderId: string }> },
 ) {
   const user = await getSessionUser()
-  if (!isAdmin(user))
-    return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+  if (!isAdmin(user)) return apiError('FORBIDDEN', 401)
 
   const { orderId } = await params
   const refund = await refundCancelledOrder(orderId, user!.id)

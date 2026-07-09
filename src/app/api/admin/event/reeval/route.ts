@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { reevaluateAllActiveUsers } from '@/lib/event'
+import { apiError } from '@/lib/api-errors'
 
 // POST /api/admin/event/reeval — 전체 활성 사용자 미션 온디맨드 재평가 (관리자 전용)
 //
@@ -9,19 +10,14 @@ import { reevaluateAllActiveUsers } from '@/lib/event'
 // reevaluateAllActiveUsers는 evt_action_log 기반으로 전 미션 타입을 멱등 재평가한다.
 export async function POST() {
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
-  if (!isAdmin(user))
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
+  if (!isAdmin(user)) return apiError('FORBIDDEN', 403)
 
   try {
     const result = await reevaluateAllActiveUsers()
     return NextResponse.json({ ok: true, ...result })
   } catch (err) {
     console.error('[admin/event/reeval] 재평가 실패:', err)
-    return NextResponse.json(
-      { ok: false, error: '재평가 실패' },
-      { status: 500 },
-    )
+    return apiError('ADM_EVT_REEVAL_FAILED', 500)
   }
 }

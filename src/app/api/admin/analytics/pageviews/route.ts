@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { publicCacheHeaders } from '@/lib/cache-headers'
+import { apiError } from '@/lib/api-errors'
 
 // GET /api/admin/analytics/pageviews?period=7|30|90|365 — 웹 트래픽 (Phase 22 §12 ④)
 //   stat_pageview를 세션별 시퀀스로 묶어 체류·반송·이탈·랜딩·채널을 파생.
@@ -44,8 +45,7 @@ export async function GET(req: NextRequest) {
     .gte('view_dtm', from)
     .order('view_dtm', { ascending: true })
 
-  if (error)
-    return NextResponse.json({ error: '웹 트래픽 조회 실패' }, { status: 500 })
+  if (error) return apiError('ADM_PAGEVIEWS_FAILED', 500)
 
   const rows = (data ?? []) as PvRow[]
   const totalPv = rows.length

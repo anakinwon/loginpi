@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
+import { apiError } from '@/lib/api-errors'
 
 // TASK-072: 어드민 — 전체 Webhook 등록 현황 (api_key 마스킹)
 // GET /api/admin/chat/webhooks
 export async function GET() {
   const user = await getSessionUser()
-  if (!isAdmin(user))
-    return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+  if (!isAdmin(user)) return apiError('AUTH_REQUIRED', 401)
 
   const { data, error } = await getSupabaseAdmin()
     .from('msg_webhook')
@@ -17,11 +17,7 @@ export async function GET() {
     .eq('del_yn', 'N')
     .order('reg_dtm', { ascending: false })
 
-  if (error)
-    return NextResponse.json(
-      { error: 'Webhook 목록 조회 실패' },
-      { status: 500 },
-    )
+  if (error) return apiError('ADM_CHAT_WEBHOOK_LIST_FAILED', 500)
 
   const webhooks = (data ?? []).map(
     (w: { api_key: string } & Record<string, unknown>) => ({

@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import { readFile } from 'fs/promises'
 import { join } from 'path'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
+import { apiError } from '@/lib/api-errors'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -26,7 +27,7 @@ function flattenKeys(obj: Record<string, unknown>, prefix = ''): string[] {
 export async function GET() {
   const user = await getSessionUser()
   if (!isAdmin(user)) {
-    return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+    return apiError('AUTH_REQUIRED', 401)
   }
 
   // 전체 번역 키 수: DB가 아닌 ko.json 파일에서 계산 (한국어가 source of truth)

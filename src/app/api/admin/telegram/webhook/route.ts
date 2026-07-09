@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { ensureTelegramWebhook, getWebhookStatus } from '@/lib/telegram-webhook'
 import { sanitizeError } from '@/lib/sanitize-error'
+import { apiError } from '@/lib/api-errors'
 
 // 관리자용 텔레그램 webhook 진단·재등록 (환경별 봇 분리 전제 — telegram-webhook.ts 참조)
 //   GET : 현재 등록 URL vs 기대 URL 대조 + 봇 식별 + 최근 수신 오류
@@ -10,7 +11,7 @@ import { sanitizeError } from '@/lib/sanitize-error'
 export async function GET() {
   const user = await getSessionUser()
   if (!isAdmin(user)) {
-    return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+    return apiError('FORBIDDEN', 401)
   }
   try {
     const status = await getWebhookStatus()
@@ -32,7 +33,7 @@ export async function GET() {
 export async function POST() {
   const user = await getSessionUser()
   if (!isAdmin(user)) {
-    return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+    return apiError('FORBIDDEN', 401)
   }
   const result = await ensureTelegramWebhook(true)
   const status = await getWebhookStatus().catch(() => null)

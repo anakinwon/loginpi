@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { apiError } from '@/lib/api-errors'
 
 // Open Beta 운영 준비 체크리스트 — 관리자 전용. ops_checklist(sql/111) 상태/메모 관리.
 const STATUS = ['TODO', 'DOING', 'DONE', 'NA'] as const
@@ -22,7 +23,7 @@ interface ChkRow {
 export async function GET() {
   const user = await getSessionUser()
   if (!isAdmin(user)) {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+    return apiError('FORBIDDEN', 403)
   }
 
   const { data, error } = await getSupabaseAdmin()
@@ -49,14 +50,14 @@ export async function GET() {
 export async function PATCH(req: NextRequest) {
   const user = await getSessionUser()
   if (!isAdmin(user)) {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+    return apiError('FORBIDDEN', 403)
   }
 
   let body: unknown
   try {
     body = await req.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
 
   const { chk_id, status_cd, note_txt } = body as {
@@ -65,7 +66,7 @@ export async function PATCH(req: NextRequest) {
     note_txt?: string
   }
   if (!chk_id) {
-    return NextResponse.json({ error: 'chk_id가 필요합니다' }, { status: 400 })
+    return apiError('ADM_CHK_ID_REQUIRED', 400)
   }
 
   const patch: Record<string, unknown> = {
@@ -74,7 +75,7 @@ export async function PATCH(req: NextRequest) {
   }
   if (status_cd !== undefined) {
     if (!STATUS.includes(status_cd as Status)) {
-      return NextResponse.json({ error: '유효하지 않은 상태' }, { status: 400 })
+      return apiError('ADM_INVALID_STATUS', 400)
     }
     patch.status_cd = status_cd
   }
@@ -93,7 +94,7 @@ export async function PATCH(req: NextRequest) {
     .maybeSingle()
 
   if (error || !data) {
-    return NextResponse.json({ error: '저장 실패' }, { status: 500 })
+    return apiError('SAVE_FAILED', 500)
   }
   return NextResponse.json({ item: data })
 }

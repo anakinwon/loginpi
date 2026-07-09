@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { apiError } from '@/lib/api-errors'
 
 // WAU/MAU 윈도우: 날짜 D의 활동 로그는 D ~ D+29 행의 wau_cnt·mau_cnt에 영향을 준다
 const RIPPLE_DAYS = 29
@@ -116,7 +117,7 @@ async function logBatchRun(
 // Vercel Cron은 GET으로 호출한다 — 매일 00:00 UTC: 어제 확정 + 오늘 행 갱신
 export async function GET(req: NextRequest) {
   if (!isCronAuthorized(req)) {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+    return apiError('FORBIDDEN', 403)
   }
   const startDtm = new Date()
   const target = yesterdayKst()
@@ -133,7 +134,7 @@ export async function POST(req: NextRequest) {
   if (!cronAuth) {
     const user = await getSessionUser()
     if (!isAdmin(user)) {
-      return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+      return apiError('FORBIDDEN', 403)
     }
     regrId = user?.pi_username ?? user?.google_email ?? user?.id ?? 'ADMIN'
   }
@@ -195,8 +196,14 @@ export async function POST(req: NextRequest) {
   await logBatchRun(triggerCd, date, date, startDtm, s, regrId)
 
   if (s.failed > 0) {
+    const dates = s.failedDates.join(', ')
     return NextResponse.json(
-      { error: `재계산 실패: ${s.failedDates.join(', ')}`, date },
+      {
+        error: `재계산 실패: ${dates}`,
+        code: 'ADM_STATS_REBUILD_FAILED',
+        params: { dates },
+        date,
+      },
       { status: 500 },
     )
   }

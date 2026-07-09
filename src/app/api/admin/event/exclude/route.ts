@@ -1,16 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { apiError } from '@/lib/api-errors'
 
 // GET /api/admin/event/exclude — 제외 대상자 목록 조회
 export async function GET() {
   const user = await getSessionUser()
   if (!user) {
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+    return apiError('AUTH_REQUIRED', 401)
   }
 
   if (!isAdmin(user)) {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+    return apiError('FORBIDDEN', 403)
   }
 
   try {
@@ -39,10 +40,7 @@ export async function GET() {
     return NextResponse.json({ excluded: data })
   } catch (err) {
     console.error('[admin/event/exclude] 조회 실패:', err)
-    return NextResponse.json(
-      { error: '제외 대상자 조회 실패' },
-      { status: 500 },
-    )
+    return apiError('ADM_EVT_EXCLUDE_LIST_FAILED', 500)
   }
 }
 
@@ -50,18 +48,18 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   const user = await getSessionUser()
   if (!user) {
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+    return apiError('AUTH_REQUIRED', 401)
   }
 
   if (!isAdmin(user)) {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+    return apiError('FORBIDDEN', 403)
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
 
   const { pi_username, reason } = body as {
@@ -80,10 +78,7 @@ export async function POST(request: NextRequest) {
   ]
 
   if (names.length === 0) {
-    return NextResponse.json(
-      { error: 'Pi 사용자명을 입력해주세요' },
-      { status: 400 },
-    )
+    return apiError('ADM_EVT_PI_USERNAME_REQUIRED', 400)
   }
 
   try {
@@ -136,7 +131,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ added, already, notFound }, { status: 201 })
   } catch (err) {
     console.error('[admin/event/exclude] POST 실패:', err)
-    return NextResponse.json({ error: '제외 추가 실패' }, { status: 500 })
+    return apiError('ADM_EVT_EXCLUDE_ADD_FAILED', 500)
   }
 }
 
@@ -144,21 +139,18 @@ export async function POST(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   const user = await getSessionUser()
   if (!user) {
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+    return apiError('AUTH_REQUIRED', 401)
   }
 
   if (!isAdmin(user)) {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+    return apiError('FORBIDDEN', 403)
   }
 
   const { searchParams } = new URL(request.url)
   const user_id = searchParams.get('user_id')
 
   if (!user_id?.trim()) {
-    return NextResponse.json(
-      { error: '사용자 ID가 필요합니다' },
-      { status: 400 },
-    )
+    return apiError('ADM_EVT_USER_ID_REQUIRED', 400)
   }
 
   try {
@@ -186,6 +178,6 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ success: true })
   } catch (err) {
     console.error('[admin/event/exclude] DELETE 실패:', err)
-    return NextResponse.json({ error: '제외 해제 실패' }, { status: 500 })
+    return apiError('ADM_EVT_EXCLUDE_REMOVE_FAILED', 500)
   }
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { sanitizeError } from '@/lib/sanitize-error'
+import { apiError } from '@/lib/api-errors'
 
 // 로그성 테이블 기간 기준 물리 정리 — fn_log_table_purge RPC 호출.
 // 안전장치는 DB 함수에 내장(PURGEABLE 화이트리스트 + 최소 보존일 7일).
@@ -9,14 +10,14 @@ import { sanitizeError } from '@/lib/sanitize-error'
 export async function POST(req: NextRequest) {
   const requester = await getSessionUser()
   if (!isAdmin(requester)) {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+    return apiError('FORBIDDEN', 403)
   }
 
   let body: { table?: unknown; days?: unknown }
   try {
     body = await req.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
 
   const table = typeof body.table === 'string' ? body.table.trim() : ''
@@ -24,13 +25,10 @@ export async function POST(req: NextRequest) {
     typeof body.days === 'number' ? Math.floor(body.days) : Number.NaN
 
   if (!table) {
-    return NextResponse.json({ error: '대상 테이블 누락' }, { status: 400 })
+    return apiError('ADM_PURGE_TABLE_REQUIRED', 400)
   }
   if (!Number.isFinite(days) || days < 7) {
-    return NextResponse.json(
-      { error: '보존일은 7일 이상의 숫자여야 합니다' },
-      { status: 400 },
-    )
+    return apiError('ADM_PURGE_MIN_DAYS', 400)
   }
 
   const { data, error } = await getSupabaseAdmin().rpc('fn_log_table_purge', {

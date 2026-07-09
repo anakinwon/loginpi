@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { apiError } from '@/lib/api-errors'
 
 // 테마 코드 형식: 대문자 스네이크케이스 (VARCHAR(20), DA 표준)
 const THEME_CD_RE = /^[A-Z0-9_]{1,20}$/
@@ -8,7 +9,7 @@ const THEME_CD_RE = /^[A-Z0-9_]{1,20}$/
 export async function GET(req: NextRequest) {
   const requester = await getSessionUser()
   if (!isAdmin(requester)) {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+    return apiError('FORBIDDEN', 403)
   }
 
   const { searchParams } = new URL(req.url)
@@ -35,7 +36,7 @@ export async function GET(req: NextRequest) {
   }
 
   const { data, error } = await query
-  if (error) return NextResponse.json({ error: '조회 실패' }, { status: 500 })
+  if (error) return apiError('QUERY_FAILED', 500)
 
   return NextResponse.json({ themes: data })
 }
@@ -43,7 +44,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const requester = await getSessionUser()
   if (!isAdmin(requester)) {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+    return apiError('FORBIDDEN', 403)
   }
 
   const body = (await req.json()) as {
@@ -59,16 +60,10 @@ export async function POST(req: NextRequest) {
 
   const themeCd = body.theme_cd?.trim().toUpperCase() ?? ''
   if (!THEME_CD_RE.test(themeCd)) {
-    return NextResponse.json(
-      { error: '테마 코드는 영문 대문자·숫자·_ 조합 1~20자여야 합니다' },
-      { status: 400 },
-    )
+    return apiError('ADM_THEME_CD_FORMAT', 400)
   }
   if (!body.theme_nm?.trim() || !body.theme_emoji?.trim()) {
-    return NextResponse.json(
-      { error: '테마명과 이모지는 필수입니다' },
-      { status: 400 },
-    )
+    return apiError('ADM_THEME_NM_EMOJI_REQUIRED', 400)
   }
   const tp = body.theme_tp_cd === 'PREMIUM' ? 'PREMIUM' : 'BASIC'
 
@@ -92,12 +87,9 @@ export async function POST(req: NextRequest) {
   if (error) {
     // PK 충돌 — 동일 코드(논리삭제된 것 포함) 존재 (PRD_17: 재생성 시 별도 코드 사용)
     if (error.code === '23505') {
-      return NextResponse.json(
-        { error: '이미 존재하는 테마 코드입니다(삭제된 코드 포함)' },
-        { status: 409 },
-      )
+      return apiError('ADM_THEME_CD_DUPLICATE', 409)
     }
-    return NextResponse.json({ error: '등록 실패' }, { status: 500 })
+    return apiError('ADM_REGISTER_FAILED', 500)
   }
 
   return NextResponse.json({ theme: data }, { status: 201 })

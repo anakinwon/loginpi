@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { apiError } from '@/lib/api-errors'
 
 // 약관/동의 내역 (관리자 전용) — sys_user_consent 이력을 "사용자별 1행"으로 집계.
 // 유형별 최신 상태만 투영(reg_dtm DESC 첫 등장=최신). FK 미설계 → sys_user 별도 .in() 병합.
@@ -23,7 +24,7 @@ interface UserRow {
 export async function GET(req: NextRequest) {
   const user = await getSessionUser()
   if (!isAdmin(user)) {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+    return apiError('FORBIDDEN', 403)
   }
 
   const sp = req.nextUrl.searchParams
@@ -58,7 +59,7 @@ export async function GET(req: NextRequest) {
 
   const { data, error } = await query
   if (error) {
-    return NextResponse.json({ error: '조회 실패' }, { status: 500 })
+    return apiError('QUERY_FAILED', 500)
   }
   const rows = (data ?? []) as ConsentRow[]
 

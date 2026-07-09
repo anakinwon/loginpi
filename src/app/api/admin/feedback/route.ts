@@ -2,12 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { maskUsername } from '@/lib/mask-username'
+import { apiError } from '@/lib/api-errors'
 
 // GET /api/admin/feedback?page=1&limit=20&shop_id=&hide_yn=&score=
 export async function GET(req: NextRequest) {
   const user = await getSessionUser()
-  if (!isAdmin(user))
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+  if (!isAdmin(user)) return apiError('FORBIDDEN', 403)
 
   const { searchParams } = req.nextUrl
   const page = Math.max(1, Number(searchParams.get('page') ?? '1'))
@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
   if (score) q = q.eq('fbck_scr', Number(score))
 
   const { data: rows, count, error } = await q
-  if (error) return NextResponse.json({ error: '조회 실패' }, { status: 500 })
+  if (error) return apiError('QUERY_FAILED', 500)
 
   const usrIds = [
     ...new Set((rows ?? []).map((r: { usr_id: string }) => r.usr_id)),

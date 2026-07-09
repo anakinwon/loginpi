@@ -1,16 +1,17 @@
-// 매출 통계 분류 코드 한국어 레이블 — 단일 소스
+// 매출 통계 시스템 분류 코드 — 표시명은 i18n(adminAnalytics.theme.<cd>)에서 해석한다.
 // msg_theme에 등록되지 않은 시스템 분류 코드 (sql/026_revenue_breakdown.sql의
 // fn_top_revenue_themes CASE 매핑과 반드시 동기화 유지)
-export const THEME_LABEL: Record<string, string> = {
-  SUBSCRIPTION: '구독',
-  PI_TIP: '빈(Bean)',
-  DIRECT_PAY: '직접 전송',
-  PRODUCT_ORDER: '상품 구매',
-  UNKNOWN: '기타',
-}
+export const SYSTEM_THEME_CODES = [
+  'SUBSCRIPTION',
+  'PI_TIP',
+  'DIRECT_PAY',
+  'PRODUCT_ORDER',
+  'UNKNOWN',
+] as const
 
-export function themeLabel(cd: string): string {
-  return THEME_LABEL[cd] ?? cd
+// 시스템 분류 코드 여부 — 참이면 t('adminAnalytics.theme.'+cd)로 표시(그 외는 카페 테마명/코드)
+export function isSystemThemeCode(cd: string): boolean {
+  return (SYSTEM_THEME_CODES as readonly string[]).includes(cd)
 }
 
 // 주요 테마 고정 색 — 서로 뚜렷이 구분 (빈/구독 등 혼동 방지)

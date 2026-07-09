@@ -2,13 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { viewerScopedCacheHeaders } from '@/lib/cache-headers'
+import { apiError } from '@/lib/api-errors'
 
 // GET /api/admin/board?page=1&limit=30&ctgr=NOTICE
 export async function GET(request: NextRequest) {
   const user = await getSessionUser()
   const admin = isAdmin(user)
-  if (!admin)
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+  if (!admin) return apiError('FORBIDDEN', 403)
 
   const { searchParams } = request.nextUrl
   const page = Math.max(1, Number(searchParams.get('page') ?? 1))
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
   if (ctgr) query = query.eq('ctgr_cd', ctgr)
 
   const { data: posts, count, error } = await query
-  if (error) return NextResponse.json({ error: '조회 실패' }, { status: 500 })
+  if (error) return apiError('QUERY_FAILED', 500)
 
   const totalPages = Math.ceil((count ?? 0) / limit)
   return NextResponse.json(

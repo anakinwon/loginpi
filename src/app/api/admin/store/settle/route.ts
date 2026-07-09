@@ -7,6 +7,7 @@ import {
   listSettledOrders,
   settleOrderById,
 } from '@/lib/mps-order'
+import { apiError } from '@/lib/api-errors'
 
 // 미정산(release_txid 없음) DONE 주문의 판매자 A2U 일괄 정산 — 관리자 백필/재시도 전용.
 // GET 으로 대상 미리보기 → POST 로 실행. settleOrder가 멱등이라 재실행 안전(이중송금 방지).
@@ -14,8 +15,7 @@ import {
 // GET /api/admin/store/settle — 백필 대상 미리보기
 export async function GET() {
   const user = await getSessionUser()
-  if (!user || !isAdmin(user))
-    return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+  if (!user || !isAdmin(user)) return apiError('FORBIDDEN', 401)
 
   const [orders, settled] = await Promise.all([
     listUnsettledOrders(),
@@ -78,8 +78,7 @@ export async function GET() {
 //   body { order_ids?: string[] } — 지정 시 해당 주문만, 없으면 전체 미정산 대상
 export async function POST(req: NextRequest) {
   const user = await getSessionUser()
-  if (!user || !isAdmin(user))
-    return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+  if (!user || !isAdmin(user)) return apiError('FORBIDDEN', 401)
 
   let body: { order_ids?: string[] } = {}
   try {

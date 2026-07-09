@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { apiError } from '@/lib/api-errors'
 
 export async function GET(req: NextRequest) {
   const requester = await getSessionUser()
-  if (!isAdmin(requester))
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+  if (!isAdmin(requester)) return apiError('FORBIDDEN', 403)
 
   const { searchParams } = new URL(req.url)
   const search = searchParams.get('search')?.trim() ?? ''
@@ -24,15 +24,14 @@ export async function GET(req: NextRequest) {
   }
 
   const { data, error } = await query
-  if (error) return NextResponse.json({ error: '조회 실패' }, { status: 500 })
+  if (error) return apiError('QUERY_FAILED', 500)
 
   return NextResponse.json({ terms: data })
 }
 
 export async function POST(req: NextRequest) {
   const requester = await getSessionUser()
-  if (!isAdmin(requester))
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+  if (!isAdmin(requester)) return apiError('FORBIDDEN', 403)
 
   const body = (await req.json()) as {
     term_log_nm: string
@@ -42,10 +41,7 @@ export async function POST(req: NextRequest) {
   }
 
   if (!body.term_log_nm?.trim() || !body.term_phy_nm?.trim()) {
-    return NextResponse.json(
-      { error: '논리명과 물리명은 필수입니다' },
-      { status: 400 },
-    )
+    return apiError('ADM_STD_LOGICAL_PHYSICAL_REQUIRED', 400)
   }
 
   const { data, error } = await getSupabaseAdmin()
@@ -61,7 +57,7 @@ export async function POST(req: NextRequest) {
     .select()
     .single()
 
-  if (error) return NextResponse.json({ error: '등록 실패' }, { status: 500 })
+  if (error) return apiError('ADM_REGISTER_FAILED', 500)
 
   return NextResponse.json({ term: data }, { status: 201 })
 }

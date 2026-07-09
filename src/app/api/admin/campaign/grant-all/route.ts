@@ -4,6 +4,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getActiveFeeMode, beanToPi } from '@/lib/fee-resolver'
 import { payCampaignPiReward } from '@/lib/campaign-pi-reward'
 import { sanitizeError } from '@/lib/sanitize-error'
+import { apiError } from '@/lib/api-errors'
 
 const CAMPAIGN_CD = 'SHOP_ONBOARD'
 
@@ -46,11 +47,7 @@ async function logBatchRun(
 //   재원/선착순 초과는 'INSUFFICIENT_POOL'/'SOLD_OUT'으로 errors에 남는다.
 export async function POST() {
   const user = await getSessionUser()
-  if (!isAdmin(user))
-    return NextResponse.json(
-      { error: '관리자 권한이 필요합니다' },
-      { status: 403 },
-    )
+  if (!isAdmin(user)) return apiError('ADM_ADMIN_REQUIRED', 403)
 
   const start = new Date()
   const db = getSupabaseAdmin()

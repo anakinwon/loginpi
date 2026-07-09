@@ -2,12 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { ADMIN_NAV_BY_HREF } from '@/lib/admin-nav-catalog'
+import { apiError } from '@/lib/api-errors'
 
 // GET /api/admin/quick-menu — 현재 팝업 노출 메뉴(순서대로 href 목록)
 export async function GET() {
   const requester = await getSessionUser()
   if (!isAdmin(requester)) {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+    return apiError('FORBIDDEN', 403)
   }
 
   const { data, error } = await getSupabaseAdmin()
@@ -17,7 +18,7 @@ export async function GET() {
     .eq('del_yn', 'N')
     .order('sort_ord', { ascending: true })
 
-  if (error) return NextResponse.json({ error: '조회 실패' }, { status: 500 })
+  if (error) return apiError('QUERY_FAILED', 500)
   return NextResponse.json({
     hrefs: (data ?? []).map((r) => (r as { menu_href: string }).menu_href),
   })
@@ -28,7 +29,7 @@ export async function GET() {
 export async function PUT(req: NextRequest) {
   const requester = await getSessionUser()
   if (!isAdmin(requester)) {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+    return apiError('FORBIDDEN', 403)
   }
 
   const body = (await req.json().catch(() => null)) as {
@@ -36,7 +37,7 @@ export async function PUT(req: NextRequest) {
   } | null
   const rawHrefs = Array.isArray(body?.hrefs) ? body!.hrefs : null
   if (!rawHrefs) {
-    return NextResponse.json({ error: '잘못된 요청' }, { status: 400 })
+    return apiError('BAD_REQUEST', 400)
   }
 
   // 카탈로그 존재 href만 + 중복 제거 (순서 보존)
@@ -58,8 +59,7 @@ export async function PUT(req: NextRequest) {
     .from('sys_quick_menu')
     .update({ del_yn: 'Y', del_dtm: now, modr_id: modrId, mod_dtm: now })
     .eq('del_yn', 'N')
-  if (clearErr)
-    return NextResponse.json({ error: '저장 실패' }, { status: 500 })
+  if (clearErr) return apiError('SAVE_FAILED', 500)
 
   if (hrefs.length > 0) {
     const rows = hrefs.map((href, i) => ({
@@ -71,8 +71,7 @@ export async function PUT(req: NextRequest) {
       modr_id: modrId,
     }))
     const { error: insErr } = await db.from('sys_quick_menu').insert(rows)
-    if (insErr)
-      return NextResponse.json({ error: '저장 실패' }, { status: 500 })
+    if (insErr) return apiError('SAVE_FAILED', 500)
   }
 
   return NextResponse.json({ ok: true, count: hrefs.length })

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { apiError } from '@/lib/api-errors'
 
 // LIKE 와일드카드(%, _, \) 이스케이프 — 사용자 입력이 패턴으로 오작동/주입되지 않게.
 function escapeLike(s: string): string {
@@ -10,7 +11,7 @@ function escapeLike(s: string): string {
 export async function GET(req: NextRequest) {
   const requester = await getSessionUser()
   if (!isAdmin(requester)) {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+    return apiError('FORBIDDEN', 403)
   }
 
   const q = (new URL(req.url).searchParams.get('q') ?? '').trim()
@@ -31,7 +32,7 @@ export async function GET(req: NextRequest) {
   const { data, error } = await query
 
   if (error) {
-    return NextResponse.json({ error: '연동 현황 조회 실패' }, { status: 500 })
+    return apiError('ADM_LINKS_LIST_FAILED', 500)
   }
 
   return NextResponse.json({ users: data })
@@ -43,30 +44,24 @@ export async function GET(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   const requester = await getSessionUser()
   if (!isAdmin(requester)) {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+    return apiError('FORBIDDEN', 403)
   }
 
   let body: { userId?: string; del_yn?: string }
   try {
     body = (await req.json()) as { userId?: string; del_yn?: string }
   } catch {
-    return NextResponse.json({ error: '잘못된 요청' }, { status: 400 })
+    return apiError('BAD_REQUEST', 400)
   }
 
   const { userId, del_yn } = body
   if (!userId || (del_yn !== 'Y' && del_yn !== 'N')) {
-    return NextResponse.json(
-      { error: 'userId와 del_yn(Y|N)이 필요합니다' },
-      { status: 400 },
-    )
+    return apiError('ADM_LINK_TOGGLE_PARAMS_REQUIRED', 400)
   }
 
   // 자기 자신은 비활성화 금지 (관리자 자기 계정 잠금 방지)
   if (userId === requester!.id && del_yn === 'Y') {
-    return NextResponse.json(
-      { error: '본인 계정은 비활성화할 수 없습니다' },
-      { status: 400 },
-    )
+    return apiError('ADM_CANNOT_DEACTIVATE_SELF', 400)
   }
 
   const now = new Date().toISOString()
@@ -83,7 +78,7 @@ export async function PATCH(req: NextRequest) {
     .eq('id', userId)
 
   if (error) {
-    return NextResponse.json({ error: '상태 변경 실패' }, { status: 500 })
+    return apiError('ADM_LINK_STATUS_UPDATE_FAILED', 500)
   }
 
   return NextResponse.json({ success: true, userId, del_yn })

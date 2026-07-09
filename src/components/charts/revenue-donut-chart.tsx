@@ -1,7 +1,8 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import PlotlyPlot from './plotly-plot'
-import { themeLabel, themeColorMap } from '@/lib/stats-labels'
+import { themeColorMap, isSystemThemeCode } from '@/lib/stats-labels'
 import type { RevenueDataPoint } from '@/types/stats'
 
 const BASE_LAYOUT = {
@@ -22,6 +23,7 @@ interface Props {
 }
 
 export default function RevenueDonutChart({ data }: Props) {
+  const t = useTranslations('adminAnalytics')
   // 테마별 합산
   const themeMap: Record<string, number> = {}
   for (const row of data) {
@@ -29,7 +31,9 @@ export default function RevenueDonutChart({ data }: Props) {
   }
 
   const themeCds = Object.keys(themeMap)
-  const labels = themeCds.map(themeLabel)
+  const labels = themeCds.map((cd) =>
+    isSystemThemeCode(cd) ? t(`theme.${cd}`) : cd,
+  )
   const values = Object.values(themeMap)
   const colorOf = themeColorMap(themeCds)
 

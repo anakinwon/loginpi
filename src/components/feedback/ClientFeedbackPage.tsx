@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
 import { usePiAuth } from '@/components/pi-auth-provider'
+import { useApiMessage } from '@/hooks/use-api-error'
 import { StarRating } from './StarRating'
 
 interface CtgrItem {
@@ -43,6 +44,7 @@ export function ClientFeedbackPage({
   const router = useRouter()
   const t = useTranslations('feedback')
   const tc = useTranslations('common')
+  const resolveMsg = useApiMessage()
   const { user, isLoading: authLoading } = usePiAuth()
   const authed = serverAuthed || !!user
 
@@ -128,9 +130,11 @@ export function ClientFeedbackPage({
       if (res.ok) {
         const d = (await res.json()) as {
           bean_rwrd_qty: number
-          message: string
+          message?: string
+          msgCode?: string
+          params?: Record<string, string | number>
         }
-        toast.success(d.message)
+        toast.success(resolveMsg(d, t('submittedThanks')))
         setSubmitted(true)
       } else {
         const d = (await res.json()) as { error?: string }

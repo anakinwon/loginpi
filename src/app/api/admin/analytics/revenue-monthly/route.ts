@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { viewerScopedCacheHeaders } from '@/lib/cache-headers'
+import { apiError } from '@/lib/api-errors'
 
 // GET /api/admin/analytics/revenue-monthly — 월별 Pi 매출(최근 25개월) (Phase 22 §12 ①)
 //   Z-차트(당월·누계·이동누계)·YoY 비교용. stat_revenue_dly 일별 → 월 단위 집계.
@@ -13,8 +14,7 @@ const MONTHS = 25
 export async function GET() {
   const user = await getSessionUser()
   const admin = isAdmin(user)
-  if (!admin)
-    return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+  if (!admin) return apiError('FORBIDDEN', 401)
 
   const now = new Date()
   const y = now.getUTCFullYear()
@@ -28,8 +28,7 @@ export async function GET() {
     .select('stat_dt, rev_pi, txn_cnt')
     .gte('stat_dt', fromDt)
 
-  if (error)
-    return NextResponse.json({ error: '월별 매출 조회 실패' }, { status: 500 })
+  if (error) return apiError('ADM_REVENUE_MONTHLY_FAILED', 500)
 
   // 월(YYYY-MM)별 합산
   const agg = new Map<string, { revPi: number; txnCnt: number }>()

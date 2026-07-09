@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { publicCacheHeaders } from '@/lib/cache-headers'
+import { apiError } from '@/lib/api-errors'
 
 // GET /api/admin/analytics/usage?period=7|30|90|365 — 접속·사용 분석 (Phase 22 §12 ③)
 //   sys_user_actvty_log(일별 활동, UNIQUE usr_id×actvty_dt) + sys_user(가입일) +
@@ -47,8 +48,7 @@ export async function GET(req: NextRequest) {
       .not('sido_nm', 'is', null),
   ])
 
-  if (logRes.error || userRes.error)
-    return NextResponse.json({ error: '사용 분석 조회 실패' }, { status: 500 })
+  if (logRes.error || userRes.error) return apiError('ADM_USAGE_ANALYTICS_FAILED', 500)
 
   const logs = (logRes.data ?? []) as { usr_id: string; actvty_dt: string }[]
   const users = (userRes.data ?? []) as { id: string; reg_dtm: string }[]

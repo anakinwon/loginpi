@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { apiError } from '@/lib/api-errors'
 
 // 어드민 스티커팩 상세 — 조회(스티커 목록 포함)·수정·논리삭제
 
@@ -9,7 +10,7 @@ type Params = { params: Promise<{ packId: string }> }
 export async function GET(_req: NextRequest, { params }: Params) {
   const requester = await getSessionUser()
   if (!isAdmin(requester)) {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+    return apiError('FORBIDDEN', 403)
   }
   const { packId } = await params
 
@@ -31,18 +32,14 @@ export async function GET(_req: NextRequest, { params }: Params) {
       .order('sort_ord'),
   ])
 
-  if (!pack)
-    return NextResponse.json(
-      { error: '팩을 찾을 수 없습니다' },
-      { status: 404 },
-    )
+  if (!pack) return apiError('ADM_STKR_PACK_NOT_FOUND', 404)
   return NextResponse.json({ pack, stickers: stickers ?? [] })
 }
 
 export async function PATCH(req: NextRequest, { params }: Params) {
   const requester = await getSessionUser()
   if (!isAdmin(requester)) {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+    return apiError('FORBIDDEN', 403)
   }
   const { packId } = await params
 
@@ -50,7 +47,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   try {
     body = await req.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
   const { pack_nm, pack_desc, theme_cd, price_bean, use_yn, is_dflt_yn } =
     body as {
@@ -70,10 +67,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   if (pack_nm !== undefined) {
     const name = pack_nm.trim()
     if (!name || name.length > 100) {
-      return NextResponse.json(
-        { error: '팩 이름은 1~100자여야 합니다' },
-        { status: 400 },
-      )
+      return apiError('ADM_STKR_PACK_NAME_RANGE', 400)
     }
     update.pack_nm = name
   }
@@ -82,10 +76,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   if (price_bean !== undefined) {
     const price = Number(price_bean)
     if (!Number.isInteger(price) || price < 0 || price > 100000) {
-      return NextResponse.json(
-        { error: '가격은 0~100000 Bean 정수여야 합니다' },
-        { status: 400 },
-      )
+      return apiError('ADM_STKR_PRICE_RANGE', 400)
     }
     update.price_bean = price
   }
@@ -99,15 +90,14 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     .eq('pack_id', packId)
     .eq('del_yn', 'N')
 
-  if (error)
-    return NextResponse.json({ error: '팩 수정 실패' }, { status: 500 })
+  if (error) return apiError('ADM_STKR_PACK_UPDATE_FAILED', 500)
   return NextResponse.json({ ok: true })
 }
 
 export async function DELETE(_req: NextRequest, { params }: Params) {
   const requester = await getSessionUser()
   if (!isAdmin(requester)) {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+    return apiError('FORBIDDEN', 403)
   }
   const { packId } = await params
 
@@ -122,7 +112,6 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
     .eq('pack_id', packId)
     .eq('del_yn', 'N')
 
-  if (error)
-    return NextResponse.json({ error: '팩 삭제 실패' }, { status: 500 })
+  if (error) return apiError('ADM_STKR_PACK_DELETE_FAILED', 500)
   return NextResponse.json({ ok: true })
 }

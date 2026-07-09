@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { apiError } from '@/lib/api-errors'
 
 // POST /api/admin/feedback/hide
 export async function POST(req: NextRequest) {
   const user = await getSessionUser()
-  if (!isAdmin(user))
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+  if (!isAdmin(user)) return apiError('FORBIDDEN', 403)
 
   const body = await req.json().catch(() => null)
-  if (!body) return NextResponse.json({ error: '잘못된 요청' }, { status: 400 })
+  if (!body) return apiError('BAD_REQUEST', 400)
 
   const { fbck_id, hide_yn, hide_reason_txt } = body as {
     fbck_id: string
@@ -17,19 +17,12 @@ export async function POST(req: NextRequest) {
     hide_reason_txt?: string
   }
 
-  if (!fbck_id)
-    return NextResponse.json({ error: 'fbck_id가 필요합니다' }, { status: 400 })
+  if (!fbck_id) return apiError('ADM_FBCK_ID_REQUIRED', 400)
   if (hide_yn !== 'Y' && hide_yn !== 'N') {
-    return NextResponse.json(
-      { error: 'hide_yn은 Y 또는 N이어야 합니다' },
-      { status: 400 },
-    )
+    return apiError('ADM_FBCK_HIDE_YN_INVALID', 400)
   }
   if (hide_yn === 'Y' && !hide_reason_txt?.trim()) {
-    return NextResponse.json(
-      { error: '숨김 처리 시 사유를 입력해 주세요' },
-      { status: 400 },
-    )
+    return apiError('ADM_FBCK_HIDE_REASON_REQUIRED', 400)
   }
 
   const db = getSupabaseAdmin()
@@ -40,11 +33,7 @@ export async function POST(req: NextRequest) {
     .eq('del_yn', 'N')
     .maybeSingle()
 
-  if (!existing)
-    return NextResponse.json(
-      { error: '후기를 찾을 수 없습니다' },
-      { status: 404 },
-    )
+  if (!existing) return apiError('FBCK_NOT_FOUND', 404)
 
   const updates: Record<string, unknown> = {
     hide_yn,
@@ -63,7 +52,7 @@ export async function POST(req: NextRequest) {
     .from('fbck_mst')
     .update(updates)
     .eq('fbck_id', fbck_id)
-  if (error) return NextResponse.json({ error: '처리 실패' }, { status: 500 })
+  if (error) return apiError('ADM_PROCESS_FAILED', 500)
 
   return NextResponse.json({
     ok: true,

@@ -74,7 +74,8 @@ export default function RevenueAbcChart({ items }: { items: AbcItem[] }) {
         yaxis: 'y2',
         line: { color: colors[0], width: 2 },
         marker: { size: 5 },
-        hovertemplate: '누적: %{y:.1f}%<extra></extra>',
+        // plotly %{...} 토큰은 next-intl ICU 파싱과 충돌 → 접두 라벨만 t()로 붙인다
+        hovertemplate: `${t('abcCumHover')}: %{y:.1f}%<extra></extra>`,
       },
     ]
 

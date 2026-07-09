@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { validateMagicBytes } from '@/lib/upload-validate'
+import { apiError } from '@/lib/api-errors'
 
 // 어드민 스티커 추가 — multipart files 업로드 → Storage 저장 → msg_stkr INSERT
 // 커스텀 스티커 제작(/api/stickers/custom)과 동일한 보안 정책: SVG 제외(Stored XSS)
@@ -23,7 +24,7 @@ const BUCKET = 'chat-attachments'
 export async function POST(request: NextRequest, { params }: Params) {
   const requester = await getSessionUser()
   if (!isAdmin(requester)) {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+    return apiError('FORBIDDEN', 403)
   }
   const { packId } = await params
 
@@ -34,50 +35,31 @@ export async function POST(request: NextRequest, { params }: Params) {
     .eq('pack_id', packId)
     .eq('del_yn', 'N')
     .maybeSingle()
-  if (!pack)
-    return NextResponse.json(
-      { error: '팩을 찾을 수 없습니다' },
-      { status: 404 },
-    )
+  if (!pack) return apiError('ADM_STKR_PACK_NOT_FOUND', 404)
 
   let formData: FormData
   try {
     formData = await request.formData()
   } catch {
-    return NextResponse.json(
-      { error: '잘못된 요청 형식입니다' },
-      { status: 400 },
-    )
+    return apiError('BAD_REQUEST_FORMAT', 400)
   }
 
   const files = formData
     .getAll('files')
     .filter((f): f is File => f instanceof File)
   if (files.length < 1 || files.length > MAX_FILES) {
-    return NextResponse.json(
-      { error: `스티커 이미지는 1~${MAX_FILES}개여야 합니다` },
-      { status: 400 },
-    )
+    return apiError('ADM_STKR_FILE_COUNT', 400, { max: MAX_FILES })
   }
   for (const f of files) {
     if (f.size > MAX_BYTES) {
-      return NextResponse.json(
-        { error: '스티커 이미지는 1장당 2MB 이하여야 합니다' },
-        { status: 413 },
-      )
+      return apiError('ADM_STKR_FILE_TOO_LARGE', 413)
     }
     if (!ALLOWED_MIME.has(f.type)) {
-      return NextResponse.json(
-        { error: '허용되지 않은 이미지 형식입니다 (png/jpg/gif/webp)' },
-        { status: 415 },
-      )
+      return apiError('ADM_STKR_IMG_TYPE', 415)
     }
     // KISA MC: Magic Byte 검증 — 위조된 Content-Type 차단
     if (!validateMagicBytes(await f.arrayBuffer(), f.type)) {
-      return NextResponse.json(
-        { error: '파일 내용이 선언된 형식과 일치하지 않습니다' },
-        { status: 415 },
-      )
+      return apiError('FILE_CONTENT_MISMATCH', 415)
     }
   }
 
@@ -126,10 +108,7 @@ export async function POST(request: NextRequest, { params }: Params) {
   }
 
   if (rows.length === 0) {
-    return NextResponse.json(
-      { error: '스티커 이미지 업로드에 실패했습니다' },
-      { status: 500 },
-    )
+    return apiError('ADM_STKR_UPLOAD_FAILED', 500)
   }
 
   const { data: inserted, error } = await db
@@ -137,8 +116,7 @@ export async function POST(request: NextRequest, { params }: Params) {
     .insert(rows)
     .select('stkr_id, stkr_nm, stkr_url, sort_ord')
 
-  if (error)
-    return NextResponse.json({ error: '스티커 등록 실패' }, { status: 500 })
+  if (error) return apiError('ADM_STKR_CREATE_FAILED', 500)
   return NextResponse.json(
     { stickers: inserted ?? [], uploaded: rows.length },
     { status: 201 },

@@ -11,6 +11,7 @@ import {
   ACTIVE_COUNTRY_CODES,
   getAlpha2,
 } from '@/lib/locale-country'
+import { useApiMessage } from '@/hooks/use-api-error'
 
 // routing.ts에 등록된 locale 집합 — 미등록 locale은 영어로 폴백 서비스됨
 const ROUTING_LOCALES = new Set<string>(routing.locales)
@@ -61,6 +62,7 @@ export default function I18nPage() {
   const t = useTranslations('admin.i18n')
   const tc = useTranslations('common')
   const ta = useTranslations('adminI18n')
+  const resolveMsg = useApiMessage()
 
   const [stats, setStats] = useState<StatsData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -153,9 +155,11 @@ export default function I18nPage() {
         translated?: number
         error?: string
         message?: string
+        msgCode?: string
+        params?: Record<string, string | number>
       }
       if (!res.ok) throw new Error(d.error ?? t('translateFail'))
-      if (d.message) toast.info(d.message, { id: toastId })
+      if (d.message) toast.info(resolveMsg(d, d.message), { id: toastId })
       else
         toast.success(t('translateSuccess', { count: d.translated ?? 0 }), {
           id: toastId,

@@ -5,6 +5,7 @@ import { join, resolve, sep } from 'path'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { routing } from '@/i18n/routing'
 import { sanitizeError } from '@/lib/sanitize-error'
+import { apiError } from '@/lib/api-errors'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -56,7 +57,7 @@ export async function POST(req: NextRequest) {
     !!process.env.CRON_SECRET &&
     req.headers.get('authorization') === `Bearer ${process.env.CRON_SECRET}`
   if (!isAdmin(user) && !cronOk) {
-    return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+    return apiError('AUTH_REQUIRED', 401)
   }
 
   const body = (await req.json().catch(() => ({}))) as { locale?: string }
@@ -64,18 +65,12 @@ export async function POST(req: NextRequest) {
 
   // ko는 source of truth — 명시적 요청도 거부
   if (targetLocale !== undefined && SYNC_SKIP.has(targetLocale)) {
-    return NextResponse.json(
-      { error: 'ko는 DB→JSON 동기화 대상이 아닙니다' },
-      { status: 400 },
-    )
+    return apiError('ADM_I18N_KO_SYNC_EXCLUDED', 400)
   }
 
   // 요청 locale이 있으면 허용 목록에서 검증
   if (targetLocale !== undefined && !ALLOWED_LOCALES.has(targetLocale)) {
-    return NextResponse.json(
-      { error: '유효하지 않은 locale입니다' },
-      { status: 400 },
-    )
+    return apiError('ADM_I18N_INVALID_LOCALE', 400)
   }
 
   const { data: locales } = await supabase

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { sendA2U, isA2UEnabled } from '@/lib/pi-a2u'
+import { apiError } from '@/lib/api-errors'
 
 // POST /api/admin/payments/[id]/refund — 관리자 수동 환불 (pi_pymnt 단건, 전액)
 // 입금 확인된(completed) U2A 결제를 공식 A2U 흐름(create→submit→complete)으로 되돌려준다.
@@ -23,14 +24,9 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const admin = await getSessionUser()
-  if (!isAdmin(admin))
-    return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+  if (!isAdmin(admin)) return apiError('FORBIDDEN', 401)
 
-  if (!isA2UEnabled())
-    return NextResponse.json(
-      { error: 'A2U 비활성 (PI_API_KEY/PI_WALLET_PRIVATE_SEED 미설정)' },
-      { status: 503 },
-    )
+  if (!isA2UEnabled()) return apiError('ADM_A2U_DISABLED', 503)
 
   const { id } = await params
   const db = getSupabaseAdmin()
@@ -40,11 +36,7 @@ export async function POST(
     .select('id, payment_id, user_id, amount, status, metadata')
     .eq('id', id)
     .maybeSingle()
-  if (!pymnt)
-    return NextResponse.json(
-      { error: '결제를 찾을 수 없습니다' },
-      { status: 404 },
-    )
+  if (!pymnt) return apiError('ADM_PAYMENT_NOT_FOUND', 404)
 
   const meta = (pymnt.metadata ?? {}) as { type?: string; refund?: RefundMeta }
   const amount = Number(pymnt.amount)
@@ -55,13 +47,14 @@ export async function POST(
     amount <= 0 ||
     meta.type === 'ADMIN_REFUND'
   )
-    return NextResponse.json(
-      { error: '환불 대상이 아닙니다 (완료된 결제만 환불 가능)' },
-      { status: 409 },
-    )
+    return apiError('ADM_REFUND_NOT_ELIGIBLE', 409)
   if (meta.refund && meta.refund.status !== 'error')
     return NextResponse.json(
-      { error: '이미 환불되었거나 처리 중입니다', refund: meta.refund },
+      {
+        error: '이미 환불되었거나 처리 중입니다',
+        code: 'ADM_REFUND_ALREADY',
+        refund: meta.refund,
+      },
       { status: 409 },
     )
 
@@ -72,11 +65,7 @@ export async function POST(
     .eq('id', pymnt.user_id)
     .maybeSingle()
   const uid = (payer as { pi_uid?: string } | null)?.pi_uid
-  if (!uid)
-    return NextResponse.json(
-      { error: '결제자의 Pi 계정 정보(pi_uid)가 없어 A2U 환불이 불가합니다' },
-      { status: 409 },
-    )
+  if (!uid) return apiError('ADM_REFUND_NO_PI_UID', 409)
 
   const now = new Date().toISOString()
   const adminId = admin!.id
@@ -97,10 +86,7 @@ export async function POST(
     .or('metadata->refund.is.null,metadata->refund->>status.eq.error')
     .select('id')
   if (!claimed || claimed.length === 0)
-    return NextResponse.json(
-      { error: '다른 요청이 이미 환불을 처리 중입니다' },
-      { status: 409 },
-    )
+    return apiError('ADM_REFUND_CONCURRENT', 409)
 
   try {
     // 공식 A2U 3단계 — 앱 지갑 서명·블록체인 제출 (Stellar memo는 ASCII ≤28바이트)
@@ -166,9 +152,6 @@ export async function POST(
       })
       .eq('id', id)
     console.error('[admin/refund] A2U 송금 실패:', id, message)
-    return NextResponse.json(
-      { error: `A2U 송금 실패: ${message}` },
-      { status: 502 },
-    )
+    return apiError('ADM_A2U_REMIT_FAILED', 502, { message })
   }
 }

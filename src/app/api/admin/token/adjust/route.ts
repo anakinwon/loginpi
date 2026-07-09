@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { applyBean } from '@/lib/bean'
+import { apiError } from '@/lib/api-errors'
 
 // 수동 조정 사유 화이트리스트 — 어뷰징 방지
 const ALLOWED_REASONS = [
@@ -26,7 +27,7 @@ interface AdjustBody {
 export async function POST(req: NextRequest) {
   const user = await getSessionUser()
   if (!isAdmin(user)) {
-    return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+    return apiError('FORBIDDEN', 401)
   }
 
   const body = (await req.json()) as Partial<AdjustBody>
@@ -36,40 +37,25 @@ export async function POST(req: NextRequest) {
     typeof body.adj_bean !== 'number' ||
     body.adj_bean === 0
   ) {
-    return NextResponse.json(
-      { error: 'usr_id와 adj_bean(0 제외)은 필수입니다' },
-      { status: 400 },
-    )
+    return apiError('ADM_ADJUST_FIELDS_REQUIRED', 400)
   }
   if (!body.reason || !ALLOWED_REASONS.includes(body.reason as AdjustReason)) {
-    return NextResponse.json(
-      {
-        error: `reason은 다음 중 하나여야 합니다: ${ALLOWED_REASONS.join(', ')}`,
-      },
-      { status: 400 },
-    )
+    return apiError('ADM_ADJUST_REASON_INVALID', 400, {
+      reasons: ALLOWED_REASONS.join(', '),
+    })
   }
   // evidence_url — javascript:/data: Stored XSS 차단: http(s)만 허용, 길이 상한
   if (body.evidence_url !== undefined && body.evidence_url !== null) {
     if (body.evidence_url.length > 2048) {
-      return NextResponse.json(
-        { error: 'evidence_url이 너무 깁니다 (최대 2048자)' },
-        { status: 400 },
-      )
+      return apiError('ADM_EVIDENCE_URL_TOO_LONG', 400)
     }
     try {
       const u = new URL(body.evidence_url)
       if (u.protocol !== 'https:' && u.protocol !== 'http:') {
-        return NextResponse.json(
-          { error: 'evidence_url은 http(s) URL만 허용합니다' },
-          { status: 400 },
-        )
+        return apiError('ADM_EVIDENCE_URL_PROTOCOL', 400)
       }
     } catch {
-      return NextResponse.json(
-        { error: 'evidence_url이 유효한 URL이 아닙니다' },
-        { status: 400 },
-      )
+      return apiError('ADM_EVIDENCE_URL_INVALID', 400)
     }
   }
 

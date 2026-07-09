@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { apiError } from '@/lib/api-errors'
 
 const PAGE_SIZE = 50
 
 export async function GET(req: NextRequest) {
   const requester = await getSessionUser()
-  if (!isAdmin(requester))
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+  if (!isAdmin(requester)) return apiError('FORBIDDEN', 403)
 
   const { searchParams } = new URL(req.url)
   const tbl = searchParams.get('tbl') ?? ''
@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
   if (to) query = query.lte('chg_dtm', `${to}T23:59:59.999Z`)
 
   const { data, error, count } = await query
-  if (error) return NextResponse.json({ error: '조회 실패' }, { status: 500 })
+  if (error) return apiError('QUERY_FAILED', 500)
 
   return NextResponse.json({
     logs: data ?? [],

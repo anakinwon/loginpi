@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { publicCacheHeaders } from '@/lib/cache-headers'
+import { apiError } from '@/lib/api-errors'
 import type { BeanRevenueResponse } from '@/types/stats'
 
 // GET /api/admin/stats/bean-revenue — Bean 매출 KPI(누적) 집계.
@@ -16,7 +17,7 @@ export async function GET() {
   )
   if (error) {
     console.error('[Bean 매출 KPI] 집계 실패:', error.message)
-    return NextResponse.json({ error: '매출 집계 실패' }, { status: 500 })
+    return apiError('ADM_BEAN_REVENUE_FAILED', 500)
   }
 
   const body: BeanRevenueResponse = {

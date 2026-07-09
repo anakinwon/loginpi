@@ -1,7 +1,8 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import PlotlyPlot from './plotly-plot'
-import { themeLabel } from '@/lib/stats-labels'
+import { isSystemThemeCode } from '@/lib/stats-labels'
 import type { RevenueDataPoint } from '@/types/stats'
 
 const COLORS = [
@@ -45,6 +46,7 @@ interface Props {
 }
 
 export default function RevenueTimelineChart({ data }: Props) {
+  const t = useTranslations('adminAnalytics')
   // 테마 목록 추출 (삽입 순서 유지)
   const themes = [...new Set(data.map((d) => d.theme_cd))]
   const dates = [...new Set(data.map((d) => d.stat_dt))].sort()
@@ -55,7 +57,7 @@ export default function RevenueTimelineChart({ data }: Props) {
         .filter((d) => d.theme_cd === theme)
         .map((d) => [d.stat_dt, d.rev_pi]),
     )
-    const label = themeLabel(theme)
+    const label = isSystemThemeCode(theme) ? t(`theme.${theme}`) : theme
     return {
       x: dates,
       y: dates.map((dt) => revByDate.get(dt) ?? 0),

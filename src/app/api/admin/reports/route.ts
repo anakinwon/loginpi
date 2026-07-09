@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { apiError } from '@/lib/api-errors'
 
 // 신고 처리 (관리자 전용) — rpt_report 목록·상태/메모 갱신.
 // FK 미설계 → 신고자명은 reporter_id로 sys_user 별도 .in() 병합.
@@ -21,7 +22,7 @@ interface RptRow {
 export async function GET(req: NextRequest) {
   const user = await getSessionUser()
   if (!isAdmin(user)) {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+    return apiError('FORBIDDEN', 403)
   }
 
   const sp = req.nextUrl.searchParams
@@ -42,7 +43,7 @@ export async function GET(req: NextRequest) {
   q = q.order('reg_dtm', { ascending: false }).range(from, from + limit - 1)
 
   const { data, count, error } = await q
-  if (error) return NextResponse.json({ error: '조회 실패' }, { status: 500 })
+  if (error) return apiError('QUERY_FAILED', 500)
   const rows = (data ?? []) as RptRow[]
 
   // 신고자명 병합
@@ -76,22 +77,21 @@ export async function GET(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   const user = await getSessionUser()
   if (!isAdmin(user)) {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+    return apiError('FORBIDDEN', 403)
   }
 
   let body: unknown
   try {
     body = await req.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
   const { rpt_id, status_cd, admin_memo } = body as {
     rpt_id?: string
     status_cd?: string
     admin_memo?: string
   }
-  if (!rpt_id)
-    return NextResponse.json({ error: 'rpt_id 필요' }, { status: 400 })
+  if (!rpt_id) return apiError('ADM_REPORT_ID_REQUIRED', 400)
 
   const patch: Record<string, unknown> = {
     modr_id: user!.id,
@@ -99,7 +99,7 @@ export async function PATCH(req: NextRequest) {
   }
   if (status_cd !== undefined) {
     if (!STATUS.includes(status_cd)) {
-      return NextResponse.json({ error: '유효하지 않은 상태' }, { status: 400 })
+      return apiError('ADM_INVALID_STATUS', 400)
     }
     patch.status_cd = status_cd
     patch.handler_id = user!.id
@@ -117,7 +117,6 @@ export async function PATCH(req: NextRequest) {
     .eq('del_yn', 'N')
     .select('rpt_id, status_cd, admin_memo')
     .maybeSingle()
-  if (error || !data)
-    return NextResponse.json({ error: '저장 실패' }, { status: 500 })
+  if (error || !data) return apiError('SAVE_FAILED', 500)
   return NextResponse.json({ item: data })
 }

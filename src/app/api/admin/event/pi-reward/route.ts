@@ -3,13 +3,13 @@ import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { triggerPiReward } from '@/lib/pi-reward'
 import { sanitizeError } from '@/lib/sanitize-error'
+import { apiError } from '@/lib/api-errors'
 
 // GET /api/admin/event/pi-reward?event_id=...
 // Pi 보상 지급 현황 목록 (관리자 전용)
 export async function GET(req: Request) {
   const user = await getSessionUser()
-  if (!isAdmin(user))
-    return NextResponse.json({ error: '관리자 권한 필요' }, { status: 403 })
+  if (!isAdmin(user)) return apiError('ADM_ADMIN_REQUIRED', 403)
 
   const { searchParams } = new URL(req.url)
   const eventId = searchParams.get('event_id') ?? 'evt-20260614-001'
@@ -59,14 +59,13 @@ export async function GET(req: Request) {
 // body: { event_id?, target?: 'all' | 'failed' | user_id }
 export async function POST(req: Request) {
   const user = await getSessionUser()
-  if (!isAdmin(user))
-    return NextResponse.json({ error: '관리자 권한 필요' }, { status: 403 })
+  if (!isAdmin(user)) return apiError('ADM_ADMIN_REQUIRED', 403)
 
   let body: unknown
   try {
     body = await req.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
 
   const { event_id: eventId = 'evt-20260614-001', target = 'failed' } =

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { apiError } from '@/lib/api-errors'
 
 const DEST_WALLETS = ['REWARD_POOL', 'PLATFORM', 'FOUNDATION'] as const
 
@@ -9,7 +10,7 @@ const DEST_WALLETS = ['REWARD_POOL', 'PLATFORM', 'FOUNDATION'] as const
 export async function POST(req: NextRequest) {
   const user = await getSessionUser()
   if (!isAdmin(user)) {
-    return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+    return apiError('FORBIDDEN', 401)
   }
 
   const body = (await req.json().catch(() => ({}))) as {
@@ -20,24 +21,17 @@ export async function POST(req: NextRequest) {
 
   const amt = Math.floor(Number(body.bean_amt))
   if (!Number.isInteger(amt) || amt <= 0) {
-    return NextResponse.json(
-      { error: '발행액(bean_amt)은 1 이상의 정수여야 합니다' },
-      { status: 400 },
-    )
+    return apiError('ADM_MINT_AMT_MIN', 400)
   }
   const dest = body.dest_wallet ?? 'REWARD_POOL'
   if (!(DEST_WALLETS as readonly string[]).includes(dest)) {
-    return NextResponse.json(
-      { error: `dest_wallet은 ${DEST_WALLETS.join(', ')} 중 하나여야 합니다` },
-      { status: 400 },
-    )
+    return apiError('ADM_MINT_DEST_INVALID', 400, {
+      wallets: DEST_WALLETS.join(', '),
+    })
   }
   const reason = (body.reason ?? '').trim()
   if (!reason) {
-    return NextResponse.json(
-      { error: '발행 사유(reason)는 필수입니다' },
-      { status: 400 },
-    )
+    return apiError('ADM_MINT_REASON_REQUIRED', 400)
   }
 
   const { data, error } = await getSupabaseAdmin().rpc('fn_bean_mint', {
@@ -48,7 +42,7 @@ export async function POST(req: NextRequest) {
   })
   if (error) {
     console.error('[token/mint] 발행 실패:', error.message)
-    return NextResponse.json({ error: '발행 처리 실패' }, { status: 500 })
+    return apiError('ADM_MINT_FAILED', 500)
   }
 
   return NextResponse.json({ ok: true, dest_wallet: dest, balance: data })

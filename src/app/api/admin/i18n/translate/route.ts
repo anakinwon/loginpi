@@ -3,6 +3,8 @@ import { createClient } from '@supabase/supabase-js'
 import { readFile } from 'fs/promises'
 import { join } from 'path'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
+import { apiError } from '@/lib/api-errors'
+import { apiMessage } from '@/lib/api-errors/messages'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -99,29 +101,20 @@ export async function POST(req: NextRequest) {
     !!process.env.CRON_SECRET &&
     req.headers.get('authorization') === `Bearer ${process.env.CRON_SECRET}`
   if (!isAdmin(user) && !cronOk) {
-    return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+    return apiError('AUTH_REQUIRED', 401)
   }
 
   const { locale } = (await req.json()) as { locale: string }
 
   if (!locale || locale === 'ko') {
-    return NextResponse.json(
-      { error: '번역 대상 언어가 잘못됐습니다' },
-      { status: 400 },
-    )
+    return apiError('ADM_I18N_INVALID_TARGET_LANG', 400)
   }
 
   const localeName = getLocaleName(locale)
 
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) {
-    return NextResponse.json(
-      {
-        error:
-          'GEMINI_API_KEY가 설정되지 않았습니다. aistudio.google.com/apikey에서 무료 발급 후 .env.local에 추가하세요.',
-      },
-      { status: 500 },
-    )
+    return apiError('ADM_I18N_GEMINI_KEY_MISSING', 500)
   }
 
   const koJsonPath = join(process.cwd(), 'messages', 'ko.json')
@@ -131,17 +124,11 @@ export async function POST(req: NextRequest) {
     const koJson = JSON.parse(raw) as Record<string, unknown>
     koFlat = flattenJson(koJson)
   } catch {
-    return NextResponse.json(
-      { error: 'ko.json 파일을 읽을 수 없습니다' },
-      { status: 500 },
-    )
+    return apiError('ADM_I18N_KO_JSON_UNREADABLE', 500)
   }
 
   if (Object.keys(koFlat).length === 0) {
-    return NextResponse.json(
-      { error: 'ko.json이 비어있습니다' },
-      { status: 400 },
-    )
+    return apiError('ADM_I18N_KO_JSON_EMPTY', 400)
   }
 
   // PostgREST 기본 1,000행 제한 회피 — 전체 기존 키를 페이징 수집
@@ -173,7 +160,7 @@ export async function POST(req: NextRequest) {
   }
 
   if (Object.keys(toTranslate).length === 0) {
-    return NextResponse.json({ translated: 0, message: '번역할 키가 없습니다' })
+    return NextResponse.json({ translated: 0, ...apiMessage('I18N_NO_KEYS') })
   }
 
   const entries = Object.entries(toTranslate)
@@ -206,17 +193,13 @@ ${JSON.stringify(batch, null, 2)}`
         error: apiErr instanceof Error ? apiErr.message : String(apiErr),
       })
       // 이미 번역된 데이터가 있으면 부분 성공 반환, 없으면 오류
-      const msg =
-        totalUpserted > 0
-          ? '일부 번역 후 중단되었습니다. 관리자에게 문의하세요'
-          : '번역 작업이 실패했습니다. 잠시 후 다시 시도해주세요'
       if (totalUpserted > 0) {
         return NextResponse.json({
           translated: totalUpserted,
-          message: msg,
+          ...apiMessage('I18N_PARTIAL_STOP'),
         })
       }
-      return NextResponse.json({ error: msg }, { status: 502 })
+      return apiError('ADM_I18N_TRANSLATE_FAILED', 502)
     }
 
     let translated: Record<string, string> = {}

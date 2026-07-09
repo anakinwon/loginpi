@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { sanitizeThemeTokens } from '@/lib/ui-theme'
+import { apiError } from '@/lib/api-errors'
 
 // PATCH /api/admin/ui-themes/[themeId] — 테마 수정 (이름·설명·색상·정렬)
 export async function PATCH(
@@ -10,7 +11,7 @@ export async function PATCH(
 ) {
   const requester = await getSessionUser()
   if (!isAdmin(requester)) {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+    return apiError('FORBIDDEN', 403)
   }
 
   const { themeId } = await params
@@ -21,7 +22,7 @@ export async function PATCH(
     sort_ord?: number
   } | null
 
-  if (!body) return NextResponse.json({ error: '잘못된 요청' }, { status: 400 })
+  if (!body) return apiError('BAD_REQUEST', 400)
 
   const patch: Record<string, unknown> = {
     modr_id: requester?.id ?? 'ADMIN',
@@ -30,10 +31,7 @@ export async function PATCH(
   if (body.theme_nm !== undefined) {
     const nm = body.theme_nm.trim()
     if (!nm || nm.length > 50) {
-      return NextResponse.json(
-        { error: '테마명은 1~50자여야 합니다' },
-        { status: 400 },
-      )
+      return apiError('ADM_THEME_NAME_LENGTH', 400)
     }
     patch.theme_nm = nm
   }
@@ -53,12 +51,8 @@ export async function PATCH(
     )
     .maybeSingle()
 
-  if (error) return NextResponse.json({ error: '수정 실패' }, { status: 500 })
-  if (!data)
-    return NextResponse.json(
-      { error: '테마를 찾을 수 없습니다' },
-      { status: 404 },
-    )
+  if (error) return apiError('UPDATE_FAILED', 500)
+  if (!data) return apiError('ADM_THEME_NOT_FOUND', 404)
   return NextResponse.json({ theme: data })
 }
 
@@ -69,7 +63,7 @@ export async function DELETE(
 ) {
   const requester = await getSessionUser()
   if (!isAdmin(requester)) {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+    return apiError('FORBIDDEN', 403)
   }
 
   const { themeId } = await params
@@ -83,22 +77,12 @@ export async function DELETE(
     .eq('del_yn', 'N')
     .maybeSingle()
 
-  if (!theme)
-    return NextResponse.json(
-      { error: '테마를 찾을 수 없습니다' },
-      { status: 404 },
-    )
+  if (!theme) return apiError('ADM_THEME_NOT_FOUND', 404)
   if ((theme as { actv_yn: string }).actv_yn === 'Y') {
-    return NextResponse.json(
-      { error: '활성 테마는 삭제할 수 없습니다' },
-      { status: 409 },
-    )
+    return apiError('ADM_THEME_ACTIVE_DELETE_FORBIDDEN', 409)
   }
   if ((theme as { lock_yn: string }).lock_yn === 'Y') {
-    return NextResponse.json(
-      { error: '기본 테마는 삭제할 수 없습니다' },
-      { status: 409 },
-    )
+    return apiError('ADM_THEME_DEFAULT_DELETE_FORBIDDEN', 409)
   }
 
   const now = new Date().toISOString()
@@ -113,6 +97,6 @@ export async function DELETE(
     .eq('theme_id', themeId)
     .eq('del_yn', 'N')
 
-  if (error) return NextResponse.json({ error: '삭제 실패' }, { status: 500 })
+  if (error) return apiError('DELETE_FAILED', 500)
   return NextResponse.json({ ok: true })
 }

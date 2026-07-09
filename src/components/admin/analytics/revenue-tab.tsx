@@ -14,7 +14,7 @@ import { useFeeMode } from '@/components/feature-flag-provider'
 import { BeanIcon } from '@/components/ui/bean-icon'
 import RevenueTreemapChart from '@/components/charts/revenue-treemap-chart'
 import BubbleChart from '@/components/charts/bubble-chart'
-import { themeLabel, themeColorMap, THEME_LABEL } from '@/lib/stats-labels'
+import { themeColorMap, isSystemThemeCode } from '@/lib/stats-labels'
 import type { RevenueStatsResponse, BeanRevenueResponse } from '@/types/stats'
 
 // Plotly 차트는 window 의존 → dynamic + ssr:false
@@ -154,11 +154,11 @@ export function RevenueTab({ period }: { period: number }) {
 
   // 테마명 — 시스템 분류 코드(구독·기타 등)는 번역키, 카페 테마명(DB)은 theme_nm 그대로
   const themeName = (cd: string, nm?: string | null) =>
-    cd in THEME_LABEL
+    isSystemThemeCode(cd)
       ? t(`theme.${cd}`)
       : tTheme.has(cd)
         ? tTheme(cd)
-        : (nm ?? themeLabel(cd))
+        : (nm ?? cd)
 
   // ABC 분석 대상 — 테마별 Pi 매출 (topThemes)
   const abcItems = useMemo(
