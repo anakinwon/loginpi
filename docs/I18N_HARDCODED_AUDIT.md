@@ -5,6 +5,12 @@
 > 권장 전략: 파일별 t() 전환이 아니라 **공유 에러코드 카탈로그(ko/en) 신설 → API `{ error, code }` 반환 → 클라이언트 `t(code)` 해석**.
 > 추가 보류 2건: `payError.includes('충전')` 조건분기(group-room-creator.tsx:602)·`chat-auth.ts` plan_nm — 에러코드화 단계에서 함께 처리.
 
+> ## ✅ P2-A/B·성공 message 완결 (2026-07-09 저녁, 커밋 09bc3f4c·74c195f8)
+> - admin API 82파일/233지점 → apiError 전환(기존 재사용 + 신규 ADM_ 141코드, 카탈로그 4파일: admin-stats·admin-std·admin-content·admin-ops)
+> - 성공 message → apiMessage()/useApiMessage (apiMsgs 5코드) · admin lib: stats-labels(adminAnalytics.theme 재사용)·ABC차트 전환, telegram-webhook은 비노출 확인
+> - 457키(에러 451+메시지 등) × 66언어 완주·운영DB 델타 85,916행 반영. 정당 잔존만 유지(sanitizeError 폴백=KISA·Pi memo·AI 프롬프트·DB 저장값)
+> - 최종 잔여(소규모 후속): analytics 차트 라벨맵(소비 컴포넌트 동시 개편 필요) · ops-deploy MASTER 동적 문구 12종 · chat-auth plan_nm · payError.includes('충전') 분기
+>
 > ## ✅ P1-C 완결 (2026-07-09 오후, 커밋 124edb4·cdb832d9·8771de21·7fe339fa·9f43bb4d)
 > 사용자 API 에러 **107개 route / 약 487지점 전량** 에러코드 체계로 전환 완료.
 > - 아키텍처: `src/lib/api-errors/`(공통 23 + 도메인 287 = **310코드**, 도메인별 파일로 분리) + `apiError(code, status, params?)` → `{ error: 한국어 폴백, code, params }` 반환 + 클라이언트 `useApiErrorMessage()` 훅(`src/hooks/use-api-error.ts`) — code 없으면 error 폴백이라 **미전환 소비처 하위호환**
