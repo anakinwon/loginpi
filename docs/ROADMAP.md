@@ -41,7 +41,7 @@ Pi Browser + 일반 브라우저를 모두 지원하는 Next.js 16 기반 Pi Net
 | 17 | BEAN 토큰 발행 (Pi Launchpad) | 📝 기획·문서 전용 | 앱 코드 0 유지. T01 KYC·T02 신청·T05 법무 외부 회신 대기 (PRD_12) |
 | 18 | 판매자 주문 알림 (Telegram 3계층 Outbox) | ✅ 100% | PRD_13 |
 | 19 | Bean Token 경제 관리 | 🔶 P0 완료 | 잔여: bean_fee_plan 하드코딩 DB 이전(보류) (PRD_16) |
-| 20 | 화면 성능 최적화 (6탭 전수 진단) | 🚧 Phase 1 적용 | 잔여 CRITICAL 2건: CAFE WebSocket 폴백·MAP 클러스터링 (SHOP window.Pi 가드는 2026-07-09 검증 종결 — 4개 진입점 기구현 확인) (PRD_18) |
+| 20 | 화면 성능 최적화 (6탭 전수 진단) | ✅ **CRITICAL 전량 종결** (2026-07-09 전수 확인) | CAFE 폴백·MAP 클러스터링=6/23 기구현(bda03c35)·SHOP 가드=기구현 — 스테일 잔여 표기 정리. +유령 폴링 실버그 수정(방 이탈 후 폴링 누수, disposed 가드). 잔여는 HIGH/MEDIUM급 (PRD_18) |
 | 21 | 보안 강화 (KISA 21 + DDoS 5계층) | 🔶 코드 완료 | 잔여: Vercel Firewall/BotID 수동 설정·Supabase timeout·세션 블랙리스트 (PRD_2) |
 | 22 | 데이터 분석 4탭 통합 페이지 | 🚧 P1 구현 진행 | 매출 탭 KPI 델타 배지+오늘 실시간 매출 적용(2026-07-08). 잔여: 나머지 탭·sql/122~125 (PRD_21) |
 | 23 | 실시간 시스템 모니터링 | 🚧 착수 | `/admin/monitor` 24메트릭·Pi 결제 성공률 최우선. 미결정: 저장·보존·갱신주기 (PRD_22) |

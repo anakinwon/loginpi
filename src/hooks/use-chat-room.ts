@@ -318,6 +318,9 @@ export function useChatRoom(
   // 서버 브로드캐스트 수신 (클라이언트는 수신만 — 발송은 API 서버가 담당)
   // postgres_changes 대신 broadcast를 사용하므로 RLS 설정 불필요
   useEffect(() => {
+    // removeChannel이 subscribe 콜백에 CLOSED를 전달하므로, cleanup 이후의
+    // CLOSED가 startPolling을 되살리는 유령 폴링을 disposed 가드로 차단
+    let disposed = false
     const supabase = getSupabaseClient()
     const channel = supabase.channel(`room:${roomId}`)
 
@@ -348,6 +351,7 @@ export function useChatRoom(
         setOnlineUserIds([...new Set(ids)])
       })
       .subscribe(async (status) => {
+        if (disposed) return
         if (status === 'SUBSCRIBED') {
           stopPolling() // WebSocket 정상 — polling 폴백 불필요(복구 시 자동 중지)
           await channel.track({ userId: currentUserId })
@@ -368,6 +372,7 @@ export function useChatRoom(
     channelRef.current = channel
 
     return () => {
+      disposed = true
       stopPolling()
       supabase.removeChannel(channel)
       channelRef.current = null

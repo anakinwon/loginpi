@@ -167,7 +167,7 @@
 | R-07 | **텔레그램 봇 단일 장애점** — Pi Browser 푸시 부재의 유일 대체 채널 | 중 | 🟠 높음 (주문·채팅 알림 유실) | webhook 자가치유 cron 1분(b3563c0)·환경별 봇 분리 철칙·진단 API `/api/admin/telegram/webhook`·앱 내 Realtime+Pull 2계층 백업 | ✅ 자가치유 배포 |
 | R-08 | **법무 컴플라이언스** — (구)문서 현행화 지연 → 4종 v1.1 완결(2026-07-09 공지·7/16 시행)로 해소. ⭐**법무 전략 확정(2026-07-09 마스터)**: 상시 법무팀 불요 — ①기본 컴플라이언스=자체 문서 체계(완료) ②VASP 쟁점=에스크로 보관 규모 확대 시 1회 스팟 자문(유일한 워치 포인트) ③T05 증권성=토큰 발행 결정 시점으로 이연. 외부 법무 자문은 **Pi 공식 요구 아님 이중 확인**(PRD_12 v1.8 + 2026-07-09 웹 재확인 — 등재 요구=KYC·브랜딩·Pi SDK·품질·개발자 약관뿐). 원칙: 법무 요구 발생 시 "Pi 공식 요구 vs 자체 안전장치" 먼저 구분 | 저 | 🟡 중간 | 트리거형 스팟 자문 노선 | ✅ 전략 확정·문서 v1.1 완결 |
 | R-09 | **service_role 단일 커넥션 풀 천장** — RLS 비활성 구조상 전 부하가 한 풀로 수렴 | 중 (사용자 증가 시) | 🟠 높음 | A 레지스터 공통 천장 참조·pooler 사이즈 모니터링(/admin/monitor DB 부하 메트릭) | 🚧 모니터링 구축 중 |
-| R-10 | **잔여 CRITICAL 성능 2건** — CAFE WebSocket 폴백·MAP 마커 클러스터링 (SHOP window.Pi 가드는 ✅2026-07-09 검증 종결: 결제 진입 4곳 — store-item-detail·client-cart·seller-bond-card·client-bean-wallet — 전부 `if(!window.Pi)`+toast 안내 확인) | 중 | 🟡 중간 | PRD_18 Phase 2 잔여 작업으로 관리 | 🚧 2건 대기 |
+| R-10 | **성능 CRITICAL — 전량 종결** (✅2026-07-09 전수 확인): SHOP window.Pi 가드=4개 진입점 기구현·CAFE WebSocket 폴백=6/23 기구현(bda03c35, 5초 polling+after 커서)·MAP 클러스터링=6/23 기구현(@googlemaps/markerclusterer). 점검 중 **유령 폴링 실버그 발견·수정**(2026-07-09): removeChannel의 CLOSED 콜백이 cleanup 후 startPolling을 되살려 방 이탈마다 이전 방 폴링 영구 지속 → disposed 가드 추가. 잔여는 PRD_18 HIGH/MEDIUM급만 | 저 | 🟢 낮음 | PRD_18 Phase 2(HIGH/MEDIUM)로 관리 | ✅ CRITICAL 0건 |
 
 > **성능 레지스터(A) 현행화 노트 [2026-07-08]**: substring 검색 trigram 확대(§ 2026-06-20 항목)는 sql/072·076으로 **적용 완료**. 다국어 리스크(#7)는 활성 locale 24→**189개 확장(2026-07-07)** 으로 민감 변수가 커졌으나 번역 캐시·빌드 검증 통과로 현재 안정. 나머지 7종 분석은 여전히 유효.
 
