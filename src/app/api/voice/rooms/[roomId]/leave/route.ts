@@ -7,6 +7,7 @@ import {
   getActiveParticipant,
   closeCallSessionIfLast,
 } from '@/lib/voice'
+import { apiError } from '@/lib/api-errors'
 
 type Params = { params: Promise<{ roomId: string }> }
 
@@ -21,15 +22,10 @@ interface LeaveBody {
 export async function POST(req: Request, { params }: Params) {
   const { roomId } = await params
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   const participant = await getActiveParticipant(roomId, user.id)
-  if (!participant)
-    return NextResponse.json(
-      { error: '음성채널 참여 중이 아닙니다' },
-      { status: 404 },
-    )
+  if (!participant) return apiError('VOICE_NOT_PARTICIPANT', 404)
 
   const stats = (await req.json().catch(() => ({}))) as LeaveBody
   const supabase = getSupabaseAdmin()

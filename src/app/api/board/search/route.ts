@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { apiError } from '@/lib/api-errors'
 
 // GET /api/board/search?q=검색어&limit=20
 // 통합검색 — 전 카테고리(brd_post)를 가로질러 제목·본문 substring 검색.
@@ -42,7 +43,7 @@ export async function GET(request: NextRequest) {
     .order('reg_dtm', { ascending: false })
     .limit(limit)
 
-  if (error) return NextResponse.json({ error: '검색 실패' }, { status: 500 })
+  if (error) return apiError('BOARD_SEARCH_FAILED', 500)
 
   type Row = {
     post_id: string

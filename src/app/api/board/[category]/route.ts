@@ -3,6 +3,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth-check'
 import { getCategory, hasMinRole } from '@/lib/board'
 import { sanitizeTitle, sanitizeMarkdown } from '@/lib/sanitize'
+import { apiError } from '@/lib/api-errors'
 
 // GET /api/board/[category]?page=1&limit=20&q=검색어
 export async function GET(
@@ -12,10 +13,7 @@ export async function GET(
   const { category } = await params
   const ctgr = await getCategory(category)
   if (!ctgr) {
-    return NextResponse.json(
-      { error: '존재하지 않는 게시판입니다' },
-      { status: 404 },
-    )
+    return apiError('BOARD_NOT_FOUND', 404)
   }
 
   const { searchParams } = request.nextUrl
@@ -50,7 +48,7 @@ export async function GET(
 
   const { data, count, error } = await query
   if (error) {
-    return NextResponse.json({ error: '목록 조회 실패' }, { status: 500 })
+    return apiError('LIST_FAILED', 500)
   }
 
   // 갤러리 게시판이면 각 게시글의 첫 번째 이미지를 thumb_url로 병합
@@ -99,23 +97,20 @@ export async function POST(
   ])
 
   if (!ctgr) {
-    return NextResponse.json(
-      { error: '존재하지 않는 게시판입니다' },
-      { status: 404 },
-    )
+    return apiError('BOARD_NOT_FOUND', 404)
   }
   if (!user) {
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+    return apiError('AUTH_REQUIRED', 401)
   }
   if (!hasMinRole(user.role, ctgr.wr_min_role_cd)) {
-    return NextResponse.json({ error: '작성 권한이 없습니다' }, { status: 403 })
+    return apiError('BOARD_WRITE_FORBIDDEN', 403)
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
 
   const { post_ttl, post_cont } = body as {
@@ -123,7 +118,7 @@ export async function POST(
     post_cont?: string
   }
   if (!post_ttl?.trim()) {
-    return NextResponse.json({ error: '제목을 입력해주세요' }, { status: 400 })
+    return apiError('BOARD_TITLE_REQUIRED', 400)
   }
 
   const { data, error } = await getSupabaseAdmin()
@@ -141,7 +136,7 @@ export async function POST(
     .single()
 
   if (error) {
-    return NextResponse.json({ error: '게시글 작성 실패' }, { status: 500 })
+    return apiError('BOARD_CREATE_FAILED', 500)
   }
 
   return NextResponse.json({ post_id: data.post_id }, { status: 201 })

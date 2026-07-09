@@ -1,6 +1,7 @@
 import { createHmac } from 'crypto'
 import { NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
+import { apiError } from '@/lib/api-errors'
 
 // POST /api/voice/turn-credentials
 // Pi 토큰 검증 후 TTL 짧은 TURN 임시 자격증명 반환.
@@ -16,8 +17,7 @@ interface IceServer {
 
 export async function POST() {
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   const ttl = Number(process.env.TURN_CREDENTIAL_TTL ?? 3600)
 

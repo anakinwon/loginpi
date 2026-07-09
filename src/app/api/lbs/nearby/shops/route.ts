@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { publicCacheHeaders } from '@/lib/cache-headers'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { apiError } from '@/lib/api-errors'
 
 // GET /api/lbs/nearby/shops?lat=37.5&lng=127.0&radius_m=5000&page=1&limit=20
 // 위치 기반 상점 목록 조회 (페이지네이션)
@@ -34,17 +35,11 @@ export async function GET(request: NextRequest) {
 
   // 입력값 검증
   if (!lat || !lng || isNaN(lat) || isNaN(lng)) {
-    return NextResponse.json(
-      { error: 'lat, lng는 필수 숫자 필드입니다' },
-      { status: 400 },
-    )
+    return apiError('LOC_LATLNG_NUMERIC_REQUIRED', 400)
   }
 
   if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
-    return NextResponse.json(
-      { error: '좌표 범위를 벗어났습니다' },
-      { status: 400 },
-    )
+    return apiError('LOC_COORD_OUT_OF_RANGE', 400)
   }
 
   try {
@@ -175,6 +170,6 @@ export async function GET(request: NextRequest) {
     )
   } catch (err) {
     console.error('[lbs/nearby/shops] 조회 실패:', err)
-    return NextResponse.json({ error: '상점 조회 실패' }, { status: 500 })
+    return apiError('LOC_SHOP_QUERY_FAILED', 500)
   }
 }

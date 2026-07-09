@@ -4,6 +4,7 @@ import { getSessionUser } from '@/lib/auth-check'
 import { getCategory } from '@/lib/board'
 import { validateMagicBytes } from '@/lib/upload-validate'
 import { randomUUID } from 'crypto'
+import { apiError } from '@/lib/api-errors'
 
 const BUCKET = 'board-attachments'
 const MAX_FILES = 5
@@ -83,8 +84,7 @@ export async function GET(_request: NextRequest, { params }: Params) {
     .order('sort_ord', { ascending: true })
     .order('reg_dtm', { ascending: true })
 
-  if (error)
-    return NextResponse.json({ error: '첨부파일 조회 실패' }, { status: 500 })
+  if (error) return apiError('BOARD_ATTACH_LIST_FAILED', 500)
   return NextResponse.json({ attachments: data ?? [] })
 }
 
@@ -96,18 +96,10 @@ export async function POST(request: NextRequest, { params }: Params) {
     getSessionUser(),
   ])
 
-  if (!ctgr)
-    return NextResponse.json(
-      { error: '존재하지 않는 게시판입니다' },
-      { status: 404 },
-    )
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!ctgr) return apiError('BOARD_NOT_FOUND', 404)
+  if (!user) return apiError('AUTH_REQUIRED', 401)
   if (ctgr.attch_yn !== 'Y') {
-    return NextResponse.json(
-      { error: '이 게시판은 첨부파일을 지원하지 않습니다' },
-      { status: 403 },
-    )
+    return apiError('BOARD_ATTACH_NOT_SUPPORTED', 403)
   }
 
   const db = getSupabaseAdmin()
@@ -121,19 +113,12 @@ export async function POST(request: NextRequest, { params }: Params) {
     .eq('del_yn', 'N')
     .single()
 
-  if (!post)
-    return NextResponse.json(
-      { error: '게시글을 찾을 수 없습니다' },
-      { status: 404 },
-    )
+  if (!post) return apiError('BOARD_POST_NOT_FOUND', 404)
 
   const isOwner = post.rgst_usr_id === user.id
   const isModerator = user.role === 'ADMIN' || user.role === 'MASTER'
   if (!isOwner && !isModerator) {
-    return NextResponse.json(
-      { error: '첨부파일 업로드 권한이 없습니다' },
-      { status: 403 },
-    )
+    return apiError('BOARD_ATTACH_UPLOAD_FORBIDDEN', 403)
   }
 
   // 기존 첨부파일 수 확인 (5개 제한)
@@ -147,26 +132,18 @@ export async function POST(request: NextRequest, { params }: Params) {
   try {
     formData = await request.formData()
   } catch {
-    return NextResponse.json(
-      { error: '잘못된 요청 형식입니다' },
-      { status: 400 },
-    )
+    return apiError('BAD_REQUEST_FORMAT', 400)
   }
 
   const files = formData.getAll('files') as File[]
   if (files.length === 0) {
-    return NextResponse.json(
-      { error: '업로드할 파일을 선택해주세요' },
-      { status: 400 },
-    )
+    return apiError('BOARD_ATTACH_FILE_REQUIRED', 400)
   }
   if ((existing ?? 0) + files.length > MAX_FILES) {
-    return NextResponse.json(
-      {
-        error: `첨부파일은 최대 ${MAX_FILES}개까지 가능합니다 (현재 ${existing ?? 0}개)`,
-      },
-      { status: 400 },
-    )
+    return apiError('BOARD_ATTACH_MAX_FILES', 400, {
+      max: MAX_FILES,
+      count: existing ?? 0,
+    })
   }
 
   // sort_ord가 FormData에 있으면 사용 (갤러리 업로드 시 명시적 순서 지정)
@@ -184,10 +161,7 @@ export async function POST(request: NextRequest, { params }: Params) {
   for (let i = 0; i < files.length; i++) {
     const file = files[i]
     if (file.size > MAX_SIZE) {
-      return NextResponse.json(
-        { error: `파일 크기는 20MB를 초과할 수 없습니다 (${file.name})` },
-        { status: 400 },
-      )
+      return apiError('BOARD_ATTACH_FILE_TOO_LARGE', 400, { name: file.name })
     }
 
     // KISA FU 검증: 카테고리별 MIME 화이트리스트 적용
@@ -195,19 +169,13 @@ export async function POST(request: NextRequest, { params }: Params) {
       ALLOWED_MIME_BY_CATEGORY[ctgr.ctgr_cd] ?? ALLOWED_MIME_DEFAULT
     const ext = mimeMap.get(file.type)
     if (!ext) {
-      return NextResponse.json(
-        { error: '허용되지 않은 파일 형식입니다' },
-        { status: 415 },
-      )
+      return apiError('FILE_TYPE_NOT_ALLOWED', 415)
     }
 
     // KISA MC: Magic Byte 검증 — 위조된 Content-Type 차단
     const buffer = await file.arrayBuffer()
     if (!validateMagicBytes(buffer, file.type)) {
-      return NextResponse.json(
-        { error: `파일 내용이 선언된 형식과 일치하지 않습니다 (${file.name})` },
-        { status: 415 },
-      )
+      return apiError('BOARD_FILE_CONTENT_MISMATCH', 415, { name: file.name })
     }
 
     const storagePath = `${postId}/${randomUUID()}.${ext}`
@@ -227,10 +195,7 @@ export async function POST(request: NextRequest, { params }: Params) {
         fileType: file.type,
         error: uploadErr.message,
       })
-      return NextResponse.json(
-        { error: '파일 업로드에 실패했습니다. 잠시 후 다시 시도해주세요' },
-        { status: 500 },
-      )
+      return apiError('UPLOAD_FAILED', 500)
     }
 
     const {
@@ -263,10 +228,7 @@ export async function POST(request: NextRequest, { params }: Params) {
         storagePath,
         error: dbErr.message,
       })
-      return NextResponse.json(
-        { error: '파일 업로드에 실패했습니다. 잠시 후 다시 시도해주세요' },
-        { status: 500 },
-      )
+      return apiError('UPLOAD_FAILED', 500)
     }
 
     uploaded.push({

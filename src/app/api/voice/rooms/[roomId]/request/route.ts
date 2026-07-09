@@ -8,6 +8,7 @@ import {
   countMemberSlots,
   updateMicState,
 } from '@/lib/voice'
+import { apiError } from '@/lib/api-errors'
 
 type Params = { params: Promise<{ roomId: string }> }
 
@@ -17,15 +18,10 @@ type Params = { params: Promise<{ roomId: string }> }
 export async function POST(_req: Request, { params }: Params) {
   const { roomId } = await params
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   const participant = await getActiveParticipant(roomId, user.id)
-  if (!participant)
-    return NextResponse.json(
-      { error: '음성채널 참여 중이 아닙니다' },
-      { status: 403 },
-    )
+  if (!participant) return apiError('VOICE_NOT_PARTICIPANT', 403)
 
   // 이미 송출 중이거나 신청 중이면 멱등 응답
   if (participant.mic_st_cd !== 'LISTEN_ONLY') {
@@ -35,12 +31,7 @@ export async function POST(_req: Request, { params }: Params) {
   const participants = await getActiveParticipants(roomId)
   const { occupied } = countMemberSlots(participants)
   if (occupied >= VOICE_MAX_MEMBER_SLOTS) {
-    return NextResponse.json(
-      {
-        error: `보이스챗 정원(멤버 ${VOICE_MAX_MEMBER_SLOTS}명)이 가득 찼습니다 — 자리가 나면 다시 신청해 주세요`,
-      },
-      { status: 400 },
-    )
+    return apiError('VOICE_SLOTS_FULL', 400, { max: VOICE_MAX_MEMBER_SLOTS })
   }
 
   await updateMicState(participant.participant_id, 'PENDING', user.display_name)

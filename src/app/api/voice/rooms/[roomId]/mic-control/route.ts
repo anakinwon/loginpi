@@ -10,6 +10,7 @@ import {
   updateMicState,
   type MicState,
 } from '@/lib/voice'
+import { apiError } from '@/lib/api-errors'
 
 type Params = { params: Promise<{ roomId: string }> }
 
@@ -39,30 +40,22 @@ const ACTION_ALIAS: Record<string, 'approve' | 'deny' | 'revoke' | 'grant'> = {
 export async function POST(req: Request, { params }: Params) {
   const { roomId } = await params
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   // 방장 권한 검증 — OWNER 또는 ADMIN만 제어 가능
   const mbr = await getRoomMember(roomId, user.id)
   if (!mbr || (mbr.mbr_role_cd !== 'OWNER' && mbr.mbr_role_cd !== 'ADMIN')) {
-    return NextResponse.json(
-      { error: '방장만 보이스챗 권한을 제어할 수 있습니다' },
-      { status: 403 },
-    )
+    return apiError('VOICE_HOST_ONLY_MIC_CONTROL', 403)
   }
 
   const body = (await req.json().catch(() => null)) as MicControlBody | null
   const action = body?.action ? ACTION_ALIAS[body.action] : undefined
   if (!body?.target_usr_id || !action) {
-    return NextResponse.json({ error: '잘못된 요청' }, { status: 400 })
+    return apiError('BAD_REQUEST', 400)
   }
 
   const target = await getActiveParticipant(roomId, body.target_usr_id)
-  if (!target)
-    return NextResponse.json(
-      { error: '음성채널에 없는 참여자입니다' },
-      { status: 404 },
-    )
+  if (!target) return apiError('VOICE_PARTICIPANT_NOT_IN_CHANNEL', 404)
 
   // 상태 전이 검증 + 송출 허용(approve/grant) 시 멤버 CONNECTED 정원 재확인
   let nextState: MicState
@@ -77,12 +70,9 @@ export async function POST(req: Request, { params }: Params) {
         target.mic_st_cd !== 'CONNECTED' &&
         connected >= VOICE_MAX_MEMBER_SLOTS
       ) {
-        return NextResponse.json(
-          {
-            error: `동시 보이스챗은 멤버 최대 ${VOICE_MAX_MEMBER_SLOTS}명까지입니다`,
-          },
-          { status: 400 },
-        )
+        return apiError('VOICE_MAX_SLOTS', 400, {
+          max: VOICE_MAX_MEMBER_SLOTS,
+        })
       }
     }
     nextState = 'CONNECTED'

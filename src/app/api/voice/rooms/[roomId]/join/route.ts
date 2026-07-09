@@ -10,6 +10,7 @@ import {
   openCallSessionIfFirst,
 } from '@/lib/voice'
 import { recordUserAction } from '@/lib/event'
+import { apiError } from '@/lib/api-errors'
 
 type Params = { params: Promise<{ roomId: string }> }
 
@@ -19,12 +20,10 @@ type Params = { params: Promise<{ roomId: string }> }
 export async function POST(_req: Request, { params }: Params) {
   const { roomId } = await params
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   const mbr = await getRoomMember(roomId, user.id)
-  if (!mbr)
-    return NextResponse.json({ error: '카페 멤버가 아닙니다' }, { status: 403 })
+  if (!mbr) return apiError('VOICE_NOT_CAFE_MEMBER', 403)
 
   const isOwner = mbr.mbr_role_cd === 'OWNER' || mbr.mbr_role_cd === 'ADMIN'
 
@@ -65,7 +64,7 @@ export async function POST(_req: Request, { params }: Params) {
         participants: await getActiveParticipants(roomId),
       })
     }
-    return NextResponse.json({ error: '음성채널 입장 실패' }, { status: 500 })
+    return apiError('VOICE_JOIN_FAILED', 500)
   }
 
   const updated = await getActiveParticipants(roomId)

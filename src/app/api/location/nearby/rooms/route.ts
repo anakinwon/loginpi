@@ -2,19 +2,16 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { sanitizeError } from '@/lib/sanitize-error'
+import { apiError } from '@/lib/api-errors'
 
 // GET /api/location/nearby/rooms?lat=&lng=&radius=
 // msg_room.latd_crd/lngt_crd 직접 사용 — LBS 동의자 카페 생성 위치 기준 (loc_tp_cd='05')
 export async function GET(request: NextRequest) {
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   if (user.lbs_consent_yn !== 'Y') {
-    return NextResponse.json(
-      { error: '위치기반서비스 이용약관에 동의하지 않으셨습니다' },
-      { status: 403 },
-    )
+    return apiError('LOC_CONSENT_REQUIRED', 403)
   }
 
   const sp = request.nextUrl.searchParams
@@ -30,10 +27,7 @@ export async function GET(request: NextRequest) {
     lng < -180 ||
     lng > 180
   ) {
-    return NextResponse.json(
-      { error: 'lat, lng는 필수 유효한 WGS84 좌표입니다' },
-      { status: 400 },
-    )
+    return apiError('LOC_LATLNG_WGS84_REQUIRED', 400)
   }
 
   const db = getSupabaseAdmin()

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth-check'
 import { getCategory } from '@/lib/board'
+import { apiError } from '@/lib/api-errors'
 
 type Params = { params: Promise<{ category: string; postId: string }> }
 
@@ -10,10 +11,7 @@ export async function GET(_request: NextRequest, { params }: Params) {
   const { category, postId } = await params
   const ctgr = await getCategory(category)
   if (!ctgr) {
-    return NextResponse.json(
-      { error: '존재하지 않는 게시판입니다' },
-      { status: 404 },
-    )
+    return apiError('BOARD_NOT_FOUND', 404)
   }
 
   const db = getSupabaseAdmin()
@@ -27,10 +25,7 @@ export async function GET(_request: NextRequest, { params }: Params) {
     .single()
 
   if (fetchErr || !postData) {
-    return NextResponse.json(
-      { error: '게시글을 찾을 수 없습니다' },
-      { status: 404 },
-    )
+    return apiError('BOARD_POST_NOT_FOUND', 404)
   }
 
   // 조회수 비동기 증가 (응답 지연 없음)
@@ -71,12 +66,9 @@ export async function PATCH(request: NextRequest, { params }: Params) {
   ])
 
   if (!ctgr)
-    return NextResponse.json(
-      { error: '존재하지 않는 게시판입니다' },
-      { status: 404 },
-    )
+    return apiError('BOARD_NOT_FOUND', 404)
   if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+    return apiError('AUTH_REQUIRED', 401)
 
   const { data: post } = await getSupabaseAdmin()
     .from('brd_post')
@@ -86,22 +78,19 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     .single()
 
   if (!post)
-    return NextResponse.json(
-      { error: '게시글을 찾을 수 없습니다' },
-      { status: 404 },
-    )
+    return apiError('BOARD_POST_NOT_FOUND', 404)
 
   const isOwner = post.rgst_usr_id === user.id
   const isModerator = user.role === 'ADMIN' || user.role === 'MASTER'
   if (!isOwner && !isModerator) {
-    return NextResponse.json({ error: '수정 권한이 없습니다' }, { status: 403 })
+    return apiError('UPDATE_FORBIDDEN', 403)
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
 
   const { post_ttl, post_cont } = body as {
@@ -109,7 +98,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     post_cont?: string
   }
   if (!post_ttl?.trim()) {
-    return NextResponse.json({ error: '제목을 입력해주세요' }, { status: 400 })
+    return apiError('BOARD_TITLE_REQUIRED', 400)
   }
 
   const { error } = await getSupabaseAdmin()
@@ -122,7 +111,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     })
     .eq('post_id', postId)
 
-  if (error) return NextResponse.json({ error: '수정 실패' }, { status: 500 })
+  if (error) return apiError('UPDATE_FAILED', 500)
   return NextResponse.json({ success: true })
 }
 
@@ -135,12 +124,9 @@ export async function DELETE(_request: NextRequest, { params }: Params) {
   ])
 
   if (!ctgr)
-    return NextResponse.json(
-      { error: '존재하지 않는 게시판입니다' },
-      { status: 404 },
-    )
+    return apiError('BOARD_NOT_FOUND', 404)
   if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+    return apiError('AUTH_REQUIRED', 401)
 
   const { data: post } = await getSupabaseAdmin()
     .from('brd_post')
@@ -150,15 +136,12 @@ export async function DELETE(_request: NextRequest, { params }: Params) {
     .single()
 
   if (!post)
-    return NextResponse.json(
-      { error: '게시글을 찾을 수 없습니다' },
-      { status: 404 },
-    )
+    return apiError('BOARD_POST_NOT_FOUND', 404)
 
   const isOwner = post.rgst_usr_id === user.id
   const isModerator = user.role === 'ADMIN' || user.role === 'MASTER'
   if (!isOwner && !isModerator) {
-    return NextResponse.json({ error: '삭제 권한이 없습니다' }, { status: 403 })
+    return apiError('DELETE_FORBIDDEN', 403)
   }
 
   const { error } = await getSupabaseAdmin()
@@ -170,6 +153,6 @@ export async function DELETE(_request: NextRequest, { params }: Params) {
     })
     .eq('post_id', postId)
 
-  if (error) return NextResponse.json({ error: '삭제 실패' }, { status: 500 })
+  if (error) return apiError('DELETE_FAILED', 500)
   return NextResponse.json({ success: true })
 }

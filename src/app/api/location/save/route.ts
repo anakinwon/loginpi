@@ -2,26 +2,23 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { reverseGeocode } from '@/lib/google-maps'
+import { apiError } from '@/lib/api-errors'
 
 // Rule LBS-02: 서버에서 동의 재검증 — 클라이언트 캐시와 관계없이 DB 상태 기준
 export async function POST(request: NextRequest) {
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   // 동의하지 않은 사용자는 403 반환 (Rule LBS-02)
   if (user.lbs_consent_yn !== 'Y') {
-    return NextResponse.json(
-      { error: '위치기반서비스 이용약관에 동의하지 않으셨습니다' },
-      { status: 403 },
-    )
+    return apiError('LOC_CONSENT_REQUIRED', 403)
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
 
   const {
@@ -49,26 +46,17 @@ export async function POST(request: NextRequest) {
   }
 
   if (!loc_tp_cd || lat === undefined || lng === undefined) {
-    return NextResponse.json(
-      { error: 'loc_tp_cd, lat, lng는 필수입니다' },
-      { status: 400 },
-    )
+    return apiError('LOC_SAVE_FIELDS_REQUIRED', 400)
   }
 
   const VALID_LOC_TYPES = ['01', '02', '03', '04'] as const
   if (!(VALID_LOC_TYPES as readonly string[]).includes(loc_tp_cd)) {
-    return NextResponse.json(
-      { error: 'loc_tp_cd: 01(가입), 02(로그인), 03(매장), 04(상품거래)' },
-      { status: 400 },
-    )
+    return apiError('LOC_TP_CD_INVALID', 400)
   }
 
   // WGS84 좌표 범위 검증
   if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
-    return NextResponse.json(
-      { error: '유효하지 않은 좌표값입니다' },
-      { status: 400 },
-    )
+    return apiError('LOC_INVALID_COORD', 400)
   }
 
   // 행정구역 자동 보강 — 클라이언트가 시도/시군구/동/주소를 하나도 안 보냈을 때만
@@ -126,10 +114,7 @@ export async function POST(request: NextRequest) {
     .single()
 
   if (error) {
-    return NextResponse.json(
-      { error: '위치 저장 중 오류가 발생했습니다' },
-      { status: 500 },
-    )
+    return apiError('LOC_SAVE_FAILED', 500)
   }
 
   return NextResponse.json({ ok: true, loc_hist_id: data.loc_hist_id })

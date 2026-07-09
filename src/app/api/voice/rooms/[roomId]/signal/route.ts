@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
 import { broadcastToCall } from '@/lib/realtime-broadcast'
 import { getActiveParticipant } from '@/lib/voice'
+import { apiError } from '@/lib/api-errors'
 
 type Params = { params: Promise<{ roomId: string }> }
 
@@ -23,20 +24,15 @@ interface SignalBody {
 export async function POST(req: Request, { params }: Params) {
   const { roomId } = await params
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   // 음성채널 활성 참여자만 시그널 송신 가능
   const participant = await getActiveParticipant(roomId, user.id)
-  if (!participant)
-    return NextResponse.json(
-      { error: '음성채널 참여 중이 아닙니다' },
-      { status: 403 },
-    )
+  if (!participant) return apiError('VOICE_NOT_PARTICIPANT', 403)
 
   const body = (await req.json().catch(() => null)) as SignalBody | null
   if (!body || !SIGNAL_EVENTS.includes(body.event) || !body.to_usr_id) {
-    return NextResponse.json({ error: '잘못된 시그널 요청' }, { status: 400 })
+    return apiError('VOICE_INVALID_SIGNAL', 400)
   }
 
   await broadcastToCall(roomId, body.event, {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth-check'
+import { apiError } from '@/lib/api-errors'
 
 const BUCKET = 'board-attachments'
 
@@ -11,7 +12,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
   const { postId, attchId } = await params
   const user = await getSessionUser()
   if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+    return apiError('AUTH_REQUIRED', 401)
 
   const db = getSupabaseAdmin()
 
@@ -24,10 +25,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     .single()
 
   if (!attch)
-    return NextResponse.json(
-      { error: '첨부파일을 찾을 수 없습니다' },
-      { status: 404 },
-    )
+    return apiError('BOARD_ATTACH_NOT_FOUND', 404)
 
   const postOwnerId = (attch.brd_post as unknown as { rgst_usr_id: string })
     .rgst_usr_id
@@ -36,22 +34,19 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     user.role !== 'ADMIN' &&
     user.role !== 'MASTER'
   ) {
-    return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+    return apiError('FORBIDDEN', 403)
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청' }, { status: 400 })
+    return apiError('BAD_REQUEST', 400)
   }
 
   const sortOrd = (body as { sort_ord?: unknown }).sort_ord
   if (typeof sortOrd !== 'number') {
-    return NextResponse.json(
-      { error: 'sort_ord(number)가 필요합니다' },
-      { status: 400 },
-    )
+    return apiError('BOARD_ATTACH_SORT_ORD_REQUIRED', 400)
   }
 
   const { error: dbErr } = await db
@@ -59,8 +54,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     .update({ sort_ord: sortOrd, modr_id: user.display_name.slice(0, 20) })
     .eq('attch_id', attchId)
 
-  if (dbErr)
-    return NextResponse.json({ error: 'DB 업데이트 실패' }, { status: 500 })
+  if (dbErr) return apiError('UPDATE_FAILED', 500)
   return NextResponse.json({ success: true })
 }
 
@@ -71,7 +65,7 @@ export async function DELETE(_request: NextRequest, { params }: Params) {
   const user = await getSessionUser()
 
   if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+    return apiError('AUTH_REQUIRED', 401)
 
   const db = getSupabaseAdmin()
 
@@ -84,17 +78,14 @@ export async function DELETE(_request: NextRequest, { params }: Params) {
     .single()
 
   if (!attch)
-    return NextResponse.json(
-      { error: '첨부파일을 찾을 수 없습니다' },
-      { status: 404 },
-    )
+    return apiError('BOARD_ATTACH_NOT_FOUND', 404)
 
   const postOwnerId = (attch.brd_post as unknown as { rgst_usr_id: string })
     .rgst_usr_id
   const isOwner = postOwnerId === user.id
   const isModerator = user.role === 'ADMIN' || user.role === 'MASTER'
   if (!isOwner && !isModerator) {
-    return NextResponse.json({ error: '삭제 권한이 없습니다' }, { status: 403 })
+    return apiError('DELETE_FORBIDDEN', 403)
   }
 
   // DB 논리삭제
@@ -107,8 +98,7 @@ export async function DELETE(_request: NextRequest, { params }: Params) {
     })
     .eq('attch_id', attchId)
 
-  if (dbErr)
-    return NextResponse.json({ error: 'DB 삭제 실패' }, { status: 500 })
+  if (dbErr) return apiError('DELETE_FAILED', 500)
 
   // Storage 물리삭제 (실패해도 DB는 이미 논리삭제됨 — 고아 파일은 주기적 정리 대상)
   await db.storage.from(BUCKET).remove([attch.fl_pth])

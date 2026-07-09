@@ -1,3 +1,27 @@
 // i18n 에러코드 카탈로그 — board 도메인 (값=한국어 폴백 메시지)
 // messages/ko.json·en.json apiErrors 네임스페이스에 동일 키 동반 필수.
-export const BOARD_ERRORS = {} as const
+export const BOARD_ERRORS = {
+  BOARD_NOT_FOUND: '존재하지 않는 게시판입니다',
+  BOARD_WRITE_FORBIDDEN: '작성 권한이 없습니다',
+  BOARD_TITLE_REQUIRED: '제목을 입력해주세요',
+  BOARD_CREATE_FAILED: '게시글 작성 실패',
+  BOARD_SEARCH_FAILED: '검색 실패',
+  BOARD_POST_NOT_FOUND: '게시글을 찾을 수 없습니다',
+  BOARD_ACCEPT_QNA_ONLY: 'Q&A 게시판에서만 채택할 수 있습니다',
+  BOARD_ACCEPT_AUTHOR_ONLY: '질문 작성자만 채택할 수 있습니다',
+  BOARD_COMMENT_NOT_FOUND: '댓글을 찾을 수 없습니다',
+  BOARD_ACCEPT_FAILED: '채택 처리 실패',
+  BOARD_ATTACH_LIST_FAILED: '첨부파일 조회 실패',
+  BOARD_ATTACH_NOT_SUPPORTED: '이 게시판은 첨부파일을 지원하지 않습니다',
+  BOARD_ATTACH_UPLOAD_FORBIDDEN: '첨부파일 업로드 권한이 없습니다',
+  BOARD_ATTACH_FILE_REQUIRED: '업로드할 파일을 선택해주세요',
+  BOARD_ATTACH_MAX_FILES: '첨부파일은 최대 {max}개까지 가능합니다 (현재 {count}개)',
+  BOARD_ATTACH_FILE_TOO_LARGE: '파일 크기는 20MB를 초과할 수 없습니다 ({name})',
+  BOARD_FILE_CONTENT_MISMATCH: '파일 내용이 선언된 형식과 일치하지 않습니다 ({name})',
+  BOARD_ATTACH_NOT_FOUND: '첨부파일을 찾을 수 없습니다',
+  BOARD_ATTACH_SORT_ORD_REQUIRED: 'sort_ord(number)가 필요합니다',
+  BOARD_COMMENT_NOT_SUPPORTED: '이 게시판은 댓글을 지원하지 않습니다',
+  BOARD_COMMENT_REQUIRED: '댓글 내용을 입력해주세요',
+  BOARD_COMMENT_CREATE_FAILED: '댓글 작성 실패',
+  BOARD_COMMENT_DELETE_FAILED: '댓글 삭제 실패',
+} as const
