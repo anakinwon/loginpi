@@ -14,3 +14,20 @@ SET del_yn   = 'Y',
     mod_dtm  = CURRENT_TIMESTAMP
 WHERE item_key IN ('C_LAW_REVIEW', 'C_VASP')
   AND del_yn = 'N';
+
+-- ------------------------------------------------------------
+-- 2차 (2026-07-09 마스터 확정 — 책임 3분리 프레임): C_BIZ_REG·C_LAW_FILL 트리거형(NA) 전환
+--   P2P 개인·O2O 매장주=각자 책임. 플랫폼 자체분만: 통신판매업=공정위 고시 면제(50회/간이과세),
+--   사업자등록=수익 실현 시 20일 내. 트리거 도달 시 status_cd='TODO'로 되돌려 재활성화.
+-- ------------------------------------------------------------
+UPDATE public.ops_checklist SET
+  title='[트리거·현재 해당없음] 사업자등록+통신판매업 신고 — 수익 실현(환금·규모화) 또는 연 거래 50회 도달 시 TODO 전환',
+  note_txt='2026-07-09 확정: 플랫폼 자체분만 해당(P2P 개인·O2O 매장주는 각자 책임). 통신판매업=공정위 고시 면제(50회 미만/간이과세자)·사업자등록=영리 실현 시 20일 내(비용 0). LBS 간이신고(정부24 무료)도 등록 시 동시 처리',
+  status_cd='NA', modr_id='ADMIN', mod_dtm=CURRENT_TIMESTAMP
+WHERE item_key='C_BIZ_REG';
+
+UPDATE public.ops_checklist SET
+  title='[트리거·현재 해당없음] 약관 미기입값 — 사업자번호·위치책임자는 사업자등록 시 기입',
+  note_txt='2026-07-09 확정: 사업자번호·위치정보관리책임자=C_BIZ_REG 트리거 종속(등록 전엔 기입할 값 없음). 무비용 기입(작성일 등)은 자체 처리',
+  status_cd='NA', modr_id='ADMIN', mod_dtm=CURRENT_TIMESTAMP
+WHERE item_key='C_LAW_FILL';
