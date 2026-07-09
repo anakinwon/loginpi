@@ -3021,6 +3021,11 @@
     },
     "labels": {
       "noName": "(이름 없음)"
+    },
+    "export": {
+      "csv": "CSV 내보내기",
+      "working": "내보내는 중…",
+      "fail": "내보낼 데이터가 없거나 실패했습니다"
     }
   },
   "openPromo": {

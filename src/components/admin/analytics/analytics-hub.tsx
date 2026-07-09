@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
+import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
 import { readCache, writeCache } from '@/lib/client-cache'
 import { cn } from '@/lib/utils'
+import { collectArraySections, buildCsv, downloadCsv } from '@/lib/csv-export'
 import { StatsDateFilter } from '@/components/admin/stats/stats-date-filter'
 import { RevenueTab } from './revenue-tab'
 import { OrderTab } from './order-tab'
@@ -17,6 +19,23 @@ import type { ActivityStatsResponse } from '@/types/stats'
 
 const TAB_KEYS = ['usage', 'order', 'revenue', 'perf'] as const
 type TabKey = (typeof TAB_KEYS)[number]
+
+// 탭별 내보내기 데이터 소스 — 각 탭이 화면에 쓰는 API와 동일 (period 미사용 API는 그대로)
+const TAB_EXPORT_APIS: Record<TabKey, Array<{ name: string; url: string }>> = {
+  usage: [
+    { name: 'activity', url: '/api/admin/stats/activity?period={p}' },
+    { name: 'usage', url: '/api/admin/analytics/usage?period={p}' },
+  ],
+  order: [{ name: 'orders', url: '/api/admin/analytics/orders?period={p}' }],
+  revenue: [
+    { name: 'bean_revenue', url: '/api/admin/stats/bean-revenue' },
+    { name: 'revenue_monthly', url: '/api/admin/analytics/revenue-monthly' },
+  ],
+  perf: [
+    { name: 'performance', url: '/api/admin/analytics/performance?period={p}' },
+    { name: 'pageviews', url: '/api/admin/analytics/pageviews?period={p}' },
+  ],
+}
 
 function NorthStarMetric({
   label,
@@ -45,6 +64,32 @@ export function AnalyticsHub() {
   const [tab, setTab] = useState<TabKey>('usage')
   const [period, setPeriod] = useState(30)
   const [activity, setActivity] = useState<ActivityStatsResponse | null>(null)
+  const [exporting, setExporting] = useState(false)
+
+  // 현재 탭 데이터 CSV 내보내기 — 탭이 쓰는 API를 재호출해 배열 데이터셋을 섹션별로 직렬화
+  async function exportCurrentTab() {
+    if (exporting) return
+    setExporting(true)
+    try {
+      const sources = TAB_EXPORT_APIS[tab]
+      const sections: ReturnType<typeof collectArraySections> = []
+      for (const src of sources) {
+        const res = await piFetch(src.url.replace('{p}', String(period)))
+        if (!res.ok) continue
+        sections.push(...collectArraySections(await res.json(), src.name))
+      }
+      if (sections.length === 0) {
+        toast.error(t('export.fail'))
+        return
+      }
+      const today = new Date().toISOString().slice(0, 10)
+      downloadCsv(`analytics_${tab}_${period}d_${today}.csv`, buildCsv(sections))
+    } catch {
+      toast.error(t('export.fail'))
+    } finally {
+      setExporting(false)
+    }
+  }
 
   // 북극성: 활성 사용자(MAU)·고착도 — 누적 지표라 period 무관, 최근 30일 1회 조회
   useEffect(() => {
@@ -71,6 +116,13 @@ export function AnalyticsHub() {
       {/* 글로벌 컨트롤바 */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <StatsDateFilter period={period} onChange={setPeriod} />
+        <button
+          onClick={() => void exportCurrentTab()}
+          disabled={exporting}
+          className="text-muted-foreground hover:bg-muted hover:text-foreground rounded-lg border px-3 py-1.5 text-sm transition-colors disabled:opacity-50"
+        >
+          {exporting ? t('export.working') : t('export.csv')}
+        </button>
       </div>
 
       {/* ⭐ 북극성 배너 — 전 탭 고정 */}

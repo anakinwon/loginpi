@@ -892,6 +892,11 @@
       "region": "Region Distribution",
       "regionEmpty": "No location consent data.",
       "timeline": "DAU / WAU / MAU Trend"
+    },
+    "export": {
+      "csv": "Export CSV",
+      "working": "Exporting...",
+      "fail": "No data to export or export failed"
     }
   },
   "adminCampaign": {
