@@ -167,7 +167,7 @@
 | R-07 | **텔레그램 봇 단일 장애점** — Pi Browser 푸시 부재의 유일 대체 채널 | 중 | 🟠 높음 (주문·채팅 알림 유실) | webhook 자가치유 cron 1분(b3563c0)·환경별 봇 분리 철칙·진단 API `/api/admin/telegram/webhook`·앱 내 Realtime+Pull 2계층 백업 | ✅ 자가치유 배포 |
 | R-08 | **법무 문서 현행화 지연** — 7종 전부 v1.0(6/12), 텔레그램 제3자·Gemini 위탁·kakao_id 누락 | 확정 (갭 존재) | 🟠 높음 (개인정보 법령) | `docs/law/compliance/법무문서_갭점검_2026-07-08.md` 갭 9건 식별 완료 → 🔴 3건 개정 초안은 마스터 승인 대기 | 🚧 갭점검 완료 |
 | R-09 | **service_role 단일 커넥션 풀 천장** — RLS 비활성 구조상 전 부하가 한 풀로 수렴 | 중 (사용자 증가 시) | 🟠 높음 | A 레지스터 공통 천장 참조·pooler 사이즈 모니터링(/admin/monitor DB 부하 메트릭) | 🚧 모니터링 구축 중 |
-| R-10 | **잔여 CRITICAL 성능 3건** — CAFE WebSocket 폴백·SHOP 결제 window.Pi 가드·MAP 마커 클러스터링 | 중 | 🟡 중간 | PRD_18 Phase 2 잔여 작업으로 관리 | 🚧 대기 |
+| R-10 | **잔여 CRITICAL 성능 2건** — CAFE WebSocket 폴백·MAP 마커 클러스터링 (SHOP window.Pi 가드는 ✅2026-07-09 검증 종결: 결제 진입 4곳 — store-item-detail·client-cart·seller-bond-card·client-bean-wallet — 전부 `if(!window.Pi)`+toast 안내 확인) | 중 | 🟡 중간 | PRD_18 Phase 2 잔여 작업으로 관리 | 🚧 2건 대기 |
 
 > **성능 레지스터(A) 현행화 노트 [2026-07-08]**: substring 검색 trigram 확대(§ 2026-06-20 항목)는 sql/072·076으로 **적용 완료**. 다국어 리스크(#7)는 활성 locale 24→**189개 확장(2026-07-07)** 으로 민감 변수가 커졌으나 번역 캐시·빌드 검증 통과로 현재 안정. 나머지 7종 분석은 여전히 유효.
 
