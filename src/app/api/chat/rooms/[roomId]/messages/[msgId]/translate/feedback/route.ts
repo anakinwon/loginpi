@@ -3,6 +3,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth-check'
 import { getRoomMember } from '@/lib/chat'
 import { LOCALE_CD_RE } from '@/lib/chat-translate'
+import { apiError } from '@/lib/api-errors'
 
 type Params = { params: Promise<{ roomId: string; msgId: string }> }
 
@@ -12,18 +13,16 @@ type Params = { params: Promise<{ roomId: string; msgId: string }> }
 export async function POST(request: NextRequest, { params }: Params) {
   const { roomId, msgId } = await params
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   const mbr = await getRoomMember(roomId, user.id)
-  if (!mbr)
-    return NextResponse.json({ error: '카페 멤버가 아닙니다' }, { status: 403 })
+  if (!mbr) return apiError('CHAT_NOT_MEMBER', 403)
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
 
   const { locale_cd: localeCd, feedback } = body as {
@@ -31,16 +30,10 @@ export async function POST(request: NextRequest, { params }: Params) {
     feedback?: string
   }
   if (!localeCd || !LOCALE_CD_RE.test(localeCd)) {
-    return NextResponse.json(
-      { error: '유효하지 않은 locale 코드' },
-      { status: 400 },
-    )
+    return apiError('CHAT_INVALID_LOCALE', 400)
   }
   if (feedback !== 'Y' && feedback !== 'N') {
-    return NextResponse.json(
-      { error: 'feedback은 Y 또는 N이어야 합니다' },
-      { status: 400 },
-    )
+    return apiError('CHAT_FEEDBACK_YN', 400)
   }
 
   const slug = String(user.display_name ?? 'user').slice(0, 20)
@@ -57,13 +50,8 @@ export async function POST(request: NextRequest, { params }: Params) {
     .select('trans_id')
     .maybeSingle()
 
-  if (error)
-    return NextResponse.json({ error: '피드백 저장 실패' }, { status: 500 })
-  if (!data)
-    return NextResponse.json(
-      { error: '번역 캐시를 찾을 수 없습니다' },
-      { status: 404 },
-    )
+  if (error) return apiError('SAVE_FAILED', 500)
+  if (!data) return apiError('CHAT_TRANSLATE_CACHE_NOT_FOUND', 404)
 
   return NextResponse.json({ success: true, feedback })
 }

@@ -6,6 +6,7 @@ import { broadcastToRoom } from '@/lib/realtime-broadcast'
 import { recordUserAction } from '@/lib/event'
 import { getActiveFeeMode } from '@/lib/fee-resolver'
 import { withGuard } from '@/lib/api-guard'
+import { apiError } from '@/lib/api-errors'
 
 // 카페방 P2P Bean 선물 — Pi 결제가 아닌 Bean 실전송(USER→USER).
 // 보내는 사람 Bean 차감 + 받는 사람 적립을 fn_bean_transfer로 원자적 수행 후 TIP_NOTI 알림.
@@ -13,8 +14,7 @@ import { withGuard } from '@/lib/api-guard'
 
 async function handlePOST(request: NextRequest) {
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   // Bean 선물은 모든 사용자 허용 — 자기 Bean을 보내는 P2P 전송이라 구독 게이트 없음.
   // (잔액 부족은 transferBean이 INSUFFICIENT_BEAN으로 차단)
@@ -23,7 +23,7 @@ async function handlePOST(request: NextRequest) {
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
 
   const { room_id, recipient_id, amount } = body as {
@@ -33,28 +33,19 @@ async function handlePOST(request: NextRequest) {
   }
 
   if (!room_id || !recipient_id || amount === undefined) {
-    return NextResponse.json(
-      { error: 'room_id, recipient_id, amount가 필요합니다' },
-      { status: 400 },
-    )
+    return apiError('TIP_PARAMS_REQUIRED', 400)
   }
 
   // 고정 프리셋 + 직접입력(1~상한)을 통합 검증 — 정수·양수·상한 이내. 프리셋은 상한 이하라 자동 포함.
   const tipCfg = await getTipPresets()
   if (!Number.isInteger(amount) || amount <= 0 || amount > tipCfg.customMax) {
-    return NextResponse.json(
-      {
-        error: `1 ~ ${tipCfg.customMax.toLocaleString()} Bean 사이 정수만 가능합니다`,
-      },
-      { status: 400 },
-    )
+    return apiError('TIP_AMOUNT_RANGE', 400, {
+      max: tipCfg.customMax.toLocaleString(),
+    })
   }
 
   if (recipient_id === user.id) {
-    return NextResponse.json(
-      { error: '자기 자신에게 Bean을 보낼 수 없습니다' },
-      { status: 400 },
-    )
+    return apiError('TIP_SELF', 400)
   }
 
   const db = getSupabaseAdmin()
@@ -83,22 +74,13 @@ async function handlePOST(request: NextRequest) {
     ])
 
   if (!recipient) {
-    return NextResponse.json(
-      { error: '수신자를 찾을 수 없습니다' },
-      { status: 404 },
-    )
+    return apiError('TIP_RECIPIENT_NOT_FOUND', 404)
   }
   if (!senderMbr) {
-    return NextResponse.json(
-      { error: '해당 카페에 참여 중이 아닙니다' },
-      { status: 403 },
-    )
+    return apiError('TIP_NOT_IN_ROOM', 403)
   }
   if (!recipientMbr) {
-    return NextResponse.json(
-      { error: '수신자가 해당 카페에 없습니다' },
-      { status: 400 },
-    )
+    return apiError('TIP_RECIPIENT_NOT_IN_ROOM', 400)
   }
 
   // 직거래 문의방(Direct)에서는 Bean/Pi 선물 금지 — 거래 당사자 간 금전 선물 차단(요건).
@@ -109,10 +91,7 @@ async function handlePOST(request: NextRequest) {
     .eq('room_id', room_id)
     .maybeSingle()
   if ((giftRoom as { theme_cd?: string } | null)?.theme_cd === 'DIRECT') {
-    return NextResponse.json(
-      { error: '직거래 문의방에서는 선물을 보낼 수 없습니다' },
-      { status: 403 },
-    )
+    return apiError('TIP_NO_DIRECT_DEAL_ROOM', 403)
   }
 
   const recipientRow = recipient as { id: string; display_name: string | null }
@@ -156,6 +135,7 @@ async function handlePOST(request: NextRequest) {
         error: insufficient
           ? 'Bean 잔액이 부족합니다. 충전 후 다시 시도하세요.'
           : 'Bean 전송에 실패했습니다',
+        code: insufficient ? 'CHAT_BEAN_INSUFFICIENT' : 'TIP_TRANSFER_FAILED',
         requiresBean: insufficient,
       },
       { status: insufficient ? 402 : 500 },

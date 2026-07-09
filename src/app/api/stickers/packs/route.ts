@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth-check'
+import { apiError } from '@/lib/api-errors'
 
 interface StickerRow {
   stkr_id: string
@@ -22,8 +23,7 @@ interface PackRow {
 // GET /api/stickers/packs — 보유팩(전체 스티커) + 미보유 스토어팩(미리보기 3개)
 export async function GET() {
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   const db = getSupabaseAdmin()
 

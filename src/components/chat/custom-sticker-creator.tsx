@@ -3,6 +3,10 @@ import { useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
+import {
+  useApiErrorMessage,
+  type ApiErrorPayload,
+} from '@/hooks/use-api-error'
 
 // TASK-074: 커스텀 스티커 제작 다이얼로그 (Business 전용 — 권한은 API가 검증)
 // 이미지 1~10장 업로드 → 팩 생성. 마켓 판매 옵션 시 다른 사용자가 구매 가능.
@@ -16,6 +20,7 @@ export function CustomStickerCreator({
 }) {
   const t = useTranslations('chat')
   const tc = useTranslations('common')
+  const apiErr = useApiErrorMessage()
   const [packNm, setPackNm] = useState('')
   const [priceBean, setPriceBean] = useState('50')
   const [mktYn, setMktYn] = useState(false)
@@ -51,8 +56,7 @@ export function CustomStickerCreator({
         method: 'POST',
         body: fd,
       })
-      const data = (await res.json()) as {
-        error?: string
+      const data = (await res.json()) as ApiErrorPayload & {
         businessRequired?: boolean
         pack?: { sticker_cnt: number }
       }
@@ -60,7 +64,7 @@ export function CustomStickerCreator({
         toast.error(
           data.businessRequired
             ? t('customSticker.businessOnly')
-            : (data.error ?? t('customSticker.createFail')),
+            : apiErr(data, t('customSticker.createFail')),
         )
         return
       }

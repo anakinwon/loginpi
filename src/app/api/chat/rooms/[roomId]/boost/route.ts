@@ -5,6 +5,7 @@ import { getRoomMember } from '@/lib/chat'
 import { applyBean } from '@/lib/bean'
 import { ROOM_BOOST_BEAN, ROOM_BOOST_DAYS } from '@/lib/bean-fee'
 import { microFeeBean, applyPromoGate } from '@/lib/fee-resolver'
+import { apiError } from '@/lib/api-errors'
 
 type Params = { params: Promise<{ roomId: string }> }
 
@@ -13,16 +14,12 @@ type Params = { params: Promise<{ roomId: string }> }
 export async function POST(_req: Request, { params }: Params) {
   const { roomId } = await params
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   // 방장(OWNER)만 부스트 구매 가능
   const mbr = await getRoomMember(roomId, user.id)
   if (!mbr || mbr.mbr_role_cd !== 'OWNER')
-    return NextResponse.json(
-      { error: '카페 방장만 부스트할 수 있습니다' },
-      { status: 403 },
-    )
+    return apiError('CHAT_BOOST_OWNER_ONLY', 403)
 
   const db = getSupabaseAdmin()
   const { data: room } = await db
@@ -31,11 +28,7 @@ export async function POST(_req: Request, { params }: Params) {
     .eq('room_id', roomId)
     .eq('del_yn', 'N')
     .maybeSingle()
-  if (!room)
-    return NextResponse.json(
-      { error: '카페를 찾을 수 없습니다' },
-      { status: 404 },
-    )
+  if (!room) return apiError('CHAT_ROOM_NOT_FOUND', 404)
 
   // Bean 차감 — PI 모드(메인넷 등재 기간)는 마이크로 무료화로 차감 스킵 (PRD_24 §0)
   // 오픈기념행사 무료화 게이트 — PRD_26
@@ -60,6 +53,8 @@ export async function POST(_req: Request, { params }: Params) {
           error: insufficient
             ? `부스트에 ${feeBean} Bean이 필요합니다. 충전 후 다시 시도하세요.`
             : '부스트 처리에 실패했습니다',
+          code: insufficient ? 'CHAT_BOOST_FEE_REQUIRED' : 'CHAT_BOOST_FAILED',
+          ...(insufficient ? { params: { fee: feeBean } } : {}),
           requiresBean: insufficient,
           feeBean,
         },
@@ -99,10 +94,7 @@ export async function POST(_req: Request, { params }: Params) {
         regrId: user.display_name.slice(0, 20),
       })
     }
-    return NextResponse.json(
-      { error: '부스트 적용에 실패했습니다 (환불 처리됨)' },
-      { status: 500 },
-    )
+    return apiError('CHAT_BOOST_APPLY_FAILED', 500)
   }
 
   return NextResponse.json({

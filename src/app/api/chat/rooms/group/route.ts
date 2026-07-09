@@ -7,6 +7,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getRoomFeeBean } from '@/lib/bean-fee'
 import { applyBean, getBalance } from '@/lib/bean'
 import { getActiveFeeMode, applyPromoGate } from '@/lib/fee-resolver'
+import { apiError } from '@/lib/api-errors'
 
 // 무료 테마(FITNESS) = 일반카페(무료). 그 외 테마 = 프리미엄카페.
 // 프리미엄 생성료: 구독자는 패키지 할인으로 무료, 비구독자는 Bean으로 결제.
@@ -15,14 +16,14 @@ import { getActiveFeeMode, applyPromoGate } from '@/lib/fee-resolver'
 export async function POST(request: NextRequest) {
   const user = await getSessionUser()
   if (!user) {
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+    return apiError('AUTH_REQUIRED', 401)
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
 
   const {
@@ -46,7 +47,7 @@ export async function POST(request: NextRequest) {
   }
 
   if (!theme_cd) {
-    return NextResponse.json({ error: '테마를 선택해 주세요' }, { status: 400 })
+    return apiError('CHAT_THEME_REQUIRED', 400)
   }
 
   // 테마 등급으로 무료/유료 판정: 일반(BASIC) 테마 그룹 카페는 무료, PREMIUM 테마만 Bean 결제.
@@ -76,6 +77,7 @@ export async function POST(request: NextRequest) {
           return NextResponse.json(
             {
               error: 'Bean 잔액이 부족합니다. 충전 후 다시 시도하세요.',
+              code: 'CHAT_BEAN_INSUFFICIENT',
               requiresBean: true,
               feeBean: createFeeBean,
               balance: bal,
@@ -87,10 +89,7 @@ export async function POST(request: NextRequest) {
     }
   }
   if (!room_nm?.trim()) {
-    return NextResponse.json(
-      { error: '카페 이름을 입력해 주세요' },
-      { status: 400 },
-    )
+    return apiError('CHAT_ROOM_NAME_REQUIRED', 400)
   }
 
   // 무료로 개설되는 모든 방(생성료 0 Bean — 무료 테마·구독 혜택 무료 생성 포함) = 7일 고정·연장 불가.
@@ -164,6 +163,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(
           {
             error: 'Bean 잔액이 부족합니다. 충전 후 다시 시도하세요.',
+            code: 'CHAT_BEAN_INSUFFICIENT',
             requiresBean: true,
             feeBean: createFeeBean,
           },
@@ -210,6 +210,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ room }, { status: 201 })
   } catch {
-    return NextResponse.json({ error: '카페 생성 실패' }, { status: 500 })
+    return apiError('CHAT_ROOM_CREATE_FAILED', 500)
   }
 }

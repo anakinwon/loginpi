@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { broadcastToRoom } from '@/lib/realtime-broadcast'
+import { apiError } from '@/lib/api-errors'
 
 // TASK-072: 봇 메시지 전송 API (API Key 기반 — 세션 불필요)
 // POST /api/chat/bot/messages
@@ -10,10 +11,7 @@ export async function POST(request: NextRequest) {
   const auth = request.headers.get('authorization') ?? ''
   const match = /^Bot\s+(\S+)$/i.exec(auth)
   if (!match) {
-    return NextResponse.json(
-      { error: 'Authorization: Bot <api_key> 헤더가 필요합니다' },
-      { status: 401 },
-    )
+    return apiError('BOT_AUTH_HEADER_REQUIRED', 401)
   }
   const apiKey = match[1]
 
@@ -21,14 +19,11 @@ export async function POST(request: NextRequest) {
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
   const msgCont = String((body as { msg_cont?: string }).msg_cont ?? '').trim()
   if (!msgCont || msgCont.length > 2000) {
-    return NextResponse.json(
-      { error: '메시지 내용(2000자 이내)을 입력해주세요' },
-      { status: 400 },
-    )
+    return apiError('BOT_MESSAGE_CONTENT_REQUIRED', 400)
   }
 
   const db = getSupabaseAdmin()
@@ -40,11 +35,7 @@ export async function POST(request: NextRequest) {
     .eq('del_yn', 'N')
     .maybeSingle()
 
-  if (!hook)
-    return NextResponse.json(
-      { error: '유효하지 않은 API Key' },
-      { status: 401 },
-    )
+  if (!hook) return apiError('BOT_INVALID_API_KEY', 401)
 
   const hookRow = hook as {
     webhook_id: string
@@ -63,10 +54,7 @@ export async function POST(request: NextRequest) {
     .gte('reg_dtm', since)
     .eq('del_yn', 'N')
   if ((count ?? 0) >= 30) {
-    return NextResponse.json(
-      { error: '봇 메시지 전송 한도 초과 (분당 30건)' },
-      { status: 429 },
-    )
+    return apiError('BOT_RATE_LIMIT', 429)
   }
 
   const { data: msg, error } = await db
@@ -83,8 +71,7 @@ export async function POST(request: NextRequest) {
     .select()
     .single()
 
-  if (error || !msg)
-    return NextResponse.json({ error: '봇 메시지 전송 실패' }, { status: 500 })
+  if (error || !msg) return apiError('BOT_MESSAGE_SEND_FAILED', 500)
 
   await broadcastToRoom(hookRow.room_id, 'new_msg', msg)
   return NextResponse.json({ message: msg }, { status: 201 })

@@ -3,6 +3,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth-check'
 import { applyBean } from '@/lib/bean'
 import { getActiveFeeMode } from '@/lib/fee-resolver'
+import { apiError } from '@/lib/api-errors'
 
 type Params = { params: Promise<{ packId: string }> }
 
@@ -11,8 +12,7 @@ type Params = { params: Promise<{ packId: string }> }
 export async function POST(_req: NextRequest, { params }: Params) {
   const { packId } = await params
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   const db = getSupabaseAdmin()
 
@@ -25,10 +25,7 @@ export async function POST(_req: NextRequest, { params }: Params) {
     .maybeSingle()
 
   if (!pack) {
-    return NextResponse.json(
-      { error: '존재하지 않는 스티커 팩입니다' },
-      { status: 404 },
-    )
+    return apiError('STKR_PACK_NOT_FOUND', 404)
   }
 
   const packRow = pack as {
@@ -40,10 +37,7 @@ export async function POST(_req: NextRequest, { params }: Params) {
 
   const isFree = packRow.is_dflt_yn === 'Y' || Number(packRow.price_bean) === 0
   if (isFree) {
-    return NextResponse.json(
-      { error: '무료 팩은 구매가 필요 없습니다' },
-      { status: 400 },
-    )
+    return apiError('STKR_FREE_PACK_NO_BUY', 400)
   }
 
   // 중복 구매 방지
@@ -56,10 +50,7 @@ export async function POST(_req: NextRequest, { params }: Params) {
     .maybeSingle()
 
   if (existing) {
-    return NextResponse.json(
-      { error: '이미 보유한 스티커 팩입니다' },
-      { status: 409 },
-    )
+    return apiError('STKR_ALREADY_OWNED', 409)
   }
 
   const feeBean = Number(packRow.price_bean)
@@ -93,6 +84,7 @@ export async function POST(_req: NextRequest, { params }: Params) {
     return NextResponse.json(
       {
         error: 'Bean 잔액이 부족합니다. 충전 후 다시 시도하세요.',
+        code: 'CHAT_BEAN_INSUFFICIENT',
         requiresBean: true,
         feeBean,
       },

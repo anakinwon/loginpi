@@ -5,6 +5,10 @@ import { useRouter, Link } from '@/i18n/navigation'
 import { toast } from 'sonner'
 import { usePiAuth } from '@/components/pi-auth-provider'
 import { piFetch } from '@/lib/pi-fetch'
+import {
+  useApiErrorMessage,
+  type ApiErrorPayload,
+} from '@/hooks/use-api-error'
 import { BeanIcon } from '@/components/ui/bean-icon'
 import { getCurrentPosition } from '@/lib/geo'
 import {
@@ -55,6 +59,7 @@ function StepBar({ current, total = 3 }: { current: Step; total?: number }) {
 
 export function GroupRoomCreator() {
   const t = useTranslations('chat.creator')
+  const apiErr = useApiErrorMessage()
   const themeName = useThemeName()
   const router = useRouter()
   const { isInPiBrowser, user } = usePiAuth()
@@ -70,6 +75,8 @@ export function GroupRoomCreator() {
   const [roomDesc, setRoomDesc] = useState('')
   const [payStatus, setPayStatus] = useState<PayStatus>('idle')
   const [payError, setPayError] = useState<string | null>(null)
+  // 에러 응답의 code를 보존 — 표시 언어와 무관하게 Bean 부족 여부를 판정(충전 링크 노출)
+  const [payErrorCode, setPayErrorCode] = useState<string | null>(null)
   const [canUsePremiumTheme, setCanUsePremiumTheme] = useState(false)
   const [canCreateRoomFree, setCanCreateRoomFree] = useState(false)
   // TASK-063: 이벤트방 모드 (Business 폐지 — 구독자 무료·비구독자 Bean 생성료)
@@ -89,6 +96,7 @@ export function GroupRoomCreator() {
     setRoomDesc('')
     setPayStatus('idle')
     setPayError(null)
+    setPayErrorCode(null)
     setRoomType('G')
     setGpsCoords(null)
 
@@ -214,6 +222,7 @@ export function GroupRoomCreator() {
     if (!selectedTheme) return
     setPayStatus('completing')
     setPayError(null)
+    setPayErrorCode(null)
     try {
       const res = await piFetch('/api/chat/rooms/group', {
         method: 'POST',
@@ -230,11 +239,7 @@ export function GroupRoomCreator() {
           lng: gpsCoords?.lng,
         }),
       })
-      if (!res.ok) {
-        const d = (await res.json()) as { error?: string }
-        throw new Error(d.error ?? t('createFail'))
-      }
-      const data = (await res.json()) as {
+      const data = (await res.json()) as ApiErrorPayload & {
         room?: { room_id: string }
         mode?: string
         pay?: {
@@ -242,6 +247,12 @@ export function GroupRoomCreator() {
           memo: string
           metadata: Record<string, unknown>
         }
+      }
+      if (!res.ok) {
+        setPayStatus('error')
+        setPayErrorCode(data.code ?? null)
+        setPayError(apiErr(data, t('createFail')))
+        return
       }
       // PI 모드 유료 카페 — 서버가 결제 요구. Pi 직결제로 핸드오프(완료 시 complete가 방 생성).
       if (data.mode === 'PI' && data.pay) {
@@ -254,9 +265,9 @@ export function GroupRoomCreator() {
       if (data.room?.room_id) {
         router.push(`/chat/${data.room.room_id}`)
       }
-    } catch (e) {
+    } catch {
       setPayStatus('error')
-      setPayError(e instanceof Error ? e.message : t('createError'))
+      setPayError(t('createError'))
     }
   }, [
     selectedTheme,
@@ -265,6 +276,7 @@ export function GroupRoomCreator() {
     gpsCoords,
     router,
     t,
+    apiErr,
     startRoomPiPayment,
   ])
 
@@ -273,6 +285,7 @@ export function GroupRoomCreator() {
     if (!selectedTheme) return
     setPayStatus('completing')
     setPayError(null)
+    setPayErrorCode(null)
     try {
       const res = await piFetch('/api/chat/rooms/event', {
         method: 'POST',
@@ -290,11 +303,7 @@ export function GroupRoomCreator() {
           lng: gpsCoords?.lng ?? null,
         }),
       })
-      if (!res.ok) {
-        const d = (await res.json()) as { error?: string }
-        throw new Error(d.error ?? t('eventCreateFail'))
-      }
-      const data = (await res.json()) as {
+      const data = (await res.json()) as ApiErrorPayload & {
         room?: { room_id: string }
         mode?: string
         pay?: {
@@ -302,6 +311,12 @@ export function GroupRoomCreator() {
           memo: string
           metadata: Record<string, unknown>
         }
+      }
+      if (!res.ok) {
+        setPayStatus('error')
+        setPayErrorCode(data.code ?? null)
+        setPayError(apiErr(data, t('eventCreateFail')))
+        return
       }
       // PI 모드 유료 이벤트방 — Pi 직결제로 핸드오프(완료 시 complete가 방 생성).
       if (data.mode === 'PI' && data.pay) {
@@ -314,9 +329,9 @@ export function GroupRoomCreator() {
       if (data.room?.room_id) {
         router.push(`/chat/${data.room.room_id}`)
       }
-    } catch (e) {
+    } catch {
       setPayStatus('error')
-      setPayError(e instanceof Error ? e.message : t('eventCreateError'))
+      setPayError(t('eventCreateError'))
     }
   }, [
     selectedTheme,
@@ -325,6 +340,7 @@ export function GroupRoomCreator() {
     gpsCoords,
     router,
     t,
+    apiErr,
     startRoomPiPayment,
   ])
 
@@ -607,7 +623,7 @@ export function GroupRoomCreator() {
                 {payError && (
                   <div className="space-y-1 text-center">
                     <p className="text-destructive text-xs">{payError}</p>
-                    {payError.includes('충전') && (
+                    {payErrorCode === 'CHAT_BEAN_INSUFFICIENT' && (
                       <Link
                         href="/bean"
                         onClick={() => setOpen(false)}

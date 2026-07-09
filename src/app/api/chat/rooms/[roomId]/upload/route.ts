@@ -4,6 +4,7 @@ import { getSessionUser } from '@/lib/auth-check'
 import { getRoomMember } from '@/lib/chat'
 import { recordUserAction } from '@/lib/event'
 import { validateMagicBytes } from '@/lib/upload-validate'
+import { apiError } from '@/lib/api-errors'
 
 type Params = { params: Promise<{ roomId: string }> }
 
@@ -43,44 +44,30 @@ function getMsgTpCd(mime: string): 'IMAGE' | 'VOICE' | 'FILE' {
 export async function POST(request: NextRequest, { params }: Params) {
   const { roomId } = await params
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   const mbr = await getRoomMember(roomId, user.id)
-  if (!mbr)
-    return NextResponse.json({ error: '카페 멤버가 아닙니다' }, { status: 403 })
+  if (!mbr) return apiError('CHAT_NOT_MEMBER', 403)
 
   let formData: FormData
   try {
     formData = await request.formData()
   } catch {
-    return NextResponse.json(
-      { error: '잘못된 요청 형식입니다' },
-      { status: 400 },
-    )
+    return apiError('BAD_REQUEST_FORMAT', 400)
   }
 
   const file = formData.get('file')
   if (!(file instanceof File)) {
-    return NextResponse.json(
-      { error: 'file 필드가 필요합니다' },
-      { status: 400 },
-    )
+    return apiError('FILE_FIELD_REQUIRED', 400)
   }
 
   if (file.size > MAX_BYTES) {
-    return NextResponse.json(
-      { error: '파일 크기는 10MB 이하여야 합니다' },
-      { status: 413 },
-    )
+    return apiError('CHAT_FILE_SIZE_MAX_10MB', 413)
   }
 
   const ext = ALLOWED_MIME.get(file.type)
   if (!ext) {
-    return NextResponse.json(
-      { error: '허용되지 않은 파일 형식입니다' },
-      { status: 415 },
-    )
+    return apiError('FILE_TYPE_NOT_ALLOWED', 415)
   }
 
   const uuid = crypto.randomUUID()
@@ -89,10 +76,7 @@ export async function POST(request: NextRequest, { params }: Params) {
 
   // KISA MC: Magic Byte 검증 — 위조된 Content-Type 차단
   if (!validateMagicBytes(buffer, file.type)) {
-    return NextResponse.json(
-      { error: '파일 내용이 선언된 형식과 일치하지 않습니다' },
-      { status: 415 },
-    )
+    return apiError('FILE_CONTENT_MISMATCH', 415)
   }
 
   const isMedia =
@@ -112,10 +96,7 @@ export async function POST(request: NextRequest, { params }: Params) {
       fileSize: file.size,
       error: error.message,
     })
-    return NextResponse.json(
-      { error: '파일 업로드에 실패했습니다. 잠시 후 다시 시도해주세요' },
-      { status: 500 },
-    )
+    return apiError('UPLOAD_FAILED', 500)
   }
 
   // 미디어 외 파일은 ?download= 파라미터로 Content-Disposition: attachment 강제

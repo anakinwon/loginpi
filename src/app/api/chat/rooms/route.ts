@@ -4,6 +4,7 @@ import { getSessionUser } from '@/lib/auth-check'
 import { getOrCreateDirectRoom } from '@/lib/chat'
 import { recordActivity } from '@/lib/activity-log'
 import { getChatRoomLists } from '@/lib/chat-room-list'
+import { apiError } from '@/lib/api-errors'
 
 // GET /api/chat/rooms — 내가 참여 중인 카페 목록 (+?include=public 시 공개 그룹방)
 // Pi Browser 클라이언트 게이트(ClientChatList)가 X-Pi-Token 헤더로 호출한다.
@@ -26,21 +27,20 @@ export async function GET(request: NextRequest) {
     if (!includePublic) return NextResponse.json({ rooms })
     return NextResponse.json({ rooms, publicRooms })
   } catch {
-    return NextResponse.json({ error: '카페 목록 조회 실패' }, { status: 500 })
+    return apiError('LIST_FAILED', 500)
   }
 }
 
 // POST /api/chat/rooms — 1:1 Direct Room 생성 (TASK-053에서 Group·Event 추가)
 export async function POST(request: NextRequest) {
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
 
   const { target_usr_id, item_id } = body as {
@@ -48,16 +48,10 @@ export async function POST(request: NextRequest) {
     item_id?: string
   }
   if (!target_usr_id) {
-    return NextResponse.json(
-      { error: 'target_usr_id가 필요합니다' },
-      { status: 400 },
-    )
+    return apiError('CHAT_TARGET_REQUIRED', 400)
   }
   if (target_usr_id === user.id) {
-    return NextResponse.json(
-      { error: '자기 자신과 카페를 만들 수 없습니다' },
-      { status: 400 },
-    )
+    return apiError('CHAT_SELF_ROOM', 400)
   }
 
   // 상대방 존재 확인
@@ -67,11 +61,7 @@ export async function POST(request: NextRequest) {
     .eq('id', target_usr_id)
     .single()
 
-  if (!targetUser)
-    return NextResponse.json(
-      { error: '상대방 사용자를 찾을 수 없습니다' },
-      { status: 404 },
-    )
+  if (!targetUser) return apiError('CHAT_TARGET_USER_NOT_FOUND', 404)
 
   // 상품별 방 분리 — item_id 있으면 상품명 조회 + 판매자 검증(당사자 중 하나가 판매자여야 변조 차단)
   let itemNm: string | null = null
@@ -83,16 +73,10 @@ export async function POST(request: NextRequest) {
       .maybeSingle()
     const it = item as { item_nm: string; seller_id: string } | null
     if (!it) {
-      return NextResponse.json(
-        { error: '상품을 찾을 수 없습니다' },
-        { status: 404 },
-      )
+      return apiError('CHAT_PRODUCT_NOT_FOUND', 404)
     }
     if (it.seller_id !== target_usr_id && it.seller_id !== user.id) {
-      return NextResponse.json(
-        { error: '상품 판매자가 대화 당사자가 아닙니다' },
-        { status: 400 },
-      )
+      return apiError('CHAT_SELLER_NOT_PARTY', 400)
     }
     itemNm = it.item_nm
   }
@@ -107,6 +91,6 @@ export async function POST(request: NextRequest) {
     )
     return NextResponse.json({ room }, { status: 201 })
   } catch {
-    return NextResponse.json({ error: '카페 생성 실패' }, { status: 500 })
+    return apiError('CHAT_ROOM_CREATE_FAILED', 500)
   }
 }

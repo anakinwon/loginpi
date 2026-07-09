@@ -20,6 +20,7 @@ import { queueRoomTranslations } from '@/lib/chat-translate-dedup'
 import { pushRoomWebhooks } from '@/lib/chat-webhook'
 import { recordUserAction } from '@/lib/event'
 import { enqueueChatNoti } from '@/lib/chat-noti'
+import { apiError } from '@/lib/api-errors'
 
 type Params = { params: Promise<{ roomId: string }> }
 
@@ -29,12 +30,10 @@ type Params = { params: Promise<{ roomId: string }> }
 export async function GET(request: NextRequest, { params }: Params) {
   const { roomId } = await params
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   const mbr = await getRoomMember(roomId, user.id)
-  if (!mbr)
-    return NextResponse.json({ error: '카페 멤버가 아닙니다' }, { status: 403 })
+  if (!mbr) return apiError('CHAT_NOT_MEMBER', 403)
 
   const { searchParams } = new URL(request.url)
   const limit = Math.min(Number(searchParams.get('limit') ?? '50'), 100)
@@ -79,8 +78,7 @@ export async function GET(request: NextRequest, { params }: Params) {
 
   const { data: messages, error } = await query
 
-  if (error)
-    return NextResponse.json({ error: '메시지 조회 실패' }, { status: 500 })
+  if (error) return apiError('QUERY_FAILED', 500)
 
   const reversed = (messages ?? []).reverse()
   const hasMore = (messages ?? []).length === limit
@@ -122,12 +120,10 @@ export async function GET(request: NextRequest, { params }: Params) {
 export async function POST(request: NextRequest, { params }: Params) {
   const { roomId } = await params
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   const mbr = await getRoomMember(roomId, user.id)
-  if (!mbr)
-    return NextResponse.json({ error: '카페 멤버가 아닙니다' }, { status: 403 })
+  if (!mbr) return apiError('CHAT_NOT_MEMBER', 403)
 
   // 메시지 전송 = 가장 명확한 활성 사용자 신호
   recordActivity(user.id, 'MSG')
@@ -135,17 +131,14 @@ export async function POST(request: NextRequest, { params }: Params) {
   // rate limiting: 1초 5건 초과 방지
   const recentCount = await getRecentMsgCount(roomId, user.id)
   if (recentCount >= 5) {
-    return NextResponse.json(
-      { error: '너무 빠르게 메시지를 전송하고 있습니다' },
-      { status: 429 },
-    )
+    return apiError('CHAT_MSG_RATE_LIMIT', 429)
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
 
   const {
@@ -173,25 +166,16 @@ export async function POST(request: NextRequest, { params }: Params) {
     clientMsgId && UUID_RE.test(clientMsgId) ? clientMsgId : undefined
 
   if (msg_tp_cd === 'TEXT' && !msg_cont?.trim()) {
-    return NextResponse.json(
-      { error: '메시지 내용을 입력해주세요' },
-      { status: 400 },
-    )
+    return apiError('CHAT_MSG_CONTENT_REQUIRED', 400)
   }
 
   if (msg_tp_cd === 'STICKER' && !stkr_id) {
-    return NextResponse.json(
-      { error: '스티커 ID가 필요합니다' },
-      { status: 400 },
-    )
+    return apiError('CHAT_STICKER_ID_REQUIRED', 400)
   }
 
   const validTypes = ['TEXT', 'IMAGE', 'FILE', 'VOICE', 'STICKER', 'SYSTEM']
   if (!validTypes.includes(msg_tp_cd)) {
-    return NextResponse.json(
-      { error: '유효하지 않은 메시지 타입' },
-      { status: 400 },
-    )
+    return apiError('CHAT_INVALID_MSG_TYPE', 400)
   }
 
   // TASK-065 보안: IMAGE/FILE/VOICE의 attch_url은 이 방의 Storage 공개 URL만 허용
@@ -199,10 +183,7 @@ export async function POST(request: NextRequest, { params }: Params) {
   if (msg_tp_cd === 'IMAGE' || msg_tp_cd === 'FILE' || msg_tp_cd === 'VOICE') {
     const expectedPrefix = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/chat-attachments/${roomId}/`
     if (!attch_url || !attch_url.startsWith(expectedPrefix)) {
-      return NextResponse.json(
-        { error: '유효하지 않은 첨부 파일 URL입니다' },
-        { status: 400 },
-      )
+      return apiError('CHAT_INVALID_ATTACHMENT_URL', 400)
     }
   }
 
@@ -227,6 +208,7 @@ export async function POST(request: NextRequest, { params }: Params) {
         return NextResponse.json(
           {
             error: 'AI 월 호출 한도를 초과했습니다',
+            code: 'CHAT_AI_MONTHLY_LIMIT',
             aiLimitExceeded: true,
             requiresBean: true,
             feeBean: aiFeeBean,
@@ -240,6 +222,8 @@ export async function POST(request: NextRequest, { params }: Params) {
         return NextResponse.json(
           {
             error: `추가 AI 호출 1회에 ${aiFeeBean} Bean이 필요합니다`,
+            code: 'CHAT_AI_FEE_REQUIRED',
+            params: { fee: aiFeeBean },
             aiLimitExceeded: true,
             requiresBean: true,
             feeBean: aiFeeBean,
@@ -264,10 +248,7 @@ export async function POST(request: NextRequest, { params }: Params) {
       .maybeSingle()
 
     if (!stkrRow) {
-      return NextResponse.json(
-        { error: '존재하지 않는 스티커입니다' },
-        { status: 404 },
-      )
+      return apiError('CHAT_STICKER_NOT_FOUND', 404)
     }
 
     const { data: packRow } = await db
@@ -278,10 +259,7 @@ export async function POST(request: NextRequest, { params }: Params) {
       .maybeSingle()
 
     if (!packRow) {
-      return NextResponse.json(
-        { error: '스티커 팩을 찾을 수 없습니다' },
-        { status: 404 },
-      )
+      return apiError('CHAT_STICKER_PACK_NOT_FOUND', 404)
     }
 
     const pack = packRow as {
@@ -301,10 +279,7 @@ export async function POST(request: NextRequest, { params }: Params) {
         .maybeSingle()
 
       if (!ownership) {
-        return NextResponse.json(
-          { error: '이 스티커 팩을 구매하지 않았습니다' },
-          { status: 403 },
-        )
+        return apiError('CHAT_STICKER_PACK_NOT_OWNED', 403)
       }
     }
 
@@ -330,8 +305,7 @@ export async function POST(request: NextRequest, { params }: Params) {
     .select()
     .single()
 
-  if (error)
-    return NextResponse.json({ error: '메시지 전송 실패' }, { status: 500 })
+  if (error) return apiError('CHAT_MESSAGE_SEND_FAILED', 500)
 
   // AI 한도 초과분 건당 과금 (동의·잔액 확인 완료 후) — 메시지 삽입 성공 시에만 차감
   if (aiExtraCharge) {

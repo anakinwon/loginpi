@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { apiError } from '@/lib/api-errors'
 
 export interface ThemeRow {
   theme_cd: string
@@ -21,7 +22,6 @@ export async function GET() {
     .eq('del_yn', 'N')
     .order('sort_ord')
 
-  if (error)
-    return NextResponse.json({ error: '테마 목록 조회 실패' }, { status: 500 })
+  if (error) return apiError('LIST_FAILED', 500)
   return NextResponse.json({ themes: (data ?? []) as ThemeRow[] })
 }

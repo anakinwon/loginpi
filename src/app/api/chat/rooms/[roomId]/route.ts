@@ -9,6 +9,7 @@ import {
   toPublicRoom,
   isRoomExpired,
 } from '@/lib/chat'
+import { apiError } from '@/lib/api-errors'
 
 type Params = { params: Promise<{ roomId: string }> }
 
@@ -16,23 +17,22 @@ type Params = { params: Promise<{ roomId: string }> }
 export async function GET(_request: Request, { params }: Params) {
   const { roomId } = await params
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   const [room, mbr] = await Promise.all([
     getRoom(roomId),
     getRoomMember(roomId, user.id),
   ])
 
-  if (!room)
-    return NextResponse.json(
-      { error: '카페를 찾을 수 없습니다' },
-      { status: 404 },
-    )
+  if (!room) return apiError('CHAT_ROOM_NOT_FOUND', 404)
   // 기간 만료 카페(무료방 7일 초과 등)는 방장·멤버 포함 누구도 열 수 없음
   if (isRoomExpired(room)) {
     return NextResponse.json(
-      { error: '기간이 만료된 카페입니다', expired: true },
+      {
+        error: '기간이 만료된 카페입니다',
+        code: 'CHAT_ROOM_EXPIRED',
+        expired: true,
+      },
       { status: 410 },
     )
   }
@@ -49,14 +49,12 @@ export async function GET(_request: Request, { params }: Params) {
         room.entry_expire_dtm &&
         new Date(room.entry_expire_dtm) <= new Date()
       ) {
-        return NextResponse.json(
-          { error: '종료된 이벤트방입니다' },
-          { status: 403 },
-        )
+        return apiError('CHAT_EVENT_ENDED', 403)
       }
       return NextResponse.json(
         {
           error: '카페 멤버가 아닙니다',
+          code: 'CHAT_NOT_MEMBER',
           isPublic: true,
           room: {
             room_nm: room.room_nm,
@@ -69,7 +67,7 @@ export async function GET(_request: Request, { params }: Params) {
         { status: 403 },
       )
     }
-    return NextResponse.json({ error: '카페 멤버가 아닙니다' }, { status: 403 })
+    return apiError('CHAT_NOT_MEMBER', 403)
   }
 
   // 테마 이모지 — 클라이언트 게이트(ClientChatRoom) 헤더 렌더용
@@ -104,36 +102,25 @@ export async function GET(_request: Request, { params }: Params) {
 export async function PATCH(request: NextRequest, { params }: Params) {
   const { roomId } = await params
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   const [room, mbr] = await Promise.all([
     getRoom(roomId),
     getRoomMember(roomId, user.id),
   ])
-  if (!room)
-    return NextResponse.json(
-      { error: '카페를 찾을 수 없습니다' },
-      { status: 404 },
-    )
+  if (!room) return apiError('CHAT_ROOM_NOT_FOUND', 404)
   if (!mbr || mbr.mbr_role_cd !== 'OWNER') {
-    return NextResponse.json(
-      { error: '방장만 카페를 수정할 수 있습니다' },
-      { status: 403 },
-    )
+    return apiError('CHAT_ROOM_OWNER_ONLY_EDIT', 403)
   }
   if (room.room_tp_cd === 'D') {
-    return NextResponse.json(
-      { error: '1:1 카페는 수정할 수 없습니다' },
-      { status: 400 },
-    )
+    return apiError('CHAT_DM_NOT_EDITABLE', 400)
   }
 
   let body: unknown
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
 
   const { room_nm, room_desc, is_public_yn, max_mbr_cnt, join_pwd, lat, lng } =
@@ -153,10 +140,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
   if (room_nm !== undefined) {
     const nm = String(room_nm).trim()
     if (!nm || nm.length > 100) {
-      return NextResponse.json(
-        { error: '방 이름은 1~100자여야 합니다' },
-        { status: 400 },
-      )
+      return apiError('CHAT_ROOM_NAME_LENGTH', 400)
     }
     patch.room_nm = nm
   }
@@ -171,10 +155,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
   const nextPublic = is_public_yn ?? room.is_public_yn
   if (is_public_yn !== undefined) {
     if (is_public_yn !== 'Y' && is_public_yn !== 'N') {
-      return NextResponse.json(
-        { error: '공개 여부 값이 올바르지 않습니다' },
-        { status: 400 },
-      )
+      return apiError('CHAT_INVALID_PUBLIC_YN', 400)
     }
     patch.is_public_yn = is_public_yn
   }
@@ -182,10 +163,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
   if (max_mbr_cnt !== undefined) {
     const cnt = Number(max_mbr_cnt)
     if (!Number.isInteger(cnt) || cnt < 2 || cnt > 1000) {
-      return NextResponse.json(
-        { error: '정원은 2~1000명이어야 합니다' },
-        { status: 400 },
-      )
+      return apiError('CHAT_CAPACITY_RANGE', 400)
     }
     patch.max_mbr_cnt = cnt
   }
@@ -201,25 +179,18 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     } else {
       const pwd = String(join_pwd)
       if (pwd.length < 4 || pwd.length > 64) {
-        return NextResponse.json(
-          { error: '비밀번호는 4~64자여야 합니다' },
-          { status: 400 },
-        )
+        return apiError('CHAT_PASSWORD_LENGTH', 400)
       }
       patch.join_pwd_hash = hashRoomPassword(pwd)
     }
   }
 
   if (Object.keys(patch).length === 0) {
-    return NextResponse.json(
-      { error: '변경할 내용이 없습니다' },
-      { status: 400 },
-    )
+    return apiError('CHAT_NO_CHANGES', 400)
   }
 
   const updated = await updateRoom(roomId, user.display_name, patch)
-  if (!updated)
-    return NextResponse.json({ error: '카페 수정 실패' }, { status: 500 })
+  if (!updated) return apiError('UPDATE_FAILED', 500)
 
   // LBS 동의자 카페 위치 수정 저장 — 비블로킹
   const validLat =

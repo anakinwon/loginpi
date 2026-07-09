@@ -7,6 +7,7 @@ import { recordUserAction } from '@/lib/event'
 import { getRoomFeeBean } from '@/lib/bean-fee'
 import { applyBean, getBalance } from '@/lib/bean'
 import { getActiveFeeMode, applyPromoGate } from '@/lib/fee-resolver'
+import { apiError } from '@/lib/api-errors'
 
 // POST /api/chat/rooms/event — 이벤트 카페 생성
 // Business 플랜 폐지: 그룹방 PREMIUM과 동일하게 구독·Bean 요금만 체크한다.
@@ -14,8 +15,7 @@ import { getActiveFeeMode, applyPromoGate } from '@/lib/fee-resolver'
 // 참가자는 entry_fee_pi(Bean) 소진 후 payments/complete에서 GUEST 입장 처리
 export async function POST(request: NextRequest) {
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   // 구독 여부로 생성료 판정 (그룹방 PREMIUM 테마 처리와 동일 패턴).
   // canCreateRoom.allowed=true → 구독자(월 무제한 무료) → 생성료 0,
@@ -36,6 +36,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(
           {
             error: 'Bean 잔액이 부족합니다. 충전 후 다시 시도하세요.',
+            code: 'CHAT_BEAN_INSUFFICIENT',
             requiresBean: true,
             feeBean: createFeeBean,
             balance: bal,
@@ -50,7 +51,7 @@ export async function POST(request: NextRequest) {
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
 
   const {
@@ -75,23 +76,11 @@ export async function POST(request: NextRequest) {
     lng?: number
   }
 
-  if (!room_nm?.trim())
-    return NextResponse.json(
-      { error: '방 이름을 입력해주세요' },
-      { status: 400 },
-    )
-  if (!theme_cd)
-    return NextResponse.json({ error: '테마를 선택해주세요' }, { status: 400 })
-  if (!entry_expire_dtm)
-    return NextResponse.json(
-      { error: '이벤트 종료 시각을 설정해주세요' },
-      { status: 400 },
-    )
+  if (!room_nm?.trim()) return apiError('CHAT_EVENT_ROOM_NAME_REQUIRED', 400)
+  if (!theme_cd) return apiError('CHAT_THEME_REQUIRED', 400)
+  if (!entry_expire_dtm) return apiError('CHAT_EVENT_END_TIME_REQUIRED', 400)
   if (new Date(entry_expire_dtm) <= new Date()) {
-    return NextResponse.json(
-      { error: '이벤트 종료 시각은 현재 시각보다 이후여야 합니다' },
-      { status: 400 },
-    )
+    return apiError('CHAT_EVENT_END_TIME_FUTURE', 400)
   }
 
   // PI 모드 유료 이벤트방 — Bean 차감 대신 Pi 직결제. 방은 결제 완료(complete) 시 생성한다.
@@ -150,6 +139,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(
           {
             error: 'Bean 잔액이 부족합니다. 충전 후 다시 시도하세요.',
+            code: 'CHAT_BEAN_INSUFFICIENT',
             requiresBean: true,
             feeBean: createFeeBean,
           },
@@ -196,6 +186,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ room }, { status: 201 })
   } catch {
-    return NextResponse.json({ error: '이벤트방 생성 실패' }, { status: 500 })
+    return apiError('CHAT_EVENT_ROOM_CREATE_FAILED', 500)
   }
 }

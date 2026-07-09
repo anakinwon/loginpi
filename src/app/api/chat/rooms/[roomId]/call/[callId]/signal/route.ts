@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { getSessionUser } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { broadcastToCall } from '@/lib/realtime-broadcast'
+import { apiError } from '@/lib/api-errors'
 
 type Params = { params: Promise<{ roomId: string; callId: string }> }
 
@@ -23,8 +24,7 @@ const SignalSchema = z.object({
 export async function POST(req: Request, { params }: Params) {
   const { roomId, callId } = await params
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   // 통화 참여자 검증
   const { data: call } = await getSupabaseAdmin()
@@ -35,25 +35,17 @@ export async function POST(req: Request, { params }: Params) {
     .eq('del_yn', 'N')
     .maybeSingle()
 
-  if (!call)
-    return NextResponse.json(
-      { error: '통화를 찾을 수 없습니다' },
-      { status: 404 },
-    )
+  if (!call) return apiError('CHAT_CALL_NOT_FOUND', 404)
 
   const isParticipant =
     call.caller_usr_id === user.id || call.callee_usr_id === user.id
-  if (!isParticipant)
-    return NextResponse.json(
-      { error: '통화 참여자가 아닙니다' },
-      { status: 403 },
-    )
+  if (!isParticipant) return apiError('CHAT_CALL_NOT_PARTICIPANT', 403)
 
   let body: unknown
   try {
     body = await req.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
   const parsed = SignalSchema.safeParse(body)
   if (!parsed.success)

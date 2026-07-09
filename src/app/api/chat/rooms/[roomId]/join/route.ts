@@ -14,6 +14,7 @@ import { getRoomFeeBean, type RoomGrade } from '@/lib/bean-fee'
 import { microFeeBean, applyPromoGate } from '@/lib/fee-resolver'
 import { eventEntryFeeBean } from '@/lib/bean-shared'
 import { applyBean, getBalance } from '@/lib/bean'
+import { apiError } from '@/lib/api-errors'
 
 type Params = { params: Promise<{ roomId: string }> }
 
@@ -25,28 +26,24 @@ type Params = { params: Promise<{ roomId: string }> }
 export async function POST(request: NextRequest, { params }: Params) {
   const { roomId } = await params
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   const room = await getRoom(roomId)
-  if (!room)
-    return NextResponse.json(
-      { error: '카페를 찾을 수 없습니다' },
-      { status: 404 },
-    )
+  if (!room) return apiError('CHAT_ROOM_NOT_FOUND', 404)
 
   // Direct Room은 join API로 입장 불가 — getOrCreateDirectRoom으로만 생성
   if (room.room_tp_cd === 'D') {
-    return NextResponse.json(
-      { error: '1:1 카페에는 직접 입장할 수 없습니다' },
-      { status: 403 },
-    )
+    return apiError('CHAT_DM_NO_DIRECT_JOIN', 403)
   }
 
   // 기간이 만료된 카페(무료방 7일 초과 등)는 입장 불가
   if (isRoomExpired(room)) {
     return NextResponse.json(
-      { error: '기간이 만료된 카페입니다', expired: true },
+      {
+        error: '기간이 만료된 카페입니다',
+        code: 'CHAT_ROOM_EXPIRED',
+        expired: true,
+      },
       { status: 410 },
     )
   }
@@ -56,10 +53,7 @@ export async function POST(request: NextRequest, { params }: Params) {
   // 이벤트방 종료 시각 확인
   if (isEvent && room.entry_expire_dtm) {
     if (new Date(room.entry_expire_dtm) <= new Date()) {
-      return NextResponse.json(
-        { error: '종료된 이벤트입니다' },
-        { status: 410 },
-      )
+      return apiError('CHAT_EVENT_CLOSED', 410)
     }
   }
 
@@ -84,20 +78,21 @@ export async function POST(request: NextRequest, { params }: Params) {
   //     (생성자는 위 '이미 멤버'에서 통과하므로 본인 비공개 이벤트 접근은 영향 없음)
   if (room.is_public_yn === 'N') {
     if (isEvent) {
-      return NextResponse.json(
-        { error: '비공개 이벤트입니다' },
-        { status: 403 },
-      )
+      return apiError('CHAT_PRIVATE_EVENT', 403)
     }
     if (!room.join_pwd_hash) {
-      return NextResponse.json({ error: '비공개 카페입니다' }, { status: 403 })
+      return apiError('CHAT_PRIVATE_ROOM', 403)
     }
     if (
       !join_pwd ||
       !verifyRoomPassword(String(join_pwd), room.join_pwd_hash)
     ) {
       return NextResponse.json(
-        { error: '비밀번호가 일치하지 않습니다', requiresPassword: true },
+        {
+          error: '비밀번호가 일치하지 않습니다',
+          code: 'CHAT_PASSWORD_MISMATCH',
+          requiresPassword: true,
+        },
         { status: 401 },
       )
     }
@@ -111,10 +106,7 @@ export async function POST(request: NextRequest, { params }: Params) {
     .eq('del_yn', 'N')
 
   if ((count ?? 0) >= room.max_mbr_cnt) {
-    return NextResponse.json(
-      { error: '카페 정원이 가득 찼습니다' },
-      { status: 409 },
-    )
+    return apiError('CHAT_ROOM_FULL', 409)
   }
 
   // 입장료(Bean) 산정 — 이벤트방은 호스트 지정가, 그 외는 등급 정액(구독자 무료).
@@ -174,6 +166,7 @@ export async function POST(request: NextRequest, { params }: Params) {
       return NextResponse.json(
         {
           error: 'Bean 잔액이 부족합니다. 충전 후 다시 시도하세요.',
+          code: 'CHAT_BEAN_INSUFFICIENT',
           requiresBean: true,
           feeBean: enterFeeBean,
         },
@@ -203,7 +196,7 @@ export async function POST(request: NextRequest, { params }: Params) {
         regrId: user.display_name.slice(0, 20),
       })
     }
-    return NextResponse.json({ error: '입장 실패' }, { status: 500 })
+    return apiError('CHAT_JOIN_FAILED', 500)
   }
   return NextResponse.json({ message: '입장 성공' }, { status: 201 })
 }

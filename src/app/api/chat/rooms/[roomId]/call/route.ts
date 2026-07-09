@@ -5,6 +5,7 @@ import { getRoomMember } from '@/lib/chat'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { broadcastToCall } from '@/lib/realtime-broadcast'
 import { recordUserAction } from '@/lib/event'
+import { apiError } from '@/lib/api-errors'
 
 type Params = { params: Promise<{ roomId: string }> }
 
@@ -16,18 +17,16 @@ const StartCallSchema = z.object({
 export async function POST(req: Request, { params }: Params) {
   const { roomId } = await params
   const caller = await getSessionUser()
-  if (!caller)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!caller) return apiError('AUTH_REQUIRED', 401)
 
   const mbr = await getRoomMember(roomId, caller.id)
-  if (!mbr)
-    return NextResponse.json({ error: '카페 멤버가 아닙니다' }, { status: 403 })
+  if (!mbr) return apiError('CHAT_NOT_MEMBER', 403)
 
   let body: unknown
   try {
     body = await req.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
   const parsed = StartCallSchema.safeParse(body)
   if (!parsed.success)
@@ -35,18 +34,11 @@ export async function POST(req: Request, { params }: Params) {
 
   const { callee_usr_id } = parsed.data
   if (callee_usr_id === caller.id) {
-    return NextResponse.json(
-      { error: '자기 자신에게 통화할 수 없습니다' },
-      { status: 400 },
-    )
+    return apiError('CHAT_CALL_SELF', 400)
   }
 
   const calleeMbr = await getRoomMember(roomId, callee_usr_id)
-  if (!calleeMbr)
-    return NextResponse.json(
-      { error: '수신자가 카페 멤버가 아닙니다' },
-      { status: 403 },
-    )
+  if (!calleeMbr) return apiError('CHAT_CALL_RECIPIENT_NOT_MEMBER', 403)
 
   // 이미 RINGING 상태인 활성 통화가 있으면 거부 (동시 통화 1건 제한)
   const { data: active } = await getSupabaseAdmin()
@@ -57,11 +49,7 @@ export async function POST(req: Request, { params }: Params) {
     .eq('del_yn', 'N')
     .maybeSingle()
 
-  if (active)
-    return NextResponse.json(
-      { error: '이미 진행 중인 통화가 있습니다' },
-      { status: 409 },
-    )
+  if (active) return apiError('CHAT_CALL_ALREADY_ACTIVE', 409)
 
   const { data: call, error } = await getSupabaseAdmin()
     .from('msg_call_log')
@@ -76,8 +64,7 @@ export async function POST(req: Request, { params }: Params) {
     .select('call_id')
     .single()
 
-  if (error)
-    return NextResponse.json({ error: '통화 생성 실패' }, { status: 500 })
+  if (error) return apiError('CHAT_CALL_CREATE_FAILED', 500)
 
   await broadcastToCall(roomId, 'call_invite', {
     call_id: call.call_id,

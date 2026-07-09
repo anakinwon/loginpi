@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth-check'
+import { apiError } from '@/lib/api-errors'
 
 export const revalidate = 120 // 2분 캐시 (공개 데이터)
 
@@ -9,17 +10,13 @@ export const revalidate = 120 // 2분 캐시 (공개 데이터)
 // 랭킹 = fn_chat_marketplace RPC (멤버수×2 + 최근7일 메시지×0.5 + 최근7일 Bean×10)
 export async function GET(request: NextRequest) {
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   const sp = new URL(request.url).searchParams
   const themeCd = sp.get('theme')
   // theme_cd 화이트리스트 패턴 (영대문자·숫자·언더스코어 20자) — 인젝션 방어
   if (themeCd && !/^[A-Z0-9_]{1,20}$/.test(themeCd)) {
-    return NextResponse.json(
-      { error: '유효하지 않은 테마 코드' },
-      { status: 400 },
-    )
+    return apiError('CHAT_INVALID_THEME_CD', 400)
   }
 
   // 통합 검색어 — 카페이름·소개 prefix 검색. 길이 제한(50)만, 와일드카드 이스케이프는 RPC가 처리.
@@ -62,11 +59,7 @@ export async function GET(request: NextRequest) {
         .eq('del_yn', 'N'),
     ])
 
-  if (error)
-    return NextResponse.json(
-      { error: '마켓플레이스 조회 실패' },
-      { status: 500 },
-    )
+  if (error) return apiError('QUERY_FAILED', 500)
 
   return NextResponse.json({
     pagination: {

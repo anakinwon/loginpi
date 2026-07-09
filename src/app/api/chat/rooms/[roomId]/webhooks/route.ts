@@ -5,6 +5,7 @@ import { getSessionUser } from '@/lib/auth-check'
 import { getRoomMember } from '@/lib/chat'
 import { getChatPlan } from '@/lib/chat-auth'
 import { validateWebhookUrl } from '@/lib/chat-webhook'
+import { apiError } from '@/lib/api-errors'
 
 type Params = { params: Promise<{ roomId: string }> }
 
@@ -15,19 +16,13 @@ async function requireOwnerBusiness(roomId: string) {
   const user = await getSessionUser()
   if (!user)
     return {
-      error: NextResponse.json(
-        { error: '로그인이 필요합니다' },
-        { status: 401 },
-      ),
+      error: apiError('AUTH_REQUIRED', 401),
     }
 
   const mbr = await getRoomMember(roomId, user.id)
   if (!mbr || mbr.mbr_role_cd !== 'OWNER') {
     return {
-      error: NextResponse.json(
-        { error: '방장만 Webhook을 관리할 수 있습니다' },
-        { status: 403 },
-      ),
+      error: apiError('CHAT_WEBHOOK_OWNER_ONLY', 403),
     }
   }
 
@@ -37,6 +32,7 @@ async function requireOwnerBusiness(roomId: string) {
       error: NextResponse.json(
         {
           error: 'Webhook은 Business 플랜 전용 기능입니다',
+          code: 'CHAT_WEBHOOK_BUSINESS_ONLY',
           businessRequired: true,
         },
         { status: 402 },
@@ -59,11 +55,7 @@ export async function GET(_request: NextRequest, { params }: Params) {
     .eq('del_yn', 'N')
     .order('reg_dtm', { ascending: false })
 
-  if (error)
-    return NextResponse.json(
-      { error: 'Webhook 목록 조회 실패' },
-      { status: 500 },
-    )
+  if (error) return apiError('LIST_FAILED', 500)
 
   // api_key는 앞 8자만 노출 (등록 시 1회 전체 반환)
   const webhooks = (data ?? []).map(
@@ -87,7 +79,7 @@ export async function POST(request: NextRequest, { params }: Params) {
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
   const { bot_nm, webhook_url } = body as {
     bot_nm?: string
@@ -111,10 +103,7 @@ export async function POST(request: NextRequest, { params }: Params) {
     .eq('room_id', roomId)
     .eq('del_yn', 'N')
   if ((count ?? 0) >= 5) {
-    return NextResponse.json(
-      { error: '방당 Webhook은 최대 5개까지 등록할 수 있습니다' },
-      { status: 409 },
-    )
+    return apiError('CHAT_WEBHOOK_MAX', 409)
   }
 
   const apiKey = `pibot_${randomBytes(24).toString('hex')}`
@@ -134,8 +123,7 @@ export async function POST(request: NextRequest, { params }: Params) {
     .select('webhook_id, bot_nm, webhook_url, reg_dtm')
     .single()
 
-  if (error)
-    return NextResponse.json({ error: 'Webhook 등록 실패' }, { status: 500 })
+  if (error) return apiError('CHAT_WEBHOOK_CREATE_FAILED', 500)
 
   // api_key는 이 응답에서만 전체 노출 — 이후 조회는 마스킹
   return NextResponse.json(
@@ -152,11 +140,7 @@ export async function DELETE(request: NextRequest, { params }: Params) {
   const { user } = gate
 
   const webhookId = new URL(request.url).searchParams.get('id')
-  if (!webhookId)
-    return NextResponse.json(
-      { error: 'webhook id가 필요합니다' },
-      { status: 400 },
-    )
+  if (!webhookId) return apiError('CHAT_WEBHOOK_ID_REQUIRED', 400)
 
   const { error } = await getSupabaseAdmin()
     .from('msg_webhook')
@@ -170,7 +154,6 @@ export async function DELETE(request: NextRequest, { params }: Params) {
     .eq('room_id', roomId)
     .eq('del_yn', 'N')
 
-  if (error)
-    return NextResponse.json({ error: 'Webhook 삭제 실패' }, { status: 500 })
+  if (error) return apiError('CHAT_WEBHOOK_DELETE_FAILED', 500)
   return NextResponse.json({ deleted: true })
 }

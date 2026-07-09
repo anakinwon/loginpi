@@ -11,6 +11,7 @@ import {
   consumeTransQuota,
   TRANSLATE_DAILY_FREE,
 } from '@/lib/chat-translate-quota'
+import { apiError } from '@/lib/api-errors'
 
 type Params = { params: Promise<{ roomId: string }> }
 
@@ -24,12 +25,10 @@ const MAX_BATCH = 50
 export async function POST(request: NextRequest, { params }: Params) {
   const { roomId } = await params
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   const mbr = await getRoomMember(roomId, user.id)
-  if (!mbr)
-    return NextResponse.json({ error: '카페 멤버가 아닙니다' }, { status: 403 })
+  if (!mbr) return apiError('CHAT_NOT_MEMBER', 403)
 
   // 자동번역은 구독 기능 — 미구독(FREE)은 차단. 단 오픈프로모 기간엔 누구나 무료 허용.
   //   프로모 종료 시 다시 구독자 전용으로 복귀(유료 전환). 서버 권위 판정(매 요청 DB 조회).
@@ -39,6 +38,7 @@ export async function POST(request: NextRequest, { params }: Params) {
     return NextResponse.json(
       {
         error: 'PyTranslate™는 구독 후 이용할 수 있습니다',
+        code: 'CHAT_TRANSLATE_SUBSCR_ONLY',
         requiresSubscription: true,
         feature: 'AUTO_TRANSLATE',
       },
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest, { params }: Params) {
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
 
   const { locale_cd: localeCd, msg_ids: msgIds } = body as {
@@ -58,16 +58,10 @@ export async function POST(request: NextRequest, { params }: Params) {
     msg_ids?: unknown
   }
   if (!localeCd || !LOCALE_CD_RE.test(localeCd)) {
-    return NextResponse.json(
-      { error: '유효하지 않은 locale 코드' },
-      { status: 400 },
-    )
+    return apiError('CHAT_INVALID_LOCALE', 400)
   }
   if (!Array.isArray(msgIds) || msgIds.length === 0) {
-    return NextResponse.json(
-      { error: 'msg_ids 배열이 필요합니다' },
-      { status: 400 },
-    )
+    return apiError('CHAT_MSG_IDS_REQUIRED', 400)
   }
 
   const validIds = [
@@ -78,10 +72,7 @@ export async function POST(request: NextRequest, { params }: Params) {
     ),
   ].slice(0, MAX_BATCH)
   if (validIds.length === 0) {
-    return NextResponse.json(
-      { error: '유효한 msg_id가 없습니다' },
-      { status: 400 },
-    )
+    return apiError('CHAT_NO_VALID_MSG_ID', 400)
   }
 
   const supabase = getSupabaseAdmin()

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSessionUser } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getRoom, getRoomMember } from '@/lib/chat'
+import { apiError } from '@/lib/api-errors'
 
 type Params = { params: Promise<{ roomId: string }> }
 
@@ -12,7 +13,7 @@ export async function POST(_request: NextRequest, { params }: Params) {
   const { roomId } = await params
   const user = await getSessionUser()
   if (!user) {
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+    return apiError('AUTH_REQUIRED', 401)
   }
 
   const [room, mbr] = await Promise.all([
@@ -21,16 +22,10 @@ export async function POST(_request: NextRequest, { params }: Params) {
   ])
   // 당사자(멤버)만 만기 가능
   if (!mbr) {
-    return NextResponse.json(
-      { error: '이 대화의 당사자만 만기할 수 있습니다' },
-      { status: 403 },
-    )
+    return apiError('CHAT_EXPIRE_PARTY_ONLY', 403)
   }
   if (!room || room.room_tp_cd !== 'D') {
-    return NextResponse.json(
-      { error: '직거래 문의방이 아닙니다' },
-      { status: 400 },
-    )
+    return apiError('CHAT_NOT_DIRECT_DEAL_ROOM', 400)
   }
 
   await getSupabaseAdmin()

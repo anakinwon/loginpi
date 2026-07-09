@@ -3,6 +3,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth-check'
 import { getRoomMember } from '@/lib/chat'
 import { getChatPlan } from '@/lib/chat-auth'
+import { apiError } from '@/lib/api-errors'
 
 type Params = { params: Promise<{ roomId: string }> }
 
@@ -11,15 +12,11 @@ type Params = { params: Promise<{ roomId: string }> }
 export async function GET(request: NextRequest, { params }: Params) {
   const { roomId } = await params
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   const mbr = await getRoomMember(roomId, user.id)
   if (!mbr || mbr.mbr_role_cd !== 'OWNER') {
-    return NextResponse.json(
-      { error: '방장만 분석을 볼 수 있습니다' },
-      { status: 403 },
-    )
+    return apiError('CHAT_ANALYTICS_OWNER_ONLY', 403)
   }
 
   const plan = await getChatPlan(user.id)
@@ -27,6 +24,7 @@ export async function GET(request: NextRequest, { params }: Params) {
     return NextResponse.json(
       {
         error: '분석 대시보드는 Business 플랜 전용 기능입니다',
+        code: 'CHAT_ANALYTICS_BUSINESS_ONLY',
         businessRequired: true,
       },
       { status: 402 },
@@ -50,8 +48,7 @@ export async function GET(request: NextRequest, { params }: Params) {
         .eq('del_yn', 'N'),
     ])
 
-  if (error)
-    return NextResponse.json({ error: '분석 조회 실패' }, { status: 500 })
+  if (error) return apiError('QUERY_FAILED', 500)
 
   const rows = (daily ?? []) as {
     stat_dt: string

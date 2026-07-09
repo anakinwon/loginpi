@@ -3,6 +3,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth-check'
 import { getChatPlan } from '@/lib/chat-auth'
 import { validateMagicBytes } from '@/lib/upload-validate'
+import { apiError } from '@/lib/api-errors'
 
 // TASK-074: 커스텀 스티커 제작 (Business 전용)
 // POST /api/stickers/custom — multipart: pack_nm, price_bean, mkt_yn, files(1~10)
@@ -22,14 +23,14 @@ const BUCKET = 'chat-attachments'
 
 export async function POST(request: NextRequest) {
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   const plan = await getChatPlan(user.id)
   if (plan.tier !== 'BUSINESS') {
     return NextResponse.json(
       {
         error: '커스텀 스티커 제작은 Business 플랜 전용 기능입니다',
+        code: 'STKR_CUSTOM_BUSINESS_ONLY',
         businessRequired: true,
       },
       { status: 402 },
@@ -40,10 +41,7 @@ export async function POST(request: NextRequest) {
   try {
     formData = await request.formData()
   } catch {
-    return NextResponse.json(
-      { error: '잘못된 요청 형식입니다' },
-      { status: 400 },
-    )
+    return apiError('BAD_REQUEST_FORMAT', 400)
   }
 
   const packNm = String(formData.get('pack_nm') ?? '').trim()
@@ -54,42 +52,24 @@ export async function POST(request: NextRequest) {
     .filter((f): f is File => f instanceof File)
 
   if (!packNm || packNm.length > 100) {
-    return NextResponse.json(
-      { error: '팩 이름을 입력해주세요 (100자 이내)' },
-      { status: 400 },
-    )
+    return apiError('STKR_PACK_NAME_REQUIRED', 400)
   }
   if (!Number.isInteger(priceBean) || priceBean < 0 || priceBean > 10000) {
-    return NextResponse.json(
-      { error: '판매가는 0~10000 Bean 정수여야 합니다' },
-      { status: 400 },
-    )
+    return apiError('STKR_PRICE_RANGE', 400)
   }
   if (files.length < 1 || files.length > MAX_STICKERS) {
-    return NextResponse.json(
-      { error: `스티커 이미지는 1~${MAX_STICKERS}개여야 합니다` },
-      { status: 400 },
-    )
+    return apiError('STKR_IMAGE_COUNT', 400, { max: MAX_STICKERS })
   }
   for (const f of files) {
     if (f.size > MAX_BYTES) {
-      return NextResponse.json(
-        { error: '스티커 이미지는 1장당 2MB 이하여야 합니다' },
-        { status: 413 },
-      )
+      return apiError('STKR_IMAGE_SIZE_MAX', 413)
     }
     if (!ALLOWED_MIME.has(f.type)) {
-      return NextResponse.json(
-        { error: '허용되지 않은 이미지 형식입니다 (png/jpg/gif/webp)' },
-        { status: 415 },
-      )
+      return apiError('STKR_IMG_TYPE_NOT_ALLOWED', 415)
     }
     // KISA MC: Magic Byte 검증 — 위조된 Content-Type 차단
     if (!validateMagicBytes(await f.arrayBuffer(), f.type)) {
-      return NextResponse.json(
-        { error: '파일 내용이 선언된 형식과 일치하지 않습니다' },
-        { status: 415 },
-      )
+      return apiError('FILE_CONTENT_MISMATCH', 415)
     }
   }
 
@@ -103,10 +83,7 @@ export async function POST(request: NextRequest) {
     .eq('ownr_usr_id', user.id)
     .eq('del_yn', 'N')
   if ((count ?? 0) >= 10) {
-    return NextResponse.json(
-      { error: '커스텀 팩은 최대 10개까지 만들 수 있습니다' },
-      { status: 409 },
-    )
+    return apiError('STKR_MAX_PACKS', 409)
   }
 
   // 팩 생성
@@ -125,8 +102,7 @@ export async function POST(request: NextRequest) {
     .select('pack_id, pack_nm')
     .single()
 
-  if (packError || !pack)
-    return NextResponse.json({ error: '팩 생성 실패' }, { status: 500 })
+  if (packError || !pack) return apiError('STKR_PACK_CREATE_FAILED', 500)
   const packId = (pack as { pack_id: string }).pack_id
 
   // 이미지 업로드 → msg_stkr INSERT (개별 실패 시 전체 롤백 대신 성공분만 유지)
@@ -168,10 +144,7 @@ export async function POST(request: NextRequest) {
       .from('msg_stkr_pack')
       .update({ del_yn: 'Y', del_dtm: new Date().toISOString() })
       .eq('pack_id', packId)
-    return NextResponse.json(
-      { error: '스티커 이미지 업로드에 실패했습니다' },
-      { status: 500 },
-    )
+    return apiError('STKR_IMAGE_UPLOAD_FAILED', 500)
   }
 
   const { error: stkrError } = await db.from('msg_stkr').insert(stickerRows)
@@ -180,7 +153,7 @@ export async function POST(request: NextRequest) {
       .from('msg_stkr_pack')
       .update({ del_yn: 'Y', del_dtm: new Date().toISOString() })
       .eq('pack_id', packId)
-    return NextResponse.json({ error: '스티커 등록 실패' }, { status: 500 })
+    return apiError('STKR_REGISTER_FAILED', 500)
   }
 
   // 제작자 자동 보유 처리 (pymnt_id 없이 — 제작 = 소유)

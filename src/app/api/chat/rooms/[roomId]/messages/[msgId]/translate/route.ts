@@ -10,6 +10,7 @@ import { TRANSLATE_ONCE_BEAN } from '@/lib/bean-fee'
 import { applyPromoGate } from '@/lib/fee-resolver'
 import { consumeTransQuota } from '@/lib/chat-translate-quota'
 import { recordUserAction } from '@/lib/event'
+import { apiError } from '@/lib/api-errors'
 
 type Params = { params: Promise<{ roomId: string; msgId: string }> }
 
@@ -19,12 +20,10 @@ type Params = { params: Promise<{ roomId: string; msgId: string }> }
 export async function POST(request: NextRequest, { params }: Params) {
   const { roomId, msgId } = await params
   const user = await getSessionUser()
-  if (!user)
-    return NextResponse.json({ error: '로그인이 필요합니다' }, { status: 401 })
+  if (!user) return apiError('AUTH_REQUIRED', 401)
 
   const mbr = await getRoomMember(roomId, user.id)
-  if (!mbr)
-    return NextResponse.json({ error: '카페 멤버가 아닙니다' }, { status: 403 })
+  if (!mbr) return apiError('CHAT_NOT_MEMBER', 403)
 
   // 자동번역 과금: 구독자(TRANSLATE/PyCafé™)는 무료, 비구독자는 건당 Bean 과금(맛보기·전환 유도)
   const isSubscriber = await canAutoTranslate(user.id)
@@ -33,7 +32,7 @@ export async function POST(request: NextRequest, { params }: Params) {
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ error: '잘못된 요청 본문' }, { status: 400 })
+    return apiError('BAD_REQUEST_BODY', 400)
   }
 
   const { locale_cd: localeCd, confirm } = body as {
@@ -41,10 +40,7 @@ export async function POST(request: NextRequest, { params }: Params) {
     confirm?: boolean
   }
   if (!localeCd || !LOCALE_CD_RE.test(localeCd)) {
-    return NextResponse.json(
-      { error: '유효하지 않은 locale 코드' },
-      { status: 400 },
-    )
+    return apiError('CHAT_INVALID_LOCALE', 400)
   }
 
   const { data: msg } = await getSupabaseAdmin()
@@ -55,16 +51,9 @@ export async function POST(request: NextRequest, { params }: Params) {
     .eq('del_yn', 'N')
     .maybeSingle()
 
-  if (!msg)
-    return NextResponse.json(
-      { error: '메시지를 찾을 수 없습니다' },
-      { status: 404 },
-    )
+  if (!msg) return apiError('CHAT_MSG_NOT_FOUND', 404)
   if (msg.msg_tp_cd !== 'TEXT' || !msg.msg_cont) {
-    return NextResponse.json(
-      { error: '텍스트 메시지만 번역할 수 있습니다' },
-      { status: 400 },
-    )
+    return apiError('CHAT_TRANSLATE_TEXT_ONLY', 400)
   }
 
   // M3.2: 자동번역 기능 사용 미션 기록 (비블로킹)
@@ -94,6 +83,7 @@ export async function POST(request: NextRequest, { params }: Params) {
       return NextResponse.json(
         {
           error: 'PyTranslate™는 구독자 전용입니다',
+          code: 'CHAT_TRANSLATE_SUBSCRIBER_ONLY',
           requiresBean: true,
           requiresConfirm: true,
           feeBean,
@@ -108,6 +98,8 @@ export async function POST(request: NextRequest, { params }: Params) {
       return NextResponse.json(
         {
           error: `번역 1회에 ${feeBean} Bean이 필요합니다. Bean을 충전하거나 PyTranslate™를 구독하세요.`,
+          code: 'CHAT_TRANSLATE_FEE_REQUIRED',
+          params: { fee: feeBean },
           requiresBean: true,
           feeBean,
           requiresSubscription: true,
@@ -135,6 +127,7 @@ export async function POST(request: NextRequest, { params }: Params) {
           {
             error:
               '오늘 무료 번역 한도(10건)를 모두 사용했습니다. 내일 다시 이용해 주세요.',
+            code: 'CHAT_TRANSLATE_DAILY_LIMIT',
             quotaExhausted: true,
           },
           { status: 429 },
@@ -178,6 +171,6 @@ export async function POST(request: NextRequest, { params }: Params) {
       `[chat-translate] 번역 실패 msg:${msgId} locale:${localeCd}`,
       err,
     )
-    return NextResponse.json({ error: '번역에 실패했습니다' }, { status: 502 })
+    return apiError('CHAT_TRANSLATE_FAILED', 502)
   }
 }
