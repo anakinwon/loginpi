@@ -110,7 +110,9 @@ if (quotedUpper) {
 }
 
 // ---------- CREATE TABLE 단위 검사 (R1·R2·R3·R4·R6) ----------
-const PREFIX_RE = /^(sys_|brd_|std_|pi_|auth_|cod_|msg_|i18n_|approval_)/
+// 2026-07-10 현행화(DA 승인: 마스터) — 승인 기사용 접두사 14종 소급 등재 (정본 §2-1 동기화)
+const PREFIX_RE =
+  /^(sys_|brd_|std_|pi_|auth_|cod_|msg_|i18n_|approval_|mps_|bean_|evt_|fbck_|stat_|metric_|usr_|ops_|ui_|fee_|promo_|mainnet_|tip_|trans_)/
 const LOG_TABLE_RE = /(_log|_hist)$/
 const SYS_COLS = [
   { col: 'regr_id', re: /\bregr_id\s+TEXT\s+NOT\s+NULL\s+DEFAULT\s+'ADMIN'/i, spec: "regr_id TEXT NOT NULL DEFAULT 'ADMIN'" },
@@ -162,7 +164,7 @@ for (const t of extractCreateTables(sqlNoComments)) {
   if (!PREFIX_RE.test(t.name.toLowerCase())) {
     violations.push({
       rule: 'R2',
-      msg: `테이블명 '${t.name}' 도메인 접두사 누락 — sys_/brd_/std_/pi_/auth_/cod_/msg_/i18n_ 중 하나로 시작 (정본 §2-1)`,
+      msg: `테이블명 '${t.name}' 도메인 접두사 누락 — 정본 §2-1 승인 접두사 목록(22종) 중 하나로 시작해야 함. 신규 접두사는 DA 승인 필요 (docs/da/데이터표준규칙.md §2-1)`,
     })
   }
   // R1: 시스템 컬럼 4개
