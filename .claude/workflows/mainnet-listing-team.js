@@ -33,6 +33,7 @@ const COMMON = `작업 디렉토리: C:\\Users\\anaki\\workspace\\cafe-pi-claude
 운영 URL: https://cafepi.vercel.app · staging: https://loginpi.vercel.app.
 staging DB 접근: .env.local의 NEXT_PUBLIC_SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY로 @supabase/supabase-js 사용(프로젝트 루트에서 node 스크립트 실행 — ESM .mjs, 프로젝트 node_modules 사용. 임시 스크립트는 프로젝트 루트에 tmp-*.mjs로 만들고 실행 후 삭제).
 ⛔절대 금지: 운영/staging에 테스트 데이터 생성·코드 수정·커밋. 조사(읽기)만 수행.
+⛔비밀값(SERVICE_ROLE_KEY·API 키 등) 하드코딩 절대 금지 — 반드시 .env.local을 런타임에 파싱해 사용. 임시 스크립트는 실행 직후 반드시 삭제(rm).
 외부 페이지는 node https(maxHeaderSize 1MB)로 fetch 가능.`
 
 const results = await parallel([
