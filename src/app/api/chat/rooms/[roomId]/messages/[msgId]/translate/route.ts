@@ -3,6 +3,7 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { getSessionUser } from '@/lib/auth-check'
 import { getRoomMember } from '@/lib/chat'
 import { LOCALE_CD_RE, baseLang } from '@/lib/chat-translate'
+import { targetLangBase } from '@/lib/locale-lang'
 import { getOrTranslateMessage } from '@/lib/chat-translate-dedup'
 import { canAutoTranslate } from '@/lib/chat-auth'
 import { applyBean, getBalance } from '@/lib/bean'
@@ -63,7 +64,11 @@ export async function POST(request: NextRequest, { params }: Params) {
   )
 
   // 원본 언어가 이미 감지되어 있고 대상 언어와 같으면 번역 불필요 (과금 없음)
-  if (msg.src_lang_cd && baseLang(msg.src_lang_cd) === baseLang(localeCd)) {
+  // localeCd는 국가 파생 코드(er=영어 등)라 baseLang 직접 비교는 오판 → targetLangBase로 해석
+  if (
+    msg.src_lang_cd &&
+    baseLang(msg.src_lang_cd) === targetLangBase(localeCd)
+  ) {
     return NextResponse.json({
       trans_cont: msg.msg_cont,
       cached: true,

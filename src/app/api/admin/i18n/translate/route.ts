@@ -5,6 +5,7 @@ import { join } from 'path'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { apiError } from '@/lib/api-errors'
 import { apiMessage } from '@/lib/api-errors/messages'
+import { resolveLangName } from '@/lib/locale-lang'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -24,9 +25,14 @@ const LOCALE_NAME_OVERRIDES: Record<string, string> = {
 }
 
 // locale_cd → Gemini용 언어명
-// Intl.DisplayNames 자동 파생 → override 적용 → 최후 폴백: locale_cd 그대로
+// override → locale-lang 단일소스(국가 파생 locale 해석: ye→Arabic, bn→Malay) →
+// Intl.DisplayNames 자동 파생 → 최후 폴백: locale_cd 그대로
+// ⚠️ Intl.DisplayNames는 코드를 "언어코드"로 해석하므로 국가 파생 locale(bn=브루나이,
+//    mt=몰타, am=아르메니아)을 벵골어·몰타어·암하라어로 오판한다 — locale-lang이 우선
 function getLocaleName(locale_cd: string): string {
   if (LOCALE_NAME_OVERRIDES[locale_cd]) return LOCALE_NAME_OVERRIDES[locale_cd]
+  const resolved = resolveLangName(locale_cd)
+  if (resolved) return resolved
   try {
     const names = new Intl.DisplayNames(['en'], { type: 'language' })
     const name = names.of(locale_cd)

@@ -1,5 +1,6 @@
 import 'server-only'
 import Anthropic from '@anthropic-ai/sdk'
+import { resolveLangName } from './locale-lang'
 
 // PyTranslate™ 번역 엔진 (Phase 12 — TASK-091)
 // 1차: Gemini 2.5 Flash (저비용·고속 — PRD의 2.0-flash는 2026-06 기준 단종되어 404 반환)
@@ -23,10 +24,14 @@ export interface TranslateResult {
 }
 
 // 번역 + 언어감지 단일 호출 프롬프트 (JSON 응답 강제)
+// ⚠️ locale_cd는 국가 파생 코드(ye=아랍어, il=히브리어, bn=말레이어)라 raw 코드를 그대로 넘기면
+//    엔진이 언어를 특정 못 해 원문 반환/오역한다 → locale-lang 해석기로 실제 언어명을 지시한다
 function buildPrompt(text: string, targetLocale: string): string {
+  const langName = resolveLangName(targetLocale)
+  const target = langName ?? `the language of locale "${targetLocale}"`
   return [
     `You are a chat message translator.`,
-    `Translate the chat message below to the language of locale "${targetLocale}".`,
+    `Translate the chat message below into ${target}.`,
     `Rules:`,
     `- Preserve emojis, slang, tone, and line breaks exactly.`,
     `- If the message is already in the target language, return it unchanged.`,

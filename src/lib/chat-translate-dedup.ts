@@ -2,6 +2,7 @@ import 'server-only'
 import { getSupabaseAdmin } from './supabase-admin'
 import { broadcastToRoom } from './realtime-broadcast'
 import { translateMessage, baseLang, LOCALE_CD_RE } from './chat-translate'
+import { targetLangBase } from './locale-lang'
 
 // PyTranslate™ 동시성 dedup (Phase 12 — TASK-092)
 // 같은 (msgId, locale) 번역 요청이 동시에 여러 건 들어와도 번역 API는 1회만 호출된다.
@@ -62,12 +63,16 @@ export async function getOrTranslateMessage(params: {
     )
 
     // 3. DB 캐시 저장 — 멀티 인스턴스 동시 번역 경합은 UPSERT로 흡수
+    // del_yn='N'·del_dtm=null 명시: 논리삭제된 오염 캐시(sql/175)와 충돌 시 부활시켜야
+    // 조회 필터(del_yn='N')에 다시 잡힌다 — 누락 시 영구 캐시미스로 매번 재번역(비용 누수)
     await supabase.from('msg_trans').upsert(
       {
         msg_id: msgId,
         locale_cd: localeCd,
         trans_cont: translated,
         model_ver: modelVer,
+        del_yn: 'N',
+        del_dtm: null,
         regr_id: 'SYSTEM',
         modr_id: 'SYSTEM',
       },
@@ -139,7 +144,8 @@ export async function queueRoomTranslations(params: {
 
   let detectedSrcLang: string | null = null
   for (const localeCd of locales) {
-    if (detectedSrcLang && baseLang(localeCd) === detectedSrcLang) continue
+    // localeCd는 국가 파생 코드(er=영어 등)라 baseLang 직접 비교는 오판 → targetLangBase로 해석
+    if (detectedSrcLang && targetLangBase(localeCd) === detectedSrcLang) continue
     try {
       const { srcLangCd } = await getOrTranslateMessage({
         msgId,
