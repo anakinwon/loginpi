@@ -697,11 +697,6 @@
     }
   },
   "adminAnalytics": {
-    "adminAnalytics": {
-      "export": {
-        "fail": "No data to export or failed"
-      }
-    },
     "charts": {
       "abcCum": "ޖަމާކުރެވިފައިވާ ނިސްބަތް",
       "abcCumHover": "ޖުމްލަ",
