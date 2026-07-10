@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "giây"
     },
+    "export": {
+      "csv": "Xuất CSV",
+      "fail": "Không có Data để xuất hoặc đã thất bại",
+      "working": "Đang xuất..."
+    },
     "labels": {
       "noName": "(Không có tên)"
     },

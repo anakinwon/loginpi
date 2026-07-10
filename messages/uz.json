@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "soniya"
     },
+    "export": {
+      "csv": "CSV Eksport qilish",
+      "fail": "Eksport qilish uchun Data yo'q yoki muvaffaqiyatsiz tugadi",
+      "working": "Eksport qilinmoqda..."
+    },
     "labels": {
       "noName": "(Ismsiz)"
     },

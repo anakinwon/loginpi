@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "sek."
     },
+    "export": {
+      "csv": "Eksportuoti CSV",
+      "fail": "Nėra Data eksportuoti arba nepavyko",
+      "working": "Eksportuojama..."
+    },
     "labels": {
       "noName": "(Be pavadinimo)"
     },

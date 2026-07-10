@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "seconds"
     },
+    "export": {
+      "csv": "Tumitha CSV",
+      "fail": "Kaapo Data yokutumitha nenge ocha ndjipala",
+      "working": "Otaku tumithwa..."
+    },
     "labels": {
       "noName": "(no name)"
     },

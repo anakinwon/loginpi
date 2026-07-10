@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "sek"
     },
+    "export": {
+      "csv": "CSV eksportere",
+      "fail": "Váilu Data dahje eksporteren ii lihkostuvvan",
+      "working": "Eksporteremin…"
+    },
     "labels": {
       "noName": "(Inget namn)"
     },

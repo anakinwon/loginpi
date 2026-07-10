@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "sek."
     },
+    "export": {
+      "csv": "Eksporter CSV",
+      "fail": "Ingen data at eksportere eller mislykkedes",
+      "working": "Eksporterer..."
+    },
     "labels": {
       "noName": "(Intet navn)"
     },

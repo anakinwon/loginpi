@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "ثانية"
     },
+    "export": {
+      "csv": "CSV exportéieren",
+      "fail": "Keng Data fir ze exportéieren oder ass feelgeschloen",
+      "working": "Am Exportéieren..."
+    },
     "labels": {
       "noName": "(لا يوجد اسم)"
     },

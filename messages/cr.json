@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "segundos"
     },
+    "export": {
+      "csv": "CSV pīkiskwāw",
+      "fail": "ēkā wiya Data pīkiskwāw ēkāyō māyāhtāw",
+      "working": "pīkiskwāw-āpihtaw…"
+    },
     "labels": {
       "noName": "(Sin nombre)"
     },

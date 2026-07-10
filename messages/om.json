@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "ثانية"
     },
+    "export": {
+      "csv": "CSV ergii",
+      "fail": "Data ergamu hin jiru yookaan milkaa'uu dide",
+      "working": "Ergamaa jira…"
+    },
     "labels": {
       "noName": "(لا يوجد اسم)"
     },

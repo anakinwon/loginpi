@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "s"
     },
+    "export": {
+      "csv": "Exportovat CSV",
+      "fail": "Žádná data k exportu nebo selhalo",
+      "working": "Probíhá export..."
+    },
     "labels": {
       "noName": "(Bez jména)"
     },

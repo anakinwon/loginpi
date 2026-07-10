@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "ሰከንድ"
     },
+    "export": {
+      "csv": "CSV eksport",
+      "fail": "Eksportimiseks pole Data või see ebaõnnestus.",
+      "working": "Eksportimine..."
+    },
     "labels": {
       "noName": "(ስም የለም)"
     },

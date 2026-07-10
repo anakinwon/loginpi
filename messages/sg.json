@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "seconds"
     },
+    "export": {
+      "csv": "Exporté CSV",
+      "fail": "Ayeke na Data pëpe ti exporté wala akpé.",
+      "working": "A yeke exporté..."
+    },
     "labels": {
       "noName": "(no name)"
     },

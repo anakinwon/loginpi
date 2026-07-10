@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "segundos"
     },
+    "export": {
+      "csv": "Export CSV",
+      "fail": "Ha ho Data ea ho romela kapa e hlotsoe",
+      "working": "E ntse e romeloa..."
+    },
     "labels": {
       "noName": "(Sem nome)"
     },

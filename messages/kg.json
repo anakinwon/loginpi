@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "секунд"
     },
+    "export": {
+      "csv": "Exporta CSV",
+      "fail": "Ve Data ya kulongola to ya fwa",
+      "working": "Kulongola..."
+    },
     "labels": {
       "noName": "(Аты жок)"
     },

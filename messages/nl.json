@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "sec"
     },
+    "export": {
+      "csv": "CSV exporteren",
+      "fail": "Geen Data om te exporteren of mislukt",
+      "working": "Bezig met exporteren..."
+    },
     "labels": {
       "noName": "(geen naam)"
     },

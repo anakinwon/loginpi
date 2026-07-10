@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "sec"
     },
+    "export": {
+      "csv": "Izvezi CSV",
+      "fail": "Nema Data za izvoz ili je izvoz neuspeo.",
+      "working": "Izvozi se..."
+    },
     "labels": {
       "noName": "(geen naam)"
     },

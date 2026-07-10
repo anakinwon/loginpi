@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "sek."
     },
+    "export": {
+      "csv": "Útflutningur CSV",
+      "fail": "Engin Data til að flytja út eða mistókst",
+      "working": "Er að flytja út…"
+    },
     "labels": {
       "noName": "(Nafnlaust)"
     },

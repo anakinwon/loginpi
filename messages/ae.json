@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "ثانية"
     },
+    "export": {
+      "csv": "CSV uz-barəiti",
+      "fail": "nōit Data uz-barəiti vā frasāiti",
+      "working": "uz-barənti..."
+    },
     "labels": {
       "noName": "(لا يوجد اسم)"
     },

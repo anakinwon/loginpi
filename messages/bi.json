@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "secondes"
     },
+    "export": {
+      "csv": "Ekspot CSV",
+      "fail": "I no gat Data blong ekspotem o i fel.",
+      "working": "I stap ekspotem..."
+    },
     "labels": {
       "noName": "(Sans nom)"
     },

@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "secondes"
     },
+    "export": {
+      "csv": "CSV kutūla",
+      "fail": "Kukakwata Data ya kutūla nansha kwalelwe",
+      "working": "Kutūla..."
+    },
     "labels": {
       "noName": "(Sans nom)"
     },

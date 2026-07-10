@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "seconds"
     },
+    "export": {
+      "csv": "Fakaha atu CSV",
+      "fail": "'Ikai ha Data ke fakaha atu pe kuo 'ikai lava",
+      "working": "Fakaha atu..."
+    },
     "labels": {
       "noName": "(no name)"
     },

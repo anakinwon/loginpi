@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "secondes"
     },
+    "export": {
+      "csv": "Содироти CSV",
+      "fail": "Барои содирот Data мавҷуд нест ё ноком шуд",
+      "working": "Дар ҳоли содирот…"
+    },
     "labels": {
       "noName": "(Sans nom)"
     },

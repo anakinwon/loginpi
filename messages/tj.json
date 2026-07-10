@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "сония"
     },
+    "export": {
+      "csv": "Export CSV",
+      "fail": "No data to export or failed.",
+      "working": "Exporting..."
+    },
     "labels": {
       "noName": "(Ном надорад)"
     },

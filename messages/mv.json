@@ -697,6 +697,11 @@
     }
   },
   "adminAnalytics": {
+    "adminAnalytics": {
+      "export": {
+        "fail": "No data to export or failed"
+      }
+    },
     "charts": {
       "abcCum": "ޖަމާކުރެވިފައިވާ ނިސްބަތް",
       "abcCumHover": "ޖުމްލަ",
@@ -759,6 +764,11 @@
       "uPerson": "މީހުން",
       "uPv": "PV",
       "uSec": "ސިކުންތު"
+    },
+    "export": {
+      "csv": "Export CSV",
+      "fail": "އެކްސްޕޯޓް ކުރާނެ ޑޭޓާއެއް ނެތް ނުވަތަ ފެއިލްވެއްޖެ",
+      "working": "Exporting..."
     },
     "labels": {
       "noName": "(ނަމެއް ނެތް)"

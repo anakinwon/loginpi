@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "segundos"
     },
+    "export": {
+      "csv": "CSV Ekisipoto",
+      "fail": "A hu na Data ya u ekisipoto kana yo kundwa.",
+      "working": "Ekisipoto i khou bvela phanda..."
+    },
     "labels": {
       "noName": "(Sin nombre)"
     },

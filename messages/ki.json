@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "seconds"
     },
+    "export": {
+      "csv": "Rutithia CSV",
+      "fail": "Gũtirĩ Data ya kũrutithia kana nĩ yaregire",
+      "working": "Kũrutithia..."
+    },
     "labels": {
       "noName": "(no name)"
     },

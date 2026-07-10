@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "seconds"
     },
+    "export": {
+      "csv": "CSV ekspot",
+      "fail": "Ejjeļo̧k Data n̄an ekspot ak ejjeļo̧k wāween",
+      "working": "Kōm̧m̧an ekspot wōt..."
+    },
     "labels": {
       "noName": "(no name)"
     },

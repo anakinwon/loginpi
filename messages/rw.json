@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "seconds"
     },
+    "export": {
+      "csv": "Kohereza CSV hanze",
+      "fail": "Nta Data ihari yo kohereza hanze cyangwa byarananiranye",
+      "working": "Birimo koherezwa hanze…"
+    },
     "labels": {
       "noName": "(no name)"
     },

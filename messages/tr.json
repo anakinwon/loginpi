@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "saniye"
     },
+    "export": {
+      "csv": "CSV Dışa Aktar",
+      "fail": "Dışa aktarılacak veri yok veya başarısız oldu.",
+      "working": "Dışa aktarılıyor..."
+    },
     "labels": {
       "noName": "(İsimsiz)"
     },

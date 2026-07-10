@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "seconds"
     },
+    "export": {
+      "csv": "Thumela i-CSV",
+      "fail": "Ayikho idatha yokuthumela noma kwehlulekile",
+      "working": "Kuyathunyelwa..."
+    },
     "labels": {
       "noName": "(no name)"
     },

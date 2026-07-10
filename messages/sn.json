@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "secondes"
     },
+    "export": {
+      "csv": "Tumira kunze CSV",
+      "fail": "Hapana Data yekutumira kunze kana kuti zvakakundikana.",
+      "working": "Kutumira kunze..."
+    },
     "labels": {
       "noName": "(Sans nom)"
     },

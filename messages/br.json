@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "segundos"
     },
+    "export": {
+      "csv": "Ezporzhiañ CSV",
+      "fail": "N'eus Data ebet da ezporzhiañ pe c'hwitet eo",
+      "working": "O ezporzhiañ..."
+    },
     "labels": {
       "noName": "(Sem nome)"
     },

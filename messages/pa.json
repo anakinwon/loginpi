@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "segundos"
     },
+    "export": {
+      "csv": "CSV ਨਿਰਯਾਤ ਕਰੋ",
+      "fail": "ਨਿਰਯਾਤ ਕਰਨ ਲਈ ਕੋਈ ਡਾਟਾ ਨਹੀਂ ਹੈ ਜਾਂ ਅਸਫਲ ਰਿਹਾ",
+      "working": "ਨਿਰਯਾਤ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ…"
+    },
     "labels": {
       "noName": "(Sin nombre)"
     },

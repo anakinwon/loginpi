@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "sek."
     },
+    "export": {
+      "csv": "Eksportēt CSV",
+      "fail": "Nav datu eksportēšanai vai neizdevās",
+      "working": "Notiek eksportēšana..."
+    },
     "labels": {
       "noName": "(Bez nosaukuma)"
     },

@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "seconds"
     },
+    "export": {
+      "csv": "CSV e-kepo",
+      "fail": "I-kare Data e-kepo ke i-kare",
+      "working": "E-kepo i-kare..."
+    },
     "labels": {
       "noName": "(no name)"
     },

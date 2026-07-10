@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "saat"
     },
+    "export": {
+      "csv": "Eksport CSV",
+      "fail": "Tiada Data untuk dieksport atau gagal",
+      "working": "Mengeksport..."
+    },
     "labels": {
       "noName": "(Tiada Nama)"
     },

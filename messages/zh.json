@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "秒"
     },
+    "export": {
+      "csv": "CSV 导出",
+      "fail": "没有可导出的 Data 或失败了",
+      "working": "正在导出…"
+    },
     "labels": {
       "noName": "(无名称)"
     },

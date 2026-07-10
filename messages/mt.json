@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "seconds"
     },
+    "export": {
+      "csv": "Esporta CSV",
+      "fail": "M'hemmx Data biex tesporta jew falliet",
+      "working": "Qed jesporta…"
+    },
     "labels": {
       "noName": "(no name)"
     },

@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "secondes"
     },
+    "export": {
+      "csv": "Manondrana CSV",
+      "fail": "Tsy misy Data haondrana na tsy nahomby",
+      "working": "Eo am-panondranana..."
+    },
     "labels": {
       "noName": "(Sans nom)"
     },

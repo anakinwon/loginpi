@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "sek"
     },
+    "export": {
+      "csv": "ɖe CSV go",
+      "fail": "Data aɖeke mele be woaɖe go o alo megbe",
+      "working": "le go ɖem…"
+    },
     "labels": {
       "noName": "(Nimetu)"
     },

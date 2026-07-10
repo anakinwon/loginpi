@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "secondes"
     },
+    "export": {
+      "csv": "Ekspòte CSV",
+      "fail": "Pa gen Data pou ekspòte oswa echwe",
+      "working": "Ap ekspòte…"
+    },
     "labels": {
       "noName": "(Sans nom)"
     },

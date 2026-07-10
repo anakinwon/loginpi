@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "segundos"
     },
+    "export": {
+      "csv": "CSV экспорт",
+      "fail": "Экспортламалли Data çук е ăнăçсăр пулчĕ",
+      "working": "Экспортлани..."
+    },
     "labels": {
       "noName": "(Sem nome)"
     },

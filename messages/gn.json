@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "secondes"
     },
+    "export": {
+      "csv": "CSV Eksporta",
+      "fail": "Ndaipóri Data oñe-eksporta haguã térã ojejavy",
+      "working": "Oñe-eksporta hína…"
+    },
     "labels": {
       "noName": "(Sans nom)"
     },

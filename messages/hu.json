@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "mp"
     },
+    "export": {
+      "csv": "CSV exportálása",
+      "fail": "Nincs exportálható adat, vagy sikertelen.",
+      "working": "Exportálás folyamatban..."
+    },
     "labels": {
       "noName": "(Nincs név)"
     },

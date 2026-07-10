@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "තත්පර"
     },
+    "export": {
+      "csv": "CSV Export",
+      "fail": "No data to export or failed",
+      "working": "Exporting..."
+    },
     "labels": {
       "noName": "(නමක් නැත)"
     },

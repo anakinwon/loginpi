@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "secondes"
     },
+    "export": {
+      "csv": "Easpórtáil CSV",
+      "fail": "Níl aon Data le heaspórtáil nó theip air",
+      "working": "Á easpórtáil…"
+    },
     "labels": {
       "noName": "(Sans nom)"
     },

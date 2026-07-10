@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "sec"
     },
+    "export": {
+      "csv": "Export CSV",
+      "fail": "Nu există Data de exportat sau a eșuat",
+      "working": "Se exportă..."
+    },
     "labels": {
       "noName": "(Fără nume)"
     },

@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "secondi"
     },
+    "export": {
+      "csv": "CSV Auina atu i fafo",
+      "fail": "Leai se Data e auina atu i fafo pe ua le manuia",
+      "working": "O lo'o auina atu i fafo..."
+    },
     "labels": {
       "noName": "(Senza nome)"
     },

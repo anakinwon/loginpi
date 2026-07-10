@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "ilbiriqsi"
     },
+    "export": {
+      "csv": "CSV Dhoofin",
+      "fail": "Ma jiraan Data la dhoofiyo ama way fashilantay",
+      "working": "Waa la dhoofinayaa…"
+    },
     "labels": {
       "noName": "(Magac la'aan)"
     },

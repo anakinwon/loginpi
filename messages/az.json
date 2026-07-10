@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "saniyə"
     },
+    "export": {
+      "csv": "CSV İxrac",
+      "fail": "İxrac etmək üçün Data yoxdur və ya uğursuz oldu.",
+      "working": "İxrac edilir..."
+    },
     "labels": {
       "noName": "(Ad yoxdur)"
     },

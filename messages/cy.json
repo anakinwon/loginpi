@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "δευτ."
     },
+    "export": {
+      "csv": "Allforio CSV",
+      "fail": "Dim Data i'w allforio neu methwyd",
+      "working": "Yn allforio…"
+    },
     "labels": {
       "noName": "(Χωρίς όνομα)"
     },

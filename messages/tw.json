@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "秒"
     },
+    "export": {
+      "csv": "Fa CSV kɔ abɔnten",
+      "fail": "Data nni hɔ a yɛde bɛfa kɔ abɔnten anaasɛ ante yiye.",
+      "working": "Fa kɔ abɔnten rekɔ so…"
+    },
     "labels": {
       "noName": "(無名稱)"
     },

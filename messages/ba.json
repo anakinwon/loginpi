@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "sek"
     },
+    "export": {
+      "csv": "CSV экспортлау",
+      "fail": "Экспортлау өсөн Data юҡ йәки уңышһыҙ булды",
+      "working": "Экспортлау бара..."
+    },
     "labels": {
       "noName": "(Bez imena)"
     },

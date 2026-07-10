@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "sec"
     },
+    "export": {
+      "csv": "CSV Экспарт",
+      "fail": "Няма Data для экспарту ці не атрымалася",
+      "working": "Экспартуецца..."
+    },
     "labels": {
       "noName": "(geen naam)"
     },

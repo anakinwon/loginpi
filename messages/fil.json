@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "segundo"
     },
+    "export": {
+      "csv": "Export CSV",
+      "fail": "No Data to Export or Failed",
+      "working": "Exporting..."
+    },
     "labels": {
       "noName": "(Walang Pangalan)"
     },

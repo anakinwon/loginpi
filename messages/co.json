@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "segundos"
     },
+    "export": {
+      "csv": "CSV esporta",
+      "fail": "Nisuna Data da esportà o fallita",
+      "working": "Esporta..."
+    },
     "labels": {
       "noName": "(Sin nombre)"
     },

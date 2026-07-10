@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "ثانية"
     },
+    "export": {
+      "csv": "CSV Export",
+      "fail": "Nyns eus Data dhe Eksporya po fyllys",
+      "working": "Ow eksporya..."
+    },
     "labels": {
       "noName": "(لا يوجد اسم)"
     },

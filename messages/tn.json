@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "ثانية"
     },
+    "export": {
+      "csv": "Romela CSV",
+      "fail": "Ga go na Data ya go romela kgotsa go paletswe",
+      "working": "E a romela…"
+    },
     "labels": {
       "noName": "(لا يوجد اسم)"
     },

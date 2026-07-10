@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "saat"
     },
+    "export": {
+      "csv": "CSV এক্সপোর্ট",
+      "fail": "এক্সপোর্ট করার জন্য কোনো Data নেই অথবা ব্যর্থ হয়েছে",
+      "working": "এক্সপোর্ট করা হচ্ছে..."
+    },
     "labels": {
       "noName": "(Tiada Nama)"
     },

@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "sekonda"
     },
+    "export": {
+      "csv": "Eksporto CSV",
+      "fail": "Nuk ka Data për eksportim ose dështoi",
+      "working": "Duke eksportuar..."
+    },
     "labels": {
       "noName": "(Pa emër)"
     },

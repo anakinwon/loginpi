@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "detik"
     },
+    "export": {
+      "csv": "Ekspor CSV",
+      "fail": "Tidak ada Data untuk diekspor atau gagal",
+      "working": "Sedang mengekspor..."
+    },
     "labels": {
       "noName": "(Tanpa nama)"
     },

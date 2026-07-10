@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "sekuntia"
     },
+    "export": {
+      "csv": "Vie CSV",
+      "fail": "Ei vietävää Dataa tai epäonnistui",
+      "working": "Viedään..."
+    },
     "labels": {
       "noName": "(Nimetön)"
     },

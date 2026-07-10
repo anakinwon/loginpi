@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "segundos"
     },
+    "export": {
+      "csv": "CSV ཕྱིར་འདོན་",
+      "fail": "Data ཕྱིར་འདོན་བྱེད་རྒྱུ་མེད་པའམ་མ་འགྲུབ་པ།",
+      "working": "ཕྱིར་འདོན་བྱེད་བཞིན་པ།..."
+    },
     "labels": {
       "noName": "(Sin nombre)"
     },

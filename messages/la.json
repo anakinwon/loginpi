@@ -760,6 +760,11 @@
       "uPv": "PV",
       "uSec": "ວິນາທີ"
     },
+    "export": {
+      "csv": "CSV Exportare",
+      "fail": "Nulla Data ad Exportandum aut Defecit",
+      "working": "Exportans..."
+    },
     "labels": {
       "noName": "(ບໍ່ມີຊື່)"
     },
