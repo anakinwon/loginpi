@@ -17,5 +17,18 @@
     "form": {
       "priceConverted": "≈ {pi} π (등록시점 환율 참고 환산)"
     }
+  },
+  "adminToken": {
+    "dashboard": {
+      "identityMismatch": "⚠️ Bean 항등식 불일치 — 지급({issued}) ≠ 유통({circulating}) + 회수({collected}). DB 점검 필요."
+    },
+    "wallets": {
+      "mintTitle": "🆕 프로모션 Bean 지급",
+      "mintAmountLabel": "지급액 (Bean)",
+      "mintSuccess": "지급 완료 — {dest} 잔액 {balance} Bean"
+    }
+  },
+  "adminCampaign": {
+    "mintAmountPlaceholder": "지급액(Bean)"
   }
 }

@@ -35,7 +35,11 @@ Pi 메인넷/런치패드 심사의 4대 금지선을 모두 충족합니다.
 ### 2.1 Pi 계정 로그인 지원 (Pi 외 로그인 강제 없음)
 - Pi SDK `authenticate()`를 1차 인증 경로로 사용. Google OAuth는 **선택적 보조 연동**일 뿐
   서비스 이용에 강제되지 않습니다.
-- 근거: `src/components/pi-auth-provider.tsx`(Pi 인증·세션), `src/auth.ts`(Google은 선택적 연동)
+- **Pi Sign-In (2026-07-08 추가)**: 일반 브라우저에서도 `accounts.pinet.com` OAuth로
+  **Pi 공식 계정 로그인**이 가능합니다(PC QR·모바일 딥링크·Pi Browser SDK 3종 여정 실기기 검증 완료).
+  Pi Browser 밖에서도 Pi 계정 우선 신원 체계를 강화합니다.
+- 근거: `src/components/pi-auth-provider.tsx`(Pi 인증·세션), `src/auth.ts`(Google은 선택적 연동),
+  `src/components/pi-oauth-login-button.tsx`(Pi Sign-In)
 
 ### 2.2 Pi 외 통화 없음 (법정화폐·외부 토큰 결제 경로 부재)
 - 모든 실결제는 **Pi**로만 이루어집니다.
@@ -232,7 +236,7 @@ Core Web Vitals 목표(LCP < 2.5s · CLS < 0.1 · INP < 200ms) 아래 다층 최
 ## 8. 인프라·운영 안정성
 
 - **환경변수 타입 검증**: `src/env.ts`(t3-env)로 빌드 시점에 누락·타입 오류를 차단합니다.
-- **다국어**: 22개 활성 locale을 단일 소스(`src/lib/locale-currency.ts`·`locale-country.ts`)로 관리하고,
+- **다국어**: 189개 활성 locale(66개 언어 완역, 2026-07-08 기준)을 단일 소스(`src/lib/locale-currency.ts`·`locale-country.ts`)로 관리하고,
   빌드 시 `scripts/validate-locales.mjs`가 messages ↔ 통화 ↔ 국가 ↔ 라우팅을 교차검증합니다(불일치 시 빌드 실패).
 - **graceful fallback**: 런타임 설정이 DB 미적용 상태여도 코드 상수로 폴백해 무중단 운영합니다
   (예: 선물 프리셋 `getTipPresets` → `src/lib/bean.ts`).

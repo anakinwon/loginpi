@@ -17,5 +17,18 @@
     "form": {
       "priceConverted": "≈ {pi} π (reference conversion at registration-time rate)"
     }
+  },
+  "adminToken": {
+    "dashboard": {
+      "identityMismatch": "Warning: Bean identity mismatch - granted({issued}) != circulating({circulating}) + collected({collected}). Check DB."
+    },
+    "wallets": {
+      "mintTitle": "Promotional Bean Grant",
+      "mintAmountLabel": "Grant amount (Bean)",
+      "mintSuccess": "Granted - {dest} balance {balance} Bean"
+    }
+  },
+  "adminCampaign": {
+    "mintAmountPlaceholder": "Grant amount (Bean)"
   }
 }

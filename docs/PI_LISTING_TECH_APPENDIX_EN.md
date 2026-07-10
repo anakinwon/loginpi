@@ -37,7 +37,12 @@ The app satisfies all four prohibitions central to Pi Mainnet / Launchpad review
 ### 2.1 Pi account login supported (no forced non-Pi login)
 - The Pi SDK `authenticate()` is the primary authentication path. Google OAuth is only an
   **optional, supplementary link** and is never required to use the service.
-- Evidence: `src/components/pi-auth-provider.tsx` (Pi auth & session), `src/auth.ts` (Google is optional)
+- **Pi Sign-In (added 2026-07-08)**: regular browsers can also sign in with the **official Pi
+  account** via `accounts.pinet.com` OAuth (verified on real devices across three journeys —
+  desktop QR, mobile deep link, and Pi Browser SDK). This further strengthens the
+  "Pi-account-first" identity model outside Pi Browser.
+- Evidence: `src/components/pi-auth-provider.tsx` (Pi auth & session), `src/auth.ts` (Google is optional),
+  `src/components/pi-oauth-login-button.tsx` (Pi Sign-In)
 
 ### 2.2 No non-Pi currency (no fiat / external-token payment path)
 - All real payments are made **only in Pi**.
@@ -257,7 +262,7 @@ secrets are intentionally omitted from this document.)
 ## 8. Infrastructure & Operational Stability
 
 - **Type-safe environment variables**: `src/env.ts` (t3-env) blocks missing/typed errors at build time.
-- **Internationalization**: 22 active locales managed from a single source
+- **Internationalization**: 189 active locales (66 fully translated languages, as of 2026-07-08) managed from a single source
   (`src/lib/locale-currency.ts` · `locale-country.ts`); at build time, `scripts/validate-locales.mjs`
   cross-validates messages ↔ currency ↔ country ↔ routing (build fails on any mismatch).
 - **Graceful fallback**: runtime settings fall back to code constants even when the DB migration is not
