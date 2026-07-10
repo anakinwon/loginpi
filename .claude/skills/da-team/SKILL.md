@@ -28,7 +28,7 @@ DA팀 5인(da-leader·da-standards·da-modeler·da-quality·da-migration)을 조
 | quality | da-quality | P1/P2/P3 게이트·전수조사·보고서 | da-qa-checklist | `{NN}_quality_gate.md`, `docs/da/reports/*` |
 | migration | da-migration | 이행 계획·이행 SQL·검증 쿼리 | - | `{NN}_migration_plan.md`, `{NN}_migration_ddl.sql` |
 
-작업 디렉토리: `docs/da/_workspace/` (파일명 `{NN}_{팀원}_{산출물}.{ext}`, NN은 Phase 순번)
+작업 디렉토리: `docs/da/_workspace/{YYYYMMDD}_{잡슬러그}/` — **잡별 하위 디렉토리 필수** (파일명 `{NN}_{팀원}_{산출물}.{ext}`, NN은 Phase 순번). 다중 세션이 병렬로 DA 작업을 수행하므로 `_workspace/` 직속 파일·타 잡 디렉토리는 절대 건드리지 않는다 (2026-07-10 1차 실행에서 타 세션 전수조사와 충돌 회피 확인). Phase 0의 존재 검사도 해당 잡 디렉토리 기준으로 수행한다.
 
 ## 워크플로우
 
@@ -88,6 +88,8 @@ TaskCreate(tasks: [
 - 상충·판단 필요 사항은 leader에게 상신
 
 **리더 모니터링:** TaskGet으로 진행 확인, 유휴 팀원 알림 처리, 막힌 팀원 재지시
+- 팀원이 완료 메시지 없이 유휴 전환되면 **디스크의 산출물 존재·내용부터 확인**한다 (완료 메시지 유실 사례 — 산출물은 정상인 경우가 있음)
+- 팀원 보고가 서로 상충하면(예: 파일 상태) **리더가 디스크 실물을 직접 grep/Read로 판정**한다 — 읽기 시점 경합이 흔한 원인
 
 ### Phase 4: 품질 게이트 & 통합
 

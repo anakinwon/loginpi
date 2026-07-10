@@ -30,7 +30,7 @@ FROM information_schema.columns c
 JOIN information_schema.tables t
   ON t.table_schema='public' AND t.table_name=c.table_name AND t.table_type='BASE TABLE'
 WHERE c.table_schema='public'
-  AND c.column_name !~ '_(id|uid|nm|cd|yn|dtm|dt|no|cnt|amt|sz|ord|url|desc|txt|cont|key|pi|pct|seq|tp|sts|emoji|tag|crd)$'
+  AND c.column_name !~ '_(id|uid|nm|cd|yn|dtm|dt|no|cnt|amt|sz|ord|url|desc|txt|cont|key|pi|pct|seq|tp|sts|emoji|tag|crd|val)$'
   AND c.column_name NOT IN ('regr_id','reg_dtm','modr_id','mod_dtm','del_yn','del_dtm','id')
 ORDER BY c.table_name, c.column_name;
 ```

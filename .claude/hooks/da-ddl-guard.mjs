@@ -122,10 +122,11 @@ const SYS_COLS = [
 ]
 // R7: 표준 도메인 약어 (컬럼명 마지막 토큰)
 // crd = 좌표값(NUMERIC(11,8)) — 2026-06-12 위경도 표준화로 등재 (std_dom)
+// val = 값(JSONB 스냅샷) — 2026-07-10 sys_cfg_chg_hist 설계로 등재 (sql/176, 정본 §1-2 동기)
 const DOMAIN_SUFFIXES = new Set([
   'id', 'uid', 'nm', 'cd', 'yn', 'dtm', 'dt', 'no', 'cnt', 'amt', 'sz', 'ord',
   'url', 'desc', 'txt', 'cont', 'key', 'pi', 'pct', 'seq', 'tp', 'sts', 'emoji', 'tag',
-  'crd',
+  'crd', 'val',
 ])
 
 // 컬럼명이 표준 도메인 약어로 끝나는지 검사 (CREATE·ALTER 공통). 위반 시 warnings 적재
