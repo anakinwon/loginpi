@@ -44,7 +44,7 @@ memory: project
 
 **텍스트 컬럼**: CHAR(n) **절대 금지** → TEXT 또는 VARCHAR 사용 (공백 패딩으로 인한 .eq 매칭 실패 방지)
 
-**FK 설계 없음**: 이 코드베이스는 FK 비설계 원칙. PostgREST 임베디드 조인(.select('table:fk(...)')) 사용 금지
+**FK 정책 (2026-07-01 사고 반영 정정)**: 현재 FK는 유지가 기본. PostgREST 임베디드 조인(`.select('*, mps_shop(...)')`)이 FK에 의존하므로, 무FK 전환은 "① 임베디드 조인을 별도 조회+Map으로 대체 → ② 그 뒤 FK 제거" 순서로만 개별·점진 진행. ⛔코드 대체 없는 FK 일괄 제거 금지 (sql/155 사고 → sql/156 복구)
 
 **현재 운영 테이블**: `sys_user`, `pi_pymnt`, `auth_link_cd`, `brd_*`, `std_*`, `approval_queue`, `i18n_locale`, `i18n_message`, `i18n_cntry_mst`, `bean_wlt`, `bean_txn`, `bean_campaign`, `mps_shop`, `mps_item`, `usr_loc_hist` 등
 
