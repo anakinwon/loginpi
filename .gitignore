@@ -51,6 +51,8 @@ next-env.d.ts
 !.claude/agents/**
 !.claude/hooks/
 !.claude/hooks/**
+!.claude/workflows/
+!.claude/workflows/**
 !.claude/settings.json
 
 # 스크린샷 (개발용)
