@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { useThemeName } from '@/components/chat/use-theme-name'
 import { Link } from '@/i18n/navigation'
@@ -70,6 +70,33 @@ function haversineKm(
 // 이 거리(km) 이상 이동했을 때만 재조회 → watchPosition 콜백 폭주로 인한 과도한 API 호출 방지
 const LIVE_MOVE_THRESHOLD_KM = 0.03 // 30m
 
+// ── P1 선표시(당근 패턴): 마지막 위치·동의를 캐시해 GPS/동의 API 대기를 체감에서 제거 ──
+//   위치: 캐시 좌표로 즉시 지도+목록 표시 → GPS 도착 시 30m 이상 차이면 조용히 보정.
+//   동의: 이전 동의자는 낙관 표시로 즉시 진행 — 정본은 서버(데이터 API가 미동의 403 재검증, Rule LBS-01 유지).
+const LAST_POS_KEY = 'lbs_last_pos' // { lat, lng, ts }
+const CONSENT_CACHE_KEY = 'lbs_consent_y' // '1' = 직전 세션에서 동의 확인됨
+const LAST_POS_TTL_MS = 7 * 24 * 60 * 60 * 1000 // 7일
+
+function readLastPos(): { lat: number; lng: number } | null {
+  try {
+    const raw = localStorage.getItem(LAST_POS_KEY)
+    if (!raw) return null
+    const p = JSON.parse(raw) as { lat: number; lng: number; ts: number }
+    if (!p || typeof p.lat !== 'number' || typeof p.lng !== 'number')
+      return null
+    if (Date.now() - (p.ts ?? 0) > LAST_POS_TTL_MS) return null
+    return { lat: p.lat, lng: p.lng }
+  } catch {
+    return null
+  }
+}
+
+function writeLastPos(pos: { lat: number; lng: number }) {
+  try {
+    localStorage.setItem(LAST_POS_KEY, JSON.stringify({ ...pos, ts: Date.now() }))
+  } catch {}
+}
+
 export function NearbyExplorer() {
   const t = useTranslations('lbs')
   const themeName = useThemeName()
@@ -79,6 +106,11 @@ export function NearbyExplorer() {
     null,
   )
   const [locError, setLocError] = useState<string | null>(null)
+  // GPS 실패 시 "캐시 선표시 중인가" 판정용 최신 좌표 참조 (updater 내 setState 회피)
+  const coordsRef = useRef<{ lat: number; lng: number } | null>(null)
+  useEffect(() => {
+    coordsRef.current = coords
+  })
   const [radius, setRadius] = useState<number>(1)
   const [tab, setTab] = useState<Tab>('shops')
   // 이동 중 실시간 위치 추적 (watchPosition) — 기본 ON, 토글로 끌 수 있음
@@ -92,29 +124,61 @@ export function NearbyExplorer() {
   const [bizCategory, setBizCategory] = useState<BizCategory>('ALL')
   const [focusShopId, setFocusShopId] = useState<string | null>(null)
 
-  // 마운트 시 동의 여부 확인 (Rule LBS-01)
+  // 마운트 직후 캐시 선적용 (hydration mismatch 방지 위해 초기값 대신 첫 effect에서) —
+  // 이전 동의자는 동의 API 응답을 기다리지 않고, 마지막 위치로 지도를 즉시 띄운다.
+  useEffect(() => {
+    try {
+      if (localStorage.getItem(CONSENT_CACHE_KEY) === '1') setLbsConsent('Y')
+      const last = readLastPos()
+      if (last) setCoords((prev) => prev ?? last)
+    } catch {}
+  }, [])
+
+  // 마운트 시 동의 여부 확인 (Rule LBS-01) — 서버가 정본. 낙관 캐시와 불일치 시 서버 값으로 교정.
   useEffect(() => {
     piFetch('/api/location/consent')
       .then((r) => (r.ok ? r.json() : null))
       .then((d: { consent_yn?: string } | null) => {
-        setLbsConsent(d?.consent_yn === 'Y' ? 'Y' : 'N')
+        const y = d?.consent_yn === 'Y'
+        setLbsConsent(y ? 'Y' : 'N')
+        try {
+          if (y) localStorage.setItem(CONSENT_CACHE_KEY, '1')
+          else localStorage.removeItem(CONSENT_CACHE_KEY)
+        } catch {}
       })
-      .catch(() => setLbsConsent('N'))
+      .catch(() => setLbsConsent((prev) => prev ?? 'N')) // 네트워크 실패 시 낙관 상태 유지
   }, [])
 
   // GPS 수집 (동의자만) — 실패 원인별 메시지 구분 (권한 차단·측위 불가·타임아웃)
   // fresh: '위치 갱신' 클릭 시 60초 캐시를 무시하고 새로 측위
+  // 캐시 좌표로 선표시 중이면: GPS 도착 시 30m 이상 차이일 때만 보정(불필요한 재조회·지도 점프 방지)
   const requestLocation = useCallback((fresh = false) => {
     setLocError(null)
     getCurrentPosition({ fresh })
-      .then(setCoords)
-      .catch((e: Error) => setLocError(e.message))
+      .then((pos) => {
+        writeLastPos(pos)
+        setCoords((prev) =>
+          prev &&
+          haversineKm(prev.lat, prev.lng, pos.lat, pos.lng) <
+            LIVE_MOVE_THRESHOLD_KM
+            ? prev
+            : pos,
+        )
+      })
+      .catch((e: Error) => {
+        // 캐시 좌표로 이미 표시 중이면 GPS 실패를 치명 오류로 띄우지 않음 (조용한 폴백)
+        if (!coordsRef.current) setLocError(e.message)
+      })
   }, [])
 
-  // 동의자 진입 시 자동으로 위치 1회 수집
+  // 동의자 진입 시 자동으로 위치 1회 수집 — 캐시 선표시 중이어도 GPS는 병행 시작(도착 시 보정)
+  const [gpsStarted, setGpsStarted] = useState(false)
   useEffect(() => {
-    if (lbsConsent === 'Y' && !coords) requestLocation()
-  }, [lbsConsent, coords, requestLocation])
+    if (lbsConsent === 'Y' && !gpsStarted) {
+      setGpsStarted(true)
+      requestLocation()
+    }
+  }, [lbsConsent, gpsStarted, requestLocation])
 
   // 이동 중 실시간 추적 — 동의자 + liveTracking ON일 때 watchPosition 구독.
   // 30m 이상 이동했을 때만 좌표를 갱신 → 기존 조회 effect가 자동으로 거리순 재정렬.
@@ -125,6 +189,7 @@ export function NearbyExplorer() {
     const watchId = navigator.geolocation.watchPosition(
       (pos) => {
         const next = { lat: pos.coords.latitude, lng: pos.coords.longitude }
+        writeLastPos(next) // 다음 진입 선표시용 최신 위치 유지
         setCoords((prev) =>
           prev &&
           haversineKm(prev.lat, prev.lng, next.lat, next.lng) <
@@ -279,7 +344,8 @@ export function NearbyExplorer() {
         </button>
       </div>
 
-      {loading ? (
+      {/* 첫 로드(데이터 없음)만 풀 로딩 — 재조회 중엔 지도·목록을 유지해 언마운트 깜빡임 제거 */}
+      {loading && shops.length === 0 && rooms.length === 0 ? (
         <p className="text-muted-foreground py-16 text-center text-sm">
           {t('searching')}
         </p>
