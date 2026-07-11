@@ -202,8 +202,16 @@
 ### 재발방지 (철칙)
 1. **Portal 앱 스코프 변경 = 세트 작업**: 앱 네트워크 전환 시 `PI_API_KEY`·`PI_WALLET_PRIVATE_SEED` 동시 로테이트 + 재배포 + 실기기 결제 검증까지가 한 단위. (uid 재발급은 재바인딩이 자가치유하지만 **API 키는 자가치유 불가**.)
 2. **`NEXT_PUBLIC_PI_SANDBOX`≠실기기 네트워크**: 실기기 Pi Browser의 Testnet/Mainnet은 Portal 등록이 결정. 번들 플래그만 보고 네트워크를 단정하지 말 것.
-3. **진단 공식**: "로그인 O·결제 approve 404" = 십중팔구 키↔앱 스코프 불일치. 완결 결제 ID approve 재호출 프로브로 서버 키의 `network`를 실측하라(무해·읽기 API 불요).
+3. **진단 공식**: "로그인 O·결제 approve 404" = 십중팔구 키↔앱 스코프 불일치. 완결 결제 ID approve 재호출 프로브로 서버 키의 `network`를 실측하라(읽기 API 불요).
 4. approve/complete의 Pi API 실패는 현재 클라이언트 응답에만 담김 — 서버 로그(console.error)에도 남기는 관측성 개선 권장.
+5. ⚠️ **프로브 부작용 주의**: Pi approve API는 이미 완결된 결제에도 200+결제객체를 반환하며, 이때 approve 라우트가 `pi_pymnt`를 `status:'approved'`로 **upsert해 completed를 되돌린다**(2026-07-11 진단 중 실제 발생 — 7/3 완결 2행 격하 → 당일 원복 완료). 프로브 후 반드시 대상 행 status 재확인. 근본책: approve upsert를 `status='completed'가 아닐 때만` 갱신하도록 가드 권장.
+
+### ✅ 최종 해결 확정 (2026-07-11 마스터 실기기 검증)
+- 마스터가 Portal **메인넷 앱** `PI_API_KEY` 확보 → Vercel production env 교체 → 리디플로이(Vercel API, `cafe-wrtrfozrd` READY 18:08 KST).
+- 반영 검증: 교체 전 프로브=테스트넷 결제 조회 성공(`Pi Testnet`) → 교체 후 동일 프로브=`payment_not_found` 404(새 키는 다른 앱 스코프 — 의도된 정상 신호).
+- **메인넷 첫 실결제 성공**: `rR0TAqLy…` 2.2 Pi 카트 결제 completed+txid (18:06 KST). **`PI_API_KEY` 교체만으로 복구** — `PI_WALLET_PRIVATE_SEED`는 U2A와 무관(A2U 서명 전용)이라 유지. 시드 요건="메인넷 앱 등록 지갑과 동일 키페어"(Pi 지갑 키페어는 양 네트워크 공용) — 첫 환불/보상 A2U 시 실검증 필요.
+- 🎉 **메인넷 등재 신청 완료** (마스터, 2026-07-11).
+- 잔여: ①테스트넷 시절 금전 데이터(pi_pymnt·bean_txn) 초기화 결정(컷오버 정책) ②A2U(환불·팁·보상) 메인넷 첫 실행 검증 ③approve upsert 격하 가드 코드 반영.
 
 ---
 
