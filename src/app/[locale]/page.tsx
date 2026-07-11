@@ -1,5 +1,4 @@
 import { getTranslations } from 'next-intl/server'
-import { Link } from '@/i18n/navigation'
 import { resolveDbTier } from '@/lib/db-env'
 import { computeIsProd } from '@/lib/feature-flags'
 import { StatsDashboard } from '@/components/admin/stats/stats-dashboard'
@@ -14,7 +13,6 @@ export async function generateMetadata() {
 
 export default async function HomePage() {
   const t = await getTranslations('adminStats')
-  const tf = await getTranslations('faq')
   // 운영(메인넷)이면 대시보드(제목+통계) 전체 숨김 — staging·dev만 노출(단일 소스)
   const isProd = computeIsProd(resolveDbTier())
 
@@ -40,21 +38,7 @@ export default async function HomePage() {
           <StatsDashboard />
         </>
       )}
-
-      {/* 푸터 — 고객지원·약관 노출 */}
-      <footer className="text-muted-foreground flex flex-wrap items-center justify-center gap-x-3 gap-y-1 border-t pt-4 text-xs">
-        <Link href="/support" className="hover:underline">
-          {tf('supportTitle')}
-        </Link>
-        <span>·</span>
-        <Link href="/docs/legal/terms" className="hover:underline">
-          {tf('terms')}
-        </Link>
-        <span>·</span>
-        <Link href="/docs/legal/privacy" className="hover:underline">
-          {tf('privacy')}
-        </Link>
-      </footer>
+      {/* 푸터는 layout 공통 SiteFooter로 이동 (2026-07-11 전 페이지 적용) */}
     </div>
   )
 }

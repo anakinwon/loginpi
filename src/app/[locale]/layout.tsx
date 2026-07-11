@@ -14,6 +14,7 @@ import { PiSdkScript } from '@/components/pi-sdk-script'
 import { PageviewTracker } from '@/components/analytics/pageview-tracker'
 import { Header } from '@/components/layout/header'
 import { BottomNav } from '@/components/layout/bottom-nav'
+import { SiteFooter } from '@/components/layout/site-footer'
 import { StagingBanner } from '@/components/layout/staging-banner'
 import { Toaster } from '@/components/ui/sonner'
 import { getActiveUiTheme, buildThemeStyleCss } from '@/lib/ui-theme'
@@ -143,6 +144,8 @@ export default async function LocaleLayout({
                   >
                     {children}
                   </FeatureFlagProvider>
+                  {/* 전 페이지 공통 푸터 — 고객지원·공지사항·약관·방침 (2026-07-11) */}
+                  <SiteFooter />
                 </main>
                 <BottomNav />
                 {/* 가입/이용 동의 전역 게이트 — 로그인 후 필수 동의 미완료 시 차단 모달 */}

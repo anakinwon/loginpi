@@ -159,9 +159,19 @@ await Promise.all(Array.from({ length: WORKERS }, worker))
 // ── 전 json 재생성 (DB 정본) — 실패 그룹이 있어도 성공분은 반영해 배포 가능하게 한다 ──
 function arrayify(n){if(n===null||typeof n!=='object'||Array.isArray(n))return n;for(const k of Object.keys(n))n[k]=arrayify(n[k]);const ks=Object.keys(n);if(ks.length>0&&ks.every((k,i)=>k===String(i)))return ks.map(k=>n[k]);return n}
 function unflatten(f){const r={};for(const[key,val]of Object.entries(f)){const p=key.split('.');let c=r;for(let i=0;i<p.length-1;i++){if(typeof c[p[i]]!=='object'||c[p[i]]===null)c[p[i]]={};c=c[p[i]]}c[p[p.length-1]]=val}return arrayify(r)}
+// 재발 방지 가드(2026-07-11): DB에 오염 키가 섞여도 json에는 ko(source of truth)에 존재하는 키만 쓴다.
+//   사례 = mv의 'adminAnalytics.adminAnalytics.export.fail' 이중 중첩 → validate-locales 빌드 차단 사고.
+const KO_KEY_SET = new Set(Object.keys(ko))
 for (const lc of locales) {
   const flat = await fetchMap(lc)
-  writeFileSync(`messages/${lc}.json`, JSON.stringify(unflatten(flat), null, 2), 'utf8')
+  const clean = {}
+  let droppedCnt = 0
+  for (const [k, v] of Object.entries(flat)) {
+    if (KO_KEY_SET.has(k)) clean[k] = v
+    else droppedCnt++
+  }
+  if (droppedCnt > 0) console.warn(`  ⚠️ ${lc}: ko에 없는 키 ${droppedCnt}개 제외(DB 정리 필요)`)
+  writeFileSync(`messages/${lc}.json`, JSON.stringify(unflatten(clean), null, 2), 'utf8')
 }
 console.log(`json 재생성 ${locales.length}개 — 완료. 운영 DB 델타 반영 잊지 말 것.`)
 
