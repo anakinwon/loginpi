@@ -369,4 +369,3 @@ See Article 4
 **Contact Information**
 - Email: anakin.won@gmail.com
 - Address: Seoul, Jung-gu, Jungnim-ro 21, The Place Chungjeongro
-- Business Registration Number: (In Preparation)
