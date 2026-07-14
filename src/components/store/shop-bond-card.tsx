@@ -7,6 +7,7 @@ import { piFetch } from '@/lib/pi-fetch'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { BeanIcon } from '@/components/ui/bean-icon'
+import { beanToPi, useFeeMode } from '@/hooks/use-fee-mode'
 import { useApiErrorMessage, type ApiErrorPayload } from '@/hooks/use-api-error'
 
 interface BondState {
@@ -19,10 +20,15 @@ interface BondState {
 
 // 후기 보상 보증금 예치 카드 (판매자 SHOP 보증금) — PRD_24 §10-7.
 //   매장주가 Bean 지갑에서 보증금으로 예치 → 잔액 ≥ 최대 보상액일 때 상품 후기 작성 버튼 활성.
+//   잔액은 Bean 기준 단일 저장, PI 모드 표시=÷100 (§10-7 Bean/Pi 일관 규칙).
+//   PI 모드 예치는 서버 미구현(501 FBCK_PI_BOND_NOT_READY) — 입력 대신 안내 노출.
 export function ShopBondCard() {
   const t = useTranslations('store')
   const tc = useTranslations('common')
+  const tErr = useTranslations('apiErrors')
   const apiErr = useApiErrorMessage()
+  const feeMode = useFeeMode()
+  const isPi = feeMode === 'PI'
   const [state, setState] = useState<BondState | null>(null)
   const [amt, setAmt] = useState('')
   const [busy, setBusy] = useState(false)
@@ -74,7 +80,12 @@ export function ShopBondCard() {
     <div className="shadow-soft bg-card space-y-3 rounded-xl border p-4">
       <div className="flex items-center justify-between gap-2">
         <p className="flex items-center gap-1.5 text-sm font-semibold">
-          <BeanIcon className="h-5 w-5" /> {t('rewardBond.title')}
+          {isPi ? (
+            <span className="text-base font-bold">π</span>
+          ) : (
+            <BeanIcon className="h-5 w-5" />
+          )}{' '}
+          {t('rewardBond.title')}
         </p>
         {state.sufficient ? (
           <span className="shrink-0 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400">
@@ -88,8 +99,8 @@ export function ShopBondCard() {
       </div>
 
       <p className="text-muted-foreground text-xs">
-        {t.rich('rewardBond.desc', {
-          amount: state.max_reward,
+        {t.rich(isPi ? 'rewardBond.descPi' : 'rewardBond.desc', {
+          amount: isPi ? beanToPi(state.max_reward) : state.max_reward,
           b: (c) => <b>{c}</b>,
         })}
       </p>
@@ -99,32 +110,45 @@ export function ShopBondCard() {
           {t('rewardBond.balanceLabel')}
         </span>
         <span className="flex items-center gap-1 text-base font-bold">
-          <BeanIcon className="h-4 w-4" /> {state.balance.toLocaleString()}
+          {isPi ? (
+            <>π {beanToPi(state.balance).toLocaleString()}</>
+          ) : (
+            <>
+              <BeanIcon className="h-4 w-4" /> {state.balance.toLocaleString()}
+            </>
+          )}
         </span>
       </div>
 
-      <div className="flex items-end gap-2">
-        <div className="flex-1 space-y-1">
-          <label className="text-muted-foreground text-xs">
-            {t('rewardBond.depositInputLabel', {
-              wallet: state.wallet.toLocaleString(),
-            })}
-          </label>
-          <Input
-            type="number"
-            min="1"
-            inputMode="numeric"
-            value={amt}
-            onChange={(e) => setAmt(e.target.value)}
-            placeholder={t('rewardBond.amountPlaceholder', {
-              n: Math.max(state.max_reward, 100),
-            })}
-          />
+      {isPi ? (
+        // PI 모드 예치는 Pi 직결제(createPayment) 후속 구현 전 — 전 locale 기번역 키 재사용
+        <p className="text-muted-foreground rounded-lg border border-dashed px-3 py-2 text-xs">
+          {tErr('FBCK_PI_BOND_NOT_READY')}
+        </p>
+      ) : (
+        <div className="flex items-end gap-2">
+          <div className="flex-1 space-y-1">
+            <label className="text-muted-foreground text-xs">
+              {t('rewardBond.depositInputLabel', {
+                wallet: state.wallet.toLocaleString(),
+              })}
+            </label>
+            <Input
+              type="number"
+              min="1"
+              inputMode="numeric"
+              value={amt}
+              onChange={(e) => setAmt(e.target.value)}
+              placeholder={t('rewardBond.amountPlaceholder', {
+                n: Math.max(state.max_reward, 100),
+              })}
+            />
+          </div>
+          <Button onClick={deposit} disabled={busy}>
+            {busy ? t('rewardBond.depositing') : t('rewardBond.depositBtn')}
+          </Button>
         </div>
-        <Button onClick={deposit} disabled={busy}>
-          {busy ? t('rewardBond.depositing') : t('rewardBond.depositBtn')}
-        </Button>
-      </div>
+      )}
     </div>
   )
 }

@@ -4242,6 +4242,7 @@
       "depositInputLabel": "Bean to deposit (my wallet: {wallet})",
       "depositSuccess": "Deposited {n} Bean as security",
       "desc": "Customer review rewards are paid from this deposit. The review button on your items is enabled only when the balance is at least <b>{amount} Bean</b>.",
+      "descPi": "Customer review rewards are paid from this deposit. The review button on your items is enabled only when the balance is at least <b>{amount} π</b>.",
       "enterAmount": "Enter the amount of Bean to deposit",
       "title": "Review reward deposit"
     },

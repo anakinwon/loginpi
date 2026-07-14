@@ -599,7 +599,7 @@ export function ClientMyShops({
             return (
               <div
                 key={shop.shop_id}
-                className={`flex items-center gap-3 rounded-lg border p-3 ${isRep ? 'border-amber-400 bg-amber-50/40 dark:border-amber-600 dark:bg-amber-950/20' : ''}`}
+                className={`flex flex-wrap items-center gap-3 rounded-lg border p-3 ${isRep ? 'border-amber-400 bg-amber-50/40 dark:border-amber-600 dark:bg-amber-950/20' : ''}`}
               >
                 <div className="bg-muted flex size-12 shrink-0 items-center justify-center overflow-hidden rounded">
                   {shop.thumb_url ? (
@@ -614,7 +614,7 @@ export function ClientMyShops({
                   )}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <span className="truncate text-base font-semibold text-amber-600 dark:text-amber-400">
                       {shop.shop_nm}
                     </span>
@@ -638,7 +638,9 @@ export function ClientMyShops({
                     </p>
                   )}
                 </div>
-                <div className="flex shrink-0 flex-wrap justify-end gap-1.5">
+                {/* 모바일: w-full로 버튼 그룹을 별도 줄로 — 정보 영역(min-w-0)이 0폭까지
+                    눌려 배지가 버튼 뒤로 겹쳐 보이는 문제 방지. sm+: 기존 한 줄 유지 */}
+                <div className="flex w-full flex-wrap items-center justify-end gap-1.5 sm:w-auto sm:shrink-0">
                   <Button
                     size="sm"
                     variant="secondary"

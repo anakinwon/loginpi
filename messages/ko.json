@@ -2710,6 +2710,7 @@
       "badgeActive": "✓ 후기 활성",
       "badgeNeedCharge": "⚠ 충전 필요",
       "desc": "고객 후기 보상은 이 보증금에서 지급됩니다. 잔액이 <b>{amount} Bean</b> 이상일 때만 내 상품에 후기 작성 버튼이 활성화됩니다.",
+      "descPi": "고객 후기 보상은 이 보증금에서 지급됩니다. 잔액이 <b>{amount} π</b> 이상일 때만 내 상품에 후기 작성 버튼이 활성화됩니다.",
       "balanceLabel": "현재 보증금 잔액",
       "depositInputLabel": "예치할 Bean (내 지갑: {wallet})",
       "amountPlaceholder": "예: {n}",
