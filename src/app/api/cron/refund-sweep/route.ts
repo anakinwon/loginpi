@@ -7,7 +7,10 @@ import { refundCancelledOrder } from '@/lib/mps-refund'
 // 주기적으로 자동 재시도한다. 사람이 환불 버튼을 누르는 개입 자체를 없애는 것이 목적.
 // 멱등: refundCancelledOrder가 REFUND_IN 존재 시 ALREADY_REFUNDED skip → 중복 송금 없음.
 
-const SWEEP_WINDOW_HOURS = 48 // 최근 취소분만 — 과거 잔재 소급은 관리자가 명시적으로(환불 버튼)
+// 2026-07-15: 48h → 30일 확장. 운영 메인넷 A2U가 feature_not_available(등재 승인 전 미개방)로
+// 장기간 pending될 수 있어, A2U 개방 시 미환불 취소건이 자동 소급되도록 윈도우를 넓힌다.
+// (멱등: REFUND_IN 존재 시 skip — 이중 송금 없음. 그 이전 잔재는 관리자 환불 버튼으로만)
+const SWEEP_WINDOW_HOURS = 720 // 30일
 const SWEEP_LIMIT = 20 // 실행당 A2U 상한 — cron 주기당 부하 제한
 
 function isCronAuthorized(req: NextRequest): boolean {

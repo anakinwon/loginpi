@@ -722,3 +722,23 @@ Pi Sign-In QR은 채굴 앱 스캐너·폰 카메라가 아니라 **파이지갑
 "Continue in the Pi Browser" + **[Open Pi Browser]** 딥링크(`pi://redirect.pi/pi-net/<swp URL>`)로
 렌더링되어 **같은 폰의 Pi Browser 앱에서 승인** → 원래 브라우저가 상태 폴링으로 자동 진행.
 기기 1대 완결 — "같은 폰으로 QR을 어떻게 찍나" 딜레마는 Pi가 기기별 렌더링으로 해결. ✅휴대폰 일반 브라우저 실기기 검증 완료(2026-07-08) — 3종 여정(PC QR·모바일 딥링크·Pi Browser SDK) 전부 통과.
+
+## [2026-07-15] 운영 취소 자동환불 미실행 — 메인넷 A2U 미개방 (feature_not_available) ⭐
+
+**증상**: 운영 실결제(0.8π, 결제ID Z9UwKh…) 후 판매자 취소 → 자동 환불 미도착. 관리자 환불 버튼도 실패.
+
+**원인 (플랫폼 게이트 — 코드 버그 아님)**: Pi 플랫폼이 운영(메인넷)에서 이 앱의 **A2U(app_to_user) 결제 생성 자체를 거부** —
+`createPayment: [HTTP 400] {"error":"feature_not_available"}`. 진단 근거:
+- pi_pymnt.metadata.refund에 관리자 재시도 에러 원문 기록 (serverWallet=GD3W3DGC… 태그 정상 = 시드·키 문제 아님)
+- 정산 FAILED 34건 중 최근 8건이 동일 에러 → 환불·정산·팁·후기보상 **모든 A2U 유출 경로 공통 차단**
+- U2A(사용자→앱 결제·에스크로 입금)는 정상 — **유입만 되고 유출 불가** 상태 ("에스크로 운영 적용 불가" 체감의 실체)
+- 시점상 메인넷 **등재 심사 승인 전 A2U 미개방**과 일치 (7-11 첫 실결제·등재 신청 직후부터). 테스트넷 A2U는 자유.
+
+**과거 잔재 구분(같은 FAILED 집계 내 별개 원인)**: user_not_found 16건(테스트넷 uid 잔재, 7-02 사고 계열)·구 시드 4건 — 이번 건과 무관.
+
+**조치**:
+1. 코드: refund-sweep 윈도우 48h→30일 — A2U 개방 시 미환불 취소건 자동 소급(멱등 REFUND_IN 가드).
+2. 마스터: Pi Developer Portal에서 메인넷 A2U 개방 조건(등재 승인 상태) 확인. 개방 전까지 운영 에스크로 결제는 환불·정산 불가 상태로 앱 지갑에 묶임 — 결제 허용 유지 여부는 정책 판단.
+3. 개방 후: 환불=sweep 자동 / 정산 FAILED 백필=/api/admin/store/settle (cron 재시도 없음, 관리자 명시 실행).
+
+**교훈**: A2U 실패는 settle_err_tx·pi_pymnt.metadata.refund에 에러 원문이 남는다 — "환불 안 됨" 신고는 이 두 곳부터. `feature_not_available`=플랫폼 미개방(대기), `user_not_found`=uid 스코프 잔재(재로그인 유도), `You should use a private seed`=시드 불일치.
