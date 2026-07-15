@@ -14,13 +14,18 @@ export function ClientProfileGate() {
   const t = useTranslations('profile')
   const tc = useTranslations('common')
   const [user, setUser] = useState<UserRow | null>(null)
+  // 매장 보유자 여부 — 기본 탭을 내 PyShop™으로 포커싱 (로딩 완료 후 첫 렌더부터 확정)
+  const [hasShop, setHasShop] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
 
   useEffect(() => {
     piFetch('/api/profile')
       .then((res) => (res.ok ? res.json() : Promise.reject(res.status)))
-      .then((data: { user: UserRow }) => setUser(data.user))
+      .then((data: { user: UserRow; has_shop?: boolean }) => {
+        setUser(data.user)
+        setHasShop(data.has_shop === true)
+      })
       .catch(() => setError(true))
       .finally(() => setLoading(false))
   }, [])
@@ -44,7 +49,11 @@ export function ClientProfileGate() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
       <h1 className="mb-6 text-2xl font-bold">{t('title')}</h1>
-      <ProfileTabs initialUser={user} localeOptions={localeOptions} />
+      <ProfileTabs
+        initialUser={user}
+        localeOptions={localeOptions}
+        hasShop={hasShop}
+      />
     </div>
   )
 }

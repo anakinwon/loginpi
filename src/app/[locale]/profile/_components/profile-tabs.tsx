@@ -17,7 +17,8 @@ import type { UserRow } from '@/lib/users'
 import type { LocaleOption } from '@/lib/locale-options'
 
 // 라벨은 컴포넌트에서 t('tabs.<id>')로 해석한다(모듈 상수는 useTranslations 불가).
-const TAB_IDS = ['info', 'bean', 'payment', 'subscr', 'store', 'lbs'] as const
+// 순서: 개인정보 > 내 PyShop™ > 결제 내역 > 구독 현황 > Bean 지갑 > 위치 서비스 (2026-07-15 마스터 지시)
+const TAB_IDS = ['info', 'store', 'payment', 'subscr', 'bean', 'lbs'] as const
 
 type TabId = (typeof TAB_IDS)[number]
 
@@ -26,15 +27,18 @@ interface Props {
   localeOptions: LocaleOption[]
   // 요금제 모드 — PI(Pi Coin)면 Bean 지갑 탭 숨김, BEAN이면 노출(A-5 레드라인 대응)
   feeMode?: 'BEAN' | 'PI'
+  // 매장 1개 이상 보유자 — 기본 탭을 내 PyShop™으로 포커싱 (URL ?tab= 지정이 우선)
+  hasShop?: boolean
 }
 
 export function ProfileTabs({
   initialUser,
   localeOptions,
   feeMode = 'BEAN',
+  hasShop = false,
 }: Props) {
   const t = useTranslations('profile')
-  const [activeTab, setActiveTab] = useState<TabId>('info')
+  const [activeTab, setActiveTab] = useState<TabId>(hasShop ? 'store' : 'info')
   const [user, setUser] = useState(initialUser)
 
   // PI 요금제에선 Bean 지갑 탭 제거 — BEAN 요금제일 때만 노출

@@ -139,6 +139,17 @@ export async function updateShop(
   return (data as unknown as MpsShop | null) ?? null
 }
 
+// 활성 매장 1개 이상 보유 여부 — 프로필 기본 탭(내 PyShop™) 포커싱 판정용.
+// head:true로 행 미전송(존재 여부만) — 목록 조회보다 가볍다.
+export async function hasAnyShop(sellerId: string): Promise<boolean> {
+  const { count } = await getSupabaseAdmin()
+    .from('mps_shop')
+    .select('shop_id', { count: 'exact', head: true })
+    .eq('seller_id', sellerId)
+    .eq('del_yn', 'N')
+  return (count ?? 0) > 0
+}
+
 // ──────────────────────────────────────────────────────────────
 // 구글 카페 GPS 자동인증 등록 — place_id 강제 매핑 + 현장 근접 검증
 // ──────────────────────────────────────────────────────────────

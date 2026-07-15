@@ -3,6 +3,7 @@ import { cookies, headers } from 'next/headers'
 import { z } from 'zod'
 import { getSessionUser } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { hasAnyShop } from '@/lib/mps-shop'
 import { signPayload, verifyPayload } from '@/lib/pi-session-crypto'
 import { recordUserAction } from '@/lib/event'
 import { apiError } from '@/lib/api-errors'
@@ -28,13 +29,17 @@ export async function GET() {
   const user = await getSessionUser()
   if (!user) return apiError('AUTH_REQUIRED', 401)
 
-  const { data, error } = await getSupabaseAdmin()
-    .from('sys_user')
-    .select(
-      'id, display_name, real_nm, nick_nm, phone_no, addr, addr_dtl, display_locale_cd, kakao_id, self_intro, pi_username, google_email, role, reg_dtm',
-    )
-    .eq('id', user.id)
-    .maybeSingle()
+  // has_shop: 매장 보유자는 프로필 기본 탭을 내 PyShop™으로 포커싱 (병렬 조회)
+  const [{ data, error }, hasShop] = await Promise.all([
+    getSupabaseAdmin()
+      .from('sys_user')
+      .select(
+        'id, display_name, real_nm, nick_nm, phone_no, addr, addr_dtl, display_locale_cd, kakao_id, self_intro, pi_username, google_email, role, reg_dtm',
+      )
+      .eq('id', user.id)
+      .maybeSingle(),
+    hasAnyShop(user.id),
+  ])
 
   // error 무시 시 { user: null } 200 응답 → 클라이언트 게이트가 "로그인이 필요합니다"로 오인
   // (실제 사례: 027 마이그레이션 미적용으로 kakao_id 컬럼 부재 → 인증 정상인데 로그인 오류로 표시)
@@ -43,7 +48,7 @@ export async function GET() {
     return apiError('PROFILE_QUERY_FAILED', 500)
   }
 
-  return NextResponse.json({ user: data })
+  return NextResponse.json({ user: data, has_shop: hasShop })
 }
 
 export async function PATCH(req: Request) {

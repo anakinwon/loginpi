@@ -1,6 +1,7 @@
 import { getLocale, getTranslations } from 'next-intl/server'
 import { getSessionUser } from '@/lib/auth-check'
 import { getActiveFeeMode } from '@/lib/fee-resolver'
+import { hasAnyShop } from '@/lib/mps-shop'
 import { getLocaleOptions } from '@/lib/locale-options'
 import { ClientProfileGate } from './_components/client-profile-gate'
 import { ProfileTabs } from './_components/profile-tabs'
@@ -16,8 +17,12 @@ export default async function ProfilePage() {
   // Intl.DisplayNames는 Node.js와 브라우저 ICU 데이터가 달라 hydration mismatch 유발 →
   // 서버에서만 계산하고 직렬화된 string[]로 내려보냄
   const localeOptions = getLocaleOptions(locale)
-  // PI 요금제에선 Bean 지갑 탭 숨김 — 첫 렌더부터 확정값(깜빡임 방지)
-  const feeMode = await getActiveFeeMode()
+  // PI 요금제에선 Bean 지갑 탭 숨김 + 매장 보유자는 내 PyShop™ 기본 포커싱 —
+  // 둘 다 첫 렌더부터 확정값(깜빡임 방지), 병렬 조회
+  const [feeMode, hasShop] = await Promise.all([
+    getActiveFeeMode(),
+    hasAnyShop(user.id),
+  ])
   const t = await getTranslations('profile')
 
   return (
@@ -27,6 +32,7 @@ export default async function ProfilePage() {
         initialUser={user}
         localeOptions={localeOptions}
         feeMode={feeMode}
+        hasShop={hasShop}
       />
     </div>
   )
