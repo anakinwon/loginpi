@@ -8,6 +8,22 @@
 
 ---
 
+## 🚨 0순위 — 등재 승인 완료 시 즉시 실행 런북 (2026-07-15 마스터 지시)
+
+> **트리거**: Pi 메인넷 등재 심사 **승인 확인 시점**. 다른 모든 작업보다 우선 실행하고 **마스터에게 반드시 결과 보고(알림)**. 완료 전 삭제 금지.
+> **배경**: 승인 전에는 Pi가 A2U(app_to_user)를 `feature_not_available`로 차단 — 환불·정산·팁·후기보상 유출 경로 전체가 대기 상태(유입 U2A는 정상). 앱 측 구성은 2026-07-15 완결(메인넷 앱 지갑 시드 교체·`serverWallet=GA3L…` 실측 검증). 경위 정본: TROUBLESHOOT [2026-07-15]편.
+
+1. **A2U 개방 검증 (1분)** — `/admin/payments`에서 결제 `Z9UwKhPkwplMxdhARVpKUqptMEev`(0.8π, 7/15 취소건) 환불 버튼 1클릭:
+   - 성공(txid 발급) → 개방 확정, 아래 진행
+   - `feature_not_available` 지속 → 아직 미개방(승인≠개방일 수 있음, Pi에 문의)
+   - 기타 에러 → TROUBLESHOOT [2026-07-15] 판별표(`user_not_found`=uid 잔재 / `private seed`=시드 불일치)
+2. **미환불 취소건 자동 소급 확인** — refund-sweep cron(30일 윈도우·멱등)이 CANCELLED+escrow 건에 `REFUND_IN`을 생성하는지 확인. 윈도우(취소 후 30일) 경과 건은 관리자 환불 버튼으로 수동.
+3. **정산 백필** — `/api/admin/store/settle` 실행: `feature_not_available` FAILED 8건 해소. `user_not_found` 16건은 해당 구매자 재로그인(pi_uid 재바인딩) 후 재실행.
+4. **기타 A2U 경로 정상화 확인** — 팁 A2U(cron tip-pi-payout)·후기 보상(cron fbck-pi-payout) PENDING/FAILED 재시도 소화 확인, 이벤트·캠페인 보상은 관리자 승인 게이트(pi-reward 화면)에서 실송금 재개.
+5. **완료 보고** — 마스터에게 4개 항목 결과 요약 보고 후, 본 블록과 ROADMAP 0순위 블록을 완료 처리(이력 이동).
+
+---
+
 ## ⚠️ 가장 먼저 알아야 할 핵심 개념 (관리자 필독)
 
 ### 테스트넷은 메인넷으로 "자동 승계"되지 않는다
