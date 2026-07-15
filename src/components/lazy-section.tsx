@@ -12,6 +12,8 @@ interface LazySectionProps {
   rootMargin?: string
   // 뷰포트 첫 진입 시 1회 호출 — 섹션 데이터 지연 fetch 트리거용
   onVisible?: () => void
+  // 래퍼 div에 적용할 클래스 (예: [overflow-anchor:none] 스크롤 앵커 제외)
+  className?: string
 }
 
 export function LazySection({
@@ -19,6 +21,7 @@ export function LazySection({
   fallback,
   rootMargin = '200px',
   onVisible,
+  className,
 }: LazySectionProps) {
   const ref = useRef<HTMLDivElement>(null)
   const [visible, setVisible] = useState(false)
@@ -45,7 +48,7 @@ export function LazySection({
   }, [rootMargin])
 
   return (
-    <div ref={ref}>
+    <div ref={ref} className={className}>
       {visible
         ? children
         : (fallback ?? (

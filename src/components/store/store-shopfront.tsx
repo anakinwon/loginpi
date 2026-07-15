@@ -57,10 +57,16 @@ export function StoreShopfront({
   }, [shopId, isOwner])
 
   if (loading) {
+    // 높이를 확보한 스켈레톤 — 로딩 중 하단(구글 리뷰 카드)이 뷰포트에 먼저 들어와
+    // 스크롤 앵커가 되는 것을 방지 (로드 완료 시 화면이 후기로 밀려 내려가는 문제)
     return (
-      <p className="text-muted-foreground py-16 text-center text-sm">
-        {t('loading')}
-      </p>
+      <div className="space-y-4">
+        <div className="bg-muted h-40 animate-pulse rounded-lg" />
+        <div className="bg-muted h-40 animate-pulse rounded-lg" />
+        <p className="text-muted-foreground text-center text-sm">
+          {t('loading')}
+        </p>
+      </div>
     )
   }
 

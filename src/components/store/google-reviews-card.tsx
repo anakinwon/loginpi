@@ -69,7 +69,10 @@ export function GoogleReviewsCard({ shopId }: { shopId: string }) {
   if (failed || data?.available === false) return null
 
   return (
+    // overflow-anchor:none — 위쪽 콘텐츠(상품 목록) 로드 시 브라우저가 이 카드를
+    // 스크롤 기준점으로 붙잡아 화면이 후기로 밀려 내려가는 것 방지 (매장 상단 유지)
     <LazySection
+      className="[overflow-anchor:none]"
       onVisible={load}
       fallback={<div className="bg-muted h-24 animate-pulse rounded-lg" />}
     >
