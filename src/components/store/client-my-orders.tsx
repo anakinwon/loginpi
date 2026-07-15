@@ -70,6 +70,8 @@ interface OrderRow {
   has_feedback?: boolean
   // 매장주(seller) 보증금 충분 여부 — 'Y'/true일 때만 후기 작성 버튼 활성 (PRD_24 §10-7)
   bond_ok?: boolean
+  // 직원 열람(매장 Telegram 그룹방 멤버) — 열람만 가능, 상태 전이·취소 버튼 숨김
+  staff_view?: boolean
 }
 
 // 주문자 표시명 — 별명 우선, 없으면 Pi username, 없으면 display_name (fallback은 렌더 시 t()로 처리)
@@ -294,6 +296,11 @@ export function ClientMyOrders({
           >
             {stLabel}
           </span>
+          {o.staff_view && (
+            <span className="bg-muted text-muted-foreground shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium">
+              {t('staffViewBadge')}
+            </span>
+          )}
         </div>
 
         {/* 판매자: 주문자(호명용) / 구매자: 픽업 매장명 */}
@@ -411,36 +418,43 @@ export function ClientMyOrders({
               {t('actionBuyerDone')}
             </Button>
           )}
-          {role === 'seller' && o.order_st_cd === 'BUYER_DONE' && (
-            <Button
-              size="sm"
-              disabled={busy}
-              onClick={() => act(o.order_id, 'complete')}
-            >
-              {t('actionComplete')}
-            </Button>
-          )}
+          {/* 직원 열람(staff_view)은 상태 전이 권한 없음 — 판매자 액션 전체 숨김 */}
+          {role === 'seller' &&
+            !o.staff_view &&
+            o.order_st_cd === 'BUYER_DONE' && (
+              <Button
+                size="sm"
+                disabled={busy}
+                onClick={() => act(o.order_id, 'complete')}
+              >
+                {t('actionComplete')}
+              </Button>
+            )}
 
           {/* 오프라인 — 판매자 상품접수 (주문중 → 준비중) */}
-          {role === 'seller' && o.order_st_cd === 'ORDERED' && (
-            <Button
-              size="sm"
-              disabled={busy}
-              onClick={() => act(o.order_id, 'accept')}
-            >
-              {t('actionAccept')}
-            </Button>
-          )}
+          {role === 'seller' &&
+            !o.staff_view &&
+            o.order_st_cd === 'ORDERED' && (
+              <Button
+                size="sm"
+                disabled={busy}
+                onClick={() => act(o.order_id, 'accept')}
+              >
+                {t('actionAccept')}
+              </Button>
+            )}
           {/* 오프라인 — 판매자 상품완료 (준비중 → 상품대기중) */}
-          {role === 'seller' && o.order_st_cd === 'PREPARING' && (
-            <Button
-              size="sm"
-              disabled={busy}
-              onClick={() => act(o.order_id, 'ready')}
-            >
-              {t('actionReady')}
-            </Button>
-          )}
+          {role === 'seller' &&
+            !o.staff_view &&
+            o.order_st_cd === 'PREPARING' && (
+              <Button
+                size="sm"
+                disabled={busy}
+                onClick={() => act(o.order_id, 'ready')}
+              >
+                {t('actionReady')}
+              </Button>
+            )}
           {/* 오프라인 — 구매자 상품수령 (상품대기중 → 거래완료 + 즉시 정산 송금).
               미수령 시 5분 후 자동 판매완료(cron)가 안전망. markPickup이 release_txid 멱등이라 중복 안전 */}
           {role === 'buyer' && o.order_st_cd === 'READY' && (
@@ -452,31 +466,32 @@ export function ClientMyOrders({
               {t('actionPickup')}
             </Button>
           )}
-          {(o.order_st_cd === 'PENDING' ||
-            (IN_TRADE.includes(o.order_st_cd) &&
-              (role === 'buyer' || o.order_st_cd !== 'SELLER_DONE')) ||
-            // 오프라인: 상품주문중만 취소 가능(구매자 수수료/판매자 거절).
-            //          접수 후(상품준비중·준비완료)는 양측 취소 불가.
-            o.order_st_cd === 'ORDERED') && (
-            <Button
-              size="sm"
-              variant="outline"
-              disabled={busy}
-              onClick={() => act(o.order_id, 'cancel')}
-            >
-              {canceling
-                ? t(
-                    role === 'buyer'
-                      ? 'actionCancelingBuyer'
-                      : 'actionCancelingSeller',
-                  )
-                : t(
-                    role === 'buyer'
-                      ? 'actionCancelBuyer'
-                      : 'actionCancelSeller',
-                  )}
-            </Button>
-          )}
+          {!o.staff_view &&
+            (o.order_st_cd === 'PENDING' ||
+              (IN_TRADE.includes(o.order_st_cd) &&
+                (role === 'buyer' || o.order_st_cd !== 'SELLER_DONE')) ||
+              // 오프라인: 상품주문중만 취소 가능(구매자 수수료/판매자 거절).
+              //          접수 후(상품준비중·준비완료)는 양측 취소 불가.
+              o.order_st_cd === 'ORDERED') && (
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={busy}
+                onClick={() => act(o.order_id, 'cancel')}
+              >
+                {canceling
+                  ? t(
+                      role === 'buyer'
+                        ? 'actionCancelingBuyer'
+                        : 'actionCancelingSeller',
+                    )
+                  : t(
+                      role === 'buyer'
+                        ? 'actionCancelBuyer'
+                        : 'actionCancelSeller',
+                    )}
+              </Button>
+            )}
         </div>
 
         {role === 'seller' && IN_TRADE.includes(o.order_st_cd) && (

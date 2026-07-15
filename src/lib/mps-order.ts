@@ -843,6 +843,8 @@ export async function getOrderForUser(
 export async function listOrdersByRole(
   userId: string | null,
   role: 'buyer' | 'seller',
+  // 직원 열람 매장(그룹방 멤버, shop-staff-access) — seller 뷰를 해당 매장 주문까지 확장
+  staffShopIds: string[] = [],
 ) {
   const column = role === 'buyer' ? 'buyer_id' : 'seller_id'
   let q = getSupabaseAdmin()
@@ -853,7 +855,28 @@ export async function listOrdersByRole(
     )
     .eq('del_yn', 'N')
     .order('reg_dtm', { ascending: false })
-  if (userId) q = q.eq(column, userId)
+  if (userId) {
+    if (role === 'seller' && staffShopIds.length > 0) {
+      // 본인 판매분 + 직원 매장 주문. 카트 주문=shop_id 직결, 단건 주문=shop_id NULL이라
+      // 매장 상품(item_id) 경유로도 포함해야 누락이 없다.
+      const { data: staffItems } = await getSupabaseAdmin()
+        .from('mps_item')
+        .select('item_id')
+        .in('shop_id', staffShopIds)
+        .eq('del_yn', 'N')
+      const itemIds = (staffItems ?? []).map(
+        (i) => (i as { item_id: string }).item_id,
+      )
+      const ors = [
+        `seller_id.eq.${userId}`,
+        `shop_id.in.(${staffShopIds.join(',')})`,
+        ...(itemIds.length > 0 ? [`item_id.in.(${itemIds.join(',')})`] : []),
+      ]
+      q = q.or(ors.join(','))
+    } else {
+      q = q.eq(column, userId)
+    }
+  }
   const { data, error } = await q
 
   if (error) throw new Error(error.message)
@@ -947,6 +970,9 @@ export async function listOrdersByRole(
       ...(o as object),
       buyer: byId.get((o as { buyer_id: string }).buyer_id) ?? null,
       has_feedback: false,
+      // 직원 열람 주문(내가 판매자가 아님) — UI에서 상태 전이 버튼 숨김·배지 표시
+      staff_view:
+        (o as { seller_id: string }).seller_id !== userId || undefined,
     }))
   }
 

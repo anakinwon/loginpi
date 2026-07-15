@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { createOrder, listOrdersByRole } from '@/lib/mps-order'
+import { getStaffShopIds } from '@/lib/shop-staff-access'
 import { apiError } from '@/lib/api-errors'
 
 // GET /api/store/orders?role=buyer|seller — 내 주문 목록
@@ -16,7 +17,14 @@ export async function GET(req: NextRequest) {
     req.nextUrl.searchParams.get('role') === 'seller' ? 'seller' : 'buyer'
   // 관리자 전체보기 — ?all=1 + isAdmin일 때만 전체 주문(null), 그 외 본인만(role 컬럼 기준)
   const wantAll = req.nextUrl.searchParams.get('all') === '1' && isAdmin(user)
-  const orders = await listOrdersByRole(wantAll ? null : user.id, role)
+  // 판매 관리: 매장 Telegram 그룹방 멤버(직원)는 해당 매장 주문 열람 확장 (쓰기는 소유자 전용)
+  const staffShopIds =
+    role === 'seller' && !wantAll ? await getStaffShopIds(user.id) : []
+  const orders = await listOrdersByRole(
+    wantAll ? null : user.id,
+    role,
+    staffShopIds,
+  )
   return NextResponse.json({ orders })
 }
 
