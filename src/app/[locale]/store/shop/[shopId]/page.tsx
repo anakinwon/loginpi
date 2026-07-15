@@ -74,12 +74,20 @@ export default async function ShopfrontPage({
                 </span>
               )}
             </div>
-            <p className="text-muted-foreground mt-1 text-sm">
-              {t(`shopType.${shop.shop_type_cd}`)}
-              {shop.addr && ` · 📍 ${shop.addr}`}
-              {shop.biz_hour && ` · 🕒 ${shop.biz_hour}`}
-              {shop.dlvr_yn === 'Y' && ` · 🛵 ${ts('deliveryAvailable')}`}
-            </p>
+            {/* 유형·배달 / 주소 / 영업시간 — 항목별 개행, 영업시간은 저장된 \n(요일별) 유지 */}
+            <div className="text-muted-foreground mt-1 space-y-0.5 text-sm">
+              <p>
+                {t(`shopType.${shop.shop_type_cd}`)}
+                {shop.dlvr_yn === 'Y' && ` · 🛵 ${ts('deliveryAvailable')}`}
+              </p>
+              {shop.addr && <p>📍 {shop.addr}</p>}
+              {shop.biz_hour && (
+                <p className="flex gap-1">
+                  <span>🕒</span>
+                  <span className="whitespace-pre-line">{shop.biz_hour}</span>
+                </p>
+              )}
+            </div>
           </div>
 
           <StoreShopfront shopId={shopId} ownerSellerId={shop.seller_id} />
