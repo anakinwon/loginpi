@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { createShopLinkCode } from '@/lib/telegram-link'
-import { listShopStaff } from '@/lib/shop-staff-access'
 import { apiError } from '@/lib/api-errors'
 
 type Params = { params: Promise<{ shopId: string }> }
@@ -45,19 +44,15 @@ export async function GET(_req: Request, { params }: Params) {
   const botUser = process.env.TELEGRAM_BOT_USERNAME
   const botConfigured = !!botUser && !!process.env.TELEGRAM_BOT_TOKEN
   const code = botConfigured ? createShopLinkCode(shopId) : null
-  const connected = r.shop.tlgm_conn_yn === 'Y'
-  // 그룹 바인딩 매장: 판매 관리 열람 가능 직원 목록(앱 가입+개인 연동 완료자 기준).
-  // 개인 바인딩·미연동이면 null — 패널에서 목록 영역 미표시.
-  const staff = connected ? await listShopStaff(shopId) : null
+  // Telegram은 순수 알림 채널 — 판매 관리 권한은 매니저 등록(mps_shop_staff)으로만 관리
   return NextResponse.json({
-    connected,
+    connected: r.shop.tlgm_conn_yn === 'Y',
     botConfigured,
     url: code ? `https://t.me/${botUser}?start=${code}` : null,
     // 매장 전용 그룹방 연동(권장) — 그룹 chat_id 바인딩으로 매장 직원이 함께 수신.
     // 한 소유자가 여러 매장을 가져도 그룹 단위로 수신이 분리된다.
     groupUrl: code ? `https://t.me/${botUser}?startgroup=${code}` : null,
     shop_nm: r.shop.shop_nm,
-    staff,
   })
 }
 

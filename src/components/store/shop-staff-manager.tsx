@@ -15,9 +15,9 @@ interface StaffRow {
   reg_dtm: string
 }
 
-// 매장 관리직원 등록/해제 (mps_shop_staff) — 매장 보기 소유자 영역에 표시.
-//   등록 직원 = 판매 관리 열람 + 주문 상태 변경(접수·준비완료·거래완료).
-//   Telegram 그룹 멤버(열람만)와 별개의 명시 권한 — 그룹 없이도 동작한다.
+// 판매 관리 매니저 등록/해제 (mps_shop_staff) — 매장 보기 소유자 영역에 표시.
+//   등록 매니저 = 판매 관리 열람 + 주문 상태 변경(접수·준비완료·거래완료). 해제=논리삭제(del_yn).
+//   판매 관리 권한의 단일 관리 지점 — Telegram 그룹은 순수 알림 채널(권한 무관).
 export function ShopStaffManager({ shopId }: { shopId: string }) {
   const t = useTranslations('store')
   const tc = useTranslations('common')

@@ -88,7 +88,7 @@ export function StoreShopfront({
             </Link>
           </div>
           <ShopTelegramConnect shopId={shopId} />
-          {/* 관리직원 등록 — 등록 직원은 판매 관리 열람+주문 상태 변경 가능 (sql/181) */}
+          {/* 판매 관리 매니저 — 등록 매니저는 열람+주문 상태 변경 가능, 해제=논리삭제 (sql/181) */}
           <ShopStaffManager shopId={shopId} />
           {/* 후기 보상 보증금 — 매장별 관리(알림과 동일 단위, sql/180). 내 매장 목록에서 이전 */}
           <ShopBondCard shopId={shopId} />
