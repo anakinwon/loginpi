@@ -2770,6 +2770,8 @@
     "repBadge": "⭐ 대표",
     "verifiedBadge": "✅ 인증",
     "viewShop": "🏪 매장 보기",
+    "tlgmBtnOn": "📨 알림 ✓",
+    "tlgmBtnOff": "📨 알림 연동",
     "setRepBtn": "⭐ 대표 지정",
     "buyerFallback": "구매자",
     "orderStOffline": {

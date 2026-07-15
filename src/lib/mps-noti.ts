@@ -96,6 +96,64 @@ export interface DispatchResult {
   skipped: number
 }
 
+// 주문 → 매장 Telegram 해석 (ORDER·TXN_ST 판매자 알림 공용)
+//   FK 무설계 → order_id→item_id→shop_id→mps_shop을 단계별 .in() 조회 후 Map 병합.
+//   orderShop: order_id→shop_id(매장 주문 전체) / shopTlgm: shop_id→chat_id(연동 매장만)
+export async function resolveOrderShopChat(
+  db: ReturnType<typeof getSupabaseAdmin>,
+  orderIds: string[],
+): Promise<{
+  orderShop: Map<string, string>
+  shopTlgm: Map<string, number>
+}> {
+  const orderShop = new Map<string, string>()
+  const shopTlgm = new Map<string, number>()
+  if (orderIds.length === 0) return { orderShop, shopTlgm }
+
+  const { data: ords } = await db
+    .from('mps_order')
+    .select('order_id, item_id')
+    .in('order_id', orderIds)
+  const orderItem = new Map(
+    (ords ?? []).map((o) => [
+      (o as { order_id: string }).order_id,
+      (o as { item_id: string }).item_id,
+    ]),
+  )
+  const itemIds = [...new Set([...orderItem.values()])]
+  if (itemIds.length === 0) return { orderShop, shopTlgm }
+
+  const { data: items } = await db
+    .from('mps_item')
+    .select('item_id, shop_id')
+    .in('item_id', itemIds)
+  const itemShop = new Map(
+    (items ?? [])
+      .map((i) => [
+        (i as { item_id: string }).item_id,
+        (i as { shop_id: string | null }).shop_id,
+      ])
+      .filter((e) => e[1]) as [string, string][],
+  )
+  for (const [oid, iid] of orderItem) {
+    const sid = itemShop.get(iid)
+    if (sid) orderShop.set(oid, sid)
+  }
+  const shopIds = [...new Set([...orderShop.values()])]
+  if (shopIds.length > 0) {
+    const { data: shops } = await db
+      .from('mps_shop')
+      .select('shop_id, tlgm_chat_id, tlgm_conn_yn')
+      .in('shop_id', shopIds)
+      .eq('tlgm_conn_yn', 'Y')
+    for (const s of shops ?? []) {
+      const sr = s as { shop_id: string; tlgm_chat_id: number | null }
+      if (sr.tlgm_chat_id) shopTlgm.set(sr.shop_id, sr.tlgm_chat_id)
+    }
+  }
+  return { orderShop, shopTlgm }
+}
+
 // 미발송 Telegram 알림 일괄 발송. cron(order-autocomplete) 및 on-demand에서 호출.
 export async function dispatchOrderNotis(limit = 100): Promise<DispatchResult> {
   const result: DispatchResult = { sent: 0, failed: 0, skipped: 0 }
@@ -139,55 +197,10 @@ export async function dispatchOrderNotis(limit = 100): Promise<DispatchResult> {
 
   // ── 매장별 1:1 Telegram 우선 발송 (PRD: 매장 등록/수정 연동) ───────────────
   // 주문 → 매장(shop) telegram 우선, 매장 미연동 시 판매자(sys_user) telegram 폴백.
-  // FK 무설계 → order_id→item_id→shop_id→mps_shop을 단계별 .in() 조회 후 Map 병합.
   const orderIds = [
     ...new Set(parsed.map((p) => p.body?.order_id).filter(Boolean) as string[]),
   ]
-  const orderShop = new Map<string, string>() // order_id → shop_id
-  const shopTlgm = new Map<string, number>() // shop_id → chat_id (연동된 매장만)
-  if (orderIds.length > 0) {
-    const { data: ords } = await db
-      .from('mps_order')
-      .select('order_id, item_id')
-      .in('order_id', orderIds)
-    const orderItem = new Map(
-      (ords ?? []).map((o) => [
-        (o as { order_id: string }).order_id,
-        (o as { item_id: string }).item_id,
-      ]),
-    )
-    const itemIds = [...new Set([...orderItem.values()])]
-    if (itemIds.length > 0) {
-      const { data: items } = await db
-        .from('mps_item')
-        .select('item_id, shop_id')
-        .in('item_id', itemIds)
-      const itemShop = new Map(
-        (items ?? [])
-          .map((i) => [
-            (i as { item_id: string }).item_id,
-            (i as { shop_id: string | null }).shop_id,
-          ])
-          .filter((e) => e[1]) as [string, string][],
-      )
-      for (const [oid, iid] of orderItem) {
-        const sid = itemShop.get(iid)
-        if (sid) orderShop.set(oid, sid)
-      }
-      const shopIds = [...new Set([...orderShop.values()])]
-      if (shopIds.length > 0) {
-        const { data: shops } = await db
-          .from('mps_shop')
-          .select('shop_id, tlgm_chat_id, tlgm_conn_yn')
-          .in('shop_id', shopIds)
-          .eq('tlgm_conn_yn', 'Y')
-        for (const s of shops ?? []) {
-          const sr = s as { shop_id: string; tlgm_chat_id: number | null }
-          if (sr.tlgm_chat_id) shopTlgm.set(sr.shop_id, sr.tlgm_chat_id)
-        }
-      }
-    }
-  }
+  const { orderShop, shopTlgm } = await resolveOrderShopChat(db, orderIds)
 
   // 판매자(폴백) chat_id 일괄 조회 (N+1 방지)
   const recvIds = [...new Set(rows.map((r) => r.recv_usr_id))]
@@ -230,9 +243,18 @@ export async function dispatchOrderNotis(limit = 100): Promise<DispatchResult> {
       continue
     }
 
-    const res = await sendTelegramMessage(chatId, buildMessage(body), [
-      { text: '📦 주문 확인하기', url: orderDeepLink(body) },
-    ])
+    // 매장 주문인데 매장 미연동 → 개인 폴백 발송. 매장별 분리 연동 안내를 덧붙인다
+    // (여러 매장 주문이 한 개인 계정으로 몰리는 운영 혼선 방지 — 발견 시점에 안내).
+    const fallbackHint =
+      shopId && !shopChatId
+        ? '\n\nℹ️ 매장별로 알림을 분리하려면: 내 매장 목록 → 📨 알림 연동'
+        : ''
+
+    const res = await sendTelegramMessage(
+      chatId,
+      buildMessage(body) + fallbackHint,
+      [{ text: '📦 주문 확인하기', url: orderDeepLink(body) }],
+    )
 
     if (res.ok) {
       // mod_dtm은 트리거가 자동 갱신

@@ -38,6 +38,7 @@ interface Shop {
   google_place_json: unknown
   dlvr_yn: string | null
   fbck_consent_yn: string | null
+  tlgm_conn_yn: string | null
 }
 
 interface ShopForm {
@@ -106,6 +107,8 @@ export function ClientMyShops({
   const [form, setForm] = useState<ShopForm>(EMPTY_FORM)
   const [saving, setSaving] = useState(false)
   const [settingRepId, setSettingRepId] = useState<string | null>(null)
+  // 매장별 Telegram 연동 패널 토글(목록 인라인) — 수정 화면에 숨겨져 발견 안 되던 문제 해소
+  const [tlgmShopId, setTlgmShopId] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -673,6 +676,24 @@ export function ClientMyShops({
                   <Button
                     size="sm"
                     variant="outline"
+                    className={
+                      shop.tlgm_conn_yn === 'Y'
+                        ? 'border-sky-300 text-sky-700 dark:border-sky-800 dark:text-sky-400'
+                        : ''
+                    }
+                    onClick={() => {
+                      const closing = tlgmShopId === shop.shop_id
+                      setTlgmShopId(closing ? null : shop.shop_id)
+                      if (closing) void load() // 연동 후 닫을 때 배지 상태 갱신
+                    }}
+                  >
+                    {shop.tlgm_conn_yn === 'Y'
+                      ? t('tlgmBtnOn')
+                      : t('tlgmBtnOff')}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
                     onClick={() => openEdit(shop)}
                   >
                     {t('shop.edit')}
@@ -685,6 +706,11 @@ export function ClientMyShops({
                     {t('shop.delete')}
                   </Button>
                 </div>
+                {tlgmShopId === shop.shop_id && (
+                  <div className="w-full">
+                    <ShopTelegramConnect shopId={shop.shop_id} />
+                  </div>
+                )}
               </div>
             )
           })}

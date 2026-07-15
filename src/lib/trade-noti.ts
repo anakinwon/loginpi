@@ -1,6 +1,7 @@
 import 'server-only'
 import { getSupabaseAdmin } from './supabase-admin'
 import { sendTelegramMessage, escapeHtml, isTelegramEnabled } from './telegram'
+import { resolveOrderShopChat } from './mps-noti'
 
 // 통합 알림 — 거래 상태 변경(TXN_ST)·후기 도착(FBCK) (PRD_13 §18-9 당근마켓식 알림 허브)
 //   Pi Browser는 푸시가 없어 상태 변경·후기를 상대가 영영 모를 수 있다 → 텔레그램으로 도달성 확보.
@@ -212,8 +213,10 @@ export interface TradeDispatchResult {
 }
 
 // (B) dispatch — TXN_ST·FBCK 미발송분을 Telegram 발송. cron(chat-noti, 1분)에서 호출.
-//   채팅과 달리 즉시성 알림이라 지연·읽음 게이트 없음(ORDER와 동일). 수신자 개인 텔레그램만
-//   대상(매장 텔레그램은 주문 접수 채널 — 상태·후기는 당사자 개인 통지가 목적).
+//   채팅과 달리 즉시성 알림이라 지연·읽음 게이트 없음(ORDER와 동일).
+//   판매자 수신 주문 상태(TXN_ST:SELLER — 수령확인·취소 등)는 ORDER와 동일하게
+//   매장 Telegram 우선 → 개인 폴백: 매장 운영 알림을 매장 채널로 일원화(2026-07-15).
+//   구매자 통지·후기(FBCK)는 기존대로 당사자 개인 텔레그램 대상.
 export async function dispatchTradeNotis(
   limit = 100,
 ): Promise<TradeDispatchResult> {
@@ -242,6 +245,24 @@ export async function dispatchTradeNotis(
     }> | null) ?? []
   if (rows.length === 0) return result
 
+  // 판매자 수신 TXN_ST의 주문 → 매장 Telegram 해석 (연동 매장만 Map에 존재)
+  const sellerOrderIds = [
+    ...new Set(
+      rows
+        .filter((r) => r.noti_tp_cd === 'TXN_ST')
+        .map((r) => {
+          try {
+            const b = JSON.parse(r.noti_body) as TxnStBody
+            return b.recv_role === 'SELLER' ? b.order_id : null
+          } catch {
+            return null // 파싱 실패는 본 루프의 BAD_BODY 처리에 위임
+          }
+        })
+        .filter(Boolean) as string[],
+    ),
+  ]
+  const { orderShop, shopTlgm } = await resolveOrderShopChat(db, sellerOrderIds)
+
   // 수신자 텔레그램 연동 일괄 조회 (N+1 방지)
   const recvIds = [...new Set(rows.map((r) => r.recv_usr_id))]
   const { data: users } = await db
@@ -258,9 +279,11 @@ export async function dispatchTradeNotis(
   for (const row of rows) {
     let text: string
     let button: { text: string; url: string }
+    let sellerOrderId: string | null = null // TXN_ST:SELLER → 매장 우선 라우팅 키
     try {
       if (row.noti_tp_cd === 'TXN_ST') {
         const body = JSON.parse(row.noti_body) as TxnStBody
+        if (body.recv_role === 'SELLER') sellerOrderId = body.order_id
         text = buildTxnStMessage(body)
         button = {
           text: '📦 주문 확인하기',
@@ -293,9 +316,13 @@ export async function dispatchTradeNotis(
       continue
     }
 
+    // 판매자 주문 상태 알림: 매장 Telegram 우선 → 개인 폴백 (mps-noti ORDER와 동일 규칙)
+    const shopId = sellerOrderId ? orderShop.get(sellerOrderId) : undefined
+    const shopChatId = shopId ? shopTlgm.get(shopId) : undefined
     const u = byId.get(row.recv_usr_id)
-    const chatId =
+    const personalChatId =
       u && u.tlgm_conn_yn === 'Y' && u.tlgm_chat_id ? u.tlgm_chat_id : undefined
+    const chatId = shopChatId ?? personalChatId
 
     // 텔레그램 미연동 — 앱 내 화면(주문관리·후기 목록)이 안전망. 재시도 큐에서 이탈.
     if (!chatId) {
