@@ -251,6 +251,87 @@ export async function getPlaceDetails(
   }
 }
 
+// ──────────────────────────────────────────────────────────────
+// Place Reviews (New) — 매장 상세 화면의 구글 평점·리뷰 표시용
+// 평점(rating)·총개수(userRatingCount)는 전체 리뷰 기준 집계값,
+// 리뷰 본문(reviews)은 구글 정책상 최대 5개만 제공된다.
+// ⚠️ 구글 약관: 리뷰 데이터 영구 저장(DB 캐싱) 금지 → 라이브 조회 + 단기 fetch 캐시만
+// ──────────────────────────────────────────────────────────────
+export interface PlaceReview {
+  author_nm: string | null
+  author_photo_url: string | null
+  rating: number | null
+  text: string | null
+  relative_time: string | null // "1개월 전" 등 구글 제공 상대시간 (languageCode 반영)
+  publish_dtm: string | null
+}
+
+export interface PlaceReviews {
+  rating: number | null // 전체 리뷰 기준 평균 (소수점 1자리)
+  user_rating_count: number | null // 전체 리뷰 개수
+  google_maps_uri: string | null // 전체 리뷰는 구글 지도로 유도 (API는 5개 제한)
+  reviews: PlaceReview[]
+}
+
+interface GoogleReviewItem {
+  rating?: number
+  text?: { text?: string }
+  originalText?: { text?: string }
+  authorAttribution?: { displayName?: string; photoUri?: string; uri?: string }
+  relativePublishTimeDescription?: string
+  publishTime?: string
+}
+
+// 리뷰 전용 최소 필드 마스크 — getPlaceDetails(등록 검증용)와 분리해 과금 SKU를 낮게 유지
+const REVIEWS_FIELD_MASK = 'rating,userRatingCount,googleMapsUri,reviews'
+
+// place_id로 구글 평점·리뷰(최대 5개) 조회. 장소 없으면 null, API 오류는 throw.
+// languageCode: 뷰어 locale의 언어 부분 (예: 'ko', 'en') — 리뷰 번역·상대시간 표기에 반영
+export async function getPlaceReviews(
+  placeId: string,
+  languageCode = 'ko',
+): Promise<PlaceReviews | null> {
+  const key = process.env.GOOGLE_MAPS_API_KEY
+  if (!key) throw new Error('GOOGLE_MAPS_API_KEY 미설정')
+
+  const res = await fetch(
+    `${PLACE_DETAILS_URL}/${encodeURIComponent(placeId)}?languageCode=${encodeURIComponent(languageCode)}`,
+    {
+      headers: {
+        'X-Goog-Api-Key': key,
+        'X-Goog-FieldMask': REVIEWS_FIELD_MASK,
+      },
+      // 약관상 영구 저장 불가 — 1시간 단기 캐시로 비용만 절감 (URL에 languageCode 포함 → 언어별 캐시)
+      next: { revalidate: 3600 },
+    },
+  )
+
+  if (res.status === 404) return null
+  if (!res.ok) {
+    const body = await res.text().catch(() => '')
+    throw new Error(
+      `Place Reviews API HTTP ${res.status}${body ? `: ${body.slice(0, 200)}` : ''}`,
+    )
+  }
+
+  const d = (await res.json()) as GooglePlaceResponse & {
+    reviews?: GoogleReviewItem[]
+  }
+  return {
+    rating: d.rating ?? null,
+    user_rating_count: d.userRatingCount ?? null,
+    google_maps_uri: d.googleMapsUri ?? null,
+    reviews: (d.reviews ?? []).map((r) => ({
+      author_nm: r.authorAttribution?.displayName ?? null,
+      author_photo_url: r.authorAttribution?.photoUri ?? null,
+      rating: r.rating ?? null,
+      text: r.text?.text ?? r.originalText?.text ?? null,
+      relative_time: r.relativePublishTimeDescription ?? null,
+      publish_dtm: r.publishTime ?? null,
+    })),
+  }
+}
+
 // 전화번호 정규화 — 숫자만 추출해 형식 차이(공백·하이픈·국가코드) 흡수 후 비교용.
 // 국가코드 흡수: 국제번호(+82 10...)와 국내번호(010...)를 끝 9자리로 느슨히 비교.
 export function normalizePhone(phone: string): string {

@@ -2447,6 +2447,13 @@
       "pending": "취소 완료 — 환불은 곧 처리됩니다"
     },
     "backToList": "상품 목록",
+    "googleReviews": {
+      "title": "Google 리뷰",
+      "source": "출처: Google",
+      "reviewCount": "리뷰 {count}개",
+      "anonymous": "Google 사용자",
+      "viewAllOnGoogle": "Google 지도에서 전체 리뷰 {count}개 보기"
+    },
     "shopfrontOwnerHint": "내 매장입니다 — 상품을 누르면 바로 수정할 수 있어요",
     "shopfrontEditBadge": "✏️ 수정",
     "shopfrontAddItem": "+ 메뉴 추가",

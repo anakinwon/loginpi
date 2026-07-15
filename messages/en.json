@@ -3983,6 +3983,13 @@
     "allCategories": "All Categories",
     "approveFail": "Payment approval failed. Please try again shortly",
     "backToList": "Item List",
+    "googleReviews": {
+      "title": "Google Reviews",
+      "source": "Source: Google",
+      "reviewCount": "{count} reviews",
+      "anonymous": "Google user",
+      "viewAllOnGoogle": "See all {count} reviews on Google Maps"
+    },
     "bond": {
       "active": "Active",
       "avail": "Available Balance",

@@ -2,12 +2,13 @@ import { getTranslations } from 'next-intl/server'
 import { Link } from '@/i18n/navigation'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { StoreShopfront } from '@/components/store/store-shopfront'
+import { GoogleReviewsCard } from '@/components/store/google-reviews-card'
 
 async function getShop(shopId: string) {
   const { data } = await getSupabaseAdmin()
     .from('mps_shop')
     .select(
-      'seller_id, shop_nm, shop_type_cd, addr, biz_hour, owner_verified_yn, dlvr_yn',
+      'seller_id, shop_nm, shop_type_cd, addr, biz_hour, owner_verified_yn, dlvr_yn, place_id',
     )
     .eq('shop_id', shopId)
     .eq('del_yn', 'N')
@@ -20,6 +21,7 @@ async function getShop(shopId: string) {
     biz_hour: string | null
     owner_verified_yn: string | null
     dlvr_yn: string | null
+    place_id: string | null
   } | null
 }
 
@@ -81,6 +83,9 @@ export default async function ShopfrontPage({
           </div>
 
           <StoreShopfront shopId={shopId} ownerSellerId={shop.seller_id} />
+
+          {/* 구글 평점·리뷰 — place_id 연결(구글 카페 인증 등록) 매장만 표시 */}
+          {shop.place_id && <GoogleReviewsCard shopId={shopId} />}
         </>
       )}
     </div>
