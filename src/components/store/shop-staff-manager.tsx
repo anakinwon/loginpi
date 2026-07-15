@@ -15,6 +15,12 @@ interface StaffRow {
   reg_dtm: string
 }
 
+interface StaffResponse {
+  staff: StaffRow[]
+  // 소유자가 매장 그룹방 참여 중이면 이름 — "(소유자)" 칩 표시용 (× 없음)
+  owner: { name: string } | null
+}
+
 // 판매 관리 매니저 등록/해제 (mps_shop_staff) — 매장 보기 소유자 영역에 표시.
 //   등록 매니저 = 판매 관리 열람 + 주문 상태 변경(접수·준비완료·거래완료). 해제=논리삭제(del_yn).
 //   판매 관리 권한의 단일 관리 지점 — Telegram 그룹은 순수 알림 채널(권한 무관).
@@ -23,6 +29,7 @@ export function ShopStaffManager({ shopId }: { shopId: string }) {
   const tc = useTranslations('common')
   const apiErr = useApiErrorMessage()
   const [staff, setStaff] = useState<StaffRow[] | null>(null)
+  const [owner, setOwner] = useState<{ name: string } | null>(null)
   const [uname, setUname] = useState('')
   const [busy, setBusy] = useState(false)
 
@@ -30,8 +37,9 @@ export function ShopStaffManager({ shopId }: { shopId: string }) {
     try {
       const res = await piFetch(`/api/store/shops/${shopId}/staff`)
       if (res.ok) {
-        const d = (await res.json()) as { staff: StaffRow[] }
+        const d = (await res.json()) as StaffResponse
         setStaff(d.staff)
+        setOwner(d.owner)
       }
     } catch {
       // 비치명적 — 카드 미표시
@@ -119,12 +127,20 @@ export function ShopStaffManager({ shopId }: { shopId: string }) {
         </Button>
       </div>
 
-      {/* 등록 매니저 칩 목록 — × 클릭 시 논리삭제(del_yn) 해제 */}
+      {/* 매니저 칩 목록(그룹 자동 동기화 + 수동 등록 통합) — × 클릭 시 논리삭제(del_yn) 해제 */}
       <div className="flex flex-wrap items-center gap-1.5">
         <span className="text-muted-foreground text-xs">
           {t('staffMgr.listLabel')}
         </span>
-        {staff.length === 0 ? (
+        {owner && (
+          <span className="bg-muted inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium">
+            {owner.name}
+            <span className="text-muted-foreground ml-1">
+              {t('staffMgr.ownerBadge')}
+            </span>
+          </span>
+        )}
+        {staff.length === 0 && !owner ? (
           <span className="text-muted-foreground text-xs">
             {t('staffMgr.empty')}
           </span>

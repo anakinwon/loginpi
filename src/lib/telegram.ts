@@ -20,6 +20,29 @@ export interface TelegramButton {
   url: string
 }
 
+// 그룹 멤버십 상태 조회 — 매장 그룹방 멤버의 판매 관리 매니저 자동 동기화에 사용.
+//   개인 chat_id(양수)는 곧 그 사용자의 Telegram user id라 그대로 user_id로 조회 가능.
+//   실패(미설정·네트워크·비멤버 400)는 null — 호출부가 비멤버로 처리.
+export async function getChatMemberStatus(
+  chatId: number,
+  userId: number,
+): Promise<string | null> {
+  const token = process.env.TELEGRAM_BOT_TOKEN
+  if (!token) return null
+  try {
+    const res = await fetch(
+      `${API_BASE}/bot${token}/getChatMember?chat_id=${chatId}&user_id=${userId}`,
+    )
+    const json = (await res.json()) as {
+      ok: boolean
+      result?: { status?: string }
+    }
+    return json.ok ? (json.result?.status ?? null) : null
+  } catch {
+    return null
+  }
+}
+
 export interface SendResult {
   ok: boolean
   messageId?: number

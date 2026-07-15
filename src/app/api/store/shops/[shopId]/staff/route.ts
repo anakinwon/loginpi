@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
+import { syncGroupManagers } from '@/lib/shop-staff-access'
 import { apiError } from '@/lib/api-errors'
 
 type Params = { params: Promise<{ shopId: string }> }
@@ -35,6 +36,10 @@ export async function GET(_req: NextRequest, { params }: Params) {
   const r = await ownShop(shopId, user.id, isAdmin(user))
   if ('error' in r) return apiError('FORBIDDEN', r.error)
 
+  // 그룹방 멤버 자동 동기화 — 그룹 멤버(앱 가입+개인 연동)를 매니저로 실체화.
+  // ×로 제외(del_yn='Y')된 사람은 부활하지 않음. 소유자는 그룹 참여 여부만 표시용 반환.
+  const ownerInGroup = await syncGroupManagers(shopId)
+
   const db = getSupabaseAdmin()
   const { data: rows, error } = await db
     .from('mps_shop_staff')
@@ -43,16 +48,16 @@ export async function GET(_req: NextRequest, { params }: Params) {
     .eq('del_yn', 'N')
     .order('reg_dtm', { ascending: true })
   // 테이블 미생성(마이그레이션 전) — 빈 목록으로 강등해 화면은 정상 동작
-  if (error) return NextResponse.json({ staff: [] })
+  if (error) return NextResponse.json({ staff: [], owner: null })
 
   const usrIds = (rows ?? []).map((r) => (r as { usr_id: string }).usr_id)
-  // usr_id는 FK 없는 TEXT(sys_user.id) — 임베드 불가, 별도 조회 후 Map 병합
-  const { data: users } = usrIds.length
-    ? await db
-        .from('sys_user')
-        .select('id, nick_nm, display_name, pi_username')
-        .in('id', usrIds)
-    : { data: [] }
+  // usr_id는 FK 없는 TEXT(sys_user.id) — 임베드 불가, 별도 조회 후 Map 병합.
+  // 소유자 이름도 함께 조회(그룹 참여 시 "(소유자)" 칩 표시용)
+  const lookupIds = [...new Set([...usrIds, r.sellerId])]
+  const { data: users } = await db
+    .from('sys_user')
+    .select('id, nick_nm, display_name, pi_username')
+    .in('id', lookupIds)
   const byId = new Map((users ?? []).map((u) => [(u as { id: string }).id, u]))
   const staff = (rows ?? []).map((r) => {
     const row = r as { usr_id: string; reg_dtm: string }
@@ -72,7 +77,20 @@ export async function GET(_req: NextRequest, { params }: Params) {
       reg_dtm: row.reg_dtm,
     }
   })
-  return NextResponse.json({ staff })
+  const ow = byId.get(r.sellerId) as {
+    nick_nm: string | null
+    display_name: string | null
+    pi_username: string | null
+  } | null
+  return NextResponse.json({
+    staff,
+    // 소유자가 매장 그룹방에 참여 중이면 목록 선두에 "(소유자)" 칩으로 표시
+    owner: ownerInGroup
+      ? {
+          name: ow?.nick_nm || ow?.pi_username || ow?.display_name || 'owner',
+        }
+      : null,
+  })
 }
 
 const addSchema = z.object({
