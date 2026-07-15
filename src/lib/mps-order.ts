@@ -392,13 +392,19 @@ export async function markBuyerDone(orderId: string, buyerId: string) {
 }
 
 // ② 판매자 "거래 완료" — BUYER_DONE → DONE + 판매자 A2U 자동 정산 (실패 시 정산대기 폴백)
-export async function markComplete(orderId: string, sellerId: string) {
+// actorId: 실제 행위자(소유자 또는 등록 직원) — 인가는 라우트(resolveOrderSeller)에서 완료,
+// sellerId는 주문 무결성 필터(.eq)용 실제 판매자. 감사 추적은 modr_id=actorId로 남긴다.
+export async function markComplete(
+  orderId: string,
+  sellerId: string,
+  actorId: string = sellerId,
+) {
   const db = getSupabaseAdmin()
   const { data } = await db
     .from('mps_order')
     .update({
       order_st_cd: 'DONE',
-      modr_id: sellerId,
+      modr_id: actorId,
       mod_dtm: new Date().toISOString(),
     })
     .eq('order_id', orderId)
@@ -420,13 +426,17 @@ export async function markComplete(orderId: string, sellerId: string) {
 // 오프라인 매장 주문 흐름 — ORDERED → PREPARING → READY → DONE
 // ──────────────────────────────────────────────────────────────
 
-// 판매자 "접수" — ORDERED → PREPARING (상품준비중)
-export async function markPreparing(orderId: string, sellerId: string) {
+// 판매자 "접수" — ORDERED → PREPARING (상품준비중). actorId=등록 직원 대행 허용
+export async function markPreparing(
+  orderId: string,
+  sellerId: string,
+  actorId: string = sellerId,
+) {
   const { data } = await getSupabaseAdmin()
     .from('mps_order')
     .update({
       order_st_cd: 'PREPARING',
-      modr_id: sellerId,
+      modr_id: actorId,
       mod_dtm: new Date().toISOString(),
     })
     .eq('order_id', orderId)
@@ -441,15 +451,19 @@ export async function markPreparing(orderId: string, sellerId: string) {
   return order
 }
 
-// 판매자 "준비완료" — PREPARING → READY (상품준비완료, 5분 자동완료 타이머 시작)
-export async function markReady(orderId: string, sellerId: string) {
+// 판매자 "준비완료" — PREPARING → READY (상품준비완료, 5분 자동완료 타이머 시작). actorId=등록 직원 대행 허용
+export async function markReady(
+  orderId: string,
+  sellerId: string,
+  actorId: string = sellerId,
+) {
   const now = new Date().toISOString()
   const { data } = await getSupabaseAdmin()
     .from('mps_order')
     .update({
       order_st_cd: 'READY',
       ready_dtm: now, // 자동완료 기준 시각
-      modr_id: sellerId,
+      modr_id: actorId,
       mod_dtm: now,
     })
     .eq('order_id', orderId)
@@ -843,15 +857,18 @@ export async function getOrderForUser(
 export async function listOrdersByRole(
   userId: string | null,
   role: 'buyer' | 'seller',
-  // 직원 열람 매장(그룹방 멤버, shop-staff-access) — seller 뷰를 해당 매장 주문까지 확장
+  // 직원 열람 매장(등록 직원 ∪ 그룹방 멤버) — seller 뷰를 해당 매장 주문까지 확장
   staffShopIds: string[] = [],
+  // 등록 직원 매장(mps_shop_staff) — 이 매장 주문은 직원도 상태 변경 가능(can_act)
+  registeredShopIds: string[] = [],
 ) {
   const column = role === 'buyer' ? 'buyer_id' : 'seller_id'
   let q = getSupabaseAdmin()
     .from('mps_order')
     .select(
       // 대표 item + 카트 주문 라인 전체(lines: 상품명·수량) 임베드
-      '*, mps_item ( item_nm, thumbnail_url, ctgr_id, mps_shop ( shop_nm, addr, latd_crd, lngt_crd, place_id, fbck_consent_yn ) ), lines:mps_order_item ( ord_qty, price_pi, item:mps_item ( item_nm ) )',
+      // item.shop_id: 단건 주문의 매장 식별(매장별 후기 보증금 bond_ok 판정용)
+      '*, mps_item ( item_nm, thumbnail_url, ctgr_id, shop_id, mps_shop ( shop_nm, addr, latd_crd, lngt_crd, place_id, fbck_consent_yn ) ), lines:mps_order_item ( ord_qty, price_pi, item:mps_item ( item_nm ) )',
     )
     .eq('del_yn', 'N')
     .order('reg_dtm', { ascending: false })
@@ -905,12 +922,20 @@ export async function listOrdersByRole(
     }
   }
 
-  // 후기 작성 게이트 — 매장주(seller) 보증금이 최대 보상액 이상이어야 버튼 활성 (PRD_24 §10-7).
+  // 후기 작성 게이트 — 주문 매장의 보증금(매장별 관리, sql/180)이 최대 보상액 이상이어야 버튼 활성.
   //   잔액 ≥ 최대 보상액(FR_1~5 중 최대)이어야 어떤 점수 후기든 보상 지급이 보장된다
   //   (잔액 부족 매장에서 버튼만 활성화되면 작성 시 서버 게이트가 막아 모순 발생).
-  let bondOkSellers = new Set<string>()
+  //   주문의 매장 = 카트 주문 shop_id 직결, 단건 주문은 대표 item의 shop_id.
+  const orderShopId = (o: unknown): string | null => {
+    const row = o as {
+      shop_id?: string | null
+      mps_item?: { shop_id?: string | null } | null
+    }
+    return row.shop_id ?? row.mps_item?.shop_id ?? null
+  }
+  let bondOkShops = new Set<string>()
   if (role === 'buyer' && orders.length > 0) {
-    const doneSellers = [
+    const doneShops = [
       ...new Set(
         orders
           .filter((o) =>
@@ -918,10 +943,11 @@ export async function listOrdersByRole(
               (o as { order_st_cd: string }).order_st_cd,
             ),
           )
-          .map((o) => (o as { seller_id: string }).seller_id),
+          .map(orderShopId)
+          .filter((s): s is string => s !== null),
       ),
     ]
-    if (doneSellers.length > 0) {
+    if (doneShops.length > 0) {
       const { data: feeRows } = await getSupabaseAdmin()
         .from('bean_fee_plan')
         .select('amt_bean')
@@ -936,18 +962,18 @@ export async function listOrdersByRole(
       if (maxReward > 0) {
         const { data: bondRows } = await getSupabaseAdmin()
           .from('fbck_reward_bond')
-          .select('owner_id, bond_bal_bean')
+          .select('shop_id, bond_bal_bean')
           .eq('bond_kind', 'SHOP')
           .eq('del_yn', 'N')
-          .in('owner_id', doneSellers)
-        bondOkSellers = new Set(
+          .in('shop_id', doneShops)
+        bondOkShops = new Set(
           (bondRows ?? [])
             .filter(
               (r) =>
                 Number((r as { bond_bal_bean: number }).bond_bal_bean) >=
                 maxReward,
             )
-            .map((r) => (r as { owner_id: string }).owner_id),
+            .map((r) => (r as { shop_id: string }).shop_id),
         )
       }
     }
@@ -966,22 +992,39 @@ export async function listOrdersByRole(
     const byId = new Map(
       (buyers ?? []).map((b) => [(b as { id: string }).id, b]),
     )
-    return orders.map((o) => ({
-      ...(o as object),
-      buyer: byId.get((o as { buyer_id: string }).buyer_id) ?? null,
-      has_feedback: false,
-      // 직원 열람 주문(내가 판매자가 아님) — UI에서 상태 전이 버튼 숨김·배지 표시
-      staff_view:
-        (o as { seller_id: string }).seller_id !== userId || undefined,
-    }))
+    return orders.map((o) => {
+      const row = o as {
+        seller_id: string
+        shop_id: string | null
+        mps_item?: { shop_id?: string | null } | null
+      }
+      const staffView = row.seller_id !== userId
+      // 주문의 매장: 카트=헤더 shop_id, 단건=대표 item의 shop_id
+      const orderShop = row.shop_id ?? row.mps_item?.shop_id ?? null
+      return {
+        ...(o as object),
+        buyer: byId.get((o as { buyer_id: string }).buyer_id) ?? null,
+        has_feedback: false,
+        // 직원 열람 주문(내가 판매자가 아님) — UI에서 배지 표시
+        staff_view: staffView || undefined,
+        // 등록 직원 매장 주문 — 직원도 접수·준비완료·거래완료 가능 (그룹 열람자는 불가)
+        can_act:
+          staffView && orderShop && registeredShopIds.includes(orderShop)
+            ? true
+            : undefined,
+      }
+    })
   }
 
-  return orders.map((o) => ({
-    ...(o as object),
-    has_feedback: feedbackOrderIds.has((o as { order_id: string }).order_id),
-    // 매장주 보증금이 충분(≥최대 보상액)할 때만 후기 작성 버튼 활성
-    bond_ok: bondOkSellers.has((o as { seller_id: string }).seller_id),
-  }))
+  return orders.map((o) => {
+    const shopId = orderShopId(o)
+    return {
+      ...(o as object),
+      has_feedback: feedbackOrderIds.has((o as { order_id: string }).order_id),
+      // 주문 매장의 보증금이 충분(≥최대 보상액)할 때만 후기 작성 버튼 활성 (매장별 관리)
+      bond_ok: shopId !== null && bondOkShops.has(shopId),
+    }
+  })
 }
 
 // 거래 이력 — FR-12

@@ -70,8 +70,10 @@ interface OrderRow {
   has_feedback?: boolean
   // 매장주(seller) 보증금 충분 여부 — 'Y'/true일 때만 후기 작성 버튼 활성 (PRD_24 §10-7)
   bond_ok?: boolean
-  // 직원 열람(매장 Telegram 그룹방 멤버) — 열람만 가능, 상태 전이·취소 버튼 숨김
+  // 직원 열람(등록 직원 또는 매장 Telegram 그룹방 멤버) — 배지 표시
   staff_view?: boolean
+  // 등록 직원(mps_shop_staff) — 접수·준비완료·거래완료 상태 변경 가능 (취소는 소유자 전용)
+  can_act?: boolean
 }
 
 // 주문자 표시명 — 별명 우선, 없으면 Pi username, 없으면 display_name (fallback은 렌더 시 t()로 처리)
@@ -418,9 +420,9 @@ export function ClientMyOrders({
               {t('actionBuyerDone')}
             </Button>
           )}
-          {/* 직원 열람(staff_view)은 상태 전이 권한 없음 — 판매자 액션 전체 숨김 */}
+          {/* 상태 전이: 소유자 또는 등록 직원(can_act). 그룹 열람자(staff_view만)는 버튼 숨김 */}
           {role === 'seller' &&
-            !o.staff_view &&
+            (!o.staff_view || o.can_act) &&
             o.order_st_cd === 'BUYER_DONE' && (
               <Button
                 size="sm"
@@ -431,9 +433,9 @@ export function ClientMyOrders({
               </Button>
             )}
 
-          {/* 오프라인 — 판매자 상품접수 (주문중 → 준비중) */}
+          {/* 오프라인 — 상품접수 (주문중 → 준비중) */}
           {role === 'seller' &&
-            !o.staff_view &&
+            (!o.staff_view || o.can_act) &&
             o.order_st_cd === 'ORDERED' && (
               <Button
                 size="sm"
@@ -443,9 +445,9 @@ export function ClientMyOrders({
                 {t('actionAccept')}
               </Button>
             )}
-          {/* 오프라인 — 판매자 상품완료 (준비중 → 상품대기중) */}
+          {/* 오프라인 — 상품완료 (준비중 → 상품대기중) */}
           {role === 'seller' &&
-            !o.staff_view &&
+            (!o.staff_view || o.can_act) &&
             o.order_st_cd === 'PREPARING' && (
               <Button
                 size="sm"

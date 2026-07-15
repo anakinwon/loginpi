@@ -2,12 +2,14 @@ import 'server-only'
 import { getSupabaseAdmin } from './supabase-admin'
 import { getChatMemberStatus } from './telegram'
 
-// 매장 직원 열람 권한 — "매장 Telegram 그룹방 멤버 = 그 매장 판매 관리 열람 가능" (2026-07-15 마스터 지시)
-//   별도 직원 테이블 없이 그룹 초대/강퇴가 곧 권한 부여/회수 — 알림 수신자와 열람 권한자가 항상 일치.
-//   판정 경로: 내 개인 Telegram 연동(sys_user.tlgm_chat_id, 개인 chat_id=Telegram user id)
-//              ↔ 그룹 바인딩 매장(mps_shop.tlgm_chat_id<0) getChatMember 멤버십 조회.
-//   전제: 직원은 앱 가입 + 프로필 개인정보 탭에서 개인 Telegram 연동을 마쳐야 한다.
-//   범위: 열람(read) 전용 — 주문 상태 전이·취소 등 쓰기는 소유자(seller) 전용 유지.
+// 매장 직원 권한 — 2단계 체계 (2026-07-15 마스터 지시, sql/181)
+//   ① 등록 직원(mps_shop_staff): 판매 관리 열람 + 주문 상태 변경(접수·준비완료·거래완료).
+//      소유자가 앱(매장 보기 → 직원 관리)에서 Pi username으로 등록/해제.
+//   ② 매장 Telegram 그룹방 멤버: 판매 관리 열람만 — 그룹 초대/강퇴가 곧 열람 권한 부여/회수.
+//      판정 경로: 내 개인 Telegram 연동(sys_user.tlgm_chat_id=Telegram user id)
+//                 ↔ 그룹 바인딩 매장(mps_shop.tlgm_chat_id<0) getChatMember 멤버십 조회.
+//   쓰기를 그룹 멤버십에 걸지 않는 이유: Telegram 장애가 주문 처리를 막으면 안 되고,
+//   그룹의 임의 멤버가 주문 상태를 조작할 수 없어야 한다. 취소·환불은 소유자 전용 유지.
 
 // left/kicked 제외 전원 허용 — restricted(제한 멤버)도 그룹 알림은 받으므로 열람 포함
 const MEMBER_OK = new Set(['creator', 'administrator', 'member', 'restricted'])
@@ -16,9 +18,70 @@ const MEMBER_OK = new Set(['creator', 'administrator', 'member', 'restricted'])
 const TTL_MS = 10 * 60 * 1000
 const cache = new Map<string, { ids: string[]; exp: number }>()
 
-// 내가(소유자 아님) 그룹방 멤버로 참여 중인 매장 shop_id 목록.
+// 내가 등록 직원(mps_shop_staff)으로 소속된 매장 shop_id 목록 — 상태 변경 권한의 기준.
+//   테이블 미생성(마이그레이션 전) 등 조회 실패는 빈 배열로 강등 — 기능만 비활성.
+export async function getRegisteredStaffShopIds(
+  userId: string,
+): Promise<string[]> {
+  const { data, error } = await getSupabaseAdmin()
+    .from('mps_shop_staff')
+    .select('shop_id')
+    .eq('usr_id', userId)
+    .eq('del_yn', 'N')
+  if (error) return []
+  return (data ?? []).map((r) => (r as { shop_id: string }).shop_id)
+}
+
+// 등록 직원 여부 단건 판정 — 주문 상태 변경 API 인가에 사용
+export async function isRegisteredStaff(
+  userId: string,
+  shopId: string,
+): Promise<boolean> {
+  const { data, error } = await getSupabaseAdmin()
+    .from('mps_shop_staff')
+    .select('staff_id')
+    .eq('usr_id', userId)
+    .eq('shop_id', shopId)
+    .eq('del_yn', 'N')
+    .maybeSingle()
+  return !error && !!data
+}
+
+// 주문 상태 변경 인가 — 소유자(seller) 또는 그 매장 등록 직원이면 실제 seller_id 반환.
+//   mark* 함수는 무결성을 위해 .eq('seller_id', ...)를 유지하므로, 직원 대행 시에도
+//   주문의 실제 seller_id로 호출하고 modr_id에는 행위자(actor)를 기록한다.
+export async function resolveOrderSeller(
+  orderId: string,
+  userId: string,
+): Promise<string | null> {
+  const db = getSupabaseAdmin()
+  const { data } = await db
+    .from('mps_order')
+    .select('seller_id, shop_id, mps_item(shop_id)')
+    .eq('order_id', orderId)
+    .eq('del_yn', 'N')
+    .maybeSingle()
+  if (!data) return null
+  const row = data as {
+    seller_id: string
+    shop_id: string | null
+    mps_item?: unknown
+  }
+  if (row.seller_id === userId) return row.seller_id
+
+  // 매장 판정: 카트 주문=헤더 shop_id, 단건 주문=대표 item의 shop_id
+  const rawItem = row.mps_item
+  const itemObj = Array.isArray(rawItem) ? rawItem[0] : rawItem
+  const shopId =
+    row.shop_id ?? (itemObj as { shop_id?: string | null } | null)?.shop_id
+  if (!shopId) return null
+
+  return (await isRegisteredStaff(userId, shopId)) ? row.seller_id : null
+}
+
+// 내가(소유자 아님) 그룹방 멤버로 참여 중인 매장 shop_id 목록 (열람 전용 경로).
 //   그룹 바인딩 매장 수는 플랫폼 전체 기준 소수(매장당 1그룹) — 순차 조회로 충분.
-export async function getStaffShopIds(userId: string): Promise<string[]> {
+export async function getGroupStaffShopIds(userId: string): Promise<string[]> {
   const hit = cache.get(userId)
   if (hit && hit.exp > Date.now()) return hit.ids
 
@@ -54,6 +117,15 @@ export async function getStaffShopIds(userId: string): Promise<string[]> {
 
   cache.set(userId, { ids, exp: Date.now() + TTL_MS })
   return ids
+}
+
+// 판매 관리 열람 가능 매장 전체 — 등록 직원(쓰기 겸용) ∪ 그룹 멤버(열람만)
+export async function getStaffShopIds(userId: string): Promise<string[]> {
+  const [registered, group] = await Promise.all([
+    getRegisteredStaffShopIds(userId),
+    getGroupStaffShopIds(userId),
+  ])
+  return [...new Set([...registered, ...group])]
 }
 
 export interface ShopStaffEntry {

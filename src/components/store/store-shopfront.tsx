@@ -9,6 +9,8 @@ import { formatCcy } from '@/lib/format-ccy'
 import { deriveTradeStatus, TRADE_ST_STYLE } from '@/lib/mps-trade-status'
 import { ItemRow, type StoreItem } from './store-item-list'
 import { ShopTelegramConnect } from './shop-telegram-connect'
+import { ShopStaffManager } from './shop-staff-manager'
+import { ShopBondCard } from './shop-bond-card'
 
 // 매장 스토어프론트 상품 그리드 (FR-15·SCR-10) — 특정 매장의 상품을 예쁘게 모아보기.
 // 방문자: 카드 클릭 → 상품 상세(카트 담기·구매). 공개(게스트 포함).
@@ -86,6 +88,10 @@ export function StoreShopfront({
             </Link>
           </div>
           <ShopTelegramConnect shopId={shopId} />
+          {/* 관리직원 등록 — 등록 직원은 판매 관리 열람+주문 상태 변경 가능 (sql/181) */}
+          <ShopStaffManager shopId={shopId} />
+          {/* 후기 보상 보증금 — 매장별 관리(알림과 동일 단위, sql/180). 내 매장 목록에서 이전 */}
+          <ShopBondCard shopId={shopId} />
         </>
       )}
 
