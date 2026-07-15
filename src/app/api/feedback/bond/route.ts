@@ -5,14 +5,31 @@ import { getActiveFeeMode } from '@/lib/fee-resolver'
 import { apiError } from '@/lib/api-errors'
 
 // 후기 보상 보증금 — 매장 주체(seller/카페 owner)가 보상 재원을 선예치. PRD_24 §10-7.
-//   보증금은 owner_id(usr_id) + bond_kind(SHOP/CAFE)당 1행(매장 여러 개여도 주체당 1개).
-//   GET: 내 보증금 잔액 + 내 Bean 지갑 + 임계(최대 보상액).
-//   POST: { kind, bean_amt } 예치(BEAN=지갑 차감 원자). PI 모드 예치는 후속(501).
+//   SHOP kind는 매장(mps_shop)별 1행(sql/180, 매장별 Telegram 알림과 동일 관리 단위) — shop 필수.
+//   CAFE kind는 기존 주체(owner_id) 단위 유지.
+//   GET: 매장 보증금 잔액 + 내 Bean 지갑 + 임계(최대 보상액).
+//   POST: { kind, shop_id, bean_amt } 예치(BEAN=지갑 차감 원자). PI 모드 예치는 후속(501).
 
 const KINDS = ['SHOP', 'CAFE'] as const
 type BondKind = (typeof KINDS)[number]
 
 type Db = ReturnType<typeof getSupabaseAdmin>
+
+// SHOP kind 매장 소유 검증 — 내 매장(del_yn='N')일 때만 예치·조회 허용 (IDOR 방지)
+async function ownsShop(
+  db: Db,
+  shopId: string,
+  userId: string,
+): Promise<boolean> {
+  const { data } = await db
+    .from('mps_shop')
+    .select('shop_id')
+    .eq('shop_id', shopId)
+    .eq('seller_id', userId)
+    .eq('del_yn', 'N')
+    .maybeSingle()
+  return data !== null
+}
 
 // 최대 후기 보상액(FR_1~5 중 최대) — 보증금 충분 임계
 async function getMaxReward(db: Db): Promise<number> {
@@ -35,14 +52,35 @@ export async function GET(req: NextRequest) {
   if (!KINDS.includes(kind)) return apiError('FBCK_INVALID_BOND_KIND', 400)
 
   const db = getSupabaseAdmin()
+
+  // SHOP kind: 매장 단위 조회 — shop 파라미터 필수 + 소유 검증
+  const shopId = req.nextUrl.searchParams.get('shop')
+  if (kind === 'SHOP') {
+    if (!shopId) return apiError('FBCK_BOND_SHOP_REQUIRED', 400)
+    if (!(await ownsShop(db, shopId, user.id)))
+      return apiError('STORE_SHOP_NOT_OWNED_OR_MISSING', 403)
+  }
+
+  // 매장 단위 행(shop_id) 또는 주체 단위 행(CAFE)
+  const bondQuery =
+    kind === 'SHOP'
+      ? db
+          .from('fbck_reward_bond')
+          .select('bond_bal_bean')
+          .eq('shop_id', shopId!)
+          .eq('del_yn', 'N')
+          .maybeSingle()
+      : db
+          .from('fbck_reward_bond')
+          .select('bond_bal_bean')
+          .eq('owner_id', user.id)
+          .eq('bond_kind', kind)
+          .is('shop_id', null)
+          .eq('del_yn', 'N')
+          .maybeSingle()
+
   const [{ data: bond }, { data: wlt }, maxReward] = await Promise.all([
-    db
-      .from('fbck_reward_bond')
-      .select('bond_bal_bean')
-      .eq('owner_id', user.id)
-      .eq('bond_kind', kind)
-      .eq('del_yn', 'N')
-      .maybeSingle(),
+    bondQuery,
     db
       .from('bean_wlt')
       .select('bean_amt')
@@ -59,6 +97,7 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.json({
     kind,
+    shop_id: kind === 'SHOP' ? shopId : null,
     balance, // 현재 보증금 잔액(Bean)
     wallet, // 내 Bean 지갑 잔액(예치 가능액)
     max_reward: maxReward, // 후기 1건 최대 보상액(임계)
@@ -70,7 +109,7 @@ export async function POST(req: NextRequest) {
   const user = await getSessionUser()
   if (!user) return apiError('AUTH_REQUIRED', 401)
 
-  let body: { kind?: string; bean_amt?: number }
+  let body: { kind?: string; shop_id?: string; bean_amt?: number }
   try {
     body = await req.json()
   } catch {
@@ -83,11 +122,20 @@ export async function POST(req: NextRequest) {
   if (!Number.isFinite(beanAmt) || beanAmt <= 0)
     return apiError('FBCK_INVALID_DEPOSIT_QTY', 400)
 
+  const db = getSupabaseAdmin()
+
+  // SHOP kind: 매장 단위 예치 — shop_id 필수 + 소유 검증 (RPC 내부 2차 검증 병행)
+  const shopId = body.shop_id ?? null
+  if (kind === 'SHOP') {
+    if (!shopId) return apiError('FBCK_BOND_SHOP_REQUIRED', 400)
+    if (!(await ownsShop(db, shopId, user.id)))
+      return apiError('STORE_SHOP_NOT_OWNED_OR_MISSING', 403)
+  }
+
   // PI 모드 예치는 Pi Browser 직결제(createPayment) 필요 — 후속 단계로 분리
   const mode = await getActiveFeeMode()
   if (mode === 'PI') return apiError('FBCK_PI_BOND_NOT_READY', 501)
 
-  const db = getSupabaseAdmin()
   const { data, error } = await db.rpc('fn_fbck_bond_deposit', {
     p_owner_id: user.id,
     p_bond_kind: kind,
@@ -95,6 +143,7 @@ export async function POST(req: NextRequest) {
     p_pay_src: 'BEAN',
     p_pymnt_id: null,
     p_regr_id: user.id,
+    p_shop_id: kind === 'SHOP' ? shopId : null,
   })
 
   if (error) {
@@ -103,6 +152,10 @@ export async function POST(req: NextRequest) {
       return apiError('FBCK_INSUFFICIENT_BEAN', 400)
     if (msg.includes('INVALID_AMOUNT'))
       return apiError('FBCK_INVALID_DEPOSIT_AMOUNT', 400)
+    if (msg.includes('SHOP_ID_REQUIRED'))
+      return apiError('FBCK_BOND_SHOP_REQUIRED', 400)
+    if (msg.includes('SHOP_NOT_OWNED'))
+      return apiError('STORE_SHOP_NOT_OWNED_OR_MISSING', 403)
     console.error('[보증금 예치] 실패:', msg)
     return apiError('FBCK_DEPOSIT_FAILED', 500)
   }

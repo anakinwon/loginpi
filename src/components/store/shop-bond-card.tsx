@@ -18,11 +18,12 @@ interface BondState {
   sufficient: boolean // 후기 버튼 활성 조건(잔액 ≥ 최대 보상액)
 }
 
-// 후기 보상 보증금 예치 카드 (판매자 SHOP 보증금) — PRD_24 §10-7.
-//   매장주가 Bean 지갑에서 보증금으로 예치 → 잔액 ≥ 최대 보상액일 때 상품 후기 작성 버튼 활성.
+// 후기 보상 보증금 예치 카드 (매장별 SHOP 보증금, sql/180) — PRD_24 §10-7.
+//   매장주가 Bean 지갑에서 해당 매장 보증금으로 예치 → 잔액 ≥ 최대 보상액일 때 상품 후기 작성 버튼 활성.
+//   매장별 Telegram 알림과 동일하게 매장 보기(스토어프론트) 소유자 영역에서 매장 단위로 관리.
 //   잔액은 Bean 기준 단일 저장, PI 모드 표시=÷100 (§10-7 Bean/Pi 일관 규칙).
 //   PI 모드 예치는 서버 미구현(501 FBCK_PI_BOND_NOT_READY) — 입력 대신 안내 노출.
-export function ShopBondCard() {
+export function ShopBondCard({ shopId }: { shopId: string }) {
   const t = useTranslations('store')
   const tc = useTranslations('common')
   const tErr = useTranslations('apiErrors')
@@ -35,12 +36,12 @@ export function ShopBondCard() {
 
   const load = useCallback(async () => {
     try {
-      const res = await piFetch('/api/feedback/bond?kind=SHOP')
+      const res = await piFetch(`/api/feedback/bond?kind=SHOP&shop=${shopId}`)
       if (res.ok) setState((await res.json()) as BondState)
     } catch {
       // 비치명적 — 카드 미표시
     }
-  }, [])
+  }, [shopId])
 
   useEffect(() => {
     void load()
@@ -57,7 +58,7 @@ export function ShopBondCard() {
       const res = await piFetch('/api/feedback/bond', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ kind: 'SHOP', bean_amt: v }),
+        body: JSON.stringify({ kind: 'SHOP', shop_id: shopId, bean_amt: v }),
       })
       const data = (await res.json()) as ApiErrorPayload & { ok?: boolean }
       if (res.ok && data.ok) {
@@ -72,7 +73,7 @@ export function ShopBondCard() {
     } finally {
       setBusy(false)
     }
-  }, [amt, load])
+  }, [amt, load, shopId])
 
   if (!state) return null
 

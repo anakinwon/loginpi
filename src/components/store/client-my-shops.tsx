@@ -9,7 +9,6 @@ import { piFetch } from '@/lib/pi-fetch'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { ShopBondCard } from '@/components/store/shop-bond-card'
 import { ShopTelegramConnect } from '@/components/store/shop-telegram-connect'
 
 type ShopType = 'ONLINE' | 'OFFLINE' | 'BOTH'
@@ -312,8 +311,7 @@ export function ClientMyShops({
         </div>
       )}
 
-      {/* 후기 보상 보증금 예치 — 매장 보유 시(목록 화면). 잔액 ≥ 최대 보상액이어야 상품 후기 버튼 활성 */}
-      {!formOpen && shops.length > 0 && <ShopBondCard />}
+      {/* 후기 보상 보증금은 매장별 관리로 전환(sql/180) — 각 매장 보기(스토어프론트) 소유자 영역에서 예치 */}
 
       {/* 등록/수정 인라인 폼 */}
       {formOpen && (

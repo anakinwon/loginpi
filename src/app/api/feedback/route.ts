@@ -209,6 +209,8 @@ export async function POST(req: NextRequest) {
   // 후기 보상 보증금 주체(매장) — 카페=OWNER usr_id / 상점=seller_id. 보증금 게이트·차감에 사용.
   let ownerId: string | null = null
   let bondKind: 'CAFE' | 'SHOP' | null = null
+  // SHOP kind 보증금은 매장(mps_shop) 단위 관리(sql/180) — 차감 대상 매장
+  let bondShopId: string | null = null
 
   // shop_id = msg_room.room_id (PyCafé™ 카페 후기)
   if (shop_id) {
@@ -265,19 +267,21 @@ export async function POST(req: NextRequest) {
     // 매장주 동의 게이트 — 이용후기·Bean 보상에 동의(fbck_consent_yn='Y')한 매장의 상품만 후기 허용 (UI 게이트의 서버 측 이중 방어)
     const { data: itemShop } = await db
       .from('mps_item')
-      .select('seller_id, mps_shop(fbck_consent_yn)')
+      .select('seller_id, shop_id, mps_shop(fbck_consent_yn)')
       .eq('item_id', prodId)
       .maybeSingle()
     const itemShopRow = itemShop as {
       seller_id?: string
+      shop_id?: string | null
       mps_shop?: { fbck_consent_yn?: string } | null
     } | null
     const consentYn = itemShopRow?.mps_shop?.fbck_consent_yn
     if (consentYn !== 'Y') {
       return apiError('FBCK_SHOP_NOT_PARTICIPATING', 403)
     }
-    // 보증금 주체 = 상점 seller (보상 재원 차감 대상)
+    // 보증금 주체 = 상점 seller, 차감 재원 = 상품 소속 매장의 보증금(매장별 관리)
     ownerId = itemShopRow?.seller_id ?? null
+    bondShopId = itemShopRow?.shop_id ?? null
     bondKind = 'SHOP'
   }
 
@@ -287,15 +291,30 @@ export async function POST(req: NextRequest) {
   if (!ownerId || !bondKind) {
     return apiError('FBCK_SHOP_INFO_MISSING', 500)
   }
+  // SHOP kind는 매장 단위 관리 — 상품에 매장이 없으면 보증금 재원도 없음
+  if (bondKind === 'SHOP' && !bondShopId) {
+    return apiError('FBCK_SHOP_INFO_MISSING', 500)
+  }
   const rewardBean = await getRewardBean(Number(fbck_scr))
   if (rewardBean > 0) {
-    const { data: bond } = await db
-      .from('fbck_reward_bond')
-      .select('bond_bal_bean')
-      .eq('owner_id', ownerId)
-      .eq('bond_kind', bondKind)
-      .eq('del_yn', 'N')
-      .maybeSingle()
+    // 매장 단위 행(SHOP) 또는 주체 단위 행(CAFE) 조회
+    const bondQuery =
+      bondKind === 'SHOP'
+        ? db
+            .from('fbck_reward_bond')
+            .select('bond_bal_bean')
+            .eq('shop_id', bondShopId!)
+            .eq('del_yn', 'N')
+            .maybeSingle()
+        : db
+            .from('fbck_reward_bond')
+            .select('bond_bal_bean')
+            .eq('owner_id', ownerId)
+            .eq('bond_kind', bondKind)
+            .is('shop_id', null)
+            .eq('del_yn', 'N')
+            .maybeSingle()
+    const { data: bond } = await bondQuery
     const bondBal = Number(
       (bond as { bond_bal_bean: number } | null)?.bond_bal_bean ?? 0,
     )
@@ -383,6 +402,7 @@ export async function POST(req: NextRequest) {
       p_fbck_id: fbckId,
       p_reward_bean: rewardBean,
       p_mode: mode,
+      p_shop_id: bondShopId, // SHOP=매장 단위 차감 / CAFE=null(주체 단위)
     })
     const row = (Array.isArray(rwd) ? rwd[0] : rwd) as {
       ok: boolean
