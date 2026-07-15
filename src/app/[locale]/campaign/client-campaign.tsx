@@ -58,10 +58,16 @@ export function ClientCampaign() {
     {
       key: 'telegram',
       label: t('condM3'),
-      href: '/profile?tab=store',
+      // 개인 Telegram 연동 카드가 내 PyShop™ 탭 → 개인정보 탭으로 이동(2026-07-15)
+      href: '/profile?tab=info',
       cta: t('ctaM3'),
     },
-    { key: 'tlgm_alrt', label: t('condM4'), href: '/profile', cta: t('ctaM4') },
+    {
+      key: 'tlgm_alrt',
+      label: t('condM4'),
+      href: '/profile?tab=info',
+      cta: t('ctaM4'),
+    },
   ]
 
   const load = useCallback(async () => {

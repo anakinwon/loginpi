@@ -8,6 +8,7 @@ import { piFetch } from '@/lib/pi-fetch'
 import { formatCcy } from '@/lib/format-ccy'
 import { deriveTradeStatus, TRADE_ST_STYLE } from '@/lib/mps-trade-status'
 import { ItemRow, type StoreItem } from './store-item-list'
+import { ShopTelegramConnect } from './shop-telegram-connect'
 
 // 매장 스토어프론트 상품 그리드 (FR-15·SCR-10) — 특정 매장의 상품을 예쁘게 모아보기.
 // 방문자: 카드 클릭 → 상품 상세(카트 담기·구매). 공개(게스트 포함).
@@ -65,17 +66,21 @@ export function StoreShopfront({
 
   return (
     <div className="space-y-4">
-      {/* 본인 매장일 때만: 수정 안내 배너 + 메뉴 추가 버튼 */}
+      {/* 본인 매장일 때만: 수정 안내 배너 + 메뉴 추가 버튼 + 매장별 Telegram 주문 알림 연동
+          (프로필 내 PyShop™ 탭에서 이곳으로 이전 — 2026-07-15 마스터 지시) */}
       {isOwner && (
-        <div className="border-primary/30 bg-primary/5 flex flex-wrap items-center justify-between gap-2 rounded-lg border px-3 py-2">
-          <p className="text-sm font-medium">{t('shopfrontOwnerHint')}</p>
-          <Link
-            href={`/store/my/shop-items/new?shop=${shopId}`}
-            className="bg-primary text-primary-foreground shrink-0 rounded-md px-3 py-1.5 text-xs font-medium hover:opacity-90"
-          >
-            {t('shopfrontAddItem')}
-          </Link>
-        </div>
+        <>
+          <div className="border-primary/30 bg-primary/5 flex flex-wrap items-center justify-between gap-2 rounded-lg border px-3 py-2">
+            <p className="text-sm font-medium">{t('shopfrontOwnerHint')}</p>
+            <Link
+              href={`/store/my/shop-items/new?shop=${shopId}`}
+              className="bg-primary text-primary-foreground shrink-0 rounded-md px-3 py-1.5 text-xs font-medium hover:opacity-90"
+            >
+              {t('shopfrontAddItem')}
+            </Link>
+          </div>
+          <ShopTelegramConnect shopId={shopId} />
+        </>
       )}
 
       {items.length === 0 ? (

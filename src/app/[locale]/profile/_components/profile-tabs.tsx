@@ -83,6 +83,9 @@ export function ProfileTabs({
       {activeTab === 'info' && (
         <div className="space-y-8">
           <AccountIntegrationSection />
+          {/* 개인 Telegram 연동 — 캠페인 참여 조건·채팅 알림·매장 미연동 폴백용.
+              매장별 주문 알림 연동은 매장 보기(스토어프론트)로 이전(2026-07-15) */}
+          <TelegramConnect />
           <ProfileForm
             initialUser={user}
             localeOptions={localeOptions}
@@ -133,7 +136,6 @@ function StoreTab() {
           </Link>
         </nav>
       </div>
-      <TelegramConnect />
       <StoreItemList mine />
     </div>
   )
