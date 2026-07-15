@@ -266,10 +266,18 @@ export interface PlaceReview {
   publish_dtm: string | null
 }
 
+// 매장 사진 — 구글 CDN 임시 URL 핫링크 (파일 복사·저장 금지, 표시 전용)
+export interface PlacePhoto {
+  photo_url: string // lh3.googleusercontent.com 임시 URL — ⚠️ DB 저장 금지 (만료됨)
+  author_nm: string | null // 기여자 표기 의무 (점주 아닌 방문자 사진 포함)
+}
+
 export interface PlaceReviews {
   rating: number | null // 전체 리뷰 기준 평균 (소수점 1자리)
   user_rating_count: number | null // 전체 리뷰 개수
   google_maps_uri: string | null // 전체 리뷰는 구글 지도로 유도 (API는 5개 제한)
+  photos: PlacePhoto[] // 사진 스트립용 상위 N장 (구글 제공 최대 10장 중)
+  photos_page_uri: string | null // 구글 지도 사진 탭 딥링크 (googleMapsLinks.photosUri)
   reviews: PlaceReview[]
 }
 
@@ -283,7 +291,43 @@ interface GoogleReviewItem {
 }
 
 // 리뷰 전용 최소 필드 마스크 — getPlaceDetails(등록 검증용)와 분리해 과금 SKU를 낮게 유지
-const REVIEWS_FIELD_MASK = 'rating,userRatingCount,googleMapsUri,reviews'
+const REVIEWS_FIELD_MASK =
+  'rating,userRatingCount,googleMapsUri,reviews,photos,googleMapsLinks'
+
+// 사진 스트립 표시 장수 — 구글 제공 최대치(10장). 발급은 1시간 캐시로 월 무료 쿼터 내 운용
+const PHOTO_STRIP_MAX = 10
+
+interface GooglePhotoItem {
+  name?: string // 'places/{place_id}/photos/{ref}' — media 엔드포인트 리소스 이름
+  widthPx?: number
+  heightPx?: number
+  authorAttributions?: { displayName?: string; uri?: string }[]
+}
+
+// 사진 리소스 이름 → 구글 CDN 임시 URL 발급.
+// skipHttpRedirect=true: 이미지 바이트 대신 photoUri(JSON)만 수신 — 키 미포함 URL이라
+// 클라이언트 <img src>에 안전하게 전달 가능. 실패 장은 null(스트립에서 제외).
+async function resolvePhotoUri(
+  name: string,
+  key: string,
+): Promise<string | null> {
+  try {
+    const res = await fetch(
+      // 1600px 한 번 발급해 스트립(축소)·라이트박스(확대) 겸용 — 과금은 픽셀이 아닌 발급 횟수 기준
+      `https://places.googleapis.com/v1/${name}/media?maxWidthPx=1600&skipHttpRedirect=true`,
+      {
+        headers: { 'X-Goog-Api-Key': key },
+        // photoUri는 한시적 URL — 1시간 캐시로 발급 횟수(과금)만 절감
+        next: { revalidate: 3600 },
+      },
+    )
+    if (!res.ok) return null
+    const d = (await res.json()) as { photoUri?: string }
+    return d.photoUri ?? null
+  } catch {
+    return null
+  }
+}
 
 // place_id로 구글 평점·리뷰(최대 5개) 조회. 장소 없으면 null, API 오류는 throw.
 // languageCode: 뷰어 locale의 언어 부분 (예: 'ko', 'en') — 리뷰 번역·상대시간 표기에 반영
@@ -316,11 +360,32 @@ export async function getPlaceReviews(
 
   const d = (await res.json()) as GooglePlaceResponse & {
     reviews?: GoogleReviewItem[]
+    photos?: GooglePhotoItem[]
+    googleMapsLinks?: { photosUri?: string }
   }
+
+  // 상위 N장 media URL 병렬 발급 — 개별 실패는 해당 장만 제외 (스트립 전체 무영향)
+  const photoItems = (d.photos ?? []).slice(0, PHOTO_STRIP_MAX)
+  const photoUris = await Promise.all(
+    photoItems.map((p) => (p.name ? resolvePhotoUri(p.name, key) : null)),
+  )
+  const photos: PlacePhoto[] = []
+  photoItems.forEach((p, i) => {
+    const uri = photoUris[i]
+    if (uri) {
+      photos.push({
+        photo_url: uri,
+        author_nm: p.authorAttributions?.[0]?.displayName ?? null,
+      })
+    }
+  })
+
   return {
     rating: d.rating ?? null,
     user_rating_count: d.userRatingCount ?? null,
     google_maps_uri: d.googleMapsUri ?? null,
+    photos,
+    photos_page_uri: d.googleMapsLinks?.photosUri ?? null,
     reviews: (d.reviews ?? []).map((r) => ({
       author_nm: r.authorAttribution?.displayName ?? null,
       author_photo_url: r.authorAttribution?.photoUri ?? null,

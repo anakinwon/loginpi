@@ -3988,7 +3988,11 @@
       "source": "Source: Google",
       "reviewCount": "{count} reviews",
       "anonymous": "Google user",
-      "viewAllOnGoogle": "See all {count} reviews on Google Maps"
+      "viewAllOnGoogle": "See all {count} reviews on Google Maps",
+      "morePhotos": "See more photos on Google",
+      "close": "Close",
+      "prevPhoto": "Previous photo",
+      "nextPhoto": "Next photo"
     },
     "bond": {
       "active": "Active",

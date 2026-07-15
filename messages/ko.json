@@ -2452,7 +2452,11 @@
       "source": "출처: Google",
       "reviewCount": "리뷰 {count}개",
       "anonymous": "Google 사용자",
-      "viewAllOnGoogle": "Google 지도에서 전체 리뷰 {count}개 보기"
+      "viewAllOnGoogle": "Google 지도에서 전체 리뷰 {count}개 보기",
+      "morePhotos": "Google에서 사진 더 보기",
+      "close": "닫기",
+      "prevPhoto": "이전 사진",
+      "nextPhoto": "다음 사진"
     },
     "shopfrontOwnerHint": "내 매장입니다 — 상품을 누르면 바로 수정할 수 있어요",
     "shopfrontEditBadge": "✏️ 수정",
