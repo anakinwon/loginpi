@@ -14,6 +14,13 @@ import { LazySection } from '@/components/lazy-section'
 // 주변 탐색 — 동의자에게만 GPS 기준 주변 매장·채팅방 노출 (Rule LBS-01)
 // nearby/shops·nearby/rooms API를 보여주는 화면. Pi Browser 클라이언트 게이트 패턴.
 
+interface NearbyShopItem {
+  item_id: string
+  item_nm: string
+  price_pi: number | string
+  thumbnail_url: string | null
+}
+
 interface NearbyShop {
   shop_id: string
   shop_nm: string
@@ -24,6 +31,7 @@ interface NearbyShop {
   lat: number
   lng: number
   owner_verified_yn?: string | null
+  items?: NearbyShopItem[]
 }
 
 interface NearbyRoom {
@@ -93,7 +101,10 @@ function readLastPos(): { lat: number; lng: number } | null {
 
 function writeLastPos(pos: { lat: number; lng: number }) {
   try {
-    localStorage.setItem(LAST_POS_KEY, JSON.stringify({ ...pos, ts: Date.now() }))
+    localStorage.setItem(
+      LAST_POS_KEY,
+      JSON.stringify({ ...pos, ts: Date.now() }),
+    )
   } catch {}
 }
 
@@ -441,9 +452,39 @@ export function NearbyExplorer() {
                         </p>
                       )}
                       {s.biz_hour && (
-                        <p className="text-muted-foreground text-xs">
-                          🕒 {s.biz_hour}
+                        // 저장된 개행(\n, 요일별) 유지 — 아이콘·텍스트 2열로 둘째 줄 이하 정렬
+                        <p className="text-muted-foreground flex gap-1 text-xs">
+                          <span>🕒</span>
+                          <span className="whitespace-pre-line">
+                            {s.biz_hour}
+                          </span>
                         </p>
+                      )}
+                      {/* 판매중 메뉴 썸네일 — 탭 시 상품 상세로 (카드의 지도 포커스와 분리) */}
+                      {(s.items?.length ?? 0) > 0 && (
+                        <div className="mt-1.5 flex gap-1.5 overflow-x-auto pb-0.5">
+                          {s.items!.map((it) => (
+                            <Link
+                              key={it.item_id}
+                              href={`/store/${it.item_id}`}
+                              onClick={(e) => e.stopPropagation()}
+                              title={`${it.item_nm} · ${Number(it.price_pi)} π`}
+                              className="bg-muted flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-md border"
+                            >
+                              {it.thumbnail_url ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img
+                                  src={it.thumbnail_url}
+                                  alt={it.item_nm}
+                                  className="h-full w-full object-cover"
+                                  loading="lazy"
+                                />
+                              ) : (
+                                <span className="text-lg">🛒</span>
+                              )}
+                            </Link>
+                          ))}
+                        </div>
                       )}
                     </div>
                     <span className="text-primary bg-muted shrink-0 rounded-full px-2 py-1 text-xs font-medium">

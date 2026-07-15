@@ -333,7 +333,15 @@ export function ShopsMapView({
             a.textContent = addr
             wrap.appendChild(a)
           }
-          // 판매중 상품이 있으면 영업시간 자리에 썸네일 그리드 대체 표시
+          // 영업시간 — 저장된 개행(\n, 요일별) 유지 (pre-line)
+          if (biz_hour) {
+            const h = document.createElement('p')
+            h.style.cssText =
+              'color:#6b7280;font-size:12px;margin:0;white-space:pre-line'
+            h.textContent = `🕒 ${biz_hour}`
+            wrap.appendChild(h)
+          }
+          // 판매중 상품 썸네일 그리드 — 영업시간과 함께 표시
           // (썸네일만 노출, 상품명은 마우스오버 title로, 탭 → 에스크로 거래)
           if (items.length > 0) {
             const head = document.createElement('p')
@@ -374,11 +382,6 @@ export function ShopsMapView({
               grid.appendChild(cell)
             }
             wrap.appendChild(grid)
-          } else if (biz_hour) {
-            const h = document.createElement('p')
-            h.style.cssText = 'color:#6b7280;font-size:12px;margin:0'
-            h.textContent = `🕒 ${biz_hour}`
-            wrap.appendChild(h)
           }
           wrap.appendChild(buildNavLinks(lat, lng, nm))
           return wrap
