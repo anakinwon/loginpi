@@ -531,6 +531,8 @@ export function ItemRow({
   priority?: boolean
 }) {
   const tradeSt = deriveTradeStatus(item)
+  // 미게시 상태(DRAFT·CLOSED) — 소유자 스토어프론트 조회에만 존재. 거래 상태 대신 게시 상태 배지
+  const unlisted = item.item_st_cd === 'DRAFT' || item.item_st_cd === 'CLOSED'
   return (
     <li>
       <Link
@@ -563,12 +565,18 @@ export function ItemRow({
             {ownerBadge && (
               <span className="text-primary shrink-0 text-xs">✏️</span>
             )}
-            {tradeSt !== 'OPEN' && (
-              <span
-                className={`shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-medium ${TRADE_ST_STYLE[tradeSt]}`}
-              >
-                {t(`tradeSt.${tradeSt}`)}
+            {unlisted ? (
+              <span className="shrink-0 rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+                {t(`itemSt.${item.item_st_cd}`)}
               </span>
+            ) : (
+              tradeSt !== 'OPEN' && (
+                <span
+                  className={`shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-medium ${TRADE_ST_STYLE[tradeSt]}`}
+                >
+                  {t(`tradeSt.${tradeSt}`)}
+                </span>
+              )
             )}
           </div>
           <p className="text-muted-foreground mt-0.5 text-sm">

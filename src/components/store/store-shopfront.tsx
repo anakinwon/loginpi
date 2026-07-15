@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { usePiAuth } from '@/components/pi-auth-provider'
+import { piFetch } from '@/lib/pi-fetch'
 import { formatCcy } from '@/lib/format-ccy'
 import { deriveTradeStatus, TRADE_ST_STYLE } from '@/lib/mps-trade-status'
 import { ItemRow, type StoreItem } from './store-item-list'
@@ -28,12 +29,31 @@ export function StoreShopfront({
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch(`/api/store/items?shop=${shopId}&limit=50`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d: { items?: StoreItem[] } | null) => setItems(d?.items ?? []))
+    let cancelled = false
+    setLoading(true)
+    // 본인 매장: 임시저장(DRAFT)·게시중단(CLOSED) 포함 전 상태 조회 — 공개 목록(OPEN·SOLD)만
+    // 보면 미게시 메뉴가 "등록된 상품이 없습니다"로 나오는 문제 방지. 게스트: 공개 상태만.
+    const req = isOwner
+      ? piFetch('/api/store/items?mine=1')
+          .then((r) => (r.ok ? r.json() : null))
+          .then((d: { items?: StoreItem[] } | null) =>
+            (d?.items ?? []).filter((it) => it.shop_id === shopId),
+          )
+      : fetch(`/api/store/items?shop=${shopId}&limit=50`)
+          .then((r) => (r.ok ? r.json() : null))
+          .then((d: { items?: StoreItem[] } | null) => d?.items ?? [])
+    req
+      .then((list) => {
+        if (!cancelled) setItems(list)
+      })
       .catch(() => {})
-      .finally(() => setLoading(false))
-  }, [shopId])
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [shopId, isOwner])
 
   if (loading) {
     return (
@@ -84,6 +104,9 @@ export function StoreShopfront({
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
           {items.map((item) => {
             const tradeSt = deriveTradeStatus(item)
+            // 미게시 상태(소유자 조회에만 존재) — 거래 상태 대신 게시 상태 배지 표시
+            const unlisted =
+              item.item_st_cd === 'DRAFT' || item.item_st_cd === 'CLOSED'
             // 본인 매장이면 수정 화면으로, 아니면 공개 상품 상세로
             const href = isOwner
               ? `/store/my/items/${item.item_id}/edit`
@@ -106,9 +129,15 @@ export function StoreShopfront({
                     <span className="text-4xl">🛒</span>
                   )}
                   <span
-                    className={`absolute top-2 left-2 rounded-full px-2 py-0.5 text-xs font-medium ${TRADE_ST_STYLE[tradeSt]}`}
+                    className={`absolute top-2 left-2 rounded-full px-2 py-0.5 text-xs font-medium ${
+                      unlisted
+                        ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+                        : TRADE_ST_STYLE[tradeSt]
+                    }`}
                   >
-                    {t(`tradeSt.${tradeSt}`)}
+                    {unlisted
+                      ? t(`itemSt.${item.item_st_cd}`)
+                      : t(`tradeSt.${tradeSt}`)}
                   </span>
                   {/* 본인 매장: 수정 가능 배지 (우상단) */}
                   {isOwner && (
