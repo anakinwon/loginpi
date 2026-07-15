@@ -22,11 +22,10 @@ interface BondState {
 //   매장주가 Bean 지갑에서 해당 매장 보증금으로 예치 → 잔액 ≥ 최대 보상액일 때 상품 후기 작성 버튼 활성.
 //   매장별 Telegram 알림과 동일하게 매장 보기(스토어프론트) 소유자 영역에서 매장 단위로 관리.
 //   잔액은 Bean 기준 단일 저장, PI 모드 표시=÷100 (§10-7 Bean/Pi 일관 규칙).
-//   PI 모드 예치는 서버 미구현(501 FBCK_PI_BOND_NOT_READY) — 입력 대신 안내 노출.
+//   예치: BEAN 모드=Bean 지갑 차감(API) / PI 모드=Pi 직결제(createPayment→complete FBCK_BOND).
 export function ShopBondCard({ shopId }: { shopId: string }) {
   const t = useTranslations('store')
   const tc = useTranslations('common')
-  const tErr = useTranslations('apiErrors')
   const apiErr = useApiErrorMessage()
   const feeMode = useFeeMode()
   const isPi = feeMode === 'PI'
@@ -75,6 +74,63 @@ export function ShopBondCard({ shopId }: { shopId: string }) {
     }
   }, [amt, load, shopId])
 
+  // PI 모드 예치 — Pi 직결제(U2A). ⭐Pi 결제는 Pi Browser 전용: window.Pi 선검사 최우선 가드.
+  //   complete 콜백(FBCK_BOND)이 fn_fbck_bond_deposit(p_pay_src='PI')로 매장 보증금 적립(멱등).
+  const depositPi = useCallback(() => {
+    const pi = Number(amt)
+    const bean = Math.round(pi * 100) // 1π = 100 Bean 정수 저장
+    if (!Number.isFinite(pi) || pi <= 0 || bean <= 0) {
+      toast.error(t('rewardBond.enterAmountPi'))
+      return
+    }
+    if (!window.Pi) {
+      toast.error(t('piBrowserOnly'))
+      return
+    }
+    setBusy(true)
+    window.Pi.createPayment(
+      {
+        amount: pi,
+        memo: '후기 보상 보증금 예치', // Pi 결제 memo — ™·특수문자 금지 원칙(브랜드 표기 규칙)
+        metadata: {
+          type: 'FBCK_BOND',
+          kind: 'SHOP',
+          shop_id: shopId,
+          bean_amt: bean,
+        },
+      },
+      {
+        onReadyForServerApproval: async (paymentId: string) => {
+          await fetch('/api/payments/approve', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ paymentId }),
+          })
+        },
+        onReadyForServerCompletion: async (paymentId: string, txid: string) => {
+          const r = await fetch('/api/payments/complete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ paymentId, txid }),
+          })
+          setBusy(false)
+          if (r.ok) {
+            toast.success(t('rewardBond.depositSuccessPi', { n: pi }))
+            setAmt('')
+            void load()
+          } else {
+            toast.error(t('rewardBond.depositFail'))
+          }
+        },
+        onCancel: () => setBusy(false),
+        onError: (e: Error) => {
+          setBusy(false)
+          toast.error(e.message)
+        },
+      },
+    )
+  }, [amt, load, shopId, t])
+
   if (!state) return null
 
   return (
@@ -122,10 +178,28 @@ export function ShopBondCard({ shopId }: { shopId: string }) {
       </div>
 
       {isPi ? (
-        // PI 모드 예치는 Pi 직결제(createPayment) 후속 구현 전 — 전 locale 기번역 키 재사용
-        <p className="text-muted-foreground rounded-lg border border-dashed px-3 py-2 text-xs">
-          {tErr('FBCK_PI_BOND_NOT_READY')}
-        </p>
+        // PI 모드 예치 — π 금액 입력 → Pi 직결제 (Pi Browser 전용, window.Pi 가드)
+        <div className="flex items-end gap-2">
+          <div className="flex-1 space-y-1">
+            <label className="text-muted-foreground text-xs">
+              {t('rewardBond.depositInputLabelPi')}
+            </label>
+            <Input
+              type="number"
+              min="0.01"
+              step="0.01"
+              inputMode="decimal"
+              value={amt}
+              onChange={(e) => setAmt(e.target.value)}
+              placeholder={t('rewardBond.amountPlaceholder', {
+                n: beanToPi(Math.max(state.max_reward, 100)),
+              })}
+            />
+          </div>
+          <Button onClick={depositPi} disabled={busy}>
+            {busy ? t('rewardBond.depositing') : t('rewardBond.depositBtn')}
+          </Button>
+        </div>
       ) : (
         <div className="flex items-end gap-2">
           <div className="flex-1 space-y-1">

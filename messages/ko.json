@@ -2724,6 +2724,9 @@
       "descPi": "고객 후기 보상은 이 보증금에서 지급됩니다. 잔액이 <b>{amount} π</b> 이상일 때만 내 상품에 후기 작성 버튼이 활성화됩니다.",
       "balanceLabel": "현재 보증금 잔액",
       "depositInputLabel": "예치할 Bean (내 지갑: {wallet})",
+      "depositInputLabelPi": "예치할 금액 (π)",
+      "enterAmountPi": "예치할 π 금액을 입력하세요",
+      "depositSuccessPi": "π {n} 보증금 예치가 완료되었습니다",
       "amountPlaceholder": "예: {n}",
       "depositing": "예치 중…",
       "depositBtn": "보증금 예치"

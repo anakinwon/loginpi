@@ -157,6 +157,71 @@ async function handlePOST(request: NextRequest) {
           console.error(`[M9] 미션 기록 실패: ${err.message}`),
         )
       }
+    } else if (meta?.type === 'FBCK_BOND' && payment.user_uid) {
+      // FBCK_BOND: 후기 보상 보증금 Pi 직결제 예치 — 매장(shop_id)별 관리(sql/180).
+      //   fn_fbck_bond_deposit(p_pay_src='PI')가 잔액 적립 + 매장 소유 검증(SHOP_NOT_OWNED).
+      //   멱등: bean_txn(FBCK_BOND_PI, ref_id=paymentId) 마커로 중복 complete 시 재적립 차단.
+      const bondKind = String(meta.kind ?? 'SHOP')
+      const bondShopId = meta.shop_id ? String(meta.shop_id) : null
+      const bondBean = Math.floor(Number(meta.bean_amt))
+
+      const { data: dup } = await db
+        .from('bean_txn')
+        .select('txn_id')
+        .eq('ref_tp_cd', 'FBCK_BOND_PI')
+        .eq('ref_id', paymentId)
+        .maybeSingle()
+
+      if (
+        !dup &&
+        ['SHOP', 'CAFE'].includes(bondKind) &&
+        (bondKind !== 'SHOP' || bondShopId) &&
+        Number.isInteger(bondBean) &&
+        bondBean > 0 &&
+        // 결제 금액(Pi)이 예치액 환산가 이상인지 서버 재검증 (1π=100 Bean, 클라 금액 불신)
+        Number(payment.amount) + 1e-6 >= bondBean / 100
+      ) {
+        const { data: owner } = await db
+          .from('sys_user')
+          .select('id, display_name')
+          .eq('pi_uid', payment.user_uid)
+          .maybeSingle()
+
+        if (owner) {
+          const o = owner as { id: string; display_name: string | null }
+          const slug = String(o.display_name ?? 'user').slice(0, 20)
+          const { error: bondErr } = await db.rpc('fn_fbck_bond_deposit', {
+            p_owner_id: o.id,
+            p_bond_kind: bondKind,
+            p_bean_amt: bondBean,
+            p_pay_src: 'PI',
+            p_pymnt_id: paymentId,
+            p_regr_id: slug,
+            p_shop_id: bondKind === 'SHOP' ? bondShopId : null,
+          })
+          if (bondErr) {
+            // 소유 불일치(SHOP_NOT_OWNED) 등 — 적립 없이 결제만 완료(관리자 정산 대상 로그)
+            console.error(
+              `[FBCK_BOND] 예치 적립 실패 payment:${paymentId} shop:${bondShopId}:`,
+              bondErr.message,
+            )
+          } else {
+            // 멱등 마커 + 회계(Pi 결제 흔적) — bean_amt=0(지갑 미경유), pi_amt=결제 Pi
+            await db.from('bean_txn').insert({
+              usr_id: o.id,
+              txn_tp_cd: 'SPEND',
+              bean_amt: 0,
+              bal_amt: 0,
+              pi_amt: bondBean / 100,
+              ref_tp_cd: 'FBCK_BOND_PI',
+              ref_id: paymentId,
+              memo_txt: `후기 보상 보증금 Pi 예치 (${bondKind}${bondShopId ? ` ${bondShopId}` : ''})`,
+              regr_id: 'SYSTEM',
+              modr_id: 'SYSTEM',
+            })
+          }
+        }
+      }
     } else if (meta?.type === 'BEAN_CHARGE' && payment.user_uid) {
       // BEAN_CHARGE: Pi 결제 완료 → Bean 내부 적립금 충전 (fn_bean_apply 원자적 적립)
       const beanAmt = Math.floor(Number(meta.bean_amt))
