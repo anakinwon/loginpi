@@ -4335,6 +4335,10 @@
       "groupHint": "Pick (or create) the store's group in Telegram, then confirm the connection with [Refresh] below.",
       "hint": "Press [Start] in Telegram, then confirm the connection with [Refresh] below.",
       "refresh": "Refresh",
+      "staffEmpty": "No staff can view sales yet. Staff appear here after signing up, linking their personal Telegram, and joining the group.",
+      "staffNote": "Only group members who signed up and linked their personal Telegram (Profile → Personal info) are listed — only they can view sales management.",
+      "staffOwner": "(owner)",
+      "staffTitle": "👥 Staff who can view sales management",
       "title": "📨 Telegram order alerts (this store only)"
     },
     "tradeSt": {

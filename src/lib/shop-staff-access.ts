@@ -55,3 +55,85 @@ export async function getStaffShopIds(userId: string): Promise<string[]> {
   cache.set(userId, { ids, exp: Date.now() + TTL_MS })
   return ids
 }
+
+export interface ShopStaffEntry {
+  usr_id: string
+  name: string // 별명 > Pi username > display_name
+  is_owner: boolean
+}
+
+// 역방향 대조 규모 상한 — 개인 Telegram 연동 사용자가 이 수를 넘으면 목록을 자르고 로그
+const STAFF_SCAN_LIMIT = 200
+
+const staffListCache = new Map<
+  string,
+  { list: ShopStaffEntry[]; exp: number }
+>()
+
+// "이 매장 그룹에서 판매 관리를 볼 수 있는 직원 목록" — 소유자 확인용 (연동 패널 표시).
+//   Bot API는 그룹 전체 멤버 열거가 불가 → 역방향 대조: 앱 가입 + 개인 Telegram 연동 완료
+//   사용자 전수 × getChatMember. 그룹 멤버여도 앱 미가입/미연동자는 나타나지 않는다(=열람도 불가).
+//   그룹 바인딩 매장이 아니면 null(목록 개념 없음).
+export async function listShopStaff(
+  shopId: string,
+): Promise<ShopStaffEntry[] | null> {
+  const hit = staffListCache.get(shopId)
+  if (hit && hit.exp > Date.now()) return hit.list
+
+  const db = getSupabaseAdmin()
+  const { data: shop } = await db
+    .from('mps_shop')
+    .select('tlgm_chat_id, tlgm_conn_yn, seller_id')
+    .eq('shop_id', shopId)
+    .eq('del_yn', 'N')
+    .maybeSingle()
+  const s = shop as {
+    tlgm_chat_id: number | null
+    tlgm_conn_yn: string
+    seller_id: string
+  } | null
+  // 그룹(음수 chat_id) 바인딩 매장만 목록 제공
+  if (!s || s.tlgm_conn_yn !== 'Y' || !s.tlgm_chat_id || s.tlgm_chat_id >= 0) {
+    return null
+  }
+
+  const { data: users } = await db
+    .from('sys_user')
+    .select('id, nick_nm, display_name, pi_username, tlgm_chat_id')
+    .eq('tlgm_conn_yn', 'Y')
+    .gt('tlgm_chat_id', 0)
+    .eq('del_yn', 'N')
+    .limit(STAFF_SCAN_LIMIT + 1)
+  const candidates = (users ?? []) as Array<{
+    id: string
+    nick_nm: string | null
+    display_name: string | null
+    pi_username: string | null
+    tlgm_chat_id: number
+  }>
+  if (candidates.length > STAFF_SCAN_LIMIT) {
+    console.warn(
+      `[shop-staff] 개인 연동 사용자 ${STAFF_SCAN_LIMIT}명 초과 — 목록이 잘렸을 수 있음 (역방향 대조 상한)`,
+    )
+  }
+
+  // 멤버십 병렬 조회 — 대상은 개인 연동 완료자뿐이라 규모 제한적
+  const checks = await Promise.all(
+    candidates.slice(0, STAFF_SCAN_LIMIT).map(async (u) => {
+      const st = await getChatMemberStatus(s.tlgm_chat_id!, u.tlgm_chat_id)
+      return st && MEMBER_OK.has(st) ? u : null
+    }),
+  )
+  const list: ShopStaffEntry[] = checks
+    .filter(Boolean)
+    .map((u) => ({
+      usr_id: u!.id,
+      name:
+        u!.nick_nm || u!.pi_username || u!.display_name || u!.id.slice(0, 8),
+      is_owner: u!.id === s.seller_id,
+    }))
+    .sort((a, b) => Number(b.is_owner) - Number(a.is_owner))
+
+  staffListCache.set(shopId, { list, exp: Date.now() + TTL_MS })
+  return list
+}

@@ -5,11 +5,19 @@ import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
 
+interface StaffEntry {
+  usr_id: string
+  name: string
+  is_owner: boolean
+}
+
 interface Status {
   connected: boolean
   botConfigured: boolean
   url: string | null
   groupUrl: string | null
+  // 그룹 바인딩 매장의 판매 관리 열람 가능 직원(앱 가입+개인 연동 완료자) — 개인 바인딩이면 null
+  staff: StaffEntry[] | null
 }
 
 // 매장별 Telegram 주문 알림 연동 (매장당 1:1) — 매장 수정 화면에 삽입.
@@ -55,18 +63,52 @@ export function ShopTelegramConnect({ shopId }: { shopId: string }) {
       {!status.botConfigured ? (
         <p className="text-muted-foreground text-xs">{t('tlgm.botNotReady')}</p>
       ) : status.connected ? (
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <span className="text-xs font-medium text-green-600 dark:text-green-400">
-            {t('tlgm.connected')}
-          </span>
-          <button
-            type="button"
-            onClick={disconnect}
-            disabled={busy}
-            className="text-destructive text-xs underline underline-offset-2 disabled:opacity-50"
-          >
-            {busy ? tc('processing') : t('tlgm.disconnect')}
-          </button>
+        <div className="space-y-2">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <span className="text-xs font-medium text-green-600 dark:text-green-400">
+              {t('tlgm.connected')}
+            </span>
+            <button
+              type="button"
+              onClick={disconnect}
+              disabled={busy}
+              className="text-destructive text-xs underline underline-offset-2 disabled:opacity-50"
+            >
+              {busy ? tc('processing') : t('tlgm.disconnect')}
+            </button>
+          </div>
+
+          {/* 그룹 바인딩 매장: 판매 관리 열람 가능 직원 목록 (권한 확인용) */}
+          {status.staff !== null && (
+            <div className="bg-card space-y-1.5 rounded-lg border p-2.5">
+              <p className="text-xs font-medium">{t('tlgm.staffTitle')}</p>
+              {status.staff.length === 0 ? (
+                <p className="text-muted-foreground text-xs">
+                  {t('tlgm.staffEmpty')}
+                </p>
+              ) : (
+                <ul className="flex flex-wrap gap-1.5">
+                  {status.staff.map((m) => (
+                    <li
+                      key={m.usr_id}
+                      className="bg-muted rounded-full px-2 py-0.5 text-xs"
+                    >
+                      {m.name}
+                      {m.is_owner && (
+                        <span className="text-muted-foreground">
+                          {' '}
+                          {t('tlgm.staffOwner')}
+                        </span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <p className="text-muted-foreground text-[11px]">
+                {t('tlgm.staffNote')}
+              </p>
+            </div>
+          )}
         </div>
       ) : (
         <div className="space-y-2">
