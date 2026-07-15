@@ -42,23 +42,37 @@ export function ShopStaffManager({ shopId }: { shopId: string }) {
     void load()
   }, [load])
 
+  // 콤마 구분 다중 등록 — "anakin2, cclemong"처럼 한 번에 여러 명. 실패자는 개별 안내
   async function add() {
-    const v = uname.trim()
-    if (!v) return
+    const names = [
+      ...new Set(
+        uname
+          .split(',')
+          .map((s) => s.trim().replace(/^@/, ''))
+          .filter(Boolean),
+      ),
+    ]
+    if (names.length === 0) return
     setBusy(true)
     try {
-      const res = await piFetch(`/api/store/shops/${shopId}/staff`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pi_username: v }),
-      })
-      const data = (await res.json()) as ApiErrorPayload & { ok?: boolean }
-      if (res.ok && data.ok) {
-        toast.success(t('staffMgr.added', { name: v }))
+      let ok = 0
+      for (const n of names) {
+        const res = await piFetch(`/api/store/shops/${shopId}/staff`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pi_username: n }),
+        })
+        const data = (await res.json()) as ApiErrorPayload & { ok?: boolean }
+        if (res.ok && data.ok) {
+          ok++
+        } else {
+          toast.error(`${n} — ${apiErr(data, t('staffMgr.addFail'))}`)
+        }
+      }
+      if (ok > 0) {
+        toast.success(t('staffMgr.added', { n: ok }))
         setUname('')
         void load()
-      } else {
-        toast.error(apiErr(data, t('staffMgr.addFail')))
       }
     } catch {
       toast.error(tc('networkError'))
@@ -91,37 +105,6 @@ export function ShopStaffManager({ shopId }: { shopId: string }) {
       <p className="text-sm font-medium">{t('staffMgr.title')}</p>
       <p className="text-muted-foreground text-xs">{t('staffMgr.desc')}</p>
 
-      {staff.length === 0 ? (
-        <p className="text-muted-foreground text-xs">{t('staffMgr.empty')}</p>
-      ) : (
-        <ul className="space-y-1">
-          {staff.map((m) => (
-            <li
-              key={m.usr_id}
-              className="bg-card flex items-center justify-between gap-2 rounded-lg border px-2.5 py-1.5"
-            >
-              <span className="truncate text-xs font-medium">
-                {m.name}
-                {m.pi_username && m.pi_username !== m.name && (
-                  <span className="text-muted-foreground">
-                    {' '}
-                    @{m.pi_username}
-                  </span>
-                )}
-              </span>
-              <button
-                type="button"
-                onClick={() => remove(m)}
-                disabled={busy}
-                className="text-destructive shrink-0 text-xs underline underline-offset-2 disabled:opacity-50"
-              >
-                {t('staffMgr.removeBtn')}
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-
       <div className="flex items-center gap-2">
         <Input
           value={uname}
@@ -134,6 +117,37 @@ export function ShopStaffManager({ shopId }: { shopId: string }) {
         <Button size="sm" onClick={add} disabled={busy || !uname.trim()}>
           {busy ? tc('processing') : t('staffMgr.addBtn')}
         </Button>
+      </div>
+
+      {/* 등록 매니저 칩 목록 — × 클릭 시 논리삭제(del_yn) 해제 */}
+      <div className="flex flex-wrap items-center gap-1.5">
+        <span className="text-muted-foreground text-xs">
+          {t('staffMgr.listLabel')}
+        </span>
+        {staff.length === 0 ? (
+          <span className="text-muted-foreground text-xs">
+            {t('staffMgr.empty')}
+          </span>
+        ) : (
+          staff.map((m) => (
+            <span
+              key={m.usr_id}
+              className="inline-flex items-center gap-1 rounded-full border border-rose-200 bg-rose-50 py-0.5 pr-1 pl-2.5 text-xs font-medium text-rose-900 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-200"
+            >
+              {m.name}
+              <button
+                type="button"
+                onClick={() => remove(m)}
+                disabled={busy}
+                aria-label={t('staffMgr.removeBtn')}
+                title={t('staffMgr.removeBtn')}
+                className="px-0.5 leading-none font-bold text-rose-500 hover:text-rose-700 disabled:opacity-50 dark:text-rose-400 dark:hover:text-rose-300"
+              >
+                ×
+              </button>
+            </span>
+          ))
+        )}
       </div>
       <p className="text-muted-foreground text-[11px]">{t('staffMgr.note')}</p>
     </div>
