@@ -9,6 +9,7 @@ interface Status {
   connected: boolean
   botConfigured: boolean
   url: string | null
+  groupUrl: string | null
 }
 
 // 매장별 Telegram 주문 알림 연동 (매장당 1:1) — 매장 수정 화면에 삽입.
@@ -70,7 +71,19 @@ export function ShopTelegramConnect({ shopId }: { shopId: string }) {
       ) : (
         <div className="space-y-2">
           <p className="text-muted-foreground text-xs">{t('tlgm.desc')}</p>
+          <p className="text-muted-foreground text-xs">{t('tlgm.groupDesc')}</p>
           <div className="flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                if (!status.groupUrl) return
+                window.open(status.groupUrl, '_blank', 'noopener,noreferrer')
+                setHint(t('tlgm.groupHint'))
+              }}
+              className="bg-primary text-primary-foreground rounded-lg px-3 py-1.5 text-xs font-medium transition-opacity hover:opacity-90"
+            >
+              {t('tlgm.groupConnect')}
+            </button>
             <button
               type="button"
               onClick={() => {
@@ -78,7 +91,7 @@ export function ShopTelegramConnect({ shopId }: { shopId: string }) {
                 window.open(status.url, '_blank', 'noopener,noreferrer')
                 setHint(t('tlgm.hint'))
               }}
-              className="bg-primary text-primary-foreground rounded-lg px-3 py-1.5 text-xs font-medium transition-opacity hover:opacity-90"
+              className="rounded-lg border px-3 py-1.5 text-xs font-medium transition-opacity hover:opacity-80"
             >
               {t('tlgm.connect')}
             </button>

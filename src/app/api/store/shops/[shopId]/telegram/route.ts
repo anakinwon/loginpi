@@ -43,12 +43,14 @@ export async function GET(_req: Request, { params }: Params) {
 
   const botUser = process.env.TELEGRAM_BOT_USERNAME
   const botConfigured = !!botUser && !!process.env.TELEGRAM_BOT_TOKEN
+  const code = botConfigured ? createShopLinkCode(shopId) : null
   return NextResponse.json({
     connected: r.shop.tlgm_conn_yn === 'Y',
     botConfigured,
-    url: botConfigured
-      ? `https://t.me/${botUser}?start=${createShopLinkCode(shopId)}`
-      : null,
+    url: code ? `https://t.me/${botUser}?start=${code}` : null,
+    // 매장 전용 그룹방 연동(권장) — 그룹 chat_id 바인딩으로 매장 직원이 함께 수신.
+    // 한 소유자가 여러 매장을 가져도 그룹 단위로 수신이 분리된다.
+    groupUrl: code ? `https://t.me/${botUser}?startgroup=${code}` : null,
     shop_nm: r.shop.shop_nm,
   })
 }

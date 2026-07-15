@@ -38,7 +38,9 @@ export async function POST(req: NextRequest) {
   const replyToMsgId = msg?.reply_to_message?.message_id
   if (!text || chatId == null) return NextResponse.json({ ok: true })
 
-  const m = text.match(/^\/start(?:\s+(\S+))?/)
+  // 그룹방 연동(startgroup) 시 '/start@봇이름 code' 형식으로 도착 — @멘션 허용.
+  // 그룹 chat_id는 음수(BIGINT) — 개인/그룹 동일하게 바인딩·발송 가능.
+  const m = text.match(/^\/start(?:@\S+)?(?:\s+(\S+))?/)
   if (!m) {
     // /start가 아닌 일반 텍스트 → P2P 릴레이 중계 (PRD_13 §18-6 인용답장 라우팅)
     //   실패해도 항상 200 — Telegram 재시도 폭주 방지(사용자 안내는 relay 내부에서 발송)

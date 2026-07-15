@@ -4325,11 +4325,14 @@
     "title": "PyShop",
     "tlgm": {
       "botNotReady": "The Telegram bot isn't ready yet.",
-      "connect": "Connect Telegram",
+      "connect": "Connect my Telegram",
       "connected": "✓ Connected — orders for this store are sent to Telegram",
       "desc": "Connect the Telegram that should receive order alerts for this store. Each store can use a different Telegram.",
       "disconnect": "Disconnect",
       "disconnected": "Telegram has been disconnected",
+      "groupConnect": "👥 Connect a group (recommended)",
+      "groupDesc": "Connect a store-only Telegram group so your staff receive alerts together. Even with multiple stores, alerts stay separated per group.",
+      "groupHint": "Pick (or create) the store's group in Telegram, then confirm the connection with [Refresh] below.",
       "hint": "Press [Start] in Telegram, then confirm the connection with [Refresh] below.",
       "refresh": "Refresh",
       "title": "📨 Telegram order alerts (this store only)"
