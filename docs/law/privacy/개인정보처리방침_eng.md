@@ -1,11 +1,12 @@
 # Privacy Policy
 # プライバシーポリシー
 
-**Version**: v1.1 (Notice posted — v1.0 remains in effect until the effective date)  
-**Effective Date**: 2026-07-16 (service notice posted 2026-07-09 — satisfies the 7-day advance notice under Article 11)  
-**Revised**: 2026-07-08 · **Originally Created**: 2026-06-12  
+**Version**: v1.2 (Editorial corrections — no substantive change, effective immediately)  
+**Effective Date**: v1.1 2026-07-16 (service notice posted 2026-07-09 — satisfies the 7-day advance notice under Article 11) · v1.2 2026-07-16 (editorial corrections)  
+**Revised**: 2026-07-16 · **Originally Created**: 2026-06-12  
 
 > **Key v1.1 Revisions**: ① New Telegram third-party disclosure and international transfer provisions ② Explicit Google (Gemini) translation entrustment ③ New collection items: KakaoTalk ID (event prizes) and Telegram linking information ④ Pi official account authentication (Pi Sign-In) path added ⑤ Additional profile information (real name, phone number, address, etc. — all optional) specified with items, purposes, and optionality
+> **v1.2 Editorial Corrections (no substantive change)**: Corrections aligning the text with the actual Service implementation, with no addition, deletion, or change to collected items, purposes, retention periods, or user rights — ① corrected purpose wording for locale collection (3-6) ② corrected account security guidance to reflect the OAuth-only authentication scheme (Article 9 — the Service does not collect or store its own passwords) ③ removed reference to an unused channel (SMS, Article 13)
 
 ---
 
@@ -82,7 +83,7 @@ Members experiencing issues with personal information can immediately contact th
 
 | Item | Scope | Purpose of Collection | Legal Basis |
 |---|---|---|---|
-| Location code (locale) | Country/region code (e.g., ko-KR) | Multilingual services, currency exchange rate application | Terms of Use Agreement |
+| Location code (locale) | Country/region code (e.g., ko-KR) | Multilingual services, region-appropriate display | Terms of Use Agreement |
 | Estimated location | IP-based location estimation | Content localization | Terms of Use Agreement |
 
 **Optional Consent Item**: Refer to Location-Based Service Terms and Location Information Collection and Use Agreement
@@ -226,10 +227,10 @@ Members consent to the above international transfers through use of the Service 
    - Notification to affected Members (Personal Information Protection Act Article 34)
 
 ### Article 9: Member's Security Obligations
-Members must comply with the following:
-- Set strong passwords (combination of letters, numbers, special characters)
-- Do not share password with others
-- Confirm logout when using public devices
+The Service does not collect or store its own passwords; authentication is performed only through Pi accounts and Google accounts (OAuth). Members must comply with the following:
+- Follow the security practices of the Pi account and Google account used for authentication (the provider's password, two-factor authentication, etc.)
+- Do not share account access credentials with others
+- Enable device lock and confirm logout when using public devices
 - Report immediately upon suspicious login
 
 ---
@@ -304,7 +305,6 @@ See Article 4
 2. **Opt-out**:
    - My Page > Notification Settings
    - Email footer "Unsubscribe" link
-   - SMS: Reply "Unsubscribe"
 
 3. **Effect of Opt-out**:
    - Marketing email delivery suspended
@@ -356,6 +356,7 @@ See Article 4
 **Supplementary Provisions**
 - v1.0: Enacted and effective June 12, 2026.
 - v1.1: Revised July 8, 2026 (draft) — new Telegram third-party disclosure and international transfer provisions, explicit Google (Gemini) translation entrustment, new collection items KakaoTalk ID (3-7) and Telegram linking information (3-8), Pi Sign-In authentication path added. **Effective July 15, 2026 (planned), following notification at least 7 days in advance per Article 11.**
+- v1.2: Revised July 16, 2026 — **editorial corrections (no substantive change)**. Corrections aligning the text with the actual Service implementation (purpose wording for locale collection in 3-6, OAuth-only authentication scheme in Article 9, removal of the unused SMS channel in Article 13), with no addition, deletion, or change to collected items, purposes, retention periods, or user rights; not subject to the advance-notice requirement for substantive changes under Article 11, and therefore effective immediately.
 
 **Revision History**
 
@@ -363,6 +364,7 @@ See Article 4
 |---|---|---|
 | v1.0 | 2026-06-12 | Initial enactment |
 | v1.1 | 2026-07-08 (draft) | Telegram/Gemini third-party disclosure, entrustment and international transfer; KakaoTalk ID and Telegram chat ID collection items; Pi Sign-In path |
+| v1.2 | 2026-07-16 | Editorial corrections (no substantive change) — locale purpose wording (3-6), OAuth-only account security (Article 9), SMS removal (Article 13) |
 
 ---
 

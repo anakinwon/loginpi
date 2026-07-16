@@ -1,11 +1,12 @@
 # Service Terms of Use
 # サービス利用規約
 
-**Version**: v1.1 (Notice posted — v1.0 remains in effect until the effective date)  
-**Effective Date**: 2026-07-16 (service notice posted 2026-07-09 — satisfies the 7-day notice under Article 3)  
-**Revised**: 2026-07-09 · **Originally Created**: 2026-06-12  
+**Version**: v1.2 (Editorial corrections — no substantive change, effective immediately)  
+**Effective Date**: v1.1 2026-07-16 (service notice posted 2026-07-09 — satisfies the 7-day notice under Article 3) · v1.2 2026-07-16 (editorial corrections)  
+**Revised**: 2026-07-16 · **Originally Created**: 2026-06-12  
 
 > **Key v1.1 Revisions**: ① New review and reward provisions (Article 14-2 — verified-transaction authorship, opt-in shop rewards, one per transaction, recovery upon fraud) ② New seller deposit provisions (Article 14-3 — deposit, purpose, set-off, return)
+> **v1.2 Editorial Corrections (no substantive change)**: Corrections aligning the text with the actual Service implementation, with no change to Members' rights or obligations — ① clarified the authentication scheme as implemented (Article 4 — Pi account authentication is mandatory; Google linking is an optional auxiliary) ② corrected the technical description of payment processing (Article 12 — Pi SDK official payment function) ③ terminology cleanup in the liability clause (Article 20 — unified to value-fluctuation wording)
 
 ---
 
@@ -35,14 +36,16 @@ These Terms of Use govern the conditions and procedures for using the Cafe.pi se
 
 ### Article 4: Registration Procedure and Qualifications
 1. Individuals wishing to use the Service may register as Members through the following procedure:
-   - (1) Select "Login with Pi Account" or "Login with Google Account" on the registration screen.
-   - (2) Complete Pi Browser or Google OAuth authentication.
+   - (1) Select "Login with Pi Account" on the registration screen — **Member identification and authentication are based on the Pi account (mandatory)**.
+   - (2) Complete Pi SDK authentication in Pi Browser, or Pi Sign-In (OAuth) authentication in a standard browser.
    - (3) Confirm agreement to these Terms, the Privacy Policy, and the Personal Information Collection and Use Agreement.
    - (4) Enter additional profile information (e.g., nickname) and complete registration.
 
+   A Google account is an **optional auxiliary linking method** for account recovery and convenience in standard browsers; it does not replace Pi account authentication. Accounts without a linked Pi account are restricted from using the Service.
+
 2. Minimum requirements for membership:
    - An individual 14 years of age or older (minors require parental/guardian consent — see Article 5).
-   - A valid Pi Account or Google Account.
+   - A valid Pi Account (Google account linking is optional).
    - A resident of South Korea or a country where the Service is supported (confirmed via IP-based location verification).
 
 3. Registration may be refused in the following cases:
@@ -124,7 +127,7 @@ These Terms of Use govern the conditions and procedures for using the Cafe.pi se
 4. **No Direct Asset Custody**: The Company does not directly hold or custody Members' Pi assets. All transactions occur directly from a Member's Pi wallet (Pi Wallet or Pi Browser built-in wallet).
 
 ### Article 12: Payment Method and Approval
-1. Tips, subscription fees, marketplace product purchases, and other payments are processed via Pi SDK's `invokeContract()` method or official payment UI.
+1. Tips, subscription fees, marketplace product purchases, and other payments are processed via the Pi SDK's official payment function (`createPayment`) and the Pi wallet payment approval UI.
 2. Upon payment approval, the Company provides a transaction completion notice, indicating the establishment of a transaction between Members.
 3. Upon payment, funds are deducted from the Member's Pi wallet and immediately deposited into the recipient's wallet (blockchain delays possible).
 
@@ -216,7 +219,7 @@ The following Content is prohibited:
    - Data loss due to hacking, viruses, or unauthorized access.
    - Information disclosure due to a Member's account management negligence.
    - Legality, quality, or completion of Member-to-member transactions.
-   - Damages from Pi virtual asset price fluctuations.
+   - Damages from fluctuations in the value of the Pi virtual asset.
    - Product defects or shipping delays in the Marketplace.
    - Indirect damages from Service errors or suspension (business loss, lost profits, etc.).
 
@@ -272,8 +275,17 @@ In interpreting these Terms, the interpretation most favorable to the Member app
 ---
 
 **Supplementary Provisions**
-- These Terms of Use take effect on June 12, 2026.
-- If current Terms exist, amendments will be noted and announced.
+- v1.0: Enacted and effective June 12, 2026.
+- v1.1: Revised July 9, 2026 — new review and reward provisions (Article 14-2) and seller deposit provisions (Article 14-3). **Notice posted 2026-07-09, effective 2026-07-16.**
+- v1.2: Revised July 16, 2026 — **editorial corrections (no substantive change)**. Corrections aligning the text with the actual Service implementation (Article 4 authentication scheme — Pi account mandatory, Google optional auxiliary; Article 12 payment description; Article 20 terminology), with no change to Members' rights or obligations; not subject to the advance-notice requirement for substantive amendments under Article 3, and therefore effective immediately.
+
+**Revision History**
+
+| Version | Date | Description |
+|---|---|---|
+| v1.0 | 2026-06-12 | Initial enactment |
+| v1.1 | 2026-07-09 | New review/reward and seller deposit provisions |
+| v1.2 | 2026-07-16 | Editorial corrections (no substantive change) — Article 4 Pi-mandatory/Google-optional clarification, Article 12 createPayment, Article 20 value-fluctuation wording |
 
 ---
 
