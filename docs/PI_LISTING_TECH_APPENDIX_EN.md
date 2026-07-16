@@ -5,7 +5,7 @@
 > ① Pi policy compliance, ② Pi Browser compatibility, ③ payment & fund integrity,
 > ④ security (KISA criteria), and ⑤ adoption of the K-DATA data standard.
 >
-> - As of: 2026-06-24
+> - As of: 2026-07-16
 > - Stack: Next.js 16 (App Router) · React 19 · TypeScript 6 · Supabase · Vercel (Pro)
 > - Every claim is backed by an actual file in the repository.
 
