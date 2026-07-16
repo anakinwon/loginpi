@@ -36,14 +36,16 @@ export async function GET(request: NextRequest) {
     )
   }
 
-  // 프로브 대상 uid + 알림 수신처 = MASTER 계정 (신규 env·테이블 불요)
+  // 프로브 대상 uid + 알림 수신처 = 최고 권한 계정 (신규 env·테이블 불요)
+  // ⚠️ 운영 DB 실측(2026-07-16): role 최고값은 'ADMIN'(MASTER 행 없음) — 겸용 조회 필수.
   const db = getSupabaseAdmin()
   const { data: master } = await db
     .from('sys_user')
     .select('pi_uid, tlgm_chat_id')
-    .eq('role', 'MASTER')
+    .in('role', ['MASTER', 'ADMIN'])
     .eq('del_yn', 'N')
     .not('pi_uid', 'is', null)
+    .order('role', { ascending: false }) // MASTER > ADMIN 우선
     .limit(1)
     .maybeSingle()
   const masterRow = master as {
