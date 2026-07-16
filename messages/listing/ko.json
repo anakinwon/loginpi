@@ -13,10 +13,18 @@
     "beanFlowCharge": "충전(지급)"
   },
   "store": {
-    "fiatRefAt": "{date} 환율 참고",
+    "fiatRefAt": "{date} 기준 참고 환산",
     "form": {
-      "priceConverted": "≈ {pi} π (등록시점 환율 참고 환산)"
+      "priceConverted": "≈ {pi} π (등록시점 참고 환산)",
+      "priceConverting": "참고 환산 중…",
+      "priceConvertHint": "자국통화로 입력하면 등록시점 참고 환산율로 Pi 가격이 정해집니다",
+      "priceQuoteFail": "참고 환산율을 가져오지 못했습니다. Pi로 직접 입력해 주세요.",
+      "priceQuoteRequired": "참고 환산을 마친 뒤 저장해 주세요"
     }
+  },
+  "adminI18n": {
+    "price": "환산 기준",
+    "priceLoading": "환산 기준 불러오는 중…"
   },
   "adminToken": {
     "dashboard": {
@@ -59,7 +67,8 @@
   "apiErrors": {
     "ADM_MINT_AMT_MIN": "지급액(bean_amt)은 1 이상의 정수여야 합니다",
     "ADM_MINT_REASON_REQUIRED": "지급 사유(reason)는 필수입니다",
-    "ADM_MINT_FAILED": "지급 처리 실패"
+    "ADM_MINT_FAILED": "지급 처리 실패",
+    "STORE_FX_UNAVAILABLE": "참고 환산율을 가져오지 못했습니다. Pi로 직접 입력해 주세요."
   },
   "themes": {
     "CRYPTO_TRADING": "크립토 라운지"

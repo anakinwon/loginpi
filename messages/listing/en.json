@@ -15,8 +15,16 @@
   "store": {
     "fiatRefAt": "Reference rate as of {date}",
     "form": {
-      "priceConverted": "≈ {pi} π (reference conversion at registration-time rate)"
+      "priceConverted": "≈ {pi} π (reference conversion at registration-time rate)",
+      "priceConverting": "Converting at reference rate…",
+      "priceConvertHint": "If you enter in local currency, the Pi price is set using the reference conversion rate at the time of registration.",
+      "priceQuoteFail": "Could not fetch the reference rate. Please enter the Pi amount directly.",
+      "priceQuoteRequired": "Please save after the reference conversion is complete."
     }
+  },
+  "adminI18n": {
+    "price": "Reference rate",
+    "priceLoading": "Loading reference rates…"
   },
   "adminToken": {
     "dashboard": {
@@ -59,7 +67,8 @@
   "apiErrors": {
     "ADM_MINT_AMT_MIN": "Grant amount (bean_amt) must be an integer of 1 or more",
     "ADM_MINT_REASON_REQUIRED": "Grant reason (reason) is required",
-    "ADM_MINT_FAILED": "Grant processing failed"
+    "ADM_MINT_FAILED": "Grant processing failed",
+    "STORE_FX_UNAVAILABLE": "Could not fetch the reference rate. Please enter directly in Pi."
   },
   "themes": {
     "CRYPTO_TRADING": "Crypto Lounge"
