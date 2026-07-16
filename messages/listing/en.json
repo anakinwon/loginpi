@@ -60,5 +60,8 @@
     "ADM_MINT_AMT_MIN": "Grant amount (bean_amt) must be an integer of 1 or more",
     "ADM_MINT_REASON_REQUIRED": "Grant reason (reason) is required",
     "ADM_MINT_FAILED": "Grant processing failed"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "Crypto Lounge"
   }
 }

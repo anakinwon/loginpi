@@ -60,5 +60,8 @@
     "ADM_MINT_AMT_MIN": "지급액(bean_amt)은 1 이상의 정수여야 합니다",
     "ADM_MINT_REASON_REQUIRED": "지급 사유(reason)는 필수입니다",
     "ADM_MINT_FAILED": "지급 처리 실패"
+  },
+  "themes": {
+    "CRYPTO_TRADING": "크립토 라운지"
   }
 }
