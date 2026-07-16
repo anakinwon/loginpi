@@ -44,6 +44,10 @@
     {
       "path": "/api/cron/metric-purge",
       "schedule": "30 2 * * *"
+    },
+    {
+      "path": "/api/cron/a2u-probe",
+      "schedule": "30 0 * * *"
     }
   ],
   "headers": [
