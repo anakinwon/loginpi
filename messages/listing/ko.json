@@ -20,15 +20,45 @@
   },
   "adminToken": {
     "dashboard": {
-      "identityMismatch": "⚠️ Bean 항등식 불일치 — 지급({issued}) ≠ 유통({circulating}) + 회수({collected}). DB 점검 필요."
+      "identityMismatch": "⚠️ Bean 항등식 불일치 — 지급({issued}) ≠ 유통({circulating}) + 회수({collected}). DB 점검 필요.",
+      "debitHeader": "차변 (지급 — 원천)",
+      "totalIssued": "총 지급량",
+      "chargeIssued": "충전 지급 (CHARGE)",
+      "mintIssued": "보상·프로모션 지급"
+    },
+    "revenue": {
+      "piCashSub": "충전 {count}건 · 지급"
     },
     "wallets": {
       "mintTitle": "🆕 프로모션 Bean 지급",
+      "mintDesc": "현금(Pi) 없는 보조금성 지급 — 보상 캠페인 재원. 대차대조표 지급 총량에 포함됩니다(매출 아님).",
       "mintAmountLabel": "지급액 (Bean)",
+      "mintReasonLabel": "지급 사유",
+      "minting": "지급 중…",
+      "mintBtn": "지급",
+      "mintAmountError": "지급액은 1 이상의 정수여야 합니다",
+      "mintReasonError": "지급 사유는 필수입니다",
       "mintSuccess": "지급 완료 — {dest} 잔액 {balance} Bean"
     }
   },
   "adminCampaign": {
-    "mintAmountPlaceholder": "지급액(Bean)"
+    "mintBadge": "충전=지급",
+    "mintAmountPlaceholder": "지급액(Bean)",
+    "mintReasonPlaceholder": "지급 사유 (필수)",
+    "mintNote": "현금(Pi) 없는 보조금성 지급 — bean_mint_log 기록 + 대차대조표 지급 총량에 합산",
+    "mintAmountError": "지급액은 1 이상 정수여야 합니다",
+    "mintReasonError": "지급 사유는 필수입니다",
+    "mintFail": "지급 실패"
+  },
+  "adminFeeMode": {
+    "subtitle": "플랫폼 요금·보상 결제 단위 전환: <b>Bean 포인트</b> ⇄ <b>Pi Coin</b> (1:100). 메인넷 등재 A-5 대응 — 버튼 하나로 즉시 전환·복귀.",
+    "beanModeDesc": "Bean 포인트 요금제 (평상시 — Bean 차감)",
+    "beanBtn": "Bean 포인트 요금제",
+    "beanToken": "Bean 포인트"
+  },
+  "apiErrors": {
+    "ADM_MINT_AMT_MIN": "지급액(bean_amt)은 1 이상의 정수여야 합니다",
+    "ADM_MINT_REASON_REQUIRED": "지급 사유(reason)는 필수입니다",
+    "ADM_MINT_FAILED": "지급 처리 실패"
   }
 }

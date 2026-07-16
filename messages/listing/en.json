@@ -20,15 +20,45 @@
   },
   "adminToken": {
     "dashboard": {
-      "identityMismatch": "Warning: Bean identity mismatch - granted({issued}) != circulating({circulating}) + collected({collected}). Check DB."
+      "identityMismatch": "Warning: Bean identity mismatch - granted({issued}) != circulating({circulating}) + collected({collected}). Check DB.",
+      "debitHeader": "Debit (Grants - Source)",
+      "totalIssued": "Total granted",
+      "chargeIssued": "Charge grants (CHARGE)",
+      "mintIssued": "Reward/promotional grants"
+    },
+    "revenue": {
+      "piCashSub": "{count} charges · granted"
     },
     "wallets": {
       "mintTitle": "Promotional Bean Grant",
+      "mintDesc": "Subsidy grant without cash (Pi) - funding for reward campaigns. Included in the balance-sheet grant total (not revenue).",
       "mintAmountLabel": "Grant amount (Bean)",
+      "mintReasonLabel": "Grant reason",
+      "minting": "Granting...",
+      "mintBtn": "Grant",
+      "mintAmountError": "Grant amount must be an integer of 1 or more",
+      "mintReasonError": "Grant reason is required",
       "mintSuccess": "Granted - {dest} balance {balance} Bean"
     }
   },
   "adminCampaign": {
-    "mintAmountPlaceholder": "Grant amount (Bean)"
+    "mintBadge": "Charge = Grant",
+    "mintAmountPlaceholder": "Grant amount (Bean)",
+    "mintReasonPlaceholder": "Grant reason (required)",
+    "mintNote": "Subsidy grant without cash (Pi) - recorded in bean_mint_log and added to the balance-sheet grant total",
+    "mintAmountError": "Grant amount must be an integer of 1 or more",
+    "mintReasonError": "Grant reason is required",
+    "mintFail": "Grant failed"
+  },
+  "adminFeeMode": {
+    "subtitle": "Switch the platform fee/reward settlement unit: <b>Bean Points</b> ⇄ <b>Pi Coin</b> (1:100). Mainnet listing A-5 response - switch and revert instantly with one button.",
+    "beanModeDesc": "Bean Points fee plan (normal - Bean deduction)",
+    "beanBtn": "Bean Points fee plan",
+    "beanToken": "Bean Points"
+  },
+  "apiErrors": {
+    "ADM_MINT_AMT_MIN": "Grant amount (bean_amt) must be an integer of 1 or more",
+    "ADM_MINT_REASON_REQUIRED": "Grant reason (reason) is required",
+    "ADM_MINT_FAILED": "Grant processing failed"
   }
 }
