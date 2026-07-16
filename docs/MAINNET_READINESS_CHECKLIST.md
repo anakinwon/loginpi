@@ -268,13 +268,13 @@
 | 1 | **본인 Pi KYC 완료 확인** (메인넷 지갑 슬롯 전제) | B-2-1 / A-2 | ✅ **완료** (DB E-1 DONE) |
 | 2 | **A-3 상표 결정**: Trademark Licensing Agreement(Dev Portal) 체결 **또는** Pi 접두 개명. 공식 규칙상 'Pi App_Name' 형태 금지 | A-3 / C-1-A | ✅ **Py 개명 완료**(2026-06-27, PyCafé™/PyShop™/PyTranslate™ — C-A 공식답변 반영) |
 | 3 | **메인넷 Developer Portal 프로젝트 신규 생성** (testnet과 별도, App Network=Mainnet) | B-2-2, B-3 | ✅ **완료** (메인넷 API키 발급·U2A 결제 정상으로 실존 확증, DB E-3 DONE) |
-| 4 | **앱 URL 확보 + 도메인 검증** (`validation-key.txt`, 타 프로젝트와 URL 중복 불가) | B-1-12, B-2-3 | 🔴 **유일 잔여 차단** — 운영 `/validation-key.txt` 404 실측(2026-07-16) = Vercel env `PI_DOMAIN_VALIDATION_KEY` 미설정(라우트는 구현 완료). 포털 키 확인→env 입력→재배포→포털 Verify (~10분) |
+| 4 | **앱 URL 확보 + 도메인 검증** (`validation-key.txt`, 타 프로젝트와 URL 중복 불가) | B-1-12, B-2-3 | ✅ **완료**(2026-07-16) — 포털 키를 Vercel 운영 env `PI_DOMAIN_VALIDATION_KEY` 설정+재배포, `/validation-key.txt` HTTP 200·키 일치 실측, 포털 Verify 통과 |
 | 5 | **메인넷 API Key 발급** → Vercel `PI_API_KEY` 설정 | B-2-4 | ✅ **완료** (2026-07-11 메인넷 키 교체·결제 실측) |
 | 6 | **등록 지갑 = A2U 정산 지갑 일치** 확인 → `PI_WALLET_PRIVATE_SEED` | B-3 | ✅ **완료** (2026-07-15 serverWallet=GA3L 전환 실측) |
 | 7 | Vercel 환경변수 전체 + Cron 등록 | D-2, D-4 | ✅ **완료** — 운영 env+운영DB 컷오버+SANDBOX=false(07-02)+fee_mode=PI+LISTING_MODE=true(07-09)+메인넷 `PI_API_KEY`(07-11)+메인넷 지갑 시드(07-15). 잔여=시크릿 rotate만(자체 보안 권장 — 등재 요건 아님, 제출 후 수행 가능) |
 | 8 | **Pi Browser 실기기 로그인·결제 검증** (P0 게이트) | D-1 | ✅ **완료** (DB E-8 DONE — 2026-07-09 마스터 실기기 로그인·결제·통합알림 검증) |
 | 9 | U2A 트랜잭션 1건으로 생태계 연결 확인 | B-1-13 | ✅ **완료** (DB E-9 DONE — 메인넷 U2A 결제 실측) |
-| 10 | 등재 신청 제출 (요건 A-1~A-7 충족 상태) | A 전체 | 🔴 **최종 액션** — 선행 요건 중 미완은 4번(도메인 검증)뿐. 완료 직후 제출 가능 |
+| 10 | 등재 신청 제출 (요건 A-1~A-7 충족 상태) | A 전체 | 🔴 **유일 잔여** — 선행 요건 1~9 전부 완료(2026-07-16). 즉시 제출 가능 상태 |
 
 ---
 
