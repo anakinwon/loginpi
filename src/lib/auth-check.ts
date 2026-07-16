@@ -102,6 +102,6 @@ export function isAdmin(user: UserRow | null): boolean {
 //   존재하지 않아 종전 role==='MASTER' 단독 체크는 전원 차단(사문화)이었음.
 //   'MASTER' 값은 dev 세션(/api/auth/dev)·향후 계층 분리 호환으로 계속 허용.
 //   초고위험 게이트는 반드시 이 함수를 쓸 것(개별 role 문자열 비교 금지).
-export function isMaster(user: UserRow | null): boolean {
+export function isMaster(user: UserRow | null): user is UserRow {
   return user?.role === 'ADMIN' || user?.role === 'MASTER'
 }
