@@ -32,7 +32,10 @@ pnpm format           # Prettier (Tailwind 클래스 순서 자동 정렬)
 pnpm format:check     # 포맷 검사 (수정 없음)
 pnpm tsc --noEmit     # 타입 체크
 pnpm dlx shadcn@latest add <컴포넌트명>
+node scripts/promote-to-prod.mjs --yes   # 운영 승격 (master→production, ff-only)
 ```
+
+**⚠️ 배포 검증 철칙 (2026-07-16 사고)**: Vercel은 빌드 실패 시 **이전 배포를 조용히 계속 서빙** — "서비스가 응답한다" ≠ 반영됨. 승격 후 반드시 `api.github.com/repos/anakinwon/loginpi/commits/<sha>/status`에서 **`Vercel – cafe: success` 개별 확인**(종합 state는 staging 선실패로 오판 가능, gh CLI 없음 — node fetch). 라우트 수정 커밋 전 최소 관문은 lint가 아니라 **`pnpm build`**(lint는 타입 에러를 못 잡음). 게이트를 함수로 추출하면 TS 내로잉이 끊긴다 — 타입 술어(`user is UserRow`)로 선언.
 
 ---
 
@@ -95,6 +98,7 @@ pnpm dlx shadcn@latest add <컴포넌트명>
 - `pnpm build` 시 `scripts/validate-locales.mjs`가 messages ↔ 통화 ↔ 국가 ↔ routing.ts 교차 검증 (수동: `pnpm validate:locales`)
 - **활성 locale 189개** (2026-07-08 글로벌 대확장, 66개 언어 완역). 신규 locale 추가는 **7곳 체크리스트**(PRD_3_MUL_LAN v2.0 §0) — ⚠️ `i18n_cntry_mst` FK는 `i18n_lang_mst`(언어마스터) 참조, 국기 이모지 베이스 U+1F1E6, 국가코드≠언어코드(실제 주 언어는 `scripts/i18n-lang-map.mjs` 단일소스)
 - **카페 테마명은 번역키** `themes.<theme_cd>` + `useThemeName` 훅(폐기 테마는 DB명 폴백) — theme_nm_en 직접 표시 금지. 번역키 폐기는 **삭제**(빈 값 "" 금지 — 99% 통계 사고)
+- **번들 직렬화 노출 주의**: next-intl은 메시지 번들 **전체**를 모든 페이지 HTML에 직렬화 — 죽은 키·오버레이 `_comment`도 소스에 노출된다(등재 심사 스캔 대상, 2026-07-16 베팅 키 4,512행 사고). 폐기 키는 json+DB 동시 삭제. `i18n_message`는 del_yn이 없고 sync가 무필터 조회라 **유일하게 물리 DELETE가 정본**(sql/182 — 남기면 동기화 때 부활)
 
 ---
 
@@ -156,6 +160,10 @@ import { getSessionUser, isAdmin } from '@/lib/auth-check'
 const user = await getSessionUser()  // Pi(쿠키/헤더) 또는 Google 세션 통합
 if (!isAdmin(user)) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
 ```
+
+**⭐권한 최상위 = ADMIN** (2026-07-16 마스터 확정): DB `sys_user.role` 최고값은 ADMIN — **MASTER 행은 존재하지 않는다**(dev 세션·UI 라벨에만 존재). 초고위험 게이트(배포 승격·요금제 전환·DB 스위치 등)는 `isMaster()`(auth-check.ts, 타입 술어·ADMIN/MASTER 겸용)만 사용 — `role === 'MASTER'` 문자열 단독 비교는 전원 차단 사문화가 되므로 금지(6곳 사고 8d359cfd).
+
+**"PC 정상·Pi Browser만 401" 증상 = 일반 `fetch` 잔존**: PC는 same-origin 쿠키로 통과하지만 Pi Browser는 쿠키가 없어 무인증. `fetch('/api/` grep으로 색출 후 `piFetch` 교체(admin 26화면 63건 사고 0d7aa24b).
 
 ---
 
