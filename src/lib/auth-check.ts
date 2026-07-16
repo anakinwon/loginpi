@@ -96,3 +96,12 @@ export async function getSessionUser(): Promise<UserRow | null> {
 export function isAdmin(user: UserRow | null): boolean {
   return user?.role === 'ADMIN' || user?.role === 'MASTER'
 }
+
+// 최상위(super user) 게이트 — 배포 승격·요금제 전환·DB 스위치 등 초고위험 작업 전용.
+// ⭐2026-07-16 마스터 확정: ADMIN이 최상위 super user다. 운영 DB에 MASTER role 행이
+//   존재하지 않아 종전 role==='MASTER' 단독 체크는 전원 차단(사문화)이었음.
+//   'MASTER' 값은 dev 세션(/api/auth/dev)·향후 계층 분리 호환으로 계속 허용.
+//   초고위험 게이트는 반드시 이 함수를 쓸 것(개별 role 문자열 비교 금지).
+export function isMaster(user: UserRow | null): boolean {
+  return user?.role === 'ADMIN' || user?.role === 'MASTER'
+}

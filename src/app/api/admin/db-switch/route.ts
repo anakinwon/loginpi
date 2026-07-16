@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSessionUser } from '@/lib/auth-check'
+import { getSessionUser, isMaster } from '@/lib/auth-check'
 import { getSupabaseAdmin, getDbTierInfo } from '@/lib/supabase-admin'
 import {
   getDbSwitchState,
@@ -13,7 +13,7 @@ import { apiError } from '@/lib/api-errors'
 // 운영DB(prod-ro)는 읽기전용 자격증명 있을 때만(쓰기 사고 차단).
 async function requireMaster() {
   const user = await getSessionUser()
-  return user?.role === 'MASTER' ? user : null
+  return isMaster(user) ? user : null
 }
 
 // 현재 DB(읽기전용 포함)에서 read가 실제로 되는지 라이브 진단 — RO JWT 거부 여부 판별용
@@ -49,8 +49,7 @@ async function testRead(): Promise<{
 }
 
 export async function GET() {
-  if (!(await requireMaster()))
-    return apiError('ADM_MASTER_ONLY', 403)
+  if (!(await requireMaster())) return apiError('ADM_MASTER_ONLY', 403)
   const connTest = await testRead()
   return NextResponse.json({
     ...getDbSwitchState(),
@@ -60,8 +59,7 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  if (!(await requireMaster()))
-    return apiError('ADM_MASTER_ONLY', 403)
+  if (!(await requireMaster())) return apiError('ADM_MASTER_ONLY', 403)
 
   let body: { target?: string }
   try {

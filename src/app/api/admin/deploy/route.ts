@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSessionUser } from '@/lib/auth-check'
+import { getSessionUser, isMaster } from '@/lib/auth-check'
 import {
   getDeployOverview,
   triggerStagingDeploy,
@@ -7,22 +7,20 @@ import {
 } from '@/lib/ops-deploy'
 import { apiError } from '@/lib/api-errors'
 
-// 배포 컨트롤 — MASTER 전용(운영 승격은 핵심가치 직결, ADMIN보다 상위 권한 요구).
+// 배포 컨트롤 — 최상위(super user) 전용. 2026-07-16 ADMIN=최상위 확정(isMaster 중앙 게이트).
 async function requireMaster() {
   const user = await getSessionUser()
-  if (user?.role !== 'MASTER') return null
+  if (!isMaster(user)) return null
   return user
 }
 
 export async function GET() {
-  if (!(await requireMaster()))
-    return apiError('ADM_MASTER_ONLY', 403)
+  if (!(await requireMaster())) return apiError('ADM_MASTER_ONLY', 403)
   return NextResponse.json(await getDeployOverview())
 }
 
 export async function POST(req: NextRequest) {
-  if (!(await requireMaster()))
-    return apiError('ADM_MASTER_ONLY', 403)
+  if (!(await requireMaster())) return apiError('ADM_MASTER_ONLY', 403)
 
   let body: { target?: string }
   try {

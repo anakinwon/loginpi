@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSessionUser } from '@/lib/auth-check'
+import { getSessionUser, isMaster } from '@/lib/auth-check'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { sanitizeError } from '@/lib/sanitize-error'
 import { apiError } from '@/lib/api-errors'
@@ -10,7 +10,7 @@ import { apiError } from '@/lib/api-errors'
 
 async function requireMaster() {
   const user = await getSessionUser()
-  return user?.role === 'MASTER' ? user : null
+  return isMaster(user) ? user : null
 }
 
 export async function GET() {
