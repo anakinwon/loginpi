@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { useTranslations } from 'next-intl'
 import { BeanIcon } from '@/components/ui/bean-icon'
+import { piFetch } from '@/lib/pi-fetch'
 
 interface Campaign {
   campaign_cd: string
@@ -80,7 +81,7 @@ function MintBox({ balance, onDone }: { balance: number; onDone: () => void }) {
     }
     setBusy(true)
     try {
-      const res = await fetch('/api/admin/token/mint', {
+      const res = await piFetch('/api/admin/token/mint', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -168,7 +169,7 @@ function CreateForm({ onDone }: { onDone: () => void }) {
   async function create() {
     setBusy(true)
     try {
-      const res = await fetch('/api/admin/campaign', {
+      const res = await piFetch('/api/admin/campaign', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -333,7 +334,7 @@ function CampaignCard({
   async function toggle() {
     setBusy(true)
     try {
-      const res = await fetch('/api/admin/campaign', {
+      const res = await piFetch('/api/admin/campaign', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -472,7 +473,7 @@ function PendingPanel({
   async function act(usrId: string, action: 'approve' | 'reject') {
     setBusy(usrId)
     try {
-      const res = await fetch('/api/admin/campaign', {
+      const res = await piFetch('/api/admin/campaign', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -625,7 +626,7 @@ export default function AdminCampaignPage() {
   const [selected, setSelected] = useState<string | null>(null)
 
   const load = useCallback(async () => {
-    const res = await fetch('/api/admin/campaign')
+    const res = await piFetch('/api/admin/campaign')
     if (res.ok) setData((await res.json()) as ListData)
     setLoading(false)
   }, [])

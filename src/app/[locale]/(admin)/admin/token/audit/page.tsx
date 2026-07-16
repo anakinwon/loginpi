@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { BeanIcon } from '@/components/ui/bean-icon'
+import { piFetch } from '@/lib/pi-fetch'
 
 interface AuditRow {
   audit_id: string
@@ -45,7 +46,7 @@ export default function BeanAuditLogPage() {
     setError(null)
     const params = new URLSearchParams({ limit: '100' })
     if (usrId) params.set('usr_id', usrId)
-    fetch(`/api/admin/token/audit?${params}`)
+    piFetch(`/api/admin/token/audit?${params}`)
       .then((r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`)
         return r.json() as Promise<{ data: AuditRow[]; total: number }>

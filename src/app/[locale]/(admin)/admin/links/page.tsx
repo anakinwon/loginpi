@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useDynamicLimit } from '@/hooks/use-dynamic-limit'
 import { AdminPagination } from '@/components/admin/admin-pagination'
+import { piFetch } from '@/lib/pi-fetch'
 
 // p-6(48) + 제목+설명(56) + gap(16) + 통계카드(100) + gap(16) + 검색(36) + gap(16) + 필터칩(36) + gap(16) + 테이블헤더(33) + gap(16) + 페이지네이션(36)
 const CHROME_PX = 425
@@ -65,7 +66,7 @@ export default function LinksPage() {
       return
     setToggling(u.id)
     try {
-      const res = await fetch('/api/admin/links', {
+      const res = await piFetch('/api/admin/links', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: u.id, del_yn: next }),
@@ -92,7 +93,7 @@ export default function LinksPage() {
 
   // 최초 전체 로드 (통계 + 목록 초기값)
   useEffect(() => {
-    fetch('/api/admin/links')
+    piFetch('/api/admin/links')
       .then((r) => r.json())
       .then((d: { users: UserRow[] }) => {
         setAllUsers(d.users ?? [])
@@ -112,7 +113,7 @@ export default function LinksPage() {
     }
     setSearching(true)
     const h = setTimeout(() => {
-      fetch(`/api/admin/links?q=${encodeURIComponent(term)}`)
+      piFetch(`/api/admin/links?q=${encodeURIComponent(term)}`)
         .then((r) => r.json())
         .then((d: { users: UserRow[] }) => setUsers(d.users ?? []))
         .finally(() => setSearching(false))

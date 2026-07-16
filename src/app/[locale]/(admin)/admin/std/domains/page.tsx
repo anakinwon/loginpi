@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useDynamicLimit } from '@/hooks/use-dynamic-limit'
 import { AdminPagination } from '@/components/admin/admin-pagination'
+import { piFetch } from '@/lib/pi-fetch'
 
 // p-6(48) + 제목+설명(56) + gap(16) + 검색+타입필터(36) + gap(16) + 테이블헤더(33) + gap(16) + 페이지네이션(36)
 const CHROME_PX = 257
@@ -92,7 +93,7 @@ export default function StdDomainsPage() {
     const params = new URLSearchParams()
     if (search) params.set('search', search)
     if (typeFilter) params.set('type', typeFilter)
-    fetch(`/api/admin/std/domains?${params}`)
+    piFetch(`/api/admin/std/domains?${params}`)
       .then((r) => r.json())
       .then((d: { domains: DomainRow[] }) => setDomains(d.domains ?? []))
       .finally(() => setLoading(false))
@@ -172,7 +173,7 @@ export default function StdDomainsPage() {
     if (!confirm(t('deleteConfirm', { name: nm }))) return
     setDeleting(id)
     try {
-      const res = await fetch(`/api/admin/std/domains/${id}`, {
+      const res = await piFetch(`/api/admin/std/domains/${id}`, {
         method: 'DELETE',
       })
       if (!res.ok) {

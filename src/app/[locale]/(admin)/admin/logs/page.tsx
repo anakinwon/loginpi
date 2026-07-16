@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import dynamic from 'next/dynamic'
+import { piFetch } from '@/lib/pi-fetch'
 
 // 로그성 테이블 모니터·정리 화면.
 // Vercel 서버리스라 운영서버에 로그 '파일'은 없다 → DB 로그 테이블의 행수·용량을 보고,
@@ -69,7 +70,7 @@ export default function LogsPage() {
 
   // loading 초기값이 true라 첫 로드 시 별도 토글 불필요. 재조회는 busyTbl로 진행표시.
   const load = useCallback(() => {
-    fetch('/api/admin/logs')
+    piFetch('/api/admin/logs')
       .then(async (r) => {
         const d = await r.json()
         // GET 실패(예: RPC 미적용)를 조용히 삼키지 않고 화면에 노출
@@ -107,7 +108,7 @@ export default function LogsPage() {
     setConfirmTbl(null)
     setNotice(null)
     try {
-      const res = await fetch('/api/admin/logs/purge', {
+      const res = await piFetch('/api/admin/logs/purge', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ table: row.tbl, days: d }),

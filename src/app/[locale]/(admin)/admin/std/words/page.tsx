@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useDynamicLimit } from '@/hooks/use-dynamic-limit'
 import { AdminPagination } from '@/components/admin/admin-pagination'
+import { piFetch } from '@/lib/pi-fetch'
 
 // p-6(48) + 제목+설명(56) + gap(16) + 검색입력(36) + gap(16) + 테이블헤더(33) + gap(16) + 페이지네이션(36)
 const CHROME_PX = 257
@@ -64,7 +65,7 @@ export default function StdWordsPage() {
     setLoading(true)
     const params = new URLSearchParams()
     if (search) params.set('search', search)
-    fetch(`/api/admin/std/words?${params}`)
+    piFetch(`/api/admin/std/words?${params}`)
       .then((r) => r.json())
       .then((d: { words: WordRow[] }) => setWords(d.words ?? []))
       .finally(() => setLoading(false))
@@ -136,7 +137,7 @@ export default function StdWordsPage() {
     if (!confirm(t('deleteConfirm', { name: nm }))) return
     setDeleting(id)
     try {
-      const res = await fetch(`/api/admin/std/words/${id}`, {
+      const res = await piFetch(`/api/admin/std/words/${id}`, {
         method: 'DELETE',
       })
       if (!res.ok) {

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { AdminPagination } from '@/components/admin/admin-pagination'
 import { BeanIcon } from '@/components/ui/bean-icon'
+import { piFetch } from '@/lib/pi-fetch'
 
 // 거래 유형 코드값 — 표시 라벨은 i18n(adminToken.transactions.type.*)
 // TRANSFER = 카페방 P2P Bean 선물(fn_bean_transfer) — 보낸이 −/받은이 + 2건
@@ -62,7 +63,7 @@ export default function TokenTransactionsPage() {
   // 전체 거래를 1회 조회 — 필터는 클라이언트에서 적용해 탭 카운트가 항상 전체 기준이 되게 함
   useEffect(() => {
     setLoading(true)
-    fetch(`/api/admin/token/transactions?limit=500`)
+    piFetch(`/api/admin/token/transactions?limit=500`)
       .then((r) => r.json())
       .then((d: { transactions: TxnRow[] }) => setTxns(d.transactions ?? []))
       .finally(() => setLoading(false))

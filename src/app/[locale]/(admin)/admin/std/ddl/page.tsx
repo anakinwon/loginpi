@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { piFetch } from '@/lib/pi-fetch'
 
 const DOM_TYPE_MAP: Record<string, { pg: string; mysql: string }> = {
   NM: { pg: 'VARCHAR(100)', mysql: 'VARCHAR(100)' },
@@ -102,7 +103,7 @@ export default function DdlExportPage() {
   const [dbType, setDbType] = useState<'pg' | 'mysql'>('pg')
 
   useEffect(() => {
-    fetch('/api/admin/std/terms')
+    piFetch('/api/admin/std/terms')
       .then((r) => r.json())
       .then((d: { terms: TermOption[] }) => setAllTerms(d.terms ?? []))
   }, [])

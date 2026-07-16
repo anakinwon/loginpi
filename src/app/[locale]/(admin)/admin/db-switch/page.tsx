@@ -4,10 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
-import {
-  useApiErrorMessage,
-  type ApiErrorPayload,
-} from '@/hooks/use-api-error'
+import { useApiErrorMessage, type ApiErrorPayload } from '@/hooks/use-api-error'
 
 interface SwitchState {
   tier: string

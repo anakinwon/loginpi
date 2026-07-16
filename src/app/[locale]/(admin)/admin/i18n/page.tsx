@@ -12,6 +12,7 @@ import {
   getAlpha2,
 } from '@/lib/locale-country'
 import { useApiMessage } from '@/hooks/use-api-error'
+import { piFetch } from '@/lib/pi-fetch'
 
 // routing.ts에 등록된 locale 집합 — 미등록 locale은 영어로 폴백 서비스됨
 const ROUTING_LOCALES = new Set<string>(routing.locales)
@@ -88,7 +89,7 @@ export default function I18nPage() {
 
   const loadStats = useCallback(() => {
     setLoading(true)
-    fetch('/api/admin/i18n/stats')
+    piFetch('/api/admin/i18n/stats')
       .then((r) => r.json())
       .then((d: StatsData) => setStats(d))
       .finally(() => setLoading(false))
@@ -146,7 +147,7 @@ export default function I18nPage() {
           eta: etaText,
         }),
       )
-      const res = await fetch('/api/admin/i18n/translate', {
+      const res = await piFetch('/api/admin/i18n/translate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ locale }),
@@ -166,7 +167,7 @@ export default function I18nPage() {
         })
 
       setSyncing(locale)
-      const syncRes = await fetch('/api/admin/i18n/sync', {
+      const syncRes = await piFetch('/api/admin/i18n/sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ locale }),
@@ -206,7 +207,7 @@ export default function I18nPage() {
     try {
       // 서버 백그라운드로 시작 — 페이지를 떠나거나 브라우저를 닫아도
       // 서버(로컬 dev)가 after()로 끝까지 translate+sync를 진행한다.
-      const res = await fetch('/api/admin/i18n/translate-all', {
+      const res = await piFetch('/api/admin/i18n/translate-all', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ locales: targets.map((l) => l.locale_cd) }),
@@ -229,7 +230,7 @@ export default function I18nPage() {
       for (;;) {
         await new Promise((r) => setTimeout(r, 5000))
         if (autoAbortRef.current) break
-        const fresh = (await fetch('/api/admin/i18n/stats').then((r) =>
+        const fresh = (await piFetch('/api/admin/i18n/stats').then((r) =>
           r.json(),
         )) as StatsData
         setStats(fresh)
@@ -259,7 +260,7 @@ export default function I18nPage() {
   async function syncAll() {
     setSyncing('all')
     try {
-      const res = await fetch('/api/admin/i18n/sync', {
+      const res = await piFetch('/api/admin/i18n/sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({}),
@@ -290,7 +291,7 @@ export default function I18nPage() {
   ) {
     setToggling(locale_cd)
     try {
-      const res = await fetch('/api/admin/i18n/locale', {
+      const res = await piFetch('/api/admin/i18n/locale', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ locale_cd, is_active, ...options }),

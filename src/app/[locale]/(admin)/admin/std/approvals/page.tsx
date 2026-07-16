@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { piFetch } from '@/lib/pi-fetch'
 
 interface ApprovalRow {
   apv_id: string
@@ -63,7 +64,7 @@ export default function StdApprovalsPage() {
       page: String(page),
     })
     if (entityFilter) params.set('entity_type', entityFilter)
-    fetch(`/api/admin/std/approvals?${params}`)
+    piFetch(`/api/admin/std/approvals?${params}`)
       .then((r) => r.json())
       .then((d: { approvals: ApprovalRow[]; total: number }) => {
         setApprovals(d.approvals ?? [])
@@ -83,7 +84,7 @@ export default function StdApprovalsPage() {
   ) {
     setProcessing(apvId)
     try {
-      const res = await fetch(`/api/admin/std/approvals/${apvId}`, {
+      const res = await piFetch(`/api/admin/std/approvals/${apvId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action, reject_reason: reason }),

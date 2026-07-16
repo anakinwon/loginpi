@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { useDynamicLimit } from '@/hooks/use-dynamic-limit'
 import { AdminPagination } from '@/components/admin/admin-pagination'
 import { AdminDashboardStats } from '@/components/admin/admin-dashboard-stats'
+import { piFetch } from '@/lib/pi-fetch'
 
 // p-6(48) + 제목+설명(56) + gap(16) + 통계카드(110) + gap(16) + 테이블헤더(33)
 // + gap(16) + 페이지네이션(36)
@@ -50,7 +51,7 @@ export default function UsersPage() {
   }, [limit])
 
   useEffect(() => {
-    fetch('/api/admin/users')
+    piFetch('/api/admin/users')
       .then((r) => r.json())
       .then((d: { users: UserRow[] }) => setUsers(d.users ?? []))
       .finally(() => setLoading(false))
@@ -59,7 +60,7 @@ export default function UsersPage() {
   async function changeRole(id: string, role: Role) {
     setChanging(id)
     try {
-      const res = await fetch(`/api/admin/users/${id}`, {
+      const res = await piFetch(`/api/admin/users/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ role }),

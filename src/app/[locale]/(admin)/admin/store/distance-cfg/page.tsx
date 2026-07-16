@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import type { DistCfgRow } from '@/lib/mps-dist-cfg'
+import { piFetch } from '@/lib/pi-fetch'
 
 const PRESETS = [5, 10, 20, 30, 50, 100, 0] as const
 
@@ -25,7 +26,7 @@ export default function DistanceCfgPage() {
 
   const load = () => {
     setLoading(true)
-    fetch('/api/admin/store/distance-cfg')
+    piFetch('/api/admin/store/distance-cfg')
       .then((r) => r.json() as Promise<HistoryResp>)
       .then((d) => {
         setHistory(d.history ?? [])
@@ -44,7 +45,7 @@ export default function DistanceCfgPage() {
     setSaved(false)
     setErr(null)
     try {
-      const res = await fetch('/api/admin/store/distance-cfg', {
+      const res = await piFetch('/api/admin/store/distance-cfg', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ max_dist_km: km, note_txt: note }),

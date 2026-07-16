@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useDynamicLimit } from '@/hooks/use-dynamic-limit'
 import { AdminPagination } from '@/components/admin/admin-pagination'
+import { piFetch } from '@/lib/pi-fetch'
 
 // p-6(48) + 제목+설명(56) + gap(16) + 검색입력(36) + gap(16) + 테이블헤더(33) + gap(16) + 페이지네이션(36)
 const CHROME_PX = 257
@@ -78,7 +79,7 @@ export default function StdTermsPage() {
     setLoading(true)
     const params = new URLSearchParams()
     if (search) params.set('search', search)
-    fetch(`/api/admin/std/terms?${params}`)
+    piFetch(`/api/admin/std/terms?${params}`)
       .then((r) => r.json())
       .then((d: { terms: TermRow[] }) => setTerms(d.terms ?? []))
       .finally(() => setLoading(false))
@@ -90,10 +91,10 @@ export default function StdTermsPage() {
   }, [load])
 
   useEffect(() => {
-    fetch('/api/admin/std/words')
+    piFetch('/api/admin/std/words')
       .then((r) => r.json())
       .then((d: { words: WordOption[] }) => setAllWords(d.words ?? []))
-    fetch('/api/admin/std/domains')
+    piFetch('/api/admin/std/domains')
       .then((r) => r.json())
       .then((d: { domains: DomainOption[] }) => setAllDomains(d.domains ?? []))
   }, [])
@@ -193,7 +194,7 @@ export default function StdTermsPage() {
     if (!confirm(t('deleteConfirm', { name: nm }))) return
     setDeleting(id)
     try {
-      const res = await fetch(`/api/admin/std/terms/${id}`, {
+      const res = await piFetch(`/api/admin/std/terms/${id}`, {
         method: 'DELETE',
       })
       if (!res.ok) {

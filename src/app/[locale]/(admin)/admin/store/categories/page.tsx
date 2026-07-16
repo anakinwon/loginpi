@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { piFetch } from '@/lib/pi-fetch'
 
 interface CtgrRow {
   ctgr_id: string
@@ -38,7 +39,7 @@ export default function StoreCategoriesPage() {
 
   const load = useCallback(() => {
     setLoading(true)
-    fetch('/api/admin/store/categories')
+    piFetch('/api/admin/store/categories')
       .then((r) => r.json())
       .then((d: { categories: CtgrRow[] }) => setRows(d.categories ?? []))
       .finally(() => setLoading(false))
@@ -111,7 +112,7 @@ export default function StoreCategoriesPage() {
     if (!confirm(t('deleteConfirm', { name: c.ctgr_nm }))) return
     setDeleting(c.ctgr_id)
     try {
-      const res = await fetch(`/api/admin/store/categories/${c.ctgr_id}`, {
+      const res = await piFetch(`/api/admin/store/categories/${c.ctgr_id}`, {
         method: 'DELETE',
       })
       if (!res.ok) {

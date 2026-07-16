@@ -4,6 +4,7 @@ import { Fragment, useEffect, useState, useCallback } from 'react'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { piFetch } from '@/lib/pi-fetch'
 
 interface AuditLog {
   log_id: string
@@ -48,7 +49,7 @@ export default function StdAuditPage() {
     if (tbl) params.set('tbl', tbl)
     if (from) params.set('from', from)
     if (to) params.set('to', to)
-    fetch(`/api/admin/std/audit?${params}`)
+    piFetch(`/api/admin/std/audit?${params}`)
       .then((r) => r.json())
       .then((d: { logs: AuditLog[]; total: number }) => {
         setLogs(d.logs ?? [])

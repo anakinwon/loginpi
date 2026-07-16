@@ -6,6 +6,7 @@ import { BeanIcon } from '@/components/ui/bean-icon'
 import { TokenRevenue } from '@/components/admin/token-revenue'
 import { BeanRevenueDistribution } from '@/components/admin/token-distribution'
 import BeanRevenueTimeline from '@/components/admin/bean-daily-chart'
+import { piFetch } from '@/lib/pi-fetch'
 
 interface TokenKpi {
   total_issued_bean: number
@@ -334,7 +335,7 @@ export default function TokenAdminPage() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('/api/admin/token/stats')
+    piFetch('/api/admin/token/stats')
       .then((r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`)
         return r.json() as Promise<StatsResponse>

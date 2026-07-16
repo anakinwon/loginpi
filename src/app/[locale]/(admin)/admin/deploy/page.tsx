@@ -5,10 +5,7 @@ import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { piFetch } from '@/lib/pi-fetch'
 import { cn } from '@/lib/utils'
-import {
-  useApiErrorMessage,
-  type ApiErrorPayload,
-} from '@/hooks/use-api-error'
+import { useApiErrorMessage, type ApiErrorPayload } from '@/hooks/use-api-error'
 
 interface CommitInfo {
   sha: string

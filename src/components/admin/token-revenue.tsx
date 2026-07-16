@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { BeanIcon } from '@/components/ui/bean-icon'
+import { piFetch } from '@/lib/pi-fetch'
 
 interface RevenueData {
   pi_revenue: { total_pi: number; total_bean: number; charge_cnt: number }
@@ -44,7 +45,7 @@ export function TokenRevenue() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('/api/admin/token/revenue')
+    piFetch('/api/admin/token/revenue')
       .then((r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`)
         return r.json() as Promise<RevenueData>

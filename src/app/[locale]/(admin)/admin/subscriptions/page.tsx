@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import dynamic from 'next/dynamic'
 import { AdminPagination } from '@/components/admin/admin-pagination'
 import { useDynamicLimit } from '@/hooks/use-dynamic-limit'
+import { piFetch } from '@/lib/pi-fetch'
 
 // 통계 차트는 Plotly(window 의존) 사용 — SSR 불가, dynamic + ssr:false 필수
 const SubscrStatsCharts = dynamic(
@@ -105,7 +106,7 @@ export default function SubscriptionsPage() {
 
   // 최초 전체 로드 (차트 + 목록 초기값)
   useEffect(() => {
-    fetch('/api/admin/subscriptions')
+    piFetch('/api/admin/subscriptions')
       .then((r) => r.json())
       .then((d: { subscriptions: SubscrRow[] }) => {
         setAllRows(d.subscriptions ?? [])
@@ -124,7 +125,7 @@ export default function SubscriptionsPage() {
     }
     setSearching(true)
     const h = setTimeout(() => {
-      fetch(`/api/admin/subscriptions?q=${encodeURIComponent(term)}`)
+      piFetch(`/api/admin/subscriptions?q=${encodeURIComponent(term)}`)
         .then((r) => r.json())
         .then((d: { subscriptions: SubscrRow[] }) =>
           setRows(d.subscriptions ?? []),

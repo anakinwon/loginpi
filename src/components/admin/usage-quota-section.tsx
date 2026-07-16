@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import UsageDonut from './usage-donut'
+import { piFetch } from '@/lib/pi-fetch'
 
 // 인프라 사용량 할당 도넛 섹션 (self-contained) — /api/admin/usage 조회.
 //   Vercel 3종(수동: 한도·사용량) + Supabase DB(자동 사용량, 한도만 수동).
@@ -35,7 +36,7 @@ export default function UsageQuotaSection() {
   const [saving, setSaving] = useState(false)
 
   const load = useCallback(() => {
-    fetch('/api/admin/usage')
+    piFetch('/api/admin/usage')
       .then(async (r) => {
         const d = await r.json()
         if (!r.ok) throw new Error(d.detail || d.error || `HTTP ${r.status}`)
@@ -65,7 +66,7 @@ export default function UsageQuotaSection() {
   async function save(q: Quota) {
     setSaving(true)
     try {
-      const res = await fetch('/api/admin/usage', {
+      const res = await piFetch('/api/admin/usage', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { AdminPagination } from '@/components/admin/admin-pagination'
 import { BeanIcon } from '@/components/ui/bean-icon'
+import { piFetch } from '@/lib/pi-fetch'
 
 interface GovWallet {
   wlt_id: string
@@ -71,7 +72,7 @@ export default function TokenWalletsPage() {
 
   const load = () => {
     setLoading(true)
-    fetch('/api/admin/token/wallets?type=ALL&limit=500')
+    piFetch('/api/admin/token/wallets?type=ALL&limit=500')
       .then((r) => r.json())
       .then(
         (d: {
@@ -103,7 +104,7 @@ export default function TokenWalletsPage() {
     setAdjusting(true)
     setAdjustMsg(null)
     try {
-      const res = await fetch('/api/admin/token/adjust', {
+      const res = await piFetch('/api/admin/token/adjust', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -156,7 +157,7 @@ export default function TokenWalletsPage() {
     setMinting(true)
     setMintMsg(null)
     try {
-      const res = await fetch('/api/admin/token/mint', {
+      const res = await piFetch('/api/admin/token/mint', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { BeanIcon } from '@/components/ui/bean-icon'
+import { piFetch } from '@/lib/pi-fetch'
 
 interface TopUserRow {
   usr_id: string
@@ -59,7 +60,7 @@ export default function BeanTopUsersPage() {
   const load = (m: Metric) => {
     setLoading(true)
     setError(null)
-    fetch(`/api/admin/token/top-users?metric=${m}&limit=${PAGE_LIMIT}`)
+    piFetch(`/api/admin/token/top-users?metric=${m}&limit=${PAGE_LIMIT}`)
       .then((r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`)
         return r.json() as Promise<{ data: TopUserRow[] }>

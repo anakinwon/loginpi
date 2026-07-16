@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { AdminPagination } from '@/components/admin/admin-pagination'
 import { useDynamicLimit } from '@/hooks/use-dynamic-limit'
+import { piFetch } from '@/lib/pi-fetch'
 
 // p-6(48) + 제목+설명(56) + gap(16) + 생성폼(88) + gap(16) + 필터(36) + gap(16) + 테이블헤더(33) + gap(16) + 페이지(36)
 const CHROME_PX = 361
@@ -80,7 +81,7 @@ export default function StickersPage() {
   }, [limit, filter])
 
   async function reload() {
-    const res = await fetch('/api/admin/stickers')
+    const res = await piFetch('/api/admin/stickers')
     if (!res.ok) return
     const d = (await res.json()) as { packs: PackRow[]; themes: ThemeOption[] }
     setPacks(d.packs ?? [])
@@ -111,7 +112,7 @@ export default function StickersPage() {
     }
     setCreating(true)
     try {
-      const res = await fetch('/api/admin/stickers', {
+      const res = await piFetch('/api/admin/stickers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -148,7 +149,7 @@ export default function StickersPage() {
     setDetailId(packId)
     setDetailLoading(true)
     try {
-      const res = await fetch(`/api/admin/stickers/${packId}`)
+      const res = await piFetch(`/api/admin/stickers/${packId}`)
       if (!res.ok) {
         setDetailId(null)
         return
@@ -170,7 +171,7 @@ export default function StickersPage() {
   }
 
   async function saveEdit(packId: string) {
-    const res = await fetch(`/api/admin/stickers/${packId}`, {
+    const res = await piFetch(`/api/admin/stickers/${packId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -193,7 +194,7 @@ export default function StickersPage() {
 
   async function removePack(p: PackRow) {
     if (!confirm(t('deleteConfirm', { name: p.pack_nm }))) return
-    const res = await fetch(`/api/admin/stickers/${p.pack_id}`, {
+    const res = await piFetch(`/api/admin/stickers/${p.pack_id}`, {
       method: 'DELETE',
     })
     if (!res.ok) {
@@ -211,7 +212,7 @@ export default function StickersPage() {
     try {
       const fd = new FormData()
       for (const f of Array.from(files)) fd.append('files', f)
-      const res = await fetch(`/api/admin/stickers/${packId}/items`, {
+      const res = await piFetch(`/api/admin/stickers/${packId}/items`, {
         method: 'POST',
         body: fd,
       })
@@ -242,7 +243,7 @@ export default function StickersPage() {
 
   async function removeSticker(packId: string, stkrId: string) {
     if (!confirm(t('stkrDeleteConfirm'))) return
-    const res = await fetch(`/api/admin/stickers/${packId}/items/${stkrId}`, {
+    const res = await piFetch(`/api/admin/stickers/${packId}/items/${stkrId}`, {
       method: 'DELETE',
     })
     if (!res.ok) {

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useDynamicLimit } from '@/hooks/use-dynamic-limit'
 import { AdminPagination } from '@/components/admin/admin-pagination'
+import { piFetch } from '@/lib/pi-fetch'
 
 // p-6 + 제목/설명 + 검색·필터 + 테이블헤더 + 페이지네이션 (domains와 동일 기준)
 const CHROME_PX = 257
@@ -161,7 +162,7 @@ export default function AdminThemesPage() {
     const params = new URLSearchParams()
     if (search) params.set('search', search)
     if (tpFilter) params.set('tp', tpFilter)
-    fetch(`/api/admin/themes?${params}`)
+    piFetch(`/api/admin/themes?${params}`)
       .then((r) => r.json())
       .then((d: { themes: ThemeRow[] }) => setThemes(d.themes ?? []))
       .finally(() => setLoading(false))
@@ -241,7 +242,7 @@ export default function AdminThemesPage() {
     if (!confirm(t('deleteConfirm', { name: nm }))) return
     setDeleting(themeCd)
     try {
-      const res = await fetch(`/api/admin/themes/${themeCd}`, {
+      const res = await piFetch(`/api/admin/themes/${themeCd}`, {
         method: 'DELETE',
       })
       if (!res.ok) {

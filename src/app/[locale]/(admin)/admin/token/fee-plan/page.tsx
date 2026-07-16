@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import { BeanIcon } from '@/components/ui/bean-icon'
+import { piFetch } from '@/lib/pi-fetch'
 
 interface FeePlanRow {
   fee_plan_id: string
@@ -76,7 +77,7 @@ export default function BeanFeePlanPage() {
   const load = () => {
     setLoading(true)
     setError(null)
-    fetch('/api/admin/token/fee-plan')
+    piFetch('/api/admin/token/fee-plan')
       .then((r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`)
         return r.json() as Promise<{ data: FeePlanRow[] }>
@@ -93,7 +94,7 @@ export default function BeanFeePlanPage() {
   const toggleUseYn = (row: FeePlanRow) => {
     setToggling(row.fee_plan_id)
     const next: 'Y' | 'N' = row.use_yn === 'Y' ? 'N' : 'Y'
-    fetch('/api/admin/token/fee-plan', {
+    piFetch('/api/admin/token/fee-plan', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ fee_plan_id: row.fee_plan_id, use_yn: next }),

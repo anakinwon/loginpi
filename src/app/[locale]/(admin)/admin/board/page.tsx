@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { useDynamicLimit } from '@/hooks/use-dynamic-limit'
 import { AdminPagination } from '@/components/admin/admin-pagination'
+import { piFetch } from '@/lib/pi-fetch'
 
 // p-6(48) + 제목+설명(56) + gap(16) + 카테고리필터(36) + gap(16) + 테이블헤더(33) + gap(16) + 페이지네이션(36)
 const CHROME_PX = 257
@@ -50,7 +51,7 @@ export default function AdminBoardPage() {
       limit: String(limit),
       ...(ctgrFilter !== 'ALL' ? { ctgr: ctgrFilter } : {}),
     })
-    fetch(`/api/admin/board?${qs}`)
+    piFetch(`/api/admin/board?${qs}`)
       .then((r) => r.json())
       .then((d: { posts: PostRow[]; total: number }) => {
         setPosts(d.posts ?? [])
@@ -60,7 +61,7 @@ export default function AdminBoardPage() {
   }, [page, ctgrFilter, limit])
 
   const handlePinToggle = async (postId: string, currentPin: string) => {
-    const res = await fetch(`/api/admin/board/${postId}`, { method: 'PATCH' })
+    const res = await piFetch(`/api/admin/board/${postId}`, { method: 'PATCH' })
     if (res.ok) {
       const { pin_yn } = await res.json()
       setPosts((prev) =>
@@ -75,7 +76,9 @@ export default function AdminBoardPage() {
 
   const handleDelete = async (postId: string, title: string) => {
     if (!confirm(t('deleteConfirm', { title }))) return
-    const res = await fetch(`/api/admin/board/${postId}`, { method: 'DELETE' })
+    const res = await piFetch(`/api/admin/board/${postId}`, {
+      method: 'DELETE',
+    })
     if (res.ok) {
       setPosts((prev) => prev.filter((p) => p.post_id !== postId))
       setTotal((total) => total - 1)
