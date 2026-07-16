@@ -82,6 +82,9 @@ export default getRequestConfig(async ({ requestLocale }) => {
       messages,
       deepMerge(deepMerge(listingKo, listingEn), listingLoc),
     )
+    // 오버레이 파일의 _comment(운영 방침 설명)가 번들에 직렬화되면 그 자체가
+    // '발행'·'token' 등 절제 대상 단어를 페이지 소스에 노출한다 — 병합 후 제거.
+    delete messages._comment
   }
 
   return { locale, messages }
