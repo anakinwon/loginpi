@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 import { ChevronDown, ChevronUp, Plus, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { piFetch } from '@/lib/pi-fetch'
+import { adminRefresh } from '@/lib/admin-refresh'
 import {
   ADMIN_NAV_CATALOG,
   ADMIN_NAV_BY_HREF,
@@ -91,7 +92,8 @@ export default function QuickMenuAdminPage() {
         throw new Error(d.error ?? t('saveFail'))
       }
       toast.success(t('saved'))
-      router.refresh() // 레이아웃의 팝업 즉시 반영
+      // 레이아웃의 팝업 즉시 반영 (_pit 선갱신으로 만료 티켓 게이트 사이클 방지)
+      await adminRefresh(router)
     } catch (e) {
       toast.error(e instanceof Error ? e.message : t('saveFail'))
     } finally {

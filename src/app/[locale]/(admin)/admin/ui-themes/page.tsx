@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { piFetch } from '@/lib/pi-fetch'
+import { adminRefresh } from '@/lib/admin-refresh'
 import {
   THEME_TOKEN_META,
   THEME_TOKEN_KEYS,
@@ -234,7 +235,8 @@ export default function UiThemesPage() {
       toast.success(isNew ? tr('uiThemes.created') : tr('uiThemes.updated'))
       setEditing(null)
       await load()
-      router.refresh() // 활성 테마를 편집했을 수 있으니 레이아웃 재반영
+      // _pit 선갱신 후 refresh — 만료 티켓 게이트 사이클(Pi 429) 방지
+      await adminRefresh(router)
     } catch (e) {
       toast.error(e instanceof Error ? e.message : tr('uiThemes.saveFail'))
     } finally {
@@ -267,7 +269,8 @@ export default function UiThemesPage() {
         }),
       )
       await load()
-      router.refresh() // 서버 레이아웃이 새 활성 테마/범위로 색상 주입
+      // 서버 레이아웃이 새 활성 테마/범위로 색상 주입 (_pit 선갱신으로 게이트 미발동)
+      await adminRefresh(router)
     } catch {
       toast.error(tr('uiThemes.activateFail'))
     } finally {
