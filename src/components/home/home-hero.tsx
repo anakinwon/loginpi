@@ -37,7 +37,9 @@ export async function HomeHero() {
           className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/45 via-black/20 to-transparent"
         />
         {/* 사이트 소개 태그라인 — 강렬한 1줄 (진입 애니메이션은 히어로보다 0.35s 늦게) */}
-        <p className="home-hero-tagline absolute inset-x-0 top-5 px-4 text-center text-xl font-extrabold tracking-tight text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.75)] sm:top-6 sm:text-2xl">
+        {/* 태그라인 — 샴페인 골드 그라데이션(일러스트의 금색 π·연결선과 동일 계열, 파란 하늘과 보색 대비).
+            bg-clip-text는 text-shadow와 섞이면 탁해져서 filter 기반 drop-shadow만 사용 */}
+        <p className="home-hero-tagline absolute inset-x-0 top-5 bg-gradient-to-r from-amber-200 via-yellow-100 to-amber-300 bg-clip-text px-4 text-center text-[clamp(0.95rem,4.2vw,1.5rem)] font-extrabold tracking-tight whitespace-nowrap text-transparent drop-shadow-[0_2px_8px_rgba(0,0,0,0.65)] sm:top-6">
           {t('heroTagline')}
         </p>
         {/* 하단 미세 그라데이션 — 이미지와 페이지 배경의 이음새를 부드럽게 */}
