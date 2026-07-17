@@ -1993,6 +1993,7 @@
     "optionalNotice": "동의하지 않아도 일반 서비스 이용에는 제한이 없습니다. 위치 서비스만 비활성화됩니다.",
     "later": "나중에",
     "agreeStart": "동의하고 시작",
+    "consentFail": "동의 처리에 실패했습니다. 로그인 상태를 확인해주세요",
     "processing": "처리 중...",
     "nearbyTitle": "📍 매장 찾기",
     "loading": "불러오는 중…",

@@ -179,7 +179,13 @@ export function NearbyExplorer() {
     piFetch('/api/location/consent')
       .then((r) => (r.ok ? r.json() : null))
       .then((d: { consent_yn?: string } | null) => {
-        const y = d?.consent_yn === 'Y'
+        // 401 등 비정상 응답은 '미동의 확정'이 아니다 — Pi 자동인증 완료 전 레이스에서
+        // 동의자 캐시를 지우면 게이트가 오뜬다. 정상 200 응답만 정본으로 반영.
+        if (d === null) {
+          setLbsConsent((prev) => prev ?? 'N')
+          return
+        }
+        const y = d.consent_yn === 'Y'
         setLbsConsent(y ? 'Y' : 'N')
         try {
           if (y) localStorage.setItem(CONSENT_CACHE_KEY, '1')

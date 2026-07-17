@@ -2,8 +2,10 @@
 
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
+import { toast } from 'sonner'
 import { Link } from '@/i18n/navigation'
 import { piFetch } from '@/lib/pi-fetch'
+import { useApiErrorMessage, type ApiErrorPayload } from '@/hooks/use-api-error'
 import {
   Dialog,
   DialogContent,
@@ -22,6 +24,7 @@ interface Props {
 
 export function LbsConsentDialog({ open, onOpenChange, onConsented }: Props) {
   const t = useTranslations('lbs')
+  const apiErr = useApiErrorMessage()
   const [loading, setLoading] = useState(false)
 
   async function handleConsent() {
@@ -35,7 +38,13 @@ export function LbsConsentDialog({ open, onOpenChange, onConsented }: Props) {
       if (res.ok) {
         onConsented()
         onOpenChange(false)
+      } else {
+        // 401(세션 미인식)·500 등 — 무반응이면 버튼이 죽은 것처럼 보인다. 원인을 토스트로 노출.
+        const data = (await res.json().catch(() => ({}))) as ApiErrorPayload
+        toast.error(apiErr(data, t('consentFail')))
       }
+    } catch {
+      toast.error(t('consentFail'))
     } finally {
       setLoading(false)
     }

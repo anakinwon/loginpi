@@ -3581,6 +3581,7 @@
   },
   "lbs": {
     "agreeStart": "Agree and Start",
+    "consentFail": "Failed to save consent. Please check that you are signed in.",
     "bizCat": {
       "ALL": "Pi stores",
       "BAKERY": "Bakeries",
