@@ -510,9 +510,8 @@ export function StatsDashboard({
       </section>
       )}
 
-      {/* ─── 통합 분석 — 관리자(full)만. 개인 식별은 서버사이드 마스킹 병행
-              (orders RFM 표시명 등). 스크롤 진입 시 마운트. ───── */}
-      {scope === 'full' && (
+      {/* ─── 통합 분석 — 공개 포함(2026-07-17 마스터). 단 내부 매출 탭은 full 한정,
+              개인 식별은 서버사이드 마스킹 병행(orders RFM 표시명 등). 스크롤 진입 시 마운트. ───── */}
       <section className="space-y-4">
         <h2 className="text-lg font-semibold">{ta('pageTitle')}</h2>
         <LazySection
@@ -524,10 +523,9 @@ export function StatsDashboard({
             </div>
           }
         >
-          <AnalyticsHub />
+          <AnalyticsHub scope={scope} />
         </LazySection>
       </section>
-      )}
     </div>
   )
 }

@@ -59,8 +59,16 @@ function NorthStarMetric({
   )
 }
 
-export function AnalyticsHub() {
+// scope='public': revenue(매출) 탭 숨김 — 홈 공개 노출용(심사 절제, 매출 API 미호출).
+// scope='full': 4탭 전체(기존) — 관리자 뷰.
+export function AnalyticsHub({
+  scope = 'full',
+}: {
+  scope?: 'full' | 'public'
+}) {
   const t = useTranslations('adminAnalytics')
+  const visibleTabs =
+    scope === 'public' ? TAB_KEYS.filter((k) => k !== 'revenue') : TAB_KEYS
   const [tab, setTab] = useState<TabKey>('usage')
   const [period, setPeriod] = useState(30)
   const [activity, setActivity] = useState<ActivityStatsResponse | null>(null)
@@ -152,7 +160,7 @@ export function AnalyticsHub() {
 
       {/* 탭 네비 — 활성 탭을 채운 pill로 강조(선택 구분 명확) */}
       <div className="bg-muted/40 flex gap-1 overflow-x-auto rounded-xl p-1">
-        {TAB_KEYS.map((key) => (
+        {visibleTabs.map((key) => (
           <button
             key={key}
             onClick={() => setTab(key)}
@@ -169,8 +177,8 @@ export function AnalyticsHub() {
         ))}
       </div>
 
-      {/* 탭 내용 */}
-      {tab === 'revenue' ? (
+      {/* 탭 내용 — revenue는 full 한정(공개 스코프 방어: 탭 버튼 제거 + 렌더 이중 차단) */}
+      {tab === 'revenue' && scope === 'full' ? (
         <RevenueTab period={period} />
       ) : tab === 'order' ? (
         <OrderTab period={period} />
