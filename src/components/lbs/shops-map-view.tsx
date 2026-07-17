@@ -306,13 +306,15 @@ export function ShopsMapView({
           placeId: string,
           name: string,
           addr: string | null,
+          lat: number,
+          lng: number,
         ) => {
           const btn = document.createElement('button')
           btn.textContent = t('map.claimBtn')
           btn.style.cssText =
             'margin-top:8px;width:100%;padding:7px 10px;font-size:12px;border-radius:6px;background:#7c3aed;color:#fff;border:none;font-weight:700;cursor:pointer'
           btn.addEventListener('click', () => {
-            setClaimTarget({ place_id: placeId, name, addr })
+            setClaimTarget({ place_id: placeId, name, addr, lat, lng })
           })
           return btn
         }
@@ -499,6 +501,8 @@ export function ShopsMapView({
                   place.id,
                   place.displayName ?? t('map.unknownShop'),
                   place.formattedAddress ?? null,
+                  loc.lat(),
+                  loc.lng(),
                 ),
               )
             }
