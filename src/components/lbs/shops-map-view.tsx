@@ -84,6 +84,28 @@ const CATEGORY_CONFIG: Record<
   WINE_BAR: { bg: '#be123c', border: '#881337', placeType: 'wine_bar' },
 }
 
+// Haversine 거리(km) — nearby-explorer와 동일 공식. 구글 검색 매장은 API가 거리를
+// 주지 않으므로(등록 매장 distance_km와 달리) 클라이언트에서 직접 계산해 표시한다.
+function haversineKm(
+  lat1: number,
+  lng1: number,
+  lat2: number,
+  lng2: number,
+): number {
+  const dLat = ((lat2 - lat1) * Math.PI) / 180
+  const dLng = ((lng2 - lng1) * Math.PI) / 180
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLng / 2) ** 2
+  return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+}
+
+function formatDistKm(km: number): string {
+  return km < 1 ? `${Math.round(km * 1000)}m` : `${km.toFixed(1)}km`
+}
+
 export function ShopsMapView({
   shops,
   userLat,
@@ -415,10 +437,7 @@ export function ShopsMapView({
           // Pi 등록 매장 표시 — shops는 읽기 전용 순회(변조 없음), 컴파일러 보수 판정 예외
           // eslint-disable-next-line react-hooks/immutability
           for (const shop of shops) {
-            const dist =
-              shop.distance_km < 1
-                ? `${Math.round(shop.distance_km * 1000)}m`
-                : `${shop.distance_km.toFixed(1)}km`
+            const dist = formatDistKm(shop.distance_km)
             addMarker(
               { lat: shop.lat, lng: shop.lng },
               shop.shop_nm,
@@ -474,6 +493,15 @@ export function ShopsMapView({
               'font-weight:600;font-size:14px;margin:0 0 4px'
             nameEl.textContent = place.displayName ?? t('map.noName')
             wrap.appendChild(nameEl)
+
+            // 내 위치 ↔ 매장 거리 — 등록 매장(buildShopInfo)과 동일한 📍 표기.
+            // 미등록 구글 매장도 거리를 보여줘야 100m 현장 인증 가능 여부를 미리 가늠할 수 있다.
+            const distEl = document.createElement('p')
+            distEl.style.cssText = `color:${cfg.bg};font-size:12px;margin:0 0 4px`
+            distEl.textContent = `📍 ${formatDistKm(
+              haversineKm(userLat, userLng, loc.lat(), loc.lng()),
+            )}`
+            wrap.appendChild(distEl)
 
             if (place.rating) {
               const rateEl = document.createElement('p')
