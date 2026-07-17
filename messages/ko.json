@@ -3072,7 +3072,9 @@
     "targetLabel": "대상",
     "targetValue": "파이오니어",
     "benefitLabel": "혜택",
-    "benefitValue": "카페 무료 생성 · 무료 참여 · 무료 자동번역"
+    "benefitValue": "카페 무료 생성 · 무료 참여 · 무료 자동번역",
+    "expand": "자세히 보기",
+    "collapse": "접기"
   },
   "themes": {
     "CRYPTO_TRADING": "Pi투자",

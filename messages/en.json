@@ -3770,7 +3770,9 @@
     "subtitle": "All Platform Fees Free",
     "targetLabel": "Target",
     "targetValue": "Pioneer",
-    "title": "🎉 Grand Open Event"
+    "title": "🎉 Grand Open Event",
+    "expand": "View Details",
+    "collapse": "Collapse"
   },
   "pay": {
     "amountInvalid": "Enter an amount greater than 0.",

@@ -20,6 +20,8 @@ export function GrandOpenBanner() {
   const t = useTranslations('openPromo')
   // 초기 가시성 = SSR 판정(active). 하이드레이션 일치 위해 동일 초기값 사용.
   const [visible, setVisible] = useState(active)
+  // 접이식 — 기본 접힘 (2026-07-17 마스터, 문서 카드 2종과 동일 패턴)
+  const [open, setOpen] = useState(false)
 
   useEffect(() => {
     if (!active) {
@@ -52,40 +54,66 @@ export function GrandOpenBanner() {
   ]
 
   return (
-    <section className="relative overflow-hidden rounded-2xl border border-amber-300/60 bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 p-6 shadow-sm dark:border-amber-500/30 dark:from-amber-950/40 dark:via-orange-950/30 dark:to-rose-950/30">
+    <section className="relative overflow-hidden rounded-2xl border border-amber-300/60 bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 shadow-sm dark:border-amber-500/30 dark:from-amber-950/40 dark:via-orange-950/30 dark:to-rose-950/30">
       {/* 배경 glow 장식 */}
       <div className="pointer-events-none absolute -top-10 -right-10 h-40 w-40 rounded-full bg-amber-400/25 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-12 -left-8 h-36 w-36 rounded-full bg-rose-400/20 blur-3xl" />
 
-      <div className="relative space-y-4">
-        {/* 이벤트 배지 */}
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-3 py-1 text-xs font-bold text-white shadow-sm">
-          {t('title')}
-        </span>
-
-        {/* 메인 카피 */}
-        <div className="space-y-1">
-          <h2 className="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 bg-clip-text text-2xl font-extrabold tracking-tight text-transparent sm:text-3xl">
+      {/* 헤더 (토글) — 기본 접힘, 문서 카드 2종과 동일한 컴팩트 바 패턴 */}
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="relative flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left transition-colors hover:bg-amber-100/40 dark:hover:bg-amber-900/20"
+      >
+        <span className="flex min-w-0 items-center gap-2">
+          <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-2 py-0.5 text-xs font-bold text-white shadow-sm">
+            {t('title')}
+          </span>
+          <span className="truncate bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 bg-clip-text text-sm font-extrabold tracking-tight text-transparent">
             {t('subtitle')}
-          </h2>
-          <p className="text-muted-foreground text-sm">{t('desc')}</p>
-        </div>
+          </span>
+        </span>
+        <span className="text-muted-foreground flex shrink-0 items-center gap-1 text-xs">
+          <span className="hidden sm:inline">
+            {open ? t('collapse') : t('expand')}
+          </span>
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            className={`h-4 w-4 transition-transform ${open ? 'rotate-180' : ''}`}
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="m6 9 6 6 6-6"
+            />
+          </svg>
+        </span>
+      </button>
 
-        {/* 상세 정보 */}
-        <dl className="grid gap-2 sm:grid-cols-3">
-          {items.map((it) => (
-            <div
-              key={it.label}
-              className="rounded-xl border border-amber-200/60 bg-white/60 px-3 py-2 backdrop-blur-sm dark:border-amber-500/20 dark:bg-white/5"
-            >
-              <dt className="text-[11px] font-semibold tracking-wide text-amber-700 dark:text-amber-400">
-                {it.label}
-              </dt>
-              <dd className="mt-0.5 text-sm font-medium">{it.value}</dd>
-            </div>
-          ))}
-        </dl>
-      </div>
+      {/* 본문 (펼침 시) */}
+      {open && (
+        <div className="relative space-y-3 border-t border-amber-200/60 px-4 py-4 dark:border-amber-500/20">
+          <p className="text-muted-foreground text-sm">{t('desc')}</p>
+          <dl className="grid gap-2 sm:grid-cols-3">
+            {items.map((it) => (
+              <div
+                key={it.label}
+                className="rounded-xl border border-amber-200/60 bg-white/60 px-3 py-2 backdrop-blur-sm dark:border-amber-500/20 dark:bg-white/5"
+              >
+                <dt className="text-[11px] font-semibold tracking-wide text-amber-700 dark:text-amber-400">
+                  {it.label}
+                </dt>
+                <dd className="mt-0.5 text-sm font-medium">{it.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      )}
     </section>
   )
 }
