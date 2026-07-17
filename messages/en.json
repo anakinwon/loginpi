@@ -3583,15 +3583,33 @@
     "agreeStart": "Agree and Start",
     "bizCat": {
       "ALL": "Pi stores",
+      "BAKERY": "Bakeries",
       "BAR": "Bars",
       "CAFE": "Cafes",
-      "RESTAURANT": "Restaurants"
+      "COFFEE_SHOP": "Coffee shops",
+      "DESSERT_SHOP": "Dessert shops",
+      "FAST_FOOD": "Fast food",
+      "ICE_CREAM_SHOP": "Ice cream shops",
+      "MEAL_TAKEAWAY": "Takeout",
+      "PUB": "Pubs",
+      "RESTAURANT": "Restaurants",
+      "TEA_HOUSE": "Tea houses",
+      "WINE_BAR": "Wine bars"
     },
     "bizCatOption": {
       "ALL": "Pi stores",
+      "BAKERY": "🥐 Bakery",
       "BAR": "🍺 Bar",
       "CAFE": "☕ Cafe",
-      "RESTAURANT": "🍽️ Restaurant"
+      "COFFEE_SHOP": "☕ Coffee shop",
+      "DESSERT_SHOP": "🍰 Dessert",
+      "FAST_FOOD": "🍔 Fast food",
+      "ICE_CREAM_SHOP": "🍦 Ice cream",
+      "MEAL_TAKEAWAY": "🥡 Takeout",
+      "PUB": "🍻 Pub",
+      "RESTAURANT": "🍽️ Restaurant",
+      "TEA_HOUSE": "🍵 Tea house",
+      "WINE_BAR": "🍷 Wine bar"
     },
     "claim": {
       "addr": "Address",

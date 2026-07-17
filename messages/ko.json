@@ -2043,14 +2043,32 @@
     "bizCat": {
       "ALL": "Pi 매장",
       "CAFE": "카페",
+      "COFFEE_SHOP": "커피전문점",
+      "TEA_HOUSE": "찻집",
+      "BAKERY": "베이커리",
+      "DESSERT_SHOP": "디저트",
+      "ICE_CREAM_SHOP": "아이스크림",
       "RESTAURANT": "식당",
-      "BAR": "술집"
+      "FAST_FOOD": "패스트푸드",
+      "MEAL_TAKEAWAY": "테이크아웃",
+      "BAR": "술집",
+      "PUB": "펍",
+      "WINE_BAR": "와인바"
     },
     "bizCatOption": {
       "ALL": "Pi 매장",
       "CAFE": "☕ 카페",
+      "COFFEE_SHOP": "☕ 커피전문점",
+      "TEA_HOUSE": "🍵 찻집",
+      "BAKERY": "🥐 베이커리",
+      "DESSERT_SHOP": "🍰 디저트",
+      "ICE_CREAM_SHOP": "🍦 아이스크림",
       "RESTAURANT": "🍽️ 식당",
-      "BAR": "🍺 술집"
+      "FAST_FOOD": "🍔 패스트푸드",
+      "MEAL_TAKEAWAY": "🥡 테이크아웃",
+      "BAR": "🍺 술집",
+      "PUB": "🍻 펍",
+      "WINE_BAR": "🍷 와인바"
     },
     "liveOn": "🔴 실시간 ON",
     "liveOff": "⚪ 실시간",

@@ -47,19 +47,41 @@ interface MarkerEntry {
   position: { lat: number; lng: number }
 }
 
-// 업종별 핀 색상 + Google Places 타입 (표시 라벨은 i18n lbs.bizCat.* — t()로 렌더)
+// 업종별 핀 색상 + Google Places 공식 타입 (표시 라벨은 i18n lbs.bizCat.* — t()로 렌더)
+// placeType은 Places API (New) Table A 'Food and Drink' 공식 값 그대로 사용
 const CATEGORY_CONFIG: Record<
   BizCategory,
   { bg: string; border: string; placeType: string }
 > = {
   ALL: { bg: '#f97316', border: '#c2410c', placeType: '' },
   CAFE: { bg: '#22c55e', border: '#15803d', placeType: 'cafe' },
+  COFFEE_SHOP: { bg: '#b45309', border: '#78350f', placeType: 'coffee_shop' },
+  TEA_HOUSE: { bg: '#14b8a6', border: '#0f766e', placeType: 'tea_house' },
+  BAKERY: { bg: '#eab308', border: '#a16207', placeType: 'bakery' },
+  DESSERT_SHOP: { bg: '#ec4899', border: '#be185d', placeType: 'dessert_shop' },
+  ICE_CREAM_SHOP: {
+    bg: '#0ea5e9',
+    border: '#0369a1',
+    placeType: 'ice_cream_shop',
+  },
   RESTAURANT: {
     bg: '#ef4444',
     border: '#b91c1c',
     placeType: 'restaurant',
   },
+  FAST_FOOD: {
+    bg: '#f59e0b',
+    border: '#b45309',
+    placeType: 'fast_food_restaurant',
+  },
+  MEAL_TAKEAWAY: {
+    bg: '#64748b',
+    border: '#334155',
+    placeType: 'meal_takeaway',
+  },
   BAR: { bg: '#a855f7', border: '#7e22ce', placeType: 'bar' },
+  PUB: { bg: '#6366f1', border: '#4338ca', placeType: 'pub' },
+  WINE_BAR: { bg: '#be123c', border: '#881337', placeType: 'wine_bar' },
 }
 
 export function ShopsMapView({

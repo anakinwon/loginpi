@@ -47,11 +47,40 @@ interface NearbyRoom {
 
 type Tab = 'shops' | 'rooms'
 type ShopsViewMode = 'list' | 'map'
-export type BizCategory = 'ALL' | 'CAFE' | 'RESTAURANT' | 'BAR'
+// Google Places API (New) Table A 'Food and Drink' 공식 타입 기준 (1:1 매핑, 요리별 세분 타입 제외)
+// https://developers.google.com/maps/documentation/places/web-service/place-types
+export type BizCategory =
+  | 'ALL' // Pi 등록 매장 (Google 타입 아님)
+  | 'CAFE' // cafe
+  | 'COFFEE_SHOP' // coffee_shop
+  | 'TEA_HOUSE' // tea_house
+  | 'BAKERY' // bakery
+  | 'DESSERT_SHOP' // dessert_shop
+  | 'ICE_CREAM_SHOP' // ice_cream_shop
+  | 'RESTAURANT' // restaurant
+  | 'FAST_FOOD' // fast_food_restaurant
+  | 'MEAL_TAKEAWAY' // meal_takeaway
+  | 'BAR' // bar
+  | 'PUB' // pub
+  | 'WINE_BAR' // wine_bar
 const RADIUS_OPTIONS = [1, 5, 10] as const
 
 // 표시 라벨은 i18n lbs.bizCatOption.* — 렌더에서 t()로 처리
-const BIZ_CATEGORIES: BizCategory[] = ['ALL', 'CAFE', 'RESTAURANT', 'BAR']
+const BIZ_CATEGORIES: BizCategory[] = [
+  'ALL',
+  'CAFE',
+  'COFFEE_SHOP',
+  'TEA_HOUSE',
+  'BAKERY',
+  'DESSERT_SHOP',
+  'ICE_CREAM_SHOP',
+  'RESTAURANT',
+  'FAST_FOOD',
+  'MEAL_TAKEAWAY',
+  'BAR',
+  'PUB',
+  'WINE_BAR',
+]
 
 function formatDistance(km: number): string {
   if (km < 1) return `${Math.round(km * 1000)}m`
