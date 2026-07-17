@@ -402,3 +402,55 @@ body {
     inset 4px 4px 10px rgba(0, 0, 0, 0.5),
     inset -4px -4px 10px rgba(255, 255, 255, 0.05);
 }
+
+/* ── 홈 히어로 (생동감 연출) ─────────────────────────────────────────── */
+/* Ken Burns 느린 줌 — overflow-hidden 프레임 안에서 살짝 확대·복귀 반복 */
+@keyframes home-hero-kenburns {
+  0% {
+    transform: scale(1) translateY(0);
+  }
+  100% {
+    transform: scale(1.06) translateY(-1.5%);
+  }
+}
+/* 진입 페이드업 — 첫 로드 시 부드럽게 떠오름 */
+@keyframes home-hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* 앰비언트 글로우 — 프레임 뒤 보라·앰버 광채가 숨쉬듯 맥동 */
+@keyframes home-hero-glow {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.04);
+  }
+}
+.home-hero-enter {
+  animation: home-hero-rise 0.9s ease-out both;
+}
+.home-hero-img {
+  animation: home-hero-kenburns 18s ease-in-out infinite alternate;
+  will-change: transform;
+}
+.home-hero-glow {
+  animation: home-hero-glow 6s ease-in-out infinite;
+}
+/* 접근성 — 모션 최소화 설정 시 전부 정지 */
+@media (prefers-reduced-motion: reduce) {
+  .home-hero-enter,
+  .home-hero-img,
+  .home-hero-glow {
+    animation: none;
+  }
+}

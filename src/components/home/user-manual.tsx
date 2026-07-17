@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
-import { useFeatureFlags } from '@/components/feature-flag-provider'
 
 // 홈 "쉬운 사용 설명서" — 2단 접기(바깥 카드 기본 접힘 → 주제별 아코디언, 여러 개 동시 열기).
 // 콘텐츠는 i18n(adminStats.manual.topics) 배열. validate-locales가 배열을 leaf로 보아 키 정합 통과.
@@ -27,9 +26,8 @@ export function UserManual() {
     : []
   // 숨김 주제 제외(데이터는 보존) — icon 기준이라 모든 locale에서 동일하게 숨겨진다
   const topics = allTopics.filter((tp) => !HIDDEN_TOPIC_ICONS.has(tp.icon))
-  // 운영(메인넷)에선 바깥 카드 기본 펼침, staging·dev는 기본 접힘 (server 주입값 — hydration 일치)
-  const { isProd } = useFeatureFlags()
-  const [open, setOpen] = useState(isProd)
+  // 전 환경 기본 접힘 — 홈 히어로가 시각 앵커가 되도록 (2026-07-17 마스터, 구 정책: 운영 기본 펼침)
+  const [open, setOpen] = useState(false)
   const [expanded, setExpanded] = useState<Set<number>>(new Set())
 
   function toggleTopic(i: number) {
