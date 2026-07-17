@@ -28,13 +28,13 @@ export function TechWhitepaper() {
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="hover:bg-muted/30 flex w-full items-center justify-between gap-3 px-5 py-4 text-left transition-colors"
+        className="hover:bg-muted/30 flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left transition-colors"
       >
         <span className="flex items-center gap-2">
           <span className="bg-primary/10 text-primary rounded-full px-2 py-0.5 text-xs font-semibold">
             {t('badge')}
           </span>
-          <span className="text-sm font-bold sm:text-base">{t('title')}</span>
+          <span className="text-sm font-bold">{t('title')}</span>
         </span>
         <span className="text-muted-foreground flex shrink-0 items-center gap-1 text-xs">
           <span className="hidden sm:inline">

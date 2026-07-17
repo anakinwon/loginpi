@@ -446,11 +446,16 @@ body {
 .home-hero-glow {
   animation: home-hero-glow 6s ease-in-out infinite;
 }
+/* 태그라인 — 히어로보다 0.35s 늦게 떠올라 시선이 이미지→카피 순으로 흐른다 */
+.home-hero-tagline {
+  animation: home-hero-rise 0.9s ease-out 0.35s both;
+}
 /* 접근성 — 모션 최소화 설정 시 전부 정지 */
 @media (prefers-reduced-motion: reduce) {
   .home-hero-enter,
   .home-hero-img,
-  .home-hero-glow {
+  .home-hero-glow,
+  .home-hero-tagline {
     animation: none;
   }
 }

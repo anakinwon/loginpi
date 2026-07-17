@@ -31,6 +31,15 @@ export async function HomeHero() {
           sizes="(max-width: 640px) 100vw, 512px"
           className="home-hero-img object-cover"
         />
+        {/* 상단 스크림 — 하늘 영역 위 태그라인 가독성 확보 */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/45 via-black/20 to-transparent"
+        />
+        {/* 사이트 소개 태그라인 — 강렬한 1줄 (진입 애니메이션은 히어로보다 0.35s 늦게) */}
+        <p className="home-hero-tagline absolute inset-x-0 top-5 px-4 text-center text-xl font-extrabold tracking-tight text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.75)] sm:top-6 sm:text-2xl">
+          {t('heroTagline')}
+        </p>
         {/* 하단 미세 그라데이션 — 이미지와 페이지 배경의 이음새를 부드럽게 */}
         <div
           aria-hidden="true"

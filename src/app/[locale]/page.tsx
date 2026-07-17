@@ -22,13 +22,14 @@ export default async function HomePage() {
       {/* 그랜드 오픈 이벤트 환영 배너 — 오픈 프로모 활성 시에만 노출(전액 무료 사실일 때) */}
       <GrandOpenBanner />
 
-      {/* Pi 글로벌 커뮤니티 히어로 — 홈의 시각적 앵커 (2026-07-17 마스터 커스터마이징) */}
-      <HomeHero />
-
+      {/* 문서 카드 2종(컴팩트) — 히어로 위에 배치 (2026-07-17 마스터 커스터마이징) */}
       <div className="space-y-2">
         <TechWhitepaper />
         <UserManual />
       </div>
+
+      {/* Pi 글로벌 커뮤니티 히어로 — 홈의 시각적 앵커 + 사이트 소개 태그라인 */}
+      <HomeHero />
 
       {!isProd && (
         <>
