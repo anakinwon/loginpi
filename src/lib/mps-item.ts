@@ -226,10 +226,11 @@ export async function listOpenItems(filter: ItemListFilter) {
     return { items, total, page, limit }
   }
 
-  const sortKey =
-    (filter.sort ?? 'latest') in SORT_MAP
-      ? (filter.sort as keyof typeof SORT_MAP)
-      : 'latest'
+  // sort 미지정(undefined)·SORT_MAP 밖 값(distance 등)은 latest로 폴백
+  // (기존엔 검사만 coalescing하고 반환은 원본이라 sort 생략 시 SORT_MAP[undefined] 크래시)
+  const requested = filter.sort ?? 'latest'
+  const sortKey: keyof typeof SORT_MAP =
+    requested in SORT_MAP ? (requested as keyof typeof SORT_MAP) : 'latest'
   const sort = SORT_MAP[sortKey]
   const { data, count, error } = await q
     .order(sort.column, { ascending: sort.ascending })
