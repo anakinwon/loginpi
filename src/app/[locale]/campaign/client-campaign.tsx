@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { Link } from '@/i18n/navigation'
 import { BeanIcon } from '@/components/ui/bean-icon'
+import { beanToPi, useFeeMode } from '@/hooks/use-fee-mode'
 import { piFetch } from '@/lib/pi-fetch'
 
 interface MyShop {
@@ -35,6 +36,8 @@ interface Status {
 
 export function ClientCampaign() {
   const t = useTranslations('event.shop')
+  // PI 모드(운영)에선 보상 표기도 π — 실지급이 Pi A2U(관리자 승인)라 표시 단위를 일치시킨다
+  const isPi = useFeeMode() === 'PI'
   const [st, setSt] = useState<Status | null>(null)
   const [loading, setLoading] = useState(true)
   const [authed, setAuthed] = useState(true)
@@ -147,8 +150,17 @@ export function ClientCampaign() {
       <div className="from-primary/10 to-primary/5 rounded-2xl bg-gradient-to-b p-6 text-center">
         <p className="text-sm font-semibold">🏪 {st.campaign_nm}</p>
         <p className="mt-2 flex items-center justify-center gap-1.5 text-3xl font-bold tabular-nums">
-          {st.reward_bean.toLocaleString()}
-          <BeanIcon className="inline-block h-7 w-7 align-text-bottom" />
+          {isPi ? (
+            <>
+              {beanToPi(st.reward_bean).toLocaleString()}
+              <span className="align-text-bottom">π</span>
+            </>
+          ) : (
+            <>
+              {st.reward_bean.toLocaleString()}
+              <BeanIcon className="inline-block h-7 w-7 align-text-bottom" />
+            </>
+          )}
         </p>
         <p className="text-muted-foreground mt-1 text-xs">
           {t('remaining', {

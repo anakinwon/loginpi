@@ -111,7 +111,14 @@ function RankingCard({
   )
 }
 
-export function StatsDashboard() {
+// scope='public': 활성 사용자(커뮤니티 활성 지표) 섹션만 — 홈 공개 노출용(메인넷 심사 절제).
+// scope='full': 매출·통합분석 포함 전체 — 관리자 뷰(/admin/stats·홈 관리자 조건부 개방).
+// 이 구분은 표시 게이팅이며, 데이터 보호는 각 stats API의 서버 마스킹·게이트가 정본.
+export function StatsDashboard({
+  scope = 'full',
+}: {
+  scope?: 'full' | 'public'
+}) {
   const t = useTranslations('adminStats')
   const tTheme = useTranslations('themes')
   const tc = useTranslations('common')
@@ -348,7 +355,8 @@ export function StatsDashboard() {
         </RankingCard>
       </section>
 
-      {/* ─── 매출 섹션 — 스크롤 진입 시 데이터 로드 + 차트 마운트 ───── */}
+      {/* ─── 매출 섹션 — 관리자(full)만. 공개(public)엔 미렌더·API 미호출 ───── */}
+      {scope === 'full' && (
       <section className="space-y-4">
         <h2 className="text-lg font-semibold">{t('revenue')}</h2>
 
@@ -500,9 +508,11 @@ export function StatsDashboard() {
           </div>
         </LazySection>
       </section>
+      )}
 
-      {/* ─── 통합 분석 — (구)번역 섹션 자리에 이식. 공개 노출이므로 개인 식별은
-              서버사이드에서 마스킹된다(orders RFM 표시명 등). 스크롤 진입 시 마운트. ───── */}
+      {/* ─── 통합 분석 — 관리자(full)만. 개인 식별은 서버사이드 마스킹 병행
+              (orders RFM 표시명 등). 스크롤 진입 시 마운트. ───── */}
+      {scope === 'full' && (
       <section className="space-y-4">
         <h2 className="text-lg font-semibold">{ta('pageTitle')}</h2>
         <LazySection
@@ -517,6 +527,7 @@ export function StatsDashboard() {
           <AnalyticsHub />
         </LazySection>
       </section>
+      )}
     </div>
   )
 }

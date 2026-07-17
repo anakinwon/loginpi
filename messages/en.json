@@ -1536,6 +1536,7 @@
   "adminStats": {
     "activeUsers": "Active Users",
     "adminTitle": "Statistics Dashboard",
+    "publicSubtitle": "Community activity metrics (daily aggregates)",
     "beanDistEmpty": "No Bean transactions for the period.",
     "beanDistError": "Distribution error: {error}",
     "beanDistFootnote": "Bar length/ratio = Share of gross transaction volume by type · Net change (net) = Sum of signs based on user wallet (Inflow +, Outflow −, Movement 0)",

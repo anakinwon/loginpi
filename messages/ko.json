@@ -963,6 +963,7 @@
     },
     "adminTitle": "통계 대시보드",
     "subtitle": "활성 사용자 · 매출 통계 (일별 집계 기반)",
+    "publicSubtitle": "커뮤니티 활성 지표 (일별 집계 기반)",
     "fetchFail": "데이터 조회 실패",
     "activeUsers": "활성 사용자",
     "revenue": "매출",
