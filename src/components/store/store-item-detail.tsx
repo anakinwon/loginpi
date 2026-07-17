@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
 import { toast } from 'sonner'
-import { useRouter } from '@/i18n/navigation'
+import { Link, useRouter } from '@/i18n/navigation'
 import { usePiAuth } from '@/components/pi-auth-provider'
 import { piFetch } from '@/lib/pi-fetch'
 import { Button } from '@/components/ui/button'
@@ -423,14 +423,21 @@ export function StoreItemDetail({ itemId }: { itemId: string }) {
             <p className="text-sm whitespace-pre-wrap">{item.item_desc}</p>
           )}
 
+          {/* 매장 카드 — 탭 시 매장 상세(스토어프론트)로 이동 */}
           {item.shop && (
-            <div className="rounded-lg border p-3 text-sm">
-              <p className="font-medium">🏪 {item.shop.shop_nm}</p>
-              <p className="text-muted-foreground mt-0.5 text-xs">
-                {t(`shopType.${item.shop.shop_type_cd}`)}
-                {item.shop.addr && ` · ${item.shop.addr}`}
-              </p>
-            </div>
+            <Link
+              href={`/store/shop/${item.shop.shop_id}`}
+              className="hover:bg-muted/50 flex items-center justify-between gap-2 rounded-lg border p-3 text-sm transition-colors"
+            >
+              <div className="min-w-0">
+                <p className="truncate font-medium">🏪 {item.shop.shop_nm}</p>
+                <p className="text-muted-foreground mt-0.5 truncate text-xs">
+                  {t(`shopType.${item.shop.shop_type_cd}`)}
+                  {item.shop.addr && ` · ${item.shop.addr}`}
+                </p>
+              </div>
+              <span className="text-muted-foreground shrink-0 text-xs">›</span>
+            </Link>
           )}
 
           {/* 주문방법 3종 — 매장이용·픽업·배달(배달가능 매장만). 배달 시 위치 입력 */}
