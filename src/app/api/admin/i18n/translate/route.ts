@@ -1,16 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { readFile } from 'fs/promises'
 import { join } from 'path'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { apiError } from '@/lib/api-errors'
 import { apiMessage } from '@/lib/api-errors/messages'
 import { resolveLangName } from '@/lib/locale-lang'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-)
 
 // Gemini 프롬프트 품질을 위한 언어명 override
 // - Intl.DisplayNames가 모호하거나 locale_cd가 언어코드가 아닌 경우만 등록
@@ -144,7 +139,7 @@ export async function POST(req: NextRequest) {
     const PAGE = 1000
     let from = 0
     for (;;) {
-      const { data: existingMsgs } = await supabase
+      const { data: existingMsgs } = await getSupabaseAdmin()
         .from('i18n_message')
         .select('msg_key, msg_val')
         .eq('locale_cd', locale)
@@ -235,7 +230,7 @@ ${JSON.stringify(batch, null, 2)}`
 
     // 배치별 즉시 upsert — Gemini 실패 시에도 이전 배치 데이터 보존
     if (batchRows.length > 0) {
-      await supabase
+      await getSupabaseAdmin()
         .from('i18n_message')
         .upsert(batchRows, { onConflict: 'locale_cd,msg_key' })
       totalUpserted += batchRows.length

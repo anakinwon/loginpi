@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { readFile, writeFile } from 'fs/promises'
 import { join } from 'path'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
@@ -7,11 +7,6 @@ import { LOCALE_CURRENCY } from '@/lib/locale-currency'
 import { LOCALE_COUNTRY } from '@/lib/locale-country'
 import { sanitizeError } from '@/lib/sanitize-error'
 import { apiError } from '@/lib/api-errors'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-)
 
 // alpha-2 코드 → 국기 이모지 (Regional Indicator Symbol 변환)
 // ⚠️ 베이스는 U+1F1E6('A'). 과거 0x1f1e0 오계산으로 il·et·ps·sq 국기가 깨졌음(sql/167 보정)
@@ -86,7 +81,7 @@ export async function PATCH(req: NextRequest) {
   // 새 locale 활성화: sort_ord = 현재 최대값 + 1
   let sort_ord = 0
   if (is_active === 'Y') {
-    const { data } = await supabase
+    const { data } = await getSupabaseAdmin()
       .from('i18n_locale')
       .select('sort_ord')
       .order('sort_ord', { ascending: false })
@@ -98,7 +93,7 @@ export async function PATCH(req: NextRequest) {
   const flag_emoji = country_cd ? toFlagEmoji(country_cd) : null
   const nm = locale_nm ?? locale_cd
 
-  const { error } = await supabase
+  const { error } = await getSupabaseAdmin()
     .from('i18n_locale')
     .upsert(
       { locale_cd, locale_nm: nm, flag_emoji, is_active, sort_ord },
@@ -120,7 +115,7 @@ export async function PATCH(req: NextRequest) {
 
   // locale_cd가 null이었던 국가를 활성화할 때 i18n_cntry_mst.locale_cd 연결
   if (country_cd && is_active === 'Y') {
-    await supabase
+    await getSupabaseAdmin()
       .from('i18n_cntry_mst')
       .update({ locale_cd })
       .eq('country_cd', country_cd.toUpperCase())

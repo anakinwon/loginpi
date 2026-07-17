@@ -1,16 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { writeFile } from 'fs/promises'
 import { join, resolve, sep } from 'path'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { routing } from '@/i18n/routing'
 import { sanitizeError } from '@/lib/sanitize-error'
 import { apiError } from '@/lib/api-errors'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-)
 
 // 키가 '0','1','2',… 연속 정수 인덱스인 객체를 배열로 변환 (재귀).
 // DB는 배열을 'feat.PISHOP.0/.1/.2' 평탄 키로 저장하므로, 복원 시 객체가 아닌
@@ -73,7 +68,7 @@ export async function POST(req: NextRequest) {
     return apiError('ADM_I18N_INVALID_LOCALE', 400)
   }
 
-  const { data: locales } = await supabase
+  const { data: locales } = await getSupabaseAdmin()
     .from('i18n_locale')
     .select('locale_cd')
     .eq('is_active', 'Y')
@@ -114,7 +109,7 @@ export async function POST(req: NextRequest) {
     let from = 0
     let pageError: string | null = null
     for (;;) {
-      const { data: msgs, error } = await supabase
+      const { data: msgs, error } = await getSupabaseAdmin()
         .from('i18n_message')
         .select('msg_key, msg_val')
         .eq('locale_cd', lc)

@@ -1,14 +1,9 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { readFile } from 'fs/promises'
 import { join } from 'path'
 import { getSessionUser, isAdmin } from '@/lib/auth-check'
 import { apiError } from '@/lib/api-errors'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-)
 
 // ko.json의 전체 flat 키 목록 반환 (source of truth)
 function flattenKeys(obj: Record<string, unknown>, prefix = ''): string[] {
@@ -43,7 +38,7 @@ export async function GET() {
     totalKeys = 0
   }
 
-  const { data: locales } = await supabase
+  const { data: locales } = await getSupabaseAdmin()
     .from('i18n_locale')
     .select('*')
     .eq('is_active', 'Y')
@@ -53,7 +48,7 @@ export async function GET() {
   const nonKoLocales = (locales ?? []).filter((loc) => loc.locale_cd !== 'ko')
   const countEntries = await Promise.all(
     nonKoLocales.map(async (loc) => {
-      const { count } = await supabase
+      const { count } = await getSupabaseAdmin()
         .from('i18n_message')
         .select('*', { count: 'exact', head: true })
         .eq('locale_cd', loc.locale_cd)
