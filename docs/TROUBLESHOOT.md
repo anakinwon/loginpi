@@ -786,3 +786,39 @@ Pi Sign-In QR은 채굴 앱 스캐너·폰 카메라가 아니라 **파이지갑
 **교훈**:
 - **마운트 직후 API의 401은 "상태 없음 확정"이 아니라 "아직 모름"** — Pi 자동인증 레이스에서 이를 확정값으로 저장·캐시 삭제하면 정상 사용자의 상태를 파괴한다. 상태 조회는 200만 정본. (UA 사전차단 금지·getSessionUser 폴백 계열과 같은 "인증 신호 성급 확정 금지" 원칙 — PRD_10 Rule LBS-01 v1.3 명문화)
 - **`if (res.ok)`만 있고 else 없는 사용자 액션은 금지** — 실패가 침묵하면 사용자는 버그를 "버튼 고장"으로만 인지해 진단 단서가 사라진다. 실패 경로=반드시 toast(apiErr).
+
+---
+
+## [2026-07-17] 승격마다 반복된 loginpi preview 빌드 실패 — 모듈 스코프 createClient (lazy init 위반) ⭐
+
+**증상**: 운영 승격(production 브랜치 push)마다 GitHub 커밋 상태의 `Vercel – loginpi`가 failure — 실서비스는 정상인데 상태 판독이 오염됨.
+
+**구조 파악 (Vercel API 실측)**: 한 커밋에 배포가 여러 개 생긴다 — ① loginpi×master(스테이징 실서비스, production 타깃)=READY ② loginpi×production 브랜치(preview 타깃)=ERROR. GitHub 커밋 상태는 같은 컨텍스트를 **마지막 배포 결과가 덮어쓰므로** 실서비스 성공 후 preview 실패가 늦게 끝나면 failure로 보인다.
+
+**근본 원인**: i18n API route 5곳이 **모듈 스코프에서 `createClient(env)` 직접 호출** — Next 빌드의 "Collecting page data"가 route 모듈을 import 실행하는데, preview 타깃엔 SUPABASE env가 없어(`production` 타깃에만 등록) `supabaseUrl is required`로 빌드 폭발. CLAUDE.md lazy init 철칙의 잠복 위반이 env 없는 환경에서만 표면화된 것.
+
+**조치 (c0825fde)**: 5곳 전부 `getSupabaseAdmin()`(lazy 싱글턴) 전환 — 부수 효과로 3-tier DB 라우터 우회도 해소. 적용 후 전 컨텍스트 success 실측(노이즈 소멸).
+
+**교훈**: ① env 의존 생성자는 **핸들러 안에서 lazy**로만 — 빌드는 모든 route를 import한다. ② 커밋 상태가 이상하면 "어느 배포(타깃·브랜치)의 상태인가"를 Vercel API로 구분 판독. ③ 치환 스크립트로 일괄 수정 시 **새로 삽입한 문자열이 다음 치환에 물리지 않게** 순서 설계(이번에 import 경로가 한 차례 오염 — 로컬 dev 서버 `.next` 캐시에 잔상 남아 재시작 필요했음).
+
+---
+
+## [2026-07-17] "Top 3 구매왕은 있는데 매출 0" — 매출 일집계 결제 type 화이트리스트 회귀 ⭐
+
+**증상**: 운영 매출 대시보드 전 지표 0(총매출·건수·AOV·일별·테마별)인데 Top 3 구매왕만 정상 표시.
+
+**원인 사슬 (운영 실측)**: ① `stat_revenue_dly` 0행 vs `pi_pymnt` 완결 41건·173.2π 실재 ② 배치는 매일 `success_yn='Y'` — **0건 삽입도 성공이라 은폐** ③ sql/043(KST 개편)이 sql/026의 세분화 경로(PRODUCT_ORDER·DIRECT_PAY·잔여 catch-all)를 유실한 채 함수 재작성 → 기타 수용이 "type IS NULL"만 잔존 ④ 이후 등장한 신종 type(MPS_ESCROW 35건 155.8π·FBCK_BOND 2π·ADMIN_REFUND 15.4π)이 전 경로 불일치. Top 3(fn_top_spenders)는 type 무관 합산이라 표시 — **두 지표의 소스 정의 불일치**가 증상의 정체 (부수 발견: 환불이 '구매왕'에 합산되던 결함).
+
+**조치 (sql/183, 운영·스테이징 적용+백필)**: MPS_ESCROW→'PRODUCT_ORDER' 명시 분류(기존 코드·라벨 재사용) · **type 있는 미분류 완결 결제 전부 'UNKNOWN' 수용(catch-all)** · ADMIN_REFUND는 매출·구매왕 양쪽 명시 제외 · 결제 최초일부터 백필(운영 157.8π/37건 복원 실측).
+
+**교훈**: ① **열린 집합(결제 type)을 화이트리스트로 집계하면 성장이 곧 구멍** — "명시 분류+나머지 전부 수용" 구조만 미래-안전. ② "배치 성공≠데이터 정확" — 화면 0이면 배치 로그가 아니라 집계 테이블 행수→원장 type 분포 순으로 대조. ③ 함수 교체 전 `pg_get_functiondef`로 배포본 시그니처 대조, 교체 후 백필까지가 한 작업. ④ 함수 전면 재작성(043류) 시 직전 개정판(026)의 분기 전수를 diff로 대조 — 회귀는 재작성에서 태어난다.
+
+---
+
+## [2026-07-18] 등재 알람 하트비트 전환 — "무소식"의 모호함 제거 (감시 체계 개선)
+
+**배경 (사고 아님·설계 변경)**: a2u-probe는 개방(OPEN) 시에만 알람하는 침묵형 — 마스터 관점에서 "알람 없음"이 '아직 미승인'인지 '알람 체계 고장'인지 구분 불가.
+
+**변경 (a4378bda, 마스터 지시)**: 매일 09:30 KST **세 판정 모두 발송** — CLOSED=📡 "승인 대기 D+N"(신청일 07-16 기준) · OPEN=🚨 긴급+0순위 런북 · ERROR=⚠️ 에러 원문 200자(`escapeHtml`+`<code>` — 원문에 `<`·`&` 있으면 텔레그램 HTML 파싱 전체 실패로 알람 유실되므로 이스케이프 필수). 운영 검증 `notified:true`·마스터 수신 확인.
+
+**운영 규약**: **알람이 하루라도 안 오면 그 자체가 감시 체계 이상 신호** → 즉시 점검(cron 실행 여부는 같은 프로젝트 시간별 cron의 sys_batch_log로 교차 확인 가능 — Vercel cron 이력 API는 미제공).
