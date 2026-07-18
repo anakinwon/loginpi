@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '@/lib/supabase-admin'
-import { isTelegramEnabled, sendTelegramMessage } from '@/lib/telegram'
+import {
+  escapeHtml,
+  isTelegramEnabled,
+  sendTelegramMessage,
+} from '@/lib/telegram'
 
 // 메인넷 등재 승인 감지 프로브 cron — A2U(App-to-User) 개방 여부를 매일 1회 검사.
 // 배경(2026-07-16): 등재 "제출"은 별도 절차 없음(포털 Checklist 10/10=신청 완결, 공식 3소스 확인).
@@ -8,8 +12,19 @@ import { isTelegramEnabled, sendTelegramMessage } from '@/lib/telegram'
 //   승인 확인 즉시 0순위 런북(환불 sweep 소급·정산 백필 — MAINNET_READINESS 최상단) 실행 필요.
 // 안전장치: A2U는 생성→블록체인 제출→완료 3단계이며 돈은 "블록체인 제출" 시에만 이동.
 //   프로브는 생성만 시도하고 성공 시 즉시 취소 → 실제 송금 0. approve/complete 절대 호출 금지.
+// ⭐하트비트 설계(2026-07-18 마스터): OPEN(🚨긴급)뿐 아니라 CLOSED(📡대기)·ERROR(⚠️이상)도
+//   매일 텔레그램 발송 — "무소식"이 '미승인'인지 '알람 고장'인지 모호해지는 문제 제거.
+//   매일 아침 반드시 1건이 도착하며, 안 오면 그 자체가 감시 체계 이상 신호다.
 const PI_PAYMENTS_URL = 'https://api.minepi.com/v2/payments'
 const PROBE_AMOUNT = 0.001 // 생성 요청용 명목값 — 취소되므로 송금되지 않음
+const LISTING_APPLIED_DT = '2026-07-16' // 등재 신청 완결일 (포털 10/10) — 대기 D+N 표기 기준
+
+// 신청일 기준 경과일 (KST) — D+0=신청 당일
+function daysSinceApplied(): number {
+  const kstNow = Date.now() + 9 * 3600_000
+  const applied = Date.parse(`${LISTING_APPLIED_DT}T00:00:00Z`)
+  return Math.max(0, Math.floor((kstNow - applied) / 86400_000))
+}
 
 function isCronAuthorized(req: NextRequest): boolean {
   const secret = process.env.CRON_SECRET
@@ -118,12 +133,33 @@ export async function GET(request: NextRequest) {
   }
 
   if (bodyText.includes('feature_not_available')) {
-    // 미개방(승인 전) — 정상 대기 상태. 침묵 유지(로그만).
+    // 미개방(승인 전) — 정상 대기. 매일 상태 알람(하트비트) 발송.
+    let notified = false
+    if (masterRow.tlgm_chat_id && isTelegramEnabled()) {
+      const sent = await sendTelegramMessage(
+        masterRow.tlgm_chat_id,
+        `📡 <b>메인넷 등재 일일 점검 — 승인 대기 중 (D+${daysSinceApplied()})</b>\n\n` +
+          'A2U 미개방(feature_not_available) — 아직 승인 전 정상 상태입니다.\n' +
+          '개방이 감지되는 즉시 🚨 긴급 알람과 0순위 런북 안내가 발송됩니다.\n\n' +
+          '(이 점검 알람이 하루라도 안 오면 감시 체계 이상 — 아소카에게 확인 요청)',
+      )
+      notified = sent.ok
+    }
     console.info('[cron/a2u-probe] CLOSED (feature_not_available) — 승인 대기')
-    return NextResponse.json({ ok: true, a2u: 'CLOSED' })
+    return NextResponse.json({ ok: true, a2u: 'CLOSED', notified })
   }
 
-  // 예상 밖 응답 — 키/시드 회귀·pending 잔류 등 가능. Vercel 로그로 판독(스팸 방지 위해 무통지).
+  // 예상 밖 응답 — 키/시드 회귀·pending 잔류 등 가능. ⚠️알람으로 즉시 노출(무통지 폐기).
+  let notified = false
+  if (masterRow.tlgm_chat_id && isTelegramEnabled()) {
+    const sent = await sendTelegramMessage(
+      masterRow.tlgm_chat_id,
+      `⚠️ <b>메인넷 프로브 이상 응답 (HTTP ${createRes.status})</b>\n\n` +
+        `<code>${escapeHtml(bodyText.slice(0, 200))}</code>\n\n` +
+        '키/시드 회귀·pending 잔류 등 가능 — Vercel 로그 확인 필요.',
+    )
+    notified = sent.ok
+  }
   console.error(
     `[cron/a2u-probe] ERROR (${createRes.status}): ${bodyText.slice(0, 300)}`,
   )
@@ -132,5 +168,6 @@ export async function GET(request: NextRequest) {
     a2u: 'ERROR',
     status: createRes.status,
     detail: bodyText.slice(0, 300),
+    notified,
   })
 }
