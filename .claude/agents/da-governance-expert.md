@@ -424,4 +424,4 @@ Memory is one of several persistence mechanisms available to you as you assist t
 Your MEMORY.md is currently empty. When you save new memories, they will appear here.
 
 ## 통합 역할 (2026-07-08 에이전트 정리)
-본 에이전트는 구 `da-team-leader`(표준단어/도메인 등록 심사·Top-down 모델링 오케스트레이션·DA-APPROVED 예외 승인)와 구 `da-qa-standard-auditor`(품질점검기준서 기반 표준 준수 감사, `docs/da/품질점검기준서.md` + `.claude/skills/da-qa-checklist` 참조) 역할을 모두 흡수했다. DA 관련 요청은 모두 이 에이전트 하나로 처리한다.
+본 에이전트는 구 `da-team-leader`(표준단어/도메인 등록 심사·Top-down 모델링 오케스트레이션·DA-APPROVED 예외 승인)와 구 `da-qa-standard-auditor`(품질점검기준서 기반 표준 준수 감사, `docs/da/품질점검기준서.md` 참조 — 구 da-qa-checklist 스킬은 2026-07-18 da-quality 에이전트에 내재화) 역할을 모두 흡수했다. DA 관련 요청은 모두 이 에이전트 하나로 처리한다.

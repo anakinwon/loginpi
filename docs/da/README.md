@@ -15,15 +15,14 @@
   ├── 품질점검기준서.md            ← 점검 절차 + P1/P2/P3 체크리스트 + 보고 양식
   └── reports/                   ← 점검 보고서 (YYYY-MM-DD_제목.md)
 
-[계층 2] 실행 지식 — Claude Code Skills
-  .claude/skills/
-  ├── da-naming-rules/           ← DDL 작성 시 명명규칙 적용 (지침서 DOCX·PPTX 보유)
-  └── da-qa-checklist/           ← 품질 점검 수행 절차
+[계층 2] 실행 지식 — DA팀 에이전트에 내재화 (2026-07-18, 구 스킬 da-naming-rules·da-qa-checklist 폐지)
+  docs/da/references/            ← 지침서 원문 (표준단어·도메인·용어·코드 DOCX, 명명규칙 PPTX, DQ시스템기능.xls)
 
 [계층 3] 역할 에이전트 — Claude Code Agents
-  .claude/agents/da/
-  ├── da-team-leader.md          ← DA 오케스트레이터 (의사결정·위임)
-  └── da-qa-standard-auditor.md  ← 품질 감사 (표준·명명 점검)
+  .claude/agents/
+  ├── da-leader.md / da-standards.md(명명규칙 내재) / da-modeler.md
+  ├── da-quality.md(점검 절차 내재) / da-migration.md   ← da-team 스킬이 팀 소집
+  └── da-governance-expert.md    ← 단건 DDL 리뷰·단순 질의 단독 처리
 
 [자동 강제] Hook — 규칙 위반 DDL 차단
   .claude/hooks/da-ddl-guard.mjs ← PreToolUse Hook (R1~R7 검사 + DA-APPROVED 승인)
@@ -40,8 +39,8 @@
 |---|---|---|---|
 | `da-team-leader` | Agent | 표준화 원칙·절차 수립, 표준 의사결정, 점검 위임 | README + 데이터표준규칙.md |
 | `da-qa-standard-auditor` | Agent | DDL·모델·메타데이터 표준 준수 감사 | 품질점검기준서.md + 데이터표준규칙.md |
-| `da-naming-rules` | Skill | 신규 DDL 작성 시 명명규칙 자동 적용 | 데이터표준규칙.md §1~§3 |
-| `da-qa-checklist` | Skill | 품질 점검 절차 수행 | 품질점검기준서.md |
+| `da-standards` | Agent | 명명규칙 적용·검증 (구 da-naming-rules 스킬 내재화) | 데이터표준규칙.md §1~§3 |
+| `da-quality` | Agent | 품질 점검 절차 수행 (구 da-qa-checklist 스킬 내재화) | 품질점검기준서.md |
 | `da-ddl-guard` | Hook | DDL 자동 검사 — 준수 시 bypass, 위반 시 차단 | 데이터표준규칙.md (R1~R7) |
 | Admin UI (`/admin/std/*`) | App | 표준단어·도메인·용어 CRUD, 승인 워크플로우, Audit | DB: `std_dic`·`std_dom`·`std_term` |
 

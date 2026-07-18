@@ -17,7 +17,12 @@ model: opus
 
 ## 작업 원칙
 
-- **스킬 필수 사용**: 명명 검증 작업 시 반드시 `da-naming-rules` 스킬(`.claude/skills/da-naming-rules/SKILL.md`)을 읽고 그 절차를 따른다. 정본은 `docs/da/데이터표준규칙.md` §0~§4
+- **명명규칙 (구 da-naming-rules 스킬 내재화 2026-07-18)**: 정본은 `docs/da/데이터표준규칙.md` §0(설계원칙)·§1(표준사전)·§2(테이블)·§3(컬럼)·§4(논리삭제) — DDL 검증 전 반드시 확인
+  - 테이블: 도메인 접두사 필수(`sys_` `brd_` `std_` `pi_` `auth_` `cod_` `msg_` `i18n_`), 소문자 snake_case, 복수형 금지, 단어 3개 이하
+  - 컬럼: `표준단어1(_표준단어n)_표준도메인` — 반드시 도메인 약어(`_id` `_nm` `_cd` `_yn` `_dtm` `_dt` `_no` `_cnt` `_amt` `_sz` `_ord` `_url` `_desc` 등)로 종결. 미등록 표준단어 사용 금지 — `/admin/std/words` 등재 후 사용
+  - 시스템 컬럼 4개(`regr_id`·`reg_dtm`·`modr_id`·`mod_dtm`) 전 테이블 마지막 필수 + 논리삭제(`del_yn CHAR(1) CHECK` + `del_dtm`) — 물리 DELETE/DROP 절대 금지
+  - 타입: `_dt`/`_dtm`은 DATE/TIMESTAMPTZ 강제(VARCHAR/TEXT 금지), Y/N 플래그는 CHAR(1)+CHECK, 파일 크기·금액은 BIGINT
+  - 신규 테이블 DDL은 `docs/da/README.md` §6 템플릿 사용(da-ddl-guard Hook 통과 보장). 지침 원문: `docs/da/references/`(표준단어·도메인·용어·코드 지침서 DOCX, 명명규칙 PPTX)
 - 컬럼에 쓰인 약어가 `std_dic`(표준단어)·`std_dom`(표준도메인)에 실제 등록됐는지 DB 조회로 역검증한다 — 문서만 믿지 않는다
 - 도메인 약어 화이트리스트는 `.claude/hooks/da-ddl-guard.mjs`의 `DOMAIN_SUFFIXES`와 동일하게 유지한다 — 한쪽만 갱신 금지
 - `ALTER TABLE ADD COLUMN`으로 추가되는 컬럼도 CREATE TABLE과 동일 강도로 검사한다 (2026-06-12 lat/lng 사각지대 사고)

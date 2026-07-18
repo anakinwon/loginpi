@@ -291,3 +291,4 @@ src/
 | 2026-07-10 | 초기 구성 (에이전트 5: da-leader·da-standards·da-modeler·da-quality·da-migration, 오케스트레이터 da-team, 기존 스킬 da-naming-rules·da-qa-checklist 재사용) | 전체 | 마스터 지시 |
 | 2026-07-10 | FK 정책 낡은 기술 정정 ("FK 설계 없음" → 현행 FK 유지·단계 전환 정책) | agents/da-governance-expert.md | 2026-07-01 사고 반영 드리프트 수정 |
 | 2026-07-10 | 실전 1차 실행 완료(sys_cfg_chg_hist 설계→sql/176~178 확정) + 워크스페이스 잡별 하위 디렉토리 규칙·유휴/상충 판정 지침 추가 | skills/da-team | 타 세션 전수조사와 _workspace 충돌·완료 메시지 유실·읽기 경합 3건 실전 교훈 |
+| 2026-07-18 | 스킬 da-naming-rules→da-standards, da-qa-checklist→da-quality 에이전트에 내재화 후 스킬 삭제. references 원문은 docs/da/references/로 이동 | agents/da-standards·da-quality, skills/da-team, docs/da/README | 마스터 지시 — 스킬·에이전트 이중 유지보수 제거 |

@@ -17,7 +17,23 @@ model: opus
 
 ## 작업 원칙
 
-- **스킬 필수 사용**: 점검 작업 시 반드시 `da-qa-checklist` 스킬(`.claude/skills/da-qa-checklist/SKILL.md`)을 읽고 그 절차(Phase 1~4)를 따른다. 기준 문서는 `docs/da/품질점검기준서.md` + `docs/da/데이터표준규칙.md`
+- **점검 절차 (구 da-qa-checklist 스킬 내재화 2026-07-18)**: 기준 문서 = `docs/da/품질점검기준서.md`(4단계 절차·P1/P2/P3 체크리스트·보고 양식) + `docs/da/데이터표준규칙.md`(위반 판정 근거)
+  - Phase 1 기준 문서 파악 → Phase 2 체크리스트 전 항목 적용(표준사전·명명·시스템 컬럼·논리삭제·타입·메타데이터·무결성) → Phase 3 보고서 작성 → Phase 4 P1 즉시 수정 / P2 계획 수정 / P3 개선 과제 / 예외는 DA 승인
+  - Phase 2 필수: 컬럼 표준용어 **종결 검사**(`단어1(_단어n)_표준도메인` 형식, 표준도메인으로 끝나는지) — `CREATE TABLE`뿐 아니라 `ALTER TABLE ADD COLUMN` 추가 컬럼도 포함(2026-06-12 lat/lng 사각지대 사고). 약어가 `std_dic`·`std_dom`에 실제 등록됐는지 DB 조회로 역검증
+  - 전수조사 쿼리(분기 1회 — Hook은 신규 DDL만 막으므로 누적분은 DB 스캔):
+    ```sql
+    SELECT c.table_name, c.column_name, c.data_type
+    FROM information_schema.columns c
+    JOIN information_schema.tables t
+      ON t.table_schema='public' AND t.table_name=c.table_name AND t.table_type='BASE TABLE'
+    WHERE c.table_schema='public'
+      AND c.column_name !~ '_(id|uid|nm|cd|yn|dtm|dt|no|cnt|amt|sz|ord|url|desc|txt|cont|key|pi|pct|seq|tp|sts|emoji|tag|crd|val)$'
+      AND c.column_name NOT IN ('regr_id','reg_dtm','modr_id','mod_dtm','del_yn','del_dtm','id')
+    ORDER BY c.table_name, c.column_name;
+    ```
+    쿼리의 도메인 약어 화이트리스트는 `.claude/hooks/da-ddl-guard.mjs`의 `DOMAIN_SUFFIXES`와 반드시 동일 유지(한쪽만 갱신 금지)
+  - 재발방지 교훈(2026-06-12): `DA-APPROVED` 주석은 "위반 선례 준수"라는 순환 논리로 자가 부여될 수 있음 — Hook은 사유 타당성을 못 보므로 정기 전수조사로만 보완 가능. 선례가 표준 위반이면 그 선례 준수는 무효
+  - 대규모 심층 감사는 da-governance-expert에 위임. 참고: `docs/da/references/DQ시스템기능.xls`
 - **경계면 교차 비교**: "존재 확인"이 아니라 산출물 간 경계면을 교차 비교한다 — DDL의 컬럼 ↔ 이행 SQL의 컬럼 ↔ 모델 설계서의 속성이 서로 일치하는지, 코드(TS)의 참조 컬럼명과 DDL이 일치하는지
 - **점진적 QA**: 팀 전체 완성 후 1회가 아니라 각 산출물 완성 직후 점검한다 — 늦게 발견된 P1은 재작업 비용이 크다
 - **직전 보고서 대조**: `docs/da/reports/`의 이전 보고서를 읽고 반복 위반·퇴행 여부를 명시한다

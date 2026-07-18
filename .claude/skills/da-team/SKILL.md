@@ -23,9 +23,9 @@ DA팀 5인(da-leader·da-standards·da-modeler·da-quality·da-migration)을 조
 | 팀원 | 에이전트 타입 | 역할 | 스킬 | 주 출력 |
 |------|-------------|------|------|---------|
 | leader | da-leader | 총괄·작업 분해·통합·최종 승인 | - | `{NN}_leader_review.md` |
-| standards | da-standards | 표준사전·명명 검증·등재안 | da-naming-rules | `{NN}_standards_naming-review.md` |
-| modeler | da-modeler | 논리/물리 모델·DDL 초안 | da-naming-rules(참조) | `{NN}_modeler_model.md`, `{NN}_modeler_ddl.sql` |
-| quality | da-quality | P1/P2/P3 게이트·전수조사·보고서 | da-qa-checklist | `{NN}_quality_gate.md`, `docs/da/reports/*` |
+| standards | da-standards | 표준사전·명명 검증·등재안 | (명명규칙 내재화) | `{NN}_standards_naming-review.md` |
+| modeler | da-modeler | 논리/물리 모델·DDL 초안 | (da-standards 검증 의존) | `{NN}_modeler_model.md`, `{NN}_modeler_ddl.sql` |
+| quality | da-quality | P1/P2/P3 게이트·전수조사·보고서 | (점검 절차 내재화) | `{NN}_quality_gate.md`, `docs/da/reports/*` |
 | migration | da-migration | 이행 계획·이행 SQL·검증 쿼리 | - | `{NN}_migration_plan.md`, `{NN}_migration_ddl.sql` |
 
 작업 디렉토리: `docs/da/_workspace/{YYYYMMDD}_{잡슬러그}/` — **잡별 하위 디렉토리 필수** (파일명 `{NN}_{팀원}_{산출물}.{ext}`, NN은 Phase 순번). 다중 세션이 병렬로 DA 작업을 수행하므로 `_workspace/` 직속 파일·타 잡 디렉토리는 절대 건드리지 않는다 (2026-07-10 1차 실행에서 타 세션 전수조사와 충돌 회피 확인). Phase 0의 존재 검사도 해당 잡 디렉토리 기준으로 수행한다.
