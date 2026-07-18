@@ -92,13 +92,17 @@ export async function POST(request: NextRequest) {
     return apiError('CHAT_ROOM_NAME_REQUIRED', 400)
   }
 
-  // 무료로 개설되는 모든 방(생성료 0 Bean — 무료 테마·구독 혜택 무료 생성 포함) = 7일 고정·연장 불가.
-  // Bean 결제로 만든 방만 영구(클라이언트 지정 만료일 또는 DB 기본 9999). 기간 선택은 결제 방에만 허용.
+  // 유효기간 재개방 (2026-07-18 마스터 지시): 무료 방 7일 강제 해제 — 클라이언트 지정 만료일 수용.
+  // null = 무기한(DB 기본). 형식 오류·과거 시각은 거부 (클라이언트 우회 방지).
   const isFreeRoom = createFeeBean === 0
-  const FREE_ROOM_TTL_MS = 7 * 24 * 60 * 60 * 1000
-  const finalExprDtm = isFreeRoom
-    ? new Date(Date.now() + FREE_ROOM_TTL_MS).toISOString()
-    : (expr_dtm ?? null)
+  let finalExprDtm: string | null = null
+  if (expr_dtm != null) {
+    const exprDate = new Date(expr_dtm)
+    if (isNaN(exprDate.getTime()) || exprDate.getTime() <= Date.now()) {
+      return apiError('BAD_REQUEST_BODY', 400)
+    }
+    finalExprDtm = exprDate.toISOString()
+  }
 
   // 무료로 개설되는 방은 무조건 공개 + 최대 정원 10명으로 강제 (클라이언트 우회 방지).
   // Bean 결제로 만든 방만 비공개·정원 확대 가능.
