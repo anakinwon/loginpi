@@ -2892,8 +2892,6 @@
       "themeStep": "Choose a theme for your café",
       "total": "Total",
       "unlimited": "Unlimited",
-      "startDate": "Start Date",
-      "endDate": "End Date",
       "validity": "Validity Period",
       "validityDays": "{n} days",
       "visibility": "Visibility"

@@ -5,7 +5,10 @@ import { useRouter, Link } from '@/i18n/navigation'
 import { toast } from 'sonner'
 import { usePiAuth } from '@/components/pi-auth-provider'
 import { piFetch } from '@/lib/pi-fetch'
-import { useApiErrorMessage, type ApiErrorPayload } from '@/hooks/use-api-error'
+import {
+  useApiErrorMessage,
+  type ApiErrorPayload,
+} from '@/hooks/use-api-error'
 import { BeanIcon } from '@/components/ui/bean-icon'
 import { getCurrentPosition } from '@/lib/geo'
 import {
@@ -31,20 +34,14 @@ type PayStatus =
   | 'cancelled'
 type RoomType = 'G' | 'E'
 
-// 카페·이벤트방 생성 고정 정책 (마스터 지시):
-//   공개 · 정원 10 · 이벤트 입장료 무료 · 이벤트 종료 7일.
-// 유효기간(카페)은 2026-07-18 마스터 지시로 재개방 — 캘린더 시작일~종료일 선택(기본 오늘~+7일).
-// ⚠️ msg_room에 시작일 컬럼이 없어 서버 전송은 종료일(expr_dtm)만 — 시작일은 기간 시각화용.
+// 모든 카페·이벤트방 생성 고정 정책 (마스터 지시):
+//   공개 · 정원 10 · 유효기간(카페)/종료(이벤트) 7일 · 이벤트 입장료 무료.
+// 사용자 선택 불가 — UI는 안내만, 전송값은 아래 상수로 강제.
 const FIXED_MAX_MBR = 10
 const FIXED_VALID_DAYS = 7
-// 생성 시점 +7일 ISO — 이벤트 종료(entry_expire_dtm) 고정값
+// 생성 시점 +7일 ISO — 카페 만료(expr_dtm) · 이벤트 종료(entry_expire_dtm) 공통
 function plus7dIso(): string {
   return new Date(Date.now() + FIXED_VALID_DAYS * 86400000).toISOString()
-}
-// 로컬 yyyy-MM-dd — <input type="date"> 값 형식
-function ymd(d: Date): string {
-  const p = (n: number) => String(n).padStart(2, '0')
-  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
 }
 
 function StepBar({ current, total = 3 }: { current: Step; total?: number }) {
@@ -84,12 +81,6 @@ export function GroupRoomCreator() {
   const [canCreateRoomFree, setCanCreateRoomFree] = useState(false)
   // TASK-063: 이벤트방 모드 (Business 폐지 — 구독자 무료·비구독자 Bean 생성료)
   const [roomType, setRoomType] = useState<RoomType>('G')
-  // 카페 유효기간 — 네이티브 date input (기본 오늘~+7일), 2026-07-18 재개방
-  const [startDt, setStartDt] = useState(() => ymd(new Date()))
-  const [endDt, setEndDt] = useState(() =>
-    ymd(new Date(Date.now() + 7 * 86400000)),
-  )
-  const [noExpiry, setNoExpiry] = useState(false)
   const [gpsCoords, setGpsCoords] = useState<{
     lat: number
     lng: number
@@ -107,9 +98,6 @@ export function GroupRoomCreator() {
     setPayError(null)
     setPayErrorCode(null)
     setRoomType('G')
-    setStartDt(ymd(new Date()))
-    setEndDt(ymd(new Date(Date.now() + 7 * 86400000)))
-    setNoExpiry(false)
     setGpsCoords(null)
 
     // LBS 동의자이면 카페 위치 자동 수집 (서버가 동의 여부 재검증 후 저장)
@@ -243,14 +231,10 @@ export function GroupRoomCreator() {
           theme_cd: selectedTheme.theme_cd,
           room_nm: roomNm,
           room_desc: roomDesc || null,
-          // 고정 정책 — 공개 · 정원 10. 유효기간은 캘린더 종료일(무기한=null)
+          // 고정 정책 — 공개 · 정원 10 · 유효기간 7일 (사용자 선택 불가)
           is_public_yn: 'Y',
           max_mbr_cnt: FIXED_MAX_MBR,
-          // 종료일 그 날의 끝(로컬) — 오프셋 없는 ISO 문자열은 로컬 시각으로 파싱됨
-          expr_dtm:
-            noExpiry || !endDt
-              ? null
-              : new Date(`${endDt}T23:59:59.999`).toISOString(),
+          expr_dtm: plus7dIso(),
           lat: gpsCoords?.lat,
           lng: gpsCoords?.lng,
         }),
@@ -289,8 +273,6 @@ export function GroupRoomCreator() {
     selectedTheme,
     roomNm,
     roomDesc,
-    endDt,
-    noExpiry,
     gpsCoords,
     router,
     t,
@@ -364,9 +346,7 @@ export function GroupRoomCreator() {
 
   // 카페 만들기는 Pi Browser에서 로그인한 사용자만 가능 (비로그인·일반 브라우저는 버튼 숨김)
   // 생성·소유권이 걸려 있어 Pi 로그인 필수 (요금은 Bean 차감)
-  // 단, 로컬 개발(NODE_ENV=development)에서는 테스트를 위해 항상 노출 — 운영 빌드엔 미적용
-  const isLocalDev = process.env.NODE_ENV === 'development'
-  if (!isLocalDev && (!isInPiBrowser || !user)) return null
+  if (!isInPiBrowser || !user) return null
 
   return (
     <>
@@ -541,66 +521,15 @@ export function GroupRoomCreator() {
                       <span className="font-medium">{t('freeEntry')}</span>
                     </div>
                   )}
-                  {roomType === 'E' && (
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">
-                        {t('endTimeLabel')}
-                      </span>
-                      <span className="font-medium">
-                        {t('validityDays', { n: FIXED_VALID_DAYS })}
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                {/* 카페 유효기간 — 네이티브 date input 시작일~종료일 (2026-07-18 재개방)
-                    시작일은 msg_room에 저장 컬럼이 없어 기간 표시용, 서버 전송은 종료일(expr_dtm)만 */}
-                {roomType === 'G' && (
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm font-medium">{t('validity')}</p>
-                      <button
-                        type="button"
-                        onClick={() => setNoExpiry((v) => !v)}
-                        className={`rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors ${
-                          noExpiry
-                            ? 'border-primary bg-primary/10 text-primary'
-                            : 'hover:bg-muted'
-                        }`}
-                      >
-                        {t('unlimited')}
-                      </button>
-                    </div>
-                    {!noExpiry && (
-                      <div className="grid grid-cols-2 gap-2">
-                        <label className="block">
-                          <span className="text-muted-foreground mb-1 block text-xs">
-                            {t('startDate')}
-                          </span>
-                          <input
-                            type="date"
-                            value={startDt}
-                            min={ymd(new Date())}
-                            onChange={(e) => setStartDt(e.target.value)}
-                            className="bg-background focus:ring-ring w-full rounded-xl border px-3 py-2 text-sm outline-none focus:ring-2"
-                          />
-                        </label>
-                        <label className="block">
-                          <span className="text-muted-foreground mb-1 block text-xs">
-                            {t('endDate')}
-                          </span>
-                          <input
-                            type="date"
-                            value={endDt}
-                            min={startDt}
-                            onChange={(e) => setEndDt(e.target.value)}
-                            className="bg-background focus:ring-ring w-full rounded-xl border px-3 py-2 text-sm outline-none focus:ring-2"
-                          />
-                        </label>
-                      </div>
-                    )}
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">
+                      {roomType === 'E' ? t('endTimeLabel') : t('validity')}
+                    </span>
+                    <span className="font-medium">
+                      {t('validityDays', { n: FIXED_VALID_DAYS })}
+                    </span>
                   </div>
-                )}
+                </div>
 
                 <div className="flex gap-2">
                   <button
@@ -634,9 +563,7 @@ export function GroupRoomCreator() {
                   ) : (
                     <button
                       onClick={createFreeRoom}
-                      disabled={
-                        isBusy || (!noExpiry && (!endDt || endDt < startDt))
-                      }
+                      disabled={isBusy}
                       className="bg-primary text-primary-foreground flex-1 rounded-xl px-4 py-2 text-sm font-medium disabled:opacity-40"
                     >
                       {isBusy ? (

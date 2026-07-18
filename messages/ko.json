@@ -1407,8 +1407,6 @@
       "maxMembers": "최대 정원",
       "validity": "유효기간",
       "unlimited": "무기한",
-      "startDate": "시작일자",
-      "endDate": "종료일자",
       "entryFee": "입장료 (참가자 Bean 소진)",
       "endTimeLabel": "이벤트 종료 시각 *",
       "endTimeHint": "종료 시각이 지나면 참가자(GUEST) 멤버십이 자동 만료됩니다",
