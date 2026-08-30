@@ -46,6 +46,36 @@
       "command": "cmd",
       "args": ["/c", "npx", "-y", "@modelcontextprotocol/server-sequential-thinking"]
     },
+    "gemini": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "gemini-mcp-tool"]
+    },
+    "cloudinary": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "--package",
+        "@cloudinary/asset-management",
+        "--",
+        "mcp",
+        "start"
+      ],
+      "env": {
+        "CLOUDINARY_URL": "${CLOUDINARY_URL}"
+      }
+    },
+    "filesystem": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "C:\\Users\\anaki\\workspace\\loginpi"
+      ]
+    },
     "supabase": {
       "type": "http",
       "url": "https://mcp.supabase.com/mcp?project_ref=hpcvltlqqjgexpwzhzig&features=docs%2Caccount%2Cdatabase%2Cdebugging%2Cdevelopment%2Cfunctions%2Cbranching%2Cstorage"
