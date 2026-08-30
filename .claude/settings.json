@@ -35,4 +35,9 @@
       }
     ]
   }
+   , "outputStyle": "Explanatory"
+   , "statusLine": {
+       "type": "command"
+     , "command": "bash C:/Users/anaki/workspace/dr-project/.claude/statusline.sh"
+   }
 }
