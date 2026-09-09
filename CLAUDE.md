@@ -292,3 +292,16 @@ src/
 | 2026-07-10 | FK 정책 낡은 기술 정정 ("FK 설계 없음" → 현행 FK 유지·단계 전환 정책) | agents/da-governance-expert.md | 2026-07-01 사고 반영 드리프트 수정 |
 | 2026-07-10 | 실전 1차 실행 완료(sys_cfg_chg_hist 설계→sql/176~178 확정) + 워크스페이스 잡별 하위 디렉토리 규칙·유휴/상충 판정 지침 추가 | skills/da-team | 타 세션 전수조사와 _workspace 충돌·완료 메시지 유실·읽기 경합 3건 실전 교훈 |
 | 2026-07-18 | 스킬 da-naming-rules→da-standards, da-qa-checklist→da-quality 에이전트에 내재화 후 스킬 삭제. references 원문은 docs/da/references/로 이동 | agents/da-standards·da-quality, skills/da-team, docs/da/README | 마스터 지시 — 스킬·에이전트 이중 유지보수 제거 |
+
+---
+
+## 하네스: task-observer (스킬 관찰·개선)
+
+**목표:** 작업 중 발생한 교정·판단·마찰을 포착해 재사용 가능한 스킬 개선안으로 축적한다.
+
+**트리거 (필수):** **매 세션 첫 도구 호출 전, 그리고 계획을 세우거나 제안하기 전에** `task-observer` 스킬을 호출하라. 도구를 한 번이라도 쓸 턴이면 아무리 단순해 보여도 해당한다. 이 스킬은 description 매칭만으로는 활성화가 보장되지 않으므로 이 지시문이 유일한 강제 수단이다.
+
+**관찰 로그 위치:** `~/.claude/projects/C--Users-anaki-workspace-loginpi/skill-observations/`
+(cwd가 아니라 세션을 가로질러 유지되는 **고정 절대경로**를 쓴다. git worktree 등 임시 체크아웃 안이면 안 된다.)
+
+**출처:** `rebelytics/one-skill-to-rule-them-all` (CC BY 4.0) — 실체는 `.agents/skills/task-observer/`

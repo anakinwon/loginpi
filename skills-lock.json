@@ -211,6 +211,12 @@
       "skillPath": "skills/stitch-skill/SKILL.md",
       "computedHash": "c96b580192b34167efa01f460bbc669ff4315cf97f3cf6ff85ded8029aa720b8"
     },
+    "task-observer": {
+      "source": "rebelytics/one-skill-to-rule-them-all",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "518bdbfb2071248f1339f38190a74431efaea6fbb659fd5e17c75bcbce91add6"
+    },
     "tdd": {
       "source": "mattpocock/skills",
       "sourceType": "github",
