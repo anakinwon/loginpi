@@ -2,7 +2,10 @@
   "env": {
     "MAX_THINKING_TOKENS": "10000",
     "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "90",
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "CLAUDE_FLOW_V3_ENABLED": "true",
+    "CLAUDE_FLOW_HOOKS_ENABLED": "true",
+    "CLAUDE_FLOW_ENABLE_NATIVE_BRIDGE_ON_WINDOWS": "1"
   },
   "hooks": {
     "PreToolUse": [
@@ -34,10 +37,22 @@
         ]
       }
     ]
+  },
+  "outputStyle": "Explanatory",
+  "statusLine": {
+    "type": "command",
+    "command": "bash C:/Users/anaki/workspace/loginpi/.claude/statusline.sh"
+  },
+  "permissions": {
+    "allow": [
+      "Bash",
+      "Bash(npx @claude-flow*)",
+      "Bash(npx claude-flow*)",
+      "Bash(node .claude/*)",
+      "mcp__claude-flow__*"
+    ],
+    "deny": [],
+    "ask": [],
+    "defaultMode": "bypassPermissions"
   }
-   , "outputStyle": "Explanatory"
-   , "statusLine": {
-       "type": "command"
-     , "command": "bash C:/Users/anaki/workspace/dr-project/.claude/statusline.sh"
-   }
 }

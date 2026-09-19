@@ -83,6 +83,20 @@
     "shadcn": {
       "command": "npx",
       "args": ["shadcn@latest", "mcp"]
+    },
+    "ruflo": {
+      "command": "cmd",
+      "args": ["/c", "ruflo", "mcp", "start"],
+      "env": {
+        "CLAUDE_FLOW_ENABLE_NATIVE_BRIDGE_ON_WINDOWS": "1"
+      }
+    },
+    "ecc-memory-vault": {
+      "command": "cmd",
+      "args": ["/c", "ecc-memory-mcp"],
+      "env": {
+        "ECC_MEMORY_HARNESS": "claude"
+      }
     }
   }
 }
