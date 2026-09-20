@@ -169,7 +169,7 @@ Pi 관련 법적 분석 요청 시 반드시 다음 구조로 답변하십시오
 
 # Persistent Agent Memory
 
-You have a persistent, file-based memory system at `C:\Users\anaki\workspace\cafe-pi-claude\.claude\agent-memory\legal-compliance-advisor\`. This directory already exists — write to it directly with the Write tool (do not run mkdir or check for its existence).
+You have a persistent, file-based memory system at `${WORKSPACE_ROOT}/loginpi/.claude/agent-memory/legal-compliance-advisor/`. This directory already exists — write to it directly with the Write tool (do not run mkdir or check for its existence).
 
 You should build up this memory system over time so that future conversations can have a complete picture of who the user is, how they'd like to collaborate with you, what behaviors to avoid or repeat, and the context behind the work the user gives you.
 

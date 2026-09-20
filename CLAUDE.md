@@ -316,3 +316,9 @@ src/
 4. **루핑 검증** — 결과가 최상인지 별도 패스(`verifier`/`critic`)로 검토하고 통과할 때까지 반복(`ralph` 패턴). 자기 승인 금지. 안전 상한(기본 10회) 도달 시 현황과 막힌 원인을 보고하고 지시를 받는다.
 
 **해석 확정(마스터 승인 2026-09-20):** ① "최고 성능 + 최저 토큰"은 작업 크기로 조정 — 단순 작업은 직접 수행, 다단계·다파일·조사·검증은 위임. ② "무한 반복"은 verifier 통과까지 **안전 상한 10회** 내 반복 — 상한 도달 시 현황·막힌 원인을 보고하고 지시를 받는다. 전역 사본: `~/.claude/CLAUDE.md`의 `USER:START~END` 구간(OMC 관리 구역 밖).
+
+## 워크스페이스 루트 전역변수 + 작업 이력 로그 (2026-09-20 마스터 지시)
+
+- **`WORKSPACE_ROOT` = `C:/Users/anaki/workspace`** — 정의처 2곳: Windows 사용자 환경변수(`setx`, 새 프로세스부터 적용) + `.claude/settings.json`의 `env`. 프로젝트 루트는 `$WORKSPACE_ROOT/loginpi`.
+- **절대경로 하드코딩 금지** — 참조 형식: bash/훅/statusLine `$WORKSPACE_ROOT`, `.mcp.json` 등 Claude JSON `${WORKSPACE_ROOT}`(공식 확장 지원), Node `process.env.WORKSPACE_ROOT`, 에이전트 프롬프트(.md) `${WORKSPACE_ROOT}/loginpi/...`(에이전트가 이 정의로 해석). 구 폴더명 `cafe-pi-claude` 경로는 전부 사문 — `loginpi`로 교정 완료.
+- **작업 이력 로그**: `work-history/YYYY/MM/YYYY-MM-DD.log`(사람용) + `.jsonl`(통계용, 턴당 1레코드) — `.claude/hooks/work-history-logger.mjs`가 Stop·SessionEnd 훅에서 세션 기록으로부터 자동 생성. **통계 파일·차트 보고서** (기간 4종 — 일별 `YYYY/MM/<날짜>`, 주별 `YYYY/weekly/<YYYY-Www>`(ISO 월~일), 월별 `YYYY/MM/<YYYY-MM>`, 년도별 `YYYY/<YYYY>`, 각각 이전 기간 대비 증감 포함): `pnpm work:report [--period day|week|month|year|all] [--date YYYY-MM-DD]` → `work-statistics/…/<stem>.{summary,tokens,usage,performance}.{json,csv,md}` + `turns.csv` + `report.html`(①토큰 ②agent/mcp/skill/plugin/hook ③성능 섹션) + 스크린샷 `charts.png`(agent-browser). 터미널 통계: `pnpm work:stats --type summary|tokens|usage|performance|all` [--month 2026-09] [--by category|tool|day|hour|weekday|session|skill|mcp|agent] [--csv] [--json] [--list]`. 카테고리는 요청문 키워드로 자동 판정(GIT·DEPLOY·INSTALL·FIX·TEST·DATA·REFACTOR·CONFIG·DOCS·FEATURE·QUERY·OTHER), 요청문에 `#cat:NAME`으로 강제 가능.

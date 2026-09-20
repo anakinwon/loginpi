@@ -4,8 +4,9 @@
  * 팔레트: 딥 퍼플(인디고) + Pi Coin 골드
  */
 const pptxgen = require('pptxgenjs')
-const OUT =
-  'C:/Users/anaki/workspace/cafe-pi-claude/docs/제품설명서_202060615.pptx'
+const ROOT = process.env.WORKSPACE_ROOT
+if (!ROOT) throw new Error('WORKSPACE_ROOT 환경변수가 없습니다 — 예: setx WORKSPACE_ROOT C:/Users/<user>/workspace')
+const OUT = `${ROOT}/loginpi/docs/제품설명서_202060615.pptx`
 
 const pres = new pptxgen()
 pres.defineLayout({ name: 'W', width: 13.333, height: 7.5 })

@@ -29,7 +29,8 @@ const FINDINGS = {
 
 phase('점검')
 
-const COMMON = `작업 디렉토리: C:\\Users\\anaki\\workspace\\cafe-pi-claude (Next.js 16 + Supabase, Pi Network 앱 cafe.pi).
+const WORKSPACE_ROOT = globalThis.process?.env?.WORKSPACE_ROOT ?? '$WORKSPACE_ROOT'   // 전역변수 (CLAUDE.md 정의)
+const COMMON = `작업 디렉토리: ${WORKSPACE_ROOT}/loginpi (Next.js 16 + Supabase, Pi Network 앱 cafe.pi).
 운영 URL: https://cafepi.vercel.app · staging: https://loginpi.vercel.app.
 staging DB 접근: .env.local의 NEXT_PUBLIC_SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY로 @supabase/supabase-js 사용(프로젝트 루트에서 node 스크립트 실행 — ESM .mjs, 프로젝트 node_modules 사용. 임시 스크립트는 프로젝트 루트에 tmp-*.mjs로 만들고 실행 후 삭제).
 ⛔절대 금지: 운영/staging에 테스트 데이터 생성·코드 수정·커밋. 조사(읽기)만 수행.

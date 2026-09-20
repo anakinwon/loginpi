@@ -11,7 +11,9 @@
     "lint": "eslint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "build:whitepaper": "node .whitepaper-build/build.js"
+    "build:whitepaper": "node .whitepaper-build/build.js",
+    "work:stats": "node scripts/work-history-stats.mjs",
+    "work:report": "node scripts/work-history-report.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.101.0",

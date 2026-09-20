@@ -3,7 +3,9 @@
  * 팔레트: 딥퍼플(인디고) + Pi 골드 + 환경 시맨틱컬러(DEV=블루/STG=앰버/PROD=퍼플)
  */
 const pptxgen = require('pptxgenjs')
-const OUT = 'C:/Users/anaki/workspace/cafe-pi-claude/docs/Infrastructure.pptx'
+const ROOT = process.env.WORKSPACE_ROOT
+if (!ROOT) throw new Error('WORKSPACE_ROOT 환경변수가 없습니다 — 예: setx WORKSPACE_ROOT C:/Users/<user>/workspace')
+const OUT = `${ROOT}/loginpi/docs/Infrastructure.pptx`
 
 const pres = new pptxgen()
 pres.defineLayout({ name: 'W', width: 13.333, height: 7.5 })

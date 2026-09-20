@@ -5,7 +5,8 @@
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
     "CLAUDE_FLOW_V3_ENABLED": "true",
     "CLAUDE_FLOW_HOOKS_ENABLED": "true",
-    "CLAUDE_FLOW_ENABLE_NATIVE_BRIDGE_ON_WINDOWS": "1"
+    "CLAUDE_FLOW_ENABLE_NATIVE_BRIDGE_ON_WINDOWS": "1",
+    "WORKSPACE_ROOT": "C:/Users/anaki/workspace"
   },
   "hooks": {
     "PreToolUse": [
@@ -36,12 +37,34 @@
           }
         ]
       }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/work-history-logger.mjs\"",
+            "timeout": 20
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/work-history-logger.mjs\"",
+            "timeout": 20
+          }
+        ]
+      }
     ]
   },
   "outputStyle": "Explanatory",
   "statusLine": {
     "type": "command",
-    "command": "bash C:/Users/anaki/workspace/loginpi/.claude/statusline.sh"
+    "command": "bash $WORKSPACE_ROOT/loginpi/.claude/statusline.sh"
   },
   "permissions": {
     "allow": [

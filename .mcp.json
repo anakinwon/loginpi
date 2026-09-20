@@ -28,7 +28,7 @@
         "--context",
         "ide-assistant",
         "--project",
-        "C:\\Users\\anaki\\workspace\\loginpi"
+        "${WORKSPACE_ROOT}/loginpi"
       ]
     },
     "github": {
@@ -73,7 +73,7 @@
         "npx",
         "-y",
         "@modelcontextprotocol/server-filesystem",
-        "C:\\Users\\anaki\\workspace\\loginpi"
+        "${WORKSPACE_ROOT}/loginpi"
       ]
     },
     "supabase": {

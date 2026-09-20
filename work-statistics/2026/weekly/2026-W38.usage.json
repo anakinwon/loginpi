@@ -1,0 +1,171 @@
+{
+  "range": {
+    "from": "2026-09-14",
+    "to": "2026-09-20"
+  },
+  "generated_at": "2026-09-20 09:27:54",
+  "items": [
+    {
+      "type": "hook",
+      "name": "PreToolUse:PreToolUse",
+      "kind": "hook",
+      "plugin": null,
+      "turns": 19,
+      "calls": 222,
+      "errors": 0,
+      "avg_ms": null,
+      "total_ms": 0
+    },
+    {
+      "type": "hook",
+      "name": "PostToolUse:PostToolUse",
+      "kind": "hook",
+      "plugin": null,
+      "turns": 19,
+      "calls": 161,
+      "errors": 0,
+      "avg_ms": null,
+      "total_ms": 0
+    },
+    {
+      "type": "hook",
+      "name": "Stop:Stop",
+      "kind": "hook",
+      "plugin": null,
+      "turns": 14,
+      "calls": 32,
+      "errors": 0,
+      "avg_ms": null,
+      "total_ms": 0
+    },
+    {
+      "type": "hook",
+      "name": "UserPromptSubmit:UserPromptSubmit",
+      "kind": "hook",
+      "plugin": null,
+      "turns": 10,
+      "calls": 10,
+      "errors": 0,
+      "avg_ms": null,
+      "total_ms": 0
+    },
+    {
+      "type": "hook",
+      "name": "PostToolUseFailure:PostToolUseFailure",
+      "kind": "hook",
+      "plugin": null,
+      "turns": 2,
+      "calls": 6,
+      "errors": 0,
+      "avg_ms": null,
+      "total_ms": 0
+    },
+    {
+      "type": "mcp",
+      "name": "gemini",
+      "kind": "m",
+      "plugin": null,
+      "turns": 2,
+      "calls": 2,
+      "errors": 0,
+      "avg_ms": 475,
+      "total_ms": 949
+    },
+    {
+      "type": "skill",
+      "name": "task-observer",
+      "kind": "s",
+      "plugin": null,
+      "turns": 1,
+      "calls": 1,
+      "errors": 0,
+      "avg_ms": null,
+      "total_ms": 0
+    },
+    {
+      "type": "skill",
+      "name": "git-commit",
+      "kind": "s",
+      "plugin": null,
+      "turns": 1,
+      "calls": 1,
+      "errors": 0,
+      "avg_ms": null,
+      "total_ms": 0
+    },
+    {
+      "type": "skill",
+      "name": "dataviz",
+      "kind": "s",
+      "plugin": null,
+      "turns": 1,
+      "calls": 1,
+      "errors": 0,
+      "avg_ms": null,
+      "total_ms": 0
+    }
+  ],
+  "byType": [
+    {
+      "type": "hook",
+      "distinct": 5,
+      "calls": 431,
+      "turns_using": 21
+    },
+    {
+      "type": "mcp",
+      "distinct": 1,
+      "calls": 2,
+      "turns_using": 2
+    },
+    {
+      "type": "skill",
+      "distinct": 3,
+      "calls": 3,
+      "turns_using": 3
+    }
+  ],
+  "byKind": [
+    {
+      "kind": "m",
+      "label": "mcp",
+      "distinct": 1,
+      "calls": 2
+    },
+    {
+      "kind": "s",
+      "label": "skill",
+      "distinct": 3,
+      "calls": 3
+    }
+  ],
+  "hooksByEvent": [
+    {
+      "event": "PreToolUse",
+      "distinct": 1,
+      "runs": 222
+    },
+    {
+      "event": "PostToolUse",
+      "distinct": 1,
+      "runs": 161
+    },
+    {
+      "event": "Stop",
+      "distinct": 1,
+      "runs": 32
+    },
+    {
+      "event": "UserPromptSubmit",
+      "distinct": 1,
+      "runs": 10
+    },
+    {
+      "event": "PostToolUseFailure",
+      "distinct": 1,
+      "runs": 6
+    }
+  ],
+  "hook_ms_total": 16275,
+  "hook_runs_total": 81
+}

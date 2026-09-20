@@ -1,0 +1,10 @@
+type,name,kind,plugin,turns,calls,errors,avg_ms,total_ms
+hook,PreToolUse:PreToolUse,hook,,19,222,0,,0
+hook,PostToolUse:PostToolUse,hook,,19,161,0,,0
+hook,Stop:Stop,hook,,14,32,0,,0
+hook,UserPromptSubmit:UserPromptSubmit,hook,,10,10,0,,0
+hook,PostToolUseFailure:PostToolUseFailure,hook,,2,6,0,,0
+mcp,gemini,m,,2,2,0,475,949
+skill,task-observer,s,,1,1,0,,0
+skill,git-commit,s,,1,1,0,,0
+skill,dataviz,s,,1,1,0,,0
