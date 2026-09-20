@@ -19,8 +19,9 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { kfmt, ms2, pct, usd, csvSafe, CATEGORY_KEYS } from './work-history-core.mjs'
-export { kfmt, ms2, pct, usd }
+import { kfmt, ms2, pct, usd, csvSafe, CATEGORY_KEYS, METRICS, KPI_TREE, TIER_LABEL, QUESTIONS, UNMEASURABLE, evaluateSlo } from './work-history-core.mjs'
+export { kfmt, ms2, pct, usd, METRICS, KPI_TREE, TIER_LABEL, QUESTIONS, UNMEASURABLE }
+export const fmtMetric = (k, v) => { if (v == null) return '-'; const u = METRICS[k]?.unit; if (u === 'USD') return usd(v); if (u === 'ms') return ms2(v); if (u === '비율') return pct(v, 1); if (u === '배') return `${v}배`; if (u === '자' || u === '건' || u === '개' || u === '회') return typeof v === 'number' ? v.toLocaleString() : String(v); return String(v) }
 
 export const PROJECT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 export const LOG_ROOT = process.env.WORK_HISTORY_DIR || path.join(PROJECT, 'work-history')
@@ -123,10 +124,23 @@ export function aggregate(rows) {
   const timed = rows.filter(isTimed); const t = tokenSum(rows); const n = requestsOf(rows)
   const idle = rows.map(r => r.idle_ms).filter(x => x != null); const idleSum = idle.reduce((a, b) => a + b, 0); const el = sum(timed, r => r.elapsed_ms)
   const costAgents = +agentSum(rows, r => r.cost_agents_usd).toFixed(4)
-  const total = { turns: rows.length, requests: n, n_timed: timed.length, elapsed_ms: el, avg_elapsed_ms: avg(timed, r => r.elapsed_ms), p50_elapsed_ms: quantile(timed.map(r => r.elapsed_ms), 0.5), p90_elapsed_ms: quantile(timed.map(r => r.elapsed_ms), 0.9), ttft_p50_ms: quantile(timed.map(r => r.ttft_ms).filter(x => x != null), 0.5), ttft_p90_ms: quantile(timed.map(r => r.ttft_ms).filter(x => x != null), 0.9), idle_ms: idleSum, active_ratio: el + idleSum ? +(el / (el + idleSum)).toFixed(3) : null, tools: sum(rows, r => r.tools_total), errors: sum(rows, r => r.tool_errors), days: new Set(rows.map(r => r.date)).size, sessions: new Set(rows.map(r => r.session)).size, projects: new Set(rows.map(r => r.project).filter(Boolean)).size, superseded: rows.filter(r => r.superseded).length, incomplete: rows.filter(r => r.incomplete).length, absorbed: rows.filter(r => r.absorbed).length, interrupted: rows.filter(r => r.interrupted).length, res_chars: sum(rows, r => r.res_chars), req_chars: sum(rows, r => r.req_chars), output: t.output, cost_usd: t.cost_usd, cost_agents_usd: costAgents, cost_total_usd: t.cost_usd != null ? +(t.cost_usd + costAgents).toFixed(4) : null, cost_per_request: t.cost_usd != null && n ? +((t.cost_usd + costAgents) / n).toFixed(4) : null, agents: agentSum(rows, r => (r.agents_detail || []).length), agent_wall_ms: agentSum(rows, r => r.agent_wall_ms) }
+  const p1 = rows.filter(r => r.part === 1 || r.part == null)
+  const delivered = Math.max(0, n - rows.filter(r => r.superseded).length - rows.filter(r => r.interrupted).length - p1.filter((r, i) => p1[i + 1] && p1[i + 1].correction).length)
+  const costTotal = t.cost_usd != null ? +(t.cost_usd + costAgents).toFixed(4) : null
+  const total = { turns: rows.length, requests: n, delivered_requests: delivered, n_timed: timed.length, elapsed_ms: el, avg_elapsed_ms: avg(timed, r => r.elapsed_ms), p50_elapsed_ms: quantile(timed.map(r => r.elapsed_ms), 0.5), p90_elapsed_ms: quantile(timed.map(r => r.elapsed_ms), 0.9), elapsed_per_request: delivered ? Math.round(el / delivered) : null, ttft_p50_ms: quantile(timed.map(r => r.ttft_ms).filter(x => x != null), 0.5), ttft_p90_ms: quantile(timed.map(r => r.ttft_ms).filter(x => x != null), 0.9), idle_ms: idleSum, active_ratio: el + idleSum ? +(el / (el + idleSum)).toFixed(3) : null, tools: sum(rows, r => r.tools_total), errors: sum(rows, r => r.tool_errors), error_rate: sum(rows, r => r.tools_total) ? +(sum(rows, r => r.tool_errors) / sum(rows, r => r.tools_total)).toFixed(4) : 0, days: new Set(rows.map(r => r.date)).size, sessions: new Set(rows.map(r => r.session)).size, projects: new Set(rows.map(r => r.project).filter(Boolean)).size, superseded: rows.filter(r => r.superseded).length, incomplete: rows.filter(r => r.incomplete).length, absorbed: rows.filter(r => r.absorbed).length, interrupted: rows.filter(r => r.interrupted).length, res_chars: sum(rows, r => r.res_chars), req_chars: sum(rows, r => r.req_chars), output: t.output, thinking_ratio: t.output ? +(t.thinking / t.output).toFixed(3) : null, api_per_request: n ? +(t.api_calls / n).toFixed(1) : null, cost_usd: t.cost_usd, cost_agents_usd: costAgents, cost_total_usd: costTotal, cost_per_request: costTotal != null && n ? +(costTotal / n).toFixed(4) : null, cost_per_delivered: costTotal != null && delivered ? +(costTotal / delivered).toFixed(4) : null, agent_cost_share: costTotal ? +(costAgents / costTotal).toFixed(3) : null, agents: agentSum(rows, r => (r.agents_detail || []).length), agent_wall_ms: agentSum(rows, r => r.agent_wall_ms), tool_share: el > 0 ? +(sum(timed, r => r.perf?.tool_ms) / el).toFixed(3) : null }
   const axes = {}; for (const k of AXIS_KEYS) axes[k] = sortAxis(k, groupTurns(rows, AXES[k]))
   axes.tool = groupSteps(rows)
-  return { total, axes, outcome: outcomeStats(rows) }
+  const outcome = outcomeStats(rows)
+  outcome.edit_settle_rate = n ? +(p1.filter(r => (r.files_changed || 0) > 0).length / n).toFixed(3) : null
+  return { total, axes, outcome }
+}
+/** KPI 트리 값 채우기 + SLO 경보 — total·outcome·tokens distribution 을 합쳐 레지스트리 키로 조회 */
+export function kpiView(rows) {
+  const agg = aggregate(rows); const tk = tokensStats(rows); const pf = perfStats(rows)
+  const vals = { ...agg.total, ...agg.outcome, ...tk.distribution, gen_tps: pf.total.gen_tps, out_tps: pf.total.out_tps, cache_hit: tk.total.cache_hit, agent_parallelism: (() => { const a = rows.filter(r => r.agent_parallelism != null); return a.length ? +(a.reduce((s, r) => s + r.agent_parallelism, 0) / a.length).toFixed(2) : null })(), tool_chars: sum(rows, r => r.perf?.tool_chars), tool_ms: sum(rows, r => r.perf?.tool_ms), hook_ms: sum(rows, r => r.perf?.hook_ms), turn_duration_ms: sum(rows, r => r.perf?.turn_duration_ms), ttft_ms: agg.total.ttft_p50_ms, cost_per_turn: tk.total.cost_per_turn }
+  const tree = {}
+  for (const [tier, keys] of Object.entries(KPI_TREE)) tree[tier] = keys.map(k => ({ metric: k, label: METRICS[k]?.label || k, value: vals[k] ?? null, unit: METRICS[k]?.unit || '', formula: METRICS[k]?.formula || '', population: METRICS[k]?.population || '' }))
+  return { values: vals, tree, alerts: evaluateSlo(vals), questions: QUESTIONS.map(q => ({ ...q, values: Object.fromEntries(q.metrics.map(m => [m, vals[m] ?? null])) })) }
 }
 
 // ── ① tokens ─────────────────────────────────────────────────────────────────
@@ -210,7 +224,7 @@ export function parseArgs(argv, spec) {
 }
 export const HELP_STATS = `work-history-stats — 작업 이력 통계
   --date YYYY-MM-DD | --month YYYY-MM | --from A --to B   기간 (기본 전체)
-  --type summary|tokens|usage|performance|all             통계 유형 (기본 summary)
+  --type summary|kpi|tokens|usage|performance|all         통계 유형 (기본 summary; kpi = KPI 트리·경보·질문 판정)
   --by ${AXIS_KEYS.join('|')}|tool   축 (기본 category)
   --csv | --json | --list | --help
 exit: 0 정상, 1 인자 오류, 2 레코드 없음`
@@ -220,7 +234,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const { opt, errs } = parseArgs(process.argv.slice(2), { date: 'value', month: 'value', from: 'value', to: 'value', type: 'value', by: 'value', csv: 'flag', json: 'flag', list: 'flag', help: 'flag' })
   if (opt.help) { console.log(HELP_STATS); process.exit(0) }
   const type = opt.type || 'summary'
-  if (!['summary', 'tokens', 'usage', 'performance', 'all'].includes(type)) errs.push(`--type 값 오류: ${type}`)
+  if (!['summary', 'kpi', 'tokens', 'usage', 'performance', 'all'].includes(type)) errs.push(`--type 값 오류: ${type}`)
   if (opt.by && !AXIS_KEYS.includes(opt.by) && opt.by !== 'tool') errs.push(`--by 값 오류: ${opt.by}`)
   if (errs.length) { console.error(errs.join('\n') + '\n\n' + HELP_STATS); process.exit(1) }
   const from = opt.from || opt.date || (opt.month ? `${opt.month}-01` : '0000-00-00'), to = opt.to || opt.date || (opt.month ? `${opt.month}-31` : '9999-99-99')
@@ -231,9 +245,16 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const omit = (o, re) => Object.fromEntries(Object.entries(o).filter(([k]) => !re.test(k)))
   const head = `${from === '0000-00-00' ? '전체' : from} ~ ${to === '9999-99-99' ? '' : to}`
   const show = (title, arr) => { if (!arr.length) return; console.log(`\n▶ ${title}`); console.table(arr) }
-  if (opt.json) { const out = { range: { from, to }, summary: agg, tokens: tokensStats(rows), usage: usageStats(rows), performance: perfStats(rows) }; console.log(JSON.stringify(type === 'all' || type === 'summary' ? out : { range: out.range, [type]: out[type] }, null, 2)); process.exit(0) }
+  if (opt.json) { const out = { range: { from, to }, kpi: kpiView(rows), summary: agg, tokens: tokensStats(rows), usage: usageStats(rows), performance: perfStats(rows) }; console.log(JSON.stringify(type === 'all' || type === 'summary' ? out : { range: out.range, [type]: out[type] }, null, 2)); process.exit(0) }
   if (opt.list) { console.table(listRows(rows).map(o => ({ ...omit(o, /_ms$|cost_usd/), cost: usd(o.cost_usd), cache_hit: o.cache_hit == null ? '-' : pct(o.cache_hit, 1), req: o.req?.slice(0, 40) }))); process.exit(0) }
   if (opt.csv) { const t = type === 'tokens' ? fmtTok(tokensStats(rows).by[by] || []) : type === 'usage' ? usageStats(rows).items : type === 'performance' ? (by === 'tool' ? perfStats(rows).tools : fmtPerf(perfStats(rows).by[by] || [])) : tables(agg, by); console.log(toCsv(t)); process.exit(0) }
+  if (type === 'kpi' || type === 'all') {
+    const k = kpiView(rows); console.log(`\n■ KPI 트리  ${head}   (정의: core.METRICS · 비율은 timed, 요청 단위는 distinct 턴)`)
+    for (const [tier, items] of Object.entries(k.tree)) { console.log(`\n▶ ${tier} ${TIER_LABEL[tier]}`); console.table(items.map(i => ({ metric: i.metric, label: i.label, value: fmtMetric(i.metric, i.value), population: i.population }))) }
+    const warns = k.alerts.filter(a => a.status === 'WARN'); console.log(`\n▶ 경보 (${warns.length})`); console.table(k.alerts.map(a => ({ metric: a.metric, label: a.label, value: fmtMetric(a.metric, a.value), warn: fmtMetric(a.metric, a.warn), status: a.status })))
+    console.log('\n▶ 질문별 판정'); for (const q of k.questions) console.log(`  · ${q.q} → ${Object.entries(q.values).map(([m, v]) => `${m}=${fmtMetric(m, v)}`).join(' · ')}`)
+    console.log('\n▶ 측정 불가 (원천 부재)'); for (const u of UNMEASURABLE) console.log(`  · ${u.metric}: ${u.reason}`)
+  }
   if (type === 'tokens' || type === 'all') { const ts = tokensStats(rows); console.log(`\n■ ① 토큰·비용  ${head}`); console.log(`  API 호출 ${ts.total.api_calls} · 입력 ${kfmt(ts.total.input)} · 캐시 읽기 ${kfmt(ts.total.cache_read)} · 캐시 생성 ${kfmt(ts.total.cache_create)} · 출력 ${kfmt(ts.total.output)} (thinking ${kfmt(ts.total.thinking)}) · 캐시 적중 ${pct(ts.total.cache_hit, 1)} · gen ${ts.total.gen_tps ?? '-'} tok/s · 비용 ${usd(ts.total.cost_usd)} (턴당 ${usd(ts.total.cost_per_turn)}) · 출력 p50/p90 ${kfmt(ts.distribution.out_p50)}/${kfmt(ts.distribution.out_p90)}`); show(`by ${by}`, fmtTok(ts.by[by] || ts.by.category)) }
   if (type === 'usage' || type === 'all') { const us = usageStats(rows); console.log(`\n■ ② agent/mcp/skill/plugin/hook 사용  ${head}`); show('유형별', us.byType); show('종류별 (s=스킬 p=플러그인 m=독립 MCP)', us.byKind); show('리소스별', us.items.filter(i => i.type !== 'hook').map(i => ({ ...omit(i, /_ms$/), avg: ms2(i.avg_ms) }))); show('훅 이벤트별', us.hooksByEvent) }
   if (type === 'performance' || type === 'all') { const ps = perfStats(rows); console.log(`\n■ ③ 성능 비교  ${head}  (비율·평균은 timed 레코드 기준)`); show(`by ${by}`, fmtPerf([ps.total, ...(ps.by[by] || ps.by.category)])); show('도구별 지연', ps.tools.map(t => ({ tool: t.tool, calls: t.calls, errors: t.errors, error_rate: pct(t.error_rate, 1), avg: ms2(t.avg_ms), total: ms2(t.total_ms), share: pct(t.share_of_tool_time, 1) }))) }

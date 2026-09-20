@@ -147,7 +147,67 @@ export const METRICS = {
   agent_parallelism:{ label: '병렬도', formula: 'Σ agent wall ÷ max agent wall', population: 'agents', unit: '배' },
   tool_chars:       { label: '도구 결과 컨텍스트 소비', formula: 'Σ tool_result 문자 수', population: 'steps', unit: '자' },
 }
-export const KPI_TREE = { north_star: 'cost_per_request', lagging: ['cost_per_request', 'ttft_ms', 'correction_rate'], leading: ['ctx_growth', 'rework_rate', 'unverified_rate', 'recovery_multiplier', 'agent_parallelism'], diagnostic: ['gen_tps', 'tool_share', 'error_rate', 'cache_miss_events', 'tool_chars'], vanity: ['cache_hit', 'turns', 'output'] }
+// ── 지표 체계 (2026-09-20 지표 관점 10인 점검 종합) ───────────────────────────────
+// 계층: L0 North Star → L1 결과(후행) → L2 동인(선행) → L3 진단 → 참고(허영·보조). 각 지표에 slo { warn, dir } 가 있으면 경보 판정.
+// 원칙 ① 분모는 요청(distinct 턴) 또는 완료 턴(timed) 로 명시 ② 비율의 분자·분모는 같은 모집단 ③ 비교는 n≥20 일 때만 ④ 값이 좋아 보일수록 나빠지는 역지표는 참고로 강등
+Object.assign(METRICS, {
+  delivered_requests:  { label: '완료 요청 수', formula: 'requests − superseded − interrupted − (다음 요청이 교정인 요청)', population: 'requests', unit: '건', tier: 'L1' },
+  cost_per_delivered:  { label: '완료 요청당 비용 ★', formula: 'cost_total_usd ÷ delivered_requests', population: 'requests', unit: 'USD', tier: 'L0', dir: 'lower', slo: { warn: 4 }, note: 'North Star — 재작업·중단으로 버려진 요청의 비용까지 완료 요청에 부담시킨다' },
+  elapsed_per_request: { label: '요청당 소요', formula: 'Σ elapsed(timed) ÷ delivered_requests', population: 'requests', unit: 'ms', tier: 'L1', dir: 'lower', slo: { warn: 300000 } },
+  edit_settle_rate:    { label: '편집 정착률', formula: '(files_changed>0 인 요청) ÷ requests', population: 'requests', unit: '비율', tier: 'L1', note: '평가·조회 위주 세션은 낮은 게 정상 — 카테고리와 함께 볼 것' },
+  agent_cost_share:    { label: '위임 비용 비중', formula: 'cost_agents_usd ÷ cost_total_usd', population: 'agents', unit: '비율', tier: 'L2', slo: { warn: 0.6 }, note: '병렬도와 함께 판단 — 비중이 높아도 벽시계 절감이 크면 정당' },
+  thinking_ratio:      { label: 'thinking 비율', formula: 'thinking ÷ output', population: 'all', unit: '비율', tier: 'L3' },
+  api_per_request:     { label: '요청당 API 호출', formula: 'Σ api_calls ÷ requests', population: 'requests', unit: '회', tier: 'L3', note: '도구 루프 길이' },
+})
+Object.assign(METRICS.cost_per_request, { tier: 'L1', dir: 'lower', slo: { warn: 3 } })
+Object.assign(METRICS.ttft_ms, { slo: { warn: 60000, stat: 'p90' } })
+Object.assign(METRICS.correction_rate, { slo: { warn: 0.2 } })
+Object.assign(METRICS.ctx_growth, { slo: { warn: 5 } })
+Object.assign(METRICS.rework_rate, { slo: { warn: 0.5 } })
+Object.assign(METRICS.unverified_rate, { slo: { warn: 0.01 } })
+Object.assign(METRICS.recovery_multiplier, { slo: { warn: 5 } })
+Object.assign(METRICS.error_rate, { tier: 'ref', slo: { warn: 0.03, min_n: 50 } })
+Object.assign(METRICS.tool_share, { tier: 'L3', slo: { warn: 0.45 } })
+Object.assign(METRICS.cache_hit, { tier: 'ref' }); Object.assign(METRICS.turns, { tier: 'ref' }); Object.assign(METRICS.out_tps, { tier: 'ref' })
+Object.assign(METRICS.gen_tps, { tier: 'L3' }); Object.assign(METRICS.cache_miss_events, { tier: 'L2', slo: { warn: 3 } }); Object.assign(METRICS.tool_chars, { tier: 'L3' }); Object.assign(METRICS.agent_parallelism, { tier: 'L2' })
+Object.assign(METRICS.active_ratio, { tier: 'L3' }); Object.assign(METRICS.idle_ms, { tier: 'L3' }); Object.assign(METRICS.hook_ms, { tier: 'L3' }); Object.assign(METRICS.tool_ms, { tier: 'L3' }); Object.assign(METRICS.files_changed, { tier: 'L1' })
+Object.assign(METRICS.elapsed_ms, { tier: 'L1' }); Object.assign(METRICS.turn_duration_ms, { tier: 'ref' }); Object.assign(METRICS.requests, { tier: 'L1' }); Object.assign(METRICS.n_timed, { tier: 'ref' }); Object.assign(METRICS.cost_usd, { tier: 'L2' }); Object.assign(METRICS.cost_agents_usd, { tier: 'L2' }); Object.assign(METRICS.cost_total_usd, { tier: 'L1' })
+export const KPI_TREE = {
+  L0: ['cost_per_delivered'],
+  L1: ['cost_per_request', 'elapsed_per_request', 'ttft_ms', 'correction_rate', 'delivered_requests', 'files_changed', 'edit_settle_rate', 'cost_total_usd'],
+  L2: ['ctx_growth', 'cache_miss_events', 'rework_rate', 'unverified_rate', 'recovery_multiplier', 'agent_cost_share', 'agent_parallelism', 'cost_usd', 'cost_agents_usd'],
+  L3: ['gen_tps', 'tool_share', 'thinking_ratio', 'api_per_request', 'active_ratio', 'idle_ms', 'tool_ms', 'hook_ms', 'tool_chars'],
+  ref: ['cache_hit', 'error_rate', 'turns', 'n_timed', 'out_tps', 'turn_duration_ms'],
+}
+export const TIER_LABEL = { L0: 'North Star', L1: '결과 (후행)', L2: '동인 (선행)', L3: '진단', ref: '참고·허영' }
+// 대시보드가 답해야 할 질문 ↔ 지표
+export const QUESTIONS = [
+  { q: '오늘이 어제보다 효율적이었나', metrics: ['cost_per_delivered', 'elapsed_per_request', 'correction_rate'], rule: '이전 기간과 n≥20 일 때만 증감 판정, 아니면 방향만' },
+  { q: '돈이 어디로 가나', metrics: ['cost_total_usd', 'cost_agents_usd', 'agent_cost_share'], rule: '카테고리·모델·에이전트별 분해' },
+  { q: '느린 원인이 모델인가 도구인가 위임인가', metrics: ['tool_share', 'gen_tps', 'agent_parallelism', 'ttft_ms'], rule: '턴 소요 구성(도구·훅·모델) + 도구별 p90' },
+  { q: '재작업을 얼마나 했나', metrics: ['correction_rate', 'rework_rate', 'unverified_rate', 'recovery_multiplier'], rule: '요청 연쇄·파일 재수정·무검증 쓰기·오류 회복' },
+  { q: '컨텍스트가 비대해지고 있나', metrics: ['ctx_growth', 'cache_miss_events', 'api_per_request'], rule: '호출당 컨텍스트 첫/끝/피크 — cache_hit 는 보지 않는다' },
+]
+// 원천 부재로 아직 측정 불가 (하네스 개선 필요)
+export const UNMEASURABLE = [
+  { metric: 'Pre/PostToolUse 훅 소요', reason: 'transcript hook_success 첨부에 durationMs 없음 (Stop 훅만 stop_hook_summary 로 존재)' },
+  { metric: '플랜 한도 소진율(5시간·7일)', reason: 'transcript 에 없음 — 상태표시줄 입력 rate_limits 를 별도 스냅샷해야 함' },
+  { metric: '서브에이전트 내부 오류 상세', reason: 'errors 건수만 귀속, 오류 내용·회복 비용은 서브 transcript 재파싱 필요' },
+  { metric: '커밋·라인 단위 산출', reason: 'git 과 턴의 연결 키 없음 — 턴 경계 HEAD SHA 기록 필요' },
+]
+/** SLO 평가: agg.total(+outcome, tokens distribution) 값에 slo 가 있는 지표를 대조 → [{metric, value, warn, status}] */
+export function evaluateSlo(values) {
+  const out = []
+  for (const [k, m] of Object.entries(METRICS)) {
+    if (!m.slo) continue
+    const key = m.slo.stat ? `${k.replace(/_ms$/, '')}_${m.slo.stat}_ms` : k
+    const v = values[key] ?? values[k]; if (v == null) { out.push({ metric: k, label: m.label, value: null, warn: m.slo.warn, status: 'n/a' }); continue }
+    if (m.slo.min_n && (values.tools || 0) < m.slo.min_n) { out.push({ metric: k, label: m.label, value: v, warn: m.slo.warn, status: 'n<' + m.slo.min_n }); continue }
+    const bad = m.dir === 'higher' ? v < m.slo.warn : v > m.slo.warn
+    out.push({ metric: k, label: m.label, value: v, warn: m.slo.warn, status: bad ? 'WARN' : 'ok' })
+  }
+  return out
+}
 
 // ── 표시 포맷 ─────────────────────────────────────────────────────────────────
 export const kfmt = n => { n = Number(n) || 0; return n >= 1e6 ? `${(n / 1e6).toFixed(2)}M` : n >= 1e3 ? `${(n / 1e3).toFixed(1)}k` : String(n) }

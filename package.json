@@ -14,7 +14,8 @@
     "build:whitepaper": "node .whitepaper-build/build.js",
     "work:stats": "node scripts/work-history-stats.mjs",
     "work:report": "node scripts/work-history-report.mjs",
-    "test": "node --test test/**/*.test.mjs"
+    "test": "node --test test/**/*.test.mjs",
+    "work:metrics-doc": "node scripts/work-history-metrics-doc.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.101.0",

@@ -7,8 +7,18 @@ import os from 'node:os'
 import path from 'node:path'
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
-import { aggregate, tokensStats, perfStats, loadRows, isoWeek } from '../scripts/work-history-stats.mjs'
-import { categorize, costUsd, makeRedactor } from '../scripts/work-history-core.mjs'
+import { aggregate, tokensStats, perfStats, loadRows, isoWeek, kpiView } from '../scripts/work-history-stats.mjs'
+import { categorize, costUsd, makeRedactor, METRICS, KPI_TREE, evaluateSlo } from '../scripts/work-history-core.mjs'
+
+test('metric registry: every KPI tree key is defined, and SLO evaluation flags breaches', () => {
+  for (const keys of Object.values(KPI_TREE)) for (const k of keys) assert.ok(METRICS[k], `registry missing ${k}`)
+  const al = evaluateSlo({ cost_per_delivered: 9, ttft_p90_ms: 10000, correction_rate: 0.1, ctx_growth: 8, tools: 10, error_rate: 0.5 })
+  const by = Object.fromEntries(al.map(a => [a.metric, a.status]))
+  assert.equal(by.cost_per_delivered, 'WARN'); assert.equal(by.ttft_ms, 'ok'); assert.equal(by.correction_rate, 'ok'); assert.equal(by.ctx_growth, 'WARN'); assert.equal(by.error_rate, 'n<50')
+  const rows = [{ id: 'a:1.1', date: '2026-09-20', hour: 6, weekday: 'Sun', session: 'a', turn: 1, part: 1, category: 'FEATURE', tags: ['FEATURE'], ts_req: '2026-09-20T06:00:00+09:00', elapsed_ms: 60000, tools_total: 2, tool_errors: 0, files_changed: 1, tokens: { api_calls: 2, input: 100, cache_read: 9000, cache_create: 900, output: 600, thinking: 100, context: 10000, cache_hit: 0.9 }, perf: { tool_ms: 20000, hook_ms: 0 }, steps: [], cost_usd: 1, cost_agents_usd: 3, agents_detail: [{ cost_usd: 3, wall_ms: 5000 }], agent_parallelism: 1, skills: [], mcp: [], agents: [] }]
+  const k = kpiView(rows)
+  assert.equal(k.values.cost_total_usd, 4); assert.equal(k.values.cost_per_delivered, 4); assert.equal(k.values.agent_cost_share, 0.75); assert.equal(k.tree.L0[0].metric, 'cost_per_delivered')
+})
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const LOGGER = path.join(ROOT, '.claude', 'hooks', 'work-history-logger.mjs')

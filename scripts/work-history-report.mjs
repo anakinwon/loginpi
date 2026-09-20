@@ -17,8 +17,8 @@
  */
 import fs from 'node:fs'
 import path from 'node:path'
-import { loadRows, aggregate, tokensStats, usageStats, perfStats, compare, tables, toCsv, ms2, pct, kfmt, usd, listRows, isoWeek, fmtTok, fmtPerf, fmtCmp, parseArgs, PROJECT } from './work-history-stats.mjs'
-import { categoryColorVar, CATEGORY_KEYS, METRICS, KPI_TREE, SCHEMA_VERSION } from './work-history-core.mjs'
+import { loadRows, aggregate, tokensStats, usageStats, perfStats, compare, tables, toCsv, ms2, pct, kfmt, usd, listRows, isoWeek, fmtTok, fmtPerf, fmtCmp, parseArgs, kpiView, fmtMetric, PROJECT } from './work-history-stats.mjs'
+import { categoryColorVar, CATEGORY_KEYS, METRICS, TIER_LABEL, UNMEASURABLE, SCHEMA_VERSION } from './work-history-core.mjs'
 
 // ── 인자·기간 ───────────────────────────────────────────────────────────────
 const HELP = `work-history-report — 통계 파일 + 차트 보고서
@@ -89,7 +89,9 @@ const OC = agg.outcome
 const agentRows = rows.flatMap(r => (r.agents_detail || []).map(a => ({ turn: `#${r.turn}`, name: a.name, type: a.type, model: a.model, wall: ms2(a.wall_ms), wall_ms: a.wall_ms, output: kfmt(a.tokens?.output), cost: usd(a.cost_usd), cost_usd: a.cost_usd, tools: a.tools, errors: a.errors })))
 written.push(w('outcome.json', JSON.stringify({ range: { from, to }, generated_at: generatedAt, ...OC, agents: agentRows }, null, 2)))
 written.push(w('outcome.md', `# ④ 산출·품질·위임 ${stem}\n\n${header}\n\n| 요청 | 레코드 | 편집 호출 | 변경 파일 | 재작업 파일 | 재작업률 | 쓰기 턴 | 무검증 | 교정 요청 | 교정률 | 중단 | 재전송 | 오류 회복 배수 |\n|---|---|---|---|---|---|---|---|---|---|---|---|---|\n| ${OC.requests} | ${OC.records} | ${OC.edit_calls} | ${OC.files_changed} | ${OC.files_reworked} | ${pct(OC.rework_rate, 1)} | ${OC.write_turns} | ${OC.unverified_write_turns} | ${OC.corrections} | ${pct(OC.correction_rate, 1)} | ${OC.interrupted} | ${OC.superseded} | ${OC.recovery_multiplier ?? '-'}× |\n\n## 서브에이전트 (${agentRows.length}) — 비용 ${usd(total.cost_agents_usd)} · 실행 시간 합 ${ms2(total.agent_wall_ms)}\n\n${mdTable(agentRows)}\n\n## 파일별 수정\n\n${mdTable(OC.files)}\n`))
-written.push(w('metrics.json', JSON.stringify({ schema_version: SCHEMA_VERSION, generated_at: generatedAt, kpi_tree: KPI_TREE, metrics: METRICS }, null, 2)))
+const KV = kpiView(rows)
+written.push(w('metrics.json', JSON.stringify({ schema_version: SCHEMA_VERSION, generated_at: generatedAt, range: { from, to }, kpi_tree: KV.tree, alerts: KV.alerts, questions: KV.questions, definitions: METRICS, tier_labels: TIER_LABEL, unmeasurable: UNMEASURABLE }, null, 2)))
+written.push(w('kpi.md', `# KPI ${stem}\n\n${header}\n\n${Object.entries(KV.tree).map(([tier, items]) => `## ${tier} · ${TIER_LABEL[tier]}\n\n| 지표 | 값 | 정의 | 모집단 |\n|---|---|---|---|\n${items.map(i => `| ${i.label} (\`${i.metric}\`) | ${fmtMetric(i.metric, i.value)} | ${i.formula.replace(/\|/g, '\\|')} | ${i.population} |`).join('\n')}\n`).join('\n')}\n## 경보\n\n| 지표 | 값 | 임계 | 상태 |\n|---|---|---|---|\n${KV.alerts.map(a => `| ${a.label} | ${fmtMetric(a.metric, a.value)} | ${fmtMetric(a.metric, a.warn)} | ${a.status} |`).join('\n')}\n\n## 질문별 판정\n\n${KV.questions.map(q => `- **${q.q}** — ${Object.entries(q.values).map(([m, v]) => `${METRICS[m]?.label || m} ${fmtMetric(m, v)}`).join(' · ')}`).join('\n')}\n`))
 
 // ── 차트 ───────────────────────────────────────────────────────────────────────
 const KIND = { s: { label: '스킬 (s)', v: 'var(--s1)' }, p: { label: '플러그인 (p)', v: 'var(--s2)' }, m: { label: '독립 MCP (m)', v: 'var(--s3)' }, agent: { label: '에이전트', v: 'var(--s4)' } }
@@ -157,7 +159,7 @@ const perfCatBars = PF.by.category.filter(o => o.n_timed).map(o => ({ label: o.k
 const shareBars = rows.filter(r => r.elapsed_ms > 0 && !r.absorbed).map(r => ({ label: turnLabel(r), segs: [{ value: Math.min(r.perf?.tool_ms || 0, r.elapsed_ms), color: 'var(--s2)' }, { value: Math.min(r.perf?.hook_ms || 0, Math.max(0, r.elapsed_ms - (r.perf?.tool_ms || 0))), color: 'var(--s7)' }, { value: Math.max(0, r.elapsed_ms - Math.min(r.perf?.tool_ms || 0, r.elapsed_ms) - (r.perf?.hook_ms || 0)), color: 'var(--s1)' }], sub: `· 도구 ${pct(r.perf?.tool_share, 1)}`, tip: `${turnLabel(r)} 소요 ${ms2(r.elapsed_ms)} = 도구 ${ms2(r.perf?.tool_ms)} + 훅 ${ms2(r.perf?.hook_ms)} + 모델·기타 ${ms2(r.elapsed_ms - (r.perf?.tool_ms || 0) - (r.perf?.hook_ms || 0))}` }))
 const latencyBars = PF.tools.slice(0, 10).map(t => ({ label: t.tool.replace(/^mcp__/, 'mcp:').replace(/__.*$/, ''), value: +((t.p50_ms || t.avg_ms || 0) / 1000).toFixed(1), sub: `· p90 ${ms2(t.p90_ms)} · ${t.calls}회${t.errors ? ` · 오류 ${t.errors}` : ''}`, color: 'var(--s1)', tip: `${t.tool}: 중앙 ${ms2(t.p50_ms)} · p90 ${ms2(t.p90_ms)} · 최대 ${ms2(t.max_ms)} · 평균 ${ms2(t.avg_ms)} · 호출 ${t.calls} · 결과 ${kfmt(t.chars)}자` }))
 const tpsBars = PF.by.category.filter(o => o.gen_tps != null).map(o => ({ label: o.key, value: o.gen_tps, sub: `· 턴당 출력 ${kfmt(o.avg_out_tokens)}`, color: catVar(o.key), tip: `${o.key}: gen ${o.gen_tps} tok/s (종단 ${o.out_tps ?? '-'}) · API ${o.avg_api_calls}회/턴 · 캐시 적중 ${pct(o.cache_hit, 1)}` }))
-const kpi = [['요청당 비용 ★', usd(total.cost_per_request), `요청 ${total.requests} · 총 ${usd(total.cost_total_usd)} (메인 ${usd(total.cost_usd)} + 에이전트 ${usd(total.cost_agents_usd)})`], ['첫 응답 대기', ms2(total.ttft_p50_ms), `p90 ${ms2(total.ttft_p90_ms)} · 완료 중앙 ${ms2(total.p50_elapsed_ms)}`], ['교정률', pct(OC.correction_rate, 1), `교정 ${OC.corrections} · 중단 ${OC.interrupted} · 재전송 ${OC.superseded}`], ['산출', `${OC.files_changed}파일`, `편집 ${OC.edit_calls}회 · 재작업률 ${pct(OC.rework_rate, 1)} · 무검증 ${OC.unverified_write_turns}/${OC.write_turns}`], ['컨텍스트 팽창', TK.distribution.ctx_growth != null ? `${TK.distribution.ctx_growth}배` : '-', `호출당 ${kfmt(TK.distribution.ctx_per_call_first)} → ${kfmt(TK.distribution.ctx_per_call_last)} · 미스 ${TK.distribution.cache_miss_events}`], ['활성비', pct(total.active_ratio, 1), `소요 ${ms2(total.elapsed_ms)} · 유휴 ${ms2(total.idle_ms)} · 위임 ${ms2(total.agent_wall_ms)}`]]
+const kpi = [['완료 요청당 비용 ★', usd(total.cost_per_delivered), `완료 ${total.delivered_requests}/${total.requests} 요청 · 총 ${usd(total.cost_total_usd)} (메인 ${usd(total.cost_usd)} + 에이전트 ${usd(total.cost_agents_usd)})`], ['첫 응답 대기', ms2(total.ttft_p50_ms), `p90 ${ms2(total.ttft_p90_ms)} · 완료 중앙 ${ms2(total.p50_elapsed_ms)}`], ['교정률', pct(OC.correction_rate, 1), `교정 ${OC.corrections} · 중단 ${OC.interrupted} · 재전송 ${OC.superseded}`], ['산출', `${OC.files_changed}파일`, `편집 ${OC.edit_calls}회 · 재작업률 ${pct(OC.rework_rate, 1)} · 무검증 ${OC.unverified_write_turns}/${OC.write_turns}`], ['컨텍스트 팽창', TK.distribution.ctx_growth != null ? `${TK.distribution.ctx_growth}배` : '-', `호출당 ${kfmt(TK.distribution.ctx_per_call_first)} → ${kfmt(TK.distribution.ctx_per_call_last)} · 미스 ${TK.distribution.cache_miss_events}`], ['활성비', pct(total.active_ratio, 1), `소요 ${ms2(total.elapsed_ms)} · 유휴 ${ms2(total.idle_ms)} · 위임 ${ms2(total.agent_wall_ms)}`]]
 
 const html = `<meta charset="utf-8">
 <title>작업 통계 ${stem}</title>
@@ -211,6 +213,13 @@ footer{margin-top:22px;color:var(--ink3);font-size:12px}
 <div class="wrap">
 <header><h1>작업 통계 ${esc(stem)}</h1><span class="meta">${esc({ day: '일별', week: '주별', month: '월별', year: '년도별', range: '기간' }[R.period])} · ${esc(from)} ~ ${esc(to)} · 세션 ${total.sessions} · ${esc(models.join(', '))} · 생성 ${esc(generatedAt)}</span></header>
 <div class="kpi">${kpi.map(([l, v, sub]) => `<div><span>${l}</span><b>${v}</b><small>${sub}</small></div>`).join('')}</div>
+
+<h2 class="type">KPI 트리<small>정의·모집단·경보는 ${esc(stem)}.metrics.json / docs/WORK_METRICS.md · 경보 ${KV.alerts.filter(a => a.status === 'WARN').length}건</small></h2>
+<div class="grid">
+  ${['L0', 'L1', 'L2', 'L3'].map(t => `<section${t === 'L1' || t === 'L2' ? '' : ''}><h3>${esc(t)} · ${esc(TIER_LABEL[t])}</h3><p class="desc">${t === 'L0' ? 'North Star — 버려진 요청의 비용까지 완료 요청에 부담' : t === 'L1' ? '결과(후행)' : t === 'L2' ? '동인(선행) — 먼저 움직이는 지표' : '진단 — 원인 추적용'}</p>${htmlTable(KV.tree[t].map(i => ({ ...i, alert: KV.alerts.find(a => a.metric === i.metric) })), [['지표', o => esc(o.label)], ['값', o => `${esc(fmtMetric(o.metric, o.value))}${o.alert?.status === 'WARN' ? ' <i class="dot" style="background:var(--bad)"></i>' : ''}`, o => o.alert?.status === 'WARN' ? 'num bad' : 'num'], ['모집단', o => esc(o.population)]])}</section>`).join('')}
+  <section class="wide"><h3>경보 (SLO)</h3><p class="desc">임계를 넘은 지표 · n 부족은 판정 보류</p>${htmlTable(KV.alerts, [['지표', o => esc(o.label)], ['값', o => esc(fmtMetric(o.metric, o.value)), o => o.status === 'WARN' ? 'num bad' : 'num'], ['임계', o => esc(fmtMetric(o.metric, o.warn)), 'num'], ['상태', o => esc(o.status), o => o.status === 'WARN' ? 'bad' : '']])}</section>
+  <section class="wide"><h3>다섯 가지 질문</h3><p class="desc">대시보드가 답해야 할 질문과 그 근거 지표</p>${htmlTable(KV.questions, [['질문', o => esc(o.q)], ['근거', o => Object.entries(o.values).map(([m, v]) => `${esc(METRICS[m]?.label || m)} <b>${esc(fmtMetric(m, v))}</b>`).join(' · ')], ['규칙', o => esc(o.rule), 'req']])}</section>
+</div>
 
 <h2 class="type">추이<small>${esc(SUB_LABEL[subKey])} · 기간 안의 흐름</small></h2>
 <div class="grid">
