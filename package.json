@@ -13,7 +13,8 @@
     "format:check": "prettier --check .",
     "build:whitepaper": "node .whitepaper-build/build.js",
     "work:stats": "node scripts/work-history-stats.mjs",
-    "work:report": "node scripts/work-history-report.mjs"
+    "work:report": "node scripts/work-history-report.mjs",
+    "test": "node --test test/**/*.test.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.101.0",
