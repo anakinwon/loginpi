@@ -115,6 +115,40 @@ export function makeRedactor({ workspaceRoot, extra = [] } = {}) {
 }
 export const csvSafe = s => (typeof s === 'string' && /^[=+\-@\t\r]/.test(s) ? "'" + s : s)   // 스프레드시트 수식 인젝션 방지
 
+// ── 지표 정의 레지스트리 (단일 진실 원천 — 보고서·CSV·터미널이 이 정의만 쓴다; report 가 <stem>.metrics.json 으로 동봉) ────────────
+// population: all(모든 레코드) | timed(응답 완료 턴) | requests(distinct 턴) | steps(도구 호출) | agents(서브에이전트)
+export const METRICS = {
+  cost_total_usd:   { label: '총비용(에이전트 포함)', formula: 'Σ cost_usd + Σ cost_agents_usd', population: 'all', unit: 'USD', tier: 'north-star-input' },
+  cost_per_request: { label: '요청당 비용', formula: 'cost_total_usd ÷ requests', population: 'requests', unit: 'USD', tier: 'L1', direction: 'lower' },
+  cost_usd:         { label: '메인 세션 비용', formula: 'Σ (input·p_in + cache_read·p_cr + cache_create·p_cc·1.6 + output·p_out)/1e6', population: 'all', unit: 'USD' },
+  cost_agents_usd:  { label: '서브에이전트 비용', formula: 'Σ agents_detail[].cost_usd', population: 'agents', unit: 'USD' },
+  requests:         { label: '요청 수', formula: 'distinct(session:turn)', population: 'requests', unit: '건' },
+  turns:            { label: '레코드 수', formula: 'count(part 레코드)', population: 'all', unit: '건', note: '요청이 아니라 파트 단위 — 분모로 쓰지 말 것' },
+  n_timed:          { label: '완료 턴 수', formula: 'count(elapsed_ms≠null ∧ ¬absorbed ∧ ¬superseded ∧ ¬incomplete)', population: 'timed', unit: '건' },
+  elapsed_ms:       { label: '체감 소요', formula: 'ts_res − 직전 경계(요청 또는 이전 파트 응답)', population: 'timed', unit: 'ms', note: '사용자가 실제 기다린 시간' },
+  turn_duration_ms: { label: '하네스 턴 소요', formula: 'system.turn_duration (파트별 FIFO 귀속)', population: 'timed', unit: 'ms', note: '흡수된 직전 턴 작업 포함' },
+  ttft_ms:          { label: '첫 응답 대기', formula: '첫 assistant text 블록 ts − 직전 경계', population: 'timed', unit: 'ms', tier: 'L1', direction: 'lower' },
+  idle_ms:          { label: '턴 간 유휴', formula: 'ts_req − 이전 턴 ts_res (mid-turn 제외)', population: 'requests', unit: 'ms' },
+  active_ratio:     { label: '세션 활성비', formula: 'Σ elapsed ÷ (Σ elapsed + Σ idle)', population: 'timed', unit: '비율' },
+  tool_ms:          { label: '도구 실행 시간', formula: 'Σ steps[].ms (Agent 는 디스패치 시간만)', population: 'all', unit: 'ms' },
+  hook_ms:          { label: 'Stop 훅 시간', formula: 'Σ stop_hook_summary.durationMs', population: 'all', unit: 'ms', note: 'Pre/Post 훅은 원천에 시간 없음' },
+  gen_tps:          { label: '생성 속도(근사)', formula: 'output ÷ (elapsed − tool_ms − hook_ms)', population: 'timed', unit: 'tok/s', note: '분모에 하네스 대기 약 16% 포함' },
+  out_tps:          { label: '종단 처리량', formula: 'output ÷ elapsed', population: 'timed', unit: 'tok/s' },
+  tool_share:       { label: '도구 시간 비중', formula: 'tool_ms ÷ elapsed', population: 'timed', unit: '비율', note: '서브에이전트 대기 미포함' },
+  cache_hit:        { label: '캐시 읽기 비중', formula: 'cache_read ÷ context', population: 'all', unit: '비율', note: '컨텍스트가 클수록 1에 수렴 — 효율 지표 아님' },
+  ctx_growth:       { label: '컨텍스트 팽창률', formula: '끝 턴 (context÷api_calls) ÷ 첫 턴 (context÷api_calls)', population: 'all', unit: '배', tier: 'L2', direction: 'lower' },
+  cache_miss_events:{ label: '캐시 미스 이벤트', formula: '직전 고수위 대비 호출당 cache_read 20k 이상 하락 횟수', population: 'all', unit: '회' },
+  error_rate:       { label: '도구 오류율', formula: 'tool_errors ÷ tools_total', population: 'steps', unit: '비율', note: '보조 지표 — 서브에이전트·오답 산출물 미포함' },
+  recovery_multiplier: { label: '오류 회복 배수', formula: 'Σ(오류 후 같은 도구 성공까지 추가 호출 시간) ÷ Σ 오류 호출 시간', population: 'steps', unit: '배', tier: 'L2', direction: 'lower' },
+  correction_rate:  { label: '사용자 교정률', formula: 'correction 요청 ÷ requests (10분 내 머리글 일치·교정 어두·재전송)', population: 'requests', unit: '비율', tier: 'L1', direction: 'lower' },
+  rework_rate:      { label: '파일 재작업률', formula: '2턴 이상에서 수정된 파일 ÷ 수정 파일', population: 'steps', unit: '비율', tier: 'L2', direction: 'lower' },
+  unverified_rate:  { label: '무검증 쓰기 턴 비율', formula: '쓰기 후 테스트·실행 확인 없는 턴 ÷ 쓰기 턴', population: 'requests', unit: '비율', tier: 'L2', direction: 'lower' },
+  files_changed:    { label: '변경 파일 수', formula: 'distinct(Write|Edit 대상)', population: 'all', unit: '개', tier: 'outcome' },
+  agent_parallelism:{ label: '병렬도', formula: 'Σ agent wall ÷ max agent wall', population: 'agents', unit: '배' },
+  tool_chars:       { label: '도구 결과 컨텍스트 소비', formula: 'Σ tool_result 문자 수', population: 'steps', unit: '자' },
+}
+export const KPI_TREE = { north_star: 'cost_per_request', lagging: ['cost_per_request', 'ttft_ms', 'correction_rate'], leading: ['ctx_growth', 'rework_rate', 'unverified_rate', 'recovery_multiplier', 'agent_parallelism'], diagnostic: ['gen_tps', 'tool_share', 'error_rate', 'cache_miss_events', 'tool_chars'], vanity: ['cache_hit', 'turns', 'output'] }
+
 // ── 표시 포맷 ─────────────────────────────────────────────────────────────────
 export const kfmt = n => { n = Number(n) || 0; return n >= 1e6 ? `${(n / 1e6).toFixed(2)}M` : n >= 1e3 ? `${(n / 1e3).toFixed(1)}k` : String(n) }
 export const ms2 = ms => { if (ms == null || !(ms >= 0)) return '-'; const s = Math.round(ms / 1000); return s < 60 ? `${s}s` : s < 3600 ? `${Math.floor(s / 60)}m${String(s % 60).padStart(2, '0')}s` : `${Math.floor(s / 3600)}h${String(Math.floor(s % 3600 / 60)).padStart(2, '0')}m` }

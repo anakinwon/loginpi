@@ -113,8 +113,8 @@ function classifyPrompt(text) {
 // ── 상태 ─────────────────────────────────────────────────────────────────────
 const emptyTokens = () => ({ api_calls: 0, input: 0, cache_read: 0, cache_create: 0, output: 0, thinking: 0 })
 const emptyRes = () => ({ skills: [], mcp: [], agents: [], hooks: [], plugins: [] })
-const emptyPart = () => ({ tools: {}, steps: [], descriptions: [], tokens: emptyTokens(), seenReq: {}, res: emptyRes(), hookMs: 0, hookRuns: 0, turnDurationMs: null })
-const freshState = () => ({ v: SCHEMA_VERSION, offset: 0, turn: 0, reqTs: null, sinceTs: null, responded: false, part: 0, midTurn: false, reqText: '', reqCat: null, model: null, file: null, announced: false, lastEmitted: null, ...emptyPart() })
+const emptyPart = () => ({ tools: {}, steps: [], descriptions: [], writes: [], tokens: emptyTokens(), seenReq: {}, res: emptyRes(), hookMs: 0, hookRuns: 0, turnDurationMs: null, firstTextTs: null })
+const freshState = () => ({ v: SCHEMA_VERSION, offset: 0, turn: 0, reqTs: null, sinceTs: null, prevResTs: null, responded: false, part: 0, midTurn: false, interrupted: false, reqText: '', reqCat: null, model: null, file: null, announced: false, lastEmitted: null, tdQueue: [], hkQueue: [], agentTurn: {}, agentSeen: {}, ...emptyPart() })
 const statePath = sid => path.join(STATE_DIR, `${sid}.json`)
 function loadState(sid) { try { const s = JSON.parse(fs.readFileSync(statePath(sid), 'utf8')); return { ...freshState(), ...s } } catch { return freshState() } }
 function saveState(sid, st) { fs.mkdirSync(STATE_DIR, { recursive: true }); fs.writeFileSync(statePath(sid), JSON.stringify(st)) }
@@ -130,7 +130,9 @@ function processTranscript(transcript, sid, st, { final = false } = {}) {
   const fresh = lines.map(parse).filter(Boolean)
   const short = sid.slice(0, 8)
   const results = new Map()                                              // 이번 구간의 tool_result (Stop 시점엔 턴의 결과가 모두 도착해 있음)
-  for (const j of fresh) if (j.type === 'user' && Array.isArray(j.message?.content)) for (const b of j.message.content) if (b.type === 'tool_result') results.set(b.tool_use_id, { ok: !b.is_error, ts: j.timestamp })
+  const resultChars = c => typeof c === 'string' ? c.length : Array.isArray(c) ? c.reduce((a, p) => a + (typeof p?.text === 'string' ? p.text.length : typeof p?.source?.data === 'string' ? p.source.data.length : 0), 0) : 0
+  for (const j of fresh) if (j.type === 'user' && Array.isArray(j.message?.content)) for (const b of j.message.content) if (b.type === 'tool_result') results.set(b.tool_use_id, { ok: !b.is_error, ts: j.timestamp, chars: resultChars(b.content) })
+  const subagentsDir = path.join(path.dirname(transcript), sid, 'subagents')
 
   let pendingText = null
   const notes = []
@@ -157,21 +159,57 @@ function processTranscript(transcript, sid, st, { final = false } = {}) {
     const el = extra.elapsed_ms
     const genMs = el > 0 ? Math.max(1, el - toolMs - st.hookMs) : null
     const part = extra.part ?? st.part
+    const since = st.responded && st.sinceTs ? st.sinceTs : st.reqTs
+    const ttft = st.firstTextTs ? Math.max(0, new Date(st.firstTextTs) - new Date(since)) : null
+    const filesChanged = [...new Set(st.writes)]
+    const lastWriteIdx = st.steps.map(s => /^(Write|Edit|MultiEdit|NotebookEdit)$/.test(s.t)).lastIndexOf(true)
+    const verified = filesChanged.length ? st.steps.slice(lastWriteIdx + 1).some(s => (s.t === 'Bash' || s.t === 'PowerShell') && /test|검증|verify|확인|check|run|실행|render|screenshot|--check|lint|build/i.test(s.d || '')) : null
     return {
       v: SCHEMA_VERSION, id: `${sid}:${st.turn}.${part}`, session: short, session_id: sid, project: PROJECT_NAME, model: st.model,
-      date: dayOf(st.reqTs), hour: hourOf(st.reqTs), weekday: weekdayOf(st.reqTs), turn: st.turn, part, mid_turn: !!st.midTurn,
+      date: dayOf(st.reqTs), hour: hourOf(st.reqTs), weekday: weekdayOf(st.reqTs), turn: st.turn, part, mid_turn: !!st.midTurn, ultrathink: /\bultrathink\b/i.test(st.reqText),
       category: cat.category, tags: cat.tags, rule: cat.rule, confidence: cat.confidence, category_req: st.reqCat?.category || null,
-      ts_req: localIso(st.reqTs), ts_res: extra.ts_res ?? null, elapsed_ms: el ?? null,
-      tools_total: total, tools: st.tools, tool_errors: errors,
+      ts_req: localIso(st.reqTs), ts_res: extra.ts_res ?? null, elapsed_ms: el ?? null, idle_ms: part <= 1 && st.prevResTs && !st.midTurn ? Math.max(0, new Date(st.reqTs) - new Date(st.prevResTs)) : null, ttft_ms: ttft,
+      tools_total: total, tools: st.tools, tool_errors: errors, edit_calls: st.writes.length, files_changed: filesChanged.length, files: filesChanged.slice(0, 40), verified,
       skills: [...new Set(st.res.skills.map(r => r.name))], mcp: [...new Set(st.res.mcp.map(r => r.name))], agents: [...new Set(st.res.agents.map(r => r.name))],
       req_chars: st.reqText.length, res_chars: extra.res_chars ?? 0, req_head: redact(cut(st.reqText, 80)),
       tokens: { ...t, context: ctx, cache_hit: ctx ? +(t.cache_read / ctx).toFixed(4) : null }, cost_usd: costUsd(t, st.model),
       resources: { skills: st.res.skills, mcp: st.res.mcp, agents: st.res.agents, hooks: st.res.hooks, plugins: plugins() },
-      perf: { turn_duration_ms: st.turnDurationMs, tool_ms: toolMs, hook_ms: st.hookMs, hook_runs: st.hookRuns, out_tps: el > 0 ? +(t.output / (el / 1000)).toFixed(2) : null, gen_tps: genMs ? +(t.output / (genMs / 1000)).toFixed(2) : null, tool_share: el > 0 ? +(toolMs / el).toFixed(3) : null },
-      steps: st.steps, ...(extra.flags || {}),
+      perf: { turn_duration_ms: st.turnDurationMs, tool_ms: toolMs, hook_ms: st.hookMs, hook_runs: st.hookRuns, tool_chars: st.steps.reduce((a, s) => a + (s.chars || 0), 0), out_tps: el > 0 ? +(t.output / (el / 1000)).toFixed(2) : null, gen_tps: genMs ? +(t.output / (genMs / 1000)).toFixed(2) : null, tool_share: el > 0 ? +(toolMs / el).toFixed(3) : null },
+      steps: st.steps.map(({ d, ...s }) => s), ...(st.interrupted ? { interrupted: true } : {}), ...(extra.flags || {}),
     }
   }
-  const resetPart = () => Object.assign(st, emptyPart())                  // part 델타: 방출 후 누적기 초기화
+  // 서브에이전트 기록(<transcript dir>/<sid>/subagents/*.jsonl + .meta.json) → 디스패치한 턴에 귀속되는 agent 레코드 (Stop 마다 갱신, loadRows 가 agent_id 기준 last-write-wins 병합)
+  const scanSubagents = () => {
+    let dir; try { dir = fs.readdirSync(subagentsDir).filter(f => f.endsWith('.meta.json')) } catch { return }
+    for (const mf of dir) {
+      const base = path.join(subagentsDir, mf.replace(/\.meta\.json$/, ''))
+      let meta, stat; try { meta = JSON.parse(fs.readFileSync(base + '.meta.json', 'utf8')); stat = fs.statSync(base + '.jsonl') } catch { continue }
+      const agentId = mf.replace(/^agent-/, '').replace(/\.meta\.json$/, '')   // 파일명 agent-<agentId>.meta.json (agentId 는 'a'+이름+'-'+해시)
+      const seen = st.agentSeen[agentId]; if (seen && seen.mtime === stat.mtimeMs && seen.size === stat.size) continue
+      let text; try { text = fs.readFileSync(base + '.jsonl', 'utf8') } catch { continue }
+      const firstTs = (text.match(/"timestamp":"([^"]+)"/) || [])[1] || null
+      // 귀속 턴: ① 이미 매핑 ② toolUseId(일반 Agent) ③ name(팀원 에이전트: meta.name = Agent 호출의 name 인자) ④ 부모 에이전트의 턴 ⑤ 시작 시각이 속한 턴
+      let turnId = st.agentTurn[agentId] || (meta.toolUseId && st.agentTurn['tu:' + meta.toolUseId]) || (meta.name && st.agentTurn['nm:' + meta.name]) || (meta.parentAgentId && st.agentTurn[meta.parentAgentId])
+      if (!turnId && firstTs) { const starts = Object.entries(st.agentTurn).filter(([k]) => k.startsWith('ts:')).map(([k, v]) => [v, k.slice(3)]).sort(); for (const [ts, id] of starts) if (ts <= firstTs) turnId = id }
+      if (!turnId) continue                                                // 아직 디스패치 턴을 모름(다음 Stop 에서 재시도)
+      st.agentTurn[agentId] = turnId
+      const tk = emptyTokens(); const seenReq = new Set(); let first = null, last = null, model = meta.model || null, tools = 0, errors = 0, outChars = 0
+      for (const l of text.split('\n')) {
+        if (!l) continue; let j; try { j = JSON.parse(l) } catch { continue }
+        if (j.timestamp) { first = first || j.timestamp; last = j.timestamp }
+        if (j.type === 'assistant') {
+          if (j.message?.model) model = j.message.model
+          const rid = j.requestId || j.uuid
+          if (j.message?.usage && !seenReq.has(rid)) { seenReq.add(rid); const u = j.message.usage; tk.api_calls++; tk.input += u.input_tokens || 0; tk.cache_read += u.cache_read_input_tokens || 0; tk.cache_create += u.cache_creation_input_tokens || 0; tk.output += u.output_tokens || 0; tk.thinking += u.output_tokens_details?.thinking_tokens || 0 }
+          for (const b of j.message?.content || []) { if (b.type === 'tool_use') tools++; else if (b.type === 'text') outChars += (b.text || '').length }
+        } else if (j.type === 'user' && Array.isArray(j.message?.content)) for (const b of j.message.content) if (b.type === 'tool_result' && b.is_error) errors++
+      }
+      const nameFromTu = meta.toolUseId && st.agentTurn['name:' + meta.toolUseId]
+      record(logFileFor(st.agentTurn['ts:' + turnId] || st.reqTs, 'jsonl'), { v: SCHEMA_VERSION, agent: true, id: turnId, agent_id: agentId, name: meta.name || nameFromTu || agentId.slice(0, 12), type: meta.customAgentType || meta.agentType || null, model, depth: meta.spawnDepth || 1, parent: meta.parentAgentId || null, ts_start: first ? localIso(first) : null, ts_end: last ? localIso(last) : null, wall_ms: first && last ? Math.max(0, new Date(last) - new Date(first)) : null, tokens: { ...tk, context: tk.input + tk.cache_read + tk.cache_create }, cost_usd: costUsd(tk, model), tools, errors, out_chars: outChars })
+      st.agentSeen[agentId] = { mtime: stat.mtimeMs, size: stat.size }
+    }
+  }
+  const resetPart = () => Object.assign(st, emptyPart())                  // part 델타: 방출 후 누적기 초기화 (agentTurn/agentSeen/fixQueue 는 턴·세션 단위라 유지)
   const emitResponse = (why) => {
     if (!st.turn || !file) return
     const { cnt, total, errors } = totals()
@@ -187,15 +225,15 @@ function processTranscript(transcript, sid, st, { final = false } = {}) {
       block(file, '<', pendingText.text)
       usageLines(pendingText.ts, ms)
       const rec = makeRecord(cat, { ts_res: localIso(pendingText.ts), elapsed_ms: ms, res_chars: pendingText.text.length })
-      record(logFileFor(st.reqTs, 'jsonl'), rec); st.lastEmitted = { id: rec.id, reqTs: st.reqTs }
-      st.responded = true; st.sinceTs = pendingText.ts; pendingText = null
+      record(logFileFor(st.reqTs, 'jsonl'), rec); emitted(rec)
+      st.responded = true; st.sinceTs = pendingText.ts; st.prevResTs = pendingText.ts; pendingText = null
       resetPart()
     } else if (!st.responded) {
       if (why === 'final') {
         flushNotes(); const now = new Date()
         line(file, now, 'RESPONSE', st.turn, `[${tag}] (no final text — session ended before the turn completed) | tools ${total} | errors ${errors}`)
         usageLines(now, 0)
-        const rec = makeRecord(cat, { part: st.part + 1, ts_res: null, elapsed_ms: null, res_chars: 0, flags: { incomplete: true } }); record(logFileFor(st.reqTs, 'jsonl'), rec); st.lastEmitted = { id: rec.id, reqTs: st.reqTs }; st.part += 1; resetPart()
+        const rec = makeRecord(cat, { part: st.part + 1, ts_res: null, elapsed_ms: null, res_chars: 0, flags: { incomplete: true } }); record(logFileFor(st.reqTs, 'jsonl'), rec); emitted(rec); st.part += 1; resetPart()
       } else if (why === 'next' && total === 0 && notes.length === 0) {
         line(file, st.reqTs, 'RESPONSE', st.turn, `[${tag}] (no response — superseded by the next request)`)
         record(logFileFor(st.reqTs, 'jsonl'), makeRecord(cat, { part: 1, ts_res: null, elapsed_ms: null, res_chars: 0, flags: { superseded: true } }))
@@ -203,29 +241,33 @@ function processTranscript(transcript, sid, st, { final = false } = {}) {
         flushNotes()
         line(file, new Date(st.reqTs), 'RESPONSE', st.turn, `[${tag}] (no final text — work continued under the next request) | tools ${total}${cnt ? ` (${cnt})` : ''} | errors ${errors} | cost ${usd(cost)}`)
         usageLines(st.reqTs, 0)
-        const rec = makeRecord(cat, { part: 1, ts_res: null, elapsed_ms: null, res_chars: 0, flags: { absorbed: true } }); record(logFileFor(st.reqTs, 'jsonl'), rec); st.lastEmitted = { id: rec.id, reqTs: st.reqTs }; resetPart()
+        const rec = makeRecord(cat, { part: 1, ts_res: null, elapsed_ms: null, res_chars: 0, flags: st.interrupted ? { interrupted: true, incomplete: true } : { absorbed: true } }); record(logFileFor(st.reqTs, 'jsonl'), rec); emitted(rec); resetPart()
       }
     }
   }
   const openTurn = (ts, text, mid) => {
     emitResponse('next')
-    st.turn += 1; st.reqTs = ts; st.sinceTs = ts; st.responded = false; st.part = 0; st.midTurn = mid; st.reqText = text; st.lastEmitted = null
+    st.turn += 1; st.reqTs = ts; st.sinceTs = ts; st.responded = false; st.part = 0; st.midTurn = mid; st.interrupted = false; st.reqText = text; st.lastEmitted = null; st.tdQueue = []; st.hkQueue = []
     resetPart()
+    st.agentTurn['ts:' + `${sid}:${st.turn}`] = ts
     file = logFileFor(ts); st.file = file
     st.reqCat = categorize(text)
     line(file, ts, 'REQUEST', st.turn, `${mid ? '(mid-turn) ' : ''}[${st.reqCat.category}] ${'─'.repeat(mid ? 36 : 45)}`)
     block(file, '>', text)
   }
   const ensureTurn = ts => { if (!st.turn) { st.turn = 1; st.reqTs = ts; st.sinceTs = ts; st.reqText = ''; st.reqCat = categorize(''); file = ensureFile(ts); st.file = file } }
-  const lateFix = (patch) => {                                            // 이미 방출된 턴에 뒤늦게 도착한 perf 값 → 보정 레코드
+  const lateFix = (patch, kind) => {                                      // 이미 방출된 파트에 뒤늦게 도착한 perf 값 → 보정 레코드. 값 없이 방출된 파트 순서(FIFO)로 귀속
     if (!st.lastEmitted) return false
-    record(logFileFor(st.lastEmitted.reqTs, 'jsonl'), { v: SCHEMA_VERSION, fix: true, id: st.lastEmitted.id, perf: patch }); return true
+    const q = kind === 'td' ? (st.tdQueue = st.tdQueue || []) : (st.hkQueue = st.hkQueue || [])
+    const id = q.length ? q.shift() : st.lastEmitted.id
+    record(logFileFor(st.lastEmitted.reqTs, 'jsonl'), { v: SCHEMA_VERSION, fix: true, id, perf: patch }); return true
   }
+  const emitted = rec => { st.lastEmitted = { id: rec.id, reqTs: st.reqTs }; if (rec.perf.turn_duration_ms == null) (st.tdQueue = st.tdQueue || []).push(rec.id); if (!rec.perf.hook_ms) (st.hkQueue = st.hkQueue || []).push(rec.id) }
 
   for (const j of fresh) {
     const ts = j.timestamp || new Date().toISOString()
     if (j.type === 'assistant' && !j.isSidechain) {
-      if (j.message?.model) st.model = j.message.model                      // 턴 단위 모델 (세션 중 /model 전환 반영)
+      if (j.message?.model && !/^</.test(j.message.model)) st.model = j.message.model   // 턴 단위 모델 (세션 중 /model 전환 반영; "<synthetic>" 등 하네스 합성 메시지는 제외)
       announce(j, ts)
       const rid = j.requestId || j.uuid
       if (j.message?.usage && st.turn && !st.seenReq[rid]) { st.seenReq[rid] = 1; const u = j.message.usage, t = st.tokens; t.api_calls += 1; t.input += u.input_tokens || 0; t.cache_read += u.cache_read_input_tokens || 0; t.cache_create += u.cache_creation_input_tokens || 0; t.output += u.output_tokens || 0; t.thinking += u.output_tokens_details?.thinking_tokens || 0 }
@@ -236,27 +278,32 @@ function processTranscript(transcript, sid, st, { final = false } = {}) {
           st.tools[b.name] = (st.tools[b.name] || 0) + 1
           if ((b.name === 'Bash' || b.name === 'PowerShell') && b.input?.description) st.descriptions.push(String(b.input.description))
           if (b.name === 'Skill' && b.input?.skill) { const r = skillRes(b.input.skill); bump(st.res.skills, r, r) }
-          if (b.name === 'Agent') { const n = String(b.input?.subagent_type || 'general-purpose'); bump(st.res.agents, { name: n }, { name: n }) }
+          if (b.name === 'Agent') { const n = String(b.input?.subagent_type || 'general-purpose'); bump(st.res.agents, { name: n }, { name: n }); st.agentTurn['tu:' + b.id] = `${sid}:${st.turn}`; if (b.input?.name) { st.agentTurn['name:' + b.id] = String(b.input.name); st.agentTurn['nm:' + String(b.input.name)] = `${sid}:${st.turn}` } }
           const mr = mcpRes(b.name); if (mr) bump(st.res.mcp, mr, mr)
           const r = results.get(b.id); const ms = r ? new Date(r.ts) - new Date(ts) : null
-          st.steps.push({ t: b.name, ok: r ? r.ok : null, ms: ms >= 0 ? ms : null })
+          const tgt = /^(Read|Edit|Write|MultiEdit|NotebookEdit)$/.test(b.name) ? rel(b.input?.file_path || b.input?.notebook_path || '') : (b.name === 'Grep' || b.name === 'Glob') && b.input?.path ? rel(b.input.path) : undefined
+          if (/^(Write|Edit|MultiEdit|NotebookEdit)$/.test(b.name) && tgt) st.writes.push(tgt)
+          st.steps.push({ t: b.name, ok: r ? r.ok : null, ms: ms >= 0 ? ms : null, ...(tgt ? { tgt: redact(tgt) } : {}), ...(r && r.chars ? { chars: r.chars } : {}), d: (b.name === 'Bash' || b.name === 'PowerShell') ? String(b.input?.description || '') : undefined })
           line(file, ts, 'STEP', st.turn, `${b.name} ${summarize(b.name, b.input)} ${r ? `→ ${r.ok ? 'OK' : 'ERROR'} ${elapsed(ms)}` : '→ (pending)'}`)
-        } else if (b.type === 'text' && b.text?.trim()) { if (pendingText) notes.push(pendingText); pendingText = { ts, text: b.text } }
+        } else if (b.type === 'text' && b.text?.trim()) { if (pendingText) notes.push(pendingText); pendingText = { ts, text: b.text }; if (!st.firstTextTs) st.firstTextTs = ts }
       }
     } else if (j.type === 'attachment' && /^hook_/.test(j.attachment?.type || '') && st.turn) {
       const a = j.attachment; const name = String(a.hookName || a.hookEvent || a.type).replace(/:.*$/, ''); const ev = String(a.hookEvent || name)
       bump(st.res.hooks, { name, event: ev }, { name, event: ev })
     } else if (j.type === 'system' && st.turn) {
+      // 진행 중인(아직 방출 안 된) 파트가 있으면 그 파트의 값 → 누적. 없으면(직전 파트 방출 후 도착) → 보정 레코드
+      const partOpen = !!pendingText || st.steps.length > 0 || st.tokens.api_calls > 0
       if (j.subtype === 'stop_hook_summary' && Array.isArray(j.hookInfos)) {
         const ms = j.hookInfos.reduce((a, h) => a + (h.durationMs || 0), 0)
-        if (st.responded && st.lastEmitted) lateFix({ hook_ms: ms, hook_runs: j.hookInfos.length }); else { st.hookRuns += j.hookInfos.length; st.hookMs += ms }
+        if (!partOpen && st.lastEmitted) lateFix({ hook_ms: ms, hook_runs: j.hookInfos.length }, 'hk'); else { st.hookRuns += j.hookInfos.length; st.hookMs += ms }
       }
       if (j.subtype === 'turn_duration') {
         const v = Object.entries(j).find(([k, x]) => /duration/i.test(k) && typeof x === 'number')
-        if (v) { if (st.responded && st.lastEmitted) lateFix({ turn_duration_ms: v[1] }); else st.turnDurationMs = v[1] }
+        if (v) { if (!partOpen && st.lastEmitted) lateFix({ turn_duration_ms: v[1] }, 'td'); else st.turnDurationMs = v[1] }
       }
     } else if (j.type === 'user' && !j.isMeta && !j.isSidechain) {
       const text = userText(j); if (text == null) continue
+      if (/^\[Request interrupted by user[^\]]*\]$/.test(text.trim())) { if (st.turn) st.interrupted = true; continue }   // 사용자 중단 → 현재 턴에 플래그
       const c = classifyPrompt(text); if (!c) continue
       announce(j, ts)
       if (c.kind === 'REQUEST') openTurn(ts, c.text, false)
@@ -267,6 +314,7 @@ function processTranscript(transcript, sid, st, { final = false } = {}) {
   }
   emitResponse(final ? 'final' : 'stop')
   st.offset = next; st.file = file
+  try { scanSubagents() } catch (e) { if (process.env.WORK_HISTORY_DEBUG) process.stderr.write(`subagent scan: ${e?.stack || e}\n`) }
   return st
 }
 

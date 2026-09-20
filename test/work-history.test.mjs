@@ -129,6 +129,48 @@ test('logger holds back an incomplete trailing line instead of dropping it', () 
   assert.equal(readRecords(env).filter(r => !r.fix).length, 1)
 })
 
+test('late turn_duration goes to the open part, not the previously emitted one', () => {
+  const { env, transcript } = setup(); const s = sid()
+  fs.writeFileSync(transcript, jsonl([
+    user('요청', 0),
+    asst([{ type: 'text', text: '1차 답' }], 1000, { requestId: 'r1' }),
+    stopSummary(1500), turnDuration(1600, 63000),                                                   // 파트 1 의 값 — 경계 전에 도착
+    user('<command-name>/diff</command-name>', 5000),                                               // 경계 → 파트 1 방출 (td=63000)
+    asst([{ type: 'text', text: '2차 답' }], 6000, { requestId: 'r2' }),
+    stopSummary(6500), turnDuration(6600, 7000),                                                    // 파트 2 의 값 — 파트 2 는 아직 미방출(open)
+  ]))
+  runLogger(env, { session_id: s, hook_event_name: 'Stop', transcript_path: transcript })
+  const rows = loadRows({ root: env.WORK_HISTORY_DIR }).sort((a, b) => a.part - b.part)
+  assert.deepEqual(rows.map(r => r.perf.turn_duration_ms), [63000, 7000])
+  assert.deepEqual(rows.map(r => r.perf.hook_ms), [200, 200])
+})
+
+test('subagent transcripts are attributed to the dispatching turn by name and costed', () => {
+  const { dir, env, transcript } = setup(); const s = sid()
+  fs.writeFileSync(transcript, jsonl([
+    user('평가해줘', 0),
+    asst([toolUse('t1', 'Agent', { subagent_type: 'scientist', name: 'eval-x', description: 'x', prompt: 'p' })], 500, { requestId: 'r1' }), toolResult('t1', 900),
+    asst([{ type: 'text', text: '위임 완료' }], 3000, { requestId: 'r2' }),
+  ]))
+  const sub = path.join(dir, s, 'subagents'); fs.mkdirSync(sub, { recursive: true })
+  fs.writeFileSync(path.join(sub, 'agent-aeval-x-abc123.meta.json'), JSON.stringify({ agentType: 'scientist', name: 'eval-x', model: 'claude-sonnet-5', customAgentType: 'scientist', teamName: 'default' }))
+  fs.writeFileSync(path.join(sub, 'agent-aeval-x-abc123.jsonl'), jsonl([
+    { type: 'user', agentId: 'aeval-x-abc123', isSidechain: true, message: { role: 'user', content: 'p' }, timestamp: iso(1000) },
+    { type: 'assistant', agentId: 'aeval-x-abc123', isSidechain: true, requestId: 'a1', message: { model: 'claude-sonnet-5', content: [toolUse('u1', 'Read', { file_path: 'a' })], usage: { input_tokens: 1000, cache_read_input_tokens: 0, cache_creation_input_tokens: 0, output_tokens: 2000 } }, timestamp: iso(1500) },
+    { type: 'user', agentId: 'aeval-x-abc123', isSidechain: true, message: { role: 'user', content: [{ type: 'tool_result', tool_use_id: 'u1', is_error: true }] }, timestamp: iso(1800) },
+    { type: 'assistant', agentId: 'aeval-x-abc123', isSidechain: true, requestId: 'a2', message: { model: 'claude-sonnet-5', content: [{ type: 'text', text: 'done' }], usage: { input_tokens: 0, cache_read_input_tokens: 0, cache_creation_input_tokens: 0, output_tokens: 1000 } }, timestamp: iso(11000) },
+  ]))
+  runLogger(env, { session_id: s, hook_event_name: 'Stop', transcript_path: transcript })
+  const rows = loadRows({ root: env.WORK_HISTORY_DIR })
+  assert.equal(rows.length, 1)
+  const a = rows[0].agents_detail; assert.ok(a && a.length === 1)
+  assert.equal(a[0].name, 'eval-x'); assert.equal(a[0].model, 'claude-sonnet-5'); assert.equal(a[0].tools, 1); assert.equal(a[0].errors, 1); assert.equal(a[0].wall_ms, 10000)
+  assert.equal(a[0].tokens.output, 3000)
+  assert.equal(a[0].cost_usd, +((1000 * 2 + 3000 * 10) / 1e6).toFixed(4))                 // sonnet 5: $2 in / $10 out per M
+  assert.equal(rows[0].cost_agents_usd, a[0].cost_usd)
+  assert.equal(aggregate(rows).total.cost_total_usd, +(rows[0].cost_usd + a[0].cost_usd).toFixed(4))
+})
+
 test('continuation parts are deltas, not cumulative snapshots', () => {
   const { env, transcript } = setup(); const s = sid()
   fs.writeFileSync(transcript, jsonl([

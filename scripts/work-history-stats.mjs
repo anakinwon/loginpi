@@ -30,19 +30,53 @@ const WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 function* walk(dir) { if (!fs.existsSync(dir)) return; for (const e of fs.readdirSync(dir, { withFileTypes: true })) { const p = path.join(dir, e.name); if (e.isDirectory()) yield* walk(p); else if (e.name.endsWith('.jsonl')) yield p } }
 /** 범위 안의 레코드. 파일명(YYYY-MM-DD.jsonl)으로 프리필터 → id 기준 last-write-wins → fix 레코드를 perf 에 병합 → ts_req 정렬 */
 export function loadRows({ from = '0000-00-00', to = '9999-99-99', root = LOG_ROOT } = {}) {
-  const byId = new Map(), fixes = [], anon = []
+  const byId = new Map(), fixes = [], anon = [], agents = new Map()      // agents: agent_id → 최신 agent 레코드
   for (const f of walk(root)) {
     const day = path.basename(f, '.jsonl'); if (/^\d{4}-\d{2}-\d{2}$/.test(day) && (day < from || day > to)) continue
     for (const l of fs.readFileSync(f, 'utf8').split('\n')) {
       if (!l.trim()) continue
       let r; try { r = JSON.parse(l) } catch { continue }
       if (r.fix) { fixes.push(r); continue }
+      if (r.agent) { agents.set(r.agent_id, r); continue }
       if (r.date < from || r.date > to) continue
       if (r.id) byId.set(r.id, r); else anon.push(r)                        // v1 레코드(id 없음)는 그대로
     }
   }
   for (const fx of fixes) { const r = byId.get(fx.id); if (r) r.perf = { ...(r.perf || {}), ...fx.perf } }
-  return [...byId.values(), ...anon].sort((a, b) => (a.ts_req || '').localeCompare(b.ts_req || '') || (a.part || 0) - (b.part || 0))
+  const rows = [...byId.values(), ...anon].sort((a, b) => (a.ts_req || '').localeCompare(b.ts_req || '') || (a.part || 0) - (b.part || 0))
+  // 서브에이전트 레코드를 디스패치 턴의 part 1 레코드에 귀속 (cost_agents_usd · agent_wall · 병렬도)
+  const firstPart = new Map(); for (const r of rows) { const t = r.id && r.id.replace(/\.\d+$/, ''); if (t && (!firstPart.has(t) || r.part < firstPart.get(t).part)) firstPart.set(t, r) }
+  for (const a of agents.values()) {
+    const r = firstPart.get(a.id); if (!r) continue
+    r.agents_detail = r.agents_detail || []; r.agents_detail.push(a)
+  }
+  for (const r of rows) {
+    if (!r.agents_detail) continue
+    const d = r.agents_detail; const walls = d.map(a => a.wall_ms || 0)
+    r.cost_agents_usd = +d.reduce((s, a) => s + (a.cost_usd || 0), 0).toFixed(4)
+    r.agent_wall_ms = walls.reduce((s, w) => s + w, 0); r.agent_wall_max_ms = Math.max(0, ...walls)
+    r.agent_parallelism = r.agent_wall_max_ms ? +(r.agent_wall_ms / r.agent_wall_max_ms).toFixed(2) : null
+    r.agent_tokens_output = d.reduce((s, a) => s + (a.tokens?.output || 0), 0); r.agent_tools = d.reduce((s, a) => s + (a.tools || 0), 0); r.agent_errors = d.reduce((s, a) => s + (a.errors || 0), 0)
+  }
+  // 사용자 교정(UCR): 직전 요청과 머리글 24자 일치 또는 교정 어두, 10분 이내 → correction
+  let prev = null
+  for (const r of rows) {
+    if (r.part !== 1) continue
+    if (prev && prev.session === r.session) {
+      const gap = new Date(r.ts_req) - new Date(prev.ts_req)
+      const samePrefix = (r.req_head || '').slice(0, 24) === (prev.req_head || '').slice(0, 24) && (r.req_head || '').length > 8
+      const lead = /^(아니|다시|말고|대신|바꿔|수정해|고쳐|추가해\s?줘|빼고|제외|그게 아니|틀렸)/.test(r.req_head || '')
+      r.correction = gap <= 10 * 60e3 && (samePrefix || lead || !!prev.superseded)
+    } else r.correction = false
+    prev = r
+  }
+  // 오류 회복(ERM): 오류 스텝 뒤 같은 도구가 성공할 때까지의 추가 호출·시간
+  for (const r of rows) {
+    let extra = 0, extraMs = 0, errMs = 0; const s = r.steps || []
+    for (let i = 0; i < s.length; i++) if (s[i].ok === false) { errMs += s[i].ms || 0; for (let j = i + 1; j < s.length; j++) { extra++; extraMs += s[j].ms || 0; if (s[j].t === s[i].t && s[j].ok) break } }
+    r.recovery = { extra_calls: extra, extra_ms: extraMs, error_ms: errMs, multiplier: errMs ? +(extraMs / errMs).toFixed(1) : null }
+  }
+  return rows
 }
 
 // ── 공통 ─────────────────────────────────────────────────────────────────────
@@ -66,19 +100,33 @@ const tokenSum = rs => { const t = { api_calls: 0, input: 0, cache_read: 0, cach
 
 // ── summary ──────────────────────────────────────────────────────────────────
 function groupTurns(rows, keyFn) {
-  return [...groupBy(rows, keyFn)].map(([k, rs]) => { const timed = rs.filter(isTimed); const t = tokenSum(rs); return { key: k, turns: rs.length, n_timed: timed.length, elapsed_ms: sum(timed, r => r.elapsed_ms), avg_elapsed: avg(timed, r => r.elapsed_ms), p50_elapsed: quantile(timed.map(r => r.elapsed_ms), 0.5), tools: sum(rs, r => r.tools_total), avg_tools: +(sum(rs, r => r.tools_total) / rs.length).toFixed(1), errors: sum(rs, r => r.tool_errors), output: t.output, cost_usd: t.cost_usd, req_chars: sum(rs, r => r.req_chars), res_chars: sum(rs, r => r.res_chars), mid_turn: rs.filter(r => r.mid_turn).length } })
+  return [...groupBy(rows, keyFn)].map(([k, rs]) => { const timed = rs.filter(isTimed); const t = tokenSum(rs); const n = requestsOf(rs); const ca = +rs.reduce((a, r) => a + (r.cost_agents_usd || 0), 0).toFixed(4); return { key: k, turns: rs.length, requests: n, n_timed: timed.length, elapsed_ms: sum(timed, r => r.elapsed_ms), avg_elapsed: avg(timed, r => r.elapsed_ms), p50_elapsed: quantile(timed.map(r => r.elapsed_ms), 0.5), tools: sum(rs, r => r.tools_total), avg_tools: +(sum(rs, r => r.tools_total) / rs.length).toFixed(1), errors: sum(rs, r => r.tool_errors), output: t.output, cost_usd: t.cost_usd, cost_agents_usd: ca, cost_total_usd: t.cost_usd != null ? +(t.cost_usd + ca).toFixed(4) : null, cost_per_request: t.cost_usd != null && n ? +((t.cost_usd + ca) / n).toFixed(4) : null, files_changed: sum(rs, r => r.files_changed), corrections: rs.filter(r => r.correction).length, req_chars: sum(rs, r => r.req_chars), res_chars: sum(rs, r => r.res_chars), mid_turn: rs.filter(r => r.mid_turn).length } })
 }
 function groupSteps(rows) {
   const g = new Map()
-  for (const r of rows) for (const s of r.steps || []) { const a = g.get(s.t) || { key: s.t, calls: 0, errors: 0, ms: 0, timed: 0 }; a.calls++; if (s.ok === false) a.errors++; if (s.ms != null) { a.ms += s.ms; a.timed++ } g.set(s.t, a) }
-  return [...g.values()].map(a => ({ ...a, avg_ms: a.timed ? Math.round(a.ms / a.timed) : null })).sort((x, y) => y.calls - x.calls)
+  for (const r of rows) for (const s of r.steps || []) { const a = g.get(s.t) || { key: s.t, calls: 0, errors: 0, ms: 0, timed: 0, chars: 0, msList: [] }; a.calls++; if (s.ok === false) a.errors++; if (s.ms != null) { a.ms += s.ms; a.timed++; a.msList.push(s.ms) } a.chars += s.chars || 0; g.set(s.t, a) }
+  return [...g.values()].map(({ msList, ...a }) => ({ ...a, avg_ms: a.timed ? Math.round(a.ms / a.timed) : null, p50_ms: quantile(msList, 0.5), p90_ms: quantile(msList, 0.9), max_ms: msList.length ? Math.max(...msList) : null })).sort((x, y) => y.calls - x.calls)
+}
+// 요청(턴) 단위 지표 — part 레코드가 아니라 distinct 턴이 분모
+export const requestsOf = rows => new Set(rows.filter(r => r.id).map(r => r.id.replace(/\.\d+$/, ''))).size || rows.filter(r => r.part === 1 || r.part == null).length
+const agentSum = (rows, f) => rows.reduce((a, r) => a + (f(r) || 0), 0)
+export function outcomeStats(rows) {
+  const p1 = rows.filter(r => r.part === 1 || r.part == null); const n = requestsOf(rows) || 1
+  const corrections = p1.filter(r => r.correction).length, interrupted = rows.filter(r => r.interrupted).length
+  const writeTurns = p1.filter(r => (r.files_changed || 0) > 0); const unverified = writeTurns.filter(r => r.verified === false).length
+  const files = new Map(); for (const r of rows) for (const s of r.steps || []) if (s.tgt && /^(Write|Edit|MultiEdit|NotebookEdit)$/.test(s.t)) { const k = s.tgt; const e = files.get(k) || { file: k, calls: 0, turns: new Set() }; e.calls++; e.turns.add(r.turn); files.set(k, e) }
+  const fileRows = [...files.values()].map(e => ({ file: e.file, calls: e.calls, turns: e.turns.size, rework: e.turns.size > 1 })).sort((a, b) => b.calls - a.calls)
+  const rec = rows.map(r => r.recovery).filter(Boolean)
+  return { requests: n, records: rows.length, edit_calls: sum(rows, r => r.edit_calls), files_changed: files.size, files_reworked: fileRows.filter(f => f.rework).length, rework_rate: files.size ? +(fileRows.filter(f => f.rework).length / files.size).toFixed(3) : null, write_turns: writeTurns.length, unverified_write_turns: unverified, unverified_rate: writeTurns.length ? +(unverified / writeTurns.length).toFixed(3) : null, corrections, correction_rate: +(corrections / n).toFixed(3), interrupted, superseded: rows.filter(r => r.superseded).length, error_extra_calls: agentSum(rec, x => x.extra_calls), error_extra_ms: agentSum(rec, x => x.extra_ms), error_ms: agentSum(rec, x => x.error_ms), recovery_multiplier: agentSum(rec, x => x.error_ms) ? +(agentSum(rec, x => x.extra_ms) / agentSum(rec, x => x.error_ms)).toFixed(1) : null, files: fileRows.slice(0, 30) }
 }
 export function aggregate(rows) {
-  const timed = rows.filter(isTimed); const t = tokenSum(rows)
-  const total = { turns: rows.length, n_timed: timed.length, elapsed_ms: sum(timed, r => r.elapsed_ms), avg_elapsed_ms: avg(timed, r => r.elapsed_ms), p50_elapsed_ms: quantile(timed.map(r => r.elapsed_ms), 0.5), tools: sum(rows, r => r.tools_total), errors: sum(rows, r => r.tool_errors), days: new Set(rows.map(r => r.date)).size, sessions: new Set(rows.map(r => r.session)).size, projects: new Set(rows.map(r => r.project).filter(Boolean)).size, superseded: rows.filter(r => r.superseded).length, incomplete: rows.filter(r => r.incomplete).length, absorbed: rows.filter(r => r.absorbed).length, res_chars: sum(rows, r => r.res_chars), req_chars: sum(rows, r => r.req_chars), output: t.output, cost_usd: t.cost_usd }
+  const timed = rows.filter(isTimed); const t = tokenSum(rows); const n = requestsOf(rows)
+  const idle = rows.map(r => r.idle_ms).filter(x => x != null); const idleSum = idle.reduce((a, b) => a + b, 0); const el = sum(timed, r => r.elapsed_ms)
+  const costAgents = +agentSum(rows, r => r.cost_agents_usd).toFixed(4)
+  const total = { turns: rows.length, requests: n, n_timed: timed.length, elapsed_ms: el, avg_elapsed_ms: avg(timed, r => r.elapsed_ms), p50_elapsed_ms: quantile(timed.map(r => r.elapsed_ms), 0.5), p90_elapsed_ms: quantile(timed.map(r => r.elapsed_ms), 0.9), ttft_p50_ms: quantile(timed.map(r => r.ttft_ms).filter(x => x != null), 0.5), ttft_p90_ms: quantile(timed.map(r => r.ttft_ms).filter(x => x != null), 0.9), idle_ms: idleSum, active_ratio: el + idleSum ? +(el / (el + idleSum)).toFixed(3) : null, tools: sum(rows, r => r.tools_total), errors: sum(rows, r => r.tool_errors), days: new Set(rows.map(r => r.date)).size, sessions: new Set(rows.map(r => r.session)).size, projects: new Set(rows.map(r => r.project).filter(Boolean)).size, superseded: rows.filter(r => r.superseded).length, incomplete: rows.filter(r => r.incomplete).length, absorbed: rows.filter(r => r.absorbed).length, interrupted: rows.filter(r => r.interrupted).length, res_chars: sum(rows, r => r.res_chars), req_chars: sum(rows, r => r.req_chars), output: t.output, cost_usd: t.cost_usd, cost_agents_usd: costAgents, cost_total_usd: t.cost_usd != null ? +(t.cost_usd + costAgents).toFixed(4) : null, cost_per_request: t.cost_usd != null && n ? +((t.cost_usd + costAgents) / n).toFixed(4) : null, agents: agentSum(rows, r => (r.agents_detail || []).length), agent_wall_ms: agentSum(rows, r => r.agent_wall_ms) }
   const axes = {}; for (const k of AXIS_KEYS) axes[k] = sortAxis(k, groupTurns(rows, AXES[k]))
   axes.tool = groupSteps(rows)
-  return { total, axes }
+  return { total, axes, outcome: outcomeStats(rows) }
 }
 
 // ── ① tokens ─────────────────────────────────────────────────────────────────
@@ -88,7 +136,15 @@ export function tokensStats(rows) {
   const by = {}; for (const k of ['category', 'hour', 'day', 'week', 'month', 'year', 'session', 'model', 'project']) by[k] = sortAxis(k, [...groupBy(rows, AXES[k])].map(([key, rs]) => tokenRow(key, rs)))
   const turns = rows.map(r => ({ id: r.id, turn: `${r.session}#${r.turn}${r.part > 1 ? '.' + r.part : ''}`, ts_req: r.ts_req, category: r.category, model: r.model, ...tok(r), cost_usd: r.cost_usd ?? null, out_tps: r.perf?.out_tps ?? null, gen_tps: r.perf?.gen_tps ?? null, cache_hit: tok(r).cache_hit ?? null }))
   const outs = rows.filter(isTimed).map(r => tok(r).output)
-  return { total, by, turns, distribution: { out_p50: quantile(outs, 0.5), out_p90: quantile(outs, 0.9), out_max: outs.length ? Math.max(...outs) : null, ctx_first: rows.length ? tok(rows[0]).context : null, ctx_last: rows.length ? tok(rows[rows.length - 1]).context : null } }
+  // 호출당 컨텍스트: 턴 합계가 아니라 (context ÷ api_calls) — 세션 내 첫/끝 호출 비교로 컨텍스트 팽창률
+  const withCalls = rows.filter(r => tok(r).api_calls > 0)
+  const perCall = r => Math.round(tok(r).context / tok(r).api_calls)
+  const ctxFirst = withCalls.length ? perCall(withCalls[0]) : null, ctxLast = withCalls.length ? perCall(withCalls[withCalls.length - 1]) : null
+  const ctxPeak = withCalls.length ? Math.max(...withCalls.map(perCall)) : null
+  // 캐시 미스 이벤트: 직전 고수위 대비 cache_read 가 20k 이상 하락한 턴 수 (구조적으로 1에 수렴하는 cache_hit 의 대안)
+  let hi = 0, misses = 0; for (const r of withCalls) { const cr = tok(r).cache_read / tok(r).api_calls; if (hi - cr > 20000) misses++; hi = Math.max(hi, cr) }
+  const agentsOut = rows.reduce((a, r) => a + (r.agent_tokens_output || 0), 0)
+  return { total: { ...total, cost_agents_usd: +rows.reduce((a, r) => a + (r.cost_agents_usd || 0), 0).toFixed(4), agent_output: agentsOut }, by, turns, distribution: { out_p50: quantile(outs, 0.5), out_p90: quantile(outs, 0.9), out_max: outs.length ? Math.max(...outs) : null, ctx_per_call_first: ctxFirst, ctx_per_call_last: ctxLast, ctx_per_call_peak: ctxPeak, ctx_growth: ctxFirst && ctxLast ? +(ctxLast / ctxFirst).toFixed(2) : null, cache_miss_events: misses } }
 }
 
 // ── ② usage ──────────────────────────────────────────────────────────────────
@@ -122,14 +178,16 @@ const perfRow = (key, rs) => {
 export function perfStats(rows) {
   const total = perfRow('total', rows)
   const by = {}; for (const k of ['category', 'hour', 'day', 'week', 'month', 'year', 'model', 'session', 'project']) by[k] = sortAxis(k, [...groupBy(rows, AXES[k])].map(([key, rs]) => perfRow(key, rs)))
-  const tools = groupSteps(rows).map(a => ({ tool: a.key, calls: a.calls, errors: a.errors, error_rate: a.calls ? +(a.errors / a.calls).toFixed(4) : 0, avg_ms: a.avg_ms, total_ms: a.ms, share_of_tool_time: null }))
+  const tools = groupSteps(rows).map(a => ({ tool: a.key, calls: a.calls, errors: a.errors, error_rate: a.calls ? +(a.errors / a.calls).toFixed(4) : 0, avg_ms: a.avg_ms, p50_ms: a.p50_ms, p90_ms: a.p90_ms, max_ms: a.max_ms, total_ms: a.ms, chars: a.chars, share_of_tool_time: null }))
   const toolMsTotal = sum(tools, t => t.total_ms); for (const t of tools) t.share_of_tool_time = toolMsTotal ? +(t.total_ms / toolMsTotal).toFixed(3) : null
   const turns = rows.map(r => ({ id: r.id, turn: `${r.session}#${r.turn}${r.part > 1 ? '.' + r.part : ''}`, ts_req: r.ts_req, category: r.category, timed: isTimed(r), elapsed_ms: r.elapsed_ms, turn_duration_ms: r.perf?.turn_duration_ms ?? null, tool_ms: r.perf?.tool_ms ?? null, tool_share: r.perf?.tool_share ?? null, hook_ms: r.perf?.hook_ms ?? null, tools: r.tools_total, errors: r.tool_errors, api_calls: tok(r).api_calls, output_tokens: tok(r).output, out_tps: r.perf?.out_tps ?? null, gen_tps: r.perf?.gen_tps ?? null, cache_hit: tok(r).cache_hit ?? null, cost_usd: r.cost_usd ?? null }))
   return { total, by, tools, turns }
 }
+export const MIN_N_COMPARE = 20
 export function compare(cur, prev) {
   if (!cur || !prev) return null
-  return ['turns', 'n_timed', 'avg_elapsed_ms', 'p50_elapsed_ms', 'avg_tools', 'error_rate', 'avg_out_tokens', 'gen_tps', 'avg_api_calls', 'cache_hit', 'tool_share', 'cost_usd', 'cost_per_turn'].map(k => ({ metric: k, current: cur[k], previous: prev[k], delta: cur[k] != null && prev[k] ? +(((cur[k] - prev[k]) / prev[k])).toFixed(4) : null }))
+  const small = Math.min(cur.n_timed || cur.turns || 0, prev.n_timed || prev.turns || 0) < MIN_N_COMPARE
+  return ['turns', 'n_timed', 'avg_elapsed_ms', 'p50_elapsed_ms', 'avg_tools', 'error_rate', 'avg_out_tokens', 'gen_tps', 'avg_api_calls', 'cache_hit', 'tool_share', 'cost_usd', 'cost_per_turn'].map(k => ({ metric: k, current: cur[k], previous: prev[k], delta: cur[k] != null && prev[k] ? +(((cur[k] - prev[k]) / prev[k])).toFixed(4) : null, reliable: !small && !['turns', 'n_timed'].includes(k) ? true : !small, note: small ? `표본 부족 (n<${MIN_N_COMPARE}) — 방향만 참고` : '' }))
 }
 
 // ── 표·CSV ────────────────────────────────────────────────────────────────────
