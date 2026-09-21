@@ -109,3 +109,6 @@ prod_seed*.sql
 # 작업 이력·통계 산출물 (대화 전문 포함 — 저장소 밖에 보관, 2026-09-20 보안 평가)
 work-history/
 work-statistics/
+
+# Ruflo(ruvector) 로컬 벡터 DB — 세션별 바이너리, 커밋 금지
+ruvector.db
