@@ -7,11 +7,23 @@
       "skillPath": "skills/agent-browser/SKILL.md",
       "computedHash": "80161e6836b3b40f4e83730a290deb40ac14d877d38c97ad5f6d71be37ce74c3"
     },
+    "agent-reach": {
+      "source": "panniantong/agent-reach",
+      "sourceType": "github",
+      "skillPath": "agent_reach/skill/SKILL.md",
+      "computedHash": "e363fdbbe24627e59df4e15b360bbb656532b61938a131bd0391d353f49b13ae"
+    },
     "ask-matt": {
       "source": "mattpocock/skills",
       "sourceType": "github",
       "skillPath": "skills/engineering/ask-matt/SKILL.md",
       "computedHash": "5ec84a4c2d9021d99780e5222b2a9f532b53cca8237024eb6cb40ad370c667c5"
+    },
+    "awesome-design-md": {
+      "source": "wearescientist/awesome-design-md",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "a5987926a560c8415f1d4d54b94f90fd1824f623d8be590a879393da3a67def4"
     },
     "brandkit": {
       "source": "Leonxlnx/taste-skill",
@@ -175,6 +187,12 @@
       "skillPath": "skills/ponytail/SKILL.md",
       "computedHash": "9e8d05cbbaf6dc38f0cffc924c09b3cbe76d94ba4ba0d09bde803da2f8c6b5a0"
     },
+    "prompt-master": {
+      "source": "nidhinjs/prompt-master",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "8e0f826023d036d462e7db6bab2ffca145325ae8e6fbfbf35b98bc04f154e4e9"
+    },
     "prototype": {
       "source": "mattpocock/skills",
       "sourceType": "github",
@@ -276,6 +294,12 @@
       "sourceType": "github",
       "skillPath": "skills/engineering/wayfinder/SKILL.md",
       "computedHash": "731db837ef3b7e03d6742b296a58ab48c8a0867320d5af269611e21a80059607"
+    },
+    "web-design-guidelines": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-design-guidelines/SKILL.md",
+      "computedHash": "f3bc47f890f42a44db1007ab390709ec368e4b8c089baee6b0007182236ac474"
     },
     "writing-great-skills": {
       "source": "mattpocock/skills",
