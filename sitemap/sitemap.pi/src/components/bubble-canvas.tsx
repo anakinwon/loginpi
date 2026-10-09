@@ -1,8 +1,9 @@
 'use client'
 
 // 메인 버블 캔버스 — SVG 원형 버블 물리(충돌·밀어내기·벽 반사·부유) + 드래그·호버/포커스 툴팁·클릭/Enter 상세 이동.
-// 크기 = 요금제(PLAN_AREA) 비율로 화면 면적을 나눔. 스타일은 크립토버블과 같은 "가운데 투명 → 외곽으로 갈수록 진해지는 링" 그라데이션, 외곽 색 = 요금제(PLAN_COLOR 추천 팔레트), 글자는 흰색·증감은 부호로 표시.
-// 글자는 9px 미만으로 줄이지 않고 반지름에 따라 표시 단계를 낮춘다(3 배지·아이콘·도메인·% → 2 도메인·% → 1 첫 글자 → 0 없음, 정보는 툴팁·aria-label 로 유지).
+// 크기 = 요금제(PLAN_AREA) 비율로 화면 면적을 나눔. 스타일은 크립토버블과 같은 "가운데 투명 → 외곽으로 갈수록 진해지는 링" 그라데이션, 외곽 색 = 요금제(PLAN_COLOR 추천 팔레트), 글자는 흰색.
+// 버블 안 = 회사 로고 + 회사명만(마스터 지시 2026-10-10 — 광고·자사·등급 배지와 증감 % 는 툴팁·aria-label 로만 표시). 로고 미등록이면 회사명 첫 글자 심볼.
+// 글자는 9px 미만으로 줄이지 않고 반지름에 따라 표시 단계를 낮춘다(3 로고·회사명 → 2 회사명 → 1 로고(첫 글자) → 0 없음).
 // 프레임마다 React 렌더 없이 transform 속성만 갱신(60fps 목표). prefers-reduced-motion 이면 정지 배치(드래그 없음)
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import {
@@ -14,7 +15,7 @@ import {
 } from '@/lib/site'
 
 const C = {
-  fill: 0.56, // 화면 면적 대비 버블 면적 합 — 등비 가중치로 작은 버블이 줄어든 만큼 보정
+  fill: 0.935, // 화면 면적 대비 버블 면적 합 — 등비 가중치로 작은 버블이 줄어든 만큼 보정. 요금제별 반지름 조정(BSC1 ×1.56·BSC2 ×1.44·PRM1 ×1.3·PRM2 ×1.196·VIP ×1.15, 가중치 합 380→634.3) 반영해 0.56→0.935, 다른 요금제 크기 유지
   maxR: 0.24, // 반지름 상한(짧은 변 대비) — 필터로 몇 개만 남을 때 과대 방지
   gap: 2,
   drift: 0.012, // 정착 후 은은한 부유 가속(무작위, 60Hz 프레임당) — 화면 크기 k^0.85 비례, 잔여 변화율 원본 수준(PC ≈7.5%·모바일 ≈6%)
@@ -30,7 +31,7 @@ const C = {
   speedRef: 916, // 속도 기준 화면 크기 √(w·h) — PC 1280×656 캔버스
   maxDt: 3, // 탭 복귀 등 큰 경과시간 상한(프레임 배수)
   clickMove: 6, // 이 거리(px) 미만 이동이면 클릭으로 판정
-  iconMinR: 34, // 이 반지름 이상만 단계 3(배지·아이콘·도메인·%)
+  iconMinR: 34, // 이 반지름 이상만 단계 3(로고 + 회사명)
   minFont: 9, // 글자 하한(px) — 이보다 작아지면 표시 단계를 낮춘다
   relax: 300, // 정지 배치 반복 횟수
 } as const
@@ -400,18 +401,19 @@ export function BubbleCanvas({
         {nodes.map(({ it, r }) => {
           if (!r) return null
           const badge = PLAN_BADGE[it.plan]
-          // 도메인 글자 — 폭(wk·r)·높이(hk·r) 상한에 맞추고, 9px 미만이면 .pi 생략 후 재시도
+          // 회사명 글자 — 폭(wk·r)·높이(hk·r) 상한에 맞추고, 9px 미만이면 괄호 꼬리("(Sample)" 등) 생략 후 재시도
+          const label = it.name || it.domain
           const fit = (wk: number, hk: number) => {
-            let text = it.domain
+            let text = label
             let f = fitFont(text, r * wk, r * hk)
             if (f < C.minFont) {
-              text = text.replace(/\.pi$/, '')
+              text = text.replace(/\s*\(.*\)$/, '')
               f = fitFont(text, r * wk, r * hk)
             }
             return { text, f }
           }
-          const big = fit(1.7, 0.3)
-          const mid = fit(1.85, 0.42)
+          const big = fit(1.6, 0.28)
+          const mid = fit(1.8, 0.42)
           const stage =
             r >= C.iconMinR && big.f >= C.minFont
               ? 3
@@ -420,11 +422,9 @@ export function BubbleCanvas({
                 : r * 0.9 >= C.minFont
                   ? 1
                   : 0
-          const nm = stage === 3 ? big : mid
-          const ir = r * 0.2
-          const iy = -r * 0.3
-          const fBadge = clamp(r * 0.2, C.minFont, 13)
-          const fPct = clamp(r * (stage === 3 ? 0.24 : 0.3), C.minFont, 26)
+          // 로고 — 단계 3 은 회사명 위, 단계 1 은 버블 가운데 단독. 로고 미등록이면 회사명 첫 글자 심볼
+          const ir = stage === 3 ? r * 0.3 : r * 0.55
+          const iy = stage === 3 ? -r * 0.2 : 0
           return (
             <g
               key={it.id}
@@ -437,7 +437,7 @@ export function BubbleCanvas({
               style={{ color: PLAN_COLOR[it.plan] }}
               tabIndex={0}
               role="link"
-              aria-label={`${it.domain}, ${badge ? `${tag(it)}, ` : ''}${planName(it)}, ${fmtViews(it)}, ${fmtPct(it.chgPct)}`}
+              aria-label={`${label} (${it.domain}), ${badge ? `${tag(it)}, ` : ''}${planName(it)}, ${fmtViews(it)}, ${fmtPct(it.chgPct)}`}
               onPointerDown={(e) => onDown(e, it)}
               onPointerEnter={() => activate(it)}
               onPointerLeave={() =>
@@ -466,17 +466,7 @@ export function BubbleCanvas({
                   textAnchor="middle"
                   dominantBaseline="central"
                 >
-                  {stage === 3 && badge && (
-                    <text
-                      y={-r * 0.62}
-                      fontSize={fBadge}
-                      fontWeight={700}
-                      fill="rgba(255,255,255,0.7)"
-                    >
-                      {tag(it)} · {badge}
-                    </text>
-                  )}
-                  {stage === 3 &&
+                  {(stage === 3 || stage === 1) &&
                     (it.img ? (
                       <>
                         <clipPath id={`${uid}-c-${it.id}`}>
@@ -494,39 +484,29 @@ export function BubbleCanvas({
                       </>
                     ) : (
                       <>
-                        <circle r={ir} cy={iy} fill="rgba(255,255,255,0.14)" />
+                        {stage === 3 && (
+                          <circle r={ir} cy={iy} fill="rgba(255,255,255,0.14)" />
+                        )}
                         <text
                           y={iy}
-                          fontSize={Math.max(ir * 1.1, C.minFont)}
+                          fontSize={
+                            stage === 3
+                              ? Math.max(ir * 1.1, C.minFont)
+                              : Math.min(r * 0.9, 18)
+                          }
                           fontWeight={700}
                         >
-                          {it.domain[0].toUpperCase()}
+                          {label[0].toUpperCase()}
                         </text>
                       </>
                     ))}
                   {stage >= 2 && (
-                    <>
-                      <text
-                        y={stage === 3 ? r * 0.08 : -r * 0.14}
-                        fontSize={nm.f}
-                        fontWeight={700}
-                      >
-                        {nm.text}
-                      </text>
-                      <text
-                        y={stage === 3 ? r * 0.4 : r * 0.32}
-                        fontSize={fPct}
-                        fontWeight={600}
-                        fill="#fff"
-                        className="bubble-pct"
-                      >
-                        {fmtPct(it.chgPct)}
-                      </text>
-                    </>
-                  )}
-                  {stage === 1 && (
-                    <text fontSize={Math.min(r * 0.9, 18)} fontWeight={700}>
-                      {it.domain[0].toUpperCase()}
+                    <text
+                      y={stage === 3 ? r * 0.35 : 0}
+                      fontSize={(stage === 3 ? big : mid).f}
+                      fontWeight={700}
+                    >
+                      {(stage === 3 ? big : mid).text}
                     </text>
                   )}
                 </g>

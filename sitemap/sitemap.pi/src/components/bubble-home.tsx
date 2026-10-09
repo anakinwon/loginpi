@@ -99,7 +99,6 @@ export function BubbleHome() {
     const id = setTimeout(() => setToast(false), 2500)
     return () => clearTimeout(id)
   }, [toast])
-  const hasSample = data?.items.some((it) => it.sample) ?? false
 
   return (
     <div className="flex flex-col">
@@ -169,11 +168,6 @@ export function BubbleHome() {
         </div>
       </div>
 
-      {(data?.demo || hasSample) && (
-        <p className="bg-amber-400/10 px-3 py-1 text-xs text-amber-200">
-          {t(data?.demo ? 'demo' : 'sampleNote')}
-        </p>
-      )}
       {toast && (
         <p
           role="status"
