@@ -1,0 +1,52 @@
+{
+  "env": {
+    "WORK_HISTORY_PROJECT": "sitemap.pi"
+  },
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/../../.claude/hooks/model-advisor.mjs\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "matcher": "anakin_phase-decide",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/../../.claude/hooks/model-advisor.mjs\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/../../.claude/hooks/work-history-logger.mjs\" && node \"$CLAUDE_PROJECT_DIR/../../.claude/hooks/work-stats-refresh.mjs\"",
+            "timeout": 20
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/../../.claude/hooks/work-history-logger.mjs\"",
+            "timeout": 20
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -27,13 +27,17 @@ export function route(prompt) {
   if (!produce && steps.length) steps.push('응답 → 메인 (팀장 판정 첫 줄 포함)')
   const plan = steps.length ? `[모델 단계 계획] 이 턴은 다음 호출 순서로 진행 : ${steps.map((x, i) => `${i + 1}) ${x}`).join(' ')} ; 메인 /model 전환 금지 ; 응답 첫머리에 "수행 단계 : <실제 수행 단계 → 담당>" 한 줄 보고 (기준 : anakins-claudemodel-for-work 스킬)` : null
   const user = produce ? `권장 effort high (${category}) : /effort high 입력 (작업 중 입력해도 다음 요청부터 적용, 5.5 계열은 캐시 유지)` : null
-  return { user, plan }
+  const deep = !/ultrathink/i.test(prompt) && category !== 'GIT' && DEEP_MAIN_RE.test(prompt)   // 실측 : FEATURE 소요 차이 없음(113 vs 109초), QUERY 7배(n=5) → 설계·결정·원인 분석에만
+  return { user, plan: [plan, deep ? DEEP_MAIN : null].filter(Boolean).join(' ') || null }
 }
 export const advise = prompt => route(prompt).user
 
 // 깊은 추론 지시 자동 부착(SubagentStart) : ultrathink는 effort 값을 바꾸지 않고 컨텍스트 지시만 더함(code.claude.com model-config "Use ultrathink", 2026-10-08 확인)
 // 실측(요청 257건) : 조회·운영 요청에 ultrathink 사용 시 Opus 5.5·Fable 5.1 모두 수용률 상승 없이 소요 약 2배·재작업률 상승 → 결론 단계(anakin_phase-decide)에만 부착
 export const DEEP = '[깊은 추론 지시 : ultrathink 자동 부착] 결론 단계 : 대안을 빠짐없이 비교하고, 결론마다 반론과 뒤집히는 조건을 검토한 뒤 결론을 쓴다'
+// 메인 세션 자동 선별(UserPromptSubmit) : 사용자가 ultrathink를 쓰지 않아도 설계·결정·원인 분석 요청이면 같은 성격의 컨텍스트 지시를 주입(2026-10-09 마스터 지시)
+const DEEP_MAIN_RE = /결론|판정|설계|아키텍처|방식\s?(선정|결정)|비교\s?평가|트레이드\s?오프|근본\s?원인|원인\s?(분석|파악|추적)|장애|디버그|디버깅|왜\s?(안|실패)/
+export const DEEP_MAIN = '[깊은 추론 지시 : ultrathink 자동 선별] 설계·결정·원인 분석 요청 : 대안과 엣지 케이스를 빠짐없이 검토하고, 결론마다 반론과 뒤집히는 조건을 따진 뒤 행동한다'
 export const deepFor = agentType => agentType === 'anakin_phase-decide' ? DEEP : null   // 대시보드(my-claude-model-dashboard.mjs) 발화율 계산용
 
 const isMain = import.meta.url === pathToFileURL(process.argv[1] || '').href   // 대시보드 등에서 import 시 훅 본체(stdin 대기) 미실행
@@ -53,6 +57,11 @@ if (isMain && process.argv[2] === '--selftest') {
   assert.deepEqual(route('[SYSTEM NOTIFICATION - NOT USER INPUT] <task-notification><result>결론 초안</result></task-notification>'), { user: null, plan: null })
   assert.equal(deepFor('anakin_phase-decide'), DEEP); assert.equal(deepFor('anakin_phase-collect'), null)
   assert.deepEqual(route(''), { user: null, plan: null }); assert.deepEqual(route(undefined), { user: null, plan: null })
+  assert.match(route('결제 실패 근본 원인 분석해 줘').plan, /ultrathink 자동 선별/)
+  assert.match(route('DB 동기화 방식 결정해 줘').plan, /ultrathink 자동 선별/)
+  assert.doesNotMatch(route('결론 설계해 줘 ultrathink').plan, /ultrathink 자동 선별/)   // 사용자가 직접 쓴 경우 중복 주입 안 함
+  assert.equal(route('git status 보여 줘').plan, null)
+  assert.doesNotMatch(route('대시보드 만들어 줘').plan, /ultrathink 자동 선별/)
   console.log('selftest ok')
 } else if (isMain) {
   let raw = ''

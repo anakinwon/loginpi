@@ -37,7 +37,7 @@ import { SCHEMA_VERSION, categorize, costUsd, makeRedactor, kfmt, elapsed, usd }
 
 const HERE = path.dirname(fileURLToPath(import.meta.url))
 const PROJECT = path.resolve(HERE, '..', '..')
-const PROJECT_NAME = path.basename(PROJECT)
+const PROJECT_NAME = process.env.WORK_HISTORY_PROJECT || path.basename(PROJECT)   // 하위 앱(sitemap.pi 등) 세션은 그 폴더 settings env 로 구분
 const WORKSPACE_ROOT = (process.env.WORKSPACE_ROOT || path.dirname(PROJECT)).replace(/\\/g, '/').replace(/\/+$/, '')
 const LOG_ROOT = process.env.WORK_HISTORY_DIR || path.join(PROJECT, 'work-history')
 const STATE_DIR = process.env.WORK_HISTORY_STATE_DIR || path.join(PROJECT, '.omc', 'state', 'work-history')

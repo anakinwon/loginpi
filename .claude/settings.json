@@ -43,7 +43,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/work-history-logger.mjs\"",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/work-history-logger.mjs\" && node \"$CLAUDE_PROJECT_DIR/.claude/hooks/work-stats-refresh.mjs\"",
             "timeout": 20
           }
         ]
