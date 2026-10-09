@@ -20,6 +20,8 @@ export const env = createEnv({
     ADMIN_PI_UIDS: z.string().optional(),
     // 도메인 소유 확인 토큰 HMAC 키(32자 이상 권장, 세션 키와 분리). 미설정 시 PI_SESSION_SECRET 폴백(src/lib/api.ts verifyToken)
     SITEMAP_VERIFY_SECRET: z.string().min(32).optional(),
+    // 메인 버블에 가상 샘플 91개(src/data/sample-sites.json)를 DB 데이터와 섞어 표시 — '1'일 때만, 운영 기본 미설정(미노출)
+    SITEMAP_SHOW_SAMPLES: z.enum(['0', '1']).optional(),
     // Vercel 주입 — 운영 tier 판정용(APP_TIER 미설정 시 production = 운영)
     VERCEL_ENV: z.string().optional(),
     // PostgREST 대상 스키마 — 비운영은 pi-nonprod 프로젝트의 sitemap_dev·sitemap_stg, 운영은 미설정(public)
@@ -47,6 +49,7 @@ export const env = createEnv({
     ADMIN_PI_USERNAMES: process.env.ADMIN_PI_USERNAMES,
     ADMIN_PI_UIDS: process.env.ADMIN_PI_UIDS,
     SITEMAP_VERIFY_SECRET: process.env.SITEMAP_VERIFY_SECRET,
+    SITEMAP_SHOW_SAMPLES: process.env.SITEMAP_SHOW_SAMPLES,
     VERCEL_ENV: process.env.VERCEL_ENV,
     SUPABASE_SCHEMA: process.env.SUPABASE_SCHEMA,
     APP_TIER: process.env.APP_TIER,

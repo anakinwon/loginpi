@@ -1,5 +1,5 @@
 {
-  "$comment": "Pi 멀티사이트 레지스트리(PRD_28 §8) — domain·ctgr(sitemap PRD §2 site_ctgr_cd)·wave(W1~W5, 모선 null)·preset·appSts(LIVE 운영 / BUILDING 구축 중 / PLANNED 예정)·listSts(sitemap.pi 디렉터리 시드 상태 sql/001)·planCd(요금제 = site_mst.plan_cd, 메인 버블 크기 VIP>PRM3>PRM2>PRM1>BSC3>BSC2>BSC1 — DB 미연결 시 메인 화면 정적 폴백, sitemap.pi src/lib/site.ts(PLAN_AREA)·src/app/api/bubbles/route.ts)·hold(⏸ 노출 보류 / △ 조건부 사유). 앱 폴더 = sitemap/<domain>(cafe.pi 는 저장소 루트)",
+  "$comment": "Pi 멀티사이트 레지스트리(PRD_28 §8) — domain·ctgr(sitemap PRD §2 site_ctgr_cd)·wave(W1~W5, 모선 null)·preset·appSts(LIVE 운영 / BUILDING 구축 중 / PLANNED 예정)·listSts(sitemap.pi 디렉터리 시드 상태 sql/001)·planCd(요금제 = site_mst.plan_cd, 메인 버블 크기 5단계 VIP>PRM2>PRM1>BSC2>BSC1 — DB 미연결 시 메인 화면 정적 폴백, sitemap.pi src/lib/site.ts(PLAN_AREA)·src/app/api/bubbles/route.ts)·hold(⏸ 노출 보류 / △ 조건부 사유). 앱 폴더 = sitemap/<domain>(cafe.pi 는 저장소 루트)",
   "sites": [
     {
       "domain": "cafe.pi",
@@ -48,7 +48,7 @@
       "preset": "COMMERCE",
       "appSts": "PLANNED",
       "listSts": "APPROVED",
-      "planCd": "BSC3",
+      "planCd": "BSC2",
       "hold": null
     },
     {
@@ -58,7 +58,7 @@
       "preset": "COMMERCE",
       "appSts": "PLANNED",
       "listSts": "APPROVED",
-      "planCd": "PRM3",
+      "planCd": "PRM2",
       "hold": "노출 중(마스터 지시 2026-10-09) · 등재 제출 전 재검토 — ⏸ 상품권·현금등가물 — 규제 확인 전 수익화·노출 금지"
     },
     {
@@ -68,7 +68,7 @@
       "preset": "COMMUNITY",
       "appSts": "PLANNED",
       "listSts": "APPROVED",
-      "planCd": "PRM3",
+      "planCd": "PRM2",
       "hold": null
     },
     {
@@ -78,7 +78,7 @@
       "preset": "COMMUNITY",
       "appSts": "PLANNED",
       "listSts": "APPROVED",
-      "planCd": "BSC3",
+      "planCd": "BSC2",
       "hold": null
     },
     {
@@ -88,7 +88,7 @@
       "preset": "COMMUNITY",
       "appSts": "PLANNED",
       "listSts": "APPROVED",
-      "planCd": "PRM1",
+      "planCd": "BSC1",
       "hold": null
     },
     {
@@ -98,7 +98,7 @@
       "preset": "COMMUNITY",
       "appSts": "PLANNED",
       "listSts": "APPROVED",
-      "planCd": "BSC2",
+      "planCd": "BSC1",
       "hold": "노출 중(마스터 지시 2026-10-09) · 등재 제출 전 재검토 — ⏸ 도박 레드라인 — 상금 0 확인 전 보류"
     },
     {
@@ -138,7 +138,7 @@
       "preset": "EDU",
       "appSts": "PLANNED",
       "listSts": "APPROVED",
-      "planCd": "PRM2",
+      "planCd": "BSC2",
       "hold": null
     },
     {
@@ -148,7 +148,7 @@
       "preset": "EDU",
       "appSts": "PLANNED",
       "listSts": "APPROVED",
-      "planCd": "PRM2",
+      "planCd": "PRM1",
       "hold": null
     },
     {
@@ -158,7 +158,7 @@
       "preset": "CONTENT",
       "appSts": "PLANNED",
       "listSts": "APPROVED",
-      "planCd": "BSC3",
+      "planCd": "BSC2",
       "hold": "노출 중(마스터 지시 2026-10-09) · 등재 제출 전 재검토 — △ 기부금품법 — '기부' 어휘 제거·팁 프레임 확인 후 승인"
     },
     {

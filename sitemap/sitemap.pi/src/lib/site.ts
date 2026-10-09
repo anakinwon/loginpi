@@ -201,40 +201,37 @@ export interface Paged<T> {
   pageSize: number
 }
 
-// 요금제 7단계 + NONE(무료), 큰 순서 = 메인 버블 크기 순서. DB CHECK(site_mst_plan_cd_check)와 동일.
-// 표시명은 번역키 plan.<cd>. Phase 2 에서 멤버십 주문(fee_ordr) 기준으로 동기화 예정
-export const PLAN_CD = [
-  'VIP',
-  'PRM3',
-  'PRM2',
-  'PRM1',
-  'BSC3',
-  'BSC2',
-  'BSC1',
-  'NONE',
-] as const
+// 요금제 5단계 + NONE(무료), 큰 순서 = 메인 버블 크기 순서. DB CHECK(site_mst_plan_cd_check)와 동일.
+// 표시명은 번역키 plan.<cd>. Phase 2 에서 멤버십 주문(fee_ordr) 기준으로 동기화 예정(5단계 개편 — 마스터 지시 2026-10-09)
+export const PLAN_CD = ['VIP', 'PRM2', 'PRM1', 'BSC2', 'BSC1', 'NONE'] as const
 export type PlanCd = (typeof PLAN_CD)[number]
 
 // 버블 배지 — NONE 은 유료 노출이 아니므로 배지·광고 라벨 없음
 export const PLAN_BADGE: Record<PlanCd, string> = {
   VIP: 'VIP',
-  PRM3: 'P3',
   PRM2: 'P2',
   PRM1: 'P1',
-  BSC3: 'B3',
   BSC2: 'B2',
   BSC1: 'B1',
   NONE: '',
 }
 
-// 버블 면적 가중치 — 화면 면적을 이 비율로 나눠 반지름을 정한다(반지름 비 VIP:BSC1 ≈ 3.2:1)
+// 요금제 색 — 레벨이 높을수록 채도·명도를 올려 더 눈에 띄게(마스터 지시 2026-10-09) : 기본1 무채색 → VIP 밝은 골드
+export const PLAN_COLOR: Record<PlanCd, string> = {
+  VIP: '#FFC21A', // VIP(영구) · 브릴리언트 골드(최고 명도·채도)
+  PRM2: '#FF3D9A', // 프리미엄2(5년) · 핫 핑크
+  PRM1: '#7C5CFF', // 프리미엄1(1년) · 비비드 바이올렛
+  BSC2: '#2A8FA8', // 기본2(12개월) · 차분한 틸
+  BSC1: '#5E6A7D', // 기본1(6개월) · 저채도 슬레이트
+  NONE: '#9CA3AF', // 무료(요금제 없음)
+}
+
+// 버블 면적 가중치 — 레벨마다 면적 ×2 등비(인접 레벨 반지름 ×√2, VIP:기본1 반지름 4:1, 마스터 지시 2026-10-09)
 export const PLAN_AREA: Record<PlanCd, number> = {
-  VIP: 10,
-  PRM3: 7,
-  PRM2: 5,
-  PRM1: 3.5,
-  BSC3: 2.4,
-  BSC2: 1.6,
+  VIP: 16,
+  PRM2: 8,
+  PRM1: 4,
+  BSC2: 2,
   BSC1: 1,
   NONE: 0.7,
 }
@@ -253,10 +250,11 @@ export interface BubbleItem {
   own: boolean // 자사 사이트(own_site_yn=Y) — 요금제는 관리자 배정, 배지 "자사"(마스터 결정 2026-10-09)
   views: number // 선택 기간 조회 합
   chgPct: number // 직전 동일 기간 대비 증감률(%) — 직전 0·현재 >0 이면 100, 둘 다 0 이면 0
+  sample?: boolean // 데모 화면 전용 가상 샘플(src/data/sample-sites.json) — 배지 "샘플", 상세 이동 없음
 }
 
 export interface BubbleResponse {
   items: BubbleItem[]
   period: BubblePeriod
-  demo: boolean // DB 미연결 — sitemap/sites.json 정적 폴백(값 0%)
+  demo: boolean // DB 미연결 — sitemap/sites.json 정적 폴백(값 0%) + 샘플
 }

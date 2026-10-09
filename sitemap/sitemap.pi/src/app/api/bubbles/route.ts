@@ -1,9 +1,11 @@
 // 메인 버블 API — GET ?period=day|week|month&ctgr= : APPROVED 사이트 + 요금제(plan_cd) + 기간 조회 합·직전 동일 기간 대비 증감률.
-// 증감은 fn_sel_stat_site_chg RPC(DB 합산). DB 미설정·조회 실패 시 sitemap/sites.json 정적 폴백(demo=true, 값 0%) — 메인 화면이 비지 않게
+// 증감은 fn_sel_stat_site_chg RPC(DB 합산). DB 미설정·조회 실패 시 sitemap/sites.json 정적 폴백(demo=true, 값 0%) — 메인 화면이 비지 않게.
+// 가상 샘플 91개(src/data/sample-sites.json)는 데모 폴백 또는 서버 env SITEMAP_SHOW_SAMPLES=1 일 때만 섞는다(운영 기본 미노출)
 import { NextResponse } from 'next/server'
 import { withGuard } from '@pi/guard'
 import { resolveDbConfig } from '@pi/db'
 import registry from '../../../../../sites.json'
+import samples from '@/data/sample-sites.json'
 import { apiError, db, PUBLIC_CACHE } from '@/lib/api'
 import {
   BUBBLE_DAYS,
@@ -24,6 +26,33 @@ const MAX_BUBBLES = 200
 const pct = (cur: number, prev: number) =>
   prev > 0 ? ((cur - prev) / prev) * 100 : cur > 0 ? 100 : 0
 
+// 샘플 증감률 — 도메인 FNV-1a 해시 기반 고정 의사난수 −30%~+40%(0.1 단위), 새로고침해도 같은 값
+const samplePct = (domain: string) => {
+  let h = 0x811c9dc5
+  for (const ch of domain) h = Math.imul(h ^ ch.charCodeAt(0), 0x01000193)
+  return (((h >>> 0) % 701) - 300) / 10
+}
+
+const sampleItems = (ctgr: string | null): BubbleItem[] =>
+  samples.sites
+    .filter((s) => !ctgr || s.ctgr === ctgr)
+    .map((s) => ({
+      id: s.domain,
+      domain: s.domain,
+      name: s.name,
+      ctgr: s.ctgr as SiteCtgr,
+      img: null,
+      plan: s.planCd as PlanCd,
+      own: false,
+      views: 0,
+      chgPct: samplePct(s.domain),
+      sample: true,
+    }))
+
+// 실데이터 뒤에 샘플을 붙이되 버블 상한(MAX_BUBBLES) 유지
+const withSamples = (items: BubbleItem[], ctgr: string | null) =>
+  [...items, ...sampleItems(ctgr)].slice(0, MAX_BUBBLES)
+
 function demo(period: BubblePeriod, ctgr: string | null): BubbleResponse {
   const items: BubbleItem[] = registry.sites
     .filter((s) => s.listSts === 'APPROVED' && (!ctgr || s.ctgr === ctgr))
@@ -38,7 +67,7 @@ function demo(period: BubblePeriod, ctgr: string | null): BubbleResponse {
       views: 0,
       chgPct: 0,
     }))
-  return { items, period, demo: true }
+  return { items: withSamples(items, ctgr), period, demo: true }
 }
 
 async function load(
@@ -83,7 +112,12 @@ async function load(
       chgPct: pct(c.cur, c.prev),
     }
   })
-  return { items, period, demo: false }
+  return {
+    items:
+      process.env.SITEMAP_SHOW_SAMPLES === '1' ? withSamples(items, ctgr) : items,
+    period,
+    demo: false,
+  }
 }
 
 export const GET = withGuard(async (req) => {

@@ -42,8 +42,9 @@
 -- 11. 감사(PRD §8) : 상태 변경 이력은 별도 hist 테이블 없이 논리삭제 + modr_id/mod_dtm 으로 보존(Phase 1).
 --    심사 이력 조회 요건이 생기면 site_sts_hist(append-only) 추가.
 -- 12. (2026-10-09 마스터 지시 — 메인 화면 버블, 미적용 상태라 001 직접 수정)
+--    5단계 개편(2026-10-09 마스터 지시, PRM3·BSC3 폐지) : 프리미엄1(1년)·기본2(12개월) 기간 동일 [확인중 : 마스터]
 --    site_mst.plan_cd = 요금제코드(신규 표준단어 PLAN 요금제 — fee_plan 선례 재사용, 도메인 _cd).
---    7단계 + NONE 을 CHECK 로 고정(판정 3과 같은 이유 — 표시명은 번역키 plan.<cd>). 값 = 메인 버블 크기(유료 노출).
+--    5단계 + NONE 을 CHECK 로 고정(판정 3과 같은 이유 — 표시명은 번역키 plan.<cd>). 값 = 메인 버블 크기(유료 노출).
 --    Phase 1 은 시드·관리자 수기 값, **Phase 2 에서 멤버십 주문(fee_ordr) 기준으로 동기화 예정**
 --    (ACTIVE 멤버십 주문의 기간 → plan_cd, 만료 시 NONE). 그때 진실 원천은 fee_ordr, 이 컬럼은 노출용 반정규화.
 --    기간 증감 집계 = fn_sel_stat_site_chg(p_days) RPC — 직전 동일 기간 대비 view_cnt 합(UTC 일자), DB 에서 합산해
@@ -72,7 +73,7 @@ CREATE TABLE IF NOT EXISTS site_mst (
   apv_dtm       TIMESTAMPTZ,                                          -- 승인일시 (일반 순위 기준 — 최초 승인 시 기록)
   ownr_usr_id   UUID,                                                 -- 소유자사용자ID → sys_user.id (자사 시드는 NULL)
   own_site_yn   CHAR(1)       NOT NULL DEFAULT 'N',                   -- 자사사이트여부 (Y = 유료 구매 상시 금지)
-  plan_cd       VARCHAR(10)   NOT NULL DEFAULT 'NONE',                -- 요금제코드 (메인 버블 크기 7단계 + NONE)
+  plan_cd       VARCHAR(10)   NOT NULL DEFAULT 'NONE',                -- 요금제코드 (메인 버블 크기 5단계 + NONE)
   pvt_cntc_txt  TEXT,                                                 -- 비공개연락처텍스트 (심사용, 제출 시 필수 — 앱 검증)
   pub_cntc_txt  TEXT,                                                 -- 공개연락처텍스트 (옵트인, NULL = 비공개)
   del_yn        CHAR(1)       NOT NULL DEFAULT 'N',                   -- 삭제여부
@@ -98,9 +99,9 @@ CREATE TABLE IF NOT EXISTS site_mst (
   CONSTRAINT site_mst_ownr_usr_id_check CHECK (ownr_usr_id IS NOT NULL OR own_site_yn = 'Y'),
   CONSTRAINT site_mst_site_desc_check CHECK (site_desc IS NULL OR char_length(site_desc) <= 2000),
   CONSTRAINT site_mst_own_site_yn_check CHECK (own_site_yn IN ('Y', 'N')),
-  -- 큰 순서 : VIP(영구) > PRM3(10년) > PRM2(5년) > PRM1(2년) > BSC3(12개월) > BSC2(6개월) > BSC1(1개월) > NONE(무료)
+  -- 큰 순서 : VIP(영구) > PRM2(5년) > PRM1(1년) > BSC2(12개월) > BSC1(6개월) > NONE(무료)
   CONSTRAINT site_mst_plan_cd_check CHECK (plan_cd IN
-    ('VIP', 'PRM3', 'PRM2', 'PRM1', 'BSC3', 'BSC2', 'BSC1', 'NONE')),
+    ('VIP', 'PRM2', 'PRM1', 'BSC2', 'BSC1', 'NONE')),
   CONSTRAINT site_mst_del_yn_check CHECK (del_yn IN ('Y', 'N'))
 );
 
@@ -112,7 +113,7 @@ COMMENT ON COLUMN site_mst.rjct_rsn_cd  IS 'GAMBLING·NON_PI_PYMNT·GIFT_CARD·I
 COMMENT ON COLUMN site_mst.apv_dtm      IS '최초 승인일시 — 일반 순위 기본 정렬(역순). 결제 이력은 순위에 반영하지 않음';
 COMMENT ON COLUMN site_mst.ownr_usr_id  IS 'sys_user.id — 등록자. 자사 시드(own_site_yn=Y)만 NULL 허용, 운영자 계정 생성 후 귀속';
 COMMENT ON COLUMN site_mst.own_site_yn  IS '자사 사이트 여부 — Y 이면 부가서비스 구매 상시 금지(PRD §3)';
-COMMENT ON COLUMN site_mst.plan_cd      IS 'VIP·PRM3·PRM2·PRM1·BSC3·BSC2·BSC1·NONE — 메인 버블 크기(유료 노출, 광고 라벨 필수). 표시명은 번역키 plan.<cd>. Phase 2 에서 멤버십 주문(fee_ordr) 기준으로 동기화 예정';
+COMMENT ON COLUMN site_mst.plan_cd      IS 'VIP·PRM2·PRM1·BSC2·BSC1·NONE — 메인 버블 크기(유료 노출, 광고 라벨 필수). 표시명은 번역키 plan.<cd>. Phase 2 에서 멤버십 주문(fee_ordr) 기준으로 동기화 예정';
 COMMENT ON COLUMN site_mst.pvt_cntc_txt IS '심사용 연락처 — 비공개(공개 API 응답에서 제외 필수)';
 COMMENT ON COLUMN site_mst.pub_cntc_txt IS '공개 연락처 — 등록자 옵트인 시에만 값 존재';
 
@@ -342,9 +343,10 @@ SELECT fn_grant_svc_only('FUNCTION', 'fn_sel_stat_site_chg(integer)');
 --      gifticon(상품권·현금등가물) · omok(도박 — 상금 0 확인 전) · yoda(제3자 상표) · fondation("기부" 어휘·팁 프레임)
 --      — 원래 판정은 PENDING 보류였음(sitemap/sites.json hold 사유 유지). 등재 심사 전 다시 PENDING/반려 여부 결정
 --    요금제(plan_cd) 배정 — 마스터 확정 2026-10-09, Phase 2 에서 fee_ordr 기준 동기화 예정(판정 12)
---      VIP(영구) sitemap·cafe / PRM3(10년) seminar·gifticon / PRM2(5년) barista·was·webserver /
---      PRM1(2년) lan·schema·dbms·expedition / BSC3(12개월) bluemountain·fondation·teamkorea /
---      BSC2(6개월) yea·omok / BSC1(1개월) anakin·yoda·youngrok
+--      5단계 개편(2026-10-09) : VIP(영구) sitemap·cafe / PRM2(5년) seminar·gifticon·barista /
+--      PRM1(1년) was·lan·schema·dbms / BSC2(12개월) webserver·bluemountain·fondation·teamkorea·yea /
+--      BSC1(6개월) anakin·yoda·youngrok·omok·expedition
+--      화면 예시용 가상 샘플 91개는 시드에 넣지 않는다(src/data/sample-sites.json, 데모 화면 전용)
 --    사이트명 : PRD 표의 식별자 그대로(cafe 만 공식 브랜드 표기 PyCafé™) — 표시명·설명은 관리 화면에서 보완
 --    멱등 : 같은 도메인의 활성 행이 있으면 건너뜀(상태가 바뀐 뒤 재실행해도 덮어쓰지 않음)
 --    소유 귀속 : 운영자(ADMIN) sys_user 가 첫 로그인으로 생성된 뒤
@@ -356,23 +358,23 @@ SELECT v.site_dom_nm, v.site_nm, v.site_ctgr_cd, v.site_sts_cd, v.plan_cd,
        'Y'
   FROM (VALUES
     ('cafe.pi',         'PyCafé™',      'COMMUNITY', 'APPROVED', 'VIP'),
-    ('teamkorea.pi',    'teamkorea',    'COMMUNITY', 'APPROVED', 'BSC3'),
-    ('expedition.pi',   'expedition',   'COMMUNITY', 'APPROVED', 'PRM1'),
-    ('seminar.pi',      'seminar',      'COMMUNITY', 'APPROVED', 'PRM3'),
+    ('teamkorea.pi',    'teamkorea',    'COMMUNITY', 'APPROVED', 'BSC2'),
+    ('expedition.pi',   'expedition',   'COMMUNITY', 'APPROVED', 'BSC1'),
+    ('seminar.pi',      'seminar',      'COMMUNITY', 'APPROVED', 'PRM2'),
     ('lan.pi',          'lan',          'EDU',       'APPROVED', 'PRM1'),
     ('dbms.pi',         'dbms',         'EDU',       'APPROVED', 'PRM1'),
     ('schema.pi',       'schema',       'EDU',       'APPROVED', 'PRM1'),
-    ('webserver.pi',    'webserver',    'EDU',       'APPROVED', 'PRM2'),
-    ('was.pi',          'was',          'EDU',       'APPROVED', 'PRM2'),
+    ('webserver.pi',    'webserver',    'EDU',       'APPROVED', 'BSC2'),
+    ('was.pi',          'was',          'EDU',       'APPROVED', 'PRM1'),
     ('barista.pi',      'barista',      'SHOP',      'APPROVED', 'PRM2'),
-    ('bluemountain.pi', 'bluemountain', 'SHOP',      'APPROVED', 'BSC3'),
-    ('gifticon.pi',     'gifticon',     'SHOP',      'APPROVED', 'PRM3'),
-    ('fondation.pi',    'fondation',    'CONTENT',   'APPROVED', 'BSC3'),
+    ('bluemountain.pi', 'bluemountain', 'SHOP',      'APPROVED', 'BSC2'),
+    ('gifticon.pi',     'gifticon',     'SHOP',      'APPROVED', 'PRM2'),
+    ('fondation.pi',    'fondation',    'CONTENT',   'APPROVED', 'BSC2'),
     ('yoda.pi',         'yoda',         'CONTENT',   'APPROVED', 'BSC1'),
     ('anakin.pi',       'anakin',       'PERSONAL',  'APPROVED', 'BSC1'),
     ('youngrok.pi',     'youngrok',     'PERSONAL',  'APPROVED', 'BSC1'),
     ('yea.pi',          'yea',          'EVENT',     'APPROVED', 'BSC2'),
-    ('omok.pi',         'omok',         'GAME',      'APPROVED', 'BSC2'),
+    ('omok.pi',         'omok',         'GAME',      'APPROVED', 'BSC1'),
     ('sitemap.pi',      'sitemap',      'TOOL',      'APPROVED', 'VIP')
   ) AS v (site_dom_nm, site_nm, site_ctgr_cd, site_sts_cd, plan_cd)
  WHERE NOT EXISTS (
@@ -387,7 +389,7 @@ COMMIT;
 -- SELECT site_sts_cd, COUNT(*) FROM site_mst WHERE own_site_yn = 'Y' AND del_yn = 'N' GROUP BY site_sts_cd;
 --   → APPROVED 19 (마스터 지시 2026-10-09 전부 노출)
 -- SELECT plan_cd, COUNT(*) FROM site_mst WHERE del_yn = 'N' GROUP BY plan_cd;
---   → VIP 2·PRM3 2·PRM2 3·PRM1 4·BSC3 3·BSC2 2·BSC1 3
+--   → VIP 2·PRM2 3·PRM1 4·BSC2 5·BSC1 5
 -- SELECT * FROM fn_sel_stat_site_chg(7);                                          -- 최근 7일 vs 직전 7일
 -- SELECT site_ctgr_cd, COUNT(*) FROM site_mst WHERE del_yn = 'N' GROUP BY site_ctgr_cd ORDER BY 1;
 --   → COMMUNITY 4·CONTENT 2·EDU 5·EVENT 1·GAME 1·PERSONAL 2·SHOP 3·TOOL 1

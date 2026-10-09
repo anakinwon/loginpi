@@ -69,3 +69,18 @@
     transition: none;
   }
 }
+
+/* 버블 등장 — 위치 이동 없이 불투명도만 0→1(원본 관찰 0.6~0.8s) */
+.bubble {
+  animation: bubble-in 0.7s ease-out backwards;
+}
+@keyframes bubble-in {
+  from {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bubble {
+    animation: none;
+  }
+}

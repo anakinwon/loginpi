@@ -1,0 +1,642 @@
+{
+  "$comment": "가상 샘플 91개 — 실제 .pi 사이트가 아님(도메인은 영단어 + -demo). 데모 화면 전용: DB 미연결 폴백 또는 서버 env SITEMAP_SHOW_SAMPLES=1 일 때만 /api/bubbles 가 섞어 노출, DB 시드에 넣지 않는다. 요금제 배분 VIP 3·PRM2 12·PRM1 16·BSC2 25·BSC1 35(실제 19개와 합쳐 5·15·20·30·40 = 110, 마스터 지시 2026-10-09), 카테고리 9종 순환 배분. 증감률은 route.ts 가 도메인 해시로 고정 생성",
+  "sites": [
+    {
+      "domain": "aurora-demo.pi",
+      "name": "Aurora (Sample)",
+      "ctgr": "COMMUNITY",
+      "planCd": "VIP",
+      "sample": true
+    },
+    {
+      "domain": "maple-demo.pi",
+      "name": "Maple (Sample)",
+      "ctgr": "EDU",
+      "planCd": "VIP",
+      "sample": true
+    },
+    {
+      "domain": "harbor-demo.pi",
+      "name": "Harbor (Sample)",
+      "ctgr": "SHOP",
+      "planCd": "VIP",
+      "sample": true
+    },
+    {
+      "domain": "pixel-demo.pi",
+      "name": "Pixel (Sample)",
+      "ctgr": "CONTENT",
+      "planCd": "PRM2",
+      "sample": true
+    },
+    {
+      "domain": "lumen-demo.pi",
+      "name": "Lumen (Sample)",
+      "ctgr": "PERSONAL",
+      "planCd": "PRM2",
+      "sample": true
+    },
+    {
+      "domain": "orbit-demo.pi",
+      "name": "Orbit (Sample)",
+      "ctgr": "EVENT",
+      "planCd": "PRM2",
+      "sample": true
+    },
+    {
+      "domain": "cedar-demo.pi",
+      "name": "Cedar (Sample)",
+      "ctgr": "GAME",
+      "planCd": "PRM2",
+      "sample": true
+    },
+    {
+      "domain": "nova-demo.pi",
+      "name": "Nova (Sample)",
+      "ctgr": "TOOL",
+      "planCd": "PRM2",
+      "sample": true
+    },
+    {
+      "domain": "delta-demo.pi",
+      "name": "Delta (Sample)",
+      "ctgr": "ETC",
+      "planCd": "PRM2",
+      "sample": true
+    },
+    {
+      "domain": "ember-demo.pi",
+      "name": "Ember (Sample)",
+      "ctgr": "COMMUNITY",
+      "planCd": "PRM2",
+      "sample": true
+    },
+    {
+      "domain": "fjord-demo.pi",
+      "name": "Fjord (Sample)",
+      "ctgr": "EDU",
+      "planCd": "PRM2",
+      "sample": true
+    },
+    {
+      "domain": "garnet-demo.pi",
+      "name": "Garnet (Sample)",
+      "ctgr": "SHOP",
+      "planCd": "PRM2",
+      "sample": true
+    },
+    {
+      "domain": "hazel-demo.pi",
+      "name": "Hazel (Sample)",
+      "ctgr": "CONTENT",
+      "planCd": "PRM2",
+      "sample": true
+    },
+    {
+      "domain": "indigo-demo.pi",
+      "name": "Indigo (Sample)",
+      "ctgr": "PERSONAL",
+      "planCd": "PRM2",
+      "sample": true
+    },
+    {
+      "domain": "jade-demo.pi",
+      "name": "Jade (Sample)",
+      "ctgr": "EVENT",
+      "planCd": "PRM2",
+      "sample": true
+    },
+    {
+      "domain": "kiwi-demo.pi",
+      "name": "Kiwi (Sample)",
+      "ctgr": "GAME",
+      "planCd": "PRM1",
+      "sample": true
+    },
+    {
+      "domain": "lotus-demo.pi",
+      "name": "Lotus (Sample)",
+      "ctgr": "TOOL",
+      "planCd": "PRM1",
+      "sample": true
+    },
+    {
+      "domain": "meadow-demo.pi",
+      "name": "Meadow (Sample)",
+      "ctgr": "ETC",
+      "planCd": "PRM1",
+      "sample": true
+    },
+    {
+      "domain": "nectar-demo.pi",
+      "name": "Nectar (Sample)",
+      "ctgr": "COMMUNITY",
+      "planCd": "PRM1",
+      "sample": true
+    },
+    {
+      "domain": "opal-demo.pi",
+      "name": "Opal (Sample)",
+      "ctgr": "EDU",
+      "planCd": "PRM1",
+      "sample": true
+    },
+    {
+      "domain": "pebble-demo.pi",
+      "name": "Pebble (Sample)",
+      "ctgr": "SHOP",
+      "planCd": "PRM1",
+      "sample": true
+    },
+    {
+      "domain": "quartz-demo.pi",
+      "name": "Quartz (Sample)",
+      "ctgr": "CONTENT",
+      "planCd": "PRM1",
+      "sample": true
+    },
+    {
+      "domain": "raven-demo.pi",
+      "name": "Raven (Sample)",
+      "ctgr": "PERSONAL",
+      "planCd": "PRM1",
+      "sample": true
+    },
+    {
+      "domain": "sierra-demo.pi",
+      "name": "Sierra (Sample)",
+      "ctgr": "EVENT",
+      "planCd": "PRM1",
+      "sample": true
+    },
+    {
+      "domain": "tundra-demo.pi",
+      "name": "Tundra (Sample)",
+      "ctgr": "GAME",
+      "planCd": "PRM1",
+      "sample": true
+    },
+    {
+      "domain": "umber-demo.pi",
+      "name": "Umber (Sample)",
+      "ctgr": "TOOL",
+      "planCd": "PRM1",
+      "sample": true
+    },
+    {
+      "domain": "violet-demo.pi",
+      "name": "Violet (Sample)",
+      "ctgr": "ETC",
+      "planCd": "PRM1",
+      "sample": true
+    },
+    {
+      "domain": "willow-demo.pi",
+      "name": "Willow (Sample)",
+      "ctgr": "COMMUNITY",
+      "planCd": "PRM1",
+      "sample": true
+    },
+    {
+      "domain": "xenon-demo.pi",
+      "name": "Xenon (Sample)",
+      "ctgr": "EDU",
+      "planCd": "PRM1",
+      "sample": true
+    },
+    {
+      "domain": "yarrow-demo.pi",
+      "name": "Yarrow (Sample)",
+      "ctgr": "SHOP",
+      "planCd": "PRM1",
+      "sample": true
+    },
+    {
+      "domain": "zephyr-demo.pi",
+      "name": "Zephyr (Sample)",
+      "ctgr": "CONTENT",
+      "planCd": "PRM1",
+      "sample": true
+    },
+    {
+      "domain": "amber-demo.pi",
+      "name": "Amber (Sample)",
+      "ctgr": "PERSONAL",
+      "planCd": "BSC2",
+      "sample": true
+    },
+    {
+      "domain": "birch-demo.pi",
+      "name": "Birch (Sample)",
+      "ctgr": "EVENT",
+      "planCd": "BSC2",
+      "sample": true
+    },
+    {
+      "domain": "coral-demo.pi",
+      "name": "Coral (Sample)",
+      "ctgr": "GAME",
+      "planCd": "BSC2",
+      "sample": true
+    },
+    {
+      "domain": "dune-demo.pi",
+      "name": "Dune (Sample)",
+      "ctgr": "TOOL",
+      "planCd": "BSC2",
+      "sample": true
+    },
+    {
+      "domain": "echo-demo.pi",
+      "name": "Echo (Sample)",
+      "ctgr": "ETC",
+      "planCd": "BSC2",
+      "sample": true
+    },
+    {
+      "domain": "flint-demo.pi",
+      "name": "Flint (Sample)",
+      "ctgr": "COMMUNITY",
+      "planCd": "BSC2",
+      "sample": true
+    },
+    {
+      "domain": "grove-demo.pi",
+      "name": "Grove (Sample)",
+      "ctgr": "EDU",
+      "planCd": "BSC2",
+      "sample": true
+    },
+    {
+      "domain": "ivory-demo.pi",
+      "name": "Ivory (Sample)",
+      "ctgr": "SHOP",
+      "planCd": "BSC2",
+      "sample": true
+    },
+    {
+      "domain": "juniper-demo.pi",
+      "name": "Juniper (Sample)",
+      "ctgr": "CONTENT",
+      "planCd": "BSC2",
+      "sample": true
+    },
+    {
+      "domain": "koala-demo.pi",
+      "name": "Koala (Sample)",
+      "ctgr": "PERSONAL",
+      "planCd": "BSC2",
+      "sample": true
+    },
+    {
+      "domain": "lagoon-demo.pi",
+      "name": "Lagoon (Sample)",
+      "ctgr": "EVENT",
+      "planCd": "BSC2",
+      "sample": true
+    },
+    {
+      "domain": "mango-demo.pi",
+      "name": "Mango (Sample)",
+      "ctgr": "GAME",
+      "planCd": "BSC2",
+      "sample": true
+    },
+    {
+      "domain": "nimbus-demo.pi",
+      "name": "Nimbus (Sample)",
+      "ctgr": "TOOL",
+      "planCd": "BSC2",
+      "sample": true
+    },
+    {
+      "domain": "olive-demo.pi",
+      "name": "Olive (Sample)",
+      "ctgr": "ETC",
+      "planCd": "BSC2",
+      "sample": true
+    },
+    {
+      "domain": "prism-demo.pi",
+      "name": "Prism (Sample)",
+      "ctgr": "COMMUNITY",
+      "planCd": "BSC2",
+      "sample": true
+    },
+    {
+      "domain": "quill-demo.pi",
+      "name": "Quill (Sample)",
+      "ctgr": "EDU",
+      "planCd": "BSC2",
+      "sample": true
+    },
+    {
+      "domain": "ripple-demo.pi",
+      "name": "Ripple (Sample)",
+      "ctgr": "SHOP",
+      "planCd": "BSC2",
+      "sample": true
+    },
+    {
+      "domain": "summit-demo.pi",
+      "name": "Summit (Sample)",
+      "ctgr": "CONTENT",
+      "planCd": "BSC2",
+      "sample": true
+    },
+    {
+      "domain": "canyon-demo.pi",
+      "name": "Canyon (Sample)",
+      "ctgr": "PERSONAL",
+      "planCd": "BSC2",
+      "sample": true
+    },
+    {
+      "domain": "tidal-demo.pi",
+      "name": "Tidal (Sample)",
+      "ctgr": "EVENT",
+      "planCd": "BSC2",
+      "sample": true
+    },
+    {
+      "domain": "acorn-demo.pi",
+      "name": "Acorn (Sample)",
+      "ctgr": "GAME",
+      "planCd": "BSC2",
+      "sample": true
+    },
+    {
+      "domain": "bamboo-demo.pi",
+      "name": "Bamboo (Sample)",
+      "ctgr": "TOOL",
+      "planCd": "BSC2",
+      "sample": true
+    },
+    {
+      "domain": "comet-demo.pi",
+      "name": "Comet (Sample)",
+      "ctgr": "ETC",
+      "planCd": "BSC2",
+      "sample": true
+    },
+    {
+      "domain": "daisy-demo.pi",
+      "name": "Daisy (Sample)",
+      "ctgr": "COMMUNITY",
+      "planCd": "BSC2",
+      "sample": true
+    },
+    {
+      "domain": "falcon-demo.pi",
+      "name": "Falcon (Sample)",
+      "ctgr": "EDU",
+      "planCd": "BSC2",
+      "sample": true
+    },
+    {
+      "domain": "glacier-demo.pi",
+      "name": "Glacier (Sample)",
+      "ctgr": "SHOP",
+      "planCd": "BSC1",
+      "sample": true
+    },
+    {
+      "domain": "heron-demo.pi",
+      "name": "Heron (Sample)",
+      "ctgr": "CONTENT",
+      "planCd": "BSC1",
+      "sample": true
+    },
+    {
+      "domain": "island-demo.pi",
+      "name": "Island (Sample)",
+      "ctgr": "PERSONAL",
+      "planCd": "BSC1",
+      "sample": true
+    },
+    {
+      "domain": "jasper-demo.pi",
+      "name": "Jasper (Sample)",
+      "ctgr": "EVENT",
+      "planCd": "BSC1",
+      "sample": true
+    },
+    {
+      "domain": "kelp-demo.pi",
+      "name": "Kelp (Sample)",
+      "ctgr": "GAME",
+      "planCd": "BSC1",
+      "sample": true
+    },
+    {
+      "domain": "lilac-demo.pi",
+      "name": "Lilac (Sample)",
+      "ctgr": "TOOL",
+      "planCd": "BSC1",
+      "sample": true
+    },
+    {
+      "domain": "marble-demo.pi",
+      "name": "Marble (Sample)",
+      "ctgr": "ETC",
+      "planCd": "BSC1",
+      "sample": true
+    },
+    {
+      "domain": "nutmeg-demo.pi",
+      "name": "Nutmeg (Sample)",
+      "ctgr": "COMMUNITY",
+      "planCd": "BSC1",
+      "sample": true
+    },
+    {
+      "domain": "oasis-demo.pi",
+      "name": "Oasis (Sample)",
+      "ctgr": "EDU",
+      "planCd": "BSC1",
+      "sample": true
+    },
+    {
+      "domain": "pepper-demo.pi",
+      "name": "Pepper (Sample)",
+      "ctgr": "SHOP",
+      "planCd": "BSC1",
+      "sample": true
+    },
+    {
+      "domain": "rocket-demo.pi",
+      "name": "Rocket (Sample)",
+      "ctgr": "CONTENT",
+      "planCd": "BSC1",
+      "sample": true
+    },
+    {
+      "domain": "saffron-demo.pi",
+      "name": "Saffron (Sample)",
+      "ctgr": "PERSONAL",
+      "planCd": "BSC1",
+      "sample": true
+    },
+    {
+      "domain": "thistle-demo.pi",
+      "name": "Thistle (Sample)",
+      "ctgr": "EVENT",
+      "planCd": "BSC1",
+      "sample": true
+    },
+    {
+      "domain": "velvet-demo.pi",
+      "name": "Velvet (Sample)",
+      "ctgr": "GAME",
+      "planCd": "BSC1",
+      "sample": true
+    },
+    {
+      "domain": "walnut-demo.pi",
+      "name": "Walnut (Sample)",
+      "ctgr": "TOOL",
+      "planCd": "BSC1",
+      "sample": true
+    },
+    {
+      "domain": "atlas-demo.pi",
+      "name": "Atlas (Sample)",
+      "ctgr": "ETC",
+      "planCd": "BSC1",
+      "sample": true
+    },
+    {
+      "domain": "breeze-demo.pi",
+      "name": "Breeze (Sample)",
+      "ctgr": "COMMUNITY",
+      "planCd": "BSC1",
+      "sample": true
+    },
+    {
+      "domain": "cobalt-demo.pi",
+      "name": "Cobalt (Sample)",
+      "ctgr": "EDU",
+      "planCd": "BSC1",
+      "sample": true
+    },
+    {
+      "domain": "dawn-demo.pi",
+      "name": "Dawn (Sample)",
+      "ctgr": "SHOP",
+      "planCd": "BSC1",
+      "sample": true
+    },
+    {
+      "domain": "fern-demo.pi",
+      "name": "Fern (Sample)",
+      "ctgr": "CONTENT",
+      "planCd": "BSC1",
+      "sample": true
+    },
+    {
+      "domain": "gazelle-demo.pi",
+      "name": "Gazelle (Sample)",
+      "ctgr": "PERSONAL",
+      "planCd": "BSC1",
+      "sample": true
+    },
+    {
+      "domain": "horizon-demo.pi",
+      "name": "Horizon (Sample)",
+      "ctgr": "EVENT",
+      "planCd": "BSC1",
+      "sample": true
+    },
+    {
+      "domain": "iris-demo.pi",
+      "name": "Iris (Sample)",
+      "ctgr": "GAME",
+      "planCd": "BSC1",
+      "sample": true
+    },
+    {
+      "domain": "lantern-demo.pi",
+      "name": "Lantern (Sample)",
+      "ctgr": "TOOL",
+      "planCd": "BSC1",
+      "sample": true
+    },
+    {
+      "domain": "mist-demo.pi",
+      "name": "Mist (Sample)",
+      "ctgr": "ETC",
+      "planCd": "BSC1",
+      "sample": true
+    },
+    {
+      "domain": "ocean-demo.pi",
+      "name": "Ocean (Sample)",
+      "ctgr": "COMMUNITY",
+      "planCd": "BSC1",
+      "sample": true
+    },
+    {
+      "domain": "pine-demo.pi",
+      "name": "Pine (Sample)",
+      "ctgr": "EDU",
+      "planCd": "BSC1",
+      "sample": true
+    },
+    {
+      "domain": "river-demo.pi",
+      "name": "River (Sample)",
+      "ctgr": "SHOP",
+      "planCd": "BSC1",
+      "sample": true
+    },
+    {
+      "domain": "tulip-demo.pi",
+      "name": "Tulip (Sample)",
+      "ctgr": "CONTENT",
+      "planCd": "BSC1",
+      "sample": true
+    },
+    {
+      "domain": "vortex-demo.pi",
+      "name": "Vortex (Sample)",
+      "ctgr": "PERSONAL",
+      "planCd": "BSC1",
+      "sample": true
+    },
+    {
+      "domain": "wren-demo.pi",
+      "name": "Wren (Sample)",
+      "ctgr": "EVENT",
+      "planCd": "BSC1",
+      "sample": true
+    },
+    {
+      "domain": "sable-demo.pi",
+      "name": "Sable (Sample)",
+      "ctgr": "GAME",
+      "planCd": "BSC1",
+      "sample": true
+    },
+    {
+      "domain": "plume-demo.pi",
+      "name": "Plume (Sample)",
+      "ctgr": "TOOL",
+      "planCd": "BSC1",
+      "sample": true
+    },
+    {
+      "domain": "meteor-demo.pi",
+      "name": "Meteor (Sample)",
+      "ctgr": "ETC",
+      "planCd": "BSC1",
+      "sample": true
+    },
+    {
+      "domain": "cliff-demo.pi",
+      "name": "Cliff (Sample)",
+      "ctgr": "COMMUNITY",
+      "planCd": "BSC1",
+      "sample": true
+    }
+  ]
+}

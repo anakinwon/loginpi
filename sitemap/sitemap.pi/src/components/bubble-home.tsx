@@ -11,7 +11,7 @@ import { readApi, useApiErrorText, type ApiErrorBody } from '@/lib/client-api'
 import {
   BUBBLE_DAYS,
   LIMITS,
-  PLAN_AREA,
+  PLAN_AREA, PLAN_COLOR,
   PLAN_BADGE,
   PLAN_CD,
   SITE_CTGR,
@@ -41,6 +41,7 @@ export function BubbleHome() {
   const [data, setData] = useState<BubbleResponse | null>(null)
   const [error, setError] = useState<ApiErrorBody | null>(null)
   const [loading, setLoading] = useState(false)
+  const [toast, setToast] = useState(false)
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -84,10 +85,21 @@ export function BubbleHome() {
     [t],
   )
   const planName = useCallback((it: BubbleItem) => tp(it.plan), [tp])
+  // 가상 샘플은 상세 페이지가 없으므로 이동 대신 안내(404 방지)
   const open = useCallback(
-    (domain: string) => router.push(`/s/${domain}`),
-    [router],
+    (domain: string) => {
+      if (!data?.items.some((it) => it.domain === domain && it.sample))
+        return router.push(`/s/${domain}`)
+      setToast(true)
+    },
+    [router, data],
   )
+  useEffect(() => {
+    if (!toast) return
+    const id = setTimeout(() => setToast(false), 2500)
+    return () => clearTimeout(id)
+  }, [toast])
+  const hasSample = data?.items.some((it) => it.sample) ?? false
 
   return (
     <div className="flex flex-col">
@@ -157,9 +169,17 @@ export function BubbleHome() {
         </div>
       </div>
 
-      {data?.demo && (
+      {(data?.demo || hasSample) && (
         <p className="bg-amber-400/10 px-3 py-1 text-xs text-amber-200">
-          {t('demo')}
+          {t(data?.demo ? 'demo' : 'sampleNote')}
+        </p>
+      )}
+      {toast && (
+        <p
+          role="status"
+          className="fixed bottom-16 left-1/2 z-20 -translate-x-1/2 rounded-md bg-neutral-800 px-3 py-2 text-sm text-white shadow-lg"
+        >
+          {t('sampleToast')}
         </p>
       )}
 
@@ -186,6 +206,7 @@ export function BubbleHome() {
                 label={t('canvasLabel')}
                 adLabel={t('ad')}
                 ownLabel={t('own')}
+                sampleLabel={t('sample')}
                 planName={planName}
                 fmtPct={fmtPct}
                 fmtViews={fmtViews}
@@ -214,8 +235,8 @@ function Legend() {
         return (
           <span key={p} className="flex items-center gap-1">
             <span
-              className="inline-block rounded-full border border-white/50"
-              style={{ width: d, height: d }}
+              className="inline-block rounded-full border border-white/30"
+              style={{ width: d, height: d, background: PLAN_COLOR[p] }}
             />
             {tp(p)}
           </span>
@@ -243,6 +264,26 @@ function CtgrLinks() {
     </nav>
   )
 }
+
+const SiteLink = ({
+  sample,
+  domain,
+  children,
+}: {
+  sample?: boolean
+  domain: string
+  children: React.ReactNode
+}) =>
+  sample ? (
+    <span className="flex items-center gap-2">{children}</span>
+  ) : (
+    <Link
+      href={`/s/${domain}`}
+      className="flex items-center gap-2 hover:underline"
+    >
+      {children}
+    </Link>
+  )
 
 // 표 보기 — 버블의 키보드·스크린리더 대안. 크기·요금제·조회수·증감 정렬 + 반응형 페이지네이션(클라이언트 페이지)
 function BubbleTable({
@@ -334,10 +375,8 @@ function BubbleTable({
                   {(page - 1) * size + i + 1}
                 </td>
                 <td className="max-w-0 px-2 py-2">
-                  <Link
-                    href={`/s/${it.domain}`}
-                    className="flex items-center gap-2 hover:underline"
-                  >
+                  {/* 가상 샘플은 상세가 없으므로 링크 없이 표시 */}
+                  <SiteLink sample={it.sample} domain={it.domain}>
                     {it.img ? (
                       <img
                         src={it.img}
@@ -358,7 +397,7 @@ function BubbleTable({
                         {it.name}
                       </span>
                     </span>
-                  </Link>
+                  </SiteLink>
                 </td>
                 <td className="hidden px-2 py-2 sm:table-cell">
                   <span
@@ -369,7 +408,8 @@ function BubbleTable({
                 <td className="px-2 py-2 whitespace-nowrap">
                   {PLAN_BADGE[it.plan] && (
                     <span className="mr-1 rounded bg-amber-300/20 px-1 text-xs text-amber-200">
-                      {it.own ? t('own') : t('ad')} · {PLAN_BADGE[it.plan]}
+                      {t(it.sample ? 'sample' : it.own ? 'own' : 'ad')} ·{' '}
+                      {PLAN_BADGE[it.plan]}
                     </span>
                   )}
                   <span className="hidden text-xs text-white/70 md:inline">
