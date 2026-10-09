@@ -1,0 +1,195 @@
+{
+  "$comment": "Pi 멀티사이트 레지스트리(PRD_28 §8) — domain·ctgr(sitemap PRD §2 site_ctgr_cd)·wave(W1~W5, 모선 null)·preset·appSts(LIVE 운영 / BUILDING 구축 중 / PLANNED 예정)·listSts(sitemap.pi 디렉터리 시드 상태 sql/001)·planCd(요금제 = site_mst.plan_cd, 메인 버블 크기 VIP>PRM3>PRM2>PRM1>BSC3>BSC2>BSC1 — DB 미연결 시 메인 화면 정적 폴백, sitemap.pi src/lib/site.ts(PLAN_AREA)·src/app/api/bubbles/route.ts)·hold(⏸ 노출 보류 / △ 조건부 사유). 앱 폴더 = sitemap/<domain>(cafe.pi 는 저장소 루트)",
+  "sites": [
+    {
+      "domain": "cafe.pi",
+      "ctgr": "COMMUNITY",
+      "wave": null,
+      "preset": "MOTHERSHIP",
+      "appSts": "LIVE",
+      "listSts": "APPROVED",
+      "planCd": "VIP",
+      "hold": null
+    },
+    {
+      "domain": "sitemap.pi",
+      "ctgr": "TOOL",
+      "wave": "W1",
+      "preset": "HUB",
+      "appSts": "BUILDING",
+      "listSts": "APPROVED",
+      "planCd": "VIP",
+      "hold": null
+    },
+    {
+      "domain": "yea.pi",
+      "ctgr": "EVENT",
+      "wave": "W2",
+      "preset": "VOTE",
+      "appSts": "PLANNED",
+      "listSts": "APPROVED",
+      "planCd": "BSC2",
+      "hold": null
+    },
+    {
+      "domain": "barista.pi",
+      "ctgr": "SHOP",
+      "wave": "W2",
+      "preset": "COMMERCE",
+      "appSts": "PLANNED",
+      "listSts": "APPROVED",
+      "planCd": "PRM2",
+      "hold": null
+    },
+    {
+      "domain": "bluemountain.pi",
+      "ctgr": "SHOP",
+      "wave": "W2",
+      "preset": "COMMERCE",
+      "appSts": "PLANNED",
+      "listSts": "APPROVED",
+      "planCd": "BSC3",
+      "hold": null
+    },
+    {
+      "domain": "gifticon.pi",
+      "ctgr": "SHOP",
+      "wave": "W2",
+      "preset": "COMMERCE",
+      "appSts": "PLANNED",
+      "listSts": "APPROVED",
+      "planCd": "PRM3",
+      "hold": "노출 중(마스터 지시 2026-10-09) · 등재 제출 전 재검토 — ⏸ 상품권·현금등가물 — 규제 확인 전 수익화·노출 금지"
+    },
+    {
+      "domain": "seminar.pi",
+      "ctgr": "COMMUNITY",
+      "wave": "W3",
+      "preset": "COMMUNITY",
+      "appSts": "PLANNED",
+      "listSts": "APPROVED",
+      "planCd": "PRM3",
+      "hold": null
+    },
+    {
+      "domain": "teamkorea.pi",
+      "ctgr": "COMMUNITY",
+      "wave": "W3",
+      "preset": "COMMUNITY",
+      "appSts": "PLANNED",
+      "listSts": "APPROVED",
+      "planCd": "BSC3",
+      "hold": null
+    },
+    {
+      "domain": "expedition.pi",
+      "ctgr": "COMMUNITY",
+      "wave": "W3",
+      "preset": "COMMUNITY",
+      "appSts": "PLANNED",
+      "listSts": "APPROVED",
+      "planCd": "PRM1",
+      "hold": null
+    },
+    {
+      "domain": "omok.pi",
+      "ctgr": "GAME",
+      "wave": "W3",
+      "preset": "COMMUNITY",
+      "appSts": "PLANNED",
+      "listSts": "APPROVED",
+      "planCd": "BSC2",
+      "hold": "노출 중(마스터 지시 2026-10-09) · 등재 제출 전 재검토 — ⏸ 도박 레드라인 — 상금 0 확인 전 보류"
+    },
+    {
+      "domain": "lan.pi",
+      "ctgr": "EDU",
+      "wave": "W3",
+      "preset": "EDU",
+      "appSts": "PLANNED",
+      "listSts": "APPROVED",
+      "planCd": "PRM1",
+      "hold": null
+    },
+    {
+      "domain": "dbms.pi",
+      "ctgr": "EDU",
+      "wave": "W4",
+      "preset": "EDU",
+      "appSts": "PLANNED",
+      "listSts": "APPROVED",
+      "planCd": "PRM1",
+      "hold": null
+    },
+    {
+      "domain": "schema.pi",
+      "ctgr": "EDU",
+      "wave": "W4",
+      "preset": "EDU",
+      "appSts": "PLANNED",
+      "listSts": "APPROVED",
+      "planCd": "PRM1",
+      "hold": null
+    },
+    {
+      "domain": "webserver.pi",
+      "ctgr": "EDU",
+      "wave": "W4",
+      "preset": "EDU",
+      "appSts": "PLANNED",
+      "listSts": "APPROVED",
+      "planCd": "PRM2",
+      "hold": null
+    },
+    {
+      "domain": "was.pi",
+      "ctgr": "EDU",
+      "wave": "W4",
+      "preset": "EDU",
+      "appSts": "PLANNED",
+      "listSts": "APPROVED",
+      "planCd": "PRM2",
+      "hold": null
+    },
+    {
+      "domain": "fondation.pi",
+      "ctgr": "CONTENT",
+      "wave": "W4",
+      "preset": "CONTENT",
+      "appSts": "PLANNED",
+      "listSts": "APPROVED",
+      "planCd": "BSC3",
+      "hold": "노출 중(마스터 지시 2026-10-09) · 등재 제출 전 재검토 — △ 기부금품법 — '기부' 어휘 제거·팁 프레임 확인 후 승인"
+    },
+    {
+      "domain": "yoda.pi",
+      "ctgr": "CONTENT",
+      "wave": "W4",
+      "preset": "CONTENT",
+      "appSts": "PLANNED",
+      "listSts": "APPROVED",
+      "planCd": "BSC1",
+      "hold": "노출 중(마스터 지시 2026-10-09) · 등재 제출 전 재검토 — ⏸ 제3자 상표"
+    },
+    {
+      "domain": "anakin.pi",
+      "ctgr": "PERSONAL",
+      "wave": "W5",
+      "preset": "CONTENT",
+      "appSts": "PLANNED",
+      "listSts": "APPROVED",
+      "planCd": "BSC1",
+      "hold": null
+    },
+    {
+      "domain": "youngrok.pi",
+      "ctgr": "PERSONAL",
+      "wave": "W5",
+      "preset": "CONTENT",
+      "appSts": "PLANNED",
+      "listSts": "APPROVED",
+      "planCd": "BSC1",
+      "hold": null
+    }
+  ]
+}

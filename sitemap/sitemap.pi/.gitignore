@@ -1,0 +1,6 @@
+# 중첩 앱 산출물 — 루트 .gitignore는 /node_modules·/.next/를 루트에만 고정한다
+node_modules
+.next
+.vercel
+.env*
+!.env.example

@@ -1,0 +1,71 @@
+/* sitemap.pi 전역 스타일 — Tailwind v4 CSS-first 진입점(config 파일 없음) */
+@import 'tailwindcss';
+
+/* 공용 패키지(packages/*) 컴포넌트의 클래스도 스캔 */
+@source '../../../../packages';
+
+/* next-themes class 기반 다크모드 연동 — 없으면 dark: 클래스 미작동 */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-destructive: var(--destructive);
+}
+
+/* 사이트 전체 어두운 단일 테마 — 홈 버블 캔버스(#070a12)와 헤더·하위 페이지 톤 통일(라이트 테마 없음, layout 이 .dark 고정) */
+:root {
+  color-scheme: dark;
+  --background: #070a12;
+  --foreground: oklch(0.985 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+}
+
+/* 공용 컴포넌트 클래스 — shadcn 미도입 단계의 최소 버튼·입력·카드 */
+@layer components {
+  .card {
+    @apply rounded-lg border border-neutral-200 p-4 dark:border-neutral-800;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-1 rounded-md border border-neutral-300 px-3 py-1.5 text-sm font-medium hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-700 dark:hover:bg-neutral-900;
+  }
+  .btn-primary {
+    @apply border-transparent bg-violet-600 text-white hover:bg-violet-700 dark:hover:bg-violet-500;
+  }
+  .btn-danger {
+    @apply border-transparent bg-red-600 text-white hover:bg-red-700 dark:hover:bg-red-500;
+  }
+  .input {
+    @apply w-full rounded-md border border-neutral-300 bg-transparent px-3 py-2 text-sm dark:border-neutral-700;
+  }
+  .label {
+    @apply mb-1 block text-sm font-medium;
+  }
+}
+
+/* 메인 버블(bubble-canvas) — 호버·포커스 시 확대·글로우(색 = currentColor = 증감 톤), 포커스 링 */
+.bubble {
+  cursor: pointer;
+  outline: none;
+}
+.bubble-inner {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 150ms ease-out;
+}
+.bubble:hover .bubble-inner,
+.bubble:focus-visible .bubble-inner {
+  transform: scale(1.06);
+  filter: drop-shadow(0 0 10px currentColor);
+}
+.bubble:focus-visible .bubble-ring {
+  stroke: #fff;
+  stroke-width: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bubble-inner {
+    transition: none;
+  }
+}

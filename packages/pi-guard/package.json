@@ -1,0 +1,13 @@
+{
+  "name": "@pi/guard",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pi 멀티사이트 공용 API 가드 — rate limit·악성 UA 차단·보안 헤더·Origin 검사·i18n 에러 응답",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "next": "^16"
+  }
+}

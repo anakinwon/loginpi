@@ -1,0 +1,14 @@
+{
+  "name": "@pi/db",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pi 멀티사이트 공용 DB — Supabase admin(lazy·3-tier·스키마 옵션)·Pi 사용자(sys_user) 함수",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "@supabase/supabase-js": "^2.107.0",
+    "next": "^16"
+  }
+}
