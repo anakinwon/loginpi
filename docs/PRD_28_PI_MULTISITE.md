@@ -136,7 +136,9 @@ createCompleteRoute({ piApiKey, db, handlers: { SITE_MBR, CTGR_SLOT, HOME_SLOT }
 
 ## 8. 사이트 포트폴리오 (PRD_27 §2.5 승계)
 
-범례 : ⏸ 노출·제출 보류 / △ 조건부 승인 (출처 sitemap PRD §2·PRD_27 §2.5 리스크 플래그)
+범례 : ⏸ 사이트 앱 Pi 제출 보류 / △ 조건부 승인 (출처 sitemap PRD §2·PRD_27 §2.5 리스크 플래그)
+
+> **마스터 예외(2026-10-09)** : sitemap.pi 디렉터리(메인 버블)에는 ⏸·△ 사이트도 19개 전부 노출한다. §1.1-8(해당 사이트 앱의 Pi 생성·제출 보류)은 그대로 유지. 단 gifticon(상품권)·omok(도박) 광고 노출은 **sitemap.pi 자체 등재 심사 리스크**이므로 sitemap.pi 제출 전 노출 여부를 재결정한다.
 
 | 웨이브 | 사이트 | 프리셋 | 주의 |
 |---|---|---|---|

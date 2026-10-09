@@ -77,3 +77,4 @@ pnpm dev | pnpm build | pnpm lint | pnpm tsc --noEmit | pnpm format
 | 2026-10-09 | 루트 loginpi/CLAUDE.md를 `@../../CLAUDE.md` import로 우선 적용, 우선순위·추가 제약·cafe.pi 전용 항목 원칙 명시 |
 | 2026-10-09 | PRD_28 정합 — 워크스페이스 멤버·공용 패키지 의존(복제 폐기)·운영 브랜치·비운영 스키마 |
 | 2026-10-09 | PRD_28 v0.2 정합 — 배경을 PRD_28로 교체, sql/173 공유 전제 삭제 |
+| 2026-10-09 | 마스터 지시 — 메인 화면 버블(PRD §3-4) : 요금제 7종 크기(`site_mst.plan_cd`), 유료 노출이므로 버블마다 "광고"·요금제 배지 필수, DB 미연결 시 sites.json 폴백 |
