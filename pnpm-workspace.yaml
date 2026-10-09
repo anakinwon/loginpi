@@ -1,3 +1,8 @@
+# 워크스페이스(PRD_28 §3) : 루트 패키지 = cafe.pi(이동 없음), 공용 패키지 packages/*, 사이트 앱 sitemap/<도메인>.pi
+packages:
+  - 'packages/*'
+  - 'sitemap/*'
+  - '!sitemap/_template'
 allowBuilds:
   '@parcel/watcher': true
   '@swc/core': true
