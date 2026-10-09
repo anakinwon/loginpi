@@ -19,7 +19,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { kfmt, ms2, pct, usd, csvSafe, CATEGORY_KEYS, METRICS, KPI_TREE, TIER_LABEL, QUESTIONS, UNMEASURABLE, evaluateSlo } from './work-history-core.mjs'
+import { kfmt, ms2, pct, usd, csvSafe, CATEGORY_KEYS, METRICS, KPI_TREE, TIER_LABEL, QUESTIONS, UNMEASURABLE, evaluateSlo, costUsd } from './work-history-core.mjs'
 export { kfmt, ms2, pct, usd, METRICS, KPI_TREE, TIER_LABEL, QUESTIONS, UNMEASURABLE }
 export const fmtMetric = (k, v) => { if (v == null) return '-'; const u = METRICS[k]?.unit; if (u === 'USD') return usd(v); if (u === 'ms') return ms2(v); if (u === '비율') return pct(v, 1); if (u === '배') return `${v}배`; if (u === '자' || u === '건' || u === '개' || u === '회') return typeof v === 'number' ? v.toLocaleString() : String(v); return String(v) }
 
@@ -38,6 +38,7 @@ export function loadRows({ from = '0000-00-00', to = '9999-99-99', root = LOG_RO
       if (!l.trim()) continue
       let r; try { r = JSON.parse(l) } catch { continue }
       if (r.fix) { fixes.push(r); continue }
+      if (r.tokens && r.model) { const c = costUsd(r.tokens, r.model); if (c != null) r.cost_usd = c }   // 저장값 대신 현행 PRICING으로 재계산 : 단가 추가·정정이 과거 기록에도 반영(PRICING 미등록 모델은 저장값 유지)
       if (r.agent) { agents.set(r.agent_id, r); continue }
       if (r.date < from || r.date > to) continue
       if (r.id) byId.set(r.id, r); else anon.push(r)                        // v1 레코드(id 없음)는 그대로

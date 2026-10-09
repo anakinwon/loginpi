@@ -73,7 +73,7 @@ ${UNMEASURABLE.map(u => `| ${u.metric} | ${u.reason} |`).join('\n')}
 | 명령 | 결과 |
 |---|---|
 | \`pnpm work:stats --type kpi [--date D]\` | KPI 트리 값 · 경보 · 질문별 판정 (터미널) |
-| \`pnpm work:report --period all\` | 일·주·월·년 보고서 (summary/tokens/usage/performance/outcome/metrics.json + report.html) |
+| \`pnpm work:report --period all\` | 일·주·월·년 보고서 (summary/tokens/usage/performance/outcome/metrics.json, report.html 은 work-statistics/main-dashboard/) |
 | \`pnpm work:metrics-doc\` | 이 문서 재생성 |
 | \`pnpm test\` | 로거·집계·분류·마스킹 회귀 테스트 |
 `

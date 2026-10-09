@@ -69,7 +69,8 @@ const CMP = prevRows.length ? compare(PF.total, perfStats(prevRows).total) : nul
 const models = [...new Set(rows.map(r => r.model).filter(Boolean))]
 
 // ── 통계 파일 ──────────────────────────────────────────────────────────────────
-const w = (name, body) => { fs.writeFileSync(path.join(OUT, `${stem}.${name}`), body); return `${stem}.${name}` }
+const DASH = path.resolve(PROJECT, 'work-statistics', 'main-dashboard')   // HTML 시각화 파일은 이 한 폴더에 모은다 (2026-09-22 지시)
+const w = (name, body) => { const dir = name.endsWith('.html') ? DASH : OUT; fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(path.join(dir, `${stem}.${name}`), body); return `${stem}.${name}` }
 const written = []
 const mdTable = (arr, drop = /_ms$|^steps$|cost_usd/) => { if (!arr?.length) return '_없음_'; const cols = Object.keys(arr[0]).filter(c => !drop.test(c)); return [`| ${cols.join(' | ')} |`, `|${cols.map(() => '---').join('|')}|`, ...arr.map(o => `| ${cols.map(c => { const v = o[c]; return v == null ? '' : typeof v === 'object' ? JSON.stringify(v) : String(v) }).join(' | ')} |`)].join('\n') }
 const header = `생성: ${generatedAt} · 범위: ${from} ~ ${to} · 모델: ${models.join(', ') || '-'} · 출처: work-history/*.jsonl (v2, id 중복 제거·보정 병합)`

@@ -86,7 +86,10 @@ export function categorize(text, evidence = {}) {
 // USD per 1M tokens. 출처: https://claude.com/pricing (2026-09 확인). cache_create 는 5분 캐시 기준(1시간 캐시는 ×1.6 — 세션 TTL 이 1h 이면 CACHE_1H=true).
 export const PRICING = {
   'claude-fable-5-1':          { input: 10, output: 50, cache_read: 0.25, cache_create: 12.5 },
+  'claude-fable-5':            { input: 10, output: 50, cache_read: 1,    cache_create: 12.5 },   // docs.claude.com/en/docs/about-claude/pricing 2026-10-06 확인 (cache read 0.1x, 5.1만 0.025x)
+  'claude-opus-5-5':           { input: 4,  output: 20, cache_read: 0.2,  cache_create: 5 },      // docs.claude.com/en/docs/about-claude/pricing 2026-10-08 확인 (1h 쓰기 8 = 5×1.6)
   'claude-opus-5':             { input: 5,  output: 25, cache_read: 0.5,  cache_create: 6.25 },
+  'claude-sonnet-5-5':         { input: 2,  output: 10, cache_read: 0.1,  cache_create: 2.5 },    // docs.claude.com/en/docs/about-claude/pricing 2026-10-08 확인 (캐시 읽기 0.05x)
   'claude-sonnet-5':           { input: 2,  output: 10, cache_read: 0.2,  cache_create: 2.5 },
   'claude-haiku-4-5-20251001': { input: 1,  output: 5,  cache_read: 0.1,  cache_create: 1.25 },
 }
@@ -111,7 +114,8 @@ export function makeRedactor({ workspaceRoot, extra = [] } = {}) {
   rules.push([/\b([A-Za-z0-9_]*(?:KEY|SECRET|TOKEN|PASSWORD|PASSWD|CREDENTIAL|PRIVATE)[A-Za-z0-9_]*)(\s*[=:]\s*)(["']?)([^\s"'`,;]{8,})/gi, '$1$2$3[REDACTED]'])
   rules.push([/\b(Authorization|X-Pi-Token|apikey|api_key|x-api-key)(\s*[:=]\s*)(?:Bearer\s+)?([^\s"'`,;]{8,})/gi, '$1$2[REDACTED]'])
   for (const r of extra) rules.push(r)
-  return s => rules.reduce((acc, [re, rep]) => acc.replace(re, rep), String(s ?? ''))
+  rules.push([/[\w.+-]+@[\w-]+(?:\.[\w-]+)*\.[A-Za-z]{2,}\b/g, '$EMAIL'])   // 이메일(최상위 도메인은 영문만 : 패키지@버전 오탐 방지)
+  return s => rules.reduce((acc, [re, rep]) => acc.replace(re, rep), String(s ?? '').replace(/\b([A-Za-z])%3[Aa](?=[\\/])/g, '$1:'))   // file:///c%3A/… 도 경로 규칙에 걸리도록 콜론 복원
 }
 export const csvSafe = s => (typeof s === 'string' && /^[=+\-@\t\r]/.test(s) ? "'" + s : s)   // 스프레드시트 수식 인젝션 방지
 

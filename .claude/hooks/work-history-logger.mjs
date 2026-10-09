@@ -165,11 +165,11 @@ function processTranscript(transcript, sid, st, { final = false } = {}) {
     const lastWriteIdx = st.steps.map(s => /^(Write|Edit|MultiEdit|NotebookEdit)$/.test(s.t)).lastIndexOf(true)
     const verified = filesChanged.length ? st.steps.slice(lastWriteIdx + 1).some(s => (s.t === 'Bash' || s.t === 'PowerShell') && /test|검증|verify|확인|check|run|실행|render|screenshot|--check|lint|build/i.test(s.d || '')) : null
     return {
-      v: SCHEMA_VERSION, id: `${sid}:${st.turn}.${part}`, session: short, session_id: sid, project: PROJECT_NAME, model: st.model,
+      v: SCHEMA_VERSION, id: `${sid}:${st.turn}.${part}`, session: short, session_id: sid, project: PROJECT_NAME, model: st.model, effort: st.effort ?? null,
       date: dayOf(st.reqTs), hour: hourOf(st.reqTs), weekday: weekdayOf(st.reqTs), turn: st.turn, part, mid_turn: !!st.midTurn, ultrathink: /\bultrathink\b/i.test(st.reqText),
       category: cat.category, tags: cat.tags, rule: cat.rule, confidence: cat.confidence, category_req: st.reqCat?.category || null,
       ts_req: localIso(st.reqTs), ts_res: extra.ts_res ?? null, elapsed_ms: el ?? null, idle_ms: part <= 1 && st.prevResTs && !st.midTurn ? Math.max(0, new Date(st.reqTs) - new Date(st.prevResTs)) : null, ttft_ms: ttft,
-      tools_total: total, tools: st.tools, tool_errors: errors, edit_calls: st.writes.length, files_changed: filesChanged.length, files: filesChanged.slice(0, 40), verified,
+      tools_total: total, tools: st.tools, tool_errors: errors, edit_calls: st.writes.length, files_changed: filesChanged.length, files: filesChanged.slice(0, 40).map(redact), verified,
       skills: [...new Set(st.res.skills.map(r => r.name))], mcp: [...new Set(st.res.mcp.map(r => r.name))], agents: [...new Set(st.res.agents.map(r => r.name))],
       req_chars: st.reqText.length, res_chars: extra.res_chars ?? 0, req_head: redact(cut(st.reqText, 80)),
       tokens: { ...t, context: ctx, cache_hit: ctx ? +(t.cache_read / ctx).toFixed(4) : null }, cost_usd: costUsd(t, st.model),
@@ -268,6 +268,7 @@ function processTranscript(transcript, sid, st, { final = false } = {}) {
     const ts = j.timestamp || new Date().toISOString()
     if (j.type === 'assistant' && !j.isSidechain) {
       if (j.message?.model && !/^</.test(j.message.model)) st.model = j.message.model   // 턴 단위 모델 (세션 중 /model 전환 반영; "<synthetic>" 등 하네스 합성 메시지는 제외)
+      if (j.perTurnEffort || j.effort) st.effort = j.perTurnEffort || j.effort   // 턴 단위 추론 effort(low·medium·high·xhigh·max : /effort 설정값, ultrathink 키워드는 별도 플래그), 미지원 모델은 필드 없음
       announce(j, ts)
       const rid = j.requestId || j.uuid
       if (j.message?.usage && st.turn && !st.seenReq[rid]) { st.seenReq[rid] = 1; const u = j.message.usage, t = st.tokens; t.api_calls += 1; t.input += u.input_tokens || 0; t.cache_read += u.cache_read_input_tokens || 0; t.cache_create += u.cache_creation_input_tokens || 0; t.output += u.output_tokens || 0; t.thinking += u.output_tokens_details?.thinking_tokens || 0 }
