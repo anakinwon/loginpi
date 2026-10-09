@@ -54,6 +54,7 @@ next-env.d.ts
 !.claude/workflows/
 !.claude/workflows/**
 !.claude/settings.json
+!.claude/subagent-statusline.mjs
 
 # 스크린샷 (개발용)
 *.png

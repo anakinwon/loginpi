@@ -308,6 +308,23 @@ src/
 
 ---
 
+## 하네스: teamAnakin (턴 내 단계별 모델 운용)
+
+**목표:** 한 턴 안의 단계(수집 → 결론 → 산출 → 검증 → 검수 → 커밋)마다 맞는 모델·effort의 서브에이전트에 넘기고, 팀장이 결과를 취합·승인한 뒤 메인이 보고한다.
+
+**구성:** 정의 `.claude/agents/teamAnakin/` — `anakin_phase-collect`(수집·Sonnet) · `anakin_phase-decide`(결론·Fable) · `anakin_phase-verify`(검증·Sonnet) · `anakin_phase-review`(문서 검수·Opus) · `anakin_phase-commit`(커밋·Haiku 4.5) · `teamanakin-admin`(팀장·Opus). 운용 기준서 `.claude/skills/anakin-skills/anakins-ClaudeModel-for-Work.md`.
+
+**트리거:** UserPromptSubmit 훅 `.claude/hooks/model-advisor.mjs`가 요청마다 `[모델 단계 계획]` 줄을 주입 → 그 순서로 호출. 팀원이 1명이라도 실행된 턴은 **`teamanakin-admin` 승인 단계 생략 불가**(커밋 단독 턴 제외). `[모델 단계 계획]`이 주입된 턴은 위 "작업 수행 원칙" ③④의 verifier·code-reviewer 대신 teamAnakin 단계가 우선하며, 반려 시 재작업 상한 10회는 동일. 인증·결제·페이지 변경은 Pi Browser 실기기 미검증이면 APPROVED 불가(최대 CONDITIONAL).
+
+**상태 표시·이력:** `.claude/subagent-statusline.mjs`(subagentStatusLine, 에이전트 행 `[단계] · 모델 · effort · 경과` + statusline.sh ▶ 단계) / 대시보드 `node scripts/my-claude-model-dashboard.mjs`(모델 운용) · `node scripts/model-change-dashboard.mjs`(요청별 모델·effort 흐름) → `work-statistics/mywork/`(gitignore). 정기 재평가 2026-10-22(팀장 모드 2).
+
+**변경 이력:**
+| 날짜 | 변경 내용 | 대상 | 사유 |
+|------|----------|------|------|
+| 2026-10-09 | 타 프로젝트(장표·공문서·DR) 팀 이식 — 정의 6종을 loginpi 규칙(pnpm build 관문·Pi Browser 실기기·브랜드 표기·DA 표준)으로 변형, korean-law MCP·read-hwp·check-doc-style·DRM 절차 제외, subagent-statusline 신규, 훅 2종·subagentStatusLine·refreshInterval 등록, 공용 work-history 스크립트의 `npm run` 회귀를 `pnpm`으로 복원, 요청별 변경 대시보드 기준 시각을 loginpi 도입 시점으로 | agents/teamAnakin·skills/anakin-skills·hooks·settings.json·scripts | 마스터 지시 — teamAnakin 팀으로 프로젝트 진행 |
+
+---
+
 ## 작업 수행 원칙 (2026-09-20 마스터 지시 — 모든 요청에 적용)
 
 1. **요청 철저 검토** — 착수 전 목표·범위·완료 기준을 세운다. 읽기에 따라 결과가 달라지면 AskUserQuestion 1문항으로 확인.

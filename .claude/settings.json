@@ -59,12 +59,36 @@
           }
         ]
       }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/model-advisor.mjs\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "matcher": "anakin_phase-decide",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/model-advisor.mjs\"",
+            "timeout": 10
+          }
+        ]
+      }
     ]
   },
   "outputStyle": "Explanatory",
   "statusLine": {
     "type": "command",
-    "command": "bash $WORKSPACE_ROOT/loginpi/.claude/statusline.sh"
+    "command": "bash $WORKSPACE_ROOT/loginpi/.claude/statusline.sh",
+    "refreshInterval": 2
   },
   "permissions": {
     "allow": [
@@ -77,5 +101,9 @@
     "deny": [],
     "ask": [],
     "defaultMode": "bypassPermissions"
+  },
+  "subagentStatusLine": {
+    "type": "command",
+    "command": "node \"$CLAUDE_PROJECT_DIR/.claude/subagent-statusline.mjs\""
   }
 }
