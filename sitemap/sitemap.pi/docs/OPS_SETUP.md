@@ -27,7 +27,7 @@ node scripts/db-migrate.mjs --app sitemap --tier dev --dry-run   # 적용 예정
 node scripts/db-migrate.mjs --app sitemap --tier dev             # baseline → 001 순서 적용
 ```
 
-- [ ] dev → stg → prod 순서로 적용, 각 단계 후 `001` 하단 검증 쿼리 실행(APPROVED 19, 요금제 VIP 2·P3 2·P2 3·P1 4·B3 3·B2 2·B1 3)
+- [ ] dev → stg → prod 순서로 적용, 각 단계 후 `001` 하단 검증 쿼리 실행(APPROVED 19, 요금제 VIP 2·P2 3·P1 4·B2 5·B1 5 — 샘플 91개는 DB에 없음)
 - [ ] 이력은 대상 스키마 `schema_migrations`(파일키+SHA-256). 적용된 파일은 수정하지 말고 새 `NNN_*.sql`로 분리
 - [ ] 적용 후 API가 `PGRST205`(테이블 없음)면 SQL Editor에서 `NOTIFY pgrst, 'reload schema';`
 
