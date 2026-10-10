@@ -292,6 +292,7 @@ src/
 | 2026-07-10 | FK 정책 낡은 기술 정정 ("FK 설계 없음" → 현행 FK 유지·단계 전환 정책) | agents/da-governance-expert.md | 2026-07-01 사고 반영 드리프트 수정 |
 | 2026-07-10 | 실전 1차 실행 완료(sys_cfg_chg_hist 설계→sql/176~178 확정) + 워크스페이스 잡별 하위 디렉토리 규칙·유휴/상충 판정 지침 추가 | skills/da-team | 타 세션 전수조사와 _workspace 충돌·완료 메시지 유실·읽기 경합 3건 실전 교훈 |
 | 2026-07-18 | 스킬 da-naming-rules→da-standards, da-qa-checklist→da-quality 에이전트에 내재화 후 스킬 삭제. references 원문은 docs/da/references/로 이동 | agents/da-standards·da-quality, skills/da-team, docs/da/README | 마스터 지시 — 스킬·에이전트 이중 유지보수 제거 |
+| 2026-10-10 | 팀 실행을 현행 Claude Code 방식으로 전환 — TeamCreate/TeamDelete(현행 버전 부재) 대신 이름 붙인 Agent 소집 + SendMessage·ListAgents·TaskStop, 공유 작업 목록 TaskCreate/TaskGet/TaskList/TaskUpdate 활성화(env `CLAUDE_CODE_ENABLE_TODO_TOOLS=1` 추가, `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` 유지). 폴백은 비대화형 실행 한정 | skills/da-team, .claude/settings.json | 마스터 지시 — "팀 기능 당장 추가", 서브 에이전트 폴백이 상시화되던 문제 해소 |
 
 ---
 

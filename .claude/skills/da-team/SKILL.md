@@ -7,9 +7,19 @@ description: "DA팀(리더·표준·모델·품질·이행 5인) 에이전트 �
 
 DA팀 5인(da-leader·da-standards·da-modeler·da-quality·da-migration)을 조율하여 표준 준수 데이터 아키텍처 산출물(모델·DDL·이행 계획·품질 보고서)을 생성하는 통합 스킬.
 
-## 실행 모드: 에이전트 팀
+## 실행 모드: 에이전트 팀 (Claude Code 2.1.29x 암묵적 단일 팀)
 
-팀 도구(TeamCreate/SendMessage/TaskCreate)를 사용한다. 팀 기능이 비활성 환경이면 **서브 에이전트 모드로 폴백** — 동일 에이전트 정의를 Agent 도구로 순차/병렬 호출하고, 통신 규칙은 파일 기반 전달로 대체한다.
+**TeamCreate/TeamDelete 도구는 현행 버전에 없다** — 세션당 팀 1개가 암묵적으로 존재하고, `name`을 붙여 띄운 Agent가 곧 팀원이다(공식 문서 code.claude.com/docs/en/agent-teams.md, 2026-10-10 확인).
+
+| 용도 | 도구 |
+|---|---|
+| 팀원 소집 | `Agent(subagent_type: "da-standards", name: "standards", run_in_background)` — 이름이 주소 |
+| 팀원 간·리더 통신 | `SendMessage(to: "<팀원 이름>")` — 완료된 팀원에게 보내면 기록에서 재개 |
+| 팀원 목록·상태 | `ListAgents` |
+| 공유 작업 목록 | `TaskCreate` / `TaskGet` / `TaskList` / `TaskUpdate` |
+| 팀원 종료 | `SendMessage({type:"shutdown_request"})` 또는 `TaskStop(task_id: "<팀원 이름>")` |
+
+전제 설정(프로젝트 `.claude/settings.json` env): `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`(팀원·종료/계획승인 프로토콜), `CLAUDE_CODE_ENABLE_TODO_TOOLS=1`(문서 미등재 모델에서 Task* 도구 활성). 비대화형(`-p`·SDK)에서는 teammate가 생성되지 않으므로 그때만 **서브 에이전트/Workflow 모드로 폴백**(파일 기반 전달).
 
 ## 팀 소집 판단 (소집 전 필수)
 
@@ -44,38 +54,33 @@ DA팀 5인(da-leader·da-standards·da-modeler·da-quality·da-migration)을 조
 ### Phase 1: 준비
 
 1. 요구 분석 — 작업 유형(설계/변경/이행/감사) 판별, 팀 소집 여부 판단(위 표)
-2. `docs/da/_workspace/` 생성, 사용자 요구를 `00_input.md`로 저장
+2. `docs/da/_workspace/` 생성, 사용자 요구를 `00_input.md`로 저장 — ⚠️ **"수정 범위"와 "점검 범위"를 따로 적는다.** 점검 범위는 항상 "모델에 등장하는 전 객체(신규·변경·승계·baseline·grandfathered)". "재정의 금지·승계 대상" 문구만 쓰면 팀원이 그 객체를 점검에서 빼 버린다(2026-10-10 sys_user.id·role 이 이렇게 통과 — 정본 §10 #22)
 3. 관련 정본 확인 — `docs/da/데이터표준규칙.md`, 기존 `sql/` 최신 상태
 
 ### Phase 2: 팀 구성
 
 작업 유형에 따라 필요한 팀원만 소집한다 (설계만이면 migration 제외 가능, 감사만이면 quality+standards만).
 
-```
-TeamCreate(
-  team_name: "da-team",
-  members: [
-    { name: "standards", agent_type: "da-standards", model: "opus" },
-    { name: "modeler",   agent_type: "da-modeler",   model: "opus" },
-    { name: "quality",   agent_type: "da-quality",   model: "opus" },
-    { name: "migration", agent_type: "da-migration", model: "opus" }
-  ]
-)
-```
-
-리더 역할은 오케스트레이터(메인 세션)가 da-leader 정의(`.claude/agents/da-leader.md`)를 읽고 수행한다.
-
-작업 등록 (표준 설계 작업 기준):
+팀원은 이름 붙인 Agent 호출로 소집한다(한 메시지에 병렬 호출, 각자 백그라운드):
 
 ```
-TaskCreate(tasks: [
-  { title: "표준사전 사전검토",  assignee: "standards" },
-  { title: "논리/물리 모델 설계", assignee: "modeler" },
-  { title: "DDL 초안 명명 검증",  assignee: "standards", depends_on: ["논리/물리 모델 설계"] },
-  { title: "이행 영향 분석·계획", assignee: "migration", depends_on: ["논리/물리 모델 설계"] },
-  { title: "품질 게이트(점진)",   assignee: "quality" },
-  { title: "통합 검토·확정",     assignee: "leader",  depends_on: ["DDL 초안 명명 검증", "이행 영향 분석·계획", "품질 게이트(점진)"] }
-])
+Agent(subagent_type: "da-standards", name: "standards", run_in_background: true, prompt: "<잡 디렉토리·역할·첫 작업>")
+Agent(subagent_type: "da-modeler",   name: "modeler",   run_in_background: true, prompt: "...")
+Agent(subagent_type: "da-quality",   name: "quality",   run_in_background: true, prompt: "...")
+Agent(subagent_type: "da-migration", name: "migration", run_in_background: true, prompt: "...")   // 이행 대상 있을 때만
+```
+
+리더 역할은 오케스트레이터(메인 세션)가 da-leader 정의(`.claude/agents/da-leader.md`)를 읽고 수행한다. 단계별 승인 판정을 독립 관점으로 받으려면 `Agent(subagent_type: "da-leader", name: "leader")`를 추가 소집해도 된다.
+
+작업 등록 (표준 설계 작업 기준 — 작업마다 TaskCreate 1회, 선후관계는 description 에 명시하고 TaskUpdate 로 상태·담당 갱신):
+
+```
+TaskCreate(subject: "표준사전 사전검토",   description: "담당 standards")
+TaskCreate(subject: "논리/물리 모델 설계",  description: "담당 modeler · 선행: 표준사전 승인")
+TaskCreate(subject: "DDL 초안 명명 검증",   description: "담당 standards · 선행: 모델 설계")
+TaskCreate(subject: "이행 영향 분석·계획",  description: "담당 migration · 선행: 모델 설계")
+TaskCreate(subject: "품질 게이트(점진)",    description: "담당 quality")
+TaskCreate(subject: "통합 검토·확정",      description: "담당 leader · 선행: 명명 검증·이행·품질 게이트")
 ```
 
 ### Phase 3: 팀 작업 수행 (자체 조율)
@@ -87,7 +92,7 @@ TaskCreate(tasks: [
 - quality는 각 산출물 완성 알림을 받는 즉시 점진 QA 수행 — P1 발견 시 작성자에게 직접 발신
 - 상충·판단 필요 사항은 leader에게 상신
 
-**리더 모니터링:** TaskGet으로 진행 확인, 유휴 팀원 알림 처리, 막힌 팀원 재지시
+**리더 모니터링:** TaskList/TaskGet으로 진행 확인, ListAgents로 팀원 상태 확인, 유휴 팀원 알림 처리, 막힌 팀원 SendMessage 재지시 (ListAgents 반복 폴링 금지 — 완료 알림은 자동 도착)
 - 팀원이 완료 메시지 없이 유휴 전환되면 **디스크의 산출물 존재·내용부터 확인**한다 (완료 메시지 유실 사례 — 산출물은 정상인 경우가 있음)
 - 팀원 보고가 서로 상충하면(예: 파일 상태) **리더가 디스크 실물을 직접 grep/Read로 판정**한다 — 읽기 시점 경합이 흔한 원인
 
@@ -102,7 +107,7 @@ TaskCreate(tasks: [
 
 ### Phase 5: 정리
 
-1. 팀원 종료 요청 후 팀 정리 (TeamDelete)
+1. 팀원 종료 요청(SendMessage `shutdown_request` 또는 TaskStop) 후 TaskList 잔여 작업 정리 (TeamDelete 없음 — 팀은 세션 종료와 함께 사라짐)
 2. `_workspace/` 보존 (감사 추적·후속 부분 재실행용)
 3. 사용자에게 결과 요약 보고 — 산출물 목록·게이트 판정·마스터 적용 필요 항목·미해결 P2/P3
 4. 피드백 기회 제공 — 개선점이 있으면 CLAUDE.md 변경 이력에 기록하고 하네스 갱신
@@ -110,7 +115,7 @@ TaskCreate(tasks: [
 ## 데이터 흐름
 
 ```
-[leader(메인)] → TeamCreate
+[leader(메인)] → Agent(name: ...) × N 소집 + TaskCreate
    ├─ standards ←SendMessage→ modeler   (명명 검증 루프)
    │                             │
    │                             ├→ migration (이행 영향 조기 공유)
@@ -129,7 +134,7 @@ TaskCreate(tasks: [
 | 팀원 1명 실패/무응답 | SendMessage 상태 확인 → 1회 재시작 → 재실패 시 리더가 해당 작업 흡수, 보고서에 명시 |
 | 검증 루프 3회 초과 | 리더가 정본 기준 직권 판정, 판정 근거 기록 |
 | 팀원 간 상충 | 삭제 금지·출처 병기 후 리더 판정 |
-| 팀 도구 비활성 | 서브 에이전트 모드 폴백 — Agent 도구 병렬 호출 + 파일 기반 전달 |
+| 팀원 소집 불가(비대화형 `-p`·SDK, 또는 env 미설정) | 서브 에이전트/Workflow 모드 폴백 — Agent 도구 병렬 호출 + 파일 기반 전달. Task* 도구 미노출이면 `CLAUDE_CODE_ENABLE_TODO_TOOLS=1` 확인 |
 | DB 접근 불가 | 파일 기준 진행 + "DB 미검증" 명시 (판정 보류 아님) |
 | P1 위반 잔존 | 확정 차단 — 재작업 또는 사용자 에스컬레이션 |
 
