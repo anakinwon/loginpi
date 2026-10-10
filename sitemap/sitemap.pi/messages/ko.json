@@ -124,7 +124,7 @@
     "views": "조회 {count}회",
     "contact": "연락처",
     "visit": "사이트 방문",
-    "leaveTitle": "외부 .pi 사이트로 이동합니다",
+    "leaveTitle": "외부 사이트로 이동합니다",
     "leaveBody": "sitemap.pi를 떠나 아래 사이트로 이동합니다. 이동한 사이트의 내용과 결제는 해당 운영자의 책임입니다.",
     "leaveConfirm": "이동",
     "cancel": "취소"
