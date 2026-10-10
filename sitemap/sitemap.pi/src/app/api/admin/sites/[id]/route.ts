@@ -1,5 +1,7 @@
 // 관리자 사이트 심사 API — PATCH /api/admin/sites/<id>
 //  approve : PENDING → APPROVED (apv_dtm 은 최초 승인 시만 기록 — 일반 순위 기준 보존). 자사 사이트가 아니면 ownershipVerified:true 필수(400)
+//            ownershipVerified 이면 소유 확인 결과(vrf_yn·vrf_dtm·vrf_usr_id·vrf_dom_nm=현재 도메인)를 함께 기록 —
+//            DB 제약 site_mst_vrf_yn_apv_check(002)가 외부 사이트의 APPROVED·SUSPENDED 에 현재 도메인 확인을 재강제한다
 //  reject  : PENDING → REJECTED (rjct_rsn_cd 필수)
 //  suspend : APPROVED → SUSPENDED (관리자 직권) / restore : SUSPENDED → APPROVED
 import { NextResponse } from 'next/server'
@@ -37,11 +39,12 @@ export const PATCH = withAuthGuard(
 
     const { data: cur, error: curErr } = await db()
       .from('site_mst')
-      .select('site_id, site_sts_cd, apv_dtm, own_site_yn')
+      .select('site_id, site_dom_nm, site_sts_cd, apv_dtm, own_site_yn')
       .eq('site_id', id)
       .eq('del_yn', 'N')
       .maybeSingle<{
         site_id: string
+        site_dom_nm: string
         site_sts_cd: SiteSts
         apv_dtm: string | null
         own_site_yn: 'Y' | 'N'
@@ -65,6 +68,13 @@ export const PATCH = withAuthGuard(
             apv_dtm: cur.apv_dtm ?? now,
             rjct_rsn_cd: null,
             rjct_rsn_cont: null,
+            // PENDING 은 도메인 변경 불가(DRAFT·REJECTED 만) — 상태 조건 갱신이라 읽은 도메인 = 갱신 시점 도메인
+            ...(body.ownershipVerified === true && {
+              vrf_yn: 'Y',
+              vrf_dtm: now,
+              vrf_usr_id: admin.id,
+              vrf_dom_nm: cur.site_dom_nm,
+            }),
           }
         : body.action === 'reject'
           ? {

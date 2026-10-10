@@ -26,7 +26,7 @@ export const GET = withGuard(
 
     const { data, error, count } = await db()
       .from('site_mst')
-      .select(`${OWNER_SITE_COLS}, sys_user(pi_username)`, { count: 'exact' })
+      .select(`${OWNER_SITE_COLS}, sys_user!site_mst_sys_user_id_fkey(pi_username:pi_usr_nm)`, { count: 'exact' })
       .eq('del_yn', 'N')
       .eq('site_sts_cd', sts)
       .order('reg_dtm', { ascending: true })

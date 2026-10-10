@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS site_mst (
   rjct_rsn_cd   VARCHAR(20),                                          -- 반려사유코드 (REJECTED 시 필수)
   rjct_rsn_cont TEXT,                                                 -- 반려사유내용 (등록자 안내 문구)
   apv_dtm       TIMESTAMPTZ,                                          -- 승인일시 (일반 순위 기준 — 최초 승인 시 기록)
-  ownr_usr_id   UUID,                                                 -- 소유자사용자ID → sys_user.id (자사 시드는 NULL)
+  ownr_usr_id   UUID,                                                 -- 소유자사용자ID → sys_user.usr_id (자사 시드는 NULL)
   own_site_yn   CHAR(1)       NOT NULL DEFAULT 'N',                   -- 자사사이트여부 (Y = 유료 구매 상시 금지)
   plan_cd       VARCHAR(10)   NOT NULL DEFAULT 'NONE',                -- 요금제코드 (메인 버블 크기 5단계 + NONE)
   pvt_cntc_txt  TEXT,                                                 -- 비공개연락처텍스트 (심사용, 제출 시 필수 — 앱 검증)
@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS site_mst (
   modr_id       TEXT          NOT NULL DEFAULT 'ADMIN',               -- 변경자ID
   mod_dtm       TIMESTAMPTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP,     -- 변경일시
   CONSTRAINT site_mst_pkey PRIMARY KEY (site_id),
-  CONSTRAINT site_mst_sys_user_id_fkey FOREIGN KEY (ownr_usr_id) REFERENCES sys_user (id),
+  CONSTRAINT site_mst_sys_user_id_fkey FOREIGN KEY (ownr_usr_id) REFERENCES sys_user (usr_id),
   -- 단일 라벨 .pi 도메인, 소문자만 (DRAFT→PENDING 제출 검증과 동일 규칙을 DB 에서 재강제)
   CONSTRAINT site_mst_site_dom_nm_check CHECK (site_dom_nm ~ '^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.pi$'),
   CONSTRAINT site_mst_site_ctgr_cd_check CHECK (site_ctgr_cd IN
@@ -111,7 +111,7 @@ COMMENT ON COLUMN site_mst.site_ctgr_cd IS 'COMMUNITY·EDU·SHOP·CONTENT·PERSO
 COMMENT ON COLUMN site_mst.site_sts_cd  IS 'DRAFT 작성중·PENDING 심사대기·APPROVED 노출·REJECTED 반려·SUSPENDED 정지·WITHDRAWN 철회';
 COMMENT ON COLUMN site_mst.rjct_rsn_cd  IS 'GAMBLING·NON_PI_PYMNT·GIFT_CARD·INVEST·ADULT·PII_COLLECT·PI_BRAND·OWNERSHIP·ETC — OWNERSHIP 반려 (사용자,도메인)은 재제출 불가(앱 409)';
 COMMENT ON COLUMN site_mst.apv_dtm      IS '최초 승인일시 — 일반 순위 기본 정렬(역순). 결제 이력은 순위에 반영하지 않음';
-COMMENT ON COLUMN site_mst.ownr_usr_id  IS 'sys_user.id — 등록자. 자사 시드(own_site_yn=Y)만 NULL 허용, 운영자 계정 생성 후 귀속';
+COMMENT ON COLUMN site_mst.ownr_usr_id  IS 'sys_user.usr_id — 등록자. 자사 시드(own_site_yn=Y)만 NULL 허용, 운영자 계정 생성 후 귀속';
 COMMENT ON COLUMN site_mst.own_site_yn  IS '자사 사이트 여부 — Y 이면 부가서비스 구매 상시 금지(PRD §3)';
 COMMENT ON COLUMN site_mst.plan_cd      IS 'VIP·PRM2·PRM1·BSC2·BSC1·NONE — 메인 버블 크기(유료 노출, 광고 라벨 필수). 표시명은 번역키 plan.<cd>. Phase 2 에서 멤버십 주문(fee_ordr) 기준으로 동기화 예정';
 COMMENT ON COLUMN site_mst.pvt_cntc_txt IS '심사용 연락처 — 비공개(공개 API 응답에서 제외 필수)';
@@ -185,7 +185,7 @@ CREATE OR REPLACE TRIGGER trg_site_mst_mod_dtm
 CREATE TABLE IF NOT EXISTS site_rpt (
   rpt_id        UUID          NOT NULL DEFAULT gen_random_uuid(),     -- 신고ID
   site_id       UUID          NOT NULL,                               -- 사이트ID → site_mst
-  rptr_usr_id   UUID          NOT NULL,                               -- 신고자사용자ID → sys_user.id (로그인 필수)
+  rptr_usr_id   UUID          NOT NULL,                               -- 신고자사용자ID → sys_user.usr_id (로그인 필수)
   rpt_rsn_cd    VARCHAR(20)   NOT NULL,                               -- 신고사유코드
   rpt_cont      TEXT,                                                 -- 신고내용 (상세 설명, 1,000자)
   rpt_sts_cd    VARCHAR(20)   NOT NULL DEFAULT 'RECEIVED',            -- 신고상태코드
@@ -199,7 +199,7 @@ CREATE TABLE IF NOT EXISTS site_rpt (
   mod_dtm       TIMESTAMPTZ   NOT NULL DEFAULT CURRENT_TIMESTAMP,     -- 변경일시
   CONSTRAINT site_rpt_pkey PRIMARY KEY (rpt_id),
   CONSTRAINT site_rpt_site_mst_id_fkey FOREIGN KEY (site_id) REFERENCES site_mst (site_id),
-  CONSTRAINT site_rpt_sys_user_id_fkey FOREIGN KEY (rptr_usr_id) REFERENCES sys_user (id),
+  CONSTRAINT site_rpt_sys_user_id_fkey FOREIGN KEY (rptr_usr_id) REFERENCES sys_user (usr_id),
   -- 금지 카테고리 7종 + FRAUD(사기)·BROKEN(접속 불가)·ETC [확인중 : legal-compliance-advisor]
   CONSTRAINT site_rpt_rpt_rsn_cd_check CHECK (rpt_rsn_cd IN
     ('GAMBLING', 'NON_PI_PYMNT', 'GIFT_CARD', 'INVEST', 'ADULT', 'PII_COLLECT', 'PI_BRAND',
@@ -350,7 +350,7 @@ SELECT fn_grant_svc_only('FUNCTION', 'fn_sel_stat_site_chg(integer)');
 --    사이트명 : PRD 표의 식별자 그대로(cafe 만 공식 브랜드 표기 PyCafé™) — 표시명·설명은 관리 화면에서 보완
 --    멱등 : 같은 도메인의 활성 행이 있으면 건너뜀(상태가 바뀐 뒤 재실행해도 덮어쓰지 않음)
 --    소유 귀속 : 운영자(ADMIN) sys_user 가 첫 로그인으로 생성된 뒤
---      UPDATE site_mst SET ownr_usr_id = <admin id>, modr_id = 'ADMIN' WHERE own_site_yn = 'Y' AND ownr_usr_id IS NULL;
+--      UPDATE site_mst SET ownr_usr_id = <admin usr_id>, modr_id = 'ADMIN' WHERE own_site_yn = 'Y' AND ownr_usr_id IS NULL;
 -- ------------------------------------------------------------
 INSERT INTO site_mst (site_dom_nm, site_nm, site_ctgr_cd, site_sts_cd, plan_cd, apv_dtm, own_site_yn)
 SELECT v.site_dom_nm, v.site_nm, v.site_ctgr_cd, v.site_sts_cd, v.plan_cd,

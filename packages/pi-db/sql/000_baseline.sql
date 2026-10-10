@@ -11,9 +11,12 @@
 -- 2. 접근 통제 : RLS 비활성 + 서버 전용 service_role 키만 접근 (cafe.pi 패턴 승계).
 --    RLS를 끄는 대신 anon·authenticated 권한을 테이블·함수 단위로 회수한다(fn_grant_svc_only).
 --    anon 키가 클라이언트에 노출돼도 PostgREST 로 읽기·쓰기 불가 — 방어 심층화.
--- 3. sys_user 컬럼명 = cafe.pi 원형 유지(id·display_name·role·pi_wallet_address 등 표준도메인 미종결
---    컬럼 포함). @pi/db upsertPiUser·@pi/auth getSessionUser 가 cafe 와 같은 코드로 양쪽 DB를 다루므로
---    여기서만 표준명으로 바꾸면 공용 패키지가 깨진다. 표준화는 cafe 로드맵(정본 §10 잔여 위반)과 동시 진행.
+-- 3. sys_user 컬럼명 = 정본 v2.4 §1-3(단일 단어 금지)·마스터 확정 개명 7건 반영(2026-10-10,
+--    sitemap 데이터 모델 §10-1·§10-2) : id→usr_id · role→role_cd(VARCHAR(20)) · pi_username→pi_usr_nm ·
+--    pi_wallet_address→pi_wlt_adr_txt · display_name→dsp_nm · last_login_dtm→lst_lgn_dtm · rejoin_dtm→rjn_dtm.
+--    세션·API 필드명(userId·role·username·displayName, UserRow 필드)은 불변 — DB 컬럼 ↔ TS 필드 매핑은
+--    @pi/db users.ts 한 곳에서만 처리. cafe.pi 자체 DB(id·role·pi_username 등)는 범위 밖(정본 §10 잔여 위반).
+--    ⚠ cafe 가 @pi/db 로 옮겨 오려면 cafe DB 도 같은 개명을 선행해야 한다.
 -- 4. sys_user 는 Pi 전용 최소 컬럼 : Google(NextAuth)·LBS 동의·실명·연락처·카카오 등 cafe 전용 컬럼 제외.
 --    ⚠ @pi/db 로 upsertPiUser 이관 시 재가입 부활 분기의 lbs_consent_* 갱신·sys_user_consent 논리삭제를 제거할 것.
 -- 5. pi_pymnt 제외 (PRD_28 §4 목록과의 차이 — 의도적) :
@@ -21,7 +24,7 @@
 --    표준 미준수 컬럼을 가진 채 @pi/payments 코어 계약(metadata.type 레지스트리·멱등 상태)이 아직 미확정이다.
 --    소비자 없이 스키마를 먼저 굳히면 코어 확정 때 이행 비용만 생긴다.
 --    → @pi/payments 코어 확정 시 packages/pi-db/sql/010_pi_pymnt.sql 로 별도 추가(sitemap Phase 2 착수 조건).
--- 6. 물리 DELETE 금지 — 탈퇴·차단은 del_yn='Y' + del_dtm + del_rsn_cd, 재가입은 행 부활(rejoin_dtm).
+-- 6. 물리 DELETE 금지 — 탈퇴·차단은 del_yn='Y' + del_dtm + del_rsn_cd, 재가입은 행 부활(rjn_dtm).
 -- ============================================================
 
 BEGIN;
@@ -85,17 +88,17 @@ $$;
 -- ------------------------------------------------------------
 -- 1) sys_user — Pi 사용자 (사이트마다 별도 DB, 사이트 안에서 1인 1행)
 --    pi_uid    : (Pi 포털 앱 × Testnet/Mainnet) scoped 값 → 영구 식별자 아님. upsert 충돌 키로만 사용
---    pi_username : 사람의 불변 키 — 활성 행 부분 UNIQUE(ux_sys_user_pi_username_actv)로 DB 강제
+--    pi_usr_nm : 사람의 불변 키 — 활성 행 부분 UNIQUE(ux_sys_user_pi_usr_nm_actv)로 DB 강제
 -- ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS sys_user (
-  id                UUID         NOT NULL DEFAULT gen_random_uuid(),       -- 사용자ID (cafe 원형명 유지)
+  usr_id            UUID         NOT NULL DEFAULT gen_random_uuid(),       -- 사용자ID
   pi_uid            TEXT,                                                  -- Pi 앱별 scoped uid
-  pi_username       TEXT,                                                  -- Pi 사용자명 (불변 키)
-  pi_wallet_address TEXT,                                                  -- Pi 지갑 주소 (A2U 지급 대비)
-  display_name      TEXT         NOT NULL DEFAULT '',                      -- 표시명 (기본 = pi_username)
-  role              TEXT         NOT NULL DEFAULT 'USER',                  -- 권한: ADMIN(최상위) / USER
-  last_login_dtm    TIMESTAMPTZ,                                           -- 최근로그인일시
-  rejoin_dtm        TIMESTAMPTZ,                                           -- 재가입일시 (이전 활동 숨김 컷오프)
+  pi_usr_nm         TEXT,                                                  -- Pi 사용자명 (불변 키)
+  pi_wlt_adr_txt    TEXT,                                                  -- Pi 지갑 주소 (A2U 지급 대비)
+  dsp_nm            TEXT         NOT NULL DEFAULT '',                      -- 표시명 (기본 = pi_usr_nm)
+  role_cd           VARCHAR(20)  NOT NULL DEFAULT 'USER',                  -- 권한코드: ADMIN(최상위) / USER
+  lst_lgn_dtm       TIMESTAMPTZ,                                           -- 최종로그인일시
+  rjn_dtm           TIMESTAMPTZ,                                           -- 재가입일시 (이전 활동 숨김 컷오프)
   del_rsn_cd        VARCHAR(20),                                           -- 삭제사유코드
   del_yn            CHAR(1)      NOT NULL DEFAULT 'N',                     -- 삭제여부
   del_dtm           TIMESTAMPTZ,                                           -- 삭제일시
@@ -103,11 +106,11 @@ CREATE TABLE IF NOT EXISTS sys_user (
   reg_dtm           TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,       -- 등록일시
   modr_id           TEXT         NOT NULL DEFAULT 'ADMIN',                 -- 변경자ID
   mod_dtm           TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP,       -- 변경일시
-  CONSTRAINT sys_user_pkey PRIMARY KEY (id),
+  CONSTRAINT sys_user_pkey PRIMARY KEY (usr_id),
   -- 전체 UNIQUE(부분 아님) — upsertPiUser 의 upsert(onConflict: 'pi_uid') 추론 대상
   CONSTRAINT sys_user_pi_uid_key UNIQUE (pi_uid),
   -- MASTER 행은 존재하지 않는다(2026-07-16 확정). isMaster() 는 ADMIN 을 최상위로 판정
-  CONSTRAINT sys_user_role_check CHECK (role IN ('ADMIN', 'USER')),
+  CONSTRAINT sys_user_role_cd_check CHECK (role_cd IN ('ADMIN', 'USER')),
   -- WDRW 자진탈퇴(부활 가능) · SYS_DUP uid 재발급 중복정리(부활 가능) · ADMIN_BLCK 관리자 차단(부활 불가)
   CONSTRAINT sys_user_del_rsn_cd_check CHECK (del_rsn_cd IS NULL OR del_rsn_cd IN ('WDRW', 'SYS_DUP', 'ADMIN_BLCK')),
   CONSTRAINT sys_user_del_yn_check CHECK (del_yn IN ('Y', 'N'))
@@ -115,15 +118,15 @@ CREATE TABLE IF NOT EXISTS sys_user (
 
 COMMENT ON TABLE  sys_user             IS 'Pi 사용자 — @pi/db baseline. 사이트별 DB에 1행/인. 물리 DELETE 금지';
 COMMENT ON COLUMN sys_user.pi_uid      IS 'Pi uid — 포털 앱×네트워크 scoped(사이트마다·sandbox 전환 시 재발급). 영구 식별자로 쓰지 말 것';
-COMMENT ON COLUMN sys_user.pi_username IS 'Pi 사용자명 — 사람의 불변 키. 활성 행(del_yn=N) UNIQUE';
-COMMENT ON COLUMN sys_user.role        IS 'ADMIN(최상위, env 시드) / USER. role 문자열 단독 비교 대신 isAdmin()·isMaster() 사용';
-COMMENT ON COLUMN sys_user.rejoin_dtm  IS '재가입(행 부활) 일시 — 이 시각 이전 활동 기록은 화면에 노출하지 않음';
+COMMENT ON COLUMN sys_user.pi_usr_nm   IS 'Pi 사용자명 — 사람의 불변 키. 활성 행(del_yn=N) UNIQUE';
+COMMENT ON COLUMN sys_user.role_cd     IS 'ADMIN(최상위, env 시드) / USER. role_cd 문자열 단독 비교 대신 isAdmin()·isMaster() 사용';
+COMMENT ON COLUMN sys_user.rjn_dtm     IS '재가입(행 부활) 일시 — 이 시각 이전 활동 기록은 화면에 노출하지 않음';
 COMMENT ON COLUMN sys_user.del_rsn_cd  IS '삭제사유: WDRW·SYS_DUP(부활 가능) / ADMIN_BLCK·NULL(부활 불가)';
 
--- 활성 pi_username 유일성 (cafe sql/162 동일 — 인덱스명도 동일하게 유지해 장애 대응 문서 공용)
-CREATE UNIQUE INDEX IF NOT EXISTS ux_sys_user_pi_username_actv
-  ON sys_user (pi_username)
-  WHERE del_yn = 'N' AND pi_username IS NOT NULL;
+-- 활성 pi_usr_nm 유일성 (cafe sql/162 의 pi_username 규칙과 같은 의미 — 위반 에러 시 인덱스가 아니라 코드를 고칠 것)
+CREATE UNIQUE INDEX IF NOT EXISTS ux_sys_user_pi_usr_nm_actv
+  ON sys_user (pi_usr_nm)
+  WHERE del_yn = 'N' AND pi_usr_nm IS NOT NULL;
 
 -- mod_dtm 자동 갱신 (정본 §6)
 CREATE OR REPLACE FUNCTION fn_upd_sys_user_mod_dtm()
@@ -151,5 +154,5 @@ COMMIT;
 -- SELECT indexname FROM pg_indexes WHERE schemaname = current_schema() AND tablename = 'sys_user';
 -- SELECT relrowsecurity FROM pg_class WHERE oid = 'sys_user'::regclass;          -- f 이어야 정상
 -- SELECT has_table_privilege('anon', 'sys_user', 'SELECT');                       -- f 이어야 정상 (Supabase)
--- SELECT pi_username, COUNT(*) FROM sys_user WHERE del_yn = 'N' AND pi_username IS NOT NULL
---   GROUP BY pi_username HAVING COUNT(*) > 1;                                      -- 0행이어야 정상
+-- SELECT pi_usr_nm, COUNT(*) FROM sys_user WHERE del_yn = 'N' AND pi_usr_nm IS NOT NULL
+--   GROUP BY pi_usr_nm HAVING COUNT(*) > 1;                                      -- 0행이어야 정상

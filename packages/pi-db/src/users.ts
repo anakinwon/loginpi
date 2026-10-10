@@ -1,12 +1,13 @@
 // @pi/db — Pi 사용자(sys_user) 함수: upsertPiUser(uid→username 재바인딩·재가입 부활)·조회·접속 기록.
 // 출처: cafe.pi src/lib/users.ts Pi 함수 복사 추출(Google 경로·프로필 수정 제외). 컬럼은 baseline sys_user(000_baseline.sql) 기준.
-// ⭐사용자 매칭 철칙: pi_uid는 (포털 앱 × Testnet/Mainnet) scoped 값 — 사람의 불변 키는 pi_username.
+// ⭐사용자 매칭 철칙: pi_uid는 (포털 앱 × Testnet/Mainnet) scoped 값 — 사람의 불변 키는 pi_usr_nm(TS 필드 pi_username).
+// DB 컬럼 ↔ TS 필드 매핑은 이 파일 한 곳(toUserRow)에서만 — 세션·API 필드명 불변(sitemap 데이터 모델 §10-3 R-3).
 import 'server-only'
 import { after } from 'next/server'
 import { getSupabaseAdmin } from './supabase-admin'
 import { isReadOnlyDb, resolveDbTier } from './db-env'
 
-// sys_user 행 형태 — packages/pi-db/sql/000_baseline.sql 정본(Pi 전용 최소 컬럼, cafe 전용 Google·LBS·프로필 컬럼 제외)
+// 사용자 TS 형태(필드명 불변) — DB 행은 toUserRow 로 변환. 컬럼 정본은 packages/pi-db/sql/000_baseline.sql
 export interface UserRow {
   id: string
   pi_uid: string | null
@@ -28,6 +29,35 @@ export interface UserRow {
   mod_dtm: string
 }
 
+// sys_user DB 행 — 000_baseline.sql 개명 컬럼(usr_id·pi_usr_nm·pi_wlt_adr_txt·dsp_nm·role_cd·lst_lgn_dtm·rjn_dtm)
+type SysUserDbRow = Omit<
+  UserRow,
+  'id' | 'pi_username' | 'pi_wallet_address' | 'display_name' | 'role' | 'last_login_dtm' | 'rejoin_dtm'
+> & {
+  usr_id: string
+  pi_usr_nm: string | null
+  pi_wlt_adr_txt: string | null
+  dsp_nm: string
+  role_cd: string
+  lst_lgn_dtm: string | null
+  rjn_dtm: string | null
+}
+
+function toUserRow(r: SysUserDbRow | null | undefined): UserRow | null {
+  if (!r) return null
+  const { usr_id, pi_usr_nm, pi_wlt_adr_txt, dsp_nm, role_cd, lst_lgn_dtm, rjn_dtm, ...rest } = r
+  return {
+    ...rest,
+    id: usr_id,
+    pi_username: pi_usr_nm,
+    pi_wallet_address: pi_wlt_adr_txt,
+    display_name: dsp_nm,
+    role: role_cd,
+    last_login_dtm: lst_lgn_dtm,
+    rejoin_dtm: rjn_dtm,
+  }
+}
+
 export interface PiUserInput {
   uid: string
   username: string | null
@@ -46,7 +76,7 @@ export class PiLoginRejectedError extends Error {
 }
 
 export interface UpsertPiUserOptions {
-  // 처음 보는 uid + 같은 pi_username 행 존재 시 그 행에 uid 재바인딩(활성)·부활(논리삭제)할지. 기본 true(cafe 의미).
+  // 처음 보는 uid + 같은 pi_usr_nm 행 존재 시 그 행에 uid 재바인딩(활성)·부활(논리삭제)할지. 기본 true(cafe 의미).
   // false = 다른 Pi 앱이 발급한 토큰의 username 재사용(계정 탈취) 차단 → 로그인 거부(AUTH_PI_ACCOUNT_CONFLICT).
   // ADMIN 계정은 이 옵션과 무관하게 재바인딩하지 않는다
   rebindByUsername?: boolean
@@ -54,7 +84,7 @@ export interface UpsertPiUserOptions {
   onRevive?: (userId: string) => Promise<void> | void
 }
 
-// Pi 로그인 upsert — ① pi_uid 일치 ② 불변 키(pi_username) 폴백 재바인딩 ②-b 재가입 부활 ③ 신규 INSERT
+// Pi 로그인 upsert — ① pi_uid 일치 ② 불변 키(pi_usr_nm) 폴백 재바인딩 ②-b 재가입 부활 ③ 신규 INSERT
 // sandbox 플립·메인넷 전환·포털 앱 변경 시 uid가 전원 재발급되므로, 처음 보는 uid라도
 // 같은 username의 활성 계정이 있으면 그 행에 uid를 재바인딩해 원 계정으로 잇는다.
 export async function upsertPiUser(
@@ -69,11 +99,11 @@ export async function upsertPiUser(
       const { data } = await getSupabaseAdmin()
         .from('sys_user')
         .select()
-        .eq('pi_username', piUser.username)
+        .eq('pi_usr_nm', piUser.username)
         .eq('del_yn', 'N')
         .order('reg_dtm', { ascending: true })
         .limit(1)
-      const row = data?.[0] as UserRow | undefined
+      const row = toUserRow(data?.[0])
       // uid 불일치 username 매칭 = 재바인딩과 같은 위험 → 쓰기 경로와 동일 규칙으로 거부
       if (row && (opts.rebindByUsername === false || isAdminRole(row.role)))
         throw accountConflict()
@@ -88,18 +118,18 @@ export async function upsertPiUser(
   // ② 이 uid를 가진 행이 전무(비활성 포함)할 때만 username 폴백
   const { data: uidHolder } = await db
     .from('sys_user')
-    .select('id')
+    .select('usr_id')
     .eq('pi_uid', piUser.uid)
     .maybeSingle()
   if (!uidHolder && piUser.username) {
     const { data: candidates } = await db
       .from('sys_user')
       .select()
-      .eq('pi_username', piUser.username)
+      .eq('pi_usr_nm', piUser.username)
       .eq('del_yn', 'N')
       .order('reg_dtm', { ascending: true }) // 중복 존재 시 최고참 행 = 정본
       .limit(1)
-    const original = candidates?.[0] as UserRow | undefined
+    const original = toUserRow(candidates?.[0])
     if (original) {
       if (opts.rebindByUsername === false || isAdminRole(original.role)) {
         console.warn(
@@ -111,33 +141,33 @@ export async function upsertPiUser(
         .from('sys_user')
         .update({
           pi_uid: piUser.uid,
-          pi_wallet_address: piUser.walletAddress,
-          last_login_dtm: nowIso,
+          pi_wlt_adr_txt: piUser.walletAddress,
+          lst_lgn_dtm: nowIso,
           modr_id: 'SYSTEM',
           mod_dtm: nowIso,
         })
-        .eq('id', original.id)
+        .eq('usr_id', original.id)
         .select()
         .single()
       if (!rebindError && rebound) {
         console.warn(
           `[auth] pi_uid 재바인딩: @${piUser.username} ${original.pi_uid} → ${piUser.uid}`,
         )
-        return rebound as UserRow
+        return toUserRow(rebound) as UserRow
       }
       // 재바인딩 실패는 기록만 하고 기존 경로로 폴스루 — 로그인 관문은 살린다
       console.error('[auth] pi_uid 재바인딩 실패:', rebindError?.message)
     } else {
-      // ②-b 재가입 부활: 같은 username의 논리삭제 행을 살린다(pi_username 유일성 — 중복 행 금지).
+      // ②-b 재가입 부활: 같은 username의 논리삭제 행을 살린다(pi_usr_nm 유일성 — 중복 행 금지).
       // 부활 허용 사유는 WDRW·SYS_DUP만 — 그 외는 신규 INSERT가 차단 우회가 되므로 로그인 거부
       const { data: delCands } = await db
         .from('sys_user')
         .select()
-        .eq('pi_username', piUser.username)
+        .eq('pi_usr_nm', piUser.username)
         .eq('del_yn', 'Y')
         .order('reg_dtm', { ascending: true })
         .limit(1)
-      const delRow = delCands?.[0] as UserRow | undefined
+      const delRow = toUserRow(delCands?.[0])
       if (delRow) {
         // 부활도 uid 재바인딩이다 — 옵션 false·ADMIN 행이면 같은 사유로 거부(신규 INSERT로 우회도 불가)
         if (opts.rebindByUsername === false || isAdminRole(delRow.role)) {
@@ -154,14 +184,14 @@ export async function upsertPiUser(
           .update({
             del_yn: 'N',
             del_dtm: null,
-            rejoin_dtm: nowIso, // del_rsn_cd는 이력으로 보존
+            rjn_dtm: nowIso, // del_rsn_cd는 이력으로 보존
             pi_uid: piUser.uid,
-            pi_wallet_address: piUser.walletAddress,
-            last_login_dtm: nowIso,
+            pi_wlt_adr_txt: piUser.walletAddress,
+            lst_lgn_dtm: nowIso,
             modr_id: 'SYSTEM',
             mod_dtm: nowIso,
           })
-          .eq('id', delRow.id)
+          .eq('usr_id', delRow.id)
           .select()
           .single()
         if (!reviveError && revived) {
@@ -171,11 +201,11 @@ export async function upsertPiUser(
             console.error('[auth] 재가입 후처리 실패:', e)
           }
           console.warn(
-            `[auth] 재가입 부활: @${piUser.username} (${delRow.id}) rejoin_dtm=${nowIso}`,
+            `[auth] 재가입 부활: @${piUser.username} (${delRow.id}) rjn_dtm=${nowIso}`,
           )
-          return revived as UserRow
+          return toUserRow(revived) as UserRow
         }
-        // 부활 실패는 기록 후 폴스루 — 활성 pi_username UNIQUE 인덱스가 중복 INSERT를 막는다
+        // 부활 실패는 기록 후 폴스루 — 활성 pi_usr_nm UNIQUE 인덱스(ux_sys_user_pi_usr_nm_actv)가 중복 INSERT를 막는다
         console.error('[auth] 재가입 부활 실패:', reviveError?.message)
       }
     }
@@ -187,10 +217,10 @@ export async function upsertPiUser(
     .upsert(
       {
         pi_uid: piUser.uid,
-        pi_username: piUser.username,
-        pi_wallet_address: piUser.walletAddress,
-        display_name: piUser.username ?? `pi_${piUser.uid.slice(0, 8)}`,
-        last_login_dtm: nowIso,
+        pi_usr_nm: piUser.username,
+        pi_wlt_adr_txt: piUser.walletAddress,
+        dsp_nm: piUser.username ?? `pi_${piUser.uid.slice(0, 8)}`,
+        lst_lgn_dtm: nowIso,
       },
       { onConflict: 'pi_uid' },
     )
@@ -198,7 +228,7 @@ export async function upsertPiUser(
     .single()
 
   if (error) throw new Error(error.message ?? 'Pi 사용자 저장 실패')
-  return data as UserRow
+  return toUserRow(data) as UserRow
 }
 
 const accountConflict = () =>
@@ -216,10 +246,10 @@ export async function getUserById(id: string): Promise<UserRow | null> {
   const { data } = await getSupabaseAdmin()
     .from('sys_user')
     .select()
-    .eq('id', id)
+    .eq('usr_id', id)
     .eq('del_yn', 'N')
     .maybeSingle()
-  return (data as UserRow) ?? null
+  return toUserRow(data)
 }
 
 // 구버전 토큰(userId='')·DB 오류 폴백용. 비활성 계정은 유효 토큰이어도 차단
@@ -230,10 +260,10 @@ export async function getUserByPiUid(uid: string): Promise<UserRow | null> {
     .eq('pi_uid', uid)
     .eq('del_yn', 'N')
     .maybeSingle()
-  return (data as UserRow) ?? null
+  return toUserRow(data)
 }
 
-// 접속 기록(last_login_dtm) — Pi Browser는 토큰 재사용으로 /api/auth/pi를 다시 타지 않으므로
+// 접속 기록(lst_lgn_dtm) — Pi Browser는 토큰 재사용으로 /api/auth/pi를 다시 타지 않으므로
 // 세션 검증 성공 시마다 호출하되 5분 스로틀한다.
 // ponytail: 인스턴스 메모리 스로틀 — 서버리스 재기동 시 초기화, DB 조건(lt threshold)이 2차 방어
 const TOUCH_INTERVAL_MS = 5 * 60 * 1000
@@ -250,10 +280,10 @@ export function touchLastLogin(userId: string): void {
     const threshold = new Date(now - TOUCH_INTERVAL_MS).toISOString()
     const { error } = await getSupabaseAdmin()
       .from('sys_user')
-      .update({ last_login_dtm: new Date(now).toISOString() })
-      .eq('id', userId)
-      .or(`last_login_dtm.is.null,last_login_dtm.lt.${threshold}`)
-    if (error) console.error('[users] last_login_dtm 갱신 실패:', error.message)
+      .update({ lst_lgn_dtm: new Date(now).toISOString() })
+      .eq('usr_id', userId)
+      .or(`lst_lgn_dtm.is.null,lst_lgn_dtm.lt.${threshold}`)
+    if (error) console.error('[users] lst_lgn_dtm 갱신 실패:', error.message)
   }
   try {
     after(run) // 응답 이후 실행 보장
@@ -262,7 +292,7 @@ export function touchLastLogin(userId: string): void {
   }
 }
 
-// env 시드 관리자(PRD_28 §5) — adminUsernames(쉼표 구분, 예: ADMIN_PI_USERNAMES)에 pi_username이 있으면 role=ADMIN 승격.
+// env 시드 관리자(PRD_28 §5) — adminUsernames(쉼표 구분, 예: ADMIN_PI_USERNAMES)에 pi_username이 있으면 role_cd=ADMIN 승격.
 // 승격만 한다: 목록에서 빠져도 자동 강등하지 않음(오설정 1회로 운영자 전원 잠김 방지) — 강등은 DB에서 수동.
 // adminUids(예: ADMIN_PI_UIDS) 설정 시 pi_uid도 목록에 있어야 승격(username만으로 승격 불가 — 타 앱 토큰 재사용 방어).
 // 운영 tier(resolveDbTier()==='prod', 미설정 기본 포함)에서 adminUids 가 비면 승격하지 않는다(KISA 2026-10-09 재점검 — env 검증 우회 대비 이중 방어)
@@ -286,13 +316,13 @@ export async function grantEnvAdmin(
   if (uids.length && !(user.pi_uid && uids.includes(user.pi_uid))) return user
   const { data, error } = await getSupabaseAdmin()
     .from('sys_user')
-    .update({ role: 'ADMIN', modr_id: 'SYSTEM' })
-    .eq('id', user.id)
+    .update({ role_cd: 'ADMIN', modr_id: 'SYSTEM' })
+    .eq('usr_id', user.id)
     .select()
     .single()
   if (error) {
     console.error('[users] ADMIN 승격 실패:', error.message)
     return user
   }
-  return data as UserRow
+  return toUserRow(data) as UserRow
 }
