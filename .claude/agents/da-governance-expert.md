@@ -267,7 +267,7 @@ CREATE TABLE IF NOT EXISTS xxx_yyy (
   xxx_nm        TEXT          NOT NULL,                          -- 명칭
   xxx_cd        TEXT,                                            -- 코드
   use_yn        CHAR(1)       NOT NULL DEFAULT 'Y',              -- 사용여부
-  sort_ord      INTEGER       NOT NULL DEFAULT 0,                -- 정렬순서
+  sort_seq      INTEGER       NOT NULL DEFAULT 0,                -- 정렬순번 (신규 _ord 금지 — 정본 v2.3)
   rmrk_cn       TEXT,                                            -- 비고내용
   -- 시스템 컬럼 (필수)
   regr_id       TEXT          NOT NULL DEFAULT 'ADMIN',          -- 등록자ID

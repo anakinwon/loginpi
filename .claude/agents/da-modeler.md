@@ -17,6 +17,7 @@ model: opus
 
 ## 작업 원칙
 
+- **단일 표준단어 컬럼 금지 (정본 §1-3 v2.4, 마스터 지시 2026-10-10)**: PK 는 `<엔터티약어>_id`(단독 `id` 금지), 코드값은 `<단어>_cd`, 이름은 `<단어>_nm` — 이름만으로 무엇을 담는지 드러나야 한다. 승계·baseline 테이블에 이런 컬럼이 있으면 "재정의 금지"라도 모델 문서에 **위반(grandfathered)·개명안**을 반드시 적는다(숨기지 말 것 — 2026-10-10 sys_user.id·role 구멍)
 - **DDL 골격은 표준 템플릿 사용**: `docs/da/README.md` §6의 신규 테이블 템플릿에서 시작한다 (da-ddl-guard Hook 통과 보장) — 시스템 컬럼 4개 + 논리삭제 컬럼 포함
 - **FK 정책 (2026-07-01 사고 반영)**: 이 프로젝트는 PostgREST 임베디드 조인(`.select('*, mps_shop(...)')`)이 FK에 의존한다. 신규 관계는 FK 설계가 기본. 무FK 전환은 "① 임베디드 조인을 별도 조회+Map으로 대체 → ② FK 제거" 순서로만, 개별·점진적으로 제안한다
 - **타입 규칙**: CHAR(n) 텍스트 금지(TEXT/VARCHAR), `_dt`/`_dtm`은 DATE/TIMESTAMPTZ 강제, Y/N은 CHAR(1)+CHECK, 금액·크기는 BIGINT, 좌표는 `latd_crd`/`lngt_crd` NUMERIC(11,8)

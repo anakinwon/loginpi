@@ -10,7 +10,7 @@
  *   - 규칙 위반       → exit 2 (차단 + DA 통보 → 승인절차)
  *   - DA 승인 주석    → exit 0 (-- DA-APPROVED: <사유> 가 SQL에 존재하면 통과)
  *
- * 검사 규칙: R1~R6 차단 / R7 경고
+ * 검사 규칙: R1~R6·R8 차단 / R7 경고 (R8 = 단일 표준단어 컬럼 금지, 2026-10-10)
  */
 
 // ---------- stdin 수신 ----------
@@ -130,8 +130,21 @@ const DOMAIN_SUFFIXES = new Set([
 ])
 
 // 컬럼명이 표준 도메인 약어로 끝나는지 검사 (CREATE·ALTER 공통). 위반 시 warnings 적재
+// + R8(차단, 2026-10-10 정본 v2.4 §1-3): 단일 표준단어 컬럼 금지 — `id`·`role` 처럼 토큰 1개면 위반.
+//   (구 R7 은 마지막 토큰만 봐서 단독 `id` 가 '도메인 종결'로 통과 → sys_user.id 구멍)
+// + 신규 `_ord` 종결 경고(정본 v2.3 §1-2 — ord 도메인 신규 금지, 기존 컬럼 호환 위해 차단은 하지 않음)
 function checkColumnDomain(colName, tableName) {
-  const lastToken = colName.toLowerCase().split('_').pop()
+  const tokens = colName.toLowerCase().split('_')
+  if (tokens.length < 2) {
+    violations.push({
+      rule: 'R8',
+      msg: `컬럼 '${colName}' (${tableName}) — 단일 표준단어 표준용어 금지 (정본 §1-3 v2.4). 최소 '표준단어1_표준도메인' — PK 는 '<엔터티약어>_id'(예 usr_id), 코드값은 '<단어>_cd'(예 role_cd)`,
+    })
+  }
+  if (tokens.at(-1) === 'ord') {
+    warnings.push(`컬럼 '${colName}' (${tableName}) — '_ord'(순서) 도메인은 신규 사용 금지, '_seq' 사용 (정본 §1-2 v2.3). 기존 컬럼이면 무시`)
+  }
+  const lastToken = tokens.at(-1)
   if (!DOMAIN_SUFFIXES.has(lastToken)) {
     warnings.push(
       `컬럼 '${colName}' (${tableName}) — 표준 도메인 약어로 끝나지 않음 (정본 §1-3). 표준용어 형식: 단어1(_단어n)_도메인`,
