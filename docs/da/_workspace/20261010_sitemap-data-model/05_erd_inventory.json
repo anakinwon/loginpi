@@ -1,0 +1,2549 @@
+{
+  "tables": [
+    {
+      "name": "sys_user",
+      "logical_name": "사용자",
+      "subject_area": "사용자",
+      "source": "000",
+      "columns": [
+        {
+          "name": "usr_id",
+          "logical_name": "사용자ID",
+          "type": "UUID",
+          "nullable": false,
+          "pk": true,
+          "unique": false,
+          "default": "gen_random_uuid()",
+          "fk": null
+        },
+        {
+          "name": "pi_uid",
+          "logical_name": "Pi앱별UID",
+          "type": "TEXT",
+          "nullable": true,
+          "pk": false,
+          "unique": true,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "pi_usr_nm",
+          "logical_name": "Pi사용자명",
+          "type": "TEXT",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "pi_wlt_adr_txt",
+          "logical_name": "Pi지갑주소",
+          "type": "TEXT",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "dsp_nm",
+          "logical_name": "표시명",
+          "type": "TEXT",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "''",
+          "fk": null
+        },
+        {
+          "name": "role_cd",
+          "logical_name": "권한",
+          "type": "VARCHAR(20)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'USER'",
+          "fk": null
+        },
+        {
+          "name": "lst_lgn_dtm",
+          "logical_name": "최근로그인일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "rjn_dtm",
+          "logical_name": "재가입일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "del_rsn_cd",
+          "logical_name": "삭제사유코드",
+          "type": "VARCHAR(20)",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "del_yn",
+          "logical_name": "삭제여부",
+          "type": "CHAR(1)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'N'",
+          "fk": null
+        },
+        {
+          "name": "del_dtm",
+          "logical_name": "삭제일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "regr_id",
+          "logical_name": "등록자ID",
+          "type": "TEXT",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'ADMIN'",
+          "fk": null
+        },
+        {
+          "name": "reg_dtm",
+          "logical_name": "등록일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "CURRENT_TIMESTAMP",
+          "fk": null
+        },
+        {
+          "name": "modr_id",
+          "logical_name": "변경자ID",
+          "type": "TEXT",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'ADMIN'",
+          "fk": null
+        },
+        {
+          "name": "mod_dtm",
+          "logical_name": "변경일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "CURRENT_TIMESTAMP",
+          "fk": null
+        }
+      ]
+    },
+    {
+      "name": "usr_snc",
+      "logical_name": "사용자제재",
+      "subject_area": "사용자",
+      "source": "02",
+      "columns": [
+        {
+          "name": "snc_id",
+          "logical_name": "제재ID",
+          "type": "UUID",
+          "nullable": false,
+          "pk": true,
+          "unique": false,
+          "default": "gen_random_uuid()",
+          "fk": null
+        },
+        {
+          "name": "tgt_usr_id",
+          "logical_name": "대상사용자ID",
+          "type": "UUID",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": {
+            "table": "sys_user",
+            "column": "usr_id"
+          }
+        },
+        {
+          "name": "snc_tp_cd",
+          "logical_name": "제재유형코드",
+          "type": "VARCHAR(20)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'SUSPEND'",
+          "fk": null
+        },
+        {
+          "name": "snc_sts_cd",
+          "logical_name": "제재상태코드",
+          "type": "VARCHAR(20)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'ACTIVE'",
+          "fk": null
+        },
+        {
+          "name": "snc_rsn_cd",
+          "logical_name": "제재사유코드",
+          "type": "VARCHAR(20)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "snc_rsn_cont",
+          "logical_name": "제재사유내용",
+          "type": "TEXT",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "snc_bgn_dtm",
+          "logical_name": "제재시작일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "CURRENT_TIMESTAMP",
+          "fk": null
+        },
+        {
+          "name": "snc_end_dtm",
+          "logical_name": "제재종료일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "rel_dtm",
+          "logical_name": "해제일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "prcs_usr_id",
+          "logical_name": "처리사용자ID",
+          "type": "UUID",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": {
+            "table": "sys_user",
+            "column": "usr_id"
+          }
+        },
+        {
+          "name": "del_yn",
+          "logical_name": "삭제여부",
+          "type": "CHAR(1)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'N'",
+          "fk": null
+        },
+        {
+          "name": "del_dtm",
+          "logical_name": "삭제일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "regr_id",
+          "logical_name": "등록자ID",
+          "type": "TEXT",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'ADMIN'",
+          "fk": null
+        },
+        {
+          "name": "reg_dtm",
+          "logical_name": "등록일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "CURRENT_TIMESTAMP",
+          "fk": null
+        },
+        {
+          "name": "modr_id",
+          "logical_name": "변경자ID",
+          "type": "TEXT",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'ADMIN'",
+          "fk": null
+        },
+        {
+          "name": "mod_dtm",
+          "logical_name": "변경일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "CURRENT_TIMESTAMP",
+          "fk": null
+        }
+      ]
+    },
+    {
+      "name": "site_mst",
+      "logical_name": "사이트",
+      "subject_area": "사이트 디렉터리",
+      "source": "001",
+      "columns": [
+        {
+          "name": "site_id",
+          "logical_name": "사이트ID",
+          "type": "UUID",
+          "nullable": false,
+          "pk": true,
+          "unique": false,
+          "default": "gen_random_uuid()",
+          "fk": null
+        },
+        {
+          "name": "site_dom_nm",
+          "logical_name": "사이트도메인명",
+          "type": "VARCHAR(253)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "site_nm",
+          "logical_name": "사이트명",
+          "type": "VARCHAR(100)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "site_ctgr_cd",
+          "logical_name": "사이트카테고리코드",
+          "type": "VARCHAR(20)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "site_desc",
+          "logical_name": "사이트설명",
+          "type": "TEXT",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "site_img_url",
+          "logical_name": "사이트이미지URL",
+          "type": "TEXT",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "site_sts_cd",
+          "logical_name": "사이트상태코드",
+          "type": "VARCHAR(20)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'DRAFT'",
+          "fk": null
+        },
+        {
+          "name": "rjct_rsn_cd",
+          "logical_name": "반려사유코드",
+          "type": "VARCHAR(20)",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "rjct_rsn_cont",
+          "logical_name": "반려사유내용",
+          "type": "TEXT",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "apv_dtm",
+          "logical_name": "승인일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "ownr_usr_id",
+          "logical_name": "소유자사용자ID",
+          "type": "UUID",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": {
+            "table": "sys_user",
+            "column": "usr_id"
+          }
+        },
+        {
+          "name": "own_site_yn",
+          "logical_name": "자사사이트여부",
+          "type": "CHAR(1)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'N'",
+          "fk": null
+        },
+        {
+          "name": "plan_cd",
+          "logical_name": "요금제코드",
+          "type": "VARCHAR(10)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'NONE'",
+          "fk": null
+        },
+        {
+          "name": "pvt_cntc_txt",
+          "logical_name": "비공개연락처텍스트",
+          "type": "TEXT",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "pub_cntc_txt",
+          "logical_name": "공개연락처텍스트",
+          "type": "TEXT",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "site_mv_url",
+          "logical_name": "사이트이동URL",
+          "type": "TEXT",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null,
+          "source": "02"
+        },
+        {
+          "name": "vrf_yn",
+          "logical_name": "확인여부",
+          "type": "CHAR(1)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'N'",
+          "fk": null,
+          "source": "02"
+        },
+        {
+          "name": "vrf_dtm",
+          "logical_name": "확인일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null,
+          "source": "02"
+        },
+        {
+          "name": "vrf_usr_id",
+          "logical_name": "확인사용자ID",
+          "type": "UUID",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": {
+            "table": "sys_user",
+            "column": "usr_id"
+          },
+          "source": "02"
+        },
+        {
+          "name": "vrf_dom_nm",
+          "logical_name": "확인도메인명",
+          "type": "VARCHAR(253)",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null,
+          "source": "02"
+        },
+        {
+          "name": "del_yn",
+          "logical_name": "삭제여부",
+          "type": "CHAR(1)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'N'",
+          "fk": null
+        },
+        {
+          "name": "del_dtm",
+          "logical_name": "삭제일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "regr_id",
+          "logical_name": "등록자ID",
+          "type": "TEXT",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'ADMIN'",
+          "fk": null
+        },
+        {
+          "name": "reg_dtm",
+          "logical_name": "등록일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "CURRENT_TIMESTAMP",
+          "fk": null
+        },
+        {
+          "name": "modr_id",
+          "logical_name": "변경자ID",
+          "type": "TEXT",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'ADMIN'",
+          "fk": null
+        },
+        {
+          "name": "mod_dtm",
+          "logical_name": "변경일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "CURRENT_TIMESTAMP",
+          "fk": null
+        }
+      ]
+    },
+    {
+      "name": "site_sts_hist",
+      "logical_name": "사이트상태이력",
+      "subject_area": "사이트 디렉터리",
+      "source": "02",
+      "columns": [
+        {
+          "name": "hist_id",
+          "logical_name": "이력ID",
+          "type": "UUID",
+          "nullable": false,
+          "pk": true,
+          "unique": false,
+          "default": "gen_random_uuid()",
+          "fk": null
+        },
+        {
+          "name": "site_id",
+          "logical_name": "사이트ID",
+          "type": "UUID",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": {
+            "table": "site_mst",
+            "column": "site_id"
+          }
+        },
+        {
+          "name": "old_sts_cd",
+          "logical_name": "이전상태코드",
+          "type": "VARCHAR(20)",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "new_sts_cd",
+          "logical_name": "이후상태코드",
+          "type": "VARCHAR(20)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "chg_rsn_cd",
+          "logical_name": "변경사유코드",
+          "type": "VARCHAR(20)",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "chg_rsn_cont",
+          "logical_name": "변경사유내용",
+          "type": "TEXT",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "site_dom_nm",
+          "logical_name": "사이트도메인명",
+          "type": "VARCHAR(253)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "chgr_id",
+          "logical_name": "변경자ID(업무)",
+          "type": "TEXT",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "chg_dtm",
+          "logical_name": "변경일시(업무)",
+          "type": "TIMESTAMPTZ",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "CURRENT_TIMESTAMP",
+          "fk": null
+        },
+        {
+          "name": "del_yn",
+          "logical_name": "삭제여부",
+          "type": "CHAR(1)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'N'",
+          "fk": null
+        },
+        {
+          "name": "del_dtm",
+          "logical_name": "삭제일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "regr_id",
+          "logical_name": "등록자ID",
+          "type": "TEXT",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'ADMIN'",
+          "fk": null
+        },
+        {
+          "name": "reg_dtm",
+          "logical_name": "등록일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "CURRENT_TIMESTAMP",
+          "fk": null
+        },
+        {
+          "name": "modr_id",
+          "logical_name": "변경자ID",
+          "type": "TEXT",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'ADMIN'",
+          "fk": null
+        },
+        {
+          "name": "mod_dtm",
+          "logical_name": "변경일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "CURRENT_TIMESTAMP",
+          "fk": null
+        }
+      ]
+    },
+    {
+      "name": "site_rpt",
+      "logical_name": "사이트신고",
+      "subject_area": "사이트 디렉터리",
+      "source": "001",
+      "columns": [
+        {
+          "name": "rpt_id",
+          "logical_name": "신고ID",
+          "type": "UUID",
+          "nullable": false,
+          "pk": true,
+          "unique": false,
+          "default": "gen_random_uuid()",
+          "fk": null
+        },
+        {
+          "name": "site_id",
+          "logical_name": "사이트ID",
+          "type": "UUID",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": {
+            "table": "site_mst",
+            "column": "site_id"
+          }
+        },
+        {
+          "name": "rptr_usr_id",
+          "logical_name": "신고자사용자ID",
+          "type": "UUID",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": {
+            "table": "sys_user",
+            "column": "usr_id"
+          }
+        },
+        {
+          "name": "rpt_rsn_cd",
+          "logical_name": "신고사유코드",
+          "type": "VARCHAR(20)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "rpt_cont",
+          "logical_name": "신고내용",
+          "type": "TEXT",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "rpt_sts_cd",
+          "logical_name": "신고상태코드",
+          "type": "VARCHAR(20)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'RECEIVED'",
+          "fk": null
+        },
+        {
+          "name": "prcs_dtm",
+          "logical_name": "처리일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "prcs_cont",
+          "logical_name": "처리내용",
+          "type": "TEXT",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "del_yn",
+          "logical_name": "삭제여부",
+          "type": "CHAR(1)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'N'",
+          "fk": null
+        },
+        {
+          "name": "del_dtm",
+          "logical_name": "삭제일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "regr_id",
+          "logical_name": "등록자ID",
+          "type": "TEXT",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'ADMIN'",
+          "fk": null
+        },
+        {
+          "name": "reg_dtm",
+          "logical_name": "등록일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "CURRENT_TIMESTAMP",
+          "fk": null
+        },
+        {
+          "name": "modr_id",
+          "logical_name": "변경자ID",
+          "type": "TEXT",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'ADMIN'",
+          "fk": null
+        },
+        {
+          "name": "mod_dtm",
+          "logical_name": "변경일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "CURRENT_TIMESTAMP",
+          "fk": null
+        }
+      ]
+    },
+    {
+      "name": "site_img",
+      "logical_name": "사이트이미지",
+      "subject_area": "사이트 디렉터리",
+      "source": "02",
+      "columns": [
+        {
+          "name": "img_id",
+          "logical_name": "이미지ID",
+          "type": "UUID",
+          "nullable": false,
+          "pk": true,
+          "unique": false,
+          "default": "gen_random_uuid()",
+          "fk": null
+        },
+        {
+          "name": "site_id",
+          "logical_name": "사이트ID",
+          "type": "UUID",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": {
+            "table": "site_mst",
+            "column": "site_id"
+          }
+        },
+        {
+          "name": "img_url",
+          "logical_name": "이미지URL",
+          "type": "TEXT",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "img_seq",
+          "logical_name": "이미지순서",
+          "type": "INT",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "del_yn",
+          "logical_name": "삭제여부",
+          "type": "CHAR(1)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'N'",
+          "fk": null
+        },
+        {
+          "name": "del_dtm",
+          "logical_name": "삭제일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "regr_id",
+          "logical_name": "등록자ID",
+          "type": "TEXT",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'ADMIN'",
+          "fk": null
+        },
+        {
+          "name": "reg_dtm",
+          "logical_name": "등록일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "CURRENT_TIMESTAMP",
+          "fk": null
+        },
+        {
+          "name": "modr_id",
+          "logical_name": "변경자ID",
+          "type": "TEXT",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'ADMIN'",
+          "fk": null
+        },
+        {
+          "name": "mod_dtm",
+          "logical_name": "변경일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "CURRENT_TIMESTAMP",
+          "fk": null
+        }
+      ]
+    },
+    {
+      "name": "stat_site_dly",
+      "logical_name": "사이트일별통계",
+      "subject_area": "통계",
+      "source": "001",
+      "columns": [
+        {
+          "name": "site_id",
+          "logical_name": "사이트ID",
+          "type": "UUID",
+          "nullable": false,
+          "pk": true,
+          "unique": false,
+          "default": null,
+          "fk": {
+            "table": "site_mst",
+            "column": "site_id"
+          }
+        },
+        {
+          "name": "stat_dt",
+          "logical_name": "통계일자",
+          "type": "DATE",
+          "nullable": false,
+          "pk": true,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "view_cnt",
+          "logical_name": "조회건수",
+          "type": "INT",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "0",
+          "fk": null
+        },
+        {
+          "name": "clck_cnt",
+          "logical_name": "클릭건수",
+          "type": "INT",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "0",
+          "fk": null
+        },
+        {
+          "name": "del_yn",
+          "logical_name": "삭제여부",
+          "type": "CHAR(1)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'N'",
+          "fk": null
+        },
+        {
+          "name": "del_dtm",
+          "logical_name": "삭제일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "regr_id",
+          "logical_name": "등록자ID",
+          "type": "TEXT",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'ADMIN'",
+          "fk": null
+        },
+        {
+          "name": "reg_dtm",
+          "logical_name": "등록일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "CURRENT_TIMESTAMP",
+          "fk": null
+        },
+        {
+          "name": "modr_id",
+          "logical_name": "변경자ID",
+          "type": "TEXT",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'ADMIN'",
+          "fk": null
+        },
+        {
+          "name": "mod_dtm",
+          "logical_name": "변경일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "CURRENT_TIMESTAMP",
+          "fk": null
+        }
+      ]
+    },
+    {
+      "name": "fee_plan",
+      "logical_name": "요금상품",
+      "subject_area": "요금·주문",
+      "source": "02",
+      "columns": [
+        {
+          "name": "fee_plan_id",
+          "logical_name": "요금상품ID",
+          "type": "UUID",
+          "nullable": false,
+          "pk": true,
+          "unique": false,
+          "default": "gen_random_uuid()",
+          "fk": null
+        },
+        {
+          "name": "fee_plan_cd",
+          "logical_name": "요금상품코드",
+          "type": "VARCHAR(30)",
+          "nullable": false,
+          "pk": false,
+          "unique": true,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "fee_tp_cd",
+          "logical_name": "요금유형코드",
+          "type": "VARCHAR(20)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "use_day_cnt",
+          "logical_name": "사용일건수",
+          "type": "INT",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "lft_yn",
+          "logical_name": "영구여부",
+          "type": "CHAR(1)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'N'",
+          "fk": null
+        },
+        {
+          "name": "subscr_yn",
+          "logical_name": "구독여부",
+          "type": "CHAR(1)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'N'",
+          "fk": null
+        },
+        {
+          "name": "pi_amt",
+          "logical_name": "Pi금액",
+          "type": "NUMERIC(18,7)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "nrm_pi_amt",
+          "logical_name": "정가Pi금액",
+          "type": "NUMERIC(18,7)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "stk_cnt",
+          "logical_name": "재고건수",
+          "type": "INT",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "stk_scp_cd",
+          "logical_name": "재고범위코드",
+          "type": "VARCHAR(20)",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "promo_apl_yn",
+          "logical_name": "프로모션적용여부",
+          "type": "CHAR(1)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'N'",
+          "fk": null
+        },
+        {
+          "name": "apl_bgn_dtm",
+          "logical_name": "적용시작일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "apl_end_dtm",
+          "logical_name": "적용종료일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "use_yn",
+          "logical_name": "사용여부",
+          "type": "CHAR(1)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'N'",
+          "fk": null
+        },
+        {
+          "name": "sort_seq",
+          "logical_name": "정렬순서",
+          "type": "INT",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "0",
+          "fk": null
+        },
+        {
+          "name": "fee_plan_desc",
+          "logical_name": "요금상품설명",
+          "type": "TEXT",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "del_yn",
+          "logical_name": "삭제여부",
+          "type": "CHAR(1)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'N'",
+          "fk": null
+        },
+        {
+          "name": "del_dtm",
+          "logical_name": "삭제일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "regr_id",
+          "logical_name": "등록자ID",
+          "type": "TEXT",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'ADMIN'",
+          "fk": null
+        },
+        {
+          "name": "reg_dtm",
+          "logical_name": "등록일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "CURRENT_TIMESTAMP",
+          "fk": null
+        },
+        {
+          "name": "modr_id",
+          "logical_name": "변경자ID",
+          "type": "TEXT",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'ADMIN'",
+          "fk": null
+        },
+        {
+          "name": "mod_dtm",
+          "logical_name": "변경일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "CURRENT_TIMESTAMP",
+          "fk": null
+        }
+      ]
+    },
+    {
+      "name": "fee_plan_bnd",
+      "logical_name": "요금상품묶음",
+      "subject_area": "요금·주문",
+      "source": "02",
+      "columns": [
+        {
+          "name": "bnd_id",
+          "logical_name": "묶음ID",
+          "type": "UUID",
+          "nullable": false,
+          "pk": true,
+          "unique": false,
+          "default": "gen_random_uuid()",
+          "fk": null
+        },
+        {
+          "name": "bnd_plan_cd",
+          "logical_name": "묶음상품코드",
+          "type": "VARCHAR(30)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": {
+            "table": "fee_plan",
+            "column": "fee_plan_cd"
+          }
+        },
+        {
+          "name": "item_plan_cd",
+          "logical_name": "항목상품코드",
+          "type": "VARCHAR(30)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": {
+            "table": "fee_plan",
+            "column": "fee_plan_cd"
+          }
+        },
+        {
+          "name": "del_yn",
+          "logical_name": "삭제여부",
+          "type": "CHAR(1)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'N'",
+          "fk": null
+        },
+        {
+          "name": "del_dtm",
+          "logical_name": "삭제일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "regr_id",
+          "logical_name": "등록자ID",
+          "type": "TEXT",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'ADMIN'",
+          "fk": null
+        },
+        {
+          "name": "reg_dtm",
+          "logical_name": "등록일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "CURRENT_TIMESTAMP",
+          "fk": null
+        },
+        {
+          "name": "modr_id",
+          "logical_name": "변경자ID",
+          "type": "TEXT",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'ADMIN'",
+          "fk": null
+        },
+        {
+          "name": "mod_dtm",
+          "logical_name": "변경일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "CURRENT_TIMESTAMP",
+          "fk": null
+        }
+      ]
+    },
+    {
+      "name": "fee_ord",
+      "logical_name": "요금주문",
+      "subject_area": "요금·주문",
+      "source": "02",
+      "columns": [
+        {
+          "name": "ord_id",
+          "logical_name": "주문ID",
+          "type": "UUID",
+          "nullable": false,
+          "pk": true,
+          "unique": false,
+          "default": "gen_random_uuid()",
+          "fk": null
+        },
+        {
+          "name": "ord_usr_id",
+          "logical_name": "주문사용자ID",
+          "type": "UUID",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": {
+            "table": "sys_user",
+            "column": "usr_id"
+          }
+        },
+        {
+          "name": "site_id",
+          "logical_name": "사이트ID",
+          "type": "UUID",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": {
+            "table": "site_mst",
+            "column": "site_id"
+          }
+        },
+        {
+          "name": "fee_plan_cd",
+          "logical_name": "요금상품코드",
+          "type": "VARCHAR(30)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": {
+            "table": "fee_plan",
+            "column": "fee_plan_cd"
+          }
+        },
+        {
+          "name": "site_ctgr_cd",
+          "logical_name": "사이트카테고리코드",
+          "type": "VARCHAR(20)",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "ord_pi_amt",
+          "logical_name": "주문Pi금액",
+          "type": "NUMERIC(18,7)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "nrm_pi_amt",
+          "logical_name": "정가Pi금액",
+          "type": "NUMERIC(18,7)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "promo_apl_yn",
+          "logical_name": "프로모션적용여부",
+          "type": "CHAR(1)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'N'",
+          "fk": null
+        },
+        {
+          "name": "pymnt_id",
+          "logical_name": "결제ID",
+          "type": "TEXT",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "ord_sts_cd",
+          "logical_name": "주문상태코드",
+          "type": "VARCHAR(20)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'HELD'",
+          "fk": null
+        },
+        {
+          "name": "ord_tp_cd",
+          "logical_name": "주문유형코드",
+          "type": "VARCHAR(20)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'NEW'",
+          "fk": null
+        },
+        {
+          "name": "use_bgn_dtm",
+          "logical_name": "사용시작일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "use_end_dtm",
+          "logical_name": "사용종료일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "hld_expr_dtm",
+          "logical_name": "확보만료일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "upr_ord_id",
+          "logical_name": "상위주문ID",
+          "type": "UUID",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": {
+            "table": "fee_ord",
+            "column": "ord_id"
+          }
+        },
+        {
+          "name": "subscr_cnl_yn",
+          "logical_name": "구독해지여부",
+          "type": "CHAR(1)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'N'",
+          "fk": null
+        },
+        {
+          "name": "rvk_rsn_cd",
+          "logical_name": "회수사유코드",
+          "type": "VARCHAR(20)",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "rvk_dtm",
+          "logical_name": "회수일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "snc_id",
+          "logical_name": "제재ID",
+          "type": "UUID",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": {
+            "table": "usr_snc",
+            "column": "snc_id"
+          }
+        },
+        {
+          "name": "del_yn",
+          "logical_name": "삭제여부",
+          "type": "CHAR(1)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'N'",
+          "fk": null
+        },
+        {
+          "name": "del_dtm",
+          "logical_name": "삭제일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "regr_id",
+          "logical_name": "등록자ID",
+          "type": "TEXT",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'ADMIN'",
+          "fk": null
+        },
+        {
+          "name": "reg_dtm",
+          "logical_name": "등록일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "CURRENT_TIMESTAMP",
+          "fk": null
+        },
+        {
+          "name": "modr_id",
+          "logical_name": "변경자ID",
+          "type": "TEXT",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'ADMIN'",
+          "fk": null
+        },
+        {
+          "name": "mod_dtm",
+          "logical_name": "변경일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "CURRENT_TIMESTAMP",
+          "fk": null
+        }
+      ]
+    },
+    {
+      "name": "fee_ord_hist",
+      "logical_name": "요금주문이력",
+      "subject_area": "요금·주문",
+      "source": "02",
+      "columns": [
+        {
+          "name": "hist_id",
+          "logical_name": "이력ID",
+          "type": "UUID",
+          "nullable": false,
+          "pk": true,
+          "unique": false,
+          "default": "gen_random_uuid()",
+          "fk": null
+        },
+        {
+          "name": "ord_id",
+          "logical_name": "주문ID",
+          "type": "UUID",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": {
+            "table": "fee_ord",
+            "column": "ord_id"
+          }
+        },
+        {
+          "name": "old_sts_cd",
+          "logical_name": "이전상태코드",
+          "type": "VARCHAR(20)",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "new_sts_cd",
+          "logical_name": "이후상태코드",
+          "type": "VARCHAR(20)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "chg_rsn_cd",
+          "logical_name": "변경사유코드",
+          "type": "VARCHAR(20)",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "chgr_id",
+          "logical_name": "변경자ID(업무)",
+          "type": "TEXT",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "chg_dtm",
+          "logical_name": "변경일시(업무)",
+          "type": "TIMESTAMPTZ",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "CURRENT_TIMESTAMP",
+          "fk": null
+        },
+        {
+          "name": "del_yn",
+          "logical_name": "삭제여부",
+          "type": "CHAR(1)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'N'",
+          "fk": null
+        },
+        {
+          "name": "del_dtm",
+          "logical_name": "삭제일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "regr_id",
+          "logical_name": "등록자ID",
+          "type": "TEXT",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'ADMIN'",
+          "fk": null
+        },
+        {
+          "name": "reg_dtm",
+          "logical_name": "등록일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "CURRENT_TIMESTAMP",
+          "fk": null
+        },
+        {
+          "name": "modr_id",
+          "logical_name": "변경자ID",
+          "type": "TEXT",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'ADMIN'",
+          "fk": null
+        },
+        {
+          "name": "mod_dtm",
+          "logical_name": "변경일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "CURRENT_TIMESTAMP",
+          "fk": null
+        }
+      ]
+    },
+    {
+      "name": "promo_fee_cfg",
+      "logical_name": "프로모션요금설정",
+      "subject_area": "요금·주문",
+      "source": "02",
+      "columns": [
+        {
+          "name": "promo_fee_id",
+          "logical_name": "프로모션요금ID",
+          "type": "UUID",
+          "nullable": false,
+          "pk": true,
+          "unique": false,
+          "default": "gen_random_uuid()",
+          "fk": null
+        },
+        {
+          "name": "promo_actv_yn",
+          "logical_name": "프로모션활성여부",
+          "type": "CHAR(1)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'N'",
+          "fk": null
+        },
+        {
+          "name": "promo_bgn_dtm",
+          "logical_name": "프로모션시작일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "promo_end_dtm",
+          "logical_name": "프로모션종료일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "chg_rsn_cont",
+          "logical_name": "변경사유내용",
+          "type": "TEXT",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "del_yn",
+          "logical_name": "삭제여부",
+          "type": "CHAR(1)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'N'",
+          "fk": null
+        },
+        {
+          "name": "del_dtm",
+          "logical_name": "삭제일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "regr_id",
+          "logical_name": "등록자ID",
+          "type": "TEXT",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'ADMIN'",
+          "fk": null
+        },
+        {
+          "name": "reg_dtm",
+          "logical_name": "등록일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "CURRENT_TIMESTAMP",
+          "fk": null
+        },
+        {
+          "name": "modr_id",
+          "logical_name": "변경자ID",
+          "type": "TEXT",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'ADMIN'",
+          "fk": null
+        },
+        {
+          "name": "mod_dtm",
+          "logical_name": "변경일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "CURRENT_TIMESTAMP",
+          "fk": null
+        }
+      ]
+    },
+    {
+      "name": "sys_cfg",
+      "logical_name": "운영설정",
+      "subject_area": "시스템 설정",
+      "source": "02",
+      "columns": [
+        {
+          "name": "cfg_id",
+          "logical_name": "설정ID",
+          "type": "UUID",
+          "nullable": false,
+          "pk": true,
+          "unique": false,
+          "default": "gen_random_uuid()",
+          "fk": null
+        },
+        {
+          "name": "cfg_key",
+          "logical_name": "설정키",
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "cfg_val",
+          "logical_name": "설정값",
+          "type": "JSONB",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "cfg_desc",
+          "logical_name": "설정설명",
+          "type": "TEXT",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "use_yn",
+          "logical_name": "사용여부",
+          "type": "CHAR(1)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'Y'",
+          "fk": null
+        },
+        {
+          "name": "del_yn",
+          "logical_name": "삭제여부",
+          "type": "CHAR(1)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'N'",
+          "fk": null
+        },
+        {
+          "name": "del_dtm",
+          "logical_name": "삭제일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "regr_id",
+          "logical_name": "등록자ID",
+          "type": "TEXT",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'ADMIN'",
+          "fk": null
+        },
+        {
+          "name": "reg_dtm",
+          "logical_name": "등록일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "CURRENT_TIMESTAMP",
+          "fk": null
+        },
+        {
+          "name": "modr_id",
+          "logical_name": "변경자ID",
+          "type": "TEXT",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'ADMIN'",
+          "fk": null
+        },
+        {
+          "name": "mod_dtm",
+          "logical_name": "변경일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "CURRENT_TIMESTAMP",
+          "fk": null
+        }
+      ]
+    },
+    {
+      "name": "sys_cfg_chg_hist",
+      "logical_name": "설정변경이력",
+      "subject_area": "시스템 설정",
+      "source": "02",
+      "columns": [
+        {
+          "name": "hist_id",
+          "logical_name": "이력ID",
+          "type": "UUID",
+          "nullable": false,
+          "pk": true,
+          "unique": false,
+          "default": "gen_random_uuid()",
+          "fk": null
+        },
+        {
+          "name": "cfg_tbl_nm",
+          "logical_name": "설정테이블명",
+          "type": "VARCHAR(63)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "cfg_tgt_id",
+          "logical_name": "설정대상ID",
+          "type": "TEXT",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "chg_actn_cd",
+          "logical_name": "변경행위코드",
+          "type": "VARCHAR(20)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "old_val",
+          "logical_name": "이전값",
+          "type": "JSONB",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "new_val",
+          "logical_name": "이후값",
+          "type": "JSONB",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "chg_rsn_cont",
+          "logical_name": "변경사유내용",
+          "type": "TEXT",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "chgr_id",
+          "logical_name": "변경자ID(업무)",
+          "type": "TEXT",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "chg_dtm",
+          "logical_name": "변경일시(업무)",
+          "type": "TIMESTAMPTZ",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "CURRENT_TIMESTAMP",
+          "fk": null
+        },
+        {
+          "name": "del_yn",
+          "logical_name": "삭제여부",
+          "type": "CHAR(1)",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'N'",
+          "fk": null
+        },
+        {
+          "name": "del_dtm",
+          "logical_name": "삭제일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": true,
+          "pk": false,
+          "unique": false,
+          "default": null,
+          "fk": null
+        },
+        {
+          "name": "regr_id",
+          "logical_name": "등록자ID",
+          "type": "TEXT",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'ADMIN'",
+          "fk": null
+        },
+        {
+          "name": "reg_dtm",
+          "logical_name": "등록일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "CURRENT_TIMESTAMP",
+          "fk": null
+        },
+        {
+          "name": "modr_id",
+          "logical_name": "변경자ID",
+          "type": "TEXT",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "'ADMIN'",
+          "fk": null
+        },
+        {
+          "name": "mod_dtm",
+          "logical_name": "변경일시",
+          "type": "TIMESTAMPTZ",
+          "nullable": false,
+          "pk": false,
+          "unique": false,
+          "default": "CURRENT_TIMESTAMP",
+          "fk": null
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "child_table": "site_mst",
+      "child_columns": [
+        "ownr_usr_id"
+      ],
+      "parent_table": "sys_user",
+      "parent_columns": [
+        "usr_id"
+      ],
+      "constraint_name": "site_mst_sys_user_id_fkey",
+      "identifying": false,
+      "cardinality": "1:N",
+      "optional": true
+    },
+    {
+      "child_table": "site_mst",
+      "child_columns": [
+        "vrf_usr_id"
+      ],
+      "parent_table": "sys_user",
+      "parent_columns": [
+        "usr_id"
+      ],
+      "constraint_name": "site_mst_vrf_usr_id_fkey",
+      "identifying": false,
+      "cardinality": "1:N",
+      "optional": true
+    },
+    {
+      "child_table": "site_rpt",
+      "child_columns": [
+        "site_id"
+      ],
+      "parent_table": "site_mst",
+      "parent_columns": [
+        "site_id"
+      ],
+      "constraint_name": "site_rpt_site_mst_id_fkey",
+      "identifying": false,
+      "cardinality": "1:N",
+      "optional": false
+    },
+    {
+      "child_table": "site_rpt",
+      "child_columns": [
+        "rptr_usr_id"
+      ],
+      "parent_table": "sys_user",
+      "parent_columns": [
+        "usr_id"
+      ],
+      "constraint_name": "site_rpt_sys_user_id_fkey",
+      "identifying": false,
+      "cardinality": "1:N",
+      "optional": false
+    },
+    {
+      "child_table": "stat_site_dly",
+      "child_columns": [
+        "site_id"
+      ],
+      "parent_table": "site_mst",
+      "parent_columns": [
+        "site_id"
+      ],
+      "constraint_name": "stat_site_dly_site_mst_id_fkey",
+      "identifying": true,
+      "cardinality": "1:N",
+      "optional": false
+    },
+    {
+      "child_table": "site_sts_hist",
+      "child_columns": [
+        "site_id"
+      ],
+      "parent_table": "site_mst",
+      "parent_columns": [
+        "site_id"
+      ],
+      "constraint_name": "site_sts_hist_site_mst_id_fkey",
+      "identifying": false,
+      "cardinality": "1:N",
+      "optional": false
+    },
+    {
+      "child_table": "site_img",
+      "child_columns": [
+        "site_id"
+      ],
+      "parent_table": "site_mst",
+      "parent_columns": [
+        "site_id"
+      ],
+      "constraint_name": "site_img_site_mst_id_fkey",
+      "identifying": false,
+      "cardinality": "1:N",
+      "optional": false
+    },
+    {
+      "child_table": "usr_snc",
+      "child_columns": [
+        "tgt_usr_id"
+      ],
+      "parent_table": "sys_user",
+      "parent_columns": [
+        "usr_id"
+      ],
+      "constraint_name": "usr_snc_tgt_usr_id_fkey",
+      "identifying": false,
+      "cardinality": "1:N",
+      "optional": false
+    },
+    {
+      "child_table": "usr_snc",
+      "child_columns": [
+        "prcs_usr_id"
+      ],
+      "parent_table": "sys_user",
+      "parent_columns": [
+        "usr_id"
+      ],
+      "constraint_name": "usr_snc_prcs_usr_id_fkey",
+      "identifying": false,
+      "cardinality": "1:N",
+      "optional": false
+    },
+    {
+      "child_table": "fee_plan_bnd",
+      "child_columns": [
+        "bnd_plan_cd"
+      ],
+      "parent_table": "fee_plan",
+      "parent_columns": [
+        "fee_plan_cd"
+      ],
+      "constraint_name": "fee_plan_bnd_bnd_plan_cd_fkey",
+      "identifying": false,
+      "cardinality": "1:N",
+      "optional": false
+    },
+    {
+      "child_table": "fee_plan_bnd",
+      "child_columns": [
+        "item_plan_cd"
+      ],
+      "parent_table": "fee_plan",
+      "parent_columns": [
+        "fee_plan_cd"
+      ],
+      "constraint_name": "fee_plan_bnd_item_plan_cd_fkey",
+      "identifying": false,
+      "cardinality": "1:N",
+      "optional": false
+    },
+    {
+      "child_table": "fee_ord",
+      "child_columns": [
+        "ord_usr_id"
+      ],
+      "parent_table": "sys_user",
+      "parent_columns": [
+        "usr_id"
+      ],
+      "constraint_name": "fee_ord_sys_user_id_fkey",
+      "identifying": false,
+      "cardinality": "1:N",
+      "optional": false
+    },
+    {
+      "child_table": "fee_ord",
+      "child_columns": [
+        "site_id"
+      ],
+      "parent_table": "site_mst",
+      "parent_columns": [
+        "site_id"
+      ],
+      "constraint_name": "fee_ord_site_mst_id_fkey",
+      "identifying": false,
+      "cardinality": "1:N",
+      "optional": true
+    },
+    {
+      "child_table": "fee_ord",
+      "child_columns": [
+        "fee_plan_cd"
+      ],
+      "parent_table": "fee_plan",
+      "parent_columns": [
+        "fee_plan_cd"
+      ],
+      "constraint_name": "fee_ord_fee_plan_cd_fkey",
+      "identifying": false,
+      "cardinality": "1:N",
+      "optional": false
+    },
+    {
+      "child_table": "fee_ord",
+      "child_columns": [
+        "upr_ord_id"
+      ],
+      "parent_table": "fee_ord",
+      "parent_columns": [
+        "ord_id"
+      ],
+      "constraint_name": "fee_ord_upr_ord_id_fkey",
+      "identifying": false,
+      "cardinality": "1:N",
+      "optional": true
+    },
+    {
+      "child_table": "fee_ord",
+      "child_columns": [
+        "snc_id"
+      ],
+      "parent_table": "usr_snc",
+      "parent_columns": [
+        "snc_id"
+      ],
+      "constraint_name": "fee_ord_usr_snc_id_fkey",
+      "identifying": false,
+      "cardinality": "1:N",
+      "optional": true
+    },
+    {
+      "child_table": "fee_ord_hist",
+      "child_columns": [
+        "ord_id"
+      ],
+      "parent_table": "fee_ord",
+      "parent_columns": [
+        "ord_id"
+      ],
+      "constraint_name": "fee_ord_hist_fee_ord_id_fkey",
+      "identifying": false,
+      "cardinality": "1:N",
+      "optional": false
+    }
+  ],
+  "notes": [
+    "적용 순서 000_baseline.sql(sys_user 7컬럼 개명 사본) → 001_sitemap_phase1.sql(REFERENCES sys_user (usr_id) 사본) → 02_modeler_ddl.sql(초안, Part A=Phase 1 델타 / Part B=Phase 2). 테이블 14개(000:1, 001:3, 02:10), FK 17개. 모든 FK ON DELETE 미지정(NO ACTION).",
+    "pi_pymnt : Phase 2 010 적용 후 FK 추가 예정(fee_ord.pymnt_id, 키 타입 TBD). DDL 에 테이블이 없어 ERD 테이블로 만들지 않음(정본 §3 mermaid 의 pi_pymnt |o--o| fee_ord 관계도 제외).",
+    "주석 처리된 FK 제외 : 02 fee_ord 의 \"-- [TBD 010] CONSTRAINT fee_ord_pi_pymnt_id_fkey FOREIGN KEY (pymnt_id) REFERENCES pi_pymnt (<PK>)\" — 010 적용 후 ALTER 로 추가 예정.",
+    "site_mst 는 001 CREATE TABLE + 02 Part A1 ALTER ADD COLUMN 5개(site_mv_url·vrf_yn·vrf_dtm·vrf_usr_id·vrf_dom_nm, 컬럼 source=\"02\") 반영 최종형. vrf_usr_id FK(site_mst_vrf_usr_id_fkey)는 02 의 별도 ALTER ADD CONSTRAINT 로 수집. 실제 DB 물리 순서는 ALTER 컬럼이 공통6(del_yn~mod_dtm) 뒤에 붙지만, ERD 표기는 정본 §5-1 순서(업무 컬럼 뒤 공통6)를 따름.",
+    "sys_user 는 000 기준 전체 15컬럼 — 정본 v2.4 재점검·마스터 확정 개명 7건 반영본(usr_id·role_cd VARCHAR(20)·pi_usr_nm·pi_wlt_adr_txt·dsp_nm·lst_lgn_dtm·rjn_dtm). 원본 000·001 파일은 무수정이며 생성기가 메모리에서 개명 사본을 만들어 읽는다. 정본 §5 에 sys_user 물리 정의가 없어 논리명은 000 DDL 인라인 주석·COMMENT 기준.",
+    "identifying 관계는 stat_site_dly.site_id → site_mst 1건뿐(PK (site_id, stat_dt) 의 일부). 나머지는 모두 대리키 UUID PK 를 가진 비식별 관계.",
+    "fee_plan_bnd 2개 FK·fee_ord.fee_plan_cd FK 는 PK(fee_plan_id)가 아니라 자연키 UNIQUE(fee_plan.fee_plan_cd, 제약 fee_plan_fee_plan_cd_key)를 참조 — ERD 도구에서 대체키(AK) 참조로 표기 필요.",
+    "같은 부모 복수 참조(역할명 관계) : sys_user→site_mst 2개(ownr_usr_id·vrf_usr_id), sys_user→usr_snc 2개(tgt_usr_id·prcs_usr_id), fee_plan→fee_plan_bnd 2개(bnd_plan_cd·item_plan_cd). 자기참조 : fee_ord.upr_ord_id → fee_ord.ord_id.",
+    "카디널리티 세부(정본 §4-2) : site_img 는 사이트당 활성 0..4(img_seq 2~5), usr_snc.tgt_usr_id 는 동시 ACTIVE ≤ 1, fee_ord.site_id 는 멤버십이면 NULL(트리거 강제), fee_ord.upr_ord_id 는 NEW 외 필수(CHECK), fee_ord.snc_id 는 SUSPENDED 시 필수(CHECK). relationships 에서는 1:N 으로 표기.",
+    "논리 참조(FK 없음) : sys_cfg_chg_hist(cfg_tbl_nm, cfg_tgt_id)는 sys_cfg·promo_fee_cfg·fee_plan·fee_plan_bnd 4개를 다형 참조 — 정본 §3 mermaid 의 sys_cfg/promo_fee_cfg ||--o{ sys_cfg_chg_hist 는 \"논리 참조\"이므로 relationships 에서 제외, 필요 시 ERD 에 점선 주석으로만 표기.",
+    "감사 업무 컬럼 chgr_id·chg_dtm(site_sts_hist·fee_ord_hist·sys_cfg_chg_hist)과 시스템 컬럼 regr_id·modr_id 는 sys_user FK 없음(TEXT — sys_user.usr_id 또는 ADMIN·SYSTEM).",
+    "unique=true 는 전체 UNIQUE 제약만 표기(sys_user.pi_uid, fee_plan.fee_plan_cd). 부분 UNIQUE 인덱스(활성 행 한정)는 컬럼 unique 로 표기하지 않음 : ux_sys_user_pi_usr_nm_actv(pi_usr_nm, del_yn=N), ux_site_mst_site_dom_nm_actv(site_dom_nm, PENDING·APPROVED·SUSPENDED), ux_site_rpt_site_id_rptr_actv(site_id, rptr_usr_id, RECEIVED), ux_site_img_site_id_img_seq_actv(site_id, img_seq), ux_usr_snc_tgt_usr_id_actv(tgt_usr_id, ACTIVE), ux_fee_plan_bnd_item_actv(bnd_plan_cd, item_plan_cd), ux_fee_ord_pymnt_id_actv(pymnt_id), ux_fee_ord_site_id_promo_actv(site_id, 프로모·취소 제외), ux_sys_cfg_cfg_key_actv(cfg_key), ux_promo_fee_cfg_sngl((1) 싱글톤).",
+    "정본 §5 와 DDL 대조 : 컬럼명·타입·NULL·기본값 차이 없음(정본이 02 r2 와 일치 선언, 대조 확인). 표기 차이만 존재 — 정본 §5 는 공통6 을 축약 표기. 이력 3종의 chgr_id·chg_dtm 은 DDL 주석이 \"변경자ID/변경일시 (업무 감사)\"라 시스템 컬럼 modr_id·mod_dtm 논리명과 겹치므로 ERD 논리명에 \"(업무)\" 접미로 구분.",
+    "source 구분 : sys_user=000, site_mst·site_rpt·stat_site_dly=001, 나머지 10개=02(site_sts_hist 는 Part A=Phase 1, 그 외 9개는 Part B=Phase 2). 02 는 초안(운영 적용 금지, 마스터 승인 후 sql/002·003 으로 확정) — ERD 에 Phase 표기 권장.",
+    "정본 §3 주제영역 \"결제(공용)\"은 pi_pymnt 만 소속이라 DDL 기준 빈 영역 — 플레이스홀더(점선 박스) 표기 여부는 ERD 작성 단계에서 판단."
+  ]
+}
