@@ -43,6 +43,8 @@ export function BubbleHome() {
   const [error, setError] = useState<ApiErrorBody | null>(null)
   const [loading, setLoading] = useState(false)
   const [toast, setToast] = useState(false)
+  const [leave, setLeave] = useState<string | null>(null) // 이동 안내 중인 외부 주소
+  const td = useTranslations('detail')
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -86,12 +88,14 @@ export function BubbleHome() {
     [t],
   )
   const planName = useCallback((it: BubbleItem) => tp(it.plan), [tp])
-  // 가상 샘플은 상세 페이지가 없으므로 이동 대신 안내(404 방지)
+  // 가상 샘플은 상세 페이지가 없으므로 이동 대신 안내(404 방지).
+  // 연결 주소(url)가 지정된 사이트는 상세 대신 이동 안내 후 그 주소로(외부 이동은 클릭 + 안내 필수, MAINNET A-6)
   const open = useCallback(
     (domain: string) => {
-      if (!data?.items.some((it) => it.domain === domain && it.sample))
-        return router.push(`/s/${domain}`)
-      setToast(true)
+      const it = data?.items.find((x) => x.domain === domain)
+      if (it?.sample) return setToast(true)
+      if (it?.url) return setLeave(it.url)
+      router.push(`/s/${domain}`)
     },
     [router, data],
   )
@@ -169,6 +173,33 @@ export function BubbleHome() {
         </div>
       </div>
 
+      {leave && (
+        <div
+          role="dialog"
+          aria-modal="false"
+          aria-label={td('leaveTitle')}
+          className="fixed bottom-16 left-1/2 z-20 flex w-[min(92vw,26rem)] -translate-x-1/2 flex-col gap-2 rounded-lg border border-white/15 bg-neutral-900 p-4 text-sm text-white shadow-lg"
+        >
+          <p className="font-medium">{td('leaveTitle')}</p>
+          <p className="text-white/70">{td('leaveBody')}</p>
+          <p className="font-mono break-all">{leave}</p>
+          <div className="flex gap-2">
+            <button
+              className="btn btn-primary"
+              onClick={() => {
+                // 새 창으로 열기 — noopener 로 이동한 사이트가 이 창(window.opener)에 접근하지 못하게
+                window.open(leave, '_blank', 'noopener,noreferrer')
+                setLeave(null)
+              }}
+            >
+              {td('leaveConfirm')}
+            </button>
+            <button className="btn" onClick={() => setLeave(null)}>
+              {td('cancel')}
+            </button>
+          </div>
+        </div>
+      )}
       {toast && (
         <p
           role="status"

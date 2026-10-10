@@ -42,6 +42,14 @@ const SPARKLE = new Set(
   ),
 )
 
+// 연결 주소 재지정 — .pi 도메인은 일반 브라우저에서 열리지 않으므로 레지스트리에 url 이 있으면 그 주소로 이동
+// (cafe.pi → https://cafepi.vercel.app/, 마스터 지시 2026-10-10). DB 행에도 도메인으로 적용
+const REG_URL = new Map(
+  registry.sites.flatMap((s) =>
+    'url' in s && s.url ? [[s.domain, s.url] as const] : [],
+  ),
+)
+
 const sampleItems = (ctgr: string | null): BubbleItem[] =>
   samples.sites
     .filter((s) => !ctgr || s.ctgr === ctgr)
@@ -75,6 +83,7 @@ function demo(period: BubblePeriod, ctgr: string | null): BubbleResponse {
       plan: (PLAN_CD.includes(s.planCd as PlanCd)
         ? s.planCd
         : 'NONE') as PlanCd,
+      url: REG_URL.get(s.domain),
       own: true, // 레지스트리 19개는 전부 자사
       views: 0,
       chgPct: 0,
@@ -120,6 +129,7 @@ async function load(
       name: s.site_nm,
       ctgr: s.site_ctgr_cd,
       img: s.site_img_url,
+      url: REG_URL.get(s.site_dom_nm),
       plan: s.plan_cd,
       own: s.own_site_yn === 'Y',
       views: c.cur,

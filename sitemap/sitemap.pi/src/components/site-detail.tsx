@@ -65,7 +65,9 @@ export function SiteDetail({ domain }: { domain: string }) {
   const url = `https://${site.site_dom_nm}`
   const visit = () => {
     recordStat(site.site_id, 'CLCK')
-    window.location.assign(url)
+    // 새 창으로 열기 — noopener 로 이동한 사이트가 이 창(window.opener)에 접근하지 못하게
+    window.open(url, '_blank', 'noopener,noreferrer')
+    setConfirming(false)
   }
 
   return (

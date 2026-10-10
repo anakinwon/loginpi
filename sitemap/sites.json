@@ -1,8 +1,9 @@
 {
-  "$comment": "Pi 멀티사이트 레지스트리(PRD_28 §8) — domain·ctgr(sitemap PRD §2 site_ctgr_cd)·wave(W1~W5, 모선 null)·preset·appSts(LIVE 운영 / BUILDING 구축 중 / PLANNED 예정)·listSts(sitemap.pi 디렉터리 시드 상태 sql/001)·planCd(요금제 = site_mst.plan_cd, 메인 버블 크기 5단계 VIP>PRM2>PRM1>BSC2>BSC1 — DB 미연결 시 메인 화면 정적 폴백, sitemap.pi src/lib/site.ts(PLAN_AREA)·src/app/api/bubbles/route.ts)·hold(⏸ 노출 보류 / △ 조건부 사유). 앱 폴더 = sitemap/<domain>(cafe.pi 는 저장소 루트)",
+  "$comment": "Pi 멀티사이트 레지스트리(PRD_28 §8) — domain·url(선택 : 버블 클릭 시 이동 주소 재지정, .pi 는 일반 브라우저에서 열리지 않으므로)·ctgr(sitemap PRD §2 site_ctgr_cd)·wave(W1~W5, 모선 null)·preset·appSts(LIVE 운영 / BUILDING 구축 중 / PLANNED 예정)·listSts(sitemap.pi 디렉터리 시드 상태 sql/001)·planCd(요금제 = site_mst.plan_cd, 메인 버블 크기 5단계 VIP>PRM2>PRM1>BSC2>BSC1 — DB 미연결 시 메인 화면 정적 폴백, sitemap.pi src/lib/site.ts(PLAN_AREA)·src/app/api/bubbles/route.ts)·hold(⏸ 노출 보류 / △ 조건부 사유). 앱 폴더 = sitemap/<domain>(cafe.pi 는 저장소 루트)",
   "sites": [
     {
       "domain": "cafe.pi",
+      "url": "https://cafepi.vercel.app/",
       "ctgr": "COMMUNITY",
       "wave": null,
       "preset": "MOTHERSHIP",

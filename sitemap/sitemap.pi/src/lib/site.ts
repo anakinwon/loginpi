@@ -263,6 +263,7 @@ export interface BubbleItem {
   views: number // 선택 기간 조회 합
   chgPct: number // 직전 동일 기간 대비 증감률(%) — 직전 0·현재 >0 이면 100, 둘 다 0 이면 0
   sample?: boolean // 데모 화면 전용 가상 샘플(src/data/sample-sites.json) — 배지 "샘플", 상세 이동 없음
+  url?: string // 연결 주소 재지정(sitemap/sites.json url) — 있으면 버블 클릭 시 상세 대신 이동 안내 후 이 주소로
   sparkle?: boolean // 부가서비스 "반짝임"(요금제 외 추가요금 결제) — 버블에 반짝임 효과. 현재 샘플만(api/bubbles SPARKLE)
 }
 
