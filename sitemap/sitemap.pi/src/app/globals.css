@@ -84,3 +84,39 @@
     animation: none;
   }
 }
+
+/* 부가서비스 "반짝임" 버블 — 테두리를 한 바퀴 도는 빛줄기 + 별 깜빡임(색 = currentColor = 요금제 보색 PLAN_SPARKLE). 움직임 줄이기 설정이면 정지 표시 */
+.sparkle-glint {
+  transform-box: fill-box;
+  transform-origin: center;
+  filter: drop-shadow(0 0 4px currentColor);
+  animation: sparkle-spin 2.4s linear infinite;
+}
+@keyframes sparkle-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.sparkle-star {
+  transform-box: fill-box;
+  transform-origin: center;
+  filter: drop-shadow(0 0 3px currentColor);
+  animation: sparkle-twinkle 1.8s ease-in-out infinite backwards;
+}
+@keyframes sparkle-twinkle {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.3) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(45deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sparkle-glint,
+  .sparkle-star {
+    animation: none;
+  }
+}

@@ -33,6 +33,15 @@ const samplePct = (domain: string) => {
   return (((h >>> 0) % 701) - 300) / 10
 }
 
+// 부가서비스 "반짝임" — 유료 요금제마다 sample-sites.json 의 첫 샘플이 추가요금을 내고 선택한 것으로 간주(마스터 지시 2026-10-10).
+// 카테고리 필터 전에 정해 필터를 바꿔도 같은 사이트가 반짝인다.
+// ponytail: 실사이트 구매는 Phase 2(site_mst 부가서비스 컬럼 + fee_plan 결제) — 그전엔 실사이트에 붙이지 않는다(미결제 유료 표시 금지)
+const SPARKLE = new Set(
+  PLAN_CD.filter((p) => p !== 'NONE').map(
+    (p) => samples.sites.find((s) => s.planCd === p)?.domain,
+  ),
+)
+
 const sampleItems = (ctgr: string | null): BubbleItem[] =>
   samples.sites
     .filter((s) => !ctgr || s.ctgr === ctgr)
@@ -47,6 +56,7 @@ const sampleItems = (ctgr: string | null): BubbleItem[] =>
       views: 0,
       chgPct: samplePct(s.domain),
       sample: true,
+      sparkle: SPARKLE.has(s.domain),
     }))
 
 // 실데이터 뒤에 샘플을 붙이되 버블 상한(MAX_BUBBLES) 유지
@@ -62,7 +72,9 @@ function demo(period: BubblePeriod, ctgr: string | null): BubbleResponse {
       name: s.domain === 'cafe.pi' ? 'PyCafé™' : s.domain.replace(/\.pi$/, ''),
       ctgr: s.ctgr as SiteCtgr,
       img: null,
-      plan: (PLAN_CD.includes(s.planCd as PlanCd) ? s.planCd : 'NONE') as PlanCd,
+      plan: (PLAN_CD.includes(s.planCd as PlanCd)
+        ? s.planCd
+        : 'NONE') as PlanCd,
       own: true, // 레지스트리 19개는 전부 자사
       views: 0,
       chgPct: 0,
@@ -76,7 +88,9 @@ async function load(
 ): Promise<BubbleResponse | null> {
   let q = db()
     .from('site_mst')
-    .select('site_id, site_dom_nm, site_nm, site_ctgr_cd, site_img_url, plan_cd, own_site_yn')
+    .select(
+      'site_id, site_dom_nm, site_nm, site_ctgr_cd, site_img_url, plan_cd, own_site_yn',
+    )
     .eq('del_yn', 'N')
     .eq('site_sts_cd', 'APPROVED')
   if (ctgr) q = q.eq('site_ctgr_cd', ctgr)
@@ -114,7 +128,9 @@ async function load(
   })
   return {
     items:
-      process.env.SITEMAP_SHOW_SAMPLES === '1' ? withSamples(items, ctgr) : items,
+      process.env.SITEMAP_SHOW_SAMPLES === '1'
+        ? withSamples(items, ctgr)
+        : items,
     period,
     demo: false,
   }

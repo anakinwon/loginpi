@@ -10,12 +10,13 @@ import {
   PLAN_AREA,
   PLAN_BADGE,
   PLAN_COLOR,
+  PLAN_SPARKLE,
   PLAN_CD,
   type BubbleItem,
 } from '@/lib/site'
 
 const C = {
-  fill: 0.935, // 화면 면적 대비 버블 면적 합 — 등비 가중치로 작은 버블이 줄어든 만큼 보정. 요금제별 반지름 조정(BSC1 ×1.56·BSC2 ×1.44·PRM1 ×1.3·PRM2 ×1.196·VIP ×1.15, 가중치 합 380→634.3) 반영해 0.56→0.935, 다른 요금제 크기 유지
+  fill: 0.887, // 화면 면적 대비 버블 면적 합 — 등비 가중치로 작은 버블이 줄어든 만큼 보정. 요금제별 반지름 조정(BSC1 ×1.56·BSC2 ×1.44·PRM1 ×1.3·PRM2 ×1.076·VIP ×1.15, 가중치 합 380→601.75) 반영해 0.56→0.887, 다른 요금제 크기 유지
   maxR: 0.24, // 반지름 상한(짧은 변 대비) — 필터로 몇 개만 남을 때 과대 방지
   gap: 2,
   drift: 0.012, // 정착 후 은은한 부유 가속(무작위, 60Hz 프레임당) — 화면 크기 k^0.85 비례, 잔여 변화율 원본 수준(PC ≈7.5%·모바일 ≈6%)
@@ -35,6 +36,13 @@ const C = {
   minFont: 9, // 글자 하한(px) — 이보다 작아지면 표시 단계를 낮춘다
   relax: 300, // 정지 배치 반복 횟수
 } as const
+
+// 반짝임 별 — [각도(°), 크기(반지름 비율), 깜빡임 지연] : 시차를 둬 번갈아 반짝이게
+const SPARKLE_STARS = [
+  [-55, 0.16, '0s'],
+  [150, 0.12, '0.6s'],
+  [235, 0.1, '1.2s'],
+] as const
 
 export const TONE = { up: '#22c55e', down: '#ef4444', flat: '#9ca3af' } as const
 
@@ -161,6 +169,7 @@ export function BubbleCanvas({
   adLabel,
   ownLabel,
   sampleLabel,
+  sparkleLabel,
   planName,
   fmtPct,
   fmtViews,
@@ -171,6 +180,7 @@ export function BubbleCanvas({
   adLabel: string
   ownLabel: string // 자사 사이트 배지(광고 대신)
   sampleLabel: string // 가상 샘플 배지(광고 대신)
+  sparkleLabel: string // 부가서비스 "반짝임" — 툴팁·aria-label 표시
   planName: (it: BubbleItem) => string
   fmtPct: (chg: number) => string
   fmtViews: (it: BubbleItem) => string
@@ -437,7 +447,7 @@ export function BubbleCanvas({
               style={{ color: PLAN_COLOR[it.plan] }}
               tabIndex={0}
               role="link"
-              aria-label={`${label} (${it.domain}), ${badge ? `${tag(it)}, ` : ''}${planName(it)}, ${fmtViews(it)}, ${fmtPct(it.chgPct)}`}
+              aria-label={`${label} (${it.domain}), ${badge ? `${tag(it)}, ` : ''}${planName(it)}, ${it.sparkle ? `${sparkleLabel}, ` : ''}${fmtViews(it)}, ${fmtPct(it.chgPct)}`}
               onPointerDown={(e) => onDown(e, it)}
               onPointerEnter={() => activate(it)}
               onPointerLeave={() =>
@@ -460,6 +470,41 @@ export function BubbleCanvas({
                   stroke={PLAN_COLOR[it.plan]}
                   strokeWidth={Math.max(1.5, r * 0.035)}
                 />
+                {/* 부가서비스 "반짝임" — 테두리를 도는 빛줄기 + 외곽 별 3개 깜빡임(globals.css .sparkle-*) */}
+                {it.sparkle && (
+                  <g
+                    pointerEvents="none"
+                    style={{ color: PLAN_SPARKLE[it.plan] }}
+                  >
+                    <circle
+                      className="sparkle-glint"
+                      r={r}
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={Math.max(2, r * 0.05)}
+                      strokeLinecap="round"
+                      pathLength={100}
+                      strokeDasharray="10 90"
+                    />
+                    {SPARKLE_STARS.map(([deg, k, delay]) => {
+                      const a = (deg * Math.PI) / 180
+                      const s = Math.max(4, r * k)
+                      return (
+                        <g
+                          key={deg}
+                          transform={`translate(${Math.cos(a) * r * 0.8} ${Math.sin(a) * r * 0.8})`}
+                        >
+                          <path
+                            className="sparkle-star"
+                            style={{ animationDelay: delay }}
+                            d={`M0 ${-s}Q0 0 ${s} 0Q0 0 0 ${s}Q0 0 ${-s} 0Q0 0 0 ${-s}Z`}
+                            fill="currentColor"
+                          />
+                        </g>
+                      )
+                    })}
+                  </g>
+                )}
                 <g
                   pointerEvents="none"
                   fill="#fff"
@@ -485,7 +530,11 @@ export function BubbleCanvas({
                     ) : (
                       <>
                         {stage === 3 && (
-                          <circle r={ir} cy={iy} fill="rgba(255,255,255,0.14)" />
+                          <circle
+                            r={ir}
+                            cy={iy}
+                            fill="rgba(255,255,255,0.14)"
+                          />
                         )}
                         <text
                           y={iy}
@@ -532,6 +581,9 @@ export function BubbleCanvas({
               )}
               {planName(active)}
             </p>
+            {active.sparkle && (
+              <p className="text-amber-200">✨ {sparkleLabel}</p>
+            )}
             <p>
               {fmtViews(active)} ·{' '}
               <span style={{ color: TONE[toneOf(active.chgPct)] }}>

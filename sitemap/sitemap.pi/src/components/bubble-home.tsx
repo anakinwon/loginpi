@@ -11,7 +11,8 @@ import { readApi, useApiErrorText, type ApiErrorBody } from '@/lib/client-api'
 import {
   BUBBLE_DAYS,
   LIMITS,
-  PLAN_AREA, PLAN_COLOR,
+  PLAN_AREA,
+  PLAN_COLOR,
   PLAN_BADGE,
   PLAN_CD,
   SITE_CTGR,
@@ -201,6 +202,7 @@ export function BubbleHome() {
                 adLabel={t('ad')}
                 ownLabel={t('own')}
                 sampleLabel={t('sample')}
+                sparkleLabel={t('sparkle')}
                 planName={planName}
                 fmtPct={fmtPct}
                 fmtViews={fmtViews}
@@ -362,7 +364,8 @@ function BubbleTable({
         </thead>
         <tbody>
           {rows.map((it, i) => {
-            const d = Math.sqrt(PLAN_AREA[it.plan]) * 5
+            // 크기 레벨 — 요금제 순서(PLAN_CD) 기준 VIP=LV5 … BSC1=LV1, NONE(무료)=없음. 점 크기보다 상대 비교가 쉽다
+            const lv = PLAN_CD.length - 1 - PLAN_CD.indexOf(it.plan)
             return (
               <tr key={it.id} className="border-b border-white/5">
                 <td className="px-2 py-2 text-white/50">
@@ -393,11 +396,20 @@ function BubbleTable({
                     </span>
                   </SiteLink>
                 </td>
-                <td className="hidden px-2 py-2 sm:table-cell">
-                  <span
-                    className="inline-block rounded-full border border-white/50"
-                    style={{ width: d, height: d }}
-                  />
+                <td className="hidden px-2 py-2 whitespace-nowrap sm:table-cell">
+                  {lv > 0 ? (
+                    <span
+                      className="rounded border px-1.5 text-xs font-bold tabular-nums"
+                      style={{
+                        color: PLAN_COLOR[it.plan],
+                        borderColor: PLAN_COLOR[it.plan],
+                      }}
+                    >
+                      LV{lv}
+                    </span>
+                  ) : (
+                    <span className="text-white/40">—</span>
+                  )}
                 </td>
                 <td className="px-2 py-2 whitespace-nowrap">
                   {PLAN_BADGE[it.plan] && (

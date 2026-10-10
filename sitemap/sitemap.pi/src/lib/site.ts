@@ -226,12 +226,22 @@ export const PLAN_COLOR: Record<PlanCd, string> = {
   NONE: '#9CA3AF', // 무료(요금제 없음)
 }
 
+// 부가서비스 "반짝임" 색 — PLAN_COLOR 의 보색(HSL 색상 +180°, 채도 유지, 어두운 배경 가시성 위해 명도 하한 62%, 마스터 지시 2026-10-10)
+export const PLAN_SPARKLE: Record<PlanCd, string> = {
+  VIP: '#3D71FF', // 골드 ↔ 로열 블루
+  PRM2: '#3DFFA2', // 핫 핑크 ↔ 민트
+  PRM1: '#DFFF5C', // 바이올렛 ↔ 라임
+  BSC2: '#D87B64', // 틸 ↔ 코랄
+  BSC1: '#ACA190', // 슬레이트 ↔ 웜 그레이(원색이 저채도라 보색도 저채도)
+  NONE: '#FFFFFF', // 무료는 부가서비스 대상 아님 — 폴백
+}
+
 // 버블 면적 가중치 — 레벨마다 면적 ×2 등비(인접 레벨 반지름 ×√2, VIP:기본1 반지름 4:1, 마스터 지시 2026-10-09)
 // 예외(마스터 지시 2026-10-10, 등비 기준 대비 반지름) : BSC1 ×1.3×1.2 = ×1.56(면적 1 × 2.4336 ≈ 2.43), BSC2 ×1.2×1.2 = ×1.44(면적 2 × 2.0736 ≈ 4.15),
-// PRM1 ×1.3(면적 4 × 1.69 = 6.76), PRM2 ×1.3×0.8×1.15 = ×1.196(면적 8 × 1.4304 ≈ 11.44), VIP ×1.15(면적 16 × 1.3225 = 21.16)
+// PRM1 ×1.3(면적 4 × 1.69 = 6.76), PRM2 ×1.3×0.8×1.15×0.9 ≈ ×1.076(면적 8 × 1.1586 ≈ 9.27), VIP ×1.15(면적 16 × 1.3225 = 21.16)
 export const PLAN_AREA: Record<PlanCd, number> = {
   VIP: 21.16,
-  PRM2: 11.44,
+  PRM2: 9.27,
   PRM1: 6.76,
   BSC2: 4.15,
   BSC1: 2.43,
@@ -253,6 +263,7 @@ export interface BubbleItem {
   views: number // 선택 기간 조회 합
   chgPct: number // 직전 동일 기간 대비 증감률(%) — 직전 0·현재 >0 이면 100, 둘 다 0 이면 0
   sample?: boolean // 데모 화면 전용 가상 샘플(src/data/sample-sites.json) — 배지 "샘플", 상세 이동 없음
+  sparkle?: boolean // 부가서비스 "반짝임"(요금제 외 추가요금 결제) — 버블에 반짝임 효과. 현재 샘플만(api/bubbles SPARKLE)
 }
 
 export interface BubbleResponse {

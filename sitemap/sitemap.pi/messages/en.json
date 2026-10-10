@@ -32,6 +32,7 @@
     "ad": "Ad",
     "own": "Own",
     "sample": "Sample",
+    "sparkle": "Sparkle add-on",
     "sampleToast": "This is a sample site — a fictional example with no detail page.",
     "legend": "Size by plan (ad/own)",
     "views": "{count} views",
