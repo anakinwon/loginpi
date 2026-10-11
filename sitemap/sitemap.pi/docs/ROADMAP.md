@@ -47,7 +47,8 @@
 - [ ] `public` 스키마에 남은 동일 구조 테이블 5개(`schema_migrations` 없음, 마이그레이션 도구 외 생성) 처리 방침 — 운영 선행이면 유지, 아니면 삭제 [확인중 : 마스터]
 - [ ] 데이터 모델 §10 후속 — ② 신고 RPC 전환 ✅(2026-10-11, `fn_prcs_site_rpt` 호출·보상 코드 삭제), ③ `site_mv_url` 입력 ✅(2026-10-11, 스키마 `mvUrl`·등록/수정 저장·공개 컬럼 — 폼 입력란·상세 이동 버튼 반영은 ④와 함께), ④ 버블 URL 대체 ✅(2026-10-11, `site_mv_url` 우선·정적 폴백 유지 + 등록 폼 입력란·상세 이동 버튼 반영), ⑤ OWNERSHIP 재제출 확장
 - [ ] DA 미결 — #18(cafe DB 개명 선행 여부), 정본 개정 제안 P-1~P-7·D-2(데이터 모델 §12) [확인중 : 마스터]
-- [x] **승인 전 요금 결제**(마스터 지시 2026-10-11, PRD v0.8) — pi-db/010 `pi_pymnt` · sitemap/004 `fee_plan` + `site_mst.pymnt_id`, 결제 API prepare/approve/complete(metadata.type `SITE_REG`), 승인 게이트 402 `PAYMENT_REQUIRED`, 폼 요금제 선택·결제 버튼. 실기기 결제 검증 대기(스테이징 Vercel env `PI_API_KEY` 필요)
+- [x] **승인 전 요금 결제**(마스터 지시 2026-10-11, PRD v0.8) — pi-db/010 `pi_pymnt` · sitemap/004 `fee_plan` + `site_mst.pymnt_id`, 결제 API prepare/approve/complete(metadata.type `SITE_REG`), 승인 게이트 402 `PAYMENT_REQUIRED`, 폼 요금제 선택. 실기기 결제 검증 대기(스테이징 Vercel env `PI_API_KEY` 필요)
+- [x] **결제 경로 보강 + 전용 결제 페이지 `/pay/<siteId>`**(2026-10-11 밤, 적대적 검증 블로커 6건 반영 — `../../../docs/HANDOFF.md` §6) — approve "조회→검증→원장→승인" 순서, complete 원장 선조회 + sql/005 RPC `p_usr_id`, `POST /api/payments/cancel`, `PAYABLE_STS` 공용, 철회 잠금(APPROVED 원장), 결제 버튼 `isInPiBrowser` 가드, 관리자 단가 0 허용, `GET /api/me/sites/<id>`. 내 사이트는 결제 링크·제출 직후 자동 이동. **실기기 결제 검증 대기**(Vercel env `PI_API_KEY` 등록 후 HANDOFF §6 순서)
 
 ## Phase 2 — 수익
 
@@ -102,3 +103,4 @@
 | 2026-10-09 | PRD_28 정합 — 워크스페이스 전환·공용 패키지 추출·리스크 갱신 |
 | 2026-10-11 | 실기기 로그인 성공(스테이징) · Portal testnet 앱 등록·도메인 검증 완료 · Google 로그인 통합(sql/003)·로컬 왕복 검증 · 로그인 플레이북·프로세스 다이어그램 연결 |
 | 2026-10-11 | 진행 상태 점검 반영 — 진행률 표(Phase 0 진행중·Phase 1 구현 완료), 착수일 확정, 완료 항목 체크(Phase 0 2건·Phase 1 7건), `@pi/payments`를 Phase 2로 이동, 시드 문구 19건 APPROVED로 정정, Phase 3 소유 검증 선행 구현 명시, HANDOFF §4 후속 항목(자격증명 교체·`public` 사본·데이터 모델 §10·DA 미결) 추가 |
+| 2026-10-11 | 승인 전 결제 보강 — 적대적 검증 블로커 6건 반영(approve 순서·complete 선조회·cancel API·PAYABLE·isInPiBrowser·단가 0), 전용 결제 페이지 `/pay/<siteId>`, sql/005 |

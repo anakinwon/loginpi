@@ -52,9 +52,9 @@ cd sitemap/sitemap.pi && pnpm build
 - SQL Editor에서 파일 단건 실행 금지 — 마이그레이션 도구만(스키마·순서·이력 보장)
 - `.gitignore`의 `.env*`·`.vercel` 제외 규칙 유지(2026-10-11 주석 처리 사고를 원복함)
 
-## 6. 2026-10-11 저녁 상태 — 승인 전 결제(3cd69cd4) 는 **실기기 결제 테스트 전 수정 필수** (적대적 검증 53 에이전트 확정)
+## 6. 2026-10-11 승인 전 결제 — 적대적 검증(53 에이전트) 블로커 6건 **수정 완료**(같은 날 밤, 전용 결제 페이지 `/pay/<siteId>` 와 함께)
 
-배포는 됐지만(스테이징 success) 아래 블로커 때문에 **testnet 이라도 결제 버튼을 누르지 말 것** — 돈이 이동했는데 원장(pi_pymnt)에 안 남는 경로가 있다.
+3cd69cd4 시점엔 아래 블로커 때문에 결제 금지였다. **현재 코드(다음 커밋)는 6건 모두 반영** — 실기기 결제 테스트 가능 상태(단, Vercel env `PI_API_KEY` 등록 뒤). 표의 "수정" 열이 실제 반영 내용이다.
 
 | 등급 | 결함 | 위치 | 수정 |
 |---|---|---|---|
@@ -67,4 +67,8 @@ cd sitemap/sitemap.pi && pnpm build
 
 전체 결함 목록·탈락 항목: `%TEMP%/claude/.../tasks/wc3inqbms.output`(세션 산출물) 또는 워크플로 저널 `wf_bfab4749-e39/journal.jsonl`.
 
-다음 세션 순서: ① 위 6건 수정(approve 순서가 1순위) → tsc·build → 커밋·푸시·`Vercel – sitemaps: success` ② Vercel env `PI_API_KEY`(testnet 앱) 등록·Redeploy ③ Pi Browser(pinet 도메인)에서 결제 1건 → 관리자 승인 → 미결제 승인 402 확인 ④ 플레이북·ROADMAP 기록.
+**반영 내역(2026-10-11 밤)** — approve 순서 뒤집기(`GET /v2/payments/{id}` 선조회 → metadata·direction·user_uid·소유/own_site_yn/PAYABLE/pymnt_id·요금제 일치·이중 APPROVED·정가 검증 → pi_pymnt APPROVED upsert → Pi approve, 거부 경로는 Pi cancel) · complete 원장 선조회 + RPC `p_usr_id`(sql/005, 구 2인자 함수 제거, dev·stg 적용·P0002 자가 점검) · `POST /api/payments/cancel` 신설(onCancel/onError·txid 없는 미완료 복구) · `PAYABLE_STS` 공용 상수 + 철회 잠금을 APPROVED 원장 존재까지 확장 · 결제 버튼 `usePiAuth().isInPiBrowser` 가드 + try/catch + 120초 타임아웃 · 관리자 UI 단가 0 요금제 승인 허용. **결제 UI 는 `/pay/<siteId>` 한 곳**(내 사이트 목록은 링크, 제출 직후 결제 필요하면 자동 이동). 단건 조회 `GET /api/me/sites/<id>` 신설.
+
+팀장 후속 지적(미반영, 실기기 검증 전 검토): ⓐ 같은 사이트 동시 approve 2건이 `hasOtherApprovedPayment`→upsert 사이에 둘 다 통과 가능(두 번째는 RPC P0003 으로 기록만 막힘) — `pi_pymnt` 부분 유니크 인덱스(`(meta_val->>'site_id') WHERE pymnt_sts_cd='APPROVED' AND pymnt_tp_cd='SITE_REG'`) 검토 ⓑ 결제 버튼 120초 타임아웃 뒤 재클릭 시 prepare·createPayment 재실행(Pi SDK 가 pending 있으면 거부) — 문구 보강 정도.
+
+다음 세션 순서: ① Vercel env `PI_API_KEY`(testnet 앱) 등록·Redeploy ② Pi Browser(pinet 도메인) → 내 사이트 → "심사비 결제하기" → `/pay/<id>` 에서 결제 1건 → `pi_pymnt` COMPLETED·`site_mst.pymnt_id` 확인 → 관리자 승인 ③ 미결제 신청 승인 시 402 확인, 취소 1건(onCancel → 원장 CANCELED) 확인 ④ 플레이북·ROADMAP 실기기 검증 기록.
