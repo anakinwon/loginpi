@@ -65,10 +65,17 @@
   "auth": {
     "checking": "로그인 확인 중…",
     "signedIn": "{name} 님",
-    "signedOut": "로그인되지 않음",
     "required": "Pi 계정 로그인이 필요합니다.",
     "signIn": "Pi로 로그인",
-    "openInPiBrowser": "Pi Browser에서 열면 Pi 계정으로 로그인할 수 있습니다."
+    "openInPiBrowser": "Pi Browser에서 열면 Pi 계정으로 로그인할 수 있습니다.",
+    "authenticating": "인증 중…"
+  },
+  "piOAuth": {
+    "signingIn": "Pi 계정으로 로그인하는 중…",
+    "failed": "Pi 로그인에 실패했습니다. 다시 시도해 주세요.",
+    "stateMismatch": "로그인 요청을 확인할 수 없습니다(만료 또는 다른 탭). 다시 시도해 주세요.",
+    "retry": "다시 시도",
+    "backHome": "홈으로"
   },
   "siteCtgr": {
     "COMMUNITY": "커뮤니티",

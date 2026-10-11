@@ -65,10 +65,17 @@
   "auth": {
     "checking": "Checking sign-in…",
     "signedIn": "{name}",
-    "signedOut": "Not signed in",
     "required": "Please sign in with your Pi account.",
     "signIn": "Sign in with Pi",
-    "openInPiBrowser": "Open this page in Pi Browser to sign in with your Pi account."
+    "openInPiBrowser": "Open this page in Pi Browser to sign in with your Pi account.",
+    "authenticating": "Signing in…"
+  },
+  "piOAuth": {
+    "signingIn": "Signing in with your Pi account…",
+    "failed": "Pi sign-in failed. Please try again.",
+    "stateMismatch": "Could not verify this sign-in request (expired or another tab). Please try again.",
+    "retry": "Retry",
+    "backHome": "Home"
   },
   "siteCtgr": {
     "COMMUNITY": "Community",

@@ -39,6 +39,8 @@ export const env = createEnv({
   client: {
     NEXT_PUBLIC_APP_URL: z.string().url(),
     NEXT_PUBLIC_PI_SANDBOX: z.enum(['true', 'false']).optional(),
+    // Pi Sign-In(OAuth) Client ID — 일반 브라우저 Pi 로그인. 미설정이면 SDK 로그인만(cafe.pi 동일 규칙)
+    NEXT_PUBLIC_PI_OAUTH_CLIENT_ID: z.string().optional(),
     NEXT_PUBLIC_SUPABASE_URL: z.string().url().optional(),
   },
   runtimeEnv: {
@@ -63,6 +65,7 @@ export const env = createEnv({
     PROD_RO_SUPABASE_KEY: process.env.PROD_RO_SUPABASE_KEY,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_PI_SANDBOX: process.env.NEXT_PUBLIC_PI_SANDBOX,
+    NEXT_PUBLIC_PI_OAUTH_CLIENT_ID: process.env.NEXT_PUBLIC_PI_OAUTH_CLIENT_ID,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
   },
   // 운영 tier(@pi/db resolveDbTier 와 같은 우선순위 : APP_TIER > VERCEL_ENV)에서 관리자 username 만 있고 uid 가 없으면 빌드 실패.
@@ -71,13 +74,13 @@ export const env = createEnv({
     z.object(shape).superRefine((v, ctx) => {
       if (!isServer) return
       const prod =
-        v.APP_TIER === 'prod' ||
-        (!v.APP_TIER && v.VERCEL_ENV === 'production')
+        v.APP_TIER === 'prod' || (!v.APP_TIER && v.VERCEL_ENV === 'production')
       if (prod && v.ADMIN_PI_USERNAMES && !v.ADMIN_PI_UIDS)
         ctx.addIssue({
           code: 'custom',
           path: ['ADMIN_PI_UIDS'],
-          message: '운영 tier 에서 ADMIN_PI_USERNAMES 를 쓰려면 ADMIN_PI_UIDS 도 필수입니다',
+          message:
+            '운영 tier 에서 ADMIN_PI_USERNAMES 를 쓰려면 ADMIN_PI_UIDS 도 필수입니다',
         })
     }),
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
