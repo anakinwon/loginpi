@@ -1,0 +1,40 @@
+%% Pi 계정 ↔ Google 연동 시퀀스 — Pi Browser 가 코드 발급, 일반 브라우저 Google 세션이 입력 (sql/003)
+sequenceDiagram
+  autonumber
+  participant PB as Pi Browser<br/>(Pi 세션)
+  participant PC as 일반 브라우저<br/>(Google 세션, 미연동)
+  participant S as sitemap.pi 서버
+  participant G as Google
+  participant DB as Supabase<br/>sys_user · sys_auth_lnk_cd · sys_usr_auth_lnk
+
+  PB->>S: POST /api/auth/link-start (X-Pi-Token)
+  S->>S: getPiSessionUser — Pi 세션만 허용
+  S->>DB: 이전 미사용 코드 del_yn='Y'
+  S->>DB: INSERT sys_auth_lnk_cd (6자리, exp +10분)
+  Note over S,DB: 활성 UNIQUE 충돌 시 3회 재시도
+  S-->>PB: { code: 246810, expiresAt }
+
+  PC->>S: GET /api/auth/signin/google → 302
+  PC->>G: 계정 선택 · 동의
+  G-->>S: /api/auth/callback/google?code&iss
+  S->>G: 토큰 교환
+  S->>DB: SELECT sys_usr_auth_lnk WHERE sub
+  DB-->>S: 없음 → userId=null
+  S-->>PC: JWT 쿠키 (user.id='')
+  Note over PC: 헤더 "Pi 계정 연동 필요" · LinkCodeForm
+
+  PC->>S: POST /api/auth/link-complete { code } (piFetch)
+  S->>S: auth() — Google 세션 · user.id='' 확인
+  S->>DB: SELECT 코드 (del_yn='N', use_dtm null, 미만료)
+  S->>DB: INSERT sys_usr_auth_lnk (usr_id, GOOGLE, sub, email)
+  Note over S,DB: (prvd,sub)·(usr,prvd) 활성 UNIQUE → 23505 = 409
+  S->>DB: UPDATE 코드 use_dtm·use_prvd_cd
+  S-->>PC: { ok, userId }
+
+  PC->>S: POST /api/auth/session (update(data))
+  S->>DB: jwt trigger 'update' → SELECT sys_usr_auth_lnk
+  DB-->>S: usr_id
+  S-->>PC: JWT 재발급 (user.id = usr_id)
+  PC->>S: GET /api/auth/me
+  S-->>PC: { id, username: linktest, role }
+  Note over PC: 헤더 linktest · 이후 Google 로그인만으로 동일 계정

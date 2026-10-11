@@ -1,0 +1,66 @@
+<!doctype html>
+<!-- sitemap.pi 프로세스 다이어그램 뷰어 — pfd/*.mmd 를 Mermaid(cdnjs)로 렌더. 브라우저로 이 파일을 열면 됨(서버 불필요).
+     SVG/PNG 재생성: node pfd/render.mjs (Playwright 필요) 또는 Claude Code 에서 Playwright MCP 로 export -->
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>sitemap.pi 프로세스 다이어그램</title>
+<style>
+  :root { color-scheme: light; }
+  body { margin: 0; padding: 24px 16px 48px; font: 14px/1.5 system-ui, -apple-system, 'Segoe UI', 'Malgun Gothic', sans-serif; background: #f8fafc; color: #0f172a; }
+  header { max-width: 1400px; margin: 0 auto 24px; }
+  header h1 { font-size: 22px; margin: 0 0 6px; }
+  header p { margin: 0; color: #475569; }
+  nav { max-width: 1400px; margin: 0 auto 16px; display: flex; flex-wrap: wrap; gap: 8px; }
+  nav a { font-size: 13px; padding: 4px 10px; border: 1px solid #cbd5e1; border-radius: 999px; color: #1e293b; text-decoration: none; background: #fff; }
+  section { max-width: 1400px; margin: 0 auto 32px; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px 20px 20px; }
+  section h2 { font-size: 17px; margin: 0 0 4px; }
+  section p.desc { margin: 0 0 12px; color: #475569; font-size: 13px; }
+  .diagram { overflow-x: auto; }
+  .diagram svg { max-width: 100%; height: auto; }
+  footer { max-width: 1400px; margin: 0 auto; color: #64748b; font-size: 12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>sitemap.pi 프로세스 다이어그램</h1>
+  <p>기준 2026-10-11 · 소스 <code>pfd/*.mmd</code>(Mermaid) · 상세 문서: <code>docs/ROADMAP.md</code>, <code>../../docs/LOGIN_PLAYBOOK.md</code>, <code>../../docs/ROADMAP_MULTISITE.md</code></p>
+</header>
+<nav>
+  <a href="#d01">01 진행 현황</a><a href="#d02">02 작업 세션</a><a href="#d03">03 로그인 아키텍처</a><a href="#d04">04 연동 시퀀스</a><a href="#d05">05 세션 판정</a><a href="#d06">06 멀티사이트 로드맵</a>
+</nav>
+
+<section id="d01"><h2>01. 진행 현황 — Phase 0 · 1 · 후속</h2><p class="desc">초록 완료 / 노랑 부분 / 회색 미착수 / 빨강 차단(마스터 결정 대기). Phase 1 은 구현 7/8 이나 실기기 검증 전이라 완료 아님.</p><div class="diagram" data-src="01-progress-overview.mmd"></div></section>
+<section id="d02"><h2>02. 2026-10-11 작업 세션 프로세스</h2><p class="desc">요청 8건 → 커밋 11건(전부 로컬). 빨강은 실제로 막혔던 지점과 해소 방법.</p><div class="diagram" data-src="02-session-2026-10-11.mmd"></div></section>
+<section id="d03"><h2>03. 로그인 통합 아키텍처 — 3경로 1세션</h2><p class="desc">Pi Browser = Pi SDK, 일반 브라우저 = Pi Sign-In(OAuth) 또는 Google(NextAuth) + 연동. 서버는 <code>getSessionUser()</code> 하나로 통합.</p><div class="diagram" data-src="03-login-architecture.mmd"></div></section>
+<section id="d04"><h2>04. Pi 계정 ↔ Google 연동 시퀀스</h2><p class="desc">Pi Browser 가 6자리 코드 발급(10분) → 일반 브라우저 Google 세션이 입력 → <code>sys_usr_auth_lnk</code> 생성 → 세션 재발급. 2026-10-11 로컬 실왕복 검증.</p><div class="diagram" data-src="04-link-sequence.mmd"></div></section>
+<section id="d05"><h2>05. 세션 판정 흐름 — 서버 · 클라이언트</h2><p class="desc">null 이면 서버 redirect 금지(클라이언트 게이트). Google 미연동(user.id='')은 서버에서 null, 클라이언트에서 연동 코드 입력으로 분기.</p><div class="diagram" data-src="05-session-resolution.mmd"></div></section>
+<section id="d06"><h2>06. 멀티사이트 플랫폼 로드맵 — Site Kit · 웨이브 게이트</h2><p class="desc">M0~M5 와 PRD_28 §8 웨이브. 각 웨이브는 선행 마일스톤 + 직전 웨이브 회고 없이는 착수 금지.</p><div class="diagram" data-src="06-multisite-roadmap.mmd"></div></section>
+
+<footer>재생성: 이 파일을 브라우저로 열면 항상 최신 .mmd 를 렌더. 정적 SVG/PNG 는 <code>pfd/svg/</code>·<code>pfd/png/</code>(Playwright 로 export).</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.15.0/mermaid.min.js" integrity="sha384-yQ4mmBBT+vhTAwjFH0toJXNYJ6O4usWnt6EPIdWwrRvx2V/n5lXuDZQwQFeSFydF" crossorigin="anonymous"></script>
+<script>
+  mermaid.initialize({ startOnLoad: false, theme: 'base', securityLevel: 'loose',
+    themeVariables: { fontFamily: 'system-ui, Segoe UI, Malgun Gothic, sans-serif', fontSize: '14px', primaryColor: '#ffffff', primaryBorderColor: '#64748b', lineColor: '#475569' },
+    flowchart: { htmlLabels: true, curve: 'basis', nodeSpacing: 28, rankSpacing: 40 },
+    sequence: { actorMargin: 40, messageMargin: 32, mirrorActors: false } });
+  (async () => {
+    const els = [...document.querySelectorAll('.diagram[data-src]')];
+    for (const el of els) {
+      try {
+        const res = await fetch(el.dataset.src);
+        if (!res.ok) throw new Error(res.status + ' ' + el.dataset.src);
+        const src = await res.text();
+        const { svg } = await mermaid.render('m_' + el.dataset.src.replace(/\W/g, '_'), src);
+        el.innerHTML = svg;
+      } catch (e) {
+        el.innerHTML = '<pre style="color:#b91c1c">렌더 실패: ' + String(e) + '\n(file:// 로 열었다면 fetch 차단 — 로컬 서버(npx serve pfd) 또는 inline 모드 사용)</pre>';
+      }
+    }
+    document.body.dataset.rendered = String(els.filter(e => e.querySelector('svg')).length);
+  })();
+</script>
+</body>
+</html>

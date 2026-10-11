@@ -1,0 +1,19 @@
+%% 2026-10-11 작업 세션 프로세스 — 요청 → 산출 → 검증 → 커밋 (11건, 전부 로컬 미푸시)
+flowchart TD
+  classDef req fill:#e0f2fe,stroke:#0284c7,color:#0c4a6e
+  classDef work fill:#ffffff,stroke:#64748b,color:#0f172a
+  classDef commit fill:#dcfce7,stroke:#16a34a,color:#14532d
+  classDef issue fill:#fee2e2,stroke:#dc2626,color:#7f1d1d
+  classDef doc fill:#fef3c7,stroke:#d97706,color:#78350f
+
+  r1["① ROADMAP 진행 점검"]:::req --> w1["git·코드·SQL 대조<br/>체크 0/32 → 실제 Phase1 7/8"]:::work --> c1["06db0e89 ROADMAP 정정"]:::commit
+  r2["② 로컬 실행"]:::req --> w2["포트 3001 · .env.local 생성"]:::work --> i1["503 DB_UNAVAILABLE<br/>env 오타 TAGING_ · tier 불일치"]:::issue --> i2["PGRST106<br/>Exposed schemas 미등록"]:::issue --> w3["대시보드 등록 → 목록 19건 200"]:::work
+  r3["③ 다음 스텝"]:::req --> c2["caab8310 신고 RPC 전환<br/>복합형 NULL 직렬화 실측"]:::commit --> c3["35a73a32 site_mv_url 스키마"]:::commit --> c4["c02bbca9 버블·상세·폼 반영"]:::commit --> c5["c40c16dd https 렌더 가드<br/>(보안 리뷰 2회)"]:::commit
+  r4["④ 샘플 버블 → 광고 등록 화면"]:::req --> c6["9f22025d /ad 안내 페이지<br/>sampleToast 폐기"]:::commit
+  r5["⑤ 로그인 = cafe.pi 방식"]:::req --> c7["5987ff20 SDK→Pi OAuth<br/>+ /auth/pi/callback"]:::commit --> q1{"Portal 콜백 URI<br/>sitemap.pi 불가"}:::issue
+  q1 --> r6["⑥ Google+Pi 매핑 최초 버전"]:::req --> w4["PRD_28 §1.1-2 충돌 발견<br/>→ 마스터 재확인"]:::issue
+  r7["⑦ 멀티사이트 ROADMAP"]:::req --> d1["49d88c0b ROADMAP_MULTISITE<br/>검수 12 · 승인 3 반영"]:::doc
+  w4 --> c8["e48db38b 로그인 통합<br/>NextAuth · sql/003 · /link"]:::commit
+  r8["⑧ 로그인 가이드"]:::req --> d2["bf00f873 LOGIN_PLAYBOOK<br/>+ PRD_28 예외 1행"]:::doc
+  c8 --> t1["Google 실왕복 테스트"]:::work --> i3["400 액세스 차단<br/>→ 리디렉션 URI 등록"]:::issue --> i4["iss missing<br/>→ 콜백 URL 직접 입력"]:::issue --> t2["콜백 302 · link-complete 200<br/>DB 연동 1행 ✓"]:::work --> i5["update() 무인자 = GET<br/>→ update(data) + 자가 치유"]:::issue
+  i5 --> n1(["다음: 새로고침 확인 → 재로그인 → 테스트 행 정리 → 커밋"]):::work

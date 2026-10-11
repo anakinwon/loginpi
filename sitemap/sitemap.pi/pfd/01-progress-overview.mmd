@@ -1,0 +1,29 @@
+%% sitemap.pi 진행 현황 — Phase 0·1·후속 (2026-10-11 기준). 색: 완료 초록 / 부분 노랑 / 미착수 회색 / 차단 빨강. 단계는 위→아래, 항목은 좌→우
+flowchart TB
+  classDef done fill:#dcfce7,stroke:#16a34a,color:#14532d
+  classDef part fill:#fef9c3,stroke:#ca8a04,color:#713f12
+  classDef todo fill:#f1f5f9,stroke:#94a3b8,color:#334155
+  classDef block fill:#fee2e2,stroke:#dc2626,color:#7f1d1d
+  classDef gate fill:#e0e7ff,stroke:#4f46e5,color:#312e81,stroke-width:2px
+
+  subgraph P0["Phase 0 — 선결 · 완료 2 · 부분 2 · 미착수 4"]
+    direction LR
+    p0a["별도 Supabase<br/>sitemap_dev·stg<br/>000→003 적용"]:::done --- p0b["pnpm 워크스페이스<br/>packages/*·sitemap/*"]:::done --- p0c["독립 웹서버<br/>Vercel 배포 ✓<br/>도메인·Ignored Build ✗"]:::part --- p0d["Developer Portal<br/>앱 2개 등록 ✗<br/>validation-key 라우트 ✓"]:::part --- p0e["A-6 질의<br/>유료 노출 질의"]:::todo --- p0f["약관 초안<br/>단가 확정"]:::todo
+  end
+
+  subgraph P1["Phase 1 — MVP · 구현 7/8 · Pi Browser 실기기 검증 대기"]
+    direction LR
+    p1a["스캐폴드<br/>@pi/auth·db·guard"]:::done --- p1b["DDL 001·002<br/>DA 1차 승인"]:::done --- p1c["등록·심사·신고<br/>목록·상세·조회수"]:::done --- p1d["시드 19건<br/>APPROVED"]:::done --- p1e["보안 점검<br/>KISA 재점검 일부"]:::part --- p1g{{"완료 기준<br/>pnpm build ✓<br/>실기기 ✗"}}:::gate
+  end
+
+  subgraph F["Phase 1 후속 (HANDOFF §4) — 2026-10-11 처리"]
+    direction LR
+    f1["스테이징 503 해소<br/>PGRST106 → Exposed schemas"]:::done --- f2["§10 ② 신고 RPC"]:::done --- f3["§10 ③ site_mv_url"]:::done --- f4["§10 ④ 버블 URL"]:::done --- f5["샘플 버블 → /ad"]:::done --- f6["로그인 통합<br/>Pi SDK + OAuth + Google"]:::done --- f7["§10 ⑤ OWNERSHIP<br/>재제출"]:::todo --- f8["자격증명 교체<br/>public 사본 방침"]:::block
+  end
+
+  P2["Phase 2 — 수익 · 착수 조건 PRD §9 #2 회신 · @pi/payments · fee_* · 멤버십"]:::todo
+
+  P0 --> P1 --> F
+  F -. "실기기 통과 후" .-> P2
+
+  linkStyle default stroke:#94a3b8,stroke-width:1px

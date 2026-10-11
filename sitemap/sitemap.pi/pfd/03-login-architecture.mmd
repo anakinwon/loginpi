@@ -1,0 +1,33 @@
+%% 로그인 통합 아키텍처 — 3경로 1세션 (sitemap.pi, cafe.pi 방식 승계). 위→아래: 클라이언트 → 외부 → API → 통합 세션
+flowchart TB
+  classDef client fill:#e0f2fe,stroke:#0284c7,color:#0c4a6e
+  classDef ext fill:#fef3c7,stroke:#d97706,color:#78350f
+  classDef api fill:#ffffff,stroke:#334155,color:#0f172a
+  classDef db fill:#ede9fe,stroke:#7c3aed,color:#4c1d95
+  classDef core fill:#dcfce7,stroke:#16a34a,color:#14532d,stroke-width:2px
+
+  subgraph PB["Pi Browser"]
+    a1["usePiLogin → signIn()<br/>window.Pi.authenticate"]:::client
+  end
+  subgraph NB["일반 브라우저 (PC)"]
+    b1["usePiLogin<br/>SDK 3초 실패 → startPiOAuth"]:::client
+    c1["GoogleLoginButton<br/>signIn('google')"]:::client
+  end
+
+  a1 -- "accessToken" --> api1["POST /api/auth/pi<br/>@pi/auth"]:::api
+  b1 --> ext1["accounts.pinet.com<br/>Sign in with Pi (QR)"]:::ext
+  ext1 -- "#access_token" --> cb1["/auth/pi/callback<br/>(client page)"]:::client --> api1
+  api1 -- "GET /v2/me 검증" --> ext2["api.minepi.com"]:::ext
+  api1 -- "upsertPiUser<br/>(pi_username 불변 키)" --> db1[("sys_user")]:::db
+  api1 -- "HMAC 토큰<br/>쿠키 + JSON token" --> s1
+
+  c1 --> api2["/api/auth/[...nextauth]<br/>NextAuth v5 · Google"]:::api
+  api2 --> ext3["accounts.google.com"]:::ext
+  ext3 -- "code → callback" --> api2
+  api2 -- "jwt: sub → usr_id" --> db2[("sys_usr_auth_lnk")]:::db
+  api2 -- "JWT 세션 쿠키<br/>user.id = usr_id | ''" --> s1
+
+  s1["getSessionUser()<br/>① Pi 쿠키 ② X-Pi-Token ③ Google 세션(연동 사용자만)"]:::core
+  s1 --> g1["requireUser · requireAdmin<br/>(API 15개, 경로 무관)"]:::api
+  s1 --> g2["GET /api/auth/me"]:::api --> h1["useAppUser()<br/>Pi 우선 → Google 연동 → googleUnlinked"]:::client
+  h1 --> ui["LoginGate · AuthStatus · 관리 메뉴"]:::client

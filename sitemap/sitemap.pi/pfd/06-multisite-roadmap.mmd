@@ -1,0 +1,29 @@
+%% 멀티사이트 플랫폼 로드맵 — Site Kit M0~M5 와 PRD_28 §8 웨이브 게이트 (docs/ROADMAP_MULTISITE.md)
+flowchart LR
+  classDef now fill:#dcfce7,stroke:#16a34a,color:#14532d,stroke-width:2px
+  classDef next fill:#fef9c3,stroke:#ca8a04,color:#713f12
+  classDef later fill:#f1f5f9,stroke:#94a3b8,color:#334155
+  classDef cond fill:#fee2e2,stroke:#dc2626,color:#7f1d1d,stroke-dasharray:4 3
+  classDef wave fill:#e0e7ff,stroke:#4f46e5,color:#312e81
+
+  M0["M0 1호 마감 · 결정<br/>실기기 검증 · Portal 확인<br/>LOGIN_PLAYBOOK ✓"]:::now
+  M1["M1 Kit v1 추출<br/>@pi/auth 컴포넌트 승격<br/>_template · new-site.mjs"]:::next
+  M2["M2 Provision 자동화<br/>db-provision (Exposed schemas)<br/>Vercel · env 주입"]:::later
+  M3["M3 Payments Kit<br/>@pi/payments · fee_* 템플릿"]:::later
+  M4["M4 Fleet Ops<br/>빌드 상태 대시보드 · 일괄 승격 · site:check CI"]:::later
+  M5["M5 허브 SSO (조건부)<br/>PRD_28 §11 #4 회신 후"]:::cond
+
+  M0 --> M1 --> M2 --> M4
+  M1 --> M3
+  M0 -. "Section 4 해석" .-> M5
+
+  W1["W1 sitemap.pi<br/>게이트 M0·M1"]:::wave
+  W2["W2 yea·barista·bluemountain·gifticon⏸<br/>게이트 M1 + 회고"]:::wave
+  W3["W3 seminar·teamkorea·expedition·omok⏸·lan<br/>게이트 M2 + 회고"]:::wave
+  W4["W4 dbms·schema·webserver·was·fondation△·yoda⏸<br/>게이트 M3 + 회고"]:::wave
+  W5["W5 anakin·youngrok<br/>게이트 M4 + 회고"]:::wave
+
+  M1 --> W1 --> W2 --> W3 --> W4 --> W5
+  M2 --> W3
+  M3 --> W4
+  M4 --> W5

@@ -1,0 +1,28 @@
+%% 세션 판정 흐름 — 서버 getSessionUser (src/lib/auth.ts) 와 클라이언트 useAppUser (google-auth.tsx)
+flowchart TD
+  classDef yes fill:#dcfce7,stroke:#16a34a,color:#14532d
+  classDef no fill:#fee2e2,stroke:#dc2626,color:#7f1d1d
+  classDef q fill:#fef9c3,stroke:#ca8a04,color:#713f12
+  classDef io fill:#e0f2fe,stroke:#0284c7,color:#0c4a6e
+
+  subgraph SV["서버 — getSessionUser(req)"]
+    s0(["요청"]):::io --> s1{"pi_session 쿠키<br/>HMAC 유효?"}:::q
+    s1 -- 예 --> s2["getUserById(userId)"]:::yes --> sU(["UserRow"]):::yes
+    s1 -- 아니오 --> s3{"X-Pi-Token 헤더<br/>HMAC 유효?"}:::q
+    s3 -- 예 --> s2
+    s3 -- 아니오 --> s4{"googleEnabled()<br/>env 3종?"}:::q
+    s4 -- 아니오 --> sN(["null → 401<br/>(redirect 금지)"]):::no
+    s4 -- 예 --> s5{"auth().user.id<br/>비어 있지 않음?"}:::q
+    s5 -- "'' (미연동)" --> sN
+    s5 -- usr_id --> s2
+  end
+
+  subgraph CL["클라이언트 — useAppUser()"]
+    c0(["렌더"]):::io --> c1{"usePiAuth().user?"}:::q
+    c1 -- 예 --> cP(["source='pi'<br/>children(user)"]):::yes
+    c1 -- 아니오 --> c2{"useSession()<br/>status"}:::q
+    c2 -- loading --> cL(["로그인 확인 중…"]):::io
+    c2 -- unauthenticated --> cG(["게이트: Pi 로그인 + Google 버튼"]):::no
+    c2 -- "authenticated, id=''" --> cU(["googleUnlinked<br/>→ LinkCodeForm"]):::q
+    c2 -- "authenticated, id=usr_id" --> c3["GET /api/auth/me"]:::io --> cGU(["source='google'<br/>children(user)"]):::yes
+  end
