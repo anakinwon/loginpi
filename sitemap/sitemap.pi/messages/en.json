@@ -19,7 +19,8 @@
     "months": "{n} months",
     "years": "{n, plural, =1 {1 year} other {# years}}",
     "lifetime": "Lifetime",
-    "discount": "{pct}% off vs. monthly rate"
+    "discount": "{pct}% off vs. monthly rate",
+    "discountLifetime": "{pct}% off vs. monthly rate on a 10-year basis"
   },
   "bubble": {
     "periodLabel": "Period",

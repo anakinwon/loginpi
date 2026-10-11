@@ -19,7 +19,8 @@
     "months": "{n}개월",
     "years": "{n}년",
     "lifetime": "영구",
-    "discount": "1개월 요금 대비 {pct}% 할인"
+    "discount": "1개월 요금 대비 {pct}% 할인",
+    "discountLifetime": "10년 환산 1개월 요금 대비 {pct}% 할인"
   },
   "bubble": {
     "periodLabel": "기간",

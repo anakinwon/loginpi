@@ -21,18 +21,19 @@ export interface RegFee {
   pi_amt: number
   fee_plan_nm: string
   use_mon_cnt: number | null // 이용 개월수, null = 영구
-  dc_pct: number | null // 1개월 단가 대비 할인율(%), null = 표시 없음(영구·기준단가 0·할인 아님)
+  dc_pct: number | null // 1개월 단가 대비 할인율(%), null = 표시 없음(기준단가 0·할인 아님). 영구는 10년 환산
 }
 
-// 할인율(%) = 1 - 단가 / (1개월 기준단가 × 개월수). 영구(개월 null)는 비교 기준이 없어 미표시(PRD §3-1 "—"),
-// 기준단가 0 이거나 할인이 아니면(PRM1 처럼 월 환산이 더 비싸면) null
+// 영구 요금제의 할인율 환산 개월수 — 마스터 확정 2026-10-11 "영구도 10년 환산으로 할인 표시"(PRD §3-1 영구 = 10년 상각)
+export const LIFETIME_MONTHS = 120
+
+// 할인율(%) = 1 - 단가 / (1개월 기준단가 × 개월수). 기준단가 0 이거나 할인이 아니면 null
 export const regFeeDiscountPct = (
   piAmt: number,
   monPiAmt: number,
   useMonCnt: number | null,
 ) => {
-  if (useMonCnt == null) return null
-  const base = monPiAmt * useMonCnt
+  const base = monPiAmt * (useMonCnt ?? LIFETIME_MONTHS)
   if (!(base > 0)) return null
   const pct = Math.round((1 - piAmt / base) * 100)
   return pct > 0 ? pct : null

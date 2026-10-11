@@ -80,7 +80,7 @@ export function useRegFees(): FeeMap | null {
   return fees
 }
 
-// 요금제 기간·할인 표시 문구(번역 fee.*) — term: "6개월"·"5년"·"영구", discount: "1개월 요금 대비 17% 할인"(영구는 서버가 null → 빈 문자열)
+// 요금제 기간·할인 표시 문구(번역 fee.*) — term: "6개월"·"5년"·"영구", discount: "1개월 요금 대비 17% 할인"(영구는 "10년 환산 25% 할인")
 export function useFeeLabel() {
   const t = useTranslations('fee')
   return useCallback(
@@ -93,7 +93,12 @@ export function useFeeLabel() {
           : m % 12 === 0
             ? t('years', { n: m / 12 })
             : t('months', { n: m })
-      const discount = f.dc_pct == null ? '' : t('discount', { pct: f.dc_pct })
+      const discount =
+        f.dc_pct == null
+          ? ''
+          : m == null
+            ? t('discountLifetime', { pct: f.dc_pct })
+            : t('discount', { pct: f.dc_pct })
       return { term, discount }
     },
     [t],
