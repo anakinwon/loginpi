@@ -80,6 +80,8 @@ export const IMG_MIME = [
 
 // 단일 라벨 .pi 도메인, 소문자 — DB CHECK(site_mst_site_dom_nm_check)와 동일
 export const DOMAIN_RE = /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.pi$/
+// 이동 URL 형식 — DB CHECK(sql/002 site_mst_site_mv_url_check)와 동일: https + 호스트
+export const MV_URL_RE = /^https:\/\/[^\s/?#]+/
 
 // 경로 세그먼트 → 소문자 도메인. 잘못된 퍼센트 인코딩(URIError)은 '' → DOMAIN_RE 불일치 → 호출부 404(500 방지)
 export const decodeDomain = (raw: string) => {
@@ -120,6 +122,13 @@ export const siteInputSchema = z
     ctgr: z.enum(SITE_CTGR),
     desc: optText(LIMITS.descMax),
     imgUrl: z.string().url().max(1000).nullable().optional(),
+    // 이동 URL(일반 브라우저용 https 연결 주소) — DB CHECK site_mst_site_mv_url_check 와 같은 형식. null·빈 문자열은 null
+    mvUrl: z
+      .string()
+      .nullable()
+      .transform((v) => (v == null || v.trim() === '' ? null : v.trim()))
+      .pipe(z.string().url().regex(MV_URL_RE).max(1000).nullable())
+      .optional(),
     pvtCntc: optText(LIMITS.cntcMax),
     pubCntc: optText(LIMITS.cntcMax),
     submit: z.boolean().default(false),
@@ -165,7 +174,7 @@ export const siteActionSchema = z.object({ action: z.literal('withdraw') })
 
 // 공개 응답 컬럼 — pvt_cntc_txt(심사용 비공개 연락처) 절대 포함 금지
 export const PUBLIC_SITE_COLS =
-  'site_id, site_dom_nm, site_nm, site_ctgr_cd, site_desc, site_img_url, pub_cntc_txt, apv_dtm, own_site_yn'
+  'site_id, site_dom_nm, site_nm, site_ctgr_cd, site_desc, site_img_url, site_mv_url, pub_cntc_txt, apv_dtm, own_site_yn'
 
 export interface PublicSite {
   site_id: string
@@ -174,6 +183,7 @@ export interface PublicSite {
   site_ctgr_cd: SiteCtgr
   site_desc: string | null
   site_img_url: string | null
+  site_mv_url: string | null // 이동 URL(https) — NULL 이면 도메인으로 이동
   pub_cntc_txt: string | null
   apv_dtm: string | null
   own_site_yn: 'Y' | 'N'

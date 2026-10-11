@@ -93,6 +93,7 @@ export const PATCH = withAuthGuard(
         site_ctgr_cd: body.ctgr,
         site_desc: body.desc ?? null,
         site_img_url: body.imgUrl ?? null,
+        site_mv_url: body.mvUrl ?? null,
         pvt_cntc_txt: body.pvtCntc ?? null,
         pub_cntc_txt: body.pubCntc ?? null,
         site_sts_cd: nextSts,
