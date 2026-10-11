@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { hasLocale, NextIntlClientProvider } from 'next-intl'
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { ThemeProvider } from 'next-themes'
+import { SessionProvider } from 'next-auth/react'
 import { PiAuthProvider, PiSdkScript } from '@pi/auth/client'
 import { routing } from '@/i18n/routing'
 import { SiteHeader } from '@/components/site-header'
@@ -46,13 +47,16 @@ export default async function LocaleLayout({
             forcedTheme="dark"
             disableTransitionOnChange
           >
-            <PiAuthProvider>
-              <SiteHeader />
-              {/* 홈 버블처럼 data-fullbleed 자식이 있으면 폭 제한·여백 해제(:has 미지원 브라우저는 기존 폭으로 표시) */}
-              <main className="mx-auto max-w-5xl px-4 py-6 has-[[data-fullbleed]]:max-w-none has-[[data-fullbleed]]:p-0">
-                {children}
-              </main>
-            </PiAuthProvider>
+            {/* Google(NextAuth) 세션 — Pi 세션(PiAuthProvider)과 useAppUser 가 통합. 미설정 환경은 /api/auth/* 가 404 라 세션 null */}
+            <SessionProvider>
+              <PiAuthProvider>
+                <SiteHeader />
+                {/* 홈 버블처럼 data-fullbleed 자식이 있으면 폭 제한·여백 해제(:has 미지원 브라우저는 기존 폭으로 표시) */}
+                <main className="mx-auto max-w-5xl px-4 py-6 has-[[data-fullbleed]]:max-w-none has-[[data-fullbleed]]:p-0">
+                  {children}
+                </main>
+              </PiAuthProvider>
+            </SessionProvider>
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>

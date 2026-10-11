@@ -60,7 +60,8 @@
     "search": "Search",
     "mySites": "My sites",
     "admin": "Admin",
-    "switchLocale": "한국어"
+    "switchLocale": "한국어",
+    "link": "Link account"
   },
   "auth": {
     "checking": "Checking sign-in…",
@@ -68,7 +69,12 @@
     "required": "Please sign in with your Pi account.",
     "signIn": "Sign in with Pi",
     "openInPiBrowser": "Open this page in Pi Browser to sign in with your Pi account.",
-    "authenticating": "Signing in…"
+    "authenticating": "Signing in…",
+    "google": "Sign in with Google",
+    "signOut": "Sign out",
+    "or": "or",
+    "linkRequired": "You are signed in with Google, but it is not linked to a Pi account yet. Issue a link code in Pi Browser and enter it here.",
+    "linkNeeded": "Link Pi account"
   },
   "piOAuth": {
     "signingIn": "Signing in with your Pi account…",
@@ -76,6 +82,23 @@
     "stateMismatch": "Could not verify this sign-in request (expired or another tab). Please try again.",
     "retry": "Retry",
     "backHome": "Home"
+  },
+  "link": {
+    "title": "Link account",
+    "intro": "Connect the account you signed in with in Pi Browser to Google sign-in in a regular browser. After linking you can use the same account on a PC browser.",
+    "checking": "Checking sign-in…",
+    "piIssueTitle": "To sign in from a regular browser too",
+    "codeHint": "Issue the code below, then sign in with Google on a PC browser and enter it on the Link account page (within 10 minutes).",
+    "piIssue": "Issue link code",
+    "reissue": "Issue a new code",
+    "expiresIn": "Expires in {min} min",
+    "enterTitle": "Enter link code",
+    "enterHint": "In Pi Browser open sitemap.pi → Link account → Issue link code, then enter the 6-digit code.",
+    "codeLabel": "Link code",
+    "submit": "Link",
+    "done": "Linked. You can now use Google sign-in as well.",
+    "linked": "{name} is linked to Google sign-in.",
+    "googleOff": "Google sign-in is off in this environment, so no linking is needed."
   },
   "siteCtgr": {
     "COMMUNITY": "Community",
@@ -247,6 +270,10 @@
     "AUTH_PI_ACCOUNT_CONFLICT": "This Pi username is already registered with different credentials. Please contact the admin",
     "AUTH_PI_ACCOUNT_INACTIVE": "This account is inactive. Please contact the admin",
     "DOMAIN_REJECTED_OWNERSHIP": "This domain was rejected because ownership could not be verified and cannot be submitted again. Please contact the admin",
-    "OWNERSHIP_NOT_VERIFIED": "Verify domain ownership before approving"
+    "OWNERSHIP_NOT_VERIFIED": "Verify domain ownership before approving",
+    "AUTH_GOOGLE_REQUIRED": "Google sign-in is required.",
+    "LINK_CODE_INVALID": "The link code is invalid or expired. Issue a new one in Pi Browser.",
+    "LINK_ALREADY_LINKED": "This account is already linked.",
+    "LINK_CODE_GEN_FAILED": "Could not create a link code. Please try again later."
   }
 }

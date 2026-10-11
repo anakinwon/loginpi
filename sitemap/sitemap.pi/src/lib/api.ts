@@ -31,6 +31,13 @@ export const apiError = createApiError({
     '도메인 소유 확인 불가로 반려된 도메인은 다시 제출할 수 없습니다. 관리자에게 문의하세요',
   OWNERSHIP_NOT_VERIFIED: '도메인 소유 확인 후 승인하세요',
   SITE_LIMIT: `작성 중·심사 대기 사이트는 최대 ${LIMITS.openMax}개까지 둘 수 있습니다`,
+  // Google 로그인 ↔ Pi 계정 연동(sql/003)
+  AUTH_GOOGLE_REQUIRED: 'Google 로그인이 필요합니다',
+  LINK_CODE_INVALID:
+    '연동 코드가 올바르지 않거나 만료되었습니다. Pi Browser 에서 다시 발급하세요',
+  LINK_ALREADY_LINKED: '이미 연동된 계정입니다',
+  LINK_CODE_GEN_FAILED:
+    '연동 코드를 만들지 못했습니다. 잠시 후 다시 시도하세요',
 })
 
 export const db = () => getSupabaseAdmin()

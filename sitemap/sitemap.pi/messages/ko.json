@@ -60,7 +60,8 @@
     "search": "검색",
     "mySites": "내 사이트",
     "admin": "관리",
-    "switchLocale": "English"
+    "switchLocale": "English",
+    "link": "계정 연동"
   },
   "auth": {
     "checking": "로그인 확인 중…",
@@ -68,7 +69,12 @@
     "required": "Pi 계정 로그인이 필요합니다.",
     "signIn": "Pi로 로그인",
     "openInPiBrowser": "Pi Browser에서 열면 Pi 계정으로 로그인할 수 있습니다.",
-    "authenticating": "인증 중…"
+    "authenticating": "인증 중…",
+    "google": "Google로 로그인",
+    "signOut": "로그아웃",
+    "or": "또는",
+    "linkRequired": "Google 로그인은 됐지만 아직 Pi 계정과 연결되지 않았습니다. Pi Browser에서 연동 코드를 발급받아 입력하세요.",
+    "linkNeeded": "Pi 계정 연동 필요"
   },
   "piOAuth": {
     "signingIn": "Pi 계정으로 로그인하는 중…",
@@ -76,6 +82,23 @@
     "stateMismatch": "로그인 요청을 확인할 수 없습니다(만료 또는 다른 탭). 다시 시도해 주세요.",
     "retry": "다시 시도",
     "backHome": "홈으로"
+  },
+  "link": {
+    "title": "계정 연동",
+    "intro": "Pi Browser에서 로그인한 계정을 일반 브라우저의 Google 로그인과 연결합니다. 연결 후에는 PC 브라우저에서도 같은 계정으로 이용할 수 있습니다.",
+    "checking": "로그인 확인 중…",
+    "piIssueTitle": "일반 브라우저에서도 로그인하려면",
+    "codeHint": "아래 코드를 발급받아, PC 등 일반 브라우저에서 Google 로그인 후 계정 연동 화면에 입력하세요(10분 내).",
+    "piIssue": "연동 코드 발급",
+    "reissue": "코드 다시 발급",
+    "expiresIn": "{min}분 후 만료",
+    "enterTitle": "연동 코드 입력",
+    "enterHint": "Pi Browser에서 sitemap.pi → 계정 연동 → 연동 코드 발급 후 6자리 코드를 입력하세요.",
+    "codeLabel": "연동 코드",
+    "submit": "연동하기",
+    "done": "연동이 완료되었습니다. 이제 Google 로그인으로도 이용할 수 있습니다.",
+    "linked": "{name} 계정이 Google 로그인과 연동되어 있습니다.",
+    "googleOff": "이 환경은 Google 로그인이 꺼져 있어 연동이 필요 없습니다."
   },
   "siteCtgr": {
     "COMMUNITY": "커뮤니티",
@@ -247,6 +270,10 @@
     "AUTH_PI_ACCOUNT_CONFLICT": "이미 등록된 Pi 계정과 인증 정보가 다릅니다. 관리자에게 문의하세요",
     "AUTH_PI_ACCOUNT_INACTIVE": "비활성 계정입니다. 관리자에게 문의하세요",
     "DOMAIN_REJECTED_OWNERSHIP": "도메인 소유 확인 불가로 반려된 도메인은 다시 제출할 수 없습니다. 관리자에게 문의하세요",
-    "OWNERSHIP_NOT_VERIFIED": "도메인 소유 확인 후 승인하세요"
+    "OWNERSHIP_NOT_VERIFIED": "도메인 소유 확인 후 승인하세요",
+    "AUTH_GOOGLE_REQUIRED": "Google 로그인이 필요합니다.",
+    "LINK_CODE_INVALID": "연동 코드가 올바르지 않거나 만료되었습니다. Pi Browser에서 다시 발급하세요.",
+    "LINK_ALREADY_LINKED": "이미 연동된 계정입니다.",
+    "LINK_CODE_GEN_FAILED": "연동 코드를 만들지 못했습니다. 잠시 후 다시 시도하세요."
   }
 }

@@ -35,12 +35,18 @@ export const env = createEnv({
     STAGING_SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
     PROD_RO_SUPABASE_URL: z.string().url().optional(),
     PROD_RO_SUPABASE_KEY: z.string().optional(),
+    // Google 로그인(NextAuth, 일반 브라우저) — 셋 다 있어야 활성(src/auth.ts googleEnabled). 운영은 AUTH_URL 설정 금지(host 자동 감지)
+    AUTH_SECRET: z.string().min(32).optional(),
+    GOOGLE_CLIENT_ID: z.string().optional(),
+    GOOGLE_CLIENT_SECRET: z.string().optional(),
   },
   client: {
     NEXT_PUBLIC_APP_URL: z.string().url(),
     NEXT_PUBLIC_PI_SANDBOX: z.enum(['true', 'false']).optional(),
     // Pi Sign-In(OAuth) Client ID — 일반 브라우저 Pi 로그인. 미설정이면 SDK 로그인만(cafe.pi 동일 규칙)
     NEXT_PUBLIC_PI_OAUTH_CLIENT_ID: z.string().optional(),
+    // '1' 이면 클라이언트에 Google 로그인 버튼 노출(서버 env 3종과 함께 설정)
+    NEXT_PUBLIC_GOOGLE_LOGIN: z.enum(['1']).optional(),
     NEXT_PUBLIC_SUPABASE_URL: z.string().url().optional(),
   },
   runtimeEnv: {
@@ -63,6 +69,10 @@ export const env = createEnv({
       process.env.STAGING_SUPABASE_SERVICE_ROLE_KEY,
     PROD_RO_SUPABASE_URL: process.env.PROD_RO_SUPABASE_URL,
     PROD_RO_SUPABASE_KEY: process.env.PROD_RO_SUPABASE_KEY,
+    AUTH_SECRET: process.env.AUTH_SECRET,
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+    NEXT_PUBLIC_GOOGLE_LOGIN: process.env.NEXT_PUBLIC_GOOGLE_LOGIN,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_PI_SANDBOX: process.env.NEXT_PUBLIC_PI_SANDBOX,
     NEXT_PUBLIC_PI_OAUTH_CLIENT_ID: process.env.NEXT_PUBLIC_PI_OAUTH_CLIENT_ID,
@@ -81,6 +91,15 @@ export const env = createEnv({
           path: ['ADMIN_PI_UIDS'],
           message:
             '운영 tier 에서 ADMIN_PI_USERNAMES 를 쓰려면 ADMIN_PI_UIDS 도 필수입니다',
+        })
+      // Google 로그인은 셋 다 — 일부만 있으면 버튼은 뜨는데 콜백이 실패하는 반쪽 상태가 된다
+      const g = [v.GOOGLE_CLIENT_ID, v.GOOGLE_CLIENT_SECRET, v.AUTH_SECRET]
+      if (g.some(Boolean) && !g.every(Boolean))
+        ctx.addIssue({
+          code: 'custom',
+          path: ['GOOGLE_CLIENT_ID'],
+          message:
+            'Google 로그인은 GOOGLE_CLIENT_ID·GOOGLE_CLIENT_SECRET·AUTH_SECRET 세 값을 함께 설정해야 합니다',
         })
     }),
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
