@@ -11,6 +11,7 @@ import { Pagination } from './pagination'
 import {
   readApi,
   useApiErrorText,
+  useFeeLabel,
   useRegFees,
   type ApiErrorBody,
   type FeeMap,
@@ -37,7 +38,7 @@ const needsPayment = (s: OwnerSite, fees: FeeMap | null) =>
   s.own_site_yn !== 'Y' &&
   !s.pymnt_id &&
   (PAYABLE_STS as readonly string[]).includes(s.site_sts_cd) &&
-  (fees == null || (fees[s.plan_cd] ?? 0) > 0)
+  (fees == null || (fees[s.plan_cd]?.pi_amt ?? 0) > 0)
 
 export function MySites() {
   return <LoginGate>{() => <MySitesInner />}</LoginGate>
@@ -54,6 +55,7 @@ function MySitesInner() {
   const [editing, setEditing] = useState<OwnerSite | 'new' | null>(null)
   const tp = useTranslations('plan')
   const fees = useRegFees()
+  const feeLabel = useFeeLabel()
 
   const load = useCallback(async () => {
     setError(null)
@@ -125,10 +127,13 @@ function MySitesInner() {
                   </span>
                   <span className="text-muted-foreground text-xs">
                     {tp(s.plan_cd)}
+                    {fees?.[s.plan_cd]
+                      ? ` · ${feeLabel(fees[s.plan_cd]).term}`
+                      : ''}
                   </span>
                   {s.own_site_yn !== 'Y' &&
                     s.site_sts_cd !== 'WITHDRAWN' &&
-                    (fees?.[s.plan_cd] ?? 0) > 0 && (
+                    (fees?.[s.plan_cd]?.pi_amt ?? 0) > 0 && (
                       <span
                         className={
                           s.pymnt_id
@@ -149,7 +154,9 @@ function MySitesInner() {
                       className="btn btn-primary w-fit"
                       href={`/pay/${s.site_id}`}
                     >
-                      {t('payGo', { amount: fees?.[s.plan_cd] ?? '…' })}
+                      {t('payGo', {
+                        amount: fees?.[s.plan_cd]?.pi_amt ?? '…',
+                      })}
                     </Link>
                   </div>
                 )}
@@ -233,6 +240,7 @@ function SiteForm({
   const planLocked = !!site?.pymnt_id
   const tp = useTranslations('plan')
   const fees = useRegFees()
+  const feeLabel = useFeeLabel()
   const router = useRouter()
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -343,12 +351,18 @@ function SiteForm({
           disabled={planLocked}
           onChange={(e) => setPlanCd(e.target.value)}
         >
-          {APPLY_PLAN_CD.map((p) => (
-            <option key={p} value={p}>
-              {tp(p)}
-              {fees && fees[p] != null ? ` — ${fees[p]} Pi` : ''}
-            </option>
-          ))}
+          {APPLY_PLAN_CD.map((p) => {
+            const f = fees?.[p]
+            const { term, discount } = feeLabel(f)
+            return (
+              <option key={p} value={p}>
+                {tp(p)}
+                {f
+                  ? ` — ${term} · ${f.pi_amt} Pi${discount ? ` (${discount})` : ''}`
+                  : ''}
+              </option>
+            )
+          })}
         </select>
         <p className="text-muted-foreground mt-1 text-xs">
           {planLocked ? t('planLocked') : t('planHint')}

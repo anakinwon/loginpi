@@ -40,6 +40,14 @@
   .input {
     @apply w-full rounded-md border border-neutral-300 bg-transparent px-3 py-2 text-sm dark:border-neutral-700;
   }
+  /* 네이티브 select 드롭다운 — 일부 브라우저·WebView 는 목록을 밝은 배경으로 그려 흰 글씨(foreground)가 안 보인다(마스터 지적 2026-10-11).
+     목록(option)의 배경·글자색을 명시해 어디서나 대비 확보. 기본 색상 변수 그대로 */
+  select.input {
+    @apply bg-background;
+  }
+  select.input option {
+    @apply bg-neutral-900 text-neutral-100;
+  }
   .label {
     @apply mb-1 block text-sm font-medium;
   }

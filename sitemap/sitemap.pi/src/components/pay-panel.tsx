@@ -11,6 +11,7 @@ import { SitePayButton } from './site-pay-button'
 import {
   readApi,
   useApiErrorText,
+  useFeeLabel,
   useRegFees,
   type ApiErrorBody,
 } from '@/lib/client-api'
@@ -26,6 +27,7 @@ function PayPanelInner({ siteId }: { siteId: string }) {
   const ts = useTranslations('siteSts')
   const errText = useApiErrorText()
   const fees = useRegFees()
+  const feeLabel = useFeeLabel()
   const [site, setSite] = useState<OwnerSite | null>(null)
   const [error, setError] = useState<ApiErrorBody | null>(null)
 
@@ -51,7 +53,9 @@ function PayPanelInner({ siteId }: { siteId: string }) {
   if (!site)
     return <p className="text-muted-foreground text-sm">{t('loading')}</p>
 
-  const amount = fees?.[site.plan_cd] ?? null
+  const fee = fees?.[site.plan_cd]
+  const amount = fee?.pi_amt ?? null
+  const { term, discount } = feeLabel(fee)
   const payable = (PAYABLE_STS as readonly string[]).includes(site.site_sts_cd)
   // 요금표에 해당 요금제가 있고 단가 0 일 때만 "불필요" — 조회 중·조회 실패는 금액 미상으로 두고 버튼 유지(서버 prepare 가 최종 판정)
   const notRequired =
@@ -67,10 +71,18 @@ function PayPanelInner({ siteId }: { siteId: string }) {
         <dt className="text-muted-foreground">{t('status')}</dt>
         <dd>{ts(site.site_sts_cd)}</dd>
         <dt className="text-muted-foreground">{t('plan')}</dt>
-        <dd>{tp(site.plan_cd)}</dd>
+        <dd>
+          {tp(site.plan_cd)}
+          {term ? ` · ${term}` : ''}
+        </dd>
         <dt className="text-muted-foreground">{t('amount')}</dt>
         <dd className="text-lg font-semibold">
           {amount == null ? '…' : `${amount} Pi`}
+          {discount && (
+            <span className="text-muted-foreground ml-2 text-xs font-normal">
+              {discount}
+            </span>
+          )}
         </dd>
       </dl>
 

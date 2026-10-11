@@ -232,7 +232,7 @@ function SiteActions({
   const needPay =
     needVerify &&
     !site.pymnt_id &&
-    (fees == null || (fees[site.plan_cd] ?? 0) > 0)
+    (fees == null || (fees[site.plan_cd]?.pi_amt ?? 0) > 0)
   const [verified, setVerified] = useState(false)
   const memo = (
     <input

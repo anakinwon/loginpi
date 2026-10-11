@@ -20,23 +20,49 @@ export interface RegFee {
   plan_cd: PlanCd
   pi_amt: number
   fee_plan_nm: string
+  use_mon_cnt: number | null // 이용 개월수, null = 영구
+  dc_pct: number | null // 1개월 단가 대비 할인율(%), null = 표시 없음(영구·기준단가 0·할인 아님)
+}
+
+// 할인율(%) = 1 - 단가 / (1개월 기준단가 × 개월수). 영구(개월 null)는 비교 기준이 없어 미표시(PRD §3-1 "—"),
+// 기준단가 0 이거나 할인이 아니면(PRM1 처럼 월 환산이 더 비싸면) null
+export const regFeeDiscountPct = (
+  piAmt: number,
+  monPiAmt: number,
+  useMonCnt: number | null,
+) => {
+  if (useMonCnt == null) return null
+  const base = monPiAmt * useMonCnt
+  if (!(base > 0)) return null
+  const pct = Math.round((1 - piAmt / base) * 100)
+  return pct > 0 ? pct : null
 }
 
 // 요금표(REGISTER, 사용 중) — 단가 0 이면 결제 불필요
 export async function getRegFees(): Promise<RegFee[]> {
   const { data, error } = await db()
     .from('fee_plan')
-    .select('plan_cd, pi_amt, fee_plan_nm, sort_no')
+    .select('plan_cd, pi_amt, fee_plan_nm, sort_no, use_mon_cnt, mon_pi_amt')
     .eq('fee_tp_cd', 'REGISTER')
     .eq('use_yn', 'Y')
     .eq('del_yn', 'N')
     .order('sort_no')
   if (error) throw error
-  return (data ?? []).map((r) => ({
-    plan_cd: r.plan_cd as PlanCd,
-    pi_amt: Number(r.pi_amt),
-    fee_plan_nm: r.fee_plan_nm as string,
-  }))
+  return (data ?? []).map((r) => {
+    const pi_amt = Number(r.pi_amt)
+    const use_mon_cnt = r.use_mon_cnt == null ? null : Number(r.use_mon_cnt)
+    return {
+      plan_cd: r.plan_cd as PlanCd,
+      pi_amt,
+      fee_plan_nm: r.fee_plan_nm as string,
+      use_mon_cnt,
+      dc_pct: regFeeDiscountPct(
+        pi_amt,
+        Number(r.mon_pi_amt ?? 0),
+        use_mon_cnt,
+      ),
+    }
+  })
 }
 
 export async function getRegFee(planCd: string): Promise<RegFee | null> {

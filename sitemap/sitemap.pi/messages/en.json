@@ -15,6 +15,12 @@
     "BSC1": "Basic Plan 1",
     "NONE": "Free"
   },
+  "fee": {
+    "months": "{n} months",
+    "years": "{n, plural, =1 {1 year} other {# years}}",
+    "lifetime": "Lifetime",
+    "discount": "{pct}% off vs. monthly rate"
+  },
   "bubble": {
     "periodLabel": "Period",
     "period": {
@@ -239,7 +245,7 @@
     "submit": "Submit for review",
     "cancel": "Cancel",
     "plan": "Listing plan",
-    "planHint": "The plan sets your bubble size on the home screen and the review fee (Pi). Approval requires the fee to be paid.",
+    "planHint": "The plan sets your bubble size, listing period and review fee (Pi). Discounts are relative to the monthly rate. Approval requires the fee to be paid.",
     "planLocked": "Payment is complete, so the plan can no longer be changed."
   },
   "admin": {
