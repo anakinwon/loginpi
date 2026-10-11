@@ -51,3 +51,20 @@ cd sitemap/sitemap.pi && pnpm build
 - 적용된 SQL(000·001·002)은 수정 금지 — 변경은 새 `NNN_*.sql`
 - SQL Editor에서 파일 단건 실행 금지 — 마이그레이션 도구만(스키마·순서·이력 보장)
 - `.gitignore`의 `.env*`·`.vercel` 제외 규칙 유지(2026-10-11 주석 처리 사고를 원복함)
+
+## 6. 2026-10-11 저녁 상태 — 승인 전 결제(3cd69cd4) 는 **실기기 결제 테스트 전 수정 필수** (적대적 검증 53 에이전트 확정)
+
+배포는 됐지만(스테이징 success) 아래 블로커 때문에 **testnet 이라도 결제 버튼을 누르지 말 것** — 돈이 이동했는데 원장(pi_pymnt)에 안 남는 경로가 있다.
+
+| 등급 | 결함 | 위치 | 수정 |
+|---|---|---|---|
+| 블로커 | Pi API approve 를 **서버 검증보다 먼저** 호출 — metadata·소유·정가 검증 실패(400/409)해도 Pi 측은 developer_approved → 사용자 서명·온체인 전송 진행 → complete 시 RPC P0002 → 원장 공백 | `src/app/api/payments/approve/route.ts:26` | 순서 뒤집기: `GET /v2/payments/{id}` 로 선조회 → 검증 → pi_pymnt APPROVED upsert → 그 다음 approve. 검증 실패는 `POST /v2/payments/{id}/cancel` + CANCELED 기록. 헤더 주석 3행("지갑 차감은 complete 전엔 없음") 틀림 — 차감은 서명 시점 |
+| 중대 | complete 가 원장·소유자 확인 전에 Pi complete·RPC 실행(소유자 불일치 판정이 DB 갱신 뒤) | `complete/route.ts:29` | Pi complete 전에 `pi_pymnt WHERE pymnt_id AND usr_id=user.id AND sts IN (APPROVED,COMPLETED)` 선조회, RPC 에 p_usr_id 인자 추가 |
+| 중대 | 취소 경로 없음 — CANCELED 선언만, onCancel/onError·txid 없는 미완료 결제가 APPROVED 좀비로 남아 재결제 거부 가능 | `site-pay-button.tsx:76`, `pi-auth-root.tsx:11` | `POST /api/payments/cancel`(Pi API cancel + CANCELED·cncl_dtm) 신설, onCancel/onError·txid 없는 복구 경로에서 호출. approve 시 같은 site_id 에 APPROVED 다른 결제 있으면 409 |
+| 중대 | approve·RPC 가 사이트 상태(PAYABLE) 미검사 — approve~complete 사이 철회 창 | `approve/route.ts:41`, `sql/004 RPC WHERE` | PAYABLE 을 lib/site.ts 로 올려 approve 재적용, RPC WHERE 에 site_sts_cd IN (DRAFT,PENDING,REJECTED), 철회 잠금을 APPROVED 결제 존재로 확장 |
+| 중대 | PC(Google 세션)에서 결제 버튼 — window.Pi 는 일반 브라우저에도 있어 createPayment 가 예외/무응답, 안내 미표시·busy 고착 | `site-pay-button.tsx:29` | `usePiAuth().isInPiBrowser` false 면 호출 없이 piBrowserOnly 표시(UA 아님), createPayment try/catch + 타임아웃 |
+| 중대 | 관리자 UI 가 단가 0 요금제도 '미결제' 로 승인 비활성(서버는 통과) | `admin-panel.tsx:257` | /api/fee-plans 로 단가 0 이면 결제 조건 제외 |
+
+전체 결함 목록·탈락 항목: `%TEMP%/claude/.../tasks/wc3inqbms.output`(세션 산출물) 또는 워크플로 저널 `wf_bfab4749-e39/journal.jsonl`.
+
+다음 세션 순서: ① 위 6건 수정(approve 순서가 1순위) → tsc·build → 커밋·푸시·`Vercel – sitemaps: success` ② Vercel env `PI_API_KEY`(testnet 앱) 등록·Redeploy ③ Pi Browser(pinet 도메인)에서 결제 1건 → 관리자 승인 → 미결제 승인 402 확인 ④ 플레이북·ROADMAP 기록.
