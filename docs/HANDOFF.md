@@ -71,6 +71,6 @@ cd sitemap/sitemap.pi && pnpm build
 
 팀장 후속 지적(미반영, 실기기 검증 전 검토): ⓐ 같은 사이트 동시 approve 2건이 `hasOtherApprovedPayment`→upsert 사이에 둘 다 통과 가능(두 번째는 RPC P0003 으로 기록만 막힘) — `pi_pymnt` 부분 유니크 인덱스(`(meta_val->>'site_id') WHERE pymnt_sts_cd='APPROVED' AND pymnt_tp_cd='SITE_REG'`) 검토 ⓑ 결제 버튼 120초 타임아웃 뒤 재클릭 시 prepare·createPayment 재실행(Pi SDK 가 pending 있으면 거부) — 문구 보강 정도.
 
-DA 후속(2026-10-11 요금제 기간·할인 표시, sql/006): `fee_plan.use_mon_cnt`(표시용, 개월) ↔ DA 사전 D3·Phase 2 모델 `use_day_cnt`(일수, `docs/da/_workspace/20261010_sitemap-data-model/01_standards_dictionary.md`) 이중화 — Phase 2 fee_plan 통합 때 하나로 합치고 표준단어 `MON` 등재 여부 DA 판정. **prod 적용 전 da-governance-expert 리뷰 필수**. 영구(VIP) 할인은 **마스터 확정(2026-10-11)으로 10년 환산 25% 표시**(PRD §3-1 표 갱신), 프리미엄1은 3년(sql/007, 50%) — 법무 §9 #10 확정 시 문구만 재점검.
+DA 후속(2026-10-11 요금제 기간·할인 표시, sql/006): `fee_plan.use_mon_cnt`(표시용, 개월) ↔ DA 사전 D3·Phase 2 모델 `use_day_cnt`(일수, `docs/da/_workspace/20261010_sitemap-data-model/01_standards_dictionary.md`) 이중화 — Phase 2 fee_plan 통합 때 하나로 합치고 표준단어 `MON` 등재 여부 DA 판정. **prod 적용 전 da-governance-expert 리뷰 필수**. 영구(VIP) 할인은 **마스터 확정(2026-10-11)으로 10년 환산 25% 표시**(PRD §3-1 표 갱신), 프리미엄1은 3년(sql/007), 단가 조정 PRM1 64.8 Pi 40%·PRM2 90 Pi 50%(sql/008) — 법무 §9 #10 확정 시 문구만 재점검.
 
 다음 세션 순서: ① Vercel env `PI_API_KEY`(testnet 앱) 등록·Redeploy ② Pi Browser(pinet 도메인) → 내 사이트 → "심사비 결제하기" → `/pay/<id>` 에서 결제 1건 → `pi_pymnt` COMPLETED·`site_mst.pymnt_id` 확인 → 관리자 승인 ③ 미결제 신청 승인 시 402 확인, 취소 1건(onCancel → 원장 CANCELED) 확인 ④ 플레이북·ROADMAP 실기기 검증 기록.
