@@ -170,6 +170,8 @@
     "pvtRequired": "A review contact is required to submit.",
     "pubCntc": "Public contact (optional)",
     "pubHint": "Shown on the site page if provided.",
+    "mvUrl": "Redirect URL (optional)",
+    "mvHint": "An https address for regular browsers that cannot open .pi. Entering or changing it triggers a new review.",
     "saveDraft": "Save draft",
     "submit": "Submit for review",
     "cancel": "Cancel"

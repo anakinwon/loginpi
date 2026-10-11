@@ -178,6 +178,7 @@ function SiteForm({
   )
   const [pvtCntc, setPvtCntc] = useState(site?.pvt_cntc_txt ?? '')
   const [pubCntc, setPubCntc] = useState(site?.pub_cntc_txt ?? '')
+  const [mvUrl, setMvUrl] = useState(site?.site_mv_url ?? '')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -218,6 +219,7 @@ function SiteForm({
           imgUrl,
           pvtCntc,
           pubCntc,
+          mvUrl,
           submit,
         }),
       }),
@@ -366,6 +368,23 @@ function SiteForm({
           onChange={(e) => setPubCntc(e.target.value)}
         />
         <p className="text-muted-foreground mt-1 text-xs">{t('pubHint')}</p>
+      </div>
+
+      <div>
+        <label className="label" htmlFor="f-mv">
+          {t('mvUrl')}
+        </label>
+        <input
+          id="f-mv"
+          className="input"
+          type="url"
+          inputMode="url"
+          placeholder="https://"
+          maxLength={1000}
+          value={mvUrl}
+          onChange={(e) => setMvUrl(e.target.value)}
+        />
+        <p className="text-muted-foreground mt-1 text-xs">{t('mvHint')}</p>
       </div>
 
       {error && (

@@ -98,7 +98,7 @@ async function load(
   let q = db()
     .from('site_mst')
     .select(
-      'site_id, site_dom_nm, site_nm, site_ctgr_cd, site_img_url, plan_cd, own_site_yn',
+      'site_id, site_dom_nm, site_nm, site_ctgr_cd, site_img_url, site_mv_url, plan_cd, own_site_yn',
     )
     .eq('del_yn', 'N')
     .eq('site_sts_cd', 'APPROVED')
@@ -129,7 +129,8 @@ async function load(
       name: s.site_nm,
       ctgr: s.site_ctgr_cd,
       img: s.site_img_url,
-      url: REG_URL.get(s.site_dom_nm),
+      // 등록자 입력 이동 URL(site_mv_url) 우선, 없으면 정적 레지스트리 폴백(데이터 모델 §10 ④)
+      url: s.site_mv_url ?? REG_URL.get(s.site_dom_nm),
       plan: s.plan_cd,
       own: s.own_site_yn === 'Y',
       views: c.cur,

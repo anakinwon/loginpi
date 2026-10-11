@@ -62,7 +62,8 @@ export function SiteDetail({ domain }: { domain: string }) {
     return <p className="text-muted-foreground text-sm">{t('loading')}</p>
 
   const { site, viewCnt } = data
-  const url = `https://${site.site_dom_nm}`
+  // 이동 URL(등록자 입력·심사 완료) 우선, 없으면 .pi 도메인 — 이동은 클릭+안내+새 창(A-6)
+  const url = site.site_mv_url ?? `https://${site.site_dom_nm}`
   const visit = () => {
     recordStat(site.site_id, 'CLCK')
     // 새 창으로 열기 — noopener 로 이동한 사이트가 이 창(window.opener)에 접근하지 못하게
