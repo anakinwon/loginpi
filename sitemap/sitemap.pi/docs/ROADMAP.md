@@ -38,7 +38,7 @@
 - [ ] 보안 점검 — kisa-web-security-auditor. **부분** : 2026-10-09 재점검 조치(`ADMIN_PI_UIDS` 필수·비운영 DB 운영 폴백 차단)는 반영됨, 업로드·신고·검색 입력 공식 점검 기록 없음
 
 **완료 기준** : Pi Browser 실기기에서 로그인 → 등록 → 승인 → 목록·상세·방문 버튼 동작, `pnpm build` 통과
-→ `pnpm build`·`tsc` 통과(2026-10-11). **Pi Browser 실기기 로그인 ✅ 2026-10-11**(스테이징 sitemapst.vercel.app, Portal testnet 앱 등록·도메인 검증·`NEXT_PUBLIC_PI_SANDBOX=true` 후 성공). Google 실왕복·연동 ✅(로컬). 잔여 : 실기기 등록 → 승인 → 목록·상세·방문 흐름
+→ `pnpm build`·`tsc` 통과(2026-10-11). **Pi Browser 실기기 로그인 — 미증명**(2026-10-11 스테이징에서 Pi 권한 허용까지 확인됐으나 `sys_user` 에 행이 없어 서버 성립 증거 없음. 3경로 감사 후 22108f8d 수정 배포 — 재검증 대기). Google 실왕복·연동 ✅(로컬). 잔여 : 실기기 등록 → 승인 → 목록·상세·방문 흐름
 
 **후속 (HANDOFF 2026-10-11 §4, Phase 1 완료 전 처리)**
 

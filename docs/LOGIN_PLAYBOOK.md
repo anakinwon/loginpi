@@ -124,6 +124,10 @@ Q4. 결제가 있는가?                                     → Pi Browser 에�
 | `409 LINK_ALREADY_LINKED` | link-complete | 이 Google 이 이미 다른 사용자에 연동, 또는 이 사용자가 이미 Google 연동 | 의도된 차단. 본인 확인 후 DB 에서 기존 연동 `del_yn='Y'` | 설계 |
 | 빌드 실패 `ADMIN_PI_UIDS 도 필수` | 운영 빌드 | 운영 tier 에서 username 만 설정 | 첫 로그인 후 `sys_user.pi_uid` 확인해 등록 | KISA 2026-10-09 |
 | 빌드 실패 `Google 로그인은 … 세 값을 함께` | 빌드 | env 일부만 설정 | 셋 다 넣거나 셋 다 비움 | 설계 |
+| 로그인했는데 전부 "미로그인" 버튼만, 오류 문구 0건, 새로고침 반복 중 | 로컬·스테이징 | `/api/auth/**` IP 당 8회/분 초과 → 5분 차단(429)을 클라이언트가 "세션 없음"으로 처리. 로드마다 GET 3~4건이라 새로고침 2~3회면 발생 | 5분 대기 또는 dev 재시작. 22108f8d 이후 GET 은 일반 한도·dev 우회 — 재발 시 `X-RateLimit-Remaining` 헤더 확인 | 2026-10-11 |
+| Google 로그인됐는데 "Pi 계정 연동 필요"도 안 뜨고 로그아웃 버튼도 없음 | 일반 브라우저 | JWT 의 userId 가 삭제·해제된 사용자를 가리킴(연동 해제·테스트 데이터 정리 뒤) — 22108f8d 이전엔 재조회 안 함 | "Google로 로그인" 재클릭(토큰 교체). 이후 버전은 세션 조회마다 자가 치유 | 2026-10-11 |
+| Pi 세션인데 `/link` 에 "Google 로그인이 꺼져 있어 연동이 필요 없습니다" | 스테이징(Google OFF) | 발급 버튼이 `NEXT_PUBLIC_GOOGLE_LOGIN` 에 묶여 숨겨짐(설계 오류) | 22108f8d 에서 분리 — Pi 세션이면 항상 발급. 입력은 같은 DB 를 보는 다른 환경(PC 로컬)에서 가능 | 2026-10-11 |
+| 헤더는 로그인인데 보호 API 401, `sys_user` 에 행 없음 | Pi Browser | `upsertUser` 실패를 삼키고 userId='' 세션 발급(cafe 호환 기본). DB 503·스키마 미노출·FK 오류 등 | sitemap 은 `requireDbUser:true` → 503 `AUTH_DB_UNAVAILABLE` 로 드러남. Vercel 함수 로그 `[auth/pi] upsertUser 실패` 확인 | 2026-10-11 |
 | `tsc` : `token.googleSub` 가 `{}` | 개발 | `next-auth/jwt` 가 `@auth/core/jwt` 재수출이라 pnpm 격리에서 모듈 보강 미적용 | 콜백 안에서 로컬 타입(`LinkJwt`)으로 좁힘 | 2026-10-11 |
 
 ## 6. 완료 체크리스트 (실기기 — 이걸 다 통과해야 "로그인 됨")
@@ -149,4 +153,5 @@ Q4. 결제가 있는가?                                     → Pi Browser 에�
 
 | 날짜 | 내용 |
 |---|---|
-| 2026-10-11 | 최초 작성 — 결정 트리, 절대 규칙 7, 세팅 순서·예산, 구성 요소(서버·클라이언트·DB), env 표, 실패 신호 사전 17항목, 완료 체크리스트, FAQ. sitemap.pi 로그인 통합(Pi SDK + Pi OAuth + Google 연동) 구현과 동시 작성 |
+| 2026-10-11 | 3경로 감사(워크플로) 반영 — 실패 신호 4항목 추가(auth rate limit 429·삭제 사용자 JWT 고착·발급 버튼 플래그 결합·유령 세션), 환경 분리 교훈 : Google 은 PC localhost, Pi 는 Portal 등록 URL(스테이징), 연동은 같은 DB 라 교차 가능 |
+| 2026-10-11 | 최초 작성 — 결정 트리, 절대 규칙 7, 세팅 순서·예산, 구성 요소(서버·클라이언트·DB), env 표, 실패 신호 사전 21항목, 완료 체크리스트, FAQ. sitemap.pi 로그인 통합(Pi SDK + Pi OAuth + Google 연동) 구현과 동시 작성 |
