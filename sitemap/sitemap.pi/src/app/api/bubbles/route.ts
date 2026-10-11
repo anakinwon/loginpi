@@ -9,6 +9,7 @@ import samples from '@/data/sample-sites.json'
 import { apiError, db, PUBLIC_CACHE } from '@/lib/api'
 import {
   BUBBLE_DAYS,
+  MV_URL_RE,
   PLAN_CD,
   SITE_CTGR,
   type BubbleItem,
@@ -130,7 +131,10 @@ async function load(
       ctgr: s.site_ctgr_cd,
       img: s.site_img_url,
       // 등록자 입력 이동 URL(site_mv_url) 우선, 없으면 정적 레지스트리 폴백(데이터 모델 §10 ④)
-      url: s.site_mv_url ?? REG_URL.get(s.site_dom_nm),
+      url:
+        (s.site_mv_url && MV_URL_RE.test(s.site_mv_url)
+          ? s.site_mv_url
+          : null) ?? REG_URL.get(s.site_dom_nm),
       plan: s.plan_cd,
       own: s.own_site_yn === 'Y',
       views: c.cur,

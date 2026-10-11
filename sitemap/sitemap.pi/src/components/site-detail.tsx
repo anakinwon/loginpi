@@ -7,7 +7,7 @@ import { useTranslations } from 'next-intl'
 import { piFetch } from '@pi/auth/client'
 import { LoginGate } from './login-gate'
 import { readApi, useApiErrorText, type ApiErrorBody } from '@/lib/client-api'
-import { LIMITS, RPT_RSN, type PublicSite } from '@/lib/site'
+import { LIMITS, MV_URL_RE, RPT_RSN, type PublicSite } from '@/lib/site'
 
 function recordStat(siteId: string, type: 'VIEW' | 'CLCK') {
   const key = `stat:${type}:${siteId}`
@@ -63,7 +63,11 @@ export function SiteDetail({ domain }: { domain: string }) {
 
   const { site, viewCnt } = data
   // 이동 URL(등록자 입력·심사 완료) 우선, 없으면 .pi 도메인 — 이동은 클릭+안내+새 창(A-6)
-  const url = site.site_mv_url ?? `https://${site.site_dom_nm}`
+  // 렌더 시점 재검증(심층 방어) — 저장 경로(zod·DB CHECK)와 같은 https 규칙, 불일치 값은 무시
+  const url =
+    site.site_mv_url && MV_URL_RE.test(site.site_mv_url)
+      ? site.site_mv_url
+      : `https://${site.site_dom_nm}`
   const visit = () => {
     recordStat(site.site_id, 'CLCK')
     // 새 창으로 열기 — noopener 로 이동한 사이트가 이 창(window.opener)에 접근하지 못하게
