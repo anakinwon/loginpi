@@ -6,7 +6,7 @@
 
 | Phase | 이름 | 기간 | 상태 |
 |---|---|---|---|
-| 0 | 선결 | 1주 | **진행중** — 완료 2 · 부분 2 · 미착수 4 |
+| 0 | 선결 | 1주 | **진행중** — 완료 3 · 부분 1 · 미착수 4 |
 | 1 | MVP(무료 디렉터리) | 2주 | **구현 완료 · 실기기 검증 대기** — 7/8, `pnpm build` 통과(2026-10-11) |
 | 2 | 수익(부가서비스·프리미엄·멤버십·구독) | 2주 | 대기 (착수 조건 PRD §9 #2 미회신) |
 | 2+ | 장기 요금(2년·5년·10년·영구) 개시 | — | 법무·환불 확정 대기 |
@@ -17,7 +17,7 @@
 
 - [ ] A-6 공식 질의(`.pi` 간 이동·디렉터리 등재) 제출 — pi-mainnet-listing-auditor 질의문 작성 (PRD §9 #1 [확인중])
 - [ ] 유료 노출(광고) 판매 허용 여부 질의 (PRD §9 #2 [확인중] — Phase 2 착수 게이트)
-- [ ] Developer Portal sitemap.pi 앱 등록·도메인 검증, Pi API 키 발급 — `/validation-key.txt` 라우트는 구현됨, 등록·검증 완료 기록 없음(OPS_SETUP §5)
+- [x] Developer Portal sitemap.pi 앱 등록·도메인 검증, Pi API 키 발급 — testnet 앱 등록·App URL sitemapst.vercel.app·도메인 검증 통과(2026-10-11, 검증 키 커밋 c9ee2fc0). mainnet 앱은 운영 도메인 확정 후
 - [x] 별도 Supabase 프로젝트(PostgreSQL) 생성 — cafe.pi DB와 분리(확정). `sitemap_postgres`에 `sitemap_dev`·`sitemap_stg` 스키마 000→002 적용·시드 19(2026-10-11, HANDOFF §3). Data API Exposed schemas 등록 완료(2026-10-11)
 - [ ] 독립 웹서버 구축 — **부분** : Vercel 프로젝트 `sitemaps` 배포 성공(Root Directory `sitemap/sitemap.pi`). 미완 : `sitemap.pi` 도메인 연결, loginpi 프로젝트 Ignored Build Step `sitemap/**` 제외, 스테이징 Vercel env(`STAGING_SUPABASE_*`·`APP_TIER`·`SUPABASE_SCHEMA`) 등록 확인 (자체 호스팅 여부 [확인중 : 마스터])
 - [x] loginpi 워크스페이스 전환(`pnpm-workspace.yaml` packages `packages/*`·`sitemap/*`) + 루트 `tsconfig.json`·`eslint.config`·`.prettierignore`에 `packages/**`·`sitemap/**` 제외 — PRD_28 Phase 0 (e28ac56f)
@@ -38,7 +38,7 @@
 - [ ] 보안 점검 — kisa-web-security-auditor. **부분** : 2026-10-09 재점검 조치(`ADMIN_PI_UIDS` 필수·비운영 DB 운영 폴백 차단)는 반영됨, 업로드·신고·검색 입력 공식 점검 기록 없음
 
 **완료 기준** : Pi Browser 실기기에서 로그인 → 등록 → 승인 → 목록·상세·방문 버튼 동작, `pnpm build` 통과
-→ `pnpm build`·`tsc` 통과(2026-10-11, 로컬 3001 포트에서 목록·상세·검색·버블 API 동작 확인). **실기기 검증 미실시** — sys_user 개명으로 인증 경로가 바뀌어 미검증이면 완료 선언 불가(HANDOFF §4-2)
+→ `pnpm build`·`tsc` 통과(2026-10-11). **Pi Browser 실기기 로그인 ✅ 2026-10-11**(스테이징 sitemapst.vercel.app, Portal testnet 앱 등록·도메인 검증·`NEXT_PUBLIC_PI_SANDBOX=true` 후 성공). Google 실왕복·연동 ✅(로컬). 잔여 : 실기기 등록 → 승인 → 목록·상세·방문 흐름
 
 **후속 (HANDOFF 2026-10-11 §4, Phase 1 완료 전 처리)**
 
@@ -99,4 +99,5 @@
 | 2026-10-09 | 마스터 지시 반영 — 별도 Supabase·독립 웹서버, 멤버십 기간제·구독, 장기 요금 개시 조건 |
 | 2026-10-09 | 검수 반영 — Phase 2+ 진행률 행·위치, Phase 2 이름·착수 게이트·완료 기준(멤버십·구독 갱신·유예), 단가 확정 범위 |
 | 2026-10-09 | PRD_28 정합 — 워크스페이스 전환·공용 패키지 추출·리스크 갱신 |
+| 2026-10-11 | 실기기 로그인 성공(스테이징) · Portal testnet 앱 등록·도메인 검증 완료 · Google 로그인 통합(sql/003)·로컬 왕복 검증 · 로그인 플레이북·프로세스 다이어그램 연결 |
 | 2026-10-11 | 진행 상태 점검 반영 — 진행률 표(Phase 0 진행중·Phase 1 구현 완료), 착수일 확정, 완료 항목 체크(Phase 0 2건·Phase 1 7건), `@pi/payments`를 Phase 2로 이동, 시드 문구 19건 APPROVED로 정정, Phase 3 소유 검증 선행 구현 명시, HANDOFF §4 후속 항목(자격증명 교체·`public` 사본·데이터 모델 §10·DA 미결) 추가 |
