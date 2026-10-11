@@ -61,7 +61,7 @@ Pi Browser                                   일반 브라우저
 | L0 | **Identity** | `@pi/auth` : SDK 로그인(현행) + `usePiLogin`(SDK→OAuth)·`LoginGate`·`AuthStatus`·OAuth 콜백 페이지 **컴포넌트** | 현재 `sitemap/sitemap.pi/src/components/login-gate.tsx`·`auth-status.tsx`·`app/[locale]/auth/pi/callback` → 패키지로 승격 |
 | L1 | **Provision** | `scripts/new-site.mjs <domain>` : `_template` 복사·패키지명·env.example·routing·CLAUDE.md/PRD/ROADMAP/OPS 골격 생성. `scripts/db-provision.mjs` : 스키마 생성 + **Exposed schemas 등록(Supabase Management API)** + 버킷. Vercel 프로젝트 생성·env 주입은 `vercel` CLI 래퍼 | `db-migrate --app`·`promote-to-prod --app` 은 이미 범용. 오늘의 PGRST106 이 첫 자동화 대상 |
 | L2 | **Shared i18n·유틸** | `@pi/i18n`(PRD_28 §4 2차 — auth·piOAuth·apiErrors 공통 메시지 + 사이트 메시지 병합), `LazySection`·`Pagination` 승격. **UI 컴포넌트(btn·card·input)는 추출하지 않는다** — PRD_28 §4 "shadcn/ui 복사 모델이 정석" 판정 유지 | sitemap `messages` 공통 네임스페이스, `components/lazy-section.tsx`·`pagination.tsx` |
-| L3 | **Playbook** | `docs/SITE_PLAYBOOK.md` : 명령·기대 출력·실패 신호·조치 5열, 소요 시간 예산, 로그인 결정 트리(§3) 1페이지. Developer Portal 2앱 등록은 스크린샷 체크리스트(자동화 불가) | OPS_SETUP §1~7 + HANDOFF §4 + 10-11 세션 기록 |
+| L3 | **Playbook** | `docs/SITE_PLAYBOOK.md`(전체) : 명령·기대 출력·실패 신호·조치 5열, 소요 시간 예산. 로그인 장은 **`docs/LOGIN_PLAYBOOK.md` 로 선반영 완료(2026-10-11)** — 결정 트리·절대 규칙·세팅 순서·실패 신호 17항목. Developer Portal 2앱 등록은 스크린샷 체크리스트(자동화 불가) | OPS_SETUP §1~7 + HANDOFF §4 + 10-11 세션 기록 |
 | L4 | **Conformance** | `pnpm site:check` : `fetch('/api/` 잔존(piFetch 강제)·`redirect(` on null user·env 스키마↔`.env.example` 동기·i18n 죽은 키·브랜드 표기·DA 접두사·Pi 외 로그인 어휘. **승인 요청 전 선행 관문**(teamanakin-admin 승인·`-- DA-APPROVED:`·실기기 검증 규칙은 그대로) | 루트 CLAUDE.md 사고 목록 전부 규칙화 |
 
 ## 5. 단계 (플랫폼 마일스톤)
@@ -69,7 +69,7 @@ Pi Browser                                   일반 브라우저
 | 단계 | 이름 | 산출물 | 완료 기준 | 선행 |
 |---|---|---|---|---|
 | **M0** | 1호 마감 · 결정 | sitemap.pi Phase 1 실기기 검증, §3 확인(스테이징 호스트 등록 가능 여부·§11 #4 회신 경로), localhost Redirect URI 등록으로 OAuth 로컬 가동 | 실기기 로그인·등록·승인 통과, §2 1호 실측 기입 | — |
-| **M1** | Kit v1 — 추출 | L0 컴포넌트 승격, `_template` 실체화, `new-site.mjs`, PLAYBOOK v1(로그인 결정 트리 포함) | **2호 사이트 골격을 플레이북만 보고 1일 내 생성·배포·실기기 로그인** (dogfood) | M0 |
+| **M1** | Kit v1 — 추출 | L0 컴포넌트 승격, `_template` 실체화, `new-site.mjs`, PLAYBOOK v1(로그인 장은 `LOGIN_PLAYBOOK.md` 기완료) | **2호 사이트 골격을 플레이북만 보고 1일 내 생성·배포·실기기 로그인** (dogfood) | M0 |
 | **M2** | Provision 자동화 | `db-provision.mjs`(스키마·Exposed schemas·버킷), Vercel 생성·env 템플릿 주입 래퍼, 실패 신호 사전 20항목 | 3호를 **손 단계 ≤ 15** 로 구축 | M1 |
 | **M3** | Payments Kit | `@pi/payments` 레지스트리 + `fee_*` 표준 마이그레이션 템플릿(sitemap Phase 2 가 곧 Kit) | sitemap 결제 1건 + 템플릿으로 다음 사이트 결제 1건 | M1, sitemap Phase 2 착수 조건(PRD §9 #2) |
 | **M4** | Fleet Ops | 19 사이트 **배포·빌드 상태 전용** 운영 대시보드(GitHub status 루프, 사용자 데이터 미포함 — §1.1-1 통합 대시보드와 무관), 일괄 승격, 공통 i18n 동기, `site:check` CI | 파도 단위 승격이 명령 1개 | M2 |
@@ -111,5 +111,6 @@ Pi Browser                                   일반 브라우저
 | 날짜 | 내용 |
 |---|---|
 | 2026-10-11 | 최초 작성 — 1호 진단, 원칙 3, 지표, 신원 결정(사이트별 Pi OAuth·Google 매핑 폐기·허브 SSO 보류), Site Kit 5층, M0~M5, PRD_28 §8 웨이브 게이트, 이번 주 조치 |
+| 2026-10-11 | LOGIN_PLAYBOOK.md 선반영 연결(L3·M1), 신원 §3 에 Google 연동 마스터 예외(2026-10-11) 반영 |
 | 2026-10-11 | 팀장 승인(CONDITIONAL) 반영 — M1 을 M0 이후로(§2 _template 선제 작성 금지), Fleet 대시보드 범위 한정, @pi/i18n 차수 병기 |
 | 2026-10-11 | 검수 반영 — PRD_28 §1.1-1/§1.1-2/§7 충돌 명시, 허브 SSO 를 조건부 M5 로 격하, 스테이징 호스트 [확인중], 1호 수치 "추정" 표기, 17/18 수치·웨이브 명칭을 PRD_28 §8 로 통일, `@pi/ui` 제외(§4 판정 유지), CI 를 승인 대체가 아닌 선행 관문으로 정정, 프래그먼트 교환 도식 보완 |

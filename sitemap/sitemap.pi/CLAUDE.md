@@ -4,7 +4,7 @@
 
 > **우선순위** : 위 루트(loginpi) CLAUDE.md 규칙을 먼저 적용한다. 이 파일은 sitemap.pi 전용 추가 규칙만 담고, 충돌 시 루트를 따른다.
 > - 이 파일의 규칙 중 루트보다 **엄격한 제약**(Bean·토큰 어휘 금지와 Pi 직접 가격, 외부 이동 안내, 광고 라벨)은 충돌이 아니라 추가 제약으로 함께 적용한다.
-> - cafe.pi 전용 항목(PiRC2 구독 컨트랙트·카페 테마·189 locale·Bean 요금제·Google 세션 등)은 해당 기능을 도입할 때만 적용한다.
+> - cafe.pi 전용 항목(PiRC2 구독 컨트랙트·카페 테마·189 locale·Bean 요금제 등)은 해당 기능을 도입할 때만 적용한다. **Google 세션은 2026-10-11 도입**(마스터 예외 — Pi 계정 연동 전제, `docs/LOGIN_PLAYBOOK.md`) → 루트 CLAUDE.md 통합 체크 규칙(`getSessionUser` = Pi OR Google) 그대로 적용.
 
 Pi Network에서 만들어진 `.pi` 사이트를 등록·홍보하는 디렉터리 서비스.
 
@@ -79,3 +79,4 @@ pnpm dev | pnpm build | pnpm lint | pnpm tsc --noEmit | pnpm format
 | 2026-10-09 | PRD_28 v0.2 정합 — 배경을 PRD_28로 교체, sql/173 공유 전제 삭제 |
 | 2026-10-09 | 마스터 지시 — 메인 화면 버블(PRD §3-4) : 요금제 7종 크기(`site_mst.plan_cd`), 유료 노출이므로 버블마다 "광고"·요금제 배지 필수, DB 미연결 시 sites.json 폴백 |
 | 2026-10-09 | 마스터 지시 — 요금제 5단계(VIP·PRM2·PRM1·BSC2·BSC1, 면적 ×2 등비), 가상 샘플 91개는 데모 전용(DB 미시드·`SITEMAP_SHOW_SAMPLES=1`·"샘플" 배지·상세 이동 없음), 버블 글자 9px 하한·표시 단계 |
+| 2026-10-11 | 로그인 통합 — Pi SDK + Pi Sign-In(OAuth) + Google(NextAuth, 연동 코드) : src/auth.ts·lib/auth.ts·sql/003, 플레이북 docs/LOGIN_PLAYBOOK.md |

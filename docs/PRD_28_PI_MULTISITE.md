@@ -23,7 +23,7 @@
 근거 : pi-mainnet-listing-auditor 점검 2026-10-09, `MAINNET_READINESS_CHECKLIST.md` A-1~A-7
 
 1. **사이트 간 사용자 데이터 교차 조회·전송 0** — 각 사이트는 자기 Pi 앱이 authenticate한 사용자 정보만 저장·조회한다. sitemap.pi를 포함한 어떤 사이트도 다른 사이트 DB의 `pi_username`·uid·access token을 조회·보관하지 않는다(Pi Developer Terms Section 4). 제재 공유·통합 대시보드는 Section 4 공식 해석 전까지 구현 금지
-2. **로그인은 Pi 인증만** — 신규 사이트에 Google 등 Pi 외 로그인 금지(A-4)
+2. **로그인은 Pi 인증만** — 신규 사이트에 Google 등 Pi 외 로그인 금지(A-4). **예외(마스터 2026-10-11)** : sitemap.pi 는 Pi 계정 연동을 전제로 한 Google 로그인 허용 — Google 만으로 신규 계정 생성 금지, 연동 코드는 Pi Browser 로그인 사용자만 발급(`docs/LOGIN_PLAYBOOK.md`, DDL `sitemap/sitemap.pi/sql/003`). A-4 등재 심사 재점검 [TBD : pi-mainnet-listing-auditor]
 3. **거래는 Pi만** — Bean·포인트·토큰·법정화폐 결제 어휘·기능 금지, 자국 통화는 참고 환산 표시만(A-5)
 4. **교차 프로모션 금지** — 각 사이트 UI에 다른 .pi 사이트 링크·배너·추천 금지, 디렉터리 기능은 sitemap.pi 한 곳에만(A-6)
 5. **sitemap.pi 디렉터리 표기** — 자사 사이트도 일반 등재와 같은 기준으로 노출, 유료·자사 홍보 슬롯은 "광고" 라벨로 유기 순위와 분리, 외부 이동은 클릭 + 이동 고지 후에만
