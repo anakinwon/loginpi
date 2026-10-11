@@ -65,8 +65,9 @@ export function useAppUser() {
     googleUnlinked: !pi.user && status === 'authenticated' && !linkedId,
     googleEmail: session?.user?.email ?? null,
     piError: pi.error,
+    // 인자를 넘겨야 POST(/api/auth/session) → jwt trigger 'update' 로 연동 재조회(인자 없으면 GET 만 — 실측 2026-10-11)
     refreshGoogle: async () => {
-      await update()
+      await update({ linked: true })
       await refresh()
     },
   }
