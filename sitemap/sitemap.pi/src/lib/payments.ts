@@ -1,5 +1,6 @@
-// 등록 심사비 결제 서버 공용 — Pi Platform API(approve·complete) 호출, 요금표 조회, SITE_REG metadata 계약.
-//  금액은 Pi 소수(number). 서버가 fee_plan 으로 정가를 재계산해 클라이언트 금액을 신뢰하지 않는다(루트 CLAUDE.md 결제 철칙)
+// 등록 심사비 결제 서버 공용 — Pi Platform API(조회·approve·complete·cancel), 요금표 조회, SITE_REG metadata 계약, 원장 조회.
+//  금액은 Pi 소수(number). 서버가 fee_plan 으로 정가를 재계산해 클라이언트 금액을 신뢰하지 않는다(루트 CLAUDE.md 결제 철칙).
+//  순서 철칙(2026-10-11 적대적 검증) : Pi approve 는 **검증·원장 기록 뒤**에만 — approve 뒤에는 사용자 서명·전송이 진행되므로 그 전에 거부해야 지갑이 안전하다
 import 'server-only'
 import { db } from './api'
 import type { PlanCd } from './site'
@@ -47,16 +48,21 @@ export type PiApiResult =
   | { ok: true; payment: PaymentDTO }
   | { ok: false; status: number; body: string; alreadyApproved?: PaymentDTO }
 
-async function piApi(path: string, body?: unknown): Promise<PiApiResult> {
+async function piApi(
+  path: string,
+  method: 'GET' | 'POST',
+  body?: unknown,
+): Promise<PiApiResult> {
   const apiKey = process.env.PI_API_KEY
   if (!apiKey) return { ok: false, status: 500, body: 'PI_API_KEY 미설정' }
   const res = await fetch(`${PI_PAYMENTS_URL}/${path}`, {
-    method: 'POST',
+    method,
     headers: {
       Authorization: `Key ${apiKey}`,
       ...(body ? { 'Content-Type': 'application/json' } : {}),
     },
     body: body ? JSON.stringify(body) : undefined,
+    cache: 'no-store',
   })
   if (res.ok) return { ok: true, payment: (await res.json()) as PaymentDTO }
   const text = await res.text()
@@ -76,10 +82,16 @@ async function piApi(path: string, body?: unknown): Promise<PiApiResult> {
   return { ok: false, status: res.status, body: text }
 }
 
+const enc = encodeURIComponent
+// 결제 객체 조회(승인 전 검증용) — 개발자 approve 전엔 지갑 변동 없음
+export const getPiPayment = (paymentId: string) => piApi(enc(paymentId), 'GET')
 export const approvePiPayment = (paymentId: string) =>
-  piApi(`${encodeURIComponent(paymentId)}/approve`)
+  piApi(`${enc(paymentId)}/approve`, 'POST')
 export const completePiPayment = (paymentId: string, txid: string) =>
-  piApi(`${encodeURIComponent(paymentId)}/complete`, { txid })
+  piApi(`${enc(paymentId)}/complete`, 'POST', { txid })
+// 취소 — 검증 실패·사용자 취소·서명 전 이탈 복구. 실패해도 호출자는 진행(best-effort)
+export const cancelPiPayment = (paymentId: string) =>
+  piApi(`${enc(paymentId)}/cancel`, 'POST')
 
 // metadata 검증 — 형태가 맞을 때만 SiteRegMeta
 export function parseSiteRegMeta(meta: unknown): SiteRegMeta | null {
@@ -94,4 +106,60 @@ export function parseSiteRegMeta(meta: unknown): SiteRegMeta | null {
     plan_cd: m.plan_cd as PlanCd,
     usr_id: typeof m.usr_id === 'string' ? m.usr_id : '',
   }
+}
+
+export interface PymntRow {
+  pymnt_id: string
+  usr_id: string
+  pymnt_sts_cd: 'APPROVED' | 'COMPLETED' | 'CANCELED'
+  meta_val: Record<string, unknown>
+}
+
+// 원장 조회(결제자 본인 행만)
+export async function getOwnPayment(
+  paymentId: string,
+  userId: string,
+): Promise<PymntRow | null> {
+  const { data, error } = await db()
+    .from('pi_pymnt')
+    .select('pymnt_id, usr_id, pymnt_sts_cd, meta_val')
+    .eq('pymnt_id', paymentId)
+    .eq('usr_id', userId)
+    .eq('del_yn', 'N')
+    .maybeSingle<PymntRow>()
+  if (error) throw error
+  return data
+}
+
+// 같은 사이트에 진행 중(APPROVED) 인 다른 결제가 있는지 — 이중 결제 방지
+export async function hasOtherApprovedPayment(
+  siteId: string,
+  exceptPaymentId: string,
+): Promise<boolean> {
+  const { count, error } = await db()
+    .from('pi_pymnt')
+    .select('pymnt_id', { count: 'exact', head: true })
+    .eq('pymnt_tp_cd', SITE_REG)
+    .eq('pymnt_sts_cd', 'APPROVED')
+    .eq('del_yn', 'N')
+    .contains('meta_val', { site_id: siteId })
+    .neq('pymnt_id', exceptPaymentId)
+  if (error) throw error
+  return (count ?? 0) > 0
+}
+
+// 원장 상태 전이(취소) — COMPLETED 는 건드리지 않는다. 갱신 실패는 로깅(호출자는 Pi 취소가 끝난 뒤라 응답을 바꾸지 않음)
+export async function markPaymentCanceled(paymentId: string, userId: string) {
+  const { error } = await db()
+    .from('pi_pymnt')
+    .update({
+      pymnt_sts_cd: 'CANCELED',
+      cncl_dtm: new Date().toISOString(),
+      modr_id: userId,
+    })
+    .eq('pymnt_id', paymentId)
+    .eq('usr_id', userId)
+    .eq('pymnt_sts_cd', 'APPROVED')
+  if (error)
+    console.error('[payments] markPaymentCanceled', paymentId, error.message)
 }

@@ -43,10 +43,12 @@ export const apiError = createApiError({
   PAY_NOT_REQUIRED: '이 사이트는 결제가 필요하지 않습니다',
   PAY_ALREADY_PAID: '이미 결제가 완료된 신청입니다',
   PAY_SITE_MISMATCH: '결제 정보가 신청 내용과 일치하지 않습니다',
-  PAY_AMOUNT_SHORT: '결제 금액이 요금보다 적습니다',
+  PAY_AMOUNT_SHORT: '결제 금액이 요금과 다릅니다',
   PAY_PI_APPROVE_FAILED: 'Pi 결제 승인에 실패했습니다. 잠시 후 다시 시도하세요',
   PAY_PI_COMPLETE_FAILED:
     'Pi 결제 완료 처리에 실패했습니다. 잠시 후 다시 시도하세요',
+  PAY_PI_CANCEL_FAILED:
+    '결제가 이미 진행되어 취소할 수 없습니다. 다시 로그인하면 완료 처리됩니다',
 })
 
 export const db = () => getSupabaseAdmin()

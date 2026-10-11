@@ -190,7 +190,8 @@
     "verifyGuide": "도메인 소유 확인: 내 사이트의 {url} 파일에 아래 값만 게시하세요. 관리자가 심사 때 확인합니다.",
     "paid": "결제 완료",
     "unpaid": "결제 대기",
-    "payHint": "등록 심사비를 결제해야 관리자가 승인할 수 있습니다. 결제는 Pi Browser에서만 가능합니다."
+    "payHint": "등록 심사비를 결제해야 관리자가 승인할 수 있습니다. 결제는 Pi Browser에서만 가능합니다.",
+    "payGo": "심사비 {amount} Pi 결제하기"
   },
   "pay": {
     "payNow": "{plan} 심사비 {amount} Pi 결제하기",
@@ -198,7 +199,20 @@
     "done": "결제가 완료되었습니다. 관리자 승인을 기다려 주세요.",
     "cancelled": "결제가 취소되었습니다.",
     "failed": "결제 처리 중 오류가 발생했습니다.",
-    "piBrowserOnly": "결제는 Pi Browser에서만 할 수 있습니다. Pi Browser로 이 페이지를 열어 주세요."
+    "piBrowserOnly": "결제는 Pi Browser에서만 할 수 있습니다. Pi Browser로 이 페이지를 열어 주세요.",
+    "title": "등록 심사비 결제",
+    "intro": "아래 금액을 Pi로 결제하면 관리자 심사·승인이 진행됩니다. 결제는 Pi Browser에서만 가능합니다.",
+    "loading": "불러오는 중…",
+    "domain": "도메인",
+    "name": "사이트 이름",
+    "status": "상태",
+    "plan": "요금제",
+    "amount": "결제 금액",
+    "alreadyPaid": "결제가 완료된 신청입니다. 관리자 승인을 기다려 주세요.",
+    "notRequired": "이 신청은 결제가 필요하지 않습니다.",
+    "notPayable": "현재 상태에서는 결제할 수 없습니다. 내 사이트에서 신청 상태를 확인해 주세요.",
+    "backToMe": "내 사이트로",
+    "timeout": "결제 응답이 없습니다. Pi Browser에서 다시 시도해 주세요."
   },
   "form": {
     "newTitle": "사이트 등록",
@@ -296,8 +310,9 @@
     "PAY_NOT_REQUIRED": "이 사이트는 결제가 필요하지 않습니다.",
     "PAY_ALREADY_PAID": "이미 결제가 완료된 신청입니다. 요금제 변경·철회는 관리자에게 문의하세요.",
     "PAY_SITE_MISMATCH": "결제 정보가 신청 내용과 일치하지 않습니다.",
-    "PAY_AMOUNT_SHORT": "결제 금액이 요금보다 적습니다.",
+    "PAY_AMOUNT_SHORT": "결제 금액이 요금과 다릅니다.",
     "PAY_PI_APPROVE_FAILED": "Pi 결제 승인에 실패했습니다. 잠시 후 다시 시도하세요.",
-    "PAY_PI_COMPLETE_FAILED": "Pi 결제 완료 처리에 실패했습니다. 잠시 후 다시 시도하세요."
+    "PAY_PI_COMPLETE_FAILED": "Pi 결제 완료 처리에 실패했습니다. 잠시 후 다시 시도하세요.",
+    "PAY_PI_CANCEL_FAILED": "결제가 이미 진행되어 취소할 수 없습니다. 다시 로그인하면 완료 처리됩니다."
   }
 }

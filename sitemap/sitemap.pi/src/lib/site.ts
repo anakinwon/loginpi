@@ -83,6 +83,8 @@ export const DOMAIN_RE = /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.pi$/
 // 신청자가 고를 수 있는 등록 요금제(단가는 fee_plan, /api/fee-plans) — PLAN_CD 에서 NONE 제외
 export const APPLY_PLAN_CD = ['VIP', 'PRM2', 'PRM1', 'BSC2', 'BSC1'] as const
 export type ApplyPlanCd = (typeof APPLY_PLAN_CD)[number]
+// 등록 심사비 결제가 가능한 사이트 상태 — prepare·approve·RPC(sql/005)·결제 페이지가 같은 값을 쓴다
+export const PAYABLE_STS = ['DRAFT', 'PENDING', 'REJECTED'] as const satisfies readonly string[]
 // 이동 URL 형식 — DB CHECK(sql/002 site_mst_site_mv_url_check)와 동일: https + 호스트
 export const MV_URL_RE = /^https:\/\/[^\s/?#]+/
 

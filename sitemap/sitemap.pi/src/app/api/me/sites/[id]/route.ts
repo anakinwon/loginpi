@@ -1,4 +1,5 @@
-// 내 사이트 수정·제출·철회 API — PATCH /api/me/sites/<id> (로그인 + 소유자 본인)
+// 내 사이트 단건 조회·수정·제출·철회 API — GET/PATCH /api/me/sites/<id> (로그인 + 소유자 본인)
+//  GET : 결제 페이지(/pay/<id>)용 소유자 뷰(OWNER_SITE_COLS)
 //  { action:'withdraw' } → WITHDRAWN (WITHDRAWN·SUSPENDED 제외 — 정지 사이트 철회로 제재 이력 회피·도메인 재등록 방지)
 //  등록 본문(siteInputSchema) → 저장. submit=true 면 PENDING 제출, APPROVED 사이트 내용 변경은 재심사(PENDING)
 //  도메인 변경은 DRAFT·REJECTED(미노출)만, SUSPENDED·WITHDRAWN 은 수정 불가. OWNERSHIP 반려 행은 도메인 변경 불가(반려 이력 세탁 방지 → 409)
@@ -15,6 +16,7 @@ import {
   requireUser,
   uuidParam,
 } from '@/lib/api'
+import { hasOtherApprovedPayment } from '@/lib/payments'
 import {
   OPEN_STS,
   OWNER_SITE_COLS,
@@ -25,6 +27,25 @@ import {
 
 const EDITABLE: SiteSts[] = ['DRAFT', 'PENDING', 'REJECTED', 'APPROVED']
 const DOMAIN_EDITABLE: SiteSts[] = ['DRAFT', 'REJECTED']
+
+export const GET = withAuthGuard(
+  dbRoute(async (req, ctx) => {
+    const id = await uuidParam(ctx)
+    if (!id) return apiError('INVALID_INPUT', 400)
+    const user = await requireUser(req)
+    if (user instanceof NextResponse) return user
+    const { data, error } = await db()
+      .from('site_mst')
+      .select(OWNER_SITE_COLS)
+      .eq('site_id', id)
+      .eq('ownr_usr_id', user.id)
+      .eq('del_yn', 'N')
+      .maybeSingle()
+    if (error) return dbFail(error)
+    if (!data) return apiError('NOT_FOUND', 404)
+    return NextResponse.json({ site: data })
+  }),
+)
 
 export const PATCH = withAuthGuard(
   dbRoute(async (req, ctx) => {
@@ -65,6 +86,9 @@ export const PATCH = withAuthGuard(
         return apiError('INVALID_STATE', 409)
       // 결제 완료 신청은 철회 불가(결제만 날아감) — 환불 수단 확정(PRD §9 #6) 전까지 관리자 경유
       if (cur.pymnt_id && cur.site_sts_cd !== 'APPROVED')
+        return apiError('PAY_ALREADY_PAID', 409)
+      // 결제 진행 중(APPROVED 원장, complete 전)도 철회 금지 — 철회 뒤 complete 되면 돈만 받고 심사 못 하는 상태
+      if (await hasOtherApprovedPayment(cur.site_id, ''))
         return apiError('PAY_ALREADY_PAID', 409)
       patch = { site_sts_cd: 'WITHDRAWN' }
     } else {

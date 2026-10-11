@@ -2,7 +2,7 @@
 
 // 클라이언트 API 호출 공용 — JSON 응답 파싱 + 오류 코드(apiErrors.<CODE>) 번역. 인증 필요 호출은 piFetch(X-Pi-Token) 사용
 import { useTranslations } from 'next-intl'
-import { useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 export interface ApiErrorBody {
   error?: string
@@ -44,4 +44,23 @@ export function useApiErrorText() {
     },
     [t],
   )
+}
+
+export type FeeMap = Record<string, number>
+// 등록 요금표(/api/fee-plans, 공개) — 폼 요금제 선택·결제 페이지 금액·관리자 승인 게이트 공용.
+//  null = 조회 중(호출처는 "결제 필요"로 간주), {} = 조회 실패(목록·관리자는 결제 불필요로 표시, 결제 페이지는 금액 미상으로 버튼 유지). 서버가 최종 판정
+export function useRegFees(): FeeMap | null {
+  const [fees, setFees] = useState<FeeMap | null>(null)
+  useEffect(() => {
+    void readApi<{ items: { plan_cd: string; pi_amt: number }[] }>(
+      fetch('/api/fee-plans'),
+    ).then((r) => {
+      if (r.ok)
+        setFees(
+          Object.fromEntries(r.data.items.map((f) => [f.plan_cd, f.pi_amt])),
+        )
+      else setFees({})
+    })
+  }, [])
+  return fees
 }

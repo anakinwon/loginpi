@@ -190,7 +190,8 @@
     "verifyGuide": "Domain ownership check: publish only the value below at {url} on your site. An admin checks it during review.",
     "paid": "Paid",
     "unpaid": "Payment pending",
-    "payHint": "The review fee must be paid before an admin can approve. Payment works in Pi Browser only."
+    "payHint": "The review fee must be paid before an admin can approve. Payment works in Pi Browser only.",
+    "payGo": "Pay {amount} Pi review fee"
   },
   "pay": {
     "payNow": "Pay {amount} Pi review fee ({plan})",
@@ -198,7 +199,20 @@
     "done": "Payment complete. Please wait for admin approval.",
     "cancelled": "Payment was cancelled.",
     "failed": "An error occurred during payment.",
-    "piBrowserOnly": "Payments work in Pi Browser only. Please open this page in Pi Browser."
+    "piBrowserOnly": "Payments work in Pi Browser only. Please open this page in Pi Browser.",
+    "title": "Pay registration review fee",
+    "intro": "Pay the amount below in Pi and admin review will proceed. Payments work in Pi Browser only.",
+    "loading": "Loading…",
+    "domain": "Domain",
+    "name": "Site name",
+    "status": "Status",
+    "plan": "Plan",
+    "amount": "Amount",
+    "alreadyPaid": "This application is already paid. Please wait for admin approval.",
+    "notRequired": "No payment is required for this application.",
+    "notPayable": "Payment is not available in the current status. Check the application in My sites.",
+    "backToMe": "Back to My sites",
+    "timeout": "No response from payment. Please try again in Pi Browser."
   },
   "form": {
     "newTitle": "List a site",
@@ -296,8 +310,9 @@
     "PAY_NOT_REQUIRED": "This site does not require payment.",
     "PAY_ALREADY_PAID": "This application is already paid. Contact an admin to change the plan or withdraw.",
     "PAY_SITE_MISMATCH": "The payment does not match this application.",
-    "PAY_AMOUNT_SHORT": "The payment amount is less than the fee.",
+    "PAY_AMOUNT_SHORT": "Payment amount does not match the fee.",
     "PAY_PI_APPROVE_FAILED": "Pi payment approval failed. Please try again later.",
-    "PAY_PI_COMPLETE_FAILED": "Pi payment completion failed. Please try again later."
+    "PAY_PI_COMPLETE_FAILED": "Pi payment completion failed. Please try again later.",
+    "PAY_PI_CANCEL_FAILED": "The payment is already in progress and cannot be cancelled. Sign in again to finish it."
   }
 }

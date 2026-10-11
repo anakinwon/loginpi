@@ -7,7 +7,12 @@ import { useTranslations } from 'next-intl'
 import { piFetch } from '@pi/auth/client'
 import { LoginGate } from './login-gate'
 import { Pagination } from './pagination'
-import { readApi, useApiErrorText, type ApiErrorBody } from '@/lib/client-api'
+import {
+  readApi,
+  useApiErrorText,
+  useRegFees,
+  type ApiErrorBody,
+} from '@/lib/client-api'
 import {
   LIMITS,
   RJCT_RSN,
@@ -222,6 +227,12 @@ function SiteActions({
   const [rsnCont, setRsnCont] = useState('')
   // 외부 등록은 소유 확인 체크 후에만 승인 가능(서버도 ownershipVerified 없으면 400)
   const needVerify = site.own_site_yn !== 'Y'
+  // 결제 필요 = 외부 등록 · 미결제 · 단가 > 0 (요금표 조회 중엔 필요로 간주 — 서버 402 가 최종 판정)
+  const fees = useRegFees()
+  const needPay =
+    needVerify &&
+    !site.pymnt_id &&
+    (fees == null || (fees[site.plan_cd] ?? 0) > 0)
   const [verified, setVerified] = useState(false)
   const memo = (
     <input
@@ -247,14 +258,14 @@ function SiteActions({
           </label>
         )}
         {/* 외부 등록은 결제 완료 전 승인 불가(서버 402 PAYMENT_REQUIRED — 단가 0 요금제는 서버가 통과시킴) */}
-        {needVerify && !site.pymnt_id && (
+        {needPay && (
           <p className="text-xs text-amber-700 dark:text-amber-300">
             {t('unpaidNote')}
           </p>
         )}
         <button
           className="btn btn-primary w-fit"
-          disabled={needVerify && (!verified || !site.pymnt_id)}
+          disabled={(needVerify && !verified) || needPay}
           onClick={() =>
             onAct({ action: 'approve', ownershipVerified: verified })
           }

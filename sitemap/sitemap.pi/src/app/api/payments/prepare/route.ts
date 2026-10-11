@@ -12,9 +12,9 @@ import {
   requireUser,
 } from '@/lib/api'
 import { getRegFee, SITE_REG, type SiteRegMeta } from '@/lib/payments'
-import type { PlanCd, SiteSts } from '@/lib/site'
+import { PAYABLE_STS, type PlanCd, type SiteSts } from '@/lib/site'
 
-const PAYABLE: SiteSts[] = ['DRAFT', 'PENDING', 'REJECTED']
+const PAYABLE: readonly SiteSts[] = PAYABLE_STS
 const bodySchema = z.object({ siteId: z.uuid() })
 
 export const POST = withAuthGuard(

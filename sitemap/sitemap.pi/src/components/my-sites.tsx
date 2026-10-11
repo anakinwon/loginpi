@@ -5,11 +5,16 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { piFetch } from '@pi/auth/client'
-import { Link } from '@/i18n/navigation'
+import { Link, useRouter } from '@/i18n/navigation'
 import { LoginGate } from './login-gate'
 import { Pagination } from './pagination'
-import { SitePayButton } from './site-pay-button'
-import { readApi, useApiErrorText, type ApiErrorBody } from '@/lib/client-api'
+import {
+  readApi,
+  useApiErrorText,
+  useRegFees,
+  type ApiErrorBody,
+  type FeeMap,
+} from '@/lib/client-api'
 import {
   APPLY_PLAN_CD,
   DOMAIN_RE,
@@ -19,31 +24,20 @@ import {
   SITE_CTGR,
   type OwnerSite,
   type Paged,
+  PAYABLE_STS,
   type SiteSts,
   VERIFY_FILE,
 } from '@/lib/site'
 
 const EDITABLE: SiteSts[] = ['DRAFT', 'PENDING', 'REJECTED', 'APPROVED']
-// 결제 가능 상태 — 외부 등록·미결제·단가 > 0 이면 결제 버튼(승인 전 결제, 마스터 지시 2026-10-11)
-const PAYABLE: SiteSts[] = ['DRAFT', 'PENDING', 'REJECTED']
 
-type FeeMap = Record<string, number>
-// 요금표(/api/fee-plans) — 폼 요금제 선택·결제 버튼 금액 표시 공용
-function useRegFees(): FeeMap | null {
-  const [fees, setFees] = useState<FeeMap | null>(null)
-  useEffect(() => {
-    void readApi<{ items: { plan_cd: string; pi_amt: number }[] }>(
-      fetch('/api/fee-plans'),
-    ).then((r) => {
-      if (r.ok)
-        setFees(
-          Object.fromEntries(r.data.items.map((f) => [f.plan_cd, f.pi_amt])),
-        )
-      else setFees({})
-    })
-  }, [])
-  return fees
-}
+// 결제 필요 여부 — 외부 등록·미결제·결제 가능 상태·단가 > 0 (승인 전 결제, 마스터 지시 2026-10-11). 결제 자체는 /pay/<id>
+//  요금표 조회 중(null)엔 필요로 간주(admin-panel 과 동일 — 서버가 최종 판정), 조회 실패({})는 불필요
+const needsPayment = (s: OwnerSite, fees: FeeMap | null) =>
+  s.own_site_yn !== 'Y' &&
+  !s.pymnt_id &&
+  (PAYABLE_STS as readonly string[]).includes(s.site_sts_cd) &&
+  (fees == null || (fees[s.plan_cd] ?? 0) > 0)
 
 export function MySites() {
   return <LoginGate>{() => <MySitesInner />}</LoginGate>
@@ -146,21 +140,19 @@ function MySitesInner() {
                       </span>
                     )}
                 </div>
-                {s.own_site_yn !== 'Y' &&
-                  !s.pymnt_id &&
-                  PAYABLE.includes(s.site_sts_cd) &&
-                  (fees?.[s.plan_cd] ?? 0) > 0 && (
-                    <div className="mt-1 flex flex-col gap-1">
-                      <p className="text-muted-foreground text-xs">
-                        {t('payHint')}
-                      </p>
-                      <SitePayButton
-                        site={s}
-                        amount={fees?.[s.plan_cd] ?? null}
-                        onPaid={() => void load()}
-                      />
-                    </div>
-                  )}
+                {needsPayment(s, fees) && (
+                  <div className="mt-1 flex flex-col gap-1">
+                    <p className="text-muted-foreground text-xs">
+                      {t('payHint')}
+                    </p>
+                    <Link
+                      className="btn btn-primary w-fit"
+                      href={`/pay/${s.site_id}`}
+                    >
+                      {t('payGo', { amount: fees?.[s.plan_cd] ?? '…' })}
+                    </Link>
+                  </div>
+                )}
                 {s.site_sts_cd === 'REJECTED' && s.rjct_rsn_cd && (
                   <p className="text-destructive text-sm">
                     {t('rejectReason')}: {tr(s.rjct_rsn_cd)}
@@ -241,6 +233,7 @@ function SiteForm({
   const planLocked = !!site?.pymnt_id
   const tp = useTranslations('plan')
   const fees = useRegFees()
+  const router = useRouter()
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -269,7 +262,7 @@ function SiteForm({
     if (submit && !pvtCntc.trim()) return setError(t('pvtRequired'))
     setBusy(true)
     setError(null)
-    const r = await readApi(
+    const r = await readApi<{ site: OwnerSite }>(
       piFetch(site ? `/api/me/sites/${site.site_id}` : '/api/me/sites', {
         method: site ? 'PATCH' : 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -288,8 +281,11 @@ function SiteForm({
       }),
     )
     setBusy(false)
-    if (r.ok) onDone()
-    else setError(errText(r.body))
+    if (!r.ok) return setError(errText(r.body))
+    // 제출 직후 결제가 필요하면 결제 페이지로 — 승인 전 결제 흐름을 끊지 않는다
+    if (submit && needsPayment(r.data.site, fees))
+      router.push(`/pay/${r.data.site.site_id}`)
+    else onDone()
   }
 
   return (
