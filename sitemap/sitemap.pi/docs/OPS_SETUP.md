@@ -44,7 +44,8 @@ node scripts/db-migrate.mjs --app sitemap --tier dev             # baseline → 
 ## 5. Pi Developer Portal
 
 - [ ] sitemap 앱 2개 등록(testnet = 스테이징 URL, mainnet = `https://sitemap.pi`) — cafe.pi와 별도 앱이라 `pi_uid`가 다르다(사람 키는 `pi_username`)
-- [ ] 앱 URL·도메인 검증 : 앱별 키를 `PI_DOMAIN_VALIDATION_KEY`에 넣고 `/validation-key.txt` 응답 확인
+- [x] 앱 URL·도메인 검증 : testnet 앱 App URL `https://sitemapst.vercel.app`, 검증 키는 앱 루트 `validation-key.txt` 커밋(c9ee2fc0) → 통과(2026-10-11)
+- [ ] **Pi Browser 진입 도메인** : Portal 앱 화면 "Open app" 의 `<app>.pinet.com` 을 Vercel env `NEXT_PUBLIC_PI_APP_DOMAIN` 에 등록 → Redeploy. Pi Browser 실기기 테스트는 반드시 그 주소로(배포 도메인 직접 입력 시 authenticate 무응답 — LOGIN_PLAYBOOK §5)
 - [ ] API 키 → `PI_API_KEY`(Phase 2 결제부터 사용)
 - [ ] 스테이징은 `NEXT_PUBLIC_PI_SANDBOX=true`
 

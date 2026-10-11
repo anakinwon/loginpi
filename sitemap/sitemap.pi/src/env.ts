@@ -45,6 +45,8 @@ export const env = createEnv({
     NEXT_PUBLIC_PI_SANDBOX: z.enum(['true', 'false']).optional(),
     // Pi Sign-In(OAuth) Client ID — 일반 브라우저 Pi 로그인. 미설정이면 SDK 로그인만(cafe.pi 동일 규칙)
     NEXT_PUBLIC_PI_OAUTH_CLIENT_ID: z.string().optional(),
+    // Pi Browser 가 이 앱을 여는 Portal 포워딩 도메인(<app>.pinet.com, 환경별 다름) — 인증 API Origin 허용(@pi/guard withAuthGuard ③)
+    NEXT_PUBLIC_PI_APP_DOMAIN: z.string().optional(),
     // '1' 이면 클라이언트에 Google 로그인 버튼 노출(서버 env 3종과 함께 설정)
     NEXT_PUBLIC_GOOGLE_LOGIN: z.enum(['1']).optional(),
     NEXT_PUBLIC_SUPABASE_URL: z.string().url().optional(),
@@ -76,6 +78,7 @@ export const env = createEnv({
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_PI_SANDBOX: process.env.NEXT_PUBLIC_PI_SANDBOX,
     NEXT_PUBLIC_PI_OAUTH_CLIENT_ID: process.env.NEXT_PUBLIC_PI_OAUTH_CLIENT_ID,
+    NEXT_PUBLIC_PI_APP_DOMAIN: process.env.NEXT_PUBLIC_PI_APP_DOMAIN,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
   },
   // 운영 tier(@pi/db resolveDbTier 와 같은 우선순위 : APP_TIER > VERCEL_ENV)에서 관리자 username 만 있고 uid 가 없으면 빌드 실패.

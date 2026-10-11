@@ -127,9 +127,15 @@ export function withAuthGuard(handler: Handler, opts?: GuardOptions): Handler {
         const hostHostname = req.headers.get('host')?.split(':')[0] ?? ''
         const appUrl = process.env.NEXT_PUBLIC_APP_URL
         const appHostname = appUrl ? new URL(appUrl).hostname : ''
+        // ③ Pi Browser 는 앱을 Portal 이 발급한 포워딩 도메인(<app>.pinet.com)으로 연다 — Origin 은 pinet, Host 는 배포 도메인이라
+        //    ①②만으로는 로그인 POST 가 403 cross_origin_auth. 환경별로 그 도메인을 NEXT_PUBLIC_PI_APP_DOMAIN 에 둔다(cafe.pi 동일, 2026-10-11)
+        const piAppDomain = (process.env.NEXT_PUBLIC_PI_APP_DOMAIN ?? '')
+          .replace(/^https?:\/\//, '')
+          .split('/')[0]
         const allowed =
           (!!hostHostname && originHostname === hostHostname) ||
-          (!!appHostname && originHostname === appHostname)
+          (!!appHostname && originHostname === appHostname) ||
+          (!!piAppDomain && originHostname === piAppDomain)
         if (!allowed) return forbiddenResponse('cross_origin_auth')
       } catch {
         return forbiddenResponse('cross_origin_auth')
