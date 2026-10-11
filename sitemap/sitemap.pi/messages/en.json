@@ -33,7 +33,6 @@
     "own": "Own",
     "sample": "Sample",
     "sparkle": "Sparkle add-on",
-    "sampleToast": "This is a sample site — a fictional example with no detail page.",
     "legend": "Size by plan (ad/own)",
     "views": "{count} views",
     "loading": "Loading…",
@@ -46,6 +45,16 @@
     "colChg": "Change",
     "ctgrPage": "Category page",
     "ctgrBrowse": "Browse by category"
+  },
+  "ad": {
+    "title": "Put your site here",
+    "lead": "This bubble is an empty sample slot. Register your .pi site and it will appear here after review.",
+    "planLabel": "Selected slot",
+    "step1": "1. Register your site — free today",
+    "step2": "2. Operator review — once approved it appears in lists, search and bubbles",
+    "step3": "3. Paid placement (ads) plans — coming soon; free listing only until sales open",
+    "cta": "Register my site",
+    "back": "Back to bubbles"
   },
   "nav": {
     "search": "Search",

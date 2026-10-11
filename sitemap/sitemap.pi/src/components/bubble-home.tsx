@@ -42,7 +42,6 @@ export function BubbleHome() {
   const [data, setData] = useState<BubbleResponse | null>(null)
   const [error, setError] = useState<ApiErrorBody | null>(null)
   const [loading, setLoading] = useState(false)
-  const [toast, setToast] = useState(false)
   const [leave, setLeave] = useState<string | null>(null) // 이동 안내 중인 외부 주소
   const td = useTranslations('detail')
 
@@ -88,22 +87,17 @@ export function BubbleHome() {
     [t],
   )
   const planName = useCallback((it: BubbleItem) => tp(it.plan), [tp])
-  // 가상 샘플은 상세 페이지가 없으므로 이동 대신 안내(404 방지).
+  // 가상 샘플은 비어 있는 자리 — 상세 대신 "이 자리에 내 사이트를" 안내(/ad?plan=)로 등록 유도(마스터 지시 2026-10-11).
   // 연결 주소(url)가 지정된 사이트는 상세 대신 이동 안내 후 그 주소로(외부 이동은 클릭 + 안내 필수, MAINNET A-6)
   const open = useCallback(
     (domain: string) => {
       const it = data?.items.find((x) => x.domain === domain)
-      if (it?.sample) return setToast(true)
+      if (it?.sample) return router.push(`/ad?plan=${it.plan}`)
       if (it?.url) return setLeave(it.url)
       router.push(`/s/${domain}`)
     },
     [router, data],
   )
-  useEffect(() => {
-    if (!toast) return
-    const id = setTimeout(() => setToast(false), 2500)
-    return () => clearTimeout(id)
-  }, [toast])
 
   return (
     <div className="flex flex-col">
@@ -200,14 +194,6 @@ export function BubbleHome() {
           </div>
         </div>
       )}
-      {toast && (
-        <p
-          role="status"
-          className="fixed bottom-16 left-1/2 z-20 -translate-x-1/2 rounded-md bg-neutral-800 px-3 py-2 text-sm text-white shadow-lg"
-        >
-          {t('sampleToast')}
-        </p>
-      )}
 
       {error ? (
         <div className="p-4 text-sm text-red-300" role="alert">
@@ -295,22 +281,22 @@ function CtgrLinks() {
 const SiteLink = ({
   sample,
   domain,
+  plan,
   children,
 }: {
   sample?: boolean
   domain: string
+  plan: string
   children: React.ReactNode
-}) =>
-  sample ? (
-    <span className="flex items-center gap-2">{children}</span>
-  ) : (
-    <Link
-      href={`/s/${domain}`}
-      className="flex items-center gap-2 hover:underline"
-    >
-      {children}
-    </Link>
-  )
+}) => (
+  <Link
+    // 샘플은 비어 있는 자리 → 등록 안내(/ad), 실사이트는 상세
+    href={sample ? `/ad?plan=${plan}` : `/s/${domain}`}
+    className="flex items-center gap-2 hover:underline"
+  >
+    {children}
+  </Link>
+)
 
 // 표 보기 — 버블의 키보드·스크린리더 대안. 크기·요금제·조회수·증감 정렬 + 반응형 페이지네이션(클라이언트 페이지)
 function BubbleTable({
@@ -404,7 +390,11 @@ function BubbleTable({
                 </td>
                 <td className="max-w-0 px-2 py-2">
                   {/* 가상 샘플은 상세가 없으므로 링크 없이 표시 */}
-                  <SiteLink sample={it.sample} domain={it.domain}>
+                  <SiteLink
+                    sample={it.sample}
+                    domain={it.domain}
+                    plan={it.plan}
+                  >
                     {it.img ? (
                       <img
                         src={it.img}
