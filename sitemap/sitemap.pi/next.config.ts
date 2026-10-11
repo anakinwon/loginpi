@@ -22,6 +22,8 @@ const CSP_REPORT_ONLY = [
 const nextConfig: NextConfig = {
   turbopack: { root: repoRoot },
   outputFileTracingRoot: repoRoot,
+  // Portal 도메인 검증 키 파일(앱 루트, env 미설정 시 폴백)을 서버리스 번들에 포함
+  outputFileTracingIncludes: { '/validation-key.txt': ['./validation-key.txt'] },
   poweredByHeader: false,
   async headers() {
     return [
