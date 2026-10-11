@@ -141,6 +141,18 @@ function SiteQueue() {
               {s.own_site_yn === 'Y' && (
                 <span className="text-xs text-violet-400">{t('ownSite')}</span>
               )}
+              <span className="text-muted-foreground text-xs">{s.plan_cd}</span>
+              {s.own_site_yn !== 'Y' && (
+                <span
+                  className={
+                    s.pymnt_id
+                      ? 'rounded bg-emerald-100 px-2 py-0.5 text-xs text-emerald-800 dark:bg-emerald-900 dark:text-emerald-100'
+                      : 'rounded bg-amber-100 px-2 py-0.5 text-xs text-amber-800 dark:bg-amber-900 dark:text-amber-100'
+                  }
+                >
+                  {s.pymnt_id ? t('paid') : t('unpaid')}
+                </span>
+              )}
             </div>
             <p className="text-muted-foreground">
               {t('owner')}: {s.sys_user?.pi_username ?? '-'} · {t('pvtCntc')}:{' '}
@@ -234,9 +246,15 @@ function SiteActions({
             {t('ownershipVerified')}
           </label>
         )}
+        {/* 외부 등록은 결제 완료 전 승인 불가(서버 402 PAYMENT_REQUIRED — 단가 0 요금제는 서버가 통과시킴) */}
+        {needVerify && !site.pymnt_id && (
+          <p className="text-xs text-amber-700 dark:text-amber-300">
+            {t('unpaidNote')}
+          </p>
+        )}
         <button
           className="btn btn-primary w-fit"
-          disabled={needVerify && !verified}
+          disabled={needVerify && (!verified || !site.pymnt_id)}
           onClick={() =>
             onAct({ action: 'approve', ownershipVerified: verified })
           }

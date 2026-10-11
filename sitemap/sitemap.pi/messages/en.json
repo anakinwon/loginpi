@@ -50,9 +50,9 @@
     "title": "Put your site here",
     "lead": "This bubble is an empty sample slot. Register your .pi site and it will appear here after review.",
     "planLabel": "Selected slot",
-    "step1": "1. Register your site — free today",
+    "step1": "1. Register your site — choose a plan and pay the review fee (Pi)",
     "step2": "2. Operator review — once approved it appears in lists, search and bubbles",
-    "step3": "3. Paid placement (ads) plans — coming soon; free listing only until sales open",
+    "step3": "3. After approval, your site appears in the home bubbles, lists and search at the chosen plan size",
     "cta": "Register my site",
     "back": "Back to bubbles"
   },
@@ -187,7 +187,18 @@
     "withdraw": "Withdraw",
     "view": "Public page",
     "withdrawConfirm": "Withdraw the listing for {domain}? It will be removed from the directory.",
-    "verifyGuide": "Domain ownership check: publish only the value below at {url} on your site. An admin checks it during review."
+    "verifyGuide": "Domain ownership check: publish only the value below at {url} on your site. An admin checks it during review.",
+    "paid": "Paid",
+    "unpaid": "Payment pending",
+    "payHint": "The review fee must be paid before an admin can approve. Payment works in Pi Browser only."
+  },
+  "pay": {
+    "payNow": "Pay {amount} Pi review fee ({plan})",
+    "paying": "Processing payment…",
+    "done": "Payment complete. Please wait for admin approval.",
+    "cancelled": "Payment was cancelled.",
+    "failed": "An error occurred during payment.",
+    "piBrowserOnly": "Payments work in Pi Browser only. Please open this page in Pi Browser."
   },
   "form": {
     "newTitle": "List a site",
@@ -212,7 +223,10 @@
     "mvHint": "An https address for regular browsers that cannot open .pi. Entering or changing it triggers a new review.",
     "saveDraft": "Save draft",
     "submit": "Submit for review",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "plan": "Listing plan",
+    "planHint": "The plan sets your bubble size on the home screen and the review fee (Pi). Approval requires the fee to be paid.",
+    "planLocked": "Payment is complete, so the plan can no longer be changed."
   },
   "admin": {
     "title": "Admin",
@@ -236,7 +250,10 @@
     "verifyStep1": "Open this address in Pi Browser and confirm it matches the token exactly",
     "verifyStep2": "If it differs or does not open, reject with reason \"Domain ownership not verified\" — the same owner cannot resubmit this domain",
     "verifyStep3": "Confirm the site content matches the listing and the prohibited-category rules",
-    "ownershipVerified": "I confirmed the ownership file matches the token"
+    "ownershipVerified": "I confirmed the ownership file matches the token",
+    "paid": "Paid",
+    "unpaid": "Unpaid",
+    "unpaidNote": "Cannot approve: the review fee has not been paid (pay first, then approve)."
   },
   "apiErrors": {
     "AUTH_REQUIRED": "Sign-in required",
@@ -274,6 +291,13 @@
     "LINK_CODE_INVALID": "The link code is invalid or expired. Issue a new one in Pi Browser.",
     "LINK_ALREADY_LINKED": "This account is already linked.",
     "LINK_CODE_GEN_FAILED": "Could not create a link code. Please try again later.",
-    "AUTH_DB_UNAVAILABLE": "Could not save your account, so sign-in failed. Please try again later."
+    "AUTH_DB_UNAVAILABLE": "Could not save your account, so sign-in failed. Please try again later.",
+    "PAYMENT_REQUIRED": "Cannot approve: the registration review fee has not been paid.",
+    "PAY_NOT_REQUIRED": "This site does not require payment.",
+    "PAY_ALREADY_PAID": "This application is already paid. Contact an admin to change the plan or withdraw.",
+    "PAY_SITE_MISMATCH": "The payment does not match this application.",
+    "PAY_AMOUNT_SHORT": "The payment amount is less than the fee.",
+    "PAY_PI_APPROVE_FAILED": "Pi payment approval failed. Please try again later.",
+    "PAY_PI_COMPLETE_FAILED": "Pi payment completion failed. Please try again later."
   }
 }

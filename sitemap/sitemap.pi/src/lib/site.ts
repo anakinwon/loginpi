@@ -80,6 +80,9 @@ export const IMG_MIME = [
 
 // 단일 라벨 .pi 도메인, 소문자 — DB CHECK(site_mst_site_dom_nm_check)와 동일
 export const DOMAIN_RE = /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.pi$/
+// 신청자가 고를 수 있는 등록 요금제(단가는 fee_plan, /api/fee-plans) — PLAN_CD 에서 NONE 제외
+export const APPLY_PLAN_CD = ['VIP', 'PRM2', 'PRM1', 'BSC2', 'BSC1'] as const
+export type ApplyPlanCd = (typeof APPLY_PLAN_CD)[number]
 // 이동 URL 형식 — DB CHECK(sql/002 site_mst_site_mv_url_check)와 동일: https + 호스트
 export const MV_URL_RE = /^https:\/\/[^\s/?#]+/
 
@@ -131,6 +134,8 @@ export const siteInputSchema = z
       .optional(),
     pvtCntc: optText(LIMITS.cntcMax),
     pubCntc: optText(LIMITS.cntcMax),
+    // 등록 요금제(승인 전 결제 대상, 마스터 지시 2026-10-11) — 신청자는 유료 5단계만 선택, NONE 은 자사(관리자) 전용
+    planCd: z.enum(APPLY_PLAN_CD).default('BSC1'),
     submit: z.boolean().default(false),
   })
   .refine((v) => !v.submit || !!v.pvtCntc, {
@@ -190,13 +195,16 @@ export interface PublicSite {
 }
 
 // 소유자·관리자 조회 컬럼 — 비공개 연락처·상태·반려 사유 포함
-export const OWNER_SITE_COLS = `${PUBLIC_SITE_COLS}, site_sts_cd, rjct_rsn_cd, rjct_rsn_cont, pvt_cntc_txt, reg_dtm, mod_dtm`
+export const OWNER_SITE_COLS = `${PUBLIC_SITE_COLS}, site_sts_cd, rjct_rsn_cd, rjct_rsn_cont, pvt_cntc_txt, plan_cd, pymnt_id, pay_dtm, reg_dtm, mod_dtm`
 
-// 소유자·관리자 응답 — 비공개 연락처·상태·반려 사유 포함
+// 소유자·관리자 응답 — 비공개 연락처·상태·반려 사유·요금제·결제 포함
 export interface OwnerSite extends PublicSite {
   // 도메인 소유 확인 토큰(서버 계산값, 컬럼 아님) — 소유자·관리자 목록 응답에만
   vrfy_tkn?: string | null
   site_sts_cd: SiteSts
+  plan_cd: PlanCd // 등록 요금제(신청자 선택)
+  pymnt_id: string | null // 등록 심사비 결제ID — null 이면 미결제(외부 등록은 승인 불가)
+  pay_dtm: string | null
   rjct_rsn_cd: string | null
   rjct_rsn_cont: string | null
   pvt_cntc_txt: string | null

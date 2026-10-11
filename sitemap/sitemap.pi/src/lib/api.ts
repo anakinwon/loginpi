@@ -38,6 +38,15 @@ export const apiError = createApiError({
   LINK_ALREADY_LINKED: '이미 연동된 계정입니다',
   LINK_CODE_GEN_FAILED:
     '연동 코드를 만들지 못했습니다. 잠시 후 다시 시도하세요',
+  // 등록 심사비 결제(sql/004, 마스터 지시 2026-10-11)
+  PAYMENT_REQUIRED: '등록 심사비 결제가 완료되지 않아 승인할 수 없습니다',
+  PAY_NOT_REQUIRED: '이 사이트는 결제가 필요하지 않습니다',
+  PAY_ALREADY_PAID: '이미 결제가 완료된 신청입니다',
+  PAY_SITE_MISMATCH: '결제 정보가 신청 내용과 일치하지 않습니다',
+  PAY_AMOUNT_SHORT: '결제 금액이 요금보다 적습니다',
+  PAY_PI_APPROVE_FAILED: 'Pi 결제 승인에 실패했습니다. 잠시 후 다시 시도하세요',
+  PAY_PI_COMPLETE_FAILED:
+    'Pi 결제 완료 처리에 실패했습니다. 잠시 후 다시 시도하세요',
 })
 
 export const db = () => getSupabaseAdmin()

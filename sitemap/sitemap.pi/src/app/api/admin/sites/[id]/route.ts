@@ -6,6 +6,7 @@
 //  suspend : APPROVED → SUSPENDED (관리자 직권) / restore : SUSPENDED → APPROVED
 import { NextResponse } from 'next/server'
 import { withAuthGuard } from '@pi/guard'
+import { getRegFee } from '@/lib/payments'
 import {
   apiError,
   db,
@@ -39,7 +40,9 @@ export const PATCH = withAuthGuard(
 
     const { data: cur, error: curErr } = await db()
       .from('site_mst')
-      .select('site_id, site_dom_nm, site_sts_cd, apv_dtm, own_site_yn')
+      .select(
+        'site_id, site_dom_nm, site_sts_cd, apv_dtm, own_site_yn, plan_cd, pymnt_id',
+      )
       .eq('site_id', id)
       .eq('del_yn', 'N')
       .maybeSingle<{
@@ -48,6 +51,8 @@ export const PATCH = withAuthGuard(
         site_sts_cd: SiteSts
         apv_dtm: string | null
         own_site_yn: 'Y' | 'N'
+        plan_cd: string
+        pymnt_id: string | null
       }>()
     if (curErr) return dbFail(curErr)
     if (!cur) return apiError('NOT_FOUND', 404)
@@ -59,6 +64,11 @@ export const PATCH = withAuthGuard(
       body.ownershipVerified !== true
     )
       return apiError('OWNERSHIP_NOT_VERIFIED', 400)
+    // 승인 전 요금 결제 게이트(마스터 지시 2026-10-11) — 외부 등록은 요금제 단가 > 0 이면 결제 완료(pymnt_id) 필수
+    if (body.action === 'approve' && cur.own_site_yn !== 'Y' && !cur.pymnt_id) {
+      const fee = await getRegFee(cur.plan_cd)
+      if (!fee || fee.pi_amt > 0) return apiError('PAYMENT_REQUIRED', 402)
+    }
 
     const now = new Date().toISOString()
     const patch: Record<string, unknown> =

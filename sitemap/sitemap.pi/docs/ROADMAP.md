@@ -47,6 +47,7 @@
 - [ ] `public` 스키마에 남은 동일 구조 테이블 5개(`schema_migrations` 없음, 마이그레이션 도구 외 생성) 처리 방침 — 운영 선행이면 유지, 아니면 삭제 [확인중 : 마스터]
 - [ ] 데이터 모델 §10 후속 — ② 신고 RPC 전환 ✅(2026-10-11, `fn_prcs_site_rpt` 호출·보상 코드 삭제), ③ `site_mv_url` 입력 ✅(2026-10-11, 스키마 `mvUrl`·등록/수정 저장·공개 컬럼 — 폼 입력란·상세 이동 버튼 반영은 ④와 함께), ④ 버블 URL 대체 ✅(2026-10-11, `site_mv_url` 우선·정적 폴백 유지 + 등록 폼 입력란·상세 이동 버튼 반영), ⑤ OWNERSHIP 재제출 확장
 - [ ] DA 미결 — #18(cafe DB 개명 선행 여부), 정본 개정 제안 P-1~P-7·D-2(데이터 모델 §12) [확인중 : 마스터]
+- [x] **승인 전 요금 결제**(마스터 지시 2026-10-11, PRD v0.8) — pi-db/010 `pi_pymnt` · sitemap/004 `fee_plan` + `site_mst.pymnt_id`, 결제 API prepare/approve/complete(metadata.type `SITE_REG`), 승인 게이트 402 `PAYMENT_REQUIRED`, 폼 요금제 선택·결제 버튼. 실기기 결제 검증 대기(스테이징 Vercel env `PI_API_KEY` 필요)
 
 ## Phase 2 — 수익
 

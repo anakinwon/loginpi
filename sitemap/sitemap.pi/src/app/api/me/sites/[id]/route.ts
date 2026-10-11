@@ -42,7 +42,9 @@ export const PATCH = withAuthGuard(
 
     const { data: cur, error: curErr } = await db()
       .from('site_mst')
-      .select('site_id, site_dom_nm, site_sts_cd, rjct_rsn_cd')
+      .select(
+        'site_id, site_dom_nm, site_sts_cd, rjct_rsn_cd, plan_cd, pymnt_id',
+      )
       .eq('site_id', id)
       .eq('ownr_usr_id', user.id)
       .eq('del_yn', 'N')
@@ -51,6 +53,8 @@ export const PATCH = withAuthGuard(
         site_dom_nm: string
         site_sts_cd: SiteSts
         rjct_rsn_cd: string | null
+        plan_cd: string
+        pymnt_id: string | null
       }>()
     if (curErr) return dbFail(curErr)
     if (!cur) return apiError('NOT_FOUND', 404)
@@ -59,6 +63,9 @@ export const PATCH = withAuthGuard(
     if (siteActionSchema.safeParse(raw).success) {
       if (cur.site_sts_cd === 'WITHDRAWN' || cur.site_sts_cd === 'SUSPENDED')
         return apiError('INVALID_STATE', 409)
+      // 결제 완료 신청은 철회 불가(결제만 날아감) — 환불 수단 확정(PRD §9 #6) 전까지 관리자 경유
+      if (cur.pymnt_id && cur.site_sts_cd !== 'APPROVED')
+        return apiError('PAY_ALREADY_PAID', 409)
       patch = { site_sts_cd: 'WITHDRAWN' }
     } else {
       const parsed = siteInputSchema.safeParse(raw)
@@ -75,6 +82,9 @@ export const PATCH = withAuthGuard(
         return apiError('DOMAIN_REJECTED_OWNERSHIP', 409)
       if (body.imgUrl && !isOwnImgUrl(body.imgUrl, user.id))
         return apiError('IMG_URL_INVALID', 400)
+      // 결제 완료 후 요금제 변경 불가(결제 금액 = 요금제 단가)
+      if (cur.pymnt_id && body.planCd !== cur.plan_cd)
+        return apiError('PAY_ALREADY_PAID', 409)
       // 제출 또는 노출 중 내용 변경 → 재심사. 그 외(DRAFT·PENDING·REJECTED 저장)는 상태 유지
       const nextSts: SiteSts =
         body.submit || cur.site_sts_cd === 'APPROVED'
@@ -94,6 +104,7 @@ export const PATCH = withAuthGuard(
         site_desc: body.desc ?? null,
         site_img_url: body.imgUrl ?? null,
         site_mv_url: body.mvUrl ?? null,
+        plan_cd: body.planCd,
         pvt_cntc_txt: body.pvtCntc ?? null,
         pub_cntc_txt: body.pubCntc ?? null,
         site_sts_cd: nextSts,

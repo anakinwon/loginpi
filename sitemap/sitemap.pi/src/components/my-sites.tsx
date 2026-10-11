@@ -8,8 +8,10 @@ import { piFetch } from '@pi/auth/client'
 import { Link } from '@/i18n/navigation'
 import { LoginGate } from './login-gate'
 import { Pagination } from './pagination'
+import { SitePayButton } from './site-pay-button'
 import { readApi, useApiErrorText, type ApiErrorBody } from '@/lib/client-api'
 import {
+  APPLY_PLAN_CD,
   DOMAIN_RE,
   isPiBrandDomain,
   LIMITS,
@@ -22,6 +24,26 @@ import {
 } from '@/lib/site'
 
 const EDITABLE: SiteSts[] = ['DRAFT', 'PENDING', 'REJECTED', 'APPROVED']
+// 결제 가능 상태 — 외부 등록·미결제·단가 > 0 이면 결제 버튼(승인 전 결제, 마스터 지시 2026-10-11)
+const PAYABLE: SiteSts[] = ['DRAFT', 'PENDING', 'REJECTED']
+
+type FeeMap = Record<string, number>
+// 요금표(/api/fee-plans) — 폼 요금제 선택·결제 버튼 금액 표시 공용
+function useRegFees(): FeeMap | null {
+  const [fees, setFees] = useState<FeeMap | null>(null)
+  useEffect(() => {
+    void readApi<{ items: { plan_cd: string; pi_amt: number }[] }>(
+      fetch('/api/fee-plans'),
+    ).then((r) => {
+      if (r.ok)
+        setFees(
+          Object.fromEntries(r.data.items.map((f) => [f.plan_cd, f.pi_amt])),
+        )
+      else setFees({})
+    })
+  }, [])
+  return fees
+}
 
 export function MySites() {
   return <LoginGate>{() => <MySitesInner />}</LoginGate>
@@ -36,6 +58,8 @@ function MySitesInner() {
   const [data, setData] = useState<Paged<OwnerSite> | null>(null)
   const [error, setError] = useState<ApiErrorBody | null>(null)
   const [editing, setEditing] = useState<OwnerSite | 'new' | null>(null)
+  const tp = useTranslations('plan')
+  const fees = useRegFees()
 
   const load = useCallback(async () => {
     setError(null)
@@ -105,7 +129,38 @@ function MySitesInner() {
                   <span className="rounded bg-neutral-100 px-2 py-0.5 text-xs dark:bg-neutral-800">
                     {ts(s.site_sts_cd)}
                   </span>
+                  <span className="text-muted-foreground text-xs">
+                    {tp(s.plan_cd)}
+                  </span>
+                  {s.own_site_yn !== 'Y' &&
+                    s.site_sts_cd !== 'WITHDRAWN' &&
+                    (fees?.[s.plan_cd] ?? 0) > 0 && (
+                      <span
+                        className={
+                          s.pymnt_id
+                            ? 'rounded bg-emerald-100 px-2 py-0.5 text-xs text-emerald-800 dark:bg-emerald-900 dark:text-emerald-100'
+                            : 'rounded bg-amber-100 px-2 py-0.5 text-xs text-amber-800 dark:bg-amber-900 dark:text-amber-100'
+                        }
+                      >
+                        {s.pymnt_id ? t('paid') : t('unpaid')}
+                      </span>
+                    )}
                 </div>
+                {s.own_site_yn !== 'Y' &&
+                  !s.pymnt_id &&
+                  PAYABLE.includes(s.site_sts_cd) &&
+                  (fees?.[s.plan_cd] ?? 0) > 0 && (
+                    <div className="mt-1 flex flex-col gap-1">
+                      <p className="text-muted-foreground text-xs">
+                        {t('payHint')}
+                      </p>
+                      <SitePayButton
+                        site={s}
+                        amount={fees?.[s.plan_cd] ?? null}
+                        onPaid={() => void load()}
+                      />
+                    </div>
+                  )}
                 {s.site_sts_cd === 'REJECTED' && s.rjct_rsn_cd && (
                   <p className="text-destructive text-sm">
                     {t('rejectReason')}: {tr(s.rjct_rsn_cd)}
@@ -134,10 +189,10 @@ function MySitesInner() {
                   )}
                   {s.site_sts_cd !== 'WITHDRAWN' &&
                     s.site_sts_cd !== 'SUSPENDED' && (
-                    <button className="btn" onClick={() => void withdraw(s)}>
-                      {t('withdraw')}
-                    </button>
-                  )}
+                      <button className="btn" onClick={() => void withdraw(s)}>
+                        {t('withdraw')}
+                      </button>
+                    )}
                   {s.site_sts_cd === 'APPROVED' && (
                     <Link className="btn" href={`/s/${s.site_dom_nm}`}>
                       {t('view')}
@@ -179,6 +234,13 @@ function SiteForm({
   const [pvtCntc, setPvtCntc] = useState(site?.pvt_cntc_txt ?? '')
   const [pubCntc, setPubCntc] = useState(site?.pub_cntc_txt ?? '')
   const [mvUrl, setMvUrl] = useState(site?.site_mv_url ?? '')
+  // 등록 요금제 — 신청자는 유료 5단계 중 선택. 결제 완료 후엔 변경 불가(서버 409)
+  const [planCd, setPlanCd] = useState<string>(
+    site?.plan_cd && site.plan_cd !== 'NONE' ? site.plan_cd : 'BSC1',
+  )
+  const planLocked = !!site?.pymnt_id
+  const tp = useTranslations('plan')
+  const fees = useRegFees()
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -220,6 +282,7 @@ function SiteForm({
           pvtCntc,
           pubCntc,
           mvUrl,
+          planCd,
           submit,
         }),
       }),
@@ -271,6 +334,29 @@ function SiteForm({
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
+      </div>
+
+      <div>
+        <label className="label" htmlFor="f-plan">
+          {t('plan')}
+        </label>
+        <select
+          id="f-plan"
+          className="input"
+          value={planCd}
+          disabled={planLocked}
+          onChange={(e) => setPlanCd(e.target.value)}
+        >
+          {APPLY_PLAN_CD.map((p) => (
+            <option key={p} value={p}>
+              {tp(p)}
+              {fees && fees[p] != null ? ` — ${fees[p]} Pi` : ''}
+            </option>
+          ))}
+        </select>
+        <p className="text-muted-foreground mt-1 text-xs">
+          {planLocked ? t('planLocked') : t('planHint')}
+        </p>
       </div>
 
       <div>
