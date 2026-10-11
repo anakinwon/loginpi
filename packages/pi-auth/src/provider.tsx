@@ -44,6 +44,15 @@ const PiAuthContext = createContext<PiAuthContextValue | null>(null)
 const safeNextHere = (next: string | null) =>
   safeNext(next, window.location.origin)
 
+// 진단 모드 — URL 에 ?pidebug=1 이 있으면 timeout·SDK 부재도 화면에 표시(UA 는 표시용, 판정에 쓰지 않음)
+function debugMode(): boolean {
+  try {
+    return new URLSearchParams(window.location.search).has('pidebug')
+  } catch {
+    return false
+  }
+}
+
 function detectSandbox(): boolean {
   const { hostname } = window.location
   if (hostname === 'localhost' || hostname === '127.0.0.1') return true
@@ -99,6 +108,11 @@ export function PiAuthProvider({
     async (opts?: { silent?: boolean }): Promise<PiSessionUser | null> => {
       // 가드는 window.Pi 존재만 — UA 사전 차단 금지. 성공 여부로만 isInPiBrowser 판정
       if (!window.Pi) {
+        // 진단 모드(?pidebug=1): SDK 미로드 사실을 화면에 — 평소엔 조용히(일반 브라우저 정상 경로)
+        if (debugMode())
+          setError(
+            '진단: Pi SDK 없음(window.Pi undefined) — sdk.minepi.com 차단 또는 스크립트 미로드',
+          )
         setIsInPiBrowser(false)
         setIsLoading(false)
         return null
@@ -171,7 +185,13 @@ export function PiAuthProvider({
       } catch (err) {
         const msg =
           err instanceof Error ? err.message : 'Pi 인증 중 오류가 발생했습니다'
+        // timeout 은 평소 비표시(일반 브라우저는 매 로드마다 20초 뒤 timeout 이 정상). ?pidebug=1 이면 진단 정보 표시 —
+        // Pi Browser 에서 authenticate 가 무응답인 원인(앱 미등록 URL·sandbox 불일치·SDK 버전)을 실기기에서 읽기 위함(2026-10-11)
         if (msg !== 'timeout') setError(msg)
+        else if (debugMode())
+          setError(
+            `진단: Pi 인증 응답 없음(${AUTH_TIMEOUT_MS / 1000}초) — origin=${window.location.origin} sandbox=${detectSandbox()} Pi=${typeof window.Pi} ua=${navigator.userAgent.slice(0, 90)}`,
+          )
         setIsInPiBrowser(false)
         return null
       } finally {
