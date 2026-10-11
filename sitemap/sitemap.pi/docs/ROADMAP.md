@@ -104,3 +104,4 @@
 | 2026-10-11 | 실기기 로그인 성공(스테이징) · Portal testnet 앱 등록·도메인 검증 완료 · Google 로그인 통합(sql/003)·로컬 왕복 검증 · 로그인 플레이북·프로세스 다이어그램 연결 |
 | 2026-10-11 | 진행 상태 점검 반영 — 진행률 표(Phase 0 진행중·Phase 1 구현 완료), 착수일 확정, 완료 항목 체크(Phase 0 2건·Phase 1 7건), `@pi/payments`를 Phase 2로 이동, 시드 문구 19건 APPROVED로 정정, Phase 3 소유 검증 선행 구현 명시, HANDOFF §4 후속 항목(자격증명 교체·`public` 사본·데이터 모델 §10·DA 미결) 추가 |
 | 2026-10-11 | 승인 전 결제 보강 — 적대적 검증 블로커 6건 반영(approve 순서·complete 선조회·cancel API·PAYABLE·isInPiBrowser·단가 0), 전용 결제 페이지 `/pay/<siteId>`, sql/005 |
+| 2026-10-11 | 마스터 지시 — 요금제에 기간·1개월 요금 대비 할인율 표시(sql/006 `fee_plan.use_mon_cnt`·`mon_pi_amt`, 서버 계산 `dc_pct`, 폼 선택지·내 사이트·결제 페이지), select 드롭다운 글자색 보정(`select.input option`) |
