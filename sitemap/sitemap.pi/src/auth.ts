@@ -52,9 +52,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (account?.provider === 'google' && profile?.sub) {
         t.googleSub = profile.sub
         t.userId = await findLinkedUserId(profile.sub)
-      } else if (t.googleSub && (trigger === 'update' || !t.userId)) {
-        // 연동 여부 재조회 — ① link-complete 뒤 클라이언트 update(data)(POST → trigger 'update')
-        // ② 미연동 토큰은 세션 GET 때마다 자가 치유(연동되면 userId 가 박혀 이후 조회 없음). 실측 2026-10-11: 인자 없는 update() 는 GET 이라 ①만으론 반영 안 됨
+      } else if (t.googleSub) {
+        // 세션 조회마다 연동 재확인(쿼리 1건) — 연동·해제·사용자 삭제가 즉시 반영된다.
+        // 실측 2026-10-11: userId 가 있을 때 건너뛰면 삭제된 사용자를 가리키는 토큰이 영구 고착(/me null·폼 미노출·409)
+        void trigger
         t.userId = await findLinkedUserId(t.googleSub)
       }
       return t

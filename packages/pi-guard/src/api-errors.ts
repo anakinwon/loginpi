@@ -24,6 +24,8 @@ export const AUTH_ERRORS = {
   AUTH_PI_ACCOUNT_CONFLICT:
     '이미 등록된 Pi 계정과 인증 정보가 다릅니다. 관리자에게 문의하세요',
   AUTH_PI_ACCOUNT_INACTIVE: '비활성 계정입니다. 관리자에게 문의하세요',
+  AUTH_DB_UNAVAILABLE:
+    '사용자 정보를 저장하지 못해 로그인할 수 없습니다. 잠시 후 다시 시도하세요',
 } as const
 
 export type ApiErrorParams = Record<string, string | number>

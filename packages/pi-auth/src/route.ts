@@ -36,6 +36,9 @@ export interface PiAuthRouteOptions<U extends PiAuthUserRecord> {
   }) => Promise<U>
   // GET 쿠키 부재 시 폴백(X-Pi-Token 헤더 등 통합 세션). 미지정 시 { user: null }
   getSessionUser?: (req: NextRequest) => Promise<U | null>
+  // true 면 upsertUser 실패(DB 오류) 시 세션을 발급하지 않고 503 — userId='' 유령 세션(헤더는 로그인·API 는 401) 대신 오류를 드러낸다.
+  // 기본 false = cafe.pi 기존 동작(graceful degradation) 유지
+  requireDbUser?: boolean
   // 로그인·세션 복원 기록(fire-and-forget)
   onLogin?: (userId: string) => void
   guard?: GuardOptions
@@ -144,6 +147,7 @@ export function createPiAuthRoute<U extends PiAuthUserRecord>(
       )
         return apiError(code, 403)
       console.error('[auth/pi] upsertUser 실패:', e)
+      if (opts.requireDbUser) return apiError('AUTH_DB_UNAVAILABLE', 503)
     }
 
     if (userId) opts.onLogin?.(userId)

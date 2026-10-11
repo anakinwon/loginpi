@@ -73,9 +73,13 @@ export function withGuard(handler: Handler, opts?: GuardOptions): Handler {
       })
     }
 
-    // 3) Rate limiting
-    const rl = checkRateLimit(ip, getPolicyForPath(pathname))
-    if (!rl.allowed) return rateLimitedResponse(rl.retryAfter)
+    // 3) Rate limiting — 개발 환경은 HMR·반복 새로고침·프로브가 단일 IP 라 우회(proxy.ts 와 동일 규칙)
+    let remaining = -1
+    if (process.env.NODE_ENV !== 'development') {
+      const rl = checkRateLimit(ip, getPolicyForPath(pathname, req.method))
+      if (!rl.allowed) return rateLimitedResponse(rl.retryAfter)
+      remaining = rl.remaining
+    }
 
     // 4) 핸들러 실행 + 응답 계측
     const start = Date.now()
@@ -104,7 +108,8 @@ export function withGuard(handler: Handler, opts?: GuardOptions): Handler {
     for (const [k, v] of Object.entries(SECURITY_HEADERS)) {
       res.headers.set(k, v)
     }
-    res.headers.set('X-RateLimit-Remaining', String(rl.remaining))
+    if (remaining >= 0)
+      res.headers.set('X-RateLimit-Remaining', String(remaining))
     return res
   }
 }

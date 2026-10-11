@@ -100,8 +100,11 @@ export function getClientIp(req: NextRequest): string {
   return 'unknown'
 }
 
-export function getPolicyForPath(pathname: string): PolicyKey {
-  if (pathname.startsWith('/api/auth/')) return 'AUTH'
+// method 가 GET 이면 /api/auth/** 도 세션 조회(복원·/me)라 일반 API 한도 — 로그인 시도(POST/DELETE)만 AUTH 버킷(8회/분, 5분 차단).
+// 실측 2026-10-11: 페이지 로드마다 GET 3~4건이라 새로고침 2~3회면 로그인까지 429 로 막혔다
+export function getPolicyForPath(pathname: string, method = 'GET'): PolicyKey {
+  if (pathname.startsWith('/api/auth/'))
+    return method.toUpperCase() === 'GET' ? 'API_GENERAL' : 'AUTH'
   if (pathname.startsWith('/api/payments/')) return 'PAYMENT'
   if (pathname.startsWith('/api/admin/')) return 'ADMIN'
   if (pathname.startsWith('/api/')) return 'API_GENERAL'

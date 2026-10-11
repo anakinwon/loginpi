@@ -97,8 +97,7 @@
     "codeLabel": "연동 코드",
     "submit": "연동하기",
     "done": "연동이 완료되었습니다. 이제 Google 로그인으로도 이용할 수 있습니다.",
-    "linked": "{name} 계정이 Google 로그인과 연동되어 있습니다.",
-    "googleOff": "이 환경은 Google 로그인이 꺼져 있어 연동이 필요 없습니다."
+    "linked": "{name} 계정이 Google 로그인과 연동되어 있습니다."
   },
   "siteCtgr": {
     "COMMUNITY": "커뮤니티",
@@ -274,6 +273,7 @@
     "AUTH_GOOGLE_REQUIRED": "Google 로그인이 필요합니다.",
     "LINK_CODE_INVALID": "연동 코드가 올바르지 않거나 만료되었습니다. Pi Browser에서 다시 발급하세요.",
     "LINK_ALREADY_LINKED": "이미 연동된 계정입니다.",
-    "LINK_CODE_GEN_FAILED": "연동 코드를 만들지 못했습니다. 잠시 후 다시 시도하세요."
+    "LINK_CODE_GEN_FAILED": "연동 코드를 만들지 못했습니다. 잠시 후 다시 시도하세요.",
+    "AUTH_DB_UNAVAILABLE": "사용자 정보를 저장하지 못해 로그인할 수 없습니다. 잠시 후 다시 시도하세요."
   }
 }
