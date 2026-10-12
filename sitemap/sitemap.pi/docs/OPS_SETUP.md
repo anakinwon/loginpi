@@ -46,7 +46,7 @@ node scripts/db-migrate.mjs --app sitemap --tier dev             # baseline → 
 - [ ] sitemap 앱 2개 등록(testnet = 스테이징 URL, mainnet = `https://sitemap.pi`) — cafe.pi와 별도 앱이라 `pi_uid`가 다르다(사람 키는 `pi_username`)
 - [x] 앱 URL·도메인 검증 : testnet 앱 App URL `https://sitemapst.vercel.app`, 검증 키는 앱 루트 `validation-key.txt` 커밋(c9ee2fc0) → 통과(2026-10-11)
 - [ ] **Pi Browser 진입 도메인** : Portal 앱 화면 "Open app" 의 `<app>.pinet.com` 을 Vercel env `NEXT_PUBLIC_PI_APP_DOMAIN` 에 등록 → Redeploy. Pi Browser 실기기 테스트는 반드시 그 주소로(배포 도메인 직접 입력 시 authenticate 무응답 — LOGIN_PLAYBOOK §5)
-- [ ] API 키 → `PI_API_KEY` — **등록 심사비 결제(승인 전 결제, 2026-10-11)부터 필수**. 없으면 결제 approve 가 500 SERVER_CONFIG. testnet 앱 키(스테이징)·mainnet 앱 키(운영) 구분
+- [ ] API 키 → `PI_API_KEY` — **등록 심사비 결제(승인 전 결제, 2026-10-11)부터 필수**. 없으면 결제 approve 가 500 SERVER_CONFIG. testnet 앱 키(스테이징)·mainnet 앱 키(운영) 구분. **등록 전 검증** `.env.local` 에 넣고 `node scripts/pi-key-probe.mjs --app sitemap` → VALID 여야 한다(무효 키 = 결제창 타임아웃, TROUBLESHOOT 2026-10-12). 단 VALID 는 키 생존만 뜻하고 앱 일치는 못 가린다 — **sitemap testnet 앱 화면에서 복사**, 교체 뒤 approve 로그 `Pi GET 404` 면 다른 앱 키. `PI_WALLET_ADDRESS`·`PI_WALLET_PRIVATE_SEED` 는 A2U 전용이라 **이 앱엔 불필요**(코드 미참조)
 - [ ] 스테이징은 `NEXT_PUBLIC_PI_SANDBOX=true`
 
 ## 6. Vercel (독립 웹서버 기본안)
