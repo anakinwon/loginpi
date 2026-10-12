@@ -822,3 +822,80 @@ Pi Sign-In QR은 채굴 앱 스캐너·폰 카메라가 아니라 **파이지갑
 **변경 (a4378bda, 마스터 지시)**: 매일 09:30 KST **세 판정 모두 발송** — CLOSED=📡 "승인 대기 D+N"(신청일 07-16 기준) · OPEN=🚨 긴급+0순위 런북 · ERROR=⚠️ 에러 원문 200자(`escapeHtml`+`<code>` — 원문에 `<`·`&` 있으면 텔레그램 HTML 파싱 전체 실패로 알람 유실되므로 이스케이프 필수). 운영 검증 `notified:true`·마스터 수신 확인.
 
 **운영 규약**: **알람이 하루라도 안 오면 그 자체가 감시 체계 이상 신호** → 즉시 점검(cron 실행 여부는 같은 프로젝트 시간별 cron의 sys_batch_log로 교차 확인 가능 — Vercel cron 이력 API는 미제공).
+
+---
+
+## [2026-10-12] sitemap.pi 등록 심사비 결제 타임아웃 — `PI_WALLET_*` 등록은 무관, 실체는 `PI_API_KEY` 401 무효 ⭐
+
+### 증상
+- 스테이징(`sitemapst.vercel.app`, testnet 앱) Pi Browser 에서 `/pay/<siteId>` 결제 → 결제창 대기 후 **타임아웃**. 로그인·prepare·요금표(`/api/fee-plans` 200, sql/010 단가) 정상.
+- 마스터가 Vercel env 에 `PI_WALLET_ADDRESS`(.env.local 표기는 `PI_WALLET_AGGRESS` 오타)·`PI_WALLET_PRIVATE_SEED` 등록·재배포했으나 증상 동일.
+
+### 원인 (로컬 키 기준 실측 확정 2026-10-12 — Vercel 실값은 [확인중 : Vercel Functions 로그 `[payments/approve] Pi GET` 코드])
+1. **`PI_WALLET_*` 두 값은 sitemap.pi 코드가 읽지 않는다**(`src/env.ts`·`src/lib/payments.ts` 에 참조 0건). cafe.pi 에서도 시드는 **A2U(환불·팁·보상) 서명 전용**이라 U2A 결제(approve/complete)와 무관 — 2026-07-11 편 결론 그대로.
+2. U2A approve 가 쓰는 유일한 시크릿은 **`PI_API_KEY`**. 로컬 `sitemap/sitemap.pi/.env.local` 의 값을 Pi API 에 프로브하면 **401 `Invalid/missing API key`**(동일 프로브에 cafe.pi 키는 404 `payment_not_found` = 유효 — 방법 교차검증 완료). 이 값이 Vercel 에 그대로 들어갔거나 아예 미등록이면 approve 라우트 1단계 `GET /v2/payments/{id}` 가 401 → `PAY_PI_APPROVE_FAILED` 502(미등록이면 `SERVER_CONFIG` 500) → Pi 측 승인이 영영 없어 **Pi Browser 결제 모달이 자체 타임아웃**. 우리 오류 문구는 모달 뒤에 가려져 사용자는 "타임아웃"만 본다(cafe.pi 7-11 사고와 같은 지문).
+- 진단 흐름: approve 는 "조회(GET) → 검증 → 원장 APPROVED → approve" 순서(53710ed1)라 키가 무효면 **`pi_pymnt` 행이 0건**인 채 실패한다. 원장이 비어 있고 결제창만 타임아웃이면 십중팔구 키.
+
+### 해결 (마스터 조치 — Portal·시크릿은 마스터 전용)
+1. Pi Developer Portal → **sitemap testnet 앱**(스테이징) → API Key 재복사(또는 재발급). 등록 전 로컬에서 검증:
+   `.env.local` 에 넣고 `node scripts/pi-key-probe.mjs --app sitemap` → `VALID` 확인(키 원문을 `--key` 인자로 넘기면 셸 이력에 남으므로 env 파일 경로 방식 우선).
+   ⚠ **VALID = 키가 살아 있다는 뜻일 뿐, 어느 앱의 키인지는 판정 못 한다**(다른 앱·다른 네트워크 키도 404 payment_not_found). 반드시 **sitemap testnet 앱 화면**에서 복사할 것 — 교체 뒤 approve 로그가 `Pi GET 404` 면 다른 앱 키(7-11 스코프 불일치 재현).
+2. Vercel sitemap 프로젝트 env `PI_API_KEY`(Preview/Production 모두) 교체 → **Redeploy**(env 는 배포 단위 반영) → `Vercel – <project>: success` 개별 확인.
+3. 실기기(pinet 도메인) 결제 1건 → `pi_pymnt` COMPLETED·`site_mst.pymnt_id` 확인 (HANDOFF 다음 세션 순서 ②~④).
+4. 확인용 로그: Vercel Functions 로그에서 `[payments/approve] Pi GET 401` — 교체 전 지문, 교체 후 사라져야 정상.
+- `PI_WALLET_ADDRESS`·`PI_WALLET_PRIVATE_SEED` 는 sitemap.pi 에선 제거해도 무방(A2U 미구현). 남겨도 무해하나 `.env.local` 키 이름 오타(`AGGRESS`)는 정리 권장.
+
+### 재발방지 (철칙)
+1. **"결제창 타임아웃 + `pi_pymnt` 0건" = 키 문제 1순위** — 시드·지갑·샌드박스 플래그보다 먼저 `scripts/pi-key-probe.mjs` 로 키부터 판정(읽기 전용, 부작용 없음). 판독: `Pi GET 401` = 무효 키 / `Pi GET 404` = 살아 있지만 다른 앱·네트워크 키(프로브 VALID 로는 못 거른다). 7-11 편의 "완결 결제 ID approve 재호출" 프로브는 status 격하 부작용이 있으므로 **이 GET 프로브로 대체**.
+2. 시크릿 역할 구분을 문서에 고정: `PI_API_KEY` = U2A approve/complete(결제 성립 필수) / `PI_WALLET_PRIVATE_SEED` = A2U 서명(환불·보상, sitemap 미사용). "결제가 안 된다" 는 전자, "환불이 안 된다" 는 후자.
+3. 인수인계 "다음 세션 순서" 에 env 이름만 쓰지 말고 **검증 명령을 같이 적는다**(OPS_SETUP §5 반영) — 이름만 있으면 비슷한 이름의 다른 시크릿을 넣고 "등록 완료" 로 오판한다.
+
+---
+
+## [2026-10-12] sitemap.pi 스테이징 일반 브라우저 로그인 불가 — 현 배포에 Google env 4종 + Pi Sign-In 1종 부재(진입 도메인 1종은 별건) [확인중 : Vercel env 화면]
+
+### 증상
+- `sitemapst.vercel.app`(Vercel 프로젝트 `sitemaps`) 일반 브라우저: 헤더에 **"Pi로 로그인" 버튼만** 보이고 Google 버튼 없음. 클릭하면 SDK 시도 3초(login-gate.tsx SDK_TIMEOUT_MS) 뒤 OAuth Client ID 가 없어 조용히 종료(아래 20초는 `?pidebug=1` 진단 문구 기준 — 출처가 다른 수치). 전날(2026-10-11)엔 됐다고 마스터 보고. 같은 날 Pi Browser 결제(`PI_API_KEY` 교체·Redeploy 뒤)는 성공.
+
+### 원인 (라이브 배포 실측 2026-10-12 — Playwright 재현 + 번들·API 프로브)
+1. **서버 Google env 3종 부재**: `/api/auth/session`·`providers`·`csrf` 전부 `404 {"code":"NOT_FOUND"}` = `googleEnabled()` false. `src/env.ts` superRefine 이 3종 중 일부만 있으면 빌드를 실패시키는데 오늘 11:26Z 빌드가 success 이므로 **셋 다 없음**(`GOOGLE_CLIENT_ID`·`GOOGLE_CLIENT_SECRET`·`AUTH_SECRET`, 단 SKIP_ENV_VALIDATION 이 켜졌다면 예외). 콘솔에 authjs `autherror` 반복.
+2. **클라이언트 공개 env 부재**: 번들에 `NEXT_PUBLIC_GOOGLE_LOGIN`·`NEXT_PUBLIC_PI_OAUTH_CLIENT_ID`(+ Pi Browser 진입용 `NEXT_PUBLIC_PI_APP_DOMAIN` — 일반 브라우저 로그인과 무관, 별건)이 리터럴로 안 박히고 `process.env.X` 참조로 남음 = **빌드 시점에 미설정**(`NEXT_PUBLIC_APP_URL`·`PI_SANDBOX=true`는 박혀 있음). → Google 버튼 숨김, Pi OAuth 폴백 없음.
+3. 남은 경로는 Pi SDK `authenticate`뿐인데 일반 브라우저에선 20초 무응답이 정상(`?pidebug=1` 진단 문구 "Pi 인증 응답 없음 … sandbox=true"). 결과적으로 **일반 브라우저 로그인 경로가 0개**.
+- 배포 이력(GitHub deployments API): 커밋 da168c18 기준 `sitemaps` 배포 레코드 1건에 **Production 빌드 4회** — 10-11 11:19Z(git push) + **10-12 10:34·10:55·11:26Z(Redeploy 3회)**, 넷 다 환경 "Production – sitemaps" → env 는 Production 범위에 있어야 하며 Preview 범위 가설은 배제. 라이브는 오늘 Redeploy 산출물. 전날 배포는 Vercel 인증 벽 때문에 번들 비교 불가 → "전날은 됐다"가 사실이면 **Redeploy 사이에 env가 빠졌거나(삭제·환경 범위 변경·다른 프로젝트에 등록) 전날 테스트가 localhost였을 가능성** 둘 중 하나. Vercel env 화면이 판정 지점.
+- 코드 결함 아님: 미설정 환경에서 404·버튼 숨김은 설계(route.ts 주석, LOGIN_PLAYBOOK §Google). `sys_usr_auth_lnk`엔 anakin2 Google 연동 행(10-11 05:35Z)이 있으나 stg DB는 localhost와 공유라 스테이징 로그인 증거는 아님.
+
+### 해결 (마스터 조치 — Vercel env는 마스터 전용. MCP 인증 승인 시 Claude가 직접 수행 가능)
+1. Vercel → `sitemaps` 프로젝트 → Settings → Environment Variables에서 **Production** 범위에 아래 6종 존재 확인·등록:
+   **주 경로 = Google 4종**: `GOOGLE_CLIENT_ID` · `GOOGLE_CLIENT_SECRET` · `AUTH_SECRET`(32자+) · `NEXT_PUBLIC_GOOGLE_LOGIN=1`. (선택) `NEXT_PUBLIC_PI_OAUTH_CLIENT_ID` — ⚠ Pi Sign-In Redirect URI 호스트는 앱 도메인+루프백만 등록 가능해 스테이징 Vercel 도메인은 콜백이 거부될 수 있음(루트 CLAUDE.md) [확인중 : Developer Portal Redirect URI 등록 화면]. `NEXT_PUBLIC_PI_APP_DOMAIN`(Portal "Open app" pinet 도메인)은 Pi Browser 진입용으로 별도 점검.
+   ⚠ `NEXT_PUBLIC_*`는 **빌드 시점 리터럴** — 등록 뒤 반드시 Redeploy(Build Cache 미사용 권장).
+2. Google Cloud Console OAuth 클라이언트 리디렉션 URI에 `https://sitemapst.vercel.app/api/auth/callback/google` 포함 확인.
+3. 검증: `curl https://sitemapst.vercel.app/api/auth/providers` → `google` 포함 200 / 번들 `NEXT_PUBLIC_GOOGLE_LOGIN:"1"` / 일반 브라우저에서 Google 버튼 → 로그인 → `/link` 연동 상태.
+
+### 재발방지
+1. **Redeploy 전후 env 스냅샷 비교**를 운영 절차에 추가 — 공개 env는 번들 grep(`NEXT_PUBLIC_X:"…"` vs `process.env.X`)으로, 서버 env는 기능 엔드포인트(`/api/auth/providers` 200/404)로 1분 안에 판정 가능(서버 접근 불요).
+2. OPS_SETUP §6 "env : Production / Preview 각각 등록"을 **체크리스트 표(변수명 × 환경)**로 — 이름만 나열하면 범위 누락을 못 잡는다.
+3. 로그인 변경 완료 기준에 "스테이징 URL에서 Google 버튼 노출 + providers 200" 스크린샷을 포함(전날 검증이 localhost였는지 스테이징이었는지 기록이 없어 오늘 판정이 갈렸다).
+
+---
+
+## [2026-10-12] sitemap.pi "반짝임" 부가서비스가 모바일에서 정적 — reduce 시 `animation: none` 정책 + SVG transform 의존 제거
+
+### 증상
+- 메인 버블의 유료 부가서비스 "반짝임"(테두리 빛줄기 회전 + 별 깜빡임)이 Windows 데스크톱 브라우저에선 움직이는데 마스터 모바일에선 **정적**으로 표시(버블 자체 동작 여부는 [확인중 : 마스터 실기기]).
+
+### 원인 (결론 단계 판정 + Playwright 실측)
+1. **1순위 H1 — 기기 '움직임 줄이기'**(Android 접근성 "애니메이션 제거"·Samsung "애니메이션 줄이기"·iOS "동작 줄이기")가 `prefers-reduced-motion: reduce` 로 매칭 → `globals.css` 가 `.sparkle-glint/.sparkle-star { animation: none }` 으로 **의도적 정지**. 수정 전 라이브(`sitemapst.vercel.app`)를 reduce 에뮬레이션(390×844)으로 열면 animationName none·getAnimations 0·800ms 스크린샷 바이트 동일 = 정적 재현. ⚠ 같은 설정이면 버블 물리도 정지(bubble-canvas.tsx `reduced` 분기)하므로, 실기기에서 **버블은 떠다니는데 반짝임만 정적**이면 H1 이 아니라 아래 2.
+2. 2순위 H4 — WebKit(iOS)에서 `filter: drop-shadow` + CSS `transform` 애니메이션 조합의 리페인트 누락 가능성. Playwright WebKit(iPhone 13) 실측에서 **수정 후 코드는 정상 렌더**(reduce 에서도 svg PNG 800ms 바이트 상이) → 수정안이 transform 을 제거해 우회됨. 수정 전 코드의 WebKit 재현은 미수행.
+3. H2(`transform-box` 미지원)·H3(성능)·H5(`pathLength` 미지원)는 '정적' 증상과 불일치 — 기각.
+
+### 해결 (globals.css 단일 파일, tsx 변경 0 — 커밋 전 작업트리)
+- 빛줄기: `transform: rotate(360deg)` → **`stroke-dashoffset: -100`**(기존 `pathLength={100}`·`strokeDasharray="10 90"` 활용, 한 바퀴·같은 방향). `transform-box`·`transform-origin` 삭제.
+- 별: `scale(.3→1) rotate(45deg)` 제거, **opacity 깜빡임만**(인라인 `animationDelay` 시차 유지). 별 크기 펄스는 의도적으로 포기.
+- reduce: `animation: none` → **3배 감속**(`.sparkle-glint 7.2s`·`.sparkle-star 5.4s`) — "모바일에서도 효과가 나타나게" 요구를 "접근성 모드에서도 정지 대신 감소"로 읽은 **팀 해석** [확인중 : 마스터 확인 — 정지 유지 원하면 아래 되돌림 경로].
+- 검증: Chromium 390×844·1280×800·Pixel 7 에뮬레이션 + WebKit iPhone 13, 각 reduce/no-preference — 모두 animationName 유지·running, Δdashoffset(300ms) reduce 4.2 / no-pref 13, opacity 3샘플 상이, 버블 등장 애니메이션·hover 전이 회귀 없음. `pnpm build`(sitemap.pi) exit 0, prettier 통과. 스크린샷 `.playwright-mcp/sparkle/`(gitignore).
+- **남은 확인**: Pi Browser 실기기(Android·iOS)에서 빛줄기 이동·별 깜빡임 육안 — 아직 정적이면 ① 버블 부유 여부로 H1/H4 분기 ② H4 면 `.sparkle-*` 의 `filter: drop-shadow` 2줄 삭제(글로우 손실, 효과 유지).
+
+### 재발방지·정책 메모
+1. 장식 애니메이션의 reduce 정책은 **"정지 vs 감소"를 기능 소유자(유료 여부)와 함께 결정**하고 CSS 주석에 명시 — 접근성 모드가 켜진 단말에서 '정상 동작'이 곧 '버그 신고'가 된다.
+2. 되돌림 경로(등재 심사·접근성 요구 시): 별 opacity 깜빡임(공간 이동 없음)은 감속 유지, 빛줄기(공간 이동)만 `animation-play-state: paused` — WCAG 2.2.2(A) 관점의 더 방어적인 분할.
+3. SVG 자식 요소 장식 애니메이션은 **paint 속성(stroke-dashoffset·opacity) 우선**, CSS transform(+`transform-box`)은 모바일 WebKit 변수를 늘린다.
