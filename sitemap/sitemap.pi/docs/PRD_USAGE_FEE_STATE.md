@@ -53,15 +53,15 @@
 
 | 키 | 기본 | 의미 |
 |---|---|---|
-| `site.pay_timeout_hours` | 1 | 신청중 미결제 자동 반려까지 |
-| `site.use_start_delay_hours` | 1 | 결제완료 → 사용중 자동 전이 지연. 관리자가 볼 수 있는 유예이지만 **통지 수단이 없고 D3 권장값에선 PAID 단계 차단 수단도 없어 "검토 창"이 아니라 단순 대기 시간**(관리자는 "사용 시작"으로 앞당길 수만 있음) — 관리자 알림(PAID 발생 시 메일·텔레그램)은 ROADMAP 후속 과제로 등재, 그전엔 관리자 화면 PAID 탭 수동 확인 |
-| `site.reapply_window_hours` | 12 | 사용완료 후 직전 신청인 재등록 우선 창 |
+| `SITE_PAY_TIMEOUT_HOUR` | 1 | 신청중 미결제 자동 반려까지 |
+| `SITE_USE_BGN_DELAY_HOUR` | 1 | 결제완료 → 사용중 자동 전이 지연. 관리자가 볼 수 있는 유예이지만 **통지 수단이 없고 D3 권장값에선 PAID 단계 차단 수단도 없어 "검토 창"이 아니라 단순 대기 시간**(관리자는 "사용 시작"으로 앞당길 수만 있음) — 관리자 알림(PAID 발생 시 메일·텔레그램)은 ROADMAP 후속 과제로 등재, 그전엔 관리자 화면 PAID 탭 수동 확인 |
+| `SITE_REAPLY_WINDOW_HOUR` | 12 | 사용완료 후 직전 신청인 재등록 우선 창 |
 
 관리자 화면 "운영 설정" 섹션에서 변경(`/api/admin/cfg`, 0.01~720h). 실기기 검증 시 0.05h로 낮춰 전 구간 1회 통과 후 복귀.
 
 ## 5. DB 변경 (sql/012, da-team 리뷰 후 DA-APPROVED)
 
-- `sys_cfg` 신규(cfg_cd PK·cfg_val·cfg_desc + 시스템 컬럼·del_yn, 테이블별 mod_dtm 트리거 `fn_upd_sys_cfg_mod_dtm`). 표준단어 등재 APL(신청)·USE_BGN/USE_END·CFG·cfg_val 타입 [확인중 : da-team].
+- `sys_cfg` 신규(cfg_key PK(UPPER_SNAKE)·cfg_val JSONB·cfg_val·cfg_desc + 시스템 컬럼·del_yn, 테이블별 mod_dtm 트리거 `fn_upd_sys_cfg_mod_dtm`). 표준단어 등재 APL(신청)·USE_BGN/USE_END·CFG·cfg_val 타입 [확인중 : da-team].
 - `site_mst` 컬럼 3: `aply_dtm`[확인중 : da-team — 표준단어 APL(3자) 등재 시 `apl_dtm`], `use_bgn_dtm`, `use_end_dtm`. `apv_dtm`은 "최초 노출 개시일시"로 COMMENT 재정의(공개 API·인덱스 파급 회피) [확인중 : da-team].
 - 자사 시드(own_site_yn='Y') INSERT 는 새 CHECK(aply·apv·use_bgn NOT NULL) 때문에 세 컬럼을 CURRENT_TIMESTAMP 로 채워야 함 — 012 주석에 시드 작성 규칙 명시.
 - 재등록 시 pymnt_id·pay_dtm 초기화로 "어느 결제가 어느 사용기간을 샀는가"가 site_mst 에서 사라짐 → `site_sts_hist` 트리거가 PAID→IN_USE 전이 때 `chg_rsn_cont` 에 pymnt_id·use_bgn/end 스냅샷을 남기도록 확장(감사, PRD §8).
@@ -120,4 +120,5 @@
 | 날짜 | 내용 |
 |---|---|
 | 2026-10-13 | v0.1 설계안 — 워크플로(수집·결론·비평) 산출, 비평 치명 6건 반영(PAID 반려 재신청 경로·관리자 반려 Pi 결제 검사·cancel 전 txid 확인·무결제 점유 쿨다운·영구 무료 노출 차단·bubbles.ts:77 제외) |
+| 2026-10-13 | P1 완료 — sql/012 작성·da-governance-expert 리뷰(P1 2·P2 7·P3 8 반영: sys_cfg cfg_key/JSONB·fn_prcs_site_rpt IN_USE 정정·멱등 DROP·이행 가드·unique_violation→P0003·롤백 순서)·dev 적용(19건 IN_USE, 이력 19, 외부 무기간 0). stg 는 P2 코드 푸시 직전 적용 |
 | 2026-10-13 | v0.2 → v0.2c — 팀장 반려 3회 반영(2차: D3 "PAID 차단 수단 없음" 정합·크론 fail-closed·운영 CRON_SECRET 등록을 P8 검토 뒤로 / 3차: CRON_SECRET env optional 명시·P5 build 검증·D3 운용 경로): 결정 D0(광고 단위)·D-A(12h 창)·D-B(관리자 반려 범위) 추가, 전이 #5 PAID 를 [확인중 : D3] 로 정합, P8 이행~승격 공백 대책, 검토 창 알림 부재·자사 시드 CHECK·감사 스냅샷·쿨다운 출처 추가, 기본값 확정 3건(상태명·이행 유예·크론 플랜)으로 내림, 표기 통일 |

@@ -125,7 +125,7 @@
 | W07 | 영구 | **LFT** | LFTM | lifetime | 기간 없는 상품(영구 멤버십) | `lft_yn` | REQ-53·58 | PERM 은 permission 과 혼동. cafe 사용례 없음. 사용자 표시 "평생"은 금지 어휘지만 약어와는 무관 |
 | W08 | 해지(취소) | **CNL** | CNCL | cancel | 구독 갱신 안 함 표시 / 결제 취소 | `subscr_cnl_yn` | REQ-60·65 | cafe 사용례 없음. 코드값 CANCELED 와 같은 단어 |
 | W09 | 회수 | RVK | (유지) | revoke | 슬롯·주문 강제 종료 | `rvk_rsn_cd`·`rvk_dtm` | REQ-65·68 | 이미 자음 3자. 충돌 없음 |
-| W10 | 적용 | **APL** | APLY | apply | 단가·프로모 적용 | `apl_bgn_dtm`·`promo_apl_yn` | REQ-53·61 | cafe 사용례 없음(`apply_` 원형만) |
+| W10 | 적용 | **APL** | APLY | apply | 단가·프로모 적용 | `apl_bgn_dtm`·`promo_apl_yn` | REQ-53·61 | cafe 사용례 없음(`apply_` 원형만). APLY 는 신청(W24) 전용 |
 | W11 | 시작 | BGN | (유지) | begin | 기간 시작 | `use_bgn_dtm`·`apl_bgn_dtm`·`promo_bgn_dtm`·`snc_bgn_dtm` | REQ-53·64 | 이미 자음 3자. cafe START(5자) 사용례와의 관계는 D-7(판정 완료) |
 | W12 | 일 | DAY | (유지) | day | 일수 단위(1개월 = 30일) | `use_day_cnt` | REQ-53·58 | **3자 현장 최빈형이라 유지**. DY·DD 는 현장에서 드물고 DD 는 날짜 포맷과 혼동된다. 도메인은 cnt(D3) |
 | W13 | 정가 | **NRM** | LIST | normal price | 할인·프로모 적용 전 정상가(정가) | `nrm_pi_amt` | REQ-53·63 | ⚠ LST 는 cafe `lst_read_msg_id` 에서 "last(최종)" 뜻으로 쓰여 동음이의 → 불가. NRM(정상가)은 cafe 사용례 없음. 판매가는 `pi_amt` |
@@ -139,6 +139,7 @@
 | W21 | 유입 | **IFL** | INFL | inflow | STATS 유입 경로 | `ifl_src_cd`(가칭) | REQ-81 | **보류**("유입" 정의 [TBD : 마스터]). INF 는 info·infinity('infinity' 금지값)와 혼동돼 불가 |
 | W22 | 제재 | **SNC** | SANC | sanction | 관리자의 계정 제재(혜택 정지) — 마스터 확정 REQ-14 | `usr_snc`·`snc_id`·`snc_tp_cd`·`snc_sts_cd`·`snc_rsn_cd`·`snc_bgn_dtm`·`snc_end_dtm` | REQ-14 | cafe 사용례 없음. SUSP 는 코드값 SUSPENDED 와 혼동, BLCK 는 baseline ADMIN_BLCK 뜻이라 제외(r2 판단 유지) |
 | W23 | 해제 | **REL** | RLSE | release | 제재의 실제 해제(예정 종료와 별도) | `rel_dtm` | REQ-14 | ⚠ RLS 는 이 프로젝트에서 Row Level Security(정본 §7 정책 명명)라 불가. REL 은 cafe 사용례 없음. `snc_end_dtm` = 예정 종료, `rel_dtm` = 실제 해제 |
+| W24 | 신청 | **APLY** | APL | apply(application) | 사용료 전환(2026-10-13) 사이트 신청 — `aply_dtm`(신청일시) | `aply_dtm` | PRD_USAGE_FEE_STATE | da-governance-expert 승인 2026-10-13. 4자 예외 : APL 은 W10 적용이 선점(동음이의 회피), 공공 공통표준 관례 APLY |
 
 **등재하지 않는 단어 (요청 목록 중)**
 
