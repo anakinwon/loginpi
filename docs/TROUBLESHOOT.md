@@ -899,3 +899,22 @@ Pi Sign-In QR은 채굴 앱 스캐너·폰 카메라가 아니라 **파이지갑
 1. 장식 애니메이션의 reduce 정책은 **"정지 vs 감소"를 기능 소유자(유료 여부)와 함께 결정**하고 CSS 주석에 명시 — 접근성 모드가 켜진 단말에서 '정상 동작'이 곧 '버그 신고'가 된다.
 2. 되돌림 경로(등재 심사·접근성 요구 시): 별 opacity 깜빡임(공간 이동 없음)은 감속 유지, 빛줄기(공간 이동)만 `animation-play-state: paused` — WCAG 2.2.2(A) 관점의 더 방어적인 분할.
 3. SVG 자식 요소 장식 애니메이션은 **paint 속성(stroke-dashoffset·opacity) 우선**, CSS transform(+`transform-box`)은 모바일 WebKit 변수를 늘린다.
+
+---
+
+## [2026-10-13] sitemap.pi 로컬만 "계정 연동 필요" 재요구 — 로컬 Supabase 키 무효 + 판정 불가를 미연동으로 합친 코드 ⭐
+
+### 증상
+- 같은 Google 계정이 Vercel 스테이징에선 "연동됨", 로컬(localhost:3001)에선 "연동 코드 입력" 요구. DB(`sitemap_stg.sys_usr_auth_lnk`)엔 연동 행(anakin2, 2026-10-11) 존재 → **Vercel 이 정답**.
+
+### 원인 (실측)
+1. 로컬 `.env.local` `STAGING_SUPABASE_SERVICE_ROLE_KEY` 가 Supabase 에서 `Unregistered API key`(회전된 키) → 로컬 `/api/fee-plans` 503, 연동 조회 실패. Vercel 키는 유효.
+2. 코드: `findLinkedUserId` 가 supabase-js 의 `error` 필드를 안 보고 `null`(미연동) 반환 + jwt 콜백이 매 세션 조회마다 덮어씀 → DB 장애가 "미연동"으로 둔갑(f745cc35 에서 error→undefined·덮어쓰기 금지, 87b4fa52 에서 최초 로그인 분기 `?? null` 제거 + `linkUnknown` 플래그로 UI 에 "연동 상태 확인 불가(일시 오류)" 표시).
+
+### 해결
+- 마스터: Supabase 활성 Secret key 로 로컬 키 교체 → dev 서버 **완전 재시작**(`getSupabaseAdmin` 모듈 캐시라 HMR 미반영) → 새로고침만으로 자동 교정(세션 재확인). ✅ 2026-10-13 마스터 "연동됨" 확인.
+- 코드 2건 배포(87b4fa52, Vercel – sitemaps success).
+
+### 재발방지
+1. **인증 상태는 삼상태**(연동·미연동·판정 불가). "못 읽음"을 "없음"으로 합치면 장애가 사용자 행동 요구로 둔갑 — supabase-js 는 throw 가 아니라 `error` 필드라 catch 만으론 못 잡는다.
+2. 로컬 DB 건전성 1차 판정 = `/api/fee-plans` 200 여부. 로컬·Vercel 이 같은 DB 라도 키는 환경별 사본 — `vercel env pull` 로 STAGING_* 만 동기화(AUTH_SECRET·APP_URL 은 환경별 유지).
