@@ -15,8 +15,8 @@
 
 ## 2. Storage 버킷 `site-img` (이미지 업로드)
 
-- [ ] Storage → New bucket → 이름 `site-img`, **Public bucket ON**(공개 URL로 표시), 파일 크기 제한 2MB, 허용 MIME `image/png, image/jpeg, image/webp, image/gif`
-- [ ] 비운영은 `pi-nonprod` 프로젝트에 버킷 1개를 dev·stg가 공유(경로 `<userId>/<UUID>.<ext>`라 충돌 없음)
+- [ ] Storage → New bucket → 이름 `site-img`, **Public bucket ON**(공개 URL로 표시), 파일 크기 제한 2MB, 허용 MIME `image/png, image/jpeg, image/webp, image/gif` — 대시보드 수동 또는 스크립트 `PROD_SUPABASE_URL=… PROD_SUPABASE_SERVICE_ROLE_KEY=… node scripts/storage-bucket.mjs --env-prefix PROD_`(운영 키는 .env.local 에 두지 않고 1회성 환경변수로, 이미 있으면 설정만 출력). **운영 프로젝트 미생성(2026-10-13 현재)** — 승격 전 실행
+- [x] 비운영은 `pi-nonprod` 프로젝트에 버킷 1개를 dev·stg가 공유(경로 `<userId>/<UUID>.<ext>`라 충돌 없음) — 2026-10-13 생성 완료(`node scripts/storage-bucket.mjs`, 업로드·공개 GET 200 확인)
 - [ ] 버킷이 없으면 업로드 API가 503 `IMG_BUCKET_MISSING`을 반환한다 — 등록·심사는 이미지 없이도 동작
 - [ ] 반려·철회 사이트 이미지 정리는 Phase 1 범위 밖(파일 잔존) — 용량 증가 시 정리 배치 추가
 

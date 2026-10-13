@@ -28,7 +28,7 @@ export const GET = withGuard(
     const { data, error, count } = await db()
       .from('site_mst')
       .select(
-        `${OWNER_SITE_COLS}, plan_sort_no, pi_pymnt(pi_amt), sys_user!site_mst_sys_user_id_fkey(pi_username:pi_usr_nm)`,
+        `${OWNER_SITE_COLS}, plan_sort_no, pi_pymnt!site_mst_pi_pymnt_id_fkey(pi_amt), sys_user!site_mst_sys_user_id_fkey(pi_username:pi_usr_nm)`,
         { count: 'exact' },
       )
       .eq('del_yn', 'N')

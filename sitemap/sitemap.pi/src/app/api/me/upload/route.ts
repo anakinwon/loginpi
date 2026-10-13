@@ -1,4 +1,4 @@
-// 사이트 이미지 업로드 API — POST multipart(file) → Supabase Storage 공개 버킷 site-img/<userId>/<UUID>.<ext>, 공개 URL 반환.
+// 회사 로고(사이트 이미지) 업로드 API — POST multipart(file, 신청 폼이 300×300 으로 맞춰 보냄·src/lib/logo.ts) → Supabase Storage 공개 버킷 site-img/<userId>/<UUID>.<ext>, 공개 URL 반환.
 // 매직바이트로 형식 판정(선언 MIME 불신, SVG 제외 — 스크립트 삽입 위험), 2MB 제한, 파일명은 서버 생성 UUID. 로그인 필수
 import { randomUUID } from 'node:crypto'
 import { NextResponse } from 'next/server'
