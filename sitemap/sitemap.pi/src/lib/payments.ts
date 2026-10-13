@@ -3,7 +3,13 @@
 //  순서 철칙(2026-10-11 적대적 검증) : Pi approve 는 **검증·원장 기록 뒤**에만 — approve 뒤에는 사용자 서명·전송이 진행되므로 그 전에 거부해야 지갑이 안전하다
 import 'server-only'
 import { db } from './api'
-import type { PlanCd } from './site'
+import {
+  APPLY_PLAN_CD,
+  OCCUPY_STS,
+  PLAN_CAP,
+  type ApplyPlanCd,
+  type PlanCd,
+} from './site'
 
 export const PI_PAYMENTS_URL = 'https://api.minepi.com/v2/payments'
 export const SITE_REG = 'SITE_REG' as const
@@ -60,6 +66,22 @@ export async function getRegFees(): Promise<RegFee[]> {
       dc_pct: regFeeDiscountPct(pi_amt, Number(r.mon_pi_amt ?? 0), use_mon_cnt),
     }
   })
+}
+
+// 요금제별 남은 슬롯 — PLAN_CAP − 점유 상태(APPLYING·PAID·IN_USE·USED·SUSPENDED) 실사이트 수. 음수는 0 으로 고정(상한 초과 등록은 막지 않는다)
+export async function getPlanRemaining(): Promise<Record<ApplyPlanCd, number>> {
+  const { data, error } = await db()
+    .from('site_mst')
+    .select('plan_cd')
+    .eq('del_yn', 'N')
+    .in('site_sts_cd', OCCUPY_STS)
+    .in('plan_cd', APPLY_PLAN_CD)
+  if (error) throw error
+  const used: Record<string, number> = {}
+  for (const r of data ?? []) used[r.plan_cd] = (used[r.plan_cd] ?? 0) + 1
+  return Object.fromEntries(
+    APPLY_PLAN_CD.map((p) => [p, Math.max(0, PLAN_CAP[p] - (used[p] ?? 0))]),
+  ) as Record<ApplyPlanCd, number>
 }
 
 export async function getRegFee(planCd: string): Promise<RegFee | null> {

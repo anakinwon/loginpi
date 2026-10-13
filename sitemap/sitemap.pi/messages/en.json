@@ -54,13 +54,16 @@
     "ctgrBrowse": "Browse by category"
   },
   "ad": {
-    "title": "Put your site here",
-    "lead": "This bubble is an empty sample slot. Register your .pi site and pay the usage fee to appear here.",
-    "planLabel": "Selected slot",
-    "step1": "1. Register your site — choose a plan and pay the usage fee (Pi)",
-    "step2": "2. Use starts automatically once the configured time after payment has passed",
-    "step3": "3. During the usage period, your site appears in the home bubbles, lists and search at the chosen plan size",
-    "cta": "Register my site",
+    "title": "Register my business!",
+    "lead": "Your business is awaited here. Register your Pi site and it appears on screen as a brilliant bubble.",
+    "planLabel": "Plan :",
+    "planHint": "(slots remaining per plan)",
+    "remaining": "{n} left",
+    "full": "All plan slots are taken right now. Please check back later.",
+    "step1": "1. Register my business - choose a plan, register → pay in Pi",
+    "step2": "2. Use starts automatically once the agreed time after payment has passed.",
+    "step3": "3. During the usage period, your site appears as a home bubble at the chosen plan size.",
+    "cta": "Register my business",
     "back": "Back to bubbles"
   },
   "nav": {

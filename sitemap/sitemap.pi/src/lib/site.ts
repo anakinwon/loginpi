@@ -130,6 +130,15 @@ export const DOMAIN_RE = /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.pi$/
 // 신청자가 고를 수 있는 등록 요금제(단가는 fee_plan, /api/fee-plans) — PLAN_CD 에서 NONE 제외
 export const APPLY_PLAN_CD = ['VIP', 'PRM2', 'PRM1', 'BSC2', 'BSC1'] as const
 export type ApplyPlanCd = (typeof APPLY_PLAN_CD)[number]
+// 요금제별 총 슬롯(메인 버블 자리) — 마스터 지시 2026-10-09 "5·15·20·30·40 = 110". 남은 수량 = 총 슬롯 − 점유 상태(OCCUPY_STS) 실사이트
+// ponytail: 상수 고정 — 관리자 변경이 필요해지면 sys_cfg(PLAN_CAP) 로 이전
+export const PLAN_CAP: Record<ApplyPlanCd, number> = {
+  VIP: 5,
+  PRM2: 15,
+  PRM1: 20,
+  BSC2: 30,
+  BSC1: 40,
+}
 // 사용료 결제가 가능한 사이트 상태 — prepare·approve·RPC(sql/012 fn_cmpl_site_reg_pymnt)·결제 페이지가 같은 값을 쓴다
 export const PAYABLE_STS = ['APPLYING'] as const satisfies readonly string[]
 // 이동 URL 형식 — DB CHECK(sql/002 site_mst_site_mv_url_check)와 동일: https + 호스트
