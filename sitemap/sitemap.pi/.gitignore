@@ -4,3 +4,5 @@ node_modules
 .vercel
 .env*
 !.env.example
+# 에이전트 메모리(세션 산출물, 커밋 금지)
+.claude/agent-memory/

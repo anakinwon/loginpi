@@ -7,7 +7,9 @@ import {
   APPLY_PLAN_CD,
   OCCUPY_STS,
   PLAN_CAP,
+  EFCT_CD,
   type ApplyPlanCd,
+  type EfctCd,
   type PlanCd,
 } from './site'
 
@@ -15,6 +17,8 @@ export const PI_PAYMENTS_URL = 'https://api.minepi.com/v2/payments'
 export const SITE_REG = 'SITE_REG' as const
 // 반짝임 부가서비스 단독 결제 — complete RPC fn_cmpl_site_spk_pymnt(sql/013)
 export const SITE_SPK = 'SITE_SPK' as const
+// 버블 이펙트 단독 결제 — complete RPC fn_cmpl_site_efct_pymnt(sql/017)
+export const SITE_EFCT = 'SITE_EFCT' as const
 
 // SDK metadata 계약 — complete RPC(fn_cmpl_site_reg_pymnt)가 site_id·plan_cd 를 읽는다
 export interface SiteRegMeta {
@@ -23,6 +27,13 @@ export interface SiteRegMeta {
   plan_cd: PlanCd
   usr_id: string
   spk: 'Y' | 'N' // 합산 결제에 반짝임 부가서비스 포함 여부 — RPC 가 spk_* 기록
+  efct?: EfctCd // 합산 결제에 포함된 버블 이펙트 — RPC 가 efct_* 기록(없으면 미포함)
+}
+export interface SiteEfctMeta {
+  type: typeof SITE_EFCT
+  site_id: string
+  usr_id: string
+  efct: EfctCd
 }
 export interface SiteSpkMeta {
   type: typeof SITE_SPK
@@ -94,6 +105,22 @@ export async function getPlanRemaining(): Promise<Record<ApplyPlanCd, number>> {
 }
 
 // 반짝임 부가서비스 단가 — fee_plan SPARKLE × 요금제(sql/014). 없음·미판매·0 이면 null(판매 안 함)
+// 버블 이펙트 단가 — fee_plan EFFECT × 요금제(sql/017, 3종 공통). 없음·미판매·0 이면 null
+export async function getEfctFee(planCd: string): Promise<number | null> {
+  const { data, error } = await db()
+    .from('fee_plan')
+    .select('pi_amt')
+    .eq('fee_tp_cd', 'EFFECT')
+    .eq('plan_cd', planCd)
+    .eq('use_yn', 'Y')
+    .eq('del_yn', 'N')
+    .limit(1)
+    .maybeSingle<{ pi_amt: number | string }>()
+  if (error) throw error
+  const amt = Number(data?.pi_amt ?? 0)
+  return amt > 0 ? amt : null
+}
+
 export async function getSpkFee(planCd: string): Promise<number | null> {
   const { data, error } = await db()
     .from('fee_plan')
@@ -125,15 +152,26 @@ async function piApi(
 ): Promise<PiApiResult> {
   const apiKey = process.env.PI_API_KEY
   if (!apiKey) return { ok: false, status: 500, body: 'PI_API_KEY 미설정' }
-  const res = await fetch(`${PI_PAYMENTS_URL}/${path}`, {
-    method,
-    headers: {
-      Authorization: `Key ${apiKey}`,
-      ...(body ? { 'Content-Type': 'application/json' } : {}),
-    },
-    body: body ? JSON.stringify(body) : undefined,
-    cache: 'no-store',
-  })
+  // 네트워크 예외·8초 타임아웃은 { ok:false, status:0 } 으로 정규화 — 호출자가 throw(500) 대신 건별 거부·skip 으로 처리(크론 회차 격리, 적대적 리뷰 2026-10-13)
+  let res: Response
+  try {
+    res = await fetch(`${PI_PAYMENTS_URL}/${path}`, {
+      method,
+      headers: {
+        Authorization: `Key ${apiKey}`,
+        ...(body ? { 'Content-Type': 'application/json' } : {}),
+      },
+      body: body ? JSON.stringify(body) : undefined,
+      cache: 'no-store',
+      signal: AbortSignal.timeout(8_000),
+    })
+  } catch (e) {
+    return {
+      ok: false,
+      status: 0,
+      body: e instanceof Error ? e.message : 'fetch',
+    }
+  }
   if (res.ok) return { ok: true, payment: (await res.json()) as PaymentDTO }
   const text = await res.text()
   // already_approved: 재요청 멱등 처리(cafe.pi 동일) — 결제 객체가 함께 오면 성공으로 취급
@@ -176,6 +214,27 @@ export function parseSiteRegMeta(meta: unknown): SiteRegMeta | null {
     plan_cd: m.plan_cd as PlanCd,
     usr_id: typeof m.usr_id === 'string' ? m.usr_id : '',
     spk: m.spk === 'Y' ? 'Y' : 'N',
+    ...(isEfctCd(m.efct) && { efct: m.efct }),
+  }
+}
+
+const isEfctCd = (v: unknown): v is EfctCd =>
+  typeof v === 'string' && (EFCT_CD as readonly string[]).includes(v)
+
+export function parseSiteEfctMeta(meta: unknown): SiteEfctMeta | null {
+  if (!meta || typeof meta !== 'object') return null
+  const m = meta as Record<string, unknown>
+  if (
+    m.type !== SITE_EFCT ||
+    typeof m.site_id !== 'string' ||
+    !isEfctCd(m.efct)
+  )
+    return null
+  return {
+    type: SITE_EFCT,
+    site_id: m.site_id,
+    usr_id: typeof m.usr_id === 'string' ? m.usr_id : '',
+    efct: m.efct,
   }
 }
 
@@ -219,15 +278,16 @@ export async function hasOtherApprovedPayment(
   siteId: string,
   exceptPaymentId: string,
   // type 생략 = 두 유형 모두(철회·정지 가드 — 반짝임 단독 결제 진행 중에도 상태 전이를 막는다)
-  type?: typeof SITE_REG | typeof SITE_SPK,
+  type?: typeof SITE_REG | typeof SITE_SPK | typeof SITE_EFCT,
 ): Promise<boolean> {
   const { count, error } = await db()
     .from('pi_pymnt')
     .select('pymnt_id', { count: 'exact', head: true })
-    .in('pymnt_tp_cd', type ? [type] : [SITE_REG, SITE_SPK])
+    .in('pymnt_tp_cd', type ? [type] : [SITE_REG, SITE_SPK, SITE_EFCT])
     .eq('pymnt_sts_cd', 'APPROVED')
     .eq('del_yn', 'N')
-    .contains('meta_val', { site_id: siteId })
+    // meta_val->>'site_id' 동등 비교 — sql/012·013 식 부분 인덱스(idx_pi_pymnt_meta_val_site_id*)를 탄다(JSONB @> 는 못 탐)
+    .eq('meta_val->>site_id', siteId)
     .neq('pymnt_id', exceptPaymentId)
   if (error) throw error
   return (count ?? 0) > 0
@@ -239,7 +299,7 @@ export async function markPaymentCanceled(
   paymentId: string,
   userId: string,
   actor: string = userId,
-) {
+): Promise<boolean> {
   const { error } = await db()
     .from('pi_pymnt')
     .update({
@@ -252,4 +312,5 @@ export async function markPaymentCanceled(
     .eq('pymnt_sts_cd', 'APPROVED')
   if (error)
     console.error('[payments] markPaymentCanceled', paymentId, error.message)
+  return !error
 }

@@ -22,7 +22,10 @@ import {
   hasOtherApprovedPayment,
   markPaymentCanceled,
   parseSiteRegMeta,
+  parseSiteEfctMeta,
   parseSiteSpkMeta,
+  getEfctFee,
+  SITE_EFCT,
   SITE_SPK,
 } from '@/lib/payments'
 import { PAYABLE_STS, SPK_PAYABLE_STS, type SiteSts } from '@/lib/site'
@@ -59,7 +62,9 @@ export const POST = withAuthGuard(
 
     // 2) 검증
     const meta =
-      parseSiteRegMeta(payment.metadata) ?? parseSiteSpkMeta(payment.metadata)
+      parseSiteRegMeta(payment.metadata) ??
+      parseSiteSpkMeta(payment.metadata) ??
+      parseSiteEfctMeta(payment.metadata)
     if (!meta) return reject('PAY_SITE_MISMATCH', 400)
     if (payment.direction !== 'user_to_app')
       return reject('PAY_SITE_MISMATCH', 400)
@@ -72,7 +77,7 @@ export const POST = withAuthGuard(
     const { data: site, error } = await db()
       .from('site_mst')
       .select(
-        'site_id, site_sts_cd, plan_cd, pymnt_id, own_site_yn, spk_yn, spk_pymnt_id',
+        'site_id, site_sts_cd, plan_cd, pymnt_id, own_site_yn, spk_yn, spk_pymnt_id, efct_cd, efct_pymnt_id',
       )
       .eq('site_id', meta.site_id)
       .eq('ownr_usr_id', user.id)
@@ -85,6 +90,8 @@ export const POST = withAuthGuard(
         own_site_yn: 'Y' | 'N'
         spk_yn: 'Y' | 'N'
         spk_pymnt_id: string | null
+        efct_cd: string | null
+        efct_pymnt_id: string | null
       }>()
     if (error) return dbFail(error)
     if (!site || site.own_site_yn === 'Y')
@@ -92,7 +99,28 @@ export const POST = withAuthGuard(
 
     // 정가 산정 — 사이트 현재 값 기준(prepare 이후 PATCH 로 바뀌었으면 metadata 와 불일치 → 거부)
     let expected: number
-    if (meta.type === SITE_SPK) {
+    if (meta.type === SITE_EFCT) {
+      // 이펙트 단독 : 반짝임 단독과 같은 가드 + 선택 코드 일치
+      if (
+        !(SPK_PAYABLE_STS as readonly string[]).includes(site.site_sts_cd) ||
+        (site.site_sts_cd === 'APPLYING' && !site.pymnt_id) ||
+        site.efct_cd !== meta.efct
+      )
+        return reject('INVALID_STATE', 409)
+      if (site.efct_pymnt_id && site.efct_pymnt_id !== payment.identifier)
+        return reject('PAY_ALREADY_PAID', 409)
+      if (
+        await hasOtherApprovedPayment(
+          site.site_id,
+          payment.identifier,
+          SITE_EFCT,
+        )
+      )
+        return reject('PAY_ALREADY_PAID', 409)
+      const efct = await getEfctFee(site.plan_cd)
+      if (efct == null) return reject('PAY_NOT_REQUIRED', 409)
+      expected = efct
+    } else if (meta.type === SITE_SPK) {
       // 반짝임 단독 : 사용료 결제 뒤·신청 켜짐·미결제(같은 결제 재시도는 허용)
       if (
         !(SPK_PAYABLE_STS as readonly string[]).includes(site.site_sts_cd) ||
@@ -130,7 +158,14 @@ export const POST = withAuthGuard(
           : null
       if ((spk != null ? 'Y' : 'N') !== meta.spk)
         return reject('PAY_SITE_MISMATCH', 409)
-      expected = fee.pi_amt + (spk ?? 0)
+      // 합산 이펙트 포함 여부·코드도 현재 값과 일치해야 한다
+      const efct =
+        site.efct_cd && !site.efct_pymnt_id
+          ? await getEfctFee(site.plan_cd)
+          : null
+      if ((efct != null ? site.efct_cd : undefined) !== meta.efct)
+        return reject('PAY_SITE_MISMATCH', 409)
+      expected = fee.pi_amt + (spk ?? 0) + (efct ?? 0)
     }
     // 정가와 정확히 일치(초과도 거부 — 서버 prepare 금액 그대로여야 한다)
     if (Math.abs(Number(payment.amount) - expected) > 1e-6)

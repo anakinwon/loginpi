@@ -52,6 +52,7 @@ export type FeeInfo = {
   use_mon_cnt: number | null
   dc_pct: number | null
   spk: number | null // 반짝임 부가서비스 단가(요금제별) — null 이면 판매 안 함
+  efct: number | null // 버블 이펙트 단가(요금제별, 3종 공통)
 }
 export type FeeMap = Record<string, FeeInfo>
 // 등록 요금표(/api/fee-plans, 공개) — 폼 요금제 선택·결제 페이지 금액·관리자 승인 게이트 공용.
@@ -70,6 +71,7 @@ export function useFeeData(): { fees: FeeMap | null; cfg: SiteCfg | null } {
       items: (Omit<FeeInfo, 'spk'> & {
         plan_cd: string
         spk_pi_amt: number | null
+        efct_pi_amt: number | null
       })[]
       cfg?: SiteCfg
     }>(fetch('/api/fee-plans')).then((r) => {
@@ -83,6 +85,7 @@ export function useFeeData(): { fees: FeeMap | null; cfg: SiteCfg | null } {
                 use_mon_cnt: f.use_mon_cnt,
                 dc_pct: f.dc_pct,
                 spk: f.spk_pi_amt,
+                efct: f.efct_pi_amt,
               },
             ]),
           ),

@@ -18,6 +18,7 @@ import {
   type ApiErrorBody,
   type FeeMap,
 } from '@/lib/client-api'
+import { EFCT_ICON } from './bubble-canvas'
 import { LogoField } from './logo-field'
 import {
   APPLY_PLAN_CD,
@@ -32,6 +33,7 @@ import {
   type Paged,
   PAYABLE_STS,
   SPK_PAYABLE_STS,
+  EFCT_CD,
   VERIFY_FILE,
   WITHDRAW_BLOCKED_STS,
 } from '@/lib/site'
@@ -49,9 +51,19 @@ const payAmount = (s: OwnerSite, fees: FeeMap | null) => {
   if (base == null) return '…'
   const spk =
     s.spk_yn === 'Y' && !s.spk_pymnt_id ? (fees?.[s.plan_cd]?.spk ?? 0) : 0
-  return String(base + spk)
+  const efct =
+    s.efct_cd && !s.efct_pymnt_id ? (fees?.[s.plan_cd]?.efct ?? 0) : 0
+  return String(base + spk + efct)
 }
 // 반짝임 단독 결제 필요 — 사용료 결제 뒤(APPLYING 은 pymnt_id 있을 때)·신청 켜짐·미결제·판매 중
+// 이펙트 단독 결제 필요 — 반짝임과 같은 조건
+const needsEfctPayment = (s: OwnerSite, fees: FeeMap | null) =>
+  s.own_site_yn !== 'Y' &&
+  !!s.efct_cd &&
+  !s.efct_pymnt_id &&
+  (SPK_PAYABLE_STS as readonly string[]).includes(s.site_sts_cd) &&
+  (s.site_sts_cd !== 'APPLYING' || !!s.pymnt_id) &&
+  (fees == null || (fees[s.plan_cd]?.efct ?? 0) > 0)
 const needsSpkPayment = (s: OwnerSite, fees: FeeMap | null) =>
   s.own_site_yn !== 'Y' &&
   s.spk_yn === 'Y' &&
@@ -67,6 +79,7 @@ export function MySites() {
 function MySitesInner() {
   const t = useTranslations('me')
   const ts = useTranslations('siteSts')
+  const te = useTranslations('efct')
   const tr = useTranslations('rjctRsn')
   const errText = useApiErrorText()
   const [page, setPage] = useState(1)
@@ -193,6 +206,25 @@ function MySitesInner() {
                     )}
                   </p>
                 )}
+                {s.efct_cd && (
+                  <p className="text-xs">
+                    {EFCT_ICON[s.efct_cd]} {te(s.efct_cd)}
+                    {s.own_site_yn !== 'Y' && (
+                      <span className="text-muted-foreground">
+                        {' · '}
+                        {s.efct_pymnt_id ? t('paid') : t('unpaid')}
+                      </span>
+                    )}
+                  </p>
+                )}
+                {needsEfctPayment(s, fees) && (
+                  <Link
+                    className="btn w-fit"
+                    href={`/pay/${s.site_id}?kind=efct`}
+                  >
+                    {t('efctGo', { amount: fees?.[s.plan_cd]?.efct ?? '…' })}
+                  </Link>
+                )}
                 {needsSpkPayment(s, fees) && (
                   <Link
                     className="btn w-fit"
@@ -303,6 +335,7 @@ function SiteForm({
   onDone: () => void
 }) {
   const t = useTranslations('form')
+  const te = useTranslations('efct')
   const tc = useTranslations('siteCtgr')
   const errText = useApiErrorText()
   const [domain, setDomain] = useState(site?.site_dom_nm ?? '')
@@ -321,6 +354,12 @@ function SiteForm({
   )
   // 반짝임 부가서비스 — 결제된 뒤엔 끌 수 없다(서버도 강제)
   const [spk, setSpk] = useState(site?.spk_yn === 'Y')
+  // 버블 이펙트 — 결제된 뒤엔 못 바꾼다(서버도 강제)
+  const [efct, setEfct] = useState<string>(site?.efct_cd ?? '')
+  const efctPaid =
+    !!site?.efct_pymnt_id &&
+    site.site_sts_cd !== 'USED' &&
+    site.site_sts_cd !== 'EXPIRED'
   // 재등록(USED·EXPIRED)은 새 결제라 지난 주기 결제와 무관하게 다시 고른다
   const spkPaid =
     !!site?.spk_pymnt_id &&
@@ -364,6 +403,7 @@ function SiteForm({
           mvUrl,
           planCd,
           spk,
+          efct: efct || null,
           submit,
         }),
       }),
@@ -458,6 +498,30 @@ function SiteForm({
         </label>
         <p className="text-muted-foreground mt-1 text-xs">
           {spkPaid ? t('spkPaid') : t('spkHint')}
+        </p>
+      </div>
+
+      <div>
+        <label className="label" htmlFor="f-efct">
+          {t('efct')}
+          {fees?.[planCd]?.efct != null ? ` (+${fees[planCd].efct} Pi)` : ''}
+        </label>
+        <select
+          id="f-efct"
+          className="input"
+          value={efct}
+          disabled={efctPaid}
+          onChange={(e) => setEfct(e.target.value)}
+        >
+          <option value="">{t('efctNone')}</option>
+          {EFCT_CD.map((c) => (
+            <option key={c} value={c}>
+              {EFCT_ICON[c]} {te(c)}
+            </option>
+          ))}
+        </select>
+        <p className="text-muted-foreground mt-1 text-xs">
+          {efctPaid ? t('efctPaid') : t('efctHint')}
         </p>
       </div>
 

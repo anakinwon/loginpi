@@ -8,7 +8,7 @@
 |---|---|---|---|
 | 0 | 선결 | 1주 | **진행중** — 완료 3 · 부분 1(스테이징 env 등록 완료, 도메인·Ignored Build Step 미완) · 미착수 4 |
 | 1 | MVP(사용료 디렉터리) | 2주 | **구현 완료 · 스테이징 운용 중** — 실기기 ✅ 로그인(2026-10-11)·사용료 결제 1건(2026-10-12, 마스터 확인)·반짝임 모바일(2026-10-13). 2026-10-13 심사 폐지·사용료 전환 P0~P3 반영, 잔여 P5~P8(크론·문구 개명·문서·운영 승격) |
-| 2 | 수익(부가서비스·프리미엄·멤버십·구독) | 2주 | **일부 착수** — 반짝임 부가서비스(합산·단독 결제, sql/013~015) 스테이징 반영·실기기 결제 ✅(2026-10-13). 슬롯·STATS·멤버십은 대기(착수 조건 PRD §9 #2 미회신) |
+| 2 | 수익(부가서비스·프리미엄·멤버십·구독) | 2주 | **일부 착수** — 반짝임 부가서비스(합산·단독 결제, sql/013~015) 스테이징 반영·실기기 결제 ✅(2026-10-13) + **버블 이펙트 3종**(궤도·펄스·혜성, sql/017, dev·stg, 시연 3사이트 — 실기기 미검증). 슬롯·STATS·멤버십은 대기(착수 조건 PRD §9 #2 미회신) |
 | 2+ | 장기 요금(2년·5년·10년·영구) 개시 | — | 법무·환불 확정 대기 |
 | 3 | 신뢰(리뷰·소유 검증) | 2주 | 대기 (수동 소유 검증은 Phase 1 선행 구현 → 2026-10-13 강제 검증 해제(D1), 선택 배지로 전환 — 잔여) |
 | 4 | 허브(PRD_27 §2.6) | — | **동결** (마스터 재개 지시 전 착수 금지) |
@@ -54,7 +54,8 @@
 
 - [x] **심사 폐지·사용료 전환 P0~P3**(정본 `PRD_USAGE_FEE_STATE.md` v0.2c, sql/012 DA 승인, 0e150859) — 신청 상태 9종(APPLYING·PAID·IN_USE·USED·EXPIRED·REJECTED·SUSPENDED·WITHDRAWN·DRAFT), sys_cfg 타이머(결제 1h·사용 시작 지연 1h·재등록 12h), RPC `fn_cmpl_site_reg_pymnt`·`fn_bgn_site_use`, 관리자 액션 start/reject/suspend/restore, 재등록·쿨다운·결제 경계 가드, 금지 카테고리 반려 도메인 재신청 차단(D2, 4a758cda). stg DB 적용(IN_USE 20)
 - [x] **P4** 운영 설정(2026-10-13) — `src/lib/cfg.ts`·`/api/admin/cfg`·관리자 "운영 설정" 탭·`/api/fee-plans` cfg 동봉·안내 문구 실제 시간(h). 변경 감사 `sys_cfg_chg_hist` 는 후속. 반짝임 부가서비스 결제 실기기 ✅(마스터 2026-10-13)
-- [ ] 사용료 전환 잔여 — **P5** 크론 `/api/cron/site-sts-sweep`(PAID→IN_USE 자동, 1h 미결제 PAY_TIMEOUT 반려, USED/EXPIRED 전이, `CRON_SECRET` fail-closed, 운영 등록은 PAID 탭 검토 뒤) → **P6** '심사비' 문구 전수 개명 → **P7** 문서 → **P8** 실기기(설정 0.05h 전 구간) + **운영 DB sql/012~016 적용과 `prod/sitemap` 승격을 한 창**. ⚠ 크론 전까지 PAID→IN_USE 는 관리자 "사용 시작" 수동
+- [x] **P5** 크론(2026-10-13) — `/api/cron/site-sts-sweep`(vercel.json `*/5`, Bearer `CRON_SECRET` fail-closed, 4전이 + 진행 중 결제 txid 가드, 멱등). stg 수동 실측 4전이·skip·401 ✅. 운영 `CRON_SECRET` 은 PAID 탭 검토 뒤 등록(OPS_SETUP §6-1)
+- [ ] 사용료 전환 잔여 — **P6** '심사비' 문구 전수 개명 → **P7** 문서 → **P8** 실기기(설정 0.05h 전 구간) + **운영 DB sql/012~016 적용과 `prod/sitemap` 승격을 한 창**. ⚠ 운영 크론 가동(P8 CRON_SECRET 등록) 전까지 PAID→IN_USE 는 관리자 "사용 시작" 수동
 - [x] **요금 재편·명칭 확정**(sql/014~016, fa6ade8b·4cc53c1f) — 기본·골드·프리미엄·플래티넘·VIP, 약정 1·3·6·12·24개월, 사용료 10·25·45·80·130, 반짝임 2·5·9·16·26 Pi, 할인율 소수 2자리, 화면 총수(PLAN_CAP) 110 → 90
 - [x] 빈 버블 안내 `/ad` 개편(19b559ea) — "내 비지니스를 등록하자!" 문구, 요금제 콤보 + 남은 수량(`PLAN_CAP` − 점유), 0 이면 미노출, `/api/fee-plans` `remaining`
 - [x] 회사 로고 300×300(`logo.ts`·`logo-field.tsx`, 중앙 자르기 PNG) + 관리자 콘텐츠 수정(`PATCH action=edit`) + Storage 버킷 `site-img` 스크립트(2575d96d). 실기기 로고 업로드 검증 대기
@@ -65,6 +66,7 @@
 ## Phase 2 — 수익
 
 - [x] **반짝임 부가서비스(SPARKLE)**(마스터 지시 2026-10-13, fa6ade8b, PRD_USAGE_FEE_STATE §10) — sql/013 `site_mst.spk_yn·spk_pymnt_id·spk_pay_dtm` + `fee_plan` SPARKLE × 요금제 + RPC `fn_cmpl_site_spk_pymnt`(DA 조건부 승인 반영), 신청·수정·관리자 폼 선택, 사용료 합산 결제(prepare REG + `metadata.spk`)·사용 중 단독 결제(`/pay?kind=spk`, `SITE_SPK`), approve 정가 재계산·spk 일치 검증, 철회·정지 가드 두 결제 유형, 결제 사이트(자사는 토글)만 버블 반짝임. 적대적 리뷰 반영(sql/014 RPC 상태 게이트 제거·철회/정지 가드 두 결제 유형·관리자 토글 보존). **실기기 결제(합산·단독) 검증 대기**
+- [x] **버블 이펙트 부가서비스(EFFECT)**(마스터 지시 2026-10-13, PRD_01 §3-1 채택, 정본 `PRD_02_EFCT.md`) — sql/017 `site_mst.efct_cd·efct_pymnt_id·efct_pay_dtm` + `fee_plan` EFFECT × 요금제(15% [확인중]) + RPC `fn_cmpl_site_efct_pymnt`·`fn_cmpl_site_reg_pymnt` 재정의(DA 조건부 승인 반영 — EFCT 4자 예외 등재), 렌더 3종 `src/components/effects`(궤도 토성형 타원 고리+마스크 위성·펄스 SMIL 링·혜성 대시 테이퍼 꼬리, CSS transform 애니메이션 금지 철칙, 스타일은 globals.css), 신청·수정·관리자 콤보, 합산(`metadata.efct`)·단독(`/pay?kind=efct`, `SITE_EFCT`) 결제, 시연 barista 🪐·seminar 💓·gifticon ☄ 미결제 예외(`EFCT_TRIAL_DOMAINS`). dev·stg 적용. **Pi Browser 실기기 미검증**
 - [ ] 공용 패키지 `@pi/payments` 추출(cafe.pi `pi-pay-button`·`api/payments/approve·complete` 출처) — Phase 1에서 이동
 - [ ] `010_pi_pymnt.sql`(@pi/db baseline) 선행 → `003_sitemap_phase2.sql`(`fee_plan`·`fee_plan_bndl`·`fee_ordr`·`promo_fee_config` 등 테이블 9) + 시드 — da-governance-expert 리뷰
 - [ ] U2A approve/complete — `@pi/payments` 레지스트리에 핸들러 등록(서버 정가 재계산), CTGR_SLOT·HOME_SLOT·EXTEND·STATS·PREMIUM30
@@ -127,3 +129,4 @@
 | 2026-10-12 | 반짝임 부가서비스 모바일 정적 수정 — SVG transform 대신 stroke-dashoffset·opacity, 움직임 줄이기 모드는 정지 대신 3배 감속(TROUBLESHOOT 2026-10-12). ✅ 모바일 실기기 정상 동작 확인(마스터 2026-10-13), reduce 감속 정책은 마스터 확인 [확인중] |
 | 2026-10-12 | 스테이징 결제 타임아웃 해결 — 원인 Vercel `PI_API_KEY` 무효(Pi API 401), `scripts/pi-key-probe.mjs` 신설, ✅ 실기기 사용료 결제 1건 성공(마스터 확인). 일반 브라우저 로그인 복구 — Google env 4종(AUTH_SECRET 포함) 스테이징 등록, Google OAuth redirect_uri 등록 안내 [확인중 : 마스터 등록 완료 시점] |
 | 2026-10-13 | 진행 현행화 — 진행률 표(Phase 1 스테이징 운용·Phase 2 일부 착수), 2026-10-13 마스터 지시 묶음 8항목(완료 6 — 심사 폐지·사용료 전환 P0~P3, 요금 재편·명칭 확정, 빈 버블 안내, 로고·관리자 수정, 관리 테이블, 외부 이동 카드·연동 3상태 / 미완 2 — 사용료 전환 잔여 P4~P8, 마스터 결정 대기), Phase 2 반짝임 부가서비스 체크, 사용료 전환 잔여 P4~P8·마스터 결정 대기 항목, 리스크 2건(운영 DB 스키마 드리프트·Vercel success≠반영) 추가 |
+| 2026-10-13 | 버블 이펙트 부가서비스 3종(궤도·펄스·혜성) 구축 — 서브에이전트 3(기획·설계·구축) + 팀장 검토, sql/017 dev·stg, 시연 3사이트 미결제 예외, 문서 PRD_02_EFCT·PRD §3·FEE_STATE §11·PRD_01 §3-1 |

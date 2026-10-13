@@ -16,7 +16,10 @@ export default async function PayPage({
   return (
     <div className="mx-auto flex max-w-xl flex-col gap-4">
       <h1 className="text-2xl font-bold">{t('title')}</h1>
-      <PayPanel siteId={siteId} kind={kind === 'spk' ? 'SPK' : 'REG'} />
+      <PayPanel
+        siteId={siteId}
+        kind={kind === 'spk' ? 'SPK' : kind === 'efct' ? 'EFCT' : 'REG'}
+      />
     </div>
   )
 }

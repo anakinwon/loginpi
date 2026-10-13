@@ -19,8 +19,8 @@ export const GET = withGuard(
         // 반짝임 부가서비스 단가(요금제별, sql/014) — 판매 중 행만
         db()
           .from('fee_plan')
-          .select('plan_cd, pi_amt')
-          .eq('fee_tp_cd', 'SPARKLE')
+          .select('plan_cd, pi_amt, fee_tp_cd')
+          .in('fee_tp_cd', ['SPARKLE', 'EFFECT'])
           .eq('use_yn', 'Y')
           .eq('del_yn', 'N'),
         // 운영 타이머(sys_cfg) — 조회 실패는 기본값(안내 문구용 보조 정보)
@@ -30,15 +30,23 @@ export const GET = withGuard(
         }),
       ])
       if (spk.error) throw spk.error
-      const spkBy = new Map(
-        (spk.data ?? []).map((r) => [r.plan_cd as string, Number(r.pi_amt)]),
-      )
+      const byTp = (tp: string) =>
+        new Map(
+          (spk.data ?? [])
+            .filter((r) => r.fee_tp_cd === tp)
+            .map((r) => [r.plan_cd as string, Number(r.pi_amt)]),
+        )
+      const spkBy = byTp('SPARKLE')
+      const efctBy = byTp('EFFECT')
       const items = fees.map((f) => ({
         ...f,
         remaining: remaining?.[f.plan_cd as keyof typeof remaining] ?? null,
         // spk_pi_amt : 이 요금제의 반짝임 부가서비스 단가(판매 안 하면 null)
         spk_pi_amt:
           (spkBy.get(f.plan_cd) ?? 0) > 0 ? spkBy.get(f.plan_cd)! : null,
+        // efct_pi_amt : 버블 이펙트(3종 공통) 단가
+        efct_pi_amt:
+          (efctBy.get(f.plan_cd) ?? 0) > 0 ? efctBy.get(f.plan_cd)! : null,
       }))
       return NextResponse.json({ items, cfg }, { headers: PUBLIC_CACHE })
     } catch (e) {

@@ -13,16 +13,20 @@ import {
   requireUser,
 } from '@/lib/api'
 import {
+  getEfctFee,
   getRegFee,
   getSpkFee,
+  SITE_EFCT,
   SITE_REG,
   SITE_SPK,
+  type SiteEfctMeta,
   type SiteRegMeta,
   type SiteSpkMeta,
 } from '@/lib/payments'
 import {
   PAYABLE_STS,
   SPK_PAYABLE_STS,
+  type EfctCd,
   type PlanCd,
   type SiteSts,
 } from '@/lib/site'
@@ -31,7 +35,7 @@ const PAYABLE: readonly SiteSts[] = PAYABLE_STS
 const SPK_PAYABLE: readonly SiteSts[] = SPK_PAYABLE_STS
 const bodySchema = z.object({
   siteId: z.uuid(),
-  kind: z.enum(['REG', 'SPK']).default('REG'),
+  kind: z.enum(['REG', 'SPK', 'EFCT']).default('REG'),
 })
 
 export const POST = withAuthGuard(
@@ -44,7 +48,7 @@ export const POST = withAuthGuard(
     const { data: site, error } = await db()
       .from('site_mst')
       .select(
-        'site_id, site_dom_nm, site_sts_cd, plan_cd, pymnt_id, own_site_yn, spk_yn, spk_pymnt_id',
+        'site_id, site_dom_nm, site_sts_cd, plan_cd, pymnt_id, own_site_yn, spk_yn, spk_pymnt_id, efct_cd, efct_pymnt_id',
       )
       .eq('site_id', body.siteId)
       .eq('ownr_usr_id', user.id)
@@ -58,10 +62,36 @@ export const POST = withAuthGuard(
         own_site_yn: 'Y' | 'N'
         spk_yn: 'Y' | 'N'
         spk_pymnt_id: string | null
+        efct_cd: EfctCd | null
+        efct_pymnt_id: string | null
       }>()
     if (error) return dbFail(error)
     if (!site) return apiError('NOT_FOUND', 404)
     if (site.own_site_yn === 'Y') return apiError('PAY_NOT_REQUIRED', 409)
+
+    if (body.kind === 'EFCT') {
+      // 이펙트 단독 : 반짝임 단독과 같은 조건(사용료 결제 뒤·선택됨·미결제)
+      if (site.efct_pymnt_id) return apiError('PAY_ALREADY_PAID', 409)
+      if (
+        !site.efct_cd ||
+        !SPK_PAYABLE.includes(site.site_sts_cd) ||
+        (site.site_sts_cd === 'APPLYING' && !site.pymnt_id)
+      )
+        return apiError('INVALID_STATE', 409)
+      const efct = await getEfctFee(site.plan_cd)
+      if (efct == null) return apiError('PAY_NOT_REQUIRED', 409)
+      const metadata: SiteEfctMeta = {
+        type: SITE_EFCT,
+        site_id: site.site_id,
+        usr_id: user.id,
+        efct: site.efct_cd,
+      }
+      return NextResponse.json({
+        amount: efct,
+        memo: `sitemap.pi bubble effect (${site.efct_cd.toLowerCase()}) - ${site.site_dom_nm}`,
+        metadata,
+      })
+    }
 
     if (body.kind === 'SPK') {
       if (site.spk_pymnt_id) return apiError('PAY_ALREADY_PAID', 409)
@@ -96,17 +126,23 @@ export const POST = withAuthGuard(
       site.spk_yn === 'Y' && !site.spk_pymnt_id
         ? await getSpkFee(site.plan_cd)
         : null
+    // 합산 — 이펙트도 같은 규칙(선택됨·미결제·판매 중)
+    const efct =
+      site.efct_cd && !site.efct_pymnt_id
+        ? await getEfctFee(site.plan_cd)
+        : null
     const metadata: SiteRegMeta = {
       type: SITE_REG,
       site_id: site.site_id,
       plan_cd: site.plan_cd,
       usr_id: user.id,
       spk: spk != null ? 'Y' : 'N',
+      ...(efct != null && site.efct_cd && { efct: site.efct_cd }),
     }
     return NextResponse.json({
-      amount: fee.pi_amt + (spk ?? 0),
+      amount: fee.pi_amt + (spk ?? 0) + (efct ?? 0),
       // memo 는 ™·특수문자 없이(결제 호환), 브랜드 원형 표기 금지 규칙과 별개로 ASCII 유지
-      memo: `sitemap.pi site usage fee (${site.plan_cd}${spk != null ? ' + sparkle' : ''}) - ${site.site_dom_nm}`,
+      memo: `sitemap.pi site usage fee (${site.plan_cd}${spk != null ? ' + sparkle' : ''}${efct != null ? ' + effect' : ''}) - ${site.site_dom_nm}`,
       metadata,
     })
   }),

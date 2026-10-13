@@ -6,6 +6,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useFormatter, useTranslations } from 'next-intl'
 import { piFetch } from '@pi/auth/client'
+import { EFCT_ICON } from './bubble-canvas'
 import { CfgPanel } from './cfg-panel'
 import { LoginGate } from './login-gate'
 import { LogoField } from './logo-field'
@@ -15,6 +16,7 @@ import {
   LIMITS,
   PLAN_COLOR,
   RJCT_RSN,
+  EFCT_CD,
   SITE_CTGR,
   VERIFY_FILE,
   type OwnerSite,
@@ -315,6 +317,7 @@ function SiteRows({
   usePeriod: string
 }) {
   const t = useTranslations('admin')
+  const te = useTranslations('efct')
   // 상세 행 id — 열기/닫기 버튼의 aria-controls 대상(접근성, 팀장 지적 2026-10-13)
   const detailId = `site-detail-${s.site_id}`
   // 콘텐츠 수정 폼 열림 — 행을 닫으면 폼도 닫는다
@@ -405,6 +408,12 @@ function SiteRows({
                 {t('pvtCntc')}: {s.pvt_cntc_txt ?? '-'}
                 {' · '}
                 {t('pubCntc')}: {s.pub_cntc_txt ?? '-'}
+                {s.efct_cd && (
+                  <>
+                    {' · '}
+                    {EFCT_ICON[s.efct_cd]} {te(s.efct_cd)}
+                  </>
+                )}
                 {s.spk_yn === 'Y' && (
                   <>
                     {' · ✨ '}
@@ -490,6 +499,7 @@ function SiteEdit({
 }) {
   const t = useTranslations('form')
   const ta = useTranslations('admin')
+  const te = useTranslations('efct')
   const tc = useTranslations('siteCtgr')
   const [name, setName] = useState(s.site_nm)
   const [ctgr, setCtgr] = useState<string>(s.site_ctgr_cd)
@@ -498,6 +508,7 @@ function SiteEdit({
   const [pubCntc, setPubCntc] = useState(s.pub_cntc_txt ?? '')
   const [mvUrl, setMvUrl] = useState(s.site_mv_url ?? '')
   const [spk, setSpk] = useState(s.spk_yn === 'Y')
+  const [efct, setEfct] = useState<string>(s.efct_cd ?? '')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const f = `a-${s.site_id}`
@@ -516,6 +527,7 @@ function SiteEdit({
           pubCntc,
           mvUrl,
           spk,
+          efct: efct || null,
         })
       }}
     >
@@ -609,6 +621,29 @@ function SiteEdit({
           </span>
         )}
       </label>
+      <div>
+        <label className="label" htmlFor={`${f}-efct`}>
+          {t('efct')}
+          {s.own_site_yn !== 'Y' && s.efct_cd && (
+            <span className="text-muted-foreground ml-2 text-xs">
+              {s.efct_pymnt_id ? ta('paid') : ta('unpaid')}
+            </span>
+          )}
+        </label>
+        <select
+          id={`${f}-efct`}
+          className="input"
+          value={efct}
+          onChange={(e) => setEfct(e.target.value)}
+        >
+          <option value="">{t('efctNone')}</option>
+          {EFCT_CD.map((c) => (
+            <option key={c} value={c}>
+              {EFCT_ICON[c]} {te(c)}
+            </option>
+          ))}
+        </select>
+      </div>
       {error && (
         <p className="text-destructive text-sm" role="alert">
           {error}

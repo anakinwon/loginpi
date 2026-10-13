@@ -9,7 +9,9 @@ import samples from '@/data/sample-sites.json'
 import { apiError, db, PUBLIC_CACHE } from '@/lib/api'
 import {
   BUBBLE_DAYS,
+  effectOn,
   isSparkleOn,
+  type EfctCd,
   MV_URL_RE,
   PLAN_CD,
   SITE_CTGR,
@@ -38,6 +40,15 @@ const samplePct = (domain: string) => {
 // 부가서비스 "반짝임" — 유료 요금제마다 sample-sites.json 의 첫 샘플이 추가요금을 내고 선택한 것으로 간주(마스터 지시 2026-10-10).
 // 카테고리 필터 전에 정해 필터를 바꿔도 같은 사이트가 반짝인다.
 // 실사이트는 site_mst.spk_yn·spk_pay_dtm(sql/013, isSparkleOn) — 결제 전엔 붙이지 않는다(미결제 유료 표시 금지)
+// 부가서비스 "버블 이펙트" 데모 — 유료 요금제마다 두 번째 샘플에 궤도→펄스→혜성 순환(마스터 지시 2026-10-13 3종 시연)
+const EFFECT_SAMPLE = new Map<string, EfctCd>(
+  PLAN_CD.filter((p) => p !== 'NONE').flatMap((p, i) => {
+    const d = samples.sites.filter((s) => s.planCd === p)[1]?.domain
+    return d
+      ? [[d, (['ORBIT', 'PULSE', 'COMET'] as const)[i % 3]] as const]
+      : []
+  }),
+)
 const SPARKLE = new Set(
   PLAN_CD.filter((p) => p !== 'NONE').map(
     (p) => samples.sites.find((s) => s.planCd === p)?.domain,
@@ -67,6 +78,7 @@ const sampleItems = (ctgr: string | null): BubbleItem[] =>
       chgPct: samplePct(s.domain),
       sample: true,
       sparkle: SPARKLE.has(s.domain),
+      effect: EFFECT_SAMPLE.get(s.domain) ?? null,
     }))
 
 // 실데이터 뒤에 샘플을 붙이되 버블 상한(MAX_BUBBLES) 유지
@@ -100,7 +112,7 @@ async function load(
   let q = db()
     .from('site_mst')
     .select(
-      'site_id, site_dom_nm, site_nm, site_ctgr_cd, site_img_url, site_mv_url, plan_cd, own_site_yn, spk_yn, spk_pay_dtm',
+      'site_id, site_dom_nm, site_nm, site_ctgr_cd, site_img_url, site_mv_url, plan_cd, own_site_yn, spk_yn, spk_pay_dtm, efct_cd, efct_pay_dtm',
     )
     .eq('del_yn', 'N')
     .eq('site_sts_cd', 'IN_USE')
@@ -142,6 +154,7 @@ async function load(
       chgPct: pct(c.cur, c.prev),
       // 반짝임 부가서비스 — 신청 + (결제 완료 또는 자사). 샘플은 SPARKLE Set
       sparkle: isSparkleOn(s),
+      effect: effectOn({ ...s, efct_cd: s.efct_cd as EfctCd | null }),
     }
   })
   return {

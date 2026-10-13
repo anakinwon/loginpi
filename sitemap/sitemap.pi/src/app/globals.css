@@ -156,19 +156,10 @@
   }
 }
 
-/* 부가서비스 "반짝임" 버블 — 테두리를 한 바퀴 도는 빛줄기 + 별 깜빡임(색 = currentColor = 요금제 보색 PLAN_SPARKLE).
+/* 부가서비스 "반짝임" 버블 — 외곽 별 3개 깜빡임(색 = currentColor = 요금제 보색 PLAN_SPARKLE). 테두리를 도는 빛줄기(.sparkle-glint)는 혜성 이펙트와 겹쳐 제거(마스터 2026-10-13).
    CSS transform 비사용 — 모바일 WebKit·WebView 의 SVG transform-box 의존과 filter+transform 캐시 문제를 피하려고
-   빛줄기는 stroke-dashoffset(pathLength=100 기준 -100 = 한 바퀴), 별은 opacity 만 애니메이션한다.
+   별은 opacity 만 애니메이션한다.
    움직임 줄이기 설정이면 정지가 아니라 3배 느리게(유료 부가서비스라 모바일에서도 효과가 보여야 함) */
-.sparkle-glint {
-  filter: drop-shadow(0 0 4px currentColor);
-  animation: sparkle-spin 2.4s linear infinite;
-}
-@keyframes sparkle-spin {
-  to {
-    stroke-dashoffset: -100;
-  }
-}
 .sparkle-star {
   filter: drop-shadow(0 0 3px currentColor);
   animation: sparkle-twinkle 1.8s ease-in-out infinite backwards;
@@ -183,10 +174,95 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .sparkle-glint {
-    animation-duration: 7.2s;
-  }
   .sparkle-star {
     animation-duration: 5.4s;
+  }
+}
+
+/* ===== 버블 이펙트 부가서비스(궤도·펄스·혜성) — 모듈 src/components/effects/*.tsx 와 한 쌍. 반짝임(.sparkle-*)처럼 이 파일에 직접 둔다 ===== */
+/* 이펙트 "궤도"(ORBIT) — 기울어진 타원 고리 위를 위성 점이 천천히 돈다(색 = currentColor = 요금제 보색). globals.css 에 직접 둔다(dev Turbopack 이 별도 파일 @import 를 누락 — 2026-10-13)
+   모바일 WebView 철칙(TROUBLESHOOT 2026-10-12) : CSS transform 애니메이션 비사용, 위성 이동은 stroke-dashoffset(pathLength=100 → -100 = 한 바퀴)만.
+   움직임 줄이기는 정지가 아니라 3배 감속(유료 부가서비스 — 모바일 접근성 모드에서도 보여야 함) */
+.efct-orbit-path {
+  opacity: 0.45;
+}
+.efct-orbit-sat {
+  animation: efct-orbit-spin 40s linear infinite;
+}
+.efct-orbit-sat2 {
+  animation-duration: 64s;
+  animation-direction: reverse;
+  animation-delay: -24s; /* 음수 지연 = 시작 위상을 위성 1 과 다르게 */
+}
+.efct-orbit-glow {
+  filter: drop-shadow(0 0 4px currentColor);
+}
+@keyframes efct-orbit-spin {
+  to {
+    stroke-dashoffset: -100;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .efct-orbit-sat {
+    animation-duration: 120s;
+  }
+  .efct-orbit-sat2 {
+    animation-duration: 192s;
+  }
+}
+
+/* 이펙트 "펄스" — 파동 링은 SMIL(pulse.tsx), 여기는 후광(halo) 박동 + 발광 filter 1개.
+   CSS transform 비사용(모바일 WebView 철칙) — opacity 만 애니메이션.
+   박동 리듬 = pulse.tsx 와 동일 주기 2s(lub 0s → dub 0.28s → 휴지). 움직임 줄이기는 정지 대신 3배 감속(유료 효과) */
+.efct-pulse {
+  filter: drop-shadow(0 0 3px currentColor);
+}
+.efct-pulse-halo {
+  opacity: 0.12;
+  animation: efct-pulse-beat 2s linear infinite;
+}
+@keyframes efct-pulse-beat {
+  0%,
+  30%,
+  100% {
+    opacity: 0.12;
+  }
+  5% {
+    opacity: 0.55;
+  }
+  14% {
+    opacity: 0.15;
+  }
+  19% {
+    opacity: 0.45;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .efct-pulse-halo {
+    animation-duration: 6s;
+  }
+}
+
+/* 이펙트 "혜성"(COMET) — comet.tsx 와 한 쌍, globals.css 에 직접 둔다(dev Turbopack 이 별도 파일 @import 를 누락 — 2026-10-13).
+   머리·꼬리 원이 같은 stroke-dashoffset 애니메이션(pathLength=100 기준 +100 = 한 바퀴)을 공유해
+   머리(1.5%·굵기 2배)가 앞서고 긴 꼬리(최대 60%)가 뒤따른다. 반짝임(2.4s·시계방향)과 구분되게 반시계방향(28.8s — 마스터 2026-10-13 1/3 → 1/2 → 1/2).
+   CSS transform 비사용 — 모바일 WebKit·WebView SVG transform 사고(TROUBLESHOOT 2026-10-12) 회피.
+   움직임 줄이기는 정지가 아니라 3배 감속(유료 부가서비스 — 모바일에서도 보여야 함) */
+.efct-comet-head,
+.efct-comet-tail {
+  animation: efct-comet-spin 28.8s linear infinite;
+}
+.efct-comet-head {
+  filter: drop-shadow(0 0 4px currentColor);
+}
+@keyframes efct-comet-spin {
+  to {
+    stroke-dashoffset: 100;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .efct-comet-head,
+  .efct-comet-tail {
+    animation-duration: 86.4s;
   }
 }

@@ -31,6 +31,7 @@ const seg = (on: boolean) =>
 
 export function BubbleHome() {
   const t = useTranslations('bubble')
+  const te = useTranslations('efct')
   const tp = useTranslations('plan')
   const tc = useTranslations('siteCtgr')
   const locale = useLocale()
@@ -227,6 +228,7 @@ export function BubbleHome() {
                 ownLabel={t('own')}
                 sampleLabel={t('sample')}
                 sparkleLabel={t('sparkle')}
+                effectLabel={(cd) => te(cd)}
                 planName={planName}
                 fmtPct={fmtPct}
                 fmtViews={fmtViews}

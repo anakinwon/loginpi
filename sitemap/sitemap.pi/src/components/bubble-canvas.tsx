@@ -6,11 +6,13 @@
 // 글자는 9px 미만으로 줄이지 않고 반지름에 따라 표시 단계를 낮춘다(3 로고·회사명 → 2 회사명 → 1 로고(첫 글자) → 0 없음).
 // 프레임마다 React 렌더 없이 transform 속성만 갱신(60fps 목표). prefers-reduced-motion 이면 정지 배치(드래그 없음)
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
+import { EFFECTS } from './effects'
 import {
   PLAN_AREA,
   PLAN_BADGE,
   PLAN_COLOR,
   PLAN_SPARKLE,
+  type EfctCd,
   PLAN_CD,
   type BubbleItem,
 } from '@/lib/site'
@@ -38,6 +40,12 @@ const C = {
 } as const
 
 // 반짝임 별 — [각도(°), 크기(반지름 비율), 깜빡임 지연] : 시차를 둬 번갈아 반짝이게
+// 이펙트 아이콘(툴팁·폼) — 번역 이름 앞에 붙는 기호
+export const EFCT_ICON: Record<EfctCd, string> = {
+  ORBIT: '🪐',
+  PULSE: '💓',
+  COMET: '☄',
+}
 const SPARKLE_STARS = [
   [-55, 0.16, '0s'],
   [150, 0.12, '0.6s'],
@@ -170,6 +178,7 @@ export function BubbleCanvas({
   ownLabel,
   sampleLabel,
   sparkleLabel,
+  effectLabel,
   planName,
   fmtPct,
   fmtViews,
@@ -181,6 +190,7 @@ export function BubbleCanvas({
   ownLabel: string // 자사 사이트 배지(광고 대신)
   sampleLabel: string // 가상 샘플 배지(광고 대신)
   sparkleLabel: string // 부가서비스 "반짝임" — 툴팁·aria-label 표시
+  effectLabel: (cd: EfctCd) => string // 부가서비스 "버블 이펙트" 이름(번역 efct.<cd>)
   planName: (it: BubbleItem) => string
   fmtPct: (chg: number) => string
   fmtViews: (it: BubbleItem) => string
@@ -447,7 +457,7 @@ export function BubbleCanvas({
               style={{ color: PLAN_COLOR[it.plan] }}
               tabIndex={0}
               role="link"
-              aria-label={`${label} (${it.domain}), ${badge ? `${tag(it)}, ` : ''}${planName(it)}, ${it.sparkle ? `${sparkleLabel}, ` : ''}${fmtViews(it)}, ${fmtPct(it.chgPct)}`}
+              aria-label={`${label} (${it.domain}), ${badge ? `${tag(it)}, ` : ''}${planName(it)}, ${it.sparkle ? `${sparkleLabel}, ` : ''}${it.effect ? `${effectLabel(it.effect)}, ` : ''}${fmtViews(it)}, ${fmtPct(it.chgPct)}`}
               onPointerDown={(e) => onDown(e, it)}
               onPointerEnter={() => activate(it)}
               onPointerLeave={() =>
@@ -470,22 +480,26 @@ export function BubbleCanvas({
                   stroke={PLAN_COLOR[it.plan]}
                   strokeWidth={Math.max(1.5, r * 0.035)}
                 />
-                {/* 부가서비스 "반짝임" — 테두리를 도는 빛줄기 + 외곽 별 3개 깜빡임(globals.css .sparkle-*) */}
+                {/* 부가서비스 "버블 이펙트"(궤도·펄스·혜성) — src/components/effects, 반짝임과 중복 가능 */}
+                {it.effect && (
+                  <g
+                    pointerEvents="none"
+                    style={{ color: PLAN_SPARKLE[it.plan] }}
+                  >
+                    {EFFECTS[it.effect]({
+                      r,
+                      color: PLAN_SPARKLE[it.plan],
+                      stage,
+                      id: `${uid}-e-${it.id}`,
+                    })}
+                  </g>
+                )}
+                {/* 부가서비스 "반짝임" — 외곽 별 3개 깜빡임(globals.css .sparkle-star). 테두리를 도는 빛줄기는 혜성 이펙트와 겹쳐 제거(마스터 2026-10-13) */}
                 {it.sparkle && (
                   <g
                     pointerEvents="none"
                     style={{ color: PLAN_SPARKLE[it.plan] }}
                   >
-                    <circle
-                      className="sparkle-glint"
-                      r={r}
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth={Math.max(2, r * 0.05)}
-                      strokeLinecap="round"
-                      pathLength={100}
-                      strokeDasharray="10 90"
-                    />
                     {SPARKLE_STARS.map(([deg, k, delay]) => {
                       const a = (deg * Math.PI) / 180
                       const s = Math.max(4, r * k)
@@ -583,6 +597,11 @@ export function BubbleCanvas({
             </p>
             {active.sparkle && (
               <p className="text-amber-200">✨ {sparkleLabel}</p>
+            )}
+            {active.effect && (
+              <p className="text-sky-200">
+                {EFCT_ICON[active.effect]} {effectLabel(active.effect)}
+              </p>
             )}
             <p>
               {fmtViews(active)} ·{' '}

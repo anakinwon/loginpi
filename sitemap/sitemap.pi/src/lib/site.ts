@@ -145,6 +145,9 @@ export const PLAN_CAP: Record<ApplyPlanCd, number> = {
 // 사용료 결제가 가능한 사이트 상태 — prepare·approve·RPC(sql/012 fn_cmpl_site_reg_pymnt)·결제 페이지가 같은 값을 쓴다
 export const PAYABLE_STS = ['APPLYING'] as const satisfies readonly string[]
 // 반짝임 부가서비스 단독 결제가 가능한 상태 — 사용료 결제 뒤(APPLYING 은 pymnt_id 있을 때만)·사용 중. prepare·approve·RPC fn_cmpl_site_spk_pymnt(sql/013) 동일
+// 버블 이펙트 코드 — DB CHECK(site_mst_efct_cd_check, sql/017)와 동일. 렌더는 src/components/effects
+export const EFCT_CD = ['ORBIT', 'PULSE', 'COMET'] as const
+export type EfctCd = (typeof EFCT_CD)[number]
 export const SPK_PAYABLE_STS = [
   'APPLYING',
   'PAID',
@@ -197,6 +200,8 @@ const SITE_CONTENT_FIELDS = {
   pubCntc: optText(LIMITS.cntcMax),
   // 반짝임 부가서비스 신청(spk_yn) — 결제는 prepare(합산)·/pay?kind=spk(단독)
   spk: z.boolean().default(false),
+  // 버블 이펙트 부가서비스(efct_cd) — 요금제별 1종 선택, null = 없음. 결제는 반짝임과 같은 합산·단독 경로
+  efct: z.enum(EFCT_CD).nullable().optional(),
 }
 
 // 등록·수정 본문. submit=true 면 APPLYING 신청(비공개 연락처 필수), 아니면 DRAFT 저장
@@ -268,7 +273,7 @@ export interface PublicSite {
 }
 
 // 소유자·관리자 조회 컬럼 — 비공개 연락처·상태·반려 사유 포함
-export const OWNER_SITE_COLS = `${PUBLIC_SITE_COLS}, site_sts_cd, rjct_rsn_cd, rjct_rsn_cont, pvt_cntc_txt, plan_cd, pymnt_id, pay_dtm, aply_dtm, use_bgn_dtm, use_end_dtm, spk_yn, spk_pymnt_id, spk_pay_dtm, reg_dtm, mod_dtm`
+export const OWNER_SITE_COLS = `${PUBLIC_SITE_COLS}, site_sts_cd, rjct_rsn_cd, rjct_rsn_cont, pvt_cntc_txt, plan_cd, pymnt_id, pay_dtm, aply_dtm, use_bgn_dtm, use_end_dtm, spk_yn, spk_pymnt_id, spk_pay_dtm, efct_cd, efct_pymnt_id, efct_pay_dtm, reg_dtm, mod_dtm`
 
 // RPC 가 돌려준 site_mst 전체 행에서 소유자 응답 컬럼만 추림
 export const pickOwnerSite = (row: Record<string, unknown>) =>
@@ -290,6 +295,9 @@ export interface OwnerSite extends PublicSite {
   spk_yn: 'Y' | 'N' // 반짝임 부가서비스 신청
   spk_pymnt_id: string | null // 반짝임 결제ID(합산이면 pymnt_id 와 같음) — null 이면 미결제
   spk_pay_dtm: string | null
+  efct_cd: EfctCd | null // 버블 이펙트 선택(궤도·펄스·혜성)
+  efct_pymnt_id: string | null // 이펙트 결제ID — null 이면 미결제
+  efct_pay_dtm: string | null
   rjct_rsn_cd: string | null
   rjct_rsn_cont: string | null
   pvt_cntc_txt: string | null
@@ -299,6 +307,27 @@ export interface OwnerSite extends PublicSite {
 
 // 요금제 표시명 접미 — 반짝임 부가서비스를 함께 하는 사이트는 "요금제++"(마스터 지시 2026-10-13). admin-panel·my-sites·pay-panel 이 tp(plan_cd) 뒤에 붙인다
 // 반짝임 노출 조건 — 신청 + (결제 완료 또는 자사). 상태(IN_USE)는 호출처 쿼리가 거른다(sql/013 규칙)
+// 이펙트 시연 사이트 — 테스트 목적이라 미결제여도 효과를 바로 붙인다(마스터 지시 2026-10-13, 검증 끝나면 비우기)
+export const EFCT_TRIAL_DOMAINS: ReadonlySet<string> = new Set([
+  'barista.pi', // 🪐 궤도
+  'seminar.pi', // 💓 펄스
+  'gifticon.pi', // ☄ 혜성
+])
+
+// 이펙트 노출 조건 — 선택 + (결제 완료 또는 자사 또는 시연 사이트). 상태(IN_USE)는 호출처 쿼리가 거른다(sql/017)
+export const effectOn = (s: {
+  efct_cd: EfctCd | null
+  efct_pay_dtm: string | null
+  own_site_yn: 'Y' | 'N'
+  site_dom_nm?: string
+}): EfctCd | null =>
+  s.efct_cd &&
+  (s.efct_pay_dtm != null ||
+    s.own_site_yn === 'Y' ||
+    (s.site_dom_nm != null && EFCT_TRIAL_DOMAINS.has(s.site_dom_nm)))
+    ? s.efct_cd
+    : null
+
 export const isSparkleOn = (s: {
   spk_yn: 'Y' | 'N'
   spk_pay_dtm: string | null
@@ -376,6 +405,7 @@ export interface BubbleItem {
   chgPct: number // 직전 동일 기간 대비 증감률(%) — 직전 0·현재 >0 이면 100, 둘 다 0 이면 0
   sample?: boolean // 데모 화면 전용 가상 샘플(src/data/sample-sites.json) — 배지 "샘플", 상세 이동 없음
   url?: string // 연결 주소 재지정(sitemap/sites.json url) — 있으면 버블 클릭 시 상세 대신 이동 안내 후 이 주소로
+  effect?: EfctCd | null // 부가서비스 "버블 이펙트"(궤도·펄스·혜성) — effectOn(sql/017), 샘플은 api/bubbles EFFECT_SAMPLE
   sparkle?: boolean // 부가서비스 "반짝임"(요금제 외 추가요금 결제) — 버블에 반짝임 효과. 실사이트는 isSparkleOn(sql/013), 샘플은 api/bubbles SPARKLE
 }
 

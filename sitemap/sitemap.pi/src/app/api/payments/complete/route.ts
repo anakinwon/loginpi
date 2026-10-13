@@ -12,7 +12,12 @@ import {
   parseBody,
   requireUser,
 } from '@/lib/api'
-import { completePiPayment, getOwnPayment, SITE_SPK } from '@/lib/payments'
+import {
+  completePiPayment,
+  getOwnPayment,
+  SITE_EFCT,
+  SITE_SPK,
+} from '@/lib/payments'
 import { pickOwnerSite } from '@/lib/site'
 
 const bodySchema = z.object({
@@ -54,7 +59,9 @@ export const POST = withAuthGuard(
     const { data, error } = await db().rpc(
       row.pymnt_tp_cd === SITE_SPK
         ? 'fn_cmpl_site_spk_pymnt'
-        : 'fn_cmpl_site_reg_pymnt',
+        : row.pymnt_tp_cd === SITE_EFCT
+          ? 'fn_cmpl_site_efct_pymnt'
+          : 'fn_cmpl_site_reg_pymnt',
       {
         p_pymnt_id: body.paymentId,
         p_tx_id: body.txid,
