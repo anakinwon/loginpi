@@ -296,7 +296,6 @@
     "verifyStep3": "사이트 내용이 등록 정보·금지 카테고리 기준에 맞는지 확인",
     "paid": "결제 완료",
     "unpaid": "결제 대기",
-    "colDate": "등록일",
     "colSite": "사이트",
     "colDomain": "도메인",
     "colCtgr": "카테고리",
@@ -316,7 +315,7 @@
     "total": "총 {n}건",
     "colPayAmt": "결제 금액",
     "colPayDtm": "결제일시",
-    "colAply": "신청일",
+    "colAply": "신청일시",
     "colUse": "사용기간"
   },
   "apiErrors": {

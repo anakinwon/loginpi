@@ -94,6 +94,7 @@ function PayPanelInner({ siteId, kind }: { siteId: string; kind: PayKind }) {
         <dt className="text-muted-foreground">{t('plan')}</dt>
         <dd>
           {tp(site.plan_cd)}
+          {site.spk_yn === 'Y' ? '++' : ''}
           {term ? ` · ${term}` : ''}
         </dd>
         {(kind === 'SPK' || spkAdd != null) && (

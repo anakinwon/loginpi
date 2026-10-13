@@ -1,4 +1,4 @@
-// 관리자 신청 목록 API — GET ?sts=PAID&page=&size= (기본 PAID = 사용 시작 대기, 비싼 요금제 → 결제일시 내림차순 → 접수순). 비공개 연락처·등록자 Pi 사용자명·도메인 소유 확인 토큰 포함. isAdmin 게이트(401/403)
+// 관리자 신청 목록 API — GET ?sts=PAID&page=&size= (기본 IN_USE = 사용중, 비싼 요금제 → 결제일시 내림차순 → 접수순). 비공개 연락처·등록자 Pi 사용자명·도메인 소유 확인 토큰 포함. isAdmin 게이트(401/403)
 import { NextResponse } from 'next/server'
 import { withGuard } from '@pi/guard'
 import {
@@ -19,7 +19,7 @@ export const GET = withGuard(
   dbRoute(async (req) => {
     const admin = await requireAdmin(req)
     if (admin instanceof NextResponse) return admin
-    const sts = req.nextUrl.searchParams.get('sts') ?? 'PAID'
+    const sts = req.nextUrl.searchParams.get('sts') ?? 'IN_USE'
     if (!SITE_STS.includes(sts as SiteSts))
       return apiError('INVALID_INPUT', 400)
     const page = pageParam(req)

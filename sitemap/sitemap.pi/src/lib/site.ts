@@ -297,6 +297,7 @@ export interface OwnerSite extends PublicSite {
   mod_dtm: string
 }
 
+// 요금제 표시명 접미 — 반짝임 부가서비스를 함께 하는 사이트는 "요금제++"(마스터 지시 2026-10-13). admin-panel·my-sites·pay-panel 이 tp(plan_cd) 뒤에 붙인다
 // 반짝임 노출 조건 — 신청 + (결제 완료 또는 자사). 상태(IN_USE)는 호출처 쿼리가 거른다(sql/013 규칙)
 export const isSparkleOn = (s: {
   spk_yn: 'Y' | 'N'

@@ -34,11 +34,11 @@ interface AdminReport {
   sys_user: { pi_username: string | null } | null
 }
 
-// 상태 탭 — 기본 PAID(사용 시작 대기 큐)
+// 상태 탭 — 기본 IN_USE(사용중, 마스터 지시 2026-10-13)
 const SITE_TABS = [
+  'IN_USE',
   'PAID',
   'APPLYING',
-  'IN_USE',
   'USED',
   'REJECTED',
   'SUSPENDED',
@@ -166,7 +166,7 @@ function SiteQueue() {
   const tp = useTranslations('plan')
   const fmt = useFormatter()
   const errText = useApiErrorText()
-  const [sts, setSts] = useState<(typeof SITE_TABS)[number]>('PAID')
+  const [sts, setSts] = useState<(typeof SITE_TABS)[number]>('IN_USE')
   const { data, error, setError, setPage, size, setSize, loading, reload } =
     usePaged<AdminSite>(`/api/admin/sites?sts=${sts}`)
   // 펼친 행(사이트 1건만 — 상세·액션은 한 번에 하나)
@@ -183,7 +183,8 @@ function SiteQueue() {
     } else setError(r.body)
   }
 
-  const COLS = 12
+  // 열 7 — 결제 금액·결제일시·사용기간·등록자는 결제 배지 툴팁(hover)으로(마스터 지시 2026-10-13)
+  const COLS = 7
 
   return (
     <section className="flex flex-col gap-3">
@@ -219,17 +220,12 @@ function SiteQueue() {
         <table className="admin-table">
           <thead>
             <tr>
-              <th>{t('colDate')}</th>
               <th>{t('colAply')}</th>
               <th>{t('colSite')}</th>
               <th>{t('colDomain')}</th>
               <th>{t('colCtgr')}</th>
               <th>{t('colPlan')}</th>
               <th>{t('colPay')}</th>
-              <th>{t('colPayAmt')}</th>
-              <th>{t('colPayDtm')}</th>
-              <th>{t('colUse')}</th>
-              <th>{t('colOwner')}</th>
               <th>{t('colDetail')}</th>
             </tr>
           </thead>
@@ -251,12 +247,9 @@ function SiteQueue() {
                   cols={COLS}
                   onToggle={() => setOpen(isOpen ? null : s.site_id)}
                   onAct={(body) => void act(s.site_id, body)}
-                  date={fmt.dateTime(new Date(s.reg_dtm), {
-                    dateStyle: 'short',
-                  })}
                   aplyDtm={s.aply_dtm ? short(s.aply_dtm) : '-'}
                   ctgr={tc(s.site_ctgr_cd)}
-                  plan={tp(s.plan_cd)}
+                  plan={tp(s.plan_cd) + (s.spk_yn === 'Y' ? '++' : '')}
                   payDtm={s.pay_dtm ? short(s.pay_dtm) : '-'}
                   usePeriod={
                     s.use_bgn_dtm
@@ -291,7 +284,6 @@ function SiteRows({
   cols,
   onToggle,
   onAct,
-  date,
   aplyDtm,
   ctgr,
   plan,
@@ -303,7 +295,6 @@ function SiteRows({
   cols: number
   onToggle: () => void
   onAct: (body: object) => void
-  date: string
   aplyDtm: string
   ctgr: string
   plan: string
@@ -318,24 +309,39 @@ function SiteRows({
   useEffect(() => {
     if (!open) setEditing(false)
   }, [open])
-  const pay =
-    s.own_site_yn === 'Y' ? (
-      <span className="text-xs text-violet-400">{t('ownSite')}</span>
-    ) : (
+  // 결제 상세(금액·일시·사용기간·등록자) — 배지에 마우스를 올리면(또는 키보드 포커스) 툴팁, 터치 기기는 상세 행에서 같은 정보
+  const payInfo = (
+    <span className="group relative inline-block" tabIndex={0}>
+      {s.own_site_yn === 'Y' ? (
+        <span className="text-xs text-violet-400">{t('ownSite')}</span>
+      ) : (
+        <span
+          className={
+            s.pymnt_id
+              ? 'rounded bg-emerald-100 px-2 py-0.5 text-xs text-emerald-800 dark:bg-emerald-900 dark:text-emerald-100'
+              : 'rounded bg-amber-100 px-2 py-0.5 text-xs text-amber-800 dark:bg-amber-900 dark:text-amber-100'
+          }
+        >
+          {s.pymnt_id ? t('paid') : t('unpaid')}
+        </span>
+      )}
       <span
-        className={
-          s.pymnt_id
-            ? 'rounded bg-emerald-100 px-2 py-0.5 text-xs text-emerald-800 dark:bg-emerald-900 dark:text-emerald-100'
-            : 'rounded bg-amber-100 px-2 py-0.5 text-xs text-amber-800 dark:bg-amber-900 dark:text-amber-100'
-        }
+        role="tooltip"
+        className="absolute top-full left-0 z-10 mt-1 hidden w-max rounded border border-neutral-700 bg-neutral-900 px-3 py-2 text-left text-xs whitespace-nowrap text-neutral-100 shadow-lg group-focus-within:block group-hover:block"
       >
-        {s.pymnt_id ? t('paid') : t('unpaid')}
+        {t('colPayAmt')}: {s.pi_pymnt ? `${Number(s.pi_pymnt.pi_amt)} Pi` : '-'}
+        <br />
+        {t('colPayDtm')}: {payDtm}
+        <br />
+        {t('colUse')}: {usePeriod}
+        <br />
+        {t('colOwner')}: {s.sys_user?.pi_username ?? '-'}
       </span>
-    )
+    </span>
+  )
   return (
     <>
       <tr className="admin-table-row" onClick={onToggle}>
-        <td className="whitespace-nowrap">{date}</td>
         <td className="whitespace-nowrap">{aplyDtm}</td>
         <td className="font-semibold">{s.site_nm}</td>
         <td className="font-mono whitespace-nowrap">{s.site_dom_nm}</td>
@@ -352,13 +358,7 @@ function SiteRows({
             {plan}
           </span>
         </td>
-        <td className="whitespace-nowrap">{pay}</td>
-        <td className="text-right whitespace-nowrap tabular-nums">
-          {s.pi_pymnt ? `${Number(s.pi_pymnt.pi_amt)} Pi` : '-'}
-        </td>
-        <td className="whitespace-nowrap">{payDtm}</td>
-        <td className="whitespace-nowrap">{usePeriod}</td>
-        <td className="whitespace-nowrap">{s.sys_user?.pi_username ?? '-'}</td>
+        <td className="whitespace-nowrap">{payInfo}</td>
         <td className="whitespace-nowrap">
           <button
             type="button"
@@ -378,6 +378,16 @@ function SiteRows({
         <tr className="admin-table-detail" id={detailId}>
           <td colSpan={cols}>
             <div className="flex flex-col gap-2 text-sm">
+              <p className="text-muted-foreground">
+                {t('colPayAmt')}:{' '}
+                {s.pi_pymnt ? `${Number(s.pi_pymnt.pi_amt)} Pi` : '-'}
+                {' · '}
+                {t('colPayDtm')}: {payDtm}
+                {' · '}
+                {t('colUse')}: {usePeriod}
+                {' · '}
+                {t('colOwner')}: {s.sys_user?.pi_username ?? '-'}
+              </p>
               <p className="text-muted-foreground">
                 {t('pvtCntc')}: {s.pvt_cntc_txt ?? '-'}
                 {' · '}

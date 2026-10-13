@@ -296,7 +296,6 @@
     "verifyStep3": "Confirm the site content matches the listing and the prohibited-category rules",
     "paid": "Paid",
     "unpaid": "Unpaid",
-    "colDate": "Registered",
     "colSite": "Site",
     "colDomain": "Domain",
     "colCtgr": "Category",
@@ -316,7 +315,7 @@
     "total": "{n} total",
     "colPayAmt": "Amount",
     "colPayDtm": "Paid at",
-    "colAply": "Applied",
+    "colAply": "Applied at",
     "colUse": "Usage period"
   },
   "apiErrors": {

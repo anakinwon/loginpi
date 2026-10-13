@@ -148,6 +148,7 @@ function MySitesInner() {
                   </span>
                   <span className="text-muted-foreground text-xs">
                     {tp(s.plan_cd)}
+                    {s.spk_yn === 'Y' ? '++' : ''}
                     {fees?.[s.plan_cd]
                       ? ` · ${feeLabel(fees[s.plan_cd]).term}`
                       : ''}
