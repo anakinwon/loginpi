@@ -21,6 +21,7 @@ import {
 import { hasOtherApprovedPayment } from '@/lib/payments'
 import {
   APPLY_FROM_STS,
+  BLOCK_REAPPLY_RSN,
   DOMAIN_EDITABLE_STS,
   EDITABLE_STS,
   OPEN_STS,
@@ -104,8 +105,18 @@ export const PATCH = withAuthGuard(
         !DOMAIN_EDITABLE_STS.includes(cur.site_sts_cd)
       )
         return apiError('INVALID_STATE', 409)
-      if (body.domain !== cur.site_dom_nm && cur.rjct_rsn_cd === 'OWNERSHIP')
-        return apiError('DOMAIN_REJECTED_OWNERSHIP', 409)
+      // 차단 사유(OWNERSHIP·금지 7종)로 반려된 행은 도메인을 바꿔 우회하지 못한다
+      if (
+        body.domain !== cur.site_dom_nm &&
+        cur.rjct_rsn_cd &&
+        (BLOCK_REAPPLY_RSN as readonly string[]).includes(cur.rjct_rsn_cd)
+      )
+        return apiError(
+          cur.rjct_rsn_cd === 'OWNERSHIP'
+            ? 'DOMAIN_REJECTED_OWNERSHIP'
+            : 'DOMAIN_REJECTED_POLICY',
+          409,
+        )
       if (body.imgUrl && !isOwnImgUrl(body.imgUrl, user.id))
         return apiError('IMG_URL_INVALID', 400)
       // 사용 중엔 이동 URL·요금제 잠금(피싱 교체 방지 — 다음 재등록 때만)

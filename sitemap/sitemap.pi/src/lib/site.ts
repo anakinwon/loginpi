@@ -29,6 +29,17 @@ export const SITE_STS = [
 export type SiteSts = (typeof SITE_STS)[number]
 
 // 금지 카테고리 7종(PRD §5) + OWNERSHIP(도메인 소유 확인 불가 — 같은 사용자·도메인 재제출 409) + PAY_TIMEOUT(미결제 자동 반려) + ETC
+// 재신청 영구 차단 사유(마스터 D2 2026-10-13) — 소유 확인 불가 + 금지 카테고리 7종. 심사 폐지 뒤 결제만으로 공개되므로 반려 이력으로 막는다
+export const BLOCK_REAPPLY_RSN = [
+  'OWNERSHIP',
+  'GAMBLING',
+  'NON_PI_PYMNT',
+  'GIFT_CARD',
+  'INVEST',
+  'ADULT',
+  'PII_COLLECT',
+  'PI_BRAND',
+] as const
 export const RJCT_RSN = [
   'GAMBLING',
   'NON_PI_PYMNT',

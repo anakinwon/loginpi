@@ -12,7 +12,13 @@ import {
 } from '@pi/guard'
 import { getSupabaseAdmin, resolveDbConfig, type UserRow } from '@pi/db'
 import { getSessionUser, isAdmin } from './auth'
-import { IMG_BUCKET, LIMITS, OCCUPY_STS, OPEN_STS } from './site'
+import {
+  BLOCK_REAPPLY_RSN,
+  IMG_BUCKET,
+  LIMITS,
+  OCCUPY_STS,
+  OPEN_STS,
+} from './site'
 
 export const apiError = createApiError({
   ...COMMON_ERRORS,
@@ -27,6 +33,8 @@ export const apiError = createApiError({
   IMG_TOO_LARGE: '이미지는 2MB 이하만 올릴 수 있습니다',
   IMG_TYPE: 'PNG·JPEG·WebP·GIF 이미지만 올릴 수 있습니다',
   IMG_URL_INVALID: '이 서비스에 업로드한 이미지만 사용할 수 있습니다',
+  DOMAIN_REJECTED_POLICY:
+    '금지 카테고리 사유로 반려된 도메인은 다시 신청할 수 없습니다. 관리자에게 문의하세요',
   DOMAIN_REJECTED_OWNERSHIP:
     '도메인 소유 확인 불가로 반려된 도메인은 다시 제출할 수 없습니다. 관리자에게 문의하세요',
   SITE_LIMIT: `작성 중·신청 중 사이트는 최대 ${LIMITS.openMax}개까지 둘 수 있습니다`,
@@ -192,14 +200,24 @@ export async function checkSiteWrite(
     if ((count ?? 0) >= LIMITS.openMax) return apiError('SITE_LIMIT', 409)
   }
   if (opts.submit) {
-    const { count: rjct, error: rjctErr } = await db()
-      .from('site_mst')
-      .select('site_id', { count: 'exact', head: true })
-      .eq('ownr_usr_id', userId)
+    // 반려 이력(site_sts_hist) 기준 — OWNERSHIP + 금지 7종(BLOCK_REAPPLY_RSN, 마스터 D2). 재신청으로 rjct_* 가 지워진 행도 이력엔 남는다
+    const { data: blocked, error: rjctErr } = await db()
+      .from('site_sts_hist')
+      .select('chg_rsn_cd, site_mst!inner(ownr_usr_id)')
       .eq('site_dom_nm', domain)
-      .eq('rjct_rsn_cd', 'OWNERSHIP')
+      .eq('del_yn', 'N')
+      .eq('new_sts_cd', 'REJECTED')
+      .in('chg_rsn_cd', BLOCK_REAPPLY_RSN)
+      .eq('site_mst.ownr_usr_id', userId)
+      .limit(1)
     if (rjctErr) return dbFail(rjctErr)
-    if (rjct) return apiError('DOMAIN_REJECTED_OWNERSHIP', 409)
+    if (blocked?.length)
+      return apiError(
+        blocked[0].chg_rsn_cd === 'OWNERSHIP'
+          ? 'DOMAIN_REJECTED_OWNERSHIP'
+          : 'DOMAIN_REJECTED_POLICY',
+        409,
+      )
     const since = new Date(
       Date.now() - LIMITS.payTimeoutWindowH * 3600_000,
     ).toISOString()
