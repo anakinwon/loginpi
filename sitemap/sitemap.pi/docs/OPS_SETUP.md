@@ -59,6 +59,17 @@ node scripts/db-migrate.mjs --app sitemap --tier dev             # baseline → 
 - [ ] 커스텀 도메인 `sitemap.pi` 연결
 - [ ] 승격 후 GitHub commit status에서 이 프로젝트 `Vercel – <project>: success` 개별 확인(배포 검증 철칙)
 
+### 6-1. 크론 `/api/cron/site-sts-sweep` (사용료 상태 자동 전이, PRD_USAGE_FEE_STATE §6 — P5 2026-10-13)
+
+- `vercel.json` `crons` `*/5 * * * *` — **Vercel cron 은 Production 배포에서만 실행**(Preview·스테이징은 수동 호출). 호출 헤더 `Authorization: Bearer <CRON_SECRET>`(Vercel 이 env `CRON_SECRET` 값을 자동 첨부)
+- [ ] env `CRON_SECRET`(16자 이상, `openssl rand -hex 24`) — **미설정이면 라우트가 401 로 멈춘다(fail-closed)**. 스테이징은 등록 즉시 수동 검증 가능 :
+  `curl -H "Authorization: Bearer $CRON_SECRET" https://sitemapst.vercel.app/api/cron/site-sts-sweep` → `{ok, used, expired, started[], startFailed[], rejected[], skipped[]}`
+- [ ] **운영 등록은 이행(sql/012~016) 직후가 아니라 관리자가 PAID 탭을 1회 검토한 뒤** — 첫 회차가 기존 결제 고객을 즉시 사용중으로 공개한다
+- 회차 순서 ① IN_USE→USED ② USED·SUSPENDED→EXPIRED ③ PAID→IN_USE(RPC `fn_bgn_site_use`, 최대 50) ④ APPLYING 미결제 반려(최대 20, 진행 중 Pi 결제는 txid 없을 때만 cancel, 아니면 `skipped`). 전부 현재 상태 조건부라 중복 실행 안전
+- `startFailed` 에 `P0004` 가 남으면 해당 요금제 `fee_plan.use_mon_cnt` 결측 — 요금표를 고치면 다음 회차에 자동 처리. `skipped.why` = `pi_get_*`(Pi 조회 실패)·`pi_cancel_*`·`txid_present`(서명 완료 — complete 가 마무리)·`state_changed`
+- 실기기 전 구간 검증은 관리자 "운영 설정" 탭에서 3값을 0.05h 로 낮춘 뒤 5분 크론(또는 수동 호출) → 복귀
+- **수동 복구(같은 site_id 가 `skipped` 에 회차마다 반복될 때 — Vercel 로그 `[cron/sweep] reject skipped`)** : `pi_get_404`/`pi_get_401` 은 Pi API 키 교체·sandbox 플립으로 원장의 결제ID 를 Pi 가 모르는 경우 — 키를 복구해도 404 면 Developer Portal 결제 내역으로 실결제 여부 확인 뒤 `UPDATE pi_pymnt SET pymnt_sts_cd='CANCELED', cncl_dtm=now(), modr_id='ADMIN' WHERE pymnt_id='…' AND pymnt_sts_cd='APPROVED'`(실결제 확인 시엔 complete 수동 처리). `ledger_update` 는 DB 일시 장애 — 다음 회차 자동 재시도. `txid_present` 는 정상(사용자 다음 로그인 때 complete 복구)
+
 ## 7. 출시 전 검증 (Phase 1 완료 기준 — ROADMAP)
 
 - [ ] Pi Browser 실기기 : 로그인 → 내 사이트 등록(이미지 포함) → 관리자 승인 → 홈·카테고리·검색 노출 → 상세 조회수 증가 → "사이트 방문" 이동 안내 후 이동 → 신고 → 관리자 인용(정지) 확인

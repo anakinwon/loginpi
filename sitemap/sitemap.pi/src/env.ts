@@ -10,6 +10,8 @@ export const env = createEnv({
       .min(32, 'PI_SESSION_SECRET는 최소 32자 이상이어야 합니다'),
     // Pi Developer Portal 앱 API 키(결제 approve/complete — Phase 2)
     PI_API_KEY: z.string().optional(),
+    // 크론 /api/cron/site-sts-sweep Bearer 비밀값 — optional(운영 tier 필수 검사 금지 : 미등록이면 크론이 401 로 멈추는 fail-closed, PRD_USAGE_FEE_STATE §6). 운영 등록은 P8 PAID 탭 검토 뒤
+    CRON_SECRET: z.string().min(16).optional(),
     // Developer Portal 도메인 소유 검증 키 — /validation-key.txt가 그대로 서빙, 미설정 시 404
     PI_DOMAIN_VALIDATION_KEY: z.string().optional(),
     SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
@@ -54,6 +56,7 @@ export const env = createEnv({
   runtimeEnv: {
     PI_SESSION_SECRET: process.env.PI_SESSION_SECRET,
     PI_API_KEY: process.env.PI_API_KEY,
+    CRON_SECRET: process.env.CRON_SECRET,
     PI_DOMAIN_VALIDATION_KEY: process.env.PI_DOMAIN_VALIDATION_KEY,
     SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
     ADMIN_PI_USERNAMES: process.env.ADMIN_PI_USERNAMES,
