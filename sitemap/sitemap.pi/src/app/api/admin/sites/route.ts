@@ -1,4 +1,4 @@
-// 관리자 심사 대기열 API — GET ?sts=PENDING&page= (기본 PENDING, 접수순). 비공개 연락처·등록자 Pi 사용자명·도메인 소유 확인 토큰 포함. isAdmin 게이트(401/403)
+// 관리자 심사 대기열 API — GET ?sts=PENDING&page=&size= (기본 PENDING, 접수순). 비공개 연락처·등록자 Pi 사용자명·도메인 소유 확인 토큰 포함. isAdmin 게이트(401/403)
 import { NextResponse } from 'next/server'
 import { withGuard } from '@pi/guard'
 import {
@@ -8,6 +8,7 @@ import {
   dbRoute,
   pageParam,
   requireAdmin,
+  sizeParam,
   verifyToken,
 } from '@/lib/api'
 import { LIMITS, OWNER_SITE_COLS, SITE_STS, type SiteSts } from '@/lib/site'
@@ -22,11 +23,14 @@ export const GET = withGuard(
     if (!SITE_STS.includes(sts as SiteSts))
       return apiError('INVALID_INPUT', 400)
     const page = pageParam(req)
-    const size = LIMITS.adminPageSize
+    const size = sizeParam(req, LIMITS.adminPageSize)
 
     const { data, error, count } = await db()
       .from('site_mst')
-      .select(`${OWNER_SITE_COLS}, sys_user!site_mst_sys_user_id_fkey(pi_username:pi_usr_nm)`, { count: 'exact' })
+      .select(
+        `${OWNER_SITE_COLS}, sys_user!site_mst_sys_user_id_fkey(pi_username:pi_usr_nm)`,
+        { count: 'exact' },
+      )
       .eq('del_yn', 'N')
       .eq('site_sts_cd', sts)
       .order('reg_dtm', { ascending: true })

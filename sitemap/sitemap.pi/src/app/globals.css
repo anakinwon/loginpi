@@ -51,6 +51,25 @@
   .label {
     @apply mb-1 block text-sm font-medium;
   }
+  /* 관리 목록 테이블(admin-table 접두 — Tailwind table·table-row 유틸리티와 이름 충돌 회피) — 좁은 화면은 가로 스크롤(-wrap), 행 hover 강조, 상세 행(-detail)은 배경 구분 */
+  .admin-table-wrap {
+    @apply overflow-x-auto rounded-lg border border-neutral-200 dark:border-neutral-800;
+  }
+  .admin-table {
+    @apply w-full border-collapse text-sm;
+  }
+  .admin-table th {
+    @apply bg-neutral-100 px-3 py-2 text-left font-medium whitespace-nowrap text-neutral-600 dark:bg-neutral-900 dark:text-neutral-300;
+  }
+  .admin-table td {
+    @apply border-t border-neutral-200 px-3 py-2 align-top dark:border-neutral-800;
+  }
+  .admin-table tr.admin-table-row {
+    @apply cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-900/60;
+  }
+  .admin-table tr.admin-table-detail td {
+    @apply bg-neutral-50 dark:bg-neutral-900/40;
+  }
 }
 
 /* 메인 버블(bubble-canvas) — 호버·포커스 시 확대·글로우(색 = currentColor = 증감 톤), 포커스 링 */

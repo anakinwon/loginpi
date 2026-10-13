@@ -112,7 +112,23 @@ export async function parseBody<T>(
 }
 
 export const pageParam = (req: NextRequest) =>
-  Math.max(1, Math.min(1000, Number(req.nextUrl.searchParams.get('page')) || 1))
+  Math.max(
+    1,
+    Math.min(
+      1000,
+      Math.floor(Number(req.nextUrl.searchParams.get('page'))) || 1,
+    ),
+  )
+
+// 페이지당 건수(?size=) — 기본값은 호출처 LIMITS, 10~100 으로 클램프(과대 요청 방지)
+export const sizeParam = (req: NextRequest, dflt: number) =>
+  Math.max(
+    10,
+    Math.min(
+      100,
+      Math.floor(Number(req.nextUrl.searchParams.get('size'))) || dflt,
+    ),
+  )
 
 export const PUBLIC_CACHE = {
   'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=120',

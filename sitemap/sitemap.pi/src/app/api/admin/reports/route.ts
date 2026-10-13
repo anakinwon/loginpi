@@ -1,4 +1,4 @@
-// 관리자 신고 대기열 API — GET ?sts=RECEIVED&page= (기본 RECEIVED, 접수순). 대상 사이트·신고자 Pi 사용자명 임베드. isAdmin 게이트
+// 관리자 신고 대기열 API — GET ?sts=RECEIVED&page=&size= (기본 RECEIVED, 접수순). 대상 사이트·신고자 Pi 사용자명 임베드. isAdmin 게이트
 import { NextResponse } from 'next/server'
 import { withGuard } from '@pi/guard'
 import {
@@ -8,6 +8,7 @@ import {
   dbRoute,
   pageParam,
   requireAdmin,
+  sizeParam,
 } from '@/lib/api'
 import { LIMITS } from '@/lib/site'
 
@@ -22,7 +23,7 @@ export const GET = withGuard(
     const sts = req.nextUrl.searchParams.get('sts') ?? 'RECEIVED'
     if (!RPT_STS.includes(sts)) return apiError('INVALID_INPUT', 400)
     const page = pageParam(req)
-    const size = LIMITS.adminPageSize
+    const size = sizeParam(req, LIMITS.adminPageSize)
 
     const { data, error, count } = await db()
       .from('site_rpt')

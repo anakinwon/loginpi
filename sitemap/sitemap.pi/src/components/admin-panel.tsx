@@ -1,9 +1,10 @@
 'use client'
 
 // 관리 화면 — 클라이언트 게이트 + piFetch. 사이트 심사(승인·반려 사유·정지·복구)·신고 처리(인용 → 사이트 정지 / 기각).
+// 목록은 테이블(행 클릭 → 상세·액션 행 펼침) + 서버 페이지네이션(page·size, 기본 LIMITS.adminPageSize) — 마스터 지시 2026-10-13.
 // 권한 판정은 서버(isAdmin) — 401/403 은 오류 문구로 표시
 import { useCallback, useEffect, useState } from 'react'
-import { useTranslations } from 'next-intl'
+import { useFormatter, useTranslations } from 'next-intl'
 import { piFetch } from '@pi/auth/client'
 import { LoginGate } from './login-gate'
 import { Pagination } from './pagination'
@@ -33,6 +34,8 @@ interface AdminReport {
 }
 
 const SITE_TABS = ['PENDING', 'APPROVED', 'SUSPENDED', 'REJECTED'] as const
+// 페이지당 건수 선택지 — 서버 sizeParam 클램프(10~100)와 일치
+const PAGE_SIZES = [20, 50, 100] as const
 
 export function AdminPanel() {
   const t = useTranslations('admin')
@@ -62,26 +65,47 @@ export function AdminPanel() {
   )
 }
 
-// 목록 조회 공용 — 페이지·필터 변경 시 비동기 재조회
+// 목록 조회 공용 — 페이지·건수·필터 변경 시 비동기 재조회(렌더 비차단, 이전 데이터는 응답 전까지 유지)
 function usePaged<T>(url: string) {
   const [page, setPage] = useState(1)
+  const [size, setSizeState] = useState<number>(LIMITS.adminPageSize)
   const [data, setData] = useState<Paged<T> | null>(null)
   const [error, setError] = useState<ApiErrorBody | null>(null)
+  const [loading, setLoading] = useState(false)
   const load = useCallback(async () => {
     setError(null)
+    setLoading(true)
     const r = await readApi<Paged<T>>(
-      piFetch(`${url}${url.includes('?') ? '&' : '?'}page=${page}`),
+      piFetch(
+        `${url}${url.includes('?') ? '&' : '?'}page=${page}&size=${size}`,
+      ),
     )
+    setLoading(false)
     if (r.ok) setData(r.data)
     else {
       setData(null)
       setError(r.body)
     }
-  }, [url, page])
+  }, [url, page, size])
   useEffect(() => {
     void load()
   }, [load])
-  return { page, setPage, data, error, setError, reload: load }
+  // 건수 변경은 1페이지부터
+  const setSize = (n: number) => {
+    setSizeState(n)
+    setPage(1)
+  }
+  return {
+    page,
+    setPage,
+    size,
+    setSize,
+    data,
+    error,
+    setError,
+    loading,
+    reload: load,
+  }
 }
 
 async function patch(url: string, body: object) {
@@ -94,123 +118,261 @@ async function patch(url: string, body: object) {
   )
 }
 
+// 목록 머리말 — 총 건수 + 페이지당 건수 선택
+function ListMeta({
+  total,
+  size,
+  onSize,
+}: {
+  total: number | null
+  size: number
+  onSize: (n: number) => void
+}) {
+  const t = useTranslations('admin')
+  return (
+    <div className="text-muted-foreground flex flex-wrap items-center justify-between gap-2 text-xs">
+      <span>{total == null ? '' : t('total', { n: total })}</span>
+      <label className="flex items-center gap-1">
+        {t('pageSize')}
+        <select
+          className="input w-auto py-1"
+          value={size}
+          onChange={(e) => onSize(Number(e.target.value))}
+        >
+          {PAGE_SIZES.map((n) => (
+            <option key={n} value={n}>
+              {n}
+            </option>
+          ))}
+        </select>
+      </label>
+    </div>
+  )
+}
+
 function SiteQueue() {
   const t = useTranslations('admin')
   const ts = useTranslations('siteSts')
   const tc = useTranslations('siteCtgr')
+  const tp = useTranslations('plan')
+  const fmt = useFormatter()
   const errText = useApiErrorText()
   const [sts, setSts] = useState<(typeof SITE_TABS)[number]>('PENDING')
-  const { data, error, setError, setPage, reload } = usePaged<AdminSite>(
-    `/api/admin/sites?sts=${sts}`,
-  )
+  const { data, error, setError, setPage, size, setSize, loading, reload } =
+    usePaged<AdminSite>(`/api/admin/sites?sts=${sts}`)
+  // 펼친 행(사이트 1건만 — 상세·액션은 한 번에 하나)
+  const [open, setOpen] = useState<string | null>(null)
 
   const act = async (id: string, body: object) => {
     const r = await patch(`/api/admin/sites/${id}`, body)
-    if (r.ok) void reload()
-    else setError(r.body)
+    if (r.ok) {
+      setOpen(null)
+      void reload()
+    } else setError(r.body)
   }
+
+  const COLS = 8
 
   return (
     <section className="flex flex-col gap-3">
-      <select
-        className="input w-auto"
-        value={sts}
-        onChange={(e) => {
-          setSts(e.target.value as (typeof SITE_TABS)[number])
-          setPage(1)
-        }}
-      >
-        {SITE_TABS.map((s) => (
-          <option key={s} value={s}>
-            {ts(s)}
-          </option>
-        ))}
-      </select>
+      <div className="flex flex-wrap items-center gap-3">
+        <select
+          className="input w-auto"
+          value={sts}
+          onChange={(e) => {
+            setSts(e.target.value as (typeof SITE_TABS)[number])
+            setPage(1)
+            setOpen(null)
+          }}
+        >
+          {SITE_TABS.map((s) => (
+            <option key={s} value={s}>
+              {ts(s)}
+            </option>
+          ))}
+        </select>
+        <div className="grow">
+          <ListMeta total={data?.total ?? null} size={size} onSize={setSize} />
+        </div>
+      </div>
       {error && (
         <p className="text-destructive text-sm" role="alert">
           {errText(error)}
         </p>
       )}
-      {data && data.items.length === 0 && (
-        <p className="text-muted-foreground text-sm">{t('empty')}</p>
-      )}
-      <ul className="flex flex-col gap-3">
-        {data?.items.map((s) => (
-          <li key={s.site_id} className="card flex flex-col gap-1 text-sm">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="font-semibold">{s.site_nm}</span>
-              <span className="font-mono">{s.site_dom_nm}</span>
-              <span className="text-muted-foreground">
-                {tc(s.site_ctgr_cd)}
-              </span>
-              {s.own_site_yn === 'Y' && (
-                <span className="text-xs text-violet-400">{t('ownSite')}</span>
-              )}
-              <span className="text-muted-foreground text-xs">{s.plan_cd}</span>
-              {s.own_site_yn !== 'Y' && (
-                <span
-                  className={
-                    s.pymnt_id
-                      ? 'rounded bg-emerald-100 px-2 py-0.5 text-xs text-emerald-800 dark:bg-emerald-900 dark:text-emerald-100'
-                      : 'rounded bg-amber-100 px-2 py-0.5 text-xs text-amber-800 dark:bg-amber-900 dark:text-amber-100'
-                  }
-                >
-                  {s.pymnt_id ? t('paid') : t('unpaid')}
-                </span>
-              )}
-            </div>
-            <p className="text-muted-foreground">
-              {t('owner')}: {s.sys_user?.pi_username ?? '-'} · {t('pvtCntc')}:{' '}
-              {s.pvt_cntc_txt ?? '-'}
-              {' · '}
-              {t('pubCntc')}: {s.pub_cntc_txt ?? '-'}
-            </p>
-            {s.own_site_yn !== 'Y' && s.vrfy_tkn && (
-              <div className="rounded border border-amber-300 p-2 text-xs">
-                <p>
-                  {t('verifyToken')}:{' '}
-                  <code className="font-mono select-all">{s.vrfy_tkn}</code>
-                </p>
-                <ol className="ml-4 list-decimal">
-                  <li>
-                    {t('verifyStep1')}{' '}
-                    <a
-                      className="underline"
-                      href={`https://${s.site_dom_nm}${VERIFY_FILE}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {`https://${s.site_dom_nm}${VERIFY_FILE}`}
-                    </a>
-                  </li>
-                  <li>{t('verifyStep2')}</li>
-                  <li>{t('verifyStep3')}</li>
-                </ol>
-              </div>
+      <div
+        className={`admin-table-wrap ${loading ? 'opacity-60' : ''}`}
+        aria-busy={loading}
+      >
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>{t('colDate')}</th>
+              <th>{t('colSite')}</th>
+              <th>{t('colDomain')}</th>
+              <th>{t('colCtgr')}</th>
+              <th>{t('colPlan')}</th>
+              <th>{t('colPay')}</th>
+              <th>{t('colOwner')}</th>
+              <th>{t('colDetail')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data && data.items.length === 0 && (
+              <tr>
+                <td colSpan={COLS} className="text-muted-foreground">
+                  {t('empty')}
+                </td>
+              </tr>
             )}
-            {s.site_img_url && (
-              <img
-                src={s.site_img_url}
-                alt=""
-                className="size-20 rounded object-cover"
-              />
-            )}
-            {s.site_desc && (
-              <p className="whitespace-pre-wrap">{s.site_desc}</p>
-            )}
-            <SiteActions site={s} onAct={(body) => void act(s.site_id, body)} />
-          </li>
-        ))}
-      </ul>
+            {data?.items.map((s) => {
+              const isOpen = open === s.site_id
+              return (
+                <SiteRows
+                  key={s.site_id}
+                  site={s}
+                  open={isOpen}
+                  cols={COLS}
+                  onToggle={() => setOpen(isOpen ? null : s.site_id)}
+                  onAct={(body) => void act(s.site_id, body)}
+                  date={fmt.dateTime(new Date(s.reg_dtm), {
+                    dateStyle: 'short',
+                  })}
+                  ctgr={tc(s.site_ctgr_cd)}
+                  plan={tp(s.plan_cd)}
+                />
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
       {data && (
         <Pagination
           page={data.page}
           total={data.total}
           pageSize={data.pageSize}
-          onChange={setPage}
+          onChange={(p) => {
+            setPage(p)
+            setOpen(null)
+          }}
         />
       )}
     </section>
+  )
+}
+
+// 사이트 1건 = 요약 행 + (펼침 시) 상세·액션 행
+function SiteRows({
+  site: s,
+  open,
+  cols,
+  onToggle,
+  onAct,
+  date,
+  ctgr,
+  plan,
+}: {
+  site: AdminSite
+  open: boolean
+  cols: number
+  onToggle: () => void
+  onAct: (body: object) => void
+  date: string
+  ctgr: string
+  plan: string
+}) {
+  const t = useTranslations('admin')
+  // 상세 행 id — 열기/닫기 버튼의 aria-controls 대상(접근성, 팀장 지적 2026-10-13)
+  const detailId = `site-detail-${s.site_id}`
+  const pay =
+    s.own_site_yn === 'Y' ? (
+      <span className="text-xs text-violet-400">{t('ownSite')}</span>
+    ) : (
+      <span
+        className={
+          s.pymnt_id
+            ? 'rounded bg-emerald-100 px-2 py-0.5 text-xs text-emerald-800 dark:bg-emerald-900 dark:text-emerald-100'
+            : 'rounded bg-amber-100 px-2 py-0.5 text-xs text-amber-800 dark:bg-amber-900 dark:text-amber-100'
+        }
+      >
+        {s.pymnt_id ? t('paid') : t('unpaid')}
+      </span>
+    )
+  return (
+    <>
+      <tr className="admin-table-row" onClick={onToggle}>
+        <td className="whitespace-nowrap">{date}</td>
+        <td className="font-semibold">{s.site_nm}</td>
+        <td className="font-mono whitespace-nowrap">{s.site_dom_nm}</td>
+        <td className="whitespace-nowrap">{ctgr}</td>
+        <td className="whitespace-nowrap">{plan}</td>
+        <td className="whitespace-nowrap">{pay}</td>
+        <td className="whitespace-nowrap">{s.sys_user?.pi_username ?? '-'}</td>
+        <td className="whitespace-nowrap">
+          <button
+            type="button"
+            className="btn py-0.5 text-xs"
+            aria-expanded={open}
+            aria-controls={detailId}
+            onClick={(e) => {
+              e.stopPropagation()
+              onToggle()
+            }}
+          >
+            {open ? t('detailClose') : t('detailOpen')}
+          </button>
+        </td>
+      </tr>
+      {open && (
+        <tr className="admin-table-detail" id={detailId}>
+          <td colSpan={cols}>
+            <div className="flex flex-col gap-2 text-sm">
+              <p className="text-muted-foreground">
+                {t('pvtCntc')}: {s.pvt_cntc_txt ?? '-'}
+                {' · '}
+                {t('pubCntc')}: {s.pub_cntc_txt ?? '-'}
+              </p>
+              {s.own_site_yn !== 'Y' && s.vrfy_tkn && (
+                <div className="rounded border border-amber-300 p-2 text-xs">
+                  <p>
+                    {t('verifyToken')}:{' '}
+                    <code className="font-mono select-all">{s.vrfy_tkn}</code>
+                  </p>
+                  <ol className="ml-4 list-decimal">
+                    <li>
+                      {t('verifyStep1')}{' '}
+                      <a
+                        className="underline"
+                        href={`https://${s.site_dom_nm}${VERIFY_FILE}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {`https://${s.site_dom_nm}${VERIFY_FILE}`}
+                      </a>
+                    </li>
+                    <li>{t('verifyStep2')}</li>
+                    <li>{t('verifyStep3')}</li>
+                  </ol>
+                </div>
+              )}
+              <div className="flex gap-3">
+                {s.site_img_url && (
+                  <img
+                    src={s.site_img_url}
+                    alt=""
+                    className="size-20 shrink-0 rounded object-cover"
+                  />
+                )}
+                {s.site_desc && (
+                  <p className="whitespace-pre-wrap">{s.site_desc}</p>
+                )}
+              </div>
+              <SiteActions site={s} onAct={onAct} />
+            </div>
+          </td>
+        </tr>
+      )}
+    </>
   )
 }
 
@@ -322,10 +484,10 @@ function ReportQueue() {
   const t = useTranslations('admin')
   const tr = useTranslations('rptRsn')
   const ts = useTranslations('siteSts')
+  const fmt = useFormatter()
   const errText = useApiErrorText()
-  const { data, error, setError, setPage, reload } = usePaged<AdminReport>(
-    '/api/admin/reports?sts=RECEIVED',
-  )
+  const { data, error, setError, setPage, size, setSize, loading, reload } =
+    usePaged<AdminReport>('/api/admin/reports?sts=RECEIVED')
   const [memo, setMemo] = useState<Record<string, string>>({})
 
   const act = async (id: string, action: 'accept' | 'dismiss') => {
@@ -339,52 +501,85 @@ function ReportQueue() {
 
   return (
     <section className="flex flex-col gap-3">
+      <ListMeta total={data?.total ?? null} size={size} onSize={setSize} />
       {error && (
         <p className="text-destructive text-sm" role="alert">
           {errText(error)}
         </p>
       )}
-      {data && data.items.length === 0 && (
-        <p className="text-muted-foreground text-sm">{t('empty')}</p>
-      )}
-      <ul className="flex flex-col gap-3">
-        {data?.items.map((r) => (
-          <li key={r.rpt_id} className="card flex flex-col gap-1 text-sm">
-            <p>
-              <span className="font-mono">{r.site_mst?.site_dom_nm}</span>{' '}
-              <span className="text-muted-foreground">
-                ({r.site_mst ? ts(r.site_mst.site_sts_cd) : '-'})
-              </span>
-            </p>
-            <p>
-              {t('reason')}: {tr(r.rpt_rsn_cd)} · {t('reporter')}:{' '}
-              {r.sys_user?.pi_username ?? '-'}
-            </p>
-            {r.rpt_cont && <p className="whitespace-pre-wrap">{r.rpt_cont}</p>}
-            <input
-              className="input"
-              maxLength={LIMITS.rsnCont}
-              placeholder={t('memoPlaceholder')}
-              value={memo[r.rpt_id] ?? ''}
-              onChange={(e) => setMemo({ ...memo, [r.rpt_id]: e.target.value })}
-            />
-            <div className="flex gap-2">
-              <button
-                className="btn btn-danger"
-                onClick={() => void act(r.rpt_id, 'accept')}
-              >
-                {t('accept')}
-              </button>
-              <button
-                className="btn"
-                onClick={() => void act(r.rpt_id, 'dismiss')}
-              >
-                {t('dismiss')}
-              </button>
-            </div>
-          </li>
-        ))}
-      </ul>
+      <div
+        className={`admin-table-wrap ${loading ? 'opacity-60' : ''}`}
+        aria-busy={loading}
+      >
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>{t('colReceived')}</th>
+              <th>{t('colDomain')}</th>
+              <th>{t('colReason')}</th>
+              <th>{t('colReporter')}</th>
+              <th>{t('colContent')}</th>
+              <th>{t('colProcess')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data && data.items.length === 0 && (
+              <tr>
+                <td colSpan={6} className="text-muted-foreground">
+                  {t('empty')}
+                </td>
+              </tr>
+            )}
+            {data?.items.map((r) => (
+              <tr key={r.rpt_id}>
+                <td className="whitespace-nowrap">
+                  {fmt.dateTime(new Date(r.reg_dtm), { dateStyle: 'short' })}
+                </td>
+                <td className="whitespace-nowrap">
+                  <span className="font-mono">{r.site_mst?.site_dom_nm}</span>{' '}
+                  <span className="text-muted-foreground text-xs">
+                    ({r.site_mst ? ts(r.site_mst.site_sts_cd) : '-'})
+                  </span>
+                </td>
+                <td className="whitespace-nowrap">{tr(r.rpt_rsn_cd)}</td>
+                <td className="whitespace-nowrap">
+                  {r.sys_user?.pi_username ?? '-'}
+                </td>
+                <td className="min-w-48 whitespace-pre-wrap">
+                  {r.rpt_cont ?? '-'}
+                </td>
+                <td className="min-w-64">
+                  <div className="flex flex-col gap-2">
+                    <input
+                      className="input"
+                      maxLength={LIMITS.rsnCont}
+                      placeholder={t('memoPlaceholder')}
+                      value={memo[r.rpt_id] ?? ''}
+                      onChange={(e) =>
+                        setMemo({ ...memo, [r.rpt_id]: e.target.value })
+                      }
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        className="btn btn-danger"
+                        onClick={() => void act(r.rpt_id, 'accept')}
+                      >
+                        {t('accept')}
+                      </button>
+                      <button
+                        className="btn"
+                        onClick={() => void act(r.rpt_id, 'dismiss')}
+                      >
+                        {t('dismiss')}
+                      </button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       {data && (
         <Pagination
           page={data.page}
