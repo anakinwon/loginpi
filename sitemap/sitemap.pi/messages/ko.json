@@ -251,7 +251,7 @@
     "planLocked": "결제가 완료되어 요금제를 바꿀 수 없습니다."
   },
   "admin": {
-    "title": "관리",
+    "title": "사이트 관리",
     "tabSites": "사이트 심사",
     "tabReports": "신고 처리",
     "empty": "대상이 없습니다.",
@@ -292,7 +292,9 @@
     "colContent": "내용",
     "colProcess": "처리",
     "pageSize": "페이지당",
-    "total": "총 {n}건"
+    "total": "총 {n}건",
+    "colPayAmt": "결제 금액",
+    "colPayDtm": "결제일시"
   },
   "apiErrors": {
     "AUTH_REQUIRED": "로그인이 필요합니다",

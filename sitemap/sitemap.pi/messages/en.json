@@ -251,7 +251,7 @@
     "planLocked": "Payment is complete, so the plan can no longer be changed."
   },
   "admin": {
-    "title": "Admin",
+    "title": "Site admin",
     "tabSites": "Site review",
     "tabReports": "Reports",
     "empty": "Nothing here.",
@@ -292,7 +292,9 @@
     "colContent": "Content",
     "colProcess": "Action",
     "pageSize": "Per page",
-    "total": "{n} total"
+    "total": "{n} total",
+    "colPayAmt": "Amount",
+    "colPayDtm": "Paid at"
   },
   "apiErrors": {
     "AUTH_REQUIRED": "Sign-in required",

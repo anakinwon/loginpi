@@ -16,13 +16,17 @@ import {
 } from '@/lib/client-api'
 import {
   LIMITS,
+  PLAN_COLOR,
   RJCT_RSN,
   VERIFY_FILE,
   type OwnerSite,
   type Paged,
 } from '@/lib/site'
 
-type AdminSite = OwnerSite & { sys_user: { pi_username: string | null } | null }
+type AdminSite = OwnerSite & {
+  sys_user: { pi_username: string | null } | null
+  pi_pymnt: { pi_amt: number | string } | null // 결제 원장 임베드(미결제 null)
+}
 interface AdminReport {
   rpt_id: string
   site_id: string
@@ -171,7 +175,7 @@ function SiteQueue() {
     } else setError(r.body)
   }
 
-  const COLS = 8
+  const COLS = 10
 
   return (
     <section className="flex flex-col gap-3">
@@ -213,6 +217,8 @@ function SiteQueue() {
               <th>{t('colCtgr')}</th>
               <th>{t('colPlan')}</th>
               <th>{t('colPay')}</th>
+              <th>{t('colPayAmt')}</th>
+              <th>{t('colPayDtm')}</th>
               <th>{t('colOwner')}</th>
               <th>{t('colDetail')}</th>
             </tr>
@@ -240,6 +246,14 @@ function SiteQueue() {
                   })}
                   ctgr={tc(s.site_ctgr_cd)}
                   plan={tp(s.plan_cd)}
+                  payDtm={
+                    s.pay_dtm
+                      ? fmt.dateTime(new Date(s.pay_dtm), {
+                          dateStyle: 'short',
+                          timeStyle: 'short',
+                        })
+                      : '-'
+                  }
                 />
               )
             })}
@@ -271,6 +285,7 @@ function SiteRows({
   date,
   ctgr,
   plan,
+  payDtm,
 }: {
   site: AdminSite
   open: boolean
@@ -280,6 +295,7 @@ function SiteRows({
   date: string
   ctgr: string
   plan: string
+  payDtm: string
 }) {
   const t = useTranslations('admin')
   // 상세 행 id — 열기/닫기 버튼의 aria-controls 대상(접근성, 팀장 지적 2026-10-13)
@@ -305,8 +321,23 @@ function SiteRows({
         <td className="font-semibold">{s.site_nm}</td>
         <td className="font-mono whitespace-nowrap">{s.site_dom_nm}</td>
         <td className="whitespace-nowrap">{ctgr}</td>
-        <td className="whitespace-nowrap">{plan}</td>
+        <td className="whitespace-nowrap">
+          {/* 요금제 배지 — 메인 버블과 같은 색(PLAN_COLOR) */}
+          <span
+            className="rounded border px-2 py-0.5 text-xs font-semibold"
+            style={{
+              color: PLAN_COLOR[s.plan_cd],
+              borderColor: PLAN_COLOR[s.plan_cd],
+            }}
+          >
+            {plan}
+          </span>
+        </td>
         <td className="whitespace-nowrap">{pay}</td>
+        <td className="text-right whitespace-nowrap tabular-nums">
+          {s.pi_pymnt ? `${Number(s.pi_pymnt.pi_amt)} Pi` : '-'}
+        </td>
+        <td className="whitespace-nowrap">{payDtm}</td>
         <td className="whitespace-nowrap">{s.sys_user?.pi_username ?? '-'}</td>
         <td className="whitespace-nowrap">
           <button
