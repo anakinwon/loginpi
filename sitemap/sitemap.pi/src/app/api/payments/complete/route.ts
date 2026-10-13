@@ -12,7 +12,7 @@ import {
   parseBody,
   requireUser,
 } from '@/lib/api'
-import { completePiPayment, getOwnPayment } from '@/lib/payments'
+import { completePiPayment, getOwnPayment, SITE_SPK } from '@/lib/payments'
 import { pickOwnerSite } from '@/lib/site'
 
 const bodySchema = z.object({
@@ -50,11 +50,17 @@ export const POST = withAuthGuard(
     }
 
     // 3) 원장 COMPLETED + 사이트 결제 기록(한 트랜잭션)
-    const { data, error } = await db().rpc('fn_cmpl_site_reg_pymnt', {
-      p_pymnt_id: body.paymentId,
-      p_tx_id: body.txid,
-      p_usr_id: user.id,
-    })
+    // 원장 유형으로 RPC 선택 — SITE_SPK 는 상태를 바꾸지 않고 spk_* 만 기록(sql/013)
+    const { data, error } = await db().rpc(
+      row.pymnt_tp_cd === SITE_SPK
+        ? 'fn_cmpl_site_spk_pymnt'
+        : 'fn_cmpl_site_reg_pymnt',
+      {
+        p_pymnt_id: body.paymentId,
+        p_tx_id: body.txid,
+        p_usr_id: user.id,
+      },
+    )
     if (error) {
       // P0002 결제 없음/결제자 불일치 · P0003 사이트 불일치·결제 불가 상태·이미 다른 결제 — 운영자 확인 대상
       console.error('[payments/complete] RPC', error.code, error.message)

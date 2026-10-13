@@ -13,12 +13,20 @@ import {
 
 export const PI_PAYMENTS_URL = 'https://api.minepi.com/v2/payments'
 export const SITE_REG = 'SITE_REG' as const
+// 반짝임 부가서비스 단독 결제 — complete RPC fn_cmpl_site_spk_pymnt(sql/013)
+export const SITE_SPK = 'SITE_SPK' as const
 
 // SDK metadata 계약 — complete RPC(fn_cmpl_site_reg_pymnt)가 site_id·plan_cd 를 읽는다
 export interface SiteRegMeta {
   type: typeof SITE_REG
   site_id: string
   plan_cd: PlanCd
+  usr_id: string
+  spk: 'Y' | 'N' // 합산 결제에 반짝임 부가서비스 포함 여부 — RPC 가 spk_* 기록
+}
+export interface SiteSpkMeta {
+  type: typeof SITE_SPK
+  site_id: string
   usr_id: string
 }
 
@@ -41,7 +49,8 @@ export const regFeeDiscountPct = (
 ) => {
   const base = monPiAmt * (useMonCnt ?? LIFETIME_MONTHS)
   if (!(base > 0)) return null
-  const pct = Math.round((1 - piAmt / base) * 100)
+  // 소수 2자리(마스터 요금표 16.67·33.33·45.83% 와 일치, sql/015)
+  const pct = Math.round((1 - piAmt / base) * 10000) / 100
   return pct > 0 ? pct : null
 }
 
@@ -82,6 +91,22 @@ export async function getPlanRemaining(): Promise<Record<ApplyPlanCd, number>> {
   return Object.fromEntries(
     APPLY_PLAN_CD.map((p) => [p, Math.max(0, PLAN_CAP[p] - (used[p] ?? 0))]),
   ) as Record<ApplyPlanCd, number>
+}
+
+// 반짝임 부가서비스 단가 — fee_plan SPARKLE × 요금제(sql/014). 없음·미판매·0 이면 null(판매 안 함)
+export async function getSpkFee(planCd: string): Promise<number | null> {
+  const { data, error } = await db()
+    .from('fee_plan')
+    .select('pi_amt')
+    .eq('fee_tp_cd', 'SPARKLE')
+    .eq('plan_cd', planCd)
+    .eq('use_yn', 'Y')
+    .eq('del_yn', 'N')
+    .limit(1)
+    .maybeSingle<{ pi_amt: number | string }>()
+  if (error) throw error
+  const amt = Number(data?.pi_amt ?? 0)
+  return amt > 0 ? amt : null
 }
 
 export async function getRegFee(planCd: string): Promise<RegFee | null> {
@@ -150,6 +175,18 @@ export function parseSiteRegMeta(meta: unknown): SiteRegMeta | null {
     site_id: m.site_id,
     plan_cd: m.plan_cd as PlanCd,
     usr_id: typeof m.usr_id === 'string' ? m.usr_id : '',
+    spk: m.spk === 'Y' ? 'Y' : 'N',
+  }
+}
+
+export function parseSiteSpkMeta(meta: unknown): SiteSpkMeta | null {
+  if (!meta || typeof meta !== 'object') return null
+  const m = meta as Record<string, unknown>
+  if (m.type !== SITE_SPK || typeof m.site_id !== 'string') return null
+  return {
+    type: SITE_SPK,
+    site_id: m.site_id,
+    usr_id: typeof m.usr_id === 'string' ? m.usr_id : '',
   }
 }
 
@@ -157,6 +194,7 @@ export interface PymntRow {
   pymnt_id: string
   usr_id: string
   pymnt_sts_cd: 'APPROVED' | 'COMPLETED' | 'CANCELED'
+  pymnt_tp_cd: string // SITE_REG | SITE_SPK — complete 가 RPC 를 고른다
   meta_val: Record<string, unknown>
 }
 
@@ -167,7 +205,7 @@ export async function getOwnPayment(
 ): Promise<PymntRow | null> {
   const { data, error } = await db()
     .from('pi_pymnt')
-    .select('pymnt_id, usr_id, pymnt_sts_cd, meta_val')
+    .select('pymnt_id, usr_id, pymnt_sts_cd, pymnt_tp_cd, meta_val')
     .eq('pymnt_id', paymentId)
     .eq('usr_id', userId)
     .eq('del_yn', 'N')
@@ -180,11 +218,13 @@ export async function getOwnPayment(
 export async function hasOtherApprovedPayment(
   siteId: string,
   exceptPaymentId: string,
+  // type 생략 = 두 유형 모두(철회·정지 가드 — 반짝임 단독 결제 진행 중에도 상태 전이를 막는다)
+  type?: typeof SITE_REG | typeof SITE_SPK,
 ): Promise<boolean> {
   const { count, error } = await db()
     .from('pi_pymnt')
     .select('pymnt_id', { count: 'exact', head: true })
-    .eq('pymnt_tp_cd', SITE_REG)
+    .in('pymnt_tp_cd', type ? [type] : [SITE_REG, SITE_SPK])
     .eq('pymnt_sts_cd', 'APPROVED')
     .eq('del_yn', 'N')
     .contains('meta_val', { site_id: siteId })

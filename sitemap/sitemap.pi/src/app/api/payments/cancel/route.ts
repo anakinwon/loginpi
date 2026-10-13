@@ -36,7 +36,8 @@ export const POST = withAuthGuard(
       await cancelPiPayment(body.paymentId).catch(() => undefined)
       return NextResponse.json({ ok: true, status: 'NONE' })
     }
-    if (row.pymnt_sts_cd === 'COMPLETED') return apiError('PAY_ALREADY_PAID', 409)
+    if (row.pymnt_sts_cd === 'COMPLETED')
+      return apiError('PAY_ALREADY_PAID', 409)
     if (row.pymnt_sts_cd === 'CANCELED') {
       // 원장은 이미 취소 — Pi 측 pending 이 남았을 수 있어 한 번 더 정리(best-effort)
       await cancelPiPayment(body.paymentId).catch(() => undefined)
@@ -45,7 +46,11 @@ export const POST = withAuthGuard(
     const r = await cancelPiPayment(body.paymentId)
     if (!r.ok) {
       // Pi 가 취소 거부(서명 완료·거래 진행 중 등) — 원장은 APPROVED 유지, 이후 complete(미완료 결제 복구)가 마무리한다
-      console.error('[payments/cancel] Pi cancel', r.status, r.body.slice(0, 300))
+      console.error(
+        '[payments/cancel] Pi cancel',
+        r.status,
+        r.body.slice(0, 300),
+      )
       return apiError('PAY_PI_CANCEL_FAILED', 409)
     }
     await markPaymentCanceled(body.paymentId, user.id)

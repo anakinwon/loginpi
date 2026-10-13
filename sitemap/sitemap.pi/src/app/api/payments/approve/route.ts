@@ -1,5 +1,5 @@
 // 결제 승인 — POST /api/payments/approve { paymentId }. Pi SDK onReadyForServerApproval 에서 호출(piFetch).
-//  순서(2026-10-11 적대적 검증 반영) : 세션 → Pi API **조회(GET)** → metadata(SITE_REG)·결제자 uid·사이트 소유/상태(PAYABLE_STS=APPLYING)/미결제·이중 결제·사용료 정가 검증
+//  순서(2026-10-11 적대적 검증 반영) : 세션 → Pi API **조회(GET)** → metadata(SITE_REG 사용료[+반짝임 합산] / SITE_SPK 반짝임 단독)·결제자 uid·사이트 소유/상태/미결제·이중 결제·정가 검증
 //   → pi_pymnt APPROVED 기록 → **그 다음** Pi API approve. approve 뒤에는 사용자 서명·온체인 전송이 진행되므로, 검증 실패는 approve 전에 거부하고 Pi 측도 cancel 한다.
 //  Pi approve 가 실패하면 원장을 CANCELED 로 되돌린다(좀비 APPROVED 방지)
 import { NextResponse } from 'next/server'
@@ -18,11 +18,14 @@ import {
   cancelPiPayment,
   getPiPayment,
   getRegFee,
+  getSpkFee,
   hasOtherApprovedPayment,
   markPaymentCanceled,
   parseSiteRegMeta,
+  parseSiteSpkMeta,
+  SITE_SPK,
 } from '@/lib/payments'
-import { PAYABLE_STS, type SiteSts } from '@/lib/site'
+import { PAYABLE_STS, SPK_PAYABLE_STS, type SiteSts } from '@/lib/site'
 
 const bodySchema = z.object({ paymentId: z.string().min(1).max(200) })
 
@@ -55,7 +58,8 @@ export const POST = withAuthGuard(
     }
 
     // 2) 검증
-    const meta = parseSiteRegMeta(payment.metadata)
+    const meta =
+      parseSiteRegMeta(payment.metadata) ?? parseSiteSpkMeta(payment.metadata)
     if (!meta) return reject('PAY_SITE_MISMATCH', 400)
     if (payment.direction !== 'user_to_app')
       return reject('PAY_SITE_MISMATCH', 400)
@@ -67,7 +71,9 @@ export const POST = withAuthGuard(
 
     const { data: site, error } = await db()
       .from('site_mst')
-      .select('site_id, site_sts_cd, plan_cd, pymnt_id, own_site_yn')
+      .select(
+        'site_id, site_sts_cd, plan_cd, pymnt_id, own_site_yn, spk_yn, spk_pymnt_id',
+      )
       .eq('site_id', meta.site_id)
       .eq('ownr_usr_id', user.id)
       .eq('del_yn', 'N')
@@ -77,23 +83,57 @@ export const POST = withAuthGuard(
         plan_cd: string
         pymnt_id: string | null
         own_site_yn: 'Y' | 'N'
+        spk_yn: 'Y' | 'N'
+        spk_pymnt_id: string | null
       }>()
     if (error) return dbFail(error)
     if (!site || site.own_site_yn === 'Y')
       return reject('PAY_SITE_MISMATCH', 400)
-    if (!(PAYABLE_STS as readonly string[]).includes(site.site_sts_cd))
-      return reject('INVALID_STATE', 409)
-    if (site.pymnt_id && site.pymnt_id !== payment.identifier)
-      return reject('PAY_ALREADY_PAID', 409)
-    // 요금제는 사이트 현재 값 기준(prepare 이후 PATCH 로 바뀌었으면 metadata 와 불일치 → 거부)
-    if (meta.plan_cd !== site.plan_cd) return reject('PAY_SITE_MISMATCH', 409)
-    if (await hasOtherApprovedPayment(site.site_id, payment.identifier))
-      return reject('PAY_ALREADY_PAID', 409)
 
-    const fee = await getRegFee(site.plan_cd)
-    if (!fee || fee.pi_amt <= 0) return reject('PAY_NOT_REQUIRED', 409)
+    // 정가 산정 — 사이트 현재 값 기준(prepare 이후 PATCH 로 바뀌었으면 metadata 와 불일치 → 거부)
+    let expected: number
+    if (meta.type === SITE_SPK) {
+      // 반짝임 단독 : 사용료 결제 뒤·신청 켜짐·미결제(같은 결제 재시도는 허용)
+      if (
+        !(SPK_PAYABLE_STS as readonly string[]).includes(site.site_sts_cd) ||
+        (site.site_sts_cd === 'APPLYING' && !site.pymnt_id) ||
+        site.spk_yn !== 'Y'
+      )
+        return reject('INVALID_STATE', 409)
+      if (site.spk_pymnt_id && site.spk_pymnt_id !== payment.identifier)
+        return reject('PAY_ALREADY_PAID', 409)
+      if (
+        await hasOtherApprovedPayment(
+          site.site_id,
+          payment.identifier,
+          SITE_SPK,
+        )
+      )
+        return reject('PAY_ALREADY_PAID', 409)
+      const spk = await getSpkFee(site.plan_cd)
+      if (spk == null) return reject('PAY_NOT_REQUIRED', 409)
+      expected = spk
+    } else {
+      if (!(PAYABLE_STS as readonly string[]).includes(site.site_sts_cd))
+        return reject('INVALID_STATE', 409)
+      if (site.pymnt_id && site.pymnt_id !== payment.identifier)
+        return reject('PAY_ALREADY_PAID', 409)
+      if (meta.plan_cd !== site.plan_cd) return reject('PAY_SITE_MISMATCH', 409)
+      if (await hasOtherApprovedPayment(site.site_id, payment.identifier))
+        return reject('PAY_ALREADY_PAID', 409)
+      const fee = await getRegFee(site.plan_cd)
+      if (!fee || fee.pi_amt <= 0) return reject('PAY_NOT_REQUIRED', 409)
+      // 합산 포함 여부도 사이트 현재 값과 일치해야 한다(prepare 뒤 반짝임을 끄거나 켠 경우 거부)
+      const spk =
+        site.spk_yn === 'Y' && !site.spk_pymnt_id
+          ? await getSpkFee(site.plan_cd)
+          : null
+      if ((spk != null ? 'Y' : 'N') !== meta.spk)
+        return reject('PAY_SITE_MISMATCH', 409)
+      expected = fee.pi_amt + (spk ?? 0)
+    }
     // 정가와 정확히 일치(초과도 거부 — 서버 prepare 금액 그대로여야 한다)
-    if (Math.abs(Number(payment.amount) - fee.pi_amt) > 1e-6)
+    if (Math.abs(Number(payment.amount) - expected) > 1e-6)
       return reject('PAY_AMOUNT_SHORT', 400)
 
     // 3) 원장 기록(APPROVED) — Pi approve 보다 먼저. 재호출은 무시(멱등)

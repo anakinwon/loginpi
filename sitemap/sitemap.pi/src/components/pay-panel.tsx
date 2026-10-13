@@ -15,13 +15,17 @@ import {
   useRegFees,
   type ApiErrorBody,
 } from '@/lib/client-api'
-import { PAYABLE_STS, type OwnerSite } from '@/lib/site'
+import { PAYABLE_STS, SPK_PAYABLE_STS, type OwnerSite } from '@/lib/site'
 
-export function PayPanel({ siteId }: { siteId: string }) {
-  return <LoginGate>{() => <PayPanelInner siteId={siteId} />}</LoginGate>
+export type PayKind = 'REG' | 'SPK' // 사용료(반짝임 합산 포함) / 반짝임 부가서비스 단독
+
+export function PayPanel({ siteId, kind }: { siteId: string; kind: PayKind }) {
+  return (
+    <LoginGate>{() => <PayPanelInner siteId={siteId} kind={kind} />}</LoginGate>
+  )
 }
 
-function PayPanelInner({ siteId }: { siteId: string }) {
+function PayPanelInner({ siteId, kind }: { siteId: string; kind: PayKind }) {
   const t = useTranslations('pay')
   const tp = useTranslations('plan')
   const ts = useTranslations('siteSts')
@@ -54,12 +58,29 @@ function PayPanelInner({ siteId }: { siteId: string }) {
     return <p className="text-muted-foreground text-sm">{t('loading')}</p>
 
   const fee = fees?.[site.plan_cd]
-  const amount = fee?.pi_amt ?? null
+  const spkFee = fee?.spk ?? null
+  // 합산 : 신청에 반짝임이 켜져 있고 미결제면 사용료에 더한다(요금제에 반짝임 단가가 없으면 제외 — 서버와 같은 규칙)
+  const spkAdd =
+    kind === 'REG' && site.spk_yn === 'Y' && !site.spk_pymnt_id ? spkFee : null
+  const amount =
+    kind === 'SPK'
+      ? spkFee
+      : fee?.pi_amt == null
+        ? null
+        : fee.pi_amt + (spkAdd ?? 0)
   const { term, discount } = feeLabel(fee)
-  const payable = (PAYABLE_STS as readonly string[]).includes(site.site_sts_cd)
+  const paid = kind === 'SPK' ? !!site.spk_pymnt_id : !!site.pymnt_id
+  const payable =
+    kind === 'SPK'
+      ? (SPK_PAYABLE_STS as readonly string[]).includes(site.site_sts_cd) &&
+        site.spk_yn === 'Y' &&
+        (site.site_sts_cd !== 'APPLYING' || !!site.pymnt_id)
+      : (PAYABLE_STS as readonly string[]).includes(site.site_sts_cd)
   // 요금표에 해당 요금제가 있고 단가 0 일 때만 "불필요" — 조회 중·조회 실패는 금액 미상으로 두고 버튼 유지(서버 prepare 가 최종 판정)
   const notRequired =
-    site.own_site_yn === 'Y' || (amount != null && !(amount > 0))
+    site.own_site_yn === 'Y' ||
+    (amount != null && !(amount > 0)) ||
+    (kind === 'SPK' && fees != null && spkFee == null)
 
   return (
     <div className="flex flex-col gap-4">
@@ -75,10 +96,16 @@ function PayPanelInner({ siteId }: { siteId: string }) {
           {tp(site.plan_cd)}
           {term ? ` · ${term}` : ''}
         </dd>
+        {(kind === 'SPK' || spkAdd != null) && (
+          <>
+            <dt className="text-muted-foreground">{t('spk')}</dt>
+            <dd>✨ {spkFee == null ? '…' : `${spkFee} Pi`}</dd>
+          </>
+        )}
         <dt className="text-muted-foreground">{t('amount')}</dt>
         <dd className="text-lg font-semibold">
           {amount == null ? '…' : `${amount} Pi`}
-          {discount && (
+          {kind === 'REG' && discount && (
             <span className="text-muted-foreground ml-2 text-xs font-normal">
               {discount}
             </span>
@@ -86,9 +113,11 @@ function PayPanelInner({ siteId }: { siteId: string }) {
         </dd>
       </dl>
 
-      {site.pymnt_id ? (
+      {paid ? (
         <p className="rounded bg-emerald-100 px-3 py-2 text-sm text-emerald-800 dark:bg-emerald-900 dark:text-emerald-100">
-          {t('alreadyPaid', { at: site.pay_dtm ?? '' })}
+          {kind === 'SPK'
+            ? t('spkAlreadyPaid')
+            : t('alreadyPaid', { at: site.pay_dtm ?? '' })}
         </p>
       ) : notRequired ? (
         <p className="text-muted-foreground text-sm">{t('notRequired')}</p>
@@ -99,6 +128,7 @@ function PayPanelInner({ siteId }: { siteId: string }) {
           <p className="text-muted-foreground text-sm">{t('intro')}</p>
           <SitePayButton
             site={site}
+            kind={kind}
             amount={amount}
             onPaid={() => void load()}
           />

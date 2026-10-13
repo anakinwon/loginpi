@@ -7,12 +7,14 @@ import { useCallback, useEffect, useState } from 'react'
 import { useFormatter, useTranslations } from 'next-intl'
 import { piFetch } from '@pi/auth/client'
 import { LoginGate } from './login-gate'
+import { LogoField } from './logo-field'
 import { Pagination } from './pagination'
 import { readApi, useApiErrorText, type ApiErrorBody } from '@/lib/client-api'
 import {
   LIMITS,
   PLAN_COLOR,
   RJCT_RSN,
+  SITE_CTGR,
   VERIFY_FILE,
   type OwnerSite,
   type Paged,
@@ -311,6 +313,11 @@ function SiteRows({
   const t = useTranslations('admin')
   // 상세 행 id — 열기/닫기 버튼의 aria-controls 대상(접근성, 팀장 지적 2026-10-13)
   const detailId = `site-detail-${s.site_id}`
+  // 콘텐츠 수정 폼 열림 — 행을 닫으면 폼도 닫는다
+  const [editing, setEditing] = useState(false)
+  useEffect(() => {
+    if (!open) setEditing(false)
+  }, [open])
   const pay =
     s.own_site_yn === 'Y' ? (
       <span className="text-xs text-violet-400">{t('ownSite')}</span>
@@ -375,6 +382,14 @@ function SiteRows({
                 {t('pvtCntc')}: {s.pvt_cntc_txt ?? '-'}
                 {' · '}
                 {t('pubCntc')}: {s.pub_cntc_txt ?? '-'}
+                {s.spk_yn === 'Y' && (
+                  <>
+                    {' · ✨ '}
+                    {s.own_site_yn === 'Y' || s.spk_pymnt_id
+                      ? t('paid')
+                      : t('unpaid')}
+                  </>
+                )}
               </p>
               {s.own_site_yn !== 'Y' && s.vrfy_tkn && (
                 <div className="rounded border border-amber-300 p-2 text-xs">
@@ -399,24 +414,192 @@ function SiteRows({
                   </ol>
                 </div>
               )}
-              <div className="flex gap-3">
-                {s.site_img_url && (
-                  <img
-                    src={s.site_img_url}
-                    alt=""
-                    className="size-20 shrink-0 rounded object-cover"
-                  />
-                )}
-                {s.site_desc && (
-                  <p className="whitespace-pre-wrap">{s.site_desc}</p>
-                )}
-              </div>
-              <SiteActions site={s} onAct={onAct} />
+              {editing ? (
+                <SiteEdit
+                  site={s}
+                  onAct={onAct}
+                  onCancel={() => setEditing(false)}
+                />
+              ) : (
+                <>
+                  <div className="flex gap-3">
+                    {s.site_img_url && (
+                      <img
+                        src={s.site_img_url}
+                        alt=""
+                        className="size-20 shrink-0 rounded-full object-cover"
+                      />
+                    )}
+                    {s.site_desc && (
+                      <p className="whitespace-pre-wrap">{s.site_desc}</p>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap items-start gap-2">
+                    {/* 콘텐츠 수정(로고 등록 포함) — 상태와 무관하게 항상 */}
+                    <button
+                      type="button"
+                      className="btn mt-2 w-fit"
+                      onClick={() => setEditing(true)}
+                    >
+                      {t('edit')}
+                    </button>
+                    <SiteActions site={s} onAct={onAct} />
+                  </div>
+                </>
+              )}
             </div>
           </td>
         </tr>
       )}
     </>
+  )
+}
+
+// 관리자 콘텐츠 수정 — 이름·구분·소개·회사 로고·공개 연락처·이동 URL(PATCH action=edit). 도메인·요금제·상태는 여기서 바꾸지 않는다
+function SiteEdit({
+  site: s,
+  onAct,
+  onCancel,
+}: {
+  site: AdminSite
+  onAct: (body: object) => void
+  onCancel: () => void
+}) {
+  const t = useTranslations('form')
+  const ta = useTranslations('admin')
+  const tc = useTranslations('siteCtgr')
+  const [name, setName] = useState(s.site_nm)
+  const [ctgr, setCtgr] = useState<string>(s.site_ctgr_cd)
+  const [desc, setDesc] = useState(s.site_desc ?? '')
+  const [imgUrl, setImgUrl] = useState<string | null>(s.site_img_url)
+  const [pubCntc, setPubCntc] = useState(s.pub_cntc_txt ?? '')
+  const [mvUrl, setMvUrl] = useState(s.site_mv_url ?? '')
+  const [spk, setSpk] = useState(s.spk_yn === 'Y')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const f = `a-${s.site_id}`
+  return (
+    <form
+      className="flex max-w-xl flex-col gap-3"
+      onSubmit={(e) => {
+        e.preventDefault()
+        if (!name.trim()) return
+        onAct({
+          action: 'edit',
+          name,
+          ctgr,
+          desc,
+          imgUrl,
+          pubCntc,
+          mvUrl,
+          spk,
+        })
+      }}
+    >
+      <div>
+        <label className="label" htmlFor={`${f}-name`}>
+          {t('name')}
+        </label>
+        <input
+          id={`${f}-name`}
+          className="input"
+          maxLength={LIMITS.nameMax}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+      </div>
+      <div>
+        <label className="label" htmlFor={`${f}-ctgr`}>
+          {t('category')}
+        </label>
+        <select
+          id={`${f}-ctgr`}
+          className="input"
+          value={ctgr}
+          onChange={(e) => setCtgr(e.target.value)}
+        >
+          {SITE_CTGR.map((c) => (
+            <option key={c} value={c}>
+              {tc(c)}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div>
+        <label className="label" htmlFor={`${f}-desc`}>
+          {t('desc')}
+        </label>
+        <textarea
+          id={`${f}-desc`}
+          className="input"
+          rows={4}
+          maxLength={LIMITS.descMax}
+          value={desc}
+          onChange={(e) => setDesc(e.target.value)}
+        />
+      </div>
+      <LogoField
+        id={`${f}-img`}
+        value={imgUrl}
+        onChange={setImgUrl}
+        onError={setError}
+        onBusy={setBusy}
+      />
+      <div>
+        <label className="label" htmlFor={`${f}-pub`}>
+          {t('pubCntc')}
+        </label>
+        <input
+          id={`${f}-pub`}
+          className="input"
+          maxLength={LIMITS.cntcMax}
+          value={pubCntc}
+          onChange={(e) => setPubCntc(e.target.value)}
+        />
+      </div>
+      <div>
+        <label className="label" htmlFor={`${f}-mv`}>
+          {t('mvUrl')}
+        </label>
+        <input
+          id={`${f}-mv`}
+          className="input"
+          type="url"
+          inputMode="url"
+          placeholder="https://"
+          maxLength={1000}
+          value={mvUrl}
+          onChange={(e) => setMvUrl(e.target.value)}
+        />
+      </div>
+      <label className="flex items-center gap-2 text-sm">
+        <input
+          type="checkbox"
+          checked={spk}
+          onChange={(e) => setSpk(e.target.checked)}
+        />
+        ✨ {t('spk')}
+        {/* 자사 사이트는 결제 없이 켜짐, 외부 사이트는 소유자 결제 뒤 노출 */}
+        {s.own_site_yn !== 'Y' && (
+          <span className="text-muted-foreground text-xs">
+            {s.spk_pymnt_id ? ta('paid') : ta('unpaid')}
+          </span>
+        )}
+      </label>
+      {error && (
+        <p className="text-destructive text-sm" role="alert">
+          {error}
+        </p>
+      )}
+      <div className="flex gap-2">
+        <button type="submit" className="btn btn-primary" disabled={busy}>
+          {t('save')}
+        </button>
+        <button type="button" className="btn" onClick={onCancel}>
+          {t('cancel')}
+        </button>
+      </div>
+    </form>
   )
 }
 

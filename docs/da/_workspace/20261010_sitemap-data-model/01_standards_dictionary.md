@@ -135,7 +135,7 @@
 | W17 | 묶음 | **BND** | BNDL | bundle | 묶음 상품(PREMIUM30) | `fee_plan_bnd`·`bnd_plan_cd` | REQ-56 | cafe 사용례 없음. PKG 는 앱 패키지 뜻이라 피함 |
 | W18 | 파이 | PI | (유지) | Pi | Pi Network 통화 — 금액 용어의 수식어(판정 완료 D1) | `pi_amt`·`ord_pi_amt`·`nrm_pi_amt` | REQ-06 | 고유명 2자 |
 | W19 | 그룹 | GRP | (유지) | group | 상품군 | `fee_grp_cd` | REQ-53·55 | **조건부**. 이미 자음 3자 |
-| W20 | 반짝임 | **SPK** | SPRK | sparkle | 부가서비스 "반짝임" | `spk_yn`(site_mst 반정규화 시) | REQ-55 | **조건부**. cafe 사용례 없음 |
+| W20 | 반짝임 | **SPK** | SPRK | sparkle | 부가서비스 "반짝임" | `spk_yn`·`spk_pymnt_id`·`spk_pay_dtm`(site_mst, sql/013) | REQ-55 | **확정**(2026-10-13 sql/013). cafe 사용례 없음 |
 | W21 | 유입 | **IFL** | INFL | inflow | STATS 유입 경로 | `ifl_src_cd`(가칭) | REQ-81 | **보류**("유입" 정의 [TBD : 마스터]). INF 는 info·infinity('infinity' 금지값)와 혼동돼 불가 |
 | W22 | 제재 | **SNC** | SANC | sanction | 관리자의 계정 제재(혜택 정지) — 마스터 확정 REQ-14 | `usr_snc`·`snc_id`·`snc_tp_cd`·`snc_sts_cd`·`snc_rsn_cd`·`snc_bgn_dtm`·`snc_end_dtm` | REQ-14 | cafe 사용례 없음. SUSP 는 코드값 SUSPENDED 와 혼동, BLCK 는 baseline ADMIN_BLCK 뜻이라 제외(r2 판단 유지) |
 | W23 | 해제 | **REL** | RLSE | release | 제재의 실제 해제(예정 종료와 별도) | `rel_dtm` | REQ-14 | ⚠ RLS 는 이 프로젝트에서 Row Level Security(정본 §7 정책 명명)라 불가. REL 은 cafe 사용례 없음. `snc_end_dtm` = 예정 종료, `rel_dtm` = 실제 해제 |
@@ -299,8 +299,8 @@ As-Is 001·baseline 컬럼은 그대로 둔다(재명명 금지). 아래는 신�
 | `plan_cd` | VIP·PRM2·PRM1·BSC2·BSC1·NONE — 정렬 순서 = 나열 순서, **레벨 = VIP LV5·PRM2 LV4·PRM1 LV3·BSC2 LV2·BSC1 LV1·NONE 없음(파생, 저장 금지)**. 배지 VIP·P2·P1·B2·B1. 면적 가중치 21.16·9.27·6.76·4.15·2.43·0.7(마스터 결정 #1, 화면 상수) | 기존(+레벨·가중치 규칙) | REQ-40~43 |
 | `p_cnt_tp_cd`(RPC 인자) | VIEW·CLCK | 기존 | REQ-78 |
 | `chg_rsn_cd`(site_sts_hist) | `rjct_rsn_cd` 9종 + 정지·복구·철회 사유 [TBD — 모델러 제안, 예 RPT_ACCEPT·ADMIN_SUSPEND·ADMIN_RESTORE·USER_WITHDRAW] | 신규 | REQ-80 |
-| `fee_tp_cd` | REGISTER(무료, 판매 행 여부는 모델러)·CTGR_SLOT·HOME_SLOT·EXTEND·STATS·PREMIUM30·MEMBERSHIP·**SPARKLE** | 신규 | REQ-53·55 |
-| ↳ SPARKLE 구매 자격 | **마스터 확정 REQ-55 : 유료 요금제 사이트만** — `site_mst.plan_cd <> 'NONE'` AND `own_site_yn = 'N'`(자사 구매 금지, REQ-44) AND `site_sts_cd = 'APPROVED'` AND `del_yn = 'N'`. 가격·기간·재고는 [확인중 : 마스터]. 강제 수단(주문 생성 검증 / DB 제약)은 모델러 판단 | 신규 규칙 | REQ-55 |
+| `fee_tp_cd` | REGISTER(사용료 × 요금제)·**SPARKLE**(확정 sql/013·014 — 요금제별 5행 SPK_<plan>, 013 의 NONE 공통 행·CHECK 는 014 에서 폐기)·CTGR_SLOT·HOME_SLOT·EXTEND·STATS·PREMIUM30·MEMBERSHIP(계획) | 신규 | REQ-53·55 |
+| ↳ SPARKLE 구매 자격 | **마스터 확정 REQ-55 : 유료 요금제 사이트만** — `site_mst.plan_cd <> 'NONE'` AND `own_site_yn = 'N'`(자사 구매 금지, REQ-44) AND `site_sts_cd IN (APPLYING·PAID·IN_USE)`(012 상태 체계, sql/013 RPC) AND `del_yn = 'N'`. 무료 요금제(NONE)는 자사 전용이라 plan_cd 조건은 앱(APPLY_PLAN_CD)이 보장. 가격 [확인중 : 마스터, 임시 5 Pi]·기간 = 사이트 사용기간. 자사(own_site_yn=Y)는 결제 없이 관리자 spk_yn 으로 노출 | 확정(2026-10-13) | REQ-55 |
 | `fee_grp_cd`(조건부) | BASIC·ADDON·PREMIUM·MEMBERSHIP — PRD §3 표의 "구분" 열. 부가서비스(슬롯·EXTEND·STATS·SPARKLE) = ADDON | 신규(조건부) | REQ-53·55 |
 | `stk_scp_cd` | PER_CTGR·GLOBAL (NULL = 비배타, 재고 무제한) | 신규 | REQ-54 |
 | `ord_sts_cd` | HELD·ACTIVE·EXPIRED·CANCELED·SUSPENDED·REVOKED | 신규 | REQ-65 |
@@ -310,7 +310,7 @@ As-Is 001·baseline 컬럼은 그대로 둔다(재명명 금지). 아래는 신�
 | `snc_sts_cd` | ACTIVE(제재 중)·RELEASED(정상 해제·기간 만료)·CANCELED(관리자 오인 취소 → 0 Pi 보상 연장 대상, PRD §3-1) | 신규 | REQ-14·68 |
 | `snc_rsn_cd` | [TBD : legal-compliance-advisor] — 제안 : `rpt_rsn_cd` 10종 재사용 + ADMIN_ETC | 신규(TBD) | REQ-14 |
 | `chg_actn_cd`(sys_cfg_chg_hist) | INSERT·UPDATE·TOGGLE·ROLLBACK·DELETE (cafe 의 SWITCH 는 fee_mode 전용이라 제외) | 승계 | sql/176 |
-| Pi 결제 `metadata.type` | `SITE_MBR`(확정) / 슬롯·STATS·PREMIUM30·EXTEND·SPARKLE 는 [TBD] — 제안 패턴 `SITE_<요약>`(예 SITE_SLOT·SITE_STATS·SITE_PRM·SITE_SPRK). DB 컬럼은 `pi_pymnt`(공용 010) 소관 | 신규(TBD) | REQ-70 |
+| Pi 결제 `metadata.type` | `SITE_MBR`(확정) / 슬롯·STATS·PREMIUM30·EXTEND·SPARKLE 는 [TBD] — 제안 패턴 `SITE_<요약>`(예 SITE_SLOT·SITE_STATS·SITE_PRM). **SITE_SPK 확정**(sql/013, SPRK→SPK 약어 결정으로 SITE_SPRK 폐기). DB 컬럼은 `pi_pymnt`(공용 010) 소관 | 신규(TBD) | REQ-70 |
 
 코드값 규칙 : ASCII 대문자·숫자·`_` 만 쓴다. ™·é 같은 특수문자와 소문자는 금지한다(PyCafé™ 표기 규칙의 "DB 코드값 원형 유지").
 

@@ -51,6 +51,7 @@ export type FeeInfo = {
   pi_amt: number
   use_mon_cnt: number | null
   dc_pct: number | null
+  spk: number | null // 반짝임 부가서비스 단가(요금제별) — null 이면 판매 안 함
 }
 export type FeeMap = Record<string, FeeInfo>
 // 등록 요금표(/api/fee-plans, 공개) — 폼 요금제 선택·결제 페이지 금액·관리자 승인 게이트 공용.
@@ -58,9 +59,12 @@ export type FeeMap = Record<string, FeeInfo>
 export function useRegFees(): FeeMap | null {
   const [fees, setFees] = useState<FeeMap | null>(null)
   useEffect(() => {
-    void readApi<{ items: (FeeInfo & { plan_cd: string })[] }>(
-      fetch('/api/fee-plans'),
-    ).then((r) => {
+    void readApi<{
+      items: (Omit<FeeInfo, 'spk'> & {
+        plan_cd: string
+        spk_pi_amt: number | null
+      })[]
+    }>(fetch('/api/fee-plans')).then((r) => {
       if (r.ok)
         setFees(
           Object.fromEntries(
@@ -70,6 +74,7 @@ export function useRegFees(): FeeMap | null {
                 pi_amt: f.pi_amt,
                 use_mon_cnt: f.use_mon_cnt,
                 dc_pct: f.dc_pct,
+                spk: f.spk_pi_amt,
               },
             ]),
           ),

@@ -23,10 +23,12 @@ const post = (path: string, body: unknown) =>
 
 export function SitePayButton({
   site,
+  kind,
   amount,
   onPaid,
 }: {
   site: OwnerSite
+  kind: 'REG' | 'SPK' // 사용료(반짝임 합산 포함) / 반짝임 부가서비스 단독 — prepare 에 그대로 전달
   amount: number | null // 표시용 단가(요금표) — null 이면 미조회
   onPaid: () => void
 }) {
@@ -56,7 +58,7 @@ export function SitePayButton({
       piFetch('/api/payments/prepare', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ siteId: site.site_id }),
+        body: JSON.stringify({ siteId: site.site_id, kind }),
       }),
     )
     if (!prep.ok) return finish({ ok: false, text: errText(prep.body) })
@@ -107,10 +109,12 @@ export function SitePayButton({
       >
         {busy
           ? t('paying')
-          : t('payNow', {
-              plan: tp(site.plan_cd),
-              amount: amount == null ? '…' : String(amount),
-            })}
+          : kind === 'SPK'
+            ? t('payNowSpk', { amount: amount == null ? '…' : String(amount) })
+            : t('payNow', {
+                plan: tp(site.plan_cd),
+                amount: amount == null ? '…' : String(amount),
+              })}
       </button>
       {!isInPiBrowser && (
         <p className="text-muted-foreground text-xs">{t('piBrowserOnly')}</p>

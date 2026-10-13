@@ -213,7 +213,9 @@
     "permanent": "Permanent",
     "reapplyUntil": "Usage has ended. Re-register within the configured window to keep this domain.",
     "reapply": "Re-register",
-    "reapplyOpen": "Apply again"
+    "reapplyOpen": "Apply again",
+    "spk": "Sparkle add-on",
+    "spkGo": "Pay {amount} Pi for the sparkle add-on"
   },
   "pay": {
     "payNow": "Pay {amount} Pi usage fee ({plan})",
@@ -234,7 +236,10 @@
     "notRequired": "No payment is required for this application.",
     "notPayable": "Payment is not available in the current status. Check the application in My sites.",
     "backToMe": "Back to My sites",
-    "timeout": "No response from payment. Please try again in Pi Browser."
+    "timeout": "No response from payment. Please try again in Pi Browser.",
+    "spk": "Sparkle add-on",
+    "payNowSpk": "Pay {amount} Pi for the sparkle add-on",
+    "spkAlreadyPaid": "The sparkle add-on is already paid."
   },
   "form": {
     "newTitle": "List a site",
@@ -246,9 +251,9 @@
     "name": "Site name",
     "category": "Category",
     "desc": "Description",
-    "image": "Image",
-    "imageHint": "PNG, JPEG, WebP or GIF, up to 2MB. Inappropriate images lead to rejection or suspension.",
-    "imageRemove": "Remove image",
+    "image": "Company logo (300×300)",
+    "imageHint": "PNG, JPEG, WebP or GIF, up to 2MB. Automatically fitted to a 300×300 px square (center crop) and shown as a round logo in the home bubbles and lists. Inappropriate images lead to rejection or suspension.",
+    "imageRemove": "Remove logo",
     "pvtCntc": "Operator contact (private)",
     "pvtHint": "Used only for operator inquiries and never shown. Required to apply.",
     "pvtRequired": "An operator contact is required to apply.",
@@ -262,7 +267,10 @@
     "cancel": "Cancel",
     "plan": "Listing plan",
     "planHint": "The plan sets the home bubble size, usage period and usage fee (Pi). Discounts are relative to the 1-month rate; use starts after the usage fee is paid.",
-    "planLocked": "The plan cannot be changed while in use."
+    "planLocked": "The plan cannot be changed while in use.",
+    "spk": "Sparkle add-on",
+    "spkHint": "Makes your home bubble sparkle. Paid together with the usage fee, or turned on in Edit while in use with a separate payment.",
+    "spkPaid": "Paid — stays on for the usage period."
   },
   "admin": {
     "title": "Site admin",
@@ -296,6 +304,7 @@
     "colPay": "Payment",
     "colOwner": "Owner",
     "colDetail": "Detail",
+    "edit": "Edit",
     "detailOpen": "Open",
     "detailClose": "Close",
     "colReceived": "Received",

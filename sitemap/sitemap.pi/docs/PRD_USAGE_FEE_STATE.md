@@ -115,11 +115,21 @@
 | P7 | 문서(PRD v0.7·ROADMAP·OPS·CLAUDE·HANDOFF·ERD) | anakin_phase-review |
 | P8 | Pi Browser 실기기 전 구간(설정 0.05h) → **prod 이행과 코드 승격을 한 창에서**: ① sql/012 적용 직후 즉시 `promote-to-prod` → ② `Vercel – sitemaps: success` 개별 확인 → ③ 공개 API 건수 = 이행 전 APPROVED 건수 → ④ 관리자 PAID 탭 검토(이행된 결제 고객) → ⑤ **운영 Vercel env `CRON_SECRET` 등록 + Redeploy**(이때부터 자동 전이 시작). 012 가 CHECK 를 교체해 `APPROVED`·`PENDING` 을 없애므로 이행~승격 사이엔 운영 공개 필터 4곳이 0건·등록/결제 경로 실패(수 분 허용, 심야 권장). 대안: CHECK 를 신·구 합집합으로 2단계 적용. dev 도 P1~P2 사이 같은 공백 허용 | 실기기 로그 HANDOFF·승격 체크 success |
 
+## 10. 반짝임 부가서비스 (sql/013, 마스터 지시 2026-10-13)
+
+- **선택** : 신청·수정 폼(소유자)과 관리자 수정 폼의 체크박스 → `site_mst.spk_yn`. 결제된 반짝임은 소유자가 끌 수 없다(서버 강제). 관리자는 토글 가능, 자사(own_site_yn=Y)는 결제 없이 노출
+- **결제** : ① 합산 — 신청(APPLYING, 사용료 미결제)에 반짝임이 켜져 있으면 `prepare`(kind=REG) 가 사용료+부가서비스 단가를 합산하고 metadata.spk='Y', `fn_cmpl_site_reg_pymnt` 가 같은 결제ID 로 `spk_pymnt_id·spk_pay_dtm` 기록 ② 단독 — 사용료 결제 뒤(APPLYING 결제완료·PAID·IN_USE = SPK_PAYABLE_STS) `/pay/<id>?kind=spk` → prepare kind=SPK(type SITE_SPK) → `fn_cmpl_site_spk_pymnt`(상태 불변). approve 는 사이트 현재값으로 정가 재계산 + metadata.spk 일치 검증
+- **노출** : `isSparkleOn` = spk_yn=Y AND (spk_pay_dtm NOT NULL OR own_site_yn=Y), IN_USE 버블만(/api/bubbles). 재등록(USED·EXPIRED → 새 결제) 시 spk_pymnt_id·spk_pay_dtm 초기화(새 주기 = 새 결제)
+- **단가** : `fee_plan` SPARKLE × 요금제 5행(sql/014, 마스터 확정 2026-10-13) — BSC1 2 · BSC2 5 · PRM1 9 · PRM2 16 · VIP 26 Pi(사용료 10·25·45·80·130, 할인 0·16.67·25·33.33·45.83%, 약정 1·3·6·12·24개월 — sql/015 2차 확정). UPDATE 로 변경. 판매 중단은 use_yn='N'(폼·prepare 가 자동 제외)
+- **한계** : PAID 상태는 소유자 수정 불가(EDITABLE_STS)라 사용 시작 전 1시간엔 소유자가 반짝임을 새로 켤 수 없다(관리자 토글은 가능) — 사용 중(IN_USE) 부터 단독 추가 가능
+
 ## 변경 이력
 
 | 날짜 | 내용 |
 |---|---|
 | 2026-10-13 | v0.1 설계안 — 워크플로(수집·결론·비평) 산출, 비평 치명 6건 반영(PAID 반려 재신청 경로·관리자 반려 Pi 결제 검사·cancel 전 txid 확인·무결제 점유 쿨다운·영구 무료 노출 차단·bubbles.ts:77 제외) |
+| 2026-10-13 | 요금 재정의 2차(sql/015) — 사용료 10·25·45·80·130, 반짝임 2·5·9·16·26, 할인율 소수 2자리 표시 |
+| 2026-10-13 | 반짝임 부가서비스 §10 — sql/013(dev·stg 적용, prod 미적용), 합산·단독 결제, 관리자 토글. 실기기 미검증, 단가 [확인중] |
 | 2026-10-13 | P2·P3 완료 — 코드 전환 25파일(0e150859), stg sql/012 적용(IN_USE 20), 스테이징 배포 success(/api/sites 20·bubbles 111). 실기기 미검증. 다음 P4(sys_cfg 읽기·관리자 설정 UI)·P5(크론) |
 | 2026-10-13 | P1 완료 — sql/012 작성·da-governance-expert 리뷰(P1 2·P2 7·P3 8 반영: sys_cfg cfg_key/JSONB·fn_prcs_site_rpt IN_USE 정정·멱등 DROP·이행 가드·unique_violation→P0003·롤백 순서)·dev 적용(19건 IN_USE, 이력 19, 외부 무기간 0). stg 는 P2 코드 푸시 직전 적용 |
 | 2026-10-13 | v0.2 → v0.2c — 팀장 반려 3회 반영(2차: D3 "PAID 차단 수단 없음" 정합·크론 fail-closed·운영 CRON_SECRET 등록을 P8 검토 뒤로 / 3차: CRON_SECRET env optional 명시·P5 build 검증·D3 운용 경로): 결정 D0(광고 단위)·D-A(12h 창)·D-B(관리자 반려 범위) 추가, 전이 #5 PAID 를 [확인중 : D3] 로 정합, P8 이행~승격 공백 대책, 검토 창 알림 부재·자사 시드 CHECK·감사 스냅샷·쿨다운 출처 추가, 기본값 확정 3건(상태명·이행 유예·크론 플랜)으로 내림, 표기 통일 |

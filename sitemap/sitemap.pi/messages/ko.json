@@ -213,7 +213,9 @@
     "permanent": "영구",
     "reapplyUntil": "사용이 끝났습니다. 설정된 재등록 기간 안에 재등록하면 이 도메인을 이어서 사용할 수 있습니다.",
     "reapply": "재등록",
-    "reapplyOpen": "다시 신청"
+    "reapplyOpen": "다시 신청",
+    "spk": "반짝임 부가서비스",
+    "spkGo": "반짝임 부가서비스 {amount} Pi 결제하기"
   },
   "pay": {
     "payNow": "{plan} 사용료 {amount} Pi 결제하기",
@@ -234,7 +236,10 @@
     "notRequired": "이 신청은 결제가 필요하지 않습니다.",
     "notPayable": "현재 상태에서는 결제할 수 없습니다. 내 사이트에서 신청 상태를 확인해 주세요.",
     "backToMe": "내 사이트로",
-    "timeout": "결제 응답이 없습니다. Pi Browser에서 다시 시도해 주세요."
+    "timeout": "결제 응답이 없습니다. Pi Browser에서 다시 시도해 주세요.",
+    "spk": "반짝임 부가서비스",
+    "payNowSpk": "반짝임 부가서비스 {amount} Pi 결제하기",
+    "spkAlreadyPaid": "반짝임 부가서비스 결제가 완료되었습니다."
   },
   "form": {
     "newTitle": "사이트 등록",
@@ -246,9 +251,9 @@
     "name": "사이트 이름",
     "category": "사이트 구분",
     "desc": "소개",
-    "image": "대표 이미지",
-    "imageHint": "PNG·JPEG·WebP·GIF, 2MB 이하. 부적절한 이미지는 반려·정지 사유입니다.",
-    "imageRemove": "이미지 빼기",
+    "image": "회사 로고 (300×300)",
+    "imageHint": "PNG·JPEG·WebP·GIF, 2MB 이하. 올리면 300×300 px 정사각형으로 자동 맞춤(중앙 자르기)되어 메인 버블·목록에 원형 로고로 표시됩니다. 부적절한 이미지는 반려·정지 사유입니다.",
+    "imageRemove": "로고 빼기",
     "pvtCntc": "운영 연락처(비공개)",
     "pvtHint": "운영 문의에만 쓰이며 공개되지 않습니다. 신청 시 필수.",
     "pvtRequired": "신청에는 운영 연락처가 필요합니다.",
@@ -262,7 +267,10 @@
     "cancel": "취소",
     "plan": "등록 요금제",
     "planHint": "요금제에 따라 메인 버블 크기·사용 기간·사용료(Pi)가 정해집니다. 할인율은 1개월 요금 기준이며, 사용료 결제 후 사용이 시작됩니다.",
-    "planLocked": "사용 중에는 요금제를 바꿀 수 없습니다."
+    "planLocked": "사용 중에는 요금제를 바꿀 수 없습니다.",
+    "spk": "반짝임 부가서비스",
+    "spkHint": "선택하면 메인 버블이 반짝입니다. 사용료와 함께 결제되며, 사용 중에는 수정에서 켜고 추가 결제할 수 있습니다.",
+    "spkPaid": "결제 완료 — 사용 기간 동안 유지됩니다."
   },
   "admin": {
     "title": "사이트 관리",
@@ -296,6 +304,7 @@
     "colPay": "결제",
     "colOwner": "등록자",
     "colDetail": "상세",
+    "edit": "수정",
     "detailOpen": "열기",
     "detailClose": "닫기",
     "colReceived": "접수일",

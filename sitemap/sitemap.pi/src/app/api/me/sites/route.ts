@@ -68,6 +68,7 @@ export const POST = withAuthGuard(
         site_img_url: body.imgUrl ?? null,
         site_mv_url: body.mvUrl ?? null,
         plan_cd: body.planCd,
+        spk_yn: body.spk ? 'Y' : 'N',
         pvt_cntc_txt: body.pvtCntc ?? null,
         pub_cntc_txt: body.pubCntc ?? null,
         site_sts_cd: body.submit ? 'APPLYING' : 'DRAFT',

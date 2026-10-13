@@ -68,7 +68,7 @@ export const PATCH = withAuthGuard(
     const { data: cur, error: curErr } = await db()
       .from('site_mst')
       .select(
-        'site_id, site_dom_nm, site_sts_cd, rjct_rsn_cd, plan_cd, pymnt_id, site_mv_url',
+        'site_id, site_dom_nm, site_sts_cd, rjct_rsn_cd, plan_cd, pymnt_id, site_mv_url, spk_yn, spk_pymnt_id',
       )
       .eq('site_id', id)
       .eq('ownr_usr_id', user.id)
@@ -81,6 +81,8 @@ export const PATCH = withAuthGuard(
         plan_cd: string
         pymnt_id: string | null
         site_mv_url: string | null
+        spk_yn: 'Y' | 'N'
+        spk_pymnt_id: string | null
       }>()
     if (curErr) return dbFail(curErr)
     if (!cur) return apiError('NOT_FOUND', 404)
@@ -149,6 +151,8 @@ export const PATCH = withAuthGuard(
         site_img_url: body.imgUrl ?? null,
         site_mv_url: body.mvUrl ?? null,
         plan_cd: body.planCd,
+        // 결제된 반짝임은 소유자가 바꾸지 못한다(현재값 유지 — 관리자 토글도 보존). 재등록은 새 결제라 선택값 그대로
+        spk_yn: cur.spk_pymnt_id && !renew ? cur.spk_yn : body.spk ? 'Y' : 'N',
         pvt_cntc_txt: body.pvtCntc ?? null,
         pub_cntc_txt: body.pubCntc ?? null,
         ...(reapply && {
@@ -163,6 +167,8 @@ export const PATCH = withAuthGuard(
             pay_dtm: null,
             use_bgn_dtm: null,
             use_end_dtm: null,
+            spk_pymnt_id: null,
+            spk_pay_dtm: null,
           }),
       }
     }

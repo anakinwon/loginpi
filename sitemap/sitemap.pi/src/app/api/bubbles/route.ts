@@ -9,6 +9,7 @@ import samples from '@/data/sample-sites.json'
 import { apiError, db, PUBLIC_CACHE } from '@/lib/api'
 import {
   BUBBLE_DAYS,
+  isSparkleOn,
   MV_URL_RE,
   PLAN_CD,
   SITE_CTGR,
@@ -36,7 +37,7 @@ const samplePct = (domain: string) => {
 
 // 부가서비스 "반짝임" — 유료 요금제마다 sample-sites.json 의 첫 샘플이 추가요금을 내고 선택한 것으로 간주(마스터 지시 2026-10-10).
 // 카테고리 필터 전에 정해 필터를 바꿔도 같은 사이트가 반짝인다.
-// ponytail: 실사이트 구매는 Phase 2(site_mst 부가서비스 컬럼 + fee_plan 결제) — 그전엔 실사이트에 붙이지 않는다(미결제 유료 표시 금지)
+// 실사이트는 site_mst.spk_yn·spk_pay_dtm(sql/013, isSparkleOn) — 결제 전엔 붙이지 않는다(미결제 유료 표시 금지)
 const SPARKLE = new Set(
   PLAN_CD.filter((p) => p !== 'NONE').map(
     (p) => samples.sites.find((s) => s.planCd === p)?.domain,
@@ -99,7 +100,7 @@ async function load(
   let q = db()
     .from('site_mst')
     .select(
-      'site_id, site_dom_nm, site_nm, site_ctgr_cd, site_img_url, site_mv_url, plan_cd, own_site_yn',
+      'site_id, site_dom_nm, site_nm, site_ctgr_cd, site_img_url, site_mv_url, plan_cd, own_site_yn, spk_yn, spk_pay_dtm',
     )
     .eq('del_yn', 'N')
     .eq('site_sts_cd', 'IN_USE')
@@ -139,6 +140,8 @@ async function load(
       own: s.own_site_yn === 'Y',
       views: c.cur,
       chgPct: pct(c.cur, c.prev),
+      // 반짝임 부가서비스 — 신청 + (결제 완료 또는 자사). 샘플은 SPARKLE Set
+      sparkle: isSparkleOn(s),
     }
   })
   return {

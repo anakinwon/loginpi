@@ -16,6 +16,7 @@ import {
   type ApiErrorBody,
   type FeeMap,
 } from '@/lib/client-api'
+import { LogoField } from './logo-field'
 import {
   APPLY_PLAN_CD,
   DOMAIN_EDITABLE_STS,
@@ -28,6 +29,7 @@ import {
   type OwnerSite,
   type Paged,
   PAYABLE_STS,
+  SPK_PAYABLE_STS,
   VERIFY_FILE,
   WITHDRAW_BLOCKED_STS,
 } from '@/lib/site'
@@ -39,6 +41,22 @@ const needsPayment = (s: OwnerSite, fees: FeeMap | null) =>
   !s.pymnt_id &&
   (PAYABLE_STS as readonly string[]).includes(s.site_sts_cd) &&
   (fees == null || (fees[s.plan_cd]?.pi_amt ?? 0) > 0)
+// 사용료 결제 표시 금액 — 반짝임 신청(미결제)이 있으면 합산(서버 prepare 와 같은 규칙)
+const payAmount = (s: OwnerSite, fees: FeeMap | null) => {
+  const base = fees?.[s.plan_cd]?.pi_amt
+  if (base == null) return '…'
+  const spk =
+    s.spk_yn === 'Y' && !s.spk_pymnt_id ? (fees?.[s.plan_cd]?.spk ?? 0) : 0
+  return String(base + spk)
+}
+// 반짝임 단독 결제 필요 — 사용료 결제 뒤(APPLYING 은 pymnt_id 있을 때)·신청 켜짐·미결제·판매 중
+const needsSpkPayment = (s: OwnerSite, fees: FeeMap | null) =>
+  s.own_site_yn !== 'Y' &&
+  s.spk_yn === 'Y' &&
+  !s.spk_pymnt_id &&
+  (SPK_PAYABLE_STS as readonly string[]).includes(s.site_sts_cd) &&
+  (s.site_sts_cd !== 'APPLYING' || !!s.pymnt_id) &&
+  (fees == null || (fees[s.plan_cd]?.spk ?? 0) > 0)
 
 export function MySites() {
   return <LoginGate>{() => <MySitesInner />}</LoginGate>
@@ -157,11 +175,28 @@ function MySitesInner() {
                       className="btn btn-primary w-fit"
                       href={`/pay/${s.site_id}`}
                     >
-                      {t('payGo', {
-                        amount: fees?.[s.plan_cd]?.pi_amt ?? '…',
-                      })}
+                      {t('payGo', { amount: payAmount(s, fees) })}
                     </Link>
                   </div>
+                )}
+                {s.spk_yn === 'Y' && (
+                  <p className="text-xs">
+                    ✨ {t('spk')}
+                    {s.own_site_yn !== 'Y' && (
+                      <span className="text-muted-foreground">
+                        {' · '}
+                        {s.spk_pymnt_id ? t('paid') : t('unpaid')}
+                      </span>
+                    )}
+                  </p>
+                )}
+                {needsSpkPayment(s, fees) && (
+                  <Link
+                    className="btn w-fit"
+                    href={`/pay/${s.site_id}?kind=spk`}
+                  >
+                    {t('spkGo', { amount: fees?.[s.plan_cd]?.spk ?? '…' })}
+                  </Link>
                 )}
                 {s.site_sts_cd === 'APPLYING' && (
                   <p className="text-muted-foreground text-xs">
@@ -273,6 +308,13 @@ function SiteForm({
   const [planCd, setPlanCd] = useState<string>(
     site?.plan_cd && site.plan_cd !== 'NONE' ? site.plan_cd : 'BSC1',
   )
+  // 반짝임 부가서비스 — 결제된 뒤엔 끌 수 없다(서버도 강제)
+  const [spk, setSpk] = useState(site?.spk_yn === 'Y')
+  // 재등록(USED·EXPIRED)은 새 결제라 지난 주기 결제와 무관하게 다시 고른다
+  const spkPaid =
+    !!site?.spk_pymnt_id &&
+    site.site_sts_cd !== 'USED' &&
+    site.site_sts_cd !== 'EXPIRED'
   const inUse = site?.site_sts_cd === 'IN_USE'
   // 결제가 남은 행(IN_USE, 결제 후 반려 등)은 요금제 잠금 — 재등록(USED·EXPIRED)만 새 결제라 선택 가능
   const planLocked =
@@ -290,21 +332,6 @@ function SiteForm({
   const norm = normalizeDomain(domain)
   const domainValid = DOMAIN_RE.test(norm)
   const domainLocked = !!site && !DOMAIN_EDITABLE_STS.includes(site.site_sts_cd)
-
-  const upload = async (file: File) => {
-    if (file.size > LIMITS.imgMaxBytes)
-      return setError(errText({ code: 'IMG_TOO_LARGE' }))
-    setBusy(true)
-    setError(null)
-    const fd = new FormData()
-    fd.append('file', file)
-    const r = await readApi<{ url: string }>(
-      piFetch('/api/me/upload', { method: 'POST', body: fd }),
-    )
-    setBusy(false)
-    if (r.ok) setImgUrl(r.data.url)
-    else setError(errText(r.body))
-  }
 
   const save = async (submit: boolean) => {
     if (!domainValid) return setError(t('domainInvalid'))
@@ -325,6 +352,7 @@ function SiteForm({
           pubCntc,
           mvUrl,
           planCd,
+          spk,
           submit,
         }),
       }),
@@ -407,6 +435,22 @@ function SiteForm({
       </div>
 
       <div>
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={spk}
+            disabled={spkPaid}
+            onChange={(e) => setSpk(e.target.checked)}
+          />
+          ✨ {t('spk')}
+          {fees?.[planCd]?.spk != null ? ` (+${fees[planCd].spk} Pi)` : ''}
+        </label>
+        <p className="text-muted-foreground mt-1 text-xs">
+          {spkPaid ? t('spkPaid') : t('spkHint')}
+        </p>
+      </div>
+
+      <div>
         <label className="label" htmlFor="f-ctgr">
           {t('category')}
         </label>
@@ -441,39 +485,13 @@ function SiteForm({
         </p>
       </div>
 
-      <div>
-        <label className="label" htmlFor="f-img">
-          {t('image')}
-        </label>
-        {imgUrl && (
-          <img
-            src={imgUrl}
-            alt=""
-            className="mb-2 size-24 rounded-md object-cover"
-          />
-        )}
-        <input
-          id="f-img"
-          type="file"
-          accept="image/png,image/jpeg,image/webp,image/gif"
-          className="text-sm"
-          disabled={busy}
-          onChange={(e) => {
-            const f = e.target.files?.[0]
-            if (f) void upload(f)
-          }}
-        />
-        <p className="text-muted-foreground mt-1 text-xs">{t('imageHint')}</p>
-        {imgUrl && (
-          <button
-            type="button"
-            className="btn mt-1"
-            onClick={() => setImgUrl(null)}
-          >
-            {t('imageRemove')}
-          </button>
-        )}
-      </div>
+      <LogoField
+        value={imgUrl}
+        onChange={setImgUrl}
+        onError={setError}
+        onBusy={setBusy}
+        disabled={busy}
+      />
 
       <div>
         <label className="label" htmlFor="f-pvt">

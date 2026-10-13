@@ -118,6 +118,8 @@ export const WITHDRAW_BLOCKED_STS: SiteSts[] = [
 export const VERIFY_FILE = '/sitemap-verify.txt'
 
 export const IMG_BUCKET = 'site-img'
+// 회사 로고 한 변(px) — 신청 폼이 올리기 전에 이 크기 정사각형으로 맞춘다(중앙 자르기). 메인 버블·목록이 원형으로 그린다(마스터 지시 2026-10-13)
+export const LOGO_PX = 300
 export const IMG_MIME = [
   'image/png',
   'image/jpeg',
@@ -141,6 +143,12 @@ export const PLAN_CAP: Record<ApplyPlanCd, number> = {
 }
 // 사용료 결제가 가능한 사이트 상태 — prepare·approve·RPC(sql/012 fn_cmpl_site_reg_pymnt)·결제 페이지가 같은 값을 쓴다
 export const PAYABLE_STS = ['APPLYING'] as const satisfies readonly string[]
+// 반짝임 부가서비스 단독 결제가 가능한 상태 — 사용료 결제 뒤(APPLYING 은 pymnt_id 있을 때만)·사용 중. prepare·approve·RPC fn_cmpl_site_spk_pymnt(sql/013) 동일
+export const SPK_PAYABLE_STS = [
+  'APPLYING',
+  'PAID',
+  'IN_USE',
+] as const satisfies readonly string[]
 // 이동 URL 형식 — DB CHECK(sql/002 site_mst_site_mv_url_check)와 동일: https + 호스트
 export const MV_URL_RE = /^https:\/\/[^\s/?#]+/
 
@@ -172,6 +180,24 @@ const optText = (max: number) =>
     .nullable()
     .optional()
 
+// 콘텐츠 필드 — 소유자 등록·수정(siteInputSchema)과 관리자 수정(adminSiteActionSchema edit)이 공유. 도메인·요금제·상태는 포함하지 않는다
+const SITE_CONTENT_FIELDS = {
+  name: z.string().trim().min(1).max(LIMITS.nameMax),
+  ctgr: z.enum(SITE_CTGR),
+  desc: optText(LIMITS.descMax),
+  imgUrl: z.string().url().max(1000).nullable().optional(),
+  // 이동 URL(일반 브라우저용 https 연결 주소) — DB CHECK site_mst_site_mv_url_check 와 같은 형식. null·빈 문자열은 null
+  mvUrl: z
+    .string()
+    .nullable()
+    .transform((v) => (v == null || v.trim() === '' ? null : v.trim()))
+    .pipe(z.string().url().regex(MV_URL_RE).max(1000).nullable())
+    .optional(),
+  pubCntc: optText(LIMITS.cntcMax),
+  // 반짝임 부가서비스 신청(spk_yn) — 결제는 prepare(합산)·/pay?kind=spk(단독)
+  spk: z.boolean().default(false),
+}
+
 // 등록·수정 본문. submit=true 면 APPLYING 신청(비공개 연락처 필수), 아니면 DRAFT 저장
 export const siteInputSchema = z
   .object({
@@ -179,19 +205,8 @@ export const siteInputSchema = z
       .string()
       .transform(normalizeDomain)
       .pipe(z.string().regex(DOMAIN_RE)),
-    name: z.string().trim().min(1).max(LIMITS.nameMax),
-    ctgr: z.enum(SITE_CTGR),
-    desc: optText(LIMITS.descMax),
-    imgUrl: z.string().url().max(1000).nullable().optional(),
-    // 이동 URL(일반 브라우저용 https 연결 주소) — DB CHECK site_mst_site_mv_url_check 와 같은 형식. null·빈 문자열은 null
-    mvUrl: z
-      .string()
-      .nullable()
-      .transform((v) => (v == null || v.trim() === '' ? null : v.trim()))
-      .pipe(z.string().url().regex(MV_URL_RE).max(1000).nullable())
-      .optional(),
+    ...SITE_CONTENT_FIELDS,
     pvtCntc: optText(LIMITS.cntcMax),
-    pubCntc: optText(LIMITS.cntcMax),
     // 등록 요금제(사용료 결제 대상) — 신청자는 유료 5단계만 선택, NONE 은 자사(관리자) 전용
     planCd: z.enum(APPLY_PLAN_CD).default('BSC1'),
     submit: z.boolean().default(false),
@@ -214,8 +229,10 @@ export const statInputSchema = z.object({
 })
 
 // 관리자 액션 — start(PAID→IN_USE 즉시 사용 시작) · reject(APPLYING) · suspend(IN_USE) · restore(SUSPENDED). 승인·소유 확인 단계 없음
+//  edit : 콘텐츠 수정(이름·구분·소개·로고·공개 연락처·이동 URL) — 상태·도메인·요금제는 그대로(마스터 지시 2026-10-13, 관리자 로고 등록)
 export const adminSiteActionSchema = z.discriminatedUnion('action', [
   z.object({ action: z.literal('start') }),
+  z.object({ action: z.literal('edit'), ...SITE_CONTENT_FIELDS }),
   z.object({
     action: z.literal('reject'),
     rsnCd: z.enum(RJCT_RSN),
@@ -250,7 +267,7 @@ export interface PublicSite {
 }
 
 // 소유자·관리자 조회 컬럼 — 비공개 연락처·상태·반려 사유 포함
-export const OWNER_SITE_COLS = `${PUBLIC_SITE_COLS}, site_sts_cd, rjct_rsn_cd, rjct_rsn_cont, pvt_cntc_txt, plan_cd, pymnt_id, pay_dtm, aply_dtm, use_bgn_dtm, use_end_dtm, reg_dtm, mod_dtm`
+export const OWNER_SITE_COLS = `${PUBLIC_SITE_COLS}, site_sts_cd, rjct_rsn_cd, rjct_rsn_cont, pvt_cntc_txt, plan_cd, pymnt_id, pay_dtm, aply_dtm, use_bgn_dtm, use_end_dtm, spk_yn, spk_pymnt_id, spk_pay_dtm, reg_dtm, mod_dtm`
 
 // RPC 가 돌려준 site_mst 전체 행에서 소유자 응답 컬럼만 추림
 export const pickOwnerSite = (row: Record<string, unknown>) =>
@@ -269,12 +286,22 @@ export interface OwnerSite extends PublicSite {
   aply_dtm: string | null // 신청일시(APPLYING 진입, 미결제 타이머 기준)
   use_bgn_dtm: string | null // 사용 시작(fn_bgn_site_use)
   use_end_dtm: string | null // 사용 종료 — null 이면 영구(자사)
+  spk_yn: 'Y' | 'N' // 반짝임 부가서비스 신청
+  spk_pymnt_id: string | null // 반짝임 결제ID(합산이면 pymnt_id 와 같음) — null 이면 미결제
+  spk_pay_dtm: string | null
   rjct_rsn_cd: string | null
   rjct_rsn_cont: string | null
   pvt_cntc_txt: string | null
   reg_dtm: string
   mod_dtm: string
 }
+
+// 반짝임 노출 조건 — 신청 + (결제 완료 또는 자사). 상태(IN_USE)는 호출처 쿼리가 거른다(sql/013 규칙)
+export const isSparkleOn = (s: {
+  spk_yn: 'Y' | 'N'
+  spk_pay_dtm: string | null
+  own_site_yn: 'Y' | 'N'
+}) => s.spk_yn === 'Y' && (s.spk_pay_dtm != null || s.own_site_yn === 'Y')
 
 export interface Paged<T> {
   items: T[]
@@ -300,11 +327,11 @@ export const PLAN_BADGE: Record<PlanCd, string> = {
 
 // 요금제 색 — 레벨이 높을수록 채도·명도를 올려 더 눈에 띄게(마스터 지시 2026-10-09) : 기본1 무채색 → VIP 밝은 골드
 export const PLAN_COLOR: Record<PlanCd, string> = {
-  VIP: '#FFC21A', // VIP(영구) · 브릴리언트 골드(최고 명도·채도)
-  PRM2: '#FF3D9A', // 프리미엄2(5년) · 핫 핑크
-  PRM1: '#7C5CFF', // 프리미엄1(1년) · 비비드 바이올렛
-  BSC2: '#2A8FA8', // 기본2(12개월) · 차분한 틸
-  BSC1: '#5E6A7D', // 기본1(6개월) · 저채도 슬레이트
+  VIP: '#FFC21A', // VIP(24개월) · 브릴리언트 골드(최고 명도·채도)
+  PRM2: '#FF3D9A', // 프리미엄2(12개월) · 핫 핑크
+  PRM1: '#7C5CFF', // 프리미엄1(6개월) · 비비드 바이올렛
+  BSC2: '#2A8FA8', // 기본2(3개월) · 차분한 틸
+  BSC1: '#5E6A7D', // 기본1(1개월) · 저채도 슬레이트
   NONE: '#9CA3AF', // 무료(요금제 없음)
 }
 
@@ -346,7 +373,7 @@ export interface BubbleItem {
   chgPct: number // 직전 동일 기간 대비 증감률(%) — 직전 0·현재 >0 이면 100, 둘 다 0 이면 0
   sample?: boolean // 데모 화면 전용 가상 샘플(src/data/sample-sites.json) — 배지 "샘플", 상세 이동 없음
   url?: string // 연결 주소 재지정(sitemap/sites.json url) — 있으면 버블 클릭 시 상세 대신 이동 안내 후 이 주소로
-  sparkle?: boolean // 부가서비스 "반짝임"(요금제 외 추가요금 결제) — 버블에 반짝임 효과. 현재 샘플만(api/bubbles SPARKLE)
+  sparkle?: boolean // 부가서비스 "반짝임"(요금제 외 추가요금 결제) — 버블에 반짝임 효과. 실사이트는 isSparkleOn(sql/013), 샘플은 api/bubbles SPARKLE
 }
 
 export interface BubbleResponse {
