@@ -81,7 +81,8 @@
     "signOut": "Sign out",
     "or": "or",
     "linkRequired": "You are signed in with Google, but it is not linked to a Pi account yet. Issue a link code in Pi Browser and enter it here.",
-    "linkNeeded": "Link Pi account"
+    "linkNeeded": "Link Pi account",
+    "linkCheckFailed": "Could not check your account link status (temporary server error). Please refresh in a moment."
   },
   "piOAuth": {
     "signingIn": "Signing in with your Pi account…",

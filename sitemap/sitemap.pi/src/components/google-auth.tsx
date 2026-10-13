@@ -38,6 +38,8 @@ export function useAppUser() {
   const [googleUser, setGoogleUser] = useState<PiSessionUser | null>(null)
   const [meLoading, setMeLoading] = useState(false)
   const linkedId = session?.user?.id || null
+  // DB 오류로 연동 판정 불가 — '미연동'(코드 입력)과 분리해 일시 오류로 안내
+  const linkUnknown = !!session?.user?.linkUnknown
 
   // react-hooks/set-state-in-effect 경고 1건 — 세션 변화에 따른 서버 재조회(외부 시스템 동기화)라 의도된 패턴
   const refresh = useCallback(async () => {
@@ -61,8 +63,12 @@ export function useAppUser() {
     user,
     source: pi.user ? ('pi' as const) : googleUser ? ('google' as const) : null,
     isLoading: pi.isLoading || status === 'loading' || meLoading,
-    // Google 로그인은 됐지만 Pi 계정 미연동 — 코드 입력 안내 대상
-    googleUnlinked: !pi.user && status === 'authenticated' && !linkedId,
+    // Google 로그인은 됐지만 Pi 계정 미연동(확정) — 코드 입력 안내 대상
+    googleUnlinked:
+      !pi.user && status === 'authenticated' && !linkedId && !linkUnknown,
+    // Google 로그인은 됐지만 DB 오류로 연동 여부를 모름 — 새로고침 유도
+    googleLinkError:
+      !pi.user && status === 'authenticated' && !linkedId && linkUnknown,
     googleEmail: session?.user?.email ?? null,
     piError: pi.error,
     // 인자를 넘겨야 POST(/api/auth/session) → jwt trigger 'update' 로 연동 재조회(인자 없으면 GET 만 — 실측 2026-10-11)
@@ -101,6 +107,16 @@ export function GoogleSignOutButton() {
     >
       {t('signOut')}
     </button>
+  )
+}
+
+// 연동 판정 불가(DB 오류) 안내 — 코드 입력 폼 대신 표시(이미 연동된 사용자가 폼을 보는 혼란 방지)
+export function LinkCheckFailed() {
+  const t = useTranslations('auth')
+  return (
+    <p className="text-destructive text-sm" role="alert">
+      {t('linkCheckFailed')}
+    </p>
   )
 }
 

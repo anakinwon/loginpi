@@ -81,7 +81,8 @@
     "signOut": "로그아웃",
     "or": "또는",
     "linkRequired": "Google 로그인은 됐지만 아직 Pi 계정과 연결되지 않았습니다. Pi Browser에서 연동 코드를 발급받아 입력하세요.",
-    "linkNeeded": "Pi 계정 연동 필요"
+    "linkNeeded": "Pi 계정 연동 필요",
+    "linkCheckFailed": "연동 상태를 확인하지 못했습니다(일시적 서버 오류). 잠시 후 새로고침하세요."
   },
   "piOAuth": {
     "signingIn": "Pi 계정으로 로그인하는 중…",

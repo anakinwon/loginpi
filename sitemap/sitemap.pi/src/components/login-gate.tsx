@@ -12,6 +12,7 @@ import { env } from '@/env'
 import {
   GoogleLoginButton,
   googleLoginEnabled,
+  LinkCheckFailed,
   LinkCodeForm,
   useAppUser,
 } from './google-auth'
@@ -50,12 +51,15 @@ export function LoginGate({
   children: (user: PiSessionUser) => React.ReactNode
 }) {
   const t = useTranslations('auth')
-  const { user, isLoading, googleUnlinked, piError } = useAppUser()
+  const { user, isLoading, googleUnlinked, googleLinkError, piError } =
+    useAppUser()
   const { login, busy, oauthReady } = usePiLogin()
 
   if (isLoading && !user)
     return <p className="text-muted-foreground text-sm">{t('checking')}</p>
   if (user) return <>{children(user)}</>
+  // DB 오류로 연동 판정 불가 → 코드 입력 폼 대신 일시 오류
+  if (googleLinkError) return <LinkCheckFailed />
   // Google 로그인은 됐지만 Pi 계정 미연동 → 연동 코드 입력
   if (googleUnlinked)
     return (

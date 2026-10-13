@@ -15,6 +15,7 @@ export const googleEnabled = () =>
 // JWT 추가 필드(src/types/next-auth.d.ts 와 동일 — 보강이 적용되지 않는 경로용)
 type LinkJwt = {
   sub?: string
+  // 문자열 = 연동 / null = 미연동 확정 / undefined = DB 오류로 아직 한 번도 판정 못 함(JSON 직렬화에서 키가 빠져 그대로 복원됨)
   userId?: string | null
   googleSub?: string
 }
@@ -60,8 +61,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       const t = token as LinkJwt
       if (account?.provider === 'google' && profile?.sub) {
         t.googleSub = profile.sub
-        // 최초 로그인은 이전 값이 없어 DB 오류도 null(미연동 안내) — 서버 로그로 구분
-        t.userId = (await findLinkedUserId(profile.sub)) ?? null
+        // 최초 로그인 — DB 오류(undefined)를 null(미연동)로 합치지 않는다. 비워 두면 session.linkUnknown 으로
+        // 클라이언트가 '일시 오류'를 안내하고, 다음 세션 조회(아래 분기)에서 DB 가 살아나면 자동 교정된다(2026-10-13 로컬 키 거부 사고)
+        t.userId = await findLinkedUserId(profile.sub)
       } else if (t.googleSub) {
         // 세션 조회마다 연동 재확인(쿼리 1건) — 연동·해제·사용자 삭제가 즉시 반영된다.
         // 실측 2026-10-11: userId 가 있을 때 건너뛰면 삭제된 사용자를 가리키는 토큰이 영구 고착(/me null·폼 미노출·409)
@@ -78,8 +80,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         ...session,
         user: {
           ...session.user,
-          id: t.userId ?? '', // '' = Google 로그인은 됐지만 Pi 계정 미연동
+          id: t.userId ?? '', // '' = Google 로그인은 됐지만 Pi 계정 미연동(또는 판정 불가 — linkUnknown 으로 구분)
           sub: t.googleSub ?? t.sub,
+          linkUnknown: t.userId === undefined, // DB 오류로 연동 여부를 한 번도 확정하지 못함
         },
       }
     },

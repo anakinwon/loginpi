@@ -8,13 +8,15 @@ import {
   GoogleLoginButton,
   GoogleSignOutButton,
   googleLoginEnabled,
+  LinkCheckFailed,
   useAppUser,
 } from './google-auth'
 import { usePiLogin } from './login-gate'
 
 export function AuthStatus() {
   const t = useTranslations('auth')
-  const { user, source, isLoading, googleUnlinked, piError } = useAppUser()
+  const { user, source, isLoading, googleUnlinked, googleLinkError, piError } =
+    useAppUser()
   const { login, busy } = usePiLogin()
 
   if (isLoading && !user) return <p className="text-sm">{t('checking')}</p>
@@ -27,6 +29,7 @@ export function AuthStatus() {
         {source === 'google' && <GoogleSignOutButton />}
       </span>
     )
+  if (googleLinkError) return <LinkCheckFailed />
   if (googleUnlinked)
     return (
       <Link href="/link" className="btn text-sm">
