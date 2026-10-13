@@ -75,4 +75,6 @@ DA 후속(2026-10-11 요금제 기간·할인 표시, sql/006): `fee_plan.use_mo
 
 ⚠ **운영 승격 선행 조건(2026-10-13)**: sitemap 관리 목록이 `site_mst.plan_sort_no`(sql/011 생성 컬럼)를 select·order 하므로 코드 승격 **전에** `node scripts/db-migrate.mjs --app sitemap --tier prod` 로 sql/011 선적용 — 미적용 상태로 승격하면 /api/admin/sites 가 400 으로 관리 목록 전체 장애. dev·stg 는 적용 완료. **✅ 운영 DB 적용 완료 2026-10-13(마스터 수동, 번들 pi-db/010 + 004~011 — schema_migrations 등록 SQL 별도 제공)**. sql/012 는 P2 코드 승격과 한 창에서.
 
+**사용료 전환(2026-10-13, PRD_USAGE_FEE_STATE v0.2c)**: P0~P3 완료·스테이징 반영(0e150859, stg DB sql/012 적용). 남은 단계 P4 sys_cfg 읽기·/api/admin/cfg·설정 UI → P5 크론 site-sts-sweep(CRON_SECRET fail-closed, 운영 등록은 PAID 탭 검토 뒤) → P6 문구 전수 개명 → P7 문서 → P8 실기기(설정 0.05h 전 구간) + prod sql/012 와 승격 한 창. ⚠ 크론 전까지 PAID→IN_USE 는 관리자 "사용 시작" 수동. 빈 버블 안내(/ad) 문구·요금제 콤보(남은 수량) 변경 요청 접수(마스터 2026-10-13) — P2 뒤 적용 예정.
+
 다음 세션 순서: ① Vercel env `PI_API_KEY`(testnet 앱) 등록·Redeploy — **2026-10-12 실측: .env.local 의 키는 401 무효, `PI_WALLET_*` 는 무관(TROUBLESHOOT 2026-10-12)** → **sitemap testnet 앱** 화면에서 재복사 → .env.local 갱신 후 `node scripts/pi-key-probe.mjs --app sitemap` VALID 확인(VALID 는 생존만, 앱 일치는 approve 로그 404 여부로) → 등록 ② Pi Browser(pinet 도메인) → 내 사이트 → "심사비 결제하기" → `/pay/<id>` 에서 결제 1건 → `pi_pymnt` COMPLETED·`site_mst.pymnt_id` 확인 → 관리자 승인 ③ 미결제 신청 승인 시 402 확인, 취소 1건(onCancel → 원장 CANCELED) 확인 ④ 플레이북·ROADMAP 실기기 검증 기록.

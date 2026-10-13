@@ -33,7 +33,7 @@
 | # | 전이 | 트리거 | 주체 | 조건 | 기록 |
 |---|---|---|---|---|---|
 | 1 | →`DRAFT` | 등록(submit=false) | 등록자 | DRAFT+APPLYING 5건 상한 | reg_dtm |
-| 2 | `DRAFT`·`REJECTED`·`USED`·`EXPIRED`→`APPLYING` | 신청(submit) | 등록자 | 운영 연락처 필수, 도메인 미점유(USED는 본인 행만), OWNERSHIP·금지 7종 반려 이력 없음, **PAY_TIMEOUT 쿨다운**(24h 내 3회 초과 409), **pymnt_id 잔존 행은 재신청 차단**(환불 처리 전) | aply_dtm=now, rjct_* NULL, USED·EXPIRED 재등록 시 pymnt_id·pay_dtm·use_* 초기화 |
+| 2 | `DRAFT`·`REJECTED`·`USED`·`EXPIRED`→`APPLYING` | 신청(submit) | 등록자 | 운영 연락처 필수, 도메인 미점유(USED는 본인 행만), OWNERSHIP·금지 7종 반려 이력 없음, **PAY_TIMEOUT 쿨다운**(24h 내 3회 이상 409 APPLY_COOLDOWN), **pymnt_id 잔존 행은 재신청 차단**(환불 처리 전) | aply_dtm=now, rjct_* NULL, USED·EXPIRED 재등록 시 pymnt_id·pay_dtm·use_* 초기화 |
 | 3 | `APPLYING`→`PAID` | 결제 complete → RPC | 등록자 | 원장 APPROVED/COMPLETED, 결제자=소유자, 금액=서버 정가 | pymnt_id, pay_dtm, plan_cd |
 | 4 | `APPLYING`→`REJECTED(PAY_TIMEOUT)` | 크론 | SYSTEM | aply_dtm + 미결제 시간 ≤ now **AND pymnt_id IS NULL** AND (진행 중 Pi 결제 없음 OR Pi cancel 성공) — **txid 있는 결제는 cancel 금지·건너뜀** | rjct_rsn_cd=PAY_TIMEOUT, modr_id=SYSTEM |
 | 5 | `APPLYING`→`REJECTED` (`PAID`·`IN_USE` 반려는 [확인중 : 마스터 D3·D-B]) | 관리자 반려 | 관리자 | 사유 필수. **진행 중 Pi 결제 있으면 409 PAY_IN_PROGRESS**. D3 권장값 채택 시 PAID 반려 전이는 **삭제**(환불 기록 수단 선행 전), D-B 권장값 채택 시 IN_USE 는 반려 대신 정지(#10) | rjct_* |
@@ -120,5 +120,6 @@
 | 날짜 | 내용 |
 |---|---|
 | 2026-10-13 | v0.1 설계안 — 워크플로(수집·결론·비평) 산출, 비평 치명 6건 반영(PAID 반려 재신청 경로·관리자 반려 Pi 결제 검사·cancel 전 txid 확인·무결제 점유 쿨다운·영구 무료 노출 차단·bubbles.ts:77 제외) |
+| 2026-10-13 | P2·P3 완료 — 코드 전환 25파일(0e150859), stg sql/012 적용(IN_USE 20), 스테이징 배포 success(/api/sites 20·bubbles 111). 실기기 미검증. 다음 P4(sys_cfg 읽기·관리자 설정 UI)·P5(크론) |
 | 2026-10-13 | P1 완료 — sql/012 작성·da-governance-expert 리뷰(P1 2·P2 7·P3 8 반영: sys_cfg cfg_key/JSONB·fn_prcs_site_rpt IN_USE 정정·멱등 DROP·이행 가드·unique_violation→P0003·롤백 순서)·dev 적용(19건 IN_USE, 이력 19, 외부 무기간 0). stg 는 P2 코드 푸시 직전 적용 |
 | 2026-10-13 | v0.2 → v0.2c — 팀장 반려 3회 반영(2차: D3 "PAID 차단 수단 없음" 정합·크론 fail-closed·운영 CRON_SECRET 등록을 P8 검토 뒤로 / 3차: CRON_SECRET env optional 명시·P5 build 검증·D3 운용 경로): 결정 D0(광고 단위)·D-A(12h 창)·D-B(관리자 반려 범위) 추가, 전이 #5 PAID 를 [확인중 : D3] 로 정합, P8 이행~승격 공백 대책, 검토 창 알림 부재·자사 시드 CHECK·감사 스냅샷·쿨다운 출처 추가, 기본값 확정 3건(상태명·이행 유예·크론 플랜)으로 내림, 표기 통일 |
