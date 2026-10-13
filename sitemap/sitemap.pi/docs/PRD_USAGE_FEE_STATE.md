@@ -61,8 +61,8 @@
 
 ## 5. DB 변경 (sql/012, da-team 리뷰 후 DA-APPROVED)
 
-- `sys_cfg` 신규(cfg_key PK(UPPER_SNAKE)·cfg_val JSONB·cfg_val·cfg_desc + 시스템 컬럼·del_yn, 테이블별 mod_dtm 트리거 `fn_upd_sys_cfg_mod_dtm`). 표준단어 등재 APL(신청)·USE_BGN/USE_END·CFG·cfg_val 타입 [확인중 : da-team].
-- `site_mst` 컬럼 3: `aply_dtm`[확인중 : da-team — 표준단어 APL(3자) 등재 시 `apl_dtm`], `use_bgn_dtm`, `use_end_dtm`. `apv_dtm`은 "최초 노출 개시일시"로 COMMENT 재정의(공개 API·인덱스 파급 회피) [확인중 : da-team].
+- `sys_cfg` 신규(cfg_key PK(UPPER_SNAKE)·cfg_val JSONB·cfg_desc + 시스템 컬럼·del_yn, 테이블별 mod_dtm 트리거 `fn_upd_sys_cfg_mod_dtm`). 표준단어 APLY(신청, W24 — APL 은 적용 W10 선점)·USE_BGN/USE_END·CFG 등재 완료, cfg_val JSONB 확정(da-governance-expert 2026-10-13).
+- `site_mst` 컬럼 3: `aply_dtm`(APLY 확정, 2026-10-13), `use_bgn_dtm`, `use_end_dtm`. `apv_dtm`은 "최초 노출 개시일시"로 COMMENT 재정의(공개 API·인덱스 파급 회피, DA 수용 2026-10-13).
 - 자사 시드(own_site_yn='Y') INSERT 는 새 CHECK(aply·apv·use_bgn NOT NULL) 때문에 세 컬럼을 CURRENT_TIMESTAMP 로 채워야 함 — 012 주석에 시드 작성 규칙 명시.
 - 재등록 시 pymnt_id·pay_dtm 초기화로 "어느 결제가 어느 사용기간을 샀는가"가 site_mst 에서 사라짐 → `site_sts_hist` 트리거가 PAID→IN_USE 전이 때 `chg_rsn_cont` 에 pymnt_id·use_bgn/end 스냅샷을 남기도록 확장(감사, PRD §8).
 - 무결제 점유 쿨다운(#2)은 `site_sts_hist`(chg_rsn_cd=PAY_TIMEOUT, 같은 사용자·도메인, 24h) 집계로 판정.
