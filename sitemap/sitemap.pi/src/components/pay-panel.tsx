@@ -1,6 +1,6 @@
 'use client'
 
-// 등록 심사비 결제 페이지 본문 — 클라이언트 게이트(LoginGate) 뒤에서 piFetch 로 내 사이트 단건 조회,
+// 사용료 결제 페이지 본문 — 클라이언트 게이트(LoginGate) 뒤에서 piFetch 로 내 사이트 단건 조회,
 //  요약(도메인·이름·요금제·금액) + SitePayButton. 결제 완료·불필요·불가 상태는 안내만. 서버 redirect 없음(Pi Browser 무한 루프 금지)
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
@@ -97,7 +97,11 @@ function PayPanelInner({ siteId }: { siteId: string }) {
       ) : (
         <>
           <p className="text-muted-foreground text-sm">{t('intro')}</p>
-          <SitePayButton site={site} amount={amount} onPaid={() => void load()} />
+          <SitePayButton
+            site={site}
+            amount={amount}
+            onPaid={() => void load()}
+          />
         </>
       )}
 

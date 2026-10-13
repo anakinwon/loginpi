@@ -1,6 +1,6 @@
 // 결제 완료 — POST /api/payments/complete { paymentId, txid }. Pi SDK onReadyForServerCompletion(및 미완료 결제 복구)에서 호출(piFetch).
 //  순서(2026-10-11 적대적 검증 반영) : 세션 → **원장 선조회**(결제자 본인·APPROVED/COMPLETED, 아니면 Pi 호출 없이 409) → Pi API complete
-//   → fn_cmpl_site_reg_pymnt(p_usr_id 포함, 한 트랜잭션 : pi_pymnt COMPLETED + site_mst.pymnt_id/pay_dtm/plan_cd). 재호출 멱등
+//   → fn_cmpl_site_reg_pymnt(p_usr_id 포함, 한 트랜잭션 : pi_pymnt COMPLETED + site_mst APPLYING→PAID 전이·pymnt_id/pay_dtm/plan_cd, sql/012). 재호출 멱등
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { withAuthGuard } from '@pi/guard'
@@ -13,7 +13,7 @@ import {
   requireUser,
 } from '@/lib/api'
 import { completePiPayment, getOwnPayment } from '@/lib/payments'
-import { OWNER_SITE_COLS } from '@/lib/site'
+import { pickOwnerSite } from '@/lib/site'
 
 const bodySchema = z.object({
   paymentId: z.string().min(1).max(200),
@@ -41,7 +41,11 @@ export const POST = withAuthGuard(
     const r = await completePiPayment(body.paymentId, body.txid)
     if (!r.ok) {
       if (r.status === 500) return apiError('SERVER_CONFIG', 500)
-      console.error('[payments/complete] Pi API', r.status, r.body.slice(0, 300))
+      console.error(
+        '[payments/complete] Pi API',
+        r.status,
+        r.body.slice(0, 300),
+      )
       return apiError('PAY_PI_COMPLETE_FAILED', 502)
     }
 
@@ -61,9 +65,6 @@ export const POST = withAuthGuard(
     const site = data as Record<string, unknown> | null
     if (!site?.site_id) return apiError('PAY_SITE_MISMATCH', 409)
 
-    const cols = OWNER_SITE_COLS.split(',').map((c) => c.trim())
-    const out: Record<string, unknown> = {}
-    for (const c of cols) out[c] = site[c]
-    return NextResponse.json({ ok: true, site: out })
+    return NextResponse.json({ ok: true, site: pickOwnerSite(site) })
   }),
 )

@@ -1,4 +1,4 @@
-// 등록 심사비 결제 서버 공용 — Pi Platform API(조회·approve·complete·cancel), 요금표 조회, SITE_REG metadata 계약, 원장 조회.
+// 사용료 결제 서버 공용 — Pi Platform API(조회·approve·complete·cancel), 요금표 조회, SITE_REG metadata 계약, 원장 조회.
 //  금액은 Pi 소수(number). 서버가 fee_plan 으로 정가를 재계산해 클라이언트 금액을 신뢰하지 않는다(루트 CLAUDE.md 결제 철칙).
 //  순서 철칙(2026-10-11 적대적 검증) : Pi approve 는 **검증·원장 기록 뒤**에만 — approve 뒤에는 사용자 서명·전송이 진행되므로 그 전에 거부해야 지갑이 안전하다
 import 'server-only'
@@ -57,11 +57,7 @@ export async function getRegFees(): Promise<RegFee[]> {
       pi_amt,
       fee_plan_nm: r.fee_plan_nm as string,
       use_mon_cnt,
-      dc_pct: regFeeDiscountPct(
-        pi_amt,
-        Number(r.mon_pi_amt ?? 0),
-        use_mon_cnt,
-      ),
+      dc_pct: regFeeDiscountPct(pi_amt, Number(r.mon_pi_amt ?? 0), use_mon_cnt),
     }
   })
 }
@@ -176,13 +172,18 @@ export async function hasOtherApprovedPayment(
 }
 
 // 원장 상태 전이(취소) — COMPLETED 는 건드리지 않는다. 갱신 실패는 로깅(호출자는 Pi 취소가 끝난 뒤라 응답을 바꾸지 않음)
-export async function markPaymentCanceled(paymentId: string, userId: string) {
+//  actor : modr_id 기록 주체 — 본인 취소는 userId, 크론 미결제 반려는 'SYSTEM'
+export async function markPaymentCanceled(
+  paymentId: string,
+  userId: string,
+  actor: string = userId,
+) {
   const { error } = await db()
     .from('pi_pymnt')
     .update({
       pymnt_sts_cd: 'CANCELED',
       cncl_dtm: new Date().toISOString(),
-      modr_id: userId,
+      modr_id: actor,
     })
     .eq('pymnt_id', paymentId)
     .eq('usr_id', userId)

@@ -1,5 +1,5 @@
 // 결제 승인 — POST /api/payments/approve { paymentId }. Pi SDK onReadyForServerApproval 에서 호출(piFetch).
-//  순서(2026-10-11 적대적 검증 반영) : 세션 → Pi API **조회(GET)** → metadata(SITE_REG)·결제자 uid·사이트 소유/상태/미결제·이중 결제·정가 검증
+//  순서(2026-10-11 적대적 검증 반영) : 세션 → Pi API **조회(GET)** → metadata(SITE_REG)·결제자 uid·사이트 소유/상태(PAYABLE_STS=APPLYING)/미결제·이중 결제·사용료 정가 검증
 //   → pi_pymnt APPROVED 기록 → **그 다음** Pi API approve. approve 뒤에는 사용자 서명·온체인 전송이 진행되므로, 검증 실패는 approve 전에 거부하고 Pi 측도 cancel 한다.
 //  Pi approve 가 실패하면 원장을 CANCELED 로 되돌린다(좀비 APPROVED 방지)
 import { NextResponse } from 'next/server'
@@ -37,12 +37,19 @@ export const POST = withAuthGuard(
     const got = await getPiPayment(body.paymentId)
     if (!got.ok) {
       if (got.status === 500) return apiError('SERVER_CONFIG', 500)
-      console.error('[payments/approve] Pi GET', got.status, got.body.slice(0, 300))
+      console.error(
+        '[payments/approve] Pi GET',
+        got.status,
+        got.body.slice(0, 300),
+      )
       return apiError('PAY_PI_APPROVE_FAILED', 502)
     }
     const payment = got.payment
     // 거부 경로 공통 — Pi 측도 취소(best-effort) 후 오류 반환
-    const reject = async (code: Parameters<typeof apiError>[0], status: number) => {
+    const reject = async (
+      code: Parameters<typeof apiError>[0],
+      status: number,
+    ) => {
       await cancelPiPayment(payment.identifier).catch(() => undefined)
       return apiError(code, status)
     }
@@ -50,7 +57,8 @@ export const POST = withAuthGuard(
     // 2) 검증
     const meta = parseSiteRegMeta(payment.metadata)
     if (!meta) return reject('PAY_SITE_MISMATCH', 400)
-    if (payment.direction !== 'user_to_app') return reject('PAY_SITE_MISMATCH', 400)
+    if (payment.direction !== 'user_to_app')
+      return reject('PAY_SITE_MISMATCH', 400)
     // 결제자 불일치 — 타인 결제이므로 Pi cancel 없이 거부(reject 미사용). Pi 세션 없는(pi_uid 없음) 사용자도 결제 불가
     if (!user.pi_uid || payment.user_uid !== user.pi_uid)
       return apiError('PAY_SITE_MISMATCH', 403)
@@ -71,7 +79,8 @@ export const POST = withAuthGuard(
         own_site_yn: 'Y' | 'N'
       }>()
     if (error) return dbFail(error)
-    if (!site || site.own_site_yn === 'Y') return reject('PAY_SITE_MISMATCH', 400)
+    if (!site || site.own_site_yn === 'Y')
+      return reject('PAY_SITE_MISMATCH', 400)
     if (!(PAYABLE_STS as readonly string[]).includes(site.site_sts_cd))
       return reject('INVALID_STATE', 409)
     if (site.pymnt_id && site.pymnt_id !== payment.identifier)
@@ -108,7 +117,11 @@ export const POST = withAuthGuard(
     // 4) Pi approve — 실패 시 원장 CANCELED 로 되돌림
     const r = await approvePiPayment(payment.identifier)
     if (!r.ok && !r.alreadyApproved) {
-      console.error('[payments/approve] Pi approve', r.status, r.body.slice(0, 300))
+      console.error(
+        '[payments/approve] Pi approve',
+        r.status,
+        r.body.slice(0, 300),
+      )
       // Pi 측 pending 도 정리(best-effort) — 남으면 다음 createPayment 가 거부될 수 있다
       await cancelPiPayment(payment.identifier).catch(() => undefined)
       await markPaymentCanceled(payment.identifier, user.id)

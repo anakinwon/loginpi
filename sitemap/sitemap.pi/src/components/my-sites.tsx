@@ -1,9 +1,9 @@
 'use client'
 
-// 내 사이트 — 클라이언트 게이트(서버 redirect 없음) 뒤에서 piFetch 로 내 등록 목록·등록·수정·제출·철회.
-// 상태·반려 사유 표시, 'pi' 접두 도메인은 PI_BRAND 반려 대상 경고(등록은 받음 — 심사에서 판정)
+// 내 사이트 — 클라이언트 게이트(서버 redirect 없음) 뒤에서 piFetch 로 내 등록 목록·등록·수정·신청·재등록·철회.
+// 상태 9종(siteSts)·사용기간·반려 사유 표시, 'pi' 접두 도메인은 PI_BRAND 반려 대상 경고(등록은 받음 — 관리자가 반려·정지)
 import { useCallback, useEffect, useState } from 'react'
-import { useTranslations } from 'next-intl'
+import { useFormatter, useTranslations } from 'next-intl'
 import { piFetch } from '@pi/auth/client'
 import { Link, useRouter } from '@/i18n/navigation'
 import { LoginGate } from './login-gate'
@@ -18,7 +18,9 @@ import {
 } from '@/lib/client-api'
 import {
   APPLY_PLAN_CD,
+  DOMAIN_EDITABLE_STS,
   DOMAIN_RE,
+  EDITABLE_STS,
   isPiBrandDomain,
   LIMITS,
   normalizeDomain,
@@ -26,13 +28,11 @@ import {
   type OwnerSite,
   type Paged,
   PAYABLE_STS,
-  type SiteSts,
   VERIFY_FILE,
+  WITHDRAW_BLOCKED_STS,
 } from '@/lib/site'
 
-const EDITABLE: SiteSts[] = ['DRAFT', 'PENDING', 'REJECTED', 'APPROVED']
-
-// 결제 필요 여부 — 외부 등록·미결제·결제 가능 상태·단가 > 0 (승인 전 결제, 마스터 지시 2026-10-11). 결제 자체는 /pay/<id>
+// 결제 필요 여부 — 외부 등록·미결제·결제 가능 상태(APPLYING)·단가 > 0. 결제 자체는 /pay/<id>
 //  요금표 조회 중(null)엔 필요로 간주(admin-panel 과 동일 — 서버가 최종 판정), 조회 실패({})는 불필요
 const needsPayment = (s: OwnerSite, fees: FeeMap | null) =>
   s.own_site_yn !== 'Y' &&
@@ -54,8 +54,11 @@ function MySitesInner() {
   const [error, setError] = useState<ApiErrorBody | null>(null)
   const [editing, setEditing] = useState<OwnerSite | 'new' | null>(null)
   const tp = useTranslations('plan')
+  const fmt = useFormatter()
   const fees = useRegFees()
   const feeLabel = useFeeLabel()
+  const when = (iso: string) =>
+    fmt.dateTime(new Date(iso), { dateStyle: 'short', timeStyle: 'short' })
 
   const load = useCallback(async () => {
     setError(null)
@@ -160,6 +163,28 @@ function MySitesInner() {
                     </Link>
                   </div>
                 )}
+                {s.site_sts_cd === 'APPLYING' && (
+                  <p className="text-muted-foreground text-xs">
+                    {t('payDeadline')}
+                  </p>
+                )}
+                {s.site_sts_cd === 'PAID' && (
+                  <p className="text-muted-foreground text-xs">
+                    {t('useStartAt')}
+                  </p>
+                )}
+                {s.site_sts_cd === 'IN_USE' && (
+                  <p className="text-muted-foreground text-xs">
+                    {t('useEndAt', {
+                      time: s.use_end_dtm
+                        ? when(s.use_end_dtm)
+                        : t('permanent'),
+                    })}
+                  </p>
+                )}
+                {s.site_sts_cd === 'USED' && (
+                  <p className="text-xs text-amber-600">{t('reapplyUntil')}</p>
+                )}
                 {s.site_sts_cd === 'REJECTED' && s.rjct_rsn_cd && (
                   <p className="text-destructive text-sm">
                     {t('rejectReason')}: {tr(s.rjct_rsn_cd)}
@@ -181,18 +206,29 @@ function MySitesInner() {
                   </p>
                 )}
                 <div className="mt-1 flex flex-wrap gap-2">
-                  {EDITABLE.includes(s.site_sts_cd) && (
-                    <button className="btn" onClick={() => setEditing(s)}>
-                      {t('edit')}
-                    </button>
-                  )}
-                  {s.site_sts_cd !== 'WITHDRAWN' &&
-                    s.site_sts_cd !== 'SUSPENDED' && (
-                      <button className="btn" onClick={() => void withdraw(s)}>
-                        {t('withdraw')}
+                  {/* USED 는 저장 경로가 없어 [재등록]만 노출(수정 버튼을 눌러도 재신청이 되는 오해 방지) */}
+                  {EDITABLE_STS.includes(s.site_sts_cd) &&
+                    s.site_sts_cd !== 'USED' && (
+                      <button className="btn" onClick={() => setEditing(s)}>
+                        {t('edit')}
                       </button>
                     )}
-                  {s.site_sts_cd === 'APPROVED' && (
+                  {/* 재등록(USED, 도메인 유지)·다시 신청(EXPIRED) — 수정 폼을 열어 신청하면 새 결제로 이어진다 */}
+                  {(s.site_sts_cd === 'USED' ||
+                    s.site_sts_cd === 'EXPIRED') && (
+                    <button
+                      className="btn btn-primary"
+                      onClick={() => setEditing(s)}
+                    >
+                      {t(s.site_sts_cd === 'USED' ? 'reapply' : 'reapplyOpen')}
+                    </button>
+                  )}
+                  {!WITHDRAW_BLOCKED_STS.includes(s.site_sts_cd) && (
+                    <button className="btn" onClick={() => void withdraw(s)}>
+                      {t('withdraw')}
+                    </button>
+                  )}
+                  {s.site_sts_cd === 'IN_USE' && (
                     <Link className="btn" href={`/s/${s.site_dom_nm}`}>
                       {t('view')}
                     </Link>
@@ -233,11 +269,17 @@ function SiteForm({
   const [pvtCntc, setPvtCntc] = useState(site?.pvt_cntc_txt ?? '')
   const [pubCntc, setPubCntc] = useState(site?.pub_cntc_txt ?? '')
   const [mvUrl, setMvUrl] = useState(site?.site_mv_url ?? '')
-  // 등록 요금제 — 신청자는 유료 5단계 중 선택. 결제 완료 후엔 변경 불가(서버 409)
+  // 등록 요금제 — 신청자는 유료 5단계 중 선택. 사용 중(IN_USE)엔 요금제·이동 URL 잠금(서버 409), 재등록(USED·EXPIRED)은 새 결제라 선택 가능
   const [planCd, setPlanCd] = useState<string>(
     site?.plan_cd && site.plan_cd !== 'NONE' ? site.plan_cd : 'BSC1',
   )
-  const planLocked = !!site?.pymnt_id
+  const inUse = site?.site_sts_cd === 'IN_USE'
+  // 결제가 남은 행(IN_USE, 결제 후 반려 등)은 요금제 잠금 — 재등록(USED·EXPIRED)만 새 결제라 선택 가능
+  const planLocked =
+    inUse ||
+    (!!site?.pymnt_id &&
+      site.site_sts_cd !== 'USED' &&
+      site.site_sts_cd !== 'EXPIRED')
   const tp = useTranslations('plan')
   const fees = useRegFees()
   const feeLabel = useFeeLabel()
@@ -247,8 +289,7 @@ function SiteForm({
 
   const norm = normalizeDomain(domain)
   const domainValid = DOMAIN_RE.test(norm)
-  const domainLocked =
-    !!site && !['DRAFT', 'REJECTED'].includes(site.site_sts_cd)
+  const domainLocked = !!site && !DOMAIN_EDITABLE_STS.includes(site.site_sts_cd)
 
   const upload = async (file: File) => {
     if (file.size > LIMITS.imgMaxBytes)
@@ -290,7 +331,7 @@ function SiteForm({
     )
     setBusy(false)
     if (!r.ok) return setError(errText(r.body))
-    // 제출 직후 결제가 필요하면 결제 페이지로 — 승인 전 결제 흐름을 끊지 않는다
+    // 신청 직후 결제가 필요하면 결제 페이지로 — 신청 → 결제 흐름을 끊지 않는다
     if (submit && needsPayment(r.data.site, fees))
       router.push(`/pay/${r.data.site.site_id}`)
     else onDone()
@@ -301,10 +342,6 @@ function SiteForm({
       <h2 className="text-lg font-semibold">
         {site ? t('editTitle') : t('newTitle')}
       </h2>
-      {site?.site_sts_cd === 'APPROVED' && (
-        <p className="text-sm text-amber-600">{t('reReviewNote')}</p>
-      )}
-
       <div>
         <label className="label" htmlFor="f-domain">
           {t('domain')}
@@ -478,6 +515,7 @@ function SiteForm({
           placeholder="https://"
           maxLength={1000}
           value={mvUrl}
+          disabled={inUse}
           onChange={(e) => setMvUrl(e.target.value)}
         />
         <p className="text-muted-foreground mt-1 text-xs">{t('mvHint')}</p>
@@ -506,7 +544,7 @@ function SiteForm({
           disabled={busy}
           onClick={() => void save(true)}
         >
-          {t('submit')}
+          {inUse ? t('save') : t('submit')}
         </button>
         <button type="button" className="btn" onClick={onDone}>
           {t('cancel')}

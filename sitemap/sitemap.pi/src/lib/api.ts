@@ -19,7 +19,7 @@ export const apiError = createApiError({
   ...AUTH_ERRORS,
   DB_UNAVAILABLE: '데이터베이스에 연결할 수 없습니다. 잠시 후 다시 시도하세요',
   NOT_FOUND: '대상을 찾을 수 없습니다',
-  DUPLICATE_DOMAIN: '이미 등록(심사 중 포함)된 도메인입니다',
+  DUPLICATE_DOMAIN: '이미 등록(신청 중 포함)된 도메인입니다',
   ALREADY_REPORTED: '이미 신고한 사이트입니다. 처리 결과를 기다려 주세요',
   INVALID_STATE: '현재 상태에서는 할 수 없는 작업입니다',
   IMG_BUCKET_MISSING:
@@ -29,8 +29,9 @@ export const apiError = createApiError({
   IMG_URL_INVALID: '이 서비스에 업로드한 이미지만 사용할 수 있습니다',
   DOMAIN_REJECTED_OWNERSHIP:
     '도메인 소유 확인 불가로 반려된 도메인은 다시 제출할 수 없습니다. 관리자에게 문의하세요',
-  OWNERSHIP_NOT_VERIFIED: '도메인 소유 확인 후 승인하세요',
-  SITE_LIMIT: `작성 중·심사 대기 사이트는 최대 ${LIMITS.openMax}개까지 둘 수 있습니다`,
+  SITE_LIMIT: `작성 중·신청 중 사이트는 최대 ${LIMITS.openMax}개까지 둘 수 있습니다`,
+  APPLY_COOLDOWN:
+    '결제 기한 초과로 반복 반려된 도메인입니다. 잠시 후 다시 신청하세요',
   // Google 로그인 ↔ Pi 계정 연동(sql/003)
   AUTH_GOOGLE_REQUIRED: 'Google 로그인이 필요합니다',
   LINK_CODE_INVALID:
@@ -38,8 +39,13 @@ export const apiError = createApiError({
   LINK_ALREADY_LINKED: '이미 연동된 계정입니다',
   LINK_CODE_GEN_FAILED:
     '연동 코드를 만들지 못했습니다. 잠시 후 다시 시도하세요',
-  // 등록 심사비 결제(sql/004, 마스터 지시 2026-10-11)
-  PAYMENT_REQUIRED: '등록 심사비 결제가 완료되지 않아 승인할 수 없습니다',
+  // 사용료 결제(sql/004·012)
+  PLAN_TERM_MISSING:
+    '요금제 사용기간이 설정되지 않았습니다. 요금표를 확인하세요',
+  PAY_IN_PROGRESS:
+    '진행 중인 Pi 결제가 있어 처리할 수 없습니다. 결제가 끝난 뒤 다시 시도하세요',
+  PAY_PENDING_REFUND:
+    '결제된 신청이 반려되어 환불 처리 전입니다. 관리자에게 문의하세요',
   PAY_NOT_REQUIRED: '이 사이트는 결제가 필요하지 않습니다',
   PAY_ALREADY_PAID: '이미 결제가 완료된 신청입니다',
   PAY_SITE_MISMATCH: '결제 정보가 신청 내용과 일치하지 않습니다',
@@ -165,9 +171,10 @@ export function verifyToken(siteId: string, domain: string): string | null {
     .slice(0, 16)
 }
 
-// 등록·제출 규칙(앱 레벨) — addsOpen: 새 DRAFT/PENDING 행이 늘어나면 사용자당 상한 검사,
-// submit: PENDING 으로 들어가면 ① 본인이 같은 도메인으로 OWNERSHIP 반려 이력(상태·삭제 무관, 반려 행 자체 재제출 포함) → 409 DOMAIN_REJECTED_OWNERSHIP
-//         ② 같은 도메인 PENDING 이상(다른 행) 존재 → 409 DUPLICATE_DOMAIN. 통과 시 null
+// 등록·신청 규칙(앱 레벨) — addsOpen: 새 DRAFT/APPLYING 행이 늘어나면 사용자당 상한 검사,
+// submit: APPLYING 으로 들어가면 ① 본인이 같은 도메인으로 OWNERSHIP 반려 이력(상태·삭제 무관, 반려 행 자체 재신청 포함) → 409 DOMAIN_REJECTED_OWNERSHIP
+//         ② 본인·같은 도메인 PAY_TIMEOUT 반려가 시간 창 안에 상한 이상 → 409 APPLY_COOLDOWN(무결제 점유 반복 차단)
+//         ③ 같은 도메인 점유 상태(OCCUPY_STS, 다른 행) 존재 → 409 DUPLICATE_DOMAIN. 통과 시 null
 // ponytail: 조회 후 쓰기라 동시 요청 시 상한 1~2건 초과 가능 — 도메인 중복은 DB UNIQUE 가 최종 방어
 export async function checkSiteWrite(
   userId: string,
@@ -193,6 +200,23 @@ export async function checkSiteWrite(
       .eq('rjct_rsn_cd', 'OWNERSHIP')
     if (rjctErr) return dbFail(rjctErr)
     if (rjct) return apiError('DOMAIN_REJECTED_OWNERSHIP', 409)
+    const since = new Date(
+      Date.now() - LIMITS.payTimeoutWindowH * 3600_000,
+    ).toISOString()
+    const { count: timeouts, error: toErr } = await db()
+      .from('site_sts_hist')
+      .select('hist_id, site_mst!inner(ownr_usr_id)', {
+        count: 'exact',
+        head: true,
+      })
+      .eq('site_dom_nm', domain)
+      .eq('del_yn', 'N')
+      .eq('chg_rsn_cd', 'PAY_TIMEOUT')
+      .eq('site_mst.ownr_usr_id', userId)
+      .gte('chg_dtm', since)
+    if (toErr) return dbFail(toErr)
+    if ((timeouts ?? 0) >= LIMITS.payTimeoutMax)
+      return apiError('APPLY_COOLDOWN', 409)
     let q = db()
       .from('site_mst')
       .select('site_id', { count: 'exact', head: true })

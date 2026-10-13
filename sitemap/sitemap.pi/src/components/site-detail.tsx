@@ -63,7 +63,7 @@ export function SiteDetail({ domain }: { domain: string }) {
     return <p className="text-muted-foreground text-sm">{t('loading')}</p>
 
   const { site, viewCnt } = data
-  // 이동 URL(등록자 입력·심사 완료) 우선, 없으면 .pi 도메인 — 이동은 클릭+안내+새 창(A-6)
+  // 이동 URL(등록자 입력) 우선, 없으면 .pi 도메인 — 이동은 클릭+안내+새 창(A-6)
   // 렌더 시점 재검증(심층 방어) — 저장 경로(zod·DB CHECK)와 같은 https 규칙, 불일치 값은 무시
   const url =
     site.site_mv_url && MV_URL_RE.test(site.site_mv_url)

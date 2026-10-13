@@ -1,12 +1,10 @@
-// 관리자 사이트 심사 API — PATCH /api/admin/sites/<id>
-//  approve : PENDING → APPROVED (apv_dtm 은 최초 승인 시만 기록 — 일반 순위 기준 보존). 자사 사이트가 아니면 ownershipVerified:true 필수(400)
-//            ownershipVerified 이면 소유 확인 결과(vrf_yn·vrf_dtm·vrf_usr_id·vrf_dom_nm=현재 도메인)를 함께 기록 —
-//            DB 제약 site_mst_vrf_yn_apv_check(002)가 외부 사이트의 APPROVED·SUSPENDED 에 현재 도메인 확인을 재강제한다
-//  reject  : PENDING → REJECTED (rjct_rsn_cd 필수)
-//  suspend : APPROVED → SUSPENDED (관리자 직권) / restore : SUSPENDED → APPROVED
+// 관리자 사이트 신청 관리 API — PATCH /api/admin/sites/<id> (심사·승인 없음, PRD_USAGE_FEE_STATE §3)
+//  start   : PAID → IN_USE 즉시 사용 시작 — RPC fn_bgn_site_use(sql/012, 사용기간 계산 단일 장소, modr_id=관리자). 대상 아님 NULL → 409
+//  reject  : APPLYING → REJECTED (rjct_rsn_cd 필수). 진행 중 Pi 결제(원장 APPROVED)가 있으면 409 PAY_IN_PROGRESS — PAID 반려는 환불 수단 전까지 없음(D3)
+//  suspend : IN_USE → SUSPENDED (관리자 직권) / restore : SUSPENDED → IN_USE (use_end_dtm 경과면 USED)
 import { NextResponse } from 'next/server'
 import { withAuthGuard } from '@pi/guard'
-import { getRegFee } from '@/lib/payments'
+import { hasOtherApprovedPayment } from '@/lib/payments'
 import {
   apiError,
   db,
@@ -19,13 +17,14 @@ import {
 import {
   adminSiteActionSchema,
   OWNER_SITE_COLS,
+  pickOwnerSite,
   type SiteSts,
 } from '@/lib/site'
 
 const FROM: Record<string, SiteSts> = {
-  approve: 'PENDING',
-  reject: 'PENDING',
-  suspend: 'APPROVED',
+  start: 'PAID',
+  reject: 'APPLYING',
+  suspend: 'IN_USE',
   restore: 'SUSPENDED',
 }
 
@@ -40,61 +39,57 @@ export const PATCH = withAuthGuard(
 
     const { data: cur, error: curErr } = await db()
       .from('site_mst')
-      .select(
-        'site_id, site_dom_nm, site_sts_cd, apv_dtm, own_site_yn, plan_cd, pymnt_id',
-      )
+      .select('site_id, site_sts_cd, use_end_dtm')
       .eq('site_id', id)
       .eq('del_yn', 'N')
       .maybeSingle<{
         site_id: string
-        site_dom_nm: string
         site_sts_cd: SiteSts
-        apv_dtm: string | null
-        own_site_yn: 'Y' | 'N'
-        plan_cd: string
-        pymnt_id: string | null
+        use_end_dtm: string | null
       }>()
     if (curErr) return dbFail(curErr)
     if (!cur) return apiError('NOT_FOUND', 404)
     if (cur.site_sts_cd !== FROM[body.action])
       return apiError('INVALID_STATE', 409)
-    if (
-      body.action === 'approve' &&
-      cur.own_site_yn !== 'Y' &&
-      body.ownershipVerified !== true
-    )
-      return apiError('OWNERSHIP_NOT_VERIFIED', 400)
-    // 승인 전 요금 결제 게이트(마스터 지시 2026-10-11) — 외부 등록은 요금제 단가 > 0 이면 결제 완료(pymnt_id) 필수
-    if (body.action === 'approve' && cur.own_site_yn !== 'Y' && !cur.pymnt_id) {
-      const fee = await getRegFee(cur.plan_cd)
-      if (!fee || fee.pi_amt > 0) return apiError('PAYMENT_REQUIRED', 402)
+
+    if (body.action === 'start') {
+      const { data, error } = await db().rpc('fn_bgn_site_use', {
+        p_site_id: cur.site_id,
+        p_actor: admin.id,
+      })
+      if (error) {
+        // P0004 요금제 사용기간 없음(fee_plan 결측) — 운영자가 요금표를 고친 뒤 재시도
+        console.error(
+          '[admin/sites] fn_bgn_site_use',
+          error.code,
+          error.message,
+        )
+        return error.code === 'P0004'
+          ? apiError('PLAN_TERM_MISSING', 409)
+          : dbFail(error)
+      }
+      const site = data as Record<string, unknown> | null
+      if (!site?.site_id) return apiError('INVALID_STATE', 409)
+      return NextResponse.json({ site: pickOwnerSite(site) })
     }
 
-    const now = new Date().toISOString()
+    if (
+      body.action === 'reject' &&
+      (await hasOtherApprovedPayment(cur.site_id, ''))
+    )
+      return apiError('PAY_IN_PROGRESS', 409)
+
+    const expired = !!cur.use_end_dtm && new Date(cur.use_end_dtm) <= new Date()
     const patch: Record<string, unknown> =
-      body.action === 'approve'
+      body.action === 'reject'
         ? {
-            site_sts_cd: 'APPROVED',
-            apv_dtm: cur.apv_dtm ?? now,
-            rjct_rsn_cd: null,
-            rjct_rsn_cont: null,
-            // PENDING 은 도메인 변경 불가(DRAFT·REJECTED 만) — 상태 조건 갱신이라 읽은 도메인 = 갱신 시점 도메인
-            ...(body.ownershipVerified === true && {
-              vrf_yn: 'Y',
-              vrf_dtm: now,
-              vrf_usr_id: admin.id,
-              vrf_dom_nm: cur.site_dom_nm,
-            }),
+            site_sts_cd: 'REJECTED',
+            rjct_rsn_cd: body.rsnCd,
+            rjct_rsn_cont: body.rsnCont ?? null,
           }
-        : body.action === 'reject'
-          ? {
-              site_sts_cd: 'REJECTED',
-              rjct_rsn_cd: body.rsnCd,
-              rjct_rsn_cont: body.rsnCont ?? null,
-            }
-          : body.action === 'suspend'
-            ? { site_sts_cd: 'SUSPENDED', rjct_rsn_cont: body.rsnCont ?? null }
-            : { site_sts_cd: 'APPROVED', rjct_rsn_cont: null }
+        : body.action === 'suspend'
+          ? { site_sts_cd: 'SUSPENDED', rjct_rsn_cont: body.rsnCont ?? null }
+          : { site_sts_cd: expired ? 'USED' : 'IN_USE', rjct_rsn_cont: null }
 
     const { data, error } = await db()
       .from('site_mst')
@@ -104,7 +99,7 @@ export const PATCH = withAuthGuard(
       .select(OWNER_SITE_COLS)
       .maybeSingle()
     if (error) {
-      // 반려·철회 후 같은 도메인이 재등록된 상태에서 복구·승인 시 활성 도메인 UNIQUE 충돌
+      // 같은 도메인이 재등록된 상태에서 복구 시 활성 도메인 UNIQUE 충돌
       if (error.code === '23505') return apiError('DUPLICATE_DOMAIN', 409)
       return dbFail(error)
     }

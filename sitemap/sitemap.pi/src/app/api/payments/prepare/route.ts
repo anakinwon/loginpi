@@ -1,5 +1,5 @@
 // 결제 준비 — POST /api/payments/prepare { siteId } → Pi SDK createPayment 에 넘길 { amount, memo, metadata }.
-//  서버가 정가(fee_plan)를 정하고 metadata 에 site_id·plan_cd 를 박는다. 소유자 본인·미결제·외부 등록(own_site_yn='N')만
+//  서버가 사용료 정가(fee_plan)를 정하고 metadata 에 site_id·plan_cd 를 박는다. 소유자 본인·미결제·결제 가능 상태(PAYABLE_STS=APPLYING)·외부 등록(own_site_yn='N')만
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { withAuthGuard } from '@pi/guard'
@@ -59,7 +59,7 @@ export const POST = withAuthGuard(
     return NextResponse.json({
       amount: fee.pi_amt,
       // memo 는 ™·특수문자 없이(결제 호환), 브랜드 원형 표기 금지 규칙과 별개로 ASCII 유지
-      memo: `sitemap.pi site registration fee (${site.plan_cd}) - ${site.site_dom_nm}`,
+      memo: `sitemap.pi site usage fee (${site.plan_cd}) - ${site.site_dom_nm}`,
       metadata,
     })
   }),

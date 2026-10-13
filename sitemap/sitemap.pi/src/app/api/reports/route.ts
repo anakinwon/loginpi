@@ -23,7 +23,7 @@ export const POST = withAuthGuard(
       .select('site_id')
       .eq('site_id', body.siteId)
       .eq('del_yn', 'N')
-      .eq('site_sts_cd', 'APPROVED')
+      .eq('site_sts_cd', 'IN_USE')
       .maybeSingle()
     if (siteErr) return dbFail(siteErr)
     if (!site) return apiError('NOT_FOUND', 404)

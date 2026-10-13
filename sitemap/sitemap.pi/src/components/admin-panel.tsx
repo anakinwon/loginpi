@@ -1,6 +1,6 @@
 'use client'
 
-// 관리 화면 — 클라이언트 게이트 + piFetch. 사이트 심사(승인·반려 사유·정지·복구)·신고 처리(인용 → 사이트 정지 / 기각).
+// 관리 화면 — 클라이언트 게이트 + piFetch. 사이트 신청 관리(사용 시작·반려 사유·정지·복구 — 심사·승인 없음)·신고 처리(인용 → 사이트 정지 / 기각).
 // 목록은 테이블(행 클릭 → 상세·액션 행 펼침) + 서버 페이지네이션(page·size, 기본 LIMITS.adminPageSize) — 마스터 지시 2026-10-13.
 // 권한 판정은 서버(isAdmin) — 401/403 은 오류 문구로 표시
 import { useCallback, useEffect, useState } from 'react'
@@ -8,12 +8,7 @@ import { useFormatter, useTranslations } from 'next-intl'
 import { piFetch } from '@pi/auth/client'
 import { LoginGate } from './login-gate'
 import { Pagination } from './pagination'
-import {
-  readApi,
-  useApiErrorText,
-  useRegFees,
-  type ApiErrorBody,
-} from '@/lib/client-api'
+import { readApi, useApiErrorText, type ApiErrorBody } from '@/lib/client-api'
 import {
   LIMITS,
   PLAN_COLOR,
@@ -37,7 +32,15 @@ interface AdminReport {
   sys_user: { pi_username: string | null } | null
 }
 
-const SITE_TABS = ['PENDING', 'APPROVED', 'SUSPENDED', 'REJECTED'] as const
+// 상태 탭 — 기본 PAID(사용 시작 대기 큐)
+const SITE_TABS = [
+  'PAID',
+  'APPLYING',
+  'IN_USE',
+  'USED',
+  'REJECTED',
+  'SUSPENDED',
+] as const
 // 페이지당 건수 선택지 — 서버 sizeParam 클램프(10~100)와 일치
 const PAGE_SIZES = [20, 50, 100] as const
 
@@ -161,11 +164,14 @@ function SiteQueue() {
   const tp = useTranslations('plan')
   const fmt = useFormatter()
   const errText = useApiErrorText()
-  const [sts, setSts] = useState<(typeof SITE_TABS)[number]>('PENDING')
+  const [sts, setSts] = useState<(typeof SITE_TABS)[number]>('PAID')
   const { data, error, setError, setPage, size, setSize, loading, reload } =
     usePaged<AdminSite>(`/api/admin/sites?sts=${sts}`)
   // 펼친 행(사이트 1건만 — 상세·액션은 한 번에 하나)
   const [open, setOpen] = useState<string | null>(null)
+
+  const short = (iso: string) =>
+    fmt.dateTime(new Date(iso), { dateStyle: 'short', timeStyle: 'short' })
 
   const act = async (id: string, body: object) => {
     const r = await patch(`/api/admin/sites/${id}`, body)
@@ -175,7 +181,7 @@ function SiteQueue() {
     } else setError(r.body)
   }
 
-  const COLS = 10
+  const COLS = 12
 
   return (
     <section className="flex flex-col gap-3">
@@ -212,6 +218,7 @@ function SiteQueue() {
           <thead>
             <tr>
               <th>{t('colDate')}</th>
+              <th>{t('colAply')}</th>
               <th>{t('colSite')}</th>
               <th>{t('colDomain')}</th>
               <th>{t('colCtgr')}</th>
@@ -219,6 +226,7 @@ function SiteQueue() {
               <th>{t('colPay')}</th>
               <th>{t('colPayAmt')}</th>
               <th>{t('colPayDtm')}</th>
+              <th>{t('colUse')}</th>
               <th>{t('colOwner')}</th>
               <th>{t('colDetail')}</th>
             </tr>
@@ -244,14 +252,13 @@ function SiteQueue() {
                   date={fmt.dateTime(new Date(s.reg_dtm), {
                     dateStyle: 'short',
                   })}
+                  aplyDtm={s.aply_dtm ? short(s.aply_dtm) : '-'}
                   ctgr={tc(s.site_ctgr_cd)}
                   plan={tp(s.plan_cd)}
-                  payDtm={
-                    s.pay_dtm
-                      ? fmt.dateTime(new Date(s.pay_dtm), {
-                          dateStyle: 'short',
-                          timeStyle: 'short',
-                        })
+                  payDtm={s.pay_dtm ? short(s.pay_dtm) : '-'}
+                  usePeriod={
+                    s.use_bgn_dtm
+                      ? `${short(s.use_bgn_dtm)} ~ ${s.use_end_dtm ? short(s.use_end_dtm) : '∞'}`
                       : '-'
                   }
                 />
@@ -283,9 +290,11 @@ function SiteRows({
   onToggle,
   onAct,
   date,
+  aplyDtm,
   ctgr,
   plan,
   payDtm,
+  usePeriod,
 }: {
   site: AdminSite
   open: boolean
@@ -293,9 +302,11 @@ function SiteRows({
   onToggle: () => void
   onAct: (body: object) => void
   date: string
+  aplyDtm: string
   ctgr: string
   plan: string
   payDtm: string
+  usePeriod: string
 }) {
   const t = useTranslations('admin')
   // 상세 행 id — 열기/닫기 버튼의 aria-controls 대상(접근성, 팀장 지적 2026-10-13)
@@ -318,6 +329,7 @@ function SiteRows({
     <>
       <tr className="admin-table-row" onClick={onToggle}>
         <td className="whitespace-nowrap">{date}</td>
+        <td className="whitespace-nowrap">{aplyDtm}</td>
         <td className="font-semibold">{s.site_nm}</td>
         <td className="font-mono whitespace-nowrap">{s.site_dom_nm}</td>
         <td className="whitespace-nowrap">{ctgr}</td>
@@ -338,6 +350,7 @@ function SiteRows({
           {s.pi_pymnt ? `${Number(s.pi_pymnt.pi_amt)} Pi` : '-'}
         </td>
         <td className="whitespace-nowrap">{payDtm}</td>
+        <td className="whitespace-nowrap">{usePeriod}</td>
         <td className="whitespace-nowrap">{s.sys_user?.pi_username ?? '-'}</td>
         <td className="whitespace-nowrap">
           <button
@@ -418,15 +431,6 @@ function SiteActions({
   const tr = useTranslations('rjctRsn')
   const [rsnCd, setRsnCd] = useState<string>(RJCT_RSN[0])
   const [rsnCont, setRsnCont] = useState('')
-  // 외부 등록은 소유 확인 체크 후에만 승인 가능(서버도 ownershipVerified 없으면 400)
-  const needVerify = site.own_site_yn !== 'Y'
-  // 결제 필요 = 외부 등록 · 미결제 · 단가 > 0 (요금표 조회 중엔 필요로 간주 — 서버 402 가 최종 판정)
-  const fees = useRegFees()
-  const needPay =
-    needVerify &&
-    !site.pymnt_id &&
-    (fees == null || (fees[site.plan_cd]?.pi_amt ?? 0) > 0)
-  const [verified, setVerified] = useState(false)
   const memo = (
     <input
       className="input"
@@ -437,34 +441,19 @@ function SiteActions({
     />
   )
 
-  if (site.site_sts_cd === 'PENDING')
+  // PAID → 즉시 사용 시작(크론 자동 전이를 앞당김). 반려는 APPLYING 만(PAID 반려는 환불 수단 전까지 없음 — PRD D3)
+  if (site.site_sts_cd === 'PAID')
+    return (
+      <button
+        className="btn btn-primary mt-2 w-fit"
+        onClick={() => onAct({ action: 'start' })}
+      >
+        {t('start')}
+      </button>
+    )
+  if (site.site_sts_cd === 'APPLYING')
     return (
       <div className="mt-2 flex flex-col gap-2">
-        {needVerify && (
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={verified}
-              onChange={(e) => setVerified(e.target.checked)}
-            />
-            {t('ownershipVerified')}
-          </label>
-        )}
-        {/* 외부 등록은 결제 완료 전 승인 불가(서버 402 PAYMENT_REQUIRED — 단가 0 요금제는 서버가 통과시킴) */}
-        {needPay && (
-          <p className="text-xs text-amber-700 dark:text-amber-300">
-            {t('unpaidNote')}
-          </p>
-        )}
-        <button
-          className="btn btn-primary w-fit"
-          disabled={(needVerify && !verified) || needPay}
-          onClick={() =>
-            onAct({ action: 'approve', ownershipVerified: verified })
-          }
-        >
-          {t('approve')}
-        </button>
         <div className="flex flex-wrap items-center gap-2">
           <select
             className="input w-auto"
@@ -487,7 +476,7 @@ function SiteActions({
         {memo}
       </div>
     )
-  if (site.site_sts_cd === 'APPROVED')
+  if (site.site_sts_cd === 'IN_USE')
     return (
       <div className="mt-2 flex flex-col gap-2">
         {memo}

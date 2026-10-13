@@ -1,4 +1,4 @@
-// 등록 심사비 결제 — /pay/<siteId>. 서버는 세션·사이트를 보지 않는다(redirect 금지) — 조회·분기는 클라이언트 PayPanel(LoginGate + piFetch)
+// 사용료 결제 — /pay/<siteId>. 서버는 세션·사이트를 보지 않는다(redirect 금지) — 조회·분기는 클라이언트 PayPanel(LoginGate + piFetch)
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { PayPanel } from '@/components/pay-panel'
 

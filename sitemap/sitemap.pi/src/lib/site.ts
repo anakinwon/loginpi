@@ -14,17 +14,21 @@ export const SITE_CTGR = [
 ] as const
 export type SiteCtgr = (typeof SITE_CTGR)[number]
 
+// 사이트 상태 9종(PRD_USAGE_FEE_STATE §2, sql/012) — 심사 없음 : 신청(APPLYING) → 결제(PAID) → 사용(IN_USE) → 사용완료(USED, 재등록 창) → 만료(EXPIRED, 신청가능)
 export const SITE_STS = [
   'DRAFT',
-  'PENDING',
-  'APPROVED',
+  'APPLYING',
+  'PAID',
+  'IN_USE',
+  'USED',
+  'EXPIRED',
   'REJECTED',
   'SUSPENDED',
   'WITHDRAWN',
 ] as const
 export type SiteSts = (typeof SITE_STS)[number]
 
-// 금지 카테고리 7종(PRD §5) + OWNERSHIP(도메인 소유 확인 불가 — 같은 사용자·도메인 재제출 409) + ETC
+// 금지 카테고리 7종(PRD §5) + OWNERSHIP(도메인 소유 확인 불가 — 같은 사용자·도메인 재제출 409) + PAY_TIMEOUT(미결제 자동 반려) + ETC
 export const RJCT_RSN = [
   'GAMBLING',
   'NON_PI_PYMNT',
@@ -34,6 +38,7 @@ export const RJCT_RSN = [
   'PII_COLLECT',
   'PI_BRAND',
   'OWNERSHIP',
+  'PAY_TIMEOUT',
   'ETC',
 ] as const
 
@@ -60,12 +65,43 @@ export const LIMITS = {
   rsnCont: 500,
   searchMin: 2, // pg_trgm 3글자 단위 — UI 최소 2글자(CLAUDE.md 검색 표준)
   imgMaxBytes: 2 * 1024 * 1024,
-  openMax: 5, // 사용자당 DRAFT+PENDING 합계 상한(도메인 대량 선점·심사 큐 폭주 방지)
+  openMax: 5, // 사용자당 DRAFT+APPLYING 합계 상한(도메인 대량 선점 방지)
+  payTimeoutMax: 3, // 같은 사용자·도메인 PAY_TIMEOUT 반려 횟수 상한(아래 시간 창 안) — 초과 시 409 APPLY_COOLDOWN
+  payTimeoutWindowH: 24,
 } as const
 
-// 도메인 점유 상태 — DB 활성 UNIQUE(ux_site_mst_site_dom_nm_actv)와 동일. DRAFT 는 점유하지 않는다
-export const OCCUPY_STS: SiteSts[] = ['PENDING', 'APPROVED', 'SUSPENDED']
-export const OPEN_STS: SiteSts[] = ['DRAFT', 'PENDING']
+// 도메인 점유 상태 — DB 활성 UNIQUE(ux_site_mst_site_dom_nm_actv)와 동일. DRAFT·EXPIRED 는 점유하지 않는다(USED 는 직전 신청인 재등록 창)
+export const OCCUPY_STS: SiteSts[] = [
+  'APPLYING',
+  'PAID',
+  'IN_USE',
+  'USED',
+  'SUSPENDED',
+]
+// 사용자당 상한(openMax) 집계 대상
+export const OPEN_STS: SiteSts[] = ['DRAFT', 'APPLYING']
+// 신청(submit) 전이 출발 상태 → APPLYING. USED·EXPIRED 는 재등록(결제·사용기간 초기화)
+export const APPLY_FROM_STS: SiteSts[] = [
+  'DRAFT',
+  'REJECTED',
+  'USED',
+  'EXPIRED',
+]
+// 등록 본문 수정 가능 상태(EXPIRED 는 재신청만 — submit 필수). IN_USE 는 도메인·요금제·이동 URL 잠금
+export const EDITABLE_STS: SiteSts[] = [
+  'DRAFT',
+  'APPLYING',
+  'REJECTED',
+  'IN_USE',
+  'USED',
+]
+export const DOMAIN_EDITABLE_STS: SiteSts[] = ['DRAFT', 'REJECTED']
+// 철회 불가 — PAID(결제만 날아감)·SUSPENDED(제재 회피)·WITHDRAWN
+export const WITHDRAW_BLOCKED_STS: SiteSts[] = [
+  'PAID',
+  'SUSPENDED',
+  'WITHDRAWN',
+]
 
 // 도메인 소유 확인 파일 경로 — 등록자가 자기 사이트에 vrfy_tkn 을 게시, 관리자가 수동 확인(.pi 는 서버 fetch 불가)
 export const VERIFY_FILE = '/sitemap-verify.txt'
@@ -83,8 +119,8 @@ export const DOMAIN_RE = /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.pi$/
 // 신청자가 고를 수 있는 등록 요금제(단가는 fee_plan, /api/fee-plans) — PLAN_CD 에서 NONE 제외
 export const APPLY_PLAN_CD = ['VIP', 'PRM2', 'PRM1', 'BSC2', 'BSC1'] as const
 export type ApplyPlanCd = (typeof APPLY_PLAN_CD)[number]
-// 등록 심사비 결제가 가능한 사이트 상태 — prepare·approve·RPC(sql/005)·결제 페이지가 같은 값을 쓴다
-export const PAYABLE_STS = ['DRAFT', 'PENDING', 'REJECTED'] as const satisfies readonly string[]
+// 사용료 결제가 가능한 사이트 상태 — prepare·approve·RPC(sql/012 fn_cmpl_site_reg_pymnt)·결제 페이지가 같은 값을 쓴다
+export const PAYABLE_STS = ['APPLYING'] as const satisfies readonly string[]
 // 이동 URL 형식 — DB CHECK(sql/002 site_mst_site_mv_url_check)와 동일: https + 호스트
 export const MV_URL_RE = /^https:\/\/[^\s/?#]+/
 
@@ -97,7 +133,7 @@ export const decodeDomain = (raw: string) => {
   }
 }
 
-// 'pi'로 시작하는 라벨 = PI_BRAND 금지 카테고리 → 등록은 받되 심사에서 반려(클라이언트 경고만)
+// 'pi'로 시작하는 라벨 = PI_BRAND 금지 카테고리 → 등록은 받되 관리자가 반려·정지(클라이언트 경고만)
 export const isPiBrandDomain = (domain: string) => /^pi/.test(domain)
 
 export const normalizeDomain = (raw: string) =>
@@ -116,7 +152,7 @@ const optText = (max: number) =>
     .nullable()
     .optional()
 
-// 등록·수정 본문. submit=true 면 PENDING 제출(비공개 연락처 필수), 아니면 DRAFT 저장
+// 등록·수정 본문. submit=true 면 APPLYING 신청(비공개 연락처 필수), 아니면 DRAFT 저장
 export const siteInputSchema = z
   .object({
     domain: z
@@ -136,7 +172,7 @@ export const siteInputSchema = z
       .optional(),
     pvtCntc: optText(LIMITS.cntcMax),
     pubCntc: optText(LIMITS.cntcMax),
-    // 등록 요금제(승인 전 결제 대상, 마스터 지시 2026-10-11) — 신청자는 유료 5단계만 선택, NONE 은 자사(관리자) 전용
+    // 등록 요금제(사용료 결제 대상) — 신청자는 유료 5단계만 선택, NONE 은 자사(관리자) 전용
     planCd: z.enum(APPLY_PLAN_CD).default('BSC1'),
     submit: z.boolean().default(false),
   })
@@ -157,12 +193,9 @@ export const statInputSchema = z.object({
   type: z.enum(['VIEW', 'CLCK']),
 })
 
+// 관리자 액션 — start(PAID→IN_USE 즉시 사용 시작) · reject(APPLYING) · suspend(IN_USE) · restore(SUSPENDED). 승인·소유 확인 단계 없음
 export const adminSiteActionSchema = z.discriminatedUnion('action', [
-  // 외부 등록(own_site_yn='N') 승인은 ownershipVerified:true 필수(관리자가 소유 확인 파일을 확인했다는 명시 — 서버 400 강제)
-  z.object({
-    action: z.literal('approve'),
-    ownershipVerified: z.boolean().optional(),
-  }),
+  z.object({ action: z.literal('start') }),
   z.object({
     action: z.literal('reject'),
     rsnCd: z.enum(RJCT_RSN),
@@ -179,7 +212,7 @@ export const adminReportActionSchema = z.object({
 
 export const siteActionSchema = z.object({ action: z.literal('withdraw') })
 
-// 공개 응답 컬럼 — pvt_cntc_txt(심사용 비공개 연락처) 절대 포함 금지
+// 공개 응답 컬럼 — pvt_cntc_txt(운영 비공개 연락처) 절대 포함 금지
 export const PUBLIC_SITE_COLS =
   'site_id, site_dom_nm, site_nm, site_ctgr_cd, site_desc, site_img_url, site_mv_url, pub_cntc_txt, apv_dtm, own_site_yn'
 
@@ -197,16 +230,25 @@ export interface PublicSite {
 }
 
 // 소유자·관리자 조회 컬럼 — 비공개 연락처·상태·반려 사유 포함
-export const OWNER_SITE_COLS = `${PUBLIC_SITE_COLS}, site_sts_cd, rjct_rsn_cd, rjct_rsn_cont, pvt_cntc_txt, plan_cd, pymnt_id, pay_dtm, reg_dtm, mod_dtm`
+export const OWNER_SITE_COLS = `${PUBLIC_SITE_COLS}, site_sts_cd, rjct_rsn_cd, rjct_rsn_cont, pvt_cntc_txt, plan_cd, pymnt_id, pay_dtm, aply_dtm, use_bgn_dtm, use_end_dtm, reg_dtm, mod_dtm`
 
-// 소유자·관리자 응답 — 비공개 연락처·상태·반려 사유·요금제·결제 포함
+// RPC 가 돌려준 site_mst 전체 행에서 소유자 응답 컬럼만 추림
+export const pickOwnerSite = (row: Record<string, unknown>) =>
+  Object.fromEntries(
+    OWNER_SITE_COLS.split(',').map((c) => [c.trim(), row[c.trim()]]),
+  )
+
+// 소유자·관리자 응답 — 비공개 연락처·상태·반려 사유·요금제·결제·사용기간 포함
 export interface OwnerSite extends PublicSite {
-  // 도메인 소유 확인 토큰(서버 계산값, 컬럼 아님) — 소유자·관리자 목록 응답에만
+  // 도메인 소유 확인 토큰(서버 계산값, 컬럼 아님) — 소유자·관리자 목록 응답에만(선택 배지용)
   vrfy_tkn?: string | null
   site_sts_cd: SiteSts
   plan_cd: PlanCd // 등록 요금제(신청자 선택)
-  pymnt_id: string | null // 등록 심사비 결제ID — null 이면 미결제(외부 등록은 승인 불가)
+  pymnt_id: string | null // 사용료 결제ID — null 이면 미결제
   pay_dtm: string | null
+  aply_dtm: string | null // 신청일시(APPLYING 진입, 미결제 타이머 기준)
+  use_bgn_dtm: string | null // 사용 시작(fn_bgn_site_use)
+  use_end_dtm: string | null // 사용 종료 — null 이면 영구(자사)
   rjct_rsn_cd: string | null
   rjct_rsn_cont: string | null
   pvt_cntc_txt: string | null

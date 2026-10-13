@@ -1,4 +1,4 @@
-// 공개 사이트 목록·검색 API — GET ?ctgr=&q=&page= (APPROVED·활성만, 승인일 역순, 페이지네이션, s-maxage 캐시)
+// 공개 사이트 목록·검색 API — GET ?ctgr=&q=&page= (IN_USE·활성만, 최초 노출일(apv_dtm) 역순, 페이지네이션, s-maxage 캐시)
 // 검색은 pg_trgm GIN 가속 ilike(사이트명·도메인), q 최소 2자. 응답에서 pvt_cntc_txt 제외(PUBLIC_SITE_COLS)
 import { NextResponse } from 'next/server'
 import { withGuard } from '@pi/guard'
@@ -34,12 +34,12 @@ export const GET = withGuard(
     if (sp.has('q') && q.length < LIMITS.searchMin)
       return apiError('INVALID_INPUT', 400)
 
-    // 부분 인덱스(idx_site_mst_apv_dtm·site_ctgr_cd) 사용 조건 그대로 : del_yn='N' AND site_sts_cd='APPROVED'
+    // 부분 인덱스(idx_site_mst_apv_dtm·site_ctgr_cd, sql/012) 사용 조건 그대로 : del_yn='N' AND site_sts_cd='IN_USE'
     let query = db()
       .from('site_mst')
       .select(PUBLIC_SITE_COLS, { count: 'exact' })
       .eq('del_yn', 'N')
-      .eq('site_sts_cd', 'APPROVED')
+      .eq('site_sts_cd', 'IN_USE')
     if (ctgr) query = query.eq('site_ctgr_cd', ctgr)
     if (q) {
       const pat = `"%${q}%"`

@@ -1,6 +1,6 @@
 'use client'
 
-// 등록 심사비 결제 버튼 — Pi Browser 에서만 결제. 판정은 UA 가 아니라 usePiAuth().isInPiBrowser(authenticate 성공 신호).
+// 사용료 결제 버튼 — Pi Browser 에서만 결제. 판정은 UA 가 아니라 usePiAuth().isInPiBrowser(authenticate 성공 신호).
 //  서버 prepare → SDK createPayment → approve → complete(piFetch, X-Pi-Token 자동). 금액·memo·metadata 는 서버 값 그대로.
 //  취소·오류 시 /api/payments/cancel 로 원장·Pi 측 정리(좀비 APPROVED 방지). createPayment 예외·무응답 대비 try/catch + 타임아웃
 import { useRef, useState } from 'react'
@@ -81,7 +81,9 @@ export function SitePayButton({
           } else finish({ ok: false, text: errText(r.body) })
         },
         onCancel: (paymentId) => {
-          void post('/api/payments/cancel', { paymentId: paymentId || currentId })
+          void post('/api/payments/cancel', {
+            paymentId: paymentId || currentId,
+          })
           finish({ ok: false, text: t('cancelled') })
         },
         onError: (e, p) => {

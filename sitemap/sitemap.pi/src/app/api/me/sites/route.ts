@@ -1,5 +1,5 @@
-// 내 사이트 API — GET(내 등록 목록, 전 상태·페이지네이션 + 도메인 소유 확인 토큰) / POST(등록 : submit=true → PENDING 제출, false → DRAFT 저장). 로그인 필수
-// 등록 규칙 : DRAFT+PENDING 합계 사용자당 5건(409 SITE_LIMIT), 제출 시 같은 도메인 PENDING 이상 존재 → 409 DUPLICATE_DOMAIN
+// 내 사이트 API — GET(내 등록 목록, 전 상태·페이지네이션 + 도메인 소유 확인 토큰) / POST(등록 : submit=true → APPLYING 신청(aply_dtm), false → DRAFT 저장). 로그인 필수
+// 등록 규칙 : DRAFT+APPLYING 합계 사용자당 5건(409 SITE_LIMIT), 신청 시 같은 도메인 점유 상태 존재 → 409 DUPLICATE_DOMAIN
 import { NextResponse } from 'next/server'
 import { withAuthGuard, withGuard } from '@pi/guard'
 import {
@@ -70,7 +70,8 @@ export const POST = withAuthGuard(
         plan_cd: body.planCd,
         pvt_cntc_txt: body.pvtCntc ?? null,
         pub_cntc_txt: body.pubCntc ?? null,
-        site_sts_cd: body.submit ? 'PENDING' : 'DRAFT',
+        site_sts_cd: body.submit ? 'APPLYING' : 'DRAFT',
+        aply_dtm: body.submit ? new Date().toISOString() : null,
         ownr_usr_id: user.id,
         own_site_yn: 'N',
         regr_id: user.id,

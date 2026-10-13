@@ -1,6 +1,6 @@
 // 관리자 신고 처리 API — PATCH /api/admin/reports/<id> { action:'accept'|'dismiss', prcsCont }
-//  RECEIVED 만 처리(prcs_dtm 기록). accept 는 대상 사이트가 APPROVED 면 SUSPENDED 로 전환하고 상태 이력을 남긴다.
-//  신고 전환·사이트 정지·이력은 DB 함수 fn_prcs_site_rpt(sql/002) 한 트랜잭션 — 앱 보상 처리 없음(데이터 모델 §10 ②)
+//  RECEIVED 만 처리(prcs_dtm 기록). accept 는 대상 사이트가 IN_USE 면 SUSPENDED 로 전환하고 상태 이력을 남긴다.
+//  신고 전환·사이트 정지·이력은 DB 함수 fn_prcs_site_rpt(sql/002, 012 재정의) 한 트랜잭션 — 앱 보상 처리 없음(데이터 모델 §10 ②)
 import { NextResponse } from 'next/server'
 import { withAuthGuard } from '@pi/guard'
 import {
@@ -38,7 +38,11 @@ export const PATCH = withAuthGuard(
     if (!rpt?.rpt_id || !rpt.site_id || !rpt.rpt_sts_cd)
       return apiError('INVALID_STATE', 409)
     return NextResponse.json({
-      report: { rpt_id: rpt.rpt_id, site_id: rpt.site_id, rpt_sts_cd: rpt.rpt_sts_cd },
+      report: {
+        rpt_id: rpt.rpt_id,
+        site_id: rpt.site_id,
+        rpt_sts_cd: rpt.rpt_sts_cd,
+      },
     })
   }),
 )

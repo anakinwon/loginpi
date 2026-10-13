@@ -1,4 +1,4 @@
-// 공개 사이트 상세 API — GET /api/sites/<domain> : APPROVED·활성 사이트 공개 컬럼 + 조회수 합계(stat_site_dly.view_cnt 합)
+// 공개 사이트 상세 API — GET /api/sites/<domain> : IN_USE(사용 중)·활성 사이트 공개 컬럼 + 조회수 합계(stat_site_dly.view_cnt 합)
 import { NextResponse } from 'next/server'
 import { withGuard } from '@pi/guard'
 import {
@@ -28,7 +28,7 @@ export const GET = withGuard(
       .select(PUBLIC_SITE_COLS)
       .eq('site_dom_nm', domain)
       .eq('del_yn', 'N')
-      .eq('site_sts_cd', 'APPROVED')
+      .eq('site_sts_cd', 'IN_USE')
       .maybeSingle<PublicSite>()
     if (error) return dbFail(error)
     if (!site) return apiError('NOT_FOUND', 404)
