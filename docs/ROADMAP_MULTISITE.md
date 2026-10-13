@@ -73,7 +73,7 @@ Pi Browser                                   일반 브라우저
 | **M2** | Provision 자동화 | `db-provision.mjs`(스키마·Exposed schemas·버킷), Vercel 생성·env 템플릿 주입 래퍼, 실패 신호 사전 20항목 | 3호를 **손 단계 ≤ 15** 로 구축 | M1 |
 | **M3** | Payments Kit | `@pi/payments` 레지스트리 + `fee_*` 표준 마이그레이션 템플릿(sitemap Phase 2 가 곧 Kit) | sitemap 결제 1건 + 템플릿으로 다음 사이트 결제 1건 | M1, sitemap Phase 2 착수 조건(PRD §9 #2) |
 | **M4** | Fleet Ops | 19 사이트 **배포·빌드 상태 전용** 운영 대시보드(GitHub status 루프, 사용자 데이터 미포함 — §1.1-1 통합 대시보드와 무관), 일괄 승격, 공통 i18n 동기, `site:check` CI | 파도 단위 승격이 명령 1개 | M2 |
-| **M5** | (조건부) 허브 SSO | §11 #4 회신이 허용일 때만 — cafe.pi 코드 발급·교환 API, `@pi/auth` `startHubSso` | 사이트측 Client ID 등록 0 | §11 #4 회신, legal·listing-auditor 승인 |
+| **M5** | ~~(조건부) 허브 SSO~~ **폐기(마스터 확정 2026-10-13)** | 통합·SSO 미사용 대전제 — 외부(Google) 1 + Pi 1 계정이 사람을 따라다님, 사이트별 UUID 별도. 근거 `docs/SSO_DECISION.md`(A안 26/30). 재검토는 "결론이 뒤집히는 조건" 둘 이상 충족 시 | — | — |
 
 ## 6. 전개 — PRD_28 §8 웨이브에 Kit 게이트를 얹는다
 
@@ -113,4 +113,5 @@ Pi Browser                                   일반 브라우저
 | 2026-10-11 | 최초 작성 — 1호 진단, 원칙 3, 지표, 신원 결정(사이트별 Pi OAuth·Google 매핑 폐기·허브 SSO 보류), Site Kit 5층, M0~M5, PRD_28 §8 웨이브 게이트, 이번 주 조치 |
 | 2026-10-11 | LOGIN_PLAYBOOK.md 선반영 연결(L3·M1), 신원 §3 에 Google 연동 마스터 예외(2026-10-11) 반영 |
 | 2026-10-11 | 팀장 승인(CONDITIONAL) 반영 — M1 을 M0 이후로(§2 _template 선제 작성 금지), Fleet 대시보드 범위 한정, @pi/i18n 차수 병기 |
+| 2026-10-13 | 마스터 확정 — 통합·SSO 미사용 대전제(Google 1 + Pi 1 계정 동행, 사이트별 UUID 별도, 통합 무의미), M5 허브 SSO 폐기. 조사·의견서 `docs/SSO_DECISION.md`(외부 59출처·3렌즈) |
 | 2026-10-11 | 검수 반영 — PRD_28 §1.1-1/§1.1-2/§7 충돌 명시, 허브 SSO 를 조건부 M5 로 격하, 스테이징 호스트 [확인중], 1호 수치 "추정" 표기, 17/18 수치·웨이브 명칭을 PRD_28 §8 로 통일, `@pi/ui` 제외(§4 판정 유지), CI 를 승인 대체가 아닌 선행 관문으로 정정, 프래그먼트 교환 도식 보완 |
