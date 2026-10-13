@@ -9,10 +9,10 @@
   },
   "plan": {
     "VIP": "VIP Plan",
-    "PRM2": "Premium Plan 2",
-    "PRM1": "Premium Plan 1",
-    "BSC2": "Basic Plan 2",
-    "BSC1": "Basic Plan 1",
+    "PRM2": "Platinum Plan",
+    "PRM1": "Premium Plan",
+    "BSC2": "Gold Plan",
+    "BSC1": "Basic Plan",
     "NONE": "Free"
   },
   "fee": {

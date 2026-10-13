@@ -132,14 +132,15 @@ export const DOMAIN_RE = /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.pi$/
 // 신청자가 고를 수 있는 등록 요금제(단가는 fee_plan, /api/fee-plans) — PLAN_CD 에서 NONE 제외
 export const APPLY_PLAN_CD = ['VIP', 'PRM2', 'PRM1', 'BSC2', 'BSC1'] as const
 export type ApplyPlanCd = (typeof APPLY_PLAN_CD)[number]
-// 요금제별 총 슬롯(메인 버블 자리) — 마스터 지시 2026-10-09 "5·15·20·30·40 = 110". 남은 수량 = 총 슬롯 − 점유 상태(OCCUPY_STS) 실사이트
+// 요금제별 총 슬롯(메인 버블 자리) — 마스터 지시 2026-10-09 "5·15·20·30·40 = 110" → 2026-10-13 기본요금제 각 10 감축(20·30, 합 90).
+//  남은 수량 = 총 슬롯 − 점유 상태(OCCUPY_STS) 실사이트
 // ponytail: 상수 고정 — 관리자 변경이 필요해지면 sys_cfg(PLAN_CAP) 로 이전
 export const PLAN_CAP: Record<ApplyPlanCd, number> = {
   VIP: 5,
   PRM2: 15,
   PRM1: 20,
-  BSC2: 30,
-  BSC1: 40,
+  BSC2: 20,
+  BSC1: 30,
 }
 // 사용료 결제가 가능한 사이트 상태 — prepare·approve·RPC(sql/012 fn_cmpl_site_reg_pymnt)·결제 페이지가 같은 값을 쓴다
 export const PAYABLE_STS = ['APPLYING'] as const satisfies readonly string[]
@@ -317,21 +318,22 @@ export type PlanCd = (typeof PLAN_CD)[number]
 
 // 버블 배지 — NONE 은 유료 노출이 아니므로 배지·광고 라벨 없음
 export const PLAN_BADGE: Record<PlanCd, string> = {
+  // 명칭 확정(마스터 2026-10-13) : 기본·골드·프리미엄·플래티넘·VIP — 코드값은 유지, 배지는 머리글자
   VIP: 'VIP',
-  PRM2: 'P2',
-  PRM1: 'P1',
-  BSC2: 'B2',
-  BSC1: 'B1',
+  PRM2: 'PT',
+  PRM1: 'P',
+  BSC2: 'G',
+  BSC1: 'B',
   NONE: '',
 }
 
 // 요금제 색 — 레벨이 높을수록 채도·명도를 올려 더 눈에 띄게(마스터 지시 2026-10-09) : 기본1 무채색 → VIP 밝은 골드
 export const PLAN_COLOR: Record<PlanCd, string> = {
-  VIP: '#FFC21A', // VIP(24개월) · 브릴리언트 골드(최고 명도·채도)
-  PRM2: '#FF3D9A', // 프리미엄2(12개월) · 핫 핑크
-  PRM1: '#7C5CFF', // 프리미엄1(6개월) · 비비드 바이올렛
-  BSC2: '#2A8FA8', // 기본2(3개월) · 차분한 틸
-  BSC1: '#5E6A7D', // 기본1(1개월) · 저채도 슬레이트
+  VIP: '#FFC21A', // VIP요금(24개월) · 브릴리언트 골드(최고 명도·채도)
+  PRM2: '#FF3D9A', // 플래티넘요금(12개월) · 핫 핑크
+  PRM1: '#7C5CFF', // 프리미엄요금(6개월) · 비비드 바이올렛
+  BSC2: '#2A8FA8', // 골드요금(3개월) · 차분한 틸
+  BSC1: '#5E6A7D', // 기본요금(1개월) · 저채도 슬레이트
   NONE: '#9CA3AF', // 무료(요금제 없음)
 }
 

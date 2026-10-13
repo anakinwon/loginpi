@@ -1,5 +1,5 @@
 {
-  "$comment": "가상 샘플 91개 — 실제 .pi 사이트가 아님(도메인은 영단어 + -demo). 데모 화면 전용: DB 미연결 폴백 또는 서버 env SITEMAP_SHOW_SAMPLES=1 일 때만 /api/bubbles 가 섞어 노출, DB 시드에 넣지 않는다. 요금제 배분 VIP 3·PRM2 12·PRM1 16·BSC2 25·BSC1 35(실제 19개와 합쳐 5·15·20·30·40 = 110, 마스터 지시 2026-10-09), 카테고리 9종 순환 배분. 증감률은 route.ts 가 도메인 해시로 고정 생성",
+  "$comment": "가상 샘플 71개 — 실제 .pi 사이트가 아님(도메인은 영단어 + -demo). 데모 화면 전용: DB 미연결 폴백 또는 서버 env SITEMAP_SHOW_SAMPLES=1 일 때만 /api/bubbles 가 섞어 노출, DB 시드에 넣지 않는다. 요금제 배분 VIP 3·PRM2 12·PRM1 16·BSC2 15·BSC1 25(실제 19개와 합쳐 5·15·20·20·30 = 90, 마스터 지시 2026-10-09 → 2026-10-13 기본요금제 각 10 감축), 카테고리 9종 순환 배분. 증감률은 route.ts 가 도메인 해시로 고정 생성",
   "sites": [
     {
       "domain": "aurora-demo.pi",
@@ -324,76 +324,6 @@
       "sample": true
     },
     {
-      "domain": "quill-demo.pi",
-      "name": "Quill (Sample)",
-      "ctgr": "EDU",
-      "planCd": "BSC2",
-      "sample": true
-    },
-    {
-      "domain": "ripple-demo.pi",
-      "name": "Ripple (Sample)",
-      "ctgr": "SHOP",
-      "planCd": "BSC2",
-      "sample": true
-    },
-    {
-      "domain": "summit-demo.pi",
-      "name": "Summit (Sample)",
-      "ctgr": "CONTENT",
-      "planCd": "BSC2",
-      "sample": true
-    },
-    {
-      "domain": "canyon-demo.pi",
-      "name": "Canyon (Sample)",
-      "ctgr": "PERSONAL",
-      "planCd": "BSC2",
-      "sample": true
-    },
-    {
-      "domain": "tidal-demo.pi",
-      "name": "Tidal (Sample)",
-      "ctgr": "EVENT",
-      "planCd": "BSC2",
-      "sample": true
-    },
-    {
-      "domain": "acorn-demo.pi",
-      "name": "Acorn (Sample)",
-      "ctgr": "GAME",
-      "planCd": "BSC2",
-      "sample": true
-    },
-    {
-      "domain": "bamboo-demo.pi",
-      "name": "Bamboo (Sample)",
-      "ctgr": "TOOL",
-      "planCd": "BSC2",
-      "sample": true
-    },
-    {
-      "domain": "comet-demo.pi",
-      "name": "Comet (Sample)",
-      "ctgr": "ETC",
-      "planCd": "BSC2",
-      "sample": true
-    },
-    {
-      "domain": "daisy-demo.pi",
-      "name": "Daisy (Sample)",
-      "ctgr": "COMMUNITY",
-      "planCd": "BSC2",
-      "sample": true
-    },
-    {
-      "domain": "falcon-demo.pi",
-      "name": "Falcon (Sample)",
-      "ctgr": "EDU",
-      "planCd": "BSC2",
-      "sample": true
-    },
-    {
       "domain": "glacier-demo.pi",
       "name": "Glacier (Sample)",
       "ctgr": "SHOP",
@@ -565,76 +495,6 @@
       "domain": "mist-demo.pi",
       "name": "Mist (Sample)",
       "ctgr": "ETC",
-      "planCd": "BSC1",
-      "sample": true
-    },
-    {
-      "domain": "ocean-demo.pi",
-      "name": "Ocean (Sample)",
-      "ctgr": "COMMUNITY",
-      "planCd": "BSC1",
-      "sample": true
-    },
-    {
-      "domain": "pine-demo.pi",
-      "name": "Pine (Sample)",
-      "ctgr": "EDU",
-      "planCd": "BSC1",
-      "sample": true
-    },
-    {
-      "domain": "river-demo.pi",
-      "name": "River (Sample)",
-      "ctgr": "SHOP",
-      "planCd": "BSC1",
-      "sample": true
-    },
-    {
-      "domain": "tulip-demo.pi",
-      "name": "Tulip (Sample)",
-      "ctgr": "CONTENT",
-      "planCd": "BSC1",
-      "sample": true
-    },
-    {
-      "domain": "vortex-demo.pi",
-      "name": "Vortex (Sample)",
-      "ctgr": "PERSONAL",
-      "planCd": "BSC1",
-      "sample": true
-    },
-    {
-      "domain": "wren-demo.pi",
-      "name": "Wren (Sample)",
-      "ctgr": "EVENT",
-      "planCd": "BSC1",
-      "sample": true
-    },
-    {
-      "domain": "sable-demo.pi",
-      "name": "Sable (Sample)",
-      "ctgr": "GAME",
-      "planCd": "BSC1",
-      "sample": true
-    },
-    {
-      "domain": "plume-demo.pi",
-      "name": "Plume (Sample)",
-      "ctgr": "TOOL",
-      "planCd": "BSC1",
-      "sample": true
-    },
-    {
-      "domain": "meteor-demo.pi",
-      "name": "Meteor (Sample)",
-      "ctgr": "ETC",
-      "planCd": "BSC1",
-      "sample": true
-    },
-    {
-      "domain": "cliff-demo.pi",
-      "name": "Cliff (Sample)",
-      "ctgr": "COMMUNITY",
       "planCd": "BSC1",
       "sample": true
     }

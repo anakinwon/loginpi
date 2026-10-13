@@ -108,14 +108,14 @@ Pi는 정기 자동결제 미지원(루트 CLAUDE.md PiRC2 절 "Pi SDK `invokeCo
 
 | 순서(큰→작은) | plan_cd | 표시명(ko / en, 번역키 `plan.<cd>`) | 기간 | 배지 | 색 | 면적 가중치 | 배정(우선등록 19개) | 화면 총수(샘플 포함, 합 110) |
 |---|---|---|---|---|---|---|---|---|
-| 1 | VIP | VIP요금제 / VIP Plan | 5년 | VIP | #FFC21A | 16 | sitemap.pi, cafe.pi | 5 (샘플 3) |
-| 2 | PRM2 | 프리미엄요금제2 / Premium Plan 2 | 3년 | P2 | #FF3D9A | 8 | seminar.pi, gifticon.pi, barista.pi | 15 (샘플 12) |
-| 3 | PRM1 | 프리미엄요금제1 / Premium Plan 1 | 2년 | P1 | #7C5CFF | 4 | was.pi, lan.pi, schema.pi, dbms.pi | 20 (샘플 16) |
-| 4 | BSC2 | 기본요금제2 / Basic Plan 2 | 12개월 | B2 | #2A8FA8 | 2 | webserver.pi, bluemountain.pi, fondation.pi, teamkorea.pi, yea.pi | 30 (샘플 25) |
-| 5 | BSC1 | 기본요금제1 / Basic Plan 1 | 6개월 | B1 | #5E6A7D | 1 | anakin.pi, yoda.pi, youngrok.pi, omok.pi, expedition.pi | 40 (샘플 35) |
+| 1 | VIP | VIP요금 / VIP Plan | 24개월 | VIP | #FFC21A | 16 | sitemap.pi, cafe.pi | 5 (샘플 3) |
+| 2 | PRM2 | 플래티넘요금 / Platinum Plan | 12개월 | PT | #FF3D9A | 8 | seminar.pi, gifticon.pi, barista.pi | 15 (샘플 12) |
+| 3 | PRM1 | 프리미엄요금 / Premium Plan | 6개월 | P | #7C5CFF | 4 | was.pi, lan.pi, schema.pi, dbms.pi | 20 (샘플 16) |
+| 4 | BSC2 | 골드요금 / Gold Plan | 3개월 | G | #2A8FA8 | 2 | webserver.pi, bluemountain.pi, fondation.pi, teamkorea.pi, yea.pi | 30 (샘플 25) |
+| 5 | BSC1 | 기본요금 / Basic Plan | 1개월 | B | #5E6A7D | 1 | anakin.pi, yoda.pi, youngrok.pi, omok.pi, expedition.pi | 40 (샘플 35) |
 | — | NONE | 무료 / Free | — | 없음 | #9CA3AF | 0.7 | 외부 등록 기본값 | — |
 
-- **화면 총수** : 마스터 지시 총수 5·15·20·30·40(=110), 샘플 = 총수 − 실제 배정(3·12·16·25·35 = 91). 지시문의 VIP 샘플 "2개"는 실제 2개(sitemap·cafe)와 합치면 4가 되어 총수 5와 어긋남 → 총수 기준 3개 적용 [확인중 : 마스터]
+- **화면 총수** : 마스터 지시 총수 5·15·20·30·40(=110) → 2026-10-13 기본요금제 각 10 감축 5·15·20·20·30(=90, PLAN_CAP), 샘플 = 총수 − 실제 배정(3·12·16·15·25 = 71). 지시문의 VIP 샘플 "2개"는 실제 2개(sitemap·cafe)와 합치면 4가 되어 총수 5와 어긋남 → 총수 기준 3개 적용 [확인중 : 마스터]
 - **기간** : 마스터 확정 2026-10-11(sql/007·009) — 기본1 6개월 · 기본2 1년 · 프리미엄1 **2년** · 프리미엄2 **3년** · VIP **5년**(영구 폐지). §3-1 기간 7종과의 대응은 Phase 2 결제 설계 때 재정의
 - **기간·할인 표시(2026-10-11 마스터 지시, sql/006)** : `fee_plan.use_mon_cnt`(개월, NULL=영구)·`mon_pi_amt`(1개월 기준단가, 시드 3 Pi = §3-1)로 서버가 할인율 `1 - 단가/(기준단가×개월)`을 계산해 표시, **영구는 10년(120개월) 환산**(마스터 확정 2026-10-11). **현재 값(sql/010, 마스터 확정 2026-10-11)** — 단가 = 3 Pi × 개월 × (1 − 할인율) : BSC1 6개월 16.2 Pi 10% · BSC2 1년 31.68 Pi 12% · PRM1 2년 61.2 Pi 15% · PRM2 3년 88.56 Pi 18% · VIP 5년 138.6 Pi 23%. 영구 요금제 없음(10년 환산 경로 미사용). 등록 심사비는 §3-1 멤버십 표와 별개 단가. 표시광고 §9 #10 확정 시 문구 재점검
 - **크기 규칙** : 레벨마다 면적 ×2 등비(인접 반지름 ×√2, **VIP:기본1 반지름 4:1**). 화면 면적의 일정 비율(`C.fill`)을 면적 가중치로 나눠 반지름 결정, 화면 크기에 맞춰 자동 스케일. 필터로 몇 개만 남으면 최대 반지름(짧은 변 24%) 상한까지 전체를 같은 비율로 축소 — 크기 순서는 항상 유지

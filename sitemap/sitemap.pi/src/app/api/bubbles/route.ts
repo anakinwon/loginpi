@@ -1,6 +1,6 @@
 // 메인 버블 API — GET ?period=day|week|month&ctgr= : IN_USE(사용 중) 사이트 + 요금제(plan_cd) + 기간 조회 합·직전 동일 기간 대비 증감률.
 // 증감은 fn_sel_stat_site_chg RPC(DB 합산). DB 미설정·조회 실패 시 sitemap/sites.json 정적 폴백(demo=true, 값 0%) — 메인 화면이 비지 않게.
-// 가상 샘플 91개(src/data/sample-sites.json)는 데모 폴백 또는 서버 env SITEMAP_SHOW_SAMPLES=1 일 때만 섞는다(운영 기본 미노출)
+// 가상 샘플 71개(src/data/sample-sites.json)는 데모 폴백 또는 서버 env SITEMAP_SHOW_SAMPLES=1 일 때만 섞는다(운영 기본 미노출)
 import { NextResponse } from 'next/server'
 import { withGuard } from '@pi/guard'
 import { resolveDbConfig } from '@pi/db'
