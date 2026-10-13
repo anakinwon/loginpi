@@ -19,18 +19,27 @@ type LinkJwt = {
   googleSub?: string
 }
 
-async function findLinkedUserId(sub: string): Promise<string | null> {
+// 반환 : usr_id = 연동 있음 / null = 연동 없음(확정) / undefined = DB 오류(판정 불가 — 호출자는 이전 값 유지).
+// supabase-js 는 조회 실패를 throw 가 아니라 error 로 돌려주므로 error 를 꼭 본다(안 보면 DB 장애가 '미연동'으로 둔갑 — 2026-10-13 로컬 키 회전 사고)
+async function findLinkedUserId(
+  sub: string,
+): Promise<string | null | undefined> {
   try {
-    const { data } = await getSupabaseAdmin()
+    const { data, error } = await getSupabaseAdmin()
       .from('sys_usr_auth_lnk')
       .select('usr_id')
       .eq('prvd_cd', 'GOOGLE')
       .eq('prvd_sub_txt', sub)
       .eq('del_yn', 'N')
       .maybeSingle<{ usr_id: string }>()
+    if (error) {
+      console.error('[auth] findLinkedUserId', error.message)
+      return undefined
+    }
     return data?.usr_id ?? null
-  } catch {
-    return null
+  } catch (e) {
+    console.error('[auth] findLinkedUserId', e instanceof Error ? e.message : e)
+    return undefined
   }
 }
 
@@ -51,12 +60,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       const t = token as LinkJwt
       if (account?.provider === 'google' && profile?.sub) {
         t.googleSub = profile.sub
-        t.userId = await findLinkedUserId(profile.sub)
+        // 최초 로그인은 이전 값이 없어 DB 오류도 null(미연동 안내) — 서버 로그로 구분
+        t.userId = (await findLinkedUserId(profile.sub)) ?? null
       } else if (t.googleSub) {
         // 세션 조회마다 연동 재확인(쿼리 1건) — 연동·해제·사용자 삭제가 즉시 반영된다.
         // 실측 2026-10-11: userId 가 있을 때 건너뛰면 삭제된 사용자를 가리키는 토큰이 영구 고착(/me null·폼 미노출·409)
+        // DB 오류(undefined)면 덮어쓰지 않는다 — 장애 순간 연동 사용자 전원이 '미연동'으로 강등되는 것을 막는다
         void trigger
-        t.userId = await findLinkedUserId(t.googleSub)
+        const linked = await findLinkedUserId(t.googleSub)
+        if (linked !== undefined) t.userId = linked
       }
       return t
     },
