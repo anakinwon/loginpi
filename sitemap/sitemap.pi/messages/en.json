@@ -207,11 +207,11 @@
     "unpaid": "Payment pending",
     "payHint": "Use starts automatically once the configured time after paying the usage fee has passed. Applications that do not start payment within the configured time are rejected. Payment works in Pi Browser only.",
     "payGo": "Pay {amount} Pi usage fee",
-    "payDeadline": "Payment deadline: the application is rejected automatically if payment is not started within the configured time.",
-    "useStartAt": "Payment complete. Use starts automatically once the configured time has passed.",
+    "payDeadline": "Payment deadline: the application is rejected automatically if payment is not started within {h} hour(s).",
+    "useStartAt": "Payment complete. Use starts automatically after {h} hour(s).",
     "useEndAt": "Ends {time}",
     "permanent": "Permanent",
-    "reapplyUntil": "Usage has ended. Re-register within the configured window to keep this domain.",
+    "reapplyUntil": "Usage has ended. Re-register within {h} hour(s) to keep this domain.",
     "reapply": "Re-register",
     "reapplyOpen": "Apply again",
     "spk": "Sparkle add-on",
@@ -316,7 +316,8 @@
     "colPayAmt": "Amount",
     "colPayDtm": "Paid at",
     "colAply": "Applied at",
-    "colUse": "Usage period"
+    "colUse": "Usage period",
+    "tabCfg": "Settings"
   },
   "apiErrors": {
     "AUTH_REQUIRED": "Sign-in required",
@@ -366,5 +367,20 @@
     "APPLY_COOLDOWN": "This domain was repeatedly rejected for missed payment deadlines. Please apply again later",
     "PLAN_TERM_MISSING": "The plan has no usage period configured. Check the fee table.",
     "DOMAIN_REJECTED_POLICY": "This domain was rejected for a prohibited category and cannot be re-applied. Contact the administrator."
+  },
+  "cfg": {
+    "intro": "Usage-fee state timers (hours, 0.01–720). Saved values reach the notices within minutes (cache 30 s–2.5 min); automatic transitions will read them once the cron (P5) ships. For device testing, lower to 0.05, run the full flow, then restore.",
+    "loading": "Loading settings…",
+    "hourUnit": "hour(s)",
+    "save": "Save",
+    "saved": "Saved",
+    "current": "Current {val} h",
+    "modAt": "Last changed {time}",
+    "SITE_PAY_TIMEOUT_HOUR": "Payment deadline",
+    "SITE_PAY_TIMEOUT_HOUR_hint": "An application is rejected automatically (PAY_TIMEOUT) if payment is not started within this time.",
+    "SITE_USE_BGN_DELAY_HOUR": "Use start delay",
+    "SITE_USE_BGN_DELAY_HOUR_hint": "After payment, use starts automatically once this time has passed. Admins can start it earlier.",
+    "SITE_REAPLY_WINDOW_HOUR": "Re-registration window",
+    "SITE_REAPLY_WINDOW_HOUR_hint": "After usage ends, only the previous applicant may re-register the same domain during this time. Afterwards anyone can apply."
   }
 }

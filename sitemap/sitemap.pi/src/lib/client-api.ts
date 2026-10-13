@@ -56,16 +56,24 @@ export type FeeInfo = {
 export type FeeMap = Record<string, FeeInfo>
 // 등록 요금표(/api/fee-plans, 공개) — 폼 요금제 선택·결제 페이지 금액·관리자 승인 게이트 공용.
 //  null = 조회 중(호출처는 "결제 필요"로 간주), {} = 조회 실패(목록·관리자는 결제 불필요로 표시, 결제 페이지는 금액 미상으로 버튼 유지). 서버가 최종 판정
-export function useRegFees(): FeeMap | null {
+// 운영 타이머(sys_cfg, 시간) — 안내 문구 "신청 후 N시간" 등. null = 조회 중·실패
+export type SiteCfg = {
+  SITE_PAY_TIMEOUT_HOUR: number
+  SITE_USE_BGN_DELAY_HOUR: number
+  SITE_REAPLY_WINDOW_HOUR: number
+}
+export function useFeeData(): { fees: FeeMap | null; cfg: SiteCfg | null } {
   const [fees, setFees] = useState<FeeMap | null>(null)
+  const [cfg, setCfg] = useState<SiteCfg | null>(null)
   useEffect(() => {
     void readApi<{
       items: (Omit<FeeInfo, 'spk'> & {
         plan_cd: string
         spk_pi_amt: number | null
       })[]
+      cfg?: SiteCfg
     }>(fetch('/api/fee-plans')).then((r) => {
-      if (r.ok)
+      if (r.ok) {
         setFees(
           Object.fromEntries(
             r.data.items.map((f) => [
@@ -79,11 +87,19 @@ export function useRegFees(): FeeMap | null {
             ]),
           ),
         )
-      else setFees({})
+        setCfg(r.data.cfg ?? null)
+      } else setFees({})
     })
   }, [])
-  return fees
+  return { fees, cfg }
 }
+export function useRegFees(): FeeMap | null {
+  return useFeeData().fees
+}
+
+// 시간(소수) → 표시 문자열 : 1 → "1", 0.05 → "0.05", 12 → "12"
+export const hourText = (h: number | null | undefined) =>
+  h == null ? '…' : String(Math.round(h * 100) / 100)
 
 // 요금제 기간·할인 표시 문구(번역 fee.*) — term: "6개월"·"5년"·"영구", discount: "1개월 요금 대비 17% 할인"(영구는 "10년 환산 25% 할인")
 export function useFeeLabel() {

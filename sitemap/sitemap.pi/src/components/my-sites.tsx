@@ -9,8 +9,10 @@ import { Link, useRouter } from '@/i18n/navigation'
 import { LoginGate } from './login-gate'
 import { Pagination } from './pagination'
 import {
+  hourText,
   readApi,
   useApiErrorText,
+  useFeeData,
   useFeeLabel,
   useRegFees,
   type ApiErrorBody,
@@ -73,7 +75,7 @@ function MySitesInner() {
   const [editing, setEditing] = useState<OwnerSite | 'new' | null>(null)
   const tp = useTranslations('plan')
   const fmt = useFormatter()
-  const fees = useRegFees()
+  const { fees, cfg } = useFeeData()
   const feeLabel = useFeeLabel()
   const when = (iso: string) =>
     fmt.dateTime(new Date(iso), { dateStyle: 'short', timeStyle: 'short' })
@@ -201,12 +203,16 @@ function MySitesInner() {
                 )}
                 {s.site_sts_cd === 'APPLYING' && (
                   <p className="text-muted-foreground text-xs">
-                    {t('payDeadline')}
+                    {t('payDeadline', {
+                      h: hourText(cfg?.SITE_PAY_TIMEOUT_HOUR),
+                    })}
                   </p>
                 )}
                 {s.site_sts_cd === 'PAID' && (
                   <p className="text-muted-foreground text-xs">
-                    {t('useStartAt')}
+                    {t('useStartAt', {
+                      h: hourText(cfg?.SITE_USE_BGN_DELAY_HOUR),
+                    })}
                   </p>
                 )}
                 {s.site_sts_cd === 'IN_USE' && (
@@ -219,7 +225,11 @@ function MySitesInner() {
                   </p>
                 )}
                 {s.site_sts_cd === 'USED' && (
-                  <p className="text-xs text-amber-600">{t('reapplyUntil')}</p>
+                  <p className="text-xs text-amber-600">
+                    {t('reapplyUntil', {
+                      h: hourText(cfg?.SITE_REAPLY_WINDOW_HOUR),
+                    })}
+                  </p>
                 )}
                 {s.site_sts_cd === 'REJECTED' && s.rjct_rsn_cd && (
                   <p className="text-destructive text-sm">

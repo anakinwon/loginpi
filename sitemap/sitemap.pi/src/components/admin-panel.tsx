@@ -6,6 +6,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useFormatter, useTranslations } from 'next-intl'
 import { piFetch } from '@pi/auth/client'
+import { CfgPanel } from './cfg-panel'
 import { LoginGate } from './login-gate'
 import { LogoField } from './logo-field'
 import { Pagination } from './pagination'
@@ -48,7 +49,7 @@ const PAGE_SIZES = [20, 50, 100] as const
 
 export function AdminPanel() {
   const t = useTranslations('admin')
-  const [tab, setTab] = useState<'sites' | 'reports'>('sites')
+  const [tab, setTab] = useState<'sites' | 'reports' | 'cfg'>('sites')
   return (
     <LoginGate>
       {() => (
@@ -66,8 +67,20 @@ export function AdminPanel() {
             >
               {t('tabReports')}
             </button>
+            <button
+              className={tab === 'cfg' ? 'btn btn-primary' : 'btn'}
+              onClick={() => setTab('cfg')}
+            >
+              {t('tabCfg')}
+            </button>
           </div>
-          {tab === 'sites' ? <SiteQueue /> : <ReportQueue />}
+          {tab === 'sites' ? (
+            <SiteQueue />
+          ) : tab === 'reports' ? (
+            <ReportQueue />
+          ) : (
+            <CfgPanel />
+          )}
         </div>
       )}
     </LoginGate>
