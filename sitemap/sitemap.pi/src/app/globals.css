@@ -51,6 +51,50 @@
   .label {
     @apply mb-1 block text-sm font-medium;
   }
+  /* 외부 이동 안내 레이어(leave-dialog) — 아이보리 바탕 + 3D 입체(마스터 지시 2026-10-13).
+     어두운 메인 위에서 눈에 띄도록 밝은 카드, 아래쪽 두꺼운 그림자 + 바닥 단차 + 상단 하이라이트로 떠 있는 느낌. 색은 다크모드와 무관하게 고정 */
+  .leave-card {
+    @apply rounded-2xl p-5 text-neutral-900;
+    background: linear-gradient(180deg, #fffdf4 0%, #fbf5e2 100%);
+    border: 1px solid #e6dcbf;
+    box-shadow:
+      inset 0 1px 0 #ffffff,
+      inset 0 -2px 0 #ece3c8,
+      0 6px 0 #d9ceab,
+      0 18px 36px -8px rgba(0, 0, 0, 0.65),
+      0 0 0 1px rgba(0, 0, 0, 0.25);
+    transform: perspective(900px) rotateX(2deg);
+    transform-origin: 50% 100%;
+  }
+  .leave-title {
+    @apply text-xs font-semibold tracking-wide text-amber-800 uppercase;
+  }
+  .leave-url {
+    @apply rounded-md border border-amber-200 bg-white/70 px-2 py-1 text-neutral-700;
+  }
+  .btn-3d {
+    @apply inline-flex items-center justify-center rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-semibold text-neutral-800 transition-transform active:translate-y-0.5;
+    box-shadow:
+      inset 0 1px 0 #fff,
+      0 3px 0 #cfc7b0;
+  }
+  .btn-3d:active {
+    box-shadow:
+      inset 0 1px 0 #fff,
+      0 1px 0 #cfc7b0;
+  }
+  .btn-3d-primary {
+    @apply border-amber-500 bg-amber-400 text-neutral-900;
+    background: linear-gradient(180deg, #ffd766 0%, #f5b800 100%);
+    box-shadow:
+      inset 0 1px 0 #fff3bf,
+      0 3px 0 #b88600;
+  }
+  .btn-3d-primary:active {
+    box-shadow:
+      inset 0 1px 0 #fff3bf,
+      0 1px 0 #b88600;
+  }
   /* 관리 목록 테이블(admin-table 접두 — Tailwind table·table-row 유틸리티와 이름 충돌 회피) — 좁은 화면은 가로 스크롤(-wrap), 행 hover 강조, 상세 행(-detail)은 배경 구분 */
   .admin-table-wrap {
     @apply overflow-x-auto rounded-lg border border-neutral-200 dark:border-neutral-800;

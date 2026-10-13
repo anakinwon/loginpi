@@ -8,6 +8,7 @@ import { piFetch } from '@pi/auth/client'
 import { LoginGate } from './login-gate'
 import { readApi, useApiErrorText, type ApiErrorBody } from '@/lib/client-api'
 import { LIMITS, MV_URL_RE, RPT_RSN, type PublicSite } from '@/lib/site'
+import { LeaveDialog } from './leave-dialog'
 
 function recordStat(siteId: string, type: 'VIEW' | 'CLCK') {
   const key = `stat:${type}:${siteId}`
@@ -104,23 +105,13 @@ export function SiteDetail({ domain }: { domain: string }) {
       )}
 
       {confirming ? (
-        <div
-          className="card flex flex-col gap-2"
-          role="dialog"
-          aria-modal="false"
-        >
-          <p className="font-medium">{t('leaveTitle')}</p>
-          <p className="text-sm">{t('leaveBody')}</p>
-          <p className="font-mono text-sm break-all">{url}</p>
-          <div className="flex gap-2">
-            <button className="btn btn-primary" onClick={visit}>
-              {t('leaveConfirm')}
-            </button>
-            <button className="btn" onClick={() => setConfirming(false)}>
-              {t('cancel')}
-            </button>
-          </div>
-        </div>
+        <LeaveDialog
+          url={url}
+          name={site.site_nm}
+          desc={site.site_desc}
+          onConfirm={visit}
+          onCancel={() => setConfirming(false)}
+        />
       ) : (
         <div>
           <button

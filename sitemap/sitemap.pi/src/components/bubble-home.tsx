@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useLocale, useTranslations } from 'next-intl'
 import { Link, useRouter } from '@/i18n/navigation'
 import { BubbleCanvas, TONE, toneOf } from './bubble-canvas'
+import { LeaveDialog } from './leave-dialog'
 import { Pagination } from './pagination'
 import { readApi, useApiErrorText, type ApiErrorBody } from '@/lib/client-api'
 import {
@@ -42,7 +43,13 @@ export function BubbleHome() {
   const [data, setData] = useState<BubbleResponse | null>(null)
   const [error, setError] = useState<ApiErrorBody | null>(null)
   const [loading, setLoading] = useState(false)
-  const [leave, setLeave] = useState<string | null>(null) // 이동 안내 중인 외부 주소
+  // 이동 안내 중인 외부 사이트 — desc 는 열릴 때만 /api/sites/<domain> 으로 지연 조회(undefined=조회 중, null=없음)
+  const [leave, setLeave] = useState<{
+    url: string
+    domain: string
+    name: string
+    desc?: string | null
+  } | null>(null)
   const td = useTranslations('detail')
 
   const load = useCallback(async () => {
@@ -93,7 +100,20 @@ export function BubbleHome() {
     (domain: string) => {
       const it = data?.items.find((x) => x.domain === domain)
       if (it?.sample) return router.push(`/ad?plan=${it.plan}`)
-      if (it?.url) return setLeave(it.url)
+      if (it?.url) {
+        const next = { url: it.url, domain: it.domain, name: it.name }
+        setLeave(next)
+        void readApi<{ site: { site_desc: string | null } }>(
+          fetch(`/api/sites/${encodeURIComponent(it.domain)}`),
+        ).then((r) =>
+          setLeave((cur) =>
+            cur && cur.domain === next.domain
+              ? { ...cur, desc: r.ok ? r.data.site.site_desc : null }
+              : cur,
+          ),
+        )
+        return
+      }
       router.push(`/s/${domain}`)
     },
     [router, data],
@@ -168,31 +188,18 @@ export function BubbleHome() {
       </div>
 
       {leave && (
-        <div
-          role="dialog"
-          aria-modal="false"
-          aria-label={td('leaveTitle')}
-          className="fixed bottom-16 left-1/2 z-20 flex w-[min(92vw,26rem)] -translate-x-1/2 flex-col gap-2 rounded-lg border border-white/15 bg-neutral-900 p-4 text-sm text-white shadow-lg"
-        >
-          <p className="font-medium">{td('leaveTitle')}</p>
-          <p className="text-white/70">{td('leaveBody')}</p>
-          <p className="font-mono break-all">{leave}</p>
-          <div className="flex gap-2">
-            <button
-              className="btn btn-primary"
-              onClick={() => {
-                // 새 창으로 열기 — noopener 로 이동한 사이트가 이 창(window.opener)에 접근하지 못하게
-                window.open(leave, '_blank', 'noopener,noreferrer')
-                setLeave(null)
-              }}
-            >
-              {td('leaveConfirm')}
-            </button>
-            <button className="btn" onClick={() => setLeave(null)}>
-              {td('cancel')}
-            </button>
-          </div>
-        </div>
+        <LeaveDialog
+          floating
+          url={leave.url}
+          name={leave.name}
+          desc={leave.desc}
+          onConfirm={() => {
+            // 새 창으로 열기 — noopener 로 이동한 사이트가 이 창(window.opener)에 접근하지 못하게
+            window.open(leave.url, '_blank', 'noopener,noreferrer')
+            setLeave(null)
+          }}
+          onCancel={() => setLeave(null)}
+        />
       )}
 
       {error ? (
