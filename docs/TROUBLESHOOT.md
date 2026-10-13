@@ -893,7 +893,7 @@ Pi Sign-In QR은 채굴 앱 스캐너·폰 카메라가 아니라 **파이지갑
 - 별: `scale(.3→1) rotate(45deg)` 제거, **opacity 깜빡임만**(인라인 `animationDelay` 시차 유지). 별 크기 펄스는 의도적으로 포기.
 - reduce: `animation: none` → **3배 감속**(`.sparkle-glint 7.2s`·`.sparkle-star 5.4s`) — "모바일에서도 효과가 나타나게" 요구를 "접근성 모드에서도 정지 대신 감소"로 읽은 **팀 해석** [확인중 : 마스터 확인 — 정지 유지 원하면 아래 되돌림 경로].
 - 검증: Chromium 390×844·1280×800·Pixel 7 에뮬레이션 + WebKit iPhone 13, 각 reduce/no-preference — 모두 animationName 유지·running, Δdashoffset(300ms) reduce 4.2 / no-pref 13, opacity 3샘플 상이, 버블 등장 애니메이션·hover 전이 회귀 없음. `pnpm build`(sitemap.pi) exit 0, prettier 통과. 스크린샷 `.playwright-mcp/sparkle/`(gitignore).
-- **남은 확인**: Pi Browser 실기기(Android·iOS)에서 빛줄기 이동·별 깜빡임 육안 — 아직 정적이면 ① 버블 부유 여부로 H1/H4 분기 ② H4 면 `.sparkle-*` 의 `filter: drop-shadow` 2줄 삭제(글로우 손실, 효과 유지).
+- ✅ **실기기 확인 완료(2026-10-13, 마스터)**: 모바일에서 빛줄기 이동·별 깜빡임 정상 동작 — 배포 ba8ba143(sitemapst.vercel.app). H4 대비 경로(`filter: drop-shadow` 삭제)는 불필요해져 보류.
 
 ### 재발방지·정책 메모
 1. 장식 애니메이션의 reduce 정책은 **"정지 vs 감소"를 기능 소유자(유료 여부)와 함께 결정**하고 CSS 주석에 명시 — 접근성 모드가 켜진 단말에서 '정상 동작'이 곧 '버그 신고'가 된다.
