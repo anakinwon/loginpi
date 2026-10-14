@@ -454,6 +454,7 @@ export function BubbleCanvas({
               }}
               className="bubble"
               data-stage={stage}
+              data-sample={it.sample || undefined}
               style={{ color: PLAN_COLOR[it.plan] }}
               tabIndex={0}
               role="link"

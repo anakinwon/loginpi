@@ -135,6 +135,21 @@
   stroke: #fff;
   stroke-width: 3px;
 }
+/* 가상 샘플 버블(관리자 목록에 없는 데모) — 반투명으로 낮춰 실제 등록 사이트가 강조되게. 호버·포커스 때만 원래 밝기(마스터 2026-10-14, 0.4 → 0.2 "더 투명하게") */
+.bubble[data-sample] {
+  opacity: 0.2;
+  transition: opacity 150ms ease-out;
+}
+.bubble[data-sample]:hover,
+.bubble[data-sample]:focus-visible {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bubble-inner {
+    transition: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .bubble-inner {
     transition: none;
