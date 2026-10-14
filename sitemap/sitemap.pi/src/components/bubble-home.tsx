@@ -216,10 +216,25 @@ export function BubbleHome() {
             className="relative h-[calc(100dvh-17rem)] min-h-[380px] sm:h-[calc(100dvh-9rem)]"
             aria-busy={loading}
           >
+            {/* 배경 — NASA 이미지 라이브러리의 실제 은하수 사진(ISS iss073e0982679, 2025-10-25, NASA 미디어 사용 지침상 미국 내 저작권 비대상·출처 표기 권장 https://www.nasa.gov/nasa-brand-center/images-and-media/ 확인일 2026-10-14, 출처 링크는 범례. 마스터 지시 2026-10-14).
+                <img object-cover> + srcSet 으로 어떤 화면 비율·크기에도 잘라 채우고(데스크톱·모바일), 960w 는 저밀도(DPR≤2)·좁은 화면용.
+                CSS url() 배경 대신 요소를 쓴다 — srcSet 반응형 선택이 공짜이고 번들러 에셋 해석을 안 거친다(2026-10-14 dev 캐시 stale 사고 — `.next/dev` 삭제로 해결, 루트 docs/TROUBLESHOOT.md 2026-10-14). 움직임은 .sky-drift(globals.css 켄 번즈 120s). 동영상은 모바일 자동재생·데이터 때문에 보류 */}
+            <img
+              src="/sky/milky-way.webp"
+              srcSet="/sky/milky-way-sm.webp 960w, /sky/milky-way.webp 1920w"
+              sizes="100vw"
+              alt=""
+              aria-hidden
+              decoding="async"
+              className="sky-drift absolute inset-0 size-full object-cover object-center"
+            />
+            <div className="absolute inset-0 bg-[#070a12]/45" aria-hidden />
             {!data ? (
-              <p className="p-4 text-sm text-white/60">{t('loading')}</p>
+              <p className="relative p-4 text-sm text-white/60">
+                {t('loading')}
+              </p>
             ) : items.length === 0 ? (
-              <p className="p-4 text-sm text-white/60">{t('empty')}</p>
+              <p className="relative p-4 text-sm text-white/60">{t('empty')}</p>
             ) : (
               <BubbleCanvas
                 items={items}
@@ -264,6 +279,14 @@ function Legend() {
           </span>
         )
       })}
+      <a
+        className="text-white/70 underline decoration-white/30 hover:text-white"
+        href="https://images.nasa.gov/details/iss073e0982679"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {t('bgCredit')}
+      </a>
     </div>
   )
 }

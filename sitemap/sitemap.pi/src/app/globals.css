@@ -116,6 +116,28 @@
   }
 }
 
+/* 홈 배경 은하수(bubble-home <img>) — 시간에 따라 천천히 흐르는 켄 번즈 : 확대 1 → 1.18 + 좌우·상하 드리프트, 120초 왕복.
+   HTML img 의 CSS transform 이라 SVG 금지 철칙과 무관. scale ≥ 1 + 이동 ≤ 3% 라 가장자리가 드러나지 않는다(object-cover 유지).
+   움직임 줄이기 설정은 정지 대신 3배 느리게(프로젝트 공통 규칙). 마스터 지시 2026-10-14 */
+.sky-drift {
+  will-change: transform;
+  transform-origin: center;
+  animation: sky-drift 120s ease-in-out infinite alternate;
+}
+@keyframes sky-drift {
+  from {
+    transform: scale(1) translate(0, 0);
+  }
+  to {
+    transform: scale(1.18) translate(3%, -2%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sky-drift {
+    animation-duration: 360s;
+  }
+}
+
 /* 메인 버블(bubble-canvas) — 호버·포커스 시 확대·글로우(색 = currentColor = 증감 톤), 포커스 링 */
 .bubble {
   cursor: pointer;
@@ -144,12 +166,6 @@
 .bubble[data-sample]:focus-visible {
   opacity: 1;
 }
-@media (prefers-reduced-motion: reduce) {
-  .bubble-inner {
-    transition: none;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .bubble-inner {
     transition: none;

@@ -918,3 +918,25 @@ Pi Sign-In QR은 채굴 앱 스캐너·폰 카메라가 아니라 **파이지갑
 ### 재발방지
 1. **인증 상태는 삼상태**(연동·미연동·판정 불가). "못 읽음"을 "없음"으로 합치면 장애가 사용자 행동 요구로 둔갑 — supabase-js 는 throw 가 아니라 `error` 필드라 catch 만으론 못 잡는다.
 2. 로컬 DB 건전성 1차 판정 = `/api/fee-plans` 200 여부. 로컬·Vercel 이 같은 DB 라도 키는 환경별 사본 — `vercel env pull` 로 STAGING_* 만 동기화(AUTH_SECRET·APP_URL 은 환경별 유지).
+
+## [2026-10-14] sitemap.pi dev 서버가 globals.css 변경을 반영하지 않음 — Turbopack 영속 캐시(`.next/dev`) stale, 처음엔 url() 누락으로 오진
+
+### 증상
+
+- `src/app/globals.css` 에 규칙을 추가·수정해도 dev(`pnpm dev`)가 서빙하는 CSS 청크(`/_next/static/chunks/…globals….css`)에 새 규칙이 없거나 옛 값(opacity 0.4)이 그대로. 서버 로그 "✓ Compiled", 브라우저 콘솔 오류 0. 서버 재시작만으로는 복구 안 됨.
+- 전날(2026-10-13) `@import './effects/*.css'` 가 "누락"된 사고도 같은 증상 — 그때는 CSS 를 globals.css 로 합쳐 우회.
+
+### 원인
+
+- Next 16 Turbopack 의 영속 파일시스템 캐시(`.next/dev`)가 stale. dev 실행 중 같은 폴더에서 `pnpm build` 를 돌린 뒤 발생(정확한 트리거는 미확정).
+- 1차 진단은 "`url('/sky/…')` 규칙을 Turbopack 이 못 풀어 통째로 버림" — 그 가설로 배경을 `<img>` 요소로 바꿨는데(그 자체는 좋은 선택), 다음 편집(opacity 0.4 → 0.2, keyframes)도 반영되지 않아 캐시 문제로 확정.
+
+### 조치
+
+- dev 종료 → `.next/dev` 삭제 → `pnpm dev`. 즉시 정상 반영(켄 번즈 애니메이션·opacity 0.2 확인).
+
+### 재발방지
+
+1. **소스가 아니라 브라우저가 받은 CSS 청크를 fetch 해 셀렉터를 grep** 한다. 없으면 같은 파일에 사소한 편집 하나 더 넣어 반영되는지 본다 — 안 되면 규칙이 아니라 캐시 문제.
+2. dev 실행 중 같은 앱 폴더에서 `pnpm build` 를 돌리지 않는다(검증 빌드는 dev 를 끄고).
+3. 설명 못 하는 컴파일러 침묵 하나로 구조를 바꾸기 전에 캐시 가설을 먼저 배제한다(주석·문서에 잘못된 원인이 남는다 — 이번에 PRD_02 §3 문구 정정).
