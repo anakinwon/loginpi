@@ -37,23 +37,8 @@ const samplePct = (domain: string) => {
   return (((h >>> 0) % 701) - 300) / 10
 }
 
-// 부가서비스 "반짝임" — 유료 요금제마다 sample-sites.json 의 첫 샘플이 추가요금을 내고 선택한 것으로 간주(마스터 지시 2026-10-10).
-// 카테고리 필터 전에 정해 필터를 바꿔도 같은 사이트가 반짝인다.
-// 실사이트는 site_mst.spk_yn·spk_pay_dtm(sql/013, isSparkleOn) — 결제 전엔 붙이지 않는다(미결제 유료 표시 금지)
-// 부가서비스 "버블 이펙트" 데모 — 유료 요금제마다 두 번째 샘플에 궤도→펄스→혜성 순환(마스터 지시 2026-10-13 3종 시연)
-const EFFECT_SAMPLE = new Map<string, EfctCd>(
-  PLAN_CD.filter((p) => p !== 'NONE').flatMap((p, i) => {
-    const d = samples.sites.filter((s) => s.planCd === p)[1]?.domain
-    return d
-      ? [[d, (['ORBIT', 'PULSE', 'COMET'] as const)[i % 3]] as const]
-      : []
-  }),
-)
-const SPARKLE = new Set(
-  PLAN_CD.filter((p) => p !== 'NONE').map(
-    (p) => samples.sites.find((s) => s.planCd === p)?.domain,
-  ),
-)
+// 부가서비스(반짝임·이펙트)는 샘플에 붙이지 않는다 — 시연은 자사 실사이트 site_mst.spk_yn·efct_cd 로(마스터 지시 2026-10-14, 샘플 데모 폐기).
+// 실사이트는 isSparkleOn(sql/013)·effectOn(sql/017) — 결제 전엔 붙이지 않는다(미결제 유료 표시 금지, 자사 예외)
 
 // 연결 주소 재지정 — .pi 도메인은 일반 브라우저에서 열리지 않으므로 레지스트리에 url 이 있으면 그 주소로 이동
 // (cafe.pi → https://cafepi.vercel.app/, 마스터 지시 2026-10-10). DB 행에도 도메인으로 적용
@@ -77,8 +62,8 @@ const sampleItems = (ctgr: string | null): BubbleItem[] =>
       views: 0,
       chgPct: samplePct(s.domain),
       sample: true,
-      sparkle: SPARKLE.has(s.domain),
-      effect: EFFECT_SAMPLE.get(s.domain) ?? null,
+      sparkle: false,
+      effect: null,
     }))
 
 // 실데이터 뒤에 샘플을 붙이되 버블 상한(MAX_BUBBLES) 유지
@@ -152,7 +137,7 @@ async function load(
       own: s.own_site_yn === 'Y',
       views: c.cur,
       chgPct: pct(c.cur, c.prev),
-      // 반짝임 부가서비스 — 신청 + (결제 완료 또는 자사). 샘플은 SPARKLE Set
+      // 반짝임 부가서비스 — 신청 + (결제 완료 또는 자사)
       sparkle: isSparkleOn(s),
       effect: effectOn({ ...s, efct_cd: s.efct_cd as EfctCd | null }),
     }
