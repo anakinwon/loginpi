@@ -69,11 +69,9 @@ export function SiteDetail({ domain }: { domain: string }) {
     site.site_mv_url && MV_URL_RE.test(site.site_mv_url)
       ? site.site_mv_url
       : `https://${site.site_dom_nm}`
+  // 열기(window.open, 점프 연출 뒤)·닫기(setConfirming(false))는 LeaveDialog 가 맡고, 여기선 클릭 통계만
   const visit = () => {
     recordStat(site.site_id, 'CLCK')
-    // 새 창으로 열기 — noopener 로 이동한 사이트가 이 창(window.opener)에 접근하지 못하게
-    window.open(url, '_blank', 'noopener,noreferrer')
-    setConfirming(false)
   }
 
   return (

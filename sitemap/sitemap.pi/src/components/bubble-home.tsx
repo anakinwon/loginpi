@@ -194,11 +194,6 @@ export function BubbleHome() {
           url={leave.url}
           name={leave.name}
           desc={leave.desc}
-          onConfirm={() => {
-            // 새 창으로 열기 — noopener 로 이동한 사이트가 이 창(window.opener)에 접근하지 못하게
-            window.open(leave.url, '_blank', 'noopener,noreferrer')
-            setLeave(null)
-          }}
           onCancel={() => setLeave(null)}
         />
       )}
@@ -212,8 +207,9 @@ export function BubbleHome() {
         </div>
       ) : view === 'bubble' ? (
         <>
+          {/* overflow-hidden 필수 — 배경 .sky-drift 가 1.18배까지 커지므로(켄 번즈) 잘라 주지 않으면 위로 상단 바, 아래로 범례를 덮는다(2026-10-14 마스터 지적 "로딩 후 위아래 공간") */}
           <div
-            className="relative h-[calc(100dvh-17rem)] min-h-[380px] sm:h-[calc(100dvh-9rem)]"
+            className="relative h-[calc(100dvh-17rem)] min-h-[380px] overflow-hidden sm:h-[calc(100dvh-9rem)]"
             aria-busy={loading}
           >
             {/* 배경 — NASA 이미지 라이브러리의 실제 은하수 사진(ISS iss073e0982679, 2025-10-25, NASA 미디어 사용 지침상 미국 내 저작권 비대상·출처 표기 권장 https://www.nasa.gov/nasa-brand-center/images-and-media/ 확인일 2026-10-14, 출처 링크는 범례. 마스터 지시 2026-10-14).

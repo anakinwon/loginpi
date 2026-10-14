@@ -51,49 +51,374 @@
   .label {
     @apply mb-1 block text-sm font-medium;
   }
-  /* 외부 이동 안내 레이어(leave-dialog) — 아이보리 바탕 + 3D 입체(마스터 지시 2026-10-13).
-     어두운 메인 위에서 눈에 띄도록 밝은 카드, 아래쪽 두꺼운 그림자 + 바닥 단차 + 상단 하이라이트로 떠 있는 느낌. 색은 다크모드와 무관하게 고정 */
-  .leave-card {
-    @apply rounded-2xl p-5 text-neutral-900;
-    background: linear-gradient(180deg, #fffdf4 0%, #fbf5e2 100%);
-    border: 1px solid #e6dcbf;
+  /* 외부 이동 안내 레이어(leave-dialog) — 우주선 실루엣(엔터프라이즈형 톱뷰, 마스터 지시 2026-10-14) :
+     선수(.ship-head > .ship-prow > .ship-prow-in 화살촉 clip-path + 조종석 창) → 본체(.ship-hull, 선수와 같은 폭으로 바로 이어짐, 하단 디플렉터) + 좌우 워프 나셀(.ship-nacelle, 앞끝 붉은 버사드·파란 글로우 맥동, 점프 .ship-jump 때 백열).
+     전부 HTML 요소 CSS(모바일 WebView 철칙 무관). 별은 warp-field <canvas>(뒤), 플래시는 .hud-flash(앞). 색은 다크 고정 */
+  .ship {
+    padding: 0 26px; /* 나셀 자리 */
+    --hull: rgba(7, 10, 18, 0.95); /* 뒤 버블이 비치지 않게 거의 불투명 */
+    --rim: rgba(165, 180, 252, 0.55);
+    --glow: rgba(127, 34, 254, 0.35);
+  }
+  .ship-hull {
+    position: relative;
+    color: #fff;
+    background:
+      radial-gradient(
+        120% 80% at 50% 0%,
+        rgba(127, 34, 254, 0.2),
+        transparent 60%
+      ),
+      var(--hull);
+    border: 1px solid var(--rim);
     box-shadow:
-      inset 0 1px 0 #ffffff,
-      inset 0 -2px 0 #ece3c8,
-      0 6px 0 #d9ceab,
-      0 18px 36px -8px rgba(0, 0, 0, 0.65),
-      0 0 0 1px rgba(0, 0, 0, 0.25);
-    transform: perspective(900px) rotateX(2deg);
-    transform-origin: 50% 100%;
+      inset 0 0 0 1px rgba(127, 34, 254, 0.25),
+      0 0 24px var(--glow),
+      0 18px 36px -8px rgba(0, 0, 0, 0.8);
   }
-  .leave-title {
-    @apply text-xs font-semibold tracking-wide text-amber-800 uppercase;
+  /* 선수(prow) — 화살촉 폴리곤(clip-path) : 테두리는 바깥(.ship-prow 림색) 안에 1.5px 작은 같은 폴리곤(.ship-prow-in), 글로우는 clip 에 안 잘리게 래퍼(.ship-head) drop-shadow */
+  .ship-head {
+    @apply w-full; /* 본체와 같은 폭 — 선수가 동체로 바로 이어진다 */
+    filter: drop-shadow(0 0 14px var(--glow))
+      drop-shadow(0 12px 18px rgba(0, 0, 0, 0.7));
   }
-  .leave-url {
-    @apply rounded-md border border-amber-200 bg-white/70 px-2 py-1 text-neutral-700;
+  .ship-prow,
+  .ship-prow-in {
+    clip-path: polygon(
+      50% 0,
+      64% 14%,
+      100% 72%,
+      100% 100%,
+      0 100%,
+      0 72%,
+      36% 14%
+    );
   }
-  .btn-3d {
-    @apply inline-flex items-center justify-center rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-semibold text-neutral-800 transition-transform active:translate-y-0.5;
+  .ship-prow {
+    padding: 1.5px;
+    background: linear-gradient(180deg, #c7d2fe, rgba(165, 180, 252, 0.4));
+  }
+  .ship-prow-in {
+    @apply relative px-10 pt-16 pb-3 text-center;
+    background:
+      radial-gradient(
+        120% 70% at 50% 0%,
+        rgba(127, 34, 254, 0.35),
+        transparent 55%
+      ),
+      repeating-linear-gradient(
+        90deg,
+        transparent 0 34px,
+        rgba(255, 255, 255, 0.035) 34px 35px
+      ),
+      var(--hull);
+  }
+  /* 조종석 창 — 선수 끝 바로 아래, 시안 빛 */
+  .ship-prow-in::before {
+    content: '';
+    position: absolute;
+    top: 18px;
+    left: 50%;
+    width: 26px;
+    height: 12px;
+    transform: translateX(-50%);
+    border-radius: 50% 50% 40% 40%;
+    background: linear-gradient(180deg, #e0f2fe, #38bdf8);
+    box-shadow: 0 0 10px #67e8f9;
+  }
+  .ship-hull {
+    @apply px-5 pt-4 pb-5;
+    border-radius: 0 0 2rem 2rem; /* 위는 선수와 맞닿음 */
+    border-top: 0;
+  }
+  /* 디플렉터 디시 — 본체 앞(아래) 중앙, 호박빛 */
+  .ship-hull::after {
+    content: '';
+    position: absolute;
+    bottom: -7px;
+    left: 50%;
+    width: 22px;
+    height: 14px;
+    transform: translateX(-50%);
+    border-radius: 0 0 11px 11px;
+    background: radial-gradient(
+      circle at 50% 30%,
+      #fde68a,
+      #f59e0b 60%,
+      #b45309
+    );
+    box-shadow: 0 0 12px #f59e0b;
+  }
+  /* 워프 나셀 — 본체 좌우, 세로 알약, 앞끝(위) 붉은 버사드 콜렉터 */
+  .ship-nacelle {
+    position: absolute;
+    top: 38%;
+    width: 18px;
+    height: 50%;
+    border-radius: 9999px;
+    background: linear-gradient(180deg, #1e3a8a, #3b82f6 35%, #93c5fd 100%);
+    border: 1px solid rgba(191, 219, 254, 0.6);
+    box-shadow: 0 0 14px rgba(96, 165, 250, 0.7);
+    animation: nacelle-pulse 2.4s ease-in-out infinite;
+  }
+  .ship-nacelle-l {
+    left: 0;
+  }
+  .ship-nacelle-r {
+    right: 0;
+    animation-delay: -1.2s;
+  }
+  .ship-nacelle::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: 50%;
+    width: 14px;
+    height: 14px;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: radial-gradient(
+      circle at 40% 35%,
+      #fecaca,
+      #ef4444 55%,
+      #7f1d1d
+    );
+    box-shadow: 0 0 10px #ef4444;
+  }
+  @keyframes nacelle-pulse {
+    0%,
+    100% {
+      box-shadow: 0 0 10px rgba(96, 165, 250, 0.5);
+    }
+    50% {
+      box-shadow: 0 0 22px rgba(147, 197, 253, 0.95);
+    }
+  }
+  /* 점프 시퀀스(--fly = leave-dialog FLY_MS) — 0~35% 진동(음속 접근) → 40% 소닉붐(.ship-boom 링 + .hud-flash) → 화면 정중앙 블랙홀(.ship-hole)을 향해 선수 방향 그대로 작아지며 음속으로 날아가 점으로 소멸(회전 없음)(마스터 지시 2026-10-14, 구 상승 소멸 대체).
+     --jx/--jy = 카드 중심에서 소멸 지점까지 거리(leave-dialog 가 점프 때 뷰포트 중심으로 계산, 인라인은 0 = 카드 중심) */
+  .ship {
+    --fly: 1s; /* = leave-dialog FLY_MS */
+    --jx: 0px;
+    --jy: 0px;
+  }
+  .ship-jump {
+    transform-origin: 50% 50%;
+    animation: ship-jump var(--fly) cubic-bezier(0.7, 0, 1, 0.3) forwards; /* 구간별 적용 — 40%→100% 흡입 구간이 느리게 끌리다 급가속(음속) */
+  }
+  @keyframes ship-jump {
+    0% {
+      transform: translate(0, 0);
+    }
+    8% {
+      transform: translate(-2px, 1px);
+    }
+    16% {
+      transform: translate(2px, -1px);
+    }
+    24% {
+      transform: translate(-3px, 2px);
+    }
+    32% {
+      transform: translate(3px, -2px);
+    }
+    40% {
+      transform: translate(0, 8px) scale(1.02, 0.98); /* 반동 */
+      opacity: 1;
+      filter: blur(0);
+    }
+    80% {
+      opacity: 1;
+    }
+    100% {
+      transform: translate(var(--jx), var(--jy)) scale(0.02);
+      opacity: 0;
+      filter: blur(2px);
+    }
+  }
+  /* 블랙홀(워프 포인트) — 작은 검은 코어 + 얇게 도는 시안 고리(conic). 우주선은 회전 없이 선수 방향 그대로 이 점으로. HTML div 라 transform 애니메이션 허용(SVG 아님). 소닉붐(36%) 직후 열려 끝까지 유지, 닫힘은 dialog 언마운트 */
+  .ship-hole {
+    --fly: 1s; /* .ship 의 형제라 상속 안 됨 — leave-dialog FLY_MS 와 같게 */
+    width: 96px; /* 작게 — 워프 포인트 느낌(마스터 지시 2026-10-14 "너무 크지 않게") */
+    height: 96px;
+    margin: -48px 0 0 -48px;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      #000 0 30%,
+      rgba(0, 0, 0, 0.9) 40%,
+      rgba(56, 189, 248, 0.35) 50%,
+      transparent 62%
+    );
     box-shadow:
-      inset 0 1px 0 #fff,
-      0 3px 0 #cfc7b0;
+      0 0 16px 4px rgba(103, 232, 249, 0.6),
+      0 0 48px 14px rgba(129, 140, 248, 0.3);
+    opacity: 0;
+    animation: ship-hole var(--fly) ease-out forwards;
   }
-  .btn-3d:active {
-    box-shadow:
-      inset 0 1px 0 #fff,
-      0 1px 0 #cfc7b0;
+  .ship-hole::before {
+    content: '';
+    position: absolute;
+    inset: 8%;
+    border-radius: 50%;
+    background: conic-gradient(
+      from 0deg,
+      transparent 0 20%,
+      rgba(224, 242, 254, 0.9) 30%,
+      transparent 42%,
+      rgba(196, 181, 253, 0.8) 62%,
+      transparent 72%,
+      rgba(224, 242, 254, 0.7) 88%,
+      transparent 100%
+    );
+    mask: radial-gradient(
+      circle,
+      transparent 0 60%,
+      #000 66% 78%,
+      transparent 84%
+    );
+    animation: ship-hole-spin 0.5s linear infinite;
   }
-  .btn-3d-primary {
-    @apply border-amber-500 bg-amber-400 text-neutral-900;
-    background: linear-gradient(180deg, #ffd766 0%, #f5b800 100%);
-    box-shadow:
-      inset 0 1px 0 #fff3bf,
-      0 3px 0 #b88600;
+  @keyframes ship-hole {
+    0%,
+    34% {
+      transform: scale(0);
+      opacity: 0;
+    }
+    48% {
+      transform: scale(1.1);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
   }
-  .btn-3d-primary:active {
+  @keyframes ship-hole-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  .ship-boom {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 3px solid #fff;
     box-shadow:
-      inset 0 1px 0 #fff3bf,
-      0 1px 0 #b88600;
+      0 0 20px #bae6fd,
+      inset 0 0 20px #bae6fd;
+    opacity: 0;
+    pointer-events: none;
+    animation: ship-boom var(--fly) ease-out forwards;
+  }
+  @keyframes ship-boom {
+    0%,
+    36% {
+      transform: translate(-50%, -50%) scale(0.2);
+      opacity: 0;
+    }
+    42% {
+      transform: translate(-50%, -50%) scale(0.8);
+      opacity: 1;
+    }
+    100% {
+      transform: translate(-50%, -50%) scale(14);
+      opacity: 0;
+    }
+  }
+  /* 점프 — 나셀 백열·본체 글로우 강화 */
+  .ship-jump .ship-nacelle {
+    animation: none;
+    background: linear-gradient(180deg, #93c5fd, #e0f2fe 40%, #fff);
+    box-shadow:
+      0 0 30px #bae6fd,
+      0 0 60px #60a5fa;
+  }
+  .ship-jump .ship-hull {
+    box-shadow:
+      inset 0 0 0 1px rgba(165, 180, 252, 0.6),
+      0 0 40px rgba(147, 197, 253, 0.7);
+  }
+  .ship-jump .ship-head {
+    filter: drop-shadow(0 0 28px #93c5fd);
+  }
+  /* 파일런 — 본체에서 나셀로 뻗는 얇은 사선 */
+  .ship-pylon {
+    position: absolute;
+    top: 52%;
+    width: 30px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--rim), rgba(191, 219, 254, 0.9));
+    pointer-events: none;
+  }
+  .ship-pylon-l {
+    left: 8px;
+    transform: rotate(-28deg);
+  }
+  .ship-pylon-r {
+    right: 8px;
+    transform: rotate(28deg);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ship-nacelle {
+      animation-duration: 7.2s;
+    }
+  }
+  .hud-label {
+    @apply font-mono text-[11px] font-semibold tracking-widest text-cyan-300/80 uppercase;
+  }
+  .hud-coord {
+    @apply rounded-md border border-cyan-300/30 bg-cyan-300/10 px-2 py-1 text-cyan-100;
+  }
+  .btn-hud {
+    @apply inline-flex items-center justify-center rounded-lg border border-white/25 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition-transform active:translate-y-0.5 disabled:opacity-60;
+  }
+  .btn-hud-primary {
+    @apply border-violet-400 bg-violet-600 hover:bg-violet-500;
+    box-shadow: 0 0 16px rgba(127, 34, 254, 0.6);
+  }
+  /* 점프 플래시 — 소닉붐 시점(--fly 의 38%)에 흰색 0 → 0.9 → 0 (HTML div, opacity 만). --fly 는 .ship 의 값과 같게 유지 */
+  .hud-flash {
+    --fly: 1s;
+    background: #fff;
+    opacity: 0;
+    animation: hud-flash 0.5s ease-out calc(var(--fly) * 0.38) both;
+  }
+  @keyframes hud-flash {
+    0% {
+      opacity: 0;
+    }
+    35% {
+      opacity: 0.9;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+  /* 움직임 줄이기 — 플래시는 1회뿐이라 WCAG 깜빡임 기준엔 안 걸리지만 세기만 낮춘다 */
+  @media (prefers-reduced-motion: reduce) {
+    .hud-flash {
+      animation-name: hud-flash-soft;
+    }
+    @keyframes hud-flash-soft {
+      0%,
+      100% {
+        opacity: 0;
+      }
+      35% {
+        opacity: 0.35;
+      }
+    }
+  }
+  /* 워프 스타필드 중심 어둠 — 카드 뒤 별이 은하수 배경과 뒤섞이지 않게 살짝 가라앉힘 */
+  .warp-field {
+    background: radial-gradient(
+      ellipse at center,
+      rgba(7, 10, 18, 0.35),
+      rgba(7, 10, 18, 0.65) 80%
+    );
   }
   /* 관리 목록 테이블(admin-table 접두 — Tailwind table·table-row 유틸리티와 이름 충돌 회피) — 좁은 화면은 가로 스크롤(-wrap), 행 hover 강조, 상세 행(-detail)은 배경 구분 */
   .admin-table-wrap {

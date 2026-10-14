@@ -178,9 +178,14 @@
     "views": "{count, plural, one {# view} other {# views}}",
     "contact": "Contact",
     "visit": "Visit site",
-    "leaveTitle": "You are leaving for an external site",
+    "leaveTitle": "Warp ready — leaving for an external site",
     "leaveBody": "You are leaving sitemap.pi for the site below. Its content and payments are the responsibility of its operator.",
-    "leaveConfirm": "Continue",
+    "leaveConfirm": "Jump",
+    "hudDest": "Destination",
+    "hudCoord": "Coordinates",
+    "hudLog": "Ship's log",
+    "popupBlocked": "The new window was blocked.",
+    "popupBlockedLink": "Tap here to go",
     "cancel": "Cancel"
   },
   "report": {
