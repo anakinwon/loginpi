@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "title": "schema.pi",
+    "description": "Data standard dictionary metasystem on Pi Network"
+  },
+  "home": {
+    "title": "schema.pi",
+    "description": "Data standard dictionary metasystem — dev environment ready",
+    "ready": "Development environment is ready"
+  }
+}

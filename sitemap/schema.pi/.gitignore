@@ -1,0 +1,8 @@
+# 중첩 앱 산출물 — 루트 .gitignore는 /node_modules·/.next/를 루트에만 고정한다(sitemap.pi 동일)
+node_modules
+.next
+.vercel
+.env*
+!.env.example
+# 에이전트 메모리(세션 산출물, 커밋 금지)
+.claude/agent-memory/

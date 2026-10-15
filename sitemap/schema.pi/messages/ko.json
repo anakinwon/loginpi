@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "title": "schema.pi",
+    "description": "Pi Network 데이터 표준사전 메타시스템"
+  },
+  "home": {
+    "title": "schema.pi",
+    "description": "데이터 표준사전 메타시스템 — 개발 환경 준비 완료",
+    "ready": "개발 환경이 준비되었습니다"
+  }
+}
