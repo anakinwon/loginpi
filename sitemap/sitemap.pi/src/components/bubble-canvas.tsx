@@ -4,7 +4,7 @@
 // 크기 = 요금제(PLAN_AREA) 비율로 화면 면적을 나눔. 스타일은 크립토버블과 같은 "가운데 투명 → 외곽으로 갈수록 진해지는 링" 그라데이션, 외곽 색 = 요금제(PLAN_COLOR 추천 팔레트), 글자는 흰색.
 // 버블 안 = 회사 로고 + 회사명만(마스터 지시 2026-10-10 — 광고·자사·등급 배지와 증감 % 는 툴팁·aria-label 로만 표시). 로고 미등록이면 회사명 첫 글자 심볼.
 // 글자는 9px 미만으로 줄이지 않고 반지름에 따라 표시 단계를 낮춘다(3 로고·회사명 → 2 회사명 → 1 로고(첫 글자) → 0 없음).
-// 프레임마다 React 렌더 없이 transform 속성만 갱신(60fps 목표). prefers-reduced-motion 이면 정지 배치(드래그 없음)
+// 프레임마다 React 렌더 없이 transform 속성만 갱신(60fps 목표). prefers-reduced-motion 분기 없음 — 모바일 단말의 "애니메이션 제거" 설정이 reduce 로 잡혀 Pi Browser 에서 버블이 정지·드래그 불가였다(마스터 지시 2026-10-16 "모바일에서도 드래그앤드롭"). 물리·드래그는 기기·설정 무관 동일
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { EFFECTS } from './effects'
 import {
@@ -36,7 +36,6 @@ const C = {
   clickMove: 6, // 이 거리(px) 미만 이동이면 클릭으로 판정
   iconMinR: 34, // 이 반지름 이상만 단계 3(로고 + 회사명)
   minFont: 9, // 글자 하한(px) — 이보다 작아지면 표시 단계를 낮춘다
-  relax: 300, // 정지 배치 반복 횟수
 } as const
 
 // 반짝임 별 — [각도(°), 크기(반지름 비율), 깜빡임 지연] : 시차를 둬 번갈아 반짝이게
@@ -216,7 +215,6 @@ export function BubbleCanvas({
     moved: boolean
   } | null>(null)
   const [size, setSize] = useState({ w: 0, h: 0 })
-  const [reduced, setReduced] = useState(false)
   const [active, setActive] = useState<BubbleItem | null>(null)
 
   const rs = useMemo(() => radii(items, size.w, size.h), [items, size])
@@ -240,14 +238,6 @@ export function BubbleCanvas({
     })
     ro.observe(el)
     return () => ro.disconnect()
-  }, [])
-
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
-    setReduced(mq.matches)
-    const on = () => setReduced(mq.matches)
-    mq.addEventListener('change', on)
-    return () => mq.removeEventListener('change', on)
   }, [])
 
   const paint = () => {
@@ -291,16 +281,11 @@ export function BubbleCanvas({
       b.y = clamp(b.y, r, h - r)
       return { item: it, r, b }
     })
-    if (reduced) {
-      for (let i = 0; i < C.relax; i++) step(nodesRef.current, w, h, 0, null)
-      for (const n of nodesRef.current) ((n.b.vx = 0), (n.b.vy = 0))
-    }
     paint()
-  }, [items, rs, size, reduced, order])
+  }, [items, rs, size, order])
 
   // 애니메이션 루프 — 탭이 숨겨지면 rAF 자체가 멈춘다
   useEffect(() => {
-    if (reduced) return
     let raf = 0
     let last = performance.now()
     const loop = (now: number) => {
@@ -324,7 +309,7 @@ export function BubbleCanvas({
     }
     raf = requestAnimationFrame(loop)
     return () => cancelAnimationFrame(raf)
-  }, [reduced])
+  }, [])
 
   const activate = (it: BubbleItem | null) => {
     activeRef.current = it?.id ?? null
@@ -363,7 +348,6 @@ export function BubbleCanvas({
     const p = local(e)
     if (!d.moved && Math.hypot(p.x - d.x0, p.y - d.y0) < C.clickMove) return
     d.moved = true
-    if (reduced) return
     const b = bodies.current.get(d.id)
     if (b) {
       b.vx = (p.x - d.px) * 0.5

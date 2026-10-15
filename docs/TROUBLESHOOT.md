@@ -894,6 +894,7 @@ Pi Sign-In QR은 채굴 앱 스캐너·폰 카메라가 아니라 **파이지갑
 - reduce: `animation: none` → **3배 감속**(`.sparkle-glint 7.2s`·`.sparkle-star 5.4s`) — "모바일에서도 효과가 나타나게" 요구를 "접근성 모드에서도 정지 대신 감소"로 읽은 **팀 해석** [확인중 : 마스터 확인 — 정지 유지 원하면 아래 되돌림 경로].
 - 검증: Chromium 390×844·1280×800·Pixel 7 에뮬레이션 + WebKit iPhone 13, 각 reduce/no-preference — 모두 animationName 유지·running, Δdashoffset(300ms) reduce 4.2 / no-pref 13, opacity 3샘플 상이, 버블 등장 애니메이션·hover 전이 회귀 없음. `pnpm build`(sitemap.pi) exit 0, prettier 통과. 스크린샷 `.playwright-mcp/sparkle/`(gitignore).
 - ✅ **실기기 확인 완료(2026-10-13, 마스터)**: 모바일에서 빛줄기 이동·별 깜빡임 정상 동작 — 배포 ba8ba143(sitemapst.vercel.app). H4 대비 경로(`filter: drop-shadow` 삭제)는 불필요해져 보류.
+- **정책 확정(2026-10-16, 마스터)**: 이펙트 3종(궤도 120s·혜성 86.4s — 사실상 정지)과 우주선 점프(reduce 면 연출 건너뜀)가 Pi Browser 에서 안 보인다는 지적 → H1 확정으로 보고 **reduce 감속·건너뜀 전부 폐기**(유료 부가서비스 4종 + 우주선·워프 = 기기·설정 무관 PC 동일). 되돌림 경로(아래 메모 2)는 그대로 유효. sitemap.pi PRD v0.9.4·`PRD_02_EFCT.md` §3.
 
 ### 재발방지·정책 메모
 1. 장식 애니메이션의 reduce 정책은 **"정지 vs 감소"를 기능 소유자(유료 여부)와 함께 결정**하고 CSS 주석에 명시 — 접근성 모드가 켜진 단말에서 '정상 동작'이 곧 '버그 신고'가 된다.

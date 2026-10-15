@@ -2,7 +2,7 @@
 
 // 워프 스타필드 — 외부 이동 안내(leave-dialog) 뒤에 깔리는 <canvas> 2D 별 가속 효과(마스터 지시 2026-10-14 "우주선 타고 이동하는 느낌").
 //  별 160개가 화면 중심에서 z 축으로 다가오며 이전 위치 → 현재 위치를 선으로 그려 속도감을 낸다. mode 'idle' 은 천천히, 'warp'(점프) 는 최고속으로 easing.
-//  HTML canvas 라 모바일 WebView 의 SVG transform 금지 철칙과 무관. 움직임 줄이기 설정은 정지 대신 1/3 속도(프로젝트 공통 규칙).
+//  HTML canvas 라 모바일 WebView 의 SVG transform 금지 철칙과 무관. 움직임 줄이기 설정에도 감속하지 않는다 — 모바일 "애니메이션 제거" 설정이 reduce 로 잡혀 Pi Browser 에서 워프가 빠지던 문제(마스터 2026-10-16 "모바일도 동일").
 //  canvas 는 치환 요소라 inset-0 만으로는 늘어나지 않는다(고유 300×150 유지) → size-full 필수. 저사양 보호 : DPR 캡 1.5, 탭 비가시·언마운트 시 rAF 정지. 배경은 투명(은하수 배경이 비친다), 중심 어둠은 CSS radial 로.
 import { useEffect, useRef } from 'react'
 
@@ -35,9 +35,6 @@ export function WarpField({
     if (!cv) return
     const ctx = cv.getContext('2d')
     if (!ctx) return
-    const slow = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      ? 3
-      : 1
     const rnd = () => Math.random() * 2 - 1
     const stars: Star[] = Array.from({ length: C.count }, () => ({
       x: rnd(),
@@ -48,7 +45,7 @@ export function WarpField({
     let w = 0
     let h = 0
     let dpr = 1
-    let v = C.idle / slow
+    let v = C.idle
     let raf = 0
     let running = true
 
@@ -62,7 +59,7 @@ export function WarpField({
     }
     const frame = () => {
       if (!running) return
-      const target = (modeRef.current === 'warp' ? C.warp : C.idle) / slow
+      const target = modeRef.current === 'warp' ? C.warp : C.idle
       v += (target - v) * C.ease
       ctx.clearRect(0, 0, w, h)
       const cx = w / 2
