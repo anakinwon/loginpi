@@ -1,0 +1,1 @@
+{"name":"@pi/payments","version":"0.1.0","private":true,"description":"Pi 멀티사이트 공용 결제 — Pi Platform API(조회·approve·complete·cancel)·pi_pymnt 원장·approve/complete/cancel 라우트 팩토리(metadata.type 핸들러 레지스트리)","type":"module","exports":{".":"./src/index.ts"},"dependencies":{"@pi/guard":"workspace:*"},"peerDependencies":{"@supabase/supabase-js":"^2.107.0","next":"^16","zod":"^4"}}
