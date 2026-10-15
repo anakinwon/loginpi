@@ -1,15 +1,15 @@
-# CLAUDE.md — sitemap.pi
+# CLAUDE.md — schema.pi
 
 @../../CLAUDE.md
 
-> **우선순위** : 위 루트(loginpi) CLAUDE.md 규칙을 먼저 적용한다. 이 파일은 sitemap.pi 전용 추가 규칙만 담고, 충돌 시 루트를 따른다.
+> **우선순위** : 위 루트(loginpi) CLAUDE.md 규칙을 먼저 적용한다. 이 파일은 schema.pi 전용 추가 규칙만 담고, 충돌 시 루트를 따른다.
 > - 이 파일의 규칙 중 루트보다 **엄격한 제약**(Bean·토큰 어휘 금지와 Pi 직접 가격, 외부 이동 안내, 광고 라벨)은 충돌이 아니라 추가 제약으로 함께 적용한다.
 > - cafe.pi 전용 항목(PiRC2 구독 컨트랙트·카페 테마·189 locale·Bean 요금제 등)은 해당 기능을 도입할 때만 적용한다. **Google 세션은 2026-10-11 도입**(마스터 예외 — Pi 계정 연동 전제, `docs/LOGIN_PLAYBOOK.md`) → 루트 CLAUDE.md 통합 체크 규칙(`getSessionUser` = Pi OR Google) 그대로 적용.
 
 Pi Network에서 만들어진 `.pi` 사이트를 등록·홍보하는 디렉터리 서비스.
 
 - 요구사항 정본 : `docs/PRD.md` / 로드맵 : `docs/ROADMAP.md`
-- 상위 플랜 : `../../docs/PRD_28_PI_MULTISITE.md`(19개 .pi 멀티사이트, 오라클 멀티테넌트형) — sitemap.pi는 W1 1호. 사이트별 앱·DB·배포 분리 원칙(PRD_28 §1)에 따라 **별도 앱**(별도 DB·독립 웹서버 마스터 확정 2026-10-09). 구 설계 `../../docs/PRD_27_PI_FACTORY.md`는 동결·대체됨
+- 상위 플랜 : `../../docs/PRD_28_PI_MULTISITE.md`(19개 .pi 멀티사이트, 오라클 멀티테넌트형) — schema.pi는 W1 1호. 사이트별 앱·DB·배포 분리 원칙(PRD_28 §1)에 따라 **별도 앱**(별도 DB·독립 웹서버 마스터 확정 2026-10-09). 구 설계 `../../docs/PRD_27_PI_FACTORY.md`는 동결·대체됨
 
 ---
 
@@ -35,10 +35,10 @@ Pi Network에서 만들어진 `.pi` 사이트를 등록·홍보하는 디렉터�
 
 | 항목 | 결정 |
 |---|---|
-| 앱 | 이 폴더의 독립 Next.js 앱 — loginpi pnpm 워크스페이스 멤버(`sitemap/*`, `../../docs/PRD_28_PI_MULTISITE.md` §3) |
-| 웹서버 | **독립 웹서버(마스터 확정 2026-10-09)** — cafe.pi와 빌드·배포·런타임·도메인 완전 분리. 기본안 별도 Vercel 프로젝트(Root Directory = `sitemap/sitemap.pi`, 운영 브랜치 `prod/sitemap`), 자체 호스팅(VM·컨테이너) 여부 [확인중 : 마스터] |
+| 앱 | 이 폴더의 독립 Next.js 앱 — loginpi pnpm 워크스페이스 멤버(`schema/*`, `../../docs/PRD_28_PI_MULTISITE.md` §3) |
+| 웹서버 | **독립 웹서버(마스터 확정 2026-10-09)** — cafe.pi와 빌드·배포·런타임·도메인 완전 분리. 기본안 별도 Vercel 프로젝트(Root Directory = `schema/schema.pi`, 운영 브랜치 `prod/schema`), 자체 호스팅(VM·컨테이너) 여부 [확인중 : 마스터] |
 | Pi | 별도 Developer Portal 앱·API 키 |
-| DB | **별도 Supabase 프로젝트의 PostgreSQL(마스터 확정 2026-10-09)** — 운영은 전용 프로젝트, 개발·스테이징은 공유 `pi-nonprod` 프로젝트의 `sitemap_dev`·`sitemap_stg` 스키마(PRD_28 §5), cafe.pi DB와 공유하지 않음, RLS 비활성 + 서버 전용 SERVICE_ROLE_KEY(cafe.pi 패턴) |
+| DB | **별도 Supabase 프로젝트의 PostgreSQL(마스터 확정 2026-10-09)** — 운영은 전용 프로젝트, 개발·스테이징은 공유 `pi-nonprod` 프로젝트의 `schema_dev`·`schema_stg` 스키마(PRD_28 §5), cafe.pi DB와 공유하지 않음, RLS 비활성 + 서버 전용 SERVICE_ROLE_KEY(cafe.pi 패턴) |
 | 공용 코드 | **워크스페이스 패키지 의존**(`@pi/auth`·`@pi/db`·`@pi/guard`·`@pi/payments`, PRD_28 §4 — 복제 금지). 출처 : `pi-session-crypto`·`pi-fetch`·`auth-check`(getSessionUser·isAdmin)·`api/auth/pi`·`pi-pay-button`·`api/payments/approve·complete` |
 | 기술 스택 | cafe.pi와 동일 버전(Next 16 · React 19 · Tailwind v4 · shadcn base-nova · next-intl v4 · zod 4) |
 | DA | `../../docs/da/데이터표준규칙.md` 적용(시스템 컬럼 4개·`del_yn` 논리삭제·물리 DELETE 금지). 공통 테이블(`sys_user`·`pi_pymnt`)은 `@pi/db` baseline 승계(PRD_28 §4) |
@@ -78,5 +78,5 @@ pnpm dev | pnpm build | pnpm lint | pnpm tsc --noEmit | pnpm format
 | 2026-10-09 | PRD_28 정합 — 워크스페이스 멤버·공용 패키지 의존(복제 폐기)·운영 브랜치·비운영 스키마 |
 | 2026-10-09 | PRD_28 v0.2 정합 — 배경을 PRD_28로 교체, sql/173 공유 전제 삭제 |
 | 2026-10-09 | 마스터 지시 — 메인 화면 버블(PRD §3-4) : 요금제 7종 크기(`site_mst.plan_cd`), 유료 노출이므로 버블마다 "광고"·요금제 배지 필수, DB 미연결 시 sites.json 폴백 |
-| 2026-10-09 | 마스터 지시 — 요금제 5단계(VIP·PRM2·PRM1·BSC2·BSC1, 면적 ×2 등비), 가상 샘플 91개는 데모 전용(DB 미시드·`SITEMAP_SHOW_SAMPLES=1`·"샘플" 배지·상세 이동 없음), 버블 글자 9px 하한·표시 단계 |
+| 2026-10-09 | 마스터 지시 — 요금제 5단계(VIP·PRM2·PRM1·BSC2·BSC1, 면적 ×2 등비), 가상 샘플 91개는 데모 전용(DB 미시드·`schema_SHOW_SAMPLES=1`·"샘플" 배지·상세 이동 없음), 버블 글자 9px 하한·표시 단계 |
 | 2026-10-11 | 로그인 통합 — Pi SDK + Pi Sign-In(OAuth) + Google(NextAuth, 연동 코드) : src/auth.ts·lib/auth.ts·sql/003, 플레이북 docs/LOGIN_PLAYBOOK.md |
