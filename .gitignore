@@ -118,3 +118,5 @@ work-statistics/
 
 # Ruflo(ruvector) 로컬 벡터 DB — 세션별 바이너리, 커밋 금지
 ruvector.db
+
+.vercel
