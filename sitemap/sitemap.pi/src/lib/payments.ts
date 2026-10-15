@@ -3,6 +3,7 @@
 //  순서 철칙(2026-10-11 적대적 검증) : Pi approve 는 **검증·원장 기록 뒤**에만 — approve 뒤에는 사용자 서명·전송이 진행되므로 그 전에 거부해야 지갑이 안전하다
 import 'server-only'
 import { db } from './api'
+import { createLedger } from '@pi/payments'
 import {
   APPLY_PLAN_CD,
   OCCUPY_STS,
@@ -13,7 +14,18 @@ import {
   type PlanCd,
 } from './site'
 
-export const PI_PAYMENTS_URL = 'https://api.minepi.com/v2/payments'
+// Pi Platform API·원장은 공용 패키지(@pi/payments). 기존 import 경로 유지를 위해 재노출
+export {
+  PI_PAYMENTS_URL,
+  getPiPayment,
+  approvePiPayment,
+  completePiPayment,
+  cancelPiPayment,
+  type PiApiResult,
+  type PymntRow,
+} from '@pi/payments'
+export const { getOwnPayment, markPaymentCanceled } = createLedger(db)
+
 export const SITE_REG = 'SITE_REG' as const
 // 반짝임 부가서비스 단독 결제 — complete RPC fn_cmpl_site_spk_pymnt(sql/013)
 export const SITE_SPK = 'SITE_SPK' as const
@@ -141,66 +153,6 @@ export async function getRegFee(planCd: string): Promise<RegFee | null> {
   return fees.find((f) => f.plan_cd === planCd) ?? null
 }
 
-export type PiApiResult =
-  | { ok: true; payment: PaymentDTO }
-  | { ok: false; status: number; body: string; alreadyApproved?: PaymentDTO }
-
-async function piApi(
-  path: string,
-  method: 'GET' | 'POST',
-  body?: unknown,
-): Promise<PiApiResult> {
-  const apiKey = process.env.PI_API_KEY
-  if (!apiKey) return { ok: false, status: 500, body: 'PI_API_KEY 미설정' }
-  // 네트워크 예외·8초 타임아웃은 { ok:false, status:0 } 으로 정규화 — 호출자가 throw(500) 대신 건별 거부·skip 으로 처리(크론 회차 격리, 적대적 리뷰 2026-10-13)
-  let res: Response
-  try {
-    res = await fetch(`${PI_PAYMENTS_URL}/${path}`, {
-      method,
-      headers: {
-        Authorization: `Key ${apiKey}`,
-        ...(body ? { 'Content-Type': 'application/json' } : {}),
-      },
-      body: body ? JSON.stringify(body) : undefined,
-      cache: 'no-store',
-      signal: AbortSignal.timeout(8_000),
-    })
-  } catch (e) {
-    return {
-      ok: false,
-      status: 0,
-      body: e instanceof Error ? e.message : 'fetch',
-    }
-  }
-  if (res.ok) return { ok: true, payment: (await res.json()) as PaymentDTO }
-  const text = await res.text()
-  // already_approved: 재요청 멱등 처리(cafe.pi 동일) — 결제 객체가 함께 오면 성공으로 취급
-  try {
-    const j = JSON.parse(text) as { error?: string; payment?: PaymentDTO }
-    if (j.error === 'already_approved' && j.payment)
-      return {
-        ok: false,
-        status: res.status,
-        body: text,
-        alreadyApproved: j.payment,
-      }
-  } catch {
-    // 본문이 JSON 이 아님 — 아래 실패 반환
-  }
-  return { ok: false, status: res.status, body: text }
-}
-
-const enc = encodeURIComponent
-// 결제 객체 조회(승인 전 검증용) — 개발자 approve 전엔 지갑 변동 없음
-export const getPiPayment = (paymentId: string) => piApi(enc(paymentId), 'GET')
-export const approvePiPayment = (paymentId: string) =>
-  piApi(`${enc(paymentId)}/approve`, 'POST')
-export const completePiPayment = (paymentId: string, txid: string) =>
-  piApi(`${enc(paymentId)}/complete`, 'POST', { txid })
-// 취소 — 검증 실패·사용자 취소·서명 전 이탈 복구. 실패해도 호출자는 진행(best-effort)
-export const cancelPiPayment = (paymentId: string) =>
-  piApi(`${enc(paymentId)}/cancel`, 'POST')
-
 // metadata 검증 — 형태가 맞을 때만 SiteRegMeta
 export function parseSiteRegMeta(meta: unknown): SiteRegMeta | null {
   if (!meta || typeof meta !== 'object') return null
@@ -249,30 +201,6 @@ export function parseSiteSpkMeta(meta: unknown): SiteSpkMeta | null {
   }
 }
 
-export interface PymntRow {
-  pymnt_id: string
-  usr_id: string
-  pymnt_sts_cd: 'APPROVED' | 'COMPLETED' | 'CANCELED'
-  pymnt_tp_cd: string // SITE_REG | SITE_SPK — complete 가 RPC 를 고른다
-  meta_val: Record<string, unknown>
-}
-
-// 원장 조회(결제자 본인 행만)
-export async function getOwnPayment(
-  paymentId: string,
-  userId: string,
-): Promise<PymntRow | null> {
-  const { data, error } = await db()
-    .from('pi_pymnt')
-    .select('pymnt_id, usr_id, pymnt_sts_cd, pymnt_tp_cd, meta_val')
-    .eq('pymnt_id', paymentId)
-    .eq('usr_id', userId)
-    .eq('del_yn', 'N')
-    .maybeSingle<PymntRow>()
-  if (error) throw error
-  return data
-}
-
 // 같은 사이트에 진행 중(APPROVED) 인 다른 결제가 있는지 — 이중 결제 방지
 export async function hasOtherApprovedPayment(
   siteId: string,
@@ -293,24 +221,3 @@ export async function hasOtherApprovedPayment(
   return (count ?? 0) > 0
 }
 
-// 원장 상태 전이(취소) — COMPLETED 는 건드리지 않는다. 갱신 실패는 로깅(호출자는 Pi 취소가 끝난 뒤라 응답을 바꾸지 않음)
-//  actor : modr_id 기록 주체 — 본인 취소는 userId, 크론 미결제 반려는 'SYSTEM'
-export async function markPaymentCanceled(
-  paymentId: string,
-  userId: string,
-  actor: string = userId,
-): Promise<boolean> {
-  const { error } = await db()
-    .from('pi_pymnt')
-    .update({
-      pymnt_sts_cd: 'CANCELED',
-      cncl_dtm: new Date().toISOString(),
-      modr_id: actor,
-    })
-    .eq('pymnt_id', paymentId)
-    .eq('usr_id', userId)
-    .eq('pymnt_sts_cd', 'APPROVED')
-  if (error)
-    console.error('[payments] markPaymentCanceled', paymentId, error.message)
-  return !error
-}

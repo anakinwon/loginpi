@@ -11,6 +11,7 @@
     "@base-ui/react": "^1.5.0",
     "@pi/auth": "workspace:*",
     "@pi/db": "workspace:*",
+    "@pi/payments": "workspace:*",
     "@pi/guard": "workspace:*",
     "@supabase/supabase-js": "^2.107.0",
     "@t3-oss/env-nextjs": "^0.13.11",
