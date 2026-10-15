@@ -1,0 +1,2 @@
+- [sitemap APL/APLY·sys_cfg 판정](project_sitemap_apl_aply.md) — 신청=APLY, 적용=APL, sys_cfg=cfg_key·cfg_val JSONB
+- [sitemap RPC 권한 회수 점검](feedback_sitemap_rpc_grant.md) — 신규 함수 fn_grant_svc_only 누락=P1(013 사례)
