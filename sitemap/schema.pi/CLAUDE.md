@@ -2,7 +2,7 @@
 
 데이터 표준사전 메타시스템(표준분류체계·표준단어·표준도메인·표준용어·승인·변경 이력). **loginpi 워크스페이스 멤버**(`sitemap/schema.pi`, 2026-10-16 dr-project에서 승계)이며, 루트 `loginpi/CLAUDE.md`의 규칙(Pi Browser 핵심가치·쿠키 OR `X-Pi-Token` 이중 경로·`redirect` 금지·DA 표준)을 먼저 적용한다. 배포 : Vercel 프로젝트 `schema`(Root Directory `sitemap/schema.pi`, 운영 브랜치 `prod/schema`, https://schem.vercel.app)
 
-- 요구사항 정본 : `docs/PRD.md` / 일정·진행 현황 : `docs/ROADMAP.md` / 출발 근거 : `docs/requirement/reqst.md`(DA Wordict 분석서)
+- 상위 7단계 계획(METAPi→ModelPi→PiErd→물리 구축→PiMig→PiCDC/PipeLinr→PiAnal) : `docs/MASTER_ROADMAP.md` / 요구사항 정본 : `docs/PRD.md` / 일정·진행 현황 : `docs/ROADMAP.md` / 출발 근거 : `docs/requirement/reqst.md`(DA Wordict 분석서)
 - 기능·규칙을 바꾸면 ROADMAP 해당 단계에 진행 기록 1줄을 같은 커밋으로 남긴다
 
 ## 절대 규칙

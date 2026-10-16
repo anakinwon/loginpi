@@ -2,7 +2,7 @@
 
 > **v0.2 재설계(2026-10-15)** : loginpi와 분리된 독립 프로젝트, 전용 Supabase·Vercel, loginpi 코드는 읽기 참고만. 1~3단계 항목 중 loginpi 경로(`@pi/*`·`pi-nonprod`·`db-migrate.mjs`·cafe.pi 이전) 서술은 1단계 상세 설계 시 정정 [확인중 : 1단계 설계]
 
-작성일 2026-10-15 · 요구사항 `PRD.md` · 일정은 단계 순서만 확정, 단계별 착수·완료일은 [TBD : 마스터 확정] · 진행 상태 점검 2026-10-16(회사 작업 종료 시점)
+작성일 2026-10-15 · 상위 7단계 계획 `MASTER_ROADMAP.md`(2026-10-17, 이 문서 0~4단계 = 마스터 1·2단계) · 요구사항 `PRD.md` · 일정은 단계 순서만 확정, 단계별 착수·완료일은 [TBD : 마스터 확정] · 진행 상태 점검 2026-10-16(회사 작업 종료 시점)
 
 ## 진행 현황
 
@@ -132,3 +132,4 @@
 | 2026-10-15 | loginpi 분리 결정 : 0단계 폐기·revert(`11cff97b`, Vercel 3종 success 확인), 문서 정본을 nia-dr-project로 이동, 재설계 대기 |
 | 2026-10-15 | v0.2 재설계 : 0단계를 독립 기반으로 교체(구 0단계 폐기 이력 보존) |
 | 2026-10-16 | loginpi 편입·운영 배포(schem.vercel.app, prod/schema) : Pi 로그인(@pi/auth) + Google 로그인 통합(연동 코드, sql/020 sys_usr_auth_lnk·sys_auth_lnk_cd) |
+| 2026-10-17 | 마스터 로드맵 7단계 신설(`MASTER_ROADMAP.md`) : 이 문서 4단계 = ModelPi, ERD = 3단계 PiErd(2026-10-17 착수, MD1 관계와 함께) |
