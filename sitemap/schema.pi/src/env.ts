@@ -20,6 +20,8 @@ const schema = z.object({
   GOOGLE_CLIENT_SECRET: z.string().optional(),
   // Google 버튼 노출 플래그(클라이언트 인라인) — 서버 3종이 없으면 버튼만 보이고 404 가 나므로 함께 설정
   NEXT_PUBLIC_GOOGLE_LOGIN: z.enum(['1']).optional(),
+  // 개념 모델 AI 추천(프로젝트명·설명, src/lib/modelpi/project-ai.ts) — 없으면 업종 템플릿 문장으로 대체(외부 전송 없음)
+  ANTHROPIC_API_KEY: z.string().optional(),
 }).superRefine((v, ctx) => {
   const g = [v.GOOGLE_CLIENT_ID, v.GOOGLE_CLIENT_SECRET, v.AUTH_SECRET]
   if (g.some(Boolean) && !g.every(Boolean))
