@@ -59,6 +59,9 @@ export async function DELETE(req: Request, { params }: Ctx) {
     const { data, error } = await db().from('mdl_ent').update({ del_yn: 'Y', del_dtm: new Date().toISOString(), ver_no: v.data + 1, modr_id: uid }).eq('ent_id', entId).eq('ver_no', v.data).eq('del_yn', 'N').select('ent_id')
     if (error) return dbError(error)
     if (!data.length) return apiError('VERSION_CONFLICT', 409)
+    // 엔터티 속성(sql/025)도 함께 논리 삭제(고아 속성 방지)
+    const at = await db().from('mdl_attr').update({ del_yn: 'Y', del_dtm: new Date().toISOString(), modr_id: uid }).eq('ent_id', entId).eq('del_yn', 'N')
+    if (at.error) console.error('[entities/delete] 속성 논리 삭제 실패', entId, at.error.message)
     await audit({ area_id: areaId, tgt_tp_cd: 'ENT', tgt_id: entId, act_cd: 'DEL', bfr_val: cur, usr_id: uid })
     return NextResponse.json({ ok: true })
   } catch (e) {

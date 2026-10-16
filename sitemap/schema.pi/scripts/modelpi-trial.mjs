@@ -38,6 +38,20 @@ let rm = 0
 for (const x of rr) { const r = await call('POST', `${B}/relations`, { prnt_ent_id: x.prnt_ent_id, chld_ent_id: x.chld_ent_id, crdn_cd: x.crdn_cd, idnt_yn: x.idnt_yn, chld_opt_yn: x.idnt_yn === 'Y' ? 'N' : 'Y', rel_nm: x.rel_nm }); r.s === 201 ? rm++ : console.log('  관계 실패', x.prnt_nm, x.chld_nm, r.j.code) }
 const rr2 = (await call('GET', `${B}/relations/suggest?prj=${P}`)).j.rels
 console.log(`[관계] 추천 ${rr.length} · 등록 ${rm} · 등록 후 재추천 ${rr2.length}건(0 이어야 함)`)
+// 속성(MD3) : 엔터티마다 주식별자·필수 추천 → 용어 있는 것만 등록(관계 등록 뒤라 식별 상속 반영, 부모 먼저 위해 2회 반복) → 커버리지
+const ents = (await call('GET', `${B}/entities?prj=${P}&size=100`)).j.items
+const amiss = new Map()
+let pkOk = 0, an = 0
+for (let round = 0; round < 2; round++)
+  for (const e of ents) {
+    const sg = (await call('GET', `${B}/entities/${e.ent_id}/attributes/suggest`)).j
+    for (const c of [...sg.pk, ...sg.required]) {
+      if (c.missing) { if (round === 1) amiss.set(c.term_log_nm, (amiss.get(c.term_log_nm) ?? 0) + 1); continue }
+      an += (await call('POST', `${B}/entities/${e.ent_id}/attributes`, { term_id: c.term_id, pk_yn: c.role === 'PK' ? 'Y' : 'N', esntl_yn: c.esntl ? 'Y' : 'N', fk_rel_id: c.fk_rel_id ?? null })).s === 201
+    }
+  }
+for (const e of ents) pkOk += (await call('GET', `${B}/entities/${e.ent_id}/attributes`)).j.items.some((a) => a.pk_yn === 'Y')
+console.log(`[속성] 등록 ${an} · 주식별자 확정 엔터티 ${pkOk}/${ents.length} · 용어 신청 필요 ${amiss.size}종(${[...amiss.keys()].slice(0, 12).join(', ')}${amiss.size > 12 ? ' …' : ''})`)
 if (KEEP) { console.log('정리 생략(keep) prj_id', P); process.exit(0) }
 let del = 0
 for (const x of (await call('GET', `${B}/relations?prj=${P}&size=100`)).j.items) del += (await call('DELETE', `${B}/relations/${x.rel_id}?ver_no=${x.ver_no}`)).s === 200
