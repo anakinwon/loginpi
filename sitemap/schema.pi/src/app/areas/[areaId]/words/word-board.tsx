@@ -1,4 +1,5 @@
 'use client'
+import { piFetch } from '@pi/auth/client'
 // 표준단어 조회·등록·수정·삭제(클라이언트) — /api/areas/[areaId]/words(목록·등록·상태 필터), /words/[dicId](수정·삭제, ver_no 낙관적 잠금), /check(입력 중 중복 검사), /suggest(논리명 입력 시 물리명·영문풀네임·한자·설명 자동 채움, 저장 안 함)
 // 승인 절차 : 등록·수정·삭제는 승인 신청, DA만 즉시 승인 선택 가능(기본 끔), 조회 전용 역할은 등록 영역 비활성
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -53,7 +54,7 @@ export default function WordBoard({ areaId }: { areaId: string }) {
   const [selfApv, setSelfApv] = useState(false)
   const [rsn, setRsn] = useState('')
   useEffect(() => {
-    fetch(`/api/areas/${areaId}`)
+    piFetch(`/api/areas/${areaId}`)
       .then((r) => r.json())
       .then((j) => j.ok && setRole(j.role))
   }, [areaId])
@@ -65,7 +66,7 @@ export default function WordBoard({ areaId }: { areaId: string }) {
   const [total, setTotal] = useState(0)
   const load = useCallback(async () => {
     const sp = new URLSearchParams({ page: String(cond.page), size: String(cond.size), ...(cond.kw ? { q: cond.kw } : {}), ...(cond.sts ? { sts: cond.sts } : {}) })
-    const j = await (await fetch(`${base}?${sp}`)).json()
+    const j = await (await piFetch(`${base}?${sp}`)).json()
     if (j.ok) {
       setWords(j.words)
       setTotal(j.total)
@@ -84,7 +85,7 @@ export default function WordBoard({ areaId }: { areaId: string }) {
     let live = true
     const t = setTimeout(async () => {
       setSug({ busy: true, src: [], alts: [] })
-      const j = await (await fetch(`${base}/suggest?${new URLSearchParams({ log_nm: nm })}`)).json().catch(() => null)
+      const j = await (await piFetch(`${base}/suggest?${new URLSearchParams({ log_nm: nm })}`)).json().catch(() => null)
       if (!live) return
       if (!j?.ok) return setSug({ busy: false, src: [], alts: [] })
       const fill = j.fill as Record<string, string>
@@ -113,7 +114,7 @@ export default function WordBoard({ areaId }: { areaId: string }) {
     }
     const t = setTimeout(async () => {
       const sp = new URLSearchParams({ log_nm: form.dic_log_nm, phy_nm: form.dic_phy_nm, eng_nm: form.dic_eng_nm })
-      const j = await (await fetch(`${base}/check?${sp}`)).json()
+      const j = await (await piFetch(`${base}/check?${sp}`)).json()
       if (!j.ok) return
       if (edit) {
         j.logical_dup = j.logical_dup && form.dic_log_nm !== edit.dic_log_nm
@@ -163,11 +164,11 @@ export default function WordBoard({ areaId }: { areaId: string }) {
     if (edit) {
       // 빈 선택 항목은 비움(null)으로 전송, 서버가 바뀐 항목만 반영
       const body = { ver_no: edit.ver_no, ...apvOpt(), ...Object.fromEntries(Object.entries(form).map(([k, v]) => [k, v === '' && NULLABLE.includes(k as Field) ? null : v])) }
-      const j = await (await fetch(`${base}/${edit.dic_id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json()
+      const j = await (await piFetch(`${base}/${edit.dic_id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json()
       return done(j, `표준단어 ${form.dic_log_nm} 수정·승인 완료`)
     }
     const body = { ...Object.fromEntries(Object.entries(form).filter(([, v]) => v !== '')), ...apvOpt() }
-    const j = await (await fetch(base, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json()
+    const j = await (await piFetch(base, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json()
     done(j, `표준단어 ${form.dic_log_nm} 등록·승인 완료`)
   }
   // 승인 신청 선택 항목 — 자기 승인은 승인권자만, 신청사유는 입력했을 때만
@@ -177,7 +178,7 @@ export default function WordBoard({ areaId }: { areaId: string }) {
   const remove = async (w: Word) => {
     const now = w.std_sts_cd === 'RJCT' || (selfApprover && selfApv)
     if (!confirm(`${w.dic_log_nm} 단어를 ${now ? '즉시 삭제' : '삭제 신청'}합니다`)) return
-    const j = await (await fetch(`${base}/${w.dic_id}?ver_no=${w.ver_no}${selfApprover && selfApv ? '&self_apv=1' : ''}`, { method: 'DELETE' })).json()
+    const j = await (await piFetch(`${base}/${w.dic_id}?ver_no=${w.ver_no}${selfApprover && selfApv ? '&self_apv=1' : ''}`, { method: 'DELETE' })).json()
     done(j, `표준단어 ${w.dic_log_nm} 삭제`)
   }
 

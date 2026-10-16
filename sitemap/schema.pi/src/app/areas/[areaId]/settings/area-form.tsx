@@ -1,4 +1,5 @@
 'use client'
+import { piFetch } from '@pi/auth/client'
 // 분류체계 설정 폼 — GET/PATCH /api/areas/[areaId] : 바뀐 항목만 전송, 설정 권한자(SYS·DA) 외 읽기 전용
 import { useCallback, useEffect, useState } from 'react'
 import { can } from '@/lib/roles'
@@ -26,7 +27,7 @@ export default function AreaForm({ areaId }: { areaId: string }) {
   const [msg, setMsg] = useState('')
 
   const load = useCallback(async () => {
-    const j = await (await fetch(base)).json()
+    const j = await (await piFetch(base)).json()
     if (!j.ok) {
       setMsg(j.message)
       return
@@ -43,7 +44,7 @@ export default function AreaForm({ areaId }: { areaId: string }) {
     e.preventDefault()
     if (!orig) return
     const body = Object.fromEntries(Object.entries(form).filter(([k, v]) => k !== 'area_id' && (v ?? '') !== (orig[k] ?? '')).map(([k, v]) => [k, k === 'area_desc' && v === '' ? null : v]))
-    const j = await (await fetch(base, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json()
+    const j = await (await piFetch(base, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json()
     setMsg(j.ok ? '저장했습니다' : j.message)
     if (j.ok) load()
   }

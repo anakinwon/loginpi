@@ -1,14 +1,14 @@
 # CLAUDE.md : schema.pi
 
-데이터 표준사전 메타시스템(표준분류체계·표준단어·표준도메인·표준용어·승인·변경 이력). nia-dr-project 저장소 안의 **독립 프로젝트**이며, 상위 `nia-dr-project/.claude/CLAUDE.md`의 언어·커밋·문체 규칙을 함께 따른다.
+데이터 표준사전 메타시스템(표준분류체계·표준단어·표준도메인·표준용어·승인·변경 이력). **loginpi 워크스페이스 멤버**(`sitemap/schema.pi`, 2026-10-16 dr-project에서 승계)이며, 루트 `loginpi/CLAUDE.md`의 규칙(Pi Browser 핵심가치·쿠키 OR `X-Pi-Token` 이중 경로·`redirect` 금지·DA 표준)을 먼저 적용한다. 배포 : Vercel 프로젝트 `schema`(Root Directory `sitemap/schema.pi`, 운영 브랜치 `prod/schema`, https://schem.vercel.app)
 
 - 요구사항 정본 : `docs/PRD.md` / 일정·진행 현황 : `docs/ROADMAP.md` / 출발 근거 : `docs/requirement/reqst.md`(DA Wordict 분석서)
 - 기능·규칙을 바꾸면 ROADMAP 해당 단계에 진행 기록 1줄을 같은 커밋으로 남긴다
 
 ## 절대 규칙
 
-1. **loginpi 무영향** : loginpi 저장소(`C:\Users\USER\workspace\loginpi`)와 sitemap.pi는 수정·커밋·푸시·배포 금지. loginpi 코드·문서는 **읽기 참고만** 허용(2026-10-15 마스터 결정). `@pi/*` 패키지 의존 금지, 필요한 기능은 schema.pi 안에 직접 구현
-2. **푸시·배포는 명시 승인 후** : 로컬 커밋까지만 기본. Vercel 배포는 마스터 지시 전 금지
+1. **공용 패키지 재사용** : 인증·가드는 `@pi/auth`·`@pi/guard`(workspace) 의존 — 복제 금지(PRD_28 §4). cafe.pi·sitemap.pi 코드는 수정하지 않는다. (구 "loginpi 무영향·`@pi/*` 금지" 규칙은 nia-dr-project 분리 시절 — 2026-10-16 loginpi 편입으로 폐기)
+2. **운영 반영은 명시 승인 후** : master 푸시까지 기본, `prod/schema` 푸시(운영 배포)는 마스터 지시 뒤. 배포 후 `Vercel – schema: success` 개별 확인(루트 CLAUDE.md 배포 검증 철칙)
 3. **추측 금지** : 미확정 값은 `[TBD]`·`[확인중 : 확인 채널]`로만 표기
 
 ## 스택·명령
@@ -31,7 +31,8 @@ corepack pnpm@11.4.0 db:seed [-- --dry-run]      # DA#_META/SQLiteDB_v5.db → D
 ## 환경변수(`.env.local`, 커밋 금지)
 
 - `NEXT_PUBLIC_SUPABASE_URL` · `SUPABASE_SERVICE_ROLE_KEY`(**`sb_secret_` 서버 전용 키**, publishable 키 사용 금지) · `SCHEMA_DATABASE_URL`(**Session pooler** 주소 `aws-0-<리전>.pooler.supabase.com:5432`, Direct 주소는 IPv6 전용이라 접속 불가)
-- `DEV_USER_PI_NM` : 개발 전용 임시 사용자(쿠키 `dev_user`로 전환 가능, 운영 빌드에서는 무시)
+- `PI_SESSION_SECRET`(32자 이상, 필수 — HMAC 세션 서명) · `NEXT_PUBLIC_PI_SANDBOX`(운영 false) · `NEXT_PUBLIC_PI_APP_DOMAIN`(Portal 포워딩 도메인 `<app>.pinet.com`, 없으면 Pi Browser 로그인 POST 403 cross_origin_auth) · `ADMIN_PI_USERNAMES`(로그인 시 `role_cd=ADMIN` 승격)
+- `DEV_USER_PI_NM` : 개발 전용 임시 사용자(쿠키 `dev_user`로 전환 가능, 운영 빌드에서는 무시). Pi 세션이 있으면 그쪽 우선
 - 값 확인은 키 이름·접두사만 출력, 비밀값을 화면·로그·커밋에 남기지 않는다
 - 목록 정본 : `.env.example`
 
@@ -71,4 +72,5 @@ corepack pnpm@11.4.0 db:seed [-- --dry-run]      # DA#_META/SQLiteDB_v5.db → D
 
 - 이 PC DRM이 새로 생성된 Office·PDF·일부 파일을 `.exs`로 암호화 : `.exs`·`" 2.exs"` 파일은 스테이징 금지, 파일은 개별 지정 스테이징
 - 폴더명 `DA#_META`의 `#` : SQLite를 `file:` URI로 열면 `#` 뒤가 잘려 빈 DB가 생성됨 → 일반 경로로 연다
-- 로그인 : Pi 로그인 미구현(개발 임시 사용자). 구현 시 `src/lib/api.ts`의 `currentUser()`만 교체
+- 로그인(2026-10-16) : Pi SDK 로그인 — `src/lib/auth.ts`(`@pi/auth` 세션 ↔ `sys_user`, `pi_usr_nm` 불변키 매칭) · `src/app/api/auth/pi`(POST `/v2/me` 검증) · `src/app/login-gate.tsx`(클라이언트 게이트, UA 판정 금지) · `currentUser()` = Pi 세션 우선 → 비운영만 개발 임시 사용자. 클라이언트 API 호출은 `fetch` 대신 **`piFetch`**(`@pi/auth/client`, Pi Browser 쿠키 미저장 대응). 일반 브라우저용 Pi Sign-In(OAuth)·Google 로그인은 미구현
+- `src/proxy.ts` 는 무동작 자리표시자 — 삭제 금지(저장소 루트 `src/middleware.ts` 가 이 앱 미들웨어로 번들돼 `/` 404, next.config 주석 참조)

@@ -1,4 +1,5 @@
 'use client'
+import { piFetch } from '@pi/auth/client'
 // 표준용어 조회·등록·수정·삭제(클라이언트) — /terms/analyze(분해 후보), /terms(목록 : page·size·상태 필터, 등록), /terms/[termId](도메인·설명 수정, 삭제 : ver_no), /domains(도메인 선택지 : 승인완료만)
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
@@ -79,7 +80,7 @@ export default function TermBoard({ areaId }: { areaId: string }) {
   const [selfApv, setSelfApv] = useState(false)
   const [rsn, setRsn] = useState('')
   useEffect(() => {
-    fetch(`/api/areas/${areaId}`)
+    piFetch(`/api/areas/${areaId}`)
       .then((r) => r.json())
       .then((j) => j.ok && setRole(j.role))
   }, [areaId])
@@ -94,7 +95,7 @@ export default function TermBoard({ areaId }: { areaId: string }) {
   const [total, setTotal] = useState(0)
   const load = useCallback(async () => {
     const sp = new URLSearchParams({ page: String(cond.page), size: String(cond.size), ...(cond.kw ? { q: cond.kw } : {}), ...(cond.sts ? { sts: cond.sts } : {}) })
-    const j = await (await fetch(`${base}?${sp}`)).json()
+    const j = await (await piFetch(`${base}?${sp}`)).json()
     if (j.ok) {
       setTerms(j.terms)
       setTotal(j.total)
@@ -104,7 +105,7 @@ export default function TermBoard({ areaId }: { areaId: string }) {
     load()
   }, [load])
   useEffect(() => {
-    fetch(`/api/areas/${areaId}/domains`)
+    piFetch(`/api/areas/${areaId}/domains`)
       .then((r) => r.json())
       .then((j) => j.ok && setDomains(j.domains.filter((d: { std_sts_cd: string }) => d.std_sts_cd === 'CNFM'))) // 승인완료 도메인만 사용 가능
   }, [areaId])
@@ -118,7 +119,7 @@ export default function TermBoard({ areaId }: { areaId: string }) {
       return
     }
     const t = setTimeout(async () => {
-      const j = await (await fetch(`${base}/analyze?name=${encodeURIComponent(name)}`)).json()
+      const j = await (await piFetch(`${base}/analyze?name=${encodeURIComponent(name)}`)).json()
       setCands(j.ok ? j.candidates : [])
       setPick(0)
     }, 400)
@@ -162,13 +163,13 @@ export default function TermBoard({ areaId }: { areaId: string }) {
     let j
     if (edit) {
       const body = { ver_no: edit.ver_no, ...apvOpt(), dom_id: domId, term_desc: desc || null, ...Object.fromEntries(EXT.map(([k]) => [k, ext[k] || null])) }
-      j = await (await fetch(`${base}/${edit.term_id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json()
+      j = await (await piFetch(`${base}/${edit.term_id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json()
       if (j.ok) setMsg(reqMsg(j, `용어 ${edit.term_log_nm} 수정·승인 완료`))
     } else {
       if (!cur) return
       const dic_ids = cur.segments.flatMap((s) => ('word' in s ? [s.word.dic_id] : []))
       const body = { dic_ids, dom_id: domId, ...(desc ? { term_desc: desc } : {}), ...Object.fromEntries(Object.entries(ext).filter(([, v]) => v)), ...apvOpt() }
-      j = await (await fetch(base, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json()
+      j = await (await piFetch(base, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json()
       if (j.ok) setMsg(reqMsg(j, `표준용어 ${j.term.term_log_nm} 등록·승인 완료`))
     }
     if (!j.ok) {
@@ -182,7 +183,7 @@ export default function TermBoard({ areaId }: { areaId: string }) {
     // 반려 행 = 즉시 삭제(서버 규칙), 승인권자 자기 승인 = 즉시 삭제, 그 외 삭제 신청
     const now = t.std_sts_cd === 'RJCT' || (selfApprover && selfApv)
     if (!confirm(`${t.term_log_nm} 용어를 ${now ? '즉시 삭제' : '삭제 신청'}합니다`)) return
-    const j = await (await fetch(`${base}/${t.term_id}?ver_no=${t.ver_no}${selfApprover && selfApv ? '&self_apv=1' : ''}`, { method: 'DELETE' })).json()
+    const j = await (await piFetch(`${base}/${t.term_id}?ver_no=${t.ver_no}${selfApprover && selfApv ? '&self_apv=1' : ''}`, { method: 'DELETE' })).json()
     setMsg(j.ok ? reqMsg(j, `용어 ${t.term_log_nm} 삭제`) : j.message)
     if (j.ok) {
       if (edit?.term_id === t.term_id) reset()

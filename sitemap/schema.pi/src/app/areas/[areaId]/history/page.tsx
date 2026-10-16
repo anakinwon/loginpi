@@ -1,4 +1,5 @@
 'use client'
+import { piFetch } from '@pi/auth/client'
 // 변경 이력 화면 — 대상·동작·사용자·기간 조건 조회, 행을 펼치면 변경 전후 값 비교(바뀐 항목만)
 import Link from 'next/link'
 import { use, useCallback, useEffect, useState } from 'react'
@@ -39,7 +40,7 @@ export default function HistoryPage({ params }: { params: Promise<{ areaId: stri
 
   const load = useCallback(async () => {
     const sp = new URLSearchParams({ ...applied, page: String(page) })
-    const j = await (await fetch(`/api/areas/${areaId}/history?${sp}`)).json()
+    const j = await (await piFetch(`/api/areas/${areaId}/history?${sp}`)).json()
     if (j.ok) {
       setData(j)
       setMsg('')

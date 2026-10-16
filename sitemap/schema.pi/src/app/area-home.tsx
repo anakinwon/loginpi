@@ -1,4 +1,5 @@
 'use client'
+import { piFetch } from '@pi/auth/client'
 // 분류체계 목록·생성(클라이언트) — /api/areas
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -18,7 +19,7 @@ export default function AreaHome() {
   const [desc, setDesc] = useState('')
 
   const load = async () => {
-    const j = await (await fetch('/api/areas')).json()
+    const j = await (await piFetch('/api/areas')).json()
     if (!j.ok) {
       setMsg(j.message)
       setAreas([])
@@ -32,7 +33,7 @@ export default function AreaHome() {
 
   const create = async (e: React.FormEvent) => {
     e.preventDefault()
-    const r = await fetch('/api/areas', {
+    const r = await piFetch('/api/areas', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ area_nm: nm, area_desc: desc || undefined }),

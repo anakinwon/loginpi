@@ -1,4 +1,5 @@
 'use client'
+import { piFetch } from '@pi/auth/client'
 // 표준 점검 화면(P17~P19) — 점검 실행 → 대상 유형별 준수율·등급별·규칙별 건수, 위반 목록(등급·규칙 필터, 100건씩), CSV 내려받기
 import Link from 'next/link'
 import { use, useMemo, useState } from 'react'
@@ -40,7 +41,7 @@ export default function CheckPage({ params }: { params: Promise<{ areaId: string
   const run = async () => {
     setBusy(true)
     setMsg('')
-    const j = await (await fetch(`/api/areas/${areaId}/check`)).json().catch(() => null)
+    const j = await (await piFetch(`/api/areas/${areaId}/check`)).json().catch(() => null)
     setBusy(false)
     if (!j?.ok) return setMsg(j?.message ?? '점검에 실패했습니다')
     setRes(j)

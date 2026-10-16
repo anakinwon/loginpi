@@ -1,4 +1,5 @@
 'use client'
+import { piFetch } from '@pi/auth/client'
 // 표준도메인 조회·등록·수정·삭제(클라이언트) — /api/areas/[areaId]/domains(목록·등록·상태 필터), /domains/[domId](수정·삭제, ver_no), /name-preview, /api/types
 import { useCallback, useEffect, useState } from 'react'
 import { can, type MbrRole } from '@/lib/roles'
@@ -60,7 +61,7 @@ export default function DomainBoard({ areaId }: { areaId: string }) {
   const [selfApv, setSelfApv] = useState(false)
   const [rsn, setRsn] = useState('')
   useEffect(() => {
-    fetch(`/api/areas/${areaId}`)
+    piFetch(`/api/areas/${areaId}`)
       .then((r) => r.json())
       .then((j) => j.ok && setRole(j.role))
   }, [areaId])
@@ -74,7 +75,7 @@ export default function DomainBoard({ areaId }: { areaId: string }) {
   const [total, setTotal] = useState(0)
   const load = useCallback(async () => {
     const sp = new URLSearchParams({ page: String(cond.page), size: String(cond.size), ...(cond.kw ? { q: cond.kw } : {}), ...(cond.sts ? { sts: cond.sts } : {}) })
-    const j = await (await fetch(`${base}?${sp}`)).json()
+    const j = await (await piFetch(`${base}?${sp}`)).json()
     if (j.ok) {
       setDomains(j.domains)
       setTotal(j.total)
@@ -88,13 +89,13 @@ export default function DomainBoard({ areaId }: { areaId: string }) {
 
   // 선택지(논리타입·도메인그룹·대표도메인명 후보)는 화면 진입 시 1회
   useEffect(() => {
-    fetch('/api/types')
+    piFetch('/api/types')
       .then((r) => r.json())
       .then((j) => j.ok && setTypes(j.types))
-    fetch(`/api/areas/${areaId}/domain-groups`)
+    piFetch(`/api/areas/${areaId}/domain-groups`)
       .then((r) => r.json())
       .then((j) => j.ok && setGroups(j.items))
-    fetch(`/api/areas/${areaId}/words?key=Y`)
+    piFetch(`/api/areas/${areaId}/words?key=Y`)
       .then((r) => r.json())
       .then((j) => j.ok && setKeyWords(j.words.filter((w: { key_dom_yn: string }) => w.key_dom_yn === 'Y')))
   }, [areaId])
@@ -107,7 +108,7 @@ export default function DomainBoard({ areaId }: { areaId: string }) {
     }
     const t = setTimeout(async () => {
       const sp = new URLSearchParams({ key: form.key_dom_nm, lgc: form.lgc_tp_cd, len: form.data_len, scale: form.data_scale })
-      const j = await (await fetch(`${base}/name-preview?${sp}`)).json()
+      const j = await (await piFetch(`${base}/name-preview?${sp}`)).json()
       setPreview(j.ok ? { dom_nm: j.dom_nm, dup: j.dup && j.dom_nm !== edit?.dom_nm } : null)
     }, 300)
     return () => clearTimeout(t)
@@ -143,18 +144,18 @@ export default function DomainBoard({ areaId }: { areaId: string }) {
     const vals = { ...form, data_len: num(form.data_len), data_scale: num(form.data_scale) }
     if (edit) {
       const body = { ver_no: edit.ver_no, ...apvOpt(), ...Object.fromEntries(Object.entries(vals).map(([k, v]) => [k, v === '' ? null : v])) }
-      const j = await (await fetch(`${base}/${edit.dom_id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json()
+      const j = await (await piFetch(`${base}/${edit.dom_id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json()
       return done(j, `표준도메인 ${preview?.dom_nm ?? edit.dom_nm} 수정·승인 완료`)
     }
     const body = { ...Object.fromEntries(Object.entries(vals).filter(([, v]) => v !== '' && v !== null)), ...apvOpt() }
-    const j = await (await fetch(base, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json()
+    const j = await (await piFetch(base, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json()
     done(j, `표준도메인 ${j.domain?.dom_nm ?? ''} 등록·승인 완료`)
   }
 
   const remove = async (d: Domain) => {
     const now = d.std_sts_cd === 'RJCT' || (selfApprover && selfApv)
     if (!confirm(`${d.dom_nm} 도메인을 ${now ? '즉시 삭제' : '삭제 신청'}합니다`)) return
-    const j = await (await fetch(`${base}/${d.dom_id}?ver_no=${d.ver_no}${selfApprover && selfApv ? '&self_apv=1' : ''}`, { method: 'DELETE' })).json()
+    const j = await (await piFetch(`${base}/${d.dom_id}?ver_no=${d.ver_no}${selfApprover && selfApv ? '&self_apv=1' : ''}`, { method: 'DELETE' })).json()
     done(j, `표준도메인 ${d.dom_nm} 삭제`)
   }
 

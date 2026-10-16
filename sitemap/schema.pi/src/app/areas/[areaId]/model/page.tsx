@@ -1,4 +1,5 @@
 'use client'
+import { piFetch } from '@pi/auth/client'
 // 개념 모델 화면(PRD §2.5 MD1) — 상단 프로젝트(여러 개) 선택·등록, 그 아래 왼쪽 주제영역(2레벨·약어 3자) 트리·등록·수정·삭제, 오른쪽 선택 주제영역의 핵심 엔터티 등록(표준단어 분해 → 논리명·물리 테이블명 미리보기)·목록
 // 주제영역명 입력 시 약어 3자·설명 자동 채움(/subjects/suggest, 저장 안 함), 선택 주제영역의 핵심 엔터티 추천 칩(누르면 엔터티명 채움)
 // 엔터티 이름은 승인완료 표준단어로만 생성(미등록 단어는 표준단어 신청), 끝 단어 엔터티 분류어 → 테이블 접미어(TB_주제영역_단어_접미어)
@@ -77,7 +78,7 @@ export default function ModelPage({ params }: { params: Promise<{ areaId: string
   const [entSug, setEntSug] = useState<{ ent_log_nm: string; tbl_phy_nm: string; dic_ids: string[] }[]>([])
   // 프로젝트 목록 — 처음에는 첫 프로젝트 선택
   const loadPrj = useCallback(async () => {
-    const j = await (await fetch(`${api}/projects`)).json()
+    const j = await (await piFetch(`${api}/projects`)).json()
     if (!j.ok) return
     setPrjs(j.items)
     setPrj((p) => j.items.find((x: Prj) => x.prj_id === p?.prj_id) ?? j.items[0] ?? null)
@@ -86,14 +87,14 @@ export default function ModelPage({ params }: { params: Promise<{ areaId: string
     loadPrj()
   }, [loadPrj])
   useEffect(() => {
-    fetch(api)
+    piFetch(api)
       .then((r) => r.json())
       .then((j) => j.ok && setRole(j.role))
   }, [api])
   const editor = !!role && can(role, 'REQUEST')
 
   const loadSubj = useCallback(async () => {
-    const j = await (await fetch(`${api}/subjects`)).json()
+    const j = await (await piFetch(`${api}/subjects`)).json()
     if (j.ok) setSubjs(j.items)
   }, [api])
   useEffect(() => {
@@ -102,7 +103,7 @@ export default function ModelPage({ params }: { params: Promise<{ areaId: string
   const loadEnt = useCallback(async () => {
     if (!prj) return (setEnts([]), setTotal(0))
     const sp = new URLSearchParams({ page: String(page), size: '20', prj: prj.prj_id, ...(sel ? { subj: sel.subj_id } : {}) })
-    const j = await (await fetch(`${api}/entities?${sp}`)).json()
+    const j = await (await piFetch(`${api}/entities?${sp}`)).json()
     if (j.ok) {
       setEnts(j.items)
       setTotal(j.total)
@@ -116,7 +117,7 @@ export default function ModelPage({ params }: { params: Promise<{ areaId: string
     const nm = ef.name.trim()
     if (!nm) return setCands([])
     const t = setTimeout(async () => {
-      const j = await (await fetch(`${api}/entities/analyze?${new URLSearchParams({ name: nm, tp: ef.tp, ...(sel ? { subj: sel.subj_id } : {}) })}`)).json()
+      const j = await (await piFetch(`${api}/entities/analyze?${new URLSearchParams({ name: nm, tp: ef.tp, ...(sel ? { subj: sel.subj_id } : {}) })}`)).json()
       if (j.ok) {
         setCands(j.candidates)
         setPick(0)
@@ -132,7 +133,7 @@ export default function ModelPage({ params }: { params: Promise<{ areaId: string
     let live = true
     const t = setTimeout(async () => {
       setSug((s) => ({ ...s, busy: true }))
-      const j = await (await fetch(`${api}/subjects/suggest?${new URLSearchParams({ nm, ...(prj ? { prj: prj.prj_id } : {}) })}`)).json().catch(() => null)
+      const j = await (await piFetch(`${api}/subjects/suggest?${new URLSearchParams({ nm, ...(prj ? { prj: prj.prj_id } : {}) })}`)).json().catch(() => null)
       if (!live || !j?.ok) return setSug({ busy: false, src: [], alts: [], isWord: null })
       const prev = lastFill.current
       const fill = { subj_abbr_nm: j.fill.subj_abbr_nm ?? '', subj_desc: j.fill.subj_desc ?? '' }
@@ -152,7 +153,7 @@ export default function ModelPage({ params }: { params: Promise<{ areaId: string
   // 선택 주제영역의 핵심 엔터티 추천(주제영역 단어 + 상세·이력·상태이력, 주제영역명으로 시작하는 복합어)
   useEffect(() => {
     if (!sel) return setEntSug([])
-    fetch(`${api}/subjects/suggest?${new URLSearchParams({ nm: sel.subj_nm, prj: sel.prj_id, abbr: sel.subj_abbr_nm })}`)
+    piFetch(`${api}/subjects/suggest?${new URLSearchParams({ nm: sel.subj_nm, prj: sel.prj_id, abbr: sel.subj_abbr_nm })}`)
       .then((r) => r.json())
       .then((j) => j.ok && (setEntSug(j.ents), setChk(new Set())))
   }, [sel, api, ents])
@@ -166,7 +167,7 @@ export default function ModelPage({ params }: { params: Promise<{ areaId: string
     let n = 0
     const fail: string[] = []
     for (const e of list) {
-      const j = await (await fetch(`${api}/entities`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ subj_id: sel.subj_id, dic_ids: e.dic_ids, ent_tp_cd: 'BASE' }) })).json()
+      const j = await (await piFetch(`${api}/entities`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ subj_id: sel.subj_id, dic_ids: e.dic_ids, ent_tp_cd: 'BASE' }) })).json()
       if (j.ok) n++
       else fail.push(`${e.ent_log_nm}(${j.message ?? ''})`)
     }
@@ -177,7 +178,7 @@ export default function ModelPage({ params }: { params: Promise<{ areaId: string
     e.preventDefault()
     const body = { prj_nm: pf.prj_nm.trim(), prj_desc: pf.prj_desc.trim() || null }
     if (!body.prj_nm || !confirm(pEdit ? `프로젝트 '${pEdit.prj_nm}' 수정 내용을 저장하시겠습니까?` : `프로젝트 '${body.prj_nm}'을(를) 등록하시겠습니까?`)) return
-    const j = await (await fetch(pEdit ? `${api}/projects/${pEdit.prj_id}` : `${api}/projects`, { method: pEdit ? 'PATCH' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(pEdit ? { ...body, ver_no: pEdit.ver_no } : body) })).json()
+    const j = await (await piFetch(pEdit ? `${api}/projects/${pEdit.prj_id}` : `${api}/projects`, { method: pEdit ? 'PATCH' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(pEdit ? { ...body, ver_no: pEdit.ver_no } : body) })).json()
     if (!j.ok) return setMsg(j.message ?? '')
     setMsg(`프로젝트 ${body.prj_nm} ${pEdit ? '수정' : '등록'} 완료`)
     setPf({ prj_nm: '', prj_desc: '' })
@@ -187,7 +188,7 @@ export default function ModelPage({ params }: { params: Promise<{ areaId: string
   }
   const delPrj = async () => {
     if (!prj || !confirm(`프로젝트 '${prj.prj_nm}'을(를) 삭제하시겠습니까?`)) return
-    const j = await (await fetch(`${api}/projects/${prj.prj_id}?ver_no=${prj.ver_no}`, { method: 'DELETE' })).json()
+    const j = await (await piFetch(`${api}/projects/${prj.prj_id}?ver_no=${prj.ver_no}`, { method: 'DELETE' })).json()
     if (!j.ok) return setMsg(j.message ?? '')
     setPrj(null)
     setSel(null)
@@ -201,7 +202,7 @@ export default function ModelPage({ params }: { params: Promise<{ areaId: string
     if (!prj) return
     const body = { prj_id: prj.prj_id, subj_nm: sf.subj_nm.trim(), subj_abbr_nm: sf.subj_abbr_nm.trim(), up_subj_id: sf.up_subj_id || null, subj_desc: sf.subj_desc.trim() || null, sort_seq: Number(sf.sort_seq) || 1 }
     if (!confirm(sEdit ? `주제영역 '${sEdit.subj_nm}' 수정 내용을 저장하시겠습니까?` : `주제영역 '${body.subj_nm}(${body.subj_abbr_nm.toUpperCase()})'을(를) 등록하시겠습니까?`)) return
-    const j = await (await fetch(sEdit ? `${api}/subjects/${sEdit.subj_id}` : `${api}/subjects`, { method: sEdit ? 'PATCH' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(sEdit ? { ...body, ver_no: sEdit.ver_no } : body) })).json()
+    const j = await (await piFetch(sEdit ? `${api}/subjects/${sEdit.subj_id}` : `${api}/subjects`, { method: sEdit ? 'PATCH' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(sEdit ? { ...body, ver_no: sEdit.ver_no } : body) })).json()
     if (!j.ok) return setMsg(j.message ?? '')
     setMsg(`주제영역 ${body.subj_nm} ${sEdit ? '수정' : '등록'} 완료`)
     setSf(SUBJ0)
@@ -211,7 +212,7 @@ export default function ModelPage({ params }: { params: Promise<{ areaId: string
   }
   const delSubj = async (s: Subj) => {
     if (!confirm(`주제영역 '${s.subj_nm}'을(를) 삭제하시겠습니까?`)) return
-    const j = await (await fetch(`${api}/subjects/${s.subj_id}?ver_no=${s.ver_no}`, { method: 'DELETE' })).json()
+    const j = await (await piFetch(`${api}/subjects/${s.subj_id}?ver_no=${s.ver_no}`, { method: 'DELETE' })).json()
     if (!j.ok) return setMsg(j.message ?? '')
     if (sel?.subj_id === s.subj_id) setSel(null)
     loadSubj()
@@ -220,7 +221,7 @@ export default function ModelPage({ params }: { params: Promise<{ areaId: string
     e.preventDefault()
     if (!okCand || !sel || !cur?.dic_ids) return
     if (!confirm(`엔터티 '${cur.ent_log_nm}'(${cur.tbl_phy_nm})을(를) 주제영역 '${sel.subj_nm}'에 등록하시겠습니까?`)) return
-    const j = await (await fetch(`${api}/entities`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ subj_id: sel.subj_id, dic_ids: cur.dic_ids, ent_tp_cd: ef.tp, ent_desc: ef.desc.trim() || null }) })).json()
+    const j = await (await piFetch(`${api}/entities`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ subj_id: sel.subj_id, dic_ids: cur.dic_ids, ent_tp_cd: ef.tp, ent_desc: ef.desc.trim() || null }) })).json()
     if (!j.ok) return setMsg(j.message ?? '')
     setMsg(`엔터티 ${cur.ent_log_nm} 등록 완료`)
     setEf({ name: '', tp: ef.tp, desc: '' })
@@ -228,7 +229,7 @@ export default function ModelPage({ params }: { params: Promise<{ areaId: string
   }
   const delEnt = async (x: Ent) => {
     if (!confirm(`엔터티 '${x.ent_log_nm}'을(를) 삭제하시겠습니까?`)) return
-    const j = await (await fetch(`${api}/entities/${x.ent_id}?ver_no=${x.ver_no}`, { method: 'DELETE' })).json()
+    const j = await (await piFetch(`${api}/entities/${x.ent_id}?ver_no=${x.ver_no}`, { method: 'DELETE' })).json()
     if (!j.ok) return setMsg(j.message ?? '')
     loadEnt()
   }

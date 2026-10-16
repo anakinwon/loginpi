@@ -2,6 +2,7 @@
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import type { ZodType } from 'zod'
+import { getSessionUser } from './auth'
 import { db } from './db'
 import { can, type MbrRole, type Perm } from './roles'
 
@@ -105,11 +106,13 @@ export interface CurrentUser {
   pi_usr_nm: string
 }
 
-// 현재 사용자 — Pi 로그인 구현 전 개발 전용 임시 사용자(쿠키 dev_user 우선, 없으면 DEV_USER_PI_NM, 운영 빌드에서는 항상 null)
-// 로그인 모듈 구현 시 이 함수만 교체 [확인중 : Pi 로그인 0단계]
+// 현재 사용자 — Pi 세션(쿠키 OR X-Pi-Token 헤더, src/lib/auth.ts) 우선. 비운영 빌드에서만 개발 임시 사용자(쿠키 dev_user → DEV_USER_PI_NM) 폴백
 export async function currentUser(): Promise<CurrentUser | null> {
+  const pi = await getSessionUser()
+  if (pi) return { usr_id: pi.usr_id, pi_usr_nm: pi.pi_usr_nm }
+  if (process.env.NODE_ENV === 'production') return null
   const nm = (await cookies()).get(DEV_COOKIE)?.value || process.env.DEV_USER_PI_NM
-  if (process.env.NODE_ENV === 'production' || !nm || !DEV_USER_RE.test(nm)) return null
+  if (!nm || !DEV_USER_RE.test(nm)) return null
   // 활성 사용자명 유일은 부분 인덱스라 upsert 충돌 대상으로 쓸 수 없어 조회 후 생성
   const got = await db().from('sys_user').select('usr_id, pi_usr_nm').eq('pi_usr_nm', nm).eq('del_yn', 'N').maybeSingle()
   if (got.error) throw got.error

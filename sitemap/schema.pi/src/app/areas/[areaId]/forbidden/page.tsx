@@ -1,4 +1,5 @@
 'use client'
+import { piFetch } from '@pi/auth/client'
 // 금칙어 관리 화면(P05) — 표준단어별 대체 표기(금칙어·이음동의어) 등록·삭제·조회. 원칙 : 동의어는 표준단어로 쓰지 않고 이 목록으로만 관리(sql/016)
 import Link from 'next/link'
 import { use, useCallback, useEffect, useState } from 'react'
@@ -32,10 +33,10 @@ export default function ForbiddenPage({ params }: { params: Promise<{ areaId: st
   const [cond, setCond] = useState({ kw: '', tp: '', page: 1, size: 20 })
   const [total, setTotal] = useState(0)
   useEffect(() => {
-    fetch(`/api/areas/${areaId}`)
+    piFetch(`/api/areas/${areaId}`)
       .then((r) => r.json())
       .then((j) => j.ok && setRole(j.role))
-    fetch(`/api/areas/${areaId}/words?size=100&sts=CNFM`)
+    piFetch(`/api/areas/${areaId}/words?size=100&sts=CNFM`)
       .then((r) => r.json())
       .then((j) => j.ok && setWords(j.words))
   }, [areaId])
@@ -43,7 +44,7 @@ export default function ForbiddenPage({ params }: { params: Promise<{ areaId: st
 
   const load = useCallback(async () => {
     const sp = new URLSearchParams({ page: String(cond.page), size: String(cond.size), ...(cond.kw ? { q: cond.kw } : {}), ...(cond.tp ? { tp: cond.tp } : {}) })
-    const j = await (await fetch(`${base}?${sp}`)).json()
+    const j = await (await piFetch(`${base}?${sp}`)).json()
     if (j.ok) {
       setItems(j.items)
       setTotal(j.total)
@@ -57,7 +58,7 @@ export default function ForbiddenPage({ params }: { params: Promise<{ areaId: st
     const nm = form.word.trim()
     if (!nm) return
     const t = setTimeout(async () => {
-      const j = await (await fetch(`/api/areas/${areaId}/words?${new URLSearchParams({ q: nm, sts: 'CNFM', size: '20' })}`)).json()
+      const j = await (await piFetch(`/api/areas/${areaId}/words?${new URLSearchParams({ q: nm, sts: 'CNFM', size: '20' })}`)).json()
       if (j.ok) setWords(j.words)
     }, 300)
     return () => clearTimeout(t)
@@ -69,7 +70,7 @@ export default function ForbiddenPage({ params }: { params: Promise<{ areaId: st
     e.preventDefault()
     if (!target || !form.txt.trim()) return
     if (!confirm(`표준단어 '${target.dic_log_nm}'의 ${TP_NM[form.tp]} '${form.txt.trim()}'을(를) 등록하시겠습니까?`)) return
-    const j = await (await fetch(base, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dic_id: target.dic_id, rel_tp_cd: form.tp, rel_txt: form.txt.trim() }) })).json()
+    const j = await (await piFetch(base, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dic_id: target.dic_id, rel_tp_cd: form.tp, rel_txt: form.txt.trim() }) })).json()
     if (!j.ok) return setMsg(j.message ?? '')
     setMsg(`${TP_NM[form.tp]} '${form.txt.trim()}' 등록 완료 : 이 표기는 표준단어로 등록할 수 없습니다`)
     setForm({ ...form, txt: '' })
@@ -77,7 +78,7 @@ export default function ForbiddenPage({ params }: { params: Promise<{ areaId: st
   }
   const remove = async (it: Item) => {
     if (!confirm(`${TP_NM[it.rel_tp_cd]} '${it.rel_txt}'을(를) 삭제하시겠습니까?`)) return
-    const j = await (await fetch(`${base}?rel_id=${it.rel_id}`, { method: 'DELETE' })).json()
+    const j = await (await piFetch(`${base}?rel_id=${it.rel_id}`, { method: 'DELETE' })).json()
     if (!j.ok) return setMsg(j.message ?? '')
     setMsg(`'${it.rel_txt}' 삭제 완료`)
     load()

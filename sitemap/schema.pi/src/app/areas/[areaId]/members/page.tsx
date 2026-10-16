@@ -1,4 +1,5 @@
 'use client'
+import { piFetch } from '@pi/auth/client'
 // 멤버 화면 — 분류체계 참여자 목록·역할 즉시 변경(PATCH), 멤버 추가(가입된 Pi 사용자명 기준), 역할 R&R 표. 변경·추가는 설정 권한자(SYS·DA)만
 import Link from 'next/link'
 import { use, useCallback, useEffect, useState } from 'react'
@@ -31,7 +32,7 @@ export default function MembersPage({ params }: { params: Promise<{ areaId: stri
   const manage = can(myRole, 'SETTINGS')
 
   const load = useCallback(async () => {
-    const [jm, ja] = await Promise.all([(await fetch(base)).json(), (await fetch(`/api/areas/${areaId}`)).json()])
+    const [jm, ja] = await Promise.all([(await piFetch(base)).json(), (await piFetch(`/api/areas/${areaId}`)).json()])
     if (jm.ok) setMbrs(jm.members)
     else setMsg(jm.message)
     if (ja.ok) setMyRole(ja.role)
@@ -42,7 +43,7 @@ export default function MembersPage({ params }: { params: Promise<{ areaId: stri
 
   const add = async (e: React.FormEvent) => {
     e.preventDefault()
-    const j = await (await fetch(base, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pi_usr_nm: nm, mbr_role_cd: role }) })).json()
+    const j = await (await piFetch(base, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pi_usr_nm: nm, mbr_role_cd: role }) })).json()
     setMsg(j.ok ? `${nm} 추가` : j.message)
     if (j.ok) {
       setNm('')
@@ -51,7 +52,7 @@ export default function MembersPage({ params }: { params: Promise<{ areaId: stri
   }
 
   const changeRole = async (m: Mbr, next: string) => {
-    const j = await (await fetch(base, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mbr_id: m.mbr_id, mbr_role_cd: next }) })).json()
+    const j = await (await piFetch(base, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mbr_id: m.mbr_id, mbr_role_cd: next }) })).json()
     setMsg(j.ok ? `${m.sys_user.pi_usr_nm} 역할 변경 : ${roleNm(m.mbr_role_cd)} → ${roleNm(next)}` : j.message)
     load()
   }

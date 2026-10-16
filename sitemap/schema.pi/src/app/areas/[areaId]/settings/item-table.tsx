@@ -1,4 +1,5 @@
 'use client'
+import { piFetch } from '@pi/auth/client'
 // 설정 항목 목록·등록·수정·삭제(도메인그룹·약어 공용) — /api/areas/[areaId]/{path}, /{path}/[id](ver_no 낙관적 잠금)
 import { useCallback, useEffect, useState } from 'react'
 
@@ -19,7 +20,7 @@ export default function ItemTable({ areaId, cfg }: { areaId: string; cfg: ItemCf
   const [msg, setMsg] = useState('')
 
   const load = useCallback(async () => {
-    const j = await (await fetch(base)).json()
+    const j = await (await piFetch(base)).json()
     if (j.ok) setItems(j.items)
     else setMsg(j.message)
   }, [base])
@@ -42,15 +43,15 @@ export default function ItemTable({ areaId, cfg }: { areaId: string; cfg: ItemCf
     e.preventDefault()
     if (edit) {
       const body = { ver_no: edit.ver_no, ...Object.fromEntries(Object.entries(form).map(([k, v]) => [k, v === '' ? null : v])) }
-      after(await (await fetch(`${base}/${edit[cfg.pk]}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json(), '수정했습니다')
+      after(await (await piFetch(`${base}/${edit[cfg.pk]}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json(), '수정했습니다')
       return
     }
     const body = Object.fromEntries(Object.entries(form).filter(([, v]) => v !== ''))
-    after(await (await fetch(base, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json(), '등록했습니다')
+    after(await (await piFetch(base, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json(), '등록했습니다')
   }
   const remove = async (it: Item) => {
     if (!confirm(`${it[cfg.fields[0].key]} 항목을 삭제합니다`)) return
-    after(await (await fetch(`${base}/${it[cfg.pk]}?ver_no=${it.ver_no}`, { method: 'DELETE' })).json(), '삭제했습니다')
+    after(await (await piFetch(`${base}/${it[cfg.pk]}?ver_no=${it.ver_no}`, { method: 'DELETE' })).json(), '삭제했습니다')
   }
 
   return (

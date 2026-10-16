@@ -1,4 +1,5 @@
 'use client'
+import { piFetch } from '@pi/auth/client'
 // 대표도메인 관리(클라이언트) — 지정 = 승인완료 속성 분류어 단어에 key_dom_yn Y 수정 신청, 해제 = N 수정 신청(사용 도메인 0건만)
 // 목록 /api/areas/[areaId]/key-domains, 신청 PATCH /api/areas/[areaId]/words/[dicId] (승인 절차·DA 즉시 승인 공용, sql/013)
 import { useCallback, useEffect, useState } from 'react'
@@ -45,7 +46,7 @@ export default function KeyDomainBoard({ areaId }: { areaId: string }) {
   const [cond, setCond] = useState({ kw: '', sts: '', page: 1, size: 10 })
   const [total, setTotal] = useState(0)
   useEffect(() => {
-    fetch(`/api/areas/${areaId}`)
+    piFetch(`/api/areas/${areaId}`)
       .then((r) => r.json())
       .then((j) => j.ok && setRole(j.role))
   }, [areaId])
@@ -54,7 +55,7 @@ export default function KeyDomainBoard({ areaId }: { areaId: string }) {
 
   const load = useCallback(async () => {
     const sp = new URLSearchParams({ page: String(cond.page), size: String(cond.size), ...(cond.kw ? { q: cond.kw } : {}), ...(cond.sts ? { sts: cond.sts } : {}) })
-    const [l, c] = await Promise.all([fetch(`/api/areas/${areaId}/key-domains?${sp}`).then((r) => r.json()), fetch(`/api/areas/${areaId}/words?attr=Y`).then((r) => r.json())])
+    const [l, c] = await Promise.all([piFetch(`/api/areas/${areaId}/key-domains?${sp}`).then((r) => r.json()), piFetch(`/api/areas/${areaId}/words?attr=Y`).then((r) => r.json())])
     if (l.ok) {
       setItems(l.items)
       setTotal(l.total)
@@ -75,7 +76,7 @@ export default function KeyDomainBoard({ areaId }: { areaId: string }) {
   // 지정·해제 신청 — 단어 수정 신청(202 = 승인대기, 200 = DA 즉시 승인)
   const send = async (w: { dic_id: string; dic_log_nm: string; ver_no: number }, to: 'Y' | 'N') => {
     const body = { ver_no: w.ver_no, key_dom_yn: to, ...(selfApprover && selfApv ? { self_apv: true } : {}), ...(rsn.trim() ? { req_rsn: rsn.trim() } : {}) }
-    const j = await (await fetch(`/api/areas/${areaId}/words/${w.dic_id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json()
+    const j = await (await piFetch(`/api/areas/${areaId}/words/${w.dic_id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json()
     if (!j.ok) return setMsg(j.message ?? '')
     const act = to === 'Y' ? '지정' : '지정 해제'
     setMsg(j.requested ? `대표도메인 ${w.dic_log_nm} ${act} 신청을 접수했습니다(승인 후 사용 가능)` : `대표도메인 ${w.dic_log_nm} ${act}·승인 완료`)

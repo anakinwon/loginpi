@@ -1,4 +1,5 @@
 'use client'
+import { piFetch } from '@pi/auth/client'
 // 일괄등록 화면 — 유형(단어·도메인·용어) 선택 → CSV 선택 → 검증(묶음별 check) → 결과 표·CSV 내려받기 → 반영(묶음별 apply, 서버 재검증)
 // 일괄등록 권한(DA·STD) 전용(API가 확인), 반영 행은 승인대기. 순서 : 단어 → 도메인 → 용어. 설계 docs/design/bulk-import.md
 import Link from 'next/link'
@@ -45,7 +46,7 @@ export default function BulkPage({ params }: { params: Promise<{ areaId: string 
     let done = 0
     for (let i = 0; i < file.rows.length; i += BATCH_SIZE) {
       setBusy(`${m === 'check' ? '검증' : '반영'} 중 ${Math.min(i + BATCH_SIZE, file.rows.length).toLocaleString()} / ${file.rows.length.toLocaleString()}행`)
-      const res = await fetch(`/api/areas/${areaId}/bulk/${kind}`, {
+      const res = await piFetch(`/api/areas/${areaId}/bulk/${kind}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mode: m, start_row: i + 2, header: file.header, rows: file.rows.slice(i, i + BATCH_SIZE) }),

@@ -1,4 +1,5 @@
 'use client'
+import { piFetch } from '@pi/auth/client'
 // 개발 전용 사용자 전환(Pi 로그인 구현 전) — /api/dev/user, 운영 빌드에서는 표시하지 않음
 import { useEffect, useState } from 'react'
 
@@ -6,7 +7,7 @@ export default function DevUserSwitch() {
   const [cur, setCur] = useState<string | null>(null)
   const [nm, setNm] = useState('')
   useEffect(() => {
-    fetch('/api/dev/user')
+    piFetch('/api/dev/user')
       .then((r) => r.json())
       .then((j) => setCur(j.ok ? (j.user?.pi_usr_nm ?? '(없음)') : null))
   }, [])
@@ -14,7 +15,7 @@ export default function DevUserSwitch() {
 
   const change = async (e: React.FormEvent) => {
     e.preventDefault()
-    const j = await (await fetch('/api/dev/user', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pi_usr_nm: nm }) })).json()
+    const j = await (await piFetch('/api/dev/user', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pi_usr_nm: nm }) })).json()
     if (j.ok) location.reload()
   }
   return (

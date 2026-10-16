@@ -1,4 +1,5 @@
 'use client'
+import { piFetch } from '@pi/auth/client'
 // 엔터티 분류어 관리 화면 — 단어에 엔터티 분류어 지정·테이블 접미어 지정·변경·해제 신청(단어 수정 승인 절차, sql/017), 목록 조회
 // 기준 : 정의서 §8.4 데이터 성격 접미어 + 기관 확장(2026-10-16 마스터 확정), 단어 물리명(컬럼용)과 테이블 접미어(테이블명용)는 별도
 import Link from 'next/link'
@@ -51,7 +52,7 @@ export default function EntityClassPage({ params }: { params: Promise<{ areaId: 
   const [total, setTotal] = useState(0)
   const [used, setUsed] = useState<Map<string, string>>(new Map())
   useEffect(() => {
-    fetch(`/api/areas/${areaId}`)
+    piFetch(`/api/areas/${areaId}`)
       .then((r) => r.json())
       .then((j) => j.ok && setRole(j.role))
   }, [areaId])
@@ -60,7 +61,7 @@ export default function EntityClassPage({ params }: { params: Promise<{ areaId: 
 
   const load = useCallback(async () => {
     const sp = new URLSearchParams({ page: String(cond.page), size: String(cond.size), ...(cond.kw ? { q: cond.kw } : {}), ...(cond.sts ? { sts: cond.sts } : {}) })
-    const [l, all] = await Promise.all([fetch(`/api/areas/${areaId}/entity-classes?${sp}`).then((r) => r.json()), fetch(`/api/areas/${areaId}/entity-classes?size=100`).then((r) => r.json())])
+    const [l, all] = await Promise.all([piFetch(`/api/areas/${areaId}/entity-classes?${sp}`).then((r) => r.json()), piFetch(`/api/areas/${areaId}/entity-classes?size=100`).then((r) => r.json())])
     if (l.ok) {
       setItems(l.items)
       setTotal(l.total)
@@ -76,7 +77,7 @@ export default function EntityClassPage({ params }: { params: Promise<{ areaId: 
     const nm = pick.trim()
     if (!nm) return
     const t = setTimeout(async () => {
-      const j = await (await fetch(`/api/areas/${areaId}/words?${new URLSearchParams({ q: nm, sts: 'CNFM', size: '20' })}`)).json()
+      const j = await (await piFetch(`/api/areas/${areaId}/words?${new URLSearchParams({ q: nm, sts: 'CNFM', size: '20' })}`)).json()
       if (j.ok) setCands((j.words as Cand[]).filter((w) => w.forbid_yn !== 'Y' && w.ent_clss_yn !== 'Y'))
     }, 300)
     return () => clearTimeout(t)
@@ -95,7 +96,7 @@ export default function EntityClassPage({ params }: { params: Promise<{ areaId: 
   // 단어 수정 신청(202 = 승인대기, 200 = DA 즉시 승인)
   const send = async (w: { dic_id: string; dic_log_nm: string; ver_no: number }, body: Record<string, unknown>, what: string) => {
     const j = await (
-      await fetch(`/api/areas/${areaId}/words/${w.dic_id}`, {
+      await piFetch(`/api/areas/${areaId}/words/${w.dic_id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ver_no: w.ver_no, ...body, ...(selfApprover && selfApv ? { self_apv: true } : {}), ...(rsn.trim() ? { req_rsn: rsn.trim() } : {}) }),

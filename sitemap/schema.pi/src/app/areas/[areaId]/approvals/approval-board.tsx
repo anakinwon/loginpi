@@ -1,4 +1,5 @@
 'use client'
+import { piFetch } from '@pi/auth/client'
 // 승인 요청 목록·처리(클라이언트) — /api/areas/[areaId]/approvals(목록·필터·페이징), /approvals/[reqId](건별 승인·반려·취소), /approvals/batch(선택 승인·반려)
 import { Fragment, useCallback, useEffect, useState } from 'react'
 import { ACT_NM, APV_STS_NM } from '@/lib/roles'
@@ -77,7 +78,7 @@ export default function ApprovalBoard({ areaId, sts, tp }: { areaId: string; sts
 
   const load = useCallback(async () => {
     const sp = new URLSearchParams({ sts: cond.sts, page: String(cond.page), size: String(cond.size), ...(cond.tp && { tp: cond.tp }), ...(cond.act && { act: cond.act }), ...(cond.mine && { mine: '1' }) })
-    const j = await (await fetch(`${base}?${sp}`)).json()
+    const j = await (await piFetch(`${base}?${sp}`)).json()
     if (!j.ok) {
       setMsg(j.message)
       return
@@ -100,7 +101,7 @@ export default function ApprovalBoard({ areaId, sts, tp }: { areaId: string; sts
     setOpen(null)
   }
 
-  const post = async (url: string, body: object) => (await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json()
+  const post = async (url: string, body: object) => (await piFetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json()
 
   // 건별 처리 : 승인(의견 선택)·반려(사유 필수)·취소(신청자 본인)
   const act = async (id: string, action: 'APV' | 'RJCT' | 'CNCL') => {
