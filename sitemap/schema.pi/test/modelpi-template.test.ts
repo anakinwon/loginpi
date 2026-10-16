@@ -32,3 +32,12 @@ test('업종 추천 : 키워드 점수 순, 근거 단어, 빈 입력·무관 �
   assert.deepEqual(recommendIndustries(''), [])
   assert.deepEqual(recommendIndustries('zzz'), [])
 })
+
+test('스키마 접두사 후보 : AI → 업종 코드 → 앞 2·3자 → TB, 형식·사용 중 제외, 최대 4', async () => {
+  const { tblPfxCands } = await import('../src/lib/modelpi/template.ts')
+  assert.deepEqual(tblPfxCands('ECOM', []), ['ECOM', 'EC', 'ECO', 'TB'])
+  assert.deepEqual(tblPfxCands('ECOM', ['TB', 'ECOM']), ['EC', 'ECO', 'ECOA', 'ECOB'])
+  assert.deepEqual(tblPfxCands('FIN', [], ['bank', 'x1', 'TOOLONG']), ['BANK', 'FIN', 'FI', 'TB'])
+  assert.deepEqual(tblPfxCands(null, ['TB']), ['TBA', 'TBB', 'TBC', 'TBD'])
+  for (const x of tblPfxCands('EDU', ['EDU', 'ED'])) assert.match(x, /^[A-Z]{2,4}$/)
+})

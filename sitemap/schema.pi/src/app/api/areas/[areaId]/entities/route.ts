@@ -10,7 +10,7 @@ import { entSchema, prepareEnt } from '@/lib/model'
 import { entNames, type EntWord } from '@/lib/model-name'
 
 type Ctx = { params: Promise<{ areaId: string }> }
-const COLS = 'ent_id, subj_id, ent_log_nm, ent_tp_cd, ent_desc, dic_ids, ver_no, regr_id, reg_dtm, mdl_subj!inner(subj_nm, subj_abbr_nm, up_subj_id)'
+const COLS = 'ent_id, subj_id, ent_log_nm, ent_tp_cd, ent_desc, dic_ids, ver_no, regr_id, reg_dtm, mdl_subj!inner(subj_nm, subj_abbr_nm, up_subj_id), mdl_prj!mdl_ent_mdl_prj_id_fkey(tbl_pfx_txt)'
 
 export async function GET(req: Request, { params }: Ctx) {
   const { areaId } = await params
@@ -37,7 +37,7 @@ export async function GET(req: Request, { params }: Ctx) {
   const r = await pageRows(build, sp, 1000)
   if (r.error) return dbError(r.error)
   try {
-    const rows = r.rows as unknown as { dic_ids: string[]; mdl_subj: { subj_abbr_nm: string } }[]
+    const rows = r.rows as unknown as { dic_ids: string[]; mdl_subj: { subj_abbr_nm: string }; mdl_prj: { tbl_pfx_txt: string } | null }[]
     // 물리 테이블명 미리보기 — 현재 페이지 구성 단어를 한 번에 조회
     const ids = [...new Set(rows.flatMap((x) => x.dic_ids))]
     const w = ids.length ? await db().from('std_dic').select('dic_id, dic_log_nm, dic_phy_nm, attr_clss_yn, ent_clss_yn, forbid_yn, tbl_sfx_txt, std_sts_cd, del_yn').in('dic_id', ids) : { data: [], error: null }
@@ -45,7 +45,7 @@ export async function GET(req: Request, { params }: Ctx) {
     const by = new Map((w.data as (EntWord & { std_sts_cd: string; del_yn: string })[]).map((x) => [x.dic_id, x]))
     const named = rows.map((x) => {
       const ws = x.dic_ids.map((id) => by.get(id)).filter((v): v is EntWord & { std_sts_cd: string; del_yn: string } => !!v)
-      const n = entNames(ws, x.mdl_subj.subj_abbr_nm)
+      const n = entNames(ws, x.mdl_subj.subj_abbr_nm, x.mdl_prj?.tbl_pfx_txt)
       return { ...x, tbl_phy_nm: n.tbl_phy_nm, too_long: n.too_long, words: ws.map((v) => ({ dic_log_nm: v.dic_log_nm, ok: v.std_sts_cd === 'CNFM' && v.del_yn === 'N' })) }
     })
     const items = await withActors(areaId, 'DIC', 'ent_id', named as unknown as Record<string, unknown>[])

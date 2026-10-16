@@ -64,3 +64,18 @@ export function recommendIndustries(text: string, max = 3) {
     .sort((a, b) => b.score - a.score || INDSTRY_CDS.indexOf(a.cd) - INDSTRY_CDS.indexOf(b.cd))
     .slice(0, max)
 }
+
+// 스키마 접두사 후보(규칙, sql/023) — AI 후보(있으면) → 업종 코드 → 업종 코드 앞 2·3자 → TB 순, 영문 대문자 2~4자만, 같은 분류체계 다른 프로젝트가 쓰는 접두사 제외, 최대 4개
+// 모두 쓰이면 업종 코드 앞 3자(없으면 TB) + A~Z 로 빈 자리를 찾음
+export function tblPfxCands(cd: string | null, used: Iterable<string>, ai: string[] = [], max = 4): string[] {
+  const taken = new Set([...used].map((x) => x.toUpperCase()))
+  const base = isIndstry(cd) ? [cd, cd.slice(0, 2), cd.slice(0, 3)] : []
+  const out: string[] = []
+  for (const x of [...ai.map((a) => a.trim().toUpperCase()), ...base, 'TB']) if (/^[A-Z]{2,4}$/.test(x) && !taken.has(x) && !out.includes(x)) out.push(x)
+  const stem = isIndstry(cd) ? cd.slice(0, 3) : 'TB'
+  for (let i = 0; out.length < max && i < 26; i++) {
+    const x = stem + String.fromCharCode(65 + i)
+    if (!taken.has(x) && !out.includes(x)) out.push(x)
+  }
+  return out.slice(0, max)
+}

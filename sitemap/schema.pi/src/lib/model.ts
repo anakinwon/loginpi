@@ -31,10 +31,10 @@ export const prjCrud = simpleCrud({
   pk: 'prj_id',
   idParam: 'prjId',
   tgt: 'PRJ',
-  cols: 'prj_id, prj_nm, prj_desc, indstry_cd, sort_seq, ver_no, regr_id, reg_dtm',
+  cols: 'prj_id, prj_nm, prj_desc, indstry_cd, tbl_pfx_txt, sort_seq, ver_no, regr_id, reg_dtm',
   order: 'sort_seq',
   perm: 'REQUEST',
-  schema: z.object({ prj_nm: z.string().trim().min(1).max(100), prj_desc: z.string().trim().max(4000).nullable().optional(), indstry_cd: z.enum(INDSTRY_CDS).nullable().optional(), sort_seq: z.number().int().min(1).max(9999).optional() }),
+  schema: z.object({ prj_nm: z.string().trim().min(1).max(100), prj_desc: z.string().trim().max(4000).nullable().optional(), indstry_cd: z.enum(INDSTRY_CDS).nullable().optional(), tbl_pfx_txt: z.string().trim().regex(/^[A-Za-z]{2,4}$/).transform((s) => s.toUpperCase()).optional(), sort_seq: z.number().int().min(1).max(9999).optional() }),
   dupCode: 'PRJ_DUP',
   beforeDelete: async (id) => {
     const { data, error } = await db().from('mdl_subj').select('subj_id').eq('prj_id', id).eq('del_yn', 'N').limit(1)
@@ -83,13 +83,13 @@ export const entSchema = z.object({
 
 // 등록·수정 공용 검증 : 주제영역(같은 분류체계·활성), 구성 단어(승인완료), 이름 규칙 → 이름·미리보기 또는 오류
 export async function prepareEnt(areaId: string, b: z.infer<typeof entSchema>) {
-  const s = await db().from('mdl_subj').select('subj_abbr_nm').eq('subj_id', b.subj_id).eq('area_id', areaId).eq('del_yn', 'N').maybeSingle()
+  const s = await db().from('mdl_subj').select('subj_abbr_nm, mdl_prj!mdl_subj_mdl_prj_id_fkey(tbl_pfx_txt)').eq('subj_id', b.subj_id).eq('area_id', areaId).eq('del_yn', 'N').maybeSingle<{ subj_abbr_nm: string; mdl_prj: { tbl_pfx_txt: string } | null }>()
   if (s.error) throw s.error
   if (!s.data) return 'NOT_FOUND' as const
   const words = await entWords(areaId, b.dic_ids)
   if (!words) return 'ENT_WORD_INVALID' as const
   const bad = entNameError(words, b.ent_tp_cd)
-  return bad ?? entNames(words, s.data.subj_abbr_nm)
+  return bad ?? entNames(words, s.data.subj_abbr_nm, s.data.mdl_prj?.tbl_pfx_txt)
 }
 
 // 관계(sql/021 mdl_rel) — 목록 열, 본문 스키마, CRUD(등록·수정·삭제 = 신청 권한, 수정은 현재 행과 합쳐 규칙 재검증)

@@ -24,12 +24,16 @@ export function entNameError(words: EntWord[], tp: EntTp): ErrorCode | null {
   return null
 }
 
-// 논리명·물리 테이블명 — 끝 단어가 접미어 있는 엔터티 분류어면 그 단어 약어 대신 접미어(이력 → _H)
-export function entNames(words: EntWord[], subjAbbr: string) {
+// 스키마 접두사(프로젝트 tbl_pfx_txt, sql/023) — 영문 대문자 2~4자, 기본 TB
+export const TBL_PFX_RE = /^[A-Z]{2,4}$/
+export const TBL_PFX_DEFAULT = 'TB'
+
+// 논리명·물리 테이블명(접두사_주제영역약어_단어약어[접미어]) — 끝 단어가 접미어 있는 엔터티 분류어면 그 단어 약어 대신 접미어(이력 → _H)
+export function entNames(words: EntWord[], subjAbbr: string, pfx: string = TBL_PFX_DEFAULT) {
   const last = words[words.length - 1]
   const sfx = last?.ent_clss_yn === 'Y' && last.tbl_sfx_txt ? last.tbl_sfx_txt : ''
   const body = (sfx ? words.slice(0, -1) : words).map((w) => w.dic_phy_nm)
-  const phy = `TB_${subjAbbr}${body.length ? `_${body.join('_')}` : ''}${sfx}`
+  const phy = `${TBL_PFX_RE.test(pfx) ? pfx : TBL_PFX_DEFAULT}_${subjAbbr}${body.length ? `_${body.join('_')}` : ''}${sfx}`
   return { ent_log_nm: words.map((w) => w.dic_log_nm).join(''), tbl_phy_nm: phy, tbl_sfx_txt: sfx || null, too_long: phy.length > TBL_NM_MAX }
 }
 

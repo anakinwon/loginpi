@@ -28,7 +28,7 @@ export async function GET(req: Request, { params }: Ctx) {
   try {
     const isPrj = /^[0-9a-f-]{36}$/i.test(prj)
     // 업종 추천(프로젝트 업종 지정 시) — 프로젝트 기존 주제영역 제외
-    const ind = isPrj ? await db().from('mdl_prj').select('indstry_cd').eq('prj_id', prj).eq('area_id', areaId).eq('del_yn', 'N').maybeSingle() : null
+    const ind = isPrj ? await db().from('mdl_prj').select('indstry_cd, tbl_pfx_txt').eq('prj_id', prj).eq('area_id', areaId).eq('del_yn', 'N').maybeSingle() : null
     if (ind?.error) throw ind.error
     const tmpl = isIndstry(ind?.data?.indstry_cd) ? TEMPLATES[ind.data.indstry_cd] : null
     const dict = await areaDict<EntWord>(areaId, 'dic_id, dic_log_nm, dic_phy_nm, attr_clss_yn, ent_clss_yn, forbid_yn, tbl_sfx_txt')
@@ -39,6 +39,7 @@ export async function GET(req: Request, { params }: Ctx) {
       subjects = recommendSubjects(tmpl, ex.data as { subj_nm: string; subj_abbr_nm: string }[], dict)
     }
     const industry = tmpl ? { cd: tmpl.cd, nm: tmpl.nm } : null
+    const pfx = (ind?.data as { tbl_pfx_txt?: string } | null)?.tbl_pfx_txt // 프로젝트 스키마 접두사(sql/023)
     if (!nm) return NextResponse.json({ ok: true, fill: {}, abbr_alts: [], ents: [], subjects, industry, src: tmpl ? [`업종 템플릿 : ${tmpl.nm}`] : [] })
     const src: string[] = []
     let eng = ''
@@ -92,7 +93,7 @@ export async function GET(req: Request, { params }: Ctx) {
     const have = new Set(ex.data.map((x) => x.ent_log_nm as string))
     const eAbbr = (/^[A-Z]{3}$/.test(subjAbbr) ? subjAbbr : abbr) || '○○○'
     // 업종 핵심 엔터티 먼저(미등록 단어 포함, 화면이 신청 안내), 그다음 기본 조합·복합어(바로 등록 가능한 것만)
-    const ents: EntRec[] = tmpl ? recommendEntities(tmpl, nm, eAbbr, have, dict) : []
+    const ents: EntRec[] = tmpl ? recommendEntities(tmpl, nm, eAbbr, have, dict, pfx) : []
     const seen = new Set(ents.map((e) => e.ent_log_nm))
     let pat = 0
     for (const n of names) {
@@ -100,7 +101,7 @@ export async function GET(req: Request, { params }: Ctx) {
       const segs = splitTerm(n, dict)[0]
       const ws = segs?.flatMap((x) => ('word' in x ? [x.word as EntWord] : [])) ?? []
       if (!ws.length || ws.length !== segs.length || entNameError(ws, 'BASE')) continue
-      const e = entNames(ws, eAbbr)
+      const e = entNames(ws, eAbbr, pfx)
       if (have.has(e.ent_log_nm) || seen.has(e.ent_log_nm)) continue
       ents.push({ ent_log_nm: e.ent_log_nm, tbl_phy_nm: e.tbl_phy_nm, dic_ids: ws.map((w) => w.dic_id), ent_tp_cd: 'BASE', ent_desc: '', ok: true, missing_words: [], rule_error: null, src: 'pattern' as const })
       pat++

@@ -30,3 +30,10 @@ test('주제영역 약어 3자 : 이커머스 예시', () => {
   assert.ok(subjAbbrCands('Customer').length > 1, '중복 대비 대안')
   assert.deepEqual(subjAbbrCands(''), [])
 })
+
+test('스키마 접두사(sql/023) : 프로젝트 접두사로 시작, 형식 밖이면 기본 TB', () => {
+  assert.equal(entNames([고객, 등급, 이력], 'CCS', 'ECOM').tbl_phy_nm, 'ECOM_CCS_CUST_GRD_H')
+  assert.equal(entNames([고객], 'CCS', 'EC').tbl_phy_nm, 'EC_CCS_CUST')
+  assert.equal(entNames([고객], 'CCS').tbl_phy_nm, 'TB_CCS_CUST')
+  assert.equal(entNames([고객], 'CCS', 'ec1').tbl_phy_nm, 'TB_CCS_CUST')
+})
