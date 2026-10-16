@@ -1,0 +1,3 @@
+# schema.pi 줄 끝 고정 — sql 은 db-migrate 가 파일 바이트 SHA-256 을 sys_mgrt_hist 와 대조하므로 LF 로 고정(CRLF 체크아웃 시 해시 불일치로 중단, 2026-10-16)
+*.sql text eol=lf
+*.sh text eol=lf
