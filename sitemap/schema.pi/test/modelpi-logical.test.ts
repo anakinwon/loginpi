@@ -16,11 +16,23 @@ test('핵심어 : 끝 엔터티 분류어 제외', () => {
   assert.equal(entCore([W('고객')]).clss, null)
 })
 
-test('기본 엔터티 : PK ~번호, 필수 = 이름 + 상태·구분 코드 2개', () => {
+test('기본(실체) 엔터티 : PK ~번호, 필수 4종 먼저(명칭·등록일시·상태코드) 뒤 구분 코드', () => {
   const r = recommendAttrs({ ...base, words: [W('고객'), C('기본')], tp: 'BASE' })
   assert.deepEqual(r.pk.map((c) => [c.term_log_nm, c.missing]), [['고객번호', false]])
-  assert.deepEqual(r.required.map((c) => c.term_log_nm), ['고객명', '고객구분코드', '고객상태코드'])
+  assert.deepEqual(r.required.map((c) => [c.term_log_nm, c.must ?? '', c.missing]), [['고객명', 'name', false], ['고객등록일시', 'dt', true], ['고객상태코드', 'st', false], ['고객구분코드', '', false]])
   assert.ok(r.required.every((c) => c.esntl))
+})
+
+test('필수 4종 : 행위 엔터티 = 핵심어+일시, 이미 충족한 범주 생략, 점검표', () => {
+  const act = recommendAttrs({ ...base, words: [W('주문'), C('기본')], tp: 'ACT' })
+  assert.deepEqual(act.required.filter((c) => c.must).map((c) => c.term_log_nm), ['주문명', '주문일시', '주문상태코드'])
+  assert.deepEqual(act.must, { pk: false, name: false, dt: false, st: false })
+  const done = recommendAttrs({ ...base, havePk: true, have: new Set(['고객번호', '고객명', '가입일시', '회원상태코드']), words: [W('고객'), C('기본')], tp: 'BASE' })
+  assert.deepEqual(done.must, { pk: true, name: true, dt: true, st: true })
+  assert.ok(!done.required.some((c) => c.must), '충족한 범주는 추천하지 않음')
+  const tm = recommendAttrs({ ...base, tmpl: { terms: ['고객번호', '고객명', '가입일시', '회원상태코드'], pk: ['고객번호'] }, words: [W('고객'), C('기본')], tp: 'BASE' })
+  // 범주별로 표준에 있는 용어 우선(고객상태코드), 모두 없으면 업종 템플릿 이름(가입일시 → 용어 신청)
+  assert.deepEqual(tm.required.filter((c) => c.must).map((c) => [c.term_log_nm, c.src, c.missing]), [['고객명', 'industry', false], ['가입일시', 'industry', true], ['고객상태코드', 'rule', false]])
 })
 
 test('상세 엔터티 : 식별 관계 부모 PK 상속 + 순번', () => {

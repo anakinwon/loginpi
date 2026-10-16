@@ -28,14 +28,18 @@ interface Cand {
   reason: string
   missing: boolean
   fk_rel_id?: string
+  must?: 'name' | 'dt' | 'st'
 }
+// 필수 4종(마스터 지시 2026-10-17) : 주식별자·주식별자 명칭·행위 일시·행위 상태코드
+type Must = { pk: boolean; name: boolean; dt: boolean; st: boolean }
+const MUST_NM: Record<keyof Must, string> = { pk: '주식별자', name: '주식별자 명칭', dt: '행위 일시', st: '행위 상태코드' }
 const ROLE_NM = { PK: '주식별자', FK: '참조(FK)', REQ: '필수' } as const
 const SRC_NM = { industry: '업종', rule: '규칙', inherit: '상속' } as const
 
 export default function Attrs({ api, areaId, entId, entNm, editor }: { api: string; areaId: string; entId: string; entNm: string; editor: boolean }) {
   const base = `${api}/entities/${entId}/attributes`
   const [items, setItems] = useState<Attr[]>([])
-  const [sug, setSug] = useState<{ pk: Cand[]; required: Cand[]; warn: string[] }>({ pk: [], required: [], warn: [] })
+  const [sug, setSug] = useState<{ pk: Cand[]; required: Cand[]; warn: string[]; must?: Must }>({ pk: [], required: [], warn: [] })
   const [chk, setChk] = useState<Set<string>>(new Set())
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState('')
@@ -44,7 +48,7 @@ export default function Attrs({ api, areaId, entId, entNm, editor }: { api: stri
     const [a, s] = await Promise.all([piFetch(base).then((r) => r.json()), piFetch(`${base}/suggest`).then((r) => r.json())])
     if (a.ok) setItems(a.items)
     if (s.ok) {
-      setSug({ pk: s.pk, required: s.required, warn: s.warn })
+      setSug({ pk: s.pk, required: s.required, warn: s.warn, must: s.must })
       // 기본 체크 = 용어가 있는 주식별자·필수 후보(선택 FK 는 해제)
       setChk(new Set([...s.pk, ...s.required].filter((c: Cand) => !c.missing && (c.role === 'PK' || c.esntl)).map((c: Cand) => c.term_log_nm)))
     }
@@ -109,6 +113,7 @@ export default function Attrs({ api, areaId, entId, entNm, editor }: { api: stri
           {c.role === 'PK' && '🔑 '}
           {c.term_log_nm}
         </span>{' '}
+        {(c.role === 'PK' || c.must) && <span className="rounded bg-amber-200 px-1 text-[0.65rem] text-amber-900">필수 4종</span>}{' '}
         {!c.missing && <span className="font-mono text-gray-500">{c.term_phy_nm}</span>} <span className="text-gray-500">{c.dom_nm}</span>{' '}
         <span className="rounded bg-gray-100 px-1 text-[0.65rem] text-gray-600">
           {ROLE_NM[c.role]}
@@ -126,6 +131,16 @@ export default function Attrs({ api, areaId, entId, entNm, editor }: { api: stri
 
   return (
     <div className="space-y-2 rounded border border-[#d5ddec] bg-[#f8fafd] p-3 text-xs">
+      {sug.must && (
+        <p className="flex flex-wrap items-center gap-1" aria-label="필수 4종 점검">
+          <span className="font-semibold text-[#1f3a68]">필수 4종 점검 :</span>
+          {(Object.keys(MUST_NM) as (keyof Must)[]).map((k) => (
+            <span key={k} className={`rounded px-1.5 py-0.5 ${sug.must![k] ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-700'}`}>
+              {sug.must![k] ? '✓' : '✗'} {MUST_NM[k]}
+            </span>
+          ))}
+        </p>
+      )}
       <table className="w-full border-collapse bg-white">
         <thead>
           <tr className="thead-3d text-center">

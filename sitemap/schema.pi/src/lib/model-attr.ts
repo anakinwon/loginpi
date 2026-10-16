@@ -70,6 +70,7 @@ export async function attrSuggestInput(areaId: string, ent: NonNullable<Awaited<
     parents,
     terms: [...flat(pre.data), ...flat(ex.data)],
     have: new Set(mine.map((a) => toRow(a).term_log_nm)),
+    havePk: mine.some((a) => a.pk_yn === 'Y'),
   }
 }
 
