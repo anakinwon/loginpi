@@ -2,7 +2,7 @@
 import { piFetch } from '@pi/auth/client'
 // 엔터티 속성 패널(MD3, sql/025) — 등록된 속성(주식별자·필수·용어·물리명·도메인) + 주식별자·필수 속성 추천 체크 목록 → 선택 등록(반자동)
 // 추천은 저장하지 않음(GET …/attributes/suggest), 고른 것만 POST …/attributes. 용어 없는 후보는 빨강·체크 불가·용어 신청 링크(표준 선행)
-// 물리명은 물리 모델 전환 전까지 항상 대문자(PRD §2.6)
+// 물리명은 물리 모델 전환 전까지 항상 대문자(PRD §2.6). 순서 = ▲▼(주식별자는 앞 묶음 안에서만, 일반 속성은 그 뒤에서만 이동, PUT …/attributes/order)
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import { confirmSave } from '../words/word-board'
@@ -76,6 +76,17 @@ export default function Attrs({ api, areaId, entId, entNm, editor }: { api: stri
     setMsg(j.ok ? '' : j.message)
     void load()
   }
+  // 순서 이동 — 같은 묶음(주식별자 / 일반) 안에서 이웃과 맞바꿔 전체 순서 저장
+  const move = async (k: number, d: -1 | 1) => {
+    const j = k + d
+    if (j < 0 || j >= items.length || items[j].pk_yn !== items[k].pk_yn) return
+    const ids = items.map((a) => a.attr_id)
+    ;[ids[k], ids[j]] = [ids[j], ids[k]]
+    setItems((xs) => ids.map((id) => xs.find((x) => x.attr_id === id)!))
+    const r = await (await piFetch(`${base}/order`, { method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ids }) })).json()
+    setMsg(r.ok ? '' : r.message)
+    void load()
+  }
   const del = async (a: Attr) => {
     if (!confirm(`속성 ${a.std_term?.term_log_nm} 을(를) 삭제하시겠습니까?`)) return
     const j = await (await piFetch(`${base}/${a.attr_id}?ver_no=${a.ver_no}`, { method: 'DELETE' })).json()
@@ -118,7 +129,7 @@ export default function Attrs({ api, areaId, entId, entNm, editor }: { api: stri
       <table className="w-full border-collapse bg-white">
         <thead>
           <tr className="thead-3d text-center">
-            {['PK', '필수', '속성(용어)', '물리명', '도메인', '처리'].map((h) => (
+            {['순서', 'PK', '필수', '속성(용어)', '물리명', '도메인', '처리'].map((h) => (
               <th key={h} className="border px-2 py-1">
                 {h}
               </th>
@@ -128,13 +139,26 @@ export default function Attrs({ api, areaId, entId, entNm, editor }: { api: stri
         <tbody>
           {items.length === 0 ? (
             <tr>
-              <td colSpan={6} className="border px-2 py-2 text-center text-gray-500">
+              <td colSpan={7} className="border px-2 py-2 text-center text-gray-500">
                 등록된 속성이 없습니다 — 아래 추천에서 골라 등록하십시오
               </td>
             </tr>
           ) : (
-            items.map((a) => (
+            items.map((a, k) => (
               <tr key={a.attr_id}>
+                <td className="border px-1 py-1 text-center whitespace-nowrap">
+                  <span className="mr-1 tabular-nums text-gray-500">{k + 1}</span>
+                  {editor && (
+                    <>
+                      <button type="button" onClick={() => void move(k, -1)} disabled={k === 0 || items[k - 1].pk_yn !== a.pk_yn} className="px-0.5 disabled:opacity-20" aria-label={`${a.std_term?.term_log_nm} 위로`} title="위로">
+                        ▲
+                      </button>
+                      <button type="button" onClick={() => void move(k, 1)} disabled={k === items.length - 1 || items[k + 1].pk_yn !== a.pk_yn} className="px-0.5 disabled:opacity-20" aria-label={`${a.std_term?.term_log_nm} 아래로`} title="아래로">
+                        ▼
+                      </button>
+                    </>
+                  )}
+                </td>
                 <td className="border px-2 py-1 text-center">
                   {editor ? (
                     <button type="button" onClick={() => void patch(a, { pk_yn: a.pk_yn === 'Y' ? 'N' : 'Y' })} title="주식별자 지정·해제">
