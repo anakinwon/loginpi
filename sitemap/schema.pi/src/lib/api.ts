@@ -14,6 +14,7 @@ const ERRORS = {
   LINK_ALREADY_LINKED: '이미 연동된 계정입니다',
   LINK_CODE_INVALID: '연동 코드가 올바르지 않거나 만료되었습니다',
   LINK_CODE_GEN_FAILED: '연동 코드를 만들지 못했습니다. 다시 시도하십시오',
+  LINK_CODE_LOCKED: '연동 코드 오류가 반복되어 10분간 잠겼습니다. 잠시 뒤 다시 시도하십시오',
   FORBIDDEN: '권한이 없습니다',
   NOT_FOUND: '대상을 찾을 수 없습니다',
   AREA_DUP_NM: '같은 이름의 분류체계가 이미 있습니다',
