@@ -14,6 +14,18 @@ const schema = z.object({
   NEXT_PUBLIC_PI_APP_DOMAIN: z.string().optional(),
   // 로그인 시 sys_user.role_cd=ADMIN 으로 승격할 Pi 사용자명(쉼표 구분)
   ADMIN_PI_USERNAMES: z.string().optional(),
+  // Google 로그인(NextAuth, 일반 브라우저) — 셋 다 있어야 활성(src/auth.ts googleEnabled). 운영은 AUTH_URL 설정 금지(host 자동 감지)
+  AUTH_SECRET: z.string().min(32, 'AUTH_SECRET는 최소 32자 이상이어야 합니다').optional(),
+  GOOGLE_CLIENT_ID: z.string().optional(),
+  GOOGLE_CLIENT_SECRET: z.string().optional(),
+  // Google 버튼 노출 플래그(클라이언트 인라인) — 서버 3종이 없으면 버튼만 보이고 404 가 나므로 함께 설정
+  NEXT_PUBLIC_GOOGLE_LOGIN: z.enum(['1']).optional(),
+}).superRefine((v, ctx) => {
+  const g = [v.GOOGLE_CLIENT_ID, v.GOOGLE_CLIENT_SECRET, v.AUTH_SECRET]
+  if (g.some(Boolean) && !g.every(Boolean))
+    ctx.addIssue({ code: 'custom', path: ['GOOGLE_CLIENT_ID'], message: 'Google 로그인은 GOOGLE_CLIENT_ID·GOOGLE_CLIENT_SECRET·AUTH_SECRET 세 값을 함께 설정해야 합니다' })
+  if (v.NEXT_PUBLIC_GOOGLE_LOGIN === '1' && !g.every(Boolean))
+    ctx.addIssue({ code: 'custom', path: ['NEXT_PUBLIC_GOOGLE_LOGIN'], message: 'NEXT_PUBLIC_GOOGLE_LOGIN=1 은 Google 서버 설정 3종이 있을 때만' })
 })
 
 const parsed = schema.safeParse(process.env)

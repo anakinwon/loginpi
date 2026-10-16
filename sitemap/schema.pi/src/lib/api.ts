@@ -2,13 +2,18 @@
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import type { ZodType } from 'zod'
-import { getSessionUser } from './auth'
+import { getAppUser } from './auth'
 import { db } from './db'
 import { can, type MbrRole, type Perm } from './roles'
 
 const ERRORS = {
   INVALID_INPUT: '입력값이 올바르지 않습니다',
   AUTH_REQUIRED: '로그인이 필요합니다',
+  AUTH_PI_REQUIRED: 'Pi Browser 에서 Pi 계정으로 로그인해야 합니다',
+  AUTH_GOOGLE_REQUIRED: 'Google 로그인이 필요합니다',
+  LINK_ALREADY_LINKED: '이미 연동된 계정입니다',
+  LINK_CODE_INVALID: '연동 코드가 올바르지 않거나 만료되었습니다',
+  LINK_CODE_GEN_FAILED: '연동 코드를 만들지 못했습니다. 다시 시도하십시오',
   FORBIDDEN: '권한이 없습니다',
   NOT_FOUND: '대상을 찾을 수 없습니다',
   AREA_DUP_NM: '같은 이름의 분류체계가 이미 있습니다',
@@ -106,10 +111,10 @@ export interface CurrentUser {
   pi_usr_nm: string
 }
 
-// 현재 사용자 — Pi 세션(쿠키 OR X-Pi-Token 헤더, src/lib/auth.ts) 우선. 비운영 빌드에서만 개발 임시 사용자(쿠키 dev_user → DEV_USER_PI_NM) 폴백
+// 현재 사용자 — 통합 세션(Pi 쿠키 OR X-Pi-Token → Google 연동 세션, src/lib/auth.ts getAppUser) 우선. 비운영 빌드에서만 개발 임시 사용자(쿠키 dev_user → DEV_USER_PI_NM) 폴백
 export async function currentUser(): Promise<CurrentUser | null> {
-  const pi = await getSessionUser()
-  if (pi) return { usr_id: pi.usr_id, pi_usr_nm: pi.pi_usr_nm }
+  const u = await getAppUser()
+  if (u) return { usr_id: u.usr_id, pi_usr_nm: u.pi_usr_nm }
   if (process.env.NODE_ENV === 'production') return null
   const nm = (await cookies()).get(DEV_COOKIE)?.value || process.env.DEV_USER_PI_NM
   if (!nm || !DEV_USER_RE.test(nm)) return null

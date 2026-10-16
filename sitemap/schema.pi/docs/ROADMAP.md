@@ -131,3 +131,4 @@
 | 2026-10-15 | 0단계 문서 정리 : 제안서 결정 기록·PRD_27 동결 처리 방침·스테이징 상태 기록 |
 | 2026-10-15 | loginpi 분리 결정 : 0단계 폐기·revert(`11cff97b`, Vercel 3종 success 확인), 문서 정본을 nia-dr-project로 이동, 재설계 대기 |
 | 2026-10-15 | v0.2 재설계 : 0단계를 독립 기반으로 교체(구 0단계 폐기 이력 보존) |
+| 2026-10-16 | loginpi 편입·운영 배포(schem.vercel.app, prod/schema) : Pi 로그인(@pi/auth) + Google 로그인 통합(연동 코드, sql/020 sys_usr_auth_lnk·sys_auth_lnk_cd) |

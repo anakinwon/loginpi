@@ -2,7 +2,8 @@
 // ⚠ getSessionUser() null 시 redirect 금지(Pi Browser 무한 루프) → 클라이언트 게이트(src/app/login-gate.tsx)로 위임
 // 사용자 매칭 철칙 : pi_uid 는 앱·네트워크 scoped 라 영구 식별자 금지 — 사람의 불변 키는 pi_usr_nm(활성 행 UNIQUE)
 import 'server-only'
-import { createGetSessionUser, type PiAuthUserRecord } from '@pi/auth'
+import { createGetSessionUser, type PiAuthUserRecord, type TokenSource } from '@pi/auth'
+import { auth, googleEnabled } from '@/auth'
 import { db } from './db'
 
 export interface AuthUser extends PiAuthUserRecord {
@@ -77,7 +78,21 @@ export async function upsertUser(pi: { uid: string; username: string | null; wal
   return toAuthUser(data as Row)
 }
 
-// 현재 Pi 세션 사용자(쿠키 우선 → X-Pi-Token 헤더 폴백) — 로그인 시각 갱신은 응답을 막지 않는다
+// 통합 세션 — Pi 우선, 없으면 Google(NextAuth) 세션의 연동 사용자(session.user.id = sys_user.usr_id, 미연동이면 '')
+export async function getAppUser(req?: TokenSource): Promise<AuthUser | null> {
+  const pi = await getSessionUser(req)
+  if (pi) return pi
+  if (!googleEnabled()) return null
+  try {
+    const session = await auth()
+    const id = session?.user?.id
+    return id ? await getUserById(id) : null
+  } catch {
+    return null
+  }
+}
+
+// Pi 세션만(쿠키 우선 → X-Pi-Token 헤더 폴백) — 연동 코드 발급처럼 "Pi Browser 로그인" 자체가 조건인 곳에서 사용. 로그인 시각 갱신은 응답을 막지 않는다
 export const getSessionUser = createGetSessionUser<AuthUser>({
   sessionSecret: process.env.PI_SESSION_SECRET,
   getUserById,
