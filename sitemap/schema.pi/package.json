@@ -2,7 +2,7 @@
   "name": "schema-pi",
   "version": "0.1.0",
   "private": true,
-  "description": "schema.pi 데이터 표준사전 메타시스템 — loginpi와 분리된 독립 프로젝트(Next.js 16 · React 19 · Tailwind v4)",
+  "description": "schema.pi 데이터 표준사전 메타시스템 — loginpi 워크스페이스 멤버(sitemap/*), 공용 인증 @pi/auth(Next.js 16 · React 19 · Tailwind v4)",
   "packageManager": "pnpm@11.4.0",
   "scripts": {
     "dev": "next dev --turbopack -p 3002",
@@ -13,6 +13,8 @@
     "test": "node --test \"test/**/*.test.ts\""
   },
   "dependencies": {
+    "@pi/auth": "workspace:*",
+    "@pi/guard": "workspace:*",
     "@supabase/supabase-js": "^2.117.3",
     "next": "16.2.7",
     "postgres": "^3.4.9",

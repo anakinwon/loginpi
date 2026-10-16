@@ -1,3 +1,0 @@
-# schema.pi 단독 pnpm 설정 — 설치 스크립트 허용 목록(sharp : next/image 처리, loginpi 동일 설정)
-allowBuilds:
-  sharp: true
