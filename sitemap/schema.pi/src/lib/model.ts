@@ -1,0 +1,92 @@
+// 개념 모델(PRD §2.5 MD1) — 주제영역 CRUD 설정, 엔터티 구성 단어 조회(이름 규칙은 model-name.ts)
+// 엔터티명 = 표준단어 결합(정의서 §8.4 엔터티 정의 + [데이터 성격 = 엔터티 분류어]), 물리명 = TB_ + 주제영역 약어 + 단어 약어 + 테이블 접미어
+import { z } from 'zod'
+import { db } from './db'
+import { simpleCrud } from './simple-crud'
+import { areaDict } from './term'
+import { splitTerm } from './term-split'
+import { entNameError, entNames, ENT_TP, type EntTp, type EntWord } from './model-name'
+
+// 이름이 승인완료 표준단어이거나 표준단어로만 분해되는지(주제영역명 규칙 : 표준에 근거한 이름만, 2026-10-16 마스터 지시)
+export async function isStdName(areaId: string, nm: string): Promise<boolean> {
+  const dict = await areaDict(areaId)
+  const segs = splitTerm(nm.trim(), dict)[0]
+  return !!segs?.length && segs.every((s) => 'word' in s)
+}
+
+// 승인완료 표준단어를 요청 순서대로(하나라도 없거나 미확정이면 null)
+export async function entWords(areaId: string, ids: string[]): Promise<EntWord[] | null> {
+  const { data, error } = await db().from('std_dic').select('dic_id, dic_log_nm, dic_phy_nm, attr_clss_yn, ent_clss_yn, forbid_yn, tbl_sfx_txt').eq('area_id', areaId).eq('del_yn', 'N').eq('std_sts_cd', 'CNFM').in('dic_id', ids)
+  if (error) throw error
+  const by = new Map((data as EntWord[]).map((w) => [w.dic_id, w]))
+  const out = ids.map((id) => by.get(id))
+  return out.every(Boolean) ? (out as EntWord[]) : null
+}
+
+// 프로젝트 CRUD(여러 개, 프로젝트명 = 자유 이름) — 등록·수정·삭제 = 신청 권한, 주제영역이 있으면 삭제 불가
+export const prjCrud = simpleCrud({
+  table: 'mdl_prj',
+  pk: 'prj_id',
+  idParam: 'prjId',
+  tgt: 'PRJ',
+  cols: 'prj_id, prj_nm, prj_desc, sort_seq, ver_no, regr_id, reg_dtm',
+  order: 'sort_seq',
+  perm: 'REQUEST',
+  schema: z.object({ prj_nm: z.string().trim().min(1).max(100), prj_desc: z.string().trim().max(4000).nullable().optional(), sort_seq: z.number().int().min(1).max(9999).optional() }),
+  dupCode: 'PRJ_DUP',
+  beforeDelete: async (id) => {
+    const { data, error } = await db().from('mdl_subj').select('subj_id').eq('prj_id', id).eq('del_yn', 'N').limit(1)
+    if (error) throw error
+    return data.length ? 'PRJ_IN_USE' : null
+  },
+})
+
+// 주제영역 CRUD — 등록·수정·삭제 = 신청 권한(DA·STD·MDL), 하위 주제영역·엔터티가 있으면 삭제 불가
+export const subjCrud = simpleCrud({
+  table: 'mdl_subj',
+  pk: 'subj_id',
+  idParam: 'subjId',
+  tgt: 'SUBJ',
+  cols: 'subj_id, prj_id, up_subj_id, subj_nm, subj_abbr_nm, subj_desc, sort_seq, ver_no, regr_id, reg_dtm',
+  order: 'sort_seq',
+  perm: 'REQUEST',
+  schema: z.object({
+    prj_id: z.string().uuid(),
+    up_subj_id: z.string().uuid().nullable().optional(),
+    subj_nm: z.string().trim().min(1).max(100),
+    subj_abbr_nm: z.string().trim().regex(/^[A-Za-z]{3}$/).transform((s) => s.toUpperCase()),
+    subj_desc: z.string().trim().max(4000).nullable().optional(),
+    sort_seq: z.number().int().min(1).max(9999).optional(),
+  }),
+  dupCode: 'SUBJ_DUP',
+  beforeSave: async (areaId, row) => ('subj_nm' in row && !(await isStdName(areaId, row.subj_nm as string)) ? 'SUBJ_NOT_WORD' : null),
+  beforeDelete: async (id) => {
+    const [c, e] = await Promise.all([
+      db().from('mdl_subj').select('subj_id').eq('up_subj_id', id).eq('del_yn', 'N').limit(1),
+      db().from('mdl_ent').select('ent_id').eq('subj_id', id).eq('del_yn', 'N').limit(1),
+    ])
+    if (c.error) throw c.error
+    if (e.error) throw e.error
+    return c.data.length || e.data.length ? 'SUBJ_IN_USE' : null
+  },
+})
+
+// 엔터티 등록·수정 본문
+export const entSchema = z.object({
+  subj_id: z.string().uuid(),
+  dic_ids: z.array(z.string().uuid()).min(1).max(20),
+  ent_tp_cd: z.enum(Object.keys(ENT_TP) as [EntTp, ...EntTp[]]).default('BASE'),
+  ent_desc: z.string().trim().max(4000).nullable().optional(),
+})
+
+// 등록·수정 공용 검증 : 주제영역(같은 분류체계·활성), 구성 단어(승인완료), 이름 규칙 → 이름·미리보기 또는 오류
+export async function prepareEnt(areaId: string, b: z.infer<typeof entSchema>) {
+  const s = await db().from('mdl_subj').select('subj_abbr_nm').eq('subj_id', b.subj_id).eq('area_id', areaId).eq('del_yn', 'N').maybeSingle()
+  if (s.error) throw s.error
+  if (!s.data) return 'NOT_FOUND' as const
+  const words = await entWords(areaId, b.dic_ids)
+  if (!words) return 'ENT_WORD_INVALID' as const
+  const bad = entNameError(words, b.ent_tp_cd)
+  return bad ?? entNames(words, s.data.subj_abbr_nm)
+}
+

@@ -1,83 +1,74 @@
-# CLAUDE.md — schema.pi
+# CLAUDE.md : schema.pi
 
-@../../CLAUDE.md
+데이터 표준사전 메타시스템(표준분류체계·표준단어·표준도메인·표준용어·승인·변경 이력). nia-dr-project 저장소 안의 **독립 프로젝트**이며, 상위 `nia-dr-project/.claude/CLAUDE.md`의 언어·커밋·문체 규칙을 함께 따른다.
 
-> **우선순위** : 위 루트(loginpi) CLAUDE.md 규칙을 먼저 적용한다. 이 파일은 schema.pi 전용 추가 규칙만 담고, 충돌 시 루트를 따른다.
-> - 이 파일의 규칙 중 루트보다 **엄격한 제약**(Bean·토큰 어휘 금지와 Pi 직접 가격, 외부 이동 안내, 광고 라벨)은 충돌이 아니라 추가 제약으로 함께 적용한다.
-> - cafe.pi 전용 항목(PiRC2 구독 컨트랙트·카페 테마·189 locale·Bean 요금제 등)은 해당 기능을 도입할 때만 적용한다. **Google 세션은 2026-10-11 도입**(마스터 예외 — Pi 계정 연동 전제, `docs/LOGIN_PLAYBOOK.md`) → 루트 CLAUDE.md 통합 체크 규칙(`getSessionUser` = Pi OR Google) 그대로 적용.
+- 요구사항 정본 : `docs/PRD.md` / 일정·진행 현황 : `docs/ROADMAP.md` / 출발 근거 : `docs/requirement/reqst.md`(DA Wordict 분석서)
+- 기능·규칙을 바꾸면 ROADMAP 해당 단계에 진행 기록 1줄을 같은 커밋으로 남긴다
 
-Pi Network에서 만들어진 `.pi` 사이트를 등록·홍보하는 디렉터리 서비스.
+## 절대 규칙
 
-- 요구사항 정본 : `docs/PRD.md` / 로드맵 : `docs/ROADMAP.md`
-- 상위 플랜 : `../../docs/PRD_28_PI_MULTISITE.md`(19개 .pi 멀티사이트, 오라클 멀티테넌트형) — schema.pi는 W1 1호. 사이트별 앱·DB·배포 분리 원칙(PRD_28 §1)에 따라 **별도 앱**(별도 DB·독립 웹서버 마스터 확정 2026-10-09). 구 설계 `../../docs/PRD_27_PI_FACTORY.md`는 동결·대체됨
+1. **loginpi 무영향** : loginpi 저장소(`C:\Users\USER\workspace\loginpi`)와 sitemap.pi는 수정·커밋·푸시·배포 금지. loginpi 코드·문서는 **읽기 참고만** 허용(2026-10-15 마스터 결정). `@pi/*` 패키지 의존 금지, 필요한 기능은 schema.pi 안에 직접 구현
+2. **푸시·배포는 명시 승인 후** : 로컬 커밋까지만 기본. Vercel 배포는 마스터 지시 전 금지
+3. **추측 금지** : 미확정 값은 `[TBD]`·`[확인중 : 확인 채널]`로만 표기
 
----
+## 스택·명령
 
-## ⭐ 핵심 가치 (최우선)
-
-1. **Pi Browser에서 Pi 계정으로 로그인할 수 있어야 한다.**
-2. **Pi Browser에서 Pi 계정으로 결제할 수 있어야 한다.**
-3. **유료 노출은 항상 "광고" 라벨로 구분되고, 결제는 일반 순위에 영향을 주지 않는다.**
-
-인증·결제·노출 변경은 **Pi Browser 실기기 검증 뒤에만 완료**로 간주한다.
-
-## 승계 철칙 (cafe.pi에서 검증된 규칙 — 위반 시 장애)
-
-- Pi Browser는 `Set-Cookie`를 저장하지 않음 → 인증은 **쿠키 OR `X-Pi-Token` 헤더** 이중 경로, 클라이언트는 `piFetch`
-- `getSessionUser()` null 시 **redirect 금지**(무한 루프) → 클라이언트 게이트
-- Pi Browser 판정에 UA 사용 금지 — `window.Pi.authenticate()` 성공만 신뢰
-- 사람의 불변 키는 `pi_username`(uid는 앱별 scoped 값 — 이 앱은 cafe.pi와 uid가 다름)
-- 결제 complete는 클라이언트 금액 불신, 서버가 `fee_plan`으로 정가 재계산
-- 가격은 **Pi 직접 표기**, Bean·토큰·코인 어휘 금지(등재 심사 "Pi 외 통화" 레드라인, `../../docs/MAINNET_READINESS_CHECKLIST.md` A-5)
-- 외부 사이트 이동은 **사용자 클릭 + 이동 안내** 후에만, 자동 리다이렉트·iframe 삽입 금지(`../../docs/MAINNET_READINESS_CHECKLIST.md` A-6)
-
-## 아키텍처
-
-| 항목 | 결정 |
-|---|---|
-| 앱 | 이 폴더의 독립 Next.js 앱 — loginpi pnpm 워크스페이스 멤버(`schema/*`, `../../docs/PRD_28_PI_MULTISITE.md` §3) |
-| 웹서버 | **독립 웹서버(마스터 확정 2026-10-09)** — cafe.pi와 빌드·배포·런타임·도메인 완전 분리. 기본안 별도 Vercel 프로젝트(Root Directory = `schema/schema.pi`, 운영 브랜치 `prod/schema`), 자체 호스팅(VM·컨테이너) 여부 [확인중 : 마스터] |
-| Pi | 별도 Developer Portal 앱·API 키 |
-| DB | **별도 Supabase 프로젝트의 PostgreSQL(마스터 확정 2026-10-09)** — 운영은 전용 프로젝트, 개발·스테이징은 공유 `pi-nonprod` 프로젝트의 `schema_dev`·`schema_stg` 스키마(PRD_28 §5), cafe.pi DB와 공유하지 않음, RLS 비활성 + 서버 전용 SERVICE_ROLE_KEY(cafe.pi 패턴) |
-| 공용 코드 | **워크스페이스 패키지 의존**(`@pi/auth`·`@pi/db`·`@pi/guard`·`@pi/payments`, PRD_28 §4 — 복제 금지). 출처 : `pi-session-crypto`·`pi-fetch`·`auth-check`(getSessionUser·isAdmin)·`api/auth/pi`·`pi-pay-button`·`api/payments/approve·complete` |
-| 기술 스택 | cafe.pi와 동일 버전(Next 16 · React 19 · Tailwind v4 · shadcn base-nova · next-intl v4 · zod 4) |
-| DA | `../../docs/da/데이터표준규칙.md` 적용(시스템 컬럼 4개·`del_yn` 논리삭제·물리 DELETE 금지). 공통 테이블(`sys_user`·`pi_pymnt`)은 `@pi/db` baseline 승계(PRD_28 §4) |
-
-## 작업 팀
-
-teamAnakin(`../../.claude/agents/teamAnakin/`) 단계 운용을 기본으로 하고, 도메인 판단은 보강 인원에 맡긴다.
-
-| 구분 | 에이전트 | 역할 | 호출 시점 |
-|---|---|---|---|
-| 팀장 | teamanakin-admin | 취합·검토·승인 | 팀원이 실행된 모든 턴의 마지막 |
-| 단계 | anakin_phase-collect / decide / verify / review / commit | 수집 / 결론 / 실행 검증 / 문서 검수 / 커밋 | 단계 전환 시 |
-| 보강 | pi-mainnet-listing-auditor | A-6 질의·광고 라벨·어휘 심사 | Phase 0, Phase 2 출시 전 게이트 |
-| 보강 | pricing-promo-manager | `fee_plan` 단가·프로모 토글·자사 구매 금지 규칙 | Phase 2 설계 |
-| 보강 | legal-compliance-advisor | 약관·금지 카테고리·광고 표시·연락처·리뷰 운영정책 | Phase 0, Phase 3 |
-| 보강 | da-governance-expert | DDL 리뷰(접두사·시스템 컬럼·`fee_`·`ordr` 명명) | DDL이 생기는 Phase마다(1·2·3) |
-| 보강 | kisa-web-security-auditor | URL 입력·이미지 업로드·신고 API 점검 | Phase 1 출시 전 |
-| 보강 | prd-roadmap-consultant | PRD·ROADMAP 갱신 | Phase 경계 |
-
-## 명령어 (Phase 1 스캐폴드 후 유효)
+Next.js 16(App Router, Turbopack) · React 19 · Tailwind v4 · zod 4 · Supabase(전용 프로젝트, PostgreSQL 17) · pnpm 11.4.0(corepack)
 
 ```bash
-pnpm dev | pnpm build | pnpm lint | pnpm tsc --noEmit | pnpm format
+corepack pnpm@11.4.0 install         # 의존성(이 폴더 node_modules 전용, 루트 node_modules = 장표 도구용 별개)
+corepack pnpm@11.4.0 dev             # http://localhost:3002
+corepack pnpm@11.4.0 build           # 라우트·API 변경 후 최소 관문
+corepack pnpm@11.4.0 test            # node:test 단위 테스트(test/**/*.test.ts, 타입 제거 실행)
+npx --no-install tsc --noEmit -p .   # 타입 체크
+corepack pnpm@11.4.0 db:migrate [-- --dry-run]   # sql/NNN_*.sql 순서 적용, sys_mgrt_hist 에 파일 해시 기록
+corepack pnpm@11.4.0 db:seed [-- --dry-run]      # DA#_META/SQLiteDB_v5.db → DBMS·논리타입·타입매핑 기준 데이터
 ```
 
-라우트·API 변경 커밋 전 최소 관문은 `pnpm build`.
+- **dev 서버 실행 중 build 금지** : 같은 `.next`를 써서 실행 중 서버가 500을 낸다. dev 중지 → `.next` 삭제 → build → dev 재기동 순서. 3002 포트를 잡은 고아 node 프로세스가 남으면 먼저 종료
+- Windows 파일 잠금(EBUSY)으로 `.next` 삭제·빌드 정리가 실패하면 잠시 뒤 재시도
 
-## 변경 이력
+## 환경변수(`.env.local`, 커밋 금지)
 
-| 날짜 | 내용 |
+- `NEXT_PUBLIC_SUPABASE_URL` · `SUPABASE_SERVICE_ROLE_KEY`(**`sb_secret_` 서버 전용 키**, publishable 키 사용 금지) · `SCHEMA_DATABASE_URL`(**Session pooler** 주소 `aws-0-<리전>.pooler.supabase.com:5432`, Direct 주소는 IPv6 전용이라 접속 불가)
+- `DEV_USER_PI_NM` : 개발 전용 임시 사용자(쿠키 `dev_user`로 전환 가능, 운영 빌드에서는 무시)
+- 값 확인은 키 이름·접두사만 출력, 비밀값을 화면·로그·커밋에 남기지 않는다
+- 목록 정본 : `.env.example`
+
+## 구조
+
+| 경로 | 역할 |
 |---|---|
-| 2026-10-09 | 최초 작성 — 별도 앱 결정, 승계 철칙, 팀 구성(teamAnakin + 보강 6) |
-| 2026-10-09 | 검수 반영 — sql/173 공유 범위 정정, 근거 문서 인용, 보강 인원 호출 시점 정정 |
-| 2026-10-09 | 팀장 반려 반영 — 별도 앱을 결론 단계 판단·[확인중 : 마스터]로 정정, Pi 외 통화 근거를 체크리스트 A-5로 정정 |
-| 2026-10-09 | 마스터 확정 반영 — 별도 Supabase(PostgreSQL)·독립 웹서버, 별도 앱 확정 |
-| 2026-10-09 | 루트 loginpi/CLAUDE.md를 `@../../CLAUDE.md` import로 우선 적용, 우선순위·추가 제약·cafe.pi 전용 항목 원칙 명시 |
-| 2026-10-09 | PRD_28 정합 — 워크스페이스 멤버·공용 패키지 의존(복제 폐기)·운영 브랜치·비운영 스키마 |
-| 2026-10-09 | PRD_28 v0.2 정합 — 배경을 PRD_28로 교체, sql/173 공유 전제 삭제 |
-| 2026-10-09 | 마스터 지시 — 메인 화면 버블(PRD §3-4) : 요금제 7종 크기(`site_mst.plan_cd`), 유료 노출이므로 버블마다 "광고"·요금제 배지 필수, DB 미연결 시 sites.json 폴백 |
-| 2026-10-09 | 마스터 지시 — 요금제 5단계(VIP·PRM2·PRM1·BSC2·BSC1, 면적 ×2 등비), 가상 샘플 91개는 데모 전용(DB 미시드·`schema_SHOW_SAMPLES=1`·"샘플" 배지·상세 이동 없음), 버블 글자 9px 하한·표시 단계 |
-| 2026-10-11 | 로그인 통합 — Pi SDK + Pi Sign-In(OAuth) + Google(NextAuth, 연동 코드) : src/auth.ts·lib/auth.ts·sql/003, 플레이북 docs/LOGIN_PLAYBOOK.md |
-| 2026-10-16 | 개발환경 스캐폴드(마스터 지시) — sitemap.pi 골격 복제 : package.json(`@site/schema`, dev·start 포트 **3002** — sitemap.pi 3001 과 충돌 회피)·next.config(env 검증·next-intl·CSP·validation-key 트레이싱)·tsconfig(docs 제외)·postcss·vercel.json(icn1, 크론 없음)·src/env.ts(사이트 전용 항목 제외한 공통 골격)·i18n(ko·en)·proxy(@pi/guard)·[locale] layout(PiSdkScript·PiAuthProvider·next-themes dark 고정)·홈 확인 페이지·validation-key 라우트. `pnpm build`·`tsc` 통과, dev 3002 응답 확인. 위 본문(서비스 설명·핵심 가치 3·2026-10-09~11 이력)은 sitemap.pi 원문 — schema.pi 성격으로 재작성 필요 |
+| `sql/NNN_*.sql` | DDL·DB 함수. **적용된 파일 수정 금지**(해시 불일치 시 마이그레이션 중단) : 변경은 새 번호 파일 |
+| `scripts/` | `db-migrate.mjs`, `db-seed.mjs` |
+| `src/lib/` | `db.ts`(서버 전용 클라이언트), `api.ts`(오류 카탈로그·역할 확인·감사 이력), 업무 규칙(`dom-name`·`term-split`·`term`·`domain`·`change`·`settings`·`simple-crud`) |
+| `src/app/api/` | REST 라우트(파일은 HTTP 메서드 함수만 export : 공용 스키마·함수는 `src/lib`) |
+| `src/app/areas/[areaId]/` | 화면(words·domains·terms·approvals·members·settings) |
+| `test/` | 업무 규칙 단위 테스트 |
+
+## 업무 규칙(구현 기준)
+
+- 역할 R&R 7종(SYS·DA·STD·MDL·QLT·MIG·VIEWER, PRD §3.1) : 권한 검사는 `requireAreaRole(areaId, VIEW|REQUEST|APPROVE|BULK|SETTINGS)`, 권한표 정본 `src/lib/roles.ts`
+- 승인 절차(PRD §3.2, `sql/012`·`src/lib/approval.ts`) : 최초 등록도 승인대기 → 승인완료 후 사용, 1단계 승인(DA·STD), 신청 시 즉시 승인은 DA만 선택(기본 꺼짐, 권한 SELF_APPROVE), 반려사유 필수, 일괄등록 = 승인대기
+- 이름은 **서버가 생성**하고 클라이언트 값을 신뢰하지 않는다 : 도메인명 = 대표도메인명 + 논리타입 약어 + 길이[,소수점], 용어명 = 구성 단어 결합(물리명 구분자 = 분류체계 설정, 기본 `_`)
+- **동의어 불허**(2026-10-16) : 동음이의어(같은 논리명)·이음동의어(같은 물리명)·대체 표기(금칙어 BAN·이음동의어 SYN, `std_dic_rel`)와 겹치는 단어는 등록·수정 불가, DB 강제(sql/002 유일·014 물리명 유일·016 트리거). 금칙어는 `/forbidden`에서만 관리
+- 엔터티 분류어·테이블 접미어(sql/017) : 단어 물리명(컬럼용)과 별도 칸 `tbl_sfx_txt`, 엔터티 분류어 전용·분류체계 유일, `/entity-classes`에서 단어 수정 신청으로 관리
+- 용어 구성 : **표준단어 2개 이상**(DA 정의서 §8.5 R18), 금칙어 불가, 끝 단어 속성 분류어
+- 수정 : `ver_no` 낙관적 잠금, 바뀐 항목만 반영. 삭제 : **논리 삭제만**(`del_yn`·`del_dtm`, 물리 DELETE 금지). 용어에서 사용 중인 단어·도메인은 이름·구조 변경과 삭제 불가
+- 승인 시점 재검증 : 이름 재생성·구성 규칙·중복·기준 버전 일치 후 DB 함수(`fn_apv_std_req`)로 원자 처리
+- 모든 변경은 `std_audit_log`에 변경 전후 값 기록
+- **시스템 컬럼은 항상 맨 뒤**(2026-10-15 마스터 지시) : 기존 테이블에 컬럼을 추가할 때도 `ADD COLUMN`만 쓰지 않고 `fn_add_cols_keep_sys(테이블, ADD 절)`(`sql/010`)로 시스템 컬럼 4개를 다시 맨 끝에 둔다(값 보존·mod_dtm 트리거 정지 후 복사)
+- 신규 테이블 : RLS 비활성 + anon·authenticated 권한 회수 + service_role 만 허용(`fn_grant_svc_only`), 시스템 컬럼 4개(`regr_id`·`reg_dtm`·`modr_id`·`mod_dtm`) 맨 끝, `mod_dtm` 트리거. DA 표준 규칙 요약은 메모리 `da-standard-core-rules`(원본 : loginpi `docs/da/references/` 01 정의서 §8.5)
+
+## 검증·완료 기준
+
+- 코드 변경 : `tsc` · `pnpm test` · `pnpm build` 통과
+- DB 변경 : 로컬 PostgreSQL(PGlite 소켓, 스크래치패드 전용)에서 먼저 적용·시나리오 시험 → Supabase `db:migrate`
+- API 변경 : 로컬 3002에서 역할별 시나리오 시험, 시험 데이터는 논리 삭제로 정리
+- 보고 수치는 이번 실행 출력에서만 인용, 이전 실행 결과는 그 사실을 밝힌다
+
+## 환경 주의
+
+- 이 PC DRM이 새로 생성된 Office·PDF·일부 파일을 `.exs`로 암호화 : `.exs`·`" 2.exs"` 파일은 스테이징 금지, 파일은 개별 지정 스테이징
+- 폴더명 `DA#_META`의 `#` : SQLite를 `file:` URI로 열면 `#` 뒤가 잘려 빈 DB가 생성됨 → 일반 경로로 연다
+- 로그인 : Pi 로그인 미구현(개발 임시 사용자). 구현 시 `src/lib/api.ts`의 `currentUser()`만 교체
