@@ -16,6 +16,7 @@ interface Prj {
   prj_desc: string | null
   indstry_cd: string | null
   tbl_pfx_txt: string
+  trgt_dbms_cd: string
   sort_seq: number
   ver_no: number
 }
@@ -88,7 +89,18 @@ interface SubjRec {
   missing_words: string[]
 }
 // tbl_pfx_txt = 스키마 접두사(물리 테이블명 맨 앞, 영문 대문자 2~4자, sql/023) — 비우면 서버 기본 TB
-const PF0 = { prj_nm: '', prj_desc: '', indstry_cd: '', tbl_pfx_txt: '' }
+// trgt_dbms_cd = 대상 DBMS(예정, 필수, sql/024) — 물리명 미리보기 대소문자 기준, 물리 모델(MD5)에서 확정
+const PF0 = { prj_nm: '', prj_desc: '', indstry_cd: '', tbl_pfx_txt: '', trgt_dbms_cd: '' }
+interface DbmsOpt {
+  cd: string
+  nm: string
+  identCase: string
+  identMax: number
+  pk: string
+  fk: string
+  idx: string
+  partition: string
+}
 const PFX_RE = /^[A-Z]{2,4}$/
 const SUBJ0 = {
   subj_nm: '',
@@ -138,6 +150,22 @@ export default function ModelPage({ params, searchParams }: { params: Promise<{ 
   const [subjRecs, setSubjRecs] = useState<SubjRec[]>([])
   const [subjChk, setSubjChk] = useState<Set<string>>(new Set())
   // 업종 목록(1회)·업종 추천(프로젝트명·설명 입력 0.4초 뒤, 저장 안 함)
+  // 대상 DBMS 프로파일 목록(1회, sql/024) — 콤보·툴팁(이름은 물리 모델 전환 전까지 항상 대문자)
+  const [dbmsOpts, setDbmsOpts] = useState<DbmsOpt[]>([])
+  useEffect(() => {
+    piFetch('/api/dbms-profiles')
+      .then((r) => r.json())
+      .then((j) => j.ok && setDbmsOpts(j.dbms))
+  }, [])
+  const dbmsNm = (cd: string) => dbmsOpts.find((x) => x.cd === cd)?.nm ?? cd
+  const dbmsTitle = (cd: string) => {
+    const d = dbmsOpts.find((x) => x.cd === cd)
+    return d ? `${d.nm} : 식별자 최대 ${d.identMax}자, 물리 모델 전환 시 ${d.identCase === 'lower' ? '소문자' : '대문자'} 기본 제안(그 전 단계는 항상 대문자)
+PK ${d.pk}
+FK ${d.fk}
+인덱스 ${d.idx}
+파티션 ${d.partition}` : ''
+  }
   useEffect(() => {
     piFetch('/api/industries')
       .then((r) => r.json())
@@ -182,7 +210,7 @@ export default function ModelPage({ params, searchParams }: { params: Promise<{ 
   // 업종 선택 → AI 추천(POST /projects/ai-suggest)
   //  · 새 프로젝트 등록 : 업종을 바꿀 때마다 이름·설명을 비우고 새 업종 추천으로 다시 채움(마스터 지시 2026-10-17 — 직전 업종 값이 남던 문제)
   //  · 수정 모드 : 설명은 비었거나 직전 AI 문장 그대로일 때만, 이름은 비었을 때만 채움(저장된 값 보존)
-  const [aiP, setAiP] = useState<{ busy: boolean; names: string[]; prefixes: string[]; src: string }>({ busy: false, names: [], prefixes: [], src: '' })
+  const [aiP, setAiP] = useState<{ busy: boolean; names: string[]; prefixes: string[]; src: string; dbms?: { cd: string; why: string } }>({ busy: false, names: [], prefixes: [], src: '' })
   const aiDesc = useRef('')
   const aiSeq = useRef(0) // 업종을 빠르게 바꿀 때 마지막 요청 응답만 반영
   // edit·cur : 수정 진입(startEdit)처럼 setPEdit·setPf 직후 같은 틱에 부를 때 — 클로저의 pEdit·pf 가 아직 이전 값이라 명시 전달
@@ -190,7 +218,7 @@ export default function ModelPage({ params, searchParams }: { params: Promise<{ 
     const fresh = !edit
     const src = cur ?? pf
     const seq = ++aiSeq.current
-    setPf((p) => (fresh ? { ...p, indstry_cd: cd, prj_nm: '', prj_desc: '', tbl_pfx_txt: '' } : { ...p, indstry_cd: cd }))
+    setPf((p) => (fresh ? { ...p, indstry_cd: cd, prj_nm: '', prj_desc: '', tbl_pfx_txt: '', trgt_dbms_cd: '' } : { ...p, indstry_cd: cd }))
     if (fresh) aiDesc.current = ''
     if (!cd) return setAiP({ busy: false, names: [], prefixes: [], src: '' })
     setAiP((a) => ({ ...a, busy: true }))
@@ -211,9 +239,10 @@ export default function ModelPage({ params, searchParams }: { params: Promise<{ 
         prj_desc: fresh || !p.prj_desc.trim() || p.prj_desc === aiDesc.current ? j.desc : p.prj_desc,
         prj_nm: fresh || !p.prj_nm.trim() ? (j.names[0] ?? '') : p.prj_nm,
         tbl_pfx_txt: fresh || !p.tbl_pfx_txt ? (j.prefixes?.[0] ?? '') : p.tbl_pfx_txt,
+        trgt_dbms_cd: fresh || !p.trgt_dbms_cd ? (j.dbms?.cd ?? '') : p.trgt_dbms_cd,
       }))
       aiDesc.current = j.desc
-      setAiP({ busy: false, names: j.names, prefixes: j.prefixes ?? [], src: j.src })
+      setAiP({ busy: false, names: j.names, prefixes: j.prefixes ?? [], src: j.src, dbms: j.dbms })
     } catch {
       if (seq === aiSeq.current) setAiP({ busy: false, names: [], prefixes: [], src: '' })
     }
@@ -226,7 +255,7 @@ export default function ModelPage({ params, searchParams }: { params: Promise<{ 
     setSel(null)
     setPage(1)
     setPEdit(p)
-    setPf({ ...cur, indstry_cd: p.indstry_cd ?? '', tbl_pfx_txt: p.tbl_pfx_txt ?? '' })
+    setPf({ ...cur, indstry_cd: p.indstry_cd ?? '', tbl_pfx_txt: p.tbl_pfx_txt ?? '', trgt_dbms_cd: p.trgt_dbms_cd ?? '' })
     aiDesc.current = ''
     setAiP({ busy: false, names: [], prefixes: [], src: '' })
     if (p.indstry_cd) void pickInd(p.indstry_cd, true, cur)
@@ -363,7 +392,9 @@ export default function ModelPage({ params, searchParams }: { params: Promise<{ 
       prj_desc: pf.prj_desc.trim() || null,
       indstry_cd: pf.indstry_cd || null,
       ...(pf.tbl_pfx_txt ? { tbl_pfx_txt: pf.tbl_pfx_txt } : {}),
+      trgt_dbms_cd: pf.trgt_dbms_cd,
     }
+    if (!pf.trgt_dbms_cd) return setMsg('대상 DBMS(예정)를 선택하십시오 — 물리명 미리보기 기준, 물리 모델에서 확정')
     if (pf.tbl_pfx_txt && !PFX_RE.test(pf.tbl_pfx_txt)) return setMsg('스키마 접두사는 영문 대문자 2~4자입니다')
     if (!body.prj_nm || !confirm(pEdit ? `프로젝트 '${pEdit.prj_nm}' 수정 내용을 저장하시겠습니까?` : `프로젝트 '${body.prj_nm}'을(를) 등록하시겠습니까?`)) return
     const j = await (
@@ -535,6 +566,11 @@ export default function ModelPage({ params, searchParams }: { params: Promise<{ 
               </span>
             )}
             {prj && (
+              <span className="rounded bg-white/20 px-2 py-0.5 text-xs" title={dbmsTitle(prj.trgt_dbms_cd)}>
+                {dbmsNm(prj.trgt_dbms_cd)}
+              </span>
+            )}
+            {prj && (
               <span className="rounded bg-white/20 px-2 py-0.5 font-mono text-xs" title="스키마 접두사 — 물리 테이블명 = 접두사_주제영역약어_단어약어[접미어]">
                 {prj.tbl_pfx_txt}_
               </span>
@@ -575,6 +611,26 @@ export default function ModelPage({ params, searchParams }: { params: Promise<{ 
               aria-label="스키마 접두사"
               title="스키마 접두사 : 물리 테이블명 맨 앞 영문 대문자 2~4자(비우면 TB). 업종을 고르면 AI가 추천"
             />
+            <select
+              value={pf.trgt_dbms_cd}
+              onChange={(e) => setPf({ ...pf, trgt_dbms_cd: e.target.value })}
+              required
+              className={`rounded border bg-white px-2 py-1 text-gray-900 ${pf.trgt_dbms_cd ? 'border-white/60' : 'border-amber-400'}`}
+              aria-label="대상 DBMS"
+              title={pf.trgt_dbms_cd ? dbmsTitle(pf.trgt_dbms_cd) : '대상 DBMS(예정, 필수) : 식별자 길이 경고 기준, 물리 모델 전환 때 확정(대·소문자는 그때 선택, 그 전은 항상 대문자)'}
+            >
+              <option value="">대상 DBMS(필수)</option>
+              {dbmsOpts.map((x) => (
+                <option key={x.cd} value={x.cd}>
+                  {x.nm}
+                </option>
+              ))}
+            </select>
+            {!aiP.busy && aiP.dbms && aiP.dbms.cd !== pf.trgt_dbms_cd && (
+              <button type="button" onClick={() => setPf((p) => ({ ...p, trgt_dbms_cd: aiP.dbms!.cd }))} className="rounded-full bg-sky-200 px-2 py-0.5 text-xs font-semibold text-gray-900" title={`업종 추천 DBMS — ${aiP.dbms.why}`}>
+                추천 {dbmsNm(aiP.dbms.cd)}
+              </button>
+            )}
             {!aiP.busy &&
               aiP.prefixes
                 .filter((x) => x !== pf.tbl_pfx_txt)
@@ -659,6 +715,7 @@ export default function ModelPage({ params, searchParams }: { params: Promise<{ 
                 <tr>
                   <th className="px-4 py-2">프로젝트명</th>
                   <th className="px-4 py-2">업종</th>
+                  <th className="px-4 py-2">대상 DBMS</th>
                   <th className="px-4 py-2">접두사</th>
                   <th className="px-4 py-2">설명</th>
                   {editor && <th className="px-4 py-2" />}
@@ -677,6 +734,9 @@ export default function ModelPage({ params, searchParams }: { params: Promise<{ 
                       <td className="px-4 py-2 font-medium">{p.prj_nm}</td>
                       <td className="px-4 py-2" title={p.indstry_cd ? indTitle(p.indstry_cd) : undefined}>
                         {p.indstry_cd ? indNm(p.indstry_cd) : '-'}
+                      </td>
+                      <td className="px-4 py-2" title={dbmsTitle(p.trgt_dbms_cd)}>
+                        {dbmsNm(p.trgt_dbms_cd)}
                       </td>
                       <td className="px-4 py-2 font-mono">{p.tbl_pfx_txt}_</td>
                       <td className={`px-4 py-2 ${on ? '' : 'text-gray-700'}`}>{p.prj_desc ?? '-'}</td>
