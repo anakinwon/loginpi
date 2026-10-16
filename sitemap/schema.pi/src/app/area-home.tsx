@@ -3,7 +3,7 @@ import { piFetch } from '@pi/auth/client'
 // 분류체계 목록·생성(클라이언트) — /api/areas
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { ROLE_NM, can, type MbrRole } from '@/lib/roles'
+import { ROLE_NM, type MbrRole } from '@/lib/roles'
 
 interface Area {
   area_id: string
@@ -65,49 +65,10 @@ export default function AreaHome() {
                 </div>
                 <div className="flex items-center gap-3 text-sm">
                   <span className="rounded bg-gray-100 px-2 py-0.5 text-xs">{ROLE_NM[a.role as MbrRole] ?? a.role}</span>
+                  {/* 화면별 메뉴는 분류체계 안 하단 고정 바(areas/[areaId]/area-nav.tsx) */}
                   <Link href={`/areas/${a.area_id}/words`} className="text-blue-700 underline">
-                    표준단어
+                    열기
                   </Link>
-                  <Link href={`/areas/${a.area_id}/key-domains`} className="text-blue-700 underline">
-                    대표도메인
-                  </Link>
-                  <Link href={`/areas/${a.area_id}/entity-classes`} className="text-blue-700 underline">
-                    엔터티 분류어
-                  </Link>
-                  <Link href={`/areas/${a.area_id}/domains`} className="text-blue-700 underline">
-                    표준도메인
-                  </Link>
-                  <Link href={`/areas/${a.area_id}/terms`} className="text-blue-700 underline">
-                    표준용어
-                  </Link>
-                  <Link href={`/areas/${a.area_id}/approvals`} className="text-blue-700 underline">
-                    승인
-                  </Link>
-                  <Link href={`/areas/${a.area_id}/members`} className="text-blue-700 underline">
-                    멤버
-                  </Link>
-                  {can(a.role, 'SETTINGS') && (
-                    <Link href={`/areas/${a.area_id}/settings`} className="text-blue-700 underline">
-                      설정
-                    </Link>
-                  )}
-                  <Link href={`/areas/${a.area_id}/history`} className="text-blue-700 underline">
-                    이력
-                  </Link>
-                  <Link href={`/areas/${a.area_id}/check`} className="text-blue-700 underline">
-                    표준 점검
-                  </Link>
-                  <Link href={`/areas/${a.area_id}/model`} className="text-blue-700 underline">
-                    개념 모델
-                  </Link>
-                  <Link href={`/areas/${a.area_id}/forbidden`} className="text-blue-700 underline">
-                    금칙어
-                  </Link>
-                  {can(a.role, 'BULK') && (
-                    <Link href={`/areas/${a.area_id}/bulk`} className="text-blue-700 underline">
-                      일괄등록
-                    </Link>
-                  )}
                 </div>
               </li>
             ))}
