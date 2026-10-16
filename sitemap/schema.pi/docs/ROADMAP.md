@@ -132,4 +132,4 @@
 | 2026-10-15 | loginpi 분리 결정 : 0단계 폐기·revert(`11cff97b`, Vercel 3종 success 확인), 문서 정본을 nia-dr-project로 이동, 재설계 대기 |
 | 2026-10-15 | v0.2 재설계 : 0단계를 독립 기반으로 교체(구 0단계 폐기 이력 보존) |
 | 2026-10-16 | loginpi 편입·운영 배포(schem.vercel.app, prod/schema) : Pi 로그인(@pi/auth) + Google 로그인 통합(연동 코드, sql/020 sys_usr_auth_lnk·sys_auth_lnk_cd) |
-| 2026-10-17 | 마스터 로드맵 7단계 신설(`MASTER_ROADMAP.md`) : 이 문서 4단계 = ModelPi, ERD = 3단계 PiErd(2026-10-17 착수, MD1 관계와 함께) |
+| 2026-10-17 | 마스터 로드맵 7단계 신설(`MASTER_ROADMAP.md`) : 이 문서 4단계 = 마스터 2단계 ModelPi(2026-10-17 착수, MD1 관계부터), ERD = 3단계 PiErd(2단계 뒤). 단계별 앱 분리 결정 |
