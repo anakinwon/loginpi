@@ -68,6 +68,11 @@ export default function TermBoard({ areaId }: { areaId: string }) {
   const [domains, setDomains] = useState<{ dom_id: string; dom_nm: string; key_dom_nm: string }[]>([])
   const [q, setQ] = useState('')
   const [name, setName] = useState('')
+  // 다른 화면(개념 모델 속성 추천 등)에서 ?new=용어명 으로 들어오면 등록 폼 용어명에 채움(분석 → 단어 조합·도메인 선택은 사용자가)
+  useEffect(() => {
+    const nm = new URLSearchParams(window.location.search).get('new')?.trim()
+    if (nm) setName(nm.slice(0, 400))
+  }, [])
   const [cands, setCands] = useState<Candidate[]>([])
   const [pick, setPick] = useState(0)
   const [domId, setDomId] = useState('')

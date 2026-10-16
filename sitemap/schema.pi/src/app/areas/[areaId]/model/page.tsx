@@ -9,6 +9,7 @@ import { use, useCallback, useEffect, useRef, useState } from 'react'
 import { can, type MbrRole } from '@/lib/roles'
 import { ActorCells, noEnterSubmit } from '../words/word-board'
 import Relations from './relations'
+import Attrs from './attrs'
 
 interface Prj {
   prj_id: string
@@ -128,6 +129,8 @@ export default function ModelPage({ params, searchParams }: { params: Promise<{ 
   const [sf, setSf] = useState(SUBJ0)
   const [sEdit, setSEdit] = useState<Subj | null>(null)
   const [ents, setEnts] = useState<Ent[]>([])
+  // 속성 패널을 펼친 엔터티(MD3) — 단건 등록 직후 자동 펼침(주식별자·필수 속성 추천 즉시 노출)
+  const [openEnt, setOpenEnt] = useState<string | null>(null)
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
   const [ef, setEf] = useState({ name: '', tp: 'BASE', desc: '' })
@@ -481,8 +484,9 @@ FK ${d.fk}
       })
     ).json()
     if (!j.ok) return setMsg(j.message ?? '')
-    setMsg(`엔터티 ${cur.ent_log_nm} 등록 완료`)
+    setMsg(`엔터티 ${cur.ent_log_nm} 등록 완료 — 아래 속성 패널에서 주식별자·필수 속성을 고르십시오`)
     setEf({ name: '', tp: ef.tp, desc: '' })
+    setOpenEnt(j.item?.ent_id ?? null)
     loadEnt()
   }
   const delEnt = async (x: Ent) => {
@@ -1102,7 +1106,7 @@ FK ${d.fk}
                       </td>
                     </tr>
                   ) : (
-                    ents.map((x, i) => (
+                    ents.map((x, i) => [
                       <tr key={x.ent_id} className="hover:bg-gray-50">
                         <td className="border px-2 py-1 text-center text-gray-500 tabular-nums">{(page - 1) * 20 + i + 1}</td>
                         <td className="border px-2 py-1 font-medium" title={x.words.map((w) => w.dic_log_nm).join('+')}>
@@ -1120,14 +1124,24 @@ FK ${d.fk}
                         <td className="w-[30%] border px-2 py-1 !whitespace-normal">{x.ent_desc}</td>
                         <ActorCells nm={x.regr_nm} d={x.reg_dtm} />
                         <td className="border px-2 py-1 text-center">
+                          <button onClick={() => setOpenEnt(openEnt === x.ent_id ? null : x.ent_id)} className="mr-2 text-blue-700 underline" aria-expanded={openEnt === x.ent_id}>
+                            속성{openEnt === x.ent_id ? ' ▲' : ' ▼'}
+                          </button>
                           {editor && (
                             <button onClick={() => delEnt(x)} className="text-red-700 underline">
                               삭제
                             </button>
                           )}
                         </td>
-                      </tr>
-                    ))
+                      </tr>,
+                      openEnt === x.ent_id && (
+                        <tr key={`${x.ent_id}-attrs`}>
+                          <td colSpan={9} className="border px-2 py-2 !whitespace-normal">
+                            <Attrs api={api} areaId={areaId} entId={x.ent_id} entNm={x.ent_log_nm} editor={editor} />
+                          </td>
+                        </tr>
+                      ),
+                    ])
                   )}
                 </tbody>
               </table>
