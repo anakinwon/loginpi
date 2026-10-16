@@ -61,11 +61,23 @@ export function useAppUser() {
     void refresh()
   }, [refresh])
 
-  const user = pi.user ?? googleUser
+  // 개발 전용 사용자(쿠키 dev_user, 홈 DevUserSwitch) — 비운영 빌드에서만 마지막 폴백. 운영은 NODE_ENV 상수로 코드 제거 + /api/dev/user 404
+  const [devUser, setDevUser] = useState<PiSessionUser | null>(null)
+  const [devLoading, setDevLoading] = useState(process.env.NODE_ENV !== 'production')
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'production') return
+    void readJson<{ user: { usr_id: string; pi_usr_nm: string } | null }>(piFetch('/api/dev/user', { cache: 'no-store' })).then((r) => {
+      const u = r.ok ? r.data.user : null
+      setDevUser(u ? toSessionUser({ id: u.usr_id, username: u.pi_usr_nm, displayName: u.pi_usr_nm, role: 'USER' }) : null)
+      setDevLoading(false)
+    })
+  }, [])
+
+  const user = pi.user ?? googleUser ?? devUser
   return {
     user,
-    source: pi.user ? ('pi' as const) : googleUser ? ('google' as const) : null,
-    isLoading: pi.isLoading || status === 'loading' || meLoading,
+    source: pi.user ? ('pi' as const) : googleUser ? ('google' as const) : devUser ? ('dev' as const) : null,
+    isLoading: pi.isLoading || status === 'loading' || meLoading || (devLoading && !pi.user && !googleUser),
     // Google 로그인은 됐지만 Pi 계정 미연동(확정) — 코드 입력 안내 대상
     googleUnlinked: !pi.user && status === 'authenticated' && !linkedId && !linkUnknown,
     // Google 로그인은 됐지만 DB 오류로 연동 여부를 모름 — 새로고침 유도

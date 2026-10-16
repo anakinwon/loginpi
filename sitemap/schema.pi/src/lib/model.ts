@@ -7,6 +7,7 @@ import { areaDict } from './term'
 import { splitTerm } from './term-split'
 import { entNameError, entNames, ENT_TP, type EntTp, type EntWord } from './model-name'
 import { CRDN, relError, type Crdn, type RelRule } from './model-rel'
+import { INDSTRY_CDS } from './modelpi/template'
 
 // 이름이 승인완료 표준단어이거나 표준단어로만 분해되는지(주제영역명 규칙 : 표준에 근거한 이름만, 2026-10-16 마스터 지시)
 export async function isStdName(areaId: string, nm: string): Promise<boolean> {
@@ -24,16 +25,16 @@ export async function entWords(areaId: string, ids: string[]): Promise<EntWord[]
   return out.every(Boolean) ? (out as EntWord[]) : null
 }
 
-// 프로젝트 CRUD(여러 개, 프로젝트명 = 자유 이름) — 등록·수정·삭제 = 신청 권한, 주제영역이 있으면 삭제 불가
+// 프로젝트 CRUD(여러 개, 프로젝트명 = 자유 이름, 업종 = 선택(sql/022, 주제영역·엔터티 추천 근거)) — 등록·수정·삭제 = 신청 권한, 주제영역이 있으면 삭제 불가
 export const prjCrud = simpleCrud({
   table: 'mdl_prj',
   pk: 'prj_id',
   idParam: 'prjId',
   tgt: 'PRJ',
-  cols: 'prj_id, prj_nm, prj_desc, sort_seq, ver_no, regr_id, reg_dtm',
+  cols: 'prj_id, prj_nm, prj_desc, indstry_cd, sort_seq, ver_no, regr_id, reg_dtm',
   order: 'sort_seq',
   perm: 'REQUEST',
-  schema: z.object({ prj_nm: z.string().trim().min(1).max(100), prj_desc: z.string().trim().max(4000).nullable().optional(), sort_seq: z.number().int().min(1).max(9999).optional() }),
+  schema: z.object({ prj_nm: z.string().trim().min(1).max(100), prj_desc: z.string().trim().max(4000).nullable().optional(), indstry_cd: z.enum(INDSTRY_CDS).nullable().optional(), sort_seq: z.number().int().min(1).max(9999).optional() }),
   dupCode: 'PRJ_DUP',
   beforeDelete: async (id) => {
     const { data, error } = await db().from('mdl_subj').select('subj_id').eq('prj_id', id).eq('del_yn', 'N').limit(1)

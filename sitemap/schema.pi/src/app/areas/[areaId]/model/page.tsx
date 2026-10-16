@@ -13,6 +13,7 @@ interface Prj {
   prj_id: string
   prj_nm: string
   prj_desc: string | null
+  indstry_cd: string | null
   sort_seq: number
   ver_no: number
 }
@@ -51,6 +52,13 @@ interface Cand {
 }
 const TP_NM: Record<string, string> = { BASE: '실체·기준', ACT: '행위', AGG: '집계' }
 const RULE_MSG: Record<string, string> = { ENT_FORBIDDEN_WORD: '금칙어 포함', ENT_LAST_ATTR: '속성 분류어(도메인 단어)로 끝남 : 테이블명은 속성 불필요', ENT_AGG_SUFFIX: "집계 엔터티는 '집계'로 끝나야 함" }
+// 업종(Industry) — 프로젝트 등록 시 추천(반자동 : 사용자가 골라 저장), 코드 sql/022·템플릿 src/data/industry
+interface Ind {
+  cd: string
+  nm: string
+  traits: { biz: string; reg: string; data: string; volume: string }
+}
+const PF0 = { prj_nm: '', prj_desc: '', indstry_cd: '' }
 const SUBJ0 = { subj_nm: '', subj_abbr_nm: '', up_subj_id: '', subj_desc: '', sort_seq: '1' }
 
 export default function ModelPage({ params }: { params: Promise<{ areaId: string }> }) {
@@ -61,7 +69,9 @@ export default function ModelPage({ params }: { params: Promise<{ areaId: string
   const [sel, setSel] = useState<Subj | null>(null)
   const [prjs, setPrjs] = useState<Prj[]>([])
   const [prj, setPrj] = useState<Prj | null>(null)
-  const [pf, setPf] = useState({ prj_nm: '', prj_desc: '' })
+  const [pf, setPf] = useState(PF0)
+  const [inds, setInds] = useState<Ind[]>([])
+  const [indSug, setIndSug] = useState<{ cd: string; nm: string; why: string[] }[]>([])
   const [pEdit, setPEdit] = useState<Prj | null>(null)
   const [chk, setChk] = useState<Set<string>>(new Set())
   const [sf, setSf] = useState(SUBJ0)
@@ -77,6 +87,29 @@ export default function ModelPage({ params }: { params: Promise<{ areaId: string
   const [sug, setSug] = useState<{ busy: boolean; src: string[]; alts: string[]; isWord: boolean | null }>({ busy: false, src: [], alts: [], isWord: null })
   const lastFill = useRef<{ subj_abbr_nm: string; subj_desc: string }>({ subj_abbr_nm: '', subj_desc: '' })
   const [entSug, setEntSug] = useState<{ ent_log_nm: string; tbl_phy_nm: string; dic_ids: string[] }[]>([])
+  // 업종 목록(1회)·업종 추천(프로젝트명·설명 입력 0.4초 뒤, 저장 안 함)
+  useEffect(() => {
+    piFetch('/api/industries')
+      .then((r) => r.json())
+      .then((j) => j.ok && setInds(j.industries))
+  }, [])
+  useEffect(() => {
+    const text = `${pf.prj_nm} ${pf.prj_desc}`.trim()
+    if (!text) return setIndSug([])
+    const t = setTimeout(async () => {
+      const j = await (await piFetch(`${api}/projects/suggest?${new URLSearchParams({ text })}`)).json()
+      if (j.ok) setIndSug(j.industries)
+    }, 400)
+    return () => clearTimeout(t)
+  }, [api, pf.prj_nm, pf.prj_desc])
+  const indNm = (cd: string) => inds.find((x) => x.cd === cd)?.nm ?? cd
+  const indTitle = (cd: string) => {
+    const t = inds.find((x) => x.cd === cd)?.traits
+    return t ? `핵심 업무 : ${t.biz}
+규제 : ${t.reg}
+데이터 특성 : ${t.data}
+대용량 : ${t.volume}` : ''
+  }
   // 프로젝트 목록 — 처음에는 첫 프로젝트 선택
   const loadPrj = useCallback(async () => {
     const j = await (await piFetch(`${api}/projects`)).json()
@@ -177,12 +210,12 @@ export default function ModelPage({ params }: { params: Promise<{ areaId: string
   }
   const savePrj = async (e: React.FormEvent) => {
     e.preventDefault()
-    const body = { prj_nm: pf.prj_nm.trim(), prj_desc: pf.prj_desc.trim() || null }
+    const body = { prj_nm: pf.prj_nm.trim(), prj_desc: pf.prj_desc.trim() || null, indstry_cd: pf.indstry_cd || null }
     if (!body.prj_nm || !confirm(pEdit ? `프로젝트 '${pEdit.prj_nm}' 수정 내용을 저장하시겠습니까?` : `프로젝트 '${body.prj_nm}'을(를) 등록하시겠습니까?`)) return
     const j = await (await piFetch(pEdit ? `${api}/projects/${pEdit.prj_id}` : `${api}/projects`, { method: pEdit ? 'PATCH' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(pEdit ? { ...body, ver_no: pEdit.ver_no } : body) })).json()
     if (!j.ok) return setMsg(j.message ?? '')
     setMsg(`프로젝트 ${body.prj_nm} ${pEdit ? '수정' : '등록'} 완료`)
-    setPf({ prj_nm: '', prj_desc: '' })
+    setPf(PF0)
     setPEdit(null)
     if (!pEdit) setPrj(j.item)
     loadPrj()
@@ -269,22 +302,40 @@ export default function ModelPage({ params }: { params: Promise<{ areaId: string
             </option>
           ))}
         </select>
+        {prj?.indstry_cd && (
+          <span className="rounded bg-white/20 px-2 py-0.5 text-xs" title={indTitle(prj.indstry_cd)}>
+            {indNm(prj.indstry_cd)}
+          </span>
+        )}
         {prj?.prj_desc && <span className="text-xs opacity-80">{prj.prj_desc}</span>}
         {editor && (
           <span className="ml-auto flex flex-wrap items-center gap-2">
             <input value={pf.prj_nm} onChange={(e) => setPf({ ...pf, prj_nm: e.target.value })} placeholder={pEdit ? '프로젝트명' : '새 프로젝트명'} maxLength={100} className="w-40 rounded px-2 py-1 text-gray-900" aria-label="프로젝트명" />
             <input value={pf.prj_desc} onChange={(e) => setPf({ ...pf, prj_desc: e.target.value })} placeholder="설명" maxLength={4000} className="w-48 rounded px-2 py-1 text-gray-900" aria-label="프로젝트 설명" />
+            <select value={pf.indstry_cd} onChange={(e) => setPf({ ...pf, indstry_cd: e.target.value })} className="rounded px-2 py-1 text-gray-900" aria-label="업종" title={pf.indstry_cd ? indTitle(pf.indstry_cd) : '업종을 고르면 주제영역·핵심 엔터티를 추천합니다'}>
+              <option value="">업종 선택(선택)</option>
+              {inds.map((x) => (
+                <option key={x.cd} value={x.cd}>
+                  {x.nm}
+                </option>
+              ))}
+            </select>
+            {indSug.filter((x) => x.cd !== pf.indstry_cd).map((x) => (
+              <button key={x.cd} type="button" onClick={() => setPf({ ...pf, indstry_cd: x.cd })} className="rounded-full bg-amber-300 px-2 py-0.5 text-xs font-semibold text-gray-900" title={`추천 근거 : ${x.why.join(', ')}`}>
+                추천 {x.nm}
+              </button>
+            ))}
             <button disabled={!pf.prj_nm.trim()} className="btn-3d px-4 disabled:opacity-40">
               {pEdit ? '수정 저장' : '프로젝트 등록'}
             </button>
             {pEdit ? (
-              <button type="button" onClick={() => (setPEdit(null), setPf({ prj_nm: '', prj_desc: '' }))} className="underline">
+              <button type="button" onClick={() => (setPEdit(null), setPf(PF0))} className="underline">
                 취소
               </button>
             ) : (
               prj && (
                 <>
-                  <button type="button" onClick={() => (setPEdit(prj), setPf({ prj_nm: prj.prj_nm, prj_desc: prj.prj_desc ?? '' }))} className="underline">
+                  <button type="button" onClick={() => (setPEdit(prj), setPf({ prj_nm: prj.prj_nm, prj_desc: prj.prj_desc ?? '', indstry_cd: prj.indstry_cd ?? '' }))} className="underline">
                     수정
                   </button>
                   <button type="button" onClick={delPrj} className="underline">
