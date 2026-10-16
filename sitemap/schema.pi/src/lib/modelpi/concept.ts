@@ -48,14 +48,14 @@ export interface EntRec {
   src: 'industry' | 'pattern'
 }
 // 선택 주제영역의 핵심 엔터티 후보 — 템플릿에서 주제영역명이 같은 엔터티(단어 + 엔터티 분류어), 프로젝트에 이미 있는 이름 제외
-export function recommendEntities(t: IndstryTmpl, subjNm: string, subjAbbr: string, have: Set<string>, dict: EntWord[], pfx?: string): EntRec[] {
+export function recommendEntities(t: IndstryTmpl, subjNm: string, subjAbbr: string, have: Set<string>, dict: EntWord[], pfx?: string, dbms?: string): EntRec[] {
   return t.entities
     .filter((e) => e.subj === subjNm && !have.has(entKey(e)))
     .map((e) => {
       const nm = entKey(e)
       const r = resolveName(nm, dict)
       const err = r.missing.length ? null : entNameError(r.words, e.tp)
-      const n = r.words.length && !r.missing.length ? entNames(r.words, subjAbbr || '○○○', pfx) : null
+      const n = r.words.length && !r.missing.length ? entNames(r.words, subjAbbr || '○○○', pfx, dbms) : null
       return { ent_log_nm: nm, tbl_phy_nm: n?.tbl_phy_nm ?? '', dic_ids: r.words.map((w) => w.dic_id), ent_tp_cd: e.tp, ent_desc: e.desc, ok: !!n && !err, missing_words: r.missing, rule_error: err, src: 'industry' as const }
     })
 }

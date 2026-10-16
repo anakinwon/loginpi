@@ -37,3 +37,9 @@ test('스키마 접두사(sql/023) : 프로젝트 접두사로 시작, 형식 �
   assert.equal(entNames([고객], 'CCS').tbl_phy_nm, 'TB_CCS_CUST')
   assert.equal(entNames([고객], 'CCS', 'ec1').tbl_phy_nm, 'TB_CCS_CUST')
 })
+
+test('대상 DBMS(sql/024) : 물리 모델링까지 DBMS 와 무관하게 대문자, 길이 경고만 DBMS 기준', () => {
+  assert.equal(entNames([고객, 등급, 이력], 'CCS', 'ECM', '0014').tbl_phy_nm, 'ECM_CCS_CUST_GRD_H')
+  assert.equal(entNames([고객, 등급, 이력], 'CCS', 'ECM', '0001').tbl_phy_nm, 'ECM_CCS_CUST_GRD_H')
+  assert.equal(entNames([고객], 'CCS', 'ECM').tbl_phy_nm, 'ECM_CCS_CUST')
+})

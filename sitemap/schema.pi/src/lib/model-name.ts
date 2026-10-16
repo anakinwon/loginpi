@@ -1,5 +1,6 @@
 // 개념 모델 엔터티 이름 규칙(순수 함수) — 표준단어 조합 논리명·물리 테이블명 미리보기·이름 규칙(정의서 §8.4·§8.5, PRD §2.5 MD1)
 import type { ErrorCode } from './api'
+import { DBMS_PRFL, isDbms } from './modelpi/dbms.ts'
 
 export interface EntWord {
   dic_id: string
@@ -29,12 +30,14 @@ export const TBL_PFX_RE = /^[A-Z]{2,4}$/
 export const TBL_PFX_DEFAULT = 'TB'
 
 // 논리명·물리 테이블명(접두사_주제영역약어_단어약어[접미어]) — 끝 단어가 접미어 있는 엔터티 분류어면 그 단어 약어 대신 접미어(이력 → _H)
-export function entNames(words: EntWord[], subjAbbr: string, pfx: string = TBL_PFX_DEFAULT) {
+// dbms = 프로젝트 대상 DBMS(sql/024) : 식별자 최대 길이 경고만. 이름은 물리 모델링 단계까지 DBMS 와 무관하게 항상 대문자(마스터 지시 2026-10-17) — 대·소문자 선택은 실제 물리 모델 전환 시점에만
+export function entNames(words: EntWord[], subjAbbr: string, pfx: string = TBL_PFX_DEFAULT, dbms?: string | null) {
   const last = words[words.length - 1]
   const sfx = last?.ent_clss_yn === 'Y' && last.tbl_sfx_txt ? last.tbl_sfx_txt : ''
   const body = (sfx ? words.slice(0, -1) : words).map((w) => w.dic_phy_nm)
   const phy = `${TBL_PFX_RE.test(pfx) ? pfx : TBL_PFX_DEFAULT}_${subjAbbr}${body.length ? `_${body.join('_')}` : ''}${sfx}`
-  return { ent_log_nm: words.map((w) => w.dic_log_nm).join(''), tbl_phy_nm: phy, tbl_sfx_txt: sfx || null, too_long: phy.length > TBL_NM_MAX }
+  const max = isDbms(dbms) ? Math.min(TBL_NM_MAX, DBMS_PRFL[dbms].identMax) : TBL_NM_MAX
+  return { ent_log_nm: words.map((w) => w.dic_log_nm).join(''), tbl_phy_nm: phy, tbl_sfx_txt: sfx || null, too_long: phy.length > max }
 }
 
 // 주제영역 약어 3자 후보(정의서 §8.4) — 한 단어 = 첫 글자 + 뒤 자음 순서(Customer CST·Product PRD·Order ORD·Claim CLM·Delivery DLV),

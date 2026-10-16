@@ -6,7 +6,7 @@ const call = async (m, u, b) => { const r = await fetch(u, { method: m, headers:
 const area = (await call('GET', `${R}/areas`)).j.areas.find((a) => a.area_nm.startsWith('행안부'))
 const B = `${R}/areas/${area.area_id}`
 const hist = async () => (await call('GET', `${B}/history?page=1`)).j.total
-const prj = (await call('POST', `${B}/projects`, { prj_nm: `반자동시험_${IND}`, prj_desc: '추천 시험 — 종료 후 논리 삭제', indstry_cd: IND })).j.item
+const prj = (await call('POST', `${B}/projects`, { prj_nm: `반자동시험_${IND}`, prj_desc: '추천 시험 — 종료 후 논리 삭제', indstry_cd: IND, trgt_dbms_cd: '0014' })).j.item
 const P = prj.prj_id
 const h0 = await hist()
 const sr = (await call('GET', `${B}/subjects/suggest?prj=${P}`)).j
