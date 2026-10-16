@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { use, useCallback, useEffect, useRef, useState } from 'react'
 import { can, type MbrRole } from '@/lib/roles'
 import { ActorCells, noEnterSubmit } from '../words/word-board'
+import Relations from './relations'
 
 interface Prj {
   prj_id: string
@@ -513,6 +514,7 @@ export default function ModelPage({ params }: { params: Promise<{ areaId: string
           </div>
         </section>
       </div>
+      {prj && <Relations api={api} prjId={prj.prj_id} editor={editor} entsKey={ents} />}
     </main>
   )
 }

@@ -7,7 +7,7 @@ import { apiError, dbError, requireAreaRole } from '@/lib/api'
 type Ctx = { params: Promise<{ areaId: string }> }
 const PAGE = 50
 const q = z.object({
-  tgt: z.enum(['AREA', 'MBR', 'DIC', 'DOM', 'DOM_GRP', 'TERM', 'ABBR', 'PRJ', 'SUBJ', 'ENT']).optional(),
+  tgt: z.enum(['AREA', 'MBR', 'DIC', 'DOM', 'DOM_GRP', 'TERM', 'ABBR', 'PRJ', 'SUBJ', 'ENT', 'REL']).optional(),
   act: z.enum(['INS', 'UPD', 'DEL']).optional(),
   usr: z.string().trim().max(100).optional(),
   from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),

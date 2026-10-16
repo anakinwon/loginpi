@@ -6,6 +6,7 @@ import { simpleCrud } from './simple-crud'
 import { areaDict } from './term'
 import { splitTerm } from './term-split'
 import { entNameError, entNames, ENT_TP, type EntTp, type EntWord } from './model-name'
+import { CRDN, relError, type Crdn, type RelRule } from './model-rel'
 
 // 이름이 승인완료 표준단어이거나 표준단어로만 분해되는지(주제영역명 규칙 : 표준에 근거한 이름만, 2026-10-16 마스터 지시)
 export async function isStdName(areaId: string, nm: string): Promise<boolean> {
@@ -90,3 +91,39 @@ export async function prepareEnt(areaId: string, b: z.infer<typeof entSchema>) {
   return bad ?? entNames(words, s.data.subj_abbr_nm)
 }
 
+// 관계(sql/021 mdl_rel) — 목록 열, 본문 스키마, CRUD(등록·수정·삭제 = 신청 권한, 수정은 현재 행과 합쳐 규칙 재검증)
+// 부모·자식 = 같은 프로젝트의 활성 엔터티(DB 트리거도 강제 : 23514 → INVALID_INPUT 백스톱)
+export const REL_COLS = 'rel_id, prj_id, prnt_ent_id, chld_ent_id, rel_nm, crdn_cd, idnt_yn, prnt_opt_yn, chld_opt_yn, rel_desc, ver_no, regr_id, reg_dtm'
+const YN = z.enum(['Y', 'N'])
+export const relSchema = z.object({
+  prnt_ent_id: z.string().uuid(),
+  chld_ent_id: z.string().uuid(),
+  rel_nm: z.string().trim().max(100).nullable().optional(),
+  // 기본값은 DB 컬럼 DEFAULT(1N·N·N·Y) — zod .default() 는 수정(partial)에서도 채워져 보내지 않은 칸을 덮어쓰므로 쓰지 않는다
+  crdn_cd: z.enum(Object.keys(CRDN) as [Crdn, ...Crdn[]]).optional(),
+  idnt_yn: YN.optional(),
+  prnt_opt_yn: YN.optional(),
+  chld_opt_yn: YN.optional(),
+  rel_desc: z.string().trim().max(4000).nullable().optional(),
+})
+export const relCrud = simpleCrud({
+  table: 'mdl_rel',
+  pk: 'rel_id',
+  idParam: 'relId',
+  tgt: 'REL',
+  cols: REL_COLS,
+  order: 'reg_dtm',
+  perm: 'REQUEST',
+  schema: relSchema,
+  dupCode: 'REL_DUP',
+  beforeSave: async (areaId, row, cur) => {
+    const m = { ...(cur ?? {}), ...row } as unknown as RelRule
+    const bad = relError(m)
+    if (bad) return bad
+    if (!('prnt_ent_id' in row) && !('chld_ent_id' in row)) return null
+    const ids = [...new Set([m.prnt_ent_id, m.chld_ent_id])]
+    const { data, error } = await db().from('mdl_ent').select('ent_id, prj_id').eq('area_id', areaId).eq('del_yn', 'N').in('ent_id', ids)
+    if (error) throw error
+    return data.length === ids.length && new Set(data.map((e) => e.prj_id as string)).size === 1 ? null : 'REL_ENT_INVALID'
+  },
+})

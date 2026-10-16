@@ -17,8 +17,8 @@ interface Cfg {
   dupCode: ErrorCode
   // 쓰기 권한(기본 SETTINGS : 설정 데이터, 모델 데이터는 REQUEST)
   perm?: 'SETTINGS' | 'REQUEST'
-  // 저장 전 검사(등록 = 전체 본문, 수정 = 바뀐 항목만) — 위반 코드 또는 null
-  beforeSave?: (areaId: string, row: Record<string, unknown>) => Promise<ErrorCode | null>
+  // 저장 전 검사(등록 = 전체 본문, 수정 = 바뀐 항목만 + 현재 행) — 위반 코드 또는 null
+  beforeSave?: (areaId: string, row: Record<string, unknown>, cur?: Record<string, unknown>) => Promise<ErrorCode | null>
   // 삭제 불가 사유(없으면 null)
   beforeDelete?: (id: string) => Promise<ErrorCode | null>
 }
@@ -85,7 +85,7 @@ export function simpleCrud(c: Cfg) {
       if (typeof cur === 'string') return apiError(cur, status(cur))
       const set = Object.fromEntries(Object.entries(parsed.data).filter(([k, v]) => (v ?? null) !== (cur.cur[k] ?? null)))
       if (!Object.keys(set).length) return apiError('NO_CHANGE', 400)
-      const bad = c.beforeSave ? await c.beforeSave(p.areaId, set) : null
+      const bad = c.beforeSave ? await c.beforeSave(p.areaId, set, cur.cur) : null
       if (bad) return apiError(bad, 400)
       const uid = auth.user.usr_id
       const { rows, error } = await write(p.areaId, p[c.idParam], cur.ver, { ...set, modr_id: uid })
