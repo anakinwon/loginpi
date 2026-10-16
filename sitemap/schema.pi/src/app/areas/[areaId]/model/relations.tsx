@@ -2,6 +2,7 @@
 import { piFetch } from '@pi/auth/client'
 // 엔터티 관계 화면(PRD §2.5 MD1 잔여) — 선택 프로젝트의 관계 목록·등록·수정·삭제. 부모·자식 = 프로젝트 엔터티 선택, 카디널리티·식별·선택성, IE 표기 미리보기
 // 규칙 위반(N:M·자기참조 식별, 식별+부모 선택)은 입력 중 표시·등록 버튼 비활성(서버가 같은 규칙으로 재검증)
+// 업종 추천 관계(반자동) : 프로젝트 업종 템플릿 관계 중 양쪽 엔터티가 등록된 것 → 칩을 누르면 폼만 채움(저장은 등록 버튼)
 import { useCallback, useEffect, useState } from 'react'
 import { CRDN, relError, relNotation } from '@/lib/model-rel'
 import { ActorCells, confirmSave, noEnterSubmit } from '../words/word-board'
@@ -28,6 +29,15 @@ interface Rel {
   regr_nm?: string | null
   reg_dtm: string
 }
+interface RelRec {
+  prnt_ent_id: string
+  chld_ent_id: string
+  prnt_nm: string
+  chld_nm: string
+  crdn_cd: string
+  idnt_yn: string
+  rel_nm: string
+}
 const F0 = { prnt_ent_id: '', chld_ent_id: '', rel_nm: '', crdn_cd: '1N', idnt_yn: 'N', prnt_opt_yn: 'N', chld_opt_yn: 'Y', rel_desc: '' }
 const RULE_MSG: Record<string, string> = { REL_NM_IDNT: 'N:M 관계는 식별 불가', REL_SELF_IDNT: '자기참조는 식별 불가', REL_IDNT_OPT: '식별 관계는 부모 필수' }
 const SIZE = 20
@@ -40,6 +50,7 @@ export default function Relations({ api, prjId, editor, entsKey }: { api: string
   const [f, setF] = useState(F0)
   const [edit, setEdit] = useState<Rel | null>(null)
   const [msg, setMsg] = useState('')
+  const [recs, setRecs] = useState<RelRec[]>([])
 
   // 프로젝트 엔터티 선택지(엔터티 등록·삭제 시 다시 조회)
   useEffect(() => {
@@ -53,7 +64,9 @@ export default function Relations({ api, prjId, editor, entsKey }: { api: string
       setRels(j.items)
       setTotal(j.total)
     }
-  }, [api, prjId, page])
+    const r = await (await piFetch(`${api}/relations/suggest?${new URLSearchParams({ prj: prjId })}`)).json()
+    if (r.ok) setRecs(r.rels)
+  }, [api, prjId, page, entsKey])
   useEffect(() => {
     load()
   }, [load])
@@ -120,6 +133,16 @@ export default function Relations({ api, prjId, editor, entsKey }: { api: string
       {editor && (
         <form onSubmit={save} onKeyDown={noEnterSubmit} className="rounded-xl border border-[#c7d2e6] bg-white p-4 text-sm shadow-md">
           <div className={`-m-4 mb-4 rounded-t-xl px-4 py-2 font-semibold text-white ${edit ? 'bg-[#c2410c]' : 'bg-[#1f3a68]'}`}>{edit ? '관계 수정' : '관계 등록'}</div>
+          {!edit && recs.length > 0 && (
+            <div className="mb-3 flex flex-wrap items-center gap-1 text-xs">
+              <span className="font-semibold text-[#1f3a68]">업종 추천 :</span>
+              {recs.map((r) => (
+                <button key={`${r.prnt_ent_id}|${r.chld_ent_id}|${r.rel_nm}`} type="button" onClick={() => setF({ ...F0, prnt_ent_id: r.prnt_ent_id, chld_ent_id: r.chld_ent_id, crdn_cd: r.crdn_cd, idnt_yn: r.idnt_yn, chld_opt_yn: r.idnt_yn === 'Y' ? 'N' : 'Y', rel_nm: r.rel_nm })} className="rounded-full border border-amber-400 bg-amber-100 px-2 py-0.5 hover:bg-amber-200">
+                  {r.prnt_nm} → {r.chld_nm} <span className="text-gray-600">({r.rel_nm} · {CRDN[r.crdn_cd as keyof typeof CRDN]}{r.idnt_yn === 'Y' ? ' · 식별' : ''})</span>
+                </button>
+              ))}
+            </div>
+          )}
           <div className="grid gap-3 md:grid-cols-[1fr_auto_1fr]">
             {sel('prnt_ent_id', '부모 엔터티')}
             <label className="flex flex-col gap-1">
