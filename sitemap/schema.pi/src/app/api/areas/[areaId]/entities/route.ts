@@ -1,4 +1,4 @@
-// 핵심 엔터티 — GET ?subj=&q=&page=&size= 목록(조회 권한, 주제영역·물리 테이블명 미리보기·등록자 포함), POST { subj_id, dic_ids, ent_tp_cd?, ent_desc? } 등록(신청 권한)
+// 핵심 엔터티 — GET ?subj=&prj=&lvl=CNCP|LGCL|ALL(기본 CNCP)&q=&page=&size= 목록(조회 권한, 주제영역·물리 테이블명 미리보기·등록자 포함), POST { subj_id, dic_ids, ent_tp_cd?, ent_desc?, mdl_lvl_cd? } 등록(신청 권한)
 // 이름은 서버가 생성(승인완료 표준단어 결합, 클라이언트 값 불신), 규칙 src/lib/model-name.ts, 저장 = mdl_ent(sql/018), 감사 이력 기록
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
@@ -6,11 +6,11 @@ import { db } from '@/lib/db'
 import { apiError, audit, dbError, parseBody, requireAreaRole } from '@/lib/api'
 import { pageRows } from '@/lib/paging'
 import { withActors } from '@/lib/approval'
-import { entSchema, prepareEnt } from '@/lib/model'
+import { entSchema, MDL_LVLS, prepareEnt, type MdlLvl } from '@/lib/model'
 import { entNames, type EntWord } from '@/lib/model-name'
 
 type Ctx = { params: Promise<{ areaId: string }> }
-const COLS = 'ent_id, subj_id, ent_log_nm, ent_tp_cd, ent_desc, dic_ids, ver_no, regr_id, reg_dtm, mdl_subj!inner(subj_nm, subj_abbr_nm, up_subj_id), mdl_prj!mdl_ent_mdl_prj_id_fkey(tbl_pfx_txt, trgt_dbms_cd)'
+const COLS = 'ent_id, subj_id, ent_log_nm, ent_tp_cd, ent_desc, dic_ids, mdl_lvl_cd, ver_no, regr_id, reg_dtm, mdl_subj!inner(subj_nm, subj_abbr_nm, up_subj_id), mdl_prj!mdl_ent_mdl_prj_id_fkey(tbl_pfx_txt, trgt_dbms_cd)'
 
 export async function GET(req: Request, { params }: Ctx) {
   const { areaId } = await params
@@ -20,6 +20,9 @@ export async function GET(req: Request, { params }: Ctx) {
   const subj = sp.get('subj')
   const prj = sp.get('prj')
   const q = sp.get('q')?.trim()
+  // 모델 단계 : 기본 CNCP(개념 화면 기존 동작), ALL = 전체
+  const lvlRaw = sp.get('lvl') ?? 'CNCP'
+  const lvl = lvlRaw === 'ALL' ? null : (MDL_LVLS as readonly string[]).includes(lvlRaw) ? (lvlRaw as MdlLvl) : 'CNCP'
   // 주제영역 선택 시 그 주제영역과 하위(2레벨) 엔터티
   let subjIds: string[] | null = null
   if (subj && z.string().uuid().safeParse(subj).success) {
@@ -30,6 +33,7 @@ export async function GET(req: Request, { params }: Ctx) {
   const build = () => {
     let query = db().from('mdl_ent').select(COLS, { count: 'exact' }).eq('area_id', areaId).eq('del_yn', 'N').order('reg_dtm', { ascending: false }).order('ent_log_nm')
     if (subjIds) query = query.in('subj_id', subjIds)
+    if (lvl) query = query.eq('mdl_lvl_cd', lvl)
     if (prj && z.string().uuid().safeParse(prj).success) query = query.eq('prj_id', prj)
     if (q) query = query.ilike('ent_log_nm', `%${q.replace(/[%_,()]/g, '')}%`)
     return query
@@ -67,8 +71,8 @@ export async function POST(req: Request, { params }: Ctx) {
     const uid = auth.user.usr_id
     const { data, error } = await db()
       .from('mdl_ent')
-      .insert({ area_id: areaId, subj_id: body.subj_id, ent_log_nm: p.ent_log_nm, ent_tp_cd: body.ent_tp_cd, ent_desc: body.ent_desc ?? null, dic_ids: body.dic_ids, regr_id: uid, modr_id: uid })
-      .select('ent_id, ent_log_nm, ver_no')
+      .insert({ area_id: areaId, subj_id: body.subj_id, ent_log_nm: p.ent_log_nm, ent_tp_cd: body.ent_tp_cd, ent_desc: body.ent_desc ?? null, dic_ids: body.dic_ids, ...(body.mdl_lvl_cd ? { mdl_lvl_cd: body.mdl_lvl_cd } : {}), regr_id: uid, modr_id: uid })
+      .select('ent_id, ent_log_nm, mdl_lvl_cd, ver_no')
       .single()
     if (error) return dbError(error, 'ENT_DUP')
     await audit({ area_id: areaId, tgt_tp_cd: 'ENT', tgt_id: data.ent_id, act_cd: 'INS', aftr_val: { ...body, ent_log_nm: p.ent_log_nm, tbl_phy_nm: p.tbl_phy_nm }, usr_id: uid })

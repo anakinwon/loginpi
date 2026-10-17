@@ -74,12 +74,17 @@ export const subjCrud = simpleCrud({
   },
 })
 
+// 엔터티 모델 단계(sql/026) — CNCP 개념 핵심 / LGCL 논리 추가. 보내지 않으면 등록 = DB 기본(CNCP), 수정 = 현재 값 유지
+export const MDL_LVLS = ['CNCP', 'LGCL'] as const
+export type MdlLvl = (typeof MDL_LVLS)[number]
+
 // 엔터티 등록·수정 본문
 export const entSchema = z.object({
   subj_id: z.string().uuid(),
   dic_ids: z.array(z.string().uuid()).min(1).max(20),
   ent_tp_cd: z.enum(Object.keys(ENT_TP) as [EntTp, ...EntTp[]]).default('BASE'),
   ent_desc: z.string().trim().max(4000).nullable().optional(),
+  mdl_lvl_cd: z.enum(MDL_LVLS).optional(),
 })
 
 // 등록·수정 공용 검증 : 주제영역(같은 분류체계·활성), 구성 단어(승인완료), 이름 규칙 → 이름·미리보기 또는 오류
