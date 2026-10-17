@@ -20,6 +20,7 @@ export const domainSchema = z
     dom_desc: opt(4000),
     // 도메인그룹 필수(2026-10-15 결정 B, 행안부 공통표준 전 도메인 그룹 지정)
     dom_grp_id: z.string().uuid(),
+    std_se_cd: z.enum(['STD', 'NSTD']).optional(), // 표준구분코드(sql/033), 없으면 STD
   })
   // 소수점은 길이가 있을 때만, 길이 이하
   .refine((d) => d.data_scale === undefined || (d.data_len !== undefined && d.data_scale <= d.data_len))

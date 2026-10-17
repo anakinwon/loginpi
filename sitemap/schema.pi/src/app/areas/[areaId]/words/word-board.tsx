@@ -16,6 +16,7 @@ interface Word {
   attr_clss_yn: string
   forbid_yn: string
   dic_desc: string | null
+  std_se_cd?: string
   std_sts_cd: string
   pend_act?: string | null
   regr_nm?: string | null
@@ -31,11 +32,11 @@ interface Check {
   syn_of: string | null
   eng_dup: { dic_log_nm: string; dic_phy_nm: string }[]
 }
-const EMPTY = { dic_log_nm: '', dic_phy_nm: '', dic_eng_nm: '', dic_chn_nm: '', ent_clss_yn: 'N', attr_clss_yn: 'N', forbid_yn: 'N', dic_desc: '' }
+const EMPTY = { dic_log_nm: '', dic_phy_nm: '', dic_eng_nm: '', dic_chn_nm: '', ent_clss_yn: 'N', attr_clss_yn: 'N', forbid_yn: 'N', dic_desc: '', std_se_cd: 'STD' }
 type Field = keyof typeof EMPTY
 // 목록 열 너비(#·논리명·상태·물리명·영문풀네임·분류어·금칙·설명·작업) — 설명은 남는 폭
 // 설명 = 표 폭의 30%, 나머지 열 = 값에 맞춰 자동(table-auto + 줄바꿈 없음)
-const COL_W = ['', '', '', '', '', '', 'w-[30%]', '', '', '', '', '', '']
+const COL_W = ['', '', '', '', '', '', 'w-[30%]', '', '', '', '', '', '', '']
 const NULLABLE: Field[] = ['dic_eng_nm', 'dic_chn_nm', 'dic_desc']
 
 export default function WordBoard({ areaId }: { areaId: string }) {
@@ -62,10 +63,10 @@ export default function WordBoard({ areaId }: { areaId: string }) {
   const requester = !!role && can(role, 'REQUEST')
 
   // 조회 조건(검색어·상태·페이지·페이지 크기) — 바뀌면 서버에서 해당 페이지만 조회
-  const [cond, setCond] = useState({ kw: '', sts: '', page: 1, size: 10 })
+  const [cond, setCond] = useState({ kw: '', sts: '', se: '', page: 1, size: 10 })
   const [total, setTotal] = useState(0)
   const load = useCallback(async () => {
-    const sp = new URLSearchParams({ page: String(cond.page), size: String(cond.size), ...(cond.kw ? { q: cond.kw } : {}), ...(cond.sts ? { sts: cond.sts } : {}) })
+    const sp = new URLSearchParams({ page: String(cond.page), size: String(cond.size), ...(cond.kw ? { q: cond.kw } : {}), ...(cond.sts ? { sts: cond.sts } : {}), ...(cond.se ? { se: cond.se } : {}) })
     const j = await (await piFetch(`${base}?${sp}`)).json()
     if (j.ok) {
       setWords(j.words)
@@ -250,6 +251,7 @@ export default function WordBoard({ areaId }: { areaId: string }) {
           </a>
           {flag('attr_clss_yn', '속성 분류어 (도메인 사용)')}
           {flag('forbid_yn', '금칙어')}
+          <SeSelect value={form.std_se_cd} onChange={(v) => setForm({ ...form, std_se_cd: v })} />
           <ApvFields approver={selfApprover} selfApv={selfApv} setSelfApv={setSelfApv} rsn={rsn} setRsn={setRsn} />
           <div className="ml-auto flex gap-2">
             {edit && (
@@ -282,6 +284,7 @@ export default function WordBoard({ areaId }: { areaId: string }) {
         >
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="검색명(논리명·물리명)" className="flex-1 rounded border px-3 py-2 text-sm" />
           <StsFilter value={cond.sts} onChange={(sts) => setCond({ ...cond, sts, page: 1 })} />
+          <SeFilter value={cond.se} onChange={(se) => setCond({ ...cond, se, page: 1 })} />
           <button className="btn-3d">검색</button>
           <a href={`/api/areas/${areaId}/export/words${cond.kw ? `?q=${encodeURIComponent(cond.kw)}` : ''}`} className="btn-3d btn-3d-green" download>
             엑셀 다운로드
@@ -296,7 +299,7 @@ export default function WordBoard({ areaId }: { areaId: string }) {
             </colgroup>
             <thead>
               <tr className="thead-3d text-center">
-                {['#', '논리명', '물리명', '영문풀네임', '분류어', '금칙', '설명', '등록자', '등록일시', '상태', '승인자', '승인일시', '처리'].map((h, i) => (
+                {['#', '논리명', '물리명', '영문풀네임', '분류어', '금칙', '설명', '구분', '등록자', '등록일시', '상태', '승인자', '승인일시', '처리'].map((h, i) => (
                   <th key={i} className="whitespace-nowrap border px-2 py-2">
                     {h}
                   </th>
@@ -306,7 +309,7 @@ export default function WordBoard({ areaId }: { areaId: string }) {
             <tbody>
               {words.length === 0 ? (
                 <tr>
-                  <td colSpan={13} className="border px-2 py-4 text-center text-gray-500">
+                  <td colSpan={14} className="border px-2 py-4 text-center text-gray-500">
                     등록된 단어가 없습니다
                   </td>
                 </tr>
@@ -320,6 +323,7 @@ export default function WordBoard({ areaId }: { areaId: string }) {
                     <td className="border px-2 py-1">{[w.ent_clss_yn === 'Y' && `엔터티${w.tbl_sfx_txt ? `(${w.tbl_sfx_txt})` : ''}`, w.attr_clss_yn === 'Y' && '속성(도메인 사용)'].filter(Boolean).join('·')}</td>
                     <td className="border px-2 py-1">{w.forbid_yn === 'Y' && '금칙어'}</td>
                     <td className="border px-2 py-1 !whitespace-normal">{w.dic_desc}</td>
+                    <SeCell se={w.std_se_cd} />
                     <ActorCells nm={w.regr_nm} d={w.std_reg_dtm} />
                     <StsCell sts={w.std_sts_cd} pend={w.pend_act} apv={`/areas/${areaId}/approvals?tp=DIC`} />
                     <ActorCells nm={w.apv_nm} d={w.apv_dtm} />
@@ -436,6 +440,45 @@ export function ApvLink({ apv }: { apv: string }) {
     <a href={`${apv}&sts=REQ`} title="승인 요청 화면에서 승인·반려·취소" className="text-xs text-blue-700 underline">
       승인대기
     </a>
+  )
+}
+
+// 표준구분코드(sql/033, 마스터 지시 2026-10-17) — STD 표준 / NSTD 비표준. 검색줄 조건·목록 열·등록 폼 공용
+export const SE_NM: Record<string, string> = { STD: '표준', NSTD: '비표준' }
+export function SeFilter({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  return (
+    <select value={value} onChange={(e) => onChange(e.target.value)} className="rounded border px-2 py-2 text-sm" aria-label="표준구분">
+      <option value="">전체 구분</option>
+      {Object.entries(SE_NM).map(([c, n]) => (
+        <option key={c} value={c}>
+          {n}
+        </option>
+      ))}
+    </select>
+  )
+}
+export function SeCell({ se }: { se?: string | null }) {
+  const n = se === 'NSTD'
+  return (
+    <td className="whitespace-nowrap border px-2 py-1 text-center">
+      <span className={`rounded px-1.5 py-0.5 ${n ? 'bg-amber-100 text-amber-800' : 'bg-green-50 text-green-800'}`} title={n ? '표준 규칙 예외로 수용' : '표준'}>
+        {SE_NM[se ?? 'STD'] ?? se}
+      </span>
+    </td>
+  )
+}
+export function SeSelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  return (
+    <label className="mr-3 flex items-center gap-1">
+      <span className="text-sm text-gray-700">표준구분</span>
+      <select value={value || 'STD'} onChange={(e) => onChange(e.target.value)} className="rounded border border-[#b8c6e0] bg-white px-2 py-1.5" aria-label="표준구분 선택">
+        {Object.entries(SE_NM).map(([c, n]) => (
+          <option key={c} value={c}>
+            {n}
+          </option>
+        ))}
+      </select>
+    </label>
   )
 }
 

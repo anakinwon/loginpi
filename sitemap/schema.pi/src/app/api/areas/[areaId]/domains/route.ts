@@ -10,7 +10,7 @@ import { domGrpValid } from '@/lib/settings'
 
 type Ctx = { params: Promise<{ areaId: string }> }
 const COLS =
-  'dom_id, key_dom_nm, dom_nm, dom_tp_cd, dom_grp_id, lgc_tp_cd, data_len, data_scale, min_val_txt, max_val_txt, fmt_txt, unit_nm, alw_val_txt, disp_fmt_txt, dom_desc, std_sts_cd, ver_no, std_lgc_tp(lgc_tp_nm, lgc_tp_abbr_nm), std_dom_grp(dom_grp_nm), regr_id, std_reg_dtm'
+  'dom_id, key_dom_nm, dom_nm, dom_tp_cd, dom_grp_id, lgc_tp_cd, data_len, data_scale, min_val_txt, max_val_txt, fmt_txt, unit_nm, alw_val_txt, disp_fmt_txt, dom_desc, std_se_cd, std_sts_cd, ver_no, std_lgc_tp(lgc_tp_nm, lgc_tp_abbr_nm), std_dom_grp(dom_grp_nm), regr_id, std_reg_dtm'
 
 export async function GET(req: Request, { params }: Ctx) {
   const { areaId } = await params
@@ -19,6 +19,7 @@ export async function GET(req: Request, { params }: Ctx) {
   const sp = new URL(req.url).searchParams
   const q = sp.get('q')?.trim()
   const sts = sp.get('sts')
+  const se = sp.get('se')
   const pd = await pendingChg(areaId, 'DOM')
   if ('error' in pd) return dbError(pd.error)
   const build = () => {
@@ -29,6 +30,8 @@ export async function GET(req: Request, { params }: Ctx) {
     }
     // 상태 필터(REQ·CNFM·RJCT·DSCD, 그 외 값은 무시)
     query = stsFilter(query, sts, 'dom_id', pd.pend)
+    // 표준구분 조건(STD·NSTD, 그 외 값은 무시)
+    if (se === 'STD' || se === 'NSTD') query = query.eq('std_se_cd', se)
     return query
   }
   const r = await pageRows(build, sp, 1000)

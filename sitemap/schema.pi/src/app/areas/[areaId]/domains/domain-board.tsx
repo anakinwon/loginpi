@@ -3,7 +3,7 @@ import { piFetch } from '@pi/auth/client'
 // 표준도메인 조회·등록·수정·삭제(클라이언트) — /api/areas/[areaId]/domains(목록·등록·상태 필터), /domains/[domId](수정·삭제, ver_no), /name-preview, /api/types
 import { useCallback, useEffect, useState } from 'react'
 import { can, type MbrRole } from '@/lib/roles'
-import { ActorCells, ApvFields, ApvLink, StsCell, StsFilter, confirmSave, noEnterSubmit } from '../words/word-board'
+import { ActorCells, ApvFields, ApvLink, SeCell, SeFilter, SeSelect, StsCell, StsFilter, confirmSave, noEnterSubmit } from '../words/word-board'
 
 interface Domain {
   dom_id: string
@@ -21,6 +21,7 @@ interface Domain {
   alw_val_txt: string | null
   disp_fmt_txt: string | null
   dom_desc: string | null
+  std_se_cd?: string
   std_sts_cd: string
   pend_act?: string | null
   regr_nm?: string | null
@@ -37,11 +38,11 @@ interface LgcType {
   lgc_tp_abbr_nm: string
 }
 const TP_NM: Record<string, string> = { CD: '코드', NO: '번호', GNRL: '일반' }
-const EMPTY = { key_dom_nm: '', dom_tp_cd: 'GNRL', dom_grp_id: '', lgc_tp_cd: '', data_len: '', data_scale: '', min_val_txt: '', max_val_txt: '', fmt_txt: '', disp_fmt_txt: '', unit_nm: '', alw_val_txt: '', dom_desc: '' }
+const EMPTY = { key_dom_nm: '', dom_tp_cd: 'GNRL', dom_grp_id: '', lgc_tp_cd: '', data_len: '', data_scale: '', min_val_txt: '', max_val_txt: '', fmt_txt: '', disp_fmt_txt: '', unit_nm: '', alw_val_txt: '', dom_desc: '', std_se_cd: 'STD' }
 type Field = keyof typeof EMPTY
 // 목록 열 너비(#·도메인명·상태·대표도메인명·유형·그룹·논리타입·길이·설명·작업) 설명은 남는 폭
 // 설명 = 표 폭의 30%, 나머지 열 = 값에 맞춰 자동(table-auto + 줄바꿈 없음)
-const COL_W = ['', '', '', '', '', '', '', 'w-[30%]', '', '', '', '', '', '']
+const COL_W = ['', '', '', '', '', '', '', 'w-[30%]', '', '', '', '', '', '', '']
 
 export default function DomainBoard({ areaId }: { areaId: string }) {
   const base = `/api/areas/${areaId}/domains`
@@ -71,10 +72,10 @@ export default function DomainBoard({ areaId }: { areaId: string }) {
   const apvOpt = () => ({ ...(selfApprover && selfApv ? { self_apv: true } : {}), ...(rsn.trim() ? { req_rsn: rsn.trim() } : {}) })
 
   // 조회 조건(검색어·상태·페이지·페이지 크기) — 바뀌면 서버에서 해당 페이지만 조회
-  const [cond, setCond] = useState({ kw: '', sts: '', page: 1, size: 10 })
+  const [cond, setCond] = useState({ kw: '', sts: '', se: '', page: 1, size: 10 })
   const [total, setTotal] = useState(0)
   const load = useCallback(async () => {
-    const sp = new URLSearchParams({ page: String(cond.page), size: String(cond.size), ...(cond.kw ? { q: cond.kw } : {}), ...(cond.sts ? { sts: cond.sts } : {}) })
+    const sp = new URLSearchParams({ page: String(cond.page), size: String(cond.size), ...(cond.kw ? { q: cond.kw } : {}), ...(cond.sts ? { sts: cond.sts } : {}), ...(cond.se ? { se: cond.se } : {}) })
     const j = await (await piFetch(`${base}?${sp}`)).json()
     if (j.ok) {
       setDomains(j.domains)
@@ -230,6 +231,7 @@ export default function DomainBoard({ areaId }: { areaId: string }) {
                 {preview.dup && ' (이미 있음)'}
               </p>
             )}
+            <SeSelect value={form.std_se_cd} onChange={(v) => setForm({ ...form, std_se_cd: v })} />
             <ApvFields approver={selfApprover} selfApv={selfApv} setSelfApv={setSelfApv} rsn={rsn} setRsn={setRsn} />
             <div className="ml-auto flex gap-2">
               {edit && (
@@ -267,6 +269,7 @@ export default function DomainBoard({ areaId }: { areaId: string }) {
         >
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="검색명(대표도메인명·도메인명)" className="flex-1 rounded border px-3 py-2 text-sm" />
           <StsFilter value={cond.sts} onChange={(sts) => setCond({ ...cond, sts, page: 1 })} />
+          <SeFilter value={cond.se} onChange={(se) => setCond({ ...cond, se, page: 1 })} />
           <button className="btn-3d">검색</button>
           <a href={`/api/areas/${areaId}/export/domains${cond.kw ? `?q=${encodeURIComponent(cond.kw)}` : ''}`} className="btn-3d btn-3d-green" download>
             엑셀 다운로드
@@ -281,7 +284,7 @@ export default function DomainBoard({ areaId }: { areaId: string }) {
             </colgroup>
             <thead>
               <tr className="thead-3d text-center">
-                {['#', '도메인명', '대표도메인명', '유형', '그룹', '논리타입', '길이', '설명', '등록자', '등록일시', '상태', '승인자', '승인일시', '처리'].map((h, i) => (
+                {['#', '도메인명', '대표도메인명', '유형', '그룹', '논리타입', '길이', '설명', '등록자', '등록일시', '구분', '상태', '승인자', '승인일시', '처리'].map((h, i) => (
                   <th key={i} className="whitespace-nowrap border px-2 py-2">
                     {h}
                   </th>
@@ -291,7 +294,7 @@ export default function DomainBoard({ areaId }: { areaId: string }) {
             <tbody>
               {domains.length === 0 ? (
                 <tr>
-                  <td colSpan={14} className="border px-2 py-4 text-center text-gray-500">
+                  <td colSpan={15} className="border px-2 py-4 text-center text-gray-500">
                     등록된 도메인이 없습니다
                   </td>
                 </tr>
@@ -307,6 +310,7 @@ export default function DomainBoard({ areaId }: { areaId: string }) {
                     <td className="border px-2 py-1">{d.data_len ? `${d.data_len}${d.data_scale ? `,${d.data_scale}` : ''}` : ''}{d.unit_nm ? ` (${d.unit_nm})` : ''}</td>
                     <td className="border px-2 py-1 !whitespace-normal">{d.dom_desc}</td>
                     <ActorCells nm={d.regr_nm} d={d.std_reg_dtm} />
+                    <SeCell se={d.std_se_cd} />
                     <StsCell sts={d.std_sts_cd} pend={d.pend_act} apv={`/areas/${areaId}/approvals?tp=DOM`} />
                     <ActorCells nm={d.apv_nm} d={d.apv_dtm} />
                     <td className="whitespace-nowrap border px-2 py-1 text-center">

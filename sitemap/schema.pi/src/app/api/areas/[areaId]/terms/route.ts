@@ -10,7 +10,7 @@ import { areaSep, termDomError, termDup, termExtShape, wordsByIds } from '@/lib/
 import { termNames, termRuleError } from '@/lib/term-split'
 
 type Ctx = { params: Promise<{ areaId: string }> }
-const COLS = 'term_id, term_log_nm, term_phy_nm, term_desc, nstd_yn, alw_val_txt, disp_fmt_txt, adm_cd_nm, own_org_nm, syn_txt, std_sts_cd, ver_no, std_dom(dom_id, dom_nm, key_dom_nm), regr_id, std_reg_dtm'
+const COLS = 'term_id, term_log_nm, term_phy_nm, term_desc, nstd_yn, std_se_cd, alw_val_txt, disp_fmt_txt, adm_cd_nm, own_org_nm, syn_txt, std_sts_cd, ver_no, std_dom(dom_id, dom_nm, key_dom_nm), regr_id, std_reg_dtm'
 
 export async function GET(req: Request, { params }: Ctx) {
   const { areaId } = await params
@@ -19,6 +19,7 @@ export async function GET(req: Request, { params }: Ctx) {
   const sp = new URL(req.url).searchParams
   const q = sp.get('q')?.trim()
   const sts = sp.get('sts')
+  const se = sp.get('se')
   const pd = await pendingChg(areaId, 'TERM')
   if ('error' in pd) return dbError(pd.error)
   const build = () => {
@@ -29,6 +30,8 @@ export async function GET(req: Request, { params }: Ctx) {
     }
     // 상태 필터(REQ·CNFM·RJCT·DSCD, 그 외 값은 무시)
     query = stsFilter(query, sts, 'term_id', pd.pend)
+    // 표준구분 조건(STD·NSTD, 그 외 값은 무시)
+    if (se === 'STD' || se === 'NSTD') query = query.eq('std_se_cd', se)
     return query
   }
   const r = await pageRows(build, sp, 500)
@@ -46,6 +49,7 @@ const termSchema = z.object({
   dic_ids: z.array(z.string().uuid()).min(1).max(20),
   dom_id: z.string().uuid(),
   term_desc: z.string().trim().max(4000).optional(),
+  std_se_cd: z.enum(['STD', 'NSTD']).optional(), // 표준구분코드(sql/033), 없으면 STD
   ...termExtShape,
 })
 
@@ -71,7 +75,7 @@ export async function POST(req: Request, { params }: Ctx) {
     if (dup.dup_log || dup.dup_phy) return apiError('TERM_DUP_NM', 409)
 
     // 모든 등록은 승인 신청(승인대기) : DA가 즉시 승인을 고를 때만 승인완료
-    const res = await requestIns('TERM', areaId, { ...body, ...names }, user, role, { self_apv: opt.self_apv, reason: opt.req_rsn })
+    const res = await requestIns('TERM', areaId, { ...body, ...names, ...(body.std_se_cd === 'NSTD' ? { nstd_yn: 'Y' } : {}) }, user, role, { self_apv: opt.self_apv, reason: opt.req_rsn })
     if (typeof res === 'string') return apiError(res, ERR_STATUS(res))
     const { data: term, error } = await db().from('std_term').select(COLS).eq('term_id', res.tgt_id).single()
     if (error) return dbError(error)

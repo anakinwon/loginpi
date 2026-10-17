@@ -41,6 +41,7 @@ const TGT_NM: Record<string, string> = { DIC: '단어', DOM: '도메인', TERM: 
 const STS = ['REQ', 'APV', 'RJCT', 'CNCL'] as const
 // 요청 내용 표의 칸 이름(없는 칸은 원래 키로 표시)
 const FIELD_NM: Record<string, string> = {
+  std_se_cd: '표준구분', // STD 표준 / NSTD 비표준(sql/033)
   dic_log_nm: '논리명',
   dic_phy_nm: '물리명',
   dic_eng_nm: '영문풀네임',

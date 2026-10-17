@@ -25,6 +25,7 @@ const SCHEMA: Record<ChgTp, z.ZodType<Record<string, unknown>>> = {
       forbid_yn: yn,
       dic_desc: txt(4000),
       key_dom_yn: yn,
+      std_se_cd: z.enum(['STD', 'NSTD']), // 표준구분코드(sql/033) : STD 표준 / NSTD 비표준
       // 테이블 접미어(sql/017) : 앞 '_' 자동, 대문자, 빈 값 = null
       tbl_sfx_txt: z
         .string()
@@ -51,10 +52,11 @@ const SCHEMA: Record<ChgTp, z.ZodType<Record<string, unknown>>> = {
       disp_fmt_txt: txt(200),
       dom_desc: txt(4000),
       dom_grp_id: z.string().uuid(),
+      std_se_cd: z.enum(['STD', 'NSTD']),
     })
     .partial()
     .strict(),
-  TERM: z.object({ dom_id: z.string().uuid(), term_desc: txt(4000), alw_val_txt: txt(4000), disp_fmt_txt: txt(200), adm_cd_nm: txt(200), own_org_nm: txt(200), syn_txt: txt(4000) }).partial().strict(),
+  TERM: z.object({ dom_id: z.string().uuid(), term_desc: txt(4000), alw_val_txt: txt(4000), disp_fmt_txt: txt(200), adm_cd_nm: txt(200), own_org_nm: txt(200), syn_txt: txt(4000), std_se_cd: z.enum(['STD', 'NSTD']) }).partial().strict(),
 }
 const LOCKED: Record<ChgTp, string[]> = {
   DIC: ['dic_log_nm', 'dic_phy_nm', 'attr_clss_yn', 'forbid_yn'],

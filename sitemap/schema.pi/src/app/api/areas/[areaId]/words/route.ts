@@ -8,7 +8,7 @@ import { pageRows } from '@/lib/paging'
 import { apiError, audit, dbError, parseBody, requireAreaRole } from '@/lib/api'
 
 type Ctx = { params: Promise<{ areaId: string }> }
-const COLS = 'dic_id, dic_log_nm, dic_phy_nm, dic_eng_nm, dic_chn_nm, ent_clss_yn, attr_clss_yn, forbid_yn, dic_desc, key_dom_yn, tbl_sfx_txt, std_sts_cd, ver_no, mod_dtm, regr_id, std_reg_dtm'
+const COLS = 'dic_id, dic_log_nm, dic_phy_nm, dic_eng_nm, dic_chn_nm, ent_clss_yn, attr_clss_yn, forbid_yn, dic_desc, key_dom_yn, tbl_sfx_txt, std_se_cd, std_sts_cd, ver_no, mod_dtm, regr_id, std_reg_dtm'
 
 export async function GET(req: Request, { params }: Ctx) {
   const { areaId } = await params
@@ -17,6 +17,7 @@ export async function GET(req: Request, { params }: Ctx) {
   const sp = new URL(req.url).searchParams
   const q = sp.get('q')?.trim()
   const sts = sp.get('sts')
+  const se = sp.get('se')
   const pd = await pendingChg(areaId, 'DIC')
   if ('error' in pd) return dbError(pd.error)
   const build = () => {
@@ -27,6 +28,8 @@ export async function GET(req: Request, { params }: Ctx) {
     }
     // 상태 필터(REQ·CNFM·RJCT·DSCD, 그 외 값은 무시)
     query = stsFilter(query, sts, 'dic_id', pd.pend)
+    // 표준구분 조건(STD·NSTD, 그 외 값은 무시)
+    if (se === 'STD' || se === 'NSTD') query = query.eq('std_se_cd', se)
     // 속성 분류어만(도메인 대표도메인명 선택지)
     if (sp.get('attr') === 'Y') query = query.eq('attr_clss_yn', 'Y').eq('std_sts_cd', 'CNFM')
     // 지정된 대표도메인만(도메인 등록 대표도메인명 선택지, sql/013)
@@ -55,6 +58,7 @@ const wordSchema = z.object({
   attr_clss_yn: yn,
   forbid_yn: yn,
   dic_desc: z.string().trim().max(4000).optional(),
+  std_se_cd: z.enum(['STD', 'NSTD']).optional(), // 표준구분코드(sql/033), 없으면 STD
 })
 
 export async function POST(req: Request, { params }: Ctx) {

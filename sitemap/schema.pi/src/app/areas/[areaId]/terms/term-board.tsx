@@ -4,7 +4,7 @@ import { piFetch } from '@pi/auth/client'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import { can, type MbrRole } from '@/lib/roles'
-import { ActorCells, ApvFields, ApvLink, StsCell, StsFilter, confirmSave, noEnterSubmit } from '../words/word-board'
+import { ActorCells, ApvFields, ApvLink, SeCell, SeFilter, SeSelect, StsCell, StsFilter, confirmSave, noEnterSubmit } from '../words/word-board'
 
 interface Term {
   term_id: string
@@ -12,6 +12,7 @@ interface Term {
   term_phy_nm: string
   term_desc: string | null
   nstd_yn: string
+  std_se_cd?: string
   alw_val_txt: string | null
   disp_fmt_txt: string | null
   adm_cd_nm: string | null
@@ -59,7 +60,7 @@ type Ext = Record<(typeof EXT)[number][0], string>
 const EMPTY_EXT: Ext = { alw_val_txt: '', disp_fmt_txt: '', adm_cd_nm: '', own_org_nm: '', syn_txt: '' }
 // 목록 열 너비(#·논리 용어명·상태·물리 용어명·도메인·설명·작업) — 설명은 남는 폭
 // 설명 = 표 폭의 30%, 나머지 열 = 값에 맞춰 자동(table-auto + 줄바꿈 없음)
-const COL_W = ['', '', '', '', 'w-[30%]', '', '', '', '', '', '']
+const COL_W = ['', '', '', '', 'w-[30%]', '', '', '', '', '', '', '']
 const INPUT = 'w-full rounded border px-3 py-2'
 
 export default function TermBoard({ areaId }: { areaId: string }) {
@@ -77,6 +78,7 @@ export default function TermBoard({ areaId }: { areaId: string }) {
   const [pick, setPick] = useState(0)
   const [domId, setDomId] = useState('')
   const [desc, setDesc] = useState('')
+  const [se, setSe] = useState('STD') // 표준구분코드(sql/033)
   const [ext, setExt] = useState<Ext>(EMPTY_EXT)
   const [msg, setMsg] = useState('')
   const [edit, setEdit] = useState<Term | null>(null)
@@ -96,10 +98,10 @@ export default function TermBoard({ areaId }: { areaId: string }) {
   const reqMsg = (j: { requested?: boolean; resubmitted?: boolean }, okMsg: string) => (j.resubmitted ? '재신청을 접수했습니다' : j.requested ? '승인 신청을 접수했습니다(승인 후 사용 가능)' : okMsg)
 
   // 조회 조건(검색어·페이지·페이지 크기) — 바뀌면 서버에서 해당 페이지만 조회
-  const [cond, setCond] = useState({ kw: '', sts: '', page: 1, size: 10 })
+  const [cond, setCond] = useState({ kw: '', sts: '', se: '', page: 1, size: 10 })
   const [total, setTotal] = useState(0)
   const load = useCallback(async () => {
-    const sp = new URLSearchParams({ page: String(cond.page), size: String(cond.size), ...(cond.kw ? { q: cond.kw } : {}), ...(cond.sts ? { sts: cond.sts } : {}) })
+    const sp = new URLSearchParams({ page: String(cond.page), size: String(cond.size), ...(cond.kw ? { q: cond.kw } : {}), ...(cond.sts ? { sts: cond.sts } : {}), ...(cond.se ? { se: cond.se } : {}) })
     const j = await (await piFetch(`${base}?${sp}`)).json()
     if (j.ok) {
       setTerms(j.terms)
@@ -146,6 +148,7 @@ export default function TermBoard({ areaId }: { areaId: string }) {
     setName('')
     setDomId('')
     setDesc('')
+    setSe('STD')
     setExt(EMPTY_EXT)
     setCands([])
     setRsn('')
@@ -156,6 +159,7 @@ export default function TermBoard({ areaId }: { areaId: string }) {
     setName(t.term_log_nm)
     setDomId(t.std_dom?.dom_id ?? '')
     setDesc(t.term_desc ?? '')
+    setSe(t.std_se_cd ?? 'STD')
     setExt(Object.fromEntries(EXT.map(([k]) => [k, t[k] ?? ''])) as Ext)
     setMsg('')
     window.scrollTo({ top: 0, behavior: 'smooth' }) // 등록·수정 영역이 목록 위에 있음
@@ -167,13 +171,13 @@ export default function TermBoard({ areaId }: { areaId: string }) {
     if (!confirmSave(!!edit)) return
     let j
     if (edit) {
-      const body = { ver_no: edit.ver_no, ...apvOpt(), dom_id: domId, term_desc: desc || null, ...Object.fromEntries(EXT.map(([k]) => [k, ext[k] || null])) }
+      const body = { ver_no: edit.ver_no, ...apvOpt(), dom_id: domId, term_desc: desc || null, std_se_cd: se, ...Object.fromEntries(EXT.map(([k]) => [k, ext[k] || null])) }
       j = await (await piFetch(`${base}/${edit.term_id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json()
       if (j.ok) setMsg(reqMsg(j, `용어 ${edit.term_log_nm} 수정·승인 완료`))
     } else {
       if (!cur) return
       const dic_ids = cur.segments.flatMap((s) => ('word' in s ? [s.word.dic_id] : []))
-      const body = { dic_ids, dom_id: domId, ...(desc ? { term_desc: desc } : {}), ...Object.fromEntries(Object.entries(ext).filter(([, v]) => v)), ...apvOpt() }
+      const body = { dic_ids, dom_id: domId, std_se_cd: se, ...(desc ? { term_desc: desc } : {}), ...Object.fromEntries(Object.entries(ext).filter(([, v]) => v)), ...apvOpt() }
       j = await (await piFetch(base, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json()
       if (j.ok) setMsg(reqMsg(j, `표준용어 ${j.term.term_log_nm} 등록·승인 완료`))
     }
@@ -292,6 +296,7 @@ export default function TermBoard({ areaId }: { areaId: string }) {
           </div>
           <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-2">
             <p className="text-xs text-gray-500">용어는 표준단어 2개 이상으로 구성하고 끝 단어는 속성 분류어여야 합니다. 등록 후 구성은 바꿀 수 없습니다(도메인·설명·부가 칸만 수정)</p>
+            <SeSelect value={se} onChange={setSe} />
             <ApvFields approver={selfApprover} selfApv={selfApv} setSelfApv={setSelfApv} rsn={rsn} setRsn={setRsn} />
             <div className="ml-auto flex gap-2">
               {edit && (
@@ -323,6 +328,7 @@ export default function TermBoard({ areaId }: { areaId: string }) {
         >
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="검색명(논리·물리 용어명)" className="flex-1 rounded border px-3 py-2 text-sm" />
           <StsFilter value={cond.sts} onChange={(sts) => setCond({ ...cond, sts, page: 1 })} />
+          <SeFilter value={cond.se} onChange={(se) => setCond({ ...cond, se, page: 1 })} />
           <button className="btn-3d">검색</button>
           <a href={`/api/areas/${areaId}/export/terms${cond.kw ? `?q=${encodeURIComponent(cond.kw)}` : ''}`} className="btn-3d btn-3d-green" download>
             엑셀 다운로드
@@ -337,7 +343,7 @@ export default function TermBoard({ areaId }: { areaId: string }) {
             </colgroup>
             <thead>
               <tr className="thead-3d text-center">
-                {['#', '논리 용어명', '물리 용어명', '도메인', '설명', '등록자', '등록일시', '상태', '승인자', '승인일시', '처리'].map((h, i) => (
+                {['#', '논리 용어명', '물리 용어명', '도메인', '설명', '등록자', '등록일시', '구분', '상태', '승인자', '승인일시', '처리'].map((h, i) => (
                   <th key={i} className="whitespace-nowrap border px-2 py-2">
                     {h}
                   </th>
@@ -347,7 +353,7 @@ export default function TermBoard({ areaId }: { areaId: string }) {
             <tbody>
               {terms.length === 0 ? (
                 <tr>
-                  <td colSpan={11} className="border px-2 py-4 text-center text-gray-500">
+                  <td colSpan={12} className="border px-2 py-4 text-center text-gray-500">
                     등록된 용어가 없습니다
                   </td>
                 </tr>
@@ -357,7 +363,6 @@ export default function TermBoard({ areaId }: { areaId: string }) {
                     <td className="border px-2 py-1 text-center text-gray-500 tabular-nums">{((cond.page - 1) * cond.size + i + 1).toLocaleString()}</td>
                     <td className="border px-2 py-1 font-medium">
                       {t.term_log_nm}
-                      {t.nstd_yn === 'Y' && <span className="ml-1 rounded bg-amber-100 px-1 text-xs font-normal text-amber-800" title="표준 규칙 예외로 수용한 용어">비표준</span>}
                     </td>
                     <td className="border px-2 py-1 font-mono break-all">{t.term_phy_nm}</td>
                     <td className="border px-2 py-1 break-all">{t.std_dom?.dom_nm}</td>
@@ -370,6 +375,7 @@ export default function TermBoard({ areaId }: { areaId: string }) {
                       ))}
                     </td>
                     <ActorCells nm={t.regr_nm} d={t.std_reg_dtm} />
+                    <SeCell se={t.std_se_cd} />
                     <StsCell sts={t.std_sts_cd} pend={t.pend_act} apv={`/areas/${areaId}/approvals?tp=TERM`} />
                     <ActorCells nm={t.apv_nm} d={t.apv_dtm} />
                     <td className="whitespace-nowrap border px-2 py-1 text-center">
