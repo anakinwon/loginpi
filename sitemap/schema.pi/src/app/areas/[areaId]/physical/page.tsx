@@ -3,7 +3,7 @@ import { piFetch } from '@pi/auth/client'
 // 물리 모델 화면(PRD_PiErd S2 P1·P5·P6) — 논리 모델 → 물리 전환과 칼럼 그리드 편집, DDL·물리 정의서 내려받기
 //  상단 : 프로젝트·DBMS·대소문자·삭제 칼럼 선택 → 전환 미리보기(관문 사유·변환 이슈·테이블/칼럼/FK 수) → 전환
 //  아래 : 물리 모델(DBMS별) 선택 → 논리와의 차이(도메인 영향 포함)·DDL·정의서 / 왼쪽 테이블 목록 · 오른쪽 칼럼 그리드(순서·NULL·기본값, 저장 = 테이블 단위 묶음)
-//  재전환 = 삭제 후 다시 전환(그리드 편집값은 사라짐 — 변경분 반영 전환은 S5)
+//  논리 변경 반영(S5) = 동기화(순서·NULL·기본값 편집 유지) + 변경분 DDL(ALTER) 내려받기. 삭제 후 재전환도 가능(편집값 사라짐)
 import Link from 'next/link'
 import { use, useCallback, useEffect, useMemo, useState } from 'react'
 import { dbmsList, type DbmsCd } from '@/lib/modelpi/dbms'
@@ -173,6 +173,15 @@ export default function PhysicalPage({ params }: { params: Promise<{ areaId: str
     await loadDet()
   }
   const diffN = det?.diff ? Object.values(det.diff).reduce((n, v) => n + v.length, 0) : 0
+  const sync = async () => {
+    if (!det || !window.confirm('논리 모델의 변경(추가·삭제·이름·타입·주키)을 이 물리 모델에 반영합니다. 칼럼 순서·NULL·기본값 편집은 유지됩니다. 먼저 변경분 DDL 을 내려받아 두기를 권합니다. 계속할까요?')) return
+    setBusy(true)
+    const j = await (await piFetch(`${base}?sync=1`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phy_mdl_id: det.mdl.phy_mdl_id, ver_no: det.mdl.ver_no }) })).json()
+    setBusy(false)
+    setMsg(j.ok ? `동기화했습니다 — 변경 ${j.ops}건, FK 추가 ${j.addFk}·삭제 ${j.delFk}` : [j.message, ...(j.why ?? []), ...(j.issues ?? [])].join(' / '))
+    await loadList()
+    await loadDet()
+  }
   const canConvert = editor && !!pv && !pv.why.length && !pv.issues.length && !models.some((m) => m.dbms_cd === dbms)
 
   return (
@@ -275,7 +284,19 @@ export default function PhysicalPage({ params }: { params: Promise<{ areaId: str
           </section>
           {det.diff && (
             <details className="mt-2 rounded border p-2 text-sm" open={diffN > 0}>
-              <summary className={diffN ? 'font-semibold text-amber-700' : 'text-green-700'}>{diffN ? `논리 모델과 차이 ${diffN}건(도메인 영향 ${det.diff.dom_chg.length}) — 반영하려면 삭제 후 다시 전환` : '논리 모델과 차이 없음'}</summary>
+              <summary className={diffN ? 'font-semibold text-amber-700' : 'text-green-700'}>{diffN ? `논리 모델과 차이 ${diffN}건(도메인 영향 ${det.diff.dom_chg.length})` : '논리 모델과 차이 없음'}</summary>
+              {diffN > 0 && (
+                <p className="my-1 flex flex-wrap gap-2">
+                  <button type="button" className={btn} onClick={() => void down('format=alter', '변경분DDL.sql')}>
+                    변경분 DDL(ALTER) 내려받기
+                  </button>
+                  {editor && (
+                    <button type="button" className={`${btn} bg-[#1f3a68] text-white`} disabled={busy} onClick={() => void sync()}>
+                      논리 변경 반영(동기화)
+                    </button>
+                  )}
+                </p>
+              )}
               {(Object.keys(DIFF_NM) as (keyof Diff)[])
                 .filter((k) => det.diff![k].length)
                 .map((k) => (

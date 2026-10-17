@@ -1,13 +1,15 @@
 // 물리 모델(PRD_PiErd S2 P1~P4) — GET : 물리 모델 목록 + 변환 미리보기(?dbms=, 관문·이슈·테이블 수) / ?mdl= : 저장된 물리 모델 + 현재 논리와의 차이
 // GET ?mdl=&format=ddl : DDL(.sql 내려받기, S2 P6) / ?mdl=&format=csv&type=tbl|col : 테이블·칼럼 정의서 CSV
 // PATCH : 칼럼 그리드 편집(테이블 1개, 순서·NULL·기본값 묶음, 칼럼별 ver_no 잠금, S2 P5)
+// GET ?mdl=&format=alter : 변경분 DDL(현재 논리와의 차이, S5) / POST ?sync=1 {phy_mdl_id, ver_no} : 논리 변경을 저장 모델에 동기화(사용자 편집 유지)
 // POST : 전환(관문 통과·이슈 0 일 때만, 프로젝트 × DBMS 활성 1건) / DELETE ?mdl=&ver_no= : 논리 삭제(재전환은 삭제 후 다시 전환)
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { apiError, audit, dbError, errMsg, parseBody, requireAreaRole } from '@/lib/api'
 import { db } from '@/lib/db'
 import { kstDtm } from '@/lib/bulk'
-import { delPhy, listPhy, loadPhy, phyDdlInput, phyPlan, savePhy } from '@/lib/model-phy'
+import { delPhy, listPhy, loadPhy, phyDdlInput, phyPlan, savePhy, syncPhy, syncPlan } from '@/lib/model-phy'
+import { alterDdl } from '@/lib/modelpi/phy-sync'
 import { genDdl, phyDocTables } from '@/lib/modelpi/ddl'
 import { docCsv } from '@/lib/modelpi/docs'
 import { DBMS_PRFL, isDbms, type DbmsCd } from '@/lib/modelpi/dbms'
@@ -35,6 +37,15 @@ export async function GET(req: Request, { params }: Ctx) {
       const p = await loadPhy(areaId, mdlId)
       if (!p || p.mdl.prj_id !== prjId) return apiError('NOT_FOUND', 404)
       const format = sp.get('format')
+      if (format === 'alter') {
+        const s = await syncPlan(areaId, prjId, p)
+        if (!s) return apiError('NOT_FOUND', 404)
+        const prjNm = ((await db().from('mdl_prj').select('prj_nm').eq('prj_id', prjId).maybeSingle()).data as { prj_nm: string } | null)?.prj_nm ?? 'model'
+        const at = kstDtm(new Date().toISOString())
+        const sql = alterDdl(s.ops, { dbms: p.mdl.dbms_cd as DbmsCd, ltr: p.mdl.idntfr_ltr_cd as 'UPPER' | 'LOWER', prjNm, at }) + (s.addFk.length || s.delFk.length ? `-- FK 변경 ${s.addFk.length}건 추가·${s.delFk.length}건 삭제 : 동기화 후 전체 DDL 의 FK 문을 참고하십시오\n` : '')
+        const name = encodeURIComponent(`${prjNm}_${DBMS_PRFL[p.mdl.dbms_cd as DbmsCd].nm}_변경분DDL_${at.slice(0, 10)}.sql`)
+        return new NextResponse(sql, { headers: { 'Content-Type': 'application/sql; charset=utf-8', 'Content-Disposition': `attachment; filename*=UTF-8''${name}`, 'Cache-Control': 'no-store' } })
+      }
       if (format === 'ddl' || format === 'csv') {
         const type = sp.get('type')
         if (format === 'csv' && type !== 'tbl' && type !== 'col') return apiError('INVALID_INPUT', 400)
@@ -76,6 +87,25 @@ export async function POST(req: Request, { params }: Ctx) {
   const auth = await requireAreaRole(areaId, 'REQUEST')
   if (auth instanceof NextResponse) return auth
   if (!uuid.safeParse(prjId).success) return apiError('INVALID_INPUT', 400)
+  if (new URL(req.url).searchParams.get('sync') === '1') {
+    const sb = await parseBody(req, z.object({ phy_mdl_id: uuid, ver_no: z.number().int() }))
+    if (sb instanceof NextResponse) return sb
+    try {
+      const p = await loadPhy(areaId, sb.phy_mdl_id)
+      if (!p || p.mdl.prj_id !== prjId) return apiError('NOT_FOUND', 404)
+      const s = await syncPlan(areaId, prjId, p)
+      if (!s) return apiError('NOT_FOUND', 404)
+      if (s.why.length) return NextResponse.json({ ok: false, code: 'PHY_GATE', message: errMsg('PHY_GATE'), why: s.why }, { status: 409 })
+      if (s.issues.length) return NextResponse.json({ ok: false, code: 'PHY_ISSUES', message: errMsg('PHY_ISSUES'), issues: s.issues }, { status: 409 })
+      if (s.capped) return apiError('INVALID_INPUT', 400)
+      const r = await syncPhy(areaId, sb.phy_mdl_id, sb.ver_no, s, auth.user.usr_id)
+      if (r === 'VERSION_CONFLICT') return apiError('VERSION_CONFLICT', 409)
+      await audit({ area_id: areaId, tgt_tp_cd: 'PHY', tgt_id: sb.phy_mdl_id, act_cd: 'UPD', aftr_val: { sync: r }, usr_id: auth.user.usr_id })
+      return NextResponse.json({ ok: true, ...r })
+    } catch (e) {
+      return dbError(e as { code?: string; message?: string })
+    }
+  }
   const b = await parseBody(req, body)
   if (b instanceof NextResponse) return b
   const dbms = b.dbms_cd as DbmsCd

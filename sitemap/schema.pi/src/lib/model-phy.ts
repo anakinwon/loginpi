@@ -7,6 +7,7 @@ import { checkLogical } from './modelpi/normalize'
 import { phyGate, toPhysical, type PhyCol, type PhyTbl, type TpMap } from './modelpi/phy'
 import type { DbmsCd } from './modelpi/dbms'
 import type { DdlIn, DdlTbl } from './modelpi/ddl'
+import { planSync, type StoredTbl, type SyncOp } from './modelpi/phy-sync'
 
 const PAGE = 1000 // PostgREST max_rows 대응 — range 반복 조회
 const TBL_CHUNK = 100 // in() URL 길이 제한 대응
@@ -123,6 +124,81 @@ export async function savePhy(areaId: string, prjId: string, opt: { dbms: DbmsCd
     throw e
   }
   return m.data as { phy_mdl_id: string; ver_no: number }
+}
+
+// 동기화 계획(S5) — 저장 모델 vs 현재 논리 변환. 관문(논리 점검)을 통과해야 계획을 낸다
+export async function syncPlan(areaId: string, prjId: string, p: NonNullable<Awaited<ReturnType<typeof loadPhy>>>) {
+  const plan = await phyPlan(areaId, prjId, p.mdl.dbms_cd as DbmsCd, p.mdl.del_col_use_yn === 'Y')
+  if (!plan) return null
+  const ops = planSync(p.tables as unknown as StoredTbl[], plan.tables)
+  const have = new Map(p.fks.map((f) => [f.rel_id, f]))
+  const want = new Set(plan.fks.map((f) => f.rel_id))
+  const delFk = p.fks.filter((f) => !want.has(f.rel_id))
+  // 새 FK 이름 = 변환 번호를 그대로 쓰면 유지되는 FK 이름과 겹칠 수 있음 → 같은 접두로 빈 번호를 찾아 다시 매김
+  const taken = new Set(p.fks.filter((f) => want.has(f.rel_id)).map((f) => f.fk_nm))
+  const addFk = plan.fks
+    .filter((f) => !have.has(f.rel_id))
+    .map((f) => {
+      const base = f.fk_nm.replace(/_\d{2}$/, '')
+      let nm = f.fk_nm
+      for (let n = 1; taken.has(nm) && n < 100; n++) nm = `${base}_${String(n).padStart(2, '0')}`
+      taken.add(nm)
+      return { ...f, fk_nm: nm }
+    })
+  return { why: plan.why, issues: plan.issues, capped: plan.capped, ops, addFk, delFk }
+}
+
+// 동기화 적용 — 모델 ver_no 를 먼저 올려 동시 동기화 차단, 주키 순서 고유 인덱스 충돌을 피해 2단계(주키 해제 → 최종값)
+// ponytail: 다단 update(무트랜잭션) — 중간 실패 시 일부 반영, 다시 동기화하면 남은 차이만 반영됨
+export async function syncPhy(areaId: string, mdlId: string, verNo: number, s: NonNullable<Awaited<ReturnType<typeof syncPlan>>>, uid: string) {
+  const claim = await db().from('mdl_phy_mdl').update({ ver_no: verNo + 1, modr_id: uid }).eq('phy_mdl_id', mdlId).eq('area_id', areaId).eq('ver_no', verNo).eq('del_yn', 'N').select('phy_mdl_id')
+  if (claim.error) throw claim.error
+  if (!claim.data.length) return 'VERSION_CONFLICT' as const
+  const now = new Date().toISOString()
+  const del = { del_yn: 'Y', del_dtm: now, modr_id: uid }
+  const sys = { regr_id: uid, modr_id: uid }
+  const up = async (tb: string, set: Record<string, unknown>, k: string, id: string) => {
+    const r = await db().from(tb).update({ ...set, modr_id: uid }).eq(k, id)
+    if (r.error) throw r.error
+  }
+  const of = <K extends SyncOp['op']>(k: K) => s.ops.filter((o): o is Extract<SyncOp, { op: K }> => o.op === k)
+  for (const o of of('DEL_COL')) await up('mdl_phy_col', del, 'phy_col_id', o.phy_col_id)
+  for (const o of of('DEL_TBL')) {
+    const c = await db().from('mdl_phy_col').update(del).eq('phy_tbl_id', o.phy_tbl_id).eq('del_yn', 'N')
+    if (c.error) throw c.error
+    await up('mdl_phy_tbl', del, 'phy_tbl_id', o.phy_tbl_id)
+  }
+  // 이름 변경 2단계 : 임시 이름(대문자·고유) → 최종 이름 — 맞바꿈(A↔B)·연쇄(A→B→C)·같은 이름 새 칼럼에서도 고유 인덱스 충돌 없음
+  const tmp = (id: string) => `#TMP_${id.replace(/-/g, '').toUpperCase()}`
+  for (const o of of('REN_TBL')) await up('mdl_phy_tbl', { tbl_nm: tmp(o.phy_tbl_id) }, 'phy_tbl_id', o.phy_tbl_id)
+  for (const o of of('REN_TBL')) await up('mdl_phy_tbl', { tbl_nm: o.to }, 'phy_tbl_id', o.phy_tbl_id)
+  const mods = of('MOD_COL')
+  const renames = mods.filter((m) => m.from.col_nm !== m.to.col_nm)
+  for (const o of renames) await up('mdl_phy_col', { col_nm: tmp(o.phy_col_id) }, 'phy_col_id', o.phy_col_id)
+  for (const o of renames) await up('mdl_phy_col', { col_nm: o.to.col_nm }, 'phy_col_id', o.phy_col_id)
+  for (const o of mods.filter((m) => m.from.pk_yn === 'Y')) await up('mdl_phy_col', { pk_yn: 'N', pk_seq: null }, 'phy_col_id', o.phy_col_id) // 1단계 : 주키 해제
+  for (const o of of('SEQ')) await up('mdl_phy_col', { col_seq: o.col_seq }, 'phy_col_id', o.phy_col_id)
+  const add = of('ADD_COL')
+  if (add.length) {
+    const r = await db().from('mdl_phy_col').insert(add.map((o) => ({ area_id: areaId, phy_tbl_id: o.phy_tbl_id, ...o.col, ...sys })))
+    if (r.error) throw r.error
+  }
+  for (const o of mods) {
+    const t = o.to
+    await up('mdl_phy_col', { col_nm: t.col_nm, phy_tp_nm: t.phy_tp_nm, data_len: t.data_len, data_scale: t.data_scale, pk_yn: t.pk_yn, pk_seq: t.pk_seq, dom_id: t.dom_id, dom_ver_no: t.dom_ver_no, ...(t.pk_yn === 'Y' ? { null_yn: 'N' } : {}) }, 'phy_col_id', o.phy_col_id) // 2단계 : 최종값(순서·NULL·기본값 = 사용자 결정 유지)
+  }
+  for (const o of of('ADD_TBL')) {
+    const t = await db().from('mdl_phy_tbl').insert({ area_id: areaId, phy_mdl_id: mdlId, ent_id: o.tbl.ent_id, tbl_nm: o.tbl.tbl_nm, tbl_desc: o.tbl.tbl_desc, ...sys }).select('phy_tbl_id').single()
+    if (t.error) throw t.error
+    const c = await db().from('mdl_phy_col').insert(o.tbl.cols.map((x) => ({ area_id: areaId, phy_tbl_id: (t.data as { phy_tbl_id: string }).phy_tbl_id, ...x, ...sys })))
+    if (c.error) throw c.error
+  }
+  for (const f of s.delFk) await up('mdl_phy_fk', del, 'phy_fk_id', f.phy_fk_id)
+  if (s.addFk.length) {
+    const r = await db().from('mdl_phy_fk').insert(s.addFk.map((f) => ({ area_id: areaId, phy_mdl_id: mdlId, ...f, ...sys })))
+    if (r.error) throw r.error
+  }
+  return { ops: s.ops.length, addFk: s.addFk.length, delFk: s.delFk.length }
 }
 
 // 논리 삭제 — 모델 먼저(중간 실패 시 남는 하위 행은 비활성 모델 소속이라 목록·고유 인덱스에 영향 없음, 재시도로 정리)
