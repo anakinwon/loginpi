@@ -85,3 +85,12 @@ test('검증 결함 회귀 : 중복 칼럼 경고, NUMBER(*,0), KEY·INDEX·CHEC
   assert.deepEqual(t.cols.map((c) => [c.name, c.type, c.len]), [['A', 'INT', null], ['KEY', 'VARCHAR', 5], ['INDEX', 'INT', null], ['CHECK_YN', 'CHAR', 1], ['N', 'NUMBER', null]])
   assert.ok(r.warnings.some((w) => w.includes('중복 칼럼')))
 })
+
+test('보안 회귀 : 한 테이블 칼럼 6만 개 — 선형 시간·상한에서 중단·경고', () => {
+  const cols = Array.from({ length: 60_000 }, (_, i) => `c${i} int`).join(', ')
+  const t0 = performance.now()
+  const r = parseDdl(`CREATE TABLE big (${cols});`)
+  assert.ok(performance.now() - t0 < 3000)
+  assert.ok(r.tables[0].cols.length <= 50_001)
+  assert.ok(r.warnings.some((w) => w.includes('중단')))
+})

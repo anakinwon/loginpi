@@ -67,13 +67,19 @@ export function csvToRvs(text: string): RvsResult | { missing: string[] } {
   const tables = new Map<string, RvsTbl>()
   const fkMap = new Map<string, { name: string | null; table: string; cols: string[]; ref_table: string; ref_cols: string[] }>()
   const warnings: string[] = []
+  const seen = new Set<string>() // 테이블|칼럼 — 중복 행 O(1) 판정
   for (const r of rows.slice(1)) {
+    if (seen.size > 50_000) {
+      warnings.push('칼럼이 50,000개를 넘어 해석을 중단했습니다 — 나누어 올리십시오')
+      break
+    }
     const tn = v(r, 'TABLE_NAME').toUpperCase()
     const cn = v(r, 'COLUMN_NAME').toUpperCase()
     if (!tn || !cn) continue
     const t = tables.get(tn) ?? { name: tn, comment: v(r, 'TABLE_COMMENT') || null, cols: [], pk: [] }
     tables.set(tn, t)
-    const dup = t.cols.some((c) => c.name === cn) // FK 여러 개로 같은 칼럼 행이 반복될 수 있음 — 칼럼은 1번만, FK 는 행마다
+    const dup = seen.has(`${tn}|${cn}`) // FK 여러 개로 같은 칼럼 행이 반복될 수 있음 — 칼럼은 1번만, FK 는 행마다
+    seen.add(`${tn}|${cn}`)
     const pkPos = num(v(r, 'PK_POS'))
     if (!dup) t.cols.push({ name: cn, type: v(r, 'DATA_TYPE').toUpperCase(), len: num(v(r, 'DATA_LENGTH')), scale: num(v(r, 'DATA_SCALE')), nullable: pkPos === null && !/^(N|NO|FALSE)$/i.test(v(r, 'NULLABLE')), dflt: v(r, 'DATA_DEFAULT') || null, comment: v(r, 'COLUMN_COMMENT') || null })
     if (!dup && pkPos !== null) (t as RvsTbl & { pkPos?: Map<string, number> }).pk.push(`${pkPos}\u0000${cn}`)
@@ -169,11 +175,12 @@ export function relCands(r: RvsResult): RelCand[] {
     if (!ch || !byNm.has(f.ref_table)) continue
     add({ prnt: f.ref_table, chld: f.table, cols: f.cols, ref_cols: f.ref_cols, src: 'FK', fk_nm: f.name, idnt: f.cols.every((c) => ch.pk.includes(c)), opt: f.cols.some((c) => ch.cols.find((x) => x.name === c)?.nullable) })
   }
+  const used = new Set(out.flatMap((x) => x.cols.map((c) => `${x.chld}|${c}`))) // 선언 FK 칼럼 — 이름 후보 제외(O(1))
   const pk1 = new Map(r.tables.filter((t) => t.pk.length === 1 && !GENERIC_COLS.has(t.pk[0])).map((t) => [t.pk[0], t.name]))
   for (const t of r.tables)
     for (const c of t.cols) {
       const p = pk1.get(c.name)
-      if (!p || p === t.name || out.some((x) => x.chld === t.name && x.cols.includes(c.name))) continue
+      if (!p || p === t.name || used.has(`${t.name}|${c.name}`)) continue
       add({ prnt: p, chld: t.name, cols: [c.name], ref_cols: [c.name], src: 'NAME', fk_nm: null, idnt: t.pk.includes(c.name), opt: c.nullable })
     }
   return out

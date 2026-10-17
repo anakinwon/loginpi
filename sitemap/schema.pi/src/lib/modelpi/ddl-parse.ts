@@ -149,7 +149,10 @@ function parseCol(def: string): RvsCol | null {
   }
 }
 
+export const COL_CAP = 50_000 // 전체 칼럼 상한 — 넘으면 해석 중단(경고), 큰 스키마는 나누어 올림
+
 export function parseDdl(sql: string): RvsResult {
+  let colTotal = 0
   const tables = new Map<string, RvsTbl>()
   const fks: RvsFk[] = []
   const warnings: string[] = []
@@ -162,6 +165,7 @@ export function parseDdl(sql: string): RvsResult {
       const p = paren(s, m[0].length - 1)
       if (!p) { warnings.push(`${name} : 괄호가 닫히지 않음`); continue }
       const t: RvsTbl = { name, comment: null, cols: [], pk: [] }
+      const seen = new Set<string>() // 중복 칼럼 O(1) 판정
       for (const part of splitTop(s.slice(p[0] + 1, p[1]), ',')) {
         let k: RegExpExecArray | null
         if ((k = RE_PK.exec(part))) t.pk = list(k[2])
@@ -170,18 +174,24 @@ export function parseDdl(sql: string): RvsResult {
         else {
           const c = parseCol(part)
           if (!c) { warnings.push(`${name} : 해석 못 한 정의 "${part.slice(0, 40)}"`); continue }
-          if (t.cols.some((x) => x.name === c.name)) {
+          if (seen.has(c.name)) {
             warnings.push(`${name}.${c.name} : 중복 칼럼 — 뒤의 정의는 무시`)
             continue
           }
           if (/\bPRIMARY\s+KEY\b/i.test(part)) t.pk.push(c.name)
           const r = /\bREFERENCES\s+((?:"(?:[^"]|"")*"|[\w$#]+)(?:\s*\.\s*(?:"(?:[^"]|"")*"|[\w$#]+))*)\s*(?:\(([^)]*)\))?/i.exec(part)
           if (r) fks.push({ name: null, table: name, cols: [c.name], ref_table: ident(r[1]), ref_cols: r[2] ? list(r[2]) : [] })
+          seen.add(c.name)
           t.cols.push(c)
+          if (++colTotal > COL_CAP) break
         }
       }
       for (const c of t.cols) if (t.pk.includes(c.name)) c.nullable = false
       tables.set(name, t)
+      if (colTotal > COL_CAP) {
+        warnings.push(`칼럼이 ${COL_CAP.toLocaleString()}개를 넘어 해석을 중단했습니다 — 스키마·주제영역 단위로 나누어 올리십시오`)
+        break
+      }
     } else if ((m = /^ALTER\s+TABLE\s+(?:ONLY\s+)?(?:IF\s+EXISTS\s+)?((?:"(?:[^"]|"")*"|[\w$#]+)(?:\s*\.\s*(?:"(?:[^"]|"")*"|[\w$#]+))*)\s+ADD\s+(.*)$/i.exec(s))) {
       const name = ident(m[1])
       let k: RegExpExecArray | null
