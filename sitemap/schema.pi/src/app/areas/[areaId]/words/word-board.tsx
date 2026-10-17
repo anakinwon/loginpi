@@ -286,7 +286,7 @@ export default function WordBoard({ areaId }: { areaId: string }) {
           <StsFilter value={cond.sts} onChange={(sts) => setCond({ ...cond, sts, page: 1 })} />
           <SeFilter value={cond.se} onChange={(se) => setCond({ ...cond, se, page: 1 })} />
           <button className="btn-3d">검색</button>
-          <a href={`/api/areas/${areaId}/export/words${cond.kw ? `?q=${encodeURIComponent(cond.kw)}` : ''}`} className="btn-3d btn-3d-green" download>
+          <a href={`/api/areas/${areaId}/export/words?${new URLSearchParams({ ...(cond.kw ? { q: cond.kw } : {}), ...(cond.se ? { se: cond.se } : {}) })}`} className="btn-3d btn-3d-green" download>
             엑셀 다운로드
           </a>
         </form>

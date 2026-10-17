@@ -5,9 +5,11 @@ import { db } from '@/lib/db'
 import { dbError, requireAreaRole } from '@/lib/api'
 import { HEADERS, toCsv, kstDtm } from '@/lib/bulk'
 import { fetchAll } from '@/lib/bulk-check'
+const SE_NM: Record<string, string> = { STD: '표준', NSTD: '비표준' } // 표준구분코드(sql/033)
 
 type Ctx = { params: Promise<{ areaId: string }> }
 interface Row {
+  std_se_cd: string
   std_reg_dtm: string
   key_dom_nm: string
   dom_nm: string
@@ -26,12 +28,14 @@ export async function GET(req: Request, { params }: Ctx) {
   const { areaId } = await params
   const auth = await requireAreaRole(areaId, 'VIEW')
   if (auth instanceof NextResponse) return auth
-  const q = new URL(req.url).searchParams.get('q')?.trim()
+  const sp = new URL(req.url).searchParams
+  const q = sp.get('q')?.trim()
+  const se = sp.get('se') // 표준구분 조건(STD·NSTD, 그 외 값은 무시)
   try {
     const doms = await fetchAll<Row>(() => {
       let query = db()
         .from('std_dom')
-        .select('key_dom_nm, dom_nm, dom_desc, data_len, data_scale, fmt_txt, disp_fmt_txt, unit_nm, alw_val_txt, std_lgc_tp(lgc_tp_nm), std_dom_grp(dom_grp_nm), std_reg_dtm, dom_id')
+        .select('key_dom_nm, dom_nm, dom_desc, data_len, data_scale, fmt_txt, disp_fmt_txt, unit_nm, alw_val_txt, std_lgc_tp(lgc_tp_nm), std_dom_grp(dom_grp_nm), std_se_cd, std_reg_dtm, dom_id')
         .eq('area_id', areaId)
         .eq('del_yn', 'N')
         .order('std_reg_dtm', { ascending: false })
@@ -40,11 +44,12 @@ export async function GET(req: Request, { params }: Ctx) {
         const p = `%${q.replace(/[%_,()]/g, '')}%`
         query = query.or(`key_dom_nm.ilike.${p},dom_nm.ilike.${p}`)
       }
+      if (se === 'STD' || se === 'NSTD') query = query.eq('std_se_cd', se)
       return query
     })
     const H = HEADERS.domains
     const csv = toCsv([
-      [H.grp_nm, H.key_nm, H.dom_nm, H.desc, H.tp_nm, H.len, H.scale, H.stor_fmt, H.disp_fmt, H.unit, H.alw, '등록일시'],
+      [H.grp_nm, H.key_nm, H.dom_nm, H.desc, H.tp_nm, H.len, H.scale, H.stor_fmt, H.disp_fmt, H.unit, H.alw, '표준구분', '등록일시'],
       ...doms.map((d) => [
         d.std_dom_grp?.dom_grp_nm,
         d.key_dom_nm,
@@ -57,6 +62,7 @@ export async function GET(req: Request, { params }: Ctx) {
         d.disp_fmt_txt,
         d.unit_nm,
         d.alw_val_txt,
+        SE_NM[d.std_se_cd] ?? d.std_se_cd,
         kstDtm(d.std_reg_dtm),
       ]),
     ])

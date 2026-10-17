@@ -5,9 +5,11 @@ import { db } from '@/lib/db'
 import { dbError, requireAreaRole } from '@/lib/api'
 import { HEADERS, toCsv, kstDtm } from '@/lib/bulk'
 import { fetchAll } from '@/lib/bulk-check'
+const SE_NM: Record<string, string> = { STD: '표준', NSTD: '비표준' } // 표준구분코드(sql/033)
 
 type Ctx = { params: Promise<{ areaId: string }> }
 interface Row {
+  std_se_cd: string
   std_reg_dtm: string
   term_log_nm: string
   term_phy_nm: string
@@ -24,12 +26,14 @@ export async function GET(req: Request, { params }: Ctx) {
   const { areaId } = await params
   const auth = await requireAreaRole(areaId, 'VIEW')
   if (auth instanceof NextResponse) return auth
-  const q = new URL(req.url).searchParams.get('q')?.trim()
+  const sp = new URL(req.url).searchParams
+  const q = sp.get('q')?.trim()
+  const se = sp.get('se') // 표준구분 조건(STD·NSTD, 그 외 값은 무시)
   try {
     const terms = await fetchAll<Row>(() => {
       let query = db()
         .from('std_term')
-        .select('term_log_nm, term_phy_nm, term_desc, alw_val_txt, disp_fmt_txt, adm_cd_nm, own_org_nm, syn_txt, std_dom(dom_nm), std_reg_dtm, term_id')
+        .select('term_log_nm, term_phy_nm, term_desc, alw_val_txt, disp_fmt_txt, adm_cd_nm, own_org_nm, syn_txt, std_dom(dom_nm), std_se_cd, std_reg_dtm, term_id')
         .eq('area_id', areaId)
         .eq('del_yn', 'N')
         .order('std_reg_dtm', { ascending: false })
@@ -38,12 +42,13 @@ export async function GET(req: Request, { params }: Ctx) {
         const p = `%${q.replace(/[%_,()]/g, '')}%`
         query = query.or(`term_log_nm.ilike.${p},term_phy_nm.ilike.${p}`)
       }
+      if (se === 'STD' || se === 'NSTD') query = query.eq('std_se_cd', se)
       return query
     })
     const H = HEADERS.terms
     const csv = toCsv([
-      [H.log_nm, H.desc, H.phy_nm, H.dom_nm, H.alw, H.disp_fmt, H.adm_cd, H.org, H.syns, '등록일시'],
-      ...terms.map((t) => [t.term_log_nm, t.term_desc, t.term_phy_nm, t.std_dom?.dom_nm, t.alw_val_txt, t.disp_fmt_txt, t.adm_cd_nm, t.own_org_nm, t.syn_txt, kstDtm(t.std_reg_dtm)]),
+      [H.log_nm, H.desc, H.phy_nm, H.dom_nm, H.alw, H.disp_fmt, H.adm_cd, H.org, H.syns, '표준구분', '등록일시'],
+      ...terms.map((t) => [t.term_log_nm, t.term_desc, t.term_phy_nm, t.std_dom?.dom_nm, t.alw_val_txt, t.disp_fmt_txt, t.adm_cd_nm, t.own_org_nm, t.syn_txt, SE_NM[t.std_se_cd] ?? t.std_se_cd, kstDtm(t.std_reg_dtm)]),
     ])
     const name = encodeURIComponent(`표준용어_${new Date().toISOString().slice(0, 10)}.csv`)
     return new NextResponse(csv, { headers: { 'Content-Type': 'text/csv; charset=utf-8', 'Content-Disposition': `attachment; filename*=UTF-8''${name}` } })

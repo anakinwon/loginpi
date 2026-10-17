@@ -19,19 +19,23 @@ interface Row {
   forbid_yn: string
   key_dom_yn: string
   tbl_sfx_txt: string | null
+  std_se_cd: string
   std_reg_dtm: string
 }
+const SE_NM: Record<string, string> = { STD: '표준', NSTD: '비표준' } // 표준구분코드(sql/033)
 
 export async function GET(req: Request, { params }: Ctx) {
   const { areaId } = await params
   const auth = await requireAreaRole(areaId, 'VIEW')
   if (auth instanceof NextResponse) return auth
-  const q = new URL(req.url).searchParams.get('q')?.trim()
+  const sp = new URL(req.url).searchParams
+  const q = sp.get('q')?.trim()
+  const se = sp.get('se') // 표준구분 조건(STD·NSTD, 그 외 값은 무시)
   try {
     const words = await fetchAll<Row>(() => {
       let query = db()
         .from('std_dic')
-        .select('dic_id, dic_log_nm, dic_phy_nm, dic_eng_nm, dic_chn_nm, dic_desc, ent_clss_yn, attr_clss_yn, forbid_yn, key_dom_yn, tbl_sfx_txt, std_reg_dtm')
+        .select('dic_id, dic_log_nm, dic_phy_nm, dic_eng_nm, dic_chn_nm, dic_desc, ent_clss_yn, attr_clss_yn, forbid_yn, key_dom_yn, tbl_sfx_txt, std_se_cd, std_reg_dtm')
         .eq('area_id', areaId)
         .eq('del_yn', 'N')
         .order('std_reg_dtm', { ascending: false })
@@ -40,6 +44,7 @@ export async function GET(req: Request, { params }: Ctx) {
         const p = `%${q.replace(/[%_,()]/g, '')}%`
         query = query.or(`dic_log_nm.ilike.${p},dic_phy_nm.ilike.${p}`)
       }
+      if (se === 'STD' || se === 'NSTD') query = query.eq('std_se_cd', se)
       return query
     })
     const rels = await fetchAll<{ dic_id: string; rel_tp_cd: string; rel_txt: string }>(() =>
@@ -53,7 +58,7 @@ export async function GET(req: Request, { params }: Ctx) {
     }
     const H = HEADERS.words
     const csv = toCsv([
-      [H.log_nm, H.phy_nm, H.eng_nm, H.desc, H.fmt_word, H.syns, H.forbid, '엔터티분류어여부', '금칙어여부', H.key_dom, '테이블접미어', '등록일시'],
+      [H.log_nm, H.phy_nm, H.eng_nm, H.desc, H.fmt_word, H.syns, H.forbid, '엔터티분류어여부', '금칙어여부', H.key_dom, '테이블접미어', '표준구분', '등록일시'],
       ...words.map((w) => [
         w.dic_log_nm,
         w.dic_phy_nm,
@@ -67,6 +72,7 @@ export async function GET(req: Request, { params }: Ctx) {
         w.forbid_yn,
         w.key_dom_yn,
         w.tbl_sfx_txt,
+        SE_NM[w.std_se_cd] ?? w.std_se_cd,
         kstDtm(w.std_reg_dtm),
       ]),
     ])
