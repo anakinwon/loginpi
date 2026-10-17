@@ -1,6 +1,7 @@
 // 다이어그램(서버, PRD_PiErd S3 E2) — 프로젝트 × 주제영역(NULL 전체) × 모델단계 다이어그램과 엔터티 배치(좌표·고정·순번) 조회·저장
 // 조회는 다이어그램을 만들지 않는다(없으면 dgm null, 좌표 없음 → 화면이 자동 배치). 저장 시 없으면 생성
 // 주제영역 다이어그램 = 그 주제영역 엔터티 + 관계로 이어진 다른 주제영역 엔터티(참조 ref = true)
+// 순서 원칙(마스터 지시 2026-10-17) : 엔터티 작성완료 → 물리 전환 → 테이블 작성완료 → ERD — 작성완료 테이블이 있는 엔터티만 그린다(없으면 빈 ERD + 안내)
 import { db } from './db'
 import { loadLogical } from './model-logical'
 
@@ -22,11 +23,25 @@ async function findDgm(areaId: string, prjId: string, subjId: string | null, lvl
   return r.data as { dgm_id: string; dgm_nm: string; ver_no: number } | null
 }
 
-export async function loadDgm(areaId: string, prjId: string, subjId: string | null, lvl: DgmLvl) {
+export async function loadDgm(areaId: string, prjId: string, subjId: string | null, lvl: DgmLvl, phyId: string | null = null) {
   const m = await loadLogical(areaId, prjId)
   if (!m) return null
-  const own = new Set(m.ents.filter((e) => !subjId || e.subj_id === subjId).map((e) => e.ent_id))
-  const rels = m.rels.filter((r) => own.has(r.prnt_ent_id) || own.has(r.chld_ent_id))
+  // 기준 물리 모델(DBMS별) — 지정 없으면 먼저 만든 것
+  const pm = await db().from('mdl_phy_mdl').select('phy_mdl_id, dbms_cd').eq('area_id', areaId).eq('prj_id', prjId).eq('del_yn', 'N').order('reg_dtm')
+  if (pm.error) throw pm.error
+  const phyModels = pm.data as { phy_mdl_id: string; dbms_cd: string }[]
+  const phy = phyModels.find((x) => x.phy_mdl_id === phyId) ?? phyModels[0] ?? null
+  let phyEnts = new Set<string>()
+  if (phy) {
+    // 작성완료 테이블만(마스터 지시 : 물리모델도 테이블별 작성완료 상태일 때 ERD 확인)
+    const t = await db().from('mdl_phy_tbl').select('ent_id').eq('phy_mdl_id', phy.phy_mdl_id).eq('phy_sts_cd', 'CMPTN').eq('del_yn', 'N').limit(5000)
+    if (t.error) throw t.error
+    phyEnts = new Set((t.data as { ent_id: string }[]).map((x) => x.ent_id))
+  }
+  const inSubj = m.ents.filter((e) => !subjId || e.subj_id === subjId)
+  const hidden = inSubj.filter((e) => !phyEnts.has(e.ent_id)).length // 물리 미전환 엔터티 수(안내용)
+  const own = new Set(inSubj.filter((e) => phyEnts.has(e.ent_id)).map((e) => e.ent_id))
+  const rels = m.rels.filter((r) => phyEnts.has(r.prnt_ent_id) && phyEnts.has(r.chld_ent_id) && (own.has(r.prnt_ent_id) || own.has(r.chld_ent_id)))
   const shown = new Set([...own, ...rels.flatMap((r) => [r.prnt_ent_id, r.chld_ent_id])])
   const ents = m.ents.filter((e) => shown.has(e.ent_id)).map(({ words: _w, ...e }) => ({ ...e, ref: !own.has(e.ent_id) }))
   const dgm = await findDgm(areaId, prjId, subjId, lvl)
@@ -36,7 +51,7 @@ export async function loadDgm(areaId: string, prjId: string, subjId: string | nu
     if (p.error) throw p.error
     pos = (p.data as { ent_id: string; xcrd: number; ycrd: number; fix_yn: string; sort_seq: number }[]).filter((x) => shown.has(x.ent_id)).map((x) => ({ ent_id: x.ent_id, x: Number(x.xcrd), y: Number(x.ycrd), fix: x.fix_yn === 'Y', seq: x.sort_seq }))
   }
-  return { prj: m.prj, dgm, ents, rels, pos, capped: m.capped }
+  return { prj: m.prj, dgm, ents, rels, pos, capped: m.capped, phy_models: phyModels, phy_mdl_id: phy?.phy_mdl_id ?? null, hidden, phy_done: own.size > 0 }
 }
 
 // 좌표 저장 — 다이어그램 없으면 생성, 기존 배치는 update·새 배치는 insert. 화면에 없는(삭제된) 엔터티는 트리거가 거부

@@ -51,6 +51,10 @@ const ERRORS = {
   PHY_GATE: '논리 모델 점검을 통과해야 물리 모델로 전환할 수 있습니다(N:M 0·FK 누락 0·수정 필요 0·주식별자 누락 0)',
   PHY_ISSUES: '변환할 수 없는 항목이 있습니다(도메인·타입 매핑·이름 한도) — 목록을 고친 뒤 다시 전환하십시오',
   PHY_DUP: '이 프로젝트에 같은 DBMS 의 물리 모델이 이미 있습니다',
+  SUBJ_LOCKED: '작성완료 상태인 엔터티·테이블은 편집할 수 없습니다 — 완료 취소 후 편집하십시오',
+  STAGE_GATE: '완료 조건을 충족하지 않습니다 — 사유를 해결한 뒤 다시 완료하십시오',
+  SUBJ_NOT_LGC: '작성완료 상태인 엔터티만 물리 모델로 전환할 수 있습니다',
+  PHY_PENDING: '물리 모델에 반영되지 않은 논리 변경이 있습니다 — 논리 변경 반영 후 완료하십시오',
   PHY_COL_INVALID: '이 테이블의 칼럼이 아닙니다',
   PHY_COL_DEFAULT: '기본값은 숫자·작은따옴표 문자열(\'값\')·CURRENT_TIMESTAMP·CURRENT_DATE(PostgreSQL 은 TRUE·FALSE, Oracle·Tibero 는 SYSDATE·SYSTIMESTAMP 추가)만 쓸 수 있습니다',
   PHY_COL_PK_NULL: '주키 칼럼은 NULL 을 허용할 수 없습니다',
@@ -112,6 +116,7 @@ export function dupCodeOf(msg: string | undefined, fallback: ErrorCode): ErrorCo
 }
 
 export function dbError(e: { code?: string; message?: string }, dupCode?: ErrorCode) {
+  if (e.code === 'MLK01') return apiError('SUBJ_LOCKED', 409) // 완료 주제영역 편집 잠금(sql/031 트리거)
   if (e.code === '23514') return apiError('INVALID_INPUT', 400) // CHECK·트리거 규칙 위반(형식·2레벨 등)
   if (e.code === '23505' && (dupCode || /std_dic_/.test(e.message ?? ''))) return apiError(dupCodeOf(e.message, dupCode ?? 'INVALID_INPUT'), 409)
   console.error('[db]', e.code, e.message)

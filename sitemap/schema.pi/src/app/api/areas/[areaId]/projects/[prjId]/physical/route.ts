@@ -2,13 +2,14 @@
 // GET ?mdl=&format=ddl : DDL(.sql 내려받기, S2 P6) / ?mdl=&format=csv&type=tbl|col : 테이블·칼럼 정의서 CSV
 // PATCH : 칼럼 그리드 편집(테이블 1개, 순서·NULL·기본값 묶음, 칼럼별 ver_no 잠금, S2 P5)
 // GET ?mdl=&format=alter : 변경분 DDL(현재 논리와의 차이, S5) / POST ?sync=1 {phy_mdl_id, ver_no} : 논리 변경을 저장 모델에 동기화(사용자 편집 유지)
-// POST : 전환(관문 통과·이슈 0 일 때만, 프로젝트 × DBMS 활성 1건) / DELETE ?mdl=&ver_no= : 논리 삭제(재전환은 삭제 후 다시 전환)
+// POST {dbms_cd, ent_ids} : 엔터티 선택 전환(마스터 지시 2026-10-17 — 작성완료 엔터티만, 범위 관문·이슈 0, 모델 없으면 생성·있으면 추가)
+// GET ?dbms=&ent=a,b : 선택 엔터티 범위 미리보기(없으면 작성완료·미전환 엔터티 전체) / DELETE ?mdl=&ver_no= : 논리 삭제(재전환은 삭제 후 다시 전환)
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { apiError, audit, dbError, errMsg, parseBody, requireAreaRole } from '@/lib/api'
 import { db } from '@/lib/db'
 import { kstDtm } from '@/lib/bulk'
-import { delPhy, listPhy, loadPhy, phyDdlInput, phyPlan, savePhy, syncPhy, syncPlan } from '@/lib/model-phy'
+import { convertEntities, delPhy, listPhy, loadPhy, phyDdlInput, phyPlan, syncPhy, syncPlan } from '@/lib/model-phy'
 import { alterDdl } from '@/lib/modelpi/phy-sync'
 import { genDdl, phyDocTables } from '@/lib/modelpi/ddl'
 import { docCsv } from '@/lib/modelpi/docs'
@@ -22,7 +23,15 @@ const body = z.object({
   idntfr_ltr_cd: z.enum(['UPPER', 'LOWER']).optional(),
   del_col_use_yn: z.enum(['Y', 'N']).default('Y'),
   phy_mdl_desc: z.string().max(2000).nullish(),
+  ent_ids: z.array(uuid).min(1).max(500),
 })
+
+// 프로젝트 엔터티(논리 상태 포함)
+async function prjEnts(areaId: string, prjId: string) {
+  const r = await db().from('mdl_ent').select('ent_id, ent_log_nm, lgc_sts_cd').eq('area_id', areaId).eq('prj_id', prjId).eq('del_yn', 'N').limit(5000)
+  if (r.error) throw r.error
+  return r.data as { ent_id: string; ent_log_nm: string; lgc_sts_cd: string }[]
+}
 
 export async function GET(req: Request, { params }: Ctx) {
   const { areaId, prjId } = await params
@@ -59,7 +68,8 @@ export async function GET(req: Request, { params }: Ctx) {
           headers: { 'Content-Type': doc ? 'text/csv; charset=utf-8' : 'application/sql; charset=utf-8', 'Content-Disposition': `attachment; filename*=UTF-8''${name}`, 'Cache-Control': 'no-store' },
         })
       }
-      const plan = await phyPlan(areaId, prjId, p.mdl.dbms_cd as DbmsCd, p.mdl.del_col_use_yn === 'Y')
+      // 차이 = 전환된 엔터티 범위(전환 안 한 엔터티는 추가 테이블로 세지 않음)
+      const plan = await phyPlan(areaId, prjId, p.mdl.dbms_cd as DbmsCd, p.mdl.del_col_use_yn === 'Y', new Set(p.tables.map((t) => t.ent_id)))
       return NextResponse.json({ ok: true, ...p, diff: plan ? phyDiff(p.tables, plan.tables) : null })
     }
     const want = sp.get('dbms')
@@ -69,7 +79,19 @@ export async function GET(req: Request, { params }: Ctx) {
     if (!prj.data) return apiError('NOT_FOUND', 404)
     const t = want ?? (prj.data as { trgt_dbms_cd: string }).trgt_dbms_cd
     const dbms: DbmsCd = isDbms(t) ? t : '0014'
-    const plan = await phyPlan(areaId, prjId, dbms, true)
+    const ents = await prjEnts(areaId, prjId)
+    const pick = (sp.get('ent') ?? '').split(',').filter((x) => uuid.safeParse(x).success).slice(0, 500)
+    // 기본 범위 = 작성완료이면서 이 DBMS 물리 모델에 아직 전환되지 않은 엔터티
+    const ex = await db().from('mdl_phy_mdl').select('phy_mdl_id').eq('area_id', areaId).eq('prj_id', prjId).eq('dbms_cd', dbms).eq('del_yn', 'N').maybeSingle()
+    if (ex.error) throw ex.error
+    const conv = new Set<string>()
+    if (ex.data) {
+      const tb = await db().from('mdl_phy_tbl').select('ent_id').eq('phy_mdl_id', (ex.data as { phy_mdl_id: string }).phy_mdl_id).eq('del_yn', 'N').limit(5000)
+      if (tb.error) throw tb.error
+      for (const x of tb.data as { ent_id: string }[]) conv.add(x.ent_id)
+    }
+    const scope = new Set(pick.length ? pick : ents.filter((e) => e.lgc_sts_cd === 'CMPTN' && !conv.has(e.ent_id)).map((e) => e.ent_id))
+    const plan = await phyPlan(areaId, prjId, dbms, true, scope)
     if (!plan) return apiError('NOT_FOUND', 404)
     return NextResponse.json({
       ok: true,
@@ -110,15 +132,22 @@ export async function POST(req: Request, { params }: Ctx) {
   if (b instanceof NextResponse) return b
   const dbms = b.dbms_cd as DbmsCd
   try {
-    const plan = await phyPlan(areaId, prjId, dbms, b.del_col_use_yn === 'Y')
+    // 선택 엔터티 = 이 프로젝트 소속·작성완료
+    const ents = await prjEnts(areaId, prjId)
+    if (b.ent_ids.some((id) => !ents.some((e) => e.ent_id === id))) return apiError('NOT_FOUND', 404)
+    const notLgc = ents.filter((e) => b.ent_ids.includes(e.ent_id) && e.lgc_sts_cd !== 'CMPTN')
+    if (notLgc.length) return NextResponse.json({ ok: false, code: 'SUBJ_NOT_LGC', message: errMsg('SUBJ_NOT_LGC'), why: notLgc.map((e) => `${e.ent_log_nm} : 작성중`) }, { status: 409 })
+    const plan = await phyPlan(areaId, prjId, dbms, b.del_col_use_yn === 'Y', new Set(b.ent_ids))
     if (!plan) return apiError('NOT_FOUND', 404)
     if (plan.why.length) return NextResponse.json({ ok: false, code: 'PHY_GATE', message: errMsg('PHY_GATE'), why: plan.why }, { status: 409 })
     if (plan.issues.length) return NextResponse.json({ ok: false, code: 'PHY_ISSUES', message: errMsg('PHY_ISSUES'), issues: plan.issues }, { status: 409 })
     if (plan.capped) return apiError('INVALID_INPUT', 400) // 조회 상한을 넘은 모델은 일부만 전환되므로 거부
     const ltr = b.idntfr_ltr_cd ?? (DBMS_PRFL[dbms].identCase === 'lower' ? 'LOWER' : 'UPPER')
-    const item = await savePhy(areaId, prjId, { dbms, ltr, delCol: b.del_col_use_yn === 'Y', desc: b.phy_mdl_desc ?? null }, plan.tables, plan.fks, auth.user.usr_id)
-    await audit({ area_id: areaId, tgt_tp_cd: 'PHY', tgt_id: item.phy_mdl_id, act_cd: 'INS', aftr_val: { prj_id: prjId, dbms_cd: dbms, idntfr_ltr_cd: ltr, tbl: plan.tables.length, fk: plan.fks.length }, usr_id: auth.user.usr_id })
-    return NextResponse.json({ ok: true, item, tbl_cnt: plan.tables.length, fk_cnt: plan.fks.length }, { status: 201 })
+    const r = await convertEntities(areaId, prjId, { dbms, ltr, delCol: b.del_col_use_yn === 'Y', desc: b.phy_mdl_desc ?? null }, b.ent_ids, auth.user.usr_id)
+    if (!r) return apiError('NOT_FOUND', 404)
+    if (!r.tbl) return apiError('NO_CHANGE', 400) // 선택 엔터티가 모두 이미 전환됨
+    await audit({ area_id: areaId, tgt_tp_cd: 'PHY', tgt_id: r.phy_mdl_id!, act_cd: r.created ? 'INS' : 'UPD', aftr_val: { prj_id: prjId, dbms_cd: dbms, ent_ids: b.ent_ids, tbl: r.tbl, fk: r.fk }, usr_id: auth.user.usr_id })
+    return NextResponse.json({ ok: true, item: { phy_mdl_id: r.phy_mdl_id }, created: r.created, tbl_cnt: r.tbl, fk_cnt: r.fk }, { status: 201 })
   } catch (e) {
     const x = e as { code?: string; message?: string }
     return dbError(x, /prj_dbms/.test(x.message ?? '') ? 'PHY_DUP' : 'INVALID_INPUT') // 프로젝트 × DBMS 중복만 PHY_DUP
@@ -188,6 +217,9 @@ export async function DELETE(req: Request, { params }: Ctx) {
     const p = await loadPhy(areaId, mdlId!)
     if (!p || p.mdl.prj_id !== prjId) return apiError('NOT_FOUND', 404)
     if (p.mdl.ver_no !== ver) return apiError('VERSION_CONFLICT', 409)
+    // 작성완료 테이블은 잠금 — 모델만 지워지고 테이블이 잠긴 채 남지 않게 먼저 거부
+    const locked = p.tables.filter((t) => t.phy_sts_cd === 'CMPTN')
+    if (locked.length) return NextResponse.json({ ok: false, code: 'SUBJ_LOCKED', message: errMsg('SUBJ_LOCKED'), why: [`작성완료 테이블 ${locked.length}개(${locked.slice(0, 3).map((t) => t.tbl_nm).join(', ')}) — 테이블 완료 취소 후 삭제`] }, { status: 409 })
     await delPhy(mdlId!, auth.user.usr_id)
     await audit({ area_id: areaId, tgt_tp_cd: 'PHY', tgt_id: mdlId!, act_cd: 'DEL', bfr_val: { dbms_cd: p.mdl.dbms_cd, tbl: p.tables.length }, usr_id: auth.user.usr_id })
     return NextResponse.json({ ok: true })

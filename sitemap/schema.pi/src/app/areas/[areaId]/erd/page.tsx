@@ -3,6 +3,7 @@ import { piFetch } from '@pi/auth/client'
 // ERD 화면(PRD_PiErd S3 E1·E3·E4·E5·E6 1차) — 모델의 뷰 : 엔터티·속성·관계는 논리 모델 정본, 여기서는 배치(좌표·고정)만 저장
 //  캔버스 @xyflow/react : 엔터티 박스(내용 맞춤 크기, 유형별 색, 참조 엔터티 점선), IE 관계선(식별 실선·비식별 점선·까마귀발, 가까운 변 자동 연결)
 //  자동 배치(modelpi/layout.ts) : 미리보기 → 저장·되돌리기, 새 엔터티만 배치, 고정 존중 / 표시 수준 개념·논리·물리, 논리명·물리명 전환
+//  순서 = 엔터티 작성완료 → 물리 전환 → 테이블 작성완료 → ERD(마스터 지시 2026-10-17) : 작성완료 테이블의 엔터티만 그림, 없으면 안내만
 //  ERD 단위 = 주제영역 1개(마스터 지시 2026-10-17) — 전체 보기 없음, 다른 주제영역 엔터티(관계 상대)는 '참조 표시' 를 켤 때만
 //  3단 : 왼쪽 모델 트리(주제영역 → 엔터티, 누르면 이동) · 캔버스 · 오른쪽 편집(E6 — 엔터티 추가·수정·속성, 논리 모델 화면과 같은 컴포넌트·같은 표준 검증 API), 아래 관계 편집·검토 결과
 //  편집 뒤 다시 불러올 때 저장 안 한 드래그 위치는 유지
@@ -10,6 +11,7 @@ import '@xyflow/react/dist/style.css'
 import { Background, Controls, Handle, MiniMap, Position, ReactFlow, ReactFlowProvider, useNodesState, useReactFlow, type Edge, type Node, type NodeProps } from '@xyflow/react'
 import Link from 'next/link'
 import { use, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { dbmsList } from '@/lib/modelpi/dbms'
 import { autoLayout, boxSize } from '@/lib/modelpi/layout'
 import { can, type MbrRole } from '@/lib/roles'
 import Attrs from '../model/attrs'
@@ -129,6 +131,10 @@ function Erd({ areaId }: { areaId: string }) {
   const [subjs, setSubjs] = useState<{ subj_id: string; subj_nm: string; prj_id: string }[]>([])
   const [subj, setSubj] = useState('')
   const [showRef, setShowRef] = useState(false) // 다른 주제영역 참조 엔터티 표시(기본 숨김)
+  const [phyId, setPhyId] = useState('') // 기준 물리 모델(빈 값 = 서버가 첫 모델)
+  const [phyModels, setPhyModels] = useState<{ phy_mdl_id: string; dbms_cd: string }[] | null>(null) // null = 아직 모름
+  const [hidden, setHidden] = useState(0)
+  const [phyDone, setPhyDone] = useState(true) // 이 주제영역 물리완료 여부
   const [lvl, setLvl] = useState<Lvl>('LGCL')
   const [phy, setPhy] = useState(false)
   const [ents, setEnts] = useState<Ent[]>([])
@@ -169,9 +175,13 @@ function Erd({ areaId }: { areaId: string }) {
   const load = useCallback(async () => {
     if (!prjId || !subj) return // 주제영역을 고른 뒤에만
     const seq = ++loadSeq.current
-    const j = await (await piFetch(`${api}/projects/${prjId}/diagram?lvl=${lvl}${subj ? `&subj=${subj}` : ''}`)).json()
+    const j = await (await piFetch(`${api}/projects/${prjId}/diagram?lvl=${lvl}${subj ? `&subj=${subj}` : ''}${phyId ? `&phy=${phyId}` : ''}`)).json()
     if (seq !== loadSeq.current) return
     if (!j.ok) return setMsg(j.message)
+    setPhyModels(j.phy_models)
+    setHidden(j.hidden)
+    setPhyDone(!!j.phy_done)
+    if (!phyId && j.phy_mdl_id) setPhyId(j.phy_mdl_id)
     const es = (j.ents as Ent[]).filter((e) => showRef || !e.ref)
     const pos = new Map((j.pos as { ent_id: string; x: number; y: number; fix: boolean }[]).map((p) => [p.ent_id, p]))
     const keep = keepRef.current === `${prjId}|${subj}|${lvl}`
@@ -197,7 +207,7 @@ function Erd({ areaId }: { areaId: string }) {
     if (j.capped) setMsg('프로젝트 조회 상한(엔터티 500·속성 5,000)을 넘어 일부만 표시될 수 있습니다')
     else if (!keep) setMsg('') // 편집 뒤 재조회는 편집 결과 메시지 유지
     if (!keep) requestAnimationFrame(() => flow.fitView({ padding: 0.15, maxZoom: 1 }))
-  }, [api, prjId, subj, lvl, phy, showRef, setNodes, flow])
+  }, [api, prjId, subj, lvl, phy, showRef, phyId, setNodes, flow])
   // 프로젝트를 바꾸면 그 프로젝트의 첫 주제영역을 자동 선택(ERD 는 주제영역 단위)
   useEffect(() => {
     const mine = subjs.filter((s) => s.prj_id === prjId)
@@ -339,7 +349,7 @@ function Erd({ areaId }: { areaId: string }) {
       </svg>
 
       <section className="mt-3 flex flex-wrap items-center gap-2 rounded-xl border border-[#c7d2e6] bg-gradient-to-r from-[#1f3a68] to-[#3b5f9e] px-4 py-2 text-sm text-white shadow-md" aria-label="ERD 설정">
-        <select value={prjId} onChange={(e) => (setPrjId(e.target.value), setSubj(''), setSel(null))} className={sel2} aria-label="프로젝트 선택">
+        <select value={prjId} onChange={(e) => (setPrjId(e.target.value), setSubj(''), setPhyId(''), setPhyModels(null), setSel(null))} className={sel2} aria-label="프로젝트 선택">
           {prjs.length === 0 && <option value="">프로젝트가 없습니다</option>}
           {prjs.map((p) => (
             <option key={p.prj_id} value={p.prj_id}>
@@ -356,6 +366,15 @@ function Erd({ areaId }: { areaId: string }) {
               </option>
             ))}
         </select>
+        {phyModels && phyModels.length > 1 && (
+          <select value={phyId} onChange={(e) => (setPhyId(e.target.value), setSel(null))} className={sel2} aria-label="기준 물리 모델">
+            {phyModels.map((p) => (
+              <option key={p.phy_mdl_id} value={p.phy_mdl_id}>
+                물리 {dbmsList().find((d) => d.cd === p.dbms_cd)?.nm ?? p.dbms_cd}
+              </option>
+            ))}
+          </select>
+        )}
         <select value={lvl} onChange={(e) => setLvl(e.target.value as Lvl)} className={sel2} aria-label="표시 수준">
           {(Object.keys(LVL_NM) as Lvl[]).map((k) => (
             <option key={k} value={k}>
@@ -386,6 +405,33 @@ function Erd({ areaId }: { areaId: string }) {
           )}
         </span>
       </section>
+      {phyModels && phyModels.length === 0 && (
+        <p className="mt-2 rounded border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900" role="note">
+          이 프로젝트에는 아직 물리 모델이 없습니다. 순서는 논리 모델 → 물리 모델 → ERD 입니다 —{' '}
+          <Link href={`/areas/${areaId}/physical`} className="font-semibold underline">
+            물리 모델에서 먼저 전환
+          </Link>
+          하십시오.
+        </p>
+      )}
+      {phyModels && phyModels.length > 0 && !phyDone && (
+        <p className="mt-2 rounded border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900" role="note">
+          이 주제영역에 작성완료된 테이블이 없습니다. 순서는 엔터티 작성완료 → 물리 전환 → 테이블 작성완료 → ERD 입니다 —{' '}
+          <Link href={`/areas/${areaId}/physical`} className="font-semibold underline">
+            물리 모델에서 엔터티 전환·테이블 작성완료
+          </Link>
+          하십시오.
+        </p>
+      )}
+      {phyModels && phyModels.length > 0 && phyDone && hidden > 0 && (
+        <p className="mt-2 text-sm text-amber-800" role="note">
+          작성완료 테이블이 아닌 엔터티 {hidden}개는 표시하지 않습니다 —{' '}
+          <Link href={`/areas/${areaId}/physical`} className="underline">
+            물리 모델에서 전환·작성완료
+          </Link>
+          하면 보입니다.
+        </p>
+      )}
       {msg && (
         <p role="status" className="mt-2 text-sm font-medium text-[#1f3a68]">
           {msg}

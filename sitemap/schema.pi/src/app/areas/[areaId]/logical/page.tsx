@@ -11,6 +11,7 @@ import { can, type MbrRole } from '@/lib/roles'
 import Attrs from '../model/attrs'
 import EntForm from '../model/ent-form'
 import Relations from '../model/relations'
+import StageBar from '../model/stage-bar'
 
 interface Attr {
   attr_id: string
@@ -282,6 +283,7 @@ export default function LogicalPage({ params }: { params: Promise<{ areaId: stri
           </span>
         )}
       </div>
+      {prjId && <StageBar api={api} prjId={prjId} editor={editor} mode="LGC" rev={m} onChanged={() => void load()} />}
       {showMmd && m && <textarea readOnly value={m.mermaid} rows={10} className="mt-2 w-full rounded border p-2 font-mono text-xs" aria-label="Mermaid 텍스트" />}
       {msg && (
         <p role="status" className="mt-2 text-sm font-medium text-[#1f3a68]">

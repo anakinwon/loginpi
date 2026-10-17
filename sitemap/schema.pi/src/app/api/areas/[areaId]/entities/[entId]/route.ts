@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { db } from '@/lib/db'
-import { apiError, audit, dbError, requireAreaRole } from '@/lib/api'
+import { apiError, audit, dbError, errMsg, requireAreaRole } from '@/lib/api'
 import { entSchema, prepareEnt } from '@/lib/model'
 
 type Ctx = { params: Promise<{ areaId: string; entId: string }> }
@@ -63,6 +63,11 @@ export async function DELETE(req: Request, { params }: Ctx) {
     const cur = await current(areaId, entId)
     if (!cur) return apiError('NOT_FOUND', 404)
     const uid = auth.user.usr_id
+    // 이 엔터티가 부모인 관계의 자식이 작성완료면 관계·상속 속성 정리가 잠금에 막힘 → 먼저 거부(부분 삭제 방지)
+    const ch = await db().from('mdl_rel').select('chld_ent_id, mdl_ent!mdl_rel_chld_ent_id_fkey(ent_log_nm, lgc_sts_cd)').eq('prnt_ent_id', entId).eq('del_yn', 'N')
+    if (ch.error) return dbError(ch.error)
+    const lockedCh = (ch.data as unknown as { mdl_ent: { ent_log_nm: string; lgc_sts_cd: string } | null }[]).filter((r) => r.mdl_ent?.lgc_sts_cd === 'CMPTN')
+    if (lockedCh.length) return NextResponse.json({ ok: false, code: 'SUBJ_LOCKED', message: errMsg('SUBJ_LOCKED'), why: [`작성완료 자식 엔터티 ${lockedCh.map((r) => r.mdl_ent!.ent_log_nm).join(', ')} — 자식 완료 취소 후 삭제`] }, { status: 409 })
     const { data, error } = await db().from('mdl_ent').update({ del_yn: 'Y', del_dtm: new Date().toISOString(), ver_no: v.data + 1, modr_id: uid }).eq('ent_id', entId).eq('ver_no', v.data).eq('del_yn', 'N').select('ent_id')
     if (error) return dbError(error)
     if (!data.length) return apiError('VERSION_CONFLICT', 409)

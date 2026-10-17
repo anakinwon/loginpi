@@ -3,11 +3,13 @@ import { piFetch } from '@pi/auth/client'
 // 물리 모델 화면(PRD_PiErd S2 P1·P5·P6) — 논리 모델 → 물리 전환과 칼럼 그리드 편집, DDL·물리 정의서 내려받기
 //  상단 : 프로젝트·DBMS·대소문자·삭제 칼럼 선택 → 전환 미리보기(관문 사유·변환 이슈·테이블/칼럼/FK 수) → 전환
 //  아래 : 물리 모델(DBMS별) 선택 → 논리와의 차이(도메인 영향 포함)·DDL·정의서 / 왼쪽 테이블 목록 · 오른쪽 칼럼 그리드(순서·NULL·기본값, 저장 = 테이블 단위 묶음)
+//  엔터티 선택 전환(마스터 지시 2026-10-17) : 작성완료 엔터티만 골라 전환, 테이블 작성완료 → ERD
 //  논리 변경 반영(S5) = 동기화(순서·NULL·기본값 편집 유지) + 변경분 DDL(ALTER) 내려받기. 삭제 후 재전환도 가능(편집값 사라짐)
 import Link from 'next/link'
 import { use, useCallback, useEffect, useMemo, useState } from 'react'
 import { dbmsList, type DbmsCd } from '@/lib/modelpi/dbms'
 import { can, type MbrRole } from '@/lib/roles'
+import StageBar from '../model/stage-bar'
 
 interface Col {
   phy_col_id: string
@@ -90,15 +92,21 @@ export default function PhysicalPage({ params }: { params: Promise<{ areaId: str
       })
   }, [api, areaId])
 
+  const [picked, setPicked] = useState<Set<string>>(new Set()) // 전환할 엔터티
+  const [stageRev, setStageRev] = useState(0)
+  const pickKey = [...picked].sort().join(',')
   const loadList = useCallback(async () => {
     if (!prjId) return
-    const j = await (await piFetch(`${base}${dbms ? `?dbms=${dbms}` : ''}`)).json()
+    const j = await (await piFetch(`${base}?${new URLSearchParams({ ...(dbms ? { dbms } : {}), ...(pickKey ? { ent: pickKey } : {}) })}`)).json()
     if (!j.ok) return setMsg(j.message)
     setPv(j.preview)
     if (!dbms) setDbms(j.preview.dbms_cd)
     setModels(j.models)
     setMdlId((cur) => (j.models.some((m: Mdl) => m.phy_mdl_id === cur) ? cur : (j.models[0]?.phy_mdl_id ?? '')))
-  }, [base, prjId, dbms])
+  }, [base, prjId, dbms, pickKey])
+  useEffect(() => {
+    setPicked(new Set()) // 프로젝트·DBMS 가 바뀌면 전환 선택 초기화
+  }, [prjId, dbms])
   useEffect(() => {
     void loadList()
     try {
@@ -122,13 +130,15 @@ export default function PhysicalPage({ params }: { params: Promise<{ areaId: str
     if (!dbms) return
     setBusy(true)
     setMsg('')
-    const r = await piFetch(base, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dbms_cd: dbms, del_col_use_yn: delCol ? 'Y' : 'N', ...(ltr ? { idntfr_ltr_cd: ltr } : {}) }) })
+    const r = await piFetch(base, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dbms_cd: dbms, ent_ids: [...picked], del_col_use_yn: delCol ? 'Y' : 'N', ...(ltr ? { idntfr_ltr_cd: ltr } : {}) }) })
     const j = await r.json()
     setBusy(false)
     if (!j.ok) return setMsg([j.message, ...(j.why ?? []), ...(j.issues ?? [])].join(' / '))
     setMsg(`물리 모델을 만들었습니다 — 테이블 ${j.tbl_cnt}·FK ${j.fk_cnt}`)
     setMdlId(j.item.phy_mdl_id)
+    setPicked(new Set())
     await loadList()
+    setStageRev((v) => v + 1)
   }
   const remove = async () => {
     if (!det || !window.confirm(`${dbmsNm(det.mdl.dbms_cd)} 물리 모델을 삭제할까요? 칼럼 그리드에서 바꾼 순서·NULL·기본값도 함께 삭제됩니다(다시 전환하면 논리 모델 기준으로 새로 만듭니다).`)) return
@@ -137,6 +147,7 @@ export default function PhysicalPage({ params }: { params: Promise<{ areaId: str
     setMsg('삭제했습니다')
     setMdlId('')
     await loadList()
+    setStageRev((v) => v + 1)
   }
   const down = async (q: string, fallback: string) => {
     const r = await piFetch(`${base}?mdl=${mdlId}&${q}`)
@@ -180,9 +191,10 @@ export default function PhysicalPage({ params }: { params: Promise<{ areaId: str
     setBusy(false)
     setMsg(j.ok ? `동기화했습니다 — 변경 ${j.ops}건, FK 추가 ${j.addFk}·삭제 ${j.delFk}` : [j.message, ...(j.why ?? []), ...(j.issues ?? [])].join(' / '))
     await loadList()
+    setStageRev((v) => v + 1)
     await loadDet()
   }
-  const canConvert = editor && !!pv && !pv.why.length && !pv.issues.length && !models.some((m) => m.dbms_cd === dbms)
+  const canConvert = editor && picked.size > 0 && !!pv && !pv.why.length && !pv.issues.length
 
   return (
     <main className="mx-auto max-w-7xl px-6 py-10">
@@ -223,11 +235,12 @@ export default function PhysicalPage({ params }: { params: Promise<{ areaId: str
         </button>
       </section>
 
+      {prjId && dbms && <StageBar api={api} prjId={prjId} editor={editor} mode="PHY" dbms={dbms} picked={picked} onPick={setPicked} rev={stageRev} onChanged={() => void loadDet()} />}
       {pv && (
         <section className="mt-3 rounded border p-3 text-sm" aria-label="전환 미리보기">
           <p>
-            미리보기({dbmsNm(pv.dbms_cd)}) : 테이블 {pv.tbl_cnt} · 칼럼 {pv.col_cnt} · FK {pv.fk_cnt}
-            {models.some((m) => m.dbms_cd === dbms) && <span className="ml-2 text-amber-700">이 DBMS 물리 모델이 이미 있습니다(삭제 후 다시 전환)</span>}
+            미리보기({dbmsNm(pv.dbms_cd)}{picked.size ? ` · 선택 엔터티 ${picked.size}` : ' · 전환 가능(작성완료·미전환) 엔터티 전체'}) : 테이블 {pv.tbl_cnt} · 칼럼 {pv.col_cnt} · FK {pv.fk_cnt}
+            {!picked.size && <span className="ml-2 text-amber-700">아래에서 전환할 엔터티(작성완료)를 고르십시오</span>}
           </p>
           {pv.why.length > 0 && (
             <ul className="mt-1 list-disc pl-5 text-red-700">
