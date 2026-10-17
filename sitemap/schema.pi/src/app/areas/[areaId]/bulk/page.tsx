@@ -3,7 +3,7 @@ import { piFetch } from '@pi/auth/client'
 // 일괄등록 화면 — 유형(단어·도메인·용어) 선택 → CSV 선택 → 검증(묶음별 check) → 결과 표·CSV 내려받기 → 반영(묶음별 apply, 서버 재검증)
 // 일괄등록 권한(DA·STD) 전용(API가 확인), 반영 행은 승인대기. 순서 : 단어 → 도메인 → 용어. 설계 docs/design/bulk-import.md
 import Link from 'next/link'
-import { use, useState } from 'react'
+import { use, useRef, useState } from 'react'
 import { BATCH_SIZE, HEADERS, MAX_ROWS, markCrossBatchDup, parseCsv, resultsCsv, type BulkKind, type BulkResult, type BulkStatus } from '@/lib/bulk'
 
 const KIND_NM: Record<BulkKind, string> = { words: '표준단어', domains: '표준도메인', terms: '표준용어' }
@@ -20,6 +20,8 @@ export default function BulkPage({ params }: { params: Promise<{ areaId: string 
   const [applied, setApplied] = useState<number | null>(null)
   const [busy, setBusy] = useState('')
   const [msg, setMsg] = useState('')
+  const [drag, setDrag] = useState(false)
+  const fileRef = useRef<HTMLInputElement>(null)
 
   const resetResult = () => {
     setResults(null)
@@ -106,8 +108,40 @@ export default function BulkPage({ params }: { params: Promise<{ areaId: string 
         <p className="mt-1">{Object.values(HEADERS[kind]).join(', ')}</p>
       </details>
       <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
-        <input type="file" accept=".csv,text/csv" onChange={(e) => pickFile(e.target.files?.[0])} aria-label="CSV 파일" />
-        {file && <span className="text-gray-600">{file.rows.length.toLocaleString()}행</span>}
+        {/* 파일 선택 대화창 — 버튼(또는 끌어다 놓기)으로 숨긴 기본 file input 을 연다. value 초기화 = 같은 파일을 다시 골라도 onChange 발생 */}
+        <input
+          ref={fileRef}
+          type="file"
+          accept=".csv,text/csv"
+          className="hidden"
+          onChange={(e) => {
+            void pickFile(e.target.files?.[0])
+            e.target.value = ''
+          }}
+          aria-label="CSV 파일"
+        />
+        <button
+          type="button"
+          disabled={!!busy}
+          onClick={() => fileRef.current?.click()}
+          onDragOver={(e) => (e.preventDefault(), setDrag(true))}
+          onDragLeave={() => setDrag(false)}
+          onDrop={(e) => {
+            e.preventDefault()
+            setDrag(false)
+            void pickFile(e.dataTransfer.files?.[0])
+          }}
+          className={`rounded border-2 border-dashed px-4 py-2 font-semibold text-[#1f3a68] disabled:opacity-40 ${drag ? 'border-[#1f3a68] bg-[#e9eff9]' : 'border-[#9fb3d6] hover:bg-[#f3f6fb]'}`}
+        >
+          📂 CSV 파일 선택 <span className="font-normal text-gray-500">(또는 여기로 끌어다 놓기)</span>
+        </button>
+        {file ? (
+          <span className="text-gray-700">
+            <b>{file.name}</b> · {file.rows.length.toLocaleString()}행
+          </span>
+        ) : (
+          <span className="text-gray-500">선택한 파일 없음</span>
+        )}
         <button disabled={!file || !!busy} onClick={() => run('check')} className="rounded border px-4 py-1 disabled:opacity-40">
           검증
         </button>
