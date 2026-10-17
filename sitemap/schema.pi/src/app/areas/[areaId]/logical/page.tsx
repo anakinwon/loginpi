@@ -208,6 +208,26 @@ export default function LogicalPage({ params }: { params: Promise<{ areaId: stri
       setShowMmd(true)
     }
   }
+  // 정의서(S1 L6) : piFetch 로 받아 내려받기·인쇄 창(Pi Browser 는 쿠키가 없어 직접 링크 불가)
+  const downDoc = async (type: 'ent' | 'attr' | 'rel') => {
+    const r = await piFetch(`${api}/projects/${prjId}/docs?format=csv&type=${type}`)
+    if (!r.ok) return setMsg('정의서를 만들지 못했습니다')
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(await r.blob())
+    a.download = `${m?.prj.prj_nm ?? 'model'}_${{ ent: '엔터티정의서', attr: '속성정의서', rel: '관계정의서' }[type]}.csv`
+    a.click()
+    URL.revokeObjectURL(a.href)
+    if (r.headers.get('X-Doc-Capped')) setMsg('조회 상한을 넘어 정의서가 일부만 출력되었습니다 — 주제영역 단위로 나누어 확인하십시오')
+  }
+  const printDoc = async () => {
+    const w = window.open('', '_blank') // 팝업 차단 회피 : 클릭 시점에 창을 먼저 열고 내용을 채움
+    if (!w) return setMsg('팝업이 차단되었습니다 — 팝업을 허용한 뒤 다시 누르십시오')
+    const r = await piFetch(`${api}/projects/${prjId}/docs?format=html`)
+    const html = r.ok ? await r.text() : '<p>정의서를 만들지 못했습니다</p>'
+    w.document.open()
+    w.document.write(html)
+    w.document.close()
+  }
   const downMmd = () => {
     const a = document.createElement('a')
     a.href = URL.createObjectURL(new Blob([m?.mermaid ?? ''], { type: 'text/plain;charset=utf-8' }))
@@ -240,7 +260,7 @@ export default function LogicalPage({ params }: { params: Promise<{ areaId: stri
         </select>
         {m && <span className="rounded bg-white/20 px-2 py-0.5 font-mono text-xs">{m.prj.tbl_pfx_txt}_</span>}
         {m && (
-          <span className="ml-auto flex gap-2">
+          <span className="ml-auto flex flex-wrap gap-2">
             <button type="button" onClick={() => void copyMmd()} className="rounded bg-white/20 px-3 py-1 hover:bg-white/30">
               논리 ERD 복사(Mermaid)
             </button>
@@ -249,6 +269,15 @@ export default function LogicalPage({ params }: { params: Promise<{ areaId: stri
             </button>
             <button type="button" onClick={() => setShowMmd((v) => !v)} className="rounded bg-white/20 px-3 py-1 hover:bg-white/30">
               {showMmd ? '텍스트 닫기' : '텍스트 보기'}
+            </button>
+            <span className="mx-1 border-l border-white/40" aria-hidden />
+            {(['ent', 'attr', 'rel'] as const).map((t) => (
+              <button key={t} type="button" onClick={() => void downDoc(t)} className="rounded bg-white/20 px-3 py-1 hover:bg-white/30" title="CSV(엑셀)">
+                {{ ent: '엔터티', attr: '속성', rel: '관계' }[t]}정의서
+              </button>
+            ))}
+            <button type="button" onClick={() => void printDoc()} className="rounded bg-white/20 px-3 py-1 hover:bg-white/30" title="3종 인쇄용(브라우저 인쇄 → PDF)">
+              정의서 인쇄
             </button>
           </span>
         )}

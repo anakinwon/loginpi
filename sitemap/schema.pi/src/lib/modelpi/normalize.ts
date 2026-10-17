@@ -17,6 +17,7 @@ export interface LAttr {
   pk_seq: number | null
   esntl_yn: string
   fk_rel_id: string | null
+  attr_desc?: string | null // 정의서(L6)
   src_attr_id?: string | null // 상속 원천(부모 식별자 속성, 역할명 상속 포함 — sql/027)
   ver_no: number
   term_ok: boolean // 승인완료·활성 표준용어
@@ -41,6 +42,7 @@ export interface LRel {
   idnt_yn: string
   prnt_opt_yn: string
   chld_opt_yn: string
+  rel_desc?: string | null // 정의서(L6)
 }
 export interface FkGap {
   rel_id: string
