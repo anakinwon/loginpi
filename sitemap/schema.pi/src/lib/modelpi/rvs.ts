@@ -170,10 +170,12 @@ export function relCands(r: RvsResult): RelCand[] {
     seen.add(k)
     out.push(c)
   }
+  const pkOf = new Map(r.tables.map((t) => [t.name, new Set(t.pk)])) // 주키 소속 O(1)
+  const colOf = new Map(r.tables.map((t) => [t.name, new Map(t.cols.map((c) => [c.name, c]))]))
   for (const f of r.fks) {
     const ch = byNm.get(f.table)
     if (!ch || !byNm.has(f.ref_table)) continue
-    add({ prnt: f.ref_table, chld: f.table, cols: f.cols, ref_cols: f.ref_cols, src: 'FK', fk_nm: f.name, idnt: f.cols.every((c) => ch.pk.includes(c)), opt: f.cols.some((c) => ch.cols.find((x) => x.name === c)?.nullable) })
+    add({ prnt: f.ref_table, chld: f.table, cols: f.cols, ref_cols: f.ref_cols, src: 'FK', fk_nm: f.name, idnt: f.cols.every((c) => pkOf.get(f.table)!.has(c)), opt: f.cols.some((c) => colOf.get(f.table)!.get(c)?.nullable) })
   }
   const used = new Set(out.flatMap((x) => x.cols.map((c) => `${x.chld}|${c}`))) // 선언 FK 칼럼 — 이름 후보 제외(O(1))
   const pk1 = new Map(r.tables.filter((t) => t.pk.length === 1 && !GENERIC_COLS.has(t.pk[0])).map((t) => [t.pk[0], t.name]))
@@ -181,7 +183,7 @@ export function relCands(r: RvsResult): RelCand[] {
     for (const c of t.cols) {
       const p = pk1.get(c.name)
       if (!p || p === t.name || used.has(`${t.name}|${c.name}`)) continue
-      add({ prnt: p, chld: t.name, cols: [c.name], ref_cols: [c.name], src: 'NAME', fk_nm: null, idnt: t.pk.includes(c.name), opt: c.nullable })
+      add({ prnt: p, chld: t.name, cols: [c.name], ref_cols: [c.name], src: 'NAME', fk_nm: null, idnt: pkOf.get(t.name)!.has(c.name), opt: c.nullable })
     }
   return out
 }

@@ -94,3 +94,13 @@ test('보안 회귀 : 한 테이블 칼럼 6만 개 — 선형 시간·상한에
   assert.ok(r.tables[0].cols.length <= 50_001)
   assert.ok(r.warnings.some((w) => w.includes('중단')))
 })
+
+test('보안 회귀 : 주키 칼럼 5만 개 — 주키 판정도 선형 시간', () => {
+  const n = 50_000
+  const cols = Array.from({ length: n }, (_, i) => `c${i} int`).join(', ')
+  const pk = Array.from({ length: n }, (_, i) => `c${i}`).join(', ')
+  const t0 = performance.now()
+  const r = parseDdl(`CREATE TABLE big (${cols}, PRIMARY KEY (${pk}));`)
+  assert.ok(performance.now() - t0 < 3000)
+  assert.equal(r.tables[0].cols.filter((c) => !c.nullable).length, n)
+})

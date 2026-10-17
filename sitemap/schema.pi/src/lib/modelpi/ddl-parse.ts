@@ -186,7 +186,7 @@ export function parseDdl(sql: string): RvsResult {
           if (++colTotal > COL_CAP) break
         }
       }
-      for (const c of t.cols) if (t.pk.includes(c.name)) c.nullable = false
+      { const pkSet = new Set(t.pk); for (const c of t.cols) if (pkSet.has(c.name)) c.nullable = false } // Set 조회(O(n))
       tables.set(name, t)
       if (colTotal > COL_CAP) {
         warnings.push(`칼럼이 ${COL_CAP.toLocaleString()}개를 넘어 해석을 중단했습니다 — 스키마·주제영역 단위로 나누어 올리십시오`)
@@ -199,7 +199,7 @@ export function parseDdl(sql: string): RvsResult {
       else if ((k = RE_PK.exec(m[2])) && tables.has(name)) {
         const t = tables.get(name)!
         t.pk = list(k[2])
-        for (const c of t.cols) if (t.pk.includes(c.name)) c.nullable = false
+        { const pkSet = new Set(t.pk); for (const c of t.cols) if (pkSet.has(c.name)) c.nullable = false } // Set 조회(O(n))
       } else skipped++
     } else if ((m = /^COMMENT\s+ON\s+TABLE\s+((?:"(?:[^"]|"")*"|[\w$#]+)(?:\s*\.\s*(?:"(?:[^"]|"")*"|[\w$#]+))*)\s+IS\s+('(?:[^']|'')*')$/i.exec(s))) {
       const t = tables.get(ident(m[1]))

@@ -65,10 +65,11 @@ export async function stageRvs(areaId: string, prjId: string, o: { src: 'DDL' | 
         .select('rvs_tbl_id, tbl_nm')
       if (t.error) throw t.error
       const tid = new Map((t.data as { rvs_tbl_id: string; tbl_nm: string }[]).map((x) => [x.tbl_nm, x.rvs_tbl_id]))
-      const rows = part.flatMap((x, k) =>
-        x.cols.map((c, n) => {
+      const rows = part.flatMap((x, k) => {
+        const pkPos = new Map(x.pk.map((nm, i) => [nm, i])) // 주키 위치 O(1)
+        return x.cols.map((c, n) => {
           const m = maps[i + k][n]
-          const pk = x.pk.indexOf(c.name)
+          const pk = pkPos.get(c.name) ?? -1
           return {
             area_id: areaId,
             rvs_tbl_id: tid.get(x.name),
@@ -87,8 +88,8 @@ export async function stageRvs(areaId: string, prjId: string, o: { src: 'DDL' | 
             cand_nm: m.cand_nm,
             ...sys,
           }
-        }),
-      )
+        })
+      })
       for (let s = 0; s < rows.length; s += CHUNK) {
         const c = await db().from('mdl_rvs_col').insert(rows.slice(s, s + CHUNK))
         if (c.error) throw c.error
