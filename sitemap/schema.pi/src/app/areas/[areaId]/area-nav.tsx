@@ -45,6 +45,7 @@ const REST: Item[] = [
       { seg: 'entity-classes', nm: '엔터티 분류어' },
     ],
   },
+  { seg: 'logical', nm: '논리 모델' },
   { seg: 'forbidden', nm: '금칙어' },
   {
     seg: 'settings',
