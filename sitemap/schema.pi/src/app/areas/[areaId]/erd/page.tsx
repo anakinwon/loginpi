@@ -3,6 +3,7 @@ import { piFetch } from '@pi/auth/client'
 // ERD 화면(PRD_PiErd S3 E1·E3·E4·E5·E6 1차) — 모델의 뷰 : 엔터티·속성·관계는 논리 모델 정본, 여기서는 배치(좌표·고정)만 저장
 //  캔버스 @xyflow/react : 엔터티 박스(내용 맞춤 크기, 유형별 색, 참조 엔터티 점선), IE 관계선(식별 실선·비식별 점선·까마귀발, 가까운 변 자동 연결)
 //  자동 배치(modelpi/layout.ts) : 미리보기 → 저장·되돌리기, 새 엔터티만 배치, 고정 존중 / 표시 수준 개념·논리·물리, 논리명·물리명 전환
+//  ERD 단위 = 주제영역 1개(마스터 지시 2026-10-17) — 전체 보기 없음, 다른 주제영역 엔터티(관계 상대)는 '참조 표시' 를 켤 때만
 //  3단 : 왼쪽 모델 트리(주제영역 → 엔터티, 누르면 이동) · 캔버스 · 오른쪽 편집(E6 — 엔터티 추가·수정·속성, 논리 모델 화면과 같은 컴포넌트·같은 표준 검증 API), 아래 관계 편집·검토 결과
 //  편집 뒤 다시 불러올 때 저장 안 한 드래그 위치는 유지
 import '@xyflow/react/dist/style.css'
@@ -127,6 +128,7 @@ function Erd({ areaId }: { areaId: string }) {
   const [prjId, setPrjId] = useState('')
   const [subjs, setSubjs] = useState<{ subj_id: string; subj_nm: string; prj_id: string }[]>([])
   const [subj, setSubj] = useState('')
+  const [showRef, setShowRef] = useState(false) // 다른 주제영역 참조 엔터티 표시(기본 숨김)
   const [lvl, setLvl] = useState<Lvl>('LGCL')
   const [phy, setPhy] = useState(false)
   const [ents, setEnts] = useState<Ent[]>([])
@@ -165,12 +167,12 @@ function Erd({ areaId }: { areaId: string }) {
   }, [api, areaId])
 
   const load = useCallback(async () => {
-    if (!prjId) return
+    if (!prjId || !subj) return // 주제영역을 고른 뒤에만
     const seq = ++loadSeq.current
     const j = await (await piFetch(`${api}/projects/${prjId}/diagram?lvl=${lvl}${subj ? `&subj=${subj}` : ''}`)).json()
     if (seq !== loadSeq.current) return
     if (!j.ok) return setMsg(j.message)
-    const es = j.ents as Ent[]
+    const es = (j.ents as Ent[]).filter((e) => showRef || !e.ref)
     const pos = new Map((j.pos as { ent_id: string; x: number; y: number; fix: boolean }[]).map((p) => [p.ent_id, p]))
     const keep = keepRef.current === `${prjId}|${subj}|${lvl}`
     keepRef.current = ''
@@ -183,7 +185,8 @@ function Erd({ areaId }: { areaId: string }) {
       { mode: 'new' },
     )
     setEnts(es)
-    setRels(j.rels)
+    const shownIds = new Set(es.map((e) => e.ent_id))
+    setRels((j.rels as Rel[]).filter((r) => shownIds.has(r.prnt_ent_id) && shownIds.has(r.chld_ent_id))) // 숨긴 참조 엔터티의 관계 제외
     setNodes(es.map((e) => ({ id: e.ent_id, type: 'ent', position: laid[e.ent_id], data: { ent: e, lvl, phy, fix: !!pos.get(e.ent_id)?.fix } })))
     setDirty((d) => (keep && d) || es.some((e) => !pos.has(e.ent_id)))
     setUndo(null)
@@ -191,10 +194,16 @@ function Erd({ areaId }: { areaId: string }) {
       .then((r) => r.json())
       .then((c) => seq === loadSeq.current && c.ok && setChk({ summary: c.summary, issues: c.issues }))
       .catch(() => {})
-    if (j.capped) setMsg('조회 상한을 넘어 일부 엔터티만 표시합니다 — 주제영역을 선택하십시오')
+    if (j.capped) setMsg('프로젝트 조회 상한(엔터티 500·속성 5,000)을 넘어 일부만 표시될 수 있습니다')
     else if (!keep) setMsg('') // 편집 뒤 재조회는 편집 결과 메시지 유지
     if (!keep) requestAnimationFrame(() => flow.fitView({ padding: 0.15, maxZoom: 1 }))
-  }, [api, prjId, subj, lvl, phy, setNodes, flow])
+  }, [api, prjId, subj, lvl, phy, showRef, setNodes, flow])
+  // 프로젝트를 바꾸면 그 프로젝트의 첫 주제영역을 자동 선택(ERD 는 주제영역 단위)
+  useEffect(() => {
+    const mine = subjs.filter((s) => s.prj_id === prjId)
+    if (mine.length && !mine.some((s) => s.subj_id === subj)) setSubj(mine[0].subj_id)
+    if (!mine.length) { setSubj(''); setNodes([]); setEnts([]); setRels([]) }
+  }, [prjId, subjs, subj, setNodes])
   useEffect(() => {
     curRef.current = new Map(nodes.map((n) => [n.id, { ...n.position }]))
   }, [nodes])
@@ -339,7 +348,6 @@ function Erd({ areaId }: { areaId: string }) {
           ))}
         </select>
         <select value={subj} onChange={(e) => (setSubj(e.target.value), setSel(null))} className={sel2} aria-label="주제영역 선택">
-          <option value="">전체 주제영역</option>
           {subjs
             .filter((s) => s.prj_id === prjId)
             .map((s) => (
@@ -357,6 +365,9 @@ function Erd({ areaId }: { areaId: string }) {
         </select>
         <label className="flex items-center gap-1">
           <input type="checkbox" checked={phy} onChange={(e) => setPhy(e.target.checked)} /> 물리명
+        </label>
+        <label className="flex items-center gap-1" title="관계로 이어진 다른 주제영역 엔터티를 점선 박스로 함께 표시">
+          <input type="checkbox" checked={showRef} onChange={(e) => (setShowRef(e.target.checked), setSel(null))} /> 다른 주제영역 참조 표시
         </label>
         <span className="ml-auto flex flex-wrap gap-2">
           <button type="button" className={btn} disabled={!nodes.length} onClick={() => arrange('all')}>
