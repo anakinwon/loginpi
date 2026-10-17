@@ -1,9 +1,10 @@
 'use client'
 import { piFetch } from '@pi/auth/client'
-// 일괄등록 화면 — 유형(단어·도메인·용어) 선택 → CSV 선택 → 검증(묶음별 check) → 결과 표·CSV 내려받기 → 반영(묶음별 apply, 서버 재검증)
+// 일괄등록 화면 — 유형 = ?tab=words|domains|terms(하단 메뉴 표준단어·표준도메인·표준용어의 서브 '일괄등록', 마스터 지시 2026-10-17 — 화면 안 유형 탭 없음) → CSV 선택 → 검증(묶음별 check) → 결과 표·CSV 내려받기 → 반영(묶음별 apply, 서버 재검증)
 // 일괄등록 권한(DA·STD) 전용(API가 확인), 반영 행은 승인대기. 순서 : 단어 → 도메인 → 용어. 설계 docs/design/bulk-import.md
 import Link from 'next/link'
-import { use, useRef, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
+import { use, useEffect, useRef, useState } from 'react'
 import { BATCH_SIZE, HEADERS, MAX_ROWS, markCrossBatchDup, parseCsv, resultsCsv, type BulkKind, type BulkResult, type BulkStatus } from '@/lib/bulk'
 
 const KIND_NM: Record<BulkKind, string> = { words: '표준단어', domains: '표준도메인', terms: '표준용어' }
@@ -13,7 +14,8 @@ const SHOW = 500
 
 export default function BulkPage({ params }: { params: Promise<{ areaId: string }> }) {
   const { areaId } = use(params)
-  const [kind, setKind] = useState<BulkKind>('words')
+  const q = useSearchParams().get('tab')
+  const kind: BulkKind = q === 'domains' || q === 'terms' ? q : 'words'
   const [file, setFile] = useState<{ name: string; header: string[]; rows: string[][] } | null>(null)
   const [results, setResults] = useState<BulkResult[] | null>(null)
   const [mode, setMode] = useState<'check' | 'apply' | null>(null)
@@ -22,6 +24,8 @@ export default function BulkPage({ params }: { params: Promise<{ areaId: string 
   const [msg, setMsg] = useState('')
   const [drag, setDrag] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
+  const kindRef = useRef(kind) // 진행 중 유형이 바뀌면(메뉴 이동) 이전 유형 결과를 버리기 위함
+  kindRef.current = kind
 
   const resetResult = () => {
     setResults(null)
@@ -29,6 +33,12 @@ export default function BulkPage({ params }: { params: Promise<{ areaId: string 
     setMode(null)
     setMsg('')
   }
+  // 하단 메뉴로 유형이 바뀌면(같은 화면 재사용) 선택 파일·결과 초기화
+  useEffect(() => {
+    setFile(null)
+    resetResult()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [kind])
   const pickFile = async (f: File | undefined) => {
     resetResult()
     setFile(null)
@@ -42,6 +52,7 @@ export default function BulkPage({ params }: { params: Promise<{ areaId: string 
   // 묶음(1,000행)별 순차 호출 — 첫 데이터 행 번호 = 2(헤더 1행)
   const run = async (m: 'check' | 'apply') => {
     if (!file) return
+    const k = kind
     if (m === 'apply' && !confirm(`${KIND_NM[kind]} ${okCount.toLocaleString()}건을 반영합니다`)) return
     setMsg('')
     const out: BulkResult[] = []
@@ -62,6 +73,7 @@ export default function BulkPage({ params }: { params: Promise<{ areaId: string 
       done += j.applied
     }
     setBusy('')
+    if (kindRef.current !== k) return // 메뉴로 유형이 바뀜 — 새 유형 화면에 이전 결과를 쓰지 않음
     setResults(m === 'check' ? markCrossBatchDup(out) : out)
     setMode(m)
     setApplied(m === 'apply' ? done : null)
@@ -83,26 +95,10 @@ export default function BulkPage({ params }: { params: Promise<{ areaId: string 
       <Link href="/" className="text-sm text-blue-700 underline">
         ← 분류체계 목록
       </Link>
-      <h1 className="mt-2 text-2xl font-bold">일괄등록</h1>
+      <h1 className="mt-2 text-2xl font-bold">{KIND_NM[kind]} 일괄등록</h1>
       <p className="mt-1 text-sm text-gray-600">
         행안부 공공데이터 공통표준 CSV 양식(UTF-8). 단어 → 도메인 → 용어 순서로 반영하십시오. 이미 있는 이름은 건너뜁니다. 반영된 행은 승인대기로 저장됩니다. 승인 화면에서 단어 → 도메인 → 용어 순서로 승인하십시오. 데이터아키텍트·표준담당자 전용
       </p>
-      <div className="mt-4 flex gap-2" role="tablist">
-        {(Object.keys(KIND_NM) as BulkKind[]).map((k) => (
-          <button
-            key={k}
-            role="tab"
-            aria-selected={kind === k}
-            onClick={() => {
-              setKind(k)
-              resetResult()
-            }}
-            className={`rounded border px-4 py-1 text-sm ${kind === k ? 'bg-gray-800 text-white' : ''}`}
-          >
-            {KIND_NM[k]}
-          </button>
-        ))}
-      </div>
       <details className="mt-3 text-xs text-gray-600">
         <summary>CSV 헤더</summary>
         <p className="mt-1">{Object.values(HEADERS[kind]).join(', ')}</p>
