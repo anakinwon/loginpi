@@ -100,7 +100,7 @@ export function TermPick({ api, areaId, picked, onPick, label, initialQ }: { api
   )
 }
 
-export default function Attrs({ api, areaId, entId, entNm, editor }: { api: string; areaId: string; entId: string; entNm: string; editor: boolean }) {
+export default function Attrs({ api, areaId, entId, entNm, editor, onChanged }: { api: string; areaId: string; entId: string; entNm: string; editor: boolean; onChanged?: () => void }) {
   const base = `${api}/entities/${entId}/attributes`
   const [items, setItems] = useState<Attr[]>([])
   const [sug, setSug] = useState<{ pk: Cand[]; required: Cand[]; warn: string[]; must?: Must }>({ pk: [], required: [], warn: [] })
@@ -141,11 +141,13 @@ export default function Attrs({ api, areaId, entId, entNm, editor }: { api: stri
     setBusy(false)
     setMsg(`속성 ${n}건 등록${fail.length ? ` · 실패 ${fail.join(', ')}` : ''}`)
     void load()
+    onChanged?.() // 변경 후 호출측(ERD 등) 갱신
   }
   const patch = async (a: Attr, set: { pk_yn?: string; esntl_yn?: string; term_id?: string; attr_desc?: string | null; propagate?: boolean }) => {
     const j = await (await piFetch(`${base}/${a.attr_id}`, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ver_no: a.ver_no, ...set }) })).json()
     setMsg(j.ok ? (j.propagated || j.propagate_fail?.length ? `자식 FK ${j.propagated}건 함께 변경${j.propagate_fail?.length ? ` · 실패 ${j.propagate_fail.join(', ')}` : ''}` : '') : j.message)
     void load()
+    onChanged?.() // 변경 후 호출측(ERD 등) 갱신
     return !!j.ok
   }
   const addOne = async () => {
@@ -156,6 +158,7 @@ export default function Attrs({ api, areaId, entId, entNm, editor }: { api: stri
     setMsg(j.ok ? `속성 ${nw.t.term_log_nm} 등록` : j.message)
     if (j.ok) setNw({ t: null, pk: false, es: true })
     void load()
+    onChanged?.() // 변경 후 호출측(ERD 등) 갱신
   }
   const saveEd = async (a: Attr) => {
     if (!ed) return
@@ -181,12 +184,14 @@ export default function Attrs({ api, areaId, entId, entNm, editor }: { api: stri
     const r = await (await piFetch(`${base}/order`, { method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ids }) })).json()
     setMsg(r.ok ? '' : r.message)
     void load()
+    onChanged?.() // 변경 후 호출측(ERD 등) 갱신
   }
   const del = async (a: Attr) => {
     if (!confirm(`속성 ${a.std_term?.term_log_nm} 을(를) 삭제하시겠습니까?`)) return
     const j = await (await piFetch(`${base}/${a.attr_id}?ver_no=${a.ver_no}`, { method: 'DELETE' })).json()
     setMsg(j.ok ? '속성을 삭제했습니다' : j.message)
     void load()
+    onChanged?.() // 변경 후 호출측(ERD 등) 갱신
   }
 
   const row = (c: Cand) => (

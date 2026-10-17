@@ -3,13 +3,17 @@ import { piFetch } from '@pi/auth/client'
 // ERD 화면(PRD_PiErd S3 E1·E3·E4·E5·E6 1차) — 모델의 뷰 : 엔터티·속성·관계는 논리 모델 정본, 여기서는 배치(좌표·고정)만 저장
 //  캔버스 @xyflow/react : 엔터티 박스(내용 맞춤 크기, 유형별 색, 참조 엔터티 점선), IE 관계선(식별 실선·비식별 점선·까마귀발, 가까운 변 자동 연결)
 //  자동 배치(modelpi/layout.ts) : 미리보기 → 저장·되돌리기, 새 엔터티만 배치, 고정 존중 / 표시 수준 개념·논리·물리, 논리명·물리명 전환
-//  3단 : 왼쪽 모델 트리(주제영역 → 엔터티, 누르면 이동) · 캔버스 · 오른쪽 엔터티 정보(편집은 논리 모델 화면 — 캔버스 직접 편집은 S3 후속)
+//  3단 : 왼쪽 모델 트리(주제영역 → 엔터티, 누르면 이동) · 캔버스 · 오른쪽 편집(E6 — 엔터티 추가·수정·속성, 논리 모델 화면과 같은 컴포넌트·같은 표준 검증 API), 아래 관계 편집·검토 결과
+//  편집 뒤 다시 불러올 때 저장 안 한 드래그 위치는 유지
 import '@xyflow/react/dist/style.css'
 import { Background, Controls, Handle, MiniMap, Position, ReactFlow, ReactFlowProvider, useNodesState, useReactFlow, type Edge, type Node, type NodeProps } from '@xyflow/react'
 import Link from 'next/link'
 import { use, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { autoLayout, boxSize } from '@/lib/modelpi/layout'
 import { can, type MbrRole } from '@/lib/roles'
+import Attrs from '../model/attrs'
+import EntForm from '../model/ent-form'
+import Relations from '../model/relations'
 
 interface Attr {
   attr_id: string
@@ -30,6 +34,15 @@ interface Ent {
   ent_desc: string | null
   attrs: Attr[]
   ref: boolean
+  ver_no: number
+  dic_ids: string[]
+  mdl_lvl_cd: string
+}
+interface Issue {
+  kind: string
+  ent_id: string
+  msg: string
+  action: string
 }
 interface Rel {
   rel_id: string
@@ -126,6 +139,10 @@ function Erd({ areaId }: { areaId: string }) {
   const [busy, setBusy] = useState(false)
   const editor = !!role && can(role, 'REQUEST')
   const loadSeq = useRef(0) // 늦게 도착한 응답이 최신 선택을 덮어쓰지 않도록
+  const curRef = useRef<Map<string, { x: number; y: number }>>(new Map()) // 편집 뒤 재조회 시 저장 안 한 드래그 위치 유지
+  const keepRef = useRef('') // 편집 뒤 재조회 대상 키(프로젝트|주제영역|단계) — 다른 대상 조회에는 적용 안 함
+  const [form, setForm] = useState<'new' | 'edit' | null>(null)
+  const [chk, setChk] = useState<{ summary: { no_pk: number; fk_missing: number; issues: number; reviews: number }; issues: Issue[] } | null>(null)
 
   useEffect(() => {
     piFetch(api)
@@ -155,6 +172,10 @@ function Erd({ areaId }: { areaId: string }) {
     if (!j.ok) return setMsg(j.message)
     const es = j.ents as Ent[]
     const pos = new Map((j.pos as { ent_id: string; x: number; y: number; fix: boolean }[]).map((p) => [p.ent_id, p]))
+    const keep = keepRef.current === `${prjId}|${subj}|${lvl}`
+    keepRef.current = ''
+    if (!keep) setChk(null)
+    if (keep) for (const [id, c] of curRef.current) pos.set(id, { ent_id: id, ...c, fix: pos.get(id)?.fix ?? false })
     // 좌표 없는 엔터티만 자동 배치(좌표가 하나도 없으면 전체 배치)
     const laid = autoLayout(
       es.map((e) => ({ id: e.ent_id, ...sizeOf(e, lvl, phy), group: e.subj_id, x: pos.get(e.ent_id)?.x, y: pos.get(e.ent_id)?.y, fixed: pos.get(e.ent_id)?.fix })),
@@ -164,11 +185,30 @@ function Erd({ areaId }: { areaId: string }) {
     setEnts(es)
     setRels(j.rels)
     setNodes(es.map((e) => ({ id: e.ent_id, type: 'ent', position: laid[e.ent_id], data: { ent: e, lvl, phy, fix: !!pos.get(e.ent_id)?.fix } })))
-    setDirty(es.some((e) => !pos.has(e.ent_id)))
+    setDirty((d) => (keep && d) || es.some((e) => !pos.has(e.ent_id)))
     setUndo(null)
-    setMsg(j.capped ? '조회 상한을 넘어 일부 엔터티만 표시합니다 — 주제영역을 선택하십시오' : '')
-    requestAnimationFrame(() => flow.fitView({ padding: 0.15, maxZoom: 1 }))
+    void piFetch(`${api}/projects/${prjId}/logical`)
+      .then((r) => r.json())
+      .then((c) => seq === loadSeq.current && c.ok && setChk({ summary: c.summary, issues: c.issues }))
+      .catch(() => {})
+    if (j.capped) setMsg('조회 상한을 넘어 일부 엔터티만 표시합니다 — 주제영역을 선택하십시오')
+    else if (!keep) setMsg('') // 편집 뒤 재조회는 편집 결과 메시지 유지
+    if (!keep) requestAnimationFrame(() => flow.fitView({ padding: 0.15, maxZoom: 1 }))
   }, [api, prjId, subj, lvl, phy, setNodes, flow])
+  useEffect(() => {
+    curRef.current = new Map(nodes.map((n) => [n.id, { ...n.position }]))
+  }, [nodes])
+  // 편집(엔터티·속성·관계) 뒤 다시 불러오기 — 현재 위치 유지
+  const refresh = () => {
+    keepRef.current = `${prjId}|${subj}|${lvl}`
+    void load()
+  }
+  const formDone = (id: string, t: string) => {
+    setMsg(t)
+    setForm(null)
+    setSel(id)
+    refresh()
+  }
   useEffect(() => {
     void load()
     try {
@@ -258,6 +298,8 @@ function Erd({ areaId }: { areaId: string }) {
     for (const e of ents) g.set(e.subj_nm, [...(g.get(e.subj_nm) ?? []), e])
     return [...g.entries()]
   }, [ents])
+  const prjSubjs = subjs.filter((s) => s.prj_id === prjId)
+  const selIss = (chk?.issues ?? []).filter((i) => i.ent_id === sel)
   const sel2 = 'rounded border border-white/60 bg-white px-2 py-1 text-gray-900'
   const btn = 'rounded bg-white/20 px-3 py-1 hover:bg-white/30 disabled:opacity-40'
 
@@ -339,7 +381,7 @@ function Erd({ areaId }: { areaId: string }) {
         </p>
       )}
 
-      <div className="mt-3 grid h-[72vh] gap-3 md:grid-cols-[14rem_1fr_16rem]">
+      <div className="mt-3 grid h-[72vh] gap-3 md:grid-cols-[14rem_1fr_24rem]">
         <nav className="overflow-auto rounded border text-sm" aria-label="모델 트리">
           {tree.map(([nm, es]) => (
             <details key={nm} open>
@@ -383,7 +425,14 @@ function Erd({ areaId }: { areaId: string }) {
         </div>
 
         <aside className="overflow-auto rounded border p-3 text-sm" aria-label="엔터티 정보">
-          {selEnt ? (
+          {editor && !form && (
+            <button type="button" onClick={() => setForm('new')} disabled={!prjSubjs.length} className="mb-2 rounded border px-2 py-1 text-xs hover:bg-gray-50 disabled:opacity-40">
+              ＋ 엔터티 추가
+            </button>
+          )}
+          {form === 'new' && <EntForm key="new" api={api} areaId={areaId} subjs={prjSubjs} onDone={formDone} onCancel={() => setForm(null)} />}
+          {form === 'edit' && selEnt && <EntForm key={`edit-${selEnt.ent_id}-${selEnt.ver_no}`} api={api} areaId={areaId} subjs={prjSubjs} init={selEnt} onDone={formDone} onCancel={() => setForm(null)} />}
+          {selEnt && !form ? (
             <>
               <h2 className="font-semibold text-[#1f3a68]">{selEnt.ent_log_nm}</h2>
               <p className="font-mono text-xs text-gray-600">{selEnt.tbl_phy_nm}</p>
@@ -393,28 +442,60 @@ function Erd({ areaId }: { areaId: string }) {
               </p>
               {selEnt.ent_desc && <p className="mt-1 text-xs text-gray-700">{selEnt.ent_desc}</p>}
               {editor && (
+                <button type="button" onClick={() => setForm('edit')} className="mt-2 mr-2 rounded border px-2 py-0.5 text-xs hover:bg-gray-50">
+                  엔터티 수정
+                </button>
+              )}
+              {selIss.length > 0 && (
+                <ul className="mt-2 list-disc pl-4 text-xs text-red-700" aria-label="이 엔터티 검토 결과">
+                  {selIss.map((i, k) => (
+                    <li key={k}>{i.msg}</li>
+                  ))}
+                </ul>
+              )}
+              {editor && (
                 <label className="mt-2 flex items-center gap-1">
                   <input type="checkbox" checked={!!byId.get(selEnt.ent_id)?.data.fix} onChange={() => toggleFix(selEnt.ent_id)} /> 위치 고정(자동 배치 제외)
                 </label>
               )}
-              <ul className="mt-2 font-mono text-xs">
-                {selEnt.attrs.map((a) => (
-                  <li key={a.attr_id}>
-                    {a.pk_yn === 'Y' ? '🔑' : a.fk_rel_id ? '↗' : '·'} {a.term_log_nm} <span className="text-gray-500">{a.term_phy_nm}</span>
-                    {a.esntl_yn === 'Y' && a.pk_yn !== 'Y' && ' *'}
-                  </li>
-                ))}
-              </ul>
-              <p className="mt-2 text-xs text-gray-600">관계 {rels.filter((r) => r.prnt_ent_id === selEnt.ent_id || r.chld_ent_id === selEnt.ent_id).length}건</p>
-              <Link href={`/areas/${areaId}/logical`} className="mt-2 inline-block text-xs text-blue-700 underline">
-                논리 모델에서 속성·관계 편집 →
-              </Link>
+              <p className="mt-2 text-xs text-gray-600">관계 {rels.filter((r) => r.prnt_ent_id === selEnt.ent_id || r.chld_ent_id === selEnt.ent_id).length}건(아래 관계 편집)</p>
+              <div className="mt-2">
+                <Attrs key={selEnt.ent_id} api={api} areaId={areaId} entId={selEnt.ent_id} entNm={selEnt.ent_log_nm} editor={editor} onChanged={refresh} />
+              </div>
             </>
-          ) : (
-            <p className="text-gray-500">엔터티를 누르면 정보가 보입니다. 🔑 주식별자 · ↗ 상속(FK) · * 필수 / 실선 = 식별 관계, 점선 = 비식별 관계, 까마귀발 = 여러 건, ○ = 선택</p>
+          ) : form ? null : (
+            <p className="text-gray-500">엔터티를 누르면 정보·속성 편집이 보입니다. 🔑 주식별자 · ↗ 상속(FK) · * 필수 / 실선 = 식별 관계, 점선 = 비식별 관계, 까마귀발 = 여러 건, ○ = 선택</p>
           )}
         </aside>
       </div>
+
+      {chk && (
+        <section className="mt-3 rounded border p-3 text-sm" aria-label="검토 결과">
+          <h2 className="font-semibold text-[#1f3a68]">검토 결과(논리 모델 점검)</h2>
+          <p className="mt-1">
+            주식별자 없음 {chk.summary.no_pk} · FK 누락 {chk.summary.fk_missing} · 수정 필요 {chk.summary.issues} · 검토 {chk.summary.reviews}
+            {!chk.summary.no_pk && !chk.summary.fk_missing && !chk.summary.issues ? <span className="ml-2 text-green-700">물리 전환 가능</span> : <span className="ml-2 text-amber-700">물리 전환 전 해결 필요</span>}
+          </p>
+          <details className="mt-1">
+            <summary className="cursor-pointer text-xs text-gray-600">이슈 {chk.issues.length}건 보기(누르면 해당 엔터티로 이동)</summary>
+            <ul className="mt-1 max-h-48 overflow-auto text-xs">
+              {chk.issues.map((i, k) => (
+                <li key={k}>
+                  <button type="button" className="text-left hover:underline" onClick={() => focus(i.ent_id)}>
+                    [{i.kind}] {ents.find((e) => e.ent_id === i.ent_id)?.ent_log_nm ?? ''} — {i.msg}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </details>
+        </section>
+      )}
+      {prjId && (
+        <details className="mt-3 rounded border p-3 text-sm">
+          <summary className="cursor-pointer font-semibold text-[#1f3a68]">관계 편집(등록·수정·삭제·FK 상속·N:M 해소)</summary>
+          <Relations api={api} prjId={prjId} editor={editor} entsKey={ents.length} onSaved={refresh} />
+        </details>
+      )}
     </main>
   )
 }
