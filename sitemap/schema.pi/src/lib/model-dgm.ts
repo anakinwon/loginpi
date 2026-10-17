@@ -4,6 +4,7 @@
 // 순서 원칙(마스터 지시 2026-10-17) : 엔터티 작성완료 → 물리 전환 → 테이블 작성완료 → ERD — 작성완료 테이블이 있는 엔터티만 그린다(없으면 빈 ERD + 안내)
 import { db } from './db'
 import { loadLogical } from './model-logical'
+import type { RelLyt } from './modelpi/edge-geo'
 
 export type DgmLvl = 'CNCP' | 'LGCL' | 'PHY'
 export interface DgmPos {
@@ -14,6 +15,8 @@ export interface DgmPos {
   seq?: number
 }
 const CHUNK = 20 // 행별 update 동시 실행 묶음
+// 관계선 배치(sql/034, 2026-10-18) — 사용자가 끝점·꺾임점을 옮긴 관계만, 행 없음 = 자동
+export type DgmRel = RelLyt & { rel_id: string }
 
 async function findDgm(areaId: string, prjId: string, subjId: string | null, lvl: DgmLvl) {
   let q = db().from('mdl_dgm').select('dgm_id, dgm_nm, ver_no').eq('area_id', areaId).eq('prj_id', prjId).eq('mdl_lvl_cd', lvl).eq('del_yn', 'N')
@@ -46,17 +49,25 @@ export async function loadDgm(areaId: string, prjId: string, subjId: string | nu
   const ents = m.ents.filter((e) => shown.has(e.ent_id)).map(({ words: _w, ...e }) => ({ ...e, ref: !own.has(e.ent_id) }))
   const dgm = await findDgm(areaId, prjId, subjId, lvl)
   let pos: DgmPos[] = []
+  let relLyt: DgmRel[] = []
   if (dgm) {
+    const shownRel = new Set(rels.map((r) => r.rel_id))
+    const q = await db().from('mdl_dgm_rel').select('rel_id, prnt_side_cd, prnt_pstn_rt, chld_side_cd, chld_pstn_rt, mid_xcrd, mid_ycrd').eq('dgm_id', dgm.dgm_id).eq('del_yn', 'N').limit(5000)
+    if (q.error) throw q.error
+    relLyt = (q.data as Record<string, unknown>[])
+      .filter((x) => shownRel.has(x.rel_id as string))
+      .map((x) => ({ rel_id: x.rel_id as string, ps: x.prnt_side_cd as RelLyt['ps'], pr: Number(x.prnt_pstn_rt), cs: x.chld_side_cd as RelLyt['cs'], cr: Number(x.chld_pstn_rt), mx: x.mid_xcrd == null ? null : Number(x.mid_xcrd), my: x.mid_ycrd == null ? null : Number(x.mid_ycrd) }))
     const p = await db().from('mdl_dgm_ent').select('ent_id, xcrd, ycrd, fix_yn, sort_seq').eq('dgm_id', dgm.dgm_id).eq('del_yn', 'N').limit(5000)
     if (p.error) throw p.error
     pos = (p.data as { ent_id: string; xcrd: number; ycrd: number; fix_yn: string; sort_seq: number }[]).filter((x) => shown.has(x.ent_id)).map((x) => ({ ent_id: x.ent_id, x: Number(x.xcrd), y: Number(x.ycrd), fix: x.fix_yn === 'Y', seq: x.sort_seq }))
   }
-  return { prj: m.prj, dgm, ents, rels, pos, capped: m.capped, phy_models: phyModels, phy_mdl_id: phy?.phy_mdl_id ?? null, hidden, phy_done: own.size > 0 }
+  return { prj: m.prj, dgm, ents, rels, pos, rel_lyt: relLyt, capped: m.capped, phy_models: phyModels, phy_mdl_id: phy?.phy_mdl_id ?? null, hidden, phy_done: own.size > 0 }
 }
 
 // 좌표 저장 — 다이어그램 없으면 생성, 기존 배치는 update·새 배치는 insert. 화면에 없는(삭제된) 엔터티는 트리거가 거부
 // ponytail: 행별 update(CHUNK 동시) — 엔터티 수천 개를 자주 저장하면 DB 함수(JSON 일괄 upsert)로
-export async function saveDgm(areaId: string, prjId: string, subjId: string | null, lvl: DgmLvl, nm: string, pos: DgmPos[], uid: string) {
+// relLyt·relScope(선택) : 화면에 보인 관계(scope) 중 relLyt 에 있는 것은 저장, 없는 것은 자동으로 되돌림(논리 삭제). scope 밖(숨긴 참조 관계)은 그대로
+export async function saveDgm(areaId: string, prjId: string, subjId: string | null, lvl: DgmLvl, nm: string, pos: DgmPos[], uid: string, relLyt?: DgmRel[], relScope?: string[]) {
   let dgm = await findDgm(areaId, prjId, subjId, lvl)
   if (!dgm) {
     const c = await db().from('mdl_dgm').insert({ area_id: areaId, prj_id: prjId, subj_id: subjId, mdl_lvl_cd: lvl, dgm_nm: nm, regr_id: uid, modr_id: uid }).select('dgm_id, dgm_nm, ver_no').single()
@@ -80,5 +91,30 @@ export async function saveDgm(areaId: string, prjId: string, subjId: string | nu
     const rs = await Promise.all(upd.slice(i, i + CHUNK).map((p) => db().from('mdl_dgm_ent').update(row(p)).eq('dgm_ent_id', have.get(p.ent_id)!)))
     for (const r of rs) if (r.error) throw r.error
   }
+  if (relLyt && relScope) await saveRelLyt(areaId, dgm.dgm_id, relLyt, relScope, uid)
   return { dgm, ins: ins.length, upd: upd.length }
+}
+
+async function saveRelLyt(areaId: string, dgmId: string, lyt: DgmRel[], scope: string[], uid: string) {
+  const cur = await db().from('mdl_dgm_rel').select('dgm_rel_id, rel_id').eq('dgm_id', dgmId).eq('del_yn', 'N').limit(5000)
+  if (cur.error) throw cur.error
+  const have = new Map((cur.data as { dgm_rel_id: string; rel_id: string }[]).map((x) => [x.rel_id, x.dgm_rel_id]))
+  const keep = new Set(lyt.map((l) => l.rel_id))
+  const row = (l: DgmRel) => ({ prnt_side_cd: l.ps, prnt_pstn_rt: l.pr, chld_side_cd: l.cs, chld_pstn_rt: l.cr, mid_xcrd: l.mx == null ? null : Math.round(l.mx * 10) / 10, mid_ycrd: l.my == null ? null : Math.round(l.my * 10) / 10, modr_id: uid })
+  const ins = lyt.filter((l) => !have.has(l.rel_id)).map((l) => ({ area_id: areaId, dgm_id: dgmId, rel_id: l.rel_id, ...row(l), regr_id: uid }))
+  if (ins.length) {
+    const r = await db().from('mdl_dgm_rel').insert(ins)
+    if (r.error) throw r.error
+  }
+  const upd = lyt.filter((l) => have.has(l.rel_id))
+  for (let i = 0; i < upd.length; i += CHUNK) {
+    const rs = await Promise.all(upd.slice(i, i + CHUNK).map((l) => db().from('mdl_dgm_rel').update(row(l)).eq('dgm_rel_id', have.get(l.rel_id)!)))
+    for (const r of rs) if (r.error) throw r.error
+  }
+  // 화면에 보였는데 저장 목록에 없음 = 자동으로 되돌림
+  const off = scope.filter((id) => have.has(id) && !keep.has(id)).map((id) => have.get(id)!)
+  if (off.length) {
+    const r = await db().from('mdl_dgm_rel').update({ del_yn: 'Y', del_dtm: new Date().toISOString(), modr_id: uid }).in('dgm_rel_id', off)
+    if (r.error) throw r.error
+  }
 }

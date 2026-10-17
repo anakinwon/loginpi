@@ -7,12 +7,15 @@ import { piFetch } from '@pi/auth/client'
 //  ERD 단위 = 주제영역 1개(마스터 지시 2026-10-17) — 전체 보기 없음, 다른 주제영역 엔터티(관계 상대)는 '참조 표시' 를 켤 때만
 //  3단 : 왼쪽 모델 트리(주제영역 → 엔터티, 누르면 이동) · 캔버스 · 오른쪽 편집(E6 — 엔터티 추가·수정·속성, 논리 모델 화면과 같은 컴포넌트·같은 표준 검증 API), 아래 관계 편집·검토 결과
 //  편집 뒤 다시 불러올 때 저장 안 한 드래그 위치는 유지
+//  관계선 위치 조정(마스터 지시 2026-10-18) : 선을 누르면 끝점 2개(박스 변 따라 이동·변 바꾸기)·꺾임점 1개(가운데 선 이동) 손잡이, 두 번 누르면 자동으로.
+//   자동 = 가까운 변 + 같은 변에 모인 선 고르게 나눔(modelpi/edge-geo.ts). 옮긴 선만 배치 저장 때 함께 저장(sql/034 mdl_dgm_rel)
 import '@xyflow/react/dist/style.css'
-import { Background, Controls, Handle, MiniMap, Position, ReactFlow, ReactFlowProvider, useNodesState, useReactFlow, type Edge, type Node, type NodeProps } from '@xyflow/react'
+import { Background, BaseEdge, Controls, EdgeLabelRenderer, getSmoothStepPath, Handle, MiniMap, Position, ReactFlow, ReactFlowProvider, useNodesState, useReactFlow, type Edge, type EdgeProps, type Node, type NodeProps } from '@xyflow/react'
 import Link from 'next/link'
 import { use, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { dbmsList } from '@/lib/modelpi/dbms'
 import { autoLayout, boxSize } from '@/lib/modelpi/layout'
+import { autoAnchors, project, sidePoint, type Box, type Pt, type RelLyt, type Side } from '@/lib/modelpi/edge-geo'
 import { can, type MbrRole } from '@/lib/roles'
 import Attrs from '../model/attrs'
 import EntForm from '../model/ent-form'
@@ -113,14 +116,46 @@ function EntNode({ data, selected }: NodeProps<ENode>) {
 }
 const nodeTypes = { ent: EntNode }
 
-// 가까운 변 — 두 박스 중심의 상대 위치로 변 선택(드래그할 때마다 다시 계산)
-function sides(a: ENode, b: ENode, lvl: Lvl, phy: boolean): [string, string] {
-  const sa = sizeOf(a.data.ent, lvl, phy), sb = sizeOf(b.data.ent, lvl, phy)
-  const dx = b.position.x + sb.w / 2 - (a.position.x + sa.w / 2)
-  const dy = b.position.y + sb.h / 2 - (a.position.y + sa.h / 2)
-  if (Math.abs(dx) > Math.abs(dy)) return dx > 0 ? ['r', 'l'] : ['l', 'r']
-  return dy > 0 ? ['b', 't'] : ['t', 'b']
+// 관계선(사용자 정의 선) — 끝점·꺾임점은 부모 화면이 계산해 data 로 넘김. 선택된 선(편집 권한)만 손잡이 3개
+type Grip = 's' | 't' | 'm'
+type RelData = { sp: Pt; tp: Pt; ps: Side; cs: Side; mx: number | null; my: number | null; edit: boolean; onDrag: (id: string, k: Grip, screen: Pt) => void; onReset: (id: string) => void }
+type REdge = Edge<RelData, 'rel'>
+const POS: Record<Side, Position> = { T: Position.Top, R: Position.Right, B: Position.Bottom, L: Position.Left }
+const GRIP_NM: Record<Grip, string> = { s: '부모 끝점 — 끌어서 박스 변을 따라 이동', t: '자식 끝점 — 끌어서 박스 변을 따라 이동', m: '꺾임점 — 끌어서 가운데 선 이동' }
+
+function RelEdge({ id, data, markerStart, markerEnd, style, label, labelStyle, selected }: EdgeProps<REdge>) {
+  const d = data!
+  const [path, lx, ly] = getSmoothStepPath({ sourceX: d.sp.x, sourceY: d.sp.y, sourcePosition: POS[d.ps], targetX: d.tp.x, targetY: d.tp.y, targetPosition: POS[d.cs], ...(d.mx !== null && d.my !== null ? { centerX: d.mx, centerY: d.my } : {}) })
+  const grip = (k: Grip, p: Pt) => (
+    <div
+      key={k}
+      className="nodrag nopan"
+      title={`${GRIP_NM[k]} · 두 번 누르면 자동 위치`}
+      style={{ position: 'absolute', transform: `translate(-50%, -50%) translate(${p.x}px, ${p.y}px)`, pointerEvents: 'all', width: 11, height: 11, borderRadius: k === 'm' ? 2 : 9999, background: k === 'm' ? '#d97706' : '#fff', border: '2px solid #d97706', cursor: 'move' }}
+      onPointerDown={(e) => {
+        // 끄는 동안은 창(window) 이벤트로 추적 — 선이 다시 그려지며 손잡이가 바뀌어도 끊기지 않고, 엔터티 끌기·캔버스 이동과 겹치지 않음
+        e.stopPropagation()
+        e.preventDefault()
+        const move = (ev: PointerEvent) => d.onDrag(id, k, { x: ev.clientX, y: ev.clientY })
+        const up = () => (window.removeEventListener('pointermove', move), window.removeEventListener('pointerup', up))
+        window.addEventListener('pointermove', move)
+        window.addEventListener('pointerup', up)
+      }}
+      onClick={(e) => e.stopPropagation()} // 놓을 때 생기는 click 이 캔버스(pane)로 올라가 선 선택이 풀리지 않게
+      onDoubleClick={(e) => (e.stopPropagation(), d.onReset(id))}
+    />
+  )
+  // 꺾임점 손잡이 = 가운데 선 위 : 좌우 변끼리면 세로 선(x 만 의미), 위아래 변끼리면 가로 선(y 만 의미), 섞이면 꺾임 1번이라 손잡이 없음
+  const hz = (s: Side) => s === 'L' || s === 'R'
+  const mid = hz(d.ps) && hz(d.cs) ? { x: d.mx ?? lx, y: (d.sp.y + d.tp.y) / 2 } : !hz(d.ps) && !hz(d.cs) ? { x: (d.sp.x + d.tp.x) / 2, y: d.my ?? ly } : null
+  return (
+    <>
+      <BaseEdge id={id} path={path} markerStart={markerStart} markerEnd={markerEnd} style={selected ? { ...style, stroke: '#d97706', strokeWidth: 2 } : style} label={label} labelX={lx} labelY={ly} labelStyle={labelStyle} interactionWidth={14} />
+      {d.edit && <EdgeLabelRenderer>{[grip('s', d.sp), grip('t', d.tp), mid && grip('m', mid)]}</EdgeLabelRenderer>}
+    </>
+  )
 }
+const edgeTypes = { rel: RelEdge }
 
 function Erd({ areaId }: { areaId: string }) {
   const api = `/api/areas/${areaId}`
@@ -141,6 +176,8 @@ function Erd({ areaId }: { areaId: string }) {
   const [rels, setRels] = useState<Rel[]>([])
   const [nodes, setNodes, onNodesChange] = useNodesState<ENode>([])
   const [sel, setSel] = useState<string | null>(null)
+  const [selRel, setSelRel] = useState<string | null>(null) // 선택된 관계선
+  const [lyt, setLyt] = useState<Record<string, RelLyt>>({}) // 사용자가 옮긴 관계선(없으면 자동)
   const [dirty, setDirty] = useState(false)
   const [undo, setUndo] = useState<Record<string, { x: number; y: number }> | null>(null)
   const [msg, setMsg] = useState('')
@@ -198,6 +235,8 @@ function Erd({ areaId }: { areaId: string }) {
     const shownIds = new Set(es.map((e) => e.ent_id))
     setRels((j.rels as Rel[]).filter((r) => shownIds.has(r.prnt_ent_id) && shownIds.has(r.chld_ent_id))) // 숨긴 참조 엔터티의 관계 제외
     setNodes(es.map((e) => ({ id: e.ent_id, type: 'ent', position: laid[e.ent_id], data: { ent: e, lvl, phy, fix: !!pos.get(e.ent_id)?.fix } })))
+    if (!keep) setLyt(Object.fromEntries(((j.rel_lyt ?? []) as (RelLyt & { rel_id: string })[]).map(({ rel_id, ...l }) => [rel_id, l])))
+    if (!keep) setSelRel(null)
     setDirty((d) => (keep && d) || es.some((e) => !pos.has(e.ent_id)))
     setUndo(null)
     void piFetch(`${api}/projects/${prjId}/logical`)
@@ -241,21 +280,58 @@ function Erd({ areaId }: { areaId: string }) {
   }, [lvl, phy, setNodes])
 
   const byId = useMemo(() => new Map(nodes.map((n) => [n.id, n])), [nodes])
-  const edges: Edge[] = useMemo(
+  // 박스(실측 크기 우선)·자동 끝점 — 드래그할 때마다 다시 계산
+  const geo = useMemo(() => {
+    const boxes = new Map<string, Box>()
+    for (const n of nodes) {
+      const s = sizeOf(n.data.ent, lvl, phy)
+      boxes.set(n.id, { x: n.position.x, y: n.position.y, w: n.measured?.width ?? s.w, h: n.measured?.height ?? s.h })
+    }
+    const shown = rels.filter((r) => boxes.has(r.prnt_ent_id) && boxes.has(r.chld_ent_id))
+    return { boxes, shown, auto: autoAnchors(shown.map((r) => ({ id: r.rel_id, from: r.prnt_ent_id, to: r.chld_ent_id })), boxes) }
+  }, [nodes, rels, lvl, phy])
+  const lytOf = useCallback((id: string): RelLyt => lyt[id] ?? { ...geo.auto.get(id)!, mx: null, my: null }, [lyt, geo])
+  // 손잡이 끌기 — 끝점은 놓은 자리에서 가장 가까운 변·비율로, 꺾임점은 좌표 그대로
+  const dragRel = useCallback(
+    (id: string, k: Grip, screen: Pt) => {
+      const r = rels.find((x) => x.rel_id === id)
+      if (!r) return
+      const p = flow.screenToFlowPosition(screen)
+      const cur = lytOf(id)
+      let next: RelLyt = cur
+      if (k === 'm') next = { ...cur, mx: p.x, my: p.y }
+      else {
+        const b = geo.boxes.get(k === 's' ? r.prnt_ent_id : r.chld_ent_id)
+        if (!b) return
+        const pr = project(b, p)
+        next = k === 's' ? { ...cur, ps: pr.side, pr: pr.r } : { ...cur, cs: pr.side, cr: pr.r }
+      }
+      setLyt((L) => ({ ...L, [id]: next }))
+      setDirty(true)
+    },
+    [rels, flow, lytOf, geo],
+  )
+  const resetRel = useCallback((id: string) => {
+    setLyt(({ [id]: _, ...rest }) => rest)
+    setDirty(true)
+    setMsg('관계선을 자동 위치로 되돌렸습니다(저장하면 반영)')
+  }, [])
+  const edges: REdge[] = useMemo(
     () =>
-      rels
-        .filter((r) => byId.has(r.prnt_ent_id) && byId.has(r.chld_ent_id))
-        .map((r) => {
-          const self = r.prnt_ent_id === r.chld_ent_id
-          const [s, t] = self ? ['r', 't'] : sides(byId.get(r.prnt_ent_id)!, byId.get(r.chld_ent_id)!, lvl, phy)
+      geo.shown.map((r) => {
+          const l = lytOf(r.rel_id)
+          const sp = sidePoint(geo.boxes.get(r.prnt_ent_id)!, l.ps, l.pr)
+          const tp = sidePoint(geo.boxes.get(r.chld_ent_id)!, l.cs, l.cr)
           const many = r.crdn_cd !== '11'
           return {
             id: r.rel_id,
             source: r.prnt_ent_id,
             target: r.chld_ent_id,
-            sourceHandle: `s-${s}`,
-            targetHandle: `t-${t}`,
-            type: 'smoothstep',
+            sourceHandle: `s-${l.ps.toLowerCase()}`,
+            targetHandle: `t-${l.cs.toLowerCase()}`,
+            type: 'rel' as const,
+            selected: selRel === r.rel_id,
+            data: { sp, tp, ps: l.ps, cs: l.cs, mx: l.mx, my: l.my, edit: editor && selRel === r.rel_id, onDrag: dragRel, onReset: resetRel },
             label: r.rel_nm ?? undefined,
             labelStyle: { fontSize: 10 },
             style: { stroke: '#475569', strokeWidth: 1.4, strokeDasharray: r.idnt_yn === 'Y' ? undefined : '6 4' },
@@ -263,7 +339,7 @@ function Erd({ areaId }: { areaId: string }) {
             markerEnd: many ? (r.chld_opt_yn === 'Y' ? 'ie-zero-many' : 'ie-one-many') : r.chld_opt_yn === 'Y' ? 'ie-zero-one' : 'ie-one',
           }
         }),
-    [rels, byId, lvl, phy],
+    [geo, lytOf, selRel, editor, dragRel, resetRel],
   )
 
   const curPos = () => Object.fromEntries(nodes.map((n) => [n.id, { ...n.position }]))
@@ -291,7 +367,13 @@ function Erd({ areaId }: { areaId: string }) {
       await piFetch(`${api}/projects/${prjId}/diagram`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ subj_id: subj || null, mdl_lvl_cd: lvl, pos: nodes.map((n) => ({ ent_id: n.id, x: n.position.x, y: n.position.y, fix: n.data.fix })) }),
+        body: JSON.stringify({
+          subj_id: subj || null,
+          mdl_lvl_cd: lvl,
+          pos: nodes.map((n) => ({ ent_id: n.id, x: n.position.x, y: n.position.y, fix: n.data.fix })),
+          rel_lyt: geo.shown.filter((r) => lyt[r.rel_id]).map((r) => ({ rel_id: r.rel_id, ...lyt[r.rel_id] })),
+          rel_scope: geo.shown.map((r) => r.rel_id),
+        }),
       })
     ).json()
     setBusy(false)
@@ -312,6 +394,8 @@ function Erd({ areaId }: { areaId: string }) {
     void flow.setCenter(n.position.x + w / 2, n.position.y + h / 2, { zoom: 1.1, duration: 300 })
   }
   const selEnt = ents.find((e) => e.ent_id === sel)
+  const selRelObj = rels.find((r) => r.rel_id === selRel)
+  const entNm = (id: string) => { const e = ents.find((x) => x.ent_id === id); return e ? (phy ? e.tbl_phy_nm : e.ent_log_nm) : '' }
   const tree = useMemo(() => {
     const g = new Map<string, Ent[]>()
     for (const e of ents) g.set(e.subj_nm, [...(g.get(e.subj_nm) ?? []), e])
@@ -465,10 +549,12 @@ function Erd({ areaId }: { areaId: string }) {
             nodes={nodes}
             edges={edges}
             nodeTypes={nodeTypes}
+            edgeTypes={edgeTypes}
             onNodesChange={onNodesChange}
             onNodeDragStop={() => setDirty(true)}
-            onNodeClick={(_, n) => setSel(n.id)}
-            onPaneClick={() => setSel(null)}
+            onNodeClick={(_, n) => (setSel(n.id), setSelRel(null))}
+            onEdgeClick={(_, e) => (setSelRel(e.id), setSel(null), setForm(null))}
+            onPaneClick={() => (setSel(null), setSelRel(null))}
             nodesDraggable={editor}
             nodesConnectable={false}
             minZoom={0.05}
@@ -520,8 +606,31 @@ function Erd({ areaId }: { areaId: string }) {
                 <Attrs key={selEnt.ent_id} api={api} areaId={areaId} entId={selEnt.ent_id} entNm={selEnt.ent_log_nm} editor={editor} onChanged={refresh} />
               </div>
             </>
-          ) : form ? null : (
-            <p className="text-gray-500">엔터티를 누르면 정보·속성 편집이 보입니다. 🔑 주식별자 · ↗ 상속(FK) · * 필수 / 실선 = 식별 관계, 점선 = 비식별 관계, 까마귀발 = 여러 건, ○ = 선택</p>
+          ) : form ? null : selRelObj ? (
+            <>
+              <h2 className="font-semibold text-[#1f3a68]">관계선</h2>
+              <p className="mt-1 text-xs">
+                {entNm(selRelObj.prnt_ent_id)} → {entNm(selRelObj.chld_ent_id)}
+                {selRelObj.rel_nm && ` · ${selRelObj.rel_nm}`} · {selRelObj.idnt_yn === 'Y' ? '식별' : '비식별'}
+              </p>
+              <p className="mt-1 text-xs text-gray-600">{lyt[selRelObj.rel_id] ? '위치를 옮긴 선(배치 저장 때 함께 저장)' : '자동 위치(가까운 변, 같은 변의 선은 고르게 나눔)'}</p>
+              {editor ? (
+                <>
+                  <ul className="mt-2 list-disc pl-4 text-xs text-gray-700">
+                    <li>흰 원 = 끝점 : 끌면 박스 변을 따라 움직이고, 다른 변 가까이 놓으면 그 변으로 옮겨 갑니다</li>
+                    <li>주황 네모 = 꺾임점 : 끌면 가운데 선이 옮겨집니다</li>
+                    <li>손잡이를 두 번 누르거나 아래 버튼 = 자동 위치</li>
+                  </ul>
+                  <button type="button" disabled={!lyt[selRelObj.rel_id]} onClick={() => resetRel(selRelObj.rel_id)} className="mt-2 rounded border px-2 py-0.5 text-xs hover:bg-gray-50 disabled:opacity-40">
+                    선 위치 초기화(자동)
+                  </button>
+                </>
+              ) : (
+                <p className="mt-2 text-xs text-gray-500">조회 권한 : 선 위치는 편집 권한이 있을 때 옮길 수 있습니다</p>
+              )}
+            </>
+          ) : (
+            <p className="text-gray-500">엔터티를 누르면 정보·속성 편집, 관계선을 누르면 선 위치 조정이 보입니다. 🔑 주식별자 · ↗ 상속(FK) · * 필수 / 실선 = 식별 관계, 점선 = 비식별 관계, 까마귀발 = 여러 건, ○ = 선택</p>
           )}
         </aside>
       </div>
