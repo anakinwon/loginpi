@@ -22,6 +22,7 @@ const terms = [
   T('t3', '번호', 'NO', ['w2'], 'd1', 'Y'), // 비표준 수용(제외)
   T('t4', '금지고객', 'BAN_CUST', ['w5', 'w1'], null), // 금칙어
   T('t5', '고객명칭', 'CUST_NM', ['w1', 'w3'], 'd1'), // 이름 불일치·끝 단어 ≠ 도메인
+  T('t6', '고객명칭', 'CUST_NM', ['w1', 'w3'], 'd1', 'Y'), // 비표준 수용 : 끝 단어 ≠ 도메인이어도 T05 제외
 ]
 const r = runCheck({ words, doms, terms, syns: ['손님'], sep: '_' })
 const has = (rule: string, id: string) => r.violations.some((v) => v.rule === rule && v.id === id)
@@ -32,8 +33,9 @@ test('용어 규칙 T01~T05', () => {
   assert.ok(has('T02', 't4'))
   assert.ok(has('T04', 't5'))
   assert.ok(has('T05', 't5'))
+  assert.ok(!has('T05', 't6'), '비표준 수용 용어는 끝 단어 = 도메인 점검 제외')
   assert.ok(!r.violations.some((v) => v.id === 't1'), '정상 용어 위반 없음')
-  assert.equal(r.nstd, 1)
+  assert.equal(r.nstd, 2)
 })
 
 test('도메인 규칙 D01·D02', () => {

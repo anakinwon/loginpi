@@ -94,7 +94,8 @@ export function runCheck(input: { words: ChkWord[]; doms: ChkDom[]; terms: ChkTe
     if (nm.term_log_nm !== t.term_log_nm || nm.term_phy_nm !== t.term_phy_nm) add('T04', t.term_id, t.term_log_nm, `기대 ${nm.term_log_nm} / ${nm.term_phy_nm}`)
     const d = t.dom_id ? dById.get(t.dom_id) : undefined
     const last = ws[ws.length - 1]
-    if (d && last && d.key_dom_nm !== last.dic_log_nm) add('T05', t.term_id, t.term_log_nm, `끝 단어 ${last.dic_log_nm} ≠ 도메인 ${d.dom_nm}`)
+    // 일괄등록 비표준 수용 용어(행안부 '끝 단어의 도메인분류명' 방식)는 끝 단어 = 도메인 점검에서 제외(마스터 지시 2026-10-17)
+    if (t.nstd_yn !== 'Y' && d && last && d.key_dom_nm !== last.dic_log_nm) add('T05', t.term_id, t.term_log_nm, `끝 단어 ${last.dic_log_nm} ≠ 도메인 ${d.dom_nm}`)
   }
 
   // 도메인 D01·D02
