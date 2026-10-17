@@ -501,6 +501,7 @@ FK ${d.fk}
       })
     ).json()
     if (!j.ok) return setMsg(j.message ?? '')
+    if (j.partial) setMsg(j.message)
     loadEnt()
   }
   const subjRow = (s: Subj, lvl: number) => (

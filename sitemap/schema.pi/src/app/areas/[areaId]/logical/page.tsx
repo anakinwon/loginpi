@@ -53,6 +53,7 @@ interface Gap {
   chld_nm: string
   term_id: string
   term_log_nm: string
+  src_attr_id: string
   pk: boolean
   esntl: boolean
 }
@@ -153,7 +154,7 @@ export default function LogicalPage({ params }: { params: Promise<{ areaId: stri
     const fail: string[] = []
     for (const g of gaps) {
       const j = await (
-        await piFetch(`${api}/entities/${g.chld_ent_id}/attributes`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ term_id: g.term_id, pk_yn: g.pk ? 'Y' : 'N', esntl_yn: g.esntl ? 'Y' : 'N', fk_rel_id: g.rel_id }) })
+        await piFetch(`${api}/entities/${g.chld_ent_id}/attributes`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ term_id: g.term_id, pk_yn: g.pk ? 'Y' : 'N', esntl_yn: g.esntl ? 'Y' : 'N', fk_rel_id: g.rel_id, src_attr_id: g.src_attr_id }) })
       ).json()
       if (j.ok) n++
       else fail.push(`${g.term_log_nm}(${j.message ?? ''})`)
@@ -185,7 +186,7 @@ export default function LogicalPage({ params }: { params: Promise<{ areaId: stri
     const nr = (m?.rels ?? []).filter((r) => r.prnt_ent_id === e.ent_id || r.chld_ent_id === e.ent_id).length
     if (!confirm(`엔터티 ${e.ent_log_nm} 을(를) 삭제하시겠습니까? 속성 ${e.attrs.length}건·관계 ${nr}건도 함께 삭제됩니다(논리 삭제).`)) return
     const j = await (await piFetch(`${api}/entities/${e.ent_id}?ver_no=${e.ver_no}`, { method: 'DELETE' })).json()
-    setMsg(j.ok ? `엔터티 ${e.ent_log_nm} 삭제 완료` : j.message)
+    setMsg(j.ok ? (j.partial ? j.message : `엔터티 ${e.ent_log_nm} 삭제 완료`) : j.message)
     if (j.ok) {
       setSel(null)
       setForm(null)

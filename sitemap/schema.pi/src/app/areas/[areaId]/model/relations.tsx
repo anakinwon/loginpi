@@ -102,10 +102,16 @@ export default function Relations({ api, prjId, editor, entsKey, onSaved }: { ap
     setF({ prnt_ent_id: x.prnt_ent_id, chld_ent_id: x.chld_ent_id, rel_nm: x.rel_nm ?? '', crdn_cd: x.crdn_cd, idnt_yn: x.idnt_yn, prnt_opt_yn: x.prnt_opt_yn, chld_opt_yn: x.chld_opt_yn, rel_desc: x.rel_desc ?? '' })
     setMsg('')
   }
+  // 삭제 : 이 관계로 상속한 자식 속성이 있으면 "함께 삭제 / 일반 속성으로 전환" 선택(미리보기 후)
   const del = async (x: Rel) => {
     if (!confirm(`관계 ${x.prnt.ent_log_nm} → ${x.chld.ent_log_nm} 을(를) 삭제하시겠습니까?`)) return
-    const j = await (await piFetch(`${api}/relations/${x.rel_id}?ver_no=${x.ver_no}`, { method: 'DELETE' })).json()
-    setMsg(j.ok ? '관계를 삭제했습니다' : j.message)
+    const pv = await (await piFetch(`${api}/relations/${x.rel_id}`)).json().catch(() => null)
+    if (!pv?.ok) return setMsg('상속 속성 미리보기를 불러오지 못해 삭제를 멈췄습니다 — 다시 시도하십시오')
+    const fa: { ent_log_nm: string; term_log_nm: string }[] = pv.fk_attrs
+    const fk =
+      fa.length && confirm(`관계는 삭제됩니다. 이 관계로 상속한 속성 ${fa.length}건(${fa.map((a) => `${a.ent_log_nm}.${a.term_log_nm}`).join(', ')})은 어떻게 할까요?\n\n확인 = 속성도 함께 삭제\n취소 = 속성은 일반 속성으로 남김(관계는 그래도 삭제)`) ? 'del' : 'keep'
+    const j = await (await piFetch(`${api}/relations/${x.rel_id}?ver_no=${x.ver_no}&fk=${fk}`, { method: 'DELETE' })).json()
+    setMsg(!j.ok ? j.message : j.partial ? j.message : `관계를 삭제했습니다${j.fk_attrs ? ` · 상속 속성 ${j.fk_attrs}건 ${j.fk_mode === 'del' ? '삭제' : '일반 속성으로 전환'}` : ''}`)
     if (j.ok) {
       load()
       onSaved?.()
