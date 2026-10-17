@@ -14,6 +14,7 @@ export interface LAttr {
   pk_seq: number | null
   esntl_yn: string
   fk_rel_id: string | null
+  src_attr_id?: string | null // 상속 원천(부모 식별자 속성, 역할명 상속 포함 — sql/027)
   ver_no: number
   term_ok: boolean // 승인완료·활성 표준용어
 }
@@ -38,6 +39,7 @@ export interface LRel {
 }
 export interface FkGap {
   rel_id: string
+  src_attr_id: string // 부모 식별자 속성(상속 원천)
   chld_ent_id: string
   prnt_nm: string
   chld_nm: string
@@ -71,23 +73,26 @@ export function checkLogical(ents: LEnt[], rels: LRel[]) {
   const issues: Issue[] = []
   const pkOf = (e: LEnt) => e.attrs.filter((a) => a.pk_yn === 'Y')
 
-  // ① FK 전파 누락 — 관계마다 부모 PK 용어가 자식에 있는지
+  // ① FK 전파 누락 — 관계마다 부모 PK 가 자식에 있는지 : 같은 용어 또는 이 관계로 상속한 역할 속성(src_attr_id)
   for (const r of rels) {
     const p = byId.get(r.prnt_ent_id), c = byId.get(r.chld_ent_id)
     if (!p || !c) continue
+    const ppk = pkOf(p)
+    const roles = new Set(c.attrs.filter((a) => a.fk_rel_id === r.rel_id && a.src_attr_id).map((a) => a.src_attr_id as string))
     if (p.ent_id === c.ent_id) {
-      issues.push({ kind: 'KEY', ent_id: c.ent_id, attr_ids: [], msg: `자기참조(${r.rel_nm ?? '관계'}) : 부모 식별자를 "상위~" 역할 속성(예 상위${entCore(c.words).core}번호)으로 두십시오(04 §3)`, action: 'review' })
+      // 자기참조 : 자기 PK 와 같은 용어로는 둘 수 없으므로 "상위~" 역할 속성이 있어야 함
+      if (!ppk.length || ppk.some((k) => !roles.has(k.attr_id)))
+        issues.push({ kind: 'KEY', ent_id: c.ent_id, attr_ids: [], msg: `자기참조(${r.rel_nm ?? '관계'}) : 부모 식별자를 "상위~" 역할 속성(예 상위${entCore(c.words).core}번호)으로 두십시오(04 §3)`, action: 'review' })
       continue
     }
-    const ppk = pkOf(p)
     if (!ppk.length) {
       issues.push({ kind: 'KEY', ent_id: c.ent_id, attr_ids: [], msg: `부모 ${p.ent_log_nm} 에 주식별자가 없어 FK 를 전파할 수 없습니다`, action: 'review' })
       continue
     }
     const have = new Set(c.attrs.map((a) => a.term_id))
     for (const k of ppk)
-      if (!have.has(k.term_id))
-        fkGaps.push({ rel_id: r.rel_id, chld_ent_id: c.ent_id, prnt_nm: p.ent_log_nm, chld_nm: c.ent_log_nm, term_id: k.term_id, term_log_nm: k.term_log_nm, pk: r.idnt_yn === 'Y', esntl: r.idnt_yn === 'Y' || r.prnt_opt_yn === 'N' })
+      if (!have.has(k.term_id) && !roles.has(k.attr_id))
+        fkGaps.push({ rel_id: r.rel_id, chld_ent_id: c.ent_id, prnt_nm: p.ent_log_nm, chld_nm: c.ent_log_nm, term_id: k.term_id, term_log_nm: k.term_log_nm, src_attr_id: k.attr_id, pk: r.idnt_yn === 'Y', esntl: r.idnt_yn === 'Y' || r.prnt_opt_yn === 'N' })
   }
 
   for (const e of ents) {

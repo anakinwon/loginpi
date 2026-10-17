@@ -1,4 +1,4 @@
-// 엔터티 속성(MD3, sql/025) — GET 목록(조회 권한, PK 먼저·용어·도메인 포함), POST { term_id, pk_yn?, esntl_yn?, fk_rel_id?, attr_desc? } 등록(신청 권한)
+// 엔터티 속성(MD3, sql/025) — GET 목록(조회 권한, PK 먼저·용어·도메인 포함), POST { term_id, pk_yn?, esntl_yn?, fk_rel_id?, src_attr_id?, attr_desc? } 등록(신청 권한)
 // 속성 = 승인완료 표준용어만(같은 분류체계), PK 는 필수로 강제·PK 순서 자동, 상속 관계는 이 엔터티가 자식인 관계만, 감사 이력 ATTR
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
@@ -13,6 +13,7 @@ const schema = z.object({
   pk_yn: YN.optional(),
   esntl_yn: YN.optional(),
   fk_rel_id: z.string().uuid().nullable().optional(),
+  src_attr_id: z.string().uuid().nullable().optional(), // 상속 원천 = 관계 부모의 주식별자(역할명 상속, sql/027)
   attr_desc: z.string().trim().max(4000).nullable().optional(),
 })
 
@@ -40,10 +41,16 @@ export async function POST(req: Request, { params }: Ctx) {
     const t = await db().from('std_term').select('term_id, term_log_nm').eq('term_id', b.term_id).eq('area_id', areaId).eq('del_yn', 'N').eq('std_sts_cd', 'CNFM').maybeSingle()
     if (t.error) throw t.error
     if (!t.data) return apiError('ATTR_TERM_INVALID', 400)
+    if (b.src_attr_id && !b.fk_rel_id) return apiError('ATTR_SRC_INVALID', 400)
     if (b.fk_rel_id) {
-      const r = await db().from('mdl_rel').select('rel_id').eq('rel_id', b.fk_rel_id).eq('chld_ent_id', entId).eq('del_yn', 'N').maybeSingle()
+      const r = await db().from('mdl_rel').select('rel_id, prnt_ent_id').eq('rel_id', b.fk_rel_id).eq('chld_ent_id', entId).eq('del_yn', 'N').maybeSingle()
       if (r.error) throw r.error
       if (!r.data) return apiError('INVALID_INPUT', 400)
+      if (b.src_attr_id) {
+        const s = await db().from('mdl_attr').select('attr_id').eq('attr_id', b.src_attr_id).eq('ent_id', r.data.prnt_ent_id).eq('pk_yn', 'Y').eq('del_yn', 'N').maybeSingle()
+        if (s.error) throw s.error
+        if (!s.data) return apiError('ATTR_SRC_INVALID', 400)
+      }
     }
     const pk = b.pk_yn === 'Y'
     if (pk && b.esntl_yn === 'N') return apiError('ATTR_PK_ESNTL', 400)
@@ -58,6 +65,7 @@ export async function POST(req: Request, { params }: Ctx) {
       pk_seq: pk ? seq.pk : null,
       esntl_yn: pk || b.esntl_yn === 'Y' ? 'Y' : 'N',
       fk_rel_id: b.fk_rel_id ?? null,
+      src_attr_id: b.src_attr_id ?? null,
       attr_desc: b.attr_desc ?? null,
       regr_id: uid,
       modr_id: uid,

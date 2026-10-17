@@ -70,12 +70,22 @@ export async function DELETE(req: Request, { params }: Ctx) {
     const now = new Date().toISOString()
     const [at, rl] = await Promise.all([
       db().from('mdl_attr').update({ del_yn: 'Y', del_dtm: now, modr_id: uid }).eq('ent_id', entId).eq('del_yn', 'N'),
-      db().from('mdl_rel').update({ del_yn: 'Y', del_dtm: now, modr_id: uid }).or(`prnt_ent_id.eq.${entId},chld_ent_id.eq.${entId}`).eq('del_yn', 'N'),
+      db().from('mdl_rel').update({ del_yn: 'Y', del_dtm: now, modr_id: uid }).or(`prnt_ent_id.eq.${entId},chld_ent_id.eq.${entId}`).eq('del_yn', 'N').select('rel_id'),
     ])
+    // 지운 관계로 상속했던 다른 엔터티의 속성은 일반 속성으로 전환(PRD_PiErd S0 D1 — 고아 FK 방지)
+    const relIds = (rl.data ?? []).map((x) => x.rel_id as string)
+    let partial = !!(at.error || rl.error)
+    if (relIds.length) {
+      const fk = await db().from('mdl_attr').update({ fk_rel_id: null, src_attr_id: null, modr_id: uid }).in('fk_rel_id', relIds).eq('del_yn', 'N')
+      if (fk.error) {
+        console.error('[entities/delete] 상속 속성 전환 실패', entId, fk.error.message)
+        partial = true
+      }
+    }
     if (at.error) console.error('[entities/delete] 속성 논리 삭제 실패', entId, at.error.message)
     if (rl.error) console.error('[entities/delete] 관계 논리 삭제 실패', entId, rl.error.message)
-    await audit({ area_id: areaId, tgt_tp_cd: 'ENT', tgt_id: entId, act_cd: 'DEL', bfr_val: cur, usr_id: uid })
-    return NextResponse.json({ ok: true })
+    await audit({ area_id: areaId, tgt_tp_cd: 'ENT', tgt_id: entId, act_cd: 'DEL', bfr_val: cur, aftr_val: { rel_ids: relIds }, usr_id: uid })
+    return NextResponse.json(partial ? { ok: true, partial: true, message: '엔터티는 삭제했지만 속성·관계 정리 일부가 실패했습니다 — 논리 모델 점검에서 확인하십시오' } : { ok: true })
   } catch (e) {
     return dbError(e as { code?: string; message?: string })
   }

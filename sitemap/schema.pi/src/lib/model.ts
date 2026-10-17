@@ -128,6 +128,13 @@ export const relCrud = simpleCrud({
     const bad = relError(m)
     if (bad) return bad
     if (!('prnt_ent_id' in row) && !('chld_ent_id' in row)) return null
+    // 수정 : 부모·자식이 바뀌는데 이 관계로 상속한 속성이 있으면 차단(원천 속성·상속 속성이 옛 엔터티를 가리키게 됨, PRD_PiErd S0)
+    const c = cur as { rel_id?: string; prnt_ent_id?: string; chld_ent_id?: string } | undefined
+    if (c?.rel_id && (m.prnt_ent_id !== c.prnt_ent_id || m.chld_ent_id !== c.chld_ent_id)) {
+      const fk = await db().from('mdl_attr').select('attr_id').eq('fk_rel_id', c.rel_id).eq('del_yn', 'N').limit(1)
+      if (fk.error) throw fk.error
+      if (fk.data.length) return 'REL_FK_IN_USE'
+    }
     const ids = [...new Set([m.prnt_ent_id, m.chld_ent_id])]
     const { data, error } = await db().from('mdl_ent').select('ent_id, prj_id').eq('area_id', areaId).eq('del_yn', 'N').in('ent_id', ids)
     if (error) throw error

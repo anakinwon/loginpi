@@ -64,3 +64,17 @@ test('Mermaid : 엔터티·PK/FK·관계 IE 표기', () => {
   assert.match(m, /VC10 T_\d+ PK, FK "주문번호/)
   assert.match(m, /ECM_CUST \|\|--\|\{ ECM_DTL : "포함"/)
 })
+
+test('역할명 상속(sql/027 src_attr_id) : 다른 용어라도 원천이 부모 PK 면 FK 충족, 자기참조는 역할 속성이 있어야 검토 해소', () => {
+  const custPk = cust.attrs[0]
+  const trn = E('trn', [W('송금'), W('기본', true)], [A('송금번호', { pk_yn: 'Y', pk_seq: 1 }), A('발신고객번호', { fk_rel_id: 'rs', src_attr_id: custPk.attr_id }), A('수신고객번호', { fk_rel_id: 'rr', src_attr_id: custPk.attr_id })])
+  const r = checkLogical([cust, trn], [R('rs', 'cust', 'trn'), R('rr', 'cust', 'trn')])
+  assert.equal(r.fkGaps.length, 0, '같은 부모 2회 상속(역할명)도 누락 아님')
+  const g = checkLogical([cust, E('trn2', [W('송금'), W('기본', true)], [A('송금번호', { pk_yn: 'Y', pk_seq: 1 })])], [R('rx', 'cust', 'trn2')]).fkGaps
+  assert.deepEqual(g.map((x) => [x.term_log_nm, x.src_attr_id]), [['고객번호', custPk.attr_id]], '누락 FK 는 원천 속성 ID 를 함께 돌려줌(적용 시 src_attr_id)')
+  const org = E('org', [W('조직'), W('기본', true)], [A('조직번호', { pk_yn: 'Y', pk_seq: 1 })])
+  const selfRel = R('rself', 'org', 'org', { prnt_opt_yn: 'Y' })
+  assert.ok(checkLogical([org], [selfRel]).issues.some((i) => i.kind === 'KEY' && /자기참조/.test(i.msg)), '역할 속성 없으면 검토')
+  const org2 = { ...org, attrs: [...org.attrs, A('상위조직번호', { esntl_yn: 'N', fk_rel_id: 'rself', src_attr_id: org.attrs[0].attr_id })] }
+  assert.ok(!checkLogical([org2], [selfRel]).issues.some((i) => i.kind === 'KEY' && /자기참조/.test(i.msg)), '상위~ 역할 속성 있으면 해소')
+})

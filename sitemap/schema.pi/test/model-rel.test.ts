@@ -5,10 +5,11 @@ import { relError, relNotation } from '../src/lib/model-rel.ts'
 
 const R = (o: Partial<Parameters<typeof relError>[0]> = {}) => ({ prnt_ent_id: 'A', chld_ent_id: 'B', crdn_cd: '1N', idnt_yn: 'N', prnt_opt_yn: 'N', ...o })
 
-test('관계 규칙 : 비식별은 제약 없음, 식별은 N:M·자기참조·부모 선택 불가', () => {
+test('관계 규칙 : 식별은 N:M·자기참조·부모 선택 불가, 자기참조는 부모 선택', () => {
   assert.equal(relError(R()), null)
   assert.equal(relError(R({ crdn_cd: 'NM' })), null, '비식별 N:M 허용')
-  assert.equal(relError(R({ chld_ent_id: 'A' })), null, '비식별 자기참조 허용')
+  assert.equal(relError(R({ chld_ent_id: 'A', prnt_opt_yn: 'Y' })), null, '비식별 자기참조(부모 선택) 허용')
+  assert.equal(relError(R({ chld_ent_id: 'A' })), 'REL_SELF_OPT', '자기참조 부모 필수 거부(최상위 행 입력 불가)')
   assert.equal(relError(R({ idnt_yn: 'Y' })), null, '식별 1:N 부모 필수')
   assert.equal(relError(R({ idnt_yn: 'Y', crdn_cd: 'NM' })), 'REL_NM_IDNT')
   assert.equal(relError(R({ idnt_yn: 'Y', chld_ent_id: 'A' })), 'REL_SELF_IDNT')
