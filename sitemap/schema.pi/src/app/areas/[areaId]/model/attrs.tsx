@@ -142,9 +142,9 @@ export default function Attrs({ api, areaId, entId, entNm, editor }: { api: stri
     setMsg(`속성 ${n}건 등록${fail.length ? ` · 실패 ${fail.join(', ')}` : ''}`)
     void load()
   }
-  const patch = async (a: Attr, set: { pk_yn?: string; esntl_yn?: string; term_id?: string; attr_desc?: string | null }) => {
+  const patch = async (a: Attr, set: { pk_yn?: string; esntl_yn?: string; term_id?: string; attr_desc?: string | null; propagate?: boolean }) => {
     const j = await (await piFetch(`${base}/${a.attr_id}`, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ver_no: a.ver_no, ...set }) })).json()
-    setMsg(j.ok ? '' : j.message)
+    setMsg(j.ok ? (j.propagated || j.propagate_fail?.length ? `자식 FK ${j.propagated}건 함께 변경${j.propagate_fail?.length ? ` · 실패 ${j.propagate_fail.join(', ')}` : ''}` : '') : j.message)
     void load()
     return !!j.ok
   }
@@ -159,10 +159,16 @@ export default function Attrs({ api, areaId, entId, entNm, editor }: { api: stri
   }
   const saveEd = async (a: Attr) => {
     if (!ed) return
-    const set: { term_id?: string; attr_desc?: string | null } = {}
+    const set: { term_id?: string; attr_desc?: string | null; propagate?: boolean } = {}
     if (ed.t && ed.t.term_id !== a.term_id) set.term_id = ed.t.term_id
     if (ed.desc.trim() !== (a.attr_desc ?? '')) set.attr_desc = ed.desc.trim() || null
     if (!Object.keys(set).length) return setEd(null)
+    // 주식별자 용어 교체 : 같은 용어로 상속한 자식 속성 전파 여부(미리보기)
+    if (set.term_id && a.pk_yn === 'Y') {
+      const hj = await (await piFetch(`${base}/${a.attr_id}`)).json().catch(() => null)
+      const heirs: { ent_log_nm: string }[] = hj?.ok ? hj.heirs : []
+      if (heirs.length) set.propagate = confirm(`이 주식별자를 상속한 자식 속성 ${heirs.length}건(${heirs.map((h) => h.ent_log_nm).join(', ')})도 ${ed.t?.term_log_nm}(으)로 바꿀까요?\n\n확인 = 함께 변경 / 취소 = 부모만 변경(자식은 FK 점검에서 누락으로 표시)`)
+    }
     if (await patch(a, set)) setEd(null)
   }
   // 순서 이동 — 같은 묶음(주식별자 / 일반) 안에서 이웃과 맞바꿔 전체 순서 저장

@@ -2,6 +2,7 @@
 import { piFetch } from '@pi/auth/client'
 // 엔터티 관계 화면(PRD §2.5 MD1 잔여) — 선택 프로젝트의 관계 목록·등록·수정·삭제. 부모·자식 = 프로젝트 엔터티 선택, 카디널리티·식별·선택성, IE 표기 미리보기
 // 규칙 위반(N:M·자기참조 식별, 식별+부모 선택)은 입력 중 표시·등록 버튼 비활성(서버가 같은 규칙으로 재검증)
+// FK 상속(PRD_PiErd S1 L1) : 관계 저장 뒤 부모 주식별자 → 자식 상속 속성 계획(GET …/fk-plan) 미리보기 → 1회 확인 적용(POST)
 // 엔터티 선택지 = 핵심·논리 단계 전체(sql/026, 논리 엔터티도 관계 대상), onSaved = 등록·수정·삭제 뒤 호출(논리 화면 점검 새로 고침)
 // 업종 추천 관계(반자동) : 프로젝트 업종 템플릿 관계 중 양쪽 엔터티가 등록된 것 → 칩을 누르면 폼만 채움(저장은 등록 버튼)
 import { useCallback, useEffect, useState } from 'react'
@@ -91,11 +92,26 @@ export default function Relations({ api, prjId, editor, entsKey, onSaved }: { ap
     const j = await r.json()
     setMsg(j.ok ? (edit ? '관계를 수정했습니다' : '관계를 등록했습니다') : j.message)
     if (j.ok) {
+      const relId = edit?.rel_id ?? j.item?.rel_id
       setF(F0)
       setEdit(null)
       load()
+      if (relId) await fkFlow(relId, edit ? '관계를 수정했습니다' : '관계를 등록했습니다')
       onSaved?.()
     }
+  }
+  // FK 상속 계획 미리보기 → 확인 시 적용(반자동 : 사용자 1회 확인)
+  const fkFlow = async (relId: string, head: string) => {
+    const pj = await (await piFetch(`${api}/relations/${relId}/fk-plan`)).json().catch(() => null)
+    if (!pj?.ok) return
+    if (pj.no_pk && !pj.self) return setMsg(`${head} · 부모에 주식별자가 없어 FK 를 상속할 수 없습니다(부모 속성에서 주식별자 지정)`)
+    const steps: { kind: 'add' | 'link' | 'fix'; term_log_nm: string; pk: boolean; esntl: boolean }[] = pj.steps
+    if (!steps.length) return
+    const KIND = { add: '추가', link: '연결', fix: 'PK·필수 수정' }
+    const list = steps.map((s) => `· ${KIND[s.kind]} ${s.term_log_nm}${s.pk ? ' (PK)' : ''}${s.esntl ? ' 필수' : ' 선택'}`).join('\n')
+    if (!confirm(`${head}. 부모 주식별자를 자식에 상속합니다(FK ${steps.length}건) :\n${list}\n\n확인 = 적용 / 취소 = 나중에(논리 모델 FK 점검에 남음)`)) return
+    const aj = await (await piFetch(`${api}/relations/${relId}/fk-plan`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({}) })).json()
+    setMsg(aj.ok ? `${head} · FK ${aj.applied}건 반영${aj.fail?.length ? ` · 실패 ${aj.fail.map((x: { term_log_nm: string; reason: string }) => `${x.term_log_nm}(${x.reason})`).join(', ')}` : ''}` : aj.message)
   }
   const startEdit = (x: Rel) => {
     setEdit(x)
