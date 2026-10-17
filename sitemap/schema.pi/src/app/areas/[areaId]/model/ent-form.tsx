@@ -3,7 +3,7 @@ import { piFetch } from '@pi/auth/client'
 // 엔터티 등록·수정 폼(논리 모델 화면용, sql/026 모델 단계) — 주제영역·엔터티명 → 승인 표준단어 분해 후보·물리명 미리보기(GET …/entities/analyze) → 유형·설명·단계
 // 등록 = 논리 엔터티(LGCL), 수정 = 이름(분해 후보 다시 선택)·유형·설명·주제영역(같은 프로젝트)·단계(논리 ↔ 핵심 승격). 이름은 서버가 표준단어로 다시 만든다(클라이언트 값 불신)
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ENT_TP } from '@/lib/model-name'
 import { confirmSave } from '../words/word-board'
 
@@ -32,6 +32,17 @@ const RULE_MSG: Record<string, string> = {
   ENT_LAST_ATTR: '속성 분류어(도메인 단어)로 끝남 : 테이블명은 속성 불필요',
   ENT_AGG_SUFFIX: "집계 엔터티는 '집계'로 끝나야 함",
 }
+interface Rec {
+  nm: string
+  tp: string
+  desc: string
+  tbl_phy_nm: string
+  ok: boolean
+  missing_words: string[]
+  rule_error: string | null
+  src: 'AI' | 'industry' | 'rule'
+}
+const SRC_NM = { AI: 'AI', industry: '업종', rule: '규칙' } as const
 const LVL_NM: Record<string, string> = { LGCL: '논리', CNCP: '핵심' }
 const DELAY = 400
 
@@ -44,6 +55,36 @@ export default function EntForm({ api, areaId, subjs, init, onDone, onCancel }: 
   const [cands, setCands] = useState<Cand[]>([])
   const [pick, setPick] = useState(0)
   const [msg, setMsg] = useState('')
+  // 추천(등록 모드만) : 주제영역을 고르면 업종 템플릿·규칙 후보, "AI 추천"은 AI 후보까지(GET …/entities/suggest, 저장 없음)
+  const [recs, setRecs] = useState<Rec[]>([])
+  const [recSrc, setRecSrc] = useState<string[]>([])
+  const [recBusy, setRecBusy] = useState(false)
+  const recSeq = useRef(0)
+  const loadRecs = async (ai: boolean) => {
+    if (!subj) return
+    // 늦게 온 이전 주제영역 응답은 버림(AI 6~9초 사이 주제영역 변경)
+    const seq = ++recSeq.current
+    setRecBusy(true)
+    const j = await (await piFetch(`${api}/entities/suggest?${new URLSearchParams({ subj, ...(ai ? { ai: '1' } : {}) })}`)).json().catch(() => null)
+    if (seq !== recSeq.current) return
+    setRecBusy(false)
+    if (!j?.ok) return setMsg(j?.message ?? '추천을 불러오지 못했습니다')
+    setRecs(j.items)
+    setRecSrc(j.src)
+    if (ai && !j.ai_used) setMsg('AI 추천을 쓸 수 없어 업종 템플릿·규칙 후보만 보여 줍니다')
+  }
+  useEffect(() => {
+    if (init || !subj) return
+    setRecs([])
+    void loadRecs(false)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subj, init])
+  const pickRec = (r: Rec) => {
+    setName(r.nm)
+    setTp(r.tp)
+    setDesc(r.desc)
+    setMsg('')
+  }
 
   // 주제영역 목록이 폼보다 늦게 도착하면 첫 주제영역으로
   useEffect(() => {
@@ -110,6 +151,37 @@ export default function EntForm({ api, areaId, subjs, init, onDone, onCancel }: 
           </select>
         )}
       </div>
+      {!init && subj && (
+        <div className="rounded border border-[#d5ddec] bg-white p-2 text-xs" aria-label="엔터티 추천">
+          <p className="mb-1 flex flex-wrap items-center gap-2">
+            <span className="font-semibold text-[#1f3a68]">엔터티 추천(누르면 이름·유형·설명을 채움, 빨강 = 표준단어 신청 필요)</span>
+            <span className="text-gray-500">{recSrc.join(' · ')}</span>
+            <button type="button" onClick={() => void loadRecs(true)} disabled={recBusy} className="btn-3d ml-auto px-3 py-0.5 disabled:opacity-40">
+              {recBusy ? '추천 중…' : '✨ AI 추천'}
+            </button>
+          </p>
+          {recs.length === 0 ? (
+            <p className="text-gray-500">{recBusy ? '불러오는 중…' : '추천할 엔터티가 없습니다'}</p>
+          ) : (
+            <ul className="divide-y divide-[#eef2f8]">
+              {recs.map((r) => (
+                <li key={r.nm}>
+                  <button type="button" onClick={() => pickRec(r)} className={`flex w-full flex-wrap items-center gap-2 px-1 py-1 text-left hover:bg-[#eef2f8] ${r.ok ? '' : 'text-red-700'}`} title={r.desc}>
+                    <b>{r.nm}</b>
+                    <span className="rounded bg-gray-100 px-1 text-[0.65rem] text-gray-600">
+                      {ENT_TP[r.tp as keyof typeof ENT_TP]} · {SRC_NM[r.src]}
+                    </span>
+                    {r.ok && <span className="font-mono text-[#1f3a68]">{r.tbl_phy_nm}</span>}
+                    {r.missing_words.length > 0 && <span>미등록 단어 : {r.missing_words.join(', ')}</span>}
+                    {r.rule_error && <span>{RULE_MSG[r.rule_error] ?? r.rule_error}</span>}
+                    <span className="block w-full text-gray-500">{r.desc}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
       {cands.length > 0 && (
         <div className="space-y-1">
           {cands.map((c, i) => (
