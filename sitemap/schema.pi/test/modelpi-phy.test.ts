@@ -90,7 +90,7 @@ test('칼럼 그리드 편집 검증 : 기본값 허용 목록·PK NULL·시스�
   const cols = t.cols.map((c, i) => ({ ...c, phy_col_id: `k${i}` })) // k0 CUST_NO(PK) k1 CUST_NM k2 JOIN_DTM k3~k6 시스템
   for (const ok of ["'N'", '0', '-1.5', 'CURRENT_TIMESTAMP', "'it''s'", null, 'TRUE']) assert.ok(bscOk(ok, '0014'), String(ok))
   assert.ok(bscOk('SYSDATE', '0001') && !bscOk('SYSDATE', '0014') && !bscOk('TRUE', '0013'))
-  for (const bad of ["'a'; DROP TABLE x; --", '1; --', 'now()', "'unclosed", 'SELECT 1', "'a' || 'b'"]) assert.ok(!bscOk(bad, '0014'), bad)
+  for (const bad of ["'a'; DROP TABLE x; --", '1; --', 'now()', "'unclosed", 'SELECT 1', "'a' || 'b'", "'a\nDROP'", "'x&y'", `'a${String.fromCharCode(0x2028)}b'`]) assert.ok(!bscOk(bad, '0014'), bad)
   assert.equal(checkColEdits(cols, [{ phy_col_id: 'k1', bsc_val_txt: "'홍'", null_yn: 'Y' }], '0014'), null)
   assert.equal(checkColEdits(cols, [{ phy_col_id: 'k1', bsc_val_txt: "x'; DROP" }], '0014'), 'PHY_COL_DEFAULT')
   assert.equal(checkColEdits(cols, [{ phy_col_id: 'k0', null_yn: 'Y' }], '0014'), 'PHY_COL_PK_NULL')

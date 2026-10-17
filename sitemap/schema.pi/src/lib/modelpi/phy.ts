@@ -206,7 +206,7 @@ export function phyDiff(prev: PhyTbl[], next: PhyTbl[]): PhyDiff {
 
 // 칼럼 그리드 편집 검증(P5) — 한 테이블의 편집 묶음(순서·NULL·기본값)을 적용한 결과로 판정, 오류 코드 또는 null
 // 기본값은 DDL DEFAULT 에 그대로 들어가므로 허용 목록만(숫자·작은따옴표 문자열·키워드) — 인젝션 차단
-const BSC_RE = /^(-?\d{1,18}(\.\d{1,18})?|'(?:[^']|'')*'|CURRENT_TIMESTAMP|CURRENT_DATE)$/i
+const BSC_RE = /^(-?\d{1,18}(\.\d{1,18})?|'(?:[^'&\p{Cc}\p{Zl}\p{Zp}]|'')*'|CURRENT_TIMESTAMP|CURRENT_DATE)$/iu // 문자열 안 제어문자·줄바꿈·&(SQL*Plus 치환) 금지
 const BSC_KW: Record<DbmsCd, RegExp> = { '0014': /^(TRUE|FALSE)$/i, '0001': /^(SYSDATE|SYSTIMESTAMP)$/i, '0013': /^(SYSDATE|SYSTIMESTAMP)$/i } // DBMS 전용 키워드
 export const bscOk = (v: string | null, dbms: DbmsCd) => v === null || (v.length <= 200 && (BSC_RE.test(v) || BSC_KW[dbms].test(v)))
 export interface ColEdit {
