@@ -1,7 +1,7 @@
 // 일괄등록 공용(순수 함수, 화면·서버 공용) — CSV 파싱, 헤더 대응, 행안부 공통표준 값 변환(한자 분리·도메인명 분해·도메인유형)
 // 설계 : docs/design/bulk-import.md. DB 조회가 필요한 판정은 bulk-check.ts
 
-export const BULK_KINDS = ['words', 'domains', 'terms'] as const
+export const BULK_KINDS = ['words', 'domains', 'terms', 'forbidden'] as const
 export type BulkKind = (typeof BULK_KINDS)[number]
 export type BulkStatus = 'OK' | 'NSTD' | 'SKIP' | 'EXCL' | 'ERR'
 export interface BulkResult {
@@ -54,11 +54,18 @@ export const HEADERS = {
     syns: '용어 이음동의어 목록',
     rev: '개정구분명(폐기 또는 변경)',
   },
+  // 금칙어·이음동의어(2026-10-18) — 행안부 공통표준단어의 금칙어·이음동의어 목록을 한 행 한 표기로 펼친 양식. 구분 = 금칙어|이음동의어(BAN|SYN)
+  forbidden: {
+    tp: '구분',
+    txt: '금칙어·이음동의어',
+    word: '대체 표준단어',
+  },
 } as const
 export const REQUIRED: Record<BulkKind, string[]> = {
   words: ['log_nm', 'phy_nm'],
   domains: ['grp_nm', 'key_nm', 'tp_nm'],
   terms: ['log_nm', 'phy_nm', 'dom_nm'],
+  forbidden: ['tp', 'txt', 'word'],
 }
 
 // RFC 4180 CSV 파서 — 따옴표 안 쉼표·줄바꿈·"" 이스케이프, UTF-8 BOM 제거, 빈 줄 제외

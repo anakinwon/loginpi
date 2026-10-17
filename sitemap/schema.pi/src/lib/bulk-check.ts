@@ -51,7 +51,44 @@ const lgcTypes = async () => {
 
 export async function checkBulk(kind: BulkKind, areaId: string, idx: Record<string, number>, raw: string[][], startRow: number): Promise<Checked> {
   const vals = raw.map((r) => pick(idx, r))
+  if (kind === 'forbidden') return checkForbidden(areaId, vals, startRow)
   return kind === 'words' ? checkWords(areaId, vals, startRow) : kind === 'domains' ? checkDomains(areaId, vals, startRow) : checkTerms(areaId, vals, startRow)
+}
+
+// 금칙어·이음동의어(마스터 지시 2026-10-18) — 구분·표기·대체 표준단어(승인완료 논리명). 판정은 sql/016 트리거와 같은 규칙을 먼저 본다 :
+//  표기 = 표준단어 논리명 불가(ALIAS_IS_WORD), 같은 표기는 한 단어에만(같은 단어면 건너뜀, 다른 단어면 ALIAS_DUP), 파일 안 중복 불가
+const ALIAS_TP: Record<string, string> = { 금칙어: 'BAN', BAN: 'BAN', 이음동의어: 'SYN', SYN: 'SYN' }
+async function checkForbidden(areaId: string, vals: Record<string, string>[], startRow: number): Promise<Checked> {
+  const txts = [...new Set(vals.map((v) => v.txt).filter(Boolean))]
+  const names = [...new Set([...vals.map((v) => v.word), ...txts].filter(Boolean))]
+  const words = new Map<string, { dic_id: string; std_sts_cd: string }>()
+  for (let i = 0; i < names.length; i += 100) {
+    const { data, error } = await db().from('std_dic').select('dic_id, dic_log_nm, std_sts_cd').eq('area_id', areaId).eq('del_yn', 'N').in('dic_log_nm', names.slice(i, i + 100))
+    if (error) throw error
+    for (const w of data) words.set(w.dic_log_nm as string, w as { dic_id: string; std_sts_cd: string })
+  }
+  const used = await synTexts(areaId, txts) // 표기 → 이미 둔 표준단어 논리명
+  const seen = new Set<string>()
+  const results: BulkResult[] = []
+  const rows: Row[] = []
+  vals.forEach((v, i) => {
+    const no = startRow + i
+    const nm = v.txt
+    const tp = ALIAS_TP[v.tp]
+    if (!tp) return results.push(err(no, nm, 'INVALID_INPUT', `구분 '${v.tp}'(금칙어·이음동의어만)`))
+    if (!nm || nm.length > 200) return results.push(err(no, nm, 'INVALID_INPUT', '표기 1~200자'))
+    const w = words.get(v.word)
+    if (!w || w.std_sts_cd !== 'CNFM') return results.push(err(no, nm, 'NOT_FOUND', `승인완료 표준단어 '${v.word}' 없음`))
+    if (words.has(nm)) return results.push(err(no, nm, 'ALIAS_IS_WORD'))
+    const cur = used.get(nm)
+    if (cur === v.word) return results.push({ row_no: no, status: 'SKIP', name: nm, detail: '이미 등록된 표기(건너뜀)' })
+    if (cur) return results.push(err(no, nm, 'ALIAS_DUP', cur))
+    if (seen.has(nm)) return results.push(err(no, nm, 'DUP_IN_FILE'))
+    seen.add(nm)
+    results.push({ row_no: no, status: 'OK', name: nm, detail: `${tp === 'BAN' ? '금칙어' : '이음동의어'} → ${v.word}`, keys: [nm] })
+    rows.push({ row_no: no, dic_id: w.dic_id, rel_tp_cd: tp, rel_txt: nm })
+  })
+  return { results, rows }
 }
 
 // 대체 표기(이음동의어·금칙어) → 표준단어 논리명(이 분류체계 활성 단어 기준, 100개씩)

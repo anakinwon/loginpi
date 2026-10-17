@@ -7,7 +7,7 @@ import { useSearchParams } from 'next/navigation'
 import { use, useEffect, useRef, useState } from 'react'
 import { BATCH_SIZE, HEADERS, MAX_ROWS, markCrossBatchDup, parseCsv, resultsCsv, type BulkKind, type BulkResult, type BulkStatus } from '@/lib/bulk'
 
-const KIND_NM: Record<BulkKind, string> = { words: '표준단어', domains: '표준도메인', terms: '표준용어' }
+const KIND_NM: Record<BulkKind, string> = { words: '표준단어', domains: '표준도메인', terms: '표준용어', forbidden: '금칙어' }
 const ST_NM: Record<BulkStatus, string> = { OK: '정상', NSTD: '비표준 수용', SKIP: '이미 있음(건너뜀)', EXCL: '폐기 행 제외', ERR: '오류' }
 const ST_CLS: Record<BulkStatus, string> = { OK: 'text-gray-800', NSTD: 'text-amber-700', SKIP: 'text-gray-500', EXCL: 'text-gray-500', ERR: 'text-red-700' }
 const SHOW = 500
@@ -15,7 +15,7 @@ const SHOW = 500
 export default function BulkPage({ params }: { params: Promise<{ areaId: string }> }) {
   const { areaId } = use(params)
   const q = useSearchParams().get('tab')
-  const kind: BulkKind = q === 'domains' || q === 'terms' ? q : 'words'
+  const kind: BulkKind = q === 'domains' || q === 'terms' || q === 'forbidden' ? q : 'words'
   const [file, setFile] = useState<{ name: string; header: string[]; rows: string[][] } | null>(null)
   const [results, setResults] = useState<BulkResult[] | null>(null)
   const [mode, setMode] = useState<'check' | 'apply' | null>(null)
@@ -97,7 +97,9 @@ export default function BulkPage({ params }: { params: Promise<{ areaId: string 
       </Link>
       <h1 className="mt-2 text-2xl font-bold">{KIND_NM[kind]} 일괄등록</h1>
       <p className="mt-1 text-sm text-gray-600">
-        행안부 공공데이터 공통표준 CSV 양식(UTF-8). 단어 → 도메인 → 용어 순서로 반영하십시오. 이미 있는 이름은 건너뜁니다. 반영된 행은 승인대기로 저장됩니다. 승인 화면에서 단어 → 도메인 → 용어 순서로 승인하십시오. 데이터아키텍트·표준담당자 전용
+        {kind === 'forbidden'
+          ? 'CSV(UTF-8) 한 행 = 표기 하나 : 구분(금칙어·이음동의어), 표기, 대체 표준단어(승인완료 논리명). 승인 없이 바로 반영되며, 반영된 표기는 표준단어로 등록할 수 없습니다. 같은 단어에 이미 있는 표기는 건너뜁니다. 데이터아키텍트·표준담당자 전용'
+          : '행안부 공공데이터 공통표준 CSV 양식(UTF-8). 단어 → 도메인 → 용어 순서로 반영하십시오. 이미 있는 이름은 건너뜁니다. 반영된 행은 승인대기로 저장됩니다. 승인 화면에서 단어 → 도메인 → 용어 순서로 승인하십시오. 데이터아키텍트·표준담당자 전용'}
       </p>
       <details className="mt-3 text-xs text-gray-600">
         <summary>CSV 헤더</summary>
@@ -165,8 +167,8 @@ export default function BulkPage({ params }: { params: Promise<{ areaId: string 
           <p className="mt-4 text-sm">
             <strong>{mode === 'apply' ? `반영 완료 ${applied?.toLocaleString()}건` : '검증 결과'}</strong>
             {mode === 'apply' && (
-              <Link href={`/areas/${areaId}/approvals`} className="ml-2 text-blue-700 underline">
-                승인 화면으로
+              <Link href={`/areas/${areaId}/${kind === 'forbidden' ? 'forbidden' : 'approvals'}`} className="ml-2 text-blue-700 underline">
+                {kind === 'forbidden' ? '금칙어 목록으로' : '승인 화면으로'}
               </Link>
             )}
             {' · '}

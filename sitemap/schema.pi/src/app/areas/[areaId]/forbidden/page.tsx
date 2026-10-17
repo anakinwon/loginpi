@@ -89,7 +89,14 @@ export default function ForbiddenPage({ params }: { params: Promise<{ areaId: st
       <Link href="/" className="text-sm text-blue-700 underline">
         ← 분류체계 목록
       </Link>
-      <h1 className="mt-2 text-2xl font-bold">금칙어 관리</h1>
+      <h1 className="mt-2 flex items-baseline gap-3 text-2xl font-bold">
+        금칙어 관리
+        {editor && (
+          <Link href={`/areas/${areaId}/bulk?tab=forbidden`} className="text-sm font-normal text-blue-700 underline">
+            CSV 일괄등록
+          </Link>
+        )}
+      </h1>
       <div className="mt-3 rounded-lg border border-[#c7d2e6] bg-[#f4f7fc] p-4 text-sm leading-relaxed">
         <p className="font-semibold text-[#1f3a68]">동의어 불허 원칙</p>
         <ul className="mt-1 list-disc pl-5 text-gray-700">

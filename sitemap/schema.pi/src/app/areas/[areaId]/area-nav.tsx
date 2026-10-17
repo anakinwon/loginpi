@@ -84,6 +84,7 @@ const REST: Item[] = [
       { seg: 'check', nm: '표준 점검' },
       { seg: 'reverse', nm: '리버스' },
       { seg: 'forbidden', nm: '금칙어' },
+      { seg: 'bulk', nm: '금칙어 일괄등록', perm: 'BULK', tab: 'forbidden' },
       { seg: 'approvals', nm: '승인' },
     ],
   },
