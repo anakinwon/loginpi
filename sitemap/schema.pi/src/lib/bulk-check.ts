@@ -196,10 +196,14 @@ async function checkDomains(areaId: string, vals: Record<string, string>[], star
 }
 
 // 영문약어 토큰 → 단어 조합(같은 물리명 단어가 여럿이면 논리명 결합이 용어명과 맞는 조합)
-function resolveWords(tokens: string[], logNm: string, byPhy: Map<string, DicWord[]>): DicWord[] | null {
+// byLog 를 주면 물리명이 이 분류체계와 다른 자리(행안부 약어 ≠ 우리 약어, 2026-10-17 일자 DT·일시 DTM 등)도 논리명으로 단어를 찾는다 —
+// 토큰 수 = 단어 수는 유지(행안부 구성 그대로), 물리명은 우리 단어로 재생성. 물리명 일치 후보를 먼저 시도
+function resolveWords(tokens: string[], logNm: string, byPhy: Map<string, DicWord[]>, byLog?: Map<string, DicWord[]>): DicWord[] | null {
   const walk = (i: number, at: number, acc: DicWord[]): DicWord[] | null => {
     if (i === tokens.length) return at === logNm.length ? acc : null
-    for (const w of byPhy.get(tokens[i]) ?? []) {
+    const phy = byPhy.get(tokens[i]) ?? []
+    const log = byLog ? (byLog.get(logNm[at]) ?? []).filter((w) => !phy.includes(w)) : []
+    for (const w of [...phy, ...log]) {
       if (logNm.startsWith(w.dic_log_nm, at)) {
         const r = walk(i + 1, at + w.dic_log_nm.length, [...acc, w])
         if (r) return r
@@ -223,17 +227,27 @@ async function checkTerms(areaId: string, vals: Record<string, string>[], start:
   const byPhy = new Map<string, DicWord[]>()
   for (const w of dict) byPhy.set(w.dic_phy_nm.toUpperCase(), [...(byPhy.get(w.dic_phy_nm.toUpperCase()) ?? []), w])
   const domByNm = new Map(doms.map((d) => [d.dom_nm, d]))
+  // 논리명 첫 글자 → 단어(긴 이름 먼저) : 물리명이 다른 행의 논리명 해석용
+  const byLog = new Map<string, DicWord[]>()
+  for (const w of [...dict].sort((a, b) => b.dic_log_nm.length - a.dic_log_nm.length)) byLog.set(w.dic_log_nm[0], [...(byLog.get(w.dic_log_nm[0]) ?? []), w])
+  // 대체 표기(SYN) → 표준단어 : 행안부 도메인 분류명이 우리 표준과 다를 때(예 율 → 비율, 마스터 지시 2026-10-17)
+  const synOf = new Map<string, string>()
+  {
+    const r = await db().from('std_dic_rel').select('rel_txt, std_dic!inner(dic_log_nm, area_id, del_yn, std_sts_cd)').eq('rel_tp_cd', 'SYN').eq('del_yn', 'N').eq('std_dic.area_id', areaId).eq('std_dic.del_yn', 'N').eq('std_dic.std_sts_cd', 'CNFM').limit(10000)
+    if (r.error) throw r.error
+    for (const x of r.data as unknown as { rel_txt: string; std_dic: { dic_log_nm: string } }[]) synOf.set(x.rel_txt, x.std_dic.dic_log_nm)
+  }
 
-  const pre: { no: number; nm: string; row?: Row; res?: BulkResult }[] = vals.map((v, i) => {
+  const pre: { no: number; nm: string; row?: Row; res?: BulkResult; mois_phy?: string; nstd_why?: string }[] = vals.map((v, i) => {
     const no = start + i
     const nm = v.log_nm
     if (isDiscarded(v.rev)) return { no, nm, res: { row_no: no, status: 'EXCL', name: nm, detail: '폐기 행 제외' } }
     if (!nm || !v.phy_nm) return { no, nm, res: err(no, nm, 'INVALID_INPUT', '용어명·영문약어명') }
     const tokens = v.phy_nm.toUpperCase().split('_')
     const unknown = tokens.filter((t) => !byPhy.has(t))
-    if (unknown.length) return { no, nm, res: err(no, nm, 'TERM_WORD_INVALID', `약어 ${unknown.join(', ')}`) }
-    const words = resolveWords(tokens, nm, byPhy)
-    if (!words) return { no, nm, res: err(no, nm, 'TERM_NAME_MISMATCH', v.phy_nm) }
+    // 물리명 그대로 해석 → 실패하면 논리명으로 해석(물리명은 우리 단어로 재생성, 결과 내용에 표시)
+    const words = (unknown.length ? null : resolveWords(tokens, nm, byPhy)) ?? resolveWords(tokens, nm, byPhy, byLog)
+    if (!words) return { no, nm, res: unknown.length ? err(no, nm, 'TERM_WORD_INVALID', `약어 ${unknown.join(', ')}`) : err(no, nm, 'TERM_NAME_MISMATCH', v.phy_nm) }
     // 단일 단어 용어는 비표준으로 수용(D2) : 금칙·끝 단어 속성 규칙은 그대로 적용
     let nstd = false
     const rule = termRuleError(words)
@@ -245,15 +259,21 @@ async function checkTerms(areaId: string, vals: Record<string, string>[], start:
     const md = parseMoisDomName(v.dom_nm)
     const abbr = md && lgc.get(md.tp)?.lgc_tp_abbr_nm
     const ourNm = md && abbr ? domName(md.key, abbr, md.len, md.scale) : null
-    const dom = ourNm ? domByNm.get(ourNm) : undefined
+    // 분류명이 대체 표기면 표준단어로 바꿔 다시 찾음(율N5,2 → 비율NM5,2)
+    const synNm = md && abbr && synOf.has(md.key) ? domName(synOf.get(md.key)!, abbr, md.len, md.scale) : null
+    const dom = (ourNm ? domByNm.get(ourNm) : undefined) ?? (synNm ? domByNm.get(synNm) : undefined)
     if (!dom) return { no, nm, res: err(no, nm, 'DOM_NOT_FOUND', ourNm ? `${v.dom_nm} → ${ourNm}` : v.dom_nm) }
     const last = words[words.length - 1].dic_log_nm
-    if (dom.key_dom_nm !== last) return { no, nm, res: err(no, nm, 'TERM_DOM_MISMATCH', `끝 단어 '${last}', 도메인 ${dom.dom_nm}`) }
+    // 끝 단어 ≠ 대표도메인(행안부 '끝 단어의 도메인분류명' 방식) = 비표준 수용(마스터 지시 2026-10-17, 설계 D1 예외)
+    const domNstd = dom.key_dom_nm !== last ? `행안부 도메인 수용 : 끝 단어 '${last}' ≠ 도메인 ${dom.dom_nm}` : null
+    if (domNstd) nstd = true
     if (v.desc.length > 4000 || v.alw.length > 4000 || v.disp_fmt.length > 200 || v.adm_cd.length > 200 || v.org.length > 200) return { no, nm, res: err(no, nm, 'INVALID_INPUT', '길이 초과') }
     const names = termNames(words, sep)
     return {
       no,
       nm,
+      mois_phy: v.phy_nm.toUpperCase(),
+      nstd_why: [rule === 'TERM_SINGLE_WORD' ? '단일 단어 용어(비표준 수용)' : null, domNstd].filter(Boolean).join(' · '),
       row: {
         row_no: no,
         ...names,
@@ -290,7 +310,8 @@ async function checkTerms(areaId: string, vals: Record<string, string>[], start:
     else if (haveLog.has(log) || havePhy.has(phy)) results.push({ ...skip(p.no, log), detail: `이미 등록된 이름(건너뜀) : ${phy}` })
     else {
       const nstd = p.row!.nstd_yn === 'Y'
-      results.push({ row_no: p.no, status: nstd ? 'NSTD' : 'OK', name: log, keys: [log, 'P:' + phy], detail: nstd ? '단일 단어 용어(비표준 수용)' : undefined })
+      const regen = phy !== p.mois_phy ? `물리명 재생성 : 행안부 ${p.mois_phy} → ${phy}` : undefined
+      results.push({ row_no: p.no, status: nstd ? 'NSTD' : 'OK', name: log, keys: [log, 'P:' + phy], detail: nstd ? [p.nstd_why, regen].filter(Boolean).join(' · ') : regen })
       rows.push(p.row!)
     }
     seenLog.add(log)

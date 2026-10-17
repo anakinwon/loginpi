@@ -41,6 +41,8 @@ async function insCheck(areaId: string, tp: ApvTp, id: string): Promise<ErrorCod
   const rule = termRuleError(words)
   // 일괄등록 비표준(단일 단어) 용어는 단어 수 규칙만 예외
   if (rule && !(rule === 'TERM_SINGLE_WORD' && t.data.nstd_yn === 'Y')) return rule
+  // 일괄등록 비표준 용어는 끝 단어 ≠ 대표도메인(행안부 도메인 수용)도 예외(마스터 지시 2026-10-17)
+  if (t.data.nstd_yn === 'Y') return null
   return termDomError(areaId, t.data.dom_id, words[words.length - 1].dic_log_nm)
 }
 
