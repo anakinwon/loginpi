@@ -37,6 +37,7 @@ const CORE: Item[] = [
     subs: [
       { seg: 'domains', nm: '표준도메인' },
       { seg: 'key-domains', nm: '대표도메인' },
+      { seg: 'domain-groups', nm: '도메인그룹' },
       { seg: 'bulk', nm: '일괄등록', perm: 'BULK', tab: 'domains' },
     ],
   },

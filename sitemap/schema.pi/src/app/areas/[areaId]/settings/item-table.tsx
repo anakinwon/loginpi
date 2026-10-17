@@ -11,6 +11,17 @@ export interface ItemCfg {
 }
 type Item = Record<string, string | number | null>
 
+// 도메인그룹 — 설정 화면 탭·표준도메인 › 도메인그룹 화면(2026-10-18) 공용
+export const GRP_CFG: ItemCfg = {
+  path: 'domain-groups',
+  pk: 'dom_grp_id',
+  title: '도메인그룹',
+  fields: [
+    { key: 'dom_grp_nm', label: '도메인그룹명', required: true, max: 200 },
+    { key: 'dom_grp_desc', label: '설명', max: 4000 },
+  ],
+}
+
 export default function ItemTable({ areaId, cfg }: { areaId: string; cfg: ItemCfg }) {
   const base = `/api/areas/${areaId}/${cfg.path}`
   const empty = Object.fromEntries(cfg.fields.map((f) => [f.key, '']))

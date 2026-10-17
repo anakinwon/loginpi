@@ -3,17 +3,8 @@
 import Link from 'next/link'
 import { use, useState } from 'react'
 import AreaForm from './area-form'
-import ItemTable, { type ItemCfg } from './item-table'
+import ItemTable, { GRP_CFG as GRP, type ItemCfg } from './item-table'
 
-const GRP: ItemCfg = {
-  path: 'domain-groups',
-  pk: 'dom_grp_id',
-  title: '도메인그룹',
-  fields: [
-    { key: 'dom_grp_nm', label: '도메인그룹명', required: true, max: 200 },
-    { key: 'dom_grp_desc', label: '설명', max: 4000 },
-  ],
-}
 const ABBR: ItemCfg = {
   path: 'abbreviations',
   pk: 'abbr_id',
