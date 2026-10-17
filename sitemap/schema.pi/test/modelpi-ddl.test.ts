@@ -23,7 +23,7 @@ const rels = [
   { rel_id: 'x2', prnt_ent_id: 'c', chld_ent_id: 'r', crdn_cd: '1N' },
 ]
 const build = (dbms: '0014' | '0001', ltr: 'UPPER' | 'LOWER'): DdlIn => {
-  const p = toPhysical(ents, rels, tp, { dbms, delCol: dbms === '0014' })
+  const p = toPhysical(ents, rels, tp, { dbms })
   return {
     dbms,
     ltr,
@@ -45,7 +45,9 @@ test('PostgreSQL DDL : 소문자·PK 제약·기본값·NOT NULL·코멘트 이�
   const s = genDdl(build('0014', 'LOWER'), { prjNm: 'p', at: 'now' })
   assert.match(s, /CREATE TABLE tb_cst_cust \(/)
   assert.match(s, /cust_no\s+VARCHAR\(10\) NOT NULL/)
-  assert.match(s, /reg_dtm\s+TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL/)
+  assert.match(s, /lst_mddtm\s+TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,\n\s+lst_mdfr_id\s+VARCHAR\(50\) DEFAULT 'ADMIN' NOT NULL,\n\s+lst_rgdtm\s+TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,\n\s+lst_rgtr_id\s+VARCHAR\(50\) DEFAULT 'ADMIN' NOT NULL,\n\s+CONSTRAINT tb_cst_cust_pkey/) // 시스템 칼럼 4개 = 맨 끝(PK 제약 앞)
+  assert.ok(s.includes("COMMENT ON COLUMN tb_cst_cust.lst_mdfr_id IS '최종수정자ID';"))
+  assert.ok(!/del_yn|regr_id/.test(s)) // 삭제여부·구 시스템 칼럼 없음
   assert.match(s, /CONSTRAINT tb_cst_cust_pkey PRIMARY KEY \(cust_no\)/)
   assert.ok(s.includes("COMMENT ON TABLE tb_cst_cust IS '고객''s 기본';"))
   assert.match(s, /^ALTER TABLE tb_cst_rmt ADD CONSTRAINT fk_tb_cst_rmt_02 FOREIGN KEY \(rcvr_cust_no\) REFERENCES tb_cst_cust \(cust_no\);$/m)
@@ -54,19 +56,19 @@ test('PostgreSQL DDL : 소문자·PK 제약·기본값·NOT NULL·코멘트 이�
 test('Oracle DDL : 대문자·VARCHAR2 아님(매핑 그대로)·PK_ 이름·FK 는 주석(STD-08)', () => {
   const s = genDdl(build('0001', 'UPPER'), { prjNm: 'p', at: 'now' })
   assert.match(s, /CONSTRAINT PK_TB_CST_CUST PRIMARY KEY \(CUST_NO\)/)
-  assert.match(s, /REG_DTM\s+TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL/)
+  assert.match(s, /LST_MDDTM\s+TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,\n\s+LST_MDFR_ID\s+VARCHAR2\(50\) DEFAULT 'ADMIN' NOT NULL,\n\s+LST_RGDTM\s+TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,\n\s+LST_RGTR_ID\s+VARCHAR2\(50\) DEFAULT 'ADMIN' NOT NULL,\n\s+CONSTRAINT PK_TB_CST_CUST/)
   assert.ok(!/^ALTER TABLE/m.test(s))
   assert.match(s, /^-- \(관계, 물리 FK 미생성 STD-08\) ALTER TABLE TB_CST_RMT/m)
 })
 
 test('물리 정의서 2종 : 테이블(주키)·칼럼(타입·시스템 여부)', () => {
   const t = phyDocTables(build('0014', 'LOWER').tables)
-  assert.deepEqual(t.tbl.rows[0], ['TB_CST_CUST', "고객's 기본", 7, 'CUST_NO'])
+  assert.deepEqual(t.tbl.rows[0], ['TB_CST_CUST', "고객's 기본", 1, 'CUST_NO']) // 정의서에는 시스템 칼럼 없음
   assert.deepEqual(t.col.rows[0].slice(0, 9), ['TB_CST_CUST', 1, 'CUST_NO', '', 'VARCHAR(10)', 'N', '', 1, 'N'])
 })
 
 test('검증 결함 회귀 : 예약어 이름 이슈, FK 칼럼 쌍 수 불일치 경고', () => {
-  const r = toPhysical([{ ent_id: 'u', tbl_phy_nm: 'USER', attrs: [{ attr_id: 'u1', term_phy_nm: 'ORDER', pk_yn: 'Y', pk_seq: 1, esntl_yn: 'Y', dom: dom('d', 5) }] }], [], tp, { dbms: '0014', delCol: false })
+  const r = toPhysical([{ ent_id: 'u', tbl_phy_nm: 'USER', attrs: [{ attr_id: 'u1', term_phy_nm: 'ORDER', pk_yn: 'Y', pk_seq: 1, esntl_yn: 'Y', dom: dom('d', 5) }] }], [], tp, { dbms: '0014' })
   assert.equal(r.issues.filter((i) => i.includes('예약어')).length, 2)
   const d = build('0014', 'LOWER')
   d.src.set('r2', 'zz') // 원천이 부모 PK 에 없음

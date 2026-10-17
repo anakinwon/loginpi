@@ -61,31 +61,24 @@ export interface PhyFk {
   fk_nm: string
 }
 
-// 시스템 칼럼(필수 4 + 선택 2, 맨 끝) — DBMS 별 타입·기본값
-// ponytail: 코드 상수(PRD §6 mdl_sys_col 대체) — 분류체계별 편집 요구가 생기면 테이블화
-type SysDef = [nm: string, tp: string, len: number | null, nul: 'Y' | 'N', dflt: string | null]
+// 시스템 칼럼(마스터 지시 2026-10-17) — 4개, 이름 = 표준용어(마스터 지정 정본, 임의 조합 금지) : 최종수정일시 LST_MDDTM·최종수정자ID LST_MDFR_ID·최종등록일시 LST_RGDTM·최종등록자ID LST_RGTR_ID(이 순서로 맨 끝)
+//  논리 엔터티·물리 모델·ERD 에는 없고 DDL 생성 때만 테이블 맨 끝에 자동 추가. 삭제여부·삭제일시는 시스템 칼럼이 아님(필요하면 논리 모델 속성으로)
+// ponytail: 코드 상수 — 분류체계별 이름·타입 편집 요구가 생기면 테이블화
+type SysDef = [nm: string, lgc: string, tp: string, dflt: string]
 const SYS_PG: SysDef[] = [
-  ['REGR_ID', 'TEXT', null, 'N', `'ADMIN'`],
-  ['REG_DTM', 'TIMESTAMPTZ', null, 'N', 'CURRENT_TIMESTAMP'],
-  ['MODR_ID', 'TEXT', null, 'N', `'ADMIN'`],
-  ['MOD_DTM', 'TIMESTAMPTZ', null, 'N', 'CURRENT_TIMESTAMP'],
+  ['LST_MDDTM', '최종수정일시', 'TIMESTAMPTZ', 'CURRENT_TIMESTAMP'],
+  ['LST_MDFR_ID', '최종수정자ID', 'VARCHAR(50)', "'ADMIN'"],
+  ['LST_RGDTM', '최종등록일시', 'TIMESTAMPTZ', 'CURRENT_TIMESTAMP'],
+  ['LST_RGTR_ID', '최종등록자ID', 'VARCHAR(50)', "'ADMIN'"],
 ]
 const SYS_ORA: SysDef[] = [
-  ['REGR_ID', 'VARCHAR2', 50, 'N', `'ADMIN'`],
-  ['REG_DTM', 'TIMESTAMP', null, 'N', 'SYSTIMESTAMP'],
-  ['MODR_ID', 'VARCHAR2', 50, 'N', `'ADMIN'`],
-  ['MOD_DTM', 'TIMESTAMP', null, 'N', 'SYSTIMESTAMP'],
+  ['LST_MDDTM', '최종수정일시', 'TIMESTAMP', 'SYSTIMESTAMP'],
+  ['LST_MDFR_ID', '최종수정자ID', 'VARCHAR2(50)', "'ADMIN'"],
+  ['LST_RGDTM', '최종등록일시', 'TIMESTAMP', 'SYSTIMESTAMP'],
+  ['LST_RGTR_ID', '최종등록자ID', 'VARCHAR2(50)', "'ADMIN'"],
 ]
-const DEL_PG: SysDef[] = [
-  ['DEL_YN', 'CHAR', 1, 'N', `'N'`],
-  ['DEL_DTM', 'TIMESTAMPTZ', null, 'Y', null],
-]
-const DEL_ORA: SysDef[] = [
-  ['DEL_YN', 'CHAR', 1, 'N', `'N'`],
-  ['DEL_DTM', 'TIMESTAMP', null, 'Y', null],
-]
-export const sysCols = (dbms: DbmsCd, delCol: boolean): SysDef[] => (dbms === '0014' ? [...SYS_PG, ...(delCol ? DEL_PG : [])] : [...SYS_ORA, ...(delCol ? DEL_ORA : [])])
-export const SYS_COL_NMS = new Set(['REGR_ID', 'REG_DTM', 'MODR_ID', 'MOD_DTM', 'DEL_YN', 'DEL_DTM'])
+export const sysCols = (dbms: DbmsCd): SysDef[] => (dbms === '0014' ? SYS_PG : SYS_ORA)
+export const SYS_COL_NMS = new Set(SYS_PG.map((x) => x[0]))
 // 예약어(PostgreSQL·Oracle 공통 주요어) — DDL 은 무인용 식별자라 예약어 이름이면 CREATE 실패 → 변환 이슈로 막음
 // ponytail: 주요 예약어만 — 전체 목록(PG 키워드 표·Oracle V$RESERVED_WORDS)이 필요하면 DBMS 프로파일로
 export const RSV_WORDS = new Set('ACCESS ADD ALL ALTER AND ANY AS ASC AUDIT BETWEEN BY CASE CHECK CLUSTER COLUMN COMMENT CONSTRAINT CREATE CURRENT DATE DEFAULT DELETE DESC DISTINCT DROP ELSE END EXISTS FILE FOR FOREIGN FROM GRANT GROUP HAVING IN INDEX INSERT INTO IS LEVEL LIKE LIMIT LOCK MODE NOT NULL NUMBER OF OFFSET ON OR ORDER PRIMARY REFERENCES RESOURCE ROW ROWNUM ROWS SELECT SESSION SET SIZE START TABLE THEN TIMESTAMP TO TRIGGER UID UNION UNIQUE UPDATE USER VALUES VIEW WHEN WHERE WITH'.split(' '))
@@ -110,8 +103,8 @@ export function phyGate(sum: { no_pk: number; fk_missing: number; issues: number
   return why
 }
 
-// 변환 — 칼럼 순서 = PK(pk_seq) → 나머지(입력 순서) → 시스템 칼럼. 타입 매핑이 없으면 issue(변환은 계속, 타입 '[TBD]')
-export function toPhysical(ents: PhyEntIn[], rels: PhyRelIn[], tpMap: TpMap[], opt: { dbms: DbmsCd; delCol: boolean }) {
+// 변환 — 칼럼 순서 = PK(pk_seq) → 나머지(입력 순서). 시스템 칼럼은 넣지 않음(DDL 생성 때만). 타입 매핑이 없으면 issue(변환은 계속, 타입 '[TBD]')
+export function toPhysical(ents: PhyEntIn[], rels: PhyRelIn[], tpMap: TpMap[], opt: { dbms: DbmsCd }) {
   const issues: string[] = []
   const tp = new Map<string, TpMap>()
   for (const m of tpMap) if (m.lgc_tp_cd && !tp.has(m.lgc_tp_cd)) tp.set(m.lgc_tp_cd, m)
@@ -122,7 +115,7 @@ export function toPhysical(ents: PhyEntIn[], rels: PhyRelIn[], tpMap: TpMap[], o
       const m = a.dom ? tp.get(a.dom.lgc_tp_cd) : undefined
       if (!a.dom) issues.push(`${e.tbl_phy_nm}.${a.term_phy_nm} : 용어 도메인 없음`)
       else if (!m) issues.push(`${e.tbl_phy_nm}.${a.term_phy_nm} : DBMS 타입 매핑 없음(논리타입 ${a.dom.lgc_tp_cd})`)
-      if (SYS_COL_NMS.has(a.term_phy_nm.toUpperCase())) issues.push(`${e.tbl_phy_nm}.${a.term_phy_nm} : 시스템 칼럼과 이름이 같습니다`)
+      if (SYS_COL_NMS.has(a.term_phy_nm.toUpperCase())) issues.push(`${e.tbl_phy_nm}.${a.term_phy_nm} : 시스템 칼럼과 이름이 같습니다(DDL 생성 때 자동 추가되므로 속성에서 빼십시오)`)
       if (RSV_WORDS.has(a.term_phy_nm.toUpperCase())) issues.push(`${e.tbl_phy_nm}.${a.term_phy_nm} : SQL 예약어라 칼럼명으로 쓸 수 없습니다(표준용어 물리명 조정)`)
       if (a.term_phy_nm.length > max) issues.push(`${e.tbl_phy_nm}.${a.term_phy_nm} : 칼럼명 ${a.term_phy_nm.length}자 > 한도 ${max}`)
       if (ordered.findIndex((x) => x.term_phy_nm.toUpperCase() === a.term_phy_nm.toUpperCase()) !== i) issues.push(`${e.tbl_phy_nm}.${a.term_phy_nm} : 칼럼명 중복(다른 용어가 같은 물리명)`)
@@ -143,8 +136,6 @@ export function toPhysical(ents: PhyEntIn[], rels: PhyRelIn[], tpMap: TpMap[], o
         pk_seq: a.pk_yn === 'Y' ? i + 1 : null, // PK 가 앞에 정렬돼 있으므로 순번 = 위치(입력 pk_seq 중복·누락 방지)
       }
     })
-    for (const [nm, t, len, nul, dflt] of sysCols(opt.dbms, opt.delCol))
-      cols.push({ attr_id: null, sys_col_yn: 'Y', col_nm: nm, col_seq: cols.length + 1, dom_id: null, dom_ver_no: null, phy_tp_nm: t, data_len: len, data_scale: null, null_yn: nul, bsc_val_txt: dflt, pk_yn: 'N', pk_seq: null })
     if (RSV_WORDS.has(e.tbl_phy_nm.toUpperCase())) issues.push(`${e.tbl_phy_nm} : SQL 예약어라 테이블명으로 쓸 수 없습니다`)
     if (e.tbl_phy_nm.length > max) issues.push(`${e.tbl_phy_nm} : 테이블명 ${e.tbl_phy_nm.length}자 > 한도 ${max}`)
     return { ent_id: e.ent_id, tbl_nm: e.tbl_phy_nm.toUpperCase(), tbl_desc: e.ent_desc ?? null, cols }

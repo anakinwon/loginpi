@@ -4,6 +4,7 @@
 import { parseCsv } from '../bulk.ts'
 import type { DbmsCd } from './dbms.ts'
 import type { RvsResult, RvsTbl } from './ddl-parse.ts'
+import { SYS_COL_NMS } from './phy.ts'
 
 // 카탈로그 CSV 머리글(대문자) — 칼럼 1행, FK 는 칼럼 행에 평탄화
 export const CAT_HEADERS = ['TABLE_NAME', 'TABLE_COMMENT', 'COLUMN_NAME', 'COLUMN_ID', 'DATA_TYPE', 'DATA_LENGTH', 'DATA_SCALE', 'NULLABLE', 'DATA_DEFAULT', 'PK_POS', 'COLUMN_COMMENT', 'FK_NAME', 'REF_TABLE', 'REF_COLUMN'] as const
@@ -186,4 +187,10 @@ export function relCands(r: RvsResult): RelCand[] {
       add({ prnt: p, chld: t.name, cols: [c.name], ref_cols: [c.name], src: 'NAME', fk_nm: null, idnt: pkOf.get(t.name)!.has(c.name), opt: c.nullable })
     }
   return out
+}
+
+// 시스템 칼럼(최종수정자ID 등 4개)은 속성으로 가져오지 않음 — DDL 생성 때만 붙는 칼럼(마스터 지시 2026-10-17)
+export function dropSysCols(r: RvsResult): RvsResult {
+  const sys = (n: string) => SYS_COL_NMS.has(n.toUpperCase())
+  return { ...r, tables: r.tables.map((t) => ({ ...t, cols: t.cols.filter((c) => !sys(c.name)), pk: t.pk.filter((c) => !sys(c)) })) }
 }

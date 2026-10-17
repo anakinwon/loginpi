@@ -66,7 +66,6 @@ export default function PhysicalPage({ params }: { params: Promise<{ areaId: str
   const [prjId, setPrjId] = useState('')
   const [dbms, setDbms] = useState<DbmsCd | ''>('')
   const [ltr, setLtr] = useState<'' | 'UPPER' | 'LOWER'>('')
-  const [delCol, setDelCol] = useState(true)
   const [pv, setPv] = useState<Preview | null>(null)
   const [models, setModels] = useState<Mdl[]>([])
   const [mdlId, setMdlId] = useState('')
@@ -136,7 +135,7 @@ export default function PhysicalPage({ params }: { params: Promise<{ areaId: str
     if (!dbms) return
     setBusy(true)
     setMsg('')
-    const r = await piFetch(base, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dbms_cd: dbms, ent_ids: [...picked], del_col_use_yn: delCol ? 'Y' : 'N', ...(ltr ? { idntfr_ltr_cd: ltr } : {}) }) })
+    const r = await piFetch(base, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dbms_cd: dbms, ent_ids: [...picked], ...(ltr ? { idntfr_ltr_cd: ltr } : {}) }) })
     const j = await r.json()
     setBusy(false)
     if (!j.ok) return setMsg([j.message, ...(j.why ?? []), ...(j.issues ?? [])].join(' / '))
@@ -234,9 +233,6 @@ export default function PhysicalPage({ params }: { params: Promise<{ areaId: str
           <option value="UPPER">대문자</option>
           <option value="LOWER">소문자</option>
         </select>
-        <label className="flex items-center gap-1">
-          <input type="checkbox" checked={delCol} onChange={(e) => setDelCol(e.target.checked)} /> 삭제여부·삭제일시 칼럼
-        </label>
         <span className="font-semibold">주제영역</span>
         <select value={subjId} onChange={(e) => (setSubjId(e.target.value), setEdit(new Map()))} className="rounded border border-white/60 bg-white px-2 py-1 text-gray-900" aria-label="주제영역 선택">
           {subjs.length === 0 && <option value="">주제영역이 없습니다</option>}
@@ -412,7 +408,7 @@ export default function PhysicalPage({ params }: { params: Promise<{ areaId: str
                     </tbody>
                   </table>
                 </div>
-                <p className="mt-1 text-xs text-gray-500">시스템 칼럼(등록자·등록일시·변경자·변경일시·삭제여부·삭제일시)은 항상 맨 끝에 고정됩니다. 기본값은 숫자·작은따옴표 문자열·CURRENT_TIMESTAMP 같은 키워드만 허용합니다.</p>
+                <p className="mt-1 text-xs text-gray-500">시스템 칼럼(최종수정일시·최종수정자ID·최종등록일시·최종등록자ID)은 모델에 두지 않고 DDL 내려받기 때만 테이블 맨 끝에 자동으로 붙습니다. 기본값은 숫자·작은따옴표 문자열·CURRENT_TIMESTAMP 같은 키워드만 허용합니다.</p>
               </section>
             )}
           </div>

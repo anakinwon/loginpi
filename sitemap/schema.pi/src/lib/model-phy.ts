@@ -14,7 +14,7 @@ const PAGE = 1000 // PostgREST max_rows 대응 — range 반복 조회
 const TBL_CHUNK = 100 // in() URL 길이 제한 대응
 
 // 변환 계획 — scope = 엔터티 ID 집합(마스터 지시 2026-10-17 : 엔터티별 작성완료 → 선택 전환), null = 프로젝트 전체. 관문도 범위 안에서만 판정
-export async function phyPlan(areaId: string, prjId: string, dbms: DbmsCd, delCol: boolean, scope: Set<string> | null = null) {
+export async function phyPlan(areaId: string, prjId: string, dbms: DbmsCd, scope: Set<string> | null = null) {
   const m0 = await loadLogical(areaId, prjId)
   if (!m0) return null
   const chk = checkLogical(m0.ents, m0.rels, { dbms })
@@ -26,7 +26,7 @@ export async function phyPlan(areaId: string, prjId: string, dbms: DbmsCd, delCo
     m.ents.map((e) => ({ ent_id: e.ent_id, tbl_phy_nm: e.tbl_phy_nm, ent_desc: e.ent_desc, attrs: e.attrs.map((a) => ({ ...a, dom: a.dom ?? null })) })),
     m.rels,
     tp.data as TpMap[],
-    { dbms, delCol },
+    { dbms },
   )
   return { prj: m.prj, why, ...conv, capped: m.capped }
 }
@@ -68,6 +68,7 @@ export async function loadPhy(areaId: string, mdlId: string) {
         .from('mdl_phy_col')
         .select('phy_col_id, phy_tbl_id, attr_id, sys_col_yn, col_nm, col_seq, dom_id, dom_ver_no, phy_tp_nm, data_len, data_scale, null_yn, bsc_val_txt, pk_yn, pk_seq, ver_no')
         .in('phy_tbl_id', ids)
+        .eq('sys_col_yn', 'N') // 이전 방식으로 저장된 시스템 칼럼(등록자·삭제여부 등)은 모델에서 제외 — 시스템 칼럼은 DDL 생성 때만
         .eq('del_yn', 'N')
         .order('phy_col_id')
         .range(from, from + PAGE - 1)
@@ -115,7 +116,7 @@ export async function syncPlan(areaId: string, prjId: string, p: NonNullable<Awa
   if (only) prev = prev.filter((t) => t.phy_tbl_id === only)
   const prevEnts = new Set(prev.map((t) => t.ent_id))
   // FK 는 전환된 엔터티 전체로 계산(범위 밖 부모를 가리키는 FK 를 삭제로 오판하지 않게), 테이블·칼럼 변경은 범위 안만
-  const plan = await phyPlan(areaId, prjId, p.mdl.dbms_cd as DbmsCd, p.mdl.del_col_use_yn === 'Y', new Set(p.tables.map((t) => t.ent_id)))
+  const plan = await phyPlan(areaId, prjId, p.mdl.dbms_cd as DbmsCd, new Set(p.tables.map((t) => t.ent_id)))
   if (!plan) return null
   const next = plan.tables.filter((t) => prevEnts.has(t.ent_id))
   const ops = planSync(prev as unknown as StoredTbl[], next)
@@ -152,21 +153,20 @@ function renumber(fks: { rel_id: string; fk_nm: string }[], taken: Set<string>) 
 
 // 엔터티 선택 전환(마스터 지시) — 물리 모델(프로젝트 × DBMS)이 없으면 만들고, 선택 엔터티(작성완료·미전환)의 테이블·칼럼·FK 추가
 // FK 는 이미 전환된 엔터티와의 관계 포함, 단 자식 테이블이 작성완료(잠금)면 건너뜀(완료 취소 후 동기화로 추가)
-export async function convertEntities(areaId: string, prjId: string, o: { dbms: DbmsCd; ltr: 'UPPER' | 'LOWER'; delCol: boolean; desc: string | null }, entIds: string[], uid: string) {
+export async function convertEntities(areaId: string, prjId: string, o: { dbms: DbmsCd; ltr: 'UPPER' | 'LOWER'; desc: string | null }, entIds: string[], uid: string) {
   const sys = { regr_id: uid, modr_id: uid }
-  const ex = await db().from('mdl_phy_mdl').select('phy_mdl_id, del_col_use_yn').eq('area_id', areaId).eq('prj_id', prjId).eq('dbms_cd', o.dbms).eq('del_yn', 'N').maybeSingle()
+  const ex = await db().from('mdl_phy_mdl').select('phy_mdl_id').eq('area_id', areaId).eq('prj_id', prjId).eq('dbms_cd', o.dbms).eq('del_yn', 'N').maybeSingle()
   if (ex.error) throw ex.error
   let mdlId = (ex.data as { phy_mdl_id: string } | null)?.phy_mdl_id ?? null
   const created = !mdlId
-  const delCol = ex.data ? (ex.data as { del_col_use_yn: string }).del_col_use_yn === 'Y' : o.delCol
   const p0 = mdlId ? await loadPhy(areaId, mdlId) : null
   const have = new Set(p0?.tables.map((t) => t.ent_id) ?? [])
   const add = entIds.filter((e) => !have.has(e))
   if (!add.length) return { phy_mdl_id: mdlId, created: false, tbl: 0, fk: 0 }
-  const plan = await phyPlan(areaId, prjId, o.dbms, delCol, new Set([...have, ...add]))
+  const plan = await phyPlan(areaId, prjId, o.dbms, new Set([...have, ...add]))
   if (!plan) return null
   if (!mdlId) {
-    const m = await db().from('mdl_phy_mdl').insert({ area_id: areaId, prj_id: prjId, dbms_cd: o.dbms, idntfr_ltr_cd: o.ltr, del_col_use_yn: delCol ? 'Y' : 'N', phy_mdl_desc: o.desc, ...sys }).select('phy_mdl_id').single()
+    const m = await db().from('mdl_phy_mdl').insert({ area_id: areaId, prj_id: prjId, dbms_cd: o.dbms, idntfr_ltr_cd: o.ltr, del_col_use_yn: 'N', phy_mdl_desc: o.desc, ...sys }).select('phy_mdl_id').single()
     if (m.error) throw m.error
     mdlId = (m.data as { phy_mdl_id: string }).phy_mdl_id
   }

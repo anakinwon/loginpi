@@ -1,8 +1,9 @@
 // DDL 생성(순수, PRD_PiErd S2 P6) — 저장된 물리 모델 → PostgreSQL·Oracle·Tibero CREATE TABLE·PK·COMMENT·FK 스크립트(.sql 내려받기만, DB 직접 실행 없음)
 // FK : PostgreSQL = ALTER TABLE ADD CONSTRAINT, Oracle·Tibero = 주석으로만(DBMS 프로파일 STD-08 물리 FK 미생성). 칼럼 쌍 = 자식 칼럼 속성의 원천(src_attr_id) → 부모 칼럼
+// 시스템 칼럼 4개(phy.ts sysCols)는 여기서만 테이블 맨 끝에 추가 — 모델·정의서·ERD 에는 없음
 // ponytail: 변경일시 갱신 트리거·인덱스(PK 외)·ALTER 변경분은 미생성 — 인덱스 설계·변경분 DDL 은 S5
 import { DBMS_PRFL, type DbmsCd } from './dbms.ts'
-import { bscOk, pkName, RSV_WORDS, type PhyCol } from './phy.ts'
+import { bscOk, pkName, RSV_WORDS, sysCols, type PhyCol } from './phy.ts'
 import type { DocTable } from './docs.ts'
 
 export interface DdlTbl {
@@ -59,11 +60,16 @@ export function genDdl(d: DdlIn, head: { prjNm: string; at: string }): string {
   for (const t of d.tables) {
     const cols = [...t.cols].sort((a, b) => a.col_seq - b.col_seq)
     const lines = cols.map((c) => `  ${nm(c.col_nm).padEnd(30)} ${tpOf(c)}${c.bsc_val_txt && bscOk(c.bsc_val_txt, d.dbms) ? ` DEFAULT ${c.bsc_val_txt}` : ''}${c.null_yn === 'N' ? ' NOT NULL' : ''}`)
+    // 시스템 칼럼 4개 — 모델에는 없고 DDL 에서만 맨 끝에 자동 추가(같은 이름 칼럼이 이미 있으면 건너뜀)
+    const have = new Set(cols.map((c) => c.col_nm.toUpperCase()))
+    const sys = sysCols(d.dbms).filter(([n]) => !have.has(n))
+    for (const [n, , tp, dflt] of sys) lines.push(`  ${nm(n).padEnd(30)} ${tp} DEFAULT ${dflt} NOT NULL`)
     const pk = cols.filter((c) => c.pk_yn === 'Y').sort((a, b) => (a.pk_seq ?? 0) - (b.pk_seq ?? 0))
     if (pk.length) lines.push(`  CONSTRAINT ${nm(pkName(d.dbms, t.tbl_nm))} PRIMARY KEY (${pk.map((c) => nm(c.col_nm)).join(', ')})`)
     out.push(`CREATE TABLE ${nm(t.tbl_nm)} (`, lines.join(',\n'), ');')
     if (t.tbl_desc) out.push(`COMMENT ON TABLE ${nm(t.tbl_nm)} IS ${q(t.tbl_desc)};`)
     for (const c of cols) if (c.col_desc) out.push(`COMMENT ON COLUMN ${nm(t.tbl_nm)}.${nm(c.col_nm)} IS ${q(c.col_desc)};`)
+    for (const [n, lgc] of sys) out.push(`COMMENT ON COLUMN ${nm(t.tbl_nm)}.${nm(n)} IS ${q(lgc)};`)
     out.push('')
   }
   const byEnt = new Map(d.tables.map((t) => [t.ent_id, t]))

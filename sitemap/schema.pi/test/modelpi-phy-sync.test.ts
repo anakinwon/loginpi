@@ -6,7 +6,7 @@ import { alterDdl, planSync, type StoredTbl } from '../src/lib/modelpi/phy-sync.
 
 const dom = (id: string, len: number, ver = 1) => ({ dom_id: id, ver_no: ver, lgc_tp_cd: '0003', data_len: len, data_scale: null })
 const tp: TpMap[] = [{ lgc_tp_cd: '0003', phy_tp_nm: 'VARCHAR', len_use_yn: 'Y' }]
-const opt = { dbms: '0014' as const, delCol: false }
+const opt = { dbms: '0014' as const }
 const cust: PhyEntIn = {
   ent_id: 'c',
   tbl_phy_nm: 'TB_CUST',
@@ -61,12 +61,12 @@ test('도메인 버전만 올라 모양이 같으면 스냅샷만(DDL 없음), �
   assert.match(alterDdl(ops, { dbms: '0014', ltr: 'LOWER', prjNm: 'p', at: 'now' }), /-- 변경 없음/)
 })
 
-test('새 칼럼이 시스템 칼럼 자리를 넘으면 시스템 칼럼을 뒤로', () => {
+test('새 칼럼은 일반 칼럼 끝 — 시스템 칼럼은 모델에 없어 순서 조정 없음', () => {
   const next = { ...cust, attrs: [...cust.attrs, { attr_id: 'a5', term_phy_nm: 'NEW_CD', pk_yn: 'N', pk_seq: null, esntl_yn: 'N', dom: dom('x', 3) }] }
   const ops = planSync(stored(), toPhysical([next], [], tp, opt).tables)
   const add = ops.find((o) => o.op === 'ADD_COL')
   assert.equal(add?.op === 'ADD_COL' && add.col.col_seq, 4)
-  assert.deepEqual(ops.filter((o) => o.op === 'SEQ').map((o) => o.op === 'SEQ' && o.col_seq), [5, 6, 7, 8])
+  assert.deepEqual(ops.filter((o) => o.op === 'SEQ').map((o) => o.op === 'SEQ' && o.col_seq), [])
 })
 
 test('테이블 추가·삭제', () => {

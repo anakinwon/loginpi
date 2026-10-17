@@ -3,6 +3,7 @@
 // 선언 FK 와 이름 기반 후보 구분 : 스테이징 칼럼의 fk_nm·ref_tbl_nm 이 있으면 선언 FK, 이름 후보는 화면에서 계산(relCands)해 반영 시 rel_id 만 남김
 import { db } from './db'
 import { parseDdl, type RvsResult } from './modelpi/ddl-parse'
+import { dropSysCols } from './modelpi/rvs'
 import { csvToRvs, mapCol, relCands, tblWords, type MapTerm, type MapWord } from './modelpi/rvs'
 import type { DbmsCd } from './modelpi/dbms'
 
@@ -29,7 +30,8 @@ export async function stdDict(areaId: string) {
 }
 
 export function parseSrc(src: 'DDL' | 'CSV', text: string): RvsResult | { missing: string[] } {
-  return src === 'DDL' ? parseDdl(text) : csvToRvs(text)
+  const r = src === 'DDL' ? parseDdl(text) : csvToRvs(text)
+  return 'missing' in r ? r : dropSysCols(r)
 }
 
 // 스테이징 저장 — 테이블·칼럼 행과 매핑. 실패 시 작업을 논리 삭제

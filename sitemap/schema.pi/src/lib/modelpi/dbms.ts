@@ -25,7 +25,7 @@ const ORACLE: Omit<DbmsPrfl, 'cd' | 'nm'> = {
   identCase: 'upper',
   identMax: 30, // 정의서 §8.5(객체 30자 이내), 12.2+ 128바이트 허용이지만 DA 표준 우선
   pk: '본질 식별자 또는 NUMBER + 시퀀스, PK_테이블명',
-  sysCols: 'REGR_ID·REG_DTM·MODR_ID·MOD_DTM(맨 끝)',
+  sysCols: 'LST_MDDTM·LST_MDFR_ID·LST_RGDTM·LST_RGTR_ID(DDL 생성 때만, 맨 끝)',
   nowFn: 'SYSDATE / SYSTIMESTAMP',
   modDtm: 'BEFORE UPDATE 트리거(PL/SQL)',
   fk: '물리 FK 생성 안 함(STD-08, 관계는 모델·메타에만)',
@@ -40,7 +40,7 @@ export const DBMS_PRFL: Record<DbmsCd, DbmsPrfl> = {
     identCase: 'lower',
     identMax: 63,
     pk: 'UUID gen_random_uuid() 또는 본질 식별자, <테이블>_pkey',
-    sysCols: 'regr_id·reg_dtm·modr_id·mod_dtm(맨 끝)',
+    sysCols: 'lst_mddtm·lst_mdfr_id·lst_rgdtm·lst_rgtr_id(DDL 생성 때만, 맨 끝)',
     nowFn: 'CURRENT_TIMESTAMP',
     modDtm: '트리거 함수(plpgsql)',
     fk: '물리 FK 생성(PostgREST 조인, 정의서 §8.5)',

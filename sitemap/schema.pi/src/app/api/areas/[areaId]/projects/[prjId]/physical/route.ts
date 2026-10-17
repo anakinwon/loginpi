@@ -21,7 +21,6 @@ const uuid = z.string().uuid()
 const body = z.object({
   dbms_cd: z.string().refine(isDbms),
   idntfr_ltr_cd: z.enum(['UPPER', 'LOWER']).optional(),
-  del_col_use_yn: z.enum(['Y', 'N']).default('Y'),
   phy_mdl_desc: z.string().max(2000).nullish(),
   ent_ids: z.array(uuid).min(1).max(500),
 })
@@ -69,7 +68,7 @@ export async function GET(req: Request, { params }: Ctx) {
         })
       }
       // 차이 = 전환된 엔터티 범위(전환 안 한 엔터티는 추가 테이블로 세지 않음)
-      const plan = await phyPlan(areaId, prjId, p.mdl.dbms_cd as DbmsCd, p.mdl.del_col_use_yn === 'Y', new Set(p.tables.map((t) => t.ent_id)))
+      const plan = await phyPlan(areaId, prjId, p.mdl.dbms_cd as DbmsCd, new Set(p.tables.map((t) => t.ent_id)))
       return NextResponse.json({ ok: true, ...p, diff: plan ? phyDiff(p.tables, plan.tables) : null })
     }
     const want = sp.get('dbms')
@@ -91,7 +90,7 @@ export async function GET(req: Request, { params }: Ctx) {
       for (const x of tb.data as { ent_id: string }[]) conv.add(x.ent_id)
     }
     const scope = new Set(pick.length ? pick : ents.filter((e) => e.lgc_sts_cd === 'CMPTN' && !conv.has(e.ent_id)).map((e) => e.ent_id))
-    const plan = await phyPlan(areaId, prjId, dbms, true, scope)
+    const plan = await phyPlan(areaId, prjId, dbms, scope)
     if (!plan) return apiError('NOT_FOUND', 404)
     return NextResponse.json({
       ok: true,
@@ -137,13 +136,13 @@ export async function POST(req: Request, { params }: Ctx) {
     if (b.ent_ids.some((id) => !ents.some((e) => e.ent_id === id))) return apiError('NOT_FOUND', 404)
     const notLgc = ents.filter((e) => b.ent_ids.includes(e.ent_id) && e.lgc_sts_cd !== 'CMPTN')
     if (notLgc.length) return NextResponse.json({ ok: false, code: 'SUBJ_NOT_LGC', message: errMsg('SUBJ_NOT_LGC'), why: notLgc.map((e) => `${e.ent_log_nm} : 작성중`) }, { status: 409 })
-    const plan = await phyPlan(areaId, prjId, dbms, b.del_col_use_yn === 'Y', new Set(b.ent_ids))
+    const plan = await phyPlan(areaId, prjId, dbms, new Set(b.ent_ids))
     if (!plan) return apiError('NOT_FOUND', 404)
     if (plan.why.length) return NextResponse.json({ ok: false, code: 'PHY_GATE', message: errMsg('PHY_GATE'), why: plan.why }, { status: 409 })
     if (plan.issues.length) return NextResponse.json({ ok: false, code: 'PHY_ISSUES', message: errMsg('PHY_ISSUES'), issues: plan.issues }, { status: 409 })
     if (plan.capped) return apiError('INVALID_INPUT', 400) // 조회 상한을 넘은 모델은 일부만 전환되므로 거부
     const ltr = b.idntfr_ltr_cd ?? (DBMS_PRFL[dbms].identCase === 'lower' ? 'LOWER' : 'UPPER')
-    const r = await convertEntities(areaId, prjId, { dbms, ltr, delCol: b.del_col_use_yn === 'Y', desc: b.phy_mdl_desc ?? null }, b.ent_ids, auth.user.usr_id)
+    const r = await convertEntities(areaId, prjId, { dbms, ltr, desc: b.phy_mdl_desc ?? null }, b.ent_ids, auth.user.usr_id)
     if (!r) return apiError('NOT_FOUND', 404)
     if (!r.tbl) return apiError('NO_CHANGE', 400) // 선택 엔터티가 모두 이미 전환됨
     await audit({ area_id: areaId, tgt_tp_cd: 'PHY', tgt_id: r.phy_mdl_id!, act_cd: r.created ? 'INS' : 'UPD', aftr_val: { prj_id: prjId, dbms_cd: dbms, ent_ids: b.ent_ids, tbl: r.tbl, fk: r.fk }, usr_id: auth.user.usr_id })

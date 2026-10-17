@@ -4,7 +4,8 @@ import assert from 'node:assert/strict'
 import { readFileSync, readdirSync } from 'node:fs'
 import { parseDdl, splitStatements } from '../src/lib/modelpi/ddl-parse.ts'
 import { genDdl, type DdlTbl } from '../src/lib/modelpi/ddl.ts'
-import { toPhysical, type TpMap } from '../src/lib/modelpi/phy.ts'
+import { SYS_COL_NMS, toPhysical, type TpMap } from '../src/lib/modelpi/phy.ts'
+import { dropSysCols } from '../src/lib/modelpi/rvs.ts'
 
 const dom = (id: string, tp: string, len: number | null, scale: number | null = null) => ({ dom_id: id, ver_no: 1, lgc_tp_cd: tp, data_len: len, data_scale: scale })
 const ents = [
@@ -20,13 +21,15 @@ const ents = [
 ]
 const rels = [{ rel_id: 'r1', prnt_ent_id: 'c', chld_ent_id: 'o', crdn_cd: '1N' }]
 const gen = (dbms: '0014' | '0001', tp: TpMap[]) => {
-  const p = toPhysical(ents, rels, tp, { dbms, delCol: true })
+  const p = toPhysical(ents, rels, tp, { dbms })
   return { p, sql: genDdl({ dbms, ltr: 'LOWER', tables: p.tables as DdlTbl[], fks: p.fks.map((f) => ({ ...f, prnt_ent_id: 'c', chld_ent_id: 'o' })), src: new Map([['o3', 'c1']]), fkOf: new Map([['o3', 'r1']]) }, { prjNm: "p'\n--x", at: 'now' }) }
 }
 
 test('왕복 : genDdl(PostgreSQL) → parseDdl = 테이블·칼럼·타입·길이·NULL·기본값·PK·FK·코멘트 차이 0', () => {
   const { p, sql } = gen('0014', [{ lgc_tp_cd: '0003', phy_tp_nm: 'character varying', len_use_yn: 'Y' }, { lgc_tp_cd: '0015', phy_tp_nm: 'NUMERIC', len_use_yn: 'Y' }])
-  const r = parseDdl(sql)
+  const raw = parseDdl(sql)
+  assert.ok(raw.tables.every((t) => [...SYS_COL_NMS].every((n) => t.cols.some((c) => c.name === n)))) // DDL 에는 시스템 칼럼 4개
+  const r = dropSysCols(raw) // 리버스는 시스템 칼럼을 속성으로 가져오지 않음
   assert.deepEqual(r.warnings, [])
   assert.equal(r.tables.length, p.tables.length)
   for (const t of p.tables) {
@@ -44,11 +47,14 @@ test('왕복 : genDdl(PostgreSQL) → parseDdl = 테이블·칼럼·타입·길�
 
 test('Oracle DDL : 주석 처리된 FK 는 관계로 읽지 않음(STD-08), VARCHAR2·SYSTIMESTAMP', () => {
   const { sql } = gen('0001', [{ lgc_tp_cd: '0003', phy_tp_nm: 'VARCHAR2', len_use_yn: 'Y' }, { lgc_tp_cd: '0015', phy_tp_nm: 'NUMBER', len_use_yn: 'Y' }])
-  const r = parseDdl(sql)
+  const raw = parseDdl(sql)
+  assert.ok(raw.tables.every((t) => [...SYS_COL_NMS].every((n) => t.cols.some((c) => c.name === n)))) // DDL 에는 시스템 칼럼 4개
+  const r = dropSysCols(raw) // 리버스는 시스템 칼럼을 속성으로 가져오지 않음
   assert.equal(r.fks.length, 0)
   const c = r.tables.find((t) => t.name === 'TB_CST_CUST')!.cols
   assert.deepEqual([c[0].type, c[0].len, c[1].type, c[1].len, c[1].scale], ['VARCHAR2', 10, 'NUMBER', 15, 2])
-  assert.equal(c.find((x) => x.name === 'REG_DTM')!.dflt, 'SYSTIMESTAMP')
+  assert.equal(raw.tables[0].cols.find((x) => x.name === 'LST_RGDTM')!.dflt, 'SYSTIMESTAMP')
+  assert.ok(!c.some((x) => SYS_COL_NMS.has(x.name)))
 })
 
 test('이 저장소 sql/*.sql 전체 : 예외 없이 해석, mdl_attr 칼럼·PK·FK, 함수 $$ 본문 안 ; 무시', () => {

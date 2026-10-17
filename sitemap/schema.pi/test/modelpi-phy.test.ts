@@ -21,19 +21,18 @@ const cust: PhyEntIn = {
 const ord: PhyEntIn = { ent_id: 'o', tbl_phy_nm: 'TB_ORD_ORDR', attrs: [{ attr_id: 'o1', term_phy_nm: 'ORDR_NO', pk_yn: 'Y', pk_seq: 1, esntl_yn: 'Y', dom: dom('dno', '0003', 10) }] }
 const rels = [{ rel_id: 'r1', prnt_ent_id: 'c', chld_ent_id: 'o', crdn_cd: '1N' }]
 
-test('변환 : PK 먼저·NOT NULL·타입 매핑(길이 사용 여부)·시스템 칼럼 맨 끝', () => {
-  const { tables, fks, issues } = toPhysical([cust, ord], rels, tpPg, { dbms: '0014', delCol: true })
+test('변환 : PK 먼저·NOT NULL·타입 매핑(길이 사용 여부)·시스템 칼럼 없음(DDL 생성 때만)', () => {
+  const { tables, fks, issues } = toPhysical([cust, ord], rels, tpPg, { dbms: '0014' })
   const c = tables[0].cols
-  assert.deepEqual(c.map((x) => x.col_nm), ['CUST_NO', 'CUST_NM', 'JOIN_DTM', 'REGR_ID', 'REG_DTM', 'MODR_ID', 'MOD_DTM', 'DEL_YN', 'DEL_DTM'])
+  assert.deepEqual(c.map((x) => x.col_nm), ['CUST_NO', 'CUST_NM', 'JOIN_DTM'])
   assert.deepEqual([c[0].pk_yn, c[0].null_yn, c[0].phy_tp_nm, c[0].data_len], ['Y', 'N', 'VARCHAR', 10])
   assert.equal(c[2].null_yn, 'Y')
   assert.equal(c[2].data_len, null) // TIMESTAMPTZ 는 길이 미사용
-  assert.equal(c[3].bsc_val_txt, `'ADMIN'`)
-  assert.equal(c.at(-1)!.null_yn, 'Y')
+  assert.ok(tables.every((t) => t.cols.every((x) => x.sys_col_yn === 'N')))
   assert.deepEqual(fks, [{ rel_id: 'r1', fk_nm: 'FK_TB_ORD_ORDR_01' }])
   assert.deepEqual(issues, [])
-  const ora = toPhysical([cust], [], [{ lgc_tp_cd: '0003', phy_tp_nm: 'VARCHAR2', len_use_yn: 'Y' }], { dbms: '0001', delCol: false })
-  assert.equal(ora.tables[0].cols.at(-1)!.col_nm, 'MOD_DTM')
+  const ora = toPhysical([cust], [], [{ lgc_tp_cd: '0003', phy_tp_nm: 'VARCHAR2', len_use_yn: 'Y' }], { dbms: '0001' })
+  assert.equal(ora.tables[0].cols.at(-1)!.col_nm, 'JOIN_DTM')
   assert.ok(ora.issues.some((i) => i.includes('JOIN_DTM') && i.includes('매핑 없음')))
 })
 
@@ -52,7 +51,7 @@ test('관문 : N:M·FK 누락·수정 필요·주식별자 누락이면 막음',
 })
 
 test('diff : 추가·삭제·변경, 도메인 버전만 오르고 모양 같으면 영향 아님', () => {
-  const opt = { dbms: '0014' as const, delCol: false }
+  const opt = { dbms: '0014' as const }
   const prev = toPhysical([cust], [], tpPg, opt).tables
   const verOnly = { ...cust, attrs: cust.attrs.map((a) => (a.attr_id === 'c2' ? { ...a, dom: dom('dn', '0003', 100, 2) } : a)) }
   assert.deepEqual(phyDiff(prev, toPhysical([verOnly], [], tpPg, opt).tables).dom_chg, [])
@@ -75,19 +74,20 @@ test('검증 결함 회귀 : 칼럼명 중복·한도 이슈, PK 순번 재부�
       { attr_id: 'b4', term_phy_nm: 'X'.repeat(31), pk_yn: 'N', pk_seq: null, esntl_yn: 'N', dom: dom('d', '0003', 5) },
     ],
   }
-  const r = toPhysical([bad], [], tpPg, { dbms: '0001', delCol: false })
+  const r = toPhysical([bad], [], tpPg, { dbms: '0001' })
   assert.deepEqual(r.tables[0].cols.filter((c) => c.pk_yn === 'Y').map((c) => c.pk_seq), [1, 2])
   assert.ok(r.issues.some((i) => i.includes('칼럼명 중복')))
   assert.ok(r.issues.some((i) => i.includes('31자 > 한도 30')))
-  const opt = { dbms: '0014' as const, delCol: false }
+  const opt = { dbms: '0014' as const }
   const prev = toPhysical([cust], [], tpPg, opt).tables
   assert.deepEqual(phyDiff(prev, toPhysical([{ ...cust, tbl_phy_nm: 'TB_CST_CUST_M' }], [], tpPg, opt).tables).chg_tbl, ['TB_CST_CUST → TB_CST_CUST_M'])
 })
 
 test('칼럼 그리드 편집 검증 : 기본값 허용 목록·PK NULL·시스템 고정·순서 중복·시스템 맨 끝', async () => {
   const { checkColEdits, bscOk } = await import('../src/lib/modelpi/phy.ts')
-  const t = toPhysical([cust], [], tpPg, { dbms: '0014', delCol: false }).tables[0]
-  const cols = t.cols.map((c, i) => ({ ...c, phy_col_id: `k${i}` })) // k0 CUST_NO(PK) k1 CUST_NM k2 JOIN_DTM k3~k6 시스템
+  const t = toPhysical([cust], [], tpPg, { dbms: '0014' }).tables[0]
+  // k0 CUST_NO(PK) k1 CUST_NM k2 JOIN_DTM k3 = 이전 방식으로 저장된 시스템 칼럼(검증 규칙은 기존 데이터용으로 유지)
+  const cols = [...t.cols, { ...t.cols[2], attr_id: null, sys_col_yn: 'Y' as const, col_nm: 'OLD_SYS', col_seq: 4, pk_yn: 'N' as const, pk_seq: null }].map((c, i) => ({ ...c, phy_col_id: `k${i}` }))
   for (const ok of ["'N'", '0', '-1.5', 'CURRENT_TIMESTAMP', "'it''s'", null, 'TRUE']) assert.ok(bscOk(ok, '0014'), String(ok))
   assert.ok(bscOk('SYSDATE', '0001') && !bscOk('SYSDATE', '0014') && !bscOk('TRUE', '0013'))
   for (const bad of ["'a'; DROP TABLE x; --", '1; --', 'now()', "'unclosed", 'SELECT 1', "'a' || 'b'", "'a\nDROP'", "'x&y'", `'a${String.fromCharCode(0x2028)}b'`]) assert.ok(!bscOk(bad, '0014'), bad)
