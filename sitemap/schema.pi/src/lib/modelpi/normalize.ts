@@ -6,6 +6,7 @@
 import { TBL_NM_MAX, type EntWord } from '../model-name.ts'
 import { entCore, mustCheck } from './logical.ts'
 import { DBMS_PRFL, isDbms } from './dbms.ts'
+import type { PhyDom } from './phy.ts'
 
 export interface LAttr {
   attr_id: string
@@ -21,6 +22,7 @@ export interface LAttr {
   src_attr_id?: string | null // 상속 원천(부모 식별자 속성, 역할명 상속 포함 — sql/027)
   ver_no: number
   term_ok: boolean // 승인완료·활성 표준용어
+  dom?: PhyDom | null // 물리 변환 입력(S2) — 용어 도메인 스냅샷 원천
 }
 export interface LEnt {
   ent_id: string

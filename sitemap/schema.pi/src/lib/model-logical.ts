@@ -16,7 +16,7 @@ export async function loadLogical(areaId: string, prjId: string) {
     db().from('mdl_ent').select('ent_id, subj_id, ent_log_nm, ent_tp_cd, ent_desc, dic_ids, mdl_lvl_cd, ver_no, reg_dtm, mdl_subj!inner(subj_nm, subj_abbr_nm, sort_seq)').eq('prj_id', prjId).eq('del_yn', 'N').order('reg_dtm').limit(ENT_MAX),
     db()
       .from('mdl_attr')
-      .select('attr_id, ent_id, term_id, pk_yn, pk_seq, esntl_yn, fk_rel_id, src_attr_id, attr_desc, attr_seq, ver_no, std_term!mdl_attr_std_term_id_fkey(term_log_nm, term_phy_nm, std_sts_cd, del_yn, std_dom!std_term_std_dom_id_fkey(dom_nm))')
+      .select('attr_id, ent_id, term_id, pk_yn, pk_seq, esntl_yn, fk_rel_id, src_attr_id, attr_desc, attr_seq, ver_no, std_term!mdl_attr_std_term_id_fkey(term_log_nm, term_phy_nm, std_sts_cd, del_yn, std_dom!std_term_std_dom_id_fkey(dom_id, dom_nm, lgc_tp_cd, data_len, data_scale, ver_no))')
       .eq('prj_id', prjId)
       .eq('del_yn', 'N')
       .order('attr_seq')
@@ -25,7 +25,7 @@ export async function loadLogical(areaId: string, prjId: string) {
   ])
   for (const x of [e, a, r]) if (x.error) throw x.error
   type ERow = { ent_id: string; subj_id: string; ent_log_nm: string; ent_tp_cd: string; ent_desc: string | null; dic_ids: string[]; mdl_lvl_cd: string; ver_no: number; mdl_subj: { subj_nm: string; subj_abbr_nm: string; sort_seq: number } }
-  type ARow = { attr_id: string; ent_id: string; term_id: string; pk_yn: string; pk_seq: number | null; esntl_yn: string; fk_rel_id: string | null; src_attr_id: string | null; attr_desc: string | null; ver_no: number; std_term: { term_log_nm: string; term_phy_nm: string; std_sts_cd: string; del_yn: string; std_dom: { dom_nm: string } | null } | null }
+  type ARow = { attr_id: string; ent_id: string; term_id: string; pk_yn: string; pk_seq: number | null; esntl_yn: string; fk_rel_id: string | null; src_attr_id: string | null; attr_desc: string | null; ver_no: number; std_term: { term_log_nm: string; term_phy_nm: string; std_sts_cd: string; del_yn: string; std_dom: { dom_id: string; dom_nm: string; lgc_tp_cd: string; data_len: number | null; data_scale: number | null; ver_no: number } | null } | null }
   const er = e.data as unknown as ERow[]
   const ar = a.data as unknown as ARow[]
   const ids = [...new Set(er.flatMap((x) => x.dic_ids))]
@@ -57,6 +57,7 @@ export async function loadLogical(areaId: string, prjId: string) {
           attr_desc: t.attr_desc,
           ver_no: t.ver_no,
           term_ok: t.std_term?.std_sts_cd === 'CNFM' && t.std_term?.del_yn === 'N',
+          dom: t.std_term?.std_dom ? (({ dom_nm: _n, ...d }) => d)(t.std_term.std_dom) : null,
         }))
       return { ent_id: x.ent_id, ent_log_nm: x.ent_log_nm, tbl_phy_nm: entNames(words, x.mdl_subj.subj_abbr_nm, pfx, dbms).tbl_phy_nm, ent_tp_cd: x.ent_tp_cd, subj_nm: x.mdl_subj.subj_nm, words, attrs, dic_bad, subj_id: x.subj_id, mdl_lvl_cd: x.mdl_lvl_cd, ent_desc: x.ent_desc, dic_ids: x.dic_ids, ver_no: x.ver_no }
     })
