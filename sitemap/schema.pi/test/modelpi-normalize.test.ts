@@ -78,3 +78,10 @@ test('역할명 상속(sql/027 src_attr_id) : 다른 용어라도 원천이 부�
   const org2 = { ...org, attrs: [...org.attrs, A('상위조직번호', { esntl_yn: 'N', fk_rel_id: 'rself', src_attr_id: org.attrs[0].attr_id })] }
   assert.ok(!checkLogical([org2], [selfRel]).issues.some((i) => i.kind === 'KEY' && /자기참조/.test(i.msg)), '상위~ 역할 속성 있으면 해소')
 })
+
+test('FK 누락 : 같은 용어가 다른 관계로 이미 상속되면 역할명 필요 누락(role)으로 보고', () => {
+  const custPk = cust.attrs[0]
+  const o2 = E('o2', [W('주문'), W('기본', true)], [A('주문번호', { pk_yn: 'Y', pk_seq: 1 }), A('고객번호', { fk_rel_id: 'ra', src_attr_id: custPk.attr_id })])
+  const g = checkLogical([cust, o2], [R('ra', 'cust', 'o2'), R('rb', 'cust', 'o2')]).fkGaps
+  assert.deepEqual(g.map((x) => [x.rel_id, x.role]), [['rb', true]])
+})

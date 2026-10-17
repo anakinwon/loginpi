@@ -8,6 +8,7 @@ import { piFetch } from '@pi/auth/client'
 import { useCallback, useEffect, useState } from 'react'
 import { CRDN, relError, relNotation } from '@/lib/model-rel'
 import { ActorCells, confirmSave, noEnterSubmit } from '../words/word-board'
+import { TermPick, type Term } from './attrs'
 
 interface EntOpt {
   ent_id: string
@@ -44,7 +45,14 @@ const F0 = { prnt_ent_id: '', chld_ent_id: '', rel_nm: '', crdn_cd: '1N', idnt_y
 const RULE_MSG: Record<string, string> = { REL_NM_IDNT: 'N:M 관계는 식별 불가', REL_SELF_IDNT: '자기참조는 식별 불가', REL_IDNT_OPT: '식별 관계는 부모 필수' }
 const SIZE = 20
 
+type Need = { src_attr_id: string; term_id: string; term_log_nm: string; reason: 'SELF' | 'OTHER_REL' | 'OWN_PK' }
+const NEED_NM = { SELF: '자기참조 — 자기 식별자와 같은 용어 불가, "상위~" 역할 용어로 상속', OTHER_REL: '같은 용어가 이미 다른 관계로 상속됨 — 역할 용어(예 발신·수신)로 상속', OWN_PK: '자식이 같은 용어를 자기 주식별자로 씀 — 식별 관계로 바꾸거나(권장) 필요하면 역할 용어로 상속(선택)' } as const
+
 export default function Relations({ api, prjId, editor, entsKey, onSaved }: { api: string; prjId: string; editor: boolean; entsKey: unknown; onSaved?: () => void }) {
+  const areaId = api.slice(api.lastIndexOf('/') + 1) // api = /api/areas/{areaId}
+  // 역할명 상속 패널(S1 L2) : FK 계획에서 같은 용어로 상속할 수 없는 식별자 → 역할 용어 선택 후 적용
+  const [roleNeed, setRoleNeed] = useState<{ relId: string; title: string; items: Need[] } | null>(null)
+  const [rolePick, setRolePick] = useState<Record<string, Term | null>>({})
   const [opts, setOpts] = useState<EntOpt[]>([])
   const [rels, setRels] = useState<Rel[]>([])
   const [total, setTotal] = useState(0)
@@ -106,7 +114,10 @@ export default function Relations({ api, prjId, editor, entsKey, onSaved }: { ap
     if (!pj?.ok) return
     if (pj.no_pk && !pj.self) return setMsg(`${head} · 부모에 주식별자가 없어 FK 를 상속할 수 없습니다(부모 속성에서 주식별자 지정)`)
     const steps: { kind: 'add' | 'link' | 'fix'; term_log_nm: string; pk: boolean; esntl: boolean }[] = pj.steps
-    if (!steps.length) return
+    const needs: Need[] = pj.needs ?? []
+    setRolePick({})
+    setRoleNeed(needs.length ? { relId, title: head, items: needs } : null)
+    if (!steps.length) return setMsg(needs.length ? `${head} · 같은 용어로 상속할 수 없는 식별자 ${needs.length}건 — 아래에서 역할 용어를 고르십시오` : `${head} · FK 상속 변경 없음`)
     const KIND = { add: '추가', link: '연결', fix: 'PK·필수 수정' }
     const list = steps.map((s) => `· ${KIND[s.kind]} ${s.term_log_nm}${s.pk ? ' (PK)' : ''}${s.esntl ? ' 필수' : ' 선택'}`).join('\n')
     if (!confirm(`${head}. 부모 주식별자를 자식에 상속합니다(FK ${steps.length}건) :\n${list}\n\n확인 = 적용 / 취소 = 나중에(논리 모델 FK 점검에 남음)`)) return
@@ -117,6 +128,15 @@ export default function Relations({ api, prjId, editor, entsKey, onSaved }: { ap
     setEdit(x)
     setF({ prnt_ent_id: x.prnt_ent_id, chld_ent_id: x.chld_ent_id, rel_nm: x.rel_nm ?? '', crdn_cd: x.crdn_cd, idnt_yn: x.idnt_yn, prnt_opt_yn: x.prnt_opt_yn, chld_opt_yn: x.chld_opt_yn, rel_desc: x.rel_desc ?? '' })
     setMsg('')
+  }
+  const applyRoles = async () => {
+    if (!roleNeed) return
+    const roles = roleNeed.items.filter((n) => rolePick[n.src_attr_id]).map((n) => ({ src_attr_id: n.src_attr_id, term_id: rolePick[n.src_attr_id]!.term_id }))
+    if (!roles.length) return
+    const aj = await (await piFetch(`${api}/relations/${roleNeed.relId}/fk-plan`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ roles }) })).json()
+    setMsg(aj.ok ? `역할명 상속 ${aj.roled}건 반영${aj.fail?.length ? ` · 실패 ${aj.fail.map((x: { term_log_nm: string; reason: string }) => `${x.term_log_nm}(${x.reason})`).join(', ')}` : ''}` : aj.message)
+    if (aj.ok && !aj.fail?.length) setRoleNeed(null)
+    onSaved?.()
   }
   // 삭제 : 이 관계로 상속한 자식 속성이 있으면 "함께 삭제 / 일반 속성으로 전환" 선택(미리보기 후)
   const del = async (x: Rel) => {
@@ -210,6 +230,33 @@ export default function Relations({ api, prjId, editor, entsKey, onSaved }: { ap
         </form>
       )}
       {msg && <p className="text-sm text-blue-800">{msg}</p>}
+      {roleNeed && editor && (
+        <div className="space-y-2 rounded border border-amber-300 bg-amber-50 p-3 text-xs" aria-label="역할명 상속">
+          <p className="font-semibold text-amber-900">역할명 상속 — 같은 용어로 상속할 수 없는 부모 식별자 : 역할 용어(승인 표준용어)를 고르십시오</p>
+          {roleNeed.items.map((n) => (
+            <div key={n.src_attr_id} className="flex flex-wrap items-center gap-2">
+              <b>{n.term_log_nm}</b>
+              <span className="text-gray-600">{NEED_NM[n.reason]}</span>
+              <TermPick
+                api={api}
+                areaId={areaId}
+                picked={rolePick[n.src_attr_id] ?? null}
+                onPick={(t) => setRolePick((r) => ({ ...r, [n.src_attr_id]: t }))}
+                label={`${n.term_log_nm} 역할 용어 검색`}
+                initialQ={n.term_log_nm}
+              />
+            </div>
+          ))}
+          <div className="flex gap-2">
+            <button type="button" onClick={() => void applyRoles()} disabled={!roleNeed.items.some((n) => rolePick[n.src_attr_id])} className="btn-3d px-4 py-0.5 disabled:opacity-40">
+              역할명 상속 적용
+            </button>
+            <button type="button" onClick={() => setRoleNeed(null)} className="underline">
+              {roleNeed.items.every((n) => n.reason === 'OWN_PK') ? '닫기(선택 사항 — 그대로 두어도 됨)' : '닫기(FK 점검에 "역할명 필요"로 남음)'}
+            </button>
+          </div>
+        </div>
+      )}
       <table className="w-full border-collapse text-[0.7rem] [&_td]:whitespace-nowrap">
         <thead>
           <tr className="thead-3d text-center">
@@ -245,6 +292,9 @@ export default function Relations({ api, prjId, editor, entsKey, onSaved }: { ap
                     <>
                       <button onClick={() => startEdit(x)} className="mr-2 text-blue-700 underline">
                         수정
+                      </button>
+                      <button onClick={() => void fkFlow(x.rel_id, `관계 ${x.prnt.ent_log_nm} → ${x.chld.ent_log_nm}`)} className="mr-2 text-blue-700 underline" title="부모 식별자 상속(FK) 다시 점검">
+                        FK
                       </button>
                       <button onClick={() => del(x)} className="text-red-700 underline">
                         삭제

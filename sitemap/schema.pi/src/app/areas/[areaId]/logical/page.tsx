@@ -56,6 +56,7 @@ interface Gap {
   src_attr_id: string
   pk: boolean
   esntl: boolean
+  role?: boolean // 역할명 상속 필요(관계 편집의 FK 버튼에서 역할 용어 선택)
 }
 interface Issue {
   kind: string
@@ -124,7 +125,7 @@ export default function LogicalPage({ params }: { params: Promise<{ areaId: stri
     const j = await (await piFetch(`${api}/projects/${prjId}/logical`)).json()
     if (!j.ok) return setMsg(j.message)
     setM(j)
-    setGapChk(new Set(j.fkGaps.map((g: Gap) => `${g.rel_id}|${g.term_id}`)))
+    setGapChk(new Set(j.fkGaps.filter((g: Gap) => !g.role).map((g: Gap) => `${g.rel_id}|${g.term_id}`)))
   }, [api, prjId])
   useEffect(() => {
     void load()
@@ -376,9 +377,10 @@ export default function LogicalPage({ params }: { params: Promise<{ areaId: stri
                       const k = `${g.rel_id}|${g.term_id}`
                       return (
                         <li key={k} className="flex items-center gap-2 py-1">
-                          <input type="checkbox" disabled={!editor} checked={gapChk.has(k)} onChange={() => setGapChk((x) => (x.has(k) ? new Set([...x].filter((y) => y !== k)) : new Set([...x, k])))} aria-label={`${g.chld_nm} ${g.term_log_nm}`} />
+                          <input type="checkbox" disabled={!editor || g.role} checked={!g.role && gapChk.has(k)} onChange={() => setGapChk((x) => (x.has(k) ? new Set([...x].filter((y) => y !== k)) : new Set([...x, k])))} aria-label={`${g.chld_nm} ${g.term_log_nm}`} />
                           <span>
                             {g.chld_nm} ← <b>{g.term_log_nm}</b> ({g.prnt_nm}) · {g.pk ? '🔑 식별(자식 PK 포함)' : '비식별 FK'} · {g.esntl ? '필수' : '선택'}
+                            {g.role && <span className="ml-1 rounded bg-amber-100 px-1 text-xs text-amber-800">역할명 필요 — 아래 관계 편집의 FK 버튼에서 역할 용어 선택</span>}
                           </span>
                         </li>
                       )

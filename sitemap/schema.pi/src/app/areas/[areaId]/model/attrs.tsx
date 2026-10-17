@@ -38,11 +38,11 @@ const MUST_NM: Record<keyof Must, string> = { pk: '주식별자', name: '주식�
 const ROLE_NM = { PK: '주식별자', FK: '참조(FK)', REQ: '필수' } as const
 const SRC_NM = { industry: '업종', rule: '규칙', inherit: '상속' } as const
 const SEARCH = { min: 2, delay: 300, size: 20 }
-type Term = { term_id: string; term_log_nm: string; term_phy_nm: string; std_dom: { dom_nm: string } | null }
+export type Term = { term_id: string; term_log_nm: string; term_phy_nm: string; std_dom: { dom_nm: string } | null }
 
 // 승인 표준용어 검색 선택 — 고르면 onPick, 결과 없음 = 용어 신청 링크
-function TermPick({ api, areaId, picked, onPick, label }: { api: string; areaId: string; picked: Term | null; onPick: (t: Term | null) => void; label: string }) {
-  const [q, setQ] = useState('')
+export function TermPick({ api, areaId, picked, onPick, label, initialQ }: { api: string; areaId: string; picked: Term | null; onPick: (t: Term | null) => void; label: string; initialQ?: string }) {
+  const [q, setQ] = useState(initialQ ?? '')
   const [hits, setHits] = useState<Term[] | null>(null)
   useEffect(() => {
     const k = q.trim()

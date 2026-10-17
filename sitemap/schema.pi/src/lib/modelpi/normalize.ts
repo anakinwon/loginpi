@@ -39,6 +39,7 @@ export interface LRel {
 }
 export interface FkGap {
   rel_id: string
+  role?: boolean // 같은 용어가 다른 관계로 이미 상속 → 역할명 상속 필요(일괄 적용 불가)
   src_attr_id: string // 부모 식별자 속성(상속 원천)
   chld_ent_id: string
   prnt_nm: string
@@ -89,10 +90,13 @@ export function checkLogical(ents: LEnt[], rels: LRel[]) {
       issues.push({ kind: 'KEY', ent_id: c.ent_id, attr_ids: [], msg: `부모 ${p.ent_log_nm} 에 주식별자가 없어 FK 를 전파할 수 없습니다`, action: 'review' })
       continue
     }
-    const have = new Set(c.attrs.map((a) => a.term_id))
-    for (const k of ppk)
-      if (!have.has(k.term_id) && !roles.has(k.attr_id))
-        fkGaps.push({ rel_id: r.rel_id, chld_ent_id: c.ent_id, prnt_nm: p.ent_log_nm, chld_nm: c.ent_log_nm, term_id: k.term_id, term_log_nm: k.term_log_nm, src_attr_id: k.attr_id, pk: r.idnt_yn === 'Y', esntl: r.idnt_yn === 'Y' || r.prnt_opt_yn === 'N' })
+    for (const k of ppk) {
+      if (roles.has(k.attr_id)) continue
+      const same = c.attrs.find((a) => a.term_id === k.term_id)
+      // 같은 용어가 일반 속성이거나 이 관계 상속이면 충족, 다른 관계로 이미 상속된 용어면 역할명 상속이 필요한 누락(S1 L2)
+      if (same && (!same.fk_rel_id || same.fk_rel_id === r.rel_id)) continue
+      fkGaps.push({ rel_id: r.rel_id, chld_ent_id: c.ent_id, prnt_nm: p.ent_log_nm, chld_nm: c.ent_log_nm, term_id: k.term_id, term_log_nm: k.term_log_nm, src_attr_id: k.attr_id, pk: r.idnt_yn === 'Y', esntl: r.idnt_yn === 'Y' || r.prnt_opt_yn === 'N', ...(same ? { role: true } : {}) })
+    }
   }
 
   for (const e of ents) {

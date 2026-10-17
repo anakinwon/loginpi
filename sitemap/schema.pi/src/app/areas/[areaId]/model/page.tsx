@@ -1218,7 +1218,7 @@ FK ${d.fk}
           )}
         </div>
       )}
-      {prj && tab === 'ent' && <Relations api={api} prjId={prj.prj_id} editor={editor} entsKey={ents} />}
+      {prj && tab === 'ent' && <Relations api={api} prjId={prj.prj_id} editor={editor} entsKey={ents} onSaved={loadEnt} />}
     </main>
   )
 }

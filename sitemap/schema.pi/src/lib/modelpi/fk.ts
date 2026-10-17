@@ -54,3 +54,29 @@ export function fkPlan(rel: FkRelIn, parentPk: FkPkIn[], child: FkChildIn[]): Fk
   }
   return steps
 }
+
+// 역할명 상속이 필요한 부모 식별자(PRD_PiErd S1 L2) — 같은 용어로는 상속할 수 없거나 하지 않은 경우
+// SELF = 자기참조(자기 PK 와 같은 용어 불가 → "상위~"), OTHER_REL = 같은 용어가 이미 다른 관계로 상속됨(예 발신·수신 고객번호), OWN_PK = 비식별 관계인데 자식이 같은 용어를 자기 PK 로 씀
+export interface FkNeed {
+  src_attr_id: string
+  term_id: string
+  term_log_nm: string
+  reason: 'SELF' | 'OTHER_REL' | 'OWN_PK'
+}
+export function fkNeeds(rel: FkRelIn, parentPk: FkPkIn[], child: FkChildIn[]): FkNeed[] {
+  const w = fkWant(rel)
+  const out: FkNeed[] = []
+  for (const k of parentPk) {
+    if (child.some((a) => a.fk_rel_id === rel.rel_id && a.src_attr_id === k.attr_id)) continue // 이미 이 관계로 상속(같은 용어든 역할명이든)
+    const base = { src_attr_id: k.attr_id, term_id: k.term_id, term_log_nm: k.term_log_nm }
+    if (rel.prnt_ent_id === rel.chld_ent_id) {
+      out.push({ ...base, reason: 'SELF' })
+      continue
+    }
+    const same = child.find((a) => a.term_id === k.term_id)
+    if (!same) continue
+    if (same.fk_rel_id && same.fk_rel_id !== rel.rel_id) out.push({ ...base, reason: 'OTHER_REL' })
+    else if (same.pk_yn === 'Y' && !w.pk && same.fk_rel_id === null) out.push({ ...base, reason: 'OWN_PK' })
+  }
+  return out
+}

@@ -41,3 +41,12 @@ test('역할명 상속은 원천으로 인정, 자기참조는 계획 없음', (
   assert.deepEqual(fkPlan(rel(), pk, [role]), [])
   assert.deepEqual(fkPlan(rel({ chld_ent_id: 'P', prnt_opt_yn: 'Y' }), pk, []), [])
 })
+
+test('역할명 상속 필요 : 자기참조·다른 관계로 상속된 같은 용어·비식별인데 자식 자체 PK', async () => {
+  const { fkNeeds } = await import('../src/lib/modelpi/fk.ts')
+  assert.deepEqual(fkNeeds(rel({ chld_ent_id: 'P', prnt_opt_yn: 'Y' }), pk, []).map((n) => n.reason), ['SELF'])
+  assert.deepEqual(fkNeeds(rel(), pk, [at({ term_id: 't-고객번호', fk_rel_id: 'r9', src_attr_id: 'p1' })]).map((n) => n.reason), ['OTHER_REL'])
+  assert.deepEqual(fkNeeds(rel(), pk, [at({ term_id: 't-고객번호', pk_yn: 'Y', esntl_yn: 'Y' })]).map((n) => n.reason), ['OWN_PK'])
+  assert.deepEqual(fkNeeds(rel(), pk, [at({ term_id: 't-수신고객번호', fk_rel_id: 'r1', src_attr_id: 'p1' })]), [], '이미 역할명으로 상속하면 필요 없음')
+  assert.deepEqual(fkNeeds(rel(), pk, []), [], '같은 용어가 없으면 일반 add(역할명 불필요)')
+})
