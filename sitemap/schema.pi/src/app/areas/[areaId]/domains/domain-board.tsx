@@ -38,6 +38,13 @@ interface LgcType {
   lgc_tp_abbr_nm: string
 }
 const TP_NM: Record<string, string> = { CD: '코드', NO: '번호', GNRL: '일반' }
+// 유형 = "값을 무엇으로 통제하느냐"(마스터 지시 2026-10-18) — 통제 대상·관리 항목·해당 분류 예
+const TP_DESC: Record<string, { ctl: string; mng: string; ex: string }> = {
+  CD: { ctl: '값의 집합', mng: '허용값 목록, 코드표(행정표준코드) 연계', ex: '코드, 여부, 구분' },
+  NO: { ctl: '값의 생성 규칙', mng: '채번 규칙, 자릿수 구성, 체크디지트, 형식', ex: '번호, 일련번호, 등록번호' },
+  GNRL: { ctl: '값의 형식만', mng: '타입, 길이, 저장·표현형식, 단위, 범위', ex: '명, 내용, 금액, 수량, 율, 연월일' },
+}
+const tpTitle = (c: string) => (TP_DESC[c] ? `${TP_NM[c]} : ${TP_DESC[c].ctl} 통제 — ${TP_DESC[c].mng} (예 : ${TP_DESC[c].ex})` : c)
 const EMPTY = { key_dom_nm: '', dom_tp_cd: 'GNRL', dom_grp_id: '', lgc_tp_cd: '', data_len: '', data_scale: '', min_val_txt: '', max_val_txt: '', fmt_txt: '', disp_fmt_txt: '', unit_nm: '', alw_val_txt: '', dom_desc: '', std_se_cd: 'STD' }
 type Field = keyof typeof EMPTY
 // 목록 열 너비(#·도메인명·상태·대표도메인명·유형·그룹·논리타입·길이·설명·작업) 설명은 남는 폭
@@ -171,6 +178,30 @@ export default function DomainBoard({ areaId }: { areaId: string }) {
           {edit ? `도메인 수정 : ${edit.dom_nm}` : '도메인 등록'}
         </h2>
         <fieldset disabled={!requester} className="p-5 disabled:opacity-60">
+          <details className="mb-3 rounded border border-[#c7d2e6] bg-white px-3 py-2 text-xs">
+            <summary className="cursor-pointer font-semibold text-[#1f3a68]">세 유형의 의미 — 유형은 &quot;값을 무엇으로 통제하느냐&quot;에 따른 구분</summary>
+            <table className="mt-2 w-full border-collapse">
+              <thead>
+                <tr className="bg-gray-50 text-left">
+                  {['유형', '통제 대상', '무엇을 관리하나', '해당 분류 예'].map((h) => (
+                    <th key={h} className="border px-2 py-1">
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {Object.entries(TP_DESC).map(([c, d]) => (
+                  <tr key={c}>
+                    <td className="border px-2 py-1">{TP_NM[c]}</td>
+                    <td className="border px-2 py-1 font-semibold">{d.ctl}</td>
+                    <td className="border px-2 py-1">{d.mng}</td>
+                    <td className="border px-2 py-1">{d.ex}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </details>
           <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4 [&_input]:border-[#b8c6e0] [&_input]:bg-white [&_input]:focus:outline-[#3b5f9e] [&_select]:border-[#b8c6e0] [&_select]:bg-white [&_select]:focus:outline-[#3b5f9e]">
             <select value={form.key_dom_nm} onChange={set('key_dom_nm')} className="w-full rounded border px-3 py-2" required aria-label="대표도메인명">
               <option value="">대표도메인명 선택(필수, 지정된 대표도메인)</option>
@@ -181,13 +212,21 @@ export default function DomainBoard({ areaId }: { areaId: string }) {
                 </option>
               ))}
             </select>
-            <select value={form.dom_tp_cd} onChange={set('dom_tp_cd')} className="w-full rounded border px-3 py-2" aria-label="도메인 유형">
-              {Object.entries(TP_NM).map(([v, n]) => (
-                <option key={v} value={v}>
-                  유형 : {n}
-                </option>
-              ))}
-            </select>
+            <div>
+              <select value={form.dom_tp_cd} onChange={set('dom_tp_cd')} className="w-full rounded border px-3 py-2" aria-label="도메인 유형" title={tpTitle(form.dom_tp_cd)}>
+                {Object.entries(TP_NM).map(([v, n]) => (
+                  <option key={v} value={v}>
+                    유형 : {n} — {TP_DESC[v].ctl}
+                  </option>
+                ))}
+              </select>
+              {TP_DESC[form.dom_tp_cd] && (
+                <p className="mt-1 text-xs leading-snug text-gray-600">
+                  <b>{TP_DESC[form.dom_tp_cd].ctl}</b> 통제 : {TP_DESC[form.dom_tp_cd].mng}
+                  <br />예 : {TP_DESC[form.dom_tp_cd].ex}
+                </p>
+              )}
+            </div>
             <select value={form.dom_grp_id} onChange={set('dom_grp_id')} className="w-full rounded border px-3 py-2" required aria-label="도메인그룹">
               <option value="">도메인그룹 선택(필수)</option>
               {groups.map((g) => (
@@ -304,7 +343,7 @@ export default function DomainBoard({ areaId }: { areaId: string }) {
                     <td className="border px-2 py-1 text-center text-gray-500 tabular-nums">{((cond.page - 1) * cond.size + i + 1).toLocaleString()}</td>
                     <td className="border px-2 py-1 font-medium">{d.dom_nm}</td>
                     <td className="border px-2 py-1">{d.key_dom_nm}</td>
-                    <td className="border px-2 py-1 text-center">{TP_NM[d.dom_tp_cd] ?? d.dom_tp_cd}</td>
+                    <td className="border px-2 py-1 text-center" title={tpTitle(d.dom_tp_cd)}>{TP_NM[d.dom_tp_cd] ?? d.dom_tp_cd}</td>
                     <td className="border px-2 py-1">{d.std_dom_grp?.dom_grp_nm}</td>
                     <td className="border px-2 py-1">{d.std_lgc_tp?.lgc_tp_nm}</td>
                     <td className="border px-2 py-1">{d.data_len ? `${d.data_len}${d.data_scale ? `,${d.data_scale}` : ''}` : ''}{d.unit_nm ? ` (${d.unit_nm})` : ''}</td>
