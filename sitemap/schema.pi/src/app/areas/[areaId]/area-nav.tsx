@@ -1,10 +1,12 @@
 'use client'
 // 분류체계 하단 고정 메뉴 — 모든 분류체계 화면 공통(layout). 현재 화면 강조, 설정·일괄등록은 권한자만(GET /api/areas/[areaId] 의 role)
 //  메뉴 체계(마스터 정의 2026-10-17) :
-//   · 표준사전 묶음 = 표준단어·표준도메인·표준용어·일괄등록 — 가장 기본 기능이라 한 묶음으로 함께 이동
+//   · 표준사전 묶음 = 표준단어·표준도메인·표준용어 — 가장 기본 기능이라 한 묶음, 일괄등록 = 표준단어의 서브 기능(마스터 지시 2026-10-17)
+//   · 묶음 3개(표준사전·모델·설정)는 모두 테두리 박스 — 설정은 1개여도 박스
 //   · 모델 묶음 = 개념 모델·논리 모델·물리 모델(마스터 지시 2026-10-17 — 표준사전 묶음처럼 한 묶음)
 //   · 대표도메인 = 표준도메인의 서브 기능 / 개념 모델 = 프로젝트·주제영역·핵심엔터티(같은 화면 ?tab=)·엔터티 분류어(엔터티 등록의 서브 기능)
-//   · 설정 묶음 = 멤버·설정·이력·표준 점검(서브 메뉴). 설정 화면은 SETTINGS 권한자만 → 상위 버튼은 볼 수 있는 첫 서브 화면으로 이동
+//   · ERD = 물리 모델의 서브 기능(마스터 지시 2026-10-17)
+//   · 설정 묶음 = 멤버·설정·이력·표준 점검·리버스·금칙어·승인(서브 메뉴, 리버스·금칙어·승인은 마스터 지시 2026-10-17 로 이동). 설정 화면은 SETTINGS 권한자만 → 상위 버튼은 볼 수 있는 첫 서브 화면으로 이동
 //   · 서브 기능은 상위 메뉴 화면에서만 바 위 서브 탭으로 노출, 서브 화면에 있어도 상위 메뉴를 강조
 //  좁은 화면은 가로 스크롤(줄바꿈 없이 한 줄 유지)
 import { piFetch } from '@pi/auth/client'
@@ -21,7 +23,14 @@ interface Item {
 }
 
 const CORE: Item[] = [
-  { seg: 'words', nm: '표준단어' },
+  {
+    seg: 'words',
+    nm: '표준단어',
+    subs: [
+      { seg: 'words', nm: '표준단어' },
+      { seg: 'bulk', nm: '일괄등록', perm: 'BULK' },
+    ],
+  },
   {
     seg: 'domains',
     nm: '표준도메인',
@@ -31,7 +40,6 @@ const CORE: Item[] = [
     ],
   },
   { seg: 'terms', nm: '표준용어' },
-  { seg: 'bulk', nm: '일괄등록', perm: 'BULK' },
 ]
 
 // 모델 묶음 — 개념 → 논리 → 물리 순서
@@ -47,14 +55,17 @@ const MODEL: Item[] = [
     ],
   },
   { seg: 'logical', nm: '논리 모델' },
-  { seg: 'physical', nm: '물리 모델' },
+  {
+    seg: 'physical',
+    nm: '물리 모델',
+    subs: [
+      { seg: 'physical', nm: '물리 모델' },
+      { seg: 'erd', nm: 'ERD' },
+    ],
+  },
 ]
 
 const REST: Item[] = [
-  { seg: 'approvals', nm: '승인' },
-  { seg: 'erd', nm: 'ERD' },
-  { seg: 'reverse', nm: '리버스' },
-  { seg: 'forbidden', nm: '금칙어' },
   {
     seg: 'settings',
     nm: '설정',
@@ -63,10 +74,14 @@ const REST: Item[] = [
       { seg: 'settings', nm: '설정', perm: 'SETTINGS' },
       { seg: 'history', nm: '이력' },
       { seg: 'check', nm: '표준 점검' },
+      { seg: 'reverse', nm: '리버스' },
+      { seg: 'forbidden', nm: '금칙어' },
+      { seg: 'approvals', nm: '승인' },
     ],
   },
 ]
 
+const group = 'flex shrink-0 gap-1 rounded-md border border-gray-300 bg-gray-50 p-0.5' // 메뉴 묶음 박스
 const tab = (on: boolean) => `block rounded px-3 py-1.5 ${on ? 'bg-gray-800 text-white' : 'text-gray-700 hover:bg-gray-100'}`
 
 export default function AreaNav() {
@@ -125,13 +140,15 @@ export default function AreaNav() {
         </ul>
       )}
       <div className="mx-auto flex max-w-6xl items-center gap-2 overflow-x-auto px-2 py-2 text-sm whitespace-nowrap">
-        <ul aria-label="표준사전" className="flex shrink-0 gap-1 rounded-md border border-gray-300 bg-gray-50 p-0.5">
+        <ul aria-label="표준사전" className={group}>
           {visible(CORE).map(item)}
         </ul>
-        <ul aria-label="모델" className="flex shrink-0 gap-1 rounded-md border border-gray-300 bg-gray-50 p-0.5">
+        <ul aria-label="모델" className={group}>
           {visible(MODEL).map(item)}
         </ul>
-        <ul className="flex shrink-0 gap-1">{visible(REST).map(item)}</ul>
+        <ul aria-label="설정" className={group}>
+          {visible(REST).map(item)}
+        </ul>
       </div>
     </nav>
   )
