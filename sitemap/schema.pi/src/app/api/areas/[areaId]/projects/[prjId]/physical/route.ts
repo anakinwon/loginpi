@@ -1,10 +1,14 @@
 // 물리 모델(PRD_PiErd S2 P1~P4) — GET : 물리 모델 목록 + 변환 미리보기(?dbms=, 관문·이슈·테이블 수) / ?mdl= : 저장된 물리 모델 + 현재 논리와의 차이
+// GET ?mdl=&format=ddl : DDL(.sql 내려받기, S2 P6) / ?mdl=&format=csv&type=tbl|col : 테이블·칼럼 정의서 CSV
 // POST : 전환(관문 통과·이슈 0 일 때만, 프로젝트 × DBMS 활성 1건) / DELETE ?mdl=&ver_no= : 논리 삭제(재전환은 삭제 후 다시 전환)
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { apiError, audit, dbError, errMsg, parseBody, requireAreaRole } from '@/lib/api'
 import { db } from '@/lib/db'
-import { delPhy, listPhy, loadPhy, phyPlan, savePhy } from '@/lib/model-phy'
+import { kstDtm } from '@/lib/bulk'
+import { delPhy, listPhy, loadPhy, phyDdlInput, phyPlan, savePhy } from '@/lib/model-phy'
+import { genDdl, phyDocTables } from '@/lib/modelpi/ddl'
+import { docCsv } from '@/lib/modelpi/docs'
 import { DBMS_PRFL, isDbms, type DbmsCd } from '@/lib/modelpi/dbms'
 import { phyDiff } from '@/lib/modelpi/phy'
 
@@ -29,6 +33,20 @@ export async function GET(req: Request, { params }: Ctx) {
       if (!uuid.safeParse(mdlId).success) return apiError('INVALID_INPUT', 400)
       const p = await loadPhy(areaId, mdlId)
       if (!p || p.mdl.prj_id !== prjId) return apiError('NOT_FOUND', 404)
+      const format = sp.get('format')
+      if (format === 'ddl' || format === 'csv') {
+        const type = sp.get('type')
+        if (format === 'csv' && type !== 'tbl' && type !== 'col') return apiError('INVALID_INPUT', 400)
+        const x = await phyDdlInput(areaId, prjId, p)
+        if (!x) return apiError('NOT_FOUND', 404)
+        const at = kstDtm(new Date().toISOString())
+        const dbmsNm = DBMS_PRFL[x.d.dbms].nm
+        const doc = format === 'csv' ? phyDocTables(x.d.tables)[type as 'tbl' | 'col'] : null
+        const name = encodeURIComponent(`${x.prjNm}_${dbmsNm}_${doc ? doc.title : 'DDL'}_${at.slice(0, 10)}.${doc ? 'csv' : 'sql'}`)
+        return new NextResponse(doc ? docCsv(doc) : genDdl(x.d, { prjNm: x.prjNm, at }), {
+          headers: { 'Content-Type': doc ? 'text/csv; charset=utf-8' : 'application/sql; charset=utf-8', 'Content-Disposition': `attachment; filename*=UTF-8''${name}`, 'Cache-Control': 'no-store' },
+        })
+      }
       const plan = await phyPlan(areaId, prjId, p.mdl.dbms_cd as DbmsCd, p.mdl.del_col_use_yn === 'Y')
       return NextResponse.json({ ok: true, ...p, diff: plan ? phyDiff(p.tables, plan.tables) : null })
     }

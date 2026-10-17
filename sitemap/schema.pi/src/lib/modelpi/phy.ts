@@ -86,6 +86,9 @@ const DEL_ORA: SysDef[] = [
 ]
 export const sysCols = (dbms: DbmsCd, delCol: boolean): SysDef[] => (dbms === '0014' ? [...SYS_PG, ...(delCol ? DEL_PG : [])] : [...SYS_ORA, ...(delCol ? DEL_ORA : [])])
 export const SYS_COL_NMS = new Set(['REGR_ID', 'REG_DTM', 'MODR_ID', 'MOD_DTM', 'DEL_YN', 'DEL_DTM'])
+// 예약어(PostgreSQL·Oracle 공통 주요어) — DDL 은 무인용 식별자라 예약어 이름이면 CREATE 실패 → 변환 이슈로 막음
+// ponytail: 주요 예약어만 — 전체 목록(PG 키워드 표·Oracle V$RESERVED_WORDS)이 필요하면 DBMS 프로파일로
+export const RSV_WORDS = new Set('ACCESS ADD ALL ALTER AND ANY AS ASC AUDIT BETWEEN BY CASE CHECK CLUSTER COLUMN COMMENT CONSTRAINT CREATE CURRENT DATE DEFAULT DELETE DESC DISTINCT DROP ELSE END EXISTS FILE FOR FOREIGN FROM GRANT GROUP HAVING IN INDEX INSERT INTO IS LEVEL LIKE LIMIT LOCK MODE NOT NULL NUMBER OF OFFSET ON OR ORDER PRIMARY REFERENCES RESOURCE ROW ROWNUM ROWS SELECT SESSION SET SIZE START TABLE THEN TIMESTAMP TO TRIGGER UID UNION UNIQUE UPDATE USER VALUES VIEW WHEN WHERE WITH'.split(' '))
 
 // 이름 규칙(P4) : PK = PostgreSQL <테이블>_PKEY / Oracle·Tibero PK_<테이블>, FK = FK_<자식테이블>_NN — 한도 초과 시 테이블 부분을 자름
 export const pkName = (dbms: DbmsCd, tbl: string) => cut(dbms === '0014' ? `${tbl}_PKEY` : `PK_${tbl}`, DBMS_PRFL[dbms].identMax, dbms === '0014' ? '_PKEY' : '')
@@ -120,6 +123,7 @@ export function toPhysical(ents: PhyEntIn[], rels: PhyRelIn[], tpMap: TpMap[], o
       if (!a.dom) issues.push(`${e.tbl_phy_nm}.${a.term_phy_nm} : 용어 도메인 없음`)
       else if (!m) issues.push(`${e.tbl_phy_nm}.${a.term_phy_nm} : DBMS 타입 매핑 없음(논리타입 ${a.dom.lgc_tp_cd})`)
       if (SYS_COL_NMS.has(a.term_phy_nm.toUpperCase())) issues.push(`${e.tbl_phy_nm}.${a.term_phy_nm} : 시스템 칼럼과 이름이 같습니다`)
+      if (RSV_WORDS.has(a.term_phy_nm.toUpperCase())) issues.push(`${e.tbl_phy_nm}.${a.term_phy_nm} : SQL 예약어라 칼럼명으로 쓸 수 없습니다(표준용어 물리명 조정)`)
       if (a.term_phy_nm.length > max) issues.push(`${e.tbl_phy_nm}.${a.term_phy_nm} : 칼럼명 ${a.term_phy_nm.length}자 > 한도 ${max}`)
       if (ordered.findIndex((x) => x.term_phy_nm.toUpperCase() === a.term_phy_nm.toUpperCase()) !== i) issues.push(`${e.tbl_phy_nm}.${a.term_phy_nm} : 칼럼명 중복(다른 용어가 같은 물리명)`)
       const useLen = m?.len_use_yn === 'Y'
@@ -141,6 +145,7 @@ export function toPhysical(ents: PhyEntIn[], rels: PhyRelIn[], tpMap: TpMap[], o
     })
     for (const [nm, t, len, nul, dflt] of sysCols(opt.dbms, opt.delCol))
       cols.push({ attr_id: null, sys_col_yn: 'Y', col_nm: nm, col_seq: cols.length + 1, dom_id: null, dom_ver_no: null, phy_tp_nm: t, data_len: len, data_scale: null, null_yn: nul, bsc_val_txt: dflt, pk_yn: 'N', pk_seq: null })
+    if (RSV_WORDS.has(e.tbl_phy_nm.toUpperCase())) issues.push(`${e.tbl_phy_nm} : SQL 예약어라 테이블명으로 쓸 수 없습니다`)
     if (e.tbl_phy_nm.length > max) issues.push(`${e.tbl_phy_nm} : 테이블명 ${e.tbl_phy_nm.length}자 > 한도 ${max}`)
     return { ent_id: e.ent_id, tbl_nm: e.tbl_phy_nm.toUpperCase(), tbl_desc: e.ent_desc ?? null, cols }
   })

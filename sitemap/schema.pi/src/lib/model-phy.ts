@@ -6,6 +6,7 @@ import { loadLogical } from './model-logical'
 import { checkLogical } from './modelpi/normalize'
 import { phyGate, toPhysical, type PhyCol, type PhyTbl, type TpMap } from './modelpi/phy'
 import type { DbmsCd } from './modelpi/dbms'
+import type { DdlIn, DdlTbl } from './modelpi/ddl'
 
 const PAGE = 1000 // PostgREST max_rows 대응 — range 반복 조회
 const TBL_CHUNK = 100 // in() URL 길이 제한 대응
@@ -64,6 +65,30 @@ export async function loadPhy(areaId: string, mdlId: string) {
   for (const y of cols) by.set(y.phy_tbl_id, [...(by.get(y.phy_tbl_id) ?? []), y])
   const tables = tbls.map((x) => ({ ...x, cols: (by.get(x.phy_tbl_id) ?? []).sort((a, b) => a.col_seq - b.col_seq) }))
   return { mdl: mdl.data, tables, fks: f.data as { phy_fk_id: string; rel_id: string; fk_nm: string }[] }
+}
+
+// DDL·물리 정의서 입력 — 저장된 물리 모델 + 논리(칼럼 설명 = 용어 논리명, FK 칼럼 쌍 원천 = 속성 fk_rel_id·src_attr_id, 관계 부모·자식)
+export async function phyDdlInput(areaId: string, prjId: string, p: NonNullable<Awaited<ReturnType<typeof loadPhy>>>): Promise<{ prjNm: string; d: DdlIn } | null> {
+  const m = await loadLogical(areaId, prjId)
+  if (!m) return null
+  const attrs = m.ents.flatMap((e) => e.attrs)
+  const lbl = new Map(attrs.map((a) => [a.attr_id, a.term_log_nm]))
+  const rel = new Map(m.rels.map((r) => [r.rel_id, r]))
+  const tables: DdlTbl[] = p.tables.map((t) => ({ ent_id: t.ent_id, tbl_nm: t.tbl_nm, tbl_desc: t.tbl_desc, cols: t.cols.map((c) => ({ ...c, col_desc: c.attr_id ? (lbl.get(c.attr_id) ?? null) : null })) }))
+  return {
+    prjNm: (m.prj as { prj_nm: string }).prj_nm,
+    d: {
+      dbms: p.mdl.dbms_cd as DbmsCd,
+      ltr: p.mdl.idntfr_ltr_cd as 'UPPER' | 'LOWER',
+      tables,
+      fks: p.fks.flatMap((f) => {
+        const r = rel.get(f.rel_id)
+        return r ? [{ rel_id: f.rel_id, fk_nm: f.fk_nm, prnt_ent_id: r.prnt_ent_id, chld_ent_id: r.chld_ent_id }] : [] // 관계가 삭제된 FK 는 제외(diff 대상)
+      }),
+      src: new Map(attrs.map((a) => [a.attr_id, a.src_attr_id ?? null])),
+      fkOf: new Map(attrs.map((a) => [a.attr_id, a.fk_rel_id])),
+    },
+  }
 }
 
 // 전환 저장 — 실패 시 보상(논리 삭제) 후 오류 던짐
