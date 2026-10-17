@@ -28,16 +28,17 @@ export async function loadLogical(areaId: string, prjId: string) {
   const er = e.data as unknown as ERow[]
   const ar = a.data as unknown as ARow[]
   const ids = [...new Set(er.flatMap((x) => x.dic_ids))]
-  const w = ids.length ? await db().from('std_dic').select('dic_id, dic_log_nm, dic_phy_nm, attr_clss_yn, ent_clss_yn, forbid_yn, tbl_sfx_txt').in('dic_id', ids) : { data: [], error: null }
+  const w = ids.length ? await db().from('std_dic').select('dic_id, dic_log_nm, dic_phy_nm, attr_clss_yn, ent_clss_yn, forbid_yn, tbl_sfx_txt, std_sts_cd, del_yn').in('dic_id', ids) : { data: [], error: null }
   if (w.error) throw w.error
-  const wb = new Map((w.data as EntWord[]).map((x) => [x.dic_id, x]))
+  const wb = new Map((w.data as (EntWord & { std_sts_cd: string; del_yn: string })[]).map((x) => [x.dic_id, x]))
   const pfx = (prj.data as { tbl_pfx_txt: string }).tbl_pfx_txt
   const dbms = (prj.data as { trgt_dbms_cd: string }).trgt_dbms_cd
   // 점검 입력(LEnt) + 편집 폼용(주제영역·단계·설명·구성 단어 ID·버전)
   const ents: (LEnt & { subj_id: string; mdl_lvl_cd: string; ent_desc: string | null; dic_ids: string[]; ver_no: number })[] = er
     .sort((x, y) => x.mdl_subj.sort_seq - y.mdl_subj.sort_seq || x.mdl_subj.subj_nm.localeCompare(y.mdl_subj.subj_nm))
     .map((x) => {
-      const words = x.dic_ids.map((id) => wb.get(id)).filter((v): v is EntWord => !!v)
+      const words = x.dic_ids.map((id) => wb.get(id)).filter((v): v is EntWord & { std_sts_cd: string; del_yn: string } => !!v)
+      const dic_bad = x.dic_ids.length - words.filter((v) => v.std_sts_cd === 'CNFM' && v.del_yn === 'N').length // 폐기·미승인·삭제 단어(L5)
       const attrs: LAttr[] = ar
         .filter((t) => t.ent_id === x.ent_id)
         .sort((p, q) => (p.pk_yn === q.pk_yn ? (p.pk_seq ?? 0) - (q.pk_seq ?? 0) : p.pk_yn === 'Y' ? -1 : 1))
@@ -55,7 +56,7 @@ export async function loadLogical(areaId: string, prjId: string) {
           ver_no: t.ver_no,
           term_ok: t.std_term?.std_sts_cd === 'CNFM' && t.std_term?.del_yn === 'N',
         }))
-      return { ent_id: x.ent_id, ent_log_nm: x.ent_log_nm, tbl_phy_nm: entNames(words, x.mdl_subj.subj_abbr_nm, pfx, dbms).tbl_phy_nm, ent_tp_cd: x.ent_tp_cd, subj_nm: x.mdl_subj.subj_nm, words, attrs, subj_id: x.subj_id, mdl_lvl_cd: x.mdl_lvl_cd, ent_desc: x.ent_desc, dic_ids: x.dic_ids, ver_no: x.ver_no }
+      return { ent_id: x.ent_id, ent_log_nm: x.ent_log_nm, tbl_phy_nm: entNames(words, x.mdl_subj.subj_abbr_nm, pfx, dbms).tbl_phy_nm, ent_tp_cd: x.ent_tp_cd, subj_nm: x.mdl_subj.subj_nm, words, attrs, dic_bad, subj_id: x.subj_id, mdl_lvl_cd: x.mdl_lvl_cd, ent_desc: x.ent_desc, dic_ids: x.dic_ids, ver_no: x.ver_no }
     })
   return { prj: prj.data, ents, rels: r.data as LRel[], capped: er.length >= ENT_MAX || ar.length >= ATTR_MAX }
 }

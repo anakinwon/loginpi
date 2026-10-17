@@ -63,7 +63,7 @@ interface Issue {
   ent_id: string
   attr_ids: string[]
   msg: string
-  action: 'move' | 'remove' | 'split' | 'review'
+  action: 'move' | 'remove' | 'split' | 'review' | 'fix'
   target_ent_id?: string
 }
 interface Check {
@@ -82,13 +82,13 @@ interface Model {
   fkGaps: Gap[]
   issues: Issue[]
   checks: Check[]
-  summary: { ents: number; passed: number; rate: number; no_pk: number; must_short: number; orphan: number; fk_missing: number; issues: number; reviews: number }
+  summary: { ents: number; passed: number; rate: number; no_pk: number; must_short: number; orphan: number; fk_missing: number; issues: number; reviews: number; std: number; rev: number }
   mermaid: string
   capped: boolean
 }
 const CRDN: Record<string, string> = { '11': '1:1', '1N': '1:N', NM: 'N:M' }
-const KIND_NM: Record<string, string> = { '1NF': '1정규형', '2NF': '2정규형', '3NF': '3정규형', '4NF': '4정규형', KEY: '식별자', STD: '표준' }
-const ACT_NM: Record<string, string> = { move: '부모로 이동', remove: '제거', split: '분리 필요', review: '검토' }
+const KIND_NM: Record<string, string> = { '1NF': '1정규형', '2NF': '2정규형', '3NF': '3정규형', '4NF': '4정규형', KEY: '식별자', STD: '표준 정합', REV: '모델 검토' }
+const ACT_NM: Record<string, string> = { move: '부모로 이동', remove: '제거', split: '분리 필요', review: '검토', fix: '수정 필요' }
 
 export default function LogicalPage({ params }: { params: Promise<{ areaId: string }> }) {
   const { areaId } = use(params)
@@ -261,7 +261,7 @@ export default function LogicalPage({ params }: { params: Promise<{ areaId: stri
       )}
 
       {s && (
-        <section className="mt-4 grid grid-cols-2 gap-2 text-center text-sm md:grid-cols-8" aria-label="논리 모델 검증 요약">
+        <section className="mt-4 grid grid-cols-2 gap-2 text-center text-sm md:grid-cols-10" aria-label="논리 모델 검증 요약">
           {[
             ['준수율', `${s.rate}%`, s.rate === 100],
             ['통과 엔터티', `${s.passed}/${s.ents}`, s.passed === s.ents],
@@ -269,15 +269,17 @@ export default function LogicalPage({ params }: { params: Promise<{ areaId: stri
             ['필수 4종 미달', s.must_short, !s.must_short],
             ['고아 엔터티', s.orphan, !s.orphan],
             ['FK 누락', s.fk_missing, !s.fk_missing],
-            ['정규화 의심', s.issues, !s.issues],
-            ['검토', s.reviews, !s.reviews],
+            ['통과 막는 이슈(합계)', s.issues, !s.issues],
+            ['표준 정합', s.std, !s.std],
+            ['모델 검토', s.rev, !s.rev],
+            ['검토(경고)', s.reviews, !s.reviews],
           ].map(([k, v, ok]) => (
             <div key={String(k)} className={`rounded-lg border px-2 py-2 ${ok ? 'border-green-300 bg-green-50' : 'border-amber-300 bg-amber-50'}`}>
               <div className="text-xs text-gray-600">{k}</div>
               <div className="text-lg font-bold tabular-nums">{v}</div>
             </div>
           ))}
-          <p className="col-span-2 text-left text-xs text-gray-600 md:col-span-8">
+          <p className="col-span-2 text-left text-xs text-gray-600 md:col-span-10">
             물리 전환(MD5) 진입 조건 : 모든 엔터티 통과(주식별자·필수 4종·관계·FK·정규화 의심 해소){m?.capped ? ' — 엔터티·속성 상한(500·5,000)에 도달해 일부만 점검' : ''}
           </p>
         </section>
@@ -396,7 +398,7 @@ export default function LogicalPage({ params }: { params: Promise<{ areaId: stri
             </div>
 
             <div className="rounded-xl border border-[#c7d2e6] bg-white p-4 text-sm shadow-sm">
-              <h3 className="font-semibold text-[#1f3a68]">정규화 점검 {sel ? '' : '(전체)'} — 이름 기반 의심, 판단은 DA</h3>
+              <h3 className="font-semibold text-[#1f3a68]">점검 {sel ? '' : '(전체)'} — 정규화 의심·모델 검토·표준 정합(판단은 DA, 수정 필요는 통과를 막음)</h3>
               {iss.length === 0 ? (
                 <p className="mt-1 text-gray-500">의심 항목이 없습니다</p>
               ) : (

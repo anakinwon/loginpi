@@ -17,7 +17,7 @@ export async function GET(_req: Request, { params }: Ctx) {
     const m = await loadLogical(areaId, prjId)
     if (!m) return apiError('NOT_FOUND', 404)
     const ents = m.ents.map(({ words, ...e }) => ({ ...e, words: words.map((w) => w.dic_log_nm) }))
-    return NextResponse.json({ ok: true, prj: m.prj, ents, rels: m.rels, ...checkLogical(m.ents, m.rels), mermaid: toMermaid(m.ents, m.rels, (m.prj as { prj_nm: string }).prj_nm), capped: m.capped })
+    return NextResponse.json({ ok: true, prj: m.prj, ents, rels: m.rels, ...checkLogical(m.ents, m.rels, { dbms: (m.prj as { trgt_dbms_cd: string }).trgt_dbms_cd }), mermaid: toMermaid(m.ents, m.rels, (m.prj as { prj_nm: string }).prj_nm), capped: m.capped })
   } catch (e) {
     return dbError(e as { code?: string; message?: string })
   }

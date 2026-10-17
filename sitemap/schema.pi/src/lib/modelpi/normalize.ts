@@ -1,8 +1,11 @@
 // ModelPi 논리 모델 점검(순수, 2026-10-17 마스터 지시) — FK 전파 누락·정규화 의심(1NF~3NF·4NF 경고)·표준 용어·엔터티별 검증·준수율
 // 반자동 : 점검·제안만 만들고 저장하지 않는다(적용은 화면이 기존 속성 API 로). 함수 종속은 업무 규칙이라 이름 기반 "의심"으로만 표시, 판단은 DA
+// 모델 검토(S1 L4, kind REV) : 물리 테이블명 중복·DBMS 이름 길이 초과·필수 관계인데 FK 선택(수정 필요, 통과 막음), 설명 없음·속성 없는 엔터티(검토)
+// 표준 정합(S1 L5, kind STD) : 엔터티명 표류(표준단어가 바뀌어 이름이 다름)·구성 단어 폐기/미승인(수정 필요), 폐기·미승인 용어(제거) — 도메인 변경 영향은 물리 스냅샷이 생기는 S2 에서
 // 근거 : 데이터 모델링 가이드 04 §3(식별 = 부모 식별자 상속·비식별 = 참조 속성), 04 문단 240~(3NF·BCNF 필수, 다치 종속은 4NF 분리), 필수 4종(logical.ts)
-import type { EntWord } from '../model-name.ts'
+import { TBL_NM_MAX, type EntWord } from '../model-name.ts'
 import { entCore, mustCheck } from './logical.ts'
+import { DBMS_PRFL, isDbms } from './dbms.ts'
 
 export interface LAttr {
   attr_id: string
@@ -26,6 +29,8 @@ export interface LEnt {
   subj_nm: string
   words: EntWord[]
   attrs: LAttr[]
+  ent_desc?: string | null
+  dic_bad?: number // 구성 단어 중 폐기·미승인·삭제 수(로더 계산)
 }
 export interface LRel {
   rel_id: string
@@ -50,11 +55,11 @@ export interface FkGap {
   esntl: boolean
 }
 export interface Issue {
-  kind: '1NF' | '2NF' | '3NF' | '4NF' | 'KEY' | 'STD'
+  kind: '1NF' | '2NF' | '3NF' | '4NF' | 'KEY' | 'STD' | 'REV'
   ent_id: string
   attr_ids: string[]
   msg: string
-  action: 'move' | 'remove' | 'split' | 'review'
+  action: 'move' | 'remove' | 'split' | 'review' | 'fix' // fix = 수정 필요(통과 막음, 자동 적용 없음)
   target_ent_id?: string // move 대상
 }
 export interface EntCheck {
@@ -68,7 +73,9 @@ export interface EntCheck {
   pass: boolean
 }
 
-export function checkLogical(ents: LEnt[], rels: LRel[]) {
+export function checkLogical(ents: LEnt[], rels: LRel[], opt: { dbms?: string } = {}) {
+  const identMax = isDbms(opt.dbms) ? DBMS_PRFL[opt.dbms].identMax : 30
+  const tblMax = Math.min(TBL_NM_MAX, identMax) // 테이블명은 인덱스명(X_테이블명_NN) 30자를 위해 25자 이내(정의서 §8.5, 엔터티 등록 미리보기와 같은 기준)
   const byId = new Map(ents.map((e) => [e.ent_id, e]))
   const fkGaps: FkGap[] = []
   const issues: Issue[] = []
@@ -140,7 +147,24 @@ export function checkLogical(ents: LEnt[], rels: LRel[]) {
     if (idp.length >= 3) issues.push({ kind: '4NF', ent_id: e.ent_id, attr_ids: [], msg: `다치 종속 의심 : 식별 부모 ${idp.length}개(${idp.map((x) => x.p.ent_log_nm).join('·')}) — 서로 독립인 조합이면 관계 엔터티로 분해(04 문단 240)`, action: 'review' })
     // ⑥ 표준 — 폐기·미승인 용어
     for (const a of e.attrs.filter((x) => !x.term_ok)) issues.push({ kind: 'STD', ent_id: e.ent_id, attr_ids: [a.attr_id], msg: `승인완료가 아닌 용어 : ${a.term_log_nm} → 승인 용어로 교체`, action: 'remove' })
+    // ⑦ 표준 정합(L5) — 엔터티명 표류·구성 단어 폐기
+    const wordNm = e.words.map((w) => w.dic_log_nm).join('')
+    if (e.dic_bad) issues.push({ kind: 'STD', ent_id: e.ent_id, attr_ids: [], msg: `엔터티명 구성 단어 ${e.dic_bad}개가 폐기·미승인 상태 → 엔터티 수정에서 승인 단어로 다시 고르십시오`, action: 'fix' })
+    else if (wordNm && wordNm !== e.ent_log_nm) issues.push({ kind: 'STD', ent_id: e.ent_id, attr_ids: [], msg: `엔터티명 표류 : ${e.ent_log_nm} ≠ 현재 표준단어 ${wordNm} → 엔터티 수정에서 저장하면 이름이 다시 만들어집니다`, action: 'fix' })
+    // ⑧ 모델 검토(L4)
+    if (e.tbl_phy_nm.length > tblMax) issues.push({ kind: 'REV', ent_id: e.ent_id, attr_ids: [], msg: `물리 테이블명 ${e.tbl_phy_nm.length}자 > 한도 ${tblMax}자(인덱스명 여유 포함) → 표준단어 약어·주제영역 약어 조정`, action: 'fix' })
+    for (const a of e.attrs.filter((x) => x.term_phy_nm.length > identMax)) issues.push({ kind: 'REV', ent_id: e.ent_id, attr_ids: [a.attr_id], msg: `칼럼명 ${a.term_phy_nm} ${a.term_phy_nm.length}자 > 한도 ${identMax}자 → 표준용어 물리명 조정`, action: 'fix' })
+    for (const r of rels.filter((x) => x.chld_ent_id === e.ent_id && x.prnt_opt_yn === 'N' && x.crdn_cd !== 'NM' && x.prnt_ent_id !== e.ent_id))
+      for (const a of e.attrs.filter((x) => x.fk_rel_id === r.rel_id && x.esntl_yn !== 'Y'))
+        issues.push({ kind: 'REV', ent_id: e.ent_id, attr_ids: [a.attr_id], msg: `필수 관계(${r.rel_nm ?? '관계'})인데 FK ${a.term_log_nm} 이(가) 선택 → 필수로(관계 편집의 FK 버튼)`, action: 'fix' })
+    if (!e.attrs.length) issues.push({ kind: 'REV', ent_id: e.ent_id, attr_ids: [], msg: '속성이 없는 엔터티 — 주식별자·필수 속성을 추가하거나 삭제하십시오', action: 'review' })
+    if (!(e.ent_desc ?? '').trim()) issues.push({ kind: 'REV', ent_id: e.ent_id, attr_ids: [], msg: '엔터티 설명이 없습니다(정의서 필수 항목)', action: 'review' })
   }
+  // ⑨ 모델 검토(L4) — 물리 테이블명 중복(프로젝트 안)
+  const byPhy = new Map<string, LEnt[]>()
+  for (const e of ents) byPhy.set(e.tbl_phy_nm, [...(byPhy.get(e.tbl_phy_nm) ?? []), e])
+  for (const [phy, g] of byPhy)
+    if (g.length > 1) for (const e of g) issues.push({ kind: 'REV', ent_id: e.ent_id, attr_ids: [], msg: `물리 테이블명 중복 : ${phy} (${g.map((x) => x.ent_log_nm).join('·')}) → 주제영역 약어·단어 구성 조정`, action: 'fix' })
 
   const linked = new Set(rels.flatMap((r) => [r.prnt_ent_id, r.chld_ent_id]))
   const checks: EntCheck[] = ents.map((e) => {
@@ -163,6 +187,8 @@ export function checkLogical(ents: LEnt[], rels: LRel[]) {
     fk_missing: fkGaps.length,
     issues: issues.filter((i) => i.action !== 'review').length,
     reviews: issues.filter((i) => i.action === 'review').length,
+    std: issues.filter((i) => i.kind === 'STD' && i.action !== 'review').length, // 표준 정합 위반(L5)
+    rev: issues.filter((i) => i.kind === 'REV' && i.action !== 'review').length, // 모델 검토 수정 필요(L4)
   }
   return { fkGaps, issues, checks, summary }
 }

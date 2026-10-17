@@ -93,3 +93,33 @@ test('N:M 관계 : 상속 점검 없이 해소 필요(split) 이슈로 통과 �
   assert.equal(i.action, 'split')
   assert.equal(r.checks.find((c) => c.ent_id === 'ord')!.pass, false)
 })
+
+test('모델 검토(L4) : 물리명 중복·이름 길이·필수 관계 FK 선택은 수정 필요, 설명·속성 없음은 검토', () => {
+  const a1 = { ...E('d1', [W('주문'), W('기본', true)], [A('주문번호', { pk_yn: 'Y', pk_seq: 1 })]), tbl_phy_nm: 'ECM_DUP_M', ent_desc: '설명' }
+  const a2 = { ...E('d2', [W('주문'), W('상세', true)], []), tbl_phy_nm: 'ECM_DUP_M' }
+  const longE = { ...E('lg', [W('고객'), W('기본', true)], [A('고객번호', { pk_yn: 'Y', pk_seq: 1, term_phy_nm: 'X'.repeat(31) })]), tbl_phy_nm: 'T'.repeat(31), ent_desc: '설명' }
+  const fkOpt = { ...E('fo', [W('송금'), W('기본', true)], [A('송금번호', { pk_yn: 'Y', pk_seq: 1 }), A('고객번호', { fk_rel_id: 'rq', esntl_yn: 'N' })]), ent_desc: '설명' }
+  const r = checkLogical([cust, a1, a2, longE, fkOpt], [R('rq', 'cust', 'fo')], { dbms: '0001' })
+  const rev = (id: string) => r.issues.filter((i) => i.kind === 'REV' && i.ent_id === id)
+  assert.ok(rev('d1').some((i) => /중복/.test(i.msg) && i.action === 'fix'))
+  assert.ok(rev('d2').some((i) => /속성이 없는/.test(i.msg) && i.action === 'review'))
+  assert.ok(rev('d2').some((i) => /설명이 없/.test(i.msg) && i.action === 'review'))
+  assert.equal(rev('lg').filter((i) => /자 > /.test(i.msg) && i.action === 'fix').length, 2, '테이블·칼럼 길이(Oracle 30)')
+  assert.ok(rev('fo').some((i) => /필수 관계/.test(i.msg) && i.action === 'fix'))
+  assert.equal(r.checks.find((c) => c.ent_id === 'fo')!.pass, false)
+  assert.ok(r.summary.rev >= 4)
+})
+
+test('표준 정합(L5) : 엔터티명 표류·구성 단어 폐기는 수정 필요', () => {
+  const drift = { ...E('dr', [W('고객'), W('기본', true)], [A('고객번호', { pk_yn: 'Y', pk_seq: 1 })]), ent_log_nm: '회원기본', ent_desc: 'x' }
+  const bad = { ...E('bd', [W('주문'), W('기본', true)], [A('주문번호', { pk_yn: 'Y', pk_seq: 1 })]), dic_bad: 1, ent_desc: 'x' }
+  const r = checkLogical([drift, bad], [])
+  assert.ok(r.issues.some((i) => i.ent_id === 'dr' && i.kind === 'STD' && /표류/.test(i.msg) && i.action === 'fix'))
+  assert.ok(r.issues.some((i) => i.ent_id === 'bd' && i.kind === 'STD' && /폐기·미승인/.test(i.msg)))
+  assert.equal(r.summary.std, 2)
+})
+
+test('테이블명 한도 = min(25, DBMS) : PostgreSQL 26자도 수정 필요(엔터티 미리보기와 같은 기준)', () => {
+  const t26 = { ...E('t26', [W('고객'), W('기본', true)], [A('고객번호', { pk_yn: 'Y', pk_seq: 1 })]), tbl_phy_nm: 'T'.repeat(26), ent_desc: 'x' }
+  assert.ok(checkLogical([t26], [], { dbms: '0014' }).issues.some((i) => i.kind === 'REV' && /26자 > 한도 25자/.test(i.msg)))
+})
