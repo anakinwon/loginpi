@@ -83,3 +83,21 @@ test('검증 결함 회귀 : 칼럼명 중복·한도 이슈, PK 순번 재부�
   const prev = toPhysical([cust], [], tpPg, opt).tables
   assert.deepEqual(phyDiff(prev, toPhysical([{ ...cust, tbl_phy_nm: 'TB_CST_CUST_M' }], [], tpPg, opt).tables).chg_tbl, ['TB_CST_CUST → TB_CST_CUST_M'])
 })
+
+test('칼럼 그리드 편집 검증 : 기본값 허용 목록·PK NULL·시스템 고정·순서 중복·시스템 맨 끝', async () => {
+  const { checkColEdits, bscOk } = await import('../src/lib/modelpi/phy.ts')
+  const t = toPhysical([cust], [], tpPg, { dbms: '0014', delCol: false }).tables[0]
+  const cols = t.cols.map((c, i) => ({ ...c, phy_col_id: `k${i}` })) // k0 CUST_NO(PK) k1 CUST_NM k2 JOIN_DTM k3~k6 시스템
+  for (const ok of ["'N'", '0', '-1.5', 'CURRENT_TIMESTAMP', "'it''s'", null, 'TRUE']) assert.ok(bscOk(ok, '0014'), String(ok))
+  assert.ok(bscOk('SYSDATE', '0001') && !bscOk('SYSDATE', '0014') && !bscOk('TRUE', '0013'))
+  for (const bad of ["'a'; DROP TABLE x; --", '1; --', 'now()', "'unclosed", 'SELECT 1', "'a' || 'b'"]) assert.ok(!bscOk(bad, '0014'), bad)
+  assert.equal(checkColEdits(cols, [{ phy_col_id: 'k1', bsc_val_txt: "'홍'", null_yn: 'Y' }], '0014'), null)
+  assert.equal(checkColEdits(cols, [{ phy_col_id: 'k1', bsc_val_txt: "x'; DROP" }], '0014'), 'PHY_COL_DEFAULT')
+  assert.equal(checkColEdits(cols, [{ phy_col_id: 'k0', null_yn: 'Y' }], '0014'), 'PHY_COL_PK_NULL')
+  assert.equal(checkColEdits(cols, [{ phy_col_id: 'k3', col_seq: 1 }], '0014'), 'PHY_COL_SYS')
+  assert.equal(checkColEdits(cols, [{ phy_col_id: 'k1', col_seq: 3 }], '0014'), 'PHY_COL_SEQ') // JOIN_DTM 과 중복
+  assert.equal(checkColEdits(cols, [{ phy_col_id: 'k1', col_seq: 3 }, { phy_col_id: 'k2', col_seq: 2 }], '0014'), null) // 맞바꾸기
+  assert.equal(checkColEdits(cols, [{ phy_col_id: 'k2', col_seq: 99 }], '0014'), 'PHY_COL_SEQ') // 시스템 칼럼 뒤로
+  assert.equal(checkColEdits(cols, [{ phy_col_id: 'zz', null_yn: 'N' }], '0014'), 'PHY_COL_INVALID')
+  assert.equal(checkColEdits(cols, [{ phy_col_id: 'k1', null_yn: 'N' }, { phy_col_id: 'k1', null_yn: 'Y' }], '0014'), 'PHY_COL_INVALID') // 중복 편집
+})

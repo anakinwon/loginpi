@@ -203,3 +203,33 @@ export function phyDiff(prev: PhyTbl[], next: PhyTbl[]): PhyDiff {
   }
   return d
 }
+
+// 칼럼 그리드 편집 검증(P5) — 한 테이블의 편집 묶음(순서·NULL·기본값)을 적용한 결과로 판정, 오류 코드 또는 null
+// 기본값은 DDL DEFAULT 에 그대로 들어가므로 허용 목록만(숫자·작은따옴표 문자열·키워드) — 인젝션 차단
+const BSC_RE = /^(-?\d{1,18}(\.\d{1,18})?|'(?:[^']|'')*'|CURRENT_TIMESTAMP|CURRENT_DATE)$/i
+const BSC_KW: Record<DbmsCd, RegExp> = { '0014': /^(TRUE|FALSE)$/i, '0001': /^(SYSDATE|SYSTIMESTAMP)$/i, '0013': /^(SYSDATE|SYSTIMESTAMP)$/i } // DBMS 전용 키워드
+export const bscOk = (v: string | null, dbms: DbmsCd) => v === null || (v.length <= 200 && (BSC_RE.test(v) || BSC_KW[dbms].test(v)))
+export interface ColEdit {
+  phy_col_id: string
+  col_seq?: number
+  null_yn?: 'Y' | 'N'
+  bsc_val_txt?: string | null
+}
+export function checkColEdits(cols: (PhyCol & { phy_col_id: string })[], edits: ColEdit[], dbms: DbmsCd): 'PHY_COL_INVALID' | 'PHY_COL_DEFAULT' | 'PHY_COL_PK_NULL' | 'PHY_COL_SYS' | 'PHY_COL_SEQ' | null {
+  const by = new Map(cols.map((c) => [c.phy_col_id, { ...c }]))
+  if (new Set(edits.map((e) => e.phy_col_id)).size !== edits.length) return 'PHY_COL_INVALID' // 같은 칼럼 중복 편집(부분 반영 방지)
+  for (const e of edits) {
+    const c = by.get(e.phy_col_id)
+    if (!c) return 'PHY_COL_INVALID'
+    if (c.sys_col_yn === 'Y' && (e.col_seq !== undefined || e.null_yn !== undefined || e.bsc_val_txt !== undefined)) return 'PHY_COL_SYS' // 시스템 칼럼은 고정
+    if (e.bsc_val_txt !== undefined && !bscOk(e.bsc_val_txt, dbms)) return 'PHY_COL_DEFAULT'
+    Object.assign(c, Object.fromEntries(Object.entries(e).filter(([, v]) => v !== undefined)))
+    if (c.pk_yn === 'Y' && c.null_yn === 'Y') return 'PHY_COL_PK_NULL'
+  }
+  const all = [...by.values()]
+  const seqs = all.map((c) => c.col_seq)
+  if (new Set(seqs).size !== seqs.length || seqs.some((s) => !Number.isInteger(s) || s < 1)) return 'PHY_COL_SEQ'
+  const maxNormal = Math.max(0, ...all.filter((c) => c.sys_col_yn !== 'Y').map((c) => c.col_seq))
+  if (all.some((c) => c.sys_col_yn === 'Y' && c.col_seq < maxNormal)) return 'PHY_COL_SEQ' // 시스템 칼럼은 맨 끝
+  return null
+}

@@ -2,7 +2,7 @@
 // FK : PostgreSQL = ALTER TABLE ADD CONSTRAINT, Oracle·Tibero = 주석으로만(DBMS 프로파일 STD-08 물리 FK 미생성). 칼럼 쌍 = 자식 칼럼 속성의 원천(src_attr_id) → 부모 칼럼
 // ponytail: 변경일시 갱신 트리거·인덱스(PK 외)·ALTER 변경분은 미생성 — 인덱스 설계·변경분 DDL 은 S5
 import { DBMS_PRFL, type DbmsCd } from './dbms.ts'
-import { pkName, type PhyCol } from './phy.ts'
+import { bscOk, pkName, RSV_WORDS, type PhyCol } from './phy.ts'
 import type { DocTable } from './docs.ts'
 
 export interface DdlTbl {
@@ -27,6 +27,8 @@ export interface DdlIn {
 }
 
 const q = (s: string) => `'${s.replace(/'/g, "''")}'`
+// 주석 줄(-- …)에 넣는 자유 텍스트 — 줄바꿈 등 제어문자를 공백으로(주석 탈출 → 임의 SQL 삽입 차단)
+const line1 = (s: string) => s.replace(/[\p{Cc}\p{Zl}\p{Zp}]/gu, ' ') // 제어문자(0~1F·7F~9F)·줄/문단 구분자
 const tpOf = (c: PhyCol) => (c.data_len != null ? `${c.phy_tp_nm}(${c.data_len}${c.data_scale != null ? `,${c.data_scale}` : ''})` : c.phy_tp_nm)
 
 // FK 칼럼 쌍 — 원천 우선, 없으면 부모 PK 중 같은 칼럼명
@@ -48,10 +50,15 @@ export function fkPairs(fk: DdlFk, byEnt: Map<string, DdlTbl>, d: Pick<DdlIn, 's
 export function genDdl(d: DdlIn, head: { prjNm: string; at: string }): string {
   const nm = (s: string) => (d.ltr === 'LOWER' ? s.toLowerCase() : s.toUpperCase())
   const pg = d.dbms === '0014'
-  const out: string[] = [`-- ${head.prjNm} 물리 모델 DDL — ${DBMS_PRFL[d.dbms].nm}, 생성 ${head.at}`, '-- 표준 데이터 모델에서 생성(직접 실행 전 DBA 검토)', '']
+  const out: string[] = [`-- ${line1(head.prjNm)} 물리 모델 DDL — ${DBMS_PRFL[d.dbms].nm}, 생성 ${line1(head.at)}`, '-- 표준 데이터 모델에서 생성(직접 실행 전 DBA 검토)']
+  // 저장 후 예약어 목록이 늘었을 수 있어 내려받을 때 다시 점검(P6 이월)
+  for (const t of d.tables) for (const n of [t.tbl_nm, ...t.cols.map((c) => c.col_nm)]) if (RSV_WORDS.has(n.toUpperCase())) out.push(line1(`-- ⚠ 예약어 이름 ${t.tbl_nm === n ? n : `${t.tbl_nm}.${n}`} : 실행 전 표준용어 물리명을 조정하십시오`))
+  // 저장된 기본값도 DEFAULT 에 넣기 전 다시 허용 목록 검사(편집 경로 밖에서 들어온 값 방어)
+  for (const t of d.tables) for (const c of t.cols) if (c.bsc_val_txt && !bscOk(c.bsc_val_txt, d.dbms)) out.push(line1(`-- ⚠ ${t.tbl_nm}.${c.col_nm} 기본값을 허용 목록 밖이라 생략 : ${c.bsc_val_txt}`))
+  out.push('')
   for (const t of d.tables) {
     const cols = [...t.cols].sort((a, b) => a.col_seq - b.col_seq)
-    const lines = cols.map((c) => `  ${nm(c.col_nm).padEnd(30)} ${tpOf(c)}${c.bsc_val_txt ? ` DEFAULT ${c.bsc_val_txt}` : ''}${c.null_yn === 'N' ? ' NOT NULL' : ''}`)
+    const lines = cols.map((c) => `  ${nm(c.col_nm).padEnd(30)} ${tpOf(c)}${c.bsc_val_txt && bscOk(c.bsc_val_txt, d.dbms) ? ` DEFAULT ${c.bsc_val_txt}` : ''}${c.null_yn === 'N' ? ' NOT NULL' : ''}`)
     const pk = cols.filter((c) => c.pk_yn === 'Y').sort((a, b) => (a.pk_seq ?? 0) - (b.pk_seq ?? 0))
     if (pk.length) lines.push(`  CONSTRAINT ${nm(pkName(d.dbms, t.tbl_nm))} PRIMARY KEY (${pk.map((c) => nm(c.col_nm)).join(', ')})`)
     out.push(`CREATE TABLE ${nm(t.tbl_nm)} (`, lines.join(',\n'), ');')
@@ -64,13 +71,13 @@ export function genDdl(d: DdlIn, head: { prjNm: string; at: string }): string {
     const pairs = fkPairs(f, byEnt, d)
     const c = byEnt.get(f.chld_ent_id), p = byEnt.get(f.prnt_ent_id)
     if (!c || !p || !pairs.length) {
-      out.push(`-- ${f.fk_nm} : 칼럼 쌍을 찾지 못함(관계 FK 상속을 확인하십시오)`)
+      out.push(line1(`-- ${f.fk_nm} : 칼럼 쌍을 찾지 못함(관계 FK 상속을 확인하십시오)`))
       continue
     }
     const want = c.cols.filter((x) => x.attr_id && d.fkOf.get(x.attr_id) === f.rel_id).length
-    if (pairs.length !== want) out.push(`-- ⚠ ${f.fk_nm} : FK 칼럼 ${want}개 중 ${pairs.length}개만 부모 PK 와 짝지음(원천 속성을 확인하십시오)`)
+    if (pairs.length !== want) out.push(line1(`-- ⚠ ${f.fk_nm} : FK 칼럼 ${want}개 중 ${pairs.length}개만 부모 PK 와 짝지음(원천 속성을 확인하십시오)`))
     const sql = `ALTER TABLE ${nm(c.tbl_nm)} ADD CONSTRAINT ${nm(f.fk_nm)} FOREIGN KEY (${pairs.map((x) => nm(x[0])).join(', ')}) REFERENCES ${nm(p.tbl_nm)} (${pairs.map((x) => nm(x[1])).join(', ')});`
-    out.push(pg ? sql : `-- (관계, 물리 FK 미생성 STD-08) ${sql}`)
+    out.push(pg ? sql : line1(`-- (관계, 물리 FK 미생성 STD-08) ${sql}`))
   }
   return out.join('\n') + '\n'
 }

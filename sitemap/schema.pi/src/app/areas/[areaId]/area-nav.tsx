@@ -46,6 +46,7 @@ const REST: Item[] = [
     ],
   },
   { seg: 'logical', nm: '논리 모델' },
+  { seg: 'physical', nm: '물리 모델' },
   { seg: 'forbidden', nm: '금칙어' },
   {
     seg: 'settings',

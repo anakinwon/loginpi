@@ -1,5 +1,6 @@
 // 물리 모델(PRD_PiErd S2 P1~P4) — GET : 물리 모델 목록 + 변환 미리보기(?dbms=, 관문·이슈·테이블 수) / ?mdl= : 저장된 물리 모델 + 현재 논리와의 차이
 // GET ?mdl=&format=ddl : DDL(.sql 내려받기, S2 P6) / ?mdl=&format=csv&type=tbl|col : 테이블·칼럼 정의서 CSV
+// PATCH : 칼럼 그리드 편집(테이블 1개, 순서·NULL·기본값 묶음, 칼럼별 ver_no 잠금, S2 P5)
 // POST : 전환(관문 통과·이슈 0 일 때만, 프로젝트 × DBMS 활성 1건) / DELETE ?mdl=&ver_no= : 논리 삭제(재전환은 삭제 후 다시 전환)
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
@@ -10,7 +11,7 @@ import { delPhy, listPhy, loadPhy, phyDdlInput, phyPlan, savePhy } from '@/lib/m
 import { genDdl, phyDocTables } from '@/lib/modelpi/ddl'
 import { docCsv } from '@/lib/modelpi/docs'
 import { DBMS_PRFL, isDbms, type DbmsCd } from '@/lib/modelpi/dbms'
-import { phyDiff } from '@/lib/modelpi/phy'
+import { checkColEdits, phyDiff } from '@/lib/modelpi/phy'
 
 type Ctx = { params: Promise<{ areaId: string; prjId: string }> }
 const uuid = z.string().uuid()
@@ -91,6 +92,57 @@ export async function POST(req: Request, { params }: Ctx) {
   } catch (e) {
     const x = e as { code?: string; message?: string }
     return dbError(x, /prj_dbms/.test(x.message ?? '') ? 'PHY_DUP' : 'INVALID_INPUT') // 프로젝트 × DBMS 중복만 PHY_DUP
+  }
+}
+
+const patchBody = z.object({
+  phy_mdl_id: z.string().uuid(),
+  phy_tbl_id: z.string().uuid(),
+  cols: z
+    .array(
+      z.object({
+        phy_col_id: z.string().uuid(),
+        ver_no: z.number().int(),
+        col_seq: z.number().int().min(1).max(10000).optional(),
+        null_yn: z.enum(['Y', 'N']).optional(),
+        bsc_val_txt: z.string().max(200).nullable().optional(),
+      }),
+    )
+    .min(1)
+    .max(1000),
+})
+
+export async function PATCH(req: Request, { params }: Ctx) {
+  const { areaId, prjId } = await params
+  const auth = await requireAreaRole(areaId, 'REQUEST')
+  if (auth instanceof NextResponse) return auth
+  if (!uuid.safeParse(prjId).success) return apiError('INVALID_INPUT', 400)
+  const b = await parseBody(req, patchBody)
+  if (b instanceof NextResponse) return b
+  try {
+    const p = await loadPhy(areaId, b.phy_mdl_id)
+    if (!p || p.mdl.prj_id !== prjId) return apiError('NOT_FOUND', 404)
+    const t = p.tables.find((x) => x.phy_tbl_id === b.phy_tbl_id)
+    if (!t) return apiError('NOT_FOUND', 404)
+    const cur = new Map(t.cols.map((c) => [c.phy_col_id, c]))
+    if (b.cols.some((e) => cur.get(e.phy_col_id) && cur.get(e.phy_col_id)!.ver_no !== e.ver_no)) return apiError('VERSION_CONFLICT', 409)
+    const edits = b.cols.map(({ ver_no: _v, ...e }) => ({ ...e, bsc_val_txt: e.bsc_val_txt === '' ? null : e.bsc_val_txt }))
+    const bad = checkColEdits(t.cols, edits, p.mdl.dbms_cd as DbmsCd)
+    if (bad) return apiError(bad, 400)
+    // ponytail: 칼럼별 update(무트랜잭션) — 각 행 ver_no 조건으로 경합 감지, 중간 충돌 시 앞 행은 반영됨(다시 불러와 재시도)
+    const done: string[] = []
+    for (const e of edits) {
+      const o = cur.get(e.phy_col_id)!
+      const { phy_col_id: _id, ...set } = e
+      const r = await db().from('mdl_phy_col').update({ ...set, ver_no: o.ver_no + 1, modr_id: auth.user.usr_id }).eq('phy_col_id', e.phy_col_id).eq('ver_no', o.ver_no).select('phy_col_id')
+      if (r.error) throw r.error
+      if (!r.data.length) return NextResponse.json({ ok: false, code: 'VERSION_CONFLICT', message: errMsg('VERSION_CONFLICT'), done }, { status: 409 })
+      done.push(e.phy_col_id)
+    }
+    await audit({ area_id: areaId, tgt_tp_cd: 'PHY', tgt_id: b.phy_tbl_id, act_cd: 'UPD', bfr_val: edits.map((e) => ({ ...e, bfr: cur.get(e.phy_col_id) && { col_seq: cur.get(e.phy_col_id)!.col_seq, null_yn: cur.get(e.phy_col_id)!.null_yn, bsc_val_txt: cur.get(e.phy_col_id)!.bsc_val_txt } })), aftr_val: edits, usr_id: auth.user.usr_id })
+    return NextResponse.json({ ok: true, updated: done.length })
+  } catch (e) {
+    return dbError(e as { code?: string; message?: string })
   }
 }
 

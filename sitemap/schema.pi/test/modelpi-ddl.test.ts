@@ -73,3 +73,12 @@ test('검증 결함 회귀 : 예약어 이름 이슈, FK 칼럼 쌍 수 불일�
   d.fkOf.set('r3', 'x1') // x1 에 FK 칼럼 2개 → 1개만 짝
   assert.match(genDdl(d, { prjNm: 'p', at: 'now' }), /⚠ FK_TB_CST_RMT_01 : FK 칼럼 2개 중 1개만/)
 })
+
+test('보안 : 프로젝트명 줄바꿈으로 주석 탈출 불가, 예약어 이름은 내려받기 시 경고', () => {
+  const s = genDdl(build('0014', 'LOWER'), { prjNm: `p\nDROP TABLE x; --\r${String.fromCharCode(0x2028)}y`, at: 'now' })
+  assert.ok(!/^DROP TABLE/m.test(s))
+  assert.ok(s.startsWith('-- p DROP TABLE x; -'))
+  const d = build('0014', 'LOWER')
+  d.tables[0] = { ...d.tables[0], tbl_nm: 'USER' }
+  assert.match(genDdl(d, { prjNm: 'p', at: 'now' }), /^-- ⚠ 예약어 이름 USER/m)
+})
