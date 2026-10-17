@@ -2,6 +2,7 @@
 // 분류체계 하단 고정 메뉴 — 모든 분류체계 화면 공통(layout). 현재 화면 강조, 설정·일괄등록은 권한자만(GET /api/areas/[areaId] 의 role)
 //  메뉴 체계(마스터 정의 2026-10-17) :
 //   · 표준사전 묶음 = 표준단어·표준도메인·표준용어·일괄등록 — 가장 기본 기능이라 한 묶음으로 함께 이동
+//   · 모델 묶음 = 개념 모델·논리 모델·물리 모델(마스터 지시 2026-10-17 — 표준사전 묶음처럼 한 묶음)
 //   · 대표도메인 = 표준도메인의 서브 기능 / 개념 모델 = 프로젝트·주제영역·핵심엔터티(같은 화면 ?tab=)·엔터티 분류어(엔터티 등록의 서브 기능)
 //   · 설정 묶음 = 멤버·설정·이력·표준 점검(서브 메뉴). 설정 화면은 SETTINGS 권한자만 → 상위 버튼은 볼 수 있는 첫 서브 화면으로 이동
 //   · 서브 기능은 상위 메뉴 화면에서만 바 위 서브 탭으로 노출, 서브 화면에 있어도 상위 메뉴를 강조
@@ -33,8 +34,8 @@ const CORE: Item[] = [
   { seg: 'bulk', nm: '일괄등록', perm: 'BULK' },
 ]
 
-const REST: Item[] = [
-  { seg: 'approvals', nm: '승인' },
+// 모델 묶음 — 개념 → 논리 → 물리 순서
+const MODEL: Item[] = [
   {
     seg: 'model',
     nm: '개념 모델',
@@ -47,6 +48,10 @@ const REST: Item[] = [
   },
   { seg: 'logical', nm: '논리 모델' },
   { seg: 'physical', nm: '물리 모델' },
+]
+
+const REST: Item[] = [
+  { seg: 'approvals', nm: '승인' },
   { seg: 'erd', nm: 'ERD' },
   { seg: 'reverse', nm: '리버스' },
   { seg: 'forbidden', nm: '금칙어' },
@@ -92,7 +97,7 @@ export default function AreaNav() {
   // 서브 탭 : 같은 화면을 ?tab= 으로 나눈 경우(개념 모델) 탭 값까지 비교 — 탭 없음 = 첫 탭(prj)
   const subOn = (x: { seg: string; tab?: string }) => at(x.seg) && (!x.tab || (curTab ?? 'prj') === x.tab)
   const subHref = (x: { seg: string; tab?: string }) => `${base}/${x.seg}${x.tab ? `?tab=${x.tab}` : ''}`
-  const active = [...CORE, ...REST].find((m) => m.subs && isOn(m))
+  const active = [...CORE, ...MODEL, ...REST].find((m) => m.subs && isOn(m))
 
   const item = (m: Item) => (
     <li key={m.seg}>
@@ -122,6 +127,9 @@ export default function AreaNav() {
       <div className="mx-auto flex max-w-6xl items-center gap-2 overflow-x-auto px-2 py-2 text-sm whitespace-nowrap">
         <ul aria-label="표준사전" className="flex shrink-0 gap-1 rounded-md border border-gray-300 bg-gray-50 p-0.5">
           {visible(CORE).map(item)}
+        </ul>
+        <ul aria-label="모델" className="flex shrink-0 gap-1 rounded-md border border-gray-300 bg-gray-50 p-0.5">
+          {visible(MODEL).map(item)}
         </ul>
         <ul className="flex shrink-0 gap-1">{visible(REST).map(item)}</ul>
       </div>
