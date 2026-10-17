@@ -126,7 +126,7 @@ DA# Modeler5(엔코아, 데스크톱 MFC)를 기준 제품으로 분석해, 같�
 
 관문 추가 : 엔터티 수백 개 렌더 성능 측정, Pi Browser 터치 드래그 실기기 확인
 
-### S4 리버스(4일) — PHY-5
+### S4 리버스(4일) — PHY-5 · ✅ 2026-10-17 완료(R1~R4, `sql/030`, 파서 = 자체 부분집합 결정 — Pi Browser 실기기 미확인)
 
 | ID | 작업 | 완료 기준 |
 |---|---|---|
@@ -152,7 +152,7 @@ DA# Modeler5(엔코아, 데스크톱 MFC)를 기준 제품으로 분석해, 같�
 | S0~S1 | `mdl_attr.src_attr_id` | 역할명 상속의 원천 부모 속성 |
 | S2 | `mdl_phy_mdl`·`mdl_phy_tbl`·`mdl_phy_col`·`mdl_phy_fk`·`mdl_sys_col` | 물리 모델(원천 참조 + 사용자 결정값) |
 | S3 | `mdl_dgm`·`mdl_dgm_ent` | 다이어그램·배치(좌표·고정·순서) — MASTER_ROADMAP ERD-2의 `mdl_ent_pos`를 대체(결정 3 확정, 로드맵 갱신 완료) |
-| S4 | `mdl_rvs_job`·`mdl_rvs_tbl`·`mdl_rvs_col`, `mdl_ent·mdl_attr.rvs_nm`, `mdl_rel.rel_src_cd` | 리버스 스테이징·출처 |
+| S4 | `mdl_rvs_job`·`mdl_rvs_tbl`·`mdl_rvs_col`(2026-10-17 조정 : 출처는 스테이징 행의 ent_id·attr_id·rel_id — 정본 테이블 rvs_nm·rel_src_cd 칼럼 추가 안 함, DA 승인) | 리버스 스테이징·출처 |
 
 ## 7. 제외(웹 구조로 대체되거나 목표 밖)
 
