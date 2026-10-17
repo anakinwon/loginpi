@@ -4,12 +4,14 @@ import { piFetch } from '@pi/auth/client'
 //  상단 : 프로젝트·DBMS·대소문자·삭제 칼럼 선택 → 전환 미리보기(관문 사유·변환 이슈·테이블/칼럼/FK 수) → 전환
 //  아래 : 물리 모델(DBMS별) 선택 → 논리와의 차이(도메인 영향 포함)·DDL·정의서 / 왼쪽 테이블 목록 · 오른쪽 칼럼 그리드(순서·NULL·기본값, 저장 = 테이블 단위 묶음)
 //  엔터티 선택 전환(마스터 지시 2026-10-17) : 작성완료 엔터티만 골라 전환, 테이블 작성완료 → ERD
+//  주제영역 콤보(논리 화면과 선택 공유) : 테이블 목록·단계 패널을 선택한 주제영역 1개로 한정
 //  논리 변경 반영(S5) = 동기화(순서·NULL·기본값 편집 유지) + 변경분 DDL(ALTER) 내려받기. 삭제 후 재전환도 가능(편집값 사라짐)
 import Link from 'next/link'
 import { use, useCallback, useEffect, useMemo, useState } from 'react'
 import { dbmsList, type DbmsCd } from '@/lib/modelpi/dbms'
 import { can, type MbrRole } from '@/lib/roles'
-import StageBar from '../model/stage-bar'
+import StageBar, { type StageData } from '../model/stage-bar'
+import { useSubj } from '../model/use-subj'
 
 interface Col {
   phy_col_id: string
@@ -28,6 +30,7 @@ interface Col {
 }
 interface Tbl {
   phy_tbl_id: string
+  ent_id: string
   tbl_nm: string
   tbl_desc: string | null
   cols: Col[]
@@ -93,6 +96,9 @@ export default function PhysicalPage({ params }: { params: Promise<{ areaId: str
   }, [api, areaId])
 
   const [picked, setPicked] = useState<Set<string>>(new Set()) // 전환할 엔터티
+  const { subjs, subjId, setSubjId } = useSubj(api, prjId)
+  const [entSubj, setEntSubj] = useState<Map<string, string>>(new Map()) // 엔터티 → 주제영역(단계 패널 응답 재사용)
+  const onStage = useCallback((d: StageData) => setEntSubj(new Map(d.ents.map((e) => [e.ent_id, e.subj_id]))), [])
   const [stageRev, setStageRev] = useState(0)
   const pickKey = [...picked].sort().join(',')
   const loadList = useCallback(async () => {
@@ -105,8 +111,8 @@ export default function PhysicalPage({ params }: { params: Promise<{ areaId: str
     setMdlId((cur) => (j.models.some((m: Mdl) => m.phy_mdl_id === cur) ? cur : (j.models[0]?.phy_mdl_id ?? '')))
   }, [base, prjId, dbms, pickKey])
   useEffect(() => {
-    setPicked(new Set()) // 프로젝트·DBMS 가 바뀌면 전환 선택 초기화
-  }, [prjId, dbms])
+    setPicked(new Set()) // 프로젝트·DBMS·주제영역이 바뀌면 전환 선택 초기화(보이지 않는 선택이 남지 않게)
+  }, [prjId, dbms, subjId])
   useEffect(() => {
     void loadList()
     try {
@@ -160,7 +166,8 @@ export default function PhysicalPage({ params }: { params: Promise<{ areaId: str
     setTimeout(() => URL.revokeObjectURL(a.href), 1000) // 일부 WebView 는 즉시 해제 시 내려받기 취소
   }
 
-  const tbl = det?.tables.find((t) => t.phy_tbl_id === tblId)
+  const subjTbls = useMemo(() => (det?.tables ?? []).filter((t) => entSubj.get(t.ent_id) === subjId), [det, entSubj, subjId])
+  const tbl = subjTbls.find((t) => t.phy_tbl_id === tblId) ?? subjTbls[0]
   const rows = useMemo(() => (tbl ? tbl.cols.map((c) => ({ ...c, ...edit.get(c.phy_col_id) })).sort((a, b) => a.col_seq - b.col_seq) : []), [tbl, edit])
   const put = (id: string, v: Partial<Col>) => setEdit((m) => new Map(m).set(id, { ...m.get(id), ...v }))
   const move = (i: number, d: -1 | 1) => {
@@ -230,12 +237,21 @@ export default function PhysicalPage({ params }: { params: Promise<{ areaId: str
         <label className="flex items-center gap-1">
           <input type="checkbox" checked={delCol} onChange={(e) => setDelCol(e.target.checked)} /> 삭제여부·삭제일시 칼럼
         </label>
+        <span className="font-semibold">주제영역</span>
+        <select value={subjId} onChange={(e) => (setSubjId(e.target.value), setEdit(new Map()))} className="rounded border border-white/60 bg-white px-2 py-1 text-gray-900" aria-label="주제영역 선택">
+          {subjs.length === 0 && <option value="">주제영역이 없습니다</option>}
+          {subjs.map((x) => (
+            <option key={x.subj_id} value={x.subj_id}>
+              {x.subj_nm}
+            </option>
+          ))}
+        </select>
         <button type="button" disabled={!canConvert || busy} onClick={() => void convert()} className="ml-auto rounded bg-white px-3 py-1 font-semibold text-[#1f3a68] disabled:opacity-40">
           물리 모델로 전환
         </button>
       </section>
 
-      {prjId && dbms && <StageBar api={api} prjId={prjId} editor={editor} mode="PHY" dbms={dbms} picked={picked} onPick={setPicked} rev={stageRev} onChanged={() => void loadDet()} />}
+      {prjId && dbms && <StageBar api={api} prjId={prjId} editor={editor} mode="PHY" dbms={dbms} picked={picked} onPick={setPicked} subjId={subjId} rev={stageRev} onChanged={() => void loadDet()} onLoad={onStage} />}
       {pv && (
         <section className="mt-3 rounded border p-3 text-sm" aria-label="전환 미리보기">
           <p>
@@ -322,9 +338,10 @@ export default function PhysicalPage({ params }: { params: Promise<{ areaId: str
 
           <div className="mt-3 grid gap-4 md:grid-cols-[16rem_1fr]">
             <ul className="max-h-[32rem] overflow-auto rounded border text-sm" aria-label="테이블 목록">
-              {det.tables.map((t) => (
+              {subjTbls.length === 0 && <li className="px-3 py-2 text-gray-500">이 주제영역에 전환된 테이블이 없습니다</li>}
+              {subjTbls.map((t) => (
                 <li key={t.phy_tbl_id}>
-                  <button type="button" onClick={() => (setTblId(t.phy_tbl_id), setEdit(new Map()))} aria-current={t.phy_tbl_id === tblId} className={`w-full px-3 py-2 text-left font-mono ${t.phy_tbl_id === tblId ? 'bg-[#e9eff9] font-semibold' : 'hover:bg-gray-50'}`}>
+                  <button type="button" onClick={() => (setTblId(t.phy_tbl_id), setEdit(new Map()))} aria-current={t.phy_tbl_id === tbl?.phy_tbl_id} className={`w-full px-3 py-2 text-left font-mono ${t.phy_tbl_id === tbl?.phy_tbl_id ? 'bg-[#e9eff9] font-semibold' : 'hover:bg-gray-50'}`}>
                     {t.tbl_nm}
                     <span className="ml-1 text-xs text-gray-500">({t.cols.length})</span>
                   </button>

@@ -1,6 +1,6 @@
 'use client'
 import { piFetch } from '@pi/auth/client'
-// 단계 상태 패널(마스터 지시 2026-10-17) — 엔터티별 논리 작성중/작성완료, 테이블별 물리 작성중/작성완료(주제영역으로 묶어 표시)
+// 단계 상태 패널(마스터 지시 2026-10-17) — 엔터티별 논리 작성중/작성완료, 테이블별 물리 작성중/작성완료(주제영역으로 묶어 표시, subjId 를 주면 그 주제영역만)
 //  논리 화면(mode LGC) : 엔터티 작성완료·완료 취소(막는 사유 표시), 주제영역 전체 완료·취소
 //  물리 화면(mode PHY) : 전환 선택(작성완료·미전환 엔터티만) + 테이블 작성완료·완료 취소, 주제영역 전체 선택·전체 완료. 완료 = 편집 잠금(DB 트리거)
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -35,8 +35,10 @@ export default function StageBar({
   dbms,
   picked,
   onPick,
+  subjId,
   rev,
   onChanged,
+  onLoad,
 }: {
   api: string
   prjId: string
@@ -45,8 +47,10 @@ export default function StageBar({
   dbms?: string // PHY : 선택 DBMS(그 DBMS 물리 모델 기준)
   picked?: Set<string> // PHY : 전환할 엔터티
   onPick?: (s: Set<string>) => void
+  subjId?: string // 주어지면 이 주제영역 엔터티만 표시
   rev?: unknown // 바뀌면 다시 불러오기(편집 결과 반영)
   onChanged?: () => void // 상태가 바뀐 뒤(화면 갱신용)
+  onLoad?: (d: StageData) => void // 불러온 뒤(화면이 엔터티 → 주제영역 매핑에 사용)
 }) {
   const [d, setD] = useState<StageData | null>(null)
   const [msg, setMsg] = useState('')
@@ -56,7 +60,8 @@ export default function StageBar({
     const j = await (await piFetch(`${api}/projects/${prjId}/stage`)).json()
     if (!j.ok) return setMsg(j.message)
     setD(j)
-  }, [api, prjId])
+    onLoad?.(j)
+  }, [api, prjId, onLoad])
   useEffect(() => {
     void load()
   }, [load, rev])
@@ -65,9 +70,9 @@ export default function StageBar({
   const tblOf = useMemo(() => new Map((phy?.tables ?? []).map((t) => [t.ent_id, t])), [phy])
   const groups = useMemo(() => {
     const g = new Map<string, EntStage[]>()
-    for (const e of d?.ents ?? []) g.set(e.subj_nm, [...(g.get(e.subj_nm) ?? []), e])
+    for (const e of d?.ents ?? []) if (!subjId || e.subj_id === subjId) g.set(e.subj_nm, [...(g.get(e.subj_nm) ?? []), e])
     return [...g.entries()]
-  }, [d])
+  }, [d, subjId])
 
   const post = async (layer: 'LGC' | 'PHY', ids: string[], sts: 'WRT' | 'CMPTN', label: string) => {
     if (!ids.length) return
@@ -176,7 +181,7 @@ export default function StageBar({
           </details>
         )
       })}
-      {!d.ents.length && <p className="mt-1 text-gray-500">엔터티가 없습니다</p>}
+      {!groups.length && <p className="mt-1 text-gray-500">엔터티가 없습니다</p>}
       {msg && (
         <p role="status" className="mt-1 text-xs font-medium text-[#1f3a68]">
           {msg}

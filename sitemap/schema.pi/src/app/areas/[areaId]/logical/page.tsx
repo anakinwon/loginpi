@@ -2,7 +2,7 @@
 import { piFetch } from '@pi/auth/client'
 // 논리 모델 화면(MD3·MD4 1차, 2026-10-17 마스터 지시) — 개념 모델의 핵심 엔터티에서 출발하는 논리 모델링 작업대
 //  상단 : 프로젝트 선택·검증 요약(준수율·PK·필수 4종·고아·FK 누락·정규화 의심)·논리 ERD(Mermaid) 복사·내려받기
-//  왼쪽 : 주제영역별 엔터티(🔑·4종 n/4·속성 수·이슈 배지) / 오른쪽 : 선택 엔터티 — 부모·자식 관계, FK 전파 누락(체크 → 적용), 정규화 의심(적용 = 이동·제거), 속성 패널(개념 모델과 공용)
+//  왼쪽 : 주제영역 콤보(선택한 주제영역 1개, 물리 화면과 선택 공유) + 엔터티(🔑·4종 n/4·속성 수·이슈 배지) / 오른쪽 : 선택 엔터티 — 부모·자식 관계, FK 전파 누락(체크 → 적용), 정규화 의심(적용 = 이동·제거), 속성 패널(개념 모델과 공용)
 //  반자동 : 점검은 저장 없음(GET …/projects/[prjId]/logical), 적용은 속성 API. 이름은 물리 전환 전까지 대문자
 //  편집(sql/026) : 논리 엔터티 추가(LGCL)·엔터티 수정(이름·유형·설명·주제영역·핵심 승격)·삭제(속성·관계 연쇄), 관계 편집 패널(개념 모델 공용)
 import Link from 'next/link'
@@ -12,6 +12,7 @@ import Attrs from '../model/attrs'
 import EntForm from '../model/ent-form'
 import Relations from '../model/relations'
 import StageBar from '../model/stage-bar'
+import { useSubj } from '../model/use-subj'
 
 interface Attr {
   attr_id: string
@@ -105,7 +106,6 @@ export default function LogicalPage({ params }: { params: Promise<{ areaId: stri
   const [rev, setRev] = useState(0) // 속성 패널 새로 그리기
   const [showMmd, setShowMmd] = useState(false)
   const [form, setForm] = useState<'new' | 'edit' | null>(null)
-  const [subjs, setSubjs] = useState<{ subj_id: string; subj_nm: string }[]>([])
   const editor = !!role && can(role, 'REQUEST')
 
   useEffect(() => {
@@ -135,18 +135,17 @@ export default function LogicalPage({ params }: { params: Promise<{ areaId: stri
     } catch {}
   }, [load, prjId, areaId])
 
-  // 엔터티 추가 폼의 주제영역 선택지 = 프로젝트 주제영역 전체(엔터티가 없는 주제영역 포함)
-  useEffect(() => {
-    if (!prjId) return setSubjs([])
-    piFetch(`${api}/subjects`)
-      .then((r) => r.json())
-      .then((j) => j.ok && setSubjs(j.items.filter((s: { prj_id: string }) => s.prj_id === prjId)))
-  }, [api, prjId])
+  // 주제영역 선택지 = 프로젝트 주제영역 전체(엔터티가 없는 주제영역 포함, 엔터티 추가 폼과 공용)
+  const { subjs, subjId, setSubjId } = useSubj(api, prjId)
 
   const chkBy = useMemo(() => new Map((m?.checks ?? []).map((c) => [c.ent_id, c])), [m])
   const entBy = useMemo(() => new Map((m?.ents ?? []).map((e) => [e.ent_id, e])), [m])
-  const subjects = useMemo(() => [...new Set((m?.ents ?? []).map((e) => e.subj_nm))], [m])
+  const subjEnts = useMemo(() => (m?.ents ?? []).filter((e) => e.subj_id === subjId), [m, subjId])
   const cur = sel ? entBy.get(sel) : undefined
+  // 선택 엔터티가 다른 주제영역이면(수정으로 주제영역 이동·새 엔터티 등록) 콤보를 따라 바꿈
+  useEffect(() => {
+    if (cur && cur.subj_id !== subjId) setSubjId(cur.subj_id)
+  }, [cur, subjId, setSubjId])
   const refresh = () => (setRev((v) => v + 1), void load())
 
   const applyGaps = async (gaps: Gap[]) => {
@@ -237,8 +236,9 @@ export default function LogicalPage({ params }: { params: Promise<{ areaId: stri
     URL.revokeObjectURL(a.href)
   }
 
-  const gaps = (m?.fkGaps ?? []).filter((g) => !sel || g.chld_ent_id === sel)
-  const iss = (m?.issues ?? []).filter((i) => !sel || i.ent_id === sel)
+  const inSubj = new Set(subjEnts.map((e) => e.ent_id))
+  const gaps = (m?.fkGaps ?? []).filter((g) => (sel ? g.chld_ent_id === sel : inSubj.has(g.chld_ent_id)))
+  const iss = (m?.issues ?? []).filter((i) => (sel ? i.ent_id === sel : inSubj.has(i.ent_id)))
   const s = m?.summary
 
   return (
@@ -283,7 +283,7 @@ export default function LogicalPage({ params }: { params: Promise<{ areaId: stri
           </span>
         )}
       </div>
-      {prjId && <StageBar api={api} prjId={prjId} editor={editor} mode="LGC" rev={m} onChanged={() => void load()} />}
+      {prjId && <StageBar api={api} prjId={prjId} editor={editor} mode="LGC" subjId={subjId} rev={m} onChanged={() => void load()} />}
       {showMmd && m && <textarea readOnly value={m.mermaid} rows={10} className="mt-2 w-full rounded border p-2 font-mono text-xs" aria-label="Mermaid 텍스트" />}
       {msg && (
         <p role="status" className="mt-2 text-sm font-medium text-[#1f3a68]">
@@ -324,37 +324,41 @@ export default function LogicalPage({ params }: { params: Promise<{ areaId: stri
                 ＋ 엔터티 추가
               </button>
             )}
+            <select value={subjId} onChange={(e) => (setSubjId(e.target.value), setSel(null), setForm(null))} className="w-full rounded border px-2 py-1" aria-label="주제영역 선택">
+              {subjs.length === 0 && <option value="">주제영역이 없습니다(개념 모델에서 등록)</option>}
+              {subjs.map((x) => (
+                <option key={x.subj_id} value={x.subj_id}>
+                  {x.subj_nm}({(m.ents ?? []).filter((e) => e.subj_id === x.subj_id).length})
+                </option>
+              ))}
+            </select>
             <button type="button" onClick={() => setSel(null)} className={`w-full rounded px-2 py-1 text-left ${!sel ? 'bg-[#1f3a68] text-white' : 'hover:bg-[#e9eff9]'}`}>
-              전체 엔터티({m.ents.length})
+              주제영역 엔터티 전체({subjEnts.length})
             </button>
-            {subjects.map((sn) => (
-              <div key={sn}>
-                <p className="px-1 text-xs font-semibold text-gray-500">{sn}</p>
-                {m.ents
-                  .filter((e) => e.subj_nm === sn)
-                  .map((e) => {
-                    const c = chkBy.get(e.ent_id)
-                    return (
-                      <button key={e.ent_id} type="button" onClick={() => setSel(e.ent_id)} className={`flex w-full items-center gap-1 rounded px-2 py-1 text-left ${sel === e.ent_id ? 'bg-[#1f3a68] text-white' : 'hover:bg-[#e9eff9]'}`}>
-                        <span className="min-w-0 flex-1 truncate">{e.ent_log_nm}</span>
-                        {e.mdl_lvl_cd === 'LGCL' && (
-                          <span className="rounded bg-purple-100 px-1 text-[0.65rem] text-purple-800" title="논리 모델에서 추가한 엔터티">
-                            논리
-                          </span>
-                        )}
-                        <span title="주식별자">{c?.pk ? '🔑' : '⚠'}</span>
-                        <span className={`rounded px-1 text-[0.65rem] ${c?.must === 4 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-700'}`} title="필수 4종">
-                          {c?.must}/4
-                        </span>
-                        <span className="text-[0.65rem] opacity-70" title="속성 수">
-                          {e.attrs.length}
-                        </span>
-                        {!!c && c.fk_missing + c.issues > 0 && <span className="rounded bg-amber-200 px-1 text-[0.65rem] text-amber-900">{c.fk_missing + c.issues}</span>}
-                      </button>
-                    )
-                  })}
-              </div>
-            ))}
+            <div>
+              {subjEnts.length === 0 && <p className="px-1 text-xs text-gray-500">이 주제영역에 엔터티가 없습니다</p>}
+              {subjEnts.map((e) => {
+                const c = chkBy.get(e.ent_id)
+                return (
+                  <button key={e.ent_id} type="button" onClick={() => setSel(e.ent_id)} className={`flex w-full items-center gap-1 rounded px-2 py-1 text-left ${sel === e.ent_id ? 'bg-[#1f3a68] text-white' : 'hover:bg-[#e9eff9]'}`}>
+                    <span className="min-w-0 flex-1 truncate">{e.ent_log_nm}</span>
+                    {e.mdl_lvl_cd === 'LGCL' && (
+                      <span className="rounded bg-purple-100 px-1 text-[0.65rem] text-purple-800" title="논리 모델에서 추가한 엔터티">
+                        논리
+                      </span>
+                    )}
+                    <span title="주식별자">{c?.pk ? '🔑' : '⚠'}</span>
+                    <span className={`rounded px-1 text-[0.65rem] ${c?.must === 4 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-700'}`} title="필수 4종">
+                      {c?.must}/4
+                    </span>
+                    <span className="text-[0.65rem] opacity-70" title="속성 수">
+                      {e.attrs.length}
+                    </span>
+                    {!!c && c.fk_missing + c.issues > 0 && <span className="rounded bg-amber-200 px-1 text-[0.65rem] text-amber-900">{c.fk_missing + c.issues}</span>}
+                  </button>
+                )
+              })}
+            </div>
           </aside>
 
           <section className="space-y-4">
