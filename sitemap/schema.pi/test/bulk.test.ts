@@ -1,7 +1,7 @@
 // 일괄등록 순수 함수 검사 — 실행 : pnpm test
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { domTpByGrp, markCrossBatchDup, mapHeader, parseCsv, parseMoisDomName, resultsCsv, splitChn, splitList, toInt } from '../src/lib/bulk.ts'
+import { domTpByGrp, guessDomGroup, markCrossBatchDup, mapHeader, parseCsv, parseMoisDomName, resultsCsv, splitChn, splitList, toInt } from '../src/lib/bulk.ts'
 
 test('CSV : BOM·따옴표 안 쉼표·줄바꿈·"" 이스케이프·CRLF·빈 줄', () => {
   const rows = parseCsv('﻿a,b\r\n"x,1","줄\n바꿈"\r\n\r\n"따""옴",\n')
@@ -28,6 +28,12 @@ test('행안부 도메인명 분해', () => {
 
 test('도메인유형·목록·숫자·결과 CSV', () => {
   assert.deepEqual(['번호', '코드', '금액'].map(domTpByGrp), ['NO', 'CD', 'GNRL'])
+  const G = [
+    { dom_grp_nm: '금액', dom_grp_desc: '행안부 공통표준도메인 그룹 : 금액·가격·비용·요금' },
+    { dom_grp_nm: '번호', dom_grp_desc: '행안부 공통표준도메인 그룹 : 번호·일련번호·등록번호류' },
+    { dom_grp_nm: '코드', dom_grp_desc: '행안부 공통표준도메인 그룹 : 코드·여부·유무' },
+  ]
+  assert.deepEqual(['금액', '가격', '등록번호', '여부', '사업자번호', '내용'].map((k) => guessDomGroup(k, G)?.dom_grp_nm ?? null), ['금액', '금액', '번호', '코드', '번호', null])
   assert.deepEqual(splitList(' 간접생산비, 공통비용,,간접생산비'), ['간접생산비', '공통비용'])
   assert.deepEqual([toInt(''), toInt('15'), toInt('1.5')], [null, 15, NaN])
   assert.equal(resultsCsv([{ row_no: 2, status: 'ERR', name: 'a,b', code: 'X' }]), '﻿행,판정,이름,코드,내용\r\n2,ERR,"a,b",X,')

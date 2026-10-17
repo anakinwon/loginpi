@@ -133,6 +133,13 @@ export function parseMoisDomName(nm: string): { key: string; tp: string; len: nu
 // 도메인유형 : 그룹 번호 → NO, 코드 → CD, 그 외 → GNRL(2026-10-15 마스터 결정 D8)
 export const domTpByGrp = (grp: string) => (grp === '번호' ? 'NO' : grp === '코드' ? 'CD' : 'GNRL')
 
+// 대표도메인명 → 도메인그룹 추정(등록 폼 자동 선택, 2026-10-18) — ① 그룹명 = 대표도메인명 ② 그룹 설명의 구성 목록('… : 금액·가격·비용·요금', 끝 '류' 무시)에 있음
+// ③ 대표도메인명이 그룹명으로 끝남(일련번호 → 번호). 못 찾으면 null(사용자가 고름)
+export function guessDomGroup<G extends { dom_grp_nm: string; dom_grp_desc?: string | null }>(key: string, groups: G[]): G | null {
+  const members = (g: G) => (g.dom_grp_desc?.split(':').pop() ?? '').split(/[·,]/).map((m) => m.trim().replace(/류$/, '')).filter(Boolean)
+  return groups.find((g) => g.dom_grp_nm === key) ?? groups.find((g) => members(g).includes(key)) ?? groups.find((g) => key.endsWith(g.dom_grp_nm)) ?? null
+}
+
 export const isDiscarded = (rev: string) => rev === '폐기'
 
 // 숫자 칸 : 빈 값 → null, 정수 아님 → NaN

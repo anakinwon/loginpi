@@ -3,6 +3,7 @@ import { piFetch } from '@pi/auth/client'
 // 표준도메인 조회·등록·수정·삭제(클라이언트) — /api/areas/[areaId]/domains(목록·등록·상태 필터), /domains/[domId](수정·삭제, ver_no), /name-preview, /api/types
 import { useCallback, useEffect, useState } from 'react'
 import { can, type MbrRole } from '@/lib/roles'
+import { domTpByGrp, guessDomGroup } from '@/lib/bulk'
 import { ActorCells, ApvFields, ApvLink, SeCell, SeFilter, SeSelect, StsCell, StsFilter, confirmSave, noEnterSubmit } from '../words/word-board'
 
 interface Domain {
@@ -55,7 +56,8 @@ export default function DomainBoard({ areaId }: { areaId: string }) {
   const base = `/api/areas/${areaId}/domains`
   const [domains, setDomains] = useState<Domain[]>([])
   const [types, setTypes] = useState<LgcType[]>([])
-  const [groups, setGroups] = useState<{ dom_grp_id: string; dom_grp_nm: string }[]>([])
+  const [groups, setGroups] = useState<{ dom_grp_id: string; dom_grp_nm: string; dom_grp_desc?: string | null }[]>([])
+  const [autoMsg, setAutoMsg] = useState('') // 대표도메인 선택 시 자동 선택 결과 안내
   // 대표도메인명 선택지 = 속성 분류어(도메인 사용) 표준단어
   const [keyWords, setKeyWords] = useState<{ dic_id: string; dic_log_nm: string; dic_phy_nm: string }[]>([])
   const [q, setQ] = useState('')
@@ -123,14 +125,33 @@ export default function DomainBoard({ areaId }: { areaId: string }) {
   }, [form.key_dom_nm, form.lgc_tp_cd, form.data_len, form.data_scale, base, edit])
 
   const set = (k: Field) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setForm({ ...form, [k]: e.target.value })
+  // 대표도메인 선택 → 도메인그룹·유형 자동 선택(마스터 지시 2026-10-18). 그룹 = ① 같은 대표도메인의 기존 도메인에서 가장 많이 쓴 그룹
+  // ② 없으면 그룹명·그룹 설명 구성 목록으로 추정(guessDomGroup). 유형 = 그룹명 기준(번호 → 번호, 코드 → 코드, 그 외 일반 : '세 유형의 의미'). 못 찾으면 그대로 두고 사용자가 고름
+  const pickKey = async (key: string) => {
+    setForm((f) => ({ ...f, key_dom_nm: key }))
+    setAutoMsg('')
+    if (!key) return
+    const j = await (await piFetch(`${base}?${new URLSearchParams({ q: key, size: '100' })}`)).json()
+    const same: Domain[] = j.ok ? j.domains.filter((d: Domain) => d.key_dom_nm === key && d.dom_grp_id) : []
+    const cnt = new Map<string, number>()
+    for (const d of same) cnt.set(d.dom_grp_id as string, (cnt.get(d.dom_grp_id as string) ?? 0) + 1)
+    const top = [...cnt].sort((a, b) => b[1] - a[1])[0]?.[0]
+    const g = (top && groups.find((x) => x.dom_grp_id === top)) || guessDomGroup(key, groups)
+    if (!g) return setAutoMsg('도메인그룹을 찾지 못했습니다 : 직접 고르십시오')
+    const tp = domTpByGrp(g.dom_grp_nm)
+    setForm((f) => (f.key_dom_nm === key ? { ...f, dom_grp_id: g.dom_grp_id, dom_tp_cd: tp } : f))
+    setAutoMsg(`자동 선택 : 그룹 ${g.dom_grp_nm} · 유형 ${TP_NM[tp] ?? tp}${g.dom_grp_id === top ? ` (같은 대표도메인 도메인 ${cnt.get(top)}건 기준)` : ' (그룹 이름 기준)'} — 바꿀 수 있습니다`)
+  }
   const reset = () => {
     setRsn('')
     setForm(EMPTY)
     setEdit(null)
+    setAutoMsg('')
     setPreview(null)
   }
   const startEdit = (d: Domain) => {
     setEdit(d)
+    setAutoMsg('')
     setForm(Object.fromEntries(Object.keys(EMPTY).map((k) => [k, String(d[k as keyof Domain] ?? '')])) as typeof EMPTY)
     setMsg('')
     window.scrollTo({ top: 0, behavior: 'smooth' }) // 등록·수정 영역이 목록 위에 있음
@@ -203,15 +224,6 @@ export default function DomainBoard({ areaId }: { areaId: string }) {
             </table>
           </details>
           <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-4 [&_input]:border-[#b8c6e0] [&_input]:bg-white [&_input]:focus:outline-[#3b5f9e] [&_select]:border-[#b8c6e0] [&_select]:bg-white [&_select]:focus:outline-[#3b5f9e]">
-            <select value={form.key_dom_nm} onChange={set('key_dom_nm')} className="w-full rounded border px-3 py-2" required aria-label="대표도메인명">
-              <option value="">대표도메인명 선택(필수, 지정된 대표도메인)</option>
-              {edit && !keyWords.some((w) => w.dic_log_nm === edit.key_dom_nm) && <option value={edit.key_dom_nm}>{edit.key_dom_nm} (지정된 대표도메인 아님)</option>}
-              {keyWords.map((w) => (
-                <option key={w.dic_id} value={w.dic_log_nm}>
-                  {w.dic_log_nm} ({w.dic_phy_nm})
-                </option>
-              ))}
-            </select>
             <div>
               <select value={form.dom_tp_cd} onChange={set('dom_tp_cd')} className="w-full rounded border px-3 py-2" aria-label="도메인 유형" title={tpTitle(form.dom_tp_cd)}>
                 {Object.entries(TP_NM).map(([v, n]) => (
@@ -235,6 +247,18 @@ export default function DomainBoard({ areaId }: { areaId: string }) {
                 </option>
               ))}
             </select>
+            <div>
+              <select value={form.key_dom_nm} onChange={(e) => void pickKey(e.target.value)} className="w-full rounded border px-3 py-2" required aria-label="대표도메인명">
+                <option value="">대표도메인명 선택(필수, 지정된 대표도메인)</option>
+                {edit && !keyWords.some((w) => w.dic_log_nm === edit.key_dom_nm) && <option value={edit.key_dom_nm}>{edit.key_dom_nm} (지정된 대표도메인 아님)</option>}
+                {keyWords.map((w) => (
+                  <option key={w.dic_id} value={w.dic_log_nm}>
+                    {w.dic_log_nm} ({w.dic_phy_nm})
+                  </option>
+                ))}
+              </select>
+              {autoMsg && <p className="mt-1 text-xs leading-snug text-[#1f3a68]">{autoMsg}</p>}
+            </div>
             <select value={form.lgc_tp_cd} onChange={set('lgc_tp_cd')} className="w-full rounded border px-3 py-2" required aria-label="논리 데이터타입">
               <option value="">논리 데이터타입 선택(필수)</option>
               {types.map((t) => (
