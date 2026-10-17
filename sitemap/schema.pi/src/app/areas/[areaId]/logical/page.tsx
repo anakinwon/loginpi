@@ -4,10 +4,13 @@ import { piFetch } from '@pi/auth/client'
 //  상단 : 프로젝트 선택·검증 요약(준수율·PK·필수 4종·고아·FK 누락·정규화 의심)·논리 ERD(Mermaid) 복사·내려받기
 //  왼쪽 : 주제영역별 엔터티(🔑·4종 n/4·속성 수·이슈 배지) / 오른쪽 : 선택 엔터티 — 부모·자식 관계, FK 전파 누락(체크 → 적용), 정규화 의심(적용 = 이동·제거), 속성 패널(개념 모델과 공용)
 //  반자동 : 점검은 저장 없음(GET …/projects/[prjId]/logical), 적용은 속성 API. 이름은 물리 전환 전까지 대문자
+//  편집(sql/026) : 논리 엔터티 추가(LGCL)·엔터티 수정(이름·유형·설명·주제영역·핵심 승격)·삭제(속성·관계 연쇄), 관계 편집 패널(개념 모델 공용)
 import Link from 'next/link'
 import { use, useCallback, useEffect, useMemo, useState } from 'react'
 import { can, type MbrRole } from '@/lib/roles'
 import Attrs from '../model/attrs'
+import EntForm from '../model/ent-form'
+import Relations from '../model/relations'
 
 interface Attr {
   attr_id: string
@@ -28,6 +31,11 @@ interface Ent {
   ent_tp_cd: string
   subj_nm: string
   attrs: Attr[]
+  subj_id: string
+  mdl_lvl_cd: string
+  ent_desc: string | null
+  dic_ids: string[]
+  ver_no: number
 }
 interface Rel {
   rel_id: string
@@ -93,6 +101,8 @@ export default function LogicalPage({ params }: { params: Promise<{ areaId: stri
   const [msg, setMsg] = useState('')
   const [rev, setRev] = useState(0) // 속성 패널 새로 그리기
   const [showMmd, setShowMmd] = useState(false)
+  const [form, setForm] = useState<'new' | 'edit' | null>(null)
+  const [subjs, setSubjs] = useState<{ subj_id: string; subj_nm: string }[]>([])
   const editor = !!role && can(role, 'REQUEST')
 
   useEffect(() => {
@@ -121,6 +131,14 @@ export default function LogicalPage({ params }: { params: Promise<{ areaId: stri
       if (prjId) window.localStorage.setItem(`logical-prj-${areaId}`, prjId)
     } catch {}
   }, [load, prjId, areaId])
+
+  // 엔터티 추가 폼의 주제영역 선택지 = 프로젝트 주제영역 전체(엔터티가 없는 주제영역 포함)
+  useEffect(() => {
+    if (!prjId) return setSubjs([])
+    piFetch(`${api}/subjects`)
+      .then((r) => r.json())
+      .then((j) => j.ok && setSubjs(j.items.filter((s: { prj_id: string }) => s.prj_id === prjId)))
+  }, [api, prjId])
 
   const chkBy = useMemo(() => new Map((m?.checks ?? []).map((c) => [c.ent_id, c])), [m])
   const entBy = useMemo(() => new Map((m?.ents ?? []).map((e) => [e.ent_id, e])), [m])
@@ -161,6 +179,23 @@ export default function LogicalPage({ params }: { params: Promise<{ areaId: stri
     const d = await (await piFetch(`${api}/entities/${e.ent_id}/attributes/${a.attr_id}?ver_no=${a.ver_no}`, { method: 'DELETE' })).json()
     setBusy(false)
     setMsg(d.ok ? `${a.term_log_nm} ${ACT_NM[i.action]} 완료` : d.message)
+    refresh()
+  }
+  const delEnt = async (e: Ent) => {
+    const nr = (m?.rels ?? []).filter((r) => r.prnt_ent_id === e.ent_id || r.chld_ent_id === e.ent_id).length
+    if (!confirm(`엔터티 ${e.ent_log_nm} 을(를) 삭제하시겠습니까? 속성 ${e.attrs.length}건·관계 ${nr}건도 함께 삭제됩니다(논리 삭제).`)) return
+    const j = await (await piFetch(`${api}/entities/${e.ent_id}?ver_no=${e.ver_no}`, { method: 'DELETE' })).json()
+    setMsg(j.ok ? `엔터티 ${e.ent_log_nm} 삭제 완료` : j.message)
+    if (j.ok) {
+      setSel(null)
+      setForm(null)
+      refresh()
+    }
+  }
+  const formDone = (id: string, t: string) => {
+    setMsg(t)
+    setForm(null)
+    setSel(id)
     refresh()
   }
   const copyMmd = async () => {
@@ -249,6 +284,11 @@ export default function LogicalPage({ params }: { params: Promise<{ areaId: stri
       {m && (
         <div className="mt-4 grid gap-4 md:grid-cols-[18rem_1fr]">
           <aside className="space-y-3 rounded-xl border border-[#c7d2e6] bg-white p-3 text-sm shadow-sm" aria-label="엔터티 목록">
+            {editor && (
+              <button type="button" onClick={() => setForm(form === 'new' ? null : 'new')} className="btn-3d w-full px-2 py-1">
+                ＋ 엔터티 추가
+              </button>
+            )}
             <button type="button" onClick={() => setSel(null)} className={`w-full rounded px-2 py-1 text-left ${!sel ? 'bg-[#1f3a68] text-white' : 'hover:bg-[#e9eff9]'}`}>
               전체 엔터티({m.ents.length})
             </button>
@@ -262,6 +302,11 @@ export default function LogicalPage({ params }: { params: Promise<{ areaId: stri
                     return (
                       <button key={e.ent_id} type="button" onClick={() => setSel(e.ent_id)} className={`flex w-full items-center gap-1 rounded px-2 py-1 text-left ${sel === e.ent_id ? 'bg-[#1f3a68] text-white' : 'hover:bg-[#e9eff9]'}`}>
                         <span className="min-w-0 flex-1 truncate">{e.ent_log_nm}</span>
+                        {e.mdl_lvl_cd === 'LGCL' && (
+                          <span className="rounded bg-purple-100 px-1 text-[0.65rem] text-purple-800" title="논리 모델에서 추가한 엔터티">
+                            논리
+                          </span>
+                        )}
                         <span title="주식별자">{c?.pk ? '🔑' : '⚠'}</span>
                         <span className={`rounded px-1 text-[0.65rem] ${c?.must === 4 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-700'}`} title="필수 4종">
                           {c?.must}/4
@@ -278,11 +323,25 @@ export default function LogicalPage({ params }: { params: Promise<{ areaId: stri
           </aside>
 
           <section className="space-y-4">
+            {form === 'new' && <EntForm key="new" api={api} areaId={areaId} subjs={subjs} onDone={formDone} onCancel={() => setForm(null)} />}
+            {form === 'edit' && cur && <EntForm key={`edit-${cur.ent_id}-${cur.ver_no}`} api={api} areaId={areaId} subjs={subjs} init={cur} onDone={formDone} onCancel={() => setForm(null)} />}
             {cur && (
               <div className="rounded-xl border border-[#c7d2e6] bg-white p-4 text-sm shadow-sm">
-                <h2 className="text-lg font-bold">
+                <h2 className="flex flex-wrap items-center gap-2 text-lg font-bold">
                   {cur.ent_log_nm} <span className="font-mono text-sm text-[#1f3a68]">{cur.tbl_phy_nm}</span>
+                  <span className={`rounded px-1.5 text-xs font-normal ${cur.mdl_lvl_cd === 'LGCL' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'}`}>{cur.mdl_lvl_cd === 'LGCL' ? '논리 엔터티' : '핵심 엔터티'}</span>
+                  {editor && (
+                    <span className="ml-auto flex gap-2 text-xs font-normal">
+                      <button type="button" onClick={() => setForm(form === 'edit' ? null : 'edit')} className="rounded border border-[#1f3a68] px-2 py-0.5 text-[#1f3a68]">
+                        엔터티 수정
+                      </button>
+                      <button type="button" onClick={() => void delEnt(cur)} className="rounded border border-red-700 px-2 py-0.5 text-red-700">
+                        삭제
+                      </button>
+                    </span>
+                  )}
                 </h2>
+                {cur.ent_desc && <p className="mt-1 text-xs text-gray-600">{cur.ent_desc}</p>}
                 <ul className="mt-2 space-y-0.5 text-xs text-gray-700">
                   {m.rels
                     .filter((r) => r.chld_ent_id === cur.ent_id || r.prnt_ent_id === cur.ent_id)
@@ -300,7 +359,7 @@ export default function LogicalPage({ params }: { params: Promise<{ areaId: stri
                         </li>
                       )
                     })}
-                  {!m.rels.some((r) => r.chld_ent_id === cur.ent_id || r.prnt_ent_id === cur.ent_id) && <li className="text-amber-700">관계가 없습니다(고아 엔터티) — 개념 모델 핵심엔터티 화면에서 관계를 등록하십시오</li>}
+                  {!m.rels.some((r) => r.chld_ent_id === cur.ent_id || r.prnt_ent_id === cur.ent_id) && <li className="text-amber-700">관계가 없습니다(고아 엔터티) — 아래 관계 편집에서 등록하십시오</li>}
                 </ul>
               </div>
             )}
@@ -369,6 +428,12 @@ export default function LogicalPage({ params }: { params: Promise<{ areaId: stri
             )}
           </section>
         </div>
+      )}
+      {m && prjId && (
+        <section className="mt-6" aria-label="관계 편집">
+          <h3 className="mb-1 font-semibold text-[#1f3a68]">관계 편집 — 핵심·논리 엔터티 전체</h3>
+          <Relations api={api} prjId={prjId} editor={editor} entsKey={m.ents.length} onSaved={refresh} />
+        </section>
       )}
     </main>
   )

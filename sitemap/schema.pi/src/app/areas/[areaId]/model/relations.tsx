@@ -2,6 +2,7 @@
 import { piFetch } from '@pi/auth/client'
 // 엔터티 관계 화면(PRD §2.5 MD1 잔여) — 선택 프로젝트의 관계 목록·등록·수정·삭제. 부모·자식 = 프로젝트 엔터티 선택, 카디널리티·식별·선택성, IE 표기 미리보기
 // 규칙 위반(N:M·자기참조 식별, 식별+부모 선택)은 입력 중 표시·등록 버튼 비활성(서버가 같은 규칙으로 재검증)
+// 엔터티 선택지 = 핵심·논리 단계 전체(sql/026, 논리 엔터티도 관계 대상), onSaved = 등록·수정·삭제 뒤 호출(논리 화면 점검 새로 고침)
 // 업종 추천 관계(반자동) : 프로젝트 업종 템플릿 관계 중 양쪽 엔터티가 등록된 것 → 칩을 누르면 폼만 채움(저장은 등록 버튼)
 import { useCallback, useEffect, useState } from 'react'
 import { CRDN, relError, relNotation } from '@/lib/model-rel'
@@ -42,7 +43,7 @@ const F0 = { prnt_ent_id: '', chld_ent_id: '', rel_nm: '', crdn_cd: '1N', idnt_y
 const RULE_MSG: Record<string, string> = { REL_NM_IDNT: 'N:M 관계는 식별 불가', REL_SELF_IDNT: '자기참조는 식별 불가', REL_IDNT_OPT: '식별 관계는 부모 필수' }
 const SIZE = 20
 
-export default function Relations({ api, prjId, editor, entsKey }: { api: string; prjId: string; editor: boolean; entsKey: unknown }) {
+export default function Relations({ api, prjId, editor, entsKey, onSaved }: { api: string; prjId: string; editor: boolean; entsKey: unknown; onSaved?: () => void }) {
   const [opts, setOpts] = useState<EntOpt[]>([])
   const [rels, setRels] = useState<Rel[]>([])
   const [total, setTotal] = useState(0)
@@ -54,7 +55,7 @@ export default function Relations({ api, prjId, editor, entsKey }: { api: string
 
   // 프로젝트 엔터티 선택지(엔터티 등록·삭제 시 다시 조회)
   useEffect(() => {
-    piFetch(`${api}/entities?${new URLSearchParams({ prj: prjId, size: '1000' })}`)
+    piFetch(`${api}/entities?${new URLSearchParams({ prj: prjId, lvl: 'ALL', size: '1000' })}`)
       .then((r) => r.json())
       .then((j) => j.ok && setOpts(j.items))
   }, [api, prjId, entsKey])
@@ -93,6 +94,7 @@ export default function Relations({ api, prjId, editor, entsKey }: { api: string
       setF(F0)
       setEdit(null)
       load()
+      onSaved?.()
     }
   }
   const startEdit = (x: Rel) => {
@@ -104,7 +106,10 @@ export default function Relations({ api, prjId, editor, entsKey }: { api: string
     if (!confirm(`관계 ${x.prnt.ent_log_nm} → ${x.chld.ent_log_nm} 을(를) 삭제하시겠습니까?`)) return
     const j = await (await piFetch(`${api}/relations/${x.rel_id}?ver_no=${x.ver_no}`, { method: 'DELETE' })).json()
     setMsg(j.ok ? '관계를 삭제했습니다' : j.message)
-    if (j.ok) load()
+    if (j.ok) {
+      load()
+      onSaved?.()
+    }
   }
   const sel = (k: 'prnt_ent_id' | 'chld_ent_id', label: string) => (
     <label className="flex flex-col gap-1">

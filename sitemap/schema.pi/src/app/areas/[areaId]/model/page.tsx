@@ -41,6 +41,7 @@ interface Ent {
   too_long: boolean
   words: { dic_log_nm: string; ok: boolean }[]
   mdl_subj: { subj_nm: string; subj_abbr_nm: string }
+  mdl_lvl_cd: string
   regr_nm?: string | null
   reg_dtm: string
 }
@@ -134,6 +135,8 @@ export default function ModelPage({ params, searchParams }: { params: Promise<{ 
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
   const [ef, setEf] = useState({ name: '', tp: 'BASE', desc: '' })
+  // 논리 모델에서 추가한 엔터티(LGCL, sql/026)까지 보기 — 기본 = 핵심 엔터티만
+  const [withLg, setWithLg] = useState(false)
   const [cands, setCands] = useState<Cand[]>([])
   const [pick, setPick] = useState(0)
   const [msg, setMsg] = useState('')
@@ -278,13 +281,14 @@ FK ${d.fk}
       size: '20',
       prj: prj.prj_id,
       ...(sel ? { subj: sel.subj_id } : {}),
+      ...(withLg ? { lvl: 'ALL' } : {}),
     })
     const j = await (await piFetch(`${api}/entities?${sp}`)).json()
     if (j.ok) {
       setEnts(j.items)
       setTotal(j.total)
     }
-  }, [api, sel, page, prj])
+  }, [api, sel, page, prj, withLg])
   useEffect(() => {
     loadEnt()
   }, [loadEnt])
@@ -490,7 +494,7 @@ FK ${d.fk}
     loadEnt()
   }
   const delEnt = async (x: Ent) => {
-    if (!confirm(`엔터티 '${x.ent_log_nm}'을(를) 삭제하시겠습니까?`)) return
+    if (!confirm(`엔터티 '${x.ent_log_nm}'을(를) 삭제하시겠습니까? 속성·관계도 함께 삭제됩니다(논리 삭제).`)) return
     const j = await (
       await piFetch(`${api}/entities/${x.ent_id}?ver_no=${x.ver_no}`, {
         method: 'DELETE',
@@ -1088,6 +1092,9 @@ FK ${d.fk}
                 </fieldset>
               </form>
 
+              <label className="mb-1 flex items-center justify-end gap-1 text-xs text-gray-600">
+                <input type="checkbox" checked={withLg} onChange={() => (setWithLg(!withLg), setPage(1))} /> 논리 엔터티 포함(논리 모델에서 추가)
+              </label>
               <table className="w-full border-collapse text-[0.7rem] [&_.text-xs]:text-[0.6rem] [&_td]:whitespace-nowrap">
                 <thead>
                   <tr className="thead-3d text-center">
@@ -1111,6 +1118,7 @@ FK ${d.fk}
                         <td className="border px-2 py-1 text-center text-gray-500 tabular-nums">{(page - 1) * 20 + i + 1}</td>
                         <td className="border px-2 py-1 font-medium" title={x.words.map((w) => w.dic_log_nm).join('+')}>
                           {x.ent_log_nm}
+                          {x.mdl_lvl_cd === 'LGCL' && <span className="ml-1 rounded bg-purple-100 px-1 text-purple-800">논리</span>}
                           {x.words.some((w) => !w.ok) && <span className="ml-1 text-red-700">(구성 단어 미확정)</span>}
                         </td>
                         <td className="border px-2 py-1 font-mono text-[#1f3a68]">
