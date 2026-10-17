@@ -40,6 +40,7 @@ test('역할명 상속은 원천으로 인정, 자기참조는 계획 없음', (
   const role = at({ term_id: 't-발신고객번호', fk_rel_id: 'r1', src_attr_id: 'p1', esntl_yn: 'Y' })
   assert.deepEqual(fkPlan(rel(), pk, [role]), [])
   assert.deepEqual(fkPlan(rel({ chld_ent_id: 'P', prnt_opt_yn: 'Y' }), pk, []), [])
+  assert.deepEqual(fkPlan(rel({ crdn_cd: 'NM' }), pk, []), [], 'N:M 은 해소 전 상속 없음')
 })
 
 test('역할명 상속 필요 : 자기참조·다른 관계로 상속된 같은 용어·비식별인데 자식 자체 PK', async () => {

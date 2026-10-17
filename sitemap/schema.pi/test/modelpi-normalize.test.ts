@@ -85,3 +85,11 @@ test('FK 누락 : 같은 용어가 다른 관계로 이미 상속되면 역할�
   const g = checkLogical([cust, o2], [R('ra', 'cust', 'o2'), R('rb', 'cust', 'o2')]).fkGaps
   assert.deepEqual(g.map((x) => [x.rel_id, x.role]), [['rb', true]])
 })
+
+test('N:M 관계 : 상속 점검 없이 해소 필요(split) 이슈로 통과 막음', () => {
+  const r = checkLogical([cust, ord], [R('rn', 'cust', 'ord', { crdn_cd: 'NM', prnt_opt_yn: 'Y' })])
+  assert.equal(r.fkGaps.length, 0)
+  const i = r.issues.find((x) => /N:M/.test(x.msg))!
+  assert.equal(i.action, 'split')
+  assert.equal(r.checks.find((c) => c.ent_id === 'ord')!.pass, false)
+})

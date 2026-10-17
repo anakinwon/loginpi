@@ -4,6 +4,7 @@
 
 export interface FkRelIn {
   rel_id: string
+  crdn_cd?: string // NM 이면 상속 계획 없음(교차 엔터티로 해소한 뒤 상속, S1 L3)
   prnt_ent_id: string
   chld_ent_id: string
   idnt_yn: string
@@ -31,7 +32,7 @@ export type FkStep =
 export const fkWant = (r: Pick<FkRelIn, 'idnt_yn' | 'prnt_opt_yn'>) => ({ pk: r.idnt_yn === 'Y', esntl: r.idnt_yn === 'Y' || r.prnt_opt_yn !== 'Y' })
 
 export function fkPlan(rel: FkRelIn, parentPk: FkPkIn[], child: FkChildIn[]): FkStep[] {
-  if (rel.prnt_ent_id === rel.chld_ent_id) return []
+  if (rel.prnt_ent_id === rel.chld_ent_id || rel.crdn_cd === 'NM') return []
   const w = fkWant(rel)
   const steps: FkStep[] = []
   for (const k of parentPk) {
@@ -64,6 +65,7 @@ export interface FkNeed {
   reason: 'SELF' | 'OTHER_REL' | 'OWN_PK'
 }
 export function fkNeeds(rel: FkRelIn, parentPk: FkPkIn[], child: FkChildIn[]): FkNeed[] {
+  if (rel.crdn_cd === 'NM') return []
   const w = fkWant(rel)
   const out: FkNeed[] = []
   for (const k of parentPk) {

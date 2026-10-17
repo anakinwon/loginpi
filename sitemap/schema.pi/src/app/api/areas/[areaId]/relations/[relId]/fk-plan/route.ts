@@ -5,22 +5,12 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { db } from '@/lib/db'
 import { apiError, audit, dbError, parseBody, requireAreaRole } from '@/lib/api'
-import { listAttrs, nextSeq } from '@/lib/model-attr'
-import { fkNeeds, fkPlan, fkWant, type FkChildIn, type FkRelIn, type FkStep } from '@/lib/modelpi/fk'
+import { nextSeq } from '@/lib/model-attr'
+import { applyFkSteps, fkState } from '@/lib/model-fk'
+import { fkWant } from '@/lib/modelpi/fk'
 
 type Ctx = { params: Promise<{ areaId: string; relId: string }> }
-type ARow = FkChildIn & { ver_no: number; pk_seq: number | null; std_term: { term_log_nm: string } | null }
-
-async function plan(areaId: string, relId: string) {
-  const r = await db().from('mdl_rel').select('rel_id, prnt_ent_id, chld_ent_id, idnt_yn, prnt_opt_yn, rel_nm').eq('rel_id', relId).eq('area_id', areaId).eq('del_yn', 'N').maybeSingle()
-  if (r.error) throw r.error
-  if (!r.data) return null
-  const rel = r.data as FkRelIn & { rel_nm: string | null }
-  const [pa, ca] = await Promise.all([listAttrs(areaId, rel.prnt_ent_id), listAttrs(areaId, rel.chld_ent_id)])
-  const prnt = (pa as unknown as ARow[]).filter((a) => a.pk_yn === 'Y').map((a) => ({ attr_id: a.attr_id, term_id: a.term_id, term_log_nm: a.std_term?.term_log_nm ?? '' }))
-  const child = ca as unknown as ARow[]
-  return { rel, child, steps: fkPlan(rel, prnt, child), needs: fkNeeds(rel, prnt, child), no_pk: prnt.length === 0, self: rel.prnt_ent_id === rel.chld_ent_id }
-}
+const plan = fkState
 
 export async function GET(_req: Request, { params }: Ctx) {
   const { areaId, relId } = await params
@@ -54,32 +44,7 @@ export async function POST(req: Request, { params }: Ctx) {
     const pick = b.src_attr_ids || b.roles ? new Set(b.src_attr_ids ?? []) : null
     const steps = p.steps.filter((s) => !pick || pick.has(s.src_attr_id))
     const uid = auth.user.usr_id
-    const done: FkStep[] = []
-    const fail: { term_log_nm: string; reason: string }[] = []
-    for (const s of steps) {
-      if (s.kind === 'add') {
-        const seq = await nextSeq(p.rel.chld_ent_id)
-        const row = { area_id: areaId, ent_id: p.rel.chld_ent_id, term_id: s.term_id, attr_seq: seq.attr, pk_yn: s.pk ? 'Y' : 'N', pk_seq: s.pk ? seq.pk : null, esntl_yn: s.pk || s.esntl ? 'Y' : 'N', fk_rel_id: relId, src_attr_id: s.src_attr_id, regr_id: uid, modr_id: uid }
-        const { data, error } = await db().from('mdl_attr').insert(row).select('attr_id').single()
-        if (error) {
-          fail.push({ term_log_nm: s.term_log_nm, reason: error.code === '23505' ? 'ATTR_DUP' : (error.code ?? 'DB') })
-          continue
-        }
-        await audit({ area_id: areaId, tgt_tp_cd: 'ATTR', tgt_id: data.attr_id, act_cd: 'INS', aftr_val: { ...row, fk_plan: 'add' }, usr_id: uid })
-      } else {
-        const cur = p.child.find((a) => a.attr_id === s.attr_id)
-        if (!cur) continue
-        const pkSeq = s.pk ? (cur.pk_seq ?? (await nextSeq(p.rel.chld_ent_id)).pk) : null
-        const set = { fk_rel_id: relId, src_attr_id: s.src_attr_id, pk_yn: s.pk ? 'Y' : 'N', pk_seq: pkSeq, esntl_yn: s.pk || s.esntl ? 'Y' : 'N', ver_no: cur.ver_no + 1, modr_id: uid }
-        const { data, error } = await db().from('mdl_attr').update(set).eq('attr_id', s.attr_id).eq('ver_no', cur.ver_no).eq('del_yn', 'N').select('attr_id')
-        if (error || !data.length) {
-          fail.push({ term_log_nm: s.term_log_nm, reason: error ? (error.code ?? 'DB') : 'VERSION_CONFLICT' })
-          continue
-        }
-        await audit({ area_id: areaId, tgt_tp_cd: 'ATTR', tgt_id: s.attr_id, act_cd: 'UPD', bfr_val: cur, aftr_val: { ...cur, ...set, fk_plan: s.kind }, usr_id: uid })
-      }
-      done.push(s)
-    }
+    const { done, fail } = await applyFkSteps(areaId, p, steps, uid)
     // 역할명 상속 : 필요한 원천(needs)만, 승인완료 용어(같은 분류체계), 관계가 요구하는 PK·필수
     let roled = 0
     const need = new Set(p.needs.map((n) => n.src_attr_id))

@@ -53,6 +53,34 @@ export default function Relations({ api, prjId, editor, entsKey, onSaved }: { ap
   // 역할명 상속 패널(S1 L2) : FK 계획에서 같은 용어로 상속할 수 없는 식별자 → 역할 용어 선택 후 적용
   const [roleNeed, setRoleNeed] = useState<{ relId: string; title: string; items: Need[] } | null>(null)
   const [rolePick, setRolePick] = useState<Record<string, Term | null>>({})
+  // N:M 해소 패널(S1 L3) : 교차 엔터티 이름 후보(GET …/resolve-nm) → 선택 → 생성·식별 관계 2개·N:M 삭제·FK 상속(POST)
+  type NmCand = { nm: string; dic_ids: string[]; tbl_phy_nm: string; ok: boolean; missing_words: string[]; rule_error: string | null; dup: boolean }
+  const [nmP, setNmP] = useState<{ relId: string; prnt: string; chld: string; rel_nm: string | null; cands: NmCand[]; pick: number } | null>(null)
+  const [nmBusy, setNmBusy] = useState(false)
+  const openNm = async (x: Rel) => {
+    const j = await (await piFetch(`${api}/relations/${x.rel_id}/resolve-nm`)).json().catch(() => null)
+    if (!j?.ok) return setMsg(j?.message ?? 'N:M 해소 후보를 불러오지 못했습니다')
+    setRoleNeed(null)
+    setNmP({ relId: x.rel_id, prnt: j.prnt, chld: j.chld, rel_nm: j.rel_nm, cands: j.cands, pick: Math.max(0, j.cands.findIndex((c: NmCand) => c.ok)) })
+  }
+  const applyNm = async () => {
+    const c = nmP?.cands[nmP.pick]
+    if (!nmP || !c?.ok || !confirm(`N:M 관계(${nmP.prnt} ↔ ${nmP.chld})를 교차 엔터티 '${c.nm}'로 해소합니다.\n\n· 교차 엔터티(논리) 생성\n· ${nmP.prnt}·${nmP.chld} → ${c.nm} 식별 관계 2개\n· 원래 N:M 관계 삭제\n· 두 부모 주식별자를 교차 엔터티 주식별자로 상속\n\n진행하시겠습니까?`)) return
+    setNmBusy(true)
+    const j = await (await piFetch(`${api}/relations/${nmP.relId}/resolve-nm`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ dic_ids: c.dic_ids }) })).json()
+    setNmBusy(false)
+    const warn = j.ok && !j.partial ? [j.no_pk ? '부모에 주식별자가 없어 교차 엔터티 식별자를 직접 지정하십시오' : '', j.needs?.length ? '두 부모 식별자 용어가 같아 역할명 상속이 필요합니다(아래 패널)' : ''].filter(Boolean).join(' · ') : ''
+    setMsg(!j.ok ? j.message : j.partial ? j.message : `N:M 해소 완료 : 교차 엔터티 ${j.ent_log_nm}·식별 관계 ${j.rel_ids.length}개·FK ${j.fk_applied}건${j.fail?.length ? ` · 실패 ${j.fail.map((f: { term_log_nm: string; reason: string }) => `${f.term_log_nm}(${f.reason})`).join(', ')}` : ''}${warn ? ` · ⚠ ${warn}` : ''}`)
+    if (j.ok && j.needs?.length) {
+      setRolePick({})
+      setRoleNeed({ relId: j.needs[0].rel_id, title: 'N:M 해소', items: j.needs[0].items })
+    }
+    if (j.ok) {
+      setNmP(null)
+      load()
+      onSaved?.()
+    }
+  }
   const [opts, setOpts] = useState<EntOpt[]>([])
   const [rels, setRels] = useState<Rel[]>([])
   const [total, setTotal] = useState(0)
@@ -230,6 +258,33 @@ export default function Relations({ api, prjId, editor, entsKey, onSaved }: { ap
         </form>
       )}
       {msg && <p className="text-sm text-blue-800">{msg}</p>}
+      {nmP && editor && (
+        <div className="space-y-2 rounded border border-purple-300 bg-purple-50 p-3 text-xs" aria-label="N:M 해소">
+          <p className="font-semibold text-purple-900">
+            N:M 해소 — {nmP.prnt} ↔ {nmP.chld}
+            {nmP.rel_nm ? ` (${nmP.rel_nm})` : ''} : 교차 엔터티 이름을 고르십시오(표준단어 조합, 빨강 = 등록 불가)
+          </p>
+          {nmP.cands.map((c, i) => (
+            <label key={c.nm} className={`flex flex-wrap items-center gap-2 ${c.ok ? '' : 'text-red-700'}`}>
+              <input type="radio" disabled={!c.ok} checked={nmP.pick === i} onChange={() => setNmP({ ...nmP, pick: i })} />
+              <b>{c.nm}</b>
+              {c.ok && <span className="font-mono text-[#1f3a68]">{c.tbl_phy_nm}</span>}
+              {c.missing_words.length > 0 && <span>미등록 단어 : {c.missing_words.join(', ')}</span>}
+              {c.dup && <span>같은 이름의 엔터티 있음</span>}
+              {c.rule_error && <span>{c.rule_error}</span>}
+            </label>
+          ))}
+          {!nmP.cands.some((c) => c.ok) && <p className="text-red-700">등록 가능한 후보가 없습니다 — 표준단어를 신청하거나 논리 모델에서 엔터티를 직접 추가한 뒤 관계를 바꾸십시오</p>}
+          <div className="flex gap-2">
+            <button type="button" onClick={() => void applyNm()} disabled={nmBusy || !nmP.cands[nmP.pick]?.ok} className="btn-3d px-4 py-0.5 disabled:opacity-40">
+              {nmBusy ? '해소 중…' : '교차 엔터티로 해소'}
+            </button>
+            <button type="button" onClick={() => setNmP(null)} className="underline">
+              닫기
+            </button>
+          </div>
+        </div>
+      )}
       {roleNeed && editor && (
         <div className="space-y-2 rounded border border-amber-300 bg-amber-50 p-3 text-xs" aria-label="역할명 상속">
           <p className="font-semibold text-amber-900">역할명 상속 — 같은 용어로 상속할 수 없는 부모 식별자 : 역할 용어(승인 표준용어)를 고르십시오</p>
@@ -293,9 +348,15 @@ export default function Relations({ api, prjId, editor, entsKey, onSaved }: { ap
                       <button onClick={() => startEdit(x)} className="mr-2 text-blue-700 underline">
                         수정
                       </button>
-                      <button onClick={() => void fkFlow(x.rel_id, `관계 ${x.prnt.ent_log_nm} → ${x.chld.ent_log_nm}`)} className="mr-2 text-blue-700 underline" title="부모 식별자 상속(FK) 다시 점검">
-                        FK
-                      </button>
+                      {x.crdn_cd === 'NM' ? (
+                        <button onClick={() => void openNm(x)} className="mr-2 text-purple-700 underline" title="교차 엔터티 + 식별 관계 2개로 해소">
+                          N:M 해소
+                        </button>
+                      ) : (
+                        <button onClick={() => void fkFlow(x.rel_id, `관계 ${x.prnt.ent_log_nm} → ${x.chld.ent_log_nm}`)} className="mr-2 text-blue-700 underline" title="부모 식별자 상속(FK) 다시 점검">
+                          FK
+                        </button>
+                      )}
                       <button onClick={() => del(x)} className="text-red-700 underline">
                         삭제
                       </button>

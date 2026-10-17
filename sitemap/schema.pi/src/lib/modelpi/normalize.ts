@@ -78,6 +78,11 @@ export function checkLogical(ents: LEnt[], rels: LRel[]) {
   for (const r of rels) {
     const p = byId.get(r.prnt_ent_id), c = byId.get(r.chld_ent_id)
     if (!p || !c) continue
+    // N:M : 물리 전환 전 교차 엔터티 + 식별 관계 2개로 해소해야 함(상속 점검 대상 아님, S1 L3) — 통과를 막는 split 이슈
+    if (r.crdn_cd === 'NM') {
+      issues.push({ kind: 'KEY', ent_id: c.ent_id, attr_ids: [], msg: `N:M 관계(${p.ent_log_nm} ↔ ${c.ent_log_nm}${r.rel_nm ? ` · ${r.rel_nm}` : ''}) : 교차 엔터티로 해소하십시오(관계 편집의 N:M 해소)`, action: 'split' })
+      continue
+    }
     const ppk = pkOf(p)
     const roles = new Set(c.attrs.filter((a) => a.fk_rel_id === r.rel_id && a.src_attr_id).map((a) => a.src_attr_id as string))
     if (p.ent_id === c.ent_id) {
