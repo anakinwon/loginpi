@@ -54,6 +54,8 @@ test('분류 : 조회·쓰기·트랜잭션 제어', () => {
   for (const t of ["SELECT query_to_xml('SELECT pg_terminate_backend(1)', true, true, '')", "SELECT * FROM cursor_to_xml('c', 1, true, true, '')"]) assert.equal(k(t), 'WRITE', t)
   for (const t of ["SELECT DBMS_LOCK.SLEEP(1) FROM DUAL", 'SELECT hr.pkg.fn(1) FROM DUAL', 'SELECT "APP"."F"(1) FROM DUAL']) assert.equal(k(t, 'ORA'), 'WRITE', t)
   assert.equal(k('SELECT t.a, NVL(t.b, 0) FROM s.t t', 'ORA'), 'READ') // 칼럼 참조·내장 함수는 조회
+  assert.equal(k("SELECT COUNT(*), TO_CHAR(SYSDATE, 'YYYY') FROM t WHERE a IN (1, 2) AND EXISTS (SELECT 1 FROM u)", 'ORA'), 'READ')
+  for (const t of ['SELECT my_fn(1) FROM DUAL', 'SELECT * FROM t@remote_link', 'SELECT * FROM TABLE(pipe_fn())']) assert.equal(k(t, 'ORA'), 'WRITE', t) // 허용 목록 밖 = 쓰기
   // Oracle 은 주석 중첩 없음 — 첫 */ 뒤는 코드
   assert.deepEqual(txts('SELECT 1 /* a /* b */ FROM DUAL; SELECT 2 FROM DUAL', 'ORA'), ['SELECT 1 /* a /* b */ FROM DUAL', 'SELECT 2 FROM DUAL'])
   assert.equal(k('EXPLAIN PLAN FOR SELECT 1 FROM DUAL', 'ORA'), 'WRITE')
