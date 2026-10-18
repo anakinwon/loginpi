@@ -9,13 +9,17 @@ import { piFetch } from '@pi/auth/client'
 //  편집 뒤 다시 불러올 때 저장 안 한 드래그 위치는 유지
 //  관계선 위치 조정(마스터 지시 2026-10-18) : 선을 누르면 끝점 2개(박스 변 따라 이동·변 바꾸기)·꺾임점 1개(가운데 선 이동) 손잡이, 두 번 누르면 자동으로.
 //   자동 = 가까운 변 + 같은 변에 모인 선 고르게 나눔(modelpi/edge-geo.ts). 옮긴 선만 배치 저장 때 함께 저장(sql/034 mdl_dgm_rel)
+//  인쇄(마스터 지시 2026-10-18) : 툴바 용지·방향 + '페이지 가이드' = 캔버스에 100% 크기 페이지 경계 점선(쪽 번호). 🖨 인쇄 = 미리보기(body 직속 포털)
+//   — 화면 그림(.react-flow__viewport)을 복사해 쪽마다 위치만 바꿔 그림 : '한 장에 맞춤' 또는 '가이드대로 나눔(엔터티 없는 쪽 제외)', @page 용지 지정, 인쇄 때 미리보기 밖은 숨김
 import '@xyflow/react/dist/style.css'
-import { Background, BaseEdge, Controls, EdgeLabelRenderer, getSmoothStepPath, Handle, MiniMap, Position, ReactFlow, ReactFlowProvider, useNodesState, useReactFlow, type Edge, type EdgeProps, type Node, type NodeProps } from '@xyflow/react'
+import { Background, BaseEdge, Controls, EdgeLabelRenderer, getSmoothStepPath, Handle, MiniMap, Position, ReactFlow, ReactFlowProvider, useNodesState, useReactFlow, ViewportPortal, type Edge, type EdgeProps, type Node, type NodeProps } from '@xyflow/react'
 import Link from 'next/link'
 import { use, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { dbmsList } from '@/lib/modelpi/dbms'
 import { autoLayout, boxSize } from '@/lib/modelpi/layout'
 import { autoAnchors, project, sidePoint, type Box, type Pt, type RelLyt, type Side } from '@/lib/modelpi/edge-geo'
+import { fitView as printFit, pageGrid, PAPER, printArea, type Orient } from '@/lib/modelpi/print'
 import { can, type MbrRole } from '@/lib/roles'
 import Attrs from '../model/attrs'
 import EntForm from '../model/ent-form'
@@ -157,6 +161,31 @@ function RelEdge({ id, data, markerStart, markerEnd, style, label, labelStyle, s
 }
 const edgeTypes = { rel: RelEdge }
 
+// IE 표기 마커 정의 — pf = id 접두어(화면 '' / 인쇄 미리보기 'p')
+const markers = (pf: string) => (
+    <svg width="0" height="0" className="absolute" aria-hidden>
+      <defs>
+        {/* IE 표기 — 끝점(엔터티 쪽)에 그림, 시작 표식은 auto-start-reverse 로 뒤집힘 */}
+        <marker id={`${pf}ie-one`} viewBox="0 0 20 20" refX="20" refY="10" markerWidth="20" markerHeight="20" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+          <path d="M14 3 L14 17" stroke="#475569" strokeWidth="1.6" fill="none" />
+        </marker>
+        <marker id={`${pf}ie-zero-one`} viewBox="0 0 24 20" refX="24" refY="10" markerWidth="24" markerHeight="20" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+          <circle cx="7" cy="10" r="4" stroke="#475569" strokeWidth="1.4" fill="white" />
+          <path d="M18 3 L18 17" stroke="#475569" strokeWidth="1.6" fill="none" />
+        </marker>
+        <marker id={`${pf}ie-one-many`} viewBox="0 0 24 20" refX="24" refY="10" markerWidth="24" markerHeight="20" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+          <path d="M8 3 L8 17 M12 10 L24 2 M12 10 L24 18 M12 10 L24 10" stroke="#475569" strokeWidth="1.4" fill="none" />
+        </marker>
+        <marker id={`${pf}ie-zero-many`} viewBox="0 0 26 20" refX="26" refY="10" markerWidth="26" markerHeight="20" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+          <circle cx="6" cy="10" r="4" stroke="#475569" strokeWidth="1.4" fill="white" />
+          <path d="M14 10 L26 2 M14 10 L26 18 M14 10 L26 10" stroke="#475569" strokeWidth="1.4" fill="none" />
+        </marker>
+      </defs>
+    </svg>
+)
+const TITLE_H = 34 // 인쇄 쪽 제목 줄
+const FOOT_H = 16 // 인쇄 쪽 범례 줄
+
 function Erd({ areaId }: { areaId: string }) {
   const api = `/api/areas/${areaId}`
   const flow = useReactFlow()
@@ -177,6 +206,9 @@ function Erd({ areaId }: { areaId: string }) {
   const [nodes, setNodes, onNodesChange] = useNodesState<ENode>([])
   const [sel, setSel] = useState<string | null>(null)
   const [selRel, setSelRel] = useState<string | null>(null) // 선택된 관계선
+  const [pr, setPr] = useState({ paper: 'A3', orient: 'landscape' as Orient, margin: 10, title: true, guide: false, mode: 'fit' as 'fit' | 'pages' }) // 인쇄 설정
+  const [shot, setShot] = useState<string | null>(null) // 인쇄 미리보기(화면 그림 복사본) — null = 닫힘
+  const canvasRef = useRef<HTMLDivElement>(null)
   const [lyt, setLyt] = useState<Record<string, RelLyt>>({}) // 사용자가 옮긴 관계선(없으면 자동)
   const [dirty, setDirty] = useState(false)
   const [undo, setUndo] = useState<Record<string, { x: number; y: number }> | null>(null)
@@ -393,6 +425,26 @@ function Erd({ areaId }: { areaId: string }) {
     const { w, h } = sizeOf(n.data.ent, lvl, phy)
     void flow.setCenter(n.position.x + w / 2, n.position.y + h / 2, { zoom: 1.1, duration: 300 })
   }
+  // 인쇄 — 쪽 크기(여백 뺀 인쇄 영역)·내용 영역(제목·범례 줄 뺌)·페이지 나눔
+  const page = useMemo(() => {
+    const a = printArea(pr.paper, pr.orient, pr.margin)
+    const ch = a.h - (pr.title ? TITLE_H + FOOT_H : 0)
+    return { ...a, cw: a.w, ch, grid: pageGrid([...geo.boxes.values()], a.w, ch) }
+  }, [pr, geo])
+  const openPrint = () => {
+    setSel(null)
+    setSelRel(null)
+    setForm(null)
+    // 선택 해제가 그려진 뒤 화면 그림 복사(가이드·손잡이 제외, 마커 id 를 인쇄용 접두로)
+    setTimeout(() => {
+      const vp = canvasRef.current?.querySelector('.react-flow__viewport')
+      if (!vp) return
+      const c = vp.cloneNode(true) as HTMLElement
+      c.querySelectorAll('.react-flow__viewport-portal, .react-flow__edgelabel-renderer').forEach((x) => x.remove())
+      setShot(c.innerHTML.replace(/url\((['"]?)#ie-/g, 'url($1#pie-'))
+    }, 80)
+  }
+  const sheets = pr.mode === 'fit' ? [{ no: 1, t: printFit([...geo.boxes.values()], page.cw, page.ch) }] : page.grid.tiles.map((t) => ({ no: t.no, t: { x: -(page.grid.x0 + t.c * page.cw), y: -(page.grid.y0 + t.r * page.ch), zoom: 1 } }))
   const selEnt = ents.find((e) => e.ent_id === sel)
   const selRelObj = rels.find((r) => r.rel_id === selRel)
   const entNm = (id: string) => { const e = ents.find((x) => x.ent_id === id); return e ? (phy ? e.tbl_phy_nm : e.ent_log_nm) : '' }
@@ -412,25 +464,7 @@ function Erd({ areaId }: { areaId: string }) {
         ← 분류체계 목록
       </Link>
       <h1 className="mt-1 text-2xl font-bold">ERD</h1>
-      <svg width="0" height="0" className="absolute" aria-hidden>
-        <defs>
-          {/* IE 표기 — 끝점(엔터티 쪽)에 그림, 시작 표식은 auto-start-reverse 로 뒤집힘 */}
-          <marker id="ie-one" viewBox="0 0 20 20" refX="20" refY="10" markerWidth="20" markerHeight="20" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
-            <path d="M14 3 L14 17" stroke="#475569" strokeWidth="1.6" fill="none" />
-          </marker>
-          <marker id="ie-zero-one" viewBox="0 0 24 20" refX="24" refY="10" markerWidth="24" markerHeight="20" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
-            <circle cx="7" cy="10" r="4" stroke="#475569" strokeWidth="1.4" fill="white" />
-            <path d="M18 3 L18 17" stroke="#475569" strokeWidth="1.6" fill="none" />
-          </marker>
-          <marker id="ie-one-many" viewBox="0 0 24 20" refX="24" refY="10" markerWidth="24" markerHeight="20" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
-            <path d="M8 3 L8 17 M12 10 L24 2 M12 10 L24 18 M12 10 L24 10" stroke="#475569" strokeWidth="1.4" fill="none" />
-          </marker>
-          <marker id="ie-zero-many" viewBox="0 0 26 20" refX="26" refY="10" markerWidth="26" markerHeight="20" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
-            <circle cx="6" cy="10" r="4" stroke="#475569" strokeWidth="1.4" fill="white" />
-            <path d="M14 10 L26 2 M14 10 L26 18 M14 10 L26 10" stroke="#475569" strokeWidth="1.4" fill="none" />
-          </marker>
-        </defs>
-      </svg>
+      {markers('')}
 
       <section className="mt-3 flex flex-wrap items-center gap-2 rounded-xl border border-[#c7d2e6] bg-gradient-to-r from-[#1f3a68] to-[#3b5f9e] px-4 py-2 text-sm text-white shadow-md" aria-label="ERD 설정">
         <select value={prjId} onChange={(e) => (setPrjId(e.target.value), setSubj(''), setPhyId(''), setPhyModels(null), setSel(null))} className={sel2} aria-label="프로젝트 선택">
@@ -481,6 +515,23 @@ function Erd({ areaId }: { areaId: string }) {
           </button>
           <button type="button" className={btn} disabled={!undo} onClick={revert}>
             되돌리기
+          </button>
+          <select value={pr.paper} onChange={(e) => setPr({ ...pr, paper: e.target.value, guide: true })} className={sel2} aria-label="인쇄 용지">
+            {Object.keys(PAPER).map((k) => (
+              <option key={k} value={k}>
+                {k}
+              </option>
+            ))}
+          </select>
+          <select value={pr.orient} onChange={(e) => setPr({ ...pr, orient: e.target.value as Orient, guide: true })} className={sel2} aria-label="인쇄 방향">
+            <option value="landscape">가로</option>
+            <option value="portrait">세로</option>
+          </select>
+          <label className="flex items-center gap-1" title="100% 크기 인쇄 쪽 경계를 점선으로 표시">
+            <input type="checkbox" checked={pr.guide} onChange={(e) => setPr({ ...pr, guide: e.target.checked })} /> 페이지 가이드
+          </label>
+          <button type="button" className={btn} disabled={!nodes.length} onClick={openPrint} title="인쇄 미리보기 — 한 장에 맞춤 또는 가이드대로 나눠 인쇄(PDF 저장은 인쇄 창의 'PDF로 저장')">
+            🖨 인쇄
           </button>
           {editor && (
             <button type="button" className="rounded bg-white px-3 py-1 font-semibold text-[#1f3a68] disabled:opacity-40" disabled={!dirty || busy || !nodes.length} onClick={() => void save()}>
@@ -544,7 +595,7 @@ function Erd({ areaId }: { areaId: string }) {
           {!ents.length && <p className="p-3 text-gray-500">엔터티가 없습니다(논리 모델에서 등록)</p>}
         </nav>
 
-        <div className="rounded border" aria-label="ERD 캔버스">
+        <div ref={canvasRef} className="rounded border" aria-label="ERD 캔버스">
           <ReactFlow
             nodes={nodes}
             edges={edges}
@@ -562,6 +613,19 @@ function Erd({ areaId }: { areaId: string }) {
             proOptions={{ hideAttribution: false }}
           >
             <Background gap={20} size={1} />
+            {pr.guide && (
+              <ViewportPortal>
+                {Array.from({ length: page.grid.rows * page.grid.cols }, (_, i) => {
+                  const c = i % page.grid.cols, r = Math.floor(i / page.grid.cols)
+                  const t = page.grid.tiles.find((x) => x.c === c && x.r === r)
+                  return (
+                    <div key={i} className="pointer-events-none absolute border-2 border-dashed border-sky-500/70" style={{ left: page.grid.x0 + c * page.cw, top: page.grid.y0 + r * page.ch, width: page.cw, height: page.ch }}>
+                      <span className="absolute top-1 left-2 text-xs font-semibold text-sky-600/80">{t ? `${t.no}쪽` : '(빈 쪽 — 인쇄 안 함)'} · {pr.paper} {pr.orient === 'landscape' ? '가로' : '세로'}</span>
+                    </div>
+                  )
+                })}
+              </ViewportPortal>
+            )}
             <Controls showInteractive={false} />
             <MiniMap pannable zoomable nodeColor={(n) => (TP_COLOR[(n.data as EntData).ent.ent_tp_cd] ?? TP_COLOR.BASE).border} />
           </ReactFlow>
@@ -662,6 +726,81 @@ function Erd({ areaId }: { areaId: string }) {
           <Relations api={api} prjId={prjId} editor={editor} entsKey={ents.length} onSaved={refresh} />
         </details>
       )}
+      {shot !== null &&
+        createPortal(
+          <div id="erd-print-root" className="fixed inset-0 z-[1000] overflow-auto bg-gray-300 p-4">
+            <style>{`@page { size: ${pr.paper === 'Letter' ? 'letter' : pr.paper} ${pr.orient}; margin: ${pr.margin}mm }
+@media print {
+  body > *:not(#erd-print-root) { display: none !important }
+  #erd-print-root { position: static !important; overflow: visible !important; background: #fff !important; padding: 0 !important }
+  #erd-print-root .no-print { display: none !important }
+  .erd-page { margin: 0 !important; box-shadow: none !important; break-after: page }
+  .erd-page:last-child { break-after: auto }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact }
+}`}</style>
+            {markers('p')}
+            <div className="no-print mx-auto mb-3 flex max-w-5xl flex-wrap items-center gap-2 rounded-xl bg-gradient-to-r from-[#1f3a68] to-[#3b5f9e] px-4 py-2 text-sm text-white shadow" aria-label="인쇄 설정">
+              <strong className="mr-1">인쇄 설정</strong>
+              <select value={pr.paper} onChange={(e) => setPr({ ...pr, paper: e.target.value })} className={sel2} aria-label="용지">
+                {Object.keys(PAPER).map((k) => (
+                  <option key={k} value={k}>
+                    {k}
+                  </option>
+                ))}
+              </select>
+              <select value={pr.orient} onChange={(e) => setPr({ ...pr, orient: e.target.value as Orient })} className={sel2} aria-label="방향">
+                <option value="landscape">가로</option>
+                <option value="portrait">세로</option>
+              </select>
+              <select value={pr.margin} onChange={(e) => setPr({ ...pr, margin: Number(e.target.value) })} className={sel2} aria-label="여백">
+                {[5, 10, 15, 20].map((m) => (
+                  <option key={m} value={m}>
+                    여백 {m}mm
+                  </option>
+                ))}
+              </select>
+              <select value={pr.mode} onChange={(e) => setPr({ ...pr, mode: e.target.value as 'fit' | 'pages' })} className={sel2} aria-label="배율">
+                <option value="fit">한 장에 맞춤</option>
+                <option value="pages">가이드대로 나눔(100%, {page.grid.tiles.length}쪽)</option>
+              </select>
+              <label className="flex items-center gap-1">
+                <input type="checkbox" checked={pr.title} onChange={(e) => setPr({ ...pr, title: e.target.checked })} /> 제목·범례
+              </label>
+              <span className="ml-auto flex gap-2">
+                <button type="button" className="rounded bg-white px-3 py-1 font-semibold text-[#1f3a68]" onClick={() => window.print()}>
+                  인쇄 ({sheets.length}쪽)
+                </button>
+                <button type="button" className={btn} onClick={() => setShot(null)}>
+                  닫기
+                </button>
+              </span>
+            </div>
+            {sheets.map((sh) => (
+              <div key={sh.no} className="erd-page mx-auto mb-4 flex flex-col overflow-hidden bg-white shadow-lg" style={{ width: page.w, height: page.h }}>
+                {pr.title && (
+                  <div className="flex shrink-0 items-end justify-between border-b-2 border-[#1f3a68] px-3 text-xs" style={{ height: TITLE_H }}>
+                    <span className="pb-1">
+                      <strong className="text-base text-[#1f3a68]">ERD — {prjSubjs.find((x) => x.subj_id === subj)?.subj_nm ?? ''}</strong>
+                      <span className="ml-2 text-gray-600">{prjs.find((x) => x.prj_id === prjId)?.prj_nm}</span>
+                    </span>
+                    <span className="pb-1 text-gray-600">
+                      {LVL_NM[lvl]} · {phy ? '물리명' : '논리명'} · 출력 {new Date().toLocaleDateString('sv-SE')} · {sh.no} / {sheets.length}쪽
+                    </span>
+                  </div>
+                )}
+                <div className="react-flow relative min-h-0 flex-1 overflow-hidden">
+                  <div className="react-flow__viewport" style={{ position: 'absolute', transform: `translate(${sh.t.x}px, ${sh.t.y}px) scale(${sh.t.zoom})` }} dangerouslySetInnerHTML={{ __html: shot }} />
+                </div>
+                {pr.title && (
+                  <div className="shrink-0 border-t px-3 text-[10px] leading-4 text-gray-500" style={{ height: FOOT_H }}>
+                    실선 = 식별 관계 · 점선 = 비식별 관계 · 까마귀발 = 여러 건 · ○ = 선택 · 🔑 주식별자 · ↗ 상속(FK) · * 필수
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>,
+          document.body,
+        )}
     </main>
   )
 }
