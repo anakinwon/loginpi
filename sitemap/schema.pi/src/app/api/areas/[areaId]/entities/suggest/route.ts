@@ -17,7 +17,7 @@ export async function GET(req: Request, { params }: Ctx) {
   const sp = new URL(req.url).searchParams
   const subjId = sp.get('subj') ?? ''
   const useAi = sp.get('ai') === '1'
-  const auth = await requireAreaRole(areaId, useAi ? 'REQUEST' : 'VIEW')
+  const auth = await requireAreaRole(areaId, useAi ? 'MODEL_EDIT' : 'MODEL_VIEW')
   if (auth instanceof NextResponse) return auth
   if (!z.string().uuid().safeParse(subjId).success) return apiError('INVALID_INPUT', 400)
   try {

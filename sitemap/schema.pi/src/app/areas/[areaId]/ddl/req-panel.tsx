@@ -254,7 +254,7 @@ export default function ReqPanel({
             )}
             {sts === 'REQ' && det.mine && !det.can_approve && (
               <span className="self-center text-xs text-gray-500">
-                본인 요청은 다른 데이터아키텍트가 승인합니다
+                본인 요청은 다른 승인권자(시스템담당자·데이터아키텍트)가 승인합니다
               </span>
             )}
             {sts === 'REQ' && det.self_approve && (

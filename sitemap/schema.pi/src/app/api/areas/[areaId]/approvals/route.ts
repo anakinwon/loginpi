@@ -4,7 +4,6 @@ import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { dbError, requireAreaRole } from '@/lib/api'
 import { pageRows } from '@/lib/paging'
-import { can } from '@/lib/roles'
 
 type Ctx = { params: Promise<{ areaId: string }> }
 const COLS =
@@ -25,7 +24,7 @@ export async function GET(req: Request, { params }: Ctx) {
   const sts = pick(sp.get('sts'), ['REQ', 'APV', 'RJCT', 'CNCL']) ?? 'REQ'
   const tp = pick(sp.get('tp'), ['DIC', 'DOM', 'TERM'])
   const act = pick(sp.get('act'), ['INS', 'UPD', 'DEL'])
-  const approver = can(auth.role, 'APPROVE')
+  const approver = auth.perms.includes('APPROVE')
   const mine = !approver || sp.get('mine') === '1'
   const build = () => {
     let q = db()

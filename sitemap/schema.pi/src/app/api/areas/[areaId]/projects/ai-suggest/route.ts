@@ -18,7 +18,7 @@ const schema = z.object({
 
 export async function POST(req: Request, { params }: Ctx) {
   const { areaId } = await params
-  const auth = await requireAreaRole(areaId, 'REQUEST')
+  const auth = await requireAreaRole(areaId, 'MODEL_EDIT')
   if (auth instanceof NextResponse) return auth
   const body = await parseBody(req, schema)
   if (body instanceof NextResponse) return body

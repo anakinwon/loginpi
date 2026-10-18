@@ -2,7 +2,6 @@
 import { piFetch } from '@pi/auth/client'
 // 분류체계 설정 폼 — GET/PATCH /api/areas/[areaId] : 바뀐 항목만 전송, 설정 권한자(SYS·DA) 외 읽기 전용
 import { useCallback, useEffect, useState } from 'react'
-import { can } from '@/lib/roles'
 
 type Area = Record<string, string | null>
 const FLAGS = [
@@ -34,7 +33,7 @@ export default function AreaForm({ areaId }: { areaId: string }) {
     }
     setOrig(j.area)
     setForm(j.area)
-    setAdmin(can(j.role, 'SETTINGS'))
+    setAdmin((j.perms ?? []).includes('SETTINGS')) // 역할 ∩ 요금제
   }, [base])
   useEffect(() => {
     load()

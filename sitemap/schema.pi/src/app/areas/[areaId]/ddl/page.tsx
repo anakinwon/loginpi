@@ -185,7 +185,7 @@ export default function DdlPage({
         `${j.message}${Array.isArray(j.detail) && j.detail.length ? ` — ${j.detail.slice(0, 3).join(' · ')}` : ''}`,
       )
     setMsg(
-      '실행을 요청했습니다 — 다른 데이터아키텍트가 승인하면 실행할 수 있습니다',
+      '실행을 요청했습니다 — 다른 승인권자(시스템담당자·데이터아키텍트)가 승인하면 실행할 수 있습니다',
     )
     setRev((r) => r + 1)
     setTab('req')

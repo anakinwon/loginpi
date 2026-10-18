@@ -12,7 +12,7 @@ const COLS = 'rel_id, rel_tp_cd, rel_txt, regr_id, reg_dtm, std_dic!inner(dic_id
 
 export async function GET(req: Request, { params }: Ctx) {
   const { areaId } = await params
-  const auth = await requireAreaRole(areaId, 'VIEW')
+  const auth = await requireAreaRole(areaId, 'SET_VIEW')
   if (auth instanceof NextResponse) return auth
   const sp = new URL(req.url).searchParams
   const q = sp.get('q')?.trim()

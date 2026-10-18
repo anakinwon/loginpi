@@ -7,7 +7,7 @@ import { piFetch } from '@pi/auth/client'
 //  편집(sql/026) : 논리 엔터티 추가(LGCL)·엔터티 수정(이름·유형·설명·주제영역·핵심 승격)·삭제(속성·관계 연쇄), 관계 편집 패널(개념 모델 공용)
 import Link from 'next/link'
 import { use, useCallback, useEffect, useMemo, useState } from 'react'
-import { can, type MbrRole } from '@/lib/roles'
+import { type MbrRole, type Perm } from '@/lib/roles'
 import Attrs from '../model/attrs'
 import EntForm from '../model/ent-form'
 import Relations from '../model/relations'
@@ -96,6 +96,7 @@ export default function LogicalPage({ params }: { params: Promise<{ areaId: stri
   const { areaId } = use(params)
   const api = `/api/areas/${areaId}`
   const [role, setRole] = useState<MbrRole | null>(null)
+  const [perms, setPerms] = useState<Perm[]>([]) // 실제 권한 = 역할 ∩ 요금제(서버 계산)
   const [prjs, setPrjs] = useState<{ prj_id: string; prj_nm: string }[]>([])
   const [prjId, setPrjId] = useState('')
   const [m, setM] = useState<Model | null>(null)
@@ -106,12 +107,12 @@ export default function LogicalPage({ params }: { params: Promise<{ areaId: stri
   const [rev, setRev] = useState(0) // 속성 패널 새로 그리기
   const [showMmd, setShowMmd] = useState(false)
   const [form, setForm] = useState<'new' | 'edit' | null>(null)
-  const editor = !!role && can(role, 'REQUEST')
+  const editor = perms.includes('MODEL_EDIT')
 
   useEffect(() => {
     piFetch(api)
       .then((r) => r.json())
-      .then((j) => j.ok && setRole(j.role))
+      .then((j) => j.ok && (setRole(j.role), setPerms(j.perms ?? [])))
     piFetch(`${api}/projects`)
       .then((r) => r.json())
       .then((j) => {

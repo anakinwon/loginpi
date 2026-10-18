@@ -34,7 +34,8 @@ export const prjCrud = simpleCrud({
   tgt: 'PRJ',
   cols: 'prj_id, prj_nm, prj_desc, indstry_cd, tbl_pfx_txt, trgt_dbms_cd, sort_seq, ver_no, regr_id, reg_dtm',
   order: 'sort_seq',
-  perm: 'REQUEST',
+  perm: 'MODEL_EDIT',
+  viewPerm: 'MODEL_VIEW',
   schema: z.object({ prj_nm: z.string().trim().min(1).max(100), prj_desc: z.string().trim().max(4000).nullable().optional(), indstry_cd: z.enum(INDSTRY_CDS).nullable().optional(), tbl_pfx_txt: z.string().trim().regex(/^[A-Za-z]{2,4}$/).transform((s) => s.toUpperCase()).optional(), trgt_dbms_cd: z.enum(DBMS_CDS), sort_seq: z.number().int().min(1).max(9999).optional() }),
   dupCode: 'PRJ_DUP',
   beforeDelete: async (id) => {
@@ -52,7 +53,8 @@ export const subjCrud = simpleCrud({
   tgt: 'SUBJ',
   cols: 'subj_id, prj_id, up_subj_id, subj_nm, subj_abbr_nm, subj_desc, sort_seq, ver_no, regr_id, reg_dtm',
   order: 'sort_seq',
-  perm: 'REQUEST',
+  perm: 'MODEL_EDIT',
+  viewPerm: 'MODEL_VIEW',
   schema: z.object({
     prj_id: z.string().uuid(),
     up_subj_id: z.string().uuid().nullable().optional(),
@@ -121,7 +123,8 @@ export const relCrud = simpleCrud({
   tgt: 'REL',
   cols: REL_COLS,
   order: 'reg_dtm',
-  perm: 'REQUEST',
+  perm: 'MODEL_EDIT',
+  viewPerm: 'MODEL_VIEW',
   schema: relSchema,
   dupCode: 'REL_DUP',
   beforeSave: async (areaId, row, cur) => {

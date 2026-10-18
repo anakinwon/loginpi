@@ -35,7 +35,7 @@ async function sameTermHeirs(areaId: string, attrId: string, termId: string) {
 
 export async function GET(_req: Request, { params }: Ctx) {
   const { areaId, entId, attrId } = await params
-  const auth = await requireAreaRole(areaId, 'VIEW')
+  const auth = await requireAreaRole(areaId, 'MODEL_VIEW')
   if (auth instanceof NextResponse) return auth
   if (!z.string().uuid().safeParse(attrId).success) return apiError('INVALID_INPUT', 400)
   try {
@@ -56,7 +56,7 @@ async function current(areaId: string, entId: string, attrId: string) {
 
 export async function PATCH(req: Request, { params }: Ctx) {
   const { areaId, entId, attrId } = await params
-  const auth = await requireAreaRole(areaId, 'REQUEST')
+  const auth = await requireAreaRole(areaId, 'MODEL_EDIT')
   if (auth instanceof NextResponse) return auth
   let raw: unknown
   try {
@@ -114,7 +114,7 @@ export async function PATCH(req: Request, { params }: Ctx) {
 
 export async function DELETE(req: Request, { params }: Ctx) {
   const { areaId, entId, attrId } = await params
-  const auth = await requireAreaRole(areaId, 'REQUEST')
+  const auth = await requireAreaRole(areaId, 'MODEL_EDIT')
   if (auth instanceof NextResponse) return auth
   const v = z.coerce.number().int().positive().safeParse(new URL(req.url).searchParams.get('ver_no'))
   if (!v.success || !z.string().uuid().safeParse(attrId).success) return apiError('INVALID_INPUT', 400)

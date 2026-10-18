@@ -11,7 +11,7 @@ type Ctx = { params: Promise<{ areaId: string }> }
 
 export async function GET(req: Request, { params }: Ctx) {
   const { areaId } = await params
-  const auth = await requireAreaRole(areaId, 'REQUEST')
+  const auth = await requireAreaRole(areaId, 'STD_REQ')
   if (auth instanceof NextResponse) return auth
   const name = new URL(req.url).searchParams.get('log_nm')?.trim() ?? ''
   if (!name || name.length > 200) return NextResponse.json({ ok: true, fill: {}, src: [] })

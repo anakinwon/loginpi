@@ -23,7 +23,7 @@ export async function GET(req: Request, { params }: Ctx) {
   const q = Q.safeParse({ conn: sp.get('conn'), node: sp.get('node'), schema: sp.get('schema'), rel: sp.get('rel') })
   if (!q.success || (q.data.node !== 'schemas' && !q.data.schema) || (q.data.node === 'columns' && !q.data.rel)) return apiError('INVALID_INPUT', 400)
   try {
-    return await getMeta(areaId, q.data.conn, auth.role, q.data.node, q.data.schema, q.data.rel)
+    return await getMeta(areaId, q.data.conn, auth.perms, q.data.node, q.data.schema, q.data.rel)
   } catch (e) {
     return dbError(e as { code?: string; message?: string })
   }

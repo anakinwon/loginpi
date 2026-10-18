@@ -114,6 +114,7 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
   const [conns, setConns] = useState<Conn[]>([])
   const [connId, setConnId] = useState('')
   const [canWrite, setCanWrite] = useState(false)
+  const [histAll, setHistAll] = useState(false)
   const [denied, setDenied] = useState(false)
   const [schemas, setSchemas] = useState<{ name: string; cur: boolean }[]>([])
   const [schema, setSchema] = useState('')
@@ -251,7 +252,8 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
       if (r.status === 403) return setDenied(true)
       const j = await r.json()
       if (j.ok) {
-        setCanWrite(!!j.all)
+        setCanWrite(!!j.write)
+        setHistAll(!!j.all)
         setHist({ items: j.items, total: j.total, page })
       }
     },
@@ -649,7 +651,7 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
                 결과
               </button>
               <button role="tab" aria-selected={tab === 'hist'} onClick={() => (setTab('hist'), void loadHist(hist.page))} className={`rounded-t border px-2 py-0.5 ${tab === 'hist' ? 'bg-white font-semibold' : ''}`}>
-                실행 이력{canWrite ? '(분류체계 전체)' : ''}
+                실행 이력{histAll ? '(분류체계 전체)' : ''}
               </button>
             </div>
             <div className="min-h-0 flex-1">

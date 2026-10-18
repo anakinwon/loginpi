@@ -4,7 +4,6 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { apiError, audit, dbError, requireAreaRole } from '@/lib/api'
 import { failRes, isFail, runReq } from '@/lib/model-ddl-req'
-import { can } from '@/lib/roles'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
@@ -14,11 +13,11 @@ const uuid = z.string().uuid()
 
 export async function POST(_req: Request, { params }: Ctx) {
   const { areaId, prjId, reqId } = await params
-  const auth = await requireAreaRole(areaId, 'REQUEST')
+  const auth = await requireAreaRole(areaId, 'MODEL_EDIT')
   if (auth instanceof NextResponse) return auth
   if (!uuid.safeParse(prjId).success || !uuid.safeParse(reqId).success) return apiError('INVALID_INPUT', 400)
   try {
-    const r = await runReq(areaId, prjId, reqId, auth.user.usr_id, can(auth.role, 'DDL_APPROVE'))
+    const r = await runReq(areaId, prjId, reqId, auth.user.usr_id, auth.perms.includes('DDL_APPROVE'))
     if (isFail(r)) return failRes(r)
     const cnt = (k: string) => r.results.filter((x) => x.rslt === k).length
     await audit({ area_id: areaId, tgt_tp_cd: 'DDL', tgt_id: reqId, act_cd: 'UPD', aftr_val: { act: 'run', req_sts_cd: r.req_sts_cd, try_no: r.exec_try_no, ok: cnt('OK'), err: cnt('ERR'), rbk: cnt('RBK'), skip: cnt('SKIP') }, usr_id: auth.user.usr_id })

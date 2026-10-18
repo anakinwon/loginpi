@@ -4,7 +4,7 @@ import 'server-only'
 import { STMT_MS, maskErr, pgClient } from './db-exec'
 import { cell, openConn, type Cell } from './sql-run'
 import { NextResponse } from 'next/server'
-import type { MbrRole } from './roles'
+import type { Perm } from './roles'
 
 export type MetaNode = 'schemas' | 'objects' | 'columns' | 'completion'
 const PG: Record<MetaNode, string> = {
@@ -41,8 +41,8 @@ const ORA: Record<MetaNode, string> = {
   completion: `SELECT table_name AS t, column_name AS col FROM all_tab_columns WHERE owner = :1 ORDER BY table_name, column_id FETCH FIRST 20000 ROWS ONLY`,
 }
 
-export async function getMeta(areaId: string, connId: string, role: MbrRole, node: MetaNode, schema: string | null, rel: string | null): Promise<NextResponse> {
-  const oc = await openConn(areaId, connId, role)
+export async function getMeta(areaId: string, connId: string, perms: readonly Perm[], node: MetaNode, schema: string | null, rel: string | null): Promise<NextResponse> {
+  const oc = await openConn(areaId, connId, perms)
   if (oc instanceof NextResponse) return oc
   const { d, t, pwd } = oc
   const args = node === 'schemas' ? [] : node === 'columns' ? [schema, rel] : [schema]

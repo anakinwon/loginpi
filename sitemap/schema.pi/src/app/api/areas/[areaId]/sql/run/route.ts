@@ -17,7 +17,7 @@ export async function POST(req: Request, { params }: Ctx) {
   const b = await parseBody(req, runBody)
   if (b instanceof NextResponse) return b
   try {
-    return await runEditor(areaId, auth.user.usr_id, auth.role, b, startedAt)
+    return await runEditor(areaId, auth.user.usr_id, auth.perms, b, startedAt)
   } catch (e) {
     return dbError(e as { code?: string; message?: string })
   }

@@ -55,12 +55,12 @@ const termSchema = z.object({
 
 export async function POST(req: Request, { params }: Ctx) {
   const { areaId } = await params
-  const auth = await requireAreaRole(areaId, 'REQUEST')
+  const auth = await requireAreaRole(areaId, 'STD_REQ')
   if (auth instanceof NextResponse) return auth
   const opt = await reqOpt(req)
   const body = await parseBody(req, termSchema)
   if (body instanceof NextResponse) return body
-  const { user, role } = auth
+  const { user, perms } = auth
 
   try {
     const words = await wordsByIds(areaId, body.dic_ids)
@@ -75,7 +75,7 @@ export async function POST(req: Request, { params }: Ctx) {
     if (dup.dup_log || dup.dup_phy) return apiError('TERM_DUP_NM', 409)
 
     // 모든 등록은 승인 신청(승인대기) : DA가 즉시 승인을 고를 때만 승인완료
-    const res = await requestIns('TERM', areaId, { ...body, ...names, ...(body.std_se_cd === 'NSTD' ? { nstd_yn: 'Y' } : {}) }, user, role, { self_apv: opt.self_apv, reason: opt.req_rsn })
+    const res = await requestIns('TERM', areaId, { ...body, ...names, ...(body.std_se_cd === 'NSTD' ? { nstd_yn: 'Y' } : {}) }, user, perms, { self_apv: opt.self_apv, reason: opt.req_rsn })
     if (typeof res === 'string') return apiError(res, ERR_STATUS(res))
     const { data: term, error } = await db().from('std_term').select(COLS).eq('term_id', res.tgt_id).single()
     if (error) return dbError(error)

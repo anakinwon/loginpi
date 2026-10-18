@@ -5,7 +5,6 @@ import { z } from 'zod'
 import { apiError, dbError, parseBody, requireAreaRole } from '@/lib/api'
 import { approveReq, cancelReq, rejectReq } from '@/lib/approval'
 import { ERR_STATUS } from '@/lib/change'
-import { can } from '@/lib/roles'
 
 type Ctx = { params: Promise<{ areaId: string; reqId: string }> }
 
@@ -22,7 +21,7 @@ export async function POST(req: Request, { params }: Ctx) {
   const body = await parseBody(req, actSchema)
   if (body instanceof NextResponse) return body
   const uid = auth.user.usr_id
-  if (body.action !== 'CNCL' && !can(auth.role, 'APPROVE')) return apiError('FORBIDDEN', 403)
+  if (body.action !== 'CNCL' && !auth.perms.includes('APPROVE')) return apiError('FORBIDDEN', 403)
   try {
     const r =
       body.action === 'APV' ? await approveReq(areaId, reqId, uid, body.opinion) : body.action === 'RJCT' ? await rejectReq(areaId, reqId, uid, body.reason) : await cancelReq(areaId, reqId, uid)

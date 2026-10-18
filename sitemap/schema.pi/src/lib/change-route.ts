@@ -12,7 +12,7 @@ const verSchema = z.coerce.number().int().positive()
 const DUP: Record<ChgTp, ErrorCode> = { DIC: 'WORD_DUP_LOGICAL', DOM: 'DOM_DUP_NM', TERM: 'TERM_DUP_NM' }
 
 async function change(tp: ChgTp, act: ChgAct, areaId: string, id: string, ver: unknown, input: unknown, opt: { self_apv?: boolean; reason?: string }) {
-  const auth = await requireAreaRole(areaId, 'REQUEST')
+  const auth = await requireAreaRole(areaId, 'STD_REQ')
   if (auth instanceof NextResponse) return auth
   const v = verSchema.safeParse(ver)
   if (!v.success || !z.string().uuid().safeParse(id).success) return apiError('INVALID_INPUT', 400)
@@ -36,7 +36,7 @@ async function change(tp: ChgTp, act: ChgAct, areaId: string, id: string, ver: u
       return NextResponse.json({ ok: true })
     }
 
-    const r = await requestChg(tp, areaId, id, act as 'UPD' | 'DEL', prep.row, v.data, auth.user, auth.role, opt)
+    const r = await requestChg(tp, areaId, id, act as 'UPD' | 'DEL', prep.row, v.data, auth.user, auth.perms, opt)
     if (typeof r === 'string') return apiError(r, ERR_STATUS(r))
     return r.status === 'REQ' ? NextResponse.json({ ok: true, requested: true, apv_req_id: r.apv_req_id }, { status: 202 }) : NextResponse.json({ ok: true, apv_req_id: r.apv_req_id })
   } catch (e) {

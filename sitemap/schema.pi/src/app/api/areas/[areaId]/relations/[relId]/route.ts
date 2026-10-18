@@ -27,7 +27,7 @@ async function fkAttrs(areaId: string, relId: string) {
 
 export async function GET(_req: Request, { params }: Ctx) {
   const { areaId, relId } = await params
-  const auth = await requireAreaRole(areaId, 'VIEW')
+  const auth = await requireAreaRole(areaId, 'MODEL_VIEW')
   if (auth instanceof NextResponse) return auth
   if (!z.string().uuid().safeParse(relId).success) return apiError('INVALID_INPUT', 400)
   try {
@@ -42,7 +42,7 @@ export const PATCH = relCrud.update
 export async function DELETE(req: Request, ctx: Ctx) {
   const { areaId, relId } = await ctx.params
   const mode = new URL(req.url).searchParams.get('fk') === 'del' ? 'del' : 'keep'
-  const auth = await requireAreaRole(areaId, 'REQUEST') // 권한 먼저(관계 삭제 뒤 권한 오류로 응답이 어긋나지 않게)
+  const auth = await requireAreaRole(areaId, 'MODEL_EDIT') // 권한 먼저(관계 삭제 뒤 권한 오류로 응답이 어긋나지 않게)
   if (auth instanceof NextResponse) return auth
   const res = await relCrud.remove(req, ctx)
   if (res.status !== 200) return res

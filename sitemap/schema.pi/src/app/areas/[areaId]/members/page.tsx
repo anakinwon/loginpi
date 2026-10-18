@@ -1,23 +1,28 @@
 'use client'
 import { piFetch } from '@pi/auth/client'
-// 멤버 화면 — 분류체계 참여자 목록·역할 즉시 변경(PATCH), 멤버 추가(가입된 Pi 사용자명 기준), 역할 R&R 표. 변경·추가는 설정 권한자(SYS·DA)만
+// 멤버 화면 — 분류체계 참여자 목록·역할 즉시 변경(PATCH), 멤버 추가(가입된 Pi 사용자명 기준), 역할·요금제 권한표(2026-10-18 마스터 표)
+//  변경·추가 = 설정 권한(역할 ∩ 요금제), 본인 역할보다 권한이 많은 역할은 고를 수 없음(canAssign)
 import Link from 'next/link'
 import { use, useCallback, useEffect, useState } from 'react'
-import { PERM, ROLE_DESC, ROLE_NM, ROLES, can, type MbrRole, type Perm } from '@/lib/roles'
+import { canAssign, PLAN_NM, PLAN_PERMS, PLANS, ROLE_DESC, ROLE_NM, ROLE_PERMS, ROLES, type MbrRole, type Perm } from '@/lib/roles'
 
 interface Mbr {
   mbr_id: string
   mbr_role_cd: string
   sys_user: { pi_usr_nm: string; dsp_nm: string }
 }
-// R&R 표 열 순서
+// 권한표 열 순서(마스터 표) — CRUD = SQL 편집기 DML·DDL 쓰기
 const PERM_COLS: [Perm, string][] = [
-  ['REQUEST', '신청'],
   ['APPROVE', '승인'],
   ['SELF_APPROVE', '즉시 승인'],
-  ['BULK', '일괄등록'],
   ['SETTINGS', '설정'],
-  ['VIEW', '조회'],
+  ['BULK', '일괄등록'],
+  ['REQUEST', '신청'],
+  ['CRUD', 'CRUD'],
+  ['MENU_SQL', '메뉴1 SQL편집기'],
+  ['MENU_STD', '메뉴2 표준'],
+  ['MENU_MODEL', '메뉴3 모델링'],
+  ['MENU_SET', '메뉴4 설정'],
 ]
 const roleNm = (r: string) => ROLE_NM[r as MbrRole] ?? r
 
@@ -26,16 +31,17 @@ export default function MembersPage({ params }: { params: Promise<{ areaId: stri
   const base = `/api/areas/${areaId}/members`
   const [mbrs, setMbrs] = useState<Mbr[]>([])
   const [myRole, setMyRole] = useState<string | null>(null)
+  const [myPerms, setMyPerms] = useState<Perm[]>([])
   const [nm, setNm] = useState('')
   const [role, setRole] = useState<MbrRole>('MDL')
   const [msg, setMsg] = useState('')
-  const manage = can(myRole, 'SETTINGS')
+  const manage = myPerms.includes('SETTINGS')
 
   const load = useCallback(async () => {
     const [jm, ja] = await Promise.all([(await piFetch(base)).json(), (await piFetch(`/api/areas/${areaId}`)).json()])
     if (jm.ok) setMbrs(jm.members)
     else setMsg(jm.message)
-    if (ja.ok) setMyRole(ja.role)
+    if (ja.ok) (setMyRole(ja.role), setMyPerms(ja.perms ?? []))
   }, [base, areaId])
   useEffect(() => {
     load()
@@ -72,7 +78,7 @@ export default function MembersPage({ params }: { params: Promise<{ areaId: stri
               <input value={nm} onChange={(e) => setNm(e.target.value)} placeholder="Pi 사용자명(가입자)" className="flex-1 rounded border border-[#b8c6e0] bg-white px-3 py-2" required maxLength={100} />
               <select value={role} onChange={(e) => setRole(e.target.value as MbrRole)} className="rounded border border-[#b8c6e0] bg-white px-2 py-2" aria-label="역할">
                 {ROLES.map((r) => (
-                  <option key={r} value={r}>
+                  <option key={r} value={r} disabled={!canAssign(myRole, r)}>
                     {ROLE_NM[r]}
                   </option>
                 ))}
@@ -105,9 +111,9 @@ export default function MembersPage({ params }: { params: Promise<{ areaId: stri
                   <td className="border px-2 py-1 font-medium">{m.sys_user.pi_usr_nm}</td>
                   <td className="border px-2 py-1">{m.sys_user.dsp_nm}</td>
                   <td className="border px-2 py-1 text-center">
-                    <select value={m.mbr_role_cd} onChange={(e) => changeRole(m, e.target.value)} disabled={!manage} className="w-full rounded border bg-white px-2 py-1 disabled:bg-gray-100" aria-label={`${m.sys_user.pi_usr_nm} 역할`}>
+                    <select value={m.mbr_role_cd} onChange={(e) => changeRole(m, e.target.value)} disabled={!manage || !canAssign(myRole, m.mbr_role_cd)} className="w-full rounded border bg-white px-2 py-1 disabled:bg-gray-100" aria-label={`${m.sys_user.pi_usr_nm} 역할`}>
                       {ROLES.map((r) => (
-                        <option key={r} value={r}>
+                        <option key={r} value={r} disabled={!canAssign(myRole, r)}>
                           {ROLE_NM[r]}
                         </option>
                       ))}
@@ -120,7 +126,8 @@ export default function MembersPage({ params }: { params: Promise<{ areaId: stri
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold">역할별 R&amp;R</h2>
+          <h2 className="text-lg font-semibold">역할·요금제 권한표</h2>
+          <p className="mt-1 text-xs text-gray-600">실제 권한 = 멤버 역할 ∩ 분류체계 요금제. CRUD = SQL 편집기 DML·DDL(SELECT·INSERT·UPDATE·DELETE·CREATE·ALTER·RENAME) 실행. 요금제 없음·만료 = 표준사전 조회만</p>
           <table className="mt-2 w-full border-collapse text-sm">
             <thead>
               <tr className="thead-3d text-center">
@@ -140,7 +147,18 @@ export default function MembersPage({ params }: { params: Promise<{ areaId: stri
                   <td className="border px-2 py-1">{ROLE_DESC[r]}</td>
                   {PERM_COLS.map(([p]) => (
                     <td key={p} className="border px-2 py-1 text-center">
-                      {PERM[p].includes(r) ? '●' : '-'}
+                      {(ROLE_PERMS[r] as readonly string[]).includes(p) ? '●' : ''}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+              {PLANS.map((pl) => (
+                <tr key={pl} className="bg-[#f3f8ee]">
+                  <td className="border px-2 py-1 font-medium">요금제 {pl === 'FREE' ? '없음' : pl.slice(1)}</td>
+                  <td className="border px-2 py-1">{PLAN_NM[pl]}</td>
+                  {PERM_COLS.map(([p]) => (
+                    <td key={p} className="border px-2 py-1 text-center">
+                      {(PLAN_PERMS[pl] as readonly string[]).includes(p) ? '●' : ''}
                     </td>
                   ))}
                 </tr>

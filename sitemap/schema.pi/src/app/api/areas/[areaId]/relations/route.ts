@@ -15,7 +15,7 @@ const uuid = (v: string | null) => (v && z.string().uuid().safeParse(v).success 
 
 export async function GET(req: Request, { params }: Ctx) {
   const { areaId } = await params
-  const auth = await requireAreaRole(areaId, 'VIEW')
+  const auth = await requireAreaRole(areaId, 'MODEL_VIEW')
   if (auth instanceof NextResponse) return auth
   const sp = new URL(req.url).searchParams
   const prj = uuid(sp.get('prj'))

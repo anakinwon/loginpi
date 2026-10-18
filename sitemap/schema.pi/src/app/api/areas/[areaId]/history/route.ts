@@ -17,7 +17,7 @@ const q = z.object({
 
 export async function GET(req: Request, { params }: Ctx) {
   const { areaId } = await params
-  const auth = await requireAreaRole(areaId, 'VIEW')
+  const auth = await requireAreaRole(areaId, 'SET_VIEW')
   if (auth instanceof NextResponse) return auth
   const raw = Object.fromEntries([...new URL(req.url).searchParams].filter(([, v]) => v !== ''))
   const p = q.safeParse(raw)

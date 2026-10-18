@@ -16,7 +16,7 @@ async function current(areaId: string, id: string) {
 
 export async function PATCH(req: Request, { params }: Ctx) {
   const { areaId, entId } = await params
-  const auth = await requireAreaRole(areaId, 'REQUEST')
+  const auth = await requireAreaRole(areaId, 'MODEL_EDIT')
   if (auth instanceof NextResponse) return auth
   let raw: Record<string, unknown>
   try {
@@ -55,7 +55,7 @@ export async function PATCH(req: Request, { params }: Ctx) {
 
 export async function DELETE(req: Request, { params }: Ctx) {
   const { areaId, entId } = await params
-  const auth = await requireAreaRole(areaId, 'REQUEST')
+  const auth = await requireAreaRole(areaId, 'MODEL_EDIT')
   if (auth instanceof NextResponse) return auth
   const v = verSchema.safeParse(new URL(req.url).searchParams.get('ver_no'))
   if (!v.success || !z.string().uuid().safeParse(entId).success) return apiError('INVALID_INPUT', 400)

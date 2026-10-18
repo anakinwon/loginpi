@@ -4,7 +4,7 @@ import { piFetch } from '@pi/auth/client'
 // 목록 /api/areas/[areaId]/key-domains, 신청 PATCH /api/areas/[areaId]/words/[dicId] (승인 절차·DA 즉시 승인 공용, sql/013)
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { can, type MbrRole } from '@/lib/roles'
+import { type MbrRole, type Perm } from '@/lib/roles'
 import { ActorCells, ApvFields, ApvLink, StsCell, StsFilter, noEnterSubmit } from '../words/word-board'
 
 interface Item {
@@ -40,6 +40,7 @@ export default function KeyDomainBoard({ areaId }: { areaId: string }) {
   const [pick, setPick] = useState('')
   const [msg, setMsg] = useState('')
   const [role, setRole] = useState<MbrRole | null>(null)
+  const [perms, setPerms] = useState<Perm[]>([]) // 실제 권한 = 역할 ∩ 요금제(서버 계산)
   const [selfApv, setSelfApv] = useState(false)
   const [rsn, setRsn] = useState('')
   const [q, setQ] = useState('')
@@ -48,10 +49,10 @@ export default function KeyDomainBoard({ areaId }: { areaId: string }) {
   useEffect(() => {
     piFetch(`/api/areas/${areaId}`)
       .then((r) => r.json())
-      .then((j) => j.ok && setRole(j.role))
+      .then((j) => j.ok && (setRole(j.role), setPerms(j.perms ?? [])))
   }, [areaId])
-  const selfApprover = !!role && can(role, 'SELF_APPROVE')
-  const requester = !!role && can(role, 'REQUEST')
+  const selfApprover = perms.includes('SELF_APPROVE')
+  const requester = perms.includes('STD_REQ')
 
   const load = useCallback(async () => {
     const sp = new URLSearchParams({ page: String(cond.page), size: String(cond.size), ...(cond.kw ? { q: cond.kw } : {}), ...(cond.sts ? { sts: cond.sts } : {}) })
@@ -137,7 +138,7 @@ export default function KeyDomainBoard({ areaId }: { areaId: string }) {
             </Link>
             (속성 분류어 선택) 후 승인되면 나타납니다. 도메인 등록의 대표도메인명은 지정된 대표도메인만 고를 수 있습니다
           </p>
-          {role && !requester && <p className="mt-2 font-medium text-gray-600">조회 권한 : 지정·해제는 신청 권한(데이터아키텍트·표준담당자·모델러)만 가능합니다</p>}
+          {role && !requester && <p className="mt-2 font-medium text-gray-600">조회 권한 : 지정·해제는 신청 권한(역할·요금제)이 있어야 합니다</p>}
           {msg && (
             <p role="status" className="mt-2 font-medium text-[#1f3a68]">
               {msg}

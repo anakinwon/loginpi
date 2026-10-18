@@ -4,7 +4,7 @@ import { piFetch } from '@pi/auth/client'
 // 기준 : 정의서 §8.4 데이터 성격 접미어 + 기관 확장(2026-10-16 마스터 확정), 단어 물리명(컬럼용)과 테이블 접미어(테이블명용)는 별도
 import Link from 'next/link'
 import { use, useCallback, useEffect, useState } from 'react'
-import { can, type MbrRole } from '@/lib/roles'
+import { type MbrRole, type Perm } from '@/lib/roles'
 import { ActorCells, ApvFields, ApvLink, StsCell, StsFilter, noEnterSubmit } from '../words/word-board'
 
 interface Item {
@@ -45,6 +45,7 @@ export default function EntityClassPage({ params }: { params: Promise<{ areaId: 
   const [edit, setEdit] = useState<{ id: string; sfx: string } | null>(null)
   const [msg, setMsg] = useState('')
   const [role, setRole] = useState<MbrRole | null>(null)
+  const [perms, setPerms] = useState<Perm[]>([]) // 실제 권한 = 역할 ∩ 요금제(서버 계산)
   const [selfApv, setSelfApv] = useState(false)
   const [rsn, setRsn] = useState('')
   const [q, setQ] = useState('')
@@ -54,10 +55,10 @@ export default function EntityClassPage({ params }: { params: Promise<{ areaId: 
   useEffect(() => {
     piFetch(`/api/areas/${areaId}`)
       .then((r) => r.json())
-      .then((j) => j.ok && setRole(j.role))
+      .then((j) => j.ok && (setRole(j.role), setPerms(j.perms ?? [])))
   }, [areaId])
-  const selfApprover = !!role && can(role, 'SELF_APPROVE')
-  const requester = !!role && can(role, 'REQUEST')
+  const selfApprover = perms.includes('SELF_APPROVE')
+  const requester = perms.includes('STD_REQ')
 
   const load = useCallback(async () => {
     const sp = new URLSearchParams({ page: String(cond.page), size: String(cond.size), ...(cond.kw ? { q: cond.kw } : {}), ...(cond.sts ? { sts: cond.sts } : {}) })
@@ -160,7 +161,7 @@ export default function EntityClassPage({ params }: { params: Promise<{ areaId: 
               </div>
             </div>
             <p className="mt-2 text-xs text-gray-500">기준 : 정의서 §8.4 데이터 성격 접미어 + 기관 확장(2026-10-16 확정). 단어 물리명(컬럼용)은 그대로 두고, 테이블 이름에는 접미어를 붙입니다(예 : 이력 → TB_○○○_H)</p>
-            {role && !requester && <p className="mt-2 font-medium text-gray-600">조회 권한 : 지정·변경·해제는 신청 권한(데이터아키텍트·표준담당자·모델러)만 가능합니다</p>}
+            {role && !requester && <p className="mt-2 font-medium text-gray-600">조회 권한 : 지정·변경·해제는 신청 권한(역할·요금제)이 있어야 합니다</p>}
             {msg && (
               <p role="status" className="mt-2 font-medium text-[#1f3a68]">
                 {msg}

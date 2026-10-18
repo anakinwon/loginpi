@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server'
 import type { ZodType } from 'zod'
 import { getAppUser } from './auth'
 import { db } from './db'
-import { can, type MbrRole, type Perm } from './roles'
+import { effPerms, type MbrRole, type Perm } from './roles'
 
 const ERRORS = {
   INVALID_INPUT: '입력값이 올바르지 않습니다',
@@ -93,7 +93,8 @@ const ERRORS = {
   TERM_NAME_MISMATCH: '영문약어명으로 찾은 단어의 결합이 용어명과 다릅니다',
   DOM_NOT_FOUND: '연결할 도메인이 없습니다(도메인을 먼저 일괄등록하십시오)',
   HEADER_MISSING: 'CSV 필수 헤더가 없습니다',
-  LAST_SETTINGS_ROLE: '설정 권한자(시스템담당자·데이터아키텍트)가 한 명은 있어야 합니다',
+  LAST_SETTINGS_ROLE: '설정 권한자(시스템담당자·데이터아키텍트·표준담당자·모델러)가 한 명은 있어야 합니다',
+  ROLE_ESCALATE: '본인 역할보다 권한이 많은 역할은 지정·변경할 수 없습니다',
   APV_LEGACY: '승인 절차 도입 이전의 등록 신청입니다. 반려한 뒤 다시 신청하십시오',
   STS_NOT_EDITABLE: '승인대기 중인 데이터는 고칠 수 없습니다(신청을 취소한 뒤 다시 등록하십시오)',
   CONFLICT_SKIP: '반영 중 같은 이름이 먼저 저장되어 건너뜀',
@@ -184,11 +185,13 @@ export async function currentUser(): Promise<CurrentUser | null> {
   return ins.data
 }
 
-// 분류체계 권한 확인(권한표 src/lib/roles.ts) — 사용자·역할 또는 오류 응답
-export async function requireAreaRole(
-  areaId: string,
-  perm: Perm,
-): Promise<{ user: CurrentUser; role: MbrRole } | NextResponse> {
+// 분류체계 권한 확인(권한표 src/lib/roles.ts) — 실제 권한 = 역할 ∩ 요금제(effPerms). 사용자·역할·권한 목록 또는 오류 응답
+export interface AreaAuth {
+  user: CurrentUser
+  role: MbrRole
+  perms: Perm[]
+}
+export async function requireAreaRole(areaId: string, perm: Perm): Promise<AreaAuth | NextResponse> {
   const user = await currentUser()
   if (!user) return apiError('AUTH_REQUIRED', 401)
   const { data, error } = await db()
@@ -201,7 +204,8 @@ export async function requireAreaRole(
   if (error) return dbError(error)
   if (!data) return apiError('FORBIDDEN', 403)
   const role = data.mbr_role_cd as MbrRole
-  return can(role, perm) ? { user, role } : apiError('FORBIDDEN', 403)
+  const perms = effPerms(role, 'P4') // 요금제 연결 전(R2) = 역할 권한 그대로
+  return perms.includes(perm) ? { user, role, perms } : apiError('FORBIDDEN', 403)
 }
 
 export async function audit(row: {

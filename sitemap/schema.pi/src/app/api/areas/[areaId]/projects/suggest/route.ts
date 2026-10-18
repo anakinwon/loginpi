@@ -8,7 +8,7 @@ type Ctx = { params: Promise<{ areaId: string }> }
 
 export async function GET(req: Request, { params }: Ctx) {
   const { areaId } = await params
-  const auth = await requireAreaRole(areaId, 'VIEW')
+  const auth = await requireAreaRole(areaId, 'MODEL_VIEW')
   if (auth instanceof NextResponse) return auth
   const text = (new URL(req.url).searchParams.get('text') ?? '').slice(0, 500)
   return NextResponse.json({ ok: true, industries: recommendIndustries(text), src: ['업종 템플릿(키워드)'] })

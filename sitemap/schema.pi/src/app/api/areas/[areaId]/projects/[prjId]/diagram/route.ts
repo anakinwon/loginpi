@@ -27,7 +27,7 @@ const body = z.object({
 
 export async function GET(req: Request, { params }: Ctx) {
   const { areaId, prjId } = await params
-  const auth = await requireAreaRole(areaId, 'VIEW')
+  const auth = await requireAreaRole(areaId, 'MODEL_VIEW')
   if (auth instanceof NextResponse) return auth
   const sp = new URL(req.url).searchParams
   const subj = sp.get('subj') || null
@@ -45,7 +45,7 @@ export async function GET(req: Request, { params }: Ctx) {
 
 export async function PUT(req: Request, { params }: Ctx) {
   const { areaId, prjId } = await params
-  const auth = await requireAreaRole(areaId, 'REQUEST')
+  const auth = await requireAreaRole(areaId, 'MODEL_EDIT')
   if (auth instanceof NextResponse) return auth
   if (!uuid.safeParse(prjId).success) return apiError('INVALID_INPUT', 400)
   const b = await parseBody(req, body)

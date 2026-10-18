@@ -12,7 +12,7 @@ const body = z.object({ phy_mdl_id: uuid, tbl_ids: z.array(uuid).min(1).max(2000
 
 export async function GET(req: Request, { params }: Ctx) {
   const { areaId, prjId } = await params
-  const auth = await requireAreaRole(areaId, 'VIEW')
+  const auth = await requireAreaRole(areaId, 'MODEL_VIEW')
   if (auth instanceof NextResponse) return auth
   const mdl = new URL(req.url).searchParams.get('mdl') ?? ''
   if (!uuid.safeParse(prjId).success || (mdl && !uuid.safeParse(mdl).success)) return apiError('INVALID_INPUT', 400)
@@ -28,7 +28,7 @@ export async function GET(req: Request, { params }: Ctx) {
 
 export async function POST(req: Request, { params }: Ctx) {
   const { areaId, prjId } = await params
-  const auth = await requireAreaRole(areaId, 'VIEW')
+  const auth = await requireAreaRole(areaId, 'MODEL_VIEW')
   if (auth instanceof NextResponse) return auth
   if (!uuid.safeParse(prjId).success) return apiError('INVALID_INPUT', 400)
   const b = await parseBody(req, body)

@@ -6,7 +6,7 @@ import { piFetch } from '@pi/auth/client'
 // 엔터티 이름은 승인완료 표준단어로만 생성(미등록 단어는 표준단어 신청), 끝 단어 엔터티 분류어 → 테이블 접미어(TB_주제영역_단어_접미어)
 import Link from 'next/link'
 import { use, useCallback, useEffect, useRef, useState } from 'react'
-import { can, type MbrRole } from '@/lib/roles'
+import { type MbrRole, type Perm } from '@/lib/roles'
 import { ActorCells, noEnterSubmit } from '../words/word-board'
 import Relations from './relations'
 import Attrs from './attrs'
@@ -118,6 +118,7 @@ export default function ModelPage({ params, searchParams }: { params: Promise<{ 
   const tab = t === 'subj' || t === 'ent' ? t : 'prj'
   const api = `/api/areas/${areaId}`
   const [role, setRole] = useState<MbrRole | null>(null)
+  const [perms, setPerms] = useState<Perm[]>([]) // 실제 권한 = 역할 ∩ 요금제(서버 계산)
   const [subjs, setSubjs] = useState<Subj[]>([])
   const [sel, setSel] = useState<Subj | null>(null)
   const [prjs, setPrjs] = useState<Prj[]>([])
@@ -209,9 +210,9 @@ FK ${d.fk}
   useEffect(() => {
     piFetch(api)
       .then((r) => r.json())
-      .then((j) => j.ok && setRole(j.role))
+      .then((j) => j.ok && (setRole(j.role), setPerms(j.perms ?? [])))
   }, [api])
-  const editor = !!role && can(role, 'REQUEST')
+  const editor = perms.includes('MODEL_EDIT')
 
   // 업종 선택 → AI 추천(POST /projects/ai-suggest)
   //  · 새 프로젝트 등록 : 업종을 바꿀 때마다 이름·설명을 비우고 새 업종 추천으로 다시 채움(마스터 지시 2026-10-17 — 직전 업종 값이 남던 문제)
