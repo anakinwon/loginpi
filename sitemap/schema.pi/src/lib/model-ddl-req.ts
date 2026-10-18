@@ -313,7 +313,7 @@ export async function testConnById(areaId: string, connId: string): Promise<{ ok
 }
 
 // 인증서 검증 실패 안내 — 자체 CA 서버는 서버 CA 인증서 지정(Supabase 는 화면 체크 한 번)
-const tlsHint = (m: string) => (/self-signed|unable to (get|verify)|certificate/i.test(m) ? `${m} — 자체 CA 서버입니다 : '서버 CA 인증서'에서 Supabase 를 체크하거나 그 DB 의 CA(PEM)를 붙여 넣으십시오` : m)
+export const tlsHint = (m: string) => (/self-signed|unable to (get|verify)|certificate/i.test(m) ? `${m} — 자체 CA 서버입니다 : '서버 CA 인증서'에서 Supabase 를 체크하거나 그 DB 의 CA(PEM)를 붙여 넣으십시오` : m)
 
 // 저장 전 연결 시험(마스터 지시 2026-10-18 "접속정보 저장 전 접속테스트 필요") — 입력 중인 값으로 SELECT 1, 저장·기록 없음
 //  서버 직접 : 수정 중 비밀번호를 비우면 대상이 그대로일 때만 저장된 비밀번호

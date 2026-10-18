@@ -3,7 +3,7 @@
 // 등록·수정·삭제 시 즉시 승인(SELF_APPROVE)은 DA만 선택 가능, 그 외는 반드시 승인 화면을 거친다(2026-10-16 마스터 지시)
 export const ROLES = ['SYS', 'DA', 'STD', 'MDL', 'QLT', 'MIG', 'VIEWER'] as const
 export type MbrRole = (typeof ROLES)[number]
-export type Perm = 'VIEW' | 'REQUEST' | 'APPROVE' | 'SELF_APPROVE' | 'BULK' | 'SETTINGS' | 'DDL_APPROVE' | 'DB_CONN_ADMIN'
+export type Perm = 'VIEW' | 'REQUEST' | 'APPROVE' | 'SELF_APPROVE' | 'BULK' | 'SETTINGS' | 'DDL_APPROVE' | 'DB_CONN_ADMIN' | 'SQL_QUERY' | 'SQL_WRITE'
 
 export const ROLE_NM: Record<MbrRole, string> = {
   SYS: '시스템담당자',
@@ -34,6 +34,9 @@ export const PERM: Record<Perm, readonly MbrRole[]> = {
   // DDL 직접 실행(2026-10-18) : 실행 요청 = REQUEST, 승인(자기 승인 금지)·접속 프로파일·에이전트 토큰 관리 = DA
   DDL_APPROVE: ['DA'],
   DB_CONN_ADMIN: ['DA'],
+  // SQL 편집기(2026-10-18) : 조회 = 데이터 담당 역할(READ ONLY 트랜잭션 강제), 쓰기(DML·DDL) 즉시 실행 = DA 만(마스터 결정 'DBeaver 처럼 전부 즉시')
+  SQL_QUERY: ['DA', 'STD', 'MDL', 'QLT', 'MIG'],
+  SQL_WRITE: ['DA'],
 }
 export const can = (role: string | null | undefined, perm: Perm) => !!role && (PERM[perm] as readonly string[]).includes(role)
 

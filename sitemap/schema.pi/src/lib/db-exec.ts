@@ -29,8 +29,8 @@ export interface Target {
   priv: boolean
   ca: string | null // 서버 CA 인증서(PEM, sql/042) — Supabase 등 자체 CA
 }
-const STMT_MS = 20_000 // 문장 1개 제한
-const LOCK_MS = 5_000
+export const STMT_MS = 20_000 // 문장 1개 제한
+export const LOCK_MS = 5_000
 
 export function maskErr(msg: unknown, hide: (string | null | undefined)[]): string {
   let s = String(msg ?? '').replace(/\s+/g, ' ')
@@ -58,7 +58,7 @@ export async function resolveTarget(c: { host_nm: string | null; port_no: number
   return { ip: ips[0], host: c.host_nm, port: c.port_no, db: c.db_nm, usr: c.usr_nm, priv: bad.length > 0, ca: c.ca_cert_txt ?? null }
 }
 
-const pgClient = (t: Target, pwd: string) =>
+export const pgClient = (t: Target, pwd: string) =>
   postgres({ host: t.ip, port: t.port, database: t.db, username: t.usr, password: pwd, max: 1, connect_timeout: 10, idle_timeout: 5, prepare: false, onnotice: () => {}, ssl: t.priv ? false : { rejectUnauthorized: true, servername: isIP(t.host) ? undefined : t.host, ...(t.ca ? { ca: t.ca } : {}) } }) // 사설 주소(개발 전용 허용)만 평문
 
 // 연결 시험(SELECT 1)
