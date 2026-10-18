@@ -226,14 +226,27 @@ async function runOra(t: Target, pwd: string, stmts: Stmt[], kinds: Kind[], o: {
   }
 }
 
-// 실행 요청 처리 — 권한·접속·판정 → 실행 → 이력·감사
-export async function runEditor(areaId: string, uid: string, role: MbrRole, b: Body): Promise<NextResponse> {
-  const c = await getConn(areaId, b.conn_id)
+// 접속 열기 공통(실행·메타) — 같은 분류체계·서버 직접·스위치·키·비밀번호·공인 주소 확인
+export async function openConn(areaId: string, connId: string): Promise<{ c: NonNullable<Awaited<ReturnType<typeof getConn>>>; d: Dialect; t: Target; pwd: string } | NextResponse> {
+  const c = await getConn(areaId, connId)
   if (!c) return failRes({ code: 'NOT_FOUND', status: 404 })
   if (c.exec_mthd_cd !== 'SRV') return failRes({ code: 'SQL_AGT_UNSUPPORTED', status: 400 })
   if (!directEnabled() || !profileKey()) return failRes({ code: 'DB_CONN_DISABLED', status: 503 })
   const d: Dialect | null = c.dbms_cd === '0014' ? 'PG' : c.dbms_cd === '0001' ? 'ORA' : null
   if (!d) return failRes({ code: 'DB_CONN_MISMATCH', status: 400 })
+  const pwd = c.pwd_enc_txt ? openPwd(areaId, c.conn_id, c.pwd_enc_txt) : null
+  if (pwd == null) return failRes({ code: 'DB_CONN_FAIL', status: 400, detail: '저장된 비밀번호를 열 수 없습니다 — 접속 관리에서 비밀번호를 다시 입력하십시오' })
+  const t = await resolveTarget(c)
+  if (t === 'BLOCKED') return failRes({ code: 'DB_CONN_BLOCKED', status: 400 })
+  if (t === 'DNS') return failRes({ code: 'DB_CONN_FAIL', status: 400, detail: '호스트 이름을 찾을 수 없습니다' })
+  return { c, d, t, pwd }
+}
+
+// 실행 요청 처리 — 권한·접속·판정 → 실행 → 이력·감사
+export async function runEditor(areaId: string, uid: string, role: MbrRole, b: Body): Promise<NextResponse> {
+  const cn = await getConn(areaId, b.conn_id)
+  if (!cn) return failRes({ code: 'NOT_FOUND', status: 404 })
+  const d: Dialect = cn.dbms_cd === '0001' ? 'ORA' : 'PG' // 판정용(지원 DBMS 확인은 openConn)
 
   const all = splitSql(b.sql, d)
   const stmts = b.cursor == null ? all : [stmtAt(all, b.cursor)].filter((s): s is Stmt => !!s)
@@ -246,11 +259,9 @@ export async function runEditor(areaId: string, uid: string, role: MbrRole, b: B
   const dangers = stmts.map((s, i) => ({ seq: i + 1, txt: s.txt.slice(0, 200), danger: danger(s) })).filter((x): x is { seq: number; txt: string; danger: Danger } => !!x.danger)
   if (dangers.length && !b.confirm) return failRes({ code: 'SQL_CONFIRM', status: 409, detail: dangers })
 
-  const pwd = c.pwd_enc_txt ? openPwd(areaId, c.conn_id, c.pwd_enc_txt) : null
-  if (pwd == null) return failRes({ code: 'DB_CONN_FAIL', status: 400, detail: '저장된 비밀번호를 열 수 없습니다 — 접속 관리에서 비밀번호를 다시 입력하십시오' })
-  const t = await resolveTarget(c)
-  if (t === 'BLOCKED') return failRes({ code: 'DB_CONN_BLOCKED', status: 400 })
-  if (t === 'DNS') return failRes({ code: 'DB_CONN_FAIL', status: 400, detail: '호스트 이름을 찾을 수 없습니다' })
+  const oc = await openConn(areaId, b.conn_id)
+  if (oc instanceof NextResponse) return oc
+  const { c, t, pwd } = oc
 
   const t0 = Date.now()
   const o = { write, limit: b.limit, schema: b.schema, oneTx: b.one_tx, deadline: t0 + BUDGET_MS }
