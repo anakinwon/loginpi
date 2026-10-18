@@ -54,11 +54,11 @@ export async function loadPhy(areaId: string, mdlId: string) {
   if (mdl.error) throw mdl.error
   if (!mdl.data) return null
   const [t, f] = await Promise.all([
-    db().from('mdl_phy_tbl').select('phy_tbl_id, ent_id, tbl_nm, tbl_desc, phy_sts_cd, phy_cmptn_dtm, ver_no').eq('phy_mdl_id', mdlId).eq('del_yn', 'N').order('tbl_nm'),
+    db().from('mdl_phy_tbl').select('phy_tbl_id, ent_id, tbl_nm, tbl_desc, phy_sts_cd, phy_cmptn_dtm, auto_inc_yn, ver_no').eq('phy_mdl_id', mdlId).eq('del_yn', 'N').order('tbl_nm'),
     db().from('mdl_phy_fk').select('phy_fk_id, rel_id, fk_nm').eq('phy_mdl_id', mdlId).eq('del_yn', 'N'),
   ])
   for (const x of [t, f]) if (x.error) throw x.error
-  const tbls = t.data as { phy_tbl_id: string; ent_id: string; tbl_nm: string; tbl_desc: string | null; phy_sts_cd: string; phy_cmptn_dtm: string | null; ver_no: number }[]
+  const tbls = t.data as { phy_tbl_id: string; ent_id: string; tbl_nm: string; tbl_desc: string | null; phy_sts_cd: string; phy_cmptn_dtm: string | null; auto_inc_yn: 'Y' | 'N'; ver_no: number }[]
   type Col = PhyCol & { phy_col_id: string; phy_tbl_id: string; ver_no: number }
   const cols: Col[] = []
   for (let i = 0; i < tbls.length; i += TBL_CHUNK) {
@@ -90,7 +90,7 @@ export async function phyDdlInput(areaId: string, prjId: string, p: NonNullable<
   const attrs = m.ents.flatMap((e) => e.attrs)
   const lbl = new Map(attrs.map((a) => [a.attr_id, a.term_log_nm]))
   const rel = new Map(m.rels.map((r) => [r.rel_id, r]))
-  const tables: DdlTbl[] = p.tables.map((t) => ({ ent_id: t.ent_id, tbl_nm: t.tbl_nm, tbl_desc: t.tbl_desc, cols: t.cols.map((c) => ({ ...c, col_desc: c.attr_id ? (lbl.get(c.attr_id) ?? null) : null })) }))
+  const tables: DdlTbl[] = p.tables.map((t) => ({ ent_id: t.ent_id, tbl_nm: t.tbl_nm, tbl_desc: t.tbl_desc, auto_inc_yn: t.auto_inc_yn, cols: t.cols.map((c) => ({ ...c, col_desc: c.attr_id ? (lbl.get(c.attr_id) ?? null) : null })) }))
   return {
     prjNm: (m.prj as { prj_nm: string }).prj_nm,
     d: {

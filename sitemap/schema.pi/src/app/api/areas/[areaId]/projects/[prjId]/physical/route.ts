@@ -11,7 +11,7 @@ import { db } from '@/lib/db'
 import { kstDtm } from '@/lib/bulk'
 import { convertEntities, delPhy, listPhy, loadPhy, phyDdlInput, phyPlan, syncPhy, syncPlan } from '@/lib/model-phy'
 import { alterDdl } from '@/lib/modelpi/phy-sync'
-import { genDdl, phyDocTables } from '@/lib/modelpi/ddl'
+import { autoIncCol, genDdl, phyDocTables } from '@/lib/modelpi/ddl'
 import { docCsv } from '@/lib/modelpi/docs'
 import { DBMS_PRFL, isDbms, type DbmsCd } from '@/lib/modelpi/dbms'
 import { checkColEdits, phyDiff } from '@/lib/modelpi/phy'
@@ -54,7 +54,7 @@ export async function GET(req: Request, { params }: Ctx) {
         const name = encodeURIComponent(`${prjNm}_${DBMS_PRFL[p.mdl.dbms_cd as DbmsCd].nm}_변경분DDL_${at.slice(0, 10)}.sql`)
         return new NextResponse(sql, { headers: { 'Content-Type': 'application/sql; charset=utf-8', 'Content-Disposition': `attachment; filename*=UTF-8''${name}`, 'Cache-Control': 'no-store' } })
       }
-      if (format === 'ddl' || format === 'csv') { // ddl &ai=1 : 단일 정수 PK 자동 증가(IDENTITY·SEQUENCE)
+      if (format === 'ddl' || format === 'csv') {
         const type = sp.get('type')
         if (format === 'csv' && type !== 'tbl' && type !== 'col') return apiError('INVALID_INPUT', 400)
         const x = await phyDdlInput(areaId, prjId, p)
@@ -63,7 +63,7 @@ export async function GET(req: Request, { params }: Ctx) {
         const dbmsNm = DBMS_PRFL[x.d.dbms].nm
         const doc = format === 'csv' ? phyDocTables(x.d.tables)[type as 'tbl' | 'col'] : null
         const name = encodeURIComponent(`${x.prjNm}_${dbmsNm}_${doc ? doc.title : 'DDL'}_${at.slice(0, 10)}.${doc ? 'csv' : 'sql'}`)
-        return new NextResponse(doc ? docCsv(doc) : genDdl(x.d, { prjNm: x.prjNm, at }, { autoInc: sp.get('ai') === '1' }), {
+        return new NextResponse(doc ? docCsv(doc) : genDdl(x.d, { prjNm: x.prjNm, at }), {
           headers: { 'Content-Type': doc ? 'text/csv; charset=utf-8' : 'application/sql; charset=utf-8', 'Content-Disposition': `attachment; filename*=UTF-8''${name}`, 'Cache-Control': 'no-store' },
         })
       }
@@ -153,9 +153,11 @@ export async function POST(req: Request, { params }: Ctx) {
   }
 }
 
+// 칼럼 편집(cols) 또는 테이블 옵션(auto_inc_yn : 단일 정수 PK 자동 증가, sql/036) — 둘 중 하나 이상
 const patchBody = z.object({
   phy_mdl_id: z.string().uuid(),
   phy_tbl_id: z.string().uuid(),
+  auto_inc_yn: z.enum(['Y', 'N']).optional(),
   cols: z
     .array(
       z.object({
@@ -166,9 +168,9 @@ const patchBody = z.object({
         bsc_val_txt: z.string().max(200).nullable().optional(),
       }),
     )
-    .min(1)
-    .max(1000),
-})
+    .max(1000)
+    .default([]),
+}).refine((b) => b.cols.length > 0 || b.auto_inc_yn !== undefined)
 
 export async function PATCH(req: Request, { params }: Ctx) {
   const { areaId, prjId } = await params
@@ -182,6 +184,19 @@ export async function PATCH(req: Request, { params }: Ctx) {
     if (!p || p.mdl.prj_id !== prjId) return apiError('NOT_FOUND', 404)
     const t = p.tables.find((x) => x.phy_tbl_id === b.phy_tbl_id)
     if (!t) return apiError('NOT_FOUND', 404)
+    // 테이블 옵션 : 자동 증가는 단일 정수 PK(관계 상속 아님)만 — 판정은 DDL 생성과 같은 autoIncCol
+    if (b.auto_inc_yn !== undefined) {
+      if (b.auto_inc_yn === 'Y') {
+        const x = await phyDdlInput(areaId, prjId, p)
+        const dt = x?.d.tables.find((y) => y.ent_id === t.ent_id)
+        if (!x || !dt || !autoIncCol(dt, x.d.fkOf)) return NextResponse.json({ ok: false, code: 'INVALID_INPUT', message: '자동 증가는 단일 정수 PK(소수점 없음·관계로 상속된 칼럼 아님) 테이블만 지정할 수 있습니다' }, { status: 400 })
+      }
+      const r = await db().from('mdl_phy_tbl').update({ auto_inc_yn: b.auto_inc_yn, ver_no: t.ver_no + 1, modr_id: auth.user.usr_id }).eq('phy_tbl_id', t.phy_tbl_id).eq('ver_no', t.ver_no).select('phy_tbl_id')
+      if (r.error) throw r.error
+      if (!r.data.length) return apiError('VERSION_CONFLICT', 409)
+      await audit({ area_id: areaId, tgt_tp_cd: 'PHY', tgt_id: t.phy_tbl_id, act_cd: 'UPD', bfr_val: { auto_inc_yn: t.auto_inc_yn }, aftr_val: { auto_inc_yn: b.auto_inc_yn }, usr_id: auth.user.usr_id })
+      if (!b.cols.length) return NextResponse.json({ ok: true, updated: 0, auto_inc_yn: b.auto_inc_yn })
+    }
     const cur = new Map(t.cols.map((c) => [c.phy_col_id, c]))
     if (b.cols.some((e) => cur.get(e.phy_col_id) && cur.get(e.phy_col_id)!.ver_no !== e.ver_no)) return apiError('VERSION_CONFLICT', 409)
     const edits = b.cols.map(({ ver_no: _v, ...e }) => ({ ...e, bsc_val_txt: e.bsc_val_txt === '' ? null : e.bsc_val_txt }))
