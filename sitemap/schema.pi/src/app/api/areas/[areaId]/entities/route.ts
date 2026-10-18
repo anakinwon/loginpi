@@ -10,7 +10,7 @@ import { entSchema, MDL_LVLS, prepareEnt, type MdlLvl } from '@/lib/model'
 import { entNames, type EntWord } from '@/lib/model-name'
 
 type Ctx = { params: Promise<{ areaId: string }> }
-const COLS = 'ent_id, subj_id, ent_log_nm, ent_tp_cd, ent_desc, dic_ids, mdl_lvl_cd, ver_no, regr_id, reg_dtm, mdl_subj!inner(subj_nm, subj_abbr_nm, up_subj_id), mdl_prj!mdl_ent_mdl_prj_id_fkey(tbl_pfx_txt, trgt_dbms_cd)'
+const COLS = 'ent_id, subj_id, ent_log_nm, ent_tp_cd, ent_desc, ent_asst_nm, dic_ids, mdl_lvl_cd, ver_no, regr_id, reg_dtm, mdl_subj!inner(subj_nm, subj_abbr_nm, up_subj_id), mdl_prj!mdl_ent_mdl_prj_id_fkey(tbl_pfx_txt, trgt_dbms_cd)'
 
 export async function GET(req: Request, { params }: Ctx) {
   const { areaId } = await params
@@ -71,7 +71,7 @@ export async function POST(req: Request, { params }: Ctx) {
     const uid = auth.user.usr_id
     const { data, error } = await db()
       .from('mdl_ent')
-      .insert({ area_id: areaId, subj_id: body.subj_id, ent_log_nm: p.ent_log_nm, ent_tp_cd: body.ent_tp_cd, ent_desc: body.ent_desc ?? null, dic_ids: body.dic_ids, ...(body.mdl_lvl_cd ? { mdl_lvl_cd: body.mdl_lvl_cd } : {}), regr_id: uid, modr_id: uid })
+      .insert({ area_id: areaId, subj_id: body.subj_id, ent_log_nm: p.ent_log_nm, ent_tp_cd: body.ent_tp_cd, ent_desc: body.ent_desc ?? null, ent_asst_nm: body.ent_asst_nm || null, dic_ids: body.dic_ids, ...(body.mdl_lvl_cd ? { mdl_lvl_cd: body.mdl_lvl_cd } : {}), regr_id: uid, modr_id: uid })
       .select('ent_id, ent_log_nm, mdl_lvl_cd, ver_no')
       .single()
     if (error) return dbError(error, 'ENT_DUP')

@@ -8,7 +8,7 @@ import { nextSeq } from '@/lib/model-attr'
 type Ctx = { params: Promise<{ areaId: string; entId: string; attrId: string }> }
 const YN = z.enum(['Y', 'N'])
 const schema = z
-  .object({ ver_no: z.coerce.number().int().positive(), term_id: z.string().uuid().optional(), propagate: z.boolean().optional(), pk_yn: YN.optional(), esntl_yn: YN.optional(), attr_desc: z.string().trim().max(4000).nullable().optional() })
+  .object({ ver_no: z.coerce.number().int().positive(), term_id: z.string().uuid().optional(), propagate: z.boolean().optional(), pk_yn: YN.optional(), esntl_yn: YN.optional(), attr_desc: z.string().trim().max(4000).nullable().optional(), attr_asst_nm: z.string().trim().max(200).nullable().optional() })
   .strict()
 
 // 이 속성을 원천으로 같은 용어로 상속한 후손 속성 전부(식별 관계 체인의 손자 이하 포함, PRD_PiErd S1 L1·D4) — 역할명 상속(다른 용어)은 제외
@@ -87,7 +87,7 @@ export async function PATCH(req: Request, { params }: Ctx) {
       if (!t.data) return apiError('ATTR_TERM_INVALID', 400)
     }
     const uid = auth.user.usr_id
-    const set = { ...(swap ? { term_id: swap } : {}), pk_yn: pk ? 'Y' : 'N', pk_seq: pkSeq, esntl_yn: esntl, ...(b.data.attr_desc !== undefined ? { attr_desc: b.data.attr_desc } : {}), ver_no: b.data.ver_no + 1, modr_id: uid }
+    const set = { ...(swap ? { term_id: swap } : {}), pk_yn: pk ? 'Y' : 'N', pk_seq: pkSeq, esntl_yn: esntl, ...(b.data.attr_desc !== undefined ? { attr_desc: b.data.attr_desc } : {}), ...(b.data.attr_asst_nm !== undefined ? { attr_asst_nm: b.data.attr_asst_nm || null } : {}), ver_no: b.data.ver_no + 1, modr_id: uid }
     const { data, error } = await db().from('mdl_attr').update(set).eq('attr_id', attrId).eq('ver_no', b.data.ver_no).eq('del_yn', 'N').select('attr_id, term_id, ver_no, pk_yn, pk_seq, esntl_yn, attr_desc')
     if (error) return dbError(error, 'ATTR_DUP')
     if (!data.length) return apiError('VERSION_CONFLICT', 409)

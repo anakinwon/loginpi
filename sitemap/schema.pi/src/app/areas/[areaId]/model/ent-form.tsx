@@ -14,6 +14,7 @@ export interface EntInit {
   ent_log_nm: string
   ent_tp_cd: string
   ent_desc: string | null
+  ent_asst_nm?: string | null
   dic_ids: string[]
   mdl_lvl_cd: string
 }
@@ -51,6 +52,7 @@ export default function EntForm({ api, areaId, subjs, init, onDone, onCancel }: 
   const [name, setName] = useState(init?.ent_log_nm ?? '')
   const [tp, setTp] = useState(init?.ent_tp_cd ?? 'BASE')
   const [desc, setDesc] = useState(init?.ent_desc ?? '')
+  const [asst, setAsst] = useState(init?.ent_asst_nm ?? '') // 보조명(sql/035)
   const [lvl, setLvl] = useState(init?.mdl_lvl_cd ?? 'LGCL')
   const [cands, setCands] = useState<Cand[]>([])
   const [pick, setPick] = useState(0)
@@ -111,7 +113,7 @@ export default function EntForm({ api, areaId, subjs, init, onDone, onCancel }: 
   const save = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!ok || !confirmSave(!!init, `엔터티 ${cur.ent_log_nm}(${LVL_NM[lvl]})을(를) `)) return
-    const body = { subj_id: subj, dic_ids: cur.dic_ids, ent_tp_cd: tp, ent_desc: desc.trim() || null, mdl_lvl_cd: lvl }
+    const body = { subj_id: subj, dic_ids: cur.dic_ids, ent_tp_cd: tp, ent_desc: desc.trim() || null, ent_asst_nm: asst.trim() || null, mdl_lvl_cd: lvl }
     const j = await (
       await piFetch(init ? `${api}/entities/${init.ent_id}` : `${api}/entities`, {
         method: init ? 'PATCH' : 'POST',
@@ -144,6 +146,7 @@ export default function EntForm({ api, areaId, subjs, init, onDone, onCancel }: 
           ))}
         </select>
         <input value={desc} onChange={(e) => setDesc(e.target.value)} placeholder="설명(관리하는 데이터)" maxLength={4000} className="rounded border border-[#b8c6e0] bg-white px-2 py-1.5 md:col-span-3" aria-label="설명" />
+        <input value={asst} onChange={(e) => setAsst(e.target.value)} placeholder="보조명(선택 — 약칭·영문명 등, ERD 개체명 보기옵션)" maxLength={200} className="rounded border border-[#b8c6e0] bg-white px-2 py-1.5" aria-label="보조명" />
         {init && (
           <select value={lvl} onChange={(e) => setLvl(e.target.value)} className="rounded border border-[#b8c6e0] bg-white px-2 py-1.5" aria-label="모델 단계">
             <option value="LGCL">논리 엔터티</option>

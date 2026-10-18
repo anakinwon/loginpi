@@ -13,6 +13,8 @@ import { piFetch } from '@pi/auth/client'
 //   — 화면 그림(.react-flow__viewport)을 복사해 쪽마다 위치만 바꿔 그림 : '한 장에 맞춤' 또는 '가이드대로 나눔(엔터티 없는 쪽 제외)', @page 용지 지정, 인쇄 때 미리보기 밖은 숨김
 //  표기법(마스터 지시 2026-10-18) : IE(ERwin 정보공학) / 바커(DA#) 선택(이 브라우저에 기억). 바커 = 둥근 박스·# * o, 선 반쪽 실선(필수)·점선(선택),
 //   까마귀발 = 여러 건, 식별 관계 = 자식 쪽 가로 막대(UID bar). 부모 쪽 반 = 부모의 자식 참여(chld_opt_yn), 자식 쪽 반 = 자식의 부모 참여(prnt_opt_yn)
+//  개체명 보기옵션(마스터 지시 2026-10-18, DA# 홈 › 옵션 › 개체명 보기옵션) : 논리 = 엔터티명(보조명·동의어)·속성명(보조명·동의어·도메인),
+//   물리 = 테이블명(엔터티명·보조명·동의어)·컬럼명(속성명·보조명·동의어·도메인). 보조명 = sql/035, 동의어 = 용어 이음동의어·엔터티는 구성 단어 SYN. 이 브라우저에 기억
 import '@xyflow/react/dist/style.css'
 import { Background, BaseEdge, Controls, EdgeLabelRenderer, getSmoothStepPath, Handle, MiniMap, Position, ReactFlow, ReactFlowProvider, useNodesState, useReactFlow, ViewportPortal, type Edge, type EdgeProps, type Node, type NodeProps } from '@xyflow/react'
 import Link from 'next/link'
@@ -35,6 +37,8 @@ interface Attr {
   pk_yn: string
   esntl_yn: string
   fk_rel_id: string | null
+  attr_asst_nm?: string | null // 보조명(sql/035)
+  term_syn?: string | null // 용어 이음동의어
 }
 interface Ent {
   ent_id: string
@@ -44,6 +48,8 @@ interface Ent {
   subj_id: string
   subj_nm: string
   ent_desc: string | null
+  ent_asst_nm?: string | null // 보조명(sql/035)
+  ent_syns?: string[] // 구성 단어 이음동의어
   attrs: Attr[]
   ref: boolean
   ver_no: number
@@ -68,7 +74,7 @@ interface Rel {
 }
 type Lvl = 'CNCP' | 'LGCL' | 'PHY'
 type Nt = 'IE' | 'BK' // 표기법 : IE(ERwin 정보공학) / BK(바커, DA#)
-type EntData = { ent: Ent; lvl: Lvl; phy: boolean; fix: boolean; nt?: Nt }
+type EntData = { ent: Ent; lvl: Lvl; phy: boolean; fix: boolean; nt?: Nt; nmo?: Nmo }
 const NT_NM: Record<Nt, string> = { IE: 'IE 표기(ERwin)', BK: '바커 표기(DA#)' }
 const LEGEND: Record<Nt, string> = {
   IE: '실선 = 식별 관계 · 점선 = 비식별 관계 · 까마귀발 = 여러 건 · ○ = 선택 · 🔑 주식별자 · ↗ 상속(FK) · * 필수',
@@ -85,16 +91,33 @@ const TP_COLOR: Record<string, { head: string; border: string; nm: string }> = {
 const LVL_NM: Record<Lvl, string> = { CNCP: '개념(이름)', LGCL: '논리(속성·키)', PHY: '물리(칼럼·도메인)' }
 
 // 속성 줄 — IE : 🔑 주식별자·↗ 상속·· 일반 + 끝 * 필수 / 바커 : # 식별자·* 필수·o 선택(앞 기호)
-const lines = (e: Ent, lvl: Lvl, phy: boolean, nt: Nt = 'IE') =>
+const lines = (e: Ent, lvl: Lvl, phy: boolean, nt: Nt = 'IE', o: Nmo = NMO_DEF) =>
   lvl === 'CNCP'
     ? []
     : e.attrs.map((a) => {
-        const nm = `${phy || lvl === 'PHY' ? a.term_phy_nm : a.term_log_nm}${lvl === 'PHY' && a.dom_nm ? ` ${a.dom_nm}` : ''}`
+        const p = phy || lvl === 'PHY'
+        const nm = p
+          ? `${a.term_phy_nm}${o.pColAttr ? ` (${a.term_log_nm})` : ''}${addOn(a.attr_asst_nm, a.term_syn, o.pColAsst, o.pColSyn)}${o.pColDom && a.dom_nm ? ` ${a.dom_nm}` : ''}`
+          : `${a.term_log_nm}${addOn(a.attr_asst_nm, a.term_syn, o.lAttrAsst, o.lAttrSyn)}${o.lAttrDom && a.dom_nm ? ` : ${a.dom_nm}` : ''}`
         if (nt === 'BK') return `${a.pk_yn === 'Y' ? '#' : a.esntl_yn === 'Y' ? '*' : 'o'} ${nm}`
         return `${a.pk_yn === 'Y' ? '🔑' : a.fk_rel_id ? '↗' : '·'} ${nm}${a.esntl_yn === 'Y' && a.pk_yn !== 'Y' ? ' *' : ''}`
       })
-const title = (e: Ent, phy: boolean) => (phy ? e.tbl_phy_nm : e.ent_log_nm)
-const sizeOf = (e: Ent, lvl: Lvl, phy: boolean) => boxSize(title(e, phy), lines(e, lvl, phy))
+// 개체명 보기옵션(DA# 개체명 보기옵션과 같은 구성) — l* 논리 표시(엔터티·속성), p* 물리 표시(테이블·컬럼)
+type Nmo = { lEntAsst: boolean; lEntSyn: boolean; lAttrAsst: boolean; lAttrSyn: boolean; lAttrDom: boolean; pTblEnt: boolean; pTblAsst: boolean; pTblSyn: boolean; pColAttr: boolean; pColAsst: boolean; pColSyn: boolean; pColDom: boolean }
+// 기본값 : DA# 화면 기본(물리 엔터티명·속성명 병기) + 물리 도메인(기존 '물리(칼럼·도메인)' 표시 유지)
+const NMO_DEF: Nmo = { lEntAsst: false, lEntSyn: false, lAttrAsst: false, lAttrSyn: false, lAttrDom: false, pTblEnt: true, pTblAsst: false, pTblSyn: false, pColAttr: true, pColAsst: false, pColSyn: false, pColDom: true }
+const NMO_FORM: [string, [string, [keyof Nmo, string][]][]][] = [
+  ['논리', [['엔터티명 보기 옵션', [['lEntAsst', '보조명 보기'], ['lEntSyn', '동의어 보기']]], ['속성명 보기 옵션', [['lAttrAsst', '보조명 보기'], ['lAttrSyn', '동의어 보기'], ['lAttrDom', '도메인 보기']]]]],
+  ['물리', [['테이블명 보기 옵션', [['pTblEnt', '엔터티명 보기'], ['pTblAsst', '보조명 보기'], ['pTblSyn', '동의어 보기']]], ['컬럼명 보기 옵션', [['pColAttr', '속성명 보기'], ['pColAsst', '보조명 보기'], ['pColSyn', '동의어 보기'], ['pColDom', '도메인 보기']]]]],
+]
+// 덧붙임 : 보조명 [ ], 동의어 { }, 물리일 때 논리명 ( )
+const addOn = (asst: string | null | undefined, syn: string | string[] | null | undefined, showAsst: boolean, showSyn: boolean) => {
+  const sy = (Array.isArray(syn) ? syn : (syn ?? '').split(',')).map((x) => x.trim()).filter(Boolean)
+  return `${showAsst && asst ? ` [${asst}]` : ''}${showSyn && sy.length ? ` {${sy.join(', ')}}` : ''}`
+}
+const title = (e: Ent, phy: boolean, o: Nmo = NMO_DEF) =>
+  phy ? `${e.tbl_phy_nm}${o.pTblEnt ? ` (${e.ent_log_nm})` : ''}${addOn(e.ent_asst_nm, e.ent_syns, o.pTblAsst, o.pTblSyn)}` : `${e.ent_log_nm}${addOn(e.ent_asst_nm, e.ent_syns, o.lEntAsst, o.lEntSyn)}`
+const sizeOf = (e: Ent, lvl: Lvl, phy: boolean, o: Nmo = NMO_DEF) => boxSize(title(e, phy, o), lines(e, lvl, phy, 'IE', o))
 
 const SIDES = [
   ['t', Position.Top],
@@ -104,9 +127,9 @@ const SIDES = [
 ] as const
 
 function EntNode({ data, selected }: NodeProps<ENode>) {
-  const { ent: e, lvl, phy, fix, nt = 'IE' } = data
+  const { ent: e, lvl, phy, fix, nt = 'IE', nmo = NMO_DEF } = data
   const c = TP_COLOR[e.ent_tp_cd] ?? TP_COLOR.BASE
-  const { w, h } = sizeOf(e, lvl, phy)
+  const { w, h } = sizeOf(e, lvl, phy, nmo)
   return (
     <div style={{ width: w, minHeight: h, borderColor: c.border, borderStyle: e.ref ? 'dashed' : 'solid' }} className={`${nt === 'BK' ? 'overflow-hidden rounded-2xl' : 'rounded'} border-2 bg-white text-xs shadow-sm ${selected ? 'ring-2 ring-amber-400' : ''}`}>
       {SIDES.map(([k, p]) => (
@@ -116,13 +139,13 @@ function EntNode({ data, selected }: NodeProps<ENode>) {
         </span>
       ))}
       <div style={{ background: c.head }} className="flex items-center gap-1 px-2 py-1 font-semibold text-white">
-        <span className="truncate">{title(e, phy)}</span>
+        <span className="truncate" title={title(e, phy, nmo)}>{title(e, phy, nmo)}</span>
         {fix && <span title="고정(자동 배치가 옮기지 않음)">📌</span>}
         {e.ref && <span className="ml-auto rounded bg-white/25 px-1 text-[10px]">참조 · {e.subj_nm}</span>}
       </div>
       {lvl !== 'CNCP' && (
         <ul className="px-2 py-1 font-mono leading-[18px]">
-          {lines(e, lvl, phy, nt).map((l, i) => (
+          {lines(e, lvl, phy, nt, nmo).map((l, i) => (
             <li key={i} className={`truncate ${e.attrs[i]?.pk_yn === 'Y' ? 'font-semibold' : ''}`}>
               {l}
             </li>
@@ -252,6 +275,21 @@ function Erd({ areaId }: { areaId: string }) {
   const [pr, setPr] = useState({ paper: 'A3', orient: 'landscape' as Orient, margin: 10, title: true, guide: false, mode: 'fit' as 'fit' | 'pages' }) // 인쇄 설정
   const [shot, setShot] = useState<string | null>(null) // 인쇄 미리보기(화면 그림 복사본) — null = 닫힘
   const [nt, setNt] = useState<Nt>('IE') // 표기법
+  const [nmo, setNmo] = useState<Nmo>(NMO_DEF) // 개체명 보기옵션
+  const [nmoDraft, setNmoDraft] = useState<Nmo | null>(null) // 대화창 편집 중 값(null = 닫힘)
+  useEffect(() => {
+    try {
+      const v = window.localStorage.getItem('erd-nmo')
+      if (v) setNmo({ ...NMO_DEF, ...JSON.parse(v) })
+    } catch {}
+  }, [])
+  const applyNmo = (v: Nmo) => {
+    setNmo(v)
+    setNmoDraft(null)
+    try {
+      window.localStorage.setItem('erd-nmo', JSON.stringify(v))
+    } catch {}
+  }
   useEffect(() => {
     try {
       if (window.localStorage.getItem('erd-notation') === 'BK') setNt('BK')
@@ -314,14 +352,14 @@ function Erd({ areaId }: { areaId: string }) {
     if (keep) for (const [id, c] of curRef.current) pos.set(id, { ent_id: id, ...c, fix: pos.get(id)?.fix ?? false })
     // 좌표 없는 엔터티만 자동 배치(좌표가 하나도 없으면 전체 배치)
     const laid = autoLayout(
-      es.map((e) => ({ id: e.ent_id, ...sizeOf(e, lvl, phy), group: e.subj_id, x: pos.get(e.ent_id)?.x, y: pos.get(e.ent_id)?.y, fixed: pos.get(e.ent_id)?.fix })),
+      es.map((e) => ({ id: e.ent_id, ...sizeOf(e, lvl, phy, nmo), group: e.subj_id, x: pos.get(e.ent_id)?.x, y: pos.get(e.ent_id)?.y, fixed: pos.get(e.ent_id)?.fix })),
       (j.rels as Rel[]).map((r) => ({ from: r.prnt_ent_id, to: r.chld_ent_id })),
       { mode: 'new' },
     )
     setEnts(es)
     const shownIds = new Set(es.map((e) => e.ent_id))
     setRels((j.rels as Rel[]).filter((r) => shownIds.has(r.prnt_ent_id) && shownIds.has(r.chld_ent_id))) // 숨긴 참조 엔터티의 관계 제외
-    setNodes(es.map((e) => ({ id: e.ent_id, type: 'ent', position: laid[e.ent_id], data: { ent: e, lvl, phy, nt, fix: !!pos.get(e.ent_id)?.fix } })))
+    setNodes(es.map((e) => ({ id: e.ent_id, type: 'ent', position: laid[e.ent_id], data: { ent: e, lvl, phy, nt, nmo, fix: !!pos.get(e.ent_id)?.fix } })))
     if (!keep) setLyt(Object.fromEntries(((j.rel_lyt ?? []) as (RelLyt & { rel_id: string })[]).map(({ rel_id, ...l }) => [rel_id, l])))
     if (!keep) setSelRel(null)
     setDirty((d) => (keep && d) || es.some((e) => !pos.has(e.ent_id)))
@@ -363,20 +401,20 @@ function Erd({ areaId }: { areaId: string }) {
 
   // 표시 수준·이름 전환은 데이터만 갱신(좌표 유지)
   useEffect(() => {
-    setNodes((ns) => ns.map((n) => ({ ...n, data: { ...n.data, lvl, phy, nt } })))
-  }, [lvl, phy, nt, setNodes])
+    setNodes((ns) => ns.map((n) => ({ ...n, data: { ...n.data, lvl, phy, nt, nmo } })))
+  }, [lvl, phy, nt, nmo, setNodes])
 
   const byId = useMemo(() => new Map(nodes.map((n) => [n.id, n])), [nodes])
   // 박스(실측 크기 우선)·자동 끝점 — 드래그할 때마다 다시 계산
   const geo = useMemo(() => {
     const boxes = new Map<string, Box>()
     for (const n of nodes) {
-      const s = sizeOf(n.data.ent, lvl, phy)
+      const s = sizeOf(n.data.ent, lvl, phy, nmo)
       boxes.set(n.id, { x: n.position.x, y: n.position.y, w: n.measured?.width ?? s.w, h: n.measured?.height ?? s.h })
     }
     const shown = rels.filter((r) => boxes.has(r.prnt_ent_id) && boxes.has(r.chld_ent_id))
     return { boxes, shown, auto: autoAnchors(shown.map((r) => ({ id: r.rel_id, from: r.prnt_ent_id, to: r.chld_ent_id })), boxes) }
-  }, [nodes, rels, lvl, phy])
+  }, [nodes, rels, lvl, phy, nmo])
   const lytOf = useCallback((id: string): RelLyt => lyt[id] ?? { ...geo.auto.get(id)!, mx: null, my: null }, [lyt, geo])
   // 손잡이 끌기 — 끝점은 놓은 자리에서 가장 가까운 변·비율로, 꺾임점은 좌표 그대로
   const dragRel = useCallback(
@@ -458,7 +496,7 @@ function Erd({ areaId }: { areaId: string }) {
   const arrange = (mode: 'all' | 'new') => {
     setUndo(curPos())
     const laid = autoLayout(
-      nodes.map((n) => ({ id: n.id, ...sizeOf(n.data.ent, lvl, phy), group: n.data.ent.subj_id, x: n.position.x, y: n.position.y, fixed: n.data.fix })),
+      nodes.map((n) => ({ id: n.id, ...sizeOf(n.data.ent, lvl, phy, nmo), group: n.data.ent.subj_id, x: n.position.x, y: n.position.y, fixed: n.data.fix })),
       rels.map((r) => ({ from: r.prnt_ent_id, to: r.chld_ent_id })),
       { mode },
     )
@@ -503,7 +541,7 @@ function Erd({ areaId }: { areaId: string }) {
     const n = byId.get(id)
     if (!n) return
     setSel(id)
-    const { w, h } = sizeOf(n.data.ent, lvl, phy)
+    const { w, h } = sizeOf(n.data.ent, lvl, phy, nmo)
     void flow.setCenter(n.position.x + w / 2, n.position.y + h / 2, { zoom: 1.1, duration: 300 })
   }
   // 인쇄 — 쪽 크기(여백 뺀 인쇄 영역)·내용 영역(제목·범례 줄 뺌)·페이지 나눔
@@ -607,6 +645,9 @@ function Erd({ areaId }: { areaId: string }) {
         <label className="flex items-center gap-1">
           <input type="checkbox" checked={phy} onChange={(e) => setPhy(e.target.checked)} /> 물리명
         </label>
+        <button type="button" className="rounded bg-white/20 px-2 py-1 hover:bg-white/30" onClick={() => setNmoDraft(nmo)} title="DA# 개체명 보기옵션 — 보조명·동의어·도메인·논리명 병기">
+          개체명 보기옵션
+        </button>
         <label className="flex items-center gap-1" title="관계로 이어진 다른 주제영역 엔터티를 점선 박스로 함께 표시">
           <input type="checkbox" checked={showRef} onChange={(e) => (setShowRef(e.target.checked), setSel(null))} /> 다른 주제영역 참조 표시
         </label>
@@ -830,6 +871,48 @@ function Erd({ areaId }: { areaId: string }) {
           <summary className="cursor-pointer font-semibold text-[#1f3a68]">관계 편집(등록·수정·삭제·FK 상속·N:M 해소)</summary>
           <Relations api={api} prjId={prjId} editor={editor} entsKey={ents.length} onSaved={refresh} />
         </details>
+      )}
+      {nmoDraft && (
+        <div className="fixed inset-0 z-[900] grid place-items-center bg-black/30" onClick={() => setNmoDraft(null)}>
+          <div role="dialog" aria-label="개체명 보기옵션" className="w-80 rounded-lg border bg-white text-sm shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between border-b px-3 py-2">
+              <strong>개체명 보기옵션</strong>
+              <button type="button" onClick={() => setNmoDraft(null)} aria-label="닫기" className="text-gray-500">
+                ✕
+              </button>
+            </div>
+            <div className="max-h-[70vh] overflow-auto p-2">
+              {NMO_FORM.map(([grp, secs]) => (
+                <div key={grp} className="mb-2 rounded border">
+                  <div className="bg-gray-100 px-2 py-1 font-semibold">{grp}</div>
+                  {secs.map(([sec, items]) => (
+                    <div key={sec}>
+                      <div className="bg-gray-50 px-3 py-0.5 text-xs font-semibold text-gray-700">{sec}</div>
+                      {items.map(([k, nm]) => (
+                        <label key={k} className="flex items-center justify-between border-t px-4 py-1 hover:bg-gray-50">
+                          {nm}
+                          <input type="checkbox" checked={nmoDraft[k]} onChange={(e) => setNmoDraft({ ...nmoDraft, [k]: e.target.checked })} />
+                        </label>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              ))}
+              <p className="px-1 text-xs text-gray-500">표시 : [보조명] · {'{동의어}'} · 물리에서 (논리명) — 논리/물리는 '물리명'·표시 수준(물리)에 따름</p>
+            </div>
+            <div className="flex justify-end gap-2 border-t px-3 py-2">
+              <button type="button" onClick={() => setNmoDraft(NMO_DEF)} className="mr-auto text-xs text-gray-600 underline">
+                기본값
+              </button>
+              <button type="button" onClick={() => applyNmo(nmoDraft)} className="btn-3d px-4 py-1">
+                확인
+              </button>
+              <button type="button" onClick={() => setNmoDraft(null)} className="rounded border px-4 py-1">
+                취소
+              </button>
+            </div>
+          </div>
+        </div>
       )}
       {shot !== null &&
         createPortal(

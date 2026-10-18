@@ -84,6 +84,7 @@ export const entSchema = z.object({
   dic_ids: z.array(z.string().uuid()).min(1).max(20),
   ent_tp_cd: z.enum(Object.keys(ENT_TP) as [EntTp, ...EntTp[]]).default('BASE'),
   ent_desc: z.string().trim().max(4000).nullable().optional(),
+  ent_asst_nm: z.string().trim().max(200).nullable().optional(), // 보조명(sql/035, 자유 입력)
   mdl_lvl_cd: z.enum(MDL_LVLS).optional(),
 })
 

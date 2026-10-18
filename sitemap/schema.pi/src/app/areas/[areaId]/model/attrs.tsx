@@ -16,6 +16,7 @@ interface Attr {
   esntl_yn: string
   fk_rel_id: string | null
   attr_desc: string | null
+  attr_asst_nm?: string | null
   ver_no: number
   std_term: { term_log_nm: string; term_phy_nm: string; std_dom: { dom_nm: string } | null } | null
 }
@@ -109,7 +110,7 @@ export default function Attrs({ api, areaId, entId, entNm, editor, onChanged }: 
   const [msg, setMsg] = useState('')
   // 자유 추가(검색 용어·PK·필수), 행 수정(용어 교체·설명)
   const [nw, setNw] = useState<{ t: Term | null; pk: boolean; es: boolean }>({ t: null, pk: false, es: true })
-  const [ed, setEd] = useState<{ id: string; t: Term | null; desc: string } | null>(null)
+  const [ed, setEd] = useState<{ id: string; t: Term | null; desc: string; asst: string } | null>(null)
 
   const load = useCallback(async () => {
     const [a, s] = await Promise.all([piFetch(base).then((r) => r.json()), piFetch(`${base}/suggest`).then((r) => r.json())])
@@ -143,7 +144,7 @@ export default function Attrs({ api, areaId, entId, entNm, editor, onChanged }: 
     void load()
     onChanged?.() // 변경 후 호출측(ERD 등) 갱신
   }
-  const patch = async (a: Attr, set: { pk_yn?: string; esntl_yn?: string; term_id?: string; attr_desc?: string | null; propagate?: boolean }) => {
+  const patch = async (a: Attr, set: { pk_yn?: string; esntl_yn?: string; term_id?: string; attr_desc?: string | null; attr_asst_nm?: string | null; propagate?: boolean }) => {
     const j = await (await piFetch(`${base}/${a.attr_id}`, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ver_no: a.ver_no, ...set }) })).json()
     setMsg(j.ok ? (j.propagated || j.propagate_fail?.length ? `자식 FK ${j.propagated}건 함께 변경${j.propagate_fail?.length ? ` · 실패 ${j.propagate_fail.join(', ')}` : ''}` : '') : j.message)
     void load()
@@ -162,9 +163,10 @@ export default function Attrs({ api, areaId, entId, entNm, editor, onChanged }: 
   }
   const saveEd = async (a: Attr) => {
     if (!ed) return
-    const set: { term_id?: string; attr_desc?: string | null; propagate?: boolean } = {}
+    const set: { term_id?: string; attr_desc?: string | null; attr_asst_nm?: string | null; propagate?: boolean } = {}
     if (ed.t && ed.t.term_id !== a.term_id) set.term_id = ed.t.term_id
     if (ed.desc.trim() !== (a.attr_desc ?? '')) set.attr_desc = ed.desc.trim() || null
+    if (ed.asst.trim() !== (a.attr_asst_nm ?? '')) set.attr_asst_nm = ed.asst.trim() || null
     if (!Object.keys(set).length) return setEd(null)
     // 주식별자 용어 교체 : 같은 용어로 상속한 자식 속성 전파 여부(미리보기)
     if (set.term_id && a.pk_yn === 'Y') {
@@ -294,7 +296,7 @@ export default function Attrs({ api, areaId, entId, entNm, editor, onChanged }: 
                 <td className="border px-2 py-1 text-center">
                   {editor && (
                     <>
-                      <button type="button" onClick={() => setEd(ed?.id === a.attr_id ? null : { id: a.attr_id, t: null, desc: a.attr_desc ?? '' })} className="mr-2 underline">
+                      <button type="button" onClick={() => setEd(ed?.id === a.attr_id ? null : { id: a.attr_id, t: null, desc: a.attr_desc ?? '', asst: a.attr_asst_nm ?? '' })} className="mr-2 underline">
                         수정
                       </button>
                       <button type="button" onClick={() => void del(a)} className="text-red-700 underline">
@@ -321,6 +323,8 @@ export default function Attrs({ api, areaId, entId, entNm, editor, onChanged }: 
                     <div className="mt-1 flex items-center gap-2">
                       <span className="font-semibold">설명</span>
                       <input value={ed.desc} onChange={(e) => setEd({ ...ed, desc: e.target.value })} maxLength={4000} className="flex-1 rounded border px-2 py-0.5" aria-label="속성 설명" />
+                      <span className="font-semibold">보조명</span>
+                      <input value={ed.asst} onChange={(e) => setEd({ ...ed, asst: e.target.value })} maxLength={200} placeholder="선택" className="w-40 rounded border px-2 py-0.5" aria-label="속성 보조명" />
                       <button type="button" onClick={() => void saveEd(a)} className="btn-3d px-3 py-0.5">
                         저장
                       </button>

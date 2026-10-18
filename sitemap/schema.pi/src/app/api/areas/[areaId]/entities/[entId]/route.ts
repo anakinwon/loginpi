@@ -42,7 +42,7 @@ export async function PATCH(req: Request, { params }: Ctx) {
     const p = await prepareEnt(areaId, b.data)
     if (typeof p === 'string') return apiError(p, p === 'NOT_FOUND' ? 404 : 400)
     const uid = auth.user.usr_id
-    const set = { subj_id: b.data.subj_id, ent_log_nm: p.ent_log_nm, ent_tp_cd: b.data.ent_tp_cd, ent_desc: b.data.ent_desc ?? null, dic_ids: b.data.dic_ids, ...(b.data.mdl_lvl_cd ? { mdl_lvl_cd: b.data.mdl_lvl_cd } : {}), ver_no: v.data + 1, modr_id: uid }
+    const set = { subj_id: b.data.subj_id, ent_log_nm: p.ent_log_nm, ent_tp_cd: b.data.ent_tp_cd, ent_desc: b.data.ent_desc ?? null, ...(b.data.ent_asst_nm !== undefined ? { ent_asst_nm: b.data.ent_asst_nm || null } : {}), dic_ids: b.data.dic_ids, ...(b.data.mdl_lvl_cd ? { mdl_lvl_cd: b.data.mdl_lvl_cd } : {}), ver_no: v.data + 1, modr_id: uid }
     const { data, error } = await db().from('mdl_ent').update(set).eq('ent_id', entId).eq('ver_no', v.data).eq('del_yn', 'N').select('ent_id, ent_log_nm, mdl_lvl_cd, ver_no')
     if (error) return dbError(error, 'ENT_DUP')
     if (!data.length) return apiError('VERSION_CONFLICT', 409)
