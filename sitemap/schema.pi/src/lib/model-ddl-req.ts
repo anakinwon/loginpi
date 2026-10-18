@@ -14,7 +14,7 @@ import { isDbms } from './modelpi/dbms'
 import { jndiOk, parseJdbcUrl, urlStorable } from './modelpi/jdbc-url'
 import { pemOk } from './modelpi/known-ca'
 import { connFp } from './modelpi/seal'
-import { directEnabled, openPwd, profileKey, sealPwd } from './secret'
+import { connBlock, directEnabled, openPwd, profileKey, sealPwd } from './secret'
 
 export type ConnRow = {
   conn_id: string
@@ -108,7 +108,7 @@ const sameTarget = (c: ConnRow, b: ConnIn) => c.exec_mthd_cd === 'SRV' && c.dbms
 export async function saveConn(areaId: string, b: ConnIn, uid: string, cur?: ConnRow & { want_ver: number }): Promise<ConnRow | Fail> {
   const srv = b.exec_mthd_cd === 'SRV'
   if (srv && (!b.host_nm || !b.port_no || !b.db_nm || !b.usr_nm)) return fail('INVALID_INPUT', 400)
-  if (srv && !profileKey()) return fail('DB_CONN_DISABLED', 503)
+  if (srv && !profileKey()) return fail('DB_CONN_DISABLED', 503, connBlock({ key: true }))
   if (!srv) {
     if (!b.agt_id || (!b.conn_url_txt && !b.jndi_nm)) return fail('INVALID_INPUT', 400)
     if (b.conn_url_txt && !urlStorable(b.conn_url_txt, b.dbms_cd)) return fail('INVALID_INPUT', 400, 'JDBC URL 형식이 이 DBMS 와 맞지 않거나 허용되지 않는 인자가 있습니다(사용자·비밀번호는 URL 에 넣지 않음)')
@@ -254,7 +254,7 @@ export async function daCount(areaId: string) {
 export async function approveReq(areaId: string, prjId: string, reqId: string, expectHash: string, uid: string, selfRsn?: string): Promise<ReqRow | Fail> {
   const q = await getReq(areaId, prjId, reqId)
   if (!q) return fail('NOT_FOUND', 404)
-  if (q.exec_mthd_cd === 'SRV' && !profileKey()) return fail('DB_CONN_DISABLED', 503) // 에이전트 요청은 서버 키 불필요
+  if (q.exec_mthd_cd === 'SRV' && !profileKey()) return fail('DB_CONN_DISABLED', 503, connBlock({ key: true })) // 에이전트 요청은 서버 키 불필요
   if (q.req_sts_cd !== 'REQ') return fail('DDL_REQ_STATE', 409)
   const self = q.req_usr_id === uid
   if (self) {
@@ -302,7 +302,7 @@ export async function testConnById(areaId: string, connId: string): Promise<{ ok
     if (u.error) throw u.error
     return { ok: true, queued: true }
   }
-  if (!profileKey() || !directEnabled()) return fail('DB_CONN_DISABLED', 503)
+  if (!profileKey() || !directEnabled()) return fail('DB_CONN_DISABLED', 503, connBlock())
   const c = c0
   const pwd = c.pwd_enc_txt ? openPwd(areaId, connId, c.pwd_enc_txt) : null
   if (pwd == null) return fail('DB_CONN_FAIL', 400, '저장된 비밀번호를 열 수 없습니다 — 비밀번호를 다시 입력하십시오')
@@ -323,7 +323,7 @@ export const tlsHint = (m: string) => (/self-signed|unable to (get|verify)|certi
 //  서버 직접 : 수정 중 비밀번호를 비우면 대상이 그대로일 때만 저장된 비밀번호
 //  에이전트 : JDBC URL 을 해석해 서버가 직접 시험(공인 주소만, 비밀번호는 시험용으로 입력 — 저장 안 함). 사내망 주소는 저장 뒤 에이전트 시험
 export async function testConnDraft(areaId: string, b: ConnIn, connId?: string): Promise<{ ok: true } | Fail> {
-  if (!directEnabled()) return fail('DB_CONN_DISABLED', 503)
+  if (!directEnabled()) return fail('DB_CONN_DISABLED', 503, connBlock({ direct: true }))
   if (b.exec_mthd_cd === 'AGT') {
     if (!b.conn_url_txt) return fail('INVALID_INPUT', 400, 'JNDI 접속은 저장 뒤 [연결 시험]으로 에이전트가 시험합니다')
     if (!urlStorable(b.conn_url_txt, b.dbms_cd)) return fail('INVALID_INPUT', 400, 'JDBC URL 형식이 이 DBMS 와 맞지 않거나 허용되지 않는 인자가 있습니다')
@@ -355,7 +355,7 @@ export async function testConnDraft(areaId: string, b: ConnIn, connId?: string):
 
 // 실행 — 승인(또는 실패·일부 실행 뒤 재실행) 요청을 점유(RUN·시도 번호 증가) → 저장 DDL 만 실행 → 문장별 결과·최종 상태
 export async function runReq(areaId: string, prjId: string, reqId: string, uid: string, isDa: boolean): Promise<(ReqRow & { results: StmtRes[] }) | Fail> {
-  if (!profileKey() || !directEnabled()) return fail('DB_CONN_DISABLED', 503)
+  if (!profileKey() || !directEnabled()) return fail('DB_CONN_DISABLED', 503, connBlock())
   const q = await getReq(areaId, prjId, reqId, true)
   if (!q) return fail('NOT_FOUND', 404)
   if (q.req_usr_id !== uid && !isDa) return fail('FORBIDDEN', 403)

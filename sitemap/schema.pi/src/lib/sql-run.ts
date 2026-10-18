@@ -15,7 +15,7 @@ import { db } from './db'
 import { audit, errMsg, type ErrorCode } from './api'
 import { can, type MbrRole } from './roles'
 import { IDLE_TX_MS, LOCK_MS, maskErr, ORA_EXPIRE_MIN, pgClient, resolveTarget, STMT_MS, type Target } from './db-exec'
-import { directEnabled, openPwd, profileKey } from './secret'
+import { connBlock, openPwd } from './secret'
 import { getConn, tlsHint } from './model-ddl-req'
 import { classify, danger, splitSql, stmtAt, type Danger, type Dialect, type Kind, type Stmt } from './modelpi/sql-split'
 
@@ -298,7 +298,8 @@ export async function openConn(areaId: string, connId: string, role: MbrRole): P
   if (c.exec_mthd_cd !== 'SRV') return failRes({ code: 'SQL_AGT_UNSUPPORTED', status: 400 })
   // DA 아닌 역할 = 조회 전용 계정 접속만(fail-closed) — 어휘 판정·READ ONLY 트랜잭션은 사용자 함수 안 부작용을 못 막고, 메타도 그 계정 권한으로 열람
   if (!can(role, 'SQL_WRITE') && c.rdonly_acct_yn !== 'Y') return failRes({ code: 'SQL_RDONLY_REQUIRED', status: 403 })
-  if (!directEnabled() || !profileKey()) return failRes({ code: 'DB_CONN_DISABLED', status: 503 })
+  const why = connBlock()
+  if (why) return failRes({ code: 'DB_CONN_DISABLED', status: 503, detail: why })
   const d: Dialect | null = c.dbms_cd === '0014' ? 'PG' : c.dbms_cd === '0001' ? 'ORA' : null
   if (!d) return failRes({ code: 'DB_CONN_MISMATCH', status: 400 })
   const pwd = c.pwd_enc_txt ? openPwd(areaId, c.conn_id, c.pwd_enc_txt) : null

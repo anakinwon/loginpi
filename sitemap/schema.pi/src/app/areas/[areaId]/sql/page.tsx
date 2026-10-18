@@ -283,7 +283,7 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
     void (async () => {
       const r = await piFetch(`${api}/sql/meta?conn=${connId}&node=schemas`)
       const j = await r.json()
-      if (!j.ok) return setMsg(j.detail ?? j.message)
+      if (!j.ok) return setMsg(typeof j.detail === 'string' ? `${j.message} — ${j.detail}` : j.message)
       setSchemas(j.items)
       const keep = store.get(`sql-schema-${areaId}-${connId}`)
       setSchema(j.items.find((s: { name: string }) => s.name === keep)?.name ?? j.items.find((s: { cur: boolean }) => s.cur)?.name ?? j.items[0]?.name ?? '')

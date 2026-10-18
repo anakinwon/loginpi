@@ -77,6 +77,7 @@ export default function ConnPanel({
   const [agts, setAgts] = useState<Agt[]>([])
   const [admin, setAdmin] = useState(false)
   const [keySet, setKeySet] = useState(true)
+  const [block, setBlock] = useState<string | null>(null) // 접속 기능 꺼짐 사유(서버 진단, 값 노출 없음)
   const [edit, setEdit] = useState<{ id: string | null; ver: number } | null>(
     null,
   )
@@ -94,6 +95,7 @@ export default function ConnPanel({
     setItems(j.items)
     setAdmin(j.admin)
     setKeySet(j.key_set)
+    setBlock(j.block ?? null)
     if (j.admin) {
       const g = await (await piFetch(`${api}/db-agts`)).json()
       if (g.ok) setAgts(g.items)
@@ -342,11 +344,9 @@ export default function ConnPanel({
 
   return (
     <div className="text-sm">
-      {!keySet && (
+      {(!keySet || block) && (
         <p className="mb-2 rounded border border-amber-300 bg-amber-50 p-2 text-xs text-amber-900">
-          서버 암호화 키(DB_PROFILE_KEY)가 없어 서버 직접 접속을
-          저장·시험·실행할 수 없습니다(에이전트 접속만). 운영 환경변수를
-          설정하십시오.
+          서버 직접 접속을 {keySet ? '시험·실행' : '저장·시험·실행'}할 수 없습니다(에이전트 접속만) — {block ?? '서버 암호화 키(DB_PROFILE_KEY) 확인'}
         </p>
       )}
       {msg && (
