@@ -54,7 +54,7 @@ export async function GET(req: Request, { params }: Ctx) {
         const name = encodeURIComponent(`${prjNm}_${DBMS_PRFL[p.mdl.dbms_cd as DbmsCd].nm}_변경분DDL_${at.slice(0, 10)}.sql`)
         return new NextResponse(sql, { headers: { 'Content-Type': 'application/sql; charset=utf-8', 'Content-Disposition': `attachment; filename*=UTF-8''${name}`, 'Cache-Control': 'no-store' } })
       }
-      if (format === 'ddl' || format === 'csv') {
+      if (format === 'ddl' || format === 'csv') { // ddl &ai=1 : 단일 정수 PK 자동 증가(IDENTITY·SEQUENCE)
         const type = sp.get('type')
         if (format === 'csv' && type !== 'tbl' && type !== 'col') return apiError('INVALID_INPUT', 400)
         const x = await phyDdlInput(areaId, prjId, p)
@@ -63,7 +63,7 @@ export async function GET(req: Request, { params }: Ctx) {
         const dbmsNm = DBMS_PRFL[x.d.dbms].nm
         const doc = format === 'csv' ? phyDocTables(x.d.tables)[type as 'tbl' | 'col'] : null
         const name = encodeURIComponent(`${x.prjNm}_${dbmsNm}_${doc ? doc.title : 'DDL'}_${at.slice(0, 10)}.${doc ? 'csv' : 'sql'}`)
-        return new NextResponse(doc ? docCsv(doc) : genDdl(x.d, { prjNm: x.prjNm, at }), {
+        return new NextResponse(doc ? docCsv(doc) : genDdl(x.d, { prjNm: x.prjNm, at }, { autoInc: sp.get('ai') === '1' }), {
           headers: { 'Content-Type': doc ? 'text/csv; charset=utf-8' : 'application/sql; charset=utf-8', 'Content-Disposition': `attachment; filename*=UTF-8''${name}`, 'Cache-Control': 'no-store' },
         })
       }

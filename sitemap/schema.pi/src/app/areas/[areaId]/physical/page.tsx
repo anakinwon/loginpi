@@ -8,7 +8,7 @@ import { piFetch } from '@pi/auth/client'
 //  논리 변경 반영(S5) = 동기화(순서·NULL·기본값 편집 유지) + 변경분 DDL(ALTER) 내려받기. 삭제 후 재전환도 가능(편집값 사라짐)
 import Link from 'next/link'
 import { use, useCallback, useEffect, useMemo, useState } from 'react'
-import { dbmsList, type DbmsCd } from '@/lib/modelpi/dbms'
+import { DBMS_PRFL, dbmsList, type DbmsCd } from '@/lib/modelpi/dbms'
 import { can, type MbrRole } from '@/lib/roles'
 import StageBar, { type StageData } from '../model/stage-bar'
 import { useSubj } from '../model/use-subj'
@@ -70,6 +70,7 @@ export default function PhysicalPage({ params }: { params: Promise<{ areaId: str
   const [models, setModels] = useState<Mdl[]>([])
   const [mdlId, setMdlId] = useState('')
   const [det, setDet] = useState<{ mdl: Mdl; tables: Tbl[]; diff: Diff | null } | null>(null)
+  const [autoInc, setAutoInc] = useState(false) // DDL 자동 증가 옵션(단일 정수 PK)
   const [tblId, setTblId] = useState('')
   const [edit, setEdit] = useState<Map<string, Partial<Col>>>(new Map())
   const [busy, setBusy] = useState(false)
@@ -165,6 +166,8 @@ export default function PhysicalPage({ params }: { params: Promise<{ areaId: str
     setTimeout(() => URL.revokeObjectURL(a.href), 1000) // 일부 WebView 는 즉시 해제 시 내려받기 취소
   }
 
+  // 자동 증가 후보 — 단일 정수 PK(관계 상속 제외는 서버가 DDL 만들 때 판정)
+  const aiCount = useMemo(() => (det?.tables ?? []).filter((t) => { const pk = t.cols.filter((c) => c.pk_yn === 'Y'); return pk.length === 1 && /^(NUMBER|NUMERIC|DECIMAL|INT|INTEGER|BIGINT|SMALLINT)$/i.test(pk[0].phy_tp_nm) && !(pk[0].data_scale ?? 0) }).length, [det])
   const subjTbls = useMemo(() => (det?.tables ?? []).filter((t) => entSubj.get(t.ent_id) === subjId), [det, entSubj, subjId])
   const tbl = subjTbls.find((t) => t.phy_tbl_id === tblId) ?? subjTbls[0]
   const rows = useMemo(() => (tbl ? tbl.cols.map((c) => ({ ...c, ...edit.get(c.phy_col_id) })).sort((a, b) => a.col_seq - b.col_seq) : []), [tbl, edit])
@@ -292,9 +295,13 @@ export default function PhysicalPage({ params }: { params: Promise<{ areaId: str
       {det && (
         <>
           <section className="mt-3 flex flex-wrap items-center gap-2 text-sm" aria-label="물리 모델 작업">
-            <button type="button" className={btn} onClick={() => void down('format=ddl', 'ddl.sql')}>
+            <button type="button" className={btn} onClick={() => void down(`format=ddl${autoInc ? '&ai=1' : ''}`, 'ddl.sql')}>
               DDL 내려받기(.sql)
             </button>
+            <label className="flex items-center gap-1" title={`단일 정수 PK(소수점 없음·관계 상속 아님)를 자동 증가로 생성 — ${DBMS_PRFL[det.mdl.dbms_cd as DbmsCd]?.autoInc ?? ''}`}>
+              <input type="checkbox" checked={autoInc} onChange={(e) => setAutoInc(e.target.checked)} /> 단일 PK 자동 증가
+              <span className="text-xs text-gray-500">(후보 {aiCount}개 테이블)</span>
+            </label>
             <button type="button" className={btn} onClick={() => void down('format=csv&type=tbl', '테이블정의서.csv')}>
               테이블정의서
             </button>
