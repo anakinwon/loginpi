@@ -9,10 +9,17 @@ declare module 'oracledb' {
     autoCommit?: boolean
     maxRows?: number
     outFormat?: number
+    resultSet?: boolean
+    fetchArraySize?: number
     fetchTypeHandler?: (m: Metadata) => { type: unknown } | undefined
+  }
+  export interface ResultSet {
+    getRows(n: number): Promise<unknown[]>
+    close(): Promise<void>
   }
   export interface Result {
     rows?: unknown[]
+    resultSet?: ResultSet
     metaData?: Metadata[]
     rowsAffected?: number
   }
