@@ -1,7 +1,7 @@
 // ERD 인쇄 기하 단위 테스트 — 인쇄 영역·페이지 나눔(빈 칸 제외)·한 장 맞춤
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { fitView, pageGrid, printArea } from '../src/lib/modelpi/print.ts'
+import { fitView, pageGrid, printArea, realign } from '../src/lib/modelpi/print.ts'
 
 test('인쇄 영역 — A4 가로 여백 10mm = 277×190mm', () => {
   const a = printArea('A4', 'landscape', 10)
@@ -35,4 +35,19 @@ test('한 장 맞춤 — 넘치면 축소, 작으면 100% 가운데', () => {
   const s = fitView([{ x: 100, y: 100, w: 200, h: 100 }], 1000, 800, 0)
   assert.equal(s.zoom, 1)
   assert.deepEqual([s.x, s.y], [300, 250])
+})
+
+test('용지 바꿈 맞춤 — 좌상단 엔터티를 첫 쪽 모서리 (40,40)으로, 간격 유지', () => {
+  const boxes = [
+    { x: 1372, y: 22, w: 100, h: 50 },
+    { x: 1620, y: 68, w: 100, h: 50 },
+  ]
+  const d = realign(boxes)
+  const moved = boxes.map((b) => ({ ...b, x: b.x + d.dx, y: b.y + d.dy }))
+  assert.deepEqual([moved[0].x, moved[0].y, moved[1].x - moved[0].x, moved[1].y - moved[0].y], [40, 40, 248, 46])
+  // A3·A4 어느 쪽이든 첫 쪽 = 원점
+  for (const cw of [1046.9, 1511.8]) assert.deepEqual([pageGrid(moved, cw, 700).x0, pageGrid(moved, cw, 700).y0], [0, 0])
+  // 이미 맞춰져 있으면 그대로
+  assert.deepEqual(realign(moved), { dx: 0, dy: 0 })
+  assert.deepEqual(realign([]), { dx: 0, dy: 0 })
 })

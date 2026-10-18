@@ -42,3 +42,10 @@ export function fitView(boxes: Box[], cw: number, ch: number, pad = 16): { x: nu
   const zoom = Math.min(1, (cw - pad * 2) / b.w, (ch - pad * 2) / b.h)
   return { x: (cw - b.w * zoom) / 2 - b.x * zoom, y: (ch - b.h * zoom) / 2 - b.y * zoom, zoom }
 }
+
+// 용지 바꿈 맞춤(마스터 지시 2026-10-18 "A3 ↔ A4 변환 시 최고 좌상단 엔터티 기준으로 모두 같은 포지션으로") — 옮길 거리
+//  좌상단(묶음 왼쪽 위)을 첫 쪽(원점) 모서리에서 at(기본 40px) 떨어진 같은 자리로, 나머지는 같은 거리만큼 — 어떤 용지든 좌상단 위치가 같음
+export function realign(boxes: Box[], at = 40): { dx: number; dy: number } {
+  const b = bounds(boxes)
+  return b ? { dx: at - b.x, dy: at - b.y } : { dx: 0, dy: 0 }
+}

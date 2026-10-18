@@ -21,7 +21,7 @@ import { createPortal } from 'react-dom'
 import { dbmsList } from '@/lib/modelpi/dbms'
 import { autoLayout, boxSize } from '@/lib/modelpi/layout'
 import { autoAnchors, halfDash, project, sidePoint, type Box, type Pt, type RelLyt, type Side } from '@/lib/modelpi/edge-geo'
-import { fitView as printFit, pageGrid, PAPER, printArea, type Orient } from '@/lib/modelpi/print'
+import { fitView as printFit, pageGrid, PAPER, printArea, realign, type Orient } from '@/lib/modelpi/print'
 import { can, type MbrRole } from '@/lib/roles'
 import Attrs from '../model/attrs'
 import EntForm from '../model/ent-form'
@@ -512,18 +512,34 @@ function Erd({ areaId }: { areaId: string }) {
     const ch = a.h - (pr.title ? TITLE_H + FOOT_H : 0)
     return { ...a, cw: a.w, ch, grid: pageGrid([...geo.boxes.values()], a.w, ch) }
   }, [pr, geo])
-  const openPrint = () => {
-    setSel(null)
-    setSelRel(null)
-    setForm(null)
-    // 선택 해제가 그려진 뒤 화면 그림 복사(가이드·손잡이 제외, 마커 id 를 인쇄용 접두로)
+  // 화면 그림 복사(가이드·손잡이 제외, 마커 id 를 인쇄용 접두로) — 다시 그려진 뒤
+  const snap = () =>
     setTimeout(() => {
       const vp = canvasRef.current?.querySelector('.react-flow__viewport')
       if (!vp) return
       const c = vp.cloneNode(true) as HTMLElement
       c.querySelectorAll('.react-flow__viewport-portal, .react-flow__edgelabel-renderer').forEach((x) => x.remove())
       setShot(c.innerHTML.replace(/url\((['"]?)#(ie|bk)-/g, 'url($1#p$2-'))
-    }, 80)
+    }, 120)
+  const openPrint = () => {
+    setSel(null)
+    setSelRel(null)
+    setForm(null)
+    snap()
+  }
+  // 용지·방향 바꿈 — 좌상단 엔터티를 첫 쪽 모서리 같은 자리(40,40)로, 전체(엔터티·옮긴 꺾임점)를 같은 거리만큼(되돌리기 가능, 저장해야 반영)
+  const changePaper = (patch: { paper?: string; orient?: Orient }) => {
+    const next = { ...pr, ...patch, guide: true }
+    const same = next.paper === pr.paper && next.orient === pr.orient
+    setPr(next)
+    const d = realign([...geo.boxes.values()])
+    if (same || (Math.abs(d.dx) < 0.5 && Math.abs(d.dy) < 0.5)) return
+    setUndo(curPos())
+    setNodes((ns) => ns.map((x) => ({ ...x, position: { x: x.position.x + d.dx, y: x.position.y + d.dy } })))
+    setLyt((L) => Object.fromEntries(Object.entries(L).map(([k, l]) => [k, l.mx == null || l.my == null ? l : { ...l, mx: l.mx + d.dx, my: l.my + d.dy }])))
+    setDirty(true)
+    setMsg(`${next.paper} ${next.orient === 'landscape' ? '가로' : '세로'} — 좌상단 엔터티 기준으로 전체를 같은 위치로 옮겼습니다(배치 저장하면 반영, 되돌리기 가능)`)
+    if (shot !== null) snap() // 인쇄 미리보기 중이면 옮긴 그림으로 다시
   }
   const sheets = pr.mode === 'fit' ? [{ no: 1, t: printFit([...geo.boxes.values()], page.cw, page.ch) }] : page.grid.tiles.map((t) => ({ no: t.no, t: { x: -(page.grid.x0 + t.c * page.cw), y: -(page.grid.y0 + t.r * page.ch), zoom: 1 } }))
   const selEnt = ents.find((e) => e.ent_id === sel)
@@ -604,14 +620,14 @@ function Erd({ areaId }: { areaId: string }) {
           <button type="button" className={btn} disabled={!undo} onClick={revert}>
             되돌리기
           </button>
-          <select value={pr.paper} onChange={(e) => setPr({ ...pr, paper: e.target.value, guide: true })} className={sel2} aria-label="인쇄 용지">
+          <select value={pr.paper} onChange={(e) => changePaper({ paper: e.target.value })} className={sel2} aria-label="인쇄 용지">
             {Object.keys(PAPER).map((k) => (
               <option key={k} value={k}>
                 {k}
               </option>
             ))}
           </select>
-          <select value={pr.orient} onChange={(e) => setPr({ ...pr, orient: e.target.value as Orient, guide: true })} className={sel2} aria-label="인쇄 방향">
+          <select value={pr.orient} onChange={(e) => changePaper({ orient: e.target.value as Orient })} className={sel2} aria-label="인쇄 방향">
             <option value="landscape">가로</option>
             <option value="portrait">세로</option>
           </select>
@@ -830,14 +846,14 @@ function Erd({ areaId }: { areaId: string }) {
             {markers('p')}
             <div className="no-print mx-auto mb-3 flex max-w-5xl flex-wrap items-center gap-2 rounded-xl bg-gradient-to-r from-[#1f3a68] to-[#3b5f9e] px-4 py-2 text-sm text-white shadow" aria-label="인쇄 설정">
               <strong className="mr-1">인쇄 설정</strong>
-              <select value={pr.paper} onChange={(e) => setPr({ ...pr, paper: e.target.value })} className={sel2} aria-label="용지">
+              <select value={pr.paper} onChange={(e) => changePaper({ paper: e.target.value })} className={sel2} aria-label="용지">
                 {Object.keys(PAPER).map((k) => (
                   <option key={k} value={k}>
                     {k}
                   </option>
                 ))}
               </select>
-              <select value={pr.orient} onChange={(e) => setPr({ ...pr, orient: e.target.value as Orient })} className={sel2} aria-label="방향">
+              <select value={pr.orient} onChange={(e) => changePaper({ orient: e.target.value as Orient })} className={sel2} aria-label="방향">
                 <option value="landscape">가로</option>
                 <option value="portrait">세로</option>
               </select>
