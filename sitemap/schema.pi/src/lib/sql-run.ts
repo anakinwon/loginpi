@@ -14,7 +14,7 @@ import { z } from 'zod'
 import { db } from './db'
 import { audit, errMsg, type ErrorCode } from './api'
 import { can, type MbrRole } from './roles'
-import { LOCK_MS, maskErr, pgClient, resolveTarget, STMT_MS, type Target } from './db-exec'
+import { IDLE_TX_MS, LOCK_MS, maskErr, ORA_EXPIRE_MIN, pgClient, resolveTarget, STMT_MS, type Target } from './db-exec'
 import { directEnabled, openPwd, profileKey } from './secret'
 import { getConn, tlsHint } from './model-ddl-req'
 import { classify, danger, splitSql, stmtAt, type Danger, type Dialect, type Kind, type Stmt } from './modelpi/sql-split'
@@ -39,7 +39,10 @@ export interface RunRes {
 type Mode = 'READ' | 'AUTO' | 'TX' | 'TRY'
 type RunOpt = { mode: Mode; limit: number; schema?: string | null; prefix: Stmt[]; deadline: number }
 const MAX_BYTES = 3_500_000 // 응답 결과 값 상한(대략) — Vercel 함수 응답 4.5MB 안
-const BUDGET_MS = 55_000 // 라우트 maxDuration 60초 안
+// 잠금 방지(마스터 강조 2026-10-18 "테이블락 방지 — 강제 종료 시 미커밋 전부 rollback") : 요청 사이에 트랜잭션을 열어 두지 않으므로 잠금은 요청 1건 동안만.
+//  시간 예산은 요청 도착 시각부터 50초 — 라우트 maxDuration 60초 전에 반드시 커밋·rollback·연결 종료(함수 강제 종료로 트랜잭션이 열린 채 남지 않게)
+//  그래도 끊기면 PG 는 idle_in_transaction_session_timeout(IDLE_TX_MS)으로 DB 가 rollback, Oracle 은 expireTime + DBA 서버 설정
+const BUDGET_MS = 50_000
 const CELL_MAX = 4000
 const ALL_ROWS = 100_000 // '전체 패치' — 응답 크기 상한이 먼저 걸릴 수 있음
 const PENDING_MAX = 50
@@ -141,6 +144,7 @@ async function runPg(t: Target, pwd: string, stmts: Stmt[], kinds: Kind[], o: Ru
     const L = local ? 'LOCAL ' : ''
     await q.unsafe(`SET ${L}statement_timeout = ${STMT_MS}`)
     await q.unsafe(`SET ${L}lock_timeout = ${LOCK_MS}`)
+    await q.unsafe(`SET ${L}idle_in_transaction_session_timeout = ${IDLE_TX_MS}`)
     await q.unsafe(`SET ${L}standard_conforming_strings = on`)
     if (o.schema) await q.unsafe(`SET ${L}search_path TO "${o.schema}"`)
   }
@@ -222,7 +226,7 @@ async function runOra(t: Target, pwd: string, stmts: Stmt[], kinds: Kind[], o: R
   const tx = o.mode === 'TX' || o.mode === 'TRY'
   let cn: import('oracledb').Connection | null = null
   try {
-    cn = await ora.getConnection({ user: t.usr, password: pwd, connectString: `${t.ip}:${t.port}/${t.db}`, connectTimeout: 10 })
+    cn = await ora.getConnection({ user: t.usr, password: pwd, connectString: `${t.ip}:${t.port}/${t.db}`, connectTimeout: 10, expireTime: ORA_EXPIRE_MIN })
     cn.callTimeout = STMT_MS
     if (o.schema) await cn.execute(`ALTER SESSION SET CURRENT_SCHEMA = "${o.schema.toUpperCase()}"`)
     for (const p of o.prefix) {
@@ -306,7 +310,7 @@ export async function openConn(areaId: string, connId: string, role: MbrRole): P
 }
 
 // 실행 요청 처리 — 권한·접속·판정 → 실행 → 이력·감사
-export async function runEditor(areaId: string, uid: string, role: MbrRole, b: Body): Promise<NextResponse> {
+export async function runEditor(areaId: string, uid: string, role: MbrRole, b: Body, startedAt = Date.now()): Promise<NextResponse> {
   const cn = await getConn(areaId, b.conn_id)
   if (!cn) return failRes({ code: 'NOT_FOUND', status: 404 })
   const d: Dialect = cn.dbms_cd === '0001' ? 'ORA' : 'PG' // 판정용(지원 DBMS 확인은 openConn)
@@ -358,7 +362,7 @@ export async function runEditor(areaId: string, uid: string, role: MbrRole, b: B
   const h = await db().from('mdl_sql_exec_hist').insert({ area_id: areaId, conn_id: c.conn_id, usr_id: uid, sql_txt: sqlTxt, stmt_cnt: stmts.length, exec_mode_cd: histMode, rslt_cd: 'ERR', err_cd: 'RUN', regr_id: uid, modr_id: uid }).select('sql_exec_id').single()
   if (h.error) throw h.error
   const t0 = Date.now()
-  const o: RunOpt = { mode, limit: b.limit, schema: b.schema, prefix: mode === 'TRY' ? prefix : [], deadline: t0 + BUDGET_MS }
+  const o: RunOpt = { mode, limit: b.limit, schema: b.schema, prefix: mode === 'TRY' ? prefix : [], deadline: startedAt + BUDGET_MS } // 요청 도착 기준
   const results = d === 'PG' ? await runPg(t, pwd, stmts, kinds, o) : await runOra(t, pwd, stmts, kinds, o)
   const ms = Date.now() - t0
   for (const r of results) if (r.err_msg) r.err_msg = tlsHint(r.err_msg)

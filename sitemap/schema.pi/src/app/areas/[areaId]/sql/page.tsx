@@ -4,11 +4,15 @@
 //  왼쪽 탐색기(스키마 › 종류 › 객체·크기 › 칼럼, 펼칠 때만 조회, 두 번 누르기 = SELECT 실행) / 가운데 편집기(CodeMirror) / 아래 결과·실행 이력
 //  쓰기(DML·DDL)는 DA 만 즉시(Auto 커밋), 위험 문장은 확인 후, 서버가 문장을 다시 판정. 편집 내용은 접속별로 이 브라우저에 초안 저장
 //  실행 방식 AUTO | MANUAL(DA) — MANUAL = 미리 실행(대기 문장 재실행 후 항상 되돌림) + [Commit] 대기 문장 한 트랜잭션 재실행·커밋 / [Rollback] 대기 목록 비움(서버리스라 요청 사이 트랜잭션 유지 불가, 마스터 결정 2026-10-18)
+//  화면 떠나기(마스터 강조 2026-10-18 '테이블락 방지') : 대기 문장이 있으면 메뉴·링크·뒤로 가기·접속/방식 바꾸기 모두 [Commit 후 / Rollback 후 / 취소] 확인 창
+//   강제 종료(탭·브라우저 닫기·오류) = 대기 문장은 이 화면 메모리에만 있어 그대로 버려짐(Rollback, DB 변화 없음) — 브라우저 기본 경고도 띄움.
+//   DB 쪽은 요청 사이에 트랜잭션을 열어 두지 않아 잠금이 남지 않고, 요청 도중 끊겨도 idle_in_transaction_session_timeout 으로 DB 가 rollback(sql-run.ts)
 //  아래 상태줄 = 수행 시간 자세히·패치 크기·전체 패치·쪽 이동(result-grid)
 //  패널 크기 = 손잡이 끌기(탐색기 너비·편집기 높이, 이 브라우저에 기억, 두 번 누르면 기본), 탐색기 이름 = 편집기로 끌어 놓기·Ctrl+C·오른쪽 누르기 복사(마스터 지시 2026-10-18)
 import { piFetch } from '@pi/auth/client'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { use, useCallback, useEffect, useRef, useState } from 'react'
 import { DANGER_NM, quoteIdent, splitSql, stmtAt, type Danger } from '@/lib/modelpi/sql-split'
 import ResultPanel, { type RunMode, type RunRes } from './result-grid'
@@ -132,12 +136,91 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
     if ((SIZES as readonly number[]).includes(n)) setLimitS(n)
     if (store.get('sql-tx') === 'MANUAL') setTxMode('MANUAL')
   }, [])
+  const leaving = useRef(false) // 확인 창에서 Commit·Rollback 뒤 떠나는 중(경고·가드 생략)
   useEffect(() => {
     if (!pending.length) return
-    const h = (e: BeforeUnloadEvent) => e.preventDefault() // 커밋 안 한 대기 문장
+    const h = (e: BeforeUnloadEvent) => void (!leaving.current && e.preventDefault()) // 탭·브라우저 닫기 = 브라우저 기본 경고(그대로 닫으면 대기 문장 버림 = Rollback), 확인 창에서 고른 이동은 제외
     window.addEventListener('beforeunload', h)
     return () => window.removeEventListener('beforeunload', h)
   }, [pending.length])
+  // 떠나기 확인 창 — why = 무엇을 하려는지, go = Commit·Rollback 뒤 이어서 할 일, cancel = 취소 때 할 일
+  const router = useRouter()
+  const [leave, setLeave] = useState<{ why: string; go: () => void; cancel?: () => void } | null>(null)
+  useEffect(() => {
+    if (leave) setMsg('') // 창을 열 때 이전 실행 오류는 지움(창 안에는 이번 Commit 결과만)
+  }, [leave])
+  useEffect(() => {
+    if (leave && !pending.length && !busy) {
+      const g = leave.go
+      setLeave(null)
+      g() // 창이 열린 사이 대기 문장이 비었음(진행 중이던 커밋 완료) — 고를 것 없이 이어서
+    }
+  }, [leave, pending.length, busy])
+  const guarded = useRef(false) // 뒤로 가기를 잡으려고 넣어 둔 같은 주소 history 항목
+  const guardHref = useRef('')
+  const skipPop = useRef(false)
+  // 링크·메뉴(같은 사이트) 누르기 — 대기 문장이 있으면 이동을 멈추고 확인 창
+  useEffect(() => {
+    if (!pending.length) return
+    const onClick = (e: MouseEvent) => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
+      const a = (e.target as Element | null)?.closest?.('a[href]') as HTMLAnchorElement | null
+      if (!a || a.target === '_blank' || a.hasAttribute('download')) return
+      const url = new URL(a.href, window.location.href)
+      if (url.origin !== window.location.origin || (url.pathname === window.location.pathname && url.search === window.location.search)) return
+      e.preventDefault()
+      e.stopPropagation()
+      setLeave({ why: '이동', go: () => leaveTo(() => (guarded.current ? router.replace : router.push)(url.pathname + url.search + url.hash)) })
+    }
+    document.addEventListener('click', onClick, true)
+    return () => document.removeEventListener('click', onClick, true)
+  }, [pending.length, router])
+  // 뒤로 가기 — 대기 문장이 생기면 같은 주소 항목을 하나 넣어 두고, 뒤로 가면 다시 넣은 뒤 확인 창(Next 라우터 상태는 그대로 복사)
+  useEffect(() => {
+    if (pending.length && !guarded.current) {
+      window.history.pushState({ ...window.history.state, sqlGuard: 1 }, '', window.location.href)
+      guarded.current = true
+      guardHref.current = window.location.href
+    } else if (!pending.length && guarded.current && !leaving.current) {
+      guarded.current = false
+      skipPop.current = true
+      window.history.back() // 넣어 둔 항목 걷어 냄(같은 주소)
+    }
+  }, [pending.length])
+  // 떠나기 실행 — 이동이 실제로 안 일어나면(되돌아갈 곳 없음 등) 잠시 뒤 경고·가드를 다시 켬
+  const leaveTo = (move: () => void) => {
+    leaving.current = true
+    move()
+    window.setTimeout(() => void (leaving.current = false), 2000)
+  }
+  useEffect(() => {
+    if (pending.length) leaving.current = false // 새 대기 문장 = 다시 지킴
+  }, [pending.length])
+  // Navigation API(크롬·엣지 등) — 뒤로·앞으로·목록에서 여러 칸 이동을 이동 전에 막고 확인 창, 확인 뒤 그 항목으로
+  useEffect(() => {
+    const nav = (window as unknown as { navigation?: { addEventListener(t: string, h: (e: NavEvent) => void): void; removeEventListener(t: string, h: (e: NavEvent) => void): void; traverseTo(k: string): void } }).navigation
+    type NavEvent = { navigationType: string; cancelable: boolean; destination: { key: string; url: string }; preventDefault(): void }
+    if (!nav || !pending.length) return
+    const h = (e: NavEvent) => {
+      if (leaving.current || e.navigationType !== 'traverse' || !e.cancelable || e.destination.url === window.location.href) return
+      e.preventDefault()
+      const key = e.destination.key
+      setLeave({ why: '뒤로·앞으로 가기', go: () => leaveTo(() => ((guarded.current = false), nav.traverseTo(key))) })
+    }
+    nav.addEventListener('navigate', h)
+    return () => nav.removeEventListener('navigate', h)
+  }, [pending.length])
+  // 대체(Navigation API 없음·취소 불가) — 가드 항목에서 한 칸 뒤로 간 경우만 되돌리고 확인 창, 여러 칸 이동은 막을 수 없음(대기 문장 버림 = Rollback)
+  useEffect(() => {
+    const onPop = () => {
+      if (skipPop.current) return void (skipPop.current = false)
+      if (!guarded.current || leaving.current || window.location.href !== guardHref.current) return
+      window.history.pushState({ ...window.history.state, sqlGuard: 1 }, '', window.location.href)
+      setLeave({ why: '뒤로 가기', go: () => leaveTo(() => ((guarded.current = false), window.history.go(-2))) })
+    }
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
   const [note, setNote] = useState('')
   useEffect(() => {
     try {
@@ -272,22 +355,24 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
 
   const flash = (t: string) => (setNote(t), window.setTimeout(() => setNote(''), 3000)) // 잠깐 보이는 알림
   // MANUAL Commit — 대기 문장을 한 트랜잭션으로 다시 실행·커밋(오류면 전체 되돌림·대기 목록 유지)
-  async function commit() {
-    if (!conn || busy || !pending.length) return
-    if (!window.confirm(`대기 문장 ${pending.length}개를 한 트랜잭션으로 다시 실행해 커밋할까요?\n(미리 실행 뒤 다른 변경·now()·시퀀스 값은 달라질 수 있습니다)\n\n${pending.map((x, i) => `${i + 1}. ${x.slice(0, 200)}`).join('\n')}`)) return
+  async function commit(ask = true): Promise<boolean> {
+    if (!conn || busy || !pending.length) return false
+    if (ask && !window.confirm(`대기 문장 ${pending.length}개를 한 트랜잭션으로 다시 실행해 커밋할까요?\n(미리 실행 뒤 다른 변경·now()·시퀀스 값은 달라질 수 있습니다)\n\n${pending.map((x, i) => `${i + 1}. ${x.slice(0, 200)}`).join('\n')}`)) return false
     setBusy(true), setMsg(''), setTab('res')
     try {
       const cid = conn.conn_id
       const j = await (await piFetch(`${api}/sql/run`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ conn_id: cid, tx: 'MANUAL', pending, commit: true, confirm: true, limit, schema: schema || null }) })).json()
-      if (connRef.current !== cid) return
+      if (connRef.current !== cid) return false
       setLast('')
-      if (!j.ok) return setMsg(`${j.message}${j.detail ? ` — ${typeof j.detail === 'string' ? j.detail : JSON.stringify(j.detail)}` : ''}`)
+      if (!j.ok) return (setMsg(`${j.message}${j.detail ? ` — ${typeof j.detail === 'string' ? j.detail : JSON.stringify(j.detail)}` : ''}`), false)
       setOut({ results: j.results, ms: j.ms, at: j.at, mode: j.mode })
-      if (j.rslt === 'OK') setPending([]), flash(`커밋했습니다 — ${pending.length}문장`)
-      else setMsg('커밋 실패 — 전체 되돌렸습니다(대기 목록은 그대로)')
       void loadHist(1)
+      if (j.rslt === 'OK') return (setPending([]), flash(`커밋했습니다 — ${pending.length}문장`), true)
+      setMsg('커밋 실패 — 전체 되돌렸습니다(대기 목록은 그대로)')
+      return false
     } catch {
       setMsg('커밋 요청이 실패했습니다(네트워크·시간 초과) — DB 반영 여부를 실행 이력에서 확인하십시오')
+      return false
     } finally {
       setBusy(false)
     }
@@ -298,8 +383,9 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
   }
   const setMode = (m: 'AUTO' | 'MANUAL') => {
     if (m === txMode) return
-    if (pending.length && !window.confirm(`대기 문장 ${pending.length}개가 있습니다 — 버리고(Rollback) ${m} 로 바꿀까요?`)) return
-    setPending([]), setTxMode(m), store.set('sql-tx', m)
+    const apply = () => (setPending([]), setTxMode(m), store.set('sql-tx', m))
+    if (pending.length) setLeave({ why: `${m} 로 바꾸기`, go: apply })
+    else apply()
   }
   const setLimit = (n: number) => (setLimitS(n), store.set('sql-fetch', String(n)))
 
@@ -382,7 +468,7 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
         <span className="text-xs text-gray-500">Ctrl+Enter 현재 문장 · Alt+X 스크립트 · Ctrl+Shift+F 정렬 · Ctrl+Space 자동 완성 · Ctrl+/ 주석</span>
       </div>
       <section className="mt-2 flex flex-wrap items-center gap-2 rounded-xl bg-gradient-to-r from-[#1f3a68] to-[#3b5f9e] px-3 py-1.5 text-sm text-white shadow" aria-label="SQL 실행 도구">
-        <select value={connId} disabled={busy} onChange={(e) => (!pending.length || window.confirm(`대기 문장 ${pending.length}개를 버리고(Rollback) 접속을 바꿀까요?`)) && setConnId(e.target.value)} className={sel} aria-label="접속">
+        <select value={connId} disabled={busy} onChange={(e) => { const v = e.target.value; if (pending.length) setLeave({ why: '접속 바꾸기', go: () => setConnId(v) }); else setConnId(v) }} className={sel} aria-label="접속">
           {!conns.length && <option value="">접속이 없습니다</option>}
           {conns.map((c) => (
             <option key={c.conn_id} value={c.conn_id} disabled={!usable(c)}>
@@ -592,6 +678,48 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
           </div>
         </div>
       </div>
+      {leave && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onKeyDown={(e) => e.key === 'Escape' && (leave.cancel?.(), setLeave(null))}>
+          <div role="alertdialog" aria-modal="true" aria-labelledby="leave-title" className="w-full max-w-xl rounded-xl bg-white p-4 text-sm shadow-xl">
+            <h2 id="leave-title" className="text-base font-bold text-red-800">
+              커밋하지 않은 대기 문장 {pending.length}개 — {leave.why} 전에 처리하십시오
+            </h2>
+            <p className="mt-1 text-xs text-gray-600">아직 DB 에 반영되지 않았습니다(MANUAL 미리 실행). Commit = 한 트랜잭션으로 다시 실행해 반영, Rollback = 버림. 탭·브라우저를 그냥 닫으면 모두 Rollback 됩니다.</p>
+            <ol className="mt-2 max-h-48 list-decimal overflow-auto rounded border bg-gray-50 py-1 pr-2 pl-7 font-mono text-xs">
+              {pending.map((x, i) => (
+                <li key={i} className="truncate" title={x}>
+                  {x}
+                </li>
+              ))}
+            </ol>
+            <div className="mt-3 flex flex-wrap justify-end gap-2">
+              <button
+                type="button"
+                disabled={busy}
+                className="rounded bg-[#1f3a68] px-3 py-1 font-semibold text-white disabled:opacity-50"
+                onClick={async () => {
+                  const go = leave.go
+                  if (await commit(false)) setLeave(null), go()
+                }}
+              >
+                ✔ Commit 후 {leave.why}
+              </button>
+              <button type="button" disabled={busy} className="rounded border border-red-300 bg-red-50 px-3 py-1 font-semibold text-red-800 disabled:opacity-50" onClick={() => (setPending([]), setLeave(null), leave.go())}>
+                ↺ Rollback 후 {leave.why}
+              </button>
+              <button type="button" autoFocus disabled={busy} className="rounded border px-3 py-1" onClick={() => (leave.cancel?.(), setLeave(null))}>
+                취소
+              </button>
+            </div>
+            {busy && <p className="mt-2 text-xs text-gray-500">커밋 중…</p>}
+            {msg && !busy && (
+              <p role="alert" className="mt-2 text-xs font-medium text-red-700">
+                {msg}
+              </p>
+            )}
+          </div>
+        </div>
+      )}
     </main>
   )
 }

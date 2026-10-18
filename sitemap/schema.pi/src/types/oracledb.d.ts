@@ -39,7 +39,7 @@ declare module 'oracledb' {
     DB_TYPE_CLOB: unknown
     DB_TYPE_NCLOB: unknown
     DB_TYPE_BLOB: unknown
-    getConnection(cfg: { user: string; password: string; connectString: string; connectTimeout?: number }): Promise<Connection>
+    getConnection(cfg: { user: string; password: string; connectString: string; connectTimeout?: number; expireTime?: number }): Promise<Connection>
   }
   export default oracledb
 }

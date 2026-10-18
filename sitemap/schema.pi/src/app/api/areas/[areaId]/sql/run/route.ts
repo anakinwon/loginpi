@@ -10,13 +10,14 @@ export const maxDuration = 60
 type Ctx = { params: Promise<{ areaId: string }> }
 
 export async function POST(req: Request, { params }: Ctx) {
+  const startedAt = Date.now() // 시간 예산 기준(인증·접속 확인 시간 포함)
   const { areaId } = await params
   const auth = await requireAreaRole(areaId, 'SQL_QUERY')
   if (auth instanceof NextResponse) return auth
   const b = await parseBody(req, runBody)
   if (b instanceof NextResponse) return b
   try {
-    return await runEditor(areaId, auth.user.usr_id, auth.role, b)
+    return await runEditor(areaId, auth.user.usr_id, auth.role, b, startedAt)
   } catch (e) {
     return dbError(e as { code?: string; message?: string })
   }

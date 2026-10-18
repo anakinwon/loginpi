@@ -31,6 +31,10 @@ export interface Target {
 }
 export const STMT_MS = 20_000 // 문장 1개 제한
 export const LOCK_MS = 5_000
+// 트랜잭션을 연 채 멈춘 세션(함수 강제 종료·연결 끊김)은 DB 가 이 시간 뒤 끊고 rollback — 잠금이 남지 않게(마스터 강조 2026-10-18)
+export const IDLE_TX_MS = 10_000
+// Oracle : 서버 쪽 idle 세션 정리(SQLNET.EXPIRE_TIME·프로파일 IDLE_TIME·MAX_IDLE_BLOCKER_TIME)는 DBA 설정 — 앱은 expireTime(분) 탐지 패킷만
+export const ORA_EXPIRE_MIN = 1
 
 export function maskErr(msg: unknown, hide: (string | null | undefined)[]): string {
   let s = String(msg ?? '').replace(/\s+/g, ' ')
@@ -97,6 +101,7 @@ export async function runPg(t: Target, pwd: string, stmts: string[], deadline: n
     await sql.begin(async (tx) => {
       await tx.unsafe(`SET LOCAL statement_timeout = ${STMT_MS}`)
       await tx.unsafe(`SET LOCAL lock_timeout = ${LOCK_MS}`)
+      await tx.unsafe(`SET LOCAL idle_in_transaction_session_timeout = ${IDLE_TX_MS}`)
       for (let i = 0; i < stmts.length; i++) {
         at = i
         if (deadline - Date.now() < STMT_MS + 5_000) throw Object.assign(new Error('실행 시간 예산 초과 — 다시 실행하십시오'), { code: 'EXEC_TIMEOUT' })
@@ -123,7 +128,7 @@ export async function runOracle(t: Target, pwd: string, stmts: string[], deadlin
   const ora = (await import('oracledb')).default
   let cn: import('oracledb').Connection | null = null
   try {
-    cn = await ora.getConnection({ user: t.usr, password: pwd, connectString: `${t.ip}:${t.port}/${t.db}`, connectTimeout: 10 })
+    cn = await ora.getConnection({ user: t.usr, password: pwd, connectString: `${t.ip}:${t.port}/${t.db}`, connectTimeout: 10, expireTime: ORA_EXPIRE_MIN })
     cn.callTimeout = STMT_MS
     for (let i = 0; i < stmts.length; i++) {
       if (done.has(i + 1)) continue
