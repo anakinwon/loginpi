@@ -13,6 +13,8 @@ const repoRoot = path.resolve(appRoot, '../..')
 const nextConfig: NextConfig = {
   outputFileTracingRoot: repoRoot,
   turbopack: { root: appRoot },
+  // DDL 서버 직접 실행(src/lib/db-exec.ts) — Oracle 드라이버는 번들하지 않고 node_modules 에서 불러옴(동적 require·선택 바이너리)
+  serverExternalPackages: ['oracledb'],
   // Google 버튼 플래그 = 서버 3종(src/auth.ts googleEnabled)에서 빌드 때 파생 — Vercel 에 NEXT_PUBLIC_GOOGLE_LOGIN 을 빠뜨리면
   // 서버는 활성인데 버튼이 숨던 운영 사고(2026-10-18 schem.vercel.app) 방지. 직접 설정한 값이 있으면 그 값 우선
   env: {

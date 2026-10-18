@@ -3,7 +3,7 @@
 // 등록·수정·삭제 시 즉시 승인(SELF_APPROVE)은 DA만 선택 가능, 그 외는 반드시 승인 화면을 거친다(2026-10-16 마스터 지시)
 export const ROLES = ['SYS', 'DA', 'STD', 'MDL', 'QLT', 'MIG', 'VIEWER'] as const
 export type MbrRole = (typeof ROLES)[number]
-export type Perm = 'VIEW' | 'REQUEST' | 'APPROVE' | 'SELF_APPROVE' | 'BULK' | 'SETTINGS'
+export type Perm = 'VIEW' | 'REQUEST' | 'APPROVE' | 'SELF_APPROVE' | 'BULK' | 'SETTINGS' | 'DDL_APPROVE' | 'DB_CONN_ADMIN'
 
 export const ROLE_NM: Record<MbrRole, string> = {
   SYS: '시스템담당자',
@@ -31,6 +31,9 @@ export const PERM: Record<Perm, readonly MbrRole[]> = {
   SELF_APPROVE: ['DA'],
   BULK: ['DA', 'STD'],
   SETTINGS: ['SYS', 'DA'],
+  // DDL 직접 실행(2026-10-18) : 실행 요청 = REQUEST, 승인(자기 승인 금지)·접속 프로파일·에이전트 토큰 관리 = DA
+  DDL_APPROVE: ['DA'],
+  DB_CONN_ADMIN: ['DA'],
 }
 export const can = (role: string | null | undefined, perm: Perm) => !!role && (PERM[perm] as readonly string[]).includes(role)
 

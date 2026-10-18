@@ -6,7 +6,7 @@ import { can, ROLES, type Perm } from '../src/lib/roles.ts'
 // 역할별 기대 권한(VIEW·REQUEST·APPROVE·SELF_APPROVE·BULK·SETTINGS) : 즉시 승인은 DA만
 const WANT: Record<string, Perm[]> = {
   SYS: ['VIEW', 'SETTINGS'],
-  DA: ['VIEW', 'REQUEST', 'APPROVE', 'SELF_APPROVE', 'BULK', 'SETTINGS'],
+  DA: ['VIEW', 'REQUEST', 'APPROVE', 'SELF_APPROVE', 'BULK', 'SETTINGS', 'DDL_APPROVE', 'DB_CONN_ADMIN'],
   STD: ['VIEW', 'REQUEST', 'APPROVE', 'BULK'],
   MDL: ['VIEW', 'REQUEST'],
   QLT: ['VIEW'],
@@ -14,8 +14,8 @@ const WANT: Record<string, Perm[]> = {
   VIEWER: ['VIEW'],
 }
 
-test('역할 7종 × 권한 6종 전수', () => {
-  const perms: Perm[] = ['VIEW', 'REQUEST', 'APPROVE', 'SELF_APPROVE', 'BULK', 'SETTINGS']
+test('역할 7종 × 권한 8종 전수', () => {
+  const perms: Perm[] = ['VIEW', 'REQUEST', 'APPROVE', 'SELF_APPROVE', 'BULK', 'SETTINGS', 'DDL_APPROVE', 'DB_CONN_ADMIN']
   for (const r of ROLES) for (const p of perms) assert.equal(can(r, p), WANT[r].includes(p), `${r} ${p}`)
 })
 

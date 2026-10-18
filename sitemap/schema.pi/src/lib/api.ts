@@ -97,6 +97,19 @@ const ERRORS = {
   APV_LEGACY: '승인 절차 도입 이전의 등록 신청입니다. 반려한 뒤 다시 신청하십시오',
   STS_NOT_EDITABLE: '승인대기 중인 데이터는 고칠 수 없습니다(신청을 취소한 뒤 다시 등록하십시오)',
   CONFLICT_SKIP: '반영 중 같은 이름이 먼저 저장되어 건너뜀',
+  DB_CONN_DISABLED: 'DB 접속 기능이 꺼져 있습니다(서버 암호화 키 DB_PROFILE_KEY 미설정 또는 서버 직접 실행 끔)',
+  DB_CONN_BLOCKED: '허용되지 않는 접속 대상입니다(사설·내부 주소는 로컬 에이전트로 실행)',
+  DB_CONN_FAIL: 'DB 에 접속하지 못했습니다(주소·포트·계정·방화벽을 확인하십시오)',
+  DB_CONN_CHANGED: '요청 뒤 접속 정보가 바뀌었습니다 — 새로 요청하십시오',
+  DB_CONN_BUSY: '처리 중인 실행 요청이 있는 접속은 바꾸거나 삭제할 수 없습니다',
+  DB_CONN_MISMATCH: '접속 DBMS 가 물리 모델 DBMS 와 다릅니다',
+  DDL_CHANGED: '요청 뒤 모델이 바뀌어 DDL 이 달라졌습니다 — 새로 요청하십시오',
+  DDL_GATE: '실행할 수 없는 테이블·이름이 있습니다 — 미리보기의 차단 사유를 해결하십시오',
+  DDL_STMT_DENIED: '허용되지 않은 형태의 문장이 있어 실행하지 않았습니다',
+  DDL_SELF_APPROVE: '본인이 요청한 실행은 승인할 수 없습니다(다른 데이터아키텍트 승인)',
+  DDL_REQ_STATE: '지금 상태에서는 할 수 없는 처리입니다 — 다시 불러오십시오',
+  DDL_LIVE_EXISTS: '이 접속에 승인·실행 중인 요청이 이미 있습니다',
+  AGT_UNAUTH: '에이전트 인증에 실패했습니다',
 } as const
 export type ErrorCode = keyof typeof ERRORS
 export const errMsg = (c: ErrorCode) => ERRORS[c]
@@ -117,6 +130,7 @@ export function dupCodeOf(msg: string | undefined, fallback: ErrorCode): ErrorCo
 
 export function dbError(e: { code?: string; message?: string }, dupCode?: ErrorCode) {
   if (e.code === 'MLK01') return apiError('SUBJ_LOCKED', 409) // 완료 주제영역 편집 잠금(sql/031 트리거)
+  if (e.code === 'MDB01') return apiError('DB_CONN_BUSY', 409) // 처리 중 요청이 걸린 접속(sql/038)
   if (e.code === '23514') return apiError('INVALID_INPUT', 400) // CHECK·트리거 규칙 위반(형식·2레벨 등)
   if (e.code === '23505' && (dupCode || /std_dic_/.test(e.message ?? ''))) return apiError(dupCodeOf(e.message, dupCode ?? 'INVALID_INPUT'), 409)
   console.error('[db]', e.code, e.message)

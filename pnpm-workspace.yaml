@@ -8,6 +8,8 @@ allowBuilds:
   '@swc/core': true
   es5-ext: true
   msw: true
+  # oracledb: schema.pi DDL 직접 실행(Oracle Thin 모드 — 순수 JS). 설치 스크립트는 Thick 모드 바이너리 점검용이라 불필요
+  oracledb: false
   sharp: true
   # sodium-native: stellar-sdk(pi-backend)의 optional 네이티브 가속 — 미빌드 시 순수 JS(tweetnacl) 폴백.
   # 네이티브 컴파일 회피(Windows·Vercel 빌드 안정성) 위해 false.
