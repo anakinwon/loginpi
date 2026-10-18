@@ -63,6 +63,9 @@ export const dbmsList = () => DBMS_CDS.map((cd) => DBMS_PRFL[cd])
 export type IdentCase = 'upper' | 'lower'
 export const defaultCase = (cd?: string | null): IdentCase => (isDbms(cd) ? DBMS_PRFL[cd].identCase : 'upper')
 export const renderIdent = (nm: string, c: IdentCase = 'upper') => (c === 'lower' ? nm.toLowerCase() : nm.toUpperCase())
+// DDL 대소문자 규칙(마스터 지시 2026-10-18) : 물리 모델까지는 무조건 대문자, DDL 생성 때 PostgreSQL 은 반드시 소문자
+//  (테이블·칼럼·PK·인덱스 이름 전부 — 무인용 식별자를 PostgreSQL 이 소문자로 접기 때문). 다른 DBMS 는 물리 모델의 대소문자 선택(기본 대문자)
+export const ddlCase = (dbms: string, ltr: 'UPPER' | 'LOWER' | string | null | undefined): IdentCase => (dbms === '0014' || ltr === 'LOWER' ? 'lower' : 'upper')
 
 // 업종 기반 대상 DBMS 추천(반자동 1차 규칙) — 금융·공공은 상용 RDBMS 운영 관행이 많아 Oracle 계열, 그 외는 PostgreSQL
 export function recommendDbms(indstry?: string | null): { cd: DbmsCd; why: string } {

@@ -2,7 +2,7 @@
 // 같은 계획으로 ① 변경분 DDL(ALTER) ② 저장 모델 갱신을 한다(DDL 과 저장 상태가 어긋나지 않음)
 // 사용자 결정값(순서·NULL·기본값)은 유지 : 논리 변경(추가·삭제·이름·타입·길이·주키)만 반영. 도메인 버전만 오르고 모양이 같으면 스냅샷만 갱신
 // 데이터 손실 문장(DROP TABLE·DROP COLUMN)은 주석으로만 낸다 — DBA 확인 후 주석을 풀어 실행
-import { DBMS_PRFL, type DbmsCd } from './dbms.ts'
+import { DBMS_PRFL, type DbmsCd, ddlCase, renderIdent } from './dbms.ts'
 import { bscOk, pkName, pkStmts, type PhyCol, type PhyTbl } from './phy.ts'
 
 export type StoredCol = PhyCol & { phy_col_id: string }
@@ -63,7 +63,7 @@ const tpOf = (c: PhyCol) => (c.data_len != null ? `${c.phy_tp_nm}(${c.data_len}$
 
 // 변경분 DDL — PostgreSQL / Oracle·Tibero 문법. 새 테이블 CREATE 는 genDdl 이 담당(여기서는 안내 주석), FK 변경은 S5 후속
 export function alterDdl(ops: SyncOp[], o: { dbms: DbmsCd; ltr: 'UPPER' | 'LOWER'; prjNm: string; at: string }): string {
-  const nm = (s: string) => (o.ltr === 'LOWER' ? s.toLowerCase() : s.toUpperCase())
+  const nm = (s: string) => renderIdent(s, ddlCase(o.dbms, o.ltr)) // PostgreSQL = 무조건 소문자(마스터 지시 2026-10-18)
   const one = (s: string) => s.replace(/[\p{Cc}\p{Zl}\p{Zp}]/gu, ' ')
   const pg = o.dbms === '0014'
   const out = [`-- ${one(o.prjNm)} 물리 모델 변경분 DDL — ${DBMS_PRFL[o.dbms].nm}, 생성 ${one(o.at)}`, '-- 데이터 손실 문장(DROP)은 주석 — DBA 확인 후 실행. 새 칼럼은 테이블 끝에 붙음(물리 순서는 재생성 시 반영)', '']

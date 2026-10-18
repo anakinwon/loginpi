@@ -240,7 +240,7 @@ export default function PhysicalPage({ params }: { params: Promise<{ areaId: str
             </option>
           ))}
         </select>
-        <select value={ltr} onChange={(e) => setLtr(e.target.value as '' | 'UPPER' | 'LOWER')} className="rounded border border-white/60 bg-white px-2 py-1 text-gray-900" aria-label="식별자 대소문자">
+        <select value={dbms === '0014' ? 'LOWER' : ltr} disabled={dbms === '0014'} title={dbms === '0014' ? 'PostgreSQL DDL 은 항상 소문자(테이블·칼럼·PK·인덱스) — 물리 모델 이름은 대문자 그대로' : 'DDL 식별자 대소문자'} onChange={(e) => setLtr(e.target.value as '' | 'UPPER' | 'LOWER')} className="rounded border border-white/60 bg-white px-2 py-1 text-gray-900 disabled:opacity-70" aria-label="식별자 대소문자">
           <option value="">대소문자 : DBMS 기본</option>
           <option value="UPPER">대문자</option>
           <option value="LOWER">소문자</option>
@@ -295,7 +295,7 @@ export default function PhysicalPage({ params }: { params: Promise<{ areaId: str
         <nav className="mt-4 flex flex-wrap gap-2" aria-label="물리 모델 목록">
           {models.map((m) => (
             <button key={m.phy_mdl_id} type="button" onClick={() => setMdlId(m.phy_mdl_id)} aria-pressed={m.phy_mdl_id === mdlId} className={`rounded-full border px-3 py-1 text-sm ${m.phy_mdl_id === mdlId ? 'border-[#1f3a68] bg-[#1f3a68] text-white' : ''}`}>
-              {dbmsNm(m.dbms_cd)} · {m.idntfr_ltr_cd === 'LOWER' ? '소문자' : '대문자'}
+              {dbmsNm(m.dbms_cd)} · {m.dbms_cd === '0014' || m.idntfr_ltr_cd === 'LOWER' ? 'DDL 소문자' : 'DDL 대문자'}
             </button>
           ))}
         </nav>

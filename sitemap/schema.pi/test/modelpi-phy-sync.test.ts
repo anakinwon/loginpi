@@ -52,6 +52,9 @@ test('추가·삭제·길이 변경·이름 변경·주키 변경·도메인 버
   assert.match(ora, /ADD \(GRD_CD VARCHAR\(2\) NOT NULL\);/)
   assert.match(ora, /MODIFY \(CUST_NM VARCHAR\(100\)\);/)
   assert.match(ora, /DROP CONSTRAINT PK_TB_CUST DROP INDEX;/) // Oracle 은 따로 만든 PK 인덱스도 지움
+  const up = alterDdl(ops, { dbms: '0014', ltr: 'UPPER', prjNm: 'p', at: 'now' }) // PostgreSQL 은 모델이 대문자여도 소문자
+  assert.match(up, /^ALTER TABLE tb_cust RENAME TO tb_cust_m;$/m)
+  assert.ok(!/TB_CUST/.test(up.replace(/^--.*$/gm, '')))
 })
 
 test('도메인 버전만 올라 모양이 같으면 스냅샷만(DDL 없음), 사용자 기본값 유지', () => {
