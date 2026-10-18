@@ -23,7 +23,7 @@ export async function GET(_req: Request, { params }: Ctx) {
     const q = await getReq(areaId, prjId, reqId, true)
     if (!q) return apiError('NOT_FOUND', 404)
     const { run_nonce: _n, ...item } = q
-    const sole = (await daCount(areaId)) === 1 // DA 1명 분류체계 = 본인 승인 가능(사유 필수)
+    const sole = q.sole_da_yn === 'Y' && (await daCount(areaId)) === 1 // 요청 때부터 단독 DA = 본인 승인 가능(사유 필수, sql/044)
     return NextResponse.json({ ok: true, item, stmts: await reqStmts(areaId, reqId), can_approve: can(auth.role, 'DDL_APPROVE') && (q.req_usr_id !== auth.user.usr_id || sole), self_approve: q.req_usr_id === auth.user.usr_id && sole && can(auth.role, 'DDL_APPROVE'), mine: q.req_usr_id === auth.user.usr_id })
   } catch (e) {
     return dbError(e as { code?: string; message?: string })

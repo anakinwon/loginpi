@@ -170,13 +170,14 @@ export type ReqRow = {
   apv_dtm: string | null
   rjct_rsn: string | null
   self_apv_rsn: string | null // 본인 승인 사유(DA 1명 분류체계, sql/043)
+  sole_da_yn: 'Y' | 'N' // 요청 시점 단독 DA(DB 계산, sql/044)
   exec_try_no: number
   lease_exp_dtm: string | null
   exec_end_dtm: string | null
   reg_dtm: string
   ver_no: number
 }
-const REQ_COLS = 'req_id, area_id, prj_id, phy_mdl_id, conn_id, dbms_cd, exec_mthd_cd, tbl_ids, ddl_hash, stmt_cnt, conn_fp, req_sts_cd, req_usr_id, apv_usr_id, apv_dtm, rjct_rsn, self_apv_rsn, exec_try_no, lease_exp_dtm, exec_end_dtm, reg_dtm, ver_no'
+const REQ_COLS = 'req_id, area_id, prj_id, phy_mdl_id, conn_id, dbms_cd, exec_mthd_cd, tbl_ids, ddl_hash, stmt_cnt, conn_fp, req_sts_cd, req_usr_id, apv_usr_id, apv_dtm, rjct_rsn, self_apv_rsn, sole_da_yn, exec_try_no, lease_exp_dtm, exec_end_dtm, reg_dtm, ver_no'
 
 export async function createReq(areaId: string, prjId: string, b: { phy_mdl_id: string; conn_id: string; tbl_ids: string[] }, uid: string): Promise<ReqRow | Fail> {
   const c = await getConn(areaId, b.conn_id)
@@ -253,7 +254,8 @@ export async function approveReq(areaId: string, prjId: string, reqId: string, e
   if (q.req_sts_cd !== 'REQ') return fail('DDL_REQ_STATE', 409)
   const self = q.req_usr_id === uid
   if (self) {
-    if ((await daCount(areaId)) !== 1) return fail('DDL_SELF_APPROVE', 403, '데이터아키텍트가 2명 이상인 분류체계는 다른 데이터아키텍트가 승인합니다')
+    // 요청 때부터 단독 DA + 지금도 단독(요청 뒤 다른 DA 를 빼는 우회 차단 — DB 트리거 sql/044 가 다시 확인)
+    if (q.sole_da_yn !== 'Y' || (await daCount(areaId)) !== 1) return fail('DDL_SELF_APPROVE', 403, '본인 승인은 요청 때부터 유일한 데이터아키텍트인 경우만 — 다른 데이터아키텍트가 승인합니다')
     if (!selfRsn || selfRsn.trim().length < 5) return fail('DDL_SELF_APPROVE', 403, '본인 승인 사유를 5자 이상 입력하십시오')
   }
   if (q.ddl_hash !== expectHash) return fail('DDL_CHANGED', 409)

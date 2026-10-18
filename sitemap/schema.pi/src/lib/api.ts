@@ -110,6 +110,7 @@ const ERRORS = {
   DDL_REQ_STATE: '지금 상태에서는 할 수 없는 처리입니다 — 다시 불러오십시오',
   DDL_LIVE_EXISTS: '이 접속에 승인·실행 중인 요청이 이미 있습니다',
   AGT_UNAUTH: '에이전트 인증에 실패했습니다',
+  DA_LOCKED: '처리 중인 DDL 실행 요청이 있어 데이터아키텍트를 바꾸거나 뺄 수 없습니다 — 요청을 처리·취소한 뒤 변경하십시오',
 } as const
 export type ErrorCode = keyof typeof ERRORS
 export const errMsg = (c: ErrorCode) => ERRORS[c]
@@ -131,6 +132,7 @@ export function dupCodeOf(msg: string | undefined, fallback: ErrorCode): ErrorCo
 export function dbError(e: { code?: string; message?: string }, dupCode?: ErrorCode) {
   if (e.code === 'MLK01') return apiError('SUBJ_LOCKED', 409) // 완료 주제영역 편집 잠금(sql/031 트리거)
   if (e.code === 'MDB01') return apiError('DB_CONN_BUSY', 409) // 처리 중 요청이 걸린 접속(sql/038)
+  if (e.code === 'MDB02') return apiError('DA_LOCKED', 409) // 처리 중 DDL 요청이 있는 분류체계의 DA 변경(sql/044)
   if (e.code === '23514') return apiError('INVALID_INPUT', 400) // CHECK·트리거 규칙 위반(형식·2레벨 등)
   if (e.code === '23505' && (dupCode || /std_dic_/.test(e.message ?? ''))) return apiError(dupCodeOf(e.message, dupCode ?? 'INVALID_INPUT'), 409)
   console.error('[db]', e.code, e.message)
