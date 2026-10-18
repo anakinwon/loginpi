@@ -4,6 +4,7 @@ import { piFetch } from '@pi/auth/client'
 // 추천은 저장하지 않음(GET …/attributes/suggest), 고른 것만 POST …/attributes. 용어 없는 후보는 빨강·체크 불가·용어 신청 링크(표준 선행)
 // 물리명은 물리 모델 전환 전까지 항상 대문자(PRD §2.6). 순서 = ▲▼(주식별자는 앞 묶음 안에서만, 일반 속성은 그 뒤에서만 이동, PUT …/attributes/order)
 // 자유 추가·용어 교체 = 승인 표준용어 검색(GET /terms?q=&sts=CNFM, 2글자 이상·0.3초 지연·20건), 없으면 용어 신청. 관계 상속 속성은 용어 교체 잠금(설명만)
+// 항목설정(마스터 지시 2026-10-18, DA# 엔터티 편집 › 항목설정) : 표 칸을 주요 항목(표시·순서)/보조 항목(숨김)으로 — 순서·속성명·처리는 고정, 이 브라우저에 기억
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import { confirmSave } from '../words/word-board'
@@ -18,8 +19,14 @@ interface Attr {
   attr_desc: string | null
   attr_asst_nm?: string | null
   ver_no: number
-  std_term: { term_log_nm: string; term_phy_nm: string; std_dom: { dom_nm: string } | null } | null
+  std_term: { term_log_nm: string; term_phy_nm: string; syn_txt?: string | null; std_dom: { dom_nm: string; data_len?: number | null; data_scale?: number | null; std_lgc_tp?: { lgc_tp_nm: string } | null } | null } | null
 }
+// 항목설정 대상 칸 — 기본 주요 항목 = 컬럼명·실질식별자·NotNull·도메인(기존 표)
+type ColKey = 'phy' | 'pk' | 'nn' | 'tp' | 'len' | 'scl' | 'dom' | 'asst' | 'fk' | 'syn' | 'desc'
+const COL_NM: Record<ColKey, string> = { phy: '컬럼명', pk: '실질식별자', nn: 'NotNull', tp: '데이터타입', len: '길이', scl: '소수점', dom: '도메인', asst: '보조명', fk: 'FK', syn: '동의어', desc: '비고' }
+const COL_DEF: ColKey[] = ['phy', 'pk', 'nn', 'dom']
+const COL_KEY = 'attr-cols'
+
 interface Cand {
   term_log_nm: string
   term_id?: string
@@ -227,8 +234,142 @@ export default function Attrs({ api, areaId, entId, entNm, editor, onChanged }: 
     </li>
   )
 
+  // 항목설정 — cols = 주요 항목(표시 순서), draft = 팝업 편집 중(null = 닫힘), selL·selR = 목록에서 고른 항목
+  const [cols, setCols] = useState<ColKey[]>(COL_DEF)
+  const [draft, setDraft] = useState<ColKey[] | null>(null)
+  const [selL, setSelL] = useState<ColKey[]>([])
+  const [selR, setSelR] = useState<ColKey[]>([])
+  useEffect(() => {
+    try {
+      const v = JSON.parse(window.localStorage.getItem(COL_KEY) ?? 'null') as ColKey[] | null
+      if (Array.isArray(v)) setCols(v.filter((k) => k in COL_NM))
+    } catch {}
+  }, [])
+  const saveCols = (v: ColKey[]) => {
+    setCols(v)
+    setDraft(null)
+    try {
+      window.localStorage.setItem(COL_KEY, JSON.stringify(v))
+    } catch {}
+  }
+  const upDown = (d: -1 | 1) => {
+    if (!draft || selL.length !== 1) return
+    const i = draft.indexOf(selL[0]), j = i + d
+    if (j < 0 || j >= draft.length) return
+    const n = [...draft]
+    ;[n[i], n[j]] = [n[j], n[i]]
+    setDraft(n)
+  }
+  // 칸 내용 — 실질식별자·NotNull 은 기존처럼 바로 편집(편집 권한)
+  const cell = (k: ColKey, a: Attr) => {
+    const d = a.std_term?.std_dom
+    switch (k) {
+      case 'phy':
+        return <td key={k} className="border px-2 py-1 font-mono text-[#1f3a68]">{a.std_term?.term_phy_nm}</td>
+      case 'pk':
+        return (
+          <td key={k} className="border px-2 py-1 text-center">
+            {editor ? (
+              <button type="button" onClick={() => void patch(a, { pk_yn: a.pk_yn === 'Y' ? 'N' : 'Y' })} title="주식별자 지정·해제">
+                {a.pk_yn === 'Y' ? `🔑${a.pk_seq}` : '·'}
+              </button>
+            ) : a.pk_yn === 'Y' ? (
+              `🔑${a.pk_seq}`
+            ) : (
+              ''
+            )}
+          </td>
+        )
+      case 'nn':
+        return (
+          <td key={k} className="border px-2 py-1 text-center">
+            <input type="checkbox" disabled={!editor || a.pk_yn === 'Y'} checked={a.esntl_yn === 'Y'} onChange={() => void patch(a, { esntl_yn: a.esntl_yn === 'Y' ? 'N' : 'Y' })} aria-label="필수" />
+          </td>
+        )
+      case 'tp':
+        return <td key={k} className="border px-2 py-1">{d?.std_lgc_tp?.lgc_tp_nm}</td>
+      case 'len':
+        return <td key={k} className="border px-2 py-1 text-right tabular-nums">{d?.data_len ?? ''}</td>
+      case 'scl':
+        return <td key={k} className="border px-2 py-1 text-right tabular-nums">{d?.data_scale ?? ''}</td>
+      case 'dom':
+        return <td key={k} className="border px-2 py-1">{d?.dom_nm}</td>
+      case 'asst':
+        return <td key={k} className="border px-2 py-1">{a.attr_asst_nm}</td>
+      case 'fk':
+        return <td key={k} className="border px-2 py-1 text-center">{a.fk_rel_id ? '상속' : ''}</td>
+      case 'syn':
+        return <td key={k} className="border px-2 py-1">{a.std_term?.syn_txt}</td>
+      case 'desc':
+        return <td key={k} className="border px-2 py-1 !whitespace-normal">{a.attr_desc}</td>
+    }
+  }
+  const span = cols.length + 3
+
   return (
     <div className="space-y-2 rounded border border-[#d5ddec] bg-[#f8fafd] p-3 text-xs">
+      <div className="flex justify-end">
+        <button type="button" onClick={() => (setDraft(cols), setSelL([]), setSelR([]))} className="rounded border bg-white px-2 py-0.5 hover:bg-gray-50" title="표에 보일 항목(주요 항목)과 숨길 항목(보조 항목)">
+          항목설정
+        </button>
+      </div>
+      {draft && (
+        <div className="fixed inset-0 z-[900] grid place-items-center bg-black/30" onClick={() => setDraft(null)}>
+          <div role="dialog" aria-label="항목 설정" className="w-[34rem] max-w-[95vw] rounded-lg border bg-white text-sm shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <div className="border-b px-3 py-2 font-semibold">항목 설정</div>
+            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 p-3">
+              <label className="flex flex-col gap-1">
+                <span className="font-semibold">— 주요 항목(표에 표시)</span>
+                <select multiple size={12} value={selL} onChange={(e) => setSelL([...e.target.selectedOptions].map((o) => o.value as ColKey))} className="rounded border p-1" aria-label="주요 항목">
+                  {draft.map((k) => (
+                    <option key={k} value={k}>
+                      {COL_NM[k]}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <div className="flex flex-col gap-2">
+                <button type="button" onClick={() => setDraft(COL_DEF)} className="rounded border px-3 py-1 hover:bg-gray-50">
+                  초기화
+                </button>
+                <button type="button" disabled={!selR.length} onClick={() => (setDraft([...draft, ...selR]), setSelR([]))} className="rounded border px-3 py-1 hover:bg-gray-50 disabled:opacity-40" aria-label="보조 항목을 주요 항목으로" title="보조 → 주요(표시)">
+                  ◁
+                </button>
+                <button type="button" disabled={!selL.length} onClick={() => (setDraft(draft.filter((k) => !selL.includes(k))), setSelL([]))} className="rounded border px-3 py-1 hover:bg-gray-50 disabled:opacity-40" aria-label="주요 항목을 보조 항목으로" title="주요 → 보조(숨김)">
+                  ▷
+                </button>
+                <button type="button" disabled={selL.length !== 1} onClick={() => upDown(-1)} className="rounded border px-3 py-1 hover:bg-gray-50 disabled:opacity-40" aria-label="위로" title="주요 항목 순서 위로">
+                  ▲
+                </button>
+                <button type="button" disabled={selL.length !== 1} onClick={() => upDown(1)} className="rounded border px-3 py-1 hover:bg-gray-50 disabled:opacity-40" aria-label="아래로" title="주요 항목 순서 아래로">
+                  ▼
+                </button>
+              </div>
+              <label className="flex flex-col gap-1">
+                <span className="font-semibold">— 보조 항목(숨김)</span>
+                <select multiple size={12} value={selR} onChange={(e) => setSelR([...e.target.selectedOptions].map((o) => o.value as ColKey))} className="rounded border p-1" aria-label="보조 항목">
+                  {(Object.keys(COL_NM) as ColKey[])
+                    .filter((k) => !draft.includes(k))
+                    .map((k) => (
+                      <option key={k} value={k}>
+                        {COL_NM[k]}
+                      </option>
+                    ))}
+                </select>
+              </label>
+            </div>
+            <p className="px-3 text-xs text-gray-500">순서·속성명·처리 칸은 항상 표시. 여러 개는 Ctrl·Shift 로 함께 고름</p>
+            <div className="flex justify-end gap-2 border-t px-3 py-2">
+              <button type="button" onClick={() => saveCols(draft)} className="btn-3d px-4 py-1">
+                확인
+              </button>
+              <button type="button" onClick={() => setDraft(null)} className="rounded border px-4 py-1">
+                취소
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {sug.must && (
         <p className="flex flex-wrap items-center gap-1" aria-label="필수 4종 점검">
           <span className="font-semibold text-[#1f3a68]">필수 4종 점검 :</span>
@@ -239,11 +380,13 @@ export default function Attrs({ api, areaId, entId, entNm, editor, onChanged }: 
           ))}
         </p>
       )}
-      <table className="w-full border-collapse bg-white">
+      {/* 좁은 패널(ERD 오른쪽)에서 칸이 늘면 가로 스크롤 — 머리글 줄바꿈 없음 */}
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse bg-white">
         <thead>
           <tr className="thead-3d text-center">
-            {['순서', 'PK', '필수', '속성(용어)', '물리명', '도메인', '처리'].map((h) => (
-              <th key={h} className="border px-2 py-1">
+            {['순서', '속성명(용어)', ...cols.map((k) => COL_NM[k]), '처리'].map((h) => (
+              <th key={h} className="border px-2 py-1 whitespace-nowrap">
                 {h}
               </th>
             ))}
@@ -252,7 +395,7 @@ export default function Attrs({ api, areaId, entId, entNm, editor, onChanged }: 
         <tbody>
           {items.length === 0 ? (
             <tr>
-              <td colSpan={7} className="border px-2 py-2 text-center text-gray-500">
+              <td colSpan={span} className="border px-2 py-2 text-center text-gray-500">
                 등록된 속성이 없습니다 — 아래 추천에서 고르거나 표준용어를 검색해 추가하십시오
               </td>
             </tr>
@@ -272,27 +415,13 @@ export default function Attrs({ api, areaId, entId, entNm, editor, onChanged }: 
                     </>
                   )}
                 </td>
-                <td className="border px-2 py-1 text-center">
-                  {editor ? (
-                    <button type="button" onClick={() => void patch(a, { pk_yn: a.pk_yn === 'Y' ? 'N' : 'Y' })} title="주식별자 지정·해제">
-                      {a.pk_yn === 'Y' ? `🔑${a.pk_seq}` : '·'}
-                    </button>
-                  ) : a.pk_yn === 'Y' ? (
-                    `🔑${a.pk_seq}`
-                  ) : (
-                    ''
-                  )}
-                </td>
-                <td className="border px-2 py-1 text-center">
-                  <input type="checkbox" disabled={!editor || a.pk_yn === 'Y'} checked={a.esntl_yn === 'Y'} onChange={() => void patch(a, { esntl_yn: a.esntl_yn === 'Y' ? 'N' : 'Y' })} aria-label="필수" />
-                </td>
                 <td className="border px-2 py-1 font-medium">
+                  {a.pk_yn === 'Y' && !cols.includes('pk') && <span title="주식별자">🔑 </span>}
                   {a.std_term?.term_log_nm}
-                  {a.fk_rel_id && <span className="ml-1 text-gray-500">(상속)</span>}
-                  {a.attr_desc && <span className="block text-[0.65rem] font-normal text-gray-500">{a.attr_desc}</span>}
+                  {a.fk_rel_id && !cols.includes('fk') && <span className="ml-1 text-gray-500">(상속)</span>}
+                  {a.attr_desc && !cols.includes('desc') && <span className="block text-[0.65rem] font-normal text-gray-500">{a.attr_desc}</span>}
                 </td>
-                <td className="border px-2 py-1 font-mono text-[#1f3a68]">{a.std_term?.term_phy_nm}</td>
-                <td className="border px-2 py-1">{a.std_term?.std_dom?.dom_nm}</td>
+                {cols.map((k) => cell(k, a))}
                 <td className="border px-2 py-1 text-center">
                   {editor && (
                     <>
@@ -308,7 +437,7 @@ export default function Attrs({ api, areaId, entId, entNm, editor, onChanged }: 
               </tr>,
               ed?.id === a.attr_id && (
                 <tr key={`${a.attr_id}-ed`} className="bg-[#fffbea]">
-                  <td colSpan={7} className="border px-2 py-2">
+                  <td colSpan={span} className="border px-2 py-2">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="font-semibold">용어</span>
                       {a.fk_rel_id ? (
@@ -338,7 +467,8 @@ export default function Attrs({ api, areaId, entId, entNm, editor, onChanged }: 
             ])
           )}
         </tbody>
-      </table>
+        </table>
+      </div>
       {editor && (
         <div className="flex flex-wrap items-center gap-2 rounded border border-[#d5ddec] bg-white p-2">
           <span className="font-semibold text-[#1f3a68]">＋ 속성 추가</span>

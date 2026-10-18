@@ -5,7 +5,7 @@ import type { EntTp, EntWord } from './model-name'
 import { TEMPLATES, entKey, isIndstry } from './modelpi/template'
 import { GENERIC_TERMS, entCore, type ParentKey, type TermRow } from './modelpi/logical'
 
-export const ATTR_COLS = 'attr_id, ent_id, term_id, attr_seq, pk_yn, pk_seq, esntl_yn, fk_rel_id, src_attr_id, attr_desc, attr_asst_nm, ver_no, regr_id, reg_dtm, std_term!mdl_attr_std_term_id_fkey(term_log_nm, term_phy_nm, std_dom!std_term_std_dom_id_fkey(dom_nm, lgc_tp_cd, data_len, data_scale))'
+export const ATTR_COLS = 'attr_id, ent_id, term_id, attr_seq, pk_yn, pk_seq, esntl_yn, fk_rel_id, src_attr_id, attr_desc, attr_asst_nm, ver_no, regr_id, reg_dtm, std_term!mdl_attr_std_term_id_fkey(term_log_nm, term_phy_nm, syn_txt, std_dom!std_term_std_dom_id_fkey(dom_nm, lgc_tp_cd, data_len, data_scale, std_lgc_tp(lgc_tp_nm)))'
 
 type TermJoin = { term_id: string; std_term: { term_log_nm: string; term_phy_nm: string; std_dom: { dom_nm: string } | null } | null }
 const toRow = (x: TermJoin): TermRow => ({ term_id: x.term_id, term_log_nm: x.std_term?.term_log_nm ?? '', term_phy_nm: x.std_term?.term_phy_nm ?? '', dom_nm: x.std_term?.std_dom?.dom_nm ?? null })
