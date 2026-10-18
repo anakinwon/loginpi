@@ -226,11 +226,13 @@ async function runOra(t: Target, pwd: string, stmts: Stmt[], kinds: Kind[], o: {
   }
 }
 
-// 접속 열기 공통(실행·메타) — 같은 분류체계·서버 직접·스위치·키·비밀번호·공인 주소 확인
-export async function openConn(areaId: string, connId: string): Promise<{ c: NonNullable<Awaited<ReturnType<typeof getConn>>>; d: Dialect; t: Target; pwd: string } | NextResponse> {
+// 접속 열기 공통(실행·메타) — 같은 분류체계·서버 직접·조회 전용 계정(DA 아니면)·스위치·키·비밀번호·공인 주소 확인
+export async function openConn(areaId: string, connId: string, role: MbrRole): Promise<{ c: NonNullable<Awaited<ReturnType<typeof getConn>>>; d: Dialect; t: Target; pwd: string } | NextResponse> {
   const c = await getConn(areaId, connId)
   if (!c) return failRes({ code: 'NOT_FOUND', status: 404 })
   if (c.exec_mthd_cd !== 'SRV') return failRes({ code: 'SQL_AGT_UNSUPPORTED', status: 400 })
+  // DA 아닌 역할 = 조회 전용 계정 접속만(fail-closed) — 어휘 판정·READ ONLY 트랜잭션은 사용자 함수 안 부작용을 못 막고, 메타도 그 계정 권한으로 열람
+  if (!can(role, 'SQL_WRITE') && c.rdonly_acct_yn !== 'Y') return failRes({ code: 'SQL_RDONLY_REQUIRED', status: 403 })
   if (!directEnabled() || !profileKey()) return failRes({ code: 'DB_CONN_DISABLED', status: 503 })
   const d: Dialect | null = c.dbms_cd === '0014' ? 'PG' : c.dbms_cd === '0001' ? 'ORA' : null
   if (!d) return failRes({ code: 'DB_CONN_MISMATCH', status: 400 })
@@ -254,14 +256,12 @@ export async function runEditor(areaId: string, uid: string, role: MbrRole, b: B
   const kinds = stmts.map((s) => classify(s, d))
   const txn = kinds.findIndex((k) => k === 'TXN')
   if (txn >= 0) return failRes({ code: 'SQL_TXN_DENIED', status: 400, detail: { seq: txn + 1, txt: stmts[txn].txt.slice(0, 200) } })
-  // DA 아닌 역할 = 조회 전용 계정 접속만(fail-closed) — 어휘 판정·READ ONLY 트랜잭션은 사용자 함수 안 부작용을 못 막음(보안 검토)
-  if (!can(role, 'SQL_WRITE') && cn.rdonly_acct_yn !== 'Y') return failRes({ code: 'SQL_RDONLY_REQUIRED', status: 403 })
   const write = kinds.includes('WRITE')
   if (write && !can(role, 'SQL_WRITE')) return failRes({ code: 'SQL_WRITE_DENIED', status: 403, detail: { seq: kinds.indexOf('WRITE') + 1, txt: stmts[kinds.indexOf('WRITE')].txt.slice(0, 200) } })
   const dangers = stmts.map((s, i) => ({ seq: i + 1, txt: s.txt.slice(0, 200), danger: danger(s) })).filter((x): x is { seq: number; txt: string; danger: Danger } => !!x.danger)
   if (dangers.length && !b.confirm) return failRes({ code: 'SQL_CONFIRM', status: 409, detail: dangers })
 
-  const oc = await openConn(areaId, b.conn_id)
+  const oc = await openConn(areaId, b.conn_id, role)
   if (oc instanceof NextResponse) return oc
   const { c, t, pwd } = oc
 

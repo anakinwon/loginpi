@@ -55,6 +55,8 @@ const KIND: [string, string][] = [
 ]
 const DBMS_NM: Record<string, string> = { '0014': 'PostgreSQL', '0001': 'Oracle' }
 const LIMITS = [200, 1000, 5000] as const
+// 식별자 따옴표 — 카탈로그 이름이 그대로 SQL 이 되지 않게(예: 테이블명 'x; DROP …'), 단순 이름(PG 소문자·Oracle 대문자)은 그대로
+const qi = (n: string, ora: boolean) => ((ora ? /^[A-Z][A-Z0-9_$#]*$/ : /^[a-z_][a-z0-9_$]*$/).test(n) ? n : `"${n.replace(/"/g, '""')}"`)
 const HSIZE = 20
 // 바이트 → DBeaver 와 같은 K·M·G(1024 단위)
 const fmtSize = (s: string | null) => {
@@ -319,7 +321,7 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
                                     return (
                                       <li key={o.name}>
                                         <div className="flex items-center hover:bg-amber-50" title={o.cmt ?? ''}>
-                                          <button type="button" className="min-w-0 flex-1 truncate text-left" onClick={() => rel && toggle(`c:${ok}`, () => void loadCols(s.name, o.name))} onDoubleClick={() => rel && run(false, `SELECT * FROM ${s.name}.${o.name}`)}>
+                                          <button type="button" className="min-w-0 flex-1 truncate text-left" onClick={() => rel && toggle(`c:${ok}`, () => void loadCols(s.name, o.name))} onDoubleClick={() => rel && run(false, `SELECT * FROM ${qi(s.name, dialect === 'ORA')}.${qi(o.name, dialect === 'ORA')}`)}>
                                             {rel ? (open.has(`c:${ok}`) ? '▾ ' : '▸ ') : '· '}
                                             {o.name}
                                           </button>
