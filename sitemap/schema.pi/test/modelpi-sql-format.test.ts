@@ -35,7 +35,7 @@ test('문장 다시 배치 — 이미지 예시', () => {
 })
 
 test('문장 다시 배치 — 그대로 둘 곳', () => {
-  // 문자열 안 공백·키워드, 괄호 안(하위 질의·함수 인자), BETWEEN…AND, CASE…END, 조인
+  // 문자열 안 공백·키워드, 함수 인자 괄호, BETWEEN…AND, CASE…END, 조인 — 하위 질의는 펼침(아래 시험)
   const src = "SELECT a,  'x  from  y' AS s, f(b, c), CASE WHEN a = 1 AND b = 2 THEN 1 ELSE 0 END AS k FROM t LEFT OUTER JOIN u ON u.id = t.id AND u.x = 1 WHERE d BETWEEN 1 AND 2 AND e IN (SELECT e FROM v WHERE z = 1)"
   assert.equal(riverFormat(src, 'PG'), [
     "SELECT a             AS a",
@@ -47,7 +47,10 @@ test('문장 다시 배치 — 그대로 둘 곳', () => {
     '    ON u.id = t.id',
     '   AND u.x = 1',
     ' WHERE d BETWEEN 1 AND 2',
-    '   AND e IN (SELECT e FROM v WHERE z = 1)',
+    '   AND e IN ( SELECT e  AS e',
+    '                FROM v',
+    '               WHERE z = 1',
+    '            )',
   ].join('\n'))
 })
 
@@ -110,3 +113,29 @@ test('SELECT 별칭 — 판정 경계', () => {
   assert.equal(riverFormat('select a into v from t', 'PG'), ['SELECT a INTO v', '  FROM t'].join('\n'))
   assert.equal(riverFormat('select distinct a, bb from t', 'PG'), ['SELECT DISTINCT a  AS a', '     , bb' + ' '.repeat(10) + 'AS bb', '  FROM t'].join('\n'))
 })
+
+test('하위 질의 펼침 — 여는 괄호 + 2 칸 강 정렬, 닫는 괄호 = 여는 괄호 열(마스터 이미지 2026-10-18)', () => {
+  const src = "select c.table_name from information_schema.columns c left join (select con.conname as constraint_name, cl.relname as tbl from pg_constraint con join pg_class cl on cl.oid = con.conrelid and cl.relkind = 'r' where con.contype = 'f') f on f.tbl = c.table_name where c.table_schema = 'public';"
+  const want = [
+    'SELECT c.table_name  AS table_name',
+    '  FROM information_schema.columns c',
+    '  LEFT JOIN ( SELECT con.conname  AS constraint_name',
+    '                   , cl.relname   AS tbl',
+    '                FROM pg_constraint con',
+    '                JOIN pg_class cl',
+    '                  ON cl.oid = con.conrelid',
+    "                 AND cl.relkind = 'r'",
+    "               WHERE con.contype = 'f'",
+    '            ) f',
+    '    ON f.tbl = c.table_name',
+    " WHERE c.table_schema = 'public'",
+    '  ;',
+  ].join('\n')
+  assert.equal(riverFormat(src, 'PG'), want)
+  assert.equal(riverFormat(want, 'PG'), want) // 두 번 정렬 = 같음
+  // SELECT 목록 스칼라 하위 질의 = ') AS 별칭', 다른 항목 맞춤에 영향 없음
+  assert.equal(riverFormat('select (select max(b) from u where u.a = t.a) mb, a from t', 'PG'), ['SELECT ( SELECT MAX(b)', '           FROM u', '          WHERE u.a = t.a', '       ) AS mb', '     , a  AS a', '  FROM t'].join('\n'))
+  // 함수 괄호·문자열 안 SELECT 는 펼치지 않음
+  assert.equal(riverFormat("select f(x) from t where s = '(select 1)'", 'PG'), ['SELECT f(x)', '  FROM t', " WHERE s = '(select 1)'"].join('\n'))
+})
+

@@ -77,12 +77,23 @@ export function riverFormat(text: string, d: Dialect): string {
   const sent = maskSql(body.replace(/[ \t\r]/g, '\u0001'), d)
   const ws = (k: number) => sent[k] === '\u0001' || sent[k] === '\n'
   const out: string[] = []
+  const subs: string[] = [] // 하위 질의 = 따로 정렬한 결과, 줄에는 자리표시 (\u0003n\u0003)
   let cur = '', depth = 0, caseD = 0, between = false, clause = '', prev = ''
   const flush = () => { if (cur.trim()) out.push(cur.trim()); cur = '' }
   let i = 0
   while (i < body.length) {
     if (ws(i)) { if (cur && !cur.endsWith(' ')) cur += ' '; i++; continue } // 문자열 밖 공백 = 한 칸
     const m = mask[i]
+    if (m === '(' && /^\(\s*(SELECT|WITH)\b/i.test(mask.slice(i, i + 64))) {
+      const j = closeParen(mask, i)
+      if (j > 0) {
+        subs.push(riverFormat(body.slice(i + 1, j).trim(), d))
+        cur += `(\u0003${subs.length - 1}\u0003)`
+        prev = ')'
+        i = j + 1
+        continue
+      }
+    }
     if (m === '(') depth++
     if (m === ')') depth = Math.max(0, depth - 1)
     if (m === ',' && depth === 0 && caseD === 0 && COMMA_CLAUSE.has(clause)) {
@@ -112,7 +123,37 @@ export function riverFormat(text: string, d: Dialect): string {
   flush()
   const lines: string[] = []
   for (const l of out) lines.push(' '.repeat(l.startsWith(',') ? commaIndent(lines) : (riverIndent(l) ?? (lines.length ? RIVER + 1 : 0))) + l)
-  return selectAliases(lines, d).join('\n') + tail
+  return expandSubs(selectAliases(lines, d), subs).join('\n') + tail
+}
+
+// 짝 괄호 위치(마스크 기준 — 문자열·주석 안 괄호 무시), 없으면 -1
+function closeParen(mask: string, i: number): number {
+  let dp = 0
+  for (let k = i; k < mask.length; k++) {
+    if (mask[k] === '(') dp++
+    else if (mask[k] === ')' && --dp === 0) return k
+  }
+  return -1
+}
+
+// 하위 질의 펼치기(2026-10-18 마스터 이미지) — 여는 괄호 열 = c 일 때
+//   LEFT JOIN ( SELECT a        ← 첫 줄은 '( ' 뒤
+//                 FROM t        ← 나머지 = c + 2 칸 들여쓰기(하위 질의 안도 강 정렬)
+//             ) f               ← 닫는 괄호 = 여는 괄호 열, 뒤 이어 별칭 등
+function expandSubs(lines: string[], subs: string[]): string[] {
+  if (!subs.length) return lines
+  const out: string[] = []
+  const todo = [...lines]
+  while (todo.length) {
+    const l = todo.shift()!
+    const m = /\(\u0003(\d+)\u0003\)/.exec(l)
+    if (!m) { out.push(l); continue }
+    const c = m.index, sl = subs[+m[1]].split('\n')
+    out.push(l.slice(0, c) + '( ' + sl[0])
+    for (const x of sl.slice(1)) out.push(' '.repeat(c + 2) + x)
+    todo.unshift((' '.repeat(c) + ')' + l.slice(c + m[0].length)).trimEnd()) // 같은 줄 뒤에 다른 하위 질의가 있으면 이어서 펼침
+  }
+  return out
 }
 
 // SELECT 목록 별칭(2026-10-18 마스터 지시 + 이미지) — 별칭 없는 칼럼(a·t.a) = AS 칼럼명, 있는 별칭은 AS 로 통일, AS 를 한 열(가장 긴 식 + 2칸)에 맞춤
@@ -156,9 +197,11 @@ function selectAliases(lines: string[], d: Dialect): string[] {
     // SELECT … INTO 변수 목록(PL/SQL·PL/pgSQL) — 쉼표 줄이 변수라 별칭을 붙이면 문법 오류 → 그 묶음 전체 그대로
     if (rows.some((r) => /\bINTO\b/i.test(maskSql(r.item, d)))) continue
     const parts = rows.map((r) => ({ ...r, ...splitItem(r.item, d) }))
-    const ends = parts.filter((p) => p.alias && p.pre.length + p.expr.length <= ALIAS_MAX).map((p) => p.pre.length + p.expr.length)
+    // 하위 질의 항목(자리표시 \u0003)은 펼친 뒤 ') AS 별칭' 한 칸 — 맞춤 열 계산에서 뺌
+    const sub = (p: { expr: string }) => p.expr.includes('\u0003')
+    const ends = parts.filter((p) => p.alias && !sub(p) && p.pre.length + p.expr.length <= ALIAS_MAX).map((p) => p.pre.length + p.expr.length)
     const col = Math.max(0, ...ends) + 2
-    for (const p of parts) if (p.alias) out[p.k] = p.pre + p.expr + ' '.repeat(Math.max(1, col - p.pre.length - p.expr.length)) + 'AS ' + p.alias
+    for (const p of parts) if (p.alias) out[p.k] = p.pre + p.expr + ' '.repeat(sub(p) ? 1 : Math.max(1, col - p.pre.length - p.expr.length)) + 'AS ' + p.alias
   }
   return out
 }
