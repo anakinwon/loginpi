@@ -78,7 +78,7 @@
 
 목표 : ERD 물리 뷰에서 DBMS별 DDL을 만들고, 적용 결과를 수집해 모델과 DB가 같은지 증명한다.
 
-- [x] PHY-1 DDL 생성(P10) 1차(2026-10-17, `PRD_PiErd.md` S2) : DBMS 프로파일(Oracle·Tibero·PostgreSQL, `src/lib/modelpi/dbms.ts` — 전환 시 선택한 대·소문자·식별자 길이·PK·FK 정책)별 CREATE TABLE·PK·COMMENT ON(P28)·시스템 컬럼 4개(DDL 생성 때만, 표준용어 LST_*)·변경분 ALTER, 산출 = `.sql` 내려받기(DB 직접 실행 없음, 적용은 사람). 남음 : 시퀀스/UUID·변경일시 트리거·인덱스·파티션. Oracle·Tibero 실 DB 실행 [확인중]
+- [x] PHY-1 DDL 생성(P10) 1차(2026-10-17, `PRD_PiErd.md` S2) : DBMS 프로파일(Oracle·Tibero·PostgreSQL, `src/lib/modelpi/dbms.ts` — 전환 시 선택한 대·소문자·식별자 길이·PK·FK 정책)별 CREATE TABLE·PK·COMMENT ON(P28)·시스템 컬럼 4개(DDL 생성 때만, 표준용어 LST_*)·변경분 ALTER, 산출 = `.sql` 내려받기. 2026-10-18 : DDL 생성 화면(ERD 작성완료 주제영역의 선택 테이블)·DA 승인 후 직접 실행(서버 PostgreSQL·Oracle / 로컬 에이전트 JDBC·JNDI, `sql/037~041`·`agent/`), PK = 인덱스 먼저·FK 미생성, PostgreSQL DDL 소문자. 남음 : 변경일시 트리거·인덱스(PK 외)·파티션. Oracle·Tibero 실 DB·실 WAS JNDI 실행 [확인중]
 - [ ] PHY-2 대상 시스템·DB 등록(P12) : 접속 정보는 DB에 저장하지 않고 환경변수 참조명만 [확인중 : 비밀 보관 방식]
 - [ ] PHY-3 카탈로그 수집(P13) : `information_schema`·`pg_catalog` 스냅샷 → `mdl_tbl_hist`·`mdl_col_hist`·`mdl_idx_hist`, 수집 스케줄(P14)
 - [ ] PHY-4 모델 ↔ DB 비교(P16)·DB 변경 이력(P15) : 누락·불일치·드리프트 목록, 표준 점검 P17 모델·DB 컬럼까지 확장, 영향 분석 P23(용어 → 사용 컬럼)

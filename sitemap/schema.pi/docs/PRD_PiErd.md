@@ -25,7 +25,7 @@ DA# Modeler5(엔코아, 데스크톱 MFC)를 기준 제품으로 분석해, 같�
 | 보기 | PiMdl_view_agent | 3단 화면(트리 / 캔버스 / 속성 패널), 표시 수준 3단계, 엔터티 소속과 표시(다이어그램)를 분리 |
 | 물리설계 | PiMdl_physical_agent | 물리 모델을 별도 저장(`mdl_phy_*`), 타입은 도메인에서만 유도(`std_tp_map`), DDL은 PG·Oracle·Tibero |
 | 데이터 | PiMdl_data_agent | 검토 엔진 확장, 표준 정합 점검(동기화 대신 영향 알림), 정의서 출력. Repository는 제외 |
-| 리버스 | PiMdl_reverse_agent | DDL 파서, 카탈로그 결과 업로드(고객 DB 직접 접속 안 함), 물리명 → 표준 용어 역매핑 |
+| 리버스 | PiMdl_reverse_agent | DDL 파서, 카탈로그 결과 업로드(리버스는 고객 DB 직접 접속 안 함 — DDL 실행만 승인 후 직접 접속, §4 결정 9~15), 물리명 → 표준 용어 역매핑 |
 | 서식 | PiMdl_form_agent | 캔버스 + dagre Layered + 위치 고정 존중 + 미리보기 후 적용 + 유형별 색 |
 
 보고서 원본 : 세션 스크래치패드 `dahash/reports/`(통합본 `_PiMdl_통합분석.md`)
@@ -65,6 +65,20 @@ DA# Modeler5(엔코아, 데스크톱 MFC)를 기준 제품으로 분석해, 같�
 | 6 | 정보보호 지정 | 표준용어에 지정 → 모든 모델 상속 | S5 |
 | 7 | 앱 분리 | schema.pi 안에서 S1~S3 진행 후 분리(로드맵 "MD5 뒤") | S3 뒤 |
 | 8 | 라이선스 | DA# SQLite에서 적재한 기준 데이터(`db-seed.mjs`) 사용 범위를 엔코아에 확인 — 확인 전 외부 배포 금지 [확인중 : 엔코아] | S2 |
+
+**2026-10-18 추가 확정(마스터 지시 "ERD완성 기능과 DDL생성 화면 — 선택 테이블 DDL 생성 또는 JDBC·JNDI 직접 연결로 DB 에 직접 생성")**
+
+| # | 항목 | 확정 | 반영 |
+|---|---|---|---|
+| 9 | ERD 완성 | 주제영역 ERD **작성완료** 상태(배치·관계선 잠금, 완료 취소 후 수정) — 엔터티 → 테이블 → ERD 작성완료 → DDL | `sql/037` |
+| 10 | ERD × DBMS | 주제영역 ERD 하나를 모든 DBMS 물리 모델이 공유, DDL 대상 = 작성완료 ERD 배치 ∩ 물리 모델 테이블 작성완료 | `model-ddl.ts` |
+| 11 | DB 연결 | 서버 직접(PostgreSQL·Oracle, 공인 주소) + 로컬 Java 에이전트(JDBC URL·JNDI, 사내망·Tibero) | `sql/038`·`039`, `agent/` |
+| 12 | MySQL·MS-SQL | 이번 제외(DBMS 프로파일 추가 때) | — |
+| 13 | 보안 | 접속 비밀번호 서버 키 암호화(에이전트는 PC 환경변수), **DA 승인 후 실행**, 미리보기·문장별 실행 이력, 공인 IP·문장 화이트리스트·에이전트 allow.hosts | `sql/038~041` |
+| 14 | 자기 승인 | 금지(요청자 ≠ 승인자, DB CHECK) | `sql/038` |
+| 15 | JNDI | 단독 jar 에이전트 + JNDI 조회(WAS 클라이언트 설정, 로컬 이름만) | `agent/README.md` |
+| 16 | PK·FK(마스터 지시) | FK 미생성, PK = 유일 인덱스 먼저 → 그 인덱스로 PK(`USING INDEX`) | `ddl.ts`·`phy.ts pkStmts` |
+| 17 | 대소문자(마스터 지시) | 물리 모델까지 대문자, PostgreSQL DDL 은 반드시 소문자(테이블·칼럼·PK·인덱스) | `dbms.ts ddlCase` |
 
 ## 5. 제작 스케줄
 
@@ -113,7 +127,7 @@ DA# Modeler5(엔코아, 데스크톱 MFC)를 기준 제품으로 분석해, 같�
 | P3 | 시스템 칼럼 자동(맨 끝) — **2026-10-17 마스터 지시로 변경** : 4개(최종수정일시 LST_MDDTM·최종수정자ID LST_MDFR_ID·최종등록일시 LST_RGDTM·최종등록자ID LST_RGTR_ID, 표준용어 그대로)를 **DDL 생성 때만** 추가. 논리·물리 모델·ERD·정의서에는 없음, 삭제여부·삭제일시는 시스템 칼럼 아님(옵션 폐기) | 코드 상수 `phy.ts` sysCols(`mdl_sys_col` 테이블 안 만듦) | 모든 DDL 테이블 끝에 4개 |
 | P4 | 물리 객체 이름 규칙 : PK·인덱스·FK 이름(DBMS 길이 한도) | `dbms.ts` 프로파일 확장 | 길이 초과 0건 |
 | P5 | 칼럼 그리드(일괄편집 겸용) | 화면 | 순서·NULL·기본값 편집 |
-| P6 | DDL 생성 : PostgreSQL·Oracle·Tibero(순수 TS, `.sql` 내려받기만, DB 직접 실행 없음) + 테이블·칼럼·인덱스 정의서 | 순수 모듈 + 단위 테스트 | 생성 DDL을 로컬 PG(PGlite)에 적용 성공 |
+| P6 | DDL 생성 : PostgreSQL·Oracle·Tibero(순수 TS) + 테이블·칼럼·인덱스 정의서. 2026-10-18 : DDL 생성 화면(선택 테이블)·DA 승인 후 직접 실행(서버 PostgreSQL·Oracle / 로컬 에이전트 JDBC·JNDI) — §4 결정 9~15 | 순수 모듈 + 단위 테스트 | 생성 DDL을 로컬 PG(PGlite)에 적용 성공, 실연결 E2E(서버 22·에이전트 19) |
 
 ### S3 ERD 자동 생성(5일) — ERD-1~3 · ✅ 2026-10-17 완료(E1~E6, `sql/029`, 배치 500개 0.9초 — Pi Browser 터치 드래그 실기기 미확인)
 
@@ -169,7 +183,7 @@ DA# Modeler5(엔코아, 데스크톱 MFC)를 기준 제품으로 분석해, 같�
 
 ## 7. 제외(웹 구조로 대체되거나 목표 밖)
 
-Repository(접속·올리기·내리기·Lock·공유) · 표준대상 편집(대상/비대상) · 파일 새로 만들기·열기·저장 · OLE 개체·선/표 그리기 · VBScript 입력창(보안) · 창 도킹·시작 페이지 · 일반 모드(FK 미생성) · Oracle 스토리지·LOB 옵션 · 고객 DB 직접 접속 · ERwin XML·CWM · 크기 최적화류 버튼(CSS 자동)
+Repository(접속·올리기·내리기·Lock·공유) · 표준대상 편집(대상/비대상) · 파일 새로 만들기·열기·저장 · OLE 개체·선/표 그리기 · VBScript 입력창(보안) · 창 도킹·시작 페이지 · 일반 모드(FK 미생성) · Oracle 스토리지·LOB 옵션 · 리버스용 고객 DB 직접 접속(DDL 실행은 2026-10-18 범위 편입) · ERwin XML·CWM · 크기 최적화류 버튼(CSS 자동)
 
 ## 8. 위험과 미확인
 
@@ -189,4 +203,5 @@ Repository(접속·올리기·내리기·Lock·공유) · 표준대상 편집(�
 | 2026-10-17 | 최초 작성 — DA# Modeler5 메뉴 분석(6탭) + REA·Ghidra 1차 코드 확인(자동 배치) 반영, 제작 스케줄 S0~S5(안) |
 | 2026-10-17 | 마스터 확정 — 결정 1~7 권장안대로, 결정 8 엔코아 확인 중, 착수일 2026-10-19, MASTER_ROADMAP ERD-2 좌표 테이블·ModelPi 분리 시점 연동 |
 | 2026-10-17 | REA·Ghidra 2차 확인 반영 — EnSchemaMan(ALTER·이행 스크립트)·EnStandardGate(정보보호 동기화·모델 승인 요청)·EnData(LPMapper)·EnReverse(선언 제약 기반 관계), S5에 모델 변경 승인·변경분 DDL 추가 |
+| 2026-10-18 | 결정 9~17 추가 — ERD 작성완료, DDL 생성 화면, DA 승인 후 직접 실행(서버·로컬 에이전트), PK 인덱스 먼저·FK 미생성, PostgreSQL 소문자 DDL. P6·제외 목록 갱신 |
 | 2026-10-17 | S0~S4 완료 표시 유지, S5 진행(동기화·변경분 DDL ✅), 마스터 지시 반영 절(단계 상태·ERD 주제영역 단위·주제영역 콤보·시스템 칼럼·메뉴), P3 시스템 칼럼 규칙 변경(4개 표준용어 LST_*, DDL 생성 때만), §6 S5 데이터·`mdl_sys_col` 미생성 |
