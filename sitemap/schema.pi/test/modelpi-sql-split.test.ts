@@ -49,6 +49,10 @@ test('분류 : 조회·쓰기·트랜잭션 제어', () => {
     assert.equal(k(t), 'TXN', t)
   assert.equal(k('BEGIN\n NULL;\nEND;\n/', 'ORA'), 'WRITE') // Oracle 익명 블록
   assert.equal(k('SELECT 1 FROM DUAL', 'ORA'), 'READ')
+  // 보안 검토 2026-10-18 : 따옴표·유니코드 이스케이프 식별자로 부작용 함수 숨기기
+  for (const t of ['SELECT "pg_terminate_backend"(1)', "SELECT pg_catalog.\"set_config\"('a','b',false)", 'SELECT U&"pg\\005Fterminate_backend"(1)', 'SELECT pg_terminate_backend /* x */ (1)']) assert.equal(k(t), 'WRITE', t)
+  // Oracle 은 주석 중첩 없음 — 첫 */ 뒤는 코드
+  assert.deepEqual(txts('SELECT 1 /* a /* b */ FROM DUAL; SELECT 2 FROM DUAL', 'ORA'), ['SELECT 1 /* a /* b */ FROM DUAL', 'SELECT 2 FROM DUAL'])
   assert.equal(k('EXPLAIN PLAN FOR SELECT 1 FROM DUAL', 'ORA'), 'WRITE')
 })
 

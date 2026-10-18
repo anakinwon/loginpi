@@ -3,12 +3,13 @@
 // 사용 : splitSql(편집기 전체, 'PG'|'ORA') → 문장 목록(원문 위치 포함), classify·danger 는 서버가 실행 전에 다시 판정(클라이언트 판정 신뢰 안 함)
 
 export type Dialect = 'PG' | 'ORA'
-export type Stmt = { txt: string; from: number; to: number; mask: string }
+export type Stmt = { txt: string; from: number; to: number; mask: string; code: string } // code = 식별자 글자 남긴 가림(함수 판정)
 export type Kind = 'READ' | 'WRITE' | 'TXN'
 export type Danger = 'NO_WHERE' | 'DROP' | 'TRUNCATE' | 'ALTER'
 
 // 문자열·주석 → 공백(글자 수 그대로 — 위치 유지, 문자열·블록 주석 안 줄바꿈도 가려 빈 줄 구분에 안 걸림)
-export function maskSql(text: string, d: Dialect): string {
+// keepIdent : 따옴표 식별자 안 글자는 남기고 따옴표만 지움(code — 부작용 함수 판정용, "pg_terminate_backend"(…) 우회 차단)
+export function maskSql(text: string, d: Dialect, keepIdent = false): string {
   const out = text.split('')
   const blank = (a: number, b: number) => { for (let k = a; k < b; k++) out[k] = ' ' }
   let i = 0
@@ -17,9 +18,10 @@ export function maskSql(text: string, d: Dialect): string {
     const c = text[i], c2 = text.slice(i, i + 2)
     if (c2 === '--') { const e = text.indexOf('\n', i); const end = e < 0 ? n : e; blank(i, end); i = end; continue }
     if (c2 === '/*') {
+      // 중첩 주석은 PostgreSQL 만 — Oracle 은 첫 */ 에서 끝남(해석 차이로 숨은 문장 방지)
       let depth = 0, j = i
       while (j < n) {
-        if (text.startsWith('/*', j)) { depth++; j += 2 } else if (text.startsWith('*/', j)) { depth--; j += 2; if (!depth) break } else j++
+        if (text.startsWith('/*', j) && (d === 'PG' || !depth)) { depth++; j += 2 } else if (text.startsWith('*/', j)) { depth--; j += 2; if (!depth) break } else j++
       }
       blank(i, j); i = j; continue
     }
@@ -38,7 +40,7 @@ export function maskSql(text: string, d: Dialect): string {
       }
       blank(i + 1, j); i = j + 1; continue
     }
-    if (c === '"') { const e = text.indexOf('"', i + 1); const end = e < 0 ? n : e; blank(i + 1, end); i = end + 1; continue }
+    if (c === '"') { const e = text.indexOf('"', i + 1); const end = e < 0 ? n : e; if (keepIdent) blank(i, i + 1), blank(end, end + 1); else blank(i + 1, end); i = end + 1; continue }
     if (d === 'PG' && c === '$') {
       const m = /^\$([A-Za-z_][A-Za-z0-9_]*)?\$/.exec(text.slice(i))
       if (m && !/\w/.test(text[i - 1] ?? '')) {
@@ -56,14 +58,14 @@ const ORA_BLOCK = /^\s*(DECLARE|BEGIN|CREATE\s+(OR\s+REPLACE\s+)?(EDITIONABLE\s+
 
 // 문장 분리 : 바깥 ; · 빈 줄(DBeaver '빈 줄은 문장 구분') · Oracle '/' 단독 줄
 export function splitSql(text: string, d: Dialect): Stmt[] {
-  const mask = maskSql(text, d)
+  const mask = maskSql(text, d), code = maskSql(text, d, true)
   const res: Stmt[] = []
   let start = 0
   const push = (a: number, b: number) => {
     const raw = text.slice(a, b), lead = raw.length - raw.trimStart().length
     const txt = raw.trim()
     if (!mask.slice(a, b).trim()) return // 주석뿐인 조각 제외
-    res.push({ txt, from: a + lead, to: a + lead + txt.length, mask: mask.slice(a + lead, a + lead + txt.length) })
+    res.push({ txt, from: a + lead, to: a + lead + txt.length, mask: mask.slice(a + lead, a + lead + txt.length), code: code.slice(a + lead, a + lead + txt.length) })
   }
   // PL/SQL 블록 여부는 문장 첫 글자가 나올 때 1회 판정
   let block: boolean | null = null
@@ -96,16 +98,16 @@ const SIDE_FX = /\b(set_config|pg_terminate_backend|pg_cancel_backend|pg_reload_
 // 트랜잭션 제어·읽기 전용 해제 = 항상 거부(Auto 커밋 모델 깨짐, READ ONLY 탈출)
 const TXN = /^\s*(BEGIN(?!\s*\w+\s*:=)|START\s+TRANSACTION|COMMIT|ROLLBACK|END|ABORT|SAVEPOINT|RELEASE|PREPARE\s+TRANSACTION|SET\s+TRANSACTION|SET\s+SESSION\s+CHARACTERISTICS|SET\s+(SESSION\s+|LOCAL\s+)?(DEFAULT_)?TRANSACTION_READ_ONLY|SET\s+CONSTRAINTS)\b/i
 
-export function classify(s: Pick<Stmt, 'mask'>, d: Dialect): Kind {
+export function classify(s: Pick<Stmt, 'mask' | 'code'>, d: Dialect): Kind {
   const m = s.mask.trim()
   if (TXN.test(m) && !(d === 'ORA' && /^\s*BEGIN\b/i.test(m))) return 'TXN' // Oracle BEGIN = PL/SQL 블록(쓰기)
   if (/\b(set\s+)?(default_)?transaction_read_only\b/i.test(m)) return 'TXN'
-  if (SIDE_FX.test(m)) return 'WRITE'
+  if (SIDE_FX.test(s.code) || /U&\s*"/i.test(s.mask)) return 'WRITE' // 따옴표 식별자·유니코드 이스케이프 식별자(U&"…") 우회 차단
   const w = word(m)
   if (w === 'EXPLAIN') {
     if (d === 'ORA') return 'WRITE' // EXPLAIN PLAN FOR = PLAN_TABLE 에 기록
     const inner = m.replace(/^\s*EXPLAIN\s*(\([^)]*\)\s*)?((ANALY[SZ]E|VERBOSE|COSTS|BUFFERS|TIMING|SUMMARY|SETTINGS|WAL|FORMAT\s+\w+)\s+)*/i, '')
-    return classify({ mask: inner }, d) === 'READ' ? 'READ' : 'WRITE'
+    return classify({ mask: inner, code: '' }, d) === 'READ' ? 'READ' : 'WRITE'
   }
   if (w === 'SHOW' || w === 'VALUES' || w === 'TABLE') return 'READ'
   if (w === 'SELECT' || w === 'WITH') {
