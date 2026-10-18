@@ -76,6 +76,16 @@ public class SchemaPiAgent {
       default: return false;
     }
   }
+  // URL 의 호스트[:포트] — 허용 호스트 대조용(형식은 urlOk 가 먼저 검사)
+  static String[] hostOf(String u) {
+    var m = Pattern.compile("^jdbc:(?:postgresql://|oracle:thin:@(?://)?|tibero:thin:@)" + HOST + "(?::(\\d{1,5}))?", Pattern.CASE_INSENSITIVE).matcher(u);
+    return m.find() ? new String[] { m.group(1).toLowerCase(), m.group(2) } : null;
+  }
+  // 허용 호스트(보안 검토 2026-10-18) — 이 PC 설정 allow.hosts 에 있는 호스트(·포트)로만 접속, 서버가 URL 을 바꿔도 비밀번호를 다른 곳으로 보내지 않음
+  static boolean hostAllowed(String[] hp, Set<String> allow) {
+    if (hp == null) return false;
+    return allow.contains(hp[0]) || (hp[1] != null && allow.contains(hp[0] + ":" + hp[1]));
+  }
   static boolean jndiOk(String n) {
     return n.length() <= 255 && n.matches("^(java:(comp/env|global|app|module|jboss)/)?[A-Za-z0-9_][A-Za-z0-9_/.-]*$") && !n.contains("..");
   }
@@ -130,6 +140,7 @@ public class SchemaPiAgent {
   final HttpClient http = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).connectTimeout(Duration.ofSeconds(15)).build(); // h2c 업그레이드 시도 없이(일부 프록시·개발 서버가 끊음)
   String server, token;
   int pollSec;
+  final Set<String> allowHosts = new HashSet<>();
 
   SchemaPiAgent(String cfg) throws Exception {
     if (Files.exists(Path.of(cfg))) try (InputStream in = new FileInputStream(cfg)) { p.load(in); }
@@ -141,6 +152,8 @@ public class SchemaPiAgent {
     if (token == null || token.isBlank()) { token = p.getProperty("agent.token"); if (token != null) log("경고 : 토큰이 설정 파일에 평문으로 있습니다 — 환경변수 SCHEMAPI_AGENT_TOKEN 권장"); }
     if (token == null || !token.matches("^spa_[\\w-]{43}$")) throw new IllegalArgumentException("에이전트 토큰(SCHEMAPI_AGENT_TOKEN) 없음·형식 오류");
     pollSec = Math.max(5, Integer.parseInt(p.getProperty("poll.seconds", "15")));
+    for (String h : p.getProperty("allow.hosts", "").split(",")) if (!h.isBlank()) allowHosts.add(h.trim().toLowerCase());
+    if (allowHosts.isEmpty()) log("경고 : allow.hosts 가 비어 있어 JDBC URL 접속은 모두 거부됩니다(JNDI 만 가능) — 접속할 DB 호스트를 적으십시오");
   }
 
   static void log(String m) { System.out.println(java.time.LocalDateTime.now().withNano(0) + " " + m); }
@@ -173,6 +186,7 @@ public class SchemaPiAgent {
       return usr != null && pwd != null ? ds.getConnection(usr, pwd) : ds.getConnection();
     }
     if (url == null || !urlOk(url, dbms)) throw new SecurityException("허용되지 않는 JDBC URL(형식·DBMS 불일치·인자)");
+    if (!hostAllowed(hostOf(url), allowHosts)) throw new SecurityException("allow.hosts 에 없는 호스트 — 이 PC 설정에 접속할 DB 호스트를 추가하십시오(비밀번호를 보내지 않음)");
     return DriverManager.getConnection(url, usr, pwd);
   }
 
@@ -296,6 +310,9 @@ public class SchemaPiAgent {
     String[][] urls = { { "jdbc:tibero:thin:@10.0.0.5:8629:tibero", "0013", "Y" }, { "jdbc:oracle:thin:@//ora:1521/SVC", "0001", "Y" }, { "jdbc:postgresql://h:5432/d?sslmode=require", "0014", "Y" },
       { "jdbc:postgresql://h/d?socketFactory=x", "0014", "N" }, { "jdbc:postgresql://h/d?password=x", "0014", "N" }, { "jdbc:tibero:thin:@h:8629:t", "0014", "N" }, { "jdbc:h2:mem:x", "0014", "N" } };
     for (String[] u : urls) { n++; if (urlOk(u[0], u[1]) != "Y".equals(u[2])) { bad++; System.out.println("URL 판정 다름 : " + u[0]); } }
+    Set<String> al = Set.of("10.0.0.5", "db.internal:5432");
+    String[][] hs = { { "jdbc:tibero:thin:@10.0.0.5:8629:t", "Y" }, { "jdbc:postgresql://db.internal:5432/d", "Y" }, { "jdbc:postgresql://db.internal:6543/d", "N" }, { "jdbc:oracle:thin:@//evil.com:1521/S", "N" }, { "jdbc:postgresql://DB.INTERNAL:5432/d", "Y" } };
+    for (String[] h : hs) { n++; if (hostAllowed(hostOf(h[0]), al) != "Y".equals(h[1])) { bad++; System.out.println("허용 호스트 판정 다름 : " + h[0]); } }
     String[][] jn = { { "java:comp/env/jdbc/ds", "Y" }, { "jdbc/TiberoDS", "Y" }, { "ldap://evil/x", "N" }, { "rmi://e/x", "N" }, { "java:comp/env/../x", "N" } };
     for (String[] j : jn) { n++; if (jndiOk(j[0]) != "Y".equals(j[1])) { bad++; System.out.println("JNDI 판정 다름 : " + j[0]); } }
     System.out.println("자체 검사 " + (n - bad) + "/" + n + " 일치");

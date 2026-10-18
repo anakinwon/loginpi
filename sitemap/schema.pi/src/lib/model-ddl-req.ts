@@ -223,9 +223,11 @@ export async function move(q: ReqRow, from: ReqRow['req_sts_cd'][], set: Record<
 }
 
 // 에이전트 재실행 — 실패·일부 실행 요청을 다시 승인 대기 상태(APV)로(승인은 유지, 에이전트가 다음 폴링 때 가져감). 서버 직접은 실행 API 로 바로 재실행
-export async function retryReq(areaId: string, prjId: string, reqId: string, uid: string): Promise<ReqRow | Fail> {
+// 재실행·실행은 요청자 본인 또는 데이터아키텍트만(보안 검토 2026-10-18 — 다른 요청자가 남의 승인 작업을 다시 돌리지 못하게)
+export async function retryReq(areaId: string, prjId: string, reqId: string, uid: string, isDa: boolean): Promise<ReqRow | Fail> {
   const q = await getReq(areaId, prjId, reqId)
   if (!q) return fail('NOT_FOUND', 404)
+  if (q.req_usr_id !== uid && !isDa) return fail('FORBIDDEN', 403)
   if (q.exec_mthd_cd !== 'AGT' || !['FAIL', 'PART'].includes(q.req_sts_cd) || !q.apv_usr_id) return fail('DDL_REQ_STATE', 409)
   return move(q, ['FAIL', 'PART'], { req_sts_cd: 'APV', modr_id: uid })
 }
@@ -312,10 +314,11 @@ export async function testConnDraft(areaId: string, b: ConnIn, connId?: string):
 }
 
 // 실행 — 승인(또는 실패·일부 실행 뒤 재실행) 요청을 점유(RUN·시도 번호 증가) → 저장 DDL 만 실행 → 문장별 결과·최종 상태
-export async function runReq(areaId: string, prjId: string, reqId: string, uid: string): Promise<(ReqRow & { results: StmtRes[] }) | Fail> {
+export async function runReq(areaId: string, prjId: string, reqId: string, uid: string, isDa: boolean): Promise<(ReqRow & { results: StmtRes[] }) | Fail> {
   if (!profileKey() || !directEnabled()) return fail('DB_CONN_DISABLED', 503)
   const q = await getReq(areaId, prjId, reqId, true)
   if (!q) return fail('NOT_FOUND', 404)
+  if (q.req_usr_id !== uid && !isDa) return fail('FORBIDDEN', 403)
   if (q.exec_mthd_cd !== 'SRV' || !['APV', 'FAIL', 'PART'].includes(q.req_sts_cd) || !q.apv_usr_id) return fail('DDL_REQ_STATE', 409)
   const c = await getConn(areaId, q.conn_id)
   if (!c || connFp(c) !== q.conn_fp) return fail('DB_CONN_CHANGED', 409)

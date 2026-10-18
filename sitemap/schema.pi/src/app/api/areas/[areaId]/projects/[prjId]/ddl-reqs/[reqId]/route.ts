@@ -38,7 +38,7 @@ export async function PATCH(req: Request, { params }: Ctx) {
   if (auth instanceof NextResponse) return auth
   try {
     const uid = auth.user.usr_id
-    const r = b.act === 'approve' ? await approveReq(areaId, prjId, reqId, b.expect_hash, uid) : b.act === 'reject' ? await rejectReq(areaId, prjId, reqId, b.rjct_rsn, uid) : b.act === 'retry' ? await retryReq(areaId, prjId, reqId, uid) : await cancelReq(areaId, prjId, reqId, uid)
+    const r = b.act === 'approve' ? await approveReq(areaId, prjId, reqId, b.expect_hash, uid) : b.act === 'reject' ? await rejectReq(areaId, prjId, reqId, b.rjct_rsn, uid) : b.act === 'retry' ? await retryReq(areaId, prjId, reqId, uid, can(auth.role, 'DDL_APPROVE')) : await cancelReq(areaId, prjId, reqId, uid)
     if (isFail(r)) return failRes(r)
     await audit({ area_id: areaId, tgt_tp_cd: 'DDL', tgt_id: reqId, act_cd: 'UPD', aftr_val: { act: b.act, req_sts_cd: r.req_sts_cd, ...(b.act === 'reject' ? { rjct_rsn: b.rjct_rsn } : {}) }, usr_id: uid })
     return NextResponse.json({ ok: true, item: r })

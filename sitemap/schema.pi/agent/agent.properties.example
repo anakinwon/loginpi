@@ -6,6 +6,8 @@
 server.url=https://schem.vercel.app
 # 작업 확인 주기(초, 최소 5)
 poll.seconds=15
+# 접속을 허용할 DB 호스트(필수, 쉼표 구분, 호스트 또는 호스트:포트) — 서버가 보낸 JDBC URL 의 호스트가 여기에 없으면 접속·비밀번호 전송을 거부
+allow.hosts=10.0.0.5,db.internal:5432
 
 # ── 선택 : 서버에 저장된 접속 정보 대신 이 PC 의 값 사용(접속 ID 별) ──
 # conn.<접속ID>.url=jdbc:tibero:thin:@10.0.0.5:8629:tibero

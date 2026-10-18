@@ -8,6 +8,7 @@ schema.pi 의 **DDL 생성 화면에서 승인된 DDL** 을 **사내망·Tibero 
   - 허용된 문장 형태인지 확인합니다. CREATE TABLE, COMMENT, PK 인덱스, PK, 시퀀스만 허용하고 FK·DROP·DML 은 거부합니다.
   - JDBC URL·JNDI 이름이 규칙에 맞는지 확인합니다.
 - DB 비밀번호는 서버에 저장하지 않습니다. 이 PC 의 환경변수에만 둡니다.
+- **이 PC 의 `allow.hosts` 에 적은 DB 호스트로만 접속합니다.** 서버 쪽 접속 정보가 바뀌어도 다른 호스트로는 비밀번호를 보내지 않습니다(설정이 비면 JDBC URL 접속을 모두 거부).
 - 외부 라이브러리 없이 Java 17 이상 표준 기능만 사용합니다. JDBC 드라이버 jar 는 고객이 준비합니다(저장소에 포함하지 않음).
 
 ## 1. 준비
@@ -45,7 +46,7 @@ powershell -File build.ps1   # Windows
 # 리눅스·맥
 export SCHEMAPI_AGENT_TOKEN='spa_…'
 export SCHEMAPI_PWD_1A2B3C4D='DB 비밀번호'
-cp agent.properties.example agent.properties
+cp agent.properties.example agent.properties   # allow.hosts 에 DB 호스트를 적음
 java -cp "schemapi-agent.jar:tibero7-jdbc.jar" SchemaPiAgent agent.properties
 ```
 
@@ -78,6 +79,8 @@ Windows 콘솔에서 한글이 깨지면 `chcp 65001` 을 실행하고 `java -Ds
 - 토큰은 만료가 필수입니다. 유출이 의심되면 화면에서 **폐기**합니다(즉시 무효).
 - 토큰과 비밀번호를 `agent.properties` 에 평문으로 두면 시작할 때 경고가 나옵니다. 환경변수를 사용하십시오.
 - 서버 주소는 https 만 허용합니다(로컬 시험용 `localhost` 제외). HTTP/1.1 로 접속합니다.
+- 접속 대상은 `allow.hosts` 로 고정합니다. 호스트가 목록에 없으면 실행·시험이 실패로 보고됩니다("allow.hosts 에 없는 호스트").
+- 재실행·실행은 요청자 본인 또는 데이터아키텍트만 할 수 있습니다.
 - 오류 메시지는 접속 주소·사용자를 가린 뒤 200자까지만 보고합니다.
 
 ## 7. 확인 상태
