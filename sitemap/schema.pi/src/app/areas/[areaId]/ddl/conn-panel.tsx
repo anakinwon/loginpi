@@ -6,6 +6,7 @@ import { piFetch } from '@pi/auth/client'
 import { useCallback, useEffect, useState } from 'react'
 import { buildJdbcUrl, parseJdbcUrl } from '@/lib/modelpi/jdbc-url'
 import { dbmsList } from '@/lib/modelpi/dbms'
+import { KNOWN_CA } from '@/lib/modelpi/known-ca'
 
 export interface Conn {
   conn_id: string
@@ -21,6 +22,7 @@ export interface Conn {
   conn_url_txt?: string | null
   jndi_nm?: string | null
   conn_desc?: string | null
+  ca_cert_txt?: string | null
   lst_test_dtm?: string | null
   agt_test_end_dtm?: string | null // 에이전트 접속 시험(sql/041)
   agt_test_rslt_cd?: 'OK' | 'ERR' | null
@@ -54,6 +56,7 @@ const EMPTY = {
   conn_url_txt: '',
   jndi_nm: '',
   conn_desc: '',
+  ca: '', // 서버 CA 인증서(PEM, sql/042)
 }
 // 에이전트 PC 의 비밀번호 환경변수 이름(접속 ID 앞 8자) — README 와 같은 규칙
 export const pwdEnv = (connId: string) =>
@@ -80,6 +83,9 @@ export default function ConnPanel({
   const [busy, setBusy] = useState(false)
   const [newAgt, setNewAgt] = useState({ nm: '', days: 90 })
   const [token, setToken] = useState<{ nm: string; tkn: string } | null>(null) // 발급 직후 한 번만
+  // 저장 전 시험(마스터 지시 "접속정보 저장 전 접속테스트 필요") : 시험이 통과한 접속 대상 값 — 값이 바뀌면 다시 시험해야 저장
+  const [okKey, setOkKey] = useState<string | null>(null)
+  const [agtLater, setAgtLater] = useState<string | null>(null) // 사내망이라 서버가 시험 못 함 → 저장 뒤 에이전트 시험
   const load = useCallback(async () => {
     const j = await (await piFetch(`${api}/db-conns`)).json()
     if (!j.ok) return setMsg(j.message)
@@ -116,9 +122,12 @@ export default function ConnPanel({
             conn_url_txt: c.conn_url_txt ?? '',
             jndi_nm: c.jndi_nm ?? '',
             conn_desc: c.conn_desc ?? '',
+            ca: c.ca_cert_txt ?? '',
           }
         : { ...EMPTY, agt_id: agts[0]?.agt_id ?? '' },
     )
+    setOkKey(null)
+    setAgtLater(null)
   }
   // JDBC URL 붙여 넣기 → 칸 채움(서버 직접은 주소 칸, 에이전트는 URL 칸 그대로). 비밀번호가 들어 있으면 비밀번호 칸으로만
   const pasteUrl = (u: string) => {
@@ -145,12 +154,32 @@ export default function ConnPanel({
     )
   }
   const srv = f.exec_mthd_cd === 'SRV'
+  // 접속 대상 값(이름·설명 제외) — 시험 통과 판정 키. 수정 중 비밀번호를 비우면 저장된 비밀번호로 시험한 것
+  const tKey = JSON.stringify([
+    f.dbms_cd,
+    f.exec_mthd_cd,
+    f.host_nm,
+    f.port_no,
+    f.db_nm,
+    f.usr_nm,
+    f.pwd,
+    f.agt_ref,
+    f.conn_url_txt,
+    f.jndi_nm,
+    f.ca.trim(),
+  ])
+  const jndi = !srv && f.agt_ref === 'JNDI'
+  const canSave = okKey === tKey || jndi || (!srv && agtLater === tKey)
+  const canTry = srv
+    ? !!(f.host_nm && f.db_nm && f.usr_nm && (f.pwd || edit?.id))
+    : f.agt_ref === 'URL' && !!(f.conn_url_txt && f.usr_nm && f.pwd)
   const body = () => ({
     conn_nm: f.conn_nm,
     dbms_cd: f.dbms_cd,
     exec_mthd_cd: f.exec_mthd_cd,
     conn_desc: f.conn_desc || null,
     usr_nm: f.usr_nm || null,
+    ca_cert_txt: f.ca.trim() || null,
     ...(srv
       ? {
           host_nm: f.host_nm,
@@ -183,6 +212,7 @@ export default function ConnPanel({
     setBusy(false)
     if (!j.ok) return fail(j)
     setEdit(null)
+    setOkKey(null)
     setMsg(
       j.item.exec_mthd_cd === 'AGT'
         ? `접속 '${j.item.conn_nm}' 저장 — 에이전트 PC 에 환경변수 ${pwdEnv(j.item.conn_id)} = DB 비밀번호 를 설정하십시오`
@@ -203,13 +233,22 @@ export default function ConnPanel({
         body: JSON.stringify({
           ...body(),
           conn_nm: f.conn_nm || '시험',
+          ...(f.pwd ? { pwd: f.pwd } : {}), // 에이전트 : 시험용(저장 안 함)
           ...(edit.id ? { conn_id: edit.id } : {}),
         }),
       })
     ).json()
     setBusy(false)
-    if (j.ok) setMsg('연결 성공 — 저장할 수 있습니다')
-    else fail({ message: `연결 실패 : ${j.message}`, detail: j.detail })
+    if (j.ok) {
+      setOkKey(tKey)
+      return setMsg('연결 성공 — 저장할 수 있습니다')
+    }
+    setOkKey(null)
+    if (!srv && j.code === 'DB_CONN_BLOCKED') {
+      setAgtLater(tKey)
+      return setMsg(`${j.detail ?? j.message}`)
+    }
+    fail({ message: `연결 실패 : ${j.message}`, detail: j.detail })
   }
   const del = async (c: Conn) => {
     if (!window.confirm(`접속 '${c.conn_nm}' 을 삭제할까요?`)) return
@@ -636,11 +675,54 @@ export default function ConnPanel({
                   autoComplete="off"
                 />
               </label>
+              {f.agt_ref === 'URL' && (
+                <label className="col-span-2">
+                  시험용 비밀번호{' '}
+                  <span className="text-xs text-gray-500">
+                    (저장 전 연결 시험에만 사용, 저장하지 않음)
+                  </span>
+                  <input
+                    className={inp}
+                    type="password"
+                    value={f.pwd}
+                    onChange={(e) => setF({ ...f, pwd: e.target.value })}
+                    autoComplete="new-password"
+                  />
+                </label>
+              )}
               <p className="col-span-2 text-xs text-gray-600">
                 비밀번호는 서버에 저장하지 않습니다 — 저장 뒤 표시되는 환경변수
                 이름으로 에이전트 PC 에 설정합니다.
               </p>
             </>
+          )}
+          {!jndi && (
+            <fieldset className="col-span-2 rounded border p-2 text-xs">
+              <legend className="px-1">
+                서버 CA 인증서(선택 — 인증서 검증 TLS)
+              </legend>
+              <label className="flex items-center gap-1">
+                <input
+                  type="checkbox"
+                  checked={f.ca.trim() === KNOWN_CA.SUPABASE_2021.pem.trim()}
+                  onChange={(e) =>
+                    setF({
+                      ...f,
+                      ca: e.target.checked ? KNOWN_CA.SUPABASE_2021.pem : '',
+                    })
+                  }
+                />
+                Supabase DB·풀러({KNOWN_CA.SUPABASE_2021.nm}) — Supabase 는 자체
+                CA 라 이것이 있어야 접속됩니다
+              </label>
+              <textarea
+                className={`${inp} mt-1 h-16 font-mono text-[10px]`}
+                value={f.ca}
+                onChange={(e) => setF({ ...f, ca: e.target.value })}
+                placeholder="-----BEGIN CERTIFICATE----- … (다른 자체 CA 는 PEM 붙여 넣기, 공인 인증서 서버는 비움)"
+                spellCheck={false}
+              />
+            </fieldset>
           )}
           <label className="col-span-2">
             설명
@@ -654,21 +736,20 @@ export default function ConnPanel({
           <div className="col-span-2 flex gap-2">
             <button
               type="submit"
-              disabled={busy}
+              disabled={busy || !canSave}
+              title={
+                canSave
+                  ? '저장'
+                  : '연결 시험을 통과해야 저장할 수 있습니다(값을 바꾸면 다시 시험)'
+              }
               className="rounded bg-[#1f3a68] px-3 py-1 text-white disabled:opacity-40"
             >
               저장
             </button>
-            {srv && (
+            {!jndi && (
               <button
                 type="button"
-                disabled={
-                  busy ||
-                  !f.host_nm ||
-                  !f.db_nm ||
-                  !f.usr_nm ||
-                  (!f.pwd && !edit.id)
-                }
+                disabled={busy || !canTry}
                 onClick={() => void tryDraft()}
                 className="rounded border border-emerald-600 px-3 py-1 text-emerald-700 disabled:opacity-40"
                 title="저장하지 않고 입력한 정보로 접속해 봅니다"
@@ -676,6 +757,15 @@ export default function ConnPanel({
                 연결 시험
               </button>
             )}
+            <span className="self-center text-xs text-gray-600">
+              {canSave
+                ? okKey === tKey
+                  ? '✓ 시험 통과'
+                  : jndi
+                    ? 'JNDI 는 저장 뒤 에이전트가 시험'
+                    : '사내망 — 저장 뒤 에이전트가 시험'
+                : '연결 시험 통과 후 저장'}
+            </span>
             <button
               type="button"
               onClick={() => setEdit(null)}

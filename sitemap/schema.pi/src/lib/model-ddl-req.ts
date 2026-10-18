@@ -11,7 +11,8 @@ import { resolveTarget, runOracle, runPg, testConn, type StmtRes } from './db-ex
 import { splitStatements } from './modelpi/ddl-parse'
 import { stmtAllowed } from './modelpi/sql-guard'
 import { isDbms } from './modelpi/dbms'
-import { jndiOk, urlStorable } from './modelpi/jdbc-url'
+import { jndiOk, parseJdbcUrl, urlStorable } from './modelpi/jdbc-url'
+import { pemOk } from './modelpi/known-ca'
 import { connFp } from './modelpi/seal'
 import { directEnabled, openPwd, profileKey, sealPwd } from './secret'
 
@@ -30,6 +31,7 @@ export type ConnRow = {
   conn_url_txt: string | null
   jndi_nm: string | null
   conn_desc: string | null
+  ca_cert_txt: string | null // 서버 CA 인증서(PEM, sql/042)
   lst_test_dtm: string | null
   agt_test_req_dtm: string | null // 에이전트 접속 시험(sql/041)
   agt_test_end_dtm: string | null
@@ -37,7 +39,7 @@ export type ConnRow = {
   agt_test_msg: string | null
   ver_no: number
 }
-const CONN_COLS = 'conn_id, area_id, conn_nm, dbms_cd, exec_mthd_cd, host_nm, port_no, db_nm, usr_nm, pwd_enc_txt, agt_id, conn_url_txt, jndi_nm, conn_desc, lst_test_dtm, agt_test_req_dtm, agt_test_end_dtm, agt_test_rslt_cd, agt_test_msg, ver_no'
+const CONN_COLS = 'conn_id, area_id, conn_nm, dbms_cd, exec_mthd_cd, host_nm, port_no, db_nm, usr_nm, pwd_enc_txt, agt_id, conn_url_txt, jndi_nm, conn_desc, ca_cert_txt, lst_test_dtm, agt_test_req_dtm, agt_test_end_dtm, agt_test_rslt_cd, agt_test_msg, ver_no'
 export type Fail = { fail: 'NOT_FOUND' | 'INVALID_INPUT' | 'DB_CONN_DISABLED' | 'DB_CONN_MISMATCH' | 'DDL_GATE' | 'DDL_SELF_APPROVE' | 'DDL_CHANGED' | 'DB_CONN_CHANGED' | 'DDL_REQ_STATE' | 'DDL_LIVE_EXISTS' | 'FORBIDDEN' | 'VERSION_CONFLICT' | 'DB_CONN_BLOCKED' | 'DB_CONN_FAIL' | 'DDL_STMT_DENIED'; status: number; detail?: unknown }
 const fail = (f: Fail['fail'], status: number, detail?: unknown): Fail => ({ fail: f, status, detail })
 export const isFail = (x: unknown): x is Fail => !!x && typeof x === 'object' && 'fail' in x
@@ -78,6 +80,7 @@ export const connBody = z.object({
   conn_url_txt: z.string().trim().max(1000).nullish(), // 형식·DBMS 일치는 saveConn(urlStorable)
   jndi_nm: z.string().trim().max(255).refine(jndiOk).nullish(),
   conn_desc: z.string().max(2000).nullish(),
+  ca_cert_txt: z.string().max(20000).refine(pemOk, 'PEM 인증서 형식이 아닙니다').nullish(), // 서버 CA(공개 인증서)
 })
 
 export interface ConnIn {
@@ -93,9 +96,10 @@ export interface ConnIn {
   conn_url_txt?: string | null
   jndi_nm?: string | null
   conn_desc?: string | null
+  ca_cert_txt?: string | null
 }
 
-const sameTarget = (c: ConnRow, b: ConnIn) => c.exec_mthd_cd === 'SRV' && c.dbms_cd === b.dbms_cd && c.host_nm === b.host_nm && c.port_no === b.port_no && c.db_nm === b.db_nm && c.usr_nm === b.usr_nm
+const sameTarget = (c: ConnRow, b: ConnIn) => c.exec_mthd_cd === 'SRV' && c.dbms_cd === b.dbms_cd && c.host_nm === b.host_nm && c.port_no === b.port_no && c.db_nm === b.db_nm && c.usr_nm === b.usr_nm && (c.ca_cert_txt ?? null) === (b.ca_cert_txt?.trim() || null)
 
 // 등록·수정 — 서버 직접은 주소·계정 필수, 에이전트는 에이전트(같은 분류체계·활성)와 JDBC URL 또는 JNDI 이름 필수(사용자명 선택). 비밀번호는 서버 키로 봉인(AAD = 분류체계:접속)
 export async function saveConn(areaId: string, b: ConnIn, uid: string, cur?: ConnRow & { want_ver: number }): Promise<ConnRow | Fail> {
@@ -128,6 +132,7 @@ export async function saveConn(areaId: string, b: ConnIn, uid: string, cur?: Con
     conn_url_txt: srv ? null : b.conn_url_txt || null,
     jndi_nm: srv ? null : b.jndi_nm || null,
     conn_desc: b.conn_desc ?? null,
+    ca_cert_txt: b.ca_cert_txt?.trim() || null,
     modr_id: uid,
   }
   if (!cur) {
@@ -287,16 +292,33 @@ export async function testConnById(areaId: string, connId: string): Promise<{ ok
   if (t === 'BLOCKED') return fail('DB_CONN_BLOCKED', 400)
   if (t === 'DNS') return fail('DB_CONN_FAIL', 400, '호스트 이름을 찾을 수 없습니다')
   const r = await testConn(c.dbms_cd, t, pwd)
-  if (!r.ok) return fail('DB_CONN_FAIL', 400, r.msg)
+  if (!r.ok) return fail('DB_CONN_FAIL', 400, tlsHint(r.msg))
   const u = await db().from('mdl_db_conn').update({ lst_test_dtm: new Date().toISOString() }).eq('conn_id', connId).eq('area_id', areaId)
   if (u.error) throw u.error
   return { ok: true }
 }
 
-// 저장 전 연결 시험(마스터 지시 2026-10-18) — 입력 중인 값으로 SELECT 1, 저장·기록 없음. 수정 중 비밀번호를 비우면 저장된 비밀번호 사용
+// 인증서 검증 실패 안내 — 자체 CA 서버는 서버 CA 인증서 지정(Supabase 는 화면 체크 한 번)
+const tlsHint = (m: string) => (/self-signed|unable to (get|verify)|certificate/i.test(m) ? `${m} — 자체 CA 서버입니다 : '서버 CA 인증서'에서 Supabase 를 체크하거나 그 DB 의 CA(PEM)를 붙여 넣으십시오` : m)
+
+// 저장 전 연결 시험(마스터 지시 2026-10-18 "접속정보 저장 전 접속테스트 필요") — 입력 중인 값으로 SELECT 1, 저장·기록 없음
+//  서버 직접 : 수정 중 비밀번호를 비우면 대상이 그대로일 때만 저장된 비밀번호
+//  에이전트 : JDBC URL 을 해석해 서버가 직접 시험(공인 주소만, 비밀번호는 시험용으로 입력 — 저장 안 함). 사내망 주소는 저장 뒤 에이전트 시험
 export async function testConnDraft(areaId: string, b: ConnIn, connId?: string): Promise<{ ok: true } | Fail> {
-  if (!profileKey() || !directEnabled()) return fail('DB_CONN_DISABLED', 503)
-  if (b.exec_mthd_cd !== 'SRV' || !b.host_nm || !b.port_no || !b.db_nm || !b.usr_nm) return fail('INVALID_INPUT', 400)
+  if (!directEnabled()) return fail('DB_CONN_DISABLED', 503)
+  if (b.exec_mthd_cd === 'AGT') {
+    if (!b.conn_url_txt) return fail('INVALID_INPUT', 400, 'JNDI 접속은 저장 뒤 [연결 시험]으로 에이전트가 시험합니다')
+    if (!urlStorable(b.conn_url_txt, b.dbms_cd)) return fail('INVALID_INPUT', 400, 'JDBC URL 형식이 이 DBMS 와 맞지 않거나 허용되지 않는 인자가 있습니다')
+    const p = parseJdbcUrl(b.conn_url_txt)!
+    if (b.dbms_cd === '0013') return fail('DB_CONN_BLOCKED', 400, 'Tibero 는 서버에 드라이버가 없어 시험할 수 없습니다 — 저장한 뒤 [연결 시험]을 누르면 에이전트가 시험합니다')
+    if (!b.usr_nm || !b.pwd) return fail('DB_CONN_FAIL', 400, '사용자와 시험용 비밀번호를 입력하십시오(비밀번호는 저장하지 않음)')
+    const t = await resolveTarget({ host_nm: p.host, port_no: p.port, db_nm: p.db, usr_nm: b.usr_nm, ca_cert_txt: b.ca_cert_txt?.trim() || null })
+    if (t === 'BLOCKED') return fail('DB_CONN_BLOCKED', 400, '사내망 주소라 서버가 시험할 수 없습니다 — 저장한 뒤 [연결 시험]을 누르면 에이전트가 시험합니다')
+    if (t === 'DNS') return fail('DB_CONN_FAIL', 400, '호스트 이름을 찾을 수 없습니다')
+    const r = await testConn(b.dbms_cd, t, b.pwd)
+    return r.ok ? { ok: true } : fail('DB_CONN_FAIL', 400, tlsHint(r.msg))
+  }
+  if (!b.host_nm || !b.port_no || !b.db_nm || !b.usr_nm) return fail('INVALID_INPUT', 400)
   let pwd = b.pwd ?? null
   if (pwd == null && connId) {
     const c = await getConn(areaId, connId)
@@ -306,11 +328,11 @@ export async function testConnDraft(areaId: string, b: ConnIn, connId?: string):
     else return fail('DB_CONN_FAIL', 400, '접속 대상이 바뀌면 비밀번호를 다시 입력하십시오')
   }
   if (pwd == null) return fail('DB_CONN_FAIL', 400, '비밀번호를 입력하십시오')
-  const t = await resolveTarget({ host_nm: b.host_nm, port_no: b.port_no, db_nm: b.db_nm, usr_nm: b.usr_nm })
+  const t = await resolveTarget({ host_nm: b.host_nm, port_no: b.port_no, db_nm: b.db_nm, usr_nm: b.usr_nm, ca_cert_txt: b.ca_cert_txt?.trim() || null })
   if (t === 'BLOCKED') return fail('DB_CONN_BLOCKED', 400)
   if (t === 'DNS') return fail('DB_CONN_FAIL', 400, '호스트 이름을 찾을 수 없습니다')
   const r = await testConn(b.dbms_cd, t, pwd)
-  return r.ok ? { ok: true } : fail('DB_CONN_FAIL', 400, r.msg)
+  return r.ok ? { ok: true } : fail('DB_CONN_FAIL', 400, tlsHint(r.msg))
 }
 
 // 실행 — 승인(또는 실패·일부 실행 뒤 재실행) 요청을 점유(RUN·시도 번호 증가) → 저장 DDL 만 실행 → 문장별 결과·최종 상태

@@ -3,7 +3,7 @@
 // PostgreSQL = 한 트랜잭션(실패하면 전부 되돌림 RBK), Oracle = DDL 이 문장마다 자동 커밋이라 문장 단위(실패 지점부터 다음 시도에서 재개 — 이전 시도 성공 문장은 SKIP)
 // 오류 메시지는 접속 주소·계정을 가리고 200자로(maskErr) — 원문을 응답·로그에 남기지 않음
 // PostgreSQL TLS = 인증서 검증(sslmode=verify-full, 호스트명 = 원래 호스트). 비밀번호가 실리므로 검증 끄기 금지
-// ponytail: 사설 CA 인증서 서버는 접속 실패(DB_CONN_FAIL) — 필요해지면 접속 프로파일에 CA 인증서 칸 추가, 그 전엔 로컬 에이전트로 실행
+// 자체 CA(Supabase 등)는 접속 프로파일의 서버 CA 인증서(sql/042)로 검증 — 시스템 신뢰 저장소 대신 그 CA 로만 검증
 import 'server-only'
 import { lookup } from 'node:dns/promises'
 import { isIP } from 'node:net'
@@ -27,6 +27,7 @@ export interface Target {
   db: string
   usr: string
   priv: boolean
+  ca: string | null // 서버 CA 인증서(PEM, sql/042) — Supabase 등 자체 CA
 }
 const STMT_MS = 20_000 // 문장 1개 제한
 const LOCK_MS = 5_000
@@ -38,7 +39,7 @@ export function maskErr(msg: unknown, hide: (string | null | undefined)[]): stri
 }
 
 // 접속 대상 확인 — 'BLOCKED'(사설·내부·포트) / 'DNS'(이름 풀이 실패)
-export async function resolveTarget(c: { host_nm: string | null; port_no: number | null; db_nm: string | null; usr_nm: string | null }): Promise<Target | 'BLOCKED' | 'DNS'> {
+export async function resolveTarget(c: { host_nm: string | null; port_no: number | null; db_nm: string | null; usr_nm: string | null; ca_cert_txt?: string | null }): Promise<Target | 'BLOCKED' | 'DNS'> {
   if (!c.host_nm || !c.port_no || !c.db_nm || !c.usr_nm) return 'BLOCKED'
   const dev = allowPrivate()
   if (!dev && !portAllowed(c.port_no)) return 'BLOCKED'
@@ -54,11 +55,11 @@ export async function resolveTarget(c: { host_nm: string | null; port_no: number
   if (!ips.length) return 'DNS'
   const bad = ips.filter((ip) => !ipAllowed(ip))
   if (bad.length && !dev) return 'BLOCKED' // 하나라도 내부 주소면 거부(재바인딩·혼합 응답)
-  return { ip: ips[0], host: c.host_nm, port: c.port_no, db: c.db_nm, usr: c.usr_nm, priv: bad.length > 0 }
+  return { ip: ips[0], host: c.host_nm, port: c.port_no, db: c.db_nm, usr: c.usr_nm, priv: bad.length > 0, ca: c.ca_cert_txt ?? null }
 }
 
 const pgClient = (t: Target, pwd: string) =>
-  postgres({ host: t.ip, port: t.port, database: t.db, username: t.usr, password: pwd, max: 1, connect_timeout: 10, idle_timeout: 5, prepare: false, onnotice: () => {}, ssl: t.priv ? false : { rejectUnauthorized: true, servername: isIP(t.host) ? undefined : t.host } }) // 사설 주소(개발 전용 허용)만 평문
+  postgres({ host: t.ip, port: t.port, database: t.db, username: t.usr, password: pwd, max: 1, connect_timeout: 10, idle_timeout: 5, prepare: false, onnotice: () => {}, ssl: t.priv ? false : { rejectUnauthorized: true, servername: isIP(t.host) ? undefined : t.host, ...(t.ca ? { ca: t.ca } : {}) } }) // 사설 주소(개발 전용 허용)만 평문
 
 // 연결 시험(SELECT 1)
 export async function testConn(dbms: string, t: Target, pwd: string): Promise<{ ok: boolean; msg: string }> {
