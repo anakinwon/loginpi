@@ -102,7 +102,7 @@ export default function StageBar({
     <section className="mt-3 rounded-xl border border-[#c7d2e6] bg-white p-3 text-sm" aria-label="단계 상태">
       <h2 className="font-semibold text-[#1f3a68]">
         {mode === 'LGC' ? '엔터티 작성 상태' : '물리 전환·테이블 작성 상태'}{' '}
-        <span className="text-xs font-normal text-gray-500">— 순서 : 엔터티 작성완료 → (엔터티 선택) 물리 전환 → 테이블 작성완료 → ERD · 작성완료하면 편집 잠금</span>
+        <span className="text-xs font-normal text-gray-500">— 순서 : 엔터티 작성완료 → (엔터티 선택) 물리 전환 → 테이블 작성완료 → ERD 작성완료 → DDL · 작성완료하면 편집 잠금</span>
       </h2>
       {groups.map(([subj, es]) => {
         const lgDone = es.filter((e) => e.lgc_sts_cd === 'CMPTN')

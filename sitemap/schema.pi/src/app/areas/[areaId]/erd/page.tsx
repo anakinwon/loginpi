@@ -292,6 +292,7 @@ function Erd({ areaId }: { areaId: string }) {
   const [phyModels, setPhyModels] = useState<{ phy_mdl_id: string; dbms_cd: string }[] | null>(null) // null = 아직 모름
   const [hidden, setHidden] = useState(0)
   const [phyDone, setPhyDone] = useState(true) // 이 주제영역 물리완료 여부
+  const [dgmSts, setDgmSts] = useState<'WRT' | 'CMPTN'>('WRT') // ERD 작성완료(sql/037) — 완료면 배치·관계선 잠금
   const [lvl, setLvl] = useState<Lvl>('LGCL')
   const [phy, setPhy] = useState(false)
   const [ents, setEnts] = useState<Ent[]>([])
@@ -425,6 +426,7 @@ function Erd({ areaId }: { areaId: string }) {
   const [msg, setMsg] = useState('')
   const [busy, setBusy] = useState(false)
   const editor = !!role && can(role, 'REQUEST')
+  const lay = editor && dgmSts !== 'CMPTN' // 배치·관계선 편집 가능(작성완료 ERD 는 완료 취소 후)
   const loadSeq = useRef(0) // 늦게 도착한 응답이 최신 선택을 덮어쓰지 않도록
   const curRef = useRef<Map<string, { x: number; y: number }>>(new Map()) // 편집 뒤 재조회 시 저장 안 한 드래그 위치 유지
   const keepRef = useRef('') // 편집 뒤 재조회 대상 키(프로젝트|주제영역|단계) — 다른 대상 조회에는 적용 안 함
@@ -460,6 +462,7 @@ function Erd({ areaId }: { areaId: string }) {
     setPhyModels(j.phy_models)
     setHidden(j.hidden)
     setPhyDone(!!j.phy_done)
+    setDgmSts(j.dgm?.dgm_sts_cd ?? 'WRT')
     if (!phyId && j.phy_mdl_id) setPhyId(j.phy_mdl_id)
     const es = (j.ents as Ent[]).filter((e) => showRef || !e.ref)
     const pos = new Map((j.pos as { ent_id: string; x: number; y: number; fix: boolean }[]).map((p) => [p.ent_id, p]))
@@ -600,7 +603,7 @@ function Erd({ areaId }: { areaId: string }) {
             targetHandle: `t-${l.cs.toLowerCase()}`,
             type: 'rel' as const,
             selected: selRel === r.rel_id,
-            data: { sp, tp, ps: l.ps, cs: l.cs, mx: l.mx, my: l.my, edit: editor && selRel === r.rel_id, onDrag: dragRel, onReset: resetRel, ...(nt === 'BK' ? { bk: { p: r.chld_opt_yn === 'Y', c: r.prnt_opt_yn === 'Y' } } : {}) },
+            data: { sp, tp, ps: l.ps, cs: l.cs, mx: l.mx, my: l.my, edit: lay && selRel === r.rel_id, onDrag: dragRel, onReset: resetRel, ...(nt === 'BK' ? { bk: { p: r.chld_opt_yn === 'Y', c: r.prnt_opt_yn === 'Y' } } : {}) },
             label: r.rel_nm ?? undefined,
             labelStyle: { fontSize: 10 },
             ...(nt === 'BK'
@@ -617,7 +620,7 @@ function Erd({ areaId }: { areaId: string }) {
                 }),
           }
         }),
-    [geo, lytOf, selRel, editor, dragRel, resetRel, nt],
+    [geo, lytOf, selRel, lay, dragRel, resetRel, nt],
   )
 
   const curPos = () => Object.fromEntries(nodes.map((n) => [n.id, { ...n.position }]))
@@ -661,6 +664,19 @@ function Erd({ areaId }: { areaId: string }) {
     setUndo(null)
     setMsg(`배치를 저장했습니다(${LVL_NM[lvl]} 다이어그램)`)
   }
+  // ERD 작성완료·완료 취소(보고 있는 주제영역 다이어그램) — 완료 = 배치·관계선 잠금, DDL 생성 대상
+  const setStage = async (sts: 'WRT' | 'CMPTN') => {
+    if (sts === 'CMPTN' && !window.confirm('ERD 작성완료 — 배치·관계선 편집이 잠기고 DDL 생성 대상이 됩니다(완료 취소 후 편집). 계속할까요?')) return
+    setBusy(true)
+    const j = await (await piFetch(`${api}/projects/${prjId}/stage`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ layer: 'DGM', sts, subj_id: subj, mdl_lvl_cd: lvl, phy_mdl_id: phyId || undefined }) })).json()
+    setBusy(false)
+    if (j.done?.length) {
+      setDgmSts(sts)
+      setSel(null)
+      setSelRel(null)
+      setMsg(sts === 'CMPTN' ? 'ERD 작성완료 — 배치·관계선이 잠겼습니다(DDL 생성 화면에서 대상)' : 'ERD 완료를 취소했습니다 — 배치·관계선을 편집할 수 있습니다')
+    } else setMsg(j.fail?.[0]?.why?.join(' · ') ?? j.message ?? '')
+  }
   const toggleFix = (id: string) => {
     setNodes((ns) => ns.map((n) => (n.id === id ? { ...n, data: { ...n.data, fix: !n.data.fix } } : n)))
     setDirty(true)
@@ -698,6 +714,7 @@ function Erd({ areaId }: { areaId: string }) {
     const next = { ...pr, ...patch, guide: true }
     const same = next.paper === pr.paper && next.orient === pr.orient
     setPr(next)
+    if (!lay) return // 작성완료 ERD·조회 권한 : 용지만 바꾸고 배치는 그대로
     const d = realign([...geo.boxes.values()])
     if (same || (Math.abs(d.dx) < 0.5 && Math.abs(d.dy) < 0.5)) return
     setUndo(curPos())
@@ -780,10 +797,10 @@ function Erd({ areaId }: { areaId: string }) {
           <input type="checkbox" checked={showRef} onChange={(e) => (setShowRef(e.target.checked), setSel(null))} /> 다른 주제영역 참조 표시
         </label>
         <span className="ml-auto flex flex-wrap gap-2">
-          <button type="button" className={btn} disabled={!nodes.length} onClick={() => arrange('all')}>
+          <button type="button" className={btn} disabled={!lay || !nodes.length} onClick={() => arrange('all')}>
             자동 배치
           </button>
-          <button type="button" className={btn} disabled={!nodes.length} onClick={() => arrange('new')}>
+          <button type="button" className={btn} disabled={!lay || !nodes.length} onClick={() => arrange('new')}>
             새 엔터티만 배치
           </button>
           <button type="button" className={btn} disabled={!undo} onClick={revert}>
@@ -806,10 +823,22 @@ function Erd({ areaId }: { areaId: string }) {
           <button type="button" className={btn} disabled={!nodes.length} onClick={openPrint} title="인쇄 미리보기 — 한 장에 맞춤 또는 가이드대로 나눠 인쇄(PDF 저장은 인쇄 창의 'PDF로 저장')">
             🖨 인쇄
           </button>
-          {editor && (
+          {lay && (
             <button type="button" className="rounded bg-white px-3 py-1 font-semibold text-[#1f3a68] disabled:opacity-40" disabled={!dirty || busy || !nodes.length} onClick={() => void save()}>
               배치 저장{dirty ? ' *' : ''}
             </button>
+          )}
+          {dgmSts === 'CMPTN' && <span className="rounded bg-emerald-500 px-2 py-1 font-semibold">ERD 작성완료</span>}
+          {editor && subj && phyDone && (
+            dgmSts === 'CMPTN' ? (
+              <button type="button" className={btn} disabled={busy} onClick={() => void setStage('WRT')} title="완료를 취소하면 배치·관계선을 다시 편집할 수 있습니다">
+                완료 취소
+              </button>
+            ) : (
+              <button type="button" className="rounded bg-emerald-500 px-3 py-1 font-semibold hover:bg-emerald-600 disabled:opacity-40" disabled={busy || dirty || !nodes.length} onClick={() => void setStage('CMPTN')} title={dirty ? '배치를 먼저 저장하십시오' : '배치·관계선을 잠그고 DDL 생성 대상으로'}>
+                ERD 작성완료
+              </button>
+            )
           )}
         </span>
       </section>
@@ -881,12 +910,12 @@ function Erd({ areaId }: { areaId: string }) {
             onNodeClick={(_, n) => (setSel(n.id), setSelRel(null))}
             onEdgeClick={(_, e) => (setSelRel(e.id), setSel(null), setForm(null))}
             onPaneClick={() => (setSel(null), setSelRel(null))}
-            nodesDraggable={editor}
+            nodesDraggable={lay}
             nodesConnectable={false}
             // 여러 엔터티 선택·함께 이동(마스터 지시 2026-10-18) : 빈 곳 왼쪽 끌기 = 선택 상자(걸친 엔터티), Ctrl+클릭 = 추가·빼기,
             //  선택한 엔터티 하나를 끌면 함께 이동. 화면 이동 = 가운데·오른쪽 버튼 끌기·휠. 조회 권한은 왼쪽 끌기 = 화면 이동(기존)
-            selectionOnDrag={editor}
-            panOnDrag={editor ? [1, 2] : true}
+            selectionOnDrag={lay}
+            panOnDrag={lay ? [1, 2] : true}
             selectionMode={SelectionMode.Partial}
             multiSelectionKeyCode="Control"
             deleteKeyCode={null} // Delete·Backspace 로 화면에서 엔터티가 빠지지 않게(삭제는 엔터티 수정 화면에서)
@@ -947,7 +976,7 @@ function Erd({ areaId }: { areaId: string }) {
                   ))}
                 </ul>
               )}
-              {editor && (
+              {lay && (
                 <label className="mt-2 flex items-center gap-1">
                   <input type="checkbox" checked={!!byId.get(selEnt.ent_id)?.data.fix} onChange={() => toggleFix(selEnt.ent_id)} /> 위치 고정(자동 배치 제외)
                 </label>
@@ -965,7 +994,7 @@ function Erd({ areaId }: { areaId: string }) {
                 {selRelObj.rel_nm && ` · ${selRelObj.rel_nm}`} · {selRelObj.idnt_yn === 'Y' ? '식별' : '비식별'}
               </p>
               <p className="mt-1 text-xs text-gray-600">{lyt[selRelObj.rel_id] ? '위치를 옮긴 선(배치 저장 때 함께 저장)' : '자동 위치(가까운 변, 같은 변의 선은 고르게 나눔)'}</p>
-              {editor ? (
+              {lay ? (
                 <>
                   <ul className="mt-2 list-disc pl-4 text-xs text-gray-700">
                     <li>흰 원 = 끝점 : 끌면 박스 변을 따라 움직이고, 다른 변 가까이 놓으면 그 변으로 옮겨 갑니다</li>
@@ -977,7 +1006,7 @@ function Erd({ areaId }: { areaId: string }) {
                   </button>
                 </>
               ) : (
-                <p className="mt-2 text-xs text-gray-500">조회 권한 : 선 위치는 편집 권한이 있을 때 옮길 수 있습니다</p>
+                <p className="mt-2 text-xs text-gray-500">{editor ? 'ERD 작성완료 : 선 위치는 완료 취소 후 옮길 수 있습니다' : '조회 권한 : 선 위치는 편집 권한이 있을 때 옮길 수 있습니다'}</p>
               )}
             </>
           ) : (
