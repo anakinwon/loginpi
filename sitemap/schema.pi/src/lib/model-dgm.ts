@@ -15,15 +15,17 @@ export interface DgmPos {
   seq?: number
 }
 const CHUNK = 20 // 행별 update 동시 실행 묶음
+// dgm_sts_cd : WRT 작성중 / CMPTN ERD 작성완료(sql/037 — 배치·관계선 잠금, DDL 대상)
+export type DgmRow = { dgm_id: string; dgm_nm: string; dgm_sts_cd: 'WRT' | 'CMPTN'; dgm_cmptn_dtm: string | null; ver_no: number }
 // 관계선 배치(sql/034, 2026-10-18) — 사용자가 끝점·꺾임점을 옮긴 관계만, 행 없음 = 자동
 export type DgmRel = RelLyt & { rel_id: string }
 
-async function findDgm(areaId: string, prjId: string, subjId: string | null, lvl: DgmLvl) {
-  let q = db().from('mdl_dgm').select('dgm_id, dgm_nm, ver_no').eq('area_id', areaId).eq('prj_id', prjId).eq('mdl_lvl_cd', lvl).eq('del_yn', 'N')
+export async function findDgm(areaId: string, prjId: string, subjId: string | null, lvl: DgmLvl) {
+  let q = db().from('mdl_dgm').select('dgm_id, dgm_nm, dgm_sts_cd, dgm_cmptn_dtm, ver_no').eq('area_id', areaId).eq('prj_id', prjId).eq('mdl_lvl_cd', lvl).eq('del_yn', 'N')
   q = subjId ? q.eq('subj_id', subjId) : q.is('subj_id', null)
   const r = await q.maybeSingle()
   if (r.error) throw r.error
-  return r.data as { dgm_id: string; dgm_nm: string; ver_no: number } | null
+  return r.data as DgmRow | null
 }
 
 export async function loadDgm(areaId: string, prjId: string, subjId: string | null, lvl: DgmLvl, phyId: string | null = null) {
@@ -70,12 +72,12 @@ export async function loadDgm(areaId: string, prjId: string, subjId: string | nu
 export async function saveDgm(areaId: string, prjId: string, subjId: string | null, lvl: DgmLvl, nm: string, pos: DgmPos[], uid: string, relLyt?: DgmRel[], relScope?: string[]) {
   let dgm = await findDgm(areaId, prjId, subjId, lvl)
   if (!dgm) {
-    const c = await db().from('mdl_dgm').insert({ area_id: areaId, prj_id: prjId, subj_id: subjId, mdl_lvl_cd: lvl, dgm_nm: nm, regr_id: uid, modr_id: uid }).select('dgm_id, dgm_nm, ver_no').single()
+    const c = await db().from('mdl_dgm').insert({ area_id: areaId, prj_id: prjId, subj_id: subjId, mdl_lvl_cd: lvl, dgm_nm: nm, regr_id: uid, modr_id: uid }).select('dgm_id, dgm_nm, dgm_sts_cd, dgm_cmptn_dtm, ver_no').single()
     if (c.error) {
       if (c.error.code !== '23505') throw c.error
       dgm = await findDgm(areaId, prjId, subjId, lvl) // 동시 생성 경합 — 먼저 만든 것을 사용
       if (!dgm) throw c.error
-    } else dgm = c.data as { dgm_id: string; dgm_nm: string; ver_no: number }
+    } else dgm = c.data as DgmRow
   }
   const cur = await db().from('mdl_dgm_ent').select('dgm_ent_id, ent_id').eq('dgm_id', dgm.dgm_id).eq('del_yn', 'N').limit(5000)
   if (cur.error) throw cur.error

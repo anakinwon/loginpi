@@ -1,10 +1,11 @@
 // 모델 단계 상태(서버, 마스터 지시 2026-10-17) — 엔터티별 논리 작성중/작성완료, 물리 테이블별 작성중/작성완료
-// 순서 : 엔터티 작성완료(관문 통과) → 엔터티 선택 물리 전환 → 테이블 작성완료(남은 동기화 0) → ERD. 완료 = DB 트리거 편집 잠금(sql/032), 수정은 완료 취소 후
+// 순서 : 엔터티 작성완료(관문 통과) → 엔터티 선택 물리 전환 → 테이블 작성완료(남은 동기화 0) → ERD 작성완료(sql/037) → DDL. 완료 = DB 트리거 편집 잠금(sql/032·037), 수정은 완료 취소 후
 import { db } from './db'
+import { findDgm, loadDgm, type DgmLvl } from './model-dgm'
 import { loadLogical } from './model-logical'
 import { loadPhy, syncPlan } from './model-phy'
 import { checkLogical } from './modelpi/normalize'
-import { scopeWhy, type Sts } from './modelpi/stage'
+import { dgmWhy, phyDgmWhy, scopeWhy, type Sts } from './modelpi/stage'
 
 export interface EntStage {
   ent_id: string
@@ -78,6 +79,8 @@ export async function setPhy(areaId: string, prjId: string, mdlId: string, tblId
   const lg = await db().from('mdl_ent').select('ent_id, lgc_sts_cd').in('ent_id', p.tables.filter((t) => tblIds.includes(t.phy_tbl_id)).map((t) => t.ent_id).slice(0, 1000))
   if (lg.error) throw lg.error
   const lgc = new Map((lg.data as { ent_id: string; lgc_sts_cd: string }[]).map((x) => [x.ent_id, x.lgc_sts_cd]))
+  const lock = await dgmLock(areaId, prjId)
+  const subjOf = await entSubj(p.tables.filter((t) => tblIds.includes(t.phy_tbl_id)).map((t) => t.ent_id))
   const res: StageRes = { done: [], fail: [] }
   for (const id of tblIds) {
     const t = p.tables.find((x) => x.phy_tbl_id === id)
@@ -86,6 +89,11 @@ export async function setPhy(areaId: string, prjId: string, mdlId: string, tblId
       continue
     }
     if (t.phy_sts_cd === sts) continue
+    const dw = phyDgmWhy(sts, { ent_id: t.ent_id, subj_id: subjOf.get(t.ent_id) ?? '' }, lock)
+    if (dw.length) {
+      res.fail.push({ id, nm: t.tbl_nm, why: dw })
+      continue
+    }
     if (sts === 'CMPTN') {
       if (lgc.get(t.ent_id) !== 'CMPTN') {
         res.fail.push({ id, nm: t.tbl_nm, why: ['엔터티가 작성완료가 아닙니다(논리 모델에서 작성완료)'] })
@@ -107,4 +115,40 @@ export async function setPhy(areaId: string, prjId: string, mdlId: string, tblId
     res.done.push(id)
   }
   return res
+}
+
+// 작성완료 ERD(주제영역) 잠금 범위 — 완료 다이어그램의 주제영역과 배치된 엔터티(DDL 대상·역순 관문 기준)
+export async function dgmLock(areaId: string, prjId: string) {
+  const d = await db().from('mdl_dgm').select('dgm_id, subj_id').eq('area_id', areaId).eq('prj_id', prjId).eq('dgm_sts_cd', 'CMPTN').eq('del_yn', 'N').not('subj_id', 'is', null)
+  if (d.error) throw d.error
+  const rows = d.data as { dgm_id: string; subj_id: string }[]
+  const e = rows.length ? await db().from('mdl_dgm_ent').select('ent_id').in('dgm_id', rows.map((x) => x.dgm_id)).eq('del_yn', 'N').limit(10000) : { data: [], error: null }
+  if (e.error) throw e.error
+  return { subjs: new Set(rows.map((x) => x.subj_id)), ents: new Set((e.data as { ent_id: string }[]).map((x) => x.ent_id)) }
+}
+
+async function entSubj(entIds: string[]) {
+  if (!entIds.length) return new Map<string, string>()
+  const r = await db().from('mdl_ent').select('ent_id, subj_id').in('ent_id', entIds.slice(0, 1000))
+  if (r.error) throw r.error
+  return new Map((r.data as { ent_id: string; subj_id: string }[]).map((x) => [x.ent_id, x.subj_id]))
+}
+
+// ERD 작성완료·완료 취소(보고 있는 주제영역 다이어그램 1건, 단계 무관) — 완료 = 배치·관계선 잠금(sql/037), 취소는 언제나 가능
+export async function setDgm(areaId: string, prjId: string, subjId: string | null, lvl: DgmLvl, phyId: string | null, sts: Sts, uid: string): Promise<StageRes | null> {
+  const d = await loadDgm(areaId, prjId, subjId, lvl, phyId)
+  if (!d) return null
+  const dgm = await findDgm(areaId, prjId, subjId, lvl)
+  const nm = dgm?.dgm_nm ?? 'ERD'
+  if (dgm?.dgm_sts_cd === sts) return { done: [], fail: [] }
+  if (sts === 'CMPTN') {
+    const placed = new Set(d.pos.map((x) => x.ent_id))
+    const why = dgmWhy({ subj: !!subjId, saved: !!dgm, own: d.ents.filter((e) => !e.ref).length, unplaced: d.ents.filter((e) => !placed.has(e.ent_id)).length })
+    if (why.length) return { done: [], fail: [{ id: dgm?.dgm_id ?? '', nm, why }] }
+  }
+  if (!dgm) return { done: [], fail: [{ id: '', nm, why: ['다이어그램이 없습니다'] }] }
+  const r = await db().from('mdl_dgm').update({ dgm_sts_cd: sts, dgm_cmptn_dtm: sts === 'CMPTN' ? new Date().toISOString() : null, ver_no: dgm.ver_no + 1, modr_id: uid }).eq('dgm_id', dgm.dgm_id).eq('area_id', areaId).eq('dgm_sts_cd', dgm.dgm_sts_cd).select('dgm_id')
+  if (r.error) throw r.error
+  if (!r.data.length) return { done: [], fail: [{ id: dgm.dgm_id, nm, why: ['다른 사용자가 먼저 상태를 바꿨습니다 — 다시 불러오십시오'] }] }
+  return { done: [dgm.dgm_id], fail: [] }
 }
