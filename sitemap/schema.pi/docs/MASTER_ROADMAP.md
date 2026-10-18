@@ -15,7 +15,7 @@
 | 1 | **METAPi** | 데이터 표준화 메타시스템 | DA# SQLite·Wordict 엑셀·행안부 공통표준 CSV | 승인완료 표준(단어·도메인·용어·대표도메인·엔터티 분류어·금칙어)·표준 점검 결과 | P01~P07·P17~P21·P30·P05 | ✅ 핵심 완료(`ROADMAP.md` 1단계), 잔여 : 폐기 전환·표준코드 P04·과금 |
 | 2 | **ModelPi** | 개념 → 논리 → 물리 데이터 모델링 | METAPi 승인완료 표준만 | 프로젝트·주제영역·엔터티·속성·관계·정규화 결정·물리 설계 | P08·P11·P22·신규(주제영역·AI 정규화) | 🔶 MD1 개념·MD2·MD3 논리·MD5 물리 1차 완료(2026-10-17, `PRD_PiErd.md` S0~S2·S5 일부), 남음 : 서브타입·이력 유형·MD4 LLM 정규화 2차·인덱스·반정규화·파티션 — 2026-10-17 착수(3단계보다 먼저, 마스터 결정) |
 | 3 | **PiErd** | 모델을 ERD로 그리고·편집하고·버전 관리 | ModelPi 모델 | ERD 캔버스(개념·논리·물리 뷰), 모델 버전·비교, ERD export | P34·P11 | 🔶 ERD-1~3 1차 완료(2026-10-17, schema.pi 안 — `PRD_PiErd.md` S3, 주제영역 1개 단위·작성완료 테이블만), ERD-4·5 남음 |
-| 4 | **PiErd → 물리 구축** | ERD에서 DDL 생성·적용·현행화 | PiErd 물리 모델 | DBMS별 DDL(`sql/NNN`)·적용 이력·모델↔DB 비교·DDL 역설계 | P09·P10·P12·P13·P15·P16·P28 | 🔶 DDL 생성(P10)·DDL 역설계(P09)·카탈로그 CSV(P13 일부) 1차 완료(2026-10-17, `PRD_PiErd.md` S2·S4), 적용 이력·모델↔DB 비교 남음 |
+| 4 | **PiErd → 물리 구축** | ERD에서 DDL 생성·적용·현행화 | PiErd 물리 모델 | DBMS별 DDL(`sql/NNN`)·적용 이력·모델↔DB 비교·DDL 역설계 | P09·P10·P12·P13·P15·P16·P28 | 🔶 DDL 생성(P10)·DDL 역설계(P09)·카탈로그 CSV(P13 일부) 1차 완료(2026-10-17, `PRD_PiErd.md` S2·S4), 2026-10-18 ERD 작성완료·DDL 생성 화면·DA 승인 후 직접 실행(서버·로컬 에이전트, 문장별 실행 이력) 완료, 모델↔DB 비교 남음 |
 | 5 | **PiMig** | 원천 → 대상 데이터 이행 | 원천 카탈로그(P13) + 대상 물리 모델 | 매핑 정의서·변환 규칙·이행 실행·검증(건수·합계·샘플)·롤백 | 신규 | ⬜ 미착수 |
 | 6 | **PiCDC · PipeLine** | 변경 데이터 캡처로 파이프라인 제작 | 원천 DB 변경 로그 + PiMig 매핑 | 파이프라인 정의(원천→변환→대상)·실행 모니터·재처리 | P14·신규 | ⬜ 미착수 |
 | 7 | **PiAnal** | 데이터 분석 시스템 + DataLake | PipeLine 적재 데이터 + 전 단계 메타 | 레이크 적재 구조·분석 데이터셋·성능 모니터·AI 튜닝·대시보드 | P32·P35~P45 | ⬜ 미착수 |
@@ -78,7 +78,7 @@
 
 목표 : ERD 물리 뷰에서 DBMS별 DDL을 만들고, 적용 결과를 수집해 모델과 DB가 같은지 증명한다.
 
-- [x] PHY-1 DDL 생성(P10) 1차(2026-10-17, `PRD_PiErd.md` S2) : DBMS 프로파일(Oracle·Tibero·PostgreSQL, `src/lib/modelpi/dbms.ts` — 전환 시 선택한 대·소문자·식별자 길이·PK·FK 정책)별 CREATE TABLE·PK·COMMENT ON(P28)·시스템 컬럼 4개(DDL 생성 때만, 표준용어 LST_*)·변경분 ALTER, 산출 = `.sql` 내려받기. 2026-10-18 : DDL 생성 화면(ERD 작성완료 주제영역의 선택 테이블)·DA 승인 후 직접 실행(서버 PostgreSQL·Oracle / 로컬 에이전트 JDBC·JNDI, `sql/037~041`·`agent/`), PK = 인덱스 먼저·FK 미생성, PostgreSQL DDL 소문자. 남음 : 변경일시 트리거·인덱스(PK 외)·파티션. Oracle·Tibero 실 DB·실 WAS JNDI 실행 [확인중]
+- [x] PHY-1 DDL 생성(P10) 1차(2026-10-17, `PRD_PiErd.md` S2) : DBMS 프로파일(Oracle·Tibero·PostgreSQL, `src/lib/modelpi/dbms.ts` — 전환 시 선택한 대·소문자·식별자 길이·PK·FK 정책)별 CREATE TABLE·PK·COMMENT ON(P28)·시스템 컬럼 4개(DDL 생성 때만, 표준용어 LST_*)·변경분 ALTER, 산출 = `.sql` 내려받기. 2026-10-18 : DDL 생성 화면(ERD 작성완료 주제영역의 선택 테이블)·DA 승인 후 직접 실행(서버 PostgreSQL·Oracle / 로컬 에이전트 JDBC·JNDI, `sql/037~044`·`agent/`, 저장 전 접속 시험·DA 1명 분류체계 본인 승인, schema.pi 자체 DB 첫 실행 성공), PK = 인덱스 먼저·FK 미생성, PostgreSQL DDL 소문자. 남음 : 변경일시 트리거·인덱스(PK 외)·파티션. Oracle·Tibero 실 DB·실 WAS JNDI 실행 [확인중]
 - [ ] PHY-2 대상 시스템·DB 등록(P12) : 접속 정보는 DB에 저장하지 않고 환경변수 참조명만 [확인중 : 비밀 보관 방식]
 - [ ] PHY-3 카탈로그 수집(P13) : `information_schema`·`pg_catalog` 스냅샷 → `mdl_tbl_hist`·`mdl_col_hist`·`mdl_idx_hist`, 수집 스케줄(P14)
 - [ ] PHY-4 모델 ↔ DB 비교(P16)·DB 변경 이력(P15) : 누락·불일치·드리프트 목록, 표준 점검 P17 모델·DB 컬럼까지 확장, 영향 분석 P23(용어 → 사용 컬럼)
