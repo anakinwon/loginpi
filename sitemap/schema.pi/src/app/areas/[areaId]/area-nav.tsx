@@ -71,6 +71,7 @@ const MODEL: Item[] = [
       { seg: 'physical', nm: '물리 모델' },
       { seg: 'erd', nm: 'ERD' },
       { seg: 'ddl', nm: 'DDL 생성' },
+      { seg: 'sql', nm: 'SQL 편집기', perm: 'SQL_QUERY' },
     ],
   },
 ]
