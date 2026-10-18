@@ -62,17 +62,19 @@ export function fkPairs(fk: DdlFk, byEnt: Map<string, DdlTbl>, d: Pick<DdlIn, 's
     .filter((v): v is [string, string] => !!v)
 }
 
-export function genDdl(d: DdlIn, head: { prjNm: string; at: string }): string {
+// opt.only(엔터티ID, DDL 생성 화면) : 선택 테이블만 CREATE·COMMENT, FK 는 부모·자식 모두 선택일 때만(자식만 선택이면 보류 주석)
+export function genDdl(d: DdlIn, head: { prjNm: string; at: string }, opt: { only?: Set<string> } = {}): string {
+  const tbls = opt.only ? d.tables.filter((t) => opt.only!.has(t.ent_id)) : d.tables
   const nm = (s: string) => (d.ltr === 'LOWER' ? s.toLowerCase() : s.toUpperCase())
   const pg = d.dbms === '0014'
   const out: string[] = [`-- ${line1(head.prjNm)} 물리 모델 DDL — ${DBMS_PRFL[d.dbms].nm}, 생성 ${line1(head.at)}`, '-- 표준 데이터 모델에서 생성(직접 실행 전 DBA 검토)']
   // 저장 후 예약어 목록이 늘었을 수 있어 내려받을 때 다시 점검(P6 이월)
-  for (const t of d.tables) for (const n of [t.tbl_nm, ...t.cols.map((c) => c.col_nm)]) if (RSV_WORDS.has(n.toUpperCase())) out.push(line1(`-- ⚠ 예약어 이름 ${t.tbl_nm === n ? n : `${t.tbl_nm}.${n}`} : 실행 전 표준용어 물리명을 조정하십시오`))
+  for (const t of tbls) for (const n of [t.tbl_nm, ...t.cols.map((c) => c.col_nm)]) if (RSV_WORDS.has(n.toUpperCase())) out.push(line1(`-- ⚠ 예약어 이름 ${t.tbl_nm === n ? n : `${t.tbl_nm}.${n}`} : 실행 전 표준용어 물리명을 조정하십시오`))
   // 저장된 기본값도 DEFAULT 에 넣기 전 다시 허용 목록 검사(편집 경로 밖에서 들어온 값 방어)
-  for (const t of d.tables) for (const c of t.cols) if (c.bsc_val_txt && !bscOk(c.bsc_val_txt, d.dbms)) out.push(line1(`-- ⚠ ${t.tbl_nm}.${c.col_nm} 기본값을 허용 목록 밖이라 생략 : ${c.bsc_val_txt}`))
-  if (d.tables.some((t) => t.auto_inc_yn === 'Y' && autoIncCol(t, d.fkOf))) out.push(line1(`-- 자동 증가(테이블별 옵션) : 단일 정수 PK ${DBMS_PRFL[d.dbms].autoInc}`))
+  for (const t of tbls) for (const c of t.cols) if (c.bsc_val_txt && !bscOk(c.bsc_val_txt, d.dbms)) out.push(line1(`-- ⚠ ${t.tbl_nm}.${c.col_nm} 기본값을 허용 목록 밖이라 생략 : ${c.bsc_val_txt}`))
+  if (tbls.some((t) => t.auto_inc_yn === 'Y' && autoIncCol(t, d.fkOf))) out.push(line1(`-- 자동 증가(테이블별 옵션) : 단일 정수 PK ${DBMS_PRFL[d.dbms].autoInc}`))
   out.push('')
-  for (const t of d.tables) {
+  for (const t of tbls) {
     const cols = [...t.cols].sort((a, b) => a.col_seq - b.col_seq)
     const ai = t.auto_inc_yn === 'Y' ? autoIncCol(t, d.fkOf) : null // 대상이 아니면(복합·문자 등) 옵션이 있어도 무시
     const tib = d.dbms === '0013'
@@ -101,6 +103,11 @@ export function genDdl(d: DdlIn, head: { prjNm: string; at: string }): string {
   }
   const byEnt = new Map(d.tables.map((t) => [t.ent_id, t]))
   for (const f of d.fks) {
+    if (opt.only && !opt.only.has(f.chld_ent_id)) continue
+    if (opt.only && !opt.only.has(f.prnt_ent_id)) {
+      out.push(line1(`-- FK 보류 : ${f.fk_nm} — 부모 테이블 미선택(부모 테이블을 함께 선택하거나 따로 추가)`))
+      continue
+    }
     const pairs = fkPairs(f, byEnt, d)
     const c = byEnt.get(f.chld_ent_id), p = byEnt.get(f.prnt_ent_id)
     if (!c || !p || !pairs.length) {

@@ -106,3 +106,15 @@ test('자동 증가(테이블별 옵션 auto_inc_yn) : 단일 정수 PK 만 — 
   assert.doesNotMatch(genDdl(d('0001', [col({})], 'N'), h), /IDENTITY|SEQUENCE/)
   assert.doesNotMatch(genDdl(d('0001', [col({}), col({ col_nm: 'SEQ', pk_seq: 2 })]), h), /AS IDENTITY/)
 })
+
+test('선택 테이블만(only) : 자식만 고르면 FK 보류 주석, 둘 다 고르면 FK 생성, 부모만이면 FK 없음', () => {
+  const d = build('0014', 'LOWER')
+  const r = genDdl(d, { prjNm: 'p', at: 'now' }, { only: new Set(['r']) })
+  assert.ok(r.includes('CREATE TABLE tb_cst_rmt (') && !r.includes('CREATE TABLE tb_cst_cust ('))
+  assert.match(r, /-- FK 보류 : fk_tb_cst_rmt_01|-- FK 보류 : FK_TB_CST_RMT_01/i)
+  assert.ok(!/^ALTER TABLE/m.test(r))
+  const c = genDdl(d, { prjNm: 'p', at: 'now' }, { only: new Set(['c']) })
+  assert.ok(!/FK|ALTER TABLE/.test(c.replace(/^--.*$/gm, '')) && !c.includes('FK 보류'))
+  const both = genDdl(d, { prjNm: 'p', at: 'now' }, { only: new Set(['c', 'r']) })
+  assert.equal(both, genDdl(d, { prjNm: 'p', at: 'now' }))
+})

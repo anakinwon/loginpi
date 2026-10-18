@@ -70,6 +70,7 @@ const MODEL: Item[] = [
     subs: [
       { seg: 'physical', nm: '물리 모델' },
       { seg: 'erd', nm: 'ERD' },
+      { seg: 'ddl', nm: 'DDL 생성' },
     ],
   },
 ]
