@@ -8,12 +8,14 @@
 //   강제 종료(탭·브라우저 닫기·오류) = 대기 문장은 이 화면 메모리에만 있어 그대로 버려짐(Rollback, DB 변화 없음) — 브라우저 기본 경고도 띄움.
 //   DB 쪽은 요청 사이에 트랜잭션을 열어 두지 않아 잠금이 남지 않고, 요청 도중 끊겨도 idle_in_transaction_session_timeout 으로 DB 가 rollback(sql-run.ts)
 //  아래 상태줄 = 수행 시간 자세히·패치 크기·전체 패치·쪽 이동(result-grid)
+//  화면 = 위 끝부터 하단 메뉴 바로 위까지 여백 없이 100%(fixed, 메뉴 높이 = --area-nav-h), 좁은 화면(<768px)은 탐색기를 왼쪽 서랍으로(☰ 탐색기)
 //  패널 크기 = 손잡이 끌기(탐색기 너비·편집기 높이, 이 브라우저에 기억, 두 번 누르면 기본), 탐색기 이름 = 편집기로 끌어 놓기·Ctrl+C·오른쪽 누르기 복사(마스터 지시 2026-10-18)
 import { piFetch } from '@pi/auth/client'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { use, useCallback, useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { DANGER_NM, quoteIdent, splitSql, stmtAt, type Danger } from '@/lib/modelpi/sql-split'
 import ResultPanel, { type RunMode, type RunRes } from './result-grid'
 import type { EdHandle } from './sql-editor'
@@ -130,6 +132,13 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
   const [hist, setHist] = useState<{ items: Hist[]; total: number; page: number }>({ items: [], total: 0, page: 1 })
   const [pane, setPane] = useState<Pane>({ l: PANE.l.def, e: PANE.e.def })
   const [pick, setPick] = useState('') // 탐색기에서 고른 이름(복사 대상)
+  const [treeOpen, setTreeOpen] = useState(false) // 좁은 화면 탐색기 서랍
+  useEffect(() => {
+    if (!treeOpen) return
+    const h = (e: KeyboardEvent) => e.key === 'Escape' && setTreeOpen(false)
+    window.addEventListener('keydown', h)
+    return () => window.removeEventListener('keydown', h)
+  }, [treeOpen])
   const manual = canWrite && txMode === 'MANUAL'
   useEffect(() => {
     const n = Number(store.get('sql-fetch'))
@@ -420,7 +429,7 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
         e.preventDefault()
         setPane((p) => { const v = { ...p, [k]: clampPane(k, p[k] + d) }; store.set('sql-pane', JSON.stringify(v)); return v })
       }}
-      className={`group flex shrink-0 touch-none items-center justify-center ${k === 'l' ? 'w-2 cursor-col-resize' : 'h-2 cursor-row-resize'}`}
+      className={`group shrink-0 touch-none items-center justify-center ${k === 'l' ? 'hidden w-2 cursor-col-resize md:flex' : 'flex h-2 cursor-row-resize'}`}
       onPointerDown={(e) => {
         e.preventDefault()
         const a0 = k === 'l' ? e.clientX : e.clientY, v0 = pane[k]
@@ -449,7 +458,7 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
 
   if (denied)
     return (
-      <main className="mx-auto max-w-3xl px-4 py-6">
+      <main className="w-full px-3 py-3 sm:px-4 lg:px-5">
         <h1 className="text-2xl font-bold">SQL 편집기</h1>
         <p className="mt-3 text-sm">SQL 편집기 권한이 없습니다(조회자 역할). 분류체계 설정 권한자에게 역할 변경을 요청하십시오.</p>
       </main>
@@ -459,15 +468,18 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
   const btn = 'rounded border border-white/40 bg-white/10 px-2 py-0.5 hover:bg-white/20 disabled:opacity-40'
   const sel = 'rounded border border-white/40 bg-[#1f3a68] px-1 py-0.5 text-white'
   return (
-    <main className="mx-auto flex h-[calc(100dvh-7rem)] max-w-[1800px] flex-col px-3 py-3">
-      <div className="flex items-baseline gap-3">
-        <Link href="/" className="text-sm text-blue-700 underline">
+    <main className="fixed inset-x-0 top-0 z-30 flex flex-col overflow-hidden bg-white" style={{ bottom: 'var(--area-nav-h, 4rem)' }}>
+      <div className="flex shrink-0 items-center gap-2 border-b px-2 py-1">
+        <Link href="/" className="shrink-0 text-xs text-blue-700 underline">
           ← 분류체계 목록
         </Link>
-        <h1 className="text-xl font-bold">SQL 편집기</h1>
-        <span className="text-xs text-gray-500">Ctrl+Enter 현재 문장 · Alt+X 스크립트 · Ctrl+Shift+F 정렬 · Ctrl+Space 자동 완성 · Ctrl+/ 주석</span>
+        <h1 className="shrink-0 text-sm font-bold">SQL 편집기</h1>
+        <span className="hidden truncate text-[11px] text-gray-500 lg:inline">Ctrl+Enter 현재 문장 · Alt+X 스크립트 · Ctrl+Shift+F 정렬 · Ctrl+Space 자동 완성 · Ctrl+/ 주석</span>
       </div>
-      <section className="mt-2 flex flex-wrap items-center gap-2 rounded-xl bg-gradient-to-r from-[#1f3a68] to-[#3b5f9e] px-3 py-1.5 text-sm text-white shadow" aria-label="SQL 실행 도구">
+      <section className="flex shrink-0 flex-wrap items-center gap-1.5 bg-gradient-to-r from-[#1f3a68] to-[#3b5f9e] px-2 py-1 text-sm text-white" aria-label="SQL 실행 도구">
+        <button type="button" className={`${btn} md:hidden`} onClick={() => setTreeOpen((v) => !v)} aria-expanded={treeOpen} aria-controls="sql-tree">
+          ☰ 탐색기
+        </button>
         <select value={connId} disabled={busy} onChange={(e) => { const v = e.target.value; if (pending.length) setLeave({ why: '접속 바꾸기', go: () => setConnId(v) }); else setConnId(v) }} className={sel} aria-label="접속">
           {!conns.length && <option value="">접속이 없습니다</option>}
           {conns.map((c) => (
@@ -531,20 +543,26 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
         {busy && <span className="text-xs">실행 중…</span>}
       </section>
       {msg && (
-        <p role="status" className="mt-1 text-sm font-medium text-red-700">
+        <p role="status" className="shrink-0 px-2 py-0.5 text-sm font-medium text-red-700">
           {msg}
         </p>
       )}
-      {note && !msg && <p className="mt-1 text-xs text-gray-600" aria-live="polite">{note}</p>}
-      {!conns.some(usable) && conns.length > 0 && <p className="mt-1 text-xs text-gray-600">쓸 수 있는 접속이 없습니다 — 데이터아키텍트가 &lsquo;DDL 생성 › DB 접속&rsquo;에서 서버 직접 접속을 &lsquo;조회 전용 계정&rsquo;으로 지정해야 합니다.</p>}
+      {note && !msg && <p className="shrink-0 px-2 py-0.5 text-xs text-gray-600" aria-live="polite">{note}</p>}
+      {!conns.some(usable) && conns.length > 0 && <p className="shrink-0 px-2 py-0.5 text-xs text-gray-600">쓸 수 있는 접속이 없습니다 — 데이터아키텍트가 &lsquo;DDL 생성 › DB 접속&rsquo;에서 서버 직접 접속을 &lsquo;조회 전용 계정&rsquo;으로 지정해야 합니다.</p>}
       {!conns.length && (
-        <p className="mt-1 text-xs text-gray-600">
+        <p className="shrink-0 px-2 py-0.5 text-xs text-gray-600">
           접속이 없습니다 — <Link href={`/areas/${areaId}/ddl`} className="underline">DDL 생성 › DB 접속</Link>에서 등록합니다.
         </p>
       )}
 
-      <div className="mt-2 flex min-h-0 flex-1">
-        <nav className="flex shrink-0 flex-col overflow-hidden rounded border text-xs" style={{ width: pane.l }} aria-label="데이터베이스 탐색기">
+      <div className="relative flex min-h-0 flex-1 border-t">
+        {treeOpen && <div className="absolute inset-0 z-10 bg-black/30 md:hidden" onClick={() => setTreeOpen(false)} aria-hidden />}
+        <nav
+          id="sql-tree"
+          className={`${treeOpen ? 'absolute inset-y-0 left-0 z-20 flex w-[85vw] max-w-sm shadow-xl' : 'hidden'} shrink-0 flex-col overflow-hidden border-r bg-white text-xs md:static md:flex md:w-[var(--tree-w)] md:max-w-none md:shadow-none`}
+          style={{ '--tree-w': `${pane.l}px` } as React.CSSProperties}
+          aria-label="데이터베이스 탐색기"
+        >
           <input value={kw} onChange={(e) => setKw(e.target.value)} placeholder="이름 필터" className="m-1 rounded border px-2 py-0.5" aria-label="탐색기 이름 필터" />
           <ul className="min-h-0 flex-1 overflow-auto px-1 pb-2 font-mono">
             {schemas.map((s) => {
@@ -574,7 +592,7 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
                                     return (
                                       <li key={o.name}>
                                         <div className="flex items-center hover:bg-amber-50" title={o.cmt ?? ''}>
-                                          <button type="button" {...nameProps(`o:${ok}`, qi(o.name, dialect === 'ORA'))} className={`min-w-0 flex-1 truncate text-left ${pick === `o:${ok}` ? 'bg-blue-100' : ''}`} onClick={() => rel && toggle(`c:${ok}`, () => void loadCols(s.name, o.name))} onDoubleClick={() => rel && run(false, `SELECT * FROM ${qi(s.name, dialect === 'ORA')}.${qi(o.name, dialect === 'ORA')}`)}>
+                                          <button type="button" {...nameProps(`o:${ok}`, qi(o.name, dialect === 'ORA'))} className={`min-w-0 flex-1 truncate text-left ${pick === `o:${ok}` ? 'bg-blue-100' : ''}`} onClick={() => rel && toggle(`c:${ok}`, () => void loadCols(s.name, o.name))} onDoubleClick={() => rel && (setTreeOpen(false), run(false, `SELECT * FROM ${qi(s.name, dialect === 'ORA')}.${qi(o.name, dialect === 'ORA')}`))}>
                                             {rel ? (open.has(`c:${ok}`) ? '▾ ' : '▸ ') : '· '}
                                             <Drag t={qi(o.name, dialect === 'ORA')}>{o.name}</Drag>
                                           </button>
@@ -612,11 +630,11 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
         {splitter('l')}
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <div className="shrink-0 overflow-hidden rounded border" style={{ height: pane.e }} aria-label="SQL 편집기">
+          <div className="shrink-0 overflow-hidden" style={{ height: pane.e, maxHeight: 'calc(100% - 7rem)' }} aria-label="SQL 편집기">
             {connId && <SqlEditor key={connId} ref={ed} initial={store.get(draftKey) ?? 'SELECT 1;\n'} dialect={dialect} tables={tables} schema={schema || undefined} onChange={(t) => store.set(draftKey, t)} onRun={(s) => void run(s)} />}
           </div>
           {splitter('e')}
-          <div className="flex min-h-20 flex-1 flex-col rounded border">
+          <div className="flex min-h-20 flex-1 flex-col border-t">
             <div role="tablist" className="flex gap-1 border-b bg-gray-50 px-1 pt-1 text-xs">
               <button role="tab" aria-selected={tab === 'res'} onClick={() => setTab('res')} className={`rounded-t border px-2 py-0.5 ${tab === 'res' ? 'bg-white font-semibold' : ''}`}>
                 결과
@@ -678,7 +696,9 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
           </div>
         </div>
       </div>
-      {leave && (
+      {/* 확인 창은 body 로 — fixed main(z-30) 쌓임 맥락 밖이라 하단 메뉴(z-40)까지 덮음 */}
+      {leave &&
+        createPortal(
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onKeyDown={(e) => e.key === 'Escape' && (leave.cancel?.(), setLeave(null))}>
           <div role="alertdialog" aria-modal="true" aria-labelledby="leave-title" className="w-full max-w-xl rounded-xl bg-white p-4 text-sm shadow-xl">
             <h2 id="leave-title" className="text-base font-bold text-red-800">
@@ -718,8 +738,9 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
               </p>
             )}
           </div>
-        </div>
-      )}
+        </div>,
+          document.body,
+        )}
     </main>
   )
 }
