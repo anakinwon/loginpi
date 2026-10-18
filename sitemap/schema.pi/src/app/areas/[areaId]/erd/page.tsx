@@ -336,12 +336,28 @@ function Erd({ areaId }: { areaId: string }) {
         const b = geo.boxes.get(k === 's' ? r.prnt_ent_id : r.chld_ent_id)
         if (!b) return
         const pr = project(b, p)
-        next = k === 's' ? { ...cur, ps: pr.side, pr: pr.r } : { ...cur, cs: pr.side, cr: pr.r }
+        // 끝점이 바뀌면 꺾임점은 두 끝의 가운데로(마스터 지시 2026-10-18)
+        next = k === 's' ? { ...cur, ps: pr.side, pr: pr.r, mx: null, my: null } : { ...cur, cs: pr.side, cr: pr.r, mx: null, my: null }
       }
       setLyt((L) => ({ ...L, [id]: next }))
       setDirty(true)
     },
     [rels, flow, lytOf, geo],
+  )
+  // 엔터티를 옮기면(끌기·자동 배치) 이어진 관계선의 꺾임점을 가운데로 — 옮긴 꺾임점은 두 끝이 그대로일 때만 유지
+  const midToCenter = useCallback(
+    (ids: Set<string> | null) =>
+      setLyt((L) => {
+        let ch = false
+        const o = { ...L }
+        for (const r of rels)
+          if ((!ids || ids.has(r.prnt_ent_id) || ids.has(r.chld_ent_id)) && o[r.rel_id]?.mx != null) {
+            o[r.rel_id] = { ...o[r.rel_id], mx: null, my: null }
+            ch = true
+          }
+        return ch ? o : L
+      }),
+    [rels],
   )
   const resetRel = useCallback((id: string) => {
     setLyt(({ [id]: _, ...rest }) => rest)
@@ -383,6 +399,7 @@ function Erd({ areaId }: { areaId: string }) {
       { mode },
     )
     setNodes((ns) => ns.map((n) => ({ ...n, position: laid[n.id] })))
+    midToCenter(null)
     setDirty(true)
     setMsg(mode === 'all' ? '자동 배치 미리보기 — 저장하면 반영, 되돌리기로 취소(고정 엔터티는 그대로)' : '새 엔터티만 배치했습니다')
     requestAnimationFrame(() => flow.fitView({ padding: 0.15, maxZoom: 1 }))
@@ -602,6 +619,7 @@ function Erd({ areaId }: { areaId: string }) {
             nodeTypes={nodeTypes}
             edgeTypes={edgeTypes}
             onNodesChange={onNodesChange}
+            onNodeDrag={(_, __, ns) => midToCenter(new Set(ns.map((x) => x.id)))}
             onNodeDragStop={() => setDirty(true)}
             onNodeClick={(_, n) => (setSel(n.id), setSelRel(null))}
             onEdgeClick={(_, e) => (setSelRel(e.id), setSel(null), setForm(null))}
