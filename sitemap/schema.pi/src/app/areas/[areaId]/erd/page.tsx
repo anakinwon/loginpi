@@ -305,6 +305,53 @@ function Erd({ areaId }: { areaId: string }) {
   const [nmo, setNmo] = useState<Nmo>(NMO_DEF) // 개체명 보기옵션
   const [nmoDraft, setNmoDraft] = useState<Nmo | null>(null) // 대화창 편집 중 값(null = 닫힘)
   const [ltReady, setLtReady] = useState(0) // 데이터타입 이름 채움 → 노드 다시 그리기
+  // 좌우 패널 너비(마스터 지시 2026-10-18 — 경계 손잡이 끌기로 넓히고 줄임, 두 번 누르면 기본, 이 브라우저에 기억)
+  const PANE = { l: { def: 224, min: 120, max: 600 }, r: { def: 384, min: 200, max: 800 } } as const
+  const [paneW, setPaneW] = useState({ l: PANE.l.def as number, r: PANE.r.def as number })
+  useEffect(() => {
+    try {
+      const v = JSON.parse(window.localStorage.getItem('erd-pane') ?? 'null')
+      if (v && typeof v.l === 'number' && typeof v.r === 'number') setPaneW({ l: v.l, r: v.r })
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+  const keepPane = (v: { l: number; r: number }) => {
+    try {
+      window.localStorage.setItem('erd-pane', JSON.stringify(v))
+    } catch {}
+  }
+  // 손잡이 — 끄는 동안 창 이벤트로 추적(캔버스 위를 지나가도 끊기지 않음), 왼쪽은 오른쪽으로 끌면 넓어지고 오른쪽은 왼쪽으로 끌면 넓어짐
+  const splitter = (k: 'l' | 'r') => (
+    <div
+      role="separator"
+      aria-orientation="vertical"
+      aria-label={k === 'l' ? '모델 트리 너비 조절' : '엔터티 정보 너비 조절'}
+      title="끌어서 너비 조절 · 두 번 누르면 기본 너비"
+      className="group hidden cursor-col-resize items-center justify-center md:flex"
+      onPointerDown={(e) => {
+        e.preventDefault()
+        const x0 = e.clientX, w0 = paneW[k]
+        let last = paneW
+        const move = (ev: PointerEvent) => {
+          const d = ev.clientX - x0
+          const w = Math.round(Math.min(PANE[k].max, Math.max(PANE[k].min, w0 + (k === 'l' ? d : -d))))
+          setPaneW((p) => (last = { ...p, [k]: w }))
+        }
+        const up = () => {
+          window.removeEventListener('pointermove', move)
+          window.removeEventListener('pointerup', up)
+          document.body.style.cursor = ''
+          keepPane(last)
+        }
+        document.body.style.cursor = 'col-resize'
+        window.addEventListener('pointermove', move)
+        window.addEventListener('pointerup', up)
+      }}
+      onDoubleClick={() => setPaneW((p) => { const v = { ...p, [k]: PANE[k].def }; keepPane(v); return v })}
+    >
+      <span className="h-16 w-1.5 rounded-full bg-[#c7d2e6] group-hover:bg-[#3b5f9e]" />
+    </div>
+  )
   useEffect(() => {
     piFetch('/api/types')
       .then((r) => r.json())
@@ -756,7 +803,7 @@ function Erd({ areaId }: { areaId: string }) {
         </p>
       )}
 
-      <div className="mt-3 grid h-[72vh] gap-3 md:grid-cols-[14rem_1fr_24rem]">
+      <div className="mt-3 grid h-[72vh] gap-3 md:grid-cols-[var(--erd-l)_10px_minmax(0,1fr)_10px_var(--erd-r)] md:gap-0" style={{ ["--erd-l" as string]: `${paneW.l}px`, ["--erd-r" as string]: `${paneW.r}px` }}>
         <nav className="overflow-auto rounded border text-sm" aria-label="모델 트리">
           {tree.map(([nm, es]) => (
             <details key={nm} open>
@@ -777,6 +824,7 @@ function Erd({ areaId }: { areaId: string }) {
           ))}
           {!ents.length && <p className="p-3 text-gray-500">엔터티가 없습니다(논리 모델에서 등록)</p>}
         </nav>
+        {splitter('l')}
 
         <div ref={canvasRef} className="rounded border" aria-label="ERD 캔버스">
           <ReactFlow
@@ -824,6 +872,7 @@ function Erd({ areaId }: { areaId: string }) {
             <MiniMap pannable zoomable nodeColor={(n) => (TP_COLOR[(n.data as EntData).ent.ent_tp_cd] ?? TP_COLOR.BASE).border} />
           </ReactFlow>
         </div>
+        {splitter('r')}
 
         <aside className="overflow-auto rounded border p-3 text-sm" aria-label="엔터티 정보">
           {editor && !form && (
