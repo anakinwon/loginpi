@@ -300,6 +300,38 @@ function Erd({ areaId }: { areaId: string }) {
   const [sel, setSel] = useState<string | null>(null)
   const [selRel, setSelRel] = useState<string | null>(null) // 선택된 관계선
   const [pr, setPr] = useState({ paper: 'A3', orient: 'landscape' as Orient, margin: 10, title: true, guide: false, mode: 'fit' as 'fit' | 'pages' }) // 인쇄 설정
+  // 마지막 설정·화면 위치 기억(마스터 지시 2026-10-18 "최종 설정 위치를 저장해서 다시 로딩 시 최종 설정과 위치로") — 이 브라우저, 분류체계별
+  //  설정 = 주제영역·표시 수준·물리명·참조 표시·기준 물리 모델·인쇄(용지·방향·가이드·여백·제목·방식), 화면 위치 = 프로젝트|주제영역|표시 수준별 이동·확대
+  const viewKey = `erd-view-${areaId}`, vpKey = `erd-vp-${areaId}`
+  const restored = useRef(false)
+  useEffect(() => {
+    try {
+      const v = JSON.parse(window.localStorage.getItem(viewKey) ?? 'null')
+      if (v) {
+        if (typeof v.subj === 'string') setSubj(v.subj)
+        if (v.lvl === 'CNCP' || v.lvl === 'LGCL' || v.lvl === 'PHY') setLvl(v.lvl)
+        if (typeof v.phy === 'boolean') setPhy(v.phy)
+        if (typeof v.showRef === 'boolean') setShowRef(v.showRef)
+        if (typeof v.phyId === 'string') setPhyId(v.phyId)
+        if (v.pr && typeof v.pr === 'object') setPr((p) => ({ ...p, ...v.pr }))
+      }
+    } catch {}
+    requestAnimationFrame(() => (restored.current = true)) // 복원 값이 그려진 뒤부터 저장(기본값으로 덮어쓰지 않게)
+  }, [viewKey])
+  const readVp = (k: string): { x: number; y: number; zoom: number } | null => {
+    try {
+      return (JSON.parse(window.localStorage.getItem(vpKey) ?? '{}') as Record<string, { x: number; y: number; zoom: number }>)[k] ?? null
+    } catch {
+      return null
+    }
+  }
+  const saveVp = (k: string, vp: { x: number; y: number; zoom: number }) => {
+    try {
+      const all = JSON.parse(window.localStorage.getItem(vpKey) ?? '{}')
+      all[k] = { x: Math.round(vp.x), y: Math.round(vp.y), zoom: Math.round(vp.zoom * 1000) / 1000 }
+      window.localStorage.setItem(vpKey, JSON.stringify(all))
+    } catch {}
+  }
   const [shot, setShot] = useState<string | null>(null) // 인쇄 미리보기(화면 그림 복사본) — null = 닫힘
   const [nt, setNt] = useState<Nt>('IE') // 표기법
   const [nmo, setNmo] = useState<Nmo>(NMO_DEF) // 개체명 보기옵션
@@ -455,10 +487,14 @@ function Erd({ areaId }: { areaId: string }) {
       .catch(() => {})
     if (j.capped) setMsg('프로젝트 조회 상한(엔터티 500·속성 5,000)을 넘어 일부만 표시될 수 있습니다')
     else if (!keep) setMsg('') // 편집 뒤 재조회는 편집 결과 메시지 유지
-    if (!keep) requestAnimationFrame(() => flow.fitView({ padding: 0.15, maxZoom: 1 }))
+    if (!keep) {
+      const vp = readVp(`${prjId}|${subj}|${lvl}`)
+      requestAnimationFrame(() => (vp ? void flow.setViewport(vp) : void flow.fitView({ padding: 0.15, maxZoom: 1 }))) // 기억한 위치가 있으면 그대로
+    }
   }, [api, prjId, subj, lvl, phy, showRef, phyId, setNodes, flow])
   // 프로젝트를 바꾸면 그 프로젝트의 첫 주제영역을 자동 선택(ERD 는 주제영역 단위)
   useEffect(() => {
+    if (!prjId || !subjs.length) return // 목록을 받기 전에는 판단하지 않음(기억한 주제영역을 지우지 않게)
     const mine = subjs.filter((s) => s.prj_id === prjId)
     if (mine.length && !mine.some((s) => s.subj_id === subj)) setSubj(mine[0].subj_id)
     if (!mine.length) { setSubj(''); setNodes([]); setEnts([]); setRels([]) }
@@ -484,6 +520,13 @@ function Erd({ areaId }: { areaId: string }) {
     } catch {}
   }, [load, prjId, areaId])
 
+  // 설정이 바뀌면 기억(복원이 끝난 뒤부터)
+  useEffect(() => {
+    if (!restored.current) return
+    try {
+      window.localStorage.setItem(viewKey, JSON.stringify({ subj, lvl, phy, showRef, phyId, pr }))
+    } catch {}
+  }, [viewKey, subj, lvl, phy, showRef, phyId, pr])
   // 표시 수준·이름 전환은 데이터만 갱신(좌표 유지)
   useEffect(() => {
     setNodes((ns) => ns.map((n) => ({ ...n, data: { ...n.data, lvl, phy, nt, nmo } })))
@@ -848,10 +891,11 @@ function Erd({ areaId }: { areaId: string }) {
             multiSelectionKeyCode="Control"
             deleteKeyCode={null} // Delete·Backspace 로 화면에서 엔터티가 빠지지 않게(삭제는 엔터티 수정 화면에서)
             onPaneContextMenu={(e) => e.preventDefault()} // 오른쪽 끌기로 화면 이동할 때 브라우저 메뉴 막음
+            onMoveEnd={(_, vp) => prjId && subj && shot === null && saveVp(`${prjId}|${subj}|${lvl}`, vp)} // 이동·확대가 끝나면 위치 기억
             onSelectionDrag={(_, ns) => midToCenter(new Set(ns.map((x) => x.id)))}
             onSelectionDragStop={() => setDirty(true)}
             minZoom={0.05}
-            fitView
+            // 처음 화면 맞춤은 load()가 함(기억한 위치가 있으면 그 위치) — fitView 속성은 그 뒤에 다시 맞춰 기억 위치를 덮으므로 쓰지 않음
             proOptions={{ hideAttribution: false }}
           >
             <Background gap={20} size={1} />
