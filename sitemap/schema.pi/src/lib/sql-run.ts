@@ -263,6 +263,10 @@ export async function runEditor(areaId: string, uid: string, role: MbrRole, b: B
   if (oc instanceof NextResponse) return oc
   const { c, t, pwd } = oc
 
+  // 이력 선기록(fail-closed) — 기록이 안 되면 실행하지 않음, 끝나면 결과로 갱신(중단되면 err_cd RUN 으로 남음)
+  const sqlTxt = stmts.map((s) => s.txt).join(';\n').slice(0, 4000)
+  const h = await db().from('mdl_sql_exec_hist').insert({ area_id: areaId, conn_id: c.conn_id, usr_id: uid, sql_txt: sqlTxt, stmt_cnt: stmts.length, exec_mode_cd: write ? 'WRITE' : 'READ', rslt_cd: 'ERR', err_cd: 'RUN', regr_id: uid, modr_id: uid }).select('sql_exec_id').single()
+  if (h.error) throw h.error
   const t0 = Date.now()
   const o = { write, limit: b.limit, schema: b.schema, oneTx: b.one_tx, deadline: t0 + BUDGET_MS }
   const results = d === 'PG' ? await runPg(t, pwd, stmts, kinds, o) : await runOra(t, pwd, stmts, kinds, o)
@@ -273,9 +277,8 @@ export async function runEditor(areaId: string, uid: string, role: MbrRole, b: B
   const firstErr = results.find((r) => r.rslt === 'ERR' || r.err_cd)
   const rslt = !firstErr ? 'OK' : okN && !o.oneTx ? 'PART' : 'ERR'
   const rowCnt = results.reduce((n, r) => n + (r.rslt === 'OK' ? (r.affected ?? 0) : 0), 0)
-  const sqlTxt = stmts.map((s) => s.txt).join(';\n').slice(0, 4000)
-  const h = await db().from('mdl_sql_exec_hist').insert({ area_id: areaId, conn_id: c.conn_id, usr_id: uid, sql_txt: sqlTxt, stmt_cnt: stmts.length, exec_mode_cd: write ? 'WRITE' : 'READ', rslt_cd: rslt, row_cnt: rowCnt, elapsed_ms: ms, err_cd: firstErr?.err_cd ?? null, err_msg: firstErr?.err_msg ?? null, regr_id: uid, modr_id: uid }).select('sql_exec_id').single()
-  if (h.error) console.error('[sql-hist]', h.error.code, h.error.message)
-  if (write) await audit({ area_id: areaId, tgt_tp_cd: 'SQL', tgt_id: h.data?.sql_exec_id ?? c.conn_id, act_cd: 'UPD', aftr_val: { conn_id: c.conn_id, conn_nm: c.conn_nm, sql: sqlTxt.slice(0, 1000), rslt, affected: rowCnt, one_tx: !!o.oneTx, confirm: !!b.confirm }, usr_id: uid })
+  const u = await db().from('mdl_sql_exec_hist').update({ rslt_cd: rslt, row_cnt: rowCnt, elapsed_ms: ms, err_cd: firstErr?.err_cd?.slice(0, 20) ?? null, err_msg: firstErr?.err_msg?.slice(0, 200) ?? null, modr_id: uid }).eq('sql_exec_id', h.data.sql_exec_id)
+  if (u.error) console.error('[sql-hist]', u.error.code, u.error.message) // 선기록은 남아 있음(err_cd RUN)
+  if (write) await audit({ area_id: areaId, tgt_tp_cd: 'SQL', tgt_id: h.data.sql_exec_id, act_cd: 'UPD', aftr_val: { conn_id: c.conn_id, conn_nm: c.conn_nm, sql: sqlTxt.slice(0, 1000), rslt, affected: rowCnt, one_tx: !!o.oneTx, confirm: !!b.confirm }, usr_id: uid })
   return NextResponse.json({ ok: true, mode: write ? 'WRITE' : 'READ', rslt, ms, results })
 }

@@ -94,7 +94,9 @@ export function stmtAt(stmts: Stmt[], cursor: number): Stmt | null {
 
 const word = (m: string) => (/^[\s(]*([A-Za-z]+)/.exec(m)?.[1] ?? '').toUpperCase()
 // 조회 문장 안이라도 부작용 있는 함수 = 쓰기(DA 만) — READ ONLY 트랜잭션이 못 막는 것들
-const SIDE_FX = /\b(set_config|pg_terminate_backend|pg_cancel_backend|pg_reload_conf|pg_rotate_logfile|pg_advisory\w*|pg_try_advisory\w*|lo_import|lo_export|lo_unlink|pg_read_file|pg_read_binary_file|pg_ls_dir|pg_stat_reset\w*|dblink\w*|pg_notify|nextval|setval|txid_current|pg_switch_wal|pg_create_\w+|pg_drop_replication_slot|pg_logical_\w+|pg_sleep\w*)\s*\(/i
+const SIDE_FX = /\b(set_config|pg_terminate_backend|pg_cancel_backend|pg_reload_conf|pg_rotate_logfile|pg_advisory\w*|pg_try_advisory\w*|lo_import|lo_export|lo_unlink|pg_read_file|pg_read_binary_file|pg_ls_dir|pg_stat_reset\w*|dblink\w*|pg_notify|nextval|setval|txid_current|pg_switch_wal|pg_create_\w+|pg_drop_replication_slot|pg_logical_\w+|pg_sleep\w*|query_to_xml\w*|cursor_to_xml\w*|table_to_xml\w*|schema_to_xml\w*|database_to_xml\w*|pg_file_\w+|pg_logdir_ls)\s*\(/i // 질의 문자열을 받아 실행하는 함수(…_to_xml)도 — 안쪽 질의의 부작용 함수 숨기기 차단
+// Oracle 패키지·스키마 함수 호출(DBMS_*·UTL_*·사용자 패키지) — 자율 트랜잭션으로 READ ONLY 를 벗어날 수 있음
+const ORA_CALL = /\b[A-Za-z_][\w$#]*\s*\.\s*[A-Za-z_][\w$#]*\s*\(/
 // 트랜잭션 제어·읽기 전용 해제 = 항상 거부(Auto 커밋 모델 깨짐, READ ONLY 탈출)
 const TXN = /^\s*(BEGIN(?!\s*\w+\s*:=)|START\s+TRANSACTION|COMMIT|ROLLBACK|END|ABORT|SAVEPOINT|RELEASE|PREPARE\s+TRANSACTION|SET\s+TRANSACTION|SET\s+SESSION\s+CHARACTERISTICS|SET\s+(SESSION\s+|LOCAL\s+)?(DEFAULT_)?TRANSACTION_READ_ONLY|SET\s+CONSTRAINTS)\b/i
 
@@ -102,6 +104,7 @@ export function classify(s: Pick<Stmt, 'mask' | 'code'>, d: Dialect): Kind {
   const m = s.mask.trim()
   if (TXN.test(m) && !(d === 'ORA' && /^\s*BEGIN\b/i.test(m))) return 'TXN' // Oracle BEGIN = PL/SQL 블록(쓰기)
   if (/\b(set\s+)?(default_)?transaction_read_only\b/i.test(m)) return 'TXN'
+  if (d === 'ORA' && ORA_CALL.test(s.code)) return 'WRITE'
   if (SIDE_FX.test(s.code) || /U&\s*"/i.test(s.mask)) return 'WRITE' // 따옴표 식별자·유니코드 이스케이프 식별자(U&"…") 우회 차단
   const w = word(m)
   if (w === 'EXPLAIN') {
