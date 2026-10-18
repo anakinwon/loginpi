@@ -511,6 +511,16 @@ export default function ConnPanel({
                           f.db_nm,
                         )
                       : ''),
+                  // 에이전트 → 서버 직접 전환 : 저장된 JDBC URL 에서 호스트·포트·DB 채움
+                  ...(e.target.value === 'SRV' &&
+                  !f.host_nm &&
+                  parseJdbcUrl(f.conn_url_txt)
+                    ? (({ host, port, db }) => ({
+                        host_nm: host,
+                        port_no: port,
+                        db_nm: db,
+                      }))(parseJdbcUrl(f.conn_url_txt)!)
+                    : {}),
                 })
               }
             >
