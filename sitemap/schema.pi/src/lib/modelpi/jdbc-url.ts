@@ -33,5 +33,18 @@ export function buildJdbcUrl(dbms: string, host: string, p: number, db: string):
   return `jdbc:oracle:thin:@//${host}:${p}/${db}`
 }
 
-// 저장 가능한 에이전트 URL — jdbc: 로 시작, 공백·제어문자 없음, 비밀번호 인자 금지(DB CHECK 와 같은 규칙)
-export const urlStorable = (u: string) => /^jdbc:[a-z0-9]+:\S{3,990}$/.test(u) && !/(password|pwd)=/i.test(u)
+// 저장 가능한 에이전트 URL(보안 검토 2026-10-18) — 세 형식(postgresql·oracle:thin·tibero:thin)만, 접속 DBMS 와 일치, 사용자·비밀번호 없음,
+//  인자는 PostgreSQL 허용 목록만(sslmode·ApplicationName·currentSchema·connectTimeout). 임의 드라이버·드라이버 인자(socketFactory 등) 차단. 에이전트(Java)도 같은 규칙
+const PG_BASE = /^jdbc:postgresql:\/\/(\[[0-9A-Fa-f:.]+\]|[A-Za-z0-9.-]+)(:\d{1,5})?\/[A-Za-z0-9_.$-]+$/
+const PG_ARG = /^(sslmode|ApplicationName|currentSchema|connectTimeout)=[\w.-]{1,64}$/
+export function urlStorable(u: string, dbms: string): boolean {
+  if (u.length > 1000 || /[\s#;]/.test(u) || !/^jdbc:(postgresql:\/\/|oracle:thin:@|tibero:thin:@)/.test(u)) return false
+  const p = parseJdbcUrl(u)
+  if (!p || p.dbms !== dbms || p.usr || p.pwd) return false
+  if (dbms !== '0014') return true // Oracle·Tibero 형식은 해석식이 끝까지 고정(인자 없음)
+  const [base, q] = u.split('?', 2)
+  return PG_BASE.test(base) && (q === undefined || q.split('&').every((kv) => PG_ARG.test(kv)))
+}
+
+// JNDI 이름(보안 검토 2026-10-18) — 로컬 이름만(java:comp/env/… 등 또는 접두 없는 이름). ldap:·rmi: 등 원격 조회(JNDI 주입) 차단. 에이전트도 같은 규칙
+export const jndiOk = (n: string) => n.length <= 255 && /^(java:(comp\/env|global|app|module|jboss)\/)?[A-Za-z0-9_][A-Za-z0-9_/.-]*$/.test(n) && !n.includes('..')

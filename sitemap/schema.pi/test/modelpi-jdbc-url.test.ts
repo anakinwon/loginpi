@@ -1,7 +1,7 @@
 // JDBC 접속 URL 해석·조립 검사(2026-10-18) — 실행 : pnpm test
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { buildJdbcUrl, parseJdbcUrl, urlStorable } from '../src/lib/modelpi/jdbc-url.ts'
+import { buildJdbcUrl, jndiOk, parseJdbcUrl, urlStorable } from '../src/lib/modelpi/jdbc-url.ts'
 
 test('PostgreSQL : JDBC·libpq URI, 기본 포트, 사용자·비밀번호 분리', () => {
   assert.deepEqual(parseJdbcUrl('jdbc:postgresql://db.example.com:6543/shop?sslmode=require'), { dbms: '0014', usr: undefined, pwd: undefined, host: 'db.example.com', port: 6543, db: 'shop' })
@@ -28,10 +28,25 @@ test('조립 → 다시 해석하면 같은 값', () => {
   }
 })
 
-test('저장 가능한 URL : 비밀번호 인자·공백 금지', () => {
-  assert.ok(urlStorable('jdbc:tibero:thin:@10.0.0.5:8629:tibero'))
-  assert.ok(!urlStorable('jdbc:postgresql://h/d?password=x'))
-  assert.ok(!urlStorable('jdbc:oracle:thin:@h:1521:X;PWD=x'))
-  assert.ok(!urlStorable('jdbc:x:a b'))
-  assert.ok(!urlStorable('http://h'))
+test('저장 가능한 URL : 세 형식·DBMS 일치·인자 허용 목록만(보안 검토)', () => {
+  assert.ok(urlStorable('jdbc:tibero:thin:@10.0.0.5:8629:tibero', '0013'))
+  assert.ok(urlStorable('jdbc:oracle:thin:@//ora:1521/SVC', '0001'))
+  assert.ok(urlStorable('jdbc:postgresql://h:5432/d?sslmode=require&ApplicationName=schemapi', '0014'))
+  for (const [u, d] of [
+    ['jdbc:tibero:thin:@10.0.0.5:8629:tibero', '0014'], // DBMS 불일치
+    ['jdbc:postgresql://h/d?password=x', '0014'],
+    ['jdbc:postgresql://h/d?socketFactory=org.springframework.context.support.ClassPathXmlApplicationContext', '0014'],
+    ['jdbc:postgresql://h/d?loggerFile=/tmp/x', '0014'],
+    ['jdbc:postgresql://h/d/extra', '0014'],
+    ['jdbc:postgresql://h/d#x', '0014'],
+    ["jdbc:h2:mem:x;INIT=RUNSCRIPT FROM 'http://e'", '0014'],
+    ['jdbc:oracle:thin:@h:1521:X;PWD=x', '0001'],
+    ['jdbc:x:a b', '0014'],
+    ['postgresql://u:p@h/d', '0014'], // libpq 형식은 저장 안 함(사용자·비밀번호)
+  ] as const) assert.ok(!urlStorable(u, d), u)
+})
+
+test('JNDI 이름 : 로컬 이름만(원격 조회 차단)', () => {
+  for (const n of ['jdbc/TiberoDS', 'java:comp/env/jdbc/ds', 'java:jboss/datasources/X', 'TiberoDS']) assert.ok(jndiOk(n), n)
+  for (const n of ['ldap://evil/x', 'rmi://evil:1099/x', 'java:comp/env/../x', 'dns:x', 'iiop://h/x', ':x', '']) assert.ok(!jndiOk(n), n)
 })

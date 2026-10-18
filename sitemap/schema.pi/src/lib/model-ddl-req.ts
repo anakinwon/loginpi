@@ -11,7 +11,7 @@ import { resolveTarget, runOracle, runPg, testConn, type StmtRes } from './db-ex
 import { splitStatements } from './modelpi/ddl-parse'
 import { stmtAllowed } from './modelpi/sql-guard'
 import { isDbms } from './modelpi/dbms'
-import { urlStorable } from './modelpi/jdbc-url'
+import { jndiOk, urlStorable } from './modelpi/jdbc-url'
 import { connFp } from './modelpi/seal'
 import { directEnabled, openPwd, profileKey, sealPwd } from './secret'
 
@@ -70,8 +70,8 @@ export const connBody = z.object({
   pwd: z.string().min(1).max(256).optional(),
   agt_id: z.string().uuid().nullish(),
   // 에이전트(sql/039) : JDBC URL(비밀번호 인자 금지) 또는 JNDI 이름 — 비밀번호는 에이전트 PC 환경변수
-  conn_url_txt: z.string().trim().max(1000).refine(urlStorable).nullish(),
-  jndi_nm: z.string().trim().max(255).regex(/^[\w/:.-]+$/).nullish(),
+  conn_url_txt: z.string().trim().max(1000).nullish(), // 형식·DBMS 일치는 saveConn(urlStorable)
+  jndi_nm: z.string().trim().max(255).refine(jndiOk).nullish(),
   conn_desc: z.string().max(2000).nullish(),
 })
 
@@ -99,6 +99,7 @@ export async function saveConn(areaId: string, b: ConnIn, uid: string, cur?: Con
   if (srv && !profileKey()) return fail('DB_CONN_DISABLED', 503)
   if (!srv) {
     if (!b.agt_id || (!b.conn_url_txt && !b.jndi_nm)) return fail('INVALID_INPUT', 400)
+    if (b.conn_url_txt && !urlStorable(b.conn_url_txt, b.dbms_cd)) return fail('INVALID_INPUT', 400, 'JDBC URL 형식이 이 DBMS 와 맞지 않거나 허용되지 않는 인자가 있습니다(사용자·비밀번호는 URL 에 넣지 않음)')
     const g = await db().from('mdl_db_agt').select('agt_id').eq('area_id', areaId).eq('agt_id', b.agt_id).eq('del_yn', 'N').maybeSingle()
     if (g.error) throw g.error
     if (!g.data) return fail('NOT_FOUND', 404)
