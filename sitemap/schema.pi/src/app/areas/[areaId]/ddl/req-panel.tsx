@@ -281,6 +281,27 @@ export default function ReqPanel({
                 로컬 에이전트가 가져가 실행합니다(에이전트 실행 중이어야 함)
               </span>
             )}
+            {det.item.exec_mthd_cd === 'AGT' &&
+              (sts === 'FAIL' || sts === 'PART') && (
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() =>
+                    void act(
+                      { act: 'retry' },
+                      '다시 실행 대기 — 에이전트가 다음 확인 때 가져갑니다',
+                    )
+                  }
+                  className="rounded bg-[#1f3a68] px-3 py-1 text-white disabled:opacity-40"
+                >
+                  에이전트로 다시 실행
+                </button>
+              )}
+            {sts === 'RUN' && (
+              <span className="self-center text-xs text-gray-600">
+                실행 중 — 잠시 뒤 다시 불러오십시오
+              </span>
+            )}
           </div>
           {tries.map((t) => (
             <details key={t} open={t === tries[0]} className="mt-2">

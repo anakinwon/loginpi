@@ -31,9 +31,13 @@ export type ConnRow = {
   jndi_nm: string | null
   conn_desc: string | null
   lst_test_dtm: string | null
+  agt_test_req_dtm: string | null // 에이전트 접속 시험(sql/041)
+  agt_test_end_dtm: string | null
+  agt_test_rslt_cd: 'OK' | 'ERR' | null
+  agt_test_msg: string | null
   ver_no: number
 }
-const CONN_COLS = 'conn_id, area_id, conn_nm, dbms_cd, exec_mthd_cd, host_nm, port_no, db_nm, usr_nm, pwd_enc_txt, agt_id, conn_url_txt, jndi_nm, conn_desc, lst_test_dtm, ver_no'
+const CONN_COLS = 'conn_id, area_id, conn_nm, dbms_cd, exec_mthd_cd, host_nm, port_no, db_nm, usr_nm, pwd_enc_txt, agt_id, conn_url_txt, jndi_nm, conn_desc, lst_test_dtm, agt_test_req_dtm, agt_test_end_dtm, agt_test_rslt_cd, agt_test_msg, ver_no'
 export type Fail = { fail: 'NOT_FOUND' | 'INVALID_INPUT' | 'DB_CONN_DISABLED' | 'DB_CONN_MISMATCH' | 'DDL_GATE' | 'DDL_SELF_APPROVE' | 'DDL_CHANGED' | 'DB_CONN_CHANGED' | 'DDL_REQ_STATE' | 'DDL_LIVE_EXISTS' | 'FORBIDDEN' | 'VERSION_CONFLICT' | 'DB_CONN_BLOCKED' | 'DB_CONN_FAIL' | 'DDL_STMT_DENIED'; status: number; detail?: unknown }
 const fail = (f: Fail['fail'], status: number, detail?: unknown): Fail => ({ fail: f, status, detail })
 export const isFail = (x: unknown): x is Fail => !!x && typeof x === 'object' && 'fail' in x
@@ -60,7 +64,8 @@ export async function getConn(areaId: string, connId: string) {
 
 // 접속 프로파일 입력 — 주소·DB명·계정은 식별자 문자만(접속 문자열 삽입 차단)
 export const connBody = z.object({
-  conn_nm: z.string().trim().min(1).max(100),
+  // 접속명에 접속 문자열·계정:비밀번호@·비밀번호 인자 금지(운영 사고 2026-10-18, DB CHECK sql/041 과 같은 규칙)
+  conn_nm: z.string().trim().min(1).max(100).refine((v) => !/:\/\//.test(v) && !/(password|pwd)\s*=/i.test(v) && !/\S+:\S+@/.test(v), '접속명에 접속 문자열·비밀번호를 넣지 마십시오'),
   dbms_cd: z.string().refine(isDbms),
   exec_mthd_cd: z.enum(['SRV', 'AGT']),
   host_nm: z.string().trim().max(255).regex(/^[A-Za-z0-9.\-:[\]]+$/).nullish(),
@@ -217,6 +222,14 @@ export async function move(q: ReqRow, from: ReqRow['req_sts_cd'][], set: Record<
   return r.data.length ? (r.data[0] as ReqRow) : fail('DDL_REQ_STATE', 409)
 }
 
+// 에이전트 재실행 — 실패·일부 실행 요청을 다시 승인 대기 상태(APV)로(승인은 유지, 에이전트가 다음 폴링 때 가져감). 서버 직접은 실행 API 로 바로 재실행
+export async function retryReq(areaId: string, prjId: string, reqId: string, uid: string): Promise<ReqRow | Fail> {
+  const q = await getReq(areaId, prjId, reqId)
+  if (!q) return fail('NOT_FOUND', 404)
+  if (q.exec_mthd_cd !== 'AGT' || !['FAIL', 'PART'].includes(q.req_sts_cd) || !q.apv_usr_id) return fail('DDL_REQ_STATE', 409)
+  return move(q, ['FAIL', 'PART'], { req_sts_cd: 'APV', modr_id: uid })
+}
+
 // 승인 — DA, 요청자 ≠ 승인자, 화면 해시 = 저장 해시 = 현재 모델 재생성 해시, 접속 지문 그대로
 export async function approveReq(areaId: string, prjId: string, reqId: string, expectHash: string, uid: string): Promise<ReqRow | Fail> {
   if (!profileKey()) return fail('DB_CONN_DISABLED', 503)
@@ -255,11 +268,17 @@ const hashStmts = (st: string[]) => createHash('sha256').update(st.join(';\n')).
 
 // 연결 시험(서버 직접 접속만) — 저장된 비밀번호로 SELECT 1, 성공하면 시험 일시 기록
 // ponytail: 시험 횟수 제한 없음 — 저장된 비밀번호만 쓰고 접속 관리(DA) 권한이라 대입 공격 경로는 없음, 남용되면 접속당 분당 제한
-export async function testConnById(areaId: string, connId: string): Promise<{ ok: true } | Fail> {
+export async function testConnById(areaId: string, connId: string): Promise<{ ok: true; queued?: boolean } | Fail> {
+  const c0 = await getConn(areaId, connId)
+  if (!c0) return fail('NOT_FOUND', 404)
+  // 에이전트 접속 : 서버는 사내망에 접속하지 않음 — 시험 요청만 남기고 에이전트가 다음 확인 때 SELECT 1 후 결과 기록(sql/041)
+  if (c0.exec_mthd_cd === 'AGT') {
+    const u = await db().from('mdl_db_conn').update({ agt_test_req_dtm: new Date().toISOString(), agt_test_end_dtm: null, agt_test_rslt_cd: null, agt_test_msg: null }).eq('conn_id', connId).eq('area_id', areaId)
+    if (u.error) throw u.error
+    return { ok: true, queued: true }
+  }
   if (!profileKey() || !directEnabled()) return fail('DB_CONN_DISABLED', 503)
-  const c = await getConn(areaId, connId)
-  if (!c) return fail('NOT_FOUND', 404)
-  if (c.exec_mthd_cd !== 'SRV') return fail('INVALID_INPUT', 400)
+  const c = c0
   const pwd = c.pwd_enc_txt ? openPwd(areaId, connId, c.pwd_enc_txt) : null
   if (pwd == null) return fail('DB_CONN_FAIL', 400, '저장된 비밀번호를 열 수 없습니다 — 비밀번호를 다시 입력하십시오')
   const t = await resolveTarget(c)

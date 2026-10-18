@@ -1,0 +1,20 @@
+# schema.pi DDL 로컬 에이전트 설정 예시 — agent.properties 로 복사해 사용(비밀값은 이 파일 말고 환경변수에)
+# 토큰 : 환경변수 SCHEMAPI_AGENT_TOKEN=spa_… (DDL 생성 화면 › DB 접속 › 로컬 에이전트 › 에이전트 발급에서 한 번만 표시)
+# DB 비밀번호 : 환경변수 SCHEMAPI_PWD_<접속 ID 앞 8자 대문자> (접속 목록 '대상' 칸에 이름이 표시됨)
+
+# 서버 주소(https 만, 로컬 시험은 http://localhost:3002)
+server.url=https://schem.vercel.app
+# 작업 확인 주기(초, 최소 5)
+poll.seconds=15
+
+# ── 선택 : 서버에 저장된 접속 정보 대신 이 PC 의 값 사용(접속 ID 별) ──
+# conn.<접속ID>.url=jdbc:tibero:thin:@10.0.0.5:8629:tibero
+# conn.<접속ID>.user=tbuser
+# conn.<접속ID>.jndi=java:comp/env/jdbc/TiberoDS
+# conn.<접속ID>.password=…   (권장하지 않음 — 시작할 때 경고, 환경변수 사용)
+
+# ── 선택 : JNDI 조회용 WAS 클라이언트 설정(WAS 클라이언트 jar 는 -cp 에 추가) ──
+# 예) JEUS  : jndi.factory=jeus.jndi.JNSContextFactory          jndi.provider.url=127.0.0.1:9736
+# 예) WebLogic : jndi.factory=weblogic.jndi.WLInitialContextFactory  jndi.provider.url=t3://127.0.0.1:7001
+# jndi.factory=
+# jndi.provider.url=

@@ -5,3 +5,7 @@ next-env.d.ts
 *.tsbuildinfo
 .env*.local
 .vercel/
+# 로컬 에이전트 빌드 산출물·설정(토큰·비밀번호가 들어갈 수 있음)
+agent/*.jar
+agent/out/
+agent/agent.properties
