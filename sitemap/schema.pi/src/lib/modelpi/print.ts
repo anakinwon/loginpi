@@ -1,5 +1,5 @@
 // ERD 인쇄 기하(순수 함수, 마스터 지시 2026-10-18 "인쇄페이지를 설정하고 인쇄", "A3·A4 등을 설정하면 점선 가이드") — 용지 인쇄 영역 px, 페이지 나눔, 한 장 맞춤
-//  px = mm × 96 / 25.4(CSS 기준). 페이지 나눔 = 100% 크기로 엔터티 묶음 왼쪽 위부터 바둑판, 엔터티가 없는 칸은 인쇄하지 않음
+//  px = mm × 96 / 25.4(CSS 기준). 페이지 나눔 = 100% 크기 바둑판을 캔버스 원점(0,0)에 고정(쪽 크기의 배수 — 엔터티를 옮겨도 쪽 경계는 그대로), 엔터티가 없는 칸은 인쇄하지 않음
 import type { Box } from './edge-geo'
 
 export const PAPER: Record<string, [number, number]> = { A4: [297, 210], A3: [420, 297], A2: [594, 420], Letter: [279.4, 215.9] } // 가로 기준 mm
@@ -19,12 +19,13 @@ export function bounds(boxes: Box[]): Box | null {
   return { x, y, w: Math.max(...boxes.map((b) => b.x + b.w)) - x, h: Math.max(...boxes.map((b) => b.y + b.h)) - y }
 }
 
-// 페이지 나눔 — 칸 크기 cw×ch(100%), 시작 = 묶음 왼쪽 위 - pad. tiles = 엔터티가 걸친 칸만(행 우선 순서, 번호는 1부터)
+// 페이지 나눔 — 칸 크기 cw×ch(100%), 칸 경계 = 원점 기준 cw·ch 배수(마스터 지시 2026-10-18 : 좌상단 엔터티가 움직여도 페이지 고정)
+//  범위 = 엔터티 묶음(± pad)이 걸친 칸들. tiles = 엔터티가 걸친 칸만(행 우선 순서, 번호는 1부터)
 export function pageGrid(boxes: Box[], cw: number, ch: number, pad = 20) {
   const b = bounds(boxes)
   if (!b || cw <= 0 || ch <= 0) return { x0: 0, y0: 0, cols: 0, rows: 0, tiles: [] as { c: number; r: number; no: number }[] }
-  const x0 = b.x - pad, y0 = b.y - pad
-  const cols = Math.max(1, Math.ceil((b.w + pad * 2) / cw)), rows = Math.max(1, Math.ceil((b.h + pad * 2) / ch))
+  const x0 = Math.floor((b.x - pad) / cw) * cw, y0 = Math.floor((b.y - pad) / ch) * ch
+  const cols = Math.max(1, Math.ceil((b.x + b.w + pad - x0) / cw)), rows = Math.max(1, Math.ceil((b.y + b.h + pad - y0) / ch))
   const tiles: { c: number; r: number; no: number }[] = []
   for (let r = 0; r < rows; r++)
     for (let c = 0; c < cols; c++) {

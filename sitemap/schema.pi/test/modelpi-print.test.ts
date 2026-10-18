@@ -17,9 +17,14 @@ test('페이지 나눔 — 엔터티가 걸친 칸만, 행 우선 번호', () =>
     { x: 900, y: 500, w: 100, h: 50 },
   ]
   const g = pageGrid(boxes, 500, 300, 20)
-  assert.deepEqual([g.cols, g.rows], [3, 2])
-  // 두 번째 박스(x 900~1000)는 칸 경계 x=980 에 걸쳐 2칸 — 빈 칸 (1,0)·(2,0)·(0,1)은 제외
-  assert.deepEqual(g.tiles.map((t) => [t.c, t.r, t.no]), [[0, 0, 1], [1, 1, 2], [2, 1, 3]])
+  // 원점 고정 : 시작 칸 = floor(-20/500)*500 = -500 → x 칸 경계 -500·0·500·1000, y 경계 -300·0·300·600
+  assert.deepEqual([g.x0, g.y0, g.cols, g.rows], [-500, -300, 4, 3])
+  // 엔터티가 걸친 칸만 : 첫 박스(0~100) = (1,1) / 두 번째 박스(900~1000, 500~550) = (2,2)
+  assert.deepEqual(g.tiles.map((t) => [t.c, t.r, t.no]), [[1, 1, 1], [2, 2, 2]])
+  // 페이지 고정 : 좌상단 엔터티를 옮겨도 경계는 쪽 크기 배수 그대로(시작 칸만 바뀜)
+  const moved = pageGrid([{ x: 40, y: 30, w: 100, h: 50 }, boxes[1]], 500, 300, 20)
+  assert.deepEqual([moved.x0, moved.y0], [0, 0])
+  assert.equal((moved.x0 - g.x0) % 500, 0)
   assert.deepEqual(pageGrid([], 500, 300).tiles, [])
 })
 
