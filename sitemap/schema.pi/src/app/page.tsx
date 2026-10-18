@@ -5,7 +5,7 @@ import LoginGate, { AuthStatus } from './login-gate'
 
 export default function Home() {
   return (
-    <main className="mx-auto max-w-4xl px-6 py-10">
+    <main className="w-full px-3 py-3 sm:px-4 lg:px-5">
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-bold">schema.pi</h1>

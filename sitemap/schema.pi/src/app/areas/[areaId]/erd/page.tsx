@@ -739,7 +739,7 @@ function Erd({ areaId }: { areaId: string }) {
   const btn = 'rounded bg-white/20 px-3 py-1 hover:bg-white/30 disabled:opacity-40'
 
   return (
-    <main className="mx-auto max-w-[1600px] px-4 py-6">
+    <main className="w-full px-3 py-3 sm:px-4 lg:px-5 md:flex md:h-full md:flex-col">
       <Link href="/" className="text-sm text-blue-700 underline">
         ← 분류체계 목록
       </Link>
@@ -875,7 +875,7 @@ function Erd({ areaId }: { areaId: string }) {
         </p>
       )}
 
-      <div className="mt-3 grid h-[72vh] gap-3 md:grid-cols-[var(--erd-l)_10px_minmax(0,1fr)_10px_var(--erd-r)] md:gap-0" style={{ ["--erd-l" as string]: `${paneW.l}px`, ["--erd-r" as string]: `${paneW.r}px` }}>
+      <div className="mt-3 grid h-[72vh] gap-3 md:h-auto md:min-h-[26rem] md:flex-1 md:grid-cols-[var(--erd-l)_10px_minmax(0,1fr)_10px_var(--erd-r)] md:gap-0" style={{ ["--erd-l" as string]: `${paneW.l}px`, ["--erd-r" as string]: `${paneW.r}px` }}>
         <nav className="overflow-auto rounded border text-sm" aria-label="모델 트리">
           {tree.map(([nm, es]) => (
             <details key={nm} open>

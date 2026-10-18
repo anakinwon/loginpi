@@ -152,9 +152,9 @@ export default function KeyDomainBoard({ areaId }: { areaId: string }) {
             e.preventDefault()
             setCond({ ...cond, kw: q.trim(), page: 1 })
           }}
-          className="flex gap-2"
+          className="flex flex-wrap gap-2"
         >
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="검색명(대표도메인명·물리명)" className="flex-1 rounded border px-3 py-2 text-sm" />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="검색명(대표도메인명·물리명)" className="min-w-[12rem] flex-1 rounded border px-3 py-2 text-sm" />
           <StsFilter value={cond.sts} onChange={(sts) => setCond({ ...cond, sts, page: 1 })} />
           <button className="btn-3d">검색</button>
         </form>

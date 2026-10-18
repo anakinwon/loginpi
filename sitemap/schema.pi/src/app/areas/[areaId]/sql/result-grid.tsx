@@ -167,7 +167,7 @@ function Grid({ r, dialect, bar }: { r: RunRes; dialect: Dialect; bar: (pager: {
           }
         }}
       >
-        <table className="border-collapse font-mono text-xs">
+        <table data-grid className="border-collapse font-mono text-xs">
           <thead className="sticky top-0 z-10 bg-[#e9eff9]">
             <tr>
               <th className="border px-2 py-1 text-right text-gray-500">#</th>

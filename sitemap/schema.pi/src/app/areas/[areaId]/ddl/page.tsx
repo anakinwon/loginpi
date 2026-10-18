@@ -202,7 +202,7 @@ export default function DdlPage({
   )
 
   return (
-    <main className="mx-auto max-w-[1600px] px-4 py-6">
+    <main className="w-full px-3 py-3 sm:px-4 lg:px-5">
       <Link href="/" className="text-sm text-blue-700 underline">
         ← 분류체계 목록
       </Link>

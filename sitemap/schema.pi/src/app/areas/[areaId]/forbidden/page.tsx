@@ -85,7 +85,7 @@ export default function ForbiddenPage({ params }: { params: Promise<{ areaId: st
   }
 
   return (
-    <main className="mx-auto max-w-7xl px-6 py-10">
+    <main className="w-full px-3 py-3 sm:px-4 lg:px-5">
       <Link href="/" className="text-sm text-blue-700 underline">
         ← 분류체계 목록
       </Link>
@@ -145,9 +145,9 @@ export default function ForbiddenPage({ params }: { params: Promise<{ areaId: st
             e.preventDefault()
             setCond({ ...cond, kw: q.trim(), page: 1 })
           }}
-          className="flex gap-2"
+          className="flex flex-wrap gap-2"
         >
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="대체 표기 검색" className="flex-1 rounded border px-3 py-2 text-sm" />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="대체 표기 검색" className="min-w-[12rem] flex-1 rounded border px-3 py-2 text-sm" />
           <select value={cond.tp} onChange={(e) => setCond({ ...cond, tp: e.target.value, page: 1 })} className="rounded border px-2 py-2 text-sm" aria-label="구분">
             <option value="">전체 구분</option>
             <option value="BAN">금칙어</option>

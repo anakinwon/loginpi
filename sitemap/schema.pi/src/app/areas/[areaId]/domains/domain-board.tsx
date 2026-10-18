@@ -154,7 +154,7 @@ export default function DomainBoard({ areaId }: { areaId: string }) {
     setAutoMsg('')
     setForm(Object.fromEntries(Object.keys(EMPTY).map((k) => [k, String(d[k as keyof Domain] ?? '')])) as typeof EMPTY)
     setMsg('')
-    window.scrollTo({ top: 0, behavior: 'smooth' }) // 등록·수정 영역이 목록 위에 있음
+    ;(document.getElementById('area-scroll') ?? window).scrollTo({ top: 0, behavior: 'smooth' }) // 등록·수정 영역이 목록 위에 있음
   }
   const done = (j: { ok: boolean; message?: string; requested?: boolean; resubmitted?: boolean }, okMsg: string) => {
     if (!j.ok) {
@@ -328,9 +328,9 @@ export default function DomainBoard({ areaId }: { areaId: string }) {
             e.preventDefault()
             setCond({ ...cond, kw: q.trim(), page: 1 })
           }}
-          className="flex gap-2"
+          className="flex flex-wrap gap-2"
         >
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="검색명(대표도메인명·도메인명)" className="flex-1 rounded border px-3 py-2 text-sm" />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="검색명(대표도메인명·도메인명)" className="min-w-[12rem] flex-1 rounded border px-3 py-2 text-sm" />
           <StsFilter value={cond.sts} onChange={(sts) => setCond({ ...cond, sts, page: 1 })} />
           <SeFilter value={cond.se} onChange={(se) => setCond({ ...cond, se, page: 1 })} />
           <button className="btn-3d">검색</button>

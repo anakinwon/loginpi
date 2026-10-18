@@ -54,3 +54,27 @@ body {
 .btn-3d-green:active {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 0 0 #0f3d1f, 0 1px 2px rgba(23, 88, 45, 0.35);
 }
+
+/* 분류체계 화면 틀(#area-scroll, layout) — 인쇄 때는 일반 흐름으로 펼치고 하단 메뉴 숨김 */
+@media print {
+  #area-scroll {
+    position: static !important;
+    overflow: visible !important;
+  }
+  nav[aria-label='분류체계 메뉴'] {
+    display: none !important;
+  }
+}
+
+/* 좁은 화면(<768px) — 표가 화면보다 넓으면 페이지 대신 표 상자 안에서 가로 스크롤(모든 분류체계 화면 100% 폭, 2026-10-18). SQL 결과 그리드(data-grid)는 자체 스크롤 */
+@media (max-width: 767px) {
+  #area-scroll main table:not([data-grid]) {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+  /* 좁은 칸에서 한글 낱말이 한 글자씩 끊기지 않게(표는 이미 자체 가로 스크롤) */
+  #area-scroll main table:not([data-grid]) :is(th, td) {
+    word-break: keep-all;
+  }
+}
