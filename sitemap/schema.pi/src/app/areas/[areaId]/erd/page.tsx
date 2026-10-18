@@ -16,7 +16,7 @@ import { piFetch } from '@pi/auth/client'
 //  개체명 보기옵션(마스터 지시 2026-10-18, DA# 홈 › 옵션 › 개체명 보기옵션) : 논리 = 엔터티명(보조명·동의어)·속성명(보조명·동의어·도메인),
 //   물리 = 테이블명(엔터티명·보조명·동의어)·컬럼명(속성명·보조명·동의어·도메인). 보조명 = sql/035, 동의어 = 용어 이음동의어·엔터티는 구성 단어 SYN. 이 브라우저에 기억
 import '@xyflow/react/dist/style.css'
-import { Background, BaseEdge, Controls, EdgeLabelRenderer, getSmoothStepPath, Handle, MiniMap, Position, ReactFlow, ReactFlowProvider, useNodesState, useReactFlow, ViewportPortal, type Edge, type EdgeProps, type Node, type NodeProps } from '@xyflow/react'
+import { Background, BaseEdge, Controls, EdgeLabelRenderer, getSmoothStepPath, Handle, MiniMap, Position, ReactFlow, ReactFlowProvider, SelectionMode, useNodesState, useReactFlow, ViewportPortal, type Edge, type EdgeProps, type Node, type NodeProps } from '@xyflow/react'
 import Link from 'next/link'
 import { use, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
@@ -792,6 +792,16 @@ function Erd({ areaId }: { areaId: string }) {
             onPaneClick={() => (setSel(null), setSelRel(null))}
             nodesDraggable={editor}
             nodesConnectable={false}
+            // 여러 엔터티 선택·함께 이동(마스터 지시 2026-10-18) : 빈 곳 왼쪽 끌기 = 선택 상자(걸친 엔터티), Ctrl+클릭 = 추가·빼기,
+            //  선택한 엔터티 하나를 끌면 함께 이동. 화면 이동 = 가운데·오른쪽 버튼 끌기·휠. 조회 권한은 왼쪽 끌기 = 화면 이동(기존)
+            selectionOnDrag={editor}
+            panOnDrag={editor ? [1, 2] : true}
+            selectionMode={SelectionMode.Partial}
+            multiSelectionKeyCode="Control"
+            deleteKeyCode={null} // Delete·Backspace 로 화면에서 엔터티가 빠지지 않게(삭제는 엔터티 수정 화면에서)
+            onPaneContextMenu={(e) => e.preventDefault()} // 오른쪽 끌기로 화면 이동할 때 브라우저 메뉴 막음
+            onSelectionDrag={(_, ns) => midToCenter(new Set(ns.map((x) => x.id)))}
+            onSelectionDragStop={() => setDirty(true)}
             minZoom={0.05}
             fitView
             proOptions={{ hideAttribution: false }}
@@ -878,7 +888,7 @@ function Erd({ areaId }: { areaId: string }) {
               )}
             </>
           ) : (
-            <p className="text-gray-500">엔터티를 누르면 정보·속성 편집, 관계선을 누르면 선 위치 조정이 보입니다. {LEGEND[nt]}</p>
+            <p className="text-gray-500">엔터티를 누르면 정보·속성 편집, 관계선을 누르면 선 위치 조정이 보입니다. 빈 곳을 끌면 여러 엔터티 선택(Ctrl+클릭 추가) → 하나를 끌면 함께 이동, 화면 이동은 가운데·오른쪽 버튼 끌기. {LEGEND[nt]}</p>
           )}
         </aside>
       </div>
