@@ -112,5 +112,53 @@ export function riverFormat(text: string, d: Dialect): string {
   flush()
   const lines: string[] = []
   for (const l of out) lines.push(' '.repeat(l.startsWith(',') ? commaIndent(lines) : (riverIndent(l) ?? (lines.length ? RIVER + 1 : 0))) + l)
-  return lines.join('\n') + tail
+  return selectAliases(lines, d).join('\n') + tail
+}
+
+// SELECT 목록 별칭(2026-10-18 마스터 지시 + 이미지) — 별칭 없는 칼럼(a·t.a) = AS 칼럼명, 있는 별칭은 AS 로 통일, AS 를 한 열(가장 긴 식 + 2칸)에 맞춤
+//   SELECT std_sts_cd  AS std_sts_cd
+//        , COUNT(*)    AS cnt
+const ALIAS_MAX = 48 // 이보다 긴 식은 맞춤 열 계산에서 빼고 한 칸만 띄움
+const IDENT = /^[A-Za-z_][\w$#]*$/
+// 칼럼명이 이 예약어면 AS 를 붙이지 않음(Oracle 에서 `AS date`·`AS user` 는 오류)
+const NO_ALIAS = new Set('DATE USER UID LEVEL SIZE ROWID ROWNUM COMMENT NUMBER RESOURCE ACCESS FILE MODE SESSION SYSDATE'.split(' '))
+
+// 항목 → 식·별칭(없으면 null). 문자열·괄호 안은 가린 마스크로 판정
+export function splitItem(item: string, d: Dialect): { expr: string; alias: string | null } {
+  const t = item.trim(), m = maskSql(t, d)
+  const flat = (s: string) => !/[()]/.test(s.replace(/\([^()]*\)/g, '').replace(/\([^()]*\)/g, '').replace(/\([^()]*\)/g, '')) // 괄호 짝 맞음(3단까지)
+  const ex = /\s+AS\s+("[^"]*"|[^\s"]+)$/i.exec(m)
+  if (ex && flat(m.slice(0, ex.index))) return { expr: t.slice(0, ex.index), alias: t.slice(ex.index + ex[0].length - ex[1].length) }
+  const im = /^(.*[\w)\]"'])\s+([A-Za-z_][\w$#]*)$/.exec(m)
+  if (im && !KW.has(im[2].toUpperCase()) && flat(im[1])) {
+    const last = /([A-Za-z_][\w$#]*)$/.exec(im[1])?.[1]?.toUpperCase()
+    if (!last || !KW.has(last) || last === 'END') return { expr: t.slice(0, im[1].length), alias: t.slice(t.length - im[2].length) }
+    return { expr: t, alias: null }
+  }
+  const parts = t.split('.')
+  const col = parts[parts.length - 1]
+  if (parts.every((p) => IDENT.test(p)) && !KW.has(col.toUpperCase()) && !NO_ALIAS.has(col.toUpperCase())) return { expr: t, alias: col }
+  return { expr: t, alias: null }
+}
+
+function selectAliases(lines: string[], d: Dialect): string[] {
+  const out = [...lines]
+  for (let s = 0; s < out.length; s++) {
+    const h = /^(\s*SELECT\s+(?:(?:DISTINCT|ALL)\s+)?(?:(?:TOP\s*\(?\s*\d+\s*\)?|FIRST\s+\d+)\s+)?)(\S.*)$/i.exec(out[s])
+    if (!h) continue
+    const rows = [{ k: s, pre: h[1], item: h[2] }]
+    for (let k = s + 1; k < out.length; k++) {
+      const c = /^(\s*,\s+)(\S.*)$/.exec(out[k])
+      if (!c) break
+      rows.push({ k, pre: c[1], item: c[2] })
+    }
+    s = rows[rows.length - 1].k
+    // SELECT … INTO 변수 목록(PL/SQL·PL/pgSQL) — 쉼표 줄이 변수라 별칭을 붙이면 문법 오류 → 그 묶음 전체 그대로
+    if (rows.some((r) => /\bINTO\b/i.test(maskSql(r.item, d)))) continue
+    const parts = rows.map((r) => ({ ...r, ...splitItem(r.item, d) }))
+    const ends = parts.filter((p) => p.alias && p.pre.length + p.expr.length <= ALIAS_MAX).map((p) => p.pre.length + p.expr.length)
+    const col = Math.max(0, ...ends) + 2
+    for (const p of parts) if (p.alias) out[p.k] = p.pre + p.expr + ' '.repeat(Math.max(1, col - p.pre.length - p.expr.length)) + 'AS ' + p.alias
+  }
+  return out
 }
