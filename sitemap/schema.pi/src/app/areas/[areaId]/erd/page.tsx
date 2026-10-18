@@ -39,6 +39,7 @@ interface Attr {
   fk_rel_id: string | null
   attr_asst_nm?: string | null // 보조명(sql/035)
   term_syn?: string | null // 용어 이음동의어
+  dom?: { lgc_tp_cd: string; data_len: number | null; data_scale: number | null } | null // 용어 도메인(데이터타입 보기)
 }
 interface Ent {
   ent_id: string
@@ -90,25 +91,38 @@ const TP_COLOR: Record<string, { head: string; border: string; nm: string }> = {
 }
 const LVL_NM: Record<Lvl, string> = { CNCP: '개념(이름)', LGCL: '논리(속성·키)', PHY: '물리(칼럼·도메인)' }
 
-// 속성 줄 — IE : 🔑 주식별자·↗ 상속·· 일반 + 끝 * 필수 / 바커 : # 식별자·* 필수·o 선택(앞 기호)
-const lines = (e: Ent, lvl: Lvl, phy: boolean, nt: Nt = 'IE', o: Nmo = NMO_DEF) =>
+// 논리 데이터타입 이름(GET /api/types, 화면 진입 시 채움) — 데이터타입 보기 : NUMERIC(10,2)·VARCHAR(50)
+const LT: Record<string, string> = {}
+const tpText = (a: Attr) => (a.dom ? `${LT[a.dom.lgc_tp_cd] ?? a.dom.lgc_tp_cd}${a.dom.data_len ? `(${a.dom.data_len}${a.dom.data_scale ? `,${a.dom.data_scale}` : ''})` : ''}` : '')
+// 속성 줄 = 칸 배열(DA# 처럼 칸 정렬) — [기호, 이름, …옵션 칸]. IE : 🔑 주식별자·↗ 상속·· 일반 + 이름 끝 * 필수 / 바커 : # 식별자·* 필수·o 선택
+//  논리 : 속성명[보조]{동의어} · (컬럼명) · 도메인 / 물리 : 컬럼명[보조]{동의어} · 데이터타입 · 속성명 · 도메인 — 켠 옵션만 칸이 생김
+const cells = (e: Ent, lvl: Lvl, phy: boolean, nt: Nt = 'IE', o: Nmo = NMO_DEF): string[][] =>
   lvl === 'CNCP'
     ? []
     : e.attrs.map((a) => {
         const p = phy || lvl === 'PHY'
-        const nm = p
-          ? `${a.term_phy_nm}${o.pColAttr ? ` (${a.term_log_nm})` : ''}${addOn(a.attr_asst_nm, a.term_syn, o.pColAsst, o.pColSyn)}${o.pColDom && a.dom_nm ? ` ${a.dom_nm}` : ''}`
-          : `${a.term_log_nm}${addOn(a.attr_asst_nm, a.term_syn, o.lAttrAsst, o.lAttrSyn)}${o.lAttrDom && a.dom_nm ? ` : ${a.dom_nm}` : ''}`
-        if (nt === 'BK') return `${a.pk_yn === 'Y' ? '#' : a.esntl_yn === 'Y' ? '*' : 'o'} ${nm}`
-        return `${a.pk_yn === 'Y' ? '🔑' : a.fk_rel_id ? '↗' : '·'} ${nm}${a.esntl_yn === 'Y' && a.pk_yn !== 'Y' ? ' *' : ''}`
+        const mark = nt === 'BK' ? (a.pk_yn === 'Y' ? '#' : a.esntl_yn === 'Y' ? '*' : 'o') : a.pk_yn === 'Y' ? '🔑' : a.fk_rel_id ? '↗' : '·'
+        const req = nt !== 'BK' && a.esntl_yn === 'Y' && a.pk_yn !== 'Y' ? ' *' : ''
+        if (p)
+          return [mark, `${a.term_phy_nm}${addOn(a.attr_asst_nm, a.term_syn, o.pColAsst, o.pColSyn)}${req}`, ...(o.pColTp ? [tpText(a)] : []), ...(o.pColAttr ? [a.term_log_nm] : []), ...(o.pColDom ? [a.dom_nm ?? ''] : [])]
+        return [mark, `${a.term_log_nm}${addOn(a.attr_asst_nm, a.term_syn, o.lAttrAsst, o.lAttrSyn)}${req}`, ...(o.lAttrPhy ? [`(${a.term_phy_nm})`] : []), ...(o.lAttrDom ? [a.dom_nm ?? ''] : [])]
       })
+// 크기 계산용 줄 — 칸별 최장 글자를 이어 붙인 한 줄을 행 수만큼(표 너비 = 칸별 최대의 합)
+const lines = (e: Ent, lvl: Lvl, phy: boolean, nt: Nt = 'IE', o: Nmo = NMO_DEF) => {
+  const rows = cells(e, lvl, phy, nt, o)
+  if (!rows.length) return []
+  const w = (t: string) => [...t].reduce((n, c) => n + (c.charCodeAt(0) > 0x2e80 ? 2 : 1), 0)
+  const max = rows[0].map((_, i) => rows.reduce((m, r) => (w(r[i] ?? '') > w(m) ? (r[i] ?? '') : m), ''))
+  const comp = max.join('   ')
+  return rows.map(() => comp)
+}
 // 개체명 보기옵션(DA# 개체명 보기옵션과 같은 구성) — l* 논리 표시(엔터티·속성), p* 물리 표시(테이블·컬럼)
-type Nmo = { lEntAsst: boolean; lEntSyn: boolean; lAttrAsst: boolean; lAttrSyn: boolean; lAttrDom: boolean; pTblEnt: boolean; pTblAsst: boolean; pTblSyn: boolean; pColAttr: boolean; pColAsst: boolean; pColSyn: boolean; pColDom: boolean }
-// 기본값 : DA# 화면 기본(물리 엔터티명·속성명 병기) + 물리 도메인(기존 '물리(칼럼·도메인)' 표시 유지)
-const NMO_DEF: Nmo = { lEntAsst: false, lEntSyn: false, lAttrAsst: false, lAttrSyn: false, lAttrDom: false, pTblEnt: true, pTblAsst: false, pTblSyn: false, pColAttr: true, pColAsst: false, pColSyn: false, pColDom: true }
+type Nmo = { lEntPhy: boolean; lEntAsst: boolean; lEntSyn: boolean; lAttrPhy: boolean; lAttrAsst: boolean; lAttrSyn: boolean; lAttrDom: boolean; pTblEnt: boolean; pTblAsst: boolean; pTblSyn: boolean; pColTp: boolean; pColAttr: boolean; pColAsst: boolean; pColSyn: boolean; pColDom: boolean }
+// 기본값 : DA# 화면(논리 = 물리명·컬럼명 병기, 물리 = 엔터티명·데이터타입·속성명 병기) + 물리 도메인(기존 '물리(칼럼·도메인)' 표시 유지)
+const NMO_DEF: Nmo = { lEntPhy: true, lEntAsst: false, lEntSyn: false, lAttrPhy: true, lAttrAsst: false, lAttrSyn: false, lAttrDom: false, pTblEnt: true, pTblAsst: false, pTblSyn: false, pColTp: true, pColAttr: true, pColAsst: false, pColSyn: false, pColDom: true }
 const NMO_FORM: [string, [string, [keyof Nmo, string][]][]][] = [
-  ['논리', [['엔터티명 보기 옵션', [['lEntAsst', '보조명 보기'], ['lEntSyn', '동의어 보기']]], ['속성명 보기 옵션', [['lAttrAsst', '보조명 보기'], ['lAttrSyn', '동의어 보기'], ['lAttrDom', '도메인 보기']]]]],
-  ['물리', [['테이블명 보기 옵션', [['pTblEnt', '엔터티명 보기'], ['pTblAsst', '보조명 보기'], ['pTblSyn', '동의어 보기']]], ['컬럼명 보기 옵션', [['pColAttr', '속성명 보기'], ['pColAsst', '보조명 보기'], ['pColSyn', '동의어 보기'], ['pColDom', '도메인 보기']]]]],
+  ['논리', [['엔터티명 보기 옵션', [['lEntPhy', '물리명(테이블명) 보기'], ['lEntAsst', '보조명 보기'], ['lEntSyn', '동의어 보기']]], ['속성명 보기 옵션', [['lAttrPhy', '컬럼명 보기'], ['lAttrAsst', '보조명 보기'], ['lAttrSyn', '동의어 보기'], ['lAttrDom', '도메인 보기']]]]],
+  ['물리', [['테이블명 보기 옵션', [['pTblEnt', '엔터티명 보기'], ['pTblAsst', '보조명 보기'], ['pTblSyn', '동의어 보기']]], ['컬럼명 보기 옵션', [['pColTp', '데이터타입 보기'], ['pColAttr', '속성명 보기'], ['pColAsst', '보조명 보기'], ['pColSyn', '동의어 보기'], ['pColDom', '도메인 보기']]]]],
 ]
 // 덧붙임 : 보조명 [ ], 동의어 { }, 물리일 때 논리명 ( )
 const addOn = (asst: string | null | undefined, syn: string | string[] | null | undefined, showAsst: boolean, showSyn: boolean) => {
@@ -116,7 +130,7 @@ const addOn = (asst: string | null | undefined, syn: string | string[] | null | 
   return `${showAsst && asst ? ` [${asst}]` : ''}${showSyn && sy.length ? ` {${sy.join(', ')}}` : ''}`
 }
 const title = (e: Ent, phy: boolean, o: Nmo = NMO_DEF) =>
-  phy ? `${e.tbl_phy_nm}${o.pTblEnt ? ` (${e.ent_log_nm})` : ''}${addOn(e.ent_asst_nm, e.ent_syns, o.pTblAsst, o.pTblSyn)}` : `${e.ent_log_nm}${addOn(e.ent_asst_nm, e.ent_syns, o.lEntAsst, o.lEntSyn)}`
+  phy ? `${e.tbl_phy_nm}${o.pTblEnt ? ` (${e.ent_log_nm})` : ''}${addOn(e.ent_asst_nm, e.ent_syns, o.pTblAsst, o.pTblSyn)}` : `${e.ent_log_nm}${o.lEntPhy ? ` (${e.tbl_phy_nm})` : ''}${addOn(e.ent_asst_nm, e.ent_syns, o.lEntAsst, o.lEntSyn)}`
 const sizeOf = (e: Ent, lvl: Lvl, phy: boolean, o: Nmo = NMO_DEF) => boxSize(title(e, phy, o), lines(e, lvl, phy, 'IE', o))
 
 const SIDES = [
@@ -131,7 +145,7 @@ function EntNode({ data, selected }: NodeProps<ENode>) {
   const c = TP_COLOR[e.ent_tp_cd] ?? TP_COLOR.BASE
   const { w, h } = sizeOf(e, lvl, phy, nmo)
   return (
-    <div style={{ width: w, minHeight: h, borderColor: c.border, borderStyle: e.ref ? 'dashed' : 'solid' }} className={`${nt === 'BK' ? 'overflow-hidden rounded-2xl' : 'rounded'} border-2 bg-white text-xs shadow-sm ${selected ? 'ring-2 ring-amber-400' : ''}`}>
+    <div style={{ minWidth: w, width: 'max-content', minHeight: h, borderColor: c.border, borderStyle: e.ref ? 'dashed' : 'solid' }} className={`${nt === 'BK' ? 'overflow-hidden rounded-2xl' : 'rounded'} border-2 bg-white text-xs shadow-sm ${selected ? 'ring-2 ring-amber-400' : ''}`}>
       {SIDES.map(([k, p]) => (
         <span key={k}>
           <Handle type="source" id={`s-${k}`} position={p} className="!h-1 !w-1 !border-0 !bg-transparent" />
@@ -143,15 +157,26 @@ function EntNode({ data, selected }: NodeProps<ENode>) {
         {fix && <span title="고정(자동 배치가 옮기지 않음)">📌</span>}
         {e.ref && <span className="ml-auto rounded bg-white/25 px-1 text-[10px]">참조 · {e.subj_nm}</span>}
       </div>
+      {/* 박스 너비 = 내용(표) 맞춤, 추정 크기는 최소 너비 — 관계선은 실측 크기(measured)로 붙음 */}
       {lvl !== 'CNCP' && (
-        <ul className="px-2 py-1 font-mono leading-[18px]">
-          {lines(e, lvl, phy, nt, nmo).map((l, i) => (
-            <li key={i} className={`truncate ${e.attrs[i]?.pk_yn === 'Y' ? 'font-semibold' : ''}`}>
-              {l}
-            </li>
-          ))}
-          {!e.attrs.length && <li className="text-gray-400">(속성 없음)</li>}
-        </ul>
+        <table className="mx-2 my-1 font-mono leading-[18px]">
+          <tbody>
+            {cells(e, lvl, phy, nt, nmo).map((r, i) => (
+              <tr key={i} className={e.attrs[i]?.pk_yn === 'Y' ? 'font-semibold' : ''}>
+                {r.map((c, j) => (
+                  <td key={j} className={`whitespace-nowrap ${j === 0 ? 'pr-1' : 'pr-3'} ${j > 1 ? 'font-normal text-gray-600' : ''}`}>
+                    {c}
+                  </td>
+                ))}
+              </tr>
+            ))}
+            {!e.attrs.length && (
+              <tr>
+                <td className="text-gray-400">(속성 없음)</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       )}
     </div>
   )
@@ -277,6 +302,17 @@ function Erd({ areaId }: { areaId: string }) {
   const [nt, setNt] = useState<Nt>('IE') // 표기법
   const [nmo, setNmo] = useState<Nmo>(NMO_DEF) // 개체명 보기옵션
   const [nmoDraft, setNmoDraft] = useState<Nmo | null>(null) // 대화창 편집 중 값(null = 닫힘)
+  const [ltReady, setLtReady] = useState(0) // 데이터타입 이름 채움 → 노드 다시 그리기
+  useEffect(() => {
+    piFetch('/api/types')
+      .then((r) => r.json())
+      .then((j) => {
+        if (!j.ok) return
+        for (const t of j.types as { lgc_tp_cd: string; lgc_tp_nm: string }[]) LT[t.lgc_tp_cd] = t.lgc_tp_nm
+        setLtReady((n) => n + 1)
+      })
+      .catch(() => {})
+  }, [])
   useEffect(() => {
     try {
       const v = window.localStorage.getItem('erd-nmo')
@@ -402,7 +438,7 @@ function Erd({ areaId }: { areaId: string }) {
   // 표시 수준·이름 전환은 데이터만 갱신(좌표 유지)
   useEffect(() => {
     setNodes((ns) => ns.map((n) => ({ ...n, data: { ...n.data, lvl, phy, nt, nmo } })))
-  }, [lvl, phy, nt, nmo, setNodes])
+  }, [lvl, phy, nt, nmo, ltReady, setNodes])
 
   const byId = useMemo(() => new Map(nodes.map((n) => [n.id, n])), [nodes])
   // 박스(실측 크기 우선)·자동 끝점 — 드래그할 때마다 다시 계산
@@ -414,7 +450,7 @@ function Erd({ areaId }: { areaId: string }) {
     }
     const shown = rels.filter((r) => boxes.has(r.prnt_ent_id) && boxes.has(r.chld_ent_id))
     return { boxes, shown, auto: autoAnchors(shown.map((r) => ({ id: r.rel_id, from: r.prnt_ent_id, to: r.chld_ent_id })), boxes) }
-  }, [nodes, rels, lvl, phy, nmo])
+  }, [nodes, rels, lvl, phy, nmo, ltReady])
   const lytOf = useCallback((id: string): RelLyt => lyt[id] ?? { ...geo.auto.get(id)!, mx: null, my: null }, [lyt, geo])
   // 손잡이 끌기 — 끝점은 놓은 자리에서 가장 가까운 변·비율로, 꺾임점은 좌표 그대로
   const dragRel = useCallback(
