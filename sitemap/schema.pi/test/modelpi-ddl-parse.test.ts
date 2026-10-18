@@ -25,7 +25,7 @@ const gen = (dbms: '0014' | '0001', tp: TpMap[]) => {
   return { p, sql: genDdl({ dbms, ltr: 'LOWER', tables: p.tables as DdlTbl[], fks: p.fks.map((f) => ({ ...f, prnt_ent_id: 'c', chld_ent_id: 'o' })), src: new Map([['o3', 'c1']]), fkOf: new Map([['o3', 'r1']]) }, { prjNm: "p'\n--x", at: 'now' }) }
 }
 
-test('왕복 : genDdl(PostgreSQL) → parseDdl = 테이블·칼럼·타입·길이·NULL·기본값·PK·FK·코멘트 차이 0', () => {
+test('왕복 : genDdl(PostgreSQL) → parseDdl = 테이블·칼럼·타입·길이·NULL·기본값·PK(인덱스 기반)·코멘트 차이 0, FK 미생성', () => {
   const { p, sql } = gen('0014', [{ lgc_tp_cd: '0003', phy_tp_nm: 'character varying', len_use_yn: 'Y' }, { lgc_tp_cd: '0015', phy_tp_nm: 'NUMERIC', len_use_yn: 'Y' }])
   const raw = parseDdl(sql)
   assert.ok(raw.tables.every((t) => [...SYS_COL_NMS].every((n) => t.cols.some((c) => c.name === n)))) // DDL 에는 시스템 칼럼 4개
@@ -42,7 +42,16 @@ test('왕복 : genDdl(PostgreSQL) → parseDdl = 테이블·칼럼·타입·길�
       t.cols.map((c) => [c.col_nm, c.phy_tp_nm.toUpperCase(), c.data_len, c.data_scale, c.null_yn === 'Y', c.bsc_val_txt]),
     )
   }
-  assert.deepEqual(r.fks, [{ name: 'FK_TB_ORD_ORDR_01', table: 'TB_ORD_ORDR', cols: ['CUST_NO'], ref_table: 'TB_CST_CUST', ref_cols: ['CUST_NO'] }])
+  assert.deepEqual(r.fks, []) // DDL 에 FK 를 만들지 않음(마스터 지시 2026-10-18)
+})
+
+test('PK USING INDEX : 앞의 유일 인덱스 칼럼을 PK 로(PostgreSQL), Oracle 은 칼럼 목록 그대로', () => {
+  const pg = parseDdl('CREATE TABLE t (a INT NOT NULL, b INT);\nCREATE UNIQUE INDEX t_pkey ON t (a, b);\nALTER TABLE t ADD CONSTRAINT t_pkey PRIMARY KEY USING INDEX t_pkey;')
+  assert.deepEqual(pg.tables[0].pk, ['A', 'B'])
+  assert.equal(pg.tables[0].cols[1].nullable, false)
+  const ora = parseDdl('CREATE TABLE T (A NUMBER);\nCREATE UNIQUE INDEX PK_T ON T (A);\nALTER TABLE T ADD CONSTRAINT PK_T PRIMARY KEY (A) USING INDEX PK_T;')
+  assert.deepEqual(ora.tables[0].pk, ['A'])
+  assert.deepEqual(parseDdl('CREATE TABLE u (a INT);\nCREATE UNIQUE INDEX ux ON u (a);').tables[0].pk, []) // 유일 인덱스만으로는 PK 아님
 })
 
 test('Oracle DDL : 주석 처리된 FK 는 관계로 읽지 않음(STD-08), VARCHAR2·SYSTIMESTAMP', () => {

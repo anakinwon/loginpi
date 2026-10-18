@@ -1,4 +1,4 @@
-// DDL 리버스 파서(순수, PRD_PiErd S4 R1) — PostgreSQL·Oracle·Tibero DDL 의 부분집합 : CREATE TABLE(칼럼·타입·길이·DEFAULT·NULL·PK·UNIQUE·CHECK 무시·FK), ALTER TABLE ADD CONSTRAINT PK/FK, COMMENT ON TABLE/COLUMN
+// DDL 리버스 파서(순수, PRD_PiErd S4 R1) — PostgreSQL·Oracle·Tibero DDL 의 부분집합 : CREATE TABLE(칼럼·타입·길이·DEFAULT·NULL·PK·UNIQUE·CHECK 무시·FK), ALTER TABLE ADD CONSTRAINT PK/FK(PK … USING INDEX = 앞의 CREATE UNIQUE INDEX 칼럼), COMMENT ON TABLE/COLUMN
 // 결정(2026-10-17, 권장안 자동 선택) : 문법 생성기(ANTLR) 대신 자체 부분집합 파서 — 새 의존성 없이 모델링에 필요한 문장만, 나머지 문장(함수·트리거·인덱스·GRANT 등)은 건너뜀
 // 문장 분리는 작은따옴표 문자열·큰따옴표 식별자·$$ 본문·-- / /* */ 주석을 존중. 이름은 대문자로 정규화(따옴표 식별자는 원문 유지)
 
@@ -156,6 +156,7 @@ export function parseDdl(sql: string): RvsResult {
   const tables = new Map<string, RvsTbl>()
   const fks: RvsFk[] = []
   const warnings: string[] = []
+  const uidx = new Map<string, string[]>() // 유일 인덱스명 → 칼럼(PK … USING INDEX 해석, 2026-10-18 PK 생성 방식)
   let skipped = 0
   for (const st of splitStatements(sql)) {
     const s = st.replace(/\s+/g, ' ').trim()
@@ -200,7 +201,14 @@ export function parseDdl(sql: string): RvsResult {
         const t = tables.get(name)!
         t.pk = list(k[2])
         { const pkSet = new Set(t.pk); for (const c of t.cols) if (pkSet.has(c.name)) c.nullable = false } // Set 조회(O(n))
+      } else if ((k = /^(?:CONSTRAINT\s+("?[\w$#]+"?)\s+)?PRIMARY\s+KEY\s+USING\s+INDEX\s+("?[\w$#]+"?)/i.exec(m[2])) && tables.has(name) && uidx.has(ident(k[2]))) {
+        // PostgreSQL PK … USING INDEX : 칼럼 = 앞에서 만든 유일 인덱스 칼럼
+        const t = tables.get(name)!
+        t.pk = uidx.get(ident(k[2]))!
+        { const pkSet = new Set(t.pk); for (const c of t.cols) if (pkSet.has(c.name)) c.nullable = false }
       } else skipped++
+    } else if ((m = /^CREATE\s+UNIQUE\s+INDEX\s+(?:IF\s+NOT\s+EXISTS\s+)?("?[\w$#]+"?)\s+ON\s+(?:ONLY\s+)?((?:"(?:[^"]|"")*"|[\w$#]+)(?:\s*\.\s*(?:"(?:[^"]|"")*"|[\w$#]+))*)\s*\(([^)]*)\)/i.exec(s))) {
+      uidx.set(ident(m[1]), list(m[3])) // PK 후보(USING INDEX 로 쓰일 때만 PK)
     } else if ((m = /^COMMENT\s+ON\s+TABLE\s+((?:"(?:[^"]|"")*"|[\w$#]+)(?:\s*\.\s*(?:"(?:[^"]|"")*"|[\w$#]+))*)\s+IS\s+('(?:[^']|'')*')$/i.exec(s))) {
       const t = tables.get(ident(m[1]))
       if (t) t.comment = unq(m[2])

@@ -46,11 +46,12 @@ test('추가·삭제·길이 변경·이름 변경·주키 변경·도메인 버
   assert.match(sql, /^ALTER TABLE tb_cust_m ADD COLUMN grd_cd VARCHAR\(2\) NOT NULL;$/m)
   assert.match(sql, /^-- ALTER TABLE tb_cust_m DROP COLUMN old_cd;$/m)
   assert.match(sql, /^ALTER TABLE tb_cust_m ALTER COLUMN cust_nm TYPE VARCHAR\(100\);$/m)
-  assert.match(sql, /ADD CONSTRAINT tb_cust_m_pkey PRIMARY KEY \(cust_no, grd_cd\);/)
+  assert.match(sql, /^CREATE UNIQUE INDEX tb_cust_m_pkey ON tb_cust_m \(cust_no, grd_cd\);\nALTER TABLE tb_cust_m ADD CONSTRAINT tb_cust_m_pkey PRIMARY KEY USING INDEX tb_cust_m_pkey;$/m) // PK 인덱스 → PK
   assert.ok(!/^;DROP/m.test(sql))
   const ora = alterDdl(ops, { dbms: '0001', ltr: 'UPPER', prjNm: 'p', at: 'now' })
   assert.match(ora, /ADD \(GRD_CD VARCHAR\(2\) NOT NULL\);/)
   assert.match(ora, /MODIFY \(CUST_NM VARCHAR\(100\)\);/)
+  assert.match(ora, /DROP CONSTRAINT PK_TB_CUST DROP INDEX;/) // Oracle 은 따로 만든 PK 인덱스도 지움
 })
 
 test('도메인 버전만 올라 모양이 같으면 스냅샷만(DDL 없음), 사용자 기본값 유지', () => {

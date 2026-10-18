@@ -85,6 +85,12 @@ export const RSV_WORDS = new Set('ACCESS ADD ALL ALTER AND ANY AS ASC AUDIT BETW
 
 // 이름 규칙(P4) : PK = PostgreSQL <테이블>_PKEY / Oracle·Tibero PK_<테이블>, FK = FK_<자식테이블>_NN — 한도 초과 시 테이블 부분을 자름
 export const pkName = (dbms: DbmsCd, tbl: string) => cut(dbms === '0014' ? `${tbl}_PKEY` : `PK_${tbl}`, DBMS_PRFL[dbms].identMax, dbms === '0014' ? '_PKEY' : '')
+// PK 생성 순서(마스터 지시 2026-10-18) : 유일 인덱스(이름 = PK 제약명) 먼저 → 그 인덱스로 PK 제약
+//  PostgreSQL ADD CONSTRAINT … PRIMARY KEY USING INDEX / Oracle·Tibero ADD CONSTRAINT … PRIMARY KEY (칼럼) USING INDEX 인덱스(Tibero 지원 [확인중 : 티베로 기술지원])
+export function pkStmts(dbms: DbmsCd, tbl: string, cols: string[], nm: (s: string) => string): string[] {
+  const k = nm(pkName(dbms, tbl)), t = nm(tbl), c = cols.map(nm).join(', ')
+  return [`CREATE UNIQUE INDEX ${k} ON ${t} (${c});`, dbms === '0014' ? `ALTER TABLE ${t} ADD CONSTRAINT ${k} PRIMARY KEY USING INDEX ${k};` : `ALTER TABLE ${t} ADD CONSTRAINT ${k} PRIMARY KEY (${c}) USING INDEX ${k};`]
+}
 const cut = (nm: string, max: number, keepSfx = '') => (nm.length <= max ? nm : nm.slice(0, max - keepSfx.length) + keepSfx)
 export const fkName = (dbms: DbmsCd, chldTbl: string, n: number) => {
   const sfx = `_${String(n).padStart(2, '0')}`

@@ -41,24 +41,27 @@ test('역할명 FK 칼럼 쌍 : 원천 속성 → 부모 PK 칼럼', () => {
   assert.deepEqual(fkPairs(d.fks[1], by, d), [['RCVR_CUST_NO', 'CUST_NO']])
 })
 
-test('PostgreSQL DDL : 소문자·PK 제약·기본값·NOT NULL·코멘트 이스케이프·FK ALTER', () => {
+test('PostgreSQL DDL : 소문자·PK 인덱스 → PK·기본값·NOT NULL·코멘트 이스케이프·FK 없음', () => {
   const s = genDdl(build('0014', 'LOWER'), { prjNm: 'p', at: 'now' })
   assert.match(s, /CREATE TABLE tb_cst_cust \(/)
   assert.match(s, /cust_no\s+VARCHAR\(10\) NOT NULL/)
-  assert.match(s, /lst_mddtm\s+TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,\n\s+lst_mdfr_id\s+VARCHAR\(50\) DEFAULT 'ADMIN' NOT NULL,\n\s+lst_rgdtm\s+TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,\n\s+lst_rgtr_id\s+VARCHAR\(50\) DEFAULT 'ADMIN' NOT NULL,\n\s+CONSTRAINT tb_cst_cust_pkey/) // 시스템 칼럼 4개 = 맨 끝(PK 제약 앞)
+  assert.match(s, /lst_mddtm\s+TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,\n\s+lst_mdfr_id\s+VARCHAR\(50\) DEFAULT 'ADMIN' NOT NULL,\n\s+lst_rgdtm\s+TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,\n\s+lst_rgtr_id\s+VARCHAR\(50\) DEFAULT 'ADMIN' NOT NULL\n\);/) // 시스템 칼럼 4개 = 맨 끝
   assert.ok(s.includes("COMMENT ON COLUMN tb_cst_cust.lst_mdfr_id IS '최종수정자ID';"))
   assert.ok(!/del_yn|regr_id/.test(s)) // 삭제여부·구 시스템 칼럼 없음
-  assert.match(s, /CONSTRAINT tb_cst_cust_pkey PRIMARY KEY \(cust_no\)/)
+  // PK : 유일 인덱스 먼저 → 그 인덱스로 PK 제약(마스터 지시 2026-10-18), CREATE TABLE 안에는 PK 제약 없음
+  assert.match(s, /^CREATE UNIQUE INDEX tb_cst_cust_pkey ON tb_cst_cust \(cust_no\);\nALTER TABLE tb_cst_cust ADD CONSTRAINT tb_cst_cust_pkey PRIMARY KEY USING INDEX tb_cst_cust_pkey;$/m)
+  assert.ok(!/^\s+CONSTRAINT/m.test(s))
   assert.ok(s.includes("COMMENT ON TABLE tb_cst_cust IS '고객''s 기본';"))
-  assert.match(s, /^ALTER TABLE tb_cst_rmt ADD CONSTRAINT fk_tb_cst_rmt_02 FOREIGN KEY \(rcvr_cust_no\) REFERENCES tb_cst_cust \(cust_no\);$/m)
+  assert.ok(!/FOREIGN KEY|REFERENCES/.test(s)) // FK 미생성(마스터 지시 2026-10-18)
 })
 
-test('Oracle DDL : 대문자·VARCHAR2 아님(매핑 그대로)·PK_ 이름·FK 는 주석(STD-08)', () => {
+test('Oracle DDL : 대문자·VARCHAR2 아님(매핑 그대로)·PK_ 인덱스 → PK USING INDEX·FK 없음', () => {
   const s = genDdl(build('0001', 'UPPER'), { prjNm: 'p', at: 'now' })
-  assert.match(s, /CONSTRAINT PK_TB_CST_CUST PRIMARY KEY \(CUST_NO\)/)
-  assert.match(s, /LST_MDDTM\s+TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,\n\s+LST_MDFR_ID\s+VARCHAR2\(50\) DEFAULT 'ADMIN' NOT NULL,\n\s+LST_RGDTM\s+TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,\n\s+LST_RGTR_ID\s+VARCHAR2\(50\) DEFAULT 'ADMIN' NOT NULL,\n\s+CONSTRAINT PK_TB_CST_CUST/)
-  assert.ok(!/^ALTER TABLE/m.test(s))
-  assert.match(s, /^-- \(관계, 물리 FK 미생성 STD-08\) ALTER TABLE TB_CST_RMT/m)
+  assert.match(s, /^CREATE UNIQUE INDEX PK_TB_CST_CUST ON TB_CST_CUST \(CUST_NO\);\nALTER TABLE TB_CST_CUST ADD CONSTRAINT PK_TB_CST_CUST PRIMARY KEY \(CUST_NO\) USING INDEX PK_TB_CST_CUST;$/m)
+  assert.match(s, /LST_MDDTM\s+TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,\n\s+LST_MDFR_ID\s+VARCHAR2\(50\) DEFAULT 'ADMIN' NOT NULL,\n\s+LST_RGDTM\s+TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,\n\s+LST_RGTR_ID\s+VARCHAR2\(50\) DEFAULT 'ADMIN' NOT NULL\n\);/)
+  assert.ok(!/FOREIGN KEY|REFERENCES/.test(s))
+  // 인덱스가 PK 보다 먼저
+  assert.ok(s.indexOf('CREATE UNIQUE INDEX PK_TB_CST_RMT') < s.indexOf('ADD CONSTRAINT PK_TB_CST_RMT'))
 })
 
 test('물리 정의서 2종 : 테이블(주키)·칼럼(타입·시스템 여부)', () => {
@@ -67,13 +70,14 @@ test('물리 정의서 2종 : 테이블(주키)·칼럼(타입·시스템 여부
   assert.deepEqual(t.col.rows[0].slice(0, 9), ['TB_CST_CUST', 1, 'CUST_NO', '', 'VARCHAR(10)', 'N', '', 1, 'N'])
 })
 
-test('검증 결함 회귀 : 예약어 이름 이슈, FK 칼럼 쌍 수 불일치 경고', () => {
+test('검증 결함 회귀 : 예약어 이름 이슈, FK 칼럼 쌍은 짝지은 것만(DDL 에는 FK 없음)', () => {
   const r = toPhysical([{ ent_id: 'u', tbl_phy_nm: 'USER', attrs: [{ attr_id: 'u1', term_phy_nm: 'ORDER', pk_yn: 'Y', pk_seq: 1, esntl_yn: 'Y', dom: dom('d', 5) }] }], [], tp, { dbms: '0014' })
   assert.equal(r.issues.filter((i) => i.includes('예약어')).length, 2)
   const d = build('0014', 'LOWER')
   d.src.set('r2', 'zz') // 원천이 부모 PK 에 없음
   d.fkOf.set('r3', 'x1') // x1 에 FK 칼럼 2개 → 1개만 짝
-  assert.match(genDdl(d, { prjNm: 'p', at: 'now' }), /⚠ FK_TB_CST_RMT_01 : FK 칼럼 2개 중 1개만/)
+  assert.equal(fkPairs(d.fks[0], new Map(d.tables.map((t) => [t.ent_id, t])), d).length, 1)
+  assert.ok(!/FOREIGN KEY/.test(genDdl(d, { prjNm: 'p', at: 'now' })))
 })
 
 test('보안 : 프로젝트명 줄바꿈으로 주석 탈출 불가, 예약어 이름은 내려받기 시 경고', () => {
@@ -107,14 +111,12 @@ test('자동 증가(테이블별 옵션 auto_inc_yn) : 단일 정수 PK 만 — 
   assert.doesNotMatch(genDdl(d('0001', [col({}), col({ col_nm: 'SEQ', pk_seq: 2 })]), h), /AS IDENTITY/)
 })
 
-test('선택 테이블만(only) : 자식만 고르면 FK 보류 주석, 둘 다 고르면 FK 생성, 부모만이면 FK 없음', () => {
+test('선택 테이블만(only) : 선택한 테이블의 CREATE·PK 인덱스·PK 만, 전체 선택이면 전체와 같음', () => {
   const d = build('0014', 'LOWER')
   const r = genDdl(d, { prjNm: 'p', at: 'now' }, { only: new Set(['r']) })
   assert.ok(r.includes('CREATE TABLE tb_cst_rmt (') && !r.includes('CREATE TABLE tb_cst_cust ('))
-  assert.match(r, /-- FK 보류 : fk_tb_cst_rmt_01|-- FK 보류 : FK_TB_CST_RMT_01/i)
-  assert.ok(!/^ALTER TABLE/m.test(r))
-  const c = genDdl(d, { prjNm: 'p', at: 'now' }, { only: new Set(['c']) })
-  assert.ok(!/FK|ALTER TABLE/.test(c.replace(/^--.*$/gm, '')) && !c.includes('FK 보류'))
+  assert.ok(r.includes('CREATE UNIQUE INDEX tb_cst_rmt_pkey') && !r.includes('tb_cst_cust_pkey'))
+  assert.ok(!/FOREIGN KEY/.test(r))
   const both = genDdl(d, { prjNm: 'p', at: 'now' }, { only: new Set(['c', 'r']) })
   assert.equal(both, genDdl(d, { prjNm: 'p', at: 'now' }))
 })

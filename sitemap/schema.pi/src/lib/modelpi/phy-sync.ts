@@ -3,7 +3,7 @@
 // 사용자 결정값(순서·NULL·기본값)은 유지 : 논리 변경(추가·삭제·이름·타입·길이·주키)만 반영. 도메인 버전만 오르고 모양이 같으면 스냅샷만 갱신
 // 데이터 손실 문장(DROP TABLE·DROP COLUMN)은 주석으로만 낸다 — DBA 확인 후 주석을 풀어 실행
 import { DBMS_PRFL, type DbmsCd } from './dbms.ts'
-import { bscOk, pkName, type PhyCol, type PhyTbl } from './phy.ts'
+import { bscOk, pkName, pkStmts, type PhyCol, type PhyTbl } from './phy.ts'
 
 export type StoredCol = PhyCol & { phy_col_id: string }
 export type StoredTbl = { phy_tbl_id: string; ent_id: string; tbl_nm: string; tbl_desc: string | null; cols: StoredCol[] }
@@ -89,8 +89,9 @@ export function alterDdl(ops: SyncOp[], o: { dbms: DbmsCd; ltr: 'UPPER' | 'LOWER
         out.push(pg ? `ALTER TABLE ${nm(x.tbl_nm)} ALTER COLUMN ${nm(x.to.col_nm)} TYPE ${tpOf(x.to)};` : `ALTER TABLE ${nm(x.tbl_nm)} MODIFY (${nm(x.to.col_nm)} ${tpOf(x.to)});`)
     } else if (x.op === 'PK') {
       // 테이블 이름을 바꿔도 기존 제약명은 옛 이름 그대로 — 옛 이름으로 지우고 새 이름으로 만든다
-      if (x.old_pk.length) out.push(`ALTER TABLE ${nm(x.tbl_nm)} DROP CONSTRAINT ${nm(pkName(o.dbms, x.old_tbl_nm))};`)
-      if (x.new_pk.length) out.push(`ALTER TABLE ${nm(x.tbl_nm)} ADD CONSTRAINT ${nm(pkName(o.dbms, x.tbl_nm))} PRIMARY KEY (${x.new_pk.map(nm).join(', ')});`)
+      // PostgreSQL 은 USING INDEX 인덱스가 제약과 함께 지워짐, Oracle·Tibero 는 DROP INDEX 명시(따로 만든 인덱스는 남음)
+      if (x.old_pk.length) out.push(`ALTER TABLE ${nm(x.tbl_nm)} DROP CONSTRAINT ${nm(pkName(o.dbms, x.old_tbl_nm))}${pg ? '' : ' DROP INDEX'};`)
+      if (x.new_pk.length) out.push(...pkStmts(o.dbms, x.tbl_nm, x.new_pk, nm)) // PK 인덱스 → PK(마스터 지시 2026-10-18)
     }
   }
   if (out.length === 3) out.push('-- 변경 없음')

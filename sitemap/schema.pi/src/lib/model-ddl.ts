@@ -1,6 +1,6 @@
 // DDL 생성 화면(서버, 마스터 지시 2026-10-18) — 프로젝트 > 물리 모델(DBMS) > 주제영역 > 테이블 선택 → DDL 미리보기·내려받기(이후 실행 요청의 스냅샷)
 // 대상 = 테이블 작성완료 ∩ 엔터티가 자기 주제영역의 작성완료 ERD(sql/037) 에 배치됨. ERD 하나를 모든 DBMS 물리 모델이 공유
-// 식별자 검증(차단, fail-closed) : 테이블·칼럼·FK 이름 = 영문 시작 영문·숫자·_ 와 DBMS 최대 길이, 데이터 타입 = 영문·숫자·공백, 예약어 — 직접 실행 전 SQL 삽입 차단
+// 식별자 검증(차단, fail-closed) : 테이블·칼럼 이름 = 영문 시작 영문·숫자·_ 와 DBMS 최대 길이, 데이터 타입 = 영문·숫자·공백, 예약어 — 직접 실행 전 SQL 삽입 차단
 import { createHash } from 'node:crypto'
 import { db } from './db'
 import { loadPhy, phyDdlInput } from './model-phy'
@@ -68,7 +68,6 @@ export async function buildDdl(areaId: string, prjId: string, mdlId: string, tbl
       if (!TP_RE.test(c.phy_tp_nm)) blockers.push(`${t.tbl_nm}.${c.col_nm} : 데이터 타입 ${c.phy_tp_nm}`)
     }
   }
-  for (const f of x.d.fks) if (only.has(f.chld_ent_id) && only.has(f.prnt_ent_id) && idBad(f.fk_nm)) blockers.push(`FK 이름 ${f.fk_nm}`)
   const ddl = only.size ? genDdl(x.d, { prjNm: x.prjNm, at: new Date().toISOString().slice(0, 16).replace('T', ' ') }, { only }) : ''
   const stmts = splitStatements(ddl)
   // 해시 = 실행 문장(주석 제외) 기준 — 생성 시각 주석이 달라도 같은 모델이면 같은 값

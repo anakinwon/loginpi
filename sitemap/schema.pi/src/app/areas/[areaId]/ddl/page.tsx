@@ -250,7 +250,7 @@ export default function DdlPage({ params }: { params: Promise<{ areaId: string }
               <pre className="mt-2 max-h-[60vh] overflow-auto rounded bg-gray-900 p-3 font-mono text-xs text-gray-100">{pv.ddl}</pre>
             </>
           )}
-          {!pv && <p className="mt-3 text-gray-500">테이블을 고른 뒤 'DDL 미리보기'를 누르십시오. 다른 주제영역으로 옮겨 가도 선택은 유지됩니다(부모 테이블을 함께 고르면 FK 도 생성).</p>}
+          {!pv && <p className="mt-3 text-gray-500">테이블을 고른 뒤 'DDL 미리보기'를 누르십시오. 다른 주제영역으로 옮겨 가도 선택은 유지됩니다. PK 는 유일 인덱스를 먼저 만든 뒤 그 인덱스로 생성하고, FK 는 만들지 않습니다.</p>}
         </section>
       </div>
     </main>
