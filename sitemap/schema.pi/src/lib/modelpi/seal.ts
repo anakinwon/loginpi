@@ -28,6 +28,6 @@ export function unseal(key: Buffer, txt: string, aad: string): string {
 }
 
 // 접속 지문 — 실행 대상(주소·계정·암호문·에이전트·버전)이 요청 뒤 바뀌었는지 대조
-export function connFp(c: { dbms_cd: string; exec_mthd_cd: string; host_nm: string | null; port_no: number | null; db_nm: string | null; usr_nm: string | null; pwd_enc_txt: string | null; agt_id: string | null; ver_no: number }): string {
-  return createHash('sha256').update(JSON.stringify([c.dbms_cd, c.exec_mthd_cd, c.host_nm, c.port_no, c.db_nm, c.usr_nm, c.pwd_enc_txt, c.agt_id, c.ver_no])).digest('hex')
+export function connFp(c: { dbms_cd: string; exec_mthd_cd: string; host_nm: string | null; port_no: number | null; db_nm: string | null; usr_nm: string | null; pwd_enc_txt: string | null; agt_id: string | null; conn_url_txt?: string | null; jndi_nm?: string | null; ver_no: number }): string {
+  return createHash('sha256').update(JSON.stringify([c.dbms_cd, c.exec_mthd_cd, c.host_nm, c.port_no, c.db_nm, c.usr_nm, c.pwd_enc_txt, c.agt_id, c.conn_url_txt ?? null, c.jndi_nm ?? null, c.ver_no])).digest('hex')
 }

@@ -12,6 +12,9 @@ test('IP : 공인 유니캐스트만 허용', () => {
   for (const ip of ['127.0.0.1', '10.1.2.3', '172.16.0.1', '172.31.255.255', '192.168.0.1', '169.254.169.254', '100.64.0.1', '0.0.0.0', '224.0.0.1', '255.255.255.255', '198.18.0.1', '::', '::1', 'fd00::1', 'fe80::1', 'ff02::1', '2001:db8::1', '2001::1', '::ffff:127.0.0.1', '::ffff:10.0.0.1', '64:ff9b::a9fe:a9fe', '2002:c0a8:0101::1', '::127.0.0.1', 'localhost', 'not-ip', ''])
     assert.equal(ipAllowed(ip), false, ip)
   assert.equal(ipAllowed('::ffff:8.8.8.8'), true)
+  // IPv6 기본 거부(보안 검토 2026-10-18) : 전역 유니캐스트 밖·NAT64 지역 접두·IPv4 변환 접두
+  for (const ip of ['64:ff9b:1::a9fe:a9fe', '64:ff9b:1::808:808', '::ffff:0:a9fe:a9fe', '100::1', '3fff::1', '4000::1', 'fec0::1', '::8.8.8.8']) assert.equal(ipAllowed(ip), false, ip)
+  assert.equal(ipAllowed('64:ff9b::808:808'), true) // 공인 IPv4 를 담은 NAT64
   assert.equal(ipAllowed('2002:0808:0808::1'), true) // 6to4 안의 공인 IPv4
 })
 

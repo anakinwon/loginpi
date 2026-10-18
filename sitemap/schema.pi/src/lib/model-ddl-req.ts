@@ -11,6 +11,7 @@ import { resolveTarget, runOracle, runPg, testConn, type StmtRes } from './db-ex
 import { splitStatements } from './modelpi/ddl-parse'
 import { stmtAllowed } from './modelpi/sql-guard'
 import { isDbms } from './modelpi/dbms'
+import { urlStorable } from './modelpi/jdbc-url'
 import { connFp } from './modelpi/seal'
 import { directEnabled, openPwd, profileKey, sealPwd } from './secret'
 
@@ -26,11 +27,13 @@ export type ConnRow = {
   usr_nm: string | null
   pwd_enc_txt: string | null
   agt_id: string | null
+  conn_url_txt: string | null
+  jndi_nm: string | null
   conn_desc: string | null
   lst_test_dtm: string | null
   ver_no: number
 }
-const CONN_COLS = 'conn_id, area_id, conn_nm, dbms_cd, exec_mthd_cd, host_nm, port_no, db_nm, usr_nm, pwd_enc_txt, agt_id, conn_desc, lst_test_dtm, ver_no'
+const CONN_COLS = 'conn_id, area_id, conn_nm, dbms_cd, exec_mthd_cd, host_nm, port_no, db_nm, usr_nm, pwd_enc_txt, agt_id, conn_url_txt, jndi_nm, conn_desc, lst_test_dtm, ver_no'
 export type Fail = { fail: 'NOT_FOUND' | 'INVALID_INPUT' | 'DB_CONN_DISABLED' | 'DB_CONN_MISMATCH' | 'DDL_GATE' | 'DDL_SELF_APPROVE' | 'DDL_CHANGED' | 'DB_CONN_CHANGED' | 'DDL_REQ_STATE' | 'DDL_LIVE_EXISTS' | 'FORBIDDEN' | 'VERSION_CONFLICT' | 'DB_CONN_BLOCKED' | 'DB_CONN_FAIL' | 'DDL_STMT_DENIED'; status: number; detail?: unknown }
 const fail = (f: Fail['fail'], status: number, detail?: unknown): Fail => ({ fail: f, status, detail })
 export const isFail = (x: unknown): x is Fail => !!x && typeof x === 'object' && 'fail' in x
@@ -66,6 +69,9 @@ export const connBody = z.object({
   usr_nm: z.string().trim().max(128).regex(/^[\w.$@-]+$/).nullish(),
   pwd: z.string().min(1).max(256).optional(),
   agt_id: z.string().uuid().nullish(),
+  // 에이전트(sql/039) : JDBC URL(비밀번호 인자 금지) 또는 JNDI 이름 — 비밀번호는 에이전트 PC 환경변수
+  conn_url_txt: z.string().trim().max(1000).refine(urlStorable).nullish(),
+  jndi_nm: z.string().trim().max(255).regex(/^[\w/:.-]+$/).nullish(),
   conn_desc: z.string().max(2000).nullish(),
 })
 
@@ -79,14 +85,26 @@ export interface ConnIn {
   usr_nm?: string | null
   pwd?: string // 쓰기 전용 — 없으면(수정) 기존 암호문 유지
   agt_id?: string | null
+  conn_url_txt?: string | null
+  jndi_nm?: string | null
   conn_desc?: string | null
 }
 
-// 등록·수정 — 서버 직접은 주소·계정 필수, 에이전트는 주소 칸을 비움. 비밀번호는 서버 키로 봉인(AAD = 분류체계:접속)
+const sameTarget = (c: ConnRow, b: ConnIn) => c.exec_mthd_cd === 'SRV' && c.dbms_cd === b.dbms_cd && c.host_nm === b.host_nm && c.port_no === b.port_no && c.db_nm === b.db_nm && c.usr_nm === b.usr_nm
+
+// 등록·수정 — 서버 직접은 주소·계정 필수, 에이전트는 에이전트(같은 분류체계·활성)와 JDBC URL 또는 JNDI 이름 필수(사용자명 선택). 비밀번호는 서버 키로 봉인(AAD = 분류체계:접속)
 export async function saveConn(areaId: string, b: ConnIn, uid: string, cur?: ConnRow & { want_ver: number }): Promise<ConnRow | Fail> {
   const srv = b.exec_mthd_cd === 'SRV'
   if (srv && (!b.host_nm || !b.port_no || !b.db_nm || !b.usr_nm)) return fail('INVALID_INPUT', 400)
   if (srv && !profileKey()) return fail('DB_CONN_DISABLED', 503)
+  if (!srv) {
+    if (!b.agt_id || (!b.conn_url_txt && !b.jndi_nm)) return fail('INVALID_INPUT', 400)
+    const g = await db().from('mdl_db_agt').select('agt_id').eq('area_id', areaId).eq('agt_id', b.agt_id).eq('del_yn', 'N').maybeSingle()
+    if (g.error) throw g.error
+    if (!g.data) return fail('NOT_FOUND', 404)
+  }
+  // 대상(DBMS·호스트·포트·DB·사용자)을 바꾸면 비밀번호 다시 입력 — 저장된 비밀번호가 새 대상으로 가지 않게
+  if (srv && cur && !b.pwd && !sameTarget(cur, b)) return fail('INVALID_INPUT', 400, '접속 대상이 바뀌면 비밀번호를 다시 입력하십시오')
   const id = cur?.conn_id ?? randomUUID()
   let enc = cur?.pwd_enc_txt ?? null
   if (srv && b.pwd) enc = sealPwd(areaId, id, b.pwd)
@@ -98,9 +116,11 @@ export async function saveConn(areaId: string, b: ConnIn, uid: string, cur?: Con
     host_nm: srv ? b.host_nm : null,
     port_no: srv ? b.port_no : null,
     db_nm: srv ? b.db_nm : null,
-    usr_nm: srv ? b.usr_nm : null,
+    usr_nm: b.usr_nm || null,
     pwd_enc_txt: enc,
     agt_id: srv ? null : (b.agt_id ?? null),
+    conn_url_txt: srv ? null : b.conn_url_txt || null,
+    jndi_nm: srv ? null : b.jndi_nm || null,
     conn_desc: b.conn_desc ?? null,
     modr_id: uid,
   }
@@ -190,7 +210,7 @@ export async function reqStmts(areaId: string, reqId: string) {
 }
 
 // 상태 전이(낙관적 : 현재 상태 조건) — 0건이면 다른 사용자가 먼저 바꿈
-async function move(q: ReqRow, from: ReqRow['req_sts_cd'][], set: Record<string, unknown>): Promise<ReqRow | Fail> {
+export async function move(q: ReqRow, from: ReqRow['req_sts_cd'][], set: Record<string, unknown>): Promise<ReqRow | Fail> {
   const r = await db().from('mdl_ddl_req').update({ ...set, ver_no: q.ver_no + 1 }).eq('req_id', q.req_id).eq('area_id', q.area_id).in('req_sts_cd', from).eq('ver_no', q.ver_no).select(REQ_COLS)
   if (r.error) return r.error.code === '23505' ? fail('DDL_LIVE_EXISTS', 409) : Promise.reject(r.error)
   return r.data.length ? (r.data[0] as ReqRow) : fail('DDL_REQ_STATE', 409)
@@ -259,7 +279,9 @@ export async function testConnDraft(areaId: string, b: ConnIn, connId?: string):
   if (pwd == null && connId) {
     const c = await getConn(areaId, connId)
     if (!c) return fail('NOT_FOUND', 404)
-    pwd = c.pwd_enc_txt ? openPwd(areaId, connId, c.pwd_enc_txt) : null
+    // 저장된 비밀번호는 대상이 그대로일 때만(대상을 바꿔 비밀번호를 다른 서버로 보내는 경로 차단 — 보안 검토 2026-10-18)
+    if (sameTarget(c, b)) pwd = c.pwd_enc_txt ? openPwd(areaId, connId, c.pwd_enc_txt) : null
+    else return fail('DB_CONN_FAIL', 400, '접속 대상이 바뀌면 비밀번호를 다시 입력하십시오')
   }
   if (pwd == null) return fail('DB_CONN_FAIL', 400, '비밀번호를 입력하십시오')
   const t = await resolveTarget({ host_nm: b.host_nm, port_no: b.port_no, db_nm: b.db_nm, usr_nm: b.usr_nm })
