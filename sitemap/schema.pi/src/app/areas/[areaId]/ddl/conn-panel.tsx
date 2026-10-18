@@ -23,6 +23,7 @@ export interface Conn {
   jndi_nm?: string | null
   conn_desc?: string | null
   ca_cert_txt?: string | null
+  rdonly_acct_yn?: 'Y' | 'N'
   lst_test_dtm?: string | null
   agt_test_end_dtm?: string | null // 에이전트 접속 시험(sql/041)
   agt_test_rslt_cd?: 'OK' | 'ERR' | null
@@ -57,6 +58,7 @@ const EMPTY = {
   jndi_nm: '',
   conn_desc: '',
   ca: '', // 서버 CA 인증서(PEM, sql/042)
+  rdonly: false, // 조회 전용 계정(sql/046)
 }
 // 에이전트 PC 의 비밀번호 환경변수 이름(접속 ID 앞 8자) — README 와 같은 규칙
 export const pwdEnv = (connId: string) =>
@@ -123,6 +125,7 @@ export default function ConnPanel({
             jndi_nm: c.jndi_nm ?? '',
             conn_desc: c.conn_desc ?? '',
             ca: c.ca_cert_txt ?? '',
+            rdonly: c.rdonly_acct_yn === 'Y',
           }
         : { ...EMPTY, agt_id: agts[0]?.agt_id ?? '' },
     )
@@ -180,6 +183,7 @@ export default function ConnPanel({
     conn_desc: f.conn_desc || null,
     usr_nm: f.usr_nm || null,
     ca_cert_txt: f.ca.trim() || null,
+    rdonly_acct_yn: f.rdonly ? 'Y' : 'N',
     ...(srv
       ? {
           host_nm: f.host_nm,
@@ -706,6 +710,12 @@ export default function ConnPanel({
               </p>
             </>
           )}
+          <label className="col-span-2 flex items-start gap-1 rounded border border-amber-300 bg-amber-50 p-2 text-xs">
+            <input type="checkbox" checked={f.rdonly} onChange={(e) => setF({ ...f, rdonly: e.target.checked })} className="mt-0.5" />
+            <span>
+              <b>조회 전용 계정</b> — 이 계정은 SELECT 권한만 있습니다(DB 에서 확인한 뒤 체크). 체크한 접속만 데이터아키텍트가 아닌 역할이 SQL 편집기로 조회할 수 있습니다.
+            </span>
+          </label>
           {!jndi && (
             <fieldset className="col-span-2 rounded border p-2 text-xs">
               <legend className="px-1">

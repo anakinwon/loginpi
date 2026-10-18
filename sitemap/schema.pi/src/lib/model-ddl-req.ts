@@ -32,6 +32,7 @@ export type ConnRow = {
   jndi_nm: string | null
   conn_desc: string | null
   ca_cert_txt: string | null // 서버 CA 인증서(PEM, sql/042)
+  rdonly_acct_yn: 'Y' | 'N' // 조회 전용 계정(sql/046) — Y 인 접속만 DA 아닌 역할이 SQL 편집기 실행
   lst_test_dtm: string | null
   agt_test_req_dtm: string | null // 에이전트 접속 시험(sql/041)
   agt_test_end_dtm: string | null
@@ -39,7 +40,7 @@ export type ConnRow = {
   agt_test_msg: string | null
   ver_no: number
 }
-const CONN_COLS = 'conn_id, area_id, conn_nm, dbms_cd, exec_mthd_cd, host_nm, port_no, db_nm, usr_nm, pwd_enc_txt, agt_id, conn_url_txt, jndi_nm, conn_desc, ca_cert_txt, lst_test_dtm, agt_test_req_dtm, agt_test_end_dtm, agt_test_rslt_cd, agt_test_msg, ver_no'
+const CONN_COLS = 'conn_id, area_id, conn_nm, dbms_cd, exec_mthd_cd, host_nm, port_no, db_nm, usr_nm, pwd_enc_txt, agt_id, conn_url_txt, jndi_nm, conn_desc, ca_cert_txt, rdonly_acct_yn, lst_test_dtm, agt_test_req_dtm, agt_test_end_dtm, agt_test_rslt_cd, agt_test_msg, ver_no'
 export type Fail = { fail: 'NOT_FOUND' | 'INVALID_INPUT' | 'DB_CONN_DISABLED' | 'DB_CONN_MISMATCH' | 'DDL_GATE' | 'DDL_SELF_APPROVE' | 'DDL_CHANGED' | 'DB_CONN_CHANGED' | 'DDL_REQ_STATE' | 'DDL_LIVE_EXISTS' | 'FORBIDDEN' | 'VERSION_CONFLICT' | 'DB_CONN_BLOCKED' | 'DB_CONN_FAIL' | 'DDL_STMT_DENIED'; status: number; detail?: unknown }
 const fail = (f: Fail['fail'], status: number, detail?: unknown): Fail => ({ fail: f, status, detail })
 export const isFail = (x: unknown): x is Fail => !!x && typeof x === 'object' && 'fail' in x
@@ -49,7 +50,7 @@ export const failRes = (f: Fail) => NextResponse.json({ ok: false, code: f.fail,
 export function connOut(c: ConnRow, full: boolean) {
   const { pwd_enc_txt, area_id: _a, ...rest } = c
   const base = { ...rest, has_pwd: !!pwd_enc_txt }
-  return full ? base : { conn_id: c.conn_id, conn_nm: c.conn_nm, dbms_cd: c.dbms_cd, exec_mthd_cd: c.exec_mthd_cd }
+  return full ? base : { conn_id: c.conn_id, conn_nm: c.conn_nm, dbms_cd: c.dbms_cd, exec_mthd_cd: c.exec_mthd_cd, rdonly_acct_yn: c.rdonly_acct_yn }
 }
 
 export async function listConns(areaId: string) {
@@ -81,6 +82,7 @@ export const connBody = z.object({
   jndi_nm: z.string().trim().max(255).refine(jndiOk).nullish(),
   conn_desc: z.string().max(2000).nullish(),
   ca_cert_txt: z.string().max(20000).refine(pemOk, 'PEM 인증서 형식이 아닙니다').nullish(), // 서버 CA(공개 인증서)
+  rdonly_acct_yn: z.enum(['Y', 'N']).optional(), // 조회 전용 계정 지정(DA 판단, sql/046)
 })
 
 export interface ConnIn {
@@ -97,6 +99,7 @@ export interface ConnIn {
   jndi_nm?: string | null
   conn_desc?: string | null
   ca_cert_txt?: string | null
+  rdonly_acct_yn?: 'Y' | 'N'
 }
 
 const sameTarget = (c: ConnRow, b: ConnIn) => c.exec_mthd_cd === 'SRV' && c.dbms_cd === b.dbms_cd && c.host_nm === b.host_nm && c.port_no === b.port_no && c.db_nm === b.db_nm && c.usr_nm === b.usr_nm && (c.ca_cert_txt ?? null) === (b.ca_cert_txt?.trim() || null)
@@ -133,6 +136,7 @@ export async function saveConn(areaId: string, b: ConnIn, uid: string, cur?: Con
     jndi_nm: srv ? null : b.jndi_nm || null,
     conn_desc: b.conn_desc ?? null,
     ca_cert_txt: b.ca_cert_txt?.trim() || null,
+    rdonly_acct_yn: b.rdonly_acct_yn ?? cur?.rdonly_acct_yn ?? 'N',
     modr_id: uid,
   }
   if (!cur) {

@@ -113,6 +113,7 @@ const ERRORS = {
   SQL_WRITE_DENIED: '쓰기 문장(INSERT·UPDATE·DELETE·DDL 등)은 데이터아키텍트만 실행할 수 있습니다 — 조회 전용 권한입니다',
   SQL_TXN_DENIED: '트랜잭션 제어 문장(BEGIN·COMMIT·ROLLBACK·SET TRANSACTION 등)은 실행할 수 없습니다 — 실행마다 자동 커밋, 한 번에 되돌리려면 \'한 트랜잭션\' 옵션을 쓰십시오',
   SQL_CONFIRM: '위험한 문장이 있습니다 — 확인 후 다시 실행하십시오',
+  SQL_RDONLY_REQUIRED: '데이터아키텍트가 \'조회 전용 계정\'으로 지정한 접속에서만 실행할 수 있습니다(SELECT 권한만 가진 DB 계정)',
   SQL_AGT_UNSUPPORTED: '로컬 에이전트 접속은 SQL 편집기에서 아직 쓸 수 없습니다(서버 직접 접속만)',
   DA_LOCKED: '처리 중인 DDL 실행 요청이 있어 데이터아키텍트를 바꾸거나 뺄 수 없습니다 — 요청을 처리·취소한 뒤 변경하십시오',
 } as const

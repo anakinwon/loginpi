@@ -254,6 +254,8 @@ export async function runEditor(areaId: string, uid: string, role: MbrRole, b: B
   const kinds = stmts.map((s) => classify(s, d))
   const txn = kinds.findIndex((k) => k === 'TXN')
   if (txn >= 0) return failRes({ code: 'SQL_TXN_DENIED', status: 400, detail: { seq: txn + 1, txt: stmts[txn].txt.slice(0, 200) } })
+  // DA 아닌 역할 = 조회 전용 계정 접속만(fail-closed) — 어휘 판정·READ ONLY 트랜잭션은 사용자 함수 안 부작용을 못 막음(보안 검토)
+  if (!can(role, 'SQL_WRITE') && cn.rdonly_acct_yn !== 'Y') return failRes({ code: 'SQL_RDONLY_REQUIRED', status: 403 })
   const write = kinds.includes('WRITE')
   if (write && !can(role, 'SQL_WRITE')) return failRes({ code: 'SQL_WRITE_DENIED', status: 403, detail: { seq: kinds.indexOf('WRITE') + 1, txt: stmts[kinds.indexOf('WRITE')].txt.slice(0, 200) } })
   const dangers = stmts.map((s, i) => ({ seq: i + 1, txt: s.txt.slice(0, 200), danger: danger(s) })).filter((x): x is { seq: number; txt: string; danger: Danger } => !!x.danger)
