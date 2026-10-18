@@ -62,6 +62,7 @@ export default function ReqPanel({
     item: Req & { ddl_txt: string }
     stmts: Stmt[]
     can_approve: boolean
+    self_approve?: boolean // DA 1명 분류체계 — 본인 승인(사유 필수)
     mine: boolean
   } | null>(null)
   const [msg, setMsg] = useState('')
@@ -221,21 +222,45 @@ export default function ReqPanel({
               <button
                 type="button"
                 disabled={busy}
-                onClick={() =>
-                  window.confirm('표시된 DDL 그대로 실행을 승인할까요?') &&
-                  void act(
-                    { act: 'approve', expect_hash: det.item.ddl_hash },
-                    '승인했습니다',
-                  )
-                }
+                onClick={() => {
+                  if (det.self_approve) {
+                    // 데이터아키텍트 1명 분류체계 — 본인 승인은 사유를 남김(감사 이력)
+                    const r = window.prompt(
+                      '본인 승인 사유(5자 이상) — 이 분류체계의 데이터아키텍트가 1명이라 본인이 승인합니다',
+                    )
+                    if (r && r.trim().length >= 5)
+                      void act(
+                        {
+                          act: 'approve',
+                          expect_hash: det.item.ddl_hash,
+                          self_rsn: r.trim(),
+                        },
+                        '본인 승인했습니다(사유 기록)',
+                      )
+                    else if (r !== null)
+                      setMsg('본인 승인 사유를 5자 이상 입력하십시오')
+                    return
+                  }
+                  if (window.confirm('표시된 DDL 그대로 실행을 승인할까요?'))
+                    void act(
+                      { act: 'approve', expect_hash: det.item.ddl_hash },
+                      '승인했습니다',
+                    )
+                }}
                 className="rounded bg-emerald-600 px-3 py-1 text-white disabled:opacity-40"
               >
-                승인
+                {det.self_approve ? '본인 승인' : '승인'}
               </button>
             )}
-            {sts === 'REQ' && det.mine && (
+            {sts === 'REQ' && det.mine && !det.can_approve && (
               <span className="self-center text-xs text-gray-500">
                 본인 요청은 다른 데이터아키텍트가 승인합니다
+              </span>
+            )}
+            {sts === 'REQ' && det.self_approve && (
+              <span className="self-center text-xs text-amber-700">
+                데이터아키텍트가 1명인 분류체계라 본인 승인 가능(사유 필수·감사
+                기록)
               </span>
             )}
             {(sts === 'REQ' || sts === 'APV') && det.can_approve && (

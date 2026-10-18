@@ -75,7 +75,7 @@ DA# Modeler5(엔코아, 데스크톱 MFC)를 기준 제품으로 분석해, 같�
 | 11 | DB 연결 | 서버 직접(PostgreSQL·Oracle, 공인 주소) + 로컬 Java 에이전트(JDBC URL·JNDI, 사내망·Tibero) | `sql/038`·`039`, `agent/` |
 | 12 | MySQL·MS-SQL | 이번 제외(DBMS 프로파일 추가 때) | — |
 | 13 | 보안 | 접속 비밀번호 서버 키 암호화(에이전트는 PC 환경변수), **DA 승인 후 실행**, 미리보기·문장별 실행 이력, 공인 IP·문장 화이트리스트·에이전트 allow.hosts | `sql/038~041` |
-| 14 | 자기 승인 | 금지(요청자 ≠ 승인자, DB CHECK) | `sql/038` |
+| 14 | 자기 승인 | 금지(요청자 ≠ 승인자, DB CHECK). 2026-10-18 보완 : 데이터아키텍트가 1명뿐인 분류체계만 본인 승인 허용(사유 5자 이상·감사 기록, DB 트리거가 DA 수 재확인) | `sql/038`·`043` |
 | 15 | JNDI | 단독 jar 에이전트 + JNDI 조회(WAS 클라이언트 설정, 로컬 이름만) | `agent/README.md` |
 | 16 | PK·FK(마스터 지시) | FK 미생성, PK = 유일 인덱스 먼저 → 그 인덱스로 PK(`USING INDEX`) | `ddl.ts`·`phy.ts pkStmts` |
 | 17 | 대소문자(마스터 지시) | 물리 모델까지 대문자, PostgreSQL DDL 은 반드시 소문자(테이블·칼럼·PK·인덱스) | `dbms.ts ddlCase` |

@@ -169,13 +169,14 @@ export type ReqRow = {
   apv_usr_id: string | null
   apv_dtm: string | null
   rjct_rsn: string | null
+  self_apv_rsn: string | null // 본인 승인 사유(DA 1명 분류체계, sql/043)
   exec_try_no: number
   lease_exp_dtm: string | null
   exec_end_dtm: string | null
   reg_dtm: string
   ver_no: number
 }
-const REQ_COLS = 'req_id, area_id, prj_id, phy_mdl_id, conn_id, dbms_cd, exec_mthd_cd, tbl_ids, ddl_hash, stmt_cnt, conn_fp, req_sts_cd, req_usr_id, apv_usr_id, apv_dtm, rjct_rsn, exec_try_no, lease_exp_dtm, exec_end_dtm, reg_dtm, ver_no'
+const REQ_COLS = 'req_id, area_id, prj_id, phy_mdl_id, conn_id, dbms_cd, exec_mthd_cd, tbl_ids, ddl_hash, stmt_cnt, conn_fp, req_sts_cd, req_usr_id, apv_usr_id, apv_dtm, rjct_rsn, self_apv_rsn, exec_try_no, lease_exp_dtm, exec_end_dtm, reg_dtm, ver_no'
 
 export async function createReq(areaId: string, prjId: string, b: { phy_mdl_id: string; conn_id: string; tbl_ids: string[] }, uid: string): Promise<ReqRow | Fail> {
   const c = await getConn(areaId, b.conn_id)
@@ -238,18 +239,29 @@ export async function retryReq(areaId: string, prjId: string, reqId: string, uid
 }
 
 // 승인 — DA, 요청자 ≠ 승인자, 화면 해시 = 저장 해시 = 현재 모델 재생성 해시, 접속 지문 그대로
-export async function approveReq(areaId: string, prjId: string, reqId: string, expectHash: string, uid: string): Promise<ReqRow | Fail> {
-  if (!profileKey()) return fail('DB_CONN_DISABLED', 503)
+// 분류체계의 활성 데이터아키텍트 수 — 1명이면 본인 승인 허용(마스터 결정 2026-10-18, DB 트리거 sql/043 이 다시 확인)
+export async function daCount(areaId: string) {
+  const r = await db().from('std_area_mbr').select('usr_id', { count: 'exact', head: true }).eq('area_id', areaId).eq('mbr_role_cd', 'DA').eq('del_yn', 'N')
+  if (r.error) throw r.error
+  return r.count ?? 0
+}
+
+export async function approveReq(areaId: string, prjId: string, reqId: string, expectHash: string, uid: string, selfRsn?: string): Promise<ReqRow | Fail> {
   const q = await getReq(areaId, prjId, reqId)
   if (!q) return fail('NOT_FOUND', 404)
+  if (q.exec_mthd_cd === 'SRV' && !profileKey()) return fail('DB_CONN_DISABLED', 503) // 에이전트 요청은 서버 키 불필요
   if (q.req_sts_cd !== 'REQ') return fail('DDL_REQ_STATE', 409)
-  if (q.req_usr_id === uid) return fail('DDL_SELF_APPROVE', 403)
+  const self = q.req_usr_id === uid
+  if (self) {
+    if ((await daCount(areaId)) !== 1) return fail('DDL_SELF_APPROVE', 403, '데이터아키텍트가 2명 이상인 분류체계는 다른 데이터아키텍트가 승인합니다')
+    if (!selfRsn || selfRsn.trim().length < 5) return fail('DDL_SELF_APPROVE', 403, '본인 승인 사유를 5자 이상 입력하십시오')
+  }
   if (q.ddl_hash !== expectHash) return fail('DDL_CHANGED', 409)
   const c = await getConn(areaId, q.conn_id)
   if (!c || connFp(c) !== q.conn_fp) return fail('DB_CONN_CHANGED', 409)
   const x = await buildDdl(areaId, prjId, q.phy_mdl_id, q.tbl_ids)
   if (!x || x.hash !== q.ddl_hash || x.blockers.length) return fail('DDL_CHANGED', 409)
-  return move(q, ['REQ'], { req_sts_cd: 'APV', apv_usr_id: uid, apv_dtm: new Date().toISOString(), modr_id: uid })
+  return move(q, ['REQ'], { req_sts_cd: 'APV', apv_usr_id: uid, apv_dtm: new Date().toISOString(), self_apv_rsn: self ? selfRsn!.trim() : null, modr_id: uid })
 }
 
 export async function rejectReq(areaId: string, prjId: string, reqId: string, rsn: string, uid: string): Promise<ReqRow | Fail> {
