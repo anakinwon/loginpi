@@ -3,6 +3,7 @@
 //  위 툴바 : 접속(서버 직접만)·활성 스키마·실행(Ctrl+Enter 현재 문장 / Alt+X 스크립트)·행 제한·한 트랜잭션(DA)·권한 표시
 //  왼쪽 탐색기(스키마 › 종류 › 객체·크기 › 칼럼, 펼칠 때만 조회, 두 번 누르기 = SELECT 실행) / 가운데 편집기(CodeMirror) / 아래 결과·실행 이력
 //  쓰기(DML·DDL)는 DA 만 즉시(Auto 커밋), 위험 문장은 확인 후, 서버가 문장을 다시 판정. 편집 내용은 접속별로 이 브라우저에 초안 저장
+//  패널 크기 = 손잡이 끌기(탐색기 너비·편집기 높이, 이 브라우저에 기억, 두 번 누르면 기본), 탐색기 이름 = 편집기로 끌어 놓기·Ctrl+C·오른쪽 누르기 복사(마스터 지시 2026-10-18)
 import { piFetch } from '@pi/auth/client'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
@@ -58,6 +59,19 @@ const LIMITS = [200, 1000, 5000] as const
 // 식별자 따옴표 — 카탈로그 이름이 그대로 SQL 이 되지 않게(예: 테이블명 'x; DROP …'), 단순 이름(PG 소문자·Oracle 대문자)은 그대로
 const qi = (n: string, ora: boolean) => ((ora ? /^[A-Z][A-Z0-9_$#]*$/ : /^[a-z_][a-z0-9_$]*$/).test(n) ? n : `"${n.replace(/"/g, '""')}"`)
 const HSIZE = 20
+// 패널 크기(px) — l 탐색기 너비, e 편집기 높이
+const PANE = { l: { min: 160, max: 720, def: 256 }, e: { min: 80, max: 1600, def: 300 } } as const
+type Pane = { l: number; e: number }
+// 탐색기 이름 끌기 — span 에 draggable(Firefox 는 button 끌기가 시작되지 않음), 편집기(CodeMirror)가 놓은 자리에 text/plain 삽입
+function Drag({ t, children }: { t: string; children: React.ReactNode }) {
+  return (
+    <span draggable onDragStart={(e) => (e.dataTransfer.setData('text/plain', t), (e.dataTransfer.effectAllowed = 'copy'))} className="cursor-grab">
+      {children}
+    </span>
+  )
+}
+const maxOf = (k: keyof Pane) => (k === 'e' && typeof window !== 'undefined' ? Math.max(PANE.e.min, Math.min(PANE.e.max, window.innerHeight - 260)) : PANE[k].max) // 편집기는 결과 패널 자리를 남김
+const clampPane = (k: keyof Pane, v: unknown) => (typeof v === 'number' && isFinite(v) ? Math.round(Math.min(maxOf(k), Math.max(PANE[k].min, v))) : PANE[k].def)
 // 바이트 → DBeaver 와 같은 K·M·G(1024 단위)
 const fmtSize = (s: string | null) => {
   const n = Number(s)
@@ -102,6 +116,15 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
   const [out, setOut] = useState<{ results: RunRes[]; ms: number } | null>(null)
   const [tab, setTab] = useState<'res' | 'hist'>('res')
   const [hist, setHist] = useState<{ items: Hist[]; total: number; page: number }>({ items: [], total: 0, page: 1 })
+  const [pane, setPane] = useState<Pane>({ l: PANE.l.def, e: PANE.e.def })
+  const [pick, setPick] = useState('') // 탐색기에서 고른 이름(복사 대상)
+  const [note, setNote] = useState('')
+  useEffect(() => {
+    try {
+      const v = JSON.parse(store.get('sql-pane') ?? 'null') as Partial<Pane> | null
+      if (v) setPane({ l: clampPane('l', v.l), e: clampPane('e', v.e) })
+    } catch {}
+  }, [])
   const conn = conns.find((c) => c.conn_id === connId)
   const dialect = conn?.dbms_cd === '0001' ? 'ORA' : 'PG'
   const draftKey = `sql-draft-${areaId}-${connId}`
@@ -221,6 +244,64 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
     }
   }
 
+  // 이름 복사·끌어 놓기 — 편집기(CodeMirror)는 끌어 온 text/plain 을 놓은 자리에 넣음. SQL 에 바로 쓰도록 필요하면 따옴표 식별자
+  const copyName = (t: string) => {
+    if (!navigator.clipboard) return setNote('이 브라우저는 복사를 지원하지 않습니다(https 필요) — 끌어 놓기를 쓰십시오')
+    void navigator.clipboard.writeText(t).then(() => setNote(`복사했습니다 : ${t}`), () => setNote('복사하지 못했습니다(브라우저 권한)'))
+    window.setTimeout(() => setNote(''), 3000)
+  }
+  // id = 트리 경로(같은 이름 여러 곳 구분), t = 복사·끌기 글자
+  const nameProps = (id: string, t: string) => ({
+    onFocus: () => setPick(id),
+    onKeyDown: (e: React.KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') (e.preventDefault(), copyName(t))
+    },
+    onContextMenu: (e: React.MouseEvent) => (e.preventDefault(), setPick(id), copyName(t)),
+  })
+  // 손잡이 — 끄는 동안 창 이벤트로 추적(편집기 위를 지나가도 끊기지 않음)
+  const splitter = (k: 'l' | 'e') => (
+    <div
+      role="separator"
+      aria-orientation={k === 'l' ? 'vertical' : 'horizontal'}
+      aria-label={k === 'l' ? '탐색기 너비 조절' : '편집기·결과 높이 조절'}
+      title="끌어서 크기 조절(방향키도 가능) · 두 번 누르면 기본 크기"
+      tabIndex={0}
+      aria-valuenow={pane[k]}
+      aria-valuemin={PANE[k].min}
+      aria-valuemax={maxOf(k)}
+      onKeyDown={(e) => {
+        const d = (k === 'l' ? { ArrowLeft: -20, ArrowRight: 20 } : { ArrowUp: -20, ArrowDown: 20 } as Record<string, number>)[e.key] // 손잡이 방향 키만
+        if (!d) return
+        e.preventDefault()
+        setPane((p) => { const v = { ...p, [k]: clampPane(k, p[k] + d) }; store.set('sql-pane', JSON.stringify(v)); return v })
+      }}
+      className={`group flex shrink-0 touch-none items-center justify-center ${k === 'l' ? 'w-2 cursor-col-resize' : 'h-2 cursor-row-resize'}`}
+      onPointerDown={(e) => {
+        e.preventDefault()
+        const a0 = k === 'l' ? e.clientX : e.clientY, v0 = pane[k]
+        let last = pane
+        const move = (ev: PointerEvent) => {
+          const v = clampPane(k, v0 + (k === 'l' ? ev.clientX : ev.clientY) - a0)
+          setPane((p) => (last = { ...p, [k]: v }))
+        }
+        const up = () => {
+          window.removeEventListener('pointermove', move)
+          window.removeEventListener('pointerup', up)
+          window.removeEventListener('pointercancel', up)
+          document.body.style.cursor = ''
+          store.set('sql-pane', JSON.stringify(last))
+        }
+        document.body.style.cursor = k === 'l' ? 'col-resize' : 'row-resize'
+        window.addEventListener('pointermove', move)
+        window.addEventListener('pointerup', up)
+        window.addEventListener('pointercancel', up)
+      }}
+      onDoubleClick={() => setPane((p) => { const v = { ...p, [k]: PANE[k].def }; store.set('sql-pane', JSON.stringify(v)); return v })}
+    >
+      <span className={`rounded-full bg-[#c7d2e6] group-hover:bg-[#3b5f9e] ${k === 'l' ? 'h-16 w-1.5' : 'h-1.5 w-16'}`} />
+    </div>
+  )
+
   if (denied)
     return (
       <main className="mx-auto max-w-3xl px-4 py-6">
@@ -283,6 +364,7 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
           {msg}
         </p>
       )}
+      {note && !msg && <p className="mt-1 text-xs text-gray-600" aria-live="polite">{note}</p>}
       {!conns.some(usable) && conns.length > 0 && <p className="mt-1 text-xs text-gray-600">쓸 수 있는 접속이 없습니다 — 데이터아키텍트가 &lsquo;DDL 생성 › DB 접속&rsquo;에서 서버 직접 접속을 &lsquo;조회 전용 계정&rsquo;으로 지정해야 합니다.</p>}
       {!conns.length && (
         <p className="mt-1 text-xs text-gray-600">
@@ -290,16 +372,16 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
         </p>
       )}
 
-      <div className="mt-2 flex min-h-0 flex-1 gap-2">
-        <nav className="flex w-64 min-w-40 shrink-0 resize-x flex-col overflow-hidden rounded border text-xs" aria-label="데이터베이스 탐색기">
+      <div className="mt-2 flex min-h-0 flex-1">
+        <nav className="flex shrink-0 flex-col overflow-hidden rounded border text-xs" style={{ width: pane.l }} aria-label="데이터베이스 탐색기">
           <input value={kw} onChange={(e) => setKw(e.target.value)} placeholder="이름 필터" className="m-1 rounded border px-2 py-0.5" aria-label="탐색기 이름 필터" />
           <ul className="min-h-0 flex-1 overflow-auto px-1 pb-2 font-mono">
             {schemas.map((s) => {
               const sk = `s:${s.name}`, list = objs[s.name]
               return (
                 <li key={s.name}>
-                  <button type="button" className={`w-full text-left hover:bg-gray-100 ${s.name === schema ? 'font-bold' : ''}`} onClick={() => toggle(sk, () => void loadObjs(s.name))} aria-expanded={open.has(sk)}>
-                    {open.has(sk) ? '▾' : '▸'} 🗄 {s.name}
+                  <button type="button" {...nameProps(sk, qi(s.name, dialect === 'ORA'))} className={`w-full text-left hover:bg-gray-100 ${s.name === schema ? 'font-bold' : ''} ${pick === sk ? 'bg-blue-100' : ''}`} onClick={() => toggle(sk, () => void loadObjs(s.name))} aria-expanded={open.has(sk)}>
+                    {open.has(sk) ? '▾' : '▸'} 🗄 <Drag t={qi(s.name, dialect === 'ORA')}>{s.name}</Drag>
                   </button>
                   {open.has(sk) && (
                     <ul className="pl-3">
@@ -321,9 +403,9 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
                                     return (
                                       <li key={o.name}>
                                         <div className="flex items-center hover:bg-amber-50" title={o.cmt ?? ''}>
-                                          <button type="button" className="min-w-0 flex-1 truncate text-left" onClick={() => rel && toggle(`c:${ok}`, () => void loadCols(s.name, o.name))} onDoubleClick={() => rel && run(false, `SELECT * FROM ${qi(s.name, dialect === 'ORA')}.${qi(o.name, dialect === 'ORA')}`)}>
+                                          <button type="button" {...nameProps(`o:${ok}`, qi(o.name, dialect === 'ORA'))} className={`min-w-0 flex-1 truncate text-left ${pick === `o:${ok}` ? 'bg-blue-100' : ''}`} onClick={() => rel && toggle(`c:${ok}`, () => void loadCols(s.name, o.name))} onDoubleClick={() => rel && run(false, `SELECT * FROM ${qi(s.name, dialect === 'ORA')}.${qi(o.name, dialect === 'ORA')}`)}>
                                             {rel ? (open.has(`c:${ok}`) ? '▾ ' : '▸ ') : '· '}
-                                            {o.name}
+                                            <Drag t={qi(o.name, dialect === 'ORA')}>{o.name}</Drag>
                                           </button>
                                           <span className="ml-1 shrink-0 text-gray-400">{fmtSize(o.size)}</span>
                                         </div>
@@ -333,8 +415,8 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
                                             {Array.isArray(cl) &&
                                               cl.map((c) => (
                                                 <li key={c.name} className="truncate" title={c.type}>
-                                                  <button type="button" className="text-left" onClick={() => ed.current?.insert(c.name)}>
-                                                    {c.pk ? '🔑' : '·'} {c.name} <span className="text-gray-400">{c.type}{c.nn ? ' NN' : ''}</span>
+                                                  <button type="button" {...nameProps(`k:${ok}.${c.name}`, qi(c.name, dialect === 'ORA'))} className={`text-left ${pick === `k:${ok}.${c.name}` ? 'bg-blue-100' : ''}`} onClick={() => ed.current?.insert(qi(c.name, dialect === 'ORA'))}>
+                                                    {c.pk ? '🔑' : '·'} <Drag t={qi(c.name, dialect === 'ORA')}>{c.name}</Drag> <span className="text-gray-400">{c.type}{c.nn ? ' NN' : ''}</span>
                                                   </button>
                                                 </li>
                                               ))}
@@ -354,14 +436,16 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
               )
             })}
           </ul>
-          <p className="border-t px-1 py-0.5 text-[10px] text-gray-500">두 번 누르기 = SELECT 실행 · 칼럼 누르기 = 편집기에 넣기 · 오른쪽 아래 모서리로 너비 조절</p>
+          <p className="border-t px-1 py-0.5 text-[10px] text-gray-500">이름을 편집기로 끌어 놓기 · 고르고 Ctrl+C 또는 오른쪽 누르기 = 이름 복사 · 두 번 누르기 = SELECT 실행 · 칼럼 누르기 = 편집기에 넣기</p>
         </nav>
+        {splitter('l')}
 
-        <div className="flex min-w-0 flex-1 flex-col gap-2">
-          <div className="h-[38%] min-h-24 resize-y overflow-hidden rounded border" aria-label="SQL 편집기">
+        <div className="flex min-w-0 flex-1 flex-col">
+          <div className="shrink-0 overflow-hidden rounded border" style={{ height: pane.e }} aria-label="SQL 편집기">
             {connId && <SqlEditor key={connId} ref={ed} initial={store.get(draftKey) ?? 'SELECT 1;\n'} dialect={dialect} tables={tables} schema={schema || undefined} onChange={(t) => store.set(draftKey, t)} onRun={(s) => void run(s)} />}
           </div>
-          <div className="flex min-h-0 flex-1 flex-col rounded border">
+          {splitter('e')}
+          <div className="flex min-h-20 flex-1 flex-col rounded border">
             <div role="tablist" className="flex gap-1 border-b bg-gray-50 px-1 pt-1 text-xs">
               <button role="tab" aria-selected={tab === 'res'} onClick={() => setTab('res')} className={`rounded-t border px-2 py-0.5 ${tab === 'res' ? 'bg-white font-semibold' : ''}`}>
                 결과
