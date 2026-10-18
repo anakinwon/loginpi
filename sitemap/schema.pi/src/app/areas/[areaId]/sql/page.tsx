@@ -379,7 +379,7 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
           ← 분류체계 목록
         </Link>
         <h1 className="text-xl font-bold">SQL 편집기</h1>
-        <span className="text-xs text-gray-500">Ctrl+Enter 현재 문장 · Alt+X 스크립트 · Ctrl+Space 자동 완성 · Ctrl+/ 주석</span>
+        <span className="text-xs text-gray-500">Ctrl+Enter 현재 문장 · Alt+X 스크립트 · Ctrl+Shift+F 정렬 · Ctrl+Space 자동 완성 · Ctrl+/ 주석</span>
       </div>
       <section className="mt-2 flex flex-wrap items-center gap-2 rounded-xl bg-gradient-to-r from-[#1f3a68] to-[#3b5f9e] px-3 py-1.5 text-sm text-white shadow" aria-label="SQL 실행 도구">
         <select value={connId} disabled={busy} onChange={(e) => (!pending.length || window.confirm(`대기 문장 ${pending.length}개를 버리고(Rollback) 접속을 바꿀까요?`)) && setConnId(e.target.value)} className={sel} aria-label="접속">
@@ -402,6 +402,9 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
         </button>
         <button type="button" className={btn} disabled={!conn || busy} onClick={() => run(true)} title="Alt+X">
           ▶▶ 스크립트
+        </button>
+        <button type="button" className={btn} disabled={!conn} onClick={() => ed.current?.format()} title="Ctrl+Shift+F — 선택 영역(없으면 커서 문장)을 강 정렬(키워드 끝 6열)로 다시 배치">
+          ≡ 정렬
         </button>
         <span className="ml-auto flex items-center gap-2">
           {canWrite ? (

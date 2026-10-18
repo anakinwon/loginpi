@@ -9,21 +9,22 @@ export type Danger = 'NO_WHERE' | 'DROP' | 'TRUNCATE' | 'ALTER'
 
 // 문자열·주석 → 공백(글자 수 그대로 — 위치 유지, 문자열·블록 주석 안 줄바꿈도 가려 빈 줄 구분에 안 걸림)
 // keepIdent : 따옴표 식별자 안 글자는 남기고 따옴표만 지움(code — 부작용 함수 판정용, "pg_terminate_backend"(…) 우회 차단)
-export function maskSql(text: string, d: Dialect, keepIdent = false): string {
+// cmt : 주석을 채울 글자(기본 공백) — 들여쓰기 정렬이 주석 유무를 가릴 때 다른 글자로
+export function maskSql(text: string, d: Dialect, keepIdent = false, cmt = ' '): string {
   const out = text.split('')
-  const blank = (a: number, b: number) => { for (let k = a; k < b; k++) out[k] = ' ' }
+  const blank = (a: number, b: number, ch = ' ') => { for (let k = a; k < b; k++) out[k] = ch }
   let i = 0
   const n = text.length
   while (i < n) {
     const c = text[i], c2 = text.slice(i, i + 2)
-    if (c2 === '--') { const e = text.indexOf('\n', i); const end = e < 0 ? n : e; blank(i, end); i = end; continue }
+    if (c2 === '--') { const e = text.indexOf('\n', i); const end = e < 0 ? n : e; blank(i, end, cmt); i = end; continue }
     if (c2 === '/*') {
       // 중첩 주석은 PostgreSQL 만 — Oracle 은 첫 */ 에서 끝남(해석 차이로 숨은 문장 방지)
       let depth = 0, j = i
       while (j < n) {
         if (text.startsWith('/*', j) && (d === 'PG' || !depth)) { depth++; j += 2 } else if (text.startsWith('*/', j)) { depth--; j += 2; if (!depth) break } else j++
       }
-      blank(i, j); i = j; continue
+      blank(i, j, cmt); i = j; continue
     }
     if (d === 'ORA' && /[qQ]/.test(c) && text[i + 1] === "'" && !/\w/.test(text[i - 1] ?? '')) {
       const open = text[i + 2] ?? '', close = ({ '[': ']', '{': '}', '(': ')', '<': '>' } as Record<string, string>)[open] ?? open
@@ -145,7 +146,7 @@ export const DANGER_NM: Record<Danger, string> = { NO_WHERE: 'WHERE 없는 UPDAT
 export const quoteIdent = (n: string, d: Dialect) => ((d === 'ORA' ? /^[A-Z][A-Z0-9_$#]*$/ : /^[a-z_][a-z0-9_$]*$/).test(n) ? n : `"${n.replace(/"/g, '""')}"`)
 
 // 입력 중 예약어 대문자(DBeaver 'Convert keyword case') — 흔한 칼럼명(name·type·value·key·data 등)은 빼고 예약어 위주로
-const KW = new Set(('SELECT FROM WHERE AND OR NOT IN IS NULL AS ON JOIN LEFT RIGHT INNER OUTER FULL CROSS NATURAL USING GROUP BY ORDER HAVING LIMIT OFFSET FETCH FIRST NEXT ROWS ONLY ' +
+export const KW = new Set(('SELECT FROM WHERE AND OR NOT IN IS NULL AS ON JOIN LEFT RIGHT INNER OUTER FULL CROSS NATURAL USING GROUP BY ORDER HAVING LIMIT OFFSET FETCH FIRST NEXT ROWS ONLY ' +
   'UNION INTERSECT EXCEPT MINUS ALL ANY SOME DISTINCT INSERT INTO VALUES UPDATE SET DELETE MERGE MATCHED CREATE TABLE ALTER DROP TRUNCATE INDEX UNIQUE VIEW SEQUENCE SCHEMA ' +
   'PRIMARY FOREIGN REFERENCES CONSTRAINT CHECK DEFAULT CASCADE RESTRICT CASE WHEN THEN ELSE END EXISTS BETWEEN LIKE ILIKE ESCAPE ASC DESC NULLS WITH RECURSIVE RETURNING ' +
   'GRANT REVOKE TRUE FALSE CAST OVER PARTITION WINDOW LATERAL TEMPORARY TEMP REPLACE TRIGGER FUNCTION PROCEDURE RETURNS LANGUAGE DECLARE BEGIN COMMIT ROLLBACK EXPLAIN ANALYZE ' +
