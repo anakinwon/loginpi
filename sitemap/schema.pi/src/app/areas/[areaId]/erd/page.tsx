@@ -131,7 +131,9 @@ const addOn = (asst: string | null | undefined, syn: string | string[] | null | 
 }
 const title = (e: Ent, phy: boolean, o: Nmo = NMO_DEF) =>
   phy ? `${e.tbl_phy_nm}${o.pTblEnt ? ` (${e.ent_log_nm})` : ''}${addOn(e.ent_asst_nm, e.ent_syns, o.pTblAsst, o.pTblSyn)}` : `${e.ent_log_nm}${o.lEntPhy ? ` (${e.tbl_phy_nm})` : ''}${addOn(e.ent_asst_nm, e.ent_syns, o.lEntAsst, o.lEntSyn)}`
-const sizeOf = (e: Ent, lvl: Lvl, phy: boolean, o: Nmo = NMO_DEF) => boxSize(title(e, phy, o), lines(e, lvl, phy, 'IE', o))
+// 물리 표시 = '물리명' 체크 또는 표시 수준 물리(마스터 지시 2026-10-18 : 물리 모델일 때 테이블명(엔터티명))
+const isPhy = (lvl: Lvl, phy: boolean) => phy || lvl === 'PHY'
+const sizeOf = (e: Ent, lvl: Lvl, phy: boolean, o: Nmo = NMO_DEF) => boxSize(title(e, isPhy(lvl, phy), o), lines(e, lvl, phy, 'IE', o))
 
 const SIDES = [
   ['t', Position.Top],
@@ -153,7 +155,7 @@ function EntNode({ data, selected }: NodeProps<ENode>) {
         </span>
       ))}
       <div style={{ background: c.head }} className="flex items-center gap-1 px-2 py-1 font-semibold text-white">
-        <span className="truncate" title={title(e, phy, nmo)}>{title(e, phy, nmo)}</span>
+        <span className="truncate" title={title(e, isPhy(lvl, phy), nmo)}>{title(e, isPhy(lvl, phy), nmo)}</span>
         {fix && <span title="고정(자동 배치가 옮기지 않음)">📌</span>}
         {e.ref && <span className="ml-auto rounded bg-white/25 px-1 text-[10px]">참조 · {e.subj_nm}</span>}
       </div>
@@ -618,7 +620,7 @@ function Erd({ areaId }: { areaId: string }) {
   const sheets = pr.mode === 'fit' ? [{ no: 1, t: printFit([...geo.boxes.values()], page.cw, page.ch) }] : page.grid.tiles.map((t) => ({ no: t.no, t: { x: -(page.grid.x0 + t.c * page.cw), y: -(page.grid.y0 + t.r * page.ch), zoom: 1 } }))
   const selEnt = ents.find((e) => e.ent_id === sel)
   const selRelObj = rels.find((r) => r.rel_id === selRel)
-  const entNm = (id: string) => { const e = ents.find((x) => x.ent_id === id); return e ? (phy ? e.tbl_phy_nm : e.ent_log_nm) : '' }
+  const entNm = (id: string) => { const e = ents.find((x) => x.ent_id === id); return e ? (isPhy(lvl, phy) ? `${e.tbl_phy_nm} (${e.ent_log_nm})` : e.ent_log_nm) : '' }
   const tree = useMemo(() => {
     const g = new Map<string, Ent[]>()
     for (const e of ents) g.set(e.subj_nm, [...(g.get(e.subj_nm) ?? []), e])
@@ -765,7 +767,7 @@ function Erd({ areaId }: { areaId: string }) {
                 {es.map((e) => (
                   <li key={e.ent_id}>
                     <button type="button" onClick={() => focus(e.ent_id)} aria-current={sel === e.ent_id} className={`w-full truncate px-3 py-1 text-left ${sel === e.ent_id ? 'bg-amber-100' : 'hover:bg-gray-50'}`}>
-                      <span style={{ color: (TP_COLOR[e.ent_tp_cd] ?? TP_COLOR.BASE).border }}>■</span> {phy ? e.tbl_phy_nm : e.ent_log_nm}
+                      <span style={{ color: (TP_COLOR[e.ent_tp_cd] ?? TP_COLOR.BASE).border }}>■</span> {isPhy(lvl, phy) ? `${e.tbl_phy_nm} (${e.ent_log_nm})` : e.ent_log_nm}
                       {e.ref && <span className="ml-1 text-xs text-gray-500">참조</span>}
                     </button>
                   </li>
