@@ -17,6 +17,7 @@ import { useRouter } from 'next/navigation'
 import { use, useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { DANGER_NM, quoteIdent, splitSql, stmtAt, type Danger } from '@/lib/modelpi/sql-split'
+import { applyBinds, bindNames } from '@/lib/modelpi/sql-bind'
 import ResultPanel, { type RunMode, type RunRes } from './result-grid'
 import type { EdHandle } from './sql-editor'
 
@@ -155,6 +156,8 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
   // 떠나기 확인 창 — why = 무엇을 하려는지, go = Commit·Rollback 뒤 이어서 할 일, cancel = 취소 때 할 일
   const router = useRouter()
   const [leave, setLeave] = useState<{ why: string; go: () => void; cancel?: () => void } | null>(null)
+  // 바인드 변수 창(DBeaver 'Bind parameter(s)') — :이름 값 입력 후 넣어 실행, 값은 이름별로 기억
+  const [bind, setBind] = useState<{ text: string; names: string[]; vals: Record<string, string>; err: string; go: (t: string) => void } | null>(null)
   useEffect(() => {
     if (leave) setMsg('') // 창을 열 때 이전 실행 오류는 지움(창 안에는 이번 Commit 결과만)
   }, [leave])
@@ -324,7 +327,7 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
     })
 
   // 실행 — script = 전체(Alt+X), 아니면 선택 영역 또는 커서가 든 문장(그 문장을 선택해 보여 줌)
-  async function run(script: boolean, sqlText?: string, confirm = false, lim = limit): Promise<void> {
+  async function run(script: boolean, sqlText?: string, confirm = false, lim = limit, bound = false): Promise<void> {
     if (!conn || busy) return
     if (manual && pending.length >= PENDING_MAX) return setMsg(`대기 문장이 ${PENDING_MAX}개입니다 — Commit 또는 Rollback 하십시오`)
     let text = sqlText
@@ -339,6 +342,12 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
         text = st.txt
       }
     }
+    // :이름 이 있으면 값부터 묻기(무시 = 그대로 실행) — 위험 확인 재실행·전체 패치는 이미 넣은 문장이라 다시 묻지 않음
+    const names = bound ? [] : bindNames(text!, dialect)
+    if (names.length) {
+      const vals = Object.fromEntries(names.map((n) => [n, store.get(`sqlbind:${n}`) ?? '']))
+      return setBind({ text: text!, names, vals, err: '', go: (t) => void run(script, t, confirm, lim, true) })
+    }
     setBusy(true), setMsg(''), setTab('res')
     const cid = conn.conn_id
     try {
@@ -347,7 +356,7 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
       if (connRef.current !== cid) return // 요청 중 접속을 바꿈
       if (j.code === 'SQL_CONFIRM') {
         const list = (j.detail as { seq: number; txt: string; danger: Danger }[]).map((d) => `${d.seq}. [${DANGER_NM[d.danger]}]\n${d.txt}`).join('\n\n')
-        if (window.confirm(`위험한 문장이 있습니다 — 그래도 실행할까요?\n\n${list}`)) return void (setBusy(false), await run(script, text, true, lim))
+        if (window.confirm(`위험한 문장이 있습니다 — 그래도 실행할까요?\n\n${list}`)) return void (setBusy(false), await run(script, text, true, lim, true))
         return setMsg('실행을 취소했습니다')
       }
       if (!j.ok) return setMsg(`${j.message}${j.detail ? ` — ${typeof j.detail === 'string' ? j.detail : (j.detail.txt ?? JSON.stringify(j.detail))}` : ''}`)
@@ -645,7 +654,7 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
             </div>
             <div className="min-h-0 flex-1">
               {tab === 'res' ? (
-                out ? <ResultPanel results={out.results} ms={out.ms} at={out.at} mode={out.mode} dialect={dialect} fetch={{ limit, sizes: SIZES, all: ALL, setLimit, busy, canAll: !!last, fetchAll: () => void (last ? run(false, last, false, ALL) : setMsg('먼저 실행하십시오')) }} /> : <p className="p-3 text-sm text-gray-500">문장에 커서를 두고 Ctrl+Enter 를 누르십시오.</p>
+                out ? <ResultPanel results={out.results} ms={out.ms} at={out.at} mode={out.mode} dialect={dialect} fetch={{ limit, sizes: SIZES, all: ALL, setLimit, busy, canAll: !!last, fetchAll: () => void (last ? run(false, last, false, ALL, true) : setMsg('먼저 실행하십시오')) }} /> : <p className="p-3 text-sm text-gray-500">문장에 커서를 두고 Ctrl+Enter 를 누르십시오.</p>
               ) : (
                 <div className="flex h-full flex-col">
                   <div className="min-h-0 flex-1 overflow-auto">
@@ -696,6 +705,79 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
           </div>
         </div>
       </div>
+      {bind &&
+        createPortal(
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onKeyDown={(e) => e.key === 'Escape' && setBind(null)}>
+            <form
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="bind-title"
+              className="flex max-h-[90vh] w-full max-w-2xl flex-col rounded-xl bg-white p-4 text-sm shadow-xl"
+              onSubmit={(e) => {
+                e.preventDefault()
+                const empty = bind.names.filter((n) => !bind.vals[n].trim())
+                if (empty.length) return setBind({ ...bind, err: `값을 입력하십시오 : ${empty.map((n) => `:${n}`).join(', ')} (NULL 은 NULL 로)` })
+                for (const n of bind.names) store.set(`sqlbind:${n}`, bind.vals[n])
+                const t = applyBinds(bind.text, dialect, bind.vals)
+                setBind(null), bind.go(t)
+              }}
+            >
+              <h2 id="bind-title" className="text-base font-bold text-[#1f3a68]">
+                바인드 변수 {bind.names.length}개
+              </h2>
+              <div className="mt-2 max-h-56 overflow-auto rounded border">
+                <table data-grid className="w-full border-collapse text-xs">
+                  <thead className="sticky top-0 bg-gray-100">
+                    <tr>
+                      <th className="w-10 border px-2 py-1">#</th>
+                      <th className="w-40 border px-2 py-1 text-left">Name</th>
+                      <th className="border px-2 py-1 text-left">Value</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {bind.names.map((n, i) => (
+                      <tr key={n}>
+                        <td className="border px-2 py-1 text-center text-gray-500">{i + 1}</td>
+                        <td className="border px-2 py-1 font-mono">:{n}</td>
+                        <td className="border p-0.5">
+                          <input
+                            autoFocus={i === 0}
+                            value={bind.vals[n]}
+                            onChange={(e) => setBind({ ...bind, err: '', vals: { ...bind.vals, [n]: e.target.value } })}
+                            className="w-full rounded border border-transparent px-1.5 py-1 font-mono focus:border-blue-400 focus:outline-none"
+                            aria-label={`:${n} 값`}
+                            placeholder="예 : 1 · 'abc' · now() · NULL"
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <pre className="mt-2 max-h-48 min-h-16 overflow-auto rounded border bg-gray-50 p-2 font-mono text-xs whitespace-pre" aria-label="실행할 SQL">
+                {applyBinds(bind.text, dialect, Object.fromEntries(Object.entries(bind.vals).filter(([, v]) => v.trim())))}
+              </pre>
+              <p className="mt-2 text-xs text-gray-600">Tab 으로 칸 이동, Enter = 확인. 값은 SQL 식 그대로 들어갑니다 — 문자열은 &apos;따옴표&apos;로, 식(now()·1+1) 사용 가능. 값은 이름별로 기억합니다.</p>
+              {bind.err && (
+                <p role="alert" className="mt-1 text-xs font-medium text-red-700">
+                  {bind.err}
+                </p>
+              )}
+              <div className="mt-3 flex flex-wrap justify-end gap-2">
+                <button type="button" className="rounded border px-3 py-1" title="값을 넣지 않고 :이름 그대로 실행" onClick={() => (setBind(null), bind.go(bind.text))}>
+                  무시
+                </button>
+                <button type="submit" className="rounded bg-[#1f3a68] px-4 py-1 font-semibold text-white">
+                  확인
+                </button>
+                <button type="button" className="rounded border px-3 py-1" onClick={() => setBind(null)}>
+                  취소
+                </button>
+              </div>
+            </form>
+          </div>,
+          document.body,
+        )}
       {/* 확인 창은 body 로 — fixed main(z-30) 쌓임 맥락 밖이라 하단 메뉴(z-40)까지 덮음 */}
       {leave &&
         createPortal(
