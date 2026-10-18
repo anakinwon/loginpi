@@ -8,7 +8,7 @@ import { piFetch } from '@pi/auth/client'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { use, useCallback, useEffect, useRef, useState } from 'react'
-import { DANGER_NM, splitSql, stmtAt, type Danger } from '@/lib/modelpi/sql-split'
+import { DANGER_NM, quoteIdent, splitSql, stmtAt, type Danger } from '@/lib/modelpi/sql-split'
 import ResultPanel, { type RunRes } from './result-grid'
 import type { EdHandle } from './sql-editor'
 
@@ -57,7 +57,7 @@ const KIND: [string, string][] = [
 const DBMS_NM: Record<string, string> = { '0014': 'PostgreSQL', '0001': 'Oracle' }
 const LIMITS = [200, 1000, 5000] as const
 // 식별자 따옴표 — 카탈로그 이름이 그대로 SQL 이 되지 않게(예: 테이블명 'x; DROP …'), 단순 이름(PG 소문자·Oracle 대문자)은 그대로
-const qi = (n: string, ora: boolean) => ((ora ? /^[A-Z][A-Z0-9_$#]*$/ : /^[a-z_][a-z0-9_$]*$/).test(n) ? n : `"${n.replace(/"/g, '""')}"`)
+const qi = (n: string, ora: boolean) => quoteIdent(n, ora ? 'ORA' : 'PG')
 const HSIZE = 20
 // 패널 크기(px) — l 탐색기 너비, e 편집기 높이
 const PANE = { l: { min: 160, max: 720, def: 256 }, e: { min: 80, max: 1600, def: 300 } } as const
@@ -456,7 +456,7 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
             </div>
             <div className="min-h-0 flex-1">
               {tab === 'res' ? (
-                out ? <ResultPanel results={out.results} ms={out.ms} /> : <p className="p-3 text-sm text-gray-500">문장에 커서를 두고 Ctrl+Enter 를 누르십시오.</p>
+                out ? <ResultPanel results={out.results} ms={out.ms} dialect={dialect} /> : <p className="p-3 text-sm text-gray-500">문장에 커서를 두고 Ctrl+Enter 를 누르십시오.</p>
               ) : (
                 <div className="flex h-full flex-col">
                   <div className="min-h-0 flex-1 overflow-auto">

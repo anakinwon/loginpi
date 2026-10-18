@@ -1,11 +1,13 @@
 'use client'
 // SQL 편집기 입력 칸(CodeMirror 6 + lang-sql, 2026-10-18) — PostgreSQL / PLSQL 방언 구문 강조·자동 완성(키워드 + 스키마 테이블·칼럼)
 // 단축키(DBeaver 와 같게) : Ctrl+Enter = 현재 문장(선택 영역이 있으면 선택만), Alt+X = 스크립트 전체, Ctrl+/ = 주석(basicSetup), Ctrl+Space = 자동 완성
+// 입력 중 예약어 대문자 : 단어 뒤에 공백·줄바꿈·; ( ) , 를 치면 직전 단어가 예약어일 때 대문자로(문자열·주석·식별자 제외, kwUpper)
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 import { basicSetup, EditorView } from 'codemirror'
 import { keymap } from '@codemirror/view'
 import { Compartment, EditorState, Prec } from '@codemirror/state'
 import { PLSQL, PostgreSQL, sql } from '@codemirror/lang-sql'
+import { kwUpper } from '@/lib/modelpi/sql-split'
 
 export type EdState = { text: string; sel: string; from: number; to: number; cursor: number }
 export type EdHandle = { get(): EdState; set(text: string): void; insert(text: string): void; select(from: number, to: number): void; focus(): void }
@@ -42,6 +44,14 @@ const SqlEditor = forwardRef<EdHandle, Props>(function SqlEditor(p, ref) {
             ]),
           ),
           basicSetup,
+          EditorState.transactionFilter.of((tr) => {
+            if (!tr.docChanged || !tr.isUserEvent('input') || tr.isUserEvent('input.paste') || tr.isUserEvent('input.drop')) return tr // 타이핑만(붙여넣기·끌어 놓기 글은 그대로)
+            const ins: { at: number; text: string }[] = []
+            tr.changes.iterChanges((fA, tA, _fB, _tB, t) => void (fA === tA && ins.push({ at: fA, text: t.toString() })))
+            if (ins.length !== 1 || !/^[\s;(),]/.test(ins[0].text)) return tr
+            const k = kwUpper(tr.startState.sliceDoc(0, ins[0].at), cb.current.dialect)
+            return k ? [tr, { changes: { from: k.from, to: k.to, insert: k.upper }, sequential: true }] : tr
+          }),
           lang.current.of(langOf(cb.current)),
           EditorView.updateListener.of((u) => {
             if (u.docChanged) cb.current.onChange(u.state.doc.toString())

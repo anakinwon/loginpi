@@ -140,3 +140,24 @@ export function danger(s: Pick<Stmt, 'mask'>): Danger | null {
 }
 
 export const DANGER_NM: Record<Danger, string> = { NO_WHERE: 'WHERE 없는 UPDATE·DELETE(전체 행)', DROP: '객체 삭제(DROP)', TRUNCATE: '전체 행 삭제(TRUNCATE)', ALTER: '구조 변경(ALTER)' }
+
+// 식별자 표기 — 단순 이름(PG 소문자·Oracle 대문자)은 그대로, 그 밖은 따옴표 식별자(카탈로그·결과 칼럼 이름을 SQL 로 옮길 때)
+export const quoteIdent = (n: string, d: Dialect) => ((d === 'ORA' ? /^[A-Z][A-Z0-9_$#]*$/ : /^[a-z_][a-z0-9_$]*$/).test(n) ? n : `"${n.replace(/"/g, '""')}"`)
+
+// 입력 중 예약어 대문자(DBeaver 'Convert keyword case') — 흔한 칼럼명(name·type·value·key·data 등)은 빼고 예약어 위주로
+const KW = new Set(('SELECT FROM WHERE AND OR NOT IN IS NULL AS ON JOIN LEFT RIGHT INNER OUTER FULL CROSS NATURAL USING GROUP BY ORDER HAVING LIMIT OFFSET FETCH FIRST NEXT ROWS ONLY ' +
+  'UNION INTERSECT EXCEPT MINUS ALL ANY SOME DISTINCT INSERT INTO VALUES UPDATE SET DELETE MERGE MATCHED CREATE TABLE ALTER DROP TRUNCATE INDEX UNIQUE VIEW SEQUENCE SCHEMA ' +
+  'PRIMARY FOREIGN REFERENCES CONSTRAINT CHECK DEFAULT CASCADE RESTRICT CASE WHEN THEN ELSE END EXISTS BETWEEN LIKE ILIKE ESCAPE ASC DESC NULLS WITH RECURSIVE RETURNING ' +
+  'GRANT REVOKE TRUE FALSE CAST OVER PARTITION WINDOW LATERAL TEMPORARY TEMP REPLACE TRIGGER FUNCTION PROCEDURE RETURNS LANGUAGE DECLARE BEGIN COMMIT ROLLBACK EXPLAIN ANALYZE ' +
+  'COUNT SUM AVG MIN MAX COALESCE NVL DECODE ROWNUM SYSDATE CURRENT_DATE CURRENT_TIMESTAMP INTERVAL').split(' '))
+
+// before = 커서 앞 글 전체(방금 경계 문자를 치기 직전). 끝 단어가 예약어이고 문자열·주석·식별자·a.b 의 b 가 아니면 바꿀 위치·대문자
+export function kwUpper(before: string, d: Dialect): { from: number; to: number; upper: string } | null {
+  const m = /(^|[^\w$."])([A-Za-z_]+)$/.exec(before)
+  if (!m) return null
+  const word = m[2], up = word.toUpperCase()
+  if (word === up || !KW.has(up)) return null
+  const from = before.length - word.length
+  if (maskSql(before, d).slice(from) !== word) return null // 문자열·주석 안
+  return { from, to: before.length, upper: up }
+}

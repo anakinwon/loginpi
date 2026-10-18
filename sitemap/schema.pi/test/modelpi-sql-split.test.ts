@@ -73,3 +73,16 @@ test('위험 : WHERE 없는 UPDATE·DELETE, DROP·TRUNCATE·ALTER', () => {
   assert.equal(dg('SELECT 1'), null)
   assert.equal(dg('INSERT INTO t VALUES (1)'), null)
 })
+
+test('예약어 대문자·식별자 표기', async () => {
+  const { kwUpper, quoteIdent } = await import('../src/lib/modelpi/sql-split.ts')
+  assert.deepEqual(kwUpper('select', 'PG'), { from: 0, to: 6, upper: 'SELECT' })
+  assert.deepEqual(kwUpper('SELECT * from', 'PG'), { from: 9, to: 13, upper: 'FROM' })
+  for (const t of ['SELECT name', 'SELECT type', "SELECT 'from", '-- from', 'SELECT t.from', 'SELECT "from', 'SELECT FROM', 'SELECT xfrom', 'SELECT from_dt']) assert.equal(kwUpper(t, 'PG'), null, t)
+  assert.deepEqual(kwUpper("SELECT 'a' from", 'PG')?.upper, 'FROM')
+  assert.equal(quoteIdent('std_dic', 'PG'), 'std_dic')
+  assert.equal(quoteIdent('MyTbl', 'PG'), '"MyTbl"')
+  assert.equal(quoteIdent('a"b', 'PG'), '"a""b"')
+  assert.equal(quoteIdent('STD_DIC', 'ORA'), 'STD_DIC')
+  assert.equal(quoteIdent('std_dic', 'ORA'), '"std_dic"')
+})
