@@ -1,7 +1,7 @@
 // ERD 관계선 기하 단위 테스트 — 변 위 점·가까운 변·끝점 투영·같은 변 선 나눔
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { autoAnchors, nearSides, project, sidePoint } from '../src/lib/modelpi/edge-geo.ts'
+import { autoAnchors, halfDash, nearSides, project, sidePoint } from '../src/lib/modelpi/edge-geo.ts'
 
 const A = { x: 0, y: 0, w: 100, h: 50 }
 const B = { x: 300, y: 0, w: 100, h: 50 }
@@ -40,4 +40,12 @@ test('같은 변에 모인 선은 고르게 나눔(상대 박스 위치 순)', (
   // 자기 관계 = 오른쪽 → 위
   const s = autoAnchors([{ id: 's', from: 'd', to: 'd' }], boxes).get('s')!
   assert.deepEqual([s.ps, s.cs], ['R', 'T'])
+})
+
+test('바커 반쪽 선 — 앞·뒤 절반, 실선·점선', () => {
+  assert.equal(halfDash(100, 'first', false), '50 100')
+  assert.equal(halfDash(100, 'second', false), '0 50 50 100')
+  // 앞 절반 점선 : 6·4 를 50 까지(마지막 dash 는 남은 길이) 후 나머지 숨김
+  assert.equal(halfDash(100, 'first', true), '6 4 6 4 6 4 6 4 6 4 0 100')
+  assert.equal(halfDash(24, 'second', true), '0 12 6 4 2 4 0 24')
 })

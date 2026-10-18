@@ -11,14 +11,16 @@ import { piFetch } from '@pi/auth/client'
 //   자동 = 가까운 변 + 같은 변에 모인 선 고르게 나눔(modelpi/edge-geo.ts). 옮긴 선만 배치 저장 때 함께 저장(sql/034 mdl_dgm_rel)
 //  인쇄(마스터 지시 2026-10-18) : 툴바 용지·방향 + '페이지 가이드' = 캔버스에 100% 크기 페이지 경계 점선(쪽 번호). 🖨 인쇄 = 미리보기(body 직속 포털)
 //   — 화면 그림(.react-flow__viewport)을 복사해 쪽마다 위치만 바꿔 그림 : '한 장에 맞춤' 또는 '가이드대로 나눔(엔터티 없는 쪽 제외)', @page 용지 지정, 인쇄 때 미리보기 밖은 숨김
+//  표기법(마스터 지시 2026-10-18) : IE(ERwin 정보공학) / 바커(DA#) 선택(이 브라우저에 기억). 바커 = 둥근 박스·# * o, 선 반쪽 실선(필수)·점선(선택),
+//   까마귀발 = 여러 건, 식별 관계 = 자식 쪽 가로 막대(UID bar). 부모 쪽 반 = 부모의 자식 참여(chld_opt_yn), 자식 쪽 반 = 자식의 부모 참여(prnt_opt_yn)
 import '@xyflow/react/dist/style.css'
 import { Background, BaseEdge, Controls, EdgeLabelRenderer, getSmoothStepPath, Handle, MiniMap, Position, ReactFlow, ReactFlowProvider, useNodesState, useReactFlow, ViewportPortal, type Edge, type EdgeProps, type Node, type NodeProps } from '@xyflow/react'
 import Link from 'next/link'
-import { use, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { use, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { dbmsList } from '@/lib/modelpi/dbms'
 import { autoLayout, boxSize } from '@/lib/modelpi/layout'
-import { autoAnchors, project, sidePoint, type Box, type Pt, type RelLyt, type Side } from '@/lib/modelpi/edge-geo'
+import { autoAnchors, halfDash, project, sidePoint, type Box, type Pt, type RelLyt, type Side } from '@/lib/modelpi/edge-geo'
 import { fitView as printFit, pageGrid, PAPER, printArea, type Orient } from '@/lib/modelpi/print'
 import { can, type MbrRole } from '@/lib/roles'
 import Attrs from '../model/attrs'
@@ -65,7 +67,13 @@ interface Rel {
   chld_opt_yn: string
 }
 type Lvl = 'CNCP' | 'LGCL' | 'PHY'
-type EntData = { ent: Ent; lvl: Lvl; phy: boolean; fix: boolean }
+type Nt = 'IE' | 'BK' // 표기법 : IE(ERwin 정보공학) / BK(바커, DA#)
+type EntData = { ent: Ent; lvl: Lvl; phy: boolean; fix: boolean; nt?: Nt }
+const NT_NM: Record<Nt, string> = { IE: 'IE 표기(ERwin)', BK: '바커 표기(DA#)' }
+const LEGEND: Record<Nt, string> = {
+  IE: '실선 = 식별 관계 · 점선 = 비식별 관계 · 까마귀발 = 여러 건 · ○ = 선택 · 🔑 주식별자 · ↗ 상속(FK) · * 필수',
+  BK: '바커 표기 : 선 반쪽 실선 = 반드시(필수) · 점선 = 선택 · 까마귀발 = 여러 건 · 가로 막대 = 식별 관계(UID) · # 식별자 · * 필수 · o 선택',
+}
 type ENode = Node<EntData, 'ent'>
 
 // 엔터티 유형별 색(E5) — BASE 실체·기준 / ACT 행위 / AGG 집계
@@ -76,8 +84,15 @@ const TP_COLOR: Record<string, { head: string; border: string; nm: string }> = {
 }
 const LVL_NM: Record<Lvl, string> = { CNCP: '개념(이름)', LGCL: '논리(속성·키)', PHY: '물리(칼럼·도메인)' }
 
-const lines = (e: Ent, lvl: Lvl, phy: boolean) =>
-  lvl === 'CNCP' ? [] : e.attrs.map((a) => `${a.pk_yn === 'Y' ? '🔑' : a.fk_rel_id ? '↗' : '·'} ${phy || lvl === 'PHY' ? a.term_phy_nm : a.term_log_nm}${lvl === 'PHY' && a.dom_nm ? ` ${a.dom_nm}` : ''}${a.esntl_yn === 'Y' && a.pk_yn !== 'Y' ? ' *' : ''}`)
+// 속성 줄 — IE : 🔑 주식별자·↗ 상속·· 일반 + 끝 * 필수 / 바커 : # 식별자·* 필수·o 선택(앞 기호)
+const lines = (e: Ent, lvl: Lvl, phy: boolean, nt: Nt = 'IE') =>
+  lvl === 'CNCP'
+    ? []
+    : e.attrs.map((a) => {
+        const nm = `${phy || lvl === 'PHY' ? a.term_phy_nm : a.term_log_nm}${lvl === 'PHY' && a.dom_nm ? ` ${a.dom_nm}` : ''}`
+        if (nt === 'BK') return `${a.pk_yn === 'Y' ? '#' : a.esntl_yn === 'Y' ? '*' : 'o'} ${nm}`
+        return `${a.pk_yn === 'Y' ? '🔑' : a.fk_rel_id ? '↗' : '·'} ${nm}${a.esntl_yn === 'Y' && a.pk_yn !== 'Y' ? ' *' : ''}`
+      })
 const title = (e: Ent, phy: boolean) => (phy ? e.tbl_phy_nm : e.ent_log_nm)
 const sizeOf = (e: Ent, lvl: Lvl, phy: boolean) => boxSize(title(e, phy), lines(e, lvl, phy))
 
@@ -89,11 +104,11 @@ const SIDES = [
 ] as const
 
 function EntNode({ data, selected }: NodeProps<ENode>) {
-  const { ent: e, lvl, phy, fix } = data
+  const { ent: e, lvl, phy, fix, nt = 'IE' } = data
   const c = TP_COLOR[e.ent_tp_cd] ?? TP_COLOR.BASE
   const { w, h } = sizeOf(e, lvl, phy)
   return (
-    <div style={{ width: w, minHeight: h, borderColor: c.border, borderStyle: e.ref ? 'dashed' : 'solid' }} className={`rounded border-2 bg-white text-xs shadow-sm ${selected ? 'ring-2 ring-amber-400' : ''}`}>
+    <div style={{ width: w, minHeight: h, borderColor: c.border, borderStyle: e.ref ? 'dashed' : 'solid' }} className={`${nt === 'BK' ? 'overflow-hidden rounded-2xl' : 'rounded'} border-2 bg-white text-xs shadow-sm ${selected ? 'ring-2 ring-amber-400' : ''}`}>
       {SIDES.map(([k, p]) => (
         <span key={k}>
           <Handle type="source" id={`s-${k}`} position={p} className="!h-1 !w-1 !border-0 !bg-transparent" />
@@ -107,7 +122,7 @@ function EntNode({ data, selected }: NodeProps<ENode>) {
       </div>
       {lvl !== 'CNCP' && (
         <ul className="px-2 py-1 font-mono leading-[18px]">
-          {lines(e, lvl, phy).map((l, i) => (
+          {lines(e, lvl, phy, nt).map((l, i) => (
             <li key={i} className={`truncate ${e.attrs[i]?.pk_yn === 'Y' ? 'font-semibold' : ''}`}>
               {l}
             </li>
@@ -122,7 +137,7 @@ const nodeTypes = { ent: EntNode }
 
 // 관계선(사용자 정의 선) — 끝점·꺾임점은 부모 화면이 계산해 data 로 넘김. 선택된 선(편집 권한)만 손잡이 3개
 type Grip = 's' | 't' | 'm'
-type RelData = { sp: Pt; tp: Pt; ps: Side; cs: Side; mx: number | null; my: number | null; edit: boolean; onDrag: (id: string, k: Grip, screen: Pt) => void; onReset: (id: string) => void }
+type RelData = { sp: Pt; tp: Pt; ps: Side; cs: Side; mx: number | null; my: number | null; edit: boolean; onDrag: (id: string, k: Grip, screen: Pt) => void; onReset: (id: string) => void; bk?: { p: boolean; c: boolean } } // bk = 바커 반쪽 점선 여부(부모 쪽·자식 쪽)
 type REdge = Edge<RelData, 'rel'>
 const POS: Record<Side, Position> = { T: Position.Top, R: Position.Right, B: Position.Bottom, L: Position.Left }
 const GRIP_NM: Record<Grip, string> = { s: '부모 끝점 — 끌어서 박스 변을 따라 이동', t: '자식 끝점 — 끌어서 박스 변을 따라 이동', m: '꺾임점 — 끌어서 가운데 선 이동' }
@@ -152,16 +167,33 @@ function RelEdge({ id, data, markerStart, markerEnd, style, label, labelStyle, s
   // 꺾임점 손잡이 = 가운데 선 위 : 좌우 변끼리면 세로 선(x 만 의미), 위아래 변끼리면 가로 선(y 만 의미), 섞이면 꺾임 1번이라 손잡이 없음
   const hz = (s: Side) => s === 'L' || s === 'R'
   const mid = hz(d.ps) && hz(d.cs) ? { x: d.mx ?? lx, y: (d.sp.y + d.tp.y) / 2 } : !hz(d.ps) && !hz(d.cs) ? { x: (d.sp.x + d.tp.x) / 2, y: d.my ?? ly } : null
+  const st = selected ? { ...style, stroke: '#d97706', strokeWidth: 2 } : style
+  // 바커 반쪽 선 — 경로 길이를 재서 앞·뒤 절반 dasharray(halfDash)
+  const ref = useRef<SVGPathElement>(null)
+  const [len, setLen] = useState(0)
+  useLayoutEffect(() => {
+    const l = ref.current?.getTotalLength() ?? 0
+    if (Math.abs(l - len) > 0.5) setLen(l)
+  }) // 매 그리기마다 확인(표기 전환·경로 변경 모두) — 길이가 바뀔 때만 상태 갱신
+  if (d.bk)
+    return (
+      <>
+        <BaseEdge id={id} path={path} style={{ stroke: 'transparent' }} label={label} labelX={lx} labelY={ly} labelStyle={labelStyle} interactionWidth={14} />
+        <path ref={ref} d={path} fill="none" stroke={st?.stroke as string} strokeWidth={st?.strokeWidth} strokeDasharray={len ? halfDash(len, 'first', d.bk.p) : undefined} markerStart={markerStart} />
+        <path d={path} fill="none" stroke={st?.stroke as string} strokeWidth={st?.strokeWidth} strokeDasharray={len ? halfDash(len, 'second', d.bk.c) : undefined} markerEnd={markerEnd} />
+        {d.edit && <EdgeLabelRenderer>{[grip('s', d.sp), grip('t', d.tp), mid && grip('m', mid)]}</EdgeLabelRenderer>}
+      </>
+    )
   return (
     <>
-      <BaseEdge id={id} path={path} markerStart={markerStart} markerEnd={markerEnd} style={selected ? { ...style, stroke: '#d97706', strokeWidth: 2 } : style} label={label} labelX={lx} labelY={ly} labelStyle={labelStyle} interactionWidth={14} />
+      <BaseEdge id={id} path={path} markerStart={markerStart} markerEnd={markerEnd} style={st} label={label} labelX={lx} labelY={ly} labelStyle={labelStyle} interactionWidth={14} />
       {d.edit && <EdgeLabelRenderer>{[grip('s', d.sp), grip('t', d.tp), mid && grip('m', mid)]}</EdgeLabelRenderer>}
     </>
   )
 }
 const edgeTypes = { rel: RelEdge }
 
-// IE 표기 마커 정의 — pf = id 접두어(화면 '' / 인쇄 미리보기 'p')
+// 관계 표식 정의(IE ie-* · 바커 bk-*) — pf = id 접두어(화면 '' / 인쇄 미리보기 'p')
 const markers = (pf: string) => (
     <svg width="0" height="0" className="absolute" aria-hidden>
       <defs>
@@ -179,6 +211,17 @@ const markers = (pf: string) => (
         <marker id={`${pf}ie-zero-many`} viewBox="0 0 26 20" refX="26" refY="10" markerWidth="26" markerHeight="20" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
           <circle cx="6" cy="10" r="4" stroke="#475569" strokeWidth="1.4" fill="white" />
           <path d="M14 10 L26 2 M14 10 L26 18 M14 10 L26 10" stroke="#475569" strokeWidth="1.4" fill="none" />
+        </marker>
+        {/* 바커 표기 — 까마귀발(여러 건)·UID 막대(식별 관계, 자식 쪽) */}
+        <marker id={`${pf}bk-many`} viewBox="0 0 20 20" refX="20" refY="10" markerWidth="20" markerHeight="20" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+          <path d="M4 10 L20 1 M4 10 L20 19 M4 10 L20 10" stroke="#475569" strokeWidth="1.4" fill="none" />
+        </marker>
+        <marker id={`${pf}bk-uid`} viewBox="0 0 20 20" refX="20" refY="10" markerWidth="20" markerHeight="20" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+          <path d="M8 2 L8 18" stroke="#475569" strokeWidth="1.8" fill="none" />
+        </marker>
+        <marker id={`${pf}bk-many-uid`} viewBox="0 0 28 20" refX="28" refY="10" markerWidth="28" markerHeight="20" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+          <path d="M3 2 L3 18" stroke="#475569" strokeWidth="1.8" fill="none" />
+          <path d="M12 10 L28 1 M12 10 L28 19 M12 10 L28 10" stroke="#475569" strokeWidth="1.4" fill="none" />
         </marker>
       </defs>
     </svg>
@@ -208,6 +251,18 @@ function Erd({ areaId }: { areaId: string }) {
   const [selRel, setSelRel] = useState<string | null>(null) // 선택된 관계선
   const [pr, setPr] = useState({ paper: 'A3', orient: 'landscape' as Orient, margin: 10, title: true, guide: false, mode: 'fit' as 'fit' | 'pages' }) // 인쇄 설정
   const [shot, setShot] = useState<string | null>(null) // 인쇄 미리보기(화면 그림 복사본) — null = 닫힘
+  const [nt, setNt] = useState<Nt>('IE') // 표기법
+  useEffect(() => {
+    try {
+      if (window.localStorage.getItem('erd-notation') === 'BK') setNt('BK')
+    } catch {}
+  }, [])
+  const pickNt = (v: Nt) => {
+    setNt(v)
+    try {
+      window.localStorage.setItem('erd-notation', v)
+    } catch {}
+  }
   const canvasRef = useRef<HTMLDivElement>(null)
   const [lyt, setLyt] = useState<Record<string, RelLyt>>({}) // 사용자가 옮긴 관계선(없으면 자동)
   const [dirty, setDirty] = useState(false)
@@ -266,7 +321,7 @@ function Erd({ areaId }: { areaId: string }) {
     setEnts(es)
     const shownIds = new Set(es.map((e) => e.ent_id))
     setRels((j.rels as Rel[]).filter((r) => shownIds.has(r.prnt_ent_id) && shownIds.has(r.chld_ent_id))) // 숨긴 참조 엔터티의 관계 제외
-    setNodes(es.map((e) => ({ id: e.ent_id, type: 'ent', position: laid[e.ent_id], data: { ent: e, lvl, phy, fix: !!pos.get(e.ent_id)?.fix } })))
+    setNodes(es.map((e) => ({ id: e.ent_id, type: 'ent', position: laid[e.ent_id], data: { ent: e, lvl, phy, nt, fix: !!pos.get(e.ent_id)?.fix } })))
     if (!keep) setLyt(Object.fromEntries(((j.rel_lyt ?? []) as (RelLyt & { rel_id: string })[]).map(({ rel_id, ...l }) => [rel_id, l])))
     if (!keep) setSelRel(null)
     setDirty((d) => (keep && d) || es.some((e) => !pos.has(e.ent_id)))
@@ -308,8 +363,8 @@ function Erd({ areaId }: { areaId: string }) {
 
   // 표시 수준·이름 전환은 데이터만 갱신(좌표 유지)
   useEffect(() => {
-    setNodes((ns) => ns.map((n) => ({ ...n, data: { ...n.data, lvl, phy } })))
-  }, [lvl, phy, setNodes])
+    setNodes((ns) => ns.map((n) => ({ ...n, data: { ...n.data, lvl, phy, nt } })))
+  }, [lvl, phy, nt, setNodes])
 
   const byId = useMemo(() => new Map(nodes.map((n) => [n.id, n])), [nodes])
   // 박스(실측 크기 우선)·자동 끝점 — 드래그할 때마다 다시 계산
@@ -379,15 +434,24 @@ function Erd({ areaId }: { areaId: string }) {
             targetHandle: `t-${l.cs.toLowerCase()}`,
             type: 'rel' as const,
             selected: selRel === r.rel_id,
-            data: { sp, tp, ps: l.ps, cs: l.cs, mx: l.mx, my: l.my, edit: editor && selRel === r.rel_id, onDrag: dragRel, onReset: resetRel },
+            data: { sp, tp, ps: l.ps, cs: l.cs, mx: l.mx, my: l.my, edit: editor && selRel === r.rel_id, onDrag: dragRel, onReset: resetRel, ...(nt === 'BK' ? { bk: { p: r.chld_opt_yn === 'Y', c: r.prnt_opt_yn === 'Y' } } : {}) },
             label: r.rel_nm ?? undefined,
             labelStyle: { fontSize: 10 },
-            style: { stroke: '#475569', strokeWidth: 1.4, strokeDasharray: r.idnt_yn === 'Y' ? undefined : '6 4' },
-            markerStart: r.prnt_opt_yn === 'Y' ? 'ie-zero-one' : 'ie-one',
-            markerEnd: many ? (r.chld_opt_yn === 'Y' ? 'ie-zero-many' : 'ie-one-many') : r.chld_opt_yn === 'Y' ? 'ie-zero-one' : 'ie-one',
+            ...(nt === 'BK'
+              ? {
+                  // 바커 : 여러 건 = 까마귀발, 1 = 표식 없음, 식별 관계 = 자식 쪽 UID 막대, N:M 은 부모 쪽도 까마귀발
+                  style: { stroke: '#475569', strokeWidth: 1.4 },
+                  markerStart: r.crdn_cd === 'NM' ? 'bk-many' : undefined,
+                  markerEnd: many ? (r.idnt_yn === 'Y' ? 'bk-many-uid' : 'bk-many') : r.idnt_yn === 'Y' ? 'bk-uid' : undefined,
+                }
+              : {
+                  style: { stroke: '#475569', strokeWidth: 1.4, strokeDasharray: r.idnt_yn === 'Y' ? undefined : '6 4' },
+                  markerStart: r.prnt_opt_yn === 'Y' ? 'ie-zero-one' : 'ie-one',
+                  markerEnd: many ? (r.chld_opt_yn === 'Y' ? 'ie-zero-many' : 'ie-one-many') : r.chld_opt_yn === 'Y' ? 'ie-zero-one' : 'ie-one',
+                }),
           }
         }),
-    [geo, lytOf, selRel, editor, dragRel, resetRel],
+    [geo, lytOf, selRel, editor, dragRel, resetRel, nt],
   )
 
   const curPos = () => Object.fromEntries(nodes.map((n) => [n.id, { ...n.position }]))
@@ -458,7 +522,7 @@ function Erd({ areaId }: { areaId: string }) {
       if (!vp) return
       const c = vp.cloneNode(true) as HTMLElement
       c.querySelectorAll('.react-flow__viewport-portal, .react-flow__edgelabel-renderer').forEach((x) => x.remove())
-      setShot(c.innerHTML.replace(/url\((['"]?)#ie-/g, 'url($1#pie-'))
+      setShot(c.innerHTML.replace(/url\((['"]?)#(ie|bk)-/g, 'url($1#p$2-'))
     }, 80)
   }
   const sheets = pr.mode === 'fit' ? [{ no: 1, t: printFit([...geo.boxes.values()], page.cw, page.ch) }] : page.grid.tiles.map((t) => ({ no: t.no, t: { x: -(page.grid.x0 + t.c * page.cw), y: -(page.grid.y0 + t.r * page.ch), zoom: 1 } }))
@@ -514,6 +578,13 @@ function Erd({ areaId }: { areaId: string }) {
           {(Object.keys(LVL_NM) as Lvl[]).map((k) => (
             <option key={k} value={k}>
               {LVL_NM[k]}
+            </option>
+          ))}
+        </select>
+        <select value={nt} onChange={(e) => pickNt(e.target.value as Nt)} className={sel2} aria-label="표기법" title="IE(정보공학, ERwin) 또는 바커(Barker, DA#) 표기">
+          {(Object.keys(NT_NM) as Nt[]).map((k) => (
+            <option key={k} value={k}>
+              {NT_NM[k]}
             </option>
           ))}
         </select>
@@ -712,7 +783,7 @@ function Erd({ areaId }: { areaId: string }) {
               )}
             </>
           ) : (
-            <p className="text-gray-500">엔터티를 누르면 정보·속성 편집, 관계선을 누르면 선 위치 조정이 보입니다. 🔑 주식별자 · ↗ 상속(FK) · * 필수 / 실선 = 식별 관계, 점선 = 비식별 관계, 까마귀발 = 여러 건, ○ = 선택</p>
+            <p className="text-gray-500">엔터티를 누르면 정보·속성 편집, 관계선을 누르면 선 위치 조정이 보입니다. {LEGEND[nt]}</p>
           )}
         </aside>
       </div>
@@ -802,7 +873,7 @@ function Erd({ areaId }: { areaId: string }) {
                       <span className="ml-2 text-gray-600">{prjs.find((x) => x.prj_id === prjId)?.prj_nm}</span>
                     </span>
                     <span className="pb-1 text-gray-600">
-                      {LVL_NM[lvl]} · {phy ? '물리명' : '논리명'} · 출력 {new Date().toLocaleDateString('sv-SE')} · {sh.no} / {sheets.length}쪽
+                      {LVL_NM[lvl]} · {NT_NM[nt]} · {phy ? '물리명' : '논리명'} · 출력 {new Date().toLocaleDateString('sv-SE')} · {sh.no} / {sheets.length}쪽
                     </span>
                   </div>
                 )}
@@ -811,7 +882,7 @@ function Erd({ areaId }: { areaId: string }) {
                 </div>
                 {pr.title && (
                   <div className="shrink-0 border-t px-3 text-[10px] leading-4 text-gray-500" style={{ height: FOOT_H }}>
-                    실선 = 식별 관계 · 점선 = 비식별 관계 · 까마귀발 = 여러 건 · ○ = 선택 · 🔑 주식별자 · ↗ 상속(FK) · * 필수
+                    {LEGEND[nt]}
                   </div>
                 )}
               </div>

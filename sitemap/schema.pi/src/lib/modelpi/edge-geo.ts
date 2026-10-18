@@ -83,3 +83,16 @@ export function autoAnchors(rels: { id: string; from: string; to: string }[], bo
   }
   return out
 }
+
+// 바커 표기 반쪽 선(2026-10-18) — 같은 경로를 두 번 그려 앞(부모 쪽)·뒤(자식 쪽) 절반만 보이게 하는 stroke-dasharray
+//  dashed = 점선(dash 6 · gap 4, 선택 참여) / 실선(필수 참여). 배열 합이 전체 길이를 넘게 끝내 무늬가 되풀이되지 않게 함
+export function halfDash(len: number, half: 'first' | 'second', dashed: boolean, dash = 6, gap = 4): string {
+  const h = len / 2
+  const seg: number[] = half === 'second' ? [0, h] : []
+  if (!dashed) seg.push(h, len)
+  else {
+    for (let s = 0; s < h; s += dash + gap) seg.push(Math.min(dash, h - s), gap)
+    seg.push(0, len)
+  }
+  return seg.map((v) => Math.round(v * 10) / 10).join(' ')
+}
