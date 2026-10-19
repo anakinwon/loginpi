@@ -44,6 +44,7 @@ export async function POST(req: Request) {
       // 사용 일수가 늘면 차감이 줄어 금액이 오름 → 10분 전 금액(준비가 날짜 경계 전) 이상 ~ 지금 금액 이하
       const lo = Math.min(q.amount, prev.quotes.find((x) => x.plan_cd === meta.plan_cd && x.prd === meta.prd)?.amount ?? q.amount)
       if (amt < lo - 1e-6 || amt > q.amount + 1e-6) return reject('PAY_AMOUNT', 400)
+      meta.pre = q.terms // 차액을 받은 선결제 수 — 견적 뒤 반영된 선결제가 차액 없이 올라가지 않게(보안 검토 2026-10-19)
     } else {
       const cur = await areaPlan(meta.area_id)
       if (subscribed(cur) && meta.plan_cd !== cur.plan) return reject('PAY_SUBSCRIBED', 409) // 구독 중 = 업그레이드 + 현재 요금제 선결제만

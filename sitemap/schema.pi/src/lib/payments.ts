@@ -30,6 +30,7 @@ export interface AreaPlanMeta {
   prd_cd: 'M' | 'Y' | 'U' // U = 업그레이드(일할계산, src/lib/upgrade.ts)
   from_plan?: Exclude<PlanCd, 'FREE'> // 업그레이드 전 요금제(U 만)
   prd?: 'M' | 'Y' // 업그레이드 새 주기(U 만 = 현재 기간 주기, 승인 때 다시 대조, 반영 = 승인 시각부터 1개월·1년)
+  pre?: number // 견적에 넣은 선결제 기간 수(U 만, approve 가 서버 견적으로 채움 — 클라이언트 값 무시, sql/056 이 이만큼만 상위 요금제로)
 }
 
 // metadata 검증 — 형태가 맞을 때만
