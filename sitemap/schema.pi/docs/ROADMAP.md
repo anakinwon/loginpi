@@ -106,7 +106,7 @@
 
 ## 3단계 : 확장
 
-- [ ] 표준코드(reqst.md FR-14 = 제안서 P04)
+- [x] 표준코드(reqst.md FR-14 = 제안서 P04, 2026-10-19) : `sql/057` `std_cd`(코드 = 코드형(CD) 도메인의 확정 표준용어 1개, 코드명·물리명 = 용어, 코드분류명·사용여부, 분류체계 안 용어당 1개)·`std_cd_val`(코드값·코드값명·정렬순서·사용여부, 코드 안 유일·길이 ≤ 용어 도메인 길이), `src/lib/std-code.ts`(simpleCrud — 조회 STD_VIEW·쓰기 STD_REQ, 승인 절차 없이 직접 반영·감사 이력 CD·CD_VAL, 용어 교체·코드 이동 불가, 코드값 있는 코드 삭제 불가), API `/codes`·`/code-values?cd_id=`, 화면 `/codes`(표준용어 › 표준코드, 용어 검색 선택·코드값 표). simpleCrud `listBy`·ItemTable `parent` 추가. PGlite 7건·API 15건 통과, 시험 데이터 논리 삭제. 승인 절차 적용 여부 [확인중 : 마스터]
 - [ ] P23 영향 분석 확장(모델 속성 사용처), P25 카탈로그 검색
 - [ ] 자동 갱신 구독(Pi SDK 계약 호출 공식 지원 이후)
 - [ ] 운영 Supabase 프로젝트·도메인 `schema.pi` 연결

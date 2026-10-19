@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { db } from './db'
 import { apiError, audit, dbError, parseBody, requireAreaRole, type ErrorCode } from './api'
+import type { Perm } from './roles'
 
 type Ctx = { params: Promise<Record<string, string>> }
 interface Cfg {
@@ -15,9 +16,11 @@ interface Cfg {
   order: string
   schema: z.ZodObject<z.ZodRawShape>
   dupCode: ErrorCode
-  // 쓰기 권한(기본 SETTINGS : 설정 데이터, 모델 데이터는 MODEL_EDIT), 목록 권한(기본 VIEW, 모델 데이터는 MODEL_VIEW)
-  perm?: 'SETTINGS' | 'MODEL_EDIT'
-  viewPerm?: 'VIEW' | 'MODEL_VIEW'
+  // 쓰기 권한(기본 SETTINGS : 설정 데이터, 모델 데이터는 MODEL_EDIT, 표준코드는 STD_REQ), 목록 권한(기본 VIEW, 모델 데이터는 MODEL_VIEW)
+  perm?: Perm
+  viewPerm?: Perm
+  // 목록 조건 = 같은 이름의 쿼리 값(UUID 만, 예 코드값 목록 ?cd_id=) — 없으면 분류체계 전체
+  listBy?: string
   // 저장 전 검사(등록 = 전체 본문, 수정 = 바뀐 항목만 + 현재 행) — 위반 코드 또는 null
   beforeSave?: (areaId: string, row: Record<string, unknown>, cur?: Record<string, unknown>) => Promise<ErrorCode | null>
   // 삭제 불가 사유(없으면 null)
@@ -25,11 +28,17 @@ interface Cfg {
 }
 
 export function simpleCrud(c: Cfg) {
-  const list = async (_req: Request, { params }: Ctx) => {
+  const list = async (req: Request, { params }: Ctx) => {
     const { areaId } = await params
     const auth = await requireAreaRole(areaId, c.viewPerm ?? 'VIEW')
     if (auth instanceof NextResponse) return auth
-    const { data, error } = await db().from(c.table).select(c.cols).eq('area_id', areaId).eq('del_yn', 'N').order(c.order)
+    let q = db().from(c.table).select(c.cols).eq('area_id', areaId).eq('del_yn', 'N')
+    if (c.listBy) {
+      const v = new URL(req.url).searchParams.get(c.listBy)
+      if (!v || !z.string().uuid().safeParse(v).success) return apiError('INVALID_INPUT', 400)
+      q = q.eq(c.listBy, v)
+    }
+    const { data, error } = await q.order(c.order)
     if (error) return dbError(error)
     return NextResponse.json({ ok: true, items: data })
   }

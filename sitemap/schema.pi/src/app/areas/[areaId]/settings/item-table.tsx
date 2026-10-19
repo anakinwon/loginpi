@@ -22,8 +22,10 @@ export const GRP_CFG: ItemCfg = {
   ],
 }
 
-export default function ItemTable({ areaId, cfg }: { areaId: string; cfg: ItemCfg }) {
+// parent = 상위 항목 조건(예 표준코드값 { cd_id }) : 목록 쿼리에 붙이고 등록 본문에 넣음
+export default function ItemTable({ areaId, cfg, parent }: { areaId: string; cfg: ItemCfg; parent?: Record<string, string> }) {
   const base = `/api/areas/${areaId}/${cfg.path}`
+  const qs = parent ? `?${new URLSearchParams(parent)}` : ''
   const empty = Object.fromEntries(cfg.fields.map((f) => [f.key, '']))
   const [items, setItems] = useState<Item[]>([])
   const [form, setForm] = useState<Record<string, string>>(empty)
@@ -31,10 +33,10 @@ export default function ItemTable({ areaId, cfg }: { areaId: string; cfg: ItemCf
   const [msg, setMsg] = useState('')
 
   const load = useCallback(async () => {
-    const j = await (await piFetch(base)).json()
+    const j = await (await piFetch(base + qs)).json()
     if (j.ok) setItems(j.items)
     else setMsg(j.message)
-  }, [base])
+  }, [base, qs])
   useEffect(() => {
     load()
   }, [load])
@@ -57,7 +59,7 @@ export default function ItemTable({ areaId, cfg }: { areaId: string; cfg: ItemCf
       after(await (await piFetch(`${base}/${edit[cfg.pk]}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json(), '수정했습니다')
       return
     }
-    const body = Object.fromEntries(Object.entries(form).filter(([, v]) => v !== ''))
+    const body = { ...parent, ...Object.fromEntries(Object.entries(form).filter(([, v]) => v !== '')) }
     after(await (await piFetch(base, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json(), '등록했습니다')
   }
   const remove = async (it: Item) => {

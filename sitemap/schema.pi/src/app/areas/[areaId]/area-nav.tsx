@@ -60,6 +60,7 @@ const CORE: Item[] = [
     tone: 'teal',
     subs: [
       { seg: 'terms', nm: '표준용어' },
+      { seg: 'codes', nm: '표준코드' },
       { seg: 'bulk', nm: '일괄등록', perm: 'BULK', tab: 'terms' },
     ],
   },
