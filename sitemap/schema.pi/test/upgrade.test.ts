@@ -13,7 +13,7 @@ const term = (prd: 'M' | 'Y', agoDays: number, rsn = 'PAY'): UpgTerm => {
 }
 
 test('마스터 사례 : 개발자 10 Pi/월 오늘 결제 → 표준담당자 = 20 − (10 − 10 × 1/30) = 10.34 Pi', () => {
-  assert.deepEqual(upgradeFee([term('M', 0)], P, 'P1', 'P2', now), { amount: 10.34, credit: 9.66, used: 1, prd: 'M' })
+  assert.deepEqual(upgradeFee([term('M', 0)], P, 'P1', 'P2', now), { amount: 10.34, credit: 9.66, prepaid: 0, terms: 0, used: 1, prd: 'M' })
   assert.equal(upgradeFee([term('M', 0.5)], P, 'P1', 'P2', now)?.used, 1) // 같은 날(24시간 안) = 1일
 })
 
@@ -35,19 +35,32 @@ test('업그레이드로 받은 기간(UPG)도 같은 계산, 유예·끝난 기
   assert.equal(upgradeFee([{ ...term('M', 40), end_dtm: iso(now - DAY_MS) }], P, 'P1', 'P2', now), null)
 })
 
-test('미리 연장한 미래 기간이 있으면 불가', () => {
-  const cur = term('M', 5)
-  assert.equal(upgradeFee([cur, { ...cur, strt_dtm: cur.end_dtm, end_dtm: iso(Date.parse(cur.end_dtm) + 30 * DAY_MS) }], P, 'P1', 'P2', now), null)
+test('선결제 기간도 함께 업그레이드 : 기간마다 상위 가격 − 현재 가격(사용 0일) 추가', () => {
+  const cur = term('M', 0)
+  const next = (t: UpgTerm, prd: 'M' | 'Y'): UpgTerm => ({ prd_cd: prd, strt_dtm: t.end_dtm, end_dtm: iso(Date.parse(t.end_dtm) + (prd === 'M' ? 30 : 365) * DAY_MS), grnt_rsn_cd: 'PAY' })
+  const m1 = next(cur, 'M')
+  const y1 = next(m1, 'Y')
+  // 마스터 표 : 선결제 1개월 → 요금제2 월 = 10.34 + (20 − 10)
+  assert.deepEqual(upgradeFee([cur, m1], P, 'P1', 'P2', now), { amount: 20.34, credit: 9.66, prepaid: 10, terms: 1, used: 1, prd: 'M' })
+  // 선결제 1개월 + 1년 → 요금제4 월 = 40.34 + (50 − 10) + (500 − 100)
+  assert.equal(upgradeFee([cur, m1, y1], P, 'P1', 'P4', now)?.amount, 480.34)
+  // 새 주기 년 : 190.34 + (20 − 10)
+  assert.equal(upgradeFee([cur, m1], P, 'P1', 'P2', now, 'Y')?.amount, 200.34)
+  // 같은 요금제 월 → 연 : 선결제 차액 0
+  assert.equal(upgradeFee([cur, m1], P, 'P1', 'P1', now, 'Y')?.amount, 90.34)
+  // 현재 기간 없이 선결제만 = 불가, 선결제 주기 요금표 없음 = 불가
+  assert.equal(upgradeFee([m1], P, 'P1', 'P2', now), null)
+  assert.equal(upgradeFee([cur, y1], { P1M: 10, P2M: 20, P1Y: 100 }, 'P1', 'P2', now), null)
 })
 
 test('월 → 상위 요금제 연 구독도 미사용분 할인, 년 → 월 불가', () => {
-  assert.deepEqual(upgradeFee([term('M', 0)], P, 'P1', 'P2', now, 'Y'), { amount: 190.34, credit: 9.66, used: 1, prd: 'Y' }) // 200 − 10 × 29/30
+  assert.deepEqual(upgradeFee([term('M', 0)], P, 'P1', 'P2', now, 'Y'), { amount: 190.34, credit: 9.66, prepaid: 0, terms: 0, used: 1, prd: 'Y' }) // 200 − 10 × 29/30
   assert.equal(upgradeFee([term('M', 14)], P, 'P1', 'P4', now, 'Y')?.amount, 495) // 500 − 10 × 15/30
   assert.equal(upgradeFee([term('Y', 0)], P, 'P1', 'P2', now, 'M'), null)
 })
 
 test('같은 요금제 월 → 연 : 개발자 월 오늘 결제 → 개발자 연 = 100 − 10 × 29/30 = 90.34 Pi', () => {
-  assert.deepEqual(upgradeFee([term('M', 0)], P, 'P1', 'P1', now, 'Y'), { amount: 90.34, credit: 9.66, used: 1, prd: 'Y' })
+  assert.deepEqual(upgradeFee([term('M', 0)], P, 'P1', 'P1', now, 'Y'), { amount: 90.34, credit: 9.66, prepaid: 0, terms: 0, used: 1, prd: 'Y' })
   assert.equal(upgradeFee([term('M', 0)], P, 'P1', 'P1', now, 'M'), null) // 같은 요금제 같은 주기 = 업그레이드 아님
   assert.equal(upgradeFee([term('Y', 0)], P, 'P1', 'P1', now, 'Y'), null)
   // 월 → 연 업그레이드 뒤(이전 월 기간이 겹쳐 남음) → 상위 요금제 연 = 연 기간 기준 : 200 − 100 × 363/365 = 100.547 → 100.55

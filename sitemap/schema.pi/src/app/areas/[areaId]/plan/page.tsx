@@ -8,7 +8,7 @@ import { PLAN_NM, PLAN_PERMS, ROLE_NM, type MbrRole, type PlanCd } from '@/lib/r
 
 type Fee = { plan_cd: Exclude<PlanCd, 'FREE'>; prd_cd: 'M' | 'Y'; plan_nm: string; pi_amt: number; use_mon_cnt: number }
 type Term = { plan_cd: PlanCd; prd_cd: 'M' | 'Y' | null; strt_dtm: string; end_dtm: string; grnt_rsn_cd: 'PAY' | 'UPG' | 'GRACE' }
-type Upg = { plan_cd: PlanCd; amount: number; credit: number; used: number; prd: 'M' | 'Y' }
+type Upg = { plan_cd: PlanCd; amount: number; credit: number; prepaid: number; terms: number; used: number; prd: 'M' | 'Y' }
 type Hist = { pymnt_id?: string; pi_amt: number; pymnt_sts_cd: string; meta_val: { plan_cd?: string; prd_cd?: string; from_plan?: string; prd?: string }; apv_dtm: string; cmpl_dtm: string | null }
 type Info = {
   plan: { plan: PlanCd; end: string | null; grace: boolean }
@@ -106,7 +106,6 @@ export default function PlanPage({ params }: { params: Promise<{ areaId: string 
   const sub = !!p && p.plan !== 'FREE' && !p.grace // 구독 중 = 업그레이드 + 현재 요금제 선결제 버튼만, 무료·만료 = 일반 요금제 버튼만(마스터 지시 2026-10-19)
   // 최종 만료일 = 현재·상위 요금제 기간 중 가장 늦은 종료(선결제 포함 — sql/054 연장 기준과 같음)
   const finalEnd = info?.terms.filter((t) => p && t.plan_cd >= p.plan).reduce<string | null>((m, t) => (!m || t.end_dtm > m ? t.end_dtm : m), null) ?? p?.end ?? null
-  const prepaid = !!info?.terms.some((t) => t.plan_cd === p?.plan && Date.parse(t.strt_dtm) > Date.now()) // 선결제 기간 있음 = 업그레이드 불가(src/lib/upgrade.ts)
   const pages = info ? Math.max(1, Math.ceil(info.hist.total / info.hist.size)) : 1
   return (
     <main className="w-full px-3 py-3 sm:px-4 lg:px-5">
@@ -136,7 +135,7 @@ export default function PlanPage({ params }: { params: Promise<{ areaId: string 
             </ul>
           )}
           <p className="border-t border-[#d5ddec] px-4 py-2 text-xs text-gray-600">
-            실제 권한 = 멤버 역할 ∩ 분류체계 요금제. 구독 중에는 업그레이드와 현재 요금제 선결제(만료일 뒤로 1개월·1년 연장)만 결제할 수 있고(무료·만료면 일반 결제), 업그레이드 = 상위 요금제(같은 요금제는 월 → 연) 가격 − 현재 가격 × (기준 일수 − 사용 일수) ÷ 기준 일수(월 30·년 365, 결제한 날 = 1일), 0.01 Pi 올림 — 결제한 때부터 새 1개월·1년.
+            실제 권한 = 멤버 역할 ∩ 분류체계 요금제. 구독 중에는 업그레이드와 현재 요금제 선결제(만료일 뒤로 1개월·1년 연장)만 결제할 수 있고(무료·만료면 일반 결제), 업그레이드 = 상위 요금제(같은 요금제는 월 → 연) 가격 − 현재 가격 × (기준 일수 − 사용 일수) ÷ 기준 일수(월 30·년 365, 결제한 날 = 1일), 0.01 Pi 올림 — 결제한 때부터 새 1개월·1년. 선결제 기간이 있으면 기간마다 (상위 가격 − 현재 가격) 차액을 더해 선결제 기간도 함께 업그레이드합니다(새 주기 뒤로 이어짐).
           </p>
         </section>
       )}
@@ -178,17 +177,16 @@ export default function PlanPage({ params }: { params: Promise<{ areaId: string 
                       ))}
                     </div>
                   )}
-                  {sub && on && <p className="mt-1 text-[11px] text-gray-500">선결제하면 그 기간이 시작될 때까지 업그레이드할 수 없습니다</p>}
-                  {sub && prepaid && cd > (p?.plan ?? '') && <p className="mt-3 text-xs text-gray-500">선결제 기간이 있어 업그레이드는 선결제 기간이 시작된 뒤 할 수 있습니다</p>}
                   {sub && ups.length > 0 && (
                     <div className="mt-3 grid grid-cols-2 gap-2">
                       {ups.map((up) => (
-                        <button key={up.prd} type="button" disabled={!info.can_pay || !!busy} onClick={() => void pay({ plan_cd: cd, prd_cd: 'U', prd: up.prd })} className="btn-3d px-2 py-1.5 text-xs disabled:opacity-50" title={`사용 ${up.used}일 · 미사용분 ${up.credit} Pi 차감 · 결제한 때부터 새 1${up.prd === 'Y' ? '년' : '개월'}`}>
+                        <button key={up.prd} type="button" disabled={!info.can_pay || !!busy} onClick={() => void pay({ plan_cd: cd, prd_cd: 'U', prd: up.prd })} className="btn-3d px-2 py-1.5 text-xs disabled:opacity-50" title={`사용 ${up.used}일 · 미사용분 ${up.credit} Pi 차감 · 결제한 때부터 새 1${up.prd === 'Y' ? '년' : '개월'}${up.terms ? ` · 선결제 ${up.terms}건 차액 ${up.prepaid} Pi 포함(선결제 기간도 이 요금제로)` : ''}`}>
                           {busy === `${cd}U${up.prd}` ? '결제 중…' : `업그레이드 ${up.amount} Pi / ${up.prd === 'Y' ? '년' : '월'}`}
                         </button>
                       ))}
                     </div>
                   )}
+                  {sub && ups[0]?.terms > 0 && <p className="mt-1 text-[11px] text-gray-500">선결제 {ups[0].terms}건 차액 {ups[0].prepaid} Pi 포함 — 선결제 기간도 이 요금제로 바뀝니다</p>}
                 </div>
               )
             })}
