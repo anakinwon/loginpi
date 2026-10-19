@@ -22,7 +22,8 @@ export async function POST(req: Request) {
       const meta = { type: AREA_PLAN, area_id: b.area_id, plan_cd: b.plan_cd, prd_cd: 'U' as const, from_plan: from, prd: q.prd }
       return NextResponse.json({ ok: true, amount: q.amount, memo: planMemo(meta), metadata: meta })
     }
-    if (subscribed(await areaPlan(b.area_id))) return apiError('PAY_SUBSCRIBED', 409) // 구독 중 = 업그레이드만
+    const cur = await areaPlan(b.area_id)
+    if (subscribed(cur) && b.plan_cd !== cur.plan) return apiError('PAY_SUBSCRIBED', 409) // 구독 중 = 업그레이드 + 현재 요금제 선결제만
     const amount = await planPrice(b.plan_cd, b.prd_cd)
     if (amount == null) return apiError('PAY_MISMATCH', 400)
     return NextResponse.json({ ok: true, amount, memo: planMemo(b), metadata: { type: AREA_PLAN, area_id: b.area_id, plan_cd: b.plan_cd, prd_cd: b.prd_cd } })

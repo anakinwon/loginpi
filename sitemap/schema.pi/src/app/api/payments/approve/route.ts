@@ -45,7 +45,8 @@ export async function POST(req: Request) {
       const lo = Math.min(q.amount, prev.quotes.find((x) => x.plan_cd === meta.plan_cd && x.prd === meta.prd)?.amount ?? q.amount)
       if (amt < lo - 1e-6 || amt > q.amount + 1e-6) return reject('PAY_AMOUNT', 400)
     } else {
-      if (subscribed(await areaPlan(meta.area_id))) return reject('PAY_SUBSCRIBED', 409) // 구독 중 = 업그레이드만
+      const cur = await areaPlan(meta.area_id)
+      if (subscribed(cur) && meta.plan_cd !== cur.plan) return reject('PAY_SUBSCRIBED', 409) // 구독 중 = 업그레이드 + 현재 요금제 선결제만
       const price = await planPrice(meta.plan_cd, meta.prd_cd)
       if (price == null || Math.abs(amt - price) > 1e-6) return reject('PAY_AMOUNT', 400) // 정가와 정확히 일치(초과도 거부)
     }

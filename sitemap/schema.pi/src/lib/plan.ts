@@ -43,7 +43,7 @@ export async function feePlans(): Promise<FeePlan[]> {
   return (data ?? []).map((r) => ({ ...r, pi_amt: Number(r.pi_amt) }) as FeePlan)
 }
 
-// 구독 중 = 결제한 요금제 사용 중(무료·유예 아님) — 이때는 업그레이드만 결제 가능(마스터 지시 2026-10-19)
+// 구독 중 = 결제한 요금제 사용 중(무료·유예 아님) — 이때는 업그레이드와 현재 요금제 선결제(만료일 뒤로 연장, sql/054)만 결제 가능(마스터 지시 2026-10-19)
 export const subscribed = (p: AreaPlan) => p.plan !== 'FREE' && !p.grace
 
 // 업그레이드 견적 — 현재 결제 요금제보다 높은 요금제(같은 요금제 월 → 연 포함)마다 일할계산 금액(src/lib/upgrade.ts). 무료·유예만 = 빈 목록

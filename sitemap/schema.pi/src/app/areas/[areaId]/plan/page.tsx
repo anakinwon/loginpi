@@ -103,7 +103,10 @@ export default function PlanPage({ params }: { params: Promise<{ areaId: string 
   }
 
   const p = info?.plan
-  const sub = !!p && p.plan !== 'FREE' && !p.grace // 구독 중 = 업그레이드 버튼만, 무료·만료 = 일반 요금제 버튼만(마스터 지시 2026-10-19)
+  const sub = !!p && p.plan !== 'FREE' && !p.grace // 구독 중 = 업그레이드 + 현재 요금제 선결제 버튼만, 무료·만료 = 일반 요금제 버튼만(마스터 지시 2026-10-19)
+  // 최종 만료일 = 현재·상위 요금제 기간 중 가장 늦은 종료(선결제 포함 — sql/054 연장 기준과 같음)
+  const finalEnd = info?.terms.filter((t) => p && t.plan_cd >= p.plan).reduce<string | null>((m, t) => (!m || t.end_dtm > m ? t.end_dtm : m), null) ?? p?.end ?? null
+  const prepaid = !!info?.terms.some((t) => t.plan_cd === p?.plan && Date.parse(t.strt_dtm) > Date.now()) // 선결제 기간 있음 = 업그레이드 불가(src/lib/upgrade.ts)
   const pages = info ? Math.max(1, Math.ceil(info.hist.total / info.hist.size)) : 1
   return (
     <main className="w-full px-3 py-3 sm:px-4 lg:px-5">
@@ -120,7 +123,7 @@ export default function PlanPage({ params }: { params: Promise<{ areaId: string 
               {p.plan === 'FREE' ? '없음(무료 — 표준사전 조회만)' : `요금제${p.plan.slice(1)} · ${PLAN_NM[p.plan]}`}
               {p.grace && <span className="ml-2 rounded bg-amber-100 px-1.5 py-0.5 text-xs font-medium text-amber-800">유예 기간</span>}
             </p>
-            {p.end && <p>{dt(p.end)} 까지</p>}
+            {p.end && <p>{dt(p.end)} 까지{finalEnd && finalEnd !== p.end && <span className="ml-1 font-semibold text-[#1f3a68]">(선결제 포함 최종 {dt(finalEnd)} 까지)</span>}</p>}
             <p className="text-gray-600">내 역할 : {ROLE_NM[info.role] ?? info.role}</p>
           </div>
           {info.terms.length > 1 && (
@@ -133,7 +136,7 @@ export default function PlanPage({ params }: { params: Promise<{ areaId: string 
             </ul>
           )}
           <p className="border-t border-[#d5ddec] px-4 py-2 text-xs text-gray-600">
-            실제 권한 = 멤버 역할 ∩ 분류체계 요금제. 구독 중에는 업그레이드만 결제할 수 있고(무료·만료면 일반 결제), 업그레이드 = 상위 요금제(같은 요금제는 월 → 연) 가격 − 현재 가격 × (기준 일수 − 사용 일수) ÷ 기준 일수(월 30·년 365, 결제한 날 = 1일), 0.01 Pi 올림 — 결제한 때부터 새 1개월·1년.
+            실제 권한 = 멤버 역할 ∩ 분류체계 요금제. 구독 중에는 업그레이드와 현재 요금제 선결제(만료일 뒤로 1개월·1년 연장)만 결제할 수 있고(무료·만료면 일반 결제), 업그레이드 = 상위 요금제(같은 요금제는 월 → 연) 가격 − 현재 가격 × (기준 일수 − 사용 일수) ÷ 기준 일수(월 30·년 365, 결제한 날 = 1일), 0.01 Pi 올림 — 결제한 때부터 새 1개월·1년.
           </p>
         </section>
       )}
@@ -166,15 +169,17 @@ export default function PlanPage({ params }: { params: Promise<{ areaId: string 
                       </li>
                     ))}
                   </ul>
-                  {!sub && (
+                  {(!sub || on) && (
                     <div className="mt-3 grid grid-cols-2 gap-2">
                       {fs.map((f) => (
-                        <button key={f.prd_cd} type="button" disabled={!info.can_pay || !!busy} onClick={() => void pay(f)} className="btn-3d px-2 py-1.5 text-sm disabled:opacity-50">
-                          {busy === `${f.plan_cd}${f.prd_cd}` ? '결제 중…' : `${f.pi_amt} Pi / ${f.prd_cd === 'Y' ? '년' : '월'}`}
+                        <button key={f.prd_cd} type="button" disabled={!info.can_pay || !!busy} onClick={() => void pay(f)} className="btn-3d px-2 py-1.5 text-sm disabled:opacity-50" title={sub ? `선결제 — 최종 만료일 ${dt(finalEnd)} 뒤로 1${f.prd_cd === 'Y' ? '년' : '개월'} 연장` : undefined}>
+                          {busy === `${f.plan_cd}${f.prd_cd}` ? '결제 중…' : `${sub ? '선결제 ' : ''}${f.pi_amt} Pi / ${f.prd_cd === 'Y' ? '년' : '월'}`}
                         </button>
                       ))}
                     </div>
                   )}
+                  {sub && on && <p className="mt-1 text-[11px] text-gray-500">선결제하면 그 기간이 시작될 때까지 업그레이드할 수 없습니다</p>}
+                  {sub && prepaid && cd > (p?.plan ?? '') && <p className="mt-3 text-xs text-gray-500">선결제 기간이 있어 업그레이드는 선결제 기간이 시작된 뒤 할 수 있습니다</p>}
                   {sub && ups.length > 0 && (
                     <div className="mt-3 grid grid-cols-2 gap-2">
                       {ups.map((up) => (
