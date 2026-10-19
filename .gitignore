@@ -120,3 +120,6 @@ work-statistics/
 ruvector.db
 
 .vercel
+
+# 분석용 로컬 영상(대용량 — 커밋 금지)
+mypoplist/videos/
