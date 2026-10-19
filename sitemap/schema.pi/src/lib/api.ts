@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server'
 import type { ZodType } from 'zod'
 import { getAppUser } from './auth'
 import { db } from './db'
+import { areaPlan, type AreaPlan } from './plan'
 import { effPerms, type MbrRole, type Perm } from './roles'
 
 const ERRORS = {
@@ -95,6 +96,14 @@ const ERRORS = {
   HEADER_MISSING: 'CSV 필수 헤더가 없습니다',
   LAST_SETTINGS_ROLE: '설정 권한자(시스템담당자·데이터아키텍트·표준담당자·모델러)가 한 명은 있어야 합니다',
   ROLE_ESCALATE: '본인 역할보다 권한이 많은 역할은 지정·변경할 수 없습니다',
+  PAY_PAYER: '요금제 결제는 이 분류체계의 시스템담당자·데이터아키텍트만 할 수 있습니다',
+  PAY_MISMATCH: '결제 정보가 요청과 맞지 않습니다(분류체계·요금제·결제자)',
+  PAY_AMOUNT: '결제 금액이 요금표와 다릅니다',
+  PAY_DUP: '이 분류체계에 진행 중인 다른 요금제 결제가 있습니다 — 완료 또는 취소 후 다시 시도하십시오',
+  PAY_PI_FAILED: 'Pi 결제 서버 처리에 실패했습니다 — 잠시 후 다시 시도하십시오',
+  PAY_PI_KEY: '결제 서버 설정(PI_API_KEY)이 없습니다 — 운영 환경변수를 확인하십시오',
+  PAY_PI_SESSION: 'Pi 계정으로 로그인해야 결제할 수 있습니다(Pi Browser)',
+  PLAN_OR_ROLE: '이 기능은 분류체계 요금제 또는 멤버 역할 권한이 없습니다(요금제 화면에서 확인)',
   APV_LEGACY: '승인 절차 도입 이전의 등록 신청입니다. 반려한 뒤 다시 신청하십시오',
   STS_NOT_EDITABLE: '승인대기 중인 데이터는 고칠 수 없습니다(신청을 취소한 뒤 다시 등록하십시오)',
   CONFLICT_SKIP: '반영 중 같은 이름이 먼저 저장되어 건너뜀',
@@ -190,22 +199,29 @@ export interface AreaAuth {
   user: CurrentUser
   role: MbrRole
   perms: Perm[]
+  plan: AreaPlan
+  admin: boolean // 전역 ADMIN(sys_user.role_cd) = 결제 없이 요금제4
 }
 export async function requireAreaRole(areaId: string, perm: Perm): Promise<AreaAuth | NextResponse> {
   const user = await currentUser()
   if (!user) return apiError('AUTH_REQUIRED', 401)
-  const { data, error } = await db()
-    .from('std_area_mbr')
-    .select('mbr_role_cd')
-    .eq('area_id', areaId)
-    .eq('usr_id', user.usr_id)
-    .eq('del_yn', 'N')
-    .maybeSingle()
-  if (error) return dbError(error)
-  if (!data) return apiError('FORBIDDEN', 403)
-  const role = data.mbr_role_cd as MbrRole
-  const perms = effPerms(role, 'P4') // 요금제 연결 전(R2) = 역할 권한 그대로
-  return perms.includes(perm) ? { user, role, perms } : apiError('FORBIDDEN', 403)
+  const [m, u] = await Promise.all([
+    db().from('std_area_mbr').select('mbr_role_cd').eq('area_id', areaId).eq('usr_id', user.usr_id).eq('del_yn', 'N').maybeSingle(),
+    db().from('sys_user').select('role_cd').eq('usr_id', user.usr_id).maybeSingle(),
+  ])
+  if (m.error) return dbError(m.error)
+  if (u.error) return dbError(u.error)
+  if (!m.data) return apiError('FORBIDDEN', 403)
+  let plan: AreaPlan
+  try {
+    plan = await areaPlan(areaId)
+  } catch (e) {
+    return dbError(e as { code?: string; message?: string })
+  }
+  const role = m.data.mbr_role_cd as MbrRole
+  const admin = u.data?.role_cd === 'ADMIN'
+  const perms = effPerms(role, plan.plan, admin)
+  return perms.includes(perm) ? { user, role, perms, plan, admin } : apiError(perm === 'VIEW' ? 'FORBIDDEN' : 'PLAN_OR_ROLE', 403)
 }
 
 export async function audit(row: {

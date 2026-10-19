@@ -11,7 +11,7 @@ export async function GET(req: Request, { params }: Ctx) {
   const { areaId } = await params
   const auth = await requireAreaRole(areaId, 'SQL_QUERY')
   if (auth instanceof NextResponse) return auth
-  const all = auth.perms.includes('APPROVE') // 전체 이력 = 승인권자(SYS·DA), 그 외 본인 이력만
+  const all = auth.perms.includes('DB_CONN_ADMIN') // 전체 이력 = SQL·접속 관리자(SYS·DA, 요금제4), 그 외 본인 이력만
   const r = await pageRows<Row>(() => {
     let q = db().from('mdl_sql_exec_hist').select('sql_exec_id, conn_id, usr_id, sql_txt, stmt_cnt, exec_mode_cd, rslt_cd, row_cnt, elapsed_ms, err_cd, err_msg, reg_dtm, mdl_db_conn(conn_nm)', { count: 'exact' }).eq('area_id', areaId).eq('del_yn', 'N')
     if (!all) q = q.eq('usr_id', auth.user.usr_id)
