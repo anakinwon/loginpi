@@ -1,9 +1,16 @@
-// 분류체계 역할 R&R 7종과 권한표(화면·서버 공용, 서버 전용 import 없음) — 코드 정의 정본은 DB std_cmn_cd(MBR_ROLE, sql/012)
-// 승인 1단계 : 승인권자(DA·STD)는 승인 화면에서 본인 신청도 승인 가능(처리자 = 신청자로 기록)
-// 등록·수정·삭제 시 즉시 승인(SELF_APPROVE)은 DA만 선택 가능, 그 외는 반드시 승인 화면을 거친다(2026-10-16 마스터 지시)
+// 분류체계 역할 R&R 7종 × 요금제 5종 권한표(화면·서버 공용, 서버 전용 import 없음) — 역할 코드 정본은 DB std_cmn_cd(MBR_ROLE, sql/012·048)
+// 2026-10-18 마스터 지시(권한·요금제 표) : 실제 권한 = 멤버 역할 권한 ∩ 분류체계 요금제 권한(교집합), 전역 ADMIN 은 요금제4
+// 승인 1단계 : 승인권자(SYS·DA)는 승인 화면에서 본인 신청도 승인 가능(처리자 = 신청자로 기록), 즉시 승인(SELF_APPROVE)도 SYS·DA
 export const ROLES = ['SYS', 'DA', 'STD', 'MDL', 'QLT', 'MIG', 'VIEWER'] as const
 export type MbrRole = (typeof ROLES)[number]
-export type Perm = 'VIEW' | 'REQUEST' | 'APPROVE' | 'SELF_APPROVE' | 'BULK' | 'SETTINGS' | 'DDL_APPROVE' | 'DB_CONN_ADMIN' | 'SQL_QUERY' | 'SQL_WRITE'
+
+// 표 칸 — 권한 6종(CRUD = SQL 편집기 DML·DDL 쓰기) + 메뉴 4종(1 SQL 편집기·2 표준·3 모델링·4 설정)
+export const BASE_PERMS = ['APPROVE', 'SELF_APPROVE', 'SETTINGS', 'BULK', 'REQUEST', 'CRUD', 'MENU_SQL', 'MENU_STD', 'MENU_MODEL', 'MENU_SET'] as const
+type BasePerm = (typeof BASE_PERMS)[number]
+// 파생 권한(표 밖) — 서버 경로·화면은 이 이름으로 판정
+//  VIEW = 멤버, STD_VIEW·MODEL_VIEW·SET_VIEW = 메뉴, STD_REQ·MODEL_EDIT = 신청 ∧ 메뉴, SQL_QUERY = 메뉴1,
+//  DDL_APPROVE = 승인, DB_CONN_ADMIN = 승인 ∧ 설정(접속 비밀번호 관리 — 설정만 가진 역할에는 주지 않음)
+export type Perm = BasePerm | 'VIEW' | 'STD_VIEW' | 'STD_REQ' | 'MODEL_VIEW' | 'MODEL_EDIT' | 'SET_VIEW' | 'SQL_QUERY' | 'DDL_APPROVE' | 'DB_CONN_ADMIN'
 
 export const ROLE_NM: Record<MbrRole, string> = {
   SYS: '시스템담당자',
@@ -15,30 +22,68 @@ export const ROLE_NM: Record<MbrRole, string> = {
   VIEWER: '조회자',
 }
 export const ROLE_DESC: Record<MbrRole, string> = {
-  SYS: '분류체계 설정·도메인그룹·약어·멤버 관리, 조회. 표준 데이터 신청·승인 없음',
-  DA: '표준 정책 총괄 : 단어·도메인·용어 신청·승인(신청 시 즉시 승인 선택 가능), 일괄등록, 설정·멤버 관리',
-  STD: '단어·도메인·용어 신청·승인(1단계 승인권자), 일괄등록',
-  MDL: '단어·도메인·용어 등록·수정·삭제 신청(승인권 없음), 본인 신청 취소',
-  QLT: '조회·엑셀 내려받기(품질 진단 기능은 향후 단계)',
-  MIG: '조회·엑셀 내려받기(이행 매핑용)',
-  VIEWER: '조회만',
+  SYS: '분류체계 설정·도메인그룹·약어·멤버 관리, 신청·승인(즉시 승인 포함), 일괄등록, SQL 쓰기, 모든 메뉴',
+  DA: '표준 정책 총괄 : 단어·도메인·용어 신청·승인(신청 시 즉시 승인 선택 가능), 일괄등록, 설정·멤버 관리, SQL 쓰기, 모든 메뉴',
+  STD: '단어·도메인·용어 신청, 일괄등록, 설정, SQL 쓰기, 모든 메뉴(승인권 없음)',
+  MDL: '단어·도메인·용어·모델 등록·수정·삭제 신청, 일괄등록, 설정, SQL 쓰기, 모든 메뉴(승인권 없음)',
+  QLT: '신청·SQL 쓰기, SQL 편집기·모델링·설정 메뉴(품질 진단 기능은 향후 단계)',
+  MIG: '신청·SQL 쓰기, SQL 편집기 메뉴(이행 매핑용)',
+  VIEWER: '표준사전 조회만',
 }
 
-export const PERM: Record<Perm, readonly MbrRole[]> = {
-  VIEW: ROLES,
-  REQUEST: ['DA', 'STD', 'MDL'],
-  APPROVE: ['DA', 'STD'],
-  SELF_APPROVE: ['DA'],
-  BULK: ['DA', 'STD'],
-  SETTINGS: ['SYS', 'DA'],
-  // DDL 직접 실행(2026-10-18) : 실행 요청 = REQUEST, 승인(자기 승인 금지)·접속 프로파일·에이전트 토큰 관리 = DA
-  DDL_APPROVE: ['DA'],
-  DB_CONN_ADMIN: ['DA'],
-  // SQL 편집기(2026-10-18) : 조회 = 데이터 담당 역할(READ ONLY 트랜잭션 강제), 쓰기(DML·DDL) 즉시 실행 = DA 만(마스터 결정 'DBeaver 처럼 전부 즉시')
-  SQL_QUERY: ['DA', 'STD', 'MDL', 'QLT', 'MIG'],
-  SQL_WRITE: ['DA'],
+const ALL = BASE_PERMS
+const MENUS: readonly BasePerm[] = ['MENU_SQL', 'MENU_STD', 'MENU_MODEL', 'MENU_SET']
+export const ROLE_PERMS: Record<MbrRole, readonly BasePerm[]> = {
+  SYS: ALL,
+  DA: ALL,
+  STD: ['SETTINGS', 'BULK', 'REQUEST', 'CRUD', ...MENUS],
+  MDL: ['SETTINGS', 'BULK', 'REQUEST', 'CRUD', ...MENUS],
+  QLT: ['REQUEST', 'CRUD', 'MENU_SQL', 'MENU_MODEL', 'MENU_SET'],
+  MIG: ['REQUEST', 'CRUD', 'MENU_SQL'],
+  VIEWER: ['MENU_STD'],
 }
-export const can = (role: string | null | undefined, perm: Perm) => !!role && (PERM[perm] as readonly string[]).includes(role)
+
+// 요금제 — FREE = 요금제 없음·만료(표준사전 조회만), 가격 정본은 DB sys_fee_plan(sql/049)
+export const PLANS = ['FREE', 'P1', 'P2', 'P3', 'P4'] as const
+export type PlanCd = (typeof PLANS)[number]
+export const PLAN_NM: Record<PlanCd, string> = { FREE: '무료(조회)', P1: '개발자', P2: '표준담당자', P3: '모델러', P4: 'DA' }
+export const PLAN_PERMS: Record<PlanCd, readonly BasePerm[]> = {
+  FREE: ['MENU_STD'],
+  P1: ['CRUD', 'MENU_SQL'],
+  P2: ['BULK', 'REQUEST', 'CRUD', 'MENU_SQL', 'MENU_STD'],
+  P3: ['BULK', 'REQUEST', 'CRUD', 'MENU_SQL', 'MENU_STD', 'MENU_MODEL'],
+  P4: ALL,
+}
+
+const isRole = (r: unknown): r is MbrRole => typeof r === 'string' && (ROLES as readonly string[]).includes(r)
+export const isPlan = (p: unknown): p is PlanCd => typeof p === 'string' && (PLANS as readonly string[]).includes(p)
+
+// 실제 권한 = 역할 ∩ 요금제(ADMIN = 요금제4) + 파생 권한. 멤버 아님(역할 없음·구 코드) = 빈 목록
+export function effPerms(role: string | null | undefined, plan: string | null | undefined, admin = false): Perm[] {
+  if (!isRole(role)) return []
+  const p = new Set<BasePerm>(PLAN_PERMS[admin ? 'P4' : isPlan(plan) ? plan : 'FREE'])
+  const b = new Set(ROLE_PERMS[role].filter((x) => p.has(x)))
+  const out: Perm[] = ['VIEW', ...b]
+  const both = (x: BasePerm, y: BasePerm) => b.has(x) && b.has(y)
+  if (b.has('MENU_STD')) out.push('STD_VIEW')
+  if (both('REQUEST', 'MENU_STD')) out.push('STD_REQ')
+  if (b.has('MENU_MODEL')) out.push('MODEL_VIEW')
+  if (both('REQUEST', 'MENU_MODEL')) out.push('MODEL_EDIT')
+  if (b.has('MENU_SET')) out.push('SET_VIEW')
+  if (b.has('MENU_SQL')) out.push('SQL_QUERY')
+  if (b.has('APPROVE')) out.push('DDL_APPROVE')
+  if (both('APPROVE', 'SETTINGS')) out.push('DB_CONN_ADMIN')
+  return out
+}
+
+// 역할만 본 권한(요금제 무관 = 요금제4) — 권한 상승 판정·역할 설명용
+export const can = (role: string | null | undefined, perm: Perm) => effPerms(role, 'P4').includes(perm)
+
+// 역할 지정·변경 가능 = 대상 역할(지금·바꿀)의 표 권한이 모두 내 역할 표 권한 안(MDL 이 자기·남을 DA 로 못 올림)
+export function canAssign(myRole: string | null | undefined, ...targets: (string | null | undefined)[]) {
+  if (!isRole(myRole) || !ROLE_PERMS[myRole].includes('SETTINGS')) return false
+  return targets.every((t) => isRole(t) && ROLE_PERMS[t].every((x) => ROLE_PERMS[myRole].includes(x)))
+}
 
 export const STS_NM: Record<string, string> = { REQ: '승인대기', CNFM: '승인완료', RJCT: '반려', DSCD: '폐기' }
 export const APV_STS_NM: Record<string, string> = { REQ: '대기', APV: '승인', RJCT: '반려', CNCL: '취소' }

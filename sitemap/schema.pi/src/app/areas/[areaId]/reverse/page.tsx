@@ -6,7 +6,7 @@ import { piFetch } from '@pi/auth/client'
 import Link from 'next/link'
 import { use, useCallback, useEffect, useMemo, useState } from 'react'
 import { dbmsList, type DbmsCd } from '@/lib/modelpi/dbms'
-import { can, type MbrRole } from '@/lib/roles'
+import { type MbrRole, type Perm } from '@/lib/roles'
 
 interface Job {
   rvs_job_id: string
@@ -61,6 +61,7 @@ export default function ReversePage({ params }: { params: Promise<{ areaId: stri
   const { areaId } = use(params)
   const api = `/api/areas/${areaId}`
   const [role, setRole] = useState<MbrRole | null>(null)
+  const [perms, setPerms] = useState<Perm[]>([]) // 실제 권한 = 역할 ∩ 요금제(서버 계산)
   const [prjs, setPrjs] = useState<{ prj_id: string; prj_nm: string }[]>([])
   const [prjId, setPrjId] = useState('')
   const [subjs, setSubjs] = useState<{ subj_id: string; subj_nm: string; prj_id: string }[]>([])
@@ -77,13 +78,13 @@ export default function ReversePage({ params }: { params: Promise<{ areaId: stri
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState('')
   const [log, setLog] = useState<string[]>([])
-  const editor = !!role && can(role, 'REQUEST')
+  const editor = perms.includes('MODEL_EDIT')
   const base = `${api}/projects/${prjId}/reverse`
 
   useEffect(() => {
     piFetch(api)
       .then((r) => r.json())
-      .then((j) => j.ok && setRole(j.role))
+      .then((j) => j.ok && (setRole(j.role), setPerms(j.perms ?? [])))
     piFetch(`${api}/projects`)
       .then((r) => r.json())
       .then((j) => {

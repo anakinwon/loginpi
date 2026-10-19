@@ -244,9 +244,9 @@ export async function retryReq(areaId: string, prjId: string, reqId: string, uid
 }
 
 // 승인 — DA, 요청자 ≠ 승인자, 화면 해시 = 저장 해시 = 현재 모델 재생성 해시, 접속 지문 그대로
-// 분류체계의 활성 데이터아키텍트 수 — 1명이면 본인 승인 허용(마스터 결정 2026-10-18, DB 트리거 sql/043 이 다시 확인)
+// 분류체계의 활성 승인권자(SYS·DA) 수 — 1명이면 본인 승인 허용(마스터 결정 2026-10-18, DB 트리거 sql/043·048 이 다시 확인)
 export async function daCount(areaId: string) {
-  const r = await db().from('std_area_mbr').select('usr_id', { count: 'exact', head: true }).eq('area_id', areaId).eq('mbr_role_cd', 'DA').eq('del_yn', 'N')
+  const r = await db().from('std_area_mbr').select('usr_id', { count: 'exact', head: true }).eq('area_id', areaId).in('mbr_role_cd', ['SYS', 'DA']).eq('del_yn', 'N')
   if (r.error) throw r.error
   return r.count ?? 0
 }
@@ -259,7 +259,7 @@ export async function approveReq(areaId: string, prjId: string, reqId: string, e
   const self = q.req_usr_id === uid
   if (self) {
     // 요청 때부터 단독 DA + 지금도 단독(요청 뒤 다른 DA 를 빼는 우회 차단 — DB 트리거 sql/044 가 다시 확인)
-    if (q.sole_da_yn !== 'Y' || (await daCount(areaId)) !== 1) return fail('DDL_SELF_APPROVE', 403, '본인 승인은 요청 때부터 유일한 데이터아키텍트인 경우만 — 다른 데이터아키텍트가 승인합니다')
+    if (q.sole_da_yn !== 'Y' || (await daCount(areaId)) !== 1) return fail('DDL_SELF_APPROVE', 403, '본인 승인은 요청 때부터 유일한 승인권자(시스템담당자·데이터아키텍트)인 경우만 — 다른 승인권자가 승인합니다')
     if (!selfRsn || selfRsn.trim().length < 5) return fail('DDL_SELF_APPROVE', 403, '본인 승인 사유를 5자 이상 입력하십시오')
   }
   if (q.ddl_hash !== expectHash) return fail('DDL_CHANGED', 409)

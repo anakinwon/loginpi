@@ -1,10 +1,9 @@
-// 승인 요청 목록 — GET ?sts=REQ|APV|RJCT|CNCL&tp=DIC|DOM|TERM&act=INS|UPD|DEL&mine=1&page=&size= : 승인권자(DA·STD)는 전체, 그 외는 본인 신청만
+// 승인 요청 목록 — GET ?sts=REQ|APV|RJCT|CNCL&tp=DIC|DOM|TERM&act=INS|UPD|DEL&mine=1&page=&size= : 승인권자(roles.ts 권한표)는 전체, 그 외는 본인 신청만
 // 응답 행 = 요청 + 신청자·처리자 이름 + tgt(대상 현재 이름 : 수정·삭제 요청 표시용)
 import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { dbError, requireAreaRole } from '@/lib/api'
 import { pageRows } from '@/lib/paging'
-import { can } from '@/lib/roles'
 
 type Ctx = { params: Promise<{ areaId: string }> }
 const COLS =
@@ -25,7 +24,7 @@ export async function GET(req: Request, { params }: Ctx) {
   const sts = pick(sp.get('sts'), ['REQ', 'APV', 'RJCT', 'CNCL']) ?? 'REQ'
   const tp = pick(sp.get('tp'), ['DIC', 'DOM', 'TERM'])
   const act = pick(sp.get('act'), ['INS', 'UPD', 'DEL'])
-  const approver = can(auth.role, 'APPROVE')
+  const approver = auth.perms.includes('APPROVE')
   const mine = !approver || sp.get('mine') === '1'
   const build = () => {
     let q = db()

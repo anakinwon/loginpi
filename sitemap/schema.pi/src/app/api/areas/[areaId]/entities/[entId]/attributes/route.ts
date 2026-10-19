@@ -19,7 +19,7 @@ const schema = z.object({
 
 export async function GET(_req: Request, { params }: Ctx) {
   const { areaId, entId } = await params
-  const auth = await requireAreaRole(areaId, 'VIEW')
+  const auth = await requireAreaRole(areaId, 'MODEL_VIEW')
   if (auth instanceof NextResponse) return auth
   if (!z.string().uuid().safeParse(entId).success) return apiError('INVALID_INPUT', 400)
   try {
@@ -31,7 +31,7 @@ export async function GET(_req: Request, { params }: Ctx) {
 
 export async function POST(req: Request, { params }: Ctx) {
   const { areaId, entId } = await params
-  const auth = await requireAreaRole(areaId, 'REQUEST')
+  const auth = await requireAreaRole(areaId, 'MODEL_EDIT')
   if (auth instanceof NextResponse) return auth
   const b = await parseBody(req, schema)
   if (b instanceof NextResponse) return b

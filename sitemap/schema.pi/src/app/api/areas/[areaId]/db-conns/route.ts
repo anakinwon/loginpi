@@ -3,7 +3,6 @@
 import { NextResponse } from 'next/server'
 import { apiError, audit, dbError, parseBody, requireAreaRole } from '@/lib/api'
 import { connBody, connOut, failRes, isFail, listConns, saveConn } from '@/lib/model-ddl-req'
-import { can } from '@/lib/roles'
 import { connBlock, profileKey } from '@/lib/secret'
 
 type Ctx = { params: Promise<{ areaId: string }> }
@@ -13,7 +12,7 @@ export async function GET(_req: Request, { params }: Ctx) {
   const auth = await requireAreaRole(areaId, 'VIEW')
   if (auth instanceof NextResponse) return auth
   try {
-    const full = can(auth.role, 'DB_CONN_ADMIN')
+    const full = auth.perms.includes('DB_CONN_ADMIN')
     return NextResponse.json({ ok: true, items: (await listConns(areaId)).map((c) => connOut(c, full)), key_set: !!profileKey(), block: connBlock(), admin: full })
   } catch (e) {
     return dbError(e as { code?: string; message?: string })

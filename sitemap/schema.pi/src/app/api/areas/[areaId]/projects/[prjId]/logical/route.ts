@@ -10,7 +10,7 @@ type Ctx = { params: Promise<{ areaId: string; prjId: string }> }
 
 export async function GET(_req: Request, { params }: Ctx) {
   const { areaId, prjId } = await params
-  const auth = await requireAreaRole(areaId, 'VIEW')
+  const auth = await requireAreaRole(areaId, 'MODEL_VIEW')
   if (auth instanceof NextResponse) return auth
   if (!z.string().uuid().safeParse(prjId).success) return apiError('INVALID_INPUT', 400)
   try {

@@ -34,7 +34,7 @@ async function prjEnts(areaId: string, prjId: string) {
 
 export async function GET(req: Request, { params }: Ctx) {
   const { areaId, prjId } = await params
-  const auth = await requireAreaRole(areaId, 'VIEW')
+  const auth = await requireAreaRole(areaId, 'MODEL_VIEW')
   if (auth instanceof NextResponse) return auth
   if (!uuid.safeParse(prjId).success) return apiError('INVALID_INPUT', 400)
   const sp = new URL(req.url).searchParams
@@ -105,7 +105,7 @@ export async function GET(req: Request, { params }: Ctx) {
 
 export async function POST(req: Request, { params }: Ctx) {
   const { areaId, prjId } = await params
-  const auth = await requireAreaRole(areaId, 'REQUEST')
+  const auth = await requireAreaRole(areaId, 'MODEL_EDIT')
   if (auth instanceof NextResponse) return auth
   if (!uuid.safeParse(prjId).success) return apiError('INVALID_INPUT', 400)
   if (new URL(req.url).searchParams.get('sync') === '1') {
@@ -174,7 +174,7 @@ const patchBody = z.object({
 
 export async function PATCH(req: Request, { params }: Ctx) {
   const { areaId, prjId } = await params
-  const auth = await requireAreaRole(areaId, 'REQUEST')
+  const auth = await requireAreaRole(areaId, 'MODEL_EDIT')
   if (auth instanceof NextResponse) return auth
   if (!uuid.safeParse(prjId).success) return apiError('INVALID_INPUT', 400)
   const b = await parseBody(req, patchBody)
@@ -221,7 +221,7 @@ export async function PATCH(req: Request, { params }: Ctx) {
 
 export async function DELETE(req: Request, { params }: Ctx) {
   const { areaId, prjId } = await params
-  const auth = await requireAreaRole(areaId, 'REQUEST')
+  const auth = await requireAreaRole(areaId, 'MODEL_EDIT')
   if (auth instanceof NextResponse) return auth
   const sp = new URL(req.url).searchParams
   const mdlId = sp.get('mdl')

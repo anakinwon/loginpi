@@ -14,7 +14,7 @@ const body = z
 
 export async function GET(_req: Request, { params }: Ctx) {
   const { areaId, prjId } = await params
-  const auth = await requireAreaRole(areaId, 'VIEW')
+  const auth = await requireAreaRole(areaId, 'MODEL_VIEW')
   if (auth instanceof NextResponse) return auth
   if (!uuid.safeParse(prjId).success) return apiError('INVALID_INPUT', 400)
   try {
@@ -27,7 +27,7 @@ export async function GET(_req: Request, { params }: Ctx) {
 
 export async function POST(req: Request, { params }: Ctx) {
   const { areaId, prjId } = await params
-  const auth = await requireAreaRole(areaId, 'REQUEST')
+  const auth = await requireAreaRole(areaId, 'MODEL_EDIT')
   if (auth instanceof NextResponse) return auth
   if (!uuid.safeParse(prjId).success) return apiError('INVALID_INPUT', 400)
   const b = await parseBody(req, body)

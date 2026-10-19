@@ -35,7 +35,7 @@ async function load(areaId: string, relId: string) {
 
 export async function GET(_req: Request, { params }: Ctx) {
   const { areaId, relId } = await params
-  const auth = await requireAreaRole(areaId, 'VIEW')
+  const auth = await requireAreaRole(areaId, 'MODEL_VIEW')
   if (auth instanceof NextResponse) return auth
   if (!z.string().uuid().safeParse(relId).success) return apiError('INVALID_INPUT', 400)
   try {
@@ -59,7 +59,7 @@ const body = z.object({ dic_ids: z.array(z.string().uuid()).min(1).max(20), subj
 
 export async function POST(req: Request, { params }: Ctx) {
   const { areaId, relId } = await params
-  const auth = await requireAreaRole(areaId, 'REQUEST')
+  const auth = await requireAreaRole(areaId, 'MODEL_EDIT')
   if (auth instanceof NextResponse) return auth
   const b = await parseBody(req, body)
   if (b instanceof NextResponse) return b

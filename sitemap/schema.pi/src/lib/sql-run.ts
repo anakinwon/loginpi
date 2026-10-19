@@ -1,5 +1,5 @@
 // SQL 편집기 실행(서버 전용, 2026-10-18 마스터 지시 "Universal SQL Editor" — DBeaver 참고). 접속 = 저장된 서버 직접(SRV) 접속만
-// 판정 : 서버가 splitSql·classify·danger 를 다시 계산(클라이언트 값 신뢰 안 함) — 트랜잭션 제어 거부, 쓰기 = SQL_WRITE(DA), 위험 문장 = confirm 필요
+// 판정 : 서버가 splitSql·classify·danger 를 다시 계산(클라이언트 값 신뢰 안 함) — 트랜잭션 제어 거부, 쓰기 = CRUD(역할 ∩ 요금제), 위험 문장 = confirm 필요
 // PostgreSQL 조회 = 문장마다 READ ONLY 트랜잭션 + SET LOCAL 타임아웃 + SELECT 1(스냅샷 고정 — 이후 transaction_read_only 해제 불가) 후 ROLLBACK
 //  행 질의(SELECT·WITH·VALUES·TABLE)는 cursor(확장 프로토콜 — 한 문장만 허용)로 limit 까지만 가져옴. standard_conforming_strings = on 고정(분리기와 같은 문자열 해석)
 // 쓰기(DA) 실행 방식(DBeaver Auto/Manual) — 서버리스라 요청 사이 트랜잭션을 열어 둘 수 없어 MANUAL 은 '미리 실행 + Commit 때 재실행'(마스터 결정 2026-10-18)
@@ -13,7 +13,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { db } from './db'
 import { audit, errMsg, type ErrorCode } from './api'
-import { can, type MbrRole } from './roles'
+import type { Perm } from './roles'
 import { IDLE_TX_MS, LOCK_MS, maskErr, ORA_EXPIRE_MIN, pgClient, resolveTarget, STMT_MS, type Target } from './db-exec'
 import { connBlock, openPwd } from './secret'
 import { getConn, tlsHint } from './model-ddl-req'
@@ -292,12 +292,12 @@ async function runOra(t: Target, pwd: string, stmts: Stmt[], kinds: Kind[], o: R
 }
 
 // 접속 열기 공통(실행·메타) — 같은 분류체계·서버 직접·조회 전용 계정(DA 아니면)·스위치·키·비밀번호·공인 주소 확인
-export async function openConn(areaId: string, connId: string, role: MbrRole): Promise<{ c: NonNullable<Awaited<ReturnType<typeof getConn>>>; d: Dialect; t: Target; pwd: string } | NextResponse> {
+export async function openConn(areaId: string, connId: string, perms: readonly Perm[]): Promise<{ c: NonNullable<Awaited<ReturnType<typeof getConn>>>; d: Dialect; t: Target; pwd: string } | NextResponse> {
   const c = await getConn(areaId, connId)
   if (!c) return failRes({ code: 'NOT_FOUND', status: 404 })
   if (c.exec_mthd_cd !== 'SRV') return failRes({ code: 'SQL_AGT_UNSUPPORTED', status: 400 })
   // DA 아닌 역할 = 조회 전용 계정 접속만(fail-closed) — 어휘 판정·READ ONLY 트랜잭션은 사용자 함수 안 부작용을 못 막고, 메타도 그 계정 권한으로 열람
-  if (!can(role, 'SQL_WRITE') && c.rdonly_acct_yn !== 'Y') return failRes({ code: 'SQL_RDONLY_REQUIRED', status: 403 })
+  if (!perms.includes('CRUD') && c.rdonly_acct_yn !== 'Y') return failRes({ code: 'SQL_RDONLY_REQUIRED', status: 403 })
   const why = connBlock()
   if (why) return failRes({ code: 'DB_CONN_DISABLED', status: 503, detail: why })
   const d: Dialect | null = c.dbms_cd === '0014' ? 'PG' : c.dbms_cd === '0001' ? 'ORA' : null
@@ -311,11 +311,11 @@ export async function openConn(areaId: string, connId: string, role: MbrRole): P
 }
 
 // 실행 요청 처리 — 권한·접속·판정 → 실행 → 이력·감사
-export async function runEditor(areaId: string, uid: string, role: MbrRole, b: Body, startedAt = Date.now()): Promise<NextResponse> {
+export async function runEditor(areaId: string, uid: string, perms: readonly Perm[], b: Body, startedAt = Date.now()): Promise<NextResponse> {
   const cn = await getConn(areaId, b.conn_id)
   if (!cn) return failRes({ code: 'NOT_FOUND', status: 404 })
   const d: Dialect = cn.dbms_cd === '0001' ? 'ORA' : 'PG' // 판정용(지원 DBMS 확인은 openConn)
-  const canWrite = can(role, 'SQL_WRITE')
+  const canWrite = perms.includes('CRUD')
   const manual = b.tx === 'MANUAL' && canWrite // MANUAL 은 쓰기 권한자만(조회 전용은 언제나 READ)
 
   // 대기 문장 — 하나씩 정확히 한 문장, 트랜잭션 제어 아님(서버가 매번 다시 판정)
@@ -354,7 +354,7 @@ export async function runEditor(areaId: string, uid: string, role: MbrRole, b: B
   const mode: Mode = b.commit ? 'TX' : manual && (write || prefix.length) ? 'TRY' : write ? 'AUTO' : 'READ'
   const histMode = mode === 'TX' ? 'CMIT' : mode === 'TRY' ? 'TRY' : mode === 'AUTO' ? 'WRITE' : 'READ'
 
-  const oc = await openConn(areaId, b.conn_id, role)
+  const oc = await openConn(areaId, b.conn_id, perms)
   if (oc instanceof NextResponse) return oc
   const { c, t, pwd } = oc
 

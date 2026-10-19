@@ -14,7 +14,7 @@ const COLS = 'ent_id, subj_id, ent_log_nm, ent_tp_cd, ent_desc, ent_asst_nm, dic
 
 export async function GET(req: Request, { params }: Ctx) {
   const { areaId } = await params
-  const auth = await requireAreaRole(areaId, 'VIEW')
+  const auth = await requireAreaRole(areaId, 'MODEL_VIEW')
   if (auth instanceof NextResponse) return auth
   const sp = new URL(req.url).searchParams
   const subj = sp.get('subj')
@@ -61,7 +61,7 @@ export async function GET(req: Request, { params }: Ctx) {
 
 export async function POST(req: Request, { params }: Ctx) {
   const { areaId } = await params
-  const auth = await requireAreaRole(areaId, 'REQUEST')
+  const auth = await requireAreaRole(areaId, 'MODEL_EDIT')
   if (auth instanceof NextResponse) return auth
   const body = await parseBody(req, entSchema)
   if (body instanceof NextResponse) return body

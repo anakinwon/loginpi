@@ -14,7 +14,7 @@ const COLS =
 
 export async function GET(req: Request, { params }: Ctx) {
   const { areaId } = await params
-  const auth = await requireAreaRole(areaId, 'VIEW')
+  const auth = await requireAreaRole(areaId, 'STD_VIEW')
   if (auth instanceof NextResponse) return auth
   const sp = new URL(req.url).searchParams
   const q = sp.get('q')?.trim()
@@ -47,12 +47,12 @@ export async function GET(req: Request, { params }: Ctx) {
 
 export async function POST(req: Request, { params }: Ctx) {
   const { areaId } = await params
-  const auth = await requireAreaRole(areaId, 'REQUEST')
+  const auth = await requireAreaRole(areaId, 'STD_REQ')
   if (auth instanceof NextResponse) return auth
   const opt = await reqOpt(req)
   const body = await parseBody(req, domainSchema)
   if (body instanceof NextResponse) return body
-  const { user, role } = auth
+  const { user, perms } = auth
 
   let dom_nm: string | null
   try {
@@ -71,7 +71,7 @@ export async function POST(req: Request, { params }: Ctx) {
 
   const row = { ...body, dom_nm }
   // 모든 등록은 승인 신청(승인대기) : DA가 즉시 승인을 고를 때만 승인완료
-  const res = await requestIns('DOM', areaId, row, user, role, { self_apv: opt.self_apv, reason: opt.req_rsn })
+  const res = await requestIns('DOM', areaId, row, user, perms, { self_apv: opt.self_apv, reason: opt.req_rsn })
   if (typeof res === 'string') return apiError(res, ERR_STATUS(res))
   const { data: dom, error } = await db().from('std_dom').select(COLS).eq('dom_id', res.tgt_id).single()
   if (error) return dbError(error)

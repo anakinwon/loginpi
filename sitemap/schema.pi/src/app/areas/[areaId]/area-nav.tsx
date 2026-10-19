@@ -1,5 +1,5 @@
 'use client'
-// 분류체계 하단 고정 메뉴 — 모든 분류체계 화면 공통(layout). 현재 화면 강조, 설정·일괄등록은 권한자만(GET /api/areas/[areaId] 의 role)
+// 분류체계 하단 고정 메뉴 — 모든 분류체계 화면 공통(layout). 현재 화면 강조, 메뉴 묶음·설정·일괄등록은 권한자만(GET /api/areas/[areaId] 의 perms = 역할 ∩ 요금제)
 //  메뉴 체계(마스터 정의 2026-10-17) :
 //   · 표준사전 묶음 = 표준단어·표준도메인·표준용어 — 가장 기본 기능이라 한 묶음, 일괄등록 = 단어·도메인·용어 각각의 서브 기능(같은 화면 ?tab=words|domains|terms, 마스터 지시 2026-10-17)
 //   · 묶음 4개(SQL 편집기·표준사전·모델·설정, 2026-10-18)는 모두 테두리 박스 — 1개짜리 묶음(설정·SQL 편집기)도 박스
@@ -17,8 +17,8 @@ import { piFetch } from '@pi/auth/client'
 import Link from 'next/link'
 import { useParams, usePathname, useSearchParams } from 'next/navigation'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { BookA, BookOpenText, Database, Lightbulb, Settings, Shapes, SquareTerminal, Workflow, type LucideIcon } from 'lucide-react'
-import { can, type Perm } from '@/lib/roles'
+import { BookA, BookOpenText, Database, Gem, Lightbulb, Settings, Shapes, SquareTerminal, Workflow, type LucideIcon } from 'lucide-react'
+import type { Perm } from '@/lib/roles'
 
 interface Item {
   seg: string
@@ -92,7 +92,7 @@ const MODEL: Item[] = [
   },
 ]
 
-// SQL 편집기 — 물리 모델 서브에서 독립(마스터 지시 2026-10-18), 조회 권한(SQL_QUERY) 역할만
+// SQL 편집기 — 물리 모델 서브에서 독립(마스터 지시 2026-10-18), 메뉴1 권한(SQL_QUERY)만
 const SQLED: Item[] = [{ seg: 'sql', nm: 'SQL 편집기', icon: SquareTerminal, tone: 'rose', perm: 'SQL_QUERY' }]
 
 const REST: Item[] = [
@@ -102,6 +102,7 @@ const REST: Item[] = [
     icon: Settings,
     tone: 'slate',
     subs: [
+      { seg: 'plan', nm: '요금제' },
       { seg: 'members', nm: '멤버' },
       { seg: 'settings', nm: '설정', perm: 'SETTINGS' },
       { seg: 'history', nm: '이력' },
@@ -113,6 +114,9 @@ const REST: Item[] = [
     ],
   },
 ]
+
+// 요금제 — 설정 메뉴가 안 보이는 경우(무료·만료·설정 메뉴 없는 역할)에도 항상 들어갈 수 있게 단독 타일
+const PLAN_ITEM: Item = { seg: 'plan', nm: '요금제', icon: Gem, tone: 'amber' }
 
 const group = 'flex shrink-0 gap-1 rounded-md border border-gray-300 bg-gray-50 p-0.5' // 메뉴 묶음 박스
 // ?tab= 이 없을 때 화면별 기본 탭
@@ -141,13 +145,13 @@ export default function AreaNav() {
   const { areaId } = useParams<{ areaId: string }>()
   const pathname = usePathname()
   const curTab = useSearchParams().get('tab')
-  const [role, setRole] = useState<string | null>(null)
+  const [perms, setPerms] = useState<Perm[]>([])
 
   useEffect(() => {
     let alive = true
     piFetch(`/api/areas/${areaId}`)
       .then((r) => r.json())
-      .then((j) => alive && setRole(j.ok ? j.role : null))
+      .then((j) => alive && setPerms(j.ok ? (j.perms ?? []) : []))
       .catch(() => {})
     return () => {
       alive = false
@@ -159,7 +163,7 @@ export default function AreaNav() {
   // 서브 탭 : 같은 화면을 ?tab= 으로 나눈 경우(개념 모델·일괄등록) 탭 값까지 비교 — 탭 없음 = 화면별 첫 탭
   const subOn = (x: { seg: string; tab?: string }) => at(x.seg) && (!x.tab || (curTab ?? DEF_TAB[x.seg]) === x.tab)
   const isOn = (m: Item) => (m.subs ? m.subs.some(subOn) : at(m.seg))
-  const allowed = (p?: Perm) => !p || can(role, p)
+  const allowed = (p?: Perm) => !p || perms.includes(p)
   const visible = (list: Item[]) => list.filter((m) => allowed(m.perm))
   const subsOf = (m: Item) => (m.subs ?? []).filter((x) => allowed(x.perm))
   // 상위 버튼 이동처 : 자기 화면을 볼 수 있으면 그대로, 아니면 볼 수 있는 첫 서브 화면
@@ -191,7 +195,7 @@ export default function AreaNav() {
       row?.removeEventListener('scroll', place)
       ro.disconnect()
     }
-  }, [pathname, curTab, role, active?.seg])
+  }, [pathname, curTab, perms, active?.seg])
   // 메뉴 높이(서브 바 유무·화면 폭에 따라 바뀜) → :root --area-nav-h
   useEffect(() => {
     const nav = navRef.current
@@ -248,15 +252,26 @@ export default function AreaNav() {
               {visible(SQLED).map(item)}
             </ul>
           )}
-          <ul aria-label="표준사전" data-sub-align="left" className={group}>
-            {visible(CORE).map(item)}
-          </ul>
-          <ul aria-label="모델" data-sub-align="right" className={group}>
-            {visible(MODEL).map(item)}
-          </ul>
-          <ul aria-label="설정" data-sub-align="right" className={group}>
-            {visible(REST).map(item)}
-          </ul>
+          {/* 메뉴 묶음 = 메뉴 권한(2 표준·3 모델링·4 설정)이 있을 때만 — 역할 ∩ 요금제 */}
+          {allowed('STD_VIEW') && (
+            <ul aria-label="표준사전" data-sub-align="left" className={group}>
+              {visible(CORE).map(item)}
+            </ul>
+          )}
+          {allowed('MODEL_VIEW') && (
+            <ul aria-label="모델" data-sub-align="right" className={group}>
+              {visible(MODEL).map(item)}
+            </ul>
+          )}
+          {allowed('SET_VIEW') ? (
+            <ul aria-label="설정" data-sub-align="right" className={group}>
+              {visible(REST).map(item)}
+            </ul>
+          ) : (
+            <ul aria-label="요금제" className={group}>
+              {item(PLAN_ITEM)}
+            </ul>
+          )}
         </div>
       </div>
     </nav>

@@ -3,7 +3,7 @@
 import { z } from 'zod'
 import { db } from './db'
 import { dupCodeOf, type ErrorCode } from './api'
-import { can, STS_NM, type MbrRole } from './roles'
+import { STS_NM, type Perm } from './roles'
 import { domKeyWordError } from './domain'
 import { termDomError, wordsByIds } from './term'
 import { termRuleError } from './term-split'
@@ -111,13 +111,13 @@ export async function requestIns(
   areaId: string,
   row: Record<string, unknown>,
   user: { usr_id: string },
-  role: MbrRole,
+  perms: readonly Perm[],
   opt: { self_apv?: boolean; reason?: string | null },
 ): Promise<{ tgt_id: string; apv_req_id: string; status: 'REQ' | 'CNFM' } | ErrorCode> {
   const { data, error } = await db().rpc('fn_req_std_ins', { p_tp: tp, p_area_id: areaId, p_row: row, p_usr_id: user.usr_id, p_rsn: opt.reason || null })
   if (error) return mapErr(error, tp)
   const { tgt_id, apv_req_id } = data as { tgt_id: string; apv_req_id: string }
-  if (!(opt.self_apv && can(role, 'SELF_APPROVE'))) return { tgt_id, apv_req_id, status: 'REQ' }
+  if (!(opt.self_apv && perms.includes('SELF_APPROVE'))) return { tgt_id, apv_req_id, status: 'REQ' }
   const a = await approveReq(areaId, apv_req_id, user.usr_id, '자기 승인(등록 즉시)')
   // 즉시 승인이 실패하면 승인대기로 남김(승인 화면에서 처리)
   return { tgt_id, apv_req_id, status: typeof a === 'string' ? 'REQ' : 'CNFM' }
@@ -132,7 +132,7 @@ export async function requestChg(
   row: Record<string, unknown>,
   ver: number,
   user: { usr_id: string },
-  role: MbrRole,
+  perms: readonly Perm[],
   opt: { self_apv?: boolean; reason?: string | null },
 ): Promise<{ apv_req_id: string; status: 'REQ' | 'APV'; ver_no?: number } | ErrorCode> {
   const uid = user.usr_id
@@ -143,7 +143,7 @@ export async function requestChg(
     .single()
   if (ins.error) return mapErr(ins.error)
   const apv_req_id = ins.data.apv_req_id as string
-  if (!(opt.self_apv && can(role, 'SELF_APPROVE'))) return { apv_req_id, status: 'REQ' }
+  if (!(opt.self_apv && perms.includes('SELF_APPROVE'))) return { apv_req_id, status: 'REQ' }
   const a = await approveReq(areaId, apv_req_id, uid, '자기 승인(즉시)')
   if (typeof a === 'string') return a
   return { apv_req_id, status: 'APV' }
@@ -156,7 +156,7 @@ export async function resubmitIns(tp: ApvTp, id: string, ver: number, row: Recor
   return { apv_req_id: data as string }
 }
 
-// 등록·수정 요청 본문 공통 칸 : 즉시 승인(DA만 유효)·신청사유
+// 등록·수정 요청 본문 공통 칸 : 즉시 승인(SELF_APPROVE = SYS·DA·요금제4 만 유효)·신청사유
 export const reqOptShape = { self_apv: z.boolean().optional(), req_rsn: z.string().trim().max(2000).optional() }
 export async function reqOpt(req: Request): Promise<{ self_apv?: boolean; req_rsn?: string }> {
   try {

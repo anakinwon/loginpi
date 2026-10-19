@@ -3,7 +3,7 @@ import { piFetch } from '@pi/auth/client'
 // 금칙어 관리 화면(P05) — 표준단어별 대체 표기(금칙어·이음동의어) 등록·삭제·조회. 원칙 : 동의어는 표준단어로 쓰지 않고 이 목록으로만 관리(sql/016)
 import Link from 'next/link'
 import { use, useCallback, useEffect, useState } from 'react'
-import { can, type MbrRole } from '@/lib/roles'
+import { type MbrRole, type Perm } from '@/lib/roles'
 import { ActorCells, noEnterSubmit } from '../words/word-board'
 
 interface Item {
@@ -25,6 +25,7 @@ export default function ForbiddenPage({ params }: { params: Promise<{ areaId: st
   const { areaId } = use(params)
   const base = `/api/areas/${areaId}/forbidden`
   const [role, setRole] = useState<MbrRole | null>(null)
+  const [perms, setPerms] = useState<Perm[]>([]) // 실제 권한 = 역할 ∩ 요금제(서버 계산)
   const [items, setItems] = useState<Item[]>([])
   const [words, setWords] = useState<Word[]>([])
   const [form, setForm] = useState({ word: '', tp: 'BAN', txt: '' })
@@ -35,12 +36,12 @@ export default function ForbiddenPage({ params }: { params: Promise<{ areaId: st
   useEffect(() => {
     piFetch(`/api/areas/${areaId}`)
       .then((r) => r.json())
-      .then((j) => j.ok && setRole(j.role))
+      .then((j) => j.ok && (setRole(j.role), setPerms(j.perms ?? [])))
     piFetch(`/api/areas/${areaId}/words?size=100&sts=CNFM`)
       .then((r) => r.json())
       .then((j) => j.ok && setWords(j.words))
   }, [areaId])
-  const editor = !!role && can(role, 'APPROVE')
+  const editor = perms.includes('APPROVE')
 
   const load = useCallback(async () => {
     const sp = new URLSearchParams({ page: String(cond.page), size: String(cond.size), ...(cond.kw ? { q: cond.kw } : {}), ...(cond.tp ? { tp: cond.tp } : {}) })
@@ -130,7 +131,7 @@ export default function ForbiddenPage({ params }: { params: Promise<{ areaId: st
               등록
             </button>
           </div>
-          {role && !editor && <p className="mt-2 font-medium text-gray-600">조회 권한 : 금칙어 등록·삭제는 데이터아키텍트·표준담당자만 가능합니다</p>}
+          {role && !editor && <p className="mt-2 font-medium text-gray-600">조회 권한 : 금칙어 등록·삭제는 승인 권한(시스템담당자·데이터아키텍트, 요금제4)이 있어야 합니다</p>}
           {msg && (
             <p role="status" className="mt-2 font-medium text-[#1f3a68]">
               {msg}

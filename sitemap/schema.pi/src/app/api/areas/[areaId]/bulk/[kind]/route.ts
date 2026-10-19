@@ -1,4 +1,4 @@
-// 일괄등록 API — POST { mode: check | apply, start_row, header, rows(최대 1,000) } : 일괄등록 권한(DA·STD), 반영 행은 승인대기(승인 화면에서 묶음 승인)
+// 일괄등록 API — POST { mode: check | apply, start_row, header, rows(최대 1,000) } : 일괄등록 권한(roles.ts 권한표), 반영 행은 승인대기(승인 화면에서 묶음 승인)
 // forbidden(금칙어·이음동의어, 2026-10-18)은 승인 대상이 아니라(P05) std_dic_rel 에 바로 넣고 단어별 감사 이력을 남긴다
 // check = 행 단위 판정만, apply = 같은 판정 후 OK·NSTD 행을 DB 함수(fn_bulk_req_std, 승인대기)로 한 트랜잭션 반영. 설계 docs/design/bulk-import.md
 import { NextResponse } from 'next/server'

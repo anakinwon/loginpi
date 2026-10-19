@@ -11,7 +11,7 @@ const schema = z.object({ ids: z.array(z.string().uuid()).min(1).max(500) })
 
 export async function PUT(req: Request, { params }: Ctx) {
   const { areaId, entId } = await params
-  const auth = await requireAreaRole(areaId, 'REQUEST')
+  const auth = await requireAreaRole(areaId, 'MODEL_EDIT')
   if (auth instanceof NextResponse) return auth
   const b = await parseBody(req, schema)
   if (b instanceof NextResponse) return b

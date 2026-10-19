@@ -12,7 +12,7 @@ type Ctx = { params: Promise<{ areaId: string }> }
 
 export async function GET(req: Request, { params }: Ctx) {
   const { areaId } = await params
-  const auth = await requireAreaRole(areaId, 'VIEW')
+  const auth = await requireAreaRole(areaId, 'MODEL_VIEW')
   if (auth instanceof NextResponse) return auth
   const sp = new URL(req.url).searchParams
   const name = sp.get('name')?.trim() ?? ''

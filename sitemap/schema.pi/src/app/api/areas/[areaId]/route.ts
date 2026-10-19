@@ -14,7 +14,7 @@ export async function GET(_req: Request, { params }: Ctx) {
   if (auth instanceof NextResponse) return auth
   const { data, error } = await db().from('std_area').select(COLS).eq('area_id', areaId).eq('del_yn', 'N').single()
   if (error) return dbError(error)
-  return NextResponse.json({ ok: true, role: auth.role, area: data })
+  return NextResponse.json({ ok: true, role: auth.role, perms: auth.perms, plan: auth.plan, admin: auth.admin, area: data })
 }
 
 const yn = z.enum(['Y', 'N'])

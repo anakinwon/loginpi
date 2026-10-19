@@ -1,8 +1,9 @@
-// 분류체계 멤버 API — GET 목록(조회 권한), POST { pi_usr_nm, mbr_role_cd } 추가 · PATCH { mbr_id, mbr_role_cd } 역할 변경(설정 권한 SYS·DA, 가입된 사용자만)
+// 분류체계 멤버 API — GET 목록(조회 권한), POST { pi_usr_nm, mbr_role_cd } 추가 · PATCH { mbr_id, mbr_role_cd } 역할 변경(설정 권한, 가입된 사용자만)
+//  권한 상승 방지(2026-10-18) : 지정할 역할·바꿀 대상의 현재 역할 모두 본인 역할 권한 안이어야 함(roles.ts canAssign — MDL 이 DA 지정·DA 강등 불가)
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { db } from '@/lib/db'
-import { can, ROLES } from '@/lib/roles'
+import { can, canAssign, ROLES } from '@/lib/roles'
 import { apiError, audit, dbError, parseBody, requireAreaRole } from '@/lib/api'
 
 type Ctx = { params: Promise<{ areaId: string }> }
@@ -32,6 +33,7 @@ export async function POST(req: Request, { params }: Ctx) {
   if (auth instanceof NextResponse) return auth
   const body = await parseBody(req, addSchema)
   if (body instanceof NextResponse) return body
+  if (!canAssign(auth.role, body.mbr_role_cd)) return apiError('ROLE_ESCALATE', 403)
   const u = await db().from('sys_user').select('usr_id').eq('pi_usr_nm', body.pi_usr_nm).eq('del_yn', 'N').maybeSingle()
   if (u.error) return dbError(u.error)
   if (!u.data) return apiError('NOT_FOUND', 404)
@@ -45,7 +47,7 @@ export async function POST(req: Request, { params }: Ctx) {
   return NextResponse.json({ ok: true, member: data }, { status: 201 })
 }
 
-// 역할 변경 — PATCH { mbr_id, mbr_role_cd } : 설정 권한(SYS·DA). 설정 권한자가 0명이 되는 변경은 거부(분류체계 관리 불능 방지)
+// 역할 변경 — PATCH { mbr_id, mbr_role_cd } : 설정 권한. 설정 권한자가 0명이 되는 변경은 거부(분류체계 관리 불능 방지)
 const roleSchema = z.object({ mbr_id: z.string().uuid(), mbr_role_cd: z.enum(ROLES) })
 
 export async function PATCH(req: Request, { params }: Ctx) {
@@ -59,6 +61,7 @@ export async function PATCH(req: Request, { params }: Ctx) {
   const cur = all.data.find((m) => m.mbr_id === body.mbr_id)
   if (!cur) return apiError('NOT_FOUND', 404)
   if (cur.mbr_role_cd === body.mbr_role_cd) return apiError('NO_CHANGE', 400)
+  if (!canAssign(auth.role, cur.mbr_role_cd, body.mbr_role_cd)) return apiError('ROLE_ESCALATE', 403)
   if (!all.data.some((m) => (m.mbr_id === body.mbr_id ? can(body.mbr_role_cd, 'SETTINGS') : can(m.mbr_role_cd, 'SETTINGS')))) return apiError('LAST_SETTINGS_ROLE', 409)
   const { error } = await db().from('std_area_mbr').update({ mbr_role_cd: body.mbr_role_cd, modr_id: auth.user.usr_id }).eq('mbr_id', body.mbr_id)
   if (error) return dbError(error)

@@ -1,7 +1,7 @@
 'use client'
 import { piFetch } from '@pi/auth/client'
 // 일괄등록 화면 — 유형 = ?tab=words|domains|terms(하단 메뉴 표준단어·표준도메인·표준용어의 서브 '일괄등록', 마스터 지시 2026-10-17 — 화면 안 유형 탭 없음) → CSV 선택 → 검증(묶음별 check) → 결과 표·CSV 내려받기 → 반영(묶음별 apply, 서버 재검증)
-// 일괄등록 권한(DA·STD) 전용(API가 확인), 반영 행은 승인대기. 순서 : 단어 → 도메인 → 용어. 설계 docs/design/bulk-import.md
+// 일괄등록 권한(roles.ts 권한표) 전용(API가 확인), 반영 행은 승인대기. 순서 : 단어 → 도메인 → 용어. 설계 docs/design/bulk-import.md
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { use, useEffect, useRef, useState } from 'react'

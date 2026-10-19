@@ -4,7 +4,8 @@ import { NextResponse } from 'next/server'
 import type { ZodType } from 'zod'
 import { getAppUser } from './auth'
 import { db } from './db'
-import { can, type MbrRole, type Perm } from './roles'
+import { areaPlan, type AreaPlan } from './plan'
+import { effPerms, type MbrRole, type Perm } from './roles'
 
 const ERRORS = {
   INVALID_INPUT: '입력값이 올바르지 않습니다',
@@ -93,7 +94,16 @@ const ERRORS = {
   TERM_NAME_MISMATCH: '영문약어명으로 찾은 단어의 결합이 용어명과 다릅니다',
   DOM_NOT_FOUND: '연결할 도메인이 없습니다(도메인을 먼저 일괄등록하십시오)',
   HEADER_MISSING: 'CSV 필수 헤더가 없습니다',
-  LAST_SETTINGS_ROLE: '설정 권한자(시스템담당자·데이터아키텍트)가 한 명은 있어야 합니다',
+  LAST_SETTINGS_ROLE: '설정 권한자(시스템담당자·데이터아키텍트·표준담당자·모델러)가 한 명은 있어야 합니다',
+  ROLE_ESCALATE: '본인 역할보다 권한이 많은 역할은 지정·변경할 수 없습니다',
+  PAY_PAYER: '요금제 결제는 이 분류체계의 시스템담당자·데이터아키텍트만 할 수 있습니다',
+  PAY_MISMATCH: '결제 정보가 요청과 맞지 않습니다(분류체계·요금제·결제자)',
+  PAY_AMOUNT: '결제 금액이 요금표와 다릅니다',
+  PAY_DUP: '이 분류체계에 진행 중인 다른 요금제 결제가 있습니다 — 완료 또는 취소 후 다시 시도하십시오',
+  PAY_PI_FAILED: 'Pi 결제 서버 처리에 실패했습니다 — 잠시 후 다시 시도하십시오',
+  PAY_PI_KEY: '결제 서버 설정(PI_API_KEY)이 없습니다 — 운영 환경변수를 확인하십시오',
+  PAY_PI_SESSION: 'Pi 계정으로 로그인해야 결제할 수 있습니다(Pi Browser)',
+  PLAN_OR_ROLE: '이 기능은 분류체계 요금제 또는 멤버 역할 권한이 없습니다(요금제 화면에서 확인)',
   APV_LEGACY: '승인 절차 도입 이전의 등록 신청입니다. 반려한 뒤 다시 신청하십시오',
   STS_NOT_EDITABLE: '승인대기 중인 데이터는 고칠 수 없습니다(신청을 취소한 뒤 다시 등록하십시오)',
   CONFLICT_SKIP: '반영 중 같은 이름이 먼저 저장되어 건너뜀',
@@ -110,7 +120,7 @@ const ERRORS = {
   DDL_REQ_STATE: '지금 상태에서는 할 수 없는 처리입니다 — 다시 불러오십시오',
   DDL_LIVE_EXISTS: '이 접속에 승인·실행 중인 요청이 이미 있습니다',
   AGT_UNAUTH: '에이전트 인증에 실패했습니다',
-  SQL_WRITE_DENIED: '쓰기 문장(INSERT·UPDATE·DELETE·DDL 등)은 데이터아키텍트만 실행할 수 있습니다 — 조회 전용 권한입니다',
+  SQL_WRITE_DENIED: '쓰기 문장(INSERT·UPDATE·DELETE·DDL 등)은 CRUD 권한(멤버 역할 ∩ 분류체계 요금제)이 있어야 실행할 수 있습니다 — 지금은 조회만 가능합니다',
   SQL_TXN_DENIED: '트랜잭션 제어 문장(BEGIN·COMMIT·ROLLBACK·SET TRANSACTION 등)은 실행할 수 없습니다 — 실행마다 자동 커밋, 한 번에 되돌리려면 \'한 트랜잭션\' 옵션을 쓰십시오',
   SQL_CONFIRM: '위험한 문장이 있습니다 — 확인 후 다시 실행하십시오',
   SQL_RDONLY_REQUIRED: '데이터아키텍트가 \'조회 전용 계정\'으로 지정한 접속에서만 실행할 수 있습니다(SELECT 권한만 가진 DB 계정)',
@@ -184,24 +194,34 @@ export async function currentUser(): Promise<CurrentUser | null> {
   return ins.data
 }
 
-// 분류체계 권한 확인(권한표 src/lib/roles.ts) — 사용자·역할 또는 오류 응답
-export async function requireAreaRole(
-  areaId: string,
-  perm: Perm,
-): Promise<{ user: CurrentUser; role: MbrRole } | NextResponse> {
+// 분류체계 권한 확인(권한표 src/lib/roles.ts) — 실제 권한 = 역할 ∩ 요금제(effPerms). 사용자·역할·권한 목록 또는 오류 응답
+export interface AreaAuth {
+  user: CurrentUser
+  role: MbrRole
+  perms: Perm[]
+  plan: AreaPlan
+  admin: boolean // 전역 ADMIN(sys_user.role_cd) = 결제 없이 요금제4
+}
+export async function requireAreaRole(areaId: string, perm: Perm): Promise<AreaAuth | NextResponse> {
   const user = await currentUser()
   if (!user) return apiError('AUTH_REQUIRED', 401)
-  const { data, error } = await db()
-    .from('std_area_mbr')
-    .select('mbr_role_cd')
-    .eq('area_id', areaId)
-    .eq('usr_id', user.usr_id)
-    .eq('del_yn', 'N')
-    .maybeSingle()
-  if (error) return dbError(error)
-  if (!data) return apiError('FORBIDDEN', 403)
-  const role = data.mbr_role_cd as MbrRole
-  return can(role, perm) ? { user, role } : apiError('FORBIDDEN', 403)
+  const [m, u] = await Promise.all([
+    db().from('std_area_mbr').select('mbr_role_cd').eq('area_id', areaId).eq('usr_id', user.usr_id).eq('del_yn', 'N').maybeSingle(),
+    db().from('sys_user').select('role_cd').eq('usr_id', user.usr_id).maybeSingle(),
+  ])
+  if (m.error) return dbError(m.error)
+  if (u.error) return dbError(u.error)
+  if (!m.data) return apiError('FORBIDDEN', 403)
+  let plan: AreaPlan
+  try {
+    plan = await areaPlan(areaId)
+  } catch (e) {
+    return dbError(e as { code?: string; message?: string })
+  }
+  const role = m.data.mbr_role_cd as MbrRole
+  const admin = u.data?.role_cd === 'ADMIN'
+  const perms = effPerms(role, plan.plan, admin)
+  return perms.includes(perm) ? { user, role, perms, plan, admin } : apiError(perm === 'VIEW' ? 'FORBIDDEN' : 'PLAN_OR_ROLE', 403)
 }
 
 export async function audit(row: {

@@ -1,9 +1,9 @@
 'use client'
 import { piFetch } from '@pi/auth/client'
 // 표준단어 조회·등록·수정·삭제(클라이언트) — /api/areas/[areaId]/words(목록·등록·상태 필터), /words/[dicId](수정·삭제, ver_no 낙관적 잠금), /check(입력 중 중복 검사), /suggest(논리명 입력 시 물리명·영문풀네임·한자·설명 자동 채움, 저장 안 함)
-// 승인 절차 : 등록·수정·삭제는 승인 신청, DA만 즉시 승인 선택 가능(기본 끔), 조회 전용 역할은 등록 영역 비활성
+// 승인 절차 : 등록·수정·삭제는 승인 신청, 즉시 승인 선택은 SYS·DA(요금제4)만(기본 끔), 조회 전용 역할은 등록 영역 비활성
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { can, STS_NM, type MbrRole } from '@/lib/roles'
+import { STS_NM, type MbrRole, type Perm } from '@/lib/roles'
 
 interface Word {
   dic_id: string
@@ -52,15 +52,16 @@ export default function WordBoard({ areaId }: { areaId: string }) {
   const [msg, setMsg] = useState('')
   // 현재 사용자 역할(분류체계 조회 응답) — 승인권자 = 자기 승인 선택, 신청 권한 없음 = 조회 전용
   const [role, setRole] = useState<MbrRole | null>(null)
+  const [perms, setPerms] = useState<Perm[]>([]) // 실제 권한 = 역할 ∩ 요금제(서버 계산)
   const [selfApv, setSelfApv] = useState(false)
   const [rsn, setRsn] = useState('')
   useEffect(() => {
     piFetch(`/api/areas/${areaId}`)
       .then((r) => r.json())
-      .then((j) => j.ok && setRole(j.role))
+      .then((j) => j.ok && (setRole(j.role), setPerms(j.perms ?? [])))
   }, [areaId])
-  const selfApprover = !!role && can(role, 'SELF_APPROVE')
-  const requester = !!role && can(role, 'REQUEST')
+  const selfApprover = perms.includes('SELF_APPROVE')
+  const requester = perms.includes('STD_REQ')
 
   // 조회 조건(검색어·상태·페이지·페이지 크기) — 바뀌면 서버에서 해당 페이지만 조회
   const [cond, setCond] = useState({ kw: '', sts: '', se: '', page: 1, size: 10 })
@@ -265,7 +266,7 @@ export default function WordBoard({ areaId }: { areaId: string }) {
           </div>
         </div>
         <p className="mt-2 text-xs text-gray-500">도메인의 대표도메인명(예 : 금액·번호·명)으로 쓰려면 속성 분류어를 선택하십시오. 용어의 끝 단어도 속성 분류어여야 합니다</p>
-        {role && !requester && <p className="mt-2 font-medium text-gray-600">조회 권한 : 등록·수정·삭제는 신청 권한(데이터아키텍트·표준담당자·모델러)만 가능합니다</p>}
+        {role && !requester && <p className="mt-2 font-medium text-gray-600">조회 권한 : 등록·수정·삭제는 신청 권한(역할·요금제)이 있어야 합니다</p>}
         {msg && (
           <p role="status" className="mt-2 font-medium text-[#1f3a68]">
             {msg}
@@ -496,7 +497,7 @@ export function StsFilter({ value, onChange }: { value: string; onChange: (v: st
   )
 }
 
-// 등록·수정 폼의 승인 선택 항목 — DA만 즉시 승인 체크(기본 끔), 신청사유는 모든 신청자(선택)
+// 등록·수정 폼의 승인 선택 항목 — SYS·DA(요금제4)만 즉시 승인 체크(기본 끔), 신청사유는 모든 신청자(선택)
 export function ApvFields(p: { approver: boolean; selfApv: boolean; setSelfApv: (v: boolean) => void; rsn: string; setRsn: (v: string) => void }) {
   return (
     <>

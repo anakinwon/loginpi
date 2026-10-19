@@ -8,7 +8,7 @@ type Ctx = { params: Promise<{ areaId: string }> }
 
 export async function GET(req: Request, { params }: Ctx) {
   const { areaId } = await params
-  const auth = await requireAreaRole(areaId, 'VIEW')
+  const auth = await requireAreaRole(areaId, 'STD_VIEW')
   if (auth instanceof NextResponse) return auth
   const name = new URL(req.url).searchParams.get('name')?.trim() ?? ''
   if (!name || name.length > 200) return apiError('INVALID_INPUT', 400)

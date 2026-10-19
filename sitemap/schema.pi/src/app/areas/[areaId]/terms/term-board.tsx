@@ -3,7 +3,7 @@ import { piFetch } from '@pi/auth/client'
 // 표준용어 조회·등록·수정·삭제(클라이언트) — /terms/analyze(분해 후보), /terms(목록 : page·size·상태 필터, 등록), /terms/[termId](도메인·설명 수정, 삭제 : ver_no), /domains(도메인 선택지 : 승인완료만)
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
-import { can, type MbrRole } from '@/lib/roles'
+import { type MbrRole, type Perm } from '@/lib/roles'
 import { ActorCells, ApvFields, ApvLink, SeCell, SeFilter, SeSelect, StsCell, StsFilter, confirmSave, noEnterSubmit } from '../words/word-board'
 
 interface Term {
@@ -84,15 +84,16 @@ export default function TermBoard({ areaId }: { areaId: string }) {
   const [edit, setEdit] = useState<Term | null>(null)
   // 현재 사용자 역할(분류체계 조회 응답) — 승인권자 = 자기 승인 선택, 신청 권한 없음 = 조회 전용
   const [role, setRole] = useState<MbrRole | null>(null)
+  const [perms, setPerms] = useState<Perm[]>([]) // 실제 권한 = 역할 ∩ 요금제(서버 계산)
   const [selfApv, setSelfApv] = useState(false)
   const [rsn, setRsn] = useState('')
   useEffect(() => {
     piFetch(`/api/areas/${areaId}`)
       .then((r) => r.json())
-      .then((j) => j.ok && setRole(j.role))
+      .then((j) => j.ok && (setRole(j.role), setPerms(j.perms ?? [])))
   }, [areaId])
-  const selfApprover = !!role && can(role, 'SELF_APPROVE')
-  const requester = !!role && can(role, 'REQUEST')
+  const selfApprover = perms.includes('SELF_APPROVE')
+  const requester = perms.includes('STD_REQ')
   // 승인 신청 선택 항목 — 자기 승인은 승인권자만, 신청사유는 입력했을 때만
   const apvOpt = () => ({ ...(selfApprover && selfApv ? { self_apv: true } : {}), ...(rsn.trim() ? { req_rsn: rsn.trim() } : {}) })
   const reqMsg = (j: { requested?: boolean; resubmitted?: boolean }, okMsg: string) => (j.resubmitted ? '재신청을 접수했습니다' : j.requested ? '승인 신청을 접수했습니다(승인 후 사용 가능)' : okMsg)
@@ -309,7 +310,7 @@ export default function TermBoard({ areaId }: { areaId: string }) {
               </button>
             </div>
           </div>
-          {role && !requester && <p className="mt-2 font-medium text-gray-600">조회 권한 : 등록·수정·삭제는 신청 권한(데이터아키텍트·표준담당자·모델러)만 가능합니다</p>}
+          {role && !requester && <p className="mt-2 font-medium text-gray-600">조회 권한 : 등록·수정·삭제는 신청 권한(역할·요금제)이 있어야 합니다</p>}
           {msg && (
             <p role="status" className="mt-2 font-medium text-[#1f3a68]">
               {msg}

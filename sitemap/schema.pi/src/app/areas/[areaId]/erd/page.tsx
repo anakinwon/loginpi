@@ -24,7 +24,7 @@ import { dbmsList } from '@/lib/modelpi/dbms'
 import { autoLayout, boxSize } from '@/lib/modelpi/layout'
 import { autoAnchors, halfDash, project, sidePoint, type Box, type Pt, type RelLyt, type Side } from '@/lib/modelpi/edge-geo'
 import { fitView as printFit, pageGrid, PAPER, printArea, realign, type Orient } from '@/lib/modelpi/print'
-import { can, type MbrRole } from '@/lib/roles'
+import { type MbrRole, type Perm } from '@/lib/roles'
 import Attrs from '../model/attrs'
 import EntForm from '../model/ent-form'
 import Relations from '../model/relations'
@@ -283,6 +283,7 @@ function Erd({ areaId }: { areaId: string }) {
   const api = `/api/areas/${areaId}`
   const flow = useReactFlow()
   const [role, setRole] = useState<MbrRole | null>(null)
+  const [perms, setPerms] = useState<Perm[]>([]) // 실제 권한 = 역할 ∩ 요금제(서버 계산)
   const [prjs, setPrjs] = useState<{ prj_id: string; prj_nm: string }[]>([])
   const [prjId, setPrjId] = useState('')
   const [subjs, setSubjs] = useState<{ subj_id: string; subj_nm: string; prj_id: string }[]>([])
@@ -425,7 +426,7 @@ function Erd({ areaId }: { areaId: string }) {
   const [undo, setUndo] = useState<Record<string, { x: number; y: number }> | null>(null)
   const [msg, setMsg] = useState('')
   const [busy, setBusy] = useState(false)
-  const editor = !!role && can(role, 'REQUEST')
+  const editor = perms.includes('MODEL_EDIT')
   const lay = editor && dgmSts !== 'CMPTN' // 배치·관계선 편집 가능(작성완료 ERD 는 완료 취소 후)
   const loadSeq = useRef(0) // 늦게 도착한 응답이 최신 선택을 덮어쓰지 않도록
   const curRef = useRef<Map<string, { x: number; y: number }>>(new Map()) // 편집 뒤 재조회 시 저장 안 한 드래그 위치 유지
@@ -436,7 +437,7 @@ function Erd({ areaId }: { areaId: string }) {
   useEffect(() => {
     piFetch(api)
       .then((r) => r.json())
-      .then((j) => j.ok && setRole(j.role))
+      .then((j) => j.ok && (setRole(j.role), setPerms(j.perms ?? [])))
     piFetch(`${api}/projects`)
       .then((r) => r.json())
       .then((j) => {
