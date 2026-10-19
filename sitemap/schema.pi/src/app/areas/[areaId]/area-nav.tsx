@@ -116,7 +116,7 @@ const REST: Item[] = [
 ]
 
 // 요금제 — 권한 무관 독립 메뉴(설정 오른쪽)
-const PLAN_ITEM: Item = { seg: 'plan', nm: '요금제', icon: Gem, tone: 'amber' }
+const PLAN_ITEM: Item = { seg: 'plan', nm: '결제', icon: Gem, tone: 'amber' }
 
 const group = 'flex shrink-0 gap-1 rounded-md border border-gray-300 bg-gray-50 p-0.5' // 메뉴 묶음 박스
 // ?tab= 이 없을 때 화면별 기본 탭
@@ -268,7 +268,7 @@ export default function AreaNav() {
               {visible(REST).map(item)}
             </ul>
           )}
-          <ul aria-label="요금제" className={group}>
+          <ul aria-label="결제" className={group}>
             {item(PLAN_ITEM)}
           </ul>
         </div>

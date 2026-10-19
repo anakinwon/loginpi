@@ -113,7 +113,7 @@ export default function PlanPage({ params }: { params: Promise<{ areaId: string 
       <Link href="/" className="text-sm text-blue-700 underline">
         ← 분류체계 목록
       </Link>
-      <h1 className="mt-1 text-2xl font-bold">요금제</h1>
+      <h1 className="mt-1 text-2xl font-bold">결제</h1>
 
       {p && (
         <section className="mt-3 overflow-hidden rounded-xl border border-[#c7d2e6] bg-gradient-to-b from-[#f4f7fc] to-[#e9eff9] shadow-md">
