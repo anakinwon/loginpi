@@ -5,7 +5,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { apiError, currentUser, dbError, parseBody } from '@/lib/api'
 import { db } from '@/lib/db'
-import { cancelPiPayment, getOwnPayment, getPiPayment, markCanceled, settlePaid } from '@/lib/payments'
+import { cancelPiPayment, getOwnPayment, getPiPayment, markCanceled, piCancelled, settlePaid } from '@/lib/payments'
 
 const body = z.object({ paymentId: z.string().min(1).max(200) })
 
@@ -29,8 +29,9 @@ export async function POST(req: Request) {
       if (!got.ok || !me.data?.pi_uid || got.payment.user_uid !== me.data.pi_uid) return apiError('PAY_MISMATCH', 403)
     }
     const c = await cancelPiPayment(b.paymentId) // Pi 측 pending 정리(남으면 다음 결제 거부)
-    if (row && c.ok) await markCanceled(b.paymentId, user.usr_id)
-    return NextResponse.json({ ok: true, canceled: c.ok })
+    const canceled = c.ok || (await piCancelled(b.paymentId)) // 이미 취소된 결제(잔액 부족 등)는 취소 요청이 실패 → Pi 상태로 확인
+    if (row && canceled) await markCanceled(b.paymentId, user.usr_id)
+    return NextResponse.json({ ok: true, canceled })
   } catch (e) {
     return dbError(e as { code?: string; message?: string })
   }

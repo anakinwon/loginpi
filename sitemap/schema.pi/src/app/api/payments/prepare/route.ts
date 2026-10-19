@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { apiError, dbError, parseBody } from '@/lib/api'
-import { AREA_PLAN, payerAuth, planMemo, planPrice } from '@/lib/payments'
+import { AREA_PLAN, hasOtherApproved, payerAuth, planMemo, planPrice } from '@/lib/payments'
 import { areaPlan, subscribed, upgradeQuotes } from '@/lib/plan'
 
 const body = z.object({ area_id: z.string().uuid(), plan_cd: z.enum(['P1', 'P2', 'P3', 'P4']), prd_cd: z.enum(['M', 'Y', 'U']), prd: z.enum(['M', 'Y']).optional() }) // prd = 업그레이드 새 주기(U 만, 기본 월)
@@ -13,6 +13,8 @@ export async function POST(req: Request) {
   const who = await payerAuth(b.area_id)
   if (who instanceof NextResponse) return who
   try {
+    // 진행 중 결제 = 지갑을 열기 전에 거부(approve 에서 거부하면 Pi 지갑 화면에 가려 타임아웃으로만 보임, 운영 2026-10-19)
+    if (await hasOtherApproved(b.area_id, '')) return apiError('PAY_DUP', 409)
     if (b.prd_cd === 'U') {
       const { from, quotes } = await upgradeQuotes(b.area_id)
       const q = quotes.find((x) => x.plan_cd === b.plan_cd && x.prd === (b.prd ?? 'M'))

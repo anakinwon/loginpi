@@ -118,11 +118,22 @@ export async function getOwnPayment(id: string, usrId: string): Promise<PymntRow
 
 // 같은 분류체계에 진행 중(APPROVED, 최근 15분) 인 다른 요금제 결제 — 이중 결제 방지. 방치된 오래된 APPROVED 는 막지 않음(검증 지적 m1)
 export const APPROVED_HOLD_MS = 15 * 60_000
+//  Pi 에서 이미 취소된(잔액 부족·사용자 취소 등, 거래 없음) 결제는 원장을 CANCELED 로 정리하고 세지 않음 — 남기면 15분 동안 새 결제가 PAY_DUP(운영 2026-10-19)
 export async function hasOtherApproved(areaId: string, exceptId: string): Promise<boolean> {
   const since = new Date(Date.now() - APPROVED_HOLD_MS).toISOString()
-  const { count, error } = await db().from('pi_pymnt').select('pymnt_id', { count: 'exact', head: true }).eq('pymnt_tp_cd', AREA_PLAN).eq('pymnt_sts_cd', 'APPROVED').eq('del_yn', 'N').eq('meta_val->>area_id', areaId).gt('apv_dtm', since).neq('pymnt_id', exceptId)
+  const { data, error } = await db().from('pi_pymnt').select('pymnt_id, usr_id').eq('pymnt_tp_cd', AREA_PLAN).eq('pymnt_sts_cd', 'APPROVED').eq('del_yn', 'N').eq('meta_val->>area_id', areaId).gt('apv_dtm', since).neq('pymnt_id', exceptId)
   if (error) throw error
-  return (count ?? 0) > 0
+  for (const r of data ?? []) {
+    if (await piCancelled(r.pymnt_id)) await markCanceled(r.pymnt_id, r.usr_id)
+    else return true // 진행 중(또는 Pi 조회 실패 = 보수적으로 진행 중)
+  }
+  return false
+}
+
+// Pi 에서 취소됐고 거래(서명)가 없는 결제인지 — 조회 실패 = false
+export async function piCancelled(id: string): Promise<boolean> {
+  const got = await getPiPayment(id)
+  return got.ok && (got.payment.status.cancelled || got.payment.status.user_cancelled) && !got.payment.transaction
 }
 
 // 서명된 결제 마무리(complete·cancel·미완료 복구 공용, 검증 지적 M1·M2) — Pi 에 결제 상태를 직접 물어
