@@ -12,6 +12,7 @@
 //     메인 메뉴는 아이콘(lucide) + 작은 글씨, 서브 탭은 글자 그대로. 아이콘 = 연한 색 3D 타일(위 밝은 테두리·아래 그림자·메뉴마다 색), 현재 메뉴 = 떠 있는 버튼 + 타일 테두리
 //     메인·서브 배경 = 그 메뉴 색의 연한 같은 계열, 메인 메뉴 = 화면 전체 폭 가운데(좁으면 가로 스크롤)
 //     서브 메뉴 = 메인 메뉴 바로 위, 묶음 기준 정렬(마스터 지시 2026-10-18) : 표준사전 = 묶음 왼쪽 끝에 맞춤, 모델·설정 = 묶음 오른쪽 끝에 맞춤(화면 끝 안쪽으로)
+//   · 요금제 = 설정 오른쪽 독립 메인 메뉴, 권한 무관(멤버면 항상 — 결제 전에도 들어가야 함, 마스터 지시 2026-10-19)
 //  좁은 화면은 가로 스크롤(줄바꿈 없이 한 줄 유지)
 import { piFetch } from '@pi/auth/client'
 import Link from 'next/link'
@@ -102,7 +103,6 @@ const REST: Item[] = [
     icon: Settings,
     tone: 'slate',
     subs: [
-      { seg: 'plan', nm: '요금제' },
       { seg: 'members', nm: '멤버' },
       { seg: 'settings', nm: '설정', perm: 'SETTINGS' },
       { seg: 'history', nm: '이력' },
@@ -115,7 +115,7 @@ const REST: Item[] = [
   },
 ]
 
-// 요금제 — 설정 메뉴가 안 보이는 경우(무료·만료·설정 메뉴 없는 역할)에도 항상 들어갈 수 있게 단독 타일
+// 요금제 — 권한 무관 독립 메뉴(설정 오른쪽)
 const PLAN_ITEM: Item = { seg: 'plan', nm: '요금제', icon: Gem, tone: 'amber' }
 
 const group = 'flex shrink-0 gap-1 rounded-md border border-gray-300 bg-gray-50 p-0.5' // 메뉴 묶음 박스
@@ -263,15 +263,14 @@ export default function AreaNav() {
               {visible(MODEL).map(item)}
             </ul>
           )}
-          {allowed('SET_VIEW') ? (
+          {allowed('SET_VIEW') && (
             <ul aria-label="설정" data-sub-align="right" className={group}>
               {visible(REST).map(item)}
             </ul>
-          ) : (
-            <ul aria-label="요금제" className={group}>
-              {item(PLAN_ITEM)}
-            </ul>
           )}
+          <ul aria-label="요금제" className={group}>
+            {item(PLAN_ITEM)}
+          </ul>
         </div>
       </div>
     </nav>

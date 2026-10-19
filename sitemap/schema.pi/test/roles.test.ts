@@ -47,17 +47,15 @@ test('파생 권한 — 메뉴·신청 조합, DB 접속 관리 = 승인 ∧ 설
   assert.deepEqual(effPerms('DA', 'FREE'), ['VIEW', 'MENU_STD', 'STD_VIEW']) // 무료 = 표준 조회만
 })
 
-test('요금제 미지정·이상 값 = FREE, 전역 ADMIN = 요금제4', () => {
+test('요금제 미지정·이상 값 = FREE', () => {
   assert.deepEqual(effPerms('DA', null), effPerms('DA', 'FREE'))
   assert.deepEqual(effPerms('DA', 'P9'), effPerms('DA', 'FREE'))
-  assert.deepEqual(effPerms('DA', 'FREE', true), effPerms('DA', 'P4'))
-  assert.deepEqual(effPerms('MIG', null, true), effPerms('MIG', 'P4')) // ADMIN 이라도 역할 한도는 그대로
 })
 
 test('구 역할 코드·빈 값 = 권한 없음', () => {
   for (const r of ['ADMIN', 'EDITOR', '', null, undefined]) {
     assert.equal(can(r, 'VIEW'), false)
-    assert.deepEqual(effPerms(r, 'P4', true), [])
+    assert.deepEqual(effPerms(r, 'P4'), [])
   }
 })
 

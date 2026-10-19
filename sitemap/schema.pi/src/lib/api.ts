@@ -99,6 +99,8 @@ const ERRORS = {
   PAY_PAYER: '요금제 결제는 이 분류체계의 시스템담당자·데이터아키텍트만 할 수 있습니다',
   PAY_MISMATCH: '결제 정보가 요청과 맞지 않습니다(분류체계·요금제·결제자)',
   PAY_AMOUNT: '결제 금액이 요금표와 다릅니다',
+  PAY_UPGRADE: '업그레이드할 수 없습니다 — 지금 결제한 요금제보다 높은 요금제만, 남은 결제 기간이 있을 때 가능합니다',
+  PAY_SUBSCRIBED: '구독 중인 분류체계는 업그레이드만 결제할 수 있습니다 — 다른 요금제는 만료 뒤 결제하십시오',
   PAY_DUP: '이 분류체계에 진행 중인 다른 요금제 결제가 있습니다 — 완료 또는 취소 후 다시 시도하십시오',
   PAY_PI_FAILED: 'Pi 결제 서버 처리에 실패했습니다 — 잠시 후 다시 시도하십시오',
   PAY_PI_KEY: '결제 서버 설정(PI_API_KEY)이 없습니다 — 운영 환경변수를 확인하십시오',
@@ -200,17 +202,12 @@ export interface AreaAuth {
   role: MbrRole
   perms: Perm[]
   plan: AreaPlan
-  admin: boolean // 전역 ADMIN(sys_user.role_cd) = 결제 없이 요금제4
 }
 export async function requireAreaRole(areaId: string, perm: Perm): Promise<AreaAuth | NextResponse> {
   const user = await currentUser()
   if (!user) return apiError('AUTH_REQUIRED', 401)
-  const [m, u] = await Promise.all([
-    db().from('std_area_mbr').select('mbr_role_cd').eq('area_id', areaId).eq('usr_id', user.usr_id).eq('del_yn', 'N').maybeSingle(),
-    db().from('sys_user').select('role_cd').eq('usr_id', user.usr_id).maybeSingle(),
-  ])
+  const m = await db().from('std_area_mbr').select('mbr_role_cd').eq('area_id', areaId).eq('usr_id', user.usr_id).eq('del_yn', 'N').maybeSingle()
   if (m.error) return dbError(m.error)
-  if (u.error) return dbError(u.error)
   if (!m.data) return apiError('FORBIDDEN', 403)
   let plan: AreaPlan
   try {
@@ -219,9 +216,8 @@ export async function requireAreaRole(areaId: string, perm: Perm): Promise<AreaA
     return dbError(e as { code?: string; message?: string })
   }
   const role = m.data.mbr_role_cd as MbrRole
-  const admin = u.data?.role_cd === 'ADMIN'
-  const perms = effPerms(role, plan.plan, admin)
-  return perms.includes(perm) ? { user, role, perms, plan, admin } : apiError(perm === 'VIEW' ? 'FORBIDDEN' : 'PLAN_OR_ROLE', 403)
+  const perms = effPerms(role, plan.plan)
+  return perms.includes(perm) ? { user, role, perms, plan } : apiError(perm === 'VIEW' ? 'FORBIDDEN' : 'PLAN_OR_ROLE', 403)
 }
 
 export async function audit(row: {

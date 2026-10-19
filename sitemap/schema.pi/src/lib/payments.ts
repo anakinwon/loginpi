@@ -27,7 +27,9 @@ export interface AreaPlanMeta {
   type: typeof AREA_PLAN
   area_id: string
   plan_cd: Exclude<PlanCd, 'FREE'>
-  prd_cd: 'M' | 'Y'
+  prd_cd: 'M' | 'Y' | 'U' // U = 업그레이드(일할계산, src/lib/upgrade.ts)
+  from_plan?: Exclude<PlanCd, 'FREE'> // 업그레이드 전 요금제(U 만)
+  prd?: 'M' | 'Y' // 업그레이드 새 주기(U 만 = 현재 기간 주기, 승인 때 다시 대조, 반영 = 승인 시각부터 1개월·1년)
 }
 
 // metadata 검증 — 형태가 맞을 때만
@@ -35,8 +37,11 @@ export function parseAreaPlanMeta(meta: unknown): AreaPlanMeta | null {
   if (!meta || typeof meta !== 'object') return null
   const m = meta as Record<string, unknown>
   if (m.type !== AREA_PLAN || typeof m.area_id !== 'string' || !/^[0-9a-f-]{36}$/i.test(m.area_id)) return null
-  if (!isPlan(m.plan_cd) || m.plan_cd === 'FREE' || (m.prd_cd !== 'M' && m.prd_cd !== 'Y')) return null
-  return { type: AREA_PLAN, area_id: m.area_id, plan_cd: m.plan_cd, prd_cd: m.prd_cd }
+  if (!isPlan(m.plan_cd) || m.plan_cd === 'FREE' || (m.prd_cd !== 'M' && m.prd_cd !== 'Y' && m.prd_cd !== 'U')) return null
+  if (m.prd_cd !== 'U') return { type: AREA_PLAN, area_id: m.area_id, plan_cd: m.plan_cd, prd_cd: m.prd_cd }
+  if (m.prd !== 'M' && m.prd !== 'Y') return null
+  if (!isPlan(m.from_plan) || m.from_plan === 'FREE' || m.from_plan > m.plan_cd || (m.from_plan === m.plan_cd && m.prd !== 'Y')) return null // 상위 요금제 또는 같은 요금제 월 → 연
+  return { type: AREA_PLAN, area_id: m.area_id, plan_cd: m.plan_cd, prd_cd: 'U', from_plan: m.from_plan, prd: m.prd }
 }
 
 // 결제자 확인 — 분류체계 멤버 + 역할 SYS·DA(요금제와 무관 : 무료·만료여도 결제 가능) + Pi 계정(pi_uid). 사용자·pi_uid 또는 오류 응답
@@ -51,7 +56,8 @@ export async function payerAuth(areaId: string): Promise<{ user: CurrentUser; pi
 }
 
 // 결제 memo(ASCII 만 — ™·한글은 결제 호환 위험)
-export const planMemo = (m: Pick<AreaPlanMeta, 'plan_cd' | 'prd_cd'>) => `schema.pi plan ${m.plan_cd} ${m.prd_cd === 'Y' ? 'yearly' : 'monthly'}`
+export const planMemo = (m: Pick<AreaPlanMeta, 'plan_cd' | 'prd_cd' | 'from_plan'>) =>
+  m.prd_cd === 'U' ? `schema.pi plan ${m.from_plan} to ${m.plan_cd} upgrade` : `schema.pi plan ${m.plan_cd} ${m.prd_cd === 'Y' ? 'yearly' : 'monthly'}`
 
 // 요금표 정가(없거나 꺼짐 = null)
 export async function planPrice(planCd: string, prdCd: string): Promise<number | null> {

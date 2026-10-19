@@ -1,5 +1,5 @@
 'use client'
-// 요금제 화면(2026-10-19) — 현재 요금제·만료·유효 기간, 요금제 4종 카드(월/년 Pi·권한·메뉴), Pi 결제(시스템담당자·데이터아키텍트), 결제 이력(페이지 단위)
+// 요금제 화면(2026-10-19) — 현재 요금제·만료·유효 기간, 요금제 4종 카드(월/년 Pi·권한·메뉴·업그레이드 일할계산), Pi 결제(시스템담당자·데이터아키텍트), 결제 이력(페이지 단위)
 //  결제 = Pi Browser 에서만(판정 = usePiAuth().isInPiBrowser — authenticate 성공 신호, UA 판정 금지). prepare → createPayment → approve → complete(piFetch)
 import { piFetch, usePiAuth } from '@pi/auth/client'
 import Link from 'next/link'
@@ -7,14 +7,15 @@ import { use, useCallback, useEffect, useRef, useState } from 'react'
 import { PLAN_NM, PLAN_PERMS, ROLE_NM, type MbrRole, type PlanCd } from '@/lib/roles'
 
 type Fee = { plan_cd: Exclude<PlanCd, 'FREE'>; prd_cd: 'M' | 'Y'; plan_nm: string; pi_amt: number; use_mon_cnt: number }
-type Term = { plan_cd: PlanCd; prd_cd: 'M' | 'Y' | null; strt_dtm: string; end_dtm: string; grnt_rsn_cd: 'PAY' | 'GRACE' }
-type Hist = { pymnt_id?: string; pi_amt: number; pymnt_sts_cd: string; meta_val: { plan_cd?: string; prd_cd?: string }; apv_dtm: string; cmpl_dtm: string | null }
+type Term = { plan_cd: PlanCd; prd_cd: 'M' | 'Y' | null; strt_dtm: string; end_dtm: string; grnt_rsn_cd: 'PAY' | 'UPG' | 'GRACE' }
+type Upg = { plan_cd: PlanCd; amount: number; credit: number; used: number; prd: 'M' | 'Y' }
+type Hist = { pymnt_id?: string; pi_amt: number; pymnt_sts_cd: string; meta_val: { plan_cd?: string; prd_cd?: string; from_plan?: string; prd?: string }; apv_dtm: string; cmpl_dtm: string | null }
 type Info = {
   plan: { plan: PlanCd; end: string | null; grace: boolean }
-  admin: boolean
   role: MbrRole
   can_pay: boolean
   fees: Fee[]
+  upgrades: Upg[]
   terms: Term[]
   hist: { items: Hist[]; total: number; page: number; size: number }
 }
@@ -61,11 +62,11 @@ export default function PlanPage({ params }: { params: Promise<{ areaId: string 
     setMsg(m), setBusy(null)
   }
 
-  async function pay(f: Fee) {
+  async function pay(f: { plan_cd: PlanCd; prd_cd: 'M' | 'Y' | 'U'; prd?: 'M' | 'Y' }) {
     // Pi SDK 는 일반 브라우저에도 주입되므로 window.Pi 존재로는 부족 — authenticate 가 성공한 세션만 결제
     if (!isInPiBrowser || !window.Pi) return setMsg({ ok: false, text: 'Pi Browser 에서 Pi 계정으로 로그인한 뒤 결제하십시오' })
-    setBusy(`${f.plan_cd}${f.prd_cd}`), setMsg(null)
-    const prep = await post('/api/payments/prepare', { area_id: areaId, plan_cd: f.plan_cd, prd_cd: f.prd_cd })
+    setBusy(`${f.plan_cd}${f.prd_cd}${f.prd ?? ''}`), setMsg(null)
+    const prep = await post('/api/payments/prepare', { area_id: areaId, plan_cd: f.plan_cd, prd_cd: f.prd_cd, prd: f.prd })
     if (!prep.ok) return finish({ ok: false, text: prep.message })
     let cur: string | null = null
     timer.current = setTimeout(() => finish({ ok: false, text: '결제 응답이 없습니다 — 잠시 뒤 화면을 새로 고쳐 결과를 확인하십시오' }), CALLBACK_TIMEOUT_MS)
@@ -102,6 +103,7 @@ export default function PlanPage({ params }: { params: Promise<{ areaId: string 
   }
 
   const p = info?.plan
+  const sub = !!p && p.plan !== 'FREE' && !p.grace // 구독 중 = 업그레이드 버튼만, 무료·만료 = 일반 요금제 버튼만(마스터 지시 2026-10-19)
   const pages = info ? Math.max(1, Math.ceil(info.hist.total / info.hist.size)) : 1
   return (
     <main className="w-full px-3 py-3 sm:px-4 lg:px-5">
@@ -120,19 +122,18 @@ export default function PlanPage({ params }: { params: Promise<{ areaId: string 
             </p>
             {p.end && <p>{dt(p.end)} 까지</p>}
             <p className="text-gray-600">내 역할 : {ROLE_NM[info.role] ?? info.role}</p>
-            {info.admin && <p className="rounded bg-emerald-50 px-1.5 py-0.5 text-xs text-emerald-800">전역 관리자 — 결제 없이 요금제4 권한</p>}
           </div>
           {info.terms.length > 1 && (
             <ul className="border-t border-[#d5ddec] px-4 py-2 text-xs text-gray-700">
               {info.terms.map((t, i) => (
                 <li key={i}>
-                  요금제{t.plan_cd.slice(1)}({t.grnt_rsn_cd === 'GRACE' ? '유예' : t.prd_cd === 'Y' ? '년' : '월'}) : {dt(t.strt_dtm)} ~ {dt(t.end_dtm)}
+                  요금제{t.plan_cd.slice(1)}({t.grnt_rsn_cd === 'GRACE' ? '유예' : t.grnt_rsn_cd === 'UPG' ? `업그레이드·${t.prd_cd === 'Y' ? '년' : '월'}` : t.prd_cd === 'Y' ? '년' : '월'}) : {dt(t.strt_dtm)} ~ {dt(t.end_dtm)}
                 </li>
               ))}
             </ul>
           )}
           <p className="border-t border-[#d5ddec] px-4 py-2 text-xs text-gray-600">
-            실제 권한 = 멤버 역할 ∩ 분류체계 요금제. 같은 요금제를 다시 결제하면 남은 기간 뒤로 연장, 다른 요금제는 결제한 때부터 시작(높은 요금제가 우선 적용, 비례 환불 없음).
+            실제 권한 = 멤버 역할 ∩ 분류체계 요금제. 구독 중에는 업그레이드만 결제할 수 있고(무료·만료면 일반 결제), 업그레이드 = 상위 요금제(같은 요금제는 월 → 연) 가격 − 현재 가격 × (기준 일수 − 사용 일수) ÷ 기준 일수(월 30·년 365, 결제한 날 = 1일), 0.01 Pi 올림 — 결제한 때부터 새 1개월·1년.
           </p>
         </section>
       )}
@@ -152,6 +153,7 @@ export default function PlanPage({ params }: { params: Promise<{ areaId: string 
             {(['P1', 'P2', 'P3', 'P4'] as const).map((cd) => {
               const fs = info.fees.filter((f) => f.plan_cd === cd)
               const on = p?.plan === cd
+              const ups = info.upgrades.filter((u) => u.plan_cd === cd)
               return (
                 <div key={cd} className={`flex flex-col rounded-xl border bg-white p-4 shadow-sm ${on ? 'border-[#3b5f9e] ring-2 ring-[#3b5f9e]/40' : 'border-gray-200'}`}>
                   <p className="text-xs text-gray-500">요금제{cd.slice(1)}</p>
@@ -164,13 +166,24 @@ export default function PlanPage({ params }: { params: Promise<{ areaId: string 
                       </li>
                     ))}
                   </ul>
-                  <div className="mt-3 grid grid-cols-2 gap-2">
-                    {fs.map((f) => (
-                      <button key={f.prd_cd} type="button" disabled={!info.can_pay || !!busy} onClick={() => void pay(f)} className="btn-3d px-2 py-1.5 text-sm disabled:opacity-50">
-                        {busy === `${f.plan_cd}${f.prd_cd}` ? '결제 중…' : `${f.pi_amt} Pi / ${f.prd_cd === 'Y' ? '년' : '월'}`}
-                      </button>
-                    ))}
-                  </div>
+                  {!sub && (
+                    <div className="mt-3 grid grid-cols-2 gap-2">
+                      {fs.map((f) => (
+                        <button key={f.prd_cd} type="button" disabled={!info.can_pay || !!busy} onClick={() => void pay(f)} className="btn-3d px-2 py-1.5 text-sm disabled:opacity-50">
+                          {busy === `${f.plan_cd}${f.prd_cd}` ? '결제 중…' : `${f.pi_amt} Pi / ${f.prd_cd === 'Y' ? '년' : '월'}`}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  {sub && ups.length > 0 && (
+                    <div className="mt-3 grid grid-cols-2 gap-2">
+                      {ups.map((up) => (
+                        <button key={up.prd} type="button" disabled={!info.can_pay || !!busy} onClick={() => void pay({ plan_cd: cd, prd_cd: 'U', prd: up.prd })} className="btn-3d px-2 py-1.5 text-xs disabled:opacity-50" title={`사용 ${up.used}일 · 미사용분 ${up.credit} Pi 차감 · 결제한 때부터 새 1${up.prd === 'Y' ? '년' : '개월'}`}>
+                          {busy === `${cd}U${up.prd}` ? '결제 중…' : `업그레이드 ${up.amount} Pi / ${up.prd === 'Y' ? '년' : '월'}`}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )
             })}
@@ -197,7 +210,7 @@ export default function PlanPage({ params }: { params: Promise<{ areaId: string 
                 <tr key={h.pymnt_id ?? i} className="odd:bg-white even:bg-[#f4f7fc]">
                   <td className="border px-2 py-1 text-center">{dt(h.apv_dtm)}</td>
                   <td className="border px-2 py-1 text-center">
-                    {PLAN_NM[h.meta_val.plan_cd as PlanCd] ?? h.meta_val.plan_cd} · {h.meta_val.prd_cd === 'Y' ? '년' : '월'}
+                    {PLAN_NM[h.meta_val.plan_cd as PlanCd] ?? h.meta_val.plan_cd} · {h.meta_val.prd_cd === 'U' ? `업그레이드(${PLAN_NM[h.meta_val.from_plan as PlanCd] ?? h.meta_val.from_plan}에서, ${h.meta_val.prd === 'Y' ? '년' : '월'})` : h.meta_val.prd_cd === 'Y' ? '년' : '월'}
                   </td>
                   <td className="border px-2 py-1 text-right tabular-nums">{Number(h.pi_amt)} Pi</td>
                   <td className="border px-2 py-1 text-center">{STS_NM[h.pymnt_sts_cd] ?? h.pymnt_sts_cd}</td>

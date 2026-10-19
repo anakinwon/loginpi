@@ -1,5 +1,5 @@
 // 분류체계 역할 R&R 7종 × 요금제 5종 권한표(화면·서버 공용, 서버 전용 import 없음) — 역할 코드 정본은 DB std_cmn_cd(MBR_ROLE, sql/012·048)
-// 2026-10-18 마스터 지시(권한·요금제 표) : 실제 권한 = 멤버 역할 권한 ∩ 분류체계 요금제 권한(교집합), 전역 ADMIN 은 요금제4
+// 2026-10-18 마스터 지시(권한·요금제 표) : 실제 권한 = 멤버 역할 권한 ∩ 분류체계 요금제 권한(교집합). 전역 ADMIN 도 결제한 요금제만(2026-10-19 마스터 지시 — 결제 안 된 권한 모두 제거)
 // 승인 1단계 : 승인권자(SYS·DA)는 승인 화면에서 본인 신청도 승인 가능(처리자 = 신청자로 기록), 즉시 승인(SELF_APPROVE)도 SYS·DA
 export const ROLES = ['SYS', 'DA', 'STD', 'MDL', 'QLT', 'MIG', 'VIEWER'] as const
 export type MbrRole = (typeof ROLES)[number]
@@ -58,10 +58,10 @@ export const PLAN_PERMS: Record<PlanCd, readonly BasePerm[]> = {
 const isRole = (r: unknown): r is MbrRole => typeof r === 'string' && (ROLES as readonly string[]).includes(r)
 export const isPlan = (p: unknown): p is PlanCd => typeof p === 'string' && (PLANS as readonly string[]).includes(p)
 
-// 실제 권한 = 역할 ∩ 요금제(ADMIN = 요금제4) + 파생 권한. 멤버 아님(역할 없음·구 코드) = 빈 목록
-export function effPerms(role: string | null | undefined, plan: string | null | undefined, admin = false): Perm[] {
+// 실제 권한 = 역할 ∩ 요금제 + 파생 권한. 멤버 아님(역할 없음·구 코드) = 빈 목록
+export function effPerms(role: string | null | undefined, plan: string | null | undefined): Perm[] {
   if (!isRole(role)) return []
-  const p = new Set<BasePerm>(PLAN_PERMS[admin ? 'P4' : isPlan(plan) ? plan : 'FREE'])
+  const p = new Set<BasePerm>(PLAN_PERMS[isPlan(plan) ? plan : 'FREE'])
   const b = new Set(ROLE_PERMS[role].filter((x) => p.has(x)))
   const out: Perm[] = ['VIEW', ...b]
   const both = (x: BasePerm, y: BasePerm) => b.has(x) && b.has(y)

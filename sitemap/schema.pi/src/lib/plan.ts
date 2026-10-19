@@ -2,6 +2,7 @@
 import 'server-only'
 import { db } from './db'
 import { PLANS, type PlanCd } from './roles'
+import { upgradeFee, type UpgQuote, type UpgTerm } from './upgrade'
 
 export interface AreaPlan {
   plan: PlanCd
@@ -40,4 +41,27 @@ export async function feePlans(): Promise<FeePlan[]> {
   const { data, error } = await db().from('sys_fee_plan').select('plan_cd, prd_cd, plan_nm, pi_amt, use_mon_cnt').eq('use_yn', 'Y').eq('del_yn', 'N').order('sort_seq')
   if (error) throw error
   return (data ?? []).map((r) => ({ ...r, pi_amt: Number(r.pi_amt) }) as FeePlan)
+}
+
+// 구독 중 = 결제한 요금제 사용 중(무료·유예 아님) — 이때는 업그레이드만 결제 가능(마스터 지시 2026-10-19)
+export const subscribed = (p: AreaPlan) => p.plan !== 'FREE' && !p.grace
+
+// 업그레이드 견적 — 현재 결제 요금제보다 높은 요금제(같은 요금제 월 → 연 포함)마다 일할계산 금액(src/lib/upgrade.ts). 무료·유예만 = 빈 목록
+export async function upgradeQuotes(areaId: string, now = Date.now()): Promise<{ from: PlanCd; quotes: (UpgQuote & { plan_cd: PlanCd })[] }> {
+  const cur = await areaPlan(areaId)
+  if (cur.plan === 'FREE') return { from: cur.plan, quotes: [] }
+  const [fees, terms] = await Promise.all([
+    feePlans(),
+    db().from('std_area_plan').select('prd_cd, strt_dtm, end_dtm, grnt_rsn_cd').eq('area_id', areaId).eq('plan_cd', cur.plan).eq('del_yn', 'N').gt('end_dtm', new Date(now).toISOString()),
+  ])
+  if (terms.error) throw terms.error
+  const price = Object.fromEntries(fees.map((f) => [f.plan_cd + f.prd_cd, f.pi_amt]))
+  // 같은·상위 요금제 × 새 주기(월·년 — 같은 요금제 월 → 연 외 불가한 조합은 upgradeFee 가 null)
+  const quotes = PLANS.slice(PLANS.indexOf(cur.plan)).flatMap((to) =>
+    (['M', 'Y'] as const).flatMap((prd) => {
+      const q = upgradeFee((terms.data ?? []) as UpgTerm[], price, cur.plan, to, now, prd)
+      return q ? [{ ...q, plan_cd: to }] : []
+    }),
+  )
+  return { from: cur.plan, quotes }
 }
