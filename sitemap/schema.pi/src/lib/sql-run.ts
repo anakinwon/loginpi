@@ -1,5 +1,5 @@
 // SQL 편집기 실행(서버 전용, 2026-10-18 마스터 지시 "Universal SQL Editor" — DBeaver 참고). 접속 = 저장된 서버 직접(SRV) 접속만
-// 판정 : 서버가 splitSql·classify·danger 를 다시 계산(클라이언트 값 신뢰 안 함) — 트랜잭션 제어 거부, 쓰기 = SQL_WRITE(DA), 위험 문장 = confirm 필요
+// 판정 : 서버가 splitSql·classify·danger 를 다시 계산(클라이언트 값 신뢰 안 함) — 트랜잭션 제어 거부, 쓰기 = CRUD(역할 ∩ 요금제), 위험 문장 = confirm 필요
 // PostgreSQL 조회 = 문장마다 READ ONLY 트랜잭션 + SET LOCAL 타임아웃 + SELECT 1(스냅샷 고정 — 이후 transaction_read_only 해제 불가) 후 ROLLBACK
 //  행 질의(SELECT·WITH·VALUES·TABLE)는 cursor(확장 프로토콜 — 한 문장만 허용)로 limit 까지만 가져옴. standard_conforming_strings = on 고정(분리기와 같은 문자열 해석)
 // 쓰기(DA) 실행 방식(DBeaver Auto/Manual) — 서버리스라 요청 사이 트랜잭션을 열어 둘 수 없어 MANUAL 은 '미리 실행 + Commit 때 재실행'(마스터 결정 2026-10-18)

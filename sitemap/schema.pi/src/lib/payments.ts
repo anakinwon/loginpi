@@ -110,11 +110,45 @@ export async function getOwnPayment(id: string, usrId: string): Promise<PymntRow
   return data
 }
 
-// 같은 분류체계에 진행 중(APPROVED) 인 다른 요금제 결제 — 이중 결제 방지
+// 같은 분류체계에 진행 중(APPROVED, 최근 15분) 인 다른 요금제 결제 — 이중 결제 방지. 방치된 오래된 APPROVED 는 막지 않음(검증 지적 m1)
+export const APPROVED_HOLD_MS = 15 * 60_000
 export async function hasOtherApproved(areaId: string, exceptId: string): Promise<boolean> {
-  const { count, error } = await db().from('pi_pymnt').select('pymnt_id', { count: 'exact', head: true }).eq('pymnt_tp_cd', AREA_PLAN).eq('pymnt_sts_cd', 'APPROVED').eq('del_yn', 'N').eq('meta_val->>area_id', areaId).neq('pymnt_id', exceptId)
+  const since = new Date(Date.now() - APPROVED_HOLD_MS).toISOString()
+  const { count, error } = await db().from('pi_pymnt').select('pymnt_id', { count: 'exact', head: true }).eq('pymnt_tp_cd', AREA_PLAN).eq('pymnt_sts_cd', 'APPROVED').eq('del_yn', 'N').eq('meta_val->>area_id', areaId).gt('apv_dtm', since).neq('pymnt_id', exceptId)
   if (error) throw error
   return (count ?? 0) > 0
+}
+
+// 서명된 결제 마무리(complete·cancel·미완료 복구 공용, 검증 지적 M1·M2) — Pi 에 결제 상태를 직접 물어
+//  서명 전(거래 없음) = { unsigned } / 서명됨 = Pi complete(이미 완료면 건너뜀) → 원장 COMPLETED + 요금제 반영(RPC, 재호출 안전)
+//  txid 는 클라이언트 값이 아니라 Pi 가 돌려준 거래 ID 를 쓴다. 본인 원장만
+export type Settle = { ok: true; plan_cd: string; end_dtm: string } | { ok: false; unsigned?: true; code: 'PAY_MISMATCH' | 'PAY_PI_KEY' | 'PAY_PI_FAILED'; status: number }
+export async function settlePaid(id: string, usrId: string): Promise<Settle> {
+  const row = await getOwnPayment(id, usrId)
+  if (!row || row.pymnt_sts_cd === 'CANCELED') return { ok: false, code: 'PAY_MISMATCH', status: 409 }
+  const g = await getPiPayment(id)
+  if (!g.ok) return g.status === 500 ? { ok: false, code: 'PAY_PI_KEY', status: 500 } : { ok: false, code: 'PAY_PI_FAILED', status: 502 }
+  const txid = g.payment.transaction?.txid
+  if (!txid) return { ok: false, unsigned: true, code: 'PAY_MISMATCH', status: 409 }
+  if (!g.payment.status.developer_completed) {
+    const c = await completePiPayment(id, txid)
+    if (!c.ok) {
+      // 다른 요청이 먼저 완료했을 수 있음 — 다시 조회해 완료면 진행
+      const again = await getPiPayment(id)
+      if (!again.ok || !again.payment.status.developer_completed) {
+        console.error('[payments] Pi complete', c.status, c.body.slice(0, 300))
+        return { ok: false, code: 'PAY_PI_FAILED', status: 502 }
+      }
+    }
+  }
+  const { data, error } = await db().rpc('fn_cmpl_area_plan_pymnt', { p_pymnt_id: id, p_tx_id: txid, p_usr_id: usrId })
+  if (error) {
+    console.error('[payments] fn_cmpl_area_plan_pymnt', error.code, error.message)
+    if (error.code === 'MPL01') return { ok: false, code: 'PAY_MISMATCH', status: 409 }
+    throw error // 일시 오류 = 원장 APPROVED 유지 → 재시도·다음 로그인 미완료 복구 대상
+  }
+  const r = data as { plan_cd: string; end_dtm: string }
+  return { ok: true, plan_cd: r.plan_cd, end_dtm: r.end_dtm }
 }
 
 // 원장 취소 — COMPLETED 는 건드리지 않음

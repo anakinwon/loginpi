@@ -1,4 +1,4 @@
-// SQL 편집기 실행 이력(2026-10-18, sql/045) — GET ?page=&size= : 본인 이력, DA(SQL_WRITE) 는 분류체계 전체. 결과 값은 저장하지 않음
+// SQL 편집기 실행 이력(2026-10-18, sql/045) — GET ?page=&size= : 본인 이력, DB 접속 관리자(SYS·DA, 요금제4)는 분류체계 전체. 결과 값은 저장하지 않음
 import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { dbError, requireAreaRole } from '@/lib/api'

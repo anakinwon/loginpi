@@ -1,7 +1,7 @@
 'use client'
 import { piFetch } from '@pi/auth/client'
 // 표준단어 조회·등록·수정·삭제(클라이언트) — /api/areas/[areaId]/words(목록·등록·상태 필터), /words/[dicId](수정·삭제, ver_no 낙관적 잠금), /check(입력 중 중복 검사), /suggest(논리명 입력 시 물리명·영문풀네임·한자·설명 자동 채움, 저장 안 함)
-// 승인 절차 : 등록·수정·삭제는 승인 신청, DA만 즉시 승인 선택 가능(기본 끔), 조회 전용 역할은 등록 영역 비활성
+// 승인 절차 : 등록·수정·삭제는 승인 신청, 즉시 승인 선택은 SYS·DA(요금제4)만(기본 끔), 조회 전용 역할은 등록 영역 비활성
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { STS_NM, type MbrRole, type Perm } from '@/lib/roles'
 
@@ -497,7 +497,7 @@ export function StsFilter({ value, onChange }: { value: string; onChange: (v: st
   )
 }
 
-// 등록·수정 폼의 승인 선택 항목 — DA만 즉시 승인 체크(기본 끔), 신청사유는 모든 신청자(선택)
+// 등록·수정 폼의 승인 선택 항목 — SYS·DA(요금제4)만 즉시 승인 체크(기본 끔), 신청사유는 모든 신청자(선택)
 export function ApvFields(p: { approver: boolean; selfApv: boolean; setSelfApv: (v: boolean) => void; rsn: string; setRsn: (v: string) => void }) {
   return (
     <>

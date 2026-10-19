@@ -8,7 +8,7 @@ import { PLAN_NM, PLAN_PERMS, ROLE_NM, type MbrRole, type PlanCd } from '@/lib/r
 
 type Fee = { plan_cd: Exclude<PlanCd, 'FREE'>; prd_cd: 'M' | 'Y'; plan_nm: string; pi_amt: number; use_mon_cnt: number }
 type Term = { plan_cd: PlanCd; prd_cd: 'M' | 'Y' | null; strt_dtm: string; end_dtm: string; grnt_rsn_cd: 'PAY' | 'GRACE' }
-type Hist = { pymnt_id: string; pi_amt: number; pymnt_sts_cd: string; meta_val: { plan_cd?: string; prd_cd?: string }; apv_dtm: string; cmpl_dtm: string | null }
+type Hist = { pymnt_id?: string; pi_amt: number; pymnt_sts_cd: string; meta_val: { plan_cd?: string; prd_cd?: string }; apv_dtm: string; cmpl_dtm: string | null }
 type Info = {
   plan: { plan: PlanCd; end: string | null; grace: boolean }
   admin: boolean
@@ -193,8 +193,8 @@ export default function PlanPage({ params }: { params: Promise<{ areaId: string 
               </tr>
             </thead>
             <tbody>
-              {info.hist.items.map((h) => (
-                <tr key={h.pymnt_id} className="odd:bg-white even:bg-[#f4f7fc]">
+              {info.hist.items.map((h, i) => (
+                <tr key={h.pymnt_id ?? i} className="odd:bg-white even:bg-[#f4f7fc]">
                   <td className="border px-2 py-1 text-center">{dt(h.apv_dtm)}</td>
                   <td className="border px-2 py-1 text-center">
                     {PLAN_NM[h.meta_val.plan_cd as PlanCd] ?? h.meta_val.plan_cd} · {h.meta_val.prd_cd === 'Y' ? '년' : '월'}

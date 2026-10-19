@@ -28,15 +28,17 @@ export async function GET(req: Request, { params }: Ctx) {
     ])
     if (hist.error) throw hist.error
     if (terms.error) throw terms.error
+    const canPay = (PAYER_ROLES as readonly string[]).includes(auth.role)
     return NextResponse.json({
       ok: true,
       plan: auth.plan,
       admin: auth.admin,
       role: auth.role,
-      can_pay: (PAYER_ROLES as readonly string[]).includes(auth.role),
+      can_pay: canPay,
       fees,
       terms: terms.data, // 지금·앞으로 유효한 기간(연장분 포함)
-      hist: { items: hist.data, total: hist.count ?? 0, page, size: SIZE },
+      // 결제ID 는 결제자(SYS·DA)에게만(검증 지적 m2 — 노출 최소화)
+      hist: { items: canPay ? hist.data : (hist.data ?? []).map(({ pymnt_id: _id, ...x }) => x), total: hist.count ?? 0, page, size: SIZE },
     })
   } catch (e) {
     return dbError(e as { code?: string; message?: string })

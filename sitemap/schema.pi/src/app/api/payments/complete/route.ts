@@ -1,12 +1,12 @@
 // 요금제 결제 완료 — POST { paymentId, txid }. SDK onReadyForServerCompletion·미완료 결제 복구에서 호출(piFetch)
-//  원장 선조회(본인·취소 아님) → Pi complete → fn_cmpl_area_plan_pymnt(원장 COMPLETED + 기간 반영 한 트랜잭션, 재호출 = 같은 행)
+//  settlePaid : 본인 원장 확인 → Pi 에 상태 조회(거래 ID 는 Pi 값) → Pi complete(이미 완료면 건너뜀) → 원장 COMPLETED + 요금제 반영(재호출 안전)
+//  Pi 완료 뒤 DB 반영이 실패해도 원장이 APPROVED 로 남아 다시 호출하면 이어서 반영(검증 지적 M1)
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { apiError, currentUser, dbError, parseBody } from '@/lib/api'
-import { db } from '@/lib/db'
-import { completePiPayment, getOwnPayment } from '@/lib/payments'
+import { settlePaid } from '@/lib/payments'
 
-const body = z.object({ paymentId: z.string().min(1).max(200), txid: z.string().min(1).max(200) })
+const body = z.object({ paymentId: z.string().min(1).max(200), txid: z.string().min(1).max(200) }) // txid 는 받기만(검증·기록은 Pi 값)
 
 export async function POST(req: Request) {
   const b = await parseBody(req, body)
@@ -14,23 +14,9 @@ export async function POST(req: Request) {
   const user = await currentUser()
   if (!user) return apiError('AUTH_REQUIRED', 401)
   try {
-    const row = await getOwnPayment(b.paymentId, user.usr_id)
-    if (!row || row.pymnt_sts_cd === 'CANCELED') return apiError('PAY_MISMATCH', 409) // 원장 없는 결제는 Pi complete 미호출
-    if (row.pymnt_sts_cd !== 'COMPLETED') {
-      const r = await completePiPayment(b.paymentId, b.txid)
-      if (!r.ok) {
-        if (r.status === 500) return apiError('PAY_PI_KEY', 500)
-        console.error('[payments/complete] Pi complete', r.status, r.body.slice(0, 300))
-        return apiError('PAY_PI_FAILED', 502)
-      }
-    }
-    const { data, error } = await db().rpc('fn_cmpl_area_plan_pymnt', { p_pymnt_id: b.paymentId, p_tx_id: b.txid, p_usr_id: user.usr_id })
-    if (error) {
-      console.error('[payments/complete] RPC', error.code, error.message)
-      return error.code === 'MPL01' ? apiError('PAY_MISMATCH', 409) : dbError(error)
-    }
-    const g = data as { plan_cd: string; end_dtm: string } | null
-    return NextResponse.json({ ok: true, plan_cd: g?.plan_cd, end_dtm: g?.end_dtm })
+    const s = await settlePaid(b.paymentId, user.usr_id)
+    if (!s.ok) return apiError(s.code, s.status)
+    return NextResponse.json({ ok: true, plan_cd: s.plan_cd, end_dtm: s.end_dtm })
   } catch (e) {
     return dbError(e as { code?: string; message?: string })
   }
