@@ -41,7 +41,7 @@ export default function ForbiddenPage({ params }: { params: Promise<{ areaId: st
       .then((r) => r.json())
       .then((j) => j.ok && setWords(j.words))
   }, [areaId])
-  const editor = perms.includes('APPROVE')
+  const editor = perms.includes('BAN_EDIT')
 
   const load = useCallback(async () => {
     const sp = new URLSearchParams({ page: String(cond.page), size: String(cond.size), ...(cond.kw ? { q: cond.kw } : {}), ...(cond.tp ? { tp: cond.tp } : {}) })
@@ -131,7 +131,7 @@ export default function ForbiddenPage({ params }: { params: Promise<{ areaId: st
               등록
             </button>
           </div>
-          {role && !editor && <p className="mt-2 font-medium text-gray-600">조회 권한 : 금칙어 등록·삭제는 승인 권한(시스템담당자·데이터아키텍트, 요금제4)이 있어야 합니다</p>}
+          {role && !editor && <p className="mt-2 font-medium text-gray-600">조회 권한 : 금칙어 등록·삭제는 일괄등록 권한 역할(시스템담당자·데이터아키텍트·표준담당자·모델러) + 표준담당자 요금제 이상이어야 합니다</p>}
           {msg && (
             <p role="status" className="mt-2 font-medium text-[#1f3a68]">
               {msg}

@@ -13,7 +13,7 @@ const TP_NM = { DIC: '단어', DOM: '도메인', TERM: '용어' } as const
 
 export async function GET(req: Request, { params }: Ctx) {
   const { areaId } = await params
-  const auth = await requireAreaRole(areaId, 'SET_VIEW')
+  const auth = await requireAreaRole(areaId, 'CHK_VIEW')
   if (auth instanceof NextResponse) return auth
   try {
     const cnfm = (t: string, cols: string, pk: string) => () => db().from(t).select(cols).eq('area_id', areaId).eq('del_yn', 'N').eq('std_sts_cd', 'CNFM').order(pk)

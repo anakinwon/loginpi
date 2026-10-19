@@ -35,6 +35,9 @@ export async function GET(req: Request, { params }: Ctx) {
     .from('std_audit_log')
     .select('log_id, tgt_tp_cd, tgt_id, act_cd, bfr_val, aftr_val, apv_req_id, reg_dtm, sys_user(pi_usr_nm)', { count: 'exact' })
     .eq('area_id', areaId)
+  // 이력 = 요금제1부터(설정 서브메뉴 2026-10-19) — 메뉴 밖 대상은 빼고 보여 줌 : DB 접속·에이전트(접속 정보) = DB_CONN_ADMIN, 멤버 = ADM_VIEW
+  const hide = [...(auth.perms.includes('DB_CONN_ADMIN') ? [] : ['DBCN', 'AGT']), ...(auth.perms.includes('ADM_VIEW') ? [] : ['MBR'])]
+  if (hide.length) query = query.not('tgt_tp_cd', 'in', `(${hide.join(',')})`)
   if (f.tgt) query = query.eq('tgt_tp_cd', f.tgt)
   if (f.act) query = query.eq('act_cd', f.act)
   if (usrId) query = query.eq('usr_id', usrId)

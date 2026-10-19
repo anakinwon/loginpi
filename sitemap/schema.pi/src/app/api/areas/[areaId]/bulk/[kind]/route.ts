@@ -42,7 +42,7 @@ const bodySchema = z.object({
 export async function POST(req: Request, { params }: Ctx) {
   const { areaId, kind } = await params
   if (!(BULK_KINDS as readonly string[]).includes(kind)) return apiError('NOT_FOUND', 404)
-  const auth = await requireAreaRole(areaId, 'BULK')
+  const auth = await requireAreaRole(areaId, kind === 'forbidden' ? 'BAN_EDIT' : 'BULK') // 금칙어 = 설정 › 금칙어 일괄등록(표준담당자 요금제+)
   if (auth instanceof NextResponse) return auth
   const body = await parseBody(req, bodySchema)
   if (body instanceof NextResponse) return body

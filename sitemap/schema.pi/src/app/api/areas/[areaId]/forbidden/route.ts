@@ -12,7 +12,7 @@ const COLS = 'rel_id, rel_tp_cd, rel_txt, regr_id, reg_dtm, std_dic!inner(dic_id
 
 export async function GET(req: Request, { params }: Ctx) {
   const { areaId } = await params
-  const auth = await requireAreaRole(areaId, 'SET_VIEW')
+  const auth = await requireAreaRole(areaId, 'BAN_VIEW')
   if (auth instanceof NextResponse) return auth
   const sp = new URL(req.url).searchParams
   const q = sp.get('q')?.trim()
@@ -45,7 +45,7 @@ const addSchema = z.object({ dic_id: z.string().uuid(), rel_tp_cd: z.enum(['SYN'
 
 export async function POST(req: Request, { params }: Ctx) {
   const { areaId } = await params
-  const auth = await requireAreaRole(areaId, 'APPROVE')
+  const auth = await requireAreaRole(areaId, 'BAN_EDIT')
   if (auth instanceof NextResponse) return auth
   const body = await parseBody(req, addSchema)
   if (body instanceof NextResponse) return body
@@ -62,7 +62,7 @@ export async function POST(req: Request, { params }: Ctx) {
 
 export async function DELETE(req: Request, { params }: Ctx) {
   const { areaId } = await params
-  const auth = await requireAreaRole(areaId, 'APPROVE')
+  const auth = await requireAreaRole(areaId, 'BAN_EDIT')
   if (auth instanceof NextResponse) return auth
   const id = new URL(req.url).searchParams.get('rel_id') ?? ''
   if (!z.string().uuid().safeParse(id).success) return apiError('INVALID_INPUT', 400)

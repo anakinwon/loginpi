@@ -5,12 +5,14 @@ export const ROLES = ['SYS', 'DA', 'STD', 'MDL', 'QLT', 'MIG', 'VIEWER'] as cons
 export type MbrRole = (typeof ROLES)[number]
 
 // 표 칸 — 권한 6종(CRUD = SQL 편집기 DML·DDL 쓰기) + 메뉴 4종(1 SQL 편집기·2 표준·3 모델링·4 설정)
-export const BASE_PERMS = ['APPROVE', 'SELF_APPROVE', 'SETTINGS', 'BULK', 'REQUEST', 'CRUD', 'MENU_SQL', 'MENU_STD', 'MENU_MODEL', 'MENU_SET'] as const
+//  설정 서브메뉴 4단(마스터 표 '설정 Sub_Menu vs Role' 2026-10-19) : MENU_SET 설정·이력 / MENU_BAN 금칙어·금칙어 일괄등록 / MENU_CHK 표준 점검·리버스 / MENU_ADM 멤버·승인
+export const BASE_PERMS = ['APPROVE', 'SELF_APPROVE', 'SETTINGS', 'BULK', 'REQUEST', 'CRUD', 'MENU_SQL', 'MENU_STD', 'MENU_MODEL', 'MENU_SET', 'MENU_BAN', 'MENU_CHK', 'MENU_ADM'] as const
 type BasePerm = (typeof BASE_PERMS)[number]
 // 파생 권한(표 밖) — 서버 경로·화면은 이 이름으로 판정
 //  VIEW = 멤버, STD_VIEW·MODEL_VIEW·SET_VIEW = 메뉴, STD_REQ·MODEL_EDIT = 신청 ∧ 메뉴, SQL_QUERY = 메뉴1,
 //  DDL_APPROVE = 승인, DB_CONN_ADMIN = 승인 ∧ 설정(접속 비밀번호 관리 — 설정만 가진 역할에는 주지 않음)
-export type Perm = BasePerm | 'VIEW' | 'STD_VIEW' | 'STD_REQ' | 'MODEL_VIEW' | 'MODEL_EDIT' | 'SET_VIEW' | 'SQL_QUERY' | 'DDL_APPROVE' | 'DB_CONN_ADMIN'
+//  설정 서브메뉴 : SET_VIEW = 설정·이력, BAN_VIEW = 금칙어 조회, BAN_EDIT = 금칙어 등록·삭제·일괄(금칙어 메뉴 ∧ 일괄등록), CHK_VIEW = 표준 점검·리버스, ADM_VIEW = 멤버·승인 메뉴, MBR_ADMIN = 멤버 관리(멤버 메뉴 ∧ 설정)
+export type Perm = BasePerm | 'VIEW' | 'STD_VIEW' | 'STD_REQ' | 'MODEL_VIEW' | 'MODEL_EDIT' | 'SET_VIEW' | 'BAN_VIEW' | 'BAN_EDIT' | 'CHK_VIEW' | 'ADM_VIEW' | 'MBR_ADMIN' | 'SQL_QUERY' | 'DDL_APPROVE' | 'DB_CONN_ADMIN'
 
 export const ROLE_NM: Record<MbrRole, string> = {
   SYS: '시스템담당자',
@@ -32,13 +34,14 @@ export const ROLE_DESC: Record<MbrRole, string> = {
 }
 
 const ALL = BASE_PERMS
-const MENUS: readonly BasePerm[] = ['MENU_SQL', 'MENU_STD', 'MENU_MODEL', 'MENU_SET']
+const SET_MENUS: readonly BasePerm[] = ['MENU_SET', 'MENU_BAN', 'MENU_CHK', 'MENU_ADM'] // 역할은 설정 메뉴를 묶음으로(요금제가 단계를 나눔)
+const MENUS: readonly BasePerm[] = ['MENU_SQL', 'MENU_STD', 'MENU_MODEL', ...SET_MENUS]
 export const ROLE_PERMS: Record<MbrRole, readonly BasePerm[]> = {
   SYS: ALL,
   DA: ALL,
   STD: ['SETTINGS', 'BULK', 'REQUEST', 'CRUD', ...MENUS],
   MDL: ['SETTINGS', 'BULK', 'REQUEST', 'CRUD', ...MENUS],
-  QLT: ['REQUEST', 'CRUD', 'MENU_SQL', 'MENU_MODEL', 'MENU_SET'],
+  QLT: ['REQUEST', 'CRUD', 'MENU_SQL', 'MENU_MODEL', ...SET_MENUS],
   MIG: ['REQUEST', 'CRUD', 'MENU_SQL'],
   VIEWER: ['MENU_STD'],
 }
@@ -48,10 +51,11 @@ export const PLANS = ['FREE', 'P1', 'P2', 'P3', 'P4'] as const
 export type PlanCd = (typeof PLANS)[number]
 export const PLAN_NM: Record<PlanCd, string> = { FREE: '무료(조회)', P1: '개발자', P2: '표준담당자', P3: '모델러', P4: 'DA' }
 export const PLAN_PERMS: Record<PlanCd, readonly BasePerm[]> = {
+  // 설정 서브메뉴(2026-10-19 마스터 표) : 개발자 = 설정·이력 / 표준담당자 = + 금칙어·금칙어 일괄등록 / 모델러 = + 표준 점검·리버스 / DA = + 멤버·승인
   FREE: ['MENU_STD'],
-  P1: ['CRUD', 'MENU_SQL'],
-  P2: ['BULK', 'REQUEST', 'CRUD', 'MENU_SQL', 'MENU_STD'],
-  P3: ['BULK', 'REQUEST', 'CRUD', 'MENU_SQL', 'MENU_STD', 'MENU_MODEL'],
+  P1: ['SETTINGS', 'CRUD', 'MENU_SQL', 'MENU_SET'],
+  P2: ['SETTINGS', 'BULK', 'REQUEST', 'CRUD', 'MENU_SQL', 'MENU_STD', 'MENU_SET', 'MENU_BAN'],
+  P3: ['SETTINGS', 'BULK', 'REQUEST', 'CRUD', 'MENU_SQL', 'MENU_STD', 'MENU_MODEL', 'MENU_SET', 'MENU_BAN', 'MENU_CHK'],
   P4: ALL,
 }
 
@@ -70,6 +74,11 @@ export function effPerms(role: string | null | undefined, plan: string | null | 
   if (b.has('MENU_MODEL')) out.push('MODEL_VIEW')
   if (both('REQUEST', 'MENU_MODEL')) out.push('MODEL_EDIT')
   if (b.has('MENU_SET')) out.push('SET_VIEW')
+  if (b.has('MENU_BAN')) out.push('BAN_VIEW')
+  if (both('MENU_BAN', 'BULK')) out.push('BAN_EDIT')
+  if (b.has('MENU_CHK')) out.push('CHK_VIEW')
+  if (b.has('MENU_ADM')) out.push('ADM_VIEW')
+  if (both('MENU_ADM', 'SETTINGS')) out.push('MBR_ADMIN')
   if (b.has('MENU_SQL')) out.push('SQL_QUERY')
   if (b.has('APPROVE')) out.push('DDL_APPROVE')
   if (both('APPROVE', 'SETTINGS')) out.push('DB_CONN_ADMIN')

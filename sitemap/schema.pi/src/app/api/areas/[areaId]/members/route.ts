@@ -10,7 +10,7 @@ type Ctx = { params: Promise<{ areaId: string }> }
 
 export async function GET(_req: Request, { params }: Ctx) {
   const { areaId } = await params
-  const auth = await requireAreaRole(areaId, 'VIEW')
+  const auth = await requireAreaRole(areaId, 'ADM_VIEW')
   if (auth instanceof NextResponse) return auth
   const { data, error } = await db()
     .from('std_area_mbr')
@@ -29,7 +29,7 @@ const addSchema = z.object({
 
 export async function POST(req: Request, { params }: Ctx) {
   const { areaId } = await params
-  const auth = await requireAreaRole(areaId, 'SETTINGS')
+  const auth = await requireAreaRole(areaId, 'MBR_ADMIN')
   if (auth instanceof NextResponse) return auth
   const body = await parseBody(req, addSchema)
   if (body instanceof NextResponse) return body
@@ -52,7 +52,7 @@ const roleSchema = z.object({ mbr_id: z.string().uuid(), mbr_role_cd: z.enum(ROL
 
 export async function PATCH(req: Request, { params }: Ctx) {
   const { areaId } = await params
-  const auth = await requireAreaRole(areaId, 'SETTINGS')
+  const auth = await requireAreaRole(areaId, 'MBR_ADMIN')
   if (auth instanceof NextResponse) return auth
   const body = await parseBody(req, roleSchema)
   if (body instanceof NextResponse) return body

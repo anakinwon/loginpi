@@ -104,14 +104,15 @@ const REST: Item[] = [
     icon: Settings,
     tone: 'slate',
     subs: [
-      { seg: 'members', nm: '멤버' },
-      { seg: 'settings', nm: '설정', perm: 'SETTINGS' },
-      { seg: 'history', nm: '이력' },
-      { seg: 'check', nm: '표준 점검' },
-      { seg: 'reverse', nm: '리버스' },
-      { seg: 'forbidden', nm: '금칙어' },
-      { seg: 'bulk', nm: '금칙어 일괄등록', perm: 'BULK', tab: 'forbidden' },
-      { seg: 'approvals', nm: '승인' },
+      // 설정 서브메뉴 × 요금제(마스터 표 2026-10-19) : 개발자 설정·이력 / 표준담당자 + 금칙어·일괄 / 모델러 + 표준 점검·리버스 / DA + 멤버·승인
+      { seg: 'settings', nm: '설정', perm: 'SET_VIEW' },
+      { seg: 'history', nm: '이력', perm: 'SET_VIEW' },
+      { seg: 'forbidden', nm: '금칙어', perm: 'BAN_VIEW' },
+      { seg: 'bulk', nm: '금칙어 일괄등록', perm: 'BAN_EDIT', tab: 'forbidden' },
+      { seg: 'check', nm: '표준 점검', perm: 'CHK_VIEW' },
+      { seg: 'reverse', nm: '리버스', perm: 'CHK_VIEW' },
+      { seg: 'members', nm: '멤버', perm: 'ADM_VIEW' },
+      { seg: 'approvals', nm: '승인', perm: 'ADM_VIEW' },
     ],
   },
 ]

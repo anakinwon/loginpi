@@ -12,17 +12,28 @@ interface Mbr {
   sys_user: { pi_usr_nm: string; dsp_nm: string }
 }
 // 권한표 열 순서(마스터 표) — CRUD = SQL 편집기 DML·DDL 쓰기
-const PERM_COLS: [Perm, string][] = [
-  ['APPROVE', '승인'],
-  ['SELF_APPROVE', '즉시 승인'],
-  ['SETTINGS', '설정'],
-  ['BULK', '일괄등록'],
-  ['REQUEST', '신청'],
-  ['CRUD', 'CRUD'],
-  ['MENU_SQL', '메뉴1 SQL편집기'],
-  ['MENU_STD', '메뉴2 표준'],
-  ['MENU_MODEL', '메뉴3 모델링'],
-  ['MENU_SET', '메뉴4 설정'],
+//  메뉴4 설정은 하단 서브메뉴 순서대로 8칸(설정 > 이력 > 금칙어 > 금칙어 일괄등록 > 표준 점검 > 리버스 > 멤버 > 승인, 2026-10-19)
+//  칸 판정 = 그 행(역할·요금제)의 표 권한 목록 → 금칙어 일괄등록만 금칙어 메뉴 ∧ 일괄등록(roles.ts BAN_EDIT)
+type Col = [string, string, (ps: readonly string[]) => boolean]
+const one = (p: Perm) => (ps: readonly string[]) => ps.includes(p)
+const PERM_COLS: Col[] = [
+  ['APPROVE', '승인', one('APPROVE')],
+  ['SELF_APPROVE', '즉시 승인', one('SELF_APPROVE')],
+  ['SETTINGS', '설정', one('SETTINGS')],
+  ['BULK', '일괄등록', one('BULK')],
+  ['REQUEST', '신청', one('REQUEST')],
+  ['CRUD', 'CRUD', one('CRUD')],
+  ['MENU_SQL', '메뉴1 SQL편집기', one('MENU_SQL')],
+  ['MENU_STD', '메뉴2 표준', one('MENU_STD')],
+  ['MENU_MODEL', '메뉴3 모델링', one('MENU_MODEL')],
+  ['SUB_SET', '메뉴4 설정', one('MENU_SET')],
+  ['SUB_HIST', '메뉴4 이력', one('MENU_SET')],
+  ['SUB_BAN', '메뉴4 금칙어', one('MENU_BAN')],
+  ['SUB_BAN_BULK', '메뉴4 금칙어 일괄등록', (ps) => ps.includes('MENU_BAN') && ps.includes('BULK')],
+  ['SUB_CHK', '메뉴4 표준 점검', one('MENU_CHK')],
+  ['SUB_RVS', '메뉴4 리버스', one('MENU_CHK')],
+  ['SUB_MBR', '메뉴4 멤버', one('MENU_ADM')],
+  ['SUB_APV', '메뉴4 승인', one('MENU_ADM')],
 ]
 const roleNm = (r: string) => ROLE_NM[r as MbrRole] ?? r
 
@@ -35,7 +46,7 @@ export default function MembersPage({ params }: { params: Promise<{ areaId: stri
   const [nm, setNm] = useState('')
   const [role, setRole] = useState<MbrRole>('MDL')
   const [msg, setMsg] = useState('')
-  const manage = myPerms.includes('SETTINGS')
+  const manage = myPerms.includes('MBR_ADMIN')
 
   const load = useCallback(async () => {
     const [jm, ja] = await Promise.all([(await piFetch(base)).json(), (await piFetch(`/api/areas/${areaId}`)).json()])
@@ -133,8 +144,8 @@ export default function MembersPage({ params }: { params: Promise<{ areaId: stri
               <tr className="thead-3d text-center">
                 <th className="w-36 border px-2 py-2">역할</th>
                 <th className="border px-2 py-2">설명</th>
-                {PERM_COLS.map(([, label]) => (
-                  <th key={label} className="w-20 border px-2 py-2">
+                {PERM_COLS.map(([k, label]) => (
+                  <th key={k} className="w-20 border px-2 py-2">
                     {label}
                   </th>
                 ))}
@@ -145,9 +156,9 @@ export default function MembersPage({ params }: { params: Promise<{ areaId: stri
                 <tr key={r} className="odd:bg-white even:bg-[#f4f7fc]">
                   <td className="border px-2 py-1 font-medium">{ROLE_NM[r]}</td>
                   <td className="border px-2 py-1">{ROLE_DESC[r]}</td>
-                  {PERM_COLS.map(([p]) => (
-                    <td key={p} className="border px-2 py-1 text-center">
-                      {(ROLE_PERMS[r] as readonly string[]).includes(p) ? '●' : ''}
+                  {PERM_COLS.map(([k, , has]) => (
+                    <td key={k} className="border px-2 py-1 text-center">
+                      {has(ROLE_PERMS[r]) ? '●' : ''}
                     </td>
                   ))}
                 </tr>
@@ -156,9 +167,9 @@ export default function MembersPage({ params }: { params: Promise<{ areaId: stri
                 <tr key={pl} className="bg-[#f3f8ee]">
                   <td className="border px-2 py-1 font-medium">요금제 {pl === 'FREE' ? '없음' : pl.slice(1)}</td>
                   <td className="border px-2 py-1">{PLAN_NM[pl]}</td>
-                  {PERM_COLS.map(([p]) => (
-                    <td key={p} className="border px-2 py-1 text-center">
-                      {(PLAN_PERMS[pl] as readonly string[]).includes(p) ? '●' : ''}
+                  {PERM_COLS.map(([k, , has]) => (
+                    <td key={k} className="border px-2 py-1 text-center">
+                      {has(PLAN_PERMS[pl]) ? '●' : ''}
                     </td>
                   ))}
                 </tr>

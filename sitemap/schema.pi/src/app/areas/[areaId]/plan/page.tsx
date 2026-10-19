@@ -31,7 +31,10 @@ const COLS: [string, string][] = [
   ['MENU_SQL', 'SQL 편집기'],
   ['MENU_STD', '표준'],
   ['MENU_MODEL', '모델링'],
-  ['MENU_SET', '설정 메뉴'],
+  ['MENU_SET', '설정·이력'],
+  ['MENU_BAN', '금칙어'],
+  ['MENU_CHK', '점검·리버스'],
+  ['MENU_ADM', '멤버·승인'],
 ]
 const STS_NM: Record<string, string> = { APPROVED: '진행 중', COMPLETED: '완료', CANCELED: '취소' }
 const dt = (s: string | null) => (s ? new Date(s).toLocaleString('ko-KR', { dateStyle: 'medium', timeStyle: 'short' }) : '-')
