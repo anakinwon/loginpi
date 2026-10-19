@@ -1,5 +1,5 @@
 // 승인 요청 처리 — POST { action: 'APV', opinion? } | { action: 'RJCT', reason } | { action: 'CNCL' }
-// 승인·반려 = 승인권자(DA·STD, 본인 신청 자기 승인 허용), 취소 = 신청자 본인. 승인 시점 재검증·원자 처리는 src/lib/approval.ts(sql/012)
+// 승인·반려 = 승인권자(SYS·DA·요금제4, 본인 신청 자기 승인 허용), 취소 = 신청자 본인. 승인 시점 재검증·원자 처리는 src/lib/approval.ts(sql/012)
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { apiError, dbError, parseBody, requireAreaRole } from '@/lib/api'

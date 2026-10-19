@@ -1,4 +1,4 @@
-// 금칙어 관리(P05) — GET ?q=&tp=SYN|BAN&page=&size= 대체 표기 목록(조회 권한), POST { dic_id, rel_tp_cd, rel_txt } 등록, DELETE ?rel_id= 논리 삭제(승인권자 DA·STD)
+// 금칙어 관리(P05) — GET ?q=&tp=SYN|BAN&page=&size= 대체 표기 목록(조회 권한), POST { dic_id, rel_tp_cd, rel_txt } 등록, DELETE ?rel_id= 논리 삭제(승인권자 SYS·DA)
 // 원칙(sql/016) : 대체 표기(이음동의어 SYN·금칙어 BAN)는 표준단어 이름과 겹칠 수 없고 한 표준단어에만 둔다. 최종 보장은 DB 트리거, 변경은 감사 이력 기록
 import { NextResponse } from 'next/server'
 import { z } from 'zod'

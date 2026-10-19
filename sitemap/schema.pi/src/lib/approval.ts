@@ -156,7 +156,7 @@ export async function resubmitIns(tp: ApvTp, id: string, ver: number, row: Recor
   return { apv_req_id: data as string }
 }
 
-// 등록·수정 요청 본문 공통 칸 : 즉시 승인(DA만 유효)·신청사유
+// 등록·수정 요청 본문 공통 칸 : 즉시 승인(SELF_APPROVE = SYS·DA·요금제4 만 유효)·신청사유
 export const reqOptShape = { self_apv: z.boolean().optional(), req_rsn: z.string().trim().max(2000).optional() }
 export async function reqOpt(req: Request): Promise<{ self_apv?: boolean; req_rsn?: string }> {
   try {

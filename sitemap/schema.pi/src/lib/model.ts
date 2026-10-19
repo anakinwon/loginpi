@@ -45,7 +45,7 @@ export const prjCrud = simpleCrud({
   },
 })
 
-// 주제영역 CRUD — 등록·수정·삭제 = 신청 권한(DA·STD·MDL), 하위 주제영역·엔터티가 있으면 삭제 불가
+// 주제영역 CRUD — 등록·수정·삭제 = 신청 권한(신청 권한 — roles.ts 권한표), 하위 주제영역·엔터티가 있으면 삭제 불가
 export const subjCrud = simpleCrud({
   table: 'mdl_subj',
   pk: 'subj_id',

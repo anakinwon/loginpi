@@ -17,7 +17,7 @@ import { piFetch } from '@pi/auth/client'
 import Link from 'next/link'
 import { useParams, usePathname, useSearchParams } from 'next/navigation'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { BookA, BookOpenText, Database, Lightbulb, Settings, Shapes, SquareTerminal, Workflow, type LucideIcon } from 'lucide-react'
+import { BookA, BookOpenText, Database, Gem, Lightbulb, Settings, Shapes, SquareTerminal, Workflow, type LucideIcon } from 'lucide-react'
 import type { Perm } from '@/lib/roles'
 
 interface Item {
@@ -102,6 +102,7 @@ const REST: Item[] = [
     icon: Settings,
     tone: 'slate',
     subs: [
+      { seg: 'plan', nm: '요금제' },
       { seg: 'members', nm: '멤버' },
       { seg: 'settings', nm: '설정', perm: 'SETTINGS' },
       { seg: 'history', nm: '이력' },
@@ -113,6 +114,9 @@ const REST: Item[] = [
     ],
   },
 ]
+
+// 요금제 — 설정 메뉴가 안 보이는 경우(무료·만료·설정 메뉴 없는 역할)에도 항상 들어갈 수 있게 단독 타일
+const PLAN_ITEM: Item = { seg: 'plan', nm: '요금제', icon: Gem, tone: 'amber' }
 
 const group = 'flex shrink-0 gap-1 rounded-md border border-gray-300 bg-gray-50 p-0.5' // 메뉴 묶음 박스
 // ?tab= 이 없을 때 화면별 기본 탭
@@ -259,9 +263,13 @@ export default function AreaNav() {
               {visible(MODEL).map(item)}
             </ul>
           )}
-          {allowed('SET_VIEW') && (
+          {allowed('SET_VIEW') ? (
             <ul aria-label="설정" data-sub-align="right" className={group}>
               {visible(REST).map(item)}
+            </ul>
+          ) : (
+            <ul aria-label="요금제" className={group}>
+              {item(PLAN_ITEM)}
             </ul>
           )}
         </div>

@@ -1,4 +1,4 @@
-// 수정·삭제 라우트 공용 — PATCH { ver_no, self_apv?, req_rsn?, ...바꿀 항목 } / DELETE ?ver_no=&self_apv=1 : 신청 권한(DA·STD·MDL)
+// 수정·삭제 라우트 공용 — PATCH { ver_no, self_apv?, req_rsn?, ...바꿀 항목 } / DELETE ?ver_no=&self_apv=1 : 신청 권한(신청 권한 — roles.ts 권한표)
 // 상태별 처리(sql/012) : 승인완료 = 수정·삭제 신청(승인권자 자기 승인 시 즉시 반영) / 반려 = 수정은 재신청, 삭제는 즉시 논리 삭제 / 승인대기 = 변경 불가(취소 후 재등록)
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
