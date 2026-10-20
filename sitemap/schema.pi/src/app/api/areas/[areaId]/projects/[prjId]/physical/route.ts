@@ -3,11 +3,13 @@
 // PATCH : 칼럼 그리드 편집(테이블 1개, 순서·NULL·기본값 묶음, 칼럼별 ver_no 잠금, S2 P5)
 // GET ?mdl=&format=alter : 변경분 DDL(현재 논리와의 차이, S5) / POST ?sync=1 {phy_mdl_id, ver_no} : 논리 변경을 저장 모델에 동기화(사용자 편집 유지)
 // POST {dbms_cd, ent_ids} : 엔터티 선택 전환(마스터 지시 2026-10-17 — 작성완료 엔터티만, 범위 관문·이슈 0, 모델 없으면 생성·있으면 추가)
+//  관계 1개 이상 필수(마스터 지시 2026-10-20) — 관계 없는 엔터티는 전환 불가, DA·SYS 만 no_rel_exc 로 예외 적용(감사 이력에 남김)
 // GET ?dbms=&ent=a,b : 선택 엔터티 범위 미리보기(없으면 작성완료·미전환 엔터티 전체) / DELETE ?mdl=&ver_no= : 논리 삭제(재전환은 삭제 후 다시 전환)
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { apiError, audit, dbError, errMsg, parseBody, requireAreaRole } from '@/lib/api'
 import { db } from '@/lib/db'
+import { inChunks } from '@/lib/paging'
 import { kstDtm } from '@/lib/bulk'
 import { convertEntities, delPhy, listPhy, loadPhy, phyDdlInput, phyPlan, syncPhy, syncPlan } from '@/lib/model-phy'
 import { alterDdl } from '@/lib/modelpi/phy-sync'
@@ -23,7 +25,17 @@ const body = z.object({
   idntfr_ltr_cd: z.enum(['UPPER', 'LOWER']).optional(),
   phy_mdl_desc: z.string().max(2000).nullish(),
   ent_ids: z.array(uuid).min(1).max(500),
+  no_rel_exc: z.boolean().optional(), // 관계 없는 엔터티 예외 전환(DA 특권)
 })
+
+// 관계(부모·자식 어느 쪽이든)가 하나도 없는 엔터티 id
+async function noRelEnts(areaId: string, ids: string[]) {
+  const q = (col: 'prnt_ent_id' | 'chld_ent_id') => inChunks<{ prnt_ent_id: string; chld_ent_id: string }>(ids, (part) => db().from('mdl_rel').select('prnt_ent_id, chld_ent_id').eq('area_id', areaId).eq('del_yn', 'N').in(col, part))
+  const rs = await Promise.all([q('prnt_ent_id'), q('chld_ent_id')])
+  for (const r of rs) if (r.error) throw r.error
+  const has = new Set(rs.flatMap((r) => r.data ?? []).flatMap((r) => [r.prnt_ent_id, r.chld_ent_id]))
+  return ids.filter((id) => !has.has(id))
+}
 
 // 프로젝트 엔터티(논리 상태 포함)
 async function prjEnts(areaId: string, prjId: string) {
@@ -136,6 +148,12 @@ export async function POST(req: Request, { params }: Ctx) {
     if (b.ent_ids.some((id) => !ents.some((e) => e.ent_id === id))) return apiError('NOT_FOUND', 404)
     const notLgc = ents.filter((e) => b.ent_ids.includes(e.ent_id) && e.lgc_sts_cd !== 'CMPTN')
     if (notLgc.length) return NextResponse.json({ ok: false, code: 'SUBJ_NOT_LGC', message: errMsg('SUBJ_NOT_LGC'), why: notLgc.map((e) => `${e.ent_log_nm} : 작성중`) }, { status: 409 })
+    const noRel = await noRelEnts(areaId, b.ent_ids)
+    const relExc = noRel.length > 0 && !!b.no_rel_exc && (auth.role === 'DA' || auth.role === 'SYS')
+    if (noRel.length && !relExc) {
+      const nm = new Map(ents.map((e) => [e.ent_id, e.ent_log_nm]))
+      return NextResponse.json({ ok: false, code: 'PHY_NO_REL', message: errMsg('PHY_NO_REL'), why: noRel.map((id) => `${nm.get(id)} : 관계 없음`), exc: auth.role === 'DA' || auth.role === 'SYS' }, { status: 409 })
+    }
     const plan = await phyPlan(areaId, prjId, dbms, new Set(b.ent_ids))
     if (!plan) return apiError('NOT_FOUND', 404)
     if (plan.why.length) return NextResponse.json({ ok: false, code: 'PHY_GATE', message: errMsg('PHY_GATE'), why: plan.why }, { status: 409 })
@@ -145,7 +163,7 @@ export async function POST(req: Request, { params }: Ctx) {
     const r = await convertEntities(areaId, prjId, { dbms, ltr, desc: b.phy_mdl_desc ?? null }, b.ent_ids, auth.user.usr_id)
     if (!r) return apiError('NOT_FOUND', 404)
     if (!r.tbl) return apiError('NO_CHANGE', 400) // 선택 엔터티가 모두 이미 전환됨
-    await audit({ area_id: areaId, tgt_tp_cd: 'PHY', tgt_id: r.phy_mdl_id!, act_cd: r.created ? 'INS' : 'UPD', aftr_val: { prj_id: prjId, dbms_cd: dbms, ent_ids: b.ent_ids, tbl: r.tbl, fk: r.fk }, usr_id: auth.user.usr_id })
+    await audit({ area_id: areaId, tgt_tp_cd: 'PHY', tgt_id: r.phy_mdl_id!, act_cd: r.created ? 'INS' : 'UPD', aftr_val: { prj_id: prjId, dbms_cd: dbms, ent_ids: b.ent_ids, tbl: r.tbl, fk: r.fk, ...(relExc ? { no_rel_exc: noRel } : {}) }, usr_id: auth.user.usr_id })
     return NextResponse.json({ ok: true, item: { phy_mdl_id: r.phy_mdl_id }, created: r.created, tbl_cnt: r.tbl, fk_cnt: r.fk }, { status: 201 })
   } catch (e) {
     const x = e as { code?: string; message?: string }

@@ -4,7 +4,7 @@ import { piFetch } from '@pi/auth/client'
 // 등록 = 논리 엔터티(LGCL), 수정 = 이름(분해 후보 다시 선택)·유형·설명·주제영역(같은 프로젝트)·단계(논리 ↔ 핵심 승격). 이름은 서버가 표준단어로 다시 만든다(클라이언트 값 불신)
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
-import { ENT_TP } from '@/lib/model-name'
+import { ENT_TP, ENT_TP_DESC } from '@/lib/model-name'
 import { confirmSave } from '../words/word-board'
 
 export interface EntInit {
@@ -31,7 +31,6 @@ interface Cand {
 const RULE_MSG: Record<string, string> = {
   ENT_FORBIDDEN_WORD: '금칙어 포함',
   ENT_LAST_ATTR: '속성 분류어(도메인 단어)로 끝남 : 테이블명은 속성 불필요',
-  ENT_AGG_SUFFIX: "집계 엔터티는 '집계'로 끝나야 함",
 }
 interface Rec {
   nm: string
@@ -140,7 +139,7 @@ export default function EntForm({ api, areaId, subjs, init, onDone, onCancel }: 
         <input value={name} onChange={(e) => setName(e.target.value)} placeholder="엔터티명(예 : 주문배송이력)" maxLength={200} className="rounded border border-[#b8c6e0] bg-white px-2 py-1.5 md:col-span-2" aria-label="엔터티명" />
         <select value={tp} onChange={(e) => setTp(e.target.value)} className="rounded border border-[#b8c6e0] bg-white px-2 py-1.5" aria-label="엔터티 유형">
           {Object.entries(ENT_TP).map(([k, v]) => (
-            <option key={k} value={k}>
+            <option key={k} value={k} title={ENT_TP_DESC[k as keyof typeof ENT_TP]}>
               {v}
             </option>
           ))}

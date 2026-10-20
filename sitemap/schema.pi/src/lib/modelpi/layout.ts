@@ -68,6 +68,7 @@ function layoutOnce(nodes: LNode[], edges: LEdge[], opt: LOpt, grouped: boolean)
   const box = (n: LNode) => ({ ...pos[n.id], w: n.w, h: n.h })
   const placed = nodes.filter(keep)
   const free = nodes.filter((n) => !keep(n)).sort((a, b) => pos[a.id].y - pos[b.id].y || pos[a.id].x - pos[b.id].x)
+  if (opt.mode === 'new' && placed.length) return nearRelated(pos, placed, free, [...seen].map((k) => k.split('>') as [string, string]), gap)
   if (placed.length) {
     const done: LNode[] = [...placed]
     for (const n of free) {
@@ -78,6 +79,50 @@ function layoutOnce(nodes: LNode[], edges: LEdge[], opt: LOpt, grouped: boolean)
       }
       done.push(n)
     }
+  }
+  return pos
+}
+
+// 증분 배치(마스터 지시 2026-10-20) — dagre 전체 좌표는 사용자가 옮긴 기존 좌표와 무관해 새 엔터티가 멀리 생기던 문제
+//  이미 놓인 관계 상대 기준 : 자식이면 부모 바로 아래, 부모면 자식 바로 위(가운데 맞춤), 겹치면 같은 줄 가장 가까운 빈 자리
+//  새 엔터티끼리 이어진 관계는 먼저 놓인 쪽을 기준으로 차례로, 관계 상대가 없으면 놓인 영역 오른쪽 위
+function nearRelated(pos: Pos, placed: LNode[], free: LNode[], rels: [string, string][], gap: number): Pos {
+  const at = new Map(placed.map((n) => [n.id, n]))
+  // 겹치면 같은 줄에서 기준 자리와 가장 가까운 빈 x(좌우 번갈아 40px 단위) — 줄이 길게 막혀도 한쪽 끝까지 밀려나지 않게
+  // ponytail: 후보 × 노드 O(k·n) 탐색 — 엔터티 수천 개면 줄 단위 구간 색인으로
+  const clear = (n: LNode) => {
+    const { x: x0, y } = pos[n.id]
+    const free = (x: number) => ![...at.values()].some((m) => m.id !== n.id && hit({ x, y, w: n.w, h: n.h }, { ...pos[m.id], w: m.w, h: m.h }, gap / 2))
+    for (let k = 0; k <= 2000; k++) {
+      const x = x0 + (k % 2 ? 1 : -1) * Math.ceil(k / 2) * 40
+      if (free(x)) {
+        pos[n.id] = { x, y }
+        break
+      }
+    }
+    at.set(n.id, n)
+  }
+  let rest = free
+  while (rest.length) {
+    const left: LNode[] = []
+    for (const n of rest) {
+      const par = rels.find(([f, t]) => t === n.id && at.has(f))?.[0]
+      const a = at.get(par ?? rels.find(([f, t]) => f === n.id && at.has(t))?.[1] ?? '')
+      if (!a) {
+        left.push(n)
+        continue
+      }
+      pos[n.id] = { x: Math.round(pos[a.id].x + a.w / 2 - n.w / 2), y: par ? pos[a.id].y + a.h + gap * 1.5 : pos[a.id].y - n.h - gap * 1.5 }
+      clear(n)
+    }
+    if (left.length === rest.length) {
+      // 놓인 상대가 없는 묶음 — 첫 엔터티만 놓인 영역 오른쪽 위에 두고, 나머지는 다시 관계 기준으로
+      const n = left.shift()!
+      const ms = [...at.values()]
+      pos[n.id] = { x: Math.max(...ms.map((m) => pos[m.id].x + m.w)) + gap, y: Math.min(...ms.map((m) => pos[m.id].y)) }
+      clear(n)
+    }
+    rest = left
   }
   return pos
 }

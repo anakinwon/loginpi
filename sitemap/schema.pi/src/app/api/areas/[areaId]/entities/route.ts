@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { db } from '@/lib/db'
 import { apiError, audit, dbError, parseBody, requireAreaRole } from '@/lib/api'
-import { pageRows } from '@/lib/paging'
+import { inChunks, pageRows } from '@/lib/paging'
 import { withActors } from '@/lib/approval'
 import { entSchema, MDL_LVLS, prepareEnt, type MdlLvl } from '@/lib/model'
 import { entNames, type EntWord } from '@/lib/model-name'
@@ -44,7 +44,7 @@ export async function GET(req: Request, { params }: Ctx) {
     const rows = r.rows as unknown as { dic_ids: string[]; mdl_subj: { subj_abbr_nm: string }; mdl_prj: { tbl_pfx_txt: string; trgt_dbms_cd: string } | null }[]
     // 물리 테이블명 미리보기 — 현재 페이지 구성 단어를 한 번에 조회
     const ids = [...new Set(rows.flatMap((x) => x.dic_ids))]
-    const w = ids.length ? await db().from('std_dic').select('dic_id, dic_log_nm, dic_phy_nm, attr_clss_yn, ent_clss_yn, forbid_yn, tbl_sfx_txt, std_sts_cd, del_yn').in('dic_id', ids) : { data: [], error: null }
+    const w = await inChunks(ids, (p) => db().from('std_dic').select('dic_id, dic_log_nm, dic_phy_nm, attr_clss_yn, ent_clss_yn, forbid_yn, tbl_sfx_txt, std_sts_cd, del_yn').in('dic_id', p))
     if (w.error) throw w.error
     const by = new Map((w.data as (EntWord & { std_sts_cd: string; del_yn: string })[]).map((x) => [x.dic_id, x]))
     const named = rows.map((x) => {

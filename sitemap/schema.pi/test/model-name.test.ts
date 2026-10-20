@@ -1,7 +1,7 @@
 // 개념 모델 엔터티 이름 규칙 검사(PRD §2.5 MD1) — 실행 : pnpm test
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { entNameError, entNames, subjAbbrCands, type EntWord } from '../src/lib/model-name.ts'
+import { ENT_TP, entNameError, entNames, entTpColor, subjAbbrCands, type EntWord } from '../src/lib/model-name.ts'
 
 const W = (nm: string, phy: string, o: Partial<EntWord> = {}): EntWord => ({ dic_id: nm, dic_log_nm: nm, dic_phy_nm: phy, attr_clss_yn: 'N', ent_clss_yn: 'N', forbid_yn: 'N', tbl_sfx_txt: null, ...o })
 const 고객 = W('고객', 'CUST'), 등급 = W('등급', 'GRD'), 이력 = W('이력', 'HSTRY', { ent_clss_yn: 'Y', tbl_sfx_txt: '_H' })
@@ -20,8 +20,7 @@ test('이름 규칙 : 금칙어·속성 분류어 끝·집계', () => {
   assert.equal(entNameError([고객, 금지], 'BASE'), 'ENT_FORBIDDEN_WORD')
   assert.equal(entNameError([고객, 번호], 'BASE'), 'ENT_LAST_ATTR')
   assert.equal(entNameError([W('부서', 'DEPT'), 코드], 'BASE'), null, '속성·엔터티 겸용(코드) 허용')
-  assert.equal(entNameError([고객, 등급], 'AGG'), 'ENT_AGG_SUFFIX')
-  assert.equal(entNameError([고객, 집계], 'AGG'), null)
+  assert.equal(entNameError([고객, 등급], 'PROC'), null, '가공 = 집계 접미 강제 없음(4종 분류, 2026-10-20)')
   assert.equal(entNameError([], 'BASE'), 'INVALID_INPUT')
 })
 
@@ -42,4 +41,13 @@ test('대상 DBMS(sql/024) : 물리 모델링까지 DBMS 와 무관하게 대문
   assert.equal(entNames([고객, 등급, 이력], 'CCS', 'ECM', '0014').tbl_phy_nm, 'ECM_CCS_CUST_GRD_H')
   assert.equal(entNames([고객, 등급, 이력], 'CCS', 'ECM', '0001').tbl_phy_nm, 'ECM_CCS_CUST_GRD_H')
   assert.equal(entNames([고객], 'CCS', 'ECM').tbl_phy_nm, 'ECM_CCS_CUST')
+})
+
+test('엔터티 유형 4종·ERD 색(노트 1.2, 2026-10-20) — 기준 초록·실체 노랑·행위 파랑·가공 없음', () => {
+  assert.deepEqual(Object.values(ENT_TP), ['실체', '기준', '행위', '가공'])
+  assert.equal(entTpColor('REF').head, '#bbf7d0')
+  assert.equal(entTpColor('BASE').head, '#fef08a')
+  assert.equal(entTpColor('ACT').head, '#bfdbfe')
+  assert.equal(entTpColor('PROC').fill, '#ffffff')
+  assert.equal(entTpColor('AGG'), entTpColor('BASE'), '모르는 값 = 실체 색')
 })

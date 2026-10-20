@@ -16,7 +16,7 @@ import { piFetch } from '@pi/auth/client'
 //  개체명 보기옵션(마스터 지시 2026-10-18, DA# 홈 › 옵션 › 개체명 보기옵션) : 논리 = 엔터티명(보조명·동의어)·속성명(보조명·동의어·도메인),
 //   물리 = 테이블명(엔터티명·보조명·동의어)·컬럼명(속성명·보조명·동의어·도메인). 보조명 = sql/035, 동의어 = 용어 이음동의어·엔터티는 구성 단어 SYN. 이 브라우저에 기억
 import '@xyflow/react/dist/style.css'
-import { Background, BaseEdge, Controls, EdgeLabelRenderer, getSmoothStepPath, Handle, MiniMap, Position, ReactFlow, ReactFlowProvider, SelectionMode, useNodesState, useReactFlow, ViewportPortal, type Edge, type EdgeProps, type Node, type NodeProps } from '@xyflow/react'
+import { Background, BaseEdge, Controls, EdgeLabelRenderer, getSmoothStepPath, Handle, MiniMap, Position, ReactFlow, ReactFlowProvider, SelectionMode, useNodesState, useReactFlow, useStoreApi, ViewportPortal, type Edge, type EdgeProps, type Node, type NodeProps } from '@xyflow/react'
 import Link from 'next/link'
 import { use, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
@@ -28,6 +28,7 @@ import { type MbrRole, type Perm } from '@/lib/roles'
 import Attrs from '../model/attrs'
 import EntForm from '../model/ent-form'
 import Relations from '../model/relations'
+import { ENT_TP, entTpColor, type EntTp } from '@/lib/model-name'
 
 interface Attr {
   attr_id: string
@@ -84,11 +85,6 @@ const LEGEND: Record<Nt, string> = {
 type ENode = Node<EntData, 'ent'>
 
 // 엔터티 유형별 색(E5) — BASE 실체·기준 / ACT 행위 / AGG 집계
-const TP_COLOR: Record<string, { head: string; border: string; nm: string }> = {
-  BASE: { head: '#1f3a68', border: '#3b5f9e', nm: '실체·기준' },
-  ACT: { head: '#9a3412', border: '#ea580c', nm: '행위' },
-  AGG: { head: '#166534', border: '#16a34a', nm: '집계' },
-}
 const LVL_NM: Record<Lvl, string> = { CNCP: '개념(이름)', LGCL: '논리(속성·키)', PHY: '물리(칼럼·도메인)' }
 
 // 논리 데이터타입 이름(GET /api/types, 화면 진입 시 채움) — 데이터타입 보기 : NUMERIC(10,2)·VARCHAR(50)
@@ -144,20 +140,20 @@ const SIDES = [
 
 function EntNode({ data, selected }: NodeProps<ENode>) {
   const { ent: e, lvl, phy, fix, nt = 'IE', nmo = NMO_DEF } = data
-  const c = TP_COLOR[e.ent_tp_cd] ?? TP_COLOR.BASE
+  const c = entTpColor(e.ent_tp_cd) // 유형별 자동 색(실체 노랑·기준 초록·행위 파랑·가공 없음)
   const { w, h } = sizeOf(e, lvl, phy, nmo)
   return (
-    <div style={{ minWidth: w, width: 'max-content', minHeight: h, borderColor: c.border, borderStyle: e.ref ? 'dashed' : 'solid' }} className={`${nt === 'BK' ? 'overflow-hidden rounded-2xl' : 'rounded'} border-2 bg-white text-xs shadow-sm ${selected ? 'ring-2 ring-amber-400' : ''}`}>
+    <div style={{ minWidth: w, width: 'max-content', minHeight: h, borderColor: c.border, borderStyle: e.ref ? 'dashed' : 'solid', background: c.fill }} className={`${nt === 'BK' ? 'overflow-hidden rounded-2xl' : 'rounded'} border-2 text-xs shadow-sm ${selected ? 'ring-2 ring-amber-400' : ''}`}>
       {SIDES.map(([k, p]) => (
         <span key={k}>
           <Handle type="source" id={`s-${k}`} position={p} className="!h-1 !w-1 !border-0 !bg-transparent" />
           <Handle type="target" id={`t-${k}`} position={p} className="!h-1 !w-1 !border-0 !bg-transparent" />
         </span>
       ))}
-      <div style={{ background: c.head }} className="flex items-center gap-1 px-2 py-1 font-semibold text-white">
+      <div style={{ background: c.head, color: c.text, borderBottom: `1px solid ${c.border}` }} className="flex items-center gap-1 px-2 py-1 font-semibold">
         <span className="truncate" title={title(e, isPhy(lvl, phy), nmo)}>{title(e, isPhy(lvl, phy), nmo)}</span>
         {fix && <span title="고정(자동 배치가 옮기지 않음)">📌</span>}
-        {e.ref && <span className="ml-auto rounded bg-white/25 px-1 text-[10px]">참조 · {e.subj_nm}</span>}
+        {e.ref && <span className="ml-auto rounded bg-white/60 px-1 text-[10px]">참조 · {e.subj_nm}</span>}
       </div>
       {/* 박스 너비 = 내용(표) 맞춤, 추정 크기는 최소 너비 — 관계선은 실측 크기(measured)로 붙음 */}
       {lvl !== 'CNCP' && (
@@ -282,6 +278,7 @@ const FOOT_H = 16 // 인쇄 쪽 범례 줄
 function Erd({ areaId }: { areaId: string }) {
   const api = `/api/areas/${areaId}`
   const flow = useReactFlow()
+  const rf = useStoreApi()
   const [role, setRole] = useState<MbrRole | null>(null)
   const [perms, setPerms] = useState<Perm[]>([]) // 실제 권한 = 역할 ∩ 요금제(서버 계산)
   const [prjs, setPrjs] = useState<{ prj_id: string; prj_nm: string }[]>([])
@@ -301,6 +298,19 @@ function Erd({ areaId }: { areaId: string }) {
   const [nodes, setNodes, onNodesChange] = useNodesState<ENode>([])
   const [sel, setSel] = useState<string | null>(null)
   const [selRel, setSelRel] = useState<string | null>(null) // 선택된 관계선
+  // 미리보기(MiniMap) 보이기·숨기기(마스터 지시 2026-10-20) — 보는 사람 브라우저에 기억(저장 실패해도 동작)
+  const [mini, setMini] = useState(true)
+  useEffect(() => {
+    try {
+      setMini(localStorage.getItem('erd-minimap') !== '0')
+    } catch {}
+  }, [])
+  const toggleMini = (v: boolean) => {
+    setMini(v)
+    try {
+      localStorage.setItem('erd-minimap', v ? '1' : '0')
+    } catch {}
+  }
   const [pr, setPr] = useState({ paper: 'A3', orient: 'landscape' as Orient, margin: 10, title: true, guide: false, mode: 'fit' as 'fit' | 'pages' }) // 인쇄 설정
   // 마지막 설정·화면 위치 기억(마스터 지시 2026-10-18 "최종 설정 위치를 저장해서 다시 로딩 시 최종 설정과 위치로") — 이 브라우저, 분류체계별
   //  설정 = 주제영역·표시 수준·물리명·참조 표시·기준 물리 모델·인쇄(용지·방향·가이드·여백·제목·방식), 화면 위치 = 프로젝트|주제영역|표시 수준별 이동·확대
@@ -431,6 +441,7 @@ function Erd({ areaId }: { areaId: string }) {
   const loadSeq = useRef(0) // 늦게 도착한 응답이 최신 선택을 덮어쓰지 않도록
   const curRef = useRef<Map<string, { x: number; y: number }>>(new Map()) // 편집 뒤 재조회 시 저장 안 한 드래그 위치 유지
   const keepRef = useRef('') // 편집 뒤 재조회 대상 키(프로젝트|주제영역|단계) — 다른 대상 조회에는 적용 안 함
+  const autoRef = useRef<Set<string>>(new Set()) // 자동 배치 후 끌지도 저장하지도 않은 엔터티 — 재조회(관계 추가 등) 때 다시 관계 상대 옆으로 배치
   const [form, setForm] = useState<'new' | 'edit' | null>(null)
   const [chk, setChk] = useState<{ summary: { no_pk: number; fk_missing: number; issues: number; reviews: number }; issues: Issue[] } | null>(null)
 
@@ -470,7 +481,10 @@ function Erd({ areaId }: { areaId: string }) {
     const keep = keepRef.current === `${prjId}|${subj}|${lvl}`
     keepRef.current = ''
     if (!keep) setChk(null)
-    if (keep) for (const [id, c] of curRef.current) pos.set(id, { ent_id: id, ...c, fix: pos.get(id)?.fix ?? false })
+    const dbPos = pos.size > 0
+    const prevAuto = keep ? autoRef.current : new Set<string>()
+    if (keep) for (const [id, c] of curRef.current) if (!prevAuto.has(id)) pos.set(id, { ent_id: id, ...c, fix: pos.get(id)?.fix ?? false })
+    autoRef.current = new Set(es.filter((e) => !pos.has(e.ent_id) && (keep ? prevAuto.has(e.ent_id) || !curRef.current.has(e.ent_id) : dbPos)).map((e) => e.ent_id))
     // 좌표 없는 엔터티만 자동 배치(좌표가 하나도 없으면 전체 배치)
     const laid = autoLayout(
       es.map((e) => ({ id: e.ent_id, ...sizeOf(e, lvl, phy, nmo), group: e.subj_id, x: pos.get(e.ent_id)?.x, y: pos.get(e.ent_id)?.y, fixed: pos.get(e.ent_id)?.fix })),
@@ -663,6 +677,7 @@ function Erd({ areaId }: { areaId: string }) {
     if (!j.ok) return setMsg(j.message)
     setDirty(false)
     setUndo(null)
+    autoRef.current.clear()
     setMsg(`배치를 저장했습니다(${LVL_NM[lvl]} 다이어그램)`)
   }
   // ERD 작성완료·완료 취소(보고 있는 주제영역 다이어그램) — 완료 = 배치·관계선 잠금, DDL 생성 대상
@@ -679,6 +694,7 @@ function Erd({ areaId }: { areaId: string }) {
     } else setMsg(j.fail?.[0]?.why?.join(' · ') ?? j.message ?? '')
   }
   const toggleFix = (id: string) => {
+    autoRef.current.delete(id)
     setNodes((ns) => ns.map((n) => (n.id === id ? { ...n, data: { ...n.data, fix: !n.data.fix } } : n)))
     setDirty(true)
   }
@@ -821,6 +837,9 @@ function Erd({ areaId }: { areaId: string }) {
           <label className="flex items-center gap-1" title="100% 크기 인쇄 쪽 경계를 점선으로 표시">
             <input type="checkbox" checked={pr.guide} onChange={(e) => setPr({ ...pr, guide: e.target.checked })} /> 페이지 가이드
           </label>
+          <label className="flex items-center gap-1" title="오른쪽 아래 전체 미리보기(작은 지도) 보이기·숨기기">
+            <input type="checkbox" checked={mini} onChange={(e) => toggleMini(e.target.checked)} /> 미리보기
+          </label>
           <button type="button" className={btn} disabled={!nodes.length} onClick={openPrint} title="인쇄 미리보기 — 한 장에 맞춤 또는 가이드대로 나눠 인쇄(PDF 저장은 인쇄 창의 'PDF로 저장')">
             🖨 인쇄
           </button>
@@ -887,7 +906,7 @@ function Erd({ areaId }: { areaId: string }) {
                 {es.map((e) => (
                   <li key={e.ent_id}>
                     <button type="button" onClick={() => focus(e.ent_id)} aria-current={sel === e.ent_id} className={`w-full truncate px-3 py-1 text-left ${sel === e.ent_id ? 'bg-amber-100' : 'hover:bg-gray-50'}`}>
-                      <span style={{ color: (TP_COLOR[e.ent_tp_cd] ?? TP_COLOR.BASE).border }}>■</span> {isPhy(lvl, phy) ? `${e.tbl_phy_nm} (${e.ent_log_nm})` : e.ent_log_nm}
+                      <span style={{ color: entTpColor(e.ent_tp_cd).border }}>■</span> {isPhy(lvl, phy) ? `${e.tbl_phy_nm} (${e.ent_log_nm})` : e.ent_log_nm}
                       {e.ref && <span className="ml-1 text-xs text-gray-500">참조</span>}
                     </button>
                   </li>
@@ -899,28 +918,45 @@ function Erd({ areaId }: { areaId: string }) {
         </nav>
         {splitter('l')}
 
-        <div ref={canvasRef} className="rounded border" aria-label="ERD 캔버스">
+        {/* 오른쪽 끌기로 화면 이동할 때 브라우저 메뉴 막음 — 빈 곳뿐 아니라 엔터티·관계선·선택 상자 위에서 떼도(onPaneContextMenu 는 빈 곳만, 2026-10-20 검증 지적) */}
+        <div
+          ref={canvasRef}
+          className="rounded border"
+          aria-label="ERD 캔버스"
+          onContextMenu={(e) => e.preventDefault()}
+        >
           <ReactFlow
             nodes={nodes}
             edges={edges}
             nodeTypes={nodeTypes}
             edgeTypes={edgeTypes}
-            onNodesChange={onNodesChange}
+            onNodesChange={(cs) => (cs.forEach((c) => c.type === 'position' && !c.dragging && autoRef.current.delete(c.id)), onNodesChange(cs))} // 화살표 키 이동도 사용자가 옮긴 것
             onNodeDrag={(_, __, ns) => midToCenter(new Set(ns.map((x) => x.id)))}
-            onNodeDragStop={() => setDirty(true)}
-            onNodeClick={(_, n) => (setSel(n.id), setSelRel(null))}
+            onNodeDragStop={(_, __, ns) => (setDirty(true), ns.forEach((x) => autoRef.current.delete(x.id)))}
+            // 엔터티 클릭(끌기 없음) = 그것만 선택(Ctrl·⌘ = 추가·빼기는 React Flow 기본) — 기본 동작은 이미 선택된 엔터티를 눌러도 여러 개 선택이 유지돼 하나만 옮길 수 없음
+            onNodeClick={(ev, n) => {
+              if (!ev.ctrlKey && !ev.metaKey) setNodes((ns) => ns.map((x) => (x.selected === (x.id === n.id) ? x : { ...x, selected: x.id === n.id })))
+              setSel(n.id)
+              setSelRel(null)
+            }}
             onEdgeClick={(_, e) => (setSelRel(e.id), setSel(null), setForm(null))}
-            onPaneClick={() => (setSel(null), setSelRel(null))}
+            // 빈 곳 클릭 = 선택 해제(selectionOnDrag 에서는 클릭이 크기 0 선택 상자로 처리돼 기본 해제가 안 됨)
+            onPaneClick={() => (setNodes((ns) => (ns.some((x) => x.selected) ? ns.map((x) => (x.selected ? { ...x, selected: false } : x)) : ns)), setSel(null), setSelRel(null))}
             nodesDraggable={lay}
             nodesConnectable={false}
             // 여러 엔터티 선택·함께 이동(마스터 지시 2026-10-18) : 빈 곳 왼쪽 끌기 = 선택 상자(걸친 엔터티), Ctrl+클릭 = 추가·빼기,
-            //  선택한 엔터티 하나를 끌면 함께 이동. 화면 이동 = 가운데·오른쪽 버튼 끌기·휠. 조회 권한은 왼쪽 끌기 = 화면 이동(기존)
+            //  선택한 엔터티 하나를 끌면 함께 이동. 화면 이동 = 가운데·오른쪽 버튼 끌기(휠 = 확대·축소, 터치 한 손가락 = 화면 이동).
+            //  잠금(작성완료·조회 권한) = 엔터티를 옮길 수 없으므로 왼쪽 끌기도 화면 이동(2026-10-20 마스터 확인)
             selectionOnDrag={lay}
             panOnDrag={lay ? [1, 2] : true}
+            // 선택 상자가 끝나면 묶음 사각형(NodesSelection)을 없애고 엔터티별 선택만 남김(2026-10-20 마스터 지시) — 사각형이 클릭을 가로채
+            //  하나만 다시 고를 수 없던 문제. 이제 엔터티 클릭 = 그것만 선택·그것만 이동, 선택된 여러 개 중 하나를 끌기 = 함께 이동, 빈 곳 클릭 = 해제
+            //  React Flow 가 onSelectionEnd 를 부른 '다음'에 nodesSelectionActive 를 켜므로 한 틱 뒤에 끔(@xyflow/react 12.12 Pane pointerup 순서)
+            onSelectionEnd={() => window.setTimeout(() => rf.setState({ nodesSelectionActive: false }))}
+            autoPanOnSelection={false} // 캔버스 가장자리에서 선택 상자를 끌면 화면이 계속 밀려 나가던 문제(검증 실측 — 화면 위치 기억까지 틀어짐)
             selectionMode={SelectionMode.Partial}
             multiSelectionKeyCode="Control"
             deleteKeyCode={null} // Delete·Backspace 로 화면에서 엔터티가 빠지지 않게(삭제는 엔터티 수정 화면에서)
-            onPaneContextMenu={(e) => e.preventDefault()} // 오른쪽 끌기로 화면 이동할 때 브라우저 메뉴 막음
             onMoveEnd={(_, vp) => prjId && subj && shot === null && saveVp(`${prjId}|${subj}|${lvl}`, vp)} // 이동·확대가 끝나면 위치 기억
             onSelectionDrag={(_, ns) => midToCenter(new Set(ns.map((x) => x.id)))}
             onSelectionDragStop={() => setDirty(true)}
@@ -943,7 +979,7 @@ function Erd({ areaId }: { areaId: string }) {
               </ViewportPortal>
             )}
             <Controls showInteractive={false} />
-            <MiniMap pannable zoomable nodeColor={(n) => (TP_COLOR[(n.data as EntData).ent.ent_tp_cd] ?? TP_COLOR.BASE).border} />
+            {mini && <MiniMap pannable zoomable nodeColor={(n) => entTpColor((n.data as EntData).ent.ent_tp_cd).border} />}
           </ReactFlow>
         </div>
         {splitter('r')}
@@ -961,7 +997,7 @@ function Erd({ areaId }: { areaId: string }) {
               <h2 className="font-semibold text-[#1f3a68]">{selEnt.ent_log_nm}</h2>
               <p className="font-mono text-xs text-gray-600">{selEnt.tbl_phy_nm}</p>
               <p className="mt-1 text-xs">
-                {selEnt.subj_nm} · {(TP_COLOR[selEnt.ent_tp_cd] ?? TP_COLOR.BASE).nm}
+                {selEnt.subj_nm} · {ENT_TP[selEnt.ent_tp_cd as EntTp] ?? selEnt.ent_tp_cd}
                 {selEnt.ref && ' · 다른 주제영역(참조)'}
               </p>
               {selEnt.ent_desc && <p className="mt-1 text-xs text-gray-700">{selEnt.ent_desc}</p>}
@@ -1011,7 +1047,7 @@ function Erd({ areaId }: { areaId: string }) {
               )}
             </>
           ) : (
-            <p className="text-gray-500">엔터티를 누르면 정보·속성 편집, 관계선을 누르면 선 위치 조정이 보입니다. 빈 곳을 끌면 여러 엔터티 선택(Ctrl+클릭 추가) → 하나를 끌면 함께 이동, 화면 이동은 가운데·오른쪽 버튼 끌기. {LEGEND[nt]}</p>
+            <p className="text-gray-500">엔터티를 누르면 정보·속성 편집, 관계선을 누르면 선 위치 조정이 보입니다. {lay ? '빈 곳을 왼쪽 버튼으로 끌면 여러 엔터티 선택(Ctrl+클릭 추가) → 하나를 끌면 함께 이동, 화면 이동은 오른쪽·가운데 버튼 끌기' : '작성완료·조회 권한은 엔터티 이동 불가 — 끌기 = 화면 이동(옮기려면 완료 취소)'}. {LEGEND[nt]}</p>
           )}
         </aside>
       </div>

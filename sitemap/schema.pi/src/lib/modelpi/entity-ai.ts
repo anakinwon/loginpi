@@ -15,7 +15,7 @@ const SCHEMA = {
         type: 'object',
         properties: {
           nm: { type: 'string', description: '엔터티명 한국어, 띄어쓰기 없이 표준단어 결합 + 엔터티 분류어로 끝남(예 : 주문배송이력), 12자 이내' },
-          tp: { type: 'string', enum: ['BASE', 'ACT', 'AGG'], description: 'BASE 실체·기준 / ACT 행위 / AGG 집계(이름이 집계로 끝남)' },
+          tp: { type: 'string', enum: ['BASE', 'REF', 'ACT', 'PROC'], description: 'BASE 실체(본질 데이터, 예 고객·상품) / REF 기준(코드·기본 기준 정보) / ACT 행위(활동으로 발생한 원천 데이터) / PROC 가공(추출·집계)' },
           desc: { type: 'string', description: '관리하는 데이터 한 문장, 60자 이내' },
         },
         required: ['nm', 'tp', 'desc'],
@@ -57,7 +57,7 @@ export async function suggestLogicalAi(t: IndstryTmpl | null, subj: { nm: string
     const j = JSON.parse(text) as { ents?: unknown }
     if (!Array.isArray(j.ents)) return []
     return j.ents
-      .filter((x): x is LgCand => !!x && typeof x.nm === 'string' && typeof x.desc === 'string' && ['BASE', 'ACT', 'AGG'].includes(x.tp))
+      .filter((x): x is LgCand => !!x && typeof x.nm === 'string' && typeof x.desc === 'string' && ['BASE', 'REF', 'ACT', 'PROC'].includes(x.tp))
       .map((x) => ({ nm: x.nm.trim().slice(0, 40), tp: x.tp, desc: x.desc.trim() }))
   } catch (e) {
     console.error('[entity-ai]', e instanceof Anthropic.APIError ? `${e.status} ${e.message}` : e)

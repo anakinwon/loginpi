@@ -40,9 +40,9 @@ interface Cand {
   fk_rel_id?: string
   must?: 'name' | 'dt' | 'st'
 }
-// 필수 4종(마스터 지시 2026-10-17) : 주식별자·주식별자 명칭·행위 일시·행위 상태코드
+// 필수 4종(마스터 지시 2026-10-17) : 주식별자·주식별자 명칭·행위 일시·행위 상태유형코드
 type Must = { pk: boolean; name: boolean; dt: boolean; st: boolean }
-const MUST_NM: Record<keyof Must, string> = { pk: '주식별자', name: '주식별자 명칭', dt: '행위 일시', st: '행위 상태코드' }
+const MUST_NM: Record<keyof Must, string> = { pk: '주식별자', name: '주식별자 명칭', dt: '행위 일시', st: '행위 상태유형코드' }
 const ROLE_NM = { PK: '주식별자', FK: '참조(FK)', REQ: '필수' } as const
 const SRC_NM = { industry: '업종', rule: '규칙', inherit: '상속' } as const
 const SEARCH = { min: 2, delay: 300, size: 20 }

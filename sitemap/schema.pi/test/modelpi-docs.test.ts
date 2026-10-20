@@ -11,7 +11,7 @@ const rels: (LRel & { rel_desc?: string })[] = [{ rel_id: 'r1', prnt_ent_id: 'c'
 
 test('정의서 3종 : 엔터티(PK·속성 수·관계 수·단계)·속성(FK 부모)·관계', () => {
   const t = docTables([cust, ord], rels)
-  assert.deepEqual(t.ent.rows[0], ['고객', '고객기본', 'ECM_CST_CUST_M', '실체·기준', '핵심', '고객번호', 2, 1, '회원 <기본>'])
+  assert.deepEqual(t.ent.rows[0], ['고객', '고객기본', 'ECM_CST_CUST_M', '실체', '핵심', '고객번호', 2, 1, '회원 <기본>'])
   assert.equal(t.ent.rows[1][4], '논리')
   const fk = t.attr.rows.find((r) => r[0] === '주문기본' && r[3] === '고객번호')!
   assert.equal(fk[9], '고객기본')

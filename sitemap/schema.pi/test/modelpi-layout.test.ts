@@ -33,6 +33,41 @@ test('증분(new) : 좌표 있는 엔터티는 그대로, 새 엔터티만 배�
   assert.ok(all.a.x !== 0 || all.a.y !== 0 || all.b.x !== 400)
 })
 
+test('증분(new) : 새 자식 = 부모 바로 아래, 새 부모 = 자식 바로 위(가운데 맞춤), 멀리 떨어진 기존 좌표 기준', () => {
+  const ns = [N('p', { x: 5000, y: 3000 }), N('k', { x: 9000, y: 100 }), N('c'), N('q'), N('cc')]
+  const p = autoLayout(ns, [{ from: 'p', to: 'c' }, { from: 'q', to: 'k' }, { from: 'c', to: 'cc' }], { mode: 'new' })
+  assert.equal(p.c.x, 5000) // 부모 가운데 맞춤(같은 폭)
+  assert.ok(p.c.y > 3000 + 80 && p.c.y < 3000 + 80 + 200, `c.y ${p.c.y}`) // 부모 바로 아래
+  assert.equal(p.q.x, 9000)
+  assert.ok(p.q.y < 100 - 80 && p.q.y > 100 - 80 - 200, `q.y ${p.q.y}`) // 자식 바로 위
+  assert.ok(p.cc.y > p.c.y && Math.abs(p.cc.x - p.c.x) < 1) // 새 엔터티끼리 사슬 : 먼저 놓인 새 부모 아래
+  assert.equal(overlap(p, ns), null)
+})
+
+test('증분(new) : 같은 부모의 새 자식 둘은 겹치지 않게 옆으로, 관계 없는 새 엔터티는 놓인 영역 오른쪽 위', () => {
+  const ns = [N('p', { x: 0, y: 0 }), N('a'), N('b'), N('z')]
+  const p = autoLayout(ns, [{ from: 'p', to: 'a' }, { from: 'p', to: 'b' }], { mode: 'new' })
+  assert.equal(p.a.y, p.b.y)
+  assert.equal(overlap(p, ns), null)
+  assert.ok(p.z.x >= Math.max(p.a.x, p.b.x) + 160 && p.z.y === 0, JSON.stringify(p.z))
+})
+
+test('증분(new) 검증 회귀 : 부모 아래 줄이 오른쪽으로 길게 막혀도 새 자식은 가까운 왼쪽 빈자리', () => {
+  const row = Array.from({ length: 10 }, (_, i) => N(`r${i}`, { x: i * 220, y: 200 }))
+  const ns = [N('p', { x: 0, y: 0 }), ...row, N('c')]
+  const p = autoLayout(ns, [{ from: 'p', to: 'c' }], { mode: 'new' })
+  assert.ok(Math.abs(p.c.x) < 400, `c.x ${p.c.x}`) // 이전 = 2200(줄 끝)
+  assert.equal(overlap(p, ns), null)
+})
+
+test('증분(new) 검증 회귀 : 놓인 엔터티와 관계없는 새 엔터티끼리 묶음 = 첫 엔터티 오른쪽 위, 자식은 그 아래', () => {
+  const ns = [N('a', { x: 0, y: 0 }), N('e'), N('f')]
+  const p = autoLayout(ns, [{ from: 'e', to: 'f' }], { mode: 'new' })
+  assert.ok(p.e.x >= 160 && p.e.y === 0, JSON.stringify(p.e))
+  assert.ok(p.f.y > p.e.y + 80 && Math.abs(p.f.x - p.e.x) < 1, JSON.stringify(p.f))
+  assert.equal(overlap(p, ns), null)
+})
+
 test('주제영역 묶음·자기참조·없는 노드 관계 무시, 박스 크기 = 내용 맞춤', () => {
   const ns = [N('a', { group: 'G1' }), N('b', { group: 'G1' }), N('c', { group: 'G2' })]
   const p = autoLayout(ns, [{ from: 'a', to: 'a' }, { from: 'a', to: 'zz' }, { from: 'a', to: 'b' }])

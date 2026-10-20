@@ -1,6 +1,7 @@
 // 논리 모델 로더(서버) — 프로젝트의 엔터티(핵심·논리 단계 전체, 구성 단어·물리명 대문자)·속성(용어·도메인·승인 여부)·관계를 한 번에 읽어 점검 엔진(normalize.ts) 입력으로
 // ponytail: 프로젝트 엔터티 상한 500·속성 5,000 — 논리 모델 작업 단위가 이를 넘으면 주제영역 단위 분할 조회로
 import { db } from './db'
+import { inChunks } from './paging'
 import { entNames, type EntWord } from './model-name'
 import type { LAttr, LEnt, LRel } from './modelpi/normalize'
 
@@ -29,10 +30,10 @@ export async function loadLogical(areaId: string, prjId: string) {
   const er = e.data as unknown as ERow[]
   const ar = a.data as unknown as ARow[]
   const ids = [...new Set(er.flatMap((x) => x.dic_ids))]
-  const w = ids.length ? await db().from('std_dic').select('dic_id, dic_log_nm, dic_phy_nm, attr_clss_yn, ent_clss_yn, forbid_yn, tbl_sfx_txt, std_sts_cd, del_yn').in('dic_id', ids) : { data: [], error: null }
+  const w = await inChunks(ids, (p) => db().from('std_dic').select('dic_id, dic_log_nm, dic_phy_nm, attr_clss_yn, ent_clss_yn, forbid_yn, tbl_sfx_txt, std_sts_cd, del_yn').in('dic_id', p))
   if (w.error) throw w.error
   // 엔터티 동의어(ERD 개체명 보기옵션, 2026-10-18) = 구성 단어의 이음동의어(SYN)
-  const sy = ids.length ? await db().from('std_dic_rel').select('dic_id, rel_txt').in('dic_id', ids).eq('rel_tp_cd', 'SYN').eq('del_yn', 'N') : { data: [], error: null }
+  const sy = await inChunks(ids, (p) => db().from('std_dic_rel').select('dic_id, rel_txt').in('dic_id', p).eq('rel_tp_cd', 'SYN').eq('del_yn', 'N'))
   if (sy.error) throw sy.error
   const synOf = new Map<string, string[]>()
   for (const x of sy.data as { dic_id: string; rel_txt: string }[]) synOf.set(x.dic_id, [...(synOf.get(x.dic_id) ?? []), x.rel_txt])

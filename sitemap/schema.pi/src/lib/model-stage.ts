@@ -1,6 +1,7 @@
 // 모델 단계 상태(서버, 마스터 지시 2026-10-17) — 엔터티별 논리 작성중/작성완료, 물리 테이블별 작성중/작성완료
 // 순서 : 엔터티 작성완료(관문 통과) → 엔터티 선택 물리 전환 → 테이블 작성완료(남은 동기화 0) → ERD 작성완료(sql/037) → DDL. 완료 = DB 트리거 편집 잠금(sql/032·037), 수정은 완료 취소 후
 import { db } from './db'
+import { inChunks } from './paging'
 import { findDgm, loadDgm, type DgmLvl } from './model-dgm'
 import { loadLogical } from './model-logical'
 import { loadPhy, syncPlan } from './model-phy'
@@ -28,7 +29,7 @@ export async function stageInfo(areaId: string, prjId: string) {
   const pm = await db().from('mdl_phy_mdl').select('phy_mdl_id, dbms_cd, ver_no').eq('area_id', areaId).eq('prj_id', prjId).eq('del_yn', 'N').order('reg_dtm')
   if (pm.error) throw pm.error
   const ids = (pm.data as { phy_mdl_id: string }[]).map((x) => x.phy_mdl_id)
-  const tb = ids.length ? await db().from('mdl_phy_tbl').select('phy_tbl_id, phy_mdl_id, ent_id, tbl_nm, phy_sts_cd').in('phy_mdl_id', ids).eq('del_yn', 'N').limit(5000) : { data: [], error: null }
+  const tb = await inChunks(ids, (p) => db().from('mdl_phy_tbl').select('phy_tbl_id, phy_mdl_id, ent_id, tbl_nm, phy_sts_cd').in('phy_mdl_id', p).eq('del_yn', 'N').limit(5000))
   if (tb.error) throw tb.error
   const rows = tb.data as { phy_tbl_id: string; phy_mdl_id: string; ent_id: string; tbl_nm: string; phy_sts_cd: Sts }[]
   const phy = (pm.data as { phy_mdl_id: string; dbms_cd: string; ver_no: number }[]).map((x) => ({ ...x, tables: rows.filter((r) => r.phy_mdl_id === x.phy_mdl_id) }))
@@ -76,7 +77,7 @@ export async function setLgc(areaId: string, prjId: string, entIds: string[], st
 export async function setPhy(areaId: string, prjId: string, mdlId: string, tblIds: string[], sts: Sts, uid: string): Promise<StageRes | null> {
   const p = await loadPhy(areaId, mdlId)
   if (!p || p.mdl.prj_id !== prjId) return null
-  const lg = await db().from('mdl_ent').select('ent_id, lgc_sts_cd').in('ent_id', p.tables.filter((t) => tblIds.includes(t.phy_tbl_id)).map((t) => t.ent_id).slice(0, 1000))
+  const lg = await inChunks(p.tables.filter((t) => tblIds.includes(t.phy_tbl_id)).map((t) => t.ent_id), (q) => db().from('mdl_ent').select('ent_id, lgc_sts_cd').in('ent_id', q))
   if (lg.error) throw lg.error
   const lgc = new Map((lg.data as { ent_id: string; lgc_sts_cd: string }[]).map((x) => [x.ent_id, x.lgc_sts_cd]))
   const lock = await dgmLock(areaId, prjId)
@@ -122,14 +123,14 @@ export async function dgmLock(areaId: string, prjId: string) {
   const d = await db().from('mdl_dgm').select('dgm_id, subj_id').eq('area_id', areaId).eq('prj_id', prjId).eq('dgm_sts_cd', 'CMPTN').eq('del_yn', 'N').not('subj_id', 'is', null)
   if (d.error) throw d.error
   const rows = d.data as { dgm_id: string; subj_id: string }[]
-  const e = rows.length ? await db().from('mdl_dgm_ent').select('ent_id').in('dgm_id', rows.map((x) => x.dgm_id)).eq('del_yn', 'N').limit(10000) : { data: [], error: null }
+  const e = await inChunks(rows.map((x) => x.dgm_id), (p) => db().from('mdl_dgm_ent').select('ent_id').in('dgm_id', p).eq('del_yn', 'N').limit(10000))
   if (e.error) throw e.error
   return { subjs: new Set(rows.map((x) => x.subj_id)), ents: new Set((e.data as { ent_id: string }[]).map((x) => x.ent_id)) }
 }
 
 async function entSubj(entIds: string[]) {
   if (!entIds.length) return new Map<string, string>()
-  const r = await db().from('mdl_ent').select('ent_id, subj_id').in('ent_id', entIds.slice(0, 1000))
+  const r = await inChunks(entIds, (p) => db().from('mdl_ent').select('ent_id, subj_id').in('ent_id', p))
   if (r.error) throw r.error
   return new Map((r.data as { ent_id: string; subj_id: string }[]).map((x) => [x.ent_id, x.subj_id]))
 }

@@ -19,7 +19,7 @@ test('템플릿 8종 : 코드 = sql/022 CHECK 목록, 참조 정합(관계·속�
     for (const r of t.rels) assert.ok(!(r.idnt === 'Y' && (r.crdn === 'NM' || r.prnt === r.chld)), `${cd} 식별 제약 ${r.prnt}→${r.chld}`)
     for (const a of t.attrs) assert.ok(keys.has(a.ent) && a.pk.every((p) => a.terms.includes(p)), `${cd} 속성 ${a.ent}`)
     for (const p of t.physical) assert.ok(keys.has(p.ent), `${cd} 물리 ${p.ent}`)
-    for (const e of t.entities) if (e.tp === 'AGG') assert.equal(e.clss, '집계', `${cd} 집계 엔터티는 '집계'로 끝남`)
+    for (const e of t.entities) if (e.clss === '코드') assert.equal(e.tp, 'REF', `${cd} 코드 엔터티 = 기준(${e.words.join('')})`)
   }
 })
 

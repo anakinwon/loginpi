@@ -130,12 +130,12 @@ export function checkLogical(ents: LEnt[], rels: LRel[], opt: { dbms?: string } 
 
     const parents = rels.filter((r) => r.chld_ent_id === e.ent_id && r.prnt_ent_id !== e.ent_id).map((r) => ({ r, p: byId.get(r.prnt_ent_id) })).filter((x): x is { r: LRel; p: LEnt } => !!x.p)
     const pkN = pkOf(e).length
-    // ③ 2NF 부분 종속 — 복합 PK 이고 식별 부모가 있을 때 : 부모에 같은 용어가 있거나 부모 수준 속성(부모 핵심어 + 명·일시·등록일시·상태코드)이면 부모로
+    // ③ 2NF 부분 종속 — 복합 PK 이고 식별 부모가 있을 때 : 부모에 같은 용어가 있거나 부모 수준 속성(부모 핵심어 + 명·일시·등록일시·상태유형코드)이면 부모로
     for (const { r, p } of parents.filter((x) => x.r.idnt_yn === 'Y')) {
       if (pkN < 2) continue
       const pcore = entCore(p.words).core
       const pTerms = new Set(p.attrs.map((a) => a.term_id))
-      const pLevel = new Set([`${pcore}명`, `${pcore}일시`, `${pcore}등록일시`, `${pcore}상태코드`])
+      const pLevel = new Set([`${pcore}명`, `${pcore}일시`, `${pcore}등록일시`, `${pcore}상태유형코드`])
       for (const a of nonKey)
         if (pTerms.has(a.term_id)) issues.push({ kind: '2NF', ent_id: e.ent_id, attr_ids: [a.attr_id], msg: `부분 종속 의심 : ${a.term_log_nm} 는 부모 ${p.ent_log_nm} 에도 있음(식별자 일부에만 종속) → 이 엔터티에서 제거`, action: 'remove', target_ent_id: p.ent_id })
         else if (pLevel.has(a.term_log_nm)) issues.push({ kind: '2NF', ent_id: e.ent_id, attr_ids: [a.attr_id], msg: `부분 종속 의심 : ${a.term_log_nm} 는 ${p.ent_log_nm}(식별자 일부) 수준 속성 → 부모로 이동`, action: 'move', target_ent_id: p.ent_id })

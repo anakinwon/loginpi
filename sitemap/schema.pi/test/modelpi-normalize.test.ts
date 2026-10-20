@@ -11,8 +11,8 @@ const A = (term: string, o: Partial<LAttr> = {}): LAttr => ({ attr_id: `a${++n}`
 const E = (id: string, words: EntWord[], attrs: LAttr[]): LEnt => ({ ent_id: id, ent_log_nm: words.map((w) => w.dic_log_nm).join(''), tbl_phy_nm: `ECM_${id.toUpperCase()}`, ent_tp_cd: 'BASE', subj_nm: 's', words, attrs })
 const R = (id: string, p: string, c: string, o: Partial<LRel> = {}): LRel => ({ rel_id: id, prnt_ent_id: p, chld_ent_id: c, rel_nm: id, crdn_cd: '1N', idnt_yn: 'N', prnt_opt_yn: 'N', chld_opt_yn: 'Y', ...o })
 
-const cust = E('cust', [W('고객'), W('기본', true)], [A('고객번호', { pk_yn: 'Y', pk_seq: 1 }), A('고객명'), A('고객등록일시'), A('고객상태코드')])
-const ord = E('ord', [W('주문'), W('기본', true)], [A('주문번호', { pk_yn: 'Y', pk_seq: 1 }), A('주문명'), A('주문일시'), A('주문상태코드'), A('고객명'), A('전화번호1'), A('전화번호2')])
+const cust = E('cust', [W('고객'), W('기본', true)], [A('고객번호', { pk_yn: 'Y', pk_seq: 1 }), A('고객명'), A('고객등록일시'), A('고객상태유형코드')])
+const ord = E('ord', [W('주문'), W('기본', true)], [A('주문번호', { pk_yn: 'Y', pk_seq: 1 }), A('주문명'), A('주문일시'), A('주문상태유형코드'), A('고객명'), A('전화번호1'), A('전화번호2')])
 const dtl = E('dtl', [W('주문'), W('상세', true)], [A('주문번호', { pk_yn: 'Y', pk_seq: 1, fk_rel_id: 'r2' }), A('주문일련번호', { pk_yn: 'Y', pk_seq: 2 }), A('주문일시'), A('상품수량')])
 const lone = E('lone', [W('기타')], [])
 const rels = [R('r1', 'cust', 'ord'), R('r2', 'ord', 'dtl', { idnt_yn: 'Y', chld_opt_yn: 'N' })]

@@ -1,6 +1,7 @@
 // 엔터티 속성(MD3, sql/025 mdl_attr) 서버 공용 — 목록 조회, 추천 입력 수집(엔터티 단어·업종 템플릿·식별/비식별 부모 PK·후보 용어), 순서 계산
 // 추천 규칙은 순수 모듈 src/lib/modelpi/logical.ts, 이 파일은 DB 조회만
 import { db } from './db'
+import { inChunks } from './paging'
 import type { EntTp, EntWord } from './model-name'
 import { TEMPLATES, entKey, isIndstry } from './modelpi/template'
 import { GENERIC_TERMS, entCore, type ParentKey, type TermRow } from './modelpi/logical'
@@ -27,7 +28,7 @@ export async function getEnt(areaId: string, entId: string) {
 // 추천 입력 — 엔터티 구성 단어, 업종 템플릿 속성, 부모 관계와 부모 PK, 후보 용어(핵심 첫 단어 접두 + 공통 후보), 등록된 속성
 export async function attrSuggestInput(areaId: string, ent: NonNullable<Awaited<ReturnType<typeof getEnt>>>) {
   const [w, prj, rels, mine] = await Promise.all([
-    db().from('std_dic').select('dic_id, dic_log_nm, dic_phy_nm, attr_clss_yn, ent_clss_yn, forbid_yn, tbl_sfx_txt').in('dic_id', ent.dic_ids),
+    inChunks(ent.dic_ids, (p) => db().from('std_dic').select('dic_id, dic_log_nm, dic_phy_nm, attr_clss_yn, ent_clss_yn, forbid_yn, tbl_sfx_txt').in('dic_id', p)),
     db().from('mdl_prj').select('indstry_cd').eq('prj_id', ent.prj_id).maybeSingle(),
     db().from('mdl_rel').select('rel_id, prnt_ent_id, idnt_yn, prnt_opt_yn, prnt:mdl_ent!mdl_rel_prnt_ent_id_fkey(ent_log_nm)').eq('chld_ent_id', ent.ent_id).eq('del_yn', 'N').neq('prnt_ent_id', ent.ent_id),
     listAttrs(areaId, ent.ent_id),
@@ -42,9 +43,9 @@ export async function attrSuggestInput(areaId: string, ent: NonNullable<Awaited<
   const ta = te ? t!.attrs.find((a) => a.ent === entKey(te)) : undefined
   // 부모 PK 속성
   const rl = rels.data as unknown as { rel_id: string; prnt_ent_id: string; idnt_yn: string; prnt_opt_yn: string; prnt: { ent_log_nm: string } | null }[]
-  const ppk = rl.length
-    ? await db().from('mdl_attr').select('ent_id, term_id, pk_seq, std_term!mdl_attr_std_term_id_fkey(term_log_nm, term_phy_nm, std_dom!std_term_std_dom_id_fkey(dom_nm))').in('ent_id', [...new Set(rl.map((r) => r.prnt_ent_id))]).eq('pk_yn', 'Y').eq('del_yn', 'N').order('pk_seq')
-    : { data: [], error: null }
+  const ppk = await inChunks([...new Set(rl.map((r) => r.prnt_ent_id))], (p) =>
+    db().from('mdl_attr').select('ent_id, term_id, pk_seq, std_term!mdl_attr_std_term_id_fkey(term_log_nm, term_phy_nm, std_dom!std_term_std_dom_id_fkey(dom_nm))').in('ent_id', p).eq('pk_yn', 'Y').eq('del_yn', 'N').order('pk_seq'),
+  )
   if (ppk.error) throw ppk.error
   const parents: ParentKey[] = rl.map((r) => ({
     rel_id: r.rel_id,

@@ -10,6 +10,7 @@ import { type MbrRole, type Perm } from '@/lib/roles'
 import { ActorCells, noEnterSubmit } from '../words/word-board'
 import Relations from './relations'
 import Attrs from './attrs'
+import { ENT_TP } from '@/lib/model-name'
 
 interface Prj {
   prj_id: string
@@ -55,15 +56,10 @@ interface Cand {
   dup?: boolean
   rule_error?: string | null
 }
-const TP_NM: Record<string, string> = {
-  BASE: '실체·기준',
-  ACT: '행위',
-  AGG: '집계',
-}
+const TP_NM: Record<string, string> = ENT_TP // 실체·기준·행위·가공(src/lib/model-name.ts)
 const RULE_MSG: Record<string, string> = {
   ENT_FORBIDDEN_WORD: '금칙어 포함',
   ENT_LAST_ATTR: '속성 분류어(도메인 단어)로 끝남 : 테이블명은 속성 불필요',
-  ENT_AGG_SUFFIX: "집계 엔터티는 '집계'로 끝나야 함",
 }
 // 업종(Industry) — 프로젝트 등록 시 추천(반자동 : 사용자가 골라 저장), 코드 sql/022·템플릿 src/data/industry
 interface Ind {

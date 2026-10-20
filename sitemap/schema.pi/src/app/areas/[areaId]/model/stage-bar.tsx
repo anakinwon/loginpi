@@ -142,7 +142,7 @@ export default function StageBar({
                 const t = tblOf.get(e.ent_id)
                 return (
                   <li key={e.ent_id} className="flex flex-wrap items-center gap-2 px-2 py-1">
-                    {mode === 'PHY' && <input type="checkbox" disabled={!editor || !canPick(e)} checked={!!picked?.has(e.ent_id)} onChange={(ev) => toggle([e.ent_id], ev.target.checked)} aria-label={`${e.ent_log_nm} 물리 전환 선택`} title={!lg ? '엔터티 작성완료 후 전환할 수 있습니다' : t ? '이미 전환됨' : '전환할 엔터티'} />}
+                    {mode === 'PHY' && <input type="checkbox" disabled={!editor || !canPick(e)} checked={!!picked?.has(e.ent_id)} onChange={(ev) => toggle([e.ent_id], ev.target.checked)} aria-label={`${e.ent_log_nm} 물리 전환 선택`} title={!lg ? '엔터티 작성완료 후 전환할 수 있습니다' : t ? '이미 전환됨 — 논리 변경은 물리 모델 화면의 [논리 변경 반영(동기화)]로 반영' : '전환할 엔터티'} />}
                     <span>{e.ent_log_nm}</span>
                     <span className="font-mono text-xs text-gray-500">{t?.tbl_nm ?? e.tbl_phy_nm}</span>
                     <span className={chip(lg)}>논리 {lg ? '작성완료' : '작성중'}</span>

@@ -25,7 +25,7 @@ export const tmplSchema = z.object({
   keywords: z.array(z.string().min(1)).min(1),
   traits: z.object({ biz: z.string(), reg: z.string(), data: z.string(), volume: z.string() }),
   subjects: z.array(z.object({ nm: z.string().min(1), eng: z.string().min(1), abbr: z.string().regex(/^[A-Z]{3}$/), desc: z.string() })).min(1),
-  entities: z.array(z.object({ subj: z.string(), words: z.array(z.string().min(1)).min(1), clss: z.enum(ENT_CLSS).nullable(), tp: z.enum(['BASE', 'ACT', 'AGG']), desc: z.string() })).min(1),
+  entities: z.array(z.object({ subj: z.string(), words: z.array(z.string().min(1)).min(1), clss: z.enum(ENT_CLSS).nullable(), tp: z.enum(['BASE', 'REF', 'ACT', 'PROC']), desc: z.string() })).min(1),
   rels: z.array(z.object({ prnt: z.string(), chld: z.string(), crdn: z.enum(['11', '1N', 'NM']), idnt: yn, nm: z.string() })),
   attrs: z.array(z.object({ ent: z.string(), terms: z.array(z.string()).min(1), pk: z.array(z.string()) })),
   physical: z.array(z.object({ ent: z.string(), kind: z.enum(['partition', 'index', 'denorm']), hint: z.string() })),

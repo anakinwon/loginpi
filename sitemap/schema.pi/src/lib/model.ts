@@ -2,6 +2,7 @@
 // 엔터티명 = 표준단어 결합(정의서 §8.4 엔터티 정의 + [데이터 성격 = 엔터티 분류어]), 물리명 = TB_ + 주제영역 약어 + 단어 약어 + 테이블 접미어
 import { z } from 'zod'
 import { db } from './db'
+import { inChunks } from './paging'
 import { simpleCrud } from './simple-crud'
 import { areaDict } from './term'
 import { splitTerm } from './term-split'
@@ -19,7 +20,7 @@ export async function isStdName(areaId: string, nm: string): Promise<boolean> {
 
 // 승인완료 표준단어를 요청 순서대로(하나라도 없거나 미확정이면 null)
 export async function entWords(areaId: string, ids: string[]): Promise<EntWord[] | null> {
-  const { data, error } = await db().from('std_dic').select('dic_id, dic_log_nm, dic_phy_nm, attr_clss_yn, ent_clss_yn, forbid_yn, tbl_sfx_txt').eq('area_id', areaId).eq('del_yn', 'N').eq('std_sts_cd', 'CNFM').in('dic_id', ids)
+  const { data, error } = await inChunks([...new Set(ids)], (p) => db().from('std_dic').select('dic_id, dic_log_nm, dic_phy_nm, attr_clss_yn, ent_clss_yn, forbid_yn, tbl_sfx_txt').eq('area_id', areaId).eq('del_yn', 'N').eq('std_sts_cd', 'CNFM').in('dic_id', p))
   if (error) throw error
   const by = new Map((data as EntWord[]).map((w) => [w.dic_id, w]))
   const out = ids.map((id) => by.get(id))

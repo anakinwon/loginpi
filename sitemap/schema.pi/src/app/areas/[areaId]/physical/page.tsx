@@ -135,13 +135,15 @@ export default function PhysicalPage({ params }: { params: Promise<{ areaId: str
     void loadDet()
   }, [loadDet])
 
-  const convert = async () => {
+  // 관계 없는 엔터티(PHY_NO_REL) = DA·SYS 만 확인 후 예외 전환(마스터 지시 2026-10-20)
+  const convert = async (noRelExc = false) => {
     if (!dbms) return
     setBusy(true)
     setMsg('')
-    const r = await piFetch(base, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dbms_cd: dbms, ent_ids: [...picked], ...(ltr ? { idntfr_ltr_cd: ltr } : {}) }) })
+    const r = await piFetch(base, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dbms_cd: dbms, ent_ids: [...picked], ...(ltr ? { idntfr_ltr_cd: ltr } : {}), ...(noRelExc ? { no_rel_exc: true } : {}) }) })
     const j = await r.json()
     setBusy(false)
+    if (!j.ok && j.code === 'PHY_NO_REL' && j.exc && !noRelExc && confirm(`관계가 없는 엔터티가 있습니다\n${(j.why ?? []).join('\n')}\n\nDA 예외로 그대로 전환하시겠습니까?(감사 이력에 남습니다)`)) return convert(true)
     if (!j.ok) return setMsg([j.message, ...(j.why ?? []), ...(j.issues ?? [])].join(' / '))
     setMsg(`물리 모델을 만들었습니다 — 테이블 ${j.tbl_cnt}·FK ${j.fk_cnt}`)
     setMdlId(j.item.phy_mdl_id)
@@ -285,6 +287,17 @@ export default function PhysicalPage({ params }: { params: Promise<{ areaId: str
           )}
           {!pv.why.length && !pv.issues.length && <p className="mt-1 text-green-700">전환할 수 있습니다</p>}
         </section>
+      )}
+      {/* 이미 전환된 엔터티의 논리 변경(속성·FK 추가 등)은 전환이 아니라 동기화로 반영 — 위에서 바로 보이게(2026-10-20 마스터 "추가했는데 반영이 안 돼") */}
+      {diffN > 0 && (
+        <p className="mt-2 flex flex-wrap items-center gap-2 rounded border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+          이미 전환된 테이블에 반영되지 않은 논리 변경 {diffN}건이 있습니다 — 전환이 아니라 동기화로 반영합니다
+          {editor && (
+            <button type="button" className={`${btn} bg-[#1f3a68] text-white`} disabled={busy} onClick={() => void sync()}>
+              논리 변경 반영(동기화)
+            </button>
+          )}
+        </p>
       )}
       {msg && (
         <p role="status" className="mt-2 text-sm font-medium text-[#1f3a68]">

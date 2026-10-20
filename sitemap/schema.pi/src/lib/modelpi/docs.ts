@@ -2,6 +2,7 @@
 // 입력 = 논리 모델 로더 결과(loadLogical). DA# 정의서 양식은 복제하지 않고 공공 DA 산출물 공통 항목만 둔다
 import { toCsv } from '../bulk.ts'
 import type { LEnt, LRel } from './normalize.ts'
+import { ENT_TP } from '../model-name.ts'
 
 export const DOC_TYPES = { ent: '엔터티정의서', attr: '속성정의서', rel: '관계정의서' } as const
 export type DocType = keyof typeof DOC_TYPES
@@ -12,7 +13,7 @@ export interface DocTable {
   rows: Cell[][]
 }
 
-const TP_NM: Record<string, string> = { BASE: '실체·기준', ACT: '행위', AGG: '집계' }
+const TP_NM: Record<string, string> = ENT_TP
 const CRDN_NM: Record<string, string> = { '11': '1:1', '1N': '1:N', NM: 'N:M' }
 const yn = (v: string | null | undefined) => (v === 'Y' ? 'Y' : 'N')
 

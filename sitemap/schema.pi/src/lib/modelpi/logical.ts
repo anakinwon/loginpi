@@ -2,7 +2,7 @@
 // 반자동 : 후보만 만들고 저장하지 않는다(사용자가 골라 POST /entities/[entId]/attributes). 속성 = 승인완료 표준용어만, 없는 용어는 missing(용어 신청 안내)
 // 근거 : 데이터 모델링 가이드 04 §2.2(식별자 4원칙·본질 식별자 ~번호·시스템 발급 ~ID·복합 3개 초과 인조), §3(식별 관계 = 부모 식별자 + 순번 상속), §5(이력 = 부모 키 + 유효시작일시), M:N 해소 = 양쪽 부모 키
 // 시스템 컬럼(등록자ID 등)은 물리 단계 자동 추가라 후보에서 제외
-// 필수 4종(마스터 지시 2026-10-17) : 모든 핵심 엔터티는 ① 주식별자 ② 주식별자 명칭(~명) ③ 행위 일시(행위 엔터티 = 핵심어+일시, 실체 = 핵심어+등록일시) ④ 행위 상태코드(핵심어+상태코드)를 반드시 포함
+// 필수 4종(마스터 지시 2026-10-17) : 모든 핵심 엔터티는 ① 주식별자 ② 주식별자 명칭(~명) ③ 행위 일시(행위 엔터티 = 핵심어+일시, 실체 = 핵심어+등록일시) ④ 행위 상태코드(핵심어+상태유형코드 — 공통코드 3종 규칙 2026-10-20, ~상태코드 단독 금지)를 반드시 포함
 import type { EntTp, EntWord } from '../model-name.ts'
 
 export interface TermRow {
@@ -43,8 +43,8 @@ export interface AttrInput {
 }
 
 // 필수 4종 범주 판정(용어명 끝) — 점검표·중복 방지 공용
-export const MUST_RE = { name: /(명|명칭)$/, dt: /일시$/, st: /상태코드$/ } as const
-export const MUST_NM = { pk: '주식별자', name: '주식별자 명칭', dt: '행위 일시', st: '행위 상태코드' } as const
+export const MUST_RE = { name: /(명|명칭)$/, dt: /일시$/, st: /상태(구분|종류|유형)코드$/ } as const
+export const MUST_NM = { pk: '주식별자', name: '주식별자 명칭', dt: '행위 일시', st: '행위 상태유형코드' } as const
 // 행위 단어 — 핵심어 끝 단어가 이 중 하나면 행위 일시 = 핵심어+일시, 아니면(실체) 핵심어+등록일시
 export const ACTION_WORDS = ['등록', '신청', '주문', '배송', '결제', '가입', '접수', '처리', '승인', '변경', '청구', '지급', '거래', '입고', '출고', '발주', '수납', '진료', '처방', '검사', '수강', '개설', '계약', '대출', '상환', '환불', '반품', '정산', '이동', '보전', '가동', '생산', '운송', '사용', '납부', '발급', '예약', '취소', '심사', '집행', '입원']
 // 등록된 속성으로 필수 4종 충족 여부
@@ -95,7 +95,7 @@ export function recommendAttrs(i: AttrInput): { pk: AttrCand[]; required: AttrCa
   } else if (clss === '관계') {
     pk = inherit
     if (inherit.length < 2) warn.push('관계(N:M 해소) 엔터티 식별자 = 양쪽 부모 식별자 — 두 부모와 식별 관계를 등록하십시오')
-  } else if (clss === '집계' || clss === '통계' || i.tp === 'AGG') {
+  } else if (clss === '집계' || clss === '통계' || i.tp === 'PROC') {
     pk = [...inherit, ...firstOf(['기준일자', '기준년월'], 'PK', true, '집계 = 기준 시점 + 집계 차원')]
   } else if (clss === '내역' || clss === '로그') {
     pk = inherit.length ? [...inherit, ...firstOf([`${core}일련번호`, '일련번호'], 'PK', true, '부모 식별자 + 순번')] : firstOf([`${core}번호`, `${core}일련번호`], 'PK', true, '본질 식별자 ~번호(04 §2.2)')
@@ -130,15 +130,15 @@ export function recommendAttrs(i: AttrInput): { pk: AttrCand[]; required: AttrCa
   }
   pickMust('name', [`${core}명`, `${core}명칭`], '식별자가 가리키는 대상의 이름')
   pickMust('dt', act ? [`${core}일시`, `${core}등록일시`] : [`${core}등록일시`, '등록일시', `${core}일시`], act ? `행위(${coreWords[coreWords.length - 1]}) 발생 일시` : '실체 등록 일시')
-  pickMust('st', [`${core}상태코드`, '상태코드'], '행위·처리 상태(공통코드 참조)')
+  pickMust('st', [`${core}상태유형코드`, '상태유형코드'], '행위·처리 상태(공통코드 유형코드 참조 — 상태 값은 4개 이상·추가 가능)')
   for (const p of i.parents.filter((x) => x.idnt_yn !== 'Y'))
     for (const t of p.pk) push({ ...cand(t.term_log_nm, 'FK', p.prnt_opt_yn === 'N', 'inherit', `비식별 관계 : ${p.prnt_nm} 참조(${p.prnt_opt_yn === 'N' ? '부모 필수 → 필수' : '부모 선택 → 선택'})`, p.rel_id), term_id: t.term_id, term_phy_nm: t.term_phy_nm, dom_nm: t.dom_nm, missing: false })
   for (const n of i.tmpl?.terms ?? []) if (!i.tmpl?.pk.includes(n)) push(cand(n, 'REQ', true, 'industry', '업종 템플릿 핵심 속성'))
   const codes = i.terms
-    .filter((t) => t.term_log_nm.startsWith(core) && /(상태|구분|유형|종류)코드$/.test(t.term_log_nm))
+    .filter((t) => t.term_log_nm.startsWith(core) && /(구분|유형|종류)코드$/.test(t.term_log_nm))
     .sort((a, b) => a.term_log_nm.length - b.term_log_nm.length)
     .slice(0, 2)
-  if (i.tp === 'BASE') {
+  if (i.tp === 'BASE' || i.tp === 'REF') {
     codes.forEach((t) => push(cand(t.term_log_nm, 'REQ', true, 'rule', '상태·구분 코드(공통코드 참조)')))
   } else if (i.tp === 'ACT') {
     for (const n of [`${core}금액`, `${core}수량`]) firstOf([n], 'REQ', true, '행위 측정값', false).forEach(push)
