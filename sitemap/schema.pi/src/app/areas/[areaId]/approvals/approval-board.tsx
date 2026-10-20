@@ -17,6 +17,7 @@ const actNm = (r: { tgt_tp_cd: string; act_cd: string; aftr_val: Record<string, 
 interface Req {
   apv_req_id: string
   tgt_tp_cd: string
+  tgt_key_txt?: string | null // 표준코드 = 코드ID
   act_cd: string
   aftr_val: Record<string, unknown> | null
   tgt?: Record<string, unknown>
@@ -37,7 +38,7 @@ interface BatchRes {
   results: { id: string; ok: boolean; code?: string; message?: string }[]
 }
 
-const TGT_NM: Record<string, string> = { DIC: '단어', DOM: '도메인', TERM: '용어' }
+const TGT_NM: Record<string, string> = { DIC: '단어', DOM: '도메인', TERM: '용어', CD: '표준코드' }
 const STS = ['REQ', 'APV', 'RJCT', 'CNCL'] as const
 // 요청 내용 표의 칸 이름(없는 칸은 원래 키로 표시)
 const FIELD_NM: Record<string, string> = {
@@ -51,6 +52,12 @@ const FIELD_NM: Record<string, string> = {
   term_log_nm: '용어 논리명',
   term_phy_nm: '용어 물리명',
   ver_no: '기준 버전',
+  // 표준코드(코드기본)
+  cd_id: '코드ID',
+  cd_cls_nm: '코드분류',
+  cd_desc: '설명',
+  use_yn: '사용여부',
+  term_id: '용어',
 }
 const fmt = (d: string | null) => (d ? new Date(d).toLocaleString('ko-KR') : '')
 
@@ -59,6 +66,7 @@ const tgtName = (r: Req) => {
   const v = { ...(r.tgt ?? {}), ...(r.aftr_val ?? {}) }
   if (r.tgt_tp_cd === 'DIC') return [v.dic_log_nm, v.dic_phy_nm]
   if (r.tgt_tp_cd === 'DOM') return [v.dom_nm ?? v.key_dom_nm, v.key_dom_nm && v.dom_nm ? v.key_dom_nm : null]
+  if (r.tgt_tp_cd === 'CD') return [v.term_log_nm, v.cd_id ?? r.tgt_key_txt] // 코드명(코드ID)
   return [v.term_log_nm, v.term_phy_nm]
 }
 

@@ -1,13 +1,15 @@
 'use client'
 import { piFetch } from '@pi/auth/client'
-// 일괄등록 화면 — 유형 = ?tab=words|domains|terms(하단 메뉴 표준단어·표준도메인·표준용어의 서브 '일괄등록', 마스터 지시 2026-10-17 — 화면 안 유형 탭 없음) → CSV 선택 → 검증(묶음별 check) → 결과 표·CSV 내려받기 → 반영(묶음별 apply, 서버 재검증)
+// 일괄등록 화면 — 유형 = ?tab=words|domains|terms|forbidden|codes(하단 메뉴 표준단어·표준도메인·표준용어의 서브 '일괄등록', 마스터 지시 2026-10-17 — 화면 안 유형 탭 없음) → CSV 선택 → 검증(묶음별 check) → 결과 표·CSV 내려받기 → 반영(묶음별 apply, 서버 재검증)
 // 일괄등록 권한(roles.ts 권한표) 전용(API가 확인), 반영 행은 승인대기. 순서 : 단어 → 도메인 → 용어. 설계 docs/design/bulk-import.md
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { use, useEffect, useRef, useState } from 'react'
 import { BATCH_SIZE, HEADERS, MAX_ROWS, markCrossBatchDup, parseCsv, resultsCsv, type BulkKind, type BulkResult, type BulkStatus } from '@/lib/bulk'
 
-const KIND_NM: Record<BulkKind, string> = { words: '표준단어', domains: '표준도메인', terms: '표준용어', forbidden: '금칙어' }
+const KIND_NM: Record<BulkKind, string> = { words: '표준단어', domains: '표준도메인', terms: '표준용어', forbidden: '금칙어', codes: '표준코드' }
+// 반영 뒤 이동 화면(승인 대상이 아닌 금칙어·표준코드는 각 목록, 나머지는 승인 화면)
+const DONE: Partial<Record<BulkKind, [string, string]>> = { forbidden: ['forbidden', '금칙어 목록으로'], codes: ['codes', '표준코드 목록으로'] }
 const ST_NM: Record<BulkStatus, string> = { OK: '정상', NSTD: '비표준 수용', SKIP: '이미 있음(건너뜀)', EXCL: '폐기 행 제외', ERR: '오류' }
 const ST_CLS: Record<BulkStatus, string> = { OK: 'text-gray-800', NSTD: 'text-amber-700', SKIP: 'text-gray-500', EXCL: 'text-gray-500', ERR: 'text-red-700' }
 const SHOW = 500
@@ -15,7 +17,7 @@ const SHOW = 500
 export default function BulkPage({ params }: { params: Promise<{ areaId: string }> }) {
   const { areaId } = use(params)
   const q = useSearchParams().get('tab')
-  const kind: BulkKind = q === 'domains' || q === 'terms' || q === 'forbidden' ? q : 'words'
+  const kind: BulkKind = q === 'domains' || q === 'terms' || q === 'forbidden' || q === 'codes' ? q : 'words'
   const [file, setFile] = useState<{ name: string; header: string[]; rows: string[][] } | null>(null)
   const [results, setResults] = useState<BulkResult[] | null>(null)
   const [mode, setMode] = useState<'check' | 'apply' | null>(null)
@@ -97,10 +99,18 @@ export default function BulkPage({ params }: { params: Promise<{ areaId: string 
       </Link>
       <h1 className="mt-2 text-2xl font-bold">{KIND_NM[kind]} 일괄등록</h1>
       <p className="mt-1 text-sm text-gray-600">
-        {kind === 'forbidden'
+        {kind === 'codes'
+          ? 'CSV(UTF-8) 한 행 = 코드상세 하나 : 코드명(~구분코드·~종류코드·~유형코드 확정 표준용어, 코드형 도메인), 코드분류, 코드값, 코드값명, 정렬순서, 사용여부(Y·N, 비우면 Y), 코드값설명. 코드기본이 없으면 첫 행의 코드분류로 함께 등록합니다. 승인 없이 바로 반영되며 이미 있는 코드값은 건너뜁니다. 같은 코드 안 코드값명은 겹칠 수 없습니다'
+          : kind === 'forbidden'
           ? 'CSV(UTF-8) 한 행 = 표기 하나 : 구분(금칙어·이음동의어), 표기, 대체 표준단어(승인완료 논리명). 승인 없이 바로 반영되며, 반영된 표기는 표준단어로 등록할 수 없습니다. 같은 단어에 이미 있는 표기는 건너뜁니다. 데이터아키텍트·표준담당자 전용'
           : '행안부 공공데이터 공통표준 CSV 양식(UTF-8). 단어 → 도메인 → 용어 순서로 반영하십시오. 이미 있는 이름은 건너뜁니다. 반영된 행은 승인대기로 저장됩니다. 승인 화면에서 단어 → 도메인 → 용어 순서로 승인하십시오. 데이터아키텍트·표준담당자 전용'}
       </p>
+      {kind === 'codes' && (
+        // 엑셀 템플릿(scripts/gen-code-template.py 생성, 시트 = 표준코드·작성안내·작성예시) — 작성 뒤 CSV UTF-8 로 저장해 올림
+        <a href="/templates/std-code-bulk-template.xlsx" download="표준코드_일괄등록_템플릿.xlsx" className="mt-3 inline-block rounded border border-[#1f3a68] px-3 py-1.5 text-sm font-semibold text-[#1f3a68] hover:bg-[#f0f4fa]">
+          ⬇ 엑셀 템플릿 내려받기
+        </a>
+      )}
       <details className="mt-3 text-xs text-gray-600">
         <summary>CSV 헤더</summary>
         <p className="mt-1">{Object.values(HEADERS[kind]).join(', ')}</p>
@@ -167,8 +177,8 @@ export default function BulkPage({ params }: { params: Promise<{ areaId: string 
           <p className="mt-4 text-sm">
             <strong>{mode === 'apply' ? `반영 완료 ${applied?.toLocaleString()}건` : '검증 결과'}</strong>
             {mode === 'apply' && (
-              <Link href={`/areas/${areaId}/${kind === 'forbidden' ? 'forbidden' : 'approvals'}`} className="ml-2 text-blue-700 underline">
-                {kind === 'forbidden' ? '금칙어 목록으로' : '승인 화면으로'}
+              <Link href={`/areas/${areaId}/${DONE[kind]?.[0] ?? 'approvals'}`} className="ml-2 text-blue-700 underline">
+                {DONE[kind]?.[1] ?? '승인 화면으로'}
               </Link>
             )}
             {' · '}

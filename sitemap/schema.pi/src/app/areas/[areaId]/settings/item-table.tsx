@@ -56,7 +56,7 @@ export default function ItemTable({ areaId, cfg, parent }: { areaId: string; cfg
     e.preventDefault()
     if (edit) {
       const body = { ver_no: edit.ver_no, ...Object.fromEntries(Object.entries(form).map(([k, v]) => [k, v === '' ? null : v])) }
-      after(await (await piFetch(`${base}/${edit[cfg.pk]}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json(), '수정했습니다')
+      after(await (await piFetch(`${base}/${encodeURIComponent(String(edit[cfg.pk]))}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json(), '수정했습니다')
       return
     }
     const body = { ...parent, ...Object.fromEntries(Object.entries(form).filter(([, v]) => v !== '')) }
@@ -64,7 +64,7 @@ export default function ItemTable({ areaId, cfg, parent }: { areaId: string; cfg
   }
   const remove = async (it: Item) => {
     if (!confirm(`${it[cfg.fields[0].key]} 항목을 삭제합니다`)) return
-    after(await (await piFetch(`${base}/${it[cfg.pk]}?ver_no=${it.ver_no}`, { method: 'DELETE' })).json(), '삭제했습니다')
+    after(await (await piFetch(`${base}/${encodeURIComponent(String(it[cfg.pk]))}?ver_no=${it.ver_no}`, { method: 'DELETE' })).json(), '삭제했습니다')
   }
 
   return (

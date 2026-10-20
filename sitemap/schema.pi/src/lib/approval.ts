@@ -1,5 +1,6 @@
 // 승인 절차 공용(sql/012) — 등록 신청·승인·반려·취소·재신청. 등록·수정·삭제 라우트, 승인 라우트, 일괄 승인 라우트가 같은 함수를 쓴다
 // 승인 시점 재검증 : 등록 신청은 사용 규칙(용어 구성 단어·도메인 승인완료, 대표도메인명 단어), 수정·삭제는 prepareChange(이름 재생성·사용 중·기준 버전)
+// 표준코드 코드기본(CD, sql/061)은 대상키 = 코드ID 텍스트(tgt_key_txt)라 전용 DB 함수 fn_cd_apv·fn_cd_rjct·fn_cd_cncl 로 분기
 import { z } from 'zod'
 import { db } from './db'
 import { dupCodeOf, type ErrorCode } from './api'
@@ -8,17 +9,42 @@ import { domKeyWordError } from './domain'
 import { termDomError, wordsByIds } from './term'
 import { termRuleError } from './term-split'
 import { prepareChange, type ChgTp } from './change'
+import { inChunks } from './paging'
+import { cdTermCheck } from './std-code-term'
 
 export type ApvTp = ChgTp
 type Err = { code?: string; message?: string }
 const DUP: Record<ApvTp, ErrorCode> = { DIC: 'WORD_DUP_LOGICAL', DOM: 'DOM_DUP_NM', TERM: 'TERM_DUP_NM' }
 
-// DB 오류 → 업무 오류 코드(알 수 없으면 throw)
-function mapErr(e: Err, tp?: ApvTp): ErrorCode {
+// DB 오류 → 업무 오류 코드(알 수 없으면 throw). CD 의 23505 = 처리 대기 요청 유일 인덱스면 대기 존재, 그 외(주식별자·활성 용어 유일)는 코드 중복
+export function mapErr(e: Err, tp?: ApvTp | 'CD'): ErrorCode {
   if (e.code === 'P0002') return 'APV_NOT_WAITING'
   if (e.code === '40001') return 'VERSION_CONFLICT'
-  if (e.code === '23505') return dupCodeOf(e.message, tp ? DUP[tp] : 'APV_WAIT_EXISTS')
+  if (tp === 'CD' && e.code === 'P0003') return 'CD_IN_USE'
+  if (tp === 'CD' && e.code === '22023') return 'INVALID_INPUT' // 반려사유 없음
+  if (e.code === '23505') {
+    if (tp === 'CD') return /ux_std_apv_req_key_wait/.test(e.message ?? '') ? 'APV_WAIT_EXISTS' : 'CD_DUP_TERM'
+    return dupCodeOf(e.message, tp ? DUP[tp] : 'APV_WAIT_EXISTS')
+  }
   throw e
+}
+
+// 코드기본 승인 전 재검증 — 등록 = 승인대기 행의 용어가 여전히 확정·코드형 도메인·이름 3종, 삭제 = 활성 코드상세 없음(수정의 활성·기준 버전은 DB 가 40001)
+async function cdCheck(areaId: string, r: ReqRow): Promise<ErrorCode | null> {
+  const cdId = r.tgt_key_txt as string
+  if (r.act_cd === 'INS') {
+    const { data, error } = await db().from('std_cd_bas').select('term_id, std_sts_cd').eq('area_id', areaId).eq('cd_id', cdId).eq('del_yn', 'N').maybeSingle()
+    if (error) throw error
+    if (!data || data.std_sts_cd !== 'REQ') return 'VERSION_CONFLICT'
+    const t = await cdTermCheck(areaId, data.term_id as string)
+    return typeof t === 'string' ? t : null
+  }
+  if (r.act_cd === 'DEL') {
+    const { data, error } = await db().from('std_cd_dtl').select('cd_val').eq('area_id', areaId).eq('cd_id', cdId).eq('del_yn', 'N').limit(1)
+    if (error) throw error
+    if (data.length) return 'CD_IN_USE'
+  }
+  return null
 }
 
 // 등록 신청 승인 전 재검증 — 승인대기 행 기준
@@ -48,8 +74,9 @@ async function insCheck(areaId: string, tp: ApvTp, id: string): Promise<ErrorCod
 
 interface ReqRow {
   apv_req_id: string
-  tgt_tp_cd: ApvTp
+  tgt_tp_cd: ApvTp | 'CD'
   tgt_id: string | null
+  tgt_key_txt: string | null
   act_cd: 'INS' | 'UPD' | 'DEL'
   aftr_val: Record<string, unknown> | null
   base_ver_no: number | null
@@ -59,7 +86,7 @@ interface ReqRow {
 export async function getReq(areaId: string, reqId: string): Promise<ReqRow | ErrorCode> {
   const { data, error } = await db()
     .from('std_apv_req')
-    .select('apv_req_id, tgt_tp_cd, tgt_id, act_cd, aftr_val, base_ver_no, apv_sts_cd, req_usr_id')
+    .select('apv_req_id, tgt_tp_cd, tgt_id, tgt_key_txt, act_cd, aftr_val, base_ver_no, apv_sts_cd, req_usr_id')
     .eq('apv_req_id', reqId)
     .eq('area_id', areaId)
     .eq('del_yn', 'N')
@@ -73,27 +100,36 @@ export async function getReq(areaId: string, reqId: string): Promise<ReqRow | Er
 export async function approveReq(areaId: string, reqId: string, usrId: string, opn?: string | null): Promise<{ tgt_id: string } | ErrorCode> {
   const r = await getReq(areaId, reqId)
   if (typeof r === 'string') return r
+  if (r.tgt_tp_cd === 'CD') {
+    const bad = await cdCheck(areaId, r)
+    if (bad) return bad
+    const { data, error } = await db().rpc('fn_cd_apv', { p_req_id: reqId, p_usr_id: usrId, p_opn: opn || null })
+    if (error) return mapErr(error, 'CD')
+    return { tgt_id: data as string }
+  }
+  const tp = r.tgt_tp_cd
   let row: Record<string, unknown> = {}
   if (r.act_cd === 'INS') {
     if (!r.tgt_id) return 'APV_LEGACY'
-    const bad = await insCheck(areaId, r.tgt_tp_cd, r.tgt_id)
+    const bad = await insCheck(areaId, tp, r.tgt_id)
     if (bad) return bad
   } else {
-    const prep = await prepareChange(areaId, r.tgt_tp_cd, r.tgt_id!, r.act_cd, r.aftr_val)
+    const prep = await prepareChange(areaId, tp, r.tgt_id!, r.act_cd, r.aftr_val)
     if (typeof prep === 'string') return prep
     if (prep.cur.ver_no !== r.base_ver_no) return 'VERSION_CONFLICT'
     row = prep.row
   }
   const { data, error } = await db().rpc('fn_apv_std_req', { p_req_id: reqId, p_row: row, p_usr_id: usrId, p_opn: opn || null })
-  if (error) return mapErr(error, r.tgt_tp_cd)
+  if (error) return mapErr(error, tp)
   return { tgt_id: data as string }
 }
 
 export async function rejectReq(areaId: string, reqId: string, usrId: string, reason: string): Promise<true | ErrorCode> {
   const r = await getReq(areaId, reqId)
   if (typeof r === 'string') return r
-  const { error } = await db().rpc('fn_rjct_std_req', { p_req_id: reqId, p_usr_id: usrId, p_rsn: reason })
-  return error ? mapErr(error) : true
+  const cd = r.tgt_tp_cd === 'CD'
+  const { error } = await db().rpc(cd ? 'fn_cd_rjct' : 'fn_rjct_std_req', { p_req_id: reqId, p_usr_id: usrId, p_rsn: reason })
+  return error ? mapErr(error, cd ? 'CD' : undefined) : true
 }
 
 // 취소 : 신청자 본인만
@@ -101,8 +137,9 @@ export async function cancelReq(areaId: string, reqId: string, usrId: string): P
   const r = await getReq(areaId, reqId)
   if (typeof r === 'string') return r
   if (r.req_usr_id !== usrId) return 'FORBIDDEN'
-  const { error } = await db().rpc('fn_cncl_std_req', { p_req_id: reqId, p_usr_id: usrId })
-  return error ? mapErr(error) : true
+  const cd = r.tgt_tp_cd === 'CD'
+  const { error } = await db().rpc(cd ? 'fn_cd_cncl' : 'fn_cncl_std_req', { p_req_id: reqId, p_usr_id: usrId })
+  return error ? mapErr(error, cd ? 'CD' : undefined) : true
 }
 
 // 등록 신청(승인대기 행 + 요청) → DA가 즉시 승인을 고를 때만 바로 승인(그 외 역할은 값을 보내도 무시). 반환 = 대상 ID·요청 ID·결과 상태
@@ -188,21 +225,18 @@ export function stsFilter<T>(query: T, sts: string | null, pk: string, pend: Map
 
 // 목록 행의 등록자·승인자·승인일시 — 등록자 = regr_id 사용자명, 승인 = 대상의 가장 최근 승인(APV) 요청(이관 데이터는 요청이 없어 빈칸)
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+// 대상·사용자 ID 는 inChunks(paging.ts)로 나눠 조회 — 수백 개를 한 번에 .in() 하면 주소가 길어 요청이 끊김(2026-10-20 대표도메인 후보 551건 장애)
 export async function withActors<T extends Record<string, unknown>>(areaId: string, tp: ApvTp, pk: string, rows: T[]): Promise<(T & { regr_nm: string | null; apv_nm: string | null; apv_dtm: string | null })[]> {
   const ids = rows.map((r) => r[pk] as string)
   const apv = new Map<string, { usr: string; dtm: string }>()
-  if (ids.length) {
-    const { data, error } = await db().from('std_apv_req').select('tgt_id, apv_usr_id, apv_dtm').eq('area_id', areaId).eq('tgt_tp_cd', tp).eq('apv_sts_cd', 'APV').eq('del_yn', 'N').in('tgt_id', ids).order('apv_dtm', { ascending: false })
-    if (error) throw error
-    for (const a of data) if (!apv.has(a.tgt_id as string)) apv.set(a.tgt_id as string, { usr: a.apv_usr_id as string, dtm: a.apv_dtm as string })
-  }
+  const ar = await inChunks(ids, (part) => db().from('std_apv_req').select('tgt_id, apv_usr_id, apv_dtm').eq('area_id', areaId).eq('tgt_tp_cd', tp).eq('apv_sts_cd', 'APV').eq('del_yn', 'N').in('tgt_id', part).order('apv_dtm', { ascending: false }))
+  if (ar.error) throw ar.error
+  for (const a of ar.data) if (!apv.has(a.tgt_id as string)) apv.set(a.tgt_id as string, { usr: a.apv_usr_id as string, dtm: a.apv_dtm as string })
   const uids = [...new Set([...rows.map((r) => r.regr_id as string), ...[...apv.values()].map((a) => a.usr)].filter((u) => u && UUID.test(u)))]
   const nm = new Map<string, string>()
-  if (uids.length) {
-    const { data, error } = await db().from('sys_user').select('usr_id, pi_usr_nm').in('usr_id', uids)
-    if (error) throw error
-    for (const u of data) nm.set(u.usr_id as string, u.pi_usr_nm as string)
-  }
+  const ur = await inChunks(uids, (part) => db().from('sys_user').select('usr_id, pi_usr_nm').in('usr_id', part))
+  if (ur.error) throw ur.error
+  for (const u of ur.data) nm.set(u.usr_id as string, u.pi_usr_nm as string)
   return rows.map((r) => {
     const a = apv.get(r[pk] as string)
     const reg = r.regr_id as string

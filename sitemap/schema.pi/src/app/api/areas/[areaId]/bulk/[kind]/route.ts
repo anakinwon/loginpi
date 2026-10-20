@@ -1,4 +1,5 @@
 // 일괄등록 API — POST { mode: check | apply, start_row, header, rows(최대 1,000) } : 일괄등록 권한(roles.ts 권한표), 반영 행은 승인대기(승인 화면에서 묶음 승인)
+// codes(표준코드 = 공통코드, 2026-10-20) : 없는 코드기본은 승인대기 등록 신청(sql/061 fn_cd_req, 자기 승인 없음), 코드상세는 그 아래 바로 반영(승인 대상 아님)
 // forbidden(금칙어·이음동의어, 2026-10-18)은 승인 대상이 아니라(P05) std_dic_rel 에 바로 넣고 단어별 감사 이력을 남긴다
 // check = 행 단위 판정만, apply = 같은 판정 후 OK·NSTD 행을 DB 함수(fn_bulk_req_std, 승인대기)로 한 트랜잭션 반영. 설계 docs/design/bulk-import.md
 import { NextResponse } from 'next/server'
@@ -7,12 +8,44 @@ import { db } from '@/lib/db'
 import { apiError, audit, dbError, errMsg, parseBody, requireAreaRole } from '@/lib/api'
 import { BATCH_SIZE, BULK_KINDS, mapHeader, type BulkKind } from '@/lib/bulk'
 import { checkBulk } from '@/lib/bulk-check'
+import { reqBas, upsertDtl } from '@/lib/std-code'
 
 type Ctx = { params: Promise<{ areaId: string; kind: string }> }
 // 일괄등록 행은 승인대기로 저장하고 행마다 등록 요청 생성(sql/012 fn_bulk_req_std, 2026-10-15 결정)
-const TP: Record<Exclude<BulkKind, 'forbidden'>, string> = { words: 'DIC', domains: 'DOM', terms: 'TERM' }
+const TP: Record<Exclude<BulkKind, 'forbidden' | 'codes'>, string> = { words: 'DIC', domains: 'DOM', terms: 'TERM' }
 type Row = Record<string, unknown>
 
+// 표준코드(공통코드, 2026-10-20) 반영 — 없는 코드기본은 등록 신청(승인대기, 사유 '일괄등록', 단어 일괄등록과 같이 자기 승인 없음 · 감사 이력 = DB 함수),
+//  코드상세는 upsertDtl 로 바로 반영(논리 삭제된 같은 키는 되살림). 판정 뒤 다른 요청이 같은 코드기본·코드값을 먼저 넣었으면 그 행만 건너뜀. 코드상세 감사 이력 = 코드기본마다 1건(추가한 목록)
+async function applyCodes(areaId: string, rows: Row[], uid: string): Promise<Set<number>> {
+  const cdOf = new Map<string, string>()
+  for (const r of rows) if (r.cd_id) cdOf.set(r.term_id as string, r.cd_id as string)
+  for (const r of rows) {
+    const term = r.term_id as string
+    if (cdOf.has(term)) continue
+    const cd = r.new_cd_id as string
+    const b = await reqBas(areaId, 'INS', cd, null, { term_id: term, cd_cls_nm: r.cd_cls_nm }, uid, '일괄등록')
+    if ('apv_req_id' in b) cdOf.set(term, cd)
+    else if (b.code === 'CD_DUP_TERM') {
+      const got = await db().from('std_cd_bas').select('cd_id').eq('area_id', areaId).eq('term_id', term).eq('del_yn', 'N').maybeSingle()
+      if (got.error) throw got.error
+      if (got.data) cdOf.set(term, got.data.cd_id)
+    }
+  }
+  const done = new Set<number>()
+  const byCd = new Map<string, { cd_val: unknown; cd_val_nm: unknown }[]>()
+  for (const r of rows) {
+    const cd = cdOf.get(r.term_id as string)
+    if (!cd) continue
+    const v = { cd_val: r.cd_val, cd_val_nm: r.cd_val_nm, cd_val_desc: r.cd_val_desc, sort_seq: r.sort_seq, use_yn: r.use_yn }
+    const d = await upsertDtl(areaId, cd, v, uid, (r.data_len as number | null) ?? null, false)
+    if (!('row' in d)) continue
+    done.add(r.row_no as number)
+    byCd.set(cd, [...(byCd.get(cd) ?? []), { cd_val: r.cd_val, cd_val_nm: r.cd_val_nm }])
+  }
+  for (const [cd, add] of byCd) await audit({ area_id: areaId, tgt_tp_cd: 'CD', tgt_id: cd, act_cd: 'UPD', aftr_val: { val_add: add, bulk: true }, usr_id: uid })
+  return done
+}
 // 금칙어·이음동의어 반영 — 한 번에 넣고, 판정 뒤 다른 요청이 같은 표기를 먼저 넣어 트리거(23505)가 막으면 행별로 다시 넣어 그 행만 건너뜀
 async function applyAliases(areaId: string, rows: Row[], uid: string): Promise<Set<number>> {
   const rec = (r: Row) => ({ dic_id: r.dic_id, rel_tp_cd: r.rel_tp_cd, rel_txt: r.rel_txt, regr_id: uid, modr_id: uid })
@@ -57,6 +90,7 @@ export async function POST(req: Request, { params }: Ctx) {
 
     let done: Set<number>
     if (k === 'forbidden') done = await applyAliases(areaId, rows, auth.user.usr_id)
+    else if (k === 'codes') done = await applyCodes(areaId, rows, auth.user.usr_id)
     else {
       const { data, error } = await db().rpc('fn_bulk_req_std', { p_tp: TP[k], p_area_id: areaId, p_rows: rows, p_usr_id: auth.user.usr_id })
       if (error) return dbError(error)

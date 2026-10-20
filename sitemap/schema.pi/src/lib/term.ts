@@ -1,5 +1,6 @@
 // 표준용어 공용 — 분류체계 단어 사전 조회, 구성 단어 검증, 용어명 중복 확인(분석·등록 API 공용)
 import { db } from './db'
+import { inChunks } from './paging'
 import { z } from 'zod'
 import type { DicWord } from './term-split'
 
@@ -22,7 +23,7 @@ export async function areaDict<T extends DicWord = DicWord>(areaId: string, cols
 
 // 요청 순서대로 단어 조회 — 하나라도 없거나 미확정이면 null
 export async function wordsByIds(areaId: string, ids: string[]): Promise<DicWord[] | null> {
-  const { data, error } = await db().from('std_dic').select(WORD_COLS).eq('area_id', areaId).eq('del_yn', 'N').eq('std_sts_cd', 'CNFM').in('dic_id', [...new Set(ids)])
+  const { data, error } = await inChunks<DicWord>([...new Set(ids)], (p) => db().from('std_dic').select(WORD_COLS).eq('area_id', areaId).eq('del_yn', 'N').eq('std_sts_cd', 'CNFM').in('dic_id', p))
   if (error) throw error
   const byId = new Map(data.map((w) => [w.dic_id, w]))
   const out = ids.map((id) => byId.get(id))

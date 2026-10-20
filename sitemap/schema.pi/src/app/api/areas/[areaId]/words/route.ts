@@ -40,7 +40,8 @@ export async function GET(req: Request, { params }: Ctx) {
   if (r.error) return dbError(r.error)
   let rows
   try {
-    rows = await withActors(areaId, 'DIC', 'dic_id', r.rows as Record<string, unknown>[])
+    // 선택지 조회(속성 분류어·지정 대표도메인)는 등록자·승인자가 필요 없음 — 건너뜀
+    rows = sp.get('attr') === 'Y' || sp.get('key') === 'Y' ? (r.rows as Record<string, unknown>[]) : await withActors(areaId, 'DIC', 'dic_id', r.rows as Record<string, unknown>[])
   } catch (e) {
     return dbError(e as { code?: string; message?: string })
   }

@@ -8,6 +8,7 @@ import { domName } from './dom-name'
 import { areaSep } from './term'
 import { termNames, termRuleError, type DicWord } from './term-split'
 import { type BulkKind, type BulkResult, domTpByGrp, isDiscarded, parseMoisDomName, pick, splitChn, splitList, toInt } from './bulk'
+import { CD_VAL_BAD, cdKind, valTooLong } from './std-code-rule'
 
 type Row = Record<string, unknown>
 export interface Checked {
@@ -52,6 +53,7 @@ const lgcTypes = async () => {
 export async function checkBulk(kind: BulkKind, areaId: string, idx: Record<string, number>, raw: string[][], startRow: number): Promise<Checked> {
   const vals = raw.map((r) => pick(idx, r))
   if (kind === 'forbidden') return checkForbidden(areaId, vals, startRow)
+  if (kind === 'codes') return checkCodes(areaId, vals, startRow)
   return kind === 'words' ? checkWords(areaId, vals, startRow) : kind === 'domains' ? checkDomains(areaId, vals, startRow) : checkTerms(areaId, vals, startRow)
 }
 
@@ -87,6 +89,74 @@ async function checkForbidden(areaId: string, vals: Record<string, string>[], st
     seen.add(nm)
     results.push({ row_no: no, status: 'OK', name: nm, detail: `${tp === 'BAN' ? '금칙어' : '이음동의어'} → ${v.word}`, keys: [nm] })
     rows.push({ row_no: no, dic_id: w.dic_id, rel_tp_cd: tp, rel_txt: nm })
+  })
+  return { results, rows }
+}
+
+// 표준코드(공통코드, 2026-10-20) — 한 행 = 코드상세 하나. 화면 등록과 같은 규칙 : 코드명 = 확정 표준용어·코드형(CD) 도메인·~구분코드·~종류코드·~유형코드,
+//  코드값 길이 ≤ 용어 도메인 길이, 코드 안 코드값·코드값명 상호 배타(이미 있는 코드값 = 건너뜀, 다른 코드값의 같은 코드값명 = 오류). 코드기본이 없으면 반영 때 등록 신청(승인대기),
+//  반려된 코드기본 아래는 등록 불가(CD_BAS_RJCT, sql/061)
+async function checkCodes(areaId: string, vals: Record<string, string>[], startRow: number): Promise<Checked> {
+  type T = { term_id: string; term_phy_nm: string; std_dom: { dom_tp_cd: string; data_len: number | null } }
+  const names = [...new Set(vals.map((v) => v.cd_nm).filter(Boolean))]
+  const terms = new Map<string, T>()
+  for (let i = 0; i < names.length; i += 100) {
+    const { data, error } = await db().from('std_term').select('term_id, term_log_nm, term_phy_nm, std_dom!inner(dom_tp_cd, data_len)').eq('area_id', areaId).eq('del_yn', 'N').eq('std_sts_cd', 'CNFM').in('term_log_nm', names.slice(i, i + 100))
+    if (error) throw error
+    for (const r of data) terms.set(r.term_log_nm as string, r as unknown as T)
+  }
+  const termIds = [...terms.values()].map((x) => x.term_id)
+  const cdOf = new Map<string, string>() // term_id → 코드ID(활성 코드기본, 코드 영문 표준용어)
+  const rjct = new Set<string>() // 반려된 코드기본의 코드ID
+  for (let i = 0; i < termIds.length; i += 100) {
+    const { data, error } = await db().from('std_cd_bas').select('cd_id, term_id, std_sts_cd').eq('area_id', areaId).eq('del_yn', 'N').in('term_id', termIds.slice(i, i + 100))
+    if (error) throw error
+    for (const r of data) {
+      cdOf.set(r.term_id as string, r.cd_id as string)
+      if (r.std_sts_cd === 'RJCT') rjct.add(r.cd_id as string)
+    }
+  }
+  const cdIds = [...cdOf.values()]
+  const haveVal = new Set<string>() // cd_id|코드값
+  const haveNm = new Map<string, string>() // cd_id|코드값명 → 코드값
+  for (let i = 0; i < cdIds.length; i += 100) {
+    const part = cdIds.slice(i, i + 100)
+    const rows = await fetchAll<{ cd_id: string; cd_val: string; cd_val_nm: string }>(() => db().from('std_cd_dtl').select('cd_id, cd_val, cd_val_nm').eq('area_id', areaId).eq('del_yn', 'N').in('cd_id', part).order('cd_id').order('cd_val'))
+    for (const r of rows) {
+      haveVal.add(`${r.cd_id}|${r.cd_val}`)
+      haveNm.set(`${r.cd_id}|${r.cd_val_nm}`, r.cd_val)
+    }
+  }
+  const seen = new Set<string>()
+  const results: BulkResult[] = []
+  const rows: Row[] = []
+  vals.forEach((v, i) => {
+    const no = startRow + i
+    const nm = `${v.cd_nm} ${v.val}`.trim()
+    if (!v.cd_nm || !v.val || !v.val_nm) return results.push(err(no, nm, 'INVALID_INPUT', '코드명·코드값·코드값명 필수'))
+    if (v.val.length > 100 || v.val_nm.length > 400 || v.cls.length > 200 || v.desc.length > 4000) return results.push(err(no, nm, 'INVALID_INPUT', '길이 초과(코드값 100·코드값명 400·코드분류 200·설명 4000자)'))
+    if (CD_VAL_BAD.test(v.val)) return results.push(err(no, nm, 'INVALID_INPUT', '코드값에 % / \\ ? # 를 쓸 수 없습니다'))
+    const sort = toInt(v.sort)
+    if (Number.isNaN(sort) || (sort ?? 0) > 99999) return results.push(err(no, nm, 'INVALID_INPUT', `정렬순서 '${v.sort}'(0~99999 정수)`))
+    const use = v.use === '' ? 'Y' : v.use.toUpperCase()
+    if (use !== 'Y' && use !== 'N') return results.push(err(no, nm, 'INVALID_INPUT', `사용여부 '${v.use}'(Y·N)`))
+    const t = terms.get(v.cd_nm)
+    if (!t) return results.push(err(no, nm, 'NOT_FOUND', `확정 표준용어 '${v.cd_nm}' 없음`))
+    if (!cdKind(v.cd_nm)) return results.push(err(no, nm, 'CD_NAME_NOT_COMMON'))
+    if (t.std_dom.dom_tp_cd !== 'CD') return results.push(err(no, nm, 'CD_TERM_INVALID'))
+    if (valTooLong(v.val, t.std_dom.data_len)) return results.push(err(no, nm, 'CD_VAL_TOO_LONG', `도메인 길이 ${t.std_dom.data_len}`))
+    const cd = cdOf.get(t.term_id)
+    if (cd && rjct.has(cd)) return results.push(err(no, nm, 'CD_BAS_RJCT'))
+    if (cd && haveVal.has(`${cd}|${v.val}`)) return results.push({ row_no: no, status: 'SKIP', name: nm, detail: '이미 등록된 코드값(건너뜀)' })
+    if (cd && haveNm.has(`${cd}|${v.val_nm}`)) return results.push(err(no, nm, 'CD_VAL_NM_DUP', `코드값 ${haveNm.get(`${cd}|${v.val_nm}`)}`))
+    const kv = `${v.cd_nm}|v|${v.val}`
+    const kn = `${v.cd_nm}|n|${v.val_nm}`
+    if (seen.has(kv)) return results.push(err(no, nm, 'DUP_IN_FILE'))
+    if (seen.has(kn)) return results.push(err(no, nm, 'CD_VAL_NM_DUP', '파일 안 앞 행'))
+    seen.add(kv)
+    seen.add(kn)
+    results.push({ row_no: no, status: 'OK', name: nm, detail: `${v.val_nm}${cd ? '' : ' · 코드기본 등록 신청(승인대기)'}`, keys: [kv, kn] })
+    rows.push({ row_no: no, term_id: t.term_id, data_len: t.std_dom.data_len, cd_id: cd ?? null, new_cd_id: t.term_phy_nm, cd_cls_nm: v.cls || null, cd_val: v.val, cd_val_nm: v.val_nm, sort_seq: sort ?? 0, use_yn: use, cd_val_desc: v.desc || null })
   })
   return { results, rows }
 }

@@ -61,14 +61,18 @@ const SCHEMA: Record<ChgTp, z.ZodType<Record<string, unknown>>> = {
 const LOCKED: Record<ChgTp, string[]> = {
   DIC: ['dic_log_nm', 'dic_phy_nm', 'attr_clss_yn', 'forbid_yn'],
   DOM: ['key_dom_nm', 'dom_tp_cd', 'lgc_tp_cd', 'data_len', 'data_scale'],
-  TERM: [],
+  TERM: ['dom_id'], // 공통코드 코드기본이 쓰는 용어는 도메인 변경 불가(코드값 길이 기준, 2026-10-20)
 }
 const TABLE = { DIC: ['std_dic', 'dic_id'], DOM: ['std_dom', 'dom_id'], TERM: ['std_term', 'term_id'] } as const
-const IN_USE: Record<ChgTp, ErrorCode> = { DIC: 'WORD_IN_USE', DOM: 'DOM_IN_USE', TERM: 'INVALID_INPUT' }
+const IN_USE: Record<ChgTp, ErrorCode> = { DIC: 'WORD_IN_USE', DOM: 'DOM_IN_USE', TERM: 'TERM_IN_USE_CD' }
 
-// 활성 용어가 이 단어·도메인을 쓰는지
+// 활성 용어가 이 단어·도메인을 쓰는지 / 용어 = 활성 공통코드 코드기본이 쓰는지(코드ID = 용어 물리명 복사 자연키, sql/060 — 삭제·도메인 변경 시 어긋남 방지)
 async function inUse(tp: ChgTp, id: string, cur?: Record<string, unknown>): Promise<boolean> {
-  if (tp === 'TERM') return false
+  if (tp === 'TERM') {
+    const { data, error } = await db().from('std_cd_bas').select('cd_id').eq('term_id', id).eq('del_yn', 'N').limit(1)
+    if (error) throw error
+    return data.length > 0
+  }
   if (tp === 'DOM') {
     const { data, error } = await db().from('std_term').select('term_id').eq('dom_id', id).eq('del_yn', 'N').limit(1)
     if (error) throw error

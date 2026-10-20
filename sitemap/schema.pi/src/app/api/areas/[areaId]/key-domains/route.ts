@@ -3,7 +3,7 @@
 import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { dbError, requireAreaRole } from '@/lib/api'
-import { pageRows } from '@/lib/paging'
+import { inChunks, pageRows } from '@/lib/paging'
 import { stsFilter, withActors } from '@/lib/approval'
 
 type Ctx = { params: Promise<{ areaId: string }> }
@@ -46,7 +46,7 @@ export async function GET(req: Request, { params }: Ctx) {
   // 사용 도메인 수 — 현재 페이지 이름만 한 번에 조회해 집계
   const cnt = new Map<string, number>()
   if (rows.length) {
-    const d = await db().from('std_dom').select('key_dom_nm').eq('area_id', areaId).eq('del_yn', 'N').in('key_dom_nm', rows.map((x) => x.dic_log_nm))
+    const d = await inChunks(rows.map((x) => x.dic_log_nm), (p) => db().from('std_dom').select('key_dom_nm').eq('area_id', areaId).eq('del_yn', 'N').in('key_dom_nm', p))
     if (d.error) return dbError(d.error)
     for (const x of d.data) cnt.set(x.key_dom_nm, (cnt.get(x.key_dom_nm) ?? 0) + 1)
   }

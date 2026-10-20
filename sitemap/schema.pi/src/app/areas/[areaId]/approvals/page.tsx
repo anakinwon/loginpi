@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import ApprovalBoard from './approval-board'
 
-// 첫 진입 필터 : ?sts=REQ|APV|RJCT|CNCL&tp=DIC|DOM|TERM(목록 화면의 "사유 보기" 링크), 그 외 값은 무시
+// 첫 진입 필터 : ?sts=REQ|APV|RJCT|CNCL&tp=DIC|DOM|TERM|CD(목록 화면의 "사유 보기" 링크), 그 외 값은 무시
 const pick = (v: string | string[] | undefined, ok: string[]) => (typeof v === 'string' && ok.includes(v) ? v : '')
 
 export default async function ApprovalsPage({ params, searchParams }: { params: Promise<{ areaId: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> }) {
@@ -14,7 +14,7 @@ export default async function ApprovalsPage({ params, searchParams }: { params: 
         ← 분류체계 목록
       </Link>
       <h1 className="mt-2 text-2xl font-bold">승인 요청</h1>
-      <ApprovalBoard areaId={areaId} sts={pick(sp.sts, ['REQ', 'APV', 'RJCT', 'CNCL']) || 'REQ'} tp={pick(sp.tp, ['DIC', 'DOM', 'TERM'])} />
+      <ApprovalBoard areaId={areaId} sts={pick(sp.sts, ['REQ', 'APV', 'RJCT', 'CNCL']) || 'REQ'} tp={pick(sp.tp, ['DIC', 'DOM', 'TERM', 'CD'])} />
     </main>
   )
 }

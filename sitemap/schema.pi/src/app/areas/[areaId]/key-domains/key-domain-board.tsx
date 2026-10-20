@@ -37,6 +37,7 @@ const COL_W = ['', '', '', '', 'w-[30%]', '', '', '', '', '', '']
 export default function KeyDomainBoard({ areaId }: { areaId: string }) {
   const [items, setItems] = useState<Item[]>([])
   const [attrWords, setAttrWords] = useState<Cand[]>([])
+  const [candErr, setCandErr] = useState('') // 후보 목록 조회 실패 사유(빈 목록과 구분 — 실패를 "속성 분류어 아님"으로 오인하지 않게)
   const [pick, setPick] = useState('')
   const [msg, setMsg] = useState('')
   const [role, setRole] = useState<MbrRole | null>(null)
@@ -62,6 +63,7 @@ export default function KeyDomainBoard({ areaId }: { areaId: string }) {
       setTotal(l.total)
     } else setMsg(l.message)
     if (c.ok) setAttrWords(c.words)
+    setCandErr(c.ok ? '' : (c.message ?? '오류'))
   }, [areaId, cond])
   useEffect(() => {
     load()
@@ -72,7 +74,7 @@ export default function KeyDomainBoard({ areaId }: { areaId: string }) {
   const cands = attrWords.filter((w) => w.key_dom_yn !== 'Y' && w.forbid_yn !== 'Y')
   const hit = attrWords.find((w) => w.dic_log_nm === pick.trim())
   const cur = hit && cands.includes(hit) ? hit : undefined
-  const why = !pick.trim() || cur ? '' : !hit ? '승인완료된 속성 분류어 단어가 아닙니다(표준단어에서 속성 분류어 지정 후 승인 필요)' : hit.key_dom_yn === 'Y' ? '이미 지정된 대표도메인입니다(아래 목록에서 확인)' : '금칙어는 대표도메인으로 지정할 수 없습니다'
+  const why = !pick.trim() || cur ? '' : candErr ? `대표도메인 후보 목록을 불러오지 못했습니다(${candErr}) — 새로고침 후 다시 시도하십시오` : !hit ? '승인완료된 속성 분류어 단어가 아닙니다(표준단어에서 속성 분류어 지정 후 승인 필요)' : hit.key_dom_yn === 'Y' ? '이미 지정된 대표도메인입니다(아래 목록에서 확인)' : '금칙어는 대표도메인으로 지정할 수 없습니다'
 
   // 지정·해제 신청 — 단어 수정 신청(202 = 승인대기, 200 = DA 즉시 승인)
   const send = async (w: { dic_id: string; dic_log_nm: string; ver_no: number }, to: 'Y' | 'N') => {

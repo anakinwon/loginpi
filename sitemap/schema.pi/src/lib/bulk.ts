@@ -1,7 +1,7 @@
 // 일괄등록 공용(순수 함수, 화면·서버 공용) — CSV 파싱, 헤더 대응, 행안부 공통표준 값 변환(한자 분리·도메인명 분해·도메인유형)
 // 설계 : docs/design/bulk-import.md. DB 조회가 필요한 판정은 bulk-check.ts
 
-export const BULK_KINDS = ['words', 'domains', 'terms', 'forbidden'] as const
+export const BULK_KINDS = ['words', 'domains', 'terms', 'forbidden', 'codes'] as const
 export type BulkKind = (typeof BULK_KINDS)[number]
 export type BulkStatus = 'OK' | 'NSTD' | 'SKIP' | 'EXCL' | 'ERR'
 export interface BulkResult {
@@ -60,12 +60,23 @@ export const HEADERS = {
     txt: '금칙어·이음동의어',
     word: '대체 표준단어',
   },
+  // 표준코드(공통코드, 2026-10-20) — 한 행 = 코드상세 하나. 코드명 = ~구분코드·~종류코드·~유형코드 확정 표준용어, 없는 코드기본은 첫 행의 코드분류로 함께 등록
+  codes: {
+    cd_nm: '코드명',
+    cls: '코드분류',
+    val: '코드값',
+    val_nm: '코드값명',
+    sort: '정렬순서',
+    use: '사용여부',
+    desc: '코드값설명',
+  },
 } as const
 export const REQUIRED: Record<BulkKind, string[]> = {
   words: ['log_nm', 'phy_nm'],
   domains: ['grp_nm', 'key_nm', 'tp_nm'],
   terms: ['log_nm', 'phy_nm', 'dom_nm'],
   forbidden: ['tp', 'txt', 'word'],
+  codes: ['cd_nm', 'val', 'val_nm'],
 }
 
 // RFC 4180 CSV 파서 — 따옴표 안 쉼표·줄바꿈·"" 이스케이프, UTF-8 BOM 제거, 빈 줄 제외
