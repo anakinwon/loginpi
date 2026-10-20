@@ -2,7 +2,11 @@
 // 애플리케이션 모니터링 탭 — schema.pi API(브라우저 계측, 분 × 경로) : TPS·평균 응답·오류율·느림, 분 단위 분포, 경로 TOP(전역 관리자만)
 // 경로 TOP 은 요청 수·느림·오류 기준 정렬(타일 클릭으로도 전환), 메뉴 열(routeMenu)을 경로 왼쪽에 별도 표시
 // 느린·오류 요청 상세(sql/069) : 어느 화면(pageMenu)·어떤 API·상태코드인지 개별 행 — 타일(느림·오류)·분포 막대(분)·화면별 TOP 으로 필터, 20행 페이지
+// AI 원인 분석 : 경로 TOP 의 느림·오류 경로 → Claude 가 원인·해결 방안 제시(화면 표시만, 저장·자동 수정 없음)
+import { piFetch } from '@pi/auth/client'
+import { Sparkles } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import type { AiResult } from '@/lib/mon-ai'
 import { pageMenu, routeMenu, SLOW_MS } from '@/lib/mon'
 import { fmtN, Line, Stack, Tile, type Pt } from './charts'
 import { usePoll } from './use-poll'
@@ -20,12 +24,95 @@ const stsNm = (n: number) => STS[n] ?? (n >= 500 ? '서버 오류' : n >= 400 ? 
 const minOf = (t: string) => Math.floor(Date.parse(t) / 60000) * 60000
 const fmtS = (t: string) => new Date(t).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })
 
+const LIKE: Record<AiResult['confidence'], [string, string]> = { HIGH: ['높음', 'bg-red-100 text-red-700'], MID: ['중간', 'bg-amber-100 text-amber-800'], LOW: ['낮음', 'bg-gray-100 text-gray-600'] }
+
+// AI 원인 분석 결과 패널 — 원인(가능성 순)·해결 방안(파일)·확인 방법·부족한 데이터
+function AiPanel({ ai, onClose, onRetry }: { ai: { route: string; busy: boolean; res?: AiResult; err?: string }; onClose: () => void; onRetry: () => void }) {
+  const r = ai.res
+  return (
+    <div className="mt-2 rounded-lg border border-violet-300 bg-violet-50/40 p-3 text-sm" aria-live="polite">
+      <div className="mb-2 flex flex-wrap items-center gap-2">
+        <Sparkles className="h-4 w-4 text-violet-700" aria-hidden />
+        <b className="text-[#2c3850]">AI 원인 분석</b>
+        <span className="text-xs text-[#5b6578]">
+          {routeMenu(ai.route)} · <span className="font-mono">{ai.route}</span>
+        </span>
+        {r && <span className={`rounded px-1.5 py-0.5 text-xs font-semibold ${LIKE[r.confidence][1]}`}>신뢰도 {LIKE[r.confidence][0]}</span>}
+        <span className="ml-auto flex gap-1 text-xs">
+          <button type="button" disabled={ai.busy} onClick={onRetry} className="rounded border border-[#d6deeb] bg-white px-2 py-0.5 disabled:opacity-40">
+            다시 분석
+          </button>
+          <button type="button" onClick={onClose} className="rounded border border-[#d6deeb] bg-white px-2 py-0.5">
+            닫기
+          </button>
+        </span>
+      </div>
+      {ai.busy && <p className="text-[#5b6578]">수치·개별 이력·소스 코드를 모아 분석하는 중입니다(최대 1~2분)…</p>}
+      {ai.err && <p className="text-red-700">{ai.err}</p>}
+      {r && (
+        <div className="space-y-3">
+          <p className="text-[#2c3850]">{r.summary}</p>
+          <div>
+            <h4 className="mb-1 text-xs font-bold text-[#2c3850]">원인(가능성 순)</h4>
+            <ol className="space-y-1">
+              {r.causes.map((c, i) => (
+                <li key={i} className="rounded border border-[#e2e7ef] bg-white p-2">
+                  <div className="flex items-center gap-2">
+                    <span className={`rounded px-1.5 py-0.5 text-xs font-semibold ${LIKE[c.likelihood][1]}`}>{LIKE[c.likelihood][0]}</span>
+                    <b className="text-[#2c3850]">{c.title}</b>
+                  </div>
+                  <p className="mt-1 whitespace-pre-wrap text-xs text-[#5b6578]">{c.evidence}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+          <div>
+            <h4 className="mb-1 text-xs font-bold text-[#2c3850]">해결 방안</h4>
+            <ol className="list-decimal space-y-1 pl-5">
+              {r.fixes.map((x, i) => (
+                <li key={i}>
+                  <b className="text-[#2c3850]">{x.title}</b>
+                  <p className="whitespace-pre-wrap text-xs text-[#2c3850]">{x.detail}</p>
+                  {x.files.length > 0 && <p className="font-mono text-xs text-[#5b6578]">{x.files.join(' · ')}</p>}
+                </li>
+              ))}
+            </ol>
+          </div>
+          {r.checks.length > 0 && (
+            <div>
+              <h4 className="mb-1 text-xs font-bold text-[#2c3850]">조치 후 확인</h4>
+              <ul className="list-disc pl-5 text-xs text-[#2c3850]">
+                {r.checks.map((c, i) => (
+                  <li key={i}>{c}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {r.gaps.length > 0 && <p className="text-xs text-[#5b6578]">부족한 데이터 : {r.gaps.join(' / ')}</p>}
+          <p className="text-xs text-[#5b6578]">AI 추정입니다 — 코드는 바꾸지 않았습니다. 근거를 확인한 뒤 조치하십시오.</p>
+        </div>
+      )}
+    </div>
+  )
+}
+
 type Row = { bkt_dtm: string; route_txt: string; req_cnt: number; err_cnt: number; slow_cnt: number; rsp_sum_val: number | string; rsp_max_val: number }
 
 export default function AppTab({ live, min }: { live: boolean; min: number }) {
   const [key, setKey] = useState<Key>('req')
   const [f, setF] = useState<Filter>({})
   const [pg, setPg] = useState(1)
+  const [ai, setAi] = useState<{ route: string; busy: boolean; res?: AiResult; err?: string } | null>(null)
+  const analyze = async (route: string) => {
+    if (ai?.busy) return
+    setAi({ route, busy: true })
+    try {
+      const j = await (await piFetch('/api/mon/app/analyze', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ route, min }) })).json()
+      setAi(j.ok ? { route, busy: false, res: j.ai } : { route, busy: false, err: j.message ?? 'AI 원인 분석에 실패했습니다' })
+    } catch {
+      setAi({ route, busy: false, err: 'AI 원인 분석에 실패했습니다(네트워크)' })
+    }
+  }
   const pick = (x: Filter) => {
     setF(x)
     setPg(1)
@@ -116,7 +203,7 @@ export default function AppTab({ live, min }: { live: boolean; min: number }) {
         </div>
         {key === 'slow' && <p className="mb-1 text-xs text-[#5b6578]">느림 = {SLOW_TXT} 걸린 요청(브라우저가 잰 응답 시간)</p>}
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[44rem] text-sm">
+          <table className="w-full min-w-[50rem] text-sm">
             <thead className="thead-3d">
               <tr>
                 <th className="px-2 py-1 text-left">메뉴</th>
@@ -126,6 +213,7 @@ export default function AppTab({ live, min }: { live: boolean; min: number }) {
                 <th className="px-2 py-1">최대(ms)</th>
                 <th className="px-2 py-1" title={SLOW_TXT}>느림</th>
                 <th className="px-2 py-1">오류</th>
+                <th className="px-2 py-1">AI 분석</th>
               </tr>
             </thead>
             <tbody>
@@ -138,11 +226,24 @@ export default function AppTab({ live, min }: { live: boolean; min: number }) {
                   <td className="px-2 py-1 text-right tabular-nums">{x.max}</td>
                   <td className={`px-2 py-1 text-right tabular-nums ${x.slow ? 'text-amber-700' : ''}`}>{x.slow}</td>
                   <td className={`px-2 py-1 text-right tabular-nums ${x.err ? 'text-red-700' : ''}`}>{x.err}</td>
+                  <td className="px-2 py-1 text-center">
+                    {(x.err > 0 || x.slow > 0) && (
+                      <button
+                        type="button"
+                        disabled={ai?.busy}
+                        onClick={() => void analyze(r)}
+                        title="이 경로의 오류·느림 원인과 해결 방안을 AI 로 분석(화면 표시만)"
+                        className="inline-flex items-center gap-1 rounded border border-violet-300 bg-violet-50 px-2 py-0.5 text-xs text-violet-800 hover:border-violet-500 disabled:opacity-40"
+                      >
+                        <Sparkles className="h-3 w-3" aria-hidden /> {ai?.busy && ai.route === r ? '분석 중…' : '원인 분석'}
+                      </button>
+                    )}
+                  </td>
                 </tr>
               ))}
               {!top.length && (
                 <tr>
-                  <td colSpan={7} className="px-2 py-4 text-center text-gray-500">
+                  <td colSpan={8} className="px-2 py-4 text-center text-gray-500">
                     {!data ? '불러오는 중…' : v.rt.size ? `${KEY_NM[key]} 건이 있는 경로가 없습니다` : '아직 수집된 요청이 없습니다 — 화면을 사용하면 1분 안에 쌓입니다'}
                   </td>
                 </tr>
@@ -150,6 +251,7 @@ export default function AppTab({ live, min }: { live: boolean; min: number }) {
             </tbody>
           </table>
         </div>
+        {ai && <AiPanel ai={ai} onClose={() => setAi(null)} onRetry={() => void analyze(ai.route)} />}
       </section>
       <section>
         <div className="mb-1 flex flex-wrap items-center gap-2">

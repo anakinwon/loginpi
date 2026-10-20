@@ -69,6 +69,8 @@ const ERRORS = {
   MON_URL_INVALID: 'http:// 또는 https:// 로 시작하는 주소를 입력하십시오(계정 정보 포함 금지, 2,000자 이내)',
   MON_URL_MAX: 'URL 은 분류체계당 100개까지 등록할 수 있습니다',
   MON_ADMIN_ONLY: '애플리케이션 모니터링은 전역 관리자만 볼 수 있습니다(schema.pi 전체 트래픽)',
+  MON_AI_OFF: 'AI 원인 분석을 쓰려면 서버에 ANTHROPIC_API_KEY 가 필요합니다',
+  MON_AI_FAIL: 'AI 원인 분석에 실패했습니다 — 잠시 뒤 다시 시도하십시오',
   VER_CAPPED: '모델이 너무 커서(엔터티 500·속성 5,000 초과) 버전으로 저장할 수 없습니다',
   REL_FK_IN_USE: '이 관계로 상속한 속성이 있어 부모·자식 엔터티를 바꿀 수 없습니다 — 관계를 삭제한 뒤 다시 등록하십시오',
   ATTR_SRC_INVALID: '원천 속성은 이 관계 부모 엔터티의 주식별자여야 합니다',
