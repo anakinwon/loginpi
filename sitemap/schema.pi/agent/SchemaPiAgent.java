@@ -29,7 +29,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 public class SchemaPiAgent {
-  static final String VERSION = "1.2.0"; // 1.1.0 = CREATE 직전 DROP … CASCADE 허용, 1.2.0 = 일반 인덱스 CREATE INDEX 허용(2026-10-20)
+  static final String VERSION = "1.3.0"; // 1.1.0 = CREATE 직전 DROP … CASCADE 허용, 1.2.0 = 일반 인덱스 CREATE INDEX 허용(2026-10-20), 1.3.0 = 폴링 때 호스트 지표 보고(서버 모니터링, 2026-10-21)
 
   // ── 문장 화이트리스트(src/lib/modelpi/sql-guard.ts 와 같은 규칙) ──
   static final String ID = "[A-Za-z][A-Za-z0-9_]*";
@@ -308,8 +308,32 @@ public class SchemaPiAgent {
   }
 
   @SuppressWarnings("unchecked")
+  // 호스트 지표(서버 모니터링, 2026-10-21) — CPU 사용률·메모리·디스크(모든 루트 합계)·코어·호스트명·OS. 읽기 실패한 값은 null(작업 가져가기는 계속)
+  static String metricsJson() {
+    StringBuilder b = new StringBuilder("{\"m\":{");
+    try {
+      com.sun.management.OperatingSystemMXBean os = (com.sun.management.OperatingSystemMXBean) java.lang.management.ManagementFactory.getOperatingSystemMXBean();
+      double cpu = os.getCpuLoad();
+      long dt = 0, df = 0;
+      for (java.io.File f : java.io.File.listRoots()) { dt += f.getTotalSpace(); df += f.getUsableSpace(); }
+      String host;
+      try { host = java.net.InetAddress.getLocalHost().getHostName(); } catch (Exception e) { host = null; }
+      b.append("\"host\":").append(Json.q(host))
+        .append(",\"os\":").append(Json.q(System.getProperty("os.name") + " " + System.getProperty("os.version")))
+        .append(",\"cores\":").append(Runtime.getRuntime().availableProcessors())
+        .append(",\"cpu\":").append(cpu < 0 ? "null" : String.valueOf(Math.round(cpu * 10000) / 100.0))
+        .append(",\"mem_tot\":").append(os.getTotalMemorySize())
+        .append(",\"mem_used\":").append(os.getTotalMemorySize() - os.getFreeMemorySize())
+        .append(",\"disk_tot\":").append(dt)
+        .append(",\"disk_used\":").append(dt - df);
+    } catch (Throwable e) {
+      // 일부 JVM(비 HotSpot)은 com.sun.management 미지원 — 지표 없이 폴링
+    }
+    return b.append("}}").toString();
+  }
+
   boolean pollOnce() throws Exception {
-    HttpResponse<String> r = post("/api/agent/jobs/claim", "{}");
+    HttpResponse<String> r = post("/api/agent/jobs/claim", metricsJson());
     if (r.statusCode() == 204) return false;
     if (r.statusCode() == 401) throw new SecurityException("토큰이 폐기·만료되었습니다 — 새 토큰 발급");
     if (r.statusCode() != 200) { log("작업 조회 실패 " + r.statusCode()); return false; }
