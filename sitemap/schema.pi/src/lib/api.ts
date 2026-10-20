@@ -236,6 +236,8 @@ export async function requireAreaRole(areaId: string, perm: Perm): Promise<AreaA
 }
 
 // 목록 검색어 → ILIKE 부분일치 패턴. PostgREST or() 구분자(, ( ))·LIKE 메타(%)·이스케이프(\)만 제거하고 '_' 는 남김 — '_' 는 한 글자 일치라 물리명(CUST_STTS_TPCD)으로도 찾힘(2026-10-20, 전엔 '_' 를 지워 0건)
+// LIKE 메타문자(% _ \) 이스케이프 — 정확 일치·접두 일치용(중복 검사·접두 후보), '_' 를 지우면 판정이 어긋남(2026-10-20)
+export const likeEsc = (s: string) => s.replace(/[\\%_]/g, (c) => `\\${c}`)
 export const likeQ = (q: string) => `%${q.replace(/[%,()\\]/g, '')}%`
 
 export async function audit(row: {

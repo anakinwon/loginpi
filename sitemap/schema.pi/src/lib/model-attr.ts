@@ -1,5 +1,6 @@
 // 엔터티 속성(MD3, sql/025 mdl_attr) 서버 공용 — 목록 조회, 추천 입력 수집(엔터티 단어·업종 템플릿·식별/비식별 부모 PK·후보 용어), 순서 계산
 // 추천 규칙은 순수 모듈 src/lib/modelpi/logical.ts, 이 파일은 DB 조회만
+import { likeEsc } from './api'
 import { db } from './db'
 import { inChunks } from './paging'
 import type { EntTp, EntWord } from './model-name'
@@ -58,7 +59,7 @@ export async function attrSuggestInput(areaId: string, ent: NonNullable<Awaited<
   const { head } = entCore(words)
   const exact = [...GENERIC_TERMS, ...(ta?.terms ?? [])]
   const [pre, ex] = await Promise.all([
-    head ? db().from('std_term').select('term_id, term_log_nm, term_phy_nm, std_dom!std_term_std_dom_id_fkey(dom_nm)').eq('area_id', areaId).eq('del_yn', 'N').eq('std_sts_cd', 'CNFM').ilike('term_log_nm', `${head.replace(/[%_]/g, '')}%`).limit(300) : Promise.resolve({ data: [], error: null }),
+    head ? db().from('std_term').select('term_id, term_log_nm, term_phy_nm, std_dom!std_term_std_dom_id_fkey(dom_nm)').eq('area_id', areaId).eq('del_yn', 'N').eq('std_sts_cd', 'CNFM').ilike('term_log_nm', `${likeEsc(head)}%`).limit(300) : Promise.resolve({ data: [], error: null }),
     db().from('std_term').select('term_id, term_log_nm, term_phy_nm, std_dom!std_term_std_dom_id_fkey(dom_nm)').eq('area_id', areaId).eq('del_yn', 'N').eq('std_sts_cd', 'CNFM').in('term_log_nm', exact),
   ])
   if (pre.error) throw pre.error
