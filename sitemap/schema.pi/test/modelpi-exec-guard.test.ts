@@ -34,7 +34,7 @@ test('실행 문장 화이트리스트 : 공용 벡터(에이전트와 같은 �
 test('생성기 출력 문장은 전부 허용(PostgreSQL·Oracle·Tibero, 자동 증가·일반/유일 인덱스 포함)', () => {
   const col = (n: string, pk: number | null) => ({ attr_id: n, sys_col_yn: 'N' as const, col_nm: n, col_seq: pk ?? 9, dom_id: null, dom_ver_no: null, phy_tp_nm: 'NUMBER', data_len: 12, data_scale: null, null_yn: 'N' as const, bsc_val_txt: pk ? null : "'X'", pk_yn: (pk ? 'Y' : 'N') as 'Y' | 'N', pk_seq: pk })
   for (const dbms of ['0014', '0001', '0013'] as const) {
-    const sql = genDdl({ dbms, ltr: dbms === '0014' ? 'LOWER' : 'UPPER', tables: [{ ent_id: 'a', tbl_nm: 'TB_CUST', tbl_desc: "고객's", auto_inc_yn: 'Y', cols: [col('CUST_NO', 1), col('CUST_CD', null)], indexes: [{ idx_nm: 'IX_TB_CUST_01', unq_yn: 'N', col_nms: ['CUST_CD', 'CUST_NO'] }, { idx_nm: 'IX_TB_CUST_02', unq_yn: 'Y', col_nms: ['CUST_CD'] }] }], fks: [], src: new Map(), fkOf: new Map() }, { prjNm: 'p', at: 'now' })
+    const sql = genDdl({ dbms, ltr: dbms === '0014' ? 'LOWER' : 'UPPER', tables: [{ ent_id: 'a', tbl_nm: 'TB_CUST', tbl_desc: "고객's", auto_inc_yn: 'Y', cols: [col('CUST_NO', 1), col('CUST_CD', null)], indexes: [{ idx_nm: 'X_TB_CUST_01', unq_yn: 'N', col_nms: ['CUST_CD', 'CUST_NO'] }, { idx_nm: 'X_TB_CUST_02', unq_yn: 'Y', col_nms: ['CUST_CD'] }] }], fks: [], src: new Map(), fkOf: new Map() }, { prjNm: 'p', at: 'now' })
     const st = splitStatements(sql)
     assert.ok(st.length >= 5)
     for (const s of st) assert.equal(stmtAllowed(s), true, `${dbms} : ${s}`)

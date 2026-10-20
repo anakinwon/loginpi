@@ -511,7 +511,7 @@ export default function PhysicalPage({ params }: { params: Promise<{ areaId: str
                   ) : (
                     editor && (
                       <div className="mt-2 border-t pt-2">
-                        <p className="text-xs text-gray-600">칼럼을 누른 순서가 인덱스 칼럼 순서입니다(최대 16개, 다시 누르면 빠짐). 이름은 IX_테이블명_번호로 자동 생성됩니다.</p>
+                        <p className="text-xs text-gray-600">칼럼을 누른 순서가 인덱스 칼럼 순서입니다(최대 16개, 다시 누르면 빠짐). 이름은 X_테이블명_번호로 자동 생성됩니다.</p>
                         <div className="mt-1 flex flex-wrap gap-1">
                           {rows.map((c) => {
                             const i = idxCols.indexOf(c.phy_col_id)

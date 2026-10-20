@@ -1,4 +1,4 @@
-// 물리 인덱스(PRD_PiErd S5 잔여, sql/063) — POST : 테이블에 일반·유일 인덱스 추가(이름 = 서버 생성 IX_<테이블>_NN), DELETE ?idx=&ver_no= : 논리 삭제
+// 물리 인덱스(PRD_PiErd S5 잔여, sql/063) — POST : 테이블에 일반·유일 인덱스 추가(이름 = 서버 생성 X_<테이블>_NN), DELETE ?idx=&ver_no= : 논리 삭제
 // 칼럼 = 그 테이블 활성 칼럼(중복 금지, 순서 = 인덱스 칼럼 순서), 같은 구성의 인덱스·PK 중복 금지, 테이블 작성완료면 거부(DB 트리거도 MLK01)
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
