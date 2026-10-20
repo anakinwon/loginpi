@@ -1,17 +1,18 @@
 'use client'
 // 메인 공개 영역(로그인 전, 마스터 결정 2026-10-21) — 소개·흐름(구현 완료 단계만)·역할 7종·요금제 이름과 열리는 메뉴(가격은 결제 화면에서만)
 // API 호출 없음(고정 문구 + roles.ts). 로그인하면 숨김 — 로그인 버튼은 아래 LoginGate 가 그대로 담당(UA 판정·redirect 없음)
-import { ArrowRight, CodeXml, DatabaseZap, Hexagon, Layers, Network, ScanText, Waypoints } from 'lucide-react'
+import { ArrowRight, CodeXml, DatabaseZap } from 'lucide-react'
 import { useAppUser } from './google-auth'
 import { PLAN_NM, PLAN_PERMS, PLANS, ROLE_DESC, ROLE_NM, ROLES } from '@/lib/roles'
+import { MENU_ICON as I } from '@/lib/menu-icons'
 
 // 표준 → 모델 → ERD → DDL(MASTER_ROADMAP 1~4단계 중 구현된 범위, 이행·CDC·분석은 미착수라 넣지 않음)
 const FLOW = [
-  { Icon: ScanText, nm: '표준단어', desc: '단어·약어·금칙어' },
-  { Icon: Hexagon, nm: '표준도메인', desc: '타입·길이 규칙' },
-  { Icon: Layers, nm: '표준용어', desc: '단어 결합·승인' },
-  { Icon: Waypoints, nm: '데이터 모델', desc: '개념·논리·물리' },
-  { Icon: Network, nm: 'ERD', desc: '주제영역별·버전 비교' },
+  { Icon: I.words, nm: '표준단어', desc: '단어·약어·금칙어' },
+  { Icon: I.domains, nm: '표준도메인', desc: '타입·길이 규칙' },
+  { Icon: I.terms, nm: '표준용어', desc: '단어 결합·승인' },
+  { Icon: I.logical, nm: '데이터 모델', desc: '개념·논리·물리' },
+  { Icon: I.erd, nm: 'ERD', desc: '주제영역별·버전 비교' },
   { Icon: CodeXml, nm: 'DDL', desc: 'DBMS별 생성·승인 실행' },
 ]
 // 요금제별로 열리는 메뉴(roles.ts PLAN_PERMS 의 메뉴 권한 → 화면 이름)

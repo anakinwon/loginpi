@@ -3,11 +3,12 @@
 // 분류체계 칩(누르면 그 분류체계가 마지막 선택) · 내 차례(역할 ∩ 요금제 권한별 카드) · 표준사전 현황 · 바로가기 · 최근 변경 5건 · 요금제
 // 모바일 = 한 열(내 차례 먼저), 데스크톱 = 왼쪽 2칸(할 일·현황) + 오른쪽 1칸(바로가기·최근 변경·요금제). 분류체계 목록·새로 만들기는 맨 아래 접기(AreaHome 재사용)
 import { piFetch } from '@pi/auth/client'
-import { Activity, Binary, ClipboardCheck, CodeXml, DatabaseZap, Hexagon, History, Inbox, Layers, Network, Orbit, ScanText, Send, Settings2, Wallet, Waypoints, type LucideIcon } from 'lucide-react'
+import { ClipboardCheck, DatabaseZap, History, Inbox, Send, Waypoints, type LucideIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import AreaHome from './area-home'
 import { ACT_NM, PLAN_NM, ROLE_NM, TGT_NM, type MbrRole, type Perm, type PlanCd } from '@/lib/roles'
+import { MENU_ICON as I } from '@/lib/menu-icons'
 
 interface Recent {
   log_id: string
@@ -39,20 +40,20 @@ interface HomeRes {
 
 const card = 'rounded-xl border border-[#c7d2e6] bg-gradient-to-b from-[#f4f7fc] to-[#e9eff9] p-4'
 const h3 = 'mb-2 flex items-center gap-1.5 font-bold text-[#2c3850]'
-// 바로가기 = 하단 메뉴(area-nav)와 같은 경로·아이콘·권한
+// 바로가기 = 하단 메뉴(area-nav)와 같은 경로·아이콘(src/lib/menu-icons)·권한
 const LINKS: { seg: string; nm: string; Icon: LucideIcon; perm?: Perm }[] = [
-  { seg: 'words', nm: '표준단어', Icon: ScanText, perm: 'STD_VIEW' },
-  { seg: 'domains', nm: '표준도메인', Icon: Hexagon, perm: 'STD_VIEW' },
-  { seg: 'terms', nm: '표준용어', Icon: Layers, perm: 'STD_VIEW' },
-  { seg: 'codes', nm: '표준코드', Icon: Binary, perm: 'STD_VIEW' },
-  { seg: 'model?tab=prj', nm: '개념 모델', Icon: Orbit, perm: 'MODEL_VIEW' },
-  { seg: 'logical', nm: '논리 모델', Icon: Waypoints, perm: 'MODEL_VIEW' },
-  { seg: 'physical', nm: '물리 모델', Icon: DatabaseZap, perm: 'MODEL_VIEW' },
-  { seg: 'erd', nm: 'ERD', Icon: Network, perm: 'MODEL_VIEW' },
-  { seg: 'sql', nm: 'SQL 편집기', Icon: CodeXml, perm: 'SQL_QUERY' },
-  { seg: 'monitor', nm: '모니터링', Icon: Activity, perm: 'MON_VIEW' },
-  { seg: 'settings', nm: '설정', Icon: Settings2, perm: 'SET_VIEW' },
-  { seg: 'plan', nm: '결제', Icon: Wallet },
+  { seg: 'words', nm: '표준단어', Icon: I.words, perm: 'STD_VIEW' },
+  { seg: 'domains', nm: '표준도메인', Icon: I.domains, perm: 'STD_VIEW' },
+  { seg: 'terms', nm: '표준용어', Icon: I.terms, perm: 'STD_VIEW' },
+  { seg: 'codes', nm: '표준코드', Icon: I.codes, perm: 'STD_VIEW' },
+  { seg: 'model?tab=prj', nm: '개념 모델', Icon: I.model, perm: 'MODEL_VIEW' },
+  { seg: 'logical', nm: '논리 모델', Icon: I.logical, perm: 'MODEL_VIEW' },
+  { seg: 'physical', nm: '물리 모델', Icon: I.physical, perm: 'MODEL_VIEW' },
+  { seg: 'erd', nm: 'ERD', Icon: I.erd, perm: 'MODEL_VIEW' },
+  { seg: 'sql', nm: 'SQL 편집기', Icon: I.sql, perm: 'SQL_QUERY' },
+  { seg: 'monitor', nm: '모니터링', Icon: I.monitor, perm: 'MON_VIEW' },
+  { seg: 'settings', nm: '설정', Icon: I.settings, perm: 'SET_VIEW' },
+  { seg: 'plan', nm: '결제', Icon: I.plan },
 ]
 const day = (s: string) => new Date(s).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' })
 const ago = (s: string) => {
@@ -162,7 +163,7 @@ export default function Dashboard() {
               {a.std && (
                 <section aria-labelledby="std-h">
                   <h3 id="std-h" className={h3}>
-                    <ScanText className="h-4 w-4" strokeWidth={1.5} aria-hidden /> 표준사전 현황 <span className="text-xs font-normal text-[#5b6578]">승인완료 기준</span>
+                    <I.words className="h-4 w-4" strokeWidth={1.5} aria-hidden /> 표준사전 현황 <span className="text-xs font-normal text-[#5b6578]">승인완료 기준</span>
                   </h3>
                   <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                     {(
