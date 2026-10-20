@@ -1,7 +1,9 @@
 'use client'
 // 설정 화면 — 분류체계 설정(이름·설명·구분자·사용여부)·도메인그룹·약어. 변경은 분류체계 관리자만, 그 외 역할은 조회
+//  AI 분석 모델 탭(2026-10-21) = schema.pi 전역 설정(전역 관리자만, 그 외는 안내 문구)
 import Link from 'next/link'
 import { use, useState } from 'react'
+import AiMdlForm from './ai-mdl-form'
 import AreaForm from './area-form'
 import ItemTable, { GRP_CFG as GRP, type ItemCfg } from './item-table'
 
@@ -19,6 +21,7 @@ const TABS = [
   ['area', '분류체계'],
   ['grp', '도메인그룹'],
   ['abbr', '약어'],
+  ['ai', 'AI 분석 모델'],
 ] as const
 
 export default function SettingsPage({ params }: { params: Promise<{ areaId: string }> }) {
@@ -41,6 +44,7 @@ export default function SettingsPage({ params }: { params: Promise<{ areaId: str
         {tab === 'area' && <AreaForm areaId={areaId} />}
         {tab === 'grp' && <ItemTable areaId={areaId} cfg={GRP} />}
         {tab === 'abbr' && <ItemTable areaId={areaId} cfg={ABBR} />}
+        {tab === 'ai' && <AiMdlForm />}
       </div>
     </main>
   )

@@ -1,5 +1,5 @@
 // 애플리케이션 모니터링 AI 원인 분석(2026-10-21, 마스터 지시 — 원인·해결 방안까지만 화면 제시, 코드 자동 수정 없음)
-// 한 API 경로의 분 단위 합계·느린/오류 개별 이력 + 그 경로 소스(route.ts·직접 import 한 src/lib·호출 화면 일부) → Claude 구조화 출력
+// 한 API 경로의 분 단위 합계·느린/오류 개별 이력 + 그 경로 소스(route.ts·직접 import 한 src/lib·호출 화면 일부) → 설정에 등록한 모델(Claude·Gemini·OpenAI) 구조화 출력
 // 외부로 보내는 값 = 경로·수치·화면 경로·소스 코드(사용자 ID·이름은 보내지 않음). 소스는 next.config outputFileTracingIncludes 로 배포본에 포함
 import 'server-only'
 import { readdir, readFile } from 'node:fs/promises'
@@ -130,10 +130,93 @@ async function gatherSrc(route: string) {
   return { found: !!rf, text: parts.join('\n\n') }
 }
 
-let client: Anthropic | null = null
+// 분석 모델(sql/070 mon_ai_mdl) — 설정에 등록한 제공사·모델·요금제·계정을 결과와 함께 돌려줘 화면에 표시(자료 신뢰성). 키는 환경변수만
+export type Prvd = 'CLAUDE' | 'GEMINI' | 'OPENAI'
+export interface AiMdl {
+  mdl_id: string | null
+  prvd_cd: Prvd
+  mdl_nm: string
+  dsp_nm: string
+  plan_nm: string
+  acct_nm: string
+}
+export const KEY_ENV: Record<Prvd, string> = { CLAUDE: 'ANTHROPIC_API_KEY', GEMINI: 'GEMINI_API_KEY', OPENAI: 'OPENAI_API_KEY' }
+export const keyOn = (p: Prvd) => !!process.env[KEY_ENV[p]]
+// 등록 모델이 없을 때(sql/070 적용 전 등) — 지금까지 쓰던 모델, 화면에는 요금제 '미등록'으로 드러냄
+const FALLBACK: AiMdl = { mdl_id: null, prvd_cd: 'CLAUDE', mdl_nm: 'claude-opus-5-5', dsp_nm: 'Claude Opus 5.5', plan_nm: '미등록', acct_nm: '' }
 
-export async function analyzeRoute(route: string, min: number): Promise<AiResult | 'OFF' | null> {
-  if (!process.env.ANTHROPIC_API_KEY) return 'OFF'
+// mdlId 가 있으면 그 모델(삭제됐으면 'GONE'), 없으면 기본 모델 → 없으면 FALLBACK
+async function pickMdl(mdlId?: string): Promise<AiMdl | 'GONE'> {
+  const q = db().from('mon_ai_mdl').select('mdl_id, prvd_cd, mdl_nm, dsp_nm, plan_nm, acct_nm').eq('del_yn', 'N')
+  const r = await (mdlId ? q.eq('mdl_id', mdlId) : q.eq('dflt_yn', 'Y')).maybeSingle()
+  if (r.error) throw r.error
+  return (r.data as AiMdl | null) ?? (mdlId ? 'GONE' : FALLBACK)
+}
+
+export interface AiRun {
+  ai: AiResult
+  mdl: AiMdl
+  ms: number // 분석 소요(밀리초)
+  tok: { in: number; out: number } // 토큰(제공사 응답 기준, 추론 토큰 포함)
+}
+
+const TIMEOUT = 90_000
+const MAX_OUT = 16_000 // Gemini·OpenAI 는 추론 토큰이 출력 한도에 포함돼 Claude(8,000)보다 크게
+type Call = { text?: string; done: boolean; in: number; out: number }
+
+let client: Anthropic | null = null
+async function callClaude(m: AiMdl, system: string, user: string): Promise<Call> {
+  client ??= new Anthropic({ timeout: TIMEOUT, maxRetries: 1 })
+  const res = await client.messages.create({
+    model: m.mdl_nm,
+    max_tokens: 8000,
+    output_config: { effort: 'medium', format: { type: 'json_schema', schema: SCHEMA } },
+    system,
+    messages: [{ role: 'user', content: user }],
+  })
+  return { text: res.content.find((b) => b.type === 'text')?.text, done: res.stop_reason === 'end_turn', in: res.usage.input_tokens, out: res.usage.output_tokens }
+}
+
+async function post(url: string, headers: Record<string, string>, body: unknown) {
+  const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', ...headers }, body: JSON.stringify(body), signal: AbortSignal.timeout(TIMEOUT) })
+  const j = await r.json().catch(() => null)
+  if (!r.ok) throw new Error(`${r.status} ${j?.error?.message ?? ''}`.slice(0, 300))
+  return j
+}
+
+async function callGemini(m: AiMdl, system: string, user: string): Promise<Call> {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(m.mdl_nm)}:generateContent`
+  const j = await post(url, { 'x-goog-api-key': process.env.GEMINI_API_KEY! }, {
+    systemInstruction: { parts: [{ text: system }] },
+    contents: [{ role: 'user', parts: [{ text: user }] }],
+    generationConfig: { responseMimeType: 'application/json', responseJsonSchema: SCHEMA, maxOutputTokens: MAX_OUT },
+  })
+  const c = j.candidates?.[0]
+  const u = j.usageMetadata ?? {}
+  const parts: { text?: string; thought?: boolean }[] = c?.content?.parts ?? []
+  return { text: parts.filter((p) => !p.thought).map((p) => p.text ?? '').join(''), done: c?.finishReason === 'STOP', in: u.promptTokenCount ?? 0, out: (u.candidatesTokenCount ?? 0) + (u.thoughtsTokenCount ?? 0) }
+}
+
+async function callOpenAi(m: AiMdl, system: string, user: string): Promise<Call> {
+  const j = await post('https://api.openai.com/v1/chat/completions', { Authorization: `Bearer ${process.env.OPENAI_API_KEY}` }, {
+    model: m.mdl_nm,
+    messages: [
+      { role: 'system', content: system },
+      { role: 'user', content: user },
+    ],
+    response_format: { type: 'json_schema', json_schema: { name: 'mon_ai_result', strict: true, schema: SCHEMA } },
+    max_completion_tokens: MAX_OUT,
+  })
+  const c = j.choices?.[0]
+  return { text: c?.message?.content ?? undefined, done: c?.finish_reason === 'stop', in: j.usage?.prompt_tokens ?? 0, out: j.usage?.completion_tokens ?? 0 }
+}
+
+const CALL: Record<Prvd, typeof callClaude> = { CLAUDE: callClaude, GEMINI: callGemini, OPENAI: callOpenAi }
+
+export async function analyzeRoute(route: string, min: number, mdlId?: string): Promise<AiRun | 'OFF' | 'GONE' | null> {
+  const mdl = await pickMdl(mdlId)
+  if (mdl === 'GONE') return 'GONE'
+  if (!keyOn(mdl.prvd_cd)) return 'OFF'
   const since = new Date(Date.now() - min * 60000).toISOString()
   const [agg, evt, src] = await Promise.all([
     db().from('mon_app_hist').select('bkt_dtm, req_cnt, err_cnt, slow_cnt, rsp_sum_val, rsp_max_val').eq('route_txt', route).gte('bkt_dtm', since).order('bkt_dtm', { ascending: false }).limit(120),
@@ -144,33 +227,27 @@ export async function analyzeRoute(route: string, min: number): Promise<AiResult
   if (evt.error) throw evt.error
   const aggTxt = agg.data.map((r) => `${r.bkt_dtm} 요청 ${r.req_cnt} 오류 ${r.err_cnt} 느림 ${r.slow_cnt} 평균 ${Math.round(Number(r.rsp_sum_val) / Math.max(1, r.req_cnt))}ms 최대 ${r.rsp_max_val}ms`).join('\n')
   const evtTxt = evt.data.map((e) => `${e.occr_dtm} ${e.evt_cd} 상태 ${e.sts_no} ${e.rsp_val}ms 화면 ${e.scr_txt ?? '-'}(${pageMenu(e.scr_txt)})`).join('\n')
-  client ??= new Anthropic({ timeout: 90_000, maxRetries: 1 })
+  const system =
+    '당신은 Next.js 16(App Router)·Supabase(PostgreSQL) 웹 서비스 운영 엔지니어입니다. 브라우저 계측(Resource Timing)으로 모은 API 응답 지표와 소스 코드를 보고 오류·지연의 원인을 추정하고 해결 방안을 제시합니다. ' +
+    '근거 없는 추측은 likelihood 를 낮추고 gaps 에 부족한 데이터를 적습니다. 상태 0 은 네트워크 실패·요청 중단(화면 이동·새로고침으로 fetch 가 끊긴 경우 포함)입니다. ' +
+    '합계 이력의 오류 건은 상태코드가 남지 않고, 개별 이력(느림·오류)은 sql/069 배포 이후 요청부터만 있습니다. 운영(production)과 로컬 개발 서버가 같은 DB 에 기록할 수 있습니다. 답은 한국어로, 짧고 간결하게 씁니다(장황한 설명 금지).'
+  const user = [
+    `API 경로 : ${route} (메뉴 : ${routeMenu(route)})`,
+    `분석 구간 : 최근 ${min}분, 느림 기준 ${SLOW_MS}ms, 분석 서버 환경 : ${process.env.VERCEL_ENV ?? process.env.NODE_ENV}`,
+    `분 단위 합계(최신순, ${agg.data.length}행) :\n${aggTxt || '없음'}`,
+    `느림·오류 개별 이력(최신순, ${evt.data.length}건) :\n${evtTxt || '없음'}`,
+    src.found ? `소스 코드 :\n${src.text}` : `소스 코드 : route.ts 를 찾지 못함\n${src.text}`,
+  ].join('\n\n')
+  const t0 = Date.now()
   try {
-    const res = await client.messages.create({
-      model: 'claude-opus-5-5',
-      max_tokens: 8000,
-      output_config: { effort: 'medium', format: { type: 'json_schema', schema: SCHEMA } },
-      system:
-        '당신은 Next.js 16(App Router)·Supabase(PostgreSQL) 웹 서비스 운영 엔지니어입니다. 브라우저 계측(Resource Timing)으로 모은 API 응답 지표와 소스 코드를 보고 오류·지연의 원인을 추정하고 해결 방안을 제시합니다. ' +
-        '근거 없는 추측은 likelihood 를 낮추고 gaps 에 부족한 데이터를 적습니다. 상태 0 은 네트워크 실패·요청 중단(화면 이동·새로고침으로 fetch 가 끊긴 경우 포함)입니다. ' +
-        '합계 이력의 오류 건은 상태코드가 남지 않고, 개별 이력(느림·오류)은 sql/069 배포 이후 요청부터만 있습니다. 운영(production)과 로컬 개발 서버가 같은 DB 에 기록할 수 있습니다. 답은 한국어로, 짧고 간결하게 씁니다(장황한 설명 금지).',
-      messages: [
-        {
-          role: 'user',
-          content: [
-            `API 경로 : ${route} (메뉴 : ${routeMenu(route)})`,
-            `분석 구간 : 최근 ${min}분, 느림 기준 ${SLOW_MS}ms, 분석 서버 환경 : ${process.env.VERCEL_ENV ?? process.env.NODE_ENV}`,
-            `분 단위 합계(최신순, ${agg.data.length}행) :\n${aggTxt || '없음'}`,
-            `느림·오류 개별 이력(최신순, ${evt.data.length}건) :\n${evtTxt || '없음'}`,
-            src.found ? `소스 코드 :\n${src.text}` : `소스 코드 : route.ts 를 찾지 못함\n${src.text}`,
-          ].join('\n\n'),
-        },
-      ],
-    })
-    const text = res.stop_reason === 'end_turn' ? res.content.find((b) => b.type === 'text')?.text : undefined
-    return text ? (JSON.parse(text) as AiResult) : null
+    const c = await CALL[mdl.prvd_cd](mdl, system, user)
+    if (!c.done || !c.text) {
+      console.error('mon-ai', mdl.prvd_cd, mdl.mdl_nm, 'incomplete')
+      return null
+    }
+    return { ai: JSON.parse(c.text) as AiResult, mdl, ms: Date.now() - t0, tok: { in: c.in, out: c.out } }
   } catch (e) {
-    console.error('mon-ai', (e as Error).message)
+    console.error('mon-ai', mdl.prvd_cd, mdl.mdl_nm, (e as Error).message)
     return null
   }
 }

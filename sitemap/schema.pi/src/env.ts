@@ -22,6 +22,9 @@ const schema = z.object({
   NEXT_PUBLIC_GOOGLE_LOGIN: z.enum(['1']).optional(),
   // 개념 모델 AI 추천(프로젝트명·설명, src/lib/modelpi/project-ai.ts) — 없으면 업종 템플릿 문장으로 대체(외부 전송 없음)
   ANTHROPIC_API_KEY: z.string().optional(),
+  // 모니터링 AI 원인 분석 — 설정에 등록한 제공사별 키(sql/070 mon_ai_mdl, 키는 DB 에 저장하지 않음). 없으면 그 제공사 모델은 분석 불가(503)
+  GEMINI_API_KEY: z.string().optional(),
+  OPENAI_API_KEY: z.string().optional(),
   // DDL 직접 실행(2026-10-18) — 접속 비밀번호 암호화 키(32바이트 base64, openssl rand -base64 32). 없으면 접속 저장·시험·승인·실행 모두 꺼짐(503)
   DB_PROFILE_KEY: z.string().optional(),
   // 서버 직접 실행(PostgreSQL·Oracle) 켜기 = 1. 끄면 로컬 에이전트 실행만(긴급 차단 스위치)

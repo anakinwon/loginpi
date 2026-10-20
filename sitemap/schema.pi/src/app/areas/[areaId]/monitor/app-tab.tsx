@@ -2,11 +2,12 @@
 // 애플리케이션 모니터링 탭 — schema.pi API(브라우저 계측, 분 × 경로) : TPS·평균 응답·오류율·느림, 분 단위 분포, 경로 TOP(전역 관리자만)
 // 경로 TOP 은 요청 수·느림·오류 기준 정렬(타일 클릭으로도 전환), 메뉴 열(routeMenu)을 경로 왼쪽에 별도 표시
 // 느린·오류 요청 상세(sql/069) : 어느 화면(pageMenu)·어떤 API·상태코드인지 개별 행 — 타일(느림·오류)·분포 막대(분)·화면별 TOP 으로 필터, 20행 페이지
-// AI 원인 분석 : 경로 TOP 의 느림·오류 경로 → Claude 가 원인·해결 방안 제시(화면 표시만, 저장·자동 수정 없음)
+// AI 원인 분석 : 경로 TOP 의 느림·오류 경로 → 설정에 등록한 AI 모델(기본 또는 패널에서 고른 모델)이 원인·해결 방안 제시(화면 표시만, 저장·자동 수정 없음)
+//  결과에 사용 모델·요금제·계정·소요·토큰을 함께 표시(자료 신뢰성, 2026-10-21 마스터 지시)
 import { piFetch } from '@pi/auth/client'
 import { Sparkles } from 'lucide-react'
-import { useMemo, useState } from 'react'
-import type { AiResult } from '@/lib/mon-ai'
+import { useEffect, useMemo, useState } from 'react'
+import type { AiMdl, AiResult, AiRun } from '@/lib/mon-ai'
 import { pageMenu, routeMenu, SLOW_MS } from '@/lib/mon'
 import { fmtN, Line, Stack, Tile, type Pt } from './charts'
 import { usePoll } from './use-poll'
@@ -24,12 +25,15 @@ const stsNm = (n: number) => STS[n] ?? (n >= 500 ? '서버 오류' : n >= 400 ? 
 const minOf = (t: string) => Math.floor(Date.parse(t) / 60000) * 60000
 const fmtS = (t: string) => new Date(t).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })
 
+type Ai = { route: string; busy: boolean; res?: AiRun; err?: string }
+type MdlOpt = Pick<AiMdl, 'dsp_nm' | 'plan_nm'> & { mdl_id: string; dflt_yn: 'Y' | 'N' }
 const LIKE: Record<AiResult['confidence'], [string, string]> = { HIGH: ['높음', 'bg-red-100 text-red-700'], MID: ['중간', 'bg-amber-100 text-amber-800'], LOW: ['낮음', 'bg-gray-100 text-gray-600'] }
 
 // AI 원인 분석 결과 패널 — 원인 > 해결 방안 묶음(가능성 순)을 하나씩 접고 펼침, 마지막에 조치 후 확인. 머리글 '숨기기'로 본문 전체 접기
-function AiPanel({ ai, onClose, onRetry }: { ai: { route: string; busy: boolean; res?: AiResult; err?: string }; onClose: () => void; onRetry: () => void }) {
+function AiPanel({ ai, mdls, mdlId, onMdl, onClose, onRetry }: { ai: Ai; mdls: MdlOpt[]; mdlId: string; onMdl: (id: string) => void; onClose: () => void; onRetry: () => void }) {
   const [open, setOpen] = useState(true)
-  const r = ai.res
+  const r = ai.res?.ai
+  const run = ai.res
   return (
     <div className="mt-2 rounded-lg border border-violet-300 bg-violet-50/40 p-3 text-sm" aria-live="polite">
       <div className="flex flex-wrap items-center gap-2">
@@ -40,6 +44,16 @@ function AiPanel({ ai, onClose, onRetry }: { ai: { route: string; busy: boolean;
         </span>
         {r && <span className={`rounded px-1.5 py-0.5 text-xs font-semibold ${LIKE[r.confidence][1]}`}>신뢰도 {LIKE[r.confidence][0]}</span>}
         <span className="ml-auto flex gap-1 text-xs">
+          {mdls.length > 1 && (
+            <select aria-label="분석 모델" value={mdlId} disabled={ai.busy} onChange={(e) => onMdl(e.target.value)} className="rounded border border-[#d6deeb] bg-white px-1 py-0.5">
+              {mdls.map((m) => (
+                <option key={m.mdl_id} value={m.mdl_id}>
+                  {m.dsp_nm}
+                  {m.dflt_yn === 'Y' ? ' (기본)' : ''}
+                </option>
+              ))}
+            </select>
+          )}
           <button type="button" onClick={() => setOpen(!open)} aria-expanded={open} className="rounded border border-[#d6deeb] bg-white px-2 py-0.5">
             {open ? '숨기기' : '보이기'}
           </button>
@@ -58,6 +72,13 @@ function AiPanel({ ai, onClose, onRetry }: { ai: { route: string; busy: boolean;
           </button>
         </span>
       </div>
+      {run && (
+        <p className="mt-1 text-xs text-[#5b6578]">
+          분석 모델 <b className="text-[#2c3850]">{run.mdl.dsp_nm}</b> (<span className="font-mono">{run.mdl.mdl_nm}</span>) · 요금제{' '}
+          {run.mdl.plan_nm && run.mdl.plan_nm !== '미등록' ? run.mdl.plan_nm : <span className="text-red-700">[미등록]</span>}
+          {run.mdl.acct_nm && ` · 계정 ${run.mdl.acct_nm}`} · {(run.ms / 1000).toFixed(1)}초 · 토큰 입력 {fmtN(run.tok.in)} / 출력 {fmtN(run.tok.out)}
+        </p>
+      )}
       {open && (
         <div className="mt-2 space-y-2">
           {ai.busy && <p className="text-[#5b6578]">수치·개별 이력·소스 코드를 모아 분석하는 중입니다(최대 1~2분)…</p>}
@@ -113,13 +134,26 @@ export default function AppTab({ live, min }: { live: boolean; min: number }) {
   const [key, setKey] = useState<Key>('req')
   const [f, setF] = useState<Filter>({})
   const [pg, setPg] = useState(1)
-  const [ai, setAi] = useState<{ route: string; busy: boolean; res?: AiResult; err?: string } | null>(null)
-  const analyze = async (route: string) => {
+  const [ai, setAi] = useState<Ai | null>(null)
+  // 설정 > AI 분석 모델 목록(기본 먼저) — 패널에서 다른 모델로 다시 분석, 실패·미적용이면 빈 목록(서버가 기본 모델 사용)
+  const [mdls, setMdls] = useState<MdlOpt[]>([])
+  const [mdlId, setMdlId] = useState('')
+  useEffect(() => {
+    piFetch('/api/mon/ai-mdl')
+      .then((r) => r.json())
+      .then((j) => {
+        if (!j.ok) return
+        setMdls(j.items)
+        setMdlId(j.items[0]?.mdl_id ?? '')
+      })
+      .catch(() => {})
+  }, [])
+  const analyze = async (route: string, id = mdlId) => {
     if (ai?.busy) return
     setAi({ route, busy: true })
     try {
-      const j = await (await piFetch('/api/mon/app/analyze', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ route, min }) })).json()
-      setAi(j.ok ? { route, busy: false, res: j.ai } : { route, busy: false, err: j.message ?? 'AI 원인 분석에 실패했습니다' })
+      const j = await (await piFetch('/api/mon/app/analyze', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ route, min, ...(id ? { mdl_id: id } : {}) }) })).json()
+      setAi(j.ok ? { route, busy: false, res: { ai: j.ai, mdl: j.mdl, ms: j.ms, tok: j.tok } } : { route, busy: false, err: j.message ?? 'AI 원인 분석에 실패했습니다' })
     } catch {
       setAi({ route, busy: false, err: 'AI 원인 분석에 실패했습니다(네트워크)' })
     }
@@ -262,7 +296,7 @@ export default function AppTab({ live, min }: { live: boolean; min: number }) {
             </tbody>
           </table>
         </div>
-        {ai && <AiPanel ai={ai} onClose={() => setAi(null)} onRetry={() => void analyze(ai.route)} />}
+        {ai && <AiPanel ai={ai} mdls={mdls} mdlId={mdlId} onMdl={setMdlId} onClose={() => setAi(null)} onRetry={() => void analyze(ai.route)} />}
       </section>
       <section>
         <div className="mb-1 flex flex-wrap items-center gap-2">
