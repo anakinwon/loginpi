@@ -48,6 +48,31 @@ if (typeof sql !== 'string' || sql.trim() === '') process.exit(0)
 // DDL/DML 키워드 없으면 통과 (SELECT 등)
 if (!/\b(CREATE|ALTER|DROP|DELETE|TRUNCATE)\b/i.test(sql)) process.exit(0)
 
+// ---------- R9 : PK·인덱스 이름 규칙(마스터 지시 2026-10-20, schema.pi sql/066 소급) — DA-APPROVED 로도 통과 불가 ----------
+// PK = pk_<테이블>(이름 없는 PRIMARY KEY = 자동 <테이블>_pkey 라 금지), 인덱스·유일 제약 = x_<테이블>_NN(이름 없는 UNIQUE = 자동 _key 라 금지)
+// 범위 : sitemap/schema.pi 의 SQL 파일(cafe.pi 루트 sql/ 은 기존 <테이블>_pkey 관례 — 소급 여부 마스터 결정 대기)
+if (/sitemap[\\/]schema\.pi[\\/]/i.test(String(toolInput.file_path ?? ''))) {
+  const s = sql.replace(/--[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '')
+  const r9 = []
+  const xOk = (nm, t) => new RegExp(`^x_${t}_\\d{2}$`, 'i').test(nm)
+  for (const m of s.matchAll(/CREATE\s+(?:UNIQUE\s+)?INDEX\s+(?:CONCURRENTLY\s+)?(?:IF\s+NOT\s+EXISTS\s+)?(\w+)\s+ON\s+(?:ONLY\s+)?(?:\w+\.)?(\w+)/gi))
+    if (!xOk(m[1], m[2])) r9.push(`인덱스 '${m[1]}' (${m[2]}) — x_${m[2]}_NN 이어야 함`)
+  for (const m of s.matchAll(/CREATE\s+(?:UNIQUE\s+)?INDEX\s+(?:CONCURRENTLY\s+)?(?:IF\s+NOT\s+EXISTS\s+)?ON\b/gi)) r9.push(`이름 없는 인덱스(${m[0]}) — x_<테이블>_NN 이름 필수`)
+  for (const m of s.matchAll(/ALTER\s+TABLE\s+(?:ONLY\s+)?(?:IF\s+EXISTS\s+)?(?:\w+\.)?(\w+)\s+ADD\s+CONSTRAINT\s+(\w+)\s+(PRIMARY\s+KEY|UNIQUE)/gi))
+    if (/^PRIMARY/i.test(m[3]) ? m[2].toLowerCase() !== `pk_${m[1]}`.toLowerCase() : !xOk(m[2], m[1])) r9.push(`제약 '${m[2]}' (${m[1]}) — ${/^PRIMARY/i.test(m[3]) ? `pk_${m[1]}` : `x_${m[1]}_NN`} 이어야 함`)
+  for (const t of extractCreateTables(s)) {
+    for (const m of t.body.matchAll(/CONSTRAINT\s+(\w+)\s+(PRIMARY\s+KEY|UNIQUE)/gi))
+      if (/^PRIMARY/i.test(m[2]) ? m[1].toLowerCase() !== `pk_${t.name}`.toLowerCase() : !xOk(m[1], t.name)) r9.push(`제약 '${m[1]}' (${t.name}) — ${/^PRIMARY/i.test(m[2]) ? `pk_${t.name}` : `x_${t.name}_NN`} 이어야 함`)
+    const unnamed = t.body.replace(/CONSTRAINT\s+\w+\s+(PRIMARY\s+KEY|UNIQUE)/gi, '')
+    if (/PRIMARY\s+KEY/i.test(unnamed)) r9.push(`테이블 '${t.name}' 이름 없는 PRIMARY KEY(자동 _pkey) — CONSTRAINT pk_${t.name} PRIMARY KEY (…) 로`)
+    if (/\bUNIQUE\b/i.test(unnamed)) r9.push(`테이블 '${t.name}' 이름 없는 UNIQUE(자동 _key) — CONSTRAINT x_${t.name}_NN UNIQUE (…) 로`)
+  }
+  if (r9.length) {
+    process.stderr.write(`⛔ [da-ddl-guard] R9 PK·인덱스 이름 규칙 위반 ${r9.length}건 (DA-APPROVED 로 통과 불가):\n` + r9.map((x) => `  [R9] ${x}`).join('\n') + '\n규칙 : PK = pk_<테이블>, 인덱스·유일 제약 = x_<테이블>_NN (sitemap/schema.pi/docs/da/데이터표준규칙.md)\n')
+    process.exit(2)
+  }
+}
+
 // ---------- DA 승인 주석 → bypass ----------
 if (/^\s*--\s*DA-APPROVED\s*:/im.test(sql)) {
   process.exit(0)
