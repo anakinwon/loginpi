@@ -16,7 +16,8 @@ import { piFetch } from '@pi/auth/client'
 //  개체명 보기옵션(마스터 지시 2026-10-18, DA# 홈 › 옵션 › 개체명 보기옵션) : 논리 = 엔터티명(보조명·동의어)·속성명(보조명·동의어·도메인),
 //   물리 = 테이블명(엔터티명·보조명·동의어)·컬럼명(속성명·보조명·동의어·도메인). 보조명 = sql/035, 동의어 = 용어 이음동의어·엔터티는 구성 단어 SYN. 이 브라우저에 기억
 import '@xyflow/react/dist/style.css'
-import { Background, BaseEdge, Controls, EdgeLabelRenderer, getSmoothStepPath, Handle, MiniMap, Position, ReactFlow, ReactFlowProvider, SelectionMode, useNodesState, useReactFlow, useStoreApi, ViewportPortal, type Edge, type EdgeProps, type Node, type NodeProps } from '@xyflow/react'
+import { toPng, toSvg } from 'html-to-image'
+import { Background, BaseEdge, Controls, EdgeLabelRenderer, getNodesBounds, getSmoothStepPath, Handle, MiniMap, Position, ReactFlow, ReactFlowProvider, SelectionMode, useNodesState, useReactFlow, useStoreApi, ViewportPortal, type Edge, type EdgeProps, type Node, type NodeProps } from '@xyflow/react'
 import Link from 'next/link'
 import { use, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
@@ -241,7 +242,7 @@ const edgeTypes = { rel: RelEdge }
 
 // 관계 표식 정의(IE ie-* · 바커 bk-*) — pf = id 접두어(화면 '' / 인쇄 미리보기 'p')
 const markers = (pf: string) => (
-    <svg width="0" height="0" className="absolute" aria-hidden>
+    <svg width="0" height="0" className="absolute" aria-hidden data-erd-markers={pf || 'screen'}>
       <defs>
         {/* IE 표기 — 끝점(엔터티 쪽)에 그림, 시작 표식은 auto-start-reverse 로 뒤집힘 */}
         <marker id={`${pf}ie-one`} viewBox="0 0 20 20" refX="20" refY="10" markerWidth="20" markerHeight="20" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
@@ -720,6 +721,40 @@ function Erd({ areaId }: { areaId: string }) {
       c.querySelectorAll('.react-flow__viewport-portal, .react-flow__edgelabel-renderer').forEach((x) => x.remove())
       setShot(c.innerHTML.replace(/url\((['"]?)#(ie|bk)-/g, 'url($1#p$2-'))
     }, 120)
+  // 이미지 내보내기(PNG·SVG, PRD_PiErd S5 2026-10-20) — 엔터티 전체 영역을 100% 크기로, 화면 이동·확대와 무관. 인쇄 복사본처럼 손잡이·가이드(포털·라벨 층)는 뺌
+  //  관계 표식(marker) 정의는 캡처 영역 밖(별도 svg)에 있어 그대로면 그림에서 빠짐 → 캡처하는 동안만 복사본을 영역 안에 넣었다 뺌
+  const exportImg = async (kind: 'png' | 'svg') => {
+    const vp = canvasRef.current?.querySelector('.react-flow__viewport') as HTMLElement | null
+    if (!vp || !nodes.length) return
+    const b = getNodesBounds(nodes)
+    const pad = 40
+    const w = Math.ceil(b.width + pad * 2)
+    const h = Math.ceil(b.height + pad * 2)
+    const defs = document.querySelector('[data-erd-markers="screen"]')?.cloneNode(true) as Element | undefined
+    if (defs) vp.appendChild(defs)
+    setBusy(true)
+    try {
+      const opt = {
+        backgroundColor: '#ffffff',
+        width: w,
+        height: h,
+        pixelRatio: kind === 'png' ? 2 : 1,
+        style: { width: `${w}px`, height: `${h}px`, transform: `translate(${pad - b.x}px, ${pad - b.y}px) scale(1)` },
+        filter: (n: HTMLElement) => !n.classList?.contains('react-flow__viewport-portal') && !n.classList?.contains('react-flow__edgelabel-renderer'),
+      }
+      const url = kind === 'png' ? await toPng(vp, opt) : await toSvg(vp, opt)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${subjs.find((s) => s.subj_id === subj)?.subj_nm ?? '전체'}_${LVL_NM[lvl].replace(/\(.*\)/, '')}_ERD_${new Date(Date.now() + 9 * 3_600_000).toISOString().slice(0, 10)}.${kind}` // 날짜 = 한국 시간
+      a.click()
+      setMsg(`ERD 를 ${kind.toUpperCase()} 로 내려받았습니다(${w}×${h})`)
+    } catch (e) {
+      setMsg(`이미지 내보내기 실패 : ${(e as Error).message}`)
+    } finally {
+      defs?.remove()
+      setBusy(false)
+    }
+  }
   const openPrint = () => {
     setSel(null)
     setSelRel(null)
@@ -842,6 +877,12 @@ function Erd({ areaId }: { areaId: string }) {
           </label>
           <button type="button" className={btn} disabled={!nodes.length} onClick={openPrint} title="인쇄 미리보기 — 한 장에 맞춤 또는 가이드대로 나눠 인쇄(PDF 저장은 인쇄 창의 'PDF로 저장')">
             🖨 인쇄
+          </button>
+          <button type="button" className={btn} disabled={!nodes.length || busy} onClick={() => void exportImg('png')} title="ERD 전체를 PNG 이미지로 내려받기(100% 크기·2배 해상도, 손잡이·가이드 제외)">
+            PNG
+          </button>
+          <button type="button" className={btn} disabled={!nodes.length || busy} onClick={() => void exportImg('svg')} title="ERD 전체를 SVG 로 내려받기(확대해도 선명)">
+            SVG
           </button>
           {lay && (
             <button type="button" className="rounded bg-white px-3 py-1 font-semibold text-[#1f3a68] disabled:opacity-40" disabled={!dirty || busy || !nodes.length} onClick={() => void save()}>
