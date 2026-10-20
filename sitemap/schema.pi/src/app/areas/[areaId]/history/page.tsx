@@ -16,7 +16,7 @@ interface Log {
   reg_dtm: string
   sys_user: { pi_usr_nm: string } | null
 }
-const TGT_NM: Record<string, string> = { AREA: '분류체계', MBR: '멤버', DIC: '단어', DOM: '도메인', DOM_GRP: '도메인그룹', TERM: '용어', CD: '표준코드', CD_VAL: '코드값', ABBR: '약어', PRJ: '프로젝트', SUBJ: '주제영역', ENT: '엔터티', REL: '관계', ATTR: '속성' }
+const TGT_NM: Record<string, string> = { AREA: '분류체계', MBR: '멤버', DIC: '단어', DOM: '도메인', DOM_GRP: '도메인그룹', TERM: '용어', CD: '표준코드', CD_VAL: '코드값', ABBR: '약어', PRJ: '프로젝트', SUBJ: '주제영역', ENT: '엔터티', REL: '관계', ATTR: '속성', VER: '모델버전' }
 const ACT_NM: Record<string, string> = { INS: '등록', UPD: '수정', DEL: '삭제' }
 const NAME_KEYS = ['dic_log_nm', 'dom_nm', 'term_log_nm', 'area_nm', 'dom_grp_nm', 'abbr_log_nm', 'pi_usr_nm', 'prj_nm', 'subj_nm', 'ent_log_nm', 'rel_nm', 'cd_val_nm']
 const EMPTY = { tgt: '', act: '', usr: '', from: '', to: '' }

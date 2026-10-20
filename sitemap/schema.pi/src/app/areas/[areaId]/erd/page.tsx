@@ -29,6 +29,7 @@ import { type MbrRole, type Perm } from '@/lib/roles'
 import Attrs from '../model/attrs'
 import EntForm from '../model/ent-form'
 import Relations from '../model/relations'
+import { VersionPanel } from './versions'
 import { ENT_TP, entTpColor, type EntTp } from '@/lib/model-name'
 
 interface Attr {
@@ -80,8 +81,8 @@ type Nt = 'IE' | 'BK' // 표기법 : IE(ERwin 정보공학) / BK(바커, DA#)
 type EntData = { ent: Ent; lvl: Lvl; phy: boolean; fix: boolean; nt?: Nt; nmo?: Nmo }
 const NT_NM: Record<Nt, string> = { IE: 'IE 표기(ERwin)', BK: '바커 표기(DA#)' }
 const LEGEND: Record<Nt, string> = {
-  IE: '실선 = 식별 관계 · 점선 = 비식별 관계 · 까마귀발 = 여러 건 · ○ = 선택 · 🔑 주식별자 · ↗ 상속(FK) · * 필수',
-  BK: '바커 표기 : 선 반쪽 실선 = 반드시(필수) · 점선 = 선택 · 까마귀발 = 여러 건 · 가로 막대 = 식별 관계(UID) · # 식별자 · * 필수 · o 선택',
+  IE: '실선 = 식별 관계 · 점선 = 비식별 관계 · 까마귀발 = 여러 건 · ○ = 선택 · 🔑 주식별자(다홍) · ↗ 상속 FK(분홍) · * 필수',
+  BK: '바커 표기 : 선 반쪽 실선 = 반드시(필수) · 점선 = 선택 · 까마귀발 = 여러 건 · 가로 막대 = 식별 관계(UID) · # 식별자(다홍) · 상속 FK(분홍) · * 필수 · o 선택',
 }
 type ENode = Node<EntData, 'ent'>
 
@@ -139,6 +140,10 @@ const SIDES = [
   ['l', Position.Left],
 ] as const
 
+// 키 속성 글자색(마스터 지시 2026-10-20) : 주식별자 = 다홍색, FK(상속 속성) = 분홍색 — PK 이면서 FK(식별 관계 상속)는 주식별자 색. 기호·이름 칸만(옵션 칸은 회색 유지)
+const KEY_C = { pk: '#E34234', fk: '#E75480' }
+const keyColor = (a: Attr | undefined) => (a?.pk_yn === 'Y' ? KEY_C.pk : a?.fk_rel_id ? KEY_C.fk : undefined)
+
 function EntNode({ data, selected }: NodeProps<ENode>) {
   const { ent: e, lvl, phy, fix, nt = 'IE', nmo = NMO_DEF } = data
   const c = entTpColor(e.ent_tp_cd) // 유형별 자동 색(실체 노랑·기준 초록·행위 파랑·가공 없음)
@@ -161,7 +166,7 @@ function EntNode({ data, selected }: NodeProps<ENode>) {
         <table className="mx-2 my-1 font-mono leading-[18px]">
           <tbody>
             {cells(e, lvl, phy, nt, nmo).map((r, i) => (
-              <tr key={i} className={e.attrs[i]?.pk_yn === 'Y' ? 'font-semibold' : ''}>
+              <tr key={i} className={e.attrs[i]?.pk_yn === 'Y' ? 'font-semibold' : ''} style={{ color: keyColor(e.attrs[i]) }}>
                 {r.map((c, j) => (
                   <td key={j} className={`whitespace-nowrap ${j === 0 ? 'pr-1' : 'pr-3'} ${j > 1 ? 'font-normal text-gray-600' : ''}`}>
                     {c}
@@ -287,6 +292,7 @@ function Erd({ areaId }: { areaId: string }) {
   const [subjs, setSubjs] = useState<{ subj_id: string; subj_nm: string; prj_id: string }[]>([])
   const [subj, setSubj] = useState('')
   const [showRef, setShowRef] = useState(false) // 다른 주제영역 참조 엔터티 표시(기본 숨김)
+  const [verOpen, setVerOpen] = useState(false) // 모델 버전 패널(스냅샷·비교, ERD-4)
   const [phyId, setPhyId] = useState('') // 기준 물리 모델(빈 값 = 서버가 첫 모델)
   const [phyModels, setPhyModels] = useState<{ phy_mdl_id: string; dbms_cd: string }[] | null>(null) // null = 아직 모름
   const [hidden, setHidden] = useState(0)
@@ -884,6 +890,9 @@ function Erd({ areaId }: { areaId: string }) {
           <button type="button" className={btn} disabled={!nodes.length || busy} onClick={() => void exportImg('svg')} title="ERD 전체를 SVG 로 내려받기(확대해도 선명)">
             SVG
           </button>
+          <button type="button" className={btn} disabled={!prjId} onClick={() => setVerOpen(true)} title="프로젝트 논리 모델 스냅샷 저장·두 버전(또는 현재) 비교">
+            버전
+          </button>
           {lay && (
             <button type="button" className="rounded bg-white px-3 py-1 font-semibold text-[#1f3a68] disabled:opacity-40" disabled={!dirty || busy || !nodes.length} onClick={() => void save()}>
               배치 저장{dirty ? ' *' : ''}
@@ -1237,6 +1246,7 @@ function Erd({ areaId }: { areaId: string }) {
           </div>,
           document.body,
         )}
+      {verOpen && prjId && <VersionPanel api={api} prjId={prjId} editor={editor} onClose={() => setVerOpen(false)} />}
     </main>
   )
 }
