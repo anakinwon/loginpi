@@ -110,6 +110,7 @@ node scripts/promote-to-prod.mjs --yes   # 운영 승격 (master→production, f
 - **논리삭제**: `del_yn CHAR(1) DEFAULT 'N'` + `del_dtm TIMESTAMPTZ` — **물리 DELETE 절대 금지**
 - **FK(외래키) — 현재는 유지, 전환은 반드시 단계적으로**: 이 프로젝트는 PostgREST 임베디드 조인(`.select('*, mps_shop(...)')`·`msg_theme(...)` 등)을 광범위하게 쓰며, 이는 **DB의 FK 관계에 의존**한다. 따라서 **FK를 일괄 제거하면 `PGRST200`으로 목록 조회가 붕괴**한다(2026-07-01 사고: FK 62개 제거 → 카페·매장·상품 목록 장애 → `sql/156`으로 전량 복구).
   무FK(앱 레벨 참조 무결성 + 별도 조회·Map 병합)가 성능·유연성 면에서 **더 나은 선택일 수 있다** — 신기술이 과거 방식을 능가하는 경우는 충분히 있다. 다만 전환 시 **반드시 "① 해당 임베디드 조인을 별도 조회+Map으로 대체 → ② 그 뒤 FK 제거" 순서**를 지킨다. ⛔ 코드 대체 없이 FK만 먼저 지우지 말 것(이번 사고의 근본 원인). 특정 FK의 성능이 우려되면 개별·점진 전환으로 접근한다.
+- **PK·인덱스 이름 (정본 §5 v2.5, 2026-10-20 마스터 재정의)**: PK = `pk_<테이블>`(이름 없는 PRIMARY KEY 금지), 인덱스·유일 제약 = `x_<테이블>_NN` — 구 `_pkey`·`_key`·`idx_`·`ux_` 금지. schema.pi 는 소급 완료(`sitemap/schema.pi/sql/066`)·Hook R9 강제, **cafe.pi DB 소급은 [확인중 : 마스터]**(기존 cafe.pi 객체는 구 이름 유지 중). FK 이름은 PostgREST 임베디드 조인 힌트라 범위 밖
 - 복합어: REGR(등록자), MODR(변경자), PYMNT(결제), CTGR(카테고리)
 - 도메인 약어: `_id`(식별자), `_nm`(이름), `_cd`(코드), `_yn`(여부), `_dtm`(일시), `_dt`(날짜)
 - `sql/*.sql` 작성 시 `da-ddl-guard` Hook 자동 검사 → 위반 차단, DA 승인(`-- DA-APPROVED:` 주석) 필요

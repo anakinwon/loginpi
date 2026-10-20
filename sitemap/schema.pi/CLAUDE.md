@@ -60,6 +60,7 @@ corepack pnpm@11.4.0 db:seed [-- --dry-run]      # DA#_META/SQLiteDB_v5.db → D
 - 모든 변경은 `std_audit_log`에 변경 전후 값 기록
 - **시스템 컬럼은 항상 맨 뒤**(2026-10-15 마스터 지시) : 기존 테이블에 컬럼을 추가할 때도 `ADD COLUMN`만 쓰지 않고 `fn_add_cols_keep_sys(테이블, ADD 절)`(`sql/010`)로 시스템 컬럼 4개를 다시 맨 끝에 둔다(값 보존·mod_dtm 트리거 정지 후 복사)
 - 신규 테이블 : RLS 비활성 + anon·authenticated 권한 회수 + service_role 만 허용(`fn_grant_svc_only`), 시스템 컬럼 4개(`regr_id`·`reg_dtm`·`modr_id`·`mod_dtm`) 맨 끝, `mod_dtm` 트리거. DA 표준 규칙 요약은 메모리 `da-standard-core-rules`(원본 : loginpi `docs/da/references/` 01 정의서 §8.5)
+- **PK·인덱스 이름(2026-10-20 마스터 재정의, 예외 없음)** : PK = `CONSTRAINT pk_<테이블> PRIMARY KEY (…)`, 인덱스·유일 제약 = `x_<테이블>_NN`(테이블별 다음 번호, 용도는 `COMMENT ON INDEX`). `_pkey`·`_key`·`ux_`·`ix_`·`idx_`·이름 없는 PK/UNIQUE 금지 — Hook R9 가 DA-APPROVED 와 무관하게 차단. 기존 객체는 `sql/066` 으로 소급 완료. 유일 위반으로 오류 코드를 고르는 판정은 인덱스 이름 상수 `src/lib/api.ts UQ` 에서만(문자열 하드코딩 금지). ModelPi 생성 DDL 도 같은 규칙(Oracle·Tibero 대문자 `PK_`·`X_`)
 
 ## 검증·완료 기준
 

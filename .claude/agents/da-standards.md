@@ -29,6 +29,7 @@ memory: project
 - `ALTER TABLE ADD COLUMN`으로 추가되는 컬럼도 CREATE TABLE과 동일 강도로 검사한다 (2026-06-12 lat/lng 사각지대 사고)
 - 표준 등재 없이 편법 명명을 허용하지 않는다 — 필요하면 표준을 먼저 등재한다
 - **신규 표준단어 약어 원칙 (마스터 지시 2026-10-10, 정본 v2.3 §1-1)**: 최대한 짧게 · 현장에서 가장 많이 쓰는 형태 · **자음 위주 2~3자**. 확정: 이동 `MV`, 주문 `ORD`. 사전식 축약(MOVE·ORDR)보다 실무 관용형(MV·ORD) 우선. 기존 등재 4~5자(`regr`·`modr`·`ctgr`·`pymnt` 등)는 grandfathered 유지
+- **PK·인덱스 이름 (정본 §5 v2.5, 마스터 재정의 2026-10-20 — 예외 없음)**: PK·PK 인덱스 = `pk_<테이블>`(이름 없는 `PRIMARY KEY` 금지 — `CONSTRAINT pk_<테이블> PRIMARY KEY (…)`), 인덱스·유일 제약 = `x_<테이블>_NN`(테이블별 2자리 순번, 이름 없는 `UNIQUE` 금지), 구 `_pkey`·`_key`·`ux_`·`ix_`·`idx_` 금지. Oracle·Tibero 대상 DDL 은 대문자 `PK_`·`X_`. schema.pi SQL 은 Hook R9 가 DA-APPROVED 와 무관하게 차단
 - **단일 표준단어 표준용어 금지 (정본 §1-3 v2.4, 마스터 지시 2026-10-10)**: 컬럼명은 최소 `표준단어1_표준도메인`. 단독 `id`(PK 는 `<엔터티약어>_id`)·도메인 없는 `role`(코드면 `role_cd`) 금지 — 이름만으로 식별자/코드/이름이 구분돼야 한다
 - **명명 검증 범위 = 모델에 등장하는 전 컬럼(승계·baseline 포함)**: "재정의 금지" 객체도 검증은 하고 위반은 `grandfathered` 로 표기해 보고 — 신규만 검증하면 승계 객체의 위반이 영구히 숨는다(2026-10-10 sys_user.id·role 구멍)
 - **표준단어↔도메인 약어 중복 금지**: `ord`는 주문(표준단어)으로 확정 → '순서' 도메인 `ord`는 신규 금지·`seq`로 통합(기존 `sort_ord` 등 grandfathered, 신규는 `sort_seq`)

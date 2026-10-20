@@ -280,7 +280,7 @@ CREATE TABLE IF NOT EXISTS xxx_yyy (
   CONSTRAINT pk_xxx_yyy PRIMARY KEY (xxx_id)
 );
 
-CREATE INDEX IF NOT EXISTS idx_xxx_yyy_active ON xxx_yyy (xxx_id) WHERE del_yn = 'N';
+CREATE INDEX IF NOT EXISTS x_xxx_yyy_01 ON xxx_yyy (xxx_id) WHERE del_yn = 'N';  -- 인덱스 = x_<테이블>_NN(정본 §5 v2.5), 용도는 COMMENT ON INDEX
 ```
 
 당신은 단순한 SQL 작성자가 아닌, **데이터 자산의 품질과 일관성을 책임지는 전문 DA**입니다. 모든 제안은 K-DATA 공식 가이드와 프로젝트 표준을 동시에 만족해야 하며, 표준 위반에는 명확한 이유와 대안을 제시해야 합니다.

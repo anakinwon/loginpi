@@ -150,11 +150,11 @@ src/
 ```sql
 -- ① users 테이블
 CREATE TABLE IF NOT EXISTS users (
-  id                UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  pi_uid            TEXT        UNIQUE,
+  id                UUID        NOT NULL DEFAULT gen_random_uuid(),
+  pi_uid            TEXT,
   pi_username       TEXT,
   pi_wallet_address TEXT,
-  google_id         TEXT        UNIQUE,
+  google_id         TEXT,
   google_email      TEXT,
   google_name       TEXT,
   google_image      TEXT,
@@ -162,8 +162,11 @@ CREATE TABLE IF NOT EXISTS users (
   role              TEXT        NOT NULL DEFAULT 'USER'
                                 CHECK (role IN ('ADMIN', 'MASTER', 'MANAGER', 'USER')),
   created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at        TIMESTAMPTZ NOT NULL DEFAULT now()
+  updated_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+  CONSTRAINT pk_users PRIMARY KEY (id)                    -- PK = pk_<테이블>(docs/da 정본 §5 v2.5)
 );
+CREATE UNIQUE INDEX IF NOT EXISTS x_users_01 ON users(pi_uid);     -- 유일 = x_<테이블>_NN
+CREATE UNIQUE INDEX IF NOT EXISTS x_users_02 ON users(google_id);
 
 -- updated_at 자동 갱신 트리거
 CREATE OR REPLACE FUNCTION trg_set_updated_at()
@@ -177,17 +180,18 @@ CREATE OR REPLACE TRIGGER users_updated_at
 
 -- ② link_codes 테이블 (6자리 OTP 코드)
 CREATE TABLE IF NOT EXISTS link_codes (
-  id            UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  code          TEXT        NOT NULL UNIQUE,
+  id            UUID        NOT NULL DEFAULT gen_random_uuid(),
+  code          TEXT        NOT NULL,
   pi_user_id    UUID        NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   expires_at    TIMESTAMPTZ NOT NULL,
   used_at       TIMESTAMPTZ,
   attempt_count INT         NOT NULL DEFAULT 0,
-  created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+  CONSTRAINT pk_link_codes PRIMARY KEY (id)               -- PK = pk_<테이블>(docs/da 정본 §5 v2.5)
 );
 
-CREATE INDEX IF NOT EXISTS idx_link_codes_code       ON link_codes(code);
-CREATE INDEX IF NOT EXISTS idx_link_codes_expires_at ON link_codes(expires_at);
+CREATE UNIQUE INDEX IF NOT EXISTS x_link_codes_01 ON link_codes(code);        -- 인덱스·유일 = x_<테이블>_NN
+CREATE INDEX IF NOT EXISTS x_link_codes_02 ON link_codes(expires_at);
 
 -- ③ RLS 비활성화 (서버 전용 Service Role Key로만 접근)
 -- 또는 RLS 활성화 후 service_role만 허용:
