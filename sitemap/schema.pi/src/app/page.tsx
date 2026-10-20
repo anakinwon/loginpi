@@ -1,6 +1,7 @@
-// schema.pi 첫 화면 — 로그인 게이트 뒤에 내 분류체계 목록·선택, 새 분류체계 생성
-import AreaHome from './area-home'
+// schema.pi 첫 화면 — 로그인 전 : 소개·흐름·역할·요금제(Intro) + 로그인(LoginGate) / 로그인 후 : 마지막 선택 분류체계 대시보드(Dashboard, 2026-10-21)
+import Dashboard from './dashboard'
 import DevUserSwitch from './dev-user-switch'
+import Intro from './intro'
 import LoginGate, { AuthStatus } from './login-gate'
 
 export default function Home() {
@@ -14,9 +15,11 @@ export default function Home() {
         <AuthStatus />
       </div>
       <DevUserSwitch />
+      {/* 로그인 상자를 소개보다 위에 — 모바일(Pi Browser)에서 스크롤 없이 바로 로그인 */}
       <LoginGate>
-        <AreaHome />
+        <Dashboard />
       </LoginGate>
+      <Intro />
     </main>
   )
 }

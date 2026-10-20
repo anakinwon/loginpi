@@ -4,6 +4,7 @@ import { piFetch } from '@pi/auth/client'
 import Link from 'next/link'
 import { use, useCallback, useEffect, useState } from 'react'
 import { auditDiff } from '@/lib/audit-diff'
+import { ACT_NM, AUDIT_NM_KEYS, TGT_NM } from '@/lib/roles'
 
 interface Log {
   log_id: string
@@ -16,16 +17,13 @@ interface Log {
   reg_dtm: string
   sys_user: { pi_usr_nm: string } | null
 }
-const TGT_NM: Record<string, string> = { AREA: '분류체계', MBR: '멤버', DIC: '단어', DOM: '도메인', DOM_GRP: '도메인그룹', TERM: '용어', CD: '표준코드', CD_VAL: '코드값', ABBR: '약어', PRJ: '프로젝트', SUBJ: '주제영역', ENT: '엔터티', REL: '관계', ATTR: '속성', VER: '모델버전' }
-const ACT_NM: Record<string, string> = { INS: '등록', UPD: '수정', DEL: '삭제' }
-const NAME_KEYS = ['dic_log_nm', 'dom_nm', 'term_log_nm', 'area_nm', 'dom_grp_nm', 'abbr_log_nm', 'pi_usr_nm', 'prj_nm', 'subj_nm', 'ent_log_nm', 'rel_nm', 'cd_val_nm']
 const EMPTY = { tgt: '', act: '', usr: '', from: '', to: '' }
 
 // 대상 이름 — 변경 후(없으면 전) 값의 이름 항목
 const targetName = (l: Log) => {
   const r = { ...(l.bfr_val ?? {}), ...(l.aftr_val ?? {}) }
   const v = { ...r, ...(r.std_term as Record<string, unknown> | undefined) } // 표준코드 = 용어 임베드(std_term.term_log_nm)
-  const k = NAME_KEYS.find((n) => v[n])
+  const k = AUDIT_NM_KEYS.find((n) => v[n])
   return k ? String(v[k]) : l.tgt_id.slice(0, 8)
 }
 const show = (v: unknown) => (v === null || v === undefined ? '(없음)' : typeof v === 'object' ? JSON.stringify(v) : String(v))

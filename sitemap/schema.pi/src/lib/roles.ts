@@ -12,7 +12,7 @@ type BasePerm = (typeof BASE_PERMS)[number]
 //  VIEW = 멤버, STD_VIEW·MODEL_VIEW·SET_VIEW = 메뉴, STD_REQ·MODEL_EDIT = 신청 ∧ 메뉴, SQL_QUERY = 메뉴1,
 //  DDL_APPROVE = 승인, DB_CONN_ADMIN = 승인 ∧ 설정(접속 비밀번호 관리 — 설정만 가진 역할에는 주지 않음)
 //  설정 서브메뉴 : SET_VIEW = 설정·이력, BAN_VIEW = 금칙어 조회, BAN_EDIT = 금칙어 등록·삭제·일괄(금칙어 메뉴 ∧ 일괄등록), CHK_VIEW = 표준 점검·리버스, ADM_VIEW = 멤버·승인 메뉴, MBR_ADMIN = 멤버 관리(멤버 메뉴 ∧ 설정)
-export type Perm = BasePerm | 'VIEW' | 'STD_VIEW' | 'STD_REQ' | 'MODEL_VIEW' | 'MODEL_EDIT' | 'SET_VIEW' | 'BAN_VIEW' | 'BAN_EDIT' | 'CHK_VIEW' | 'ADM_VIEW' | 'MBR_ADMIN' | 'SQL_QUERY' | 'DDL_APPROVE' | 'DB_CONN_ADMIN'
+export type Perm = BasePerm | 'VIEW' | 'STD_VIEW' | 'STD_REQ' | 'MODEL_VIEW' | 'MODEL_EDIT' | 'SET_VIEW' | 'BAN_VIEW' | 'BAN_EDIT' | 'CHK_VIEW' | 'ADM_VIEW' | 'MBR_ADMIN' | 'SQL_QUERY' | 'DDL_APPROVE' | 'DB_CONN_ADMIN' | 'MON_VIEW' | 'MON_EDIT'
 
 export const ROLE_NM: Record<MbrRole, string> = {
   SYS: '시스템담당자',
@@ -82,6 +82,9 @@ export function effPerms(role: string | null | undefined, plan: string | null | 
   if (b.has('MENU_SQL')) out.push('SQL_QUERY')
   if (b.has('APPROVE')) out.push('DDL_APPROVE')
   if (both('APPROVE', 'SETTINGS')) out.push('DB_CONN_ADMIN')
+  // 모니터링(2026-10-21) : 보기 = SQL 편집기와 같은 기술 메뉴(요금제1~), URL 등록·삭제 = 그중 CRUD
+  if (b.has('MENU_SQL')) out.push('MON_VIEW')
+  if (both('MENU_SQL', 'CRUD')) out.push('MON_EDIT')
   return out
 }
 
@@ -97,3 +100,7 @@ export function canAssign(myRole: string | null | undefined, ...targets: (string
 export const STS_NM: Record<string, string> = { REQ: '승인대기', CNFM: '승인완료', RJCT: '반려', DSCD: '폐기' }
 export const APV_STS_NM: Record<string, string> = { REQ: '대기', APV: '승인', RJCT: '반려', CNCL: '취소' }
 export const ACT_NM: Record<string, string> = { INS: '등록', UPD: '수정', DEL: '삭제' }
+// 변경 이력 대상 이름(감사 std_audit_log.tgt_tp_cd) — 이력 화면·메인 대시보드 공용
+export const TGT_NM: Record<string, string> = { AREA: '분류체계', MBR: '멤버', DIC: '단어', DOM: '도메인', DOM_GRP: '도메인그룹', TERM: '용어', CD: '표준코드', CD_VAL: '코드값', ABBR: '약어', PRJ: '프로젝트', SUBJ: '주제영역', ENT: '엔터티', REL: '관계', ATTR: '속성', VER: '모델버전', PHY: '물리 모델', DDL: 'DDL 실행', RVS: '역설계', SQL: 'SQL', DBCN: 'DB 접속', AGT: '에이전트', MONURL: 'URL 모니터링' }
+// 이력 행의 대상 이름 칸(변경 후 → 전 값에서 처음 나오는 것) — 이력 화면·메인 대시보드 공용
+export const AUDIT_NM_KEYS = ['dic_log_nm', 'dom_nm', 'term_log_nm', 'area_nm', 'dom_grp_nm', 'abbr_log_nm', 'pi_usr_nm', 'prj_nm', 'subj_nm', 'ent_log_nm', 'rel_nm', 'cd_val_nm', 'cd_nm', 'ver_nm', 'tbl_nm', 'idx_nm', 'conn_nm', 'agt_nm', 'url_nm']

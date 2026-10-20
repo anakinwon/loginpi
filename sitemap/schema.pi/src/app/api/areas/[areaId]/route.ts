@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { db } from '@/lib/db'
 import { apiError, audit, dbError, parseBody, requireAreaRole } from '@/lib/api'
+import { rememberArea } from '@/lib/home'
 
 type Ctx = { params: Promise<{ areaId: string }> }
 const COLS = 'area_id, area_nm, area_desc, term_sep_txt, word_use_yn, term_use_yn, dom_use_yn, combi_use_yn, cd_use_yn, cd_dom_map_yn'
@@ -12,7 +13,7 @@ export async function GET(_req: Request, { params }: Ctx) {
   const { areaId } = await params
   const auth = await requireAreaRole(areaId, 'VIEW')
   if (auth instanceof NextResponse) return auth
-  const { data, error } = await db().from('std_area').select(COLS).eq('area_id', areaId).eq('del_yn', 'N').single()
+  const [{ data, error }] = await Promise.all([db().from('std_area').select(COLS).eq('area_id', areaId).eq('del_yn', 'N').single(), rememberArea(auth.user.usr_id, areaId)])
   if (error) return dbError(error)
   return NextResponse.json({ ok: true, role: auth.role, perms: auth.perms, plan: auth.plan, area: data })
 }
