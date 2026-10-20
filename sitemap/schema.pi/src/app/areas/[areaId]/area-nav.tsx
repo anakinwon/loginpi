@@ -19,6 +19,7 @@ import Link from 'next/link'
 import { useParams, usePathname, useSearchParams } from 'next/navigation'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import {
+  Activity,
   Binary,
   ChevronDown,
   ChevronUp,
@@ -111,8 +112,21 @@ const MODEL: Item[] = [
   },
 ]
 
-// SQL 편집기 — 물리 모델 서브에서 독립(마스터 지시 2026-10-18), 메뉴1 권한(SQL_QUERY)만
+// 기술 메뉴 묶음 = 모니터링 → SQL 편집기(마스터 지시 2026-10-21 위치 교환). SQL 편집기 — 물리 모델 서브에서 독립(2026-10-18), 메뉴1 권한(SQL_QUERY)만
 const SQLED: Item[] = [
+  // 모니터링(2026-10-21, WhaTap 4종 심플) — 기술 메뉴라 SQL 편집기 옆, 권한 MON_VIEW(요금제1~ SQL 메뉴 보유 역할)
+  {
+    seg: 'monitor',
+    nm: '모니터링',
+    icon: Activity,
+    perm: 'MON_VIEW',
+    subs: [
+      { seg: 'monitor', nm: '애플리케이션', tab: 'app' },
+      { seg: 'monitor', nm: '서버', tab: 'srv' },
+      { seg: 'monitor', nm: '데이터베이스', tab: 'db' },
+      { seg: 'monitor', nm: 'URL', tab: 'url' },
+    ],
+  },
   {
     seg: 'sql',
     nm: 'SQL 편집기',
@@ -151,7 +165,7 @@ const PLAN_ITEM: Item = { seg: 'plan', nm: '결제', icon: Wallet }
 const group =
   'flex shrink-0 gap-1 rounded-md border border-gray-300 bg-gray-50 p-0.5' // 메뉴 묶음 박스
 // ?tab= 이 없을 때 화면별 기본 탭
-const DEF_TAB: Record<string, string> = { model: 'prj', bulk: 'words' }
+const DEF_TAB: Record<string, string> = { model: 'prj', bulk: 'words', monitor: 'app' }
 // 색 = 회색 계열 네이비 1색(마스터 지시 2026-10-20 — 메뉴마다 다른 파스텔 3D 타일 폐기), 아이콘 = 가는 선 기하 기호(미래지향)
 //  평소 = 흰 바탕 + 가는 네이비 테두리 타일, 현재 메뉴 = 진한 네이비 타일 + 흰 아이콘, 서브 바 = 같은 계열 연한 바탕 · 현재 서브 탭 = 진한 네이비
 const NAVY = {
@@ -227,14 +241,18 @@ export default function AreaNav() {
     const place = () => {
       const nav = navRef.current,
         sub = subRef.current,
-        g = row?.querySelector('a[aria-current="page"]')?.closest('ul')
-      if (!nav || !sub || !g) return setSubX(null)
+        a = row?.querySelector('a[aria-current="page"]'),
+        g = a?.closest('ul')
+      if (!nav || !sub || !a || !g) return setSubX(null)
       const n = nav.getBoundingClientRect(),
         r = g.getBoundingClientRect()
+      // left = 묶음 왼쪽 / item = 현재 메뉴 왼쪽(모니터링 서브 바, 2026-10-21) / 그 외 = 묶음 오른쪽 끝
       const x =
-        g.dataset.subAlign === 'left'
-          ? r.left - n.left
-          : r.right - n.left - sub.offsetWidth
+        g.dataset.subAlign === 'item'
+          ? a.getBoundingClientRect().left - n.left
+          : g.dataset.subAlign === 'left'
+            ? r.left - n.left
+            : r.right - n.left - sub.offsetWidth
       setSubX(
         Math.round(Math.max(8, Math.min(x, n.width - sub.offsetWidth - 8))),
       )
@@ -339,7 +357,7 @@ export default function AreaNav() {
         <div ref={rowRef} className="w-full overflow-x-auto px-2 py-1.5">
           <div className="mx-auto flex w-max items-center gap-2 whitespace-nowrap">
             {visible(SQLED).length > 0 && (
-              <ul aria-label="SQL 편집기" className={group}>
+              <ul aria-label="모니터링·SQL 편집기" data-sub-align="item" className={group}>
                 {visible(SQLED).map(item)}
               </ul>
             )}

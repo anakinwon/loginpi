@@ -1,8 +1,10 @@
 // 로컬 에이전트 작업 가져가기(2026-10-18) — POST(Authorization: Bearer spa_…) : 접속 시험 요청(test) 또는 그 에이전트 접속의 승인된 DDL 요청 1건(job), 없으면 204
 // 사용자 세션이 아니라 에이전트 토큰으로만 인증(쿠키 무시). 응답에 비밀번호 없음 — 비밀번호는 에이전트 PC 환경변수
+// 본문 { m } = 호스트 지표(서버 모니터링, sql/068 mon_srv_hist) — 1.2.0 에이전트는 '{}' 라 기록 없음
 import { NextResponse } from 'next/server'
 import { apiError, audit, dbError } from '@/lib/api'
 import { agtByToken, claimJob } from '@/lib/model-agent'
+import { recordSrv } from '@/lib/mon-srv'
 
 const NO_STORE = { 'Cache-Control': 'no-store' }
 
@@ -13,6 +15,9 @@ export async function POST(req: Request) {
     // 1.2.0 미만 에이전트는 일반 인덱스 CREATE INDEX(2026-10-20, 1.1.0 = CREATE 직전 DROP)를 거부해 원인 모를 실패가 되므로 작업을 넘기지 않음
     const v = /schemapi-agent\/(\d+)\.(\d+)/.exec(req.headers.get('user-agent') ?? '')
     if (!v || Number(v[1]) * 1000 + Number(v[2]) < 1002) return apiError('AGT_OUTDATED', 426)
+    // 서버 모니터링(2026-10-21) : 에이전트 1.3.0 이상은 본문 { m: 호스트 지표 } 를 함께 보냄(1분 1행, 실패해도 작업 가져가기는 계속)
+    const pb = (await req.json().catch(() => null)) as { m?: unknown } | null
+    if (pb?.m) await recordSrv(g, pb.m)
     const r = await claimJob(g)
     if (!r) return new NextResponse(null, { status: 204, headers: NO_STORE })
     if ('test' in r) return NextResponse.json({ ok: true, test: r.test }, { headers: NO_STORE })
