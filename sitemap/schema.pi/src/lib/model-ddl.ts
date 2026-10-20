@@ -3,6 +3,7 @@
 // 식별자 검증(차단, fail-closed) : 테이블·칼럼 이름 = 영문 시작 영문·숫자·_ 와 DBMS 최대 길이, 데이터 타입 = 영문·숫자·공백, 예약어 — 직접 실행 전 SQL 삽입 차단
 import { createHash } from 'node:crypto'
 import { db } from './db'
+import { inChunks } from './paging'
 import { loadPhy, phyDdlInput } from './model-phy'
 import { genDdl } from './modelpi/ddl'
 import { splitStatements } from './modelpi/ddl-parse'
@@ -29,7 +30,7 @@ export async function ddlTargets(areaId: string, prjId: string, mdlId: string) {
   ])
   for (const x of [s, e, d]) if (x.error) throw x.error
   const dgms = d.data as { dgm_id: string; subj_id: string }[]
-  const de = dgms.length ? await db().from('mdl_dgm_ent').select('dgm_id, ent_id').in('dgm_id', dgms.map((x) => x.dgm_id)).eq('del_yn', 'N').limit(10000) : { data: [], error: null }
+  const de = await inChunks(dgms.map((x) => x.dgm_id), (p) => db().from('mdl_dgm_ent').select('dgm_id, ent_id').in('dgm_id', p).eq('del_yn', 'N').limit(10000))
   if (de.error) throw de.error
   const dgmSubj = new Map(dgms.map((x) => [x.dgm_id, x.subj_id]))
   const placed = new Set((de.data as { dgm_id: string; ent_id: string }[]).map((x) => `${dgmSubj.get(x.dgm_id)}|${x.ent_id}`)) // 주제영역|엔터티(자기 주제영역 ERD 만 인정)

@@ -8,7 +8,7 @@ import { buildDdl } from './model-ddl'
 import { getConn, move, type ReqRow } from './model-ddl-req'
 import { splitStatements } from './modelpi/ddl-parse'
 import { connFp } from './modelpi/seal'
-import { stmtAllowed } from './modelpi/sql-guard'
+import { deniedAt } from './modelpi/sql-guard'
 
 export type AgtRow = { agt_id: string; area_id: string; agt_nm: string; tkn_pfx: string; exp_dtm: string; lst_seen_dtm: string | null; ver_no: number }
 const AGT_COLS = 'agt_id, area_id, agt_nm, tkn_pfx, exp_dtm, lst_seen_dtm, ver_no'
@@ -71,7 +71,7 @@ export async function claimJob(g: AgtRow) {
   const c = await getConn(g.area_id, r.conn_id)
   const stmts = splitStatements(r.ddl_txt)
   const x = await buildDdl(g.area_id, r.prj_id, r.phy_mdl_id, r.tbl_ids)
-  const why = !c || c.agt_id !== g.agt_id || connFp(c) !== r.conn_fp ? 'DB_CONN_CHANGED' : sha(stmts.join(';\n')) !== r.ddl_hash || !x || x.hash !== r.ddl_hash ? 'DDL_CHANGED' : stmts.some((s) => !stmtAllowed(s)) ? 'DDL_STMT_DENIED' : null
+  const why = !c || c.agt_id !== g.agt_id || connFp(c) !== r.conn_fp ? 'DB_CONN_CHANGED' : sha(stmts.join(';\n')) !== r.ddl_hash || !x || x.hash !== r.ddl_hash ? 'DDL_CHANGED' : deniedAt(stmts) >= 0 ? 'DDL_STMT_DENIED' : null
   if (why) {
     await move(r, ['APV'], { req_sts_cd: 'FAIL', exec_end_dtm: new Date().toISOString(), modr_id: `AGT:${g.agt_id}` })
     return { skipped: r.req_id, why }

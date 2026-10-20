@@ -9,7 +9,7 @@ import { db } from './db'
 import { buildDdl } from './model-ddl'
 import { resolveTarget, runOracle, runPg, testConn, type StmtRes } from './db-exec'
 import { splitStatements } from './modelpi/ddl-parse'
-import { stmtAllowed } from './modelpi/sql-guard'
+import { deniedAt } from './modelpi/sql-guard'
 import { isDbms } from './modelpi/dbms'
 import { jndiOk, parseJdbcUrl, urlStorable } from './modelpi/jdbc-url'
 import { pemOk } from './modelpi/known-ca'
@@ -366,7 +366,7 @@ export async function runReq(areaId: string, prjId: string, reqId: string, uid: 
   if (hashStmts(stmts) !== q.ddl_hash) return fail('DDL_CHANGED', 409) // 저장본 변조 방어
   const x = await buildDdl(areaId, prjId, q.phy_mdl_id, q.tbl_ids)
   if (!x || x.hash !== q.ddl_hash) return fail('DDL_CHANGED', 409) // 승인 뒤 모델이 바뀜 — 새로 요청
-  const denied = stmts.findIndex((st) => !stmtAllowed(st))
+  const denied = deniedAt(stmts)
   if (denied >= 0) return fail('DDL_STMT_DENIED', 400, `${denied + 1}번째 문장`)
   const pwd = c.pwd_enc_txt ? openPwd(areaId, c.conn_id, c.pwd_enc_txt) : null
   if (pwd == null) return fail('DB_CONN_FAIL', 400, '저장된 비밀번호를 열 수 없습니다 — 비밀번호를 다시 입력하십시오')

@@ -9,6 +9,7 @@ import { lookup } from 'node:dns/promises'
 import { isIP } from 'node:net'
 import postgres from 'postgres'
 import { ipAllowed, portAllowed } from './modelpi/net-guard'
+import { dropTarget } from './modelpi/sql-guard'
 import { allowPrivate } from './secret'
 
 export type Rslt = 'OK' | 'ERR' | 'SKIP' | 'RBK'
@@ -102,6 +103,8 @@ export async function runPg(t: Target, pwd: string, stmts: string[], deadline: n
       await tx.unsafe(`SET LOCAL statement_timeout = ${STMT_MS}`)
       await tx.unsafe(`SET LOCAL lock_timeout = ${LOCK_MS}`)
       await tx.unsafe(`SET LOCAL idle_in_transaction_session_timeout = ${IDLE_TX_MS}`)
+      // search_path = 현재 스키마 하나로 고정(트랜잭션 한정) — 한정 없는 DROP 이 search_path 의 다른 스키마 같은 이름 테이블을 CASCADE 로 지우지 않게(CREATE 와 같은 스키마)
+      await tx.unsafe(`SELECT set_config('search_path', quote_ident(coalesce(current_schema(), 'public')), true)`)
       for (let i = 0; i < stmts.length; i++) {
         at = i
         if (deadline - Date.now() < STMT_MS + 5_000) throw Object.assign(new Error('실행 시간 예산 초과 — 다시 실행하십시오'), { code: 'EXEC_TIMEOUT' })
@@ -139,6 +142,11 @@ export async function runOracle(t: Target, pwd: string, stmts: string[], deadlin
         res[i] = { ...res[i], rslt: 'OK', ms: Date.now() - s0 }
       } catch (e) {
         const x = e as { code?: string; errorNum?: number; message?: string }
+        // CREATE 직전 DROP(IF EXISTS 미지원) 의 '테이블 없음'(ORA-00942) = 성공으로 기록 — 재시도에서 DROP 이 다시 돌아 앞서 만든 테이블을 지우지 않게 OK
+        if (x.errorNum === 942 && dropTarget(stmts[i])) {
+          res[i] = { ...res[i], rslt: 'OK', err_msg: '테이블 없음 — DROP 건너뜀', ms: Date.now() - s0 }
+          continue
+        }
         res[i] = { ...res[i], rslt: 'ERR', err_cd: String(x.code ?? x.errorNum ?? 'ERR').slice(0, 20), err_msg: maskErr(x.message, hide), ms: Date.now() - s0 }
         break
       }

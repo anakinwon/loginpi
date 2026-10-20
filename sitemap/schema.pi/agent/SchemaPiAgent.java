@@ -29,7 +29,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 public class SchemaPiAgent {
-  static final String VERSION = "1.0.0";
+  static final String VERSION = "1.1.0"; // 1.1.0 = CREATE 직전 DROP … CASCADE 허용(2026-10-20)
 
   // ── 문장 화이트리스트(src/lib/modelpi/sql-guard.ts 와 같은 규칙) ──
   static final String ID = "[A-Za-z][A-Za-z0-9_]*";
@@ -43,6 +43,27 @@ public class SchemaPiAgent {
     Pattern.compile("^CREATE\\s+SEQUENCE\\s+" + ID + "\\s+START\\s+WITH\\s+\\d{1,18}\\s+INCREMENT\\s+BY\\s+\\d{1,18}\\s+NOCACHE$", Pattern.CASE_INSENSITIVE),
   };
   static final Pattern CREATE_TABLE = Pattern.compile("^CREATE\\s+TABLE\\s+" + ID + "\\s*\\(([\\s\\S]*)\\)$", Pattern.CASE_INSENSITIVE);
+  // CREATE 직전 DROP(2026-10-20) — 스크립트에서 바로 다음 문장이 같은 테이블 CREATE TABLE 일 때만(deniedAt)
+  static final Pattern[] DROP = {
+    Pattern.compile("^DROP\\s+TABLE\\s+IF\\s+EXISTS\\s+(" + ID + ")\\s+CASCADE$", Pattern.CASE_INSENSITIVE),
+    Pattern.compile("^DROP\\s+TABLE\\s+(" + ID + ")\\s+CASCADE\\s+CONSTRAINTS$", Pattern.CASE_INSENSITIVE),
+  };
+  static final Pattern CREATE_NM = Pattern.compile("^CREATE\\s+TABLE\\s+(" + ID + ")\\s*\\(", Pattern.CASE_INSENSITIVE);
+  static String dropTarget(String stmt) {
+    for (Pattern p : DROP) { var m = p.matcher(stmt.trim()); if (m.matches()) return m.group(1).toUpperCase(); }
+    return null;
+  }
+  // 거부할 첫 문장 순번(0부터), 없으면 -1
+  static int deniedAt(List<String> stmts) {
+    for (int i = 0; i < stmts.size(); i++) {
+      if (!stmtAllowed(stmts.get(i))) return i;
+      String d = dropTarget(stmts.get(i));
+      if (d == null) continue;
+      var m = i + 1 < stmts.size() ? CREATE_NM.matcher(stmts.get(i + 1).trim()) : null;
+      if (m == null || !m.find() || !m.group(1).toUpperCase().equals(d)) return i;
+    }
+    return -1;
+  }
   static final Pattern BAD_WORD = Pattern.compile("\\b(SELECT|INSERT|UPDATE|DELETE|MERGE|DROP|TRUNCATE|GRANT|REVOKE|EXECUTE|EXEC|BEGIN|DECLARE|CALL|COPY|REFERENCES|FOREIGN|AS\\s+SELECT|INTO|FUNCTION|PROCEDURE|TRIGGER|LANGUAGE|DO)\\b", Pattern.CASE_INSENSITIVE);
 
   static boolean stmtAllowed(String stmt) {
@@ -51,6 +72,7 @@ public class SchemaPiAgent {
     long quotes = bare.chars().filter(c -> c == '\'').count();
     if (s.isEmpty() || quotes % 2 == 1 || Pattern.compile(";|--|/\\*|\\*/|\"|\\$|\\\\").matcher(bare).find()) return false;
     for (Pattern p : FIXED) if (p.matcher(s).matches()) return true;
+    if (dropTarget(s) != null) return true;
     var m = CREATE_TABLE.matcher(bare);
     if (!m.matches()) return false;
     String body = m.group(1);
@@ -219,7 +241,8 @@ public class SchemaPiAgent {
     log("작업 " + reqId + " 시도 " + tryNo + " · 문장 " + stmts.size() + "개");
     // 서버와 같은 대조 — 하나라도 어긋나면 실행하지 않고 실패 보고
     String bad = !sha256(String.join(";\n", stmts)).equals(job.get("sha256")) ? "HASH" : null;
-    for (int k = 0; bad == null && k < stmts.size(); k++) if (!stmtAllowed(stmts.get(k))) bad = "DENIED#" + (k + 1);
+    int den = bad == null ? deniedAt(stmts) : -1;
+    if (den >= 0) bad = "DENIED#" + (den + 1);
     if (bad != null) {
       rs.add(new Res(1, "ERR", "AGT_GUARD", "에이전트 검사 실패 : " + bad, null));
       for (int k = 2; k <= stmts.size(); k++) rs.add(new Res(k, "SKIP", null, null, null));
@@ -234,6 +257,8 @@ public class SchemaPiAgent {
       int at = -1;
       try (Statement st = cn.createStatement()) {
         st.setQueryTimeout(60);
+        // PostgreSQL : search_path 를 현재 스키마 하나로 고정(트랜잭션 한정) — 한정 없는 DROP 이 다른 스키마 같은 이름 테이블을 지우지 않게(서버 runPg 와 같음)
+        if (pg) st.execute("SELECT set_config('search_path', quote_ident(coalesce(current_schema(), 'public')), true)");
         for (int k = 0; k < stmts.size(); k++) {
           int seq = k + 1;
           if (done.contains(seq)) { rs.add(new Res(seq, "SKIP", null, "이전 시도에서 성공", null)); continue; }
@@ -243,6 +268,18 @@ public class SchemaPiAgent {
             st.execute(stmts.get(k));
             rs.add(new Res(seq, "OK", null, null, System.currentTimeMillis() - t0));
           } catch (SQLException e) {
+            // CREATE 직전 DROP 의 '테이블 없음'(Oracle ORA-00942, Tibero [확인중 : 오류코드 — 7071·메시지로 판정]) = 성공 기록(재시도에서 다시 DROP 되지 않게)
+            String em = String.valueOf(e.getMessage());
+            boolean tib = "0013".equals(dbms);
+            if (dropTarget(stmts.get(k)) != null && (tib ? Math.abs(e.getErrorCode()) == 7071 || em.matches("(?is).*(not (be )?found|does not exist|존재하지).*") : e.getErrorCode() == 942)) {
+              rs.add(new Res(seq, "OK", null, "테이블 없음 — DROP 건너뜀", System.currentTimeMillis() - t0));
+              continue;
+            }
+            // Tibero 자동 증가 시퀀스 : DROP TABLE 이 시퀀스는 지우지 않아 다시 실행하면 '이미 있음' — 기존 시퀀스 그대로 사용(OK 기록) [확인중 : 티베로 오류코드]
+            if (tib && stmts.get(k).trim().toUpperCase().startsWith("CREATE SEQUENCE") && em.matches("(?is).*(already|이미).*")) {
+              rs.add(new Res(seq, "OK", null, "시퀀스 이미 있음 — 기존 시퀀스 사용", System.currentTimeMillis() - t0));
+              continue;
+            }
             rs.add(new Res(seq, "ERR", e.getSQLState() != null ? e.getSQLState() : String.valueOf(e.getErrorCode()), mask(e.getMessage(), host, usr), System.currentTimeMillis() - t0));
             for (int r = k + 1; r < stmts.size(); r++) rs.add(new Res(r + 1, "SKIP", null, null, null));
             break;
@@ -307,6 +344,8 @@ public class SchemaPiAgent {
     int bad = 0, n = 0;
     for (Object s : (List<Object>) v.get("allow")) { n++; if (!stmtAllowed((String) s)) { bad++; System.out.println("허용이어야 함 : " + s); } }
     for (Object s : (List<Object>) v.get("deny")) { n++; if (stmtAllowed((String) s)) { bad++; System.out.println("거부여야 함 : " + s); } }
+    for (Object s : (List<Object>) v.get("script_ok")) { n++; List<String> l = new ArrayList<>(); for (Object o : (List<Object>) s) l.add((String) o); if (deniedAt(l) >= 0) { bad++; System.out.println("스크립트 허용이어야 함 : " + l); } }
+    for (Object s : (List<Object>) v.get("script_bad")) { n++; List<String> l = new ArrayList<>(); for (Object o : (List<Object>) s) l.add((String) o); if (deniedAt(l) < 0) { bad++; System.out.println("스크립트 거부여야 함 : " + l); } }
     String[][] urls = { { "jdbc:tibero:thin:@10.0.0.5:8629:tibero", "0013", "Y" }, { "jdbc:oracle:thin:@//ora:1521/SVC", "0001", "Y" }, { "jdbc:postgresql://h:5432/d?sslmode=require", "0014", "Y" },
       { "jdbc:postgresql://h/d?socketFactory=x", "0014", "N" }, { "jdbc:postgresql://h/d?password=x", "0014", "N" }, { "jdbc:tibero:thin:@h:8629:t", "0014", "N" }, { "jdbc:h2:mem:x", "0014", "N" } };
     for (String[] u : urls) { n++; if (urlOk(u[0], u[1]) != "Y".equals(u[2])) { bad++; System.out.println("URL 판정 다름 : " + u[0]); } }

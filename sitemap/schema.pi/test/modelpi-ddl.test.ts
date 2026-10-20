@@ -43,7 +43,7 @@ test('역할명 FK 칼럼 쌍 : 원천 속성 → 부모 PK 칼럼', () => {
 
 test('PostgreSQL DDL : 소문자·PK 인덱스 → PK·기본값·NOT NULL·코멘트 이스케이프·FK 없음', () => {
   const s = genDdl(build('0014', 'LOWER'), { prjNm: 'p', at: 'now' })
-  assert.match(s, /CREATE TABLE tb_cst_cust \(/)
+  assert.match(s, /^DROP TABLE IF EXISTS tb_cst_cust CASCADE;\nCREATE TABLE tb_cst_cust \(/m) // CREATE 직전 DROP … CASCADE(2026-10-20)
   assert.match(s, /cust_no\s+VARCHAR\(10\) NOT NULL/)
   assert.match(s, /lst_mddtm\s+TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,\n\s+lst_mdfr_id\s+VARCHAR\(50\) DEFAULT 'ADMIN' NOT NULL,\n\s+lst_rgdtm\s+TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,\n\s+lst_rgtr_id\s+VARCHAR\(50\) DEFAULT 'ADMIN' NOT NULL\n\);/) // 시스템 칼럼 4개 = 맨 끝
   assert.ok(s.includes("COMMENT ON COLUMN tb_cst_cust.lst_mdfr_id IS '최종수정자ID';"))
@@ -57,6 +57,7 @@ test('PostgreSQL DDL : 소문자·PK 인덱스 → PK·기본값·NOT NULL·코�
 
 test('Oracle DDL : 대문자·VARCHAR2 아님(매핑 그대로)·PK_ 인덱스 → PK USING INDEX·FK 없음', () => {
   const s = genDdl(build('0001', 'UPPER'), { prjNm: 'p', at: 'now' })
+  assert.match(s, /^DROP TABLE TB_CST_CUST CASCADE CONSTRAINTS;\nCREATE TABLE TB_CST_CUST \(/m)
   assert.match(s, /^CREATE UNIQUE INDEX PK_TB_CST_CUST ON TB_CST_CUST \(CUST_NO\);\nALTER TABLE TB_CST_CUST ADD CONSTRAINT PK_TB_CST_CUST PRIMARY KEY \(CUST_NO\) USING INDEX PK_TB_CST_CUST;$/m)
   assert.match(s, /LST_MDDTM\s+TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,\n\s+LST_MDFR_ID\s+VARCHAR2\(50\) DEFAULT 'ADMIN' NOT NULL,\n\s+LST_RGDTM\s+TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,\n\s+LST_RGTR_ID\s+VARCHAR2\(50\) DEFAULT 'ADMIN' NOT NULL\n\);/)
   assert.ok(!/FOREIGN KEY|REFERENCES/.test(s))
@@ -82,7 +83,7 @@ test('검증 결함 회귀 : 예약어 이름 이슈, FK 칼럼 쌍은 짝지은
 
 test('보안 : 프로젝트명 줄바꿈으로 주석 탈출 불가, 예약어 이름은 내려받기 시 경고', () => {
   const s = genDdl(build('0014', 'LOWER'), { prjNm: `p\nDROP TABLE x; --\r${String.fromCharCode(0x2028)}y`, at: 'now' })
-  assert.ok(!/^DROP TABLE/m.test(s))
+  assert.ok(!/^DROP TABLE x;/m.test(s))
   assert.ok(s.startsWith('-- p DROP TABLE x; -'))
   const d = build('0014', 'LOWER')
   d.tables[0] = { ...d.tables[0], tbl_nm: 'USER' }

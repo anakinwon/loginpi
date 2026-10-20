@@ -3,7 +3,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { ipAllowed, portAllowed } from '../src/lib/modelpi/net-guard.ts'
-import { stmtAllowed } from '../src/lib/modelpi/sql-guard.ts'
+import { deniedAt, stmtAllowed } from '../src/lib/modelpi/sql-guard.ts'
 import { genDdl } from '../src/lib/modelpi/ddl.ts'
 import { splitStatements } from '../src/lib/modelpi/ddl-parse.ts'
 
@@ -24,9 +24,11 @@ test('포트 : 1024~65535', () => {
 })
 
 test('실행 문장 화이트리스트 : 공용 벡터(에이전트와 같은 결과)', () => {
-  const v = JSON.parse(readFileSync(new URL('./fixtures/sql-guard.json', import.meta.url), 'utf8')) as { allow: string[]; deny: string[] }
+  const v = JSON.parse(readFileSync(new URL('./fixtures/sql-guard.json', import.meta.url), 'utf8')) as { allow: string[]; deny: string[]; script_ok: string[][]; script_bad: string[][] }
   for (const s of v.allow) assert.equal(stmtAllowed(s), true, `허용 기대 : ${s}`)
   for (const s of v.deny) assert.equal(stmtAllowed(s), false, `거부 기대 : ${s}`)
+  for (const s of v.script_ok) assert.equal(deniedAt(s), -1, `스크립트 허용 기대 : ${s.join(' / ')}`)
+  for (const s of v.script_bad) assert.ok(deniedAt(s) >= 0, `스크립트 거부 기대 : ${s.join(' / ')}`)
 })
 
 test('생성기 출력 문장은 전부 허용(PostgreSQL·Oracle·Tibero, 자동 증가 포함)', () => {
@@ -36,5 +38,7 @@ test('생성기 출력 문장은 전부 허용(PostgreSQL·Oracle·Tibero, 자�
     const st = splitStatements(sql)
     assert.ok(st.length >= 5)
     for (const s of st) assert.equal(stmtAllowed(s), true, `${dbms} : ${s}`)
+    assert.equal(deniedAt(st), -1, `${dbms} 스크립트(CREATE 직전 DROP)`)
+    assert.ok(st.some((s) => /^DROP TABLE/i.test(s)))
   }
 })
