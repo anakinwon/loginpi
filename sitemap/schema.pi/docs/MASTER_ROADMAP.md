@@ -49,6 +49,7 @@
 | DBMS 프로파일·타입 매핑(sql/024) | schema.pi 정본, dbms.pi 읽기 |
 | 인덱스·파티션 | 설계안 = schema.pi, 운영·효과 측정 = dbms.pi |
 | PiMig(5단계) | 매핑·규칙 = schema.pi, 실행·모니터 = dbms.pi |
+| 모니터링(앱·서버·DB·URL, 2026-10-21) | dbms.pi 영역이나 마스터 선택으로 **schema.pi 메뉴에 임시 배치**(`/areas/[id]/monitor`, sql/068) — dbms.pi 생성 시 이전 |
 | PiCDC·PipeLine(6단계) | dbms.pi |
 | PiAnal(7단계) | 분석 데이터셋 정의 = schema.pi, 레이크 저장·성능 = dbms.pi |
 
