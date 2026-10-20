@@ -66,8 +66,8 @@ interface Preview {
   col_cnt: number
   fk_cnt: number
 }
-type Diff = Record<'add_tbl' | 'del_tbl' | 'chg_tbl' | 'add_col' | 'del_col' | 'chg_col' | 'dom_chg', string[]>
-const DIFF_NM: Record<keyof Diff, string> = { add_tbl: '추가 테이블', del_tbl: '삭제 테이블', chg_tbl: '테이블명 변경', add_col: '추가 칼럼', del_col: '삭제 칼럼', chg_col: '변경 칼럼', dom_chg: '도메인 변경 영향' }
+type Diff = Record<'add_tbl' | 'del_tbl' | 'chg_tbl' | 'add_col' | 'del_col' | 'chg_col' | 'dom_chg' | 'seq_col', string[]>
+const DIFF_NM: Record<keyof Diff, string> = { add_tbl: '추가 테이블', del_tbl: '삭제 테이블', chg_tbl: '테이블명 변경', add_col: '추가 칼럼', del_col: '삭제 칼럼', chg_col: '변경 칼럼', dom_chg: '도메인 변경 영향', seq_col: '칼럼 순서 변경' }
 const DBMS = dbmsList()
 const dbmsNm = (cd: string) => DBMS.find((d) => d.cd === cd)?.nm ?? cd
 const tpOf = (c: Col) => (c.data_len != null ? `${c.phy_tp_nm}(${c.data_len}${c.data_scale != null ? `,${c.data_scale}` : ''})` : c.phy_tp_nm)

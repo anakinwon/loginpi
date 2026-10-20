@@ -39,7 +39,7 @@ test('변환 : PK 먼저·NOT NULL·타입 매핑(길이 사용 여부)·시스�
 test('이름 규칙 : PK·FK 한도(Oracle 30) 안으로 자름', () => {
   const long = 'TB_ABCDEFGHIJKLMNOPQRSTUV' // 25자
   assert.equal(pkName('0001', long), `PK_${long}`)
-  assert.equal(pkName('0014', 'TB_X'), 'TB_X_PKEY')
+  assert.equal(pkName('0014', 'TB_X'), 'PK_TB_X') // 전 DBMS PK_<테이블>, PostgreSQL 은 DDL 에서 소문자 pk_tb_x(마스터 재정의 2026-10-20)
   const f = fkName('0001', long, 3)
   assert.ok(f.length <= 30 && f.endsWith('_03') && f.startsWith('FK_TB_'))
 })

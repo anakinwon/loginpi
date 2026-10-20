@@ -83,8 +83,9 @@ export const SYS_COL_NMS = new Set(SYS_PG.map((x) => x[0]))
 // ponytail: 주요 예약어만 — 전체 목록(PG 키워드 표·Oracle V$RESERVED_WORDS)이 필요하면 DBMS 프로파일로
 export const RSV_WORDS = new Set('ACCESS ADD ALL ALTER AND ANY AS ASC AUDIT BETWEEN BY CASE CHECK CLUSTER COLUMN COMMENT CONSTRAINT CREATE CURRENT DATE DEFAULT DELETE DESC DISTINCT DROP ELSE END EXISTS FILE FOR FOREIGN FROM GRANT GROUP HAVING IN INDEX INSERT INTO IS LEVEL LIKE LIMIT LOCK MODE NOT NULL NUMBER OF OFFSET ON OR ORDER PRIMARY REFERENCES RESOURCE ROW ROWNUM ROWS SELECT SESSION SET SIZE START TABLE THEN TIMESTAMP TO TRIGGER UID UNION UNIQUE UPDATE USER VALUES VIEW WHEN WHERE WITH'.split(' '))
 
-// 이름 규칙(P4) : PK = PostgreSQL <테이블>_PKEY / Oracle·Tibero PK_<테이블>, FK = FK_<자식테이블>_NN, 인덱스 = X_<테이블>_NN — 한도 초과 시 테이블 부분을 자름
-export const pkName = (dbms: DbmsCd, tbl: string) => cut(dbms === '0014' ? `${tbl}_PKEY` : `PK_${tbl}`, DBMS_PRFL[dbms].identMax, dbms === '0014' ? '_PKEY' : '')
+// 이름 규칙(P4) : PK·PK 인덱스 = PK_<테이블>(전 DBMS 공통, 마스터 재정의 2026-10-20 — 구 PostgreSQL <테이블>_pkey 폐기, 대소문자는 DDL 시점 : PostgreSQL pk_<테이블>·Oracle·Tibero PK_<테이블>),
+//  FK = FK_<자식테이블>_NN, 인덱스 = X_<테이블>_NN — 한도 초과 시 테이블 부분을 자름
+export const pkName = (dbms: DbmsCd, tbl: string) => cut(`PK_${tbl}`, DBMS_PRFL[dbms].identMax)
 // PK 생성 순서(마스터 지시 2026-10-18) : 유일 인덱스(이름 = PK 제약명) 먼저 → 그 인덱스로 PK 제약
 //  PostgreSQL ADD CONSTRAINT … PRIMARY KEY USING INDEX / Oracle·Tibero ADD CONSTRAINT … PRIMARY KEY (칼럼) USING INDEX 인덱스(Tibero 지원 [확인중 : 티베로 기술지원])
 export function pkStmts(dbms: DbmsCd, tbl: string, cols: string[], nm: (s: string) => string): string[] {
@@ -176,9 +177,10 @@ export interface PhyDiff {
   del_col: string[]
   chg_col: string[]
   dom_chg: string[]
+  seq_col: string[] // 칼럼 순서가 논리 순서와 다른 테이블(동기화 때 논리 순서로 맞춤, 2026-10-20)
 }
 export function phyDiff(prev: PhyTbl[], next: PhyTbl[]): PhyDiff {
-  const d: PhyDiff = { add_tbl: [], del_tbl: [], chg_tbl: [], add_col: [], del_col: [], chg_col: [], dom_chg: [] }
+  const d: PhyDiff = { add_tbl: [], del_tbl: [], chg_tbl: [], add_col: [], del_col: [], chg_col: [], dom_chg: [], seq_col: [] }
   const pm = new Map(prev.map((t) => [t.ent_id, t]))
   const nm = new Map(next.map((t) => [t.ent_id, t]))
   for (const t of next) if (!pm.has(t.ent_id)) d.add_tbl.push(t.tbl_nm)
@@ -202,6 +204,9 @@ export function phyDiff(prev: PhyTbl[], next: PhyTbl[]): PhyDiff {
       }
     }
     for (const c of p.cols) if (!ncs.has(key(c))) d.del_col.push(`${p.tbl_nm}.${c.col_nm}`)
+    // 순서 : 양쪽에 있는 일반 칼럼끼리 상대 순서 비교(추가·삭제는 위 항목이 담당)
+    const seqOf = (cs: PhyCol[], has: Map<string, PhyCol>) => cs.filter((c) => c.sys_col_yn !== 'Y' && has.has(key(c))).sort((a, b) => a.col_seq - b.col_seq).map(key).join()
+    if (seqOf(p.cols, ncs) !== seqOf(n.cols, pc)) d.seq_col.push(n.tbl_nm)
   }
   return d
 }

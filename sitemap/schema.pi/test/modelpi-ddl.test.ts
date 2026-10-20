@@ -49,7 +49,7 @@ test('PostgreSQL DDL : 소문자·PK 인덱스 → PK·기본값·NOT NULL·코�
   assert.ok(s.includes("COMMENT ON COLUMN tb_cst_cust.lst_mdfr_id IS '최종수정자ID';"))
   assert.ok(!/del_yn|regr_id/.test(s)) // 삭제여부·구 시스템 칼럼 없음
   // PK : 유일 인덱스 먼저 → 그 인덱스로 PK 제약(마스터 지시 2026-10-18), CREATE TABLE 안에는 PK 제약 없음
-  assert.match(s, /^CREATE UNIQUE INDEX tb_cst_cust_pkey ON tb_cst_cust \(cust_no\);\nALTER TABLE tb_cst_cust ADD CONSTRAINT tb_cst_cust_pkey PRIMARY KEY USING INDEX tb_cst_cust_pkey;$/m)
+  assert.match(s, /^CREATE UNIQUE INDEX pk_tb_cst_cust ON tb_cst_cust \(cust_no\);\nALTER TABLE tb_cst_cust ADD CONSTRAINT pk_tb_cst_cust PRIMARY KEY USING INDEX pk_tb_cst_cust;$/m)
   assert.ok(!/^\s+CONSTRAINT/m.test(s))
   assert.ok(s.includes("COMMENT ON TABLE tb_cst_cust IS '고객''s 기본';"))
   assert.ok(!/FOREIGN KEY|REFERENCES/.test(s)) // FK 미생성(마스터 지시 2026-10-18)
@@ -116,7 +116,7 @@ test('선택 테이블만(only) : 선택한 테이블의 CREATE·PK 인덱스·P
   const d = build('0014', 'LOWER')
   const r = genDdl(d, { prjNm: 'p', at: 'now' }, { only: new Set(['r']) })
   assert.ok(r.includes('CREATE TABLE tb_cst_rmt (') && !r.includes('CREATE TABLE tb_cst_cust ('))
-  assert.ok(r.includes('CREATE UNIQUE INDEX tb_cst_rmt_pkey') && !r.includes('tb_cst_cust_pkey'))
+  assert.ok(r.includes('CREATE UNIQUE INDEX pk_tb_cst_rmt') && !r.includes('pk_tb_cst_cust'))
   assert.ok(!/FOREIGN KEY/.test(r))
   const both = genDdl(d, { prjNm: 'p', at: 'now' }, { only: new Set(['c', 'r']) })
   assert.equal(both, genDdl(d, { prjNm: 'p', at: 'now' }))
@@ -125,8 +125,8 @@ test('선택 테이블만(only) : 선택한 테이블의 CREATE·PK 인덱스·P
 test('PostgreSQL DDL 은 물리 모델이 대문자여도 무조건 소문자(테이블·칼럼·PK·인덱스), 다른 DBMS 는 모델 선택 그대로', () => {
   const s = genDdl(build('0014', 'UPPER'), { prjNm: 'P', at: 'now' })
   const objs = s.split('\n').filter((l) => !l.startsWith('--')).join('\n').replace(/'(?:[^']|'')*'/g, "''")
-  assert.ok(objs.includes('CREATE TABLE tb_cst_cust (') && objs.includes('cust_no') && objs.includes('CREATE UNIQUE INDEX tb_cst_cust_pkey ON tb_cst_cust (cust_no)'))
-  assert.ok(!/\b(TB_CST|CUST_NO|LST_MDDTM|_PKEY)\b/.test(objs)) // 대문자 오브젝트 이름 없음
+  assert.ok(objs.includes('CREATE TABLE tb_cst_cust (') && objs.includes('cust_no') && objs.includes('CREATE UNIQUE INDEX pk_tb_cst_cust ON tb_cst_cust (cust_no)'))
+  assert.ok(!/\b(TB_CST|CUST_NO|LST_MDDTM|PK_TB_CST_CUST)\b/.test(objs)) // 대문자 오브젝트 이름 없음
   assert.match(genDdl(build('0001', 'UPPER'), { prjNm: 'P', at: 'now' }), /CREATE TABLE TB_CST_CUST \(/)
   assert.match(genDdl(build('0001', 'LOWER'), { prjNm: 'P', at: 'now' }), /CREATE TABLE tb_cst_cust \(/)
 })
@@ -145,7 +145,7 @@ test('인덱스(sql/063) : PK 문장 뒤 CREATE [UNIQUE] INDEX — PostgreSQL �
     return d
   }
   const pg = genDdl(withIdx('0014'), { prjNm: 'p', at: 'now' })
-  assert.match(pg, /^ALTER TABLE tb_cst_rmt ADD CONSTRAINT tb_cst_rmt_pkey PRIMARY KEY USING INDEX tb_cst_rmt_pkey;\nCREATE INDEX x_tb_cst_rmt_01 ON tb_cst_rmt \(sndr_cust_no, rcvr_cust_no\);\nCREATE UNIQUE INDEX x_tb_cst_rmt_02 ON tb_cst_rmt \(rcvr_cust_no\);$/m)
+  assert.match(pg, /^ALTER TABLE tb_cst_rmt ADD CONSTRAINT pk_tb_cst_rmt PRIMARY KEY USING INDEX pk_tb_cst_rmt;\nCREATE INDEX x_tb_cst_rmt_01 ON tb_cst_rmt \(sndr_cust_no, rcvr_cust_no\);\nCREATE UNIQUE INDEX x_tb_cst_rmt_02 ON tb_cst_rmt \(rcvr_cust_no\);$/m)
   assert.match(pg, /^-- ⚠ 인덱스 X_TB_CST_RMT_03 : 삭제된 칼럼 참조로 생략$/m)
   assert.ok(!/INDEX x_tb_cst_rmt_03/.test(pg))
   const ora = genDdl(withIdx('0001'), { prjNm: 'p', at: 'now' })

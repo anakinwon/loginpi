@@ -1,7 +1,7 @@
 // 물리 diff 동기화·변경분 DDL(PRD_PiErd S5) 검사 — 실행 : pnpm test
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { toPhysical, type PhyEntIn, type TpMap } from '../src/lib/modelpi/phy.ts'
+import { phyDiff, toPhysical, type PhyEntIn, type TpMap } from '../src/lib/modelpi/phy.ts'
 import { alterDdl, planSync, type StoredTbl } from '../src/lib/modelpi/phy-sync.ts'
 
 const dom = (id: string, len: number, ver = 1) => ({ dom_id: id, ver_no: ver, lgc_tp_cd: '0003', data_len: len, data_scale: null })
@@ -38,15 +38,15 @@ test('추가·삭제·길이 변경·이름 변경·주키 변경·도메인 버
   const kinds = ops.map((o) => o.op)
   assert.ok(kinds.includes('REN_TBL') && kinds.includes('ADD_COL') && kinds.includes('DEL_COL') && kinds.includes('MOD_COL') && kinds.includes('PK'))
   const add = ops.find((o) => o.op === 'ADD_COL')!
-  assert.equal(add.op === 'ADD_COL' && add.col.col_seq, 3) // 기존 일반 칼럼 2개(CUST_NO·CUST_NM, OLD_CD 삭제) 뒤
-  assert.ok(!ops.some((o) => o.op === 'SEQ')) // OLD_CD 삭제로 빈 자리에 새 칼럼 — 시스템 칼럼 이동 불필요
-  assert.match(alterDdl(ops, { dbms: '0014', ltr: 'LOWER', prjNm: 'p', at: 'now' }), /DROP CONSTRAINT tb_cust_pkey;/) // 이름 변경 전 제약명
+  assert.equal(add.op === 'ADD_COL' && add.col.col_seq, 2) // 논리 순서 = PK 먼저(CUST_NO·GRD_CD) → 새 주키 칼럼은 2번째
+  assert.deepEqual(ops.filter((o) => o.op === 'SEQ').map((o) => o.op === 'SEQ' && [o.phy_col_id, o.col_seq]), [['c1', 3]]) // CUST_NM 2 → 3
+  assert.match(alterDdl(ops, { dbms: '0014', ltr: 'LOWER', prjNm: 'p', at: 'now' }), /DROP CONSTRAINT IF EXISTS pk_tb_cust;\nALTER TABLE tb_cust_m DROP CONSTRAINT IF EXISTS tb_cust_pkey; -- 구 규칙/) // 이름 변경 전 제약명 + 구 규칙(_pkey) 이름도
   const sql = alterDdl(ops, { dbms: '0014', ltr: 'LOWER', prjNm: 'p\n;DROP', at: 'now' })
   assert.match(sql, /^ALTER TABLE tb_cust RENAME TO tb_cust_m;$/m)
   assert.match(sql, /^ALTER TABLE tb_cust_m ADD COLUMN grd_cd VARCHAR\(2\) NOT NULL;$/m)
   assert.match(sql, /^-- ALTER TABLE tb_cust_m DROP COLUMN old_cd;$/m)
   assert.match(sql, /^ALTER TABLE tb_cust_m ALTER COLUMN cust_nm TYPE VARCHAR\(100\);$/m)
-  assert.match(sql, /^CREATE UNIQUE INDEX tb_cust_m_pkey ON tb_cust_m \(cust_no, grd_cd\);\nALTER TABLE tb_cust_m ADD CONSTRAINT tb_cust_m_pkey PRIMARY KEY USING INDEX tb_cust_m_pkey;$/m) // PK 인덱스 → PK
+  assert.match(sql, /^CREATE UNIQUE INDEX pk_tb_cust_m ON tb_cust_m \(cust_no, grd_cd\);\nALTER TABLE tb_cust_m ADD CONSTRAINT pk_tb_cust_m PRIMARY KEY USING INDEX pk_tb_cust_m;$/m) // PK 인덱스 → PK
   assert.ok(!/^;DROP/m.test(sql))
   const ora = alterDdl(ops, { dbms: '0001', ltr: 'UPPER', prjNm: 'p', at: 'now' })
   assert.match(ora, /ADD \(GRD_CD VARCHAR\(2\) NOT NULL\);/)
@@ -65,7 +65,20 @@ test('도메인 버전만 올라 모양이 같으면 스냅샷만(DDL 없음), �
   assert.match(alterDdl(ops, { dbms: '0014', ltr: 'LOWER', prjNm: 'p', at: 'now' }), /-- 변경 없음/)
 })
 
-test('새 칼럼은 일반 칼럼 끝 — 시스템 칼럼은 모델에 없어 순서 조정 없음', () => {
+test('칼럼 순서 = 논리 순서 : 중간에 끼운 새 칼럼은 그 자리, 뒤 칼럼은 밀림 / 물리에서 바꾼 순서도 논리 순서로 복원', () => {
+  const mid = { ...cust, attrs: [cust.attrs[0], { attr_id: 'a5', term_phy_nm: 'NEW_CD', pk_yn: 'N', pk_seq: null, esntl_yn: 'N', dom: dom('x', 3) }, cust.attrs[1], cust.attrs[2]] }
+  const ops = planSync(stored(), toPhysical([mid], [], tp, opt).tables)
+  const add = ops.find((o) => o.op === 'ADD_COL')
+  assert.equal(add?.op === 'ADD_COL' && add.col.col_seq, 2)
+  assert.deepEqual(ops.filter((o) => o.op === 'SEQ').map((o) => o.op === 'SEQ' && [o.phy_col_id, o.col_seq]), [['c1', 3], ['c2', 4]])
+  // 물리 화면에서 CUST_NM·OLD_CD 를 맞바꿔 저장한 상태 → 동기화하면 논리 순서(2·3)로
+  const swapped = stored().map((t) => ({ ...t, cols: t.cols.map((c) => (c.col_nm === 'CUST_NM' ? { ...c, col_seq: 3 } : c.col_nm === 'OLD_CD' ? { ...c, col_seq: 2 } : c)) }))
+  assert.deepEqual(planSync(swapped, toPhysical([cust], [], tp, opt).tables).map((o) => o.op === 'SEQ' && [o.phy_col_id, o.col_seq]), [['c1', 2], ['c2', 3]])
+  assert.deepEqual(phyDiff(swapped, toPhysical([cust], [], tp, opt).tables).seq_col, ['TB_CUST']) // 순서만 달라도 차이로 보임(동기화 버튼)
+  assert.deepEqual(phyDiff(stored(), toPhysical([cust], [], tp, opt).tables).seq_col, [])
+})
+
+test('새 칼럼이 논리 끝이면 일반 칼럼 끝 — 시스템 칼럼은 모델에 없어 순서 조정 없음', () => {
   const next = { ...cust, attrs: [...cust.attrs, { attr_id: 'a5', term_phy_nm: 'NEW_CD', pk_yn: 'N', pk_seq: null, esntl_yn: 'N', dom: dom('x', 3) }] }
   const ops = planSync(stored(), toPhysical([next], [], tp, opt).tables)
   const add = ops.find((o) => o.op === 'ADD_COL')
