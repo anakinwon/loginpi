@@ -8,7 +8,8 @@ const UUID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi
 export function normRoute(url: string): string | null {
   const p = url.replace(/^https?:\/\/[^/]+/i, '').split(/[?#]/)[0].replace(/\/+$/, '')
   if (!p.startsWith('/api/') || /\/mon(\/|$)/.test(p)) return null // 모니터링 자체(/api/mon/*·/api/areas/:id/mon/*)는 제외 — 화면 폴링이 앱 지표를 오염시키지 않게
-  return p.replace(UUID, ':id').replace(/\/\d+(?=\/|$)/g, '/:id').slice(0, 200)
+  const r = p.replace(UUID, ':id').replace(/\/\d+(?=\/|$)/g, '/:id')
+  return /^[\w\-/:.]{1,200}$/.test(r) ? r : null // 경로 문자만 허용(브라우저 보고값 = 신뢰 안 함, 임의 문자열 적재 방지)
 }
 
 export const minuteOf = (t: number) => new Date(Math.floor(t / 60000) * 60000).toISOString()

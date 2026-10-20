@@ -132,6 +132,7 @@ export function checkUrl(url: string): Promise<{ sts: number; ms: number; err: s
     }
     if (u.protocol !== 'http:' && u.protocol !== 'https:') return done({ sts: 0, ms: 0, err: 'http·https 만' })
     if (u.username || u.password) return done({ sts: 0, ms: 0, err: '주소에 계정 정보 금지' })
+    if (u.port && !['80', '443', '8080', '8443'].includes(u.port)) return done({ sts: 0, ms: 0, err: '포트는 80·443·8080·8443 만' }) // 공인 호스트 포트 스캔 방지
     // 호스트가 IP 숫자면 Node 가 lookup 을 건너뛰므로 여기서 직접 검사(127.0.0.1·[::1]·169.254.169.254 등 — 2026-10-21 시험에서 우회 확인 후 추가)
     const ipHost = u.hostname.replace(/^\[|\]$/g, '')
     if (isIP(ipHost) && !ipAllowed(ipHost)) return done({ sts: 0, ms: 0, err: '내부망 주소 차단' })

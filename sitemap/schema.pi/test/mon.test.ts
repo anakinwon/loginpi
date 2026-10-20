@@ -9,6 +9,7 @@ test('경로 정규화 : UUID·숫자 → :id, 질의 제거, API 외·모니터
   assert.equal(normRoute('/api/items/123/'), '/api/items/:id')
   assert.equal(normRoute('/areas/x/words'), null)
   assert.equal(normRoute('/api/mon/app'), null)
+  assert.equal(normRoute('/api/<script>alert(1)</script>'), null) // 경로 외 문자 거부
   assert.equal(normRoute('/api/areas/30722c7a-0b23-4b80-8893-7c4f29afee7f/mon/url?live=1'), null) // 모니터링 화면 폴링 제외
 })
 
