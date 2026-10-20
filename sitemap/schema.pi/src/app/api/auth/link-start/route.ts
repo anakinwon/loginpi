@@ -25,7 +25,7 @@ export const POST = withAuthGuard(async (req) => {
   if (voidErr) return dbError(voidErr)
 
   const expiresAt = new Date(Date.now() + CODE_TTL_MS).toISOString()
-  // 활성 UNIQUE(ux_sys_auth_lnk_cd_lnk_cd_actv) 충돌 시 재시도 3회
+  // 활성 UNIQUE(x_sys_auth_lnk_cd_01, 구 ux_sys_auth_lnk_cd_lnk_cd_actv) 충돌 시 재시도 3회
   for (let attempt = 0; attempt < 3; attempt++) {
     const code = sixDigits()
     const { error } = await db()

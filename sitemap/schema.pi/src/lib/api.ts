@@ -156,14 +156,26 @@ export const apiError = (code: ErrorCode, status: number) =>
   NextResponse.json({ ok: false, code, message: ERRORS[code] }, { status })
 
 // PostgreSQL 오류 → API 오류(23505 유일 위반은 호출자가 지정한 코드로)
+// 오류 코드 판정에 쓰는 유일 인덱스 이름(sql/066 명명 규칙 x_<테이블>_NN) — 이름을 바꾸면 여기만 고친다
+// ponytail: 두 번째 값 = sql/066 이전 구 이름(코드 먼저 배포 → 마이그레이션 적용 사이 호환), 066 이 운영에 적용된 뒤 정리 때 제거
+export const UQ = {
+  DIC_PHY: ['x_std_dic_03', 'ux_std_dic_area_phy_nm_actv'], // 단어 물리명(sql/014)
+  DIC_TBL_SFX: ['x_std_dic_05', 'ux_std_dic_area_tbl_sfx_actv'], // 테이블 접미어(sql/017)
+  TERM_PHY: ['x_std_term_02', 'ux_std_term_area_phy_nm_actv'], // 용어 물리명
+  APV_KEY_WAIT: ['x_std_apv_req_03', 'ux_std_apv_req_key_wait'], // 자연키 대상 처리 대기 요청(sql/061)
+  PHY_MDL_DBMS: ['x_mdl_phy_mdl_01', 'ux_mdl_phy_mdl_prj_dbms_actv'], // 프로젝트 × DBMS 물리 모델
+} as const
+// PostgreSQL 23505 메시지 = duplicate key value violates unique constraint "<인덱스명>"
+export const uqHit = (msg: string | undefined, names: readonly string[]) => names.some((n) => (msg ?? '').includes(`"${n}"`))
+
 // 유일 위반 메시지 → 오류 코드(sql/014 물리명 인덱스, sql/016 대체 표기 트리거)
 export function dupCodeOf(msg: string | undefined, fallback: ErrorCode): ErrorCode {
   const m = msg ?? ''
   if (/std_dic_alias/.test(m)) return 'WORD_IS_SYNONYM'
   if (/std_dic_rel_word/.test(m)) return 'ALIAS_IS_WORD'
   if (/std_dic_rel_dup/.test(m)) return 'ALIAS_DUP'
-  if (/tbl_sfx/.test(m)) return 'TBL_SFX_DUP'
-  return /phy_nm/.test(m) ? 'WORD_DUP_PHYSICAL' : fallback
+  if (uqHit(m, UQ.DIC_TBL_SFX)) return 'TBL_SFX_DUP'
+  return uqHit(m, [...UQ.DIC_PHY, ...UQ.TERM_PHY]) ? 'WORD_DUP_PHYSICAL' : fallback
 }
 
 export function dbError(e: { code?: string; message?: string }, dupCode?: ErrorCode) {

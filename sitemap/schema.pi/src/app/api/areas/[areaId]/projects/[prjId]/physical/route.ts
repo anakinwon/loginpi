@@ -7,7 +7,7 @@
 // GET ?dbms=&ent=a,b : 선택 엔터티 범위 미리보기(없으면 작성완료·미전환 엔터티 전체) / DELETE ?mdl=&ver_no= : 논리 삭제(재전환은 삭제 후 다시 전환)
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
-import { apiError, audit, dbError, errMsg, parseBody, requireAreaRole } from '@/lib/api'
+import { apiError, audit, dbError, errMsg, parseBody, requireAreaRole, UQ, uqHit } from '@/lib/api'
 import { db } from '@/lib/db'
 import { inChunks } from '@/lib/paging'
 import { kstDtm } from '@/lib/bulk'
@@ -183,7 +183,7 @@ export async function POST(req: Request, { params }: Ctx) {
     return NextResponse.json({ ok: true, item: { phy_mdl_id: r.phy_mdl_id }, created: r.created, tbl_cnt: r.tbl, fk_cnt: r.fk, fk_sync: fkSync }, { status: 201 })
   } catch (e) {
     const x = e as { code?: string; message?: string }
-    return dbError(x, /prj_dbms/.test(x.message ?? '') ? 'PHY_DUP' : 'INVALID_INPUT') // 프로젝트 × DBMS 중복만 PHY_DUP
+    return dbError(x, uqHit(x.message, UQ.PHY_MDL_DBMS) ? 'PHY_DUP' : 'INVALID_INPUT') // 프로젝트 × DBMS 중복만 PHY_DUP
   }
 }
 

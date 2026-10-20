@@ -59,7 +59,7 @@ export async function POST(req: Request, { params }: Ctx) {
     const cur = await current(areaId, prjId)
     if (!cur) return apiError('NOT_FOUND', 404)
     if (cur.capped) return apiError('VER_CAPPED', 400) // ponytail: 상한(엔터티 500·속성 5,000)을 넘는 모델은 일부만 담기므로 저장 거부 — 필요해지면 주제영역 단위 스냅샷으로
-    // 순번 = 삭제 포함 최대 + 1(동시 저장은 ux_mdl_ver_prj_seq 가 막음 → VERSION_CONFLICT, 다시 저장)
+    // 순번 = 삭제 포함 최대 + 1(동시 저장은 x_mdl_ver_01(유일 인덱스) 이 막음 → VERSION_CONFLICT, 다시 저장)
     const mx = await db().from('mdl_ver').select('ver_seq').eq('prj_id', prjId).order('ver_seq', { ascending: false }).limit(1).maybeSingle()
     if (mx.error) throw mx.error
     const seq = ((mx.data as { ver_seq: number } | null)?.ver_seq ?? 0) + 1

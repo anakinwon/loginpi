@@ -28,7 +28,7 @@ try {
       reg_dtm   TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,    -- 등록일시
       modr_id   TEXT        NOT NULL DEFAULT 'ADMIN',              -- 변경자ID
       mod_dtm   TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,    -- 변경일시
-      CONSTRAINT sys_mgrt_hist_pkey PRIMARY KEY (file_nm)
+      CONSTRAINT pk_sys_mgrt_hist PRIMARY KEY (file_nm) -- PK 이름 규칙 pk_<테이블>(sql/066)
     );
     ALTER TABLE sys_mgrt_hist DISABLE ROW LEVEL SECURITY;
     REVOKE ALL ON sys_mgrt_hist FROM PUBLIC;

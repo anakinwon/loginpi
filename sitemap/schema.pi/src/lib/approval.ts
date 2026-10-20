@@ -3,7 +3,7 @@
 // 표준코드 코드기본(CD, sql/061)은 대상키 = 코드ID 텍스트(tgt_key_txt)라 전용 DB 함수 fn_cd_apv·fn_cd_rjct·fn_cd_cncl 로 분기
 import { z } from 'zod'
 import { db } from './db'
-import { dupCodeOf, type ErrorCode } from './api'
+import { dupCodeOf, UQ, uqHit, type ErrorCode } from './api'
 import { STS_NM, type Perm } from './roles'
 import { domKeyWordError } from './domain'
 import { termDomError, wordsByIds } from './term'
@@ -23,7 +23,7 @@ export function mapErr(e: Err, tp?: ApvTp | 'CD'): ErrorCode {
   if (tp === 'CD' && e.code === 'P0003') return 'CD_IN_USE'
   if (tp === 'CD' && e.code === '22023') return 'INVALID_INPUT' // 반려사유 없음
   if (e.code === '23505') {
-    if (tp === 'CD') return /ux_std_apv_req_key_wait/.test(e.message ?? '') ? 'APV_WAIT_EXISTS' : 'CD_DUP_TERM'
+    if (tp === 'CD') return uqHit(e.message, UQ.APV_KEY_WAIT) ? 'APV_WAIT_EXISTS' : 'CD_DUP_TERM'
     return dupCodeOf(e.message, tp ? DUP[tp] : 'APV_WAIT_EXISTS')
   }
   throw e
