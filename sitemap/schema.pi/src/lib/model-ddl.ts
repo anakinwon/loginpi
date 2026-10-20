@@ -68,7 +68,12 @@ export async function buildDdl(areaId: string, prjId: string, mdlId: string, tbl
       if (idBad(c.col_nm)) blockers.push(`${t.tbl_nm}.${c.col_nm} : 칼럼 이름(영문·숫자·_ ${max}자 이내, 예약어 불가)`)
       if (!TP_RE.test(c.phy_tp_nm)) blockers.push(`${t.tbl_nm}.${c.col_nm} : 데이터 타입 ${c.phy_tp_nm}`)
     }
+    for (const x of t.indexes ?? []) if (idBad(x.idx_nm)) blockers.push(`${t.tbl_nm} 인덱스 ${x.idx_nm} : 영문·숫자·_ ${max}자 이내, 예약어 불가`)
+    // 생략되는 인덱스는 주석이 실행 전에 지워져 요청자가 모름 — 실행 전에 막아 물리 화면에서 정리하게(2026-10-20 검토 지적)
+    for (const x of t.indexes ?? []) if (x.invalid) blockers.push(`${t.tbl_nm} 인덱스 ${x.idx_nm} : ${x.why ?? '삭제된 칼럼 참조'} — 물리 모델 화면에서 삭제 후 다시 만드십시오`)
   }
+  const idxNm = x.d.tables.filter((t) => only.has(t.ent_id)).flatMap((t) => (t.indexes ?? []).map((i) => i.idx_nm))
+  for (const n of new Set(idxNm.filter((n, i) => idxNm.indexOf(n) !== i))) blockers.push(`인덱스 이름 ${n} 가 두 테이블에 있습니다 — 한쪽을 삭제 후 다시 만드십시오`)
   const ddl = only.size ? genDdl(x.d, { prjNm: x.prjNm, at: new Date().toISOString().slice(0, 16).replace('T', ' ') }, { only }) : ''
   const stmts = splitStatements(ddl)
   // 해시 = 실행 문장(주석 제외) 기준 — 생성 시각 주석이 달라도 같은 모델이면 같은 값

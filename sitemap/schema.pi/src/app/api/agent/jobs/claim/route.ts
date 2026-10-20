@@ -10,9 +10,9 @@ export async function POST(req: Request) {
   try {
     const g = await agtByToken(req.headers.get('authorization'))
     if (!g) return apiError('AGT_UNAUTH', 401)
-    // 1.1.0 미만 에이전트는 CREATE 직전 DROP(2026-10-20)을 거부해 원인 모를 실패가 되므로 작업을 넘기지 않음
+    // 1.2.0 미만 에이전트는 일반 인덱스 CREATE INDEX(2026-10-20, 1.1.0 = CREATE 직전 DROP)를 거부해 원인 모를 실패가 되므로 작업을 넘기지 않음
     const v = /schemapi-agent\/(\d+)\.(\d+)/.exec(req.headers.get('user-agent') ?? '')
-    if (!v || Number(v[1]) * 1000 + Number(v[2]) < 1001) return apiError('AGT_OUTDATED', 426)
+    if (!v || Number(v[1]) * 1000 + Number(v[2]) < 1002) return apiError('AGT_OUTDATED', 426)
     const r = await claimJob(g)
     if (!r) return new NextResponse(null, { status: 204, headers: NO_STORE })
     if ('test' in r) return NextResponse.json({ ok: true, test: r.test }, { headers: NO_STORE })

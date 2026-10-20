@@ -29,7 +29,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 public class SchemaPiAgent {
-  static final String VERSION = "1.1.0"; // 1.1.0 = CREATE 직전 DROP … CASCADE 허용(2026-10-20)
+  static final String VERSION = "1.2.0"; // 1.1.0 = CREATE 직전 DROP … CASCADE 허용, 1.2.0 = 일반 인덱스 CREATE INDEX 허용(2026-10-20)
 
   // ── 문장 화이트리스트(src/lib/modelpi/sql-guard.ts 와 같은 규칙) ──
   static final String ID = "[A-Za-z][A-Za-z0-9_]*";
@@ -39,6 +39,7 @@ public class SchemaPiAgent {
     Pattern.compile("^COMMENT\\s+ON\\s+TABLE\\s+" + ID + "\\s+IS\\s+" + STR + "$", Pattern.CASE_INSENSITIVE),
     Pattern.compile("^COMMENT\\s+ON\\s+COLUMN\\s+" + ID + "\\." + ID + "\\s+IS\\s+" + STR + "$", Pattern.CASE_INSENSITIVE),
     Pattern.compile("^CREATE\\s+UNIQUE\\s+INDEX\\s+" + ID + "\\s+ON\\s+" + ID + "\\s*\\(\\s*" + IDS + "\\s*\\)$", Pattern.CASE_INSENSITIVE),
+    Pattern.compile("^CREATE\\s+INDEX\\s+" + ID + "\\s+ON\\s+" + ID + "\\s*\\(\\s*" + IDS + "\\s*\\)$", Pattern.CASE_INSENSITIVE),
     Pattern.compile("^ALTER\\s+TABLE\\s+" + ID + "\\s+ADD\\s+CONSTRAINT\\s+" + ID + "\\s+PRIMARY\\s+KEY\\s+(?:\\(\\s*" + IDS + "\\s*\\)\\s+)?USING\\s+INDEX\\s+" + ID + "$", Pattern.CASE_INSENSITIVE),
     Pattern.compile("^CREATE\\s+SEQUENCE\\s+" + ID + "\\s+START\\s+WITH\\s+\\d{1,18}\\s+INCREMENT\\s+BY\\s+\\d{1,18}\\s+NOCACHE$", Pattern.CASE_INSENSITIVE),
   };

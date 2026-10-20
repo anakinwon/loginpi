@@ -6,6 +6,7 @@ import { piFetch } from '@pi/auth/client'
 //  엔터티 선택 전환(마스터 지시 2026-10-17) : 작성완료 엔터티만 골라 전환, 테이블 작성완료 → ERD
 //  주제영역 콤보(논리 화면과 선택 공유) : 테이블 목록·단계 패널을 선택한 주제영역 1개로 한정
 //  논리 변경 반영(S5) = 동기화(순서·NULL·기본값 편집 유지) + 변경분 DDL(ALTER) 내려받기. 삭제 후 재전환도 가능(편집값 사라짐)
+//  인덱스(S5, sql/063) : 테이블 상세 아래 목록·추가(칼럼을 고른 순서 = 인덱스 칼럼 순서)·삭제, 테이블 작성완료면 읽기 전용
 import Link from 'next/link'
 import { use, useCallback, useEffect, useMemo, useState } from 'react'
 import { DBMS_PRFL, dbmsList, type DbmsCd } from '@/lib/modelpi/dbms'
@@ -37,6 +38,17 @@ interface Tbl {
   auto_inc_yn?: string // 단일 PK 자동 증가(테이블별, sql/036)
   ver_no?: number
   cols: Col[]
+  indexes?: Idx[] // 일반·유일 인덱스(sql/063)
+}
+interface Idx {
+  phy_idx_id: string
+  idx_nm: string
+  unq_yn: string
+  col_ids: string[]
+  col_nms: string[]
+  ver_no: number
+  invalid: boolean // 삭제된 칼럼 참조·PK 와 같은 구성(DDL 생략)
+  why: string | null
 }
 interface Mdl {
   phy_mdl_id: string
@@ -202,6 +214,32 @@ export default function PhysicalPage({ params }: { params: Promise<{ areaId: str
     setBusy(false)
     if (!j.ok && j.code !== 'VERSION_CONFLICT') return setMsg(j.message) // 검증 실패는 편집값을 남겨 고칠 수 있게
     setMsg(j.ok ? `${tbl.tbl_nm} 칼럼 ${j.updated}개를 저장했습니다` : `${j.message}(최신 값을 다시 불러왔습니다)`)
+    await loadDet()
+  }
+  // 인덱스 추가 폼 — 고른 칼럼 순서 = 인덱스 칼럼 순서, 테이블이 바뀌면 초기화
+  const [idxCols, setIdxCols] = useState<string[]>([])
+  const [idxUnq, setIdxUnq] = useState(false)
+  useEffect(() => {
+    setIdxCols([])
+    setIdxUnq(false)
+  }, [tbl?.phy_tbl_id])
+  const addIdx = async () => {
+    if (!tbl || !det || !idxCols.length) return
+    setBusy(true)
+    const j = await (await piFetch(`${base}/idx`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phy_mdl_id: det.mdl.phy_mdl_id, phy_tbl_id: tbl.phy_tbl_id, col_ids: idxCols, unq_yn: idxUnq ? 'Y' : 'N' }) })).json()
+    setBusy(false)
+    setMsg(j.ok ? `인덱스 ${j.item.idx_nm} 를 추가했습니다` : j.message)
+    if (!j.ok) return
+    setIdxCols([])
+    setIdxUnq(false)
+    await loadDet()
+  }
+  const delIdx = async (x: Idx) => {
+    if (!window.confirm(`인덱스 ${x.idx_nm} 를 삭제할까요?`)) return
+    setBusy(true)
+    const j = await (await piFetch(`${base}/idx?idx=${x.phy_idx_id}&ver_no=${x.ver_no}`, { method: 'DELETE' })).json()
+    setBusy(false)
+    setMsg(j.ok ? `인덱스 ${x.idx_nm} 를 삭제했습니다` : j.message)
     await loadDet()
   }
   const diffN = det?.diff ? Object.values(det.diff).reduce((n, v) => n + v.length, 0) : 0
@@ -447,6 +485,56 @@ export default function PhysicalPage({ params }: { params: Promise<{ areaId: str
                   </table>
                 </div>
                 <p className="mt-1 text-xs text-gray-500">시스템 칼럼(최종수정일시·최종수정자ID·최종등록일시·최종등록자ID)은 모델에 두지 않고 DDL 내려받기 때만 테이블 맨 끝에 자동으로 붙습니다. 기본값은 숫자·작은따옴표 문자열·CURRENT_TIMESTAMP 같은 키워드만 허용합니다.</p>
+                <section className="mt-3 rounded border p-2 text-sm" aria-label={`${tbl.tbl_nm} 인덱스`}>
+                  <h3 className="font-semibold text-[#1f3a68]">인덱스</h3>
+                  {(tbl.indexes ?? []).length === 0 ? (
+                    <p className="mt-1 text-gray-500">PK 외 인덱스가 없습니다</p>
+                  ) : (
+                    <ul className="mt-1 space-y-1">
+                      {(tbl.indexes ?? []).map((x) => (
+                        <li key={x.phy_idx_id} className={`flex flex-wrap items-center gap-2 ${x.invalid ? 'text-red-700' : ''}`}>
+                          <span className="font-mono">{x.idx_nm}</span>
+                          {x.unq_yn === 'Y' && <span className="rounded bg-[#e9eff9] px-1 text-xs">유일</span>}
+                          <span className="font-mono text-xs">({x.col_nms.join(', ')})</span>
+                          {x.invalid && <span className="text-xs">⚠ {x.why ?? '삭제된 칼럼 참조'} — DDL 에서 생략, 삭제 후 다시 만드십시오</span>}
+                          {editor && tbl.phy_sts_cd !== 'CMPTN' && (
+                            <button type="button" className={`${btn} ml-auto text-red-700`} disabled={busy} onClick={() => void delIdx(x)}>
+                              삭제
+                            </button>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  {tbl.phy_sts_cd === 'CMPTN' ? (
+                    <p className="mt-2 text-xs text-gray-500">작성완료 테이블은 인덱스를 바꿀 수 없습니다(완료 취소 후 편집)</p>
+                  ) : (
+                    editor && (
+                      <div className="mt-2 border-t pt-2">
+                        <p className="text-xs text-gray-600">칼럼을 누른 순서가 인덱스 칼럼 순서입니다(최대 16개, 다시 누르면 빠짐). 이름은 IX_테이블명_번호로 자동 생성됩니다.</p>
+                        <div className="mt-1 flex flex-wrap gap-1">
+                          {rows.map((c) => {
+                            const i = idxCols.indexOf(c.phy_col_id)
+                            return (
+                              <button key={c.phy_col_id} type="button" aria-pressed={i >= 0} disabled={i < 0 && idxCols.length >= 16} onClick={() => setIdxCols((a) => (i >= 0 ? a.filter((id) => id !== c.phy_col_id) : [...a, c.phy_col_id]))} className={`rounded-full border px-2 py-0.5 font-mono text-xs disabled:opacity-40 ${i >= 0 ? 'border-[#1f3a68] bg-[#1f3a68] text-white' : 'hover:bg-gray-50'}`}>
+                                {i >= 0 && `${i + 1}. `}
+                                {c.col_nm}
+                              </button>
+                            )
+                          })}
+                        </div>
+                        <div className="mt-2 flex items-center gap-2">
+                          <label className="flex items-center gap-1">
+                            <input type="checkbox" checked={idxUnq} onChange={(e) => setIdxUnq(e.target.checked)} /> 유일(UNIQUE)
+                          </label>
+                          <button type="button" className={`${btn} bg-[#1f3a68] text-white`} disabled={!idxCols.length || busy} onClick={() => void addIdx()}>
+                            인덱스 추가
+                          </button>
+                        </div>
+                      </div>
+                    )
+                  )}
+                </section>
               </section>
             )}
           </div>

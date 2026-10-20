@@ -1,5 +1,5 @@
 // 실행 문장 허용 형태(순수, 2026-10-18) — 직접 실행 전 문장마다 화이트리스트 판정(fail-closed). 로컬 에이전트(Java)도 같은 벡터(test/fixtures/sql-guard.json)로 검사
-// 허용 : CREATE TABLE <ID> (…) / COMMENT ON TABLE <ID> IS '…' / COMMENT ON COLUMN <ID>.<ID> IS '…' / CREATE UNIQUE INDEX <ID> ON <ID> (<ID>,…)
+// 허용 : CREATE TABLE <ID> (…) / COMMENT ON TABLE <ID> IS '…' / COMMENT ON COLUMN <ID>.<ID> IS '…' / CREATE [UNIQUE] INDEX <ID> ON <ID> (<ID>,…)
 //  ALTER TABLE <ID> ADD CONSTRAINT <ID> PRIMARY KEY [(<ID>,…)] USING INDEX <ID> / CREATE SEQUENCE <ID> START WITH n INCREMENT BY n NOCACHE
 //  DROP TABLE IF EXISTS <ID> CASCADE / DROP TABLE <ID> CASCADE CONSTRAINTS — 스크립트에서 바로 다음 문장이 같은 테이블 CREATE TABLE 일 때만(deniedAt, 마스터 지시 2026-10-20 'CREATE 직전 DROP')
 // FK·그 밖의 DROP·DML·권한·블록·주석은 모두 거부(마스터 지시 : FK 미생성, PK = 인덱스 먼저)
@@ -10,6 +10,7 @@ const FIXED = [
   new RegExp(`^COMMENT\\s+ON\\s+TABLE\\s+${ID}\\s+IS\\s+${STR}$`, 'i'),
   new RegExp(`^COMMENT\\s+ON\\s+COLUMN\\s+${ID}\\.${ID}\\s+IS\\s+${STR}$`, 'i'),
   new RegExp(`^CREATE\\s+UNIQUE\\s+INDEX\\s+${ID}\\s+ON\\s+${ID}\\s*\\(\\s*${IDS}\\s*\\)$`, 'i'),
+  new RegExp(`^CREATE\\s+INDEX\\s+${ID}\\s+ON\\s+${ID}\\s*\\(\\s*${IDS}\\s*\\)$`, 'i'), // 일반 인덱스(sql/063, 에이전트 1.2.0)
   new RegExp(`^ALTER\\s+TABLE\\s+${ID}\\s+ADD\\s+CONSTRAINT\\s+${ID}\\s+PRIMARY\\s+KEY\\s+(?:\\(\\s*${IDS}\\s*\\)\\s+)?USING\\s+INDEX\\s+${ID}$`, 'i'),
   new RegExp(`^CREATE\\s+SEQUENCE\\s+${ID}\\s+START\\s+WITH\\s+\\d{1,18}\\s+INCREMENT\\s+BY\\s+\\d{1,18}\\s+NOCACHE$`, 'i'),
 ]

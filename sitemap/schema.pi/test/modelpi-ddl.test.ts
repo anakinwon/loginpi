@@ -2,7 +2,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { autoIncCol, fkPairs, genDdl, phyDocTables, type DdlIn, type DdlTbl } from '../src/lib/modelpi/ddl.ts'
-import { toPhysical, type TpMap } from '../src/lib/modelpi/phy.ts'
+import { idxName, toPhysical, type TpMap } from '../src/lib/modelpi/phy.ts'
 
 const dom = (id: string, len: number) => ({ dom_id: id, ver_no: 1, lgc_tp_cd: '0003', data_len: len, data_scale: null })
 const tp: TpMap[] = [{ lgc_tp_cd: '0003', phy_tp_nm: 'VARCHAR', len_use_yn: 'Y' }]
@@ -129,4 +129,34 @@ test('PostgreSQL DDL 은 물리 모델이 대문자여도 무조건 소문자(�
   assert.ok(!/\b(TB_CST|CUST_NO|LST_MDDTM|_PKEY)\b/.test(objs)) // 대문자 오브젝트 이름 없음
   assert.match(genDdl(build('0001', 'UPPER'), { prjNm: 'P', at: 'now' }), /CREATE TABLE TB_CST_CUST \(/)
   assert.match(genDdl(build('0001', 'LOWER'), { prjNm: 'P', at: 'now' }), /CREATE TABLE tb_cst_cust \(/)
+})
+
+test('인덱스(sql/063) : PK 문장 뒤 CREATE [UNIQUE] INDEX — PostgreSQL 소문자·Oracle 대문자, 삭제된 칼럼 참조는 생략 주석', () => {
+  const withIdx = (dbms: '0014' | '0001'): DdlIn => {
+    const d = build(dbms, 'UPPER')
+    d.tables[1] = {
+      ...d.tables[1],
+      indexes: [
+        { idx_nm: 'IX_TB_CST_RMT_01', unq_yn: 'N', col_nms: ['SNDR_CUST_NO', 'RCVR_CUST_NO'] },
+        { idx_nm: 'IX_TB_CST_RMT_02', unq_yn: 'Y', col_nms: ['RCVR_CUST_NO'] },
+        { idx_nm: 'IX_TB_CST_RMT_03', unq_yn: 'N', col_nms: ['(삭제된 칼럼)'], invalid: true },
+      ],
+    }
+    return d
+  }
+  const pg = genDdl(withIdx('0014'), { prjNm: 'p', at: 'now' })
+  assert.match(pg, /^ALTER TABLE tb_cst_rmt ADD CONSTRAINT tb_cst_rmt_pkey PRIMARY KEY USING INDEX tb_cst_rmt_pkey;\nCREATE INDEX ix_tb_cst_rmt_01 ON tb_cst_rmt \(sndr_cust_no, rcvr_cust_no\);\nCREATE UNIQUE INDEX ix_tb_cst_rmt_02 ON tb_cst_rmt \(rcvr_cust_no\);$/m)
+  assert.match(pg, /^-- ⚠ 인덱스 IX_TB_CST_RMT_03 : 삭제된 칼럼 참조로 생략$/m)
+  assert.ok(!/INDEX ix_tb_cst_rmt_03/.test(pg))
+  const ora = genDdl(withIdx('0001'), { prjNm: 'p', at: 'now' })
+  assert.match(ora, /^CREATE INDEX IX_TB_CST_RMT_01 ON TB_CST_RMT \(SNDR_CUST_NO, RCVR_CUST_NO\);\nCREATE UNIQUE INDEX IX_TB_CST_RMT_02 ON TB_CST_RMT \(RCVR_CUST_NO\);$/m)
+  assert.ok(ora.indexOf('ADD CONSTRAINT PK_TB_CST_RMT') < ora.indexOf('CREATE INDEX IX_TB_CST_RMT_01'))
+})
+
+test('인덱스 이름 IX_<테이블>_NN : DBMS 식별자 한도 넘으면 테이블 부분을 자름', () => {
+  assert.equal(idxName('0001', 'TB_CST_RMT', 1), 'IX_TB_CST_RMT_01')
+  const long = 'TB_' + 'A'.repeat(40)
+  assert.equal(idxName('0001', long, 12).length, 30)
+  assert.ok(idxName('0001', long, 12).endsWith('_12'))
+  assert.equal(idxName('0014', long, 1), `IX_${long}_01`) // PostgreSQL 63자 안
 })

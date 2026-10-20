@@ -48,7 +48,7 @@ export async function listPhy(areaId: string, prjId: string) {
   return r.data
 }
 
-// 저장된 물리 모델 1건 → PhyTbl[](diff·DDL 입력) + FK
+// 저장된 물리 모델 1건 → PhyTbl[](diff·DDL 입력) + 테이블별 인덱스 + FK
 export async function loadPhy(areaId: string, mdlId: string) {
   const mdl = await db().from('mdl_phy_mdl').select('phy_mdl_id, prj_id, dbms_cd, idntfr_ltr_cd, del_col_use_yn, ver_no').eq('area_id', areaId).eq('phy_mdl_id', mdlId).eq('del_yn', 'N').maybeSingle()
   if (mdl.error) throw mdl.error
@@ -79,7 +79,27 @@ export async function loadPhy(areaId: string, mdlId: string) {
   }
   const by = new Map<string, Col[]>()
   for (const y of cols) by.set(y.phy_tbl_id, [...(by.get(y.phy_tbl_id) ?? []), y])
-  const tables = tbls.map((x) => ({ ...x, cols: (by.get(x.phy_tbl_id) ?? []).sort((a, b) => a.col_seq - b.col_seq) }))
+  // 인덱스(sql/063) — 칼럼 이름은 그 테이블 활성 칼럼으로 해석, 삭제된 칼럼을 가리키거나 동기화로 PK 와 같은 구성이 되면 invalid(DDL 생략·화면 빨간 표시, why = 사유)
+  //  PK 와 같은 칼럼 목록의 인덱스는 Oracle·Tibero 에서 ORA-01408 로 실행이 실패하므로 생략(2026-10-20 검토 지적)
+  type IdxRow = { phy_idx_id: string; phy_tbl_id: string; idx_nm: string; unq_yn: 'Y' | 'N'; col_ids: string[]; idx_desc: string | null; ver_no: number }
+  const idxRows: IdxRow[] = []
+  for (let i = 0; i < tbls.length; i += TBL_CHUNK) {
+    const r = await db().from('mdl_phy_idx').select('phy_idx_id, phy_tbl_id, idx_nm, unq_yn, col_ids, idx_desc, ver_no').in('phy_tbl_id', tbls.slice(i, i + TBL_CHUNK).map((x) => x.phy_tbl_id)).eq('del_yn', 'N').order('idx_nm').limit(10000)
+    if (r.error) throw r.error
+    idxRows.push(...(r.data as IdxRow[]))
+  }
+  const colNm = new Map(cols.map((c) => [c.phy_col_id, c]))
+  const idxOf = (tblId: string) =>
+    idxRows
+      .filter((x) => x.phy_tbl_id === tblId)
+      .map(({ phy_tbl_id: _t, ...x }) => {
+        const cs = x.col_ids.map((id) => colNm.get(id))
+        const gone = cs.some((c) => !c || c.phy_tbl_id !== tblId)
+        const pk = (by.get(tblId) ?? []).filter((c) => c.pk_yn === 'Y').sort((a, b) => (a.pk_seq ?? 0) - (b.pk_seq ?? 0)).map((c) => c.phy_col_id).join(',')
+        const why = gone ? '삭제된 칼럼 참조' : pk && x.col_ids.join(',') === pk ? 'PK 와 같은 칼럼 구성' : null
+        return { ...x, col_nms: cs.map((c) => (c && c.phy_tbl_id === tblId ? c.col_nm : '(삭제된 칼럼)')), invalid: !!why, why }
+      })
+  const tables = tbls.map((x) => ({ ...x, cols: (by.get(x.phy_tbl_id) ?? []).sort((a, b) => a.col_seq - b.col_seq), indexes: idxOf(x.phy_tbl_id) }))
   return { mdl: mdl.data, tables, fks: f.data as { phy_fk_id: string; rel_id: string; fk_nm: string }[] }
 }
 
@@ -90,7 +110,7 @@ export async function phyDdlInput(areaId: string, prjId: string, p: NonNullable<
   const attrs = m.ents.flatMap((e) => e.attrs)
   const lbl = new Map(attrs.map((a) => [a.attr_id, a.term_log_nm]))
   const rel = new Map(m.rels.map((r) => [r.rel_id, r]))
-  const tables: DdlTbl[] = p.tables.map((t) => ({ ent_id: t.ent_id, tbl_nm: t.tbl_nm, tbl_desc: t.tbl_desc, auto_inc_yn: t.auto_inc_yn, cols: t.cols.map((c) => ({ ...c, col_desc: c.attr_id ? (lbl.get(c.attr_id) ?? null) : null })) }))
+  const tables: DdlTbl[] = p.tables.map((t) => ({ ent_id: t.ent_id, tbl_nm: t.tbl_nm, tbl_desc: t.tbl_desc, auto_inc_yn: t.auto_inc_yn, cols: t.cols.map((c) => ({ ...c, col_desc: c.attr_id ? (lbl.get(c.attr_id) ?? null) : null })), indexes: t.indexes.map((x) => ({ idx_nm: x.idx_nm, unq_yn: x.unq_yn, col_nms: x.col_nms, invalid: x.invalid, why: x.why })) }))
   return {
     prjNm: (m.prj as { prj_nm: string }).prj_nm,
     d: {
@@ -224,8 +244,10 @@ export async function syncPhy(areaId: string, mdlId: string, verNo: number, s: N
   const of = <K extends SyncOp['op']>(k: K) => s.ops.filter((o): o is Extract<SyncOp, { op: K }> => o.op === k)
   for (const o of of('DEL_COL')) await up('mdl_phy_col', del, 'phy_col_id', o.phy_col_id)
   for (const o of of('DEL_TBL')) {
-    const c = await db().from('mdl_phy_col').update(del).eq('phy_tbl_id', o.phy_tbl_id).eq('del_yn', 'N')
-    if (c.error) throw c.error
+    for (const tb of ['mdl_phy_col', 'mdl_phy_idx']) {
+      const c = await db().from(tb).update(del).eq('phy_tbl_id', o.phy_tbl_id).eq('del_yn', 'N')
+      if (c.error) throw c.error
+    }
     await up('mdl_phy_tbl', del, 'phy_tbl_id', o.phy_tbl_id)
   }
   // 이름 변경 2단계 : 임시 이름(대문자·고유) → 최종 이름 — 맞바꿈(A↔B)·연쇄(A→B→C)·같은 이름 새 칼럼에서도 고유 인덱스 충돌 없음
@@ -271,8 +293,10 @@ export async function delPhy(mdlId: string, uid: string) {
   if (t.error) throw t.error
   const ids = (t.data as { phy_tbl_id: string }[]).map((x) => x.phy_tbl_id)
   for (let i = 0; i < ids.length; i += TBL_CHUNK) {
-    const c = await db().from('mdl_phy_col').update(del).in('phy_tbl_id', ids.slice(i, i + TBL_CHUNK)).eq('del_yn', 'N')
-    if (c.error) throw c.error
+    for (const tb of ['mdl_phy_col', 'mdl_phy_idx']) {
+      const c = await db().from(tb).update(del).in('phy_tbl_id', ids.slice(i, i + TBL_CHUNK)).eq('del_yn', 'N')
+      if (c.error) throw c.error
+    }
   }
   for (const tb of ['mdl_phy_tbl', 'mdl_phy_fk']) {
     const r = await db().from(tb).update(del).eq('phy_mdl_id', mdlId).eq('del_yn', 'N')
