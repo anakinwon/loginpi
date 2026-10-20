@@ -1,8 +1,9 @@
 'use client'
 // SQL 편집기 화면(마스터 지시 2026-10-18 "Universal SQL Editor" — DBeaver 26.0.5 화면 구성 참고)
 //  위 툴바 : 접속(서버 직접만)·활성 스키마·실행(Ctrl+Enter 현재 문장 / Alt+X 스크립트)·행 제한·한 트랜잭션(DA)·권한 표시
-//  왼쪽 탐색기(스키마 › 종류 › 객체·크기 › 칼럼, 펼칠 때만 조회, 두 번 누르기 = SELECT 실행) / 가운데 편집기(CodeMirror) / 아래 결과·실행 이력
-//  쓰기(DML·DDL)는 CRUD 권한(역할 ∩ 요금제) 즉시(Auto 커밋), 위험 문장은 확인 후, 서버가 문장을 다시 판정. 편집 내용은 접속별로 이 브라우저에 초안 저장
+//  왼쪽 탐색기(스키마 › 종류 › 객체·크기 › 칼럼, 펼칠 때만 조회, 테이블·뷰 두 번 누르기 = 객체 탭(sql-obj.tsx — Properties·Data·관계도, 2026-10-20)) / 가운데 편집기(CodeMirror) / 아래 결과·실행 이력
+//  쓰기(DML·DDL)는 CRUD 권한(역할 ∩ 요금제) 즉시(Auto 커밋), 위험 문장은 확인 후, 서버가 문장을 다시 판정
+//  편집 내용 = 계정별 SQL 탭(요금제 상한 3·5·8·10, 서버 저장 — sql-tabs.tsx, 2026-10-20). 예전 접속별 브라우저 초안은 첫 탭으로 1회 이관
 //  실행 방식 AUTO | MANUAL(DA) — MANUAL = 미리 실행(대기 문장 재실행 후 항상 되돌림) + [Commit] 대기 문장 한 트랜잭션 재실행·커밋 / [Rollback] 대기 목록 비움(서버리스라 요청 사이 트랜잭션 유지 불가, 마스터 결정 2026-10-18)
 //  화면 떠나기(마스터 강조 2026-10-18 '테이블락 방지') : 대기 문장이 있으면 메뉴·링크·뒤로 가기·접속/방식 바꾸기 모두 [Commit 후 / Rollback 후 / 취소] 확인 창
 //   강제 종료(탭·브라우저 닫기·오류) = 대기 문장은 이 화면 메모리에만 있어 그대로 버려짐(Rollback, DB 변화 없음) — 브라우저 기본 경고도 띄움.
@@ -20,6 +21,19 @@ import { DANGER_NM, quoteIdent, splitSql, stmtAt, type Danger } from '@/lib/mode
 import { applyBinds, bindNames } from '@/lib/modelpi/sql-bind'
 import ResultPanel, { type RunMode, type RunRes } from './result-grid'
 import type { EdHandle } from './sql-editor'
+import ObjEditor from './sql-obj'
+import { useSqlTabs } from './sql-tabs'
+
+// 객체 탭(테이블 객체 편집기, 2026-10-20) — 키 = 접속|스키마|이름, 서버 저장 안 함·요금제 상한에 안 셈, 이 브라우저에 목록만 기억
+interface ObjTab {
+  key: string
+  conn: string
+  schema: string
+  rel: string
+  kind: string
+}
+const OBJ_MAX = 20
+const OBJ_ICON: Record<string, string> = { r: '▦', p: '▦', v: '👁', m: '◧', f: '⇄' }
 
 const SqlEditor = dynamic(() => import('./sql-editor'), { ssr: false, loading: () => <p className="p-2 text-sm text-gray-500">편집기 불러오는 중…</p> })
 
@@ -35,6 +49,7 @@ interface Obj {
   kind: string
   size: string | null
   cmt: string | null
+  tbl?: string | null // 인덱스의 대상 테이블
 }
 interface ColM {
   name: string
@@ -55,13 +70,17 @@ interface Hist {
   err_cd: string | null
   reg_dtm: string
 }
+// 탐색기 스키마 폴더 = DBeaver 순서(2026-10-20) — 비어 있어도 (0) 으로 표시(이름 필터 중에는 빈 폴더 숨김)
 const KIND: [string, string][] = [
   ['rp', '테이블'],
-  ['v', '뷰'],
-  ['m', '구체화 뷰'],
   ['f', '외부 테이블'],
-  ['S', '시퀀스'],
+  ['v', '뷰'],
+  ['m', '물리 뷰'],
+  ['i', '인덱스'],
   ['F', '함수'],
+  ['S', '시퀀스'],
+  ['T', '데이터 타입'],
+  ['A', '집계 함수'],
 ]
 const DBMS_NM: Record<string, string> = { '0014': 'PostgreSQL', '0001': 'Oracle' }
 const SIZES = [200, 500, 1000, 5000] as const // 패치 크기
@@ -135,6 +154,38 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
   const [pane, setPane] = useState<Pane>({ l: PANE.l.def, e: PANE.e.def })
   const [pick, setPick] = useState('') // 탐색기에서 고른 이름(복사 대상)
   const [treeOpen, setTreeOpen] = useState(false) // 좁은 화면 탐색기 서랍
+  const tabs = useSqlTabs(api, setMsg, setDenied)
+  const [objTabs, setObjTabs] = useState<ObjTab[]>([])
+  const [objCurS, setObjCur] = useState('') // '' = SQL 탭이 활성
+  const objCur = objTabs.some((t) => t.key === objCurS) ? objCurS : '' // 없는 탭을 가리키면 SQL 쪽
+  const objKey = `sql-obj-tabs-${areaId}`
+  const [objReady, setObjReady] = useState(false) // 복원 뒤에만 기억(복원 전 빈 목록으로 덮어쓰지 않게)
+  useEffect(() => {
+    try {
+      const v = JSON.parse(store.get(objKey) ?? 'null') as { tabs?: ObjTab[]; cur?: string } | null
+      const list = Array.isArray(v?.tabs) ? v.tabs.filter((t) => t && typeof t.key === 'string' && typeof t.rel === 'string').slice(-OBJ_MAX) : []
+      setObjTabs(list)
+      setObjCur(v?.cur ?? '')
+    } catch {}
+    setObjReady(true)
+  }, [objKey])
+  useEffect(() => {
+    if (objReady) store.set(objKey, JSON.stringify({ tabs: objTabs, cur: objCur }))
+  }, [objKey, objReady, objTabs, objCur])
+  // 객체 탭 열기 — 이미 열려 있으면 그 탭으로, 20개를 넘으면 가장 오래된 객체 탭 닫음. SQL 탭에서 떠날 때 지금 탭 저장
+  const openObj = (s: string, rel: string, kind = 'r', cid = connId) => {
+    if (!cid) return
+    const key = `${cid}|${s}|${rel}`
+    if (!objCur) void tabs.saveTab(tabs.cur)
+    setObjTabs((l) => (l.some((t) => t.key === key) ? l : [...l, { key, conn: cid, schema: s, rel, kind }].slice(-OBJ_MAX)))
+    setObjCur(key)
+  }
+  const closeObj = (key: string) => {
+    const i = objTabs.findIndex((t) => t.key === key), rest = objTabs.filter((t) => t.key !== key)
+    setObjTabs(rest)
+    if (objCur === key) setObjCur(rest[Math.min(i, rest.length - 1)]?.key ?? '')
+  }
+  const dialectOf = (cid: string) => (conns.find((c) => c.conn_id === cid)?.dbms_cd === '0001' ? 'ORA' : 'PG')
   useEffect(() => {
     if (!treeOpen) return
     const h = (e: KeyboardEvent) => e.key === 'Escape' && setTreeOpen(false)
@@ -243,7 +294,7 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
   }, [])
   const conn = conns.find((c) => c.conn_id === connId)
   const dialect = conn?.dbms_cd === '0001' ? 'ORA' : 'PG'
-  const draftKey = `sql-draft-${areaId}-${connId}`
+  const draftKey = `sql-draft-${areaId}-${connId}` // 예전 브라우저 초안(탭 이관 때 1회 읽기만)
   const usable = (c: Conn) => c.exec_mthd_cd === 'SRV' && (canWrite || c.rdonly_acct_yn === 'Y')
 
   const loadHist = useCallback(
@@ -275,12 +326,12 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
     if (first) setConnId(first.conn_id)
   }, [conns, canWrite]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // 접속을 바꾸면 : 초안 불러오기·스키마 목록
+  // 접속을 바꾸면 : 스키마 목록(탭 내용은 접속과 무관 — 편집기는 key 로 다시 만들어 그 탭 내용), 첫 접속 때 탭 불러오기
   useEffect(() => {
     if (!connId) return
     store.set(`sql-conn-${areaId}`, connId)
     connRef.current = connId
-    ed.current?.set(store.get(draftKey) ?? 'SELECT 1;\n')
+    void tabs.load(store.get(draftKey))
     setSchemas([]), setObjs({}), setCols({}), setOpen(new Set()), setOut(null), setMsg(''), setPending([]), setLast('')
     void (async () => {
       const r = await piFetch(`${api}/sql/meta?conn=${connId}&node=schemas`)
@@ -351,6 +402,7 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
       return setBind({ text: text!, names, vals, err: '', go: (t) => void run(script, t, confirm, lim, true) })
     }
     setBusy(true), setMsg(''), setTab('res')
+    void tabs.saveTab(tabs.cur) // 실행 때 저장(바뀐 탭만, 실행과 병렬 — 실패해도 실행 진행)
     const cid = conn.conn_id
     try {
       const r = await piFetch(`${api}/sql/run`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ conn_id: conn.conn_id, sql: text, limit: lim, schema: schema || null, tx: manual ? 'MANUAL' : 'AUTO', pending: manual ? pending : [], confirm }) })
@@ -589,12 +641,12 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
                       {Array.isArray(list) &&
                         KIND.map(([ks, nm]) => {
                           const items = list.filter((o) => ks.includes(o.kind) && (!kwl || o.name.toLowerCase().includes(kwl)))
-                          if (!items.length) return null
+                          if (!items.length && kwl) return null
                           const gk = `${sk}:${ks}`
                           return (
                             <li key={ks}>
-                              <button type="button" className="w-full text-left hover:bg-gray-100" onClick={() => toggle(gk)} aria-expanded={open.has(gk)}>
-                                {open.has(gk) || kwl ? '▾' : '▸'} 📁 {nm} <span className="text-gray-400">({items.length})</span>
+                              <button type="button" className={`w-full text-left hover:bg-gray-100 ${items.length ? '' : 'text-gray-400'}`} onClick={() => items.length && toggle(gk)} aria-expanded={open.has(gk)}>
+                                {!items.length ? '·' : open.has(gk) || kwl ? '▾' : '▸'} 📁 {nm} <span className="text-gray-400">({items.length})</span>
                               </button>
                               {(open.has(gk) || kwl) && (
                                 <ul className="pl-3">
@@ -603,9 +655,10 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
                                     return (
                                       <li key={o.name}>
                                         <div className="flex items-center hover:bg-amber-50" title={o.cmt ?? ''}>
-                                          <button type="button" {...nameProps(`o:${ok}`, qi(o.name, dialect === 'ORA'))} className={`min-w-0 flex-1 truncate text-left ${pick === `o:${ok}` ? 'bg-blue-100' : ''}`} onClick={() => rel && toggle(`c:${ok}`, () => void loadCols(s.name, o.name))} onDoubleClick={() => rel && (setTreeOpen(false), run(false, `SELECT * FROM ${qi(s.name, dialect === 'ORA')}.${qi(o.name, dialect === 'ORA')}`))}>
+                                          <button type="button" {...nameProps(`o:${ok}`, qi(o.name, dialect === 'ORA'))} className={`min-w-0 flex-1 truncate text-left ${pick === `o:${ok}` ? 'bg-blue-100' : ''}`} onClick={() => rel && toggle(`c:${ok}`, () => void loadCols(s.name, o.name))} onDoubleClick={() => (rel ? (setTreeOpen(false), openObj(s.name, o.name, o.kind)) : o.kind === 'i' && o.tbl && (setTreeOpen(false), openObj(s.name, o.tbl, 'r')))}>
                                             {rel ? (open.has(`c:${ok}`) ? '▾ ' : '▸ ') : '· '}
                                             <Drag t={qi(o.name, dialect === 'ORA')}>{o.name}</Drag>
+                                            {o.kind === 'i' && o.tbl && <span className="text-gray-400" title="두 번 누르기 = 대상 테이블 열기"> · {o.tbl}</span>}
                                           </button>
                                           <span className="ml-1 shrink-0 text-gray-400">{fmtSize(o.size)}</span>
                                         </div>
@@ -636,13 +689,47 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
               )
             })}
           </ul>
-          <p className="border-t px-1 py-0.5 text-[10px] text-gray-500">이름을 편집기로 끌어 놓기 · 고르고 Ctrl+C 또는 오른쪽 누르기 = 이름 복사 · 두 번 누르기 = SELECT 실행 · 칼럼 누르기 = 편집기에 넣기</p>
+          <p className="border-t px-1 py-0.5 text-[10px] text-gray-500">이름을 편집기로 끌어 놓기 · 고르고 Ctrl+C 또는 오른쪽 누르기 = 이름 복사 · 테이블·뷰 두 번 누르기 = 객체 편집기(Properties·Data·관계도) ·칼럼 누르기 = 편집기에 넣기</p>
         </nav>
         {splitter('l')}
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <div className="shrink-0 overflow-hidden" style={{ height: pane.e, maxHeight: 'calc(100% - 7rem)' }} aria-label="SQL 편집기">
-            {connId && <SqlEditor key={connId} ref={ed} initial={store.get(draftKey) ?? 'SELECT 1;\n'} dialect={dialect} tables={tables} schema={schema || undefined} onChange={(t) => store.set(draftKey, t)} onRun={(s) => void run(s)} />}
+          {tabs.bar({
+            sqlActive: !objCur,
+            onPick: () => setObjCur(''),
+            extra: objTabs.map((t) => {
+              const on = t.key === objCur
+              return (
+                <span key={t.key} className={`flex shrink-0 items-center rounded-t border ${on ? '-mb-px border-b-white bg-white font-semibold' : 'bg-gray-100 hover:bg-white'}`}>
+                  <button type="button" role="tab" aria-selected={on} onClick={() => (!objCur && void tabs.saveTab(tabs.cur), setObjCur(t.key))} title={`${t.schema}.${t.rel} — 객체 편집기`} className="py-0.5 pl-2 font-mono whitespace-nowrap">
+                    <span aria-hidden className="mr-1 text-[#3b5f9e]">{OBJ_ICON[t.kind] ?? '▦'}</span>
+                    {t.rel}
+                  </button>
+                  <button type="button" onClick={() => closeObj(t.key)} className="min-h-6 min-w-6 px-1.5 py-0.5 text-gray-500 hover:text-red-700" aria-label={`${t.rel} 객체 탭 닫기`} title="객체 탭 닫기">
+                    ×
+                  </button>
+                </span>
+              )
+            }),
+          })}
+          {objTabs.map((t) => (
+            <div key={t.key} className={t.key === objCur ? 'min-h-0 flex-1' : 'hidden'}>
+              <ObjEditor
+                api={api}
+                conn={t.conn}
+                schema={t.schema}
+                rel={t.rel}
+                dialect={dialectOf(t.conn)}
+                active={t.key === objCur}
+                onOpen={(s, r) => openObj(s, r, 'r', t.conn)}
+                sqlFull={tabs.full}
+                onNewSql={(text) => void tabs.add(text).then((ok) => ok && setObjCur(''))}
+              />
+            </div>
+          ))}
+          <div className={`${objCur ? 'hidden' : 'flex'} min-h-0 flex-1 flex-col`}>
+          <div className="shrink-0 overflow-hidden" style={{ height: pane.e, maxHeight: 'calc(100% - 9rem)' }} aria-label="SQL 편집기">
+            {connId && tabs.cur && <SqlEditor key={`${connId}-${tabs.cur}`} ref={ed} initial={tabs.text(tabs.cur)} dialect={dialect} tables={tables} schema={schema || undefined} onChange={(t) => tabs.edit(tabs.cur, t)} onRun={(s) => void run(s)} />}
           </div>
           {splitter('e')}
           <div className="flex min-h-20 flex-1 flex-col border-t">
@@ -704,6 +791,7 @@ export default function SqlPage({ params }: { params: Promise<{ areaId: string }
                 </div>
               )}
             </div>
+          </div>
           </div>
         </div>
       </div>

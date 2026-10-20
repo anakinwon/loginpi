@@ -9,13 +9,20 @@ import type { Perm } from './roles'
 export type MetaNode = 'schemas' | 'objects' | 'columns' | 'completion'
 const PG: Record<MetaNode, string> = {
   schemas: `SELECT nspname AS name, (nspname = current_schema()) AS cur FROM pg_namespace WHERE nspname NOT LIKE 'pg\\_%' AND nspname <> 'information_schema' ORDER BY nspname`,
-  objects: `SELECT c.relname AS name, c.relkind::text AS kind, CASE WHEN c.relkind IN ('r','p','m') THEN pg_total_relation_size(c.oid) END AS size, obj_description(c.oid, 'pg_class') AS cmt
+  // DBeaver 스키마 폴더와 같은 종류(2026-10-20) : 테이블·외부 테이블·뷰·물리 뷰(구체화 뷰)·인덱스(i, tbl = 대상 테이블)·함수(F)·시퀀스·데이터 타입(T : enum·domain·range·독립 composite)·집계 함수(A)
+  objects: `SELECT c.relname AS name, c.relkind::text AS kind, CASE WHEN c.relkind IN ('r','p','m') THEN pg_total_relation_size(c.oid) WHEN c.relkind = 'i' THEN pg_relation_size(c.oid) END AS size, obj_description(c.oid, 'pg_class') AS cmt,
+                   (SELECT t.relname FROM pg_index x JOIN pg_class t ON t.oid = x.indrelid WHERE x.indexrelid = c.oid) AS tbl
               FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
-             WHERE n.nspname = $1 AND c.relkind IN ('r','p','v','m','S','f') AND NOT c.relispartition
+             WHERE n.nspname = $1 AND c.relkind IN ('r','p','v','m','S','f','i') AND NOT c.relispartition
             UNION ALL
-            SELECT p.proname || '(' || pg_get_function_identity_arguments(p.oid) || ')', 'F', NULL, NULL
-              FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace WHERE n.nspname = $1 AND p.prokind IN ('f','p')
-            ORDER BY 2, 1 LIMIT 5000`,
+            SELECT p.proname || '(' || pg_get_function_identity_arguments(p.oid) || ')', CASE p.prokind WHEN 'a' THEN 'A' ELSE 'F' END, NULL, obj_description(p.oid, 'pg_proc'), NULL
+              FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace WHERE n.nspname = $1 AND p.prokind IN ('f','p','a')
+            UNION ALL
+            SELECT t.typname, 'T', NULL, obj_description(t.oid, 'pg_type'), NULL
+              FROM pg_type t JOIN pg_namespace n ON n.oid = t.typnamespace
+             WHERE n.nspname = $1 AND t.typtype IN ('e','d','r','c') AND t.typelem = 0
+               AND (t.typrelid = 0 OR (SELECT c.relkind FROM pg_class c WHERE c.oid = t.typrelid) = 'c')
+            ORDER BY 2, 1 LIMIT 10000`,
   columns: `SELECT a.attname AS name, format_type(a.atttypid, a.atttypmod) AS type, a.attnotnull AS nn,
                    EXISTS (SELECT 1 FROM pg_index i WHERE i.indrelid = a.attrelid AND i.indisprimary AND a.attnum = ANY (i.indkey)) AS pk,
                    col_description(a.attrelid, a.attnum) AS cmt
@@ -29,9 +36,10 @@ const PG: Record<MetaNode, string> = {
 }
 const ORA: Record<MetaNode, string> = {
   schemas: `SELECT username AS name, CASE WHEN username = SYS_CONTEXT('USERENV','CURRENT_SCHEMA') THEN 1 ELSE 0 END AS cur FROM all_users WHERE oracle_maintained = 'N' ORDER BY username`,
-  objects: `SELECT object_name AS name, DECODE(object_type, 'TABLE','r', 'VIEW','v', 'MATERIALIZED VIEW','m', 'SEQUENCE','S', 'F') AS kind, NULL AS "SIZE", NULL AS cmt
-              FROM all_objects WHERE owner = :1 AND object_type IN ('TABLE','VIEW','MATERIALIZED VIEW','SEQUENCE','FUNCTION','PROCEDURE','PACKAGE')
-             ORDER BY 2, 1 FETCH FIRST 5000 ROWS ONLY`,
+  objects: `SELECT o.object_name AS name, DECODE(o.object_type, 'TABLE','r', 'VIEW','v', 'MATERIALIZED VIEW','m', 'SEQUENCE','S', 'INDEX','i', 'TYPE','T', 'F') AS kind, NULL AS "SIZE", NULL AS cmt,
+                   CASE WHEN o.object_type = 'INDEX' THEN (SELECT x.table_name FROM all_indexes x WHERE x.owner = o.owner AND x.index_name = o.object_name) END AS tbl
+              FROM all_objects o WHERE o.owner = :1 AND o.object_type IN ('TABLE','VIEW','MATERIALIZED VIEW','SEQUENCE','FUNCTION','PROCEDURE','PACKAGE','INDEX','TYPE')
+             ORDER BY 2, 1 FETCH FIRST 10000 ROWS ONLY`,
   columns: `SELECT c.column_name AS name, c.data_type || CASE WHEN c.data_type IN ('VARCHAR2','CHAR','NVARCHAR2','RAW') THEN '(' || c.char_length || ')' WHEN c.data_type = 'NUMBER' AND c.data_precision IS NOT NULL THEN '(' || c.data_precision || ',' || c.data_scale || ')' END AS type,
                    CASE c.nullable WHEN 'N' THEN 1 ELSE 0 END AS nn,
                    CASE WHEN EXISTS (SELECT 1 FROM all_constraints k JOIN all_cons_columns kc ON kc.owner = k.owner AND kc.constraint_name = k.constraint_name

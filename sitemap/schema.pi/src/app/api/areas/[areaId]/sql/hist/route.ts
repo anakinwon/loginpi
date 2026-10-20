@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { dbError, requireAreaRole } from '@/lib/api'
-import { pageRows } from '@/lib/paging'
+import { inChunks, pageRows } from '@/lib/paging'
 
 type Ctx = { params: Promise<{ areaId: string }> }
 type Row = { sql_exec_id: string; conn_id: string; usr_id: string; sql_txt: string; stmt_cnt: number; exec_mode_cd: string; rslt_cd: string; row_cnt: number | null; elapsed_ms: number | null; err_cd: string | null; err_msg: string | null; reg_dtm: string; mdl_db_conn: { conn_nm: string } | null }
@@ -20,7 +20,7 @@ export async function GET(req: Request, { params }: Ctx) {
   if ('error' in r && r.error) return dbError(r.error)
   const rows = 'rows' in r ? (r.rows ?? []) : []
   const ids = [...new Set(rows.map((x) => x.usr_id))]
-  const u = ids.length ? await db().from('sys_user').select('usr_id, dsp_nm').in('usr_id', ids) : { data: [] }
+  const u = await inChunks(ids, (p) => db().from('sys_user').select('usr_id, dsp_nm').in('usr_id', p))
   const nm = new Map(((u.data ?? []) as { usr_id: string; dsp_nm: string }[]).map((x) => [x.usr_id, x.dsp_nm]))
   return NextResponse.json({ ok: true, all, write: auth.perms.includes('CRUD'), total: 'total' in r ? r.total : rows.length, items: rows.map(({ mdl_db_conn, ...x }) => ({ ...x, conn_nm: mdl_db_conn?.conn_nm ?? null, usr_nm: nm.get(x.usr_id) ?? x.usr_id })) })
 }

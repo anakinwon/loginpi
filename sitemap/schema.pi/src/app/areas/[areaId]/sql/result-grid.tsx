@@ -105,7 +105,8 @@ function Bar({ status, fetch, total, pager }: { status: ReactNode; fetch: Fetch;
   )
 }
 
-function Grid({ r, dialect, bar }: { r: RunRes; dialect: Dialect; bar: (pager: { page: number; pages: number; go(n: number): void }) => ReactNode }) {
+// 표 1개(필터·정렬·복사·내려받기·화면 쪽 이동) — 객체 편집기 Data 탭(sql-obj)도 이걸 쓰고 아래 상태줄(bar)만 바꿈
+export function Grid({ r, dialect, bar }: { r: RunRes; dialect: Dialect; bar: (pager: { page: number; pages: number; go(n: number): void }) => ReactNode }) {
   const cols = r.columns ?? []
   const [w, setW] = useState<Record<number, number>>({}) // 칼럼 너비(px) — 없으면 자동
   const [note, setNote] = useState('')
