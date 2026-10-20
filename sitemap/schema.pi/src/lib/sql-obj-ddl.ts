@@ -84,10 +84,13 @@ function grantLines(on: string, target: string, g: DdlIn['grants']): string[] {
   })
 }
 
+// 주석 줄에 넣는 카탈로그 이름의 줄바꿈 무력화 — 이름에 개행이 있으면 주석이 끊겨 뒤 글자가 SQL 문장이 됨(2026-10-20 보안 검토)
+const cm = (s: string) => s.replace(/[\r\n\u2028\u2029]/g, ' ')
+
 export function buildDdl(o: DdlIn): string {
   const t = `${qi(o.schema)}.${qi(o.name)}`
   const kw = o.kind === 'v' ? 'VIEW' : o.kind === 'm' ? 'MATERIALIZED VIEW' : o.kind === 'f' ? 'FOREIGN TABLE' : o.kind === 'S' ? 'SEQUENCE' : 'TABLE'
-  const out: string[] = [`-- DROP ${kw} ${t};`, '']
+  const out: string[] = [`-- DROP ${kw} ${cm(t)};`, '']
   const cmts: string[] = []
   if (o.comment != null) cmts.push(`COMMENT ON ${kw} ${t} IS ${lit(o.comment)};`)
 
@@ -141,6 +144,6 @@ export function buildDdl(o: DdlIn): string {
     if (o.owner) out.push(`ALTER ${kw} ${t} OWNER TO ${qi(o.owner)};`)
     out.push(...grantLines(o.kind === 'S' ? 'SEQUENCE' : 'TABLE', t, o.grants))
   }
-  if (o.fks.length) out.push('', '', `-- ${o.schema}.${o.name} foreign keys`, '', ...o.fks.map((f) => `ALTER TABLE ${t} ADD CONSTRAINT ${qi(f.name)} ${f.definition};`))
+  if (o.fks.length) out.push('', '', `-- ${cm(o.schema)}.${cm(o.name)} foreign keys`, '', ...o.fks.map((f) => `ALTER TABLE ${t} ADD CONSTRAINT ${qi(f.name)} ${f.definition};`))
   return out.join('\n') + '\n'
 }

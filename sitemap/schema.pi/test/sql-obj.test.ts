@@ -59,3 +59,9 @@ test('상속 칼럼 제외 + INHERITS, 파티션 키, 파티션 자식, 뷰, 시
   assert.match(buildDdl(base({ kind: 'S', seq: { type: 'bigint', start: '1', inc: '1', min: '1', max: '9223372036854775807', cache: '1', cycle: false } })), /CREATE SEQUENCE public\.t\n\tAS bigint\n\tINCREMENT BY 1[\s\S]*NO CYCLE;/)
   assert.match(buildDdl(base({ persistence: 'u', cols: [col('a')] })), /^-- DROP TABLE public\.t;\n\nCREATE UNLOGGED TABLE/)
 })
+
+test('보안 회귀 : 카탈로그 이름의 개행이 주석 줄을 끊고 SQL 문장이 되지 않음(2026-10-20)', () => {
+  const d = buildDdl(base({ name: 'x\nDROP TABLE victim; --', cols: [col('id')] }))
+  assert.ok(!d.startsWith('-- DROP TABLE public."x\n')) // 주석 줄이 개행으로 끊기지 않음(CREATE 의 따옴표 식별자 안 개행은 식별자 일부라 무해)
+  assert.match(d, /^-- DROP TABLE public\."x DROP TABLE victim; --";$/m)
+})

@@ -3,7 +3,8 @@
 // PostgreSQL = READ ONLY 트랜잭션 + SET LOCAL statement_timeout, Oracle = head·cols·stats·ddl(DBMS_METADATA)·data·count 만(나머지 NOT_SUPPORTED)
 import 'server-only'
 import { NextResponse } from 'next/server'
-import { apiError, type ErrorCode } from './api'
+import { apiError, dbError, type ErrorCode } from './api'
+import { db } from './db'
 import { STMT_MS, maskErr, pgClient, type Target } from './db-exec'
 import { cell, openConn, type Cell } from './sql-run'
 import { buildDdl, qid, type DdlIn } from './sql-obj-ddl'
@@ -348,12 +349,29 @@ async function oraObj(t: Target, pwd: string, q: ObjQuery): Promise<Out> {
 // 시스템 스키마(PG pg_*·information_schema, ORA SYS·SYSTEM) 객체는 열지 않음 — 탐색기에도 없고, pg_authid 같은 계정 카탈로그(비밀번호 해시)가 Data 탭으로 노출되지 않게(2026-10-20 검증 지적)
 const SYS_SCHEMA = (s: string) => /^pg_/i.test(s) || /^(information_schema|sys|system)$/i.test(s)
 
-export async function getObj(areaId: string, connId: string, perms: readonly Perm[], q: ObjQuery): Promise<NextResponse> {
+export async function getObj(areaId: string, connId: string, perms: readonly Perm[], q: ObjQuery, uid: string): Promise<NextResponse> {
   if (SYS_SCHEMA(q.schema)) return apiError('NOT_SUPPORTED', 400)
   const oc = await openConn(areaId, connId, perms)
   if (oc instanceof NextResponse) return oc
   const { d, t, pwd } = oc
   const hide = [t.host, t.ip, t.usr, t.db, pwd]
+  // 데이터·건수 조회 = 사용자 데이터 열람이라 SQL 실행 이력에 남김(편집기 실행과 같은 fail-closed 선기록 — 기록이 안 되면 조회 안 함, 2026-10-20 보안 검토)
+  let hid: string | null = null
+  const t0 = Date.now()
+  if (q.sec === 'data' || q.sec === 'count') {
+    // 이름은 인용(개행·따옴표가 있어도 이력 텍스트를 다시 실행할 때 한 식별자), 페이지 구문은 DBMS별 표기
+    const nm = `${qid(q.schema)}.${qid(q.rel)}`
+    const pg = `${(q.page - 1) * q.size}`
+    const txt = q.sec === 'count' ? `SELECT count(*) FROM ${nm}` : d === 'PG' ? `SELECT * FROM ${nm} LIMIT ${q.size} OFFSET ${pg}` : `SELECT * FROM ${nm} OFFSET ${pg} ROWS FETCH NEXT ${q.size} ROWS ONLY`
+    const h = await db().from('mdl_sql_exec_hist').insert({ area_id: areaId, conn_id: connId, usr_id: uid, sql_txt: `-- 객체 편집기 ${q.sec === 'data' ? '데이터' : '건수'}\n${txt}`.slice(0, 4000), stmt_cnt: 1, exec_mode_cd: 'READ', rslt_cd: 'ERR', err_cd: 'RUN', regr_id: uid, modr_id: uid }).select('sql_exec_id').single()
+    if (h.error) return dbError(h.error)
+    hid = (h.data as { sql_exec_id: string }).sql_exec_id
+  }
+  const done = async (rslt: 'OK' | 'ERR', rows: number, err?: { cd: string; msg: string }) => {
+    if (!hid) return
+    const u = await db().from('mdl_sql_exec_hist').update({ rslt_cd: rslt, row_cnt: rows, elapsed_ms: Date.now() - t0, err_cd: err?.cd ?? null, err_msg: err?.msg.slice(0, 200) ?? null, modr_id: uid }).eq('sql_exec_id', hid)
+    if (u.error) console.error('[sql-obj-hist]', u.error.code, u.error.message) // 선기록은 남아 있음(err_cd RUN)
+  }
   let out: Out
   try {
     if (d === 'PG') {
@@ -370,8 +388,14 @@ export async function getObj(areaId: string, connId: string, perms: readonly Per
     } else out = await oraObj(t, pwd, q)
   } catch (e) {
     const x = e as { message?: string }
-    return NextResponse.json({ ok: false, code: 'DB_CONN_FAIL', message: maskErr(x.message, hide) }, { status: 400 })
+    const message = maskErr(x.message, hide)
+    await done('ERR', 0, { cd: 'DB_CONN_FAIL', msg: message })
+    return NextResponse.json({ ok: false, code: 'DB_CONN_FAIL', message }, { status: 400 })
   }
-  if (typeof out === 'string') return apiError(out, out === 'NOT_FOUND' ? 404 : 400)
+  if (typeof out === 'string') {
+    await done('ERR', 0, { cd: out, msg: out })
+    return apiError(out, out === 'NOT_FOUND' ? 404 : 400)
+  }
+  await done('OK', 'rows' in out && Array.isArray(out.rows) ? out.rows.length : 'count' in out ? 1 : 0)
   return NextResponse.json({ ok: true, ...out })
 }

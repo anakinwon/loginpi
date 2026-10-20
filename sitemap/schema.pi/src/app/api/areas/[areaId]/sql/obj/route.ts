@@ -26,7 +26,7 @@ export async function GET(req: Request, { params }: Ctx) {
   if (!q.success) return apiError('INVALID_INPUT', 400)
   const { conn, ...o } = q.data
   try {
-    return await getObj(areaId, conn, auth.perms, o)
+    return await getObj(areaId, conn, auth.perms, o, auth.user.usr_id)
   } catch (e) {
     return dbError(e as { code?: string; message?: string })
   }
