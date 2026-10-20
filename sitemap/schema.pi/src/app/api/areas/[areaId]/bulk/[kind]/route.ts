@@ -5,7 +5,7 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { db } from '@/lib/db'
-import { apiError, audit, dbError, errMsg, parseBody, requireAreaRole } from '@/lib/api'
+import { apiError, audit, dbError, errMsg, parseBody, requireAreaRole, type ErrorCode } from '@/lib/api'
 import { BATCH_SIZE, BULK_KINDS, mapHeader, type BulkKind } from '@/lib/bulk'
 import { checkBulk } from '@/lib/bulk-check'
 import { reqBas, upsertDtl } from '@/lib/std-code'
@@ -17,7 +17,8 @@ type Row = Record<string, unknown>
 
 // 표준코드(공통코드, 2026-10-20) 반영 — 없는 코드기본은 등록 신청(승인대기, 사유 '일괄등록', 단어 일괄등록과 같이 자기 승인 없음 · 감사 이력 = DB 함수),
 //  코드상세는 upsertDtl 로 바로 반영(논리 삭제된 같은 키는 되살림). 판정 뒤 다른 요청이 같은 코드기본·코드값을 먼저 넣었으면 그 행만 건너뜀. 코드상세 감사 이력 = 코드기본마다 1건(추가한 목록)
-async function applyCodes(areaId: string, rows: Row[], uid: string): Promise<Set<number>> {
+//  코드상세가 규칙에 막힌 행(구분코드 4번째 CD_DIV_TOO_MANY 등)은 why 에 사유 코드를 남겨 결과에 그 사유로 보고(2026-10-20 — 이전엔 사유 없이 건너뜀)
+async function applyCodes(areaId: string, rows: Row[], uid: string, why: Map<number, ErrorCode>): Promise<Set<number>> {
   const cdOf = new Map<string, string>()
   for (const r of rows) if (r.cd_id) cdOf.set(r.term_id as string, r.cd_id as string)
   for (const r of rows) {
@@ -39,7 +40,10 @@ async function applyCodes(areaId: string, rows: Row[], uid: string): Promise<Set
     if (!cd) continue
     const v = { cd_val: r.cd_val, cd_val_nm: r.cd_val_nm, cd_val_desc: r.cd_val_desc, sort_seq: r.sort_seq, use_yn: r.use_yn }
     const d = await upsertDtl(areaId, cd, v, uid, (r.data_len as number | null) ?? null, false)
-    if (!('row' in d)) continue
+    if (!('row' in d)) {
+      why.set(r.row_no as number, d.code)
+      continue
+    }
     done.add(r.row_no as number)
     byCd.set(cd, [...(byCd.get(cd) ?? []), { cd_val: r.cd_val, cd_val_nm: r.cd_val_nm }])
   }
@@ -89,8 +93,9 @@ export async function POST(req: Request, { params }: Ctx) {
     if (body.mode === 'check' || rows.length === 0) return NextResponse.json({ ok: true, results, applied: 0 })
 
     let done: Set<number>
+    const why = new Map<number, ErrorCode>()
     if (k === 'forbidden') done = await applyAliases(areaId, rows, auth.user.usr_id)
-    else if (k === 'codes') done = await applyCodes(areaId, rows, auth.user.usr_id)
+    else if (k === 'codes') done = await applyCodes(areaId, rows, auth.user.usr_id, why)
     else {
       const { data, error } = await db().rpc('fn_bulk_req_std', { p_tp: TP[k], p_area_id: areaId, p_rows: rows, p_usr_id: auth.user.usr_id })
       if (error) return dbError(error)
@@ -98,7 +103,10 @@ export async function POST(req: Request, { params }: Ctx) {
     }
     // 판정 뒤 다른 요청이 같은 이름을 먼저 저장한 행은 건너뜀으로 보고
     for (const r of results)
-      if ((r.status === 'OK' || r.status === 'NSTD') && !done.has(r.row_no)) Object.assign(r, { status: 'SKIP', code: 'CONFLICT_SKIP', detail: errMsg('CONFLICT_SKIP') })
+      if ((r.status === 'OK' || r.status === 'NSTD') && !done.has(r.row_no)) {
+        const c = why.get(r.row_no)
+        Object.assign(r, c ? { status: 'ERR', code: c, detail: errMsg(c) } : { status: 'SKIP', code: 'CONFLICT_SKIP', detail: errMsg('CONFLICT_SKIP') })
+      }
     return NextResponse.json({ ok: true, results, applied: done.size })
   } catch (e) {
     return dbError(e as { code?: string; message?: string })

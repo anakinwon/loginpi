@@ -487,6 +487,7 @@ export default function DdlPage({
                     >
                       실행 요청
                     </button>
+                    <span className="w-full text-xs font-medium text-red-700">⚠ DDL 이 테이블마다 CREATE 직전 DROP … CASCADE 를 포함합니다 — 대상 DB 의 같은 이름 테이블과 데이터가 삭제되며 되돌릴 수 없습니다.</span>
                     {!myConns.length && (
                       <span className="text-xs text-gray-500">
                         이 DBMS 접속이 없습니다 — 'DB 접속' 탭에서

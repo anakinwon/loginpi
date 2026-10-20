@@ -163,8 +163,24 @@ export async function POST(req: Request, { params }: Ctx) {
     const r = await convertEntities(areaId, prjId, { dbms, ltr, desc: b.phy_mdl_desc ?? null }, b.ent_ids, auth.user.usr_id)
     if (!r) return apiError('NOT_FOUND', 404)
     if (!r.tbl) return apiError('NO_CHANGE', 400) // 선택 엔터티가 모두 이미 전환됨
-    await audit({ area_id: areaId, tgt_tp_cd: 'PHY', tgt_id: r.phy_mdl_id!, act_cd: r.created ? 'INS' : 'UPD', aftr_val: { prj_id: prjId, dbms_cd: dbms, ent_ids: b.ent_ids, tbl: r.tbl, fk: r.fk, ...(relExc ? { no_rel_exc: noRel } : {}) }, usr_id: auth.user.usr_id })
-    return NextResponse.json({ ok: true, item: { phy_mdl_id: r.phy_mdl_id }, created: r.created, tbl_cnt: r.tbl, fk_cnt: r.fk }, { status: 201 })
+    // 부모를 나중에 전환해 기존 자식 테이블에 FK 가 생겼으면 그 자식 테이블만 동기화(FK 칼럼 + 그 테이블에 쌓인 다른 논리 변경도 함께) — 물리 작성중·논리 작성완료 테이블만(syncPlan 범위)
+    //  실패해도 전환은 이미 저장됐으므로 오류만 기록하고 성공 응답(화면 위쪽 동기화 안내로 재시도)
+    let fkSync = 0
+    try {
+      for (const ent of r.fkChild) {
+        const p = await loadPhy(areaId, r.phy_mdl_id!)
+        const t = p?.tables.find((x) => x.ent_id === ent)
+        if (!p || !t) continue
+        const s = await syncPlan(areaId, prjId, p, 'sync', t.phy_tbl_id)
+        if (!s || s.why.length || s.issues.length || s.capped || !(s.ops.length || s.addFk.length || s.delFk.length)) continue
+        const x = await syncPhy(areaId, r.phy_mdl_id!, p.mdl.ver_no, s, auth.user.usr_id)
+        if (x !== 'VERSION_CONFLICT') fkSync += x.ops
+      }
+    } catch (e) {
+      console.error('[phy] 자식 테이블 동기화 실패', e)
+    }
+    await audit({ area_id: areaId, tgt_tp_cd: 'PHY', tgt_id: r.phy_mdl_id!, act_cd: r.created ? 'INS' : 'UPD', aftr_val: { prj_id: prjId, dbms_cd: dbms, ent_ids: b.ent_ids, tbl: r.tbl, fk: r.fk, ...(fkSync ? { fk_sync_ops: fkSync } : {}), ...(relExc ? { no_rel_exc: noRel } : {}) }, usr_id: auth.user.usr_id })
+    return NextResponse.json({ ok: true, item: { phy_mdl_id: r.phy_mdl_id }, created: r.created, tbl_cnt: r.tbl, fk_cnt: r.fk, fk_sync: fkSync }, { status: 201 })
   } catch (e) {
     const x = e as { code?: string; message?: string }
     return dbError(x, /prj_dbms/.test(x.message ?? '') ? 'PHY_DUP' : 'INVALID_INPUT') // 프로젝트 × DBMS 중복만 PHY_DUP

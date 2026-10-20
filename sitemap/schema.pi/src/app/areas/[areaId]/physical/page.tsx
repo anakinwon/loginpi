@@ -145,7 +145,7 @@ export default function PhysicalPage({ params }: { params: Promise<{ areaId: str
     setBusy(false)
     if (!j.ok && j.code === 'PHY_NO_REL' && j.exc && !noRelExc && confirm(`관계가 없는 엔터티가 있습니다\n${(j.why ?? []).join('\n')}\n\nDA 예외로 그대로 전환하시겠습니까?(감사 이력에 남습니다)`)) return convert(true)
     if (!j.ok) return setMsg([j.message, ...(j.why ?? []), ...(j.issues ?? [])].join(' / '))
-    setMsg(`물리 모델을 만들었습니다 — 테이블 ${j.tbl_cnt}·FK ${j.fk_cnt}`)
+    setMsg(`물리 모델을 만들었습니다 — 테이블 ${j.tbl_cnt}·FK ${j.fk_cnt}${j.fk_sync ? ` · 기존 자식 테이블 동기화 ${j.fk_sync}건(FK 칼럼 포함)` : ''}`)
     setMdlId(j.item.phy_mdl_id)
     setPicked(new Set())
     await loadList()

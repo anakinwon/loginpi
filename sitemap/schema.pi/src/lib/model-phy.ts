@@ -162,7 +162,7 @@ export async function convertEntities(areaId: string, prjId: string, o: { dbms: 
   const p0 = mdlId ? await loadPhy(areaId, mdlId) : null
   const have = new Set(p0?.tables.map((t) => t.ent_id) ?? [])
   const add = entIds.filter((e) => !have.has(e))
-  if (!add.length) return { phy_mdl_id: mdlId, created: false, tbl: 0, fk: 0 }
+  if (!add.length) return { phy_mdl_id: mdlId, created: false, tbl: 0, fk: 0, fkChild: [] as string[] }
   const plan = await phyPlan(areaId, prjId, o.dbms, new Set([...have, ...add]))
   if (!plan) return null
   if (!mdlId) {
@@ -193,7 +193,9 @@ export async function convertEntities(areaId: string, prjId: string, o: { dbms: 
       const r = await db().from('mdl_phy_fk').insert(fks.map((f) => ({ area_id: areaId, phy_mdl_id: mdlId, ...f, ...sys })))
       if (r.error) throw r.error
     }
-    return { phy_mdl_id: mdlId, created, tbl: tables.length, fk: fks.length }
+    // 이번 FK 의 자식이 이미 전환된 테이블 — 그 FK 칼럼은 동기화로만 생기므로 호출 측이 그 테이블만 동기화(2026-10-20 FK 행만 있고 칼럼 없던 문제)
+    const fkChild = [...new Set(fks.map((f) => relChld.get(f.rel_id) ?? '').filter((id) => have.has(id)))]
+    return { phy_mdl_id: mdlId, created, tbl: tables.length, fk: fks.length, fkChild }
   } catch (e) {
     if (created && mdlId) await delPhy(mdlId, uid).catch((x) => console.error('[phy] 보상 삭제 실패', mdlId, x))
     else if (newTbl.length) {
