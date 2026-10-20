@@ -28,6 +28,8 @@ const schema = z.object({
   DDL_DIRECT_ENABLED: z.enum(['0', '1']).optional(),
   // 개발 전용 : 사설·루프백 주소 접속 허용(로컬 PostgreSQL 시험). production 에서는 무시
   DB_CONN_ALLOW_PRIVATE: z.enum(['0', '1']).optional(),
+  // 모니터링 주기 수집(GET /api/mon/collect, Vercel Cron 이 Authorization: Bearer 로 보냄) — 없으면 주기 수집 꺼짐(화면 열 때만 수집)
+  CRON_SECRET: z.string().min(16).optional(),
 }).superRefine((v, ctx) => {
   const g = [v.GOOGLE_CLIENT_ID, v.GOOGLE_CLIENT_SECRET, v.AUTH_SECRET]
   if (g.some(Boolean) && !g.every(Boolean))
