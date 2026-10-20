@@ -8,54 +8,54 @@ import Anthropic from '@anthropic-ai/sdk'
 import { db } from './db'
 import { pageMenu, routeMenu, SLOW_MS } from './mon'
 
-const SRC = path.join(process.cwd(), 'src')
+// 소스 위치는 실행 때만 계산(정적 분석되면 Turbopack 이 프로젝트 전체를 이 함수 배포본에 추적) — 포함할 파일은 next.config outputFileTracingIncludes 가 지정
+const SRC = [process.cwd(), 'src'].join(path.sep)
 const MAX_FILE = 16_000 // 파일 하나 상한(자)
 const MAX_SRC = 60_000 // 소스 합계 상한(자)
 
 const SCHEMA = {
   type: 'object',
   properties: {
-    summary: { type: 'string', description: '무슨 일이 일어났는지 2~3문장 요약' },
+    summary: { type: 'string', description: '무슨 일이 일어났는지 1~2문장 요약' },
     causes: {
       type: 'array',
-      description: '가능성 높은 순 원인 1~4개',
+      description: '가능성 높은 순 원인 1~4개, 원인마다 그 원인을 없애는 해결 방안을 바로 붙임',
       items: {
         type: 'object',
         properties: {
-          title: { type: 'string', description: '원인 한 줄' },
-          evidence: { type: 'string', description: '근거 — 수치·상태코드·시각·소스 파일과 줄(함수명)을 구체적으로' },
+          title: { type: 'string', description: '원인 한 줄(40자 이내)' },
+          evidence: { type: 'string', description: '근거 1~2문장 — 수치·상태코드·시각·소스 파일(함수명) 중 핵심만' },
           likelihood: { type: 'string', enum: ['HIGH', 'MID', 'LOW'] },
+          fixes: {
+            type: 'array',
+            description: '이 원인의 해결 방안 1~2개',
+            items: {
+              type: 'object',
+              properties: {
+                title: { type: 'string', description: '조치 한 줄(40자 이내)' },
+                detail: { type: 'string', description: '무엇을 어떻게 바꿀지 1~2문장' },
+                files: { type: 'array', items: { type: 'string' }, description: 'src/ 기준 상대 경로(없으면 빈 배열)' },
+              },
+              required: ['title', 'detail', 'files'],
+              additionalProperties: false,
+            },
+          },
         },
-        required: ['title', 'evidence', 'likelihood'],
+        required: ['title', 'evidence', 'likelihood', 'fixes'],
         additionalProperties: false,
       },
     },
-    fixes: {
-      type: 'array',
-      description: '해결 방안 1~5개(우선순위 순). 코드 변경이면 파일 경로와 무엇을 어떻게 바꿀지',
-      items: {
-        type: 'object',
-        properties: {
-          title: { type: 'string' },
-          detail: { type: 'string' },
-          files: { type: 'array', items: { type: 'string' }, description: 'src/ 기준 상대 경로' },
-        },
-        required: ['title', 'detail', 'files'],
-        additionalProperties: false,
-      },
-    },
-    checks: { type: 'array', items: { type: 'string' }, description: '조치 후 확인 방법 1~3개' },
+    checks: { type: 'array', items: { type: 'string' }, description: '조치 후 확인 방법 1~3개, 각 한 문장' },
     gaps: { type: 'array', items: { type: 'string' }, description: '판단에 부족했던 데이터(없으면 빈 배열)' },
     confidence: { type: 'string', enum: ['HIGH', 'MID', 'LOW'] },
   },
-  required: ['summary', 'causes', 'fixes', 'checks', 'gaps', 'confidence'],
+  required: ['summary', 'causes', 'checks', 'gaps', 'confidence'],
   additionalProperties: false,
 } as const
 
 export interface AiResult {
   summary: string
-  causes: { title: string; evidence: string; likelihood: 'HIGH' | 'MID' | 'LOW' }[]
-  fixes: { title: string; detail: string; files: string[] }[]
+  causes: { title: string; evidence: string; likelihood: 'HIGH' | 'MID' | 'LOW'; fixes: { title: string; detail: string; files: string[] }[] }[]
   checks: string[]
   gaps: string[]
   confidence: 'HIGH' | 'MID' | 'LOW'
@@ -63,7 +63,7 @@ export interface AiResult {
 
 const clip = (s: string, n = MAX_FILE) => (s.length > n ? `${s.slice(0, n)}\n…(이하 생략)` : s)
 const read = (p: string) => readFile(p, 'utf8').catch(() => null)
-const rel = (p: string) => path.relative(path.join(SRC, '..'), p).replaceAll('\\', '/')
+const rel = (p: string) => `src/${path.relative(SRC, p).replaceAll('\\', '/')}` // 프로젝트 루트(SRC/..)를 가리키면 Turbopack 이 전체 추적 경고
 
 // '/api/areas/:id/sql/obj' → src/app/api/areas/[areaId]/sql/obj/route.ts (:id 는 [..] 디렉터리, 세그먼트는 경로 문자만)
 async function routeFile(route: string): Promise<string | null> {
@@ -153,7 +153,7 @@ export async function analyzeRoute(route: string, min: number): Promise<AiResult
       system:
         '당신은 Next.js 16(App Router)·Supabase(PostgreSQL) 웹 서비스 운영 엔지니어입니다. 브라우저 계측(Resource Timing)으로 모은 API 응답 지표와 소스 코드를 보고 오류·지연의 원인을 추정하고 해결 방안을 제시합니다. ' +
         '근거 없는 추측은 likelihood 를 낮추고 gaps 에 부족한 데이터를 적습니다. 상태 0 은 네트워크 실패·요청 중단(화면 이동·새로고침으로 fetch 가 끊긴 경우 포함)입니다. ' +
-        '합계 이력의 오류 건은 상태코드가 남지 않고, 개별 이력(느림·오류)은 sql/069 배포 이후 요청부터만 있습니다. 운영(production)과 로컬 개발 서버가 같은 DB 에 기록할 수 있습니다. 답은 한국어로 씁니다.',
+        '합계 이력의 오류 건은 상태코드가 남지 않고, 개별 이력(느림·오류)은 sql/069 배포 이후 요청부터만 있습니다. 운영(production)과 로컬 개발 서버가 같은 DB 에 기록할 수 있습니다. 답은 한국어로, 짧고 간결하게 씁니다(장황한 설명 금지).',
       messages: [
         {
           role: 'user',

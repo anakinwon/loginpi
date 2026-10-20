@@ -26,12 +26,13 @@ const fmtS = (t: string) => new Date(t).toLocaleTimeString('ko-KR', { hour: '2-d
 
 const LIKE: Record<AiResult['confidence'], [string, string]> = { HIGH: ['높음', 'bg-red-100 text-red-700'], MID: ['중간', 'bg-amber-100 text-amber-800'], LOW: ['낮음', 'bg-gray-100 text-gray-600'] }
 
-// AI 원인 분석 결과 패널 — 원인(가능성 순)·해결 방안(파일)·확인 방법·부족한 데이터
+// AI 원인 분석 결과 패널 — 원인 > 해결 방안 묶음(가능성 순)을 하나씩 접고 펼침, 마지막에 조치 후 확인. 머리글 '숨기기'로 본문 전체 접기
 function AiPanel({ ai, onClose, onRetry }: { ai: { route: string; busy: boolean; res?: AiResult; err?: string }; onClose: () => void; onRetry: () => void }) {
+  const [open, setOpen] = useState(true)
   const r = ai.res
   return (
     <div className="mt-2 rounded-lg border border-violet-300 bg-violet-50/40 p-3 text-sm" aria-live="polite">
-      <div className="mb-2 flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <Sparkles className="h-4 w-4 text-violet-700" aria-hidden />
         <b className="text-[#2c3850]">AI 원인 분석</b>
         <span className="text-xs text-[#5b6578]">
@@ -39,7 +40,17 @@ function AiPanel({ ai, onClose, onRetry }: { ai: { route: string; busy: boolean;
         </span>
         {r && <span className={`rounded px-1.5 py-0.5 text-xs font-semibold ${LIKE[r.confidence][1]}`}>신뢰도 {LIKE[r.confidence][0]}</span>}
         <span className="ml-auto flex gap-1 text-xs">
-          <button type="button" disabled={ai.busy} onClick={onRetry} className="rounded border border-[#d6deeb] bg-white px-2 py-0.5 disabled:opacity-40">
+          <button type="button" onClick={() => setOpen(!open)} aria-expanded={open} className="rounded border border-[#d6deeb] bg-white px-2 py-0.5">
+            {open ? '숨기기' : '보이기'}
+          </button>
+          <button
+            type="button"
+            disabled={ai.busy}
+            onClick={() => {
+              setOpen(true)
+              onRetry()
+            }}
+            className="rounded border border-[#d6deeb] bg-white px-2 py-0.5 disabled:opacity-40">
             다시 분석
           </button>
           <button type="button" onClick={onClose} className="rounded border border-[#d6deeb] bg-white px-2 py-0.5">
@@ -47,49 +58,49 @@ function AiPanel({ ai, onClose, onRetry }: { ai: { route: string; busy: boolean;
           </button>
         </span>
       </div>
-      {ai.busy && <p className="text-[#5b6578]">수치·개별 이력·소스 코드를 모아 분석하는 중입니다(최대 1~2분)…</p>}
-      {ai.err && <p className="text-red-700">{ai.err}</p>}
-      {r && (
-        <div className="space-y-3">
-          <p className="text-[#2c3850]">{r.summary}</p>
-          <div>
-            <h4 className="mb-1 text-xs font-bold text-[#2c3850]">원인(가능성 순)</h4>
-            <ol className="space-y-1">
+      {open && (
+        <div className="mt-2 space-y-2">
+          {ai.busy && <p className="text-[#5b6578]">수치·개별 이력·소스 코드를 모아 분석하는 중입니다(최대 1~2분)…</p>}
+          {ai.err && <p className="text-red-700">{ai.err}</p>}
+          {r && (
+            <>
+              <p className="text-[#2c3850]">{r.summary}</p>
               {r.causes.map((c, i) => (
-                <li key={i} className="rounded border border-[#e2e7ef] bg-white p-2">
-                  <div className="flex items-center gap-2">
-                    <span className={`rounded px-1.5 py-0.5 text-xs font-semibold ${LIKE[c.likelihood][1]}`}>{LIKE[c.likelihood][0]}</span>
+                <details key={i} open={i === 0} className="rounded border border-[#e2e7ef] bg-white">
+                  <summary className="cursor-pointer px-2 py-1.5">
+                    <span className="mr-2 text-xs text-[#5b6578]">원인 {i + 1}</span>
+                    <span className={`mr-2 rounded px-1.5 py-0.5 text-xs font-semibold ${LIKE[c.likelihood][1]}`}>{LIKE[c.likelihood][0]}</span>
                     <b className="text-[#2c3850]">{c.title}</b>
+                  </summary>
+                  <div className="space-y-1 border-t border-[#e2e7ef] px-2 py-1.5">
+                    <p className="text-xs text-[#5b6578]">{c.evidence}</p>
+                    {c.fixes.map((x, j) => (
+                      <div key={j} className="rounded bg-emerald-50 px-2 py-1">
+                        <div className="text-[#2c3850]">
+                          <span className="mr-1 text-xs font-semibold text-emerald-700">해결 ▸</span>
+                          <b>{x.title}</b>
+                        </div>
+                        <p className="text-xs text-[#2c3850]">{x.detail}</p>
+                        {x.files.length > 0 && <p className="font-mono text-xs text-[#5b6578]">{x.files.join(' · ')}</p>}
+                      </div>
+                    ))}
                   </div>
-                  <p className="mt-1 whitespace-pre-wrap text-xs text-[#5b6578]">{c.evidence}</p>
-                </li>
+                </details>
               ))}
-            </ol>
-          </div>
-          <div>
-            <h4 className="mb-1 text-xs font-bold text-[#2c3850]">해결 방안</h4>
-            <ol className="list-decimal space-y-1 pl-5">
-              {r.fixes.map((x, i) => (
-                <li key={i}>
-                  <b className="text-[#2c3850]">{x.title}</b>
-                  <p className="whitespace-pre-wrap text-xs text-[#2c3850]">{x.detail}</p>
-                  {x.files.length > 0 && <p className="font-mono text-xs text-[#5b6578]">{x.files.join(' · ')}</p>}
-                </li>
-              ))}
-            </ol>
-          </div>
-          {r.checks.length > 0 && (
-            <div>
-              <h4 className="mb-1 text-xs font-bold text-[#2c3850]">조치 후 확인</h4>
-              <ul className="list-disc pl-5 text-xs text-[#2c3850]">
-                {r.checks.map((c, i) => (
-                  <li key={i}>{c}</li>
-                ))}
-              </ul>
-            </div>
+              {r.checks.length > 0 && (
+                <details className="rounded border border-[#e2e7ef] bg-white">
+                  <summary className="cursor-pointer px-2 py-1.5 text-xs font-bold text-[#2c3850]">조치 후 확인 ({r.checks.length})</summary>
+                  <ul className="list-disc border-t border-[#e2e7ef] py-1.5 pl-7 pr-2 text-xs text-[#2c3850]">
+                    {r.checks.map((c, i) => (
+                      <li key={i}>{c}</li>
+                    ))}
+                  </ul>
+                </details>
+              )}
+              {r.gaps.length > 0 && <p className="text-xs text-[#5b6578]">부족한 데이터 : {r.gaps.join(' / ')}</p>}
+              <p className="text-xs text-[#5b6578]">AI 추정입니다 — 코드는 바꾸지 않았습니다. 근거를 확인한 뒤 조치하십시오.</p>
+            </>
           )}
-          {r.gaps.length > 0 && <p className="text-xs text-[#5b6578]">부족한 데이터 : {r.gaps.join(' / ')}</p>}
-          <p className="text-xs text-[#5b6578]">AI 추정입니다 — 코드는 바꾸지 않았습니다. 근거를 확인한 뒤 조치하십시오.</p>
         </div>
       )}
     </div>
