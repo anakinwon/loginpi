@@ -8,7 +8,7 @@ import { db } from './db'
 import { inChunks } from './paging'
 import { pgClient, type Target } from './db-exec'
 import { ipAllowed } from './modelpi/net-guard'
-import { KEEP_DAYS, minuteOf, type AppRow } from './mon'
+import { evtCd, KEEP_DAYS, minuteOf, type AppRow, type Sample } from './mon'
 
 const since = (min: number) => new Date(Date.now() - min * 60000).toISOString()
 const thisMin = () => minuteOf(Date.now())
@@ -31,6 +31,19 @@ export async function appView(min: number) {
   const r = await db().from('mon_app_hist').select('bkt_dtm, route_txt, req_cnt, err_cnt, slow_cnt, rsp_sum_val, rsp_max_val').gte('bkt_dtm', since(min)).order('bkt_dtm', { ascending: false }).limit(5000)
   if (r.error) throw r.error
   return [...r.data].reverse() as (Omit<AppRow, 'rsp_sum_val'> & { rsp_sum_val: number | string })[]
+}
+// 느림·오류 개별 이력(sql/069) — 실패는 기록만(합계 저장·응답을 막지 않게)
+export async function addAppEvt(usrId: string, ss: Sample[]) {
+  if (!ss.length) return
+  const rows = ss.map((s) => ({ occr_dtm: new Date(s.t).toISOString(), evt_cd: evtCd(s.ms, s.status), scr_txt: s.page ?? null, route_txt: s.route, sts_no: s.status, rsp_val: Math.max(0, Math.min(Math.round(s.ms), 600_000)), usr_id: usrId }))
+  const { error } = await db().from('mon_app_evt_hist').insert(rows)
+  if (error) console.error('[mon] addAppEvt', error.code, error.message)
+}
+export type AppEvt = { occr_dtm: string; evt_cd: 'SLOW' | 'ERR'; scr_txt: string | null; route_txt: string; sts_no: number; rsp_val: number }
+export async function appEvtView(min: number) {
+  const r = await db().from('mon_app_evt_hist').select('occr_dtm, evt_cd, scr_txt, route_txt, sts_no, rsp_val').gte('occr_dtm', since(min)).order('occr_dtm', { ascending: false }).limit(500)
+  if (r.error) throw r.error
+  return r.data as AppEvt[]
 }
 
 // ② 서버(로컬 에이전트 호스트) ----------------------------------------------------
@@ -211,6 +224,8 @@ export async function collectAll() {
     const d = await db().from(t).delete().lt('bkt_dtm', old)
     if (d.error) throw d.error
   }
+  const e = await db().from('mon_app_evt_hist').delete().lt('occr_dtm', old)
+  if (e.error) throw e.error
   const r = await db().from('mon_url').select('url_id, area_id, chk_url').eq('use_yn', 'Y').eq('del_yn', 'N').order('mod_dtm').limit(1000)
   if (r.error) throw r.error
   return { checked: await checkRows(r.data as UrlRow[], Date.now() + 45_000), total: r.data.length }

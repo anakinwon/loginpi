@@ -103,13 +103,15 @@ export function Meter({ pct }: { pct: number | null }) {
   )
 }
 
-// 분 단위 누적 막대 — 정상(파랑)·느림(주황)·오류(빨강), 히트맵 대용
-export function Stack({ title, bars, h = 120 }: { title: string; bars: { t: string; ok: number; slow: number; err: number }[]; h?: number }) {
+// 분 단위 누적 막대 — 정상(파랑)·느림(주황)·오류(빨강), 히트맵 대용. 막대 툴팁(건수), 오류 있는 분은 빨간 점(건수 작아도 보이게)
+// onPick 이 있으면 막대마다 버튼(클릭·Enter·Space → 그 분 선택, sel = 선택된 분 테두리)
+export function Stack({ title, bars, h = 120, onPick, sel }: { title: string; bars: { t: string; ok: number; slow: number; err: number }[]; h?: number; onPick?: (t: string) => void; sel?: string | null }) {
   const W = 320
   const pad = { l: 30, r: 6, t: 8, b: 18 }
   const top = Math.max(1, ...bars.map((b) => b.ok + b.slow + b.err)) * 1.1
   const bw = bars.length ? (W - pad.l - pad.r) / bars.length : 0
   const y = (v: number) => (v / top) * (h - pad.t - pad.b)
+  const errSum = bars.reduce((n, b) => n + b.err, 0)
   return (
     <figure className="rounded-lg border border-[#d6deeb] bg-white p-2">
       <figcaption className="flex items-center gap-2 px-1 text-xs font-semibold text-[#2c3850]">
@@ -117,10 +119,10 @@ export function Stack({ title, bars, h = 120 }: { title: string; bars: { t: stri
         <span className="ml-auto flex gap-2 font-normal text-[#5b6578]">
           <span><i className="mr-0.5 inline-block h-2 w-2 bg-[#3b82f6]" />정상</span>
           <span><i className="mr-0.5 inline-block h-2 w-2 bg-[#f59e0b]" />느림</span>
-          <span><i className="mr-0.5 inline-block h-2 w-2 bg-[#dc2626]" />오류</span>
+          <span className={errSum ? 'font-semibold text-red-700' : ''}><i className="mr-0.5 inline-block h-2 w-2 bg-[#dc2626]" />오류 {errSum.toLocaleString()}건</span>
         </span>
       </figcaption>
-      <svg viewBox={`0 0 ${W} ${h}`} className="w-full" role="img" aria-label={`${title} 분 단위 분포`}>
+      <svg viewBox={`0 0 ${W} ${h}`} className="w-full" role={onPick ? 'group' : 'img'} aria-label={`${title} 분 단위 분포`}>
         <line x1={pad.l} x2={W - pad.r} y1={h - pad.b} y2={h - pad.b} stroke={C.grid} />
         <text x={pad.l - 4} y={pad.t + 6} textAnchor="end" fontSize="9" fill={C.axis}>
           {fmtN(top, 0)}
@@ -128,8 +130,27 @@ export function Stack({ title, bars, h = 120 }: { title: string; bars: { t: stri
         {bars.map((b, i) => {
           const x0 = pad.l + i * bw + 0.5
           let base = h - pad.b
+          const w = Math.max(1, bw - 1)
           return (
-            <g key={b.t}>
+            <g
+              key={b.t}
+              {...(onPick && {
+                role: 'button',
+                tabIndex: 0,
+                'aria-label': `${fmtT(b.t)} 요청 ${b.ok + b.slow + b.err}건 — 누르면 이 분의 느림·오류 상세`,
+                'aria-pressed': sel === b.t,
+                className: 'cursor-pointer outline-none focus-visible:opacity-70',
+                onClick: () => onPick(b.t),
+                onKeyDown: (e: React.KeyboardEvent) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    onPick(b.t)
+                  }
+                },
+              })}
+            >
+              <title>{`${fmtT(b.t)} 요청 ${b.ok + b.slow + b.err} · 정상 ${b.ok} · 느림 ${b.slow} · 오류 ${b.err}${onPick ? ' — 누르면 상세' : ''}`}</title>
+              <rect x={x0} y={pad.t} width={w} height={h - pad.t - pad.b} fill={sel === b.t ? 'rgba(31,58,104,0.12)' : 'transparent'} stroke={sel === b.t ? C.mark : 'none'} strokeWidth={0.8} />
               {(
                 [
                   [b.ok, '#3b82f6'],
@@ -139,8 +160,9 @@ export function Stack({ title, bars, h = 120 }: { title: string; bars: { t: stri
               ).map(([v, col]) => {
                 const hh = y(v)
                 base -= hh
-                return v > 0 ? <rect key={col} x={x0} y={base} width={Math.max(1, bw - 1)} height={hh} fill={col} /> : null
+                return v > 0 ? <rect key={col} x={x0} y={base} width={w} height={hh} fill={col} /> : null
               })}
+              {b.err > 0 && <circle cx={x0 + w / 2} cy={Math.max(pad.t, base - 4)} r={2.5} fill="#dc2626" />}
             </g>
           )
         })}
@@ -164,13 +186,21 @@ export function Stack({ title, bars, h = 120 }: { title: string; bars: { t: stri
   )
 }
 
-// 숫자 타일
-export function Tile({ nm, val, sub, warn }: { nm: string; val: string; sub?: string; warn?: boolean }) {
-  return (
-    <div className="rounded-lg border border-[#d6deeb] bg-gradient-to-b from-[#f4f7fc] to-[#e9eff9] px-3 py-2">
-      <div className="text-xs text-[#4a5a78]">{nm}</div>
-      <div className={`text-2xl font-bold tabular-nums ${warn ? 'text-red-700' : 'text-[#1f3a68]'}`}>{val}</div>
-      {sub && <div className="text-[11px] text-[#5b6578]">{sub}</div>}
-    </div>
+// 숫자 타일 — onClick 이 있으면 버튼(title = 누르면 하는 일, on = 선택됨)
+export function Tile({ nm, val, sub, warn, onClick, title, on }: { nm: string; val: string; sub?: string; warn?: boolean; onClick?: () => void; title?: string; on?: boolean }) {
+  const body = (
+    <>
+      <span className="block text-xs text-[#4a5a78]">{nm}</span>
+      <span className={`block text-2xl font-bold tabular-nums ${warn ? 'text-red-700' : 'text-[#1f3a68]'}`}>{val}</span>
+      {sub && <span className="block text-[11px] text-[#5b6578]">{sub}</span>}
+    </>
+  )
+  const cls = `rounded-lg border bg-gradient-to-b from-[#f4f7fc] to-[#e9eff9] px-3 py-2 ${on ? 'border-[#1f3a68] ring-1 ring-[#1f3a68]' : 'border-[#d6deeb]'}`
+  return onClick ? (
+    <button type="button" onClick={onClick} title={title} aria-label={`${nm} ${val} — ${title}`} aria-pressed={on} className={`${cls} text-left hover:border-[#1f3a68]`}>
+      {body}
+    </button>
+  ) : (
+    <div className={cls}>{body}</div>
   )
 }
