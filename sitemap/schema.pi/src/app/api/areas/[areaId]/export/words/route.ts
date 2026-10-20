@@ -2,7 +2,7 @@
 // 헤더는 일괄등록 양식(행안부 공통표준)과 같아 내려받은 파일을 그대로 다시 올릴 수 있다(Wordict 출력 파일 = 일괄등록 템플릿, reqst.md)
 import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { dbError, requireAreaRole } from '@/lib/api'
+import { dbError, likeQ, requireAreaRole } from '@/lib/api'
 import { HEADERS, toCsv, kstDtm } from '@/lib/bulk'
 import { fetchAll } from '@/lib/bulk-check'
 
@@ -41,7 +41,7 @@ export async function GET(req: Request, { params }: Ctx) {
         .order('std_reg_dtm', { ascending: false })
         .order('dic_id') // 같은 등록일시 1,000건 묶음 경계에서 누락·중복 방지
       if (q) {
-        const p = `%${q.replace(/[%_,()]/g, '')}%`
+        const p = likeQ(q)
         query = query.or(`dic_log_nm.ilike.${p},dic_phy_nm.ilike.${p}`)
       }
       if (se === 'STD' || se === 'NSTD') query = query.eq('std_se_cd', se)

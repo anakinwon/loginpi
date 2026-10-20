@@ -3,7 +3,7 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { db } from '@/lib/db'
-import { apiError, audit, dbError, parseBody, requireAreaRole } from '@/lib/api'
+import { apiError, audit, dbError, likeQ, parseBody, requireAreaRole } from '@/lib/api'
 import { pageRows } from '@/lib/paging'
 import { withActors } from '@/lib/approval'
 
@@ -27,7 +27,7 @@ export async function GET(req: Request, { params }: Ctx) {
       .in('rel_tp_cd', tp === 'SYN' || tp === 'BAN' ? [tp] : ['SYN', 'BAN'])
       .order('reg_dtm', { ascending: false })
       .order('rel_txt')
-    if (q) query = query.ilike('rel_txt', `%${q.replace(/[%_,()]/g, '')}%`)
+    if (q) query = query.ilike('rel_txt', likeQ(q))
     return query
   }
   const r = await pageRows(build, sp, 1000)

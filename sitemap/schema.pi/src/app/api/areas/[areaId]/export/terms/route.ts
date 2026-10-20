@@ -2,7 +2,7 @@
 // 헤더는 일괄등록 양식(행안부 공통표준)과 같고, 도메인명은 DA# 도메인명(std_dom.dom_nm)을 그대로 쓴다
 import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { dbError, requireAreaRole } from '@/lib/api'
+import { dbError, likeQ, requireAreaRole } from '@/lib/api'
 import { HEADERS, toCsv, kstDtm } from '@/lib/bulk'
 import { fetchAll } from '@/lib/bulk-check'
 const SE_NM: Record<string, string> = { STD: '표준', NSTD: '비표준' } // 표준구분코드(sql/033)
@@ -39,7 +39,7 @@ export async function GET(req: Request, { params }: Ctx) {
         .order('std_reg_dtm', { ascending: false })
         .order('term_id') // 같은 등록일시 1,000건 묶음 경계에서 누락·중복 방지
       if (q) {
-        const p = `%${q.replace(/[%_,()]/g, '')}%`
+        const p = likeQ(q)
         query = query.or(`term_log_nm.ilike.${p},term_phy_nm.ilike.${p}`)
       }
       if (se === 'STD' || se === 'NSTD') query = query.eq('std_se_cd', se)

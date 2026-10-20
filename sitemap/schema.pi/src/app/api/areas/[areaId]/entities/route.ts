@@ -3,7 +3,7 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { db } from '@/lib/db'
-import { apiError, audit, dbError, parseBody, requireAreaRole } from '@/lib/api'
+import { apiError, audit, dbError, likeQ, parseBody, requireAreaRole } from '@/lib/api'
 import { inChunks, pageRows } from '@/lib/paging'
 import { withActors } from '@/lib/approval'
 import { entSchema, MDL_LVLS, prepareEnt, type MdlLvl } from '@/lib/model'
@@ -35,7 +35,7 @@ export async function GET(req: Request, { params }: Ctx) {
     if (subjIds) query = query.in('subj_id', subjIds)
     if (lvl) query = query.eq('mdl_lvl_cd', lvl)
     if (prj && z.string().uuid().safeParse(prj).success) query = query.eq('prj_id', prj)
-    if (q) query = query.ilike('ent_log_nm', `%${q.replace(/[%_,()]/g, '')}%`)
+    if (q) query = query.ilike('ent_log_nm', likeQ(q))
     return query
   }
   const r = await pageRows(build, sp, 1000)

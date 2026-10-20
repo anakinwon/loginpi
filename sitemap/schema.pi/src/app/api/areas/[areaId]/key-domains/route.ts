@@ -2,7 +2,7 @@
 // 지정·해제는 단어 수정 신청(PATCH /words/[dicId] { ver_no, key_dom_yn })으로 처리(sql/013, 승인 절차 공용)
 import { NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { dbError, requireAreaRole } from '@/lib/api'
+import { dbError, likeQ, requireAreaRole } from '@/lib/api'
 import { inChunks, pageRows } from '@/lib/paging'
 import { stsFilter, withActors } from '@/lib/approval'
 
@@ -34,7 +34,7 @@ export async function GET(req: Request, { params }: Ctx) {
     let query = db().from('std_dic').select(COLS, { count: 'exact' }).eq('area_id', areaId).eq('del_yn', 'N').order('std_reg_dtm', { ascending: false }).order('dic_log_nm')
     query = ids.length ? query.or(`key_dom_yn.eq.Y,dic_id.in.(${ids.join(',')})`) : query.eq('key_dom_yn', 'Y')
     if (q) {
-      const p = `%${q.replace(/[%_,()]/g, '')}%`
+      const p = likeQ(q)
       query = query.or(`dic_log_nm.ilike.${p},dic_phy_nm.ilike.${p}`)
     }
     query = stsFilter(query, sts, 'dic_id', pendBy)

@@ -4,7 +4,7 @@ import { db } from '@/lib/db'
 import { pendingChg, reqOpt, requestIns, stsFilter, withActors } from '@/lib/approval'
 import { ERR_STATUS } from '@/lib/change'
 import { pageRows } from '@/lib/paging'
-import { apiError, audit, dbError, parseBody, requireAreaRole } from '@/lib/api'
+import { apiError, audit, dbError, likeQ, parseBody, requireAreaRole } from '@/lib/api'
 import { buildDomName, domKeyWordError, domainSchema } from '@/lib/domain'
 import { domGrpValid } from '@/lib/settings'
 
@@ -25,7 +25,7 @@ export async function GET(req: Request, { params }: Ctx) {
   const build = () => {
     let query = db().from('std_dom').select(COLS, { count: 'exact' }).eq('area_id', areaId).eq('del_yn', 'N').order('std_reg_dtm', { ascending: false }).order('dom_nm')
     if (q) {
-      const p = `%${q.replace(/[%_,()]/g, '')}%`
+      const p = likeQ(q)
       query = query.or(`key_dom_nm.ilike.${p},dom_nm.ilike.${p}`)
     }
     // 상태 필터(REQ·CNFM·RJCT·DSCD, 그 외 값은 무시)

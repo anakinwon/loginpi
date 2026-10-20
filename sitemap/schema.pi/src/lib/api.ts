@@ -235,6 +235,9 @@ export async function requireAreaRole(areaId: string, perm: Perm): Promise<AreaA
   return perms.includes(perm) ? { user, role, perms, plan } : apiError(perm === 'VIEW' ? 'FORBIDDEN' : 'PLAN_OR_ROLE', 403)
 }
 
+// 목록 검색어 → ILIKE 부분일치 패턴. PostgREST or() 구분자(, ( ))·LIKE 메타(%)·이스케이프(\)만 제거하고 '_' 는 남김 — '_' 는 한 글자 일치라 물리명(CUST_STTS_TPCD)으로도 찾힘(2026-10-20, 전엔 '_' 를 지워 0건)
+export const likeQ = (q: string) => `%${q.replace(/[%,()\\]/g, '')}%`
+
 export async function audit(row: {
   area_id: string
   tgt_tp_cd: string
