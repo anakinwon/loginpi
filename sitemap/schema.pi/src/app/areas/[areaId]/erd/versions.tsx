@@ -1,6 +1,6 @@
 'use client'
 // 모델 버전 패널(PRD_PiErd S5 ERD-4) — ERD 툴바 '버전' : 현재 논리 모델 스냅샷 저장·목록(페이지)·삭제, 두 버전 또는 버전 ↔ 현재 비교(추가·삭제·변경)
-// 비교 결과는 목록으로만(캔버스 강조 없음) — 저장·삭제는 MODEL_EDIT, 조회·비교는 MODEL_VIEW
+// 비교 결과 = 목록 + 'ERD 에 표시'(캔버스 색 강조, onShow — 기준 → 현재 모델 비교일 때만 캔버스와 맞음) — 저장·삭제는 MODEL_EDIT, 조회·비교는 MODEL_VIEW
 import { piFetch } from '@pi/auth/client'
 import { useCallback, useEffect, useState } from 'react'
 import type { Diff, DiffItem } from '@/lib/modelpi/ver'
@@ -60,7 +60,12 @@ function Items({ title, xs }: { title: string; xs: DiffItem[] }) {
   )
 }
 
-export function VersionPanel({ api, prjId, editor, onClose }: { api: string; prjId: string; editor: boolean; onClose: () => void }) {
+export interface VerShow {
+  title: string
+  diff: Diff
+  cnt: DiffRes['cnt']
+}
+export function VersionPanel({ api, prjId, editor, onClose, onShow }: { api: string; prjId: string; editor: boolean; onClose: () => void; onShow: (v: VerShow) => void }) {
   const base = `${api}/projects/${prjId}/versions`
   const [rows, setRows] = useState<Ver[]>([])
   const [total, setTotal] = useState(0)
@@ -193,8 +198,14 @@ export function VersionPanel({ api, prjId, editor, onClose }: { api: string; prj
 
         {res && (
           <div className="mt-3">
-            <div className="font-semibold">
+            <div className="flex flex-wrap items-center gap-2 font-semibold">
               {vNm(res.from)} → {vNm(res.to)} : 추가 {res.cnt.ins} · 삭제 {res.cnt.del} · 변경 {res.cnt.upd}
+              {/* 캔버스 = 현재 모델 — 대상이 현재일 때만 색 위치가 정확(두 과거 버전 비교는 목록으로) */}
+              {!res.to && res.cnt.ins + res.cnt.del + res.cnt.upd > 0 && (
+                <button type="button" className="rounded bg-emerald-600 px-2 py-0.5 text-sm text-white hover:bg-emerald-700" onClick={() => (onShow({ title: `${vNm(res.from)} → 현재 모델`, diff: res.diff, cnt: res.cnt }), onClose())}>
+                  ERD 에 표시
+                </button>
+              )}
             </div>
             {res.cnt.ins + res.cnt.del + res.cnt.upd === 0 && <p className="mt-1 text-gray-500">차이가 없습니다</p>}
             <Items title="엔터티" xs={res.diff.ents} />

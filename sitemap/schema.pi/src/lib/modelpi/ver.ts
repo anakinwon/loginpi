@@ -38,6 +38,7 @@ export interface DiffItem {
   op: DiffOp
   id: string
   ent_nm: string // 엔터티 = 자기 이름, 속성 = 소속 엔터티, 관계 = 부모 엔터티
+  ent_id?: string // 속성만 — 소속 엔터티(ERD 에 삭제된 속성 수 표시)
   nm: string // 엔터티·속성 = 논리명, 관계 = "부모 → 자식 (관계명)"
   chg?: DiffChg[]
 }
@@ -98,7 +99,7 @@ export function diffSnap(a: Snap, b: Snap): Diff {
   const bEnt = new Map(b.ents.map((e) => [e.ent_id, e]))
   const attrs = a.ents.flatMap((ea) => {
     const eb = bEnt.get(ea.ent_id)
-    return eb ? cmp(ea.attrs, eb.attrs, (t) => t.attr_id, ATTR_F, (t) => ({ id: t.attr_id, ent_nm: eb.ent_log_nm, nm: t.term_log_nm })) : []
+    return eb ? cmp(ea.attrs, eb.attrs, (t) => t.attr_id, ATTR_F, (t) => ({ id: t.attr_id, ent_nm: eb.ent_log_nm, ent_id: eb.ent_id, nm: t.term_log_nm })) : []
   })
   const relNm = (r: SnapRel) => `${entNm.get(r.prnt_ent_id) ?? '?'} → ${entNm.get(r.chld_ent_id) ?? '?'}${r.rel_nm ? ` (${r.rel_nm})` : ''}`
   const rels = cmp(a.rels, b.rels, (r) => r.rel_id, REL_F, (r) => ({ id: r.rel_id, ent_nm: entNm.get(r.prnt_ent_id) ?? '?', nm: relNm(r) }))
@@ -110,4 +111,26 @@ export function diffSnap(a: Snap, b: Snap): Diff {
 export const diffCnt = (d: Diff) => {
   const all = [...d.ents, ...d.attrs, ...d.rels]
   return { ins: all.filter((x) => x.op === 'INS').length, del: all.filter((x) => x.op === 'DEL').length, upd: all.filter((x) => x.op === 'UPD').length }
+}
+
+// ERD 표시 지도(ERD-4 화면 표시) — 캔버스는 현재 모델이라 추가·변경은 해당 엔터티·속성·관계에 색, 삭제는 캔버스에 없으므로 건수로만(속성 삭제는 소속 엔터티에 개수)
+export interface VerMark {
+  ent: Record<string, DiffOp>
+  attr: Record<string, DiffOp>
+  rel: Record<string, DiffOp>
+  delAttr: Record<string, number> // 엔터티ID → 삭제된 속성 수
+  delEnt: number
+  delRel: number
+}
+export function toMark(d: Diff): VerMark {
+  const m: VerMark = { ent: {}, attr: {}, rel: {}, delAttr: {}, delEnt: 0, delRel: 0 }
+  for (const x of d.ents) x.op === 'DEL' ? m.delEnt++ : (m.ent[x.id] = x.op)
+  for (const x of d.rels) x.op === 'DEL' ? m.delRel++ : (m.rel[x.id] = x.op)
+  for (const x of d.attrs) {
+    if (x.op !== 'DEL') m.attr[x.id] = x.op
+    else if (x.ent_id) m.delAttr[x.ent_id] = (m.delAttr[x.ent_id] ?? 0) + 1
+    // 속성만 바뀐 엔터티도 변경으로 표시(엔터티 자체 추가는 그대로 추가)
+    if (x.ent_id && !m.ent[x.ent_id]) m.ent[x.ent_id] = 'UPD'
+  }
+  return m
 }

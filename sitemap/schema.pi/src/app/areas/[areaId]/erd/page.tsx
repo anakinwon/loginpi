@@ -19,7 +19,7 @@ import '@xyflow/react/dist/style.css'
 import { toPng, toSvg } from 'html-to-image'
 import { Background, BaseEdge, Controls, EdgeLabelRenderer, getNodesBounds, getSmoothStepPath, Handle, MiniMap, Position, ReactFlow, ReactFlowProvider, SelectionMode, useNodesState, useReactFlow, useStoreApi, ViewportPortal, type Edge, type EdgeProps, type Node, type NodeProps } from '@xyflow/react'
 import Link from 'next/link'
-import { use, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { createContext, use, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { dbmsList } from '@/lib/modelpi/dbms'
 import { autoLayout, boxSize } from '@/lib/modelpi/layout'
@@ -29,7 +29,8 @@ import { type MbrRole, type Perm } from '@/lib/roles'
 import Attrs from '../model/attrs'
 import EntForm from '../model/ent-form'
 import Relations from '../model/relations'
-import { VersionPanel } from './versions'
+import { VersionPanel, type VerShow } from './versions'
+import { toMark, type DiffOp, type VerMark } from '@/lib/modelpi/ver'
 import { ENT_TP, entTpColor, type EntTp } from '@/lib/model-name'
 
 interface Attr {
@@ -143,13 +144,22 @@ const SIDES = [
 // 키 속성 글자색(마스터 지시 2026-10-20) : 주식별자 = 다홍색, FK(상속 속성) = 분홍색 — PK 이면서 FK(식별 관계 상속)는 주식별자 색. 기호·이름 칸만(옵션 칸은 회색 유지)
 const KEY_C = { pk: '#E34234', fk: '#E75480' }
 const keyColor = (a: Attr | undefined) => (a?.pk_yn === 'Y' ? KEY_C.pk : a?.fk_rel_id ? KEY_C.fk : undefined)
+// 버전 차이 표시(ERD-4, 버전 패널 'ERD 에 표시') — 기준 버전 → 현재 모델 : 추가 초록·변경 주황 테두리·속성 행 배경·관계선, 삭제는 캔버스에 없어 건수만
+//  노드 데이터를 다시 만들지 않도록 컨텍스트로 전달(끄기·켜기·다시 불러오기와 무관)
+const VER_C: Record<DiffOp, string> = { INS: '#16a34a', UPD: '#d97706', DEL: '#dc2626' }
+const VER_BG: Record<DiffOp, string> = { INS: '#dcfce7', UPD: '#fef3c7', DEL: '#fee2e2' }
+const VER_NM: Record<DiffOp, string> = { INS: '추가', UPD: '변경', DEL: '삭제' }
+const MarkCtx = createContext<VerMark | null>(null)
 
 function EntNode({ data, selected }: NodeProps<ENode>) {
   const { ent: e, lvl, phy, fix, nt = 'IE', nmo = NMO_DEF } = data
   const c = entTpColor(e.ent_tp_cd) // 유형별 자동 색(실체 노랑·기준 초록·행위 파랑·가공 없음)
   const { w, h } = sizeOf(e, lvl, phy, nmo)
+  const vm = useContext(MarkCtx)
+  const mk = vm?.ent[e.ent_id]
+  const delA = vm?.delAttr[e.ent_id] ?? 0
   return (
-    <div style={{ minWidth: w, width: 'max-content', minHeight: h, borderColor: c.border, borderStyle: e.ref ? 'dashed' : 'solid', background: c.fill }} className={`${nt === 'BK' ? 'overflow-hidden rounded-2xl' : 'rounded'} border-2 text-xs shadow-sm ${selected ? 'ring-2 ring-amber-400' : ''}`}>
+    <div style={{ minWidth: w, width: 'max-content', minHeight: h, borderColor: c.border, borderStyle: e.ref ? 'dashed' : 'solid', background: c.fill, boxShadow: mk ? `0 0 0 4px ${VER_C[mk]}` : undefined }} className={`${nt === 'BK' ? 'overflow-hidden rounded-2xl' : 'rounded'} border-2 text-xs shadow-sm ${selected ? 'ring-2 ring-amber-400' : ''}`}>
       {SIDES.map(([k, p]) => (
         <span key={k}>
           <Handle type="source" id={`s-${k}`} position={p} className="!h-1 !w-1 !border-0 !bg-transparent" />
@@ -159,6 +169,8 @@ function EntNode({ data, selected }: NodeProps<ENode>) {
       <div style={{ background: c.head, color: c.text, borderBottom: `1px solid ${c.border}` }} className="flex items-center gap-1 px-2 py-1 font-semibold">
         <span className="truncate" title={title(e, isPhy(lvl, phy), nmo)}>{title(e, isPhy(lvl, phy), nmo)}</span>
         {fix && <span title="고정(자동 배치가 옮기지 않음)">📌</span>}
+        {mk && <span className="rounded px-1 text-[10px] text-white" style={{ background: VER_C[mk] }}>{VER_NM[mk]}</span>}
+        {delA > 0 && <span className="rounded px-1 text-[10px] text-white" style={{ background: VER_C.DEL }} title="기준 버전에 있던 속성이 지금은 없음">속성 삭제 {delA}</span>}
         {e.ref && <span className="ml-auto rounded bg-white/60 px-1 text-[10px]">참조 · {e.subj_nm}</span>}
       </div>
       {/* 박스 너비 = 내용(표) 맞춤, 추정 크기는 최소 너비 — 관계선은 실측 크기(measured)로 붙음 */}
@@ -166,7 +178,7 @@ function EntNode({ data, selected }: NodeProps<ENode>) {
         <table className="mx-2 my-1 font-mono leading-[18px]">
           <tbody>
             {cells(e, lvl, phy, nt, nmo).map((r, i) => (
-              <tr key={i} className={e.attrs[i]?.pk_yn === 'Y' ? 'font-semibold' : ''} style={{ color: keyColor(e.attrs[i]) }}>
+              <tr key={i} className={e.attrs[i]?.pk_yn === 'Y' ? 'font-semibold' : ''} style={{ color: keyColor(e.attrs[i]), background: (vm && e.attrs[i] && VER_BG[vm.attr[e.attrs[i].attr_id]]) || undefined }}>
                 {r.map((c, j) => (
                   <td key={j} className={`whitespace-nowrap ${j === 0 ? 'pr-1' : 'pr-3'} ${j > 1 ? 'font-normal text-gray-600' : ''}`}>
                     {c}
@@ -293,6 +305,9 @@ function Erd({ areaId }: { areaId: string }) {
   const [subj, setSubj] = useState('')
   const [showRef, setShowRef] = useState(false) // 다른 주제영역 참조 엔터티 표시(기본 숨김)
   const [verOpen, setVerOpen] = useState(false) // 모델 버전 패널(스냅샷·비교, ERD-4)
+  const [verShow, setVerShow] = useState<VerShow | null>(null) // 캔버스 버전 차이 표시(기준 → 현재)
+  const verMark = useMemo(() => (verShow ? toMark(verShow.diff) : null), [verShow])
+  useEffect(() => setVerShow(null), [prjId]) // 다른 프로젝트로 바꾸면 차이 표시 해제
   const [phyId, setPhyId] = useState('') // 기준 물리 모델(빈 값 = 서버가 첫 모델)
   const [phyModels, setPhyModels] = useState<{ phy_mdl_id: string; dbms_cd: string }[] | null>(null) // null = 아직 모름
   const [hidden, setHidden] = useState(0)
@@ -617,7 +632,7 @@ function Erd({ areaId }: { areaId: string }) {
           const sp = sidePoint(geo.boxes.get(r.prnt_ent_id)!, l.ps, l.pr)
           const tp = sidePoint(geo.boxes.get(r.chld_ent_id)!, l.cs, l.cr)
           const many = r.crdn_cd !== '11'
-          return {
+          const o = {
             id: r.rel_id,
             source: r.prnt_ent_id,
             target: r.chld_ent_id,
@@ -641,8 +656,10 @@ function Erd({ areaId }: { areaId: string }) {
                   markerEnd: many ? (r.chld_opt_yn === 'Y' ? 'ie-zero-many' : 'ie-one-many') : r.chld_opt_yn === 'Y' ? 'ie-zero-one' : 'ie-one',
                 }),
           }
+          const vk = verMark?.rel[r.rel_id] // 버전 차이 표시 : 추가·변경 관계선 색·굵게
+          return vk ? { ...o, style: { ...o.style, stroke: VER_C[vk], strokeWidth: 2.6 } } : o
         }),
-    [geo, lytOf, selRel, lay, dragRel, resetRel, nt],
+    [geo, lytOf, selRel, lay, dragRel, resetRel, nt, verMark],
   )
 
   const curPos = () => Object.fromEntries(nodes.map((n) => [n.id, { ...n.position }]))
@@ -944,6 +961,21 @@ function Erd({ areaId }: { areaId: string }) {
           {msg}
         </p>
       )}
+      {verShow && verMark && (
+        <div role="status" className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 rounded border border-emerald-300 bg-emerald-50 px-3 py-1.5 text-sm">
+          <span className="font-semibold">버전 차이 표시 : {verShow.title}</span>
+          {(['INS', 'UPD'] as const).map((k) => (
+            <span key={k} className="flex items-center gap-1">
+              <span className="inline-block h-3 w-3 rounded-sm" style={{ background: VER_C[k] }} /> {VER_NM[k]}
+            </span>
+          ))}
+          <span>추가 {verShow.cnt.ins} · 변경 {verShow.cnt.upd} · 삭제 {verShow.cnt.del}</span>
+          {verMark.delEnt + verMark.delRel > 0 && <span className="text-red-700">삭제된 엔터티 {verMark.delEnt}·관계 {verMark.delRel} 는 캔버스에 없음(버전 패널 목록 참고)</span>}
+          <button type="button" className="ml-auto rounded border border-emerald-400 px-2 py-0.5 hover:bg-emerald-100" onClick={() => setVerShow(null)}>
+            표시 끄기
+          </button>
+        </div>
+      )}
 
       <div className="mt-3 grid h-[72vh] gap-3 md:h-auto md:min-h-[26rem] md:flex-1 md:grid-cols-[var(--erd-l)_10px_minmax(0,1fr)_10px_var(--erd-r)] md:gap-0" style={{ ["--erd-l" as string]: `${paneW.l}px`, ["--erd-r" as string]: `${paneW.r}px` }}>
         <nav className="overflow-auto rounded border text-sm" aria-label="모델 트리">
@@ -975,6 +1007,7 @@ function Erd({ areaId }: { areaId: string }) {
           aria-label="ERD 캔버스"
           onContextMenu={(e) => e.preventDefault()}
         >
+          <MarkCtx.Provider value={verMark}>
           <ReactFlow
             nodes={nodes}
             edges={edges}
@@ -1031,6 +1064,7 @@ function Erd({ areaId }: { areaId: string }) {
             <Controls showInteractive={false} />
             {mini && <MiniMap pannable zoomable nodeColor={(n) => entTpColor((n.data as EntData).ent.ent_tp_cd).border} />}
           </ReactFlow>
+          </MarkCtx.Provider>
         </div>
         {splitter('r')}
 
@@ -1246,7 +1280,7 @@ function Erd({ areaId }: { areaId: string }) {
           </div>,
           document.body,
         )}
-      {verOpen && prjId && <VersionPanel api={api} prjId={prjId} editor={editor} onClose={() => setVerOpen(false)} />}
+      {verOpen && prjId && <VersionPanel api={api} prjId={prjId} editor={editor} onClose={() => setVerOpen(false)} onShow={setVerShow} />}
     </main>
   )
 }

@@ -1,7 +1,7 @@
 // 모델 버전 스냅샷·비교 검사(PRD_PiErd S5 ERD-4) — 실행 : pnpm test
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { diffCnt, diffSnap, snapCnt, type Snap, type SnapAttr, type SnapEnt } from '../src/lib/modelpi/ver.ts'
+import { diffCnt, diffSnap, snapCnt, toMark, type Snap, type SnapAttr, type SnapEnt } from '../src/lib/modelpi/ver.ts'
 
 const A = (id: string, o: Partial<SnapAttr> = {}): SnapAttr => ({ attr_id: id, term_log_nm: `용어${id}`, term_phy_nm: `T_${id}`, dom_nm: '번호VC10', pk_yn: 'N', pk_seq: null, esntl_yn: 'N', fk_rel_id: null, attr_desc: null, ...o })
 const E = (id: string, attrs: SnapAttr[], o: Partial<SnapEnt> = {}): SnapEnt => ({ ent_id: id, ent_log_nm: `엔터티${id}`, tbl_phy_nm: `TB_${id}`, ent_tp_cd: 'BASE', subj_nm: '고객', ent_desc: null, attrs, ...o })
@@ -30,7 +30,7 @@ test('엔터티·속성·관계 추가·삭제·변경', () => {
   const d = diffSnap(base, b)
   assert.deepEqual(d.ents.map((x) => [x.op, x.id]), [['UPD', '1'], ['INS', '3']])
   assert.deepEqual(d.ents[0].chg, [{ fld: 'ent_log_nm', bfr: '엔터티1', aftr: '고객' }])
-  assert.deepEqual(d.attrs.map((x) => [x.op, x.id, x.ent_nm]), [['UPD', 'b', '고객'], ['INS', 'd', '고객'], ['DEL', 'c', '엔터티2']]) // 엔터티 순서대로
+  assert.deepEqual(d.attrs.map((x) => [x.op, x.id, x.ent_nm, x.ent_id]), [['UPD', 'b', '고객', '1'], ['INS', 'd', '고객', '1'], ['DEL', 'c', '엔터티2', '2']]) // 엔터티 순서대로, 소속 엔터티 ID
   assert.deepEqual(d.rels.map((x) => [x.op, x.nm]), [['UPD', '고객 → 엔터티2 (가진다)'], ['INS', '엔터티2 → 엔터티3']])
   assert.deepEqual(diffCnt(d), { ins: 3, del: 1, upd: 3 })
 })
@@ -43,4 +43,17 @@ test('엔터티 삭제 = 엔터티 1건만(그 속성은 속성 목록에 따로
   assert.deepEqual(d.ents.map((x) => [x.op, x.id]), [['DEL', '2']])
   assert.equal(d.attrs.length, 0)
   assert.deepEqual(d.rels[0].chg, [{ fld: 'chld_ent_id', bfr: '엔터티2', aftr: '엔터티1' }])
+})
+
+test('ERD 표시 지도 : 추가·변경은 ID 별 색, 삭제는 건수, 속성만 바뀐 엔터티 = 변경', () => {
+  const b = structuredClone(base)
+  b.ents[0].attrs[1].esntl_yn = 'Y' // 엔터티1 속성 변경(엔터티 자체는 그대로)
+  b.ents[1].attrs = [] // 엔터티2 속성 c 삭제
+  b.ents.push(E('3', [A('e')])) // 엔터티 추가
+  b.rels = [] // 관계 삭제
+  const m = toMark(diffSnap(base, b))
+  assert.deepEqual(m.ent, { '1': 'UPD', '2': 'UPD', '3': 'INS' })
+  assert.deepEqual(m.attr, { b: 'UPD' })
+  assert.deepEqual(m.delAttr, { '2': 1 })
+  assert.deepEqual([m.delEnt, m.delRel, Object.keys(m.rel).length], [0, 1, 0])
 })
