@@ -250,9 +250,20 @@ export interface AreaAuth {
   perms: Perm[]
   plan: AreaPlan
 }
+// 권한 조회 결과 단기 캐시(사용자×분류체계, 30초) — 몰린 요청이 DB 를 매번 왕복하지 않게 함. 성공 결과만 저장(오류·비멤버는 저장 안 함)
+const AUTH_TTL_MS = 30_000
+const AUTH_CACHE_MAX = 5000
+const authCache = new Map<string, { at: number; role: MbrRole; plan: AreaPlan }>()
+
 export async function requireAreaRole(areaId: string, perm: Perm): Promise<AreaAuth | NextResponse> {
   const user = await currentUser()
   if (!user) return apiError('AUTH_REQUIRED', 401)
+  const key = `${user.usr_id}:${areaId}`
+  const hit = authCache.get(key)
+  if (hit && Date.now() - hit.at < AUTH_TTL_MS) {
+    const perms = effPerms(hit.role, hit.plan.plan)
+    return perms.includes(perm) ? { user, role: hit.role, perms, plan: hit.plan } : apiError(perm === 'VIEW' ? 'FORBIDDEN' : 'PLAN_OR_ROLE', 403)
+  }
   // 멤버 역할·요금제 조회를 병렬로 실행(직렬 왕복 누적 방지) — 오류 판정 순서는 기존과 같음
   const [m, p] = await Promise.all([
     db().from('std_area_mbr').select('mbr_role_cd').eq('area_id', areaId).eq('usr_id', user.usr_id).eq('del_yn', 'N').maybeSingle(),
@@ -266,6 +277,8 @@ export async function requireAreaRole(areaId: string, perm: Perm): Promise<AreaA
   if ('err' in p) return dbError(p.err)
   const plan: AreaPlan = p.plan
   const role = m.data.mbr_role_cd as MbrRole
+  if (authCache.size >= AUTH_CACHE_MAX) authCache.clear()
+  authCache.set(key, { at: Date.now(), role, plan })
   const perms = effPerms(role, plan.plan)
   return perms.includes(perm) ? { user, role, perms, plan } : apiError(perm === 'VIEW' ? 'FORBIDDEN' : 'PLAN_OR_ROLE', 403)
 }
