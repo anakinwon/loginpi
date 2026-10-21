@@ -253,15 +253,18 @@ export interface AreaAuth {
 export async function requireAreaRole(areaId: string, perm: Perm): Promise<AreaAuth | NextResponse> {
   const user = await currentUser()
   if (!user) return apiError('AUTH_REQUIRED', 401)
-  const m = await db().from('std_area_mbr').select('mbr_role_cd').eq('area_id', areaId).eq('usr_id', user.usr_id).eq('del_yn', 'N').maybeSingle()
+  // 멤버 역할·요금제 조회를 병렬로 실행(직렬 왕복 누적 방지) — 오류 판정 순서는 기존과 같음
+  const [m, p] = await Promise.all([
+    db().from('std_area_mbr').select('mbr_role_cd').eq('area_id', areaId).eq('usr_id', user.usr_id).eq('del_yn', 'N').maybeSingle(),
+    areaPlan(areaId).then(
+      (plan) => ({ plan }),
+      (e) => ({ err: e as { code?: string; message?: string } }),
+    ),
+  ])
   if (m.error) return dbError(m.error)
   if (!m.data) return apiError('FORBIDDEN', 403)
-  let plan: AreaPlan
-  try {
-    plan = await areaPlan(areaId)
-  } catch (e) {
-    return dbError(e as { code?: string; message?: string })
-  }
+  if ('err' in p) return dbError(p.err)
+  const plan: AreaPlan = p.plan
   const role = m.data.mbr_role_cd as MbrRole
   const perms = effPerms(role, plan.plan)
   return perms.includes(perm) ? { user, role, perms, plan } : apiError(perm === 'VIEW' ? 'FORBIDDEN' : 'PLAN_OR_ROLE', 403)

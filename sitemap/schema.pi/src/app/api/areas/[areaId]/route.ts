@@ -1,6 +1,6 @@
 // 분류체계 설정 — GET 조회(조회자 이상), PATCH 수정(분류체계 관리자) : 이름·설명·용어 물리명 구분자·사용여부 6종
 //  구분자는 활성 용어가 있으면 변경 불가(기존 물리 용어명과 불일치 방지)
-import { NextResponse } from 'next/server'
+import { NextResponse, after } from 'next/server'
 import { z } from 'zod'
 import { db } from '@/lib/db'
 import { apiError, audit, dbError, parseBody, requireAreaRole } from '@/lib/api'
@@ -13,7 +13,9 @@ export async function GET(_req: Request, { params }: Ctx) {
   const { areaId } = await params
   const auth = await requireAreaRole(areaId, 'VIEW')
   if (auth instanceof NextResponse) return auth
-  const [{ data, error }] = await Promise.all([db().from('std_area').select(COLS).eq('area_id', areaId).eq('del_yn', 'N').single(), rememberArea(auth.user.usr_id, areaId)])
+  // 최근 분류체계 기억은 응답 뒤로 미룸(응답 경로에서 sys_user UPDATE 제외)
+  after(() => rememberArea(auth.user.usr_id, areaId))
+  const { data, error } = await db().from('std_area').select(COLS).eq('area_id', areaId).eq('del_yn', 'N').single()
   if (error) return dbError(error)
   return NextResponse.json({ ok: true, role: auth.role, perms: auth.perms, plan: auth.plan, area: data })
 }
