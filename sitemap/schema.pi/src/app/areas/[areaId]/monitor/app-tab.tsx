@@ -12,6 +12,7 @@ import { useEffect, useMemo, useState } from 'react'
 import type { AiMdl, AiResult, AiRun } from '@/lib/mon-ai'
 import { pageMenu, routeMenu, SLOW_MS } from '@/lib/mon'
 import { fmtN, Line, Stack, Tile, type Pt } from './charts'
+import { normFile } from '@/lib/mon-fix-patch'
 import { Pager, StepBar, type Step } from './fix-steps'
 import { usePoll } from './use-poll'
 
@@ -171,7 +172,11 @@ function AiPanel({ ai, mdls, mdlId, onMdl, onClose, onRetry }: { ai: Ai; mdls: M
                         {x.files.length > 0 && (
                           <div className="flex flex-wrap items-center gap-2">
                             <p className="font-mono text-xs text-[#5b6578]">{x.files.join(' · ')}</p>
-                            {prs[`${i}-${j}`]?.url ? (
+                            {x.files.every((f) => !normFile(f)) ? (
+                              <span className="ml-auto rounded border border-amber-400 bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-800" title="인증·권한·결제·요금제·환경 파일과 AI 수정 기능 자신은 사람만 수정, 그 밖에 이 앱 src 아래 ts·tsx 만 AI 수정 대상">
+                                사람 수정 필요(AI 수정 대상 아님)
+                              </span>
+                            ) : prs[`${i}-${j}`]?.url ? (
                               <span className="ml-auto flex flex-wrap items-center gap-1">
                                 <a href={prs[`${i}-${j}`].url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded border border-emerald-400 bg-white px-2 py-0.5 text-xs font-semibold text-emerald-800">
                                   <GitPullRequest className="h-3.5 w-3.5" aria-hidden />

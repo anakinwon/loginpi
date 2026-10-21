@@ -12,6 +12,7 @@ import { pageMenu, routeMenu, SLOW_MS } from './mon'
 const SRC = [process.cwd(), 'src'].join(path.sep)
 const MAX_FILE = 16_000 // 파일 하나 상한(자)
 const MAX_SRC = 60_000 // 소스 합계 상한(자)
+const CLEAN_FROM = Date.parse('2026-10-21T22:38:18Z') // 운영 배포만 수집 시작 시각(KST 10-22 07:38)
 
 const SCHEMA = {
   type: 'object',
@@ -104,9 +105,10 @@ async function gatherSrc(route: string) {
   if (rf) {
     const body = (await read(rf))!
     add(rel(rf), body)
-    for (const m of body.matchAll(/from '@\/lib\/([\w/-]+)'/g)) {
-      const base = path.join(SRC, 'lib', m[1])
-      for (const f of [`${base}.ts`, path.join(base, 'index.ts')]) {
+    // 직접 import 한 @/ 모듈 전부(@/lib/* 뿐 아니라 @/auth 같은 src 바로 아래 — 2026-10-22 NextAuth 라우트의 src/auth.ts 를 못 봐 '확인 못 함'으로 추정하던 문제)
+    for (const m of body.matchAll(/from '@\/([\w/-]+)'/g)) {
+      const base = path.join(SRC, m[1])
+      for (const f of [`${base}.ts`, `${base}.tsx`, path.join(base, 'index.ts')]) {
         const b = await read(f)
         if (b !== null) {
           add(rel(f), b)
@@ -235,7 +237,8 @@ export async function analyzeRoute(route: string, min: number, mdlId?: string): 
   const mdl = await pickMdl(mdlId)
   if (mdl === 'GONE') return 'GONE'
   if (!keyOn(mdl.prvd_cd)) return 'OFF'
-  const since = new Date(Date.now() - min * 60000).toISOString()
+  // 분석 구간 하한 = 운영 전용 수집 시작(f82ffa27 배포) — 그 전 이력에는 로컬 dev(같은 DB) 장애가 섞여 있어 근거로 쓰지 않음
+  const since = new Date(Math.max(Date.now() - min * 60000, CLEAN_FROM)).toISOString()
   const [agg, evt, src] = await Promise.all([
     db().from('mon_app_hist').select('bkt_dtm, req_cnt, err_cnt, slow_cnt, rsp_sum_val, rsp_max_val').eq('route_txt', route).gte('bkt_dtm', since).order('bkt_dtm', { ascending: false }).limit(120),
     db().from('mon_app_evt_hist').select('occr_dtm, evt_cd, scr_txt, sts_no, rsp_val').eq('route_txt', route).gte('occr_dtm', since).order('occr_dtm', { ascending: false }).limit(100),
@@ -248,7 +251,7 @@ export async function analyzeRoute(route: string, min: number, mdlId?: string): 
   const system =
     '당신은 Next.js 16(App Router)·Supabase(PostgreSQL) 웹 서비스 운영 엔지니어입니다. 브라우저 계측(Resource Timing)으로 모은 API 응답 지표와 소스 코드를 보고 오류·지연의 원인을 추정하고 해결 방안을 제시합니다. ' +
     '근거 없는 추측은 likelihood 를 낮추고 gaps 에 부족한 데이터를 적습니다. 상태 0 은 네트워크 실패·요청 중단(화면 이동·새로고침으로 fetch 가 끊긴 경우 포함)입니다. ' +
-    '합계 이력의 오류 건은 상태코드가 남지 않고, 개별 이력(느림·오류)은 sql/069 배포 이후 요청부터만 있습니다. 2026-10-22 이후 수집은 운영(production) 배포만이며, 그 이전 이력에는 로컬 개발 서버(같은 DB) 오류가 섞여 있을 수 있습니다. 답은 한국어로, 짧고 간결하게 씁니다(장황한 설명 금지).'
+    '합계 이력의 오류 건은 상태코드가 남지 않고, 개별 이력(느림·오류)은 sql/069 배포 이후 요청부터만 있습니다. 수치·이력은 운영(production) 배포에서만 수집한 값입니다(로컬·미리보기 제외). 답은 한국어로, 짧고 간결하게 씁니다(장황한 설명 금지).'
   const user = [
     `API 경로 : ${route} (메뉴 : ${routeMenu(route)})`,
     `분석 구간 : 최근 ${min}분, 느림 기준 ${SLOW_MS}ms, 분석 서버 환경 : ${process.env.VERCEL_ENV ?? process.env.NODE_ENV}`,
