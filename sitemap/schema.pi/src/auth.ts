@@ -15,7 +15,10 @@ type LinkJwt = {
   // 문자열 = 연동 / null = 미연동 확정 / undefined = DB 오류로 아직 판정 못 함(JSON 직렬화에서 키가 빠져 그대로 복원됨)
   userId?: string | null
   googleSub?: string
+  linkAt?: number // 연동 마지막 확인 시각(ms) — 연동된 token 도 LINK_TTL_MS 마다 다시 확인(연동 해제 반영)
 }
+// 연동 재확인 간격(2026-10-22 보안 점검 — AI 수정안 #13 이 update 때만 재확인해 연동 해제가 재로그인 전까지 반영되지 않던 문제)
+const LINK_TTL_MS = 60_000
 
 // 반환 : usr_id = 연동 있음 / null = 연동 없음(확정) / undefined = DB 오류(판정 불가 — 호출자는 이전 값 유지)
 async function findLinkedUserId(sub: string): Promise<string | null | undefined> {
@@ -53,10 +56,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         t.googleSub = profile.sub
         // 최초 로그인 — DB 오류(undefined)를 null(미연동)로 합치지 않는다(linkUnknown 으로 '일시 오류' 안내)
         t.userId = await findLinkedUserId(profile.sub)
-      } else if (t.googleSub && (typeof t.userId !== 'string' || trigger === 'update')) {
-        // 미연동·판정 불가 token 은 세션 조회마다 재확인(연동 즉시 반영), 연동 확인된 token 은 update 때만 재조회. DB 오류면 덮어쓰지 않는다
+        if (t.userId !== undefined) t.linkAt = Date.now()
+      } else if (t.googleSub && (typeof t.userId !== 'string' || trigger === 'update' || Date.now() - (t.linkAt ?? 0) > LINK_TTL_MS)) {
+        // 미연동·판정 불가 token 은 세션 조회마다, 연동 확인된 token 은 update 또는 60초 지난 뒤 재확인(해제·재연동 반영). DB 오류면 덮어쓰지 않는다
         const linked = await findLinkedUserId(t.googleSub)
-        if (linked !== undefined) t.userId = linked
+        if (linked !== undefined) {
+          t.userId = linked
+          t.linkAt = Date.now()
+        }
       }
       return t
     },
