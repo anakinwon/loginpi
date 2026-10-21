@@ -20,6 +20,9 @@ export function normPage(path: string): string | null {
   return /^[\w\-/:.]{1,200}$/.test(r) ? r : null
 }
 
+// AI 원인 분석 주원인 = 1순위 원인 제목 앞 200자(sql/073 main_caus_txt 길이) — 서버 저장·화면 비교가 같은 기준
+export const mainOf = (r: { causes: { title: string }[] }) => r.causes[0]?.title.slice(0, 200) ?? null
+
 export const minuteOf = (t: number) => new Date(Math.floor(t / 60000) * 60000).toISOString()
 
 export interface Sample {

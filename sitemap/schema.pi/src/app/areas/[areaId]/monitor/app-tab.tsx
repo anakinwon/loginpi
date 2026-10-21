@@ -10,10 +10,11 @@ import { piFetch } from '@pi/auth/client'
 import { GitPullRequest, Sparkles } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import type { AiMdl, AiResult, AiRun } from '@/lib/mon-ai'
-import { pageMenu, routeMenu, SLOW_MS } from '@/lib/mon'
+import { mainOf, pageMenu, routeMenu, SLOW_MS } from '@/lib/mon'
 import { fmtN, Line, Stack, Tile, type Pt } from './charts'
 import { normFile } from '@/lib/mon-fix-patch'
 import { Pager, StepBar, type Step } from './fix-steps'
+import VerifyPanel from './verify-panel'
 import { usePoll } from './use-poll'
 
 type Key = 'req' | 'slow' | 'err'
@@ -28,8 +29,10 @@ const STS: Record<number, string> = { 0: '네트워크 실패', 400: '잘못된 
 const stsNm = (n: number) => STS[n] ?? (n >= 500 ? '서버 오류' : n >= 400 ? '요청 오류' : '정상 응답(느림)')
 const minOf = (t: string) => Math.floor(Date.parse(t) / 60000) * 60000
 const fmtS = (t: string) => new Date(t).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })
+// 오늘이 아니면 날짜까지(재사용·직전 분석은 어제일 수 있음)
+const fmtDT = (t: string) => (new Date(t).toDateString() === new Date().toDateString() ? fmtS(t) : new Date(t).toLocaleString('ko-KR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }))
 
-type Ai = { route: string; busy: boolean; res?: AiRun; err?: string }
+type Ai = { route: string; busy: boolean; res?: AiRun; err?: string; verify?: boolean } // verify = AI 수정 배포 직후라 재분석 차단(실시간 확인 표시)
 // PR 상태 — 만든 뒤 '승인' = master 병합 + 운영 배포(sha), dep = Vercel 운영 배포 상태(pending·success·failure)
 type Pr = { busy?: boolean; url?: string; number?: number; head?: string; err?: string; apv?: boolean; sha?: string; ahead?: number; dep?: string | null }
 // 진행 단계(공용 fix-steps.tsx) — 화면 상태로 계산
@@ -146,10 +149,33 @@ function AiPanel({ ai, mdls, mdlId, onMdl, onClose, onRetry }: { ai: Ai; mdls: M
           {run.mdl.acct_nm && ` · 계정 ${run.mdl.acct_nm}`} · {(run.ms / 1000).toFixed(1)}초 · 토큰 입력 {fmtN(run.tok.in)} / 출력 {fmtN(run.tok.out)}
         </p>
       )}
+      {run?.basis && (
+        // 분석 근거(마스터 지시 2026-10-22) — 결과가 달라질 때 구간·표본·소스가 달라서인지 바로 보이게
+        <p className="mt-0.5 text-xs text-[#5b6578]">
+          {run.reused && <span className="mr-1 rounded bg-sky-100 px-1.5 py-0.5 font-semibold text-sky-800">이전 분석 재사용 — 데이터·소스 변화 없음</span>}
+          근거 : {fmtDT(run.basis.at)} 분석 · 구간 {fmtDT(run.basis.from)} ~ {fmtDT(run.basis.to)}
+          {run.basis.floor === 'DEPLOY' && ' (최근 AI 수정 배포 이후만)'} · 요청 {fmtN(run.basis.req)} / 오류 {fmtN(run.basis.err)} · 이력 {run.basis.evt}건 · 소스 {run.basis.src ?? '로컬'}
+          {run.basis.cut && <span className="text-amber-700"> · 상한 도달(최근 일부만 분석)</span>}
+        </p>
+      )}
+      {run?.prev && r && (
+        <p className="mt-0.5 text-xs">
+          <span className={`rounded px-1.5 py-0.5 font-semibold ${run.prev.main === mainOf(r) ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}`}>
+            직전 분석({fmtDT(run.prev.at)} · {run.prev.mdl}) 대비 주원인 {run.prev.main === mainOf(r) ? '같음' : '바뀜'}
+          </span>
+          <span className="ml-1 text-[#5b6578]">
+            {run.prev.main !== mainOf(r) && `직전 : ${run.prev.main ?? '-'} · `}
+            직전 요청 {fmtN(run.prev.req)}/오류 {fmtN(run.prev.err)} → 지금 {fmtN(run.basis.req)}/{fmtN(run.basis.err)}
+            {run.prev.src !== run.basis.src && ` · 소스 다름(${run.prev.src ?? '로컬'} → ${run.basis.src ?? '로컬'})`}
+            {run.prev.mdl !== run.mdl.dsp_nm && ' · 모델 다름'}
+          </span>
+        </p>
+      )}
       {open && (
         <div className="mt-2 space-y-2">
           {ai.busy && <p className="text-[#5b6578]">수치·개별 이력·소스 코드를 모아 분석하는 중입니다(최대 1~2분)…</p>}
-          {ai.err && <p className="text-red-700">{ai.err}</p>}
+          {ai.err && <p className={ai.verify ? 'text-amber-800' : 'text-red-700'}>{ai.err}</p>}
+          {(ai.verify || Object.values(prs).some((x) => x.sha)) && <VerifyPanel route={ai.route} />}
           {r && (
             <>
               <p className="text-[#2c3850]">{r.summary}</p>
@@ -258,7 +284,7 @@ export default function AppTab({ live, min }: { live: boolean; min: number }) {
     setAi({ route, busy: true })
     try {
       const j = await (await piFetch('/api/mon/app/analyze', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ route, min, ...(id ? { mdl_id: id } : {}) }) })).json()
-      setAi(j.ok ? { route, busy: false, res: { ai: j.ai, mdl: j.mdl, ms: j.ms, tok: j.tok } } : { route, busy: false, err: j.message ?? 'AI 원인 분석에 실패했습니다' })
+      setAi(j.ok ? { route, busy: false, res: { ai: j.ai, mdl: j.mdl, ms: j.ms, tok: j.tok, basis: j.basis, reused: j.reused, prev: j.prev } } : { route, busy: false, err: j.message ?? 'AI 원인 분석에 실패했습니다', verify: j.code === 'MON_AI_VERIFY' })
     } catch {
       setAi({ route, busy: false, err: 'AI 원인 분석에 실패했습니다(네트워크)' })
     }

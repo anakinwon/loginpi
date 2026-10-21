@@ -5,8 +5,10 @@ import 'server-only'
 import { readdir, readFile } from 'node:fs/promises'
 import path from 'node:path'
 import Anthropic from '@anthropic-ai/sdk'
+import { createHash } from 'node:crypto'
 import { db } from './db'
-import { pageMenu, routeMenu, SLOW_MS } from './mon'
+import { mainOf, pageMenu, routeMenu, SLOW_MS } from './mon'
+import { lastDeploy } from './mon-verify'
 
 // 소스 위치는 실행 때만 계산(정적 분석되면 Turbopack 이 프로젝트 전체를 이 함수 배포본에 추적) — 포함할 파일은 next.config outputFileTracingIncludes 가 지정
 const SRC = [process.cwd(), 'src'].join(path.sep)
@@ -155,14 +157,41 @@ export async function pickMdl(mdlId?: string): Promise<AiMdl | 'GONE'> {
   return (r.data as AiMdl | null) ?? (mdlId ? 'GONE' : FALLBACK)
 }
 
+// 분석 근거(마스터 지시 2026-10-22 — 결과가 달라질 때 '무엇을 보고 판단했는지'로 차이를 설명)
+export interface AiBasis {
+  at: string // 분석 시각(재사용이면 원래 분석 시각)
+  from: string // 데이터 구간 시작
+  to: string // 데이터 구간 끝(= 분석 시각)
+  req: number // 구간 요청 합계
+  err: number // 구간 오류 합계
+  evt: number // 느림·오류 개별 이력 수
+  cut: boolean // 행 상한(합계 120·이력 100)에 걸려 최근 일부만 봄
+  src: string | null // 분석한 배포본 커밋(앞 7자리)
+  floor: 'DEPLOY' | null // 구간 시작을 최근 AI 수정 배포 시점으로 올림
+}
+export interface AiPrev {
+  at: string
+  mdl: string
+  main: string | null // 1순위 원인(mainOf 기준 — 저장 길이 200자)
+  from: string
+  to: string
+  req: number
+  err: number
+  src: string | null
+}
 export interface AiRun {
   ai: AiResult
   mdl: AiMdl
-  ms: number // 분석 소요(밀리초)
+  ms: number // 분석 소요(밀리초, 재사용이면 원래 소요)
   tok: { in: number; out: number } // 토큰(제공사 응답 기준, 추론 토큰 포함)
+  basis: AiBasis
+  reused: boolean // 같은 입력 = 이전 결과 재사용(AI 다시 안 부름)
+  prev: AiPrev | null // 이 경로의 직전 분석(비교용)
 }
 
 const TIMEOUT = 90_000
+// 샘플링 고정값(같은 입력 = 같은 답에 가깝게) — Claude Opus 5.5 는 temperature 를 거부(400 'deprecated for this model', 2026-10-22 실호출)해 같은 입력 재사용(sql/073)으로 대신함
+const SEED = 20261022
 const MAX_OUT = 16_000 // Gemini·OpenAI 는 추론 토큰이 출력 한도에 포함돼 Claude(8,000)보다 크게
 type Call = { text?: string; done: boolean; in: number; out: number }
 // 구조화 출력 형식 — 원인 분석(SCHEMA)과 수정안(mon-fix.ts)이 같은 3사 호출을 씀
@@ -194,7 +223,7 @@ async function callGemini(m: AiMdl, system: string, user: string, f: Fmt): Promi
   const j = await post(url, { 'x-goog-api-key': process.env.GEMINI_API_KEY! }, {
     systemInstruction: { parts: [{ text: system }] },
     contents: [{ role: 'user', parts: [{ text: user }] }],
-    generationConfig: { responseMimeType: 'application/json', responseJsonSchema: f.schema, maxOutputTokens: MAX_OUT },
+    generationConfig: { responseMimeType: 'application/json', responseJsonSchema: f.schema, maxOutputTokens: MAX_OUT, temperature: 0, seed: SEED }, // 샘플링 고정(2026-10-22 실호출 200 확인)
   })
   const c = j.candidates?.[0]
   const u = j.usageMetadata ?? {}
@@ -211,6 +240,7 @@ async function callOpenAi(m: AiMdl, system: string, user: string, f: Fmt): Promi
     ],
     response_format: { type: 'json_schema', json_schema: { name: f.name, strict: true, schema: f.schema } },
     max_completion_tokens: MAX_OUT,
+    seed: SEED, // 같은 seed = 가능한 한 같은 답(OpenAI 최선 노력, 실호출 미확인 — 키 없음). temperature 는 추론 모델이 거부할 수 있어 넣지 않음
   })
   const c = j.choices?.[0]
   return { text: c?.message?.content ?? undefined, done: c?.finish_reason === 'stop', in: j.usage?.prompt_tokens ?? 0, out: j.usage?.completion_tokens ?? 0 }
@@ -233,33 +263,93 @@ export async function callAi<T>(mdl: AiMdl, system: string, user: string, f: Fmt
   }
 }
 
-export async function analyzeRoute(route: string, min: number, mdlId?: string): Promise<AiRun | 'OFF' | 'GONE' | null> {
+const ANL_KEEP_MS = 30 * 86_400_000 // 분석 이력 보관 30일(sql/073)
+const REUSE_MS = 86_400_000 // 같은 입력 재사용 기간 24시간
+const AGE_STEP_MS = 15 * 60_000 // 재사용 시점 단위(마지막 데이터 이후 경과)
+const PROD = process.env.VERCEL_ENV === 'production' // 분석 이력·재사용·직전 비교는 운영 분석끼리만(로컬 dev 도 같은 DB)
+const MAX_AGG = 120
+const MAX_EVT = 100
+const sha = (s: string) => createHash('sha256').update(s).digest('hex')
+
+export type AnalyzeBlock = { block: 'DEPLOYING' | 'VERIFY'; pr: number | null; at: string | null; until: number | null }
+export async function analyzeRoute(route: string, min: number, mdlId: string | undefined, usrId: string): Promise<AiRun | AnalyzeBlock | 'OFF' | 'GONE' | null> {
   const mdl = await pickMdl(mdlId)
   if (mdl === 'GONE') return 'GONE'
   if (!keyOn(mdl.prvd_cd)) return 'OFF'
-  // 분석 구간 하한 = 운영 전용 수집 시작(f82ffa27 배포) — 그 전 이력에는 로컬 dev(같은 DB) 장애가 섞여 있어 근거로 쓰지 않음
-  const since = new Date(Math.max(Date.now() - min * 60000, CLEAN_FROM)).toISOString()
+  // AI 수정 배포 직후는 재분석 차단(배포 전 오류가 구간에 남아 해결된 문제가 '미결'로 나옴) — 화면은 실시간 확인(mon-verify)으로 대신 판정
+  const dep = await lastDeploy(route)
+  if (dep && dep.sts !== 'FAIL' && dep.until > Date.now()) return { block: dep.sts === 'DPLY' ? 'DEPLOYING' : 'VERIFY', pr: dep.pr, at: dep.at, until: dep.until }
+  // 구간 하한 = max(최근 N분, 운영 전용 수집 시작, 최근 AI 수정 배포 다음 분) — 배포 전 데이터·로컬 혼입 데이터를 근거로 쓰지 않음
+  const now = Date.now()
+  const lo = Math.max(now - min * 60000, CLEAN_FROM, dep && dep.sts !== 'FAIL' ? dep.cut : 0)
+  const since = new Date(lo).toISOString()
   const [agg, evt, src] = await Promise.all([
-    db().from('mon_app_hist').select('bkt_dtm, req_cnt, err_cnt, slow_cnt, rsp_sum_val, rsp_max_val').eq('route_txt', route).gte('bkt_dtm', since).order('bkt_dtm', { ascending: false }).limit(120),
-    db().from('mon_app_evt_hist').select('occr_dtm, evt_cd, scr_txt, sts_no, rsp_val').eq('route_txt', route).gte('occr_dtm', since).order('occr_dtm', { ascending: false }).limit(100),
+    db().from('mon_app_hist').select('bkt_dtm, req_cnt, err_cnt, slow_cnt, rsp_sum_val, rsp_max_val').eq('route_txt', route).gte('bkt_dtm', since).order('bkt_dtm', { ascending: false }).limit(MAX_AGG),
+    db().from('mon_app_evt_hist').select('occr_dtm, evt_cd, scr_txt, sts_no, rsp_val').eq('route_txt', route).gte('occr_dtm', since).order('occr_dtm', { ascending: false }).limit(MAX_EVT),
     gatherSrc(route),
   ])
   if (agg.error) throw agg.error
   if (evt.error) throw evt.error
   const aggTxt = agg.data.map((r) => `${r.bkt_dtm} 요청 ${r.req_cnt} 오류 ${r.err_cnt} 느림 ${r.slow_cnt} 평균 ${Math.round(Number(r.rsp_sum_val) / Math.max(1, r.req_cnt))}ms 최대 ${r.rsp_max_val}ms`).join('\n')
   const evtTxt = evt.data.map((e) => `${e.occr_dtm} ${e.evt_cd} 상태 ${e.sts_no} ${e.rsp_val}ms 화면 ${e.scr_txt ?? '-'}(${pageMenu(e.scr_txt)})`).join('\n')
+  const srcCmt = process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? null
+  const basis: AiBasis = {
+    at: new Date(now).toISOString(),
+    from: since,
+    to: new Date(now).toISOString(),
+    req: agg.data.reduce((a, r) => a + r.req_cnt, 0),
+    err: agg.data.reduce((a, r) => a + r.err_cnt, 0),
+    evt: evt.data.length,
+    cut: agg.data.length >= MAX_AGG || evt.data.length >= MAX_EVT,
+    src: srcCmt,
+    floor: dep && dep.cut === lo ? 'DEPLOY' : null,
+  }
   const system =
     '당신은 Next.js 16(App Router)·Supabase(PostgreSQL) 웹 서비스 운영 엔지니어입니다. 브라우저 계측(Resource Timing)으로 모은 API 응답 지표와 소스 코드를 보고 오류·지연의 원인을 추정하고 해결 방안을 제시합니다. ' +
     '근거 없는 추측은 likelihood 를 낮추고 gaps 에 부족한 데이터를 적습니다. 상태 0 은 네트워크 실패·요청 중단(화면 이동·새로고침으로 fetch 가 끊긴 경우 포함)입니다. ' +
-    '합계 이력의 오류 건은 상태코드가 남지 않고, 개별 이력(느림·오류)은 sql/069 배포 이후 요청부터만 있습니다. 수치·이력은 운영(production) 배포에서만 수집한 값입니다(로컬·미리보기 제외). 답은 한국어로, 짧고 간결하게 씁니다(장황한 설명 금지).'
-  const user = [
+    '합계 이력의 오류 건은 상태코드가 남지 않고, 개별 이력(느림·오류)은 sql/069 배포 이후 요청부터만 있습니다. 수치·이력은 운영(production) 배포에서만 수집한 값입니다(로컬·미리보기 제외). ' +
+    '분석 시각과 각 행의 시각을 비교해 오류가 지금도 나는지, 과거 한때였는지 구분합니다. 답은 한국어로, 짧고 간결하게 씁니다(장황한 설명 금지).'
+  // 입력 = 시각을 뺀 근거(같은 데이터·소스·모델이면 같은 해시) — 분석 시각 줄은 해시 밖에서 붙임
+  const body = [
     `API 경로 : ${route} (메뉴 : ${routeMenu(route)})`,
-    `분석 구간 : 최근 ${min}분, 느림 기준 ${SLOW_MS}ms, 분석 서버 환경 : ${process.env.VERCEL_ENV ?? process.env.NODE_ENV}`,
-    `분 단위 합계(최신순, ${agg.data.length}행) :\n${aggTxt || '없음'}`,
-    `느림·오류 개별 이력(최신순, ${evt.data.length}건) :\n${evtTxt || '없음'}`,
-    src.found ? `소스 코드 :\n${src.text}` : `소스 코드 : route.ts 를 찾지 못함\n${src.text}`,
+    `느림 기준 ${SLOW_MS}ms, 분석 서버 환경 : ${process.env.VERCEL_ENV ?? process.env.NODE_ENV}${basis.floor ? ', 구간 시작 = 최근 AI 수정 운영 배포 직후(그 전 오류는 제외)' : ''}`,
+    `분 단위 합계(최신순, ${agg.data.length}행${agg.data.length >= MAX_AGG ? ' — 상한, 이보다 오래된 행 생략' : ''}) :\n${aggTxt || '없음'}`,
+    `느림·오류 개별 이력(최신순, ${evt.data.length}건${evt.data.length >= MAX_EVT ? ' — 상한' : ''}) :\n${evtTxt || '없음'}`,
+    src.found ? `소스 코드(배포본 ${srcCmt ?? '로컬'}) :\n${src.text}` : `소스 코드 : route.ts 를 찾지 못함\n${src.text}`,
   ].join('\n\n')
+  // 시점 단위 = 마지막 데이터 이후 경과를 15분 단위로 — 같은 데이터라도 '지금도 나는지' 판단이 바뀔 만큼 시간이 흐르면 새로 분석
+  const last = Math.max(agg.data[0] ? Date.parse(agg.data[0].bkt_dtm) : lo, evt.data[0] ? Date.parse(evt.data[0].occr_dtm) : lo)
+  const hash = sha([mdl.prvd_cd, mdl.mdl_nm, system, body, Math.floor((now - last) / AGE_STEP_MS)].join('\u0000'))
+  const user = `분석 시각 : ${basis.at}, 데이터 구간 : ${since} ~ ${basis.to}\n\n${body}`
+
+  // 같은 입력이면 이전 결과 재사용(결과가 매번 달라 보이는 혼동 방지) + 이 경로의 직전 분석(비교 표시)
+  const none = { data: null, error: null }
+  const [hit, prevQ] = PROD
+    ? await Promise.all([
+        db().from('mon_ai_anl_hist').select('anl_id, reg_dtm, rslt_json, tok_in_cnt, tok_out_cnt, elps_val, from_dtm, to_dtm').eq('inp_hash_txt', hash).gte('reg_dtm', new Date(now - REUSE_MS).toISOString()).order('reg_dtm', { ascending: false }).limit(1).maybeSingle(),
+        db().from('mon_ai_anl_hist').select('anl_id, reg_dtm, mdl_dsp_nm, main_caus_txt, from_dtm, to_dtm, req_cnt, err_cnt, src_cmt_txt').eq('route_txt', route).order('reg_dtm', { ascending: false }).limit(2),
+      ])
+    : [none, none]
+  const prevRow = (prevQ.data ?? []).find((x) => x.anl_id !== hit.data?.anl_id) ?? null
+  const prev: AiPrev | null = prevRow
+    ? { at: prevRow.reg_dtm, mdl: prevRow.mdl_dsp_nm, main: prevRow.main_caus_txt, from: prevRow.from_dtm, to: prevRow.to_dtm, req: prevRow.req_cnt, err: prevRow.err_cnt, src: prevRow.src_cmt_txt }
+    : null
+  if (hit.data) {
+    const h = hit.data
+    return { ai: h.rslt_json as AiResult, mdl, ms: h.elps_val, tok: { in: h.tok_in_cnt, out: h.tok_out_cnt }, basis: { ...basis, at: h.reg_dtm, from: h.from_dtm, to: h.to_dtm }, reused: true, prev }
+  }
   const t0 = Date.now()
   const c = await callAi<AiResult>(mdl, system, user, ANALYZE)
-  return c && { ai: c.out, mdl, ms: Date.now() - t0, tok: c.tok }
+  if (!c) return null
+  const ms = Date.now() - t0
+  if (!PROD) return { ai: c.out, mdl, ms, tok: c.tok, basis, reused: false, prev }
+  const ins = await db().from('mon_ai_anl_hist').insert({
+    route_txt: route, mdl_nm: mdl.mdl_nm, mdl_dsp_nm: mdl.dsp_nm, inp_hash_txt: hash, from_dtm: basis.from, to_dtm: basis.to,
+    req_cnt: basis.req, err_cnt: basis.err, evt_cnt: basis.evt, cut_yn: basis.cut ? 'Y' : 'N', src_cmt_txt: srcCmt,
+    main_caus_txt: mainOf(c.out), cfdc_cd: c.out.confidence, rslt_json: c.out,
+    tok_in_cnt: c.tok.in, tok_out_cnt: c.tok.out, elps_val: ms, anl_usr_id: usrId, regr_id: usrId, modr_id: usrId,
+  })
+  if (ins.error) console.error('mon-ai anl hist', ins.error.message) // 기록 실패는 결과 표시를 막지 않음
+  void db().from('mon_ai_anl_hist').delete().lt('reg_dtm', new Date(now - ANL_KEEP_MS).toISOString()).then(() => {}) // 보관 기간 정리(_hist 물리 삭제 허용)
+  return { ai: c.out, mdl, ms, tok: c.tok, basis, reused: false, prev }
 }
