@@ -5,6 +5,7 @@
 // AI 원인 분석 : 경로 TOP 의 느림·오류 경로 → 설정에 등록한 AI 모델(기본 또는 패널에서 고른 모델)이 원인·해결 방안 제시(화면 표시만, 저장·자동 수정 없음)
 //  결과에 사용 모델·요금제·계정·소요·토큰을 함께 표시(자료 신뢰성, 2026-10-21 마스터 지시)
 //  해결 방안마다 'PR 로 해결'(2026-10-22 마스터 지시) : 같은 모델이 그 파일을 고쳐 GitHub PR 생성(/api/mon/app/fix) — 병합 전 운영 반영 없음
+//  PR 을 검토한 뒤 '승인' = master 병합 + 운영 배포(/api/mon/app/fix/approve), 배포 상태를 15초마다 확인해 표시
 import { piFetch } from '@pi/auth/client'
 import { GitPullRequest, Sparkles } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
@@ -27,7 +28,40 @@ const minOf = (t: string) => Math.floor(Date.parse(t) / 60000) * 60000
 const fmtS = (t: string) => new Date(t).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })
 
 type Ai = { route: string; busy: boolean; res?: AiRun; err?: string }
-type Pr = { busy?: boolean; url?: string; number?: number; err?: string }
+// PR 상태 — 만든 뒤 '승인' = master 병합 + 운영 배포(sha), dep = Vercel 운영 배포 상태(pending·success·failure)
+type Pr = { busy?: boolean; url?: string; number?: number; err?: string; apv?: boolean; sha?: string; ahead?: number; dep?: string | null }
+// 진행 단계(마스터 지시 2026-10-22) : PR 요청 → 커밋·PR 완료 → 승인·병합 → 운영 배포. 상태 = 끝남(done)·진행 중(on)·실패(bad)·대기
+const STEPS = ['수정안 요청', '커밋·PR 완료', '승인·병합', '운영 배포'] as const
+function stepOf(x: Pr): { at: number; on: boolean; bad: boolean } {
+  if (x.dep === 'success') return { at: 4, on: false, bad: false }
+  if (x.dep === 'failure' || x.dep === 'error') return { at: 3, on: false, bad: true }
+  if (x.sha) return { at: 3, on: true, bad: false }
+  if (x.apv) return { at: 2, on: true, bad: false }
+  if (x.url) return { at: 2, on: false, bad: !!x.err }
+  return { at: 0, on: !!x.busy, bad: !!x.err }
+}
+function Steps({ x }: { x: Pr }) {
+  const st = stepOf(x)
+  return (
+    <ol className="mt-1 flex flex-wrap items-center gap-1 text-xs" aria-label="진행 상태">
+      {STEPS.map((nm, k) => {
+        const cls = k < st.at ? 'border-emerald-500 bg-emerald-600 text-white' : k === st.at && st.bad ? 'border-red-400 bg-red-50 text-red-700' : k === st.at && st.on ? 'animate-pulse border-violet-500 bg-violet-50 text-violet-800' : 'border-[#d6deeb] bg-white text-[#8a93a5]'
+        const tail = k < st.at ? ' ✓' : k === st.at && st.bad ? ' ✕' : k === st.at && st.on ? ' 진행 중' : ''
+        return (
+          <li key={nm} className="flex items-center gap-1">
+            {k > 0 && <span className="text-[#b3bccb]">→</span>}
+            <span aria-current={k === st.at ? 'step' : undefined} className={`rounded-full border px-2 py-0.5 ${cls}`}>
+              {k + 1}. {nm}
+              {tail}
+            </span>
+          </li>
+        )
+      })}
+      {x.dep === 'success' && <li className="ml-1 text-emerald-700">운영 반영 완료</li>}
+      {st.bad && x.sha && <li className="ml-1 text-red-700">운영 빌드 실패 — 이전 배포가 계속 서비스됨</li>}
+    </ol>
+  )
+}
 type MdlOpt = Pick<AiMdl, 'dsp_nm' | 'plan_nm'> & { mdl_id: string; dflt_yn: 'Y' | 'N' }
 const LIKE: Record<AiResult['confidence'], [string, string]> = { HIGH: ['높음', 'bg-red-100 text-red-700'], MID: ['중간', 'bg-amber-100 text-amber-800'], LOW: ['낮음', 'bg-gray-100 text-gray-600'] }
 
@@ -52,6 +86,32 @@ function AiPanel({ ai, mdls, mdlId, onMdl, onClose, onRetry }: { ai: Ai; mdls: M
       setPrs((p) => ({ ...p, [k]: { err: 'PR 을 만들지 못했습니다(네트워크)' } }))
     }
   }
+  const approve = async (k: string) => {
+    const cur = prs[k]
+    if (!cur?.number || cur.apv || cur.sha) return
+    if (!confirm(`PR #${cur.number} 을 승인합니다 — master 에 병합하고 바로 운영에 배포합니다(master 의 다른 미배포 커밋도 함께 나감). GitHub 에서 변경 내용을 확인하셨습니까?`)) return
+    setPrs((p) => ({ ...p, [k]: { ...cur, apv: true, err: undefined } }))
+    try {
+      const j = await (await piFetch('/api/mon/app/fix/approve', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ number: cur.number }) })).json()
+      setPrs((p) => ({ ...p, [k]: j.ok ? { ...cur, sha: j.sha, ahead: j.ahead, dep: 'pending' } : { ...cur, err: j.message ?? '승인하지 못했습니다' } }))
+    } catch {
+      setPrs((p) => ({ ...p, [k]: { ...cur, err: '승인하지 못했습니다(네트워크)' } }))
+    }
+  }
+  // 운영 배포 상태 확인 — 진행 중인 것만 15초마다, 최대 10분(Vercel 빌드 1~3분)
+  const pending = Object.entries(prs).filter(([, x]) => x.sha && (x.dep === 'pending' || x.dep === null))
+  useEffect(() => {
+    if (!pending.length) return
+    let n = 0
+    const id = setInterval(async () => {
+      if (++n > 40) return clearInterval(id)
+      for (const [k, x] of pending) {
+        const j = await (await piFetch(`/api/mon/app/fix/approve?sha=${x.sha}`)).json().catch(() => null)
+        if (j?.ok && j.state && j.state !== 'pending') setPrs((p) => ({ ...p, [k]: { ...p[k], dep: j.state } }))
+      }
+    }, 15_000)
+    return () => clearInterval(id)
+  }, [pending.map(([k]) => k).join()]) // eslint-disable-line react-hooks/exhaustive-deps
   return (
     <div className="mt-2 rounded-lg border border-violet-300 bg-violet-50/40 p-3 text-sm" aria-live="polite">
       <div className="flex flex-wrap items-center gap-2">
@@ -124,10 +184,23 @@ function AiPanel({ ai, mdls, mdlId, onMdl, onClose, onRetry }: { ai: Ai; mdls: M
                           <div className="flex flex-wrap items-center gap-2">
                             <p className="font-mono text-xs text-[#5b6578]">{x.files.join(' · ')}</p>
                             {prs[`${i}-${j}`]?.url ? (
-                              <a href={prs[`${i}-${j}`].url} target="_blank" rel="noreferrer" className="ml-auto inline-flex items-center gap-1 rounded border border-emerald-400 bg-white px-2 py-0.5 text-xs font-semibold text-emerald-800">
-                                <GitPullRequest className="h-3.5 w-3.5" aria-hidden />
-                                PR #{prs[`${i}-${j}`].number} 열기
-                              </a>
+                              <span className="ml-auto flex flex-wrap items-center gap-1">
+                                <a href={prs[`${i}-${j}`].url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded border border-emerald-400 bg-white px-2 py-0.5 text-xs font-semibold text-emerald-800">
+                                  <GitPullRequest className="h-3.5 w-3.5" aria-hidden />
+                                  PR #{prs[`${i}-${j}`].number} 열기
+                                </a>
+                                {prs[`${i}-${j}`].sha ? (
+                                  <span className="text-xs text-[#5b6578]">운영에 나간 커밋 {prs[`${i}-${j}`].ahead}개</span>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    disabled={prs[`${i}-${j}`].apv}
+                                    onClick={() => void approve(`${i}-${j}`)}
+                                    className="rounded border border-violet-600 bg-violet-700 px-2 py-0.5 text-xs font-semibold text-white disabled:opacity-60">
+                                    {prs[`${i}-${j}`].apv ? '승인 처리 중…' : '승인(병합·운영 배포)'}
+                                  </button>
+                                )}
+                              </span>
                             ) : (
                               <button
                                 type="button"
@@ -140,6 +213,7 @@ function AiPanel({ ai, mdls, mdlId, onMdl, onClose, onRetry }: { ai: Ai; mdls: M
                             )}
                           </div>
                         )}
+                        {prs[`${i}-${j}`] && <Steps x={prs[`${i}-${j}`]} />}
                         {prs[`${i}-${j}`]?.err && <p className="text-xs text-red-700">{prs[`${i}-${j}`].err}</p>}
                       </div>
                     ))}
@@ -157,7 +231,7 @@ function AiPanel({ ai, mdls, mdlId, onMdl, onClose, onRetry }: { ai: Ai; mdls: M
                 </details>
               )}
               {r.gaps.length > 0 && <p className="text-xs text-[#5b6578]">부족한 데이터 : {r.gaps.join(' / ')}</p>}
-              <p className="text-xs text-[#5b6578]">AI 추정입니다 — 'PR 로 해결'은 GitHub PR 만 만들고 운영 코드는 바꾸지 않습니다. PR 의 변경 내용과 미리보기 배포를 확인한 뒤 병합하십시오.</p>
+              <p className="text-xs text-[#5b6578]">AI 추정입니다 — 'PR 로 해결'은 GitHub PR 만 만들고 운영 코드는 바꾸지 않습니다. PR 의 변경 내용과 미리보기를 확인한 뒤 '승인'을 누르면 병합·운영 배포됩니다.</p>
             </>
           )}
         </div>

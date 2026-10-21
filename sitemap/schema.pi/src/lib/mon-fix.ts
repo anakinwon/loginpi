@@ -145,3 +145,38 @@ export async function fixPr(q: FixReq): Promise<FixPr | FixFail> {
   })
   return { url: pr.html_url, number: pr.number, branch, files: Object.keys(changed), summary: c.out.summary, mdl, ms, tok: c.tok }
 }
+
+// 승인(2026-10-22 마스터 지시 "프롬프트로 배포 요청은 곤란, 승인 처리로") — AI 수정안 PR 을 화면에서 승인 = master 에 squash 병합 + 운영 브랜치 빨리 감기(fast-forward)
+//  AI 브랜치(fix/mon-ai-*)·같은 저장소·열린 PR 만. 병합 기준 = 지금 PR 머리 커밋(검토 뒤 바뀌면 GitHub 409). master 의 다른 미배포 커밋도 함께 운영에 나감(ahead 로 알림)
+const PROD = () => process.env.GITHUB_PROD || 'prod/schema'
+export type ApproveFail = 'NO_GH' | 'NOT_AI' | 'CLOSED' | 'CONFLICT' | 'PROD_FF'
+export interface Approved {
+  sha: string // 병합 커밋(= 운영 배포 커밋)
+  ahead: number // 이번에 운영에 나간 커밋 수(병합 커밋 포함)
+  url: string // 커밋 페이지(Vercel 상태 표시)
+}
+export async function approvePr(n: number): Promise<Approved | ApproveFail> {
+  if (!process.env.GITHUB_TOKEN) return 'NO_GH'
+  const base = process.env.GITHUB_BASE || 'master'
+  const pr = await gh<{ state: string; merged: boolean; mergeable: boolean | null; title: string; head: { ref: string; sha: string; repo: { full_name: string } | null }; base: { ref: string } }>('GET', `/pulls/${n}`)
+  if (!pr.head.ref.startsWith('fix/mon-ai-') || pr.head.repo?.full_name !== repo() || pr.base.ref !== base) return 'NOT_AI'
+  if (pr.state !== 'open' || pr.merged) return 'CLOSED'
+  if (pr.mergeable === false) return 'CONFLICT'
+  const m = await gh<{ sha: string }>('PUT', `/pulls/${n}/merge`, { merge_method: 'squash', sha: pr.head.sha, commit_title: `${pr.title} (#${n})` }).catch((e: Error) => {
+    if (/ (405|409) /.test(e.message)) return null // 병합 불가·검토 뒤 머리 커밋 변경
+    throw e
+  })
+  if (!m) return 'CONFLICT'
+  await gh('DELETE', `/git/refs/heads/${enc(pr.head.ref)}`).catch(() => {}) // 병합한 AI 브랜치 정리
+  const prod = await gh<{ object: { sha: string } }>('GET', `/git/ref/heads/${enc(PROD())}`)
+  const cmp = await gh<{ status: string; ahead_by: number }>('GET', `/compare/${prod.object.sha}...${m.sha}`)
+  if (cmp.status !== 'ahead' && cmp.status !== 'identical') return 'PROD_FF' // 운영 브랜치가 master 조상이 아님 — 병합만 됨
+  await gh('PATCH', `/git/refs/heads/${enc(PROD())}`, { sha: m.sha, force: false })
+  return { sha: m.sha, ahead: cmp.ahead_by, url: `https://github.com/${repo()}/commit/${m.sha}` }
+}
+
+// 운영 배포 상태 = 그 커밋의 'Vercel – schema' 상태(pending·success·failure·error, 아직 없으면 null)
+export async function deployState(sha: string): Promise<string | null> {
+  const s = await gh<{ statuses: { context: string; state: string }[] }>('GET', `/commits/${sha}/status`)
+  return s.statuses.find((x) => x.context === 'Vercel – schema')?.state ?? null
+}
