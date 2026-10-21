@@ -1,5 +1,6 @@
 'use client'
 import { piFetch } from '@pi/auth/client'
+import { loadDevUser } from './google-auth'
 // 개발 전용 사용자 전환(Pi 로그인 구현 전) — /api/dev/user, 운영 빌드에서는 표시하지 않음
 import { useEffect, useState } from 'react'
 
@@ -7,9 +8,7 @@ export default function DevUserSwitch() {
   const [cur, setCur] = useState<string | null>(null)
   const [nm, setNm] = useState('')
   useEffect(() => {
-    piFetch('/api/dev/user')
-      .then((r) => r.json())
-      .then((j) => setCur(j.ok ? (j.user?.pi_usr_nm ?? '(없음)') : null))
+    void loadDevUser().then((r) => setCur(r.ok && r.data.ok ? (r.data.user?.pi_usr_nm ?? '(없음)') : null))
   }, [])
   if (process.env.NODE_ENV === 'production' || cur === null) return null
 
