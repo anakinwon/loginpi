@@ -8,7 +8,7 @@ import { pageMenu, routeMenu } from '@/lib/mon'
 
 type Cnt = { req: number; err: number; slow: number }
 type Data = {
-  deploy: { sts: 'DPLY' | 'DONE' | 'FAIL'; pr: number | null; at: string | null; cut: number; until: number }
+  deploy: { sts: 'DPLY' | 'DONE' | 'FAIL'; pr: number | null; at: string | null; cut: number; until: number; rbk: boolean } // rbk = 되돌림 배포(수정 전 코드)
   now: number
   post: Cnt
   pre: Cnt
@@ -69,7 +69,7 @@ export default function VerifyPanel({ route }: { route: string }) {
   return (
     <div className="rounded border border-[#d6deeb] bg-white p-2 text-xs" aria-live="polite">
       <div className="flex flex-wrap items-center gap-2">
-        <b className="text-[#2c3850]">배포 후 실시간 확인</b>
+        <b className="text-[#2c3850]">{d.deploy.rbk ? '되돌림 배포 후 실시간 확인' : '배포 후 실시간 확인'}</b>
         <span className={`rounded border px-2 py-0.5 font-semibold ${v[1]}`}>{v[0]}</span>
         <span className="text-[#5b6578]">
           {routeMenu(route)} · <span className="font-mono">{route}</span>

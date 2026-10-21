@@ -15,6 +15,12 @@ export const STS: Record<FixSts, { nm: string; st: Step }> = {
   DPLY: { nm: '운영 배포 중', st: { at: 3, on: true, bad: false } },
   DONE: { nm: '배포 완료', st: { at: 4, on: false, bad: false } },
   DPLY_FAIL: { nm: '배포 실패', st: { at: 3, on: false, bad: true } },
+  // 반려 = 승인 단계에서 멈춤(병합 안 함 = 수정 전 코드 유지), 되돌림 = 배포까지 끝난 뒤 수정 전 코드로 다시 배포
+  REJ: { nm: '반려 — 수정 전 유지', st: { at: 2, on: false, bad: true } },
+  // 되돌림 = 4단계 '운영 배포'를 다시 거침(수정 전 코드 배포) — 진행 중·실패는 4단계에서 표시
+  RBK: { nm: '되돌림 배포 중', st: { at: 3, on: true, bad: false } },
+  RBK_DONE: { nm: '되돌림 완료 — 수정 전 코드', st: { at: 4, on: false, bad: false } },
+  RBK_FAIL: { nm: '되돌림 실패', st: { at: 3, on: false, bad: true } },
 }
 
 export function StepBar({ st, small }: { st: Step; small?: boolean }) {

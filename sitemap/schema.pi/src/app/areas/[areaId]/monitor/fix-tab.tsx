@@ -30,14 +30,23 @@ type Row = {
   ahead_cnt: number | null
   dply_dtm: string | null
   err_txt: string | null
+  rej_usr_nm: string | null
+  rej_dtm: string | null
+  rej_rsn_txt: string | null
+  rbk_usr_nm: string | null
+  rbk_dtm: string | null
+  rbk_rsn_txt: string | null
+  rbk_cmt_txt: string | null
+  rbk_dply_dtm: string | null
 }
 // 상태 묶음 필터 — 진행 중 = 요청·승인·배포 처리 중, 실패 = 단계별 실패 3종
 const GRP = [
   { k: '', nm: '전체' },
   { k: 'PR', nm: '승인 대기' },
-  { k: 'REQ,APV,DPLY', nm: '진행 중' },
+  { k: 'REQ,APV,DPLY,RBK', nm: '진행 중' },
   { k: 'DONE', nm: '배포 완료' },
-  { k: 'REQ_FAIL,APV_FAIL,DPLY_FAIL', nm: '실패' },
+  { k: 'REQ_FAIL,APV_FAIL,DPLY_FAIL,RBK_FAIL', nm: '실패' },
+  { k: 'REJ,RBK,RBK_DONE,RBK_FAIL', nm: '반려·되돌림' },
 ] as const
 const dt = (t: string | null) => (t ? new Date(t).toLocaleString('ko-KR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }) : '')
 const who = (nm: string | null) => nm ?? <span className="text-red-700">[확인중 : 사용자 없음]</span>
@@ -72,6 +81,27 @@ export default function FixTab({ live }: { live: boolean }) {
     }
   }
 
+  // 반려·되돌리기 공용 — 사유 필수(2자 이상), 결과 메시지 후 목록 다시 조회
+  const act = async (r: Row, kind: 'reject' | 'rollback') => {
+    if (busy) return
+    const label = kind === 'reject' ? `PR #${r.pr_no} 반려 — PR 을 닫고 병합하지 않습니다(운영 코드는 수정 전 그대로)` : `PR #${r.pr_no} 되돌리기 — 이 AI 수정을 수정 전 코드로 되돌리는 커밋을 master 에 만들고 바로 운영에 배포합니다`
+    const reason = prompt(`${label}\n\n사유를 입력하십시오(2자 이상)`)?.trim()
+    if (!reason) return
+    if (reason.length < 2) return setMsg('사유를 2자 이상 입력하십시오')
+    setBusy(r.fix_id)
+    setMsg('')
+    try {
+      const body = kind === 'reject' ? { number: r.pr_no, reason } : { fix_id: r.fix_id, reason }
+      const j = await (await piFetch(`/api/mon/app/fix/${kind}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json()
+      setMsg(j.ok ? (kind === 'reject' ? `PR #${r.pr_no} 반려 — PR 을 닫았습니다(수정 전 코드 유지)` : `PR #${r.pr_no} 되돌림 — 수정 전 코드로 운영 배포 중(커밋 ${j.ahead}개)`) : (j.message ?? '처리하지 못했습니다'))
+    } catch {
+      setMsg('처리하지 못했습니다(네트워크)')
+    } finally {
+      setBusy('')
+      void reload()
+    }
+  }
+
   return (
     <section className="text-sm">
       <div className="flex flex-wrap items-center gap-2">
@@ -99,7 +129,7 @@ export default function FixTab({ live }: { live: boolean }) {
           </button>
         </span>
       </div>
-      <p className="mt-1 text-xs text-[#5b6578]">요청 주체 = 수정안을 만든 AI 모델 · 결재 요청자 = 'PR 로 해결'을 누른 사람 · 승인자 = '승인'을 누른 사람(병합·운영 배포)</p>
+      <p className="mt-1 text-xs text-[#5b6578]">요청 주체 = 수정안을 만든 AI 모델 · 결재 요청자 = 'PR 로 해결'을 누른 사람 · 결재 = 승인(병합·운영 배포) 또는 반려(PR 닫기 — 수정 전 유지) · 배포된 수정은 '되돌리기'로 수정 전 코드로 다시 배포</p>
       {err && <p className="mt-2 text-red-700">{err}</p>}
       {msg && (
         <p role="status" className="mt-2 text-[#2c3850]">
@@ -110,7 +140,7 @@ export default function FixTab({ live }: { live: boolean }) {
         <table className="w-full min-w-[1100px] border-collapse text-xs">
           <thead>
             <tr className="bg-[#1f3a68] text-left whitespace-nowrap text-white">
-              {['No', '요청일시', '메뉴 · API', '원인 → 해결', '진행 단계', '요청 주체(AI)', '결재 요청자', '승인자', 'PR', '배포'].map((h) => (
+              {['No', '요청일시', '메뉴 · API', '원인 → 해결', '진행 단계', '요청 주체(AI)', '결재 요청자', '결재(승인·반려)', 'PR', '배포 · 되돌리기'].map((h) => (
                 <th key={h} className="px-2 py-1.5 font-semibold">
                   {h}
                 </th>
@@ -163,7 +193,15 @@ export default function FixTab({ live }: { live: boolean }) {
                           onClick={() => void approve(r)}
                           className="rounded border border-violet-600 bg-violet-700 px-2 py-0.5 font-semibold text-white disabled:opacity-60"
                         >
-                          {busy === r.fix_id ? '승인 처리 중…' : r.fix_sts_cd === 'APV_FAIL' ? '다시 승인' : '승인(병합·운영 배포)'}
+                          {busy === r.fix_id ? '처리 중…' : r.fix_sts_cd === 'APV_FAIL' ? '다시 승인' : '승인(병합·운영 배포)'}
+                        </button>
+                        <button
+                          type="button"
+                          disabled={!!busy}
+                          onClick={() => void act(r, 'reject')}
+                          className="ml-1 rounded border border-red-500 bg-white px-2 py-0.5 font-semibold text-red-700 disabled:opacity-60"
+                        >
+                          반려
                         </button>
                         {r.apv_dtm && (
                           <div className="mt-0.5 text-[11px] text-[#5b6578]">
@@ -171,9 +209,16 @@ export default function FixTab({ live }: { live: boolean }) {
                           </div>
                         )}
                       </>
+                    ) : r.rej_dtm ? (
+                      <div className="text-red-700">
+                        <div>
+                          반려 {who(r.rej_usr_nm)} · <span className="tabular-nums">{dt(r.rej_dtm)}</span>
+                        </div>
+                        <div className="max-w-[220px] whitespace-normal text-[11px]">사유 : {r.rej_rsn_txt}</div>
+                      </div>
                     ) : r.apv_dtm ? (
                       <>
-                        <div>{who(r.apv_usr_nm)}</div>
+                        <div>승인 {who(r.apv_usr_nm)}</div>
                         <div className="tabular-nums text-[11px] text-[#5b6578]">{dt(r.apv_dtm)}</div>
                       </>
                     ) : (
@@ -200,6 +245,22 @@ export default function FixTab({ live }: { live: boolean }) {
                       <span className="text-[#8a93a5]">-</span>
                     )}
                     {r.ahead_cnt != null && <div className="text-[11px] text-[#5b6578]">함께 나간 커밋 {r.ahead_cnt}개</div>}
+                    {r.rbk_dtm && r.fix_sts_cd.startsWith('RBK') && (
+                      <div className={`mt-0.5 whitespace-normal text-[11px] ${r.fix_sts_cd === 'RBK_DONE' ? 'text-emerald-700' : r.fix_sts_cd === 'RBK_FAIL' ? 'text-red-700' : 'text-violet-800'}`}>
+                        되돌림 {r.fix_sts_cd === 'RBK_DONE' ? `완료 ${dt(r.rbk_dply_dtm)}` : r.fix_sts_cd === 'RBK_FAIL' ? '실패' : '배포 중'} · {who(r.rbk_usr_nm)} {dt(r.rbk_dtm)}
+                        <div className="max-w-[220px]">사유 : {r.rbk_rsn_txt}</div>
+                      </div>
+                    )}
+                    {(r.fix_sts_cd === 'DONE' || r.fix_sts_cd === 'DPLY_FAIL' || (r.fix_sts_cd === 'RBK_FAIL' && !r.rbk_cmt_txt)) && r.mrg_cmt_txt && (
+                      <button
+                        type="button"
+                        disabled={!!busy}
+                        onClick={() => void act(r, 'rollback')}
+                        className="mt-1 block rounded border border-amber-600 bg-white px-2 py-0.5 font-semibold text-amber-800 disabled:opacity-60"
+                      >
+                        {busy === r.fix_id ? '되돌리는 중…' : r.fix_sts_cd === 'RBK_FAIL' ? '다시 되돌리기' : '되돌리기(수정 전으로)'}
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))

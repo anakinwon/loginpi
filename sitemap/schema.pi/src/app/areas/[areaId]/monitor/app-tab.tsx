@@ -34,13 +34,14 @@ const fmtDT = (t: string) => (new Date(t).toDateString() === new Date().toDateSt
 
 type Ai = { route: string; busy: boolean; res?: AiRun; err?: string; verify?: boolean } // verify = AI 수정 배포 직후라 재분석 차단(실시간 확인 표시)
 // PR 상태 — 만든 뒤 '승인' = master 병합 + 운영 배포(sha), dep = Vercel 운영 배포 상태(pending·success·failure)
-type Pr = { busy?: boolean; url?: string; number?: number; head?: string; err?: string; apv?: boolean; sha?: string; ahead?: number; dep?: string | null }
+type Pr = { busy?: boolean; url?: string; number?: number; head?: string; err?: string; apv?: boolean; sha?: string; ahead?: number; dep?: string | null; rej?: boolean; rjb?: boolean } // rej = 반려(PR 닫힘, 수정 전 유지), rjb = 반려 처리 중
 // 진행 단계(공용 fix-steps.tsx) — 화면 상태로 계산
 function stepOf(x: Pr): Step {
   if (x.dep === 'success') return { at: 4, on: false, bad: false }
   if (x.dep === 'failure' || x.dep === 'error') return { at: 3, on: false, bad: true }
   if (x.sha) return { at: 3, on: true, bad: false }
   if (x.apv) return { at: 2, on: true, bad: false }
+  if (x.rej) return { at: 2, on: false, bad: true }
   if (x.url) return { at: 2, on: false, bad: !!x.err }
   return { at: 0, on: !!x.busy, bad: !!x.err }
 }
@@ -88,6 +89,21 @@ function AiPanel({ ai, mdls, mdlId, onMdl, onClose, onRetry }: { ai: Ai; mdls: M
       setPrs((p) => ({ ...p, [k]: j.ok ? { ...cur, sha: j.sha, ahead: j.ahead, dep: 'pending' } : { ...cur, err: j.message ?? '승인하지 못했습니다' } }))
     } catch {
       setPrs((p) => ({ ...p, [k]: { ...cur, err: '승인하지 못했습니다(네트워크)' } }))
+    }
+  }
+  // 반려(2026-10-22) — PR 닫기·브랜치 삭제, 병합 안 함 = 운영 코드는 수정 전 그대로. 사유 필수
+  const reject = async (k: string) => {
+    const cur = prs[k]
+    if (!cur?.number || cur.apv || cur.rjb || cur.sha || cur.rej) return
+    const reason = prompt(`PR #${cur.number} 반려 — PR 을 닫고 병합하지 않습니다(운영 코드는 수정 전 그대로)\n\n사유를 입력하십시오(2자 이상)`)?.trim()
+    if (!reason) return
+    if (reason.length < 2) return setPrs((p) => ({ ...p, [k]: { ...cur, err: '반려 사유를 2자 이상 입력하십시오' } }))
+    setPrs((p) => ({ ...p, [k]: { ...cur, rjb: true, err: undefined } }))
+    try {
+      const j = await (await piFetch('/api/mon/app/fix/reject', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ number: cur.number, reason }) })).json()
+      setPrs((p) => ({ ...p, [k]: j.ok ? { ...cur, rej: true, rjb: false, err: `반려 — ${reason}` } : { ...cur, rjb: false, err: j.message ?? '반려하지 못했습니다' } }))
+    } catch {
+      setPrs((p) => ({ ...p, [k]: { ...cur, rjb: false, err: '반려하지 못했습니다(네트워크)' } }))
     }
   }
   // 운영 배포 상태 확인 — 진행 중인 것만 15초마다, 최대 10분(Vercel 빌드 1~3분)
@@ -209,15 +225,26 @@ function AiPanel({ ai, mdls, mdlId, onMdl, onClose, onRetry }: { ai: Ai; mdls: M
                                   PR #{prs[`${i}-${j}`].number} 열기
                                 </a>
                                 {prs[`${i}-${j}`].sha ? (
-                                  <span className="text-xs text-[#5b6578]">운영에 나간 커밋 {prs[`${i}-${j}`].ahead}개</span>
+                                  <span className="text-xs text-[#5b6578]">운영에 나간 커밋 {prs[`${i}-${j}`].ahead}개 · 되돌리기는 'AI 수정 이력' 탭</span>
+                                ) : prs[`${i}-${j}`].rej ? (
+                                  <span className="text-xs font-semibold text-red-700">반려됨 — 수정 전 코드 유지</span>
                                 ) : (
-                                  <button
-                                    type="button"
-                                    disabled={prs[`${i}-${j}`].apv}
-                                    onClick={() => void approve(`${i}-${j}`)}
-                                    className="rounded border border-violet-600 bg-violet-700 px-2 py-0.5 text-xs font-semibold text-white disabled:opacity-60">
-                                    {prs[`${i}-${j}`].apv ? '승인 처리 중…' : '승인(병합·운영 배포)'}
-                                  </button>
+                                  <>
+                                    <button
+                                      type="button"
+                                      disabled={prs[`${i}-${j}`].apv || prs[`${i}-${j}`].rjb}
+                                      onClick={() => void approve(`${i}-${j}`)}
+                                      className="rounded border border-violet-600 bg-violet-700 px-2 py-0.5 text-xs font-semibold text-white disabled:opacity-60">
+                                      {prs[`${i}-${j}`].apv ? '처리 중…' : '승인(병합·운영 배포)'}
+                                    </button>
+                                    <button
+                                      type="button"
+                                      disabled={prs[`${i}-${j}`].apv || prs[`${i}-${j}`].rjb}
+                                      onClick={() => void reject(`${i}-${j}`)}
+                                      className="rounded border border-red-500 bg-white px-2 py-0.5 text-xs font-semibold text-red-700 disabled:opacity-60">
+                                      {prs[`${i}-${j}`].rjb ? '반려 중…' : '반려'}
+                                    </button>
+                                  </>
                                 )}
                               </span>
                             ) : (

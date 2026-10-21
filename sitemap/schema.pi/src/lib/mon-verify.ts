@@ -14,38 +14,46 @@ export interface LastDeploy {
   at: string | null // 배포 완료 확인 시각(dply_dtm, 배포 중이면 null)
   cut: number // 배포 후 구간 시작(ms) = 배포가 걸친 분 다음 분 — 그 분 버킷은 배포 전후가 섞임
   until: number // 재분석 차단 끝(ms) — 배포 실패면 지금(차단 없음)
+  rbk: boolean // 되돌리기 배포(수정 전 코드로 복귀)
 }
 
-type Row = { fix_sts_cd: string; pr_no: number | null; dply_dtm: string | null; apv_dtm: string | null; mrg_cmt_txt: string | null }
+type Row = { fix_sts_cd: string; pr_no: number | null; dply_dtm: string | null; apv_dtm: string | null; mrg_cmt_txt: string | null; rbk_dtm: string | null; rbk_cmt_txt: string | null; rbk_dply_dtm: string | null }
+// 가장 최근 코드 변경 사건 = 되돌림이면 되돌림 요청 시각, 아니면 승인(병합) 시각 — mod_dtm 은 실패 복구 같은 기록 갱신에도 바뀌어 기준으로 못 씀
+const evAt = (x: Row) => Date.parse((x.fix_sts_cd.startsWith('RBK') ? x.rbk_dtm : x.apv_dtm) ?? '') || 0
 const read = async (route: string) => {
   const r = await db()
     .from('mon_ai_fix')
-    .select('fix_sts_cd, pr_no, dply_dtm, apv_dtm, mrg_cmt_txt')
+    .select('fix_sts_cd, pr_no, dply_dtm, apv_dtm, mrg_cmt_txt, rbk_dtm, rbk_cmt_txt, rbk_dply_dtm')
     .eq('route_txt', route)
     .eq('del_yn', 'N')
-    .in('fix_sts_cd', ['DPLY', 'DONE', 'DPLY_FAIL'])
+    .in('fix_sts_cd', ['DPLY', 'DONE', 'DPLY_FAIL', 'RBK', 'RBK_DONE', 'RBK_FAIL'])
     .order('apv_dtm', { ascending: false })
-    .limit(1)
-    .maybeSingle()
+    .limit(10) // ponytail: 경로당 최근 10건 안에서 고름 — 한 경로에 AI 수정이 10건 넘게 쌓이면 rbk_dtm 정렬 조회를 따로
   if (r.error) throw r.error
-  return r.data as Row | null
+  const rows = (r.data ?? []) as Row[]
+  return rows.reduce<Row | null>((a, x) => (!a || evAt(x) > evAt(a) ? x : a), null)
 }
 
 // 이 경로의 가장 최근 AI 수정 배포 — 배포 중이면 Vercel 상태를 한 번 확인해 확정(화면을 닫아 폴링이 끊긴 경우 '배포 중'에 고착되던 문제)
 export async function lastDeploy(route: string): Promise<LastDeploy | null> {
   let row = await read(route)
   if (!row) return null
-  if (row.fix_sts_cd === 'DPLY' && row.mrg_cmt_txt && process.env.GITHUB_TOKEN) {
+  // 배포 중(DPLY)·되돌림 배포 중(RBK)이면 Vercel 상태를 한 번 확인해 확정
+  const pending = row.fix_sts_cd === 'DPLY' ? row.mrg_cmt_txt : row.fix_sts_cd === 'RBK' ? row.rbk_cmt_txt : null
+  if (pending && process.env.GITHUB_TOKEN) {
     const { deployState } = await import('./mon-fix') // 동적 import = mon-fix → mon-ai → mon-verify 순환 회피
-    if (await deployState(row.mrg_cmt_txt).catch(() => null)) row = (await read(route)) ?? row
+    if (await deployState(pending).catch(() => null)) row = (await read(route)) ?? row
   }
   const now = Date.now()
-  if (row.fix_sts_cd === 'DPLY_FAIL') return { sts: 'FAIL', pr: row.pr_no, at: row.dply_dtm, cut: now, until: now }
-  const at = row.dply_dtm
+  const rbk = row.fix_sts_cd.startsWith('RBK') // 되돌림도 코드가 바뀌는 배포 — 같은 방식으로 재분석 차단·실시간 확인
+  if (row.fix_sts_cd === 'DPLY_FAIL' || row.fix_sts_cd === 'RBK_FAIL') return { sts: 'FAIL', pr: row.pr_no, at: rbk ? row.rbk_dply_dtm : row.dply_dtm, cut: now, until: now, rbk }
+  const deploying = row.fix_sts_cd === 'DPLY' || row.fix_sts_cd === 'RBK'
+  const at = rbk ? row.rbk_dply_dtm : row.dply_dtm
   const cut = at ? Date.parse(minuteOf(Date.parse(at))) + 60_000 : now
-  // 배포 중 차단 상한 = 승인 + 30분(상태 확인이 계속 실패해도 영구 차단 없음)
-  const until = row.fix_sts_cd === 'DPLY' ? Date.parse(row.apv_dtm ?? new Date(now).toISOString()) + VERIFY_MS : (at ? Date.parse(at) : now) + VERIFY_MS
-  return { sts: row.fix_sts_cd as 'DPLY' | 'DONE', pr: row.pr_no, at, cut, until }
+  // 배포 중 차단 상한 = 승인(되돌림 요청) + 30분(상태 확인이 계속 실패해도 영구 차단 없음)
+  const started = rbk ? row.rbk_dtm : row.apv_dtm
+  const until = deploying ? Date.parse(started ?? new Date(now).toISOString()) + VERIFY_MS : (at ? Date.parse(at) : now) + VERIFY_MS
+  return { sts: deploying ? 'DPLY' : 'DONE', pr: row.pr_no, at, cut, until, rbk }
 }
 
 // 배포 후 실측 — 배포 후 구간(cut~지금)과 바로 앞 같은 길이(배포 전 기준선)의 요청·오류·느림, 배포 후 느림·오류 상세(최신 20)

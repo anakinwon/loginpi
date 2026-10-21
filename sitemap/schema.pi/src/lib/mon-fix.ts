@@ -92,9 +92,17 @@ type FixRow = Partial<{
   dply_dtm: string
   err_txt: string | null
   modr_id: string
+  rej_usr_id: string | null
+  rej_dtm: string | null
+  rej_rsn_txt: string | null
+  rbk_usr_id: string | null
+  rbk_dtm: string | null
+  rbk_rsn_txt: string | null
+  rbk_cmt_txt: string
+  rbk_dply_dtm: string
 }>
-export type FixSts = 'REQ' | 'REQ_FAIL' | 'PR' | 'APV' | 'APV_FAIL' | 'DPLY' | 'DONE' | 'DPLY_FAIL'
-async function rec(match: { fix_id?: string; pr_no?: number; mrg_cmt_txt?: string; fix_sts_cd?: FixSts | FixSts[] }, v: FixRow): Promise<string[]> {
+export type FixSts = 'REQ' | 'REQ_FAIL' | 'PR' | 'APV' | 'APV_FAIL' | 'REJ' | 'DPLY' | 'DONE' | 'DPLY_FAIL' | 'RBK' | 'RBK_DONE' | 'RBK_FAIL' // sql/072·074
+async function rec(match: { fix_id?: string; pr_no?: number; mrg_cmt_txt?: string; rbk_cmt_txt?: string; fix_sts_cd?: FixSts | FixSts[] }, v: FixRow): Promise<string[]> {
   let qb = db().from('mon_ai_fix').update(v).eq('del_yn', 'N')
   for (const [k, x] of Object.entries(match)) qb = Array.isArray(x) ? qb.in(k, x) : qb.eq(k, x as string)
   const r = await qb.select('fix_id')
@@ -283,14 +291,19 @@ async function mergeAndDeploy(n: number, head: string, onMerged: (sha: string) =
 export async function deployState(sha: string): Promise<string | null> {
   const s = await gh<{ statuses: { context: string; state: string }[] }>('GET', `/commits/${sha}/status`)
   const st = s.statuses.find((x) => x.context === 'Vercel – schema')?.state ?? null
-  if (st && st !== 'pending') await rec({ mrg_cmt_txt: sha, fix_sts_cd: 'DPLY' }, { fix_sts_cd: st === 'success' ? 'DONE' : 'DPLY_FAIL', dply_dtm: new Date().toISOString(), err_txt: st === 'success' ? null : `Vercel 운영 빌드 ${st} — 이전 배포 유지` })
+  if (st && st !== 'pending') {
+    const now = new Date().toISOString()
+    const ok = st === 'success'
+    await rec({ mrg_cmt_txt: sha, fix_sts_cd: 'DPLY' }, { fix_sts_cd: ok ? 'DONE' : 'DPLY_FAIL', dply_dtm: now, err_txt: ok ? null : `Vercel 운영 빌드 ${st} — 이전 배포 유지` })
+    await rec({ rbk_cmt_txt: sha, fix_sts_cd: 'RBK' }, { fix_sts_cd: ok ? 'RBK_DONE' : 'RBK_FAIL', rbk_dply_dtm: now, err_txt: ok ? null : `되돌림 운영 빌드 ${st} — 이전 배포(AI 수정 반영본) 유지` })
+  }
   return st
 }
 
 // 보고서 목록(최신 요청순, 20행 페이지) — 사람 이름은 sys_user 별도 조회 후 병합(FK·임베디드 조인 없음, RI 물리 미구현 결정)
 //  배포 중(DPLY) 행은 보는 김에 Vercel 상태를 확인해 확정(화면을 닫아 폴링이 끊긴 경우 보완, 한 번에 5건)
 export const FIX_PAGE = 20
-export type FixListRow = Record<string, unknown> & { fix_id: string; req_usr_nm: string | null; apv_usr_nm: string | null }
+export type FixListRow = Record<string, unknown> & { fix_id: string; req_usr_nm: string | null; apv_usr_nm: string | null; rej_usr_nm: string | null; rbk_usr_nm: string | null }
 const STALE_MS = 10 * 60_000 // 함수 최대 실행(300초)의 두 배 — 넘은 '진행 중' 행 = 강제 종료로 끊긴 것
 export async function listFixes(page: number, sts?: FixSts[]): Promise<{ rows: FixListRow[]; total: number }> {
   const old = new Date(Date.now() - STALE_MS).toISOString()
@@ -299,10 +312,12 @@ export async function listFixes(page: number, sts?: FixSts[]): Promise<{ rows: F
     db().from('mon_ai_fix').update({ fix_sts_cd: 'APV_FAIL', err_txt: '시간 초과로 중단(서버 실행 제한) — GitHub PR·운영 브랜치 상태 확인' }).eq('fix_sts_cd', 'APV').lt('apv_dtm', old).is('mrg_cmt_txt', null),
     // 병합 커밋이 남은 행 = master 병합 뒤 끊김 → 배포 실패(다시 승인 대상 아님)
     db().from('mon_ai_fix').update({ fix_sts_cd: 'DPLY_FAIL', err_txt: 'master 병합 후 시간 초과로 중단 — 운영 브랜치(prod/schema) 반영 여부 확인' }).eq('fix_sts_cd', 'APV').lt('apv_dtm', old).not('mrg_cmt_txt', 'is', null),
+    // 되돌림 커밋 전에 끊긴 되돌리기 = 코드는 그대로(AI 수정 반영본) — 되돌림 실패로 확정(다시 되돌리기 가능)
+    db().from('mon_ai_fix').update({ fix_sts_cd: 'RBK_FAIL', err_txt: '되돌리기 시간 초과로 중단 — master 커밋 이력에서 "This reverts commit" 으로 반영 여부 확인 후 다시 되돌리기' }).eq('fix_sts_cd', 'RBK').lt('rbk_dtm', old).is('rbk_cmt_txt', null),
   ])
   let q = db()
     .from('mon_ai_fix')
-    .select('fix_id, route_txt, caus_txt, fix_txt, file_txt, mdl_nm, mdl_dsp_nm, fix_sts_cd, req_usr_id, req_dtm, pr_no, pr_url, head_cmt_txt, apv_usr_id, apv_dtm, mrg_cmt_txt, ahead_cnt, dply_dtm, err_txt', { count: 'exact' })
+    .select('fix_id, route_txt, caus_txt, fix_txt, file_txt, mdl_nm, mdl_dsp_nm, fix_sts_cd, req_usr_id, req_dtm, pr_no, pr_url, head_cmt_txt, apv_usr_id, apv_dtm, mrg_cmt_txt, ahead_cnt, dply_dtm, err_txt, rej_usr_id, rej_dtm, rej_rsn_txt, rbk_usr_id, rbk_dtm, rbk_rsn_txt, rbk_cmt_txt, rbk_dply_dtm', { count: 'exact' })
     .eq('del_yn', 'N')
   if (sts?.length) q = q.in('fix_sts_cd', sts)
   const r = await q.order('req_dtm', { ascending: false }).range((page - 1) * FIX_PAGE, page * FIX_PAGE - 1)
@@ -316,18 +331,137 @@ export async function listFixes(page: number, sts?: FixSts[]): Promise<{ rows: F
   }
   if (r.error) throw r.error
   let rows = r.data
-  const dply = [...new Set(rows.filter((x) => x.fix_sts_cd === 'DPLY' && x.mrg_cmt_txt).map((x) => x.mrg_cmt_txt as string))].slice(0, 5)
+  // 배포 중(DPLY = 병합 커밋)·되돌림 배포 중(RBK = 되돌림 커밋) 행의 Vercel 상태 확정
+  const dply = [...new Set(rows.flatMap((x) => (x.fix_sts_cd === 'DPLY' && x.mrg_cmt_txt ? [x.mrg_cmt_txt as string] : x.fix_sts_cd === 'RBK' && x.rbk_cmt_txt ? [x.rbk_cmt_txt as string] : [])))].slice(0, 5)
   if (dply.length && process.env.GITHUB_TOKEN) {
     const done = await Promise.all(dply.map((sha) => deployState(sha).catch(() => null)))
     if (done.some((x) => x && x !== 'pending')) {
-      const again = await db().from('mon_ai_fix').select('fix_id, fix_sts_cd, dply_dtm, err_txt').in('mrg_cmt_txt', dply)
+      const again = await db().from('mon_ai_fix').select('fix_id, fix_sts_cd, dply_dtm, rbk_dply_dtm, err_txt').in('fix_id', rows.map((x) => x.fix_id))
       const by = new Map((again.data ?? []).map((x) => [x.fix_id, x]))
       rows = rows.map((x) => ({ ...x, ...(by.get(x.fix_id) ?? {}) }))
     }
   }
-  const ids = [...new Set(rows.flatMap((x) => [x.req_usr_id, x.apv_usr_id]).filter(Boolean))] as string[]
+  const ids = [...new Set(rows.flatMap((x) => [x.req_usr_id, x.apv_usr_id, x.rej_usr_id, x.rbk_usr_id]).filter(Boolean))] as string[]
   const users = ids.length ? await db().from('sys_user').select('usr_id, dsp_nm, pi_usr_nm').in('usr_id', ids) : { data: [], error: null }
   if (users.error) throw users.error
   const nm = new Map((users.data ?? []).map((u) => [u.usr_id, u.dsp_nm || u.pi_usr_nm]))
-  return { rows: rows.map((x) => ({ ...x, req_usr_nm: nm.get(x.req_usr_id) ?? null, apv_usr_nm: x.apv_usr_id ? (nm.get(x.apv_usr_id) ?? null) : null })), total: r.count ?? 0 }
+  const who = (id: string | null) => (id ? (nm.get(id) ?? null) : null)
+  return { rows: rows.map((x) => ({ ...x, req_usr_nm: who(x.req_usr_id), apv_usr_nm: who(x.apv_usr_id), rej_usr_nm: who(x.rej_usr_id), rbk_usr_nm: who(x.rbk_usr_id) })), total: r.count ?? 0 }
+}
+
+// 반려(2026-10-22 마스터 지시 "수정 > 배포요청 > 반려 > 수정 이전상태로 rollback") — 승인 대기 AI 수정안 PR 을 닫고 브랜치 삭제
+//  병합 전이므로 master·운영 코드는 수정 전 그대로(= 수정 이전 상태). 반려자·반려 사유를 기록하고 PR 에 사유 댓글
+//  기록 행이 있으면 승인 대기·승인 실패 행을 원자적으로 선점(승인과 동시에 눌려도 1건만), GitHub 처리가 실패하면 선점 전 상태로 되돌림
+export type RejectFail = 'NO_GH' | 'NOT_AI' | 'CLOSED' | 'BUSY'
+export async function rejectPr(n: number, usrId: string, reason: string): Promise<{ ok: true } | RejectFail> {
+  if (!process.env.GITHUB_TOKEN) return 'NO_GH'
+  const row = await db().from('mon_ai_fix').select('fix_id, fix_sts_cd').eq('pr_no', n).eq('del_yn', 'N').maybeSingle()
+  if (row.error) throw row.error
+  let fixId: string | null = null
+  const prevSts = row.data?.fix_sts_cd as FixSts | undefined
+  if (row.data) {
+    const got = await rec({ fix_id: row.data.fix_id, fix_sts_cd: ['PR', 'APV_FAIL'] }, { fix_sts_cd: 'REJ', rej_usr_id: usrId, rej_dtm: new Date().toISOString(), rej_rsn_txt: reason, err_txt: null, modr_id: usrId })
+    if (!got.length) return 'BUSY'
+    fixId = got[0]
+  }
+  const undo = async (msg: string) => {
+    if (fixId && prevSts) await rec({ fix_id: fixId, fix_sts_cd: 'REJ' }, { fix_sts_cd: prevSts, rej_usr_id: null, rej_dtm: null, rej_rsn_txt: null, err_txt: `반려 실패 — ${msg}`.slice(0, 500) })
+  }
+  try {
+    const base = process.env.GITHUB_BASE || 'master'
+    const pr = await gh<{ state: string; merged: boolean; head: { ref: string; repo: { full_name: string } | null }; base: { ref: string } }>('GET', `/pulls/${n}`)
+    if (!pr.head.ref.startsWith('fix/mon-ai-') || pr.head.repo?.full_name !== repo() || pr.base.ref !== base) {
+      await undo('AI 수정안 PR 이 아님')
+      return 'NOT_AI'
+    }
+    if (pr.state !== 'open' || pr.merged) {
+      await undo('이미 병합·닫힌 PR')
+      return 'CLOSED'
+    }
+    await gh('POST', `/issues/${n}/comments`, { body: `🚫 반려 — ${reason}\n\n(schema.pi 모니터링 > AI 수정 이력에서 반려. 병합하지 않으므로 운영 코드는 수정 전 그대로입니다)` }).catch(() => {}) // 댓글 실패는 반려를 막지 않음
+    await gh('PATCH', `/pulls/${n}`, { state: 'closed' })
+    await gh('DELETE', `/git/refs/heads/${enc(pr.head.ref)}`).catch(() => {}) // 브랜치 정리(실패해도 PR 은 닫힘)
+    return { ok: true }
+  } catch (e) {
+    await undo(why(e))
+    throw e
+  }
+}
+
+// 되돌리기(롤백) — 이미 master 병합(운영 배포)된 AI 수정을 수정 전 내용으로 되돌리는 커밋을 master 에 만들고 운영 브랜치에 빨리 감기
+//  방식 : 병합 커밋이 바꾼 파일만 병합 직전(부모) 내용으로 복원. 그 뒤 같은 파일을 다른 커밋이 또 바꿨으면 충돌로 보고 거절(사람이 직접 처리)
+//  배포 완료·배포 실패·되돌림 실패(커밋 전) 행만, 선점 후 진행. 되돌림 커밋 전 실패 = 선점 전 상태로 복구, 커밋 후 운영 반영 실패 = RBK_FAIL
+export type RollbackFail = 'NO_GH' | 'NOT_FOUND' | 'BUSY' | 'CONFLICT' | 'MOVED' | 'PROD_FF'
+const RBK_MSG: Record<Exclude<RollbackFail, 'NO_GH' | 'NOT_FOUND' | 'BUSY'>, string> = {
+  CONFLICT: '병합 뒤 같은 파일이 다시 바뀌어 자동 되돌리기 불가 — 사람이 직접 되돌려야 함',
+  MOVED: '되돌리는 사이 master 가 바뀜 — 다시 시도',
+  PROD_FF: 'master 는 되돌렸지만 운영 브랜치가 갈라져 운영 반영 못 함',
+}
+export async function rollbackFix(fixId: string, usrId: string, reason: string): Promise<{ sha: string; ahead: number; url: string } | RollbackFail> {
+  if (!process.env.GITHUB_TOKEN) return 'NO_GH'
+  const row = await db().from('mon_ai_fix').select('fix_id, fix_sts_cd, mrg_cmt_txt, rbk_cmt_txt, pr_no, fix_txt, route_txt').eq('fix_id', fixId).eq('del_yn', 'N').maybeSingle()
+  if (row.error) throw row.error
+  if (!row.data?.mrg_cmt_txt || (row.data.fix_sts_cd === 'RBK_FAIL' && row.data.rbk_cmt_txt)) return 'NOT_FOUND' // 병합 안 됨 또는 이미 되돌림 커밋 있음
+  const prevSts = row.data.fix_sts_cd as FixSts
+  const got = await rec({ fix_id: fixId, fix_sts_cd: ['DONE', 'DPLY_FAIL', 'RBK_FAIL'] }, { fix_sts_cd: 'RBK', rbk_usr_id: usrId, rbk_dtm: new Date().toISOString(), rbk_rsn_txt: reason, err_txt: null, modr_id: usrId })
+  if (!got.length) return 'BUSY'
+  const mine = { fix_id: fixId, fix_sts_cd: 'RBK' as FixSts }
+  // 되돌림 커밋 전 실패 = 코드는 그대로 → 선점 전 상태로, 되돌림 요청 기록(사람·시각·사유)도 지움(화면에 '되돌림 배포 중'이 남지 않게) — 실패 이유는 err_txt
+  const restore = (msg: string) => rec(mine, { fix_sts_cd: prevSts, rbk_usr_id: null, rbk_dtm: null, rbk_rsn_txt: null, err_txt: `되돌리기 실패 — ${msg}`.slice(0, 500) })
+  let committed: string | null = null
+  try {
+    const r = await revertMerge(row.data.mrg_cmt_txt, `⏪ revert(schema): ${row.data.fix_txt} 되돌림 — 모니터링 AI 수정안 #${row.data.pr_no} (${row.data.route_txt})`, reason, async (sha) => {
+      committed = sha
+      // 기록 실패를 그냥 넘기면 master·운영은 되돌렸는데 '안 바뀜'으로 남음 → 예외로 RBK_FAIL(커밋 sha 는 오류 문구에)
+      if (!(await rec(mine, { rbk_cmt_txt: sha })).length) throw new Error(`되돌림 커밋 ${sha.slice(0, 7)} 기록 실패`)
+    })
+    if (typeof r === 'string') {
+      if (r === 'PROD_FF') await rec(mine, { fix_sts_cd: 'RBK_FAIL', err_txt: RBK_MSG.PROD_FF })
+      else await restore(RBK_MSG[r])
+      return r
+    }
+    return r
+  } catch (e) {
+    if (committed) await rec(mine, { fix_sts_cd: 'RBK_FAIL', err_txt: `master 되돌린 뒤 운영 반영 실패 — ${why(e)}`.slice(0, 500) })
+    else await restore(why(e))
+    throw e
+  }
+}
+
+async function revertMerge(m: string, title: string, reason: string, onCommitted: (sha: string) => Promise<void>): Promise<{ sha: string; ahead: number; url: string } | 'CONFLICT' | 'MOVED' | 'PROD_FF'> {
+  const base = process.env.GITHUB_BASE || 'master'
+  const mc = await gh<{ parents: { sha: string }[] }>('GET', `/git/commits/${m}`)
+  const p = mc.parents[0]?.sha
+  if (!p || mc.parents.length !== 1) return 'CONFLICT' // squash 병합 커밋만(부모 1개)
+  const cmp = await gh<{ files?: { filename: string; status: string; sha: string }[] }>('GET', `/compare/${p}...${m}`)
+  const files = cmp.files ?? []
+  if (!files.length || files.some((f) => f.status !== 'modified' || !f.filename.startsWith(APP_DIR))) return 'CONFLICT' // AI 수정 = 이 앱 파일 수정만
+  const head = await gh<{ object: { sha: string } }>('GET', `/git/ref/heads/${enc(base)}`)
+  const hs = head.object.sha
+  const tree: { path: string; mode: string; type: string; sha: string }[] = []
+  for (const f of files) {
+    const [now, before] = await Promise.all([
+      gh<{ sha: string }>('GET', `/contents/${enc(f.filename)}?ref=${hs}`),
+      gh<{ sha: string }>('GET', `/contents/${enc(f.filename)}?ref=${p}`),
+    ])
+    if (now.sha !== f.sha) return 'CONFLICT' // 병합 뒤 같은 파일이 또 바뀜
+    tree.push({ path: f.filename, mode: '100644', type: 'blob', sha: before.sha })
+  }
+  const hc = await gh<{ tree: { sha: string } }>('GET', `/git/commits/${hs}`)
+  const t = await gh<{ sha: string }>('POST', '/git/trees', { base_tree: hc.tree.sha, tree })
+  const c = await gh<{ sha: string }>('POST', '/git/commits', { message: `${title}\n\n사유 : ${reason}\n\nThis reverts commit ${m}.`, tree: t.sha, parents: [hs] })
+  const moved = await gh('PATCH', `/git/refs/heads/${enc(base)}`, { sha: c.sha, force: false }).then(
+    () => false,
+    (e: Error) => {
+      if (/ 422 /.test(e.message)) return true // master 가 그사이 앞으로 감
+      throw e
+    },
+  )
+  if (moved) return 'MOVED'
+  await onCommitted(c.sha)
+  const prod = await gh<{ object: { sha: string } }>('GET', `/git/ref/heads/${enc(PROD())}`)
+  const pc = await gh<{ status: string; ahead_by: number }>('GET', `/compare/${prod.object.sha}...${c.sha}`)
+  if (pc.status !== 'ahead' && pc.status !== 'identical') return 'PROD_FF'
+  await gh('PATCH', `/git/refs/heads/${enc(PROD())}`, { sha: c.sha, force: false })
+  return { sha: c.sha, ahead: pc.ahead_by, url: `https://github.com/${repo()}/commit/${c.sha}` }
 }
