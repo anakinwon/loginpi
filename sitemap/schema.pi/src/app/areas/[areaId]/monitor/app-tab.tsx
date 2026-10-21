@@ -4,8 +4,9 @@
 // 느린·오류 요청 상세(sql/069) : 어느 화면(pageMenu)·어떤 API·상태코드인지 개별 행 — 타일(느림·오류)·분포 막대(분)·화면별 TOP 으로 필터, 20행 페이지
 // AI 원인 분석 : 경로 TOP 의 느림·오류 경로 → 설정에 등록한 AI 모델(기본 또는 패널에서 고른 모델)이 원인·해결 방안 제시(화면 표시만, 저장·자동 수정 없음)
 //  결과에 사용 모델·요금제·계정·소요·토큰을 함께 표시(자료 신뢰성, 2026-10-21 마스터 지시)
+//  해결 방안마다 'PR 로 해결'(2026-10-22 마스터 지시) : 같은 모델이 그 파일을 고쳐 GitHub PR 생성(/api/mon/app/fix) — 병합 전 운영 반영 없음
 import { piFetch } from '@pi/auth/client'
-import { Sparkles } from 'lucide-react'
+import { GitPullRequest, Sparkles } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import type { AiMdl, AiResult, AiRun } from '@/lib/mon-ai'
 import { pageMenu, routeMenu, SLOW_MS } from '@/lib/mon'
@@ -26,6 +27,7 @@ const minOf = (t: string) => Math.floor(Date.parse(t) / 60000) * 60000
 const fmtS = (t: string) => new Date(t).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })
 
 type Ai = { route: string; busy: boolean; res?: AiRun; err?: string }
+type Pr = { busy?: boolean; url?: string; number?: number; err?: string }
 type MdlOpt = Pick<AiMdl, 'dsp_nm' | 'plan_nm'> & { mdl_id: string; dflt_yn: 'Y' | 'N' }
 const LIKE: Record<AiResult['confidence'], [string, string]> = { HIGH: ['높음', 'bg-red-100 text-red-700'], MID: ['중간', 'bg-amber-100 text-amber-800'], LOW: ['낮음', 'bg-gray-100 text-gray-600'] }
 
@@ -34,6 +36,22 @@ function AiPanel({ ai, mdls, mdlId, onMdl, onClose, onRetry }: { ai: Ai; mdls: M
   const [open, setOpen] = useState(true)
   const r = ai.res?.ai
   const run = ai.res
+  // 해결 방안별 PR 상태(키 = 원인-해결 순번), 다시 분석하면 초기화. 같은 해결 방안은 PR 1개만(만든 뒤 버튼 = 링크)
+  const [prs, setPrs] = useState<Record<string, Pr>>({})
+  useEffect(() => setPrs({}), [run])
+  const makePr = async (k: string, c: AiResult['causes'][number], x: AiResult['causes'][number]['fixes'][number]) => {
+    if (prs[k]?.busy || prs[k]?.url) return
+    if (!confirm(`'${x.title}' 수정안을 AI 가 만들어 GitHub PR 로 올립니다(병합 전에는 운영에 반영되지 않음)`)) return
+    setPrs((p) => ({ ...p, [k]: { busy: true } }))
+    const mdl = run?.mdl.mdl_id
+    try {
+      const body = { route: ai.route, cause: { title: c.title, evidence: c.evidence }, fix: x, ...(mdl ? { mdl_id: mdl } : {}) }
+      const j = await (await piFetch('/api/mon/app/fix', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json()
+      setPrs((p) => ({ ...p, [k]: j.ok ? { url: j.url, number: j.number } : { err: j.message ?? 'PR 을 만들지 못했습니다' } }))
+    } catch {
+      setPrs((p) => ({ ...p, [k]: { err: 'PR 을 만들지 못했습니다(네트워크)' } }))
+    }
+  }
   return (
     <div className="mt-2 rounded-lg border border-violet-300 bg-violet-50/40 p-3 text-sm" aria-live="polite">
       <div className="flex flex-wrap items-center gap-2">
@@ -102,7 +120,27 @@ function AiPanel({ ai, mdls, mdlId, onMdl, onClose, onRetry }: { ai: Ai; mdls: M
                           <b>{x.title}</b>
                         </div>
                         <p className="text-xs text-[#2c3850]">{x.detail}</p>
-                        {x.files.length > 0 && <p className="font-mono text-xs text-[#5b6578]">{x.files.join(' · ')}</p>}
+                        {x.files.length > 0 && (
+                          <div className="flex flex-wrap items-center gap-2">
+                            <p className="font-mono text-xs text-[#5b6578]">{x.files.join(' · ')}</p>
+                            {prs[`${i}-${j}`]?.url ? (
+                              <a href={prs[`${i}-${j}`].url} target="_blank" rel="noreferrer" className="ml-auto inline-flex items-center gap-1 rounded border border-emerald-400 bg-white px-2 py-0.5 text-xs font-semibold text-emerald-800">
+                                <GitPullRequest className="h-3.5 w-3.5" aria-hidden />
+                                PR #{prs[`${i}-${j}`].number} 열기
+                              </a>
+                            ) : (
+                              <button
+                                type="button"
+                                disabled={prs[`${i}-${j}`]?.busy}
+                                onClick={() => void makePr(`${i}-${j}`, c, x)}
+                                className="ml-auto inline-flex items-center gap-1 rounded border border-emerald-500 bg-emerald-600 px-2 py-0.5 text-xs font-semibold text-white disabled:opacity-60">
+                                <GitPullRequest className="h-3.5 w-3.5" aria-hidden />
+                                {prs[`${i}-${j}`]?.busy ? '수정안 만드는 중…(최대 2~3분)' : 'PR 로 해결'}
+                              </button>
+                            )}
+                          </div>
+                        )}
+                        {prs[`${i}-${j}`]?.err && <p className="text-xs text-red-700">{prs[`${i}-${j}`].err}</p>}
                       </div>
                     ))}
                   </div>
@@ -119,7 +157,7 @@ function AiPanel({ ai, mdls, mdlId, onMdl, onClose, onRetry }: { ai: Ai; mdls: M
                 </details>
               )}
               {r.gaps.length > 0 && <p className="text-xs text-[#5b6578]">부족한 데이터 : {r.gaps.join(' / ')}</p>}
-              <p className="text-xs text-[#5b6578]">AI 추정입니다 — 코드는 바꾸지 않았습니다. 근거를 확인한 뒤 조치하십시오.</p>
+              <p className="text-xs text-[#5b6578]">AI 추정입니다 — 'PR 로 해결'은 GitHub PR 만 만들고 운영 코드는 바꾸지 않습니다. PR 의 변경 내용과 미리보기 배포를 확인한 뒤 병합하십시오.</p>
             </>
           )}
         </div>

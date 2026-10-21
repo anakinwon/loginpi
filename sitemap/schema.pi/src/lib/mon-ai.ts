@@ -1,4 +1,4 @@
-// 애플리케이션 모니터링 AI 원인 분석(2026-10-21, 마스터 지시 — 원인·해결 방안까지만 화면 제시, 코드 자동 수정 없음)
+// 애플리케이션 모니터링 AI 원인 분석(2026-10-21, 마스터 지시 — 원인·해결 방안 화면 제시, 이 파일은 코드를 바꾸지 않음 : 수정안 PR 은 mon-fix.ts)
 // 한 API 경로의 분 단위 합계·느린/오류 개별 이력 + 그 경로 소스(route.ts·직접 import 한 src/lib·호출 화면 일부) → 설정에 등록한 모델(Claude·Gemini·OpenAI) 구조화 출력
 // 외부로 보내는 값 = 경로·수치·화면 경로·소스 코드(사용자 ID·이름은 보내지 않음). 소스는 next.config outputFileTracingIncludes 로 배포본에 포함
 import 'server-only'
@@ -146,7 +146,7 @@ export const keyOn = (p: Prvd) => !!process.env[KEY_ENV[p]]
 const FALLBACK: AiMdl = { mdl_id: null, prvd_cd: 'CLAUDE', mdl_nm: 'claude-opus-5-5', dsp_nm: 'Claude Opus 5.5', plan_nm: '미등록', acct_nm: '' }
 
 // mdlId 가 있으면 그 모델(삭제됐으면 'GONE'), 없으면 기본 모델 → 없으면 FALLBACK
-async function pickMdl(mdlId?: string): Promise<AiMdl | 'GONE'> {
+export async function pickMdl(mdlId?: string): Promise<AiMdl | 'GONE'> {
   const q = db().from('mon_ai_mdl').select('mdl_id, prvd_cd, mdl_nm, dsp_nm, plan_nm, acct_nm').eq('del_yn', 'N')
   const r = await (mdlId ? q.eq('mdl_id', mdlId) : q.eq('dflt_yn', 'Y')).maybeSingle()
   if (r.error) throw r.error
@@ -163,14 +163,17 @@ export interface AiRun {
 const TIMEOUT = 90_000
 const MAX_OUT = 16_000 // Gemini·OpenAI 는 추론 토큰이 출력 한도에 포함돼 Claude(8,000)보다 크게
 type Call = { text?: string; done: boolean; in: number; out: number }
+// 구조화 출력 형식 — 원인 분석(SCHEMA)과 수정안(mon-fix.ts)이 같은 3사 호출을 씀
+export type Fmt = { name: string; schema: object; claudeMax: number }
+const ANALYZE: Fmt = { name: 'mon_ai_result', schema: SCHEMA, claudeMax: 8000 }
 
 let client: Anthropic | null = null
-async function callClaude(m: AiMdl, system: string, user: string): Promise<Call> {
+async function callClaude(m: AiMdl, system: string, user: string, f: Fmt): Promise<Call> {
   client ??= new Anthropic({ timeout: TIMEOUT, maxRetries: 1 })
   const res = await client.messages.create({
     model: m.mdl_nm,
-    max_tokens: 8000,
-    output_config: { effort: 'medium', format: { type: 'json_schema', schema: SCHEMA } },
+    max_tokens: f.claudeMax,
+    output_config: { effort: 'medium', format: { type: 'json_schema', schema: f.schema as Record<string, unknown> } },
     system,
     messages: [{ role: 'user', content: user }],
   })
@@ -184,12 +187,12 @@ async function post(url: string, headers: Record<string, string>, body: unknown)
   return j
 }
 
-async function callGemini(m: AiMdl, system: string, user: string): Promise<Call> {
+async function callGemini(m: AiMdl, system: string, user: string, f: Fmt): Promise<Call> {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(m.mdl_nm)}:generateContent`
   const j = await post(url, { 'x-goog-api-key': process.env.GEMINI_API_KEY! }, {
     systemInstruction: { parts: [{ text: system }] },
     contents: [{ role: 'user', parts: [{ text: user }] }],
-    generationConfig: { responseMimeType: 'application/json', responseJsonSchema: SCHEMA, maxOutputTokens: MAX_OUT },
+    generationConfig: { responseMimeType: 'application/json', responseJsonSchema: f.schema, maxOutputTokens: MAX_OUT },
   })
   const c = j.candidates?.[0]
   const u = j.usageMetadata ?? {}
@@ -197,14 +200,14 @@ async function callGemini(m: AiMdl, system: string, user: string): Promise<Call>
   return { text: parts.filter((p) => !p.thought).map((p) => p.text ?? '').join(''), done: c?.finishReason === 'STOP', in: u.promptTokenCount ?? 0, out: (u.candidatesTokenCount ?? 0) + (u.thoughtsTokenCount ?? 0) }
 }
 
-async function callOpenAi(m: AiMdl, system: string, user: string): Promise<Call> {
+async function callOpenAi(m: AiMdl, system: string, user: string, f: Fmt): Promise<Call> {
   const j = await post('https://api.openai.com/v1/chat/completions', { Authorization: `Bearer ${process.env.OPENAI_API_KEY}` }, {
     model: m.mdl_nm,
     messages: [
       { role: 'system', content: system },
       { role: 'user', content: user },
     ],
-    response_format: { type: 'json_schema', json_schema: { name: 'mon_ai_result', strict: true, schema: SCHEMA } },
+    response_format: { type: 'json_schema', json_schema: { name: f.name, strict: true, schema: f.schema } },
     max_completion_tokens: MAX_OUT,
   })
   const c = j.choices?.[0]
@@ -212,6 +215,21 @@ async function callOpenAi(m: AiMdl, system: string, user: string): Promise<Call>
 }
 
 const CALL: Record<Prvd, typeof callClaude> = { CLAUDE: callClaude, GEMINI: callGemini, OPENAI: callOpenAi }
+
+// 고른 모델로 구조화 출력 1회 — 미완료·실패 = null(로그만)
+export async function callAi<T>(mdl: AiMdl, system: string, user: string, f: Fmt): Promise<{ out: T; tok: { in: number; out: number } } | null> {
+  try {
+    const c = await CALL[mdl.prvd_cd](mdl, system, user, f)
+    if (!c.done || !c.text) {
+      console.error('mon-ai', f.name, mdl.prvd_cd, mdl.mdl_nm, 'incomplete')
+      return null
+    }
+    return { out: JSON.parse(c.text) as T, tok: { in: c.in, out: c.out } }
+  } catch (e) {
+    console.error('mon-ai', f.name, mdl.prvd_cd, mdl.mdl_nm, (e as Error).message)
+    return null
+  }
+}
 
 export async function analyzeRoute(route: string, min: number, mdlId?: string): Promise<AiRun | 'OFF' | 'GONE' | null> {
   const mdl = await pickMdl(mdlId)
@@ -239,15 +257,6 @@ export async function analyzeRoute(route: string, min: number, mdlId?: string): 
     src.found ? `소스 코드 :\n${src.text}` : `소스 코드 : route.ts 를 찾지 못함\n${src.text}`,
   ].join('\n\n')
   const t0 = Date.now()
-  try {
-    const c = await CALL[mdl.prvd_cd](mdl, system, user)
-    if (!c.done || !c.text) {
-      console.error('mon-ai', mdl.prvd_cd, mdl.mdl_nm, 'incomplete')
-      return null
-    }
-    return { ai: JSON.parse(c.text) as AiResult, mdl, ms: Date.now() - t0, tok: { in: c.in, out: c.out } }
-  } catch (e) {
-    console.error('mon-ai', mdl.prvd_cd, mdl.mdl_nm, (e as Error).message)
-    return null
-  }
+  const c = await callAi<AiResult>(mdl, system, user, ANALYZE)
+  return c && { ai: c.out, mdl, ms: Date.now() - t0, tok: c.tok }
 }
