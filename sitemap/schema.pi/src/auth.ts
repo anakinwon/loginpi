@@ -18,7 +18,7 @@ type LinkJwt = {
 }
 
 // 반환 : usr_id = 연동 있음 / null = 연동 없음(확정) / undefined = DB 오류(판정 불가 — 호출자는 이전 값 유지)
-async function findLinkedUserId(sub: string): Promise<string | null | undefined> {
+async function queryLinkedUserId(sub: string): Promise<string | null | undefined> {
   try {
     const { data, error } = await db()
       .from('sys_usr_auth_lnk')
@@ -35,6 +35,27 @@ async function findLinkedUserId(sub: string): Promise<string | null | undefined>
   } catch (e) {
     console.error('[auth] findLinkedUserId', e instanceof Error ? e.message : e)
     return undefined
+  }
+}
+
+// 연동 조회 제한 시간 — 넘기면 undefined(판정 불가)로 처리해 세션 응답이 DB 지연에 묶이지 않게 한다
+const LINK_TIMEOUT_MS = 800
+
+async function findLinkedUserId(sub: string): Promise<string | null | undefined> {
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const timeout = new Promise<undefined>((resolve) => {
+    timer = setTimeout(() => {
+      console.error('[auth] findLinkedUserId timeout', LINK_TIMEOUT_MS)
+      resolve(undefined)
+    }, LINK_TIMEOUT_MS)
+  })
+  try {
+    return await Promise.race([queryLinkedUserId(sub), timeout])
+  } catch (e) {
+    console.error('[auth] findLinkedUserId', e instanceof Error ? e.message : e)
+    return undefined
+  } finally {
+    clearTimeout(timer)
   }
 }
 
