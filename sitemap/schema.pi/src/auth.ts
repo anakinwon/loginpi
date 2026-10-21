@@ -26,8 +26,8 @@ async function findLinkedUserId(sub: string): Promise<string | null | undefined>
       .eq('prvd_cd', 'GOOGLE')
       .eq('prvd_sub_txt', sub)
       .eq('del_yn', 'N')
-      // 세션 콜백 지연 방지 — 1.5초 넘으면 중단하고 DB 오류(undefined)로 처리(linkUnknown 으로 degrade)
-      .abortSignal(AbortSignal.timeout(1500))
+      // 세션 콜백 지연 방지 — 1초 넘으면 중단하고 DB 오류(undefined)로 처리(linkUnknown 으로 degrade)
+      .abortSignal(AbortSignal.timeout(1000))
       .maybeSingle<{ usr_id: string }>()
     if (error) {
       console.error('[auth] findLinkedUserId', error.message)
@@ -47,14 +47,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [Google({ clientId: process.env.GOOGLE_CLIENT_ID, clientSecret: process.env.GOOGLE_CLIENT_SECRET })],
   session: { strategy: 'jwt' },
   callbacks: {
-    async jwt({ token, account, profile }) {
+    async jwt({ token, account, profile, trigger }) {
       const t = token as LinkJwt
       if (account?.provider === 'google' && profile?.sub) {
         t.googleSub = profile.sub
         // 최초 로그인 — DB 오류(undefined)를 null(미연동)로 합치지 않는다(linkUnknown 으로 '일시 오류' 안내)
         t.userId = await findLinkedUserId(profile.sub)
-      } else if (t.googleSub) {
-        // 세션 조회마다 연동 재확인(쿼리 1건) — 연동·해제·사용자 삭제가 즉시 반영. DB 오류면 덮어쓰지 않는다
+      } else if (t.googleSub && (typeof t.userId !== 'string' || trigger === 'update')) {
+        // 미연동·판정 불가 token 은 세션 조회마다 재확인(연동 즉시 반영), 연동 확인된 token 은 update 때만 재조회. DB 오류면 덮어쓰지 않는다
         const linked = await findLinkedUserId(t.googleSub)
         if (linked !== undefined) t.userId = linked
       }
