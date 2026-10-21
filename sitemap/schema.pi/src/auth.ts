@@ -26,6 +26,8 @@ async function findLinkedUserId(sub: string): Promise<string | null | undefined>
       .eq('prvd_cd', 'GOOGLE')
       .eq('prvd_sub_txt', sub)
       .eq('del_yn', 'N')
+      // Supabase 지연 시 세션 응답이 묶이지 않도록 3초 타임아웃 — 초과하면 오류 경로(undefined → linkUnknown)로 처리
+      .abortSignal(AbortSignal.timeout(3000))
       .maybeSingle<{ usr_id: string }>()
     if (error) {
       console.error('[auth] findLinkedUserId', error.message)
