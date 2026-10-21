@@ -26,8 +26,8 @@ async function findLinkedUserId(sub: string): Promise<string | null | undefined>
       .eq('prvd_cd', 'GOOGLE')
       .eq('prvd_sub_txt', sub)
       .eq('del_yn', 'N')
-      // 세션 콜백 지연 방지 — 3초 넘으면 중단하고 DB 오류(undefined)로 처리
-      .abortSignal(AbortSignal.timeout(3000))
+      // 세션 콜백 지연 방지 — 1.5초 넘으면 중단하고 DB 오류(undefined)로 처리(linkUnknown 으로 degrade)
+      .abortSignal(AbortSignal.timeout(1500))
       .maybeSingle<{ usr_id: string }>()
     if (error) {
       console.error('[auth] findLinkedUserId', error.message)
