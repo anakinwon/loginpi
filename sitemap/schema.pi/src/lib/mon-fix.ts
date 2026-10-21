@@ -53,7 +53,7 @@ export interface FixPr {
   ms: number
   tok: { in: number; out: number }
 }
-export type FixFail = 'OFF' | 'GONE' | 'NO_GH' | 'FILE' | 'EDIT' | null
+export type FixFail = 'OFF' | 'GONE' | 'NO_GH' | 'FILE' | { edit: string } | null
 
 const repo = () => process.env.GITHUB_REPO || 'anakinwon/loginpi'
 async function gh<T>(method: string, url: string, body?: unknown): Promise<T> {
@@ -107,10 +107,22 @@ export async function fixPr(q: FixReq): Promise<FixPr | FixFail> {
     ...files.map((f) => `=== ${f} ===\n${src[f]}`),
   ].join('\n\n')
   const t0 = Date.now()
-  const c = await callAi<Patch>(mdl, system, user, FIX)
-  if (!c) return null
-  const changed = applyEdits(src, c.out.edits)
-  if (!changed) return 'EDIT'
+  // 적용 실패(find 불일치·겹침)면 이유를 붙여 1번 다시 요청 — AI 가 원문을 조금 다르게 옮기는 일이 가끔 있음(같은 입력도 성공·실패가 갈림)
+  let c: Awaited<ReturnType<typeof callAi<Patch>>> = null
+  let r: ReturnType<typeof applyEdits> = { bad: [] }
+  const tok = { in: 0, out: 0 }
+  for (let k = 0; k < 2; k++) {
+    const again = k === 0 || !('bad' in r) ? '' : `\n\n이전 답을 적용하지 못했습니다 : ${r.bad.join(' / ')}. find 를 원문에서 한 글자도 바꾸지 말고 다시 복사하십시오.`
+    c = await callAi<Patch>(mdl, system, user + again, FIX)
+    if (!c) return null
+    tok.in += c.tok.in
+    tok.out += c.tok.out
+    if (!c.out.edits.length) return { edit: `AI 가 고칠 수 없다고 답했습니다 — ${c.out.summary}`.slice(0, 500) }
+    r = applyEdits(src, c.out.edits)
+    if ('changed' in r) break
+  }
+  if (!c || !('changed' in r)) return { edit: `바꿀 부분을 원문과 맞추지 못했습니다(2회) — ${'bad' in r ? r.bad.join(' / ') : ''}`.slice(0, 500) }
+  const changed = r.changed
   const ms = Date.now() - t0
 
   // 커밋 1개 = 기준 트리 + 바뀐 파일 내용, 브랜치는 그 커밋으로 바로 생성(빈 브랜치 없음)
@@ -135,7 +147,7 @@ export async function fixPr(q: FixReq): Promise<FixPr | FixFail> {
     `**수정 요약** ${c.out.summary}`,
     `**바뀐 파일**\n${Object.keys(changed).map((p) => `- \`${APP_DIR}${p}\``).join('\n')}`,
     c.out.checks.length ? `**병합 전 확인**\n${c.out.checks.map((x) => `- [ ] ${x}`).join('\n')}` : '',
-    `**모델** ${mdl.dsp_nm} (\`${mdl.mdl_nm}\`) · 요금제 ${mdl.plan_nm || '미입력'} · ${(ms / 1000).toFixed(1)}초 · 토큰 ${c.tok.in}/${c.tok.out}`,
+    `**모델** ${mdl.dsp_nm} (\`${mdl.mdl_nm}\`) · 요금제 ${mdl.plan_nm || '미입력'} · ${(ms / 1000).toFixed(1)}초 · 토큰 ${tok.in}/${tok.out}`,
   ]
     .filter(Boolean)
     .join('\n\n')
@@ -144,7 +156,7 @@ export async function fixPr(q: FixReq): Promise<FixPr | FixFail> {
     await gh('DELETE', `/git/refs/heads/${enc(branch)}`).catch(() => {})
     throw e
   })
-  return { url: pr.html_url, number: pr.number, branch, head: commit.sha, files: Object.keys(changed), summary: c.out.summary, mdl, ms, tok: c.tok }
+  return { url: pr.html_url, number: pr.number, branch, head: commit.sha, files: Object.keys(changed), summary: c.out.summary, mdl, ms, tok }
 }
 
 // 승인(2026-10-22 마스터 지시 "프롬프트로 배포 요청은 곤란, 승인 처리로") — AI 수정안 PR 을 화면에서 승인 = master 에 squash 병합 + 운영 브랜치 빨리 감기(fast-forward)

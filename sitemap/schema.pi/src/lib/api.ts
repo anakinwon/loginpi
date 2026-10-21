@@ -75,7 +75,6 @@ const ERRORS = {
   MON_AI_FAIL: 'AI 원인 분석에 실패했습니다 — 잠시 뒤 다시 시도하십시오',
   MON_FIX_OFF: 'GitHub 토큰(GITHUB_TOKEN)이 서버에 없어 수정안 PR 을 만들 수 없습니다',
   MON_FIX_FILE: '이 해결 방안의 파일을 고칠 수 없습니다(이 앱 src 아래 ts·tsx, 저장소 master 에 있는 4만 자 이하 파일만)',
-  MON_FIX_EDIT: 'AI 수정안을 원문에 적용하지 못했습니다(바꿀 부분을 찾지 못함·변경 없음) — 다시 시도하거나 다른 모델로 시도하십시오',
   MON_FIX_GH: 'GitHub 작업에 실패했습니다(토큰 권한 Contents·Pull requests 쓰기·저장소 확인)',
   MON_FIX_NOT_AI: '모니터링 AI 수정안 PR(fix/mon-ai-*)만 이 화면에서 승인할 수 있습니다',
   MON_FIX_CLOSED: '이미 병합되었거나 닫힌 PR 입니다',

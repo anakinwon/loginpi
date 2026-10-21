@@ -7,7 +7,7 @@ import { normRoute } from '@/lib/mon'
 import { fixPr } from '@/lib/mon-fix'
 import { isGlobalAdmin } from '@/lib/mon-srv'
 
-export const maxDuration = 180
+export const maxDuration = 300 // AI 호출 최대 2회(재시도) + GitHub
 
 const txt = (n: number) => z.string().trim().min(1).max(n)
 const body = z.object({
@@ -28,7 +28,8 @@ export async function POST(req: Request) {
     const r = await fixPr({ route: b.route, cause: b.cause, fix: b.fix, mdlId: b.mdl_id })
     if (r === 'NO_GH') return apiError('MON_FIX_OFF', 503)
     if (r === 'FILE') return apiError('MON_FIX_FILE', 400)
-    if (r === 'EDIT') return apiError('MON_FIX_EDIT', 422)
+    // 적용 실패 = 이유(AI 답의 요약·불일치 목록)를 화면에 그대로 — 다시 시도·다른 모델 판단용
+    if (r && typeof r === 'object' && 'edit' in r) return NextResponse.json({ ok: false, code: 'MON_FIX_EDIT', message: `AI 수정안을 적용하지 못했습니다 — ${r.edit}` }, { status: 422 })
     if (r === 'OFF') return apiError('MON_AI_OFF', 503)
     if (r === 'GONE') return apiError('MON_AI_MDL_GONE', 409)
     if (!r) return apiError('MON_AI_FAIL', 502)

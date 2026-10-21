@@ -11,17 +11,34 @@ export function normFile(f: string): string | null {
   return FILE_RE.test(s) && !s.split('/').some((x) => x === '..' || x === '.') ? s : null
 }
 
-// 찾기·바꾸기 적용 — find 가 정확히 1번 있어야 함(0번·여러 번 = 적용 불가). 바뀐 파일만 돌려줌
-export function applyEdits(src: Record<string, string>, edits: Patch['edits']): Record<string, string> | null {
-  const out = { ...src }
-  for (const e of edits) {
+// 찾기·바꾸기 적용 — 모든 find 를 '원문' 기준으로 찾음(앞 수정 결과가 아님 — 프롬프트가 원문 복사를 요구하므로, 2026-10-22 순차 적용 때 겹친 수정이 실패하던 문제)
+//  find 는 원문에 정확히 1번(CRLF 는 LF 로 맞춤), 같은 파일 안 수정 범위가 겹치면 거절. 성공 = 바뀐 파일만, 실패 = 이유 목록(AI 재시도 안내용)
+export function applyEdits(src: Record<string, string>, edits: Patch['edits']): { changed: Record<string, string> } | { bad: string[] } {
+  const bad: string[] = []
+  const spans: Record<string, { i: number; end: number; rep: string }[]> = {}
+  edits.forEach((e, n) => {
     const k = normFile(e.path) // AI 가 'app/x.tsx' 처럼 src/ 를 빼고 줘도 같은 파일
-    const t = k === null ? undefined : out[k]
-    if (t === undefined || !e.find) return null
-    const i = t.indexOf(e.find)
-    if (i < 0 || t.indexOf(e.find, i + 1) >= 0) return null
-    out[k!] = t.slice(0, i) + e.replace + t.slice(i + e.find.length)
+    const t = k === null ? undefined : src[k]
+    const find = e.find.replace(/\r\n/g, '\n')
+    const tag = `수정 ${n + 1}(${e.path})`
+    if (t === undefined) return void bad.push(`${tag} : 주어진 파일이 아님`)
+    if (!find) return void bad.push(`${tag} : find 가 비어 있음`)
+    const i = t.indexOf(find)
+    if (i < 0) return void bad.push(`${tag} : find 를 원문에서 찾지 못함`)
+    if (t.indexOf(find, i + 1) >= 0) return void bad.push(`${tag} : find 가 원문에 여러 번 있음(앞뒤 줄을 더 포함)`)
+    ;(spans[k!] ??= []).push({ i, end: i + find.length, rep: e.replace.replace(/\r\n/g, '\n') })
+  })
+  const changed: Record<string, string> = {}
+  for (const [k, ss] of Object.entries(spans)) {
+    ss.sort((a, b) => a.i - b.i)
+    if (ss.some((x, j) => j > 0 && x.i < ss[j - 1].end)) {
+      bad.push(`${k} : 수정 범위가 서로 겹침(한 수정으로 합치십시오)`)
+      continue
+    }
+    let out = src[k]
+    for (const x of [...ss].reverse()) out = out.slice(0, x.i) + x.rep + out.slice(x.end) // 뒤에서부터 = 앞 위치가 밀리지 않음
+    if (out !== src[k]) changed[k] = out
   }
-  const changed = Object.fromEntries(Object.entries(out).filter(([p, t]) => t !== src[p]))
-  return Object.keys(changed).length ? changed : null
+  if (bad.length) return { bad }
+  return Object.keys(changed).length ? { changed } : { bad: ['바뀐 내용이 없음'] }
 }

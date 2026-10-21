@@ -208,7 +208,7 @@ function AiPanel({ ai, mdls, mdlId, onMdl, onClose, onRetry }: { ai: Ai; mdls: M
                                 onClick={() => void makePr(`${i}-${j}`, c, x)}
                                 className="ml-auto inline-flex items-center gap-1 rounded border border-emerald-500 bg-emerald-600 px-2 py-0.5 text-xs font-semibold text-white disabled:opacity-60">
                                 <GitPullRequest className="h-3.5 w-3.5" aria-hidden />
-                                {prs[`${i}-${j}`]?.busy ? '수정안 만드는 중…(최대 2~3분)' : 'PR 로 해결'}
+                                {prs[`${i}-${j}`]?.busy ? '수정안 만드는 중…(최대 3~5분)' : 'PR 로 해결'}
                               </button>
                             )}
                           </div>
