@@ -248,7 +248,7 @@ export async function analyzeRoute(route: string, min: number, mdlId?: string): 
   const system =
     '당신은 Next.js 16(App Router)·Supabase(PostgreSQL) 웹 서비스 운영 엔지니어입니다. 브라우저 계측(Resource Timing)으로 모은 API 응답 지표와 소스 코드를 보고 오류·지연의 원인을 추정하고 해결 방안을 제시합니다. ' +
     '근거 없는 추측은 likelihood 를 낮추고 gaps 에 부족한 데이터를 적습니다. 상태 0 은 네트워크 실패·요청 중단(화면 이동·새로고침으로 fetch 가 끊긴 경우 포함)입니다. ' +
-    '합계 이력의 오류 건은 상태코드가 남지 않고, 개별 이력(느림·오류)은 sql/069 배포 이후 요청부터만 있습니다. 운영(production)과 로컬 개발 서버가 같은 DB 에 기록할 수 있습니다. 답은 한국어로, 짧고 간결하게 씁니다(장황한 설명 금지).'
+    '합계 이력의 오류 건은 상태코드가 남지 않고, 개별 이력(느림·오류)은 sql/069 배포 이후 요청부터만 있습니다. 2026-10-22 이후 수집은 운영(production) 배포만이며, 그 이전 이력에는 로컬 개발 서버(같은 DB) 오류가 섞여 있을 수 있습니다. 답은 한국어로, 짧고 간결하게 씁니다(장황한 설명 금지).'
   const user = [
     `API 경로 : ${route} (메뉴 : ${routeMenu(route)})`,
     `분석 구간 : 최근 ${min}분, 느림 기준 ${SLOW_MS}ms, 분석 서버 환경 : ${process.env.VERCEL_ENV ?? process.env.NODE_ENV}`,
