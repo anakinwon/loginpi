@@ -5,8 +5,12 @@ import { applyEdits, normFile } from '../src/lib/mon-fix-patch.ts'
 
 test('normFile : src 아래 ts·tsx 만, 상위 경로·설정 파일 거절', () => {
   assert.equal(normFile('app/dev-user-switch.tsx'), 'src/app/dev-user-switch.tsx')
-  assert.equal(normFile('/src/lib/api.ts'), 'src/lib/api.ts')
+  assert.equal(normFile('/src/lib/mon.ts'), 'src/lib/mon.ts')
   assert.equal(normFile('src/app/areas/[areaId]/monitor/app-tab.tsx'), 'src/app/areas/[areaId]/monitor/app-tab.tsx')
+  // 사람만 고치는 파일(인증·권한·결제·요금제·AI 수정 기능 자신)
+  for (const deny of ['auth.ts', 'src/lib/auth.ts', 'lib/api.ts', 'src/lib/roles.ts', 'src/lib/plan.ts', 'src/env.ts', 'src/app/api/auth/pi/route.ts', 'src/app/api/payments/approve/route.ts', 'src/lib/mon-fix.ts', 'src/lib/mon-fix-patch.ts', 'src/app/api/mon/app/fix/approve/route.ts']) assert.equal(normFile(deny), null, deny)
+  assert.equal(normFile('src/app/dev-user-switch.tsx'), 'src/app/dev-user-switch.tsx') // 앱 화면은 허용(api/dev 만 제외)
+  assert.equal(normFile('src/lib/mon.ts'), 'src/lib/mon.ts')
   for (const bad of ['src/../next.config.ts', '../.github/workflows/x.ts', 'src/./a.ts', 'src/env.json', '.env.local', 'sql/071.sql', 'src/app/a.ts; rm', 'src/a b.tsx']) assert.equal(normFile(bad), null, bad)
 })
 

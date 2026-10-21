@@ -1,14 +1,17 @@
 // 모니터링 AI 수정안 순수 함수(mon-fix.ts 공용, 단위 테스트 test/mon-fix.test.ts) — 고칠 파일 경로 검사·찾기/바꾸기 적용
 // 고칠 수 있는 파일 = 이 앱 src 아래 ts·tsx 만(설정·워크플로·SQL·환경 파일 제외)
 const FILE_RE = /^src\/[\w\-./[\]()@]+\.tsx?$/
+// 사람만 고치는 파일(2026-10-22 마스터 승인 — AI 수정안 #12·#13 이 성능을 위해 권한 캐시·연동 재확인 축소를 넣어 보안 점검 지적) :
+//  인증·세션·권한·결제·요금제·환경·DB 접속, 그리고 AI 수정 기능 자신(자기 안전장치를 AI 가 풀지 못하게)
+const DENY_RE = /^src\/(auth\.ts|env\.ts|proxy\.ts|middleware\.ts|lib\/(auth|api|roles|plan|upgrade|payments|db|mon-ai|mon-fix|mon-fix-patch|net-guard)\.ts|app\/api\/(auth|payments|link|dev)\/|app\/api\/mon\/app\/fix\/)/
 
 export type Patch = { summary: string; edits: { path: string; find: string; replace: string }[]; checks: string[] }
 
-// AI 가 준 경로('app/x.tsx'·'src/app/x.tsx'·'/src/…') → 'src/…', 허용 밖이면 null
+// AI 가 준 경로('app/x.tsx'·'src/app/x.tsx'·'/src/…') → 'src/…', 허용 밖·사람만 고치는 파일이면 null
 export function normFile(f: string): string | null {
   const p = f.trim().replace(/^\/+/, '')
   const s = p.startsWith('src/') ? p : `src/${p}`
-  return FILE_RE.test(s) && !s.split('/').some((x) => x === '..' || x === '.') ? s : null
+  return FILE_RE.test(s) && !DENY_RE.test(s) && !s.split('/').some((x) => x === '..' || x === '.') ? s : null
 }
 
 // 찾기·바꾸기 적용 — 모든 find 를 '원문' 기준으로 찾음(앞 수정 결과가 아님 — 프롬프트가 원문 복사를 요구하므로, 2026-10-22 순차 적용 때 겹친 수정이 실패하던 문제)
