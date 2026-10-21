@@ -4,6 +4,7 @@
 //  승인 대기 행은 여기서도 '승인'(분석 패널을 닫았거나 새로고침해도 결재 가능), LIVE 면 15초마다 다시 조회(배포 중 행은 서버가 Vercel 상태로 확정)
 import { piFetch } from '@pi/auth/client'
 import { GitPullRequest, RefreshCw } from 'lucide-react'
+import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { routeMenu } from '@/lib/mon'
 import type { FixSts } from '@/lib/mon-fix'
@@ -51,12 +52,14 @@ const GRP = [
 const dt = (t: string | null) => (t ? new Date(t).toLocaleString('ko-KR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }) : '')
 const who = (nm: string | null) => nm ?? <span className="text-red-700">[확인중 : 사용자 없음]</span>
 
-export default function FixTab({ live }: { live: boolean }) {
+// canApv = 결재(승인·반려·되돌리기) 권한(MON_FIX_APV = DA 역할 ∩ 요금제4) — 없으면 결재 버튼 대신 상태만
+export default function FixTab({ live, canApv }: { live: boolean; canApv: boolean }) {
+  const { areaId } = useParams<{ areaId: string }>()
   const [grp, setGrp] = useState('')
   const [pg, setPg] = useState(1)
   const [busy, setBusy] = useState('') // 승인 처리 중인 fix_id
   const [msg, setMsg] = useState('')
-  const url = `/api/mon/app/fix?page=${pg}${grp ? `&sts=${grp}` : ''}`
+  const url = `/api/mon/app/fix?area=${areaId}&page=${pg}${grp ? `&sts=${grp}` : ''}`
   const { data, err, at, reload } = usePoll<{ rows: Row[]; total: number; size: number }>(url, live, 15_000)
   const rows = data?.rows ?? []
   const pages = data ? Math.max(1, Math.ceil(data.total / data.size)) : 1
@@ -71,7 +74,7 @@ export default function FixTab({ live }: { live: boolean }) {
     setBusy(r.fix_id)
     setMsg('')
     try {
-      const j = await (await piFetch('/api/mon/app/fix/approve', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ number: r.pr_no, head: r.head_cmt_txt }) })).json()
+      const j = await (await piFetch('/api/mon/app/fix/approve', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ area_id: areaId, number: r.pr_no, head: r.head_cmt_txt }) })).json()
       setMsg(j.ok ? `PR #${r.pr_no} 승인 — 운영 배포 중(커밋 ${j.ahead}개)` : (j.message ?? '승인하지 못했습니다'))
     } catch {
       setMsg('승인하지 못했습니다(네트워크)')
@@ -91,7 +94,7 @@ export default function FixTab({ live }: { live: boolean }) {
     setBusy(r.fix_id)
     setMsg('')
     try {
-      const body = kind === 'reject' ? { number: r.pr_no, reason } : { fix_id: r.fix_id, reason }
+      const body = kind === 'reject' ? { area_id: areaId, number: r.pr_no, reason } : { area_id: areaId, fix_id: r.fix_id, reason }
       const j = await (await piFetch(`/api/mon/app/fix/${kind}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json()
       setMsg(j.ok ? (kind === 'reject' ? `PR #${r.pr_no} 반려 — PR 을 닫았습니다(수정 전 코드 유지)` : `PR #${r.pr_no} 되돌림 — 수정 전 코드로 운영 배포 중(커밋 ${j.ahead}개)`) : (j.message ?? '처리하지 못했습니다'))
     } catch {
@@ -185,7 +188,9 @@ export default function FixTab({ live }: { live: boolean }) {
                   </td>
                   <td className="px-2 py-1.5 whitespace-nowrap">{who(r.req_usr_nm)}</td>
                   <td className="px-2 py-1.5 whitespace-nowrap">
-                    {(r.fix_sts_cd === 'PR' || r.fix_sts_cd === 'APV_FAIL') && r.head_cmt_txt ? (
+                    {(r.fix_sts_cd === 'PR' || r.fix_sts_cd === 'APV_FAIL') && r.head_cmt_txt && !canApv ? (
+                      <span className="text-amber-800" title="결재(승인·반려)는 DA 역할 ∩ 요금제4(DA)만">DA 결재 대기</span>
+                    ) : (r.fix_sts_cd === 'PR' || r.fix_sts_cd === 'APV_FAIL') && r.head_cmt_txt ? (
                       <>
                         <button
                           type="button"
@@ -251,7 +256,7 @@ export default function FixTab({ live }: { live: boolean }) {
                         <div className="max-w-[220px]">사유 : {r.rbk_rsn_txt}</div>
                       </div>
                     )}
-                    {(r.fix_sts_cd === 'DONE' || r.fix_sts_cd === 'DPLY_FAIL' || (r.fix_sts_cd === 'RBK_FAIL' && !r.rbk_cmt_txt)) && r.mrg_cmt_txt && (
+                    {canApv && (r.fix_sts_cd === 'DONE' || r.fix_sts_cd === 'DPLY_FAIL' || (r.fix_sts_cd === 'RBK_FAIL' && !r.rbk_cmt_txt)) && r.mrg_cmt_txt && (
                       <button
                         type="button"
                         disabled={!!busy}

@@ -12,7 +12,7 @@ type BasePerm = (typeof BASE_PERMS)[number]
 //  VIEW = 멤버, STD_VIEW·MODEL_VIEW·SET_VIEW = 메뉴, STD_REQ·MODEL_EDIT = 신청 ∧ 메뉴, SQL_QUERY = 메뉴1,
 //  DDL_APPROVE = 승인, DB_CONN_ADMIN = 승인 ∧ 설정(접속 비밀번호 관리 — 설정만 가진 역할에는 주지 않음)
 //  설정 서브메뉴 : SET_VIEW = 설정·이력, BAN_VIEW = 금칙어 조회, BAN_EDIT = 금칙어 등록·삭제·일괄(금칙어 메뉴 ∧ 일괄등록), CHK_VIEW = 표준 점검·리버스, ADM_VIEW = 멤버·승인 메뉴, MBR_ADMIN = 멤버 관리(멤버 메뉴 ∧ 설정)
-export type Perm = BasePerm | 'VIEW' | 'STD_VIEW' | 'STD_REQ' | 'MODEL_VIEW' | 'MODEL_EDIT' | 'SET_VIEW' | 'BAN_VIEW' | 'BAN_EDIT' | 'CHK_VIEW' | 'ADM_VIEW' | 'MBR_ADMIN' | 'SQL_QUERY' | 'DDL_APPROVE' | 'DB_CONN_ADMIN' | 'MON_VIEW' | 'MON_EDIT'
+export type Perm = BasePerm | 'VIEW' | 'STD_VIEW' | 'STD_REQ' | 'MODEL_VIEW' | 'MODEL_EDIT' | 'SET_VIEW' | 'BAN_VIEW' | 'BAN_EDIT' | 'CHK_VIEW' | 'ADM_VIEW' | 'MBR_ADMIN' | 'SQL_QUERY' | 'DDL_APPROVE' | 'DB_CONN_ADMIN' | 'MON_VIEW' | 'MON_EDIT' | 'MON_AI' | 'MON_FIX_APV'
 
 export const ROLE_NM: Record<MbrRole, string> = {
   SYS: '시스템담당자',
@@ -85,6 +85,10 @@ export function effPerms(role: string | null | undefined, plan: string | null | 
   // 모니터링(2026-10-21) : 보기 = SQL 편집기와 같은 기술 메뉴(요금제1~), URL 등록·삭제 = 그중 CRUD
   if (b.has('MENU_SQL')) out.push('MON_VIEW')
   if (both('MENU_SQL', 'CRUD')) out.push('MON_EDIT')
+  // AI 분석·PR 로 해결(2026-10-22 마스터 지시 "개발자와 모델러까지") = 요금제1(개발자)~ 의 SQL 쓰기 역할 — 애플리케이션 모니터링·AI 수정 이력 보기 포함
+  if (both('MENU_SQL', 'CRUD')) out.push('MON_AI')
+  // AI 수정 결재(승인·반려·되돌리기) = DA 역할 ∩ 요금제4(DA)만(마스터 지시 2026-10-22 — 표준·DDL 승인권자 SYS 는 제외)
+  if (role === 'DA' && b.has('APPROVE')) out.push('MON_FIX_APV')
   return out
 }
 

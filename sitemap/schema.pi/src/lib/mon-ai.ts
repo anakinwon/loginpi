@@ -38,8 +38,9 @@ const SCHEMA = {
                 title: { type: 'string', description: '조치 한 줄(40자 이내)' },
                 detail: { type: 'string', description: '무엇을 어떻게 바꿀지 1~2문장' },
                 files: { type: 'array', items: { type: 'string' }, description: 'src/ 기준 상대 경로(없으면 빈 배열)' },
+                code: { type: 'boolean', description: '소스 코드를 바꿔야 하는 조치면 true. 현 상태 유지·관찰·설정·운영 조치처럼 코드 변경이 없으면 false(이때 files 는 빈 배열)' },
               },
-              required: ['title', 'detail', 'files'],
+              required: ['title', 'detail', 'files', 'code'],
               additionalProperties: false,
             },
           },
@@ -58,7 +59,7 @@ const SCHEMA = {
 
 export interface AiResult {
   summary: string
-  causes: { title: string; evidence: string; likelihood: 'HIGH' | 'MID' | 'LOW'; fixes: { title: string; detail: string; files: string[] }[] }[]
+  causes: { title: string; evidence: string; likelihood: 'HIGH' | 'MID' | 'LOW'; fixes: { title: string; detail: string; files: string[]; code?: boolean }[] }[] // code 없음 = 이 필드 전 결과(재사용 이력)
   checks: string[]
   gaps: string[]
   confidence: 'HIGH' | 'MID' | 'LOW'
@@ -266,13 +267,15 @@ export async function callAi<T>(mdl: AiMdl, system: string, user: string, f: Fmt
 const ANL_KEEP_MS = 30 * 86_400_000 // 분석 이력 보관 30일(sql/073)
 const REUSE_MS = 86_400_000 // 같은 입력 재사용 기간 24시간
 const AGE_STEP_MS = 15 * 60_000 // 재사용 시점 단위(마지막 데이터 이후 경과)
+const ANL_VER = 'v2' // 출력 형식 판 — SCHEMA 를 바꾸면 올림(이전 결과 재사용 안 함). v2 = 해결 방안 code 여부(2026-10-22)
 const PROD = process.env.VERCEL_ENV === 'production' // 분석 이력·재사용·직전 비교는 운영 분석끼리만(로컬 dev 도 같은 DB)
 const MAX_AGG = 120
 const MAX_EVT = 100
 const sha = (s: string) => createHash('sha256').update(s).digest('hex')
 
 export type AnalyzeBlock = { block: 'DEPLOYING' | 'VERIFY'; pr: number | null; at: string | null; until: number | null }
-export async function analyzeRoute(route: string, min: number, mdlId: string | undefined, usrId: string): Promise<AiRun | AnalyzeBlock | 'OFF' | 'GONE' | null> {
+export type AnalyzeEmpty = { empty: { from: string; req: number; floor: boolean | null } } // 구간에 오류·느림 0건
+export async function analyzeRoute(route: string, min: number, mdlId: string | undefined, usrId: string): Promise<AiRun | AnalyzeBlock | AnalyzeEmpty | 'OFF' | 'GONE' | null> {
   const mdl = await pickMdl(mdlId)
   if (mdl === 'GONE') return 'GONE'
   if (!keyOn(mdl.prvd_cd)) return 'OFF'
@@ -290,6 +293,8 @@ export async function analyzeRoute(route: string, min: number, mdlId: string | u
   ])
   if (agg.error) throw agg.error
   if (evt.error) throw evt.error
+  // 구간에 이 경로의 오류·느림이 하나도 없으면 AI 를 부르지 않음 — 0건 데이터로 '조치'를 지어내던 문제(2026-10-22 /api/dev/user, 비용 절약)
+  if (!evt.data.length && !agg.data.some((r) => r.err_cnt > 0 || r.slow_cnt > 0)) return { empty: { from: since, req: agg.data.reduce((a, r) => a + r.req_cnt, 0), floor: dep && dep.sts !== 'FAIL' && dep.cut === lo } }
   const aggTxt = agg.data.map((r) => `${r.bkt_dtm} 요청 ${r.req_cnt} 오류 ${r.err_cnt} 느림 ${r.slow_cnt} 평균 ${Math.round(Number(r.rsp_sum_val) / Math.max(1, r.req_cnt))}ms 최대 ${r.rsp_max_val}ms`).join('\n')
   const evtTxt = evt.data.map((e) => `${e.occr_dtm} ${e.evt_cd} 상태 ${e.sts_no} ${e.rsp_val}ms 화면 ${e.scr_txt ?? '-'}(${pageMenu(e.scr_txt)})`).join('\n')
   const srcCmt = process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? null
@@ -319,7 +324,7 @@ export async function analyzeRoute(route: string, min: number, mdlId: string | u
   ].join('\n\n')
   // 시점 단위 = 마지막 데이터 이후 경과를 15분 단위로 — 같은 데이터라도 '지금도 나는지' 판단이 바뀔 만큼 시간이 흐르면 새로 분석
   const last = Math.max(agg.data[0] ? Date.parse(agg.data[0].bkt_dtm) : lo, evt.data[0] ? Date.parse(evt.data[0].occr_dtm) : lo)
-  const hash = sha([mdl.prvd_cd, mdl.mdl_nm, system, body, Math.floor((now - last) / AGE_STEP_MS)].join('\u0000'))
+  const hash = sha([ANL_VER, mdl.prvd_cd, mdl.mdl_nm, system, body, Math.floor((now - last) / AGE_STEP_MS)].join('\u0000'))
   const user = `분석 시각 : ${basis.at}, 데이터 구간 : ${since} ~ ${basis.to}\n\n${body}`
 
   // 같은 입력이면 이전 결과 재사용(결과가 매번 달라 보이는 혼동 방지) + 이 경로의 직전 분석(비교 표시)

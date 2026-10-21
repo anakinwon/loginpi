@@ -107,11 +107,11 @@ const SQLED: Item[] = [
     icon: I.monitor,
     perm: 'MON_VIEW',
     subs: [
-      { seg: 'monitor', nm: '애플리케이션', tab: 'app' },
+      { seg: 'monitor', nm: '애플리케이션', perm: 'MON_AI', tab: 'app' },
       { seg: 'monitor', nm: '서버', tab: 'srv' },
       { seg: 'monitor', nm: '데이터베이스', tab: 'db' },
       { seg: 'monitor', nm: 'URL', tab: 'url' },
-      { seg: 'monitor', nm: 'AI 수정 이력', tab: 'fix' },
+      { seg: 'monitor', nm: 'AI 수정 이력', perm: 'MON_AI', tab: 'fix' },
     ],
   },
   {

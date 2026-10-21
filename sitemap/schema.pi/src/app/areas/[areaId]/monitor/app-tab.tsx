@@ -8,6 +8,7 @@
 //  PR 을 검토한 뒤 '승인' = master 병합 + 운영 배포(/api/mon/app/fix/approve), 배포 상태를 15초마다 확인해 표시
 import { piFetch } from '@pi/auth/client'
 import { GitPullRequest, Sparkles } from 'lucide-react'
+import { useParams } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import type { AiMdl, AiResult, AiRun } from '@/lib/mon-ai'
 import { mainOf, pageMenu, routeMenu, SLOW_MS } from '@/lib/mon'
@@ -32,7 +33,7 @@ const fmtS = (t: string) => new Date(t).toLocaleTimeString('ko-KR', { hour: '2-d
 // 오늘이 아니면 날짜까지(재사용·직전 분석은 어제일 수 있음)
 const fmtDT = (t: string) => (new Date(t).toDateString() === new Date().toDateString() ? fmtS(t) : new Date(t).toLocaleString('ko-KR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }))
 
-type Ai = { route: string; busy: boolean; res?: AiRun; err?: string; verify?: boolean } // verify = AI 수정 배포 직후라 재분석 차단(실시간 확인 표시)
+type Ai = { route: string; busy: boolean; res?: AiRun; err?: string; verify?: boolean; info?: boolean } // info = 문제 없음 안내(오류 아님) // verify = AI 수정 배포 직후라 재분석 차단(실시간 확인 표시)
 // PR 상태 — 만든 뒤 '승인' = master 병합 + 운영 배포(sha), dep = Vercel 운영 배포 상태(pending·success·failure)
 type Pr = { busy?: boolean; url?: string; number?: number; head?: string; err?: string; apv?: boolean; sha?: string; ahead?: number; dep?: string | null; rej?: boolean; rjb?: boolean } // rej = 반려(PR 닫힘, 수정 전 유지), rjb = 반려 처리 중
 // 진행 단계(공용 fix-steps.tsx) — 화면 상태로 계산
@@ -59,7 +60,9 @@ type MdlOpt = Pick<AiMdl, 'dsp_nm' | 'plan_nm'> & { mdl_id: string; dflt_yn: 'Y'
 const LIKE: Record<AiResult['confidence'], [string, string]> = { HIGH: ['높음', 'bg-red-100 text-red-700'], MID: ['중간', 'bg-amber-100 text-amber-800'], LOW: ['낮음', 'bg-gray-100 text-gray-600'] }
 
 // AI 원인 분석 결과 패널 — 원인 > 해결 방안 묶음(가능성 순)을 하나씩 접고 펼침, 마지막에 조치 후 확인. 머리글 '숨기기'로 본문 전체 접기
-function AiPanel({ ai, mdls, mdlId, onMdl, onClose, onRetry }: { ai: Ai; mdls: MdlOpt[]; mdlId: string; onMdl: (id: string) => void; onClose: () => void; onRetry: () => void }) {
+// canApv = 결재(승인·반려) 권한(MON_FIX_APV = DA 역할 ∩ 요금제4) — 없으면 버튼 대신 'DA 결재 대기'
+function AiPanel({ ai, mdls, mdlId, onMdl, onClose, onRetry, canApv }: { ai: Ai; mdls: MdlOpt[]; mdlId: string; onMdl: (id: string) => void; onClose: () => void; onRetry: () => void; canApv: boolean }) {
+  const { areaId } = useParams<{ areaId: string }>()
   const [open, setOpen] = useState(true)
   const r = ai.res?.ai
   const run = ai.res
@@ -72,7 +75,7 @@ function AiPanel({ ai, mdls, mdlId, onMdl, onClose, onRetry }: { ai: Ai; mdls: M
     setPrs((p) => ({ ...p, [k]: { busy: true } }))
     const mdl = run?.mdl.mdl_id
     try {
-      const body = { route: ai.route, cause: { title: c.title, evidence: c.evidence }, fix: x, ...(mdl ? { mdl_id: mdl } : {}) }
+      const body = { area_id: areaId, route: ai.route, cause: { title: c.title, evidence: c.evidence }, fix: x, ...(mdl ? { mdl_id: mdl } : {}) }
       const j = await (await piFetch('/api/mon/app/fix', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json()
       setPrs((p) => ({ ...p, [k]: j.ok ? { url: j.url, number: j.number, head: j.head } : { err: j.message ?? 'PR 을 만들지 못했습니다' } }))
     } catch {
@@ -85,7 +88,7 @@ function AiPanel({ ai, mdls, mdlId, onMdl, onClose, onRetry }: { ai: Ai; mdls: M
     if (!confirm(`PR #${cur.number} 을 승인합니다 — master 에 병합하고 바로 운영에 배포합니다(master 의 다른 미배포 커밋도 함께 나감). GitHub 에서 변경 내용을 확인하셨습니까?`)) return
     setPrs((p) => ({ ...p, [k]: { ...cur, apv: true, err: undefined } }))
     try {
-      const j = await (await piFetch('/api/mon/app/fix/approve', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ number: cur.number, head: cur.head }) })).json()
+      const j = await (await piFetch('/api/mon/app/fix/approve', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ area_id: areaId, number: cur.number, head: cur.head }) })).json()
       setPrs((p) => ({ ...p, [k]: j.ok ? { ...cur, sha: j.sha, ahead: j.ahead, dep: 'pending' } : { ...cur, err: j.message ?? '승인하지 못했습니다' } }))
     } catch {
       setPrs((p) => ({ ...p, [k]: { ...cur, err: '승인하지 못했습니다(네트워크)' } }))
@@ -100,7 +103,7 @@ function AiPanel({ ai, mdls, mdlId, onMdl, onClose, onRetry }: { ai: Ai; mdls: M
     if (reason.length < 2) return setPrs((p) => ({ ...p, [k]: { ...cur, err: '반려 사유를 2자 이상 입력하십시오' } }))
     setPrs((p) => ({ ...p, [k]: { ...cur, rjb: true, err: undefined } }))
     try {
-      const j = await (await piFetch('/api/mon/app/fix/reject', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ number: cur.number, reason }) })).json()
+      const j = await (await piFetch('/api/mon/app/fix/reject', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ area_id: areaId, number: cur.number, reason }) })).json()
       setPrs((p) => ({ ...p, [k]: j.ok ? { ...cur, rej: true, rjb: false, err: `반려 — ${reason}` } : { ...cur, rjb: false, err: j.message ?? '반려하지 못했습니다' } }))
     } catch {
       setPrs((p) => ({ ...p, [k]: { ...cur, rjb: false, err: '반려하지 못했습니다(네트워크)' } }))
@@ -114,7 +117,7 @@ function AiPanel({ ai, mdls, mdlId, onMdl, onClose, onRetry }: { ai: Ai; mdls: M
     const id = setInterval(async () => {
       if (++n > 40) return clearInterval(id)
       for (const [k, x] of pending) {
-        const j = await (await piFetch(`/api/mon/app/fix/approve?sha=${x.sha}`)).json().catch(() => null)
+        const j = await (await piFetch(`/api/mon/app/fix/approve?area=${areaId}&sha=${x.sha}`)).json().catch(() => null)
         if (j?.ok && j.state && j.state !== 'pending') setPrs((p) => ({ ...p, [k]: { ...p[k], dep: j.state } }))
       }
     }, 15_000)
@@ -190,7 +193,7 @@ function AiPanel({ ai, mdls, mdlId, onMdl, onClose, onRetry }: { ai: Ai; mdls: M
       {open && (
         <div className="mt-2 space-y-2">
           {ai.busy && <p className="text-[#5b6578]">수치·개별 이력·소스 코드를 모아 분석하는 중입니다(최대 1~2분)…</p>}
-          {ai.err && <p className={ai.verify ? 'text-amber-800' : 'text-red-700'}>{ai.err}</p>}
+          {ai.err && <p className={ai.info ? 'text-emerald-800' : ai.verify ? 'text-amber-800' : 'text-red-700'}>{ai.err}</p>}
           {(ai.verify || Object.values(prs).some((x) => x.sha)) && <VerifyPanel route={ai.route} />}
           {r && (
             <>
@@ -211,7 +214,9 @@ function AiPanel({ ai, mdls, mdlId, onMdl, onClose, onRetry }: { ai: Ai; mdls: M
                           <b>{x.title}</b>
                         </div>
                         <p className="text-xs text-[#2c3850]">{x.detail}</p>
-                        {x.files.length > 0 && (
+                        {x.code === false ? (
+                          <p className="text-xs font-semibold text-emerald-800">코드 변경 없는 조치 — PR 불필요</p>
+                        ) : x.files.length > 0 && (
                           <div className="flex flex-wrap items-center gap-2">
                             <p className="font-mono text-xs text-[#5b6578]">{x.files.join(' · ')}</p>
                             {x.files.every((f) => !normFile(f)) ? (
@@ -228,6 +233,8 @@ function AiPanel({ ai, mdls, mdlId, onMdl, onClose, onRetry }: { ai: Ai; mdls: M
                                   <span className="text-xs text-[#5b6578]">운영에 나간 커밋 {prs[`${i}-${j}`].ahead}개 · 되돌리기는 'AI 수정 이력' 탭</span>
                                 ) : prs[`${i}-${j}`].rej ? (
                                   <span className="text-xs font-semibold text-red-700">반려됨 — 수정 전 코드 유지</span>
+                                ) : !canApv ? (
+                                  <span className="text-xs font-semibold text-amber-800" title="결재(승인·반려)는 DA 역할 ∩ 요금제4(DA)만">DA 결재 대기 — AI 수정 이력에서 진행 확인</span>
                                 ) : (
                                   <>
                                     <button
@@ -260,7 +267,7 @@ function AiPanel({ ai, mdls, mdlId, onMdl, onClose, onRetry }: { ai: Ai; mdls: M
                           </div>
                         )}
                         {prs[`${i}-${j}`] && <Steps x={prs[`${i}-${j}`]} />}
-                        {prs[`${i}-${j}`]?.err && <p className="text-xs text-red-700">{prs[`${i}-${j}`].err}</p>}
+                        {prs[`${i}-${j}`]?.err && <p className={`text-xs ${prs[`${i}-${j}`].err!.includes('AI 판단 : 바꿀 코드가 없습니다') ? 'text-amber-800' : 'text-red-700'}`}>{prs[`${i}-${j}`].err}</p>}
                       </div>
                     ))}
                   </div>
@@ -288,7 +295,8 @@ function AiPanel({ ai, mdls, mdlId, onMdl, onClose, onRetry }: { ai: Ai; mdls: M
 
 type Row = { bkt_dtm: string; route_txt: string; req_cnt: number; err_cnt: number; slow_cnt: number; rsp_sum_val: number | string; rsp_max_val: number }
 
-export default function AppTab({ live, min }: { live: boolean; min: number }) {
+export default function AppTab({ live, min, canApv }: { live: boolean; min: number; canApv: boolean }) {
+  const { areaId } = useParams<{ areaId: string }>()
   const [key, setKey] = useState<Key>('req')
   const [f, setF] = useState<Filter>({})
   const [pg, setPg] = useState(1)
@@ -310,8 +318,8 @@ export default function AppTab({ live, min }: { live: boolean; min: number }) {
     if (ai?.busy) return
     setAi({ route, busy: true })
     try {
-      const j = await (await piFetch('/api/mon/app/analyze', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ route, min, ...(id ? { mdl_id: id } : {}) }) })).json()
-      setAi(j.ok ? { route, busy: false, res: { ai: j.ai, mdl: j.mdl, ms: j.ms, tok: j.tok, basis: j.basis, reused: j.reused, prev: j.prev } } : { route, busy: false, err: j.message ?? 'AI 원인 분석에 실패했습니다', verify: j.code === 'MON_AI_VERIFY' })
+      const j = await (await piFetch('/api/mon/app/analyze', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ area_id: areaId, route, min, ...(id ? { mdl_id: id } : {}) }) })).json()
+      setAi(j.ok ? { route, busy: false, res: { ai: j.ai, mdl: j.mdl, ms: j.ms, tok: j.tok, basis: j.basis, reused: j.reused, prev: j.prev } } : { route, busy: false, err: j.message ?? 'AI 원인 분석에 실패했습니다', verify: j.code === 'MON_AI_VERIFY', info: j.code === 'MON_AI_EMPTY' })
     } catch {
       setAi({ route, busy: false, err: 'AI 원인 분석에 실패했습니다(네트워크)' })
     }
@@ -327,7 +335,7 @@ export default function AppTab({ live, min }: { live: boolean; min: number }) {
     setKey(on ? k : 'req')
     pick({ ...f, cd: on ? cd : undefined })
   }
-  const { data, err } = usePoll<{ rows: Row[]; evts?: Evt[] }>(`/api/mon/app?min=${min}`, live)
+  const { data, err } = usePoll<{ rows: Row[]; evts?: Evt[] }>(`/api/mon/app?area=${areaId}&min=${min}`, live)
   const v = useMemo(() => {
     const rows = data?.rows ?? []
     const by = new Map<string, { req: number; err: number; slow: number; sum: number }>()
@@ -454,7 +462,7 @@ export default function AppTab({ live, min }: { live: boolean; min: number }) {
             </tbody>
           </table>
         </div>
-        {ai && <AiPanel ai={ai} mdls={mdls} mdlId={mdlId} onMdl={setMdlId} onClose={() => setAi(null)} onRetry={() => void analyze(ai.route)} />}
+        {ai && <AiPanel ai={ai} mdls={mdls} mdlId={mdlId} onMdl={setMdlId} onClose={() => setAi(null)} onRetry={() => void analyze(ai.route)} canApv={canApv} />}
       </section>
       <section>
         <div className="mb-1 flex flex-wrap items-center gap-2">

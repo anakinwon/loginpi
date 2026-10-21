@@ -49,7 +49,7 @@ corepack pnpm@11.4.0 db:seed [-- --dry-run]      # DA#_META/SQLiteDB_v5.db → D
 
 ## 업무 규칙(구현 기준)
 
-- 역할 R&R 7종 × 요금제(PRD §3.1·§7) : **실제 권한 = 역할 ∩ 분류체계 요금제**(`roles.ts effPerms`, 요금제 = `src/lib/plan.ts` `std_area_plan`, 전역 ADMIN 도 결제한 요금제만 — 2026-10-19, 새 분류체계는 생성 때 요금제4 7일 체험 GRACE — 2026-10-22). 권한 검사는 `requireAreaRole(areaId, Perm)` — 메뉴 경로는 파생 권한(STD_VIEW·STD_REQ·MODEL_VIEW·MODEL_EDIT·SET_VIEW·BAN_VIEW·BAN_EDIT·CHK_VIEW·ADM_VIEW·MBR_ADMIN·SQL_QUERY — 설정 서브메뉴 4단 × 요금제 = PRD §7)으로, 화면은 `GET /api/areas/[areaId]` 의 `perms` 로 판정(`can(role)` 직접 판정 금지). 결제 = `/api/payments/*`(SYS·DA, 테스트넷 `PI_API_KEY`)
+- 역할 R&R 7종 × 요금제(PRD §3.1·§7) : **실제 권한 = 역할 ∩ 분류체계 요금제**(`roles.ts effPerms`, 요금제 = `src/lib/plan.ts` `std_area_plan`, 전역 ADMIN 도 결제한 요금제만 — 2026-10-19, 새 분류체계는 생성 때 요금제4 7일 체험 GRACE — 2026-10-22). 권한 검사는 `requireAreaRole(areaId, Perm)` — 메뉴 경로는 파생 권한(STD_VIEW·STD_REQ·MODEL_VIEW·MODEL_EDIT·SET_VIEW·BAN_VIEW·BAN_EDIT·CHK_VIEW·ADM_VIEW·MBR_ADMIN·SQL_QUERY·MON_AI(AI 분석·PR 로 해결)·MON_FIX_APV(AI 수정 결재 = DA ∩ 요금제4) — 설정 서브메뉴 4단 × 요금제 = PRD §7)으로, 화면은 `GET /api/areas/[areaId]` 의 `perms` 로 판정(`can(role)` 직접 판정 금지). 결제 = `/api/payments/*`(SYS·DA, 테스트넷 `PI_API_KEY`)
 - 승인 절차(PRD §3.2, `sql/012`·`src/lib/approval.ts`) : 최초 등록도 승인대기 → 승인완료 후 사용, 1단계 승인(SYS·DA, 요금제4), 신청 시 즉시 승인도 SYS·DA만 선택(기본 꺼짐, 권한 SELF_APPROVE), 반려사유 필수, 일괄등록 = 승인대기
 - 이름은 **서버가 생성**하고 클라이언트 값을 신뢰하지 않는다 : 도메인명 = 대표도메인명 + 논리타입 약어 + 길이[,소수점], 용어명 = 구성 단어 결합(물리명 구분자 = 분류체계 설정, 기본 `_`)
 - **동의어 불허**(2026-10-16) : 동음이의어(같은 논리명)·이음동의어(같은 물리명)·대체 표기(금칙어 BAN·이음동의어 SYN, `std_dic_rel`)와 겹치는 단어는 등록·수정 불가, DB 강제(sql/002 유일·014 물리명 유일·016 트리거). 금칙어는 `/forbidden`에서만 관리

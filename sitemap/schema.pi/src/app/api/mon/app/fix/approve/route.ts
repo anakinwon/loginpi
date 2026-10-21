@@ -1,10 +1,9 @@
-// AI 수정안 PR 승인 — POST {number, head(PR 만들 때 받은 커밋)} : master 병합 + 운영 브랜치(prod/schema) 반영(전역 관리자, 승인자 = 누른 사람 sql/072 기록)
-//  GET ?sha= : 그 커밋의 Vercel 운영 배포 상태(끝났으면 기록을 배포 완료·실패로 확정)
+// AI 수정안 PR 승인 — POST {area_id, number, head(PR 만들 때 받은 커밋)} : master 병합 + 운영 브랜치(prod/schema) 반영(그 분류체계 MON_FIX_APV = DA 역할 ∩ 요금제4, 2026-10-22, 승인자 기록)
+//  GET ?area=&sha= : 그 커밋의 Vercel 운영 배포 상태(MON_AI, 끝났으면 기록을 배포 완료·실패로 확정)
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
-import { apiError, currentUser, parseBody } from '@/lib/api'
+import { apiError, parseBody, requireAreaRole } from '@/lib/api'
 import { approvePr, deployState } from '@/lib/mon-fix'
-import { isGlobalAdmin } from '@/lib/mon-srv'
 
 const FAIL = {
   NO_GH: ['MON_FIX_OFF', 503],
@@ -16,21 +15,14 @@ const FAIL = {
   PROD_FF: ['MON_FIX_PROD_FF', 409],
 } as const
 
-// 전역 관리자면 사용자, 아니면 오류 응답
-async function admin() {
-  const user = await currentUser()
-  if (!user) return apiError('AUTH_REQUIRED', 401)
-  if (!(await isGlobalAdmin(user.usr_id))) return apiError('MON_ADMIN_ONLY', 403)
-  return user
-}
 
 export async function POST(req: Request) {
-  const b = await parseBody(req, z.object({ number: z.number().int().positive(), head: z.string().regex(/^[0-9a-f]{40}$/) }))
+  const b = await parseBody(req, z.object({ area_id: z.string().uuid(), number: z.number().int().positive(), head: z.string().regex(/^[0-9a-f]{40}$/) }))
   if (b instanceof NextResponse) return b
   try {
-    const u = await admin()
-    if (u instanceof NextResponse) return u
-    const r = await approvePr(b.number, b.head, u.usr_id)
+    const auth = await requireAreaRole(b.area_id, 'MON_FIX_APV')
+    if (auth instanceof NextResponse) return auth
+    const r = await approvePr(b.number, b.head, auth.user.usr_id)
     if (typeof r === 'string') return apiError(FAIL[r][0], FAIL[r][1])
     return NextResponse.json({ ok: true, ...r }, { headers: { 'Cache-Control': 'private, no-store' } })
   } catch (e) {
@@ -40,11 +32,13 @@ export async function POST(req: Request) {
 }
 
 export async function GET(req: Request) {
-  const sha = new URL(req.url).searchParams.get('sha') ?? ''
-  if (!/^[0-9a-f]{40}$/.test(sha)) return apiError('INVALID_INPUT', 400)
+  const sp = new URL(req.url).searchParams
+  const sha = sp.get('sha') ?? ''
+  const area = sp.get('area') ?? ''
+  if (!/^[0-9a-f]{40}$/.test(sha) || !z.string().uuid().safeParse(area).success) return apiError('INVALID_INPUT', 400)
   try {
-    const u = await admin()
-    if (u instanceof NextResponse) return u
+    const auth = await requireAreaRole(area, 'MON_AI')
+    if (auth instanceof NextResponse) return auth
     if (!process.env.GITHUB_TOKEN) return apiError('MON_FIX_OFF', 503)
     return NextResponse.json({ ok: true, state: await deployState(sha) }, { headers: { 'Cache-Control': 'private, no-store' } })
   } catch (e) {

@@ -3,6 +3,7 @@
 //  판정 : 배포 중 → 확인 중(배포 후 요청 부족) → 해결 확인(요청 N건 이상·오류 0) / 재발(배포 후 오류 1건 이상). 배포 전 같은 길이 기준선과 비교
 //  수집 경로 = 브라우저 계측(약 15초 묶음 전송) — 이 API 를 쓰는 화면을 열어 요청을 만들면 15~20초 안에 반영
 import { piFetch } from '@pi/auth/client'
+import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { pageMenu, routeMenu } from '@/lib/mon'
 
@@ -30,6 +31,7 @@ const hm = (t: string | number) => new Date(t).toLocaleTimeString('ko-KR', { hou
 const rate = (c: Cnt) => (c.req ? `${((c.err / c.req) * 100).toFixed(1)}%` : '-')
 
 export default function VerifyPanel({ route }: { route: string }) {
+  const { areaId } = useParams<{ areaId: string }>()
   const [d, setD] = useState<Data | null | undefined>(undefined) // null = 이 경로의 AI 수정 배포 기록 없음
   const [err, setErr] = useState('')
   const [at, setAt] = useState(0)
@@ -40,7 +42,7 @@ export default function VerifyPanel({ route }: { route: string }) {
       try {
         // 탭이 가려져 있으면 건너뜀(다음 예약만)
         if (document.visibilityState === 'visible') {
-          const j = await (await piFetch(`/api/mon/app/verify?route=${encodeURIComponent(route)}`)).json()
+          const j = await (await piFetch(`/api/mon/app/verify?area=${areaId}&route=${encodeURIComponent(route)}`)).json()
           if (stop) return
           if (j.ok) {
             setD(j.data)
@@ -59,7 +61,7 @@ export default function VerifyPanel({ route }: { route: string }) {
       stop = true
       clearTimeout(tm)
     }
-  }, [route])
+  }, [route, areaId])
 
   if (err) return <p className="text-xs text-red-700">{err}</p>
   if (d === undefined) return <p className="text-xs text-[#5b6578]">배포 후 실측을 불러오는 중…</p>

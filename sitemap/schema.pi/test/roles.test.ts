@@ -85,3 +85,14 @@ test('역할 지정 — 본인 역할 표 권한 안의 역할만, 설정 권한
   assert.ok(!canAssign('QLT', 'VIEWER') && !canAssign('VIEWER', 'VIEWER')) // 설정 권한 없음
   assert.ok(!canAssign('DA', 'ADMIN') && !canAssign(null, 'MDL'))
 })
+
+test('모니터링 AI 권한(2026-10-22) : AI 분석·PR 로 해결 = 요금제1~ SQL 쓰기 역할, 결재 = DA 역할 ∩ 요금제4', () => {
+  for (const r of ['SYS', 'DA', 'STD', 'MDL', 'QLT', 'MIG']) {
+    assert.ok(effPerms(r, 'P1').includes('MON_AI'), `${r} P1 MON_AI`)
+    assert.ok(effPerms(r, 'P3').includes('MON_AI'), `${r} P3 MON_AI`)
+  }
+  assert.ok(!effPerms('VIEWER', 'P4').includes('MON_AI'))
+  assert.ok(!effPerms('DA', 'FREE').includes('MON_AI'))
+  assert.ok(effPerms('DA', 'P4').includes('MON_FIX_APV'))
+  for (const [r, p] of [['SYS', 'P4'], ['DA', 'P3'], ['DA', 'P1'], ['MDL', 'P4'], ['STD', 'P4']]) assert.ok(!effPerms(r, p).includes('MON_FIX_APV'), `${r} ${p} 결재 없음`)
+})

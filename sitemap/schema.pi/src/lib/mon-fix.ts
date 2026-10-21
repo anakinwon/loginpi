@@ -175,7 +175,7 @@ async function makePr(q: FixReq, files: string[], mdl: AiMdl): Promise<FixPr | F
     if (!c) return null
     tok.in += c.tok.in
     tok.out += c.tok.out
-    if (!c.out.edits.length) return { edit: `AI 가 고칠 수 없다고 답했습니다 — ${c.out.summary}`.slice(0, 500) }
+    if (!c.out.edits.length) return { edit: `AI 판단 : 바꿀 코드가 없습니다 — ${c.out.summary}`.slice(0, 500) }
     r = applyEdits(src, c.out.edits)
     if ('changed' in r) break
   }
