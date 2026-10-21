@@ -46,6 +46,7 @@ export interface FixPr {
   url: string
   number: number
   branch: string
+  head: string // 서버가 만든 커밋 — 승인 때 이 커밋 그대로인지 확인(만든 뒤 누가 덧붙인 커밋은 승인 불가)
   files: string[]
   summary: string
   mdl: AiMdl
@@ -143,27 +144,29 @@ export async function fixPr(q: FixReq): Promise<FixPr | FixFail> {
     await gh('DELETE', `/git/refs/heads/${enc(branch)}`).catch(() => {})
     throw e
   })
-  return { url: pr.html_url, number: pr.number, branch, files: Object.keys(changed), summary: c.out.summary, mdl, ms, tok: c.tok }
+  return { url: pr.html_url, number: pr.number, branch, head: commit.sha, files: Object.keys(changed), summary: c.out.summary, mdl, ms, tok: c.tok }
 }
 
 // 승인(2026-10-22 마스터 지시 "프롬프트로 배포 요청은 곤란, 승인 처리로") — AI 수정안 PR 을 화면에서 승인 = master 에 squash 병합 + 운영 브랜치 빨리 감기(fast-forward)
-//  AI 브랜치(fix/mon-ai-*)·같은 저장소·열린 PR 만. 병합 기준 = 지금 PR 머리 커밋(검토 뒤 바뀌면 GitHub 409). master 의 다른 미배포 커밋도 함께 운영에 나감(ahead 로 알림)
+//  AI 브랜치(fix/mon-ai-*)·같은 저장소·열린 PR 만, PR 커밋 = 서버가 만든 커밋 1개(head)일 때만 — 만든 뒤 덧붙인 커밋은 거절(TOCTOU 방지), 병합도 그 sha 로 고정
+//  master 의 다른 미배포 커밋도 함께 운영에 나감(ahead 로 알림)
 const PROD = () => process.env.GITHUB_PROD || 'prod/schema'
-export type ApproveFail = 'NO_GH' | 'NOT_AI' | 'CLOSED' | 'CONFLICT' | 'PROD_FF'
+export type ApproveFail = 'NO_GH' | 'NOT_AI' | 'CLOSED' | 'CONFLICT' | 'CHANGED' | 'PROD_FF'
 export interface Approved {
   sha: string // 병합 커밋(= 운영 배포 커밋)
   ahead: number // 이번에 운영에 나간 커밋 수(병합 커밋 포함)
   url: string // 커밋 페이지(Vercel 상태 표시)
 }
-export async function approvePr(n: number): Promise<Approved | ApproveFail> {
+export async function approvePr(n: number, head: string): Promise<Approved | ApproveFail> {
   if (!process.env.GITHUB_TOKEN) return 'NO_GH'
   const base = process.env.GITHUB_BASE || 'master'
-  const pr = await gh<{ state: string; merged: boolean; mergeable: boolean | null; title: string; head: { ref: string; sha: string; repo: { full_name: string } | null }; base: { ref: string } }>('GET', `/pulls/${n}`)
+  const pr = await gh<{ state: string; merged: boolean; mergeable: boolean | null; commits: number; title: string; head: { ref: string; sha: string; repo: { full_name: string } | null }; base: { ref: string } }>('GET', `/pulls/${n}`)
   if (!pr.head.ref.startsWith('fix/mon-ai-') || pr.head.repo?.full_name !== repo() || pr.base.ref !== base) return 'NOT_AI'
   if (pr.state !== 'open' || pr.merged) return 'CLOSED'
+  if (pr.head.sha !== head || pr.commits !== 1) return 'CHANGED'
   if (pr.mergeable === false) return 'CONFLICT'
-  const m = await gh<{ sha: string }>('PUT', `/pulls/${n}/merge`, { merge_method: 'squash', sha: pr.head.sha, commit_title: `${pr.title} (#${n})` }).catch((e: Error) => {
-    if (/ (405|409) /.test(e.message)) return null // 병합 불가·검토 뒤 머리 커밋 변경
+  const m = await gh<{ sha: string }>('PUT', `/pulls/${n}/merge`, { merge_method: 'squash', sha: head, commit_title: `${pr.title} (#${n})` }).catch((e: Error) => {
+    if (/ (405|409) /.test(e.message)) return null // 병합 불가·확인 직후 머리 커밋 변경
     throw e
   })
   if (!m) return 'CONFLICT'

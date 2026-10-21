@@ -29,7 +29,7 @@ const fmtS = (t: string) => new Date(t).toLocaleTimeString('ko-KR', { hour: '2-d
 
 type Ai = { route: string; busy: boolean; res?: AiRun; err?: string }
 // PR 상태 — 만든 뒤 '승인' = master 병합 + 운영 배포(sha), dep = Vercel 운영 배포 상태(pending·success·failure)
-type Pr = { busy?: boolean; url?: string; number?: number; err?: string; apv?: boolean; sha?: string; ahead?: number; dep?: string | null }
+type Pr = { busy?: boolean; url?: string; number?: number; head?: string; err?: string; apv?: boolean; sha?: string; ahead?: number; dep?: string | null }
 // 진행 단계(마스터 지시 2026-10-22) : PR 요청 → 커밋·PR 완료 → 승인·병합 → 운영 배포. 상태 = 끝남(done)·진행 중(on)·실패(bad)·대기
 const STEPS = ['수정안 요청', '커밋·PR 완료', '승인·병합', '운영 배포'] as const
 function stepOf(x: Pr): { at: number; on: boolean; bad: boolean } {
@@ -81,18 +81,18 @@ function AiPanel({ ai, mdls, mdlId, onMdl, onClose, onRetry }: { ai: Ai; mdls: M
     try {
       const body = { route: ai.route, cause: { title: c.title, evidence: c.evidence }, fix: x, ...(mdl ? { mdl_id: mdl } : {}) }
       const j = await (await piFetch('/api/mon/app/fix', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).json()
-      setPrs((p) => ({ ...p, [k]: j.ok ? { url: j.url, number: j.number } : { err: j.message ?? 'PR 을 만들지 못했습니다' } }))
+      setPrs((p) => ({ ...p, [k]: j.ok ? { url: j.url, number: j.number, head: j.head } : { err: j.message ?? 'PR 을 만들지 못했습니다' } }))
     } catch {
       setPrs((p) => ({ ...p, [k]: { err: 'PR 을 만들지 못했습니다(네트워크)' } }))
     }
   }
   const approve = async (k: string) => {
     const cur = prs[k]
-    if (!cur?.number || cur.apv || cur.sha) return
+    if (!cur?.number || !cur.head || cur.apv || cur.sha) return
     if (!confirm(`PR #${cur.number} 을 승인합니다 — master 에 병합하고 바로 운영에 배포합니다(master 의 다른 미배포 커밋도 함께 나감). GitHub 에서 변경 내용을 확인하셨습니까?`)) return
     setPrs((p) => ({ ...p, [k]: { ...cur, apv: true, err: undefined } }))
     try {
-      const j = await (await piFetch('/api/mon/app/fix/approve', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ number: cur.number }) })).json()
+      const j = await (await piFetch('/api/mon/app/fix/approve', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ number: cur.number, head: cur.head }) })).json()
       setPrs((p) => ({ ...p, [k]: j.ok ? { ...cur, sha: j.sha, ahead: j.ahead, dep: 'pending' } : { ...cur, err: j.message ?? '승인하지 못했습니다' } }))
     } catch {
       setPrs((p) => ({ ...p, [k]: { ...cur, err: '승인하지 못했습니다(네트워크)' } }))
