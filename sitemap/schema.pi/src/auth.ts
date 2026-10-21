@@ -17,6 +17,9 @@ type LinkJwt = {
   googleSub?: string
 }
 
+// 연동 조회 타임아웃(ms) — 세션 조회마다 실행되므로 짧게 둔다
+const LINK_LOOKUP_TIMEOUT_MS = 1500
+
 // 반환 : usr_id = 연동 있음 / null = 연동 없음(확정) / undefined = DB 오류(판정 불가 — 호출자는 이전 값 유지)
 async function findLinkedUserId(sub: string): Promise<string | null | undefined> {
   try {
@@ -26,6 +29,8 @@ async function findLinkedUserId(sub: string): Promise<string | null | undefined>
       .eq('prvd_cd', 'GOOGLE')
       .eq('prvd_sub_txt', sub)
       .eq('del_yn', 'N')
+      // DB 지연 시 세션 응답이 묶이지 않도록 1.5초 타임아웃 — 초과는 error/예외로 떨어져 undefined(판정 불가) 처리
+      .abortSignal(AbortSignal.timeout(LINK_LOOKUP_TIMEOUT_MS))
       .maybeSingle<{ usr_id: string }>()
     if (error) {
       console.error('[auth] findLinkedUserId', error.message)
