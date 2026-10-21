@@ -27,6 +27,14 @@ async function readJson<T>(p: Promise<Response>): Promise<{ ok: true; data: T } 
   }
 }
 
+// 개발 전용 사용자 조회 — DevUserSwitch·useAppUser(StrictMode 이중 마운트 포함)가 같은 요청을 공유해 페이지 로드당 1회만 호출
+type DevUserBody = { ok?: boolean; user: { usr_id: string; pi_usr_nm: string } | null }
+let devUserReq: Promise<{ ok: true; data: DevUserBody } | { ok: false; body: unknown }> | null = null
+export function loadDevUser() {
+  devUserReq ??= readJson<DevUserBody>(piFetch('/api/dev/user', { cache: 'no-store' }))
+  return devUserReq
+}
+
 // /api/auth/me 응답 → 게이트가 기대하는 PiSessionUser 모양(Google 경로는 uid·scope 없음)
 const toSessionUser = (u: MeUser): PiSessionUser => ({
   userId: u.id,
@@ -66,7 +74,7 @@ export function useAppUser() {
   const [devLoading, setDevLoading] = useState(process.env.NODE_ENV !== 'production')
   useEffect(() => {
     if (process.env.NODE_ENV === 'production') return
-    void readJson<{ user: { usr_id: string; pi_usr_nm: string } | null }>(piFetch('/api/dev/user', { cache: 'no-store' })).then((r) => {
+    void loadDevUser().then((r) => {
       const u = r.ok ? r.data.user : null
       setDevUser(u ? toSessionUser({ id: u.usr_id, username: u.pi_usr_nm, displayName: u.pi_usr_nm, role: 'USER' }) : null)
       setDevLoading(false)
