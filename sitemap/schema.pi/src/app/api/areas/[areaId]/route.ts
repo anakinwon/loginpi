@@ -11,11 +11,14 @@ const COLS = 'area_id, area_nm, area_desc, term_sep_txt, word_use_yn, term_use_y
 
 export async function GET(_req: Request, { params }: Ctx) {
   const { areaId } = await params
-  const auth = await requireAreaRole(areaId, 'VIEW')
+  // 권한 확인과 분류체계 조회를 병렬 실행(권한 실패 시 조회 결과는 버림)
+  const [auth, { data, error }] = await Promise.all([
+    requireAreaRole(areaId, 'VIEW'),
+    db().from('std_area').select(COLS).eq('area_id', areaId).eq('del_yn', 'N').single(),
+  ])
   if (auth instanceof NextResponse) return auth
   // 최근 분류체계 기억은 응답 뒤로 미룸(응답 경로에서 sys_user UPDATE 제외)
   after(() => rememberArea(auth.user.usr_id, areaId))
-  const { data, error } = await db().from('std_area').select(COLS).eq('area_id', areaId).eq('del_yn', 'N').single()
   if (error) return dbError(error)
   return NextResponse.json({ ok: true, role: auth.role, perms: auth.perms, plan: auth.plan, area: data })
 }
