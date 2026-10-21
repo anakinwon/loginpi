@@ -7,6 +7,8 @@ export default function DevUserSwitch() {
   const [cur, setCur] = useState<string | null>(null)
   const [nm, setNm] = useState('')
   useEffect(() => {
+    // 운영 빌드에서는 호출하지 않음(route 가 항상 404)
+    if (process.env.NODE_ENV === 'production') return
     piFetch('/api/dev/user')
       .then((r) => r.json())
       .then((j) => setCur(j.ok ? (j.user?.pi_usr_nm ?? '(없음)') : null))
