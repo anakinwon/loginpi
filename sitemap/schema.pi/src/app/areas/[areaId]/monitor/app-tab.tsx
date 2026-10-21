@@ -12,6 +12,7 @@ import { useEffect, useMemo, useState } from 'react'
 import type { AiMdl, AiResult, AiRun } from '@/lib/mon-ai'
 import { pageMenu, routeMenu, SLOW_MS } from '@/lib/mon'
 import { fmtN, Line, Stack, Tile, type Pt } from './charts'
+import { Pager, StepBar, type Step } from './fix-steps'
 import { usePoll } from './use-poll'
 
 type Key = 'req' | 'slow' | 'err'
@@ -30,9 +31,8 @@ const fmtS = (t: string) => new Date(t).toLocaleTimeString('ko-KR', { hour: '2-d
 type Ai = { route: string; busy: boolean; res?: AiRun; err?: string }
 // PR 상태 — 만든 뒤 '승인' = master 병합 + 운영 배포(sha), dep = Vercel 운영 배포 상태(pending·success·failure)
 type Pr = { busy?: boolean; url?: string; number?: number; head?: string; err?: string; apv?: boolean; sha?: string; ahead?: number; dep?: string | null }
-// 진행 단계(마스터 지시 2026-10-22) : PR 요청 → 커밋·PR 완료 → 승인·병합 → 운영 배포. 상태 = 끝남(done)·진행 중(on)·실패(bad)·대기
-const STEPS = ['수정안 요청', '커밋·PR 완료', '승인·병합', '운영 배포'] as const
-function stepOf(x: Pr): { at: number; on: boolean; bad: boolean } {
+// 진행 단계(공용 fix-steps.tsx) — 화면 상태로 계산
+function stepOf(x: Pr): Step {
   if (x.dep === 'success') return { at: 4, on: false, bad: false }
   if (x.dep === 'failure' || x.dep === 'error') return { at: 3, on: false, bad: true }
   if (x.sha) return { at: 3, on: true, bad: false }
@@ -43,23 +43,11 @@ function stepOf(x: Pr): { at: number; on: boolean; bad: boolean } {
 function Steps({ x }: { x: Pr }) {
   const st = stepOf(x)
   return (
-    <ol className="mt-1 flex flex-wrap items-center gap-1 text-xs" aria-label="진행 상태">
-      {STEPS.map((nm, k) => {
-        const cls = k < st.at ? 'border-emerald-500 bg-emerald-600 text-white' : k === st.at && st.bad ? 'border-red-400 bg-red-50 text-red-700' : k === st.at && st.on ? 'animate-pulse border-violet-500 bg-violet-50 text-violet-800' : 'border-[#d6deeb] bg-white text-[#8a93a5]'
-        const tail = k < st.at ? ' ✓' : k === st.at && st.bad ? ' ✕' : k === st.at && st.on ? ' 진행 중' : ''
-        return (
-          <li key={nm} className="flex items-center gap-1">
-            {k > 0 && <span className="text-[#b3bccb]">→</span>}
-            <span aria-current={k === st.at ? 'step' : undefined} className={`rounded-full border px-2 py-0.5 ${cls}`}>
-              {k + 1}. {nm}
-              {tail}
-            </span>
-          </li>
-        )
-      })}
-      {x.dep === 'success' && <li className="ml-1 text-emerald-700">운영 반영 완료</li>}
-      {st.bad && x.sha && <li className="ml-1 text-red-700">운영 빌드 실패 — 이전 배포가 계속 서비스됨</li>}
-    </ol>
+    <div className="mt-1 flex flex-wrap items-center gap-1 text-xs">
+      <StepBar st={st} />
+      {x.dep === 'success' && <span className="ml-1 text-emerald-700">운영 반영 완료</span>}
+      {st.bad && x.sha && <span className="ml-1 text-red-700">운영 빌드 실패 — 이전 배포가 계속 서비스됨</span>}
+    </div>
   )
 }
 type MdlOpt = Pick<AiMdl, 'dsp_nm' | 'plan_nm'> & { mdl_id: string; dflt_yn: 'Y' | 'N' }
@@ -498,39 +486,7 @@ export default function AppTab({ live, min }: { live: boolean; min: number }) {
             </tbody>
           </table>
         </div>
-        {pages > 1 && (
-          <nav className="mt-1 flex flex-wrap items-center justify-center gap-1 text-xs" aria-label="상세 페이지">
-            <button type="button" disabled={cur <= 1} onClick={() => setPg(cur - 1)} className="rounded border border-[#d6deeb] bg-white px-2 py-0.5 disabled:opacity-40">
-              이전
-            </button>
-            {/* 모바일 축약 : 처음·끝·현재 ±1 만, 넓은 화면은 ±3 — '…' 는 각 화면에 보이는 이웃 번호 기준 */}
-            {Array.from({ length: pages }, (_, i) => i + 1)
-              .filter((n) => n === 1 || n === pages || Math.abs(n - cur) <= 3)
-              .map((n, i, a) => {
-                const mob = (x: number) => x === 1 || x === pages || Math.abs(x - cur) <= 1
-                const prevMob = a.slice(0, i).filter(mob).pop()
-                const gapD = i > 0 && n - a[i - 1] > 1
-                const gapM = mob(n) && prevMob !== undefined && n - prevMob > 1
-                const dot = gapD && gapM ? 'inline' : gapM ? 'sm:hidden' : gapD ? 'hidden sm:inline' : ''
-                return (
-                <span key={n} className={`items-center gap-1 ${mob(n) ? 'flex' : 'hidden sm:flex'}`}>
-                  {dot && <span className={`text-[#5b6578] ${dot}`}>…</span>}
-                  <button
-                    type="button"
-                    onClick={() => setPg(n)}
-                    aria-current={n === cur ? 'page' : undefined}
-                    className={`rounded border px-2 py-0.5 tabular-nums ${n === cur ? 'border-[#1f3a68] bg-[#1f3a68] text-white' : 'border-[#d6deeb] bg-white text-[#2c3850]'}`}
-                  >
-                    {n}
-                  </button>
-                </span>
-                )
-              })}
-            <button type="button" disabled={cur >= pages} onClick={() => setPg(cur + 1)} className="rounded border border-[#d6deeb] bg-white px-2 py-0.5 disabled:opacity-40">
-              다음
-            </button>
-          </nav>
-        )}
+        <Pager cur={cur} pages={pages} onPage={setPg} label="상세 페이지" />
       </section>
     </div>
   )

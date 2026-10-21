@@ -111,6 +111,7 @@ const SQLED: Item[] = [
       { seg: 'monitor', nm: '서버', tab: 'srv' },
       { seg: 'monitor', nm: '데이터베이스', tab: 'db' },
       { seg: 'monitor', nm: 'URL', tab: 'url' },
+      { seg: 'monitor', nm: 'AI 수정 이력', tab: 'fix' },
     ],
   },
   {

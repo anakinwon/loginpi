@@ -1,15 +1,16 @@
 'use client'
-// 모니터링 화면(2026-10-21, 마스터 지시 — WhaTap 4종을 심플하게) : 애플리케이션·서버·데이터베이스·URL 탭(?tab=app|srv|db|url)
+// 모니터링 화면(2026-10-21, 마스터 지시 — WhaTap 4종을 심플하게) : 애플리케이션·서버·데이터베이스·URL 탭(?tab=app|srv|db|url) + AI 수정 이력(?tab=fix, 2026-10-22)
 // LIVE(10초 갱신, 일시정지 가능)·기간(30분~24시간). 권한 = 모니터링 보기(요금제1~ 기술 메뉴), URL 등록·삭제 = 모니터링 편집, 애플리케이션 = 전역 관리자
 //  앱 경계상 dbms.pi 영역 — 마스터 선택으로 schema.pi 에 두고 dbms.pi 가 생기면 이전(MASTER_ROADMAP §3-10)
 import { piFetch } from '@pi/auth/client'
-import { Activity, AppWindow, Database, Globe, Pause, Play, Server } from 'lucide-react'
+import { Activity, AppWindow, Database, GitPullRequest, Globe, Pause, Play, Server } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { use, useEffect, useState } from 'react'
 import type { Perm } from '@/lib/roles'
 import AppTab from './app-tab'
 import DbTab from './db-tab'
+import FixTab from './fix-tab'
 import SrvTab from './srv-tab'
 import UrlTab from './url-tab'
 
@@ -18,6 +19,7 @@ const TABS = [
   { k: 'srv', nm: '서버', Icon: Server },
   { k: 'db', nm: '데이터베이스', Icon: Database },
   { k: 'url', nm: 'URL', Icon: Globe },
+  { k: 'fix', nm: 'AI 수정 이력', Icon: GitPullRequest }, // 2026-10-22 — PR 로 해결 진행 보고서(전역 관리자)
 ] as const
 type Tab = (typeof TABS)[number]['k']
 const MINS = [30, 60, 360, 1440]
@@ -98,6 +100,8 @@ export default function MonitorPage({ params }: { params: Promise<{ areaId: stri
           <SrvTab areaId={areaId} live={live} min={min} />
         ) : tab === 'db' ? (
           <DbTab areaId={areaId} live={live} min={min} />
+        ) : tab === 'fix' ? (
+          <FixTab live={live} />
         ) : (
           <UrlTab areaId={areaId} live={live} min={min} editor={perms.includes('MON_EDIT')} />
         )}

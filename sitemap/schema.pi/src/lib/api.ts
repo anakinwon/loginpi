@@ -78,6 +78,7 @@ const ERRORS = {
   MON_FIX_GH: 'GitHub 작업에 실패했습니다(토큰 권한 Contents·Pull requests 쓰기·저장소 확인)',
   MON_FIX_NOT_AI: '모니터링 AI 수정안 PR(fix/mon-ai-*)만 이 화면에서 승인할 수 있습니다',
   MON_FIX_CLOSED: '이미 병합되었거나 닫힌 PR 입니다',
+  MON_FIX_BUSY: '이 PR 은 다른 승인이 처리 중이거나 이미 처리되었습니다 — AI 수정 이력에서 상태를 확인하십시오',
   MON_FIX_CHANGED: 'PR 이 AI 가 만든 뒤 바뀌었습니다(커밋 추가) — 이 화면에서는 승인할 수 없습니다. GitHub 에서 검토 후 병합하십시오',
   MON_FIX_CONFLICT: '병합할 수 없습니다(충돌 또는 검토 뒤 PR 이 바뀜) — GitHub 에서 확인하십시오',
   MON_FIX_PROD_FF: 'master 에는 병합했지만 운영 브랜치가 master 와 갈라져 있어 운영 배포를 하지 못했습니다 — 운영 브랜치를 확인하십시오',

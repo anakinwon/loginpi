@@ -1,10 +1,10 @@
-// 애플리케이션 모니터링 AI 수정안 PR — POST {route, cause, fix, mdl_id?} : 해결 방안 1개를 AI 가 코드로 바꿔 GitHub 브랜치·PR 생성(전역 관리자)
+// 애플리케이션 모니터링 AI 수정안 PR — GET ?page=&sts=PR,DPLY : 진행 보고서 목록(sql/072) / POST {route, cause, fix, mdl_id?} : 해결 방안 1개를 AI 가 코드로 바꿔 GitHub 브랜치·PR 생성(전역 관리자)
 //  운영 반영은 사람이 PR 병합(마스터 선택 2026-10-22). 고칠 파일은 이 앱 src 아래 ts·tsx 최대 3개(src/lib/mon-fix.ts)
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { apiError, currentUser, dbError, parseBody } from '@/lib/api'
 import { normRoute } from '@/lib/mon'
-import { fixPr } from '@/lib/mon-fix'
+import { FIX_PAGE, fixPr, listFixes, type FixSts } from '@/lib/mon-fix'
 import { isGlobalAdmin } from '@/lib/mon-srv'
 
 export const maxDuration = 300 // AI 호출 최대 2회(재시도) + GitHub
@@ -25,7 +25,7 @@ export async function POST(req: Request) {
   if (normRoute(b.route) !== b.route) return apiError('INVALID_INPUT', 400)
   try {
     if (!(await isGlobalAdmin(user.usr_id))) return apiError('MON_ADMIN_ONLY', 403)
-    const r = await fixPr({ route: b.route, cause: b.cause, fix: b.fix, mdlId: b.mdl_id })
+    const r = await fixPr({ route: b.route, cause: b.cause, fix: b.fix, mdlId: b.mdl_id }, user.usr_id)
     if (r === 'NO_GH') return apiError('MON_FIX_OFF', 503)
     if (r === 'FILE') return apiError('MON_FIX_FILE', 400)
     // 적용 실패 = 이유(AI 답의 요약·불일치 목록)를 화면에 그대로 — 다시 시도·다른 모델 판단용
@@ -37,5 +37,21 @@ export async function POST(req: Request) {
   } catch (e) {
     console.error('mon-fix', (e as Error).message)
     return apiError('MON_FIX_GH', 502)
+  }
+}
+
+const STS: FixSts[] = ['REQ', 'REQ_FAIL', 'PR', 'APV', 'APV_FAIL', 'DPLY', 'DONE', 'DPLY_FAIL']
+export async function GET(req: Request) {
+  const user = await currentUser()
+  if (!user) return apiError('AUTH_REQUIRED', 401)
+  const sp = new URL(req.url).searchParams
+  const page = Math.max(1, Math.min(1000, Number(sp.get('page')) || 1))
+  const sts = (sp.get('sts') ?? '').split(',').filter((x): x is FixSts => (STS as string[]).includes(x))
+  try {
+    if (!(await isGlobalAdmin(user.usr_id))) return apiError('MON_ADMIN_ONLY', 403)
+    const r = await listFixes(page, sts)
+    return NextResponse.json({ ok: true, ...r, page, size: FIX_PAGE }, { headers: { 'Cache-Control': 'private, no-store' } })
+  } catch (e) {
+    return dbError(e as { code?: string; message?: string })
   }
 }
