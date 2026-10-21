@@ -123,7 +123,7 @@ export default function PlanPage({ params }: { params: Promise<{ areaId: string 
           <div className="flex flex-wrap items-center gap-x-6 gap-y-1 p-4 text-sm">
             <p className="text-lg font-bold text-[#1f3a68]">
               {p.plan === 'FREE' ? '없음(무료 — 표준사전 조회만)' : `요금제${p.plan.slice(1)} · ${PLAN_NM[p.plan]}`}
-              {p.grace && <span className="ml-2 rounded bg-amber-100 px-1.5 py-0.5 text-xs font-medium text-amber-800">유예 기간</span>}
+              {p.grace && <span className="ml-2 rounded bg-amber-100 px-1.5 py-0.5 text-xs font-medium text-amber-800">7일 체험</span>}
             </p>
             {p.end && <p>{dt(p.end)} 까지{finalEnd && finalEnd !== p.end && <span className="ml-1 font-semibold text-[#1f3a68]">(선결제 포함 최종 {dt(finalEnd)} 까지)</span>}</p>}
             <p className="text-gray-600">내 역할 : {ROLE_NM[info.role] ?? info.role}</p>
@@ -132,7 +132,7 @@ export default function PlanPage({ params }: { params: Promise<{ areaId: string 
             <ul className="border-t border-[#d5ddec] px-4 py-2 text-xs text-gray-700">
               {info.terms.map((t, i) => (
                 <li key={i}>
-                  요금제{t.plan_cd.slice(1)}({t.grnt_rsn_cd === 'GRACE' ? '유예' : t.grnt_rsn_cd === 'UPG' ? `업그레이드·${t.prd_cd === 'Y' ? '년' : '월'}` : t.prd_cd === 'Y' ? '년' : '월'}) : {dt(t.strt_dtm)} ~ {dt(t.end_dtm)}
+                  요금제{t.plan_cd.slice(1)}({t.grnt_rsn_cd === 'GRACE' ? '체험' : t.grnt_rsn_cd === 'UPG' ? `업그레이드·${t.prd_cd === 'Y' ? '년' : '월'}` : t.prd_cd === 'Y' ? '년' : '월'}) : {dt(t.strt_dtm)} ~ {dt(t.end_dtm)}
                 </li>
               ))}
             </ul>
