@@ -29,10 +29,14 @@ export async function findDgm(areaId: string, prjId: string, subjId: string | nu
 }
 
 export async function loadDgm(areaId: string, prjId: string, subjId: string | null, lvl: DgmLvl, phyId: string | null = null) {
-  const m = await loadLogical(areaId, prjId)
-  if (!m) return null
+  // 논리 모델·물리 모델 목록·다이어그램은 서로 독립 — 동시 조회
   // 기준 물리 모델(DBMS별) — 지정 없으면 먼저 만든 것
-  const pm = await db().from('mdl_phy_mdl').select('phy_mdl_id, dbms_cd').eq('area_id', areaId).eq('prj_id', prjId).eq('del_yn', 'N').order('reg_dtm')
+  const [m, pm, dgm] = await Promise.all([
+    loadLogical(areaId, prjId),
+    db().from('mdl_phy_mdl').select('phy_mdl_id, dbms_cd').eq('area_id', areaId).eq('prj_id', prjId).eq('del_yn', 'N').order('reg_dtm'),
+    findDgm(areaId, prjId, subjId, lvl),
+  ])
+  if (!m) return null
   if (pm.error) throw pm.error
   const phyModels = pm.data as { phy_mdl_id: string; dbms_cd: string }[]
   const phy = phyModels.find((x) => x.phy_mdl_id === phyId) ?? phyModels[0] ?? null
@@ -49,17 +53,19 @@ export async function loadDgm(areaId: string, prjId: string, subjId: string | nu
   const rels = m.rels.filter((r) => phyEnts.has(r.prnt_ent_id) && phyEnts.has(r.chld_ent_id) && (own.has(r.prnt_ent_id) || own.has(r.chld_ent_id)))
   const shown = new Set([...own, ...rels.flatMap((r) => [r.prnt_ent_id, r.chld_ent_id])])
   const ents = m.ents.filter((e) => shown.has(e.ent_id)).map(({ words: _w, ...e }) => ({ ...e, ref: !own.has(e.ent_id) }))
-  const dgm = await findDgm(areaId, prjId, subjId, lvl)
   let pos: DgmPos[] = []
   let relLyt: DgmRel[] = []
   if (dgm) {
     const shownRel = new Set(rels.map((r) => r.rel_id))
-    const q = await db().from('mdl_dgm_rel').select('rel_id, prnt_side_cd, prnt_pstn_rt, chld_side_cd, chld_pstn_rt, mid_xcrd, mid_ycrd').eq('dgm_id', dgm.dgm_id).eq('del_yn', 'N').limit(5000)
+    // 관계선 배치·엔터티 배치 동시 조회
+    const [q, p] = await Promise.all([
+      db().from('mdl_dgm_rel').select('rel_id, prnt_side_cd, prnt_pstn_rt, chld_side_cd, chld_pstn_rt, mid_xcrd, mid_ycrd').eq('dgm_id', dgm.dgm_id).eq('del_yn', 'N').limit(5000),
+      db().from('mdl_dgm_ent').select('ent_id, xcrd, ycrd, fix_yn, sort_seq').eq('dgm_id', dgm.dgm_id).eq('del_yn', 'N').limit(5000),
+    ])
     if (q.error) throw q.error
     relLyt = (q.data as Record<string, unknown>[])
       .filter((x) => shownRel.has(x.rel_id as string))
       .map((x) => ({ rel_id: x.rel_id as string, ps: x.prnt_side_cd as RelLyt['ps'], pr: Number(x.prnt_pstn_rt), cs: x.chld_side_cd as RelLyt['cs'], cr: Number(x.chld_pstn_rt), mx: x.mid_xcrd == null ? null : Number(x.mid_xcrd), my: x.mid_ycrd == null ? null : Number(x.mid_ycrd) }))
-    const p = await db().from('mdl_dgm_ent').select('ent_id, xcrd, ycrd, fix_yn, sort_seq').eq('dgm_id', dgm.dgm_id).eq('del_yn', 'N').limit(5000)
     if (p.error) throw p.error
     pos = (p.data as { ent_id: string; xcrd: number; ycrd: number; fix_yn: string; sort_seq: number }[]).filter((x) => shown.has(x.ent_id)).map((x) => ({ ent_id: x.ent_id, x: Number(x.xcrd), y: Number(x.ycrd), fix: x.fix_yn === 'Y', seq: x.sort_seq }))
   }
