@@ -10,10 +10,9 @@ const ATTR_MAX = 5000
 const REL_MAX = 5000
 
 export async function loadLogical(areaId: string, prjId: string) {
-  const prj = await db().from('mdl_prj').select('prj_id, prj_nm, tbl_pfx_txt, trgt_dbms_cd, indstry_cd').eq('prj_id', prjId).eq('area_id', areaId).eq('del_yn', 'N').maybeSingle()
-  if (prj.error) throw prj.error
-  if (!prj.data) return null
-  const [e, a, r] = await Promise.all([
+  // 프로젝트 확인과 엔터티·속성·관계 조회를 병렬로(직렬 왕복 단축) — 프로젝트가 없으면 결과를 버리고 null
+  const [prj, e, a, r] = await Promise.all([
+    db().from('mdl_prj').select('prj_id, prj_nm, tbl_pfx_txt, trgt_dbms_cd, indstry_cd').eq('prj_id', prjId).eq('area_id', areaId).eq('del_yn', 'N').maybeSingle(),
     db().from('mdl_ent').select('ent_id, subj_id, ent_log_nm, ent_tp_cd, ent_desc, ent_asst_nm, dic_ids, mdl_lvl_cd, ver_no, reg_dtm, mdl_subj!inner(subj_nm, subj_abbr_nm, sort_seq)').eq('prj_id', prjId).eq('del_yn', 'N').order('reg_dtm').limit(ENT_MAX),
     db()
       .from('mdl_attr')
@@ -24,16 +23,20 @@ export async function loadLogical(areaId: string, prjId: string) {
       .limit(ATTR_MAX),
     db().from('mdl_rel').select('rel_id, prnt_ent_id, chld_ent_id, rel_nm, crdn_cd, idnt_yn, prnt_opt_yn, chld_opt_yn, rel_desc').eq('prj_id', prjId).eq('del_yn', 'N').limit(REL_MAX),
   ])
+  if (prj.error) throw prj.error
+  if (!prj.data) return null
   for (const x of [e, a, r]) if (x.error) throw x.error
   type ERow = { ent_id: string; subj_id: string; ent_log_nm: string; ent_tp_cd: string; ent_desc: string | null; ent_asst_nm: string | null; dic_ids: string[]; mdl_lvl_cd: string; ver_no: number; mdl_subj: { subj_nm: string; subj_abbr_nm: string; sort_seq: number } }
   type ARow = { attr_id: string; ent_id: string; term_id: string; pk_yn: string; pk_seq: number | null; esntl_yn: string; fk_rel_id: string | null; src_attr_id: string | null; attr_desc: string | null; attr_asst_nm: string | null; ver_no: number; std_term: { term_log_nm: string; term_phy_nm: string; syn_txt: string | null; std_sts_cd: string; del_yn: string; std_dom: { dom_id: string; dom_nm: string; lgc_tp_cd: string; data_len: number | null; data_scale: number | null; ver_no: number } | null } | null }
   const er = e.data as unknown as ERow[]
   const ar = a.data as unknown as ARow[]
   const ids = [...new Set(er.flatMap((x) => x.dic_ids))]
-  const w = await inChunks(ids, (p) => db().from('std_dic').select('dic_id, dic_log_nm, dic_phy_nm, attr_clss_yn, ent_clss_yn, forbid_yn, tbl_sfx_txt, std_sts_cd, del_yn').in('dic_id', p))
+  // 구성 단어와 엔터티 동의어(ERD 개체명 보기옵션, 2026-10-18 = 구성 단어의 이음동의어 SYN)를 병렬 조회
+  const [w, sy] = await Promise.all([
+    inChunks(ids, (p) => db().from('std_dic').select('dic_id, dic_log_nm, dic_phy_nm, attr_clss_yn, ent_clss_yn, forbid_yn, tbl_sfx_txt, std_sts_cd, del_yn').in('dic_id', p)),
+    inChunks(ids, (p) => db().from('std_dic_rel').select('dic_id, rel_txt').in('dic_id', p).eq('rel_tp_cd', 'SYN').eq('del_yn', 'N')),
+  ])
   if (w.error) throw w.error
-  // 엔터티 동의어(ERD 개체명 보기옵션, 2026-10-18) = 구성 단어의 이음동의어(SYN)
-  const sy = await inChunks(ids, (p) => db().from('std_dic_rel').select('dic_id, rel_txt').in('dic_id', p).eq('rel_tp_cd', 'SYN').eq('del_yn', 'N'))
   if (sy.error) throw sy.error
   const synOf = new Map<string, string[]>()
   for (const x of sy.data as { dic_id: string; rel_txt: string }[]) synOf.set(x.dic_id, [...(synOf.get(x.dic_id) ?? []), x.rel_txt])
