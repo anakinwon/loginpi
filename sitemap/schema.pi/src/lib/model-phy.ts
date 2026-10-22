@@ -63,9 +63,14 @@ export async function loadPhy(areaId: string, mdlId: string) {
   for (const x of [t, f]) if (x.error) throw x.error
   const tbls = t.data as { phy_tbl_id: string; ent_id: string; tbl_nm: string; tbl_desc: string | null; phy_sts_cd: string; phy_cmptn_dtm: string | null; auto_inc_yn: 'Y' | 'N'; ver_no: number }[]
   type Col = PhyCol & { phy_col_id: string; phy_tbl_id: string; ver_no: number }
-  const cols: Col[] = []
-  for (let i = 0; i < tbls.length; i += TBL_CHUNK) {
-    const ids = tbls.slice(i, i + TBL_CHUNK).map((x) => x.phy_tbl_id)
+  // 인덱스(sql/063) — 칼럼 이름은 그 테이블 활성 칼럼으로 해석, 삭제된 칼럼을 가리키거나 동기화로 PK 와 같은 구성이 되면 invalid(DDL 생략·화면 빨간 표시, why = 사유)
+  //  PK 와 같은 칼럼 목록의 인덱스는 Oracle·Tibero 에서 ORA-01408 로 실행이 실패하므로 생략(2026-10-20 검토 지적)
+  type IdxRow = { phy_idx_id: string; phy_tbl_id: string; idx_nm: string; unq_yn: 'Y' | 'N'; col_ids: string[]; idx_desc: string | null; ver_no: number }
+  const chunks: string[][] = []
+  for (let i = 0; i < tbls.length; i += TBL_CHUNK) chunks.push(tbls.slice(i, i + TBL_CHUNK).map((x) => x.phy_tbl_id))
+  // 칼럼 청크(청크 안은 range 반복)와 인덱스 청크를 동시에 조회 — 결과는 청크 순서대로 합침
+  const colChunk = async (ids: string[]) => {
+    const out: Col[] = []
     for (let from = 0; ; from += PAGE) {
       const c = await db()
         .from('mdl_phy_col')
@@ -76,21 +81,21 @@ export async function loadPhy(areaId: string, mdlId: string) {
         .order('phy_col_id')
         .range(from, from + PAGE - 1)
       if (c.error) throw c.error
-      cols.push(...(c.data as Col[]))
+      out.push(...(c.data as Col[]))
       if (c.data.length < PAGE) break
     }
+    return out
   }
+  const idxChunk = async (ids: string[]) => {
+    const r = await db().from('mdl_phy_idx').select('phy_idx_id, phy_tbl_id, idx_nm, unq_yn, col_ids, idx_desc, ver_no').in('phy_tbl_id', ids).eq('del_yn', 'N').order('idx_nm').limit(10000)
+    if (r.error) throw r.error
+    return r.data as IdxRow[]
+  }
+  const [colRes, idxRes] = await Promise.all([Promise.all(chunks.map(colChunk)), Promise.all(chunks.map(idxChunk))])
+  const cols: Col[] = colRes.flat()
+  const idxRows: IdxRow[] = idxRes.flat()
   const by = new Map<string, Col[]>()
   for (const y of cols) by.set(y.phy_tbl_id, [...(by.get(y.phy_tbl_id) ?? []), y])
-  // 인덱스(sql/063) — 칼럼 이름은 그 테이블 활성 칼럼으로 해석, 삭제된 칼럼을 가리키거나 동기화로 PK 와 같은 구성이 되면 invalid(DDL 생략·화면 빨간 표시, why = 사유)
-  //  PK 와 같은 칼럼 목록의 인덱스는 Oracle·Tibero 에서 ORA-01408 로 실행이 실패하므로 생략(2026-10-20 검토 지적)
-  type IdxRow = { phy_idx_id: string; phy_tbl_id: string; idx_nm: string; unq_yn: 'Y' | 'N'; col_ids: string[]; idx_desc: string | null; ver_no: number }
-  const idxRows: IdxRow[] = []
-  for (let i = 0; i < tbls.length; i += TBL_CHUNK) {
-    const r = await db().from('mdl_phy_idx').select('phy_idx_id, phy_tbl_id, idx_nm, unq_yn, col_ids, idx_desc, ver_no').in('phy_tbl_id', tbls.slice(i, i + TBL_CHUNK).map((x) => x.phy_tbl_id)).eq('del_yn', 'N').order('idx_nm').limit(10000)
-    if (r.error) throw r.error
-    idxRows.push(...(r.data as IdxRow[]))
-  }
   const colNm = new Map(cols.map((c) => [c.phy_col_id, c]))
   const idxOf = (tblId: string) =>
     idxRows
