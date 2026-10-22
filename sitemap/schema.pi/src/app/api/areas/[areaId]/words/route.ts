@@ -12,13 +12,17 @@ const COLS = 'dic_id, dic_log_nm, dic_phy_nm, dic_eng_nm, dic_chn_nm, ent_clss_y
 
 export async function GET(req: Request, { params }: Ctx) {
   const { areaId } = await params
-  const auth = await requireAreaRole(areaId, 'STD_VIEW')
-  if (auth instanceof NextResponse) return auth
   const sp = new URL(req.url).searchParams
+  // 선택지 조회(속성 분류어·지정 대표도메인)는 승인대기 정보가 필요 없음 — pendingChg 생략, 일반 목록은 권한 확인과 병렬 실행
+  const pick = sp.get('attr') === 'Y' || sp.get('key') === 'Y'
+  const [auth, pd] = await Promise.all([
+    requireAreaRole(areaId, 'STD_VIEW'),
+    pick ? Promise.resolve({ pend: new Map() } as Awaited<ReturnType<typeof pendingChg>>) : pendingChg(areaId, 'DIC'),
+  ])
+  if (auth instanceof NextResponse) return auth
   const q = sp.get('q')?.trim()
   const sts = sp.get('sts')
   const se = sp.get('se')
-  const pd = await pendingChg(areaId, 'DIC')
   if ('error' in pd) return dbError(pd.error)
   const build = () => {
     let query = db().from('std_dic').select(COLS, { count: 'exact' }).eq('area_id', areaId).eq('del_yn', 'N').order('std_reg_dtm', { ascending: false }).order('dic_log_nm')
