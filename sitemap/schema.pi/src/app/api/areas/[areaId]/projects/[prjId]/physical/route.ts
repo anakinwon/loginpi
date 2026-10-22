@@ -85,15 +85,21 @@ export async function GET(req: Request, { params }: Ctx) {
     }
     const want = sp.get('dbms')
     if (want !== null && !isDbms(want)) return apiError('INVALID_INPUT', 400)
-    const prj = await db().from('mdl_prj').select('trgt_dbms_cd').eq('prj_id', prjId).eq('area_id', areaId).eq('del_yn', 'N').maybeSingle()
+    const exQ = (d: DbmsCd) => db().from('mdl_phy_mdl').select('phy_mdl_id').eq('area_id', areaId).eq('prj_id', prjId).eq('dbms_cd', d).eq('del_yn', 'N').maybeSingle()
+    // 서로 독립인 조회는 동시에(DBMS 지정 시 물리 모델 조회도 함께)
+    const [prj, ents, models, ex0] = await Promise.all([
+      db().from('mdl_prj').select('trgt_dbms_cd').eq('prj_id', prjId).eq('area_id', areaId).eq('del_yn', 'N').maybeSingle(),
+      prjEnts(areaId, prjId),
+      listPhy(areaId, prjId),
+      want !== null ? exQ(want as DbmsCd) : null,
+    ])
     if (prj.error) throw prj.error
     if (!prj.data) return apiError('NOT_FOUND', 404)
     const t = want ?? (prj.data as { trgt_dbms_cd: string }).trgt_dbms_cd
     const dbms: DbmsCd = isDbms(t) ? t : '0014'
-    const ents = await prjEnts(areaId, prjId)
     const pick = (sp.get('ent') ?? '').split(',').filter((x) => uuid.safeParse(x).success).slice(0, 500)
     // 기본 범위 = 작성완료이면서 이 DBMS 물리 모델에 아직 전환되지 않은 엔터티
-    const ex = await db().from('mdl_phy_mdl').select('phy_mdl_id').eq('area_id', areaId).eq('prj_id', prjId).eq('dbms_cd', dbms).eq('del_yn', 'N').maybeSingle()
+    const ex = ex0 ?? (await exQ(dbms))
     if (ex.error) throw ex.error
     const conv = new Set<string>()
     if (ex.data) {
@@ -106,7 +112,7 @@ export async function GET(req: Request, { params }: Ctx) {
     if (!plan) return apiError('NOT_FOUND', 404)
     return NextResponse.json({
       ok: true,
-      models: await listPhy(areaId, prjId),
+      models,
       preview: { dbms_cd: dbms, idntfr_ltr_cd: DBMS_PRFL[dbms].identCase.toUpperCase(), why: plan.why, issues: plan.issues, tbl_cnt: plan.tables.length, col_cnt: plan.tables.reduce((n, t) => n + t.cols.length, 0), fk_cnt: plan.fks.length, tables: plan.tables.slice(0, 50) },
       capped: plan.capped,
     })
