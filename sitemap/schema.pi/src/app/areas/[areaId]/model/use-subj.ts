@@ -17,11 +17,11 @@ export function useSubj(api: string, prjId: string) {
     setSubjIdRaw('')
     if (!prjId) return
     let live = true
-    piFetch(`${api}/subjects`)
+    piFetch(`${api}/subjects?prj_id=${prjId}`)
       .then((r) => r.json())
       .then((j) => {
         if (!live || !j.ok) return
-        const list: Subj[] = j.items.filter((s: { prj_id: string }) => s.prj_id === prjId)
+        const list: Subj[] = j.items
         let keep: string | null = null
         try {
           keep = window.localStorage.getItem(key)
