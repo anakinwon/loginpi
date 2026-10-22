@@ -80,11 +80,25 @@ export async function setLgc(areaId: string, prjId: string, entIds: string[], st
 export async function setPhy(areaId: string, prjId: string, mdlId: string, tblIds: string[], sts: Sts, uid: string): Promise<StageRes | null> {
   const p = await loadPhy(areaId, mdlId)
   if (!p || p.mdl.prj_id !== prjId) return null
-  const lg = await inChunks(p.tables.filter((t) => tblIds.includes(t.phy_tbl_id)).map((t) => t.ent_id), (q) => db().from('mdl_ent').select('ent_id, lgc_sts_cd').in('ent_id', q))
+  // 서로 의존하지 않는 엔터티 논리 상태·ERD 잠금·주제영역 조회는 동시에 실행
+  const entIds = p.tables.filter((t) => tblIds.includes(t.phy_tbl_id)).map((t) => t.ent_id)
+  const [lg, lock, subjOf] = await Promise.all([
+    inChunks(entIds, (q) => db().from('mdl_ent').select('ent_id, lgc_sts_cd').in('ent_id', q)),
+    dgmLock(areaId, prjId),
+    entSubj(entIds)
+  ])
   if (lg.error) throw lg.error
   const lgc = new Map((lg.data as { ent_id: string; lgc_sts_cd: string }[]).map((x) => [x.ent_id, x.lgc_sts_cd]))
-  const lock = await dgmLock(areaId, prjId)
-  const subjOf = await entSubj(p.tables.filter((t) => tblIds.includes(t.phy_tbl_id)).map((t) => t.ent_id))
+  // 남은 동기화 건수는 작성완료 대상 테이블(상태 변경·엔터티 작성완료·ERD 잠금 통과)만 루프 전에 한 번에 계산
+  const plan = new Map<string, number>()
+  if (sts === 'CMPTN') {
+    const targets = p.tables.filter((t) => tblIds.includes(t.phy_tbl_id) && t.phy_sts_cd !== sts && lgc.get(t.ent_id) === 'CMPTN' && !phyDgmWhy(sts, { ent_id: t.ent_id, subj_id: subjOf.get(t.ent_id) ?? '' }, lock).length)
+    const ns = await Promise.all(targets.map(async (t) => {
+      const sp = await syncPlan(areaId, prjId, p, 'sync', t.phy_tbl_id)
+      return sp ? sp.ops.length + sp.addFk.length + sp.delFk.length : 0
+    }))
+    targets.forEach((t, i) => plan.set(t.phy_tbl_id, ns[i]))
+  }
   const res: StageRes = { done: [], fail: [] }
   for (const id of tblIds) {
     const t = p.tables.find((x) => x.phy_tbl_id === id)
@@ -103,8 +117,7 @@ export async function setPhy(areaId: string, prjId: string, mdlId: string, tblId
         res.fail.push({ id, nm: t.tbl_nm, why: ['엔터티가 작성완료가 아닙니다(논리 모델에서 작성완료)'] })
         continue
       }
-      const sp = await syncPlan(areaId, prjId, p, 'sync', id)
-      const n = sp ? sp.ops.length + sp.addFk.length + sp.delFk.length : 0
+      const n = plan.get(id) ?? 0
       if (n) {
         res.fail.push({ id, nm: t.tbl_nm, why: [`논리 변경 ${n}건이 아직 반영되지 않았습니다 — '논리 변경 반영' 후 완료`] })
         continue
