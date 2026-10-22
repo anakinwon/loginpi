@@ -115,7 +115,9 @@ export default function Relations({ api, prjId, editor, entsKey, onSaved }: { ap
   }, [prjId])
 
   const rule = f.prnt_ent_id && f.chld_ent_id ? relError(f) : null
-  const ready = !!f.prnt_ent_id && !!f.chld_ent_id && !rule
+  // 중복 사전 확인(REL_DUP) : 로드된 목록에 같은 부모·자식·관계명 조합이 있으면 등록 막음(수정 중인 자기 자신 제외)
+  const dup = !!f.prnt_ent_id && !!f.chld_ent_id && rels.some((x) => x.rel_id !== edit?.rel_id && x.prnt_ent_id === f.prnt_ent_id && x.chld_ent_id === f.chld_ent_id && (x.rel_nm ?? '') === f.rel_nm)
+  const ready = !!f.prnt_ent_id && !!f.chld_ent_id && !rule && !dup
   const nm = (id: string) => opts.find((o) => o.ent_id === id)?.ent_log_nm ?? '?'
 
   const save = async (e: React.FormEvent) => {
@@ -126,7 +128,7 @@ export default function Relations({ api, prjId, editor, entsKey, onSaved }: { ap
       ? await piFetch(`${api}/relations/${edit.rel_id}`, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ...body, ver_no: edit.ver_no }) })
       : await piFetch(`${api}/relations`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) })
     const j = await r.json()
-    setMsg(j.ok ? (edit ? '관계를 수정했습니다' : '관계를 등록했습니다') : j.message)
+    setMsg(j.ok ? (edit ? '관계를 수정했습니다' : '관계를 등록했습니다') : j.message ?? (r.status === 409 ? '같은 부모·자식·관계명의 관계가 이미 있습니다' : '저장하지 못했습니다'))
     if (j.ok) {
       const relId = edit?.rel_id ?? j.item?.rel_id
       setF(F0)
@@ -243,6 +245,7 @@ export default function Relations({ api, prjId, editor, entsKey, onSaved }: { ap
             <span className="font-mono text-[#1f3a68]">
               {f.prnt_ent_id && f.chld_ent_id ? `${nm(f.prnt_ent_id)} ${relNotation(f)} ${nm(f.chld_ent_id)}` : ''}
               {rule && <span className="ml-2 font-sans text-red-700">{RULE_MSG[rule] ?? rule}</span>}
+              {dup && <span className="ml-2 font-sans text-red-700">같은 부모·자식·관계명의 관계가 이미 있습니다</span>}
             </span>
             <span className="flex gap-2">
               {edit && (
