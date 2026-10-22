@@ -27,11 +27,21 @@ export async function GET(req: Request, { params }: Ctx) {
   if (nm.length > 100) return NextResponse.json({ ok: true, fill: {}, abbr_alts: [], ents: [], subjects: [], src: [] })
   try {
     const isPrj = /^[0-9a-f-]{36}$/i.test(prj)
-    // 업종 추천(프로젝트 업종 지정 시) — 프로젝트 기존 주제영역 제외
-    const ind = isPrj ? await db().from('mdl_prj').select('indstry_cd, tbl_pfx_txt, trgt_dbms_cd').eq('prj_id', prj).eq('area_id', areaId).eq('del_yn', 'N').maybeSingle() : null
+    // 약어 3자 : 이미 쓰는 약어(아래에서 제외)
+    let uq = db().from('mdl_subj').select('subj_abbr_nm').eq('area_id', areaId).eq('del_yn', 'N')
+    if (isPrj) uq = uq.eq('prj_id', prj)
+    // 서로 의존하지 않는 조회는 동시에 시작(직렬 왕복 단축) — nm 이 없으면 표준단어·약어 조회 생략
+    const [ind, dict, mine, o, used] = await Promise.all([
+      // 업종 추천(프로젝트 업종 지정 시) — 프로젝트 기존 주제영역 제외
+      isPrj ? db().from('mdl_prj').select('indstry_cd, tbl_pfx_txt, trgt_dbms_cd').eq('prj_id', prj).eq('area_id', areaId).eq('del_yn', 'N').maybeSingle() : Promise.resolve(null),
+      areaDict<EntWord>(areaId, 'dic_id, dic_log_nm, dic_phy_nm, attr_clss_yn, ent_clss_yn, forbid_yn, tbl_sfx_txt'),
+      // ① 이 분류체계 ② 다른 분류체계 표준단어
+      nm ? db().from('std_dic').select('dic_eng_nm, dic_desc').eq('area_id', areaId).eq('dic_log_nm', nm).eq('del_yn', 'N').eq('std_sts_cd', 'CNFM').maybeSingle() : Promise.resolve(null),
+      nm ? db().from('std_dic').select('dic_phy_nm, dic_eng_nm, dic_desc, std_area!inner(area_nm, del_yn)').eq('dic_log_nm', nm).neq('area_id', areaId).eq('del_yn', 'N').eq('std_sts_cd', 'CNFM').eq('std_area.del_yn', 'N').limit(20) : Promise.resolve(null),
+      nm ? uq : Promise.resolve(null),
+    ])
     if (ind?.error) throw ind.error
     const tmpl = isIndstry(ind?.data?.indstry_cd) ? TEMPLATES[ind.data.indstry_cd] : null
-    const dict = await areaDict<EntWord>(areaId, 'dic_id, dic_log_nm, dic_phy_nm, attr_clss_yn, ent_clss_yn, forbid_yn, tbl_sfx_txt')
     let subjects: SubjRec[] = []
     if (tmpl) {
       const ex = await db().from('mdl_subj').select('subj_nm, subj_abbr_nm').eq('prj_id', prj).eq('del_yn', 'N')
@@ -45,17 +55,15 @@ export async function GET(req: Request, { params }: Ctx) {
     const src: string[] = []
     let eng = ''
     let desc = ''
-    // ① 이 분류체계 ② 다른 분류체계 표준단어
-    const mine = await db().from('std_dic').select('dic_eng_nm, dic_desc').eq('area_id', areaId).eq('dic_log_nm', nm).eq('del_yn', 'N').eq('std_sts_cd', 'CNFM').maybeSingle()
-    if (mine.error) throw mine.error
-    if (mine.data?.dic_eng_nm) {
+    // ① 이 분류체계 ② 다른 분류체계 표준단어(위에서 동시 조회)
+    if (mine?.error) throw mine.error
+    if (mine?.data?.dic_eng_nm) {
       eng = mine.data.dic_eng_nm
       desc = mine.data.dic_desc ?? ''
       src.push('표준단어(이 분류체계)')
     } else {
-      const o = await db().from('std_dic').select('dic_phy_nm, dic_eng_nm, dic_desc, std_area!inner(area_nm, del_yn)').eq('dic_log_nm', nm).neq('area_id', areaId).eq('del_yn', 'N').eq('std_sts_cd', 'CNFM').eq('std_area.del_yn', 'N').limit(20)
-      if (o.error) throw o.error
-      const std = pickStd(o.data as unknown as { dic_phy_nm: string; dic_eng_nm: string | null; dic_desc: string | null; std_area: { area_nm: string } }[])
+      if (o?.error) throw o.error
+      const std = pickStd((o?.data ?? []) as unknown as { dic_phy_nm: string; dic_eng_nm: string | null; dic_desc: string | null; std_area: { area_nm: string } }[])
       if (std?.dic_eng_nm) {
         eng = std.dic_eng_nm
         desc = std.dic_desc ?? ''
@@ -71,12 +79,9 @@ export async function GET(req: Request, { params }: Ctx) {
         src.push(`위키백과 '${w.title}'`)
       }
     }
-    // 약어 3자 : 이미 쓰는 약어 제외
-    let uq = db().from('mdl_subj').select('subj_abbr_nm').eq('area_id', areaId).eq('del_yn', 'N')
-    if (isPrj) uq = uq.eq('prj_id', prj)
-    const used = await uq
-    if (used.error) throw used.error
-    const taken = new Set(used.data.map((x) => x.subj_abbr_nm as string))
+    // 약어 3자 : 이미 쓰는 약어 제외(위에서 동시 조회)
+    if (used?.error) throw used.error
+    const taken = new Set((used?.data ?? []).map((x) => x.subj_abbr_nm as string))
     const abbrs = subjAbbrCands(eng).filter((a) => !taken.has(a))
     const abbr = abbrs[0] ?? ''
     if (abbr) src.push(`약어 : ${eng} → ${abbr}`)
