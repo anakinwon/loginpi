@@ -11,7 +11,8 @@ import { apiError, audit, dbError, errMsg, parseBody, requireAreaRole, UQ, uqHit
 import { db } from '@/lib/db'
 import { inChunks } from '@/lib/paging'
 import { kstDtm } from '@/lib/bulk'
-import { convertEntities, delPhy, listPhy, loadPhy, phyDdlInput, phyPlan, syncPhy, syncPlan } from '@/lib/model-phy'
+import { convertEntities, delPhy, listPhy, loadPhy, phyDdlInput, phyPlan, phyPlanOf, syncPhy, syncPlan, tpMapOf } from '@/lib/model-phy'
+import { loadLogical } from '@/lib/model-logical'
 import { alterDdl } from '@/lib/modelpi/phy-sync'
 import { autoIncCol, genDdl, phyDocTables } from '@/lib/modelpi/ddl'
 import { docCsv } from '@/lib/modelpi/docs'
@@ -89,11 +90,14 @@ export async function GET(req: Request, { params }: Ctx) {
     // 전환 테이블도 물리 모델 조인(프로젝트·DBMS)으로 같은 묶음에서 조회 — DBMS 미지정이면 프로젝트 전체를 받아 아래에서 거름
     let tbq = db().from('mdl_phy_tbl').select('ent_id, mdl_phy_mdl!inner(dbms_cd)').eq('del_yn', 'N').eq('mdl_phy_mdl.area_id', areaId).eq('mdl_phy_mdl.prj_id', prjId).eq('mdl_phy_mdl.del_yn', 'N')
     if (want !== null) tbq = tbq.eq('mdl_phy_mdl.dbms_cd', want)
-    const [prj, ents, tb, models] = await Promise.all([
+    // 논리 로드·타입 매핑(dbms 지정 시)도 같은 묶음에서 시작 — scope 는 결과를 거르는 데만 쓰임
+    const [prj, ents, tb, models, lg, tp0] = await Promise.all([
       db().from('mdl_prj').select('trgt_dbms_cd').eq('prj_id', prjId).eq('area_id', areaId).eq('del_yn', 'N').maybeSingle(),
       prjEnts(areaId, prjId),
       tbq.limit(want !== null ? 5000 : 20000),
       listPhy(areaId, prjId),
+      loadLogical(areaId, prjId),
+      want !== null ? tpMapOf(want as DbmsCd) : Promise.resolve(null),
     ])
     if (prj.error) throw prj.error
     if (!prj.data) return apiError('NOT_FOUND', 404)
@@ -107,7 +111,9 @@ export async function GET(req: Request, { params }: Ctx) {
       if ([x.mdl_phy_mdl].flat()[0]?.dbms_cd === dbms) conv.add(x.ent_id)
     }
     const scope = new Set(pick.length ? pick : ents.filter((e) => e.lgc_sts_cd === 'CMPTN' && !conv.has(e.ent_id)).map((e) => e.ent_id))
-    const plan = await phyPlan(areaId, prjId, dbms, scope)
+    // dbms 미지정이면 trgt_dbms_cd 확정 후 타입 매핑만 조회
+    const tp = tp0 ?? (await tpMapOf(dbms))
+    const plan = phyPlanOf(lg, tp, dbms, scope)
     if (!plan) return apiError('NOT_FOUND', 404)
     return NextResponse.json({
       ok: true,
