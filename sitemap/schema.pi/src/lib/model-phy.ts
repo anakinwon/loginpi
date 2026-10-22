@@ -15,12 +15,15 @@ const TBL_CHUNK = 100 // in() URL 길이 제한 대응
 
 // 변환 계획 — scope = 엔터티 ID 집합(마스터 지시 2026-10-17 : 엔터티별 작성완료 → 선택 전환), null = 프로젝트 전체. 관문도 범위 안에서만 판정
 export async function phyPlan(areaId: string, prjId: string, dbms: DbmsCd, scope: Set<string> | null = null) {
-  const m0 = await loadLogical(areaId, prjId)
+  // 타입 매핑은 dbms 만 있으면 되므로 논리 로드와 동시에 조회
+  const [m0, tp] = await Promise.all([
+    loadLogical(areaId, prjId),
+    db().from('std_tp_map').select('lgc_tp_cd, phy_tp_nm, len_use_yn').eq('dbms_cd', dbms).eq('del_yn', 'N').order('phy_tp_nm'),
+  ])
   if (!m0) return null
   const chk = checkLogical(m0.ents, m0.rels, { dbms })
   const m = { ...m0, ents: scope ? m0.ents.filter((e) => scope.has(e.ent_id)) : m0.ents }
   const why = scopeWhy(chk, m0.rels, new Set(m.ents.map((e) => e.ent_id)))
-  const tp = await db().from('std_tp_map').select('lgc_tp_cd, phy_tp_nm, len_use_yn').eq('dbms_cd', dbms).eq('del_yn', 'N').order('phy_tp_nm')
   if (tp.error) throw tp.error
   const conv = toPhysical(
     m.ents.map((e) => ({ ent_id: e.ent_id, tbl_phy_nm: e.tbl_phy_nm, ent_desc: e.ent_desc, attrs: e.attrs.map((a) => ({ ...a, dom: a.dom ?? null })) })),
