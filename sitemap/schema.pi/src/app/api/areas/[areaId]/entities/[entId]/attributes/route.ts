@@ -16,6 +16,9 @@ const schema = z.object({
   src_attr_id: z.string().uuid().nullable().optional(), // 상속 원천 = 관계 부모의 주식별자(역할명 상속, sql/027)
   attr_desc: z.string().trim().max(4000).nullable().optional(),
 })
+// 순번 유일 인덱스 충돌 여부 — 23505 이면서 메시지·상세에 순번 컬럼(attr_seq/pk_seq)이 나올 때만
+const isSeqConflict = (e: { code?: string; message?: string; details?: string }) =>
+  e.code === '23505' && /attr_seq|pk_seq/.test(`${e.message ?? ''} ${e.details ?? ''}`)
 
 export async function GET(_req: Request, { params }: Ctx) {
   const { areaId, entId } = await params
@@ -70,8 +73,19 @@ export async function POST(req: Request, { params }: Ctx) {
       regr_id: uid,
       modr_id: uid,
     }
-    const { data, error } = await db().from('mdl_attr').insert(row).select('attr_id, ver_no').single()
-    if (error) return dbError(error, 'ATTR_DUP')
+    let { data, error } = await db().from('mdl_attr').insert(row).select('attr_id, ver_no').single()
+    // 동시 등록으로 순번이 겹치면 순번을 다시 계산해 1회 재시도
+    if (error && isSeqConflict(error)) {
+      const seq2 = await nextSeq(entId)
+      row.attr_seq = seq2.attr
+      row.pk_seq = pk ? seq2.pk : null
+      const retry = await db().from('mdl_attr').insert(row).select('attr_id, ver_no').single()
+      data = retry.data
+      error = retry.error
+    }
+    // 순번 충돌이 남아 있으면 일반 오류, 용어 중복일 때만 ATTR_DUP
+    if (error) return isSeqConflict(error) ? dbError(error) : dbError(error, 'ATTR_DUP')
+    if (!data) return dbError({ message: 'insert returned no row' })
     await audit({ area_id: areaId, tgt_tp_cd: 'ATTR', tgt_id: data.attr_id, act_cd: 'INS', aftr_val: { ...row, term_log_nm: t.data.term_log_nm, ent_log_nm: ent.ent_log_nm }, usr_id: uid })
     return NextResponse.json({ ok: true, item: { ...data, term_log_nm: t.data.term_log_nm } }, { status: 201 })
   } catch (e) {
