@@ -48,7 +48,8 @@ const SIZE = 20
 type Need = { src_attr_id: string; term_id: string; term_log_nm: string; reason: 'SELF' | 'OTHER_REL' | 'OWN_PK' }
 const NEED_NM = { SELF: '자기참조 — 자기 식별자와 같은 용어 불가, "상위~" 역할 용어로 상속', OTHER_REL: '같은 용어가 이미 다른 관계로 상속됨 — 역할 용어(예 발신·수신)로 상속', OWN_PK: '자식이 같은 용어를 자기 주식별자로 씀 — 식별 관계로 바꾸거나(권장) 필요하면 역할 용어로 상속(선택)' } as const
 
-export default function Relations({ api, prjId, editor, entsKey, onSaved }: { api: string; prjId: string; editor: boolean; entsKey: unknown; onSaved?: () => void }) {
+// locked = 선택 주제영역 작성완료(sql/031 MLK01 편집 잠금) → 등록·저장 비활성, 완료 취소 후 편집 안내
+export default function Relations({ api, prjId, editor, entsKey, onSaved, locked = false }: { api: string; prjId: string; editor: boolean; entsKey: unknown; onSaved?: () => void; locked?: boolean }) {
   const areaId = api.slice(api.lastIndexOf('/') + 1) // api = /api/areas/{areaId}
   // 역할명 상속 패널(S1 L2) : FK 계획에서 같은 용어로 상속할 수 없는 식별자 → 역할 용어 선택 후 적용
   const [roleNeed, setRoleNeed] = useState<{ relId: string; title: string; items: Need[] } | null>(null)
@@ -117,7 +118,7 @@ export default function Relations({ api, prjId, editor, entsKey, onSaved }: { ap
   const rule = f.prnt_ent_id && f.chld_ent_id ? relError(f) : null
   // 중복 사전 확인(REL_DUP) : 로드된 목록에 같은 부모·자식·관계명 조합이 있으면 등록 막음(수정 중인 자기 자신 제외)
   const dup = !!f.prnt_ent_id && !!f.chld_ent_id && rels.some((x) => x.rel_id !== edit?.rel_id && x.prnt_ent_id === f.prnt_ent_id && x.chld_ent_id === f.chld_ent_id && (x.rel_nm ?? '') === f.rel_nm)
-  const ready = !!f.prnt_ent_id && !!f.chld_ent_id && !rule && !dup
+  const ready = !!f.prnt_ent_id && !!f.chld_ent_id && !rule && !dup && !locked
   const nm = (id: string) => opts.find((o) => o.ent_id === id)?.ent_log_nm ?? '?'
 
   const save = async (e: React.FormEvent) => {
@@ -128,7 +129,7 @@ export default function Relations({ api, prjId, editor, entsKey, onSaved }: { ap
       ? await piFetch(`${api}/relations/${edit.rel_id}`, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ...body, ver_no: edit.ver_no }) })
       : await piFetch(`${api}/relations`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) })
     const j = await r.json()
-    setMsg(j.ok ? (edit ? '관계를 수정했습니다' : '관계를 등록했습니다') : j.message ?? (r.status === 409 ? '같은 부모·자식·관계명의 관계가 이미 있습니다' : '저장하지 못했습니다'))
+    setMsg(j.ok ? (edit ? '관계를 수정했습니다' : '관계를 등록했습니다') : j.code === 'SUBJ_LOCKED' ? '작성완료 주제영역은 편집할 수 없습니다 — 완료 취소 후 편집하십시오' : j.message ?? (r.status === 409 ? '같은 부모·자식·관계명의 관계가 이미 있습니다' : '저장하지 못했습니다'))
     if (j.ok) {
       const relId = edit?.rel_id ?? j.item?.rel_id
       setF(F0)
@@ -246,6 +247,7 @@ export default function Relations({ api, prjId, editor, entsKey, onSaved }: { ap
               {f.prnt_ent_id && f.chld_ent_id ? `${nm(f.prnt_ent_id)} ${relNotation(f)} ${nm(f.chld_ent_id)}` : ''}
               {rule && <span className="ml-2 font-sans text-red-700">{RULE_MSG[rule] ?? rule}</span>}
               {dup && <span className="ml-2 font-sans text-red-700">같은 부모·자식·관계명의 관계가 이미 있습니다</span>}
+              {locked && <span className="ml-2 font-sans text-red-700">작성완료 주제영역입니다 — 완료 취소 후 편집하십시오</span>}
             </span>
             <span className="flex gap-2">
               {edit && (
