@@ -9,6 +9,8 @@ import { apiError, audit, dbError, likeQ, parseBody, requireAreaRole } from '@/l
 
 type Ctx = { params: Promise<{ areaId: string }> }
 const COLS = 'dic_id, dic_log_nm, dic_phy_nm, dic_eng_nm, dic_chn_nm, ent_clss_yn, attr_clss_yn, forbid_yn, dic_desc, key_dom_yn, tbl_sfx_txt, std_se_cd, std_sts_cd, ver_no, mod_dtm, regr_id, std_reg_dtm'
+// 선택지 조회(속성 분류어·지정 대표도메인)용 최소 칼럼
+const PICK_COLS = 'dic_id, dic_log_nm, dic_phy_nm, dic_eng_nm, key_dom_yn, std_sts_cd'
 
 export async function GET(req: Request, { params }: Ctx) {
   const { areaId } = await params
@@ -25,7 +27,8 @@ export async function GET(req: Request, { params }: Ctx) {
   const se = sp.get('se')
   if ('error' in pd) return dbError(pd.error)
   const build = () => {
-    let query = db().from('std_dic').select(COLS, { count: 'exact' }).eq('area_id', areaId).eq('del_yn', 'N').order('std_reg_dtm', { ascending: false }).order('dic_log_nm')
+    // 선택지 조회는 필요한 칼럼만, count 없이 조회(응답 경량화)
+    let query = db().from('std_dic').select(pick ? PICK_COLS : COLS, pick ? undefined : { count: 'exact' }).eq('area_id', areaId).eq('del_yn', 'N').order('std_reg_dtm', { ascending: false }).order('dic_log_nm')
     if (q) {
       const p = likeQ(q)
       query = query.or(`dic_log_nm.ilike.${p},dic_phy_nm.ilike.${p}`)
