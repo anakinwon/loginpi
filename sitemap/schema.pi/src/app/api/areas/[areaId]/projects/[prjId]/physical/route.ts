@@ -86,10 +86,13 @@ export async function GET(req: Request, { params }: Ctx) {
     const want = sp.get('dbms')
     if (want !== null && !isDbms(want)) return apiError('INVALID_INPUT', 400)
     // 서로 독립인 조회는 동시에 — 물리 모델은 DBMS 결정 전이므로 프로젝트 전체를 받아 아래에서 고름(프로젝트 × DBMS 유니크)
-    const [prj, ents, ex, models] = await Promise.all([
+    // 전환 테이블도 물리 모델 조인(프로젝트·DBMS)으로 같은 묶음에서 조회 — DBMS 미지정이면 프로젝트 전체를 받아 아래에서 거름
+    let tbq = db().from('mdl_phy_tbl').select('ent_id, mdl_phy_mdl!inner(dbms_cd)').eq('del_yn', 'N').eq('mdl_phy_mdl.area_id', areaId).eq('mdl_phy_mdl.prj_id', prjId).eq('mdl_phy_mdl.del_yn', 'N')
+    if (want !== null) tbq = tbq.eq('mdl_phy_mdl.dbms_cd', want)
+    const [prj, ents, tb, models] = await Promise.all([
       db().from('mdl_prj').select('trgt_dbms_cd').eq('prj_id', prjId).eq('area_id', areaId).eq('del_yn', 'N').maybeSingle(),
       prjEnts(areaId, prjId),
-      db().from('mdl_phy_mdl').select('phy_mdl_id, dbms_cd').eq('area_id', areaId).eq('prj_id', prjId).eq('del_yn', 'N').limit(100),
+      tbq.limit(want !== null ? 5000 : 20000),
       listPhy(areaId, prjId),
     ])
     if (prj.error) throw prj.error
@@ -98,13 +101,10 @@ export async function GET(req: Request, { params }: Ctx) {
     const dbms: DbmsCd = isDbms(t) ? t : '0014'
     const pick = (sp.get('ent') ?? '').split(',').filter((x) => uuid.safeParse(x).success).slice(0, 500)
     // 기본 범위 = 작성완료이면서 이 DBMS 물리 모델에 아직 전환되지 않은 엔터티
-    if (ex.error) throw ex.error
-    const exm = ((ex.data ?? []) as { phy_mdl_id: string; dbms_cd: string }[]).find((x) => x.dbms_cd === dbms)
+    if (tb.error) throw tb.error
     const conv = new Set<string>()
-    if (exm) {
-      const tb = await db().from('mdl_phy_tbl').select('ent_id').eq('phy_mdl_id', exm.phy_mdl_id).eq('del_yn', 'N').limit(5000)
-      if (tb.error) throw tb.error
-      for (const x of tb.data as { ent_id: string }[]) conv.add(x.ent_id)
+    for (const x of (tb.data ?? []) as unknown as { ent_id: string; mdl_phy_mdl: { dbms_cd: string } | { dbms_cd: string }[] }[]) {
+      if ([x.mdl_phy_mdl].flat()[0]?.dbms_cd === dbms) conv.add(x.ent_id)
     }
     const scope = new Set(pick.length ? pick : ents.filter((e) => e.lgc_sts_cd === 'CMPTN' && !conv.has(e.ent_id)).map((e) => e.ent_id))
     const plan = await phyPlan(areaId, prjId, dbms, scope)
