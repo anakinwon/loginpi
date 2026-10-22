@@ -159,27 +159,29 @@ export async function POST(req: Request, { params }: Ctx) {
       const nm = new Map(ents.map((e) => [e.ent_id, e.ent_log_nm]))
       return NextResponse.json({ ok: false, code: 'PHY_NO_REL', message: errMsg('PHY_NO_REL'), why: noRel.map((id) => `${nm.get(id)} : 관계 없음`), exc: auth.role === 'DA' || auth.role === 'SYS' }, { status: 409 })
     }
-    const plan = await phyPlan(areaId, prjId, dbms, new Set(b.ent_ids))
+    const scope = new Set(b.ent_ids)
+    const plan = await phyPlan(areaId, prjId, dbms, scope)
     if (!plan) return apiError('NOT_FOUND', 404)
     if (plan.why.length) return NextResponse.json({ ok: false, code: 'PHY_GATE', message: errMsg('PHY_GATE'), why: plan.why }, { status: 409 })
     if (plan.issues.length) return NextResponse.json({ ok: false, code: 'PHY_ISSUES', message: errMsg('PHY_ISSUES'), issues: plan.issues }, { status: 409 })
     if (plan.capped) return apiError('INVALID_INPUT', 400) // 조회 상한을 넘은 모델은 일부만 전환되므로 거부
     const ltr = b.idntfr_ltr_cd ?? (DBMS_PRFL[dbms].identCase === 'lower' ? 'LOWER' : 'UPPER')
-    const r = await convertEntities(areaId, prjId, { dbms, ltr, desc: b.phy_mdl_desc ?? null }, b.ent_ids, auth.user.usr_id)
+    const r = await convertEntities(areaId, prjId, { dbms, ltr, desc: b.phy_mdl_desc ?? null }, b.ent_ids, auth.user.usr_id, { plan, scope })
     if (!r) return apiError('NOT_FOUND', 404)
     if (!r.tbl) return apiError('NO_CHANGE', 400) // 선택 엔터티가 모두 이미 전환됨
     // 부모를 나중에 전환해 기존 자식 테이블에 FK 가 생겼으면 그 자식 테이블만 동기화(FK 칼럼 + 그 테이블에 쌓인 다른 논리 변경도 함께) — 물리 작성중·논리 작성완료 테이블만(syncPlan 범위)
     //  실패해도 전환은 이미 저장됐으므로 오류만 기록하고 성공 응답(화면 위쪽 동기화 안내로 재시도)
     let fkSync = 0
     try {
-      for (const ent of r.fkChild) {
+      // 자식 테이블 묶음을 loadPhy·syncPlan·syncPhy 각 1회로 처리(자식마다 직렬 재조회하지 않음)
+      if (r.fkChild.length) {
         const p = await loadPhy(areaId, r.phy_mdl_id!)
-        const t = p?.tables.find((x) => x.ent_id === ent)
-        if (!p || !t) continue
-        const s = await syncPlan(areaId, prjId, p, 'sync', t.phy_tbl_id)
-        if (!s || s.why.length || s.issues.length || s.capped || !(s.ops.length || s.addFk.length || s.delFk.length)) continue
-        const x = await syncPhy(areaId, r.phy_mdl_id!, p.mdl.ver_no, s, auth.user.usr_id)
-        if (x !== 'VERSION_CONFLICT') fkSync += x.ops
+        const ids = p ? p.tables.filter((x) => r.fkChild.includes(x.ent_id)).map((x) => x.phy_tbl_id) : []
+        const s = p && ids.length ? await syncPlan(areaId, prjId, p, 'sync', ids) : null
+        if (p && s && !s.why.length && !s.issues.length && !s.capped && (s.ops.length || s.addFk.length || s.delFk.length)) {
+          const x = await syncPhy(areaId, r.phy_mdl_id!, p.mdl.ver_no, s, auth.user.usr_id)
+          if (x !== 'VERSION_CONFLICT') fkSync += x.ops
+        }
       }
     } catch (e) {
       console.error('[phy] 자식 테이블 동기화 실패', e)
