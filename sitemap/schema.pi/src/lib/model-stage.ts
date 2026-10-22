@@ -19,15 +19,18 @@ export interface EntStage {
 }
 
 export async function stageInfo(areaId: string, prjId: string) {
-  const m = await loadLogical(areaId, prjId)
+  // 서로 의존하지 않는 논리 모델·엔터티 상태·물리 모델 조회는 동시에 실행(mdl_phy_tbl 만 phy_mdl_id 받은 뒤)
+  const [m, st, pm] = await Promise.all([
+    loadLogical(areaId, prjId),
+    db().from('mdl_ent').select('ent_id, lgc_sts_cd').eq('prj_id', prjId).eq('del_yn', 'N').limit(5000),
+    db().from('mdl_phy_mdl').select('phy_mdl_id, dbms_cd, ver_no').eq('area_id', areaId).eq('prj_id', prjId).eq('del_yn', 'N').order('reg_dtm')
+  ])
   if (!m) return null
-  const st = await db().from('mdl_ent').select('ent_id, lgc_sts_cd').eq('prj_id', prjId).eq('del_yn', 'N').limit(5000)
   if (st.error) throw st.error
+  if (pm.error) throw pm.error
   const sts = new Map((st.data as { ent_id: string; lgc_sts_cd: Sts }[]).map((x) => [x.ent_id, x.lgc_sts_cd]))
   const chk = checkLogical(m.ents, m.rels, { dbms: (m.prj as { trgt_dbms_cd: string }).trgt_dbms_cd })
   const ents: EntStage[] = m.ents.map((e) => ({ ent_id: e.ent_id, ent_log_nm: e.ent_log_nm, tbl_phy_nm: e.tbl_phy_nm, subj_id: e.subj_id, subj_nm: e.subj_nm, lgc_sts_cd: sts.get(e.ent_id) ?? 'WRT', why: scopeWhy(chk, m.rels, new Set([e.ent_id])) }))
-  const pm = await db().from('mdl_phy_mdl').select('phy_mdl_id, dbms_cd, ver_no').eq('area_id', areaId).eq('prj_id', prjId).eq('del_yn', 'N').order('reg_dtm')
-  if (pm.error) throw pm.error
   const ids = (pm.data as { phy_mdl_id: string }[]).map((x) => x.phy_mdl_id)
   const tb = await inChunks(ids, (p) => db().from('mdl_phy_tbl').select('phy_tbl_id, phy_mdl_id, ent_id, tbl_nm, phy_sts_cd').in('phy_mdl_id', p).eq('del_yn', 'N').limit(5000))
   if (tb.error) throw tb.error
