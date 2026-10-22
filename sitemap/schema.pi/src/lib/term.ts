@@ -10,8 +10,28 @@ export const termExtShape = { alw_val_txt: opt(4000), disp_fmt_txt: opt(200), ad
 
 const WORD_COLS = 'dic_id, dic_log_nm, dic_phy_nm, attr_clss_yn, forbid_yn'
 
-// 확정된 활성 단어 전체(분해 사전) — 1,000행씩 나눠 읽음(PostgREST 최대 행 수 제한 : 행안부 3,280건이 1,000건으로 잘리던 결함 수정 2026-10-16)
+// 분해 사전 단기 캐시 — 입력마다 같은 사전을 수천 행씩 다시 읽지 않도록 분류체계·칸 조합별로 짧게 보관(진행 중 조회도 공유)
+const DICT_TTL = 30_000
+const dictCache = new Map<string, { at: number; p: Promise<unknown[]> }>()
+
+// 확정된 활성 단어 전체(분해 사전) — 30초 캐시 후 원본 조회, 호출부 변경에 대비해 복사본 반환
 export async function areaDict<T extends DicWord = DicWord>(areaId: string, cols: string = WORD_COLS): Promise<T[]> {
+  const key = `${areaId}|${cols}`
+  const hit = dictCache.get(key)
+  if (hit && Date.now() - hit.at < DICT_TTL) return [...(await hit.p)] as T[]
+  const p = loadAreaDict<T>(areaId, cols)
+  dictCache.set(key, { at: Date.now(), p })
+  try {
+    return [...(await p)]
+  } catch (e) {
+    // 실패한 조회는 캐시에 남기지 않음
+    if (dictCache.get(key)?.p === p) dictCache.delete(key)
+    throw e
+  }
+}
+
+// 1,000행씩 나눠 읽음(PostgREST 최대 행 수 제한 : 행안부 3,280건이 1,000건으로 잘리던 결함 수정 2026-10-16)
+async function loadAreaDict<T extends DicWord>(areaId: string, cols: string): Promise<T[]> {
   const out: T[] = []
   for (let from = 0; ; from += 1000) {
     const { data, error } = await db().from('std_dic').select(cols).eq('area_id', areaId).eq('del_yn', 'N').eq('std_sts_cd', 'CNFM').order('dic_id').range(from, from + 999)
