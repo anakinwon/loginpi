@@ -137,11 +137,15 @@ export async function phyDdlInput(areaId: string, prjId: string, p: NonNullable<
 
 // 동기화 계획(S5) — 저장 모델 vs 현재 논리 변환
 // 범위(sync) = 작성중 테이블 중 엔터티가 작성완료(또는 논리 삭제)인 것 — 논리 편집 중·물리 작성완료 테이블은 건드리지 않음. all = 전환된 테이블 전체(차이 보기), only = 테이블 1개
-export async function syncPlan(areaId: string, prjId: string, p: NonNullable<Awaited<ReturnType<typeof loadPhy>>>, mode: 'sync' | 'all' = 'sync', only: string | null = null) {
+export async function syncPlan(areaId: string, prjId: string, p: NonNullable<Awaited<ReturnType<typeof loadPhy>>>, mode: 'sync' | 'all' = 'sync', only: string | string[] | null = null) {
   const info = await entInfoOf(p.tables.map((t) => t.ent_id))
   let prev = p.tables
   if (mode === 'sync') prev = prev.filter((t) => t.phy_sts_cd === 'WRT' && (info.get(t.ent_id)?.del_yn === 'Y' || info.get(t.ent_id)?.lgc_sts_cd === 'CMPTN'))
-  if (only) prev = prev.filter((t) => t.phy_tbl_id === only)
+  if (only) {
+    // only = 테이블 1개 또는 여러 개(전환 후 FK 자식 테이블 묶음 동기화)
+    const o = new Set([only].flat())
+    prev = prev.filter((t) => o.has(t.phy_tbl_id))
+  }
   const prevEnts = new Set(prev.map((t) => t.ent_id))
   // FK 는 전환된 엔터티 전체로 계산(범위 밖 부모를 가리키는 FK 를 삭제로 오판하지 않게), 테이블·칼럼 변경은 범위 안만
   const plan = await phyPlan(areaId, prjId, p.mdl.dbms_cd as DbmsCd, new Set(p.tables.map((t) => t.ent_id)))
@@ -181,7 +185,8 @@ function renumber(fks: { rel_id: string; fk_nm: string }[], taken: Set<string>) 
 
 // 엔터티 선택 전환(마스터 지시) — 물리 모델(프로젝트 × DBMS)이 없으면 만들고, 선택 엔터티(작성완료·미전환)의 테이블·칼럼·FK 추가
 // FK 는 이미 전환된 엔터티와의 관계 포함, 단 자식 테이블이 작성완료(잠금)면 건너뜀(완료 취소 후 동기화로 추가)
-export async function convertEntities(areaId: string, prjId: string, o: { dbms: DbmsCd; ltr: 'UPPER' | 'LOWER'; desc: string | null }, entIds: string[], uid: string) {
+// pre = 호출 측이 이미 계산한 변환 계획과 그 범위 — 범위가 (기존 + 추가)를 모두 덮으면 phyPlan 재실행 없이 재사용
+export async function convertEntities(areaId: string, prjId: string, o: { dbms: DbmsCd; ltr: 'UPPER' | 'LOWER'; desc: string | null }, entIds: string[], uid: string, pre?: { plan: NonNullable<Awaited<ReturnType<typeof phyPlan>>>; scope: Set<string> }) {
   const sys = { regr_id: uid, modr_id: uid }
   const ex = await db().from('mdl_phy_mdl').select('phy_mdl_id').eq('area_id', areaId).eq('prj_id', prjId).eq('dbms_cd', o.dbms).eq('del_yn', 'N').maybeSingle()
   if (ex.error) throw ex.error
@@ -191,7 +196,7 @@ export async function convertEntities(areaId: string, prjId: string, o: { dbms: 
   const have = new Set(p0?.tables.map((t) => t.ent_id) ?? [])
   const add = entIds.filter((e) => !have.has(e))
   if (!add.length) return { phy_mdl_id: mdlId, created: false, tbl: 0, fk: 0, fkChild: [] as string[] }
-  const plan = await phyPlan(areaId, prjId, o.dbms, new Set([...have, ...add]))
+  const plan = pre && [...have].every((e) => pre.scope.has(e)) ? pre.plan : await phyPlan(areaId, prjId, o.dbms, new Set([...have, ...add]))
   if (!plan) return null
   if (!mdlId) {
     const m = await db().from('mdl_phy_mdl').insert({ area_id: areaId, prj_id: prjId, dbms_cd: o.dbms, idntfr_ltr_cd: o.ltr, del_col_use_yn: 'N', phy_mdl_desc: o.desc, ...sys }).select('phy_mdl_id').single()
