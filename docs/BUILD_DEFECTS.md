@@ -72,7 +72,7 @@
 | P3 | `api/sites/[domain]/route.ts:37` | 일별 조회수 전 행 받아 JS 합산(1000행 상한 시 과소) | C | 미수정 |
 | P3 | `lib/payments.ts:92` `getPlanRemaining` | 전 행 받아 메모리 집계 | B | 미수정 |
 
-### 2.3 cafe.pi 사용자 경로 (25 지점 — P1 6 · P2 2 · P3 2 · P4 15)
+### 2.3 cafe.pi 사용자 경로 (25 지점 — P1 6 · P2 2 · P3 2 · P4 15 — Telegram 행은 위치 2곳이 결함 1건)
 
 | P | 위치(`src/`) | 내용 | 등급 | 상태 |
 |---|---|---|---|---|
@@ -115,6 +115,17 @@
 | sitemap.pi·공용 | 9 | 1 | 6 | 2 | 16 |
 | cafe.pi 사용자 | 16행(25 지점) | 9 | 4 | 3 | 9 |
 | cafe.pi 관리자·크론 | 9행(19건) | 6 | 1 | 2 | 7 |
+
+## 2.6 확신 중간(51건) — 남은 기록
+
+점검 에이전트가 위치째 넘긴 대표 항목만 남는다(나머지는 건수만 — 세션 밖 원문 없음, 수정 전 재점검 `[TBD]`).
+
+| 시스템 | 건수 | 대표 항목 |
+|---|---|---|
+| schema.pi | 19 | 쓰기 루프 9건(`syncPhy`·`setLgc`·physical PATCH:254·`attributes/order`:35·propagate:99·`applyCodes`·`approvals/batch`·`resolve-nm`·`delPhy` — `ver_no`·유일 인덱스 순서 의도 가능), `lib/auth.ts:100` 요청마다 비-await `lst_lgn_dtm` UPDATE(인증), `lib/change.ts:150`·`entities/[entId]/route.ts:12`·`attributes/[attrId]/route.ts:52` `select('*')`(감사 전체 행 필요 가능), `physical/idx` POST 전체 `loadPhy`, `words/route.ts:61` 진단 `console.log` 상시 출력 |
+| sitemap.pi·공용 | 16 | `packages/pi-db/src/users.ts:119`(로그인 직렬)·`:248,259`(인증 전체 칼럼), `lib/auth.ts:31`, `src/auth.ts:72`, `api/fee-plans/route.ts:13`, `components/my-sites.tsx:91`, `lib/payments.ts:139`·`:166`(결제 타임아웃 8초), `components/bubble-home.tsx`, `api/sites/route.ts:40`, P5 4건(`payments/approve:112` 비원자 확인·`me/sites:55` 상한 경합·`auth/link-complete:40`), P6 `api/bubbles/route.ts:73` 운영에서 demo 노출 |
+| cafe.pi 사용자 | 9 | `lib/users.ts:255` 모든 요청 `sys_user` 전체 칼럼(인증)·`:83` 로그인 2왕복, `lib/chat.ts:182` 직거래 방 중복 생성 경합, `chat/[roomId]/page.tsx:73`, `store/items/route.ts:33`, `lib/board.ts:45`, `exchange-rates`·`pi-price` 타임아웃(캐시 있음), P6 `[locale]/voice-test/page.tsx` 운영 가드 없음 |
+| cafe.pi 관리자·크론 | 7 | `api/cron/campaign-grant-all:105`(선착순 순서 의존 가능), `api/admin/stats/aggregate:45`, `api/cron/event-bean-reward:96`·`admin/event/bond-reward:102`, `admin/campaign/grant-all:109`, `cron/chat-noti:24`, `admin/std/approvals:19`·`i18n/stats:43` `select('*')` |
 
 ## 3. 수정 이력
 

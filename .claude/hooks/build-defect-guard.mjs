@@ -85,6 +85,7 @@ function selftest() {
   assert(!scan("await fetch('https://a.b', { signal: AbortSignal.timeout(2000) })").some((v) => v.p === 'R-P4'), '타임아웃 있음 통과')
   assert(scan("useEffect(() => { fetch('/api/dev/user') })").some((v) => v.p === 'R-P6'), 'dev 가드 없음')
   assert(!scan("if (process.env.NODE_ENV === 'production') return\nfetch('/api/dev/user')").some((v) => v.p === 'R-P6'), 'dev 가드 있음 통과')
+  assert(scan('export async function GET() { return 1 }', 'C:\app\api\dev\x\route.ts').some((v) => v.p === 'R-P6'), '백슬래시 dev 경로')
   console.log('selftest OK')
 }
 
@@ -113,7 +114,7 @@ else if (argv[0] === '--scan') {
   const frag = ti.content ?? ti.new_string ?? (ti.edits ?? []).map((e) => e.new_string).join('\n')
   let whole = ''
   try { whole = readFileSync(file, 'utf8') } catch {}
-  const v = scan(frag, file).filter((x) => x.p !== 'R-P6').concat(scan(whole, file).filter((x) => x.p === 'R-P6' && /\/api\/dev\//.test(frag + file)))
+  const v = scan(frag, file).filter((x) => x.p !== 'R-P6').concat(scan(whole, file).filter((x) => x.p === 'R-P6' && /[\/]api[\/]dev[\/]/.test(frag + file)))
   if (!v.length) process.exit(0)
   const msg = `[build-defect-guard] 루트 CLAUDE.md R-P0~P6 위반 의심 ${v.length}건(${file}) — 고치거나 의도면 이유를 보고에 남길 것:\n` + v.map((x) => `- ${x.p} 조각 ${x.line}행 : ${x.msg}`).join('\n')
   console.log(JSON.stringify({ hookSpecificOutput: { hookEventName: 'PostToolUse', additionalContext: msg } }))
