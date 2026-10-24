@@ -72,6 +72,12 @@ export async function GET(req: NextRequest) {
   if (error) return apiError('ADM_ORDERS_FAILED', 500)
 
   const rows = (data ?? []) as OrderRow[]
+  // 원장 2.7 보류 상향 조건 감지 — 500행 초과면 집계 RPC·서버 페이지네이션으로 전환(1000행 상한 전)
+  if (rows.length > 500)
+    console.warn(
+      '[BUILD_DEFECTS 2.7] admin/analytics/orders 행 수 초과',
+      rows.length,
+    )
 
   // ── 요약 ──
   const total = rows.length

@@ -54,6 +54,12 @@ export async function GET(req: NextRequest) {
   }
 
   const rows = subs ?? []
+  // 원장 2.7 보류 상향 조건 감지 — 500행 초과면 집계 RPC·서버 페이지네이션으로 전환(1000행 상한 전)
+  if (rows.length > 500)
+    console.warn(
+      '[BUILD_DEFECTS 2.7] admin/subscriptions 행 수 초과',
+      rows.length,
+    )
   const userIds = [...new Set(rows.map((r) => r.usr_id))]
 
   // 3) 사용자 정보 일괄 조회 → id 기준 맵 구성

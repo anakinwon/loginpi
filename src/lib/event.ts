@@ -100,6 +100,22 @@ export async function evaluateUserMissions(
     //    충족: 신규 INSERT / 논리삭제됐으면 복구 / 이미 완료면 skip
     //    미충족: 완료 상태면 취소(del_yn='Y') / 없거나 이미 삭제면 skip
     //    → 상태(예: kakao_id)가 사라지면 해당 미션이 즉시 미완료로 되돌아간다.
+    // 기존 기록(논리삭제 포함) 선조회 — 미션마다 조회하던 N+1 제거(R-P2). 미션코드는 이벤트 안에서 유일
+    const { data: existingRows } = await db
+      .from('evt_user_mission')
+      .select('evt_user_mission_id, del_yn, mission_cd')
+      .eq('event_id', event.event_id)
+      .eq('user_id', userId)
+    // 같은 미션의 삭제 행·활성 행이 함께 있으면 활성 행 우선(뒤에 넣어 덮어씀)
+    const existingMap = new Map(
+      (existingRows ?? [])
+        .sort((a, b) => (a.del_yn === 'N' ? 1 : 0) - (b.del_yn === 'N' ? 1 : 0))
+        .map((r) => [
+          (r.mission_cd as string).trim(),
+          r as { evt_user_mission_id: string; del_yn: string },
+        ]),
+    )
+
     for (const mission of missions) {
       const isCompleted = await evaluateMissionCompletion(
         userId,
@@ -110,19 +126,9 @@ export async function evaluateUserMissions(
       const mc = mission.mission_cd.trim()
       const nowIso = new Date().toISOString()
 
-      // 기존 기록(논리삭제 포함) 확인 — upsert 대신 select 후 분기하여
+      // 기존 기록 분기 — upsert 대신 select 후 분기하여
       // 부분 unique 인덱스(WHERE del_yn='N')의 ON CONFLICT 충돌을 회피
-      const { data: existingRaw } = await db
-        .from('evt_user_mission')
-        .select('evt_user_mission_id, del_yn')
-        .eq('event_id', event.event_id)
-        .eq('user_id', userId)
-        .eq('mission_cd', mc)
-        .maybeSingle()
-      const existing = existingRaw as {
-        evt_user_mission_id: string
-        del_yn: string
-      } | null
+      const existing = existingMap.get(mc) ?? null
 
       if (isCompleted) {
         if (!existing) {
@@ -232,6 +238,22 @@ interface Mission {
   sequence_prior_mission_cd?: string
 }
 
+// 이벤트 기간 내 사용자가 수행한 action_cd 집합 — 행위 로그는 사용자·이벤트당 소량(ponytail: 수천 건 넘으면 RPC distinct)
+async function doneActionCds(
+  userId: string,
+  actionCds: string[],
+  eventStartDtm: string,
+): Promise<Set<string>> {
+  const { data } = await getSupabaseAdmin()
+    .from('evt_action_log')
+    .select('action_cd')
+    .eq('user_id', userId)
+    .in('action_cd', actionCds)
+    .gte('action_dtm', eventStartDtm)
+    .limit(1000)
+  return new Set((data ?? []).map((r) => r.action_cd as string))
+}
+
 async function evaluateMissionCompletion(
   userId: string,
   eventId: string,
@@ -255,17 +277,14 @@ async function evaluateMissionCompletion(
     }
 
     case 'MULTI_AND': {
-      // 모든 action_cd 발생 확인 (이벤트 기간 내)
-      for (const actionCd of mission.required_action_cds_tx) {
-        const { data } = await db
-          .from('evt_action_log')
-          .select('evt_action_log_id')
-          .eq('user_id', userId)
-          .eq('action_cd', actionCd)
-          .gte('action_dtm', eventStartDtm)
-          .limit(1)
-        if (!data?.length) return false
-      }
+      // 모든 action_cd 발생 확인 (이벤트 기간 내) — action_cd 별 반복 조회 대신 1회(R-P1·P2)
+      const done = await doneActionCds(
+        userId,
+        mission.required_action_cds_tx,
+        eventStartDtm,
+      )
+      if (!mission.required_action_cds_tx.every((cd) => done.has(cd)))
+        return false
       // M1(계정 통합 + 프로필 완성): 로그인 연동 행위에 더해 별명·카톡ID 상태도 필수.
       // (옛 M2 상태형 평가를 M1로 통합 — 선물 전달 가능 상태가 본질, kakao_id 삭제 시 즉시 회수)
       if (mission.mission_cd.trim() === 'M1') {
@@ -275,18 +294,13 @@ async function evaluateMissionCompletion(
     }
 
     case 'MULTI_OR': {
-      // 1개 이상 action_cd 발생 확인 (M6, 이벤트 기간 내)
-      for (const actionCd of mission.required_action_cds_tx) {
-        const { data } = await db
-          .from('evt_action_log')
-          .select('evt_action_log_id')
-          .eq('user_id', userId)
-          .eq('action_cd', actionCd)
-          .gte('action_dtm', eventStartDtm)
-          .limit(1)
-        if (data?.length) return true // 1개만 발생해도 완료
-      }
-      return false
+      // 1개 이상 action_cd 발생 확인 (M6, 이벤트 기간 내) — 1회 조회
+      const done = await doneActionCds(
+        userId,
+        mission.required_action_cds_tx,
+        eventStartDtm,
+      )
+      return done.size > 0
     }
 
     case 'SEQUENCE': {

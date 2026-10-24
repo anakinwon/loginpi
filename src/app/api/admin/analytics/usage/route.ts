@@ -48,9 +48,16 @@ export async function GET(req: NextRequest) {
       .not('sido_nm', 'is', null),
   ])
 
-  if (logRes.error || userRes.error) return apiError('ADM_USAGE_ANALYTICS_FAILED', 500)
+  if (logRes.error || userRes.error)
+    return apiError('ADM_USAGE_ANALYTICS_FAILED', 500)
 
   const logs = (logRes.data ?? []) as { usr_id: string; actvty_dt: string }[]
+  // 원장 2.7 보류 상향 조건 감지 — 500행 초과면 집계 RPC·서버 페이지네이션으로 전환(1000행 상한 전)
+  if (logs.length > 500)
+    console.warn(
+      '[BUILD_DEFECTS 2.7] admin/analytics/usage 행 수 초과',
+      logs.length,
+    )
   const users = (userRes.data ?? []) as { id: string; reg_dtm: string }[]
   const locs = (locRes.data ?? []) as {
     user_str_id: string

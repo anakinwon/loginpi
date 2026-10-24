@@ -131,27 +131,31 @@ export async function GET(req: NextRequest) {
   let stats = null
   const statsTarget = shopId ?? itemId
   if (statsTarget) {
-    let statsQ = db
-      .from('fbck_mst')
-      .select('fbck_scr')
-      .eq('del_yn', 'N')
-      .eq('hide_yn', 'N')
-
-    if (shopId) statsQ = statsQ.eq('shop_id', shopId)
-    else if (itemId) statsQ = statsQ.eq('prod_id', itemId)
-
-    const { data: allScores } = await statsQ
-
-    if (allScores?.length) {
-      const dist: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
-      let sum = 0
-      for (const r of allScores as { fbck_scr: number }[]) {
-        dist[r.fbck_scr] = (dist[r.fbck_scr] ?? 0) + 1
-        sum += r.fbck_scr
-      }
+    // 점수(1~5)별 건수만 DB 에서 세어 동시 조회 — 전 행을 받아 메모리 집계하던 것(행이 늘면 느려지고 1000행 상한에서 틀림)을 대체(R-P3, 2026-10-24 전수 점검)
+    const counts = await Promise.all(
+      [1, 2, 3, 4, 5].map((scr) => {
+        let q = db
+          .from('fbck_mst')
+          .select('fbck_id', { count: 'exact', head: true })
+          .eq('del_yn', 'N')
+          .eq('hide_yn', 'N')
+          .eq('fbck_scr', scr)
+        if (shopId) q = q.eq('shop_id', shopId)
+        else if (itemId) q = q.eq('prod_id', itemId)
+        return q
+      }),
+    )
+    const dist: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
+    counts.forEach((r, i) => (dist[i + 1] = r.count ?? 0))
+    const total = Object.values(dist).reduce((a, b) => a + b, 0)
+    if (total) {
+      const sum = Object.entries(dist).reduce(
+        (a, [k, v]) => a + Number(k) * v,
+        0,
+      )
       stats = {
-        avg_score: Math.round((sum / allScores.length) * 10) / 10,
-        total_count: allScores.length,
+        avg_score: Math.round((sum / total) * 10) / 10,
+        total_count: total,
         score_dist: dist,
       }
     }

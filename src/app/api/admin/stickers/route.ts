@@ -12,25 +12,22 @@ export async function GET() {
   }
 
   const db = getSupabaseAdmin()
-  const [
-    { data: packs, error },
-    { data: stkrRows },
-    { data: ownrRows },
-    { data: themes },
-  ] = await Promise.all([
+  // 스티커 수·보유자 수 = 임베디드 count 집계(FK msg_stkr·msg_usr_stkr → msg_stkr_pack) — 행 전량 전송·1000행 상한 과소 집계 제거(R-P3)
+  const [{ data: packs, error }, { data: themes }] = await Promise.all([
     db
       .from('msg_stkr_pack')
       .select(
         `
           pack_id, pack_nm, pack_desc, theme_cd, price_bean, is_dflt_yn, use_yn,
           ownr_usr_id, mkt_yn, reg_dtm,
-          msg_theme(theme_nm, theme_emoji)
+          msg_theme(theme_nm, theme_emoji),
+          msg_stkr(count), msg_usr_stkr(count)
         `,
       )
       .eq('del_yn', 'N')
+      .eq('msg_stkr.del_yn', 'N')
+      .eq('msg_usr_stkr.del_yn', 'N')
       .order('reg_dtm', { ascending: false }),
-    db.from('msg_stkr').select('pack_id').eq('del_yn', 'N'),
-    db.from('msg_usr_stkr').select('pack_id').eq('del_yn', 'N'),
     db
       .from('msg_theme')
       .select('theme_cd, theme_nm, theme_emoji')
@@ -42,19 +39,18 @@ export async function GET() {
     return apiError('ADM_STKR_PACK_LIST_FAILED', 500)
   }
 
-  // 팩별 스티커 수·보유자 수 집계 (N+1 대신 IN 일괄 조회 후 Map 매핑)
-  const stkrCnt = new Map<string, number>()
-  for (const r of stkrRows ?? [])
-    stkrCnt.set(r.pack_id, (stkrCnt.get(r.pack_id) ?? 0) + 1)
-  const ownrCnt = new Map<string, number>()
-  for (const r of ownrRows ?? [])
-    ownrCnt.set(r.pack_id, (ownrCnt.get(r.pack_id) ?? 0) + 1)
-
-  const rows = (packs ?? []).map((p: Record<string, unknown>) => ({
-    ...p,
-    stkr_cnt: stkrCnt.get(p.pack_id as string) ?? 0,
-    ownr_cnt: ownrCnt.get(p.pack_id as string) ?? 0,
-  }))
+  type Cnt = { count: number }[] | null
+  const rows = (packs ?? []).map(
+    ({
+      msg_stkr,
+      msg_usr_stkr,
+      ...p
+    }: Record<string, unknown> & { msg_stkr?: Cnt; msg_usr_stkr?: Cnt }) => ({
+      ...p,
+      stkr_cnt: msg_stkr?.[0]?.count ?? 0,
+      ownr_cnt: msg_usr_stkr?.[0]?.count ?? 0,
+    }),
+  )
 
   return NextResponse.json({ packs: rows, themes: themes ?? [] })
 }

@@ -13,20 +13,22 @@ export async function GET() {
   const db = getSupabaseAdmin()
   const EVENT_ID = 'evt-20260614-001'
 
-  // 제외 대상자 목록
-  const { data: excluded } = await db
-    .from('evt_exclude')
-    .select('user_id')
-    .eq('event_id', EVENT_ID)
-    .eq('del_yn', 'N')
+  // 제외 대상자 목록 + 전체 미션 완료 기록 동시 조회(R-P1)
+  // (FK 부재로 조인 불가 → user_id로 사용자 정보 별도 병합)
+  // ponytail: 종료 이벤트·완료 기록 수십 행이라 메모리 집계 — 수천 행 넘는 이벤트면 사용자별 count RPC
+  const [{ data: excluded }, { data: missions, error }] = await Promise.all([
+    db
+      .from('evt_exclude')
+      .select('user_id')
+      .eq('event_id', EVENT_ID)
+      .eq('del_yn', 'N'),
+    db
+      .from('evt_user_mission')
+      .select('user_id, mission_cd, complete_dtm')
+      .eq('event_id', EVENT_ID)
+      .eq('del_yn', 'N'),
+  ])
   const excludedIds = new Set((excluded ?? []).map((e) => e.user_id))
-
-  // 전체 미션 완료 기록 (FK 부재로 조인 불가 → user_id로 사용자 정보 별도 병합)
-  const { data: missions, error } = await db
-    .from('evt_user_mission')
-    .select('user_id, mission_cd, complete_dtm')
-    .eq('event_id', EVENT_ID)
-    .eq('del_yn', 'N')
 
   if (error) {
     console.error('[admin/event/completions] 조회 실패:', error.message)
@@ -62,6 +64,12 @@ export async function GET() {
     }
   >()
 
+  // 원장 2.7 보류 상향 조건 감지 — 500행 초과면 집계 RPC·서버 페이지네이션으로 전환(1000행 상한 전)
+  if ((missions ?? []).length > 500)
+    console.warn(
+      '[BUILD_DEFECTS 2.7] admin/event/completions 행 수 초과',
+      (missions ?? []).length,
+    )
   for (const m of missions ?? []) {
     if (excludedIds.has(m.user_id)) continue
 

@@ -16,7 +16,11 @@ export async function GET(request: NextRequest) {
   const sp = request.nextUrl.searchParams
   const lat = parseFloat(sp.get('lat') ?? '')
   const lng = parseFloat(sp.get('lng') ?? '')
-  const radius = parseFloat(sp.get('radius') ?? '10')
+  // 반경(km) 0.1~500 — 숫자가 아니면 기본 10(위경도 상자 계산이 NaN 이 되지 않게, R-P5)
+  const radius = Math.min(
+    500,
+    Math.max(0.1, parseFloat(sp.get('radius') ?? '10') || 10),
+  )
 
   if (
     isNaN(lat) ||
@@ -29,14 +33,22 @@ export async function GET(request: NextRequest) {
     return apiError('LOC_LATLNG_WGS84_REQUIRED', 400)
   }
 
-  const { data, error } = await getSupabaseAdmin()
+  // 반경을 감싸는 위경도 상자로 DB 에서 먼저 거름 — 좌표 있는 매장 전량을 받아 메모리에서 거르던 것 대체(R-P3, 2026-10-24 전수 점검)
+  //  위도 1° ≈ 111km, 경도 1° ≈ 111km × cos(위도). 날짜변경선·극지방에 걸리면 경도 조건은 생략(정확한 거리 판정은 아래 그대로)
+  const dLat = radius / 111
+  const cosLat = Math.cos((lat * Math.PI) / 180)
+  const dLng = cosLat > 0.01 ? radius / (111 * cosLat) : 360
+  let q = getSupabaseAdmin()
     .from('mps_shop')
     .select(
       'shop_id, shop_nm, shop_type_cd, addr, contact_tel, biz_hour, lat:latd_crd, lng:lngt_crd, place_id, owner_verified_yn',
     )
     .eq('del_yn', 'N')
-    .not('latd_crd', 'is', null)
-    .not('lngt_crd', 'is', null)
+    .gte('latd_crd', lat - dLat)
+    .lte('latd_crd', lat + dLat)
+  if (lng - dLng >= -180 && lng + dLng <= 180)
+    q = q.gte('lngt_crd', lng - dLng).lte('lngt_crd', lng + dLng)
+  const { data, error } = await q.not('lngt_crd', 'is', null)
 
   if (error)
     return NextResponse.json(
