@@ -55,6 +55,9 @@ export const env = createEnv({
     TELEGRAM_WEBHOOK_SECRET: z.string().optional(),
     // 운영 알림 수신 텔레그램 chat id(선택) — Bean 항등식 불일치 등 CRITICAL 경보 발송 대상.
     ADMIN_TELEGRAM_CHAT_ID: z.string().optional(),
+    // 애플리케이션 모니터링 → schema.pi 수집 API(2026-10-24) — 주소 = https://schem.vercel.app/api/mon/ingest, 키 = schema.pi MON_INGEST_KEY 와 같은 값. 미설정이면 전달 안 함
+    MON_INGEST_URL: z.string().url().optional(),
+    MON_INGEST_KEY: z.string().min(32).optional(),
     TURN_HOST: z.string().optional(),
     TURN_SECRET: z.string().optional(),
     TURN_CREDENTIAL_TTL: z.coerce.number().optional(),
@@ -98,6 +101,8 @@ export const env = createEnv({
     NEXT_PUBLIC_LISTING_MODE: z.enum(['true', 'false']).optional(),
   },
   runtimeEnv: {
+    MON_INGEST_URL: process.env.MON_INGEST_URL,
+    MON_INGEST_KEY: process.env.MON_INGEST_KEY,
     PI_SESSION_SECRET: process.env.PI_SESSION_SECRET,
     AUTH_SECRET: process.env.AUTH_SECRET,
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,

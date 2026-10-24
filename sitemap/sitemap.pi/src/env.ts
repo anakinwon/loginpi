@@ -12,6 +12,9 @@ export const env = createEnv({
     PI_API_KEY: z.string().optional(),
     // 크론 /api/cron/site-sts-sweep Bearer 비밀값 — optional(운영 tier 필수 검사 금지 : 미등록이면 크론이 401 로 멈추는 fail-closed, PRD_USAGE_FEE_STATE §6). 운영 등록은 P8 PAID 탭 검토 뒤
     CRON_SECRET: z.string().min(16).optional(),
+    // 애플리케이션 모니터링 → schema.pi 수집 API(2026-10-24) — 주소 = https://schem.vercel.app/api/mon/ingest, 키 = schema.pi MON_INGEST_KEY 와 같은 값. 미설정이면 전달 안 함
+    MON_INGEST_URL: z.string().url().optional(),
+    MON_INGEST_KEY: z.string().min(32).optional(),
     // Developer Portal 도메인 소유 검증 키 — /validation-key.txt가 그대로 서빙, 미설정 시 404
     PI_DOMAIN_VALIDATION_KEY: z.string().optional(),
     SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
@@ -64,6 +67,8 @@ export const env = createEnv({
     SITEMAP_VERIFY_SECRET: process.env.SITEMAP_VERIFY_SECRET,
     SITEMAP_SHOW_SAMPLES: process.env.SITEMAP_SHOW_SAMPLES,
     VERCEL_ENV: process.env.VERCEL_ENV,
+    MON_INGEST_URL: process.env.MON_INGEST_URL,
+    MON_INGEST_KEY: process.env.MON_INGEST_KEY,
     SUPABASE_SCHEMA: process.env.SUPABASE_SCHEMA,
     APP_TIER: process.env.APP_TIER,
     STAGING_DB_TARGET: process.env.STAGING_DB_TARGET,

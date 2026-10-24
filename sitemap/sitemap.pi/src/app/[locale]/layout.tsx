@@ -9,6 +9,7 @@ import { PiSdkScript } from '@pi/auth/client'
 import { PiAuthRoot } from '@/components/pi-auth-root'
 import { routing } from '@/i18n/routing'
 import { SiteHeader } from '@/components/site-header'
+import { MonRum } from '@/components/mon-rum'
 import '../globals.css'
 
 export function generateStaticParams() {
@@ -56,6 +57,8 @@ export default async function LocaleLayout({
                 <main className="mx-auto max-w-5xl px-4 py-6 has-[[data-fullbleed]]:max-w-none has-[[data-fullbleed]]:p-0">
                   {children}
                 </main>
+                {/* 애플리케이션 모니터링 계측 → schema.pi 모니터링(운영만, 2026-10-24) */}
+                <MonRum />
               </PiAuthRoot>
             </SessionProvider>
           </ThemeProvider>

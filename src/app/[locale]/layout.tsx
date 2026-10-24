@@ -21,6 +21,7 @@ import { getActiveUiTheme, buildThemeStyleCss } from '@/lib/ui-theme'
 import { resolveDbTier } from '@/lib/db-env'
 import { computeShowPiValuation, computeIsProd } from '@/lib/feature-flags'
 import { FeatureFlagProvider } from '@/components/feature-flag-provider'
+import { MonRum } from '@/components/mon-rum'
 import { getActiveFeeMode, getOpenPromoState } from '@/lib/fee-resolver'
 
 const geistSans = Geist({
@@ -153,6 +154,8 @@ export default async function LocaleLayout({
                 {/* 가입/이용 동의 전역 게이트 — 로그인 후 필수 동의 미완료 시 차단 모달 */}
                 <ConsentGate />
                 <PageviewTracker />
+                {/* 애플리케이션 모니터링 계측 → schema.pi 모니터링(운영만, 2026-10-24) */}
+                <MonRum />
                 <Toaster richColors />
               </PiAuthProvider>
             </ThemeProvider>
