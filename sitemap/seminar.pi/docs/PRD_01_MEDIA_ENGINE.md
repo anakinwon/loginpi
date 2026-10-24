@@ -1,6 +1,6 @@
 # PRD_01: seminar.pi 자체 화상 엔진(SFU) 기획
 
-> 버전 v0.1 · 작성 2026-10-24 · 상위 `PRD.md` 10절(기준점) · 근거 [DECISION_01](DECISION_01_VIDEO.md) 7절, [DECISION_02](DECISION_02_REA_TARGET.md) · 작성 아소카
+> 버전 v0.2 · 작성 2026-10-24 · 개정 2026-10-25 · 상위 `PRD.md` 10절(기준점) · 근거 [DECISION_01](DECISION_01_VIDEO.md) 7절, [DECISION_02](DECISION_02_REA_TARGET.md) · 작성 아소카
 > 이 문서는 **엔진을 어떤 순서로, 무엇을 기준으로 만들지** 정한다. 단계별 상세 설계는 각 단계 착수 때 이 문서에 덧붙인다.
 
 ## 1. 기준점 (마스터 확정 2026-10-24)
@@ -27,6 +27,8 @@
 - 종단간 암호화(E2EE): 1차 범위 밖이다 [TBD]
 
 ## 3. 구조
+
+> **변경 제안 대기** : 통합 설계 [PRD_02](PRD_02_ENGINE_DESIGN.md) 6절이 이 절의 일부(경계 이름 M1부터·M3 범위·입장권 형식)를 바꾸자고 제안했다 — 마스터 확인 C-1·C-8 승인 전까지 이 문서가 정본.
 
 ```
 [브라우저 — seminar.pi 화면(Next.js · Vercel)]
@@ -66,6 +68,8 @@
 
 ## 5. 단계 계획 — 통과 기준(go/no-go), 건너뛰기 금지
 
+> **변경 제안 대기** : 통합 설계 [PRD_02](PRD_02_ENGINE_DESIGN.md) 6절이 이 절의 일부(경계 이름 M1부터·M3 범위·입장권 형식)를 바꾸자고 제안했다 — 마스터 확인 C-1·C-8 승인 전까지 이 문서가 정본.
+
 | 단계 | 참고 | 만드는 것 | 통과 기준 |
 |---|---|---|---|
 | **M0 실기기 관문** | — | seminar.pi 최소 앱 + `/lab/camera` 시험 화면(운영 가드 R-P6). 카메라·마이크 `getUserMedia`, 미리보기, 기기 2대 직접 연결(시그널링 = Supabase Realtime broadcast, cafe.pi 음성과 같은 방식) | iOS·Android Pi Browser에서 영상 송수신, 보이는 `<video playsinline muted>` 자동재생 OK. **실패하면 전체 재검토** |
@@ -93,9 +97,9 @@
 
 | 모델 | 분석 시점 | 읽을 곳(착수 시 소스로 확인) | 결과 |
 |---|---|---|---|
-| Galène | M1 전 | 패킷 전달·패킷 캐시·NACK·추정기 관련 패키지 [확인중 : 소스] | — |
-| mediasoup | M3 전 | Router·Transport·Producer·Consumer API와 워커 RTP 처리 | — |
-| LiveKit | M4 전 | simulcast 선택·대역폭 할당 로직 | — |
+| Galène | M1 전 | 패킷 전달·패킷 캐시·NACK·추정기 관련 패키지 | [REA_01_GALENE.md](rea/REA_01_GALENE.md) (커밋 `e2bc84f`) · 통합 설계 [PRD_02](PRD_02_ENGINE_DESIGN.md) |
+| mediasoup | M3 전 | Router·Transport·Producer·Consumer API와 워커 RTP 처리 | [REA_02_MEDIASOUP.md](rea/REA_02_MEDIASOUP.md) (커밋 `aaf6e3a`) · 통합 설계 [PRD_02](PRD_02_ENGINE_DESIGN.md) |
+| LiveKit | M4 전 | simulcast 선택·대역폭 할당 로직 | [REA_03_LIVEKIT.md](rea/REA_03_LIVEKIT.md) (커밋 `095e339`) · 통합 설계 [PRD_02](PRD_02_ENGINE_DESIGN.md) |
 
 ## 8. 위험
 
@@ -111,3 +115,4 @@
 | 날짜 | 내용 |
 |---|---|
 | 2026-10-24 | v0.1 — 기준점 K-1~K-5, 구조, 품질 지표, M0~M5 단계, 개발 환경 |
+| 2026-10-25 | v0.2 — 7절 결과 칸에 REA_01~03 링크 추가, 통합 설계 [PRD_02](PRD_02_ENGINE_DESIGN.md) 연결, Galène 행 [확인중 : 소스] 해소 |
