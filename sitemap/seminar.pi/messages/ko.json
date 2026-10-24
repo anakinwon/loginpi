@@ -1,0 +1,10 @@
+{
+  "meta": {
+    "title": "seminar.pi",
+    "description": "Pi 로 참여하는 실시간 화상 세미나"
+  },
+  "home": {
+    "title": "seminar.pi",
+    "description": "개최자가 세미나를 열고, 참가자는 Pi 로 입장해 실시간 화상으로 참여합니다."
+  }
+}

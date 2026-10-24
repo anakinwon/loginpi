@@ -26,7 +26,7 @@
 
 | 단계 | 참고 | 핵심 산출 | 통과 기준 | 상태 |
 |---|---|---|---|---|
-| M0 실기기 관문 | — | 최소 앱 + `/lab/camera`(R-P6 가드), 기기 2대 직접 연결 | iOS·Android Pi Browser 영상 송수신·자동재생 | **준비** |
+| M0 실기기 관문 | — | 최소 앱 + `/lab/camera`(R-P6 가드), 기기 2대 직접 연결 | iOS·Android Pi Browser 영상 송수신·자동재생 | **화면 완료 · 실기기 시험 대기** |
 | M1 최소 SFU | Galène | Go 설치 · `media/` 모듈 · WebSocket 시그널링 · 1→2 전달 | LAN·LTE 영상 표시 | 대기 |
 | M2 안정화 | Galène | 패킷 캐시·NACK · PLI 조절 · TURN · `tc netem` | 3% 손실 회복 | 대기 |
 | M3 구조 다듬기 | mediasoup | Router·Transport·Producer·Consumer 재구성 · API 문서 · 단위 테스트 | 회귀 0 | 대기 |
@@ -35,8 +35,9 @@
 
 ### M0 할 일
 
-- [ ] (서비스) seminar.pi 최소 Next 앱 골격(TODO 3단계 중 화면·i18n·env 만 — DB·결제 제외) · `pnpm build`
-- [ ] (서비스) `/lab/camera` 시험 화면 — 카메라·마이크 미리보기, 기기 2대 직접 연결(Supabase Realtime broadcast), 운영 차단 첫 줄(R-P6)
+- [x] (서비스) seminar.pi 최소 Next 앱 골격(화면·i18n ko/en·env, @pi/* 는 M1·M5) · `pnpm build` 통과 (2026-10-24)
+- [x] (서비스) `/lab/camera` 시험 화면 — 카메라·마이크 미리보기·전후면 전환, 기기 2대 직접 연결(Supabase Realtime broadcast, id 작은 쪽 offer), 결과 복사. 운영 빌드는 `LAB_ENABLED=1` 일 때만(R-P6) (2026-10-24)
+- [ ] (마스터) Vercel env : `LAB_ENABLED=1`, `NEXT_PUBLIC_LAB_SUPABASE_URL`·`NEXT_PUBLIC_LAB_SUPABASE_PUBLISHABLE_KEY`(pi-nonprod — ENV_GUIDE 3.4)
 - [ ] (마스터) Vercel 프로젝트 생성(Root `sitemap/seminar.pi`) — 스테이징 URL 확보 (HTTPS 필요)
 - [ ] (마스터) Pi Browser iOS·Android 실기기 시험 → 결과 TROUBLESHOOT 기록
 - [ ] (마스터) 호스팅 결정 — M1 외부 시험 전까지
