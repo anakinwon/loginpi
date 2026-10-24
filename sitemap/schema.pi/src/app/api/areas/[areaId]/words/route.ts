@@ -17,10 +17,14 @@ export async function GET(req: Request, { params }: Ctx) {
   const sp = new URL(req.url).searchParams
   // 선택지 조회(속성 분류어·지정 대표도메인)는 승인대기 정보가 필요 없음 — pendingChg 생략, 일반 목록은 권한 확인과 병렬 실행
   const pick = sp.get('attr') === 'Y' || sp.get('key') === 'Y'
+  // 구간별 소요 시간 측정(콜드 스타트·Supabase 지연 원인 구간 확인용)
+  const t0 = Date.now()
   const [auth, pd] = await Promise.all([
     requireAreaRole(areaId, 'STD_VIEW'),
     pick ? Promise.resolve({ pend: new Map() } as Awaited<ReturnType<typeof pendingChg>>) : pendingChg(areaId, 'DIC'),
   ])
+  // 인증 구간(일반 목록은 pendingChg 병렬 포함)
+  const tAuth = Date.now()
   if (auth instanceof NextResponse) return auth
   const q = sp.get('q')?.trim()
   const sts = sp.get('sts')
@@ -44,6 +48,7 @@ export async function GET(req: Request, { params }: Ctx) {
     return query
   }
   const r = await pageRows(build, sp, 1000)
+  const tPage = Date.now()
   if (r.error) return dbError(r.error)
   let rows
   try {
@@ -52,6 +57,8 @@ export async function GET(req: Request, { params }: Ctx) {
   } catch (e) {
     return dbError(e as { code?: string; message?: string })
   }
+  const tActors = Date.now()
+  console.log(JSON.stringify({ tag: 'api-timing', route: 'GET /api/areas/:id/words', pick, auth_ms: tAuth - t0, page_ms: tPage - tAuth, actors_ms: tActors - tPage, total_ms: tActors - t0, rows: rows.length }))
   return NextResponse.json({ ok: true, words: rows.map((x) => ({ ...x, pend_act: pd.pend.get(x.dic_id as string) ?? null })), total: r.total, page: r.page, size: r.size })
 }
 
