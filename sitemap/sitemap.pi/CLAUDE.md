@@ -66,6 +66,10 @@ pnpm dev | pnpm build | pnpm lint | pnpm tsc --noEmit | pnpm format
 
 라우트·API 변경 커밋 전 최소 관문은 `pnpm build`.
 
+## 구축 결함 재발 방지
+
+루트 `loginpi/CLAUDE.md` '구축 결함 재발 방지 R-P0~P6' 상속(2026-10-24, 정본 복제 금지) — 원격 DB·외부 API 왕복 지연, 직렬 조회·반복·과다 조회, 실패 경로, dev 코드 운영 가드.
+
 ## 변경 이력
 
 | 날짜 | 내용 |
@@ -80,3 +84,4 @@ pnpm dev | pnpm build | pnpm lint | pnpm tsc --noEmit | pnpm format
 | 2026-10-09 | 마스터 지시 — 메인 화면 버블(PRD §3-4) : 요금제 7종 크기(`site_mst.plan_cd`), 유료 노출이므로 버블마다 "광고"·요금제 배지 필수, DB 미연결 시 sites.json 폴백 |
 | 2026-10-09 | 마스터 지시 — 요금제 5단계(VIP·PRM2·PRM1·BSC2·BSC1, 면적 ×2 등비), 가상 샘플 91개는 데모 전용(DB 미시드·`SITEMAP_SHOW_SAMPLES=1`·"샘플" 배지·상세 이동 없음), 버블 글자 9px 하한·표시 단계 |
 | 2026-10-11 | 로그인 통합 — Pi SDK + Pi Sign-In(OAuth) + Google(NextAuth, 연동 코드) : src/auth.ts·lib/auth.ts·sql/003, 플레이북 docs/LOGIN_PLAYBOOK.md |
+| 2026-10-24 | 루트 `구축 결함 재발 방지 R-P0~P6` 상속 절 추가 |

@@ -63,21 +63,17 @@ corepack pnpm@11.4.0 db:seed [-- --dry-run]      # DA#_META/SQLiteDB_v5.db → D
 - 신규 테이블 : RLS 비활성 + anon·authenticated 권한 회수 + service_role 만 허용(`fn_grant_svc_only`), 시스템 컬럼 4개(`regr_id`·`reg_dtm`·`modr_id`·`mod_dtm`) 맨 끝, `mod_dtm` 트리거. DA 표준 규칙 요약은 메모리 `da-standard-core-rules`(원본 : loginpi `docs/da/references/` 01 정의서 §8.5)
 - **PK·인덱스 이름(2026-10-20 마스터 재정의, 예외 없음)** : PK = `CONSTRAINT pk_<테이블> PRIMARY KEY (…)`, 인덱스·유일 제약 = `x_<테이블>_NN`(테이블별 다음 번호, 용도는 `COMMENT ON INDEX`). `_pkey`·`_key`·`ux_`·`ix_`·`idx_`·이름 없는 PK/UNIQUE 금지 — Hook R9 가 DA-APPROVED 와 무관하게 차단. 기존 객체는 `sql/066` 으로 소급 완료. 유일 위반으로 오류 코드를 고르는 판정은 인덱스 이름 상수 `src/lib/api.ts UQ` 에서만(문자열 하드코딩 금지). ModelPi 생성 DDL 도 같은 규칙(Oracle·Tibero 대문자 `PK_`·`X_`)
 
-## 구축 결함 재발 방지(2026-10-24 마스터 부탁, 예외 없음 — 근거 `docs/TROUBLESHOOT.md` TS-01)
+## 구축 결함 재발 방지 — 루트 R-P0~P6 상속(2026-10-24, 사례 `docs/TROUBLESHOOT.md` TS-01)
 
-운영 모니터링에서 드러난 느림·오류 22건은 전부 구축 결함이었다. 운영 = Vercel 함수 → 원격 Supabase(조회 1회 = 왕복 1회), PGlite 시험은 이 지연을 못 보므로 **코드를 쓸 때** 아래를 지킨다.
-
-- **R-P1 직렬 조회 금지** : 앞 결과를 쓰지 않는 `await` 가 연달아 있으면 `Promise.all`. 공용 함수(`requireAreaRole`·`loadLogical`·`phyPlan` 등)가 특히 먼저
-- **R-P2 반복 조회 금지** : 한 요청에서 같은 조회·계산 2번 금지(계산 결과를 인자로 넘김), 입력마다 부르는 API 는 캐시·디바운스
-- **R-P3 과다 조회 금지** : `select` 는 쓰는 칼럼만, `count:'exact'` 는 건수를 화면에 쓸 때만, 필터는 서버(쿼리 조건)에서
-- **R-P4 외부 호출** : 요청 경로 안 외부 HTTP 는 타임아웃 ≤ 2초 + 캐시, 없어도 되는 값이면 비동기로
-- **R-P5 실패 경로 먼저** : 순번·유일값은 충돌 재시도, 중복·잠금 상태는 화면이 먼저 막고 서버도 막는다
-- **R-P6 개발 전용 코드** : dev 전용 호출·라우트는 운영 가드(`NODE_ENV`·`VERCEL_ENV`)가 첫 줄
-- **R-P0 서비스 결함은 고객 결재로 넘기지 않는다** : 같은 원인은 `src/` 전체 grep 으로 형제까지 한 커밋에 고치고 '패턴 · 매치 N · 처리 N' 을 보고. 'PR 로 해결' 은 운영 데이터·환경에서만 생기는 문제용
+규칙 정본 = 루트 `loginpi/CLAUDE.md` '구축 결함 재발 방지 R-P0~P6'(문구 복제 금지). 이 시스템의 예시 :
+- 운영 = Vercel 함수 → 원격 Supabase(조회 1회 = 왕복 1회), PGlite 시험은 지연을 못 봄
+- R-P1 공용 함수 우선 : `requireAreaRole`(모든 분류체계 API 경유)·`loadLogical`·`phyPlan`·`loadPhy`·`stageInfo`·`loadDgm`
+- R-P2 예 : `areaDict`(입력마다 사전 재조회) / R-P4 예 : `src/lib/wiki.ts` / R-P5 예 : `attr_seq` 순번 충돌·관계 중복·작성완료 잠금 / R-P6 예 : `dev-user-switch.tsx`
+- R-P0 : 'PR 로 해결'(MON_AI)은 운영 데이터·환경에서만 생기는 문제용
 
 ## 검증·완료 기준
 
-- 코드 변경 : `tsc` · `pnpm test` · `pnpm build` 통과 + 바꾼 API·lib 함수가 R-P1~P6 을 지키는지 자기 점검(검토 워크플로가 있으면 '운영 지연·실패 경로' 관점 포함)
+- 코드 변경 : `tsc` · `pnpm test` · `pnpm build` 통과 + 바꾼 API·lib 함수가 루트 R-P1~P6 을 지키는지 자기 점검(검토 워크플로가 있으면 '운영 지연·실패 경로' 관점 포함)
 - DB 변경 : 로컬 PostgreSQL(PGlite 소켓, 스크래치패드 전용)에서 먼저 적용·시나리오 시험 → Supabase `db:migrate`
 - API 변경 : 로컬 3002에서 역할별 시나리오 시험, 시험 데이터는 논리 삭제로 정리
 - 보고 수치는 이번 실행 출력에서만 인용, 이전 실행 결과는 그 사실을 밝힌다
