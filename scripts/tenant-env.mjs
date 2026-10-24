@@ -6,13 +6,18 @@
 //       비밀키는 새로 생성, 공유 키는 기존 앱에서 복사, 포털 발급 값은 빈 칸 + 구하는 곳 주석. 기존 파일은 덮어쓰지 않음
 //   ⚠ 생성 파일은 비밀값 포함 — 모두 .gitignore(.env*) 대상(.env.example 만 커밋)
 import { randomBytes } from 'node:crypto'
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
+import { chmodSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
 import { join, relative } from 'node:path'
 
 const ROOT = join(import.meta.dirname, '..')
 const TEMPLATE = 'sitemap/sitemap.pi/.env.example' // 신규 사이트 앱 템플릿(키·주석 정본)
 const MON_URL = 'https://schem.vercel.app/api/mon/ingest'
 const secret = () => randomBytes(48).toString('base64url')
+// 비밀값 파일은 소유자만 읽기·쓰기(0600) — mode 는 새 파일에만 적용되므로 기존 파일도 chmod(Windows 는 무시됨)
+const writeSecret = (p, body) => {
+  writeFileSync(p, body, { mode: 0o600 })
+  chmodSync(p, 0o600)
+}
 
 // 앱 목록 — 루트(cafe.pi) + sitemap/<domain>.pi 폴더 중 .env.local 이 있는 것
 function apps() {
@@ -83,7 +88,7 @@ function multi() {
       ...section(env),
     )
   })
-  writeFileSync(join(ROOT, '.env.multi'), out.join('\n') + '\n')
+  writeSecret(join(ROOT, '.env.multi'), out.join('\n') + '\n')
   console.log(`.env.multi 재생성 — 앱 ${all.length}개 : ${all.map((a) => a.name).join(', ')}`)
 }
 const readMulti = (k) => (existsSync(join(ROOT, '.env.multi')) ? load('.env.multi')[k] : undefined)
@@ -105,7 +110,7 @@ function create(domain, port, outDir) {
   const name = domain.replace(/\.pi$/, '')
   const NAME = name.toUpperCase().replace(/-/g, '_')
   const dir = outDir ?? join(ROOT, 'sitemap', domain)
-  mkdirSync(dir, { recursive: true })
+  mkdirSync(dir, { recursive: true, mode: 0o700 })
 
   // 템플릿 — sitemap 전용 키는 빼고, 마이그레이션 키 이름은 새 앱 이름으로
   const tpl = readFileSync(join(ROOT, TEMPLATE), 'utf8')
@@ -160,7 +165,8 @@ function create(domain, port, outDir) {
     const p = join(dir, f)
     if (existsSync(p)) console.log(`건너뜀(이미 있음) : ${relative(ROOT, p)}`)
     else {
-      writeFileSync(p, body)
+      if (f === '.env.example') writeFileSync(p, body) // 비밀값 없음 — 커밋 대상
+      else writeSecret(p, body)
       console.log(`생성 : ${relative(ROOT, p)}`)
     }
   }
