@@ -33,9 +33,8 @@ export async function GET(req: Request, { params }: Ctx) {
   try {
     if (from) {
       if (!uuid.safeParse(from).success || (to && !uuid.safeParse(to).success)) return apiError('INVALID_INPUT', 400)
-      const a = await snapOf(areaId, prjId, from)
-      const b = to ? await snapOf(areaId, prjId, to) : null
-      const cur = to ? null : await current(areaId, prjId)
+      // 비교 두 쪽은 서로 독립 — 동시 조회(R-P1, 2026-10-24 전수 점검)
+      const [a, b, cur] = await Promise.all([snapOf(areaId, prjId, from), to ? snapOf(areaId, prjId, to) : null, to ? null : current(areaId, prjId)])
       if (!a || (to ? !b : !cur)) return apiError('NOT_FOUND', 404)
       const d = diffSnap(a.snap_val, b ? b.snap_val : cur!.snap)
       return NextResponse.json({ ok: true, from: { ver_seq: a.ver_seq, ver_nm: a.ver_nm }, to: b ? { ver_seq: b.ver_seq, ver_nm: b.ver_nm } : null, diff: d, cnt: diffCnt(d), capped: cur?.capped ?? false })
@@ -56,11 +55,10 @@ export async function POST(req: Request, { params }: Ctx) {
   const b = await parseBody(req, body)
   if (b instanceof NextResponse) return b
   try {
-    const cur = await current(areaId, prjId)
+    // 현재 모델과 순번(삭제 포함 최대 + 1, 동시 저장은 x_mdl_ver_01(유일 인덱스) 이 막음 → VERSION_CONFLICT)은 서로 독립 — 동시 조회(R-P1)
+    const [cur, mx] = await Promise.all([current(areaId, prjId), db().from('mdl_ver').select('ver_seq').eq('prj_id', prjId).order('ver_seq', { ascending: false }).limit(1).maybeSingle()])
     if (!cur) return apiError('NOT_FOUND', 404)
     if (cur.capped) return apiError('VER_CAPPED', 400) // ponytail: 상한(엔터티 500·속성 5,000)을 넘는 모델은 일부만 담기므로 저장 거부 — 필요해지면 주제영역 단위 스냅샷으로
-    // 순번 = 삭제 포함 최대 + 1(동시 저장은 x_mdl_ver_01(유일 인덱스) 이 막음 → VERSION_CONFLICT, 다시 저장)
-    const mx = await db().from('mdl_ver').select('ver_seq').eq('prj_id', prjId).order('ver_seq', { ascending: false }).limit(1).maybeSingle()
     if (mx.error) throw mx.error
     const seq = ((mx.data as { ver_seq: number } | null)?.ver_seq ?? 0) + 1
     const row = { area_id: areaId, prj_id: prjId, ver_seq: seq, ver_nm: b.ver_nm, ver_desc: b.ver_desc ?? null, ...snapCnt(cur.snap) }

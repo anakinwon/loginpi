@@ -23,8 +23,8 @@ export async function POST(req: Request) {
     if (route && Math.abs(x.t - now) < 600_000 && x.ms >= 0) ss.push({ route, t: x.t, ms: x.ms, status: x.st, page: x.p ? normPage(x.p) : null })
   }
   try {
-    await addApp(bucketize(ss))
-    await addAppEvt(user.usr_id, ss.filter((s) => evtCd(s.ms, s.status)).slice(-50)) // 실패해도 합계 저장은 이미 끝남(내부에서 기록만)
+    // 합계·개별 이력 저장은 서로 독립 — 동시 실행(R-P1, 2026-10-24 전수 점검). 개별 이력 실패는 내부에서 기록만
+    await Promise.all([addApp(bucketize(ss)), addAppEvt(user.usr_id, ss.filter((s) => evtCd(s.ms, s.status)).slice(-50))])
     return new NextResponse(null, { status: 204 })
   } catch (e) {
     return dbError(e as { code?: string; message?: string })

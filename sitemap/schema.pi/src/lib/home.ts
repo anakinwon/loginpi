@@ -22,12 +22,11 @@ const n = async (q: Cnt) => {
 const head = (tbl: string) => db().from(tbl).select('*', { count: 'exact', head: true })
 
 export async function loadHome(user: CurrentUser, want: string | null) {
-  const m = await db()
-    .from('std_area_mbr')
-    .select('mbr_role_cd, std_area!inner(area_id, area_nm, del_yn)')
-    .eq('usr_id', user.usr_id)
-    .eq('del_yn', 'N')
-    .eq('std_area.del_yn', 'N')
+  // 멤버십과 마지막 선택 분류체계는 서로 독립 — 동시 조회(R-P1, 2026-10-24 전수 점검)
+  const [m, u] = await Promise.all([
+    db().from('std_area_mbr').select('mbr_role_cd, std_area!inner(area_id, area_nm, del_yn)').eq('usr_id', user.usr_id).eq('del_yn', 'N').eq('std_area.del_yn', 'N'),
+    db().from('sys_user').select('lst_area_id').eq('usr_id', user.usr_id).maybeSingle(),
+  ])
   if (m.error) throw m.error
   const areas = (m.data ?? []).map((r) => {
     const a = r.std_area as unknown as { area_id: string; area_nm: string }
@@ -36,7 +35,6 @@ export async function loadHome(user: CurrentUser, want: string | null) {
   areas.sort((a, b) => a.area_nm.localeCompare(b.area_nm, 'ko'))
   if (!areas.length) return { areas, area: null }
   // 고르는 순서 : 요청한 분류체계 → 마지막 선택 → 이름순 첫 번째(멤버가 아닌 값은 무시)
-  const u = await db().from('sys_user').select('lst_area_id').eq('usr_id', user.usr_id).maybeSingle()
   if (u.error) throw u.error
   const mine = new Set(areas.map((a) => a.area_id))
   const last = (u.data as { lst_area_id: string | null } | null)?.lst_area_id ?? null

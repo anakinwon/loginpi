@@ -14,13 +14,13 @@ const COLS =
 
 export async function GET(req: Request, { params }: Ctx) {
   const { areaId } = await params
-  const auth = await requireAreaRole(areaId, 'STD_VIEW')
+  // 권한 확인과 승인대기 조회는 서로 독립 — 동시 실행(R-P1, words #24 의 형제, 2026-10-24 전수 점검)
+  const [auth, pd] = await Promise.all([requireAreaRole(areaId, 'STD_VIEW'), pendingChg(areaId, 'DOM')])
   if (auth instanceof NextResponse) return auth
   const sp = new URL(req.url).searchParams
   const q = sp.get('q')?.trim()
   const sts = sp.get('sts')
   const se = sp.get('se')
-  const pd = await pendingChg(areaId, 'DOM')
   if ('error' in pd) return dbError(pd.error)
   const build = () => {
     let query = db().from('std_dom').select(COLS, { count: 'exact' }).eq('area_id', areaId).eq('del_yn', 'N').order('std_reg_dtm', { ascending: false }).order('dom_nm')
@@ -56,10 +56,11 @@ export async function POST(req: Request, { params }: Ctx) {
 
   let dom_nm: string | null
   try {
-    if (!(await domGrpValid(areaId, body.dom_grp_id))) return apiError('NOT_FOUND', 404)
-    const keyErr = await domKeyWordError(areaId, body.key_dom_nm)
+    // 그룹·대표도메인명 검사·이름 생성은 서로 독립 — 동시 실행 후 원래 순서로 판정(R-P1, 2026-10-24 전수 점검)
+    const [grpOk, keyErr, nm] = await Promise.all([domGrpValid(areaId, body.dom_grp_id), domKeyWordError(areaId, body.key_dom_nm), buildDomName(body)])
+    if (!grpOk) return apiError('NOT_FOUND', 404)
     if (keyErr) return apiError(keyErr, 400)
-    dom_nm = await buildDomName(body)
+    dom_nm = nm
   } catch (e) {
     return dbError(e as { code?: string; message?: string })
   }

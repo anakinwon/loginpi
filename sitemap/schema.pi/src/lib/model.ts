@@ -93,10 +93,13 @@ export const entSchema = z.object({
 
 // 등록·수정 공용 검증 : 주제영역(같은 분류체계·활성), 구성 단어(승인완료), 이름 규칙 → 이름·미리보기 또는 오류
 export async function prepareEnt(areaId: string, b: z.infer<typeof entSchema>) {
-  const s = await db().from('mdl_subj').select('subj_abbr_nm, mdl_prj!mdl_subj_mdl_prj_id_fkey(tbl_pfx_txt, trgt_dbms_cd)').eq('subj_id', b.subj_id).eq('area_id', areaId).eq('del_yn', 'N').maybeSingle<{ subj_abbr_nm: string; mdl_prj: { tbl_pfx_txt: string; trgt_dbms_cd: string } | null }>()
+  // 주제영역·구성 단어는 서로 독립 — 동시 조회(R-P1, 2026-10-24 전수 점검)
+  const [s, words] = await Promise.all([
+    db().from('mdl_subj').select('subj_abbr_nm, mdl_prj!mdl_subj_mdl_prj_id_fkey(tbl_pfx_txt, trgt_dbms_cd)').eq('subj_id', b.subj_id).eq('area_id', areaId).eq('del_yn', 'N').maybeSingle<{ subj_abbr_nm: string; mdl_prj: { tbl_pfx_txt: string; trgt_dbms_cd: string } | null }>(),
+    entWords(areaId, b.dic_ids),
+  ])
   if (s.error) throw s.error
   if (!s.data) return 'NOT_FOUND' as const
-  const words = await entWords(areaId, b.dic_ids)
   if (!words) return 'ENT_WORD_INVALID' as const
   const bad = entNameError(words, b.ent_tp_cd)
   return bad ?? entNames(words, s.data.subj_abbr_nm, s.data.mdl_prj?.tbl_pfx_txt, s.data.mdl_prj?.trgt_dbms_cd)

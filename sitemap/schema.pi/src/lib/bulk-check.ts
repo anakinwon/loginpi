@@ -2,6 +2,7 @@
 // 규칙은 화면 등록과 같다 : 순수 규칙(domainSchema·domName·termRuleError·termNames)은 그대로 쓰고,
 // DB 조회 규칙(domKeyWordError·termDomError·중복 검사)은 묶음 단위로 미리 읽은 사전에서 같은 조건으로 판정(행마다 조회하지 않음)
 import { db } from './db'
+import { chunks, inChunks } from './paging'
 import { errMsg, type ErrorCode } from './api'
 import { domainSchema } from './domain'
 import { domName } from './dom-name'
@@ -34,14 +35,10 @@ export async function fetchAll<T>(make: () => any): Promise<T[]> {
 
 // 활성 행 가운데 col 값이 values 안에 있는 것(100개씩 나눠 조회 : URL 길이 제한)
 async function existing(table: string, col: string, areaId: string, values: string[]): Promise<Set<string>> {
-  const out = new Set<string>()
-  const uniq = [...new Set(values.filter(Boolean))]
-  for (let i = 0; i < uniq.length; i += 100) {
-    const { data, error } = await db().from(table).select(col).eq('area_id', areaId).eq('del_yn', 'N').in(col, uniq.slice(i, i + 100))
-    if (error) throw error
-    for (const r of data as unknown as Record<string, string>[]) out.add(r[col])
-  }
-  return out
+  // 묶음 병렬 조회(R-P1, 2026-10-24 전수 점검)
+  const { data, error } = await inChunks<Record<string, string>>([...new Set(values.filter(Boolean))], (part) => db().from(table).select(col).eq('area_id', areaId).eq('del_yn', 'N').in(col, part))
+  if (error) throw error
+  return new Set(data.map((r) => r[col]))
 }
 
 const lgcTypes = async () => {
@@ -63,13 +60,10 @@ const ALIAS_TP: Record<string, string> = { 금칙어: 'BAN', BAN: 'BAN', 이음�
 async function checkForbidden(areaId: string, vals: Record<string, string>[], startRow: number): Promise<Checked> {
   const txts = [...new Set(vals.map((v) => v.txt).filter(Boolean))]
   const names = [...new Set([...vals.map((v) => v.word), ...txts].filter(Boolean))]
-  const words = new Map<string, { dic_id: string; std_sts_cd: string }>()
-  for (let i = 0; i < names.length; i += 100) {
-    const { data, error } = await db().from('std_dic').select('dic_id, dic_log_nm, std_sts_cd').eq('area_id', areaId).eq('del_yn', 'N').in('dic_log_nm', names.slice(i, i + 100))
-    if (error) throw error
-    for (const w of data) words.set(w.dic_log_nm as string, w as { dic_id: string; std_sts_cd: string })
-  }
-  const used = await synTexts(areaId, txts) // 표기 → 이미 둔 표준단어 논리명
+  // 단어와 대체 표기(표기 → 이미 둔 표준단어 논리명)는 서로 독립 — 동시 조회(R-P1)
+  const [w, used] = await Promise.all([inChunks<{ dic_id: string; dic_log_nm: string; std_sts_cd: string }>(names, (part) => db().from('std_dic').select('dic_id, dic_log_nm, std_sts_cd').eq('area_id', areaId).eq('del_yn', 'N').in('dic_log_nm', part)), synTexts(areaId, txts)])
+  if (w.error) throw w.error
+  const words = new Map<string, { dic_id: string; std_sts_cd: string }>(w.data.map((x) => [x.dic_log_nm, x]))
   const seen = new Set<string>()
   const results: BulkResult[] = []
   const rows: Row[] = []
@@ -99,19 +93,16 @@ async function checkForbidden(areaId: string, vals: Record<string, string>[], st
 async function checkCodes(areaId: string, vals: Record<string, string>[], startRow: number): Promise<Checked> {
   type T = { term_id: string; term_phy_nm: string; std_dom: { dom_tp_cd: string; data_len: number | null } }
   const names = [...new Set(vals.map((v) => v.cd_nm).filter(Boolean))]
-  const terms = new Map<string, T>()
-  for (let i = 0; i < names.length; i += 100) {
-    const { data, error } = await db().from('std_term').select('term_id, term_log_nm, term_phy_nm, std_dom!inner(dom_tp_cd, data_len)').eq('area_id', areaId).eq('del_yn', 'N').eq('std_sts_cd', 'CNFM').in('term_log_nm', names.slice(i, i + 100))
-    if (error) throw error
-    for (const r of data) terms.set(r.term_log_nm as string, r as unknown as T)
-  }
+  const tr = await inChunks<T & { term_log_nm: string }>(names, (part) => db().from('std_term').select('term_id, term_log_nm, term_phy_nm, std_dom!inner(dom_tp_cd, data_len)').eq('area_id', areaId).eq('del_yn', 'N').eq('std_sts_cd', 'CNFM').in('term_log_nm', part))
+  if (tr.error) throw tr.error
+  const terms = new Map<string, T>(tr.data.map((r) => [r.term_log_nm, r]))
   const termIds = [...terms.values()].map((x) => x.term_id)
   const cdOf = new Map<string, string>() // term_id → 코드ID(활성 코드기본, 코드 영문 표준용어)
   const rjct = new Set<string>() // 반려된 코드기본의 코드ID
-  for (let i = 0; i < termIds.length; i += 100) {
-    const { data, error } = await db().from('std_cd_bas').select('cd_id, term_id, std_sts_cd').eq('area_id', areaId).eq('del_yn', 'N').in('term_id', termIds.slice(i, i + 100))
-    if (error) throw error
-    for (const r of data) {
+  const cb = await inChunks<{ cd_id: string; term_id: string; std_sts_cd: string }>(termIds, (part) => db().from('std_cd_bas').select('cd_id, term_id, std_sts_cd').eq('area_id', areaId).eq('del_yn', 'N').in('term_id', part))
+  if (cb.error) throw cb.error
+  {
+    for (const r of cb.data) {
       cdOf.set(r.term_id as string, r.cd_id as string)
       if (r.std_sts_cd === 'RJCT') rjct.add(r.cd_id as string)
     }
@@ -119,9 +110,8 @@ async function checkCodes(areaId: string, vals: Record<string, string>[], startR
   const cdIds = [...cdOf.values()]
   const haveVal = new Set<string>() // cd_id|코드값
   const haveNm = new Map<string, string>() // cd_id|코드값명 → 코드값
-  for (let i = 0; i < cdIds.length; i += 100) {
-    const part = cdIds.slice(i, i + 100)
-    const rows = await fetchAll<{ cd_id: string; cd_val: string; cd_val_nm: string }>(() => db().from('std_cd_dtl').select('cd_id, cd_val, cd_val_nm').eq('area_id', areaId).eq('del_yn', 'N').in('cd_id', part).order('cd_id').order('cd_val'))
+  const dtl = await Promise.all(chunks(cdIds, 100).map((part) => fetchAll<{ cd_id: string; cd_val: string; cd_val_nm: string }>(() => db().from('std_cd_dtl').select('cd_id, cd_val, cd_val_nm').eq('area_id', areaId).eq('del_yn', 'N').in('cd_id', part).order('cd_id').order('cd_val'))))
+  for (const rows of dtl) {
     for (const r of rows) {
       haveVal.add(`${r.cd_id}|${r.cd_val}`)
       haveNm.set(`${r.cd_id}|${r.cd_val_nm}`, r.cd_val)
@@ -163,14 +153,9 @@ async function checkCodes(areaId: string, vals: Record<string, string>[], startR
 
 // 대체 표기(이음동의어·금칙어) → 표준단어 논리명(이 분류체계 활성 단어 기준, 100개씩)
 async function synTexts(areaId: string, names: string[]): Promise<Map<string, string>> {
-  const out = new Map<string, string>()
-  const uniq = [...new Set(names.filter(Boolean))]
-  for (let i = 0; i < uniq.length; i += 100) {
-    const { data, error } = await db().from('std_dic_rel').select('rel_txt, std_dic!inner(dic_log_nm, area_id, del_yn)').in('rel_tp_cd', ['SYN', 'BAN']).eq('del_yn', 'N').eq('std_dic.area_id', areaId).eq('std_dic.del_yn', 'N').in('rel_txt', uniq.slice(i, i + 100))
-    if (error) throw error
-    for (const r of data) out.set(r.rel_txt as string, (r.std_dic as unknown as { dic_log_nm: string }).dic_log_nm)
-  }
-  return out
+  const { data, error } = await inChunks<{ rel_txt: string; std_dic: unknown }>([...new Set(names.filter(Boolean))], (part) => db().from('std_dic_rel').select('rel_txt, std_dic!inner(dic_log_nm, area_id, del_yn)').in('rel_tp_cd', ['SYN', 'BAN']).eq('del_yn', 'N').eq('std_dic.area_id', areaId).eq('std_dic.del_yn', 'N').in('rel_txt', part))
+  if (error) throw error
+  return new Map(data.map((r) => [r.rel_txt, (r.std_dic as { dic_log_nm: string }).dic_log_nm]))
 }
 
 // 4.1 단어
@@ -229,14 +214,9 @@ async function checkWords(areaId: string, vals: Record<string, string>[], start:
 
 // 대표도메인명 후보 단어의 속성 분류어·대표도메인 지정 여부(확정 활성 단어만, 100개씩 조회)
 async function keyWordAttr(areaId: string, names: string[]): Promise<Map<string, { attr: string; key: string }>> {
-  const out = new Map<string, { attr: string; key: string }>()
-  const uniq = [...new Set(names.filter(Boolean))]
-  for (let i = 0; i < uniq.length; i += 100) {
-    const { data, error } = await db().from('std_dic').select('dic_log_nm, attr_clss_yn, key_dom_yn').eq('area_id', areaId).eq('del_yn', 'N').eq('std_sts_cd', 'CNFM').in('dic_log_nm', uniq.slice(i, i + 100))
-    if (error) throw error
-    for (const w of data) out.set(w.dic_log_nm, { attr: w.attr_clss_yn, key: w.key_dom_yn })
-  }
-  return out
+  const { data, error } = await inChunks<{ dic_log_nm: string; attr_clss_yn: string; key_dom_yn: string }>([...new Set(names.filter(Boolean))], (part) => db().from('std_dic').select('dic_log_nm, attr_clss_yn, key_dom_yn').eq('area_id', areaId).eq('del_yn', 'N').eq('std_sts_cd', 'CNFM').in('dic_log_nm', part))
+  if (error) throw error
+  return new Map(data.map((w) => [w.dic_log_nm, { attr: w.attr_clss_yn, key: w.key_dom_yn }]))
 }
 
 // 4.2 도메인

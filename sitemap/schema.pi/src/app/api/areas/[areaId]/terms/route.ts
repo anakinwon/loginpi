@@ -14,13 +14,13 @@ const COLS = 'term_id, term_log_nm, term_phy_nm, term_desc, nstd_yn, std_se_cd, 
 
 export async function GET(req: Request, { params }: Ctx) {
   const { areaId } = await params
-  const auth = await requireAreaRole(areaId, 'VIEW')
+  // 권한 확인과 승인대기 조회는 서로 독립 — 동시 실행(R-P1, words #24 의 형제, 2026-10-24 전수 점검)
+  const [auth, pd] = await Promise.all([requireAreaRole(areaId, 'VIEW'), pendingChg(areaId, 'TERM')])
   if (auth instanceof NextResponse) return auth
   const sp = new URL(req.url).searchParams
   const q = sp.get('q')?.trim()
   const sts = sp.get('sts')
   const se = sp.get('se')
-  const pd = await pendingChg(areaId, 'TERM')
   if ('error' in pd) return dbError(pd.error)
   const build = () => {
     let query = db().from('std_term').select(COLS, { count: 'exact' }).eq('area_id', areaId).eq('del_yn', 'N').order('std_reg_dtm', { ascending: false }).order('term_log_nm')

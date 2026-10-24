@@ -55,9 +55,10 @@ export async function GET(req: Request, { params }: Ctx) {
     const mdlId = sp.get('mdl')
     if (mdlId) {
       if (!uuid.safeParse(mdlId).success) return apiError('INVALID_INPUT', 400)
-      const p = await loadPhy(areaId, mdlId)
-      if (!p || p.mdl.prj_id !== prjId) return apiError('NOT_FOUND', 404)
       const format = sp.get('format')
+      // 차이 보기·DDL·문서는 논리 모델이 필요 — 저장 모델과 동시에 조회(R-P1, 2026-10-24 전수 점검), 변경분(alter)은 syncPlan 이 직접 조회
+      const [p, lg] = await Promise.all([loadPhy(areaId, mdlId), format === 'alter' ? null : loadLogical(areaId, prjId)])
+      if (!p || p.mdl.prj_id !== prjId) return apiError('NOT_FOUND', 404)
       if (format === 'alter') {
         const s = await syncPlan(areaId, prjId, p)
         if (!s) return apiError('NOT_FOUND', 404)
@@ -70,7 +71,7 @@ export async function GET(req: Request, { params }: Ctx) {
       if (format === 'ddl' || format === 'csv') {
         const type = sp.get('type')
         if (format === 'csv' && type !== 'tbl' && type !== 'col') return apiError('INVALID_INPUT', 400)
-        const x = await phyDdlInput(areaId, prjId, p)
+        const x = await phyDdlInput(areaId, prjId, p, lg)
         if (!x) return apiError('NOT_FOUND', 404)
         const at = kstDtm(new Date().toISOString())
         const dbmsNm = DBMS_PRFL[x.d.dbms].nm
@@ -81,7 +82,7 @@ export async function GET(req: Request, { params }: Ctx) {
         })
       }
       // 차이 = 전환된 엔터티 범위(전환 안 한 엔터티는 추가 테이블로 세지 않음)
-      const plan = await phyPlan(areaId, prjId, p.mdl.dbms_cd as DbmsCd, new Set(p.tables.map((t) => t.ent_id)))
+      const plan = phyPlanOf(lg, await tpMapOf(p.mdl.dbms_cd as DbmsCd), p.mdl.dbms_cd as DbmsCd, new Set(p.tables.map((t) => t.ent_id)))
       return NextResponse.json({ ok: true, ...p, diff: plan ? phyDiff(p.tables, plan.tables) : null })
     }
     const want = sp.get('dbms')

@@ -78,18 +78,14 @@ async function inUse(tp: ChgTp, id: string, cur?: Record<string, unknown>): Prom
     if (error) throw error
     return data.length > 0
   }
-  const { data, error } = await db().from('std_term_dic').select('term_id, std_term!inner(del_yn)').eq('dic_id', id).eq('std_term.del_yn', 'N').limit(1)
-  if (error) throw error
-  if (data.length) return true
-  // 개념 모델 엔터티 이름에 쓰이는 단어도 사용 중(sql/018)
-  const me = await db().from('mdl_ent').select('ent_id').contains('dic_ids', [id]).eq('del_yn', 'N').limit(1)
-  if (me.error) throw me.error
-  if (me.data.length) return true
-  // 대표도메인명으로 쓰이는 단어도 사용 중(이름·속성 분류어 변경과 삭제 불가)
-  if (!cur) return false
-  const d = await db().from('std_dom').select('dom_id').eq('area_id', cur.area_id as string).eq('key_dom_nm', cur.dic_log_nm as string).eq('del_yn', 'N').limit(1)
-  if (d.error) throw d.error
-  return d.data.length > 0
+  // 용어 구성·개념 모델 엔터티 이름(sql/018)·대표도메인명 사용 여부는 서로 독립 — 동시 조회(R-P1, 2026-10-24 전수 점검)
+  const [t, me, d] = await Promise.all([
+    db().from('std_term_dic').select('term_id, std_term!inner(del_yn)').eq('dic_id', id).eq('std_term.del_yn', 'N').limit(1),
+    db().from('mdl_ent').select('ent_id').contains('dic_ids', [id]).eq('del_yn', 'N').limit(1),
+    cur ? db().from('std_dom').select('dom_id').eq('area_id', cur.area_id as string).eq('key_dom_nm', cur.dic_log_nm as string).eq('del_yn', 'N').limit(1) : null,
+  ])
+  for (const x of [t, me, d]) if (x?.error) throw x.error
+  return t.data!.length > 0 || me.data!.length > 0 || (d?.data?.length ?? 0) > 0
 }
 
 // 대표도메인 지정·해제 규칙(sql/013) : 지정 상태면 속성 분류어·금칙어 아님 유지, 해제는 사용 도메인 0건일 때만
@@ -127,9 +123,11 @@ export async function wordNameError(areaId: string, log?: string | null, phy?: s
     if (error) throw error
     return data.length > 0
   }
-  if (log && (await same('dic_log_nm', log))) return 'WORD_DUP_LOGICAL'
-  if (log && (await synOf(areaId, log))) return 'WORD_IS_SYNONYM'
-  if (phy && (await same('dic_phy_nm', phy.toUpperCase()))) return 'WORD_DUP_PHYSICAL'
+  // 세 검사는 서로 독립 — 동시 조회 후 원래 우선순위로 판정(R-P1, 2026-10-24 전수 점검)
+  const [dupLog, syn, dupPhy] = await Promise.all([log ? same('dic_log_nm', log) : false, log ? synOf(areaId, log) : null, phy ? same('dic_phy_nm', phy.toUpperCase()) : false])
+  if (dupLog) return 'WORD_DUP_LOGICAL'
+  if (syn) return 'WORD_IS_SYNONYM'
+  if (dupPhy) return 'WORD_DUP_PHYSICAL'
   return null
 }
 

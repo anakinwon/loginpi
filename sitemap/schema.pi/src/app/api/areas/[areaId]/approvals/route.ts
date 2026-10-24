@@ -43,18 +43,26 @@ export async function GET(req: Request, { params }: Ctx) {
   if (r.error) return dbError(r.error)
   // 대상 현재 이름(수정·삭제 요청은 aftr_val에 이름이 없거나 일부만 있음) — 유형별 1회 조회, 논리 삭제 행 포함
   const rows = r.rows as { tgt_tp_cd: string; tgt_id: string | null; tgt_key_txt: string | null; tgt?: Record<string, unknown> }[]
-  for (const [tp, table, pk, cols] of NAME_SRC) {
-    const ids = [...new Set(rows.filter((x) => x.tgt_tp_cd === tp && x.tgt_id).map((x) => x.tgt_id as string))]
-    if (!ids.length) continue
-    const n = await inChunks(ids, (p) => db().from(table).select(`${pk}, ${cols}`).in(pk, p))
+  // 유형별 이름 조회·코드기본 조회는 서로 독립 — 동시 실행(R-P1, 2026-10-24 전수 점검)
+  const cds = [...new Set(rows.filter((x) => x.tgt_tp_cd === 'CD' && x.tgt_key_txt).map((x) => x.tgt_key_txt as string))]
+  const [names, cdRes] = await Promise.all([
+    Promise.all(
+      NAME_SRC.map(async ([tp, table, pk, cols]) => {
+        const ids = [...new Set(rows.filter((x) => x.tgt_tp_cd === tp && x.tgt_id).map((x) => x.tgt_id as string))]
+        return { tp, pk, n: ids.length ? await inChunks(ids, (p) => db().from(table).select(`${pk}, ${cols}`).in(pk, p)) : null }
+      }),
+    ),
+    cds.length ? inChunks(cds, (p) => db().from('std_cd_bas').select('cd_id, cd_cls_nm, cd_desc, use_yn, std_sts_cd, std_term(term_log_nm)').eq('area_id', areaId).in('cd_id', p)) : null,
+  ])
+  for (const { tp, pk, n } of names) {
+    if (!n) continue
     if (n.error) return dbError(n.error)
     const by = new Map((n.data as unknown as Record<string, unknown>[]).map((d) => [d[pk] as string, d]))
     for (const x of rows) if (x.tgt_tp_cd === tp && x.tgt_id) x.tgt = by.get(x.tgt_id)
   }
   // 코드기본 : 분류체계 + 코드ID(논리 삭제 행 포함) + 용어명
-  const cds = [...new Set(rows.filter((x) => x.tgt_tp_cd === 'CD' && x.tgt_key_txt).map((x) => x.tgt_key_txt as string))]
-  if (cds.length) {
-    const n = await inChunks(cds, (p) => db().from('std_cd_bas').select('cd_id, cd_cls_nm, cd_desc, use_yn, std_sts_cd, std_term(term_log_nm)').eq('area_id', areaId).in('cd_id', p))
+  if (cdRes) {
+    const n = cdRes
     if (n.error) return dbError(n.error)
     const by = new Map(
       (n.data as { cd_id: string; std_term: { term_log_nm: string } | null }[]).map(({ std_term, ...d }) => [d.cd_id, { ...d, term_log_nm: std_term?.term_log_nm ?? null }]),

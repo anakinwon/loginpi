@@ -40,13 +40,15 @@ export async function loadDgm(areaId: string, prjId: string, subjId: string | nu
   if (pm.error) throw pm.error
   const phyModels = pm.data as { phy_mdl_id: string; dbms_cd: string }[]
   const phy = phyModels.find((x) => x.phy_mdl_id === phyId) ?? phyModels[0] ?? null
-  let phyEnts = new Set<string>()
-  if (phy) {
-    // 작성완료 테이블만(마스터 지시 : 물리모델도 테이블별 작성완료 상태일 때 ERD 확인)
-    const t = await db().from('mdl_phy_tbl').select('ent_id').eq('phy_mdl_id', phy.phy_mdl_id).eq('phy_sts_cd', 'CMPTN').eq('del_yn', 'N').limit(5000)
-    if (t.error) throw t.error
-    phyEnts = new Set((t.data as { ent_id: string }[]).map((x) => x.ent_id))
-  }
+  // 작성완료 테이블(마스터 지시 : 물리모델도 테이블별 작성완료 상태일 때 ERD 확인)·관계선 배치·엔터티 배치는 서로 독립 — 동시 조회(R-P1, 2026-10-24 전수 점검)
+  const none = Promise.resolve({ data: [] as unknown[], error: null })
+  const [t, q, p] = await Promise.all([
+    phy ? db().from('mdl_phy_tbl').select('ent_id').eq('phy_mdl_id', phy.phy_mdl_id).eq('phy_sts_cd', 'CMPTN').eq('del_yn', 'N').limit(5000) : none,
+    dgm ? db().from('mdl_dgm_rel').select('rel_id, prnt_side_cd, prnt_pstn_rt, chld_side_cd, chld_pstn_rt, mid_xcrd, mid_ycrd').eq('dgm_id', dgm.dgm_id).eq('del_yn', 'N').limit(5000) : none,
+    dgm ? db().from('mdl_dgm_ent').select('ent_id, xcrd, ycrd, fix_yn, sort_seq').eq('dgm_id', dgm.dgm_id).eq('del_yn', 'N').limit(5000) : none,
+  ])
+  if (t.error) throw t.error
+  const phyEnts = new Set((t.data as { ent_id: string }[]).map((x) => x.ent_id))
   const inSubj = m.ents.filter((e) => !subjId || e.subj_id === subjId)
   const hidden = inSubj.filter((e) => !phyEnts.has(e.ent_id)).length // 물리 미전환 엔터티 수(안내용)
   const own = new Set(inSubj.filter((e) => phyEnts.has(e.ent_id)).map((e) => e.ent_id))
@@ -57,11 +59,6 @@ export async function loadDgm(areaId: string, prjId: string, subjId: string | nu
   let relLyt: DgmRel[] = []
   if (dgm) {
     const shownRel = new Set(rels.map((r) => r.rel_id))
-    // 관계선 배치·엔터티 배치 동시 조회
-    const [q, p] = await Promise.all([
-      db().from('mdl_dgm_rel').select('rel_id, prnt_side_cd, prnt_pstn_rt, chld_side_cd, chld_pstn_rt, mid_xcrd, mid_ycrd').eq('dgm_id', dgm.dgm_id).eq('del_yn', 'N').limit(5000),
-      db().from('mdl_dgm_ent').select('ent_id, xcrd, ycrd, fix_yn, sort_seq').eq('dgm_id', dgm.dgm_id).eq('del_yn', 'N').limit(5000),
-    ])
     if (q.error) throw q.error
     relLyt = (q.data as Record<string, unknown>[])
       .filter((x) => shownRel.has(x.rel_id as string))

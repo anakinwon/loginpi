@@ -31,7 +31,7 @@ export async function GET(req: Request, { params }: Ctx) {
     let uq = db().from('mdl_subj').select('subj_abbr_nm').eq('area_id', areaId).eq('del_yn', 'N')
     if (isPrj) uq = uq.eq('prj_id', prj)
     // 서로 의존하지 않는 조회는 동시에 시작(직렬 왕복 단축) — nm 이 없으면 표준단어·약어 조회 생략
-    const [ind, dict, mine, o, used] = await Promise.all([
+    const [ind, dict, mine, o, used, exSubj] = await Promise.all([
       // 업종 추천(프로젝트 업종 지정 시) — 프로젝트 기존 주제영역 제외
       isPrj ? db().from('mdl_prj').select('indstry_cd, tbl_pfx_txt, trgt_dbms_cd').eq('prj_id', prj).eq('area_id', areaId).eq('del_yn', 'N').maybeSingle() : Promise.resolve(null),
       areaDict<EntWord>(areaId, 'dic_id, dic_log_nm, dic_phy_nm, attr_clss_yn, ent_clss_yn, forbid_yn, tbl_sfx_txt'),
@@ -39,14 +39,15 @@ export async function GET(req: Request, { params }: Ctx) {
       nm ? db().from('std_dic').select('dic_eng_nm, dic_desc').eq('area_id', areaId).eq('dic_log_nm', nm).eq('del_yn', 'N').eq('std_sts_cd', 'CNFM').maybeSingle() : Promise.resolve(null),
       nm ? db().from('std_dic').select('dic_phy_nm, dic_eng_nm, dic_desc, std_area!inner(area_nm, del_yn)').eq('dic_log_nm', nm).neq('area_id', areaId).eq('del_yn', 'N').eq('std_sts_cd', 'CNFM').eq('std_area.del_yn', 'N').limit(20) : Promise.resolve(null),
       nm ? uq : Promise.resolve(null),
+      // 프로젝트 기존 주제영역(업종 추천에서 제외) — 업종 판정과 독립이라 함께 조회(R-P1, 2026-10-24 전수 점검)
+      isPrj ? db().from('mdl_subj').select('subj_nm, subj_abbr_nm').eq('prj_id', prj).eq('del_yn', 'N') : Promise.resolve(null),
     ])
     if (ind?.error) throw ind.error
     const tmpl = isIndstry(ind?.data?.indstry_cd) ? TEMPLATES[ind.data.indstry_cd] : null
     let subjects: SubjRec[] = []
     if (tmpl) {
-      const ex = await db().from('mdl_subj').select('subj_nm, subj_abbr_nm').eq('prj_id', prj).eq('del_yn', 'N')
-      if (ex.error) throw ex.error
-      subjects = recommendSubjects(tmpl, ex.data as { subj_nm: string; subj_abbr_nm: string }[], dict)
+      if (!exSubj || exSubj.error) throw exSubj?.error ?? new Error('mdl_subj')
+      subjects = recommendSubjects(tmpl, exSubj.data as { subj_nm: string; subj_abbr_nm: string }[], dict)
     }
     const industry = tmpl ? { cd: tmpl.cd, nm: tmpl.nm } : null
     const pfx = (ind?.data as { tbl_pfx_txt?: string } | null)?.tbl_pfx_txt // 프로젝트 스키마 접두사(sql/023)
@@ -70,21 +71,6 @@ export async function GET(req: Request, { params }: Ctx) {
         src.push(`표준단어 : ${std.std_area.area_nm}`)
       }
     }
-    // ③ 위키백과(영문명·설명이 비었을 때만)
-    if (!eng || !desc) {
-      const w = await wiki(nm)
-      if (w) {
-        if (!eng && w.en) eng = engTitle(w.en)
-        if (!desc) desc = wikiDesc(w.extract).desc
-        src.push(`위키백과 '${w.title}'`)
-      }
-    }
-    // 약어 3자 : 이미 쓰는 약어 제외(위에서 동시 조회)
-    if (used?.error) throw used.error
-    const taken = new Set((used?.data ?? []).map((x) => x.subj_abbr_nm as string))
-    const abbrs = subjAbbrCands(eng).filter((a) => !taken.has(a))
-    const abbr = abbrs[0] ?? ''
-    if (abbr) src.push(`약어 : ${eng} → ${abbr}`)
     // 핵심 엔터티 후보 : 기본 조합 + 주제영역명으로 시작하는 복합어(사전 순), 승인완료 단어로만 분해되고 이름 규칙·중복 통과한 것
     const compound = dict
       .filter((w) => w.dic_log_nm.startsWith(nm) && w.dic_log_nm !== nm && w.attr_clss_yn !== 'Y')
@@ -94,7 +80,19 @@ export async function GET(req: Request, { params }: Ctx) {
     const names = [...new Set([...ENT_PATTERNS.map((p) => nm + p), ...compound])]
     let eq = db().from('mdl_ent').select('ent_log_nm').eq('area_id', areaId).eq('del_yn', 'N').in('ent_log_nm', [...names, ...indEnts])
     if (isPrj) eq = eq.eq('prj_id', prj)
-    const ex = await eq
+    // ③ 위키백과(영문명·설명이 비었을 때만) — 엔터티 중복 조회와 서로 독립이라 동시 실행(R-P1, 2026-10-24 전수 점검)
+    const [w, ex] = await Promise.all([!eng || !desc ? wiki(nm) : Promise.resolve(null), eq])
+    if (w) {
+      if (!eng && w.en) eng = engTitle(w.en)
+      if (!desc) desc = wikiDesc(w.extract).desc
+      src.push(`위키백과 '${w.title}'`)
+    }
+    // 약어 3자 : 이미 쓰는 약어 제외(위에서 동시 조회)
+    if (used?.error) throw used.error
+    const taken = new Set((used?.data ?? []).map((x) => x.subj_abbr_nm as string))
+    const abbrs = subjAbbrCands(eng).filter((a) => !taken.has(a))
+    const abbr = abbrs[0] ?? ''
+    if (abbr) src.push(`약어 : ${eng} → ${abbr}`)
     if (ex.error) throw ex.error
     const have = new Set(ex.data.map((x) => x.ent_log_nm as string))
     const eAbbr = (/^[A-Z]{3}$/.test(subjAbbr) ? subjAbbr : abbr) || '○○○'

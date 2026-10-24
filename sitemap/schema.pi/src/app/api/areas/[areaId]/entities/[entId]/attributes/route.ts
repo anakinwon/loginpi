@@ -39,9 +39,13 @@ export async function POST(req: Request, { params }: Ctx) {
   const b = await parseBody(req, schema)
   if (b instanceof NextResponse) return b
   try {
-    const ent = await getEnt(areaId, entId)
+    // 엔터티·용어·다음 순번은 서로 독립 — 동시 조회(R-P1, 2026-10-24 전수 점검)
+    const [ent, t, seq] = await Promise.all([
+      getEnt(areaId, entId),
+      db().from('std_term').select('term_id, term_log_nm').eq('term_id', b.term_id).eq('area_id', areaId).eq('del_yn', 'N').eq('std_sts_cd', 'CNFM').maybeSingle(),
+      nextSeq(entId),
+    ])
     if (!ent) return apiError('NOT_FOUND', 404)
-    const t = await db().from('std_term').select('term_id, term_log_nm').eq('term_id', b.term_id).eq('area_id', areaId).eq('del_yn', 'N').eq('std_sts_cd', 'CNFM').maybeSingle()
     if (t.error) throw t.error
     if (!t.data) return apiError('ATTR_TERM_INVALID', 400)
     if (b.src_attr_id && !b.fk_rel_id) return apiError('ATTR_SRC_INVALID', 400)
@@ -57,7 +61,6 @@ export async function POST(req: Request, { params }: Ctx) {
     }
     const pk = b.pk_yn === 'Y'
     if (pk && b.esntl_yn === 'N') return apiError('ATTR_PK_ESNTL', 400)
-    const seq = await nextSeq(entId)
     const uid = auth.user.usr_id
     const row = {
       area_id: areaId,

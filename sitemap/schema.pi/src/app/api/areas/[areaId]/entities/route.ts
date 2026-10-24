@@ -44,15 +44,18 @@ export async function GET(req: Request, { params }: Ctx) {
     const rows = r.rows as unknown as { dic_ids: string[]; mdl_subj: { subj_abbr_nm: string }; mdl_prj: { tbl_pfx_txt: string; trgt_dbms_cd: string } | null }[]
     // 물리 테이블명 미리보기 — 현재 페이지 구성 단어를 한 번에 조회
     const ids = [...new Set(rows.flatMap((x) => x.dic_ids))]
-    const w = await inChunks(ids, (p) => db().from('std_dic').select('dic_id, dic_log_nm, dic_phy_nm, attr_clss_yn, ent_clss_yn, forbid_yn, tbl_sfx_txt, std_sts_cd, del_yn').in('dic_id', p))
+    // 구성 단어와 등록·승인자(ent_id·regr_id 만 씀)는 서로 독립 — 동시 조회(R-P1, 2026-10-24 전수 점검)
+    const [w, acts] = await Promise.all([
+      inChunks(ids, (p) => db().from('std_dic').select('dic_id, dic_log_nm, dic_phy_nm, attr_clss_yn, ent_clss_yn, forbid_yn, tbl_sfx_txt, std_sts_cd, del_yn').in('dic_id', p)),
+      withActors(areaId, 'DIC', 'ent_id', rows as unknown as Record<string, unknown>[]),
+    ])
     if (w.error) throw w.error
     const by = new Map((w.data as (EntWord & { std_sts_cd: string; del_yn: string })[]).map((x) => [x.dic_id, x]))
-    const named = rows.map((x) => {
+    const items = (acts as unknown as typeof rows).map((x) => {
       const ws = x.dic_ids.map((id) => by.get(id)).filter((v): v is EntWord & { std_sts_cd: string; del_yn: string } => !!v)
       const n = entNames(ws, x.mdl_subj.subj_abbr_nm, x.mdl_prj?.tbl_pfx_txt, x.mdl_prj?.trgt_dbms_cd)
       return { ...x, tbl_phy_nm: n.tbl_phy_nm, too_long: n.too_long, words: ws.map((v) => ({ dic_log_nm: v.dic_log_nm, ok: v.std_sts_cd === 'CNFM' && v.del_yn === 'N' })) }
     })
-    const items = await withActors(areaId, 'DIC', 'ent_id', named as unknown as Record<string, unknown>[])
     return NextResponse.json({ ok: true, items, total: r.total, page: r.page, size: r.size })
   } catch (e) {
     return dbError(e as { code?: string; message?: string })

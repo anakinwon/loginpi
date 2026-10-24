@@ -12,22 +12,25 @@ type Pend = { req_id: string; ent: string | null; sfx: string | null | undefined
 
 export async function GET(req: Request, { params }: Ctx) {
   const { areaId } = await params
-  const auth = await requireAreaRole(areaId, 'STD_VIEW')
-  if (auth instanceof NextResponse) return auth
   const sp = new URL(req.url).searchParams
   const q = sp.get('q')?.trim()
   const sts = sp.get('sts')
   // 대기 중인 지정·해제·접미어 변경 신청(단어 수정 요청 중 ent_clss_yn 또는 tbl_sfx_txt 를 바꾸는 것)
   // ponytail: 대기 단어 ID를 in() 목록으로 넘김, 대기 건이 수백 건을 넘으면 DB 함수로 옮길 것
-  const pend = await db()
-    .from('std_apv_req')
-    .select('apv_req_id, tgt_id, aftr_val')
-    .eq('area_id', areaId)
-    .eq('tgt_tp_cd', 'DIC')
-    .eq('act_cd', 'UPD')
-    .eq('apv_sts_cd', 'REQ')
-    .eq('del_yn', 'N')
-    .or('aftr_val->ent_clss_yn.not.is.null,aftr_val->tbl_sfx_txt.not.is.null')
+  // 권한 확인과 승인대기 조회는 서로 독립 — 동시 실행(R-P1, words #24 의 형제, 2026-10-24 전수 점검)
+  const [auth, pend] = await Promise.all([
+    requireAreaRole(areaId, 'STD_VIEW'),
+    db()
+      .from('std_apv_req')
+      .select('apv_req_id, tgt_id, aftr_val')
+      .eq('area_id', areaId)
+      .eq('tgt_tp_cd', 'DIC')
+      .eq('act_cd', 'UPD')
+      .eq('apv_sts_cd', 'REQ')
+      .eq('del_yn', 'N')
+      .or('aftr_val->ent_clss_yn.not.is.null,aftr_val->tbl_sfx_txt.not.is.null'),
+  ])
+  if (auth instanceof NextResponse) return auth
   if (pend.error) return dbError(pend.error)
   const pendBy = new Map<string, Pend>(
     pend.data.map((r) => {

@@ -5,6 +5,7 @@ import { createHash } from 'node:crypto'
 import { db } from './db'
 import { inChunks } from './paging'
 import { loadPhy, phyDdlInput } from './model-phy'
+import { loadLogical } from './model-logical'
 import { genDdl } from './modelpi/ddl'
 import { splitStatements } from './modelpi/ddl-parse'
 import { DBMS_PRFL, type DbmsCd } from './modelpi/dbms'
@@ -21,13 +22,14 @@ export interface DdlTarget {
 }
 
 export async function ddlTargets(areaId: string, prjId: string, mdlId: string) {
-  const p = await loadPhy(areaId, mdlId)
-  if (!p || p.mdl.prj_id !== prjId) return null
-  const [s, e, d] = await Promise.all([
+  // 저장 모델과 주제영역·엔터티·ERD 는 서로 독립 — 동시 조회(R-P1, 2026-10-24 전수 점검), 모델이 다른 프로젝트면 결과를 버림
+  const [p, s, e, d] = await Promise.all([
+    loadPhy(areaId, mdlId),
     db().from('mdl_subj').select('subj_id, subj_nm').eq('area_id', areaId).eq('prj_id', prjId).eq('del_yn', 'N').order('subj_nm'),
     db().from('mdl_ent').select('ent_id, subj_id').eq('area_id', areaId).eq('prj_id', prjId).eq('del_yn', 'N').limit(5000),
     db().from('mdl_dgm').select('dgm_id, subj_id').eq('area_id', areaId).eq('prj_id', prjId).eq('dgm_sts_cd', 'CMPTN').eq('del_yn', 'N').not('subj_id', 'is', null),
   ])
+  if (!p || p.mdl.prj_id !== prjId) return null
   for (const x of [s, e, d]) if (x.error) throw x.error
   const dgms = d.data as { dgm_id: string; subj_id: string }[]
   const de = await inChunks(dgms.map((x) => x.dgm_id), (p) => db().from('mdl_dgm_ent').select('dgm_id, ent_id').in('dgm_id', p).eq('del_yn', 'N').limit(10000))
@@ -50,14 +52,15 @@ const TP_RE = /^[A-Za-z][A-Za-z0-9 ]*$/
 
 // 선택 테이블 DDL — 문장·해시(실행 요청 스냅샷 대조용)·차단 사유. 차단이 하나라도 있으면 실행 요청 불가(미리보기·내려받기는 가능)
 export async function buildDdl(areaId: string, prjId: string, mdlId: string, tblIds: string[]) {
-  const tg = await ddlTargets(areaId, prjId, mdlId)
+  // 대상 판정과 논리 모델은 서로 독립 — 동시 조회(R-P1)
+  const [tg, lg] = await Promise.all([ddlTargets(areaId, prjId, mdlId), loadLogical(areaId, prjId)])
   if (!tg) return null
   const want = new Set(tblIds)
   const sel = tg.tables.filter((t) => want.has(t.phy_tbl_id))
   const blockers: string[] = []
   if (sel.length !== want.size) blockers.push('이 물리 모델의 테이블이 아닌 항목이 있습니다')
   for (const t of sel) if (!t.ok) blockers.push(`${t.tbl_nm} : ${t.why}`)
-  const x = await phyDdlInput(areaId, prjId, tg.p)
+  const x = await phyDdlInput(areaId, prjId, tg.p, lg)
   if (!x) return null
   const only = new Set(sel.filter((t) => t.ok).map((t) => t.ent_id))
   const max = DBMS_PRFL[tg.mdl.dbms_cd as DbmsCd]?.identMax ?? 30

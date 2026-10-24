@@ -2,6 +2,7 @@
 // 저장은 행 묶음 insert 4회(모델 → 테이블 → 칼럼 → FK). 중간 실패 시 이미 넣은 행을 논리 삭제로 되돌린다
 // ponytail: 다단 insert + 보상 논리 삭제 — 동시 전환·부분 실패 빈도가 문제 되면 DB 함수(JSON 입력 1트랜잭션)로
 import { db } from './db'
+import { inChunks } from './paging'
 import { loadLogical } from './model-logical'
 import { checkLogical } from './modelpi/normalize'
 import { toPhysical, type PhyCol, type PhyTbl, type TpMap } from './modelpi/phy'
@@ -44,13 +45,10 @@ export function phyPlanOf(m0: Awaited<ReturnType<typeof loadLogical>>, tp: TpMap
 
 // 엔터티 상태(논리 삭제 포함 — 저장된 물리 테이블의 동기화 범위 판정용)
 export async function entInfoOf(entIds: string[]) {
-  const out = new Map<string, { lgc_sts_cd: string; del_yn: string }>()
-  for (let i = 0; i < entIds.length; i += TBL_CHUNK) {
-    const r = await db().from('mdl_ent').select('ent_id, lgc_sts_cd, del_yn').in('ent_id', entIds.slice(i, i + TBL_CHUNK))
-    if (r.error) throw r.error
-    for (const x of r.data as { ent_id: string; lgc_sts_cd: string; del_yn: string }[]) out.set(x.ent_id, x)
-  }
-  return out
+  // 묶음 병렬 조회(R-P1, 2026-10-24 전수 점검)
+  const r = await inChunks<{ ent_id: string; lgc_sts_cd: string; del_yn: string }>(entIds, (part) => db().from('mdl_ent').select('ent_id, lgc_sts_cd, del_yn').in('ent_id', part))
+  if (r.error) throw r.error
+  return new Map(r.data.map((x) => [x.ent_id, x]))
 }
 
 export async function listPhy(areaId: string, prjId: string) {
@@ -61,13 +59,14 @@ export async function listPhy(areaId: string, prjId: string) {
 
 // 저장된 물리 모델 1건 → PhyTbl[](diff·DDL 입력) + 테이블별 인덱스 + FK
 export async function loadPhy(areaId: string, mdlId: string) {
-  const mdl = await db().from('mdl_phy_mdl').select('phy_mdl_id, prj_id, dbms_cd, idntfr_ltr_cd, del_col_use_yn, ver_no').eq('area_id', areaId).eq('phy_mdl_id', mdlId).eq('del_yn', 'N').maybeSingle()
-  if (mdl.error) throw mdl.error
-  if (!mdl.data) return null
-  const [t, f] = await Promise.all([
+  // 모델 확인과 테이블·FK 를 함께 조회(R-P1) — 모델이 이 분류체계 것이 아니면 결과를 버림
+  const [mdl, t, f] = await Promise.all([
+    db().from('mdl_phy_mdl').select('phy_mdl_id, prj_id, dbms_cd, idntfr_ltr_cd, del_col_use_yn, ver_no').eq('area_id', areaId).eq('phy_mdl_id', mdlId).eq('del_yn', 'N').maybeSingle(),
     db().from('mdl_phy_tbl').select('phy_tbl_id, ent_id, tbl_nm, tbl_desc, phy_sts_cd, phy_cmptn_dtm, auto_inc_yn, ver_no').eq('phy_mdl_id', mdlId).eq('del_yn', 'N').order('tbl_nm'),
     db().from('mdl_phy_fk').select('phy_fk_id, rel_id, fk_nm').eq('phy_mdl_id', mdlId).eq('del_yn', 'N'),
   ])
+  if (mdl.error) throw mdl.error
+  if (!mdl.data) return null
   for (const x of [t, f]) if (x.error) throw x.error
   const tbls = t.data as { phy_tbl_id: string; ent_id: string; tbl_nm: string; tbl_desc: string | null; phy_sts_cd: string; phy_cmptn_dtm: string | null; auto_inc_yn: 'Y' | 'N'; ver_no: number }[]
   type Col = PhyCol & { phy_col_id: string; phy_tbl_id: string; ver_no: number }
@@ -120,8 +119,9 @@ export async function loadPhy(areaId: string, mdlId: string) {
 }
 
 // DDL·물리 정의서 입력 — 저장된 물리 모델 + 논리(칼럼 설명 = 용어 논리명, FK 칼럼 쌍 원천 = 속성 fk_rel_id·src_attr_id, 관계 부모·자식)
-export async function phyDdlInput(areaId: string, prjId: string, p: NonNullable<Awaited<ReturnType<typeof loadPhy>>>): Promise<{ prjNm: string; d: DdlIn } | null> {
-  const m = await loadLogical(areaId, prjId)
+// lg = 호출 측이 저장 모델과 동시에 미리 받은 논리 모델(R-P1) — 없으면 여기서 조회
+export async function phyDdlInput(areaId: string, prjId: string, p: NonNullable<Awaited<ReturnType<typeof loadPhy>>>, lg?: Awaited<ReturnType<typeof loadLogical>>): Promise<{ prjNm: string; d: DdlIn } | null> {
+  const m = lg !== undefined ? lg : await loadLogical(areaId, prjId)
   if (!m) return null
   const attrs = m.ents.flatMap((e) => e.attrs)
   const lbl = new Map(attrs.map((a) => [a.attr_id, a.term_log_nm]))
@@ -146,7 +146,8 @@ export async function phyDdlInput(areaId: string, prjId: string, p: NonNullable<
 // 동기화 계획(S5) — 저장 모델 vs 현재 논리 변환
 // 범위(sync) = 작성중 테이블 중 엔터티가 작성완료(또는 논리 삭제)인 것 — 논리 편집 중·물리 작성완료 테이블은 건드리지 않음. all = 전환된 테이블 전체(차이 보기), only = 테이블 1개
 export async function syncPlan(areaId: string, prjId: string, p: NonNullable<Awaited<ReturnType<typeof loadPhy>>>, mode: 'sync' | 'all' = 'sync', only: string | string[] | null = null) {
-  const info = await entInfoOf(p.tables.map((t) => t.ent_id))
+  // 엔터티 상태와 현재 논리 변환은 서로 독립 — 함께 조회(R-P1)
+  const [info, plan] = await Promise.all([entInfoOf(p.tables.map((t) => t.ent_id)), phyPlan(areaId, prjId, p.mdl.dbms_cd as DbmsCd, new Set(p.tables.map((t) => t.ent_id)))])
   let prev = p.tables
   if (mode === 'sync') prev = prev.filter((t) => t.phy_sts_cd === 'WRT' && (info.get(t.ent_id)?.del_yn === 'Y' || info.get(t.ent_id)?.lgc_sts_cd === 'CMPTN'))
   if (only) {
@@ -156,7 +157,6 @@ export async function syncPlan(areaId: string, prjId: string, p: NonNullable<Awa
   }
   const prevEnts = new Set(prev.map((t) => t.ent_id))
   // FK 는 전환된 엔터티 전체로 계산(범위 밖 부모를 가리키는 FK 를 삭제로 오판하지 않게), 테이블·칼럼 변경은 범위 안만
-  const plan = await phyPlan(areaId, prjId, p.mdl.dbms_cd as DbmsCd, new Set(p.tables.map((t) => t.ent_id)))
   if (!plan) return null
   const next = plan.tables.filter((t) => prevEnts.has(t.ent_id))
   const ops = planSync(prev as unknown as StoredTbl[], next)
@@ -171,13 +171,9 @@ export async function syncPlan(areaId: string, prjId: string, p: NonNullable<Awa
 }
 
 async function relChldOf(relIds: string[]) {
-  const out = new Map<string, string>()
-  for (let i = 0; i < relIds.length; i += TBL_CHUNK) {
-    const r = await db().from('mdl_rel').select('rel_id, chld_ent_id').in('rel_id', relIds.slice(i, i + TBL_CHUNK))
-    if (r.error) throw r.error
-    for (const x of r.data as { rel_id: string; chld_ent_id: string }[]) out.set(x.rel_id, x.chld_ent_id)
-  }
-  return out
+  const r = await inChunks<{ rel_id: string; chld_ent_id: string }>(relIds, (part) => db().from('mdl_rel').select('rel_id, chld_ent_id').in('rel_id', part))
+  if (r.error) throw r.error
+  return new Map(r.data.map((x) => [x.rel_id, x.chld_ent_id]))
 }
 
 // FK 이름 재번호 — 변환 번호가 기존 FK 이름과 겹치면 같은 접두로 빈 번호
